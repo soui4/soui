@@ -12,20 +12,50 @@
  */
 #pragma once
 #include <ShellAPI.h>
-#include "SShellNofityHwnd2.h"
-#include "core\SWnd.h"
-
+#include <core/SWnd.h>
+#include <core/SNativeWnd.h>
  /**
   * @class      SShellNotifyIcon
   * @brief      ShellNotifyIcon
   *
   * Describe    ShellNotifyIcon
   */
+#define WM_ICONNOTIFY (WM_USER+1111)
+#ifndef ID_TASKBARICON
+#define ID_TASKBARICON	100
+#endif // !ID_TASKBARICON
+#define ANI_TIMER_ID 8
+
 namespace SOUI
 {
 	enum MenuType
 	{
 		menu, menuex, unknow
+	};
+
+	class SShellNotifyIcon;
+	class CShellNotifyHwnd2 :public SNativeWnd
+	{
+	public:
+		CShellNotifyHwnd2(SShellNotifyIcon* shellnotifyicon);
+		~CShellNotifyHwnd2(){}
+	protected:
+		//托盘通知消息处理函数
+		LRESULT OnIconNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL/* bHandled*/);
+		LRESULT OnTaskbarCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL);
+		virtual void OnFinalMessage(HWND hWnd);
+		void OnTimer(UINT_PTR nIDEvent);
+
+		BEGIN_MSG_MAP_EX(CShellNotifyHwnd2)
+			//托盘消息处理
+			MESSAGE_HANDLER(MsgTaskbarCreated, OnTaskbarCreated)
+			MSG_WM_TIMER(OnTimer)
+			MESSAGE_HANDLER(WM_ICONNOTIFY, OnIconNotify)
+			CHAIN_MSG_MAP(SNativeWnd)
+		END_MSG_MAP()
+	private:
+		SShellNotifyIcon	*m_ShellNotifyIcon;
+		UINT                MsgTaskbarCreated;		
 	};
 
 	class SShellNotifyIcon :public SWindow
@@ -52,48 +82,28 @@ namespace SOUI
 		BOOL Show();
 
 		BOOL Hide();
-		HRESULT SetTip(SStringW szTip,BOOL bLoading=FALSE);
-		BOOL ShowNotify(LPCTSTR szMsg, LPCTSTR szTitle = NULL)
-		{
-			if (szMsg)
-			{
-				_tcscpy_s(nid.szInfo, szMsg);
-				nid.uFlags |= NIF_INFO;
-				nid.uTimeout = 1000;
-				//nid.dwInfoFlags = NIIF_USER;
-			}
-			if (szTitle)
-			{
-				_tcscpy_s(nid.szInfoTitle, szTitle);
-			}
-			return Shell_NotifyIcon(NIM_MODIFY, &nid);
-		}
+		BOOL ShowNotify(LPCTSTR szMsg, LPCTSTR szTitle = NULL);
 		void ShowMenu();
 		void StartAni();
 		void StopAni();
 		bool IsRunAni() { return m_bRunAni; }
 		void SetDefIconIdx(int iIdx);
+
 	protected:
-		SOUI_MSG_MAP_BEGIN()
-			MSG_WM_PAINT_EX(OnPaint)
-			MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
-			MSG_WM_NCPAINT_EX(OnPaint)
-			SOUI_MSG_MAP_END()
+		virtual void WINAPI OnFinalRelease();
 	protected:
-		void OnPaint(SOUI::IRenderTarget * pRT) {};
-		BOOL OnEraseBkgnd(SOUI::IRenderTarget * pRT) { return TRUE; };
 		void NextFrame();
 		virtual BOOL CreateChildren(SXmlNode xmlNode);
-		virtual void WINAPI OnFinalRelease();
-		void Create(HWND hOwner, HICON hIcon, UINT uFlags = (NIF_ICON | NIF_MESSAGE | NIF_TIP), UINT uCallbackMessage = WM_ICONNOTIFY, UINT uId = ID_TASKBARICON);
-		void IniNotifyIconData(HWND hOwner, HICON hIcon, UINT flags, UINT callbackmsg, UINT ID, LPCTSTR szTip);
-		HRESULT SetMenu(SStringW strValue, BOOL bLoading);
-		HRESULT SetIcon(SStringW strValue, BOOL bLoading);
+		void IniNotifyIconData(HWND hOwner, HICON hIcon, UINT flags, LPCTSTR szTip);
+	protected:
+		HRESULT OnAttrMenu(SStringW strValue, BOOL bLoading);
+		HRESULT OnAttrIcons(SStringW strValue, BOOL bLoading);
+		HRESULT OnAttrTip(SStringW szTip,BOOL bLoading=FALSE);
 
 		SOUI_ATTRS_BEGIN()
-			ATTR_CUSTOM(L"ico", SetIcon)
-			ATTR_CUSTOM(L"tip", SetTip)
-			ATTR_CUSTOM(L"menu", SetMenu)
+			ATTR_CUSTOM(L"icons", OnAttrIcons)
+			ATTR_CUSTOM(L"tip", OnAttrTip)
+			ATTR_CUSTOM(L"menu", OnAttrMenu)
 			ATTR_INT(L"deficoidx", m_iDefIcon, FALSE)
 			ATTR_INT(L"startframe", m_iStartFrame, FALSE)
 			ATTR_INT(L"duration", m_iDuration,FALSE)
@@ -103,7 +113,7 @@ namespace SOUI
 		SStringT m_strTip;
 		SStringT m_strMenu;
 		MenuType m_menuType;
-		NOTIFYICONDATA nid;
+		NOTIFYICONDATA m_nid;
 		CShellNotifyHwnd2 *m_MsgOnlyWnd;
 		//  默认图标索引			开始帧位置		动画间隔时间
 		int m_iDefIcon, m_iCurFrame, m_iStartFrame, m_iDuration;

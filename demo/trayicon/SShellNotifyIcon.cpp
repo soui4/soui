@@ -13,27 +13,86 @@
 
 namespace SOUI
 {
+	CShellNotifyHwnd2::CShellNotifyHwnd2(SShellNotifyIcon* shellnotifyicon) :m_ShellNotifyIcon(shellnotifyicon)
+	{
+		MsgTaskbarCreated = RegisterWindowMessage(_T("TaskbarCreated"));
+		CreateWindow(_T("shell_nofity_msg_windows"), 0, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL);
+	}
+
+	//托盘通知消息处理函数
+
+	LRESULT CShellNotifyHwnd2::OnIconNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL)
+	{
+		LRESULT bRet = S_FALSE;
+		switch (lParam)
+		{
+		case  WM_RBUTTONDOWN:
+			{
+				m_ShellNotifyIcon->ShowMenu();
+				bRet = S_OK;
+			}break;
+		case WM_LBUTTONDOWN:
+			{
+				//if (m_pMainWnd->IsWindowVisible())
+				//	m_pMainWnd->ShowWindow(SW_HIDE);
+				//else
+				//{
+				//	m_pMainWnd->ShowWindow(SW_SHOW);
+				//	if(m_pMainWnd->IsIconic())
+				//	{
+				//		m_pMainWnd->SendMessage(WM_SYSCOMMAND,SC_RESTORE);
+				//	}
+
+				//	SetForegroundWindow(m_pMainWnd->m_hWnd);
+				//}
+				bRet = S_OK;
+			}break;
+		}
+		return bRet;
+	}
+
+	LRESULT CShellNotifyHwnd2::OnTaskbarCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL)
+	{
+		return m_ShellNotifyIcon->Show();
+	}
+
+	void CShellNotifyHwnd2::OnFinalMessage(HWND hWnd)
+	{
+		__super::OnFinalMessage(hWnd);
+		delete this;
+	}
+
+	void CShellNotifyHwnd2::OnTimer(UINT_PTR nIDEvent)
+	{
+		switch (nIDEvent)
+		{
+		case ANI_TIMER_ID:
+			{
+				m_ShellNotifyIcon->NextFrame();
+			}break;
+		default:
+			break;
+		}
+	}
+
+	//////////////////////////////////////////////////////////////////////////
 	SShellNotifyIcon::SShellNotifyIcon() :m_menuType(unknow), m_MsgOnlyWnd(NULL), m_iDefIcon(0), m_iStartFrame(1), m_bRunAni(false), m_iDuration(200)
 	{
-		memset(&nid, 0, sizeof(nid));
+		memset(&m_nid, 0, sizeof(m_nid));
+		m_bFloat = TRUE;
 	}
 
 	SShellNotifyIcon::~SShellNotifyIcon() {}
 
-	void SShellNotifyIcon::Create(HWND hOwner, HICON hIcon, UINT uFlags, UINT uCallbackMessage, UINT uId)
-	{
-		IniNotifyIconData(hOwner, hIcon, uFlags, uCallbackMessage, uId, m_strTip);
-	}
-
-	void SShellNotifyIcon::IniNotifyIconData(HWND hOwner, HICON hIcon, UINT flags, UINT callbackmsg, UINT ID, LPCTSTR szTip)
+	void SShellNotifyIcon::IniNotifyIconData(HWND hOwner, HICON hIcon, UINT flags, LPCTSTR szTip)
 	{	
-		nid.cbSize = sizeof(NOTIFYICONDATA);
-		nid.hWnd = hOwner;
-		nid.uID = ID;
-		nid.uFlags = flags;//NIF_ICON | NIF_MESSAGE | NIF_TIP;
-		nid.uCallbackMessage = callbackmsg;
-		nid.hIcon = hIcon;
-		_tcscpy_s(nid.szTip, szTip);
+		m_nid.cbSize = sizeof(NOTIFYICONDATA);
+		m_nid.hWnd = hOwner;
+		m_nid.uID = ID_TASKBARICON;
+		m_nid.uCallbackMessage = WM_ICONNOTIFY;
+		m_nid.uFlags = flags;
+		m_nid.hIcon = hIcon;
+		_tcscpy_s(m_nid.szTip, szTip);
 	}
 
 	void SShellNotifyIcon::ShowMenu()
@@ -75,8 +134,8 @@ namespace SOUI
 		{
 			if (m_ArrIcon.GetCount() - (m_iStartFrame + 1) > 2)//至少要两帧吧。。。
 			{
-				nid.uFlags |= NIF_ICON;
-				nid.uFlags &= ~NIF_INFO;
+				m_nid.uFlags |= NIF_ICON;
+				m_nid.uFlags &= ~NIF_INFO;
 				m_iCurFrame = m_iStartFrame;
 				m_MsgOnlyWnd->SetTimer(ANI_TIMER_ID, m_iDuration);
 				m_bRunAni = true;
@@ -93,8 +152,8 @@ namespace SOUI
 			m_bRunAni = false;
 			m_MsgOnlyWnd->KillTimer(ANI_TIMER_ID);
 		}
-		nid.hIcon = m_ArrIcon[m_iDefIcon];
-		Shell_NotifyIcon(NIM_MODIFY, &nid);
+		m_nid.hIcon = m_ArrIcon[m_iDefIcon];
+		Shell_NotifyIcon(NIM_MODIFY, &m_nid);
 	}
 
 	void SShellNotifyIcon::SetDefIconIdx(int iIdx)
@@ -104,10 +163,10 @@ namespace SOUI
 		m_iDefIcon = iIdx;
 		if (!m_bRunAni)
 		{
-			nid.uFlags |= NIF_ICON;
-			nid.uFlags &= ~NIF_INFO;
-			nid.hIcon = m_ArrIcon[m_iDefIcon];
-			Shell_NotifyIcon(NIM_MODIFY, &nid);
+			m_nid.uFlags |= NIF_ICON;
+			m_nid.uFlags &= ~NIF_INFO;
+			m_nid.hIcon = m_ArrIcon[m_iDefIcon];
+			Shell_NotifyIcon(NIM_MODIFY, &m_nid);
 		}
 	}
 
@@ -115,11 +174,11 @@ namespace SOUI
 	{
 		if (m_iCurFrame >= m_ArrIcon.GetCount())
 			m_iCurFrame = m_iStartFrame;
-		nid.hIcon = m_ArrIcon[m_iCurFrame++];
-		Shell_NotifyIcon(NIM_MODIFY, &nid);
+		m_nid.hIcon = m_ArrIcon[m_iCurFrame++];
+		Shell_NotifyIcon(NIM_MODIFY, &m_nid);
 	}
 
-	HRESULT SShellNotifyIcon::SetMenu(SStringW strValue, BOOL bLoading)
+	HRESULT SShellNotifyIcon::OnAttrMenu(SStringW strValue, BOOL bLoading)
 	{
 		SXmlDoc xmlDoc;
 		if (SApplication::getSingleton().LoadXmlDocment(xmlDoc, S_CW2T(strValue)))
@@ -137,7 +196,7 @@ namespace SOUI
 		else return S_FALSE;
 	}
 	
-	HRESULT SShellNotifyIcon::SetIcon(SStringW strValue, BOOL bLoading)
+	HRESULT SShellNotifyIcon::OnAttrIcons(SStringW strValue, BOOL bLoading)
 	{
 		for (size_t i = 0; i < m_ArrIcon.GetCount(); i++)
 		{
@@ -159,27 +218,27 @@ namespace SOUI
 	BOOL SShellNotifyIcon::Show()
 	{
 		//未初使化NotifyIconData
-		if (nid.cbSize != sizeof(NOTIFYICONDATA))
+		if (m_nid.cbSize != sizeof(NOTIFYICONDATA))
 			return FALSE;
-		return Shell_NotifyIcon(NIM_ADD, &nid);
+		return Shell_NotifyIcon(NIM_ADD, &m_nid);
 	}
 
 	BOOL SShellNotifyIcon::Hide()
 	{
-		return Shell_NotifyIcon(NIM_DELETE, &nid);
+		return Shell_NotifyIcon(NIM_DELETE, &m_nid);
 	}
 
-	HRESULT SShellNotifyIcon::SetTip(SStringW szTip, BOOL bLoading)
+	HRESULT SShellNotifyIcon::OnAttrTip(SStringW szTip, BOOL bLoading)
 	{	
 		if (!szTip.IsEmpty())
 		{
 			m_strTip = S_CW2T(GETSTRING(szTip));
 			if (!bLoading)
 			{
-				nid.uFlags |= NIF_TIP;
-				nid.uFlags &= ~NIF_INFO;
-				_tcscpy_s(nid.szTip, m_strTip);
-				Shell_NotifyIcon(NIM_MODIFY, &nid);
+				m_nid.uFlags |= NIF_TIP;
+				m_nid.uFlags &= ~NIF_INFO;
+				_tcscpy_s(m_nid.szTip, m_strTip);
+				Shell_NotifyIcon(NIM_MODIFY, &m_nid);
 			}
 			return S_OK;
 		}
@@ -188,15 +247,12 @@ namespace SOUI
 
 	BOOL SShellNotifyIcon::CreateChildren(SXmlNode xmlNode)
 	{
-		SHostWnd *pHostWnd = (SHostWnd*)(GetRoot()->GetContainer());
-		SASSERT(pHostWnd);
-		m_MsgOnlyWnd = new CShellNotifyHwnd2(pHostWnd, this);
+		m_MsgOnlyWnd = new CShellNotifyHwnd2(this);
 		SASSERT(IsWindow(m_MsgOnlyWnd->m_hWnd));
 		SASSERT(m_iDefIcon < m_ArrIcon.GetCount());
-		//SASSERT(m_ArrIcon.GetCount()>0);
 		if (m_iDefIcon >= m_ArrIcon.GetCount())
 			m_iDefIcon = 0;
-		Create(m_MsgOnlyWnd->m_hWnd, m_ArrIcon.GetCount() == 0 ? GETRESPROVIDER->LoadIcon(_T("ICON_LOGO"), 16) : m_ArrIcon[m_iDefIcon]);
+		IniNotifyIconData(m_MsgOnlyWnd->m_hWnd, m_ArrIcon.GetCount() == 0 ? GETRESPROVIDER->LoadIcon(_T("ICON_LOGO"), 16) : m_ArrIcon[m_iDefIcon],m_strTip);
 		return Show();
 	}
 
@@ -212,6 +268,21 @@ namespace SOUI
 			m_ArrIcon.RemoveAll();
 			m_MsgOnlyWnd->PostMessage(WM_CLOSE);
 		}
+	}
+
+	BOOL SShellNotifyIcon::ShowNotify(LPCTSTR szMsg, LPCTSTR szTitle /*= NULL*/)
+	{
+		if (szMsg)
+		{
+			_tcscpy_s(m_nid.szInfo, szMsg);
+			m_nid.uFlags |= NIF_INFO;
+			m_nid.uTimeout = 1000;
+		}
+		if (szTitle)
+		{
+			_tcscpy_s(m_nid.szInfoTitle, szTitle);
+		}
+		return Shell_NotifyIcon(NIM_MODIFY, &m_nid);
 	}
 
 

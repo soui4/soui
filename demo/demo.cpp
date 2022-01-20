@@ -44,18 +44,14 @@
 #define RES_TYPE 1		//从PE资源中加载UI资源
 #endif
 // #define RES_TYPE 1   //从PE资源中加载UI资源
-// #define RES_TYPE 2   //从zip包中加载资源
+//#define RES_TYPE 2   //从zip包中加载资源
 
 #include "../components/resprovider-zip/zipresprovider-param.h"
 
 #ifdef _DEBUG
 #define SYS_NAMED_RESOURCE _T("soui-sys-resourced.dll")
-//#pragma comment(lib,"lua-52d")
-//#pragma comment(lib,"scriptmodule-luad")
 #else
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
-//#pragma comment(lib,"lua-52")
-//#pragma comment(lib,"scriptmodule-lua")
 #endif
 
 #include "../controls.extend/smiley/ssmileyctrl.h"
