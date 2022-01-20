@@ -84,13 +84,9 @@ HEADERS += MainDlg.h \
           ../controls.extend/saniwindow.h \
           ../controls.extend/sgrouplist.h \
           ../controls.extend/SMcListViewEx/STabCtrlHeaderBinder.h \
-          httpsvr/filereader-i.h \
-          httpsvr/genericserver.h \
-          httpsvr/httpserver.h \
           magnet/magnetframe.h \
           smatrixwindow.h \
           sroundimage.h \
-          memflash.h \          
           threadObject.h \
           SmileyCreateHook.h \
           uianimation/uianimation.h \
@@ -148,10 +144,7 @@ SOURCES += demo.cpp \
           ../controls.extend/sprogressring.cpp \
           ../controls.extend/saniwindow.cpp \
           ../controls.extend/sgrouplist.cpp \
-          httpsvr/genericserver.cpp \
-          httpsvr/httpserver.cpp \
           magnet/magnetframe.cpp \
-          memflash.cpp	\
           smatrixwindow.cpp \ 
           sroundimage.cpp \          
           threadObject.cpp \
