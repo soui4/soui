@@ -377,6 +377,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
         
 		SNotifyCenter *pNotifyCenter = new SNotifyCenter;
         {
+			SmileyCreateHook  smileyHook;
 			//设置提示窗口布局
 			STipWnd::SetLayout(_T("layout:dlg_tip"));
 
@@ -388,7 +389,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
             dlgMain.CenterWindow();
             dlgMain.ShowWindow(SW_SHOWNORMAL);
 
-            SmileyCreateHook  smileyHook; //不知道MainDlg里哪块和mhook冲突了，在win10中，如果hook放到dlgmain.create前会导致hook失败。
             nRet=theApp->Run(dlgMain.m_hWnd);
         }
 		delete pNotifyCenter;
