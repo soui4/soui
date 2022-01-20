@@ -33,7 +33,7 @@
 #include "skin/SetSkinWnd2.h"
 #include "../controls.extend/SMcListViewEx/SMCListViewEx.h"
 #include "adapter.h"
-#include "trayicon/SShellNotifyIcon.h"
+#include "trayicon/SShellTray.h"
 #include "CAdapter.h"
 #include "CDropTarget.h"
 
@@ -423,7 +423,7 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
 		pTreeViewAdapter->Release();
 	}
 
-	FindChildByID2<SShellNotifyIcon>(8)->StartAni();
+	FindChildByID2<SShellTray>(R.id.tray_008)->StartAni();
 
 	SPathView *pPathView = FindChildByName2<SPathView>("pv_test");
 	if(pPathView)
@@ -1244,3 +1244,36 @@ void CMainDlg::onAnimationUpdate(IValueAnimator *pAnimator)
 	}
 }
 
+void CMainDlg::OnShellTrayNotify(IEvtArgs * e)
+{
+	EventTrayNotify *e2 = sobj_cast<EventTrayNotify>(e);
+	SShellTray *pTray = sobj_cast<SShellTray>(e->Sender());
+	switch(e2->lp)
+	{
+	case WM_LBUTTONDOWN:
+		if(IsWindowVisible())
+		{
+			ShowWindow(SW_HIDE);
+		}else
+		{
+			ShowWindow(SW_SHOW);
+			if(IsIconic())
+			{
+				OnRestore();
+			}
+		}
+		break;
+	case WM_RBUTTONDOWN:
+		{
+			SMenuEx tmenuex;
+			if (tmenuex.LoadMenu(_T("SMENUEX:menu_tray")))
+			{
+				POINT pt;
+				GetCursorPos(&pt);
+				SetForegroundWindow(m_hWnd);
+				tmenuex.TrackPopupMenu(0, pt.x, pt.y, m_hWnd);
+			}
+		}
+		break;
+	}
+}

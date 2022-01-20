@@ -57,7 +57,7 @@
 #include "../controls.extend/smiley/ssmileyctrl.h"
 #include "skin/SDemoSkin.h"
 #include "skin/SSkinLoader.h"
-#include "trayicon/SShellNotifyIcon.h"
+#include "trayicon/SShellTray.h"
 #include "qrcode/SQrCtrl.h"
 
 #include <interface/STaskLoop-i.h>
@@ -269,7 +269,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
         theApp->RegisterWindowClass<SRadioBox2>();//注册RadioBox2
         theApp->RegisterWindowClass<SCalendar2>();//注册SCalendar2
 
-		theApp->RegisterWindowClass<SShellNotifyIcon>();
+		theApp->RegisterWindowClass<SShellTray>();
 
         SSkinGif::Gdiplus_Startup();
         

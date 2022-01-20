@@ -28,40 +28,47 @@
 
 namespace SOUI
 {
-	enum MenuType
+	struct IShellTrayListener
 	{
-		menu, menuex, unknow
+		virtual void NextFrame() = 0;
+		virtual void OnNotify(UINT uMsg, WPARAM wParam, LPARAM lParam) = 0;
+		virtual void OnTaskbarRecreate() = 0;
 	};
 
-	class SShellNotifyIcon;
-	class CShellNotifyHwnd2 :public SNativeWnd
+	class SShellTrayMsgWnd :public SNativeWnd
 	{
 	public:
-		CShellNotifyHwnd2(SShellNotifyIcon* shellnotifyicon);
-		~CShellNotifyHwnd2(){}
+		SShellTrayMsgWnd(IShellTrayListener* shellnotifyicon);
+		~SShellTrayMsgWnd(){}
 	protected:
 		//托盘通知消息处理函数
-		LRESULT OnIconNotify(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL/* bHandled*/);
-		LRESULT OnTaskbarCreated(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL);
+		LRESULT OnIconNotify(UINT uMsg, WPARAM wParam, LPARAM lParam);
+		LRESULT OnTaskbarCreated(UINT uMsg, WPARAM wParam, LPARAM lParam);
 		virtual void OnFinalMessage(HWND hWnd);
+
 		void OnTimer(UINT_PTR nIDEvent);
 
-		BEGIN_MSG_MAP_EX(CShellNotifyHwnd2)
-			//托盘消息处理
-			MESSAGE_HANDLER(MsgTaskbarCreated, OnTaskbarCreated)
+		//托盘消息处理
+		BEGIN_MSG_MAP_EX(SShellTrayMsgWnd)
 			MSG_WM_TIMER(OnTimer)
-			MESSAGE_HANDLER(WM_ICONNOTIFY, OnIconNotify)
+			MESSAGE_HANDLER_EX(MsgTaskbarCreated, OnTaskbarCreated)
+			MESSAGE_HANDLER_EX(WM_ICONNOTIFY, OnIconNotify)
 			CHAIN_MSG_MAP(SNativeWnd)
 		END_MSG_MAP()
 	private:
-		SShellNotifyIcon	*m_ShellNotifyIcon;
+		IShellTrayListener	*m_ShellNotifyIcon;
 		UINT                MsgTaskbarCreated;		
 	};
 
-	class SShellNotifyIcon :public SWindow
+	DEF_EVT_EXT(EventTrayNotify,EVT_EXTERNAL_BEGIN+699,{
+		UINT uMsg;
+		WPARAM wp;
+		LPARAM lp;
+	});
+
+	class SShellTray :public SWindow, public IShellTrayListener
 	{
 		SOUI_CLASS_NAME(SWindow, L"shellnotifyicon")
-		friend class CShellNotifyHwnd2;
 	public:
 		/**
 		 * SShellNotifyIcon::SShellNotifyIcon
@@ -69,7 +76,7 @@ namespace SOUI
 		 *
 		 * Describe  构造函数
 		 */
-		SShellNotifyIcon();
+		SShellTray();
 
 		/**
 		 * SShellNotifyIcon::~SShellNotifyIcon
@@ -77,33 +84,31 @@ namespace SOUI
 		 *
 		 * Describe  析构函数
 		 */
-		~SShellNotifyIcon();
+		~SShellTray();
 
+	public:
 		BOOL Show();
-
 		BOOL Hide();
-		BOOL ShowNotify(LPCTSTR szMsg, LPCTSTR szTitle = NULL);
-		void ShowMenu();
 		void StartAni();
 		void StopAni();
 		bool IsRunAni() { return m_bRunAni; }
 		void SetDefIconIdx(int iIdx);
+	protected:
+		void WINAPI OnFinalRelease() override;
+		void WINAPI OnInitFinished(THIS_ IXmlNode * xmlNode) override;
+	protected:
+		void NextFrame() override;
+		void OnNotify(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
+		void OnTaskbarRecreate() override;
 
-	protected:
-		virtual void WINAPI OnFinalRelease();
-	protected:
-		void NextFrame();
-		virtual BOOL CreateChildren(SXmlNode xmlNode);
 		void IniNotifyIconData(HWND hOwner, HICON hIcon, UINT flags, LPCTSTR szTip);
 	protected:
-		HRESULT OnAttrMenu(SStringW strValue, BOOL bLoading);
 		HRESULT OnAttrIcons(SStringW strValue, BOOL bLoading);
 		HRESULT OnAttrTip(SStringW szTip,BOOL bLoading=FALSE);
 
 		SOUI_ATTRS_BEGIN()
 			ATTR_CUSTOM(L"icons", OnAttrIcons)
 			ATTR_CUSTOM(L"tip", OnAttrTip)
-			ATTR_CUSTOM(L"menu", OnAttrMenu)
 			ATTR_INT(L"deficoidx", m_iDefIcon, FALSE)
 			ATTR_INT(L"startframe", m_iStartFrame, FALSE)
 			ATTR_INT(L"duration", m_iDuration,FALSE)
@@ -112,9 +117,8 @@ namespace SOUI
 		SArray<HICON> m_ArrIcon;
 		SStringT m_strTip;
 		SStringT m_strMenu;
-		MenuType m_menuType;
 		NOTIFYICONDATA m_nid;
-		CShellNotifyHwnd2 *m_MsgOnlyWnd;
+		SShellTrayMsgWnd *m_MsgOnlyWnd;
 		//  默认图标索引			开始帧位置		动画间隔时间
 		int m_iDefIcon, m_iCurFrame, m_iStartFrame, m_iDuration;
 		bool m_bRunAni;

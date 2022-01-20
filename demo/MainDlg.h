@@ -20,6 +20,7 @@ using namespace SOUI;
 #include "skin/SDemoSkin.h"
 #include "../../controls.extend/SMcListViewEx/STabCtrlHeaderBinder.h"
 #include <helper/SDpiHelper.hpp>
+#include "trayicon/SShellTray.h"
 
 extern UINT g_dwSkinChangeMessage;
 //演示使用SNotifyCenter的异步事件
@@ -216,8 +217,10 @@ protected:
 	void OnSouiClick();
 
 	void OnSetHostAnimation();
+	void OnShellTrayNotify(IEvtArgs * e);
     //UI控件的事件及响应函数映射表
 	EVENT_MAP_BEGIN()
+		EVENT_ID_HANDLER(R.id.tray_008,EventTrayNotify::EventID,OnShellTrayNotify)
 		EVENT_NAME_COMMAND(L"btn_ani_hostwnd", OnSetHostAnimation)
 		EVENT_HANDLER(EventPath::EventID,OnEventPath)
 		EVENT_ID_HANDLER(R.id.cbx_interpolator,EventCBSelChange::EventID,OnCbxInterpolotorChange)
