@@ -13,6 +13,7 @@ translucent="1"
     </caption>
     <window pos="5,[2,-5,-5">
       <text pos="|0,|0" offset="-0.5,-0.5">这是一个由SOUI向导生成的APP框架</text>
+      <img pos="0,0,50,50" name="img_test"/>
     </window>
   </root>
 </SOUI>

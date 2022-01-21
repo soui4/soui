@@ -609,6 +609,8 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) OVERRIDE;
 
+	STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id,IObjRef **ppRet) OVERRIDE;
+
   public: // caret相关方法
     STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) OVERRIDE;
     STDMETHOD_(void, ShowCaret)(THIS_ BOOL bShow) OVERRIDE;
@@ -1468,4 +1470,43 @@ class SOUI_EXP SWindow
     DWORD m_nMainThreadId; /**< 窗口宿线程ID */
 #endif
 };
+
+
+template <class T,class Base=SWindow>
+class TWindowProxy
+	: public T
+	, public Base {
+public:
+	STDMETHOD_(long, AddRef)(THIS) OVERRIDE
+	{
+		return Base::AddRef();
+	}
+	STDMETHOD_(long, Release)(THIS) OVERRIDE
+	{
+		return Base::Release();
+	}
+	STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
+	{
+		Base::OnFinalRelease();
+	}
+
+	STDMETHOD_(IWindow*, GetWindow)(THIS) OVERRIDE
+	{
+		return (Base*)this;
+	}
+
+	STDMETHOD_(HRESULT, QueryInterface)(REFGUID id,IObjRef **ppRet) OVERRIDE
+	{
+		if(id == __uuidof(T))
+		{
+			*ppRet = (T*)this;
+			AddRef();
+			return S_OK;
+		}else
+		{
+			return Base::QueryInterface(id,ppRet);
+		}
+	}
+};
+
 } // namespace SOUI

@@ -55,7 +55,7 @@ class SOUI_EXP SSliderBar : public SProgress {
         SC_RAILBACK,
     };
 
-  public:
+  protected:
     /**
      * SSliderBar::HitTest
      * @brief    测试点

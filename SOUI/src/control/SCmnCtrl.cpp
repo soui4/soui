@@ -977,7 +977,7 @@ void SProgress::SetRange(int nMin, int nMax)
     Invalidate();
 }
 
-void SProgress::GetRange(int *pMin, int *pMax)
+void SProgress::GetRange(int *pMin, int *pMax) const
 {
     if (pMin)
         *pMin = m_nMinValue;

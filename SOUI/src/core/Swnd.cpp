@@ -3506,6 +3506,12 @@ BOOL SWindow::UnsubscribeEvent(THIS_ DWORD evtId, const IEvtSlot *pSlot)
     return GetEventSet()->unsubscribeEvent(evtId, pSlot);
 }
 
+
+HRESULT SWindow::QueryInterface(THIS_ REFGUID id,IObjRef **ppRet)
+{
+	return E_NOINTERFACE;
+}
+
 //////////////////////////////////////////////////////////////////////////
 static SWindow *ICWND_NONE = (SWindow *)-2;
 SWindow::SAnimationHandler::SAnimationHandler(SWindow *pOwner)

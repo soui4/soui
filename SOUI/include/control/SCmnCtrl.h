@@ -15,6 +15,7 @@
 #include "core/SWnd.h"
 #include "core/SAccelerator.h"
 #include "core/SFocusManager.h"
+#include <interface/SCtrl-i.h>
 
 namespace SOUI
 {
@@ -288,6 +289,7 @@ class SOUI_EXP SImageButton : public SButton {
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
 };
 
+
 /**
  * @class      SImageWnd
  * @brief      图片控件类
@@ -295,7 +297,7 @@ class SOUI_EXP SImageButton : public SButton {
  * Describe    Image Control 图片控件类
  * Usage       Usage: <img skin="skin" sub="0"/>
  */
-class SOUI_EXP SImageWnd : public SWindow {
+class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
     SOUI_CLASS_NAME(SWindow, L"img")
   public:
     /**
@@ -314,7 +316,6 @@ class SOUI_EXP SImageWnd : public SWindow {
      */
     virtual ~SImageWnd();
 
-    void OnPaint(IRenderTarget *pRT);
 
     /**
      * SImageWnd::SetSkin
@@ -326,7 +327,7 @@ class SOUI_EXP SImageWnd : public SWindow {
      *
      * Describe  设置皮肤
      */
-    BOOL SetSkin(ISkinObj *pSkin, int iFrame = 0, BOOL bAutoFree = TRUE);
+    BOOL WINAPI SetSkin(ISkinObj *pSkin, int iFrame = 0, BOOL bAutoFree = TRUE);
 
     /**
      * SImageWnd::SetImage
@@ -336,9 +337,9 @@ class SOUI_EXP SImageWnd : public SWindow {
      *
      * Describe  设置绘制图片
      */
-    void SetImage(IBitmap *pBitmap, FilterLevel fl = kNone_FilterLevel);
+    void WINAPI SetImage(IBitmap *pBitmap, FilterLevel fl = kNone_FilterLevel);
 
-    IBitmap *GetImage();
+    IBitmap * WINAPI GetImage();
 
     /**
      * SImageWnd::SetIcon
@@ -348,7 +349,7 @@ class SOUI_EXP SImageWnd : public SWindow {
      *
      * Describe  设置图标
      */
-    BOOL SetIcon(int nSubID);
+    BOOL WINAPI SetIcon(int nSubID);
 
     /**
      * SImageWnd::GetSkin
@@ -357,7 +358,7 @@ class SOUI_EXP SImageWnd : public SWindow {
      *
      * Describe  获取资源
      */
-    ISkinObj *GetSkin()
+    ISkinObj * WINAPI GetSkin()
     {
         return m_pSkin;
     }
@@ -391,6 +392,9 @@ class SOUI_EXP SImageWnd : public SWindow {
     ATTR_BOOL(L"keepAspect", m_bKeepAspect, TRUE)
     SOUI_ATTRS_END()
 
+protected:
+	void OnPaint(IRenderTarget *pRT);
+
     SOUI_MSG_MAP_BEGIN()
     MSG_WM_PAINT_EX(OnPaint)
     SOUI_MSG_MAP_END()
@@ -403,7 +407,7 @@ class SOUI_EXP SImageWnd : public SWindow {
  * Describe    此窗口支持动画效果
  */
 class SOUI_EXP SAnimateImgWnd
-    : public SWindow
+    : public TWindowProxy<IAnimateImgWnd> 
     , public ITimelineHandler {
     SOUI_CLASS_NAME(SWindow, L"animateimg")
   public:
@@ -431,14 +435,14 @@ class SOUI_EXP SAnimateImgWnd
      *
      * Describe  启动动画
      */
-    void Start();
+    void WINAPI Start();
     /**
      * SAnimateImgWnd::Stop
      * @brief    停止动画
      *
      * Describe  停止动画
      */
-    void Stop();
+    void WINAPI Stop();
 
     /**
      * SAnimateImgWnd::IsPlaying
@@ -447,7 +451,7 @@ class SOUI_EXP SAnimateImgWnd
      *
      * Describe  判断动画运行状态
      */
-    BOOL IsPlaying()
+    BOOL WINAPI IsPlaying() SCONST
     {
         return m_bPlaying;
     }
@@ -501,7 +505,7 @@ class SOUI_EXP SAnimateImgWnd
  * Describe    进度条类
  * Usage: <progress bgskin=xx posskin=xx min=0 max=100 value=10,showpercent=0/>
  */
-class SOUI_EXP SProgress : public SWindow {
+class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
     SOUI_CLASS_NAME(SWindow, L"progress")
   public:
     /**
@@ -520,7 +524,7 @@ class SOUI_EXP SProgress : public SWindow {
      *
      * Describe  设置进度条进度值
      */
-    BOOL SetValue(int nValue);
+    BOOL WINAPI SetValue(int nValue);
     /**
      * SProgress::GetValue
      * @brief    获取进度值
@@ -528,7 +532,7 @@ class SOUI_EXP SProgress : public SWindow {
      *
      * Describe  获取进度值
      */
-    int GetValue()
+    int WINAPI GetValue() const
     {
         return m_nValue;
     }
@@ -541,7 +545,7 @@ class SOUI_EXP SProgress : public SWindow {
      *
      * Describe  设置进度值
      */
-    void SetRange(int nMin, int nMax);
+    void WINAPI SetRange(int nMin, int nMax);
     /**
      * SProgress::GetRange
      * @param    int nMin  --  进度最小值
@@ -550,7 +554,7 @@ class SOUI_EXP SProgress : public SWindow {
      *
      * Describe  获取进度值
      */
-    void GetRange(int *pMin, int *pMax);
+    void WINAPI GetRange(int *pMin, int *pMax) const;
     /**
      * SProgress::IsVertical
      * @brief    判断进度条是否为竖直状态
@@ -558,7 +562,7 @@ class SOUI_EXP SProgress : public SWindow {
      *
      * Describe  获取进度值
      */
-    BOOL IsVertical() const
+    BOOL WINAPI IsVertical() const
     {
         return m_bVertical;
     }

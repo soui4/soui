@@ -315,6 +315,8 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(BOOL, SubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
 
     STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
+
+	STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id,IObjRef **ppRet) PURE;
 };
 
 SNSEND
