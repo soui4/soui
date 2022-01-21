@@ -145,6 +145,7 @@ function AddConfig(proj, strProjectName) {
         var mtSet = wizard.FindSymbol('MT');
         // DebugÉèÖÃ
         var config = proj.Object.Configurations('Debug');
+        config.ConfigurationType = typeDynamicLibrary;
         config.CharacterSet = (unicodeSet == 1) ? charSetUNICODE : charSetMBCS;
         if (WizardVersion >= 10.0) {
             config.IntermediateDirectory = '$(Configuration)\\';
@@ -188,6 +189,7 @@ function AddConfig(proj, strProjectName) {
 		}
         // ReleaseÉèÖÃ
         var config = proj.Object.Configurations('Release');
+        config.ConfigurationType = typeDynamicLibrary;
         config.CharacterSet = (unicodeSet == 1) ? charSetUNICODE : charSetMBCS;
         if (WizardVersion >= 10.0) {
             config.IntermediateDirectory = '$(Configuration)\\';

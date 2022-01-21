@@ -34,10 +34,8 @@ res\soui_res.rc2
 [!if CHECKBOX_SHELLNOTIFYICON]
 [uires]xml\menu_tray.xml
 [uires]image\traymenu_icons.png
-trayicon\SShellNotifyIcon.h
-trayicon\SShellNotifyIcon.cpp
-trayicon\SShellNofityHwnd2.h
-trayicon\SShellNofityHwnd2.cpp
+trayicon\SShellTray.h
+trayicon\SShellTray.cpp
 [!endif]
 
 [!if ResLoaderType!=0]

@@ -1,10 +1,6 @@
 #include "stdafx.h"
 #include "AppUI.h"
 #include "MainDlg.h"
-[!if CHECKBOX_SHELLNOTIFYICON]
-#include "trayicon\SShellNotifyIcon.h"
-[!endif]
-
 
 //从PE文件加载，注意从文件加载路径位置
 #define RES_TYPE 0
@@ -37,8 +33,8 @@
 #endif
 [!endif]
 
-//定义唯一的一个R,UIRES对象,ROBJ_IN_CPP是resource.h中定义的宏。
-ROBJ_IN_CPP
+#define INIT_R_DATA
+#include "res/resource.h"
 
 HMODULE UI_Engine::m_hInstance = NULL;
 HWND UI_Engine::m_hParent = NULL;
@@ -159,8 +155,9 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 		}
 #endif
 
-		theApp->InitXmlNamedID(namedXmlID, ARRAYSIZE(namedXmlID), TRUE);
-		theApp->AddResProvider(pResProvider);
+			//如果需要在代码中使用R::id::namedid这种方式来使用控件必须要这一行代码：2016年2月2日，R::id,R.name是由uiresbuilder 增加-h .\res\resource.h 这2个参数后生成的。
+			theApp->InitXmlNamedID((const LPCWSTR*)&R.name,(const int*)&R.id,sizeof(R.id)/sizeof(int));
+			theApp->AddResProvider(pResProvider);
 		
 [!if CHECKBOX_USE_LUA]
 		//加载LUA脚本模块。
@@ -181,12 +178,12 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 		if (trans)
 		{//加载语言翻译包
 			theApp->SetTranslator(trans);
-			pugi::xml_document xmlLang;
+			SXmlDoc xmlLang;
 			if (theApp->LoadXmlDocment(xmlLang, _T("lang_cn"), _T("translator")))
 			{
 				CAutoRefPtr<ITranslator> langCN;
 				trans->CreateTranslator(&langCN);
-				langCN->Load(&xmlLang.child(L"language"), 1);//1=LD_XML
+				langCN->Load(&xmlLang.root().child(L"language"), 1);//1=LD_XML
 				trans->InstallTranslator(langCN);
 			}
 		}
