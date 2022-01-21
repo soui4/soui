@@ -13,6 +13,7 @@ typedef enum _SObjectType
 	Interpolator,
 	Animation,
 	ValueAnimator,
+	UserType,
 }SObjectType;
 
 SNSEND

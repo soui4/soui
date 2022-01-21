@@ -51,7 +51,7 @@ trCtx="dlg_main"
     </window>
 [!endif]
 [!if CHECKBOX_SHELLNOTIFYICON]
-<shellnotifyicon id="110" menu="SMENU:menu_tray" ico="ICON_LOGO:16" tip="110"/>
+<shellnotifyicon name="tray_008"  icons="ICON_LOGO:16" tip="110"/>
 [!endif]
   </root>
 </SOUI>
