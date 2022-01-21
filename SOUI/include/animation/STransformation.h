@@ -26,36 +26,37 @@ SNSBEGIN
  *
  */
 class SOUI_EXP STransformation {
-public:
-enum{
-    /**
-     * Indicates a transformation that has no effect (alpha = 1 and identity matrix.)
-     */
-    TYPE_IDENTITY = 0x0,
-    /**
-     * Indicates a transformation that applies an alpha only (uses an identity matrix.)
-     */
-    TYPE_ALPHA = 0x1,
-    /**
-     * Indicates a transformation that applies a matrix only (alpha = 1.)
-     */
-    TYPE_MATRIX = 0x2,
-    /**
-     * Indicates a transformation that applies an alpha and a matrix.
-     */
-    TYPE_BOTH = TYPE_ALPHA | TYPE_MATRIX,
-};
+  public:
+    enum
+    {
+        /**
+         * Indicates a transformation that has no effect (alpha = 1 and identity matrix.)
+         */
+        TYPE_IDENTITY = 0x0,
+        /**
+         * Indicates a transformation that applies an alpha only (uses an identity matrix.)
+         */
+        TYPE_ALPHA = 0x1,
+        /**
+         * Indicates a transformation that applies a matrix only (alpha = 1.)
+         */
+        TYPE_MATRIX = 0x2,
+        /**
+         * Indicates a transformation that applies an alpha and a matrix.
+         */
+        TYPE_BOTH = TYPE_ALPHA | TYPE_MATRIX,
+    };
 
-protected:
-	SMatrix  mMatrix;
-    BYTE	 mAlpha;
+  protected:
+    SMatrix mMatrix;
+    BYTE mAlpha;
     int mTransformationType;
 
     /**
      * Creates a new transformation with alpha = 1 and the identity matrix.
      */
-public:
-	STransformation();
+  public:
+    STransformation();
 
     /**
      * Reset the transformation to a state that leaves the object
@@ -72,7 +73,7 @@ public:
      */
     int getTransformationType() const;
 
-	void setTransformationType(int type);
+    void setTransformationType(int type);
     /**
      * Clones the specified transformation.
      *
@@ -86,7 +87,7 @@ public:
      * @param t
      */
     void compose(STransformation t);
-    
+
     /**
      * Like {@link #compose(STransformation)} but does this.postConcat(t) of
      * the transformation matrix.
@@ -98,30 +99,29 @@ public:
      * @return The 3x3 Matrix representing the transformation to apply to the
      * coordinates of the object being animated
      */
-    const SMatrix & getMatrix() const;
-    
-	SMatrix & getMatrix();
+    const SMatrix &getMatrix() const;
 
-	void setMatrix(const SMatrix & mtx);
+    SMatrix &getMatrix();
+
+    void setMatrix(const SMatrix &mtx);
     /**
      * Sets the degree of transparency
      * @param alpha 255 means fully opaqe and 0 means fully transparent
      */
     void setAlpha(BYTE alpha);
 
-	void updateMatrixType();
+    void updateMatrixType();
 
     /**
      * @return The degree of transparency
      */
     BYTE getAlpha() const;
 
+    bool hasAlpha() const;
 
-	bool hasAlpha() const;
+    bool hasMatrix() const;
 
-	bool hasMatrix() const;
-
-	bool isIdentity() const;
+    bool isIdentity() const;
 };
 
 SNSEND

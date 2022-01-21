@@ -10,20 +10,22 @@ SNSBEGIN
 
 #undef INTERFACE
 #define INTERFACE ISouiFactory
-DECLARE_INTERFACE_(ISouiFactory,IObjRef)
+DECLARE_INTERFACE_(ISouiFactory, IObjRef)
 {
-	STDMETHOD_(HRESULT,CreateApp)(THIS_ IApplication **ppRet,IRenderFactory *pRenderFac,HMODULE hInst,LPCTSTR pszHostClassName,BOOL bImeApp) PURE;
-	STDMETHOD_(HRESULT,CreateNativeWnd)(THIS_ INativeWnd **ppRet) PURE;
-	STDMETHOD_(HRESULT,CreateHostWnd)(THIS_ IHostWnd **ppRet,LPCTSTR pszResID) PURE;
-	STDMETHOD_(HRESULT,CreateHostDialog)(THIS_ IHostDialog **ppRet,LPCTSTR pszResID) PURE;
-	STDMETHOD_(HRESULT,CreateStringA)(THIS_ IStringA **ppRet,LPCSTR pszSrc) PURE;
-	STDMETHOD_(HRESULT,CreateStringW)(THIS_ IStringW **ppRet,LPCWSTR pszStr) PURE;
-	STDMETHOD_(HRESULT,CreateXmlDoc)(THIS_ IXmlDoc **ppRet) PURE;
+    STDMETHOD_(HRESULT, CreateApp)
+    (THIS_ IApplication * *ppRet, IRenderFactory * pRenderFac, HMODULE hInst,
+     LPCTSTR pszHostClassName, BOOL bImeApp) PURE;
+    STDMETHOD_(HRESULT, CreateNativeWnd)(THIS_ INativeWnd * *ppRet) PURE;
+    STDMETHOD_(HRESULT, CreateHostWnd)(THIS_ IHostWnd * *ppRet, LPCTSTR pszResID) PURE;
+    STDMETHOD_(HRESULT, CreateHostDialog)(THIS_ IHostDialog * *ppRet, LPCTSTR pszResID) PURE;
+    STDMETHOD_(HRESULT, CreateStringA)(THIS_ IStringA * *ppRet, LPCSTR pszSrc) PURE;
+    STDMETHOD_(HRESULT, CreateStringW)(THIS_ IStringW * *ppRet, LPCWSTR pszStr) PURE;
+    STDMETHOD_(HRESULT, CreateXmlDoc)(THIS_ IXmlDoc * *ppRet) PURE;
 };
 
 extern "C"
 {
-	HRESULT SOUI_EXP CreateSouiFactory(ISouiFactory ** ppRet);
+    HRESULT SOUI_EXP CreateSouiFactory(ISouiFactory **ppRet);
 }
 
 SNSEND

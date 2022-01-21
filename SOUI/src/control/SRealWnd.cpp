@@ -6,23 +6,20 @@
 namespace SOUI
 {
 
-
 SRealWndParam::SRealWndParam()
-    :m_dwStyle(WS_CHILD)
-    ,m_dwExStyle(0)
+    : m_dwStyle(WS_CHILD)
+    , m_dwExStyle(0)
 {
-
 }
 
 SRealWndParam::~SRealWndParam()
 {
 }
 
-
 SRealWnd::SRealWnd()
-    :m_bInit(FALSE)
-    ,m_lpData(0)
-    ,m_hRealWnd(0)
+    : m_bInit(FALSE)
+    , m_lpData(0)
+    , m_hRealWnd(0)
 {
 }
 
@@ -37,13 +34,13 @@ BOOL SRealWnd::NeedRedrawWhenStateChange()
 
 void SRealWnd::ShowRealWindow()
 {
-    if(IsVisible(TRUE) && !IsWindow(m_hRealWnd))
+    if (IsVisible(TRUE) && !IsWindow(m_hRealWnd))
     {
         InitRealWnd();
     }
-    if(IsWindow(m_hRealWnd))
+    if (IsWindow(m_hRealWnd))
     {
-        ShowWindow(m_hRealWnd,IsVisible(TRUE) ? SW_SHOW : SW_HIDE);
+        ShowWindow(m_hRealWnd, IsVisible(TRUE) ? SW_SHOW : SW_HIDE);
     }
 }
 
@@ -57,29 +54,32 @@ void SRealWnd::OnDestroy()
 {
     if (IsWindow(m_hRealWnd))
     {
-        IRealWndHandler *pRealWndHandler=GETREALWNDHANDLER;
-        if(pRealWndHandler) pRealWndHandler->OnRealWndDestroy(this);
+        IRealWndHandler *pRealWndHandler = GETREALWNDHANDLER;
+        if (pRealWndHandler)
+            pRealWndHandler->OnRealWndDestroy(this);
     }
-	__baseCls::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
-BOOL SRealWnd::InitFromXml(IXmlNode * pNode)
+BOOL SRealWnd::InitFromXml(IXmlNode *pNode)
 {
-	SXmlNode xmlNode(pNode);
-	m_realwndParam.m_xmlParams.root().append_copy(xmlNode.child(L"params"));
-    BOOL bRet=__baseCls::InitFromXml(pNode);
-    if(bRet)
+    SXmlNode xmlNode(pNode);
+    m_realwndParam.m_xmlParams.root().append_copy(xmlNode.child(L"params"));
+    BOOL bRet = __baseCls::InitFromXml(pNode);
+    if (bRet)
     {
-        if(m_bInit) InitRealWnd();
+        if (m_bInit)
+            InitRealWnd();
     }
     return bRet;
 }
 
-const HWND SRealWnd::GetRealHwnd(BOOL bAutoCreate/*=TRUE*/)
+const HWND SRealWnd::GetRealHwnd(BOOL bAutoCreate /*=TRUE*/)
 {
-    if(!bAutoCreate) return m_hRealWnd;
+    if (!bAutoCreate)
+        return m_hRealWnd;
 
-    if(!m_bInit && !IsWindow(m_hRealWnd))
+    if (!m_bInit && !IsWindow(m_hRealWnd))
     {
         InitRealWnd();
     }
@@ -89,23 +89,26 @@ const HWND SRealWnd::GetRealHwnd(BOOL bAutoCreate/*=TRUE*/)
 
 BOOL SRealWnd::InitRealWnd()
 {
-    m_realwndParam.m_dwStyle|= WS_CHILD;
+    m_realwndParam.m_dwStyle |= WS_CHILD;
 
-    IRealWndHandler *pRealWndHandler=GETREALWNDHANDLER;
+    IRealWndHandler *pRealWndHandler = GETREALWNDHANDLER;
 
-    if(pRealWndHandler) m_hRealWnd = pRealWndHandler->OnRealWndCreate(this);
+    if (pRealWndHandler)
+        m_hRealWnd = pRealWndHandler->OnRealWndCreate(this);
 
-    if(::IsWindow(m_hRealWnd))
+    if (::IsWindow(m_hRealWnd))
     {
-        if(!m_bInit && !pRealWndHandler->OnRealWndSize(this))
+        if (!m_bInit && !pRealWndHandler->OnRealWndSize(this))
         {
             //如果不是在加载的时候创建窗口，则需要自动调整窗口位置
             CRect rcClient;
             GetClientRect(&rcClient);
-            SetWindowPos(m_hRealWnd,0,rcClient.left,rcClient.top,rcClient.Width(),rcClient.Height(),SWP_NOZORDER);
+            SetWindowPos(m_hRealWnd, 0, rcClient.left, rcClient.top, rcClient.Width(),
+                         rcClient.Height(), SWP_NOZORDER);
         }
 
-        if(pRealWndHandler) pRealWndHandler->OnRealWndInit(this);
+        if (pRealWndHandler)
+            pRealWndHandler->OnRealWndInit(this);
 
         return TRUE;
     }
@@ -114,23 +117,23 @@ BOOL SRealWnd::InitRealWnd()
 
 BOOL SRealWnd::OnRelayout(const CRect &rcWnd)
 {
-	if (!__baseCls::OnRelayout(rcWnd)) 
-		return FALSE;
+    if (!__baseCls::OnRelayout(rcWnd))
+        return FALSE;
 
-	IRealWndHandler *pRealWndHandler = GETREALWNDHANDLER;
-	HWND hRealWnd = GetRealHwnd(FALSE);
-	if (pRealWndHandler && ::IsWindow(hRealWnd))
-	{
-		if (!pRealWndHandler->OnRealWndPosition(this,rcWnd))
-		{
-			CPoint pt = rcWnd.TopLeft();
-			if(GetWindowLong(hRealWnd,GWL_STYLE)&WS_POPUP)
-			{
-				::ClientToScreen(GetContainer()->GetHostHwnd(),&pt);
-			}
-			::SetWindowPos(hRealWnd, 0, pt.x, pt.y, rcWnd.Width(), rcWnd.Height(), SWP_NOZORDER);
-		}
-	}
-	return TRUE;
+    IRealWndHandler *pRealWndHandler = GETREALWNDHANDLER;
+    HWND hRealWnd = GetRealHwnd(FALSE);
+    if (pRealWndHandler && ::IsWindow(hRealWnd))
+    {
+        if (!pRealWndHandler->OnRealWndPosition(this, rcWnd))
+        {
+            CPoint pt = rcWnd.TopLeft();
+            if (GetWindowLong(hRealWnd, GWL_STYLE) & WS_POPUP)
+            {
+                ::ClientToScreen(GetContainer()->GetHostHwnd(), &pt);
+            }
+            ::SetWindowPos(hRealWnd, 0, pt.x, pt.y, rcWnd.Width(), rcWnd.Height(), SWP_NOZORDER);
+        }
+    }
+    return TRUE;
 }
-}//namespace SOUI
+} // namespace SOUI

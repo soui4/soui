@@ -6,23 +6,23 @@
 namespace SOUI
 {
 
-	class STimerlineHandlerMgr : public ITimelineHandler
-	{
-	public:
-		STimerlineHandlerMgr(void);
-		~STimerlineHandlerMgr(void);
+class STimerlineHandlerMgr : public ITimelineHandler {
+  public:
+    STimerlineHandlerMgr(void);
+    ~STimerlineHandlerMgr(void);
 
-		bool RegisterTimelineHandler(ITimelineHandler *pHandler);
+    bool RegisterTimelineHandler(ITimelineHandler *pHandler);
 
-		bool UnregisterTimelineHandler(ITimelineHandler *pHandler);
+    bool UnregisterTimelineHandler(ITimelineHandler *pHandler);
 
-		bool IsEmpty() const;
-	public:
-		STDMETHOD_(void,OnNextFrame)(THIS_) OVERRIDE;
+    bool IsEmpty() const;
 
-	protected:
-		typedef SMap<ITimelineHandler *,bool> TLMAP;
-		TLMAP m_mapHandlers;
-	};
+  public:
+    STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
 
-}
+  protected:
+    typedef SMap<ITimelineHandler *, bool> TLMAP;
+    TLMAP m_mapHandlers;
+};
+
+} // namespace SOUI

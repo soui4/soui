@@ -17,49 +17,51 @@
 #pragma once
 #include <animation/SAnimation.h>
 
-namespace SOUI {
+namespace SOUI
+{
 /**
  * An animation that controls the alpha level of an object.
  * Useful for fading things in and out. This animation ends up
  * changing the alpha property of a {@link STransformation}
  *
  */
-class SOUI_EXP SAlphaAnimation: public SAnimation {
-	SOUI_CLASS_NAME(SAnimation,L"alpha")
-private:
-	float mFromAlpha;
+class SOUI_EXP SAlphaAnimation : public SAnimation {
+    SOUI_CLASS_NAME(SAnimation, L"alpha")
+  private:
+    float mFromAlpha;
     float mToAlpha;
 
-public:
-	SOUI_ATTRS_BEGIN()
-		ATTR_FLOAT(L"fromAlpha",mFromAlpha,FALSE)
-		ATTR_FLOAT(L"toAlpha", mToAlpha, FALSE)
-	SOUI_ATTRS_END()
+  public:
+    SOUI_ATTRS_BEGIN()
+    ATTR_FLOAT(L"fromAlpha", mFromAlpha, FALSE)
+    ATTR_FLOAT(L"toAlpha", mToAlpha, FALSE)
+    SOUI_ATTRS_END()
     /**
      * Constructor to use when building an AlphaAnimation from code
-     * 
+     *
      * @param fromAlpha Starting alpha value for the animation, where 1.0 means
      *        fully opaque and 0.0 means fully transparent.
      * @param toAlpha Ending alpha value for the animation.
      */
-public:
-	SAlphaAnimation();
-    
-	void init(float fromAlpha = 0.0f, float toAlpha = 0.0f);
-protected:
-	/**
+  public:
+    SAlphaAnimation();
+
+    void init(float fromAlpha = 0.0f, float toAlpha = 0.0f);
+
+  protected:
+    /**
      * Changes the alpha property of the supplied {@link STransformation}
      */
-	STDMETHOD_(void,applyTransformation)(THIS_ float interpolatedTime, STransformation & t) OVERRIDE;
+    STDMETHOD_(void, applyTransformation)
+    (THIS_ float interpolatedTime, STransformation &t) OVERRIDE;
 
-	STDMETHOD_(void,copy)(THIS_ const IAnimation *src) OVERRIDE;
-public:
+    STDMETHOD_(void, copy)(THIS_ const IAnimation *src) OVERRIDE;
+
+  public:
     /**
      * @hide
      */
-	STDMETHOD_(bool,hasAlpha)(THIS) SCONST OVERRIDE;
-
+    STDMETHOD_(bool, hasAlpha)(THIS) SCONST OVERRIDE;
 };
 
-
-}
+} // namespace SOUI

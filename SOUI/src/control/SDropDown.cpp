@@ -16,138 +16,143 @@
 
 namespace SOUI
 {
-    #define  IDINIT -1
-    
-    SDropDownWnd::SDropDownWnd(ISDropDownOwner* pOwner)
-        :m_pOwner(pOwner)
-        ,m_bClick(FALSE)
-        ,m_uExitCode((UINT)IDINIT)
-    {
-        GetMsgLoop()->AddMessageFilter(this);
-    }
+#define IDINIT -1
 
-    SDropDownWnd::~SDropDownWnd()
-    {
-        GetMsgLoop()->RemoveMessageFilter(this);
-    }
+SDropDownWnd::SDropDownWnd(ISDropDownOwner *pOwner)
+    : m_pOwner(pOwner)
+    , m_bClick(FALSE)
+    , m_uExitCode((UINT)IDINIT)
+{
+    GetMsgLoop()->AddMessageFilter(this);
+}
 
-    void SDropDownWnd::OnFinalMessage(HWND hWnd)
-    {
-        __baseCls::OnFinalMessage(hWnd);
-        delete this;
-    }
+SDropDownWnd::~SDropDownWnd()
+{
+    GetMsgLoop()->RemoveMessageFilter(this);
+}
 
-    void SDropDownWnd::OnKillFocus( HWND wndFocus )
-    {
-        if(wndFocus != m_hWnd)
-        {
-            EndDropDown();
-        }
-    }
-    
-    SWindow * SDropDownWnd::GetDropDownOwner()
-    {
-        SASSERT(m_pOwner);
-        return m_pOwner->GetDropDownOwner();
-    }
+void SDropDownWnd::OnFinalMessage(HWND hWnd)
+{
+    __baseCls::OnFinalMessage(hWnd);
+    delete this;
+}
 
-    BOOL SDropDownWnd::Create(LPCRECT lpRect ,LPVOID lParam,DWORD dwStyle,DWORD dwExStyle)
+void SDropDownWnd::OnKillFocus(HWND wndFocus)
+{
+    if (wndFocus != m_hWnd)
     {
-        HWND hParent = m_pOwner->GetDropDownOwner()->GetContainer()->GetHostHwnd();
-        HWND hWnd=SNativeWnd::CreateWindow(NULL,dwStyle,dwExStyle,lpRect->left,lpRect->top,lpRect->right-lpRect->left,lpRect->bottom-lpRect->top,hParent,0);
-        if(!hWnd) return FALSE;
-        m_pOwner->OnCreateDropDown(this);
-        return TRUE;
+        EndDropDown();
     }
+}
 
-    void SDropDownWnd::OnLButtonDown( UINT nFlags, CPoint point )
+SWindow *SDropDownWnd::GetDropDownOwner()
+{
+    SASSERT(m_pOwner);
+    return m_pOwner->GetDropDownOwner();
+}
+
+BOOL SDropDownWnd::Create(LPCRECT lpRect, LPVOID lParam, DWORD dwStyle, DWORD dwExStyle)
+{
+    HWND hParent = m_pOwner->GetDropDownOwner()->GetContainer()->GetHostHwnd();
+    HWND hWnd = SNativeWnd::CreateWindow(NULL, dwStyle, dwExStyle, lpRect->left, lpRect->top,
+                                         lpRect->right - lpRect->left, lpRect->bottom - lpRect->top,
+                                         hParent, 0);
+    if (!hWnd)
+        return FALSE;
+    m_pOwner->OnCreateDropDown(this);
+    return TRUE;
+}
+
+void SDropDownWnd::OnLButtonDown(UINT nFlags, CPoint point)
+{
+    CRect rcWnd;
+    SNativeWnd::GetClientRect(&rcWnd);
+    if (!rcWnd.PtInRect(point))
     {
-        CRect rcWnd;
-        SNativeWnd::GetClientRect(&rcWnd);
-        if(!rcWnd.PtInRect(point))
-        {
-            EndDropDown();
-        }else
-        {
-            m_bClick=TRUE;
-            SetMsgHandled(FALSE);
-        }
+        EndDropDown();
     }
-
-    void SDropDownWnd::OnLButtonUp( UINT nFlags, CPoint point )
+    else
     {
-        if(m_bClick)
-        {
-            LRESULT lRes=0;
-            HWND hWnd=m_hWnd;
-            CRect rcWnd;
-            SNativeWnd::GetClientRect(&rcWnd);
-            SHostWnd::ProcessWindowMessage(m_hWnd,WM_LBUTTONUP,nFlags,MAKELPARAM(point.x,point.y),lRes);
-            if(::IsWindow(hWnd) && !rcWnd.PtInRect(point))
-                EndDropDown();//强制关闭弹出窗口
-        } 
-    }
-
-    void SDropDownWnd::OnKeyDown( UINT nChar, UINT nRepCnt, UINT nFlags )
-    {
-        if(nChar==VK_RETURN)
-            EndDropDown(IDOK);
-        else if(nChar==VK_ESCAPE)
-            EndDropDown();
-        else 
-            SetMsgHandled(FALSE);
-    }
-
-    void SDropDownWnd::EndDropDown(UINT uCode)
-    {
-        if(m_uExitCode!=IDINIT) return;
-        m_uExitCode=uCode;
-        SNativeWnd::DestroyWindow();
-    }
-
-    void SDropDownWnd::OnDestroy()
-    {
-        m_pOwner->OnDestroyDropDown(this);
+        m_bClick = TRUE;
         SetMsgHandled(FALSE);
     }
+}
 
-    BOOL SDropDownWnd::PreTranslateMessage( MSG* pMsg )
+void SDropDownWnd::OnLButtonUp(UINT nFlags, CPoint point)
+{
+    if (m_bClick)
     {
-        if(pMsg->message==WM_ACTIVATEAPP)
-        {
-            SNativeWnd::SendMessage(pMsg->message,pMsg->wParam,pMsg->lParam);
-        }
-        else if(pMsg->message == WM_MOUSEMOVE)
-        {//由于窗口显示后就调用了setcapture，导致收不到setcursor消息，这里在WM_MOUSEMOVE消息里模拟一个setcursor消息。
-            SNativeWnd::SendMessage(WM_SETCURSOR,(WPARAM)m_hWnd,MAKELPARAM(HTCLIENT,WM_MOUSEMOVE));
-        }
-        return FALSE;
+        LRESULT lRes = 0;
+        HWND hWnd = m_hWnd;
+        CRect rcWnd;
+        SNativeWnd::GetClientRect(&rcWnd);
+        SHostWnd::ProcessWindowMessage(m_hWnd, WM_LBUTTONUP, nFlags, MAKELPARAM(point.x, point.y),
+                                       lRes);
+        if (::IsWindow(hWnd) && !rcWnd.PtInRect(point))
+            EndDropDown(); //强制关闭弹出窗口
     }
+}
 
-    void SDropDownWnd::OnActivateApp( BOOL bActive, DWORD dwThreadID )
+void SDropDownWnd::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
+{
+    if (nChar == VK_RETURN)
+        EndDropDown(IDOK);
+    else if (nChar == VK_ESCAPE)
+        EndDropDown();
+    else
+        SetMsgHandled(FALSE);
+}
+
+void SDropDownWnd::EndDropDown(UINT uCode)
+{
+    if (m_uExitCode != IDINIT)
+        return;
+    m_uExitCode = uCode;
+    SNativeWnd::DestroyWindow();
+}
+
+void SDropDownWnd::OnDestroy()
+{
+    m_pOwner->OnDestroyDropDown(this);
+    SetMsgHandled(FALSE);
+}
+
+BOOL SDropDownWnd::PreTranslateMessage(MSG *pMsg)
+{
+    if (pMsg->message == WM_ACTIVATEAPP)
     {
-        if(!bActive)
-        {
-            EndDropDown();
-        }
+        SNativeWnd::SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
     }
+    else if (pMsg->message == WM_MOUSEMOVE)
+    { //由于窗口显示后就调用了setcapture，导致收不到setcursor消息，这里在WM_MOUSEMOVE消息里模拟一个setcursor消息。
+        SNativeWnd::SendMessage(WM_SETCURSOR, (WPARAM)m_hWnd, MAKELPARAM(HTCLIENT, WM_MOUSEMOVE));
+    }
+    return FALSE;
+}
 
-    int SDropDownWnd::OnMouseActivate( HWND wndTopLevel, UINT nHitTest, UINT message )
+void SDropDownWnd::OnActivateApp(BOOL bActive, DWORD dwThreadID)
+{
+    if (!bActive)
     {
-        return MA_NOACTIVATEANDEAT;
+        EndDropDown();
     }
+}
 
-    BOOL SDropDownWnd::OnReleaseSwndCapture()
-    {
-        BOOL bRet=SHostWnd::OnReleaseSwndCapture();
-        SNativeWnd::SetCapture();
-        return bRet;
-    }
+int SDropDownWnd::OnMouseActivate(HWND wndTopLevel, UINT nHitTest, UINT message)
+{
+    return MA_NOACTIVATEANDEAT;
+}
 
-    IMessageLoop * SDropDownWnd::GetMsgLoop()
-    {
-        return m_pOwner->GetDropDownOwner()->GetContainer()->GetMsgLoop();
-    }
+BOOL SDropDownWnd::OnReleaseSwndCapture()
+{
+    BOOL bRet = SHostWnd::OnReleaseSwndCapture();
+    SNativeWnd::SetCapture();
+    return bRet;
+}
 
+IMessageLoop *SDropDownWnd::GetMsgLoop()
+{
+    return m_pOwner->GetDropDownOwner()->GetContainer()->GetMsgLoop();
+}
 
-}//end of namespace SOUI
+} // end of namespace SOUI

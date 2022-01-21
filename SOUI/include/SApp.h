@@ -222,7 +222,6 @@ public:
 	void * GetInnerSingleton(int nType);
 
 protected:
-	virtual void RegisterSystemObjects(){}
 
     void _CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, BOOL bImeApp);
     void _DestroySingletons();

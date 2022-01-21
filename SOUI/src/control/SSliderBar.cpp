@@ -3,8 +3,8 @@
 namespace SOUI
 {
 
-#define TIMERID_NOTIFY1     1
-#define TIMERID_DELAY1      2
+#define TIMERID_NOTIFY1 1
+#define TIMERID_DELAY1  2
 
 //////////////////////////////////////////////////////////////////////////
 //  SSliderBar
@@ -40,50 +40,54 @@ int SSliderBar::HitTest(CPoint pt)
     return -1;
 }
 
-
-SSliderBar::RANGE SSliderBar::_GetPartRange( int nLength,int nThumbSize, BOOL bThumbInRail, int nMin,int nMax,int nValue, UINT uSBCode )
+SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength,
+                                            int nThumbSize,
+                                            BOOL bThumbInRail,
+                                            int nMin,
+                                            int nMax,
+                                            int nValue,
+                                            UINT uSBCode)
 {
     int nRailLen = nLength - nThumbSize;
-    
-    int nHalfThumb = nThumbSize/2;
-    int nSelect = nRailLen*(nValue-nMin)/(nMax-nMin);
 
-    RANGE rRet={0};
-    switch(uSBCode)
+    int nHalfThumb = nThumbSize / 2;
+    int nSelect = nRailLen * (nValue - nMin) / (nMax - nMin);
+
+    RANGE rRet = { 0 };
+    switch (uSBCode)
     {
-    case SC_RAILBACK://轨道背景
-        rRet.value1=0;
-        rRet.value2=nLength;
-        if(!bThumbInRail)
+    case SC_RAILBACK: //轨道背景
+        rRet.value1 = 0;
+        rRet.value2 = nLength;
+        if (!bThumbInRail)
         {
-            rRet.value1+=nHalfThumb;
-            rRet.value2-=nHalfThumb;
+            rRet.value1 += nHalfThumb;
+            rRet.value2 -= nHalfThumb;
         }
         break;
-    case SC_RAIL:   //轨道区
-        rRet.value1=0;
-        rRet.value2=nLength;
-        rRet.value1+=nHalfThumb;
-        rRet.value2-=nHalfThumb;
+    case SC_RAIL: //轨道区
+        rRet.value1 = 0;
+        rRet.value2 = nLength;
+        rRet.value1 += nHalfThumb;
+        rRet.value2 -= nHalfThumb;
         break;
     case SC_SELECT:
-        rRet.value1=0;
-        rRet.value2=nSelect;
-        if(!bThumbInRail)
+        rRet.value1 = 0;
+        rRet.value2 = nSelect;
+        if (!bThumbInRail)
         {
-            rRet.value1+=nHalfThumb;
+            rRet.value1 += nHalfThumb;
         }
-        rRet.value2+=nHalfThumb;
+        rRet.value2 += nHalfThumb;
         break;
     case SC_THUMB:
         rRet.value1 = nSelect;
-        rRet.value2 = nSelect+nThumbSize;
+        rRet.value2 = nSelect + nThumbSize;
         break;
     }
 
     return rRet;
 }
-
 
 CRect SSliderBar::GetPartRect(UINT uSBCode)
 {
@@ -91,38 +95,42 @@ CRect SSliderBar::GetPartRect(UINT uSBCode)
 
     CRect rcClient;
     GetClientRect(&rcClient);
-    
-    SIZE szThumb = m_pSkinThumb->GetSkinSize();
-    SIZE szRail  = m_pSkinBg->GetSkinSize();
 
-    if(IsVertical())
+    SIZE szThumb = m_pSkinThumb->GetSkinSize();
+    SIZE szRail = m_pSkinBg->GetSkinSize();
+
+    if (IsVertical())
     {
-        RANGE r = _GetPartRange(rcClient.Height(),szThumb.cy,m_bThumbInRail,m_nMinValue,m_nMaxValue,m_nValue,uSBCode);
-        CRect rc(rcClient.left, rcClient.Height()-r.value2,rcClient.right, rcClient.Height()-r.value1);
-        rc.OffsetRect(0,rcClient.top);
-        int   nSliderSize = smax(szThumb.cx,szRail.cx);
-        rc.DeflateRect((rcClient.Width()-nSliderSize)/2,0);
-        if(uSBCode != SC_THUMB)
+        RANGE r = _GetPartRange(rcClient.Height(), szThumb.cy, m_bThumbInRail, m_nMinValue,
+                                m_nMaxValue, m_nValue, uSBCode);
+        CRect rc(rcClient.left, rcClient.Height() - r.value2, rcClient.right,
+                 rcClient.Height() - r.value1);
+        rc.OffsetRect(0, rcClient.top);
+        int nSliderSize = smax(szThumb.cx, szRail.cx);
+        rc.DeflateRect((rcClient.Width() - nSliderSize) / 2, 0);
+        if (uSBCode != SC_THUMB)
         {
-            rc.DeflateRect((nSliderSize-szRail.cx)/2,0);
+            rc.DeflateRect((nSliderSize - szRail.cx) / 2, 0);
         }
         return rc;
-    }else
+    }
+    else
     {
-        RANGE r = _GetPartRange(rcClient.Width(),szThumb.cx,m_bThumbInRail,m_nMinValue,m_nMaxValue,m_nValue,uSBCode);
-        CRect rc(r.value1,rcClient.top,r.value2,rcClient.bottom);
-        rc.OffsetRect(rcClient.left,0);
-        int   nSliderSize = smax(szThumb.cy,szRail.cy);
-        rc.DeflateRect(0,(rcClient.Height()-nSliderSize)/2);
-        if(uSBCode != SC_THUMB)
+        RANGE r = _GetPartRange(rcClient.Width(), szThumb.cx, m_bThumbInRail, m_nMinValue,
+                                m_nMaxValue, m_nValue, uSBCode);
+        CRect rc(r.value1, rcClient.top, r.value2, rcClient.bottom);
+        rc.OffsetRect(rcClient.left, 0);
+        int nSliderSize = smax(szThumb.cy, szRail.cy);
+        rc.DeflateRect(0, (rcClient.Height() - nSliderSize) / 2);
+        if (uSBCode != SC_THUMB)
         {
-            rc.DeflateRect(0,(nSliderSize-szRail.cy)/2);
+            rc.DeflateRect(0, (nSliderSize - szRail.cy) / 2);
         }
         return rc;
     }
 }
 
-void SSliderBar::OnPaint(IRenderTarget * pRT)
+void SSliderBar::OnPaint(IRenderTarget *pRT)
 {
     SASSERT(m_pSkinThumb && m_pSkinBg && m_pSkinPos);
 
@@ -130,17 +138,19 @@ void SSliderBar::OnPaint(IRenderTarget * pRT)
 
     BeforePaint(pRT, painter);
 
-    CRect rcRail=GetPartRect(SC_RAILBACK);
-    m_pSkinBg->DrawByIndex(pRT,rcRail,0);
-    if(m_nValue!=m_nMinValue)
+    CRect rcRail = GetPartRect(SC_RAILBACK);
+    m_pSkinBg->DrawByIndex(pRT, rcRail, 0);
+    if (m_nValue != m_nMinValue)
     {
-        CRect rcSel=GetPartRect(SC_SELECT);
-        m_pSkinPos->DrawByIndex(pRT,rcSel,0);
+        CRect rcSel = GetPartRect(SC_SELECT);
+        m_pSkinPos->DrawByIndex(pRT, rcSel, 0);
     }
     CRect rcThumb = GetPartRect(SC_THUMB);
-    int nState=0;//normal
-    if(m_bDrag) nState=2;//pushback
-    else if(m_uHtPrev==SC_THUMB) nState=1;//hover
+    int nState = 0; // normal
+    if (m_bDrag)
+        nState = 2; // pushback
+    else if (m_uHtPrev == SC_THUMB)
+        nState = 1; // hover
     m_pSkinThumb->DrawByIndex(pRT, rcThumb, nState);
 
     AfterPaint(pRT, painter);
@@ -152,77 +162,80 @@ void SSliderBar::OnLButtonUp(UINT nFlags, CPoint point)
 
     if (m_bDrag)
     {
-        m_bDrag   = FALSE;
+        m_bDrag = FALSE;
         CRect rcThumb = GetPartRect(SC_THUMB);
         InvalidateRect(rcThumb);
     }
-    OnMouseMove(nFlags,point);
+    OnMouseMove(nFlags, point);
 }
 
-void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point) 
+void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
 {
     SetCapture();
 
     UINT uHit = HitTest(point);
     if (uHit == SC_THUMB)
     {
-        m_bDrag    = TRUE;
-        m_ptDrag   = point;
-        m_nDragValue=m_nValue;
+        m_bDrag = TRUE;
+        m_ptDrag = point;
+        m_nDragValue = m_nValue;
         Invalidate();
     }
     else
     {
-        CRect rcRail=GetPartRect(SC_RAIL);
-        int nValue=0;
-        if(IsVertical())
+        CRect rcRail = GetPartRect(SC_RAIL);
+        int nValue = 0;
+        if (IsVertical())
         {
-            nValue= (rcRail.bottom - point.y)*(m_nMaxValue-m_nMinValue+1)/rcRail.Height()+m_nMinValue;
-        }else
+            nValue = (rcRail.bottom - point.y) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Height()
+                + m_nMinValue;
+        }
+        else
         {
-            nValue= (point.x-rcRail.left)*(m_nMaxValue-m_nMinValue+1)/rcRail.Width()+m_nMinValue;
+            nValue = (point.x - rcRail.left) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Width()
+                + m_nMinValue;
         }
         SetValue(nValue);
         Invalidate();
 
-        m_bDrag    = TRUE;
-        m_ptDrag   = point;
-        m_nDragValue=m_nValue;
+        m_bDrag = TRUE;
+        m_ptDrag = point;
+        m_nDragValue = m_nValue;
 
-		NotifyPos(SC_THUMB,m_nValue);
+        NotifyPos(SC_THUMB, m_nValue);
     }
 }
 
-void SSliderBar::OnMouseMove(UINT nFlags, CPoint point) 
+void SSliderBar::OnMouseMove(UINT nFlags, CPoint point)
 {
     if (m_bDrag)
     {
-        CRect rcRail=GetPartRect(SC_RAIL);
+        CRect rcRail = GetPartRect(SC_RAIL);
 
-        int nInterHei=(IsVertical()?rcRail.Height():rcRail.Width());
-        int nDragLen=IsVertical()?(m_ptDrag.y-point.y):(point.x-m_ptDrag.x);
-        int nSlide=nDragLen*(m_nMaxValue-m_nMinValue+1)/nInterHei;
+        int nInterHei = (IsVertical() ? rcRail.Height() : rcRail.Width());
+        int nDragLen = IsVertical() ? (m_ptDrag.y - point.y) : (point.x - m_ptDrag.x);
+        int nSlide = nDragLen * (m_nMaxValue - m_nMinValue + 1) / nInterHei;
 
-        int nNewTrackPos=m_nDragValue+nSlide;
-        if(nNewTrackPos<m_nMinValue)
+        int nNewTrackPos = m_nDragValue + nSlide;
+        if (nNewTrackPos < m_nMinValue)
         {
-            nNewTrackPos=m_nMinValue;
+            nNewTrackPos = m_nMinValue;
         }
-        else if(nNewTrackPos>m_nMaxValue)
+        else if (nNewTrackPos > m_nMaxValue)
         {
-            nNewTrackPos=m_nMaxValue;
+            nNewTrackPos = m_nMaxValue;
         }
-        if(nNewTrackPos!=m_nValue)
+        if (nNewTrackPos != m_nValue)
         {
-            m_nValue=nNewTrackPos;
+            m_nValue = nNewTrackPos;
             Invalidate();
-            NotifyPos(SC_THUMB,m_nValue);
+            NotifyPos(SC_THUMB, m_nValue);
         }
     }
     else
     {
         int uHit = HitTest(point);
-        if (uHit != m_uHtPrev && (m_uHtPrev==SC_THUMB || uHit==SC_THUMB))
+        if (uHit != m_uHtPrev && (m_uHtPrev == SC_THUMB || uHit == SC_THUMB))
         {
             m_uHtPrev = uHit;
             CRect rcThumb = GetPartRect(SC_THUMB);
@@ -233,12 +246,12 @@ void SSliderBar::OnMouseMove(UINT nFlags, CPoint point)
 
 void SSliderBar::OnMouseLeave()
 {
-    if (!m_bDrag && m_uHtPrev==SC_THUMB)
+    if (!m_bDrag && m_uHtPrev == SC_THUMB)
     {
         CRect rcThumb = GetPartRect(SC_THUMB);
         InvalidateRect(rcThumb);
         Invalidate();
-        m_uHtPrev=-1;
+        m_uHtPrev = -1;
     }
 }
 
@@ -255,16 +268,17 @@ SIZE SSliderBar::GetDesiredSize(int wid, int hei)
     SASSERT(m_pSkinBg && m_pSkinThumb);
     CSize szRet;
     SIZE sizeBg = m_pSkinBg->GetSkinSize();
-    SIZE sizeThumb= m_pSkinThumb->GetSkinSize();
-    
-    if(IsVertical())
+    SIZE sizeThumb = m_pSkinThumb->GetSkinSize();
+
+    if (IsVertical())
     {
-        szRet.cx=smax(sizeBg.cx,sizeThumb.cx);
-        szRet.cy=100;
-    }else
+        szRet.cx = smax(sizeBg.cx, sizeThumb.cx);
+        szRet.cy = 100;
+    }
+    else
     {
-        szRet.cy=smax(sizeBg.cy,sizeThumb.cy);
-        szRet.cx=100;
+        szRet.cy = smax(sizeBg.cy, sizeThumb.cy);
+        szRet.cx = 100;
     }
     return szRet;
 }
@@ -272,13 +286,14 @@ SIZE SSliderBar::GetDesiredSize(int wid, int hei)
 void SSliderBar::OnColorize(COLORREF cr)
 {
     __baseCls::OnColorize(cr);
-    if(m_pSkinThumb) m_pSkinThumb->OnColorize(cr);
+    if (m_pSkinThumb)
+        m_pSkinThumb->OnColorize(cr);
 }
 
 void SSliderBar::OnScaleChanged(int scale)
 {
-	__baseCls::OnScaleChanged(scale);
-	GetScaleSkin(m_pSkinThumb,scale);
+    __baseCls::OnScaleChanged(scale);
+    GetScaleSkin(m_pSkinThumb, scale);
 }
 
-}//end of namespace
+} // namespace SOUI

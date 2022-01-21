@@ -11,54 +11,58 @@ SouiFactory::~SouiFactory(void)
 {
 }
 
-STDMETHODIMP_(HRESULT) SouiFactory::CreateApp(THIS_ IApplication **ppRet,IRenderFactory *pRenderFac,HMODULE hInst,LPCTSTR pszHostClassName,BOOL bImeApp)
+STDMETHODIMP_(HRESULT)
+SouiFactory::CreateApp(THIS_ IApplication **ppRet,
+                       IRenderFactory *pRenderFac,
+                       HMODULE hInst,
+                       LPCTSTR pszHostClassName,
+                       BOOL bImeApp)
 {
-	* ppRet = new SApplication(pRenderFac,hInst,pszHostClassName,SObjectDefaultRegister(),bImeApp);
-	return S_OK;
+    *ppRet
+        = new SApplication(pRenderFac, hInst, pszHostClassName, SObjectDefaultRegister(), bImeApp);
+    return S_OK;
 }
 
 STDMETHODIMP_(HRESULT) SouiFactory::CreateNativeWnd(THIS_ INativeWnd **ppRet)
 {
-	*ppRet = new SNativeWnd();
-	return S_OK;
+    *ppRet = new SNativeWnd();
+    return S_OK;
 }
 
-STDMETHODIMP_(HRESULT) SouiFactory::CreateHostWnd(THIS_ IHostWnd **ppRet,LPCTSTR pszResID)
+STDMETHODIMP_(HRESULT) SouiFactory::CreateHostWnd(THIS_ IHostWnd **ppRet, LPCTSTR pszResID)
 {
-	*ppRet = new SHostWnd(pszResID);
-	return S_OK;
+    *ppRet = new SHostWnd(pszResID);
+    return S_OK;
 }
 
-STDMETHODIMP_(HRESULT) SouiFactory::CreateHostDialog(THIS_ IHostDialog **ppRet,LPCTSTR pszResID)
+STDMETHODIMP_(HRESULT) SouiFactory::CreateHostDialog(THIS_ IHostDialog **ppRet, LPCTSTR pszResID)
 {
-	*ppRet = new SHostDialog(pszResID);
-	return S_OK;
+    *ppRet = new SHostDialog(pszResID);
+    return S_OK;
 }
 
-STDMETHODIMP_(HRESULT) SouiFactory::CreateStringA(THIS_ IStringA **ppRet,LPCSTR pszSrc)
+STDMETHODIMP_(HRESULT) SouiFactory::CreateStringA(THIS_ IStringA **ppRet, LPCSTR pszSrc)
 {
-	*ppRet = new SStringA(pszSrc);
-	return S_OK;
+    *ppRet = new SStringA(pszSrc);
+    return S_OK;
 }
 
-STDMETHODIMP_(HRESULT) SouiFactory::CreateStringW(THIS_ IStringW **ppRet,LPCWSTR pszSrc)
+STDMETHODIMP_(HRESULT) SouiFactory::CreateStringW(THIS_ IStringW **ppRet, LPCWSTR pszSrc)
 {
-	*ppRet = new SStringW(pszSrc);
-	return S_OK;
+    *ppRet = new SStringW(pszSrc);
+    return S_OK;
 }
 
 STDMETHODIMP_(HRESULT) SouiFactory::CreateXmlDoc(THIS_ IXmlDoc **ppRet)
 {
-	*ppRet = new SXmlDoc();
-	return S_OK;
+    *ppRet = new SXmlDoc();
+    return S_OK;
 }
 
-extern "C"
-HRESULT CreateSouiFactory(ISouiFactory ** ppRet)
+extern "C" HRESULT CreateSouiFactory(ISouiFactory **ppRet)
 {
-	*ppRet = new SouiFactory();
-	return S_OK;
+    *ppRet = new SouiFactory();
+    return S_OK;
 }
-
 
 SNSEND

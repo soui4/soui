@@ -6,19 +6,21 @@
  * found in the LICENSE file.
  */
 
-
 #ifndef _SFloatBits_DEFINED_
 #define _SFloatBits_DEFINED_
 
 #include <stdint.h>
 
-namespace SOUI{
+namespace SOUI
+{
 /** Convert a sign-bit int (i.e. float interpreted as int) into a 2s compliement
     int. This also converts -0 (0x80000000) to 0. Doing this to a float allows
     it to be compared using normal C operators (<, <=, etc.)
 */
-static inline int32_t SkSignBitTo2sCompliment(int32_t x) {
-    if (x < 0) {
+static inline int32_t SkSignBitTo2sCompliment(int32_t x)
+{
+    if (x < 0)
+    {
         x &= 0x7FFFFFFF;
         x = -x;
     }
@@ -28,7 +30,8 @@ static inline int32_t SkSignBitTo2sCompliment(int32_t x) {
 /** Convert a 2s compliment int to a sign-bit (i.e. int interpreted as float).
     This undoes the result of SkSignBitTo2sCompliment().
  */
-static inline int32_t Sk2sComplimentToSignBit(int32_t x) {
+static inline int32_t Sk2sComplimentToSignBit(int32_t x)
+{
     int sign = x >> 31;
     // make x positive
     x = (x ^ sign) - sign;
@@ -37,21 +40,22 @@ static inline int32_t Sk2sComplimentToSignBit(int32_t x) {
     return x;
 }
 
-
 union SkFloatIntUnion {
-    float   fFloat;
+    float fFloat;
     int32_t fSignBitInt;
 };
 
 // Helper to see a float as its bit pattern (w/o aliasing warnings)
-static inline int32_t SkFloat2Bits(float x) {
+static inline int32_t SkFloat2Bits(float x)
+{
     SkFloatIntUnion data;
     data.fFloat = x;
     return data.fSignBitInt;
 }
 
 // Helper to see a bit pattern as a float (w/o aliasing warnings)
-static inline float SkBits2Float(int32_t floatAsBits) {
+static inline float SkBits2Float(int32_t floatAsBits)
+{
     SkFloatIntUnion data;
     data.fSignBitInt = floatAsBits;
     return data.fFloat;
@@ -62,15 +66,16 @@ static inline float SkBits2Float(int32_t floatAsBits) {
     not return the int equivalent of the float, just something cheaper for
     compares-only.
  */
-static inline int32_t SkFloatAs2sCompliment(float x) {
+static inline int32_t SkFloatAs2sCompliment(float x)
+{
     return SkSignBitTo2sCompliment(SkFloat2Bits(x));
 }
 
 //  Scalar wrappers for float-bit routines
 
-#define SFloatAs2sCompliment(x)    SkFloatAs2sCompliment(x)
-#define Sk2sComplimentAsScalar(x)    Sk2sComplimentAsFloat(x)
+#define SFloatAs2sCompliment(x)   SkFloatAs2sCompliment(x)
+#define Sk2sComplimentAsScalar(x) Sk2sComplimentAsFloat(x)
 
-}//end of namespace SOUI
+} // end of namespace SOUI
 
 #endif

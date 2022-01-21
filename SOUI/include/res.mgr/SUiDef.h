@@ -13,51 +13,51 @@
 namespace SOUI
 {
 
-	struct IUiDefInfo : IObjRef
-	{
-		virtual void SetSkinPool(SSkinPool * pSkinPool) = 0;
-		virtual SSkinPool * GetSkinPool() =0;
-		virtual void SetStylePool(SStylePool * pStylePool) = 0;
-		virtual SStylePool * GetStylePool() =0;
-		virtual void SetObjDefAttr(SObjDefAttr * pObjDefAttr) = 0;
-		virtual SObjDefAttr * GetObjDefAttr() = 0;
-		virtual STemplatePool * GetTemplatePool() = 0;
-		virtual void SetTemplatePool(STemplatePool *pPool) = 0;
+struct IUiDefInfo : IObjRef
+{
+    virtual void SetSkinPool(SSkinPool *pSkinPool) = 0;
+    virtual SSkinPool *GetSkinPool() = 0;
+    virtual void SetStylePool(SStylePool *pStylePool) = 0;
+    virtual SStylePool *GetStylePool() = 0;
+    virtual void SetObjDefAttr(SObjDefAttr *pObjDefAttr) = 0;
+    virtual SObjDefAttr *GetObjDefAttr() = 0;
+    virtual STemplatePool *GetTemplatePool() = 0;
+    virtual void SetTemplatePool(STemplatePool *pPool) = 0;
 
-		virtual SNamedColor & GetNamedColor()  =0;
-		virtual SNamedString & GetNamedString()  =0;
-		virtual SNamedDimension & GetNamedDimension() = 0;
-		virtual FontInfo & GetDefFontInfo() = 0;
-		virtual SXmlNode GetCaretInfo() = 0;
-	};
+    virtual SNamedColor &GetNamedColor() = 0;
+    virtual SNamedString &GetNamedString() = 0;
+    virtual SNamedDimension &GetNamedDimension() = 0;
+    virtual FontInfo &GetDefFontInfo() = 0;
+    virtual SXmlNode GetCaretInfo() = 0;
+};
 
-	typedef BOOL (*FunFontCheck)(const SStringW & strFontName);
+typedef BOOL (*FunFontCheck)(const SStringW &strFontName);
 
-	class SOUI_EXP SUiDef : public SSingleton2<SUiDef>
-	{
-		SINGLETON2_TYPE(SINGLETON_UIDEF)
-	public:
-		SUiDef(void);
-		~SUiDef(void);
+class SOUI_EXP SUiDef : public SSingleton2<SUiDef> {
+    SINGLETON2_TYPE(SINGLETON_UIDEF)
+  public:
+    SUiDef(void);
+    ~SUiDef(void);
 
-		static IUiDefInfo * CreateUiDefInfo(IResProvider *pResProvider, LPCTSTR pszUiDef);
+    static IUiDefInfo *CreateUiDefInfo(IResProvider *pResProvider, LPCTSTR pszUiDef);
 
-		static IUiDefInfo * CreateUiDefInfo2(IResProvider *pResProvider, LPCTSTR pszUiDef);
+    static IUiDefInfo *CreateUiDefInfo2(IResProvider *pResProvider, LPCTSTR pszUiDef);
 
-		
-		IUiDefInfo * GetUiDef(){return m_pCurUiDef;}
-		
-		void SetUiDef(IUiDefInfo* pUiDefInfo ,bool bUpdateDefFont);
+    IUiDefInfo *GetUiDef()
+    {
+        return m_pCurUiDef;
+    }
 
-		static void SetFontChecker(FunFontCheck fontCheck);
+    void SetUiDef(IUiDefInfo *pUiDefInfo, bool bUpdateDefFont);
 
-		static BOOL CheckFont(const SStringW & strFontName);
-	protected:
+    static void SetFontChecker(FunFontCheck fontCheck);
 
-		static FunFontCheck	s_funFontCheck;
+    static BOOL CheckFont(const SStringW &strFontName);
 
-		SAutoRefPtr<IUiDefInfo> m_pCurUiDef;
-	};
+  protected:
+    static FunFontCheck s_funFontCheck;
 
+    SAutoRefPtr<IUiDefInfo> m_pCurUiDef;
+};
 
-}
+} // namespace SOUI

@@ -2,14 +2,14 @@
 
 namespace SOUI
 {
-    class SOUI_EXP SAppDir 
-    {
-    public:
-        SAppDir(HINSTANCE hInst);
+class SOUI_EXP SAppDir {
+  public:
+    SAppDir(HINSTANCE hInst);
 
-        const SStringT & AppDir();
-    protected:
-        SStringT    m_strAppPath;
-    };
+    const SStringT &AppDir();
 
-}
+  protected:
+    SStringT m_strAppPath;
+};
+
+} // namespace SOUI

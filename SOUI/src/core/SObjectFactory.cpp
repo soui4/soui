@@ -7,7 +7,7 @@ namespace SOUI
 
 SObjectFactoryMgr::SObjectFactoryMgr(void)
 {
-    m_pFunOnKeyRemoved=OnFactoryRemoved;
+    m_pFunOnKeyRemoved = OnFactoryRemoved;
 }
 
 //************************************
@@ -18,22 +18,22 @@ SObjectFactoryMgr::SObjectFactoryMgr(void)
 // Parameter: SObjectFactory * pWndFactory:窗口工厂指针
 // Parameter: bool bReplace:强制替换原有工厂标志
 //************************************
-bool SObjectFactoryMgr::RegisterFactory(SObjectFactory & objFactory, bool bReplace)
+bool SObjectFactoryMgr::RegisterFactory(SObjectFactory &objFactory, bool bReplace)
 {
-	if (HasKey(objFactory.GetObjectInfo()))
-	{
-		if (!bReplace) return false;
-		RemoveKeyObject(objFactory.GetObjectInfo());
-	}
-	AddKeyObject(objFactory.GetObjectInfo(), objFactory.Clone());
-	return true;
+    if (HasKey(objFactory.GetObjectInfo()))
+    {
+        if (!bReplace)
+            return false;
+        RemoveKeyObject(objFactory.GetObjectInfo());
+    }
+    AddKeyObject(objFactory.GetObjectInfo(), objFactory.Clone());
+    return true;
 }
 
-void SObjectFactoryMgr::OnFactoryRemoved( const SObjectFactoryPtr & obj )
+void SObjectFactoryMgr::OnFactoryRemoved(const SObjectFactoryPtr &obj)
 {
     delete obj;
 }
-
 
 //************************************
 // Method:    UnregisterFactor,反注册APP自定义的窗口类
@@ -43,75 +43,76 @@ void SObjectFactoryMgr::OnFactoryRemoved( const SObjectFactoryPtr & obj )
 // Parameter: SWindowFactory * pWndFactory
 //************************************
 
-bool SObjectFactoryMgr::UnregisterFactory(const SObjectInfo & objInfo)
+bool SObjectFactoryMgr::UnregisterFactory(const SObjectInfo &objInfo)
 {
-	return  RemoveKeyObject(objInfo);
+    return RemoveKeyObject(objInfo);
 }
 
-IObject * SObjectFactoryMgr::CreateObject(const SObjectInfo & objInfo) const
+IObject *SObjectFactoryMgr::CreateObject(const SObjectInfo &objInfo) const
 {
-    if(!HasKey(objInfo))
+    if (!HasKey(objInfo))
     {
-		return OnCreateUnknownObject(objInfo);
+        return OnCreateUnknownObject(objInfo);
     }
-    IObject * pRet = GetKeyObject(objInfo)->NewObject();
+    IObject *pRet = GetKeyObject(objInfo)->NewObject();
     SASSERT(pRet);
     SetSwndDefAttr(pRet);
     return pRet;
 }
 
-
-SObjectInfo SObjectFactoryMgr::BaseObjectInfoFromObjectInfo(const SObjectInfo & objInfo)
+SObjectInfo SObjectFactoryMgr::BaseObjectInfoFromObjectInfo(const SObjectInfo &objInfo)
 {
-	if (!HasKey(objInfo))
-	{
-		return SObjectInfo();
-	}
-	
-	SStringW strBaseClass = GetKeyObject(objInfo)->BaseClassName();
-	if(strBaseClass == objInfo.mName)
-		return SObjectInfo();
+    if (!HasKey(objInfo))
+    {
+        return SObjectInfo();
+    }
 
-	return SObjectInfo(strBaseClass, objInfo.mType);
+    SStringW strBaseClass = GetKeyObject(objInfo)->BaseClassName();
+    if (strBaseClass == objInfo.mName)
+        return SObjectInfo();
+
+    return SObjectInfo(strBaseClass, objInfo.mType);
 }
 
-
-void SObjectFactoryMgr::SetSwndDefAttr(IObject * pObject) const
+void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
 {
     LPCWSTR pszClassName = pObject->GetObjectClass();
-    
-	if (pObject->GetObjectType() != Window) return;
+
+    if (pObject->GetObjectType() != Window)
+        return;
 
     //检索并设置类的默认属性
-	SXmlNode defAttr;
-	SObjDefAttr * pDefObjAttr = SUiDef::getSingleton().GetUiDef()->GetObjDefAttr();
-	if (pDefObjAttr) defAttr = pDefObjAttr->GetDefAttribute(pszClassName);
+    SXmlNode defAttr;
+    SObjDefAttr *pDefObjAttr = SUiDef::getSingleton().GetUiDef()->GetObjDefAttr();
+    if (pDefObjAttr)
+        defAttr = pDefObjAttr->GetDefAttribute(pszClassName);
 
-    if(defAttr)
+    if (defAttr)
     {
         //优先处理"class"属性
-        SXmlAttr attrClass=defAttr.attribute(L"class");
-        if(attrClass)
+        SXmlAttr attrClass = defAttr.attribute(L"class");
+        if (attrClass)
         {
             attrClass.set_userdata(1);
-			pObject->SetAttributeW(attrClass.name(), attrClass.value(), TRUE);
+            pObject->SetAttributeW(attrClass.name(), attrClass.value(), TRUE);
         }
         for (SXmlAttr attr = defAttr.first_attribute(); attr; attr = attr.next_attribute())
         {
-            if(attr.get_userdata()) continue;
-			pObject->SetAttributeW(attr.name(), attr.value(), TRUE);
+            if (attr.get_userdata())
+                continue;
+            pObject->SetAttributeW(attr.name(), attr.value(), TRUE);
         }
-        if(attrClass)
+        if (attrClass)
         {
             attrClass.set_userdata(0);
         }
     }
 }
 
-IObject * SObjectFactoryMgr::OnCreateUnknownObject(const SObjectInfo & objInfo) const
+IObject *SObjectFactoryMgr::OnCreateUnknownObject(const SObjectInfo &objInfo) const
 {
-	SLOGFMTD(L"Warning: no object %s of type:%d in SOUI!!", (LPCWSTR)objInfo.mName, objInfo.mType);
-	return NULL;
+    SLOGFMTD(L"Warning: no object %s of type:%d in SOUI!!", (LPCWSTR)objInfo.mName, objInfo.mType);
+    return NULL;
 }
 
-}//namespace SOUI
+} // namespace SOUI

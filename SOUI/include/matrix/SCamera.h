@@ -12,34 +12,35 @@
 
 #include "SMatrix.h"
 
-namespace SOUI {
-	class S3DView;
-	class SOUI_EXP SCamera  {
-	public:
-		SCamera();
-		~SCamera();
+namespace SOUI
+{
+class S3DView;
+class SOUI_EXP SCamera {
+  public:
+    SCamera();
+    ~SCamera();
 
-		void save();
-		void restore();
+    void save();
+    void restore();
 
-		void translate(float x, float y, float z);
-		void rotateX(float deg);
-		void rotateY(float deg);
-		void rotateZ(float deg);
+    void translate(float x, float y, float z);
+    void rotateX(float deg);
+    void rotateY(float deg);
+    void rotateZ(float deg);
 
-		void setCameraLocation(float x, float y, float z);
-		float getCameraLocationX();
-		float getCameraLocationY();
-		float getCameraLocationZ();
+    void setCameraLocation(float x, float y, float z);
+    float getCameraLocationX();
+    float getCameraLocationY();
+    float getCameraLocationZ();
 
-		void getMatrix(SMatrix* out) const;
+    void getMatrix(SMatrix *out) const;
 
-	private:
-		SCamera(const SCamera&);
-		SCamera& operator=(const SCamera&);
+  private:
+    SCamera(const SCamera &);
+    SCamera &operator=(const SCamera &);
 
-		S3DView * m_priv;
-	};
-}//end of namespace SOUI
+    S3DView *m_priv;
+};
+} // end of namespace SOUI
 
 #endif

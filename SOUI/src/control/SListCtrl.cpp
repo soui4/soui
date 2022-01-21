@@ -14,17 +14,17 @@ SListCtrl::SListCtrl()
     , m_nItemHeight(20)
     , m_pHeader(NULL)
     , m_nSelectItem(-1)
-    , m_crItemBg(RGBA(255,255,255,255))
-    , m_crItemBg2(RGBA(226,226,226,255))
-	, m_crItemSelBg(RGBA(57,145,209,255))
-	, m_crItemHotBg(RGBA(57,145,209,128))
-    , m_crText(RGBA(0,0,0,255))
-    , m_crSelText(RGBA(255,255,0,255))
+    , m_crItemBg(RGBA(255, 255, 255, 255))
+    , m_crItemBg2(RGBA(226, 226, 226, 255))
+    , m_crItemSelBg(RGBA(57, 145, 209, 255))
+    , m_crItemHotBg(RGBA(57, 145, 209, 128))
+    , m_crText(RGBA(0, 0, 0, 255))
+    , m_crSelText(RGBA(255, 255, 0, 255))
     , m_pItemSkin(NULL)
     , m_pIconSkin(NULL)
     , m_pCheckSkin(GETBUILTINSKIN(SKIN_SYS_CHECKBOX))
-    , m_ptIcon(-1,-1)
-    , m_ptText(-1,-1)
+    , m_ptIcon(-1, -1)
+    , m_ptText(-1, -1)
     , m_bHotTrack(FALSE)
     , m_bCheckBox(FALSE)
     , m_bMultiSelection(FALSE)
@@ -34,7 +34,7 @@ SListCtrl::SListCtrl()
     m_evtSet.addEvent(EVENTID(EventLCSelChanging));
     m_evtSet.addEvent(EVENTID(EventLCSelChanged));
     m_evtSet.addEvent(EVENTID(EventLCDbClick));
-	m_evtSet.addEvent(EVENTID(EventLCItemDeleted));
+    m_evtSet.addEvent(EVENTID(EventLCItemDeleted));
 }
 
 SListCtrl::~SListCtrl()
@@ -46,7 +46,7 @@ int SListCtrl::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, LPARAM lPar
     SASSERT(m_pHeader);
 
     int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, ST_NULL, lParam);
-    for(int i=0;i<GetItemCount();i++)
+    for (int i = 0; i < GetItemCount(); i++)
     {
         m_arrItems[i].arSubItems->SetCount(GetColumnCount());
     }
@@ -56,38 +56,43 @@ int SListCtrl::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, LPARAM lPar
 
 BOOL SListCtrl::CreateChildren(SXmlNode xmlNode)
 {
-	SXmlNode xmlHeader = xmlNode.child(L"headerStyle");
-	m_pHeader = sobj_cast<SHeaderCtrl>(SApplication::getSingletonPtr()->CreateWindowByName(xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
-	SASSERT(m_pHeader);
-	if(!m_pHeader) return FALSE;
-	InsertChild(m_pHeader);
-	m_pHeader->InitFromXml(&xmlHeader);
-	xmlHeader.set_userdata(1);
+    SXmlNode xmlHeader = xmlNode.child(L"headerStyle");
+    m_pHeader = sobj_cast<SHeaderCtrl>(SApplication::getSingletonPtr()->CreateWindowByName(
+        xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
+    SASSERT(m_pHeader);
+    if (!m_pHeader)
+        return FALSE;
+    InsertChild(m_pHeader);
+    m_pHeader->InitFromXml(&xmlHeader);
+    xmlHeader.set_userdata(1);
 
-	if (!__baseCls::CreateChildren(xmlNode))
-		return FALSE;
+    if (!__baseCls::CreateChildren(xmlNode))
+        return FALSE;
 
-    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemChanging::EventID, Subscriber(&SListCtrl::OnHeaderSizeChanging,this));
-    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemSwap::EventID, Subscriber(&SListCtrl::OnHeaderSwap,this));
+    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemChanging::EventID,
+                                             Subscriber(&SListCtrl::OnHeaderSizeChanging, this));
+    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemSwap::EventID,
+                                             Subscriber(&SListCtrl::OnHeaderSwap, this));
 
     return TRUE;
 }
 
 int SListCtrl::InsertItem(int nItem, LPCTSTR pszText, int nImage)
 {
-    if(GetColumnCount()==0) return -1;
-    if (nItem<0 || nItem>GetItemCount())
+    if (GetColumnCount() == 0)
+        return -1;
+    if (nItem < 0 || nItem > GetItemCount())
         nItem = GetItemCount();
 
     DXLVITEM lvi;
     lvi.dwData = 0;
-    lvi.arSubItems=new ArrSubItem();
+    lvi.arSubItems = new ArrSubItem();
     lvi.arSubItems->SetCount(GetColumnCount());
-    
-    DXLVSUBITEM &subItem=lvi.arSubItems->GetAt(0);
+
+    DXLVSUBITEM &subItem = lvi.arSubItems->GetAt(0);
     subItem.strText = _tcsdup(pszText);
     subItem.cchTextMax = _tcslen(pszText);
-    subItem.nImage  = nImage;
+    subItem.nImage = nImage;
 
     m_arrItems.InsertAt(nItem, lvi);
 
@@ -98,7 +103,7 @@ int SListCtrl::InsertItem(int nItem, LPCTSTR pszText, int nImage)
 
 BOOL SListCtrl::SetItemData(int nItem, LPARAM dwData)
 {
-    if (nItem >= GetItemCount() || nItem<0)
+    if (nItem >= GetItemCount() || nItem < 0)
         return FALSE;
 
     m_arrItems[nItem].dwData = dwData;
@@ -108,47 +113,48 @@ BOOL SListCtrl::SetItemData(int nItem, LPARAM dwData)
 
 LPARAM SListCtrl::GetItemData(int nItem)
 {
-    if (nItem >= GetItemCount() || nItem<0)
+    if (nItem >= GetItemCount() || nItem < 0)
         return 0;
 
-    DXLVITEM& lvi = m_arrItems[nItem];
+    DXLVITEM &lvi = m_arrItems[nItem];
 
     return lvi.dwData;
 }
 
-BOOL SListCtrl::SetSubItem(int nItem, int nSubItem, const DXLVSUBITEM* plv)
+BOOL SListCtrl::SetSubItem(int nItem, int nSubItem, const DXLVSUBITEM *plv)
 {
-    if (nItem>=GetItemCount() || nSubItem>=GetColumnCount() || nItem<0)
+    if (nItem >= GetItemCount() || nSubItem >= GetColumnCount() || nItem < 0)
         return FALSE;
-    DXLVSUBITEM & lvsi_dst=m_arrItems[nItem].arSubItems->GetAt(nSubItem);
-    if(plv->mask & S_LVIF_TEXT)
+    DXLVSUBITEM &lvsi_dst = m_arrItems[nItem].arSubItems->GetAt(nSubItem);
+    if (plv->mask & S_LVIF_TEXT)
     {
-        if(lvsi_dst.strText) free(lvsi_dst.strText);
-        lvsi_dst.strText=_tcsdup(plv->strText);
-        lvsi_dst.cchTextMax=_tcslen(plv->strText);
+        if (lvsi_dst.strText)
+            free(lvsi_dst.strText);
+        lvsi_dst.strText = _tcsdup(plv->strText);
+        lvsi_dst.cchTextMax = _tcslen(plv->strText);
     }
-    if(plv->mask&S_LVIF_IMAGE)
-        lvsi_dst.nImage=plv->nImage;
-    if(plv->mask&S_LVIF_INDENT)
-        lvsi_dst.nIndent=plv->nIndent;
+    if (plv->mask & S_LVIF_IMAGE)
+        lvsi_dst.nImage = plv->nImage;
+    if (plv->mask & S_LVIF_INDENT)
+        lvsi_dst.nIndent = plv->nIndent;
     RedrawItem(nItem);
     return TRUE;
 }
 
-BOOL SListCtrl::GetSubItem(int nItem, int nSubItem, DXLVSUBITEM* plv) const
+BOOL SListCtrl::GetSubItem(int nItem, int nSubItem, DXLVSUBITEM *plv) const
 {
-    if (nItem>=GetItemCount() || nSubItem>=GetColumnCount() || nItem<0)
+    if (nItem >= GetItemCount() || nSubItem >= GetColumnCount() || nItem < 0)
         return FALSE;
 
-    const DXLVSUBITEM & lvsi_src=m_arrItems[nItem].arSubItems->GetAt(nSubItem);
-    if(plv->mask & S_LVIF_TEXT)
+    const DXLVSUBITEM &lvsi_src = m_arrItems[nItem].arSubItems->GetAt(nSubItem);
+    if (plv->mask & S_LVIF_TEXT)
     {
-        _tcscpy_s(plv->strText,plv->cchTextMax,lvsi_src.strText);
+        _tcscpy_s(plv->strText, plv->cchTextMax, lvsi_src.strText);
     }
-    if(plv->mask&S_LVIF_IMAGE)
-        plv->nImage=lvsi_src.nImage;
-    if(plv->mask&S_LVIF_INDENT)
-        plv->nIndent=lvsi_src.nIndent;
+    if (plv->mask & S_LVIF_IMAGE)
+        plv->nImage = lvsi_src.nImage;
+    if (plv->mask & S_LVIF_INDENT)
+        plv->nIndent = lvsi_src.nIndent;
     return TRUE;
 }
 
@@ -160,26 +166,25 @@ BOOL SListCtrl::SetSubItemText(int nItem, int nSubItem, LPCTSTR pszText)
     if (nSubItem < 0 || nSubItem >= GetColumnCount())
         return FALSE;
 
-    DXLVSUBITEM &lvi=m_arrItems[nItem].arSubItems->GetAt(nSubItem);
-    if(lvi.strText)
+    DXLVSUBITEM &lvi = m_arrItems[nItem].arSubItems->GetAt(nSubItem);
+    if (lvi.strText)
     {
         free(lvi.strText);
     }
     lvi.strText = _tcsdup(pszText);
-    lvi.cchTextMax= _tcslen(pszText);
-    
-    CRect rcItem=GetItemRect(nItem,nSubItem);
+    lvi.cchTextMax = _tcslen(pszText);
+
+    CRect rcItem = GetItemRect(nItem, nSubItem);
     InvalidateRect(rcItem);
     return TRUE;
 }
 
-
-SStringT SListCtrl::GetSubItemText( int nItem, int nSubItem ) const
+SStringT SListCtrl::GetSubItemText(int nItem, int nSubItem) const
 {
-    if (nItem>=GetItemCount() || nSubItem>=GetColumnCount() || nItem<0)
+    if (nItem >= GetItemCount() || nSubItem >= GetColumnCount() || nItem < 0)
         return _T("");
 
-    const DXLVSUBITEM & lvsi_src=m_arrItems[nItem].arSubItems->GetAt(nSubItem);
+    const DXLVSUBITEM &lvsi_src = m_arrItems[nItem].arSubItems->GetAt(nSubItem);
     return lvsi_src.strText;
 }
 
@@ -190,10 +195,10 @@ int SListCtrl::GetSelectedItem()
 
 void SListCtrl::SetSelectedItem(int nItem)
 {
-	if (nItem != m_nSelectItem)
-	{
-		NotifySelChange(m_nSelectItem, nItem);
-	}
+    if (nItem != m_nSelectItem)
+    {
+        NotifySelChange(m_nSelectItem, nItem);
+    }
 }
 
 int SListCtrl::GetItemCount() const
@@ -204,18 +209,19 @@ int SListCtrl::GetItemCount() const
     return m_arrItems.GetCount();
 }
 
-BOOL SListCtrl::SetItemCount( int nItems ,int nGrowBy)
+BOOL SListCtrl::SetItemCount(int nItems, int nGrowBy)
 {
-    int nOldCount=GetItemCount();
-    if(nItems<nOldCount) return FALSE;
-    
-    BOOL bRet=m_arrItems.SetCount(nItems,nGrowBy);
-    if(bRet)
+    int nOldCount = GetItemCount();
+    if (nItems < nOldCount)
+        return FALSE;
+
+    BOOL bRet = m_arrItems.SetCount(nItems, nGrowBy);
+    if (bRet)
     {
-        for(int i=nOldCount;i<nItems;i++)
+        for (int i = nOldCount; i < nItems; i++)
         {
-            DXLVITEM & lvi=m_arrItems[i];
-            lvi.arSubItems=new ArrSubItem;
+            DXLVITEM &lvi = m_arrItems[i];
+            lvi.arSubItems = new ArrSubItem;
             lvi.arSubItems->SetCount(GetColumnCount());
         }
     }
@@ -238,106 +244,107 @@ CRect SListCtrl::GetListRect()
 //  更新滚动条
 void SListCtrl::UpdateScrollBar()
 {
-	CSize szView;
-	szView.cx = m_pHeader->GetTotalWidth(false);
-	int nMinWid = m_pHeader->GetTotalWidth(true);
-	szView.cy = GetItemCount()*m_nItemHeight;
+    CSize szView;
+    szView.cx = m_pHeader->GetTotalWidth(false);
+    int nMinWid = m_pHeader->GetTotalWidth(true);
+    szView.cy = GetItemCount() * m_nItemHeight;
 
-	CRect rcClient;
-	SWindow::GetClientRect(&rcClient);//不计算滚动条大小
-	rcClient.top+=m_nHeaderHeight;
-	if(rcClient.bottom<rcClient.top) 
-		rcClient.bottom=rcClient.top;
-	CSize size = rcClient.Size();
-	//  关闭滚动条
-	m_wBarVisible = SSB_NULL;
+    CRect rcClient;
+    SWindow::GetClientRect(&rcClient); //不计算滚动条大小
+    rcClient.top += m_nHeaderHeight;
+    if (rcClient.bottom < rcClient.top)
+        rcClient.bottom = rcClient.top;
+    CSize size = rcClient.Size();
+    //  关闭滚动条
+    m_wBarVisible = SSB_NULL;
 
-	if (size.cy<szView.cy || (size.cy<szView.cy+GetSbWidth() && size.cx<szView.cx))
-	{
-		//  需要纵向滚动条
-		m_wBarVisible |= SSB_VERT;
-		m_siVer.nMin  = 0;
-		m_siVer.nMax  = szView.cy-1;
-		m_siVer.nPage = rcClient.Height();
+    if (size.cy < szView.cy || (size.cy < szView.cy + GetSbWidth() && size.cx < szView.cx))
+    {
+        //  需要纵向滚动条
+        m_wBarVisible |= SSB_VERT;
+        m_siVer.nMin = 0;
+        m_siVer.nMax = szView.cy - 1;
+        m_siVer.nPage = rcClient.Height();
 
-		int horzSize = size.cx-GetSbWidth();
-		if (horzSize < nMinWid)
-		{
-			// 小于表头的最小宽度, 需要横向滚动条
-			m_wBarVisible |= SSB_HORZ;
-			m_siVer.nPage=size.cy-GetSbWidth() > 0 ? size.cy-GetSbWidth() : 0;//注意同时调整纵向滚动条page信息
+        int horzSize = size.cx - GetSbWidth();
+        if (horzSize < nMinWid)
+        {
+            // 小于表头的最小宽度, 需要横向滚动条
+            m_wBarVisible |= SSB_HORZ;
+            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth()
+                                                       : 0; //注意同时调整纵向滚动条page信息
 
-			m_siHoz.nMin  = 0;
-			m_siHoz.nMax  = szView.cx-1;
-			m_siHoz.nPage = (size.cx-GetSbWidth()) > 0 ? (size.cx-GetSbWidth()) : 0;
-		}
-		else 
-		{
-			if(horzSize<szView.cx || m_pHeader->IsAutoResize())
-			{//大于最小宽度，小于现在宽度，则调整表头的宽度。
-				CRect rcHead = m_pHeader->GetWindowRect();
-				rcHead.right=rcHead.left+horzSize;
-				m_pHeader->Move(rcHead);
-				szView.cx = horzSize;
-			}
-			//  不需要横向滚动条
-			m_siHoz.nPage = szView.cx;
-			m_siHoz.nMin  = 0;
-			m_siHoz.nMax  = m_siHoz.nPage-1;
-			m_siHoz.nPos  = 0;
-		}
-	}
-	else
-	{
-		//  不需要纵向滚动条
-		m_siVer.nPage = size.cy;
-		m_siVer.nMin  = 0;
-		m_siVer.nMax  = size.cy-1;
-		m_siVer.nPos  = 0;
+            m_siHoz.nMin = 0;
+            m_siHoz.nMax = szView.cx - 1;
+            m_siHoz.nPage = (size.cx - GetSbWidth()) > 0 ? (size.cx - GetSbWidth()) : 0;
+        }
+        else
+        {
+            if (horzSize < szView.cx || m_pHeader->IsAutoResize())
+            { //大于最小宽度，小于现在宽度，则调整表头的宽度。
+                CRect rcHead = m_pHeader->GetWindowRect();
+                rcHead.right = rcHead.left + horzSize;
+                m_pHeader->Move(rcHead);
+                szView.cx = horzSize;
+            }
+            //  不需要横向滚动条
+            m_siHoz.nPage = szView.cx;
+            m_siHoz.nMin = 0;
+            m_siHoz.nMax = m_siHoz.nPage - 1;
+            m_siHoz.nPos = 0;
+        }
+    }
+    else
+    {
+        //  不需要纵向滚动条
+        m_siVer.nPage = size.cy;
+        m_siVer.nMin = 0;
+        m_siVer.nMax = size.cy - 1;
+        m_siVer.nPos = 0;
 
-		if (size.cx < nMinWid)
-		{
-			//小于表头的最小宽度,  需要横向滚动条
-			m_wBarVisible |= SSB_HORZ;
-			m_siHoz.nMin  = 0;
-			m_siHoz.nMax  = szView.cx-1;
-			m_siHoz.nPage = size.cx;
-		}
-		else
-		{
-			if(size.cx<szView.cx || m_pHeader->IsAutoResize())
-			{//大于最小宽度，小于现在宽度，则调整表头的宽度。
-				CRect rcHead = m_pHeader->GetWindowRect();
-				rcHead.right=rcHead.left+size.cx;
-				m_pHeader->Move(rcHead);
-				szView.cx=size.cx;
-			}
-			//  不需要横向滚动条
-			m_siHoz.nPage = szView.cx;
-			m_siHoz.nMin  = 0;
-			m_siHoz.nMax  = m_siHoz.nPage-1;
-			m_siHoz.nPos  = 0;
-		}
-	}
+        if (size.cx < nMinWid)
+        {
+            //小于表头的最小宽度,  需要横向滚动条
+            m_wBarVisible |= SSB_HORZ;
+            m_siHoz.nMin = 0;
+            m_siHoz.nMax = szView.cx - 1;
+            m_siHoz.nPage = size.cx;
+        }
+        else
+        {
+            if (size.cx < szView.cx || m_pHeader->IsAutoResize())
+            { //大于最小宽度，小于现在宽度，则调整表头的宽度。
+                CRect rcHead = m_pHeader->GetWindowRect();
+                rcHead.right = rcHead.left + size.cx;
+                m_pHeader->Move(rcHead);
+                szView.cx = size.cx;
+            }
+            //  不需要横向滚动条
+            m_siHoz.nPage = szView.cx;
+            m_siHoz.nMin = 0;
+            m_siHoz.nMax = m_siHoz.nPage - 1;
+            m_siHoz.nPos = 0;
+        }
+    }
 
-	//  根据需要调整原点位置
-	if (HasScrollBar(FALSE) && m_siHoz.nPos+m_siHoz.nPage>szView.cx)
-	{
-		m_siHoz.nPos = szView.cx-m_siHoz.nPage;
-	}
+    //  根据需要调整原点位置
+    if (HasScrollBar(FALSE) && m_siHoz.nPos + m_siHoz.nPage > szView.cx)
+    {
+        m_siHoz.nPos = szView.cx - m_siHoz.nPage;
+    }
 
-	if (HasScrollBar(TRUE) && m_siVer.nPos +m_siVer.nPage>szView.cy)
-	{
-		m_siVer.nPos = szView.cy-m_siVer.nPage;
-	}
+    if (HasScrollBar(TRUE) && m_siVer.nPos + m_siVer.nPage > szView.cy)
+    {
+        m_siVer.nPos = szView.cy - m_siVer.nPage;
+    }
 
-	SetScrollPos(TRUE, m_siVer.nPos, TRUE);
-	SetScrollPos(FALSE, m_siHoz.nPos, TRUE);
+    SetScrollPos(TRUE, m_siVer.nPos, TRUE);
+    SetScrollPos(FALSE, m_siHoz.nPos, TRUE);
 
-	//  重新计算客户区及非客户区
-	SSendMessage(WM_NCCALCSIZE);
+    //  重新计算客户区及非客户区
+    SSendMessage(WM_NCCALCSIZE);
 
-	Invalidate();
+    Invalidate();
 }
 
 //更新表头位置
@@ -346,26 +353,28 @@ void SListCtrl::UpdateHeaderCtrl()
     CRect rcClient;
     GetClientRect(&rcClient);
     CRect rcHeader(rcClient);
-    rcHeader.bottom=rcHeader.top+m_nHeaderHeight;
-    rcHeader.left-=m_ptOrigin.x;
-    if(m_pHeader) m_pHeader->Move(rcHeader);
+    rcHeader.bottom = rcHeader.top + m_nHeaderHeight;
+    rcHeader.left -= m_ptOrigin.x;
+    if (m_pHeader)
+        m_pHeader->Move(rcHeader);
 }
 
 void SListCtrl::DeleteItem(int nItem)
 {
-    if (nItem>=0 && nItem < GetItemCount())
+    if (nItem >= 0 && nItem < GetItemCount())
     {
-        DXLVITEM &lvi=m_arrItems[nItem];
+        DXLVITEM &lvi = m_arrItems[nItem];
 
-		EventLCItemDeleted evt2(this);
-		evt2.nItem = nItem;
-		evt2.dwData = lvi.dwData;
-		FireEvent(evt2);
+        EventLCItemDeleted evt2(this);
+        evt2.nItem = nItem;
+        evt2.dwData = lvi.dwData;
+        FireEvent(evt2);
 
-        for(int i=0;i<GetColumnCount();i++)
+        for (int i = 0; i < GetColumnCount(); i++)
         {
-            DXLVSUBITEM &lvsi =lvi.arSubItems->GetAt(i);
-            if(lvsi.strText) free(lvsi.strText);
+            DXLVSUBITEM &lvsi = lvi.arSubItems->GetAt(i);
+            if (lvsi.strText)
+                free(lvsi.strText);
         }
         delete lvi.arSubItems;
         m_arrItems.RemoveAt(nItem);
@@ -374,26 +383,27 @@ void SListCtrl::DeleteItem(int nItem)
     }
 }
 
-void SListCtrl::DeleteColumn( int iCol )
+void SListCtrl::DeleteColumn(int iCol)
 {
-    if(m_pHeader->DeleteItem(iCol))
+    if (m_pHeader->DeleteItem(iCol))
     {
-		int nColumnCount = m_pHeader->GetItemCount();
+        int nColumnCount = m_pHeader->GetItemCount();
 
-        for(int i=0;i<GetItemCount();i++)
+        for (int i = 0; i < GetItemCount(); i++)
         {
-			DXLVITEM &lvi = m_arrItems[i];
+            DXLVITEM &lvi = m_arrItems[i];
 
-			if (0 == nColumnCount)
-			{
-				EventLCItemDeleted evt2(this);
-				evt2.nItem = i;
-				evt2.dwData = lvi.dwData;
-				FireEvent(evt2);
-			}
+            if (0 == nColumnCount)
+            {
+                EventLCItemDeleted evt2(this);
+                evt2.nItem = i;
+                evt2.dwData = lvi.dwData;
+                FireEvent(evt2);
+            }
 
-            DXLVSUBITEM &lvsi=lvi.arSubItems->GetAt(iCol);
-            if(lvsi.strText) free(lvsi.strText);
+            DXLVSUBITEM &lvsi = lvi.arSubItems->GetAt(iCol);
+            if (lvsi.strText)
+                free(lvsi.strText);
             m_arrItems[i].arSubItems->RemoveAt(iCol);
         }
         UpdateScrollBar();
@@ -402,20 +412,21 @@ void SListCtrl::DeleteColumn( int iCol )
 
 void SListCtrl::DeleteAllItems()
 {
-	m_nSelectItem = -1;
-    for(int i=0;i<GetItemCount();i++)
+    m_nSelectItem = -1;
+    for (int i = 0; i < GetItemCount(); i++)
     {
-		DXLVITEM &lvi = m_arrItems[i];
+        DXLVITEM &lvi = m_arrItems[i];
 
-		EventLCItemDeleted evt2(this);
-		evt2.nItem = i;
-		evt2.dwData = lvi.dwData;
-		FireEvent(evt2);
+        EventLCItemDeleted evt2(this);
+        evt2.nItem = i;
+        evt2.dwData = lvi.dwData;
+        FireEvent(evt2);
 
-        for(int j=0;j<GetColumnCount();j++)
+        for (int j = 0; j < GetColumnCount(); j++)
         {
-            DXLVSUBITEM &lvsi =lvi.arSubItems->GetAt(j);
-            if(lvsi.strText) free(lvsi.strText);
+            DXLVSUBITEM &lvsi = lvi.arSubItems->GetAt(j);
+            if (lvsi.strText)
+                free(lvsi.strText);
         }
         delete lvi.arSubItems;
     }
@@ -424,26 +435,25 @@ void SListCtrl::DeleteAllItems()
     UpdateScrollBar();
 }
 
-
 CRect SListCtrl::GetItemRect(int nItem, int nSubItem)
 {
-    if (!(nItem>=0 && nItem<GetItemCount() && nSubItem>=0 && nSubItem<GetColumnCount()))
+    if (!(nItem >= 0 && nItem < GetItemCount() && nSubItem >= 0 && nSubItem < GetColumnCount()))
         return CRect();
 
     CRect rcItem;
-    rcItem.top    = m_nItemHeight*nItem;
-    rcItem.bottom = rcItem.top+m_nItemHeight;
-    rcItem.left   = 0;
-    rcItem.right  = 0;
+    rcItem.top = m_nItemHeight * nItem;
+    rcItem.bottom = rcItem.top + m_nItemHeight;
+    rcItem.left = 0;
+    rcItem.right = 0;
 
     for (int nCol = 0; nCol < GetColumnCount(); nCol++)
     {
         SHDITEM hdi;
-        hdi.mask = SHDI_WIDTH|SHDI_ORDER;
+        hdi.mask = SHDI_WIDTH | SHDI_ORDER;
 
         m_pHeader->GetItem(nCol, &hdi);
-        rcItem.left  = rcItem.right;
-        rcItem.right = rcItem.left+hdi.cx;
+        rcItem.left = rcItem.right;
+        rcItem.right = rcItem.left + hdi.cx;
         if (hdi.iOrder == nSubItem)
             break;
     }
@@ -459,7 +469,7 @@ CRect SListCtrl::GetItemRect(int nItem, int nSubItem)
 
 //////////////////////////////////////////////////////////////////////////
 //  自动修改pt的位置为相对当前项的偏移量
-int SListCtrl::HitTest(const CPoint& pt)
+int SListCtrl::HitTest(const CPoint &pt)
 {
     CRect rcList = GetListRect();
 
@@ -483,15 +493,15 @@ void SListCtrl::RedrawItem(int nItem)
     CRect rcList = GetListRect();
 
     int nTopItem = GetTopIndex();
-    int nPageItems    = (rcList.Height()+m_nItemHeight-1)/m_nItemHeight;
+    int nPageItems = (rcList.Height() + m_nItemHeight - 1) / m_nItemHeight;
 
-    if (nItem>=nTopItem && nItem<GetItemCount() && nItem<=nTopItem+nPageItems)
+    if (nItem >= nTopItem && nItem < GetItemCount() && nItem <= nTopItem + nPageItems)
     {
-        CRect rcItem(0,0,rcList.Width(),m_nItemHeight);
-        rcItem.OffsetRect(0, m_nItemHeight*nItem-m_ptOrigin.y);
+        CRect rcItem(0, 0, rcList.Width(), m_nItemHeight);
+        rcItem.OffsetRect(0, m_nItemHeight * nItem - m_ptOrigin.y);
         rcItem.OffsetRect(rcList.TopLeft());
         CRect rcDC;
-        rcDC.IntersectRect(rcItem,rcList);
+        rcDC.IntersectRect(rcItem, rcList);
         IRenderTarget *pRT = GetRenderTarget(&rcDC, GRT_PAINTBKGND);
         SSendMessage(WM_ERASEBKGND, (WPARAM)pRT);
 
@@ -511,30 +521,29 @@ int SListCtrl::GetCountPerPage(BOOL bPartial)
     // round up to nearest item count
     return smax((int)(bPartial && divHeight.rem > 0 ? divHeight.quot + 1 : divHeight.quot), 1);
 }
-BOOL SListCtrl::SortItems(
-               PFNLVCOMPAREEX pfnCompare,
-               void * pContext 
-               )
+BOOL SListCtrl::SortItems(PFNLVCOMPAREEX pfnCompare, void *pContext)
 {
-    qsort_s(m_arrItems.GetData(),m_arrItems.GetCount(),sizeof(DXLVITEM),pfnCompare,pContext);
-    m_nSelectItem=-1;
-    m_nHoverItem=-1;
+    qsort_s(m_arrItems.GetData(), m_arrItems.GetCount(), sizeof(DXLVITEM), pfnCompare, pContext);
+    m_nSelectItem = -1;
+    m_nHoverItem = -1;
     InvalidateRect(GetListRect());
     return TRUE;
 }
 
-void SListCtrl::OnPaint(IRenderTarget * pRT)
+void SListCtrl::OnPaint(IRenderTarget *pRT)
 {
     SPainter painter;
     BeforePaint(pRT, painter);
     CRect rcList = GetListRect();
     int nTopItem = GetTopIndex();
-    pRT->PushClipRect(&rcList,RGN_AND);
+    pRT->PushClipRect(&rcList, RGN_AND);
     CRect rcItem(rcList);
 
     rcItem.bottom = rcItem.top;
-    rcItem.OffsetRect(0,-(m_ptOrigin.y%m_nItemHeight));
-    for (int nItem = nTopItem; nItem <= (nTopItem+GetCountPerPage(TRUE)) && nItem<GetItemCount(); rcItem.top = rcItem.bottom, nItem++)
+    rcItem.OffsetRect(0, -(m_ptOrigin.y % m_nItemHeight));
+    for (int nItem = nTopItem;
+         nItem <= (nTopItem + GetCountPerPage(TRUE)) && nItem < GetItemCount();
+         rcItem.top = rcItem.bottom, nItem++)
     {
         rcItem.bottom = rcItem.top + m_nItemHeight;
 
@@ -544,14 +553,14 @@ void SListCtrl::OnPaint(IRenderTarget * pRT)
     AfterPaint(pRT, painter);
 }
 
-BOOL SListCtrl::HitCheckBox(const CPoint& pt)
+BOOL SListCtrl::HitCheckBox(const CPoint &pt)
 {
     if (!m_bCheckBox)
         return FALSE;
 
     CRect rect = GetListRect();
     rect.left += ITEM_MARGIN;
-    rect.OffsetRect(-m_ptOrigin.x,0);
+    rect.OffsetRect(-m_ptOrigin.x, 0);
 
     CSize sizeSkin = m_pCheckSkin->GetSkinSize();
     int nOffsetX = 3;
@@ -564,65 +573,62 @@ BOOL SListCtrl::HitCheckBox(const CPoint& pt)
     return FALSE;
 }
 
-void SListCtrl::DrawItem(IRenderTarget * pRT, CRect rcItem, int nItem)
+void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
 {
     BOOL bTextColorChanged = FALSE;
     int nBgImg = 0;
-    COLORREF crOldText=RGBA(0xFF,0xFF,0xFF,0xFF);
+    COLORREF crOldText = RGBA(0xFF, 0xFF, 0xFF, 0xFF);
     COLORREF crItemBg = m_crItemBg;
     COLORREF crText = m_crText;
     DXLVITEM lvItem = m_arrItems[nItem];
     CRect rcIcon, rcText;
 
+    if (nItem % 2)
+    {
+        //         if (m_pItemSkin != NULL)
+        //             nBgImg = 1;
+        //         else if (CR_INVALID != m_crItemBg2)
+        //             crItemBg = m_crItemBg2;
+        //上面的代码不要了，因为skin间隔效果没必要，只留下颜色间隔就好了
+        if (CR_INVALID != m_crItemBg2)
+            crItemBg = m_crItemBg2;
+    }
 
-	if (nItem % 2)
-	{
-		//         if (m_pItemSkin != NULL)
-		//             nBgImg = 1;
-		//         else if (CR_INVALID != m_crItemBg2)
-		//             crItemBg = m_crItemBg2;
-		//上面的代码不要了，因为skin间隔效果没必要，只留下颜色间隔就好了
-		if (CR_INVALID != m_crItemBg2)
-			crItemBg = m_crItemBg2;
-	}
+    if (lvItem.checked)
+    { //和下面那个if的条件分开，才会有sel和hot的区别
+        if (m_pItemSkin != NULL)
+            nBgImg = 2;
+        else if (CR_INVALID != m_crItemSelBg)
+            crItemBg = m_crItemSelBg;
 
- 
+        if (CR_INVALID != m_crSelText)
+            crText = m_crSelText;
+    }
+    else if (m_bHotTrack && nItem == m_nHoverItem)
+    {
+        if (m_pItemSkin != NULL)
+            nBgImg = 1;
+        else if (CR_INVALID != m_crItemHotBg)
+            crItemBg = m_crItemHotBg;
 
-	if ( lvItem.checked) 
-	{//和下面那个if的条件分开，才会有sel和hot的区别
-		if (m_pItemSkin != NULL)
-			nBgImg = 2;
-		else if (CR_INVALID != m_crItemSelBg)
-			crItemBg = m_crItemSelBg;
+        if (CR_INVALID != m_crSelText)
+            crText = m_crSelText;
+    }
 
-		if (CR_INVALID != m_crSelText)
-			crText = m_crSelText;
-	}
-	else if  (m_bHotTrack && nItem == m_nHoverItem)
-	{
-		if (m_pItemSkin != NULL)
-			nBgImg = 1;
-		else if (CR_INVALID != m_crItemHotBg)
-			crItemBg = m_crItemHotBg;
+    //绘制背景
+    //     if (m_pItemSkin != NULL)
+    //         m_pItemSkin->Draw(pRT, rc, nBgImg);
+    //     else if (CR_INVALID != crItemBg)
+    //         pRT->FillSolidRect( rc, crItemBg);
+    //上面的代码在某些时候，【指定skin的时候，会导致背景异常】，所以颠倒一下顺序
+    if (CR_INVALID != crItemBg) //先画背景
+        pRT->FillSolidRect(rcItem, crItemBg);
 
-		if (CR_INVALID != m_crSelText)
-			crText = m_crSelText;
-	}
-
-	//绘制背景
-	//     if (m_pItemSkin != NULL)
-	//         m_pItemSkin->Draw(pRT, rc, nBgImg);
-	//     else if (CR_INVALID != crItemBg)
-	//         pRT->FillSolidRect( rc, crItemBg);
-	//上面的代码在某些时候，【指定skin的时候，会导致背景异常】，所以颠倒一下顺序
-	if (CR_INVALID != crItemBg)//先画背景
-		pRT->FillSolidRect( rcItem, crItemBg);
-
-	if (m_pItemSkin != NULL)//有skin，则覆盖背景
-		m_pItemSkin->DrawByIndex(pRT, rcItem, nBgImg); 
+    if (m_pItemSkin != NULL) //有skin，则覆盖背景
+        m_pItemSkin->DrawByIndex(pRT, rcItem, nBgImg);
 
     //  左边加上空白
-	rcItem.left += ITEM_MARGIN;
+    rcItem.left += ITEM_MARGIN;
 
     if (CR_INVALID != crText)
     {
@@ -632,16 +638,16 @@ void SListCtrl::DrawItem(IRenderTarget * pRT, CRect rcItem, int nItem)
 
     CRect rcCol(rcItem);
     rcCol.right = rcCol.left;
-    rcCol.OffsetRect(-m_ptOrigin.x,0);
+    rcCol.OffsetRect(-m_ptOrigin.x, 0);
 
     for (int nCol = 0; nCol < GetColumnCount(); nCol++)
     {
         CRect rcVisiblePart;
 
         SHDITEM hdi;
-        hdi.mask=SHDI_WIDTH|SHDI_ORDER;
-        m_pHeader->GetItem(nCol,&hdi);
-        rcCol.left=rcCol.right;
+        hdi.mask = SHDI_WIDTH | SHDI_ORDER;
+        m_pHeader->GetItem(nCol, &hdi);
+        rcCol.left = rcCol.right;
         rcCol.right = rcCol.left + hdi.cx;
 
         rcVisiblePart.IntersectRect(rcItem, rcCol);
@@ -663,7 +669,7 @@ void SListCtrl::DrawItem(IRenderTarget * pRT, CRect rcItem, int nItem)
             rcCol.left = sizeSkin.cx + 6 + rcCol.left;
         }
 
-        DXLVSUBITEM& subItem = lvItem.arSubItems->GetAt(hdi.iOrder);
+        DXLVSUBITEM &subItem = lvItem.arSubItems->GetAt(hdi.iOrder);
 
         if (subItem.nImage != -1 && m_pIconSkin)
         {
@@ -725,30 +731,40 @@ int SListCtrl::GetTopIndex() const
 void SListCtrl::NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox)
 {
     EventLCSelChanging evt1(this);
-	evt1.bCancel = FALSE;
-    evt1.nOldSel=nOldSel;
-    evt1.nNewSel=nNewSel;
+    evt1.bCancel = FALSE;
+    evt1.nOldSel = nOldSel;
+    evt1.nNewSel = nNewSel;
 
     FireEvent(evt1);
-    if(evt1.bCancel) return;
+    if (evt1.bCancel)
+        return;
 
-    if (checkBox) {
-    	if (nNewSel != -1) {
+    if (checkBox)
+    {
+        if (nNewSel != -1)
+        {
             DXLVITEM &newItem = m_arrItems[nNewSel];
-            newItem.checked = newItem.checked? FALSE:TRUE;
+            newItem.checked = newItem.checked ? FALSE : TRUE;
             m_nSelectItem = nNewSel;
             RedrawItem(nNewSel);
         }
-    } else  {
-        if ((m_bMultiSelection || m_bCheckBox) && GetKeyState(VK_CONTROL) < 0) {
-            if (nNewSel != -1) {
+    }
+    else
+    {
+        if ((m_bMultiSelection || m_bCheckBox) && GetKeyState(VK_CONTROL) < 0)
+        {
+            if (nNewSel != -1)
+            {
                 DXLVITEM &newItem = m_arrItems[nNewSel];
-                newItem.checked = newItem.checked? FALSE:TRUE;
+                newItem.checked = newItem.checked ? FALSE : TRUE;
                 m_nSelectItem = nNewSel;
                 RedrawItem(nNewSel);
             }
-        } else if ((m_bMultiSelection || m_bCheckBox) && GetKeyState(VK_SHIFT) < 0) {
-            if (nNewSel != -1) {
+        }
+        else if ((m_bMultiSelection || m_bCheckBox) && GetKeyState(VK_SHIFT) < 0)
+        {
+            if (nNewSel != -1)
+            {
                 if (nOldSel == -1)
                     nOldSel = 0;
 
@@ -758,21 +774,26 @@ void SListCtrl::NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox)
                 {
                     DXLVITEM &lvItem = m_arrItems[i];
                     BOOL last = lvItem.checked;
-                    if (i >= imin && i<= imax) {
+                    if (i >= imin && i <= imax)
+                    {
                         lvItem.checked = TRUE;
-                    } else {
+                    }
+                    else
+                    {
                         lvItem.checked = FALSE;
                     }
                     if (last != lvItem.checked)
                         RedrawItem(i);
                 }
             }
-        } else {
+        }
+        else
+        {
             m_nSelectItem = -1;
             for (int i = 0; i < GetItemCount(); i++)
             {
                 DXLVITEM &lvItem = m_arrItems[i];
-                if (i != nNewSel && lvItem.checked) 
+                if (i != nNewSel && lvItem.checked)
                 {
                     BOOL last = lvItem.checked;
                     lvItem.checked = FALSE;
@@ -780,7 +801,8 @@ void SListCtrl::NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox)
                         RedrawItem(i);
                 }
             }
-            if (nNewSel != -1) {
+            if (nNewSel != -1)
+            {
                 DXLVITEM &newItem = m_arrItems[nNewSel];
                 newItem.checked = TRUE;
                 m_nSelectItem = nNewSel;
@@ -788,10 +810,10 @@ void SListCtrl::NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox)
             }
         }
     }
-    
+
     EventLCSelChanged evt2(this);
-    evt2.nOldSel=nOldSel;
-    evt2.nNewSel=nNewSel;
+    evt2.nOldSel = nOldSel;
+    evt2.nNewSel = nNewSel;
     FireEvent(evt2);
 }
 
@@ -811,7 +833,7 @@ BOOL SListCtrl::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     }
 
     Invalidate();
-    if (uCode==SB_THUMBTRACK)
+    if (uCode == SB_THUMBTRACK)
         ScrollUpdate();
 
     return bRet;
@@ -819,13 +841,13 @@ BOOL SListCtrl::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 
 void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnLButtonDown(nFlags,pt);
+    __baseCls::OnLButtonDown(nFlags, pt);
     m_nHoverItem = HitTest(pt);
     BOOL hitCheckBox = HitCheckBox(pt);
 
     if (hitCheckBox)
         NotifySelChange(m_nSelectItem, m_nHoverItem, TRUE);
-    else if (m_nHoverItem!=m_nSelectItem && !m_bHotTrack)
+    else if (m_nHoverItem != m_nSelectItem && !m_bHotTrack)
         NotifySelChange(m_nSelectItem, m_nHoverItem);
     else if (m_nHoverItem != -1 || m_nSelectItem != -1)
         NotifySelChange(m_nSelectItem, m_nHoverItem);
@@ -833,20 +855,19 @@ void SListCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
 
 void SListCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
 {
-	m_nHoverItem = HitTest(pt);
-	if (m_nHoverItem != m_nSelectItem)
-		NotifySelChange(m_nSelectItem, m_nHoverItem);
+    m_nHoverItem = HitTest(pt);
+    if (m_nHoverItem != m_nSelectItem)
+        NotifySelChange(m_nSelectItem, m_nHoverItem);
 
-	EventLCDbClick evt2(this);
-	evt2.nCurSel = m_nHoverItem;
-	FireEvent(evt2);
+    EventLCDbClick evt2(this);
+    evt2.nCurSel = m_nHoverItem;
+    FireEvent(evt2);
 }
 
 void SListCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
 {
-    __baseCls::OnLButtonUp(nFlags,pt);
+    __baseCls::OnLButtonUp(nFlags, pt);
 }
-
 
 void SListCtrl::UpdateChildrenPosition()
 {
@@ -856,7 +877,7 @@ void SListCtrl::UpdateChildrenPosition()
 
 void SListCtrl::OnSize(UINT nType, CSize size)
 {
-    __baseCls::OnSize(nType,size);
+    __baseCls::OnSize(nType, size);
     UpdateScrollBar();
     UpdateHeaderCtrl();
 }
@@ -881,21 +902,21 @@ BOOL SListCtrl::OnHeaderSwap(IEvtArgs *pEvt)
     return true;
 }
 
-void SListCtrl::OnMouseMove( UINT nFlags, CPoint pt )
+void SListCtrl::OnMouseMove(UINT nFlags, CPoint pt)
 {
     int nHoverItem = HitTest(pt);
-    if(m_bHotTrack && nHoverItem != m_nHoverItem)
+    if (m_bHotTrack && nHoverItem != m_nHoverItem)
     {
-        m_nHoverItem= nHoverItem;
+        m_nHoverItem = nHoverItem;
         Invalidate();
     }
 }
 
 void SListCtrl::OnMouseLeave()
 {
-    if(m_bHotTrack)
+    if (m_bHotTrack)
     {
-        m_nHoverItem=-1;
+        m_nHoverItem = -1;
         Invalidate();
     }
     __baseCls::OnMouseLeave();
@@ -912,7 +933,8 @@ BOOL SListCtrl::GetCheckState(int nItem)
 
 BOOL SListCtrl::SetCheckState(int nItem, BOOL bCheck)
 {
-    if (!m_bCheckBox) return FALSE;
+    if (!m_bCheckBox)
+        return FALSE;
 
     if (nItem >= GetItemCount())
         return FALSE;
@@ -943,7 +965,8 @@ int SListCtrl::GetFirstCheckedItem()
     for (int i = 0; i < GetItemCount(); i++)
     {
         const DXLVITEM lvItem = m_arrItems[i];
-        if (lvItem.checked) {
+        if (lvItem.checked)
+        {
             ret = i;
             break;
         }
@@ -958,7 +981,8 @@ int SListCtrl::GetLastCheckedItem()
     for (int i = GetItemCount() - 1; i >= 0; i--)
     {
         const DXLVITEM lvItem = m_arrItems[i];
-        if (lvItem.checked) {
+        if (lvItem.checked)
+        {
             ret = i;
             break;
         }
@@ -967,9 +991,9 @@ int SListCtrl::GetLastCheckedItem()
     return ret;
 }
 
-SHeaderCtrl * SListCtrl::GetHeaderCtrl() const
+SHeaderCtrl *SListCtrl::GetHeaderCtrl() const
 {
-	return m_pHeader;
+    return m_pHeader;
 }
 
-}//end of namespace 
+} // namespace SOUI

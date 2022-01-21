@@ -5,45 +5,46 @@
 
 namespace SOUI
 {
-    class STipCtrl : public IToolTip
-                   , public SNativeWnd 
-    {
-    public:
-        STipCtrl(void);
-        virtual ~STipCtrl(void);
+class STipCtrl
+    : public IToolTip
+    , public SNativeWnd {
+  public:
+    STipCtrl(void);
+    virtual ~STipCtrl(void);
 
-        BOOL Create();
+    BOOL Create();
 
-	public://IToolTip
-		STDMETHOD_(BOOL,PreTranslateMessage)(THIS_ MSG* pMsg) OVERRIDE;
+  public: // IToolTip
+    STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG *pMsg) OVERRIDE;
 
-		STDMETHOD_(void,UpdateTip)(THIS_ const TIPID *id, RECT rc,LPCTSTR pszTip, int nScale) OVERRIDE;
+    STDMETHOD_(void, UpdateTip)
+    (THIS_ const TIPID *id, RECT rc, LPCTSTR pszTip, int nScale) OVERRIDE;
 
-		STDMETHOD_(void,ClearTip)(THIS) OVERRIDE;
+    STDMETHOD_(void, ClearTip)(THIS) OVERRIDE;
 
-		STDMETHOD_(void,RelayEvent)(THIS_ const MSG *pMsg) OVERRIDE;
-	protected:
-        virtual void OnFinalMessage(HWND hWnd);
+    STDMETHOD_(void, RelayEvent)(THIS_ const MSG *pMsg) OVERRIDE;
 
-        void OnTimer(UINT_PTR idEvent);
-        void OnPaint(HDC dc);
-        void ShowTip(BOOL bShow);
+  protected:
+    virtual void OnFinalMessage(HWND hWnd);
 
-        BEGIN_MSG_MAP_EX(STipCtrl)
-            MSG_WM_PAINT(OnPaint)
-            MSG_WM_TIMER(OnTimer)
-            REFLECT_NOTIFICATIONS_EX()
-        END_MSG_MAP()
+    void OnTimer(UINT_PTR idEvent);
+    void OnPaint(HDC dc);
+    void ShowTip(BOOL bShow);
 
-    protected:
-        int            m_nDelay;
-        int            m_nShowSpan;
-        SStringT       m_strTip;
-        int            m_nScale;
-        CRect          m_rcTarget;
-        HFONT          m_font;
+    BEGIN_MSG_MAP_EX(STipCtrl)
+    MSG_WM_PAINT(OnPaint)
+    MSG_WM_TIMER(OnTimer)
+    REFLECT_NOTIFICATIONS_EX()
+    END_MSG_MAP()
 
-        TIPID          m_id;
-    };
-}
+  protected:
+    int m_nDelay;
+    int m_nShowSpan;
+    SStringT m_strTip;
+    int m_nScale;
+    CRect m_rcTarget;
+    HFONT m_font;
 
+    TIPID m_id;
+};
+} // namespace SOUI

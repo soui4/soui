@@ -20,164 +20,167 @@ SwndStyle::SwndStyle()
     , m_bDotted(0)
     , m_bTrackMouseEvent(0)
     , m_bBlendBackground(1)
-	, m_nScale(100)
-	, m_bMultiLines(FALSE)
+    , m_nScale(100)
+    , m_bMultiLines(FALSE)
 {
-    for(int i=0; i<4; i++)
+    for (int i = 0; i < 4; i++)
     {
-        m_crText[i]=CR_INVALID;
+        m_crText[i] = CR_INVALID;
     }
 }
 
 UINT SwndStyle::GetTextAlign() const
 {
-    if(m_nTextAlign) return m_nTextAlign;
-    UINT uRet=0;
-    switch(m_uAlign)
+    if (m_nTextAlign)
+        return m_nTextAlign;
+    UINT uRet = 0;
+    switch (m_uAlign)
     {
     case Align_Center:
-		uRet |= DT_CENTER;
-		break;
+        uRet |= DT_CENTER;
+        break;
     case Align_Right:
-		uRet|= DT_RIGHT;
-		break;
+        uRet |= DT_RIGHT;
+        break;
     }
-    switch(m_uVAlign)
+    switch (m_uVAlign)
     {
     case VAlign_Middle:
-		uRet |= DT_VCENTER;
-		break;
+        uRet |= DT_VCENTER;
+        break;
     case VAlign_Bottom:
-		uRet|= DT_BOTTOM;
-		break;
+        uRet |= DT_BOTTOM;
+        break;
     }
-	if (!m_bMultiLines)
-		uRet |= DT_SINGLELINE;
-    if(m_bDotted) 
-		uRet|=DT_END_ELLIPSIS;
+    if (!m_bMultiLines)
+        uRet |= DT_SINGLELINE;
+    if (m_bDotted)
+        uRet |= DT_END_ELLIPSIS;
     return uRet;
 }
 
 int SwndStyle::GetStates()
 {
-    int fonts=1,colors=1;
-    for(int i=1;i<4;i++)
+    int fonts = 1, colors = 1;
+    for (int i = 1; i < 4; i++)
     {
-        if(m_ftText[i].GetFontPtr()!=NULL) fonts++;
-        if(m_crText[i]!=CR_INVALID) colors++;
+        if (m_ftText[i].GetFontPtr() != NULL)
+            fonts++;
+        if (m_crText[i] != CR_INVALID)
+            colors++;
     }
-    return smax(fonts,colors);
+    return smax(fonts, colors);
 }
 
-COLORREF SwndStyle::GetTextColor( int iState )
+COLORREF SwndStyle::GetTextColor(int iState)
 {
-	iState %= 4;
-    if(m_crText[iState]==CR_INVALID) iState=0;
+    iState %= 4;
+    if (m_crText[iState] == CR_INVALID)
+        iState = 0;
     return m_crText[iState];
 }
 
-IFontPtr SwndStyle::GetTextFont( int iState )
+IFontPtr SwndStyle::GetTextFont(int iState)
 {
-	iState %= 4;
-	if(!m_ftText[iState].GetFontPtr()) iState=0;
+    iState %= 4;
+    if (!m_ftText[iState].GetFontPtr())
+        iState = 0;
     return m_ftText[iState].GetFontPtr();
 }
 
-HRESULT SwndStyle::OnAttrMargin(const SStringW& strValue,BOOL bLoading)
+HRESULT SwndStyle::OnAttrMargin(const SStringW &strValue, BOOL bLoading)
 {
-	_ParseLayoutSize4(strValue, m_rcMargin);
-    return !bLoading?S_OK:S_FALSE;
+    _ParseLayoutSize4(strValue, m_rcMargin);
+    return !bLoading ? S_OK : S_FALSE;
 }
 
-HRESULT SwndStyle::OnAttrMarginX(const SStringW& strValue,BOOL bLoading)
+HRESULT SwndStyle::OnAttrMarginX(const SStringW &strValue, BOOL bLoading)
 {
-	m_rcMargin[0] = m_rcMargin[2] = GETLAYOUTSIZE(strValue);
-    return !bLoading?S_OK:S_FALSE;
+    m_rcMargin[0] = m_rcMargin[2] = GETLAYOUTSIZE(strValue);
+    return !bLoading ? S_OK : S_FALSE;
 }
 
-HRESULT SwndStyle::OnAttrMarginY(const SStringW& strValue,BOOL bLoading)
+HRESULT SwndStyle::OnAttrMarginY(const SStringW &strValue, BOOL bLoading)
 {
-	m_rcMargin[1] = m_rcMargin[3] = GETLAYOUTSIZE(strValue);
+    m_rcMargin[1] = m_rcMargin[3] = GETLAYOUTSIZE(strValue);
 
-	return !bLoading?S_OK:S_FALSE;
+    return !bLoading ? S_OK : S_FALSE;
 }
 
-void SwndStyle::_ParseLayoutSize4(const SStringW & strValue, SLayoutSize layoutSizes[])
+void SwndStyle::_ParseLayoutSize4(const SStringW &strValue, SLayoutSize layoutSizes[])
 {
-	SStringWList values;
-	size_t nValues = SplitString(strValue, L',', values);
-	if (nValues == 1)
-	{
-		layoutSizes[0] = layoutSizes[1] = layoutSizes[2] = layoutSizes[3] = GETLAYOUTSIZE(values[0]);
-	}
-	else if (nValues == 2)
-	{
-		layoutSizes[0] = layoutSizes[2] = GETLAYOUTSIZE(values[0]);
-		layoutSizes[1] = layoutSizes[3] = GETLAYOUTSIZE(values[1]);
-	}
-	else if (nValues == 4)
-	{
-		layoutSizes[0] = GETLAYOUTSIZE(values[0]);
-		layoutSizes[1] = GETLAYOUTSIZE(values[1]);
-		layoutSizes[2] = GETLAYOUTSIZE(values[2]);
-		layoutSizes[3] = GETLAYOUTSIZE(values[3]);
-	}
+    SStringWList values;
+    size_t nValues = SplitString(strValue, L',', values);
+    if (nValues == 1)
+    {
+        layoutSizes[0] = layoutSizes[1] = layoutSizes[2] = layoutSizes[3]
+            = GETLAYOUTSIZE(values[0]);
+    }
+    else if (nValues == 2)
+    {
+        layoutSizes[0] = layoutSizes[2] = GETLAYOUTSIZE(values[0]);
+        layoutSizes[1] = layoutSizes[3] = GETLAYOUTSIZE(values[1]);
+    }
+    else if (nValues == 4)
+    {
+        layoutSizes[0] = GETLAYOUTSIZE(values[0]);
+        layoutSizes[1] = GETLAYOUTSIZE(values[1]);
+        layoutSizes[2] = GETLAYOUTSIZE(values[2]);
+        layoutSizes[3] = GETLAYOUTSIZE(values[3]);
+    }
 }
 
-HRESULT SwndStyle::OnAttrPadding(const SStringW &strValue,BOOL bLoading)
+HRESULT SwndStyle::OnAttrPadding(const SStringW &strValue, BOOL bLoading)
 {
-	_ParseLayoutSize4(strValue, m_rcInset);
-	return bLoading?S_FALSE:S_OK;
+    _ParseLayoutSize4(strValue, m_rcInset);
+    return bLoading ? S_FALSE : S_OK;
 }
-
 
 void SwndStyle::SetScale(int nScale)
 {
-	m_nScale = nScale;
-	for(int i=0;i<4;i++)
-	{
-		m_ftText[i].UpdateFont(nScale);
-	}
+    m_nScale = nScale;
+    for (int i = 0; i < 4; i++)
+    {
+        m_ftText[i].UpdateFont(nScale);
+    }
 }
 
 CRect SwndStyle::GetMargin() const
 {
-	CRect rcRet;
-	rcRet.left = m_rcMargin[0].toPixelSize(GetScale());
-	rcRet.top = m_rcMargin[1].toPixelSize(GetScale());
-	rcRet.right = m_rcMargin[2].toPixelSize(GetScale());
-	rcRet.bottom = m_rcMargin[3].toPixelSize(GetScale());
-	return rcRet;
+    CRect rcRet;
+    rcRet.left = m_rcMargin[0].toPixelSize(GetScale());
+    rcRet.top = m_rcMargin[1].toPixelSize(GetScale());
+    rcRet.right = m_rcMargin[2].toPixelSize(GetScale());
+    rcRet.bottom = m_rcMargin[3].toPixelSize(GetScale());
+    return rcRet;
 }
 
 CRect SwndStyle::GetPadding() const
 {
-	CRect rcRet;
-	rcRet.left = m_rcInset[0].toPixelSize(GetScale());
-	rcRet.top = m_rcInset[1].toPixelSize(GetScale());
-	rcRet.right = m_rcInset[2].toPixelSize(GetScale());
-	rcRet.bottom = m_rcInset[3].toPixelSize(GetScale());
-	return rcRet;
-
+    CRect rcRet;
+    rcRet.left = m_rcInset[0].toPixelSize(GetScale());
+    rcRet.top = m_rcInset[1].toPixelSize(GetScale());
+    rcRet.right = m_rcInset[2].toPixelSize(GetScale());
+    rcRet.bottom = m_rcInset[3].toPixelSize(GetScale());
+    return rcRet;
 }
 
 void SwndStyle::SetAlign(UINT uAlign)
 {
-	m_uAlign = uAlign;
+    m_uAlign = uAlign;
 }
 
 void SwndStyle::SetVAlign(UINT uAlign)
 {
-	m_uVAlign = uAlign;
+    m_uVAlign = uAlign;
 }
 
 void SwndStyle::UpdateFont()
 {
-	for(int i=0;i<4;i++)
-	{
-		m_ftText[i].UpdateFont(m_nScale);
-	}
+    for (int i = 0; i < 4; i++)
+    {
+        m_ftText[i].UpdateFont(m_nScale);
+    }
 }
 
-
-}//namespace SOUI
+} // namespace SOUI

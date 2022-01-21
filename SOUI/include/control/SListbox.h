@@ -1,21 +1,21 @@
 ﻿/**
  * Copyright (C) 2014-2050 SOUI团队
  * All rights reserved.
- * 
+ *
  * @file       SListbox.h
- * @brief      
- * @version    v1.0      
- * @author     soui      
+ * @brief
+ * @version    v1.0
+ * @author     soui
  * @date       2014-07-06
- * 
- * Describe     
+ *
+ * Describe
  */
-#pragma  once
+#pragma once
 #include "core/SPanel.h"
 
 namespace SOUI
 {
-/** 
+/**
  * @struct    tagLBITEM
  * @brief     LBitem
  *
@@ -23,11 +23,12 @@ namespace SOUI
  */
 typedef struct tagLBITEM
 {
-    STrText     strText;  /**< 文本 */
-    int         nImage;   /**< 图标 */
-    LPARAM      lParam;   /**< 附加参数 */
+    STrText strText; /**< 文本 */
+    int nImage;      /**< 图标 */
+    LPARAM lParam;   /**< 附加参数 */
 
-	tagLBITEM(ITrCtxProvider * pTrCtx):strText(pTrCtx)
+    tagLBITEM(ITrCtxProvider *pTrCtx)
+        : strText(pTrCtx)
     {
         nImage = -1;
         lParam = NULL;
@@ -35,22 +36,20 @@ typedef struct tagLBITEM
 
 } LBITEM, *LPLBITEM;
 
-/** 
+/**
  * @class     SListBox
  * @brief     列表框
  *
  * Describe   列表框
  */
-class SOUI_EXP SListBox :public SScrollView
-{
-public:
-
-    SOUI_CLASS_NAME(SScrollView,L"listbox")
+class SOUI_EXP SListBox : public SScrollView {
+  public:
+    SOUI_CLASS_NAME(SScrollView, L"listbox")
     /**
      * SListBox::SListBox
      * @brief    构造函数
      *
-     * Describe  构造函数  
+     * Describe  构造函数
      */
     SListBox();
 
@@ -58,7 +57,7 @@ public:
      * SListBox::~SListBox
      * @brief    析构函数
      *
-     * Describe  析构函数  
+     * Describe  析构函数
      */
     virtual ~SListBox();
 
@@ -87,14 +86,14 @@ public:
      *
      * Describe  设置选中项
      */
-    BOOL SetCurSel(int nIndex,BOOL bNotifyChange=FALSE);
+    BOOL SetCurSel(int nIndex, BOOL bNotifyChange = FALSE);
 
     /**
      * SListBox::GetTopIndex
      * @brief    获取第一条可见记录索引
      * @return   返回int
      *
-     * Describe  
+     * Describe
      */
     int GetTopIndex() const;
 
@@ -103,14 +102,14 @@ public:
      * @brief    设置第一条可见记录索引
      * @param    int nIndex -- 第一条可见记录索引
      *
-     * Describe  
+     * Describe
      */
     BOOL SetTopIndex(int nIndex);
 
     /**
      * SListBox::GetItemHeight
      * @brief    获取高度
-     * @return   返回int 
+     * @return   返回int
      *
      * Describe  获取高度
      */
@@ -144,18 +143,18 @@ public:
      * SListBox::GetText
      * @brief    获取指定项文本
      * @param    int nIndex -- 选项索引
-	 * @param    BOOL bRawText -- 原始数据标志
+     * @param    BOOL bRawText -- 原始数据标志
      * @return   SStringT,列表项的原始字符串
      *
      * Describe  获取指定项文本
      */
-    SStringT GetText(int nIndex,BOOL bRawText=FALSE) const;
+    SStringT GetText(int nIndex, BOOL bRawText = FALSE) const;
 
     /**
      * SListBox::GetItemHeight
      * @brief    获取指定项高度
      * @param    int nIndex -- 选项索引
-     * @return   返回int 
+     * @return   返回int
      *
      * Describe  获取指定项高度
      */
@@ -166,7 +165,7 @@ public:
      * @brief    设置指定项高度
      * @param    int nIndex -- 选项索引
      * @param    int cyItemHeight -- 高度
-     * @return   返回int 
+     * @return   返回int
      *
      * Describe  设置指定项高度
      */
@@ -242,9 +241,10 @@ public:
      */
     int HitTest(CPoint &pt);
 
-	int FindString(int iFindAfter,LPCTSTR pszText) const;
-protected:
-	virtual HRESULT OnLanguageChanged();
+    int FindString(int iFindAfter, LPCTSTR pszText) const;
+
+  protected:
+    virtual HRESULT OnLanguageChanged();
 
     /**
      * SListBox::CreateChildren
@@ -294,7 +294,7 @@ protected:
      *
      * Describe  修改选中项
      */
-    void NotifySelChange(int nOldSel,int nNewSel);
+    void NotifySelChange(int nOldSel, int nNewSel);
 
     /**
      * SListBox::OnGetDlgCode
@@ -303,25 +303,25 @@ protected:
      *
      * Describe  获取窗口消息码
      */
-	virtual UINT WINAPI OnGetDlgCode () const;
+    virtual UINT WINAPI OnGetDlgCode() const;
 
-protected:
+  protected:
     /**
      * SListBox::OnSize
      * @brief    消息响应函数
      * @param    UINT nType --
-     * @param    CSize size -- 
+     * @param    CSize size --
      *
-     * Describe  获取某项得索引  
+     * Describe  获取某项得索引
      */
-    void OnSize(UINT nType,CSize size);
+    void OnSize(UINT nType, CSize size);
 
     /**
      * SListBox::OnPaint
      * @brief    绘制
      * @param    IRenderTarget *pRT -- 绘制设备
      *
-     * Describe  消息响应函数  
+     * Describe  消息响应函数
      */
     void OnPaint(IRenderTarget *pRT);
 
@@ -331,9 +331,9 @@ protected:
      * @param    UINT nFlags -- 标志
      * @param    CPoint pt -- 坐标
      *
-     * Describe  消息响应函数 
+     * Describe  消息响应函数
      */
-    void OnLButtonDown(UINT nFlags,CPoint pt);
+    void OnLButtonDown(UINT nFlags, CPoint pt);
 
     /**
      * SListBox::OnLButtonDbClick
@@ -341,9 +341,9 @@ protected:
      * @param    UINT nFlags -- 标志
      * @param    CPoint pt -- 坐标
      *
-     * Describe  消息响应函数 
+     * Describe  消息响应函数
      */
-    void OnLButtonDbClick(UINT nFlags,CPoint pt);
+    void OnLButtonDbClick(UINT nFlags, CPoint pt);
 
     /**
      * SListBox::OnLButtonUp
@@ -351,20 +351,20 @@ protected:
      * @param    UINT nFlags -- 标志
      * @param    CPoint pt -- 坐标
      *
-     * Describe  消息响应函数 
+     * Describe  消息响应函数
      */
-    void OnLButtonUp(UINT nFlags,CPoint pt);
-    
+    void OnLButtonUp(UINT nFlags, CPoint pt);
+
     /**
      * SListBox::OnMouseMove
      * @brief    鼠标移动
      * @param    UINT nFlags -- 标志
      * @param    CPoint pt -- 坐标
      *
-     * Describe  消息响应函数 
+     * Describe  消息响应函数
      */
-    void OnMouseMove(UINT nFlags,CPoint pt);
-    
+    void OnMouseMove(UINT nFlags, CPoint pt);
+
     /**
      * SListBox::OnKeyDown
      * @brief    按键按下
@@ -372,9 +372,9 @@ protected:
      * @param    UINT nRepCnt -- 重复次数
      * @param    UINT nFlags -- 标志
      *
-     * Describe  消息响应函数 
+     * Describe  消息响应函数
      */
-    void OnKeyDown( TCHAR nChar, UINT nRepCnt, UINT nFlags );
+    void OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags);
 
     /**
      * SListBox::OnChar
@@ -383,7 +383,7 @@ protected:
      * @param    UINT nRepCnt -- 重复次数
      * @param    UINT nFlags -- 标志
      *
-     * Describe  消息响应函数 
+     * Describe  消息响应函数
      */
     void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 
@@ -402,65 +402,63 @@ protected:
      * @param    UINT nRepCnt -- 重复次数
      * @param    UINT nFlags -- 标志
      *
-     * Describe  消息响应函数 
+     * Describe  消息响应函数
      */
     void OnShowWindow(BOOL bShow, UINT nStatus);
 
-
     void OnMouseLeave();
-protected:
 
-    SArray<LPLBITEM>    m_arrItems;  /**< 保存item */
+  protected:
+    SArray<LPLBITEM> m_arrItems; /**< 保存item */
 
-    SLayoutSize   m_itemHeight;     /**< item高度 */
-    int     m_iSelItem;     /**< 选中item */
-    int     m_iHoverItem;   /**< Hover状态的item */
-    int     m_iScrollSpeed; /**< 滚动速度 */
-    BOOL    m_bHotTrack;    /**<  */
+    SLayoutSize m_itemHeight; /**< item高度 */
+    int m_iSelItem;           /**< 选中item */
+    int m_iHoverItem;         /**< Hover状态的item */
+    int m_iScrollSpeed;       /**< 滚动速度 */
+    BOOL m_bHotTrack;         /**<  */
 
-	SLayoutSize m_ptIcon[2]; /**< 图标坐标 */
+    SLayoutSize m_ptIcon[2]; /**< 图标坐标 */
     SLayoutSize m_ptText[2]; /**< 文本坐标 */
 
     COLORREF m_crItemBg;    /**< 背景色 */
     COLORREF m_crItemBg2;   /**< 偶数行背景色 */
     COLORREF m_crItemSelBg; /**< 选中背景色 */
-	COLORREF m_crItemHotBg; /**< Hot背景色 */
+    COLORREF m_crItemHotBg; /**< Hot背景色 */
     COLORREF m_crText;      /**< 文字颜色 */
     COLORREF m_crSelText;   /**< 选中文字颜色 */
     SAutoRefPtr<ISkinObj> m_pItemSkin, m_pIconSkin;
 
-public:
-
+  public:
     SOUI_ATTRS_BEGIN()
-        ATTR_LAYOUTSIZE(L"itemHeight", m_itemHeight, FALSE)
-        ATTR_SKIN(L"itemSkin", m_pItemSkin, TRUE)
-        ATTR_SKIN(L"iconSkin", m_pIconSkin, TRUE)
-        ATTR_COLOR(L"colorItemBkgnd",m_crItemBg,FALSE)
-        ATTR_COLOR(L"colorItemBkgnd2", m_crItemBg2, FALSE)
-        ATTR_COLOR(L"colorItemSelBkgnd",m_crItemSelBg,FALSE)
-		ATTR_COLOR(L"colorItemHotBkgnd",m_crItemHotBg,FALSE)
-        ATTR_COLOR(L"colorText",m_crText,FALSE)
-        ATTR_COLOR(L"colorSelText",m_crSelText,FALSE)
-        ATTR_LAYOUTSIZE(L"icon-x", m_ptIcon[0], FALSE)
-        ATTR_LAYOUTSIZE(L"icon-y", m_ptIcon[1], FALSE)
-        ATTR_LAYOUTSIZE(L"text-x", m_ptText[0], FALSE)
-        ATTR_LAYOUTSIZE(L"text-y", m_ptText[1], FALSE)
-        ATTR_INT(L"hotTrack",m_bHotTrack,FALSE)
+    ATTR_LAYOUTSIZE(L"itemHeight", m_itemHeight, FALSE)
+    ATTR_SKIN(L"itemSkin", m_pItemSkin, TRUE)
+    ATTR_SKIN(L"iconSkin", m_pIconSkin, TRUE)
+    ATTR_COLOR(L"colorItemBkgnd", m_crItemBg, FALSE)
+    ATTR_COLOR(L"colorItemBkgnd2", m_crItemBg2, FALSE)
+    ATTR_COLOR(L"colorItemSelBkgnd", m_crItemSelBg, FALSE)
+    ATTR_COLOR(L"colorItemHotBkgnd", m_crItemHotBg, FALSE)
+    ATTR_COLOR(L"colorText", m_crText, FALSE)
+    ATTR_COLOR(L"colorSelText", m_crSelText, FALSE)
+    ATTR_LAYOUTSIZE(L"icon-x", m_ptIcon[0], FALSE)
+    ATTR_LAYOUTSIZE(L"icon-y", m_ptIcon[1], FALSE)
+    ATTR_LAYOUTSIZE(L"text-x", m_ptText[0], FALSE)
+    ATTR_LAYOUTSIZE(L"text-y", m_ptText[1], FALSE)
+    ATTR_INT(L"hotTrack", m_bHotTrack, FALSE)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-        MSG_WM_DESTROY(OnDestroy)
-        MSG_WM_SIZE(OnSize)
-        MSG_WM_PAINT_EX(OnPaint)
-        MSG_WM_LBUTTONDOWN(OnLButtonDown)
-        MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
-        MSG_WM_LBUTTONUP(OnLButtonUp)
-        MSG_WM_MOUSEMOVE(OnMouseMove)
-        MSG_WM_KEYDOWN(OnKeyDown)
-        MSG_WM_CHAR(OnChar)
-        MSG_WM_SHOWWINDOW(OnShowWindow)
-		MSG_WM_MOUSELEAVE(OnMouseLeave)
+    MSG_WM_DESTROY(OnDestroy)
+    MSG_WM_SIZE(OnSize)
+    MSG_WM_PAINT_EX(OnPaint)
+    MSG_WM_LBUTTONDOWN(OnLButtonDown)
+    MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
+    MSG_WM_LBUTTONUP(OnLButtonUp)
+    MSG_WM_MOUSEMOVE(OnMouseMove)
+    MSG_WM_KEYDOWN(OnKeyDown)
+    MSG_WM_CHAR(OnChar)
+    MSG_WM_SHOWWINDOW(OnShowWindow)
+    MSG_WM_MOUSELEAVE(OnMouseLeave)
     SOUI_MSG_MAP_END()
 };
 
-}//namespace SOUI
+} // namespace SOUI

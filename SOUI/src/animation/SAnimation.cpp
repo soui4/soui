@@ -5,395 +5,416 @@
 
 SNSBEGIN
 
-
-SValueDescription SValueDescription::parseValue(const SStringW & value)
+SValueDescription SValueDescription::parseValue(const SStringW &value)
 {
-	SValueDescription d;
-	if (value.IsEmpty()) {
-		d.type = IAnimation::ABSOLUTE_VALUE;
-		d.value = 0.0f;
-	}
-	else if (value.EndsWith(L"%", true)) {
-		d.type = IAnimation::RELATIVE_TO_SELF;
-		d.value = (float)_wtof(value.Left(value.GetLength() - 1))/100;
-	}
-	else if (value.EndsWith(L"%p", true)) {
-		d.type = IAnimation::RELATIVE_TO_PARENT;
-		d.value = (float)_wtof(value.Left(value.GetLength() - 2))/100;
-	}
-	else
-	{
-		d.type = IAnimation::ABSOLUTE_VALUE;
-		d.value = (float)_wtof(value);
-	}
-	return d;
+    SValueDescription d;
+    if (value.IsEmpty())
+    {
+        d.type = IAnimation::ABSOLUTE_VALUE;
+        d.value = 0.0f;
+    }
+    else if (value.EndsWith(L"%", true))
+    {
+        d.type = IAnimation::RELATIVE_TO_SELF;
+        d.value = (float)_wtof(value.Left(value.GetLength() - 1)) / 100;
+    }
+    else if (value.EndsWith(L"%p", true))
+    {
+        d.type = IAnimation::RELATIVE_TO_PARENT;
+        d.value = (float)_wtof(value.Left(value.GetLength() - 2)) / 100;
+    }
+    else
+    {
+        d.type = IAnimation::ABSOLUTE_VALUE;
+        d.value = (float)_wtof(value);
+    }
+    return d;
 }
-
 
 ////////////////////////////////////////////////////////////////////
 bool SAnimation::hasAlpha() const
 {
-	return false;
+    return false;
 }
 
 int SAnimation::resolveSize(ValueType type, float value, int size, int parentSize)
 {
-	switch (type) {
-		case RELATIVE_TO_SELF:
-			return (int)(size * value);
-		case RELATIVE_TO_PARENT:
-			return (int)(parentSize * value);
-		case ABSOLUTE_VALUE:
-		default:
-			return (int)value;
-	}
+    switch (type)
+    {
+    case RELATIVE_TO_SELF:
+        return (int)(size * value);
+    case RELATIVE_TO_PARENT:
+        return (int)(parentSize * value);
+    case ABSOLUTE_VALUE:
+    default:
+        return (int)value;
+    }
 }
 
-void SAnimation::applyTransformation(float interpolatedTime, STransformation & t)
+void SAnimation::applyTransformation(float interpolatedTime, STransformation &t)
 {
-
 }
 
 bool SAnimation::hasEnded() const
 {
-	return mEnded;
+    return mEnded;
 }
 
 bool SAnimation::hasStarted() const
 {
-	return mStarted;
+    return mStarted;
 }
 
 void SAnimation::fireAnimationEnd()
 {
-	if (mListener != NULL) {
-		mListener->onAnimationEnd(this);
-	}
+    if (mListener != NULL)
+    {
+        mListener->onAnimationEnd(this);
+    }
 }
 
 void SAnimation::fireAnimationRepeat()
 {
-	if (mListener != NULL) {
-		mListener->onAnimationRepeat(this);
-	}
+    if (mListener != NULL)
+    {
+        mListener->onAnimationRepeat(this);
+    }
 }
 
 void SAnimation::fireAnimationStart()
 {
-	if (mListener != NULL) {
-		mListener->onAnimationStart(this);
-	}
+    if (mListener != NULL)
+    {
+        mListener->onAnimationStart(this);
+    }
 }
-
 
 bool SAnimation::isCanceled()
 {
-	return mStartTime == -2;
+    return mStartTime == -2;
 }
 
-bool SAnimation::getTransformation(int64_t currentTime, STransformation & outTransformation)
+bool SAnimation::getTransformation(int64_t currentTime, STransformation &outTransformation)
 {
-	if (mStartTime == -1) {
-		mStartTime = currentTime;
-	}
+    if (mStartTime == -1)
+    {
+        mStartTime = currentTime;
+    }
 
-	int64_t startOffset = getStartOffset();
-	long duration = mDuration;
-	float normalizedTime;
-	if (duration != 0) {
-		normalizedTime = ((float)(currentTime - (mStartTime + startOffset))) /
-			(float)duration;
-	}
-	else {
-		// time is a step-change with a zero duration
-		normalizedTime = currentTime < mStartTime ? 0.0f : 1.0f;
-	}
+    int64_t startOffset = getStartOffset();
+    long duration = mDuration;
+    float normalizedTime;
+    if (duration != 0)
+    {
+        normalizedTime = ((float)(currentTime - (mStartTime + startOffset))) / (float)duration;
+    }
+    else
+    {
+        // time is a step-change with a zero duration
+        normalizedTime = currentTime < mStartTime ? 0.0f : 1.0f;
+    }
 
-	bool expired = normalizedTime >= 1.0f || isCanceled();
-	bool bMore = !expired;
+    bool expired = normalizedTime >= 1.0f || isCanceled();
+    bool bMore = !expired;
 
-	if (!mFillEnabled || mRepeatCount!=0) normalizedTime = smax(smin(normalizedTime, 1.0f), 0.0f);
+    if (!mFillEnabled || mRepeatCount != 0)
+        normalizedTime = smax(smin(normalizedTime, 1.0f), 0.0f);
 
-	if ((normalizedTime >= 0.0f || mFillBefore) && (normalizedTime <= 1.0f || mFillAfter)) {
-		if (!mStarted) {
-			mStarted = true;
-			fireAnimationStart();
-		}
+    if ((normalizedTime >= 0.0f || mFillBefore) && (normalizedTime <= 1.0f || mFillAfter))
+    {
+        if (!mStarted)
+        {
+            mStarted = true;
+            fireAnimationStart();
+        }
 
-		if (mFillEnabled) normalizedTime = smax(smin(normalizedTime, 1.0f), 0.0f);
+        if (mFillEnabled)
+            normalizedTime = smax(smin(normalizedTime, 1.0f), 0.0f);
 
-		if (mCycleFlip) {
-			normalizedTime = 1.0f - normalizedTime;
-		}
+        if (mCycleFlip)
+        {
+            normalizedTime = 1.0f - normalizedTime;
+        }
 
-		float interpolatedTime = mInterpolator->getInterpolation(normalizedTime);
-		outTransformation.clear();
-		applyTransformation(interpolatedTime, outTransformation);
-	}
+        float interpolatedTime = mInterpolator->getInterpolation(normalizedTime);
+        outTransformation.clear();
+        applyTransformation(interpolatedTime, outTransformation);
+    }
 
-	if (expired) {
-		if (mRepeatCount == mRepeated || isCanceled()) {
-			if (!mEnded) {
-				mEnded = true;
-				fireAnimationEnd();
-			}
-		}
-		else {
-			if (mRepeatCount > 0) {
-				mRepeated++;
-			}
-			else
-			{
-				mRepeated = 1;
-			}
+    if (expired)
+    {
+        if (mRepeatCount == mRepeated || isCanceled())
+        {
+            if (!mEnded)
+            {
+                mEnded = true;
+                fireAnimationEnd();
+            }
+        }
+        else
+        {
+            if (mRepeatCount > 0)
+            {
+                mRepeated++;
+            }
+            else
+            {
+                mRepeated = 1;
+            }
 
-			if (mRepeatMode == REVERSE) {
-				mCycleFlip = !mCycleFlip;
-			}
+            if (mRepeatMode == REVERSE)
+            {
+                mCycleFlip = !mCycleFlip;
+            }
 
-			mStartTime = currentTime;
-			bMore = true;
+            mStartTime = currentTime;
+            bMore = true;
 
-			fireAnimationRepeat();
-		}
-	}
+            fireAnimationRepeat();
+        }
+    }
 
-	return bMore;
+    return bMore;
 }
 
-bool SAnimation::getTransformation(uint64_t currentTime, STransformation & outTransformation, float scale)
+bool SAnimation::getTransformation(uint64_t currentTime,
+                                   STransformation &outTransformation,
+                                   float scale)
 {
-	mScaleFactor = scale;
-	return getTransformation(currentTime, outTransformation);
+    mScaleFactor = scale;
+    return getTransformation(currentTime, outTransformation);
 }
 
 long SAnimation::computeDurationHint() const
 {
-	return getStartOffset() + getDuration() * (getRepeatCount() + 1);
+    return getStartOffset() + getDuration() * (getRepeatCount() + 1);
 }
 
 void SAnimation::ensureInterpolator()
 {
-	if (!mInterpolator) {
-		mInterpolator.Attach(new SAccelerateDecelerateInterpolator());
-	}
+    if (!mInterpolator)
+    {
+        mInterpolator.Attach(new SAccelerateDecelerateInterpolator());
+    }
 }
 
-void SAnimation::setAnimationListener(IAnimationListener* listener)
+void SAnimation::setAnimationListener(IAnimationListener *listener)
 {
-	mListener = listener;
+    mListener = listener;
 }
 
 IAnimation::ZAdjustment SAnimation::getZAdjustment() const
 {
-	return mZAdjustment;
+    return mZAdjustment;
 }
 
 int SAnimation::getRepeatCount() const
 {
-	return mRepeatCount;
+    return mRepeatCount;
 }
 
 IAnimation::RepeatMode SAnimation::getRepeatMode() const
 {
-	return mRepeatMode;
+    return mRepeatMode;
 }
 
 long SAnimation::getStartOffset() const
 {
-	return mRepeated == 0 ? mStartOffset : 0;
+    return mRepeated == 0 ? mStartOffset : 0;
 }
 
 long SAnimation::getDuration() const
 {
-	return mDuration;
+    return mDuration;
 }
 
 int64_t SAnimation::getStartTime() const
 {
-	return mStartTime;
+    return mStartTime;
 }
 
-IInterpolator* SAnimation::getInterpolator() const
+IInterpolator *SAnimation::getInterpolator() const
 {
-	return mInterpolator;
+    return mInterpolator;
 }
 
 float SAnimation::getScaleFactor()
 {
-	return mScaleFactor;
+    return mScaleFactor;
 }
 
 void SAnimation::setZAdjustment(ZAdjustment zAdjustment)
 {
-	mZAdjustment = zAdjustment;
+    mZAdjustment = zAdjustment;
 }
 
 void SAnimation::setRepeatCount(int repeatCount)
 {
-	if (repeatCount < 0) {
-		repeatCount = INFINITE;
-	}
-	mRepeatCount = repeatCount;
+    if (repeatCount < 0)
+    {
+        repeatCount = INFINITE;
+    }
+    mRepeatCount = repeatCount;
 }
 
 void SAnimation::setRepeatMode(RepeatMode repeatMode)
 {
-	mRepeatMode = repeatMode;
+    mRepeatMode = repeatMode;
 }
 
 void SAnimation::startNow()
 {
-	setStartTime(STime::GetCurrentTimeMs());
+    setStartTime(STime::GetCurrentTimeMs());
 }
 
 void SAnimation::start()
 {
-	setStartTime(-1);
+    setStartTime(-1);
 }
 
 void SAnimation::setStartTime(int64_t startTimeMillis)
 {
-	mStartTime = startTimeMillis;
-	mStarted = mEnded = false;
-	mCycleFlip = false;
-	mRepeated = 0;
+    mStartTime = startTimeMillis;
+    mStarted = mEnded = false;
+    mCycleFlip = false;
+    mRepeated = 0;
 }
 
 void SAnimation::setStartOffset(long offset)
 {
-	mStartOffset = offset;
+    mStartOffset = offset;
 }
 
 void SAnimation::setFillEnabled(bool fillEnabled)
 {
-	mFillEnabled = fillEnabled;
+    mFillEnabled = fillEnabled;
 }
 
 bool SAnimation::isFillEnabled() const
 {
-	return mFillEnabled;
+    return mFillEnabled;
 }
 
 bool SAnimation::getFillAfter() const
 {
-	return mFillAfter;
+    return mFillAfter;
 }
 
 void SAnimation::setFillAfter(bool bFill)
 {
-	mFillAfter = bFill;
+    mFillAfter = bFill;
 }
 
 bool SAnimation::getFillBefore() const
 {
-	return mFillBefore;
+    return mFillBefore;
 }
 
 void SAnimation::setFillBefore(bool bFill)
 {
-	mFillBefore = bFill;
+    mFillBefore = bFill;
 }
 
 void SAnimation::scaleCurrentDuration(float scale)
 {
-	mDuration = (long)(mDuration * scale);
-	mStartOffset = (long)(mStartOffset * scale);
+    mDuration = (long)(mDuration * scale);
+    mStartOffset = (long)(mStartOffset * scale);
 }
 
 void SAnimation::setDuration(long durationMillis)
 {
-	mDuration = durationMillis;
+    mDuration = durationMillis;
 }
 
 void SAnimation::setInterpolator(IInterpolator *i)
 {
-	mInterpolator = i;
+    mInterpolator = i;
 }
 
 void SAnimation::cancel()
 {
-	if (mStarted && !mEnded)
-	{
-		mStartTime = -2;
-		mEnded = true;
-		fireAnimationEnd();
-	}
+    if (mStarted && !mEnded)
+    {
+        mStartTime = -2;
+        mEnded = true;
+        fireAnimationEnd();
+    }
 }
 
 void SAnimation::reset()
 {
-	mEnded = false;
+    mEnded = false;
 
-	mStarted = false;
+    mStarted = false;
 
-	mStartTime = -1;
+    mStartTime = -1;
 
-	mStartOffset = 0;
-	mDuration = 0;
-	mRepeatCount = 0;
-	mRepeated = 0;
-	mRepeatMode = RESTART;
-	mZAdjustment = ZORDER_NORMAL;
-	mListener = NULL;
-	mScaleFactor = 1.0f;
+    mStartOffset = 0;
+    mDuration = 0;
+    mRepeatCount = 0;
+    mRepeated = 0;
+    mRepeatMode = RESTART;
+    mZAdjustment = ZORDER_NORMAL;
+    mListener = NULL;
+    mScaleFactor = 1.0f;
 
-	mFillBefore = false;
+    mFillBefore = false;
 
-	mFillAfter = true;
+    mFillAfter = true;
 
-	mFillEnabled = true;
+    mFillEnabled = true;
 
-	mUserData = 0;
-	ensureInterpolator();
+    mUserData = 0;
+    ensureInterpolator();
 }
 
-void SAnimation::copy(const IAnimation * src)
+void SAnimation::copy(const IAnimation *src)
 {
-	const SAnimation * src2 = (SAnimation*)src;
-	mStartOffset = src2->mStartOffset;
-	mDuration = src2->mDuration;
-	mRepeatCount = src2->mRepeatCount;
-	mRepeatMode = src2->mRepeatMode;
-	mZAdjustment = src2->mZAdjustment;
-	mScaleFactor = src2->mScaleFactor;
-	mFillBefore = src2->mFillBefore;
-	mFillAfter = src2->mFillAfter;
-	mFillEnabled = src2->mFillEnabled;
-	mInterpolator = src2->mInterpolator;
+    const SAnimation *src2 = (SAnimation *)src;
+    mStartOffset = src2->mStartOffset;
+    mDuration = src2->mDuration;
+    mRepeatCount = src2->mRepeatCount;
+    mRepeatMode = src2->mRepeatMode;
+    mZAdjustment = src2->mZAdjustment;
+    mScaleFactor = src2->mScaleFactor;
+    mFillBefore = src2->mFillBefore;
+    mFillAfter = src2->mFillAfter;
+    mFillEnabled = src2->mFillEnabled;
+    mInterpolator = src2->mInterpolator;
 
-	mUserData = src2->mUserData;
-	mID = src2->mID;
-	mName = src2->mName;
+    mUserData = src2->mUserData;
+    mID = src2->mID;
+    mName = src2->mName;
 }
 
-IAnimation * SAnimation::clone() const
+IAnimation *SAnimation::clone() const
 {
-	IAnimation *pRet = SApplication::getSingletonPtr()->CreateAnimationByName(GetClassName());
-	if (pRet)
-	{
-		pRet->copy(this);
-	}
-	return pRet;
+    IAnimation *pRet = SApplication::getSingletonPtr()->CreateAnimationByName(GetClassName());
+    if (pRet)
+    {
+        pRet->copy(this);
+    }
+    return pRet;
 }
 
 void SAnimation::initialize(int width, int height, int parentWidth, int parentHeight)
 {
 }
 
-SAnimation::SAnimation():mID(0)
+SAnimation::SAnimation()
+    : mID(0)
 {
-	reset();
+    reset();
 }
 
 void SAnimation::setUserData(ULONG_PTR data)
 {
-	mUserData = data;
+    mUserData = data;
 }
 
 ULONG_PTR SAnimation::getUserData() const
 {
-	return mUserData;
+    return mUserData;
 }
 
 SAnimation::~SAnimation()

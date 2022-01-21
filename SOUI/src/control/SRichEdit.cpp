@@ -18,218 +18,212 @@
 namespace SOUI
 {
 
-    //////////////////////////////////////////////////////////////////////////
-    //  STextServiceHelper
-    
-    STextServiceHelper::STextServiceHelper()
+//////////////////////////////////////////////////////////////////////////
+//  STextServiceHelper
+
+STextServiceHelper::STextServiceHelper()
+{
+    m_rich20 = LoadLibrary(_T("riched20.dll"));
+    if (m_rich20)
+        m_funCreateTextServices
+            = (PCreateTextServices)GetProcAddress(m_rich20, "CreateTextServices");
+}
+
+STextServiceHelper::~STextServiceHelper()
+{
+    if (m_rich20)
+        FreeLibrary(m_rich20);
+    m_funCreateTextServices = NULL;
+}
+
+HRESULT STextServiceHelper::CreateTextServices(IUnknown *punkOuter,
+                                               ITextHost *pITextHost,
+                                               IUnknown **ppUnk)
+{
+    if (!m_funCreateTextServices)
+        return E_NOTIMPL;
+    return m_funCreateTextServices(punkOuter, pITextHost, ppUnk);
+}
+
+//////////////////////////////////////////////////////////////////////////
+//
+class SRicheditDropTarget : public IDropTarget {
+  public:
+    SRicheditDropTarget(ITextServices *pTxtSvr)
+        : nRef(1)
+        , pserv(pTxtSvr)
     {
-        m_rich20=LoadLibrary(_T("riched20.dll"));
-        if(m_rich20) m_funCreateTextServices= (PCreateTextServices)GetProcAddress(m_rich20,"CreateTextServices");
+        SASSERT(pserv);
+        pserv->AddRef();
     }
 
-    STextServiceHelper::~STextServiceHelper()
+    ~SRicheditDropTarget()
     {
-        if(m_rich20) FreeLibrary(m_rich20);
-        m_funCreateTextServices=NULL;
+        SASSERT(pserv);
+        pserv->Release();
     }
 
-    HRESULT STextServiceHelper::CreateTextServices(IUnknown *punkOuter, ITextHost *pITextHost, IUnknown **ppUnk)
+    // IUnkown
+    virtual HRESULT STDMETHODCALLTYPE QueryInterface(
+        /* [in] */ REFIID riid,
+        /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject)
     {
-        if(!m_funCreateTextServices) return E_NOTIMPL;
-        return m_funCreateTextServices(punkOuter,pITextHost,ppUnk);
+        HRESULT hr = E_NOINTERFACE;
+        if (riid == __uuidof(IUnknown))
+            *ppvObject = (IUnknown *)this, hr = S_OK;
+        else if (riid == __uuidof(IDropTarget))
+            *ppvObject = (IDropTarget *)this, hr = S_OK;
+        if (SUCCEEDED(hr))
+            AddRef();
+        return hr;
     }
 
-    
-    //////////////////////////////////////////////////////////////////////////
-    //
-    class SRicheditDropTarget : public IDropTarget
+    virtual ULONG STDMETHODCALLTYPE AddRef(void)
     {
-    public:
-        SRicheditDropTarget(ITextServices *pTxtSvr)
-            :nRef(1)
-            ,pserv(pTxtSvr)
+        return ++nRef;
+    }
+
+    virtual ULONG STDMETHODCALLTYPE Release(void)
+    {
+        ULONG uRet = --nRef;
+        if (uRet == 0)
+            delete this;
+        return uRet;
+    }
+
+    // IDropTarget
+    virtual HRESULT STDMETHODCALLTYPE DragEnter(
+        /* [unique][in] */ IDataObject *pDataObj,
+        /* [in] */ DWORD grfKeyState,
+        /* [in] */ POINTL pt,
+        /* [out][in] */ DWORD *pdwEffect)
+    {
+        HRESULT hr = S_FALSE;
+        IDropTarget *pDropTarget = NULL;
+        hr = pserv->TxGetDropTarget(&pDropTarget);
+        if (SUCCEEDED(hr))
         {
-            SASSERT(pserv);
-            pserv->AddRef();
+            hr = pDropTarget->DragEnter(pDataObj, grfKeyState, pt, pdwEffect);
+            *pdwEffect = DROPEFFECT_COPY;
+            pDropTarget->Release();
         }
+        return hr;
+    }
 
-        ~SRicheditDropTarget()
+    virtual HRESULT STDMETHODCALLTYPE DragOver(
+        /* [in] */ DWORD grfKeyState,
+        /* [in] */ POINTL pt,
+        /* [out][in] */ DWORD *pdwEffect)
+    {
+        HRESULT hr = S_FALSE;
+        IDropTarget *pDropTarget = NULL;
+        hr = pserv->TxGetDropTarget(&pDropTarget);
+        if (SUCCEEDED(hr))
         {
-            SASSERT(pserv);
-            pserv->Release();
+            hr = pDropTarget->DragOver(grfKeyState, pt, pdwEffect);
+            *pdwEffect = DROPEFFECT_COPY;
+            pDropTarget->Release();
         }
+        return hr;
+    }
 
-        //IUnkown
-        virtual HRESULT STDMETHODCALLTYPE QueryInterface( 
-            /* [in] */ REFIID riid,
-            /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject)
+    virtual HRESULT STDMETHODCALLTYPE DragLeave(void)
+    {
+        HRESULT hr = S_FALSE;
+        IDropTarget *pDropTarget = NULL;
+        hr = pserv->TxGetDropTarget(&pDropTarget);
+        if (SUCCEEDED(hr))
         {
-            HRESULT hr=E_NOINTERFACE;
-            if(riid==__uuidof(IUnknown))
-                *ppvObject=(IUnknown*) this,hr=S_OK;
-            else if(riid==__uuidof(IDropTarget))
-                *ppvObject=(IDropTarget*)this,hr=S_OK;
-            if(SUCCEEDED(hr)) AddRef();
-            return hr;
+            hr = pDropTarget->DragLeave();
+            pDropTarget->Release();
         }
+        return hr;
+    }
 
-        virtual ULONG STDMETHODCALLTYPE AddRef( void){return ++nRef;}
-
-        virtual ULONG STDMETHODCALLTYPE Release( void) { 
-            ULONG uRet= -- nRef;
-            if(uRet==0) delete this;
-            return uRet;
-        }
-
-        //IDropTarget
-        virtual HRESULT STDMETHODCALLTYPE DragEnter( 
-            /* [unique][in] */ IDataObject *pDataObj,
-            /* [in] */ DWORD grfKeyState,
-            /* [in] */ POINTL pt,
-            /* [out][in] */ DWORD *pdwEffect)
+    virtual HRESULT STDMETHODCALLTYPE Drop(
+        /* [unique][in] */ IDataObject *pDataObj,
+        /* [in] */ DWORD grfKeyState,
+        /* [in] */ POINTL pt,
+        /* [out][in] */ DWORD *pdwEffect)
+    {
+        if (*pdwEffect == DROPEFFECT_NONE)
+            return S_FALSE;
+        HRESULT hr = S_FALSE;
+        IDropTarget *pDropTarget = NULL;
+        hr = pserv->TxGetDropTarget(&pDropTarget);
+        if (SUCCEEDED(hr))
         {
-            HRESULT hr=S_FALSE;
-            IDropTarget *pDropTarget=NULL;
-            hr=pserv->TxGetDropTarget(&pDropTarget);
-            if(SUCCEEDED(hr))
-            {
-                hr=pDropTarget->DragEnter(pDataObj,grfKeyState,pt,pdwEffect);
-                *pdwEffect = DROPEFFECT_COPY;
-                pDropTarget->Release();
-            }
-            return hr;
+            hr = pDropTarget->Drop(pDataObj, grfKeyState, pt, pdwEffect);
+            pDropTarget->Release();
         }
+        return hr;
+    }
 
-        virtual HRESULT STDMETHODCALLTYPE DragOver( 
-            /* [in] */ DWORD grfKeyState,
-            /* [in] */ POINTL pt,
-            /* [out][in] */ DWORD *pdwEffect)    
-        {
-            HRESULT hr=S_FALSE;
-            IDropTarget *pDropTarget=NULL;
-            hr=pserv->TxGetDropTarget(&pDropTarget);
-            if(SUCCEEDED(hr))
-            {
-                hr=pDropTarget->DragOver(grfKeyState,pt,pdwEffect);
-                *pdwEffect = DROPEFFECT_COPY;
-                pDropTarget->Release();
-            }
-            return hr;
-        }
-
-
-        virtual HRESULT STDMETHODCALLTYPE DragLeave( void) 
-        {
-            HRESULT hr=S_FALSE;
-            IDropTarget *pDropTarget=NULL;
-            hr=pserv->TxGetDropTarget(&pDropTarget);
-            if(SUCCEEDED(hr))
-            {
-                hr=pDropTarget->DragLeave();
-                pDropTarget->Release();
-            }
-            return hr;
-        }
-
-
-        virtual HRESULT STDMETHODCALLTYPE Drop( 
-            /* [unique][in] */ IDataObject *pDataObj,
-            /* [in] */ DWORD grfKeyState,
-            /* [in] */ POINTL pt,
-            /* [out][in] */ DWORD *pdwEffect)
-        {
-            if(*pdwEffect == DROPEFFECT_NONE) return S_FALSE;
-            HRESULT hr=S_FALSE;
-            IDropTarget *pDropTarget=NULL;
-            hr=pserv->TxGetDropTarget(&pDropTarget);
-            if(SUCCEEDED(hr))
-            {
-                hr=pDropTarget->Drop(pDataObj,grfKeyState,pt,pdwEffect);
-                pDropTarget->Release();
-            }
-            return hr;
-        }
-
-
-
-    protected:
-        ITextServices    *pserv;            // pointer to Text Services object
-        LONG            nRef;
-    };
-
-
+  protected:
+    ITextServices *pserv; // pointer to Text Services object
+    LONG nRef;
+};
 
 const LONG cInitTextMax = (32 * 1024) - 1;
-#define FValidCF(_pcf) ((_pcf)->cbSize == sizeof(CHARFORMAT2W))
-#define FValidPF(_ppf) ((_ppf)->cbSize == sizeof(PARAFORMAT2))
-#define TIMER_INVALIDATE    6
+#define FValidCF(_pcf)   ((_pcf)->cbSize == sizeof(CHARFORMAT2W))
+#define FValidPF(_ppf)   ((_ppf)->cbSize == sizeof(PARAFORMAT2))
+#define TIMER_INVALIDATE 6
 
-EXTERN_C const IID IID_ITextServices =   // 8d33f740-cf58-11ce-a89d-00aa006cadc5
-{
-    0x8d33f740,
-    0xcf58,
-    0x11ce,
-    {0xa8, 0x9d, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5}
-};
+EXTERN_C const IID IID_ITextServices = // 8d33f740-cf58-11ce-a89d-00aa006cadc5
+    { 0x8d33f740, 0xcf58, 0x11ce, { 0xa8, 0x9d, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5 } };
 
-EXTERN_C const IID IID_ITextHost =   /* c5bdd8d0-d26e-11ce-a89e-00aa006cadc5 */
-{
-    0xc5bdd8d0,
-    0xd26e,
-    0x11ce,
-    {0xa8, 0x9e, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5}
-};
+EXTERN_C const IID IID_ITextHost = /* c5bdd8d0-d26e-11ce-a89e-00aa006cadc5 */
+    { 0xc5bdd8d0, 0xd26e, 0x11ce, { 0xa8, 0x9e, 0x00, 0xaa, 0x00, 0x6c, 0xad, 0xc5 } };
 
 // Convert Device Pixels to Himetric
 LONG DtoHimetric(LONG d, LONG dPerInch)
 {
-    return (LONG) MulDiv(d, HIMETRIC_PER_INCH, dPerInch);
+    return (LONG)MulDiv(d, HIMETRIC_PER_INCH, dPerInch);
 }
 
 // Convert Himetric Device pixels
 LONG HimetrictoD(LONG lHimetric, LONG dPerInch)
 {
-    return (LONG) MulDiv(lHimetric, dPerInch, HIMETRIC_PER_INCH);
+    return (LONG)MulDiv(lHimetric, dPerInch, HIMETRIC_PER_INCH);
 }
 
-
 STextHost::STextHost(void)
-    :m_pRichEdit(NULL)
-    ,cRefs(0)
-    ,m_fUiActive(FALSE)
-    ,pserv(NULL)
+    : m_pRichEdit(NULL)
+    , cRefs(0)
+    , m_fUiActive(FALSE)
+    , pserv(NULL)
 {
 }
 
 STextHost::~STextHost(void)
 {
-    if(pserv) pserv->Release();
+    if (pserv)
+        pserv->Release();
 }
 
 //////////////////////////////////////////////////////////////////////////
 // IUnknown
-HRESULT _stdcall STextHost::QueryInterface( REFIID riid, void **ppvObject )
+HRESULT _stdcall STextHost::QueryInterface(REFIID riid, void **ppvObject)
 {
     HRESULT hr = E_NOINTERFACE;
     *ppvObject = NULL;
 
-    if (IsEqualIID(riid, IID_IUnknown)
-            || IsEqualIID(riid, IID_ITextHost))
+    if (IsEqualIID(riid, IID_IUnknown) || IsEqualIID(riid, IID_ITextHost))
     {
         AddRef();
-        *ppvObject = (ITextHost *) this;
+        *ppvObject = (ITextHost *)this;
         hr = S_OK;
     }
 
     return hr;
 }
 
-ULONG _stdcall STextHost::AddRef( void )
+ULONG _stdcall STextHost::AddRef(void)
 {
     return ++cRefs;
 }
 
-ULONG _stdcall STextHost::Release( void )
+ULONG _stdcall STextHost::Release(void)
 {
     ULONG c_Refs = --cRefs;
 
@@ -241,66 +235,64 @@ ULONG _stdcall STextHost::Release( void )
     return c_Refs;
 }
 
-
 //////////////////////////////////////////////////////////////////////////
 // ITextHost
-HRESULT STextHost::TxGetViewInset( LPRECT prc )
+HRESULT STextHost::TxGetViewInset(LPRECT prc)
 {
-    *prc=m_pRichEdit->m_rcInset;
+    *prc = m_pRichEdit->m_rcInset;
     return S_OK;
 }
 
-HRESULT STextHost::TxGetCharFormat( const CHARFORMATW **ppCF )
+HRESULT STextHost::TxGetCharFormat(const CHARFORMATW **ppCF)
 {
-    *ppCF=&m_pRichEdit->m_cfDef;
+    *ppCF = &m_pRichEdit->m_cfDef;
     return S_OK;
 }
 
-
-HRESULT STextHost::TxGetParaFormat( const PARAFORMAT **ppPF )
+HRESULT STextHost::TxGetParaFormat(const PARAFORMAT **ppPF)
 {
-    *ppPF=&m_pRichEdit->m_pfDef;
+    *ppPF = &m_pRichEdit->m_pfDef;
     return S_OK;
 }
 
-HRESULT STextHost::TxGetClientRect( LPRECT prc )
+HRESULT STextHost::TxGetClientRect(LPRECT prc)
 {
     m_pRichEdit->GetClientRect(prc);
     return S_OK;
 }
 
-HRESULT STextHost::TxDeactivate( LONG lNewState )
+HRESULT STextHost::TxDeactivate(LONG lNewState)
 {
-    m_fUiActive=FALSE;
+    m_fUiActive = FALSE;
     return S_OK;
 }
 
-HRESULT STextHost::TxActivate( LONG * plOldState )
+HRESULT STextHost::TxActivate(LONG *plOldState)
 {
     *plOldState = m_fUiActive;
-    m_fUiActive=TRUE;
+    m_fUiActive = TRUE;
     return S_OK;
 }
 
-BOOL STextHost::TxClientToScreen( LPPOINT lppt )
+BOOL STextHost::TxClientToScreen(LPPOINT lppt)
 {
-	RECT rc={0};
-	m_pRichEdit->GetContainer()->FrameToHost(rc);
-	lppt->x += rc.left;
-	lppt->y += rc.top;
-    return ::ClientToScreen(m_pRichEdit->GetContainer()->GetHostHwnd(),lppt);
+    RECT rc = { 0 };
+    m_pRichEdit->GetContainer()->FrameToHost(rc);
+    lppt->x += rc.left;
+    lppt->y += rc.top;
+    return ::ClientToScreen(m_pRichEdit->GetContainer()->GetHostHwnd(), lppt);
 }
 
-BOOL STextHost::TxScreenToClient( LPPOINT lppt )
+BOOL STextHost::TxScreenToClient(LPPOINT lppt)
 {
-	RECT rc={0};
-	m_pRichEdit->GetContainer()->FrameToHost(rc);
-	lppt->x -= rc.left;
-	lppt->y -= rc.top;
-    return ::ScreenToClient(m_pRichEdit->GetContainer()->GetHostHwnd(),lppt);
+    RECT rc = { 0 };
+    m_pRichEdit->GetContainer()->FrameToHost(rc);
+    lppt->x -= rc.left;
+    lppt->y -= rc.top;
+    return ::ScreenToClient(m_pRichEdit->GetContainer()->GetHostHwnd(), lppt);
 }
 
-void STextHost::TxSetCursor( HCURSOR hcur, BOOL fText )
+void STextHost::TxSetCursor(HCURSOR hcur, BOOL fText)
 {
     ::SetCursor(hcur);
 }
@@ -310,46 +302,53 @@ void STextHost::TxSetFocus()
     m_pRichEdit->SetFocus();
 }
 
-void STextHost::TxSetCapture( BOOL fCapture )
+void STextHost::TxSetCapture(BOOL fCapture)
 {
-    if(fCapture)
+    if (fCapture)
         m_pRichEdit->SetCapture();
     else
         m_pRichEdit->ReleaseCapture();
 }
 
-void STextHost::TxScrollWindowEx( INT dx, INT dy, LPCRECT lprcScroll, LPCRECT lprcClip, HRGN hrgnUpdate, LPRECT lprcUpdate, UINT fuScroll )
+void STextHost::TxScrollWindowEx(INT dx,
+                                 INT dy,
+                                 LPCRECT lprcScroll,
+                                 LPCRECT lprcClip,
+                                 HRGN hrgnUpdate,
+                                 LPRECT lprcUpdate,
+                                 UINT fuScroll)
 {
     m_pRichEdit->Invalidate();
 }
 
-void STextHost::TxKillTimer( UINT idTimer )
+void STextHost::TxKillTimer(UINT idTimer)
 {
-   m_pRichEdit->KillTimer2(idTimer);
+    m_pRichEdit->KillTimer2(idTimer);
 }
 
-BOOL STextHost::TxSetTimer( UINT idTimer, UINT uTimeout )
+BOOL STextHost::TxSetTimer(UINT idTimer, UINT uTimeout)
 {
-   return m_pRichEdit->SetTimer2(idTimer,uTimeout);
+    return m_pRichEdit->SetTimer2(idTimer, uTimeout);
 }
 
-BOOL STextHost::TxSetCaretPos( INT x, INT y )
+BOOL STextHost::TxSetCaretPos(INT x, INT y)
 {
-    m_ptCaret.x=x,m_ptCaret.y=y;
-    m_pRichEdit->SetCaretPos(x,y);
-	return TRUE;
+    m_ptCaret.x = x, m_ptCaret.y = y;
+    m_pRichEdit->SetCaretPos(x, y);
+    return TRUE;
 }
 
-BOOL STextHost::TxShowCaret( BOOL fShow )
+BOOL STextHost::TxShowCaret(BOOL fShow)
 {
-    if(fShow && !m_fUiActive) return FALSE;
-	m_pRichEdit->ShowCaret(fShow);
-	return TRUE;
+    if (fShow && !m_fUiActive)
+        return FALSE;
+    m_pRichEdit->ShowCaret(fShow);
+    return TRUE;
 }
 
-BOOL STextHost::TxCreateCaret( HBITMAP hbmp, INT xWidth, INT yHeight )
+BOOL STextHost::TxCreateCaret(HBITMAP hbmp, INT xWidth, INT yHeight)
 {
-    return m_pRichEdit->CreateCaret(hbmp,xWidth,yHeight);
+    return m_pRichEdit->CreateCaret(hbmp, xWidth, yHeight);
 }
 
 HDC STextHost::TxGetDC()
@@ -357,79 +356,80 @@ HDC STextHost::TxGetDC()
     return ::GetDC(NULL);
 }
 
-INT STextHost::TxReleaseDC( HDC hdc )
+INT STextHost::TxReleaseDC(HDC hdc)
 {
-    return ::ReleaseDC(NULL,hdc);
+    return ::ReleaseDC(NULL, hdc);
 }
 
-BOOL STextHost::TxShowScrollBar( INT fnBar, BOOL fShow )
+BOOL STextHost::TxShowScrollBar(INT fnBar, BOOL fShow)
 {
-    int wBar=0;
-    switch(fnBar)
+    int wBar = 0;
+    switch (fnBar)
     {
     case SB_BOTH:
-        wBar=SSB_BOTH;
+        wBar = SSB_BOTH;
         break;
     case SB_VERT:
-        wBar=SSB_VERT;
+        wBar = SSB_VERT;
         break;
     case SB_HORZ:
-        wBar=SSB_HORZ;
+        wBar = SSB_HORZ;
         break;
     }
-    return m_pRichEdit->ShowScrollBar(wBar,fShow);
+    return m_pRichEdit->ShowScrollBar(wBar, fShow);
 }
 
-BOOL STextHost::TxEnableScrollBar( INT fuSBFlags, INT fuArrowflags )
+BOOL STextHost::TxEnableScrollBar(INT fuSBFlags, INT fuArrowflags)
 {
-    int wBar=0;
-    switch(fuSBFlags)
+    int wBar = 0;
+    switch (fuSBFlags)
     {
     case SB_BOTH:
-        wBar=SSB_BOTH;
+        wBar = SSB_BOTH;
         break;
     case SB_VERT:
-        wBar=SSB_VERT;
+        wBar = SSB_VERT;
         break;
     case SB_HORZ:
-        wBar=SSB_HORZ;
+        wBar = SSB_HORZ;
         break;
     }
-    return m_pRichEdit->EnableScrollBar(wBar,fuArrowflags==ESB_ENABLE_BOTH);
+    return m_pRichEdit->EnableScrollBar(wBar, fuArrowflags == ESB_ENABLE_BOTH);
 }
 
-BOOL STextHost::TxSetScrollRange( INT fnBar, LONG nMinPos, INT nMaxPos, BOOL fRedraw )
+BOOL STextHost::TxSetScrollRange(INT fnBar, LONG nMinPos, INT nMaxPos, BOOL fRedraw)
 {
-    return m_pRichEdit->SetScrollRange(fnBar!=SB_HORZ,nMinPos,nMaxPos,fRedraw);
+    return m_pRichEdit->SetScrollRange(fnBar != SB_HORZ, nMinPos, nMaxPos, fRedraw);
 }
 
 BOOL SRichEdit::OnTxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw)
 {
-	if(m_fScrollPending) return TRUE;
-	BOOL bVertical = fnBar!=SB_HORZ;
-	SCROLLINFO *psi=bVertical?(&m_siVer):(&m_siHoz);
+    if (m_fScrollPending)
+        return TRUE;
+    BOOL bVertical = fnBar != SB_HORZ;
+    SCROLLINFO *psi = bVertical ? (&m_siVer) : (&m_siHoz);
 
-	if(psi->nPos != nPos)
-	{
-		psi->nPos = nPos;
-		CRect rcSb = GetScrollBarRect(!!bVertical);
-		InvalidateRect(rcSb);
-	}
-	if (fRedraw)
-	{
-		Invalidate();
-	}
-	return TRUE;
+    if (psi->nPos != nPos)
+    {
+        psi->nPos = nPos;
+        CRect rcSb = GetScrollBarRect(!!bVertical);
+        InvalidateRect(rcSb);
+    }
+    if (fRedraw)
+    {
+        Invalidate();
+    }
+    return TRUE;
 }
 
-BOOL STextHost::TxSetScrollPos( INT fnBar, INT nPos, BOOL fRedraw )
+BOOL STextHost::TxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw)
 {
-    return m_pRichEdit->OnTxSetScrollPos(fnBar,nPos,fRedraw);
+    return m_pRichEdit->OnTxSetScrollPos(fnBar, nPos, fRedraw);
 }
 
-void STextHost::TxInvalidateRect( LPCRECT prc, BOOL fMode )
+void STextHost::TxInvalidateRect(LPCRECT prc, BOOL fMode)
 {
-    if(prc)
+    if (prc)
     {
         m_pRichEdit->InvalidateRect(prc);
     }
@@ -439,68 +439,68 @@ void STextHost::TxInvalidateRect( LPCRECT prc, BOOL fMode )
     }
 }
 
-void STextHost::TxViewChange( BOOL fUpdate )
+void STextHost::TxViewChange(BOOL fUpdate)
 {
-    if(fUpdate)
+    if (fUpdate)
     {
         m_pRichEdit->InvalidateRect(NULL);
     }
 }
 
-COLORREF STextHost::TxGetSysColor( int nIndex )
+COLORREF STextHost::TxGetSysColor(int nIndex)
 {
     return ::GetSysColor(nIndex);
 }
 
-HRESULT STextHost::TxGetBackStyle( TXTBACKSTYLE *pstyle )
+HRESULT STextHost::TxGetBackStyle(TXTBACKSTYLE *pstyle)
 {
-    *pstyle=TXTBACK_TRANSPARENT;
+    *pstyle = TXTBACK_TRANSPARENT;
     return S_OK;
 }
 
-HRESULT STextHost::TxGetMaxLength( DWORD *plength )
+HRESULT STextHost::TxGetMaxLength(DWORD *plength)
 {
     *plength = m_pRichEdit->m_cchTextMost;
     return S_OK;
 }
 
-HRESULT STextHost::TxGetScrollBars( DWORD *pdwScrollBar )
+HRESULT STextHost::TxGetScrollBars(DWORD *pdwScrollBar)
 {
-    *pdwScrollBar =  m_pRichEdit->m_dwStyle & (WS_VSCROLL | WS_HSCROLL | ES_AUTOVSCROLL |
-                     ES_AUTOHSCROLL | ES_DISABLENOSCROLL);
+    *pdwScrollBar = m_pRichEdit->m_dwStyle
+        & (WS_VSCROLL | WS_HSCROLL | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_DISABLENOSCROLL);
 
     return S_OK;
 }
 
-HRESULT STextHost::TxGetPasswordChar( TCHAR *pch )
+HRESULT STextHost::TxGetPasswordChar(TCHAR *pch)
 {
-    *pch=m_pRichEdit->m_chPasswordChar;
+    *pch = m_pRichEdit->m_chPasswordChar;
     return S_OK;
 }
 
-HRESULT STextHost::TxGetAcceleratorPos( LONG *pcp )
+HRESULT STextHost::TxGetAcceleratorPos(LONG *pcp)
 {
-    *pcp=m_pRichEdit->m_lAccelPos;
+    *pcp = m_pRichEdit->m_lAccelPos;
     return S_OK;
 }
 
-HRESULT STextHost::TxGetExtent( LPSIZEL lpExtent )
+HRESULT STextHost::TxGetExtent(LPSIZEL lpExtent)
 {
-    *lpExtent=m_pRichEdit->m_sizelExtent;
+    *lpExtent = m_pRichEdit->m_sizelExtent;
     return S_OK;
 }
 
-HRESULT STextHost::OnTxCharFormatChange( const CHARFORMATW * pcf )
-{
-    return S_OK;
-}
-
-HRESULT STextHost::OnTxParaFormatChange( const PARAFORMAT * ppf )
+HRESULT STextHost::OnTxCharFormatChange(const CHARFORMATW *pcf)
 {
     return S_OK;
 }
 
-HRESULT STextHost::TxGetPropertyBits( DWORD dwMask, DWORD *pdwBits )
+HRESULT STextHost::OnTxParaFormatChange(const PARAFORMAT *ppf)
+{
+    return S_OK;
+}
+
+HRESULT STextHost::TxGetPropertyBits(DWORD dwMask, DWORD *pdwBits)
 {
     DWORD dwProperties = 0;
 
@@ -518,7 +518,6 @@ HRESULT STextHost::TxGetPropertyBits( DWORD dwMask, DWORD *pdwBits )
     {
         dwProperties |= TXTBIT_READONLY;
     }
-
 
     if (m_pRichEdit->m_dwStyle & ES_PASSWORD)
     {
@@ -559,9 +558,9 @@ HRESULT STextHost::TxGetPropertyBits( DWORD dwMask, DWORD *pdwBits )
     return NOERROR;
 }
 
-HRESULT STextHost::TxNotify( DWORD iNotify, void *pv )
-{   
-    return m_pRichEdit->OnTxNotify(iNotify,pv);
+HRESULT STextHost::TxNotify(DWORD iNotify, void *pv)
+{
+    return m_pRichEdit->OnTxNotify(iNotify, pv);
 }
 
 HIMC STextHost::TxImmGetContext()
@@ -569,93 +568,93 @@ HIMC STextHost::TxImmGetContext()
     return ImmGetContext(m_pRichEdit->GetContainer()->GetHostHwnd());
 }
 
-void STextHost::TxImmReleaseContext( HIMC himc )
+void STextHost::TxImmReleaseContext(HIMC himc)
 {
-    ImmReleaseContext(m_pRichEdit->GetContainer()->GetHostHwnd(),himc);
+    ImmReleaseContext(m_pRichEdit->GetContainer()->GetHostHwnd(), himc);
 }
 
-HRESULT STextHost::TxGetSelectionBarWidth( LONG *plSelBarWidth )
+HRESULT STextHost::TxGetSelectionBarWidth(LONG *plSelBarWidth)
 {
-    *plSelBarWidth=0;
+    *plSelBarWidth = 0;
     return S_OK;
 }
 
-BOOL STextHost::Init(SRichEdit* pRichEdit)
+BOOL STextHost::Init(SRichEdit *pRichEdit)
 {
     IUnknown *pUnk;
     HRESULT hr;
 
-    m_pRichEdit=pRichEdit;
+    m_pRichEdit = pRichEdit;
 
     // Create Text Services component
-    if(FAILED(STextServiceHelper::getSingleton().CreateTextServices(NULL, this, &pUnk))) return FALSE;
+    if (FAILED(STextServiceHelper::getSingleton().CreateTextServices(NULL, this, &pUnk)))
+        return FALSE;
 
-    hr = pUnk->QueryInterface(IID_ITextServices,(void **)&pserv);
+    hr = pUnk->QueryInterface(IID_ITextServices, (void **)&pserv);
 
     pUnk->Release();
 
     return SUCCEEDED(hr);
 }
 
-
 //////////////////////////////////////////////////////////////////////////
 // dui interface
 
 SRichEdit::SRichEdit()
-    :m_pTxtHost(NULL)
-    ,m_fTransparent(0)
-    ,m_fRich(1)
-    ,m_fSaveSelection(TRUE)
-    ,m_fVertical(FALSE)
-    ,m_fWordWrap(FALSE)
-    ,m_fAllowBeep(FALSE)
-    ,m_fEnableAutoWordSel(TRUE)
-    ,m_fWantTab(FALSE)
-    ,m_fSingleLineVCenter(TRUE)
-    ,m_fScrollPending(FALSE)
-    ,m_fEnableDragDrop(FALSE)
-    ,m_fAutoSel(FALSE)
-    ,m_fNotifyChange(FALSE)
-	,m_fDisableCaret(FALSE)
-    ,m_cchTextMost(cInitTextMax)
-    ,m_chPasswordChar(_T('*'))
-    ,m_lAccelPos(-1)
-    ,m_dwStyle(ES_LEFT|ES_AUTOHSCROLL)
-    ,m_byDbcsLeadByte(0)
+    : m_pTxtHost(NULL)
+    , m_fTransparent(0)
+    , m_fRich(1)
+    , m_fSaveSelection(TRUE)
+    , m_fVertical(FALSE)
+    , m_fWordWrap(FALSE)
+    , m_fAllowBeep(FALSE)
+    , m_fEnableAutoWordSel(TRUE)
+    , m_fWantTab(FALSE)
+    , m_fSingleLineVCenter(TRUE)
+    , m_fScrollPending(FALSE)
+    , m_fEnableDragDrop(FALSE)
+    , m_fAutoSel(FALSE)
+    , m_fNotifyChange(FALSE)
+    , m_fDisableCaret(FALSE)
+    , m_cchTextMost(cInitTextMax)
+    , m_chPasswordChar(_T('*'))
+    , m_lAccelPos(-1)
+    , m_dwStyle(ES_LEFT | ES_AUTOHSCROLL)
+    , m_byDbcsLeadByte(0)
 {
     m_pNcSkin = GETBUILTINSKIN(SKIN_SYS_BORDER);
 
-    m_bFocusable  = TRUE;
+    m_bFocusable = TRUE;
     m_bClipClient = TRUE;
-    m_sizelExtent.cx=m_sizelExtent.cy=0;
+    m_sizelExtent.cx = m_sizelExtent.cy = 0;
     m_evtSet.addEvent(EVENTID(EventRENotify));
     m_evtSet.addEvent(EVENTID(EventREMenu));
-	m_evtSet.addEvent(EVENTID(EventKeyDown));
+    m_evtSet.addEvent(EVENTID(EventKeyDown));
 }
 
-
-int SRichEdit::OnCreate( LPVOID )
+int SRichEdit::OnCreate(LPVOID)
 {
-    if(0 != __baseCls::OnCreate(NULL)) return 1;
+    if (0 != __baseCls::OnCreate(NULL))
+        return 1;
 
     InitDefaultCharFormat(&m_cfDef);
     InitDefaultParaFormat(&m_pfDef);
 
-    m_pTxtHost=new STextHost;
+    m_pTxtHost = new STextHost;
     m_pTxtHost->AddRef();
-    if(!m_pTxtHost->Init(this))
+    if (!m_pTxtHost->Init(this))
     {
         m_pTxtHost->Release();
-        m_pTxtHost=NULL;
+        m_pTxtHost = NULL;
         return 1;
     }
 
-    if(!m_fTransparent && m_style.m_crBg==CR_INVALID && !m_pBgSkin) 
-        m_style.m_crBg=0xFFFFFF; 
-    //inplace activate
+    if (!m_fTransparent && m_style.m_crBg == CR_INVALID && !m_pBgSkin)
+        m_style.m_crBg = 0xFFFFFF;
+    // inplace activate
     m_pTxtHost->GetTextService()->OnTxInPlaceActivate(NULL);
     //默认没有焦点
-    m_pTxtHost->m_fUiActive=FALSE;
+    m_pTxtHost->m_fUiActive = FALSE;
     m_pTxtHost->GetTextService()->OnTxUIDeactivate();
     m_pTxtHost->GetTextService()->TxSendMessage(WM_KILLFOCUS, 0, 0, 0);
 
@@ -664,18 +663,18 @@ int SRichEdit::OnCreate( LPVOID )
     dw |= IMF_AUTOKEYBOARD | IMF_DUALFONT | IMF_UIFONTS;
     dw &= ~IMF_AUTOFONT;
     SSendMessage(EM_SETLANGOPTIONS, 0, dw);
-    
-    if(m_fNotifyChange)
-    {//receive enm_change event
-        SSendMessage(EM_SETEVENTMASK,0,ENM_CHANGE);
+
+    if (m_fNotifyChange)
+    { // receive enm_change event
+        SSendMessage(EM_SETEVENTMASK, 0, ENM_CHANGE);
     }
-    
-    if(m_strRtfSrc.IsEmpty())
+
+    if (m_strRtfSrc.IsEmpty())
         SetWindowText(SWindow::GetWindowText());
     else
-        SetAttribute(L"rtf",m_strRtfSrc,FALSE);
-    //register droptarget
-    OnEnableDragDrop( !(m_dwStyle&ES_READONLY) & m_fEnableDragDrop);
+        SetAttribute(L"rtf", m_strRtfSrc, FALSE);
+    // register droptarget
+    OnEnableDragDrop(!(m_dwStyle & ES_READONLY) & m_fEnableDragDrop);
     return 0;
 }
 
@@ -683,67 +682,67 @@ void SRichEdit::OnDestroy()
 {
     KillFocus();
     OnEnableDragDrop(FALSE);
-    
-    if(m_pTxtHost)
+
+    if (m_pTxtHost)
     {
         m_pTxtHost->GetTextService()->OnTxInPlaceDeactivate();
         m_pTxtHost->Release();
-        m_pTxtHost=NULL;
+        m_pTxtHost = NULL;
     }
     __baseCls::OnDestroy();
 }
 
-
-void SRichEdit::OnPaint( IRenderTarget * pRT )
+void SRichEdit::OnPaint(IRenderTarget *pRT)
 {
     CRect rcClient;
     GetClientRect(&rcClient);
-    pRT->PushClipRect(&rcClient,RGN_AND);
-	
-	float fMtx[9];
-	pRT->GetTransform(fMtx);
-	SMatrix mtx(fMtx);
+    pRT->PushClipRect(&rcClient, RGN_AND);
 
-	SAutoRefPtr<IRenderTarget> rt;
-	if(!mtx.isIdentity())
-	{
-		GETRENDERFACTORY->CreateRenderTarget(&rt,rcClient.Width(),rcClient.Height());
-		rt->SetViewportOrg(-rcClient.TopLeft());
-		rt->AlphaBlend(&rcClient,pRT,&rcClient,255);
-	}else
-	{
-		rt = pRT;
-	}
-	HDC hdc=rt->GetDC(0);
-	int nOldMode = ::SetGraphicsMode(hdc, GM_COMPATIBLE);	//richedit需要将GraphicMode强制设置为GM_COMPATIBLE
+    float fMtx[9];
+    pRT->GetTransform(fMtx);
+    SMatrix mtx(fMtx);
+
+    SAutoRefPtr<IRenderTarget> rt;
+    if (!mtx.isIdentity())
+    {
+        GETRENDERFACTORY->CreateRenderTarget(&rt, rcClient.Width(), rcClient.Height());
+        rt->SetViewportOrg(-rcClient.TopLeft());
+        rt->AlphaBlend(&rcClient, pRT, &rcClient, 255);
+    }
+    else
+    {
+        rt = pRT;
+    }
+    HDC hdc = rt->GetDC(0);
+    int nOldMode
+        = ::SetGraphicsMode(hdc, GM_COMPATIBLE); // richedit需要将GraphicMode强制设置为GM_COMPATIBLE
 
     ALPHAINFO ai;
-    CGdiAlpha::AlphaBackup(hdc,&rcClient,ai);
+    CGdiAlpha::AlphaBackup(hdc, &rcClient, ai);
 
-    LONG lPos =0;
-    m_pTxtHost->GetTextService()->TxGetVScroll(NULL,NULL,&lPos,NULL,NULL);
-    RECTL rcL= {rcClient.left,rcClient.top,rcClient.right,rcClient.bottom};
-    m_pTxtHost->GetTextService()->TxDraw(
-        DVASPECT_CONTENT,          // Draw Aspect
-        0,                        // Lindex
-        NULL,                    // Info for drawing optimazation
-        NULL,                    // target device information
-        hdc,            // Draw device HDC
-        NULL,                        // Target device HDC
-        &rcL,            // Bounding client rectangle
-        NULL,             // Clipping rectangle for metafiles
-        &rcClient,        // Update rectangle
-        NULL,                        // Call back function
-        NULL,                    // Call back parameter
-        TXTVIEW_ACTIVE);
+    LONG lPos = 0;
+    m_pTxtHost->GetTextService()->TxGetVScroll(NULL, NULL, &lPos, NULL, NULL);
+    RECTL rcL = { rcClient.left, rcClient.top, rcClient.right, rcClient.bottom };
+    m_pTxtHost->GetTextService()->TxDraw(DVASPECT_CONTENT, // Draw Aspect
+                                         0,                // Lindex
+                                         NULL,             // Info for drawing optimazation
+                                         NULL,             // target device information
+                                         hdc,              // Draw device HDC
+                                         NULL,             // Target device HDC
+                                         &rcL,             // Bounding client rectangle
+                                         NULL,             // Clipping rectangle for metafiles
+                                         &rcClient,        // Update rectangle
+                                         NULL,             // Call back function
+                                         NULL,             // Call back parameter
+                                         TXTVIEW_ACTIVE);
     CGdiAlpha::AlphaRestore(ai);
-	::SetGraphicsMode(hdc, nOldMode);
-	rt->ReleaseDC(hdc);
-	if(!mtx.isIdentity())
-	{
-		pRT->AlphaBlend(&rcClient,rt,&rcClient,255);
-		rt=NULL;
-	}
+    ::SetGraphicsMode(hdc, nOldMode);
+    rt->ReleaseDC(hdc);
+    if (!mtx.isIdentity())
+    {
+        pRT->AlphaBlend(&rcClient, rt, &rcClient, 255);
+        rt = NULL;
+    }
     pRT->PopClip();
 }
 
@@ -751,31 +750,32 @@ void SRichEdit::OnSetFocus(SWND wndOld)
 {
     __baseCls::OnSetFocus(wndOld);
 
-    if(m_pTxtHost && IsVisible(TRUE) && !IsDisabled(TRUE))
+    if (m_pTxtHost && IsVisible(TRUE) && !IsDisabled(TRUE))
     {
-        m_pTxtHost->m_fUiActive=TRUE;
+        m_pTxtHost->m_fUiActive = TRUE;
         m_pTxtHost->GetTextService()->OnTxUIActivate();
         m_pTxtHost->GetTextService()->TxSendMessage(WM_SETFOCUS, 0, 0, 0);
-        if(m_fAutoSel) SetSel((DWORD)MAKELONG(0,-1),TRUE);
+        if (m_fAutoSel)
+            SetSel((DWORD)MAKELONG(0, -1), TRUE);
     }
 
-	if (ES_PASSWORD & m_dwStyle || ES_NUMBER & m_dwStyle)
-	{
-		GetContainer()->EnableIME(FALSE);
-	}
+    if (ES_PASSWORD & m_dwStyle || ES_NUMBER & m_dwStyle)
+    {
+        GetContainer()->EnableIME(FALSE);
+    }
 }
 
 void SRichEdit::OnKillFocus(SWND wndFocus)
 {
-	if (ES_PASSWORD & m_dwStyle || ES_NUMBER & m_dwStyle)
-	{
-		GetContainer()->EnableIME(TRUE);
-	}
+    if (ES_PASSWORD & m_dwStyle || ES_NUMBER & m_dwStyle)
+    {
+        GetContainer()->EnableIME(TRUE);
+    }
 
     __baseCls::OnKillFocus(wndFocus);
-    if(m_pTxtHost)
+    if (m_pTxtHost)
     {
-        m_pTxtHost->m_fUiActive=FALSE;
+        m_pTxtHost->m_fUiActive = FALSE;
         m_pTxtHost->GetTextService()->OnTxUIDeactivate();
         m_pTxtHost->GetTextService()->TxSendMessage(WM_KILLFOCUS, 0, 0, 0);
         m_pTxtHost->TxShowCaret(FALSE);
@@ -784,9 +784,9 @@ void SRichEdit::OnKillFocus(SWND wndFocus)
     GetContainer()->OnUpdateCursor();
 }
 
-void SRichEdit::OnTimer( char idEvent )
+void SRichEdit::OnTimer(char idEvent)
 {
-    if(idEvent==TIMER_INVALIDATE)
+    if (idEvent == TIMER_INVALIDATE)
     {
         Invalidate();
         KillTimer(idEvent);
@@ -797,129 +797,129 @@ void SRichEdit::OnTimer( char idEvent )
     }
 }
 
-void SRichEdit::OnTimer2( UINT_PTR idEvent )
+void SRichEdit::OnTimer2(UINT_PTR idEvent)
 {
-    m_pTxtHost->GetTextService()->TxSendMessage(WM_TIMER,idEvent,0,NULL);
+    m_pTxtHost->GetTextService()->TxSendMessage(WM_TIMER, idEvent, 0, NULL);
 }
 
 UINT SRichEdit::OnGetDlgCode() const
 {
-	UINT uRet = SC_WANTCHARS | SC_WANTARROWS;
-	if (m_fWantTab) uRet |= SC_WANTTAB;
-	if (m_dwStyle&ES_WANTRETURN) uRet |= SC_WANTRETURN;
-	return uRet;
+    UINT uRet = SC_WANTCHARS | SC_WANTARROWS;
+    if (m_fWantTab)
+        uRet |= SC_WANTTAB;
+    if (m_dwStyle & ES_WANTRETURN)
+        uRet |= SC_WANTRETURN;
+    return uRet;
 }
 
-BOOL SRichEdit::OnScroll( BOOL bVertical,UINT uCode,int nPos )
+BOOL SRichEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 {
-    if(m_fScrollPending) return FALSE;
-    LRESULT lresult=-1;
-    m_fScrollPending=TRUE;
-    SPanel::OnScroll(bVertical,uCode,nPos);
-       
-    m_pTxtHost->GetTextService()->TxSendMessage(bVertical?WM_VSCROLL:WM_HSCROLL,MAKEWPARAM(uCode,nPos),0,&lresult);
-    LONG lPos=0;
-    if(bVertical)
+    if (m_fScrollPending)
+        return FALSE;
+    LRESULT lresult = -1;
+    m_fScrollPending = TRUE;
+    SPanel::OnScroll(bVertical, uCode, nPos);
+
+    m_pTxtHost->GetTextService()->TxSendMessage(bVertical ? WM_VSCROLL : WM_HSCROLL,
+                                                MAKEWPARAM(uCode, nPos), 0, &lresult);
+    LONG lPos = 0;
+    if (bVertical)
     {
-        m_pTxtHost->GetTextService()->TxGetVScroll(NULL,NULL,&lPos,NULL,NULL);
-    }else
-    {
-        m_pTxtHost->GetTextService()->TxGetHScroll(NULL,NULL,&lPos,NULL,NULL);
+        m_pTxtHost->GetTextService()->TxGetVScroll(NULL, NULL, &lPos, NULL, NULL);
     }
-    if(lPos != GetScrollPos(bVertical))
-        SetScrollPos(bVertical,lPos,TRUE);
-    
-    m_fScrollPending=FALSE;
-    if(uCode==SB_THUMBTRACK)
+    else
+    {
+        m_pTxtHost->GetTextService()->TxGetHScroll(NULL, NULL, &lPos, NULL, NULL);
+    }
+    if (lPos != GetScrollPos(bVertical))
+        SetScrollPos(bVertical, lPos, TRUE);
+
+    m_fScrollPending = FALSE;
+    if (uCode == SB_THUMBTRACK)
         ScrollUpdate();
-    return lresult==0;
+    return lresult == 0;
 }
 
 BOOL SRichEdit::OnSetCursor(const CPoint &pt)
 {
     CRect rcClient;
     GetClientRect(&rcClient);
-    if(!rcClient.PtInRect(pt))
+    if (!rcClient.PtInRect(pt))
         return FALSE;
 
-    HDC hdc=GetDC(GetContainer()->GetHostHwnd());
-    m_pTxtHost->GetTextService()->OnTxSetCursor(
-        DVASPECT_CONTENT,
-        -1,
-        NULL,
-        NULL,
-        hdc,
-        NULL,
-        &rcClient,
-        pt.x,
-        pt.y);
-    ReleaseDC(GetContainer()->GetHostHwnd(),hdc);
+    HDC hdc = GetDC(GetContainer()->GetHostHwnd());
+    m_pTxtHost->GetTextService()->OnTxSetCursor(DVASPECT_CONTENT, -1, NULL, NULL, hdc, NULL,
+                                                &rcClient, pt.x, pt.y);
+    ReleaseDC(GetContainer()->GetHostHwnd(), hdc);
     return TRUE;
 }
 
-BOOL SRichEdit::SwndProc( UINT uMsg,WPARAM wParam,LPARAM lParam,LRESULT & lResult )
+BOOL SRichEdit::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult)
 {
-    if(m_pTxtHost && m_pTxtHost->GetTextService())
+    if (m_pTxtHost && m_pTxtHost->GetTextService())
     {
-		if(uMsg == EM_GETRECT)
-		{
-			SetMsgHandled(TRUE);
-			GetClientRect((LPRECT)lParam);
-			return TRUE;
-		}
-        if(m_pTxtHost->GetTextService()->TxSendMessage(uMsg,wParam,lParam,&lResult)==S_OK)
+        if (uMsg == EM_GETRECT)
+        {
+            SetMsgHandled(TRUE);
+            GetClientRect((LPRECT)lParam);
+            return TRUE;
+        }
+        if (m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wParam, lParam, &lResult) == S_OK)
         {
             SetMsgHandled(TRUE);
             return TRUE;
         }
     }
-    return __baseCls::SwndProc(uMsg,wParam,lParam,lResult);
+    return __baseCls::SwndProc(uMsg, wParam, lParam, lResult);
 }
 
-HRESULT SRichEdit::InitDefaultCharFormat( CHARFORMAT2W* pcf ,IFont *pFont)
+HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFont *pFont)
 {
     SAutoRefPtr<IRenderTarget> pRT;
-    GETRENDERFACTORY->CreateRenderTarget(&pRT,0,0);
+    GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
     SASSERT(pRT);
     BeforePaintEx(pRT);
-    
+
     SAutoRefPtr<IFont> oldFont;
-    if(pFont==NULL) pFont=(IFont *)pRT->GetCurrentObject(OT_FONT);
+    if (pFont == NULL)
+        pFont = (IFont *)pRT->GetCurrentObject(OT_FONT);
     SIZE szTxt;
-    pRT->MeasureText(_T("A"),1,&szTxt);
-	m_nFontHeight=szTxt.cy;
+    pRT->MeasureText(_T("A"), 1, &szTxt);
+    m_nFontHeight = szTxt.cy;
 
     memset(pcf, 0, sizeof(CHARFORMAT2W));
     pcf->cbSize = sizeof(CHARFORMAT2W);
-    pcf->dwMask = CFM_SIZE | CFM_OFFSET | CFM_FACE | CFM_CHARSET | CFM_COLOR | CFM_BOLD | CFM_ITALIC | CFM_UNDERLINE;
+    pcf->dwMask = CFM_SIZE | CFM_OFFSET | CFM_FACE | CFM_CHARSET | CFM_COLOR | CFM_BOLD | CFM_ITALIC
+        | CFM_UNDERLINE;
 
     pcf->crTextColor = pRT->GetTextColor() & 0x00ffffff;
-    HDC hdc=GetDC(NULL);
+    HDC hdc = GetDC(NULL);
     LONG yPixPerInch = GetDeviceCaps(hdc, LOGPIXELSY);
-    ReleaseDC(NULL,hdc);
-    const LOGFONT *plf=pFont->LogFont();
+    ReleaseDC(NULL, hdc);
+    const LOGFONT *plf = pFont->LogFont();
     pcf->yHeight = abs(MulDiv(pFont->TextSize(), LY_PER_INCH, yPixPerInch));
     pcf->yOffset = 0;
     pcf->dwEffects = 0;
-    if(pFont->IsBold())
+    if (pFont->IsBold())
         pcf->dwEffects |= CFE_BOLD;
-    if(pFont->IsItalic())
+    if (pFont->IsItalic())
         pcf->dwEffects |= CFE_ITALIC;
-    if(pFont->IsUnderline())
+    if (pFont->IsUnderline())
         pcf->dwEffects |= CFE_UNDERLINE;
     pcf->bCharSet = plf->lfCharSet;
     pcf->bPitchAndFamily = plf->lfPitchAndFamily;
 #ifdef _UNICODE
     wcscpy(pcf->szFaceName, plf->lfFaceName);
 #else
-    //need to thunk pcf->szFaceName to a standard char string.in this case it's easy because our thunk is also our copy
-    MultiByteToWideChar(CP_ACP, 0, plf->lfFaceName, LF_FACESIZE, pcf->szFaceName, LF_FACESIZE) ;
+    // need to thunk pcf->szFaceName to a standard char string.in this case it's easy because our
+    // thunk is also our copy
+    MultiByteToWideChar(CP_ACP, 0, plf->lfFaceName, LF_FACESIZE, pcf->szFaceName, LF_FACESIZE);
 #endif
 
     return S_OK;
 }
 
-HRESULT SRichEdit::InitDefaultParaFormat( PARAFORMAT2* ppf )
+HRESULT SRichEdit::InitDefaultParaFormat(PARAFORMAT2 *ppf)
 {
     memset(ppf, 0, sizeof(PARAFORMAT2));
     ppf->cbSize = sizeof(PARAFORMAT2);
@@ -927,38 +927,37 @@ HRESULT SRichEdit::InitDefaultParaFormat( PARAFORMAT2* ppf )
     ppf->cTabCount = 1;
     ppf->rgxTabs[0] = lDefaultTab;
 
-    if(m_dwStyle&ES_CENTER)
-        ppf->wAlignment=PFA_CENTER;
-    else if(m_dwStyle&ES_RIGHT)
-        ppf->wAlignment=PFA_RIGHT;
+    if (m_dwStyle & ES_CENTER)
+        ppf->wAlignment = PFA_CENTER;
+    else if (m_dwStyle & ES_RIGHT)
+        ppf->wAlignment = PFA_RIGHT;
     else
         ppf->wAlignment = PFA_LEFT;
 
     return S_OK;
 }
 
-
-
-HRESULT SRichEdit::OnTxNotify( DWORD iNotify,LPVOID pv )
+HRESULT SRichEdit::OnTxNotify(DWORD iNotify, LPVOID pv)
 {
     EventRENotify evt(this);
-    evt.iNotify=iNotify;
-    evt.pv=pv;
+    evt.iNotify = iNotify;
+    evt.pv = pv;
     evt.hr = S_OK;
     FireEvent(evt);
     return evt.hr;
 }
 //////////////////////////////////////////////////////////////////////////
 //    richedit interfaces
-BOOL SRichEdit::GetWordWrap( void )
+BOOL SRichEdit::GetWordWrap(void)
 {
     return m_fWordWrap;
 }
 
-void SRichEdit::SetWordWrap( BOOL fWordWrap )
+void SRichEdit::SetWordWrap(BOOL fWordWrap)
 {
     m_fWordWrap = fWordWrap;
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_WORDWRAP, fWordWrap ? TXTBIT_WORDWRAP : 0);
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_WORDWRAP,
+                                                         fWordWrap ? TXTBIT_WORDWRAP : 0);
 }
 
 BOOL SRichEdit::GetReadOnly()
@@ -986,7 +985,7 @@ WORD SRichEdit::GetDefaultAlign()
     return m_pfDef.wAlignment;
 }
 
-void SRichEdit::SetDefaultAlign( WORD wNewAlign )
+void SRichEdit::SetDefaultAlign(WORD wNewAlign)
 {
     m_pfDef.wAlignment = wNewAlign;
 
@@ -999,12 +998,12 @@ BOOL SRichEdit::GetRichTextFlag()
     return m_fRich;
 }
 
-void SRichEdit::SetRichTextFlag( BOOL fRich )
+void SRichEdit::SetRichTextFlag(BOOL fRich)
 {
     m_fRich = fRich;
 
     m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_RICHTEXT,
-            fRich ? TXTBIT_RICHTEXT : 0);
+                                                         fRich ? TXTBIT_RICHTEXT : 0);
 }
 
 LONG SRichEdit::GetDefaultLeftIndent()
@@ -1012,89 +1011,97 @@ LONG SRichEdit::GetDefaultLeftIndent()
     return m_pfDef.dxOffset;
 }
 
-void SRichEdit::SetDefaultLeftIndent( LONG lNewIndent )
+void SRichEdit::SetDefaultLeftIndent(LONG lNewIndent)
 {
     m_pfDef.dxOffset = lNewIndent;
 
     m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_PARAFORMATCHANGE, 0);
 }
 
-BOOL SRichEdit::SetSaveSelection( BOOL fSaveSelection )
+BOOL SRichEdit::SetSaveSelection(BOOL fSaveSelection)
 {
     BOOL fResult = fSaveSelection;
 
     m_fSaveSelection = fSaveSelection;
 
     // notify text services of property change
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_SAVESELECTION,
-            m_fSaveSelection ? TXTBIT_SAVESELECTION : 0);
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(
+        TXTBIT_SAVESELECTION, m_fSaveSelection ? TXTBIT_SAVESELECTION : 0);
 
     return fResult;
 }
 
-void SRichEdit::OnLButtonDown( UINT nFlags, CPoint point )
+void SRichEdit::OnLButtonDown(UINT nFlags, CPoint point)
 {
-	SetCapture();
-    if(!IsFocused())
+    SetCapture();
+    if (!IsFocused())
     {
         SetFocus();
-        if(!m_fAutoSel) m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg,GetCurMsg()->wParam,GetCurMsg()->lParam,NULL);
-    }else
+        if (!m_fAutoSel)
+            m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam,
+                                                        GetCurMsg()->lParam, NULL);
+    }
+    else
     {
-        m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg,GetCurMsg()->wParam,GetCurMsg()->lParam,NULL);
+        m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam,
+                                                    GetCurMsg()->lParam, NULL);
     }
 }
 
-
 void SRichEdit::OnLButtonUp(UINT nFlags, CPoint point)
 {
-	m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg,GetCurMsg()->wParam,GetCurMsg()->lParam,NULL);
-	ReleaseCapture();
+    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam,
+                                                GetCurMsg()->lParam, NULL);
+    ReleaseCapture();
 }
 
-LRESULT SRichEdit::OnButtonClick(UINT uMsg,WPARAM wParam,LPARAM lParam)
+LRESULT SRichEdit::OnButtonClick(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    m_pTxtHost->GetTextService()->TxSendMessage(uMsg,wParam,lParam,NULL);
+    m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wParam, lParam, NULL);
     return 0;
 }
 
-
-void SRichEdit::OnRButtonDown( UINT nFlags, CPoint point )
+void SRichEdit::OnRButtonDown(UINT nFlags, CPoint point)
 {
-    if(FireCtxMenu(point)) return;//用户自己响应右键
+    if (FireCtxMenu(point))
+        return; //用户自己响应右键
     SetFocus();
     //弹出默认编辑窗菜单
     SXmlNode xmlMenu = GetMenuTemplate();
-    if(xmlMenu)
+    if (xmlMenu)
     {
         SMenu menu;
-        if(menu.LoadMenu(xmlMenu))
+        if (menu.LoadMenu(xmlMenu))
         {
-            CRect rcCantainer=GetContainer()->GetContainerRect();
+            CRect rcCantainer = GetContainer()->GetContainerRect();
             point.Offset(rcCantainer.TopLeft());
-            HWND hHost=GetContainer()->GetHostHwnd();
-            ::ClientToScreen(hHost,&point);
-            BOOL canPaste=(BOOL)SSendMessage(EM_CANPASTE,0);
-            DWORD dwStart=0,dwEnd=0;
-            SSendMessage(EM_GETSEL,(WPARAM)&dwStart,(LPARAM)&dwEnd);
-            BOOL hasSel=dwStart<dwEnd;
-            UINT uLen=(UINT)SSendMessage(WM_GETTEXTLENGTH ,0,0);
-            BOOL bReadOnly=m_dwStyle&ES_READONLY;
-            EnableMenuItem(menu.m_hMenu,MENU_CUT,MF_BYCOMMAND|((hasSel&&(!bReadOnly))?0:MF_GRAYED));
-            EnableMenuItem(menu.m_hMenu,MENU_COPY,MF_BYCOMMAND|(hasSel?0:MF_GRAYED));
-            EnableMenuItem(menu.m_hMenu,MENU_PASTE,MF_BYCOMMAND|((canPaste&&(!bReadOnly))?0:MF_GRAYED));
-            EnableMenuItem(menu.m_hMenu,MENU_DEL,MF_BYCOMMAND|((hasSel&&(!bReadOnly))?0:MF_GRAYED));
-            EnableMenuItem(menu.m_hMenu,MENU_SELALL,MF_BYCOMMAND|((uLen>0)?0:MF_GRAYED));
+            HWND hHost = GetContainer()->GetHostHwnd();
+            ::ClientToScreen(hHost, &point);
+            BOOL canPaste = (BOOL)SSendMessage(EM_CANPASTE, 0);
+            DWORD dwStart = 0, dwEnd = 0;
+            SSendMessage(EM_GETSEL, (WPARAM)&dwStart, (LPARAM)&dwEnd);
+            BOOL hasSel = dwStart < dwEnd;
+            UINT uLen = (UINT)SSendMessage(WM_GETTEXTLENGTH, 0, 0);
+            BOOL bReadOnly = m_dwStyle & ES_READONLY;
+            EnableMenuItem(menu.m_hMenu, MENU_CUT,
+                           MF_BYCOMMAND | ((hasSel && (!bReadOnly)) ? 0 : MF_GRAYED));
+            EnableMenuItem(menu.m_hMenu, MENU_COPY, MF_BYCOMMAND | (hasSel ? 0 : MF_GRAYED));
+            EnableMenuItem(menu.m_hMenu, MENU_PASTE,
+                           MF_BYCOMMAND | ((canPaste && (!bReadOnly)) ? 0 : MF_GRAYED));
+            EnableMenuItem(menu.m_hMenu, MENU_DEL,
+                           MF_BYCOMMAND | ((hasSel && (!bReadOnly)) ? 0 : MF_GRAYED));
+            EnableMenuItem(menu.m_hMenu, MENU_SELALL, MF_BYCOMMAND | ((uLen > 0) ? 0 : MF_GRAYED));
 
-            UINT uCmd=menu.TrackPopupMenu(TPM_RETURNCMD|TPM_LEFTALIGN,point.x,point.y,hHost,NULL,GetScale());
-            
+            UINT uCmd = menu.TrackPopupMenu(TPM_RETURNCMD | TPM_LEFTALIGN, point.x, point.y, hHost,
+                                            NULL, GetScale());
+
             EventREMenu evt(this);
             evt.uCmd = uCmd;
             FireEvent(evt);
-            if(evt.handled)
+            if (evt.handled)
                 return;
-                
-            switch(uCmd)
+
+            switch (uCmd)
             {
             case MENU_CUT:
                 SSendMessage(WM_CUT);
@@ -1106,185 +1113,192 @@ void SRichEdit::OnRButtonDown( UINT nFlags, CPoint point )
                 SSendMessage(WM_PASTE);
                 break;
             case MENU_DEL:
-                SSendMessage(EM_REPLACESEL,0,(LPARAM)_T(""));
+                SSendMessage(EM_REPLACESEL, 0, (LPARAM) _T(""));
                 break;
             case MENU_SELALL:
-                SSendMessage(EM_SETSEL,0,-1);
+                SSendMessage(EM_SETSEL, 0, -1);
                 break;
             default:
                 break;
             }
-
         }
     }
 }
 
-void SRichEdit::OnMouseMove( UINT nFlags, CPoint point )
+void SRichEdit::OnMouseMove(UINT nFlags, CPoint point)
 {
-    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg,GetCurMsg()->wParam,GetCurMsg()->lParam,NULL);
+    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam,
+                                                GetCurMsg()->lParam, NULL);
 }
 
-void SRichEdit::OnKeyDown( UINT nChar, UINT nRepCnt, UINT nFlags )
+void SRichEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	EventKeyDown evt(this);
-	evt.bCancel = FALSE;
-	evt.nChar = nChar;
-	evt.nFlags = nFlags;
-	FireEvent(evt);
-	if (evt.bCancel)
-	{
-		SetMsgHandled(FALSE);
-		return;
-	}
-
-    if(nChar==VK_RETURN && !(m_dwStyle&ES_WANTRETURN) && !(GetKeyState(VK_CONTROL)&0x8000))
+    EventKeyDown evt(this);
+    evt.bCancel = FALSE;
+    evt.nChar = nChar;
+    evt.nFlags = nFlags;
+    FireEvent(evt);
+    if (evt.bCancel)
     {
         SetMsgHandled(FALSE);
         return;
     }
-    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg,GetCurMsg()->wParam,GetCurMsg()->lParam,NULL);
+
+    if (nChar == VK_RETURN && !(m_dwStyle & ES_WANTRETURN) && !(GetKeyState(VK_CONTROL) & 0x8000))
+    {
+        SetMsgHandled(FALSE);
+        return;
+    }
+    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam,
+                                                GetCurMsg()->lParam, NULL);
 }
 
 #define CTRL(_ch) (_ch - 'A' + 1)
 
-void SRichEdit::OnChar( UINT nChar, UINT nRepCnt, UINT nFlags )
+void SRichEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-	SWNDMSG msg = *GetCurMsg();
-    switch(nChar)
+    SWNDMSG msg = *GetCurMsg();
+    switch (nChar)
     {
         // Ctrl-Return generates Ctrl-J (LF), treat it as an ordinary return
     case CTRL('J'):
     case VK_RETURN:
-        if(!(GetKeyState(VK_CONTROL) & 0x8000)
-                && !(m_dwStyle & ES_WANTRETURN))
+        if (!(GetKeyState(VK_CONTROL) & 0x8000) && !(m_dwStyle & ES_WANTRETURN))
             return;
         break;
 
     case VK_TAB:
-        if(!m_fWantTab && !(GetKeyState(VK_CONTROL) & 0x8000))
+        if (!m_fWantTab && !(GetKeyState(VK_CONTROL) & 0x8000))
             return;
         break;
     default:
-        if(m_dwStyle&ES_NUMBER && !isdigit(nChar) && nChar!='-' && nChar!='.' && nChar!=',')
+        if (m_dwStyle & ES_NUMBER && !isdigit(nChar) && nChar != '-' && nChar != '.'
+            && nChar != ',')
             return;
-		if((m_dwStyle&ES_UPPERCASE) && nChar>='a'&&nChar<='z')
-		{
-			nChar-=0x20;
-			msg.wParam=nChar;
-			break;
-		}
-		if((m_dwStyle&ES_LOWERCASE) && nChar>='A'&&nChar<='Z')
-		{
-			nChar+=0x20;
-			msg.wParam=nChar;
-			break;
-		}
-#ifndef _UNICODE
-        if(m_byDbcsLeadByte==0)
+        if ((m_dwStyle & ES_UPPERCASE) && nChar >= 'a' && nChar <= 'z')
         {
-            if(IsDBCSLeadByte(nChar))
+            nChar -= 0x20;
+            msg.wParam = nChar;
+            break;
+        }
+        if ((m_dwStyle & ES_LOWERCASE) && nChar >= 'A' && nChar <= 'Z')
+        {
+            nChar += 0x20;
+            msg.wParam = nChar;
+            break;
+        }
+#ifndef _UNICODE
+        if (m_byDbcsLeadByte == 0)
+        {
+            if (IsDBCSLeadByte(nChar))
             {
-                m_byDbcsLeadByte=nChar;
+                m_byDbcsLeadByte = nChar;
                 return;
             }
-        }else
+        }
+        else
         {
-            nChar=MAKEWORD(nChar,m_byDbcsLeadByte);
-            m_pTxtHost->GetTextService()->TxSendMessage(WM_IME_CHAR,nChar,0,NULL);
-            m_byDbcsLeadByte=0;
+            nChar = MAKEWORD(nChar, m_byDbcsLeadByte);
+            m_pTxtHost->GetTextService()->TxSendMessage(WM_IME_CHAR, nChar, 0, NULL);
+            m_byDbcsLeadByte = 0;
             return;
         }
-#endif//_UNICODE
+#endif //_UNICODE
         break;
     }
-    m_pTxtHost->GetTextService()->TxSendMessage(msg.uMsg,msg.wParam,msg.lParam,NULL);
+    m_pTxtHost->GetTextService()->TxSendMessage(msg.uMsg, msg.wParam, msg.lParam, NULL);
 }
 
-LRESULT SRichEdit::OnNcCalcSize( BOOL bCalcValidRects, LPARAM lParam )
+LRESULT SRichEdit::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
 {
-    __baseCls::OnNcCalcSize(bCalcValidRects,lParam);
-    
+    __baseCls::OnNcCalcSize(bCalcValidRects, lParam);
 
     CRect rcInsetPixel = GetStyle().GetPadding();
 
-	if(!m_fRich && m_fSingleLineVCenter && !(m_dwStyle&ES_MULTILINE))
+    if (!m_fRich && m_fSingleLineVCenter && !(m_dwStyle & ES_MULTILINE))
     {
-        rcInsetPixel.top   =
-        rcInsetPixel.bottom=(m_rcClient.Height()-m_nFontHeight)/2;
+        rcInsetPixel.top = rcInsetPixel.bottom = (m_rcClient.Height() - m_nFontHeight) / 2;
     }
 
-    m_siHoz.nPage=m_rcClient.Width()-rcInsetPixel.left-rcInsetPixel.right;
-    m_siVer.nPage=m_rcClient.Height()-rcInsetPixel.top-rcInsetPixel.bottom;
+    m_siHoz.nPage = m_rcClient.Width() - rcInsetPixel.left - rcInsetPixel.right;
+    m_siVer.nPage = m_rcClient.Height() - rcInsetPixel.top - rcInsetPixel.bottom;
 
-    if(m_pTxtHost)
+    if (m_pTxtHost)
     {
-        HDC hdc=GetDC(GetContainer()->GetHostHwnd());
+        HDC hdc = GetDC(GetContainer()->GetHostHwnd());
         LONG xPerInch = ::GetDeviceCaps(hdc, LOGPIXELSX);
-        LONG yPerInch =    ::GetDeviceCaps(hdc, LOGPIXELSY);
-        ReleaseDC(GetContainer()->GetHostHwnd(),hdc);
+        LONG yPerInch = ::GetDeviceCaps(hdc, LOGPIXELSY);
+        ReleaseDC(GetContainer()->GetHostHwnd(), hdc);
 
         m_sizelExtent.cx = DtoHimetric(m_rcClient.Width(), xPerInch);
         m_sizelExtent.cy = DtoHimetric(m_rcClient.Height(), yPerInch);
 
-        m_rcInset.left=DtoHimetric(rcInsetPixel.left,xPerInch);
-        m_rcInset.right=DtoHimetric(rcInsetPixel.right,xPerInch);
-        m_rcInset.top=DtoHimetric(rcInsetPixel.top,yPerInch);
-        m_rcInset.bottom=DtoHimetric(rcInsetPixel.bottom,yPerInch);
-        
+        m_rcInset.left = DtoHimetric(rcInsetPixel.left, xPerInch);
+        m_rcInset.right = DtoHimetric(rcInsetPixel.right, xPerInch);
+        m_rcInset.top = DtoHimetric(rcInsetPixel.top, yPerInch);
+        m_rcInset.bottom = DtoHimetric(rcInsetPixel.bottom, yPerInch);
+
         //窗口有焦点时，需要更新光标位置：先使edit失活用来关闭光标，再激活edit来显示光标。
         //此处不应该直接用setfocus和killfocus，因为这两个消息可能会被外面响应。导致逻辑错误
         BOOL bFocus = IsFocused();
-        if(bFocus)
+        if (bFocus)
         {
-            m_pTxtHost->m_fUiActive=FALSE;
+            m_pTxtHost->m_fUiActive = FALSE;
             m_pTxtHost->GetTextService()->OnTxUIDeactivate();
-            m_pTxtHost->GetTextService()->TxSendMessage(WM_KILLFOCUS,0,0,NULL);
+            m_pTxtHost->GetTextService()->TxSendMessage(WM_KILLFOCUS, 0, 0, NULL);
             m_pTxtHost->TxShowCaret(FALSE);
         }
-        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_EXTENTCHANGE|TXTBIT_CLIENTRECTCHANGE, TXTBIT_EXTENTCHANGE|TXTBIT_CLIENTRECTCHANGE);
-        if(bFocus)
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(
+            TXTBIT_EXTENTCHANGE | TXTBIT_CLIENTRECTCHANGE,
+            TXTBIT_EXTENTCHANGE | TXTBIT_CLIENTRECTCHANGE);
+        if (bFocus)
         {
-            m_pTxtHost->m_fUiActive=TRUE;
+            m_pTxtHost->m_fUiActive = TRUE;
             m_pTxtHost->GetTextService()->OnTxUIActivate();
-            m_pTxtHost->GetTextService()->TxSendMessage(WM_SETFOCUS,0,0,NULL);
+            m_pTxtHost->GetTextService()->TxSendMessage(WM_SETFOCUS, 0, 0, NULL);
         }
     }
     return 0;
 }
 
-LRESULT SRichEdit::OnSetReadOnly( UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT SRichEdit::OnSetReadOnly(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    return SUCCEEDED(SetAttribute(L"readonly",wParam?L"1":L"0"));
+    return SUCCEEDED(SetAttribute(L"readonly", wParam ? L"1" : L"0"));
 }
 
-LRESULT SRichEdit::OnSetLimitText( UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT SRichEdit::OnSetLimitText(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    if(wParam==0) m_cchTextMost=cInitTextMax;
-    else m_cchTextMost=(DWORD)wParam;
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_MAXLENGTHCHANGE, TXTBIT_MAXLENGTHCHANGE);
+    if (wParam == 0)
+        m_cchTextMost = cInitTextMax;
+    else
+        m_cchTextMost = (DWORD)wParam;
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_MAXLENGTHCHANGE,
+                                                         TXTBIT_MAXLENGTHCHANGE);
     return 1;
 }
 
-LRESULT SRichEdit::OnSetCharFormat( UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT SRichEdit::OnSetCharFormat(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    if(wParam == SCF_DEFAULT && !FValidCF((CHARFORMAT2W *) lParam))
-    {//设置默认字体只支持CHARFORMAT2W
-        SLOGFMTD(_T("set default char format failed! only CHARFORMAT2W can be set for default char format"));
+    if (wParam == SCF_DEFAULT && !FValidCF((CHARFORMAT2W *)lParam))
+    { //设置默认字体只支持CHARFORMAT2W
+        SLOGFMTD(
+            _T("set default char format failed! only CHARFORMAT2W can be set for default char format"));
         return 0;
     }
-    
-    m_pTxtHost->GetTextService()->TxSendMessage(uMsg,wParam,lParam,NULL);
-    if(wParam == SCF_DEFAULT)
+
+    m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wParam, lParam, NULL);
+    if (wParam == SCF_DEFAULT)
     {
-        m_cfDef=*(CHARFORMAT2W *)lParam;
-        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE,TXTBIT_CHARFORMATCHANGE);
+        m_cfDef = *(CHARFORMAT2W *)lParam;
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE,
+                                                             TXTBIT_CHARFORMATCHANGE);
     }
     return 1;
 }
 
-LRESULT SRichEdit::OnSetParaFormat( UINT uMsg, WPARAM wparam, LPARAM lparam )
+LRESULT SRichEdit::OnSetParaFormat(UINT uMsg, WPARAM wparam, LPARAM lparam)
 {
-    if(!FValidPF((PARAFORMAT *) lparam))
+    if (!FValidPF((PARAFORMAT *)lparam))
     {
         return 0;
     }
@@ -1302,28 +1316,31 @@ LRESULT SRichEdit::OnSetParaFormat( UINT uMsg, WPARAM wparam, LPARAM lparam )
         }
     }
 
-    if(wparam & SCF_DEFAULT)
+    if (wparam & SCF_DEFAULT)
     {
-        m_pfDef=*(PARAFORMAT2 *)lparam;
-        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_PARAFORMATCHANGE,TXTBIT_PARAFORMATCHANGE);
+        m_pfDef = *(PARAFORMAT2 *)lparam;
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_PARAFORMATCHANGE,
+                                                             TXTBIT_PARAFORMATCHANGE);
     }
     else
     {
-        m_pTxtHost->GetTextService()->TxSendMessage(uMsg,wparam,lparam,NULL);    // Change selection format
+        m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wparam, lparam,
+                                                    NULL); // Change selection format
     }
     return 1;
 }
 
-LRESULT SRichEdit::OnSetText(UINT uMsg,WPARAM wparam,LPARAM lparam)
+LRESULT SRichEdit::OnSetText(UINT uMsg, WPARAM wparam, LPARAM lparam)
 {
     // For RichEdit 1.0, the max text length would be reset by a settext so
     // we follow pattern here as well.
 
     HRESULT hr = m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wparam, lparam, 0);
 
-    if (FAILED(hr)) return 0;
+    if (FAILED(hr))
+        return 0;
     // Update succeeded.
-    ULONG cNewText = (ULONG)(lparam?_tcslen((LPCTSTR) lparam):0);
+    ULONG cNewText = (ULONG)(lparam ? _tcslen((LPCTSTR)lparam) : 0);
 
     // If the new text is greater than the max set the max to the new
     // text length.
@@ -1334,33 +1351,33 @@ LRESULT SRichEdit::OnSetText(UINT uMsg,WPARAM wparam,LPARAM lparam)
     return 1;
 }
 
-void SRichEdit::OnSetFont( IFont *pFont, BOOL bRedraw )
+void SRichEdit::OnSetFont(IFont *pFont, BOOL bRedraw)
 {
-    if(SUCCEEDED(InitDefaultCharFormat(&m_cfDef, pFont)))
+    if (SUCCEEDED(InitDefaultCharFormat(&m_cfDef, pFont)))
     {
         m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE,
-                TXTBIT_CHARFORMATCHANGE);
+                                                             TXTBIT_CHARFORMATCHANGE);
     }
 }
 
-void SRichEdit::SetWindowText( LPCTSTR lpszText )
+void SRichEdit::SetWindowText(LPCTSTR lpszText)
 {
 #ifdef _UNICODE
-    SSendMessage(WM_SETTEXT,0,(LPARAM)lpszText);
+    SSendMessage(WM_SETTEXT, 0, (LPARAM)lpszText);
 #else
     SStringW str = S_CT2W(lpszText);
-    SSendMessage(WM_SETTEXT,0,(LPARAM)(LPCWSTR)str);
+    SSendMessage(WM_SETTEXT, 0, (LPARAM)(LPCWSTR)str);
 #endif
     Invalidate();
 }
 
 SStringT SRichEdit::GetWindowText(BOOL bRawText)
 {
-	(bRawText);
+    (bRawText);
     SStringW strRet;
-    int nLen=(int)SSendMessage(WM_GETTEXTLENGTH);
-    wchar_t *pBuf=strRet.GetBufferSetLength(nLen+1);
-    SSendMessage(WM_GETTEXT,(WPARAM)nLen+1,(LPARAM)pBuf);
+    int nLen = (int)SSendMessage(WM_GETTEXTLENGTH);
+    wchar_t *pBuf = strRet.GetBufferSetLength(nLen + 1);
+    SSendMessage(WM_GETTEXT, (WPARAM)nLen + 1, (LPARAM)pBuf);
     strRet.ReleaseBuffer();
     return S_CW2T(strRet);
 }
@@ -1370,360 +1387,368 @@ int SRichEdit::GetWindowTextLength()
     return (int)SSendMessage(WM_GETTEXTLENGTH);
 }
 
-void SRichEdit::ReplaceSel(LPCWSTR pszText,BOOL bCanUndo)
+void SRichEdit::ReplaceSel(LPCWSTR pszText, BOOL bCanUndo)
 {
-    SSendMessage(EM_REPLACESEL,(WPARAM)bCanUndo,(LPARAM)pszText);
+    SSendMessage(EM_REPLACESEL, (WPARAM)bCanUndo, (LPARAM)pszText);
 }
 
 void SRichEdit::SetSel(DWORD dwSelection, BOOL bNoScroll)
 {
-	SSendMessage(EM_SETSEL, LOWORD(dwSelection), HIWORD(dwSelection));
-	if (!bNoScroll)
-		SSendMessage(EM_SCROLLCARET, 0, 0L);
-}
-	
-void SRichEdit::SetSel(long nStartChar, long nEndChar, BOOL bNoScroll)
-{
-    SSendMessage(EM_SETSEL, nStartChar, nEndChar);
-    if(!bNoScroll)
+    SSendMessage(EM_SETSEL, LOWORD(dwSelection), HIWORD(dwSelection));
+    if (!bNoScroll)
         SSendMessage(EM_SCROLLCARET, 0, 0L);
 }
 
-HRESULT SRichEdit::OnAttrTextColor( const SStringW &  strValue,BOOL bLoading )
+void SRichEdit::SetSel(long nStartChar, long nEndChar, BOOL bNoScroll)
 {
-    m_style.SetTextColor(0,GETCOLOR(strValue));
-    if(!bLoading)
+    SSendMessage(EM_SETSEL, nStartChar, nEndChar);
+    if (!bNoScroll)
+        SSendMessage(EM_SCROLLCARET, 0, 0L);
+}
+
+HRESULT SRichEdit::OnAttrTextColor(const SStringW &strValue, BOOL bLoading)
+{
+    m_style.SetTextColor(0, GETCOLOR(strValue));
+    if (!bLoading)
     {
         SetDefaultTextColor(m_style.GetTextColor(0));
     }
     return S_OK;
 }
 
-DWORD CALLBACK EditStreamInCallback_FILE(
-                                  DWORD_PTR dwCookie,
-                                  LPBYTE pbBuff,
-                                  LONG cb,
-                                  LONG * pcb 
-                                  )
+DWORD CALLBACK EditStreamInCallback_FILE(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
-    FILE *f=(FILE*)dwCookie;
-    LONG nReaded = (LONG)fread(pbBuff,1,cb,f);
-    if(pcb) *pcb = nReaded;
+    FILE *f = (FILE *)dwCookie;
+    LONG nReaded = (LONG)fread(pbBuff, 1, cb, f);
+    if (pcb)
+        *pcb = nReaded;
     return 0;
 }
 
-DWORD CALLBACK EditStreamOutCallback_FILE(
-                                       DWORD_PTR dwCookie,
-                                       LPBYTE pbBuff,
-                                       LONG cb,
-                                       LONG * pcb 
-                                       )
+DWORD CALLBACK EditStreamOutCallback_FILE(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
-    FILE *f=(FILE*)dwCookie;
-    LONG nWrited = (LONG)fwrite(pbBuff,1,cb,f);
-    if(pcb) *pcb = nWrited;
+    FILE *f = (FILE *)dwCookie;
+    LONG nWrited = (LONG)fwrite(pbBuff, 1, cb, f);
+    if (pcb)
+        *pcb = nWrited;
     return 0;
 }
 
-struct MemBlock{
-    LPCBYTE  pBuf;
-    LONG     nRemains;
+struct MemBlock
+{
+    LPCBYTE pBuf;
+    LONG nRemains;
 };
 
-DWORD CALLBACK EditStreamInCallback_MemBlock(
-                                       DWORD_PTR dwCookie,
-                                       LPBYTE pbBuff,
-                                       LONG cb,
-                                       LONG * pcb 
-                                       )
+DWORD CALLBACK EditStreamInCallback_MemBlock(DWORD_PTR dwCookie, LPBYTE pbBuff, LONG cb, LONG *pcb)
 {
-    MemBlock *pmb=(MemBlock*)dwCookie;
-    if(pmb->nRemains>=cb)
+    MemBlock *pmb = (MemBlock *)dwCookie;
+    if (pmb->nRemains >= cb)
     {
-        memcpy(pbBuff,pmb->pBuf,cb);
-        pmb->pBuf+=cb;
-        pmb->nRemains-=cb;
-        if(pcb) *pcb = cb;
+        memcpy(pbBuff, pmb->pBuf, cb);
+        pmb->pBuf += cb;
+        pmb->nRemains -= cb;
+        if (pcb)
+            *pcb = cb;
         return 0;
-    }else
+    }
+    else
     {
-        memcpy(pbBuff,pmb->pBuf,pmb->nRemains);
-        pmb->pBuf+=pmb->nRemains;
-        if(pcb) *pcb = pmb->nRemains;
-        pmb->nRemains =0;
+        memcpy(pbBuff, pmb->pBuf, pmb->nRemains);
+        pmb->pBuf += pmb->nRemains;
+        if (pcb)
+            *pcb = pmb->nRemains;
+        pmb->nRemains = 0;
         return 0;
     }
 }
 
-
-HRESULT SRichEdit::OnAttrRTF( const SStringW & strValue,BOOL bLoading )
+HRESULT SRichEdit::OnAttrRTF(const SStringW &strValue, BOOL bLoading)
 {
-    if(bLoading)
+    if (bLoading)
     {
-        m_strRtfSrc = strValue;//将数据保存到控件初始化完成再写入控件
+        m_strRtfSrc = strValue; //将数据保存到控件初始化完成再写入控件
         return S_FALSE;
-    }else
+    }
+    else
     {
         SStringTList lstSrc;
-        int nSegs = ParseResID(S_CW2T(strValue),lstSrc);
+        int nSegs = ParseResID(S_CW2T(strValue), lstSrc);
 
-        if(nSegs == 2)
-        {//load from resource
-            size_t dwSize=GETRESPROVIDER->GetRawBufferSize(lstSrc[0],lstSrc[1]);
-            if(dwSize)
+        if (nSegs == 2)
+        { // load from resource
+            size_t dwSize = GETRESPROVIDER->GetRawBufferSize(lstSrc[0], lstSrc[1]);
+            if (dwSize)
             {
                 EDITSTREAM es;
-                MemBlock mb={NULL,0};
+                MemBlock mb = { NULL, 0 };
                 SAutoBuf mybuf;
-                mb.pBuf=(LPCBYTE)mybuf.Allocate(dwSize);
-                mb.nRemains=(DWORD)dwSize;
-                GETRESPROVIDER->GetRawBuffer(lstSrc[0],lstSrc[1],mybuf,dwSize);
-                es.dwCookie=(DWORD_PTR)&mb;
-                es.pfnCallback=EditStreamInCallback_MemBlock;
-                SSendMessage(EM_STREAMIN,SF_RTF,(LPARAM)&es);
+                mb.pBuf = (LPCBYTE)mybuf.Allocate(dwSize);
+                mb.nRemains = (DWORD)dwSize;
+                GETRESPROVIDER->GetRawBuffer(lstSrc[0], lstSrc[1], mybuf, dwSize);
+                es.dwCookie = (DWORD_PTR)&mb;
+                es.pfnCallback = EditStreamInCallback_MemBlock;
+                SSendMessage(EM_STREAMIN, SF_RTF, (LPARAM)&es);
             }
-        }else
-        {//load from file
+        }
+        else
+        { // load from file
             LoadRtf(lstSrc[0]);
         }
         return S_FALSE;
     }
 }
 
-COLORREF SRichEdit::SetDefaultTextColor( COLORREF cr )
+COLORREF SRichEdit::SetDefaultTextColor(COLORREF cr)
 {
-    COLORREF crOld=m_cfDef.crTextColor;
-    m_cfDef.crTextColor= cr&0x00ffffff;
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE, TXTBIT_CHARFORMATCHANGE);
+    COLORREF crOld = m_cfDef.crTextColor;
+    m_cfDef.crTextColor = cr & 0x00ffffff;
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE,
+                                                         TXTBIT_CHARFORMATCHANGE);
     return crOld;
 }
 
-void SRichEdit::OnEnableDragDrop( BOOL bEnable )
+void SRichEdit::OnEnableDragDrop(BOOL bEnable)
 {
-    if(bEnable)
+    if (bEnable)
     {
-        SRicheditDropTarget *pDropTarget=new SRicheditDropTarget(m_pTxtHost->GetTextService());
-        GetContainer()->RegisterDragDrop(m_swnd,pDropTarget);
+        SRicheditDropTarget *pDropTarget = new SRicheditDropTarget(m_pTxtHost->GetTextService());
+        GetContainer()->RegisterDragDrop(m_swnd, pDropTarget);
         pDropTarget->Release();
-    }else
+    }
+    else
     {
         GetContainer()->RevokeDragDrop(m_swnd);
     }
 }
 
-HRESULT SRichEdit::OnAttrAlign( const SStringW & strValue,BOOL bLoading )
+HRESULT SRichEdit::OnAttrAlign(const SStringW &strValue, BOOL bLoading)
 {
-    if(!strValue.CompareNoCase(L"center")) m_dwStyle|=ES_CENTER;
-    else if(!strValue.CompareNoCase(L"right")) m_dwStyle|=ES_RIGHT;
-    else m_dwStyle|=ES_LEFT;
-    if(!bLoading)
+    if (!strValue.CompareNoCase(L"center"))
+        m_dwStyle |= ES_CENTER;
+    else if (!strValue.CompareNoCase(L"right"))
+        m_dwStyle |= ES_RIGHT;
+    else
+        m_dwStyle |= ES_LEFT;
+    if (!bLoading)
     {
-        if(m_dwStyle&ES_CENTER)
-            m_pfDef.wAlignment=PFA_CENTER;
-        else if(m_dwStyle&ES_RIGHT)
-            m_pfDef.wAlignment=PFA_RIGHT;
+        if (m_dwStyle & ES_CENTER)
+            m_pfDef.wAlignment = PFA_CENTER;
+        else if (m_dwStyle & ES_RIGHT)
+            m_pfDef.wAlignment = PFA_RIGHT;
         else
             m_pfDef.wAlignment = PFA_LEFT;
         m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_PARAFORMATCHANGE, 0);
     }
-    return bLoading?S_FALSE:S_OK;
+    return bLoading ? S_FALSE : S_OK;
 }
 
-HRESULT SRichEdit::OnAttrNotifyChange(const SStringW & strValue,BOOL bLoading)
+HRESULT SRichEdit::OnAttrNotifyChange(const SStringW &strValue, BOOL bLoading)
 {
-	m_fNotifyChange = STRINGASBOOL(strValue);
-    if(!bLoading)
+    m_fNotifyChange = STRINGASBOOL(strValue);
+    if (!bLoading)
     {
         LPARAM lEvtMask = SSendMessage(EM_GETEVENTMASK);
-        if(m_fNotifyChange) lEvtMask |= ENM_CHANGE;
-        else lEvtMask &= ~ENM_CHANGE;
-        SSendMessage(EM_SETEVENTMASK,0,lEvtMask);
+        if (m_fNotifyChange)
+            lEvtMask |= ENM_CHANGE;
+        else
+            lEvtMask &= ~ENM_CHANGE;
+        SSendMessage(EM_SETEVENTMASK, 0, lEvtMask);
     }
     return S_FALSE;
 }
 
-
-DWORD SRichEdit::SaveRtf( LPCTSTR pszFileName )
+DWORD SRichEdit::SaveRtf(LPCTSTR pszFileName)
 {
-    FILE *f=_tfopen(pszFileName,_T("wb"));
-    if(!f) return 0;
+    FILE *f = _tfopen(pszFileName, _T("wb"));
+    if (!f)
+        return 0;
     EDITSTREAM es;
-    es.dwCookie=(DWORD_PTR)f;
-    es.pfnCallback=EditStreamOutCallback_FILE;
-    DWORD dwRet=(DWORD)SSendMessage(EM_STREAMOUT,SF_RTF,(LPARAM)&es);
+    es.dwCookie = (DWORD_PTR)f;
+    es.pfnCallback = EditStreamOutCallback_FILE;
+    DWORD dwRet = (DWORD)SSendMessage(EM_STREAMOUT, SF_RTF, (LPARAM)&es);
     fclose(f);
     return dwRet;
 }
 
-DWORD SRichEdit::LoadRtf( LPCTSTR pszFileName )
+DWORD SRichEdit::LoadRtf(LPCTSTR pszFileName)
 {
-    FILE *f=_tfopen(pszFileName,_T("rb"));
-    if(!f) return FALSE;
+    FILE *f = _tfopen(pszFileName, _T("rb"));
+    if (!f)
+        return FALSE;
     EDITSTREAM es;
-    es.dwCookie=(DWORD_PTR)f;
-    es.pfnCallback=EditStreamInCallback_FILE;
-    DWORD dwRet=(DWORD)SSendMessage(EM_STREAMIN,SF_RTF,(LPARAM)&es);
+    es.dwCookie = (DWORD_PTR)f;
+    es.pfnCallback = EditStreamInCallback_FILE;
+    DWORD dwRet = (DWORD)SSendMessage(EM_STREAMIN, SF_RTF, (LPARAM)&es);
     fclose(f);
     return dwRet;
 }
 
 void SRichEdit::OnScaleChanged(int nScale)
 {
-	__baseCls::OnScaleChanged(nScale);
-	OnSetFont(NULL,FALSE);//更新默认字体
+    __baseCls::OnScaleChanged(nScale);
+    OnSetFont(NULL, FALSE); //更新默认字体
 }
 
 void SRichEdit::OnRebuildFont()
 {
-	__baseCls::OnRebuildFont();
-	OnSetFont(NULL,FALSE);//更新默认字体
+    __baseCls::OnRebuildFont();
+    OnSetFont(NULL, FALSE); //更新默认字体
 }
 
 void SRichEdit::OnEnable(BOOL bEnable, UINT nStatus)
 {
-	__baseCls::OnEnable(bEnable, nStatus);
-	COLORREF cr;
-	if (bEnable)
-	{
-		cr = m_style.GetTextColor(0);
-		if (CR_INVALID == cr)
-			cr = 0;
-	}
-	else
-	{
-		cr = m_style.GetTextColor(3);
-	}
+    __baseCls::OnEnable(bEnable, nStatus);
+    COLORREF cr;
+    if (bEnable)
+    {
+        cr = m_style.GetTextColor(0);
+        if (CR_INVALID == cr)
+            cr = 0;
+    }
+    else
+    {
+        cr = m_style.GetTextColor(3);
+    }
 
-	if (CR_INVALID != cr)
-		SetDefaultTextColor(cr);
+    if (CR_INVALID != cr)
+        SetDefaultTextColor(cr);
 }
 
 BOOL SRichEdit::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-	if(!(m_dwStyle&ES_MULTILINE))
-	{
-		return SWindow::OnMouseWheel(nFlags, zDelta, pt);
-	}else
-	{
-		PSWNDMSG  p = GetCurMsg();
-		LRESULT lResult = 0;
-		return m_pTxtHost->GetTextService()->TxSendMessage(p->uMsg,p->wParam,p->lParam,&lResult)==S_OK;
-	}
+    if (!(m_dwStyle & ES_MULTILINE))
+    {
+        return SWindow::OnMouseWheel(nFlags, zDelta, pt);
+    }
+    else
+    {
+        PSWNDMSG p = GetCurMsg();
+        LRESULT lResult = 0;
+        return m_pTxtHost->GetTextService()->TxSendMessage(p->uMsg, p->wParam, p->lParam, &lResult)
+            == S_OK;
+    }
 }
 
-BOOL SRichEdit::CreateCaret(HBITMAP pBmp,int nWid,int nHeight)
+BOOL SRichEdit::CreateCaret(HBITMAP pBmp, int nWid, int nHeight)
 {
-	if(m_fDisableCaret)
-		return FALSE;
-	return SWindow::CreateCaret(pBmp,nWid,nHeight);
+    if (m_fDisableCaret)
+        return FALSE;
+    return SWindow::CreateCaret(pBmp, nWid, nHeight);
 }
 
-
-HRESULT SRichEdit::OnAttrReStyle(const SStringW &strValue,DWORD dwStyle,DWORD txtBit,BOOL bLoading)
+HRESULT SRichEdit::OnAttrReStyle(const SStringW &strValue,
+                                 DWORD dwStyle,
+                                 DWORD txtBit,
+                                 BOOL bLoading)
 {
-	BOOL bValue = STRINGASBOOL(strValue);
-	DWORD dwBit = 0;
-	if(!bValue)
-		m_dwStyle&=~dwStyle;
-	else
-		m_dwStyle|=dwStyle,dwBit = txtBit;
-	if(!bLoading && txtBit!=0)
-	{
-		m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit,dwBit);
-	}
-	return bLoading?S_FALSE:S_OK;
+    BOOL bValue = STRINGASBOOL(strValue);
+    DWORD dwBit = 0;
+    if (!bValue)
+        m_dwStyle &= ~dwStyle;
+    else
+        m_dwStyle |= dwStyle, dwBit = txtBit;
+    if (!bLoading && txtBit != 0)
+    {
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit, dwBit);
+    }
+    return bLoading ? S_FALSE : S_OK;
 }
 
-HRESULT SRichEdit::OnAttrReStyle2(const SStringW &strValue,DWORD dwStyle,DWORD txtBit,BOOL bLoading)
+HRESULT SRichEdit::OnAttrReStyle2(const SStringW &strValue,
+                                  DWORD dwStyle,
+                                  DWORD txtBit,
+                                  BOOL bLoading)
 {
-	BOOL bValue = STRINGASBOOL(strValue);
-	if(!bValue)
-		m_dwStyle&=~dwStyle;
-	else
-		m_dwStyle|=dwStyle;
-	if(!bLoading && txtBit!=0)
-	{
-		m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit,txtBit);
-	}
-	return bLoading?S_FALSE:S_OK;
+    BOOL bValue = STRINGASBOOL(strValue);
+    if (!bValue)
+        m_dwStyle &= ~dwStyle;
+    else
+        m_dwStyle |= dwStyle;
+    if (!bLoading && txtBit != 0)
+    {
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(txtBit, txtBit);
+    }
+    return bLoading ? S_FALSE : S_OK;
 }
 
-
-HRESULT SRichEdit::OnAttrPasswordChar(const SStringW & strValue,BOOL bLoading)
+HRESULT SRichEdit::OnAttrPasswordChar(const SStringW &strValue, BOOL bLoading)
 {
-	SStringT strValueT=S_CW2T(strValue);
-	m_chPasswordChar=strValueT[0];
-	return bLoading?S_FALSE:S_OK;
+    SStringT strValueT = S_CW2T(strValue);
+    m_chPasswordChar = strValueT[0];
+    return bLoading ? S_FALSE : S_OK;
 }
 
-
-HRESULT SRichEdit::OnAttrEnableDragdrop(const SStringW & strValue,BOOL bLoading)
+HRESULT SRichEdit::OnAttrEnableDragdrop(const SStringW &strValue, BOOL bLoading)
 {
-	m_fEnableDragDrop = STRINGASBOOL(strValue);
-	if(!bLoading)
-	{
-		OnEnableDragDrop( !(m_dwStyle&ES_READONLY) & m_fEnableDragDrop);
-	}
-	return S_FALSE;
+    m_fEnableDragDrop = STRINGASBOOL(strValue);
+    if (!bLoading)
+    {
+        OnEnableDragDrop(!(m_dwStyle & ES_READONLY) & m_fEnableDragDrop);
+    }
+    return S_FALSE;
 }
 
-
-LRESULT SRichEdit::OnGetRect(UINT uMsg,WPARAM wp, LPARAM lp)
+LRESULT SRichEdit::OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp)
 {
-	GetClientRect((LPRECT)lp);
-	return TRUE;
+    GetClientRect((LPRECT)lp);
+    return TRUE;
 }
-
 
 //////////////////////////////////////////////////////////////////////////
 
-SEdit::SEdit() :m_crCue(RGBA(0xcc,0xcc,0xcc,0xff)),m_strCue(this)
+SEdit::SEdit()
+    : m_crCue(RGBA(0xcc, 0xcc, 0xcc, 0xff))
+    , m_strCue(this)
 {
-    m_fRich=0;
-    m_fAutoSel=TRUE;
+    m_fRich = 0;
+    m_fAutoSel = TRUE;
 }
 
 void SEdit::OnKillFocus(SWND wndFocus)
 {
     SRichEdit::OnKillFocus(wndFocus);
-    if(!m_strCue.GetText(FALSE).IsEmpty() && GetWindowTextLength() == 0) Invalidate();
+    if (!m_strCue.GetText(FALSE).IsEmpty() && GetWindowTextLength() == 0)
+        Invalidate();
 }
 
 void SEdit::OnSetFocus(SWND wndOld)
 {
     SRichEdit::OnSetFocus(wndOld);
-    if(!m_strCue.GetText(FALSE).IsEmpty() && GetWindowTextLength() == 0) Invalidate();
+    if (!m_strCue.GetText(FALSE).IsEmpty() && GetWindowTextLength() == 0)
+        Invalidate();
 }
 
 UINT SEdit::GetCueTextAlign()
 {
-	UINT algin= SWindow::GetTextAlign();
-	algin&=~(DT_CENTER|DT_RIGHT);
-	if(m_dwStyle&ES_CENTER)
-		algin|=DT_CENTER;
-	else if(m_dwStyle&ES_RIGHT)
-		algin|=DT_RIGHT;	 
-	return algin;
+    UINT algin = SWindow::GetTextAlign();
+    algin &= ~(DT_CENTER | DT_RIGHT);
+    if (m_dwStyle & ES_CENTER)
+        algin |= DT_CENTER;
+    else if (m_dwStyle & ES_RIGHT)
+        algin |= DT_RIGHT;
+    return algin;
 }
 
-void SEdit::OnPaint( IRenderTarget * pRT )
+void SEdit::OnPaint(IRenderTarget *pRT)
 {
     SRichEdit::OnPaint(pRT);
-	SStringT strCue = GetCueText();
-    if(!strCue.IsEmpty() && GetWindowTextLength() == 0 && !IsFocused())
+    SStringT strCue = GetCueText();
+    if (!strCue.IsEmpty() && GetWindowTextLength() == 0 && !IsFocused())
     {
         SPainter painter;
-        BeforePaint(pRT,painter);
+        BeforePaint(pRT, painter);
         COLORREF crOld = pRT->SetTextColor(m_crCue);
-        
+
         CRect rc;
         GetClientRect(&rc);
         CRect rcInsetPixel = GetStyle().GetPadding();
-        rc.DeflateRect(rcInsetPixel.left, rcInsetPixel.top, rcInsetPixel.right, rcInsetPixel.bottom);
-		pRT->DrawText(strCue,strCue.GetLength(),&rc,GetCueTextAlign());
-        
+        rc.DeflateRect(rcInsetPixel.left, rcInsetPixel.top, rcInsetPixel.right,
+                       rcInsetPixel.bottom);
+        pRT->DrawText(strCue, strCue.GetLength(), &rc, GetCueTextAlign());
+
         pRT->SetTextColor(crOld);
-        AfterPaint(pRT,painter);
+        AfterPaint(pRT, painter);
     }
 }
 
@@ -1734,9 +1759,9 @@ SStringT SEdit::GetCueText(BOOL bRawText) const
 
 HRESULT SEdit::OnLanguageChanged()
 {
-	HRESULT hr = __baseCls::OnLanguageChanged();
-	m_strCue.TranslateText();
-	return hr;
+    HRESULT hr = __baseCls::OnLanguageChanged();
+    m_strCue.TranslateText();
+    return hr;
 }
 
-}//namespace SOUI
+} // namespace SOUI

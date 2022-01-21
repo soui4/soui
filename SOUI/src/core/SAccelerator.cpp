@@ -4,261 +4,270 @@
 namespace SOUI
 {
 
-    SAccelerator::SAccelerator(UINT vKey,bool bCtrl,bool bAlt,bool bShift):m_wVK(vKey),m_wModifier(0)
+SAccelerator::SAccelerator(UINT vKey, bool bCtrl, bool bAlt, bool bShift)
+    : m_wVK(vKey)
+    , m_wModifier(0)
+{
+    if (bCtrl)
+        m_wModifier |= Mod_Ctrl;
+    if (bAlt)
+        m_wModifier |= Mod_Alt;
+    if (bShift)
+        m_wModifier |= Mod_Shift;
+}
+
+SAccelerator::SAccelerator(DWORD dwAccel)
+    : m_wVK(LOWORD(dwAccel))
+    , m_wModifier(HIWORD(dwAccel))
+{
+}
+
+SAccelerator::~SAccelerator(void)
+{
+}
+
+SStringT SAccelerator::FormatHotkey()
+{
+    return FormatAccelKey(MAKELONG(m_wVK, m_wModifier));
+}
+
+WORD SAccelerator::VkFromString(LPCTSTR pszKey)
+{
+    WORD wKey = 0;
+    if (_tcsicmp(pszKey, _T("esc")) == 0)
+        wKey = VK_ESCAPE;
+    else if (_tcsicmp(pszKey, _T("enter")) == 0)
+        wKey = VK_RETURN;
+    else if (_tcsicmp(pszKey, _T("up")) == 0)
+        wKey = VK_UP;
+    else if (_tcsicmp(pszKey, _T("down")) == 0)
+        wKey = VK_DOWN;
+    else if (_tcsicmp(pszKey, _T("left")) == 0)
+        wKey = VK_LEFT;
+    else if (_tcsicmp(pszKey, _T("right")) == 0)
+        wKey = VK_RIGHT;
+    else if (_tcsicmp(pszKey, _T("home")) == 0)
+        wKey = VK_HOME;
+    else if (_tcsicmp(pszKey, _T("pageup")) == 0)
+        wKey = VK_PRIOR;
+    else if (_tcsicmp(pszKey, _T("pagedown")) == 0)
+        wKey = VK_NEXT;
+    else if (_tcsicmp(pszKey, _T("insert")) == 0)
+        wKey = VK_INSERT;
+    else if (_tcsicmp(pszKey, _T("space")) == 0)
+        wKey = VK_SPACE;
+    else if (_tcsicmp(pszKey, _T("delete")) == 0)
+        wKey = VK_DELETE;
+    else if (_tcsicmp(pszKey, _T("print")) == 0)
+        wKey = VK_PRINT;
+    else if (_tcslen(pszKey) > 1)
     {
-        if(bCtrl) m_wModifier|=Mod_Ctrl;
-        if(bAlt) m_wModifier |=Mod_Alt;
-        if(bShift) m_wModifier |= Mod_Shift;
-    }
-
-    SAccelerator::SAccelerator(DWORD dwAccel):m_wVK(LOWORD(dwAccel)),m_wModifier(HIWORD(dwAccel))
-    {
-
-    }
-
-    SAccelerator::~SAccelerator(void)
-    {
-    }
-
-    SStringT SAccelerator::FormatHotkey()
-    {
-		return FormatAccelKey(MAKELONG(m_wVK,m_wModifier));
-    }
-
-	WORD SAccelerator::VkFromString(LPCTSTR pszKey)
-	{
-		WORD wKey = 0;
-		if (_tcsicmp(pszKey, _T("esc")) == 0)
-			wKey = VK_ESCAPE;
-		else if (_tcsicmp(pszKey, _T("enter")) == 0)
-			wKey = VK_RETURN;
-		else if (_tcsicmp(pszKey, _T("up")) == 0)
-			wKey = VK_UP;
-		else if (_tcsicmp(pszKey, _T("down")) == 0)
-			wKey = VK_DOWN;
-		else if (_tcsicmp(pszKey, _T("left")) == 0)
-			wKey = VK_LEFT;
-		else if (_tcsicmp(pszKey, _T("right")) == 0)
-			wKey = VK_RIGHT;
-		else if (_tcsicmp(pszKey, _T("home")) == 0)
-			wKey = VK_HOME;
-		else if (_tcsicmp(pszKey, _T("pageup")) == 0)
-			wKey = VK_PRIOR;
-		else if (_tcsicmp(pszKey, _T("pagedown")) == 0)
-			wKey = VK_NEXT;
-		else if (_tcsicmp(pszKey, _T("insert")) == 0)
-			wKey = VK_INSERT;
-		else if (_tcsicmp(pszKey, _T("space")) == 0)
-			wKey = VK_SPACE;
-		else if (_tcsicmp(pszKey, _T("delete")) == 0)
-			wKey = VK_DELETE;
-		else if (_tcsicmp(pszKey, _T("print")) == 0)
-			wKey = VK_PRINT;
-		else if (_tcslen(pszKey)>1)
-		{
-			if (pszKey[0] == _T('f'))
-			{//F1-F12
-				wKey = VK_F1 + _tstoi(pszKey + 1) - 1;
-			}
-			else if (_tcsnicmp(pszKey, _T("num "), 4) == 0)
-			{//Num 0 - Num 9 || Num Del
-				if (_tcsicmp(pszKey + 4, _T("del")) == 0)
-					wKey = VK_DECIMAL;
-				else if (_tcsicmp(pszKey + 4, _T("*")) == 0)
-					wKey = VK_MULTIPLY;
-				else if (_tcsicmp(pszKey + 4, _T("+")) == 0)
-					wKey = VK_ADD;
-				else
-					wKey = VK_NUMPAD0 + _tstoi(pszKey + 4);
-			}
-		}
-		else//if( _tcslen(pszKey)==1)
-		{
-			if (pszKey[0] >= _T('a') && pszKey[0] <= _T('z'))//a-z
-				wKey = pszKey[0] - 0x20;
-			else if(pszKey[0] >='A' && pszKey[0] <= 'Z')
-				wKey = pszKey[0];
-			else if (pszKey[0] >= _T('0') && pszKey[0] <= _T('9'))
-				wKey = pszKey[0];
-			else if (pszKey[0] == _T('-'))
-				wKey = VK_OEM_MINUS;
-			else if (pszKey[0] == _T('='))
-				wKey = VK_OEM_PLUS;
-			else if (pszKey[0] == _T(','))
-				wKey = VK_OEM_COMMA;
-			else if (pszKey[0] == _T('.'))
-				wKey = VK_OEM_PERIOD;
-			else if (pszKey[0] == _T(';'))
-				wKey = VK_OEM_1;
-			else if (pszKey[0] == _T('/'))
-				wKey = VK_OEM_2;
-			else if (pszKey[0] == _T('`'))
-				wKey = VK_OEM_3;
-			else if (pszKey[0] == _T('['))
-				wKey = VK_OEM_4;
-			else if (pszKey[0] == _T('\\'))
-				wKey = VK_OEM_5;
-			else if (pszKey[0] == _T(']'))
-				wKey = VK_OEM_6;
-			else if (pszKey[0] == _T('\''))
-				wKey = VK_OEM_7;
-
-		}
-		return wKey;
-	}
-
-	SStringT SAccelerator::GetKeyName( WORD vk )
-    {
-        SStringT str;
-        switch(vk)
-        {
-        case VK_ESCAPE:
-            str=_T("ESC");
-            break;
-        case VK_RETURN:
-            str=_T("Enter");
-            break;
-        case VK_UP:
-            str=_T("Up");
-            break;
-        case VK_DOWN:
-            str=_T("Down");
-            break;
-        case VK_LEFT:
-            str=_T("Left");
-            break;
-        case VK_RIGHT:
-            str=_T("Right");
-            break;
-        case VK_HOME:
-            str=_T("Home");
-            break;
-        case VK_END:
-            str=_T("End");
-            break;
-        case VK_PRIOR:
-            str=_T("PageUp");
-            break;
-        case VK_NEXT:
-            str=_T("PageDown");
-            break;
-        case VK_INSERT:
-            str=_T("Insert");
-            break;
-		case VK_SPACE:
-			str = _T("Space");
-			break;
-		case VK_DELETE:
-			str = _T("Delete");
-			break;
-		case VK_PRINT:
-			str = _T("Print");
-			break;
-		default:
-            if((vk>='0' && vk<='9')||(vk>='A' && vk<='Z'))
-                str=(TCHAR)vk;
-            else if(vk>=VK_NUMPAD0 && vk<=VK_NUMPAD9)
-                str.Format(_T("Num %d"),vk-VK_NUMPAD0);
-            else if(vk==VK_MULTIPLY)
-                str=_T("Num *");
-            else if(vk==VK_ADD)
-                str=_T("Num +");            
-            else if(vk==VK_DECIMAL)
-                str=_T("Num Del");            
-            else if(vk>=VK_F1 && vk<=VK_F12)
-                str.Format(_T("F%d"),vk-VK_F1+1);
-            else
-            {
-                char c=MapVirtualKeyA(vk,2);
-                switch(c)
-                {
-                case '-':
-                case '=':
-                case '[':
-                case ']':
-                case '\\':
-                case ';':
-                case '\'':
-                case ',':
-                case '.':
-                case '/':
-                case '`':
-                    str+=TCHAR(c);
-                    break;
-                }
-            }
-            break;
+        if (pszKey[0] == _T('f'))
+        { // F1-F12
+            wKey = VK_F1 + _tstoi(pszKey + 1) - 1;
         }
-        return str;
+        else if (_tcsnicmp(pszKey, _T("num "), 4) == 0)
+        { // Num 0 - Num 9 || Num Del
+            if (_tcsicmp(pszKey + 4, _T("del")) == 0)
+                wKey = VK_DECIMAL;
+            else if (_tcsicmp(pszKey + 4, _T("*")) == 0)
+                wKey = VK_MULTIPLY;
+            else if (_tcsicmp(pszKey + 4, _T("+")) == 0)
+                wKey = VK_ADD;
+            else
+                wKey = VK_NUMPAD0 + _tstoi(pszKey + 4);
+        }
     }
-
-	SStringT SAccelerator::FormatAccelKey(DWORD dwAccel)
-	{
-		WORD wModifier = HIWORD(dwAccel);
-		WORD wVk = LOWORD(dwAccel);
-
-		if (wModifier == 0 && wVk == 0)
-			return _T("无");
-		SStringT str;
-		if (wModifier & Mod_Ctrl)
-			str = _T("Ctrl+");
-		if (wModifier & Mod_Shift)
-			str += _T("Shift+");
-		if (wModifier & Mod_Alt)
-			str += _T("Alt+");
-
-		str += GetKeyName(wVk);
-		return str;
-	}
-
-	//将字符串翻译为加速键
-    DWORD SAccelerator::TranslateAccelKey( LPCTSTR pszAccelKey )
+    else // if( _tcslen(pszKey)==1)
     {
-        TCHAR szBuf[101]={0};//保证字符串结束有两个结束符
-        WORD wModifier=Mod_None;
-        WORD wKey=0;
-        int nKeyLen=(int)_tcslen(pszAccelKey);
-        if(_tcslen(pszAccelKey)>=100) return 0;
-        _tcscpy(szBuf,pszAccelKey);
-        CharLowerBuff(szBuf,nKeyLen);
+        if (pszKey[0] >= _T('a') && pszKey[0] <= _T('z')) // a-z
+            wKey = pszKey[0] - 0x20;
+        else if (pszKey[0] >= 'A' && pszKey[0] <= 'Z')
+            wKey = pszKey[0];
+        else if (pszKey[0] >= _T('0') && pszKey[0] <= _T('9'))
+            wKey = pszKey[0];
+        else if (pszKey[0] == _T('-'))
+            wKey = VK_OEM_MINUS;
+        else if (pszKey[0] == _T('='))
+            wKey = VK_OEM_PLUS;
+        else if (pszKey[0] == _T(','))
+            wKey = VK_OEM_COMMA;
+        else if (pszKey[0] == _T('.'))
+            wKey = VK_OEM_PERIOD;
+        else if (pszKey[0] == _T(';'))
+            wKey = VK_OEM_1;
+        else if (pszKey[0] == _T('/'))
+            wKey = VK_OEM_2;
+        else if (pszKey[0] == _T('`'))
+            wKey = VK_OEM_3;
+        else if (pszKey[0] == _T('['))
+            wKey = VK_OEM_4;
+        else if (pszKey[0] == _T('\\'))
+            wKey = VK_OEM_5;
+        else if (pszKey[0] == _T(']'))
+            wKey = VK_OEM_6;
+        else if (pszKey[0] == _T('\''))
+            wKey = VK_OEM_7;
+    }
+    return wKey;
+}
 
-        LPTSTR pszBuf=szBuf;
-        LPTSTR pszKey=_tcstok(pszBuf,_T("+"));
-        while(pszKey)
+SStringT SAccelerator::GetKeyName(WORD vk)
+{
+    SStringT str;
+    switch (vk)
+    {
+    case VK_ESCAPE:
+        str = _T("ESC");
+        break;
+    case VK_RETURN:
+        str = _T("Enter");
+        break;
+    case VK_UP:
+        str = _T("Up");
+        break;
+    case VK_DOWN:
+        str = _T("Down");
+        break;
+    case VK_LEFT:
+        str = _T("Left");
+        break;
+    case VK_RIGHT:
+        str = _T("Right");
+        break;
+    case VK_HOME:
+        str = _T("Home");
+        break;
+    case VK_END:
+        str = _T("End");
+        break;
+    case VK_PRIOR:
+        str = _T("PageUp");
+        break;
+    case VK_NEXT:
+        str = _T("PageDown");
+        break;
+    case VK_INSERT:
+        str = _T("Insert");
+        break;
+    case VK_SPACE:
+        str = _T("Space");
+        break;
+    case VK_DELETE:
+        str = _T("Delete");
+        break;
+    case VK_PRINT:
+        str = _T("Print");
+        break;
+    default:
+        if ((vk >= '0' && vk <= '9') || (vk >= 'A' && vk <= 'Z'))
+            str = (TCHAR)vk;
+        else if (vk >= VK_NUMPAD0 && vk <= VK_NUMPAD9)
+            str.Format(_T("Num %d"), vk - VK_NUMPAD0);
+        else if (vk == VK_MULTIPLY)
+            str = _T("Num *");
+        else if (vk == VK_ADD)
+            str = _T("Num +");
+        else if (vk == VK_DECIMAL)
+            str = _T("Num Del");
+        else if (vk >= VK_F1 && vk <= VK_F12)
+            str.Format(_T("F%d"), vk - VK_F1 + 1);
+        else
         {
-            if(_tcsicmp(pszKey,_T("ctrl"))==0)
+            char c = MapVirtualKeyA(vk, 2);
+            switch (c)
             {
-                wModifier|=Mod_Ctrl;
-            }else if(_tcsicmp(pszKey,_T("alt"))==0)
-            {
-                wModifier |=Mod_Alt;
-            }else if(_tcsicmp(pszKey,_T("shift"))==0)
-            {
-                wModifier |=Mod_Shift;
-			}else
-            {
-				wKey = VkFromString(pszKey);
+            case '-':
+            case '=':
+            case '[':
+            case ']':
+            case '\\':
+            case ';':
+            case '\'':
+            case ',':
+            case '.':
+            case '/':
+            case '`':
+                str += TCHAR(c);
                 break;
             }
-            pszBuf+=_tcslen(pszKey)+1;
-            pszKey=_tcstok(pszBuf,_T("+"));
         }
-        return MAKELONG(wKey,wModifier);
+        break;
     }
+    return str;
+}
 
-	WORD SAccelerator::GetModifier() const
-	{
-		return m_wModifier;
-	}
+SStringT SAccelerator::FormatAccelKey(DWORD dwAccel)
+{
+    WORD wModifier = HIWORD(dwAccel);
+    WORD wVk = LOWORD(dwAccel);
 
-	WORD SAccelerator::GetKey() const
-	{
-		return m_wVK;
-	}
+    if (wModifier == 0 && wVk == 0)
+        return _T("无");
+    SStringT str;
+    if (wModifier & Mod_Ctrl)
+        str = _T("Ctrl+");
+    if (wModifier & Mod_Shift)
+        str += _T("Shift+");
+    if (wModifier & Mod_Alt)
+        str += _T("Alt+");
 
-	DWORD SAccelerator::GetAcc() const
-	{
-		return MAKELONG(m_wVK,m_wModifier);
-	}
+    str += GetKeyName(wVk);
+    return str;
+}
 
-}//end of namespace SOUI
+//将字符串翻译为加速键
+DWORD SAccelerator::TranslateAccelKey(LPCTSTR pszAccelKey)
+{
+    TCHAR szBuf[101] = { 0 }; //保证字符串结束有两个结束符
+    WORD wModifier = Mod_None;
+    WORD wKey = 0;
+    int nKeyLen = (int)_tcslen(pszAccelKey);
+    if (_tcslen(pszAccelKey) >= 100)
+        return 0;
+    _tcscpy(szBuf, pszAccelKey);
+    CharLowerBuff(szBuf, nKeyLen);
+
+    LPTSTR pszBuf = szBuf;
+    LPTSTR pszKey = _tcstok(pszBuf, _T("+"));
+    while (pszKey)
+    {
+        if (_tcsicmp(pszKey, _T("ctrl")) == 0)
+        {
+            wModifier |= Mod_Ctrl;
+        }
+        else if (_tcsicmp(pszKey, _T("alt")) == 0)
+        {
+            wModifier |= Mod_Alt;
+        }
+        else if (_tcsicmp(pszKey, _T("shift")) == 0)
+        {
+            wModifier |= Mod_Shift;
+        }
+        else
+        {
+            wKey = VkFromString(pszKey);
+            break;
+        }
+        pszBuf += _tcslen(pszKey) + 1;
+        pszKey = _tcstok(pszBuf, _T("+"));
+    }
+    return MAKELONG(wKey, wModifier);
+}
+
+WORD SAccelerator::GetModifier() const
+{
+    return m_wModifier;
+}
+
+WORD SAccelerator::GetKey() const
+{
+    return m_wVK;
+}
+
+DWORD SAccelerator::GetAcc() const
+{
+    return MAKELONG(m_wVK, m_wModifier);
+}
+
+} // end of namespace SOUI

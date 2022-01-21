@@ -6,16 +6,16 @@
  * found in the LICENSE file.
  */
 
-
 #ifndef _SMatrix_DEFINED_
 #define _SMatrix_DEFINED_
 
 #include "SRect.h"
 
 #include <interface/SRender-i.h>
-#define SToBool(cond)  ((cond) != 0)
+#define SToBool(cond) ((cond) != 0)
 
-namespace SOUI{
+namespace SOUI
+{
 
 /** \class SkMatrix
 
@@ -24,59 +24,62 @@ namespace SOUI{
     using either reset() - to construct an identity matrix, or one of the set
     functions (e.g. setTranslate, setRotate, etc.).
 */
-class SOUI_EXP SMatrix : public IxForm{
-public:
-	SMatrix(){
-		reset();
-	}
-	SMatrix(const float data[9]);
+class SOUI_EXP SMatrix : public IxForm {
+  public:
+    SMatrix()
+    {
+        reset();
+    }
+    SMatrix(const float data[9]);
 
-public:
-	SMatrix &operator*=(const SMatrix &src);
-	SMatrix operator*(const SMatrix &src) const;
+  public:
+    SMatrix &operator*=(const SMatrix &src);
+    SMatrix operator*(const SMatrix &src) const;
 
-	SMatrix &operator=(const SMatrix &src);
+    SMatrix &operator=(const SMatrix &src);
 
-	friend bool operator==(const SMatrix& a, const SMatrix& b);
-	friend bool operator!=(const SMatrix& a, const SMatrix& b) {
-		return !(a == b);
-	}
+    friend bool operator==(const SMatrix &a, const SMatrix &b);
+    friend bool operator!=(const SMatrix &a, const SMatrix &b)
+    {
+        return !(a == b);
+    }
 
-public:
-	SMatrix & translate(float dx, float dy)
-	{
-		postTranslate(dx, dy);
-		return *this;
-	}
+  public:
+    SMatrix &translate(float dx, float dy)
+    {
+        postTranslate(dx, dy);
+        return *this;
+    }
 
-	SMatrix & scale(float sx, float sy)
-	{
-		postScale(sx, sy);
-		return *this;
-	}
+    SMatrix &scale(float sx, float sy)
+    {
+        postScale(sx, sy);
+        return *this;
+    }
 
-	SMatrix & shear(float sh, float sv)
-	{
-		postSkew(sh, sv);
-		return *this;
-	}
+    SMatrix &shear(float sh, float sv)
+    {
+        postSkew(sh, sv);
+        return *this;
+    }
 
-	SMatrix & rotate(float deg)
-	{
-		postRotate(deg);
-		return *this;
-	}
+    SMatrix &rotate(float deg)
+    {
+        postRotate(deg);
+        return *this;
+    }
 
-public:
+  public:
     /** Enum of bit fields for the mask return by getType().
         Use this to identify the complexity of the matrix.
     */
-    enum TypeMask {
-        kIdentity_Mask      = 0,
-        kTranslate_Mask     = 0x01,  //!< set if the matrix has translation
-        kScale_Mask         = 0x02,  //!< set if the matrix has X or Y scale
-        kAffine_Mask        = 0x04,  //!< set if the matrix skews or rotates
-        kPerspective_Mask   = 0x08   //!< set if the matrix is in perspective
+    enum TypeMask
+    {
+        kIdentity_Mask = 0,
+        kTranslate_Mask = 0x01,  //!< set if the matrix has translation
+        kScale_Mask = 0x02,      //!< set if the matrix has X or Y scale
+        kAffine_Mask = 0x04,     //!< set if the matrix skews or rotates
+        kPerspective_Mask = 0x08 //!< set if the matrix is in perspective
     };
 
     /** Returns a bitfield describing the transformations the matrix may
@@ -85,8 +88,10 @@ public:
         other bits may be set to true even in the case of a OVERRIDE perspective
         transform.
    */
-    TypeMask getType() const {
-        if (fTypeMask & kUnknown_Mask) {
+    TypeMask getType() const
+    {
+        if (fTypeMask & kUnknown_Mask)
+        {
             fTypeMask = this->computeTypeMask();
         }
         // only return the public masks
@@ -94,12 +99,14 @@ public:
     }
 
     /** Returns true if the matrix is identity.
-    */
-    bool isIdentity() const {
+     */
+    bool isIdentity() const
+    {
         return this->getType() == 0;
     }
 
-    bool isScaleTranslate() const {
+    bool isScaleTranslate() const
+    {
         return !(this->getType() & ~(kScale_Mask | kTranslate_Mask));
     }
 
@@ -107,21 +114,26 @@ public:
         true if the matrix is identity, scale-only, or rotates a multiple of
         90 degrees.
     */
-    bool rectStaysRect() const {
-        if (fTypeMask & kUnknown_Mask) {
+    bool rectStaysRect() const
+    {
+        if (fTypeMask & kUnknown_Mask)
+        {
             fTypeMask = this->computeTypeMask();
         }
         return (fTypeMask & kRectStaysRect_Mask) != 0;
     }
     // alias for rectStaysRect()
-    bool preservesAxisAlignment() const { return this->rectStaysRect(); }
+    bool preservesAxisAlignment() const
+    {
+        return this->rectStaysRect();
+    }
 
     /**
      *  Returns true if the matrix contains perspective elements.
      */
-    bool hasPerspective() const {
-        return SToBool(this->getPerspectiveTypeMaskOnly() &
-                        kPerspective_Mask);
+    bool hasPerspective() const
+    {
+        return SToBool(this->getPerspectiveTypeMaskOnly() & kPerspective_Mask);
     }
 
     /** Returns true if the matrix contains only translation, rotation/reflection or uniform scale
@@ -138,7 +150,8 @@ public:
     /** Affine arrays are in column major order
         because that's how PDF and XPS like it.
      */
-    enum {
+    enum
+    {
         kAScaleX,
         kASkewY,
         kASkewX,
@@ -147,40 +160,50 @@ public:
         kATransY
     };
 
-    float operator[](int index) const {
+    float operator[](int index) const
+    {
         SASSERT((unsigned)index < 9);
         return fMat[index];
     }
 
-    float get(int index) const {
+    float get(int index) const
+    {
         SASSERT((unsigned)index < 9);
         return fMat[index];
     }
 
-    float& operator[](int index) {
+    float &operator[](int index)
+    {
         SASSERT((unsigned)index < 9);
         this->setTypeMask(kUnknown_Mask);
         return fMat[index];
     }
 
-    void set(int index, float value) {
+    void set(int index, float value)
+    {
         SASSERT((unsigned)index < 9);
         fMat[index] = value;
         this->setTypeMask(kUnknown_Mask);
     }
 
-	void setMatrix(const float data[9],int matType = kUnknown_Mask);
+    void setMatrix(const float data[9], int matType = kUnknown_Mask);
 
     /** Set the matrix to identity
-    */
+     */
     void reset();
     // alias for reset()
-    void setIdentity() { this->reset(); }
+    void setIdentity()
+    {
+        this->reset();
+    }
 
     /** Set the matrix to translate by (dx, dy).
-    */
+     */
     void setTranslate(float dx, float dy);
-    void setTranslate(const SVector2D& v) { this->setTranslate(v.fX, v.fY); }
+    void setTranslate(const SVector2D &v)
+    {
+        this->setTranslate(v.fX, v.fY);
+    }
 
     /** Set the matrix to scale by sx and sy, with a pivot point at (px, py).
         The pivot point is the coordinate that should remain unchanged by the
@@ -188,7 +211,7 @@ public:
     */
     void setScale(float sx, float sy, float px, float py);
     /** Set the matrix to scale by sx and sy.
-    */
+     */
     void setScale(float sx, float sy);
     /** Set the matrix to scale by 1/divx and 1/divy. Returns false and doesn't
         touch the matrix if either divx or divy is zero.
@@ -200,16 +223,15 @@ public:
     */
     void setRotate(float degrees, float px, float py);
     /** Set the matrix to rotate about (0,0) by the specified number of degrees.
-    */
+     */
     void setRotate(float degrees);
     /** Set the matrix to rotate by the specified sine and cosine values, with
         a pivot point at (px, py). The pivot point is the coordinate that
         should remain unchanged by the specified transformation.
     */
-    void setSinCos(float sinValue, float cosValue,
-                   float px, float py);
+    void setSinCos(float sinValue, float cosValue, float px, float py);
     /** Set the matrix to rotate by the specified sine and cosine values.
-    */
+     */
     void setSinCos(float sinValue, float cosValue);
     /** Set the matrix to skew by sx and sy, with a pivot point at (px, py).
         The pivot point is the coordinate that should remain unchanged by the
@@ -217,20 +239,20 @@ public:
     */
     void setSkew(float kx, float ky, float px, float py);
     /** Set the matrix to skew by sx and sy.
-    */
+     */
     void setSkew(float kx, float ky);
     /** Set the matrix to the concatenation of the two specified matrices.
         Either of the two matrices may also be the target matrix.
         *this = a * b;
     */
-    void setConcat(const SMatrix& a, const SMatrix& b);
+    void setConcat(const SMatrix &a, const SMatrix &b);
 
     /** Preconcats the matrix with the specified translation.
         M' = M * T(dx, dy)
     */
     void preTranslate(float dx, float dy);
 
-	void preTranslate(int dx, int dy);
+    void preTranslate(int dx, int dy);
 
     /** Preconcats the matrix with the specified scale.
         M' = M * S(sx, sy, px, py)
@@ -259,7 +281,7 @@ public:
     /** Preconcats the matrix with the specified matrix.
         M' = M * other
     */
-    void preConcat(const SMatrix& other);
+    void preConcat(const SMatrix &other);
 
     /** Postconcats the matrix with the specified translation.
         M' = T(dx, dy) * M
@@ -268,7 +290,7 @@ public:
     /** Postconcats the matrix with the specified scale.
         M' = S(sx, sy, px, py) * M
     */
-	void postTranslate(int dx, int dy);
+    void postTranslate(int dx, int dy);
 
     void postScale(float sx, float sy, float px, float py);
     /** Postconcats the matrix with the specified scale.
@@ -298,9 +320,10 @@ public:
     /** Postconcats the matrix with the specified matrix.
         M' = other * M
     */
-    void postConcat(const SMatrix& other);
+    void postConcat(const SMatrix &other);
 
-    enum ScaleToFit {
+    enum ScaleToFit
+    {
         /**
          * Scale in X and Y independently, so that src matches dst exactly.
          * This may change the aspect ratio of the src.
@@ -336,7 +359,7 @@ public:
         @param stf the ScaleToFit option
         @return true if the matrix can be represented by the rectangle mapping.
     */
-    bool setRectToRect(const SRect& src, const SRect& dst, ScaleToFit stf);
+    bool setRectToRect(const SRect &src, const SRect &dst, ScaleToFit stf);
 
     /** Set the matrix such that the specified src points would map to the
         specified dst points. count must be within [0..4].
@@ -351,10 +374,13 @@ public:
         set inverse to be the inverse of this matrix. If this matrix cannot be
         inverted, ignore inverse and return false
     */
-    bool invert(SMatrix* inverse) const {
+    bool invert(SMatrix *inverse) const
+    {
         // Allow the trivial case to be inlined.
-        if (this->isIdentity()) {
-            if (inverse) {
+        if (this->isIdentity())
+        {
+            if (inverse)
+            {
                 inverse->reset();
             }
             return true;
@@ -395,32 +421,36 @@ public:
                     count entries
         @param count The number of points in pts.
     */
-    void mapPoints(SPoint pts[], int count) const {
+    void mapPoints(SPoint pts[], int count) const
+    {
         this->mapPoints(pts, pts, count);
     }
 
     /** Like mapPoints but with custom byte stride between the points. Stride
      *  should be a multiple of sizeof(float).
      */
-    void mapPointsWithStride(SPoint pts[], size_t stride, int count) const {
+    void mapPointsWithStride(SPoint pts[], size_t stride, int count) const
+    {
         SASSERT(stride >= sizeof(SPoint));
         SASSERT(0 == stride % sizeof(float));
-        for (int i = 0; i < count; ++i) {
+        for (int i = 0; i < count; ++i)
+        {
             this->mapPoints(pts, pts, 1);
-            pts = (SPoint*)((intptr_t)pts + stride);
+            pts = (SPoint *)((intptr_t)pts + stride);
         }
     }
 
     /** Like mapPoints but with custom byte stride between the points.
-    */
-    void mapPointsWithStride(SPoint dst[], SPoint src[],
-                             size_t stride, int count) const {
+     */
+    void mapPointsWithStride(SPoint dst[], SPoint src[], size_t stride, int count) const
+    {
         SASSERT(stride >= sizeof(SPoint));
         SASSERT(0 == stride % sizeof(float));
-        for (int i = 0; i < count; ++i) {
+        for (int i = 0; i < count; ++i)
+        {
             this->mapPoints(dst, src, 1);
-            src = (SPoint*)((intptr_t)src + stride);
-            dst = (SPoint*)((intptr_t)dst + stride);
+            src = (SPoint *)((intptr_t)src + stride);
+            dst = (SPoint *)((intptr_t)dst + stride);
         }
     }
 
@@ -437,7 +467,8 @@ public:
     */
     void mapHomogeneousPoints(float dst[], const float src[], int count) const;
 
-    void mapXY(float x, float y, SPoint* result) const {
+    void mapXY(float x, float y, SPoint *result) const
+    {
         SASSERT(result);
         this->getMapXYProc()(*this, x, y, result);
     }
@@ -461,7 +492,8 @@ public:
                     count entries
         @param count The number of vectors in vecs.
     */
-    void mapVectors(SVector2D vecs[], int count) const {
+    void mapVectors(SVector2D vecs[], int count) const
+    {
         this->mapVectors(vecs, vecs, count);
     }
 
@@ -472,7 +504,7 @@ public:
         @param src  The original rectangle to be transformed.
         @return the result of calling rectStaysRect()
     */
-    bool mapRect(SRect* dst, const SRect& src) const;
+    bool mapRect(SRect *dst, const SRect &src) const;
 
     /** Apply this matrix to the rectangle, and write the transformed rectangle
         back into it. This is accomplished by transforming the 4 corners of
@@ -480,7 +512,8 @@ public:
         @param rect The rectangle to transform.
         @return the result of calling rectStaysRect()
     */
-    bool mapRect(SRect* rect) const {
+    bool mapRect(SRect *rect) const
+    {
         return this->mapRect(rect, *rect);
     }
 
@@ -490,7 +523,8 @@ public:
         @param dst  Where the transformed quad is written.
         @param rect The original rectangle to be transformed.
     */
-    void mapRectToQuad(SPoint dst[4], const SRect& rect) const {
+    void mapRectToQuad(SPoint dst[4], const SRect &rect) const
+    {
         // This could potentially be faster if we only transformed each x and y of the rect once.
         rect.toQuad(dst);
         this->mapPoints(dst, 4);
@@ -502,31 +536,33 @@ public:
     */
     float mapRadius(float radius) const;
 
-    typedef void (*MapXYProc)(const SMatrix& mat, float x, float y,
-                                 SPoint* result);
+    typedef void (*MapXYProc)(const SMatrix &mat, float x, float y, SPoint *result);
 
-    static MapXYProc GetMapXYProc(TypeMask mask) {
+    static MapXYProc GetMapXYProc(TypeMask mask)
+    {
         SASSERT((mask & ~kAllMasks) == 0);
         return gMapXYProcs[mask & kAllMasks];
     }
 
-    MapXYProc getMapXYProc() const {
+    MapXYProc getMapXYProc() const
+    {
         return GetMapXYProc(this->getType());
     }
 
-    typedef void (*MapPtsProc)(const SMatrix& mat, SPoint dst[],
-                                  const SPoint src[], int count);
+    typedef void (*MapPtsProc)(const SMatrix &mat, SPoint dst[], const SPoint src[], int count);
 
-    static MapPtsProc GetMapPtsProc(TypeMask mask) {
+    static MapPtsProc GetMapPtsProc(TypeMask mask)
+    {
         SASSERT((mask & ~kAllMasks) == 0);
         return gMapPtsProcs[mask & kAllMasks];
     }
 
-    MapPtsProc getMapPtsProc() const {
+    MapPtsProc getMapPtsProc() const
+    {
         return GetMapPtsProc(this->getType());
     }
 
-	/** Efficient comparison of two matrices. It distinguishes between zero and
+    /** Efficient comparison of two matrices. It distinguishes between zero and
      *  negative zero. It will return false when the sign of zero values is the
      *  only difference between the two matrices. It considers NaN values to be
      *  equal to themselves. So a matrix full of NaNs is "cheap equal" to
@@ -534,11 +570,13 @@ public:
      *  while according to strict the strict == test a matrix with a NaN value
      *  is equal to nothing, including itself.
      */
-    bool cheapEqualTo(const SMatrix& m) const {
+    bool cheapEqualTo(const SMatrix &m) const
+    {
         return 0 == memcmp(fMat, m.fMat, sizeof(fMat));
     }
 
-    enum {
+    enum
+    {
         // writeTo/readFromMemory will never return a value larger than this
         kMaxFlattenSize = 9 * sizeof(float) + sizeof(uint32_t)
     };
@@ -569,18 +607,19 @@ public:
     /**
      *  Return a reference to a const identity matrix
      */
-    static const SMatrix& I();
+    static const SMatrix &I();
 
     /**
      *  Return a reference to a const matrix that is "invalid", one that could
      *  never be used.
      */
-    static const SMatrix& InvalidMatrix();
+    static const SMatrix &InvalidMatrix();
 
     /**
      * Return the concatenation of two matrices, a * b.
      */
-    static SMatrix Concat(const SMatrix& a, const SMatrix& b) {
+    static SMatrix Concat(const SMatrix &a, const SMatrix &b)
+    {
         SMatrix result;
         result.setConcat(a, b);
         return result;
@@ -590,12 +629,14 @@ public:
      * Testing routine; the matrix's type cache should never need to be
      * manually invalidated during normal use.
      */
-    void dirtyMatrixTypeCache() {
+    void dirtyMatrixTypeCache()
+    {
         this->setTypeMask(kUnknown_Mask);
     }
 
-private:
-    enum {
+  private:
+    enum
+    {
         /** Set if the matrix will map a rectangle to another rectangle. This
             can be true if the matrix is scale-only, or rotates a multiple of
             90 degrees.
@@ -611,16 +652,10 @@ private:
 
         kUnknown_Mask = 0x80,
 
-        kORableMasks =  kTranslate_Mask |
-                        kScale_Mask |
-                        kAffine_Mask |
-                        kPerspective_Mask,
+        kORableMasks = kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask,
 
-        kAllMasks = kTranslate_Mask |
-                    kScale_Mask |
-                    kAffine_Mask |
-                    kPerspective_Mask |
-                    kRectStaysRect_Mask
+        kAllMasks
+        = kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask | kRectStaysRect_Mask
     };
 
     mutable uint32_t fTypeMask;
@@ -632,15 +667,17 @@ private:
 
     void orTypeMask(int mask);
 
-    void clearTypeMask(int mask) {
+    void clearTypeMask(int mask)
+    {
         // only allow a valid mask
         SASSERT((mask & kAllMasks) == mask);
         fTypeMask = fTypeMask & ~mask;
     }
 
-    TypeMask getPerspectiveTypeMaskOnly() const {
-        if ((fTypeMask & kUnknown_Mask) &&
-            !(fTypeMask & kOnlyPerspectiveValid_Mask)) {
+    TypeMask getPerspectiveTypeMaskOnly() const
+    {
+        if ((fTypeMask & kUnknown_Mask) && !(fTypeMask & kOnlyPerspectiveValid_Mask))
+        {
             fTypeMask = this->computePerspectiveTypeMask();
         }
         return (TypeMask)(fTypeMask & 0xF);
@@ -649,47 +686,46 @@ private:
     /** Returns true if we already know that the matrix is identity;
         false otherwise.
     */
-    bool isTriviallyIdentity() const {
-        if (fTypeMask & kUnknown_Mask) {
+    bool isTriviallyIdentity() const
+    {
+        if (fTypeMask & kUnknown_Mask)
+        {
             return false;
         }
         return ((fTypeMask & 0xF) == 0);
     }
 
-    bool  invertNonIdentity(SMatrix* inverse) const;
+    bool invertNonIdentity(SMatrix *inverse) const;
 
-    static bool Poly2Proc(const SPoint[], SMatrix*, const SPoint& scale);
-    static bool Poly3Proc(const SPoint[], SMatrix*, const SPoint& scale);
-    static bool Poly4Proc(const SPoint[], SMatrix*, const SPoint& scale);
+    static bool Poly2Proc(const SPoint[], SMatrix *, const SPoint &scale);
+    static bool Poly3Proc(const SPoint[], SMatrix *, const SPoint &scale);
+    static bool Poly4Proc(const SPoint[], SMatrix *, const SPoint &scale);
 
-    static void Identity_xy(const SMatrix&, float, float, SPoint*);
-    static void Trans_xy(const SMatrix&, float, float, SPoint*);
-    static void Scale_xy(const SMatrix&, float, float, SPoint*);
-    static void ScaleTrans_xy(const SMatrix&, float, float, SPoint*);
-    static void Rot_xy(const SMatrix&, float, float, SPoint*);
-    static void RotTrans_xy(const SMatrix&, float, float, SPoint*);
-    static void Persp_xy(const SMatrix&, float, float, SPoint*);
+    static void Identity_xy(const SMatrix &, float, float, SPoint *);
+    static void Trans_xy(const SMatrix &, float, float, SPoint *);
+    static void Scale_xy(const SMatrix &, float, float, SPoint *);
+    static void ScaleTrans_xy(const SMatrix &, float, float, SPoint *);
+    static void Rot_xy(const SMatrix &, float, float, SPoint *);
+    static void RotTrans_xy(const SMatrix &, float, float, SPoint *);
+    static void Persp_xy(const SMatrix &, float, float, SPoint *);
 
     static const MapXYProc gMapXYProcs[];
 
-    static void Identity_pts(const SMatrix&, SPoint[], const SPoint[], int);
-    static void Trans_pts(const SMatrix&, SPoint dst[], const SPoint[], int);
-    static void Scale_pts(const SMatrix&, SPoint dst[], const SPoint[], int);
-    static void ScaleTrans_pts(const SMatrix&, SPoint dst[], const SPoint[],
-                               int count);
-    static void Rot_pts(const SMatrix&, SPoint dst[], const SPoint[], int);
-    static void RotTrans_pts(const SMatrix&, SPoint dst[], const SPoint[],
-                             int count);
-    static void Persp_pts(const SMatrix&, SPoint dst[], const SPoint[], int);
+    static void Identity_pts(const SMatrix &, SPoint[], const SPoint[], int);
+    static void Trans_pts(const SMatrix &, SPoint dst[], const SPoint[], int);
+    static void Scale_pts(const SMatrix &, SPoint dst[], const SPoint[], int);
+    static void ScaleTrans_pts(const SMatrix &, SPoint dst[], const SPoint[], int count);
+    static void Rot_pts(const SMatrix &, SPoint dst[], const SPoint[], int);
+    static void RotTrans_pts(const SMatrix &, SPoint dst[], const SPoint[], int count);
+    static void Persp_pts(const SMatrix &, SPoint dst[], const SPoint[], int);
     static const MapPtsProc gMapPtsProcs[];
 
-
     friend class SkPerspIter;
-public:
-	static float SFloatSinCos(float radians, float* cosValue);
+
+  public:
+    static float SFloatSinCos(float radians, float *cosValue);
 };
 
-
-}//end of namespace SOUI
+} // end of namespace SOUI
 
 #endif

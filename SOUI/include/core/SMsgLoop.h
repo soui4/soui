@@ -4,56 +4,55 @@
 
 SNSBEGIN
 
-class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop>
-{
-public:
-	SMessageLoop();
-	virtual ~SMessageLoop();
+class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
+  public:
+    SMessageLoop();
+    virtual ~SMessageLoop();
 
-public:
-	// Message filter operations
-	STDMETHOD_(BOOL,AddMessageFilter)(THIS_ IMessageFilter* pMessageFilter) OVERRIDE;
+  public:
+    // Message filter operations
+    STDMETHOD_(BOOL, AddMessageFilter)(THIS_ IMessageFilter *pMessageFilter) OVERRIDE;
 
-	STDMETHOD_(BOOL,RemoveMessageFilter)(THIS_ IMessageFilter* pMessageFilter) OVERRIDE;
+    STDMETHOD_(BOOL, RemoveMessageFilter)(THIS_ IMessageFilter *pMessageFilter) OVERRIDE;
 
-	// Idle handler operations
-	STDMETHOD_(BOOL,AddIdleHandler)(THIS_ IIdleHandler* pIdleHandler) OVERRIDE;
+    // Idle handler operations
+    STDMETHOD_(BOOL, AddIdleHandler)(THIS_ IIdleHandler *pIdleHandler) OVERRIDE;
 
-	STDMETHOD_(BOOL,RemoveIdleHandler)(THIS_ IIdleHandler* pIdleHandler) OVERRIDE;
+    STDMETHOD_(BOOL, RemoveIdleHandler)(THIS_ IIdleHandler *pIdleHandler) OVERRIDE;
 
-	// Override to change message filtering
-	STDMETHOD_(BOOL,PreTranslateMessage)(THIS_ MSG* pMsg) OVERRIDE;
+    // Override to change message filtering
+    STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG *pMsg) OVERRIDE;
 
-	// override to change idle processing
-	STDMETHOD_(BOOL,OnIdle)(THIS_ int /*nIdleCount*/) OVERRIDE;
+    // override to change idle processing
+    STDMETHOD_(BOOL, OnIdle)(THIS_ int /*nIdleCount*/) OVERRIDE;
 
-	STDMETHOD_(int,Run)(THIS) OVERRIDE;
+    STDMETHOD_(int, Run)(THIS) OVERRIDE;
 
-	STDMETHOD_(BOOL,IsRunning)(THIS) const OVERRIDE;
+    STDMETHOD_(BOOL, IsRunning)(THIS) const OVERRIDE;
 
-	STDMETHOD_(void,OnMsg)(THIS_ LPMSG pMsg) OVERRIDE;
+    STDMETHOD_(void, OnMsg)(THIS_ LPMSG pMsg) OVERRIDE;
 
-	STDMETHOD_(void,Quit)(THIS) OVERRIDE;
+    STDMETHOD_(void, Quit)(THIS) OVERRIDE;
 
-	STDMETHOD_(BOOL,PostTask)(THIS_ IRunnable * runable) OVERRIDE;
+    STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable *runable) OVERRIDE;
 
-	STDMETHOD_(int ,RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE;
+    STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE;
 
-public:
-	static BOOL IsIdleMessage( MSG* pMsg );
-protected:
-	SArray<IMessageFilter*> m_aMsgFilter;
-	SArray<IIdleHandler*> m_aIdleHandler;
-	MSG m_msg;
+  public:
+    static BOOL IsIdleMessage(MSG *pMsg);
 
-	BOOL m_bRunning;
-	BOOL m_bQuit;
-	SCriticalSection m_cs;
-	SList<IRunnable*>	m_runnables;
-	SCriticalSection m_csRunningQueue;
-	SList<IRunnable*>	m_runningQueue;
-	DWORD  m_tid;
+  protected:
+    SArray<IMessageFilter *> m_aMsgFilter;
+    SArray<IIdleHandler *> m_aIdleHandler;
+    MSG m_msg;
+
+    BOOL m_bRunning;
+    BOOL m_bQuit;
+    SCriticalSection m_cs;
+    SList<IRunnable *> m_runnables;
+    SCriticalSection m_csRunningQueue;
+    SList<IRunnable *> m_runningQueue;
+    DWORD m_tid;
 };
-
 
 SNSEND

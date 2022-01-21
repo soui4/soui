@@ -3,154 +3,168 @@
 
 SNSBEGIN
 
-SNativeWndHelper::SNativeWndHelper(HINSTANCE hInst,LPCTSTR pszClassName,BOOL bImeApp)
-        :m_hInst(hInst)
-        ,m_sharePtr(NULL)
-		,m_atom(NULL)
-    {
-        InitializeCriticalSection(&m_cs);
-        m_hHeap=HeapCreate(HEAP_CREATE_ENABLE_EXECUTE,0,0);
-		if(bImeApp)
-			m_atom = SNativeWnd::RegisterSimpleWnd2(m_hInst, pszClassName);
-		else
-			m_atom=SNativeWnd::RegisterSimpleWnd(m_hInst,pszClassName);
-    }
+SNativeWndHelper::SNativeWndHelper(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp)
+    : m_hInst(hInst)
+    , m_sharePtr(NULL)
+    , m_atom(NULL)
+{
+    InitializeCriticalSection(&m_cs);
+    m_hHeap = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE, 0, 0);
+    if (bImeApp)
+        m_atom = SNativeWnd::RegisterSimpleWnd2(m_hInst, pszClassName);
+    else
+        m_atom = SNativeWnd::RegisterSimpleWnd(m_hInst, pszClassName);
+}
 
-    SNativeWndHelper::~SNativeWndHelper()
-    {
-        if(m_hHeap) HeapDestroy(m_hHeap);
-        DeleteCriticalSection(&m_cs);
-        if(m_atom) UnregisterClass((LPCTSTR)m_atom,m_hInst);
-    }
+SNativeWndHelper::~SNativeWndHelper()
+{
+    if (m_hHeap)
+        HeapDestroy(m_hHeap);
+    DeleteCriticalSection(&m_cs);
+    if (m_atom)
+        UnregisterClass((LPCTSTR)m_atom, m_hInst);
+}
 
-    void SNativeWndHelper::LockSharePtr(void *p)
-    {
-        EnterCriticalSection(&m_cs);
-        m_sharePtr=p;
-    }
+void SNativeWndHelper::LockSharePtr(void *p)
+{
+    EnterCriticalSection(&m_cs);
+    m_sharePtr = p;
+}
 
-    void SNativeWndHelper::UnlockSharePtr()
-    {
-        LeaveCriticalSection(&m_cs);
-    }
+void SNativeWndHelper::UnlockSharePtr()
+{
+    LeaveCriticalSection(&m_cs);
+}
 
 //////////////////////////////////////////////////////////////////////////
 SNativeWnd::SNativeWnd()
-    :m_bDestoryed(FALSE)
-    ,m_pCurrentMsg(NULL)
-    ,m_hWnd(NULL)
-    ,m_pfnSuperWindowProc(::DefWindowProc)
-    ,m_pThunk(NULL)
+    : m_bDestoryed(FALSE)
+    , m_pCurrentMsg(NULL)
+    , m_hWnd(NULL)
+    , m_pfnSuperWindowProc(::DefWindowProc)
+    , m_pThunk(NULL)
 {
-	m_evtSet.addEvent(EVENTID(EventNativeMsg));
+    m_evtSet.addEvent(EVENTID(EventNativeMsg));
 }
 
 SNativeWnd::~SNativeWnd(void)
 {
 }
 
-ATOM SNativeWnd::RegisterSimpleWnd( HINSTANCE hInst,LPCTSTR pszSimpleWndName )
+ATOM SNativeWnd::RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName)
 {
-    WNDCLASSEX wcex = {sizeof(WNDCLASSEX),0};
-    wcex.cbSize           = sizeof(WNDCLASSEX);
-    wcex.style            = CS_HREDRAW | CS_VREDRAW| CS_DBLCLKS ;
-    wcex.lpfnWndProc      = StartWindowProc; // 第一个处理函数
-    wcex.hInstance        = hInst;
-    wcex.hCursor          = ::LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground    = (HBRUSH)(COLOR_WINDOW+1);
-    wcex.lpszClassName    = pszSimpleWndName;
+    WNDCLASSEX wcex = { sizeof(WNDCLASSEX), 0 };
+    wcex.cbSize = sizeof(WNDCLASSEX);
+    wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+    wcex.lpfnWndProc = StartWindowProc; // 第一个处理函数
+    wcex.hInstance = hInst;
+    wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszClassName = pszSimpleWndName;
     return ::RegisterClassEx(&wcex);
 }
 
 ATOM SNativeWnd::RegisterSimpleWnd2(HINSTANCE hInst, LPCTSTR pszSimpleWndName)
 {
-	WNDCLASSEX wcex = { sizeof(WNDCLASSEX),0 };
-	wcex.cbSize = sizeof(WNDCLASSEX);
-	wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_IME;
-	wcex.lpfnWndProc = StartWindowProc; // 第一个处理函数
-	wcex.hInstance = hInst;
-	wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-	wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-	wcex.lpszClassName = pszSimpleWndName;
-	return ::RegisterClassEx(&wcex);
+    WNDCLASSEX wcex = { sizeof(WNDCLASSEX), 0 };
+    wcex.cbSize = sizeof(WNDCLASSEX);
+    wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_IME;
+    wcex.lpfnWndProc = StartWindowProc; // 第一个处理函数
+    wcex.hInstance = hInst;
+    wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
+    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    wcex.lpszClassName = pszSimpleWndName;
+    return ::RegisterClassEx(&wcex);
 }
 
-HWND SNativeWnd::CreateWindow(LPCTSTR lpWindowName, DWORD dwStyle,DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent,LPVOID lpParam )
+HWND SNativeWnd::CreateWindow(LPCTSTR lpWindowName,
+                              DWORD dwStyle,
+                              DWORD dwExStyle,
+                              int x,
+                              int y,
+                              int nWidth,
+                              int nHeight,
+                              HWND hWndParent,
+                              LPVOID lpParam)
 {
     SNativeWndHelper::getSingletonPtr()->LockSharePtr(this);
 
-    m_pThunk=(tagThunk*)HeapAlloc(SNativeWndHelper::getSingletonPtr()->GetHeap(),HEAP_ZERO_MEMORY,sizeof(tagThunk));
+    m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::getSingletonPtr()->GetHeap(),
+                                     HEAP_ZERO_MEMORY, sizeof(tagThunk));
     // 在::CreateWindow返回之前会去调StarWindowProc函数
-    HWND hWnd= ::CreateWindowEx(dwExStyle,(LPCTSTR)SNativeWndHelper::getSingletonPtr()->GetSimpleWndAtom(), lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, 0, SNativeWndHelper::getSingletonPtr()->GetAppInstance(), lpParam);
+    HWND hWnd = ::CreateWindowEx(dwExStyle,
+                                 (LPCTSTR)SNativeWndHelper::getSingletonPtr()->GetSimpleWndAtom(),
+                                 lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, 0,
+                                 SNativeWndHelper::getSingletonPtr()->GetAppInstance(), lpParam);
     SNativeWndHelper::getSingletonPtr()->UnlockSharePtr();
-    if(!hWnd)
+    if (!hWnd)
     {
-        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(),0,m_pThunk);
-        m_pThunk=NULL;
+        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(), 0, m_pThunk);
+        m_pThunk = NULL;
     }
     return hWnd;
 }
 
-HWND SNativeWnd::GetHwnd( )
+HWND SNativeWnd::GetHwnd()
 {
-	return m_hWnd;
+    return m_hWnd;
 }
 
-
-void SNativeWnd::OnFinalMessage( HWND hWnd )
+void SNativeWnd::OnFinalMessage(HWND hWnd)
 {
-    if(m_pThunk)
+    if (m_pThunk)
     {
-        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(),0,m_pThunk);
-        m_pThunk=NULL;
+        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(), 0, m_pThunk);
+        m_pThunk = NULL;
     }
-	m_hWnd = NULL;
+    m_hWnd = NULL;
 }
 
-LRESULT CALLBACK SNativeWnd::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    SNativeWnd* pThis = (SNativeWnd*)hWnd; // 强转为对象指针
-    MSG msg= {pThis->m_hWnd, uMsg, wParam, lParam};
-    const MSG* pOldMsg = pThis->m_pCurrentMsg;
+    SNativeWnd *pThis = (SNativeWnd *)hWnd; // 强转为对象指针
+    MSG msg = { pThis->m_hWnd, uMsg, wParam, lParam };
+    const MSG *pOldMsg = pThis->m_pCurrentMsg;
     pThis->m_pCurrentMsg = &msg;
-	{
-		EventNativeMsg evt(pThis);
-		evt.pMsg = &msg;
-		evt.result = 0;
-		pThis->m_evtSet.FireEvent(&evt);
-		if(!evt.IsBubbleUp())
-			return evt.result;
-	}
+    {
+        EventNativeMsg evt(pThis);
+        evt.pMsg = &msg;
+        evt.result = 0;
+        pThis->m_evtSet.FireEvent(&evt);
+        if (!evt.IsBubbleUp())
+            return evt.result;
+    }
 
-	// pass to the message map to process
-	LRESULT lRes;
+    // pass to the message map to process
+    LRESULT lRes;
     BOOL bRet = pThis->ProcessWindowMessage(pThis->m_hWnd, uMsg, wParam, lParam, lRes, 0);
     // restore saved value for the current message
     SASSERT(pThis->m_pCurrentMsg == &msg);
 
     // do the default processing if message was not handled
-    if(!bRet)
+    if (!bRet)
     {
-        if(uMsg != WM_NCDESTROY)
+        if (uMsg != WM_NCDESTROY)
             lRes = pThis->DefWindowProc(uMsg, wParam, lParam);
         else
         {
             // unsubclass, if needed
             LONG_PTR pfnWndProc = ::GetWindowLongPtr(pThis->m_hWnd, GWLP_WNDPROC);
             lRes = pThis->DefWindowProc(uMsg, wParam, lParam);
-            if(pThis->m_pfnSuperWindowProc != ::DefWindowProc && ::GetWindowLongPtr(pThis->m_hWnd, GWLP_WNDPROC) == pfnWndProc)
-                ::SetWindowLongPtr(pThis->m_hWnd, GWLP_WNDPROC, (LONG_PTR)pThis->m_pfnSuperWindowProc);
+            if (pThis->m_pfnSuperWindowProc != ::DefWindowProc
+                && ::GetWindowLongPtr(pThis->m_hWnd, GWLP_WNDPROC) == pfnWndProc)
+                ::SetWindowLongPtr(pThis->m_hWnd, GWLP_WNDPROC,
+                                   (LONG_PTR)pThis->m_pfnSuperWindowProc);
             // mark window as destryed
-            pThis->m_bDestoryed=TRUE;
+            pThis->m_bDestoryed = TRUE;
         }
-
     }
-    if((pThis->m_bDestoryed) && pOldMsg== NULL)
+    if ((pThis->m_bDestoryed) && pOldMsg == NULL)
     {
         // clear out window handle
         HWND hWndThis = pThis->m_hWnd;
         pThis->m_hWnd = NULL;
-        pThis->m_bDestoryed =FALSE;
+        pThis->m_bDestoryed = FALSE;
         // clean up after window is destroyed
         pThis->m_pCurrentMsg = pOldMsg;
         pThis->OnFinalMessage(hWndThis);
@@ -162,11 +176,11 @@ LRESULT CALLBACK SNativeWnd::WindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LP
     return lRes;
 }
 
-LRESULT CALLBACK SNativeWnd::StartWindowProc( HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT CALLBACK SNativeWnd::StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    SNativeWnd* pThis=(SNativeWnd*)SNativeWndHelper::getSingletonPtr()->GetSharePtr();
+    SNativeWnd *pThis = (SNativeWnd *)SNativeWndHelper::getSingletonPtr()->GetSharePtr();
 
-    pThis->m_hWnd=hWnd;
+    pThis->m_hWnd = hWnd;
     // 初始化Thunk，做了两件事:1、mov指令替换hWnd为对象指针，2、jump指令跳转到WindowProc
     pThis->m_pThunk->Init((DWORD_PTR)WindowProc, pThis);
 
@@ -178,18 +192,19 @@ LRESULT CALLBACK SNativeWnd::StartWindowProc( HWND hWnd, UINT uMsg, WPARAM wPara
     return pProc(hWnd, uMsg, wParam, lParam);
 }
 
-BOOL SNativeWnd::SubclassWindow( HWND hWnd )
+BOOL SNativeWnd::SubclassWindow(HWND hWnd)
 {
     SASSERT(::IsWindow(hWnd));
     // Allocate the thunk structure here, where we can fail gracefully.
-    m_pThunk=(tagThunk*)HeapAlloc(SNativeWndHelper::getSingletonPtr()->GetHeap(),HEAP_ZERO_MEMORY,sizeof(tagThunk));
+    m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::getSingletonPtr()->GetHeap(),
+                                     HEAP_ZERO_MEMORY, sizeof(tagThunk));
     m_pThunk->Init((DWORD_PTR)WindowProc, this);
     WNDPROC pProc = (WNDPROC)m_pThunk->GetCodeAddress();
     WNDPROC pfnWndProc = (WNDPROC)::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pProc);
-    if(pfnWndProc == NULL)
+    if (pfnWndProc == NULL)
     {
-        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(),0,m_pThunk);
-        m_pThunk=NULL;
+        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(), 0, m_pThunk);
+        m_pThunk = NULL;
         return FALSE;
     }
     m_pfnSuperWindowProc = pfnWndProc;
@@ -197,8 +212,7 @@ BOOL SNativeWnd::SubclassWindow( HWND hWnd )
     return TRUE;
 }
 
-
-HWND SNativeWnd::UnsubclassWindow( BOOL bForce /*= FALSE*/ )
+HWND SNativeWnd::UnsubclassWindow(BOOL bForce /*= FALSE*/)
 {
     SASSERT(m_hWnd != NULL);
 
@@ -208,7 +222,7 @@ HWND SNativeWnd::UnsubclassWindow( BOOL bForce /*= FALSE*/ )
     HWND hWnd = NULL;
     if (bForce || pOurProc == pActiveProc)
     {
-        if(!::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)m_pfnSuperWindowProc))
+        if (!::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)m_pfnSuperWindowProc))
             return NULL;
 
         m_pfnSuperWindowProc = ::DefWindowProc;
@@ -218,10 +232,10 @@ HWND SNativeWnd::UnsubclassWindow( BOOL bForce /*= FALSE*/ )
     return hWnd;
 }
 
-LRESULT SNativeWnd::ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT SNativeWnd::ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
     LRESULT lResult = 0;
-    switch(uMsg)
+    switch (uMsg)
     {
     case WM_COMMAND:
     case WM_NOTIFY:
@@ -242,7 +256,7 @@ LRESULT SNativeWnd::ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     case WM_CTLCOLORSCROLLBAR:
     case WM_CTLCOLORSTATIC:
         bHandled = TRUE;
-        lResult = ::SendMessage(GetParent(),uMsg, wParam, lParam);
+        lResult = ::SendMessage(GetParent(), uMsg, wParam, lParam);
         break;
     default:
         bHandled = FALSE;
@@ -251,46 +265,46 @@ LRESULT SNativeWnd::ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     return lResult;
 }
 
-LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
+LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
 {
     HWND hWndChild = NULL;
 
-    switch(uMsg)
+    switch (uMsg)
     {
     case WM_COMMAND:
-        if(lParam != NULL)    // not from a menu
+        if (lParam != NULL) // not from a menu
             hWndChild = (HWND)lParam;
         break;
     case WM_NOTIFY:
         hWndChild = ((LPNMHDR)lParam)->hwndFrom;
         break;
     case WM_PARENTNOTIFY:
-        switch(LOWORD(wParam))
+        switch (LOWORD(wParam))
         {
         case WM_CREATE:
         case WM_DESTROY:
             hWndChild = (HWND)lParam;
             break;
         default:
-            hWndChild = GetDlgItem(m_hWnd,HIWORD(wParam));
+            hWndChild = GetDlgItem(m_hWnd, HIWORD(wParam));
             break;
         }
         break;
     case WM_DRAWITEM:
-        if(wParam)    // not from a menu
+        if (wParam) // not from a menu
             hWndChild = ((LPDRAWITEMSTRUCT)lParam)->hwndItem;
         break;
     case WM_MEASUREITEM:
-        if(wParam)    // not from a menu
-            hWndChild = GetDlgItem(m_hWnd,((LPMEASUREITEMSTRUCT)lParam)->CtlID);
+        if (wParam) // not from a menu
+            hWndChild = GetDlgItem(m_hWnd, ((LPMEASUREITEMSTRUCT)lParam)->CtlID);
         break;
     case WM_COMPAREITEM:
-        if(wParam)    // not from a menu
-            hWndChild =  ((LPCOMPAREITEMSTRUCT)lParam)->hwndItem;
+        if (wParam) // not from a menu
+            hWndChild = ((LPCOMPAREITEMSTRUCT)lParam)->hwndItem;
         break;
     case WM_DELETEITEM:
-        if(wParam)    // not from a menu
-            hWndChild =  ((LPDELETEITEMSTRUCT)lParam)->hwndItem;
+        if (wParam) // not from a menu
+            hWndChild = ((LPDELETEITEMSTRUCT)lParam)->hwndItem;
 
         break;
     case WM_VKEYTOITEM:
@@ -312,7 +326,7 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
         break;
     }
 
-    if(hWndChild == NULL)
+    if (hWndChild == NULL)
     {
         bHandled = FALSE;
         return 1;
@@ -322,9 +336,13 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     return ::SendMessage(hWndChild, OCM__BASE + uMsg, wParam, lParam);
 }
 
-BOOL SNativeWnd::DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
+BOOL SNativeWnd::DefaultReflectionHandler(HWND hWnd,
+                                          UINT uMsg,
+                                          WPARAM wParam,
+                                          LPARAM lParam,
+                                          LRESULT &lResult)
 {
-    switch(uMsg)
+    switch (uMsg)
     {
     case OCM_COMMAND:
     case OCM_NOTIFY:
@@ -352,442 +370,458 @@ BOOL SNativeWnd::DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, L
     return FALSE;
 }
 
-LRESULT SNativeWnd::DefWindowProc( UINT uMsg, WPARAM wParam, LPARAM lParam )
+LRESULT SNativeWnd::DefWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    return ::CallWindowProc(m_pfnSuperWindowProc,m_hWnd, uMsg, wParam, lParam);
+    return ::CallWindowProc(m_pfnSuperWindowProc, m_hWnd, uMsg, wParam, lParam);
 }
 
 LRESULT SNativeWnd::DefWindowProc()
 {
-	const MSG* pMsg = m_pCurrentMsg;
-	LRESULT lRes = 0;
-	if (pMsg != NULL)
-		lRes = DefWindowProc(pMsg->message, pMsg->wParam, pMsg->lParam);
-	return lRes;
+    const MSG *pMsg = m_pCurrentMsg;
+    LRESULT lRes = 0;
+    if (pMsg != NULL)
+        lRes = DefWindowProc(pMsg->message, pMsg->wParam, pMsg->lParam);
+    return lRes;
 }
 
 BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
+    SASSERT(::IsWindow(m_hWnd));
 
-	// determine owner window to center against
-	DWORD dwStyle = GetStyle();
-	if(hWndCenter == NULL)
-	{
-		if(dwStyle & WS_CHILD)
-			hWndCenter = ::GetParent(m_hWnd);
-		else
-			hWndCenter = ::GetWindow(m_hWnd, GW_OWNER);
+    // determine owner window to center against
+    DWORD dwStyle = GetStyle();
+    if (hWndCenter == NULL)
+    {
+        if (dwStyle & WS_CHILD)
+            hWndCenter = ::GetParent(m_hWnd);
+        else
+            hWndCenter = ::GetWindow(m_hWnd, GW_OWNER);
 
-		if(hWndCenter == NULL)
-			hWndCenter = ::GetActiveWindow();
-	}
+        if (hWndCenter == NULL)
+            hWndCenter = ::GetActiveWindow();
+    }
 
-	// get coordinates of the window relative to its parent
-	RECT rcDlg;
-	::GetWindowRect(m_hWnd, &rcDlg);
-	RECT rcArea;
-	RECT rcCenter;
-	HWND hWndParent;
-	if(!(dwStyle & WS_CHILD))
-	{
-		// don't center against invisible or minimized windows
-		if(hWndCenter != NULL)
-		{
-			DWORD dwStyleCenter = (DWORD)::GetWindowLongPtr(hWndCenter, GWL_STYLE);
-			if(!(dwStyleCenter & WS_VISIBLE) || (dwStyleCenter & WS_MINIMIZE))
-				hWndCenter = NULL;
-		}
+    // get coordinates of the window relative to its parent
+    RECT rcDlg;
+    ::GetWindowRect(m_hWnd, &rcDlg);
+    RECT rcArea;
+    RECT rcCenter;
+    HWND hWndParent;
+    if (!(dwStyle & WS_CHILD))
+    {
+        // don't center against invisible or minimized windows
+        if (hWndCenter != NULL)
+        {
+            DWORD dwStyleCenter = (DWORD)::GetWindowLongPtr(hWndCenter, GWL_STYLE);
+            if (!(dwStyleCenter & WS_VISIBLE) || (dwStyleCenter & WS_MINIMIZE))
+                hWndCenter = NULL;
+        }
 
-		// center within screen coordinates
+        // center within screen coordinates
 #if WINVER < 0x0500
-		::SystemParametersInfo(SPI_GETWORKAREA, NULL, &rcArea, NULL);
+        ::SystemParametersInfo(SPI_GETWORKAREA, NULL, &rcArea, NULL);
 #else
-		HMONITOR hMonitor = NULL;
-		if(hWndCenter != NULL)
-		{
-			hMonitor = ::MonitorFromWindow(hWndCenter, MONITOR_DEFAULTTONEAREST);
-		}
-		else
-		{
-			hMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
-		}
+        HMONITOR hMonitor = NULL;
+        if (hWndCenter != NULL)
+        {
+            hMonitor = ::MonitorFromWindow(hWndCenter, MONITOR_DEFAULTTONEAREST);
+        }
+        else
+        {
+            hMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
+        }
 
-		MONITORINFO minfo;
-		minfo.cbSize = sizeof(MONITORINFO);
-		::GetMonitorInfo(hMonitor, &minfo);
+        MONITORINFO minfo;
+        minfo.cbSize = sizeof(MONITORINFO);
+        ::GetMonitorInfo(hMonitor, &minfo);
 
-		rcArea = minfo.rcWork;
+        rcArea = minfo.rcWork;
 #endif
-		if(hWndCenter == NULL)
-			rcCenter = rcArea;
-		else
-			::GetWindowRect(hWndCenter, &rcCenter);
-	}
-	else
-	{
-		// center within parent client coordinates
-		hWndParent = ::GetParent(m_hWnd);
-		SASSERT(::IsWindow(hWndParent));
+        if (hWndCenter == NULL)
+            rcCenter = rcArea;
+        else
+            ::GetWindowRect(hWndCenter, &rcCenter);
+    }
+    else
+    {
+        // center within parent client coordinates
+        hWndParent = ::GetParent(m_hWnd);
+        SASSERT(::IsWindow(hWndParent));
 
-		::GetClientRect(hWndParent, &rcArea);
-		SASSERT(::IsWindow(hWndCenter));
-		::GetClientRect(hWndCenter, &rcCenter);
-		::MapWindowPoints(hWndCenter, hWndParent, (POINT*)&rcCenter, 2);
-	}
+        ::GetClientRect(hWndParent, &rcArea);
+        SASSERT(::IsWindow(hWndCenter));
+        ::GetClientRect(hWndCenter, &rcCenter);
+        ::MapWindowPoints(hWndCenter, hWndParent, (POINT *)&rcCenter, 2);
+    }
 
-	int DlgWidth = rcDlg.right - rcDlg.left;
-	int DlgHeight = rcDlg.bottom - rcDlg.top;
+    int DlgWidth = rcDlg.right - rcDlg.left;
+    int DlgHeight = rcDlg.bottom - rcDlg.top;
 
-	// find dialog's upper left based on rcCenter
-	int xLeft = (rcCenter.left + rcCenter.right) / 2 - DlgWidth / 2;
-	int yTop = (rcCenter.top + rcCenter.bottom) / 2 - DlgHeight / 2;
+    // find dialog's upper left based on rcCenter
+    int xLeft = (rcCenter.left + rcCenter.right) / 2 - DlgWidth / 2;
+    int yTop = (rcCenter.top + rcCenter.bottom) / 2 - DlgHeight / 2;
 
-	// if the dialog is outside the screen, move it inside
-	if(xLeft + DlgWidth > rcArea.right)
-		xLeft = rcArea.right - DlgWidth;
-	if(xLeft < rcArea.left)
-		xLeft = rcArea.left;
+    // if the dialog is outside the screen, move it inside
+    if (xLeft + DlgWidth > rcArea.right)
+        xLeft = rcArea.right - DlgWidth;
+    if (xLeft < rcArea.left)
+        xLeft = rcArea.left;
 
-	if(yTop + DlgHeight > rcArea.bottom)
-		yTop = rcArea.bottom - DlgHeight;
-	if(yTop < rcArea.top)
-		yTop = rcArea.top;
+    if (yTop + DlgHeight > rcArea.bottom)
+        yTop = rcArea.bottom - DlgHeight;
+    if (yTop < rcArea.top)
+        yTop = rcArea.top;
 
-	// map screen coordinates to child coordinates
-	return ::SetWindowPos(m_hWnd, NULL, xLeft, yTop, -1, -1,
-		SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+    // map screen coordinates to child coordinates
+    return ::SetWindowPos(m_hWnd, NULL, xLeft, yTop, -1, -1,
+                          SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 BOOL SNativeWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
+    SASSERT(::IsWindow(m_hWnd));
 
-	DWORD dwStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
-	DWORD dwNewStyle = (dwStyle & ~dwRemove) | dwAdd;
-	if(dwStyle == dwNewStyle)
-		return FALSE;
+    DWORD dwStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+    DWORD dwNewStyle = (dwStyle & ~dwRemove) | dwAdd;
+    if (dwStyle == dwNewStyle)
+        return FALSE;
 
-	::SetWindowLongPtr(m_hWnd, GWL_STYLE, dwNewStyle);
-	if(nFlags != 0)
-	{
-		::SetWindowPos(m_hWnd, NULL, 0, 0, 0, 0,
-			SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | nFlags);
-	}
+    ::SetWindowLongPtr(m_hWnd, GWL_STYLE, dwNewStyle);
+    if (nFlags != 0)
+    {
+        ::SetWindowPos(m_hWnd, NULL, 0, 0, 0, 0,
+                       SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | nFlags);
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
 BOOL SNativeWnd::ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
+    SASSERT(::IsWindow(m_hWnd));
 
-	DWORD dwStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
-	DWORD dwNewStyle = (dwStyle & ~dwRemove) | dwAdd;
-	if(dwStyle == dwNewStyle)
-		return FALSE;
+    DWORD dwStyle = (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+    DWORD dwNewStyle = (dwStyle & ~dwRemove) | dwAdd;
+    if (dwStyle == dwNewStyle)
+        return FALSE;
 
-	::SetWindowLongPtr(m_hWnd, GWL_EXSTYLE, dwNewStyle);
-	if(nFlags != 0)
-	{
-		::SetWindowPos(m_hWnd, NULL, 0, 0, 0, 0,
-			SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | nFlags);
-	}
+    ::SetWindowLongPtr(m_hWnd, GWL_EXSTYLE, dwNewStyle);
+    if (nFlags != 0)
+    {
+        ::SetWindowPos(m_hWnd, NULL, 0, 0, 0, 0,
+                       SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | nFlags);
+    }
 
-	return TRUE;
+    return TRUE;
 }
 
-BOOL SNativeWnd::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID /*= 0*/)
+BOOL SNativeWnd::ProcessWindowMessage(HWND hWnd,
+                                      UINT uMsg,
+                                      WPARAM wParam,
+                                      LPARAM lParam,
+                                      LRESULT &lResult,
+                                      DWORD dwMsgMapID /*= 0*/)
 {
-	return FALSE;
+    return FALSE;
 }
 
 BOOL SNativeWnd::SubscribeEvent(const IEvtSlot *pSlot)
 {
-	return m_evtSet.subscribeEvent(EventNativeMsg::EventID,pSlot);
+    return m_evtSet.subscribeEvent(EventNativeMsg::EventID, pSlot);
 }
 
 BOOL SNativeWnd::UnsubscribeEvent(const IEvtSlot *pSlot)
 {
-	return m_evtSet.unsubscribeEvent(EventNativeMsg::EventID,pSlot);
+    return m_evtSet.unsubscribeEvent(EventNativeMsg::EventID, pSlot);
 }
 
-BOOL SNativeWnd::UpdateLayeredWindow(HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc,COLORREF crKey, BLENDFUNCTION *pblend,DWORD dwFlags)
+BOOL SNativeWnd::UpdateLayeredWindow(HDC hdcDst,
+                                     POINT *pptDst,
+                                     SIZE *psize,
+                                     HDC hdcSrc,
+                                     POINT *pptSrc,
+                                     COLORREF crKey,
+                                     BLENDFUNCTION *pblend,
+                                     DWORD dwFlags)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::UpdateLayeredWindow(m_hWnd,hdcDst,pptDst,psize,hdcSrc,pptSrc,crKey,pblend,dwFlags);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::UpdateLayeredWindow(m_hWnd, hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend,
+                                 dwFlags);
 }
 
-BOOL SNativeWnd::SetLayeredWindowAttributes(COLORREF crKey,BYTE bAlpha,DWORD dwFlags)
+BOOL SNativeWnd::SetLayeredWindowAttributes(COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SetLayeredWindowAttributes(m_hWnd,crKey,bAlpha,dwFlags);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetLayeredWindowAttributes(m_hWnd, crKey, bAlpha, dwFlags);
 }
 
-int SNativeWnd::SetWindowRgn(HRGN hRgn,BOOL bRedraw/*=TRUE*/)
+int SNativeWnd::SetWindowRgn(HRGN hRgn, BOOL bRedraw /*=TRUE*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SetWindowRgn(m_hWnd,hRgn,bRedraw);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetWindowRgn(m_hWnd, hRgn, bRedraw);
 }
 
 BOOL SNativeWnd::ShowWindow(int nCmdShow)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::ShowWindow(m_hWnd,nCmdShow);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::ShowWindow(m_hWnd, nCmdShow);
 }
 
 BOOL SNativeWnd::MoveWindow2(LPCRECT lpRect, BOOL bRepaint /*= TRUE*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::MoveWindow(m_hWnd, lpRect->left, lpRect->top, lpRect->right - lpRect->left, lpRect->bottom - lpRect->top, bRepaint);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::MoveWindow(m_hWnd, lpRect->left, lpRect->top, lpRect->right - lpRect->left,
+                        lpRect->bottom - lpRect->top, bRepaint);
 }
 
 BOOL SNativeWnd::MoveWindow(int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::MoveWindow(m_hWnd, x, y, nWidth, nHeight, bRepaint);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::MoveWindow(m_hWnd, x, y, nWidth, nHeight, bRepaint);
 }
 
 BOOL SNativeWnd::IsWindowVisible() const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::IsWindowVisible(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::IsWindowVisible(m_hWnd);
 }
 
 BOOL SNativeWnd::IsZoomed() const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::IsZoomed(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::IsZoomed(m_hWnd);
 }
 
 BOOL SNativeWnd::IsIconic() const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::IsIconic(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::IsIconic(m_hWnd);
 }
 
 int SNativeWnd::GetWindowText(LPTSTR lpszStringBuf, int nMaxCount) const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::GetWindowText(m_hWnd, lpszStringBuf, nMaxCount);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::GetWindowText(m_hWnd, lpszStringBuf, nMaxCount);
 }
 
 BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SetWindowText(m_hWnd, lpszString);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetWindowText(m_hWnd, lpszString);
 }
 
 BOOL SNativeWnd::SendNotifyMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SendNotifyMessage(m_hWnd, message, wParam, lParam);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SendNotifyMessage(m_hWnd, message, wParam, lParam);
 }
 
 BOOL SNativeWnd::PostMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::PostMessage(m_hWnd,message,wParam,lParam);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::PostMessage(m_hWnd, message, wParam, lParam);
 }
 
 LRESULT SNativeWnd::SendMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SendMessage(m_hWnd,message,wParam,lParam);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SendMessage(m_hWnd, message, wParam, lParam);
 }
 
 HWND SNativeWnd::SetFocus()
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SetFocus(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetFocus(m_hWnd);
 }
 
 HWND SNativeWnd::SetCapture()
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SetCapture(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetCapture(m_hWnd);
 }
 
 BOOL SNativeWnd::ShowCaret()
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::ShowCaret(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::ShowCaret(m_hWnd);
 }
 
 BOOL SNativeWnd::HideCaret()
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::HideCaret(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::HideCaret(m_hWnd);
 }
 
 BOOL SNativeWnd::CreateCaret(HBITMAP hBitmap)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::CreateCaret(m_hWnd, hBitmap, 0, 0);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::CreateCaret(m_hWnd, hBitmap, 0, 0);
 }
 
 int SNativeWnd::ReleaseDC(HDC hDC)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::ReleaseDC(m_hWnd, hDC);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::ReleaseDC(m_hWnd, hDC);
 }
 
 HDC SNativeWnd::GetWindowDC()
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::GetWindowDC(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::GetWindowDC(m_hWnd);
 }
 
 HDC SNativeWnd::GetDC()
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::GetDC(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::GetDC(m_hWnd);
 }
 
 BOOL SNativeWnd::KillTimer(UINT_PTR nIDEvent)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::KillTimer(m_hWnd, nIDEvent);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::KillTimer(m_hWnd, nIDEvent);
 }
 
-UINT_PTR SNativeWnd::SetTimer(UINT_PTR nIDEvent, UINT nElapse, void (CALLBACK* lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/)
+UINT_PTR SNativeWnd::SetTimer(UINT_PTR nIDEvent,
+                              UINT nElapse,
+                              void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SetTimer(m_hWnd, nIDEvent, nElapse, (TIMERPROC)lpfnTimer);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetTimer(m_hWnd, nIDEvent, nElapse, (TIMERPROC)lpfnTimer);
 }
 
 int SNativeWnd::MapWindowRect(HWND hWndTo, LPRECT lpRect) const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::MapWindowPoints(m_hWnd, hWndTo, (LPPOINT)lpRect, 2);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::MapWindowPoints(m_hWnd, hWndTo, (LPPOINT)lpRect, 2);
 }
 
 int SNativeWnd::MapWindowPoints(HWND hWndTo, LPPOINT lpPoint, UINT nCount) const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::MapWindowPoints(m_hWnd, hWndTo, lpPoint, nCount);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::MapWindowPoints(m_hWnd, hWndTo, lpPoint, nCount);
 }
 
 BOOL SNativeWnd::ScreenToClient2(LPRECT lpRect) const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	if(!::ScreenToClient(m_hWnd, (LPPOINT)lpRect))
-		return FALSE;
-	return ::ScreenToClient(m_hWnd, ((LPPOINT)lpRect)+1);
+    SASSERT(::IsWindow(m_hWnd));
+    if (!::ScreenToClient(m_hWnd, (LPPOINT)lpRect))
+        return FALSE;
+    return ::ScreenToClient(m_hWnd, ((LPPOINT)lpRect) + 1);
 }
 
 BOOL SNativeWnd::ScreenToClient(LPPOINT lpPoint) const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::ScreenToClient(m_hWnd, lpPoint);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::ScreenToClient(m_hWnd, lpPoint);
 }
 
 BOOL SNativeWnd::ClientToScreen2(LPRECT lpRect) const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	if(!::ClientToScreen(m_hWnd, (LPPOINT)lpRect))
-		return FALSE;
-	return ::ClientToScreen(m_hWnd, ((LPPOINT)lpRect)+1);
+    SASSERT(::IsWindow(m_hWnd));
+    if (!::ClientToScreen(m_hWnd, (LPPOINT)lpRect))
+        return FALSE;
+    return ::ClientToScreen(m_hWnd, ((LPPOINT)lpRect) + 1);
 }
 
 BOOL SNativeWnd::ClientToScreen(LPPOINT lpPoint) const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::ClientToScreen(m_hWnd, lpPoint);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::ClientToScreen(m_hWnd, lpPoint);
 }
 
 BOOL SNativeWnd::GetClientRect(LPRECT lpRect) const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::GetClientRect(m_hWnd, lpRect);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::GetClientRect(m_hWnd, lpRect);
 }
 
 BOOL SNativeWnd::GetWindowRect(LPRECT lpRect) const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::GetWindowRect(m_hWnd, lpRect);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::GetWindowRect(m_hWnd, lpRect);
 }
 
 BOOL SNativeWnd::InvalidateRect(LPCRECT lpRect, BOOL bErase /*= TRUE*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::InvalidateRect(m_hWnd, lpRect, bErase);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::InvalidateRect(m_hWnd, lpRect, bErase);
 }
 
 BOOL SNativeWnd::Invalidate(BOOL bErase /*= TRUE*/)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::InvalidateRect(m_hWnd, NULL, bErase);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::InvalidateRect(m_hWnd, NULL, bErase);
 }
 
 BOOL SNativeWnd::IsWindow()
 {
-	return ::IsWindow(m_hWnd);
+    return ::IsWindow(m_hWnd);
 }
 
 BOOL SNativeWnd::DestroyWindow()
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::DestroyWindow(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::DestroyWindow(m_hWnd);
 }
 
 BOOL SNativeWnd::SetWindowPos(HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SetWindowPos(m_hWnd, hWndInsertAfter, x, y, cx, cy, nFlags);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetWindowPos(m_hWnd, hWndInsertAfter, x, y, cx, cy, nFlags);
 }
 
 BOOL SNativeWnd::IsWindowEnabled() const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::IsWindowEnabled(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::IsWindowEnabled(m_hWnd);
 }
 
 HWND SNativeWnd::SetParent(HWND hWndNewParent)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SetParent(m_hWnd, hWndNewParent);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetParent(m_hWnd, hWndNewParent);
 }
 
 HWND SNativeWnd::GetParent()
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::GetParent(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::GetParent(m_hWnd);
 }
 
 LONG_PTR SNativeWnd::SetWindowLongPtr(int nIndex, LONG_PTR dwNewLong)
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::SetWindowLongPtr(m_hWnd, nIndex, dwNewLong);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetWindowLongPtr(m_hWnd, nIndex, dwNewLong);
 }
 
 LONG_PTR SNativeWnd::GetWindowLongPtr(int nIndex) const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::GetWindowLongPtr(m_hWnd, nIndex);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::GetWindowLongPtr(m_hWnd, nIndex);
 }
 
 DWORD SNativeWnd::GetExStyle() const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+    SASSERT(::IsWindow(m_hWnd));
+    return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
 }
 
 DWORD SNativeWnd::GetStyle() const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+    SASSERT(::IsWindow(m_hWnd));
+    return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
 }
 
 int SNativeWnd::GetDlgCtrlID() const
 {
-	SASSERT(::IsWindow(m_hWnd));
-	return ::GetDlgCtrlID(m_hWnd);
+    SASSERT(::IsWindow(m_hWnd));
+    return ::GetDlgCtrlID(m_hWnd);
 }
 
-const MSG * SNativeWnd::GetCurrentMessage() const
+const MSG *SNativeWnd::GetCurrentMessage() const
 {
-	return m_pCurrentMsg;
+    return m_pCurrentMsg;
 }
 
 SNSEND
