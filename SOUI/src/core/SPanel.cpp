@@ -705,7 +705,7 @@ void SScrollView::OnViewSizeChanged(CSize szOld, CSize szNew)
     FireEvent(evt);
 }
 
-void SScrollView::SetViewOrigin(CPoint pt)
+void SScrollView::SetViewOrigin(POINT pt)
 {
     if (pt.x < 0)
         pt.x = 0;
@@ -715,9 +715,9 @@ void SScrollView::SetViewOrigin(CPoint pt)
         pt.x = (int)(m_siHoz.nMax - m_siHoz.nPage + 1);
     if (pt.y > (int)(m_siVer.nMax - m_siVer.nPage + 1))
         pt.y = (int)(m_siVer.nMax - m_siVer.nPage + 1);
-    if (m_ptOrigin == pt)
+    if (m_ptOrigin.x == pt.x && m_ptOrigin.y == pt.y)
         return;
-    CPoint ptOld = m_ptOrigin;
+    POINT ptOld = m_ptOrigin;
     m_ptOrigin = pt;
     if (GetScrollPos(FALSE) != pt.x)
         SetScrollPos(FALSE, m_ptOrigin.x, TRUE);
@@ -731,14 +731,14 @@ void SScrollView::SetViewOrigin(CPoint pt)
     Invalidate();
 }
 
-CPoint SScrollView::GetViewOrigin()
+POINT SScrollView::GetViewOrigin() const
 {
     return m_ptOrigin;
 }
 
-void SScrollView::SetViewSize(CSize szView)
+void SScrollView::SetViewSize(SIZE szView)
 {
-    if (szView == m_szView)
+    if (szView.cx == m_szView.cx && szView.cy == m_szView.cy)
         return;
 
     CSize oldViewSize = m_szView;
@@ -747,10 +747,11 @@ void SScrollView::SetViewSize(CSize szView)
     OnViewSizeChanged(oldViewSize, szView);
 }
 
-CSize SScrollView::GetViewSize()
+SIZE SScrollView::GetViewSize() const
 {
     return m_szView;
 }
+
 
 void SScrollView::UpdateScrollBar()
 {
@@ -836,7 +837,7 @@ void SScrollView::UpdateScrollBar()
 
     SSendMessage(WM_NCCALCSIZE);
 
-    if (m_ptOrigin != ptOrigin)
+    if (m_ptOrigin.x != ptOrigin.x || m_ptOrigin.y != ptOrigin.y)
     {
         m_layoutDirty = dirty_self;
         OnViewOriginChanged(ptOrigin, m_ptOrigin);
@@ -933,7 +934,7 @@ RECT SScrollView::GetChildrenLayoutRect() const
 {
     CRect rcRet = __baseCls::GetChildrenLayoutRect();
     CRect rcPadding = GetStyle().GetPadding();
-    rcRet.OffsetRect(-m_ptOrigin);
+    rcRet.OffsetRect(-m_ptOrigin.x,-m_ptOrigin.y);
     rcRet.right = rcRet.left + m_szView.cx - rcPadding.left - rcPadding.right;
     rcRet.bottom = rcRet.top + m_szView.cy - rcPadding.top - rcPadding.bottom;
     return rcRet;

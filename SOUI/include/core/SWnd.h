@@ -1472,27 +1472,27 @@ class SOUI_EXP SWindow
 };
 
 
-template <class T,class Base=SWindow>
+template <class T>
 class TWindowProxy
 	: public T
-	, public Base {
+	, public SWindow {
 public:
 	STDMETHOD_(long, AddRef)(THIS) OVERRIDE
 	{
-		return Base::AddRef();
+		return SWindow::AddRef();
 	}
 	STDMETHOD_(long, Release)(THIS) OVERRIDE
 	{
-		return Base::Release();
+		return SWindow::Release();
 	}
 	STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
 	{
-		Base::OnFinalRelease();
+		SWindow::OnFinalRelease();
 	}
 
 	STDMETHOD_(IWindow*, ToIWindow)(THIS) OVERRIDE
 	{
-		return (Base*)this;
+		return this;
 	}
 
 	STDMETHOD_(HRESULT, QueryInterface)(REFGUID id,IObjRef **ppRet) OVERRIDE
@@ -1504,7 +1504,7 @@ public:
 			return S_OK;
 		}else
 		{
-			return Base::QueryInterface(id,ppRet);
+			return E_NOTIMPL;
 		}
 	}
 };
