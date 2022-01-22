@@ -12,7 +12,7 @@ SNSBEGIN
 #define INTERFACE ICtrl
 DECLARE_INTERFACE_(ICtrl, IObjRef)
 {
-	STDMETHOD_(IWindow*, GetWindow)(THIS) PURE;
+	STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
 };
 
 #undef INTERFACE
@@ -131,6 +131,29 @@ DECLARE_INTERFACE_IID_(IProgress, ICtrl,"77407E2D-582B-4ef2-A33A-427C933BAA8C")
      * Describe  获取进度值
      */
     STDMETHOD_(BOOL, IsVertical)(THIS) SCONST PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IPanel
+DECLARE_INTERFACE_IID_(IPanel, ICtrl,"B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
+{
+	STDMETHOD_(BOOL,ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
+
+	STDMETHOD_(BOOL,EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
+
+	STDMETHOD_(BOOL,IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
+
+	STDMETHOD_(void,SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
+
+	STDMETHOD_(BOOL,SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
+
+	STDMETHOD_(int,GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
+
+	STDMETHOD_(BOOL,SetScrollRange)(THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+
+	STDMETHOD_(BOOL,GetScrollRange)(THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+
+	STDMETHOD_(BOOL,HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
 };
 
 SNSEND

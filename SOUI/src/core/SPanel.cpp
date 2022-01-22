@@ -226,7 +226,7 @@ BOOL SPanel::EnableScrollBar(int wBar, BOOL bEnable)
     return TRUE;
 }
 
-BOOL SPanel::IsScrollBarEnable(BOOL bVertical)
+BOOL SPanel::IsScrollBarEnable(BOOL bVertical) const
 {
     return m_wBarEnable & (bVertical ? SSB_VERT : SSB_HORZ);
 }
@@ -281,9 +281,9 @@ BOOL SPanel::SetScrollPos(BOOL bVertical, int nNewPos, BOOL bRedraw)
     return bRet;
 }
 
-int SPanel::GetScrollPos(BOOL bVertical)
+int SPanel::GetScrollPos(BOOL bVertical) const
 {
-    SCROLLINFO &si = bVertical ? m_siVer : m_siHoz;
+    const SCROLLINFO &si = bVertical ? m_siVer : m_siHoz;
     return si.nTrackPos != -1 ? si.nTrackPos : si.nPos;
 }
 
@@ -306,9 +306,9 @@ BOOL SPanel::SetScrollRange(BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedr
     return TRUE;
 }
 
-BOOL SPanel::GetScrollRange(BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos)
+BOOL SPanel::GetScrollRange(BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) const
 {
-    SCROLLINFO *psi = bVertical ? (&m_siVer) : (&m_siHoz);
+    const SCROLLINFO *psi = bVertical ? (&m_siVer) : (&m_siHoz);
     if (lpMaxPos)
         *lpMaxPos = psi->nMax;
     if (lpMinPos)

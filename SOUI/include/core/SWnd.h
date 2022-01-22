@@ -1490,7 +1490,7 @@ public:
 		Base::OnFinalRelease();
 	}
 
-	STDMETHOD_(IWindow*, GetWindow)(THIS) OVERRIDE
+	STDMETHOD_(IWindow*, ToIWindow)(THIS) OVERRIDE
 	{
 		return (Base*)this;
 	}

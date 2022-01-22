@@ -15,6 +15,7 @@
 
 #include <core/SWnd.h>
 #include <core/SScrollBarHandler.h>
+#include <interface/SCtrl-i.h>
 
 namespace SOUI
 {
@@ -28,7 +29,7 @@ enum SbID
 };
 
 class SOUI_EXP SPanel
-    : public SWindow
+    : public TWindowProxy<IPanel>
     , protected IScrollBarHost {
     SOUI_CLASS_NAME(SWindow, L"div")
 
@@ -38,24 +39,26 @@ class SOUI_EXP SPanel
     {
     }
 
-    BOOL ShowScrollBar(int wBar, BOOL bShow);
+public:
+	STDMETHOD_(BOOL,ShowScrollBar)(THIS_ int wBar, BOOL bShow) OVERRIDE;
 
-    BOOL EnableScrollBar(int wBar, BOOL bEnable);
+	STDMETHOD_(BOOL,EnableScrollBar)(THIS_ int wBar, BOOL bEnable) OVERRIDE;
 
-    BOOL IsScrollBarEnable(BOOL bVertical);
+	STDMETHOD_(BOOL,IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST OVERRIDE;
 
-    void SetScrollInfo(SCROLLINFO si, BOOL bVertical);
+	STDMETHOD_(void,SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) OVERRIDE;
 
-    BOOL SetScrollPos(BOOL bVertical, int nNewPos, BOOL bRedraw);
+	STDMETHOD_(BOOL,SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) OVERRIDE;
 
-    int GetScrollPos(BOOL bVertical);
+	STDMETHOD_(int,GetScrollPos)(THIS_ BOOL bVertical) SCONST OVERRIDE;
 
-    BOOL SetScrollRange(BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw);
+	STDMETHOD_(BOOL,SetScrollRange)(THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) OVERRIDE;
 
-    BOOL GetScrollRange(BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos);
+	STDMETHOD_(BOOL,GetScrollRange)(THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST OVERRIDE;
 
-    BOOL HasScrollBar(BOOL bVertical) const;
+	STDMETHOD_(BOOL,HasScrollBar)(THIS_ BOOL bVertical) SCONST OVERRIDE;
 
+public:
     virtual void WINAPI GetClientRect(LPRECT pRect) const;
     virtual CRect GetClientRect() const;
 
