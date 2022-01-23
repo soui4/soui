@@ -95,16 +95,6 @@ class THostWndProxy
         return SHostWnd::AfterAttribute(strAttribName, strValue, bLoading, hr);
     }
 
-    STDMETHOD_(BOOL, SubscribeEvent)(THIS_ const IEvtSlot *pSlot)
-    {
-        return SHostWnd::SubscribeEvent(pSlot);
-    }
-
-    STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ const IEvtSlot *pSlot)
-    {
-        return SHostWnd::UnsubscribeEvent(pSlot);
-    }
-
     STDMETHOD_(HWND, CreateWindow)
     (THIS_ LPCTSTR lpWindowName,
      DWORD dwStyle,
@@ -347,6 +337,11 @@ class THostWndProxy
         return SHostWnd::UpdateLayeredWindow(hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend,
                                              dwFlags);
     }
+
+	STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun,void * ctx) OVERRIDE
+	{
+		return SHostWnd::SetMsgHandler(fun,ctx);
+	}
 
     STDMETHOD_(HWND, CreateEx)
     (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)

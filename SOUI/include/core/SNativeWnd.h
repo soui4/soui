@@ -1,8 +1,6 @@
 ﻿#pragma once
 #include <interface/SNativeWnd-i.h>
 #include <sobject/Sobject.hpp>
-#include <event/SEvents.h>
-#include <event/SEventSet.h>
 
 #include "SSingleton2.h"
 //////////////////////////////////////////////////////////////////////////
@@ -126,8 +124,37 @@ struct tagThunk // this should come out to 16 bytes
 #error Only AMD64, ARM and X86 supported
 #endif
 
-class SOUI_EXP SNativeWnd : public TObjRefImpl<SObjectImpl<INativeWnd>> {
-    SOUI_CLASS_NAME_EX(TObjRefImpl<SObjectImpl<INativeWnd>>, L"SNativeWnd", NativeWnd)
+template<class T>
+class TObjRefProxy : public T, public TObjRefImpl<SObject>
+{
+public:
+		//!添加引用
+	/*!
+	*/
+	STDMETHOD_(long,AddRef) (THIS) OVERRIDE{
+		return TObjRefImpl<SObject>::AddRef();
+	}
+
+	//!释放引用
+	/*!
+	*/
+	STDMETHOD_(long,Release) (THIS) OVERRIDE
+	{
+		return TObjRefImpl<SObject>::Release();
+	}
+
+	//!释放对象
+	/*!
+	*/
+	STDMETHOD_(void,OnFinalRelease) (THIS) OVERRIDE
+	{
+		return TObjRefImpl<SObject>::OnFinalRelease();
+	}
+
+};
+
+class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd> {
+    SOUI_CLASS_NAME_EX(TObjRefImpl<SObject>, L"SNativeWnd", NativeWnd)
   public:
     SNativeWnd();
     virtual ~SNativeWnd(void);
@@ -278,9 +305,7 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<SObjectImpl<INativeWnd>> {
      BLENDFUNCTION *pblend,
      DWORD dwFlags) OVERRIDE;
 
-    STDMETHOD_(BOOL, SubscribeEvent)(THIS_ const IEvtSlot *pSlot) OVERRIDE;
-
-    STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ const IEvtSlot *pSlot) OVERRIDE;
+	STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun,void * ctx) OVERRIDE;
 
     LRESULT DefWindowProc();
     LRESULT ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
@@ -306,8 +331,8 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<SObjectImpl<INativeWnd>> {
 
     const MSG *m_pCurrentMsg;
     BOOL m_bDestoryed;
-    SEventSet m_evtSet;
-
+	FunMsgHandler m_fun;
+	void * m_ctx;
   public:
     HWND m_hWnd;
 

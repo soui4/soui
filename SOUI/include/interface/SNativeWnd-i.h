@@ -5,14 +5,12 @@ SNSBEGIN
 
 #undef CreateWindow
 
+typedef BOOL (*FunMsgHandler)(const LPMSG pMsg,LRESULT *pRes, void * ctx);
+
 #undef INTERFACE
 #define INTERFACE INativeWnd
-DECLARE_INTERFACE_(INativeWnd, IObject)
+DECLARE_INTERFACE_(INativeWnd, IObjRef)
 {
-    STDMETHOD_(BOOL, SubscribeEvent)(THIS_ const IEvtSlot *pSlot) PURE;
-
-    STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ const IEvtSlot *pSlot) PURE;
-
     STDMETHOD_(HWND, CreateWindow)
     (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth,
      int nHeight, HWND hWndParent, LPVOID lpParam) PURE;
@@ -130,6 +128,8 @@ DECLARE_INTERFACE_(INativeWnd, IObject)
     STDMETHOD_(BOOL, UpdateLayeredWindow)
     (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey,
      BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
+
+	STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun,void * ctx) PURE;
 };
 
 SNSEND
