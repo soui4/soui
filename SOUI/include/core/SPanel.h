@@ -295,23 +295,17 @@ public:
 	STDMETHOD_(void,SetViewOrigin)(THIS_ POINT pt) OVERRIDE;
 
   protected:
-    void OnSize(UINT nType, CSize size);
-
-  protected:
     virtual void OnViewSizeChanged(CSize szOld, CSize szNew);
     virtual void OnViewOriginChanged(CPoint ptOld, CPoint ptNew);
 
   protected:
     STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST OVERRIDE;
+	STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
 
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
 
     virtual void UpdateScrollBar();
-
-    STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
-
   protected:
-    void UpdateViewSize();
 
     HRESULT OnAttrViewSize(const SStringW &strValue, BOOL bLoading);
 
@@ -320,6 +314,10 @@ public:
     ATTR_INT(L"origin-y", m_ptOrigin.y, FALSE)
     ATTR_CUSTOM(L"viewSize", OnAttrViewSize)
     SOUI_ATTRS_END()
+
+  protected:
+	void UpdateViewSize();
+	void OnSize(UINT nType, CSize size);
 
     SOUI_MSG_MAP_BEGIN()
     MSG_WM_SIZE(OnSize)
