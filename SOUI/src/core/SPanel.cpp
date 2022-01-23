@@ -673,6 +673,8 @@ void SPanel::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *p
 //////////////////////////////////////////////////////////////////////////
 SScrollView::SScrollView()
 {
+	m_ptOrigin = CPoint();
+	m_szView = CSize();
     m_bClipClient = TRUE;
     m_viewSize[0].setInvalid();
     m_viewSize[1].setInvalid();
