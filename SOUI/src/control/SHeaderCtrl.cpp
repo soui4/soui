@@ -31,18 +31,9 @@ int SHeaderCtrl::InsertItem(int iItem,
                             LPCTSTR pszText,
                             int nWidth,
                             UINT fmt,
-                            LPARAM lParam)
-{
-    return InsertItem(iItem, pszText, nWidth, FALSE, fmt,0.0f, lParam);
-}
-
-int SHeaderCtrl::InsertItem(int iItem,
-                            LPCTSTR pszText,
-                            int nWidth,
-                            BOOL bDpiAware,
-                            UINT fmt,
-							float fWeight,
-                            LPARAM lParam)
+                            LPARAM lParam,
+							BOOL bDpiAware/*=FALSE*/,
+							float fWeight/*=0.0f*/)
 {
     SASSERT(pszText);
     SASSERT(nWidth >= 0);
@@ -116,6 +107,12 @@ BOOL SHeaderCtrl::SetItem(int iItem, const SHDITEM *pItem)
         item.cx = pItem->cx;
     if (pItem->mask & SHDI_LPARAM)
         item.lParam = pItem->lParam;
+	if(pItem->mask & SHDI_WEIGHT)
+		item.fWeight = pItem->fWeight;
+	if(pItem->mask & SHDI_FORMAT)
+		item.fmt = pItem->fmt;
+	if(pItem->mask & SHDI_VISIBLE)
+		item.bVisible = pItem->bVisible;
     return TRUE;
 }
 
@@ -620,7 +617,7 @@ void SHeaderCtrl::DrawDraggingState(DWORD dwDragTo)
     ReleaseRenderTarget(pRT);
 }
 
-int SHeaderCtrl::GetTotalWidth(bool bMinWid) const
+int SHeaderCtrl::GetTotalWidth(BOOL bMinWid) const
 {
     CRect rc = GetClientRect();
 
@@ -782,14 +779,19 @@ BOOL SHeaderCtrl::IsItemVisible(int iItem) const
     return m_arrItems[iItem].bVisible;
 }
 
-bool SHeaderCtrl::IsAutoResize() const
+BOOL SHeaderCtrl::IsAutoResize() const
 {
     for (UINT i = 0; i < m_arrItems.GetCount(); i++)
     {
         if (m_arrItems[i].fWeight > 0.0f)
-            return true;
+            return TRUE;
     }
-    return false;
+    return FALSE;
+}
+
+UINT SHeaderCtrl::GetItemCount() const
+{
+	return (UINT)m_arrItems.GetCount();
 }
 
 } // end of namespace SOUI

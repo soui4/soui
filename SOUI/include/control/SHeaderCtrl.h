@@ -18,38 +18,6 @@
 namespace SOUI
 {
 
-	enum{
-		SHDI_WIDTH   = 0x0001,
-		SHDI_TEXT    = 0x0002,
-		SHDI_FORMAT  = 0x0004,
-		SHDI_LPARAM  = 0x0008,
-		SHDI_ORDER   = 0x0010,
-		SHDI_VISIBLE = 0x0020,
-		SHDI_WEIGHT  = 0x0040,
-		SHDI_ALL     = 0xffff,
-	};
-
-
-/**
- * @struct    _SHDITEM
- * @brief     列表头项
- *
- * Describe   列表头项
- */
-typedef struct SHDITEM
-{
-    UINT mask;
-    int cx;
-	UINT fmt;
-	UINT state;
-	int iOrder;
-	LPTSTR pszText;
-	int    cchMaxText;
-    LPARAM lParam;
-	BOOL bDpiAware;
-    BOOL bVisible;
-	float fWeight;
-} * LPSHDITEM;
 
 #define SORT_MASK (HDF_SORTDOWN|HDF_SORTUP)
 #define ALIGN_MASK (HDF_LEFT|HDF_RIGHT|HDF_CENTER)
@@ -60,7 +28,7 @@ typedef struct SHDITEM
  *
  * Describe   表头控件
  */
-class SOUI_EXP SHeaderCtrl : public SWindow {
+class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
     SOUI_CLASS_NAME(SWindow, L"header")
 
     enum
@@ -89,7 +57,8 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      */
     ~SHeaderCtrl(void);
 
-    /**
+public:
+	    /**
      * SHeaderCtrl::InsertItem
      * @brief    插入新项
      * @param    int iItem --  新项索引
@@ -102,15 +71,9 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      *
      * Describe  插入新项
      */
-    int InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam);
-    int InsertItem(int iItem,
-                   LPCTSTR pszText,
-                   int nWidth,
-                   BOOL bDpiAware,
-				   UINT fmt,
-				   float fWeight,
-                   LPARAM lParam);
-    /**
+    STDMETHOD_(int,InsertItem)(THIS_ int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam,BOOL bDpiAware=FALSE,float fWeight=0.0f) OVERRIDE;
+
+	/**
      * SHeaderCtrl::GetItem
      * @brief    获得新项
      * @param    int iItem  --  索引
@@ -119,9 +82,9 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      *
      * Describe  获得新项
      */
-    BOOL GetItem(int iItem, SHDITEM *pItem) const;
+    STDMETHOD_(BOOL,GetItem)(THIS_ int iItem, SHDITEM *pItem) SCONST OVERRIDE;
 
-    BOOL SetItem(int iItem, const SHDITEM *pItem);
+    STDMETHOD_(BOOL,SetItem)(THIS_ int iItem, const SHDITEM *pItem) OVERRIDE;
 
     /**
      * SHeaderCtrl::GetItemCount
@@ -130,10 +93,7 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      *
      * Describe  获取列表项个数
      */
-    size_t GetItemCount() const
-    {
-        return m_arrItems.GetCount();
-    }
+    STDMETHOD_(UINT,GetItemCount)(THIS) SCONST OVERRIDE;
     /**
      * SHeaderCtrl::GetTotalWidth
      * @brief    获得所有宽度
@@ -141,9 +101,9 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      *
      * Describe  获得所有宽度
      */
-    int GetTotalWidth(bool bMinWid = false) const;
+    STDMETHOD_(int,GetTotalWidth)(THIS_ BOOL bMinWid = FALSE) SCONST OVERRIDE;
 
-    bool IsAutoResize() const;
+    STDMETHOD_(BOOL,IsAutoResize)(THIS) SCONST OVERRIDE;
 
     /**
      * SHeaderCtrl::GetItemWidth
@@ -153,7 +113,8 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      *
      * Describe  获得新项
      */
-    int GetItemWidth(int iItem) const;
+    STDMETHOD_(int,GetItemWidth)(THIS_ int iItem) SCONST OVERRIDE;
+
     /**
      * SHeaderCtrl::DeleteItem
      * @brief    删除指定项
@@ -162,7 +123,7 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      *
      * Describe  删除指定项
      */
-    BOOL DeleteItem(int iItem);
+    STDMETHOD_(BOOL,DeleteItem)(THIS_ int iItem) OVERRIDE;
 
     /**
      * SHeaderCtrl::DeleteAllItems
@@ -170,13 +131,15 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      *
      * Describe  获得新项
      */
-    void DeleteAllItems();
+    STDMETHOD_(void,DeleteAllItems)(THIS) OVERRIDE;
 
-    void SetItemSort(int iItem, UINT sortFlag);
+    STDMETHOD_(void,SetItemSort)(THIS_ int iItem, UINT sortFlag) OVERRIDE;
 
-    void SetItemVisible(int iItem, BOOL visible);
+    STDMETHOD_(void,SetItemVisible)(THIS_ int iItem, BOOL visible) OVERRIDE;
 
-    BOOL IsItemVisible(int iItem) const;
+    STDMETHOD_(BOOL,IsItemVisible)(THIS_ int iItem) SCONST OVERRIDE;
+
+public:
 
     /**
      * SHeaderCtrl::GetItemRect

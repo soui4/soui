@@ -193,4 +193,123 @@ DECLARE_INTERFACE_IID_(IListView, IPanel,"E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
 	STDMETHOD_(IWindow*,HitTest)(THIS_ const POINT * pt) SCONST PURE;
 };
 
+enum{
+	SHDI_WIDTH   = 0x0001,
+	SHDI_TEXT    = 0x0002,
+	SHDI_FORMAT  = 0x0004,
+	SHDI_LPARAM  = 0x0008,
+	SHDI_ORDER   = 0x0010,
+	SHDI_VISIBLE = 0x0020,
+	SHDI_WEIGHT  = 0x0040,
+	SHDI_ALL     = 0xffff,
+};
+
+
+/**
+ * @struct    _SHDITEM
+ * @brief     列表头项
+ *
+ * Describe   列表头项
+ */
+typedef struct SHDITEM
+{
+    UINT mask;
+    int cx;
+	UINT fmt;
+	UINT state;
+	int iOrder;
+	LPTSTR pszText;
+	int    cchMaxText;
+    LPARAM lParam;
+	BOOL bDpiAware;
+    BOOL bVisible;
+	float fWeight;
+} * LPSHDITEM;
+
+#undef INTERFACE
+#define INTERFACE IHeaderCtrl
+DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl,"60A8788F-C775-424f-AA82-DCA9CECE3D45")
+{
+    /**
+     * SHeaderCtrl::InsertItem
+     * @brief    插入新项
+     * @param    int iItem --  新项索引
+     * @param    LPCTSTR pszText  --  新项标题
+     * @param    int nWidth  -- 宽度
+	 * @param    BOOL bDpiAware -- dpi aware
+     * @param    UINT fmt -- format flag
+     * @param    LPARAM lParam -- 附加参数
+     * @return   返回int
+     *
+     * Describe  插入新项
+     */
+    STDMETHOD_(int,InsertItem)(THIS_ int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam,BOOL bDpiAware/*=FALSE*/,float fWeight/*=0.0f*/) PURE;
+
+	/**
+     * SHeaderCtrl::GetItem
+     * @brief    获得新项
+     * @param    int iItem  --  索引
+     * @param    SHDITEM *pItem  -- 返回列表项结构
+     * @return   返回BOOL
+     *
+     * Describe  获得新项
+     */
+    STDMETHOD_(BOOL,GetItem)(THIS_ int iItem, SHDITEM *pItem) SCONST PURE;
+
+    STDMETHOD_(BOOL,SetItem)(THIS_ int iItem, const SHDITEM *pItem) PURE;
+
+    /**
+     * SHeaderCtrl::GetItemCount
+     * @brief    获取列表项个数
+     * @return   返回int
+     *
+     * Describe  获取列表项个数
+     */
+    STDMETHOD_(UINT,GetItemCount)(THIS) SCONST PURE;
+    /**
+     * SHeaderCtrl::GetTotalWidth
+     * @brief    获得所有宽度
+     * @return   返回int
+     *
+     * Describe  获得所有宽度
+     */
+    STDMETHOD_(int,GetTotalWidth)(THIS_ BOOL bMinWid /*= FALSE*/) SCONST PURE;
+
+    STDMETHOD_(BOOL,IsAutoResize)(THIS) SCONST PURE;
+
+    /**
+     * SHeaderCtrl::GetItemWidth
+     * @brief    获得指定项宽度
+     * @param    int iItem  --  索引
+     * @return   返回int
+     *
+     * Describe  获得新项
+     */
+    STDMETHOD_(int,GetItemWidth)(THIS_ int iItem) SCONST PURE;
+
+    /**
+     * SHeaderCtrl::DeleteItem
+     * @brief    删除指定项
+     * @param    int iItem  --  索引
+     * @return   返回BOOL
+     *
+     * Describe  删除指定项
+     */
+    STDMETHOD_(BOOL,DeleteItem)(THIS_ int iItem) PURE;
+
+    /**
+     * SHeaderCtrl::DeleteAllItems
+     * @brief    删除所有项
+     *
+     * Describe  获得新项
+     */
+    STDMETHOD_(void,DeleteAllItems)(THIS) PURE;
+
+    STDMETHOD_(void,SetItemSort)(THIS_ int iItem, UINT sortFlag) PURE;
+
+    STDMETHOD_(void,SetItemVisible)(THIS_ int iItem, BOOL visible) PURE;
+
+    STDMETHOD_(BOOL,IsItemVisible)(THIS_ int iItem) SCONST PURE;
+};
+
 SNSEND
