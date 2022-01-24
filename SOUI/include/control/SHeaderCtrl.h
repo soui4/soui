@@ -12,28 +12,23 @@
  */
 #pragma once
 
-#include "core/SWnd.h"
+#include <core/SWnd.h>
+#include <interface/SCtrl-i.h>
+
 namespace SOUI
 {
-#define SHDI_WIDTH    0x0001
-#define SHDI_TEXT     0x0002
-#define SHDI_SORTFLAG 0x0004
-#define SHDI_LPARAM   0x0008
-#define SHDI_ORDER    0x0010
-#define SHDI_VISIBLE  0x0020
 
-/**
- * @enum      _SHDSORTFLAG
- * @brief     排序标志
- *
- * Describe   排序标志
- */
-enum SHDSORTFLAG
-{
-    ST_NULL = 0,
-    ST_UP,
-    ST_DOWN,
-};
+	enum{
+		SHDI_WIDTH   = 0x0001,
+		SHDI_TEXT    = 0x0002,
+		SHDI_FORMAT  = 0x0004,
+		SHDI_LPARAM  = 0x0008,
+		SHDI_ORDER   = 0x0010,
+		SHDI_VISIBLE = 0x0020,
+		SHDI_WEIGHT  = 0x0040,
+		SHDI_ALL     = 0xffff,
+	};
+
 
 /**
  * @struct    _SHDITEM
@@ -43,29 +38,21 @@ enum SHDSORTFLAG
  */
 typedef struct SHDITEM
 {
-    SHDITEM()
-        : mask(0)
-        , cx(0)
-        , bDpiAware(false)
-        , stFlag(ST_NULL)
-        , lParam(0)
-        , state(WndState_Normal)
-        , iOrder(0)
-        , bVisible(true)
-        , fWeight(0.0f)
-    {
-    }
     UINT mask;
     int cx;
-    float fWeight;
-    bool bDpiAware;
-    STrText strText;
-    SHDSORTFLAG stFlag;
+	UINT fmt;
+	UINT state;
+	int iOrder;
+	LPTSTR pszText;
+	int    cchMaxText;
     LPARAM lParam;
-    UINT state;
-    int iOrder;
-    bool bVisible;
+	BOOL bDpiAware;
+    BOOL bVisible;
+	float fWeight;
 } * LPSHDITEM;
+
+#define SORT_MASK (HDF_SORTDOWN|HDF_SORTUP)
+#define ALIGN_MASK (HDF_LEFT|HDF_RIGHT|HDF_CENTER)
 
 /**
  * @class     SHeaderCtrl
@@ -82,6 +69,10 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
         MARGIN_ADJUST_DISABLE = 2,
     };
 
+	typedef struct SHDITEMEX : public SHDITEM
+	{
+		STrText strText;
+	}* LPSHDITEMEX;
   public:
     /**
      * SHeaderCtrl::SHeaderCtrl
@@ -104,18 +95,20 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      * @param    int iItem --  新项索引
      * @param    LPCTSTR pszText  --  新项标题
      * @param    int nWidth  -- 宽度
-     * @param    SHDSORTFLAG stFlag -- 排序标志
+	 * @param    BOOL bDpiAware -- dpi aware
+     * @param    UINT fmt -- format flag
      * @param    LPARAM lParam -- 附加参数
      * @return   返回int
      *
      * Describe  插入新项
      */
-    int InsertItem(int iItem, LPCTSTR pszText, int nWidth, SHDSORTFLAG stFlag, LPARAM lParam);
+    int InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam);
     int InsertItem(int iItem,
                    LPCTSTR pszText,
                    int nWidth,
-                   SLayoutSize::Unit unit,
-                   SHDSORTFLAG stFlag,
+                   BOOL bDpiAware,
+				   UINT fmt,
+				   float fWeight,
                    LPARAM lParam);
     /**
      * SHeaderCtrl::GetItem
@@ -179,11 +172,11 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      */
     void DeleteAllItems();
 
-    void SetItemSort(int iItem, SHDSORTFLAG stFlag);
+    void SetItemSort(int iItem, UINT sortFlag);
 
-    void SetItemVisible(int iItem, bool visible);
+    void SetItemVisible(int iItem, BOOL visible);
 
-    bool IsItemVisible(int iItem) const;
+    BOOL IsItemVisible(int iItem) const;
 
     /**
      * SHeaderCtrl::GetItemRect
@@ -239,7 +232,7 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
      *
      * Describe  绘画
      */
-    virtual void DrawItem(IRenderTarget *pRT, CRect rcItem, const LPSHDITEM pItem);
+    virtual void DrawItem(IRenderTarget *pRT, CRect rcItem, const LPSHDITEMEX pItem);
 
     virtual void OnColorize(COLORREF cr);
 
@@ -366,7 +359,7 @@ class SOUI_EXP SHeaderCtrl : public SWindow {
     DWORD m_dwHitTest;          /**< 鼠标位置 */
     DWORD m_dwDragTo;           /**< 拖放目标 */
     int m_nAdjItemOldWidth;     /**< 保存被拖动项的原始宽度 */
-    SArray<SHDITEM> m_arrItems; /**< 列表项集合 */
+    SArray<SHDITEMEX> m_arrItems; /**< 列表项集合 */
     int m_nScale;               /**< Current Scale */
 };
 } // end of namespace SOUI

@@ -41,11 +41,11 @@ SListCtrl::~SListCtrl()
 {
 }
 
-int SListCtrl::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, LPARAM lParam)
+int SListCtrl::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth,UINT fmt, LPARAM lParam)
 {
     SASSERT(m_pHeader);
 
-    int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, ST_NULL, lParam);
+    int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, fmt, lParam);
     for (int i = 0; i < GetItemCount(); i++)
     {
         m_arrItems[i].arSubItems->SetCount(GetColumnCount());
@@ -448,8 +448,7 @@ CRect SListCtrl::GetItemRect(int nItem, int nSubItem)
 
     for (int nCol = 0; nCol < GetColumnCount(); nCol++)
     {
-        SHDITEM hdi;
-        hdi.mask = SHDI_WIDTH | SHDI_ORDER;
+		SHDITEM hdi = {SHDI_WIDTH | SHDI_ORDER,0};
 
         m_pHeader->GetItem(nCol, &hdi);
         rcItem.left = rcItem.right;
@@ -644,8 +643,7 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
     {
         CRect rcVisiblePart;
 
-        SHDITEM hdi;
-        hdi.mask = SHDI_WIDTH | SHDI_ORDER;
+		SHDITEM hdi={SHDI_WIDTH | SHDI_ORDER,0};
         m_pHeader->GetItem(nCol, &hdi);
         rcCol.left = rcCol.right;
         rcCol.right = rcCol.left + hdi.cx;

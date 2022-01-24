@@ -140,9 +140,9 @@ interface IMcAdapter : public ILvAdapter
 
     //排序接口
     // int iCol:排序列
-    // SHDSORTFLAG * stFlags [in, out]:当前列排序标志
+    // UINT *pFmts [in, out]:当前列排序标志
     // int nCols:总列数,stFlags数组长度
-    virtual bool OnSort(int iCol, SHDSORTFLAG *stFlags, int nCols) PURE;
+    virtual bool OnSort(int iCol, UINT *pFmts, int nCols) PURE;
 };
 
 typedef ULONG_PTR HTREEITEM;

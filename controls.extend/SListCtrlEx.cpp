@@ -921,10 +921,10 @@ lblEnd:
 		return rcList;
 	}
 
-	int SListCtrlEx::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, LPARAM lParam/*=0*/)
+	int SListCtrlEx::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth,UINT fmt, LPARAM lParam/*=0*/)
 	{
 		SASSERT(m_pHeader);
-		int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, ST_NULL, lParam);
+		int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, fmt, lParam);
 		UpdateScrollBar();
 		return nRet;
 	}

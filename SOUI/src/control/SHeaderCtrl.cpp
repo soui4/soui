@@ -30,31 +30,33 @@ SHeaderCtrl::~SHeaderCtrl(void)
 int SHeaderCtrl::InsertItem(int iItem,
                             LPCTSTR pszText,
                             int nWidth,
-                            SHDSORTFLAG stFlag,
+                            UINT fmt,
                             LPARAM lParam)
 {
-    return InsertItem(iItem, pszText, nWidth, SLayoutSize::px, stFlag, lParam);
+    return InsertItem(iItem, pszText, nWidth, FALSE, fmt,0.0f, lParam);
 }
 
 int SHeaderCtrl::InsertItem(int iItem,
                             LPCTSTR pszText,
                             int nWidth,
-                            SLayoutSize::Unit unit,
-                            SHDSORTFLAG stFlag,
+                            BOOL bDpiAware,
+                            UINT fmt,
+							float fWeight,
                             LPARAM lParam)
 {
     SASSERT(pszText);
     SASSERT(nWidth >= 0);
     if (iItem == -1)
         iItem = (int)m_arrItems.GetCount();
-    SHDITEM item;
-    item.mask = 0xFFFFFFFF;
-    SLayoutSize szWid((float)nWidth, unit);
+	SHDITEMEX item;
+	item.mask = SHDI_ALL;
+	item.fmt = fmt;
+	item.fWeight = fWeight;
+	SLayoutSize szWid((float)nWidth, bDpiAware?SLayoutSize::dp:SLayoutSize::px);
     item.cx = szWid.toPixelSize(GetScale());
-    item.bDpiAware = (unit != SLayoutSize::px);
+    item.bDpiAware = bDpiAware;
     item.strText.SetCtxProvider(this);
     item.strText.SetText(pszText);
-    item.stFlag = stFlag;
     item.state = 0;
     item.iOrder = iItem;
     item.lParam = lParam;
@@ -78,9 +80,9 @@ BOOL SHeaderCtrl::GetItem(int iItem, SHDITEM *pItem) const
 {
     if ((UINT)iItem >= m_arrItems.GetCount())
         return FALSE;
-    if (pItem->mask & SHDI_TEXT)
+    if (pItem->mask & SHDI_TEXT && pItem->pszText && pItem->cchMaxText)
     {
-        pItem->strText.SetText(m_arrItems[iItem].strText.GetText(FALSE));
+		_tcscpy_s(pItem->pszText,pItem->cchMaxText,m_arrItems[iItem].strText.GetText(FALSE).c_str());
     }
     if (pItem->mask & SHDI_WIDTH)
     {
@@ -88,10 +90,14 @@ BOOL SHeaderCtrl::GetItem(int iItem, SHDITEM *pItem) const
     }
     if (pItem->mask & SHDI_LPARAM)
         pItem->lParam = m_arrItems[iItem].lParam;
-    if (pItem->mask & SHDI_SORTFLAG)
-        pItem->stFlag = m_arrItems[iItem].stFlag;
+    if (pItem->mask & SHDI_FORMAT)
+        pItem->fmt = m_arrItems[iItem].fmt;
     if (pItem->mask & SHDI_ORDER)
         pItem->iOrder = m_arrItems[iItem].iOrder;
+	if(pItem->mask & SHDI_VISIBLE)
+		pItem->bVisible = m_arrItems[iItem].bVisible;
+	if(pItem->mask & SHDI_WEIGHT)
+		pItem->fWeight = m_arrItems[iItem].fWeight;
     return TRUE;
 }
 
@@ -100,11 +106,11 @@ BOOL SHeaderCtrl::SetItem(int iItem, const SHDITEM *pItem)
     if ((UINT)iItem >= m_arrItems.GetCount())
         return FALSE;
 
-    SHDITEM &item = m_arrItems[iItem];
+    SHDITEMEX &item = m_arrItems[iItem];
 
-    if (pItem->mask & SHDI_TEXT)
+    if (pItem->mask & SHDI_TEXT && pItem->pszText)
     {
-        item.strText.SetText(pItem->strText.GetText(FALSE));
+        item.strText.SetText(pItem->pszText);
     }
     if (pItem->mask & SHDI_WIDTH)
         item.cx = pItem->cx;
@@ -140,27 +146,34 @@ void SHeaderCtrl::OnPaint(IRenderTarget *pRT)
     AfterPaint(pRT, painter);
 }
 
-void SHeaderCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, const LPSHDITEM pItem)
+void SHeaderCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, const LPSHDITEMEX pItem)
 {
     if (!pItem->bVisible)
         return;
     if (m_pSkinItem)
         m_pSkinItem->DrawByIndex(pRT, rcItem, pItem->state);
-    pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(), rcItem,
-                  m_style.GetTextAlign());
-    if (pItem->stFlag == ST_NULL || !m_pSkinSort)
-        return;
-    CSize szSort = m_pSkinSort->GetSkinSize();
+	UINT align = DT_SINGLELINE|DT_VCENTER;
+	if(pItem->fmt & HDF_CENTER)
+		align |= DT_CENTER;
+	else if(pItem->fmt & HDF_RIGHT)
+		align |= DT_RIGHT;
+
+	BOOL bDrawSortFlag = (pItem->fmt & SORT_MASK) !=0 && m_pSkinSort;
+	if(!bDrawSortFlag)
+	{
+		pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(), rcItem,align);
+		return;
+	}
+
+	CSize szSort = m_pSkinSort->GetSkinSize();
+	rcItem.right -= szSort.cx;
+
+    pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(), rcItem,align);
     CPoint ptSort;
+	ptSort.x = rcItem.right;
     ptSort.y = rcItem.top + (rcItem.Height() - szSort.cy) / 2;
 
-    if (m_style.GetTextAlign() & DT_RIGHT)
-        ptSort.x = rcItem.left + 2;
-    else
-        ptSort.x = rcItem.right - szSort.cx - 2;
-
-    if (m_pSkinSort)
-        m_pSkinSort->DrawByIndex(pRT, CRect(ptSort, szSort), pItem->stFlag == ST_UP ? 0 : 1);
+    m_pSkinSort->DrawByIndex(pRT, CRect(ptSort, szSort), (pItem->fmt&HDF_SORTUP) ? 0 : 1);
 }
 
 BOOL SHeaderCtrl::DeleteItem(int iItem)
@@ -270,7 +283,7 @@ void SHeaderCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
 
                 if (m_dwDragTo != m_dwHitTest && IsItemHover(m_dwDragTo))
                 {
-                    SHDITEM t = m_arrItems[LOWORD(m_dwHitTest)];
+                    SHDITEMEX t = m_arrItems[LOWORD(m_dwHitTest)];
                     m_arrItems.RemoveAt(LOWORD(m_dwHitTest));
                     int nPos = LOWORD(m_dwDragTo);
                     if (nPos > LOWORD(m_dwHitTest))
@@ -465,7 +478,7 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
     int iOrder = 0;
     while (xmlItem)
     {
-        SHDITEM item;
+		SHDITEMEX item;
         item.strText.SetCtxProvider(this);
         item.mask = 0xFFFFFFFF;
         item.iOrder = iOrder++;
@@ -477,10 +490,26 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
         item.fWeight = xmlItem.attribute(L"weight").as_float();
         item.bDpiAware = (szItem.unit != SLayoutSize::px);
         item.lParam = xmlItem.attribute(L"userData").as_uint(0);
-        item.stFlag = (SHDSORTFLAG)xmlItem.attribute(L"sortFlag").as_uint(ST_NULL);
         item.bVisible = xmlItem.attribute(L"visible").as_bool(true);
-        m_arrItems.InsertAt(m_arrItems.GetCount(), item);
-        xmlItem = xmlItem.next_sibling(L"item");
+		item.fmt = 0;
+		SStringW strSort = xmlItem.attribute(L"sortFlag").as_string();
+		strSort.MakeLower();
+		if(strSort==L"down")
+			item.fmt |= HDF_SORTDOWN;
+		else if(strSort == L"up")
+			item.fmt |= HDF_SORTUP;
+		SStringW strAlign = xmlItem.attribute(L"align").as_string();
+		strAlign.MakeLower();
+		if(strAlign == L"left")
+			item.fmt |= HDF_LEFT;
+		else if(strAlign == L"center")
+			item.fmt |= HDF_CENTER;
+		else if(strAlign == L"right")
+			item.fmt |= HDF_RIGHT;
+
+		m_arrItems.InsertAt(m_arrItems.GetCount(), item);
+
+		xmlItem = xmlItem.next_sibling(L"item");
     }
 
     return TRUE;
@@ -676,12 +705,14 @@ void SHeaderCtrl::OnActivateApp(BOOL bActive, DWORD dwThreadID)
     }
 }
 
-void SHeaderCtrl::SetItemSort(int iItem, SHDSORTFLAG stFlag)
+void SHeaderCtrl::SetItemSort(int iItem, UINT sortFlag)
 {
     SASSERT(iItem >= 0 && iItem < (int)m_arrItems.GetCount());
-    if (stFlag != m_arrItems[iItem].stFlag)
+
+    if ((sortFlag & SORT_MASK) != (m_arrItems[iItem].fmt & SORT_MASK))
     {
-        m_arrItems[iItem].stFlag = stFlag;
+		m_arrItems[iItem].fmt &= ~SORT_MASK;
+        m_arrItems[iItem].fmt |= sortFlag & SORT_MASK;
         CRect rcItem = GetItemRect(iItem);
         InvalidateRect(rcItem);
     }
@@ -732,7 +763,7 @@ BOOL SHeaderCtrl::OnRelayout(const CRect &rcWnd)
     return bRet;
 }
 
-void SHeaderCtrl::SetItemVisible(int iItem, bool visible)
+void SHeaderCtrl::SetItemVisible(int iItem, BOOL visible)
 {
     SASSERT(iItem >= 0 && iItem < (int)m_arrItems.GetCount());
     m_arrItems[iItem].bVisible = visible;
@@ -745,7 +776,7 @@ void SHeaderCtrl::SetItemVisible(int iItem, bool visible)
     FireEvent(evt);
 }
 
-bool SHeaderCtrl::IsItemVisible(int iItem) const
+BOOL SHeaderCtrl::IsItemVisible(int iItem) const
 {
     SASSERT(iItem >= 0 && iItem < (int)m_arrItems.GetCount());
     return m_arrItems[iItem].bVisible;

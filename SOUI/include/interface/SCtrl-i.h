@@ -5,6 +5,8 @@
 #include <interface/SWindow-i.h>
 #include <interface/SSkinobj-i.h>
 #include <interface/SRender-i.h>
+#include <interface/SAdapter-i.h>
+#include <interface/SListViewItemLocator-i.h>
 
 SNSBEGIN
 
@@ -167,6 +169,28 @@ DECLARE_INTERFACE_IID_(IScrollView, IPanel,"49B024D6-221D-42d4-902B-AFAAC5AFFE41
 	STDMETHOD_(POINT,GetViewOrigin)(THIS) SCONST PURE;
 
 	STDMETHOD_(void,SetViewOrigin)(THIS_ POINT pt) PURE;
+};
+
+
+#undef INTERFACE
+#define INTERFACE IListView
+DECLARE_INTERFACE_IID_(IListView, IPanel,"E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
+{
+	STDMETHOD_(BOOL,SetAdapter)(THIS_ ILvAdapter *adapter) PURE;
+
+	STDMETHOD_(ILvAdapter *,GetAdapter)(THIS) PURE;
+
+	STDMETHOD_(IListViewItemLocator *,GetItemLocator)(THIS) PURE;
+
+	STDMETHOD_(void,SetItemLocator)(THIS_ IListViewItemLocator *pItemLocator) PURE;
+	
+	STDMETHOD_(void,EnsureVisible)(THIS_ int iItem) PURE;
+
+	STDMETHOD_(void,SetSel)(THIS_ int iItem, BOOL bNotify /*= FALSE*/) PURE;
+	
+	STDMETHOD_(int,GetSel)(THIS) SCONST PURE;
+
+	STDMETHOD_(IWindow*,HitTest)(THIS_ const POINT * pt) SCONST PURE;
 };
 
 SNSEND

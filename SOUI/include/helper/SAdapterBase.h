@@ -194,10 +194,10 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter>> {
     {
     }
 
-    virtual bool OnSort(int iCol, SHDSORTFLAG *stFlags, int nCols)
+    virtual bool OnSort(int iCol, UINT *pFmts, int nCols)
     {
         (iCol);
-        (stFlags);
+        (pFmts);
         (nCols);
         return false;
     }

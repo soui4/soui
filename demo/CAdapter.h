@@ -358,28 +358,28 @@ public:
 	struct SORTCTX
 	{
 		int iCol;
-		SHDSORTFLAG stFlag;
+		UINT fmt;
 	};
 
-	bool OnSort(int iCol, SHDSORTFLAG * stFlags, int nCols)
+	bool OnSort(int iCol, UINT* pFmts, int nCols)
 	{
 		if (iCol == 5) //最后一列“操作”不支持排序
 			return false;
 
-		SHDSORTFLAG stFlag = stFlags[iCol];
-		switch (stFlag)
+		UINT fmt = pFmts[iCol];
+		switch (fmt&SORT_MASK)
 		{
-		case ST_NULL:stFlag = ST_UP; break;
-		case ST_DOWN:stFlag = ST_UP; break;
-		case ST_UP:stFlag = ST_DOWN; break;
+		case 0:fmt = HDF_SORTUP; break;
+		case HDF_SORTDOWN:fmt = HDF_SORTUP; break;
+		case HDF_SORTUP:fmt = HDF_SORTDOWN; break;
 		}
 		for (int i = 0; i < nCols; i++)
 		{
-			stFlags[i] = ST_NULL;
+			pFmts[i] &= ~SORT_MASK;
 		}
-		stFlags[iCol] = stFlag;
+		pFmts[iCol] |= fmt;
 
-		SORTCTX ctx = { iCol,stFlag };
+		SORTCTX ctx = { iCol,fmt };
 		qsort_s(m_softInfo.GetData(), m_softInfo.GetCount(), sizeof(SOFTINFO), SortCmp, &ctx);
 		return true;
 	}
@@ -414,7 +414,7 @@ public:
 			break;
 
 		}
-		if (pctx->stFlag == ST_UP)
+		if (pctx->fmt & HDF_SORTUP)
 			nRet = -nRet;
 		return nRet;
 	}

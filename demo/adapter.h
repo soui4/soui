@@ -201,7 +201,7 @@ public:
 		}
 	}
 
-	virtual bool OnSort(int iCol, SHDSORTFLAG * stFlags, int nCols)
+	virtual bool OnSort(int iCol, UINT * pFmt, int nCols)
 	{
 		return false;
 	}

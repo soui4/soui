@@ -8,7 +8,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif
 #ifndef _WIN32_WINNT
-#define _WIN32_WINNT 0x0500
+#define _WIN32_WINNT 0x0501
 #endif
 #define OUTLOG_LEVEL	2	//large than 1 to disable OutputDebugString from soui system log when not use log4z module.
 #include <winsock2.h>

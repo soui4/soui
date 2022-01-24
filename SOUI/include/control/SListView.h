@@ -7,7 +7,7 @@ namespace SOUI
 {
 
 class SOUI_EXP SListView
-    : public SPanel
+    : public TPanelProxy<IListView>
     , protected IItemContainer {
     SOUI_CLASS_NAME(SPanel, L"listview")
 
@@ -17,28 +17,23 @@ class SOUI_EXP SListView
     SListView();
     ~SListView();
 
-    BOOL SetAdapter(ILvAdapter *adapter);
+	STDMETHOD_(BOOL,SetAdapter)(THIS_ ILvAdapter *adapter) OVERRIDE;
 
-    ILvAdapter *GetAdapter()
-    {
-        return m_adapter;
-    }
+	STDMETHOD_(ILvAdapter *,GetAdapter)(THIS) OVERRIDE;
 
-    IListViewItemLocator *GetItemLocator()
-    {
-        return m_lvItemLocator;
-    }
+	STDMETHOD_(IListViewItemLocator *,GetItemLocator)(THIS) OVERRIDE;
 
-    void SetItemLocator(IListViewItemLocator *pItemLocator);
-    void EnsureVisible(int iItem);
+	STDMETHOD_(void,SetItemLocator)(THIS_ IListViewItemLocator *pItemLocator) OVERRIDE;
 
-    void SetSel(int iItem, BOOL bNotify = FALSE);
-    int GetSel() const
-    {
-        return m_iSelItem;
-    }
+	STDMETHOD_(void,EnsureVisible)(THIS_ int iItem) OVERRIDE;
 
-    SItemPanel *HitTest(CPoint &pt);
+	STDMETHOD_(void,SetSel)(THIS_ int iItem, BOOL bNotify = FALSE) OVERRIDE;
+
+	STDMETHOD_(int,GetSel)(THIS) SCONST OVERRIDE;
+
+	STDMETHOD_(IWindow*,HitTest)(THIS_ const POINT * pt) SCONST OVERRIDE;
+
+    SItemPanel *HitTest(CPoint &pt) const;
 
   protected:
     virtual void OnItemSetCapture(SItemPanel *pItem, BOOL bCapture);

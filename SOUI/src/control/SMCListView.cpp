@@ -131,11 +131,11 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
     return TRUE;
 }
 
-int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, LPARAM lParam)
+int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth,UINT fmt, LPARAM lParam)
 {
     SASSERT(m_pHeader);
 
-    int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, ST_NULL, lParam);
+    int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, fmt, lParam);
     UpdateScrollBar();
     return nRet;
 }
@@ -347,30 +347,29 @@ BOOL SMCListView::OnHeaderClick(IEvtArgs *pEvt)
 {
     EventHeaderClick *pEvt2 = sobj_cast<EventHeaderClick>(pEvt);
     SASSERT(pEvt2);
-    SHDITEM hi;
-    hi.mask = SHDI_ORDER | SHDI_SORTFLAG;
-    SHDSORTFLAG *pstFlags = new SHDSORTFLAG[m_pHeader->GetItemCount()];
+	SHDITEM hi={SHDI_ORDER | SHDI_FORMAT,0};
+    UINT *pFmts = new UINT[m_pHeader->GetItemCount()];
     int *pOrders = new int[m_pHeader->GetItemCount()];
     int iCol = -1;
     for (int i = 0; i < m_pHeader->GetItemCount(); i++)
     {
         m_pHeader->GetItem(i, &hi);
-        pstFlags[hi.iOrder] = hi.stFlag;
+        pFmts[hi.iOrder] = hi.fmt;
         pOrders[hi.iOrder] = i;
         if (i == pEvt2->iItem)
             iCol = hi.iOrder;
     }
-    if (m_adapter && m_adapter->OnSort(iCol, pstFlags, m_pHeader->GetItemCount()))
+    if (m_adapter && m_adapter->OnSort(iCol, pFmts, m_pHeader->GetItemCount()))
     {
         //更新表头的排序状态
         for (int i = 0; i < m_pHeader->GetItemCount(); i++)
         {
-            m_pHeader->SetItemSort(pOrders[i], pstFlags[i]);
+            m_pHeader->SetItemSort(pOrders[i], pFmts[i]);
         }
         onDataSetChanged();
     }
     delete[] pOrders;
-    delete[] pstFlags;
+    delete[] pFmts;
     return TRUE;
 }
 
@@ -389,8 +388,7 @@ BOOL SMCListView::OnHeaderSizeChanging(IEvtArgs *pEvt)
         rcSubItem.right = rcSubItem.left = 0;
         for (int i = 0; i < m_pHeader->GetItemCount(); i++)
         {
-            SHDITEM hi;
-            hi.mask = SHDI_ORDER;
+			SHDITEM hi={SHDI_ORDER,0};
             m_pHeader->GetItem(i, &hi);
             rcSubItem.left = rcSubItem.right;
             rcSubItem.right += m_pHeader->GetItemWidth(i);
@@ -687,8 +685,7 @@ void SMCListView::UpdateVisibleItems()
             rcSubItem.right = rcSubItem.left;
             for (int i = 0; i < m_pHeader->GetItemCount(); i++)
             {
-                SHDITEM hditem;
-                hditem.mask = SHDI_ORDER | SHDI_WIDTH;
+				SHDITEM hditem={SHDI_ORDER | SHDI_WIDTH,0};
                 m_pHeader->GetItem(i, &hditem);
                 SStringW strColName = m_adapter->GetColumnName(hditem.iOrder);
                 SWindow *pColWnd = ii.pItem->FindChildByName(strColName);

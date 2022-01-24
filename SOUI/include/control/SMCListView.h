@@ -52,7 +52,7 @@ class SOUI_EXP SMCListView
      *
      * Describe  插入一列
      */
-    int InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, LPARAM lParam = 0);
+    int InsertColumn(int nIndex, LPCTSTR pszText, int nWidth,UINT fmt, LPARAM lParam = 0);
 
     void DeleteColumn(int iCol);
 
