@@ -79,7 +79,7 @@ class SOUI_EXP STreeViewItemLocator : public TObjRefImpl<ITreeViewItemLocator> {
 };
 
 class SOUI_EXP STreeView
-    : public SPanel
+    : public TPanelProxy<ITreeView>
     , protected IItemContainer {
     SOUI_CLASS_NAME(SPanel, L"treeview")
     friend class STreeViewDataSetObserver;
@@ -88,29 +88,25 @@ class SOUI_EXP STreeView
     STreeView();
     ~STreeView();
 
-    BOOL SetAdapter(ITvAdapter *adapter);
-    ITvAdapter *GetAdapter()
-    {
-        return m_adapter;
-    }
-    void SetItemLocator(ITreeViewItemLocator *pItemLocator)
-    {
-        m_tvItemLocator = pItemLocator;
-    }
+public:
+	STDMETHOD_(BOOL,SetAdapter)(THIS_ ITvAdapter *adapter) OVERRIDE;
 
-    ITreeViewItemLocator *GetItemLocator() const
-    {
-        return m_tvItemLocator;
-    }
+	STDMETHOD_(ITvAdapter *,GetAdapter)(THIS) SCONST OVERRIDE;
 
-    void SetSel(HTREEITEM hItem, BOOL bNotify = FALSE);
-    HTREEITEM GetSel() const
-    {
-        return m_hSelected;
-    }
-    SItemPanel *HitTest(CPoint &pt);
+	STDMETHOD_(void,SetItemLocator)(THIS_ ITreeViewItemLocator *pItemLocator) OVERRIDE;
 
-    void EnsureVisible(HTREEITEM hItem);
+	STDMETHOD_(ITreeViewItemLocator *,GetItemLocator)(THIS) SCONST OVERRIDE;
+
+	STDMETHOD_(void,SetSel)(THIS_ HTREEITEM hItem, BOOL bNotify = FALSE) OVERRIDE;
+
+	STDMETHOD_(HTREEITEM,GetSel)(THIS) SCONST OVERRIDE;
+
+	STDMETHOD_(void,EnsureVisible)(THIS_ HTREEITEM hItem) OVERRIDE;
+
+	STDMETHOD_(IItemPanel *,HitTest)(THIS_ const POINT * pt) SCONST OVERRIDE;
+
+  public:
+	SItemPanel *HitTest(CPoint &pt) const;
 
   protected:
     BOOL OnItemClick(IEvtArgs *pEvt);

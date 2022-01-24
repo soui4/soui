@@ -1225,7 +1225,14 @@ SItemPanel *STreeView::GetItemPanel(HTREEITEM hItem)
     return pNode->m_value.pItem;
 }
 
-SItemPanel *STreeView::HitTest(CPoint &pt)
+IItemPanel *STreeView::HitTest(const POINT *pt) const
+{
+	SASSERT(pt);
+	if(!pt) return NULL;
+	return HitTest(CPoint(*pt));
+}
+
+SItemPanel *STreeView::HitTest(CPoint &pt) const
 {
     SPOSITION pos = m_visible_items.GetHeadPosition();
     while (pos)
@@ -1355,6 +1362,26 @@ void STreeView::OnRebuildFont()
 {
     __baseCls::OnRebuildFont();
     DispatchMessage2Items(UM_UPDATEFONT, 0, 0);
+}
+
+ITvAdapter * STreeView::GetAdapter() const
+{
+	return m_adapter;
+}
+
+void STreeView::SetItemLocator(ITreeViewItemLocator *pItemLocator)
+{
+	m_tvItemLocator = pItemLocator;
+}
+
+ITreeViewItemLocator * STreeView::GetItemLocator() const
+{
+	return m_tvItemLocator;
+}
+
+HTREEITEM STreeView::GetSel() const
+{
+	return m_hSelected;
 }
 
 } // namespace SOUI

@@ -7,6 +7,7 @@
 #include <interface/SRender-i.h>
 #include <interface/SAdapter-i.h>
 #include <interface/SListViewItemLocator-i.h>
+#include "interface/STreeViewItemLocator-i.h"
 
 SNSBEGIN
 
@@ -357,6 +358,28 @@ DECLARE_INTERFACE_IID_(IMcListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE
 	STDMETHOD_(void,DeleteColumn)(THIS_ int iCol) PURE;
 
 	STDMETHOD_(int,GetColumnCount)(THIS) SCONST PURE;
+
+};
+
+#undef INTERFACE
+#define INTERFACE ITreeView
+DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B")
+{
+	STDMETHOD_(BOOL,SetAdapter)(THIS_ ITvAdapter *adapter) PURE;
+
+	STDMETHOD_(ITvAdapter *,GetAdapter)(THIS) SCONST PURE;
+
+	STDMETHOD_(void,SetItemLocator)(THIS_ ITreeViewItemLocator *pItemLocator) PURE;
+
+	STDMETHOD_(ITreeViewItemLocator *,GetItemLocator)(THIS) SCONST PURE;
+
+	STDMETHOD_(void,SetSel)(THIS_ HTREEITEM hItem, BOOL bNotify /*= FALSE*/) PURE;
+	
+	STDMETHOD_(HTREEITEM,GetSel)(THIS) SCONST PURE;
+
+	STDMETHOD_(void,EnsureVisible)(THIS_ HTREEITEM hItem) PURE;
+
+	STDMETHOD_(IItemPanel *,HitTest)(THIS_ const POINT * pt) SCONST PURE;
 
 };
 
