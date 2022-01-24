@@ -24,7 +24,7 @@ struct IItemContainer
 
 class SOUI_EXP SItemPanel
     : public SwndContainerImpl
-    , public SWindow {
+    , public TWindowProxy<IItemPanel> {
     SOUI_CLASS_NAME(SWindow, L"itemPanel")
   public:
     static SItemPanel *Create(SWindow *pFrameHost,
@@ -47,6 +47,14 @@ class SOUI_EXP SItemPanel
     {
     }
 
+public:
+	STDMETHOD_(LPARAM,GetItemIndex)(THIS) SCONST OVERRIDE;
+	STDMETHOD_(void,SetSkin)(THIS_ ISkinObj *pSkin) OVERRIDE;
+	STDMETHOD_(void,SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) OVERRIDE;
+	STDMETHOD_(void,SetItemData)(THIS_ LPARAM dwData) OVERRIDE;
+	STDMETHOD_(LPARAM,GetItemData)(THIS) SCONST OVERRIDE;
+
+public:
     STDMETHOD_(void, OnFinalRelease)(THIS);
 
   public: // SwndContainerImpl
@@ -84,6 +92,8 @@ class SOUI_EXP SItemPanel
     STDMETHOD_(void, OnUpdateCursor)();
 
   public: // SWindow
+	STDMETHOD_(COLORREF,GetBkgndColor)(THIS) SCONST OVERRIDE;
+
     virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
     virtual void ModifyItemState(DWORD dwStateAdd, DWORD dwStateRemove);
 
@@ -91,29 +101,16 @@ class SOUI_EXP SItemPanel
 
     virtual void Draw(IRenderTarget *pRT, const CRect &rc);
 
-    virtual void SetSkin(ISkinObj *pSkin);
-    virtual void SetColor(COLORREF crBk, COLORREF crSelBk);
     virtual void BeforePaint(IRenderTarget *pRT, SPainter &painter);
 
     virtual BOOL NeedRedrawWhenStateChange();
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
     virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable);
-    virtual COLORREF GetBkgndColor() const;
 
     CRect GetItemRect() const;
     void SetItemCapture(BOOL bCapture);
-    void SetItemData(LPARAM dwData);
-    LPARAM GetItemData();
-
-    LPARAM GetItemIndex() const
-    {
-        return m_lpItemIndex;
-    }
-    void SetItemIndex(LPARAM lp)
-    {
-        m_lpItemIndex = lp;
-    }
-
+	void SetItemIndex(LPARAM lp);
+  protected:
     void OnShowWindow(BOOL bShow, UINT nStatus);
     void OnDestroy();
     SOUI_MSG_MAP_BEGIN()

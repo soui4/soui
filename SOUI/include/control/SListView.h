@@ -31,7 +31,7 @@ class SOUI_EXP SListView
 
 	STDMETHOD_(int,GetSel)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(IWindow*,HitTest)(THIS_ const POINT * pt) SCONST OVERRIDE;
+	STDMETHOD_(IItemPanel*,HitTest)(THIS_ const POINT * pt) SCONST OVERRIDE;
 
     SItemPanel *HitTest(CPoint &pt) const;
 

@@ -298,7 +298,7 @@ void SItemPanel::SetItemData(LPARAM dwData)
     m_dwData = dwData;
 }
 
-LPARAM SItemPanel::GetItemData()
+LPARAM SItemPanel::GetItemData() const
 {
     return m_dwData;
 }
@@ -429,6 +429,16 @@ BOOL SItemPanel::IsItemInClip(const SMatrix &mtx,
     CRect rc;
     rc.IntersectRect(rcClip, rcItem);
     return !rc.IsRectEmpty() && (!clipRgn || clipRgn->RectInRegion(rcItem));
+}
+
+LPARAM SItemPanel::GetItemIndex() const
+{
+	return m_lpItemIndex;
+}
+
+void SItemPanel::SetItemIndex(LPARAM lp)
+{
+	m_lpItemIndex = lp;
 }
 
 SNSEND

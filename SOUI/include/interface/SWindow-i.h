@@ -200,6 +200,8 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) PURE;
 
+	STDMETHOD_(COLORREF,GetBkgndColor)(THIS) SCONST PURE;
+
     /**
      * Move2
      * @brief    将窗口移动到指定位置

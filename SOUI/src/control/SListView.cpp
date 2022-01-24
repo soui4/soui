@@ -1109,7 +1109,7 @@ int SListView::GetSel() const
 	return m_iSelItem;
 }
 
-IWindow* SListView::HitTest(const POINT * pt) const
+IItemPanel* SListView::HitTest(const POINT * pt) const
 {
 	SASSERT(pt);
 	CPoint pt2(*pt);

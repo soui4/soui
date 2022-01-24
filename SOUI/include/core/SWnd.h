@@ -559,6 +559,8 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BOOL, GetAttribute)(const IStringW *strAttr, IStringW *strValue) SCONST OVERRIDE;
 
+	STDMETHOD_(COLORREF,GetBkgndColor)(THIS) SCONST OVERRIDE;
+
     /**
      * GetISelectedSiblingInGroup
      * @brief    获得在一个group中选中状态的窗口
@@ -1183,8 +1185,6 @@ class SOUI_EXP SWindow
                                IRegion *pRgn,
                                UINT iZorderBegin,
                                UINT iZorderEnd);
-
-    virtual COLORREF GetBkgndColor() const;
 
   protected: // helper functions
     SWindow *_FindChildByID(int nID, int nDeep);
