@@ -108,7 +108,7 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
     m_adapter = adapter;
     if (m_tvItemLocator)
     {
-        m_tvItemLocator->SetTileViewWidth(GetClientRect().Width());
+        m_tvItemLocator->SetTileViewWidth(GetClientRect().Width(), FALSE);
         m_tvItemLocator->SetAdapter(adapter);
     }
     if (m_adapter)
@@ -416,8 +416,8 @@ void STileView::OnSize(UINT nType, CSize size)
     __baseCls::OnSize(nType, size);
 
     CRect rcClient = SWindow::GetClientRect();
-    m_tvItemLocator->SetTileViewWidth(rcClient.Width()); //重设TileView宽度
-    UpdateScrollBar();                                   //重设滚动条
+    m_tvItemLocator->SetTileViewWidth(rcClient.Width(), FALSE); //重设TileView宽度
+    UpdateScrollBar();                                          //重设滚动条
 
     UpdateVisibleItems();
 }
@@ -505,7 +505,7 @@ void STileView::RedrawItem(SItemPanel *pItem)
     pItem->InvalidateRect(NULL);
 }
 
-SItemPanel *STileView::HitTest(CPoint &pt)
+SItemPanel *STileView::HitTest(CPoint &pt) const
 {
     SPOSITION pos = m_lstItems.GetHeadPosition();
     while (pos)
@@ -519,6 +519,14 @@ SItemPanel *STileView::HitTest(CPoint &pt)
         }
     }
     return NULL;
+}
+
+IItemPanel *STileView::HitTest(const POINT *pt) const
+{
+    SASSERT(pt);
+    if (!pt)
+        return NULL;
+    return HitTest(CPoint(*pt));
 }
 
 LRESULT STileView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -770,7 +778,7 @@ BOOL STileView::CreateChildren(SXmlNode xmlNode)
     return TRUE;
 }
 
-void STileView::SetItemLocator(STileViewItemLocator *pItemLocator)
+void STileView::SetItemLocator(ITileViewItemLocator *pItemLocator)
 {
     m_tvItemLocator = pItemLocator;
     if (m_tvItemLocator)
@@ -1008,6 +1016,21 @@ void STileView::OnRebuildFont()
 {
     __baseCls::OnRebuildFont();
     DispatchMessage2Items(UM_UPDATEFONT, 0, 0);
+}
+
+ILvAdapter *STileView::GetAdapter() const
+{
+    return m_adapter;
+}
+
+ITileViewItemLocator *STileView::GetItemLocator() const
+{
+    return m_tvItemLocator;
+}
+
+int STileView::GetSel() const
+{
+    return m_iSelItem;
 }
 
 } // namespace SOUI

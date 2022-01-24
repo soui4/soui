@@ -1218,6 +1218,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\interface\STileViewItemLocator-i.h"
+				>
+			</File>
+			<File
 				RelativePath="include\helper\STileViewItemLocator.h"
 				>
 			</File>

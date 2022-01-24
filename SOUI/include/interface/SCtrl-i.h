@@ -7,7 +7,8 @@
 #include <interface/SRender-i.h>
 #include <interface/SAdapter-i.h>
 #include <interface/SListViewItemLocator-i.h>
-#include "interface/STreeViewItemLocator-i.h"
+#include <interface/STreeViewItemLocator-i.h>
+#include <interface/STileViewItemLocator-i.h>
 
 SNSBEGIN
 
@@ -187,7 +188,6 @@ DECLARE_INTERFACE_IID_(IScrollView, IPanel, "49B024D6-221D-42d4-902B-AFAAC5AFFE4
     STDMETHOD_(void, SetViewOrigin)(THIS_ POINT pt) PURE;
 };
 
-
 enum
 {
     SHDI_WIDTH = 0x0001,
@@ -309,78 +309,98 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
     STDMETHOD_(BOOL, IsItemVisible)(THIS_ int iItem) SCONST PURE;
 };
 
-
 #undef INTERFACE
 #define INTERFACE IListView
 DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
 {
-	STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter * adapter) PURE;
+    STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter * adapter) PURE;
 
-	STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) SCONST PURE;
+    STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) SCONST PURE;
 
-	STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
+    STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
 
-	STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator * pItemLocator) PURE;
+    STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator * pItemLocator) PURE;
 
-	STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
+    STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
 
-	STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify /*= FALSE*/) PURE;
+    STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify /*= FALSE*/) PURE;
 
-	STDMETHOD_(int, GetSel)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetSel)(THIS) SCONST PURE;
 
-	STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
+    STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
 };
 
 #undef INTERFACE
 #define INTERFACE IMcListView
 DECLARE_INTERFACE_IID_(IMcListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
 {
-	STDMETHOD_(BOOL, SetAdapter)(THIS_ IMcAdapter * adapter) PURE;
+    STDMETHOD_(BOOL, SetAdapter)(THIS_ IMcAdapter * adapter) PURE;
 
-	STDMETHOD_(IMcAdapter *, GetAdapter)(THIS) SCONST PURE;
+    STDMETHOD_(IMcAdapter *, GetAdapter)(THIS) SCONST PURE;
 
-	STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
+    STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
 
-	STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator * pItemLocator) PURE;
+    STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator * pItemLocator) PURE;
 
-	STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
+    STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
 
-	STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify /*= FALSE*/) PURE;
+    STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify /*= FALSE*/) PURE;
 
-	STDMETHOD_(int, GetSel)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetSel)(THIS) SCONST PURE;
 
-	STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
+    STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
 
-	STDMETHOD_(IHeaderCtrl *,GetIHeaderCtrl)(THIS) SCONST PURE;
+    STDMETHOD_(IHeaderCtrl *, GetIHeaderCtrl)(THIS) SCONST PURE;
 
-	STDMETHOD_(int,InsertColumn)(THIS_ int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam /*= 0*/,BOOL bDpiAware/*=TRUE*/,float fWeight/*=0.0f*/) PURE;
+    STDMETHOD_(int, InsertColumn)
+    (THIS_ int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam /*= 0*/,
+     BOOL bDpiAware /*=TRUE*/, float fWeight /*=0.0f*/) PURE;
 
-	STDMETHOD_(void,DeleteColumn)(THIS_ int iCol) PURE;
+    STDMETHOD_(void, DeleteColumn)(THIS_ int iCol) PURE;
 
-	STDMETHOD_(int,GetColumnCount)(THIS) SCONST PURE;
-
+    STDMETHOD_(int, GetColumnCount)(THIS) SCONST PURE;
 };
 
 #undef INTERFACE
 #define INTERFACE ITreeView
 DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B")
 {
-	STDMETHOD_(BOOL,SetAdapter)(THIS_ ITvAdapter *adapter) PURE;
+    STDMETHOD_(BOOL, SetAdapter)(THIS_ ITvAdapter * adapter) PURE;
 
-	STDMETHOD_(ITvAdapter *,GetAdapter)(THIS) SCONST PURE;
+    STDMETHOD_(ITvAdapter *, GetAdapter)(THIS) SCONST PURE;
 
-	STDMETHOD_(void,SetItemLocator)(THIS_ ITreeViewItemLocator *pItemLocator) PURE;
+    STDMETHOD_(void, SetItemLocator)(THIS_ ITreeViewItemLocator * pItemLocator) PURE;
 
-	STDMETHOD_(ITreeViewItemLocator *,GetItemLocator)(THIS) SCONST PURE;
+    STDMETHOD_(ITreeViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
 
-	STDMETHOD_(void,SetSel)(THIS_ HTREEITEM hItem, BOOL bNotify /*= FALSE*/) PURE;
-	
-	STDMETHOD_(HTREEITEM,GetSel)(THIS) SCONST PURE;
+    STDMETHOD_(void, SetSel)(THIS_ HTREEITEM hItem, BOOL bNotify /*= FALSE*/) PURE;
 
-	STDMETHOD_(void,EnsureVisible)(THIS_ HTREEITEM hItem) PURE;
+    STDMETHOD_(HTREEITEM, GetSel)(THIS) SCONST PURE;
 
-	STDMETHOD_(IItemPanel *,HitTest)(THIS_ const POINT * pt) SCONST PURE;
+    STDMETHOD_(void, EnsureVisible)(THIS_ HTREEITEM hItem) PURE;
 
+    STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE ITileView
+DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3")
+{
+    STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter * adapter) PURE;
+
+    STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) SCONST PURE;
+
+    STDMETHOD_(void, SetItemLocator)(THIS_ ITileViewItemLocator * pItemLocator) PURE;
+
+    STDMETHOD_(ITileViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
+
+    STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify /*= FALSE*/) PURE;
+
+    STDMETHOD_(int, GetSel)(THIS) SCONST PURE;
+
+    STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
+
+    STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
 };
 
 SNSEND

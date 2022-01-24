@@ -131,11 +131,17 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
     return TRUE;
 }
 
-int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam,BOOL bDpiAware/*=TRUE*/,float fWeight/*=0.0f*/)
+int SMCListView::InsertColumn(int nIndex,
+                              LPCTSTR pszText,
+                              int nWidth,
+                              UINT fmt,
+                              LPARAM lParam,
+                              BOOL bDpiAware /*=TRUE*/,
+                              float fWeight /*=0.0f*/)
 {
     SASSERT(m_pHeader);
 
-    int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, fmt, lParam,bDpiAware,fWeight);
+    int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, fmt, lParam, bDpiAware, fWeight);
     UpdateScrollBar();
     return nRet;
 }
@@ -868,11 +874,12 @@ SItemPanel *SMCListView::HitTest(CPoint &pt) const
     return NULL;
 }
 
-IItemPanel * SMCListView::HitTest(const POINT *pt) const
+IItemPanel *SMCListView::HitTest(const POINT *pt) const
 {
-	SASSERT(pt);
-	if(!pt) return NULL;
-	return HitTest(CPoint(*pt));
+    SASSERT(pt);
+    if (!pt)
+        return NULL;
+    return HitTest(CPoint(*pt));
 }
 
 LRESULT SMCListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -1344,22 +1351,22 @@ void SMCListView::OnRebuildFont()
 
 int SMCListView::GetSel() const
 {
-	return m_iSelItem;
+    return m_iSelItem;
 }
 
-IListViewItemLocator * SMCListView::GetItemLocator() const
+IListViewItemLocator *SMCListView::GetItemLocator() const
 {
-	return m_lvItemLocator;
+    return m_lvItemLocator;
 }
 
-IMcAdapter * SMCListView::GetAdapter() const
+IMcAdapter *SMCListView::GetAdapter() const
 {
-	return m_adapter;
+    return m_adapter;
 }
 
-IHeaderCtrl * SMCListView::GetIHeaderCtrl() const
+IHeaderCtrl *SMCListView::GetIHeaderCtrl() const
 {
-	return GetHeaderCtrl();
+    return GetHeaderCtrl();
 }
 
 } // namespace SOUI

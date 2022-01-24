@@ -1,59 +1,60 @@
 ﻿#pragma once
+#include <interface/STileViewItemLocator-i.h>
 
 namespace SOUI
 {
-class SOUI_EXP STileViewItemLocator : public TObjRefImpl<IObjRef> {
+class SOUI_EXP STileViewItemLocator : public TObjRefImpl<ITileViewItemLocator> {
   public:
     STileViewItemLocator(int nItemHei, int nItemWid, int nMarginSize = 0);
     STileViewItemLocator(LPCWSTR szItemHei,
                          LPCWSTR szItemWid,
                          SLayoutSize marginSize = SLayoutSize());
 
-    void SetAdapter(ILvAdapter *pAdapter);
+  public:
+    STDMETHOD_(void, SetAdapter)(THIS_ ILvAdapter *pAdapter) OVERRIDE;
 
-    void OnDataSetChanged()
+    STDMETHOD_(void, OnDataSetChanged)(THIS) OVERRIDE
     {
     }
 
-    int GetItemHeight(int iItem) const;
+    STDMETHOD_(int, GetItemHeight)(THIS_ int iItem) SCONST OVERRIDE;
 
-    void SetItemHeight(int iItem, int nHeight);
+    STDMETHOD_(void, SetItemHeight)(THIS_ int iItem, int nHeight) OVERRIDE;
 
     //获取item的CRect(相对于TileView)
-    CRect GetItemRect(int iItem);
+    STDMETHOD_(RECT, GetItemRect)(THIS_ int iItem) OVERRIDE;
 
     //设置TileView宽度（在TileView的OnSize中调用）
-    void SetTileViewWidth(LPCWSTR width);
-    void SetTileViewWidth(int width);
+    STDMETHOD_(void, SetTileViewWidth)(THIS_ int width, BOOL bDpiAware) OVERRIDE;
 
     //获取item的行、列位置
-    void GetItemRowAndColIndex(int iItem, int &row, int &col);
+    STDMETHOD_(void, GetItemRowAndColIndex)(THIS_ int iItem, int *row, int *col) OVERRIDE;
 
     //是否为每行的最后一个元素
-    BOOL IsLastInRow(int iItem);
+    STDMETHOD_(BOOL, IsLastInRow)(THIS_ int iItem) OVERRIDE;
 
     //获取上一行，同一列的元素index
-    int GetUpItem(int iItem);
+    STDMETHOD_(int, GetUpItem)(THIS_ int iItem) OVERRIDE;
     //获取下一行，同一列的元素index
-    int GetDownItem(int iItem);
+    STDMETHOD_(int, GetDownItem)(THIS_ int iItem) OVERRIDE;
 
-    int GetTotalHeight();
+    STDMETHOD_(int, GetTotalHeight)(THIS) OVERRIDE;
 
-    int Item2Position(int iItem);
+    STDMETHOD_(int, Item2Position)(THIS_ int iItem) OVERRIDE;
 
-    int Position2Item(int position);
+    STDMETHOD_(int, Position2Item)(THIS_ int position) OVERRIDE;
 
-    int GetScrollLineSize() const;
+    STDMETHOD_(int, GetScrollLineSize)(THIS) SCONST OVERRIDE;
 
-    int GetMarginSize() const;
+    STDMETHOD_(int, GetMarginSize)(THIS) SCONST OVERRIDE;
 
-    int SetScale(int scale);
+    STDMETHOD_(int, SetScale)(THIS_ int scale) OVERRIDE;
 
-    int GetCountInRow() const;
+    STDMETHOD_(int, GetCountInRow)(THIS) SCONST OVERRIDE;
 
-    int GetItemLineHeight() const;
+    STDMETHOD_(int, GetItemLineHeight)(THIS) SCONST OVERRIDE;
 
-    int GetItemWidth() const;
+    STDMETHOD_(int, GetItemWidth)(THIS) SCONST OVERRIDE;
 
   protected:
     //行高（包括间隔）

@@ -1227,9 +1227,10 @@ SItemPanel *STreeView::GetItemPanel(HTREEITEM hItem)
 
 IItemPanel *STreeView::HitTest(const POINT *pt) const
 {
-	SASSERT(pt);
-	if(!pt) return NULL;
-	return HitTest(CPoint(*pt));
+    SASSERT(pt);
+    if (!pt)
+        return NULL;
+    return HitTest(CPoint(*pt));
 }
 
 SItemPanel *STreeView::HitTest(CPoint &pt) const
@@ -1364,24 +1365,24 @@ void STreeView::OnRebuildFont()
     DispatchMessage2Items(UM_UPDATEFONT, 0, 0);
 }
 
-ITvAdapter * STreeView::GetAdapter() const
+ITvAdapter *STreeView::GetAdapter() const
 {
-	return m_adapter;
+    return m_adapter;
 }
 
 void STreeView::SetItemLocator(ITreeViewItemLocator *pItemLocator)
 {
-	m_tvItemLocator = pItemLocator;
+    m_tvItemLocator = pItemLocator;
 }
 
-ITreeViewItemLocator * STreeView::GetItemLocator() const
+ITreeViewItemLocator *STreeView::GetItemLocator() const
 {
-	return m_tvItemLocator;
+    return m_tvItemLocator;
 }
 
 HTREEITEM STreeView::GetSel() const
 {
-	return m_hSelected;
+    return m_hSelected;
 }
 
 } // namespace SOUI

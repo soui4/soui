@@ -3,13 +3,14 @@
 #include "core/SWnd.h"
 #include "core/SItemPanel.h"
 #include "interface/SAdapter-i.h"
+
 #include "helper/STileViewItemLocator.h"
 
 namespace SOUI
 {
 
 class SOUI_EXP STileView
-    : public SPanel
+    : public TPanelProxy<ITileView>
     , protected IItemContainer {
     SOUI_CLASS_NAME(SPanel, L"tileview")
 
@@ -19,28 +20,25 @@ class SOUI_EXP STileView
     STileView();
     ~STileView();
 
-    BOOL SetAdapter(ILvAdapter *adapter);
+  public:
+    STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter *adapter) OVERRIDE;
 
-    ILvAdapter *GetAdapter()
-    {
-        return m_adapter;
-    }
+    STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) SCONST OVERRIDE;
 
-    STileViewItemLocator *GetItemLocator()
-    {
-        return m_tvItemLocator;
-    }
+    STDMETHOD_(void, SetItemLocator)(THIS_ ITileViewItemLocator *pItemLocator) OVERRIDE;
 
-    void SetItemLocator(STileViewItemLocator *pItemLocator);
-    void EnsureVisible(int iItem);
+    STDMETHOD_(ITileViewItemLocator *, GetItemLocator)(THIS) SCONST OVERRIDE;
 
-    void SetSel(int iItem, BOOL bNotify = FALSE);
-    int GetSel() const
-    {
-        return m_iSelItem;
-    }
+    STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify = FALSE) OVERRIDE;
 
-    SItemPanel *HitTest(CPoint &pt);
+    STDMETHOD_(int, GetSel)(THIS) SCONST OVERRIDE;
+
+    STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) OVERRIDE;
+
+    STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
+
+  public:
+    SItemPanel *HitTest(CPoint &pt) const;
 
   protected:
     virtual void OnItemSetCapture(SItemPanel *pItem, BOOL bCapture);
@@ -124,7 +122,7 @@ class SOUI_EXP STileView
   protected:
     SAutoRefPtr<ILvAdapter> m_adapter;
     SAutoRefPtr<ILvDataSetObserver> m_observer;
-    SAutoRefPtr<STileViewItemLocator> m_tvItemLocator; //列表项定位接口
+    SAutoRefPtr<ITileViewItemLocator> m_tvItemLocator; //列表项定位接口
     struct ItemInfo
     {
         SItemPanel *pItem;

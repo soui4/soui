@@ -53,6 +53,8 @@ HEADERS += include/SApp.h \
            include/interface/sipcobj-i.h \
            include/interface/slayout-i.h \
            include/interface/SListViewItemLocator-i.h \
+           include/interface/STreeViewItemLocator-i.h \
+           include/interface/STileViewItemLocator-i.h \
            include/interface/slog-i.h \
            include/interface/sobject-i.h \
            include/interface/SPathEffect-i.h \
@@ -64,7 +66,6 @@ HEADERS += include/SApp.h \
            include/interface/STimelineHandler-i.h \
            include/interface/stooltip-i.h \
            include/interface/STranslator-i.h \
-           include/interface/STreeViewItemLocator-i.h \
            include/interface/SValueAnimator-i.h \
            include/interface/SRealWndHandler-i.h \
            include/interface/SAccelerator-i.h \

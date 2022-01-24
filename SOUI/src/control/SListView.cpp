@@ -1111,9 +1111,10 @@ int SListView::GetSel() const
 
 IItemPanel *SListView::HitTest(const POINT *pt) const
 {
-	SASSERT(pt);
-	if(!pt) return NULL;
-	return HitTest(CPoint(*pt));
+    SASSERT(pt);
+    if (!pt)
+        return NULL;
+    return HitTest(CPoint(*pt));
 }
 
 } // namespace SOUI

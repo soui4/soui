@@ -88,25 +88,25 @@ class SOUI_EXP STreeView
     STreeView();
     ~STreeView();
 
-public:
-	STDMETHOD_(BOOL,SetAdapter)(THIS_ ITvAdapter *adapter) OVERRIDE;
+  public:
+    STDMETHOD_(BOOL, SetAdapter)(THIS_ ITvAdapter *adapter) OVERRIDE;
 
-	STDMETHOD_(ITvAdapter *,GetAdapter)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(ITvAdapter *, GetAdapter)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void,SetItemLocator)(THIS_ ITreeViewItemLocator *pItemLocator) OVERRIDE;
+    STDMETHOD_(void, SetItemLocator)(THIS_ ITreeViewItemLocator *pItemLocator) OVERRIDE;
 
-	STDMETHOD_(ITreeViewItemLocator *,GetItemLocator)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(ITreeViewItemLocator *, GetItemLocator)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void,SetSel)(THIS_ HTREEITEM hItem, BOOL bNotify = FALSE) OVERRIDE;
+    STDMETHOD_(void, SetSel)(THIS_ HTREEITEM hItem, BOOL bNotify = FALSE) OVERRIDE;
 
-	STDMETHOD_(HTREEITEM,GetSel)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(HTREEITEM, GetSel)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void,EnsureVisible)(THIS_ HTREEITEM hItem) OVERRIDE;
+    STDMETHOD_(void, EnsureVisible)(THIS_ HTREEITEM hItem) OVERRIDE;
 
-	STDMETHOD_(IItemPanel *,HitTest)(THIS_ const POINT * pt) SCONST OVERRIDE;
+    STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
 
   public:
-	SItemPanel *HitTest(CPoint &pt) const;
+    SItemPanel *HitTest(CPoint &pt) const;
 
   protected:
     BOOL OnItemClick(IEvtArgs *pEvt);

@@ -105,11 +105,11 @@ void STileViewItemLocator::SetAdapter(ILvAdapter *pAdapter)
     m_adapter = pAdapter;
 }
 
-CRect STileViewItemLocator::GetItemRect(int iItem)
+RECT STileViewItemLocator::GetItemRect(int iItem)
 {
     //返回相对于TileView内部的Rect
     int nRowIdx, nColIdx;
-    GetItemRowAndColIndex(iItem, nRowIdx, nColIdx);
+    GetItemRowAndColIndex(iItem, &nRowIdx, &nColIdx);
 
     CRect rect;
     rect.left = m_nItemMargin.toPixelSize(m_scale)
@@ -121,26 +121,20 @@ CRect STileViewItemLocator::GetItemRect(int iItem)
     return rect;
 }
 
-void STileViewItemLocator::SetTileViewWidth(LPCWSTR width)
+void STileViewItemLocator::SetTileViewWidth(int width, BOOL bDpiAware)
 {
-    m_nTileViewWidth = GETLAYOUTSIZE(width);
+    m_nTileViewWidth.setSize((float)width, bDpiAware ? SLayoutSize::dp : SLayoutSize::px);
     m_nCountInRow = m_nTileViewWidth.toPixelSize(m_scale)
         / (m_nItemWidth.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
     if (m_nCountInRow == 0)
         m_nCountInRow = 1;
 }
 
-void STileViewItemLocator::SetTileViewWidth(int width)
+void STileViewItemLocator::GetItemRowAndColIndex(int iItem, int *pRow, int *pCol)
 {
-    m_nTileViewWidth.setSize((float)width, SLayoutSize::px);
-    m_nCountInRow = m_nTileViewWidth.toPixelSize(m_scale)
-        / (m_nItemWidth.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
-    if (m_nCountInRow == 0)
-        m_nCountInRow = 1;
-}
-
-void STileViewItemLocator::GetItemRowAndColIndex(int iItem, int &row, int &col)
-{
+    SASSERT(pRow && pCol);
+    int &row = *pRow;
+    int &col = *pCol;
     row = (iItem + 1) / m_nCountInRow;
     if (row * m_nCountInRow - 1 >= iItem)
     {

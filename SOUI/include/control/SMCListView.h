@@ -43,38 +43,44 @@ class SOUI_EXP SMCListView
      */
     virtual ~SMCListView();
 
-public:
-	STDMETHOD_(BOOL, SetAdapter)(THIS_ IMcAdapter * adapter) OVERRIDE;
+  public:
+    STDMETHOD_(BOOL, SetAdapter)(THIS_ IMcAdapter *adapter) OVERRIDE;
 
-	STDMETHOD_(IMcAdapter *, GetAdapter)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(IMcAdapter *, GetAdapter)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator * pItemLocator) OVERRIDE;
+    STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator *pItemLocator) OVERRIDE;
 
-	STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) OVERRIDE;
+    STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) OVERRIDE;
 
-	STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify = FALSE) OVERRIDE;
+    STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify = FALSE) OVERRIDE;
 
-	STDMETHOD_(int, GetSel)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(int, GetSel)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
+    STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
 
-	STDMETHOD_(IHeaderCtrl *,GetIHeaderCtrl)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(IHeaderCtrl *, GetIHeaderCtrl)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(int,InsertColumn)(THIS_ int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam = 0,BOOL bDpiAware=TRUE,float fWeight=0.0f) OVERRIDE;
+    STDMETHOD_(int, InsertColumn)
+    (THIS_ int nIndex,
+     LPCTSTR pszText,
+     int nWidth,
+     UINT fmt,
+     LPARAM lParam = 0,
+     BOOL bDpiAware = TRUE,
+     float fWeight = 0.0f) OVERRIDE;
 
-	STDMETHOD_(void,DeleteColumn)(THIS_ int iCol) OVERRIDE;
+    STDMETHOD_(void, DeleteColumn)(THIS_ int iCol) OVERRIDE;
 
-	STDMETHOD_(int,GetColumnCount)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(int, GetColumnCount)(THIS) SCONST OVERRIDE;
 
-public:
-
+  public:
     SItemPanel *HitTest(CPoint &pt) const;
 
     SHeaderCtrl *GetHeaderCtrl() const;
-	void UpdateVisibleItems();
-	void UpdateVisibleItem(int iItem);
+    void UpdateVisibleItems();
+    void UpdateVisibleItem(int iItem);
 
   protected:
     virtual void OnItemSetCapture(SItemPanel *pItem, BOOL bCapture);
@@ -230,6 +236,7 @@ public:
 
   protected:
     CRect _OnItemGetRect(int iPosition) const;
+
   protected:
     SHeaderCtrl *m_pHeader;
     SLayoutSize m_nHeaderHeight; /**< 列表头高度 */
