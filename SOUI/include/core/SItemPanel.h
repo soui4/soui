@@ -47,14 +47,14 @@ class SOUI_EXP SItemPanel
     {
     }
 
-public:
-	STDMETHOD_(LPARAM,GetItemIndex)(THIS) SCONST OVERRIDE;
-	STDMETHOD_(void,SetSkin)(THIS_ ISkinObj *pSkin) OVERRIDE;
-	STDMETHOD_(void,SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) OVERRIDE;
-	STDMETHOD_(void,SetItemData)(THIS_ LPARAM dwData) OVERRIDE;
-	STDMETHOD_(LPARAM,GetItemData)(THIS) SCONST OVERRIDE;
+  public:
+    STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, SetSkin)(THIS_ ISkinObj *pSkin) OVERRIDE;
+    STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) OVERRIDE;
+    STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) OVERRIDE;
+    STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST OVERRIDE;
 
-public:
+  public:
     STDMETHOD_(void, OnFinalRelease)(THIS);
 
   public: // SwndContainerImpl
@@ -92,7 +92,7 @@ public:
     STDMETHOD_(void, OnUpdateCursor)();
 
   public: // SWindow
-	STDMETHOD_(COLORREF,GetBkgndColor)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST OVERRIDE;
 
     virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
     virtual void ModifyItemState(DWORD dwStateAdd, DWORD dwStateRemove);
@@ -109,7 +109,8 @@ public:
 
     CRect GetItemRect() const;
     void SetItemCapture(BOOL bCapture);
-	void SetItemIndex(LPARAM lp);
+    void SetItemIndex(LPARAM lp);
+
   protected:
     void OnShowWindow(BOOL bShow, UINT nStatus);
     void OnDestroy();

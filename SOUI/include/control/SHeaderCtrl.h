@@ -18,9 +18,8 @@
 namespace SOUI
 {
 
-
-#define SORT_MASK (HDF_SORTDOWN|HDF_SORTUP)
-#define ALIGN_MASK (HDF_LEFT|HDF_RIGHT|HDF_CENTER)
+#define SORT_MASK  (HDF_SORTDOWN | HDF_SORTUP)
+#define ALIGN_MASK (HDF_LEFT | HDF_RIGHT | HDF_CENTER)
 
 /**
  * @class     SHeaderCtrl
@@ -37,10 +36,11 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
         MARGIN_ADJUST_DISABLE = 2,
     };
 
-	typedef struct SHDITEMEX : public SHDITEM
-	{
-		STrText strText;
-	}* LPSHDITEMEX;
+    typedef struct SHDITEMEX : public SHDITEM
+    {
+        STrText strText;
+    } * LPSHDITEMEX;
+
   public:
     /**
      * SHeaderCtrl::SHeaderCtrl
@@ -57,23 +57,30 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
      */
     ~SHeaderCtrl(void);
 
-public:
-	    /**
+  public:
+    /**
      * SHeaderCtrl::InsertItem
      * @brief    插入新项
      * @param    int iItem --  新项索引
      * @param    LPCTSTR pszText  --  新项标题
      * @param    int nWidth  -- 宽度
-	 * @param    BOOL bDpiAware -- dpi aware
+     * @param    BOOL bDpiAware -- dpi aware
      * @param    UINT fmt -- format flag
      * @param    LPARAM lParam -- 附加参数
      * @return   返回int
      *
      * Describe  插入新项
      */
-    STDMETHOD_(int,InsertItem)(THIS_ int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam,BOOL bDpiAware=FALSE,float fWeight=0.0f) OVERRIDE;
+    STDMETHOD_(int, InsertItem)
+    (THIS_ int iItem,
+     LPCTSTR pszText,
+     int nWidth,
+     UINT fmt,
+     LPARAM lParam,
+     BOOL bDpiAware = FALSE,
+     float fWeight = 0.0f) OVERRIDE;
 
-	/**
+    /**
      * SHeaderCtrl::GetItem
      * @brief    获得新项
      * @param    int iItem  --  索引
@@ -82,9 +89,9 @@ public:
      *
      * Describe  获得新项
      */
-    STDMETHOD_(BOOL,GetItem)(THIS_ int iItem, SHDITEM *pItem) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, GetItem)(THIS_ int iItem, SHDITEM *pItem) SCONST OVERRIDE;
 
-    STDMETHOD_(BOOL,SetItem)(THIS_ int iItem, const SHDITEM *pItem) OVERRIDE;
+    STDMETHOD_(BOOL, SetItem)(THIS_ int iItem, const SHDITEM *pItem) OVERRIDE;
 
     /**
      * SHeaderCtrl::GetItemCount
@@ -93,7 +100,7 @@ public:
      *
      * Describe  获取列表项个数
      */
-    STDMETHOD_(UINT,GetItemCount)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(UINT, GetItemCount)(THIS) SCONST OVERRIDE;
     /**
      * SHeaderCtrl::GetTotalWidth
      * @brief    获得所有宽度
@@ -101,9 +108,9 @@ public:
      *
      * Describe  获得所有宽度
      */
-    STDMETHOD_(int,GetTotalWidth)(THIS_ BOOL bMinWid = FALSE) SCONST OVERRIDE;
+    STDMETHOD_(int, GetTotalWidth)(THIS_ BOOL bMinWid = FALSE) SCONST OVERRIDE;
 
-    STDMETHOD_(BOOL,IsAutoResize)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, IsAutoResize)(THIS) SCONST OVERRIDE;
 
     /**
      * SHeaderCtrl::GetItemWidth
@@ -113,7 +120,7 @@ public:
      *
      * Describe  获得新项
      */
-    STDMETHOD_(int,GetItemWidth)(THIS_ int iItem) SCONST OVERRIDE;
+    STDMETHOD_(int, GetItemWidth)(THIS_ int iItem) SCONST OVERRIDE;
 
     /**
      * SHeaderCtrl::DeleteItem
@@ -123,7 +130,7 @@ public:
      *
      * Describe  删除指定项
      */
-    STDMETHOD_(BOOL,DeleteItem)(THIS_ int iItem) OVERRIDE;
+    STDMETHOD_(BOOL, DeleteItem)(THIS_ int iItem) OVERRIDE;
 
     /**
      * SHeaderCtrl::DeleteAllItems
@@ -131,16 +138,15 @@ public:
      *
      * Describe  获得新项
      */
-    STDMETHOD_(void,DeleteAllItems)(THIS) OVERRIDE;
+    STDMETHOD_(void, DeleteAllItems)(THIS) OVERRIDE;
 
-    STDMETHOD_(void,SetItemSort)(THIS_ int iItem, UINT sortFlag) OVERRIDE;
+    STDMETHOD_(void, SetItemSort)(THIS_ int iItem, UINT sortFlag) OVERRIDE;
 
-    STDMETHOD_(void,SetItemVisible)(THIS_ int iItem, BOOL visible) OVERRIDE;
+    STDMETHOD_(void, SetItemVisible)(THIS_ int iItem, BOOL visible) OVERRIDE;
 
-    STDMETHOD_(BOOL,IsItemVisible)(THIS_ int iItem) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, IsItemVisible)(THIS_ int iItem) SCONST OVERRIDE;
 
-public:
-
+  public:
     /**
      * SHeaderCtrl::GetItemRect
      * @brief    获取表头项得位置
@@ -316,13 +322,13 @@ public:
     BOOL m_bFixWidth;                  /**< 表项宽度固定开关 */
     BOOL m_bItemSwapEnable;            /**< 允许拖动调整位置开关 */
 
-    BOOL m_bDragging;           /**< 正在拖动标志 */
-    HBITMAP m_hDragImg;         /**< 显示拖动窗口的临时位图 */
-    CPoint m_ptClick;           /**< 当前点击坐标 */
-    DWORD m_dwHitTest;          /**< 鼠标位置 */
-    DWORD m_dwDragTo;           /**< 拖放目标 */
-    int m_nAdjItemOldWidth;     /**< 保存被拖动项的原始宽度 */
+    BOOL m_bDragging;             /**< 正在拖动标志 */
+    HBITMAP m_hDragImg;           /**< 显示拖动窗口的临时位图 */
+    CPoint m_ptClick;             /**< 当前点击坐标 */
+    DWORD m_dwHitTest;            /**< 鼠标位置 */
+    DWORD m_dwDragTo;             /**< 拖放目标 */
+    int m_nAdjItemOldWidth;       /**< 保存被拖动项的原始宽度 */
     SArray<SHDITEMEX> m_arrItems; /**< 列表项集合 */
-    int m_nScale;               /**< Current Scale */
+    int m_nScale;                 /**< Current Scale */
 };
 } // end of namespace SOUI

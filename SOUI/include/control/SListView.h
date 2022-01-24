@@ -17,21 +17,21 @@ class SOUI_EXP SListView
     SListView();
     ~SListView();
 
-	STDMETHOD_(BOOL,SetAdapter)(THIS_ ILvAdapter *adapter) OVERRIDE;
+    STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter *adapter) OVERRIDE;
 
-	STDMETHOD_(ILvAdapter *,GetAdapter)(THIS) OVERRIDE;
+    STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) OVERRIDE;
 
-	STDMETHOD_(IListViewItemLocator *,GetItemLocator)(THIS) OVERRIDE;
+    STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) OVERRIDE;
 
-	STDMETHOD_(void,SetItemLocator)(THIS_ IListViewItemLocator *pItemLocator) OVERRIDE;
+    STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator *pItemLocator) OVERRIDE;
 
-	STDMETHOD_(void,EnsureVisible)(THIS_ int iItem) OVERRIDE;
+    STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) OVERRIDE;
 
-	STDMETHOD_(void,SetSel)(THIS_ int iItem, BOOL bNotify = FALSE) OVERRIDE;
+    STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify = FALSE) OVERRIDE;
 
-	STDMETHOD_(int,GetSel)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(int, GetSel)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(IItemPanel*,HitTest)(THIS_ const POINT * pt) SCONST OVERRIDE;
+    STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
 
     SItemPanel *HitTest(CPoint &pt) const;
 

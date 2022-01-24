@@ -39,26 +39,28 @@ class SOUI_EXP SPanel
     {
     }
 
-public:
-	STDMETHOD_(BOOL,ShowScrollBar)(THIS_ int wBar, BOOL bShow) OVERRIDE;
+  public:
+    STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) OVERRIDE;
 
-	STDMETHOD_(BOOL,EnableScrollBar)(THIS_ int wBar, BOOL bEnable) OVERRIDE;
+    STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) OVERRIDE;
 
-	STDMETHOD_(BOOL,IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST OVERRIDE;
 
-	STDMETHOD_(void,SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) OVERRIDE;
+    STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) OVERRIDE;
 
-	STDMETHOD_(BOOL,SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) OVERRIDE;
+    STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) OVERRIDE;
 
-	STDMETHOD_(int,GetScrollPos)(THIS_ BOOL bVertical) SCONST OVERRIDE;
+    STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST OVERRIDE;
 
-	STDMETHOD_(BOOL,SetScrollRange)(THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) OVERRIDE;
+    STDMETHOD_(BOOL, SetScrollRange)
+    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) OVERRIDE;
 
-	STDMETHOD_(BOOL,GetScrollRange)(THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, GetScrollRange)
+    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST OVERRIDE;
 
-	STDMETHOD_(BOOL,HasScrollBar)(THIS_ BOOL bVertical) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST OVERRIDE;
 
-public:
+  public:
     virtual void WINAPI GetClientRect(LPRECT pRect) const;
     virtual CRect GetClientRect() const;
 
@@ -197,84 +199,87 @@ public:
 
 template <class T>
 class TPanelProxy
-	: public T
-	, public SPanel {
-public:
-	STDMETHOD_(long, AddRef)(THIS) OVERRIDE
-	{
-		return SPanel::AddRef();
-	}
-	STDMETHOD_(long, Release)(THIS) OVERRIDE
-	{
-		return SPanel::Release();
-	}
-	STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
-	{
-		SPanel::OnFinalRelease();
-	}
+    : public T
+    , public SPanel {
+  public:
+    STDMETHOD_(long, AddRef)(THIS) OVERRIDE
+    {
+        return SPanel::AddRef();
+    }
+    STDMETHOD_(long, Release)(THIS) OVERRIDE
+    {
+        return SPanel::Release();
+    }
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
+    {
+        SPanel::OnFinalRelease();
+    }
 
-	STDMETHOD_(IWindow*, ToIWindow)(THIS) OVERRIDE
-	{
-		return (SPanel*)this;
-	}
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) OVERRIDE
+    {
+        return (SPanel *)this;
+    }
 
-	STDMETHOD_(BOOL,ShowScrollBar)(THIS_ int wBar, BOOL bShow) OVERRIDE
-	{
-		return SPanel::ShowScrollBar(wBar,bShow);
-	}
+    STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) OVERRIDE
+    {
+        return SPanel::ShowScrollBar(wBar, bShow);
+    }
 
-	STDMETHOD_(BOOL,EnableScrollBar)(THIS_ int wBar, BOOL bEnable) OVERRIDE
-	{
-		return SPanel::EnableScrollBar(wBar,bEnable);
-	}
+    STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) OVERRIDE
+    {
+        return SPanel::EnableScrollBar(wBar, bEnable);
+    }
 
-	STDMETHOD_(BOOL,IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST OVERRIDE
-	{
-		return SPanel::IsScrollBarEnable(bVertical);
-	}
+    STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST OVERRIDE
+    {
+        return SPanel::IsScrollBarEnable(bVertical);
+    }
 
-	STDMETHOD_(void,SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) OVERRIDE
-	{
-		return SPanel::SetScrollInfo(si,bVertical);
-	}
+    STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) OVERRIDE
+    {
+        return SPanel::SetScrollInfo(si, bVertical);
+    }
 
-	STDMETHOD_(BOOL,SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) OVERRIDE
-	{
-		return SPanel::SetScrollPos(bVertical,nNewPos,bRedraw);
-	}
+    STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) OVERRIDE
+    {
+        return SPanel::SetScrollPos(bVertical, nNewPos, bRedraw);
+    }
 
-	STDMETHOD_(int,GetScrollPos)(THIS_ BOOL bVertical) SCONST OVERRIDE
-	{
-		return SPanel::GetScrollPos(bVertical);
-	}
+    STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST OVERRIDE
+    {
+        return SPanel::GetScrollPos(bVertical);
+    }
 
-	STDMETHOD_(BOOL,SetScrollRange)(THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) OVERRIDE
-	{
-		return SPanel::SetScrollRange(bVertical,nMinPos,nMaxPos,bRedraw);
-	}
+    STDMETHOD_(BOOL, SetScrollRange)
+    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) OVERRIDE
+    {
+        return SPanel::SetScrollRange(bVertical, nMinPos, nMaxPos, bRedraw);
+    }
 
-	STDMETHOD_(BOOL,GetScrollRange)(THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST OVERRIDE
-	{
-		return SPanel::GetScrollRange(bVertical,lpMinPos,lpMaxPos);
-	}
+    STDMETHOD_(BOOL, GetScrollRange)
+    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST OVERRIDE
+    {
+        return SPanel::GetScrollRange(bVertical, lpMinPos, lpMaxPos);
+    }
 
-	STDMETHOD_(BOOL,HasScrollBar)(THIS_ BOOL bVertical) SCONST OVERRIDE
-	{
-		return SPanel::HasScrollBar(bVertical);
-	}
+    STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST OVERRIDE
+    {
+        return SPanel::HasScrollBar(bVertical);
+    }
 
-	STDMETHOD_(HRESULT, QueryInterface)(REFGUID id,IObjRef **ppRet) OVERRIDE
-	{
-		if(id == __uuidof(T))
-		{
-			*ppRet = (T*)this;
-			AddRef();
-			return S_OK;
-		}else
-		{
-			return SPanel::QueryInterface(id,ppRet);
-		}
-	}
+    STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
+    {
+        if (id == __uuidof(T))
+        {
+            *ppRet = (T *)this;
+            AddRef();
+            return S_OK;
+        }
+        else
+        {
+            return SPanel::QueryInterface(id, ppRet);
+        }
+    }
 };
 
 class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
@@ -285,14 +290,14 @@ class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
     {
     }
 
-public:
-	STDMETHOD_(SIZE,GetViewSize)(THIS) SCONST OVERRIDE;
+  public:
+    STDMETHOD_(SIZE, GetViewSize)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void,SetViewSize)(THIS_ SIZE szView) OVERRIDE;
+    STDMETHOD_(void, SetViewSize)(THIS_ SIZE szView) OVERRIDE;
 
-	STDMETHOD_(POINT,GetViewOrigin)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(POINT, GetViewOrigin)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void,SetViewOrigin)(THIS_ POINT pt) OVERRIDE;
+    STDMETHOD_(void, SetViewOrigin)(THIS_ POINT pt) OVERRIDE;
 
   protected:
     virtual void OnViewSizeChanged(CSize szOld, CSize szNew);
@@ -300,13 +305,13 @@ public:
 
   protected:
     STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST OVERRIDE;
-	STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
+    STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
 
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
 
     virtual void UpdateScrollBar();
-  protected:
 
+  protected:
     HRESULT OnAttrViewSize(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
@@ -316,8 +321,8 @@ public:
     SOUI_ATTRS_END()
 
   protected:
-	void UpdateViewSize();
-	void OnSize(UINT nType, CSize size);
+    void UpdateViewSize();
+    void OnSize(UINT nType, CSize size);
 
     SOUI_MSG_MAP_BEGIN()
     MSG_WM_SIZE(OnSize)
@@ -325,7 +330,7 @@ public:
   protected:
     SLayoutSize m_viewSize[2];
     POINT m_ptOrigin;
-    SIZE  m_szView;
+    SIZE m_szView;
 };
 
 } // namespace SOUI

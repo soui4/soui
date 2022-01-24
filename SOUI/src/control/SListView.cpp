@@ -610,7 +610,7 @@ SItemPanel *SListView::HitTest(CPoint &pt) const
         CRect rcItem = ii.pItem->GetItemRect();
         if (rcItem.PtInRect(pt))
         {
-			pt -= rcItem.TopLeft();
+            pt -= rcItem.TopLeft();
             return ii.pItem;
         }
     }
@@ -626,12 +626,12 @@ LRESULT SListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
 
     LRESULT lRet = 0;
-	CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+    CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
 
     if (m_itemCapture)
     {
         CRect rcItem = m_itemCapture->GetItemRect();
-		pt -= rcItem.TopLeft();
+        pt -= rcItem.TopLeft();
         lRet = m_itemCapture->DoFrameEvent(uMsg, wParam, MAKELPARAM(pt.x, pt.y));
     }
     else
@@ -1094,28 +1094,27 @@ void SListView::OnRebuildFont()
     DispatchMessage2Items(UM_UPDATEFONT, 0, 0);
 }
 
-ILvAdapter * SListView::GetAdapter()
+ILvAdapter *SListView::GetAdapter()
 {
-	return m_adapter;
+    return m_adapter;
 }
 
-IListViewItemLocator * SListView::GetItemLocator()
+IListViewItemLocator *SListView::GetItemLocator()
 {
-	return m_lvItemLocator;
+    return m_lvItemLocator;
 }
 
 int SListView::GetSel() const
 {
-	return m_iSelItem;
+    return m_iSelItem;
 }
 
-IItemPanel* SListView::HitTest(const POINT * pt) const
+IItemPanel *SListView::HitTest(const POINT *pt) const
 {
-	SASSERT(pt);
-	CPoint pt2(*pt);
-	SItemPanel *pRet = HitTest(pt2);
-	return pRet;
+    SASSERT(pt);
+    CPoint pt2(*pt);
+    SItemPanel *pRet = HitTest(pt2);
+    return pRet;
 }
-
 
 } // namespace SOUI

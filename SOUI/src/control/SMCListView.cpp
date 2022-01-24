@@ -131,7 +131,7 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
     return TRUE;
 }
 
-int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth,UINT fmt, LPARAM lParam)
+int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam)
 {
     SASSERT(m_pHeader);
 
@@ -347,7 +347,7 @@ BOOL SMCListView::OnHeaderClick(IEvtArgs *pEvt)
 {
     EventHeaderClick *pEvt2 = sobj_cast<EventHeaderClick>(pEvt);
     SASSERT(pEvt2);
-	SHDITEM hi={SHDI_ORDER | SHDI_FORMAT,0};
+    SHDITEM hi = { SHDI_ORDER | SHDI_FORMAT, 0 };
     UINT *pFmts = new UINT[m_pHeader->GetItemCount()];
     int *pOrders = new int[m_pHeader->GetItemCount()];
     int iCol = -1;
@@ -388,7 +388,7 @@ BOOL SMCListView::OnHeaderSizeChanging(IEvtArgs *pEvt)
         rcSubItem.right = rcSubItem.left = 0;
         for (int i = 0; i < m_pHeader->GetItemCount(); i++)
         {
-			SHDITEM hi={SHDI_ORDER,0};
+            SHDITEM hi = { SHDI_ORDER, 0 };
             m_pHeader->GetItem(i, &hi);
             rcSubItem.left = rcSubItem.right;
             rcSubItem.right += m_pHeader->GetItemWidth(i);
@@ -685,7 +685,7 @@ void SMCListView::UpdateVisibleItems()
             rcSubItem.right = rcSubItem.left;
             for (int i = 0; i < m_pHeader->GetItemCount(); i++)
             {
-				SHDITEM hditem={SHDI_ORDER | SHDI_WIDTH,0};
+                SHDITEM hditem = { SHDI_ORDER | SHDI_WIDTH, 0 };
                 m_pHeader->GetItem(i, &hditem);
                 SStringW strColName = m_adapter->GetColumnName(hditem.iOrder);
                 SWindow *pColWnd = ii.pItem->FindChildByName(strColName);

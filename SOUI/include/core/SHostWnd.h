@@ -455,11 +455,10 @@ class TNativeWndProxy
                                                dwFlags);
     }
 
-	STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun,void * ctx) OVERRIDE
-	{
-		return SNativeWnd::SetMsgHandler(fun,ctx);
-	}
-
+    STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) OVERRIDE
+    {
+        return SNativeWnd::SetMsgHandler(fun, ctx);
+    }
 };
 
 class SOUI_EXP SHostWnd

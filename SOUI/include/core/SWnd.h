@@ -559,7 +559,7 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BOOL, GetAttribute)(const IStringW *strAttr, IStringW *strValue) SCONST OVERRIDE;
 
-	STDMETHOD_(COLORREF,GetBkgndColor)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST OVERRIDE;
 
     /**
      * GetISelectedSiblingInGroup
@@ -611,7 +611,7 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) OVERRIDE;
 
-	STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id,IObjRef **ppRet) OVERRIDE;
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef **ppRet) OVERRIDE;
 
   public: // caret相关方法
     STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) OVERRIDE;
@@ -1471,42 +1471,42 @@ class SOUI_EXP SWindow
 #endif
 };
 
-
 template <class T>
 class TWindowProxy
-	: public T
-	, public SWindow {
-public:
-	STDMETHOD_(long, AddRef)(THIS) OVERRIDE
-	{
-		return SWindow::AddRef();
-	}
-	STDMETHOD_(long, Release)(THIS) OVERRIDE
-	{
-		return SWindow::Release();
-	}
-	STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
-	{
-		SWindow::OnFinalRelease();
-	}
+    : public T
+    , public SWindow {
+  public:
+    STDMETHOD_(long, AddRef)(THIS) OVERRIDE
+    {
+        return SWindow::AddRef();
+    }
+    STDMETHOD_(long, Release)(THIS) OVERRIDE
+    {
+        return SWindow::Release();
+    }
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
+    {
+        SWindow::OnFinalRelease();
+    }
 
-	STDMETHOD_(IWindow*, ToIWindow)(THIS) OVERRIDE
-	{
-		return this;
-	}
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) OVERRIDE
+    {
+        return this;
+    }
 
-	STDMETHOD_(HRESULT, QueryInterface)(REFGUID id,IObjRef **ppRet) OVERRIDE
-	{
-		if(id == __uuidof(T))
-		{
-			*ppRet = (T*)this;
-			AddRef();
-			return S_OK;
-		}else
-		{
-			return E_NOTIMPL;
-		}
-	}
+    STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
+    {
+        if (id == __uuidof(T))
+        {
+            *ppRet = (T *)this;
+            AddRef();
+            return S_OK;
+        }
+        else
+        {
+            return E_NOTIMPL;
+        }
+    }
 };
 
 } // namespace SOUI

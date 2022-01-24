@@ -673,8 +673,8 @@ void SPanel::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *p
 //////////////////////////////////////////////////////////////////////////
 SScrollView::SScrollView()
 {
-	m_ptOrigin = CPoint();
-	m_szView = CSize();
+    m_ptOrigin = CPoint();
+    m_szView = CSize();
     m_bClipClient = TRUE;
     m_viewSize[0].setInvalid();
     m_viewSize[1].setInvalid();
@@ -753,7 +753,6 @@ SIZE SScrollView::GetViewSize() const
 {
     return m_szView;
 }
-
 
 void SScrollView::UpdateScrollBar()
 {
@@ -936,7 +935,7 @@ RECT SScrollView::GetChildrenLayoutRect() const
 {
     CRect rcRet = __baseCls::GetChildrenLayoutRect();
     CRect rcPadding = GetStyle().GetPadding();
-    rcRet.OffsetRect(-m_ptOrigin.x,-m_ptOrigin.y);
+    rcRet.OffsetRect(-m_ptOrigin.x, -m_ptOrigin.y);
     rcRet.right = rcRet.left + m_szView.cx - rcPadding.left - rcPadding.right;
     rcRet.bottom = rcRet.top + m_szView.cy - rcPadding.top - rcPadding.bottom;
     return rcRet;

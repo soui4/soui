@@ -433,12 +433,12 @@ BOOL SItemPanel::IsItemInClip(const SMatrix &mtx,
 
 LPARAM SItemPanel::GetItemIndex() const
 {
-	return m_lpItemIndex;
+    return m_lpItemIndex;
 }
 
 void SItemPanel::SetItemIndex(LPARAM lp)
 {
-	m_lpItemIndex = lp;
+    m_lpItemIndex = lp;
 }
 
 SNSEND

@@ -172,7 +172,6 @@ typedef enum _SOUI_EVENTS
 #define DEF_EVT(evt, id, name, x) DEF_EVENT(evt, id, name, x, SOUI_EXP)
 #define DEF_EVT_EXT(evt, id, x)   DEF_EVENT(evt, id, on_##evt, x, )
 
-
 DEF_EVT(EventInit, EVT_INIT, on_init, {});
 
 DEF_EVT(EventExit, EVT_EXIT, on_exit, {});

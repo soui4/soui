@@ -3506,10 +3506,9 @@ BOOL SWindow::UnsubscribeEvent(THIS_ DWORD evtId, const IEvtSlot *pSlot)
     return GetEventSet()->unsubscribeEvent(evtId, pSlot);
 }
 
-
-HRESULT SWindow::QueryInterface(THIS_ REFGUID id,IObjRef **ppRet)
+HRESULT SWindow::QueryInterface(THIS_ REFGUID id, IObjRef **ppRet)
 {
-	return E_NOINTERFACE;
+    return E_NOINTERFACE;
 }
 
 //////////////////////////////////////////////////////////////////////////

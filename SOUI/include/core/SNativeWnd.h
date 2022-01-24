@@ -124,33 +124,34 @@ struct tagThunk // this should come out to 16 bytes
 #error Only AMD64, ARM and X86 supported
 #endif
 
-template<class T>
-class TObjRefProxy : public T, public TObjRefImpl<SObject>
-{
-public:
-		//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) OVERRIDE{
-		return TObjRefImpl<SObject>::AddRef();
-	}
+template <class T>
+class TObjRefProxy
+    : public T
+    , public TObjRefImpl<SObject> {
+  public:
+    //!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) OVERRIDE
+    {
+        return TObjRefImpl<SObject>::AddRef();
+    }
 
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) OVERRIDE
-	{
-		return TObjRefImpl<SObject>::Release();
-	}
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) OVERRIDE
+    {
+        return TObjRefImpl<SObject>::Release();
+    }
 
-	//!释放对象
-	/*!
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) OVERRIDE
-	{
-		return TObjRefImpl<SObject>::OnFinalRelease();
-	}
-
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
+    {
+        return TObjRefImpl<SObject>::OnFinalRelease();
+    }
 };
 
 class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd> {
@@ -305,7 +306,7 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd> {
      BLENDFUNCTION *pblend,
      DWORD dwFlags) OVERRIDE;
 
-	STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun,void * ctx) OVERRIDE;
+    STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) OVERRIDE;
 
     LRESULT DefWindowProc();
     LRESULT ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
@@ -331,8 +332,9 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd> {
 
     const MSG *m_pCurrentMsg;
     BOOL m_bDestoryed;
-	FunMsgHandler m_fun;
-	void * m_ctx;
+    FunMsgHandler m_fun;
+    void *m_ctx;
+
   public:
     HWND m_hWnd;
 

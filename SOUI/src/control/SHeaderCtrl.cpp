@@ -32,18 +32,18 @@ int SHeaderCtrl::InsertItem(int iItem,
                             int nWidth,
                             UINT fmt,
                             LPARAM lParam,
-							BOOL bDpiAware/*=FALSE*/,
-							float fWeight/*=0.0f*/)
+                            BOOL bDpiAware /*=FALSE*/,
+                            float fWeight /*=0.0f*/)
 {
     SASSERT(pszText);
     SASSERT(nWidth >= 0);
     if (iItem == -1)
         iItem = (int)m_arrItems.GetCount();
-	SHDITEMEX item;
-	item.mask = SHDI_ALL;
-	item.fmt = fmt;
-	item.fWeight = fWeight;
-	SLayoutSize szWid((float)nWidth, bDpiAware?SLayoutSize::dp:SLayoutSize::px);
+    SHDITEMEX item;
+    item.mask = SHDI_ALL;
+    item.fmt = fmt;
+    item.fWeight = fWeight;
+    SLayoutSize szWid((float)nWidth, bDpiAware ? SLayoutSize::dp : SLayoutSize::px);
     item.cx = szWid.toPixelSize(GetScale());
     item.bDpiAware = bDpiAware;
     item.strText.SetCtxProvider(this);
@@ -73,7 +73,8 @@ BOOL SHeaderCtrl::GetItem(int iItem, SHDITEM *pItem) const
         return FALSE;
     if (pItem->mask & SHDI_TEXT && pItem->pszText && pItem->cchMaxText)
     {
-		_tcscpy_s(pItem->pszText,pItem->cchMaxText,m_arrItems[iItem].strText.GetText(FALSE).c_str());
+        _tcscpy_s(pItem->pszText, pItem->cchMaxText,
+                  m_arrItems[iItem].strText.GetText(FALSE).c_str());
     }
     if (pItem->mask & SHDI_WIDTH)
     {
@@ -85,10 +86,10 @@ BOOL SHeaderCtrl::GetItem(int iItem, SHDITEM *pItem) const
         pItem->fmt = m_arrItems[iItem].fmt;
     if (pItem->mask & SHDI_ORDER)
         pItem->iOrder = m_arrItems[iItem].iOrder;
-	if(pItem->mask & SHDI_VISIBLE)
-		pItem->bVisible = m_arrItems[iItem].bVisible;
-	if(pItem->mask & SHDI_WEIGHT)
-		pItem->fWeight = m_arrItems[iItem].fWeight;
+    if (pItem->mask & SHDI_VISIBLE)
+        pItem->bVisible = m_arrItems[iItem].bVisible;
+    if (pItem->mask & SHDI_WEIGHT)
+        pItem->fWeight = m_arrItems[iItem].fWeight;
     return TRUE;
 }
 
@@ -107,12 +108,12 @@ BOOL SHeaderCtrl::SetItem(int iItem, const SHDITEM *pItem)
         item.cx = pItem->cx;
     if (pItem->mask & SHDI_LPARAM)
         item.lParam = pItem->lParam;
-	if(pItem->mask & SHDI_WEIGHT)
-		item.fWeight = pItem->fWeight;
-	if(pItem->mask & SHDI_FORMAT)
-		item.fmt = pItem->fmt;
-	if(pItem->mask & SHDI_VISIBLE)
-		item.bVisible = pItem->bVisible;
+    if (pItem->mask & SHDI_WEIGHT)
+        item.fWeight = pItem->fWeight;
+    if (pItem->mask & SHDI_FORMAT)
+        item.fmt = pItem->fmt;
+    if (pItem->mask & SHDI_VISIBLE)
+        item.bVisible = pItem->bVisible;
     return TRUE;
 }
 
@@ -149,28 +150,30 @@ void SHeaderCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, const LPSHDITEMEX p
         return;
     if (m_pSkinItem)
         m_pSkinItem->DrawByIndex(pRT, rcItem, pItem->state);
-	UINT align = DT_SINGLELINE|DT_VCENTER;
-	if(pItem->fmt & HDF_CENTER)
-		align |= DT_CENTER;
-	else if(pItem->fmt & HDF_RIGHT)
-		align |= DT_RIGHT;
+    UINT align = DT_SINGLELINE | DT_VCENTER;
+    if (pItem->fmt & HDF_CENTER)
+        align |= DT_CENTER;
+    else if (pItem->fmt & HDF_RIGHT)
+        align |= DT_RIGHT;
 
-	BOOL bDrawSortFlag = (pItem->fmt & SORT_MASK) !=0 && m_pSkinSort;
-	if(!bDrawSortFlag)
-	{
-		pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(), rcItem,align);
-		return;
-	}
+    BOOL bDrawSortFlag = (pItem->fmt & SORT_MASK) != 0 && m_pSkinSort;
+    if (!bDrawSortFlag)
+    {
+        pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(),
+                      rcItem, align);
+        return;
+    }
 
-	CSize szSort = m_pSkinSort->GetSkinSize();
-	rcItem.right -= szSort.cx;
+    CSize szSort = m_pSkinSort->GetSkinSize();
+    rcItem.right -= szSort.cx;
 
-    pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(), rcItem,align);
+    pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(), rcItem,
+                  align);
     CPoint ptSort;
-	ptSort.x = rcItem.right;
+    ptSort.x = rcItem.right;
     ptSort.y = rcItem.top + (rcItem.Height() - szSort.cy) / 2;
 
-    m_pSkinSort->DrawByIndex(pRT, CRect(ptSort, szSort), (pItem->fmt&HDF_SORTUP) ? 0 : 1);
+    m_pSkinSort->DrawByIndex(pRT, CRect(ptSort, szSort), (pItem->fmt & HDF_SORTUP) ? 0 : 1);
 }
 
 BOOL SHeaderCtrl::DeleteItem(int iItem)
@@ -475,7 +478,7 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
     int iOrder = 0;
     while (xmlItem)
     {
-		SHDITEMEX item;
+        SHDITEMEX item;
         item.strText.SetCtxProvider(this);
         item.mask = 0xFFFFFFFF;
         item.iOrder = iOrder++;
@@ -488,25 +491,25 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
         item.bDpiAware = (szItem.unit != SLayoutSize::px);
         item.lParam = xmlItem.attribute(L"userData").as_uint(0);
         item.bVisible = xmlItem.attribute(L"visible").as_bool(true);
-		item.fmt = 0;
-		SStringW strSort = xmlItem.attribute(L"sortFlag").as_string();
-		strSort.MakeLower();
-		if(strSort==L"down")
-			item.fmt |= HDF_SORTDOWN;
-		else if(strSort == L"up")
-			item.fmt |= HDF_SORTUP;
-		SStringW strAlign = xmlItem.attribute(L"align").as_string();
-		strAlign.MakeLower();
-		if(strAlign == L"left")
-			item.fmt |= HDF_LEFT;
-		else if(strAlign == L"center")
-			item.fmt |= HDF_CENTER;
-		else if(strAlign == L"right")
-			item.fmt |= HDF_RIGHT;
+        item.fmt = 0;
+        SStringW strSort = xmlItem.attribute(L"sortFlag").as_string();
+        strSort.MakeLower();
+        if (strSort == L"down")
+            item.fmt |= HDF_SORTDOWN;
+        else if (strSort == L"up")
+            item.fmt |= HDF_SORTUP;
+        SStringW strAlign = xmlItem.attribute(L"align").as_string();
+        strAlign.MakeLower();
+        if (strAlign == L"left")
+            item.fmt |= HDF_LEFT;
+        else if (strAlign == L"center")
+            item.fmt |= HDF_CENTER;
+        else if (strAlign == L"right")
+            item.fmt |= HDF_RIGHT;
 
-		m_arrItems.InsertAt(m_arrItems.GetCount(), item);
+        m_arrItems.InsertAt(m_arrItems.GetCount(), item);
 
-		xmlItem = xmlItem.next_sibling(L"item");
+        xmlItem = xmlItem.next_sibling(L"item");
     }
 
     return TRUE;
@@ -708,7 +711,7 @@ void SHeaderCtrl::SetItemSort(int iItem, UINT sortFlag)
 
     if ((sortFlag & SORT_MASK) != (m_arrItems[iItem].fmt & SORT_MASK))
     {
-		m_arrItems[iItem].fmt &= ~SORT_MASK;
+        m_arrItems[iItem].fmt &= ~SORT_MASK;
         m_arrItems[iItem].fmt |= sortFlag & SORT_MASK;
         CRect rcItem = GetItemRect(iItem);
         InvalidateRect(rcItem);
@@ -791,7 +794,7 @@ BOOL SHeaderCtrl::IsAutoResize() const
 
 UINT SHeaderCtrl::GetItemCount() const
 {
-	return (UINT)m_arrItems.GetCount();
+    return (UINT)m_arrItems.GetCount();
 }
 
 } // end of namespace SOUI

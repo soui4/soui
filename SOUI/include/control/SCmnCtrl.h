@@ -289,7 +289,6 @@ class SOUI_EXP SImageButton : public SButton {
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
 };
 
-
 /**
  * @class      SImageWnd
  * @brief      图片控件类
@@ -316,7 +315,6 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      */
     virtual ~SImageWnd();
 
-
     /**
      * SImageWnd::SetSkin
      * @param    ISkinObj *pSkin -- 资源
@@ -339,7 +337,7 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      */
     void WINAPI SetImage(IBitmap *pBitmap, FilterLevel fl = kNone_FilterLevel);
 
-    IBitmap * WINAPI GetImage();
+    IBitmap *WINAPI GetImage();
 
     /**
      * SImageWnd::SetIcon
@@ -358,7 +356,7 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      *
      * Describe  获取资源
      */
-    ISkinObj * WINAPI GetSkin()
+    ISkinObj *WINAPI GetSkin()
     {
         return m_pSkin;
     }
@@ -392,8 +390,8 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
     ATTR_BOOL(L"keepAspect", m_bKeepAspect, TRUE)
     SOUI_ATTRS_END()
 
-protected:
-	void OnPaint(IRenderTarget *pRT);
+  protected:
+    void OnPaint(IRenderTarget *pRT);
 
     SOUI_MSG_MAP_BEGIN()
     MSG_WM_PAINT_EX(OnPaint)
@@ -407,7 +405,7 @@ protected:
  * Describe    此窗口支持动画效果
  */
 class SOUI_EXP SAnimateImgWnd
-    : public TWindowProxy<IAnimateImgWnd> 
+    : public TWindowProxy<IAnimateImgWnd>
     , public ITimelineHandler {
     SOUI_CLASS_NAME(SWindow, L"animateimg")
   public:

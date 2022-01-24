@@ -200,7 +200,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) PURE;
 
-	STDMETHOD_(COLORREF,GetBkgndColor)(THIS) SCONST PURE;
+    STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST PURE;
 
     /**
      * Move2
@@ -318,7 +318,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
 
-	STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id,IObjRef **ppRet) PURE;
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppRet) PURE;
 };
 
 SNSEND

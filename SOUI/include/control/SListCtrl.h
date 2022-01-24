@@ -124,12 +124,12 @@ class SOUI_EXP SListCtrl : public SPanel {
      * @param    int nIndex -- 索引
      * @param    LPCTSTR pszText -- 标题
      * @param    int nWidth -- 宽度
-	 * @param	 UINT fmt -- format
+     * @param	 UINT fmt -- format
      * @param    LPARAM lParam -- 附加参数
      *
      * Describe  插入一列
      */
-    int InsertColumn(int nIndex, LPCTSTR pszText, int nWidth,UINT fmt, LPARAM lParam = 0);
+    int InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam = 0);
     /**
      * SListCtrl::InsertItem
      * @brief    插入条目

@@ -338,10 +338,10 @@ class THostWndProxy
                                              dwFlags);
     }
 
-	STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun,void * ctx) OVERRIDE
-	{
-		return SHostWnd::SetMsgHandler(fun,ctx);
-	}
+    STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) OVERRIDE
+    {
+        return SHostWnd::SetMsgHandler(fun, ctx);
+    }
 
     STDMETHOD_(HWND, CreateEx)
     (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)
