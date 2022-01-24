@@ -1094,12 +1094,12 @@ void SListView::OnRebuildFont()
     DispatchMessage2Items(UM_UPDATEFONT, 0, 0);
 }
 
-ILvAdapter *SListView::GetAdapter()
+ILvAdapter *SListView::GetAdapter() const
 {
     return m_adapter;
 }
 
-IListViewItemLocator *SListView::GetItemLocator()
+IListViewItemLocator *SListView::GetItemLocator() const
 {
     return m_lvItemLocator;
 }
@@ -1111,10 +1111,9 @@ int SListView::GetSel() const
 
 IItemPanel *SListView::HitTest(const POINT *pt) const
 {
-    SASSERT(pt);
-    CPoint pt2(*pt);
-    SItemPanel *pRet = HitTest(pt2);
-    return pRet;
+	SASSERT(pt);
+	if(!pt) return NULL;
+	return HitTest(CPoint(*pt));
 }
 
 } // namespace SOUI

@@ -131,11 +131,11 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
     return TRUE;
 }
 
-int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam)
+int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam,BOOL bDpiAware/*=TRUE*/,float fWeight/*=0.0f*/)
 {
     SASSERT(m_pHeader);
 
-    int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, fmt, lParam);
+    int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, fmt, lParam,bDpiAware,fWeight);
     UpdateScrollBar();
     return nRet;
 }
@@ -852,7 +852,7 @@ void SMCListView::RedrawItem(SItemPanel *pItem)
     pItem->InvalidateRect(NULL);
 }
 
-SItemPanel *SMCListView::HitTest(CPoint &pt)
+SItemPanel *SMCListView::HitTest(CPoint &pt) const
 {
     SPOSITION pos = m_lstItems.GetHeadPosition();
     while (pos)
@@ -866,6 +866,13 @@ SItemPanel *SMCListView::HitTest(CPoint &pt)
         }
     }
     return NULL;
+}
+
+IItemPanel * SMCListView::HitTest(const POINT *pt) const
+{
+	SASSERT(pt);
+	if(!pt) return NULL;
+	return HitTest(CPoint(*pt));
 }
 
 LRESULT SMCListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -1333,6 +1340,26 @@ void SMCListView::OnRebuildFont()
 {
     __baseCls::OnRebuildFont();
     DispatchMessage2Items(UM_UPDATEFONT, 0, 0);
+}
+
+int SMCListView::GetSel() const
+{
+	return m_iSelItem;
+}
+
+IListViewItemLocator * SMCListView::GetItemLocator() const
+{
+	return m_lvItemLocator;
+}
+
+IMcAdapter * SMCListView::GetAdapter() const
+{
+	return m_adapter;
+}
+
+IHeaderCtrl * SMCListView::GetIHeaderCtrl() const
+{
+	return GetHeaderCtrl();
 }
 
 } // namespace SOUI

@@ -21,7 +21,7 @@ namespace SOUI
 //////////////////////////////////////////////////////////////////////////
 //  SMCListView
 class SOUI_EXP SMCListView
-    : public SPanel
+    : public TPanelProxy<IMcListView>
     , protected IItemContainer {
     SOUI_CLASS_NAME(SPanel, L"mclistview")
     friend class SMCListViewDataSetObserver;
@@ -42,48 +42,39 @@ class SOUI_EXP SMCListView
      * Describe  析构函数
      */
     virtual ~SMCListView();
-    /**
-     * SMCListView::InsertColumn
-     * @brief    插入一列
-     * @param    int nIndex -- 索引
-     * @param    LPCTSTR pszText -- 标题
-     * @param    int nWidth -- 宽度
-     * @param    LPARAM lParam -- 附加参数
-     *
-     * Describe  插入一列
-     */
-    int InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam = 0);
 
-    void DeleteColumn(int iCol);
+public:
+	STDMETHOD_(BOOL, SetAdapter)(THIS_ IMcAdapter * adapter) OVERRIDE;
 
-    int GetColumnCount() const;
+	STDMETHOD_(IMcAdapter *, GetAdapter)(THIS) SCONST OVERRIDE;
 
-    BOOL SetAdapter(IMcAdapter *adapter);
+	STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST OVERRIDE;
 
-    ILvAdapter *GetAdapter()
-    {
-        return m_adapter;
-    }
+	STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator * pItemLocator) OVERRIDE;
 
-    IListViewItemLocator *GetItemLocator()
-    {
-        return m_lvItemLocator;
-    }
+	STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) OVERRIDE;
 
-    void UpdateVisibleItems();
-    void UpdateVisibleItem(int iItem);
+	STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify = FALSE) OVERRIDE;
 
-    void SetItemLocator(IListViewItemLocator *pItemLocator);
-    void EnsureVisible(int iItem);
+	STDMETHOD_(int, GetSel)(THIS) SCONST OVERRIDE;
 
-    void SetSel(int iItem, BOOL bNotify = FALSE);
-    int GetSel() const
-    {
-        return m_iSelItem;
-    }
-    SItemPanel *HitTest(CPoint &pt);
+	STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
+
+	STDMETHOD_(IHeaderCtrl *,GetIHeaderCtrl)(THIS) SCONST OVERRIDE;
+
+	STDMETHOD_(int,InsertColumn)(THIS_ int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam = 0,BOOL bDpiAware=TRUE,float fWeight=0.0f) OVERRIDE;
+
+	STDMETHOD_(void,DeleteColumn)(THIS_ int iCol) OVERRIDE;
+
+	STDMETHOD_(int,GetColumnCount)(THIS) SCONST OVERRIDE;
+
+public:
+
+    SItemPanel *HitTest(CPoint &pt) const;
 
     SHeaderCtrl *GetHeaderCtrl() const;
+	void UpdateVisibleItems();
+	void UpdateVisibleItem(int iItem);
 
   protected:
     virtual void OnItemSetCapture(SItemPanel *pItem, BOOL bCapture);
@@ -239,7 +230,6 @@ class SOUI_EXP SMCListView
 
   protected:
     CRect _OnItemGetRect(int iPosition) const;
-
   protected:
     SHeaderCtrl *m_pHeader;
     SLayoutSize m_nHeaderHeight; /**< 列表头高度 */

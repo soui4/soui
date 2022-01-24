@@ -19,9 +19,9 @@ class SOUI_EXP SListView
 
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter *adapter) OVERRIDE;
 
-    STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) OVERRIDE;
+    STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) OVERRIDE;
+    STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator *pItemLocator) OVERRIDE;
 
