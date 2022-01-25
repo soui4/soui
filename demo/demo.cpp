@@ -363,10 +363,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
         
         //采用hook绘制菜单的边框
         SMenuWndHook::InstallHook(hInstance,L"_skin.sys.menu.border");
-        
-        //加载全局资源描述XML
-        //theApp->Init(_T("xml_init")); 不再需要这句，在AddResProvider时自动执行初始化
-        
+                
         //演示R.color.xxx,R.string.xxx在代码中的使用。
         COLORREF crRed = GETCOLOR(R.color.red);
         SStringW strTitle = GETSTRING(R.string.title);

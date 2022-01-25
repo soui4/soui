@@ -924,7 +924,7 @@ UINT CMainDlg::Run()
 			pOutput->AppendFormatText(strMsg);
 		);
 #else
-		EventThread *pEvt = new EventThread(GetRoot());
+		EventThread *pEvt = new EventThread(this);
 		pEvt->nData = nSleep;
 		SNotifyCenter::getSingleton().FireEventAsync(pEvt);
 		pEvt->Release();
@@ -941,7 +941,7 @@ void CMainDlg::OnBtnStartNotifyThread()
 	SNotifyCenter::getSingleton().addEvent(EVENTID(EventThreadStop));
 	SNotifyCenter::getSingleton().addEvent(EVENTID(EventThread));
 
-	EventThreadStart evt(GetRoot());
+	EventThreadStart evt(this);
 	SNotifyCenter::getSingleton().FireEventSync(&evt);
 	BeginThread();	
 }
@@ -951,7 +951,7 @@ void CMainDlg::OnBtnStopNotifyThread()
 	if(!IsRunning()) return;
 
 	EndThread();
-	EventThreadStop evt(GetRoot());
+	EventThreadStop evt(this);
 	SNotifyCenter::getSingleton().FireEventSync(&evt);
 
 	SNotifyCenter::getSingleton().removeEvent(EventThreadStart::EventID);
@@ -959,21 +959,21 @@ void CMainDlg::OnBtnStopNotifyThread()
 	SNotifyCenter::getSingleton().removeEvent(EventThread::EventID);
 }
 
-bool CMainDlg::OnEventThreadStart(IEvtArgs *e)
+BOOL CMainDlg::OnEventThreadStart(IEvtArgs *e)
 {
 	SChatEdit *pOutput = FindChildByID2<SChatEdit>(R.id.re_notifycenter);
 	pOutput->AppendFormatText(L"start Thread");
 	return true;
 }
 
-bool CMainDlg::OnEventThreadStop(IEvtArgs *e)
+BOOL CMainDlg::OnEventThreadStop(IEvtArgs *e)
 {
 	SChatEdit *pOutput = FindChildByID2<SChatEdit>(R.id.re_notifycenter);
 	pOutput->AppendFormatText(L"stop Thread");
 	return true;
 }
 
-bool CMainDlg::OnEventThread(IEvtArgs *e)
+BOOL CMainDlg::OnEventThread(IEvtArgs *e)
 {
 	EventThread *pEvt = sobj_cast<EventThread>(e);
 	SStringW strMsg = SStringW().Format(L"event thread, sleep = %d",pEvt->nData);

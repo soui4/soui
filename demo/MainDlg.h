@@ -187,9 +187,9 @@ protected:
 	void OnBtnStartNotifyThread();
 	void OnBtnStopNotifyThread();
 
-	bool OnEventThreadStart(IEvtArgs *e);
-	bool OnEventThreadStop(IEvtArgs *e);
-	bool OnEventThread(IEvtArgs *e);
+	BOOL OnEventThreadStart(IEvtArgs *e);
+	BOOL OnEventThreadStop(IEvtArgs *e);
+	BOOL OnEventThread(IEvtArgs *e);
 	void OnBtnOpenWrapContent();
 	
 	void OnCbxInterpolotorChange(IEvtArgs *e);
