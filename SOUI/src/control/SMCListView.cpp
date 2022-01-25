@@ -13,10 +13,11 @@ class SMCListViewDataSetObserver : public TObjRefImpl<ILvDataSetObserver> {
         : m_pOwner(pView)
     {
     }
-    virtual void onChanged();
-    virtual void onInvalidated();
+    STDMETHOD_(void, onChanged)(THIS) OVERRIDE;
 
-    virtual void OnItemChanged(int iItem);
+    STDMETHOD_(void, onInvalidated)(THIS) OVERRIDE;
+
+    STDMETHOD_(void, OnItemChanged)(THIS_ int iItem) OVERRIDE;
 
   protected:
     SMCListView *m_pOwner;
@@ -120,7 +121,7 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
         m_lvItemLocator->SetAdapter(adapter);
     if (m_adapter)
     {
-        m_adapter->InitByTemplate(m_xmlTemplate.root().first_child());
+        m_adapter->InitByTemplate(&m_xmlTemplate.root().first_child());
         m_adapter->registerDataSetObserver(m_observer);
         for (int i = 0; i < m_adapter->getViewTypeCount(); i++)
         {
@@ -398,7 +399,8 @@ BOOL SMCListView::OnHeaderSizeChanging(IEvtArgs *pEvt)
             m_pHeader->GetItem(i, &hi);
             rcSubItem.left = rcSubItem.right;
             rcSubItem.right += m_pHeader->GetItemWidth(i);
-            SStringW strColName = m_adapter->GetColumnName(hi.iOrder);
+            SStringW strColName;
+            m_adapter->GetColumnName(hi.iOrder, &strColName);
             SWindow *pCol = ii.pItem->FindChildByName(strColName);
             if (pCol)
             {
@@ -668,7 +670,7 @@ void SMCListView::UpdateVisibleItems()
                 m_pHoverItem = ii.pItem;
 
             //应用可以根据ii.pItem的状态来决定如何初始化列表数据
-            m_adapter->getView(iNewLastVisible, ii.pItem, m_xmlTemplate.root().first_child());
+            m_adapter->getView(iNewLastVisible, ii.pItem, &m_xmlTemplate.root().first_child());
             if (bNewItem)
             {
                 ii.pItem->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
@@ -693,7 +695,8 @@ void SMCListView::UpdateVisibleItems()
             {
                 SHDITEM hditem = { SHDI_ORDER | SHDI_WIDTH, 0 };
                 m_pHeader->GetItem(i, &hditem);
-                SStringW strColName = m_adapter->GetColumnName(hditem.iOrder);
+                SStringW strColName;
+                m_adapter->GetColumnName(hditem.iOrder, &strColName);
                 SWindow *pColWnd = ii.pItem->FindChildByName(strColName);
                 SASSERT(pColWnd);
                 if (m_pHeader->IsItemVisible(i))
@@ -753,7 +756,7 @@ void SMCListView::UpdateVisibleItem(int iItem)
     SASSERT(m_lvItemLocator->IsFixHeight());
     SItemPanel *pItem = GetItemPanel(iItem);
     SASSERT(pItem);
-    m_adapter->getView(iItem, pItem, m_xmlTemplate.root().first_child());
+    m_adapter->getView(iItem, pItem, &m_xmlTemplate.root().first_child());
 }
 
 void SMCListView::OnSize(UINT nType, CSize size)

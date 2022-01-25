@@ -30,7 +30,7 @@ public:
 		}
 	}
 
-	virtual int getCount()
+	STDMETHOD_(int,getCount)() OVERRIDE
 	{
 		//SAutoLock autolock(updatalock);
 		return m_musicList.GetCount();
@@ -45,7 +45,7 @@ public:
 		m_musicList.Add(item);
 		notifyDataSetChanged();
 	}
-	virtual void getView(int position, SWindow * pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
@@ -54,14 +54,6 @@ public:
 		pItem->FindChildByName(_T("songname"))->SetWindowText(m_musicList[position].songname);
 		pItem->FindChildByName(_T("artist"))->SetWindowText(m_musicList[position].artist);
 		pItem->FindChildByName(_T("album"))->SetWindowText(m_musicList[position].album);
-// 		if (IsSel(position))
-// 		{
-// 			pItem->ModifyState(WndState_Check, 0);
-// 		}
-// 		else
-// 		{
-// 			pItem->ModifyState(0, WndState_Check);
-// 		}
 		if ((pItem->GetState() & WndState_Check) || (pItem->GetState() & WndState_Hover))
 		{
 			SWindow* pChildItem = pItem->FindChildByName(_T("playbtn"));
@@ -71,63 +63,8 @@ public:
 			}
 		}
 		pItem->GetEventSet()->subscribeEvent(EventSwndStateChanged::EventID, Subscriber(&SMusicListAdapter::OnItemStateChanged, this));
-		//pItem->FindChildByName(L"btn_play")->GetEventSet()->subscribeEvent(EVT_CMD, Subscriber(&SMusicListAdapter::btn_play, this));
-		//pItem->FindChildByName(L"btn_play")->SetUserData(position);
 	}
 
-// 	bool btn_play(IEvtArgs *pEvt)
-// 	{
-// 		SAutoLock autolock(updatalock);
-// 		SWindow *btn = sobj_cast<SWindow>(pEvt->Sender());
-// 		m_curren_play = btn->GetUserData();
-// 		return SLibZplay::getSingleton().Play(m_musicList[m_curren_play].songpath);
-// 	}
-// 	bool play()
-// 	{
-// 		SAutoLock autolock(updatalock);
-// 		return SLibZplay::getSingleton().Play(m_musicList[m_curren_play].songpath);
-// 	}
-// 	void play_next()
-// 	{
-// 		SAutoLock autolock(updatalock);
-// 		if ((++m_curren_play < m_musicList.GetCount()) && m_curren_play >= 0)
-// 		{
-// 			SLibZplay::getSingleton().Play(m_musicList[m_curren_play].songpath);
-// 		}
-// 		else
-// 		{
-// 			m_curren_play = 0;
-// 			SLibZplay::getSingleton().Play(m_musicList[m_curren_play].songpath);
-// 		}
-// 	}
-// 	void play_prev()
-// 	{
-// 		SAutoLock autolock(updatalock);
-// 		if ((--m_curren_play >= 0) && m_curren_play<m_musicList.GetCount())
-// 		{
-// 			SLibZplay::getSingleton().Play(m_musicList[m_curren_play].songpath);
-// 		}
-// 		else
-// 		{
-// 			m_curren_play = 0;
-// 			SLibZplay::getSingleton().Play(m_musicList[m_curren_play].songpath);
-// 		}
-// 	}
-// 	ISlotFunctor *ctxFun;
-// 	void SetCtxMenuFun(const ISlotFunctor &pFun)
-// 	{
-// 		if (ctxFun)
-// 			ctxFun = NULL;
-// 		ctxFun = pFun.Clone();
-// 	}
-// 	bool OnItemCtxMenu(IEvtArgs *pEvt)
-// 	{
-// 		if (ctxFun)
-// 		{
-// 			return (*ctxFun)(pEvt);
-// 		}
-// 		return false;
-// 	}
 	BOOL OnItemStateChanged(IEvtArgs *pEvt)
 	{
 		SWindow *pItem = sobj_cast<SWindow>(pEvt->Sender());
@@ -189,7 +126,7 @@ public:
 		return true;
 	}
 	
-	SStringW GetColumnName(int iCol) const {
+	STDMETHOD_(SStringW,GetColumnName)(int iCol) const {
 		return m_colNames[iCol];
 	}
 
@@ -201,12 +138,7 @@ public:
 		}
 	}
 
-	virtual bool OnSort(int iCol, UINT * pFmt, int nCols)
-	{
-		return false;
-	}
-
-	virtual void InitByTemplate(SXmlNode xmlTemplate)
+	virtual void WINAPI InitByTemplate(SXmlNode xmlTemplate)
 	{
 		IniColNames(xmlTemplate);
 	}

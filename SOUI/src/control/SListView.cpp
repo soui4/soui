@@ -11,10 +11,11 @@ class SListViewDataSetObserver : public TObjRefImpl<ILvDataSetObserver> {
         : m_pOwner(pView)
     {
     }
-    virtual void onChanged();
-    virtual void onInvalidated();
+    STDMETHOD_(void, onChanged)(THIS) OVERRIDE;
 
-    virtual void OnItemChanged(int iItem);
+    STDMETHOD_(void, onInvalidated)(THIS) OVERRIDE;
+
+    STDMETHOD_(void, OnItemChanged)(THIS_ int iItem) OVERRIDE;
 
   protected:
     SListView *m_pOwner;
@@ -113,7 +114,7 @@ BOOL SListView::SetAdapter(ILvAdapter *adapter)
         m_lvItemLocator->SetAdapter(adapter);
     if (m_adapter)
     {
-        m_adapter->InitByTemplate(m_xmlTemplate.root().first_child());
+        m_adapter->InitByTemplate(&m_xmlTemplate.root().first_child());
         m_adapter->registerDataSetObserver(m_observer);
         for (int i = 0; i < m_adapter->getViewTypeCount(); i++)
         {
@@ -419,7 +420,7 @@ void SListView::UpdateVisibleItems()
             if (dwState & WndState_Hover)
                 m_pHoverItem = ii.pItem;
 
-            m_adapter->getView(iNewLastVisible, ii.pItem, m_xmlTemplate.root().first_child());
+            m_adapter->getView(iNewLastVisible, ii.pItem, &m_xmlTemplate.root().first_child());
             if (bNewItem)
             {
                 ii.pItem->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
@@ -492,7 +493,7 @@ void SListView::UpdateVisibleItem(int iItem)
     SASSERT(m_lvItemLocator->IsFixHeight());
     SItemPanel *pItem = GetItemPanel(iItem);
     SASSERT(pItem);
-    m_adapter->getView(iItem, pItem, m_xmlTemplate.root().first_child());
+    m_adapter->getView(iItem, pItem, &m_xmlTemplate.root().first_child());
 }
 
 void SListView::OnSize(UINT nType, CSize size)

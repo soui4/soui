@@ -1,29 +1,34 @@
 ﻿#pragma once
 
 #include <interface/obj-ref-i.h>
-#include <string/tstring.h>
+#include <interface/SWindow-i.h>
+#include <interface/sstring-i.h>
 
-namespace SOUI
-{
-interface ILvDataSetObserver : public IObjRef
+SNSBEGIN
+
+#undef INTERFACE
+#define INTERFACE ILvDataSetObserver
+DECLARE_INTERFACE_(ILvDataSetObserver, IObjRef)
 {
     /**
      * This method is called when the entire data set has changed,
      * most likely through a call to {@link Cursor#requery()} on a {@link Cursor}.
      */
-    virtual void onChanged() PURE;
+    STDMETHOD_(void, onChanged)(THIS) PURE;
 
     /**
      * This method is called when the entire data becomes invalid,
      * most likely through a call to {@link Cursor#deactivate()} or {@link Cursor#close()} on a
      * {@link Cursor}.
      */
-    virtual void onInvalidated() PURE;
+    STDMETHOD_(void, onInvalidated)(THIS) PURE;
 
-    virtual void OnItemChanged(int iItem) PURE;
+    STDMETHOD_(void, OnItemChanged)(THIS_ int iItem) PURE;
 };
 
-interface ILvAdapter : public IObjRef
+#undef INTERFACE
+#define INTERFACE ILvAdapter
+DECLARE_INTERFACE_(ILvAdapter, IObjRef)
 {
 
     /**
@@ -31,7 +36,7 @@ interface ILvAdapter : public IObjRef
      *
      * @param observer the object that gets notified when the data set changes.
      */
-    virtual void registerDataSetObserver(ILvDataSetObserver * observer) PURE;
+    STDMETHOD_(void, registerDataSetObserver)(THIS_ ILvDataSetObserver * observer) PURE;
 
     /**
      * Unregister an observer that has previously been registered with this
@@ -39,14 +44,14 @@ interface ILvAdapter : public IObjRef
      *
      * @param observer the object to unregister.
      */
-    virtual void unregisterDataSetObserver(ILvDataSetObserver * observer) PURE;
+    STDMETHOD_(void, unregisterDataSetObserver)(THIS_ ILvDataSetObserver * observer) PURE;
 
     /**
      * How many items are in the data set represented by this Adapter.
      *
      * @return Count of items.
      */
-    virtual int getCount() PURE;
+    STDMETHOD_(int, getCount)(THIS) PURE;
 
     /**
      * Get a View that displays the data at the specified position in the data set. You can either
@@ -65,7 +70,7 @@ interface ILvAdapter : public IObjRef
      *        {@link #getItemViewType(int,DWORD)}).
      * @param xmlTemplate the xml template provided by its owner
      */
-    virtual void getView(int position, SWindow *pItem, SXmlNode xmlTemplate) PURE;
+    STDMETHOD_(void, getView)(THIS_ int position, IWindow *pItem, IXmlNode *xmlTemplate) PURE;
 
     /**
      * Get the type of View that will be created by {@link #getView} for the specified item.
@@ -79,7 +84,7 @@ interface ILvAdapter : public IObjRef
      *         also be returned.
      * @see #IGNORE_ITEM_VIEW_TYPE
      */
-    virtual int getItemViewType(int position, DWORD dwState) PURE;
+    STDMETHOD_(int, getItemViewType)(THIS_ int position, DWORD dwState) PURE;
 
     /**
      * <p>
@@ -95,9 +100,9 @@ interface ILvAdapter : public IObjRef
      *
      * @return The number of types of Views that will be created by this adapter
      */
-    virtual int getViewTypeCount() PURE;
+    STDMETHOD_(int, getViewTypeCount)(THIS) PURE;
 
-    virtual SIZE getViewDesiredSize(int position, SWindow *pItem, int wid, int hei) PURE;
+    STDMETHOD_(SIZE, getViewDesiredSize)(THIS_ int position, IWindow *pItem, int wid, int hei) PURE;
 
     /**
      * @return true if this adapter doesn't contain any data.  This is used to determine
@@ -105,99 +110,103 @@ interface ILvAdapter : public IObjRef
      * getCount() == 0 but since getCount() includes the headers and footers, specialized
      * adapters might want a different behavior.
      */
-    virtual bool isEmpty() PURE;
+    STDMETHOD_(BOOL, isEmpty)(THIS) PURE;
 
     /**
      * @return a custom defined data that associate with the specified item.
      */
-    virtual ULONG_PTR getItemData(int position) PURE;
+    STDMETHOD_(ULONG_PTR, getItemData)(THIS_ int position) PURE;
 
     /**
      * @return a string object that associate with the specified item.
      */
-    virtual SStringT getItemDesc(int positoin) PURE;
+    STDMETHOD_(void, getItemDesc)(THIS_ int positoin, IStringW *pDesc) PURE;
 
     /**
      * init adapter from the specified template xml data
      */
-    virtual void InitByTemplate(SXmlNode xmlTemplate) PURE;
+    STDMETHOD_(void, InitByTemplate)(IXmlNode * xmlTemplate) PURE;
 };
 
-enum SHDSORTFLAG;
-interface IMcAdapter : public ILvAdapter
+#undef INTERFACE
+#define INTERFACE IMcAdapter
+DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
 {
     //获取一个列在模板中对应的窗口名称
     // int iCol: 列序号
-    virtual SStringW GetColumnName(int iCol) const PURE;
+    STDMETHOD_(void, GetColumnName)(THIS_ int iCol, IStringW *pName) SCONST PURE;
 
     //由Adapter决定一列是否需要显示
     // int iCol: 列序号
     // remark:默认显示
-    virtual bool IsColumnVisible(int iCol) const
-    {
-        return true;
-    }
+    STDMETHOD_(BOOL, IsColumnVisible)(THIS_ int iCol) SCONST PURE;
 
     //排序接口
     // int iCol:排序列
     // UINT *pFmts [in, out]:当前列排序标志
     // int nCols:总列数,stFlags数组长度
-    virtual bool OnSort(int iCol, UINT *pFmts, int nCols) PURE;
+    STDMETHOD_(BOOL, OnSort)(THIS_ int iCol, UINT *pFmts, int nCols) PURE;
 };
 
 typedef ULONG_PTR HTREEITEM;
 
-interface ITvDataSetObserver : public IObjRef
+#undef INTERFACE
+#define INTERFACE ITvDataSetObserver
+DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
 {
     /**
      * This method is called when the entire data set has changed,
      * most likely through a call to {@link Cursor#requery()} on a {@link Cursor}.
      */
-    virtual void onBranchChanged(HTREEITEM hBranch) PURE;
+    STDMETHOD_(void, onBranchChanged)(THIS_ HTREEITEM hBranch) PURE;
 
     /**
      * This method is called when the entire data becomes invalid,
      * most likely through a call to {@link Cursor#deactivate()} or {@link Cursor#close()} on a
      * {@link Cursor}.
      */
-    virtual void onBranchInvalidated(HTREEITEM hBranch, bool bInvalidParents, bool bInvalidChildren)
-        PURE;
+    STDMETHOD_(void, onBranchInvalidated)
+    (THIS_ HTREEITEM hBranch, bool bInvalidParents, bool bInvalidChildren) PURE;
 
-    virtual void onBranchExpandedChanged(HTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew)
-        PURE;
+    STDMETHOD_(void, onBranchExpandedChanged)
+    (THIS_ HTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
 };
 
-interface ITvAdapter : public IObjRef
+enum
 {
+    ITEM_NULL = 0,
+    ITEM_ROOT = 0xFFFF0000,
+};
 
-    static const HTREEITEM ITEM_NULL = 0;
-    static const HTREEITEM ITEM_ROOT = 0xFFFF0000;
+enum DATA_INDEX
+{
+    DATA_INDEX_ITEM_HEIGHT = 0, //行高
+    DATA_INDEX_ITEM_WIDTH,      //行宽度
+    DATA_INDEX_BRANCH_HEIGHT,   //分枝高度
+    DATA_INDEX_BRANCH_WIDTH,    //分枝宽度,不包含indent
+    DATA_INDEX_ITEM_EXPANDED,   //子项展开状态
+    DATA_INDEX_ITEM_OFFSET,     //当前节点在父节点中的Y方向偏移
+    DATA_INDEX_ITEM_USER,       //自定义数据
+    DATA_INDEX_NUMBER
+};
 
-    enum DATA_INDEX
-    {
-        DATA_INDEX_ITEM_HEIGHT = 0, //行高
-        DATA_INDEX_ITEM_WIDTH,      //行宽度
-        DATA_INDEX_BRANCH_HEIGHT,   //分枝高度
-        DATA_INDEX_BRANCH_WIDTH,    //分枝宽度,不包含indent
-        DATA_INDEX_ITEM_EXPANDED,   //子项展开状态
-        DATA_INDEX_ITEM_OFFSET,     //当前节点在父节点中的Y方向偏移
-        DATA_INDEX_ITEM_USER,       //自定义数据
-        DATA_INDEX_NUMBER
-    };
+enum
+{
+    TVC_COLLAPSE = 0x0001,
+    TVC_EXPAND = 0x0002,
+    TVC_TOGGLE = 0x0003,
+};
 
-    enum
-    {
-        TVC_COLLAPSE = 0x0001,
-        TVC_EXPAND = 0x0002,
-        TVC_TOGGLE = 0x0003,
-    };
-
+#undef INTERFACE
+#define INTERFACE ITvAdapter
+DECLARE_INTERFACE_(ITvAdapter, IObjRef)
+{
     /**
      * Register an observer that is called when changes happen to the data used by this adapter.
      *
      * @param observer the object that gets notified when the data set changes.
      */
-    virtual void registerDataSetObserver(ITvDataSetObserver * observer) PURE;
+    STDMETHOD_(void, registerDataSetObserver)(THIS_ ITvDataSetObserver * observer) PURE;
 
     /**
      * Unregister an observer that has previously been registered with this
@@ -205,34 +214,35 @@ interface ITvAdapter : public IObjRef
      *
      * @param observer the object to unregister.
      */
-    virtual void unregisterDataSetObserver(ITvDataSetObserver * observer) PURE;
+    STDMETHOD_(void, unregisterDataSetObserver)(THIS_ ITvDataSetObserver * observer) PURE;
 
     //获取hItem中的指定索引的数据
-    virtual ULONG_PTR GetItemDataByIndex(HTREEITEM hItem, DATA_INDEX idx) const PURE;
+    STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(THIS_ HTREEITEM hItem, DATA_INDEX idx) SCONST PURE;
 
     //保存hItem指定索引的数据
-    virtual void SetItemDataByIndex(HTREEITEM hItem, DATA_INDEX idx, ULONG_PTR data) PURE;
+    STDMETHOD_(void, SetItemDataByIndex)
+    (THIS_ HTREEITEM hItem, DATA_INDEX idx, ULONG_PTR data) PURE;
 
-    virtual HTREEITEM GetParentItem(HTREEITEM hItem) const PURE;
+    STDMETHOD_(HTREEITEM, GetParentItem)(THIS_ HTREEITEM hItem) SCONST PURE;
 
-    virtual HTREEITEM GetFirstChildItem(HTREEITEM hItem) const PURE;
-    virtual HTREEITEM GetLastChildItem(HTREEITEM hItem) const PURE;
-    virtual HTREEITEM GetPrevSiblingItem(HTREEITEM hItem) const PURE;
-    virtual HTREEITEM GetNextSiblingItem(HTREEITEM hItem) const PURE;
-    virtual BOOL HasChildren(HTREEITEM hItem) const PURE;
+    STDMETHOD_(HTREEITEM, GetFirstChildItem)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HTREEITEM, GetLastChildItem)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HTREEITEM, GetPrevSiblingItem)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HTREEITEM, GetNextSiblingItem)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(BOOL, HasChildren)(THIS_ HTREEITEM hItem) SCONST PURE;
 
-    virtual BOOL IsItemVisible(HTREEITEM hItem) const PURE;
+    STDMETHOD_(BOOL, IsItemVisible)(THIS_ HTREEITEM hItem) SCONST PURE;
 
-    virtual HTREEITEM GetFirstVisibleItem() const PURE;
-    virtual HTREEITEM GetLastVisibleItem() const PURE;
-    virtual HTREEITEM GetPrevVisibleItem(HTREEITEM hItem) const PURE;
-    virtual HTREEITEM GetNextVisibleItem(HTREEITEM hItem) const PURE;
+    STDMETHOD_(HTREEITEM, GetFirstVisibleItem)(THIS) SCONST PURE;
+    STDMETHOD_(HTREEITEM, GetLastVisibleItem)(THIS) SCONST PURE;
+    STDMETHOD_(HTREEITEM, GetPrevVisibleItem)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HTREEITEM, GetNextVisibleItem)(THIS_ HTREEITEM hItem) SCONST PURE;
 
-    virtual void ExpandItem(HTREEITEM hItem, UINT code) PURE;
+    STDMETHOD_(void, ExpandItem)(THIS_ HTREEITEM hItem, UINT code) PURE;
 
-    virtual BOOL IsItemExpanded(HTREEITEM hItem) const PURE;
+    STDMETHOD_(BOOL, IsItemExpanded)(THIS_ HTREEITEM hItem) SCONST PURE;
 
-    virtual void SetItemExpanded(HTREEITEM hItem, BOOL bExpanded) PURE;
+    STDMETHOD_(void, SetItemExpanded)(THIS_ HTREEITEM hItem, BOOL bExpanded) PURE;
 
     /**
      * Get a View that displays the data at the specified position in the data set. You can either
@@ -251,20 +261,22 @@ interface ITvAdapter : public IObjRef
      *        {@link #getItemViewType(int,DWORD)}).
      * @param xmlTemplate the xml template provided by its owner
      */
-    virtual void getView(HTREEITEM hItem, SWindow * pContainer, SXmlNode xmlTemplate) PURE;
+    STDMETHOD_(void, getView)(THIS_ HTREEITEM hItem, IWindow * pItem, IXmlNode * pXmlTemplate) PURE;
 
-    virtual int getViewType(HTREEITEM hItem) const PURE;
+    STDMETHOD_(int, getViewType)(THIS_ HTREEITEM hItem) SCONST PURE;
 
-    virtual int getViewTypeCount() const PURE;
+    STDMETHOD_(int, getViewTypeCount)(THIS) SCONST PURE;
 
-    virtual SIZE getViewDesiredSize(HTREEITEM hItem, SWindow * pItem, int wid, int hei) PURE;
+    STDMETHOD_(SIZE, getViewDesiredSize)
+    (THIS_ HTREEITEM hItem, IWindow * pItem, int wid, int hei) PURE;
 
     //定义行宽度和treeview客户区宽度相同
-    virtual bool isViewWidthMatchParent() const PURE;
+    STDMETHOD_(BOOL, isViewWidthMatchParent)(THIS) SCONST PURE;
 
     /**
      * init adapter from the specified template xml data
      */
-    virtual void InitByTemplate(SXmlNode xmlTemplate) PURE;
+    STDMETHOD_(void, InitByTemplate)(IXmlNode * pXmlTemplate) PURE;
 };
-} // namespace SOUI
+
+SNSEND

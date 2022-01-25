@@ -16,12 +16,12 @@ public:
 		delete[]m_pCbxSel;
 	}
 
-	virtual int getCount()
+	virtual int WINAPI getCount()
 	{
 		return 50000;
 	}
 
-	virtual void getView(int position, SWindow * pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
@@ -73,12 +73,12 @@ public:
 	{
 	}
 
-	virtual int getCount()
+	virtual int WINAPI getCount()
 	{
 		return 300;
 	}
 
-	virtual void getView(int position, SWindow * pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
@@ -126,21 +126,21 @@ public:
 
 	}
 
-	virtual void InitByTemplate(SXmlNode xmlTemplate)
+	virtual void WINAPI InitByTemplate(SXmlNode xmlTemplate)
 	{
 		m_nItemHeight[0] = xmlTemplate.attribute(KAttrName_Height[0]).as_int(50);
 		m_nItemHeight[1] = xmlTemplate.attribute(KAttrName_Height[1]).as_int(60);
 		m_nItemHeight[2] = xmlTemplate.attribute(KAttrName_Height[2]).as_int(70);
 	}
 
-	virtual int getCount() override
+	virtual int WINAPI getCount() override
 	{
 		return 12340;
 	}
 
-	virtual int getViewTypeCount() override{ return 3; }
+	virtual int WINAPI getViewTypeCount() override{ return 3; }
 
-	virtual int getItemViewType(int position, DWORD dwState) override
+	virtual int WINAPI getItemViewType(int position, DWORD dwState) override
 	{
 		if (position % 2 == 0)
 			return 0;//1,3,5,... odd lines
@@ -150,14 +150,14 @@ public:
 			return 1;//even lines 
 	}
 
-	virtual SIZE getViewDesiredSize(int position, SWindow *pItem, int nWid,int nHei) override
+	virtual SIZE WINAPI getViewDesiredSize(int position, SItemPanel *pItem, int nWid,int nHei) override
 	{
 		DWORD dwState = pItem->GetState();
 		int viewType = getItemViewType(position, dwState);
 		return CSize(0, m_nItemHeight[viewType]);//cx在listview，mclistview中没有使用，不需要计算
 	}
 
-	virtual void getView(int position, SWindow * pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
@@ -285,7 +285,7 @@ public:
 		}
 	}
 
-	virtual int getCount()
+	virtual int WINAPI getCount()
 	{
 		return m_softInfo.GetCount()*NUMSCALE;
 	}
@@ -298,7 +298,7 @@ public:
 		return SStringT().Format(_T("%d.%02dM"), num1, num2);
 	}
 
-	virtual void getView(int position, SWindow * pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
@@ -351,7 +351,7 @@ public:
 		}
 	}
 
-	SStringW GetColumnName(int iCol) const {
+	SStringW WINAPI GetColumnName(int iCol) const {
 		return SStringW().Format(L"col%d", iCol + 1);
 	}
 
@@ -361,10 +361,10 @@ public:
 		UINT fmt;
 	};
 
-	bool OnSort(int iCol, UINT* pFmts, int nCols)
+	BOOL WINAPI OnSort(int iCol, UINT* pFmts, int nCols)
 	{
 		if (iCol == 5) //最后一列“操作”不支持排序
-			return false;
+			return FALSE;
 
 		UINT fmt = pFmts[iCol];
 		switch (fmt&SORT_MASK)
@@ -381,7 +381,7 @@ public:
 
 		SORTCTX ctx = { iCol,fmt };
 		qsort_s(m_softInfo.GetData(), m_softInfo.GetCount(), sizeof(SOFTINFO), SortCmp, &ctx);
-		return true;
+		return TRUE;
 	}
 
 	static int __cdecl SortCmp(void *context, const void * p1, const void * p2)
@@ -437,12 +437,12 @@ public:
 	{
 
 	}
-	virtual int getCount()
+	virtual int WINAPI getCount()
 	{
 		return 50000;
 	}
 
-	virtual void getView(int position, SWindow *pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel *pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
@@ -498,7 +498,7 @@ public:
 
 	~CTreeViewAdapter() {}
 
-	virtual void getView(SOUI::HTREEITEM loc, SWindow * pItem, SXmlNode xmlTemplate) {
+	virtual void WINAPI getView(SOUI::HTREEITEM loc, SItemPanel * pItem, SXmlNode xmlTemplate) {
 		if (pItem->GetChildrenCount() == 0)
 		{
 			pItem->InitFromXml(&xmlTemplate);
@@ -525,7 +525,7 @@ public:
 		SItemPanel *pItem = sobj_cast<SItemPanel>(pToggle->GetRoot());
 		SASSERT(pItem);
 		SOUI::HTREEITEM loc = (SOUI::HTREEITEM)pItem->GetItemIndex();
-		ExpandItem(loc, ITvAdapter::TVC_TOGGLE);
+		ExpandItem(loc, TVC_TOGGLE);
 		return true;
 	}
 };

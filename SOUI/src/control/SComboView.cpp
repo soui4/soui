@@ -118,11 +118,11 @@ SListView *SComboView::GetListView()
 
 SStringT SComboView::GetLBText(int iItem, BOOL bRawText)
 {
-
     ILvAdapter *pAdapter = m_pListBox->GetAdapter();
     if (!pAdapter || iItem == -1)
         return SStringT();
-    SStringT strDesc = pAdapter->getItemDesc(iItem);
+    SStringT strDesc;
+    pAdapter->getItemDesc(iItem, &strDesc);
     if (bRawText)
         return strDesc;
     return S_CW2T(tr(S_CT2W(strDesc)));
