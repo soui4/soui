@@ -8,7 +8,6 @@
 #pragma once
 #include "souistd.h"
 #include "control/Slistbox.h"
-#include "SApp.h"
 
 #pragma warning(disable : 4018)
 #pragma warning(disable : 4267)
@@ -31,6 +30,7 @@ SListBox::SListBox()
     , m_bHotTrack(FALSE)
 {
     m_bFocusable = TRUE;
+    m_bClipClient = TRUE;
     m_ptIcon[0].fSize = m_ptIcon[1].fSize = SIZE_UNDEF;
     m_ptText[0].fSize = m_ptText[1].fSize = SIZE_UNDEF;
     m_evtSet.addEvent(EVENTID(EventLBSelChanging));
@@ -81,7 +81,7 @@ BOOL SListBox::SetCurSel(int nIndex, BOOL bNotifyChange)
 
 int SListBox::GetTopIndex() const
 {
-    return m_ptOrigin.y / m_itemHeight.toPixelSize(GetScale());
+    return m_siVer.nPos / m_itemHeight.toPixelSize(GetScale());
 }
 
 BOOL SListBox::SetTopIndex(int nIndex)
@@ -110,26 +110,25 @@ BOOL SListBox::SetItemData(int nIndex, LPARAM lParam)
     return TRUE;
 }
 
-SStringT SListBox::GetText(int nIndex, BOOL bRawText) const
+BOOL SListBox::GetIText(int nIndex, BOOL bRawText, IStringT *str) const
 {
     if (nIndex < 0 || nIndex >= GetCount())
-        return SStringT();
+        return FALSE;
 
-    return m_arrItems[nIndex]->strText.GetText(bRawText);
+    SStringT strRet = m_arrItems[nIndex]->strText.GetText(bRawText);
+    str->Copy(&strRet);
+    return TRUE;
 }
 
-int SListBox::GetItemHeight(int nIndex) const
+int SListBox::GetItemHeight() const
 {
     return m_itemHeight.toPixelSize(GetScale());
 }
 
-BOOL SListBox::SetItemHeight(int nIndex, int cyItemHeight)
+void SListBox::SetItemHeight(int cyItemHeight)
 {
-    if (cyItemHeight < 0 || nIndex < 0 || nIndex >= GetCount())
-        return FALSE;
-
     m_itemHeight = SLayoutSize((float)cyItemHeight, SLayoutSize::px);
-    return TRUE;
+    UpdateScrollBar();
 }
 
 void SListBox::DeleteAll()
@@ -144,8 +143,8 @@ void SListBox::DeleteAll()
     m_iSelItem = -1;
     m_iHoverItem = -1;
 
-    SetViewSize(CSize(0, 0));
     Invalidate();
+    UpdateScrollBar();
 }
 
 BOOL SListBox::DeleteString(int nIndex)
@@ -166,12 +165,7 @@ BOOL SListBox::DeleteString(int nIndex)
     else if (m_iHoverItem > nIndex)
         m_iHoverItem--;
 
-    CRect rcClient;
-    SWindow::GetClientRect(&rcClient);
-    CSize szView(rcClient.Width(), GetCount() * m_itemHeight.toPixelSize(GetScale()));
-    if (szView.cy > rcClient.Height())
-        szView.cx -= GetSbWidth();
-    SetViewSize(szView);
+    UpdateScrollBar();
 
     return TRUE;
 }
@@ -202,7 +196,7 @@ void SListBox::EnsureVisible(int nIndex)
     GetClientRect(&rcClient);
 
     int nItemHei = m_itemHeight.toPixelSize(GetScale());
-    int iFirstVisible = (m_ptOrigin.y + nItemHei - 1) / nItemHei;
+    int iFirstVisible = (m_siVer.nPos + nItemHei - 1) / nItemHei;
     int nVisibleItems = rcClient.Height() / nItemHei;
     if (nIndex < iFirstVisible || nIndex > iFirstVisible + nVisibleItems - 1)
     {
@@ -225,7 +219,7 @@ int SListBox::HitTest(CPoint &pt)
         return -1;
 
     CPoint pt2 = pt;
-    pt2.y -= rcClient.top - m_ptOrigin.y;
+    pt2.y -= rcClient.top - m_siVer.nPos;
     int nItemHei = m_itemHeight.toPixelSize(GetScale());
     int nRet = pt2.y / nItemHei;
     if (nRet >= GetCount())
@@ -301,12 +295,7 @@ int SListBox::InsertItem(int nIndex, LPLBITEM pItem)
     if (m_iHoverItem >= nIndex)
         m_iHoverItem++;
 
-    CRect rcClient;
-    SWindow::GetClientRect(&rcClient);
-    CSize szView(rcClient.Width(), GetCount() * m_itemHeight.toPixelSize(GetScale()));
-    if (szView.cy > rcClient.Height())
-        szView.cx -= GetSbWidth();
-    SetViewSize(szView);
+    UpdateScrollBar();
 
     return nIndex;
 }
@@ -325,7 +314,7 @@ void SListBox::RedrawItem(int iItem)
     if (iItem >= iFirstVisible && iItem < GetCount() && iItem < iFirstVisible + nPageItems)
     {
         CRect rcItem(0, 0, rcClient.Width(), nItemHei);
-        rcItem.OffsetRect(0, nItemHei * iItem - m_ptOrigin.y);
+        rcItem.OffsetRect(0, nItemHei * iItem - m_siVer.nPos);
         rcItem.OffsetRect(rcClient.TopLeft());
         IRenderTarget *pRT = GetRenderTarget(&rcItem, GRT_PAINTBKGND);
 
@@ -462,7 +451,7 @@ void SListBox::OnPaint(IRenderTarget *pRT)
          iItem++)
     {
         CRect rcItem(0, 0, m_rcClient.Width(), nItemHei);
-        rcItem.OffsetRect(0, nItemHei * iItem - m_ptOrigin.y);
+        rcItem.OffsetRect(0, nItemHei * iItem - m_siVer.nPos);
         rcItem.OffsetRect(m_rcClient.TopLeft());
         DrawItem(pRT, rcItem, iItem);
     }
@@ -473,17 +462,12 @@ void SListBox::OnPaint(IRenderTarget *pRT)
 void SListBox::OnSize(UINT nType, CSize size)
 {
     __baseCls::OnSize(nType, size);
-    CRect rcClient;
-    SWindow::GetClientRect(&rcClient);
-    CSize szView(rcClient.Width(), GetCount() * m_itemHeight.toPixelSize(GetScale()));
-    if (szView.cy > rcClient.Height())
-        szView.cx -= GetSbWidth();
-    SetViewSize(szView);
+    UpdateScrollBar();
 }
 
 void SListBox::OnLButtonDown(UINT nFlags, CPoint pt)
 {
-    SWindow::OnLButtonDown(nFlags, pt);
+    __baseCls::OnLButtonDown(nFlags, pt);
     if (!m_bHotTrack)
     {
         m_iHoverItem = HitTest(pt);
@@ -500,7 +484,7 @@ void SListBox::OnLButtonUp(UINT nFlags, CPoint pt)
         if (m_iHoverItem != m_iSelItem)
             NotifySelChange(m_iSelItem, m_iHoverItem);
     }
-    SWindow::OnLButtonUp(nFlags, pt);
+    __baseCls::OnLButtonUp(nFlags, pt);
 }
 
 void SListBox::OnLButtonDbClick(UINT nFlags, CPoint pt)
@@ -600,6 +584,43 @@ HRESULT SListBox::OnLanguageChanged()
     }
     Invalidate();
     return hr;
+}
+
+void SListBox::UpdateScrollBar()
+{
+    CRect rcClient = SWindow::GetClientRect();
+    CSize size = rcClient.Size();
+    CSize szView;
+    szView.cx = rcClient.Width();
+    szView.cy = GetCount() * GetItemHeight();
+
+    //  关闭滚动条
+    m_wBarVisible = SSB_NULL;
+
+    if (size.cy < szView.cy)
+    {
+        //  需要纵向滚动条
+        m_wBarVisible |= SSB_VERT;
+        m_siVer.nMin = 0;
+        m_siVer.nMax = szView.cy - 1;
+        m_siVer.nPage = size.cy;
+        m_siVer.nPos = smin(m_siVer.nPos, m_siVer.nMax - (int)m_siVer.nPage);
+    }
+    else
+    {
+        //  不需要纵向滚动条
+        m_siVer.nPage = size.cy;
+        m_siVer.nMin = 0;
+        m_siVer.nMax = size.cy - 1;
+        m_siVer.nPos = 0;
+    }
+
+    SetScrollPos(TRUE, m_siVer.nPos, FALSE);
+
+    //  重新计算客户区及非客户区
+    SSendMessage(WM_NCCALCSIZE);
+
+    InvalidateRect(NULL);
 }
 
 } // namespace SOUI

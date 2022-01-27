@@ -26,9 +26,9 @@
 #include <res.mgr/SSkinPool.h>
 #include <core/SwndStyle.h>
 #include <core/SSkin.h>
-#include <OCIdl.h>
 #include <animation/SAnimation.h>
 #include <interface/SWindow-i.h>
+#include <OCIdl.h>
 
 #define SC_WANTARROWS  0x0001     /* Control wants arrow keys         */
 #define SC_WANTTAB     0x0002     /* Control wants tab keys           */
@@ -78,12 +78,12 @@ enum WndState
     WndState_Disable = 0x00000010UL,
 };
 
-enum GrtFlag
+typedef struct SWNDMSG
 {
-    GRT_NODRAW = 0,
-    GRT_PAINTBKGND,
-    GRT_OFFSCREEN,
-};
+    UINT uMsg;
+    WPARAM wParam;
+    LPARAM lParam;
+} SWNDMSG, *PSWNDMSG;
 
 class SStateHelper {
   public:
@@ -168,7 +168,7 @@ enum
 
 struct ITrCtxProvider
 {
-    virtual const SStringW &GetTrCtx() const = 0;
+    virtual LPCWSTR GetTrCtx() const = 0;
 };
 
 class SOUI_EXP STrText {
@@ -530,18 +530,6 @@ class SOUI_EXP SWindow
     STDMETHOD_(DWORD, ModifyState)
     (THIS_ DWORD dwStateAdd, DWORD dwStateRemove, BOOL bUpdate = FALSE) OVERRIDE;
 
-    /**
-     * GetCurMsg
-     * @brief    获得当前正在处理的消息
-     * @return   PSWNDMSG
-     *
-     * Describe
-     */
-    STDMETHOD_(PSWNDMSG, GetCurMsg)(THIS) OVERRIDE
-    {
-        return m_pCurMsg;
-    }
-
     STDMETHOD_(void, SetIOwner)(THIS_ IWindow *pOwner) OVERRIDE;
     STDMETHOD_(IWindow *, GetIOwner)(THIS) OVERRIDE;
 
@@ -624,6 +612,18 @@ class SOUI_EXP SWindow
     void accNotifyEvent(DWORD dwEvt);
 
   public:
+    /**
+     * GetCurMsg
+     * @brief    获得当前正在处理的消息
+     * @return   PSWNDMSG
+     *
+     * Describe
+     */
+    PSWNDMSG GetCurMsg(void) const
+    {
+        return m_pCurMsg;
+    }
+
     const ISwndContainer *GetContainer() const;
 
     const SWindow *GetWindow(int uCode) const;
@@ -948,7 +948,7 @@ class SOUI_EXP SWindow
      */
     virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable);
 
-    virtual SStringW tr(const SStringW &strSrc);
+    virtual SStringW tr(const SStringW &strSrc) const;
 
     virtual SWND SwndFromPoint(CPoint &pt, bool bIncludeMsgTransparent = false);
 
@@ -1044,7 +1044,7 @@ class SOUI_EXP SWindow
      *
      * Describe
      */
-    virtual const SStringW &GetTrCtx() const;
+    virtual LPCWSTR GetTrCtx() const;
 
   public: // render相关方法
     /**

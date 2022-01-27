@@ -13,7 +13,7 @@ namespace SOUI
 // 日期 选择控件
 //
 class SOUI_EXP SDateTimePicker
-    : public SWindow
+    : public TWindowProxy<IDateTimePicker>
     , public ISDropDownOwner {
     SOUI_CLASS_NAME(SWindow, L"dateTimePicker")
 
@@ -32,13 +32,19 @@ class SOUI_EXP SDateTimePicker
     ~SDateTimePicker();
 
   public:
-    void CloseUp();
-    EnDateType HitTest(CPoint pt);
+    STDMETHOD_(void, SetTime)
+    (THIS_ WORD wYear, WORD wMonth, WORD wDay, WORD wHour, WORD wMinute, WORD wSecond) OVERRIDE;
+    STDMETHOD_(void, GetTime)
+    (THIS_ WORD *wYear, WORD *wMonth, WORD *wDay, WORD *wHour, WORD *wMinute, WORD *wSecond)
+        SCONST OVERRIDE;
+    STDMETHOD_(void, CloseUp)(THIS) OVERRIDE;
+    STDMETHOD_(void, DropDown)(THIS) OVERRIDE;
+    STDMETHOD_(void, Clear)(THIS) OVERRIDE;
+
+  public:
+    SStringT GetWindowText(BOOL bRawText = FALSE);
     void SetTime(const SYSTEMTIME &sysTime);
     void GetTime(SYSTEMTIME &sysTime);
-    void Clear();
-    void SetTime(WORD wYear, WORD wMonth, WORD wDay, WORD wHour, WORD wMinute, WORD wSecond);
-    SStringT GetWindowText(BOOL bRawText = FALSE);
 
   protected: // 继承
     virtual SWindow *GetDropDownOwner();
@@ -46,6 +52,8 @@ class SOUI_EXP SDateTimePicker
     virtual void OnDestroyDropDown(SDropDownWnd *pDropDown);
 
   protected:
+    EnDateType HitTest(CPoint pt);
+
     virtual BOOL CreateChildren(SXmlNode xmlNode);
     BOOL OnDateChanged(EventCalendarExChanged *pEvt);
     BOOL OnDateCmd(EventCmd *pEvt);

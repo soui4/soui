@@ -292,7 +292,7 @@ void SDateTimePicker::OnPaint(IRenderTarget *pRT)
 bool SDateTimePicker::CalcPopupRect(int nWidth, CRect &rcPopup)
 {
     CRect rcWnd = GetWindowRect();
-    GetContainer()->FrameToHost(rcWnd);
+    GetContainer()->FrameToHost(&rcWnd);
 
     ClientToScreen(GetContainer()->GetHostHwnd(), (LPPOINT)&rcWnd);
     ClientToScreen(GetContainer()->GetHostHwnd(), ((LPPOINT)&rcWnd) + 1);
@@ -386,6 +386,27 @@ void SDateTimePicker::GetTime(SYSTEMTIME &sysTime)
     sysTime = m_sysTime;
 }
 
+void SDateTimePicker::GetTime(WORD *wYear,
+                              WORD *wMonth,
+                              WORD *wDay,
+                              WORD *wHour,
+                              WORD *wMinute,
+                              WORD *wSecond) const
+{
+    if (wYear)
+        *wYear = m_sysTime.wYear;
+    if (wMonth)
+        *wMonth = m_sysTime.wMonth;
+    if (wDay)
+        *wDay = m_sysTime.wDay;
+    if (wHour)
+        *wHour = m_sysTime.wHour;
+    if (wMinute)
+        *wMinute = m_sysTime.wMinute;
+    if (wSecond)
+        *wSecond = m_sysTime.wSecond;
+}
+
 SStringT SDateTimePicker::GetWindowText(BOOL bRawText)
 {
     (bRawText);
@@ -425,24 +446,7 @@ void SDateTimePicker::OnLButtonDown(UINT nFlags, CPoint pt)
     m_eSelDateType = eDT_NULL;
     Invalidate();
 
-    if (NULL != m_pDropDownWnd)
-        return;
-
-    m_pDropDownWnd = new SDropDownWnd_ComboBox(this); // 直接 用这个 处理 wheel 滚动
-    CRect rcPopup;
-    SLayoutSize nWid;
-    nWid.setSize((float)m_nDropWidth, SLayoutSize::dp);
-    bool bDown = CalcPopupRect(nWid.toPixelSize(GetScale()), rcPopup);
-    m_pDropDownWnd->Create(rcPopup, 0);
-
-    // if(m_nAnimTime>0)
-    //	m_pDropDownWnd->AnimateHostWindow(m_nAnimTime,AW_SLIDE|(bDown?AW_VER_POSITIVE:AW_VER_NEGATIVE));
-    // else
-    m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0,
-                                 SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE
-                                     | SWP_NOACTIVATE);
-
-    m_pDropDownWnd->SNativeWnd::SetCapture();
+    DropDown();
 }
 
 void SDateTimePicker::OnMouseMove(UINT nFlags, CPoint pt)
@@ -697,4 +701,24 @@ LRESULT SDateTimePicker::OnAttrCueText(const SStringW &strValue, BOOL bLoading)
     Clear(); // default to show cue.
     return bLoading ? S_FALSE : S_OK;
 }
+
+void SDateTimePicker::DropDown()
+{
+    if (NULL != m_pDropDownWnd)
+        return;
+
+    m_pDropDownWnd = new SDropDownWnd_ComboBox(this);
+    CRect rcPopup;
+    SLayoutSize nWid;
+    nWid.setSize((float)m_nDropWidth, SLayoutSize::dp);
+    bool bDown = CalcPopupRect(nWid.toPixelSize(GetScale()), rcPopup);
+    m_pDropDownWnd->Create(rcPopup, 0);
+
+    m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0,
+                                 SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE
+                                     | SWP_NOACTIVATE);
+
+    m_pDropDownWnd->SNativeWnd::SetCapture();
+}
+
 } // namespace SOUI

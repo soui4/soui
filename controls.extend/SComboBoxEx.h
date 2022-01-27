@@ -24,7 +24,7 @@ namespace SOUI
 
 class  SComboBoxEx : public SComboBase
 {
-    SOUI_CLASS_NAME(SComboBoxEx, L"comboboxex")
+    SOUI_CLASS_NAME(SComboBase, L"comboboxex")
 public:
     /**
      * SComboBoxEx::SComboBoxEx

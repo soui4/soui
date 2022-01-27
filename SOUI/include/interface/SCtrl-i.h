@@ -403,4 +403,645 @@ DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3"
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
 };
 
+#undef INTERFACE
+#define INTERFACE IListBox
+DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
+{
+    /**
+     * SListBox::GetCount
+     * @brief    获取项个数
+     * @return   返回int
+     *
+     * Describe  获取项个数
+     */
+    STDMETHOD_(int, GetCount)(THIS) SCONST PURE;
+
+    /**
+     * SListBox::GetCurSel
+     * @brief    获取当前选中项索引
+     * @return   返回int
+     *
+     * Describe  获取当前选中项索引
+     */
+    STDMETHOD_(int, GetCurSel)(THIS) SCONST PURE;
+
+    /**
+     * SListBox::SetCurSel
+     * @brief    设置选中项
+     * @param    int nIndex -- 待选中索引
+     *
+     * Describe  设置选中项
+     */
+    STDMETHOD_(BOOL, SetCurSel)(THIS_ int nIndex, BOOL bNotifyChange /* = FALSE*/) PURE;
+
+    /**
+     * SListBox::GetTopIndex
+     * @brief    获取第一条可见记录索引
+     * @return   返回int
+     *
+     * Describe
+     */
+    STDMETHOD_(int, GetTopIndex)(THIS) SCONST PURE;
+
+    /**
+     * SListBox::SetTopIndex
+     * @brief    设置第一条可见记录索引
+     * @param    int nIndex -- 第一条可见记录索引
+     *
+     * Describe
+     */
+    STDMETHOD_(BOOL, SetTopIndex)(THIS_ int nIndex) PURE;
+
+    /**
+     * SListBox::GetItemHeight
+     * @brief    获取高度
+     * @return   返回int
+     *
+     * Describe  获取高度
+     */
+    STDMETHOD_(int, GetItemHeight)(THIS) SCONST PURE;
+
+    /**
+     * SListBox::SetItemHeight
+     * @brief    设置指定项高度
+     * @param    int cyItemHeight -- 高度
+     * @return   返回
+     *
+     * Describe  设置指定项高度
+     */
+    STDMETHOD_(void, SetItemHeight)(THIS_ int nItemHeight) PURE;
+
+    /**
+     * SListBox::GetItemData
+     * @brief    获取附加数据
+     * @param    int nIndex -- 选项索引
+     * @return   返回LPARAM
+     *
+     * Describe  获取附加数据
+     */
+    STDMETHOD_(LPARAM, GetItemData)(THIS_ int nIndex) SCONST PURE;
+
+    /**
+     * SListBox::SetItemData
+     * @brief    设置选项附加数据
+     * @param    int nIndex -- 选项索引
+     * @param    LPARAM lParam  -- 附加数据
+     * @return   返回BOOL
+     *
+     * Describe  设置选项附加数据
+     */
+    STDMETHOD_(BOOL, SetItemData)(THIS_ int nIndex, LPARAM lParam) PURE;
+
+    /**
+     * SListBox::GetText
+     * @brief    获取指定项文本
+     * @param    int nIndex -- 选项索引
+     * @param    BOOL bRawText -- 原始数据标志
+     * @return   SStringT,列表项的原始字符串
+     *
+     * Describe  获取指定项文本
+     */
+    STDMETHOD_(BOOL, GetIText)
+    (THIS_ int nIndex, BOOL bRawText /*= FALSE*/, IStringT *str) SCONST PURE;
+
+    /**
+     * SListBox::DeleteAll
+     * @brief    删除所有
+     *
+     * Describe  删除所有
+     */
+    STDMETHOD_(void, DeleteAll)(THIS) PURE;
+
+    /**
+     * SListBox::DeleteString
+     * @brief    设置指定项文本
+     * @param    int nIndex -- 选项索引
+     * @return   返回BOOL
+     *
+     * Describe  设置指定项文本
+     */
+    STDMETHOD_(BOOL, DeleteString)(THIS_ int nIndex) PURE;
+
+    /**
+     * SListBox::AddString
+     * @brief    添加文本
+     * @param    LPCTSTR lpszItem -- 文本
+     * @param    int nImage -- 图标
+     * @param    LPARAM lParam -- 附加数据
+     * @return   返回int 索引
+     *
+     * Describe  添加文本
+     */
+    STDMETHOD_(int, AddString)
+    (THIS_ LPCTSTR lpszItem, int nImage /*= -1*/, LPARAM lParam /*= 0*/) PURE;
+
+    /**
+     * SListBox::InsertString
+     * @brief    插入文本
+     * @param    int nIndex  -- 索引
+     * @param    LPCTSTR lpszItem -- 文本
+     * @param    int nImage -- 图标
+     * @param    LPARAM lParam -- 附加数据
+     * @return   返回int 索引
+     *
+     * Describe  在某项插入文本
+     */
+    STDMETHOD_(int, InsertString)
+    (THIS_ int nIndex, LPCTSTR lpszItem, int nImage /*= -1*/, LPARAM lParam /*= 0*/) PURE;
+
+    /**
+     * SListBox::EnsureVisible
+     * @brief    设置某项显示
+     * @param    int nIndex  -- 索引
+     *
+     * Describe  设置某项显示
+     */
+    STDMETHOD_(void, EnsureVisible)(THIS_ int nIndex) PURE;
+
+    STDMETHOD_(int, FindString)(THIS_ int iFindAfter, LPCTSTR pszText) SCONST PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IComboBase
+DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC")
+{
+    /**
+     * SComboBoxBase::GetCurSel
+     * @brief    获取选中值索引
+     * @return   返回int
+     *
+     * Describe  获取当前选中索引
+     */
+    STDMETHOD_(int, GetCurSel)(THIS) SCONST PURE;
+
+    /**
+     * SComboBoxBase::GetCount
+     * @brief    获取下拉项个数
+     * @return   返回int
+     *
+     * Describe  获取下拉项个数
+     */
+    STDMETHOD_(int, GetCount)(THIS) SCONST PURE;
+
+    /**
+     * SComboBoxBase::SetCurSel
+     * @brief    设置当前选中
+     * @param    int iSel -- 选中索引
+     *
+     * Describe  设置当前选中
+     */
+    STDMETHOD_(BOOL, SetCurSel)(THIS_ int iSel) PURE;
+
+    STDMETHOD_(BOOL, GetItemText)(THIS_ int iItem, BOOL bRawText, IStringT *str) CONST PURE;
+
+    /**
+     * FindString
+     * @brief    查找字符串位置
+     * @param    LPCTSTR pszFind --  查找目标
+     * @param    int nAfter --  开始位置
+     * @return   int -- 目标索引，失败返回-1。
+     * Describe
+     */
+    STDMETHOD_(int, FindString)
+    (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+
+    /**
+     * SComboBoxBase::DropDown
+     * @brief    下拉事件
+     *
+     * Describe  下拉事件
+     */
+    STDMETHOD_(void, DropDown)(THIS) PURE;
+
+    /**
+     * SComboBoxBase::CloseUp
+     * @brief    下拉关闭
+     *
+     * Describe  下拉关闭
+     */
+    STDMETHOD_(void, CloseUp)(THIS) PURE;
+
+    STDMETHOD_(BOOL, IsDropdown)(THIS) SCONST PURE;
+
+    STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IComboBox
+DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC9CF")
+{
+    STDMETHOD_(int, GetCount)(THIS) SCONST PURE;
+
+    /**
+     * SComboBox::GetItemData
+     * @brief    获取附加数据
+     * @param    UINT iItem -- 选项值
+     *
+     * Describe  获取附加数据
+     */
+    STDMETHOD_(LPARAM, GetItemData)(THIS_ UINT iItem) SCONST PURE;
+
+    /**
+     * SComboBox::SetItemData
+     * @brief    设置附加数据
+     * @param    UINT iItem -- 索引值
+     * @param    LPARAM lParam -- 附加值
+     *
+     * Describe  设置附加数据
+     */
+    STDMETHOD_(BOOL, SetItemData)(THIS_ UINT iItem, LPARAM lParam) PURE;
+
+    /**
+     * SComboBox::InsertItem
+     * @brief    插入新项
+     * @param    UINT iPos -- 位置
+     * @param    LPCTSTR pszText -- 文本值
+     * @param    int iIcon -- 图标
+     * @param    LPARAM lParam -- 附加值
+     *
+     * Describe  插入新项
+     */
+    STDMETHOD_(int, InsertItem)(THIS_ int iPos, LPCTSTR pszText, int iIcon, LPARAM lParam) PURE;
+    /**
+     * SComboBox::DeleteString
+     * @brief    删除某一项
+     * @param    UINT iItem -- 索引值
+     *
+     * Describe  删除某一项
+     */
+    STDMETHOD_(BOOL, DeleteString)(THIS_ int iPos) PURE;
+    /**
+     * SComboBox::ResetContent
+     * @brief    删除所有项
+     *
+     * Describe  设置附加数据
+     */
+    STDMETHOD_(void, ResetContent)(THIS) PURE;
+
+    STDMETHOD_(IListBox *, GetIListBox)(THIS) PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IComboView
+DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC253D")
+{
+    STDMETHOD_(IListView *, GetIListView)(THIS) PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IDateTimePicker
+DECLARE_INTERFACE_IID_(IDateTimePicker, ICtrl, "6DB1EF42-AED7-4a36-8011-BE2AD7B45953")
+{
+    STDMETHOD_(void, SetTime)
+    (THIS_ WORD wYear, WORD wMonth, WORD wDay, WORD wHour, WORD wMinute, WORD wSecond) PURE;
+    STDMETHOD_(void, GetTime)
+    (THIS_ WORD * wYear, WORD * wMonth, WORD * wDay, WORD * wHour, WORD * wMinute, WORD * wSecond)
+        SCONST PURE;
+    STDMETHOD_(void, CloseUp)(THIS) PURE;
+    STDMETHOD_(void, DropDown)(THIS) PURE;
+    STDMETHOD_(void, Clear)(THIS) PURE;
+};
+
+typedef int(__cdecl *FunTreeSortCallback)(void *pCtx, const void *phItem1, const void *phItem2);
+
+#undef INTERFACE
+#define INTERFACE ITreeCtrl
+DECLARE_INTERFACE_IID_(ITreeCtrl, ICtrl, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
+{
+    STDMETHOD_(HSTREEITEM, InsertItem)
+    (THIS_ LPCTSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam,
+     HSTREEITEM hParent /*= STVI_ROOT*/, HSTREEITEM hInsertAfter /*= STVI_LAST*/) PURE;
+
+    STDMETHOD_(BOOL, RemoveItem)(THIS_ HSTREEITEM hItem) PURE;
+    STDMETHOD_(void, RemoveAllItems)(THIS) PURE;
+
+    STDMETHOD_(HSTREEITEM, GetRootItem)(THIS) SCONST PURE;
+
+    STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetChildItem)
+    (THIS_ HSTREEITEM hItem, BOOL bFirst /*= TRUE*/) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetParentItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetSelectedItem)(THIS) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetNextItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+
+    STDMETHOD_(void, SortChildren)
+    (THIS_ HSTREEITEM hItem, FunTreeSortCallback sortFunc, void *pCtx) PURE;
+
+    STDMETHOD_(BOOL, SelectItem)(THIS_ HSTREEITEM hItem, BOOL bEnsureVisible /* = TRUE*/) PURE;
+
+    STDMETHOD_(BOOL, GetItemText)(THIS_ HSTREEITEM hItem, IStringT * strText) SCONST PURE;
+    STDMETHOD_(BOOL, SetItemText)(THIS_ HSTREEITEM hItem, LPCTSTR lpszItem) PURE;
+    STDMETHOD_(BOOL, GetItemImage)
+    (THIS_ HSTREEITEM hItem, int *nImage, int *nSelectedImage) SCONST PURE;
+    STDMETHOD_(BOOL, SetItemImage)(THIS_ HSTREEITEM hItem, int nImage, int nSelectedImage) PURE;
+    STDMETHOD_(LPARAM, GetItemData)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(BOOL, SetItemData)(THIS_ HSTREEITEM hItem, LPARAM lParam) PURE;
+    STDMETHOD_(BOOL, ItemHasChildren)(THIS_ HSTREEITEM hItem) PURE;
+
+    STDMETHOD_(BOOL, GetCheckState)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(BOOL, SetCheckState)(THIS_ HSTREEITEM hItem, BOOL bCheck) PURE;
+
+    STDMETHOD_(BOOL, Expand)(THIS_ HSTREEITEM hItem, UINT nCode /*= TVE_EXPAND*/) PURE;
+    STDMETHOD_(BOOL, EnsureVisible)(THIS_ HSTREEITEM hItem) PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IHotKeyCtrl
+DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55")
+{
+    /**
+     * SHotKeyCtrl::SetRule
+     * @brief    设置规则
+     * @param    WORD wInvalidComp --
+     * @param    WORD wModifier  --
+     *
+     * Describe  设置规则
+     */
+    STDMETHOD_(void, SetRule)(THIS_ WORD wInvalidComp, WORD wModifier) PURE;
+
+    /**
+     * SHotKeyCtrl::SetHotKey
+     * @brief    设置热键
+     * @param    WORD vKey --
+     * @param    WORD wModifiers  --
+     *
+     * Describe  设置热键
+     */
+    STDMETHOD_(void, SetHotKey)(THIS_ WORD wKey, WORD wModifiers) PURE;
+
+    /**
+     * SHotKeyCtrl::GetHotKey
+     * @brief    获取热键
+     * @param    WORD &vKey --
+     * @param    WORD wModifiers  --
+     *
+     * Describe  获取热键
+     */
+    STDMETHOD_(void, GetHotKey)(THIS_ WORD * wKey, WORD * wModifers) SCONST PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE IRichEdit
+DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
+{
+    STDMETHOD_(DWORD, SaveRtf)(THIS_ LPCTSTR pszFileName) PURE;
+
+    STDMETHOD_(DWORD, LoadRtf)(THIS_ LPCTSTR pszFileName) PURE;
+
+    /**
+     * SRichEdit::GetWindowTextLength
+     * @brief     获取窗口标题长度
+     * @return    返回int
+     *
+     * Describe   获取窗口标题长度
+     */
+    STDMETHOD_(int, GetWindowTextLength)(THIS) SCONST PURE;
+
+    /**
+     * SRichEdit::SetSel
+     * @brief     设置选中
+     * @param     long nStartChar --
+     * @param     long nEndChar --
+     * @param     BOOL bNoScroll --
+     *
+     * Describe   设置选中, 支持超长文本
+     */
+    STDMETHOD_(void, SetSel)(THIS_ long nStartChar, long nEndChar, BOOL bNoScroll) PURE;
+    /**
+     * SRichEdit::ReplaceSel
+     * @brief     替换选中项
+     * @param     LPCWSTR pszText --
+     * @param     BOOL bCanUndo --
+     *
+     * Describe   替换选中项
+     */
+    STDMETHOD_(void, ReplaceSel)(THIS_ LPCTSTR pszText, BOOL bCanUndo /*= TRUE*/) PURE;
+    /**
+     * SRichEdit::GetWordWrap
+     * @brief
+     * @return   返回BOOL
+     *
+     * Describe
+     */
+    STDMETHOD_(BOOL, GetWordWrap)(THIS) SCONST PURE;
+    /**
+     * SRichEdit::SetWordWrap
+     * @brief
+     * @param     BOOL fWordWrap --
+     *
+     * Describe
+     */
+    STDMETHOD_(void, SetWordWrap)(THIS_ BOOL fWordWrap) PURE;
+
+    /**
+     * SRichEdit::GetReadOnly
+     * @brief    判断是否只读
+     * @return   返回BOOL
+     *
+     * Describe  判断是否只读
+     */
+    STDMETHOD_(BOOL, GetReadOnly)(THIS) SCONST PURE;
+
+    /**
+     * SRichEdit::SetReadOnly
+     * @brief     设置只读
+     * @param     BOOL bReadOnly -- 是否只读
+     * @return    返回BOOL
+     *
+     * Describe   设置只读
+     */
+    STDMETHOD_(BOOL, SetReadOnly)(THIS_ BOOL bReadOnly) PURE;
+
+    /**
+     * SRichEdit::GetLimitText
+     * @brief     获取最小文本长度
+     * @return    返回BOOL
+     *
+     * Describe   获取最小文本长度
+     */
+    STDMETHOD_(LONG, GetLimitText)(THIS) SCONST PURE;
+
+    /**
+     * SRichEdit::SetLimitText
+     * @brief     设置最小文本长度
+     * @param     int nLength -- 长度
+     * @return    返回BOOL
+     *
+     * Describe   设置最小文本长度
+     */
+    STDMETHOD_(BOOL, SetLimitText)(THIS_ int nLength) PURE;
+
+    /**
+     * SRichEdit::GetDefaultAlign
+     * @brief     获取对齐方式
+     * @return    返回WORD
+     *
+     * Describe   设置最小文本长度
+     */
+    STDMETHOD_(WORD, GetDefaultAlign)(THIS) SCONST PURE;
+
+    /**
+     * SRichEdit::SetDefaultAlign
+     * @brief     设置默认对齐方式
+     * @param     WORD wNewAlign -- 对齐方式
+     *
+     * Describe   设置默认对齐方式
+     */
+    STDMETHOD_(void, SetDefaultAlign)(THIS_ WORD wNewAlign) PURE;
+
+    /**
+     * SRichEdit::GetRichTextFlag
+     * @brief     获取标志
+     * @return    返回BOOL
+     *
+     * Describe   获取标志
+     */
+    STDMETHOD_(BOOL, GetRichTextFlag)(THIS) SCONST PURE;
+
+    /**
+     * SRichEdit::SetRichTextFlag
+     * @brief     设置标志
+     * @param     BOOL fRich -- 标志
+     *
+     * Describe   设置标志
+     */
+    STDMETHOD_(void, SetRichTextFlag)(THIS_ BOOL fRich) PURE;
+
+    /**
+     * SRichEdit::SetRichTextFlag
+     * @brief     设置标志
+     * @param     BOOL fRich -- 标志
+     * @return    返回LONG
+     *
+     * Describe   设置标志
+     */
+    STDMETHOD_(LONG, GetDefaultLeftIndent)(THIS) SCONST PURE;
+
+    /**
+     * SRichEdit::SetDefaultLeftIndent
+     * @brief     设置缩进
+     * @param     LONG lNewIndent -- 缩进字符数
+     *
+     * Describe   设置缩进
+     */
+    STDMETHOD_(void, SetDefaultLeftIndent)(THIS_ LONG lNewIndent) PURE;
+
+    /**
+     * SRichEdit::SetSaveSelection
+     * @brief
+     * @param     BOOL fSaveSelection
+     * @return    返回BOOL
+     *
+     * Describe
+     */
+    STDMETHOD_(BOOL, SetSaveSelection)(THIS_ BOOL fSaveSelection) PURE;
+
+    /**
+     * SRichEdit::SetDefaultTextColor
+     * @brief     默认文本颜色
+     * @param     COLORREF cr -- 颜色
+     * @return    返回COLORREF
+     *
+     * Describe   设置默认文本颜色
+     */
+    STDMETHOD_(COLORREF, SetDefaultTextColor)(THIS_ COLORREF cr) PURE;
+};
+
+#undef INTERFACE
+#define INTERFACE ITabCtrl
+DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
+{
+    /**
+     * STabCtrl::GetCurSel
+     * @brief    获取当前选中
+     * @return   返回int
+     *
+     * Describe  获取当前选中
+     */
+    STDMETHOD_(int, GetCurSel)(THIS) SCONST PURE;
+
+    /**
+     * STabCtrl::SetCurSel
+     * @brief    设置当前选中
+     * @param    int nIndex -- 索引
+     * @return   返回BOOL
+     *
+     * Describe  获取当前选中
+     */
+    STDMETHOD_(BOOL, SetCurSel)(THIS_ int nIndex) PURE;
+
+    /**
+     * STabCtrl::SetItemTitle
+     * @brief    设置标题
+     * @param    int nIndex  -- 索引
+     * @param    LPCTSTR lpszTitle  -- 标题
+     * @return   返回BOOL
+     *
+     * Describe  获取当前选中
+     */
+    STDMETHOD_(BOOL, SetItemTitle)(THIS_ int nIndex, LPCTSTR lpszTitle) PURE;
+
+    /**
+     * STabCtrl::InsertItem
+     * @brief    插入tab页面
+     * @param    LPCWSTR lpContent  -- XML描述的page信息
+     * @param    int iInsert  -- 位置
+     * @return   返回插入位置
+     *
+     * Describe  插入tab页面
+     */
+    STDMETHOD_(int, InsertItem)(THIS_ LPCWSTR lpContent, int iInsert /* = -1*/) PURE;
+
+    /**
+     * STabCtrl::GetItemCount
+     * @brief    获取tab页面数
+     * @return   返回int
+     *
+     * Describe  获取tab页面数
+     */
+    STDMETHOD_(int, GetItemCount)(THIS) SCONST PURE;
+
+    /**
+     * STabCtrl::GetItem
+     * @brief    获取指定tab页面
+     * @param    int nIndex -- 索引
+     * @return   返回int
+     *
+     * Describe  获取当前选中
+     */
+    STDMETHOD_(IWindow *, GetPage)(THIS_ int nIndex) PURE;
+
+    /**
+     * STabCtrl::RemoveItem
+     * @brief    删除指定tab页面
+     * @param    int nIndex -- 索引
+     * @param    int nSelPage -- 选中页面
+     * @return   删除指定tab页面
+     *
+     * Describe  获取当前选中
+     */
+    STDMETHOD_(BOOL, RemoveItem)(THIS_ int nIndex, int iSelPage /*= 0*/) PURE;
+
+    /**
+     * STabCtrl::RemoveAllItems
+     * @brief    删除所有页面
+     *
+     * Describe  删除所有页面
+     */
+    STDMETHOD_(void, RemoveAllItems)(THIS) PURE;
+
+    /**
+     * STabCtrl::GetPageIndex
+     * @brief    获取指定页面的索引
+     * @param    LPCTSTR pszName -- 查询字符串
+     * @param    BOOL bTitle --
+     * TRUE:pszName代表的是page的title属性,FALSE：pszName代表的是page的name属性
+     * @return   找到的页面索引号
+     *
+     * Describe
+     */
+    STDMETHOD_(int, GetPageIndex)(THIS_ LPCTSTR pszName, BOOL bTitle) PURE;
+};
+
 SNSEND

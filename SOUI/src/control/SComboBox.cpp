@@ -139,4 +139,69 @@ HRESULT SComboBox::OnLanguageChanged()
     return hr;
 }
 
+BOOL SComboBox::SetCurSel(int iSel)
+{
+    if (m_pListBox->SetCurSel(iSel))
+    {
+        m_pListBox->EnsureVisible(iSel);
+        OnSelChanged();
+        return TRUE;
+    }
+    else
+    {
+        return FALSE;
+    }
+}
+
+int SComboBox::GetCurSel() const
+{
+    return m_pListBox->GetCurSel();
+}
+
+int SComboBox::GetCount() const
+{
+    return m_pListBox->GetCount();
+}
+
+LPARAM SComboBox::GetItemData(UINT iItem) const
+{
+    return m_pListBox->GetItemData(iItem);
+}
+
+BOOL SComboBox::SetItemData(UINT iItem, LPARAM lParam)
+{
+    return m_pListBox->SetItemData(iItem, lParam);
+}
+
+int SComboBox::InsertItem(int iPos, LPCTSTR pszText, int iIcon, LPARAM lParam)
+{
+    return m_pListBox->InsertString(iPos, pszText, iIcon, lParam);
+}
+
+BOOL SComboBox::DeleteString(int iPos)
+{
+    return m_pListBox->DeleteString(iPos);
+}
+
+void SComboBox::ResetContent()
+{
+    SetCurSel(-1);
+    return m_pListBox->DeleteAll();
+}
+
+BOOL SComboBox::GetItemText(int iItem, BOOL bRawText, IStringT *str) const
+{
+    if (iItem < 0 || iItem >= GetCount())
+        return FALSE;
+
+    SStringT strRet = m_pListBox->GetText(iItem, bRawText);
+    str->Copy(&strRet);
+    return TRUE;
+}
+
+IListBox *SComboBox::GetIListBox(THIS)
+{
+    return GetListBox();
+}
+
 } // namespace SOUI

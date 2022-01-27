@@ -100,7 +100,7 @@ class SOUI_EXP SDropDownWnd_ComboBox : public SDropDownWnd {
  * Describe    可输入下拉列表
  */
 class SOUI_EXP SComboBase
-    : public SWindow
+    : public TWindowProxy<IComboBase>
     , public ISDropDownOwner {
     SOUI_CLASS_NAME(SWindow, L"combobase")
   public:
@@ -119,86 +119,31 @@ class SOUI_EXP SComboBase
      * Describe  析构函数
      */
     virtual ~SComboBase(void);
-    /**
-     * SComboBoxBase::GetCurSel
-     * @brief    获取选中值索引
-     * @return   返回int
-     *
-     * Describe  获取当前选中索引
-     */
-    virtual int GetCurSel() const = 0;
 
-    /**
-     * SComboBoxBase::GetCount
-     * @brief    获取下拉项个数
-     * @return   返回int
-     *
-     * Describe  获取下拉项个数
-     */
-    virtual int GetCount() const = 0;
+  public:
+    STDMETHOD_(int, FindString)
+    (THIS_ LPCTSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE;
 
-    /**
-     * SComboBoxBase::SetCurSel
-     * @brief    设置当前选中
-     * @param    int iSel -- 选中索引
-     *
-     * Describe  设置当前选中
-     */
-    virtual BOOL SetCurSel(int iSel) = 0;
+    STDMETHOD_(void, DropDown)(THIS) OVERRIDE;
 
-    /**
-     * SComboBoxEx::GetTextRect
-     * @brief    获取文本位置
-     * @param    LPRECT pRect -- 文本位置
-     *
-     * Describe  获取文本位置
-     */
-    virtual SStringT GetWindowText(BOOL bRawText = FALSE);
+    STDMETHOD_(void, CloseUp)(THIS) OVERRIDE;
 
-    virtual SStringT GetLBText(int iItem, BOOL bRawText = FALSE) = 0;
+    STDMETHOD_(BOOL, IsDropdown)(THIS) SCONST OVERRIDE;
 
-    /**
-     * SComboBoxBase::SetWindowText
-     * @brief    设置显示文本
-     * @param    LPCTSTR pszText -- 文本
-     *
-     * Describe
-     */
-    virtual void WINAPI SetWindowText(LPCTSTR pszText);
+    STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) OVERRIDE;
 
-    /**
-     * FindString
-     * @brief    查找字符串位置
-     * @param    LPCTSTR pszFind --  查找目标
-     * @param    int nAfter --  开始位置
-     * @return   int -- 目标索引，失败返回-1。
-     * Describe
-     */
-    virtual int FindString(LPCTSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE);
+  public:
+    STDMETHOD_(void, SetWindowText)(LPCTSTR pszText) OVERRIDE;
 
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) OVERRIDE;
 
     STDMETHOD_(void, SetFocus)(THIS) OVERRIDE;
 
-    /**
-     * SComboBoxBase::DropDown
-     * @brief    下拉事件
-     *
-     * Describe  下拉事件
-     */
-    void DropDown();
+    STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs *evt) OVERRIDE;
 
-    /**
-     * SComboBoxBase::CloseUp
-     * @brief    下拉关闭
-     *
-     * Describe  下拉关闭
-     */
-    void CloseUp();
+    SStringT GetWindowText(BOOL bRawText = FALSE) OVERRIDE;
 
-    bool IsDropdown() const;
-
-    void SetDropdown(bool bDropdown);
+    SStringT GetLBText(int iItem, BOOL bRawText = FALSE);
 
   protected:
     /**
@@ -236,8 +181,6 @@ class SOUI_EXP SComboBase
      * Describe  下拉关闭
      */
     virtual void OnSelChanged();
-
-    STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs *evt) OVERRIDE;
 
   protected:
     /**
@@ -440,7 +383,7 @@ class SOUI_EXP SComboBase
     DWORD m_dwBtnState;               /**< 按钮状态      */
     SAutoRefPtr<ISkinObj> m_pSkinBtn; /**< 按钮资源      */
 
-    bool m_bDropdown;             /**< Editable or dropdown only   */
+    BOOL m_bDropdown;             /**< Editable or dropdown only   */
     SLayoutSize m_nDropHeight;    /**< 下拉框高度 */
     int m_nAnimTime;              /**< 动画时间   */
     int m_iInitSel;               /**< 默认选中索引 */
@@ -454,6 +397,69 @@ class SOUI_EXP SComboBase
     DWORD m_LastPressTime; /*最后按键的时间,*/
     BOOL m_bAutoMatch;
     int m_nTextLength;
+};
+
+template <class T>
+class TComboBaseProxy
+    : public T
+    , public SComboBase {
+  public:
+    STDMETHOD_(long, AddRef)(THIS) OVERRIDE
+    {
+        return SComboBase::AddRef();
+    }
+    STDMETHOD_(long, Release)(THIS) OVERRIDE
+    {
+        return SComboBase::Release();
+    }
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
+    {
+        SComboBase::OnFinalRelease();
+    }
+
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) OVERRIDE
+    {
+        return (SComboBase *)this;
+    }
+    STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
+    {
+        if (id == __uuidof(T))
+        {
+            *ppRet = (T *)this;
+            AddRef();
+            return S_OK;
+        }
+        else
+        {
+            return SComboBase::QueryInterface(id, ppRet);
+        }
+    }
+
+    STDMETHOD_(int, FindString)
+    (THIS_ LPCTSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE
+    {
+        return SComboBase::FindString(pszFind, nAfter, bPartMatch);
+    }
+
+    STDMETHOD_(void, DropDown)(THIS) OVERRIDE
+    {
+        return SComboBase::DropDown();
+    }
+
+    STDMETHOD_(void, CloseUp)(THIS) OVERRIDE
+    {
+        return SComboBase::CloseUp();
+    }
+
+    STDMETHOD_(BOOL, IsDropdown)(THIS) SCONST OVERRIDE
+    {
+        return SComboBase::IsDropdown();
+    }
+
+    STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) OVERRIDE
+    {
+        return SComboBase::SetDropdown(bDropdown);
+    }
 };
 
 } // namespace SOUI

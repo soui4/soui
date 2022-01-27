@@ -193,7 +193,7 @@ HWND SItemPanel::GetHostHwnd()
     return m_pFrmHost->GetContainer()->GetHostHwnd();
 }
 
-const SStringW &SItemPanel::GetTranslatorContext() const
+LPCWSTR SItemPanel::GetTranslatorContext() const
 {
     return m_pFrmHost->GetContainer()->GetTranslatorContext();
 }
@@ -341,10 +341,10 @@ IScriptModule *SItemPanel::GetScriptModule()
     return m_pFrmHost->GetContainer()->GetScriptModule();
 }
 
-void SItemPanel::FrameToHost(RECT &rc) const
+void SItemPanel::FrameToHost(RECT *rc) const
 {
     CRect rcItem = GetItemRect();
-    ::OffsetRect(&rc, rcItem.left, rcItem.top);
+    ::OffsetRect(rc, rcItem.left, rcItem.top);
 }
 
 void SItemPanel::RequestRelayout(SWND hSource, BOOL bSourceResizable)

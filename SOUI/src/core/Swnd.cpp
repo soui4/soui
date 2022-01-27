@@ -869,7 +869,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
     return TRUE;
 }
 
-SStringW SWindow::tr(const SStringW &strSrc)
+SStringW SWindow::tr(const SStringW &strSrc) const
 {
     return TR(strSrc, GetTrCtx());
 }
@@ -3152,7 +3152,7 @@ void SWindow::SetToolTipText(LPCTSTR pszText)
     }
 }
 
-const SStringW &SWindow::GetTrCtx() const
+LPCWSTR SWindow::GetTrCtx() const
 {
     if (GetContainer() && m_strTrCtx.IsEmpty())
         return GetContainer()->GetTranslatorContext();

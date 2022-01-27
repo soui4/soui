@@ -13,9 +13,9 @@
 
 #pragma once
 
-#include <event/SEvents.h>
-#include <core/SWnd.h>
-#include <core/SMsgLoop.h>
+#include <core/SDefine.h>
+#include <interface/SEvtArgs-i.h>
+#include <interface/smsgloop-i.h>
 #include <interface/SScriptModule-i.h>
 #include <interface/scaret-i.h>
 #include <interface/STimelineHandler-i.h>
@@ -29,7 +29,12 @@ enum
     ZORDER_MAX = (UINT)-1,
 };
 
-enum GrtFlag;
+enum GrtFlag
+{
+	GRT_NODRAW = 0,
+	GRT_PAINTBKGND,
+	GRT_OFFSCREEN,
+};
 
 /**
  * @struct     ISwndContainer
@@ -50,7 +55,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
 
     STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
 
-    STDMETHOD_(const SStringW &, GetTranslatorContext)(THIS) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetTranslatorContext)(THIS) SCONST PURE;
 
     STDMETHOD_(BOOL, IsTranslucent)(THIS) SCONST PURE;
 
@@ -82,7 +87,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
     STDMETHOD_(void, UpdateTooltip)(THIS) PURE;
 
     //将当前Frame的矩形坐标转换成最终Host的坐标
-    STDMETHOD_(void, FrameToHost)(THIS_ RECT & rc) SCONST PURE;
+    STDMETHOD_(void, FrameToHost)(THIS_ RECT * rc) SCONST PURE;
 
     STDMETHOD_(IAcceleratorMgr *, GetAcceleratorMgr)(THIS) PURE;
 

@@ -72,8 +72,8 @@ class SOUI_EXP SItemPanel
 
     STDMETHOD_(SWND, OnSetSwndCapture)(SWND swnd);
     STDMETHOD_(HWND, GetHostHwnd)();
-    STDMETHOD_(const SStringW &, GetTranslatorContext)() const;
-    STDMETHOD_(void, FrameToHost)(RECT &rc) const;
+    STDMETHOD_(LPCWSTR, GetTranslatorContext)() const;
+    STDMETHOD_(void, FrameToHost)(RECT *rc) const;
     STDMETHOD_(BOOL, IsTranslucent)() const;
     STDMETHOD_(BOOL, IsSendWheel2Hover)() const;
 

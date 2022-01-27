@@ -42,9 +42,9 @@ typedef struct tagLBITEM
  *
  * Describe   列表框
  */
-class SOUI_EXP SListBox : public SScrollView {
+class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
   public:
-    SOUI_CLASS_NAME(SScrollView, L"listbox")
+    SOUI_CLASS_NAME(SPanel, L"listbox")
     /**
      * SListBox::SListBox
      * @brief    构造函数
@@ -61,6 +61,7 @@ class SOUI_EXP SListBox : public SScrollView {
      */
     virtual ~SListBox();
 
+  public:
     /**
      * SListBox::GetCount
      * @brief    获取项个数
@@ -68,7 +69,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  获取项个数
      */
-    int GetCount() const;
+    STDMETHOD_(int, GetCount)(THIS) SCONST OVERRIDE;
 
     /**
      * SListBox::GetCurSel
@@ -77,7 +78,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  获取当前选中项索引
      */
-    int GetCurSel() const;
+    STDMETHOD_(int, GetCurSel)(THIS) SCONST OVERRIDE;
 
     /**
      * SListBox::SetCurSel
@@ -86,7 +87,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  设置选中项
      */
-    BOOL SetCurSel(int nIndex, BOOL bNotifyChange = FALSE);
+    STDMETHOD_(BOOL, SetCurSel)(THIS_ int nIndex, BOOL bNotifyChange = FALSE) OVERRIDE;
 
     /**
      * SListBox::GetTopIndex
@@ -95,7 +96,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe
      */
-    int GetTopIndex() const;
+    STDMETHOD_(int, GetTopIndex)(THIS) SCONST OVERRIDE;
 
     /**
      * SListBox::SetTopIndex
@@ -104,7 +105,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe
      */
-    BOOL SetTopIndex(int nIndex);
+    STDMETHOD_(BOOL, SetTopIndex)(THIS_ int nIndex) OVERRIDE;
 
     /**
      * SListBox::GetItemHeight
@@ -113,10 +114,17 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  获取高度
      */
-    int GetItemHeight() const
-    {
-        return m_itemHeight.toPixelSize(GetScale());
-    }
+    STDMETHOD_(int, GetItemHeight)(THIS) SCONST OVERRIDE;
+
+    /**
+     * SListBox::SetItemHeight
+     * @brief    设置指定项高度
+     * @param    int cyItemHeight -- 高度
+     * @return   返回
+     *
+     * Describe  设置指定项高度
+     */
+    STDMETHOD_(void, SetItemHeight)(THIS_ int nItemHeight) OVERRIDE;
 
     /**
      * SListBox::GetItemData
@@ -126,7 +134,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  获取附加数据
      */
-    LPARAM GetItemData(int nIndex) const;
+    STDMETHOD_(LPARAM, GetItemData)(THIS_ int nIndex) SCONST OVERRIDE;
 
     /**
      * SListBox::SetItemData
@@ -137,7 +145,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  设置选项附加数据
      */
-    BOOL SetItemData(int nIndex, LPARAM lParam);
+    STDMETHOD_(BOOL, SetItemData)(THIS_ int nIndex, LPARAM lParam) OVERRIDE;
 
     /**
      * SListBox::GetText
@@ -148,28 +156,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  获取指定项文本
      */
-    SStringT GetText(int nIndex, BOOL bRawText = FALSE) const;
-
-    /**
-     * SListBox::GetItemHeight
-     * @brief    获取指定项高度
-     * @param    int nIndex -- 选项索引
-     * @return   返回int
-     *
-     * Describe  获取指定项高度
-     */
-    int GetItemHeight(int nIndex) const;
-
-    /**
-     * SListBox::SetItemHeight
-     * @brief    设置指定项高度
-     * @param    int nIndex -- 选项索引
-     * @param    int cyItemHeight -- 高度
-     * @return   返回int
-     *
-     * Describe  设置指定项高度
-     */
-    BOOL SetItemHeight(int nIndex, int cyItemHeight);
+    STDMETHOD_(BOOL, GetIText)(THIS_ int nIndex, BOOL bRawText, IStringT *str) SCONST OVERRIDE;
 
     /**
      * SListBox::DeleteAll
@@ -177,7 +164,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  删除所有
      */
-    void DeleteAll();
+    STDMETHOD_(void, DeleteAll)(THIS) OVERRIDE;
 
     /**
      * SListBox::DeleteString
@@ -187,7 +174,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  设置指定项文本
      */
-    BOOL DeleteString(int nIndex);
+    STDMETHOD_(BOOL, DeleteString)(THIS_ int nIndex) OVERRIDE;
 
     /**
      * SListBox::AddString
@@ -199,7 +186,7 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  添加文本
      */
-    int AddString(LPCTSTR lpszItem, int nImage = -1, LPARAM lParam = 0);
+    STDMETHOD_(int, AddString)(THIS_ LPCTSTR lpszItem, int nImage = -1, LPARAM lParam = 0) OVERRIDE;
 
     /**
      * SListBox::InsertString
@@ -212,7 +199,8 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  在某项插入文本
      */
-    int InsertString(int nIndex, LPCTSTR lpszItem, int nImage = -1, LPARAM lParam = 0);
+    STDMETHOD_(int, InsertString)
+    (THIS_ int nIndex, LPCTSTR lpszItem, int nImage = -1, LPARAM lParam = 0) OVERRIDE;
 
     /**
      * SListBox::EnsureVisible
@@ -221,8 +209,28 @@ class SOUI_EXP SListBox : public SScrollView {
      *
      * Describe  设置某项显示
      */
-    void EnsureVisible(int nIndex);
+    STDMETHOD_(void, EnsureVisible)(THIS_ int nIndex) OVERRIDE;
 
+    STDMETHOD_(int, FindString)(THIS_ int iFindAfter, LPCTSTR pszText) SCONST OVERRIDE;
+
+  public:
+    /**
+     * SListBox::GetText
+     * @brief    获取指定项文本
+     * @param    int nIndex -- 选项索引
+     * @param    BOOL bRawText -- 原始数据标志
+     * @return   SStringT,列表项的原始字符串
+     *
+     * Describe  获取指定项文本
+     */
+    SStringT GetText(int nIndex, BOOL bRawText = FALSE) const
+    {
+        SStringT strRet;
+        GetIText(nIndex, bRawText, &strRet);
+        return strRet;
+    }
+
+  protected:
     /**
      * SListBox::RedrawItem
      * @brief    重绘选项
@@ -241,9 +249,8 @@ class SOUI_EXP SListBox : public SScrollView {
      */
     int HitTest(CPoint &pt);
 
-    int FindString(int iFindAfter, LPCTSTR pszText) const;
+    void UpdateScrollBar();
 
-  protected:
     virtual HRESULT OnLanguageChanged();
 
     /**

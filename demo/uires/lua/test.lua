@@ -168,7 +168,7 @@ function on_run(args)
 end
 
 function on_btn_select_cbx(args)
-	local btn = toSWindow(args.sender);
+	local btn = toSWindow(args:sender());
 	local cbxwnd = btn:GetWindow(2);--get previous sibling
 	local cbx = toComboboxBase(cbxwnd);
 	cbx:SetCurSel(-1);

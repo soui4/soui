@@ -121,8 +121,8 @@ class SOUI_EXP SMenuEx : protected SHostWnd {
     END_MSG_MAP()
   protected:
     virtual BOOL _HandleEvent(IEvtArgs *pEvt);
-    STDMETHOD_(const SStringW &, GetTranslatorContext)() const;
-    STDMETHOD_(int, GetScale)() const;
+	STDMETHOD_(LPCWSTR, GetTranslatorContext)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(int, GetScale)() SCONST OVERRIDE;
 
     SWindow *FindItem(UINT uPos, UINT uFlag);
 

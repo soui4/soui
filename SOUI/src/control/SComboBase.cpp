@@ -408,7 +408,7 @@ void SComboBase::OnDestroyDropDown(SDropDownWnd *pDropDown)
 BOOL SComboBase::CalcPopupRect(int nHeight, CRect &rcPopup)
 {
     CRect rcWnd = GetWindowRect();
-    GetContainer()->FrameToHost(rcWnd);
+    GetContainer()->FrameToHost(&rcWnd);
 
     ClientToScreen(GetContainer()->GetHostHwnd(), (LPPOINT)&rcWnd);
     ClientToScreen(GetContainer()->GetHostHwnd(), ((LPPOINT)&rcWnd) + 1);
@@ -679,12 +679,12 @@ void SComboBase::OnScaleChanged(int nScale)
     GetScaleSkin(m_pSkinBtn, nScale);
 }
 
-bool SComboBase::IsDropdown() const
+BOOL SComboBase::IsDropdown() const
 {
     return m_bDropdown;
 }
 
-void SComboBase::SetDropdown(bool bDropdown)
+void SComboBase::SetDropdown(BOOL bDropdown)
 {
     m_bDropdown = bDropdown;
     m_pEdit->SetVisible(!m_bDropdown, TRUE);
@@ -701,6 +701,13 @@ void SComboBase::SetFocus()
         m_pEdit->SetFocus();
     else
         __baseCls::SetFocus();
+}
+
+SStringT SComboBase::GetLBText(int iItem, BOOL bRawText /*= FALSE*/)
+{
+    SStringT str;
+    GetItemText(iItem, bRawText, &str);
+    return str;
 }
 
 } // namespace SOUI

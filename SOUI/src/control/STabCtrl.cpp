@@ -509,7 +509,7 @@ void STabCtrl::OnDestroy()
     __baseCls::OnDestroy();
 }
 
-SWindow *STabCtrl::GetPage(int iPage)
+STabPage *STabCtrl::GetItem(int iPage)
 {
     if (iPage < 0 || iPage >= (int)GetItemCount())
         return NULL;
@@ -538,10 +538,17 @@ int STabCtrl::GetPageIndex(LPCTSTR pszName, BOOL bTitle)
     return -1;
 }
 
-SWindow *STabCtrl::GetPage(LPCTSTR pszName, BOOL bTitle /*=TRUE*/)
+STabPage *STabCtrl::GetPage(LPCTSTR pszName, BOOL bTitle /*=TRUE*/)
 {
     int iPage = GetPageIndex(pszName, bTitle);
     if (iPage == -1)
+        return NULL;
+    return m_lstPages[iPage];
+}
+
+IWindow *STabCtrl::GetPage(int iPage)
+{
+    if (iPage < 0 || iPage >= GetItemCount())
         return NULL;
     return m_lstPages[iPage];
 }
@@ -750,13 +757,6 @@ BOOL STabCtrl::GetItemRect(int nIndex, CRect &rcItem)
     }
     rcItem.IntersectRect(rcItem, rcTitle);
     return TRUE;
-}
-
-STabPage *STabCtrl::GetItem(int nIndex)
-{
-    if (nIndex < 0 || nIndex >= (int)GetItemCount())
-        return NULL;
-    return m_lstPages[nIndex];
 }
 
 void STabCtrl::DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWORD dwState)
@@ -990,6 +990,16 @@ HRESULT STabCtrl::OnLanguageChanged()
     }
     InvalidateRect(GetTitleRect());
     return HRESULT(3);
+}
+
+int STabCtrl::GetCurSel() const
+{
+    return m_nCurrentPage;
+}
+
+int STabCtrl::GetItemCount(THIS) const
+{
+    return (int)m_lstPages.GetCount();
 }
 
 } // namespace SOUI

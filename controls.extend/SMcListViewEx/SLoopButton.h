@@ -6,7 +6,7 @@
 
 class EventBtnSelChanging : public TplIEvtArgs<EventBtnSelChanging>
 {
-	SOUI_CLASS_NAME(EventTCSelChanging, L"on_btn_sel_changing")
+	SOUI_CLASS_NAME(TplIEvtArgs<EventBtnSelChanging>, L"on_btn_sel_changing")
 public:
 	EventBtnSelChanging(SObject *pSender) :TplIEvtArgs<EventBtnSelChanging>(pSender), bCancel(FALSE) {}
 	enum {
@@ -18,7 +18,7 @@ public:
 };
 class EventBtnSelChanged : public TplIEvtArgs<EventBtnSelChanged>
 {
-	SOUI_CLASS_NAME(EventTCSelChanging, L"on_btn_sel_changed")
+	SOUI_CLASS_NAME(TplIEvtArgs<EventBtnSelChanged>, L"on_btn_sel_changed")
 public:
 	EventBtnSelChanged(SObject *pSender) :TplIEvtArgs<EventBtnSelChanged>(pSender), bCancel(FALSE) {}
 	enum {
@@ -32,7 +32,7 @@ public:
 class SLoopButton :
 	public SImageButton
 {
-	SOUI_CLASS_NAME(SLoopButton, L"loopbtn")
+	SOUI_CLASS_NAME(SImageButton, L"loopbtn")
 public:
 	SLoopButton();
 	~SLoopButton();

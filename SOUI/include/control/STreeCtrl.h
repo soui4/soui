@@ -68,9 +68,9 @@ typedef struct tagTVITEM
 } TVITEM, *LPTVITEM;
 
 class SOUI_EXP STreeCtrl
-    : public SScrollView
+    : public TPanelProxy<ITreeCtrl>
     , protected CSTree<LPTVITEM> {
-    SOUI_CLASS_NAME(SScrollView, L"treectrl")
+    SOUI_CLASS_NAME(SPanel, L"treectrl")
   public:
     struct IListener
     {
@@ -81,77 +81,80 @@ class SOUI_EXP STreeCtrl
 
     virtual ~STreeCtrl();
 
+  public:
+    STDMETHOD_(HSTREEITEM, InsertItem)
+    (THIS_ LPCTSTR lpszItem,
+     int nImage,
+     int nSelectedImage,
+     LPARAM lParam,
+     HSTREEITEM hParent /*= STVI_ROOT*/,
+     HSTREEITEM hInsertAfter /*= STVI_LAST*/) OVERRIDE;
+
+    STDMETHOD_(BOOL, RemoveItem)(THIS_ HSTREEITEM hItem) OVERRIDE;
+    STDMETHOD_(void, RemoveAllItems)(THIS) OVERRIDE;
+
+    STDMETHOD_(HSTREEITEM, GetRootItem)(THIS) SCONST OVERRIDE;
+
+    STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+    STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+    STDMETHOD_(HSTREEITEM, GetChildItem)
+    (THIS_ HSTREEITEM hItem, BOOL bFirst = TRUE) SCONST OVERRIDE;
+    STDMETHOD_(HSTREEITEM, GetParentItem)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+    STDMETHOD_(HSTREEITEM, GetSelectedItem)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(HSTREEITEM, GetNextItem)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+
+    STDMETHOD_(void, SortChildren)
+    (THIS_ HSTREEITEM hItem, FunTreeSortCallback sortFunc, void *pCtx) OVERRIDE;
+
+    STDMETHOD_(BOOL, SelectItem)(THIS_ HSTREEITEM hItem, BOOL bEnsureVisible = TRUE) OVERRIDE;
+
+    STDMETHOD_(BOOL, GetItemText)(THIS_ HSTREEITEM hItem, IStringT *strText) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, SetItemText)(THIS_ HSTREEITEM hItem, LPCTSTR lpszItem) OVERRIDE;
+    STDMETHOD_(BOOL, GetItemImage)
+    (THIS_ HSTREEITEM hItem, int *nImage, int *nSelectedImage) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, SetItemImage)(THIS_ HSTREEITEM hItem, int nImage, int nSelectedImage) OVERRIDE;
+    STDMETHOD_(LPARAM, GetItemData)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, SetItemData)(THIS_ HSTREEITEM hItem, LPARAM lParam) OVERRIDE;
+    STDMETHOD_(BOOL, ItemHasChildren)(THIS_ HSTREEITEM hItem) OVERRIDE;
+
+    STDMETHOD_(BOOL, GetCheckState)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, SetCheckState)(THIS_ HSTREEITEM hItem, BOOL bCheck) OVERRIDE;
+
+    STDMETHOD_(BOOL, Expand)(THIS_ HSTREEITEM hItem, UINT nCode = TVE_EXPAND) OVERRIDE;
+    STDMETHOD_(BOOL, EnsureVisible)(THIS_ HSTREEITEM hItem) OVERRIDE;
+
+  public:
     void SetListener(IListener *pListener);
 
     HSTREEITEM InsertItem(LPCTSTR lpszItem,
                           HSTREEITEM hParent = STVI_ROOT,
-                          HSTREEITEM hInsertAfter = STVI_LAST,
-                          BOOL bEnsureVisible = TRUE);
+                          HSTREEITEM hInsertAfter = STVI_LAST);
     HSTREEITEM InsertItem(LPCTSTR lpszItem,
                           int nImage,
                           int nSelectedImage,
                           HSTREEITEM hParent = STVI_ROOT,
-                          HSTREEITEM hInsertAfter = STVI_LAST,
-                          BOOL bEnsureVisible = TRUE);
-    HSTREEITEM InsertItem(LPCTSTR lpszItem,
-                          int nImage,
-                          int nSelectedImage,
-                          LPARAM lParam,
-                          HSTREEITEM hParent = STVI_ROOT,
-                          HSTREEITEM hInsertAfter = STVI_LAST,
-                          BOOL bEnsureVisible = TRUE);
-
-    BOOL RemoveItem(HSTREEITEM hItem);
-    void RemoveAllItems();
-
-    HSTREEITEM GetRootItem() const;
-    HSTREEITEM GetNextSiblingItem(HSTREEITEM hItem) const;
-    HSTREEITEM GetPrevSiblingItem(HSTREEITEM hItem) const;
-    HSTREEITEM GetChildItem(HSTREEITEM hItem, BOOL bFirst = TRUE) const;
-    HSTREEITEM GetParentItem(HSTREEITEM hItem) const;
-    HSTREEITEM GetSelectedItem() const;
-    HSTREEITEM GetNextItem(HSTREEITEM hItem) const
-    {
-        return CSTree<LPTVITEM>::GetNextItem(hItem);
-    }
-
-    typedef int(__cdecl *FunSortCallback)(void *pCtx, const void *phItem1, const void *phItem2);
-    void SortChildren(HSTREEITEM hItem, FunSortCallback sortFunc, void *pCtx);
-
-    BOOL SelectItem(HSTREEITEM hItem, BOOL bEnsureVisible = TRUE);
-
-    BOOL GetItemText(HSTREEITEM hItem, SStringT &strText) const;
-    BOOL SetItemText(HSTREEITEM hItem, LPCTSTR lpszItem);
-    BOOL GetItemImage(HSTREEITEM hItem, int &nImage, int &nSelectedImage) const;
-    BOOL SetItemImage(HSTREEITEM hItem, int nImage, int nSelectedImage);
-    LPARAM GetItemData(HSTREEITEM hItem) const;
-    BOOL SetItemData(HSTREEITEM hItem, LPARAM lParam);
-    BOOL ItemHasChildren(HSTREEITEM hItem);
-
-    BOOL GetCheckState(HSTREEITEM hItem) const;
-    BOOL SetCheckState(HSTREEITEM hItem, BOOL bCheck);
-
-    BOOL Expand(HSTREEITEM hItem, UINT nCode = TVE_EXPAND);
-    BOOL EnsureVisible(HSTREEITEM hItem);
-
-    void PageUp();
-    void PageDown();
+                          HSTREEITEM hInsertAfter = STVI_LAST);
 
     HSTREEITEM HitTest(CPoint &pt);
 
+    BOOL GetItemText(HSTREEITEM hItem, SStringT &strText) const
+    {
+        return GetItemText(hItem, &strText);
+    }
+
   protected:
+    void PageUp();
+    void PageDown();
+    void UpdateScrollBar();
+
     virtual BOOL CreateChildren(SXmlNode xmlNode);
     virtual void LoadBranch(HSTREEITEM hParent, SXmlNode xmlNode);
     virtual void LoadItemAttribute(SXmlNode xmlNode, LPTVITEM pItem);
 
-    HSTREEITEM InsertItem(LPTVITEM pItemObj,
-                          HSTREEITEM hParent,
-                          HSTREEITEM hInsertAfter,
-                          BOOL bEnsureVisible);
+    HSTREEITEM InsertItem(LPTVITEM pItemObj, HSTREEITEM hParent, HSTREEITEM hInsertAfter);
     HSTREEITEM InsertItem(SXmlNode xmlNode,
                           HSTREEITEM hParent = STVI_ROOT,
-                          HSTREEITEM hInsertAfter = STVI_LAST,
-                          BOOL bEnsureVisible = FALSE);
+                          HSTREEITEM hInsertAfter = STVI_LAST);
 
     BOOL IsAncestor(HSTREEITEM hItem1, HSTREEITEM hItem2);
     BOOL VerifyItem(HSTREEITEM hItem) const;
@@ -165,8 +168,10 @@ class SOUI_EXP STreeCtrl
     virtual void ItemLayout();
     virtual void CalcItemContentWidth(LPTVITEM pItem);
     virtual int CalcItemWidth(const LPTVITEM pItem);
-    virtual int GetMaxItemWidth();
-    virtual int GetMaxItemWidth(HSTREEITEM hItem);
+    virtual int CalcMaxItemWidth(HSTREEITEM hItem);
+
+    void UpdateContentWidth();
+
     int GetItemShowIndex(HSTREEITEM hItemObj);
     BOOL GetItemRect(LPTVITEM pItem, CRect &rcItem);
 
@@ -186,19 +191,6 @@ class SOUI_EXP STreeCtrl
     void ItemMouseLeave(HSTREEITEM hItem);
 
   protected:
-    void OnDestroy();
-
-    void OnPaint(IRenderTarget *pRT);
-
-    void OnLButtonDown(UINT nFlags, CPoint pt);
-    void OnLButtonUp(UINT nFlags, CPoint pt);
-    void OnLButtonDbClick(UINT nFlags, CPoint pt);
-    void OnRButtonDown(UINT nFlags, CPoint pt);
-
-    void OnMouseMove(UINT nFlags, CPoint pt);
-    void OnMouseLeave();
-
-  protected:
     virtual void OnNodeFree(LPTVITEM &pItemData);
 
   protected:
@@ -207,7 +199,7 @@ class SOUI_EXP STreeCtrl
     HSTREEITEM m_hCaptureItem;
 
     int m_nVisibleItems;
-    int m_nMaxItemWidth;
+    int m_nContentWidth;
 
     UINT m_uItemMask;
     int m_nItemOffset;
@@ -247,6 +239,19 @@ class SOUI_EXP STreeCtrl
     ATTR_BOOL(L"hasLines", m_bHasLines, TRUE)
     SOUI_ATTRS_END()
 
+  protected:
+    void OnDestroy();
+
+    void OnPaint(IRenderTarget *pRT);
+
+    void OnLButtonDown(UINT nFlags, CPoint pt);
+    void OnLButtonUp(UINT nFlags, CPoint pt);
+    void OnLButtonDbClick(UINT nFlags, CPoint pt);
+    void OnRButtonDown(UINT nFlags, CPoint pt);
+
+    void OnMouseMove(UINT nFlags, CPoint pt);
+    void OnMouseLeave();
+    void OnSize(UINT nType, CSize size);
     SOUI_MSG_MAP_BEGIN()
     MSG_WM_PAINT_EX(OnPaint)
     MSG_WM_DESTROY(OnDestroy)
@@ -256,6 +261,7 @@ class SOUI_EXP STreeCtrl
     MSG_WM_RBUTTONDOWN(OnRButtonDown);
     MSG_WM_MOUSEMOVE(OnMouseMove)
     MSG_WM_MOUSELEAVE(OnMouseLeave)
+    MSG_WM_SIZE(OnSize)
     SOUI_MSG_MAP_END()
 };
 

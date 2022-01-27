@@ -277,7 +277,7 @@ HRESULT STextHost::TxActivate(LONG *plOldState)
 BOOL STextHost::TxClientToScreen(LPPOINT lppt)
 {
     RECT rc = { 0 };
-    m_pRichEdit->GetContainer()->FrameToHost(rc);
+    m_pRichEdit->GetContainer()->FrameToHost(&rc);
     lppt->x += rc.left;
     lppt->y += rc.top;
     return ::ClientToScreen(m_pRichEdit->GetContainer()->GetHostHwnd(), lppt);
@@ -286,7 +286,7 @@ BOOL STextHost::TxClientToScreen(LPPOINT lppt)
 BOOL STextHost::TxScreenToClient(LPPOINT lppt)
 {
     RECT rc = { 0 };
-    m_pRichEdit->GetContainer()->FrameToHost(rc);
+    m_pRichEdit->GetContainer()->FrameToHost(&rc);
     lppt->x -= rc.left;
     lppt->y -= rc.top;
     return ::ScreenToClient(m_pRichEdit->GetContainer()->GetHostHwnd(), lppt);
@@ -948,7 +948,7 @@ HRESULT SRichEdit::OnTxNotify(DWORD iNotify, LPVOID pv)
 }
 //////////////////////////////////////////////////////////////////////////
 //    richedit interfaces
-BOOL SRichEdit::GetWordWrap(void)
+BOOL SRichEdit::GetWordWrap(void) const
 {
     return m_fWordWrap;
 }
@@ -960,7 +960,7 @@ void SRichEdit::SetWordWrap(BOOL fWordWrap)
                                                          fWordWrap ? TXTBIT_WORDWRAP : 0);
 }
 
-BOOL SRichEdit::GetReadOnly()
+BOOL SRichEdit::GetReadOnly() const
 {
     return (m_dwStyle & ES_READONLY) != 0;
 }
@@ -970,7 +970,7 @@ BOOL SRichEdit::SetReadOnly(BOOL bReadOnly)
     return 0 != SSendMessage(EM_SETREADONLY, bReadOnly);
 }
 
-LONG SRichEdit::GetLimitText()
+LONG SRichEdit::GetLimitText() const
 {
     return m_cchTextMost;
 }
@@ -980,7 +980,7 @@ BOOL SRichEdit::SetLimitText(int nLength)
     return 0 != SSendMessage(EM_EXLIMITTEXT, nLength);
 }
 
-WORD SRichEdit::GetDefaultAlign()
+WORD SRichEdit::GetDefaultAlign() const
 {
     return m_pfDef.wAlignment;
 }
@@ -993,7 +993,7 @@ void SRichEdit::SetDefaultAlign(WORD wNewAlign)
     m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_PARAFORMATCHANGE, 0);
 }
 
-BOOL SRichEdit::GetRichTextFlag()
+BOOL SRichEdit::GetRichTextFlag() const
 {
     return m_fRich;
 }
@@ -1006,7 +1006,7 @@ void SRichEdit::SetRichTextFlag(BOOL fRich)
                                                          fRich ? TXTBIT_RICHTEXT : 0);
 }
 
-LONG SRichEdit::GetDefaultLeftIndent()
+LONG SRichEdit::GetDefaultLeftIndent() const
 {
     return m_pfDef.dxOffset;
 }
@@ -1371,25 +1371,44 @@ void SRichEdit::SetWindowText(LPCTSTR lpszText)
     Invalidate();
 }
 
+int SRichEdit::GetWindowText(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText)
+{
+    SStringT str = GetWindowText(bRawText);
+    if (nBufLen < str.GetLength() + 1)
+        return 0;
+    _tcscpy(pBuf, str.c_str());
+    return str.GetLength();
+}
+
 SStringT SRichEdit::GetWindowText(BOOL bRawText)
 {
     (bRawText);
     SStringW strRet;
-    int nLen = (int)SSendMessage(WM_GETTEXTLENGTH);
+    int nLen = GetWindowTextLength();
     wchar_t *pBuf = strRet.GetBufferSetLength(nLen + 1);
     SSendMessage(WM_GETTEXT, (WPARAM)nLen + 1, (LPARAM)pBuf);
     strRet.ReleaseBuffer();
     return S_CW2T(strRet);
 }
 
-int SRichEdit::GetWindowTextLength()
+int SRichEdit::GetWindowTextLength() const
 {
-    return (int)SSendMessage(WM_GETTEXTLENGTH);
+    LRESULT lResult = 0;
+    if (m_pTxtHost)
+    {
+        m_pTxtHost->GetTextService()->TxSendMessage(WM_GETTEXTLENGTH, 0, 0, &lResult);
+    }
+    return (int)lResult;
 }
 
-void SRichEdit::ReplaceSel(LPCWSTR pszText, BOOL bCanUndo)
+void SRichEdit::ReplaceSel(LPCTSTR pszText, BOOL bCanUndo)
 {
+#ifdef _UNICODE
     SSendMessage(EM_REPLACESEL, (WPARAM)bCanUndo, (LPARAM)pszText);
+#else
+    SStringW str = S_CT2W(pszText);
+    SSendMessage(EM_REPLACESEL, (WPARAM)bCanUndo, (LPARAM)str.c_str());
+#endif
 }
 
 void SRichEdit::SetSel(DWORD dwSelection, BOOL bNoScroll)

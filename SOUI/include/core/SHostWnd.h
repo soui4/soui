@@ -40,7 +40,7 @@ class SHostWndAttr
 
     void Init();
 
-    virtual const SStringW &GetTrCtx() const;
+    virtual LPCWSTR GetTrCtx() const;
 
     CRect GetMaxInset(int nScale) const;
 
@@ -711,7 +711,7 @@ class SOUI_EXP SHostWnd
 
     STDMETHOD_(HWND, GetHostHwnd)();
 
-    STDMETHOD_(const SStringW &, GetTranslatorContext)() const;
+    STDMETHOD_(LPCWSTR, GetTranslatorContext)() const;
 
     STDMETHOD_(IRenderTarget *, OnGetRenderTarget)(LPCRECT rc, GrtFlag gdcFlags);
 

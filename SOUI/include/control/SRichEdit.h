@@ -600,7 +600,7 @@ class SOUI_EXP STextHost : public ITextHost {
  *
  * Describe    SRichEdit
  */
-class SOUI_EXP SRichEdit : public SPanel {
+class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     friend class STextHost;
 
   public:
@@ -624,19 +624,11 @@ class SOUI_EXP SRichEdit : public SPanel {
     {
     }
 
-    DWORD SaveRtf(LPCTSTR pszFileName);
-
-    DWORD LoadRtf(LPCTSTR pszFileName);
-
   public: // richedit interface
-    /**
-     * SRichEdit::GetWindowText
-     * @brief     获取窗口标题
-     * @return    返回SStringT
-     *
-     * Describe   获取窗口标题
-     */
-    SStringT GetWindowText(BOOL bRawText = FALSE);
+    STDMETHOD_(DWORD, SaveRtf)(THIS_ LPCTSTR pszFileName) OVERRIDE;
+
+    STDMETHOD_(DWORD, LoadRtf)(THIS_ LPCTSTR pszFileName) OVERRIDE;
+
     /**
      * SRichEdit::GetWindowTextLength
      * @brief     获取窗口标题长度
@@ -644,24 +636,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   获取窗口标题长度
      */
-    int GetWindowTextLength();
-    /**
-     * SRichEdit::SetWindowText
-     * @brief     设置窗口标题
-     * @param     LPCWSTR lpszText -- 窗口标题
-     *
-     * Describe   设置窗口标题
-     */
-    void WINAPI SetWindowText(LPCTSTR lpszText);
-    /**
-     * SRichEdit::SetSel
-     * @brief     设置选中
-     * @param     DWORD dwSelection --
-     * @param     BOOL bNoScroll --
-     *
-     * Describe   设置选中
-     */
-    void SetSel(DWORD dwSelection, BOOL bNoScroll = FALSE);
+    STDMETHOD_(int, GetWindowTextLength)(THIS) SCONST OVERRIDE;
 
     /**
      * SRichEdit::SetSel
@@ -672,7 +647,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   设置选中, 支持超长文本
      */
-    void SetSel(long nStartChar, long nEndChar, BOOL bNoScroll);
+    STDMETHOD_(void, SetSel)(THIS_ long nStartChar, long nEndChar, BOOL bNoScroll) OVERRIDE;
     /**
      * SRichEdit::ReplaceSel
      * @brief     替换选中项
@@ -681,7 +656,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   替换选中项
      */
-    void ReplaceSel(LPCWSTR pszText, BOOL bCanUndo = TRUE);
+    STDMETHOD_(void, ReplaceSel)(THIS_ LPCTSTR pszText, BOOL bCanUndo = TRUE) OVERRIDE;
     /**
      * SRichEdit::GetWordWrap
      * @brief
@@ -689,7 +664,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe
      */
-    BOOL GetWordWrap(void);
+    STDMETHOD_(BOOL, GetWordWrap)(THIS) SCONST OVERRIDE;
     /**
      * SRichEdit::SetWordWrap
      * @brief
@@ -697,7 +672,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe
      */
-    void SetWordWrap(BOOL fWordWrap);
+    STDMETHOD_(void, SetWordWrap)(THIS_ BOOL fWordWrap) OVERRIDE;
 
     /**
      * SRichEdit::GetReadOnly
@@ -706,7 +681,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe  判断是否只读
      */
-    BOOL GetReadOnly();
+    STDMETHOD_(BOOL, GetReadOnly)(THIS) SCONST OVERRIDE;
 
     /**
      * SRichEdit::SetReadOnly
@@ -716,7 +691,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   设置只读
      */
-    BOOL SetReadOnly(BOOL bReadOnly);
+    STDMETHOD_(BOOL, SetReadOnly)(THIS_ BOOL bReadOnly) OVERRIDE;
 
     /**
      * SRichEdit::GetLimitText
@@ -725,7 +700,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   获取最小文本长度
      */
-    LONG GetLimitText();
+    STDMETHOD_(LONG, GetLimitText)(THIS) SCONST OVERRIDE;
 
     /**
      * SRichEdit::SetLimitText
@@ -735,7 +710,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   设置最小文本长度
      */
-    BOOL SetLimitText(int nLength);
+    STDMETHOD_(BOOL, SetLimitText)(THIS_ int nLength) OVERRIDE;
 
     /**
      * SRichEdit::GetDefaultAlign
@@ -744,7 +719,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   设置最小文本长度
      */
-    WORD GetDefaultAlign();
+    STDMETHOD_(WORD, GetDefaultAlign)(THIS) SCONST OVERRIDE;
 
     /**
      * SRichEdit::SetDefaultAlign
@@ -753,7 +728,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   设置默认对齐方式
      */
-    void SetDefaultAlign(WORD wNewAlign);
+    STDMETHOD_(void, SetDefaultAlign)(THIS_ WORD wNewAlign) OVERRIDE;
 
     /**
      * SRichEdit::GetRichTextFlag
@@ -762,7 +737,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   获取标志
      */
-    BOOL GetRichTextFlag();
+    STDMETHOD_(BOOL, GetRichTextFlag)(THIS) SCONST OVERRIDE;
 
     /**
      * SRichEdit::SetRichTextFlag
@@ -771,7 +746,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   设置标志
      */
-    void SetRichTextFlag(BOOL fRich);
+    STDMETHOD_(void, SetRichTextFlag)(THIS_ BOOL fRich) OVERRIDE;
 
     /**
      * SRichEdit::SetRichTextFlag
@@ -781,7 +756,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   设置标志
      */
-    LONG GetDefaultLeftIndent();
+    STDMETHOD_(LONG, GetDefaultLeftIndent)(THIS) SCONST OVERRIDE;
 
     /**
      * SRichEdit::SetDefaultLeftIndent
@@ -790,7 +765,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   设置缩进
      */
-    void SetDefaultLeftIndent(LONG lNewIndent);
+    STDMETHOD_(void, SetDefaultLeftIndent)(THIS_ LONG lNewIndent) OVERRIDE;
 
     /**
      * SRichEdit::SetSaveSelection
@@ -800,7 +775,7 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe
      */
-    BOOL SetSaveSelection(BOOL fSaveSelection);
+    STDMETHOD_(BOOL, SetSaveSelection)(THIS_ BOOL fSaveSelection) OVERRIDE;
 
     /**
      * SRichEdit::SetDefaultTextColor
@@ -810,7 +785,38 @@ class SOUI_EXP SRichEdit : public SPanel {
      *
      * Describe   设置默认文本颜色
      */
-    COLORREF SetDefaultTextColor(COLORREF cr);
+    STDMETHOD_(COLORREF, SetDefaultTextColor)(THIS_ COLORREF cr) OVERRIDE;
+
+    /**
+     * SRichEdit::SetWindowText
+     * @brief     设置窗口标题
+     * @param     LPCWSTR lpszText -- 窗口标题
+     *
+     * Describe   设置窗口标题
+     */
+    STDMETHOD_(void, SetWindowText)(LPCTSTR lpszText) OVERRIDE;
+
+    STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) OVERRIDE;
+
+  public:
+    /**
+     * SRichEdit::GetWindowText
+     * @brief     获取窗口标题
+     * @return    返回SStringT
+     *
+     * Describe   获取窗口标题
+     */
+    SStringT GetWindowText(BOOL bRawText = FALSE);
+
+    /**
+     * SRichEdit::SetSel
+     * @brief     设置选中
+     * @param     DWORD dwSelection --
+     * @param     BOOL bNoScroll --
+     *
+     * Describe   设置选中
+     */
+    void SetSel(DWORD dwSelection, BOOL bNoScroll = FALSE);
 
   protected:
     /**

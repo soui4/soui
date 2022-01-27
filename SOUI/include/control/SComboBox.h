@@ -24,7 +24,7 @@ namespace SOUI
  *
  * Describe    可输入下拉列表
  */
-class SOUI_EXP SComboBox : public SComboBase {
+class SOUI_EXP SComboBox : public TComboBaseProxy<IComboBox> {
     SOUI_CLASS_NAME(SComboBase, L"combobox")
   public:
     /**
@@ -43,127 +43,28 @@ class SOUI_EXP SComboBox : public SComboBase {
      */
     virtual ~SComboBox();
 
-    /**
-     * SComboBox::SetCurSel
-     * @brief    设置当前选中
-     * @param    int iSel -- 选中索引
-     *
-     * Describe  设置当前选中
-     */
-    BOOL SetCurSel(int iSel)
-    {
-        if (m_pListBox->SetCurSel(iSel))
-        {
-            m_pListBox->EnsureVisible(iSel);
-            OnSelChanged();
-            return TRUE;
-        }
-        else
-        {
-            return FALSE;
-        }
-    }
+  public:
+    STDMETHOD_(BOOL, SetCurSel)(THIS_ int iSel) OVERRIDE;
 
-    /**
-     * SComboBox::GetCurSel
-     * @brief    获取选中索引
-     * @return   返回int -- 选中索引
-     *
-     * Describe  获取选中索引
-     */
-    int GetCurSel() const
-    {
-        return m_pListBox->GetCurSel();
-    }
+    STDMETHOD_(int, GetCurSel)(THIS) SCONST OVERRIDE;
 
-    /**
-     * SComboBox::GetCount
-     * @brief    获取下拉项个数
-     * @return   返回int
-     *
-     * Describe  获取下拉项个数
-     */
-    int GetCount() const
-    {
-        return m_pListBox->GetCount();
-    }
+    STDMETHOD_(int, GetCount)(THIS) SCONST OVERRIDE;
 
-    /**
-     * SComboBox::GetItemData
-     * @brief    获取附加数据
-     * @param    UINT iItem -- 选项值
-     *
-     * Describe  获取附加数据
-     */
-    LPARAM GetItemData(UINT iItem) const
-    {
-        return m_pListBox->GetItemData(iItem);
-    }
+    STDMETHOD_(LPARAM, GetItemData)(THIS_ UINT iItem) SCONST OVERRIDE;
 
-    /**
-     * SComboBox::SetItemData
-     * @brief    设置附加数据
-     * @param    UINT iItem -- 索引值
-     * @param    LPARAM lParam -- 附加值
-     *
-     * Describe  设置附加数据
-     */
-    int SetItemData(UINT iItem, LPARAM lParam)
-    {
-        return m_pListBox->SetItemData(iItem, lParam);
-    }
+    STDMETHOD_(BOOL, SetItemData)(THIS_ UINT iItem, LPARAM lParam) OVERRIDE;
 
-    /**
-     * SComboBox::InsertItem
-     * @brief    插入新项
-     * @param    UINT iPos -- 位置
-     * @param    LPCTSTR pszText -- 文本值
-     * @param    int iIcon -- 图标
-     * @param    LPARAM lParam -- 附加值
-     *
-     * Describe  插入新项
-     */
-    int InsertItem(UINT iPos, LPCTSTR pszText, int iIcon, LPARAM lParam)
-    {
-        return m_pListBox->InsertString(iPos, pszText, iIcon, lParam);
-    }
+    STDMETHOD_(int, InsertItem)(THIS_ int iPos, LPCTSTR pszText, int iIcon, LPARAM lParam) OVERRIDE;
 
-    /**
-     * SComboBox::DeleteString
-     * @brief    删除某一项
-     * @param    UINT iItem -- 索引值
-     *
-     * Describe  删除某一项
-     */
-    BOOL DeleteString(UINT iItem)
-    {
-        return m_pListBox->DeleteString(iItem);
-    }
+    STDMETHOD_(BOOL, DeleteString)(THIS_ int iPos) OVERRIDE;
 
-    /**
-     * SComboBox::ResetContent
-     * @brief    删除所有项
-     *
-     * Describe  设置附加数据
-     */
-    void ResetContent()
-    {
-        SetCurSel(-1);
-        return m_pListBox->DeleteAll();
-    }
+    STDMETHOD_(void, ResetContent)(THIS) OVERRIDE;
 
-    /**
-     * SComboBox::GetLBText
-     * @brief    获取文本
-     * @param    int iItem -- 索引值
-     * @param    BOOL bRawText-- true:未经翻译的文字，false：翻译后的文字
-     *
-     * Describe  获取文本
-     */
-    SStringT GetLBText(int iItem, BOOL bRawText = FALSE)
-    {
-        return m_pListBox->GetText(iItem, bRawText);
-    }
+    STDMETHOD_(BOOL, GetItemText)(int iItem, BOOL bRawText, IStringT *str) CONST OVERRIDE;
+
+    STDMETHOD_(IListBox *, GetIListBox)(THIS) OVERRIDE;
+
+  public:
     /**
      * SComboBox::GetListBox
      * @brief    获取下拉列表指针

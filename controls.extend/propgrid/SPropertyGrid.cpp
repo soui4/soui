@@ -119,7 +119,7 @@ namespace SOUI
         if(idx >= iTopIdx && idx <= iTopIdx+nPageItems)
         {
             rcItem = CRect(0,0,m_rcClient.Width(),nItemHei);
-            rcItem.OffsetRect(0,nItemHei*idx-m_ptOrigin.y);
+            rcItem.OffsetRect(0,nItemHei*idx-m_siVer.nPos);
             rcItem.OffsetRect(m_rcClient.TopLeft());
         }
         return rcItem;

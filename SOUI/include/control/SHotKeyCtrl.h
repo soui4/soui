@@ -23,7 +23,7 @@ namespace SOUI
  * Describe    热键控件
  */
 class SOUI_EXP SHotKeyCtrl
-    : public SWindow
+    : public TWindowProxy<IHotKeyCtrl>
     , public SAccelerator {
     SOUI_CLASS_NAME(SWindow, L"hotkey")
     enum
@@ -50,6 +50,7 @@ class SOUI_EXP SHotKeyCtrl
      */
     virtual ~SHotKeyCtrl(void);
 
+  public:
     /**
      * SHotKeyCtrl::SetRule
      * @brief    设置规则
@@ -58,7 +59,7 @@ class SOUI_EXP SHotKeyCtrl
      *
      * Describe  设置规则
      */
-    void SetRule(WORD wInvalidComp, WORD wModifier);
+    STDMETHOD_(void, SetRule)(THIS_ WORD wInvalidComp, WORD wModifier) OVERRIDE;
 
     /**
      * SHotKeyCtrl::SetHotKey
@@ -68,7 +69,7 @@ class SOUI_EXP SHotKeyCtrl
      *
      * Describe  设置热键
      */
-    void SetHotKey(WORD vKey, WORD wModifiers);
+    STDMETHOD_(void, SetHotKey)(THIS_ WORD wKey, WORD wModifiers) OVERRIDE;
 
     /**
      * SHotKeyCtrl::GetHotKey
@@ -78,7 +79,7 @@ class SOUI_EXP SHotKeyCtrl
      *
      * Describe  获取热键
      */
-    void GetHotKey(WORD &vKey, WORD &wModifers);
+    STDMETHOD_(void, GetHotKey)(THIS_ WORD *wKey, WORD *wModifers) SCONST OVERRIDE;
 
   public:
     virtual SStringT GetWindowText(BOOL bRawText = FALSE);

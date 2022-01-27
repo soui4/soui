@@ -28,7 +28,7 @@ STreeCtrl::STreeCtrl()
     , m_crItemText(RGBA(0, 0, 0, 255))
     , m_crItemSelText(RGBA(255, 255, 255, 255))
     , m_nVisibleItems(0)
-    , m_nMaxItemWidth(0)
+    , m_nContentWidth(0)
     , m_bCheckBox(FALSE)
     , m_bRightClickSel(FALSE)
     , m_uItemMask(0)
@@ -53,23 +53,18 @@ STreeCtrl::~STreeCtrl()
 
 ////////////////////////////////////////////////////////////////////////////////////////////
 
-HSTREEITEM STreeCtrl::InsertItem(LPCTSTR lpszItem,
-                                 HSTREEITEM hParent,
-                                 HSTREEITEM hInsertAfter,
-                                 BOOL bEnsureVisible)
+HSTREEITEM STreeCtrl::InsertItem(LPCTSTR lpszItem, HSTREEITEM hParent, HSTREEITEM hInsertAfter)
 {
-    return InsertItem(lpszItem, -1, -1, NULL, hParent, hInsertAfter, bEnsureVisible);
+    return InsertItem(lpszItem, -1, -1, NULL, hParent, hInsertAfter);
 }
 
 HSTREEITEM STreeCtrl::InsertItem(LPCTSTR lpszItem,
                                  int nImage,
                                  int nSelectedImage,
                                  HSTREEITEM hParent,
-                                 HSTREEITEM hInsertAfter,
-                                 BOOL bEnsureVisible)
+                                 HSTREEITEM hInsertAfter)
 {
-    return InsertItem(lpszItem, nImage, nSelectedImage, NULL, hParent, hInsertAfter,
-                      bEnsureVisible);
+    return InsertItem(lpszItem, nImage, nSelectedImage, NULL, hParent, hInsertAfter);
 }
 
 HSTREEITEM STreeCtrl::InsertItem(LPCTSTR lpszItem,
@@ -77,8 +72,7 @@ HSTREEITEM STreeCtrl::InsertItem(LPCTSTR lpszItem,
                                  int nSelectedImage,
                                  LPARAM lParam,
                                  HSTREEITEM hParent,
-                                 HSTREEITEM hInsertAfter,
-                                 BOOL bEnsureVisible)
+                                 HSTREEITEM hInsertAfter)
 {
     LPTVITEM pItemObj = new TVITEM();
 
@@ -87,7 +81,7 @@ HSTREEITEM STreeCtrl::InsertItem(LPCTSTR lpszItem,
     pItemObj->nSelectedImage = nSelectedImage;
     pItemObj->lParam = lParam;
 
-    return InsertItem(pItemObj, hParent, hInsertAfter, bEnsureVisible);
+    return InsertItem(pItemObj, hParent, hInsertAfter);
 }
 
 BOOL STreeCtrl::RemoveItem(HSTREEITEM hItem)
@@ -99,7 +93,7 @@ BOOL STreeCtrl::RemoveItem(HSTREEITEM hItem)
     LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
 
     BOOL bVisible = pItem->bVisible;
-    int nItemWidth = GetMaxItemWidth(hItem);
+    int nItemWidth = CalcMaxItemWidth(hItem);
     int nCheckBoxValue = pItem->nCheckBoxValue;
     if (bVisible)
     {
@@ -140,12 +134,10 @@ BOOL STreeCtrl::RemoveItem(HSTREEITEM hItem)
         m_nVisibleItems--;
 
         //重新计算x最大尺寸
-        if (nItemWidth == m_nMaxItemWidth)
-            GetMaxItemWidth();
+        if (nItemWidth == m_nContentWidth)
+            UpdateContentWidth();
 
-        CSize szView(m_nMaxItemWidth, m_nVisibleItems * m_nItemHei);
-        SetViewSize(szView);
-        Invalidate();
+        UpdateScrollBar();
     }
     return TRUE;
 }
@@ -157,9 +149,8 @@ void STreeCtrl::RemoveAllItems()
     m_hSelItem = NULL;
     m_hHoverItem = NULL;
     m_hCaptureItem = NULL;
-    m_nMaxItemWidth = 0;
-    SetViewSize(CSize(0, 0));
-    SetViewOrigin(CPoint(0, 0));
+    m_nContentWidth = 0;
+    UpdateScrollBar();
 }
 
 HSTREEITEM STreeCtrl::GetRootItem() const
@@ -192,14 +183,14 @@ HSTREEITEM STreeCtrl::GetSelectedItem() const
     return m_hSelItem;
 }
 
-BOOL STreeCtrl::GetItemText(HSTREEITEM hItem, SStringT &strText) const
+BOOL STreeCtrl::GetItemText(HSTREEITEM hItem, IStringT *strText) const
 {
     if (hItem)
     {
         LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
         if (pItem)
         {
-            strText = pItem->strText;
+            strText->Copy(&pItem->strText);
             return TRUE;
         }
     }
@@ -221,15 +212,17 @@ BOOL STreeCtrl::SetItemText(HSTREEITEM hItem, LPCTSTR lpszItem)
     return FALSE;
 }
 
-BOOL STreeCtrl::GetItemImage(HSTREEITEM hItem, int &nImage, int &nSelectedImage) const
+BOOL STreeCtrl::GetItemImage(HSTREEITEM hItem, int *nImage, int *nSelectedImage) const
 {
     if (hItem)
     {
         LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
         if (pItem)
         {
-            nImage = pItem->nImage;
-            nSelectedImage = pItem->nSelectedImage;
+            if (nImage)
+                *nImage = pItem->nImage;
+            if (nSelectedImage)
+                *nSelectedImage = pItem->nSelectedImage;
             return TRUE;
         }
     }
@@ -347,15 +340,8 @@ BOOL STreeCtrl::Expand(HSTREEITEM hItem, UINT nCode)
         }
         if (bRet)
         {
-            // EventTCExpand evt(this);
-            // evt.hItem=hItem;
-            // evt.bCollapsed=pItem->bCollapsed;
-            // FireEvent(evt);
-
-            GetMaxItemWidth();
-            CSize szView(m_nMaxItemWidth, m_nVisibleItems * m_nItemHei);
-            SetViewSize(szView);
-            Invalidate();
+            UpdateContentWidth();
+            UpdateScrollBar();
         }
     }
     return bRet;
@@ -380,11 +366,11 @@ BOOL STreeCtrl::EnsureVisible(HSTREEITEM hItem)
     }
     int iVisible = GetItemShowIndex(hItem);
     int yOffset = iVisible * m_nItemHei;
-    if (yOffset + m_nItemHei > m_ptOrigin.y + m_rcClient.Height())
+    if (yOffset + m_nItemHei > m_siVer.nPos + m_rcClient.Height())
     {
         SetScrollPos(TRUE, yOffset + m_nItemHei - m_rcClient.Height(), TRUE);
     }
-    else if (yOffset < m_ptOrigin.y)
+    else if (yOffset < m_siVer.nPos)
     {
         SetScrollPos(TRUE, yOffset, TRUE);
     }
@@ -450,10 +436,7 @@ void STreeCtrl::LoadItemAttribute(SXmlNode xmlItem, LPTVITEM pItem)
     }
 }
 
-HSTREEITEM STreeCtrl::InsertItem(LPTVITEM pItemObj,
-                                 HSTREEITEM hParent,
-                                 HSTREEITEM hInsertAfter,
-                                 BOOL bEnsureVisible)
+HSTREEITEM STreeCtrl::InsertItem(LPTVITEM pItemObj, HSTREEITEM hParent, HSTREEITEM hInsertAfter)
 {
     SASSERT(pItemObj);
 
@@ -490,29 +473,24 @@ HSTREEITEM STreeCtrl::InsertItem(LPTVITEM pItemObj,
         m_nVisibleItems++;
 
         int nViewWidth = CalcItemWidth(pItemObj);
-        m_nMaxItemWidth = smax(nViewWidth, m_nMaxItemWidth);
+        m_nContentWidth = smax(nViewWidth, m_nContentWidth);
 
-        CSize szView(m_nMaxItemWidth, m_nVisibleItems * m_nItemHei);
-        SetViewSize(szView);
-        Invalidate();
+        UpdateScrollBar();
     }
 
     if (bCheckState)
         CheckState(hParent);
-    if (bEnsureVisible)
-        EnsureVisible(hRet);
     return hRet;
 }
 
 HSTREEITEM STreeCtrl::InsertItem(SXmlNode xmlItem,
                                  HSTREEITEM hParent /*=STVI_ROOT*/,
-                                 HSTREEITEM hInsertAfter /*=STVI_LAST*/,
-                                 BOOL bEnsureVisible /*=FALSE*/)
+                                 HSTREEITEM hInsertAfter /*=STVI_LAST*/)
 {
     LPTVITEM pItemObj = new TVITEM();
 
     LoadItemAttribute(xmlItem, pItemObj);
-    return InsertItem(pItemObj, hParent, hInsertAfter, bEnsureVisible);
+    return InsertItem(pItemObj, hParent, hInsertAfter);
 }
 
 BOOL STreeCtrl::IsAncestor(HSTREEITEM hItem1, HSTREEITEM hItem2)
@@ -674,20 +652,22 @@ void STreeCtrl::CalcItemContentWidth(LPTVITEM pItem)
     pItem->nContentWidth = rcTest.Width() + m_nItemOffset + 2 * m_nItemMargin;
 }
 
-int STreeCtrl::GetMaxItemWidth(HSTREEITEM hItem)
+int STreeCtrl::CalcMaxItemWidth(HSTREEITEM hItem)
 {
     int nItemWidth = 0, nChildrenWidth = 0;
 
-    LPTVITEM pItem = GetItem(hItem);
-    if (pItem->bVisible)
-        nItemWidth = CalcItemWidth(pItem);
-    else
-        return 0;
-
+    if (hItem != STVI_ROOT)
+    {
+        LPTVITEM pItem = GetItem(hItem);
+        if (pItem->bVisible)
+            nItemWidth = CalcItemWidth(pItem);
+        else
+            return 0;
+    }
     HSTREEITEM hChild = GetChildItem(hItem);
     while (hChild)
     {
-        nChildrenWidth = GetMaxItemWidth(hChild);
+        nChildrenWidth = CalcMaxItemWidth(hChild);
         if (nChildrenWidth > nItemWidth)
             nItemWidth = nChildrenWidth;
 
@@ -697,21 +677,9 @@ int STreeCtrl::GetMaxItemWidth(HSTREEITEM hItem)
     return nItemWidth;
 }
 
-int STreeCtrl::GetMaxItemWidth()
+void STreeCtrl::UpdateContentWidth()
 {
-    int nItemWidth = 0;
-    m_nMaxItemWidth = 0;
-    HSTREEITEM hItem = CSTree<LPTVITEM>::GetNextItem(STVI_ROOT);
-
-    while (hItem)
-    {
-        nItemWidth = GetMaxItemWidth(hItem);
-        if (nItemWidth > m_nMaxItemWidth)
-            m_nMaxItemWidth = nItemWidth;
-        hItem = GetNextSiblingItem(hItem);
-    }
-
-    return m_nMaxItemWidth;
+    m_nContentWidth = CalcMaxItemWidth(STVI_ROOT);
 }
 
 int STreeCtrl::GetItemShowIndex(HSTREEITEM hItemObj)
@@ -748,7 +716,7 @@ BOOL STreeCtrl::GetItemRect(LPTVITEM pItemObj, CRect &rcItem)
 
     CRect rcClient;
     GetClientRect(rcClient);
-    int iFirstVisible = m_ptOrigin.y / m_nItemHei;
+    int iFirstVisible = m_siVer.nPos / m_nItemHei;
     int nPageItems = (rcClient.Height() + m_nItemHei - 1) / m_nItemHei + 1;
 
     int iVisible = -1;
@@ -763,8 +731,8 @@ BOOL STreeCtrl::GetItemRect(LPTVITEM pItemObj, CRect &rcItem)
         if (iVisible >= iFirstVisible && pItem == pItemObj)
         {
             CRect rcRet(m_nIndent * pItemObj->nLevel, 0, rcClient.Width(), m_nItemHei);
-            rcRet.OffsetRect(rcClient.left - m_ptOrigin.x,
-                             rcClient.top - m_ptOrigin.y + iVisible * m_nItemHei);
+            rcRet.OffsetRect(rcClient.left - m_siHoz.nPos,
+                             rcClient.top - m_siVer.nPos + iVisible * m_nItemHei);
             rcItem = rcRet;
             return TRUE;
         }
@@ -788,7 +756,7 @@ HSTREEITEM STreeCtrl::HitTest(CPoint &pt)
     CRect rcClient;
     GetClientRect(&rcClient);
     CPoint pt2 = pt;
-    pt2.y -= rcClient.top - m_ptOrigin.y;
+    pt2.y -= rcClient.top - m_siVer.nPos;
     int iItem = pt2.y / m_nItemHei;
     if (iItem >= m_nVisibleItems)
         return NULL;
@@ -805,8 +773,8 @@ HSTREEITEM STreeCtrl::HitTest(CPoint &pt)
         if (iVisible == iItem)
         {
             CRect rcItem(m_nIndent * pItem->nLevel, 0, rcClient.Width(), m_nItemHei);
-            rcItem.OffsetRect(rcClient.left - m_ptOrigin.x,
-                              rcClient.top - m_ptOrigin.y + iVisible * m_nItemHei);
+            rcItem.OffsetRect(rcClient.left - m_siHoz.nPos,
+                              rcClient.top - m_siVer.nPos + iVisible * m_nItemHei);
             pt -= rcItem.TopLeft();
             hRet = hItem;
             break;
@@ -832,7 +800,7 @@ void STreeCtrl::RedrawItem(HSTREEITEM hItem)
     CRect rcClient;
     GetClientRect(rcClient);
 
-    int iFirstVisible = m_ptOrigin.y / m_nItemHei;
+    int iFirstVisible = m_siVer.nPos / m_nItemHei;
     int nPageItems = (rcClient.Height() + m_nItemHei - 1) / m_nItemHei + 1;
     int iItem = GetItemShowIndex(hItem);
     if (iItem != -1 && iItem >= iFirstVisible && iItem < iFirstVisible + nPageItems)
@@ -840,8 +808,8 @@ void STreeCtrl::RedrawItem(HSTREEITEM hItem)
         LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
 
         CRect rcItem(0, 0, CalcItemWidth(pItem), m_nItemHei);
-        rcItem.OffsetRect(rcClient.left - m_ptOrigin.x,
-                          rcClient.top + m_nItemHei * iItem - m_ptOrigin.y);
+        rcItem.OffsetRect(rcClient.left - m_siHoz.nPos,
+                          rcClient.top + m_nItemHei * iItem - m_siVer.nPos);
 
         SAutoRefPtr<IRenderTarget> pRT = GetRenderTarget(&rcItem, GRT_PAINTBKGND);
 
@@ -1213,7 +1181,7 @@ void STreeCtrl::OnPaint(IRenderTarget *pRT)
     BeforePaint(pRT, painter);
 
     GetClientRect(rcClient);
-    int iFirstVisible = m_ptOrigin.y / m_nItemHei;
+    int iFirstVisible = m_siVer.nPos / m_nItemHei;
     int nPageItems = (m_rcClient.Height() + m_nItemHei - 1) / m_nItemHei + 1;
 
     int iVisible = -1;
@@ -1228,8 +1196,8 @@ void STreeCtrl::OnPaint(IRenderTarget *pRT)
         if (iVisible >= iFirstVisible)
         {
             CRect rcItem(0, 0, CalcItemWidth(pItem), m_nItemHei);
-            rcItem.OffsetRect(rcClient.left - m_ptOrigin.x,
-                              rcClient.top - m_ptOrigin.y + iVisible * m_nItemHei);
+            rcItem.OffsetRect(rcClient.left - m_siHoz.nPos,
+                              rcClient.top - m_siVer.nPos + iVisible * m_nItemHei);
             DrawLines(pRT, rcItem, hItem);
             DrawItem(pRT, rcItem, hItem);
         }
@@ -1369,7 +1337,7 @@ int STreeCtrl::CalcItemWidth(const LPTVITEM pItemObj)
     return pItemObj->nContentWidth + pItemObj->nLevel * m_nIndent;
 }
 
-void STreeCtrl::SortChildren(HSTREEITEM hItem, FunSortCallback sortFunc, void *pCtx)
+void STreeCtrl::SortChildren(HSTREEITEM hItem, FunTreeSortCallback sortFunc, void *pCtx)
 {
     m_hHoverItem = NULL;
     m_hCaptureItem = NULL;
@@ -1403,6 +1371,98 @@ void STreeCtrl::OnNodeFree(LPTVITEM &pItemData)
 void STreeCtrl::SetListener(IListener *pListener)
 {
     m_pListener = pListener;
+}
+
+void STreeCtrl::UpdateScrollBar()
+{
+    CRect rcClient;
+    SWindow::GetClientRect(&rcClient);
+
+    CSize size = rcClient.Size();
+    CSize szView(m_nContentWidth, m_nVisibleItems * m_nItemHei);
+
+    m_wBarVisible = SSB_NULL; //关闭滚动条
+
+    if (size.cy < szView.cy || (size.cy < szView.cy + GetSbWidth() && size.cx < szView.cx))
+    {
+        //需要纵向滚动条
+        m_wBarVisible |= SSB_VERT;
+        m_siVer.nMin = 0;
+        m_siVer.nMax = szView.cy - 1;
+        m_siVer.nPage = size.cy;
+        if (m_siVer.nPos + (int)m_siVer.nPage > m_siVer.nMax)
+        {
+            m_siVer.nPos = m_siVer.nMax - m_siVer.nPage;
+        }
+        if (size.cx < szView.cx + GetSbWidth())
+        {
+            //需要横向滚动条
+            m_wBarVisible |= SSB_HORZ;
+            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0;
+
+            m_siHoz.nMin = 0;
+            m_siHoz.nMax = szView.cx - 1;
+            m_siHoz.nPage = size.cx - GetSbWidth() > 0 ? size.cx - GetSbWidth() : 0;
+            if (m_siHoz.nPos + (int)m_siHoz.nPage > m_siHoz.nMax)
+            {
+                m_siHoz.nPos = m_siHoz.nMax - m_siHoz.nPage;
+            }
+        }
+        else
+        {
+            //不需要横向滚动条
+            m_siHoz.nPage = size.cx;
+            m_siHoz.nMin = 0;
+            m_siHoz.nMax = m_siHoz.nPage - 1;
+            m_siHoz.nPos = 0;
+        }
+    }
+    else
+    {
+        //不需要纵向滚动条
+        m_siVer.nPage = size.cy;
+        m_siVer.nMin = 0;
+        m_siVer.nMax = size.cy - 1;
+        m_siVer.nPos = 0;
+
+        if (size.cx < szView.cx)
+        {
+            //需要横向滚动条
+            m_wBarVisible |= SSB_HORZ;
+            m_siHoz.nMin = 0;
+            m_siHoz.nMax = szView.cx - 1;
+            m_siHoz.nPage = size.cx;
+            if (m_siHoz.nPos + (int)m_siHoz.nPage > m_siHoz.nMax)
+            {
+                m_siHoz.nPos = m_siHoz.nMax - m_siHoz.nPage;
+            }
+        }
+        //不需要横向滚动条
+        else
+        {
+            m_siHoz.nPage = size.cx;
+            m_siHoz.nMin = 0;
+            m_siHoz.nMax = m_siHoz.nPage - 1;
+            m_siHoz.nPos = 0;
+        }
+    }
+
+    SetScrollPos(TRUE, m_siVer.nPos, TRUE);
+    SetScrollPos(FALSE, m_siHoz.nPos, TRUE);
+
+    SSendMessage(WM_NCCALCSIZE);
+    Invalidate();
+}
+
+void STreeCtrl::OnSize(UINT nType, CSize size)
+{
+    __baseCls::OnSize(nType, size);
+    UpdateScrollBar();
+}
+
+HSTREEITEM STreeCtrl::GetNextItem(HSTREEITEM hItem) const
+{
+    return CSTree<LPTVITEM>::GetNextItem(hItem);
 }
 
 } // namespace SOUI

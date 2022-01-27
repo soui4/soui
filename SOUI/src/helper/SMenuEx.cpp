@@ -1104,7 +1104,7 @@ void SMenuEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     }
 }
 
-const SStringW &SMenuEx::GetTranslatorContext() const
+LPCWSTR SMenuEx::GetTranslatorContext() const
 {
     if (m_pParent != NULL)
     {

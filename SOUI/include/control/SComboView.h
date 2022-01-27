@@ -5,41 +5,24 @@
 
 namespace SOUI
 {
-class SOUI_EXP SComboView : public SComboBase {
+class SOUI_EXP SComboView : public TComboBaseProxy<IComboView> {
     SOUI_CLASS_NAME(SComboBase, L"comboview")
   public:
     SComboView(void);
     ~SComboView(void);
 
-    BOOL SetCurSel(int iSel);
+  public:
+    STDMETHOD_(BOOL, SetCurSel)(int iSel) OVERRIDE;
 
-    /**
-     * SComboView::GetCurSel
-     * @brief    获取选中索引
-     * @return   返回int -- 选中索引
-     *
-     * Describe  获取选中索引
-     */
-    int GetCurSel() const;
+    STDMETHOD_(int, GetCurSel)() SCONST OVERRIDE;
 
-    /**
-     * SComboView::GetCount
-     * @brief    获取下拉项个数
-     * @return   返回int
-     *
-     * Describe  获取下拉项个数
-     */
-    int GetCount() const;
+    STDMETHOD_(int, GetCount)() SCONST OVERRIDE;
 
-    /**
-     * SComboView::GetLBText
-     * @brief    获取文本
-     * @param    int iItem -- 索引值
-     *
-     * Describe  获取文本
-     */
-    SStringT GetLBText(int iItem, BOOL bRawText = FALSE);
+    STDMETHOD_(BOOL, GetItemText)(int iItem, BOOL bRawText, IStringT *str) SCONST OVERRIDE;
 
+    STDMETHOD_(IListView *, GetIListView)(THIS) OVERRIDE;
+
+  public:
     /**
      * SComboView::GetListBox
      * @brief    获取下拉列表指针

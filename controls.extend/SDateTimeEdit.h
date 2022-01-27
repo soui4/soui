@@ -31,7 +31,7 @@ namespace SOUI{
  */
 class SMaskEdit : public SEdit
 {
-    SOUI_CLASS_NAME(SMaskEdit, L"maskedit")
+    SOUI_CLASS_NAME(SEdit, L"maskedit")
 
 public:
     /**

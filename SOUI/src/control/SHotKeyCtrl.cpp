@@ -207,10 +207,12 @@ void SHotKeyCtrl::SetHotKey(WORD vKey, WORD wModifiers)
     Invalidate();
 }
 
-void SHotKeyCtrl::GetHotKey(WORD &vKey, WORD &wModifers)
+void SHotKeyCtrl::GetHotKey(WORD *wKey, WORD *wModifers) const
 {
-    vKey = m_wVK;
-    wModifers = m_wModifier;
+    if (wKey)
+        *wKey = m_wVK;
+    if (wModifers)
+        *wModifers = m_wModifier;
 }
 
 SStringT SHotKeyCtrl::GetWindowText(BOOL bRawText)

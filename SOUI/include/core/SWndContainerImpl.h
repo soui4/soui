@@ -49,7 +49,7 @@ class SOUI_EXP SwndContainerImpl
 
     STDMETHOD_(SWND, OnSetSwndCapture)(THIS_ SWND swnd) OVERRIDE;
     STDMETHOD_(void, OnSetSwndFocus)(THIS_ SWND swnd) OVERRIDE;
-    STDMETHOD_(void, FrameToHost)(THIS_ RECT &rc) SCONST OVERRIDE
+    STDMETHOD_(void, FrameToHost)(THIS_ RECT *rc) SCONST OVERRIDE
     {
     }
     STDMETHOD_(SWND, OnGetSwndCapture)(THIS) OVERRIDE;

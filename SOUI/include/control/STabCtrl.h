@@ -110,7 +110,7 @@ class SOUI_EXP STabPage : public SWindow {
  *
  * Describe   tab控件
  */
-class SOUI_EXP STabCtrl : public SWindow {
+class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
     friend class STabSlider;
     SOUI_CLASS_NAME(SWindow, L"tabctrl")
 
@@ -166,6 +166,7 @@ class SOUI_EXP STabCtrl : public SWindow {
     {
     }
 
+  public:
     /**
      * STabCtrl::GetCurSel
      * @brief    获取当前选中
@@ -173,13 +174,7 @@ class SOUI_EXP STabCtrl : public SWindow {
      *
      * Describe  获取当前选中
      */
-    int GetCurSel()
-    {
-        return m_nCurrentPage;
-    }
-
-    SWindow *GetPage(int iPage);
-    SWindow *GetPage(LPCTSTR pszName, BOOL bTitle = TRUE);
+    STDMETHOD_(int, GetCurSel)(THIS) SCONST OVERRIDE;
 
     /**
      * STabCtrl::SetCurSel
@@ -189,7 +184,84 @@ class SOUI_EXP STabCtrl : public SWindow {
      *
      * Describe  获取当前选中
      */
-    BOOL SetCurSel(int nIndex);
+    STDMETHOD_(BOOL, SetCurSel)(THIS_ int nIndex) OVERRIDE;
+
+    /**
+     * STabCtrl::SetItemTitle
+     * @brief    设置标题
+     * @param    int nIndex  -- 索引
+     * @param    LPCTSTR lpszTitle  -- 标题
+     * @return   返回BOOL
+     *
+     * Describe  获取当前选中
+     */
+    STDMETHOD_(BOOL, SetItemTitle)(THIS_ int nIndex, LPCTSTR lpszTitle) OVERRIDE;
+
+    /**
+     * STabCtrl::InsertItem
+     * @brief    插入tab页面
+     * @param    LPCWSTR lpContent  -- XML描述的page信息
+     * @param    int iInsert  -- 位置
+     * @return   返回插入位置
+     *
+     * Describe  插入tab页面
+     */
+    STDMETHOD_(int, InsertItem)(THIS_ LPCWSTR lpContent, int iInsert = -1) OVERRIDE;
+
+    /**
+     * STabCtrl::GetItemCount
+     * @brief    获取tab页面数
+     * @return   返回int
+     *
+     * Describe  获取tab页面数
+     */
+    STDMETHOD_(int, GetItemCount)(THIS) SCONST OVERRIDE;
+
+    /**
+     * STabCtrl::GetItem
+     * @brief    获取指定tab页面
+     * @param    int nIndex -- 索引
+     * @return   返回int
+     *
+     * Describe  获取当前选中
+     */
+    STDMETHOD_(IWindow *, GetPage)(THIS_ int nIndex) OVERRIDE;
+
+    /**
+     * STabCtrl::RemoveItem
+     * @brief    删除指定tab页面
+     * @param    int nIndex -- 索引
+     * @param    int nSelPage -- 选中页面
+     * @return   删除指定tab页面
+     *
+     * Describe  获取当前选中
+     */
+    STDMETHOD_(BOOL, RemoveItem)(THIS_ int nIndex, int iSelPage = 0) OVERRIDE;
+
+    /**
+     * STabCtrl::RemoveAllItems
+     * @brief    删除所有页面
+     *
+     * Describe  删除所有页面
+     */
+    STDMETHOD_(void, RemoveAllItems)(THIS) OVERRIDE;
+
+    /**
+     * STabCtrl::GetPageIndex
+     * @brief    获取指定页面的索引
+     * @param    LPCTSTR pszName -- 查询字符串
+     * @param    BOOL bTitle --
+     * TRUE:pszName代表的是page的title属性,FALSE：pszName代表的是page的name属性
+     * @return   找到的页面索引号
+     *
+     * Describe
+     */
+    STDMETHOD_(int, GetPageIndex)(THIS_ LPCTSTR pszName, BOOL bTitle) OVERRIDE;
+
+  public:
+    STabPage *GetItem(int iPage);
+
+    STabPage *GetPage(LPCTSTR pszName, BOOL bTitle = TRUE);
 
     /**
      * STabCtrl::SetCurSel
@@ -201,16 +273,7 @@ class SOUI_EXP STabCtrl : public SWindow {
      */
     BOOL SetCurSel(LPCTSTR pszName, BOOL bTitle = TRUE);
 
-    /**
-     * STabCtrl::SetItemTitle
-     * @brief    设置标题
-     * @param    int nIndex  -- 索引
-     * @param    LPCTSTR lpszTitle  -- 标题
-     * @return   返回BOOL
-     *
-     * Describe  获取当前选中
-     */
-    BOOL SetItemTitle(int nIndex, LPCTSTR lpszTitle);
+  protected:
     /**
      * STabCtrl::CreateChildren
      * @brief    创建tab页面
@@ -224,17 +287,6 @@ class SOUI_EXP STabCtrl : public SWindow {
     /**
      * STabCtrl::InsertItem
      * @brief    插入tab页面
-     * @param    LPCWSTR lpContent  -- XML描述的page信息
-     * @param    int iInsert  -- 位置
-     * @return   返回插入位置
-     *
-     * Describe  插入tab页面
-     */
-    virtual int InsertItem(LPCWSTR lpContent, int iInsert = -1);
-
-    /**
-     * STabCtrl::InsertItem
-     * @brief    插入tab页面
      * @param    SXmlNode xmlNode  -- xml文件
      * @param    int iInsert  -- 位置
      * @param    BOOL bLoading -- 是否加载
@@ -244,59 +296,6 @@ class SOUI_EXP STabCtrl : public SWindow {
      */
     virtual int InsertItem(SXmlNode xmlNode, int iInsert = -1, BOOL bLoading = FALSE);
 
-    /**
-     * STabCtrl::GetItemCount
-     * @brief    获取tab页面数
-     * @return   返回int
-     *
-     * Describe  获取tab页面数
-     */
-    int GetItemCount()
-    {
-        return (int)m_lstPages.GetCount();
-    }
-    /**
-     * STabCtrl::GetItem
-     * @brief    获取指定tab页面
-     * @param    int nIndex -- 索引
-     * @return   返回int
-     *
-     * Describe  获取当前选中
-     */
-    STabPage *GetItem(int nIndex);
-
-    /**
-     * STabCtrl::RemoveItem
-     * @brief    删除指定tab页面
-     * @param    int nIndex -- 索引
-     * @param    int nSelPage -- 选中页面
-     * @return   删除指定tab页面
-     *
-     * Describe  获取当前选中
-     */
-    BOOL RemoveItem(int nIndex, int nSelPage = 0);
-
-    /**
-     * STabCtrl::RemoveAllItems
-     * @brief    删除所有页面
-     *
-     * Describe  删除所有页面
-     */
-    void RemoveAllItems(void);
-
-    /**
-     * STabCtrl::GetPageIndex
-     * @brief    获取指定页面的索引
-     * @param    LPCTSTR pszName -- 查询字符串
-     * @param    BOOL bTitle --
-     * TRUE:pszName代表的是page的title属性,FALSE：pszName代表的是page的name属性
-     * @return   找到的页面索引号
-     *
-     * Describe
-     */
-    int GetPageIndex(LPCTSTR pszName, BOOL bTitle);
-
-  protected:
     /**
      * OnItemInserted
      * @brief    插入page状态

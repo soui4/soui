@@ -4,24 +4,22 @@
 #include <interface/sstring-i.h>
 #include <interface/SAnimation-i.h>
 #include <interface/SRender-i.h>
+#include <interface/SWndContainer-i.h>
 
 SNSBEGIN
-
-typedef struct SWNDMSG
-{
-    UINT uMsg;
-    WPARAM wParam;
-    LPARAM lParam;
-} SWNDMSG, *PSWNDMSG;
-
-interface ISwndContainer;
-interface IEvtArgs;
 
 #undef INTERFACE
 #define INTERFACE IWindow
 DECLARE_INTERFACE_(IWindow, IObject)
 {
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppRet) PURE;
+
+    STDMETHOD_(ISwndContainer *, GetContainer)(THIS) PURE;
+    STDMETHOD_(void, SetContainer)(THIS_ ISwndContainer * pContainer) PURE;
+
     STDMETHOD_(SWND, GetSwnd)(THIS) SCONST PURE;
+
+    STDMETHOD_(BOOL, Destroy)(THIS) PURE;
 
     STDMETHOD_(ILayout *, GetLayout)(THIS) PURE;
 
@@ -34,8 +32,6 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(BOOL, IsFloat)(THIS) SCONST PURE;
 
     STDMETHOD_(BOOL, IsDisplay)(THIS) SCONST PURE;
-
-    STDMETHOD_(void, SetWindowText)(THIS_ LPCTSTR lpszText) PURE;
 
     STDMETHOD_(void, SetToolTipText)(THIS_ LPCTSTR pszText) PURE;
 
@@ -52,14 +48,15 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     STDMETHOD_(ULONG_PTR, GetUserData)(THIS) SCONST PURE;
     STDMETHOD_(ULONG_PTR, SetUserData)(THIS_ ULONG_PTR uData) PURE;
+
     STDMETHOD_(void, GetWindowRect)(THIS_ LPRECT prect) SCONST PURE;
     STDMETHOD_(void, GetClientRect)(THIS_ LPRECT prect) SCONST PURE;
+
     STDMETHOD_(BOOL, IsContainPoint)(THIS_ POINT pt, BOOL bClientOnly) SCONST PURE;
+
     STDMETHOD_(void, DoColorize)(THIS_ COLORREF cr) PURE;
     STDMETHOD_(COLORREF, GetColorizeColor)(THIS) SCONST PURE;
-    STDMETHOD_(BOOL, Destroy)(THIS) PURE;
-    STDMETHOD_(void, BringWindowToTop)(THIS) PURE;
-    STDMETHOD_(UINT, GetChildrenCount)(THIS) SCONST PURE;
+
     STDMETHOD_(LRESULT, SSendMessage)
     (THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL * pbMsgHandled) PURE;
     STDMETHOD_(void, SDispatchMessage)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam) PURE;
@@ -74,10 +71,28 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(void, LockUpdate)(THIS) PURE;
     STDMETHOD_(void, UnlockUpdate)(THIS) PURE;
     STDMETHOD_(BOOL, IsUpdateLocked)(THIS) SCONST PURE;
+
     STDMETHOD_(void, Update)(THIS) PURE;
+
     STDMETHOD_(void, SetWindowRgn)(THIS_ IRegion * pRgn, BOOL bRedraw) PURE;
     STDMETHOD_(IRegion *, GetWindowRgn)(THIS) SCONST PURE;
     STDMETHOD_(void, SetWindowPath)(THIS_ IPath * pPath, BOOL bRedraw) PURE;
+
+    /**
+     * Move2
+     * @brief    将窗口移动到指定位置
+     * @param    int x --  left
+     * @param    int y --  top
+     * @param    int cx --  width
+     * @param    int cy --  height
+     * @return   void
+     *
+     * Describe
+     * @see     Move(LPRECT prect)
+     */
+    STDMETHOD_(void, Move2)(THIS_ int x, int y, int cx, int cy) PURE;
+
+    STDMETHOD_(void, Move)(THIS_ LPCRECT prect) PURE;
 
     STDMETHOD_(BOOL, SetTimer)(THIS_ char id, UINT uElapse) PURE;
     STDMETHOD_(void, KillTimer)(THIS_ char id) PURE;
@@ -87,19 +102,15 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
 
     STDMETHOD_(void, SetAnimation)(THIS_ IAnimation * animation) PURE;
-
     STDMETHOD_(IAnimation *, GetAnimation)(THIS) PURE;
 
     STDMETHOD_(void, StartAnimation)(THIS_ IAnimation * animation) PURE;
-
     STDMETHOD_(void, ClearAnimation)(THIS) PURE;
 
     STDMETHOD_(void, SetAlpha)(THIS_ BYTE byAlpha) PURE;
-
     STDMETHOD_(BYTE, GetAlpha)(THIS) SCONST PURE;
 
     STDMETHOD_(void, SetMatrix)(THIS_ const IxForm *mtx) PURE;
-
     STDMETHOD_(void, GetMatrix)(THIS_ IxForm * mtx) SCONST PURE;
 
     STDMETHOD_(int, GetScale)(THIS) SCONST PURE;
@@ -109,31 +120,29 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(void, RequestRelayout)(THIS) PURE;
     STDMETHOD_(void, UpdateLayout)(THIS) PURE;
 
+    STDMETHOD_(BOOL, IsLayoutDirty)(THIS) SCONST PURE;
+    STDMETHOD_(void, UpdateChildrenPosition)(THIS) PURE;
+
     STDMETHOD_(UINT, OnGetDlgCode)(THIS) SCONST PURE;
 
     STDMETHOD_(BOOL, IsFocusable)(THIS) SCONST PURE;
-
     STDMETHOD_(BOOL, IsClipClient)(THIS) SCONST PURE;
-    STDMETHOD_(BOOL, IsLayoutDirty)(THIS) SCONST PURE;
-    STDMETHOD_(void, UpdateChildrenPosition)(THIS) PURE;
+
+    STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
+    STDMETHOD_(IWindow *, GetIParent)(THIS) PURE;
 
     STDMETHOD_(IWindow *, GetIWindow)(THIS_ int uCode) PURE;
 
     STDMETHOD_(IWindow *, GetIChild)(THIS_ int iChild) PURE;
 
-    STDMETHOD_(IWindow *, GetIParent)(THIS) PURE;
-
-    STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
-
-    STDMETHOD_(const IWindow *, GetNextLayoutIChild2)(THIS_ const IWindow *pCurChild) SCONST PURE;
-    STDMETHOD_(IWindow *, GetNextLayoutIChild)(THIS_ IWindow * pCurChild) PURE;
-
-    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep) PURE;
-
-    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep) PURE;
-
     STDMETHOD_(BOOL, IsIDescendant)(THIS_ const IWindow *pTest) SCONST PURE;
 
+    STDMETHOD_(UINT, GetChildrenCount)(THIS) SCONST PURE;
+
+    STDMETHOD_(void, SetIOwner)(THIS_ IWindow * pOwner) PURE;
+    STDMETHOD_(IWindow *, GetIOwner)(THIS) PURE;
+
+    STDMETHOD_(void, BringWindowToTop)(THIS) PURE;
     /**
      * AdjustZOrder
      * @brief    调整窗口Z序
@@ -166,6 +175,16 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(BOOL, RemoveIChild)(THIS_ IWindow * pChild) PURE;
 
     /**
+     * CreateChildren
+     * @brief    从XML创建子窗口
+     * @param    LPCWSTR pszXml --  合法的utf16编码XML字符串
+     * @return   BOOL 是否创建成功
+     *
+     * Describe
+     */
+    STDMETHOD_(BOOL, CreateChildrenFromXml)(THIS_ LPCWSTR pszXml) PURE;
+
+    /**
      * DestroyChild
      * @brief    销毁一个子窗口
      * @param    SWindow * pChild --  子窗口对象
@@ -177,9 +196,8 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     STDMETHOD_(void, DestroyAllChildren)(THIS) PURE;
 
-    STDMETHOD_(ISwndContainer *, GetContainer)(THIS) PURE;
-    STDMETHOD_(void, SetContainer)(THIS_ ISwndContainer * pContainer) PURE;
-
+    STDMETHOD_(const IWindow *, GetNextLayoutIChild2)(THIS_ const IWindow *pCurChild) SCONST PURE;
+    STDMETHOD_(IWindow *, GetNextLayoutIChild)(THIS_ IWindow * pCurChild) PURE;
     /**
      * GetChildrenLayoutRect
      * @brief    获得子窗口的布局空间
@@ -188,6 +206,12 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * Describe  通常是客户区，但是tab,group这样的控件不一样
      */
     STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST PURE;
+
+    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep) PURE;
+
+    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep) PURE;
+
+    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT * pt, bool bIncludeMsgTransparent) PURE;
 
     /**
      * GetDesiredSize
@@ -201,22 +225,6 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) PURE;
 
     STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST PURE;
-
-    /**
-     * Move2
-     * @brief    将窗口移动到指定位置
-     * @param    int x --  left
-     * @param    int y --  top
-     * @param    int cx --  width
-     * @param    int cy --  height
-     * @return   void
-     *
-     * Describe
-     * @see     Move(LPRECT prect)
-     */
-    STDMETHOD_(void, Move2)(THIS_ int x, int y, int cx, int cy) PURE;
-
-    STDMETHOD_(void, Move)(THIS_ LPCRECT prect) PURE;
 
     /**
      * SetTimer2
@@ -240,34 +248,12 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(void, KillTimer2)(THIS_ UINT_PTR id) PURE;
 
-    STDMETHOD_(int, GetWindowText)(THIS_ TCHAR * pBuf, int nBufLen, BOOL bRawText) PURE;
+    STDMETHOD_(void, SetWindowText)(THIS_ LPCTSTR lpszText) PURE;
 
-    STDMETHOD_(void, SetEventMute)(THIS_ BOOL bMute) PURE;
+    STDMETHOD_(int, GetWindowText)(THIS_ TCHAR * pBuf, int nBufLen, BOOL bRawText) PURE;
 
     STDMETHOD_(DWORD, GetState)(THIS) SCONST PURE;
     STDMETHOD_(DWORD, ModifyState)(THIS_ DWORD dwStateAdd, DWORD dwStateRemove, BOOL bUpdate) PURE;
-
-    /**
-     * GetCurMsg
-     * @brief    获得当前正在处理的消息
-     * @return   PSWNDMSG
-     *
-     * Describe
-     */
-    STDMETHOD_(PSWNDMSG, GetCurMsg)(THIS) PURE;
-
-    STDMETHOD_(void, SetIOwner)(THIS_ IWindow * pOwner) PURE;
-    STDMETHOD_(IWindow *, GetIOwner)(THIS) PURE;
-
-    /**
-     * CreateChildren
-     * @brief    从XML创建子窗口
-     * @param    LPCWSTR pszXml --  合法的utf16编码XML字符串
-     * @return   BOOL 是否创建成功
-     *
-     * Describe
-     */
-    STDMETHOD_(BOOL, CreateChildrenFromXml)(THIS_ LPCWSTR pszXml) PURE;
 
     /**
      * GetISelectedSiblingInGroup
@@ -285,6 +271,17 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * Describe
      */
     STDMETHOD_(IWindow *, GetISelectedChildInGroup)(THIS) PURE;
+
+    // caret相关方法
+    STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) PURE;
+    STDMETHOD_(void, ShowCaret)(THIS_ BOOL bShow) PURE;
+    STDMETHOD_(void, SetCaretPos)(THIS_ int x, int y) PURE;
+
+    STDMETHOD_(void, SetEventMute)(THIS_ BOOL bMute) PURE;
+
+    STDMETHOD_(BOOL, SubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
+
+    STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
 
     STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs * evt) PURE;
 
@@ -306,19 +303,6 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * Describe
      */
     STDMETHOD_(BOOL, FireCtxMenu)(THIS_ POINT pt) PURE;
-
-    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT * pt, bool bIncludeMsgTransparent) PURE;
-
-    // caret相关方法
-    STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) PURE;
-    STDMETHOD_(void, ShowCaret)(THIS_ BOOL bShow) PURE;
-    STDMETHOD_(void, SetCaretPos)(THIS_ int x, int y) PURE;
-
-    STDMETHOD_(BOOL, SubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
-
-    STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
-
-    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppRet) PURE;
 };
 
 SNSEND

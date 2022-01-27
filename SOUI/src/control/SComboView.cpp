@@ -116,16 +116,17 @@ SListView *SComboView::GetListView()
     return m_pListBox;
 }
 
-SStringT SComboView::GetLBText(int iItem, BOOL bRawText)
+BOOL SComboView::GetItemText(int iItem, BOOL bRawText, IStringT *str) const
 {
     ILvAdapter *pAdapter = m_pListBox->GetAdapter();
     if (!pAdapter || iItem == -1)
-        return SStringT();
+        return FALSE;
     SStringT strDesc;
     pAdapter->getItemDesc(iItem, &strDesc);
-    if (bRawText)
-        return strDesc;
-    return S_CW2T(tr(S_CT2W(strDesc)));
+    if (!bRawText)
+        strDesc = S_CW2T(tr(S_CT2W(strDesc)));
+    str->Copy(&strDesc);
+    return TRUE;
 }
 
 int SComboView::GetCount() const
@@ -156,6 +157,11 @@ HRESULT SComboView::OnLanguageChanged()
     if (m_pListBox)
         m_pListBox->SSendMessage(UM_SETLANGUAGE);
     return hr;
+}
+
+IListView *SComboView::GetIListView(THIS)
+{
+    return GetListView();
 }
 
 } // namespace SOUI

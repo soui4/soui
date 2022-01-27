@@ -6,7 +6,7 @@ namespace SOUI
 class SWindowEx : public SWindow
 {
 public:
-    SOUI_CLASS_NAME(SWindowEx, L"windowex")
+    SOUI_CLASS_NAME(SWindow, L"windowex")
 
 protected:
     SOUI_MSG_MAP_BEGIN()

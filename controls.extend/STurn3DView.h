@@ -23,7 +23,7 @@ namespace SOUI
     
     class STurn3dView : public SWindow
     {
-        SOUI_CLASS_NAME(STurn3dView, L"Turn3dView")
+        SOUI_CLASS_NAME(SWindow, L"Turn3dView")
     public:
         STurn3dView();
         virtual ~STurn3dView();
