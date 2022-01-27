@@ -13,7 +13,10 @@
 
 #pragma once
 
-#include <event/SEventImpl.hpp>
+#include <core/sobjType.h>
+#include <sobject/Sobject.hpp>
+#include <helper/obj-ref-impl.hpp>
+#include <interface/SEvtArgs-i.h>
 
 SNSBEGIN
 
@@ -127,6 +130,52 @@ typedef enum _SOUI_EVENTS
 } SOUI_EVENTS;
 
 #ifdef __cplusplus
+class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>>
+{
+	SOUI_CLASS_NAME_EX(TObjRefImpl<SObjectImpl<IEvtArgs>>, L"event", Event)
+public:
+	UINT handled; 
+	BOOL bubbleUp; 
+	int  idFrom; 
+	LPCWSTR nameFrom;
+	IObject *sender; 
+
+	STDMETHOD_(IObject*,Sender)(THIS){return sender;}
+	STDMETHOD_(int,IdFrom) (THIS) SCONST{ return idFrom;}
+	STDMETHOD_(void,SetIdFrom)(THIS_ int id) {idFrom = id;}
+	STDMETHOD_(LPCWSTR,NameFrom) (THIS) SCONST{return nameFrom;}
+	STDMETHOD_(void,SetNameFrom) (THIS_ LPCWSTR name) {nameFrom = name;}
+	STDMETHOD_(BOOL,IsBubbleUp) (THIS) SCONST{return bubbleUp;}
+	STDMETHOD_(void,SetBubbleUp) (THIS_ BOOL bSet) {bubbleUp = bSet;}
+	STDMETHOD_(UINT,HandleCount)(THIS) SCONST {return handled;}
+	STDMETHOD_(void,IncreaseHandleCount)(THIS) {handled++;}
+	STDMETHOD_(LPCVOID,Data)(THIS) {return NULL;}
+
+public:
+	SEvtArgs(IObject *pSender)
+		: handled(0)
+		, sender(pSender)
+		, bubbleUp(true)
+	{
+		if(NULL!=sender) {
+			idFrom = sender->GetID();
+			nameFrom = sender->GetName();
+			sender->AddRef();
+		} else {
+			idFrom = 0;
+			nameFrom = NULL;
+		}
+	}
+
+	virtual ~SEvtArgs(){
+		if(sender)
+		{
+			sender->Release();
+			sender=NULL;
+		}
+	}
+};
+
 //定义一组事件定义的宏，简化事件的定义。
 #define DEF_EVT_CLASS(evt, id, evt_name, evtData, api) \
     class api evt                                      \
@@ -157,17 +206,17 @@ typedef enum _SOUI_EVENTS
     };
 
 #define EVENTID(x) x::EventID, x::GetClassName()
-#endif
+#endif//__cplusplus
 
 #define DEF_EVT_STRUCT(n, x) typedef struct n x n;
 
 #ifdef __cplusplus
 #define DEF_EVENT(evt, id, name, x, api) \
-    DEF_EVT_STRUCT(st##evt, x)           \
-    DEF_EVT_CLASS(evt, id, name, st##evt, api)
+    DEF_EVT_STRUCT(St##evt, x)           \
+    DEF_EVT_CLASS(evt, id, name, St##evt, api)
 #else
-#define DEF_EVENT(evt, id, name, x, api) DEF_EVT_STRUCT(st##evt, x)
-#endif
+#define DEF_EVENT(evt, id, name, x, api) DEF_EVT_STRUCT(St##evt, x)
+#endif//__cplusplus
 
 #define DEF_EVT(evt, id, name, x) DEF_EVENT(evt, id, name, x, SOUI_EXP)
 #define DEF_EVT_EXT(evt, id, x)   DEF_EVENT(evt, id, on_##evt, x, )
@@ -435,7 +484,9 @@ DEF_EVT(EventTCDbClick, EVT_TC_DBCLICK, on_treectrl_item_dbclick, {
     BOOL bCancel;
 });
 
-DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, { RECT rcPane; });
+DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, { 
+	RECT rcPane; 
+});
 
 DEF_EVT(EventAnimateStart, EVT_ANI_START, on_animate_start, {});
 
