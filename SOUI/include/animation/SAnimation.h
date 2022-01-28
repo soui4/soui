@@ -246,17 +246,17 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
     STDMETHOD_(long, computeDurationHint)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(bool, getTransformation)
-    (THIS_ uint64_t currentTime, STransformation &outTransformation, float scale) OVERRIDE;
+    (THIS_ uint64_t currentTime, ITransformation *outTransformation, float scale) OVERRIDE;
 
     STDMETHOD_(bool, getTransformation)
-    (THIS_ int64_t currentTime, STransformation &outTransformation) OVERRIDE;
+    (THIS_ int64_t currentTime, ITransformation *outTransformation) OVERRIDE;
 
     STDMETHOD_(bool, hasStarted)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(bool, hasEnded)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(void, applyTransformation)
-    (THIS_ float interpolatedTime, STransformation &t) OVERRIDE;
+    (THIS_ float interpolatedTime, ITransformation *t) OVERRIDE;
 
     STDMETHOD_(bool, hasAlpha)(THIS) SCONST OVERRIDE;
 

@@ -17,20 +17,20 @@ void SRotateAnimation::initialize(int width, int height, int parentWidth, int pa
     mPivotY = (float)resolveSize(mPivotYType, mPivotYValue, height, parentHeight);
 }
 
-void SRotateAnimation::applyTransformation(float interpolatedTime, STransformation &t)
+void SRotateAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
 {
     float degrees = mFromDegrees + ((mToDegrees - mFromDegrees) * interpolatedTime);
     float scale = getScaleFactor();
 
     if (mPivotX == 0.0f && mPivotY == 0.0f)
     {
-        t.getMatrix().setRotate(degrees);
+        t->GetMatrix()->setRotate(degrees);
     }
     else
     {
-        t.getMatrix().setRotate(degrees, mPivotX * scale, mPivotY * scale);
+        t->GetMatrix()->setRotate2(degrees, mPivotX * scale, mPivotY * scale);
     }
-    t.setTransformationType(STransformation::TYPE_MATRIX);
+    t->setTransformationType(TYPE_MATRIX);
 }
 
 void SRotateAnimation::copy(const IAnimation *src)

@@ -123,7 +123,7 @@ void SAnimationSet::scaleCurrentDuration(float scale)
     }
 }
 
-bool SAnimationSet::getTransformation(int64_t currentTime, STransformation &t)
+bool SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
 {
     if (mStartTime == -1)
     {
@@ -135,7 +135,7 @@ bool SAnimationSet::getTransformation(int64_t currentTime, STransformation &t)
         mStarted = true;
         fireAnimationStart();
     }
-    t.clear();
+    t->clear();
     int64_t startOffset = getStartOffset();
     if (currentTime < (mStartTime + startOffset))
     {
@@ -160,8 +160,8 @@ bool SAnimationSet::getTransformation(int64_t currentTime, STransformation &t)
         IAnimation *a = mAnimations[i];
 
         STransformation temp;
-        more = a->getTransformation(currentTime, temp, getScaleFactor()) || more;
-        t.compose(temp);
+        more = a->getTransformation(currentTime, &temp, getScaleFactor()) || more;
+        t->compose(&temp);
 
         ended = a->hasEnded() && ended;
     }

@@ -37,7 +37,7 @@ DECLARE_INTERFACE_(IInterpolator, IObject)
      * @return   LPCWSTR -- 类型名
      * Describe  这是一个虚函数，注意与GetClassName的区别。
      */
-    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS_) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS) SCONST PURE;
 
     /**
      * GetObjectType

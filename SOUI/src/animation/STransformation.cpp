@@ -68,7 +68,13 @@ void STransformation::postCompose(STransformation t)
     }
 }
 
-void STransformation::compose(STransformation t)
+void STransformation::compose(const ITransformation *t)
+{
+	const STransformation & t2 = *(const STransformation*)t;
+	compose(t2);
+}
+
+void STransformation::compose(const STransformation &t)
 {
     if (t.hasAlpha())
     {

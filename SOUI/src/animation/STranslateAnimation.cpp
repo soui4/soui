@@ -11,7 +11,7 @@ void STranslateAnimation::initialize(int width, int height, int parentWidth, int
     mToYDelta = (float)resolveSize(mToYType, mToYValue, height, parentHeight);
 }
 
-void STranslateAnimation::applyTransformation(float interpolatedTime, STransformation &t)
+void STranslateAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
 {
     float dx = mFromXDelta;
     float dy = mFromYDelta;
@@ -23,8 +23,8 @@ void STranslateAnimation::applyTransformation(float interpolatedTime, STransform
     {
         dy = mFromYDelta + ((mToYDelta - mFromYDelta) * interpolatedTime);
     }
-    t.getMatrix().setTranslate(dx, dy);
-    t.setTransformationType(STransformation::TYPE_MATRIX);
+    t->GetMatrix()->setTranslate(dx, dy);
+    t->setTransformationType(TYPE_MATRIX);
 }
 
 void STranslateAnimation::init(ValueType fromXType,

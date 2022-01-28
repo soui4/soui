@@ -17,6 +17,7 @@
 #pragma once
 #include <interface/SRender-i.h>
 #include <matrix/SMatrix.h>
+#include <interface/STransform-i.h>
 
 SNSBEGIN
 
@@ -25,27 +26,8 @@ SNSBEGIN
  * one point in time of an Animation.
  *
  */
-class SOUI_EXP STransformation {
+class SOUI_EXP STransformation : public ITransformation {
   public:
-    enum
-    {
-        /**
-         * Indicates a transformation that has no effect (alpha = 1 and identity matrix.)
-         */
-        TYPE_IDENTITY = 0x0,
-        /**
-         * Indicates a transformation that applies an alpha only (uses an identity matrix.)
-         */
-        TYPE_ALPHA = 0x1,
-        /**
-         * Indicates a transformation that applies a matrix only (alpha = 1.)
-         */
-        TYPE_MATRIX = 0x2,
-        /**
-         * Indicates a transformation that applies an alpha and a matrix.
-         */
-        TYPE_BOTH = TYPE_ALPHA | TYPE_MATRIX,
-    };
 
   protected:
     SMatrix mMatrix;
@@ -58,12 +40,22 @@ class SOUI_EXP STransformation {
   public:
     STransformation();
 
-    /**
-     * Reset the transformation to a state that leaves the object
-     * being animated in an unmodified state. The transformation type is
-     * {@link #TYPE_BOTH} by default.
-     */
-    void clear();
+public:
+	STDMETHOD_(IMatrix *,GetMatrix)(THIS) OVERRIDE
+	{
+		return &mMatrix;
+	}
+
+	STDMETHOD_(BYTE,getAlpha) (THIS) SCONST OVERRIDE;
+
+	STDMETHOD_(void,setAlpha)(THIS_ BYTE alpha) OVERRIDE;
+
+	STDMETHOD_(void,compose)(const ITransformation *t) OVERRIDE;
+
+	STDMETHOD_(void,clear)(THIS) OVERRIDE;
+
+	STDMETHOD_(void,setTransformationType)(THIS_ int type) OVERRIDE;
+public:
 
     /**
      * Indicates the nature of this transformation.
@@ -73,7 +65,6 @@ class SOUI_EXP STransformation {
      */
     int getTransformationType() const;
 
-    void setTransformationType(int type);
     /**
      * Clones the specified transformation.
      *
@@ -86,7 +77,7 @@ class SOUI_EXP STransformation {
      * a scale effect to something that has already been rotated.
      * @param t
      */
-    void compose(STransformation t);
+    void compose(const STransformation &t);
 
     /**
      * Like {@link #compose(STransformation)} but does this.postConcat(t) of
@@ -108,14 +99,8 @@ class SOUI_EXP STransformation {
      * Sets the degree of transparency
      * @param alpha 255 means fully opaqe and 0 means fully transparent
      */
-    void setAlpha(BYTE alpha);
 
     void updateMatrixType();
-
-    /**
-     * @return The degree of transparency
-     */
-    BYTE getAlpha() const;
 
     bool hasAlpha() const;
 

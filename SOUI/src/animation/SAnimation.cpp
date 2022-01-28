@@ -51,7 +51,7 @@ int SAnimation::resolveSize(ValueType type, float value, int size, int parentSiz
     }
 }
 
-void SAnimation::applyTransformation(float interpolatedTime, STransformation &t)
+void SAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
 {
 }
 
@@ -94,7 +94,7 @@ bool SAnimation::isCanceled()
     return mStartTime == -2;
 }
 
-bool SAnimation::getTransformation(int64_t currentTime, STransformation &outTransformation)
+bool SAnimation::getTransformation(int64_t currentTime, ITransformation *outTransformation)
 {
     if (mStartTime == -1)
     {
@@ -137,7 +137,7 @@ bool SAnimation::getTransformation(int64_t currentTime, STransformation &outTran
         }
 
         float interpolatedTime = mInterpolator->getInterpolation(normalizedTime);
-        outTransformation.clear();
+        outTransformation->clear();
         applyTransformation(interpolatedTime, outTransformation);
     }
 
@@ -178,7 +178,7 @@ bool SAnimation::getTransformation(int64_t currentTime, STransformation &outTran
 }
 
 bool SAnimation::getTransformation(uint64_t currentTime,
-                                   STransformation &outTransformation,
+                                   ITransformation *outTransformation,
                                    float scale)
 {
     mScaleFactor = scale;

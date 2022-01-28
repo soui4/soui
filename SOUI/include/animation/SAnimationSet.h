@@ -115,7 +115,7 @@ class SOUI_EXP SAnimationSet : public SAnimation {
      * @see android.view.animation.Animation#getTransformation
      */
     STDMETHOD_(bool, getTransformation)
-    (THIS_ int64_t currentTime, STransformation &outTransformation) OVERRIDE;
+    (THIS_ int64_t currentTime, ITransformation *outTransformation) OVERRIDE;
 
     /**
      * @see android.view.animation.Animation#scaleCurrentDuration(float)

@@ -21,10 +21,10 @@ bool SAlphaAnimation::hasAlpha() const
     return true;
 }
 
-void SAlphaAnimation::applyTransformation(float interpolatedTime, STransformation &t)
+void SAlphaAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
 {
     float alpha = mFromAlpha;
-    t.setAlpha((BYTE)((alpha + ((mToAlpha - alpha) * interpolatedTime)) * 255));
+    t->setAlpha((BYTE)((alpha + ((mToAlpha - alpha) * interpolatedTime)) * 255));
 }
 
 void SAlphaAnimation::copy(const IAnimation *src)

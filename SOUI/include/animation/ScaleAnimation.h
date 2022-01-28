@@ -116,7 +116,7 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
 
   protected:
     STDMETHOD_(void, applyTransformation)
-    (THIS_ float interpolatedTime, STransformation &t) OVERRIDE;
+    (THIS_ float interpolatedTime, ITransformation *t) OVERRIDE;
     STDMETHOD_(void, copy)(THIS_ const IAnimation *src) OVERRIDE;
 
   public:

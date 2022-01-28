@@ -12,6 +12,8 @@
 #include "SRect.h"
 
 #include <interface/SRender-i.h>
+#include <interface/SMatrix-i.h>
+
 #define SToBool(cond) ((cond) != 0)
 
 namespace SOUI
@@ -24,7 +26,7 @@ namespace SOUI
     using either reset() - to construct an identity matrix, or one of the set
     functions (e.g. setTranslate, setRotate, etc.).
 */
-class SOUI_EXP SMatrix : public IxForm {
+class SOUI_EXP SMatrix : public IxForm ,public IMatrix{
   public:
     SMatrix()
     {
@@ -69,6 +71,40 @@ class SOUI_EXP SMatrix : public IxForm {
         return *this;
     }
 
+public:
+	STDMETHOD_(IxForm *,Data)(THIS) OVERRIDE{return this;}
+
+	STDMETHOD_(void,reset)(THIS) OVERRIDE;
+    // alias for reset()
+    STDMETHOD_(void,setIdentity)(THIS) OVERRIDE;
+    /** Returns true if the matrix is identity.
+     */
+	STDMETHOD_(BOOL,isIdentity)(THIS) SCONST OVERRIDE
+    {
+        return this->getType() == 0;
+    }
+
+    /** Set the matrix to translate by (dx, dy).
+     */
+    STDMETHOD_(void,setTranslate)(THIS_ float dx, float dy) OVERRIDE;
+
+    /** Set the matrix to scale by sx and sy, with a pivot point at (px, py).
+        The pivot point is the coordinate that should remain unchanged by the
+        specified transformation.
+    */
+    STDMETHOD_(void,setScale)(THIS_ float sx, float sy) OVERRIDE;
+    /** Set the matrix to scale by sx and sy.
+     */
+	STDMETHOD_(void,setScale2)(THIS_ float sx, float sy, float px, float py) OVERRIDE;
+
+    STDMETHOD_(void,setRotate)(THIS_ float degrees) OVERRIDE;
+
+	STDMETHOD_(void,setRotate2)(THIS_ float degrees, float px, float py) OVERRIDE;
+
+		 /** Set the matrix to skew by sx and sy.
+     */
+    STDMETHOD_(void,setSkew)(THIS_ float kx, float ky) OVERRIDE;
+
   public:
     /** Enum of bit fields for the mask return by getType().
         Use this to identify the complexity of the matrix.
@@ -98,12 +134,6 @@ class SOUI_EXP SMatrix : public IxForm {
         return (TypeMask)(fTypeMask & 0xF);
     }
 
-    /** Returns true if the matrix is identity.
-     */
-    bool isIdentity() const
-    {
-        return this->getType() == 0;
-    }
 
     bool isScaleTranslate() const
     {
@@ -188,43 +218,16 @@ class SOUI_EXP SMatrix : public IxForm {
 
     void setMatrix(const float data[9], int matType = kUnknown_Mask);
 
-    /** Set the matrix to identity
-     */
-    void reset();
-    // alias for reset()
-    void setIdentity()
-    {
-        this->reset();
-    }
-
-    /** Set the matrix to translate by (dx, dy).
-     */
-    void setTranslate(float dx, float dy);
-    void setTranslate(const SVector2D &v)
+	void setTranslate(const SVector2D &v)
     {
         this->setTranslate(v.fX, v.fY);
     }
 
-    /** Set the matrix to scale by sx and sy, with a pivot point at (px, py).
-        The pivot point is the coordinate that should remain unchanged by the
-        specified transformation.
-    */
-    void setScale(float sx, float sy, float px, float py);
-    /** Set the matrix to scale by sx and sy.
-     */
-    void setScale(float sx, float sy);
-    /** Set the matrix to scale by 1/divx and 1/divy. Returns false and doesn't
+
+	/** Set the matrix to scale by 1/divx and 1/divy. Returns false and doesn't
         touch the matrix if either divx or divy is zero.
     */
     bool setIDiv(int divx, int divy);
-    /** Set the matrix to rotate by the specified number of degrees, with a
-        pivot point at (px, py). The pivot point is the coordinate that should
-        remain unchanged by the specified transformation.
-    */
-    void setRotate(float degrees, float px, float py);
-    /** Set the matrix to rotate about (0,0) by the specified number of degrees.
-     */
-    void setRotate(float degrees);
     /** Set the matrix to rotate by the specified sine and cosine values, with
         a pivot point at (px, py). The pivot point is the coordinate that
         should remain unchanged by the specified transformation.
@@ -238,9 +241,6 @@ class SOUI_EXP SMatrix : public IxForm {
         specified transformation.
     */
     void setSkew(float kx, float ky, float px, float py);
-    /** Set the matrix to skew by sx and sy.
-     */
-    void setSkew(float kx, float ky);
     /** Set the matrix to the concatenation of the two specified matrices.
         Either of the two matrices may also be the target matrix.
         *this = a * b;

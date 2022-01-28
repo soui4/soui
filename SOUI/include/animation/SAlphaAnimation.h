@@ -53,7 +53,7 @@ class SOUI_EXP SAlphaAnimation : public SAnimation {
      * Changes the alpha property of the supplied {@link STransformation}
      */
     STDMETHOD_(void, applyTransformation)
-    (THIS_ float interpolatedTime, STransformation &t) OVERRIDE;
+    (THIS_ float interpolatedTime, ITransformation *t) OVERRIDE;
 
     STDMETHOD_(void, copy)(THIS_ const IAnimation *src) OVERRIDE;
 

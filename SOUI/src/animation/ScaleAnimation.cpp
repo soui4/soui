@@ -10,7 +10,7 @@ void SScaleAnimation::initialize(int width, int height, int parentWidth, int par
     mPivotY = (float)resolveSize(mPivotYType, mPivotYValue, height, parentHeight);
 }
 
-void SScaleAnimation::applyTransformation(float interpolatedTime, STransformation &t)
+void SScaleAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
 {
     float sx = 1.0f;
     float sy = 1.0f;
@@ -27,13 +27,13 @@ void SScaleAnimation::applyTransformation(float interpolatedTime, STransformatio
 
     if (mPivotX == 0 && mPivotY == 0)
     {
-        t.getMatrix().setScale(sx, sy);
+        t->GetMatrix()->setScale(sx, sy);
     }
     else
     {
-        t.getMatrix().setScale(sx, sy, scale * mPivotX, scale * mPivotY);
+        t->GetMatrix()->setScale2(sx, sy, scale * mPivotX, scale * mPivotY);
     }
-    t.setTransformationType(STransformation::TYPE_MATRIX);
+    t->setTransformationType(TYPE_MATRIX);
 }
 
 void SScaleAnimation::copy(const IAnimation *src)

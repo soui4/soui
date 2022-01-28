@@ -324,7 +324,7 @@ void SMatrix::postTranslate(float dx, float dy)
 
 ///////////////////////////////////////////////////////////////////////////////
 
-void SMatrix::setScale(float sx, float sy, float px, float py)
+void SMatrix::setScale2(float sx, float sy, float px, float py)
 {
     if (1 == sx && 1 == sy)
     {
@@ -381,7 +381,7 @@ void SMatrix::preScale(float sx, float sy, float px, float py)
     }
 
     SMatrix m;
-    m.setScale(sx, sy, px, py);
+    m.setScale2(sx, sy, px, py);
     this->preConcat(m);
 }
 
@@ -420,7 +420,7 @@ void SMatrix::postScale(float sx, float sy, float px, float py)
         return;
     }
     SMatrix m;
-    m.setScale(sx, sy, px, py);
+    m.setScale2(sx, sy, px, py);
     this->postConcat(m);
 }
 
@@ -515,7 +515,7 @@ void SMatrix::setSinCos(float sinV, float cosV)
     this->setTypeMask(kUnknown_Mask | kOnlyPerspectiveValid_Mask);
 }
 
-void SMatrix::setRotate(float degrees, float px, float py)
+void SMatrix::setRotate2(float degrees, float px, float py)
 {
     float sinV, cosV;
     sinV = SFloatSinCos(SkDegreesToRadians(degrees), &cosV);
@@ -532,7 +532,7 @@ void SMatrix::setRotate(float degrees)
 void SMatrix::preRotate(float degrees, float px, float py)
 {
     SMatrix m;
-    m.setRotate(degrees, px, py);
+    m.setRotate2(degrees, px, py);
     this->preConcat(m);
 }
 
@@ -546,7 +546,7 @@ void SMatrix::preRotate(float degrees)
 void SMatrix::postRotate(float degrees, float px, float py)
 {
     SMatrix m;
-    m.setRotate(degrees, px, py);
+    m.setRotate2(degrees, px, py);
     this->postConcat(m);
 }
 
@@ -1802,6 +1802,11 @@ void SMatrix::setMatrix(const float fMat[9], int matType)
 {
     memcpy(this->fMat, fMat, sizeof(this->fMat));
     this->setTypeMask(matType);
+}
+
+void SMatrix::setIdentity()
+{
+	this->reset();
 }
 
 } // end of namespace SOUI

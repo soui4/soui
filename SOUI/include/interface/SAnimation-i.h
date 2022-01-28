@@ -22,12 +22,13 @@
 #pragma once
 
 #include <interface/sinterpolator-i.h>
-#include <animation/STransformation.h>
 #include <interface/sobject-i.h>
-
+#include <interface/STransform-i.h>
+#include <stdint.h>
 SNSBEGIN
 
-interface IAnimation;
+
+typedef struct IAnimation IAnimation;
 
 #undef INTERFACE
 #define INTERFACE IAnimationListener
@@ -475,7 +476,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return True if the animation is still running
      */
     STDMETHOD_(bool, getTransformation)
-    (THIS_ uint64_t currentTime, STransformation & outTransformation, float scale) PURE;
+    (THIS_ uint64_t currentTime, ITransformation * outTransformation, float scale) PURE;
 
     /**
      * Gets the transformation to apply at a specified point in time. Implementations of this
@@ -488,7 +489,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return True if the animation is still running
      */
     STDMETHOD_(bool, getTransformation)
-    (THIS_ int64_t currentTime, STransformation & outTransformation) PURE;
+    (THIS_ int64_t currentTime, ITransformation  *outTransformation) PURE;
 
     /**
      * <p>Indicates whether this animation has started or not.</p>
@@ -515,7 +516,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @param t The STransformation object to fill in with the current
      *        transforms.
      */
-    STDMETHOD_(void, applyTransformation)(THIS_ float interpolatedTime, STransformation &t) PURE;
+    STDMETHOD_(void, applyTransformation)(THIS_ float interpolatedTime, ITransformation *t) PURE;
 
     /**
      * Return true if this animation changes the view's alpha property.

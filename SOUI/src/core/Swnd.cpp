@@ -3587,7 +3587,7 @@ void SWindow::SAnimationHandler::OnNextFrame()
     {
         m_pOwner->OnAnimationInvalidate(pAni, true);
         pAni->AddRef();
-        bool bMore = pAni->getTransformation(STime::GetCurrentTimeMs(), m_transform);
+        bool bMore = pAni->getTransformation(STime::GetCurrentTimeMs(), &m_transform);
         m_pOwner->OnAnimationInvalidate(pAni, false);
         if (!bMore)
         { // animation stopped.

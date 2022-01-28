@@ -112,7 +112,7 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
 
   protected:
     STDMETHOD_(void, applyTransformation)
-    (THIS_ float interpolatedTime, STransformation &t) OVERRIDE;
+    (THIS_ float interpolatedTime, ITransformation *t) OVERRIDE;
 
   public:
     STDMETHOD_(void, initialize)
