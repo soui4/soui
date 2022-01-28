@@ -46,7 +46,7 @@
 
 #define ATTR_CHAIN_PTR(varname, flag)                                                     \
     if (FAILED(hRet) && varname != NULL                                                   \
-        && SUCCEEDED(hRet = varname->SetAttributeW(&strAttribName, &strValue, bLoading))) \
+        && SUCCEEDED(hRet = varname->ISetAttributeW(&strAttribName, &strValue, bLoading))) \
     {                                                                                     \
         hRet |= flag;                                                                     \
     }                                                                                     \

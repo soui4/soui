@@ -188,15 +188,15 @@ class TNativeWndProxy
     {
         return SNativeWnd::OnInitFinished(xmlNode);
     }
-    STDMETHOD_(HRESULT, SetAttributeA)
+    STDMETHOD_(HRESULT, ISetAttribute)
     (THIS_ const IStringA *strAttribName, const IStringA *strValue, BOOL bLoading)
     {
-        return SNativeWnd::SetAttributeA(strAttribName, strValue, bLoading);
+        return SNativeWnd::ISetAttribute(strAttribName, strValue, bLoading);
     }
-    STDMETHOD_(HRESULT, SetAttributeW)
+    STDMETHOD_(HRESULT, ISetAttributeW)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading)
     {
-        return SNativeWnd::SetAttributeW(strAttribName, strValue, bLoading);
+        return SNativeWnd::ISetAttributeW(strAttribName, strValue, bLoading);
     }
     STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading)
     {

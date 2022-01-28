@@ -96,18 +96,18 @@ public:
 		return SetAttribute(SStringW(pszAttr),SStringW(pszValue),bLoading);
 	}
 
-	STDMETHOD_(HRESULT,SetAttributeW)(THIS_ const IStringW *  strAttr, const IStringW *  strValue, BOOL bLoading) OVERRIDE
-	{
-		return SetAttribute(SStringW(strAttr),SStringW(strValue),bLoading);
-	}
-
-	STDMETHOD_(HRESULT,SetAttributeA)(THIS_ const IStringA * strAttribName, const IStringA *  strValue, BOOL bLoading) OVERRIDE
+	STDMETHOD_(HRESULT,ISetAttribute)(THIS_ const IStringA * strAttribName, const IStringA *  strValue, BOOL bLoading) OVERRIDE
 	{
 		SStringA strNameA(strAttribName);
 		SStringA strValueA(strValue);
 		SStringW strNameW=S_CA2W(strNameA);
 		SStringW strValueW=S_CA2W(strValueA);
 		return SetAttribute(strNameW, strValueW, bLoading);
+	}
+
+	STDMETHOD_(HRESULT,ISetAttributeW)(THIS_ const IStringW *  strAttr, const IStringW *  strValue, BOOL bLoading) OVERRIDE
+	{
+		return SetAttribute(SStringW(strAttr),SStringW(strValue),bLoading);
 	}
 
 	STDMETHOD_(LPCWSTR,GetObjectClass)(THIS_) SCONST OVERRIDE

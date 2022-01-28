@@ -103,7 +103,7 @@ DECLARE_INTERFACE_(ILayoutParam, IObject)
      * @return   HRESULT -- 处理处理结果
      * Describe
      */
-    STDMETHOD_(HRESULT, SetAttributeA)
+    STDMETHOD_(HRESULT, ISetAttribute)
     (THIS_ const IStringA *strAttribName, const IStringA *strValue, BOOL bLoading) PURE;
 
     /**
@@ -115,7 +115,7 @@ DECLARE_INTERFACE_(ILayoutParam, IObject)
      * @return   HRESULT -- 处理处理结果
      * Describe
      */
-    STDMETHOD_(HRESULT, SetAttributeW)
+    STDMETHOD_(HRESULT, ISetAttributeW)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading) PURE;
 
     /**
@@ -128,6 +128,18 @@ DECLARE_INTERFACE_(ILayoutParam, IObject)
      * Describe
      */
     STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading) PURE;
+
+	 /**
+     * SetAttributeW
+     * @brief    设置一个对象属性
+     * @param    LPCWSTR pszAttr --  属性名
+     * @param    LPCWSTR pszValue --  属性值
+     * @param    BOOL bLoading --  对象创建时由系统调用标志
+     * @return   HRESULT -- 处理处理结果
+     * Describe
+     */
+    STDMETHOD_(HRESULT, SetAttributeW)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading) PURE;
+
 
     /**
      * GetAttribute
@@ -241,7 +253,7 @@ DECLARE_INTERFACE_(ILayout, IObject)
      * @return   HRESULT -- 处理处理结果
      * Describe
      */
-    STDMETHOD_(HRESULT, SetAttributeA)
+    STDMETHOD_(HRESULT, ISetAttribute)
     (THIS_ const IStringA *strAttribName, const IStringA *strValue, BOOL bLoading) PURE;
 
     /**
@@ -253,7 +265,7 @@ DECLARE_INTERFACE_(ILayout, IObject)
      * @return   HRESULT -- 处理处理结果
      * Describe
      */
-    STDMETHOD_(HRESULT, SetAttributeW)
+    STDMETHOD_(HRESULT, ISetAttributeW)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading) PURE;
 
     /**
@@ -266,6 +278,17 @@ DECLARE_INTERFACE_(ILayout, IObject)
      * Describe
      */
     STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading) PURE;
+
+	/**
+     * SetAttribute
+     * @brief    设置一个对象属性
+     * @param    LPCWSTR pszAttr --  属性名
+     * @param    LPCWSTR pszValue --  属性值
+     * @param    BOOL bLoading --  对象创建时由系统调用标志
+     * @return   HRESULT -- 处理处理结果
+     * Describe
+     */
+    STDMETHOD_(HRESULT, SetAttributeW)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading) PURE;
 
     /**
      * GetAttribute

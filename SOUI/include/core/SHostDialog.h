@@ -67,15 +67,15 @@ class THostWndProxy
     {
         return SHostWnd::OnInitFinished(xmlNode);
     }
-    STDMETHOD_(HRESULT, SetAttributeA)
+    STDMETHOD_(HRESULT, ISetAttribute)
     (THIS_ const IStringA *strAttribName, const IStringA *strValue, BOOL bLoading)
     {
-        return SHostWnd::SetAttributeA(strAttribName, strValue, bLoading);
+        return SHostWnd::ISetAttribute(strAttribName, strValue, bLoading);
     }
-    STDMETHOD_(HRESULT, SetAttributeW)
+    STDMETHOD_(HRESULT, ISetAttributeW)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading)
     {
-        return SHostWnd::SetAttributeW(strAttribName, strValue, bLoading);
+        return SHostWnd::ISetAttributeW(strAttribName, strValue, bLoading);
     }
     STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading)
     {

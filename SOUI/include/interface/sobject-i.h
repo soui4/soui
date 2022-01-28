@@ -184,7 +184,7 @@ DECLARE_INTERFACE_(IObject, IObjRef)
      * @return   HRESULT -- 处理处理结果
      * Describe
      */
-    STDMETHOD_(HRESULT, SetAttributeA)
+    STDMETHOD_(HRESULT, ISetAttribute)
     (THIS_ const IStringA *strAttribName, const IStringA *strValue, BOOL bLoading) PURE;
 
     /**
@@ -196,7 +196,7 @@ DECLARE_INTERFACE_(IObject, IObjRef)
      * @return   HRESULT -- 处理处理结果
      * Describe
      */
-    STDMETHOD_(HRESULT, SetAttributeW)
+    STDMETHOD_(HRESULT, ISetAttributeW)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading) PURE;
 
     /**
