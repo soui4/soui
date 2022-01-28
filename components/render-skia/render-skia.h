@@ -358,19 +358,19 @@ public:
 	STDMETHOD_(void,rCubicTo)(THIS_ float x1, float y1, float x2, float y2,
 		float x3, float y3) OVERRIDE;
 
-	STDMETHOD_(void,arcTo)(THIS_ const RECT& oval, float startAngle, float sweepAngle,
-		bool forceMoveTo) OVERRIDE;
+	STDMETHOD_(void,arcTo)(THIS_ const RECT* oval, float startAngle, float sweepAngle,
+		BOOL forceMoveTo) OVERRIDE;
 
-	STDMETHOD_(void,arcTo)(THIS_ float x1, float y1, float x2, float y2,
+	STDMETHOD_(void,arcTo2)(THIS_ float x1, float y1, float x2, float y2,
 		float radius) OVERRIDE;
 
 	STDMETHOD_(void,close)(THIS) OVERRIDE;
 
-	STDMETHOD_(BOOL,isRect)(THIS_ bool* isClosed, Direction* direction) SCONST OVERRIDE;
+	STDMETHOD_(BOOL,isRect2)(THIS_ BOOL* isClosed, Direction* direction) SCONST OVERRIDE;
 
-	STDMETHOD_(void,addRect)(THIS_ const RECT& rect, Direction dir /*= kCW_Direction*/) OVERRIDE;
+	STDMETHOD_(void,addRect)(THIS_ const RECT* rect, Direction dir /*= kCW_Direction*/) OVERRIDE;
 
-	STDMETHOD_(void,addRect)(THIS_ float left, float top, float right, float bottom,
+	STDMETHOD_(void,addRect2)(THIS_ float left, float top, float right, float bottom,
 		Direction dir/* = kCW_Direction*/) OVERRIDE;
 
 	STDMETHOD_(void,addOval)(THIS_ const RECT * oval, Direction dir/*= kCW_Direction*/) OVERRIDE;
@@ -383,10 +383,10 @@ public:
 	STDMETHOD_(void,addRoundRect)(THIS_ const RECT* rect, float rx, float ry,
 		Direction dir/* = kCW_Direction*/) OVERRIDE;
 
-	STDMETHOD_(void,addRoundRect)(THIS_ const RECT* rect, const float radii[],
+	STDMETHOD_(void,addRoundRect2)(THIS_ const RECT* rect, const float radii[],
 		Direction dir/* = kCW_Direction*/) OVERRIDE;
 
-	STDMETHOD_(void,addPoly)(THIS_ const POINT pts[], int count, bool close) OVERRIDE;
+	STDMETHOD_(void,addPoly)(THIS_ const POINT pts[], int count, BOOL close) OVERRIDE;
 
 	STDMETHOD_(void,addPath)(THIS_ const IPath * src, float dx, float dy,
 		AddPathMode mode /*= kAppend_AddPathMode*/) OVERRIDE;
@@ -472,7 +472,7 @@ public:
 	STDMETHOD_(HRESULT,FillEllipse)(THIS_ LPCRECT pRect) OVERRIDE;
 	STDMETHOD_(HRESULT,FillSolidEllipse)(THIS_ LPCRECT pRect,COLORREF cr) OVERRIDE;
 
-	STDMETHOD_(HRESULT,DrawArc)(THIS_ LPCRECT pRect,float startAngle,float sweepAngle,bool useCenter) OVERRIDE;
+	STDMETHOD_(HRESULT,DrawArc)(THIS_ LPCRECT pRect,float startAngle,float sweepAngle,BOOL useCenter) OVERRIDE;
 	STDMETHOD_(HRESULT,FillArc)(THIS_ LPCRECT pRect,float startAngle,float sweepAngle) OVERRIDE;
 
 	STDMETHOD_(HRESULT,DrawLines)(THIS_ LPPOINT pPt,size_t nCount) OVERRIDE;
@@ -498,7 +498,7 @@ public:
 	STDMETHOD_(HRESULT,GetTransform)(THIS_ float matrix[9]) SCONST OVERRIDE;
 	STDMETHOD_(COLORREF,GetPixel)(THIS_ int x, int y) OVERRIDE;
 	STDMETHOD_(COLORREF,SetPixel)(THIS_ int x, int y, COLORREF cr) OVERRIDE;
-	STDMETHOD_(HRESULT,PushClipPath)(THIS_ const IPath * path, UINT mode, bool doAntiAlias = false) OVERRIDE;
+	STDMETHOD_(HRESULT,PushClipPath)(THIS_ const IPath * path, UINT mode, BOOL doAntiAlias = false) OVERRIDE;
 	STDMETHOD_(HRESULT,DrawPath)(THIS_ const IPath * path,IPathEffect * pathEffect=NULL) OVERRIDE;
 	STDMETHOD_(HRESULT,FillPath)(THIS_ const IPath * path) OVERRIDE;
 	STDMETHOD_(HRESULT,PushLayer)(THIS_ const RECT * pRect,BYTE byAlpha/*=0xFF*/) OVERRIDE;

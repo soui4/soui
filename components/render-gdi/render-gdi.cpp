@@ -1274,7 +1274,7 @@ namespace SOUI
 
     const float PI = 3.1415926f;
 
-    HRESULT SRenderTarget_GDI::DrawArc( LPCRECT pRect,float startAngle,float sweepAngle,bool useCenter )
+    HRESULT SRenderTarget_GDI::DrawArc( LPCRECT pRect,float startAngle,float sweepAngle,BOOL useCenter )
     {
 		if(!m_curPen) return E_INVALIDARG;
 
@@ -1399,7 +1399,7 @@ namespace SOUI
 		return m_pRenderFactory->CreateRegion(ppRegion)?S_OK:E_OUTOFMEMORY;
 	}
 
-	HRESULT SRenderTarget_GDI::PushClipPath(const IPath * path, UINT mode, bool doAntiAlias /*= false*/)
+	HRESULT SRenderTarget_GDI::PushClipPath(const IPath * path, UINT mode, BOOL doAntiAlias /*= false*/)
 	{
 		return E_NOTIMPL;
 	}

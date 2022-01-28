@@ -12,10 +12,10 @@ namespace SOUI
 	{
 	}
 
-	void SPathMeasure_Skia::setPath(IPath * path, bool forceClosed)
+	void SPathMeasure_Skia::setPath(IPath * path, BOOL forceClosed)
 	{
 		SPath_Skia * skPath = (SPath_Skia*)path;
-		m_pathMeasure.setPath(&skPath->m_skPath,forceClosed);
+		m_pathMeasure.setPath(&skPath->m_skPath,!!forceClosed);
 	}
 
 	float SPathMeasure_Skia::getLength()
@@ -28,10 +28,10 @@ namespace SOUI
 		return !!m_pathMeasure.getPosTan(distance,(SkPoint*)pos,(SkVector*)tan);
 	}
 
-	BOOL SPathMeasure_Skia::getSegment(float startD, float stopD, IPath * dst, bool startWithMoveTo)
+	BOOL SPathMeasure_Skia::getSegment(float startD, float stopD, IPath * dst, BOOL startWithMoveTo)
 	{
 		SPath_Skia * skPath = (SPath_Skia*)dst;
-		return !!m_pathMeasure.getSegment(startD,stopD,&skPath->m_skPath,startWithMoveTo);
+		return !!m_pathMeasure.getSegment(startD,stopD,&skPath->m_skPath,!!startWithMoveTo);
 	}
 
 }

@@ -8,40 +8,31 @@
 
 SNSBEGIN
 
-struct IRenderObj;
-struct IBrush;
-struct IPen;
-struct IFont;
-struct IBitmap;
-struct IRegion;
-struct IPath;
-struct IPathMeasure;
-struct IRenderTarget;
-struct IRenderFactory;
+typedef struct IRenderFactory IRenderFactory;
 
-enum EXPEND_MODE
+typedef enum EXPEND_MODE
 {
     EM_NULL = 0, /*<不变*/
     EM_STRETCH,  /*<拉伸*/
     EM_TILE,     /*<平铺*/
-};
+}EXPEND_MODE;
 
-enum FilterLevel
+typedef enum FilterLevel
 {
     kNone_FilterLevel = 0,
     kLow_FilterLevel,
     kMedium_FilterLevel,
     kHigh_FilterLevel
-};
+}FilterLevel;
 
-enum GradientType
+typedef enum GradientType
 {
     linear = 0, /*<线性渐变*/
     radial,     /*<辐射渐变*/
     sweep       /*<扫描渐变*/
-};
+}GradientType;
 
-enum RopMode
+typedef enum RopMode
 {
     kClear_Mode,    //!< [0, 0]
     kSrc_Mode,      //!< [Sa, Sc]
@@ -85,17 +76,17 @@ enum RopMode
     kDstInvert = DSTINVERT,
     kSrcInvert = SRCINVERT,
     kSrcAnd = SRCAND,
-};
+}RopMode;
 
-struct fPoint
+typedef struct fPoint
 {
     float fX, fY;
-};
+}fPoint;
 
-struct fRect
+typedef struct fRect
 {
     float fLeft, fTop, fRight, fBottom;
-};
+}fRect;
 
 typedef enum _BlurStyle
 {
@@ -126,65 +117,6 @@ DECLARE_INTERFACE_(IMaskFilter, IObjRef)
     STDMETHOD_(void *, GetPtr)(THIS) PURE;
 };
 
-/**
- * @struct     IRenderFactory
- * @brief      RenderFactory对象
- *
- * Describe
- */
-#undef INTERFACE
-#define INTERFACE IRenderFactory
-DECLARE_INTERFACE_(IRenderFactory, IObjRef)
-{
-    //!添加引用
-    /*!
-     */
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-
-    //!释放引用
-    /*!
-     */
-    STDMETHOD_(long, Release)(THIS) PURE;
-
-    //!释放对象
-    /*!
-     */
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-
-    STDMETHOD_(IImgDecoderFactory *, GetImgDecoderFactory)(THIS) PURE;
-    STDMETHOD_(void, SetImgDecoderFactory)(THIS_ IImgDecoderFactory * pImgDecoderFac) PURE;
-    STDMETHOD_(BOOL, CreateRenderTarget)
-    (THIS_ IRenderTarget * *ppRenderTarget, int nWid, int nHei) PURE;
-
-    /**
-     * CreateFont
-     * @brief    创建字体
-     * @param [out] IFont ** ppFont -- 字体对象
-     * @param [in] const LOGFONT &lf -- 字体属性
-     * @param [in] const IPropBag * pPropBag --  字体扩展属性，由渲染引擎解析
-     * @return   BOOL -- TRUE:SUCCEED, FASLE:FAILED
-     *
-     * Describe
-     */
-    STDMETHOD_(BOOL, CreateFont)(THIS_ IFont * *ppFont, const LOGFONT *lf) PURE;
-
-    STDMETHOD_(BOOL, CreateBitmap)(THIS_ IBitmap * *ppBitmap) PURE;
-
-    STDMETHOD_(BOOL, CreateRegion)(THIS_ IRegion * *ppRgn) PURE;
-
-    STDMETHOD_(HRESULT, CreateBlurMaskFilter)
-    (THIS_ float radius, BlurStyle style, BlurFlags flag, IMaskFilter **ppMaskFilter) PURE;
-
-    STDMETHOD_(HRESULT, CreateEmbossMaskFilter)
-    (THIS_ float direction[3], float ambient, float specular, float blurRadius,
-     IMaskFilter **ppMaskFilter) PURE;
-
-    STDMETHOD_(BOOL, CreatePath)(THIS_ IPath * *ppPath) PURE;
-
-    STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFGUID guidEffect, IPathEffect * *ppPathEffect) PURE;
-
-    STDMETHOD_(BOOL, CreatePathMeasure)(THIS_ IPathMeasure * *ppPathMeasure) PURE;
-};
 
 typedef enum _OBJTYPE
 {
@@ -196,6 +128,8 @@ typedef enum _OBJTYPE
     OT_RGN,
     OT_PATH,
 } OBJTYPE;
+
+
 
 /**
  * @struct     IRenderObj
@@ -741,7 +675,7 @@ DECLARE_INTERFACE_(IRegion, IRenderObj)
     /**
      * IsEqual
      * @brief    Test whether two region is equal
-     * @return   bool, true-this and testRgn are equal
+     * @return   BOOL, true-this and testRgn are equal
      * Describe
      */
     STDMETHOD_(BOOL, IsEqual)(THIS_ const IRegion *testRgn) SCONST PURE;
@@ -961,7 +895,7 @@ DECLARE_INTERFACE_(IPath, IRenderObj)
 
     /** Return the number of points in the path
      */
-    STDMETHOD_(int, countPoints)(THIS_) SCONST PURE;
+    STDMETHOD_(int, countPoints)(THIS) SCONST PURE;
 
     /** Return the point at the specified index. If the index is out of range
     (i.e. is not 0 <= index < countPoints()) then the returned coordinates
@@ -1115,12 +1049,12 @@ DECLARE_INTERFACE_(IPath, IRenderObj)
     @param forceMoveTo If true, always begin a new contour with the arc
     */
     STDMETHOD_(void, arcTo)
-    (THIS_ const RECT &oval, float startAngle, float sweepAngle, bool forceMoveTo) PURE;
+    (THIS_ const RECT *oval, float startAngle, float sweepAngle, BOOL forceMoveTo) PURE;
 
     /** Append a line and arc to the current path. This is the same as the
     PostScript call "arct".
     */
-    STDMETHOD_(void, arcTo)(THIS_ float x1, float y1, float x2, float y2, float radius) PURE;
+    STDMETHOD_(void, arcTo2)(THIS_ float x1, float y1, float x2, float y2, float radius) PURE;
 
     /** Close the current contour. If the current point is not equal to the
     first point of the contour, a line segment is automatically added.
@@ -1136,7 +1070,7 @@ DECLARE_INTERFACE_(IPath, IRenderObj)
     @param direction If not null, set to the rectangle's direction
     @return true if the path specifies a rectangle
     */
-    STDMETHOD_(BOOL, isRect)(THIS_ bool *isClosed, Direction *direction) SCONST PURE;
+    STDMETHOD_(BOOL, isRect2)(THIS_ BOOL *isClosed, Direction *direction) SCONST PURE;
 
     /**
      *  Add a closed rectangle contour to the path
@@ -1144,7 +1078,7 @@ DECLARE_INTERFACE_(IPath, IRenderObj)
      *  @param dir  The direction to wind the rectangle's contour. Cannot be
      *              kUnknown_Direction.
      */
-    STDMETHOD_(void, addRect)(THIS_ const RECT &rect, Direction dir /*= kCW_Direction*/) PURE;
+    STDMETHOD_(void, addRect)(THIS_ const RECT *rect, Direction dir /*= kCW_Direction*/) PURE;
 
     /**
      *  Add a closed rectangle contour to the path
@@ -1160,7 +1094,7 @@ DECLARE_INTERFACE_(IPath, IRenderObj)
      *  @param dir  The direction to wind the rectangle's contour. Cannot be
      *              kUnknown_Direction.
      */
-    STDMETHOD_(void, addRect)
+    STDMETHOD_(void, addRect2)
     (THIS_ float left, float top, float right, float bottom, Direction dir /* = kCW_Direction*/)
         PURE;
 
@@ -1219,7 +1153,7 @@ DECLARE_INTERFACE_(IPath, IRenderObj)
      *       SkRRect radii (i.e., either radii at a corner being 0 implies a
      *       sqaure corner and oversized radii are proportionally scaled down).
      */
-    STDMETHOD_(void, addRoundRect)
+    STDMETHOD_(void, addRoundRect2)
     (THIS_ const RECT *rect, const float radii[], Direction dir /* = kCW_Direction*/) PURE;
 
     /**
@@ -1233,7 +1167,7 @@ DECLARE_INTERFACE_(IPath, IRenderObj)
      *          this->close();
      *      }
      */
-    STDMETHOD_(void, addPoly)(THIS_ const POINT pts[], int count, bool close) PURE;
+    STDMETHOD_(void, addPoly)(THIS_ const POINT pts[], int count, BOOL close) PURE;
 
     /** Add a copy of src to the path, offset by (dx,dy)
     @param src  The path to add as a new contour
@@ -1312,7 +1246,7 @@ DECLARE_INTERFACE_(IPathMeasure, IObjRef)
     /**
      * Assign a new path, or null to have none.
      */
-    STDMETHOD_(void, setPath)(THIS_ IPath * path, bool forceClosed) PURE;
+    STDMETHOD_(void, setPath)(THIS_ IPath * path, BOOL forceClosed) PURE;
 
     /**
      * Return the total length of the current contour, or 0 if no path is
@@ -1346,7 +1280,7 @@ DECLARE_INTERFACE_(IPathMeasure, IObjRef)
      * such as <code>dst.rLineTo(0, 0)</code>.</p>
      */
     STDMETHOD_(BOOL, getSegment)
-    (THIS_ float startD, float stopD, IPath *dst, bool startWithMoveTo) PURE;
+    (THIS_ float startD, float stopD, IPath *dst, BOOL startWithMoveTo) PURE;
 };
 
 /**
@@ -1418,7 +1352,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, FillSolidEllipse)(THIS_ LPCRECT pRect, COLORREF cr) PURE;
 
     STDMETHOD_(HRESULT, DrawArc)
-    (THIS_ LPCRECT pRect, float startAngle, float sweepAngle, bool useCenter) PURE;
+    (THIS_ LPCRECT pRect, float startAngle, float sweepAngle, BOOL useCenter) PURE;
     STDMETHOD_(HRESULT, FillArc)(THIS_ LPCRECT pRect, float startAngle, float sweepAngle) PURE;
 
     STDMETHOD_(HRESULT, DrawLines)(THIS_ LPPOINT pPt, size_t nCount) PURE;
@@ -1514,12 +1448,12 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      *  @param doAntiAlias true if the clip should be anti aliased
      */
     STDMETHOD_(HRESULT, PushClipPath)
-    (THIS_ const IPath *path, UINT mode, bool doAntiAlias = false) PURE;
+    (THIS_ const IPath *path, UINT mode, BOOL doAntiAlias /*= false*/) PURE;
 
     /** Draw the specified path frame using current selected pen
     @param path     The path to be drawn
     */
-    STDMETHOD_(HRESULT, DrawPath)(THIS_ const IPath *path, IPathEffect *pathEffect = NULL) PURE;
+    STDMETHOD_(HRESULT, DrawPath)(THIS_ const IPath *path, IPathEffect *pathEffect /*= NULL*/) PURE;
 
     /** Fill the specified path frame using current selected brush
     @param path     The path to be drawn
@@ -1546,4 +1480,62 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(BOOL, GetAntiAlias)(THIS) SCONST PURE;
 };
 
+/**
+ * @struct     IRenderFactory
+ * @brief      RenderFactory对象
+ *
+ * Describe
+ */
+#undef INTERFACE
+#define INTERFACE IRenderFactory
+DECLARE_INTERFACE_(IRenderFactory, IObjRef)
+{
+    //!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+    STDMETHOD_(IImgDecoderFactory *, GetImgDecoderFactory)(THIS) PURE;
+    STDMETHOD_(void, SetImgDecoderFactory)(THIS_ IImgDecoderFactory * pImgDecoderFac) PURE;
+    STDMETHOD_(BOOL, CreateRenderTarget)(THIS_ IRenderTarget **ppRenderTarget, int nWid, int nHei) PURE;
+
+    /**
+     * CreateFont
+     * @brief    创建字体
+     * @param [out] IFont ** ppFont -- 字体对象
+     * @param [in] const LOGFONT &lf -- 字体属性
+     * @param [in] const IPropBag * pPropBag --  字体扩展属性，由渲染引擎解析
+     * @return   BOOL -- TRUE:SUCCEED, FASLE:FAILED
+     *
+     * Describe
+     */
+    STDMETHOD_(BOOL, CreateFont)(THIS_ IFont * *ppFont, const LOGFONT *lf) PURE;
+
+    STDMETHOD_(BOOL, CreateBitmap)(THIS_ IBitmap * *ppBitmap) PURE;
+
+    STDMETHOD_(BOOL, CreateRegion)(THIS_ IRegion * *ppRgn) PURE;
+
+    STDMETHOD_(HRESULT, CreateBlurMaskFilter)
+    (THIS_ float radius, BlurStyle style, BlurFlags flag, IMaskFilter **ppMaskFilter) PURE;
+
+    STDMETHOD_(HRESULT, CreateEmbossMaskFilter)
+    (THIS_ float direction[3], float ambient, float specular, float blurRadius,
+     IMaskFilter **ppMaskFilter) PURE;
+
+    STDMETHOD_(BOOL, CreatePath)(THIS_ IPath * *ppPath) PURE;
+
+    STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFGUID guidEffect, IPathEffect * *ppPathEffect) PURE;
+
+    STDMETHOD_(BOOL, CreatePathMeasure)(THIS_ IPathMeasure * *ppPathMeasure) PURE;
+};
 SNSEND
