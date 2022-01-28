@@ -458,8 +458,8 @@ typedef enum _FillStyle
  * Describe
  */
 #undef INTERFACE
-#define INTERFACE IFont
-DECLARE_INTERFACE_(IFont, IRenderObj)
+#define INTERFACE IFontS
+DECLARE_INTERFACE_(IFontS, IRenderObj)
 {
     //!添加引用
     /*!
@@ -1212,7 +1212,7 @@ DECLARE_INTERFACE_(IPath, IRenderObj)
     STDMETHOD_(void, setLastPt)(THIS_ float x, float y) PURE;
 
     STDMETHOD_(void, addString)
-    (THIS_ LPCTSTR pszText, int nLen, float x, float y, const IFont *pFont) PURE;
+    (THIS_ LPCTSTR pszText, int nLen, float x, float y, const IFontS *pFont) PURE;
 
     // Returns a float[] with each point along the path represented by 3 floats
     // * fractional length along the path that the point resides
@@ -1519,7 +1519,7 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
      *
      * Describe
      */
-    STDMETHOD_(BOOL, CreateFont)(THIS_ IFont * *ppFont, const LOGFONT *lf) PURE;
+    STDMETHOD_(BOOL, CreateFont)(THIS_ IFontS * *ppFont, const LOGFONT *lf) PURE;
 
     STDMETHOD_(BOOL, CreateBitmap)(THIS_ IBitmap * *ppBitmap) PURE;
 

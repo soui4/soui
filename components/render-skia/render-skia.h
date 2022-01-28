@@ -27,7 +27,7 @@ public:
 	STDMETHOD_(void,SetImgDecoderFactory)(THIS_ IImgDecoderFactory *pImgDecoderFac) OVERRIDE;
 	STDMETHOD_(BOOL,CreateRenderTarget)(THIS_ IRenderTarget ** ppRenderTarget,int nWid,int nHei) OVERRIDE;
 
-	STDMETHOD_(BOOL,CreateFont)(THIS_ IFont ** ppFont, const LOGFONT *lf) OVERRIDE;
+	STDMETHOD_(BOOL,CreateFont)(THIS_ IFontS ** ppFont, const LOGFONT *lf) OVERRIDE;
 
 	STDMETHOD_(BOOL,CreateBitmap)(THIS_ IBitmap ** ppBitmap) OVERRIDE;
 
@@ -105,7 +105,7 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////
 // SFont_Skia
-class SFont_Skia: public TSkiaRenderObjImpl<IFont,OT_FONT>
+class SFont_Skia: public TSkiaRenderObjImpl<IFontS,OT_FONT>
 {
 	friend class SRenderTarget_Skia;
 	friend class SPath_Skia;
@@ -401,7 +401,7 @@ public:
 
 	STDMETHOD_(void,setLastPt)(THIS_ float x, float y) OVERRIDE;
 
-	STDMETHOD_(void,addString)(THIS_ LPCTSTR pszText,int nLen, float x,float y, const IFont *pFont) OVERRIDE;
+	STDMETHOD_(void,addString)(THIS_ LPCTSTR pszText,int nLen, float x,float y, const IFontS *pFont) OVERRIDE;
 
 	STDMETHOD_(IPathInfo*, approximate)(THIS_ float acceptableError) OVERRIDE;
 
@@ -527,7 +527,7 @@ protected:
 	SAutoRefPtr<IBitmap> m_defBmp;
 	SAutoRefPtr<IPen> m_defPen;
 	SAutoRefPtr<IBrush> m_defBrush;
-	SAutoRefPtr<IFont> m_defFont;
+	SAutoRefPtr<IFontS> m_defFont;
 	SAutoRefPtr<IMaskFilter> m_curMaskFilter;
 
 	SAutoRefPtr<IRenderFactory> m_pRenderFactory;

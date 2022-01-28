@@ -7,17 +7,17 @@ class SOUI_EXP SDpiAwareFont {
     SDpiAwareFont(void);
     ~SDpiAwareFont(void);
 
-    IFont *GetFontPtr();
+    IFontS *GetFontPtr();
 
     void SetFontDesc(const SStringW &strDesc, int nScale);
 
     void UpdateFont(int nScale);
 
   protected:
-    IFont *OnGetFont(const SStringW &strDesc, int nScale);
+    IFontS *OnGetFont(const SStringW &strDesc, int nScale);
 
     SStringW m_strDesc;
-    SAutoRefPtr<IFont> m_object;
+    SAutoRefPtr<IFontS> m_object;
 };
 
 } // namespace SOUI

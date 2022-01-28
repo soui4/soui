@@ -193,7 +193,7 @@ namespace SOUI
 		return TRUE;
 	}
 
-	BOOL SRenderFactory_Skia::CreateFont( IFont ** ppFont , const LOGFONT *lf )
+	BOOL SRenderFactory_Skia::CreateFont( IFontS ** ppFont , const LOGFONT *lf )
 	{
 		*ppFont = new SFont_Skia(this,lf);
 		return TRUE;
@@ -1982,7 +1982,7 @@ namespace SOUI
 
 	static int s_cFont =0;
 	SFont_Skia::SFont_Skia( IRenderFactory * pRenderFac,const LOGFONT * plf) 
-		:TSkiaRenderObjImpl<IFont,OT_FONT>(pRenderFac)
+		:TSkiaRenderObjImpl<IFontS,OT_FONT>(pRenderFac)
 		,m_skFont(NULL)
 		,m_fillStyle(kStrokeAndFill_Style)
 		,m_bLcdText(TRUE)
@@ -2449,7 +2449,7 @@ namespace SOUI
 		m_skPath.setLastPt(x,y);
 	}
 
-	void SPath_Skia::addString(LPCTSTR pszText,int nLen, float x,float y, const IFont *pFont)
+	void SPath_Skia::addString(LPCTSTR pszText,int nLen, float x,float y, const IFontS *pFont)
 	{
 		const SFont_Skia *pFontSkia = (const SFont_Skia *)pFont;
 		if(nLen < 0) nLen = _tcslen(pszText);

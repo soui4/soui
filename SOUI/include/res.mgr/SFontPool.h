@@ -63,7 +63,7 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
     }
 };
 
-typedef IFont *IFontPtr;
+typedef IFontS *IFontPtr;
 
 struct IDefFontListener
 {

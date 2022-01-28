@@ -930,7 +930,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      *
      * Describe
      */
-    HRESULT InitDefaultCharFormat(CHARFORMAT2W *pcf, IFont *pFont = NULL);
+    HRESULT InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont = NULL);
     /**
      * SRichEdit::InitDefaultParaFormat
      * @brief
@@ -1026,7 +1026,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      *
      * Describe  设置字体
      */
-    void OnSetFont(IFont *font, BOOL bRedraw);
+    void OnSetFont(IFontS *font, BOOL bRedraw);
     /**
      * SRichEdit::OnSetText
      * @brief    设置文本

@@ -81,9 +81,9 @@ void SMenuAttr::OnInitFinished(SXmlNode xmlNode)
         m_nItemHei.setSize((float)m_pItemSkin->GetSkinSize().cy, SLayoutSize::dp);
 }
 
-SAutoRefPtr<IFont> SMenuAttr::GetFontPtr()
+SAutoRefPtr<IFontS> SMenuAttr::GetFontPtr()
 {
-    SAutoRefPtr<IFont> font = m_dpiFont.GetFontPtr();
+    SAutoRefPtr<IFontS> font = m_dpiFont.GetFontPtr();
     if (font)
         return font;
     return SFontPool::getSingleton().GetFont(FF_DEFAULTFONT, m_scale);
@@ -183,7 +183,7 @@ void SMenuODWnd::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
             bDisabled ? m_attr->m_crTxtGray
                       : (bSelected ? m_attr->m_crTxtSel : m_attr->m_crTxtNormal));
 
-        SAutoRefPtr<IFont> oldFont;
+        SAutoRefPtr<IFontS> oldFont;
         pRT->SelectObject(m_attr->GetFontPtr(), (IRenderObj **)&oldFont);
         pRT->DrawText(pdmmi->strText, pdmmi->strText.GetLength(), &rcTxt,
                       DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS);
@@ -225,7 +225,7 @@ void SMenuODWnd::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
 
         SAutoRefPtr<IRenderTarget> pRT;
         GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
-        SAutoRefPtr<IFont> oldFont;
+        SAutoRefPtr<IFontS> oldFont;
         pRT->SelectObject(m_attr->GetFontPtr(), (IRenderObj **)&oldFont);
         SIZE szTxt;
         pRT->MeasureText(pdmmi->strText, pdmmi->strText.GetLength(), &szTxt);

@@ -52,7 +52,7 @@
     if (uMsg == WM_SETFONT)                          \
     {                                                \
         SetMsgHandled(TRUE);                         \
-        func((IFont *)wParam, (BOOL)LOWORD(lParam)); \
+        func((IFontS *)wParam, (BOOL)LOWORD(lParam)); \
         lResult = 0;                                 \
         if (IsMsgHandled())                          \
             return TRUE;                             \

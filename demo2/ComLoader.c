@@ -4,11 +4,6 @@
 #include <tchar.h>
 #include <commask.h>
 
-#include <interface/SRender-i.h>
-#include <interface/sstring-i.h>
-#include <interface/sxml-i.h>
-#include <interface/SWindow-i.h>
-
 
 #ifndef SCOM_MASK
 #define SCOM_MASK scom_mask_scom_all

@@ -13,7 +13,7 @@ SDpiAwareFont::~SDpiAwareFont(void)
 {
 }
 
-IFont *SDpiAwareFont::GetFontPtr()
+IFontS *SDpiAwareFont::GetFontPtr()
 {
     return m_object;
 }
@@ -31,7 +31,7 @@ void SDpiAwareFont::UpdateFont(int nScale)
     m_object = OnGetFont(m_strDesc, nScale);
 }
 
-IFont *SDpiAwareFont::OnGetFont(const SStringW &strDesc, int nScale)
+IFontS *SDpiAwareFont::OnGetFont(const SStringW &strDesc, int nScale)
 {
     return SFontPool::getSingleton().GetFont(strDesc, nScale);
 }

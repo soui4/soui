@@ -27,7 +27,7 @@ public:
 	STDMETHOD_(void,SetImgDecoderFactory)(THIS_ IImgDecoderFactory *pImgDecoderFac) OVERRIDE;
 	STDMETHOD_(BOOL,CreateRenderTarget)(THIS_ IRenderTarget ** ppRenderTarget,int nWid,int nHei) OVERRIDE;
 
-	STDMETHOD_(BOOL,CreateFont)(THIS_ IFont ** ppFont, const LOGFONT *lf) OVERRIDE;
+	STDMETHOD_(BOOL,CreateFont)(THIS_ IFontS ** ppFont, const LOGFONT *lf) OVERRIDE;
 
 	STDMETHOD_(BOOL,CreateBitmap)(THIS_ IBitmap ** ppBitmap) OVERRIDE;
 
@@ -110,7 +110,7 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////
 // SFont_GDI
-class SFont_GDI: public TGdiRenderObjImpl<IFont,OT_FONT>
+class SFont_GDI: public TGdiRenderObjImpl<IFontS,OT_FONT>
 {
 public:
 	SFont_GDI(IRenderFactory * pRenderFac,const LOGFONT * plf);
@@ -413,7 +413,7 @@ protected:
 	SAutoRefPtr<IBitmap> m_defBmp;
 	SAutoRefPtr<IPen> m_defPen;
 	SAutoRefPtr<IBrush> m_defBrush;
-	SAutoRefPtr<IFont> m_defFont;
+	SAutoRefPtr<IFontS> m_defFont;
 	SAutoRefPtr<IRenderFactory> m_pRenderFactory;
 	UINT m_uGetDCFlag;
 };

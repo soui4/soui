@@ -49,7 +49,7 @@ class SMenuAttr : public TObjRefImpl<SObject> {
         return m_scale;
     }
 
-    SAutoRefPtr<IFont> GetFontPtr();
+    SAutoRefPtr<IFontS> GetFontPtr();
 
   protected:
     virtual void WINAPI OnInitFinished(SXmlNode xmlNode);

@@ -133,7 +133,7 @@ class SOUI_EXP SPainter {
     {
     }
 
-    SAutoRefPtr<IFont> oldFont;
+    SAutoRefPtr<IFontS> oldFont;
     COLORREF oldTextColor;
 };
 

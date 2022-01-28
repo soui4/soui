@@ -873,16 +873,16 @@ BOOL SRichEdit::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResu
     return __baseCls::SwndProc(uMsg, wParam, lParam, lResult);
 }
 
-HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFont *pFont)
+HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont)
 {
     SAutoRefPtr<IRenderTarget> pRT;
     GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
     SASSERT(pRT);
     BeforePaintEx(pRT);
 
-    SAutoRefPtr<IFont> oldFont;
+    SAutoRefPtr<IFontS> oldFont;
     if (pFont == NULL)
-        pFont = (IFont *)pRT->GetCurrentObject(OT_FONT);
+        pFont = (IFontS *)pRT->GetCurrentObject(OT_FONT);
     SIZE szTxt;
     pRT->MeasureText(_T("A"), 1, &szTxt);
     m_nFontHeight = szTxt.cy;
@@ -1351,7 +1351,7 @@ LRESULT SRichEdit::OnSetText(UINT uMsg, WPARAM wparam, LPARAM lparam)
     return 1;
 }
 
-void SRichEdit::OnSetFont(IFont *pFont, BOOL bRedraw)
+void SRichEdit::OnSetFont(IFontS *pFont, BOOL bRedraw)
 {
     if (SUCCEEDED(InitDefaultCharFormat(&m_cfDef, pFont)))
     {

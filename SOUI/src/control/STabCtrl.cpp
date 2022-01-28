@@ -769,7 +769,7 @@ void STabCtrl::DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWOR
     //根据状态从style中获得字体，颜色
     IFontPtr font = m_style.GetTextFont(iState);
     COLORREF crTxt = m_style.GetTextColor(iState);
-    SAutoRefPtr<IFont> oldFont;
+    SAutoRefPtr<IFontS> oldFont;
     if (font)
         pRT->SelectObject(font, (IRenderObj **)&oldFont);
     COLORREF crOld = 0;

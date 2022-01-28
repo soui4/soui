@@ -21,7 +21,7 @@ namespace SOUI
         return TRUE;
     }
 
-    BOOL SRenderFactory_GDI::CreateFont( IFont ** ppFont , const LOGFONT *lf)
+    BOOL SRenderFactory_GDI::CreateFont( IFontS ** ppFont , const LOGFONT *lf)
     {
         *ppFont = new SFont_GDI(this,lf);
         return TRUE;
@@ -191,7 +191,7 @@ namespace SOUI
 	}
 
 	SFont_GDI::SFont_GDI(IRenderFactory * pRenderFac,const LOGFONT * plf) 
-		:TGdiRenderObjImpl<IFont,OT_FONT>(pRenderFac)
+		:TGdiRenderObjImpl<IFontS,OT_FONT>(pRenderFac)
 		,m_hFont(NULL)
 	{
 		memcpy(&m_lf,plf,sizeof(LOGFONT));

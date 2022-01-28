@@ -13,6 +13,21 @@ SNSBEGIN
 #define INTERFACE ISouiFactory
 DECLARE_INTERFACE_(ISouiFactory, IObjRef)
 {
+	//!添加引用
+	/*!
+	*/
+	STDMETHOD_(long,AddRef) (THIS) PURE;
+
+	//!释放引用
+	/*!
+	*/
+	STDMETHOD_(long,Release) (THIS) PURE;
+
+	//!释放对象
+	/*!
+	*/
+	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+
     STDMETHOD_(HRESULT, CreateApp)
     (THIS_ IApplication * *ppRet, IRenderFactory * pRenderFac, HMODULE hInst,
      LPCTSTR pszHostClassName, BOOL bImeApp) PURE;
@@ -26,5 +41,15 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
 };
 
 SNSEND
+
+#ifdef DLL_CORE
+# ifdef SOUI_EXPORTS
+#   define SOUI_EXP __declspec(dllexport)
+# else
+#   define SOUI_EXP __declspec(dllimport)
+# endif // SOUI_EXPORTS
+#else
+#   define SOUI_EXP
+#endif
 
 EXTERN_C HRESULT SOUI_EXP CreateSouiFactory(IObjRef **ppRet);
