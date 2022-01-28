@@ -132,7 +132,7 @@ BOOL SMessageLoop::PreTranslateMessage(MSG *pMsg)
     // loop backwards
     for (int i = (int)m_aMsgFilter.GetCount() - 1; i >= 0; i--)
     {
-        IMessageFilter *pMessageFilter = m_aMsgFilter[i];
+        IMsgFilter *pMessageFilter = m_aMsgFilter[i];
         if (pMessageFilter != NULL && pMessageFilter->PreTranslateMessage(pMsg))
             return TRUE;
     }
@@ -165,12 +165,12 @@ BOOL SMessageLoop::AddIdleHandler(IIdleHandler *pIdleHandler)
     return TRUE;
 }
 
-BOOL SMessageLoop::RemoveMessageFilter(IMessageFilter *pMessageFilter)
+BOOL SMessageLoop::RemoveMessageFilter(IMsgFilter *pMessageFilter)
 {
     return RemoveElementFromArray(m_aMsgFilter, pMessageFilter);
 }
 
-BOOL SMessageLoop::AddMessageFilter(IMessageFilter *pMessageFilter)
+BOOL SMessageLoop::AddMessageFilter(IMsgFilter *pMessageFilter)
 {
     m_aMsgFilter.Add(pMessageFilter);
     return TRUE;

@@ -31,8 +31,8 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
     float mFromDegrees;
     float mToDegrees;
 
-    ValueType mPivotXType;
-    ValueType mPivotYType;
+    AniValueType mPivotXType;
+    AniValueType mPivotYType;
     float mPivotXValue;
     float mPivotYValue;
 
@@ -80,9 +80,9 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
      */
     void init(float fromDegrees,
               float toDegrees,
-              ValueType pivotXType,
+              AniValueType pivotXType,
               float pivotXValue,
-              ValueType pivotYType,
+              AniValueType pivotYType,
               float pivotYValue);
 
     STDMETHOD_(void, initialize)

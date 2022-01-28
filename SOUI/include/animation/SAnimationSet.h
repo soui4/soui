@@ -88,9 +88,9 @@ class SOUI_EXP SAnimationSet : public SAnimation {
     void init();
 
   public:
-    STDMETHOD_(void, setFillAfter)(THIS_ bool bFill) OVERRIDE;
+    STDMETHOD_(void, setFillAfter)(THIS_ BOOL bFill) OVERRIDE;
 
-    STDMETHOD_(void, setFillBefore)(THIS_ bool bFill) OVERRIDE;
+    STDMETHOD_(void, setFillBefore)(THIS_ BOOL bFill) OVERRIDE;
 
     /**
      * <p>Sets the duration of every child animation.</p>
@@ -114,7 +114,7 @@ class SOUI_EXP SAnimationSet : public SAnimation {
      *
      * @see android.view.animation.Animation#getTransformation
      */
-    STDMETHOD_(bool, getTransformation)
+    STDMETHOD_(BOOL, getTransformation)
     (THIS_ int64_t currentTime, ITransformation *outTransformation) OVERRIDE;
 
     /**

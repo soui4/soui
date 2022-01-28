@@ -44,12 +44,12 @@ namespace SOUI
 		m_thread.waitForStop();
 	}
 
-	bool STaskLoop::isRunning()
+	BOOL STaskLoop::isRunning()
 	{
 		return !m_thread.isStopped();
 	}
 
-	long STaskLoop::postTask(const IRunnable *runnable, bool waitUntilDone, int priority)
+	long STaskLoop::postTask(const IRunnable *runnable, BOOL waitUntilDone, int priority)
 	{
 		if (m_thread.isStopped())
 		{
@@ -170,7 +170,7 @@ namespace SOUI
 		m_items.clear();
 	}
 
-	bool STaskLoop::getName(char * pszBuf, int nBufLen)
+	BOOL STaskLoop::getName(char * pszBuf, int nBufLen)
 	{
 		SAutoLock autoLock(m_taskListLock);
 		if (m_strName.length() >= (size_t)nBufLen)
@@ -216,7 +216,7 @@ namespace SOUI
 		}
 	}
 
-	bool STaskLoop::cancelTask(long taskId)
+	BOOL STaskLoop::cancelTask(long taskId)
 	{
 		SAutoLock autoLock(m_taskListLock);
 		std::list<TaskItem>::iterator itemIt = m_items.begin();
@@ -243,7 +243,7 @@ namespace SOUI
 		return (int)m_items.size();
 	}
 
-	bool STaskLoop::getRunningTaskInfo(char *buf, int bufLen)
+	BOOL STaskLoop::getRunningTaskInfo(char *buf, int bufLen)
 	{
 		SAutoLock autoLock(m_runningInfoLock);
 		if(!m_hasRunningItem)

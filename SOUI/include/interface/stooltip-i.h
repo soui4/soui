@@ -11,11 +11,11 @@ SNSBEGIN
  *
  * Describe
  */
-struct TIPID
+typedef struct TIPID
 {
     DWORD dwHi;  // ID1, 用来保存一个SWND。
     DWORD dwLow; // ID2, 用来保存附加数据
-};
+}TIPID;
 
 /**
  * @struct    IToolTip
@@ -26,7 +26,7 @@ struct TIPID
 
 #undef INTERFACE
 #define INTERFACE IToolTip
-DECLARE_INTERFACE_(IToolTip, IMessageFilter)
+DECLARE_INTERFACE_(IToolTip, IMsgFilter)
 {
     STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG * pMsg) PURE;
 

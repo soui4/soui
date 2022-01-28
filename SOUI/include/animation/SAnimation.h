@@ -47,7 +47,7 @@ class SOUI_EXP SValueDescription {
      * One of Animation.ABSOLUTE_VALUE, Animation.RELATIVE_TO_SELF, or
      * Animation.RELATIVE_TO_PARENT.
      */
-    IAnimation::ValueType type;
+    AniValueType type;
 
     /**
      * The absolute or relative dimension for this Description.
@@ -148,18 +148,18 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
      * animation starts. The value of this variable is only relevant if mFillEnabled is true;
      * otherwise it is assumed to be true.
      */
-    bool mFillBefore;
+    BOOL mFillBefore;
 
     /**
      * Indicates whether the animation transformation should be applied after the
      * animation ends.
      */
-    bool mFillAfter;
+    BOOL mFillAfter;
 
     /**
      * Indicates whether fillBefore should be taken into account.
      */
-    bool mFillEnabled;
+    BOOL mFillEnabled;
 
     /**
      * Creates a new animation with a duration of 0ms, the default interpolator, with
@@ -201,19 +201,19 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
 
     STDMETHOD_(void, scaleCurrentDuration)(THIS_ float scale) OVERRIDE;
 
-    STDMETHOD_(void, setFillBefore)(THIS_ bool bFill) OVERRIDE;
+    STDMETHOD_(void, setFillBefore)(THIS_ BOOL bFill) OVERRIDE;
 
-    STDMETHOD_(void, setFillAfter)(THIS_ bool bFill) OVERRIDE;
+    STDMETHOD_(void, setFillAfter)(THIS_ BOOL bFill) OVERRIDE;
 
-    STDMETHOD_(bool, getFillBefore)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, getFillBefore)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(bool, getFillAfter)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, getFillAfter)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(void, setStartOffset)(THIS_ long offset) OVERRIDE;
 
-    STDMETHOD_(bool, isFillEnabled)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, isFillEnabled)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(void, setFillEnabled)(THIS_ bool fillEnabled) OVERRIDE;
+    STDMETHOD_(void, setFillEnabled)(THIS_ BOOL fillEnabled) OVERRIDE;
 
     STDMETHOD_(void, setStartTime)(THIS_ int64_t startTimeMillis) OVERRIDE;
 
@@ -245,20 +245,20 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
 
     STDMETHOD_(long, computeDurationHint)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(bool, getTransformation)
+    STDMETHOD_(BOOL, getTransformation2)
     (THIS_ uint64_t currentTime, ITransformation *outTransformation, float scale) OVERRIDE;
 
-    STDMETHOD_(bool, getTransformation)
+    STDMETHOD_(BOOL, getTransformation)
     (THIS_ int64_t currentTime, ITransformation *outTransformation) OVERRIDE;
 
-    STDMETHOD_(bool, hasStarted)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, hasStarted)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(bool, hasEnded)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, hasEnded)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(void, applyTransformation)
     (THIS_ float interpolatedTime, ITransformation *t) OVERRIDE;
 
-    STDMETHOD_(bool, hasAlpha)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, hasAlpha)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(void, initialize)
     (THIS_ int width, int height, int parentWidth, int parentHeight) OVERRIDE;
@@ -287,7 +287,7 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
      * @param parentSize The size of the parent of the object being animated
      * @return The dimension to use for the animation
      */
-    int resolveSize(ValueType type, float value, int size, int parentSize);
+    int resolveSize(AniValueType type, float value, int size, int parentSize);
 
     /**
      * Gurantees that this animation has an interpolator. Will use

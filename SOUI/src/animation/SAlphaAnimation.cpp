@@ -16,7 +16,7 @@ void SAlphaAnimation::init(float fromAlpha, float toAlpha)
     mToAlpha = toAlpha;
 }
 
-bool SAlphaAnimation::hasAlpha() const
+BOOL SAlphaAnimation::hasAlpha() const
 {
     return true;
 }

@@ -18,7 +18,7 @@
 
 SNSBEGIN
 
-interface IWindow;
+typedef struct IWindow IWindow;
 /*!
 \brief
     Abstract interface required for all scripting support modules to be used with

@@ -57,6 +57,64 @@ DECLARE_INTERFACE(IAnimationListener)
     STDMETHOD_(void, onAnimationRepeat)(THIS_ IAnimation * animation) PURE;
 };
 
+    /**
+     * <p>An animation listener receives notifications from an animation.
+     * Notifications indicate animation related events, such as the end or the
+     * repetition of the animation.</p>
+     */
+    typedef enum RepeatMode
+    {
+        RESTART = 1,
+        REVERSE = 2,
+    }RepeatMode;
+
+    /**
+     * Can be used as the start time to indicate the start time should be the current
+     * time when {@link #getTransformation(long, STransformation)} is invoked for the
+     * first animation frame. This can is useful for short animations.
+     */
+    enum
+    {
+        START_ON_FIRST_FRAME = -1,
+    };
+
+    typedef enum AniValueType
+    {
+        /**
+         * The specified dimension is an ABSOLUTE_VALUE number of pixels.
+         */
+        ABSOLUTE_VALUE = 0,
+        /**
+         * The specified dimension holds a float and should be multiplied by the
+         * height or width of the parent of the object being animated.
+         */
+        RELATIVE_TO_SELF = 1,
+        /**
+         * The specified dimension holds a float and should be multiplied by the
+         * height or width of the parent of the object being animated.
+         */
+        RELATIVE_TO_PARENT = 2,
+    }AniValueType;
+
+    typedef enum ZAdjustment
+    {
+        /**
+         * Requests that the content being animated be kept in its current Z
+         * order.
+         */
+        ZORDER_NORMAL = 0,
+        /**
+         * Requests that the content being animated be forced on top of all other
+         * content for the duration of the animation.
+         */
+        ZORDER_TOP = 1,
+        /**
+         * Requests that the content being animated be forced under all other
+         * content for the duration of the animation.
+         */
+        ZORDER_BOTTOM = -1
+    }ZAdjustment;
+
 #undef INTERFACE
 #define INTERFACE IAnimation
 DECLARE_INTERFACE_(IAnimation, IObject)
@@ -91,7 +149,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return   LPCWSTR -- 类型名
      * Describe  这是一个虚函数，注意与GetClassName的区别。
      */
-    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS_) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS) SCONST PURE;
 
     /**
      * GetObjectType
@@ -193,63 +251,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
     STDMETHOD_(HRESULT, AfterAttribute)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading, HRESULT hr) PURE;
 
-    /**
-     * <p>An animation listener receives notifications from an animation.
-     * Notifications indicate animation related events, such as the end or the
-     * repetition of the animation.</p>
-     */
-    enum RepeatMode
-    {
-        RESTART = 1,
-        REVERSE = 2,
-    };
 
-    /**
-     * Can be used as the start time to indicate the start time should be the current
-     * time when {@link #getTransformation(long, STransformation)} is invoked for the
-     * first animation frame. This can is useful for short animations.
-     */
-    enum
-    {
-        START_ON_FIRST_FRAME = -1,
-    };
-
-    enum ValueType
-    {
-        /**
-         * The specified dimension is an ABSOLUTE_VALUE number of pixels.
-         */
-        ABSOLUTE_VALUE = 0,
-        /**
-         * The specified dimension holds a float and should be multiplied by the
-         * height or width of the parent of the object being animated.
-         */
-        RELATIVE_TO_SELF = 1,
-        /**
-         * The specified dimension holds a float and should be multiplied by the
-         * height or width of the parent of the object being animated.
-         */
-        RELATIVE_TO_PARENT = 2,
-    };
-
-    enum ZAdjustment
-    {
-        /**
-         * Requests that the content being animated be kept in its current Z
-         * order.
-         */
-        ZORDER_NORMAL = 0,
-        /**
-         * Requests that the content being animated be forced on top of all other
-         * content for the duration of the animation.
-         */
-        ZORDER_TOP = 1,
-        /**
-         * Requests that the content being animated be forced under all other
-         * content for the duration of the animation.
-         */
-        ZORDER_BOTTOM = -1
-    };
 
     STDMETHOD_(IAnimation *, clone)(THIS) SCONST PURE;
 
@@ -302,13 +304,13 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      */
     STDMETHOD_(void, scaleCurrentDuration)(THIS_ float scale) PURE;
 
-    STDMETHOD_(void, setFillBefore)(THIS_ bool bFill) PURE;
+    STDMETHOD_(void, setFillBefore)(THIS_ BOOL bFill) PURE;
 
-    STDMETHOD_(void, setFillAfter)(THIS_ bool bFill) PURE;
+    STDMETHOD_(void, setFillAfter)(THIS_ BOOL bFill) PURE;
 
-    STDMETHOD_(bool, getFillBefore)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, getFillBefore)(THIS) SCONST PURE;
 
-    STDMETHOD_(bool, getFillAfter)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, getFillAfter)(THIS) SCONST PURE;
 
     STDMETHOD_(void, setStartOffset)(THIS_ long offset) PURE;
 
@@ -318,7 +320,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return true if the animation will take fillBefore into account
      * @attr ref android.R.styleable#Animation_fillEnabled
      */
-    STDMETHOD_(bool, isFillEnabled)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isFillEnabled)(THIS) SCONST PURE;
 
     /**
      * If fillEnabled is true, the animation will apply the value of fillBefore.
@@ -331,7 +333,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @see #setFillBefore(boolean)
      * @see #setFillAfter(boolean)
      */
-    STDMETHOD_(void, setFillEnabled)(THIS_ bool fillEnabled) PURE;
+    STDMETHOD_(void, setFillEnabled)(THIS_ BOOL fillEnabled) PURE;
 
     /**
      * When this animation should start. When the start time is set to
@@ -475,7 +477,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      *        pivot points being rotated or scaled around.
      * @return True if the animation is still running
      */
-    STDMETHOD_(bool, getTransformation)
+    STDMETHOD_(BOOL, getTransformation2)
     (THIS_ uint64_t currentTime, ITransformation * outTransformation, float scale) PURE;
 
     /**
@@ -488,7 +490,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      *        caller and will be filled in by the animation.
      * @return True if the animation is still running
      */
-    STDMETHOD_(bool, getTransformation)
+    STDMETHOD_(BOOL, getTransformation)
     (THIS_ int64_t currentTime, ITransformation  *outTransformation) PURE;
 
     /**
@@ -496,14 +498,14 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      *
      * @return true if the animation has started, false otherwise
      */
-    STDMETHOD_(bool, hasStarted)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, hasStarted)(THIS) SCONST PURE;
 
     /**
      * <p>Indicates whether this animation has ended or not.</p>
      *
      * @return true if the animation has ended, false otherwise
      */
-    STDMETHOD_(bool, hasEnded)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, hasEnded)(THIS) SCONST PURE;
 
     /**
      * Helper for getTransformation. Subclasses should implement this to apply
@@ -523,7 +525,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      *
      * @hide
      */
-    STDMETHOD_(bool, hasAlpha)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, hasAlpha)(THIS) SCONST PURE;
 
     STDMETHOD_(void, initialize)
     (THIS_ int width, int height, int parentWidth, int parentHeight) PURE;

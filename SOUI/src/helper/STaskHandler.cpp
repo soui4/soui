@@ -47,12 +47,12 @@ void STaskHandler::stop()
     m_items.RemoveAll();
 }
 
-bool STaskHandler::isRunning()
+BOOL STaskHandler::isRunning()
 {
-    return !!IsWindow();
+    return IsWindow();
 }
 
-long STaskHandler::postTask(const IRunnable *runnable, bool waitUntilDone, int priority)
+long STaskHandler::postTask(const IRunnable *runnable, BOOL waitUntilDone, int priority)
 {
     IRunnable *pCloneRunnable = runnable->clone();
     if (GetCurrentThreadId() == m_dwThreadID && waitUntilDone)
@@ -93,7 +93,7 @@ LRESULT STaskHandler::OnRunTask(UINT uMsg, WPARAM wp, LPARAM lp)
     return 0;
 }
 
-bool STaskHandler::getName(char *pszBuf, int nBufLen)
+BOOL STaskHandler::getName(char *pszBuf, int nBufLen)
 {
     if (!isRunning())
         return false;
@@ -121,7 +121,7 @@ void STaskHandler::cancelTasksForObject(void *object)
     }
 }
 
-bool STaskHandler::cancelTask(long taskId)
+BOOL STaskHandler::cancelTask(long taskId)
 {
     SAutoLock autoLock(m_taskListLock);
     SPOSITION pos = m_items.GetStartPosition();
@@ -147,7 +147,7 @@ int STaskHandler::getTaskCount() const
     return (int)m_items.GetCount();
 }
 
-bool STaskHandler::getRunningTaskInfo(char *buf, int bufLen)
+BOOL STaskHandler::getRunningTaskInfo(char *buf, int bufLen)
 {
     return false;
 }

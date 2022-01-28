@@ -13,6 +13,7 @@
 */
 
 #pragma once
+
 #include <interface/sobject-i.h>
 #include <string/strcpcvt.h>
 #include <xml/SXml.h>

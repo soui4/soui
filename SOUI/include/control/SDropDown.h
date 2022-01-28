@@ -63,7 +63,7 @@ struct ISDropDownOwner
  */
 class SOUI_EXP SDropDownWnd
     : public SHostWnd
-    , public IMessageFilter {
+    , public IMsgFilter {
     DEF_SOBJECT(SHostWnd, L"SDropDownWnd")
   public:
     /**

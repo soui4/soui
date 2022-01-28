@@ -4,7 +4,7 @@
 
 SNSBEGIN
 
-class SouiFactory : public TObjRefImpl<ISouiFactory>
+class SOUI_EXP SouiFactory : public TObjRefImpl<ISouiFactory>
 {
 public:
 	SouiFactory(void);
@@ -18,6 +18,8 @@ public:
 	STDMETHOD_(HRESULT,CreateStringA)(THIS_ IStringA **ppRet,LPCSTR pszSrc) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateStringW)(THIS_ IStringW **ppRet,LPCWSTR pszSrc) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateXmlDoc)(THIS_ IXmlDoc **ppRet) OVERRIDE;
+	STDMETHOD_(HRESULT,CreateResProvider)(THIS_ BUILTIN_RESTYPE resType, IObjRef **pObj) OVERRIDE;
+
 };
 
 SNSEND

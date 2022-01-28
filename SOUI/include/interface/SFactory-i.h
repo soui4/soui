@@ -5,6 +5,7 @@
 #include <interface/shostwnd-i.h>
 #include <interface/sstring-i.h>
 #include <interface/sxml-i.h>
+#include <interface/SResProvider-i.h>
 
 SNSBEGIN
 
@@ -21,11 +22,9 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
     STDMETHOD_(HRESULT, CreateStringA)(THIS_ IStringA * *ppRet, LPCSTR pszSrc) PURE;
     STDMETHOD_(HRESULT, CreateStringW)(THIS_ IStringW * *ppRet, LPCWSTR pszStr) PURE;
     STDMETHOD_(HRESULT, CreateXmlDoc)(THIS_ IXmlDoc * *ppRet) PURE;
+	STDMETHOD_(HRESULT, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType, IObjRef **pObj) PURE;
 };
 
-extern "C"
-{
-    HRESULT SOUI_EXP CreateSouiFactory(ISouiFactory **ppRet);
-}
-
 SNSEND
+
+EXTERN_C HRESULT SOUI_EXP CreateSouiFactory(IObjRef **ppRet);

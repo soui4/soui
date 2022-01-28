@@ -6,8 +6,8 @@
 SNSBEGIN
 
 #undef INTERFACE
-#define INTERFACE IMessageFilter
-DECLARE_INTERFACE(IMessageFilter)
+#define INTERFACE IMsgFilter
+DECLARE_INTERFACE(IMsgFilter)
 {
     STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG * pMsg) PURE;
 };
@@ -39,9 +39,9 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     // Message filter operations
-    STDMETHOD_(BOOL, AddMessageFilter)(THIS_ IMessageFilter * pMessageFilter) PURE;
+    STDMETHOD_(BOOL, AddMessageFilter)(THIS_ IMsgFilter * pMessageFilter) PURE;
 
-    STDMETHOD_(BOOL, RemoveMessageFilter)(THIS_ IMessageFilter * pMessageFilter) PURE;
+    STDMETHOD_(BOOL, RemoveMessageFilter)(THIS_ IMsgFilter * pMessageFilter) PURE;
 
     // Idle handler operations
     STDMETHOD_(BOOL, AddIdleHandler)(THIS_ IIdleHandler * pIdleHandler) PURE;
@@ -56,7 +56,7 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
 
     STDMETHOD_(int, Run)(THIS) PURE;
 
-    STDMETHOD_(BOOL, IsRunning)(THIS) const PURE;
+    STDMETHOD_(BOOL, IsRunning)(THIS) SCONST PURE;
 
     STDMETHOD_(void, OnMsg)(THIS_ LPMSG pMsg) PURE;
 

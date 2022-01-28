@@ -85,12 +85,13 @@ void SSpinButtonCtrl::OnValueChanged(bool bInit)
     SWindow *pBuddy = GetBuddy();
     if (pBuddy)
     {
+		SStringT strValue = SStringT().Format(_T("%d"), m_nValue);
         EventSpinValue2String evt(this);
         evt.bInit = bInit;
         evt.nValue = m_nValue;
-        evt.strValue = SStringT().Format(_T("%d"), m_nValue);
+        evt.strValue = &strValue;
         FireEvent(evt);
-        pBuddy->SetWindowText(evt.strValue);
+        pBuddy->SetWindowText(strValue);
     }
 }
 
@@ -182,10 +183,11 @@ BOOL SSpinButtonCtrl::OnBuddyChange(IEvtArgs *pEvt)
         {
             m_nValue = nValue;
 
+			SStringT strValue = SStringT().Format(_T("%d"), m_nValue);
             EventSpinValue2String evt(this);
             evt.bInit = false;
             evt.nValue = m_nValue;
-            evt.strValue = SStringT().Format(_T("%d"), m_nValue);
+            evt.strValue = &strValue;
             FireEvent(evt);
         }
     }

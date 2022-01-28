@@ -40,7 +40,7 @@ public:
 
 	STDMETHOD_(BOOL,Load)(THIS_ LPVOID pData,UINT uType);
 	STDMETHOD_(void, GetName)(THIS_ wchar_t szBuf[TR_MAX_NAME_LEN]);
-	STDMETHOD_( bool, NameEqual)(THIS_ LPCWSTR pszName);
+	STDMETHOD_( BOOL, NameEqual)(THIS_ LPCWSTR pszName);
 	STDMETHOD_(GUID,guid)(THIS);
 	STDMETHOD_(int,tr)(THIS_ const IStringW * strSrc,const IStringW * strCtx,wchar_t *pszOut,int nLen) SCONST;
 	STDMETHOD_(void,getFontInfo)(THIS_ IStringW * strFont) SCONST;

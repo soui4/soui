@@ -27,11 +27,11 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
     DEF_SOBJECT(SAnimation, L"translate")
 
   private:
-    ValueType mFromXType;
-    ValueType mToXType;
+    AniValueType mFromXType;
+    AniValueType mToXType;
 
-    ValueType mFromYType;
-    ValueType mToYType;
+    AniValueType mFromYType;
+    AniValueType mToYType;
 
   protected:
     /** @hide */
@@ -101,13 +101,13 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
      *        animation. This value can either be an absolute number if toYType
      *        is ABSOLUTE, or a percentage (where 1.0 is 100%) otherwise.
      */
-    void init(ValueType fromXType,
+    void init(AniValueType fromXType,
               float fromXValue,
-              ValueType toXType,
+              AniValueType toXType,
               float toXValue,
-              ValueType fromYType,
+              AniValueType fromYType,
               float fromYValue,
-              ValueType toYType,
+              AniValueType toYType,
               float toYValue);
 
   protected:

@@ -70,9 +70,9 @@ void SScaleAnimation::init(float fromX,
                            float toX,
                            float fromY,
                            float toY,
-                           ValueType pivotXType,
+                           AniValueType pivotXType,
                            float pivotXValue,
-                           ValueType pivotYType,
+                           AniValueType pivotYType,
                            float pivotYValue)
 {
     mFromX = fromX;

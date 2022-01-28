@@ -12,9 +12,7 @@ BOOL ExpLua_ResProvider(lua_State *L)
  		lua_tinker::class_def<IResProvider>(L,"LoadImage",&IResProvider::LoadImage);
  		lua_tinker::class_def<IResProvider>(L,"GetRawBufferSize",&IResProvider::GetRawBufferSize);
  		lua_tinker::class_def<IResProvider>(L,"GetRawBuffer",&IResProvider::GetRawBuffer);
- 		
-        lua_tinker::def(L,"CreateResProvider",&CreateResProvider);
-	
+ 			
 		return TRUE;
 	}catch(...)
 	{

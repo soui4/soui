@@ -39,7 +39,7 @@ DECLARE_INTERFACE(IOutputFileBuilder)
     //生成LOG文件名
     //至少应该包含pszLogName，及curFileIndex这两个参数
     STDMETHOD_(BOOL, buildOutputFile)
-    (THIS_ char *pszFileName, int nLen, tm time, const char *pszLogName, unsigned long pid,
+    (THIS_ char *pszFileName, int nLen, struct tm time, const char *pszLogName, unsigned long pid,
      int curFileIndex) SCONST PURE;
 };
 
@@ -93,25 +93,25 @@ DECLARE_INTERFACE_(ILog4zManager, IObjRef)
 
     // pre-check the log filter. if filter out return false.
     STDMETHOD_(BOOL, prePushLog)(THIS_ LoggerId id, int level) PURE;
-    STDMETHOD_(BOOL, prePushLog)(THIS_ const char *name, int level) PURE;
+    STDMETHOD_(BOOL, prePushLog2)(THIS_ const char *name, int level) PURE;
 
     //! Push log, thread safe.
     STDMETHOD_(BOOL, pushLog)
     (THIS_ LoggerId id, int level, const char *filter, const char *log, const char *file, int line,
      const char *func, const void *pRetAddr) PURE;
 
-    STDMETHOD_(BOOL, pushLog)
+    STDMETHOD_(BOOL, pushLog2)
     (THIS_ const char *name, int level, const char *filter, const char *log, const char *file,
      int line, const char *func, const void *pRetAddr) PURE;
 
     //! set logger's attribute, thread safe.
-    STDMETHOD_(BOOL, enableLogger)(THIS_ LoggerId id, bool enable) PURE;
+    STDMETHOD_(BOOL, enableLogger)(THIS_ LoggerId id, BOOL enable) PURE;
     STDMETHOD_(BOOL, setLoggerName)(THIS_ LoggerId id, const char *name) PURE;
     STDMETHOD_(BOOL, setLoggerPath)(THIS_ LoggerId id, const char *path) PURE;
     STDMETHOD_(BOOL, setLoggerLevel)(THIS_ LoggerId id, int nLevel) PURE;
-    STDMETHOD_(BOOL, setLoggerFileLine)(THIS_ LoggerId id, bool enable) PURE;
-    STDMETHOD_(BOOL, setLoggerDisplay)(THIS_ LoggerId id, bool enable) PURE;
-    STDMETHOD_(BOOL, setLoggerOutFile)(THIS_ LoggerId id, bool enable) PURE;
+    STDMETHOD_(BOOL, setLoggerFileLine)(THIS_ LoggerId id, BOOL enable) PURE;
+    STDMETHOD_(BOOL, setLoggerDisplay)(THIS_ LoggerId id, BOOL enable) PURE;
+    STDMETHOD_(BOOL, setLoggerOutFile)(THIS_ LoggerId id, BOOL enable) PURE;
     STDMETHOD_(BOOL, setLoggerLimitsize)(THIS_ LoggerId id, unsigned int limitsize) PURE;
 
     //设置LOG输出到文件的规则

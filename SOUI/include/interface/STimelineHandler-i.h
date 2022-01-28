@@ -12,7 +12,7 @@ SNSBEGIN
 #define INTERFACE ITimelineHandler
 DECLARE_INTERFACE(ITimelineHandler)
 {
-    STDMETHOD_(void, OnNextFrame)(THIS_) PURE;
+    STDMETHOD_(void, OnNextFrame)(THIS) PURE;
 };
 
 #undef INTERFACE

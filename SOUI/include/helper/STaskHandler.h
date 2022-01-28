@@ -50,7 +50,7 @@ class SOUI_EXP STaskHandler
      * @param taskList the task ID list to be canceled
      * @return the removed task list.
      */
-    STDMETHOD_(bool, cancelTask)(THIS_ long taskId) OVERRIDE;
+    STDMETHOD_(BOOL, cancelTask)(THIS_ long taskId) OVERRIDE;
 
     /**
      * get the total task number in the task mgr queue.
@@ -62,14 +62,14 @@ class SOUI_EXP STaskHandler
      * get the run loop status.
      * @return the running status
      */
-    STDMETHOD_(bool, isRunning)(THIS) OVERRIDE;
+    STDMETHOD_(BOOL, isRunning)(THIS) OVERRIDE;
 
     STDMETHOD_(long, postTask)
-    (THIS_ const IRunnable *runnable, bool waitUntilDone, int priority) OVERRIDE;
+    (THIS_ const IRunnable *runnable, BOOL waitUntilDone, int priority) OVERRIDE;
 
-    STDMETHOD_(bool, getName)(THIS_ char *pszBuf, int nBufLen) OVERRIDE;
+    STDMETHOD_(BOOL, getName)(THIS_ char *pszBuf, int nBufLen) OVERRIDE;
 
-    STDMETHOD_(bool, getRunningTaskInfo)(THIS_ char *buf, int bufLen) OVERRIDE;
+    STDMETHOD_(BOOL, getRunningTaskInfo)(THIS_ char *buf, int bufLen) OVERRIDE;
 
   private:
     LRESULT OnRunTask(UINT uMsg, WPARAM wp, LPARAM lp);

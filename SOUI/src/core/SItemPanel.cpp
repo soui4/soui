@@ -121,7 +121,7 @@ BOOL SItemPanel::OnFireEvent(IEvtArgs *evt)
     return m_pFrmHost->FireEvent(evt2);
 }
 
-CRect SItemPanel::GetContainerRect() const
+RECT SItemPanel::GetContainerRect() const
 {
     CRect rcItem;
     m_pItemContainer->OnItemGetRect(this, rcItem);

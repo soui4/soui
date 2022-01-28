@@ -5,8 +5,11 @@
 #include <interface/SAnimation-i.h>
 #include <interface/SRender-i.h>
 #include <interface/SWndContainer-i.h>
-
+//#include <interface/slayout-i.h>
 SNSBEGIN
+
+typedef struct ILayout ILayout;
+typedef struct ILayoutParam ILayoutParam;
 
 #undef INTERFACE
 #define INTERFACE IWindow
@@ -211,7 +214,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep) PURE;
 
-    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT * pt, bool bIncludeMsgTransparent) PURE;
+    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT * pt, BOOL bIncludeMsgTransparent) PURE;
 
     /**
      * GetDesiredSize

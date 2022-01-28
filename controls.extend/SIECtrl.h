@@ -87,7 +87,7 @@ namespace SOUI
     };
 
         
-    class SIECtrl :	public SActiveX, public IMessageFilter
+    class SIECtrl :	public SActiveX, public IMsgFilter
     {
         DEF_SOBJECT(SActiveX, L"iectrl")
     public:

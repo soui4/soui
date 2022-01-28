@@ -420,21 +420,21 @@ public:
 
 	//pre-check the log filter. if filter out return false. 
 	STDMETHOD_(BOOL,prePushLog)(THIS_ LoggerId id, int level) OVERRIDE;
-	STDMETHOD_(BOOL,prePushLog)(THIS_ const char * name, int level) OVERRIDE;
+	STDMETHOD_(BOOL,prePushLog2)(THIS_ const char * name, int level) OVERRIDE;
 
 	//! Push log, thread safe.
 	STDMETHOD_(BOOL,pushLog)(THIS_ LoggerId id, int level, const char * filter, const char * log, const char * file , int line , const char * func , const void *pRetAddr) OVERRIDE;
 
-	STDMETHOD_(BOOL,pushLog)(THIS_ const char * name, int level, const char * filter, const char * log, const char * file , int line , const char * func , const void *pRetAddr) OVERRIDE;
+	STDMETHOD_(BOOL,pushLog2)(THIS_ const char * name, int level, const char * filter, const char * log, const char * file , int line , const char * func , const void *pRetAddr) OVERRIDE;
 
 	//! set logger's attribute, thread safe.
-	STDMETHOD_(BOOL,enableLogger)(THIS_ LoggerId id, bool enable) OVERRIDE;
+	STDMETHOD_(BOOL,enableLogger)(THIS_ LoggerId id, BOOL enable) OVERRIDE;
 	STDMETHOD_(BOOL,setLoggerName)(THIS_ LoggerId id, const char * name) OVERRIDE;
 	STDMETHOD_(BOOL,setLoggerPath)(THIS_ LoggerId id, const char * path) OVERRIDE;
 	STDMETHOD_(BOOL,setLoggerLevel)(THIS_ LoggerId id, int nLevel) OVERRIDE;
-	STDMETHOD_(BOOL,setLoggerFileLine)(THIS_ LoggerId id, bool enable) OVERRIDE;
-	STDMETHOD_(BOOL,setLoggerDisplay)(THIS_ LoggerId id, bool enable) OVERRIDE;
-	STDMETHOD_(BOOL,setLoggerOutFile)(THIS_ LoggerId id, bool enable) OVERRIDE;
+	STDMETHOD_(BOOL,setLoggerFileLine)(THIS_ LoggerId id, BOOL enable) OVERRIDE;
+	STDMETHOD_(BOOL,setLoggerDisplay)(THIS_ LoggerId id, BOOL enable) OVERRIDE;
+	STDMETHOD_(BOOL,setLoggerOutFile)(THIS_ LoggerId id, BOOL enable) OVERRIDE;
 	STDMETHOD_(BOOL,setLoggerLimitsize)(THIS_ LoggerId id, unsigned int limitsize) OVERRIDE;
 
 	//设置LOG输出到文件的规则
@@ -1387,7 +1387,7 @@ BOOL LogerManager::stop()
     return FALSE;
 }
 
-BOOL LogerManager::prePushLog(const char * name, int level)
+BOOL LogerManager::prePushLog2(const char * name, int level)
 {
     LoggerId id = getLoggerId(name);
     if(id == LOG4Z_INVALID_LOGGER_ID) return false;
@@ -1407,7 +1407,7 @@ BOOL LogerManager::prePushLog(LoggerId id, int level)
     return true;
 }
 
-BOOL LogerManager::pushLog(const char * name, int level, const char * filter, const char * log, const char * file, int line, const char *func, const void * pRetAddr)
+BOOL LogerManager::pushLog2(const char * name, int level, const char * filter, const char * log, const char * file, int line, const char *func, const void * pRetAddr)
 {
     LoggerId id = getLoggerId(name);
     if(id == LOG4Z_INVALID_LOGGER_ID) return false;
@@ -1492,7 +1492,7 @@ LoggerId LogerManager::findLogger(const char * key)
     return LOG4Z_INVALID_LOGGER_ID;
 }
 
-BOOL LogerManager::enableLogger(LoggerId id, bool enable)
+BOOL LogerManager::enableLogger(LoggerId id, BOOL enable)
 {
     if (id <0 || id > _lastId) return false;
     _loggers[id]._enable = enable;
@@ -1504,13 +1504,13 @@ BOOL LogerManager::setLoggerLevel(LoggerId id, int level)
     _loggers[id]._level = level;
     return true;
 }
-BOOL LogerManager::setLoggerDisplay(LoggerId id, bool enable)
+BOOL LogerManager::setLoggerDisplay(LoggerId id, BOOL enable)
 {
     if (id <0 || id > _lastId) return false;
     _loggers[id]._display = enable;
     return true;
 }
-BOOL LogerManager::setLoggerOutFile(LoggerId id, bool enable)
+BOOL LogerManager::setLoggerOutFile(LoggerId id, BOOL enable)
 {
     if (id <0 || id > _lastId) return false;
     _loggers[id]._outfile = enable;
@@ -1530,7 +1530,7 @@ BOOL LogerManager::setLoggerLimitsize(LoggerId id, unsigned int limitsize)
     _loggers[id]._limitsize = limitsize;
     return true;
 }
-BOOL LogerManager::setLoggerFileLine(LoggerId id, bool enable)
+BOOL LogerManager::setLoggerFileLine(LoggerId id, BOOL enable)
 {
     if (id <0 || id > _lastId) return false;
     _loggers[id]._fileLine = enable;

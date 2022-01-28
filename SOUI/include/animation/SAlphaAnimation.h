@@ -61,7 +61,7 @@ class SOUI_EXP SAlphaAnimation : public SAnimation {
     /**
      * @hide
      */
-    STDMETHOD_(bool, hasAlpha)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, hasAlpha)(THIS) SCONST OVERRIDE;
 };
 
 } // namespace SOUI

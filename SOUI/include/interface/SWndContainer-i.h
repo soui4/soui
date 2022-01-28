@@ -29,12 +29,12 @@ enum
     ZORDER_MAX = (UINT)-1,
 };
 
-enum GrtFlag
+typedef enum GrtFlag
 {
 	GRT_NODRAW = 0,
 	GRT_PAINTBKGND,
 	GRT_OFFSCREEN,
-};
+}GrtFlag;
 
 /**
  * @struct     ISwndContainer
@@ -61,7 +61,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
 
     STDMETHOD_(BOOL, IsSendWheel2Hover)(THIS) SCONST PURE;
 
-    STDMETHOD_(CRect, GetContainerRect)(THIS) SCONST PURE;
+    STDMETHOD_(RECT, GetContainerRect)(THIS) SCONST PURE;
 
     STDMETHOD_(IRenderTarget *, OnGetRenderTarget)(THIS_ LPCRECT rc, GrtFlag gdcFlags) PURE;
 

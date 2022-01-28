@@ -11,9 +11,9 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
   public:
     // Message filter operations
-    STDMETHOD_(BOOL, AddMessageFilter)(THIS_ IMessageFilter *pMessageFilter) OVERRIDE;
+    STDMETHOD_(BOOL, AddMessageFilter)(THIS_ IMsgFilter *pMessageFilter) OVERRIDE;
 
-    STDMETHOD_(BOOL, RemoveMessageFilter)(THIS_ IMessageFilter *pMessageFilter) OVERRIDE;
+    STDMETHOD_(BOOL, RemoveMessageFilter)(THIS_ IMsgFilter *pMessageFilter) OVERRIDE;
 
     // Idle handler operations
     STDMETHOD_(BOOL, AddIdleHandler)(THIS_ IIdleHandler *pIdleHandler) OVERRIDE;
@@ -42,7 +42,7 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
     static BOOL IsIdleMessage(MSG *pMsg);
 
   protected:
-    SArray<IMessageFilter *> m_aMsgFilter;
+    SArray<IMsgFilter *> m_aMsgFilter;
     SArray<IIdleHandler *> m_aIdleHandler;
     MSG m_msg;
 

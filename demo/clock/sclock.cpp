@@ -64,7 +64,7 @@ void SClock::OnPaint(SOUI::IRenderTarget * pRT)
 SMatrix SClock::InitMatrix(double angle, CPoint &center)
 {
 	SMatrix mtx;
-	mtx.setRotate(angle-90, center.x, center.y);
+	mtx.setRotate2(angle-90, center.x, center.y);
 	return mtx;
 }
 

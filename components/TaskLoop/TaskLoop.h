@@ -29,7 +29,7 @@ public:
 		m_thread.start(&runnable, m_strName,  (Thread::ThreadPriority)priority);
 	}
 
-	STDMETHOD_(bool,getName)(THIS_ char *pszBuf, int nBufLen) OVERRIDE;
+	STDMETHOD_(BOOL,getName)(THIS_ char *pszBuf, int nBufLen) OVERRIDE;
 
 	/**
 	* Start a thread to run.
@@ -49,7 +49,7 @@ public:
 	* @param priority, the task priority.
 	* @return the task id, can be used by cancelTask.
 	*/
-	STDMETHOD_(long,postTask)(THIS_ const IRunnable *runnable, bool waitUntilDone, int priority) OVERRIDE;
+	STDMETHOD_(long,postTask)(THIS_ const IRunnable *runnable, BOOL waitUntilDone, int priority) OVERRIDE;
 
 	/**
 	* Remove tasks for a specific object from task loop pending task list
@@ -62,7 +62,7 @@ public:
 	* @param taskList the task ID list to be canceled
 	* @return the removed task list.
 	*/
-	STDMETHOD_(bool,cancelTask)(THIS_ long taskId) OVERRIDE;
+	STDMETHOD_(BOOL,cancelTask)(THIS_ long taskId) OVERRIDE;
 
 	/**
 	* get the total task number in the task loop queue.
@@ -74,7 +74,7 @@ public:
 	* get the run loop status.
 	* @return the running status
 	*/
-	STDMETHOD_(bool,isRunning)(THIS) OVERRIDE;
+	STDMETHOD_(BOOL,isRunning)(THIS) OVERRIDE;
 
 	/**
 	* get the running task info.
@@ -82,7 +82,7 @@ public:
 	* @param bufLen, buffer length
 	* @return false - no task is running; true - succeed.
 	*/
-	STDMETHOD_(bool,getRunningTaskInfo)(THIS_ char *buf, int bufLen) OVERRIDE;
+	STDMETHOD_(BOOL,getRunningTaskInfo)(THIS_ char *buf, int bufLen) OVERRIDE;
 
 private:
 	class TaskItem

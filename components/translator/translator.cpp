@@ -97,7 +97,7 @@ void STranslator::GetName(wchar_t szName[TR_MAX_NAME_LEN])
 }
 
 
-bool STranslator::NameEqual(LPCWSTR pszName)
+BOOL STranslator::NameEqual(LPCWSTR pszName)
 {
 	return wcscmp(m_szLangName,pszName) == 0;
 }

@@ -10,34 +10,34 @@ SValueDescription SValueDescription::parseValue(const SStringW &value)
     SValueDescription d;
     if (value.IsEmpty())
     {
-        d.type = IAnimation::ABSOLUTE_VALUE;
+        d.type = ABSOLUTE_VALUE;
         d.value = 0.0f;
     }
     else if (value.EndsWith(L"%", true))
     {
-        d.type = IAnimation::RELATIVE_TO_SELF;
+        d.type = RELATIVE_TO_SELF;
         d.value = (float)_wtof(value.Left(value.GetLength() - 1)) / 100;
     }
     else if (value.EndsWith(L"%p", true))
     {
-        d.type = IAnimation::RELATIVE_TO_PARENT;
+        d.type = RELATIVE_TO_PARENT;
         d.value = (float)_wtof(value.Left(value.GetLength() - 2)) / 100;
     }
     else
     {
-        d.type = IAnimation::ABSOLUTE_VALUE;
+        d.type = ABSOLUTE_VALUE;
         d.value = (float)_wtof(value);
     }
     return d;
 }
 
 ////////////////////////////////////////////////////////////////////
-bool SAnimation::hasAlpha() const
+BOOL SAnimation::hasAlpha() const
 {
     return false;
 }
 
-int SAnimation::resolveSize(ValueType type, float value, int size, int parentSize)
+int SAnimation::resolveSize(AniValueType type, float value, int size, int parentSize)
 {
     switch (type)
     {
@@ -55,12 +55,12 @@ void SAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
 {
 }
 
-bool SAnimation::hasEnded() const
+BOOL SAnimation::hasEnded() const
 {
     return mEnded;
 }
 
-bool SAnimation::hasStarted() const
+BOOL SAnimation::hasStarted() const
 {
     return mStarted;
 }
@@ -94,7 +94,7 @@ bool SAnimation::isCanceled()
     return mStartTime == -2;
 }
 
-bool SAnimation::getTransformation(int64_t currentTime, ITransformation *outTransformation)
+BOOL SAnimation::getTransformation(int64_t currentTime, ITransformation *outTransformation)
 {
     if (mStartTime == -1)
     {
@@ -114,8 +114,8 @@ bool SAnimation::getTransformation(int64_t currentTime, ITransformation *outTran
         normalizedTime = currentTime < mStartTime ? 0.0f : 1.0f;
     }
 
-    bool expired = normalizedTime >= 1.0f || isCanceled();
-    bool bMore = !expired;
+    BOOL expired = normalizedTime >= 1.0f || isCanceled();
+    BOOL bMore = !expired;
 
     if (!mFillEnabled || mRepeatCount != 0)
         normalizedTime = smax(smin(normalizedTime, 1.0f), 0.0f);
@@ -177,7 +177,7 @@ bool SAnimation::getTransformation(int64_t currentTime, ITransformation *outTran
     return bMore;
 }
 
-bool SAnimation::getTransformation(uint64_t currentTime,
+BOOL SAnimation::getTransformation2(uint64_t currentTime,
                                    ITransformation *outTransformation,
                                    float scale)
 {
@@ -203,7 +203,7 @@ void SAnimation::setAnimationListener(IAnimationListener *listener)
     mListener = listener;
 }
 
-IAnimation::ZAdjustment SAnimation::getZAdjustment() const
+ZAdjustment SAnimation::getZAdjustment() const
 {
     return mZAdjustment;
 }
@@ -213,7 +213,7 @@ int SAnimation::getRepeatCount() const
     return mRepeatCount;
 }
 
-IAnimation::RepeatMode SAnimation::getRepeatMode() const
+RepeatMode SAnimation::getRepeatMode() const
 {
     return mRepeatMode;
 }
@@ -285,32 +285,32 @@ void SAnimation::setStartOffset(long offset)
     mStartOffset = offset;
 }
 
-void SAnimation::setFillEnabled(bool fillEnabled)
+void SAnimation::setFillEnabled(BOOL fillEnabled)
 {
     mFillEnabled = fillEnabled;
 }
 
-bool SAnimation::isFillEnabled() const
+BOOL SAnimation::isFillEnabled() const
 {
     return mFillEnabled;
 }
 
-bool SAnimation::getFillAfter() const
+BOOL SAnimation::getFillAfter() const
 {
     return mFillAfter;
 }
 
-void SAnimation::setFillAfter(bool bFill)
+void SAnimation::setFillAfter(BOOL bFill)
 {
     mFillAfter = bFill;
 }
 
-bool SAnimation::getFillBefore() const
+BOOL SAnimation::getFillBefore() const
 {
     return mFillBefore;
 }
 
-void SAnimation::setFillBefore(bool bFill)
+void SAnimation::setFillBefore(BOOL bFill)
 {
     mFillBefore = bFill;
 }

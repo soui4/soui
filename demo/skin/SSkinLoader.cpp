@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SSkinLoader.h"
 #include "res.mgr\SResProvider.h"
+#include <SouiFactory.h>
 
 template<>
 SSkinLoader * SSingleton<SSkinLoader>::ms_Singleton = NULL;
@@ -43,7 +44,8 @@ void SOUI::SSkinLoader::LoadSkin(SStringT respath,const TCHAR *strXmlSkin /*= _T
 {
 	if (m_pResProvider == NULL)
 	{
-		if(CreateResProvider(RES_FILE, (IObjRef**)&m_pResProvider))
+		SouiFactory souiFac;
+		if(souiFac.CreateResProvider(RES_FILE, (IObjRef**)&m_pResProvider))
 			m_theApp->AddResProvider(m_pResProvider, NULL);
 	}
 	SASSERT(m_pResProvider);

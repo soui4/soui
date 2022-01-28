@@ -170,7 +170,7 @@ class SOUI_EXP SValueAnimator
      * animation will start from the beginning on every new cycle. REVERSE means the animation
      * will reverse directions on each iteration.
      */
-    IAnimation::RepeatMode mRepeatMode;
+    RepeatMode mRepeatMode;
 
     /**
      * The time interpolator to be used. The elapsed fraction of the animation will be passed
@@ -340,14 +340,14 @@ class SOUI_EXP SValueAnimator
      *
      * @param value {@link #RESTART} or {@link #REVERSE}
      */
-    STDMETHOD_(void, setRepeatMode)(THIS_ IAnimation::RepeatMode value) OVERRIDE;
+    STDMETHOD_(void, setRepeatMode)(THIS_ RepeatMode value) OVERRIDE;
 
     /**
      * Defines what this animation should do when it reaches the end.
      *
      * @return either one of {@link #REVERSE} or {@link #RESTART}
      */
-    STDMETHOD_(IAnimation::RepeatMode, getRepeatMode)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(RepeatMode, getRepeatMode)(THIS) SCONST OVERRIDE;
 
     /**
      * Adds a listener to the set of listeners that are sent update events through the life of
@@ -417,10 +417,10 @@ class SOUI_EXP SValueAnimator
 
     void end();
 
-    STDMETHOD_(bool, isRunning)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, isRunning)(THIS) SCONST OVERRIDE;
     ;
 
-    STDMETHOD_(bool, isStarted)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, isStarted)(THIS) SCONST OVERRIDE;
     ;
 
     /**
@@ -595,9 +595,9 @@ class TValueAnimator : public TObjRefImpl<SObjectImpl<SValueAnimator>> {
     ATTR_INT(L"id", mID, FALSE)
     ATTR_INT(L"duration", mDuration, FALSE)
     ATTR_INT(L"repeatCount", mRepeatCount, FALSE)
-    ATTR_ENUM_BEGIN(L"repeatMode", IAnimation::RepeatMode, FALSE)
-    ATTR_ENUM_VALUE(L"reverse", IAnimation::REVERSE)
-    ATTR_ENUM_VALUE(L"restart", IAnimation::RESTART)
+    ATTR_ENUM_BEGIN(L"repeatMode", RepeatMode, FALSE)
+    ATTR_ENUM_VALUE(L"reverse", REVERSE)
+    ATTR_ENUM_VALUE(L"restart", RESTART)
     ATTR_ENUM_END(mRepeatMode)
     ATTR_INTERPOLATOR(L"interpolator", mInterpolator, FALSE)
     ATTR_CHAIN_PTR(mInterpolator, 0)

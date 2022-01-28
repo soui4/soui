@@ -7,16 +7,16 @@ SOUI窗口布局接口
 
 SNSBEGIN
 
-interface IWindow;
-class SLayoutSize;
+typedef struct IWindow IWindow;
+//class SLayoutSize;
 
-enum ORIENTATION
+typedef enum ORIENTATION
 {
     Horz,
     Vert,
     Any,
     Both,
-};
+}ORIENTATION;
 
 enum
 {
@@ -60,7 +60,7 @@ DECLARE_INTERFACE_(ILayoutParam, IObject)
      * @return   LPCWSTR -- 类型名
      * Describe  这是一个虚函数，注意与GetClassName的区别。
      */
-    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS_) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS) SCONST PURE;
 
     /**
      * GetObjectType

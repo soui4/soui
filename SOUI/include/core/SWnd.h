@@ -593,7 +593,7 @@ class SOUI_EXP SWindow
      */
     STDMETHOD_(BOOL, FireCtxMenu)(THIS_ POINT pt) OVERRIDE;
 
-    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT *pt, bool bIncludeMsgTransparent = FALSE) OVERRIDE;
+    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT *pt, BOOL bIncludeMsgTransparent = FALSE) OVERRIDE;
 
     STDMETHOD_(BOOL, SubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) OVERRIDE;
 
@@ -950,7 +950,7 @@ class SOUI_EXP SWindow
 
     virtual SStringW tr(const SStringW &strSrc) const;
 
-    virtual SWND SwndFromPoint(CPoint &pt, bool bIncludeMsgTransparent = false);
+    virtual SWND SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent = false);
 
     virtual BOOL FireEvent(SEvtArgs &evt)
     {

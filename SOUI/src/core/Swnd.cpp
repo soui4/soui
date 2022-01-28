@@ -196,13 +196,15 @@ BOOL SWindow::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
     tipInfo.dwCookie = 0;
     tipInfo.rcTarget = GetWindowRect();
 
+	SStringT strTip;
     EventSwndUpdateTooltip evt(this);
     evt.bUpdated = FALSE;
+	evt.strToolTip = &strTip;
     FireEvent(&evt);
 
     if (evt.bUpdated)
     {
-        tipInfo.strTip = evt.strToolTip;
+        tipInfo.strTip = strTip;
         return !tipInfo.strTip.IsEmpty();
     }
     else
@@ -962,7 +964,7 @@ BOOL SWindow::CreateChildrenFromXml(LPCWSTR pszXml)
     return CreateChildren(xmlDoc.root());
 }
 
-SWND SWindow::SwndFromPoint(POINT *pt, bool bIncludeMsgTransparent)
+SWND SWindow::SwndFromPoint(POINT *pt, BOOL bIncludeMsgTransparent)
 {
     if (!pt)
         return 0;
@@ -973,7 +975,7 @@ SWND SWindow::SwndFromPoint(POINT *pt, bool bIncludeMsgTransparent)
 }
 
 // Hittest children
-SWND SWindow::SwndFromPoint(CPoint &pt, bool bIncludeMsgTransparent)
+SWND SWindow::SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent)
 {
     CPoint pt2(pt);
     TransformPoint(pt2);
@@ -2408,7 +2410,7 @@ void SWindow::SetAnimation(IAnimation *animation)
     m_animation = animation;
     if (m_animation)
     {
-        if (m_animation->getStartTime() == IAnimation::START_ON_FIRST_FRAME)
+        if (m_animation->getStartTime() == START_ON_FIRST_FRAME)
         {
             m_animation->startNow();
             OnAnimationStart(m_animation);
@@ -2439,7 +2441,7 @@ IAnimation *SWindow::GetAnimation()
 void SWindow::StartAnimation(IAnimation *animation)
 {
     SASSERT(animation);
-    animation->setStartTime(IAnimation::START_ON_FIRST_FRAME);
+    animation->setStartTime(START_ON_FIRST_FRAME);
     SetAnimation(animation);
 }
 
@@ -3524,13 +3526,13 @@ void SWindow::SAnimationHandler::OnAnimationStart()
 {
     IAnimation *pAni = m_pOwner->GetAnimation();
     SASSERT(pAni);
-    if (pAni->getZAdjustment() != IAnimation::ZORDER_NORMAL)
+    if (pAni->getZAdjustment() != ZORDER_NORMAL)
     {
         m_pPrevSiblingBackup = m_pOwner->GetWindow(GSW_PREVSIBLING);
         if (m_pPrevSiblingBackup == NULL)
             m_pPrevSiblingBackup = ICWND_FIRST;
 
-        if (pAni->getZAdjustment() == IAnimation::ZORDER_TOP)
+        if (pAni->getZAdjustment() == ZORDER_TOP)
             m_pOwner->AdjustZOrder(ICWND_LAST);
         else
             m_pOwner->AdjustZOrder(ICWND_FIRST);
@@ -3587,7 +3589,7 @@ void SWindow::SAnimationHandler::OnNextFrame()
     {
         m_pOwner->OnAnimationInvalidate(pAni, true);
         pAni->AddRef();
-        bool bMore = pAni->getTransformation(STime::GetCurrentTimeMs(), &m_transform);
+        BOOL bMore = pAni->getTransformation(STime::GetCurrentTimeMs(), &m_transform);
         m_pOwner->OnAnimationInvalidate(pAni, false);
         if (!bMore)
         { // animation stopped.

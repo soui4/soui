@@ -60,7 +60,7 @@ class SOUI_EXP SItemPanel
   public: // SwndContainerImpl
     STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt);
 
-    STDMETHOD_(CRect, GetContainerRect)() const;
+    STDMETHOD_(RECT, GetContainerRect)() const;
 
     STDMETHOD_(IRenderTarget *, OnGetRenderTarget)(LPCRECT rc, GrtFlag gdcFlags);
 

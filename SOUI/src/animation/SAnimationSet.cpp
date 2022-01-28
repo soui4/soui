@@ -67,8 +67,8 @@ void SAnimationSet::initialize(int width, int height, int parentWidth, int paren
     }
 
     long duration = mDuration;
-    bool fillAfter = mFillAfter;
-    bool fillBefore = mFillBefore;
+    BOOL fillAfter = mFillAfter;
+    BOOL fillBefore = mFillBefore;
     RepeatMode repeatMode = mRepeatMode;
     IInterpolator *interpolator = mInterpolator;
     long startOffset = mStartOffset;
@@ -123,7 +123,7 @@ void SAnimationSet::scaleCurrentDuration(float scale)
     }
 }
 
-bool SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
+BOOL SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
 {
     if (mStartTime == -1)
     {
@@ -152,15 +152,15 @@ bool SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
         }
     }
 
-    bool more = false;
-    bool ended = true;
+    BOOL more = false;
+    BOOL ended = true;
 
     for (int i = count - 1; i >= 0; --i)
     {
         IAnimation *a = mAnimations[i];
 
         STransformation temp;
-        more = a->getTransformation(currentTime, &temp, getScaleFactor()) || more;
+        more = a->getTransformation2(currentTime, &temp, getScaleFactor()) || more;
         t->compose(&temp);
 
         ended = a->hasEnded() && ended;
@@ -270,13 +270,13 @@ bool SAnimationSet::hasAlpha()
     return mHasAlpha;
 }
 
-void SAnimationSet::setFillBefore(bool fillBefore)
+void SAnimationSet::setFillBefore(BOOL fillBefore)
 {
     mFlags |= PROPERTY_FILL_BEFORE_MASK;
     SAnimation::setFillBefore(fillBefore);
 }
 
-void SAnimationSet::setFillAfter(bool fillAfter)
+void SAnimationSet::setFillAfter(BOOL fillAfter)
 {
     mFlags |= PROPERTY_FILL_AFTER_MASK;
     SAnimation::setFillAfter(fillAfter);

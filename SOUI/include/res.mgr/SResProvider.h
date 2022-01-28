@@ -80,6 +80,4 @@ class SResProviderFiles : public TObjRefImpl<IResProvider> {
     SMap<SResID, SStringT> m_mapFiles;
 };
 
-BOOL SOUI_EXP CreateResProvider(BUILTIN_RESTYPE resType, IObjRef **pObj);
-
 SNSEND

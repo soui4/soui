@@ -2,6 +2,7 @@
 //
 
 #include "stdafx.h"
+#include <SouiFactory.h>
 #include <helper/SMenuWndHook.h>
 #include <helper/SAutoBuf.h>
 #include "../controls.extend/SFadeFrame.h"
@@ -149,6 +150,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
     int nRet = 0; 
 
+	SouiFactory souiFac;
     //使用imgdecoder-png图片解码模块演示apng动画
     SComMgr2 *pComMgr = new SComMgr2(_T("imgdecoder-png"));
     
@@ -158,7 +160,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
 		SAutoRefPtr<ITaskLoop> pTaskLoop;
 		pComMgr->CreateTaskLoop((IObjRef**)&pTaskLoop);
-		pTaskLoop->start("test",ITaskLoop::High);
+		pTaskLoop->start("test",High);
 
 		CAsyncTaskObj obj;
 		STaskHelper::post(pTaskLoop,&obj,&CAsyncTaskObj::task1,100,false);
@@ -293,7 +295,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
         if (hSysResource)
         {
             SAutoRefPtr<IResProvider> sysResProvider;
-            CreateResProvider(RES_PE, (IObjRef**)&sysResProvider);
+            souiFac.CreateResProvider(RES_PE, (IObjRef**)&sysResProvider);
             sysResProvider->Init((WPARAM)hSysResource, 0);
             theApp->LoadSystemNamedResource(sysResProvider);
 
@@ -305,10 +307,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
         //定义一人个资源提供对象,SOUI系统中实现了3种资源加载方式，分别是从文件加载，从EXE的资源加载及从ZIP压缩包加载
         SAutoRefPtr<IResProvider>   pResProvider;
 #if (RES_TYPE == 0)//从文件加载
-        CreateResProvider(RES_FILE,(IObjRef**)&pResProvider);
+        souiFac.CreateResProvider(RES_FILE,(IObjRef**)&pResProvider);
         if(!pResProvider->Init((LPARAM)_T("uires"),0))
         {
-            CreateResProvider(RES_PE,(IObjRef**)&pResProvider);
+            souiFac.CreateResProvider(RES_PE,(IObjRef**)&pResProvider);
             if(!pResProvider->Init((WPARAM)hInstance,0))
             {
                 SASSERT(0);

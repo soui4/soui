@@ -30,8 +30,8 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
     float mFromY;
     float mToY;
 
-    ValueType mPivotXType;
-    ValueType mPivotYType;
+    AniValueType mPivotXType;
+    AniValueType mPivotYType;
     float mPivotXValue;
     float mPivotYValue;
 
@@ -102,9 +102,9 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
               float toX,
               float fromY,
               float toY,
-              ValueType pivotXType,
+              AniValueType pivotXType,
               float pivotXValue,
-              ValueType pivotYType,
+              AniValueType pivotYType,
               float pivotYValue);
 
     /**

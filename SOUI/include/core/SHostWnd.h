@@ -707,7 +707,7 @@ class SOUI_EXP SHostWnd
   protected: // IContainer
     STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt);
 
-    STDMETHOD_(CRect, GetContainerRect)() const;
+    STDMETHOD_(RECT, GetContainerRect)() const;
 
     STDMETHOD_(HWND, GetHostHwnd)();
 

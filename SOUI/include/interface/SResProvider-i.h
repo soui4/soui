@@ -17,16 +17,16 @@
 
 #include <interface/obj-ref-i.h>
 #include <interface/SRender-i.h>
-#include <string/tstring.h>
 
-SNSBEGIN
 #define UIRES_INDEX _T("uires.idx") //文件夹资源的文件映射表索引表文件名
 
-enum BUILTIN_RESTYPE
+SNSBEGIN
+
+typedef enum BUILTIN_RESTYPE
 {
     RES_PE = 0,
     RES_FILE,
-};
+}BUILTIN_RESTYPE;
 
 typedef BOOL(CALLBACK *EnumResCallback)(LPCTSTR pszType, LPCTSTR pszName, LPARAM lp);
 

@@ -4,7 +4,7 @@
 
 SNSBEGIN
 
-interface IWindow;
+typedef struct IWindow IWindow;
 
 #undef INTERFACE
 #define INTERFACE IAttrStorage
@@ -26,7 +26,7 @@ DECLARE_INTERFACE_(IAttrStorage, IObjRef)
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     STDMETHOD_(void, OnSetAttribute)
-    (THIS_ const IStringW *strName, const IStringW *strValue, bool bHandled) PURE;
+    (THIS_ const IStringW *strName, const IStringW *strValue, BOOL bHandled) PURE;
     STDMETHOD_(BOOL, OnGetAttribute)(THIS_ const IStringW *strName, IStringW *strValue) SCONST PURE;
 };
 

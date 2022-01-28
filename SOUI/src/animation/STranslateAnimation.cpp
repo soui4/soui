@@ -27,13 +27,13 @@ void STranslateAnimation::applyTransformation(float interpolatedTime, ITransform
     t->setTransformationType(TYPE_MATRIX);
 }
 
-void STranslateAnimation::init(ValueType fromXType,
+void STranslateAnimation::init(AniValueType fromXType,
                                float fromXValue,
-                               ValueType toXType,
+                               AniValueType toXType,
                                float toXValue,
-                               ValueType fromYType,
+                               AniValueType fromYType,
                                float fromYValue,
-                               ValueType toYType,
+                               AniValueType toYType,
                                float toYValue)
 {
     mFromXValue = fromXValue;

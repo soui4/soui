@@ -9,10 +9,11 @@
 SNSBEGIN
 
 //定义3种系统资源类型
-const TCHAR KTypeBitmap[] = _T("BITMAP");
-const TCHAR KTypeCursor[] = _T("CURSOR");
-const TCHAR KTypeIcon[] = _T("ICON");
-const TCHAR KTypeHtml[] = _T("HTML");
+static const TCHAR KTypeBitmap[] = _T("BITMAP");
+static const TCHAR KTypeCursor[] = _T("CURSOR");
+static const TCHAR KTypeIcon[] = _T("ICON");
+static const TCHAR KTypeHtml[] = _T("HTML");
+
 
 //////////////////////////////////////////////////////////////////////////
 IBitmap *SResLoadFromMemory::LoadImage(LPVOID pBuf, size_t size)
@@ -430,21 +431,5 @@ void SResProviderFiles::EnumResource(EnumResCallback funEnumCB, LPARAM lp)
     }
 }
 
-BOOL CreateResProvider(BUILTIN_RESTYPE resType, IObjRef **pObj)
-{
-    *pObj = NULL;
-    switch (resType)
-    {
-    case RES_PE:
-        *pObj = new SResProviderPE;
-        break;
-    case RES_FILE:
-        *pObj = new SResProviderFiles;
-        break;
-    default:
-        break;
-    }
-    return *pObj != NULL;
-}
 
 SNSEND

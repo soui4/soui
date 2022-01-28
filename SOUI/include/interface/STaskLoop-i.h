@@ -13,16 +13,17 @@ DECLARE_INTERFACE_(IRunnable, IObjRef)
     STDMETHOD_(const char *, getClassInfo)(THIS) SCONST PURE;
 };
 
+typedef enum Priority
+{
+	High = 1,
+	Normal = 0,
+	Low = -1,
+}Priority;
+
 #undef INTERFACE
 #define INTERFACE ITaskLoop
 DECLARE_INTERFACE_(ITaskLoop, IObjRef)
 {
-    enum Priority
-    {
-        High = 1,
-        Normal = 0,
-        Low = -1,
-    };
     //!ÃÌº”“˝”√
     /*!
      */
@@ -38,7 +39,7 @@ DECLARE_INTERFACE_(ITaskLoop, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    STDMETHOD_(bool, getName)(THIS_ char *pszBuf, int nBufLen) PURE;
+    STDMETHOD_(BOOL, getName)(THIS_ char *pszBuf, int nBufLen) PURE;
 
     /**
      * Start a thread to run.
@@ -59,7 +60,7 @@ DECLARE_INTERFACE_(ITaskLoop, IObjRef)
      * @return the task id, can be used by cancelTask.
      */
     STDMETHOD_(long, postTask)
-    (THIS_ const IRunnable *runnable, bool waitUntilDone, int priority) PURE;
+    (THIS_ const IRunnable *runnable, BOOL waitUntilDone, int priority) PURE;
 
     /**
      * Remove tasks for a specific object from task loop pending task list
@@ -72,7 +73,7 @@ DECLARE_INTERFACE_(ITaskLoop, IObjRef)
      * @param taskList the task ID list to be canceled
      * @return the removed task list.
      */
-    STDMETHOD_(bool, cancelTask)(THIS_ long taskId) PURE;
+    STDMETHOD_(BOOL, cancelTask)(THIS_ long taskId) PURE;
 
     /**
      * get the total task number in the task loop queue.
@@ -84,7 +85,7 @@ DECLARE_INTERFACE_(ITaskLoop, IObjRef)
      * get the run loop status.
      * @return the running status
      */
-    STDMETHOD_(bool, isRunning)(THIS) PURE;
+    STDMETHOD_(BOOL, isRunning)(THIS) PURE;
 
     /**
      * get the running task info.
@@ -92,7 +93,7 @@ DECLARE_INTERFACE_(ITaskLoop, IObjRef)
      * @param bufLen, buffer length
      * @return false - no task is running; true - succeed.
      */
-    STDMETHOD_(bool, getRunningTaskInfo)(THIS_ char *buf, int bufLen) PURE;
+    STDMETHOD_(BOOL, getRunningTaskInfo)(THIS_ char *buf, int bufLen) PURE;
 };
 
 SNSEND

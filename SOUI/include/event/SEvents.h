@@ -14,13 +14,16 @@
 #pragma once
 
 #include <core/sobjType.h>
+#include <interface/SEvtArgs-i.h>
+#include <interface/sstring-i.h>
+#ifdef __cplusplus
 #include <sobject/Sobject.hpp>
 #include <helper/obj-ref-impl.hpp>
-#include <interface/SEvtArgs-i.h>
+#endif
 
 SNSBEGIN
 
-interface IWindow;
+typedef struct IWindow IWindow;
 typedef enum _SOUI_EVENTS
 {
     EVT_INIT = 8000,
@@ -221,9 +224,9 @@ public:
 #define DEF_EVT(evt, id, name, x) DEF_EVENT(evt, id, name, x, SOUI_EXP)
 #define DEF_EVT_EXT(evt, id, x)   DEF_EVENT(evt, id, on_##evt, x, )
 
-DEF_EVT(EventInit, EVT_INIT, on_init, {});
+DEF_EVT(EventInit, EVT_INIT, on_init, {int fake;});
 
-DEF_EVT(EventExit, EVT_EXIT, on_exit, {});
+DEF_EVT(EventExit, EVT_EXIT, on_exit, {int fake;});
 
 DEF_EVT(EventTimer, EVT_TIMER, on_timer, { UINT uID; });
 
@@ -236,12 +239,12 @@ DEF_EVT(EventScroll, EVT_SCROLL, on_scroll, {
 DEF_EVT(EventSpinValue2String, EVT_SPIN_VALUE2STRING, on_spin_valuetostring, {
     BOOL bInit;
     int nValue;
-    SStringT strValue;
+    IStringT *strValue;
 });
 
-DEF_EVT(EventSwndCreate, EVT_CREATE, on_create, {});
-DEF_EVT(EventSwndInitFinish, EVT_INIT_FINISH, on_init_finish, {});
-DEF_EVT(EventSwndDestroy, EVT_DESTROY, on_destroy, {});
+DEF_EVT(EventSwndCreate, EVT_CREATE, on_create, {int fake;});
+DEF_EVT(EventSwndInitFinish, EVT_INIT_FINISH, on_init_finish, {int fake;});
+DEF_EVT(EventSwndDestroy, EVT_DESTROY, on_destroy, {int fake;});
 
 DEF_EVT(EventSwndSize, EVT_SIZE, on_size, { SIZE szWnd; });
 
@@ -250,25 +253,27 @@ DEF_EVT(EventSwndStateChanged, EVT_STATECHANGED, on_state_changed, {
     DWORD dwNewState;
 });
 
-inline bool EventSwndStateChanged_CheckState(EventSwndStateChanged *pEvt, DWORD dwState)
+#ifdef __cplusplus
+inline BOOL EventSwndStateChanged_CheckState(EventSwndStateChanged *pEvt, DWORD dwState)
 {
     return (pEvt->dwOldState & dwState) != (pEvt->dwNewState & dwState);
 }
+#endif
 
-DEF_EVT(EventSwndVisibleChanged, EVT_VISIBLECHANGED, on_visible_changed, {})
+DEF_EVT(EventSwndVisibleChanged, EVT_VISIBLECHANGED, on_visible_changed, {int fake;})
 
 DEF_EVT(EventKeyDown, EVT_KEYDOWN, on_key_down, {
     UINT nChar;
     UINT nFlags;
-    bool bCancel;
+    BOOL bCancel;
 });
 
-DEF_EVT(EventSwndMouseLeave, EVT_MOUSE_LEAVE, on_mouse_leave, {});
+DEF_EVT(EventSwndMouseLeave, EVT_MOUSE_LEAVE, on_mouse_leave, {int fake;});
 
-DEF_EVT(EventSwndMouseHover, EVT_MOUSE_HOVER, on_mouse_hover, {});
+DEF_EVT(EventSwndMouseHover, EVT_MOUSE_HOVER, on_mouse_hover, {int fake;});
 
 DEF_EVT(EventSwndUpdateTooltip, EVT_UPDATE_TOOLTIP, on_update_tooltip, {
-    SStringT strToolTip;
+    IStringT* strToolTip;
     BOOL bUpdated;
 });
 
@@ -297,13 +302,13 @@ DEF_EVT(EventItemPanelHover, EVT_ITEMPANEL_HOVER, on_itempanel_hover, {
 });
 
 //注：在EventItemPanelLeave中从IItemPanel中通过GetItemIndex获取表项索引时需要检查索引有效性。
-DEF_EVT(EventItemPanelLeave, EVT_ITEMPANEL_LEAVE, on_itempanel_leave, {});
+DEF_EVT(EventItemPanelLeave, EVT_ITEMPANEL_LEAVE, on_itempanel_leave, {int fake;});
 
 DEF_EVT(EventLButtonDown, EVT_LBUTTONDOWN, on_mouse_lbutton_down, { POINT pt; });
 
 DEF_EVT(EventLButtonUp, EVT_LBUTTONUP, on_mouse_lbutton_up, { POINT pt; });
 
-DEF_EVT(EventCmd, EVT_CMD, on_command, {});
+DEF_EVT(EventCmd, EVT_CMD, on_command, {int fake;});
 
 DEF_EVT(EventCtxMenu, EVT_CTXMENU, on_conext_menu, {
     POINT pt;
@@ -412,15 +417,14 @@ DEF_EVT(EventHeaderItemSwap, EVT_HEADER_ITEMSWAP, on_header_item_swap, {
     int iNewIndex;
 });
 
-DEF_EVT(EventHeaderRelayout, EVT_HEADER_RELAYOUT, on_header_relayout, {});
+DEF_EVT(EventHeaderRelayout, EVT_HEADER_RELAYOUT, on_header_relayout, {int fake;});
 
 DEF_EVT(EventCBSelChange, EVT_CB_SELCHANGE, on_combobox_sel_change, { int nCurSel; });
 
-class SDropDownWnd;
-DEF_EVT(EventCBDropdown, EVT_CB_DROPDOWN, on_combobox_dropdown, { SDropDownWnd *pDropDown; });
+DEF_EVT(EventCBDropdown, EVT_CB_DROPDOWN, on_combobox_dropdown, { void *pDropDown; });
 
 DEF_EVT(EventCBBeforeCloseUp, EVT_CB_BEFORE_CLOSEUP, on_combobox_before_closeup, {
-    bool bCloseBlock;
+    BOOL bCloseBlock;
 });
 
 DEF_EVT(EventLCSelChanging, EVT_LC_SELCHANGING, on_listctrl_sel_changing, {
@@ -446,7 +450,7 @@ DEF_EVT(EventCalendarSelDay, EVT_CALENDAR_SELDAY, on_calendar_sel_day, {
     WORD wNewDay;
 });
 
-DEF_EVT(EventCalendarSetDate, EVT_CALENDAR_SETDATE, on_calendar_set_date, {});
+DEF_EVT(EventCalendarSetDate, EVT_CALENDAR_SETDATE, on_calendar_set_date, {int fake;});
 
 DEF_EVT(EventCalendarExChanged, EVT_CALENDAREX_CHANGED, on_calendarex_changed, {
     WORD iNewDay;
@@ -488,18 +492,17 @@ DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, {
 	RECT rcPane; 
 });
 
-DEF_EVT(EventAnimateStart, EVT_ANI_START, on_animate_start, {});
+DEF_EVT(EventAnimateStart, EVT_ANI_START, on_animate_start, {int fake;});
 
-DEF_EVT(EventAnimateStop, EVT_ANI_STOP, EVT_ANI_STOP, {});
+DEF_EVT(EventAnimateStop, EVT_ANI_STOP, EVT_ANI_STOP, {int fake;});
 
-class SMenu;
 DEF_EVT(EventSelectMenu, EVT_SELECTMENU, on_select_menu, {
     UINT m_id;
-    SMenu *m_pMenu;
+    void *m_pMenu;
 });
 DEF_EVT(EventPopMenu, EVT_POPMENU, on_pop_menu, {
     UINT m_index;
-    SMenu *m_pMenu;
+    void *m_pMenu;
 });
 
 DEF_EVT(EventSetHotKey, EVT_HOT_KEY_SET, on_hot_key_set_event, {

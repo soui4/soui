@@ -64,7 +64,7 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
      */
     STDMETHOD_(void, GetName)(THIS_ wchar_t szBuf[TR_MAX_NAME_LEN]) PURE;
 
-    STDMETHOD_(bool, NameEqual)(THIS_ LPCWSTR pszName) PURE;
+    STDMETHOD_(BOOL, NameEqual)(THIS_ LPCWSTR pszName) PURE;
     /**
      * guid
      * @brief    获取翻译资源的ID

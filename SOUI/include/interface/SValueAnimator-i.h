@@ -4,7 +4,7 @@
 
 SNSBEGIN
 
-interface IValueAnimator;
+typedef struct IValueAnimator IValueAnimator;
 
 #undef INTERFACE
 #define INTERFACE IAnimatorUpdateListener
@@ -74,7 +74,7 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      * @return   LPCWSTR -- 类型名
      * Describe  这是一个虚函数，注意与GetClassName的区别。
      */
-    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS_) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS) SCONST PURE;
 
     /**
      * GetObjectType
@@ -279,14 +279,14 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      *
      * @param value {@link #RESTART} or {@link #REVERSE}
      */
-    STDMETHOD_(void, setRepeatMode)(THIS_ IAnimation::RepeatMode value) PURE;
+    STDMETHOD_(void, setRepeatMode)(THIS_ RepeatMode value) PURE;
 
     /**
      * Defines what this animation should do when it reaches the end.
      *
      * @return either one of {@link #REVERSE} or {@link #RESTART}
      */
-    STDMETHOD_(IAnimation::RepeatMode, getRepeatMode)(THIS) SCONST PURE;
+    STDMETHOD_(RepeatMode, getRepeatMode)(THIS) SCONST PURE;
 
     /**
      * Adds a listener to the set of listeners that are sent update events through the life of
@@ -334,9 +334,9 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
 
     STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr * pContainer) PURE;
 
-    STDMETHOD_(bool, isRunning)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isRunning)(THIS) SCONST PURE;
 
-    STDMETHOD_(bool, isStarted)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isStarted)(THIS) SCONST PURE;
 
     /**
      * Plays the IValueAnimator in reverse. If the animation is already running,

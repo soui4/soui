@@ -946,7 +946,7 @@ BOOL SHostWnd::OnFireEvent(IEvtArgs *evt)
     return _HandleEvent(evt);
 }
 
-CRect SHostWnd::GetContainerRect() const
+RECT SHostWnd::GetContainerRect() const
 {
     return GetRoot()->GetWindowRect();
 }
@@ -1920,7 +1920,7 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
         m_pHostWnd->OnHostAnimationStarted(pAni);
     }
     STransformation xform;
-    bool bMore = m_pHostWnd->m_hostAnimation->getTransformation(STime::GetCurrentTimeMs(), &xform);
+    BOOL bMore = m_pHostWnd->m_hostAnimation->getTransformation(STime::GetCurrentTimeMs(), &xform);
     SMatrix mtx = xform.getMatrix();
     mtx.preTranslate(-m_rcInit.left, -m_rcInit.top);
     mtx.postTranslate(m_rcInit.left, m_rcInit.top);

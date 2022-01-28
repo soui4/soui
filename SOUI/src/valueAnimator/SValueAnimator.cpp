@@ -40,7 +40,7 @@ SValueAnimator::SValueAnimator()
 
     mRepeatCount = 0;
 
-    mRepeatMode = IAnimation::RESTART;
+    mRepeatMode = RESTART;
     mInterpolator.Attach(new SLinearInterpolator());
 }
 
@@ -152,7 +152,7 @@ bool SValueAnimator::isInitialized()
 void SValueAnimator::skipToEndValue(bool inReverse)
 {
     float endFraction = inReverse ? 0.f : 1.f;
-    if (mRepeatCount % 2 == 1 && mRepeatMode == IAnimation::REVERSE)
+    if (mRepeatCount % 2 == 1 && mRepeatMode == REVERSE)
     {
         // This would end on fraction = 0
         endFraction = 0.f;
@@ -330,12 +330,12 @@ void SValueAnimator::reverse()
     }
 }
 
-bool SValueAnimator::isStarted() const
+BOOL SValueAnimator::isStarted() const
 {
     return mStarted;
 }
 
-bool SValueAnimator::isRunning() const
+BOOL SValueAnimator::isRunning() const
 {
     return mRunning;
 }
@@ -461,12 +461,12 @@ void SValueAnimator::addUpdateListener(IAnimatorUpdateListener *listener)
     mUpdateListeners.Add(listener);
 }
 
-IAnimation::RepeatMode SValueAnimator::getRepeatMode() const
+RepeatMode SValueAnimator::getRepeatMode() const
 {
     return mRepeatMode;
 }
 
-void SValueAnimator::setRepeatMode(IAnimation::RepeatMode value)
+void SValueAnimator::setRepeatMode(RepeatMode value)
 {
     mRepeatMode = value;
 }
@@ -511,7 +511,7 @@ long SValueAnimator::getCurrentPlayTime()
 
 bool SValueAnimator::shouldPlayBackward(int iteration, bool inReverse)
 {
-    if (iteration > 0 && mRepeatMode == IAnimation::REVERSE
+    if (iteration > 0 && mRepeatMode == REVERSE
         && (iteration < (mRepeatCount + 1) || mRepeatCount == -1))
     {
         // if we were seeked to some other iteration in a reversing animator,
