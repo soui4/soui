@@ -72,5 +72,8 @@ SNSBEGIN
     {
         SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **pImgDecoderFactory);
     }
-}//end of namespace SOUI
 
+
+	SOUI_COM_C BOOL Decoder_Wic_SCreateInstance(IObjRef **pImgDecoderFactory);
+
+SNSEND

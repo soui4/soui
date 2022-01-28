@@ -162,5 +162,9 @@ namespace SOUI
         return TRUE;
     }
 
+	SOUI_COM_C BOOL Decoder_Stb_SCreateInstance(IObjRef **pImgDecoderFactory)
+	{
+		return IMGDECODOR_STB::SCreateInstance(pImgDecoderFactory);
+	}
 }//end of namespace SOUI
 

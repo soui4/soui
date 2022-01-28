@@ -2120,15 +2120,6 @@ namespace SOUI
 		return &m_lf;
 	}
 
-	namespace RENDER_SKIA
-	{
-		BOOL SCreateInstance( IObjRef ** ppRenderFactory )
-		{
-			*ppRenderFactory = new SRenderFactory_Skia;
-			return TRUE;
-		}
-	}
-
 
 	//////////////////////////////////////////////////////////////////////////
 	static int s_cPath =0;
@@ -2706,6 +2697,20 @@ namespace SOUI
 	void* SMaskFilter_Skia::GetPtr()
 	{
 		return m_maskFilter;
+	}
+
+	namespace RENDER_SKIA
+	{
+		BOOL SCreateInstance( IObjRef ** ppRenderFactory )
+		{
+			*ppRenderFactory = new SRenderFactory_Skia;
+			return TRUE;
+		}
+	}
+
+	SOUI_COM_C BOOL Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory)
+	{
+		return RENDER_SKIA::SCreateInstance(ppRenderFactory);
 	}
 
 }//end of namespace SOUI

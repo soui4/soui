@@ -1,11 +1,11 @@
 ﻿#pragma once
+#include <interface/SRender-i.h>
 
 #include <helper/SColor.h>
 #include <helper/obj-ref-impl.hpp>
 #include <sobject/Sobject.hpp>
 #include <string/tstring.h>
 #include <string/strcpcvt.h>
-#include <interface/SRender-i.h>
 #include <souicoll.h>
 
 SNSBEGIN
@@ -423,5 +423,5 @@ namespace RENDER_GDI
 	SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppRenderFactory);
 }
 
+	SOUI_COM_C BOOL Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory);
 SNSEND
-

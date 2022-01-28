@@ -36,22 +36,7 @@
 
 #include "log4z.h"
 #include <helper/obj-ref-impl.hpp>
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <errno.h>
-#include <time.h>
-#include <string.h>
-
-#include <string>
-#include <vector>
-#include <map>
-#include <list>
-#include <sstream>
-#include <iostream>
-#include <fstream>
-#include <algorithm>
-
+#include <windows.h>
 
 #if defined (WIN32) || defined(_WIN64)
 #include <io.h>
@@ -82,6 +67,8 @@
 
 
 #include <string>
+#include <iostream>
+#include <fstream>
 #include <sstream>
 #include <errno.h>
 #include <stdio.h>
@@ -97,6 +84,25 @@
 #include <deque>
 
 using namespace SOUI;
+
+//////////////////////////////////////////////////////////////////////////
+//! -----------------default logger config, can change on this.-----------
+//////////////////////////////////////////////////////////////////////////
+//! the max logger count.
+const int LOG4Z_LOGGER_MAX = 10;
+
+//! default logger output file.
+const char* const LOG4Z_DEFAULT_PATH = "./log/";
+//! default log filter level
+const int LOG4Z_DEFAULT_LEVEL = SOUI::LOG_LEVEL_DEBUG;
+//! default logger display
+const bool LOG4Z_DEFAULT_DISPLAY = true;
+//! default logger output to file
+const bool LOG4Z_DEFAULT_OUTFILE = true;
+//! default logger output file limit size, unit M byte.
+const int LOG4Z_DEFAULT_LIMITSIZE = 100;
+//! default logger show suffix (file name and line number) 
+const bool LOG4Z_DEFAULT_SHOWSUFFIX = true;
 
 
 static const char *const LOG_STRING[]=
@@ -1920,7 +1926,7 @@ void LogerManager::setOutputListener(IOutputListener *pListener){
 	m_pListener = pListener;
 }
 
-namespace SOUI{
+SNSBEGIN
 	namespace LOG4Z{
 		SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **ppLogMgr)
 		{
@@ -1928,5 +1934,10 @@ namespace SOUI{
 			return TRUE;
 		}
 	}
-}
 
+	SOUI_COM_C BOOL Log4z_SCreateInstance(IObjRef **ppLogMgr)
+	{
+		return LOG4Z::SCreateInstance(ppLogMgr);
+	}
+
+SNSEND

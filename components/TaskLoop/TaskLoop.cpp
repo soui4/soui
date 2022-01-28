@@ -259,4 +259,9 @@ namespace SOUI
 		return TRUE;
 	}
 
+	SOUI_COM_C BOOL TaskLoop_SCreateInstance(IObjRef **ppTaskLoop)
+	{
+		return TASKLOOP::SCreateInstance(ppTaskLoop);
+	}
+
 }

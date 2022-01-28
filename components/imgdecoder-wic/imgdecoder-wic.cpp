@@ -6,9 +6,7 @@
 
 #pragma  comment(lib,"windowscodecs.lib")
 
-namespace SOUI
-{
-
+SNSBEGIN
 
     //////////////////////////////////////////////////////////////////////////
     // SImgFrame_WIC
@@ -205,5 +203,9 @@ namespace SOUI
         }
     }
 
-}//end of namespace SOUI
+	SOUI_COM_C BOOL Decoder_Wic_SCreateInstance(IObjRef **pImgDecoderFactory)
+	{
+		return IMGDECODOR_WIC::SCreateInstance(pImgDecoderFactory);
+	}
 
+SNSEND

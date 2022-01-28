@@ -141,16 +141,16 @@ BOOL SResProviderZip::Init( WPARAM wParam,LPARAM lParam )
 	BOOL bResult = FALSE;
 	switch (zipParam->type) 
 	{
-	case ZIPRES_PARAM::ZIPFILE:
+	case ZIPFILE:
 		bResult = _Init(zipParam->pszZipFile, zipParam->pszPsw);
 		break;
-	case ZIPRES_PARAM::PEDATA:
+	case PEDATA:
 		bResult =_Init(zipParam->peInfo.hInst,
 			zipParam->peInfo.pszResName,
 			zipParam->peInfo.pszResType,
 			zipParam->pszPsw);
 		break;
-	case ZIPRES_PARAM::MEMORYDATA:
+	case MEMORYDATA:
 		bResult =_Init(zipParam->Memory.pByteBuffer,
 			zipParam->Memory.dwByteCounts,
 			zipParam->pszPsw);
@@ -236,6 +236,11 @@ namespace RESPROVIDER_ZIP
 		*ppObj = new SResProviderZip;
 		return TRUE;
 	}
+}
+
+SOUI_COM_C BOOL Resp_Zip_SCreateInstance(IObjRef ** ppObj)
+{
+	return RESPROVIDER_ZIP::SCreateInstance(ppObj);
 }
 
 SNSEND

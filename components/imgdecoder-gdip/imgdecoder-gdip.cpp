@@ -305,5 +305,11 @@ namespace SOUI
         }
     }
 
+SOUI_COM_C BOOL Decoder_Gdip_SCreateInstance(IObjRef **pImgDecoderFactory)
+{
+	return IMGDECODOR_GDIP::SCreateInstance(pImgDecoderFactory);
+}
+
 }//end of namespace SOUI
+
 

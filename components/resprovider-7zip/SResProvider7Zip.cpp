@@ -213,4 +213,9 @@ namespace RESPROVIDER_7ZIP
 	}
 }
 
+SOUI_COM_C BOOL Resp_7zip_SCreateInstance(IObjRef ** ppObj)
+{
+	return RESPROVIDER_7ZIP::SCreateInstance(ppObj);
+}
+
 SNSEND

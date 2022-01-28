@@ -1475,6 +1475,11 @@ namespace SOUI
         }
     }
 
+	SOUI_COM_C BOOL Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory)
+	{
+		return RENDER_GDI::SCreateInstance(ppRenderFactory);
+	}
+
 }
 
 

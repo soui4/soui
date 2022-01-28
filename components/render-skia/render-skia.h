@@ -1,5 +1,6 @@
 ﻿#pragma once
 
+#include <interface/SRender-i.h>
 
 #include <helper/SColor.h>
 #include <helper/SAttrCracker.h>
@@ -9,7 +10,6 @@
 #include <core/SkTypeface.h>
 #include <string/tstring.h>
 #include <string/strcpcvt.h>
-#include <interface/SRender-i.h>
 #include <souicoll.h>
 
 SNSBEGIN
@@ -544,4 +544,5 @@ namespace RENDER_SKIA
 {
 	SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppRenderFactory);
 }
+	SOUI_COM_C BOOL Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory);
 SNSEND

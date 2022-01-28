@@ -312,4 +312,9 @@ namespace TRANSLATOR
 	}
 }
 
+SOUI_COM_C BOOL Translator_SCreateInstance(IObjRef **ppTrans)
+{
+	return TRANSLATOR::SCreateInstance(ppTrans);
+}
+
 SNSEND

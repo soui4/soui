@@ -1,6 +1,8 @@
 ﻿#pragma once
 
 #include <interface/SResProvider-i.h>
+#include "zipresprovider-param.h"
+
 #include <helper/obj-ref-impl.hpp>
 #include <string/tstring.h>
 #include <string/strcpcvt.h>
@@ -10,7 +12,6 @@
 #include <interface/SRender-i.h>
 
 #include "ZipArchive.h"
-#include "zipresprovider-param.h"
 
 SNSBEGIN
 
@@ -48,4 +49,5 @@ namespace RESPROVIDER_ZIP
     SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppObj);
 }
 
+	SOUI_COM_C BOOL Resp_Zip_SCreateInstance(IObjRef ** ppObj);
 SNSEND

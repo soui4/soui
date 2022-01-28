@@ -163,6 +163,11 @@ namespace SOUI
 			return TRUE;
 		}
 	}
+
+	SOUI_COM_C BOOL Script_Lua_SCreateInstance(IObjRef ** ppScript)
+	{
+		return SCRIPT_LUA::SCreateInstance(ppScript);
+	}
 }
 
 //////////////////////////////////////////////////////////////////////////

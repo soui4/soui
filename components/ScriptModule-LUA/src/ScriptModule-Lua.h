@@ -9,9 +9,9 @@ extern "C"
 #include <lauxlib.h>
 };
 
-namespace SOUI
-{
-    class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
+SNSBEGIN
+
+class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
     {
     public:
         SScriptModule_Lua(void);
@@ -134,5 +134,6 @@ namespace SOUI
 	{
 		SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppScript);
 	}
-}
 
+	SOUI_COM_C BOOL Script_Lua_SCreateInstance(IObjRef ** ppScript);
+SNSEND

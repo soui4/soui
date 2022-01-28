@@ -512,7 +512,6 @@ CRichEditOleCallback::QueryAcceptData(LPDATAOBJECT lpdataobj, CLIPFORMAT FAR *lp
             void* pBuffer = GlobalLock(stg.hGlobal);  
             {  
 
-                STRACE(L"QueryAcceptData:%s",(LPWSTR)pBuffer);
                 GlobalUnlock(stg.hGlobal);  
             }  
             return S_OK;  

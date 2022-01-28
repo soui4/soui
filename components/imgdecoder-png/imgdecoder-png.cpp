@@ -261,11 +261,16 @@ namespace SOUI
     }
 
     //////////////////////////////////////////////////////////////////////////
-    BOOL IMGDECODOR_PNG::SCreateInstance( IObjRef **pImgDecoderFactory )
+    BOOL IMGDECODOR_PNG::SCreateInstance( IObjRef **ppImgDecoderFactory )
     {
-        *pImgDecoderFactory = new SImgDecoderFactory_PNG();
+        *ppImgDecoderFactory = new SImgDecoderFactory_PNG();
         return TRUE;
     }
+
+SOUI_COM_C BOOL Decoder_Png_SCreateInstance(IObjRef **ppImgDecoderFactory)
+{
+	return IMGDECODOR_PNG::SCreateInstance(ppImgDecoderFactory);
+}
 
 }//end of namespace SOUI
 

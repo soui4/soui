@@ -1,11 +1,12 @@
 ﻿#pragma once
 
-namespace SOUI
-{
+SNSBEGIN
+
 	struct IRenderFactory;
+	typedef enum _ZipType{ ZIPFILE, PEDATA, MEMORYDATA } ZipType;
 	struct ZIPRES_PARAM
 	{
-		enum { ZIPFILE, PEDATA, MEMORYDATA } type;
+		ZipType type;
 		IRenderFactory *pRenderFac;
 		union {
 			LPCTSTR pszZipFile;
@@ -21,32 +22,33 @@ namespace SOUI
 		};
 		LPCSTR          pszPsw; //ZIP密码
 		LPCTSTR			pszChildDir;
-		void ZipFile(IRenderFactory *_pRenderFac, LPCTSTR _pszFile, LPCSTR _pszPsw = NULL, LPCTSTR _pszChildDir = NULL)
-		{
-			type = ZIPFILE;
-			pszZipFile = _pszFile;
-			pszChildDir = _pszChildDir;
-			pRenderFac = _pRenderFac;
-			pszPsw = _pszPsw;
-		}
-		void ZipResource(IRenderFactory *_pRenderFac, HINSTANCE hInst, LPCTSTR pszResName, LPCTSTR pszResType = _T("zip"), LPCSTR _pszPsw = NULL, LPCTSTR _pszChildDir = NULL)
-		{
-			type = PEDATA;
-			pRenderFac = _pRenderFac;
-			pszChildDir = _pszChildDir;
-			peInfo.hInst = hInst;
-			peInfo.pszResName = pszResName;
-			peInfo.pszResType = pszResType;
-			pszPsw = _pszPsw;
-		}
-		void ZipMemory(IRenderFactory *_pRenderFac, LPBYTE  pByteBuffer, DWORD dwByteCounts, LPCSTR _pszPsw = NULL, LPCTSTR _pszChildDir = NULL)
-		{
-			type = MEMORYDATA;
-			Memory.pByteBuffer = pByteBuffer;
-			Memory.dwByteCounts = dwByteCounts;
-			pszChildDir = _pszChildDir;
-			pRenderFac = _pRenderFac;
-			pszPsw = _pszPsw;			
-		}
 	};
-}
+
+	inline void ZipFile(ZIPRES_PARAM *param,IRenderFactory *_pRenderFac, LPCTSTR _pszFile, LPCSTR _pszPsw = NULL, LPCTSTR _pszChildDir = NULL)
+	{
+		param->type = ZIPFILE;
+		param->pszZipFile = _pszFile;
+		param->pszChildDir = _pszChildDir;
+		param->pRenderFac = _pRenderFac;
+		param->pszPsw = _pszPsw;
+	}
+	inline void ZipResource(ZIPRES_PARAM *param,IRenderFactory *_pRenderFac, HINSTANCE hInst, LPCTSTR pszResName, LPCTSTR pszResType = _T("zip"), LPCSTR _pszPsw = NULL, LPCTSTR _pszChildDir = NULL)
+	{
+		param->type = PEDATA;
+		param->pRenderFac = _pRenderFac;
+		param->pszChildDir = _pszChildDir;
+		param->peInfo.hInst = hInst;
+		param->peInfo.pszResName = pszResName;
+		param->peInfo.pszResType = pszResType;
+		param->pszPsw = _pszPsw;
+	}
+	inline void ZipMemory(ZIPRES_PARAM *param,IRenderFactory *_pRenderFac, LPBYTE  pByteBuffer, DWORD dwByteCounts, LPCSTR _pszPsw = NULL, LPCTSTR _pszChildDir = NULL)
+	{
+		param->type = MEMORYDATA;
+		param->Memory.pByteBuffer = pByteBuffer;
+		param->Memory.dwByteCounts = dwByteCounts;
+		param->pszChildDir = _pszChildDir;
+		param->pRenderFac = _pRenderFac;
+		param->pszPsw = _pszPsw;			
+	}
+SNSEND
