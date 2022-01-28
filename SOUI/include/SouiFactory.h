@@ -19,7 +19,7 @@ public:
 	STDMETHOD_(HRESULT,CreateStringW)(THIS_ IStringW **ppRet,LPCWSTR pszSrc) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateXmlDoc)(THIS_ IXmlDoc **ppRet) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateResProvider)(THIS_ BUILTIN_RESTYPE resType, IObjRef **pObj) OVERRIDE;
-
+	STDMETHOD_(HRESULT, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx,IEvtSlot **ppSlot) OVERRIDE;
 };
 
 SNSEND

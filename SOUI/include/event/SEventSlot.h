@@ -21,7 +21,6 @@ enum _SLOTTYPE
 \brief
     Slot functor class that calls back via a free function pointer.
 */
-typedef BOOL (*FunCallback)(IEvtArgs *, void *Ctx);
 class FreeFunctionSlot : public TObjRefImpl<IEvtSlot> {
   public:
     //! Slot function type.

@@ -76,6 +76,12 @@ HRESULT SouiFactory::CreateResProvider(THIS_ BUILTIN_RESTYPE resType, IObjRef **
 	return *pObj != NULL?S_OK:E_INVALIDARG;
 }
 
+HRESULT SouiFactory::CreateFuncSlot(THIS_ FunCallback fun, void *ctx,IEvtSlot **ppSlot)
+{
+	*ppSlot = new FreeFunctionSlot(fun,ctx);
+	return S_OK;
+}
+
 
 SNSEND
 
