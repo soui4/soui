@@ -119,7 +119,9 @@ typedef enum _BlurFlags
     kAll_BlurFlag = 0x03
 } BlurFlags;
 
-struct IMaskFilter : public IObjRef
+#undef INTERFACE
+#define INTERFACE IMaskFilter
+DECLARE_INTERFACE_(IMaskFilter, IObjRef)
 {
     STDMETHOD_(void *, GetPtr)(THIS) PURE;
 };
@@ -1544,63 +1546,4 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(BOOL, GetAntiAlias)(THIS) SCONST PURE;
 };
 
-/*
-inline HRESULT IBitmap::Clone(IBitmap **ppClone) const
-{
-    HRESULT hr = E_UNEXPECTED;
-    BOOL bOK = GetRenderFactory()->CreateBitmap(ppClone);
-    if(bOK)
-    {
-        hr=(*ppClone)->Init(Width(),Height(),GetPixelBits());
-        if(S_OK != hr)
-        {
-            (*ppClone)->Release();
-            (*ppClone) = NULL;
-        }
-    }
-    return hr;
-}
-
-inline HRESULT IBitmap::Scale(IBitmap **ppOutput,int nScale,FilterLevel filterLevel)
-{
-    int wid = MulDiv(Width(),nScale,100);
-    int hei = MulDiv(Height(),nScale,100);
-    return Scale(ppOutput,wid,hei,filterLevel);
-}
-
-inline HRESULT IBitmap::Scale(IBitmap **pOutput,int nWid,int nHei,FilterLevel filterLevel)
-{
-    if(nWid == Width() && nHei == Height())
-    {
-        return Clone(pOutput);
-    }
-    HRESULT hr = E_UNEXPECTED;
-    BOOL bOK = GetRenderFactory()->CreateBitmap(pOutput);
-    if(bOK)
-    {
-        IRenderTarget *pRT=NULL;
-        if(GetRenderFactory()->CreateRenderTarget(&pRT,nWid,nHei))
-        {
-            RECT rcSrc = {0,0,(long)Width(),(long)Height()};
-            RECT rcDst ={0,0,nWid,nHei};
-            hr = pRT->DrawBitmapEx(&rcDst,this,&rcSrc,MAKELONG(EM_STRETCH,filterLevel));
-            if(hr == S_OK)
-            {
-                *pOutput = (IBitmap*)pRT->GetCurrentObject(OT_BITMAP);
-                (*pOutput)->AddRef();
-            }
-            pRT->Release();
-        }else
-        {
-            hr = E_OUTOFMEMORY;
-        }
-    }
-    return hr;
-}
-
-inline HRESULT IBitmap::Save(LPCWSTR pszFileName,const LPVOID pFormat)
-{
-    return GetRenderFactory()->GetImgDecoderFactory()->SaveImage(this,pszFileName,pFormat);
-}
-*/
 SNSEND

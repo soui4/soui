@@ -189,8 +189,16 @@
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath=".\demo2.cpp"
+				RelativePath=".\demo2.c"
 				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCLCompilerTool"
+						UsePrecompiledHeader="0"
+					/>
+				</FileConfiguration>
 			</File>
 			<File
 				RelativePath=".\MainDlg.cpp"
