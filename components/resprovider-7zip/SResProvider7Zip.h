@@ -39,7 +39,7 @@ protected:
 	
 	SMap<SResID,SStringT> m_mapFiles;
     SAutoRefPtr<IRenderFactory> m_renderFactory;
-	CZipArchive m_zipFile;
+	SevenZip::CZipArchive m_zipFile;
 	SStringT m_childDir;
 };
 
@@ -48,5 +48,6 @@ namespace RESPROVIDER_7ZIP
     SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppObj);
 }
 
-SOUI_COM_C BOOL Resp_7zip_SCreateInstance(IObjRef ** ppObj);
 SNSEND
+
+EXTERN_C BOOL Resp_7zip_SCreateInstance(IObjRef ** ppObj);

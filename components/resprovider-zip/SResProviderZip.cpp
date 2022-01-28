@@ -238,9 +238,10 @@ namespace RESPROVIDER_ZIP
 	}
 }
 
-SOUI_COM_C BOOL Resp_Zip_SCreateInstance(IObjRef ** ppObj)
-{
-	return RESPROVIDER_ZIP::SCreateInstance(ppObj);
-}
 
 SNSEND
+
+EXTERN_C BOOL Resp_Zip_SCreateInstance(IObjRef ** ppObj)
+{
+	return SOUI::RESPROVIDER_ZIP::SCreateInstance(ppObj);
+}

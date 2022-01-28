@@ -9,6 +9,8 @@ extern HICON CURSORICON_LoadFromFile( LPCWSTR filename,
 									 INT width, INT height,
 									 BOOL fCursor, UINT loadflags);
 
+using namespace SevenZip;
+
 SNSBEGIN
 
 SResProvider7Zip::SResProvider7Zip():m_renderFactory(NULL)
@@ -212,10 +214,11 @@ namespace RESPROVIDER_7ZIP
 		return TRUE;
 	}
 }
+SNSEND
 
-SOUI_COM_C BOOL Resp_7zip_SCreateInstance(IObjRef ** ppObj)
+
+EXTERN_C BOOL Resp_7zip_SCreateInstance(IObjRef ** ppObj)
 {
-	return RESPROVIDER_7ZIP::SCreateInstance(ppObj);
+	return SOUI::RESPROVIDER_7ZIP::SCreateInstance(ppObj);
 }
 
-SNSEND

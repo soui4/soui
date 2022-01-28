@@ -544,5 +544,6 @@ namespace RENDER_SKIA
 {
 	SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppRenderFactory);
 }
-	SOUI_COM_C BOOL Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory);
 SNSEND
+
+EXTERN_C BOOL Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory);

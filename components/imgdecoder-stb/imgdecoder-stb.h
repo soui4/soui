@@ -67,7 +67,7 @@ SNSBEGIN
         SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **pImgDecoderFactory);
     }
 
-
-	SOUI_COM_C BOOL Decoder_Stb_SCreateInstance(IObjRef **pImgDecoderFactory);
-
 SNSEND
+
+EXTERN_C BOOL Decoder_Stb_SCreateInstance(IObjRef **pImgDecoderFactory);
+

@@ -1935,9 +1935,10 @@ SNSBEGIN
 		}
 	}
 
-	SOUI_COM_C BOOL Log4z_SCreateInstance(IObjRef **ppLogMgr)
-	{
-		return LOG4Z::SCreateInstance(ppLogMgr);
-	}
-
 SNSEND
+
+EXTERN_C BOOL Log4z_SCreateInstance(IObjRef **ppLogMgr)
+{
+	return SOUI::LOG4Z::SCreateInstance(ppLogMgr);
+}
+

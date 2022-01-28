@@ -13,6 +13,7 @@
 
 
 #include "SevenZip/FileStream.h"
+namespace SevenZip{
 
 typedef struct ZIP_FIND_DATA
 {
@@ -82,4 +83,5 @@ private:
 	CFileStream m_fileStreams;
 };
 
+}//end of ns
 #endif	//	__ZIP7ARCHIVE_H__

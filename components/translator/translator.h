@@ -79,5 +79,6 @@ namespace TRANSLATOR
 	SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **ppTrans);
 }
 
-	SOUI_COM_C BOOL Translator_SCreateInstance(IObjRef **ppTrans);
 SNSEND
+
+EXTERN_C BOOL Translator_SCreateInstance(IObjRef **ppTrans);

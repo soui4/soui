@@ -1474,12 +1474,12 @@ namespace SOUI
             return TRUE;
         }
     }
-
-	SOUI_COM_C BOOL Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory)
-	{
-		return RENDER_GDI::SCreateInstance(ppRenderFactory);
-	}
-
 }
+
+EXTERN_C BOOL Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory)
+{
+	return SOUI::RENDER_GDI::SCreateInstance(ppRenderFactory);
+}
+
 
 

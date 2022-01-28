@@ -2708,10 +2708,10 @@ namespace SOUI
 		}
 	}
 
-	SOUI_COM_C BOOL Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory)
-	{
-		return RENDER_SKIA::SCreateInstance(ppRenderFactory);
-	}
-
 }//end of namespace SOUI
 
+
+EXTERN_C BOOL Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory)
+{
+	return SOUI::RENDER_SKIA::SCreateInstance(ppRenderFactory);
+}

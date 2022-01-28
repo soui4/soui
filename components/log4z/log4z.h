@@ -169,7 +169,5 @@ namespace LOG4Z
     {
         SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **ppLogMgr);
     }
-	SOUI_COM_C BOOL Log4z_SCreateInstance(IObjRef **ppLogMgr);
 SNSEND
-
-
+EXTERN_C BOOL Log4z_SCreateInstance(IObjRef **ppLogMgr);

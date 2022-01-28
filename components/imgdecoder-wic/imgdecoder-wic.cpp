@@ -203,9 +203,10 @@ SNSBEGIN
         }
     }
 
-	SOUI_COM_C BOOL Decoder_Wic_SCreateInstance(IObjRef **pImgDecoderFactory)
-	{
-		return IMGDECODOR_WIC::SCreateInstance(pImgDecoderFactory);
-	}
 
 SNSEND
+
+EXTERN_C BOOL Decoder_Wic_SCreateInstance(IObjRef **pImgDecoderFactory)
+{
+	return SOUI::IMGDECODOR_WIC::SCreateInstance(pImgDecoderFactory);
+}

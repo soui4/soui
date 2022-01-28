@@ -399,4 +399,10 @@ namespace SOUI
 	}
 }
 
+EXTERN_C BOOL Ipc_SCreateInstance(IObjRef **ppIpcFactory)
+{
+	return SOUI::IPC::SCreateInstance(ppIpcFactory);
+}
+
+
  

@@ -130,5 +130,5 @@ namespace TASKLOOP
 {
 	SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **ppTaskLoop);
 }
-	SOUI_COM_C BOOL TaskLoop_SCreateInstance(IObjRef **ppTaskLoop);
 SNSEND
+EXTERN_C BOOL TaskLoop_SCreateInstance(IObjRef **ppTaskLoop);

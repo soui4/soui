@@ -78,8 +78,6 @@ namespace IMGDECODOR_GDIP
 	SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **pImgDecoderFactory);
 }
 
-
-
-SOUI_COM_C BOOL Decoder_Gdip_SCreateInstance(IObjRef **pImgDecoderFactory);
-
 SNSEND
+
+EXTERN_C BOOL Decoder_Gdip_SCreateInstance(IObjRef **pImgDecoderFactory);

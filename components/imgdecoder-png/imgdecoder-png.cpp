@@ -267,10 +267,10 @@ namespace SOUI
         return TRUE;
     }
 
-SOUI_COM_C BOOL Decoder_Png_SCreateInstance(IObjRef **ppImgDecoderFactory)
-{
-	return IMGDECODOR_PNG::SCreateInstance(ppImgDecoderFactory);
-}
 
 }//end of namespace SOUI
 
+EXTERN_C BOOL Decoder_Png_SCreateInstance(IObjRef **ppImgDecoderFactory)
+{
+	return SOUI::IMGDECODOR_PNG::SCreateInstance(ppImgDecoderFactory);
+}

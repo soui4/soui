@@ -12,6 +12,8 @@
 #include <tchar.h>
 #include <malloc.h>
 
+namespace SevenZip{
+
 static std::wstring StdStringtoWideString(const std::string &stdstring)
 {
 	const char* str = stdstring.c_str();
@@ -280,3 +282,4 @@ static std::string WString2String(const std::wstring &wstr)
 		std::string fileName = WString2String(pszFileName);
 		return m_fileStreams.GetFileSize(fileName.c_str());
 	} 
+	}//end of ns
