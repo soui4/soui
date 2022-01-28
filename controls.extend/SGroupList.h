@@ -38,7 +38,7 @@ namespace SOUI{
 
 	class SGroupList : public SScrollView
 	{
-		SOUI_CLASS_NAME(SScrollView,L"groupList")
+		DEF_SOBJECT(SScrollView,L"groupList")
 	public:
 		SGroupList();
 		~SGroupList();

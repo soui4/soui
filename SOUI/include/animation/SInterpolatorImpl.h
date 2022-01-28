@@ -6,17 +6,17 @@
 SNSBEGIN
 
 class SOUI_EXP SInterpolatorBase : public TObjRefImpl<SObjectImpl<IInterpolator>> {
-    SOUI_CLASS_NAME_EX(TObjRefImpl<SObjectImpl<IInterpolator>>, L"interpolator_base", Interpolator)
+    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IInterpolator>>, L"interpolator_base", Interpolator)
 };
 
 class SOUI_EXP SLinearInterpolator : public SInterpolatorBase {
-    SOUI_CLASS_NAME(SInterpolatorBase, L"Linear")
+    DEF_SOBJECT(SInterpolatorBase, L"Linear")
   public:
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 };
 
 class SOUI_EXP SAccelerateInterpolator : public SInterpolatorBase {
-    SOUI_CLASS_NAME(SInterpolatorBase, L"Accelerate")
+    DEF_SOBJECT(SInterpolatorBase, L"Accelerate")
 
   private:
     float mFactor;
@@ -41,7 +41,7 @@ class SOUI_EXP SAccelerateInterpolator : public SInterpolatorBase {
 };
 
 class SOUI_EXP SDecelerateInterpolator : public SInterpolatorBase {
-    SOUI_CLASS_NAME(SInterpolatorBase, L"Decelerate")
+    DEF_SOBJECT(SInterpolatorBase, L"Decelerate")
 
   private:
     float mFactor;
@@ -64,13 +64,13 @@ class SOUI_EXP SDecelerateInterpolator : public SInterpolatorBase {
 };
 
 class SOUI_EXP SAccelerateDecelerateInterpolator : public SInterpolatorBase {
-    SOUI_CLASS_NAME(SInterpolatorBase, L"AccelerateDecelerate")
+    DEF_SOBJECT(SInterpolatorBase, L"AccelerateDecelerate")
   public:
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 };
 
 class SOUI_EXP SAnticipateInterpolator : public SInterpolatorBase {
-    SOUI_CLASS_NAME(SInterpolatorBase, L"Anticipate")
+    DEF_SOBJECT(SInterpolatorBase, L"Anticipate")
 
   private:
     float mTension;
@@ -93,7 +93,7 @@ class SOUI_EXP SAnticipateInterpolator : public SInterpolatorBase {
 };
 
 class SOUI_EXP SAnticipateOvershootInterpolator : public SInterpolatorBase {
-    SOUI_CLASS_NAME(SInterpolatorBase, L"AnticipateOvershoot")
+    DEF_SOBJECT(SInterpolatorBase, L"AnticipateOvershoot")
   private:
     float mTension;
     float mExtraTension;
@@ -127,7 +127,7 @@ class SOUI_EXP SAnticipateOvershootInterpolator : public SInterpolatorBase {
 };
 
 class SOUI_EXP SBounceInterpolator : public SInterpolatorBase {
-    SOUI_CLASS_NAME(SInterpolatorBase, L"Bounce")
+    DEF_SOBJECT(SInterpolatorBase, L"Bounce")
 
   private:
     static float bounce(float t);
@@ -137,7 +137,7 @@ class SOUI_EXP SBounceInterpolator : public SInterpolatorBase {
 };
 
 class SOUI_EXP SCycleInterpolator : public SInterpolatorBase {
-    SOUI_CLASS_NAME(SInterpolatorBase, L"Cycle")
+    DEF_SOBJECT(SInterpolatorBase, L"Cycle")
 
   private:
     float mCycles;
@@ -153,7 +153,7 @@ class SOUI_EXP SCycleInterpolator : public SInterpolatorBase {
 };
 
 class SOUI_EXP SOvershootInterpolator : public SInterpolatorBase {
-    SOUI_CLASS_NAME(SInterpolatorBase, L"Overshoot")
+    DEF_SOBJECT(SInterpolatorBase, L"Overshoot")
 
   private:
     float mTension;
@@ -174,7 +174,7 @@ class SOUI_EXP SOvershootInterpolator : public SInterpolatorBase {
 };
 
 class SPathInterpolator : public SInterpolatorBase {
-    SOUI_CLASS_NAME(SInterpolatorBase, L"path")
+    DEF_SOBJECT(SInterpolatorBase, L"path")
 
   private:
     SArray<fPoint> mPt;

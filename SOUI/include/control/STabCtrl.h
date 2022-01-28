@@ -23,7 +23,7 @@ namespace SOUI
  * Describe   tab标签页面
  */
 class SOUI_EXP STabPage : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"page")
+    DEF_SOBJECT(SWindow, L"page")
     friend class STabCtrl;
 
   public:
@@ -112,7 +112,7 @@ class SOUI_EXP STabPage : public SWindow {
  */
 class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
     friend class STabSlider;
-    SOUI_CLASS_NAME(SWindow, L"tabctrl")
+    DEF_SOBJECT(SWindow, L"tabctrl")
 
   protected:
     int m_nHoverTabItem;                   /**< hover状态item */

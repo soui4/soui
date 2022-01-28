@@ -41,7 +41,7 @@ namespace SOUI
 
 	class STabPage2 : public STabPage
 	{
-		SOUI_CLASS_NAME(STabPage, L"page2")
+		DEF_SOBJECT(STabPage, L"page2")
         friend class STabCtrl2;
 	public:
 		STabPage2(void);
@@ -58,7 +58,7 @@ namespace SOUI
 
     class STabCtrl2 : public STabCtrl,protected ITimelineHandler
     {
-		SOUI_CLASS_NAME(STabCtrl, L"tabctrl2")
+		DEF_SOBJECT(STabCtrl, L"tabctrl2")
 	public:
 		STabCtrl2(void);
 		~STabCtrl2(void);

@@ -13,7 +13,7 @@ namespace SOUI
     // SChromeTab
     class SChromeTab : public SWindow , public SAnimator
     {
-        SOUI_CLASS_NAME(SWindow,L"chromeTab")
+        DEF_SOBJECT(SWindow,L"chromeTab")
         friend class SChromeTabCtrl;
     public:
         SChromeTab(SChromeTabCtrl* pHost);

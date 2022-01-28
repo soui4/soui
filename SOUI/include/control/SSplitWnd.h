@@ -25,7 +25,7 @@ namespace SOUI
  */
 class SOUI_EXP SSplitPane : public SWindow {
     friend class SSplitWnd;
-    SOUI_CLASS_NAME(SWindow, L"pane")
+    DEF_SOBJECT(SWindow, L"pane")
   public:
     /**
      * SSplitPane::SSplitPane
@@ -69,7 +69,7 @@ class SOUI_EXP SSplitPane : public SWindow {
  * Describe   分割窗口
  */
 class SOUI_EXP SSplitWnd : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"splitwnd")
+    DEF_SOBJECT(SWindow, L"splitwnd")
 
     enum SPLIT_ORINTATION
     {
@@ -281,7 +281,7 @@ class SOUI_EXP SSplitWnd : public SWindow {
  * Describe   垂直分割窗口
  */
 class SOUI_EXP SSplitWnd_Col : public SSplitWnd {
-    SOUI_CLASS_NAME(SSplitWnd, L"splitcol")
+    DEF_SOBJECT(SSplitWnd, L"splitcol")
   public:
     SSplitWnd_Col()
     {
@@ -297,7 +297,7 @@ class SOUI_EXP SSplitWnd_Col : public SSplitWnd {
  * Describe   横向分割窗口
  */
 class SOUI_EXP SSplitWnd_Row : public SSplitWnd {
-    SOUI_CLASS_NAME(SSplitWnd, L"splitrow")
+    DEF_SOBJECT(SSplitWnd, L"splitrow")
   public:
     SSplitWnd_Row()
     {

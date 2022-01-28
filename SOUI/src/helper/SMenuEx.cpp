@@ -16,7 +16,7 @@ namespace SOUI
 
 //////////////////////////////////////////////////////////////////////////
 class SMenuExRoot : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"menuRoot")
+    DEF_SOBJECT(SWindow, L"menuRoot")
     friend class SMenuEx;
     friend class SMenuExItem;
 
@@ -386,7 +386,7 @@ SMenuEx *SMenuExItem::GetSubMenu()
 //////////////////////////////////////////////////////////////////////////
 
 class SMenuExSep : public SMenuExItem {
-    SOUI_CLASS_NAME(SMenuExItem, L"sep")
+    DEF_SOBJECT(SMenuExItem, L"sep")
   public:
     SMenuExSep(SMenuEx *pOwnerMenu, ISkinObj *pItemSkin)
         : SMenuExItem(pOwnerMenu, pItemSkin)

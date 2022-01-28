@@ -143,7 +143,7 @@ class SOUI_EXP SCalendarCore {
 #define SHOW_YEAR_CENTURY -104 //显示近100年
 
 class SOUI_EXP SCalendar : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"calendar")
+    DEF_SOBJECT(SWindow, L"calendar")
   public:
     SCalendar(WORD iYeay, WORD iMonth, WORD iDay);
     SCalendar();

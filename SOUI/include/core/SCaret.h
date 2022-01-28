@@ -8,7 +8,7 @@ namespace SOUI
 class SOUI_EXP SCaret
     : public TObjRefImpl<SObjectImpl<ICaret>>
     , public ITimelineHandler {
-    SOUI_CLASS_NAME_EX(TObjRefImpl<SObjectImpl<ICaret>>, L"caret", None)
+    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<ICaret>>, L"caret", None)
   public:
     SCaret(ISwndContainer *pContainer);
     ~SCaret();

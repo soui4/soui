@@ -4,7 +4,7 @@
 namespace SOUI
 {
 class SOUI_EXP SSpinButtonCtrl : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"spinButton")
+    DEF_SOBJECT(SWindow, L"spinButton")
   public:
     SSpinButtonCtrl(void);
     ~SSpinButtonCtrl(void);

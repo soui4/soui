@@ -81,7 +81,7 @@ class SOUI_EXP STreeViewItemLocator : public TObjRefImpl<ITreeViewItemLocator> {
 class SOUI_EXP STreeView
     : public TPanelProxy<ITreeView>
     , protected IItemContainer {
-    SOUI_CLASS_NAME(SPanel, L"treeview")
+    DEF_SOBJECT(SPanel, L"treeview")
     friend class STreeViewDataSetObserver;
 
   public:

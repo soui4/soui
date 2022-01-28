@@ -60,7 +60,7 @@ class SOUI_EXP SRealWndParam {
  * Describe
  */
 class SOUI_EXP SRealWnd : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"realwnd")
+    DEF_SOBJECT(SWindow, L"realwnd")
   public:
     /**
      * SRealWnd::SRealWnd

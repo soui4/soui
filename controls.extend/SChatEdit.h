@@ -10,7 +10,7 @@ namespace SOUI
     
     class SChatEdit : public SRichEdit
     {
-    SOUI_CLASS_NAME(SRichEdit,L"chatedit")
+    DEF_SOBJECT(SRichEdit,L"chatedit")
     public:
         SChatEdit(void);
         ~SChatEdit(void);

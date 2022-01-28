@@ -23,7 +23,7 @@ namespace SOUI
 class SHostWndAttr
     : public TObjRefImpl<SObject>
     , public ITrCtxProvider {
-    SOUI_CLASS_NAME(TObjRefImpl<SObject>, L"SHostWndAttr")
+    DEF_SOBJECT(TObjRefImpl<SObject>, L"SHostWndAttr")
     enum
     {
         WT_UNDEFINE = 0,
@@ -109,7 +109,7 @@ enum AniState
 };
 
 class SOUI_EXP SRootWindow : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"root")
+    DEF_SOBJECT(SWindow, L"root")
     friend class SHostWnd;
 
   public:
@@ -467,7 +467,7 @@ class SOUI_EXP SHostWnd
     , protected IHostMsgHandler {
     friend class SDummyWnd;
     friend class SRootWindow;
-    SOUI_CLASS_NAME(SNativeWnd, L"SHostWnd")
+    DEF_SOBJECT(SNativeWnd, L"SHostWnd")
   protected:
     SDummyWnd *m_dummyWnd;   /**<半透明窗口使用的一个响应WM_PAINT消息的窗口*/
     SHostWndAttr m_hostAttr; /**<host属性，对应XML中的SOUI结点 */

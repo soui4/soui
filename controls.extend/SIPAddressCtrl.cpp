@@ -7,7 +7,7 @@ namespace SOUI
 {
     class SEditIP: public SEdit
     {
-        SOUI_CLASS_NAME(SEdit,L"ipedit")
+        DEF_SOBJECT(SEdit,L"ipedit")
     public:
         SEditIP();
         ~SEditIP();

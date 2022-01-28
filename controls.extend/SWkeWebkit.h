@@ -32,7 +32,7 @@ namespace SOUI
     const char TM_TICKER = 1;
     class SWkeWebkit : public SWindow, protected wkeBufHandler , protected IIdleHandler
     {
-        SOUI_CLASS_NAME(SWindow, L"wkeWebkit")
+        DEF_SOBJECT(SWindow, L"wkeWebkit")
     public:
         SWkeWebkit(void);
         ~SWkeWebkit(void);

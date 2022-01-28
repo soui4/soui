@@ -26,7 +26,7 @@ namespace SOUI
 class SOUI_EXP SScrollBar
     : public SWindow
     , protected IScrollBarHost {
-    SOUI_CLASS_NAME(SWindow, L"scrollbar")
+    DEF_SOBJECT(SWindow, L"scrollbar")
   public:
     /**
      * SScrollBar::SScrollBar

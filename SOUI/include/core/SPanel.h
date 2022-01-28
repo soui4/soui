@@ -31,7 +31,7 @@ enum SbID
 class SOUI_EXP SPanel
     : public TWindowProxy<IPanel>
     , protected IScrollBarHost {
-    SOUI_CLASS_NAME(SWindow, L"div")
+    DEF_SOBJECT(SWindow, L"div")
 
   public:
     SPanel();
@@ -283,7 +283,7 @@ class TPanelProxy
 };
 
 class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
-    SOUI_CLASS_NAME(SPanel, L"scrollview")
+    DEF_SOBJECT(SPanel, L"scrollview")
   public:
     SScrollView();
     virtual ~SScrollView()

@@ -28,7 +28,7 @@ namespace SOUI
  * Usage       <text>inner text example</text>
  */
 class SOUI_EXP SStatic : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"text")
+    DEF_SOBJECT(SWindow, L"text")
   public:
     /**
      * SStatic::SStatic
@@ -80,7 +80,7 @@ class SOUI_EXP SStatic : public SWindow {
  * Usage       <link>inner text example</link>
  */
 class SOUI_EXP SLink : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"link")
+    DEF_SOBJECT(SWindow, L"link")
 
   public:
     /**
@@ -158,7 +158,7 @@ class SOUI_EXP SButton
     : public SWindow
     , public IAcceleratorTarget
     , public ITimelineHandler {
-    SOUI_CLASS_NAME(SWindow, L"button")
+    DEF_SOBJECT(SWindow, L"button")
   public:
     /**
      * SButton::SButton
@@ -273,7 +273,7 @@ class SOUI_EXP SButton
  * Describe    图片按钮类，继承SButton
  */
 class SOUI_EXP SImageButton : public SButton {
-    SOUI_CLASS_NAME(SButton, L"imgbtn")
+    DEF_SOBJECT(SButton, L"imgbtn")
   public:
     SImageButton();
 
@@ -297,7 +297,7 @@ class SOUI_EXP SImageButton : public SButton {
  * Usage       Usage: <img skin="skin" sub="0"/>
  */
 class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
-    SOUI_CLASS_NAME(SWindow, L"img")
+    DEF_SOBJECT(SWindow, L"img")
   public:
     /**
      * SImageWnd::SImageWnd
@@ -407,7 +407,7 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
 class SOUI_EXP SAnimateImgWnd
     : public TWindowProxy<IAnimateImgWnd>
     , public ITimelineHandler {
-    SOUI_CLASS_NAME(SWindow, L"animateimg")
+    DEF_SOBJECT(SWindow, L"animateimg")
   public:
     /**
      * SAnimateImgWnd::SAnimateImgWnd
@@ -504,7 +504,7 @@ class SOUI_EXP SAnimateImgWnd
  * Usage: <progress bgskin=xx posskin=xx min=0 max=100 value=10,showpercent=0/>
  */
 class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
-    SOUI_CLASS_NAME(SWindow, L"progress")
+    DEF_SOBJECT(SWindow, L"progress")
   public:
     /**
      * SProgress::SProgress
@@ -616,7 +616,7 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
  * Usage: <hr size=1 mode="vert" lineStyle="dash"/>
  */
 class SOUI_EXP SLine : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"hr")
+    DEF_SOBJECT(SWindow, L"hr")
 
   public:
     /**
@@ -673,7 +673,7 @@ class SOUI_EXP SLine : public SWindow {
  * Usage: <check checked="1">This is a check-box</check>
  */
 class SOUI_EXP SCheckBox : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"check")
+    DEF_SOBJECT(SWindow, L"check")
 
     enum
     {
@@ -784,7 +784,7 @@ class SOUI_EXP SCheckBox : public SWindow {
  * Usage: <icon src="icon:16" />
  */
 class SOUI_EXP SIconWnd : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"icon")
+    DEF_SOBJECT(SWindow, L"icon")
   public:
     /**
      * SIconWnd::SIconWnd
@@ -836,7 +836,7 @@ class SOUI_EXP SIconWnd : public SWindow {
  * Usage: <radio checked="1">This is a check-box</radio>
  */
 class SOUI_EXP SRadioBox : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"radio")
+    DEF_SOBJECT(SWindow, L"radio")
 
   public:
     /**
@@ -976,7 +976,7 @@ class SOUI_EXP SRadioBox : public SWindow {
 };
 
 class SOUI_EXP SRadioGroup : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"radioGroup")
+    DEF_SOBJECT(SWindow, L"radioGroup")
   public:
     SRadioGroup();
 
@@ -999,7 +999,7 @@ class SOUI_EXP SRadioGroup : public SWindow {
  * Describe    Toggle控件
  */
 class SOUI_EXP SToggle : public SCheckBox {
-    SOUI_CLASS_NAME(SCheckBox, L"toggle")
+    DEF_SOBJECT(SCheckBox, L"toggle")
   public:
     /**
      * SToggle::SToggle
@@ -1049,7 +1049,7 @@ class SOUI_EXP SToggle : public SCheckBox {
  * Usage       <group colorLine1="#b8d5e2" colorLine2="#999999">group text</>
  */
 class SOUI_EXP SGroup : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"group")
+    DEF_SOBJECT(SWindow, L"group")
   public:
     SGroup();
 

@@ -4,7 +4,7 @@
 
 class SQrCtrl :public SImageWnd
 {
-	SOUI_CLASS_NAME(SImageWnd, L"qrctrl")
+	DEF_SOBJECT(SImageWnd, L"qrctrl")
 public:
 	SQrCtrl();
 	~SQrCtrl();

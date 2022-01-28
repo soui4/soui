@@ -366,7 +366,7 @@ class THostWndProxy
 };
 
 class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
-    SOUI_CLASS_NAME(SHostWnd, L"hostDialog")
+    DEF_SOBJECT(SHostWnd, L"hostDialog")
   public:
     SHostDialog(LPCTSTR pszXmlName = NULL);
     ~SHostDialog(void);

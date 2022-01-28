@@ -25,7 +25,7 @@ namespace SOUI
 class SOUI_EXP SHotKeyCtrl
     : public TWindowProxy<IHotKeyCtrl>
     , public SAccelerator {
-    SOUI_CLASS_NAME(SWindow, L"hotkey")
+    DEF_SOBJECT(SWindow, L"hotkey")
     enum
     {
         Mod_SC = Mod_Shift | Mod_Ctrl,

@@ -25,7 +25,7 @@ namespace SOUI
 class SItemBox
     : public SScrollView
 {
-    SOUI_CLASS_NAME(SScrollView, L"itembox")
+    DEF_SOBJECT(SScrollView, L"itembox")
 public:
     /**
      * SItemBox::SItemBox

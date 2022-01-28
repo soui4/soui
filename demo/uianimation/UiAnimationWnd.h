@@ -87,7 +87,7 @@ namespace SOUI
 
     class SUiAnimationWnd : public SWindow
     {
-        SOUI_CLASS_NAME(SWindow,L"uianimationwnd")
+        DEF_SOBJECT(SWindow,L"uianimationwnd")
     public:
         SUiAnimationWnd(void);
         ~SUiAnimationWnd(void);

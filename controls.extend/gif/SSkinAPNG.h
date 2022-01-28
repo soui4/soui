@@ -26,7 +26,7 @@ namespace SOUI
     */
     class SSkinAPNG : public SSkinAni
     {
-        SOUI_CLASS_NAME(SSkinAni, L"apng")
+        DEF_SOBJECT(SSkinAni, L"apng")
     public:
 		SSkinAPNG();
 		~SSkinAPNG();

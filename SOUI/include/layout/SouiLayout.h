@@ -8,7 +8,7 @@ namespace SOUI
 class SouiLayoutParam
     : public TObjRefImpl<SObjectImpl<ILayoutParam>>
     , protected SouiLayoutParamStruct {
-    SOUI_CLASS_NAME(TObjRefImpl<SObjectImpl<ILayoutParam>>, L"SouiLayoutParam")
+    DEF_SOBJECT(TObjRefImpl<SObjectImpl<ILayoutParam>>, L"SouiLayoutParam")
 
     friend class SouiLayout;
 
@@ -62,7 +62,7 @@ class SouiLayoutParam
 };
 
 class SOUI_EXP SouiLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
-    SOUI_CLASS_NAME_EX(TObjRefImpl<SObjectImpl<ILayout>>, L"SouiLayout", Layout)
+    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<ILayout>>, L"SouiLayout", Layout)
   public:
     SouiLayout(void);
     ~SouiLayout(void);

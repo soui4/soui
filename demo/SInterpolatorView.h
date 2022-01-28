@@ -6,7 +6,7 @@ namespace SOUI
 	class SInterpolatorView : public SSliderBar
 		,protected ITimelineHandler
 	{
-		SOUI_CLASS_NAME(SSliderBar,L"interpolatorView")
+		DEF_SOBJECT(SSliderBar,L"interpolatorView")
 	public:
 		SInterpolatorView(void);
 		~SInterpolatorView(void);

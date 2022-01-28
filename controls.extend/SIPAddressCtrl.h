@@ -15,7 +15,7 @@ namespace SOUI
 	
 	class SIPAddressCtrl : public SWindow
 	{
-		SOUI_CLASS_NAME(SWindow,L"ipctrl")
+		DEF_SOBJECT(SWindow,L"ipctrl")
 	public:
 		SIPAddressCtrl(void);
 		~SIPAddressCtrl(void);

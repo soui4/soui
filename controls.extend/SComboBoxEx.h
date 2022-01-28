@@ -6,7 +6,7 @@ namespace SOUI
     
     class EventOfComoboxExItem : public TplIEvtArgs<EventOfComoboxExItem>
     {
-        SOUI_CLASS_NAME(EventOfComoboxExItem,L"on_event_of_comboxex_item")
+        DEF_SOBJECT(EventOfComoboxExItem,L"on_event_of_comboxex_item")
     public:
         EventOfComoboxExItem(SObject *pSender,EventCmd *_pOrgEvt )
             :TplIEvtArgs<EventOfComoboxExItem>(pSender)
@@ -24,7 +24,7 @@ namespace SOUI
 
 class  SComboBoxEx : public SComboBase
 {
-    SOUI_CLASS_NAME(SComboBase, L"comboboxex")
+    DEF_SOBJECT(SComboBase, L"comboboxex")
 public:
     /**
      * SComboBoxEx::SComboBoxEx

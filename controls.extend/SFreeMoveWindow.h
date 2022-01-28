@@ -4,7 +4,7 @@ namespace SOUI
 {
     class SFreeMoveWindow : public SWindow
     {
-    SOUI_CLASS_NAME(SWindow,L"freeMoveWindow")
+    DEF_SOBJECT(SWindow,L"freeMoveWindow")
     public:
         SFreeMoveWindow(void);
         ~SFreeMoveWindow(void);

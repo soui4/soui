@@ -14,7 +14,7 @@ const wchar_t XmlMenus[] = L"menus";
 class SMenuBarItem
     : public SButton
     , public SMenu {
-    SOUI_CLASS_NAME(SButton, L"menuItem")
+    DEF_SOBJECT(SButton, L"menuItem")
     friend class SMenuBar;
 
   public:

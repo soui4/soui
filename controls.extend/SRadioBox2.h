@@ -6,7 +6,7 @@ namespace SOUI
 {
     class SRadioBox2 : public SRadioBox
     {
-    SOUI_CLASS_NAME(SRadioBox,L"radio2")
+    DEF_SOBJECT(SRadioBox,L"radio2")
     public:
         SRadioBox2(void);
         ~SRadioBox2(void);

@@ -7,7 +7,7 @@ namespace SOUI
 class SMenuExRoot;
 class SMenuEx;
 class SOUI_EXP SMenuExItem : public SWindow {
-    SOUI_CLASS_NAME(SWindow, L"menuItem")
+    DEF_SOBJECT(SWindow, L"menuItem")
   public:
     SMenuExItem(SMenuEx *pOwnerMenu, ISkinObj *pItemSkin);
 
@@ -62,7 +62,7 @@ class SOUI_EXP SMenuEx : protected SHostWnd {
     friend class SMenuExItem;
     friend class SMenuExRunData;
     friend class SMenuExRoot;
-    SOUI_CLASS_NAME(SHostWnd, L"smenuex")
+    DEF_SOBJECT(SHostWnd, L"smenuex")
   public:
     SMenuEx(void);
     virtual ~SMenuEx(void);

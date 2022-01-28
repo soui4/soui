@@ -8,7 +8,7 @@ namespace SOUI
 class SColorMask : public SSkinObjBase
 {
     #define STATE_COUNT 4
-    SOUI_CLASS_NAME(SSkinObjBase, L"colormask")
+    DEF_SOBJECT(SSkinObjBase, L"colormask")
 
     enum{
         ST_NORMAL=0,

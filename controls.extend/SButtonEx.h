@@ -4,7 +4,7 @@ namespace SOUI
 {
     class SButtonEx : public SButton
     {
-    SOUI_CLASS_NAME(SButton,L"buttonex")
+    DEF_SOBJECT(SButton,L"buttonex")
     
     enum{
     FREE_DRAW,

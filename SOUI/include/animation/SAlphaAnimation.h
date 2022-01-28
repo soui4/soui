@@ -26,7 +26,7 @@ namespace SOUI
  *
  */
 class SOUI_EXP SAlphaAnimation : public SAnimation {
-    SOUI_CLASS_NAME(SAnimation, L"alpha")
+    DEF_SOBJECT(SAnimation, L"alpha")
   private:
     float mFromAlpha;
     float mToAlpha;

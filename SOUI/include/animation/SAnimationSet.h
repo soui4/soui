@@ -46,7 +46,7 @@
 SNSBEGIN
 
 class SOUI_EXP SAnimationSet : public SAnimation {
-    SOUI_CLASS_NAME(SAnimation, L"set")
+    DEF_SOBJECT(SAnimation, L"set")
     enum
     {
         PROPERTY_FILL_AFTER_MASK = 0x1,

@@ -4,7 +4,7 @@ namespace SOUI
 {
 	class S3dWindow : public SWindow,public ITimelineHandler
 	{
-		SOUI_CLASS_NAME(SWindow,L"S3DView")
+		DEF_SOBJECT(SWindow,L"S3DView")
 
 	public:
 		S3dWindow(void);
@@ -53,7 +53,7 @@ namespace SOUI
 
 class SMatrixWindow : public SWindow
 {
-SOUI_CLASS_NAME(SWindow,L"matrixWindow")
+DEF_SOBJECT(SWindow,L"matrixWindow")
 public:
     SMatrixWindow(void);
     ~SMatrixWindow(void);

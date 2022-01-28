@@ -22,7 +22,7 @@
 SNSBEGIN
 
 // SObject Class Name Declaration
-#define SOUI_CLASS_NAME_EX(baseCls, classname, clsType) \
+#define DEF_SOBJECT_EX(baseCls, classname, clsType) \
   public:                                               \
     typedef baseCls __baseCls;                          \
     static LPCWSTR GetClassName()                       \
@@ -63,7 +63,7 @@ SNSBEGIN
         return baseCls::IsClass(lpszName);              \
     }
 
-#define SOUI_CLASS_NAME(baseCls, classname) SOUI_CLASS_NAME_EX(baseCls, classname, 0)
+#define DEF_SOBJECT(baseCls, classname) DEF_SOBJECT_EX(baseCls, classname, 0)
 
 /**
  * @class      SObject

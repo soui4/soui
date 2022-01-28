@@ -70,7 +70,7 @@ typedef struct tagTVITEM
 class SOUI_EXP STreeCtrl
     : public TPanelProxy<ITreeCtrl>
     , protected CSTree<LPTVITEM> {
-    SOUI_CLASS_NAME(SPanel, L"treectrl")
+    DEF_SOBJECT(SPanel, L"treectrl")
   public:
     struct IListener
     {

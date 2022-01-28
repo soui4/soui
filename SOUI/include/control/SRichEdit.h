@@ -604,7 +604,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     friend class STextHost;
 
   public:
-    SOUI_CLASS_NAME(SPanel, L"richedit")
+    DEF_SOBJECT(SPanel, L"richedit")
 
     /**
      * SRichEdit::SRichEdit
@@ -1234,7 +1234,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
  * Describe
  */
 class SOUI_EXP SEdit : public SRichEdit {
-    SOUI_CLASS_NAME(SRichEdit, L"edit")
+    DEF_SOBJECT(SRichEdit, L"edit")
   public:
     /**
      * SEdit::SEdit

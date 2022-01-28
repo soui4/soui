@@ -5,7 +5,7 @@ namespace SOUI
 {
 class SSplitBar : public SWindow
 {
-    SOUI_CLASS_NAME(SWindow, L"splitbar")
+    DEF_SOBJECT(SWindow, L"splitbar")
 public:
     SSplitBar();
     ~SSplitBar();

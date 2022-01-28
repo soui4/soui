@@ -10,7 +10,7 @@ class SOUI_EXP SActiveX : public SWindow {
     friend class SAxContainerImpl;
 
   public:
-    SOUI_CLASS_NAME(SWindow, L"activex")
+    DEF_SOBJECT(SWindow, L"activex")
     explicit SActiveX();
     virtual ~SActiveX();
 
@@ -71,7 +71,7 @@ class SOUI_EXP SActiveX : public SWindow {
 
 class SOUI_EXP SFlashCtrl : public SActiveX {
   public:
-    SOUI_CLASS_NAME(SActiveX, L"flash")
+    DEF_SOBJECT(SActiveX, L"flash")
     SFlashCtrl();
 
     ShockwaveFlashObjects::IShockwaveFlash *GetFlashInterface() const

@@ -4,7 +4,7 @@ namespace SOUI
 {
     class SImageMaskWnd : public SWindow
     {
-    SOUI_CLASS_NAME(SWindow,L"imageMask")
+    DEF_SOBJECT(SWindow,L"imageMask")
     public:
         SImageMaskWnd(void);
         ~SImageMaskWnd(void);

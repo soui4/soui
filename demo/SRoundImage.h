@@ -3,7 +3,7 @@ namespace SOUI
 {
 	class SRoundImage : public SImageWnd
 	{
-		SOUI_CLASS_NAME(SImageWnd,L"roundImg")
+		DEF_SOBJECT(SImageWnd,L"roundImg")
 	private:
 		SAutoRefPtr<IBitmap> m_img;
 	public:

@@ -12,7 +12,7 @@ namespace SOUI
 class SOUI_EXP STileView
     : public TPanelProxy<ITileView>
     , protected IItemContainer {
-    SOUI_CLASS_NAME(SPanel, L"tileview")
+    DEF_SOBJECT(SPanel, L"tileview")
 
     friend class STileViewDataSetObserver;
 

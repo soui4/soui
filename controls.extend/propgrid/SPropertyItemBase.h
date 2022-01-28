@@ -8,7 +8,7 @@ namespace SOUI
 {
     class SPropertyItemBase : public TObjRefImpl<IPropertyItem>
     {
-        SOUI_CLASS_NAME(TObjRefImpl<IPropertyItem>,L"propitembase")
+        DEF_SOBJECT(TObjRefImpl<IPropertyItem>,L"propitembase")
     public:
         virtual ~SPropertyItemBase();
 

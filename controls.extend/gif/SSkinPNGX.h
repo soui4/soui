@@ -23,7 +23,7 @@ namespace SOUI
     */
     class SSkinPNGX : public SSkinAni
     {
-        SOUI_CLASS_NAME(SSkinAni, L"pngx")
+        DEF_SOBJECT(SSkinAni, L"pngx")
     public:
 		SSkinPNGX();
 

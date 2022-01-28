@@ -25,7 +25,7 @@ namespace SOUI
  * Describe    可输入下拉列表
  */
 class SOUI_EXP SComboBox : public TComboBaseProxy<IComboBox> {
-    SOUI_CLASS_NAME(SComboBase, L"combobox")
+    DEF_SOBJECT(SComboBase, L"combobox")
   public:
     /**
      * SComboBox::SComboBox

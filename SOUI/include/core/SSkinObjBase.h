@@ -25,7 +25,7 @@ class SOUI_EXP SState2Index {
 };
 
 class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
-    SOUI_CLASS_NAME_EX(TObjRefImpl<SObjectImpl<ISkinObj>>, L"skinObjBase", Skin)
+    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<ISkinObj>>, L"skinObjBase", Skin)
   public:
     SSkinObjBase();
 

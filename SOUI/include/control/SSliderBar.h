@@ -22,7 +22,7 @@ namespace SOUI
  * Describe   滑块工具条
  */
 class SOUI_EXP SSliderBar : public SProgress {
-    SOUI_CLASS_NAME(SProgress, L"sliderbar")
+    DEF_SOBJECT(SProgress, L"sliderbar")
 
     struct RANGE
     {

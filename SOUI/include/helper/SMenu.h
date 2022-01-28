@@ -14,7 +14,7 @@ namespace SOUI
 class SMenuAttr : public TObjRefImpl<SObject> {
     friend class SMenu;
     friend class SMenuODWnd;
-    SOUI_CLASS_NAME(TObjRefImpl<SObject>, L"menuattr")
+    DEF_SOBJECT(TObjRefImpl<SObject>, L"menuattr")
   public:
     SMenuAttr();
     ~SMenuAttr();

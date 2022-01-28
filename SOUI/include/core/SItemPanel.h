@@ -25,7 +25,7 @@ struct IItemContainer
 class SOUI_EXP SItemPanel
     : public SwndContainerImpl
     , public TWindowProxy<IItemPanel> {
-    SOUI_CLASS_NAME(SWindow, L"itemPanel")
+    DEF_SOBJECT(SWindow, L"itemPanel")
   public:
     static SItemPanel *Create(SWindow *pFrameHost,
                               SXmlNode xmlNode,

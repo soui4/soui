@@ -102,7 +102,7 @@ class SOUI_EXP SDropDownWnd_ComboBox : public SDropDownWnd {
 class SOUI_EXP SComboBase
     : public TWindowProxy<IComboBase>
     , public ISDropDownOwner {
-    SOUI_CLASS_NAME(SWindow, L"combobase")
+    DEF_SOBJECT(SWindow, L"combobase")
   public:
     /**
      * SComboBoxBase::SComboBoxBase

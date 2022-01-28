@@ -132,7 +132,7 @@ typedef enum _SOUI_EVENTS
 #ifdef __cplusplus
 class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>>
 {
-	SOUI_CLASS_NAME_EX(TObjRefImpl<SObjectImpl<IEvtArgs>>, L"event", Event)
+	DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IEvtArgs>>, L"event", Event)
 public:
 	UINT handled; 
 	BOOL bubbleUp; 
@@ -181,7 +181,7 @@ public:
     class api evt                                      \
         : public SEvtArgs                              \
         , public evtData {                             \
-        SOUI_CLASS_NAME(SEvtArgs, L#evt_name)          \
+        DEF_SOBJECT(SEvtArgs, L#evt_name)          \
       public:                                          \
         STDMETHOD_(int, GetID)(THIS) const             \
         {                                              \

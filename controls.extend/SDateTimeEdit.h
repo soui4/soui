@@ -31,7 +31,7 @@ namespace SOUI{
  */
 class SMaskEdit : public SEdit
 {
-    SOUI_CLASS_NAME(SEdit, L"maskedit")
+    DEF_SOBJECT(SEdit, L"maskedit")
 
 public:
     /**
@@ -219,7 +219,7 @@ protected:
  */
 class  SDateEdit : public SMaskEdit
 {
-    SOUI_CLASS_NAME(SDateEdit, L"dateedit")
+    DEF_SOBJECT(SDateEdit, L"dateedit")
 
 public:
       
@@ -283,7 +283,7 @@ protected:
  */
 class  STimeEdit : public SDateEdit
 {
-    SOUI_CLASS_NAME(STimeEdit, L"timeedit")
+    DEF_SOBJECT(STimeEdit, L"timeedit")
 
 public:
     /**

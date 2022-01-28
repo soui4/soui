@@ -28,7 +28,7 @@ namespace SOUI
  * Describe   表头控件
  */
 class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
-    SOUI_CLASS_NAME(SWindow, L"header")
+    DEF_SOBJECT(SWindow, L"header")
 
     enum
     {

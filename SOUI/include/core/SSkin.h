@@ -7,7 +7,7 @@
 SNSBEGIN
 
 class SOUI_EXP SSkinImgList : public SSkinObjBase {
-    SOUI_CLASS_NAME(SSkinObjBase, L"imglist")
+    DEF_SOBJECT(SSkinObjBase, L"imglist")
 
   public:
     SSkinImgList();
@@ -82,7 +82,7 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
 };
 
 class SOUI_EXP SSkinImgCenter : public SSkinImgList {
-    SOUI_CLASS_NAME(SSkinImgList, L"imgCenter")
+    DEF_SOBJECT(SSkinImgList, L"imgCenter")
   public:
     SSkinImgCenter()
     {
@@ -94,7 +94,7 @@ class SOUI_EXP SSkinImgCenter : public SSkinImgList {
 
 //////////////////////////////////////////////////////////////////////////
 class SOUI_EXP SSkinImgFrame : public SSkinImgList {
-    SOUI_CLASS_NAME(SSkinImgList, L"imgframe")
+    DEF_SOBJECT(SSkinImgList, L"imgframe")
 
   public:
     SSkinImgFrame();
@@ -131,7 +131,7 @@ class SOUI_EXP SSkinImgFrame : public SSkinImgList {
 //////////////////////////////////////////////////////////////////////////
 // 加载android .9的皮肤
 class SOUI_EXP SSkinImgFrame2 : public SSkinImgFrame {
-    SOUI_CLASS_NAME(SSkinImgFrame, L"imgframe2")
+    DEF_SOBJECT(SSkinImgFrame, L"imgframe2")
   public:
     SOUI_ATTRS_BEGIN()
     ATTR_CUSTOM(L"src", OnAttrSrc)
@@ -142,7 +142,7 @@ class SOUI_EXP SSkinImgFrame2 : public SSkinImgFrame {
 
 //////////////////////////////////////////////////////////////////////////
 class SOUI_EXP SSkinButton : public SSkinObjBase {
-    SOUI_CLASS_NAME(SSkinObjBase, L"button")
+    DEF_SOBJECT(SSkinObjBase, L"button")
 
     enum
     {
@@ -198,7 +198,7 @@ class SOUI_EXP SSkinButton : public SSkinObjBase {
 //////////////////////////////////////////////////////////////////////////
 
 class SOUI_EXP SSkinGradation : public SSkinObjBase {
-    SOUI_CLASS_NAME(SSkinObjBase, L"gradation")
+    DEF_SOBJECT(SSkinObjBase, L"gradation")
   public:
     SSkinGradation();
 
@@ -256,7 +256,7 @@ enum SBSTATE
 #define THUMB_MINSIZE 18
 
 class SOUI_EXP SSkinScrollbar : public SSkinImgList {
-    SOUI_CLASS_NAME(SSkinImgList, L"scrollbar")
+    DEF_SOBJECT(SSkinImgList, L"scrollbar")
 
   public:
     SSkinScrollbar();
@@ -297,7 +297,7 @@ class SOUI_EXP SSkinScrollbar : public SSkinImgList {
 
 //////////////////////////////////////////////////////////////////////////
 class SOUI_EXP SSkinColorRect : public SSkinObjBase {
-    SOUI_CLASS_NAME(SSkinObjBase, L"colorrect")
+    DEF_SOBJECT(SSkinObjBase, L"colorrect")
   public:
     SSkinColorRect();
     virtual ~SSkinColorRect();
@@ -335,7 +335,7 @@ class SOUI_EXP SSkinColorRect : public SSkinObjBase {
 //////////////////////////////////////////////////////////////////////////
 
 class SOUI_EXP SSkinShape : public SSkinObjBase {
-    SOUI_CLASS_NAME(SSkinObjBase, L"shape")
+    DEF_SOBJECT(SSkinObjBase, L"shape")
     enum Shape
     {
         rectangle,
@@ -344,7 +344,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     };
 
     class SGradient : public TObjRefImpl<SObject> {
-        SOUI_CLASS_NAME(TObjRefImpl<SObject>, L"gradient")
+        DEF_SOBJECT(TObjRefImpl<SObject>, L"gradient")
       public:
         SGradient()
             : m_Type(linear)
@@ -382,7 +382,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     };
 
     class SStroke : public TObjRefImpl<SObject> {
-        SOUI_CLASS_NAME(TObjRefImpl<SObject>, L"stroke")
+        DEF_SOBJECT(TObjRefImpl<SObject>, L"stroke")
       public:
         SStroke()
             : m_color(CR_INVALID)
@@ -407,7 +407,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     };
 
     class SCornerSize : public TObjRefImpl<SObject> {
-        SOUI_CLASS_NAME(TObjRefImpl<SObject>, L"corners")
+        DEF_SOBJECT(TObjRefImpl<SObject>, L"corners")
 
       public:
         HRESULT OnAttrRadius(const SStringW strValue, BOOL bLoading);
@@ -428,7 +428,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     };
 
     class SShapeSize : public TObjRefImpl<SObject> {
-        SOUI_CLASS_NAME(TObjRefImpl<SObject>, L"size")
+        DEF_SOBJECT(TObjRefImpl<SObject>, L"size")
 
       public:
         SOUI_ATTRS_BEGIN()
@@ -440,7 +440,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     };
 
     class SShapeRing : public TObjRefImpl<SObject> {
-        SOUI_CLASS_NAME(TObjRefImpl<SObject>, L"ring")
+        DEF_SOBJECT(TObjRefImpl<SObject>, L"ring")
 
       public:
         SShapeRing()
@@ -489,7 +489,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
 };
 
 class SOUI_EXP SSKinGroup : public SSkinObjBase {
-    SOUI_CLASS_NAME(SSkinObjBase, L"group")
+    DEF_SOBJECT(SSkinObjBase, L"group")
   public:
     STDMETHOD_(SIZE, GetSkinSize)(THIS) SCONST OVERRIDE;
     STDMETHOD_(int, GetStates)(THIS) SCONST OVERRIDE;

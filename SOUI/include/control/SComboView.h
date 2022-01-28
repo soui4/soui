@@ -6,7 +6,7 @@
 namespace SOUI
 {
 class SOUI_EXP SComboView : public TComboBaseProxy<IComboView> {
-    SOUI_CLASS_NAME(SComboBase, L"comboview")
+    DEF_SOBJECT(SComboBase, L"comboview")
   public:
     SComboView(void);
     ~SComboView(void);

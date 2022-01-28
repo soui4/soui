@@ -44,7 +44,7 @@ typedef struct tagLBITEM
  */
 class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
   public:
-    SOUI_CLASS_NAME(SPanel, L"listbox")
+    DEF_SOBJECT(SPanel, L"listbox")
     /**
      * SListBox::SListBox
      * @brief    构造函数

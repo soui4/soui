@@ -9,7 +9,7 @@ namespace SOUI
 class SOUI_EXP SListView
     : public TPanelProxy<IListView>
     , protected IItemContainer {
-    SOUI_CLASS_NAME(SPanel, L"listview")
+    DEF_SOBJECT(SPanel, L"listview")
 
     friend class SListViewDataSetObserver;
 

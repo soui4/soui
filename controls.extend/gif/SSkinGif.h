@@ -26,7 +26,7 @@ namespace SOUI
     */
     class SSkinGif : public SSkinAni
     {
-        SOUI_CLASS_NAME(SSkinAni, L"gif")
+        DEF_SOBJECT(SSkinAni, L"gif")
     public:
         SSkinGif():m_pFrames(NULL), m_pImg(NULL)
         {

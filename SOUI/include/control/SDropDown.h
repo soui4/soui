@@ -64,7 +64,7 @@ struct ISDropDownOwner
 class SOUI_EXP SDropDownWnd
     : public SHostWnd
     , public IMessageFilter {
-    SOUI_CLASS_NAME(SHostWnd, L"SDropDownWnd")
+    DEF_SOBJECT(SHostWnd, L"SDropDownWnd")
   public:
     /**
      * SDropDownWnd::SDropDownWnd

@@ -8,7 +8,7 @@ namespace SOUI{
 
 class SClock : public SImageWnd
 {
-	SOUI_CLASS_NAME(SImageWnd, L"clock")
+	DEF_SOBJECT(SImageWnd, L"clock")
 
 public:
 	SClock();

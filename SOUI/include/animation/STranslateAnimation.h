@@ -24,7 +24,7 @@ SNSBEGIN
  *
  */
 class SOUI_EXP STranslateAnimation : public SAnimation {
-    SOUI_CLASS_NAME(SAnimation, L"translate")
+    DEF_SOBJECT(SAnimation, L"translate")
 
   private:
     ValueType mFromXType;

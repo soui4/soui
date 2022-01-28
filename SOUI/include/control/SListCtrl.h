@@ -100,7 +100,7 @@ typedef struct _DXLVITEM
 //////////////////////////////////////////////////////////////////////////
 //  SListCtrl
 class SOUI_EXP SListCtrl : public SPanel {
-    SOUI_CLASS_NAME(SPanel, L"listctrl")
+    DEF_SOBJECT(SPanel, L"listctrl")
 
   public:
     /**
