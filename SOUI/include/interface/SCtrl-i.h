@@ -373,11 +373,11 @@ DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B"
 
     STDMETHOD_(ITreeViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
 
-    STDMETHOD_(void, SetSel)(THIS_ HTREEITEM hItem, BOOL bNotify /*= FALSE*/) PURE;
+    STDMETHOD_(void, SetSel)(THIS_ HSTREEITEM hItem, BOOL bNotify /*= FALSE*/) PURE;
 
-    STDMETHOD_(HTREEITEM, GetSel)(THIS) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetSel)(THIS) SCONST PURE;
 
-    STDMETHOD_(void, EnsureVisible)(THIS_ HTREEITEM hItem) PURE;
+    STDMETHOD_(void, EnsureVisible)(THIS_ HSTREEITEM hItem) PURE;
 
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
 };

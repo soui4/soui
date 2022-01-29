@@ -288,7 +288,6 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
     STDMETHOD_(BOOL, OnSort)(THIS_ int iCol, UINT *pFmts, int nCols) PURE;
 };
 
-typedef ULONG_PTR HTREEITEM;
 
 #undef INTERFACE
 #define INTERFACE ITvDataSetObserver
@@ -313,7 +312,7 @@ DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
      * This method is called when the entire data set has changed,
      * most likely through a call to {@link Cursor#requery()} on a {@link Cursor}.
      */
-    STDMETHOD_(void, onBranchChanged)(THIS_ HTREEITEM hBranch) PURE;
+    STDMETHOD_(void, onBranchChanged)(THIS_ HSTREEITEM hBranch) PURE;
 
     /**
      * This method is called when the entire data becomes invalid,
@@ -321,10 +320,10 @@ DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
      * {@link Cursor}.
      */
     STDMETHOD_(void, onBranchInvalidated)
-    (THIS_ HTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren) PURE;
+    (THIS_ HSTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren) PURE;
 
     STDMETHOD_(void, onBranchExpandedChanged)
-    (THIS_ HTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
+    (THIS_ HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
 };
 
 enum
@@ -387,32 +386,32 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
     STDMETHOD_(void, unregisterDataSetObserver)(THIS_ ITvDataSetObserver * observer) PURE;
 
     //获取hItem中的指定索引的数据
-    STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(THIS_ HTREEITEM hItem, DATA_INDEX idx) SCONST PURE;
+    STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(THIS_ HSTREEITEM hItem, DATA_INDEX idx) SCONST PURE;
 
     //保存hItem指定索引的数据
     STDMETHOD_(void, SetItemDataByIndex)
-    (THIS_ HTREEITEM hItem, DATA_INDEX idx, ULONG_PTR data) PURE;
+    (THIS_ HSTREEITEM hItem, DATA_INDEX idx, ULONG_PTR data) PURE;
 
-    STDMETHOD_(HTREEITEM, GetParentItem)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetParentItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
-    STDMETHOD_(HTREEITEM, GetFirstChildItem)(THIS_ HTREEITEM hItem) SCONST PURE;
-    STDMETHOD_(HTREEITEM, GetLastChildItem)(THIS_ HTREEITEM hItem) SCONST PURE;
-    STDMETHOD_(HTREEITEM, GetPrevSiblingItem)(THIS_ HTREEITEM hItem) SCONST PURE;
-    STDMETHOD_(HTREEITEM, GetNextSiblingItem)(THIS_ HTREEITEM hItem) SCONST PURE;
-    STDMETHOD_(BOOL, HasChildren)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetFirstChildItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetLastChildItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(BOOL, HasChildren)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
-    STDMETHOD_(BOOL, IsItemVisible)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(BOOL, IsItemVisible)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
-    STDMETHOD_(HTREEITEM, GetFirstVisibleItem)(THIS) SCONST PURE;
-    STDMETHOD_(HTREEITEM, GetLastVisibleItem)(THIS) SCONST PURE;
-    STDMETHOD_(HTREEITEM, GetPrevVisibleItem)(THIS_ HTREEITEM hItem) SCONST PURE;
-    STDMETHOD_(HTREEITEM, GetNextVisibleItem)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetFirstVisibleItem)(THIS) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetLastVisibleItem)(THIS) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetPrevVisibleItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetNextVisibleItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
-    STDMETHOD_(void, ExpandItem)(THIS_ HTREEITEM hItem, UINT code) PURE;
+    STDMETHOD_(void, ExpandItem)(THIS_ HSTREEITEM hItem, UINT code) PURE;
 
-    STDMETHOD_(BOOL, IsItemExpanded)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(BOOL, IsItemExpanded)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
-    STDMETHOD_(void, SetItemExpanded)(THIS_ HTREEITEM hItem, BOOL bExpanded) PURE;
+    STDMETHOD_(void, SetItemExpanded)(THIS_ HSTREEITEM hItem, BOOL bExpanded) PURE;
 
     /**
      * Get a View that displays the data at the specified position in the data set. You can either
@@ -431,14 +430,14 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      *        {@link #getItemViewType(int,DWORD)}).
      * @param xmlTemplate the xml template provided by its owner
      */
-    STDMETHOD_(void, getView)(THIS_ HTREEITEM hItem, IWindow * pItem, IXmlNode * pXmlTemplate) PURE;
+    STDMETHOD_(void, getView)(THIS_ HSTREEITEM hItem, IWindow * pItem, IXmlNode * pXmlTemplate) PURE;
 
-    STDMETHOD_(int, getViewType)(THIS_ HTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(int, getViewType)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     STDMETHOD_(int, getViewTypeCount)(THIS) SCONST PURE;
 
     STDMETHOD_(SIZE, getViewDesiredSize)
-    (THIS_ HTREEITEM hItem, IWindow * pItem, int wid, int hei) PURE;
+    (THIS_ HSTREEITEM hItem, IWindow * pItem, int wid, int hei) PURE;
 
     //定义行宽度和treeview客户区宽度相同
     STDMETHOD_(BOOL, isViewWidthMatchParent)(THIS) SCONST PURE;

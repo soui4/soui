@@ -498,12 +498,12 @@ public:
 
 	~CTreeViewAdapter() {}
 
-	virtual void WINAPI getView(SOUI::HTREEITEM loc, SItemPanel * pItem, SXmlNode xmlTemplate) {
+	virtual void WINAPI getView(HSTREEITEM loc, SItemPanel * pItem, SXmlNode xmlTemplate) {
 		if (pItem->GetChildrenCount() == 0)
 		{
 			pItem->InitFromXml(&xmlTemplate);
 		}
-		ItemInfo & ii = m_tree.GetItemRef((HSTREEITEM)loc);
+		ItemInfo & ii = m_tree.GetItemRef(loc);
 		SWindow * pWnd = pItem->FindChildByID(R.id.btn_test);
 		SASSERT(pWnd);
 		pWnd->SetWindowText(S_CW2T(ii.data.strName));
@@ -524,7 +524,7 @@ public:
 		SASSERT(pToggle);
 		SItemPanel *pItem = sobj_cast<SItemPanel>(pToggle->GetRoot());
 		SASSERT(pItem);
-		SOUI::HTREEITEM loc = (SOUI::HTREEITEM)pItem->GetItemIndex();
+		HSTREEITEM loc = (HSTREEITEM)pItem->GetItemIndex();
 		ExpandItem(loc, TVC_TOGGLE);
 		return true;
 	}

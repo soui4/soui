@@ -16,61 +16,61 @@ class SOUI_EXP STreeViewItemLocator : public TObjRefImpl<ITreeViewItemLocator> {
 
   public:
     STDMETHOD_(void, SetAdapter)(THIS_ ITvAdapter *pAdapter) OVERRIDE;
-    STDMETHOD_(void, OnBranchChanged)(THIS_ HTREEITEM hItem) OVERRIDE;
+    STDMETHOD_(void, OnBranchChanged)(THIS_ HSTREEITEM hItem) OVERRIDE;
     STDMETHOD_(void, OnBranchExpandedChanged)
-    (THIS_ HTREEITEM hItem, BOOL bExpandedOld, BOOL bExpandedNew) OVERRIDE;
+    (THIS_ HSTREEITEM hItem, BOOL bExpandedOld, BOOL bExpandedNew) OVERRIDE;
 
     STDMETHOD_(int, GetTotalHeight)(THIS) SCONST OVERRIDE;
     STDMETHOD_(int, GetTotalWidth)(THIS) SCONST OVERRIDE;
-    STDMETHOD_(int, Item2Position)(THIS_ HTREEITEM hItem) SCONST OVERRIDE;
-    STDMETHOD_(HTREEITEM, Position2Item)(THIS_ int position) SCONST OVERRIDE;
+    STDMETHOD_(int, Item2Position)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+    STDMETHOD_(HSTREEITEM, Position2Item)(THIS_ int position) SCONST OVERRIDE;
     STDMETHOD_(int, GetScrollLineSize)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(void, SetItemWidth)(THIS_ HTREEITEM hItem, int nWidth) OVERRIDE;
-    STDMETHOD_(int, GetItemWidth)(THIS_ HTREEITEM hItem) SCONST OVERRIDE;
-    STDMETHOD_(void, SetItemHeight)(THIS_ HTREEITEM hItem, int nHeight) OVERRIDE;
-    STDMETHOD_(int, GetItemHeight)(THIS_ HTREEITEM hItem) SCONST OVERRIDE;
-    STDMETHOD_(int, GetItemIndent)(THIS_ HTREEITEM hItem) SCONST OVERRIDE;
+    STDMETHOD_(void, SetItemWidth)(THIS_ HSTREEITEM hItem, int nWidth) OVERRIDE;
+    STDMETHOD_(int, GetItemWidth)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+    STDMETHOD_(void, SetItemHeight)(THIS_ HSTREEITEM hItem, int nHeight) OVERRIDE;
+    STDMETHOD_(int, GetItemHeight)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+    STDMETHOD_(int, GetItemIndent)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
 
   protected:
-    BOOL IsItemExpanded(HTREEITEM hItem) const;
+    BOOL IsItemExpanded(HSTREEITEM hItem) const;
 
     //更新hItem所在的父窗口中分枝宽度数据
     // hItem:显示宽度发生变化的节点，可以是节点本身宽度变化，也可能是子节点宽度发生了变化
     // nOldWidth：原显示宽度
     // nNewWidth: 新显示宽度
-    void _UpdateBranchWidth(HTREEITEM hItem, int nOldWidth, int nNewWidth);
+    void _UpdateBranchWidth(HSTREEITEM hItem, int nOldWidth, int nNewWidth);
 
-    int _GetBranchWidth(HTREEITEM hBranch) const;
+    int _GetBranchWidth(HSTREEITEM hBranch) const;
 
-    void _SetBranchWidth(HTREEITEM hBranch, int nWidth);
+    void _SetBranchWidth(HSTREEITEM hBranch, int nWidth);
 
-    void _SetItemWidth(HTREEITEM hItem, int nWidth);
+    void _SetItemWidth(HSTREEITEM hItem, int nWidth);
 
-    int _GetBranchHeight(HTREEITEM hItem) const;
+    int _GetBranchHeight(HSTREEITEM hItem) const;
 
-    void _SetBranchHeight(HTREEITEM hItem, int nHeight);
+    void _SetBranchHeight(HSTREEITEM hItem, int nHeight);
 
-    void _UpdateBranchHeight(HTREEITEM hItem, int nDiff);
+    void _UpdateBranchHeight(HSTREEITEM hItem, int nDiff);
 
     //向后更新兄弟结点的偏移量
-    void _UpdateSiblingsOffset(HTREEITEM hItem);
+    void _UpdateSiblingsOffset(HSTREEITEM hItem);
 
-    int _GetItemOffset(HTREEITEM hItem) const;
+    int _GetItemOffset(HSTREEITEM hItem) const;
 
-    void _SetItemOffset(HTREEITEM hItem, int nOffset);
+    void _SetItemOffset(HSTREEITEM hItem, int nOffset);
 
-    void _SetItemHeight(HTREEITEM hItem, int nHeight);
+    void _SetItemHeight(HSTREEITEM hItem, int nHeight);
 
-    int _GetItemVisibleHeight(HTREEITEM hItem) const;
+    int _GetItemVisibleHeight(HSTREEITEM hItem) const;
 
-    int _GetItemVisibleWidth(HTREEITEM hItem) const;
+    int _GetItemVisibleWidth(HSTREEITEM hItem) const;
 
-    HTREEITEM _Position2Item(int position, HTREEITEM hParent, int nParentPosition) const;
+    HSTREEITEM _Position2Item(int position, HSTREEITEM hParent, int nParentPosition) const;
 
-    BOOL _IsItemVisible(HTREEITEM hItem) const;
+    BOOL _IsItemVisible(HSTREEITEM hItem) const;
 
-    void _InitBranch(HTREEITEM hItem);
+    void _InitBranch(HSTREEITEM hItem);
 
     SAutoRefPtr<ITvAdapter> m_adapter;
     int m_nLineHeight;
@@ -97,11 +97,11 @@ class SOUI_EXP STreeView
 
     STDMETHOD_(ITreeViewItemLocator *, GetItemLocator)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(void, SetSel)(THIS_ HTREEITEM hItem, BOOL bNotify = FALSE) OVERRIDE;
+    STDMETHOD_(void, SetSel)(THIS_ HSTREEITEM hItem, BOOL bNotify = FALSE) OVERRIDE;
 
-    STDMETHOD_(HTREEITEM, GetSel)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(HSTREEITEM, GetSel)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(void, EnsureVisible)(THIS_ HTREEITEM hItem) OVERRIDE;
+    STDMETHOD_(void, EnsureVisible)(THIS_ HSTREEITEM hItem) OVERRIDE;
 
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
 
@@ -112,9 +112,9 @@ class SOUI_EXP STreeView
     BOOL OnItemClick(IEvtArgs *pEvt);
     BOOL OnItemDblClick(IEvtArgs *pEvt);
 
-    void onBranchChanged(HTREEITEM hBranch);
-    void onBranchInvalidated(HTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren);
-    void onBranchExpandedChanged(HTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew);
+    void onBranchChanged(HSTREEITEM hBranch);
+    void onBranchInvalidated(HSTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren);
+    void onBranchExpandedChanged(HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew);
 
   protected:
     void OnPaint(IRenderTarget *pRT);
@@ -175,7 +175,7 @@ class SOUI_EXP STreeView
     void UpdateVisibleItems();
 
     void RedrawItem(SItemPanel *pItem);
-    SItemPanel *GetItemPanel(HTREEITEM hItem);
+    SItemPanel *GetItemPanel(HSTREEITEM hItem);
 
     void DispatchMessage2Items(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -193,7 +193,7 @@ class SOUI_EXP STreeView
         m_itemRecycle; // item回收站,每一种样式在回收站中保持一个列表，以便重复利用
     SList<ItemInfo> m_visible_items; //可见元素
 
-    typedef SMap<HTREEITEM, ItemInfo> VISIBLEITEMSMAP;
+    typedef SMap<HSTREEITEM, ItemInfo> VISIBLEITEMSMAP;
     VISIBLEITEMSMAP *m_pVisibleMap;
 
     SXmlDoc m_xmlTemplate;
@@ -201,7 +201,7 @@ class SOUI_EXP STreeView
     SItemPanel *m_itemCapture;
     SItemPanel *m_pHoverItem;
 
-    HTREEITEM m_hSelected; /**< 当前选择项 */
+    HSTREEITEM m_hSelected; /**< 当前选择项 */
 
     BOOL m_bWantTab; /**< want tab */
 };

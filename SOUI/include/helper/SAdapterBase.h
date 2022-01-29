@@ -277,7 +277,7 @@ class STvObserverMgr {
         observer->Release();
     }
 
-    void notifyChanged(HTREEITEM hBranch)
+    void notifyChanged(HSTREEITEM hBranch)
     {
         SPOSITION pos = m_lstObserver.GetHeadPosition();
         while (pos)
@@ -287,7 +287,7 @@ class STvObserverMgr {
         }
     }
 
-    void notifyInvalidated(HTREEITEM hBranch, bool bInalidParents, bool invalidChildren)
+    void notifyInvalidated(HSTREEITEM hBranch, bool bInalidParents, bool invalidChildren)
     {
         SPOSITION pos = m_lstObserver.GetHeadPosition();
         while (pos)
@@ -297,7 +297,7 @@ class STvObserverMgr {
         }
     }
 
-    void notifyExpandChanged(HTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew)
+    void notifyExpandChanged(HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew)
     {
         SPOSITION pos = m_lstObserver.GetHeadPosition();
         while (pos)
@@ -314,7 +314,7 @@ class STvObserverMgr {
 template <class BaseClass>
 class TvAdatperImpl : public BaseClass {
   public:
-    void notifyBranchChanged(HTREEITEM hBranch)
+    void notifyBranchChanged(HSTREEITEM hBranch)
     {
         m_obzMgr.notifyChanged(hBranch);
     }
@@ -324,14 +324,14 @@ class TvAdatperImpl : public BaseClass {
      * or available. Once invoked this adapter is no longer valid and should
      * not report further data set changes.
      */
-    void notifyBranchInvalidated(HTREEITEM hBranch,
+    void notifyBranchInvalidated(HSTREEITEM hBranch,
                                  bool bInvalidParents = true,
                                  bool bInvalidChildren = true)
     {
         m_obzMgr.notifyInvalidated(hBranch, bInvalidParents, bInvalidChildren);
     }
 
-    void notifyBranchExpandChanged(HTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew)
+    void notifyBranchExpandChanged(HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew)
     {
         m_obzMgr.notifyExpandChanged(hBranch, bExpandedOld, bExpandedNew);
     }
@@ -368,7 +368,7 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
     };
 
     //获取hItem中的指定索引的数据
-    STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(HTREEITEM hItem, DATA_INDEX idx) const OVERRIDE
+    STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(HSTREEITEM hItem, DATA_INDEX idx) const OVERRIDE
     {
         if (hItem == ITEM_ROOT)
             return m_rootUserData[idx];
@@ -377,7 +377,7 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
     }
 
     //保存hItem指定索引的数据
-    STDMETHOD_(void, SetItemDataByIndex)(HTREEITEM hItem, DATA_INDEX idx, ULONG_PTR data) OVERRIDE
+    STDMETHOD_(void, SetItemDataByIndex)(HSTREEITEM hItem, DATA_INDEX idx, ULONG_PTR data) OVERRIDE
     {
         if (hItem == ITEM_ROOT)
             m_rootUserData[idx] = data;
@@ -388,46 +388,46 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         }
     }
 
-    STDMETHOD_(HTREEITEM, GetParentItem)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(HSTREEITEM, GetParentItem)(HSTREEITEM hItem) const OVERRIDE
     {
         if (hItem == ITEM_ROOT)
             return ITEM_NULL;
         HSTREEITEM hParent = m_tree.GetParentItem((HSTREEITEM)hItem);
         if (hParent == NULL)
             hParent = ITEM_ROOT;
-        return (HTREEITEM)hParent;
+        return (HSTREEITEM)hParent;
     }
 
-    STDMETHOD_(BOOL, HasChildren)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(BOOL, HasChildren)(HSTREEITEM hItem) const OVERRIDE
     {
         return GetFirstChildItem(hItem) != ITEM_NULL;
     }
 
-    STDMETHOD_(HTREEITEM, GetFirstChildItem)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(HSTREEITEM, GetFirstChildItem)(HSTREEITEM hItem) const OVERRIDE
     {
         SASSERT(hItem != ITEM_NULL);
-        return (HTREEITEM)m_tree.GetChildItem((HSTREEITEM)hItem, TRUE);
+        return (HSTREEITEM)m_tree.GetChildItem((HSTREEITEM)hItem, TRUE);
     }
 
-    STDMETHOD_(HTREEITEM, GetLastChildItem)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(HSTREEITEM, GetLastChildItem)(HSTREEITEM hItem) const OVERRIDE
     {
         SASSERT(hItem != ITEM_NULL);
-        return (HTREEITEM)m_tree.GetChildItem((HSTREEITEM)hItem, FALSE);
+        return (HSTREEITEM)m_tree.GetChildItem((HSTREEITEM)hItem, FALSE);
     }
 
-    STDMETHOD_(HTREEITEM, GetPrevSiblingItem)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(HSTREEITEM hItem) const OVERRIDE
     {
         SASSERT(hItem != ITEM_NULL && hItem != ITEM_ROOT);
-        return (HTREEITEM)m_tree.GetPrevSiblingItem((HSTREEITEM)hItem);
+        return (HSTREEITEM)m_tree.GetPrevSiblingItem((HSTREEITEM)hItem);
     }
 
-    STDMETHOD_(HTREEITEM, GetNextSiblingItem)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(HSTREEITEM hItem) const OVERRIDE
     {
         SASSERT(hItem != ITEM_NULL && hItem != ITEM_ROOT);
-        return (HTREEITEM)m_tree.GetNextSiblingItem((HSTREEITEM)hItem);
+        return (HSTREEITEM)m_tree.GetNextSiblingItem((HSTREEITEM)hItem);
     }
 
-    STDMETHOD_(int, getViewType)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(int, getViewType)(HSTREEITEM hItem) const OVERRIDE
     {
         return 0;
     }
@@ -437,24 +437,24 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return 1;
     }
 
-    STDMETHOD_(void, getView)(THIS_ HTREEITEM hItem, SItemPanel *pItem, SXmlNode xmlTemplate)
+    STDMETHOD_(void, getView)(THIS_ HSTREEITEM hItem, SItemPanel *pItem, SXmlNode xmlTemplate)
     {
     }
 
     STDMETHOD_(void, getView)
-    (THIS_ HTREEITEM hItem, IWindow *pItem, IXmlNode *pXmlTemplate) OVERRIDE
+    (THIS_ HSTREEITEM hItem, IWindow *pItem, IXmlNode *pXmlTemplate) OVERRIDE
     {
         SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pItem);
         SXmlNode xmlTemplate(pXmlTemplate);
         return getView(hItem, pItemPanel, xmlTemplate);
     }
 
-    STDMETHOD_(SIZE, getViewDesiredSize)(HTREEITEM hItem, SItemPanel *pItem, int wid, int hei)
+    STDMETHOD_(SIZE, getViewDesiredSize)(HSTREEITEM hItem, SItemPanel *pItem, int wid, int hei)
     {
         return pItem->GetDesiredSize(wid, hei);
     }
 
-    STDMETHOD_(SIZE, getViewDesiredSize)(HTREEITEM hItem, IWindow *pItem, int wid, int hei) OVERRIDE
+    STDMETHOD_(SIZE, getViewDesiredSize)(HSTREEITEM hItem, IWindow *pItem, int wid, int hei) OVERRIDE
     {
         SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pItem);
         return getViewDesiredSize(hItem, pItemPanel, wid, hei);
@@ -476,7 +476,7 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return FALSE;
     }
 
-    STDMETHOD_(void, ExpandItem)(HTREEITEM hItem, UINT uCode) OVERRIDE
+    STDMETHOD_(void, ExpandItem)(HSTREEITEM hItem, UINT uCode) OVERRIDE
     {
         BOOL bExpandedOld = IsItemExpanded(hItem);
         BOOL bExpandedNew = bExpandedOld;
@@ -499,21 +499,21 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         notifyBranchExpandChanged(hItem, bExpandedOld, bExpandedNew);
     }
 
-    STDMETHOD_(BOOL, IsItemExpanded)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(BOOL, IsItemExpanded)(HSTREEITEM hItem) const OVERRIDE
     {
         if (hItem == ITEM_ROOT)
             return TRUE; //虚拟根节点自动展开
         return (BOOL)GetItemDataByIndex(hItem, DATA_INDEX_ITEM_EXPANDED);
     }
 
-    STDMETHOD_(void, SetItemExpanded)(HTREEITEM hItem, BOOL bExpanded) OVERRIDE
+    STDMETHOD_(void, SetItemExpanded)(HSTREEITEM hItem, BOOL bExpanded) OVERRIDE
     {
         SetItemDataByIndex(hItem, DATA_INDEX_ITEM_EXPANDED, bExpanded);
     }
 
-    STDMETHOD_(BOOL, IsItemVisible)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(BOOL, IsItemVisible)(HSTREEITEM hItem) const OVERRIDE
     {
-        HTREEITEM hParent = GetParentItem(hItem);
+        HSTREEITEM hParent = GetParentItem(hItem);
         while (hParent != ITEM_NULL)
         {
             if (!IsItemExpanded(hParent))
@@ -523,19 +523,19 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return TRUE;
     }
 
-    STDMETHOD_(HTREEITEM, GetFirstVisibleItem)() const OVERRIDE
+    STDMETHOD_(HSTREEITEM, GetFirstVisibleItem)() const OVERRIDE
     {
         return GetFirstChildItem(ITEM_ROOT);
     }
 
-    STDMETHOD_(HTREEITEM, GetLastVisibleItem)() const OVERRIDE
+    STDMETHOD_(HSTREEITEM, GetLastVisibleItem)() const OVERRIDE
     {
-        HTREEITEM hItem = GetLastChildItem(ITEM_ROOT);
+        HSTREEITEM hItem = GetLastChildItem(ITEM_ROOT);
         if (hItem == ITEM_NULL)
             return hItem;
         for (; IsItemExpanded(hItem);)
         {
-            HTREEITEM hChild = GetLastChildItem(hItem);
+            HSTREEITEM hChild = GetLastChildItem(hItem);
             if (hChild == ITEM_NULL)
                 break;
             hItem = hChild;
@@ -543,7 +543,7 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return hItem;
     }
 
-    STDMETHOD_(HTREEITEM, GetPrevVisibleItem)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(HSTREEITEM, GetPrevVisibleItem)(HSTREEITEM hItem) const OVERRIDE
     {
         SASSERT(IsItemVisible(hItem));
         HSTREEITEM hRet = GetPrevSiblingItem(hItem);
@@ -556,20 +556,20 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return hRet;
     }
 
-    STDMETHOD_(HTREEITEM, GetNextVisibleItem)(HTREEITEM hItem) const OVERRIDE
+    STDMETHOD_(HSTREEITEM, GetNextVisibleItem)(HSTREEITEM hItem) const OVERRIDE
     {
         SASSERT(IsItemVisible(hItem));
         if (IsItemExpanded(hItem))
         {
-            HTREEITEM hChild = GetFirstChildItem(hItem);
+            HSTREEITEM hChild = GetFirstChildItem(hItem);
             if (hChild != ITEM_NULL)
                 return hChild;
         }
 
-        HTREEITEM hParent = hItem;
+        HSTREEITEM hParent = hItem;
         while (hParent != ITEM_NULL && hParent != ITEM_ROOT)
         {
-            HTREEITEM hRet = GetNextSiblingItem(hParent);
+            HSTREEITEM hRet = GetNextSiblingItem(hParent);
             if (hRet)
                 return hRet;
             hParent = GetParentItem(hParent);
@@ -587,17 +587,17 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return m_tree.InsertItem(ii, hParent, hInsertAfter);
     }
 
-    void DeleteItem(HTREEITEM hItem)
+    void DeleteItem(HSTREEITEM hItem)
     {
         m_tree.DeleteItem(hItem);
     }
 
-    BOOL DeleteItemEx(HTREEITEM hItem)
+    BOOL DeleteItemEx(HSTREEITEM hItem)
     {
         return m_tree.DeleteItemEx(hItem);
     }
 
-    const T &GetItemData(HTREEITEM hItem) const
+    const T &GetItemData(HSTREEITEM hItem) const
     {
         SASSERT(hItem != STVI_ROOT);
         ItemInfo &ii = m_tree.GetItemRef((HSTREEITEM)hItem);
