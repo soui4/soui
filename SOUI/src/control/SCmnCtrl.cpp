@@ -416,14 +416,14 @@ void SButton::OnPaint(IRenderTarget *pRT)
         if (GetState() & WndState_Hover)
         {
             // get hover
-            m_pBgSkin->DrawByState(pRT, rcClient, WndState_Normal, m_pBgSkin->GetAlpha());
-            m_pBgSkin->DrawByState(pRT, rcClient, WndState_Hover, byNewAlpha);
+            m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Normal, m_pBgSkin->GetAlpha());
+            m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Hover, byNewAlpha);
         }
         else
         {
             // lose hover
-            m_pBgSkin->DrawByState(pRT, rcClient, WndState_Normal, m_pBgSkin->GetAlpha());
-            m_pBgSkin->DrawByState(pRT, rcClient, WndState_Hover,
+            m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Normal, m_pBgSkin->GetAlpha());
+            m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Hover,
                                    m_pBgSkin->GetAlpha() - byNewAlpha);
         }
     }

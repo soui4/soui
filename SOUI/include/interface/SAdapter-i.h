@@ -154,7 +154,7 @@ DECLARE_INTERFACE_(ILvAdapter, IObjRef)
     /**
      * init adapter from the specified template xml data
      */
-    STDMETHOD_(void, InitByTemplate)(IXmlNode * xmlTemplate) PURE;
+    STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) PURE;
 };
 
 #undef INTERFACE
@@ -270,7 +270,7 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
     /**
      * init adapter from the specified template xml data
      */
-    STDMETHOD_(void, InitByTemplate)(IXmlNode * xmlTemplate) PURE;
+    STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) PURE;
 
     //获取一个列在模板中对应的窗口名称
     // int iCol: 列序号
@@ -445,7 +445,7 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
     /**
      * init adapter from the specified template xml data
      */
-    STDMETHOD_(void, InitByTemplate)(IXmlNode * pXmlTemplate) PURE;
+    STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * pXmlTemplate) PURE;
 };
 
 SNSEND

@@ -4,7 +4,6 @@
 #include <tchar.h>
 #include <commask.h>
 
-
 #ifndef SCOM_MASK
 #define SCOM_MASK scom_mask_scom_all
 #endif 

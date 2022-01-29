@@ -30,11 +30,11 @@ class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
     SSkinObjBase();
 
     STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST OVERRIDE;
-    STDMETHOD_(void, DrawByState)
+    STDMETHOD_(void, DrawByState2)
     (THIS_ IRenderTarget *pRT, LPCRECT rcDraw, DWORD dwState, BYTE byAlpha) SCONST OVERRIDE;
     STDMETHOD_(void, DrawByState)
     (THIS_ IRenderTarget *pRT, LPCRECT rcDraw, DWORD dwState) SCONST OVERRIDE;
-    STDMETHOD_(void, DrawByIndex)
+    STDMETHOD_(void, DrawByIndex2)
     (THIS_ IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) SCONST OVERRIDE;
     STDMETHOD_(void, DrawByIndex)
     (THIS_ IRenderTarget *pRT, LPCRECT rcDraw, int iState) SCONST OVERRIDE;

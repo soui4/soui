@@ -143,7 +143,7 @@ void SScrollBarHandler::OnDraw(IRenderTarget *pRT, int iPart) const
         iPart = SB_PAGEUP;
     BYTE byAlpha = GetAlpha(iPart);
     m_pSbHost->GetScrollBarSkin(IsVertical())
-        ->DrawByState(pRT, rcPart, MAKESBSTATE(iPart, dwState, IsVertical()), byAlpha);
+        ->DrawByState2(pRT, rcPart, MAKESBSTATE(iPart, dwState, IsVertical()), byAlpha);
 }
 
 void SScrollBarHandler::OnTimer(char id)

@@ -787,7 +787,7 @@ void SSKinGroup::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
     ISkinObj *pSkin = m_skins[iState];
     if (!pSkin)
         return;
-    pSkin->DrawByIndex(pRT, rcDraw, 0, byAlpha);
+    pSkin->DrawByIndex2(pRT, rcDraw, 0, byAlpha);
 }
 
 SIZE SSKinGroup::GetSkinSize() const

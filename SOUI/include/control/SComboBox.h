@@ -60,7 +60,7 @@ class SOUI_EXP SComboBox : public TComboBaseProxy<IComboBox> {
 
     STDMETHOD_(void, ResetContent)(THIS) OVERRIDE;
 
-    STDMETHOD_(BOOL, GetItemText)(int iItem, BOOL bRawText, IStringT *str) CONST OVERRIDE;
+    STDMETHOD_(BOOL, GetItemText)(int iItem, BOOL bRawText, IStringT *str) SCONST OVERRIDE;
 
     STDMETHOD_(IListBox *, GetIListBox)(THIS) OVERRIDE;
 

@@ -13,7 +13,6 @@
 #pragma once
 
 #include <core/sobjType.h>
-#include <sobject/Sobject.hpp>
 #include <interface/obj-ref-i.h>
 #include <interface/SRender-i.h>
 
@@ -59,7 +58,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * @return   LPCWSTR -- 类型名
      * Describe  这是一个虚函数，注意与GetClassName的区别。
      */
-    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS_) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS) SCONST PURE;
 
     /**
      * GetObjectType
@@ -171,7 +170,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * @return   void
      * Describe
      */
-    STDMETHOD_(void, DrawByState)
+    STDMETHOD_(void, DrawByState2)
     (THIS_ IRenderTarget * pRT, LPCRECT rcDraw, DWORD dwState, BYTE byAlpha) SCONST PURE;
 
     /**
@@ -196,7 +195,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * @return   void
      * Describe
      */
-    STDMETHOD_(void, DrawByIndex)
+    STDMETHOD_(void, DrawByIndex2)
     (THIS_ IRenderTarget * pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) SCONST PURE;
 
     /**

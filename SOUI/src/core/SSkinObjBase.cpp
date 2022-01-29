@@ -171,20 +171,20 @@ SIZE SSkinObjBase::GetSkinSize() const
 
 void SSkinObjBase::DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState) const
 {
-    DrawByIndex(pRT, rcDraw, iState, GetAlpha());
+    DrawByIndex2(pRT, rcDraw, iState, GetAlpha());
 }
 
-void SSkinObjBase::DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
+void SSkinObjBase::DrawByIndex2(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
     _DrawByIndex(pRT, rcDraw, iState, byAlpha);
 }
 
 void SSkinObjBase::DrawByState(IRenderTarget *pRT, LPCRECT rcDraw, DWORD dwState) const
 {
-    DrawByState(pRT, rcDraw, dwState, GetAlpha());
+    DrawByState2(pRT, rcDraw, dwState, GetAlpha());
 }
 
-void SSkinObjBase::DrawByState(IRenderTarget *pRT,
+void SSkinObjBase::DrawByState2(IRenderTarget *pRT,
                                LPCRECT rcDraw,
                                DWORD dwState,
                                BYTE byAlpha) const
@@ -198,7 +198,7 @@ void SSkinObjBase::_DrawByState(IRenderTarget *pRT,
                                 BYTE byAlpha) const
 {
     int idx = State2Index(dwState);
-    DrawByIndex(pRT, rcDraw, idx, byAlpha);
+    DrawByIndex2(pRT, rcDraw, idx, byAlpha);
 }
 
 void SSkinObjBase::SetAlpha(BYTE byAlpha)
