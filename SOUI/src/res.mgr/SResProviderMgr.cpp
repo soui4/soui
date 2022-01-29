@@ -190,7 +190,7 @@ IImgX *SResProviderMgr::LoadImgX(LPCTSTR strType, LPCTSTR pszResName)
     }
 }
 
-IBitmap *SResProviderMgr::LoadImage(LPCTSTR pszType, LPCTSTR pszResName)
+IBitmapS *SResProviderMgr::LoadImage(LPCTSTR pszType, LPCTSTR pszResName)
 {
     if (!pszType)
         return NULL;
@@ -213,7 +213,7 @@ IBitmap *SResProviderMgr::LoadImage(LPCTSTR pszType, LPCTSTR pszResName)
                         pszResName);
             return NULL;
         }
-        IBitmap *pRet = pResProvider->LoadImage(pszType, pszResName);
+        IBitmapS *pRet = pResProvider->LoadImage(pszType, pszResName);
         SASSERT_FMT(pRet, _T("load image failed, resource content %s:%s not found!"), pszType,
                     pszResName);
         return pRet;
@@ -338,7 +338,7 @@ BOOL SResProviderMgr::HasResource(LPCTSTR pszType, LPCTSTR pszResName)
     }
 }
 
-IBitmap *SResProviderMgr::LoadImage2(const SStringW &strImgID)
+IBitmapS *SResProviderMgr::LoadImage2(const SStringW &strImgID)
 {
     SStringT strImgID2 = S_CW2T(strImgID);
     SStringTList strLst;

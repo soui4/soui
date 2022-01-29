@@ -224,9 +224,9 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     STDMETHOD_(void, Update)(THIS) PURE;
 
-    STDMETHOD_(void, SetWindowRgn)(THIS_ IRegion * pRgn, BOOL bRedraw) PURE;
-    STDMETHOD_(IRegion *, GetWindowRgn)(THIS) SCONST PURE;
-    STDMETHOD_(void, SetWindowPath)(THIS_ IPath * pPath, BOOL bRedraw) PURE;
+    STDMETHOD_(void, SetWindowRgn)(THIS_ IRegionS * pRgn, BOOL bRedraw) PURE;
+    STDMETHOD_(IRegionS *, GetWindowRgn)(THIS) SCONST PURE;
+    STDMETHOD_(void, SetWindowPath)(THIS_ IPathS * pPath, BOOL bRedraw) PURE;
 
     /**
      * Move2

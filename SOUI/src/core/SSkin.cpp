@@ -81,7 +81,7 @@ LRESULT SSkinImgList::OnAttrSrc(const SStringW &value, BOOL bLoading)
     return S_OK;
 }
 
-bool SSkinImgList::SetImage(IBitmap *pImg)
+bool SSkinImgList::SetImage(IBitmapS *pImg)
 {
     m_pImg = pImg;
     m_strSrc.Empty();
@@ -89,7 +89,7 @@ bool SSkinImgList::SetImage(IBitmap *pImg)
     return true;
 }
 
-IBitmap *SSkinImgList::GetImage() const
+IBitmapS *SSkinImgList::GetImage() const
 {
     if (m_pImg)
         return m_pImg;
@@ -109,7 +109,7 @@ void SSkinImgList::OnColorize(COLORREF cr)
         return;
     m_crColorize = cr;
 
-    IBitmap *pImg = GetImage();
+    IBitmapS *pImg = GetImage();
     if (m_imgBackup)
     { // restore
         LPCVOID pSrc = m_imgBackup->GetPixelBits();
@@ -159,7 +159,7 @@ void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
     {
         m_imgBackup->Scale2(&pRet->m_imgBackup, szSkin.cx, szSkin.cy, kHigh_FilterLevel);
     }
-    IBitmap *pImg = GetImage();
+    IBitmapS *pImg = GetImage();
     if (pImg)
     {
         m_pImg->Scale2(&pRet->m_pImg, szSkin.cx, szSkin.cy, kHigh_FilterLevel);
@@ -256,7 +256,7 @@ void SSkinButton::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, 
     // 只有 在 需要渐变的情况下 才 需要 这个
     if (m_colors.m_crUp[iState] != m_colors.m_crDown[iState])
     {
-        SAutoRefPtr<IRegion> rgnClip;
+        SAutoRefPtr<IRegionS> rgnClip;
         if (nCorner > 2)
         {
             CRect rcDraw(*prcDraw);
@@ -288,7 +288,7 @@ void SSkinButton::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, 
     if (CR_INVALID == m_colors.m_crBorder[iState]) //  不改变 原因的 效果
         iState = 0;
     // 画 边框
-    SAutoRefPtr<IPen> pPen, pOldPen;
+    SAutoRefPtr<IPenS> pPen, pOldPen;
     pRT->CreatePen(PS_SOLID, m_colors.m_crBorder[iState], 1, &pPen);
     pRT->SelectObject(pPen, (IRenderObj **)&pOldPen);
     pRT->DrawRoundRect(prcDraw, CPoint(nCorner, nCorner));
@@ -540,8 +540,8 @@ void SSkinColorRect::_DrawByIndex(IRenderTarget *pRT,
 
     if (m_crBorders[iState] != CR_INVALID && m_nBorderWidth > 0)
     {
-        SAutoRefPtr<IPen> pen, oldPen;
-        pRT->CreatePen(PS_SOLID, m_crBorders[iState], m_nBorderWidth, (IPen **)&pen);
+        SAutoRefPtr<IPenS> pen, oldPen;
+        pRT->CreatePen(PS_SOLID, m_crBorders[iState], m_nBorderWidth, (IPenS **)&pen);
         pRT->SelectObject(pen, (IRenderObj **)&oldPen);
         if (nCorner > 0)
             pRT->DrawRoundRect(prcDraw, CPoint(nCorner, nCorner));
@@ -658,7 +658,7 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
     RECT rcDest = *rcDraw;
     if (m_crSolid != CR_INVALID)
     {
-        SAutoRefPtr<IBrush> brush, oldBrush;
+        SAutoRefPtr<IBrushS> brush, oldBrush;
         pRT->CreateSolidColorBrush(m_crSolid, &brush);
         pRT->SelectObject(brush, (IRenderObj **)&oldBrush);
 
@@ -681,7 +681,7 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
 
     if (m_gradient != NULL)
     {
-        SAutoRefPtr<IRegion> region;
+        SAutoRefPtr<IRegionS> region;
         pRT->CreateRegion(&region);
         RECT rcGradient = rcDest;
         // set clip
@@ -710,7 +710,7 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
 
     if (m_stroke != NULL)
     {
-        SAutoRefPtr<IPen> pPen, oldPen;
+        SAutoRefPtr<IPenS> pPen, oldPen;
         int nPenWidth = m_stroke->m_width.toPixelSize(GetScale());
         pRT->CreatePen(m_stroke->m_style, m_stroke->m_color, nPenWidth, &pPen);
         pRT->SelectObject(pPen, (IRenderObj **)&oldPen);
@@ -817,7 +817,7 @@ IBitmap中的内存为RGBA格式，.9中使用alpha通道==0或者255来确定�
 */
 HRESULT SSkinImgFrame2::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
 {
-    IBitmap *pImg = LOADIMAGE2(strValue);
+    IBitmapS *pImg = LOADIMAGE2(strValue);
     if (!pImg)
         return E_FAIL;
     int nWid = pImg->Width();
@@ -854,7 +854,7 @@ HRESULT SSkinImgFrame2::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
     m_rcMargin.bottom = nHei - 2 - bottom;
 
     HRESULT hRet = S_OK;
-    IBitmap *pImgCenter = NULL;
+    IBitmapS *pImgCenter = NULL;
     if (!pImg->GetRenderFactory()->CreateBitmap(&pImgCenter))
     {
         return E_OUTOFMEMORY;

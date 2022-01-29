@@ -38,7 +38,7 @@ class SOUI_EXP SItemPanel
 
     static BOOL IsItemInClip(const SMatrix &mtx,
                              const CRect &rcClip,
-                             const IRegion *clipRgn,
+                             const IRegionS *clipRgn,
                              const CRect &rcItem);
 
   protected:

@@ -199,19 +199,19 @@ namespace SOUI
 		return TRUE;
 	}
 
-	BOOL SRenderFactory_Skia::CreateBitmap( IBitmap ** ppBitmap )
+	BOOL SRenderFactory_Skia::CreateBitmap( IBitmapS ** ppBitmap )
 	{
 		*ppBitmap = new SBitmap_Skia(this);
 		return TRUE;
 	}
 
-	BOOL SRenderFactory_Skia::CreateRegion( IRegion **ppRgn )
+	BOOL SRenderFactory_Skia::CreateRegion( IRegionS **ppRgn )
 	{
 		*ppRgn = new SRegion_Skia(this);
 		return TRUE;
 	}
 
-	BOOL SRenderFactory_Skia::CreatePath(IPath ** ppPath)
+	BOOL SRenderFactory_Skia::CreatePath(IPathS ** ppPath)
 	{
 		*ppPath = new SPath_Skia(this);
 		return TRUE;
@@ -260,7 +260,7 @@ namespace SOUI
 
 	//----------------------------------------------------------------------------------------------
 	//////////////////////////////////////////////////////////////////////////
-	SPen_Skia::SPen_Skia(IRenderFactory * pRenderFac,int iStyle/*=PS_SOLID*/,COLORREF cr/*=0xFF000000*/,int cWidth/*=1*/) :TSkiaRenderObjImpl<IPen,OT_PEN>(pRenderFac)
+	SPen_Skia::SPen_Skia(IRenderFactory * pRenderFac,int iStyle/*=PS_SOLID*/,COLORREF cr/*=0xFF000000*/,int cWidth/*=1*/) :TSkiaRenderObjImpl<IPenS,OT_PEN>(pRenderFac)
 		,m_nWidth(cWidth),m_style(iStyle),m_cr(cr)
 	{
 
@@ -331,7 +331,7 @@ namespace SOUI
 		pRenderFactory->CreateBitmap(&m_defBmp);
 		m_defBmp->Init(nWid,nHei,NULL);
 		SelectObject(m_defBmp,NULL);
-		SAutoRefPtr<IPen> pPen;
+		SAutoRefPtr<IPenS> pPen;
 		CreatePen(PS_SOLID,SColor(0,0,0).toCOLORREF(),1,&pPen);
 		SelectObject(pPen,NULL);
 	}
@@ -348,26 +348,26 @@ namespace SOUI
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::CreatePen( int iStyle,COLORREF cr,int cWidth,IPen ** ppPen )
+	HRESULT SRenderTarget_Skia::CreatePen( int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen )
 	{
 		*ppPen = new SPen_Skia(m_pRenderFactory,iStyle,cr,cWidth);
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::CreateSolidColorBrush( COLORREF cr,IBrush ** ppBrush )
+	HRESULT SRenderTarget_Skia::CreateSolidColorBrush( COLORREF cr,IBrushS ** ppBrush )
 	{
 		*ppBrush = SBrush_Skia::CreateSolidBrush(m_pRenderFactory,cr);
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::CreateBitmapBrush( IBitmap *pBmp,IBrush ** ppBrush )
+	HRESULT SRenderTarget_Skia::CreateBitmapBrush( IBitmapS *pBmp,IBrushS ** ppBrush )
 	{
 		SBitmap_Skia *pBmpSkia = (SBitmap_Skia*)pBmp;
 		*ppBrush = SBrush_Skia::CreateBitmapBrush(m_pRenderFactory,pBmpSkia->GetSkBitmap());
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::CreateRegion(IRegion ** ppRegion)
+	HRESULT SRenderTarget_Skia::CreateRegion(IRegionS ** ppRegion)
 	{
 		return m_pRenderFactory->CreateRegion(ppRegion)?S_OK:E_OUTOFMEMORY;
 	}
@@ -391,7 +391,7 @@ namespace SOUI
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::PushClipRegion( IRegion *pRegion ,UINT mode/*=RGN_AND*/)
+	HRESULT SRenderTarget_Skia::PushClipRegion( IRegionS *pRegion ,UINT mode/*=RGN_AND*/)
 	{
 		SRegion_Skia * rgn_skia=(SRegion_Skia*)pRegion;
 		SkRegion rgn=rgn_skia->GetRegion();
@@ -439,7 +439,7 @@ namespace SOUI
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::GetClipRegion( IRegion **ppRegion )
+	HRESULT SRenderTarget_Skia::GetClipRegion( IRegionS **ppRegion )
 	{
 		SRegion_Skia *pRgn=new SRegion_Skia(m_pRenderFactory);
 		SkRegion rgn = m_SkCanvas->getTotalClip();
@@ -745,7 +745,7 @@ namespace SOUI
 		return bRet?S_OK:S_FALSE;
 	}
 
-	HRESULT SRenderTarget_Skia::DrawBitmap(LPCRECT pRcDest,const IBitmap *pBitmap,int xSrc,int ySrc,BYTE byAlpha/*=0xFF*/ )
+	HRESULT SRenderTarget_Skia::DrawBitmap(LPCRECT pRcDest,const IBitmapS *pBitmap,int xSrc,int ySrc,BYTE byAlpha/*=0xFF*/ )
 	{
 		SBitmap_Skia *pBmp = (SBitmap_Skia*)pBitmap;
 		const SkBitmap & bmp=pBmp->GetSkBitmap();
@@ -771,7 +771,7 @@ namespace SOUI
 
 	HRESULT SRenderTarget_Skia::AlphaBlend( LPCRECT pRcDest,IRenderTarget *pRTSrc,LPCRECT pRcSrc,BYTE byAlpha )
 	{
-		IBitmap *pBmp=(IBitmap*) pRTSrc->GetCurrentObject(OT_BITMAP);
+		IBitmapS *pBmp=(IBitmapS*) pRTSrc->GetCurrentObject(OT_BITMAP);
 		if(!pBmp) return S_FALSE;
 		RECT rcSrc = *pRcSrc;
 		POINT ptSrcOrg;
@@ -788,7 +788,7 @@ namespace SOUI
 		return DrawBitmapEx(pRcDest,pBmp,&rcSrc,EM_STRETCH,byAlpha);
 	}
 
-	HRESULT SRenderTarget_Skia::DrawBitmapEx( LPCRECT pRcDest,const IBitmap *pBitmap,LPCRECT pRcSrc,UINT expendMode, BYTE byAlpha/*=0xFF*/ )
+	HRESULT SRenderTarget_Skia::DrawBitmapEx( LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,UINT expendMode, BYTE byAlpha/*=0xFF*/ )
 	{
 		UINT expendModeLow = LOWORD(expendMode);
 
@@ -838,7 +838,7 @@ namespace SOUI
 	}
 
 
-	HRESULT SRenderTarget_Skia::DrawBitmap9Patch( LPCRECT pRcDest,const IBitmap *pBitmap,LPCRECT pRcSrc,LPCRECT pRcSourMargin,UINT expendMode,BYTE byAlpha/*=0xFF*/ )
+	HRESULT SRenderTarget_Skia::DrawBitmap9Patch( LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,LPCRECT pRcSourMargin,UINT expendMode,BYTE byAlpha/*=0xFF*/ )
 	{
 		int xDest[4] = {pRcDest->left,pRcDest->left+pRcSourMargin->left,pRcDest->right-pRcSourMargin->right,pRcDest->right};
 		int xSrc[4] = {pRcSrc->left,pRcSrc->left+pRcSourMargin->left,pRcSrc->right-pRcSourMargin->right,pRcSrc->right};
@@ -1444,14 +1444,14 @@ namespace SOUI
 		return crRet;
 	}
 
-	HRESULT SRenderTarget_Skia::PushClipPath(const IPath * path, UINT mode, BOOL doAntiAlias /*= false*/)
+	HRESULT SRenderTarget_Skia::PushClipPath(const IPathS * path, UINT mode, BOOL doAntiAlias /*= false*/)
 	{
 		const SPath_Skia * path2 = (const SPath_Skia *)path;
 		m_SkCanvas->clipPath(path2->m_skPath,SRegion_Skia::RGNMODE2SkRgnOP(mode),!!doAntiAlias);
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::DrawPath(const IPath * path, IPathEffect * pathEffect)
+	HRESULT SRenderTarget_Skia::DrawPath(const IPathS * path, IPathEffect * pathEffect)
 	{
 		const SPath_Skia * path2 = (const SPath_Skia *)path;
 
@@ -1484,7 +1484,7 @@ namespace SOUI
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::FillPath(const IPath * path)
+	HRESULT SRenderTarget_Skia::FillPath(const IPathS * path)
 	{
 		const SPath_Skia * path2 = (const SPath_Skia *)path;
 
@@ -1613,7 +1613,7 @@ namespace SOUI
 	//////////////////////////////////////////////////////////////////////////
 	// SBitmap_Skia
 	static int s_cBmp = 0;
-	SBitmap_Skia::SBitmap_Skia( IRenderFactory *pRenderFac ) :TSkiaRenderObjImpl<IBitmap,OT_BITMAP>(pRenderFac),m_hBmp(0)
+	SBitmap_Skia::SBitmap_Skia( IRenderFactory *pRenderFac ) :TSkiaRenderObjImpl<IBitmapS,OT_BITMAP>(pRenderFac),m_hBmp(0)
 	{
 		//         STRACE(L"bitmap new; objects = %d",++s_cBmp);
 	}
@@ -1759,7 +1759,7 @@ namespace SOUI
 		return m_bitmap.getPixels();
 	}
 
-	HRESULT SBitmap_Skia::Clone(IBitmap **ppClone) const 
+	HRESULT SBitmap_Skia::Clone(IBitmapS **ppClone) const 
 	{
 		HRESULT hr = E_UNEXPECTED;
 		BOOL bOK = GetRenderFactory()->CreateBitmap(ppClone);
@@ -1775,14 +1775,14 @@ namespace SOUI
 		return hr;
 	}
 
-	HRESULT SBitmap_Skia::Scale(IBitmap **ppOutput,int nScale,FilterLevel filterLevel) SCONST
+	HRESULT SBitmap_Skia::Scale(IBitmapS **ppOutput,int nScale,FilterLevel filterLevel) SCONST
 	{
 		int wid = MulDiv(Width(),nScale,100);
 		int hei = MulDiv(Height(),nScale,100);
 		return Scale2(ppOutput,wid,hei,filterLevel);
 	}
 
-	HRESULT SBitmap_Skia::Scale2(IBitmap **pOutput,int nWid,int nHei,FilterLevel filterLevel) SCONST
+	HRESULT SBitmap_Skia::Scale2(IBitmapS **pOutput,int nWid,int nHei,FilterLevel filterLevel) SCONST
 	{
 		if(nWid == Width() && nHei == Height())
 		{
@@ -1800,7 +1800,7 @@ namespace SOUI
 				hr = pRT->DrawBitmapEx(&rcDst,this,&rcSrc,MAKELONG(EM_STRETCH,filterLevel),255);
 				if(hr == S_OK)
 				{
-					*pOutput = (IBitmap*)pRT->GetCurrentObject(OT_BITMAP);
+					*pOutput = (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
 					(*pOutput)->AddRef();
 				}
 				pRT->Release();
@@ -1821,7 +1821,7 @@ namespace SOUI
 	//////////////////////////////////////////////////////////////////////////
 	static int s_cRgn =0;
 	SRegion_Skia::SRegion_Skia( IRenderFactory *pRenderFac )
-		:TSkiaRenderObjImpl<IRegion,OT_RGN>(pRenderFac)
+		:TSkiaRenderObjImpl<IRegionS,OT_RGN>(pRenderFac)
 	{
 		//         STRACE(L"region new; objects = %d",++s_cRgn);
 	}
@@ -1885,7 +1885,7 @@ namespace SOUI
 
 	}
 
-	void SRegion_Skia::CombineRgn(const IRegion * pRgnSrc,int nCombineMode)
+	void SRegion_Skia::CombineRgn(const IRegionS * pRgnSrc,int nCombineMode)
 	{
 		const SRegion_Skia * pRgnSrc2 = (const SRegion_Skia*)pRgnSrc;
 		m_rgn.op(pRgnSrc2->GetRegion(),RGNMODE2SkRgnOP(nCombineMode));
@@ -1917,7 +1917,7 @@ namespace SOUI
 		return m_rgn.isEmpty();
 	}
 
-	BOOL SRegion_Skia::IsEqual(const IRegion *testRgn) const
+	BOOL SRegion_Skia::IsEqual(const IRegionS *testRgn) const
 	{
 		const SRegion_Skia * pRgnTest = (const SRegion_Skia*)testRgn;
 		return m_rgn == pRgnTest->m_rgn;
@@ -2124,7 +2124,7 @@ namespace SOUI
 	//////////////////////////////////////////////////////////////////////////
 	static int s_cPath =0;
 	SPath_Skia::SPath_Skia(IRenderFactory *pRenderFac)
-		:TSkiaRenderObjImpl<IPath,OT_PATH>(pRenderFac)
+		:TSkiaRenderObjImpl<IPathS,OT_PATH>(pRenderFac)
 	{
 		//         STRACE(L"path new; objects = %d",++s_cPath);
 	}
@@ -2400,13 +2400,13 @@ namespace SOUI
 		delete []skPts;
 	}
 
-	void SPath_Skia::addPath(const IPath * src, float dx, float dy, AddPathMode mode /*= kAppend_AddPathMode*/)
+	void SPath_Skia::addPath(const IPathS * src, float dx, float dy, AddPathMode mode /*= kAppend_AddPathMode*/)
 	{
 		const SPath_Skia *skSrc = (const SPath_Skia*)src;
 		m_skPath.addPath(skSrc->m_skPath,dx,dy,(SkPath::AddPathMode)mode);
 	}
 
-	void SPath_Skia::reverseAddPath(const IPath* src)
+	void SPath_Skia::reverseAddPath(const IPathS* src)
 	{
 		const SPath_Skia *skSrc = (const SPath_Skia*)src;
 		m_skPath.reverseAddPath(skSrc->m_skPath);

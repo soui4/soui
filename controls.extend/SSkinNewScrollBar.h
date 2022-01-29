@@ -96,7 +96,7 @@ protected:
         return rc;
     }
 
-    IBitmap *m_pImgVert,        //垂直滚动条图片,子图垂直排列
+    IBitmapS *m_pImgVert,        //垂直滚动条图片,子图垂直排列
             *m_pImgHorz;        //水平滚动条图片,子图水平排列
 
     SOUI_ATTRS_BEGIN()

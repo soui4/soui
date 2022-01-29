@@ -6,12 +6,6 @@
 
 #define IOB_VT_OF(x) ((IObjRefVtbl *((x)->lpVtbl))
 
-//#define AddRef(pif) \
-//	(IOB_VT_OF(pif)->AddRef((IObjRef *(pif)))
-//
-//#define Release(pif) \
-//	(IOB_VT_OF(pif)->Release((IObjRef *(pif)))
-//
 // from stddef.h
 #ifndef offsetof
 #define offsetof(s,m)  (size_t)&(((s *)0)->m)
@@ -217,7 +211,7 @@ BOOL TestLvAdapter_Init(ILvAdapter **pObj)
 	pAdapter->adapter.lpVtbl = &vtblTestLv;
 	pAdapter->nRefs = 1;
 	pAdapter->obz = NULL;
-	*pObj = (ILvAdapter *)pAdapter;
+	*pObj = &pAdapter->adapter;
 	return TRUE;
 }
 

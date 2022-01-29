@@ -29,15 +29,15 @@ public:
 
 	STDMETHOD_(BOOL,CreateFont)(THIS_ IFontS ** ppFont, const LOGFONT *lf) OVERRIDE;
 
-	STDMETHOD_(BOOL,CreateBitmap)(THIS_ IBitmap ** ppBitmap) OVERRIDE;
+	STDMETHOD_(BOOL,CreateBitmap)(THIS_ IBitmapS ** ppBitmap) OVERRIDE;
 
-	STDMETHOD_(BOOL,CreateRegion)(THIS_ IRegion **ppRgn) OVERRIDE;
+	STDMETHOD_(BOOL,CreateRegion)(THIS_ IRegionS **ppRgn) OVERRIDE;
 
 	STDMETHOD_(HRESULT,CreateBlurMaskFilter)(THIS_ float radius, BlurStyle style,BlurFlags flag,IMaskFilter ** ppMaskFilter) OVERRIDE {return E_NOTIMPL;}
 
 	STDMETHOD_(HRESULT,CreateEmbossMaskFilter)(THIS_ float direction[3], float ambient, float specular, float blurRadius,IMaskFilter ** ppMaskFilter) OVERRIDE {return E_NOTIMPL;}
 
-	STDMETHOD_(BOOL,CreatePath)(THIS_ IPath ** ppPath) OVERRIDE;
+	STDMETHOD_(BOOL,CreatePath)(THIS_ IPathS ** ppPath) OVERRIDE;
 
 	STDMETHOD_(BOOL,CreatePathEffect)(THIS_ REFGUID guidEffect,IPathEffect ** ppPathEffect) OVERRIDE;
 
@@ -78,7 +78,7 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////
 // SPen_GDI
-class SPen_GDI : public TGdiRenderObjImpl<IPen,OT_PEN>
+class SPen_GDI : public TGdiRenderObjImpl<IPenS,OT_PEN>
 {
 public:
 	SPen_GDI(IRenderFactory * pRenderFac,int iStyle=PS_SOLID,COLORREF cr=0,int cWidth=1);
@@ -182,7 +182,7 @@ protected:
 	HFONT       m_hFont;
 };
 
-class SBrush_GDI : public TGdiRenderObjImpl<IBrush,OT_BRUSH>
+class SBrush_GDI : public TGdiRenderObjImpl<IBrushS,OT_BRUSH>
 {
 public:
 	static SBrush_GDI * CreateSolidBrush(IRenderFactory * pRenderFac,COLORREF cr){
@@ -202,12 +202,12 @@ public:
 	COLORREF GetColor() const {return m_cr;}
 protected:
 	SBrush_GDI(IRenderFactory * pRenderFac,COLORREF cr)
-		:TGdiRenderObjImpl<IBrush,OT_BRUSH>(pRenderFac),m_fBmp(FALSE),m_cr(cr)
+		:TGdiRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_fBmp(FALSE),m_cr(cr)
 	{
 		m_hBrush = ::CreateSolidBrush(m_cr&0x00ffffff);
 	}
 	SBrush_GDI(IRenderFactory * pRenderFac,HBITMAP hBmp)
-		:TGdiRenderObjImpl<IBrush,OT_BRUSH>(pRenderFac),m_fBmp(TRUE)
+		:TGdiRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_fBmp(TRUE)
 	{
 		m_hBrush = ::CreatePatternBrush(hBmp);
 	}
@@ -224,11 +224,11 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////
 // SBitmap_GDI
-class SBitmap_GDI : public TGdiRenderObjImpl<IBitmap,OT_BITMAP>
+class SBitmap_GDI : public TGdiRenderObjImpl<IBitmapS,OT_BITMAP>
 {
 public:
 	SBitmap_GDI(IRenderFactory *pRenderFac)
-		:TGdiRenderObjImpl<IBitmap,OT_BITMAP>(pRenderFac),m_hBmp(0)
+		:TGdiRenderObjImpl<IBitmapS,OT_BITMAP>(pRenderFac),m_hBmp(0)
 	{
 		m_sz.cx=m_sz.cy=0;
 	}
@@ -257,11 +257,11 @@ public:
 
 	STDMETHOD_(const LPVOID,GetPixelBits)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(HRESULT,Clone)(THIS_ IBitmap **ppClone) SCONST OVERRIDE;
+	STDMETHOD_(HRESULT,Clone)(THIS_ IBitmapS **ppClone) SCONST OVERRIDE;
 
-	STDMETHOD_(HRESULT,Scale)(THIS_ IBitmap **pOutput,int nScale,FilterLevel filterLevel) SCONST OVERRIDE;
+	STDMETHOD_(HRESULT,Scale)(THIS_ IBitmapS **pOutput,int nScale,FilterLevel filterLevel) SCONST OVERRIDE;
 
-	STDMETHOD_(HRESULT,Scale2)(THIS_ IBitmap **pOutput,int nWid,int nHei,FilterLevel filterLevel) SCONST OVERRIDE;
+	STDMETHOD_(HRESULT,Scale2)(THIS_ IBitmapS **pOutput,int nWid,int nHei,FilterLevel filterLevel) SCONST OVERRIDE;
 
 	STDMETHOD_(HRESULT,Save)(THIS_ LPCWSTR pszFileName,const LPVOID pFormat) SCONST OVERRIDE;
 		virtual void SetMaskFilter(IMaskFilter *pMaskFilter){}
@@ -279,7 +279,7 @@ protected:
 
 //////////////////////////////////////////////////////////////////////////
 //	SRegion_GDI
-class SRegion_GDI: public TGdiRenderObjImpl<IRegion,OT_RGN>
+class SRegion_GDI: public TGdiRenderObjImpl<IRegionS,OT_RGN>
 {
 	friend class SRenderTarget_GDI;
 public:
@@ -288,7 +288,7 @@ public:
 
 	STDMETHOD_(void,CombineRect)(THIS_ LPCRECT lprect,int nCombineMode) OVERRIDE;
 
-	STDMETHOD_(void,CombineRgn)(THIS_ const IRegion * pRgnSrc,int nCombineMode ) OVERRIDE;
+	STDMETHOD_(void,CombineRgn)(THIS_ const IRegionS * pRgnSrc,int nCombineMode ) OVERRIDE;
 
 	STDMETHOD_(void,CombineRoundRect)(THIS_ LPCRECT lprect, POINT ptConner, int nCombineMode) OVERRIDE;
 
@@ -308,7 +308,7 @@ public:
 
 	STDMETHOD_(void,Clear)(THIS) OVERRIDE;
 
-	STDMETHOD_(BOOL,IsEqual)(THIS_ const IRegion * testRgn) SCONST OVERRIDE;
+	STDMETHOD_(BOOL,IsEqual)(THIS_ const IRegionS * testRgn) SCONST OVERRIDE;
 protected:
 	HRGN GetRegion() const;
 	void _CombineRgn(HRGN hRgn,int nCombineMode);
@@ -326,10 +326,10 @@ public:
 	~SRenderTarget_GDI();
 
 	STDMETHOD_(HRESULT,CreateCompatibleRenderTarget)(THIS_ SIZE szTarget,IRenderTarget **ppRenderTarget) OVERRIDE;
-	STDMETHOD_(HRESULT,CreatePen)(THIS_ int iStyle,COLORREF cr,int cWidth,IPen ** ppPen) OVERRIDE;
-	STDMETHOD_(HRESULT,CreateSolidColorBrush)(THIS_ COLORREF cr,IBrush ** ppBrush) OVERRIDE;
-	STDMETHOD_(HRESULT,CreateBitmapBrush)(THIS_ IBitmap *pBmp,IBrush ** ppBrush ) OVERRIDE;
-	STDMETHOD_(HRESULT,CreateRegion)(THIS_ IRegion ** ppRegion ) OVERRIDE;
+	STDMETHOD_(HRESULT,CreatePen)(THIS_ int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen) OVERRIDE;
+	STDMETHOD_(HRESULT,CreateSolidColorBrush)(THIS_ COLORREF cr,IBrushS ** ppBrush) OVERRIDE;
+	STDMETHOD_(HRESULT,CreateBitmapBrush)(THIS_ IBitmapS *pBmp,IBrushS ** ppBrush ) OVERRIDE;
+	STDMETHOD_(HRESULT,CreateRegion)(THIS_ IRegionS ** ppRegion ) OVERRIDE;
 
 	STDMETHOD_(HRESULT,Resize)(THIS_ SIZE sz) OVERRIDE;
 
@@ -338,7 +338,7 @@ public:
 	STDMETHOD_(HRESULT,SetViewportOrg)(THIS_ POINT pt) OVERRIDE;
 
 	STDMETHOD_(HRESULT,PushClipRect)(THIS_ LPCRECT pRect,UINT mode/*=RGN_AND*/) OVERRIDE;
-	STDMETHOD_(HRESULT,PushClipRegion)(THIS_ IRegion *pRegion,UINT mode/*=RGN_AND*/) OVERRIDE;
+	STDMETHOD_(HRESULT,PushClipRegion)(THIS_ IRegionS *pRegion,UINT mode/*=RGN_AND*/) OVERRIDE;
 	STDMETHOD_(HRESULT,PopClip)(THIS) OVERRIDE;
 
 	STDMETHOD_(HRESULT,ExcludeClipRect)(THIS_ LPCRECT pRc) OVERRIDE;
@@ -347,7 +347,7 @@ public:
 	STDMETHOD_(HRESULT,SaveClip)(THIS_ int *pnState) OVERRIDE;
 	STDMETHOD_(HRESULT,RestoreClip)(THIS_ int nState/*=-1*/) OVERRIDE;
 
-	STDMETHOD_(HRESULT,GetClipRegion)(THIS_ IRegion **ppRegion) OVERRIDE;
+	STDMETHOD_(HRESULT,GetClipRegion)(THIS_ IRegionS **ppRegion) OVERRIDE;
 	STDMETHOD_(HRESULT,GetClipBox)(THIS_ LPRECT prc) OVERRIDE;
 
 	STDMETHOD_(HRESULT,DrawText)(THIS_ LPCTSTR pszText,int cchLen,LPRECT pRc,UINT uFormat) OVERRIDE;
@@ -374,9 +374,9 @@ public:
 	STDMETHOD_(HRESULT,GradientFillEx)(THIS_ LPCRECT pRect,const POINT* pts,COLORREF *colors,float *pos,int nCount,BYTE byAlpha/*=0xFF*/ ) OVERRIDE;
 	STDMETHOD_(HRESULT,GradientFill2)(THIS_ LPCRECT pRect,GradientType type,COLORREF crStart,COLORREF crCenter,COLORREF crEnd,float fLinearAngle,float fCenterX,float fCenterY,int nRadius,BYTE byAlpha/*=0xFF*/) OVERRIDE;
 	STDMETHOD_(HRESULT,DrawIconEx)(THIS_ int xLeft, int yTop, HICON hIcon, int cxWidth,int cyWidth,UINT diFlags) OVERRIDE;
-	STDMETHOD_(HRESULT,DrawBitmap)(THIS_ LPCRECT pRcDest,const IBitmap *pBitmap,int xSrc,int ySrc,BYTE byAlpha/*=0xFF*/) OVERRIDE;
-	STDMETHOD_(HRESULT,DrawBitmapEx)(THIS_ LPCRECT pRcDest,const IBitmap *pBitmap,LPCRECT pRcSrc,UINT expendMode, BYTE byAlpha/*=0xFF*/) OVERRIDE;
-	STDMETHOD_(HRESULT,DrawBitmap9Patch)(THIS_ LPCRECT pRcDest,const IBitmap *pBitmap,LPCRECT pRcSrc,LPCRECT pRcSourMargin,UINT expendMode,BYTE byAlpha/*=0xFF*/) OVERRIDE;
+	STDMETHOD_(HRESULT,DrawBitmap)(THIS_ LPCRECT pRcDest,const IBitmapS *pBitmap,int xSrc,int ySrc,BYTE byAlpha/*=0xFF*/) OVERRIDE;
+	STDMETHOD_(HRESULT,DrawBitmapEx)(THIS_ LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,UINT expendMode, BYTE byAlpha/*=0xFF*/) OVERRIDE;
+	STDMETHOD_(HRESULT,DrawBitmap9Patch)(THIS_ LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,LPCRECT pRcSourMargin,UINT expendMode,BYTE byAlpha/*=0xFF*/) OVERRIDE;
 	STDMETHOD_(HRESULT,BitBlt)(THIS_ LPCRECT pRcDest,IRenderTarget *pRTSour,int xSrc,int ySrc,DWORD dwRop/*=kSrcCopy*/) OVERRIDE;
 	STDMETHOD_(HRESULT,AlphaBlend)(THIS_ LPCRECT pRcDest,IRenderTarget *pRTSrc,LPCRECT pRcSrc,BYTE byAlpha) OVERRIDE;
 	STDMETHOD_(IRenderObj *,GetCurrentObject)(THIS_ OBJTYPE uType) OVERRIDE;
@@ -392,9 +392,9 @@ public:
 	STDMETHOD_(HRESULT,GetTransform)(THIS_ float matrix[9]) SCONST OVERRIDE;
 	STDMETHOD_(COLORREF,GetPixel)(THIS_ int x, int y) OVERRIDE;
 	STDMETHOD_(COLORREF,SetPixel)(THIS_ int x, int y, COLORREF cr) OVERRIDE;
-	STDMETHOD_(HRESULT,PushClipPath)(THIS_ const IPath * path, UINT mode, BOOL doAntiAlias = false) OVERRIDE;
-	STDMETHOD_(HRESULT,DrawPath)(THIS_ const IPath * path,IPathEffect * pathEffect=NULL) OVERRIDE;
-	STDMETHOD_(HRESULT,FillPath)(THIS_ const IPath * path) OVERRIDE;
+	STDMETHOD_(HRESULT,PushClipPath)(THIS_ const IPathS * path, UINT mode, BOOL doAntiAlias = false) OVERRIDE;
+	STDMETHOD_(HRESULT,DrawPath)(THIS_ const IPathS * path,IPathEffect * pathEffect=NULL) OVERRIDE;
+	STDMETHOD_(HRESULT,FillPath)(THIS_ const IPathS * path) OVERRIDE;
 	STDMETHOD_(HRESULT,PushLayer)(THIS_ const RECT * pRect,BYTE byAlpha/*=0xFF*/) OVERRIDE;
 	STDMETHOD_(HRESULT,PopLayer)(THIS) OVERRIDE;
 	STDMETHOD_(HRESULT,SetXfermode)(THIS_ int mode,int *pOldMode=NULL) OVERRIDE;
@@ -410,9 +410,9 @@ protected:
 	POINT               m_ptOrg;
 
 	//注意保存4个默认的GDI对象
-	SAutoRefPtr<IBitmap> m_defBmp;
-	SAutoRefPtr<IPen> m_defPen;
-	SAutoRefPtr<IBrush> m_defBrush;
+	SAutoRefPtr<IBitmapS> m_defBmp;
+	SAutoRefPtr<IPenS> m_defPen;
+	SAutoRefPtr<IBrushS> m_defBrush;
 	SAutoRefPtr<IFontS> m_defFont;
 	SAutoRefPtr<IRenderFactory> m_pRenderFactory;
 	UINT m_uGetDCFlag;

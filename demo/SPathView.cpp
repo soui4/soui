@@ -83,7 +83,7 @@ namespace SOUI
 			GETRENDERFACTORY->CreatePathEffect(__uuidof(ICornerPathEffect),(IPathEffect**)&pathEffect);
 			pathEffect->Init(m_fCornerRadius);
 
-			SAutoRefPtr<IPen> pen,oldPen;
+			SAutoRefPtr<IPenS> pen,oldPen;
 			pRT->CreatePen(m_nLineStyle,m_crLine,m_nLineWidth,&pen);
 			pRT->SelectObject(pen,(IRenderObj**)&oldPen);
 

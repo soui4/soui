@@ -181,7 +181,7 @@ SPathInterpolator::SPathInterpolator(float controlX1,
 
 void SPathInterpolator::initQuad(float controlX, float controlY)
 {
-    SAutoRefPtr<IPath> path;
+    SAutoRefPtr<IPathS> path;
     GETRENDERFACTORY->CreatePath(&path);
     if (path)
     {
@@ -193,7 +193,7 @@ void SPathInterpolator::initQuad(float controlX, float controlY)
 
 void SPathInterpolator::initCubic(float x1, float y1, float x2, float y2)
 {
-    SAutoRefPtr<IPath> path;
+    SAutoRefPtr<IPathS> path;
     GETRENDERFACTORY->CreatePath(&path);
     if (path)
     {
@@ -205,7 +205,7 @@ void SPathInterpolator::initCubic(float x1, float y1, float x2, float y2)
 
 static const float PRECISION = 0.002f;
 
-void SPathInterpolator::initPath(IPath *path)
+void SPathInterpolator::initPath(IPathS *path)
 {
     IPathInfo *pathInfo = path->approximate(PRECISION);
     int numPoints = pathInfo->pointNumber();

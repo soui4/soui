@@ -29,7 +29,7 @@ DECLARE_INTERFACE(IResProviderMgr)
 
     STDMETHOD_(HBITMAP, LoadBitmap)(THIS_ LPCTSTR pszResName, BOOL bFromFile/* = FALSE*/) PURE;
 
-    STDMETHOD_(IBitmap *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) PURE;
+    STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) PURE;
 
     STDMETHOD_(IImgX *, LoadImgX)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) PURE;
 

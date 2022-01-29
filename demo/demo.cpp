@@ -89,7 +89,7 @@ public:
 	SApplication2(IRenderFactory *pRendFactory,HINSTANCE hInst):SApplication(pRendFactory,hInst){}
 
 protected:
-	STDMETHOD_(IBitmap *,LoadImage)(THIS_ LPCTSTR pszType,LPCTSTR pszResName)
+	STDMETHOD_(IBitmapS *,LoadImage)(THIS_ LPCTSTR pszType,LPCTSTR pszResName)
 	{
 		int nBufSize = GetRawBufferSize(pszType,pszResName);
 		char *pBuf = (char*)malloc(nBufSize);
@@ -116,7 +116,7 @@ protected:
 			if(strBuf.Left(4)=="<svg")
 			{
 				NSVGimage *image = nsvgParse((char*)strBuf.c_str(),"px", 96.0f);
-				IBitmap *Ret=NULL;
+				IBitmapS *Ret=NULL;
 				if(image)
 				{
 					int w = (int)image->width;

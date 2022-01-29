@@ -165,7 +165,7 @@ void SItemPanel::OnRedraw(LPCRECT rc)
         else
         {
             IRenderTarget *pRT = OnGetRenderTarget(rc, GRT_PAINTBKGND);
-            SAutoRefPtr<IRegion> rgn;
+            SAutoRefPtr<IRegionS> rgn;
             GETRENDERFACTORY->CreateRegion(&rgn);
             rgn->CombineRect(rc, RGN_COPY);
             RedrawRegion(pRT, rgn);
@@ -244,7 +244,7 @@ void SItemPanel::Draw(IRenderTarget *pRT, const CRect &rc)
         SPainter painter;
         BeforePaint(pRT, painter);
         pRT->OffsetViewportOrg(rc.left, rc.top, NULL);
-        SAutoRefPtr<IRegion> rgn;
+        SAutoRefPtr<IRegionS> rgn;
         pRT->GetClipRegion(&rgn);
         RedrawRegion(pRT, rgn);
         pRT->OffsetViewportOrg(-rc.left, -rc.top, NULL);
@@ -421,7 +421,7 @@ COLORREF SItemPanel::GetBkgndColor() const
 
 BOOL SItemPanel::IsItemInClip(const SMatrix &mtx,
                               const CRect &rcClip,
-                              const IRegion *clipRgn,
+                              const IRegionS *clipRgn,
                               const CRect &rcItem)
 {
     if (!mtx.isIdentity()) // don't clip any item if matrix is not identify.

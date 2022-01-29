@@ -145,7 +145,7 @@ int SSkinGif::LoadFromGdipImage( Gdiplus::Bitmap * pImage )
         free(pPropertyItem);
     }
 
-	GETRENDERFACTORY->CreateBitmap((IBitmap**)&m_pCurFrameBmp);
+	GETRENDERFACTORY->CreateBitmap((IBitmapS**)&m_pCurFrameBmp);
 	LoadFrame(0, pImage);
 
     return m_nFrames;

@@ -9,7 +9,7 @@ namespace SOUI
         SImageMaskWnd(void);
         ~SImageMaskWnd(void);
 
-		void SetImage(IBitmap * pBitmap,FilterLevel fl=kHigh_FilterLevel);
+		void SetImage(IBitmapS * pBitmap,FilterLevel fl=kHigh_FilterLevel);
 
     protected:
         void OnPaint(IRenderTarget *pRT);
@@ -22,7 +22,7 @@ namespace SOUI
         HRESULT OnAttrImage(const SStringW & strValue,BOOL bLoading);
         
 		void UpdateCacheFromSkin(ISkinObj *pSkin);
-		void UpdateCacheFromImage(IBitmap * pBitmap,FilterLevel fl);
+		void UpdateCacheFromImage(IBitmapS * pBitmap,FilterLevel fl);
 		void MakeCacheApha();
 
         SOUI_ATTRS_BEGIN()
@@ -31,8 +31,8 @@ namespace SOUI
         SOUI_ATTRS_END()
         
         SStringW                m_strSkin;
-        SAutoRefPtr<IBitmap>    m_bmpCache;
-        SAutoRefPtr<IBitmap>    m_bmpMask;
+        SAutoRefPtr<IBitmapS>    m_bmpCache;
+        SAutoRefPtr<IBitmapS>    m_bmpMask;
         int                     m_iMaskChannel;
     };
 }

@@ -61,9 +61,9 @@ DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
      * Describe  …Ë÷√ªÊ÷∆Õº∆¨
      */
     STDMETHOD_(void, SetImage)
-    (THIS_ IBitmap * pBitmap, FilterLevel fl /*= kNone_FilterLevel*/) PURE;
+    (THIS_ IBitmapS * pBitmap, FilterLevel fl /*= kNone_FilterLevel*/) PURE;
 
-    STDMETHOD_(IBitmap *, GetImage)(THIS) PURE;
+    STDMETHOD_(IBitmapS *, GetImage)(THIS) PURE;
 
     /**
      * SImageWnd::SetIcon

@@ -232,7 +232,7 @@ void STileView::OnPaint(IRenderTarget *pRT)
 
         CRect rcClip;
         pRT->GetClipBox(&rcClip);
-        SAutoRefPtr<IRegion> rgnClip;
+        SAutoRefPtr<IRegionS> rgnClip;
         pRT->GetClipRegion(&rgnClip);
 
         int nOffset = m_tvItemLocator->Item2Position(iFirst) - m_siVer.nPos;

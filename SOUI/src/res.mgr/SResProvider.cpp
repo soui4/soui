@@ -16,9 +16,9 @@ static const TCHAR KTypeHtml[] = _T("HTML");
 
 
 //////////////////////////////////////////////////////////////////////////
-IBitmap *SResLoadFromMemory::LoadImage(LPVOID pBuf, size_t size)
+IBitmapS *SResLoadFromMemory::LoadImage(LPVOID pBuf, size_t size)
 {
-    IBitmap *pImg = NULL;
+    IBitmapS *pImg = NULL;
     GETRENDERFACTORY->CreateBitmap(&pImg);
     if (!pImg)
         return NULL;
@@ -85,7 +85,7 @@ HCURSOR SResProviderPE::LoadCursor(LPCTSTR pszResName)
     }
 }
 
-IBitmap *SResProviderPE::LoadImage(LPCTSTR strType, LPCTSTR pszResName)
+IBitmapS *SResProviderPE::LoadImage(LPCTSTR strType, LPCTSTR pszResName)
 {
     if (!HasResource(strType, pszResName))
         return NULL;
@@ -240,9 +240,9 @@ HCURSOR SResLoadFromFile::LoadCursor(LPCTSTR strPath)
     return (HCURSOR)::LoadImage(NULL, strPath, IMAGE_CURSOR, 0, 0, LR_LOADFROMFILE);
 }
 
-IBitmap *SResLoadFromFile::LoadImage(LPCTSTR strPath)
+IBitmapS *SResLoadFromFile::LoadImage(LPCTSTR strPath)
 {
-    IBitmap *pImg = NULL;
+    IBitmapS *pImg = NULL;
     GETRENDERFACTORY->CreateBitmap(&pImg);
 
     HRESULT hr = pImg->LoadFromFile(strPath);
@@ -341,7 +341,7 @@ HCURSOR SResProviderFiles::LoadCursor(LPCTSTR pszResName)
     return SResLoadFromFile::LoadCursor(strPath);
 }
 
-IBitmap *SResProviderFiles::LoadImage(LPCTSTR strType, LPCTSTR pszResName)
+IBitmapS *SResProviderFiles::LoadImage(LPCTSTR strType, LPCTSTR pszResName)
 {
     SStringT strPath = GetRes(strType, pszResName);
     if (strPath.IsEmpty())

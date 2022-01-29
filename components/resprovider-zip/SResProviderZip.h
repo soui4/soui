@@ -26,7 +26,7 @@ public:
 	STDMETHOD_(HICON,LoadIcon)(THIS_ LPCTSTR pszResName,int cx,int cy);
 	STDMETHOD_(HBITMAP,LoadBitmap)(THIS_ LPCTSTR pszResName);
 	STDMETHOD_(HCURSOR,LoadCursor)(THIS_ LPCTSTR pszResName);
-	STDMETHOD_(IBitmap*, LoadImage)(THIS_ LPCTSTR pszType,LPCTSTR pszResName);
+	STDMETHOD_(IBitmapS*, LoadImage)(THIS_ LPCTSTR pszType,LPCTSTR pszResName);
 	STDMETHOD_(IImgX*, LoadImgX)(THIS_ LPCTSTR pszType,LPCTSTR pszResName);
 	STDMETHOD_(size_t,GetRawBufferSize)(THIS_ LPCTSTR pszType,LPCTSTR pszResName);
 	STDMETHOD_(BOOL,GetRawBuffer)(THIS_ LPCTSTR pszType,LPCTSTR pszResName,LPVOID pBuf,size_t size);

@@ -257,7 +257,7 @@ void SListView::OnPaint(IRenderTarget *pRT)
         pRT->PushClipRect(&rcClient, RGN_AND);
 
         CRect rcClip;
-        SAutoRefPtr<IRegion> rgnClip;
+        SAutoRefPtr<IRegionS> rgnClip;
         pRT->GetClipRegion(&rgnClip);
         pRT->GetClipBox(&rcClip);
 

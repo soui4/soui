@@ -245,7 +245,7 @@ static void ColorizeMode(BYTE *pArgb, const COLORIZEPARAM &param)
     pArgb[2] = red;
 }
 
-bool SDIBHelper::Colorize(IBitmap *pBmp, COLORREF crRef)
+bool SDIBHelper::Colorize(IBitmapS *pBmp, COLORREF crRef)
 {
     RGBQUAD color = RGBtoRGBQUAD(crRef);
     RGBQUAD hsl = RGBtoHSL(color);
@@ -284,7 +284,7 @@ bool SDIBHelper::Colorize(COLORREF &crTarget, COLORREF crRef)
     return true;
 }
 
-bool SDIBHelper::GrayImage(IBitmap *pBmp)
+bool SDIBHelper::GrayImage(IBitmapS *pBmp)
 {
     DIBINFO di = { (LPBYTE)pBmp->LockPixelBits(), pBmp->Width(), pBmp->Height() };
     bool bRet = ColorTransform(&di, GrayMode, 0);
@@ -332,7 +332,7 @@ static int RgbCmp(const void *p1, const void *p2)
     return deltaR + deltaG + deltaB;
 }
 
-COLORREF SDIBHelper::CalcAvarageColor(IBitmap *pBmp, int nPercent, int nBlockSize /*=5*/)
+COLORREF SDIBHelper::CalcAvarageColor(IBitmapS *pBmp, int nPercent, int nBlockSize /*=5*/)
 {
     DIBINFO di = { (LPBYTE)pBmp->LockPixelBits(), pBmp->Width(), pBmp->Height() };
 

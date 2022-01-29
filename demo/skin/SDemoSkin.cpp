@@ -17,7 +17,7 @@ namespace SOUI
 	{
 		m_bIsColor = false;
 		m_FilePath = imgfile;
-		IBitmap *image = LOADIMAGE2(L"file:" + imgfile);
+		IBitmapS *image = LOADIMAGE2(L"file:" + imgfile);
 		if (image)
 		{
 			SSkinImgList::SetImage(image);

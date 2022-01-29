@@ -121,7 +121,7 @@ SIZE SSkinAPNG::GetSkinSize() const
 	return sz;
 }
 
-IBitmap * SSkinAPNG::GetFrameImage(int iFrame/*=-1*/)
+IBitmapS * SSkinAPNG::GetFrameImage(int iFrame/*=-1*/)
 {
 	if(iFrame==-1) iFrame=m_iFrame;
 	long nRet=-1;

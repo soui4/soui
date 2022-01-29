@@ -36,7 +36,7 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
 
     STDMETHOD_(HBITMAP, LoadBitmap)(THIS_ LPCTSTR pszResName, BOOL bFromFile = FALSE) OVERRIDE;
 
-    STDMETHOD_(IBitmap *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) OVERRIDE;
+    STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) OVERRIDE;
 
     STDMETHOD_(IImgX *, LoadImgX)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) OVERRIDE;
 
@@ -69,7 +69,7 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
     IResProvider *GetMatchResProvider(LPCTSTR pszType, LPCTSTR pszResName);
 
     //使用type:name形式的字符串加载图片
-    IBitmap *LoadImage2(const SStringW &strImgID);
+    IBitmapS *LoadImage2(const SStringW &strImgID);
 
     //使用name:size形式的字符串加载图标，如果没有size,则默认系统图标SIZE
     HICON LoadIcon2(const SStringW &strIconID);

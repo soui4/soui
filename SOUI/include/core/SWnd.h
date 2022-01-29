@@ -322,9 +322,9 @@ class SOUI_EXP SWindow
     STDMETHOD_(BOOL, IsUpdateLocked)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, Update)(THIS) OVERRIDE;
     STDMETHOD_(void, Move)(THIS_ LPCRECT prect) OVERRIDE;
-    STDMETHOD_(void, SetWindowRgn)(THIS_ IRegion *pRgn, BOOL bRedraw = TRUE) OVERRIDE;
-    STDMETHOD_(IRegion *, GetWindowRgn)(THIS) SCONST OVERRIDE;
-    STDMETHOD_(void, SetWindowPath)(THIS_ IPath *pPath, BOOL bRedraw = TRUE) OVERRIDE;
+    STDMETHOD_(void, SetWindowRgn)(THIS_ IRegionS *pRgn, BOOL bRedraw = TRUE) OVERRIDE;
+    STDMETHOD_(IRegionS *, GetWindowRgn)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, SetWindowPath)(THIS_ IPathS *pPath, BOOL bRedraw = TRUE) OVERRIDE;
 
     STDMETHOD_(BOOL, SetTimer)(THIS_ char id, UINT uElapse) OVERRIDE;
     STDMETHOD_(void, KillTimer)(THIS_ char id) OVERRIDE;
@@ -1056,7 +1056,7 @@ class SOUI_EXP SWindow
      *
      * Describe
      */
-    void RedrawRegion(IRenderTarget *pRT, IRegion *pRgn);
+    void RedrawRegion(IRenderTarget *pRT, IRegionS *pRgn);
 
     /**
      * GetRenderTarget
@@ -1080,7 +1080,7 @@ class SOUI_EXP SWindow
      *
      * Describe  使用ReleaseRenderTarget释放
      */
-    IRenderTarget *GetRenderTarget(GrtFlag gdcFlags, IRegion *pRgn);
+    IRenderTarget *GetRenderTarget(GrtFlag gdcFlags, IRegionS *pRgn);
 
     /**
      * ReleaseRenderTarget
@@ -1182,7 +1182,7 @@ class SOUI_EXP SWindow
      * Describe
      */
     virtual void DispatchPaint(IRenderTarget *pRT,
-                               IRegion *pRgn,
+                               IRegionS *pRgn,
                                UINT iZorderBegin,
                                UINT iZorderEnd);
 
@@ -1202,16 +1202,16 @@ class SOUI_EXP SWindow
 
     bool _ApplyMatrix(IRenderTarget *pRT, SMatrix &oriMtx);
     SMatrix _GetMatrixEx() const;
-    SAutoRefPtr<IRegion> _ConvertRect2RenderRegion(const CRect &rc) const;
-    bool _WndRectInRgn(const CRect &rc, const IRegion *rgn) const;
+    SAutoRefPtr<IRegionS> _ConvertRect2RenderRegion(const CRect &rc) const;
+    bool _WndRectInRgn(const CRect &rc, const IRegionS *rgn) const;
 
     //将窗口内容绘制到RenderTarget上
     void _PaintClient(IRenderTarget *pRT);
     void _PaintNonClient(IRenderTarget *pRT);
     void _RedrawNonClient();
-    void _PaintRegion(IRenderTarget *pRT, IRegion *pRgn, UINT iZorderBegin, UINT iZorderEnd);
+    void _PaintRegion(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegin, UINT iZorderEnd);
 
-    void _PaintChildren(IRenderTarget *pRT, IRegion *pRgn, UINT iBeginZorder, UINT iEndZorder);
+    void _PaintChildren(IRenderTarget *pRT, IRegionS *pRgn, UINT iBeginZorder, UINT iEndZorder);
 
     void DrawDefFocusRect(IRenderTarget *pRT, CRect rc);
 
@@ -1433,8 +1433,8 @@ class SOUI_EXP SWindow
 
     LayoutDirtyType m_layoutDirty;         /**< 布局脏标志 参见LayoutDirtyType */
     SAutoRefPtr<IRenderTarget> m_cachedRT; /**< 缓存窗口绘制的RT */
-    SAutoRefPtr<IRegion> m_clipRgn;        /**< 窗口Region */
-    SAutoRefPtr<IPath> m_clipPath;         /**< 窗口Path */
+    SAutoRefPtr<IRegionS> m_clipRgn;        /**< 窗口Region */
+    SAutoRefPtr<IPathS> m_clipPath;         /**< 窗口Path */
     SAutoRefPtr<ISkinObj> m_pBgSkin;       /**< 背景skin */
     SAutoRefPtr<ISkinObj> m_pNcSkin;       /**< 非客户区skin */
     ULONG_PTR m_uData;                     /**< 窗口的数据位,可以通过GetUserData获得 */
@@ -1453,13 +1453,13 @@ class SOUI_EXP SWindow
     {
         CRect rcRT;               /**< GETRT调用的有效范围 */
         GrtFlag gdcFlags;         /**< GETRT绘制标志位 */
-        SAutoRefPtr<IRegion> rgn; /**< 保存一个和rcRT对应的IRegion对象 */
+        SAutoRefPtr<IRegionS> rgn; /**< 保存一个和rcRT对应的IRegion对象 */
         SAutoRefPtr<IRenderTarget> rt;
     } * PGETRTDATA;
 
     PGETRTDATA m_pGetRTData;
 
-    SAutoRefPtr<IRegion> m_invalidRegion;    /**< 非背景混合窗口的脏区域 */
+    SAutoRefPtr<IRegionS> m_invalidRegion;    /**< 非背景混合窗口的脏区域 */
     SAutoRefPtr<IAttrStorage> m_attrStorage; /**< 属性保存对象 */
 
 #ifdef SOUI_ENABLE_ACC

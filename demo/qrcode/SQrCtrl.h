@@ -14,7 +14,7 @@ protected:
 	void CreateQrImg(SStringT strContent);
 	virtual BOOL OnRelayout(const CRect & rcWnd) override;
 
-	void MakeCacheApha(ISkinObj *pSkin, IBitmap *_pBitCache, IBitmap *_pBitMask);
+	void MakeCacheApha(ISkinObj *pSkin, IBitmapS *_pBitCache, IBitmapS *_pBitMask);
 
 	SOUI_ATTRS_BEGIN()
 		ATTR_RECT(L"qrrect", m_QrRect, FALSE)

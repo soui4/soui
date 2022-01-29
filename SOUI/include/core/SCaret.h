@@ -45,7 +45,7 @@ class SOUI_EXP SCaret
   protected:
     BOOL m_bVisible;                 /**< Is caret visible now */
     CPoint m_ptCaret;                /**< caret position */
-    SAutoRefPtr<IBitmap> m_bmpCaret; /**< 模拟插入符 */
+    SAutoRefPtr<IBitmapS> m_bmpCaret; /**< 模拟插入符 */
     bool m_bDrawCaret;               /**< is caret drawing */
     int m_iFrame;
     BYTE m_byAlpha;

@@ -639,7 +639,7 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         GetRoot()->BeforePaint(m_memRT, painter);
 
         // m_rgnInvalidate有可能在RedrawRegion时被修改，必须生成一个临时的区域对象
-        SAutoRefPtr<IRegion> pRgnUpdate = m_rgnInvalidate;
+        SAutoRefPtr<IRegionS> pRgnUpdate = m_rgnInvalidate;
         m_rgnInvalidate = NULL;
         GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
 

@@ -48,7 +48,7 @@ namespace SOUI
             CSize  sz;
         };
     public:
-        CUiAnimationIconLayout(SUiAnimationWnd *pOwner,IBitmap *pBmpMode);
+        CUiAnimationIconLayout(SUiAnimationWnd *pOwner,IBitmapS *pBmpMode);
         ~CUiAnimationIconLayout();
 
         void SetIcons(ISkinObj *pIcon,int nIcons);
@@ -116,7 +116,7 @@ namespace SOUI
     protected:
         
         ISkinObj        *               m_pSkinIcon;
-        IBitmap         *               m_pAniMode;
+        IBitmapS         *               m_pAniMode;
         CUiAnimationIconLayout *        m_pLayout;
         BOOL                            m_bResized;
     };

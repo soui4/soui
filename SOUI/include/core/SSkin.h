@@ -22,9 +22,9 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
         m_nStates = nStates;
     }
 
-    virtual bool SetImage(IBitmap *pImg);
+    virtual bool SetImage(IBitmapS *pImg);
 
-    virtual IBitmap *GetImage() const;
+    virtual IBitmapS *GetImage() const;
 
     virtual void SetTile(BOOL bTile)
     {
@@ -54,11 +54,11 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     BOOL m_bTile;
     BOOL m_bAutoFit;
     BOOL m_bVertical;
-    SAutoRefPtr<IBitmap> m_imgBackup; //色调调整前的备分
+    SAutoRefPtr<IBitmapS> m_imgBackup; //色调调整前的备分
     FilterLevel m_filterLevel;
 
   private:
-    mutable SAutoRefPtr<IBitmap> m_pImg;
+    mutable SAutoRefPtr<IBitmapS> m_pImg;
     mutable SStringW m_strSrc;
     BOOL m_bLazyLoad;
 

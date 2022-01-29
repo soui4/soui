@@ -500,7 +500,7 @@ void SMCListView::OnPaint(IRenderTarget *pRT)
         pRT->PushClipRect(&rcClient, RGN_AND);
 
         CRect rcClip, rcInter;
-        SAutoRefPtr<IRegion> rgnClip;
+        SAutoRefPtr<IRegionS> rgnClip;
         pRT->GetClipBox(&rcClip);
         pRT->GetClipRegion(&rgnClip);
 
@@ -509,7 +509,7 @@ void SMCListView::OnPaint(IRenderTarget *pRT)
         IRenderObj *oldPen = NULL;
         if (m_crGrid != CR_INVALID)
         {
-            SAutoRefPtr<IPen> pen;
+            SAutoRefPtr<IPenS> pen;
             pRT->CreatePen(PS_SOLID, m_crGrid, 1, &pen);
             pRT->SelectObject(pen, &oldPen);
         }

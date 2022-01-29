@@ -113,7 +113,7 @@ DECLARE_INTERFACE_(IResProvider, IObjRef)
      * @return   IBitmap * -- 成功返回一个IBitmap对象，失败返回0
      * Describe  如果没有定义strType，则根据name使用FindImageType自动查找匹配的类型
      */
-    STDMETHOD_(IBitmap *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) PURE;
+    STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) PURE;
 
     /**
      * LoadImgX

@@ -33,7 +33,7 @@ BOOL SCaret::Init(HBITMAP hBmp, int nWid, int nHei)
     m_bDrawCaret = true;
     SAutoRefPtr<IRenderTarget> pRT;
     GETRENDERFACTORY->CreateRenderTarget(&pRT, nWid, nHei);
-    m_bmpCaret = (IBitmap *)pRT->GetCurrentObject(OT_BITMAP);
+    m_bmpCaret = (IBitmapS *)pRT->GetCurrentObject(OT_BITMAP);
     if (hBmp)
     {
         //以拉伸方式创建一个插入符位图

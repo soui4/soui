@@ -18,7 +18,7 @@ void SColorPicker::OnPaint( IRenderTarget *pRT)
 	CRect rcClient;
 	GetClientRect(&rcClient);
 	pRT->FillSolidRect(&rcClient,m_crCur);
-	CAutoRefPtr<IPen> pen,oldPen;
+	SAutoRefPtr<IPenS> pen,oldPen;
 	pRT->CreatePen(PS_DOT,RGBA(0xcc,0xcc,0xcc,0xff),1,&pen);
 	pRT->SelectObject(pen,(IRenderObj**)&oldPen);
 	pRT->DrawRectangle(&rcClient);

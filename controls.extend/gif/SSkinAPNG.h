@@ -81,7 +81,7 @@ namespace SOUI
 
 		virtual void _Scale(ISkinObj *pObj, int nScale) override;
 
-		IBitmap * GetFrameImage(int iFrame=-1);
+		IBitmapS * GetFrameImage(int iFrame=-1);
 
     protected:
         HRESULT OnAttrSrc(const SStringW &strValue,BOOL bLoading);

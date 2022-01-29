@@ -4,7 +4,7 @@
 
 namespace SOUI
 {
-    typedef SMap<SStringW,IBitmap *> IMGPOOL;
+    typedef SMap<SStringW,IBitmapS *> IMGPOOL;
     static IMGPOOL s_imgPool;
     
     SSkinImgFrame3::SSkinImgFrame3(void)
@@ -44,7 +44,7 @@ namespace SOUI
             p->m_value->AddRef();
         }else
         {
-            IBitmap *pImg=LOADIMAGE2(m_strImgKey);
+            IBitmapS *pImg=LOADIMAGE2(m_strImgKey);
             if(!pImg) return E_FAIL;
             s_imgPool[m_strImgKey]=pImg;
             SSkinImgFrame::SetImage(pImg);

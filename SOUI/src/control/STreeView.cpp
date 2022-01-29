@@ -506,7 +506,7 @@ void STreeView::OnPaint(IRenderTarget *pRT)
 
     CRect rcClip;
     pRT->GetClipBox(&rcClip);
-    SAutoRefPtr<IRegion> rgnClip;
+    SAutoRefPtr<IRegionS> rgnClip;
     pRT->GetClipRegion(&rgnClip);
 
     CPoint pt(0, -1);

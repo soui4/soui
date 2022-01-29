@@ -10,7 +10,7 @@ namespace SOUI
 		class SAniFrame
 		{
 		public:
-			SAutoRefPtr<IBitmap> pBmp;
+			SAutoRefPtr<IBitmapS> pBmp;
 			int                  nDelay;
 		};
     public:

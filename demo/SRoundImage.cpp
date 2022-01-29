@@ -12,7 +12,7 @@ namespace SOUI
 	{
 	}
 
-	SAutoRefPtr<IBitmap> SRoundImage::GetRoundImage() const
+	SAutoRefPtr<IBitmapS> SRoundImage::GetRoundImage() const
 	{
 		if (!m_pSkin) return NULL;
 		SAutoRefPtr<IRenderTarget> pRT; 
@@ -20,13 +20,13 @@ namespace SOUI
 		GETRENDERFACTORY->CreateRenderTarget(&pRT, rc.Width(), rc.Height());
 		rc.MoveToXY(0, 0);
 		pRT->ClearRect(&rc, 0);
-		SAutoRefPtr<IBrush> br;
+		SAutoRefPtr<IBrushS> br;
 		pRT->CreateSolidColorBrush(RGBA(0xBA, 0xB3, 0x99, 0xFF), &br);
 		pRT->SelectObject(br,NULL);
 		pRT->FillEllipse(&rc);
 		pRT->SetXfermode(kSrcIn_Mode,NULL);
 		m_pSkin->DrawByIndex(pRT, rc, 0);
-		return (IBitmap*)pRT->GetCurrentObject(OT_BITMAP);
+		return (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
 	}
 
 	void SRoundImage::OnPaint(IRenderTarget * pRT)

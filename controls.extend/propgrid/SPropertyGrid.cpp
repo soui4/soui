@@ -278,7 +278,7 @@ namespace SOUI
 
 		pItem->DrawItem(pRT,rcItem); //ªÊ÷∆Item
 
-		SAutoRefPtr<IPen> pen,oldPen;
+		SAutoRefPtr<IPenS> pen,oldPen;
 		BOOL bAntiAlias=pRT->SetAntiAlias(FALSE);
 		pRT->CreatePen(PS_SOLID,m_crItemBorder,1,&pen);
 		pRT->SelectObject(pen,(IRenderObj**)&oldPen);

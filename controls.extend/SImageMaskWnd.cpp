@@ -35,7 +35,7 @@ namespace SOUI
         else if(strChannel == L".b")
             m_iMaskChannel = 2;
 
-        IBitmap *pImg = NULL;
+        IBitmapS *pImg = NULL;
         if(m_iMaskChannel==-1)
         {//use alpha channel as default
             m_iMaskChannel = 0;
@@ -81,7 +81,7 @@ namespace SOUI
 	}
 
 
-	void SImageMaskWnd::UpdateCacheFromImage(IBitmap * pBitmap,FilterLevel fl)
+	void SImageMaskWnd::UpdateCacheFromImage(IBitmapS * pBitmap,FilterLevel fl)
 	{
 		SASSERT(m_bmpMask && m_bmpCache);
 		SAutoRefPtr<IRenderTarget> pRTDst;
@@ -140,7 +140,7 @@ namespace SOUI
         return bLoading?S_OK:S_FALSE;
     }
 
-	void SImageMaskWnd::SetImage(IBitmap * pBitmap,FilterLevel fl/*=kHigh_FilterLevel*/)
+	void SImageMaskWnd::SetImage(IBitmapS * pBitmap,FilterLevel fl/*=kHigh_FilterLevel*/)
 	{
 		UpdateCacheFromImage(pBitmap,fl);
 		MakeCacheApha();

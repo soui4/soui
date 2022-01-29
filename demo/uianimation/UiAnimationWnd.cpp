@@ -185,7 +185,7 @@ namespace SOUI{
 
     //////////////////////////////////////////////////////////////////////////
     //  CUiAnimationIconLayout
-    CUiAnimationIconLayout::CUiAnimationIconLayout(SUiAnimationWnd *pOwner,IBitmap *pBmpMode)
+    CUiAnimationIconLayout::CUiAnimationIconLayout(SUiAnimationWnd *pOwner,IBitmapS *pBmpMode)
         :m_pOwner(pOwner),m_plstIcon(NULL),m_nIcons(0),m_iModal(-1)
     {
         HRESULT hr = CoCreateInstance(

@@ -693,14 +693,14 @@ BOOL SImageWnd::SetSkin(ISkinObj *pSkin, int iFrame /*=0*/, BOOL bAutoFree /*=TR
     return TRUE;
 }
 
-void SImageWnd::SetImage(IBitmap *pBitmap, FilterLevel fl)
+void SImageWnd::SetImage(IBitmapS *pBitmap, FilterLevel fl)
 {
     m_pImg = pBitmap;
     m_fl = fl;
     OnContentChanged();
 }
 
-IBitmap *SImageWnd::GetImage()
+IBitmapS *SImageWnd::GetImage()
 {
     return m_pImg;
 }
@@ -1030,7 +1030,7 @@ void SLine::OnPaint(IRenderTarget *pRT)
         pts[1] = rcWnd.BottomRight();
         break;
     }
-    SAutoRefPtr<IPen> curPen, oldPen;
+    SAutoRefPtr<IPenS> curPen, oldPen;
     pRT->CreatePen(m_nLineStyle, m_crLine, m_nLineSize, &curPen);
     pRT->SelectObject(curPen, (IRenderObj **)&oldPen);
     pRT->DrawLines(pts, 2);
@@ -1538,7 +1538,7 @@ void SGroup::OnPaint(IRenderTarget *pRT)
             rcGroupBox.top += szFnt.cy / 2;
         rcGroupBox.DeflateRect(1, 1, 1, 0);
 
-        SAutoRefPtr<IPen> pen1, pen2, oldPen;
+        SAutoRefPtr<IPenS> pen1, pen2, oldPen;
         pRT->CreatePen(PS_SOLID, m_crLine1, 1, &pen1);
         pRT->CreatePen(PS_SOLID, m_crLine2, 1, &pen2);
         pRT->SelectObject(pen1, (IRenderObj **)&oldPen);

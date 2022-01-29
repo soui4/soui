@@ -1093,7 +1093,7 @@ void SWindow::_PaintNonClient(IRenderTarget *pRT)
 
 void SWindow::_RedrawNonClient()
 {
-    SAutoRefPtr<IRegion> rgn;
+    SAutoRefPtr<IRegionS> rgn;
     GETRENDERFACTORY->CreateRegion(&rgn);
     CRect rcWnd = GetWindowRect();
     CRect rcClient = SWindow::GetClientRect();
@@ -1123,9 +1123,9 @@ void SWindow::_RedrawNonClient()
     }
 }
 
-SAutoRefPtr<IRegion> SWindow::_ConvertRect2RenderRegion(const CRect &rc) const
+SAutoRefPtr<IRegionS> SWindow::_ConvertRect2RenderRegion(const CRect &rc) const
 {
-    SAutoRefPtr<IRegion> pRet;
+    SAutoRefPtr<IRegionS> pRet;
     GETRENDERFACTORY->CreateRegion(&pRet);
     SMatrix mtx = _GetMatrixEx();
 
@@ -1157,22 +1157,22 @@ SAutoRefPtr<IRegion> SWindow::_ConvertRect2RenderRegion(const CRect &rc) const
     return pRet;
 }
 
-static bool RgnInRgn(const IRegion *r1, IRegion *r2)
+static bool RgnInRgn(const IRegionS *r1, IRegionS *r2)
 {
-    SAutoRefPtr<IRegion> pRet;
+    SAutoRefPtr<IRegionS> pRet;
     GETRENDERFACTORY->CreateRegion(&pRet);
     pRet->CombineRgn(r1, RGN_COPY);
     pRet->CombineRgn(r2, RGN_AND);
     return !pRet->IsEmpty();
 }
 
-bool SWindow::_WndRectInRgn(const CRect &rc, const IRegion *rgn) const
+bool SWindow::_WndRectInRgn(const CRect &rc, const IRegionS *rgn) const
 {
-    SAutoRefPtr<IRegion> rgn2 = _ConvertRect2RenderRegion(rc);
+    SAutoRefPtr<IRegionS> rgn2 = _ConvertRect2RenderRegion(rc);
     return RgnInRgn(rgn, rgn2);
 }
 
-void SWindow::_PaintChildren(IRenderTarget *pRT, IRegion *pRgn, UINT iBeginZorder, UINT iEndZorder)
+void SWindow::_PaintChildren(IRenderTarget *pRT, IRegionS *pRgn, UINT iBeginZorder, UINT iEndZorder)
 {
     SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
     while (pChild)
@@ -1210,7 +1210,7 @@ void SWindow::_PaintChildren(IRenderTarget *pRT, IRegion *pRgn, UINT iBeginZorde
 }
 
 // paint zorder in [iZorderBegin,iZorderEnd) widnows
-void SWindow::DispatchPaint(IRenderTarget *pRT, IRegion *pRgn, UINT iZorderBegin, UINT iZorderEnd)
+void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegin, UINT iZorderEnd)
 {
     if (!IsVisible(FALSE) || !GetContainer())
         return;
@@ -1353,7 +1353,7 @@ void SWindow::TransformPointEx(CPoint &pt) const
 }
 
 //当前函数中的参数包含zorder,为了保证传递进来的zorder是正确的,必须在外面调用zorder重建.
-void SWindow::_PaintRegion(IRenderTarget *pRT, IRegion *pRgn, UINT iZorderBegin, UINT iZorderEnd)
+void SWindow::_PaintRegion(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegin, UINT iZorderEnd)
 {
     ASSERT_UI_THREAD();
     if (!IsVisible(TRUE))
@@ -1362,7 +1362,7 @@ void SWindow::_PaintRegion(IRenderTarget *pRT, IRegion *pRgn, UINT iZorderBegin,
     DispatchPaint(pRT, pRgn, iZorderBegin, iZorderEnd);
 }
 
-void SWindow::RedrawRegion(IRenderTarget *pRT, IRegion *pRgn)
+void SWindow::RedrawRegion(IRenderTarget *pRT, IRegionS *pRgn)
 {
     ASSERT_UI_THREAD();
     if (!IsVisible(TRUE))
@@ -1885,7 +1885,7 @@ void SWindow::DrawFocus(IRenderTarget *pRT)
 void SWindow::DrawDefFocusRect(IRenderTarget *pRT, CRect rcFocus)
 {
     rcFocus.DeflateRect(2, 2);
-    SAutoRefPtr<IPen> pPen, oldPen;
+    SAutoRefPtr<IPenS> pPen, oldPen;
     pRT->CreatePen(PS_DOT, RGBA(88, 88, 88, 0xFF), 1, &pPen);
     pRT->SelectObject(pPen, (IRenderObj **)&oldPen);
     pRT->DrawRectangle(&rcFocus);
@@ -2222,14 +2222,14 @@ IRenderTarget *SWindow::GetRenderTarget(LPCRECT pRc,
     if (pRc)
         rcRT.IntersectRect(pRc, &rcRT);
 
-    SAutoRefPtr<IRegion> rgn;
+    SAutoRefPtr<IRegionS> rgn;
     GETRENDERFACTORY->CreateRegion(&rgn);
     rgn->CombineRect(rcRT, RGN_COPY);
 
     return GetRenderTarget(gdcFlags, rgn);
 }
 
-IRenderTarget *SWindow::GetRenderTarget(GrtFlag gdcFlags, IRegion *pRgn)
+IRenderTarget *SWindow::GetRenderTarget(GrtFlag gdcFlags, IRegionS *pRgn)
 {
     SASSERT(!m_pGetRTData);
 
@@ -2298,7 +2298,7 @@ void SWindow::ReleaseRenderTarget(IRenderTarget *pRT)
         SASSERT(GetContainer());
         IRenderTarget *pRTRoot = GetContainer()->OnGetRenderTarget(rcRT, GRT_OFFSCREEN);
         SWindow *pRoot = GetRoot();
-        SAutoRefPtr<IRegion> rgn;
+        SAutoRefPtr<IRegionS> rgn;
         GETRENDERFACTORY->CreateRegion(&rgn);
         if (!mtx.isIdentity())
         {
@@ -2556,7 +2556,7 @@ void SWindow::PaintBackground(IRenderTarget *pRT, LPRECT pRc)
     pRT->PushClipRect(&rcDraw, RGN_AND);
 
     SWindow *pTopWnd = GetRoot();
-    SAutoRefPtr<IRegion> pRgn;
+    SAutoRefPtr<IRegionS> pRgn;
     GETRENDERFACTORY->CreateRegion(&pRgn);
     pRgn->CombineRect(&rcDraw, RGN_COPY);
 
@@ -2574,7 +2574,7 @@ void SWindow::PaintForeground(IRenderTarget *pRT, LPRECT pRc)
     CRect rcDraw = GetWindowRect();
     if (pRc)
         rcDraw.IntersectRect(rcDraw, pRc);
-    SAutoRefPtr<IRegion> pRgn;
+    SAutoRefPtr<IRegionS> pRgn;
     GETRENDERFACTORY->CreateRegion(&pRgn);
     pRgn->CombineRect(&rcDraw, RGN_COPY);
     pRT->PushClipRect(&rcDraw, RGN_AND);
@@ -2591,7 +2591,7 @@ void SWindow::PaintForeground2(IRenderTarget *pRT, LPRECT pRc)
     CRect rcDraw = GetWindowRect();
     if (pRc)
         rcDraw.IntersectRect(rcDraw, pRc);
-    SAutoRefPtr<IRegion> pRgn;
+    SAutoRefPtr<IRegionS> pRgn;
     GETRENDERFACTORY->CreateRegion(&pRgn);
     pRgn->CombineRect(&rcDraw, RGN_COPY);
     pRT->PushClipRect(&rcDraw, RGN_AND);
@@ -2893,7 +2893,7 @@ void SWindow::_Update()
             //刷新非背景混合的窗口
             CRect rcDirty;
             m_invalidRegion->GetRgnBox(&rcDirty);
-            SAutoRefPtr<IRegion> tmpRegin = m_invalidRegion;
+            SAutoRefPtr<IRegionS> tmpRegin = m_invalidRegion;
             m_invalidRegion = NULL;
 
             if (IsVisible(TRUE))
@@ -3018,7 +3018,7 @@ BOOL SWindow::IsContainPoint(POINT pt, BOOL bClientOnly) const
     return bRet;
 }
 
-void SWindow::SetWindowRgn(IRegion *pRgn, BOOL bRedraw /*=TRUE*/)
+void SWindow::SetWindowRgn(IRegionS *pRgn, BOOL bRedraw /*=TRUE*/)
 {
     m_clipRgn = NULL;
     if (pRgn)
@@ -3030,14 +3030,14 @@ void SWindow::SetWindowRgn(IRegion *pRgn, BOOL bRedraw /*=TRUE*/)
         InvalidateRect(NULL);
 }
 
-void SWindow::SetWindowPath(IPath *pPath, BOOL bRedraw /*=TRUE*/)
+void SWindow::SetWindowPath(IPathS *pPath, BOOL bRedraw /*=TRUE*/)
 {
     m_clipPath = pPath;
     if (bRedraw)
         InvalidateRect(NULL);
 }
 
-IRegion *SWindow::GetWindowRgn() const
+IRegionS *SWindow::GetWindowRgn() const
 {
     return m_clipRgn;
 }

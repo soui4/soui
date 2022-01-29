@@ -15,7 +15,7 @@ namespace SOUI
         
         virtual SIZE GetSkinSize();
         
-        virtual bool SetImage(IBitmap *pImg){return false;}
+        virtual bool SetImage(IBitmapS *pImg){return false;}
         
         SOUI_ATTRS_BEGIN()
             ATTR_CUSTOM(L"src",OnAttrSrc)

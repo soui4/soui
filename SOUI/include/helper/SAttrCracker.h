@@ -343,12 +343,12 @@
     }                                                     \
     else
 
-// ATTR_IMAGE:直接使用IResProvider::LoadImage创建SOUI::IBitmap对象，创建成功后引用计数为1
+// ATTR_IMAGE:直接使用IResProvider::LoadImage创建SOUI::IBitmapS对象，创建成功后引用计数为1
 //不需要调用AddRef，但是用完后需要调用Release
 #define ATTR_IMAGE(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        SOUI::IBitmap *pImg = LOADIMAGE2(strValue);   \
+        SOUI::IBitmapS *pImg = LOADIMAGE2(strValue);   \
         if (!pImg)                                    \
             hRet = E_FAIL;                            \
         else                                          \
@@ -361,11 +361,11 @@
     }                                                 \
     else
 
-// ATTR_IMAGEAUTOREF:varname应该是一个SAutoRefPtr<SOUI::IBitmap>对象
+// ATTR_IMAGEAUTOREF:varname应该是一个SAutoRefPtr<SOUI::IBitmapS>对象
 #define ATTR_IMAGEAUTOREF(attribname, varname, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname))     \
     {                                                     \
-        SOUI::IBitmap *pImg = LOADIMAGE2(strValue);       \
+        SOUI::IBitmapS *pImg = LOADIMAGE2(strValue);       \
         if (!pImg)                                        \
             hRet = E_FAIL;                                \
         else                                              \

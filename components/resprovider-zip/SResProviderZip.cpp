@@ -66,13 +66,13 @@ HCURSOR SResProviderZip::LoadCursor( LPCTSTR pszResName )
 	return (HCURSOR)CURSORICON_LoadFromBuf(zf.GetData(),zf.GetSize(),0,0,TRUE,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
 }
 
-IBitmap * SResProviderZip::LoadImage( LPCTSTR strType,LPCTSTR pszResName)
+IBitmapS * SResProviderZip::LoadImage( LPCTSTR strType,LPCTSTR pszResName)
 {
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
 	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
-	IBitmap * pBmp=NULL;
+	IBitmapS * pBmp=NULL;
 	m_renderFactory->CreateBitmap(&pBmp);
 	if(!pBmp) return NULL;
 	pBmp->LoadFromMemory(zf.GetData(),zf.GetSize());

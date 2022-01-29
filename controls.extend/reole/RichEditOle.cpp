@@ -639,7 +639,7 @@ HRESULT STDMETHODCALLTYPE  CSmileyHost::OnTimer( int nInterval )
     if(lstDone.IsEmpty()) return S_OK;
 
     //计算出刷新区域
-    SAutoRefPtr<IRegion> rgn;
+    SAutoRefPtr<IRegionS> rgn;
     GETRENDERFACTORY->CreateRegion(&rgn);;
     RECT rcSmiley;
     pos = lstDone.GetHeadPosition();

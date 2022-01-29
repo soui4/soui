@@ -360,7 +360,7 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
 		}
 
 
-        SAutoRefPtr<IRegion> pRgn;
+        SAutoRefPtr<IRegionS> pRgn;
         GETRENDERFACTORY->CreateRegion(&pRgn);
 		CRect rc=pWndRgn->GetWindowRect();
 		rc.MoveToXY(0,0);//注意：SWindow将窗口的左上角定义为Rgn的原点。

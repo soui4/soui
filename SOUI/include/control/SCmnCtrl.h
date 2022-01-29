@@ -335,9 +335,9 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      *
      * Describe  设置绘制图片
      */
-    void WINAPI SetImage(IBitmap *pBitmap, FilterLevel fl = kNone_FilterLevel);
+    void WINAPI SetImage(IBitmapS *pBitmap, FilterLevel fl = kNone_FilterLevel);
 
-    IBitmap *WINAPI GetImage();
+    IBitmapS *WINAPI GetImage();
 
     /**
      * SImageWnd::SetIcon
@@ -379,7 +379,7 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
     BOOL m_bManaged;               /**< 是否要自动释放当前的m_pSkin对象 */
     int m_iIcon;                   /**< 绘制状态索引 */
     SAutoRefPtr<ISkinObj> m_pSkin; /**< ISkinObj对象 */
-    SAutoRefPtr<IBitmap> m_pImg;   /**<使用代码设定的图片*/
+    SAutoRefPtr<IBitmapS> m_pImg;   /**<使用代码设定的图片*/
     FilterLevel m_fl;              /**<绘制图片的放大精度*/
     bool m_bKeepAspect;            /**< keep aspect ratio */
 

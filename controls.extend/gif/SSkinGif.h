@@ -87,7 +87,7 @@ namespace SOUI
 		int LoadFrame(int i, Gdiplus::Bitmap* pImage) const;
 
 		SAniFrame			*m_pFrames;
-		SAutoRefPtr<IBitmap> m_pCurFrameBmp;
+		SAutoRefPtr<IBitmapS> m_pCurFrameBmp;
 		Gdiplus::Bitmap		*m_pImg;
     };
 }//end of name space SOUI

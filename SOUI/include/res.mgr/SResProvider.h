@@ -19,7 +19,7 @@ extern const TCHAR KTypeHtml[];
 
 class SOUI_EXP SResLoadFromMemory {
   public:
-    static IBitmap *LoadImage(LPVOID pBuf, size_t size);
+    static IBitmapS *LoadImage(LPVOID pBuf, size_t size);
     static IImgX *LoadImgX(LPVOID pBuf, size_t size);
 };
 
@@ -31,7 +31,7 @@ class SResProviderPE : public TObjRefImpl<IResProvider> {
     STDMETHOD_(HICON, LoadIcon)(THIS_ LPCTSTR pszResName, int cx, int cy);
     STDMETHOD_(HBITMAP, LoadBitmap)(THIS_ LPCTSTR pszResName);
     STDMETHOD_(HCURSOR, LoadCursor)(THIS_ LPCTSTR pszResName);
-    STDMETHOD_(IBitmap *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
+    STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
     STDMETHOD_(IImgX *, LoadImgX)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
     STDMETHOD_(size_t, GetRawBufferSize)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
     STDMETHOD_(BOOL, GetRawBuffer)
@@ -51,7 +51,7 @@ class SOUI_EXP SResLoadFromFile {
     static HBITMAP LoadBitmap(LPCTSTR pszFileName);
     static HICON LoadIcon(LPCTSTR pszFileName, int cx = 0, int cy = 0);
     static HCURSOR LoadCursor(LPCTSTR pszFileName);
-    static IBitmap *LoadImage(LPCTSTR pszFileName);
+    static IBitmapS *LoadImage(LPCTSTR pszFileName);
     static IImgX *LoadImgX(LPCTSTR pszFileName);
     static size_t GetRawBufferSize(LPCTSTR pszFileName);
     static BOOL GetRawBuffer(LPCTSTR pszFileName, LPVOID pBuf, size_t size);
@@ -66,7 +66,7 @@ class SResProviderFiles : public TObjRefImpl<IResProvider> {
     STDMETHOD_(HICON, LoadIcon)(THIS_ LPCTSTR pszResName, int cx, int cy);
     STDMETHOD_(HBITMAP, LoadBitmap)(THIS_ LPCTSTR pszResName);
     STDMETHOD_(HCURSOR, LoadCursor)(THIS_ LPCTSTR pszResName);
-    STDMETHOD_(IBitmap *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
+    STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
     STDMETHOD_(IImgX *, LoadImgX)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
     STDMETHOD_(size_t, GetRawBufferSize)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
     STDMETHOD_(BOOL, GetRawBuffer)

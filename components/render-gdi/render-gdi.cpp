@@ -27,19 +27,19 @@ namespace SOUI
         return TRUE;
     }
 
-    BOOL SRenderFactory_GDI::CreateBitmap( IBitmap ** ppBitmap )
+    BOOL SRenderFactory_GDI::CreateBitmap( IBitmapS ** ppBitmap )
     {
         *ppBitmap = new SBitmap_GDI(this);
         return TRUE;
     }
 
-    BOOL SRenderFactory_GDI::CreateRegion( IRegion **ppRgn )
+    BOOL SRenderFactory_GDI::CreateRegion( IRegionS **ppRgn )
     {
         *ppRgn = new SRegion_GDI(this);
         return TRUE;
     }
 
-	BOOL SRenderFactory_GDI::CreatePath(IPath ** ppPath)
+	BOOL SRenderFactory_GDI::CreatePath(IPathS ** ppPath)
 	{
 		return FALSE;
 	}
@@ -105,7 +105,7 @@ namespace SOUI
 	}
 
 
-	SPen_GDI::SPen_GDI(IRenderFactory * pRenderFac,int iStyle/*=PS_SOLID*/,COLORREF cr/*=0*/,int cWidth/*=1*/) :TGdiRenderObjImpl<IPen,OT_PEN>(pRenderFac)
+	SPen_GDI::SPen_GDI(IRenderFactory * pRenderFac,int iStyle/*=PS_SOLID*/,COLORREF cr/*=0*/,int cWidth/*=1*/) :TGdiRenderObjImpl<IPenS,OT_PEN>(pRenderFac)
 		,m_nWidth(cWidth),m_style(iStyle),m_cr(cr)
 		,m_hPen(NULL)
 	{
@@ -336,7 +336,7 @@ namespace SOUI
         return bm.bmBits;
     }
 
-	HRESULT SBitmap_GDI::Clone(IBitmap **ppClone) const 
+	HRESULT SBitmap_GDI::Clone(IBitmapS **ppClone) const 
 	{
 		HRESULT hr = E_UNEXPECTED;
 		BOOL bOK = GetRenderFactory()->CreateBitmap(ppClone);
@@ -352,14 +352,14 @@ namespace SOUI
 		return hr;
 	}
 
-	HRESULT SBitmap_GDI::Scale(IBitmap **ppOutput,int nScale,FilterLevel filterLevel) SCONST
+	HRESULT SBitmap_GDI::Scale(IBitmapS **ppOutput,int nScale,FilterLevel filterLevel) SCONST
 	{
 		int wid = MulDiv(Width(),nScale,100);
 		int hei = MulDiv(Height(),nScale,100);
 		return Scale2(ppOutput,wid,hei,filterLevel);
 	}
 
-	HRESULT SBitmap_GDI::Scale2(IBitmap **pOutput,int nWid,int nHei,FilterLevel filterLevel) SCONST
+	HRESULT SBitmap_GDI::Scale2(IBitmapS **pOutput,int nWid,int nHei,FilterLevel filterLevel) SCONST
 	{
 		if(nWid == Width() && nHei == Height())
 		{
@@ -377,7 +377,7 @@ namespace SOUI
 				hr = pRT->DrawBitmapEx(&rcDst,this,&rcSrc,MAKELONG(EM_STRETCH,filterLevel),255);
 				if(hr == S_OK)
 				{
-					*pOutput = (IBitmap*)pRT->GetCurrentObject(OT_BITMAP);
+					*pOutput = (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
 					(*pOutput)->AddRef();
 				}
 				pRT->Release();
@@ -398,7 +398,7 @@ namespace SOUI
     //////////////////////////////////////////////////////////////////////////
     //	SRegion_GDI
     SRegion_GDI::SRegion_GDI( IRenderFactory *pRenderFac )
-        :TGdiRenderObjImpl<IRegion,OT_RGN>(pRenderFac)
+        :TGdiRenderObjImpl<IRegionS,OT_RGN>(pRenderFac)
     {
         m_hRgn = ::CreateRectRgn(0,0,0,0);
     }
@@ -437,7 +437,7 @@ namespace SOUI
 		DeleteObject(hRgn);
 	}
 
-    void SRegion_GDI::CombineRgn(const IRegion * pRgnSrc,int nCombineMode)
+    void SRegion_GDI::CombineRgn(const IRegionS * pRgnSrc,int nCombineMode)
     {
         const SRegion_GDI *pRgnSrcGdi = (const SRegion_GDI*)pRgnSrc;
         HRGN hRgn = pRgnSrcGdi->GetRegion();
@@ -481,7 +481,7 @@ namespace SOUI
         return (rcBox.left == rcBox.right) || (rcBox.top== rcBox.bottom);
     }
 
-	BOOL SRegion_GDI::IsEqual(const IRegion * testRgn) const
+	BOOL SRegion_GDI::IsEqual(const IRegionS * testRgn) const
 	{
 		const SRegion_GDI *pRgnTestGdi = (const SRegion_GDI*)testRgn;
 		return ::EqualRgn(m_hRgn,pRgnTestGdi->m_hRgn);
@@ -644,19 +644,19 @@ namespace SOUI
         return S_OK;
     }
 
-    HRESULT SRenderTarget_GDI::CreatePen( int iStyle,COLORREF cr,int cWidth,IPen ** ppPen )
+    HRESULT SRenderTarget_GDI::CreatePen( int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen )
     {
 		*ppPen = new SPen_GDI(m_pRenderFactory,iStyle,cr,cWidth);
         return S_OK;
     }
 
-    HRESULT SRenderTarget_GDI::CreateSolidColorBrush( COLORREF cr,IBrush ** ppBrush )
+    HRESULT SRenderTarget_GDI::CreateSolidColorBrush( COLORREF cr,IBrushS ** ppBrush )
     {
         *ppBrush = SBrush_GDI::CreateSolidBrush(m_pRenderFactory,cr);
         return S_OK;
     }
 
-    HRESULT SRenderTarget_GDI::CreateBitmapBrush( IBitmap *pBmp,IBrush ** ppBrush )
+    HRESULT SRenderTarget_GDI::CreateBitmapBrush( IBitmapS *pBmp,IBrushS ** ppBrush )
     {
         SBitmap_GDI *pBmpSkia = (SBitmap_GDI*)pBmp;
         *ppBrush = SBrush_GDI::CreateBitmapBrush(m_pRenderFactory,pBmpSkia->GetBitmap());
@@ -715,7 +715,7 @@ namespace SOUI
         return S_OK;
     }
 
-    HRESULT SRenderTarget_GDI::PushClipRegion( IRegion *pRegion ,UINT mode/*=RGN_AND*/)
+    HRESULT SRenderTarget_GDI::PushClipRegion( IRegionS *pRegion ,UINT mode/*=RGN_AND*/)
     {
         SRegion_GDI *pRgnGDI=(SRegion_GDI*)pRegion;
         HRGN hRgn=::CreateRectRgn(0,0,0,0);
@@ -727,7 +727,7 @@ namespace SOUI
         return S_OK;
     }
 
-    HRESULT SRenderTarget_GDI::GetClipRegion( IRegion **ppRegion )
+    HRESULT SRenderTarget_GDI::GetClipRegion( IRegionS **ppRegion )
     {
         SRegion_GDI *pRgn=new SRegion_GDI(m_pRenderFactory);
         ::GetClipRgn(m_hdc,pRgn->GetRegion());
@@ -925,7 +925,7 @@ namespace SOUI
         return bRet?S_OK:S_FALSE;
     }
 
-    HRESULT SRenderTarget_GDI::DrawBitmap(LPCRECT pRcDest,const IBitmap *pBitmap,int xSrc,int ySrc,BYTE byAlpha/*=0xFF*/ )
+    HRESULT SRenderTarget_GDI::DrawBitmap(LPCRECT pRcDest,const IBitmapS *pBitmap,int xSrc,int ySrc,BYTE byAlpha/*=0xFF*/ )
     {
         SBitmap_GDI *pBmp = (SBitmap_GDI*)pBitmap;
         HBITMAP bmp=pBmp->GetBitmap();
@@ -954,7 +954,7 @@ namespace SOUI
         return bOK?S_OK:E_FAIL;
     }
 
-    HRESULT SRenderTarget_GDI::DrawBitmapEx( LPCRECT pRcDest,const IBitmap *pBitmap,LPCRECT pRcSrc,UINT expendMode, BYTE byAlpha/*=0xFF*/ )
+    HRESULT SRenderTarget_GDI::DrawBitmapEx( LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,UINT expendMode, BYTE byAlpha/*=0xFF*/ )
     {
         UINT expandModeLow = LOWORD(expendMode);
         
@@ -994,7 +994,7 @@ namespace SOUI
     }
 
 
-    HRESULT SRenderTarget_GDI::DrawBitmap9Patch( LPCRECT pRcDest,const IBitmap *pBitmap,LPCRECT pRcSrc,LPCRECT pRcSourMargin,UINT expendMode,BYTE byAlpha/*=0xFF*/ )
+    HRESULT SRenderTarget_GDI::DrawBitmap9Patch( LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,LPCRECT pRcSourMargin,UINT expendMode,BYTE byAlpha/*=0xFF*/ )
     {
         int xDest[4] = {pRcDest->left,pRcDest->left+pRcSourMargin->left,pRcDest->right-pRcSourMargin->right,pRcDest->right};
         int xSrc[4] = {pRcSrc->left,pRcSrc->left+pRcSourMargin->left,pRcSrc->right-pRcSourMargin->right,pRcSrc->right};
@@ -1394,22 +1394,22 @@ namespace SOUI
 		return E_NOTIMPL;
 	}
 
-	HRESULT SRenderTarget_GDI::CreateRegion(IRegion ** ppRegion)
+	HRESULT SRenderTarget_GDI::CreateRegion(IRegionS ** ppRegion)
 	{
 		return m_pRenderFactory->CreateRegion(ppRegion)?S_OK:E_OUTOFMEMORY;
 	}
 
-	HRESULT SRenderTarget_GDI::PushClipPath(const IPath * path, UINT mode, BOOL doAntiAlias /*= false*/)
+	HRESULT SRenderTarget_GDI::PushClipPath(const IPathS * path, UINT mode, BOOL doAntiAlias /*= false*/)
 	{
 		return E_NOTIMPL;
 	}
 
-	HRESULT SRenderTarget_GDI::DrawPath(const IPath * path,IPathEffect * pathEffect)
+	HRESULT SRenderTarget_GDI::DrawPath(const IPathS * path,IPathEffect * pathEffect)
 	{
 		return E_NOTIMPL;
 	}
 
-	HRESULT SRenderTarget_GDI::FillPath(const IPath * path)
+	HRESULT SRenderTarget_GDI::FillPath(const IPathS * path)
 	{
 		return E_NOTIMPL;
 	}

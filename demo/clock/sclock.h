@@ -39,9 +39,9 @@ protected:
 		ATTR_IMAGEAUTOREF(L"pointer_second", pointer_second, TRUE)
 	SOUI_ATTRS_END()
 
-	SAutoRefPtr<IBitmap> pointer_hour;
-	SAutoRefPtr<IBitmap> pointer_minute;
-	SAutoRefPtr<IBitmap> pointer_second;
+	SAutoRefPtr<IBitmapS> pointer_hour;
+	SAutoRefPtr<IBitmapS> pointer_minute;
+	SAutoRefPtr<IBitmapS> pointer_second;
 };
 
 }

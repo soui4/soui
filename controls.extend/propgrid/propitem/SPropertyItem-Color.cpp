@@ -45,7 +45,7 @@ namespace SOUI
 			pRT->DrawText(strValue,strValue.GetLength(),&rcValue,DT_SINGLELINE|DT_VCENTER);
 		}else
 		{
-			SAutoRefPtr<IPen> pen,oldPen;
+			SAutoRefPtr<IPenS> pen,oldPen;
 			pRT->CreatePen(PS_SOLID,RGBA(255,0,0,255),1,&pen);
 			pRT->SelectObject(pen,(IRenderObj**)&oldPen);
 			{

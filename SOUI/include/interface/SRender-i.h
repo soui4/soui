@@ -180,8 +180,8 @@ DECLARE_INTERFACE_(IRenderObj, IObjRef)
  * Describe
  */
 #undef INTERFACE
-#define INTERFACE IBrush
-DECLARE_INTERFACE_(IBrush, IRenderObj)
+#define INTERFACE IBrushS
+DECLARE_INTERFACE_(IBrushS, IRenderObj)
 {
     //!添加引用
     /*!
@@ -222,8 +222,8 @@ DECLARE_INTERFACE_(IBrush, IRenderObj)
  * Describe
  */
 #undef INTERFACE
-#define INTERFACE IPen
-DECLARE_INTERFACE_(IPen, IRenderObj)
+#define INTERFACE IPenS
+DECLARE_INTERFACE_(IPenS, IRenderObj)
 {
     //!添加引用
     /*!
@@ -276,8 +276,8 @@ DECLARE_INTERFACE_(IPen, IRenderObj)
  * Describe
  */
 #undef INTERFACE
-#define INTERFACE IBitmap
-DECLARE_INTERFACE_(IBitmap, IRenderObj)
+#define INTERFACE IBitmapS
+DECLARE_INTERFACE_(IBitmapS, IRenderObj)
 {
     //!添加引用
     /*!
@@ -405,7 +405,7 @@ DECLARE_INTERFACE_(IBitmap, IRenderObj)
      * @return   HRESULT
      * Describe  成功后，调用者执行IBitmap::Release
      */
-    STDMETHOD_(HRESULT, Clone)(THIS_ IBitmap * *ppClone) SCONST PURE;
+    STDMETHOD_(HRESULT, Clone)(THIS_ IBitmapS * *ppClone) SCONST PURE;
 
     /**
      * Scale
@@ -417,7 +417,7 @@ DECLARE_INTERFACE_(IBitmap, IRenderObj)
      * Describe  成功后，调用者执行IBitmap::Release
      */
     STDMETHOD_(HRESULT, Scale)
-    (THIS_ IBitmap * *pOutput, int nScale, FilterLevel filterLevel) SCONST PURE;
+    (THIS_ IBitmapS * *pOutput, int nScale, FilterLevel filterLevel) SCONST PURE;
 
     /**
      * Scale
@@ -430,7 +430,7 @@ DECLARE_INTERFACE_(IBitmap, IRenderObj)
      * Describe  成功后，调用者执行IBitmap::Release
      */
     STDMETHOD_(HRESULT, Scale2)
-    (THIS_ IBitmap * *pOutput, int nWid, int nHei, FilterLevel filterLevel) SCONST PURE;
+    (THIS_ IBitmapS * *pOutput, int nWid, int nHei, FilterLevel filterLevel) SCONST PURE;
 
     /**
      * 将位图保存到文件
@@ -443,7 +443,7 @@ DECLARE_INTERFACE_(IBitmap, IRenderObj)
     STDMETHOD_(HRESULT, Save)(THIS_ LPCWSTR pszFileName, const LPVOID pFormat) SCONST PURE;
 };
 
-typedef IBitmap *IBitmapPtr;
+typedef IBitmapS *IBitmapPtr;
 
 typedef enum _FillStyle
 {
@@ -560,8 +560,8 @@ DECLARE_INTERFACE_(IFontS, IRenderObj)
  * Describe
  */
 #undef INTERFACE
-#define INTERFACE IRegion
-DECLARE_INTERFACE_(IRegion, IRenderObj)
+#define INTERFACE IRegionS
+DECLARE_INTERFACE_(IRegionS, IRenderObj)
 {
     //!添加引用
     /*!
@@ -612,7 +612,7 @@ DECLARE_INTERFACE_(IRegion, IRenderObj)
      * @return   void
      * Describe  组合模式同Win32 API CombineRgn
      */
-    STDMETHOD_(void, CombineRgn)(THIS_ const IRegion *pRgnSrc, int nCombineMode) PURE;
+    STDMETHOD_(void, CombineRgn)(THIS_ const IRegionS *pRgnSrc, int nCombineMode) PURE;
 
     STDMETHOD_(void, CombineRoundRect)(THIS_ LPCRECT lprect, POINT ptConner, int nCombineMode) PURE;
 
@@ -678,7 +678,7 @@ DECLARE_INTERFACE_(IRegion, IRenderObj)
      * @return   BOOL, true-this and testRgn are equal
      * Describe
      */
-    STDMETHOD_(BOOL, IsEqual)(THIS_ const IRegion *testRgn) SCONST PURE;
+    STDMETHOD_(BOOL, IsEqual)(THIS_ const IRegionS *testRgn) SCONST PURE;
 };
 
 typedef enum _xFormIndex
@@ -758,8 +758,8 @@ typedef enum _AddPathMode
 } AddPathMode;
 
 #undef INTERFACE
-#define INTERFACE IPath
-DECLARE_INTERFACE_(IPath, IRenderObj)
+#define INTERFACE IPathS
+DECLARE_INTERFACE_(IPathS, IRenderObj)
 {
     //!添加引用
     /*!
@@ -1175,12 +1175,12 @@ DECLARE_INTERFACE_(IPath, IRenderObj)
     @param dx   The amount to translate the path in Y as it is added
     */
     STDMETHOD_(void, addPath)
-    (THIS_ const IPath *src, float dx, float dy, AddPathMode mode /*= kAppend_AddPathMode*/) PURE;
+    (THIS_ const IPathS *src, float dx, float dy, AddPathMode mode /*= kAppend_AddPathMode*/) PURE;
 
     /**
      *  Same as addPath(), but reverses the src input
      */
-    STDMETHOD_(void, reverseAddPath)(THIS_ const IPath *src) PURE;
+    STDMETHOD_(void, reverseAddPath)(THIS_ const IPathS *src) PURE;
 
     /** Offset the path by (dx,dy), returning true on success
 
@@ -1246,7 +1246,7 @@ DECLARE_INTERFACE_(IPathMeasure, IObjRef)
     /**
      * Assign a new path, or null to have none.
      */
-    STDMETHOD_(void, setPath)(THIS_ IPath * path, BOOL forceClosed) PURE;
+    STDMETHOD_(void, setPath)(THIS_ IPathS * path, BOOL forceClosed) PURE;
 
     /**
      * Return the total length of the current contour, or 0 if no path is
@@ -1280,7 +1280,7 @@ DECLARE_INTERFACE_(IPathMeasure, IObjRef)
      * such as <code>dst.rLineTo(0, 0)</code>.</p>
      */
     STDMETHOD_(BOOL, getSegment)
-    (THIS_ float startD, float stopD, IPath *dst, BOOL startWithMoveTo) PURE;
+    (THIS_ float startD, float stopD, IPathS *dst, BOOL startWithMoveTo) PURE;
 };
 
 /**
@@ -1310,10 +1310,10 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
 
     STDMETHOD_(HRESULT, CreateCompatibleRenderTarget)
     (THIS_ SIZE szTarget, IRenderTarget * *ppRenderTarget) PURE;
-    STDMETHOD_(HRESULT, CreatePen)(THIS_ int iStyle, COLORREF cr, int cWidth, IPen **ppPen) PURE;
-    STDMETHOD_(HRESULT, CreateSolidColorBrush)(THIS_ COLORREF cr, IBrush * *ppBrush) PURE;
-    STDMETHOD_(HRESULT, CreateBitmapBrush)(THIS_ IBitmap * pBmp, IBrush * *ppBrush) PURE;
-    STDMETHOD_(HRESULT, CreateRegion)(THIS_ IRegion * *ppRegion) PURE;
+    STDMETHOD_(HRESULT, CreatePen)(THIS_ int iStyle, COLORREF cr, int cWidth, IPenS **ppPen) PURE;
+    STDMETHOD_(HRESULT, CreateSolidColorBrush)(THIS_ COLORREF cr, IBrushS * *ppBrush) PURE;
+    STDMETHOD_(HRESULT, CreateBitmapBrush)(THIS_ IBitmapS * pBmp, IBrushS * *ppBrush) PURE;
+    STDMETHOD_(HRESULT, CreateRegion)(THIS_ IRegionS * *ppRegion) PURE;
 
     STDMETHOD_(HRESULT, Resize)(THIS_ SIZE sz) PURE;
 
@@ -1323,7 +1323,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, SetViewportOrg)(THIS_ POINT pt) PURE;
 
     STDMETHOD_(HRESULT, PushClipRect)(THIS_ LPCRECT pRect, UINT mode /*=RGN_AND*/) PURE;
-    STDMETHOD_(HRESULT, PushClipRegion)(THIS_ IRegion * pRegion, UINT mode /*=RGN_AND*/) PURE;
+    STDMETHOD_(HRESULT, PushClipRegion)(THIS_ IRegionS * pRegion, UINT mode /*=RGN_AND*/) PURE;
     STDMETHOD_(HRESULT, PopClip)(THIS) PURE;
 
     STDMETHOD_(HRESULT, ExcludeClipRect)(THIS_ LPCRECT pRc) PURE;
@@ -1332,7 +1332,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, SaveClip)(THIS_ int *pnState) PURE;
     STDMETHOD_(HRESULT, RestoreClip)(THIS_ int nState /*=-1*/) PURE;
 
-    STDMETHOD_(HRESULT, GetClipRegion)(THIS_ IRegion * *ppRegion) PURE;
+    STDMETHOD_(HRESULT, GetClipRegion)(THIS_ IRegionS * *ppRegion) PURE;
     STDMETHOD_(HRESULT, GetClipBox)(THIS_ LPRECT prc) PURE;
 
     STDMETHOD_(HRESULT, DrawText)(THIS_ LPCTSTR pszText, int cchLen, LPRECT pRc, UINT uFormat) PURE;
@@ -1368,13 +1368,13 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, DrawIconEx)
     (THIS_ int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT diFlags) PURE;
     STDMETHOD_(HRESULT, DrawBitmap)
-    (THIS_ LPCRECT pRcDest, const IBitmap *pBitmap, int xSrc, int ySrc, BYTE byAlpha /*=0xFF*/)
+    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, int xSrc, int ySrc, BYTE byAlpha /*=0xFF*/)
         PURE;
     STDMETHOD_(HRESULT, DrawBitmapEx)
-    (THIS_ LPCRECT pRcDest, const IBitmap *pBitmap, LPCRECT pRcSrc, UINT expendMode,
+    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, UINT expendMode,
      BYTE byAlpha /*=0xFF*/) PURE;
     STDMETHOD_(HRESULT, DrawBitmap9Patch)
-    (THIS_ LPCRECT pRcDest, const IBitmap *pBitmap, LPCRECT pRcSrc, LPCRECT pRcSourMargin,
+    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, LPCRECT pRcSourMargin,
      UINT expendMode, BYTE byAlpha /*=0xFF*/) PURE;
     STDMETHOD_(HRESULT, BitBlt)
     (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSour, int xSrc, int ySrc, DWORD dwRop /*=kSrcCopy*/)
@@ -1448,17 +1448,17 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      *  @param doAntiAlias true if the clip should be anti aliased
      */
     STDMETHOD_(HRESULT, PushClipPath)
-    (THIS_ const IPath *path, UINT mode, BOOL doAntiAlias /*= false*/) PURE;
+    (THIS_ const IPathS *path, UINT mode, BOOL doAntiAlias /*= false*/) PURE;
 
     /** Draw the specified path frame using current selected pen
     @param path     The path to be drawn
     */
-    STDMETHOD_(HRESULT, DrawPath)(THIS_ const IPath *path, IPathEffect *pathEffect /*= NULL*/) PURE;
+    STDMETHOD_(HRESULT, DrawPath)(THIS_ const IPathS *path, IPathEffect *pathEffect /*= NULL*/) PURE;
 
     /** Fill the specified path frame using current selected brush
     @param path     The path to be drawn
     */
-    STDMETHOD_(HRESULT, FillPath)(THIS_ const IPath *path) PURE;
+    STDMETHOD_(HRESULT, FillPath)(THIS_ const IPathS *path) PURE;
 
     /** This behaves the same as save(), but in addition it allocates an
     offscreen bitmap. All drawing calls are directed there, and only when
@@ -1521,9 +1521,9 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
      */
     STDMETHOD_(BOOL, CreateFont)(THIS_ IFontS * *ppFont, const LOGFONT *lf) PURE;
 
-    STDMETHOD_(BOOL, CreateBitmap)(THIS_ IBitmap * *ppBitmap) PURE;
+    STDMETHOD_(BOOL, CreateBitmap)(THIS_ IBitmapS * *ppBitmap) PURE;
 
-    STDMETHOD_(BOOL, CreateRegion)(THIS_ IRegion * *ppRgn) PURE;
+    STDMETHOD_(BOOL, CreateRegion)(THIS_ IRegionS * *ppRgn) PURE;
 
     STDMETHOD_(HRESULT, CreateBlurMaskFilter)
     (THIS_ float radius, BlurStyle style, BlurFlags flag, IMaskFilter **ppMaskFilter) PURE;
@@ -1532,7 +1532,7 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
     (THIS_ float direction[3], float ambient, float specular, float blurRadius,
      IMaskFilter **ppMaskFilter) PURE;
 
-    STDMETHOD_(BOOL, CreatePath)(THIS_ IPath * *ppPath) PURE;
+    STDMETHOD_(BOOL, CreatePath)(THIS_ IPathS * *ppPath) PURE;
 
     STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFGUID guidEffect, IPathEffect * *ppPathEffect) PURE;
 

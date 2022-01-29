@@ -480,7 +480,7 @@ class SOUI_EXP SHostWnd
 
     IToolTip *m_pTipCtrl; /**<tip接口*/
 
-    SAutoRefPtr<IRegion> m_rgnInvalidate;             /**<脏区域*/
+    SAutoRefPtr<IRegionS> m_rgnInvalidate;             /**<脏区域*/
     SAutoRefPtr<IRenderTarget> m_memRT;               /**<绘制缓存*/
     SAutoRefPtr<SStylePool> m_privateStylePool;       /**<局部style pool*/
     SAutoRefPtr<SSkinPool> m_privateSkinPool;         /**<局部skin pool*/
