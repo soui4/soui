@@ -16,7 +16,7 @@ class STreeViewDataSetObserver : public TObjRefImpl<ITvDataSetObserver> {
     }
 
     STDMETHOD_(void, onBranchInvalidated)
-    (THIS_ HTREEITEM hBranch, bool bInvalidParents, bool bInvalidChildren) OVERRIDE
+    (THIS_ HTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren) OVERRIDE
     {
         m_pOwner->onBranchInvalidated(hBranch, bInvalidParents, bInvalidChildren);
     }
@@ -1014,7 +1014,7 @@ void STreeView::onBranchChanged(HTREEITEM hBranch)
     UpdateVisibleItems();
 }
 
-void STreeView::onBranchInvalidated(HTREEITEM hBranch, bool bInvalidParents, bool bInvalidChildren)
+void STreeView::onBranchInvalidated(HTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren)
 {
     if (m_adapter == NULL)
     {

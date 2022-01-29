@@ -113,7 +113,7 @@ class SOUI_EXP STreeView
     BOOL OnItemDblClick(IEvtArgs *pEvt);
 
     void onBranchChanged(HTREEITEM hBranch);
-    void onBranchInvalidated(HTREEITEM hBranch, bool bInvalidParents, bool bInvalidChildren);
+    void onBranchInvalidated(HTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren);
     void onBranchExpandedChanged(HTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew);
 
   protected:
