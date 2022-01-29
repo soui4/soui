@@ -320,7 +320,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
             }
         }
 #elif (RES_TYPE==1)//从EXE资源加载
-        CreateResProvider(RES_PE,(IObjRef**)&pResProvider);
+        souiFac.CreateResProvider(RES_PE,(IObjRef**)&pResProvider);
         pResProvider->Init((WPARAM)hInstance,0);
 #elif (RES_TYPE==2)//从ZIP包加载
         bLoaded=pComMgr->CreateResProvider_ZIP((IObjRef**)&pResProvider);
