@@ -125,7 +125,7 @@ void SwndContainerImpl::OnSetSwndFocus(SWND swnd)
     m_focusMgr.SetFocusedHwnd(swnd);
 }
 
-SWND SwndContainerImpl::OnGetSwndCapture()
+SWND SwndContainerImpl::OnGetSwndCapture() const
 {
     return m_hCapture;
 }
@@ -413,9 +413,9 @@ BOOL SwndContainerImpl::RegisterDragDrop(SWND swnd, IDropTarget *pDropTarget)
     return m_dropTarget.RegisterDragDrop(swnd, pDropTarget);
 }
 
-BOOL SwndContainerImpl::RevokeDragDrop(SWND swnd)
+BOOL SwndContainerImpl::UnregisterDragDrop(SWND swnd)
 {
-    return m_dropTarget.RevokeDragDrop(swnd);
+    return m_dropTarget.UnregisterDragDrop(swnd);
 }
 
 void SwndContainerImpl::OnActivate(UINT nState)

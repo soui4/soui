@@ -559,7 +559,7 @@ void SMatrix::postRotate(float degrees)
 
 ////////////////////////////////////////////////////////////////////////////////////
 
-void SMatrix::setSkew(float sx, float sy, float px, float py)
+void SMatrix::setSkew2(float sx, float sy, float px, float py)
 {
     fMat[kMScaleX] = 1;
     fMat[kMSkewX] = sx;
@@ -594,7 +594,7 @@ void SMatrix::setSkew(float sx, float sy)
 void SMatrix::preSkew(float sx, float sy, float px, float py)
 {
     SMatrix m;
-    m.setSkew(sx, sy, px, py);
+    m.setSkew2(sx, sy, px, py);
     this->preConcat(m);
 }
 
@@ -608,7 +608,7 @@ void SMatrix::preSkew(float sx, float sy)
 void SMatrix::postSkew(float sx, float sy, float px, float py)
 {
     SMatrix m;
-    m.setSkew(sx, sy, px, py);
+    m.setSkew2(sx, sy, px, py);
     this->postConcat(m);
 }
 
@@ -1807,6 +1807,16 @@ void SMatrix::setMatrix(const float fMat[9], int matType)
 void SMatrix::setIdentity()
 {
 	this->reset();
+}
+
+IxForm * SMatrix::Data() const
+{
+	return (IxForm*)this;
+}
+
+BOOL SMatrix::isIdentity() const
+{
+	return this->getType() == 0;
 }
 
 } // end of namespace SOUI

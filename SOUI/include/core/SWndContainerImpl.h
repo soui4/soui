@@ -43,7 +43,7 @@ class SOUI_EXP SwndContainerImpl
     // ISwndContainer
     STDMETHOD_(BOOL, RegisterDragDrop)(THIS_ SWND swnd, IDropTarget *pDropTarget) OVERRIDE;
 
-    STDMETHOD_(BOOL, RevokeDragDrop)(THIS_ SWND swnd) OVERRIDE;
+    STDMETHOD_(BOOL, UnregisterDragDrop)(THIS_ SWND swnd) OVERRIDE;
 
     STDMETHOD_(BOOL, OnReleaseSwndCapture)(THIS) OVERRIDE;
 
@@ -52,7 +52,7 @@ class SOUI_EXP SwndContainerImpl
     STDMETHOD_(void, FrameToHost)(THIS_ RECT *rc) SCONST OVERRIDE
     {
     }
-    STDMETHOD_(SWND, OnGetSwndCapture)(THIS) OVERRIDE;
+    STDMETHOD_(SWND, OnGetSwndCapture)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(SWND, GetFocus)(THIS) SCONST OVERRIDE;
 

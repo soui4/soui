@@ -493,6 +493,8 @@
 			<File
 				RelativePath="include\control\SMCListView.h" />
 			<File
+				RelativePath="include\interface\SMatrix-i.h" />
+			<File
 				RelativePath="include\matrix\SMatrix.h" />
 			<File
 				RelativePath="include\helper\SMemDC.h" />
@@ -602,6 +604,8 @@
 				RelativePath="include\core\STimerlineHandlerMgr.h" />
 			<File
 				RelativePath="include\helper\SToolTip.h" />
+			<File
+				RelativePath="include\interface\STransform-i.h" />
 			<File
 				RelativePath="include\animation\STransformation.h" />
 			<File

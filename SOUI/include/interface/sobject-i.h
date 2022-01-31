@@ -146,6 +146,12 @@ DECLARE_INTERFACE_(IObject, IObjRef)
      * Describe
      */
     STDMETHOD_(int, GetID)(THIS) SCONST PURE;
+
+    /**
+     * @brief 设置对象ID
+     * @param nID int--对象ID
+     * @return 
+    */
     STDMETHOD_(void, SetID)(THIS_ int nID) PURE;
 
     /**
@@ -155,6 +161,12 @@ DECLARE_INTERFACE_(IObject, IObjRef)
      * Describe
      */
     STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST PURE;
+
+    /**
+     * @brief 设置对象Name
+     * @param pszName LPCWSTR -- 对象Name
+     * @return 
+    */
     STDMETHOD_(void, SetName)(THIS_ LPCWSTR pszName) PURE;
 
     /**

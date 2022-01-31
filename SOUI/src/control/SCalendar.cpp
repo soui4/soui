@@ -305,7 +305,7 @@ int SCalendar::OnCreate(LPVOID)
         return nRet;
     for (int i = 0; i < 7; i++)
     {
-        m_strWeek[i].SetCtxProvider(this);
+        m_strWeek[i].SetOwner(this);
         m_strWeek[i].TranslateText();
     }
     return nRet;

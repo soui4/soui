@@ -169,14 +169,6 @@ long WINAPI TestLvAdapter_Release(ILvAdapter *pObj)
 	}
 
     /**
-     * @return a custom defined data that associate with the specified item.
-     */
-    ULONG_PTR WINAPI TestLvAdapter_getItemData(ILvAdapter *pObj, int position) {
-		return 0;
-	}
-
-
-    /**
      * @return a string object that associate with the specified item.
      */
     void WINAPI TestLvAdapter_getItemDesc(ILvAdapter *pObj, int positoin, IStringW *pDesc) {
@@ -200,7 +192,6 @@ ILvAdapterVtbl vtblTestLv ={
 	TestLvAdapter_getViewTypeCount,
 	TestLvAdapter_getViewDesiredSize,
 	TestLvAdapter_isEmpty,
-	TestLvAdapter_getItemData,
 	TestLvAdapter_getItemDesc,
 	TestLvAdapter_InitByTemplate
 };

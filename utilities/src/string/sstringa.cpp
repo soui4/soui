@@ -406,7 +406,24 @@ void SStringA::SetLength(int nLength)
 
 void SStringA::Copy(const IStringA *pSrc)
 {
-	AssignCopy(pSrc->GetLength(),pSrc->c_str());
+	if (m_pszData != pSrc->c_str())
+	{
+		const TStringData * pDataSrc = (const TStringData *)pSrc->GetPrivData();
+		TStringData* pData = GetData();
+		if ((pData->IsLocked() && pData != TStringData::InitDataNil()) || pDataSrc->IsLocked())
+		{
+			// actual copy necessary since one of the strings is locked
+			AssignCopy(pDataSrc->nDataLength, pSrc->c_str());
+		}
+		else
+		{
+			// can just copy references around
+			_ReleaseData();
+			SASSERT(pDataSrc != TStringData::InitDataNil());
+			m_pszData = (char*)pSrc->c_str();
+			GetData()->AddRef();
+		}
+	}
 }
 
 void SStringA::Assign(LPCSTR src)

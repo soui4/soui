@@ -41,20 +41,17 @@ class SOUI_EXP STransformation : public ITransformation {
     STransformation();
 
 public:
-	STDMETHOD_(IMatrix *,GetMatrix)(THIS) OVERRIDE
-	{
-		return &mMatrix;
-	}
+	STDMETHOD_(IMatrix *,GetMatrix)(THIS) OVERRIDE;
 
-	STDMETHOD_(BYTE,getAlpha) (THIS) SCONST OVERRIDE;
+	STDMETHOD_(BYTE,GetAlpha) (THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void,setAlpha)(THIS_ BYTE alpha) OVERRIDE;
+	STDMETHOD_(void,SetAlpha)(THIS_ BYTE alpha) OVERRIDE;
 
-	STDMETHOD_(void,compose)(const ITransformation *t) OVERRIDE;
+	STDMETHOD_(void,Compose)(const ITransformation *t) OVERRIDE;
 
-	STDMETHOD_(void,clear)(THIS) OVERRIDE;
+	STDMETHOD_(void,Clear)(THIS) OVERRIDE;
 
-	STDMETHOD_(void,setTransformationType)(THIS_ int type) OVERRIDE;
+	STDMETHOD_(void,SetTransformationType)(THIS_ int type) OVERRIDE;
 public:
 
     /**

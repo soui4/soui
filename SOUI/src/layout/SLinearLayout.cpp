@@ -229,7 +229,7 @@ void SLinearLayout::LayoutChildren(IWindow *pParent)
         while (pChild)
         {
             const SLinearLayoutParam *pLinearLayoutParam
-                = (const SLinearLayoutParam *)pChild->GetLayoutParam2();
+                = (const SLinearLayoutParam *)pChild->GetLayoutParam();
 
             int nScale = pChild->GetScale();
 
@@ -407,18 +407,18 @@ SIZE SLinearLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHei
     memset(pSize, 0, sizeof(SIZE) * pParent->GetChildrenCount());
     const IWindow **ppChilds = new const IWindow *[pParent->GetChildrenCount()];
 
-    const ILayoutParam *pParentLayoutParam = (const ILayoutParam *)pParent->GetLayoutParam2();
+    const ILayoutParam *pParentLayoutParam = (const ILayoutParam *)pParent->GetLayoutParam();
 
     float fWeight = 0;
     int nChilds = 0;
     {
         int iChild = 0;
 
-        const IWindow *pChild = pParent->GetNextLayoutIChild2(NULL);
+        const IWindow *pChild = pParent->GetNextLayoutIChild(NULL);
         while (pChild)
         {
             const SLinearLayoutParam *pLinearLayoutParam
-                = (const SLinearLayoutParam *)pChild->GetLayoutParam2();
+                = (const SLinearLayoutParam *)pChild->GetLayoutParam();
             int nScale = pChild->GetScale();
             CSize szChild(SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
             if (pLinearLayoutParam->IsMatchParent(Horz))
@@ -465,7 +465,7 @@ SIZE SLinearLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHei
 
             ppChilds[iChild] = pChild;
             pSize[iChild] = szChild;
-            pChild = pParent->GetNextLayoutIChild2(pChild);
+            pChild = pParent->GetNextLayoutIChild(pChild);
             iChild++;
         }
         nChilds = iChild;

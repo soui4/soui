@@ -97,15 +97,38 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      */
     STDMETHOD_(void, SetScriptFactory)(THIS_ IScriptFactory * pScriptModule) PURE;
 
+    /**
+     * @brief 初始化XML资源的name-id映射表
+     * @param pNames const LPCWSTR *--控件名表
+     * @param nIds const int *--控件ID表
+     * @param nCount int--控件数据
+     * @return 
+     * @remark 数据表由residbuilder工具自动生成
+    */
     STDMETHOD_(void, InitXmlNamedID)(THIS_ const LPCWSTR *pNames, const int *nIds, int nCount) PURE;
 
+    /**
+     * @brief 从资源ID加载XML
+     * @param strResId LPCTSTR--资源ID，为type:name格式
+     * @return IXmlDoc *--XML Doc
+     * @remark 使用完成后调用Rlease释放
+    */
     STDMETHOD_(IXmlDoc *, LoadXmlDocment)(THIS_ LPCTSTR strResId) PURE;
 
+    /**
+     * @brief 从资源加载动画资源
+     * @param strResId LPCTSTR--动画资源ID
+     * @return IAnimation* 动画对象
+     * @remark 使用完成后调用Rlease释放
+     */
     STDMETHOD_(IAnimation *, LoadAnimation)(THIS_ LPCTSTR strResId) PURE;
 
+    /**
+     * @brief 从资源加载数值动画资源
+     * @return IValueAnimator* 数值动画对象
+     * @remark 使用完成后调用Rlease释放
+     */
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) PURE;
 };
-
-typedef IApplication *IApplicationPtr;
 
 SNSEND

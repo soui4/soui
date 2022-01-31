@@ -166,27 +166,23 @@ enum
     HRET_FLAG_LAYOUT_PARAM = (1 << 18),
 };
 
-struct ITrCtxProvider
-{
-    virtual LPCWSTR GetTrCtx() const = 0;
-};
-
+class SWindow;
 class SOUI_EXP STrText {
-  public:
-    STrText(ITrCtxProvider *pProvider = NULL);
-    void SetCtxProvider(ITrCtxProvider *pProvider);
+public:
+	STrText(SWindow *pOwner=NULL);
+	void SetOwner(SWindow *pOwner);
 
-    void SetText(const SStringT &strText);
+	void SetText(const SStringT &strText);
 
-    SStringT GetText(BOOL bRawText = FALSE) const;
+	SStringT GetText(BOOL bRawText = FALSE) const;
 
-    void TranslateText();
+	void TranslateText();
 
-  protected:
-    ITrCtxProvider *pTrCtxProvider;
+protected:
+	SWindow *pOwner;
 
-    SStringT strRaw; //原始字符串
-    SStringT strTr;  //翻译后的字符串
+	SStringT strRaw; //原始字符串
+	SStringT strTr;  //翻译后的字符串
 };
 
 /**
@@ -196,8 +192,7 @@ class SOUI_EXP STrText {
  * Describe   SOUI窗口基类,实现窗口的基本接口
  */
 class SOUI_EXP SWindow
-    : public TObjRefImpl<SObjectImpl<IWindow>>
-    , public ITrCtxProvider {
+    : public TObjRefImpl<SObjectImpl<IWindow>>{
     DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IWindow>>, L"window", Window)
     friend class SwndLayoutBuilder;
     friend class SWindowRepos;
@@ -264,12 +259,7 @@ class SOUI_EXP SWindow
         return m_pLayout;
     }
 
-    STDMETHOD_(const ILayoutParam *, GetLayoutParam2)(THIS) SCONST OVERRIDE
-    {
-        return m_pLayoutParam;
-    }
-
-    STDMETHOD_(ILayoutParam *, GetLayoutParam)(THIS) OVERRIDE
+    STDMETHOD_(ILayoutParam *, GetLayoutParam)(THIS) SCONST OVERRIDE
     {
         return m_pLayoutParam;
     }
@@ -325,17 +315,18 @@ class SOUI_EXP SWindow
     STDMETHOD_(void, SetWindowRgn)(THIS_ IRegionS *pRgn, BOOL bRedraw = TRUE) OVERRIDE;
     STDMETHOD_(IRegionS *, GetWindowRgn)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, SetWindowPath)(THIS_ IPathS *pPath, BOOL bRedraw = TRUE) OVERRIDE;
+	STDMETHOD_(IPathS*, GetWindowPath)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, SetTimer)(THIS_ char id, UINT uElapse) OVERRIDE;
     STDMETHOD_(void, KillTimer)(THIS_ char id) OVERRIDE;
 
-    STDMETHOD_(SWND, GetCapture)(THIS) OVERRIDE;
+    STDMETHOD_(SWND, GetCapture)(THIS) SCONST OVERRIDE;
     STDMETHOD_(SWND, SetCapture)(THIS) OVERRIDE;
     STDMETHOD_(BOOL, ReleaseCapture)(THIS) OVERRIDE;
 
     STDMETHOD_(void, SetAnimation)(THIS_ IAnimation *animation) OVERRIDE;
 
-    STDMETHOD_(IAnimation *, GetAnimation)(THIS) OVERRIDE;
+    STDMETHOD_(IAnimation *, GetAnimation)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(void, StartAnimation)(THIS_ IAnimation *animation) OVERRIDE;
 
@@ -345,9 +336,9 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BYTE, GetAlpha)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(void, SetMatrix)(THIS_ const IxForm *mtx) OVERRIDE;
+    STDMETHOD_(void, SetMatrix)(THIS_ const IMatrix *mtx) OVERRIDE;
 
-    STDMETHOD_(void, GetMatrix)(THIS_ IxForm *mtx) SCONST OVERRIDE;
+    STDMETHOD_(void, GetMatrix)(THIS_ IMatrix *mtx) SCONST OVERRIDE;
 
     STDMETHOD_(int, GetScale)(THIS) SCONST OVERRIDE;
 
@@ -363,98 +354,27 @@ class SOUI_EXP SWindow
     STDMETHOD_(BOOL, IsClipClient)(THIS) SCONST OVERRIDE;
     STDMETHOD_(BOOL, IsLayoutDirty)(THIS) SCONST OVERRIDE;
 
-    /**
-     * GetNextLayoutChild
-     * @brief    获取下一个参与布局的窗口
-     * @param	SWindow *pCurChild -- 当前子窗口指针
-     * @return   SWindow * -- 下一个布局子窗口
-     *
-     * Describe
-     */
-    STDMETHOD_(const IWindow *, GetNextLayoutIChild2)
-    (THIS_ const IWindow *pCurChild) SCONST OVERRIDE;
-    STDMETHOD_(IWindow *, GetNextLayoutIChild)(THIS_ IWindow *pCurChild) OVERRIDE;
+    STDMETHOD_(IWindow *, GetNextLayoutIChild)(THIS_ const IWindow *pCurChild) SCONST OVERRIDE;
 
-    /**
-     * UpdateChildrenPosition
-     * @brief    更新子窗口位置
-     * @return   void
-     *
-     * Describe
-     */
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
 
-    STDMETHOD_(IWindow *, GetIWindow)(THIS_ int uCode) OVERRIDE;
+    STDMETHOD_(IWindow *, GetIWindow)(THIS_ int uCode) SCONST OVERRIDE;
 
-    STDMETHOD_(IWindow *, GetIChild)(THIS_ int iChild) OVERRIDE;
+    STDMETHOD_(IWindow *, GetIChild)(THIS_ int iChild) SCONST OVERRIDE;
 
-    /**
-     * GetParent
-     * @brief    获得父窗口
-     * @return   SWindow * 父窗口指针
-     *
-     * Describe
-     */
-    STDMETHOD_(IWindow *, GetIParent)(THIS) OVERRIDE;
+    STDMETHOD_(IWindow *, GetIParent)(THIS) SCONST OVERRIDE;
 
-    /**
-     * GetRoot
-     * @brief    获得顶层窗口
-     * @return   SWindow * 顶层窗口指针
-     *
-     * Describe
-     */
-    STDMETHOD_(IWindow *, GetIRoot)(THIS) OVERRIDE;
+	STDMETHOD_(IWindow *, GetIRoot)(THIS) SCONST OVERRIDE;
 
-    /**
-     * IsDesendant
-     * @brief    determining whether this window is a descendant of pWnd or not
-     * @param    const SWindow * pWnd --  the tested ascendant window
-     * @return   BOOL -- TRUE: descendant
-     * Describe
-     */
     STDMETHOD_(BOOL, IsIDescendant)(THIS_ const IWindow *pWnd) SCONST OVERRIDE;
 
-    /**
-     * AdjustZOrder
-     * @brief    调整窗口Z序
-     * @param    SWindow *pInsertAfter --  插入在这个窗口之后
-     * @return   bool,  pInsertAfter与this非同级窗口返回失败
-     *
-     * Describe  pInsertAfter可以为NULL，或是与this同一级的兄弟窗口
-     */
-    STDMETHOD_(BOOL, AdjustIZOrder)(THIS_ IWindow *pInsertAfter) OVERRIDE;
+	STDMETHOD_(BOOL, AdjustIZOrder)(THIS_ IWindow *pInsertAfter) OVERRIDE;
 
-    /**
-     * InsertChild
-     * @brief    在窗口树中插入一个子窗口
-     * @param    SWindow * pNewChild --  子窗口对象
-     * @param    SWindow * pInsertAfter --  插入位置
-     * @return   void
-     *
-     * Describe  一般用于UI初始化的时候创建，插入的窗口不会自动进入布局流程
-     */
-    STDMETHOD_(void, InsertIChild)
+	STDMETHOD_(void, InsertIChild)
     (THIS_ IWindow *pNewChild, IWindow *pInsertAfter = ICWND_LAST) OVERRIDE;
 
-    /**
-     * RemoveChild
-     * @brief    从窗口树中移除一个子窗口对象
-     * @param    SWindow * pChild --  子窗口对象
-     * @return   BOOL
-     *
-     * Describe  子窗口不会自动释放
-     */
-    STDMETHOD_(BOOL, RemoveIChild)(THIS_ IWindow *pChild) OVERRIDE;
+	STDMETHOD_(BOOL, RemoveIChild)(THIS_ IWindow *pChild) OVERRIDE;
 
-    /**
-     * DestroyChild
-     * @brief    销毁一个子窗口
-     * @param    SWindow * pChild --  子窗口对象
-     * @return   BOOL
-     *
-     * Describe  先调用RemoveChild，再调用pChild->Release来释放子窗口对象
-     */
     STDMETHOD_(BOOL, DestroyIChild)(THIS_ IWindow *pChild) OVERRIDE;
 
     STDMETHOD_(void, DestroyAllChildren)(THIS) OVERRIDE;
@@ -466,61 +386,15 @@ class SOUI_EXP SWindow
     STDMETHOD_(ISwndContainer *, GetContainer)(THIS) OVERRIDE;
     STDMETHOD_(void, SetContainer)(THIS_ ISwndContainer *pContainer) OVERRIDE;
 
-    /**
-     * GetChildrenLayoutRect
-     * @brief    获得子窗口的布局空间
-     * @return   CRect
-     *
-     * Describe  通常是客户区，但是tab,group这样的控件不一样
-     */
     STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST OVERRIDE;
 
-    /**
-     * GetDesiredSize
-     * @brief    当没有指定窗口大小时，通过如皮肤计算窗口的期望大小
-     * @param    int nParentWid -- 容器宽度，<0代表容器宽度依赖当前窗口宽度
-     * @param    int nParentHei -- 容器高度，<0代表容器高度依赖当前窗口高度
-     * @return   CSize
-     *
-     * Describe
-     */
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) OVERRIDE;
 
-    /**
-     * Move2
-     * @brief    将窗口移动到指定位置
-     * @param    int x --  left
-     * @param    int y --  top
-     * @param    int cx --  width
-     * @param    int cy --  height
-     * @return   void
-     *
-     * Describe
-     * @see     Move(LPRECT prect)
-     */
     STDMETHOD_(void, Move2)(THIS_ int x, int y, int cx = -1, int cy = -1) OVERRIDE;
 
-    /**
-     * SetTimer2
-     * @brief    利用函数定时器来模拟一个兼容窗口定时器
-     * @param    UINT_PTR id --  定时器ID
-     * @param    UINT uElapse --  延时(MS)
-     * @return   BOOL
-     *
-     * Describe  由于SetTimer只支持0-127的定时器ID，SetTimer2提供设置其它timerid
-     *           能够使用SetTimer时尽量不用SetTimer2，在Kill时效率会比较低
-     */
     STDMETHOD_(BOOL, SetTimer2)(THIS_ UINT_PTR id, UINT uElapse) OVERRIDE;
 
-    /**
-     * KillTimer2
-     * @brief    删除一个SetTimer2设置的定时器
-     * @param    UINT_PTR id --  SetTimer2设置的定时器ID
-     * @return   void
-     *
-     * Describe  需要枚举定时器列表
-     */
-    STDMETHOD_(void, KillTimer2)(THIS_ UINT_PTR id) OVERRIDE;
+	STDMETHOD_(void, KillTimer2)(THIS_ UINT_PTR id) OVERRIDE;
 
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) OVERRIDE;
 
@@ -531,16 +405,8 @@ class SOUI_EXP SWindow
     (THIS_ DWORD dwStateAdd, DWORD dwStateRemove, BOOL bUpdate = FALSE) OVERRIDE;
 
     STDMETHOD_(void, SetIOwner)(THIS_ IWindow *pOwner) OVERRIDE;
-    STDMETHOD_(IWindow *, GetIOwner)(THIS) OVERRIDE;
+    STDMETHOD_(IWindow *, GetIOwner)(THIS) SCONST OVERRIDE;
 
-    /**
-     * CreateChildrenFromXml
-     * @brief    从XML创建子窗口
-     * @param    LPCWSTR pszXml --  合法的utf16编码XML字符串
-     * @return   BOOL 是否创建成功
-     *
-     * Describe
-     */
     STDMETHOD_(BOOL, CreateChildrenFromXml)(THIS_ LPCWSTR pszXml) OVERRIDE;
 
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
@@ -549,24 +415,11 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST OVERRIDE;
 
-    /**
-     * GetISelectedSiblingInGroup
-     * @brief    获得在一个group中选中状态的窗口
-     * @return   SWindow *
-     *
-     * Describe  不是group中的窗口时返回NULL
-     */
-    STDMETHOD_(IWindow *, GetISelectedSiblingInGroup)(THIS) OVERRIDE
+	STDMETHOD_(IWindow *, GetISelectedSiblingInGroup)(THIS) OVERRIDE
     {
         return GetSelectedSiblingInGroup();
     }
 
-    /**
-     * GetSelectedChildInGroup
-     * @brief    获取有选择状态的子窗口
-     * @return   SWindow * -- 选中状态窗口
-     * Describe
-     */
     STDMETHOD_(IWindow *, GetISelectedChildInGroup)(THIS) OVERRIDE
     {
         return GetSelectedChildInGroup();
@@ -574,26 +427,11 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs *evt) OVERRIDE;
 
-    /**
-     * FireCommand
-     * @brief    激活窗口的EVT_CMD事件
-     * @return   BOOL-- true:EVT_CMD事件被处理
-     *
-     * Describe
-     */
     STDMETHOD_(BOOL, FireCommand)(THIS) OVERRIDE;
 
-    /**
-     * FireCtxMenu
-     * @brief    激活快捷菜单事件
-     * @param    CPoint pt --  鼠标点击位置
-     * @return   BOOL -- true:外部处理了快捷菜单事件
-     *
-     * Describe
-     */
     STDMETHOD_(BOOL, FireCtxMenu)(THIS_ POINT pt) OVERRIDE;
 
-    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT *pt, BOOL bIncludeMsgTransparent = FALSE) OVERRIDE;
+    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT *pt, BOOL bIncludeMsgTransparent = FALSE) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, SubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) OVERRIDE;
 
@@ -626,22 +464,15 @@ class SOUI_EXP SWindow
 
     const ISwndContainer *GetContainer() const;
 
-    const SWindow *GetWindow(int uCode) const;
-    SWindow *GetWindow(int uCode);
+    SWindow *GetWindow(int uCode) const;
 
-    const SWindow *GetChild(int iChild) const;
-    ;
-    SWindow *GetChild(int iChild);
-    ;
+    SWindow *GetChild(int iChild) const;
+ 
+    SWindow *GetParent() const;
 
-    const SWindow *GetParent() const;
-    SWindow *GetParent();
+    SWindow *GetRoot() const;
 
-    const SWindow *GetRoot() const;
-    SWindow *GetRoot();
-
-    const SWindow *GetNextLayoutChild(const SWindow *pCurChild) const;
-    SWindow *GetNextLayoutChild(SWindow *pCurChild);
+    SWindow *GetNextLayoutChild(const SWindow *pCurChild) const;
 
     BOOL IsDescendant(const SWindow *pWnd) const;
 
@@ -723,7 +554,7 @@ class SOUI_EXP SWindow
     SwndStyle &GetStyle();
 
     void SetOwner(SWindow *pOwner);
-    SWindow *GetOwner();
+    SWindow *GetOwner() const;
 
     /**
      * GetTextAlign
@@ -950,7 +781,7 @@ class SOUI_EXP SWindow
 
     virtual SStringW tr(const SStringW &strSrc) const;
 
-    virtual SWND SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent = false);
+    virtual SWND SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent = false) const;
 
     virtual BOOL FireEvent(SEvtArgs &evt)
     {

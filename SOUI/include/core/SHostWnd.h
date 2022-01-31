@@ -21,8 +21,7 @@
 namespace SOUI
 {
 class SHostWndAttr
-    : public TObjRefImpl<SObject>
-    , public ITrCtxProvider {
+    : public TObjRefImpl<SObject>{
     DEF_SOBJECT(TObjRefImpl<SObject>, L"SHostWndAttr")
     enum
     {
@@ -56,7 +55,7 @@ class SHostWndAttr
 
     SOUI_ATTRS_BEGIN()
     ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)
-    ATTR_I18NSTRT(L"title", m_strTitle, FALSE)
+    ATTR_STRINGW(L"title", m_strTitle, FALSE)
     ATTR_LAYOUTSIZE4(L"maxInset", m_rcMaxInset, FALSE)
     ATTR_LAYOUTSIZE4(L"margin", m_rcMargin, FALSE)
     ATTR_LAYOUTSIZE2(L"minsize", m_szMin, FALSE)
@@ -95,7 +94,7 @@ class SHostWndAttr
     DWORD m_dwExStyle;
 
     SStringW m_strTrCtx; //在语言翻译时作为context使用
-    STrText m_strTitle;
+    SStringW m_strTitle;
     HICON m_hAppIconSmall;
     HICON m_hAppIconBig;
 };

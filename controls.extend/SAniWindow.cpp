@@ -84,7 +84,7 @@ namespace SOUI
 		return bRet;
 	}
 
-	ILayoutParam * SAniWindow::GetLayoutParam()
+	ILayoutParam * SAniWindow::GetLayoutParam() const
 	{
 		if (m_aniMode == AM_NONE)
 			return __super::GetLayoutParam();

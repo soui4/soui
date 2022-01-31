@@ -11,7 +11,7 @@ typedef BOOL (*FunMsgHandler)(const LPMSG pMsg, LRESULT *pRes, void *ctx);
 #define INTERFACE INativeWnd
 DECLARE_INTERFACE_(INativeWnd, IObjRef)
 {
-		//!添加引用
+	//!添加引用
 	/*!
 	*/
 	STDMETHOD_(long,AddRef) (THIS) PURE;

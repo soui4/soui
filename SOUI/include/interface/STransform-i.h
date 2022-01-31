@@ -26,19 +26,47 @@ SNSBEGIN
 
 #undef INTERFACE
 #define INTERFACE ITransformation
+
 DECLARE_INTERFACE(ITransformation)
 {
+	/**
+	 * @brief 获取变换矩阵
+	 * @return IMatrix *--变换矩阵
+	*/
 	STDMETHOD_(IMatrix *,GetMatrix)(THIS) PURE;
 
-	STDMETHOD_(BYTE,getAlpha) (THIS) SCONST PURE;
+	/**
+	 * @brief 获取透明度
+     * @return BYTE--透明度
+     */
+	STDMETHOD_(BYTE,GetAlpha) (THIS) SCONST PURE;
 
-	STDMETHOD_(void,setAlpha)(THIS_ BYTE alpha) PURE;
+	/**
+	 * @brief 设置透明度
+	 * @param alpha BYTE--透明度
+	 * @return 
+	*/
+	STDMETHOD_(void,SetAlpha)(THIS_ BYTE alpha) PURE;
 
-	STDMETHOD_(void,clear)(THIS) PURE;
+	/**
+	 * @brief 清空变换矩阵及透明度
+	 * @return 
+	*/
+	STDMETHOD_(void,Clear)(THIS) PURE;
 
-	STDMETHOD_(void,setTransformationType)(THIS_ int type) PURE;
+	/**
+	 * @brief 设置变化类型
+	 * @param type int--类型
+	 * @return 
+	*/
+	STDMETHOD_(void,SetTransformationType)(THIS_ int type) PURE;
 
-	STDMETHOD_(void,compose)(const ITransformation *t) PURE;
+	/**
+	 * @brief 组合变换矩阵及透明度
+	 * @param t ITransformation *--变换对象
+	 * @return 
+	*/
+	STDMETHOD_(void,Compose)(const ITransformation *t) PURE;
 };
 
 SNSEND

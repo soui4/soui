@@ -137,7 +137,7 @@ BOOL SAnimation::getTransformation(int64_t currentTime, ITransformation *outTran
         }
 
         float interpolatedTime = mInterpolator->getInterpolation(normalizedTime);
-        outTransformation->clear();
+        outTransformation->Clear();
         applyTransformation(interpolatedTime, outTransformation);
     }
 

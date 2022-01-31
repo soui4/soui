@@ -36,7 +36,7 @@ BOOL SDropTargetDispatcher::RegisterDragDrop(SWND swnd, IDropTarget *pDropTarget
     return TRUE;
 }
 
-BOOL SDropTargetDispatcher::RevokeDragDrop(SWND swnd)
+BOOL SDropTargetDispatcher::UnregisterDragDrop(SWND swnd)
 {
     DTMAP::CPair *pPair = m_mapDropTarget.Lookup(swnd);
     if (!pPair)

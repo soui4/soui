@@ -152,7 +152,7 @@ public:
 	STDMETHOD_(void,SetBubbleUp) (THIS_ BOOL bSet) {bubbleUp = bSet;}
 	STDMETHOD_(UINT,HandleCount)(THIS) SCONST {return handled;}
 	STDMETHOD_(void,IncreaseHandleCount)(THIS) {handled++;}
-	STDMETHOD_(LPCVOID,Data)(THIS) {return NULL;}
+	STDMETHOD_(LPVOID,Data)(THIS) {return NULL;}
 
 public:
 	SEvtArgs(IObject *pSender)

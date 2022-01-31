@@ -31,7 +31,7 @@ class SDropTargetDispatcher : public IDropTarget {
     void SetOwner(SWindow *pOwner);
 
     BOOL RegisterDragDrop(SWND swnd, IDropTarget *pDropTarget);
-    BOOL RevokeDragDrop(SWND swnd);
+    BOOL UnregisterDragDrop(SWND swnd);
 
     //////////////////////////////////////////////////////////////////////////
     // IUnknown

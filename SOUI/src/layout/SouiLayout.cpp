@@ -581,7 +581,7 @@ SIZE SouiLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeight
 {
     SList<WndPos> lstWndPos;
 
-    const IWindow *pChild = pParent->GetNextLayoutIChild2(NULL);
+    const IWindow *pChild = pParent->GetNextLayoutIChild(NULL);
     while (pChild)
     {
         if (!pChild->IsFloat() && (pChild->IsVisible(FALSE) || pChild->IsDisplay()))
@@ -589,12 +589,12 @@ SIZE SouiLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeight
             WndPos wndPos;
             wndPos.pWnd = (SWindow *)pChild;
             wndPos.rc = CRect(POS_INIT, POS_INIT, POS_INIT, POS_INIT);
-            const SouiLayoutParam *pParam = (const SouiLayoutParam *)pChild->GetLayoutParam2();
+            const SouiLayoutParam *pParam = (const SouiLayoutParam *)pChild->GetLayoutParam();
             wndPos.bWaitOffsetX = pParam->IsOffsetRequired(Horz);
             wndPos.bWaitOffsetY = pParam->IsOffsetRequired(Vert);
             lstWndPos.AddTail(wndPos);
         }
-        pChild = pParent->GetNextLayoutIChild2(pChild);
+        pChild = pParent->GetNextLayoutIChild(pChild);
     }
 
     //计算子窗口位置
@@ -606,7 +606,7 @@ SIZE SouiLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeight
     while (pos)
     {
         WndPos wndPos = lstWndPos.GetNext(pos);
-        const SouiLayoutParam *pParam = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam2();
+        const SouiLayoutParam *pParam = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
         int nScale = wndPos.pWnd->GetScale();
         if (!IsWaitingPos(wndPos.rc.right))
         {
@@ -647,7 +647,7 @@ void SouiLayout::CalcPositionEx(SList<WndPos> *pListChildren, int nWidth, int nH
     {
         WndPos &wndPos = pListChildren->GetAt(pos);
         const SouiLayoutParam *pLayoutParam
-            = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam2();
+            = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
         if (!IsWaitingPos(wndPos.rc.left) && !IsWaitingPos(wndPos.rc.top)
             && (IsWaitingPos(wndPos.rc.right) && IsWaitingPos(nWidth)
                 || IsWaitingPos(wndPos.rc.bottom) && IsWaitingPos(nHeight)))
@@ -703,7 +703,7 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
             {
                 WndPos &wndPos = pListChildren->GetAt(pos);
                 const SouiLayoutParam *pLayoutParam
-                    = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam2();
+                    = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
                 int nScale = wndPos.pWnd->GetScale();
                 if (IsWaitingPos(wndPos.rc.left))
                 {
@@ -786,7 +786,7 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
                 {
                     WndPos &wndPos = pListChildren->GetAt(pos);
                     const SouiLayoutParam *pLayoutParam
-                        = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam2();
+                        = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
                     if (IsWaitingPos(wndPos.rc.left) || IsWaitingPos(wndPos.rc.top))
                         continue; //至少确定了一个点后才开始计算
 
@@ -842,7 +842,7 @@ void SouiLayout::LayoutChildren(IWindow *pParent)
         WndPos wndPos;
         wndPos.pWnd = (SWindow *)pChild;
         wndPos.rc = CRect(POS_INIT, POS_INIT, POS_INIT, POS_INIT);
-        const SouiLayoutParam *pParam = (const SouiLayoutParam *)pChild->GetLayoutParam2();
+        const SouiLayoutParam *pParam = (const SouiLayoutParam *)pChild->GetLayoutParam();
         wndPos.bWaitOffsetX = pParam->IsOffsetRequired(Horz);
         wndPos.bWaitOffsetY = pParam->IsOffsetRequired(Vert);
         lstWndPos.AddTail(wndPos);

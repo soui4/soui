@@ -113,7 +113,7 @@ namespace SOUI
 		virtual BOOL CreateChildren(SXmlNode xmlNode);
 
 		virtual void DrawItem(IRenderTarget *pRT, CRect &rc, int iItem);
-		virtual UINT OnGetDlgCode(){return SC_WANTALLKEYS;}
+		virtual UINT WINAPI OnGetDlgCode() const{return SC_WANTALLKEYS;}
 		virtual BOOL OnSetCursor(const CPoint &pt);
 		virtual BOOL OnScroll(BOOL bVertical,UINT uCode,int nPos);
 

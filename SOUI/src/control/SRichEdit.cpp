@@ -1537,7 +1537,7 @@ void SRichEdit::OnEnableDragDrop(BOOL bEnable)
     }
     else
     {
-        GetContainer()->RevokeDragDrop(m_swnd);
+        GetContainer()->UnregisterDragDrop(m_swnd);
     }
 }
 

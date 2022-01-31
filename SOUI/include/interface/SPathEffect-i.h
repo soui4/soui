@@ -22,6 +22,11 @@ DECLARE_INTERFACE_(IPathEffect, IObjRef)
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+    /**
+     * @brief 获取PathEffect的原始对象指针
+     * @return void* 原始对象指针
+    */
     STDMETHOD_(void *, GetRealPathEffect)(THIS) PURE;
 };
 

@@ -135,7 +135,7 @@ BOOL SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
         mStarted = true;
         fireAnimationStart();
     }
-    t->clear();
+    t->Clear();
     int64_t startOffset = getStartOffset();
     if (currentTime < (mStartTime + startOffset))
     {
@@ -161,7 +161,7 @@ BOOL SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
 
         STransformation temp;
         more = a->getTransformation2(currentTime, &temp, getScaleFactor()) || more;
-        t->compose(&temp);
+        t->Compose(&temp);
 
         ended = a->hasEnded() && ended;
     }

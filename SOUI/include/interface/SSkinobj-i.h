@@ -68,10 +68,34 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      */
     STDMETHOD_(int, GetObjectType)(THIS) SCONST PURE;
 
+    /**
+     * GetID
+     * @brief    获取对象ID
+     * @return   int -- 对象ID
+     * Describe
+     */
     STDMETHOD_(int, GetID)(THIS) SCONST PURE;
+
+    /**
+     * @brief 设置对象ID
+     * @param nID int--对象ID
+     * @return
+     */
     STDMETHOD_(void, SetID)(THIS_ int nID) PURE;
 
+    /**
+     * GetName
+     * @brief    获取对象Name
+     * @return   LPCWSTR -- 对象Name
+     * Describe
+     */
     STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST PURE;
+
+    /**
+     * @brief 设置对象Name
+     * @param pszName LPCWSTR -- 对象Name
+     * @return
+     */
     STDMETHOD_(void, SetName)(THIS_ LPCWSTR pszName) PURE;
 
     /**
@@ -119,15 +143,15 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
     /**
      * SetAttribute
      * @brief    设置一个对象属性
-     * @param    LPCWSTR pszAttr --  属性名
-     * @param    LPCWSTR pszValue --  属性值
+     * @param    LPCSTR pszAttr --  属性名
+     * @param    LPCSTR pszValue --  属性值
      * @param    BOOL bLoading --  对象创建时由系统调用标志
      * @return   HRESULT -- 处理处理结果
      * Describe
      */
     STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading) PURE;
 
-	/**
+    /**
      * SetAttribute
      * @brief    设置一个对象属性
      * @param    LPCWSTR pszAttr --  属性名
@@ -159,6 +183,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      */
     STDMETHOD_(HRESULT, AfterAttribute)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading, HRESULT hr) PURE;
+    //------------------------------------------------------------------------
 
     /**
      * DrawByState

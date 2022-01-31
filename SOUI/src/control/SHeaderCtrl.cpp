@@ -46,7 +46,7 @@ int SHeaderCtrl::InsertItem(int iItem,
     SLayoutSize szWid((float)nWidth, bDpiAware ? SLayoutSize::dp : SLayoutSize::px);
     item.cx = szWid.toPixelSize(GetScale());
     item.bDpiAware = bDpiAware;
-    item.strText.SetCtxProvider(this);
+    item.strText.SetOwner(this);
     item.strText.SetText(pszText);
     item.state = 0;
     item.iOrder = iItem;
@@ -479,7 +479,7 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
     while (xmlItem)
     {
         SHDITEMEX item;
-        item.strText.SetCtxProvider(this);
+        item.strText.SetOwner(this);
         item.mask = 0xFFFFFFFF;
         item.iOrder = iOrder++;
         SStringW strText = xmlItem.Text();

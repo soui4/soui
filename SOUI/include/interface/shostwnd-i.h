@@ -2,7 +2,8 @@
 #include <interface/SNativeWnd-i.h>
 SNSBEGIN
 
-interface IWindow;
+typedef struct IWindow IWindow;
+typedef struct IApplication IApplication;
 
 #undef INTERFACE
 #define INTERFACE IHostWnd

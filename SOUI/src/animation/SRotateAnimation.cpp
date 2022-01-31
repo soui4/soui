@@ -30,7 +30,7 @@ void SRotateAnimation::applyTransformation(float interpolatedTime, ITransformati
     {
         t->GetMatrix()->setRotate2(degrees, mPivotX * scale, mPivotY * scale);
     }
-    t->setTransformationType(TYPE_MATRIX);
+    t->SetTransformationType(TYPE_MATRIX);
 }
 
 void SRotateAnimation::copy(const IAnimation *src)

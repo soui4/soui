@@ -33,7 +33,7 @@ void SScaleAnimation::applyTransformation(float interpolatedTime, ITransformatio
     {
         t->GetMatrix()->setScale2(sx, sy, scale * mPivotX, scale * mPivotY);
     }
-    t->setTransformationType(TYPE_MATRIX);
+    t->SetTransformationType(TYPE_MATRIX);
 }
 
 void SScaleAnimation::copy(const IAnimation *src)

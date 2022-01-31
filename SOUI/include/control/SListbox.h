@@ -27,8 +27,8 @@ typedef struct tagLBITEM
     int nImage;      /**< 图标 */
     LPARAM lParam;   /**< 附加参数 */
 
-    tagLBITEM(ITrCtxProvider *pTrCtx)
-        : strText(pTrCtx)
+    tagLBITEM(SWindow *pOwner)
+        : strText(pOwner)
     {
         nImage = -1;
         lParam = NULL;

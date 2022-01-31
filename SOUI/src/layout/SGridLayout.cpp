@@ -251,10 +251,10 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
     }
 
     int iRow = 0, iCol = 0;
-    const IWindow *pCell = pParent->GetNextLayoutIChild2(NULL);
+    const IWindow *pCell = pParent->GetNextLayoutIChild(NULL);
     while (pCell)
     {
-        const SGridLayoutParam *pLayoutParam = (const SGridLayoutParam *)pCell->GetLayoutParam2();
+        const SGridLayoutParam *pLayoutParam = (const SGridLayoutParam *)pCell->GetLayoutParam();
         SASSERT(pLayoutParam);
         //将当前网络所占用的空间位置清0
         int colSpan = pLayoutParam->nColSpan;
@@ -316,7 +316,7 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
             }
         if (!bFind)
             break;
-        pCell = pParent->GetNextLayoutIChild2(pCell);
+        pCell = pParent->GetNextLayoutIChild(pCell);
     }
 
     CSize szRet;
@@ -637,15 +637,15 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
 int SGridLayout::CalcCells(const IWindow *pParent) const
 {
     int nCells = 0;
-    const IWindow *pCell = pParent->GetNextLayoutIChild2(NULL);
+    const IWindow *pCell = pParent->GetNextLayoutIChild(NULL);
     while (pCell)
     {
-        const SGridLayoutParam *pParam = (const SGridLayoutParam *)pCell->GetLayoutParam2();
+        const SGridLayoutParam *pParam = (const SGridLayoutParam *)pCell->GetLayoutParam();
         SASSERT(pParam);
         int nColSpan = pParam->nColSpan;
         int nRowSpan = pParam->nRowSpan;
         nCells += nColSpan * nRowSpan;
-        pCell = pParent->GetNextLayoutIChild2(pCell);
+        pCell = pParent->GetNextLayoutIChild(pCell);
     }
     return nCells;
 }

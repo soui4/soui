@@ -58,7 +58,6 @@ class SDummyWnd : public SNativeWnd {
 SHostWndAttr::SHostWndAttr(void)
     : m_hAppIconSmall(NULL)
     , m_hAppIconBig(NULL)
-    , m_strTitle(this)
 {
     Init();
 }
@@ -231,7 +230,8 @@ void SRootWindow::UpdateLayout()
 
 HRESULT SRootWindow::OnLanguageChanged()
 {
-    m_pHostWnd->SetWindowText(m_pHostWnd->m_hostAttr.m_strTitle.GetText(FALSE));
+	SStringW str = tr(m_pHostWnd->m_hostAttr.m_strTitle);
+    m_pHostWnd->SetWindowText(str);
     return 3;
 }
 
@@ -484,8 +484,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 
     ModifyStyle(0, dwStyle);
     ModifyStyleEx(0, dwExStyle);
-    SStringT strTitle = m_hostAttr.m_strTitle.GetText(FALSE);
-    SNativeWnd::SetWindowText(strTitle);
+	m_pRoot->OnLanguageChanged();
 
     if (m_hostAttr.m_hAppIconSmall)
     {
@@ -517,7 +516,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
             MONITORINFO info = { sizeof(MONITORINFO) };
             GetMonitorInfo(hMonitor, &info);
-            SStringT dummyTitle = SStringT().Format(_T("%s_dummy"), strTitle.c_str());
+            SStringT dummyTitle = SStringT().Format(_T("%s_dummy"), m_hostAttr.m_strTitle.c_str());
             m_dummyWnd->CreateWindow(dummyTitle, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
                                      info.rcWork.left, info.rcWork.top, 1, 1, m_hWnd, NULL);
             m_dummyWnd->SetWindowLongPtr(GWL_EXSTYLE,
@@ -1937,13 +1936,13 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
         if (m_pHostWnd->IsTranslucent())
         {
             CRect rcWnd = m_pHostWnd->GetRoot()->GetWindowRect();
-            m_pHostWnd->UpdateHost(0, rcWnd, xform.getAlpha());
+            m_pHostWnd->UpdateHost(0, rcWnd, xform.GetAlpha());
         }
         else if (m_pHostWnd->GetWindowLongPtr(GWL_EXSTYLE) & WS_EX_LAYERED)
         {
             ::SetLayeredWindowAttributes(
                 m_pHostWnd->m_hWnd, 0,
-                (BYTE)((int)m_pHostWnd->GetRoot()->GetAlpha() * xform.getAlpha() / 255), LWA_ALPHA);
+                (BYTE)((int)m_pHostWnd->GetRoot()->GetAlpha() * xform.GetAlpha() / 255), LWA_ALPHA);
         }
     }
     if (!bMore)

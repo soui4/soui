@@ -19,7 +19,7 @@ bool STransformation::hasAlpha() const
     return (getTransformationType() & TYPE_ALPHA) == TYPE_ALPHA;
 }
 
-BYTE STransformation::getAlpha() const
+BYTE STransformation::GetAlpha() const
 {
     return mAlpha;
 }
@@ -32,7 +32,7 @@ void STransformation::updateMatrixType()
         mTransformationType |= TYPE_MATRIX;
 }
 
-void STransformation::setAlpha(BYTE alpha)
+void STransformation::SetAlpha(BYTE alpha)
 {
     mAlpha = alpha;
     mTransformationType |= TYPE_ALPHA;
@@ -58,7 +58,7 @@ void STransformation::postCompose(STransformation t)
 {
     if (t.hasAlpha())
     {
-        mAlpha = (BYTE)((int)mAlpha * t.getAlpha() / 255);
+        mAlpha = (BYTE)((int)mAlpha * t.GetAlpha() / 255);
         mTransformationType |= TYPE_ALPHA;
     }
     if (t.hasMatrix())
@@ -68,7 +68,7 @@ void STransformation::postCompose(STransformation t)
     }
 }
 
-void STransformation::compose(const ITransformation *t)
+void STransformation::Compose(const ITransformation *t)
 {
 	const STransformation & t2 = *(const STransformation*)t;
 	compose(t2);
@@ -78,7 +78,7 @@ void STransformation::compose(const STransformation &t)
 {
     if (t.hasAlpha())
     {
-        mAlpha = (BYTE)((int)mAlpha * t.getAlpha() / 255);
+        mAlpha = (BYTE)((int)mAlpha * t.GetAlpha() / 255);
         mTransformationType |= TYPE_ALPHA;
     }
     if (t.hasMatrix())
@@ -90,13 +90,13 @@ void STransformation::compose(const STransformation &t)
 
 void STransformation::set(STransformation t)
 {
-    mAlpha = t.getAlpha();
+    mAlpha = t.GetAlpha();
     mMatrix = t.getMatrix();
 
     mTransformationType = t.getTransformationType();
 }
 
-void STransformation::setTransformationType(int type)
+void STransformation::SetTransformationType(int type)
 {
     mTransformationType = type;
 }
@@ -106,7 +106,7 @@ int STransformation::getTransformationType() const
     return mTransformationType;
 }
 
-void STransformation::clear()
+void STransformation::Clear()
 {
     mMatrix.reset();
     mAlpha = 255;
@@ -115,7 +115,12 @@ void STransformation::clear()
 
 STransformation::STransformation()
 {
-    clear();
+    Clear();
+}
+
+IMatrix * STransformation::GetMatrix()
+{
+	return &mMatrix;
 }
 
 SNSEND

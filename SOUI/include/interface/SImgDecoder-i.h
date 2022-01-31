@@ -14,7 +14,6 @@
 #pragma once
 
 #include <interface/obj-ref-i.h>
-//#include <interface/SRender-i.h>
 
 SNSBEGIN
 /**
@@ -188,6 +187,5 @@ DECLARE_INTERFACE_(IImgDecoderFactory, IObjRef)
     STDMETHOD_(LPCWSTR, GetDescription)(THIS) SCONST PURE;
 };
 
-typedef IImgDecoderFactory *IImgDecoderFactoryPtr;
 
 SNSEND

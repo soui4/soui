@@ -72,38 +72,27 @@ class SOUI_EXP SMatrix : public IxForm ,public IMatrix{
     }
 
 public:
-	STDMETHOD_(IxForm *,Data)(THIS) OVERRIDE{return this;}
+	STDMETHOD_(IxForm *,Data)(THIS) SCONST OVERRIDE;
 
 	STDMETHOD_(void,reset)(THIS) OVERRIDE;
-    // alias for reset()
-    STDMETHOD_(void,setIdentity)(THIS) OVERRIDE;
-    /** Returns true if the matrix is identity.
-     */
-	STDMETHOD_(BOOL,isIdentity)(THIS) SCONST OVERRIDE
-    {
-        return this->getType() == 0;
-    }
 
-    /** Set the matrix to translate by (dx, dy).
-     */
+	STDMETHOD_(void,setIdentity)(THIS) OVERRIDE;
+
+	STDMETHOD_(BOOL,isIdentity)(THIS) SCONST OVERRIDE;
+
     STDMETHOD_(void,setTranslate)(THIS_ float dx, float dy) OVERRIDE;
 
-    /** Set the matrix to scale by sx and sy, with a pivot point at (px, py).
-        The pivot point is the coordinate that should remain unchanged by the
-        specified transformation.
-    */
     STDMETHOD_(void,setScale)(THIS_ float sx, float sy) OVERRIDE;
-    /** Set the matrix to scale by sx and sy.
-     */
+
 	STDMETHOD_(void,setScale2)(THIS_ float sx, float sy, float px, float py) OVERRIDE;
 
     STDMETHOD_(void,setRotate)(THIS_ float degrees) OVERRIDE;
 
 	STDMETHOD_(void,setRotate2)(THIS_ float degrees, float px, float py) OVERRIDE;
 
-		 /** Set the matrix to skew by sx and sy.
-     */
     STDMETHOD_(void,setSkew)(THIS_ float kx, float ky) OVERRIDE;
+
+	STDMETHOD_(void,setSkew2)(THIS_ float kx, float ky, float px, float py) OVERRIDE;
 
   public:
     /** Enum of bit fields for the mask return by getType().
@@ -236,12 +225,8 @@ public:
     /** Set the matrix to rotate by the specified sine and cosine values.
      */
     void setSinCos(float sinValue, float cosValue);
-    /** Set the matrix to skew by sx and sy, with a pivot point at (px, py).
-        The pivot point is the coordinate that should remain unchanged by the
-        specified transformation.
-    */
-    void setSkew(float kx, float ky, float px, float py);
-    /** Set the matrix to the concatenation of the two specified matrices.
+
+	/** Set the matrix to the concatenation of the two specified matrices.
         Either of the two matrices may also be the target matrix.
         *this = a * b;
     */

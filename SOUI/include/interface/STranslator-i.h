@@ -18,7 +18,10 @@
 
 SNSBEGIN
 
-#define TR_MAX_NAME_LEN 64
+enum
+{
+    TR_MAX_NAME_LEN = 64
+};
 
 /**
  * @struct     ITranslator
@@ -64,6 +67,12 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
      */
     STDMETHOD_(void, GetName)(THIS_ wchar_t szBuf[TR_MAX_NAME_LEN]) PURE;
 
+    /**
+     * @brief 比较翻译的Name
+     * @param pszName LPCWSTR--翻译的Name
+     * @return TRUE--相同
+    */
+
     STDMETHOD_(BOOL, NameEqual)(THIS_ LPCWSTR pszName) PURE;
     /**
      * guid
@@ -86,6 +95,11 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
     STDMETHOD_(int, tr)
     (THIS_ const IStringW *strSrc, const IStringW *strCtx, wchar_t *pszOut, int nLen) SCONST PURE;
 
+    /**
+     * @brief 获取翻译的默认字体信息
+     * @param [out] strFont IStringW *--字体信息
+     * @return 
+    */
     STDMETHOD_(void, getFontInfo)(THIS_ IStringW * strFont) SCONST PURE;
 };
 

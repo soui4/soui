@@ -1019,6 +1019,25 @@ int SStringW::GetLength() const
 
 void SStringW::Copy(const IStringW *pSrc)
 {
+	if (m_pszData != pSrc->c_str())
+	{
+		const TStringData * pDataSrc = (const TStringData *)pSrc->GetPrivData();
+		TStringData* pData = GetData();
+		if ((pData->IsLocked() && pData != TStringData::InitDataNil()) || pDataSrc->IsLocked())
+		{
+			// actual copy necessary since one of the strings is locked
+			AssignCopy(pDataSrc->nDataLength, pSrc->c_str());
+		}
+		else
+		{
+			// can just copy references around
+			_ReleaseData();
+			SASSERT(pDataSrc != TStringData::InitDataNil());
+			m_pszData = (wchar_t*)pSrc->c_str();
+			GetData()->AddRef();
+		}
+	}
+
 	AssignCopy(pSrc->GetLength(),pSrc->c_str());
 }
 

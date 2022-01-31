@@ -13,33 +13,34 @@ namespace SOUI
 //////////////////////////////////////////////////////////////////////////
 // STextTr
 //////////////////////////////////////////////////////////////////////////
-STrText::STrText(ITrCtxProvider *pProvider /*= NULL*/)
-    : pTrCtxProvider(pProvider)
-{
-}
+	STrText::STrText(SWindow *pOwner_ /*= NULL*/)
+		: pOwner(pOwner_)
+	{
+	}
 
-void STrText::SetCtxProvider(ITrCtxProvider *pProvider)
-{
-    pTrCtxProvider = pProvider;
-}
+	void STrText::SetOwner(SWindow *pOwner_)
+	{
+		pOwner = pOwner_;
+	}
 
-SStringT STrText::GetText(BOOL bRawText) const
-{
-    return bRawText ? strRaw : strTr;
-}
+	SStringT STrText::GetText(BOOL bRawText) const
+	{
+		return bRawText ? strRaw : strTr;
+	}
 
-void STrText::SetText(const SStringT &strText)
-{
-    strRaw = strText;
-    TranslateText();
-}
+	void STrText::SetText(const SStringT &strText)
+	{
+		strRaw = strText;
+		TranslateText();
+	}
 
-void STrText::TranslateText()
-{
-    if (pTrCtxProvider == NULL)
-        return;
-    strTr = S_CW2T(TR(S_CT2W(strRaw), pTrCtxProvider->GetTrCtx()));
-}
+	void STrText::TranslateText()
+	{
+		if (pOwner == NULL)
+			return;
+		strTr = S_CW2T(pOwner->tr(strRaw));
+	}
+
 
 //////////////////////////////////////////////////////////////////////////
 // SWindow Implement
@@ -414,12 +415,12 @@ SWND SWindow::GetSwnd() const
     return m_swnd;
 }
 
-IWindow *SWindow::GetIParent()
+IWindow *SWindow::GetIParent() const
 {
     return GetParent();
 }
 
-IWindow *SWindow::GetIRoot()
+IWindow *SWindow::GetIRoot() const
 {
     return GetRoot();
 }
@@ -638,7 +639,7 @@ void SWindow::SetOwner(SWindow *pOwner)
     m_pOwner = pOwner;
 }
 
-SWindow *SWindow::GetOwner()
+SWindow *SWindow::GetOwner() const
 {
     return m_pOwner;
 }
@@ -964,7 +965,7 @@ BOOL SWindow::CreateChildrenFromXml(LPCWSTR pszXml)
     return CreateChildren(xmlDoc.root());
 }
 
-SWND SWindow::SwndFromPoint(POINT *pt, BOOL bIncludeMsgTransparent)
+SWND SWindow::SwndFromPoint(POINT *pt, BOOL bIncludeMsgTransparent) const
 {
     if (!pt)
         return 0;
@@ -975,7 +976,7 @@ SWND SWindow::SwndFromPoint(POINT *pt, BOOL bIncludeMsgTransparent)
 }
 
 // Hittest children
-SWND SWindow::SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent)
+SWND SWindow::SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent) const
 {
     CPoint pt2(pt);
     TransformPoint(pt2);
@@ -2141,14 +2142,9 @@ void SWindow::UpdateLayout()
     m_layoutDirty = dirty_clean;
 }
 
-const IWindow *SWindow::GetNextLayoutIChild2(const IWindow *pCurChild) const
+IWindow *SWindow::GetNextLayoutIChild(THIS_ const IWindow *pCurChild) const
 {
     return GetNextLayoutChild((const SWindow *)pCurChild);
-}
-
-IWindow *SWindow::GetNextLayoutIChild(THIS_ IWindow *pCurChild)
-{
-    return GetNextLayoutChild((SWindow *)pCurChild);
 }
 
 void SWindow::OnSetFocus(SWND wndOld)
@@ -2366,7 +2362,7 @@ SMatrix SWindow::_GetMatrixEx() const
     return mtx;
 }
 
-SWND SWindow::GetCapture()
+SWND SWindow::GetCapture() const
 {
     if (!GetContainer())
         return 0;
@@ -2427,7 +2423,7 @@ void SWindow::SetAnimation(IAnimation *animation)
  *         scheduled to play for this view.
  */
 
-IAnimation *SWindow::GetAnimation()
+IAnimation *SWindow::GetAnimation() const
 {
     return m_animation;
 }
@@ -2482,27 +2478,27 @@ void SWindow::SetMatrix(const SMatrix &mtx)
 
 void SWindow::SetAlpha(BYTE byAlpha)
 {
-    m_transform.setAlpha(byAlpha);
+    m_transform.SetAlpha(byAlpha);
     InvalidateRect(NULL);
 }
 
 BYTE SWindow::GetAlpha() const
 {
-    return (BYTE)((int)m_transform.getAlpha() * m_animationHandler.GetTransformation().getAlpha()
+    return (BYTE)((int)m_transform.GetAlpha() * m_animationHandler.GetTransformation().GetAlpha()
                   / 255);
 }
 
-void SWindow::SetMatrix(const IxForm *mtx)
+void SWindow::SetMatrix(const IMatrix *mtx)
 {
-    SMatrix smtx(mtx->fMat);
+    SMatrix smtx(mtx->Data()->fMat);
     SetMatrix(&smtx);
 }
 
-void SWindow::GetMatrix(IxForm *mtx) SCONST
+void SWindow::GetMatrix(IMatrix *mtx) SCONST
 {
     SMatrix smtx = m_transform.getMatrix();
     smtx.postConcat(m_animationHandler.GetTransformation().getMatrix());
-    memcpy(mtx, smtx.fMat, sizeof(smtx.fMat));
+    memcpy(mtx->Data()->fMat, smtx.fMat, sizeof(smtx.fMat));
 }
 
 void SWindow::SetFocus()
@@ -2538,12 +2534,12 @@ BOOL SWindow::OnNcHitTest(CPoint pt)
     return !rcClient.PtInRect(pt);
 }
 
-IWindow *SWindow::GetIWindow(int uCode)
+IWindow *SWindow::GetIWindow(int uCode) const
 {
     return GetWindow(uCode);
 }
 
-IWindow *SWindow::GetIChild(int iChild)
+IWindow *SWindow::GetIChild(int iChild) const
 {
     return GetChild(iChild);
 }
@@ -3030,6 +3026,11 @@ void SWindow::SetWindowRgn(IRegionS *pRgn, BOOL bRedraw /*=TRUE*/)
         InvalidateRect(NULL);
 }
 
+IRegionS *SWindow::GetWindowRgn() const
+{
+	return m_clipRgn;
+}
+
 void SWindow::SetWindowPath(IPathS *pPath, BOOL bRedraw /*=TRUE*/)
 {
     m_clipPath = pPath;
@@ -3037,9 +3038,10 @@ void SWindow::SetWindowPath(IPathS *pPath, BOOL bRedraw /*=TRUE*/)
         InvalidateRect(NULL);
 }
 
-IRegionS *SWindow::GetWindowRgn() const
+
+IPathS* SWindow::GetWindowPath() const
 {
-    return m_clipRgn;
+	return m_clipPath;
 }
 
 void SWindow::DoColorize(COLORREF cr)
@@ -3319,7 +3321,8 @@ BOOL SWindow::IsLayoutDirty() const
     return m_layoutDirty != dirty_clean;
 }
 
-const SWindow *SWindow::GetWindow(int uCode) const
+
+SWindow *SWindow::GetWindow(int uCode) const
 {
     SWindow *pRet = NULL;
     switch (uCode)
@@ -3346,52 +3349,11 @@ const SWindow *SWindow::GetWindow(int uCode) const
     return pRet;
 }
 
-SWindow *SWindow::GetWindow(int uCode)
-{
-    SWindow *pRet = NULL;
-    switch (uCode)
-    {
-    case GSW_FIRSTCHILD:
-        pRet = m_pFirstChild;
-        break;
-    case GSW_LASTCHILD:
-        pRet = m_pLastChild;
-        break;
-    case GSW_PREVSIBLING:
-        pRet = m_pPrevSibling;
-        break;
-    case GSW_NEXTSIBLING:
-        pRet = m_pNextSibling;
-        break;
-    case GSW_OWNER:
-        pRet = m_pOwner;
-        break;
-    case GSW_PARENT:
-        pRet = m_pParent;
-        break;
-    }
-    return pRet;
-}
 
-const SWindow *SWindow::GetChild(int iChild) const
+SWindow *SWindow::GetChild(int iChild) const
 {
     if (iChild == CHILDID_SELF)
-        return this;
-    const SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
-    for (int i = 0; i < iChild - 1 && pChild; i++)
-    {
-        pChild = pChild->GetWindow(GSW_NEXTSIBLING);
-        if (!pChild)
-            return NULL;
-    }
-
-    return pChild;
-}
-
-SWindow *SWindow::GetChild(int iChild)
-{
-    if (iChild == CHILDID_SELF)
-        return this;
+        return (SWindow*)this;
     SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
     for (int i = 0; i < iChild - 1 && pChild; i++)
     {
@@ -3403,50 +3365,20 @@ SWindow *SWindow::GetChild(int iChild)
     return pChild;
 }
 
-const SWindow *SWindow::GetParent() const
+SWindow *SWindow::GetParent() const
 {
     return m_pParent;
 }
 
-SWindow *SWindow::GetParent()
+SWindow *SWindow::GetRoot() const
 {
-    return m_pParent;
-}
-
-SWindow *SWindow::GetRoot()
-{
-    SWindow *pParent = this;
+    SWindow *pParent = (SWindow*)this;
     while (pParent->GetParent())
         pParent = pParent->GetParent();
     return pParent;
 }
 
-const SWindow *SWindow::GetRoot() const
-{
-    const SWindow *pParent = this;
-    while (pParent->GetParent())
-        pParent = pParent->GetParent();
-    return pParent;
-}
-
-const SWindow *SWindow::GetNextLayoutChild(const SWindow *pCurChild) const
-{
-    const SWindow *pRet = NULL;
-    if (pCurChild == NULL)
-    {
-        pRet = GetWindow(GSW_FIRSTCHILD);
-    }
-    else
-    {
-        pRet = pCurChild->GetWindow(GSW_NEXTSIBLING);
-    }
-
-    if (pRet && (pRet->IsFloat() || (!pRet->IsDisplay() && !pRet->IsVisible(FALSE))))
-        return GetNextLayoutChild(pRet);
-    return pRet;
-}
-
-SWindow *SWindow::GetNextLayoutChild(SWindow *pCurChild)
+SWindow *SWindow::GetNextLayoutChild(const SWindow *pCurChild) const
 {
     SWindow *pRet = NULL;
     if (pCurChild == NULL)
@@ -3493,7 +3425,7 @@ void SWindow::SetIOwner(THIS_ IWindow *pOwner)
     SetOwner((SWindow *)pOwner);
 }
 
-IWindow *SWindow::GetIOwner(THIS)
+IWindow *SWindow::GetIOwner(THIS) const
 {
     return GetOwner();
 }

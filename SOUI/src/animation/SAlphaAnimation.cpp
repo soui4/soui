@@ -24,7 +24,7 @@ BOOL SAlphaAnimation::hasAlpha() const
 void SAlphaAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
 {
     float alpha = mFromAlpha;
-    t->setAlpha((BYTE)((alpha + ((mToAlpha - alpha) * interpolatedTime)) * 255));
+    t->SetAlpha((BYTE)((alpha + ((mToAlpha - alpha) * interpolatedTime)) * 255));
 }
 
 void SAlphaAnimation::copy(const IAnimation *src)

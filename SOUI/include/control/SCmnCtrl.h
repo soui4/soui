@@ -872,6 +872,29 @@ class SOUI_EXP SRadioBox : public SWindow {
      * Describe  获取预期大小值
      */
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
+	    /**
+     * SRadioBox::OnGetDlgCode
+     * @brief    获取消息编码
+     * @return   返回编码值
+     *
+     * Describe  获取消息编码
+     */
+    STDMETHOD_(UINT,OnGetDlgCode)(THIS) SCONST OVERRIDE
+    {
+        return 0;
+    }
+    /**
+     * SRadioBox::IsSiblingsAutoGroupped
+     * @brief    是否自动添加到同一组
+     * @return   返回BOOL
+     *
+     * Describe  相同名称的单选按钮是否自动添加到同一组中
+     */
+	STDMETHOD_(BOOL,IsSiblingsAutoGroupped)(THIS) SCONST OVERRIDE
+    {
+        return TRUE;
+    }
+
     /**
      * SRadioBox::NeedRedrawWhenStateChange
      * @brief    当状态改变时候是否需要重绘
@@ -888,28 +911,6 @@ class SOUI_EXP SRadioBox : public SWindow {
      * Describe  当获得焦点时候需要绘制
      */
     virtual void DrawFocus(IRenderTarget *pRT);
-    /**
-     * SRadioBox::OnGetDlgCode
-     * @brief    获取消息编码
-     * @return   返回编码值
-     *
-     * Describe  获取消息编码
-     */
-    virtual UINT WINAPI OnGetDlgCode() const
-    {
-        return 0;
-    }
-    /**
-     * SRadioBox::IsSiblingsAutoGroupped
-     * @brief    是否自动添加到同一组
-     * @return   返回BOOL
-     *
-     * Describe  相同名称的单选按钮是否自动添加到同一组中
-     */
-    virtual BOOL IsSiblingsAutoGroupped()
-    {
-        return TRUE;
-    }
 
     /**
      * SRadioBox::GetSelectedSiblingInGroup

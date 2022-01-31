@@ -24,7 +24,7 @@ void STranslateAnimation::applyTransformation(float interpolatedTime, ITransform
         dy = mFromYDelta + ((mToYDelta - mFromYDelta) * interpolatedTime);
     }
     t->GetMatrix()->setTranslate(dx, dy);
-    t->setTransformationType(TYPE_MATRIX);
+    t->SetTransformationType(TYPE_MATRIX);
 }
 
 void STranslateAnimation::init(AniValueType fromXType,

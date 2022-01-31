@@ -146,11 +146,6 @@ class LvAdatperImpl : public BaseClass {
         return getCount() <= 0;
     }
 
-    STDMETHOD_(ULONG_PTR, getItemData)(int position) OVERRIDE
-    {
-        (position);
-        return 0;
-    }
 
     STDMETHOD_(SStringW, getItemDesc)(int position)
     {
