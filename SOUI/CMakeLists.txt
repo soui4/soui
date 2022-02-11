@@ -32,7 +32,7 @@ target_include_directories(soui4
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface
   PUBLIC ${PROJECT_SOURCE_DIR}/config
-  PUBLIC ${PROJECT_SOURCE_DIR}/utilities4/include
+  PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
 )
 target_link_libraries(soui4 utilities4)
 
