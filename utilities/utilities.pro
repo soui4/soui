@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE = lib
-TARGET = utilities
+TARGET = utilities4
 CONFIG(x64){
 TARGET = $$TARGET"64"
 }
@@ -32,8 +32,8 @@ HEADERS += resource.h \
            include/soui_mem_wrapper.h \
            include/souicoll.h \
            include/trace.h \
-           include/utilities-def.h \
-           include/utilities.h \
+           include/utilities4-def.h \
+           include/utilities4.h \
            include/atl.mini/atldef.h \
            include/atl.mini/SComCli.h \
            include/atl.mini/SComHelper.h \

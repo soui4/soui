@@ -24,9 +24,9 @@ SUBDIRS += SIpcObject
 
 imgdecoder-png.depends += zlib png
 render-skia.depends += skia
-resprovider-zip.depends += zlib utilities
-translator.depends += utilities
-resprovider-7zip.depends += 7z utilities
-ScriptModule-LUA.depends += soui3 lua-53
-TaskLoop.depends += utilities
-SIpcObject.depends += utilities
+resprovider-zip.depends += zlib utilities4
+translator.depends += utilities4
+resprovider-7zip.depends += 7z utilities4
+ScriptModule-LUA.depends += soui4 lua-53
+TaskLoop.depends += utilities4
+SIpcObject.depends += utilities4

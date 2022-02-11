@@ -291,7 +291,7 @@ public:
 		}
 
 		TCHAR szPath[MAX_PATH];
-		if (GetEnvironmentVariable(_T("SOUI3PATH"), szPath, MAX_PATH))
+		if (GetEnvironmentVariable(_T("SOUI4PATH"), szPath, MAX_PATH))
 		{
 			SetDlgItemText(IDC_SOUIDIR, szPath);
 		}
@@ -358,7 +358,7 @@ public:
 		CRegKey reg;
 		if (ERROR_SUCCESS == reg.Open(HKEY_LOCAL_MACHINE, _T("System\\CurrentControlSet\\Control\\Session Manager\\Environment"), KEY_SET_VALUE | KEY_QUERY_VALUE))
 		{
-			reg.SetStringValue(_T("SOUI3PATH"), szSouiDir);
+			reg.SetStringValue(_T("SOUI4PATH"), szSouiDir);
 			DWORD dwSize = 0;
 			LONG lRet = reg.QueryStringValue(_T("Path"), NULL, &dwSize);
 			if (ERROR_SUCCESS == lRet)
@@ -368,7 +368,7 @@ public:
 				lRet = reg.QueryStringValue(_T("Path"), pBuf, &dwSize);
 				str.ReleaseBuffer();
 
-				CString strSouiBin(_T("%SOUI3PATH%\\bin"));
+				CString strSouiBin(_T("%SOUI4PATH%\\bin"));
 				if (StrStrI(str, strSouiBin) == NULL)
 				{//已经设置后不再设置
 					if (str.IsEmpty())
@@ -412,17 +412,17 @@ public:
 				_tcscpy(szFrom, _T("entry\\*.*"));
 				_tcscpy(szTo, pCfg->strVsDir);
 				_tcscat(szTo, pCfg->strDataTarget);
-				_tcscat(szTo, _T("\\Soui3"));
+				_tcscat(szTo, _T("\\Soui4"));
 				bOK = 0 == SHFileOperation(&shfo);
 			}
 			//改写SouiWizard.vsz
 			if (bOK)
 			{
 				_tcscpy(szFrom, pCfg->strEntrySrc);
-				_tcscat(szFrom, _T("\\Soui3Wizard.vsz"));
+				_tcscat(szFrom, _T("\\Soui4Wizard.vsz"));
 				_tcscpy(szTo, pCfg->strVsDir);
 				_tcscat(szTo, pCfg->strEntryTarget);
-				_tcscat(szTo, _T("\\Soui3\\Soui3Wizard.vsz"));
+				_tcscat(szTo, _T("\\Soui4\\Soui4Wizard.vsz"));
 
 				CopyFile(szFrom, szTo, FALSE);
 
@@ -438,7 +438,7 @@ public:
 					if (f)
 					{//清空原数据再重新写入新数据
 						CStringA str = szBuf;
-						str.Replace("%SOUI3PATH%", CT2A(szSouiDir));
+						str.Replace("%SOUI4PATH%", CT2A(szSouiDir));
 						fwrite((LPCSTR)str, 1, str.GetLength(), f);
 						fclose(f);
 					}
@@ -448,10 +448,10 @@ public:
 			//改写SouiDllWizard.vsz
 			{
 				_tcscpy(szFrom, pCfg->strEntrySrc);
-				_tcscat(szFrom, _T("\\Soui3DllWizard.vsz"));
+				_tcscat(szFrom, _T("\\Soui4DllWizard.vsz"));
 				_tcscpy(szTo, pCfg->strVsDir);
 				_tcscat(szTo, pCfg->strEntryTarget);
-				_tcscat(szTo, _T("\\Soui3\\Soui3DllWizard.vsz"));
+				_tcscat(szTo, _T("\\Soui4\\Soui4DllWizard.vsz"));
 
 				CopyFile(szFrom, szTo, FALSE);
 
@@ -467,7 +467,7 @@ public:
 					if (f)
 					{//清空原数据再重新写入新数据
 						CStringA str = szBuf;
-						str.Replace("%SOUI3PATH%", CT2A(szSouiDir));
+						str.Replace("%SOUI4PATH%", CT2A(szSouiDir));
 						fwrite((LPCSTR)str, 1, str.GetLength(), f);
 						fclose(f);
 					}
@@ -475,7 +475,7 @@ public:
 			}
 
 			CString strMsg;
-			strMsg.Format(_T("为%s安装SOUI3向导:%s"), pCfg->strName, bOK ? _T("成功") : _T("失败"));
+			strMsg.Format(_T("为%s安装SOUI4向导:%s"), pCfg->strName, bOK ? _T("成功") : _T("失败"));
 			::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strMsg);
 		}
 
@@ -498,44 +498,44 @@ public:
 
 			VSENVCFG *pCfg = (VSENVCFG*)vslist.GetItemData(i);
 			//remove entry files
-			CString strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui3\\Soui3Wizard.ico");
+			CString strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4Wizard.ico");
 			BOOL bOK = DeleteFile(strSource);
 			if (bOK)
 			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui3\\Soui3Wizard.vsdir");
+				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4Wizard.vsdir");
 				bOK = DeleteFile(strSource);
 			}
 			if (bOK)
 			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui3\\Soui3Wizard.vsz");
+				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4Wizard.vsz");
 				bOK = DeleteFile(strSource);
 			}
 			// 删除Dll向导文件
 			if (bOK)
 			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui3\\Soui3DllWizard.ico");
+				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4DllWizard.ico");
 				bOK = DeleteFile(strSource);
 			}
 			if (bOK)
 			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui3\\Soui3DllWizard.vsdir");
+				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4DllWizard.vsdir");
 				bOK = DeleteFile(strSource);
 			}
 			if (bOK)
 			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui3\\Soui3DllWizard.vsz");
+				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4DllWizard.vsz");
 				bOK = DeleteFile(strSource);
 			}
 
 			// 删除Soui目录
 			if (bOK)
 			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui3");
+				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4");
 				bOK = RemoveDirectory(strSource);
 			}
 
 			CString strMsg;
-			strMsg.Format(_T("从%s中卸载SOUI3向导%s"), pCfg->strName, bOK ? _T("成功") : _T("失败"));
+			strMsg.Format(_T("从%s中卸载SOUI4向导%s"), pCfg->strName, bOK ? _T("成功") : _T("失败"));
 			::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strMsg);
 
 		}

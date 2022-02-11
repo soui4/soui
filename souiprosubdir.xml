@@ -1,6 +1,6 @@
 <DIRS>
   <dir path="third-part"/>
-  <dir path="utilities"/>
+  <dir path="utilities4"/>
   <dir path="soui-sys-resource"/>
   <dir path="soui"/>
   <dir path="components"/>

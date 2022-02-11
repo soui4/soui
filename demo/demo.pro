@@ -22,10 +22,10 @@ include($$dir/common.pri)
 QMAKE_CXXFLAGS -= /MP
 
 CONFIG(debug,debug|release){
-	LIBS += utilitiesd.lib soui3d.lib
+	LIBS += utilities4d.lib soui4d.lib
 }
 else{
-	LIBS += utilities.lib soui3.lib
+	LIBS += utilities4.lib soui4.lib
 }
 CONFIG(debug,debug|release){
 	LIBS += mhookd.lib smileyd.lib

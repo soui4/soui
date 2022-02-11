@@ -102,7 +102,7 @@ add_executable(demo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${
 
 set_target_properties(demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 add_dependencies(demo soui-sys-resource ${COM_LIBS})
-target_link_libraries(demo soui3 utilities mhook smiley)
+target_link_libraries(demo soui4 utilities4 mhook smiley)
 set_target_properties (demo PROPERTIES
     FOLDER demos
 )

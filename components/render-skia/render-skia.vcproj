@@ -43,7 +43,7 @@
 				Name="VCCustomBuildTool" />
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utilities.lib skia.lib shlwapi.lib Usp10.lib opengl32.lib"
+				AdditionalDependencies="utilities4.lib skia.lib shlwapi.lib Usp10.lib opengl32.lib"
 				AdditionalLibraryDirectories="..\..\bin"
 				DataExecutionPrevention="true"
 				EnableCOMDATFolding="2"
@@ -108,7 +108,7 @@
 				Name="VCCustomBuildTool" />
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utilitiesd.lib skiad.lib shlwapi.lib Usp10.lib opengl32.lib"
+				AdditionalDependencies="utilities4d.lib skiad.lib shlwapi.lib Usp10.lib opengl32.lib"
 				AdditionalLibraryDirectories="..\..\bin"
 				DataExecutionPrevention="true"
 				GenerateDebugInformation="true"

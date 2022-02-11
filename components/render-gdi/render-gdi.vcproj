@@ -43,7 +43,7 @@
 				Name="VCCustomBuildTool" />
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utilities.lib"
+				AdditionalDependencies="utilities4.lib"
 				AdditionalLibraryDirectories="..\..\bin"
 				DataExecutionPrevention="true"
 				EnableCOMDATFolding="2"
@@ -108,7 +108,7 @@
 				Name="VCCustomBuildTool" />
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utilitiesd.lib"
+				AdditionalDependencies="utilities4d.lib"
 				AdditionalLibraryDirectories="..\..\bin"
 				DataExecutionPrevention="true"
 				GenerateDebugInformation="true"

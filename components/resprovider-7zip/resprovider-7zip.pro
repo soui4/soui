@@ -28,10 +28,10 @@ dir = ../..
 include($$dir/common.pri)
 
 CONFIG(debug,debug|release){
-	LIBS += 7zd.lib utilitiesd.lib
+	LIBS += 7zd.lib utilities4d.lib
 }
 else{
-	LIBS += 7z.lib utilities.lib
+	LIBS += 7z.lib utilities4.lib
 }
 
 

@@ -20,7 +20,7 @@
 			UseOfMfc="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;.&quot;,&quot;..\lua-52\src&quot;,&quot;..\..\..\soui\include&quot;,&quot;..\..\..\utilities\include&quot;,&quot;..\..\..\config&quot;,..\..\..\tools\mkspecs\win32-msvc2008"
+				AdditionalIncludeDirectories="&quot;.&quot;,&quot;..\lua-52\src&quot;,&quot;..\..\..\soui\include&quot;,&quot;..\..\..\utilities4\include&quot;,&quot;..\..\..\config&quot;,..\..\..\tools\mkspecs\win32-msvc2008"
 				AdditionalOptions="-Zm200 /MP -w34100 -w34189"
 				AssemblerListingLocation="..\..\..\obj\debug\scriptmodule-lua\"
 				DebugInformationFormat="3"
@@ -74,7 +74,7 @@
 			UseOfMfc="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="&quot;.&quot;,&quot;..\lua-52\src&quot;,&quot;..\..\..\soui\include&quot;,&quot;..\..\..\utilities\include&quot;,&quot;..\..\..\config&quot;,..\..\..\tools\mkspecs\win32-msvc2008"
+				AdditionalIncludeDirectories="&quot;.&quot;,&quot;..\lua-52\src&quot;,&quot;..\..\..\soui\include&quot;,&quot;..\..\..\utilities4\include&quot;,&quot;..\..\..\config&quot;,..\..\..\tools\mkspecs\win32-msvc2008"
 				AdditionalOptions="-Zm200 /MP -w34100 -w34189"
 				AssemblerListingLocation="..\..\..\obj\release\scriptmodule-lua\"
 				DebugInformationFormat="3"

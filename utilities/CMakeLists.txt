@@ -17,14 +17,13 @@ source_group("Source Files" FILES ${CURRENT_SRCS})
 
 if (NOT ENABLE_SOUI_CORE_LIB)
     set (source  ${CURRENT_SRCS} utilities.rc)
-    add_library(utilities SHARED ${CURRENT_SRCS} ${CURRENT_HEADERS})
-    target_link_libraries(utilities png zlib)
+    add_library(utilities4 SHARED ${CURRENT_SRCS} ${CURRENT_HEADERS})
+    target_link_libraries(utilities4 png zlib)
 else()
-    add_library(utilities STATIC ${CURRENT_SRCS} ${CURRENT_HEADERS})
+    add_library(utilities4 STATIC ${CURRENT_SRCS} ${CURRENT_HEADERS})
 endif()
 
-# add_library(utilities SHARED ${CURRENT_SRCS} ${CURRENT_HEADERS})
 
-set_target_properties(utilities PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
+set_target_properties(utilities4 PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
 
-set(CORE_LIBS ${CORE_LIBS} utilities CACHE INTERNAL "core_lib")
+set(CORE_LIBS ${CORE_LIBS} utilities4 CACHE INTERNAL "core_lib")

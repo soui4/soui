@@ -22,7 +22,7 @@
 //#define SHOW_AERO //open aero for vista and win7
 
 #define TIMER_QUIT 1000
-#define TIMER_SOUI3 1100
+#define TIMER_SOUI4 1100
 
 #ifdef SHOW_AERO
 #include <dwmapi.h>
@@ -998,7 +998,7 @@ void CMainDlg::OnBtnTip()
 	{
 		CRect rc = pBtn->GetWindowRect();
 		ClientToScreen2(&rc);
-		STipWnd::ShowTip(rc.right, rc.top, STipWnd::AT_LEFT_BOTTOM, _T("欢迎使用SOUI!\n如果有好的demo欢迎发送截图给作者，SOUI2基于MIT协议,SOUI3使用自定义协议,商用收费!\n启程软件"));
+		STipWnd::ShowTip(rc.right, rc.top, STipWnd::AT_LEFT_BOTTOM, _T("欢迎使用SOUI!\n如果有好的demo欢迎发送截图给作者，SOUI2基于MIT协议,SOUI4使用自定义协议,商用收费!\n启程软件"));
 	}
 }
 
@@ -1015,7 +1015,7 @@ void CMainDlg::OnTimer(UINT_PTR idEvent)
 	{
 		SNativeWnd::KillTimer(idEvent);
 		PostQuitMessage(-3);
-	}else if(idEvent == TIMER_SOUI3)
+	}else if(idEvent == TIMER_SOUI4)
 	{
 		SWindow *pAniHost = FindChildByName(L"wnd_ani_host");
 		if (pAniHost && pAniHost->IsVisible(TRUE))
@@ -1167,7 +1167,7 @@ void CMainDlg::InitSoui3Animation()
 			pAni->Release();
 		}
 	}
-	SNativeWnd::SetTimer(TIMER_SOUI3,1000);	//start timer.
+	SNativeWnd::SetTimer(TIMER_SOUI4,1000);	//start timer.
 }
 
 void CMainDlg::onAnimationEnd(IAnimation * animation)

@@ -43,7 +43,7 @@
 				Name="VCCustomBuildTool" />
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lua-53.lib soui3.lib utilities.lib"
+				AdditionalDependencies="lua-53.lib soui4.lib utilities4.lib"
 				AdditionalLibraryDirectories="..\..\bin"
 				DataExecutionPrevention="true"
 				EnableCOMDATFolding="2"
@@ -108,7 +108,7 @@
 				Name="VCCustomBuildTool" />
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="lua-53d.lib soui3d.lib utilitiesd.lib"
+				AdditionalDependencies="lua-53d.lib soui4d.lib utilities4d.lib"
 				AdditionalLibraryDirectories="..\..\bin"
 				DataExecutionPrevention="true"
 				GenerateDebugInformation="true"

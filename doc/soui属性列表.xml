@@ -717,8 +717,8 @@
 
 
 ps:
-soui2升级到soui3 需要修改的点
-1 修改环境变量 去系统变量那边吧SOUIPATH的地址改为soui3的路径
+soui2升级到soui4 需要修改的点
+1 修改环境变量 去系统变量那边吧SOUIPATH的地址改为soui4的路径
 2 直接替换
 
 

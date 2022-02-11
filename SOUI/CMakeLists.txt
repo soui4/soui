@@ -1,5 +1,5 @@
 #
-# SOUI3 cmake配置文件
+# SOUI4 cmake配置文件
 #
 
 #
@@ -22,21 +22,21 @@ set(source ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
 
 if (NOT ENABLE_SOUI_CORE_LIB)
     set (source  ${source} soui.rc)
-    add_library(soui3 SHARED ${source})
+    add_library(soui4 SHARED ${source})
 else()
-    add_library(soui3 STATIC ${source})
+    add_library(soui4 STATIC ${source})
 endif()
 
-target_include_directories(soui3
+target_include_directories(soui4
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface
   PUBLIC ${PROJECT_SOURCE_DIR}/config
-  PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
+  PUBLIC ${PROJECT_SOURCE_DIR}/utilities4/include
 )
-target_link_libraries(soui3 utilities)
+target_link_libraries(soui4 utilities4)
 
-set_target_properties(soui3 PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "include/souistd.h")
-cotire(soui3)
+set_target_properties(soui4 PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "include/souistd.h")
+cotire(soui4)
 
-set(CORE_LIBS ${CORE_LIBS} soui3 CACHE INTERNAL "core_lib")
+set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")

@@ -39,7 +39,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="&quot;$(SOUI3PATH)\config&quot;;&quot;$(SOUI3PATH)\utilities\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(SOUI4PATH)\config&quot;;&quot;$(SOUI4PATH)\utilities4\include&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;STRICT;_DEBUG"
 				RuntimeLibrary="1"
 				TreatWChar_tAsBuiltInType="true"
@@ -62,10 +62,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utilitiesd.lib"
+				AdditionalDependencies="utilities4d.lib"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;$(SOUI3PATH)\bin&quot;"
+				AdditionalLibraryDirectories="&quot;$(SOUI4PATH)\bin&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 			/>
@@ -116,7 +116,7 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="&quot;$(SOUI3PATH)\config&quot;;&quot;$(SOUI3PATH)\utilities\include&quot;"
+				AdditionalIncludeDirectories="&quot;$(SOUI4PATH)\config&quot;;&quot;$(SOUI4PATH)\utilities4\include&quot;"
 				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
 				RuntimeLibrary="0"
 				TreatWChar_tAsBuiltInType="true"
@@ -136,10 +136,10 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utilities.lib"
+				AdditionalDependencies="utilities4.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="&quot;$(SOUI3PATH)\bin&quot;"
+				AdditionalLibraryDirectories="&quot;$(SOUI4PATH)\bin&quot;"
 				GenerateDebugInformation="true"
 				SubSystem="1"
 			/>

@@ -3,7 +3,7 @@
 ######################################################################
 
 TEMPLATE = lib
-TARGET = soui3
+TARGET = soui4
 CONFIG(x64){
 TARGET = $$TARGET"64"
 }
@@ -20,10 +20,10 @@ dir = ..
 include($$dir/common.pri)
 
 CONFIG(debug,debug|release){
-	LIBS += utilitiesd.lib
+	LIBS += utilities4d.lib
 }
 else{
-	LIBS += utilities.lib
+	LIBS += utilities4.lib
 }
 
 PRECOMPILED_HEADER = include/souistd.h

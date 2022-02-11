@@ -28,10 +28,10 @@ dir = ../..
 include($$dir/common.pri)
 
 CONFIG(debug,debug|release){
-	LIBS += utilitiesd.lib skiad.lib shlwapi.lib
+	LIBS += utilities4d.lib skiad.lib shlwapi.lib
 }
 else{
-	LIBS += utilities.lib skia.lib shlwapi.lib
+	LIBS += utilities4.lib skia.lib shlwapi.lib
 }
 LIBS += Usp10.lib opengl32.lib
 

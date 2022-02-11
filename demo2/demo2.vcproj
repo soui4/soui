@@ -62,7 +62,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utilitiesd.lib soui3d.lib"
+				AdditionalDependencies="utilities4d.lib soui4d.lib"
 				LinkIncremental="2"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\bin"
@@ -139,7 +139,7 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="utilities.lib soui3.lib"
+				AdditionalDependencies="utilities4.lib soui4.lib"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\bin"
@@ -285,7 +285,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Building SoUI Resource"
-						CommandLine="&quot;$(SOUI3PATH)\tools\uiresbuilder.exe&quot; -i &quot;$(InputPath)&quot; -p uires -r .\res\soui_res.rc2 -h .\res\resource.h idtable&#x0D;&#x0A;"
+						CommandLine="&quot;..\tools\uiresbuilder.exe&quot; -i &quot;$(InputPath)&quot; -p uires -r .\res\soui_res.rc2 -h .\res\resource.h idtable&#x0D;&#x0A;"
 						Outputs=".\res\soui_res.rc2;"
 					/>
 				</FileConfiguration>
@@ -295,7 +295,7 @@
 					<Tool
 						Name="VCCustomBuildTool"
 						Description="Building SoUI Resource"
-						CommandLine="&quot;$(SOUI3PATH)\tools\uiresbuilder.exe&quot; -i &quot;$(InputPath)&quot; -p uires -r .\res\soui_res.rc2 -h .\res\resource.h idtable&#x0D;&#x0A;xcopy &quot;%(RootDir)%(Directory)*.*&quot; &quot;$(TargetDir)uires&quot; /e/y/i&#x0D;&#x0A;"
+						CommandLine="&quot;..\tools\uiresbuilder.exe&quot; -i &quot;$(InputPath)&quot; -p uires -r .\res\soui_res.rc2 -h .\res\resource.h idtable&#x0D;&#x0A;xcopy &quot;%(RootDir)%(Directory)*.*&quot; &quot;$(TargetDir)uires&quot; /e/y/i&#x0D;&#x0A;"
 						Outputs=".\res\soui_res.rc2;"
 					/>
 				</FileConfiguration>

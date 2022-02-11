@@ -1,5 +1,5 @@
 TEMPLATE = subdirs
-TARGET = soui3
+TARGET = soui4
 CONFIG(x64){
 TARGET = $$TARGET"64"
 }
@@ -15,5 +15,5 @@ SUBDIRS += soui
 SUBDIRS += components
 SUBDIRS += demo
 
-soui.depends += utilities soui-sys-resource
+soui.depends += utilities4 soui-sys-resource
 demo.depends += soui

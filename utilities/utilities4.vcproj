@@ -2,8 +2,8 @@
 <VisualStudioProject
 	ProjectType="Visual C++"
 	Version="9,00"
-	Name="utilities"
-	ProjectGUID="{ED910FFB-01BD-3D9C-9163-EA6433E7F3B1}"
+	Name="utilities4"
+	ProjectGUID="{B90FA810-A56A-3010-B6E4-AAB9A7BAA356}"
 	Keyword="Qt4VSv1.0">
 	<Platforms>
 		<Platform
@@ -16,18 +16,18 @@
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
 			ConfigurationType="2"
-			IntermediateDirectory="..\obj\release\utilities\"
+			IntermediateDirectory="..\obj\release\utilities4\"
 			UseOfMfc="0">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=".,.,include,..\config,..\tools\mkspecs\win32-msvc2008"
 				AdditionalOptions="/MP"
-				AssemblerListingLocation="..\obj\release\utilities\"
+				AssemblerListingLocation="..\obj\release\utilities4\"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4100,4101,4102,4189,4996"
 				ExceptionHandling="1"
 				GeneratePreprocessedFile="0"
-				ObjectFile="..\obj\release\utilities\"
+				ObjectFile="..\obj\release\utilities4\"
 				Optimization ="1"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,UTILITIES_EXPORTS,QT_NO_DYNAMIC_CAST,NDEBUG"
 				ProgramDataBaseFileName="$(IntDir)"
@@ -47,7 +47,7 @@
 				LinkIncremental="1"
 				LinkTimeCodeGeneration="0"
 				OptimizeReferences="2"
-				OutputFile="$(OutDir)\utilities.dll"
+				OutputFile="$(OutDir)\utilities4.dll"
 				ProgramDatabaseFile=""
 				RandomizedBaseAddress="true"
 				SubSystem="2"
@@ -76,18 +76,18 @@
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
 			ConfigurationType="2"
-			IntermediateDirectory="..\obj\debug\utilities\"
+			IntermediateDirectory="..\obj\debug\utilities4\"
 			UseOfMfc="0">
 			<Tool
 				Name="VCCLCompilerTool"
 				AdditionalIncludeDirectories=".,.,include,..\config,..\tools\mkspecs\win32-msvc2008"
 				AdditionalOptions="/MP"
-				AssemblerListingLocation="..\obj\debug\utilities\"
+				AssemblerListingLocation="..\obj\debug\utilities4\"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4100,4101,4102,4189,4996"
 				ExceptionHandling="1"
 				GeneratePreprocessedFile="0"
-				ObjectFile="..\obj\debug\utilities\"
+				ObjectFile="..\obj\debug\utilities4\"
 				Optimization ="4"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,UTILITIES_EXPORTS,QT_NO_DYNAMIC_CAST"
 				ProgramDataBaseFileName="$(IntDir)"
@@ -104,7 +104,7 @@
 				GenerateDebugInformation="true"
 				IgnoreImportLibrary="true"
 				LinkTimeCodeGeneration="0"
-				OutputFile="$(OutDir)\utilitiesd.dll"
+				OutputFile="$(OutDir)\utilities4d.dll"
 				ProgramDatabaseFile=""
 				RandomizedBaseAddress="true"
 				SubSystem="2"
@@ -223,9 +223,9 @@
 			<File
 				RelativePath="include\string\tstring.h" />
 			<File
-				RelativePath="include\utilities-def.h" />
+				RelativePath="include\utilities4-def.h" />
 			<File
-				RelativePath="include\utilities.h" />
+				RelativePath="include\utilities4.h" />
 		</Filter>
 		<File
 			RelativePath="utilities.rc" />

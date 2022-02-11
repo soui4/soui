@@ -219,38 +219,38 @@ if %specs%==win32-msvc2017 (
 	)
 )
 
-SET /p selected=open[o], compile[c] "soui3.sln" or quit(q) [o,c or q]?
+SET /p selected=open[o], compile[c] "soui4.sln" or quit(q) [o,c or q]?
 if "%selected%" == "o" (
 	if %targetx86andx64%==1 (
-		soui3.sln
-		soui364.sln
+		soui4.sln
+		soui464.sln
 	) else if "%target%"=="x86" (
-		soui3.sln
+		soui4.sln
 	) else (
-		soui364.sln
+		soui464.sln
 	)
 ) else if "%selected%" == "c" (
 		if %targetx86andx64%==1 (
 			call !vsvarbat! x86
-			call devenv soui3.sln /Clean Debug
-			call devenv soui3.sln /build Debug
-			call devenv soui3.sln /Clean Release
-			call devenv soui3.sln /build Release
+			call devenv soui4.sln /Clean Debug
+			call devenv soui4.sln /build Debug
+			call devenv soui4.sln /Clean Release
+			call devenv soui4.sln /build Release
 			call !vsvarbat! x64
-			call devenv soui364.sln /Clean Debug
-			call devenv soui364.sln /build Debug
-			call devenv soui364.sln /Clean Release
-			call devenv soui364.sln /build Release
+			call devenv soui464.sln /Clean Debug
+			call devenv soui464.sln /build Debug
+			call devenv soui464.sln /Clean Release
+			call devenv soui464.sln /build Release
 		) else if "%target%"=="x86" (			
-			call devenv soui3.sln /Clean Debug
-			call devenv soui3.sln /build Debug
-			call devenv soui3.sln /Clean Release
-			call devenv soui3.sln /build Release
+			call devenv soui4.sln /Clean Debug
+			call devenv soui4.sln /build Debug
+			call devenv soui4.sln /Clean Release
+			call devenv soui4.sln /build Release
 		) else if "%target%"=="x64" (
-		call devenv soui364.sln /Clean Debug
-		call devenv soui364.sln /build Debug
-		call devenv soui364.sln /Clean Release
-		call devenv soui364.sln /build Release
+		call devenv soui464.sln /Clean Debug
+		call devenv soui464.sln /build Debug
+		call devenv soui464.sln /Clean Release
+		call devenv soui464.sln /build Release
 		)
 ) else (
 	goto final

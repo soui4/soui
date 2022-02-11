@@ -1,20 +1,20 @@
 ========================================================================
-    DYNAMIC LINK LIBRARY : utilities Project Overview
+    DYNAMIC LINK LIBRARY : utilities4 Project Overview
 ========================================================================
 
-AppWizard has created this utilities DLL for you.
+AppWizard has created this utilities4 DLL for you.
 
 This file contains a summary of what you will find in each of the files that
-make up your utilities application.
+make up your utilities4 application.
 
 
-utilities.vcproj
+utilities4.vcproj
     This is the main project file for VC++ projects generated using an Application Wizard.
     It contains information about the version of Visual C++ that generated the file, and
     information about the platforms, configurations, and project features selected with the
     Application Wizard.
 
-utilities.cpp
+utilities4.cpp
     This is the main DLL source file.
 
 /////////////////////////////////////////////////////////////////////////////
@@ -22,7 +22,7 @@ Other standard files:
 
 StdAfx.h, StdAfx.cpp
     These files are used to build a precompiled header (PCH) file
-    named utilities.pch and a precompiled types file named StdAfx.obj.
+    named utilities4.pch and a precompiled types file named StdAfx.obj.
 
 /////////////////////////////////////////////////////////////////////////////
 Other notes:

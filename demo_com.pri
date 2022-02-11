@@ -38,11 +38,11 @@ CONFIG(x64){
 	QMAKE_LFLAGS += /MACHINE:X64
 	DEFINES -= WIN32
 	DEFINES += _WIN64
-             LIBPATH += $(SOUI3PATH)/bin64
+             LIBPATH += $(SOUI4PATH)/bin64
 }
 else{
 	QMAKE_LFLAGS += /MACHINE:X86
-             LIBPATH += $(SOUI3PATH)/bin
+             LIBPATH += $(SOUI4PATH)/bin
 }
 #∂‡∫À±‡“Î
 QMAKE_CXXFLAGS += /MP
@@ -50,15 +50,15 @@ QMAKE_CXXFLAGS += -Fd$(IntDir)
 
 DEPENDPATH += .
 INCLUDEPATH += . \
-			   $(SOUI3PATH)/utilities/include \
-			   $(SOUI3PATH)/soui/include \
-			   $(SOUI3PATH)/components \
-			   $(SOUI3PATH)/config
+			   $(SOUI4PATH)/utilities4/include \
+			   $(SOUI4PATH)/soui/include \
+			   $(SOUI4PATH)/components \
+			   $(SOUI4PATH)/config
 
 
 CONFIG(debug,debug|release){
-	LIBS += utilitiesd.lib soui3d.lib
+	LIBS += utilities4d.lib soui4d.lib
 }
 else{
-	LIBS += utilities.lib soui3.lib
+	LIBS += utilities4.lib soui4.lib
 }

@@ -8,28 +8,17 @@ cd ..
 mkdir soui-demo
 cd soui-demo
 
-call :update_repo SoTool 
-call :update_repo sinstar3
-call :update_repo CapScreenDemo
-call :update_repo idoudemo
-call :update_repo SouiActivexDemo
-call :update_repo SlogViewer
-call :update_repo SouiWallPaper
-call :update_repo mclistview_demo
-call :update_repo MultiLangs
-call :update_repo SouiChartDemo
-call :update_repo souispy
-call :update_repo SweepingEdge
+rem call :update_repo SoTool 
 
 SET /p selected=1.是否生成soui_demo.sln工程[1=YES;Other=No]:
 if %selected% neq 1 (
 	goto :eof
 ) 
 :createsln
-If Defined SOUI3PATH (
-Echo %SOUI3PATH%
+If Defined SOUI4PATH (
+Echo %SOUI4PATH%
 ) Else (
-Echo can't find env variable SOUI3PATH, clone soui core and install wizard first, please.
+Echo can't find env variable SOUI4PATH, clone soui core and install wizard first, please.
 goto error
 )
 
@@ -68,7 +57,7 @@ goto :inputfilelist
 
 SET cfg=
 
-set file=%SOUI3PATH%\config\build.cfg
+set file=%SOUI4PATH%\config\build.cfg
 for /f "tokens=1,2* delims==" %%i in (%file%) do (
 if "%%i"=="UNICODE" set cfg_unicode=%%j
 if "%%i"=="WCHAR" set cfg_wchar=%%j
@@ -164,19 +153,19 @@ if %selected%==1 (
 
 :built
 if %specs%==win32-msvc2017 (	
-	%SOUI3PATH%\tools\qmake2017 -tp vc -r -spec %SOUI3PATH%\tools\mkspecs\%specs% "CONFIG += !cfg! "
+	%SOUI4PATH%\tools\qmake2017 -tp vc -r -spec %SOUI4PATH%\tools\mkspecs\%specs% "CONFIG += !cfg! "
 ) else (
-	%SOUI3PATH%\tools\qmake -tp vc -r -spec %SOUI3PATH%\tools\mkspecs\%specs% "CONFIG += !cfg! "
+	%SOUI4PATH%\tools\qmake -tp vc -r -spec %SOUI4PATH%\tools\mkspecs\%specs% "CONFIG += !cfg! "
 )
 pause
 goto :eof
 :update_repo
 if not exist %1 (
   echo "clone %1"
-  git clone https://github.com/soui3-demo/%1.git
+  git clone https://github.com/soui4-demo/%1.git
 ) else (
   echo "pull %1"
   cd %1
-  git pull https://github.com/soui3-demo/%1.git
+  git pull https://github.com/soui4-demo/%1.git
   cd ..
 )

@@ -17,7 +17,7 @@
 # 
 # ---core---
 # SOUI
-# utilities
+# utilities4
 # soui-sys-resource
 #
 # ---components---
@@ -67,13 +67,13 @@
 #
 
 cmake_minimum_required(VERSION 3.4.3)
-project(SOUI3)
+project(SOUI4)
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
 include(__cmake/cotire.cmake)
 include(__cmake/internal_utils.cmake)
 include(__cmake/global.cmake)
-include(__cmake/soui3-demo.cmake)
+include(__cmake/soui4-demo.cmake)
 
 
 option(USE_UNICODE "Use Unicode" ON)

@@ -9,11 +9,11 @@
  <a>
     <img alt="DirectUI" src="https://img.shields.io/badge/C%2B%2B-DirectUI%E5%BA%93-brightgreen?style=for-the-badge" />
  </a>
- <a href="https://github.com/soui3/soui/releases">
-    <img alt="releases" src="https://img.shields.io/github/v/release/soui3/soui?color=blueviolet&include_prereleases&style=for-the-badge" />
+ <a href="https://github.com/soui4/soui/releases">
+    <img alt="releases" src="https://img.shields.io/github/v/release/soui4/soui?color=blueviolet&include_prereleases&style=for-the-badge" />
  </a>
-<a href="https://github.com/soui3/soui/">
-    <img alt="star" src="https://img.shields.io/github/stars/soui3/soui?style=for-the-badge">
+<a href="https://github.com/soui4/soui/">
+    <img alt="star" src="https://img.shields.io/github/stars/soui4/soui?style=for-the-badge">
 </a>
 
  <a href="https://2926295173.github.io/SoUIDocs">
@@ -24,7 +24,7 @@
 </div>
 
 
- _SOUI3_ 是一套已经持续开发维护 **12年** 的轻量级Windows平台客户端开发框架,
+ _SOUI4_ 是一套已经持续开发维护 **12年** 的轻量级Windows平台客户端开发框架,
 （内核编译后体积1M左右），
 框架设计吸收了`WTL`，`Android`，`QT`，`Flash`等流行框架的特点，
 UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.oschina.net/p/skia)渲染），
@@ -36,9 +36,9 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 ![demo1](./doc/demo_png/souidemo1.png)
 ![demo2](./doc/demo_png/souidemo2.png)
 
-如果您初次了解此库，可以下载自动化静态编译的[demo.exe](https://github.com/soui3/soui/actions)进行尝鲜体验（无需下载源代码和其他依赖，直接下载运行）
+如果您初次了解此库，可以下载自动化静态编译的[demo.exe](https://github.com/soui4/soui/actions)进行尝鲜体验（无需下载源代码和其他依赖，直接下载运行）
 具体方法
-[![CMake Test](https://github.com/soui3/soui/actions/workflows/cmaketest.yml/badge.svg)](https://github.com/soui3/soui/actions/workflows/cmaketest.yml)
+[![CMake Test](https://github.com/soui4/soui/actions/workflows/cmaketest.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/cmaketest.yml)
 
 ```
 1.点击上方图标,进入页面
@@ -48,7 +48,7 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 ```
 如您想自己编译更多的界面案例，请拉取 DEMO仓库：
 
-- https://github.com/soui3-demo
+- https://github.com/soui4-demo
 
 每一个Demo一个单独的仓库，自己分别clone就好了。
 
@@ -63,20 +63,20 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 ### Git下载地址
 
-- [国外Git下载站点](https://github.com/soui3/soui)
+- [国外Git下载站点](https://github.com/soui4/soui)
 
-- [国内Git下载站点](https://gitee.com/setoutsoft/soui3)(作为镜像使用)
+- [国内Git下载站点](https://gitee.com/setoutsoft/soui4)(作为镜像使用)
 
 
 ### [编译](./doc/build.md)
 
-[![CMake Test](https://github.com/soui3/soui/actions/workflows/cmaketest.yml/badge.svg)](https://github.com/soui3/soui/actions/workflows/cmaketest.yml)
+[![CMake Test](https://github.com/soui4/soui/actions/workflows/cmaketest.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/cmaketest.yml)
 
 soui可以使用cmake或者qmake进行编译（前提:安装好Visual Studio），具体编译方法查看附带[编译文档](./doc/build.md)
 
 ### UI可视化设计
 
-`SOUI3 Editor`,仓库地址https://github.com/soui3-demo/SouiEditor
+`SOUI4 Editor`,仓库地址https://github.com/soui4-demo/SouiEditor
 
 使用教程见文档
 
