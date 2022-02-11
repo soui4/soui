@@ -14,6 +14,7 @@
 #include "../controls.extend/schatedit.h"
 #include "../controls.extend/SScrollText.h"
 #include "../controls.extend/SCalendar2.h"
+#include "../controls.extend/SHexEdit.h"
 
 #include "../controls.extend/SMcListViewEx\SHeaderCtrlEx.h"
 #include "../controls.extend/SMcListViewEx\SMcListViewEx.h"
@@ -263,6 +264,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<SAniWindow>();
 		theApp->RegisterWindowClass<SGroupList>();
 		theApp->RegisterWindowClass<SRoundImage>();
+        theApp->RegisterWindowClass<SHexEdit>();
         if(SUCCEEDED(CUiAnimation::Init()))
         {
             theApp->RegisterWindowClass<SUiAnimationWnd>();//注册动画控件

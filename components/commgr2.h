@@ -84,8 +84,10 @@
 	#pragma comment(lib,"sipcobjectd")
 #endif
 #if(SCOM_MASK&scom_mask_script_lua)
-#pragma comment(lib,"scriptmodule-luad")
+	#pragma comment(lib,"lua-53d")
+	#pragma comment(lib,"ScriptModule-LUAd")
 #endif
+
 #else//_DEBUG
 #if(SCOM_MASK&scom_mask_render_skia)
     #pragma comment(lib,"skia")
@@ -129,8 +131,10 @@
 	#pragma comment(lib,"sipcobject")
 #endif
 #if(SCOM_MASK&scom_mask_script_lua)
-#pragma comment(lib,"scriptmodule_lua")
+	#pragma comment(lib,"lua-53")
+	#pragma comment(lib,"ScriptModule-LUA")
 #endif
+
 #endif//_DEBUG
 
 namespace SOUI
