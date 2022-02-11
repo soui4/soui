@@ -8,39 +8,38 @@
 #include "helper/STime.h"
 #include "animation/STransformation.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
 //////////////////////////////////////////////////////////////////////////
 // STextTr
 //////////////////////////////////////////////////////////////////////////
-	STrText::STrText(SWindow *pOwner_ /*= NULL*/)
-		: pOwner(pOwner_)
-	{
-	}
+STrText::STrText(SWindow *pOwner_ /*= NULL*/)
+    : pOwner(pOwner_)
+{
+}
 
-	void STrText::SetOwner(SWindow *pOwner_)
-	{
-		pOwner = pOwner_;
-	}
+void STrText::SetOwner(SWindow *pOwner_)
+{
+    pOwner = pOwner_;
+}
 
-	SStringT STrText::GetText(BOOL bRawText) const
-	{
-		return bRawText ? strRaw : strTr;
-	}
+SStringT STrText::GetText(BOOL bRawText) const
+{
+    return bRawText ? strRaw : strTr;
+}
 
-	void STrText::SetText(const SStringT &strText)
-	{
-		strRaw = strText;
-		TranslateText();
-	}
+void STrText::SetText(const SStringT &strText)
+{
+    strRaw = strText;
+    TranslateText();
+}
 
-	void STrText::TranslateText()
-	{
-		if (pOwner == NULL)
-			return;
-		strTr = S_CW2T(pOwner->tr(strRaw));
-	}
-
+void STrText::TranslateText()
+{
+    if (pOwner == NULL)
+        return;
+    strTr = S_CW2T(pOwner->tr(strRaw));
+}
 
 //////////////////////////////////////////////////////////////////////////
 // SWindow Implement
@@ -197,10 +196,10 @@ BOOL SWindow::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
     tipInfo.dwCookie = 0;
     tipInfo.rcTarget = GetWindowRect();
 
-	SStringT strTip;
+    SStringT strTip;
     EventSwndUpdateTooltip evt(this);
     evt.bUpdated = FALSE;
-	evt.strToolTip = &strTip;
+    evt.strToolTip = &strTip;
     FireEvent(&evt);
 
     if (evt.bUpdated)
@@ -3028,7 +3027,7 @@ void SWindow::SetWindowRgn(IRegionS *pRgn, BOOL bRedraw /*=TRUE*/)
 
 IRegionS *SWindow::GetWindowRgn() const
 {
-	return m_clipRgn;
+    return m_clipRgn;
 }
 
 void SWindow::SetWindowPath(IPathS *pPath, BOOL bRedraw /*=TRUE*/)
@@ -3038,10 +3037,9 @@ void SWindow::SetWindowPath(IPathS *pPath, BOOL bRedraw /*=TRUE*/)
         InvalidateRect(NULL);
 }
 
-
-IPathS* SWindow::GetWindowPath() const
+IPathS *SWindow::GetWindowPath() const
 {
-	return m_clipPath;
+    return m_clipPath;
 }
 
 void SWindow::DoColorize(COLORREF cr)
@@ -3321,7 +3319,6 @@ BOOL SWindow::IsLayoutDirty() const
     return m_layoutDirty != dirty_clean;
 }
 
-
 SWindow *SWindow::GetWindow(int uCode) const
 {
     SWindow *pRet = NULL;
@@ -3349,11 +3346,10 @@ SWindow *SWindow::GetWindow(int uCode) const
     return pRet;
 }
 
-
 SWindow *SWindow::GetChild(int iChild) const
 {
     if (iChild == CHILDID_SELF)
-        return (SWindow*)this;
+        return (SWindow *)this;
     SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
     for (int i = 0; i < iChild - 1 && pChild; i++)
     {
@@ -3372,7 +3368,7 @@ SWindow *SWindow::GetParent() const
 
 SWindow *SWindow::GetRoot() const
 {
-    SWindow *pParent = (SWindow*)this;
+    SWindow *pParent = (SWindow *)this;
     while (pParent->GetParent())
         pParent = pParent->GetParent();
     return pParent;
@@ -3559,4 +3555,4 @@ bool SWindow::SAnimationHandler::getFillAfter() const
     return m_bFillAfter;
 }
 
-} // namespace SOUI
+SNSEND

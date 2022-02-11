@@ -23,8 +23,7 @@
 // p2: output of style
 #define GETSTYLE(p) SStylePoolMgr::getSingleton().GetStyle(p)
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  * @class      SStylePool
  * @brief      name和SwndStyle的映射表
@@ -153,4 +152,4 @@ class SOUI_EXP STemplatePoolMgr : public SSingleton2<STemplatePoolMgr> {
   protected:
     SList<STemplatePool *> m_lstTemplatePools;
 };
-} // end of namespace SOUI
+SNSEND

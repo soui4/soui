@@ -10,8 +10,7 @@
 #include "layout/SLayoutSize.h"
 #include "helper/SHostMgr.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 template <>
 SFontPool *SSingleton<SFontPool>::ms_Singleton = 0;
@@ -269,4 +268,4 @@ SStringW SFontPool::FontInfoToString(const FontInfo &fi)
     return S_CA2W(szBuf);
 }
 
-} // namespace SOUI
+SNSEND

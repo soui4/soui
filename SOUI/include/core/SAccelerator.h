@@ -15,8 +15,7 @@
 
 #include <interface/SAccelerator-i.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  * @class      CAccelerator
@@ -91,4 +90,4 @@ class SOUI_EXP SAccelerator : public IAccelerator {
     WORD m_wVK;
 };
 
-} // end of namespace SOUI
+SNSEND

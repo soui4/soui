@@ -20,8 +20,7 @@
 // Usage: <realwnd id=xx wndclass="edit" wndname="name" style="00000001" exstyle="00000000"/>
 //
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  * @class     SRealWndParam
@@ -209,4 +208,4 @@ class SOUI_EXP SRealWnd : public SWindow {
     LPVOID m_lpData; /**< 附加参数 */
 };
 
-} // namespace SOUI
+SNSEND

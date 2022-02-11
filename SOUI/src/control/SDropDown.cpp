@@ -14,8 +14,7 @@
 #include "control/SDropDown.h"
 #include <core/SMsgLoop.h>
 
-namespace SOUI
-{
+SNSBEGIN
 #define IDINIT -1
 
 SDropDownWnd::SDropDownWnd(ISDropDownOwner *pOwner)

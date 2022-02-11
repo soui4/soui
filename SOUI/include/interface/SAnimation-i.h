@@ -27,7 +27,6 @@
 #include <stdint.h>
 SNSBEGIN
 
-
 typedef struct IAnimation IAnimation;
 
 #undef INTERFACE
@@ -57,63 +56,63 @@ DECLARE_INTERFACE(IAnimationListener)
     STDMETHOD_(void, onAnimationRepeat)(THIS_ IAnimation * animation) PURE;
 };
 
+/**
+ * <p>An animation listener receives notifications from an animation.
+ * Notifications indicate animation related events, such as the end or the
+ * repetition of the animation.</p>
+ */
+typedef enum RepeatMode
+{
+    RESTART = 1,
+    REVERSE = 2,
+} RepeatMode;
+
+/**
+ * Can be used as the start time to indicate the start time should be the current
+ * time when {@link #getTransformation(long, STransformation)} is invoked for the
+ * first animation frame. This can is useful for short animations.
+ */
+enum
+{
+    START_ON_FIRST_FRAME = -1,
+};
+
+typedef enum AniValueType
+{
     /**
-     * <p>An animation listener receives notifications from an animation.
-     * Notifications indicate animation related events, such as the end or the
-     * repetition of the animation.</p>
+     * The specified dimension is an ABSOLUTE_VALUE number of pixels.
      */
-    typedef enum RepeatMode
-    {
-        RESTART = 1,
-        REVERSE = 2,
-    }RepeatMode;
-
+    ABSOLUTE_VALUE = 0,
     /**
-     * Can be used as the start time to indicate the start time should be the current
-     * time when {@link #getTransformation(long, STransformation)} is invoked for the
-     * first animation frame. This can is useful for short animations.
+     * The specified dimension holds a float and should be multiplied by the
+     * height or width of the parent of the object being animated.
      */
-    enum
-    {
-        START_ON_FIRST_FRAME = -1,
-    };
+    RELATIVE_TO_SELF = 1,
+    /**
+     * The specified dimension holds a float and should be multiplied by the
+     * height or width of the parent of the object being animated.
+     */
+    RELATIVE_TO_PARENT = 2,
+} AniValueType;
 
-    typedef enum AniValueType
-    {
-        /**
-         * The specified dimension is an ABSOLUTE_VALUE number of pixels.
-         */
-        ABSOLUTE_VALUE = 0,
-        /**
-         * The specified dimension holds a float and should be multiplied by the
-         * height or width of the parent of the object being animated.
-         */
-        RELATIVE_TO_SELF = 1,
-        /**
-         * The specified dimension holds a float and should be multiplied by the
-         * height or width of the parent of the object being animated.
-         */
-        RELATIVE_TO_PARENT = 2,
-    }AniValueType;
-
-    typedef enum ZAdjustment
-    {
-        /**
-         * Requests that the content being animated be kept in its current Z
-         * order.
-         */
-        ZORDER_NORMAL = 0,
-        /**
-         * Requests that the content being animated be forced on top of all other
-         * content for the duration of the animation.
-         */
-        ZORDER_TOP = 1,
-        /**
-         * Requests that the content being animated be forced under all other
-         * content for the duration of the animation.
-         */
-        ZORDER_BOTTOM = -1
-    }ZAdjustment;
+typedef enum ZAdjustment
+{
+    /**
+     * Requests that the content being animated be kept in its current Z
+     * order.
+     */
+    ZORDER_NORMAL = 0,
+    /**
+     * Requests that the content being animated be forced on top of all other
+     * content for the duration of the animation.
+     */
+    ZORDER_TOP = 1,
+    /**
+     * Requests that the content being animated be forced under all other
+     * content for the duration of the animation.
+     */
+    ZORDER_BOTTOM = -1
+} ZAdjustment;
 
 #undef INTERFACE
 #define INTERFACE IAnimation
@@ -515,7 +514,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return True if the animation is still running
      */
     STDMETHOD_(BOOL, getTransformation)
-    (THIS_ int64_t currentTime, ITransformation  *outTransformation) PURE;
+    (THIS_ int64_t currentTime, ITransformation * outTransformation) PURE;
 
     /**
      * <p>Indicates whether this animation has started or not.</p>

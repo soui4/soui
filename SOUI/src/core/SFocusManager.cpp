@@ -5,8 +5,7 @@
 
 #pragma warning(disable : 4800)
 
-namespace SOUI
-{
+SNSBEGIN
 
 FocusSearch::FocusSearch(SWindow *root, bool cycle)
     : root_(root)
@@ -457,4 +456,4 @@ bool SFocusManager::ProcessAccelerator(const IAccelerator *pAcc)
     }
     return false;
 }
-} // end of namespace SOUI
+SNSEND

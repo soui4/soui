@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "control/SComboBase.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 const wchar_t *KStyle_Dropdown = L"dropdownStyle"; //下拉列表风格，只包含root节点
 const wchar_t *KStyle_Edit = L"editStyle";         //编辑框风格
@@ -710,4 +709,4 @@ SStringT SComboBase::GetLBText(int iItem, BOOL bRawText /*= FALSE*/)
     return str;
 }
 
-} // namespace SOUI
+SNSEND

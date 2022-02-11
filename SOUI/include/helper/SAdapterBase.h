@@ -4,8 +4,7 @@
 #include <souicoll.h>
 #include "control/STree.h"
 
-namespace SOUI
-{
+SNSBEGIN
 class SLvObserverMgr {
   public:
     SLvObserverMgr()
@@ -145,7 +144,6 @@ class LvAdatperImpl : public BaseClass {
     {
         return getCount() <= 0;
     }
-
 
     STDMETHOD_(SStringW, getItemDesc)(int position)
     {
@@ -449,7 +447,8 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return pItem->GetDesiredSize(wid, hei);
     }
 
-    STDMETHOD_(SIZE, getViewDesiredSize)(HSTREEITEM hItem, IWindow *pItem, int wid, int hei) OVERRIDE
+    STDMETHOD_(SIZE, getViewDesiredSize)
+    (HSTREEITEM hItem, IWindow *pItem, int wid, int hei) OVERRIDE
     {
         SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pItem);
         return getViewDesiredSize(hItem, pItemPanel, wid, hei);
@@ -603,4 +602,4 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
     CSTree<ItemInfo> m_tree;
     ULONG_PTR m_rootUserData[DATA_INDEX_NUMBER];
 };
-} // namespace SOUI
+SNSEND

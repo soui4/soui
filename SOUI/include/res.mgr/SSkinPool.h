@@ -21,8 +21,7 @@
 #define GETBUILTINSKIN2(p1, scale) SOUI::SSkinPoolMgr::getSingleton().GetBuiltinSkin(p1, scale)
 #define GETSKINPOOLMGR             SOUI::SSkinPoolMgr::getSingletonPtr()
 #define GETTEMPLATEPOOLMR          SOUI::STemplatePoolMgr::getSingletonPtr()
-namespace SOUI
-{
+SNSBEGIN
 //系统内置皮肤名称
 enum SYS_SKIN
 {
@@ -221,4 +220,4 @@ class SOUI_EXP SSkinPoolMgr : public SSingleton2<SSkinPoolMgr> {
     SAutoRefPtr<SSkinPool> m_userSkinPool;
 };
 
-} // namespace SOUI
+SNSEND

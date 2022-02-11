@@ -3,8 +3,7 @@
 #include "interface/slayout-i.h"
 #include "SLinearLayoutParamStruct.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SLinearLayoutParam
     : public TObjRefImpl<SObjectImpl<ILayoutParam>>
@@ -107,4 +106,4 @@ class SHBox : public SLinearLayout {
         m_orientation = Horz;
     }
 };
-} // namespace SOUI
+SNSEND

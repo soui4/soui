@@ -1,8 +1,7 @@
 #include <souistd.h>
 #include <core\STimerlineHandlerMgr.h>
 
-namespace SOUI
-{
+SNSBEGIN
 STimerlineHandlerMgr::STimerlineHandlerMgr(void)
 {
 }
@@ -53,4 +52,4 @@ bool STimerlineHandlerMgr::IsEmpty() const
     return m_mapHandlers.IsEmpty();
 }
 
-} // namespace SOUI
+SNSEND

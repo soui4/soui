@@ -14,20 +14,20 @@ SNSBEGIN
 #define INTERFACE ISouiFactory
 DECLARE_INTERFACE_(ISouiFactory, IObjRef)
 {
-	//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) PURE;
+    //!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) PURE;
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	//!释放对象
-	/*!
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     STDMETHOD_(HRESULT, CreateApp)
     (THIS_ IApplication * *ppRet, IRenderFactory * pRenderFac, HMODULE hInst,
@@ -38,20 +38,20 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
     STDMETHOD_(HRESULT, CreateStringA)(THIS_ IStringA * *ppRet, LPCSTR pszSrc) PURE;
     STDMETHOD_(HRESULT, CreateStringW)(THIS_ IStringW * *ppRet, LPCWSTR pszStr) PURE;
     STDMETHOD_(HRESULT, CreateXmlDoc)(THIS_ IXmlDoc * *ppRet) PURE;
-	STDMETHOD_(HRESULT, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType, IObjRef **pObj) PURE;
-	STDMETHOD_(HRESULT, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx,IEvtSlot **ppSlot) PURE;
+    STDMETHOD_(HRESULT, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType, IObjRef * *pObj) PURE;
+    STDMETHOD_(HRESULT, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx, IEvtSlot **ppSlot) PURE;
 };
 
 SNSEND
 
 #ifdef DLL_CORE
-# ifdef SOUI_EXPORTS
-#   define SOUI_EXP __declspec(dllexport)
-# else
-#   define SOUI_EXP __declspec(dllimport)
-# endif // SOUI_EXPORTS
+#ifdef SOUI_EXPORTS
+#define SOUI_EXP __declspec(dllexport)
 #else
-#   define SOUI_EXP
+#define SOUI_EXP __declspec(dllimport)
+#endif // SOUI_EXPORTS
+#else
+#define SOUI_EXP
 #endif
 
 EXTERN_C HRESULT SOUI_EXP CreateSouiFactory(IObjRef **ppRet);

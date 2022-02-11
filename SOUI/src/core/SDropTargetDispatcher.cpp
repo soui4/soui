@@ -2,8 +2,7 @@
 #include "core/SDropTargetDispatcher.h"
 #include "core/SwndContainerImpl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SDropTargetDispatcher::SDropTargetDispatcher()
     : m_pDataObj(NULL)
     , m_hHover(0)
@@ -127,4 +126,4 @@ POINT SDropTargetDispatcher::PointL2FrameClient(const POINTL &pt)
     return pt2;
 }
 
-} // namespace SOUI
+SNSEND

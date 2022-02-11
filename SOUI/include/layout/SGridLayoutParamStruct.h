@@ -2,8 +2,7 @@
 
 #include "SLayoutSize.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 enum GridGravity
 {
@@ -33,4 +32,4 @@ struct SGridLayoutParamStruct
     float fRowWeight;           /**< 网格高度的加权 */
 };
 
-} // namespace SOUI
+SNSEND

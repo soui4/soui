@@ -14,8 +14,7 @@
 #include <core/SWnd.h>
 #include <helper/SplitString.h>
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  * @class     STabPage
  * @brief     tab标签页面
@@ -510,4 +509,4 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
     SOUI_ATTRS_END()
 };
 
-} // namespace SOUI
+SNSEND

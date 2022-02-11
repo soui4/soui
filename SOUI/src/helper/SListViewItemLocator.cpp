@@ -6,8 +6,7 @@
 #include <math.h>               // this is where I would normally get the warning message
 #pragma warning(pop)
 
-namespace SOUI
-{
+SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 // SListViewItemLocatorFix
 SListViewItemLocatorFix::SListViewItemLocatorFix(SLayoutSize nItemHei, SLayoutSize nDividerSize)
@@ -349,4 +348,4 @@ HSTREEITEM SListViewItemLocatorFlex::Offset2Branch(HSTREEITEM hParent, int nOffs
     }
     return NULL;
 }
-} // namespace SOUI
+SNSEND

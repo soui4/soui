@@ -10,8 +10,7 @@
 #define POSFLAG_PERCENT      '%' //采用在父窗口的百分比定义坐标
 #define POSFLAG_SIZE         '@' //在pos属性中定义窗口的size，只在在定义x2,y2时有效
 
-namespace SOUI
-{
+SNSBEGIN
 
 //坐标类型
 enum PIT
@@ -52,4 +51,4 @@ struct SouiLayoutParamStruct
     SLayoutSize width;  /**<使用width属性定义的宽 nCount==0 时有效*/
     SLayoutSize height; /**<使用height属性定义的高 nCount==0 时有效*/
 };
-} // namespace SOUI
+SNSEND

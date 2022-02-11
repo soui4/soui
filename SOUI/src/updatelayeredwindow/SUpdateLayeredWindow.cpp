@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "SUpdateLayeredWindow.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 typedef BOOL(WINAPI *FunUpdateLayeredWindow)(HWND hwnd,
                                              HDC hdcDst,
@@ -60,4 +59,4 @@ BOOL WINAPI SWndSurface::SUpdateLayeredWindowIndirect(HWND hWnd,
     return bRet;
 }
 
-} // namespace SOUI
+SNSEND

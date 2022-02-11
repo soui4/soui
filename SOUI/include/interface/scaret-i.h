@@ -165,7 +165,6 @@ DECLARE_INTERFACE_(ICaret, IObject)
 
     //-----------------------------------------------------------------------------------
 
-
     STDMETHOD_(BOOL, Init)(THIS_ HBITMAP hBmp, int nWid, int nHei) PURE;
 
     STDMETHOD_(void, SetPosition)(THIS_ int x, int y) PURE;

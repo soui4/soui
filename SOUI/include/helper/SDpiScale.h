@@ -1,6 +1,5 @@
 #pragma once
-namespace SOUI
-{
+SNSBEGIN
 class SOUI_EXP SDpiScale {
   public:
     static int GetBuiltinScaleCount();
@@ -18,4 +17,4 @@ class SOUI_EXP SDpiScale {
     static int NormalizeScale(int nScale);
 };
 
-} // namespace SOUI
+SNSEND

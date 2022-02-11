@@ -1,8 +1,7 @@
 #include <souistd.h>
 #include <helper/STime.h>
 
-namespace SOUI
-{
+SNSBEGIN
 static const int kMaxTimeBufferSize = 128;
 
 STimeSpan::STimeSpan()
@@ -360,4 +359,4 @@ SStringT STime::Format(LPCTSTR pszFormat) const
 
     return szBuffer;
 }
-} // namespace SOUI
+SNSEND

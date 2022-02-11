@@ -5,8 +5,7 @@
 #include "interface/SAdapter-i.h"
 #include "interface/STreeViewItemLocator-i.h"
 
-namespace SOUI
-{
+SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 class SOUI_EXP STreeViewItemLocator : public TObjRefImpl<ITreeViewItemLocator> {
   public:
@@ -205,4 +204,4 @@ class SOUI_EXP STreeView
 
     BOOL m_bWantTab; /**< want tab */
 };
-} // namespace SOUI
+SNSEND

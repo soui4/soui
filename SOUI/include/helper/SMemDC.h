@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SOUI_EXP SMemDC {
   public:
@@ -43,4 +42,4 @@ class SOUI_EXP SMemDC {
     BOOL m_bHasBitmap;
 };
 
-} // namespace SOUI
+SNSEND

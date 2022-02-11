@@ -10,7 +10,7 @@ typedef enum _SObjectType
     Window,
     Skin,
     Layout,
-	Event,
+    Event,
     Interpolator,
     Animation,
     ValueAnimator,

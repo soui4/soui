@@ -7,8 +7,7 @@
 #include "souistd.h"
 #include "control/STreeCtrl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 STreeCtrl::STreeCtrl()
     : m_nItemHei(20)
@@ -1465,4 +1464,4 @@ HSTREEITEM STreeCtrl::GetNextItem(HSTREEITEM hItem) const
     return CSTree<LPTVITEM>::GetNextItem(hItem);
 }
 
-} // namespace SOUI
+SNSEND

@@ -2,8 +2,8 @@
 #include "core/SHostDialog.h"
 #include "core/SMsgLoop.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
 #define RC_INIT 0xcccccccc
 
 SHostDialog::SHostDialog(LPCTSTR pszXmlName)
@@ -119,4 +119,4 @@ void SHostDialog::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     }
 }
 
-} // namespace SOUI
+SNSEND

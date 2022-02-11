@@ -2,8 +2,7 @@
 
 #include "SAccProxyWindow.h"
 
-namespace SOUI
-{
+SNSBEGIN
 #ifdef SOUI_ENABLE_ACC
 class SOUI_EXP SAccProxyButton : public SAccProxyWindow {
   public:
@@ -70,4 +69,4 @@ class SOUI_EXP SAccProxySlideBar : public SAccProxyProgress {
     virtual STDMETHODIMP get_accRole(VARIANT *pvarRole);
 };
 #endif
-} // namespace SOUI
+SNSEND

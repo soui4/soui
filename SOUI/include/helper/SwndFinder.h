@@ -2,8 +2,7 @@
 
 #include <core/SSingleton2.h>
 
-namespace SOUI
-{
+SNSBEGIN
 class SFindInfo {
   public:
     SFindInfo(SWindow *pParent, const SStringW &strName, int nDeep);
@@ -93,4 +92,4 @@ class SWindowFinder : public SSingleton2<SWindowFinder> {
     FINDCACHE m_findCache;
 };
 
-} // namespace SOUI
+SNSEND

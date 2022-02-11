@@ -10,8 +10,7 @@
 #include <res.mgr/SObjDefAttr.h>
 #include <res.mgr/SNamedValue.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 struct IUiDefInfo : IObjRef
 {
@@ -60,4 +59,4 @@ class SOUI_EXP SUiDef : public SSingleton2<SUiDef> {
     SAutoRefPtr<IUiDefInfo> m_pCurUiDef;
 };
 
-} // namespace SOUI
+SNSEND

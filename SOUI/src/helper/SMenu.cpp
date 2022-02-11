@@ -5,8 +5,7 @@
 #include "gdialpha.h"
 #include <souicoll.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 SMenuItemData::SMenuItemData()
     : iIcon(-1)
@@ -604,4 +603,4 @@ void SMenu::SetIconSkin(SAutoRefPtr<ISkinObj> icons)
     m_icons = icons;
 }
 
-} // namespace SOUI
+SNSEND

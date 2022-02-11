@@ -7,8 +7,7 @@
 #include <souistd.h>
 #include "matrix/SCamera.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  *  Use to cast a pointer to a different type, and maintaining strict-aliasing
@@ -641,4 +640,4 @@ void SCamera::getMatrix(SMatrix *out) const
     return m_priv->getMatrix(out);
 }
 
-} // end of namespace SOUI
+SNSEND

@@ -5,8 +5,7 @@
 #include <math.h>               // this is where I would normally get the warning message
 #pragma warning(pop)
 
-namespace SOUI
-{
+SNSBEGIN
 static const wchar_t *kUnitMap[] = {
     L"px",
     L"dp",
@@ -178,4 +177,4 @@ SLayoutSize::Unit SLayoutSize::unitFromString(const SStringW &strUnit)
 }
 
 SLayoutSize::Unit SLayoutSize::defUnit = SLayoutSize::px;
-} // namespace SOUI
+SNSEND

@@ -19,8 +19,7 @@
 #include "souistd.h"
 #include "SAxContainer.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SAxContainer::SAxContainer()
     : m_lRefCnt(1)
@@ -179,4 +178,4 @@ HRESULT SAxContainer::QueryService(REFGUID guidService, REFIID riid, void **ppvO
     return hr;
 }
 
-} // end of namespace SOUI
+SNSEND

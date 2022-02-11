@@ -6,8 +6,7 @@
 #include "res.mgr/SNamedValue.h"
 #include "core/swndstyle.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -178,4 +177,4 @@ void SNamedID::Init3(const LPCWSTR *pNames, const int *nIDs, int nCount, BOOL bS
     }
 }
 
-} // namespace SOUI
+SNSEND

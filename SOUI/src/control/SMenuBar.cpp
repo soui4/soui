@@ -3,8 +3,7 @@
 
 #define TIMER_POP 10
 
-namespace SOUI
-{
+SNSBEGIN
 HHOOK SMenuBar::m_hMsgHook = NULL;
 SMenuBar *SMenuBar::m_pMenuBar = NULL;
 
@@ -381,4 +380,4 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
     }
     return CallNextHookEx(m_hMsgHook, code, wParam, lParam);
 }
-} // namespace SOUI
+SNSEND

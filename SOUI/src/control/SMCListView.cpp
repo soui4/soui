@@ -5,8 +5,7 @@
 #pragma warning(disable : 4267 4018)
 
 #define ITEM_MARGIN 4
-namespace SOUI
-{
+SNSBEGIN
 class SMCListViewDataSetObserver : public TObjRefImpl<ILvDataSetObserver> {
   public:
     SMCListViewDataSetObserver(SMCListView *pView)
@@ -1372,4 +1371,4 @@ IHeaderCtrl *SMCListView::GetIHeaderCtrl() const
     return GetHeaderCtrl();
 }
 
-} // namespace SOUI
+SNSEND

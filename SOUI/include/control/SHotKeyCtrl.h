@@ -14,8 +14,7 @@
 #include "core/SWnd.h"
 #include "core/SAccelerator.h"
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  * @class      SHotKeyCtrl
  * @brief      热键控件
@@ -205,5 +204,4 @@ class SOUI_EXP SHotKeyCtrl
 
     BOOL m_bInSetting; /**< 正在设置中 */
 };
-} // namespace SOUI
-// namespace SOUI
+SNSEND

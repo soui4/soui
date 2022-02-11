@@ -19,8 +19,7 @@
 #define GWL_WNDPROC GWLP_WNDPROC
 #endif //_WIN64
 
-namespace SOUI
-{
+SNSBEGIN
 
 const TCHAR CoolMenu_oldProc[] = _T("CoolMenu_oldProc");
 
@@ -338,4 +337,4 @@ void SMenuWndHook::OnWindowPosChanged()
         */
 }
 
-} // namespace SOUI
+SNSEND

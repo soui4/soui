@@ -1,8 +1,7 @@
 ﻿#pragma once
 
 #include "SLayoutSize.h"
-namespace SOUI
-{
+SNSBEGIN
 enum Gravity
 {
     G_Undefined = -1,
@@ -22,4 +21,4 @@ struct SLinearLayoutParamStruct
     float weight;
     Gravity gravity;
 };
-} // namespace SOUI
+SNSEND

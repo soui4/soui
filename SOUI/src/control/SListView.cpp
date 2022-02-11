@@ -2,8 +2,7 @@
 #include "control/SListView.h"
 #include "helper/SListViewItemLocator.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SListViewDataSetObserver : public TObjRefImpl<ILvDataSetObserver> {
   public:
@@ -1118,4 +1117,4 @@ IItemPanel *SListView::HitTest(const POINT *pt) const
     return HitTest(CPoint(*pt));
 }
 
-} // namespace SOUI
+SNSEND

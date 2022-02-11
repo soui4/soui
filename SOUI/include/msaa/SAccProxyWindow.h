@@ -1,8 +1,7 @@
 #pragma once
 #include "interface/saccproxy-i.h"
 
-namespace SOUI
-{
+SNSBEGIN
 #ifdef SOUI_ENABLE_ACC
 class SOUI_EXP SAccProxyWindow : public TObjRefImpl<IAccProxy> {
   public:
@@ -34,4 +33,4 @@ class SOUI_EXP SAccProxyWindow : public TObjRefImpl<IAccProxy> {
 };
 
 #endif
-} // namespace SOUI
+SNSEND

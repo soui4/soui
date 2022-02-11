@@ -34,11 +34,10 @@
 #define LOG4Z_FORMAT_INPUT_ENABLE
 #endif
 
-namespace SOUI
-{
+SNSBEGIN
 class Log4zBinary;
 class Log4zStream;
-} // namespace SOUI
+SNSEND
 
 //! base micro.
 #define SOUI_LOG_STREAM(id_or_name, filter, level, log)                                           \
@@ -196,8 +195,7 @@ inline void empty_log_format_function2(const char *tag, const wchar_t *fmt, ...)
 #define LOGFMTF      LOGFMTT
 #endif
 
-namespace SOUI
-{
+SNSBEGIN
 //! optimze from std::stringstream to Log4zStream
 #if defined(WIN32) || defined(_WIN64)
 #pragma warning(push)
@@ -456,4 +454,4 @@ inline Log4zStream &Log4zStream::writeWString(const wchar_t *t)
 #pragma warning(pop)
 #endif
 
-} // end of namespace SOUI
+SNSEND

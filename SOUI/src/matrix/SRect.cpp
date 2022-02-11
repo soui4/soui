@@ -9,8 +9,7 @@
 #include <souistd.h>
 #include "matrix/SRect.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 void SRect::sort()
 {
@@ -147,4 +146,4 @@ bool SQuad::contains(const SPoint &pt) const
     return bRet;
 }
 
-} // end of namespace SOUI
+SNSEND

@@ -23,8 +23,7 @@ static char THIS_FILE[] = __FILE__;
 /////////////////////////////////////////////////////////////////////////////
 // SCalendarCore
 
-namespace SOUI
-{
+SNSBEGIN
 
 extern WORD gLunarMonthDay[];
 extern BYTE gLunarMonth[];
@@ -1143,4 +1142,4 @@ void SCalendar::GetItemRect(int nItem, CRect &rcItem)
     rcItem.bottom = rcItem.top + nItemHeight;
     rcItem.OffsetRect(m_rcDays.TopLeft());
 }
-} // namespace SOUI
+SNSEND

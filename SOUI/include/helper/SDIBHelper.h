@@ -2,8 +2,7 @@
 
 #include "interface/SRender-i.h"
 
-namespace SOUI
-{
+SNSBEGIN
 /// <summary>
 ///		简洁版本，简版去掉了对8、16、24位的支持,
 /// </summary>
@@ -22,4 +21,4 @@ class SOUI_EXP SDIBHelper {
     static COLORREF CalcAvarageColor(IBitmapS *pBmp, int nPercent = 90, int nBlockSize = 5);
 };
 
-} // namespace SOUI
+SNSEND

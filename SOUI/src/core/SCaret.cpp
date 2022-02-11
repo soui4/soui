@@ -2,8 +2,7 @@
 #include "core\SCaret.h"
 #include "animation\SInterpolatorImpl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SCaret::SCaret(ISwndContainer *pContainer)
     : m_pContainer(pContainer)
@@ -171,4 +170,4 @@ void SCaret::Invalidate()
     }
 }
 
-} // namespace SOUI
+SNSEND

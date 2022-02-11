@@ -2,8 +2,7 @@
 
 #include "core/SSingletonMap.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 struct SCRIPTTIMERINFO
 {
@@ -24,4 +23,4 @@ class SScriptTimer : public SSingletonMap<SScriptTimer, SCRIPTTIMERINFO, UINT_PT
     static VOID CALLBACK _TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 };
 
-} // namespace SOUI
+SNSEND

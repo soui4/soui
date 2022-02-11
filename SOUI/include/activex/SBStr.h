@@ -10,8 +10,7 @@
 typedef WCHAR char16;
 typedef unsigned int uint32;
 
-namespace SOUI
-{
+SNSBEGIN
 
 // Manages a BSTR string pointer.
 // The class interface is based on scoped_ptr.
@@ -94,6 +93,6 @@ class SOUI_EXP sbstr {
     DISALLOW_COPY_AND_ASSIGN(sbstr);
 };
 
-} // namespace SOUI
+SNSEND
 
 #endif //__SBSTR_H__

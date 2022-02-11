@@ -1,8 +1,7 @@
 ﻿#include "include\souistd.h"
 #include "control\SSpinButtonCtrl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SSpinButtonCtrl::SSpinButtonCtrl(void)
     : m_pDownSkin(GETBUILTINSKIN(SKIN_SYS_SPIN_DOWN))
     , m_pUpSkin(GETBUILTINSKIN(SKIN_SYS_SPIN_UP))
@@ -85,7 +84,7 @@ void SSpinButtonCtrl::OnValueChanged(bool bInit)
     SWindow *pBuddy = GetBuddy();
     if (pBuddy)
     {
-		SStringT strValue = SStringT().Format(_T("%d"), m_nValue);
+        SStringT strValue = SStringT().Format(_T("%d"), m_nValue);
         EventSpinValue2String evt(this);
         evt.bInit = bInit;
         evt.nValue = m_nValue;
@@ -183,7 +182,7 @@ BOOL SSpinButtonCtrl::OnBuddyChange(IEvtArgs *pEvt)
         {
             m_nValue = nValue;
 
-			SStringT strValue = SStringT().Format(_T("%d"), m_nValue);
+            SStringT strValue = SStringT().Format(_T("%d"), m_nValue);
             EventSpinValue2String evt(this);
             evt.bInit = false;
             evt.nValue = m_nValue;
@@ -237,4 +236,4 @@ void SSpinButtonCtrl::OnClick()
     OnValueChanged();
 }
 
-} // namespace SOUI
+SNSEND

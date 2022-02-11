@@ -12,9 +12,9 @@ DECLARE_INTERFACE(IHostMsgHandler)
      * @param uMsg UINT--消息ID
      * @param wp WPARAM--消息参数1
      * @param lp LPARAM--消息参数2
-     * @return 
+     * @return
      * @remark 目前只修改系统字体时使用
-    */
+     */
     STDMETHOD_(void, OnHostMsg)(THIS_ BOOL bRelayout, UINT uMsg, WPARAM wp, LPARAM lp) PURE;
 };
 

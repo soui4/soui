@@ -14,7 +14,6 @@ static const TCHAR KTypeCursor[] = _T("CURSOR");
 static const TCHAR KTypeIcon[] = _T("ICON");
 static const TCHAR KTypeHtml[] = _T("HTML");
 
-
 //////////////////////////////////////////////////////////////////////////
 IBitmapS *SResLoadFromMemory::LoadImage(LPVOID pBuf, size_t size)
 {
@@ -430,6 +429,5 @@ void SResProviderFiles::EnumResource(EnumResCallback funEnumCB, LPARAM lp)
             break;
     }
 }
-
 
 SNSEND

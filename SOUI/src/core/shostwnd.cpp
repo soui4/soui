@@ -11,8 +11,7 @@
 #include <Imm.h>
 #pragma comment(lib, "imm32.lib")
 
-namespace SOUI
-{
+SNSBEGIN
 
 #define KConstDummyPaint 0x80000000
 
@@ -230,7 +229,7 @@ void SRootWindow::UpdateLayout()
 
 HRESULT SRootWindow::OnLanguageChanged()
 {
-	SStringW str = tr(m_pHostWnd->m_hostAttr.m_strTitle);
+    SStringW str = tr(m_pHostWnd->m_hostAttr.m_strTitle);
     m_pHostWnd->SetWindowText(str);
     return 3;
 }
@@ -484,7 +483,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 
     ModifyStyle(0, dwStyle);
     ModifyStyleEx(0, dwExStyle);
-	m_pRoot->OnLanguageChanged();
+    m_pRoot->OnLanguageChanged();
 
     if (m_hostAttr.m_hAppIconSmall)
     {
@@ -1952,4 +1951,4 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
     }
 }
 
-} // namespace SOUI
+SNSEND

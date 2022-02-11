@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 class SOUI_EXP SAppDir {
   public:
     SAppDir(HINSTANCE hInst);
@@ -12,4 +11,4 @@ class SOUI_EXP SAppDir {
     SStringT m_strAppPath;
 };
 
-} // namespace SOUI
+SNSEND

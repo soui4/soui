@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "helper/SScriptTimer.h"
 
-namespace SOUI
-{
+SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 //  SScriptTimer
 template <>
@@ -55,4 +54,4 @@ UINT SScriptTimer::SetTimer(HWND hwnd, const SStringA &strScriptFunc, UINT nElap
     return (UINT)uID;
 }
 
-} // namespace SOUI
+SNSEND

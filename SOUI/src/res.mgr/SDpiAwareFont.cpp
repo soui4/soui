@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "res.mgr/SDpiAwareFont.h"
 
-namespace SOUI
-{
+SNSBEGIN
 static const SStringW KNoneFont = L"none";
 SDpiAwareFont::SDpiAwareFont(void)
     : m_strDesc(KNoneFont)
@@ -35,4 +34,4 @@ IFontS *SDpiAwareFont::OnGetFont(const SStringW &strDesc, int nScale)
 {
     return SFontPool::getSingleton().GetFont(strDesc, nScale);
 }
-} // namespace SOUI
+SNSEND

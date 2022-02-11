@@ -26,8 +26,7 @@
  *
  * Describe    用于实现一个font map
  */
-namespace SOUI
-{
+SNSBEGIN
 /**
  * @class     CElementTraits< FontKey >
  * @brief      FontKey的Hash及比较模板
@@ -124,4 +123,4 @@ class SOUI_EXP SFontPool : public SSingletonMap<SFontPool, IFontPtr, FontInfo> {
     SCriticalSection m_cs;
 };
 
-} // namespace SOUI
+SNSEND

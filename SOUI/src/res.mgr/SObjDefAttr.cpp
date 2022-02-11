@@ -2,8 +2,7 @@
 #include "res.mgr/SObjDefAttr.h"
 #include "SApp.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 BOOL SObjDefAttr::Init(SXmlNode xmlNode)
 {
@@ -68,4 +67,4 @@ SXmlNode SObjDefAttr::GetDefAttribute(LPCWSTR pszClassName)
     }
 }
 
-} // namespace SOUI
+SNSEND

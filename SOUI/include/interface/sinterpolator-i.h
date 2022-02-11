@@ -7,7 +7,7 @@ SNSBEGIN
 DECLARE_INTERFACE_(IInterpolator, IObject)
 {
 
-   //!添加引用
+    //!添加引用
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;

@@ -1,8 +1,7 @@
 #include <include\souistd.h>
 #include <helper\SHostMgr.h>
 
-namespace SOUI
-{
+SNSBEGIN
 SHostMgr::SHostMgr(void)
 {
 }
@@ -37,4 +36,4 @@ void SHostMgr::DispatchMessage(BOOL bRelayout, UINT uMsg, WPARAM wp, LPARAM lp)
     }
 }
 
-} // namespace SOUI
+SNSEND

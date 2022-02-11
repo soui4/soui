@@ -15,8 +15,7 @@
 #define HIMETRIC_PER_INCH 2540
 #endif
 
-namespace SOUI
-{
+SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 //  STextServiceHelper
@@ -1783,4 +1782,4 @@ HRESULT SEdit::OnLanguageChanged()
     return hr;
 }
 
-} // namespace SOUI
+SNSEND

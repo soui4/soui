@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "control/STreeView.h"
 
-namespace SOUI
-{
+SNSBEGIN
 class STreeViewDataSetObserver : public TObjRefImpl<ITvDataSetObserver> {
   public:
     STreeViewDataSetObserver(STreeView *pView)
@@ -89,8 +88,8 @@ BOOL STreeViewItemLocator::_IsItemVisible(HSTREEITEM hItem) const
 }
 
 HSTREEITEM STreeViewItemLocator::_Position2Item(int position,
-                                               HSTREEITEM hParent,
-                                               int nParentPosition) const
+                                                HSTREEITEM hParent,
+                                                int nParentPosition) const
 {
     if (position < nParentPosition
         || position >= (nParentPosition + _GetItemVisibleHeight(hParent)))
@@ -1383,4 +1382,4 @@ HSTREEITEM STreeView::GetSel() const
     return m_hSelected;
 }
 
-} // namespace SOUI
+SNSEND

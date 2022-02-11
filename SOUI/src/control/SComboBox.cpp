@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "control/SComboBox.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 SComboBox::SComboBox()
@@ -204,4 +203,4 @@ IListBox *SComboBox::GetIListBox(THIS)
     return GetListBox();
 }
 
-} // namespace SOUI
+SNSEND

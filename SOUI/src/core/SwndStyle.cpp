@@ -7,8 +7,7 @@
 #include "core/Swnd.h"
 #include "helper/SplitString.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SwndStyle::SwndStyle()
     : m_uAlign(Align_Center)
@@ -183,4 +182,4 @@ void SwndStyle::UpdateFont()
     }
 }
 
-} // namespace SOUI
+SNSEND

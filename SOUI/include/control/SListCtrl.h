@@ -14,8 +14,7 @@
 #include "core/SPanel.h"
 #include "SHeaderCtrl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  * @enum
  * @brief     类型
@@ -604,4 +603,4 @@ class SOUI_EXP SListCtrl : public SPanel {
     SOUI_MSG_MAP_END()
 };
 
-} // namespace SOUI
+SNSEND

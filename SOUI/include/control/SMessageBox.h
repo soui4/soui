@@ -13,8 +13,7 @@
 #pragma once
 #include <core/shostdialog.h>
 #include <helper/SDpiHelper.hpp>
-namespace SOUI
-{
+SNSBEGIN
 //下面是几个在msgbox模板中必须指定的ID。
 #define NAME_MSGBOX_BTNSWITCH L"btnSwitch" //一个包含3个页面的tabctrl
 #define NAME_MSGBOX_TEXT      L"msgtext"   //文本控件，只需要指定两个坐标
@@ -108,4 +107,4 @@ class SOUI_EXP SMessageBoxImpl
     END_MSG_MAP()
 };
 
-} // namespace SOUI
+SNSEND

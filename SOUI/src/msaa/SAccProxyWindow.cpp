@@ -1,8 +1,7 @@
 #include "souistd.h"
 #include "msaa\SAccProxyWindow.h"
 
-namespace SOUI
-{
+SNSBEGIN
 #ifdef SOUI_ENABLE_ACC
 /////////////////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP SAccProxyWindow::get_accName(BSTR *pszName)
@@ -113,4 +112,4 @@ STDMETHODIMP SAccProxyWindow::put_accValue(BSTR szValue)
 }
 
 #endif
-} // namespace SOUI
+SNSEND

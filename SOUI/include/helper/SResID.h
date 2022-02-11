@@ -3,8 +3,7 @@
 #include <tchar.h>
 #define MAX_RES_TYPE 30  //资源类型预定义，最大长度不超过10
 #define MAX_RES_NAME 100 //注意：给资源令名时，最大长度不要超过MAX_RES_NAME
-namespace SOUI
-{
+SNSBEGIN
 
 class SResID {
   public:
@@ -61,4 +60,4 @@ class CElementTraits<SResID> : public CElementTraitsBase<SResID> {
     }
 };
 
-} // end of namespace SOUI
+SNSEND

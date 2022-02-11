@@ -1,6 +1,5 @@
 #pragma once
-namespace SOUI
-{
+SNSBEGIN
 
 struct IScrollBarHost
 {
@@ -105,4 +104,4 @@ class SOUI_EXP SScrollBarHandler : ITimelineHandler {
     int m_nClickPos;
 };
 
-} // namespace SOUI
+SNSEND

@@ -16,8 +16,7 @@
 #include <TextServ.h>
 #include "core/SPanel.h"
 #include "core/SSingleton2.h"
-namespace SOUI
-{
+SNSBEGIN
 enum
 {
     MENU_CUT = 1,
@@ -1287,4 +1286,4 @@ class SOUI_EXP SEdit : public SRichEdit {
     COLORREF m_crCue;
     STrText m_strCue;
 };
-} // namespace SOUI
+SNSEND

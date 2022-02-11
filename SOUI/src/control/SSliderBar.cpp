@@ -1,7 +1,6 @@
 ﻿#include "souistd.h"
 #include "control/SSliderBar.h"
-namespace SOUI
-{
+SNSBEGIN
 
 #define TIMERID_NOTIFY1 1
 #define TIMERID_DELAY1  2
@@ -296,4 +295,4 @@ void SSliderBar::OnScaleChanged(int scale)
     GetScaleSkin(m_pSkinThumb, scale);
 }
 
-} // namespace SOUI
+SNSEND

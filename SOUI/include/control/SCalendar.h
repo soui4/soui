@@ -14,8 +14,7 @@
 #pragma once
 #include "core/SWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  * @class      SCalendarCore
  * @brief      日历核心类
@@ -266,4 +265,4 @@ class SOUI_EXP SCalendar : public SWindow {
     };
     wMonthOrYearInfo m_arrMonthOrYear[12];
 };
-} // namespace SOUI
+SNSEND

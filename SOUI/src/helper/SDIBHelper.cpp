@@ -3,8 +3,7 @@
 
 #define RGB2GRAY(r, g, b) (((b)*117 + (g)*601 + (r)*306) >> 10)
 
-namespace SOUI
-{
+SNSBEGIN
 struct DIBINFO
 {
     LPBYTE pBits;
@@ -380,4 +379,4 @@ COLORREF SDIBHelper::CalcAvarageColor(IBitmapS *pBmp, int nPercent, int nBlockSi
     return RGB(r, g, b);
 }
 
-} // namespace SOUI
+SNSEND

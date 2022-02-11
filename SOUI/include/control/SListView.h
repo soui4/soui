@@ -3,8 +3,7 @@
 #include "core/SItemPanel.h"
 #include "interface/SAdapter-i.h"
 #include "interface/SListViewItemLocator-i.h"
-namespace SOUI
-{
+SNSBEGIN
 
 class SOUI_EXP SListView
     : public TPanelProxy<IListView>
@@ -146,4 +145,4 @@ class SOUI_EXP SListView
     BOOL m_bWantTab;
     BOOL m_bVertical;
 };
-} // namespace SOUI
+SNSEND

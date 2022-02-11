@@ -2,8 +2,7 @@
 #include "helper\SMenuEx.h"
 #include "helper\SplitString.h"
 #include <layout/SLinearLayout.h>
-namespace SOUI
-{
+SNSBEGIN
 #define TIMERID_POPSUBMENU 100
 #define TIME_PUPSUBMENU    500
 
@@ -1345,4 +1344,4 @@ void SMenuEx::SetContextHelpId(DWORD dwId)
     pMenuRoot->m_dwContextHelpId = dwId;
 }
 
-} // namespace SOUI
+SNSEND

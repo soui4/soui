@@ -16,8 +16,7 @@
 
 #define SToBool(cond) ((cond) != 0)
 
-namespace SOUI
-{
+SNSBEGIN
 
 /** \class SkMatrix
 
@@ -26,7 +25,9 @@ namespace SOUI
     using either reset() - to construct an identity matrix, or one of the set
     functions (e.g. setTranslate, setRotate, etc.).
 */
-class SOUI_EXP SMatrix : public IxForm ,public IMatrix{
+class SOUI_EXP SMatrix
+    : public IxForm
+    , public IMatrix {
   public:
     SMatrix()
     {
@@ -71,28 +72,28 @@ class SOUI_EXP SMatrix : public IxForm ,public IMatrix{
         return *this;
     }
 
-public:
-	STDMETHOD_(IxForm *,Data)(THIS) SCONST OVERRIDE;
+  public:
+    STDMETHOD_(IxForm *, Data)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void,reset)(THIS) OVERRIDE;
+    STDMETHOD_(void, reset)(THIS) OVERRIDE;
 
-	STDMETHOD_(void,setIdentity)(THIS) OVERRIDE;
+    STDMETHOD_(void, setIdentity)(THIS) OVERRIDE;
 
-	STDMETHOD_(BOOL,isIdentity)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, isIdentity)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(void,setTranslate)(THIS_ float dx, float dy) OVERRIDE;
+    STDMETHOD_(void, setTranslate)(THIS_ float dx, float dy) OVERRIDE;
 
-    STDMETHOD_(void,setScale)(THIS_ float sx, float sy) OVERRIDE;
+    STDMETHOD_(void, setScale)(THIS_ float sx, float sy) OVERRIDE;
 
-	STDMETHOD_(void,setScale2)(THIS_ float sx, float sy, float px, float py) OVERRIDE;
+    STDMETHOD_(void, setScale2)(THIS_ float sx, float sy, float px, float py) OVERRIDE;
 
-    STDMETHOD_(void,setRotate)(THIS_ float degrees) OVERRIDE;
+    STDMETHOD_(void, setRotate)(THIS_ float degrees) OVERRIDE;
 
-	STDMETHOD_(void,setRotate2)(THIS_ float degrees, float px, float py) OVERRIDE;
+    STDMETHOD_(void, setRotate2)(THIS_ float degrees, float px, float py) OVERRIDE;
 
-    STDMETHOD_(void,setSkew)(THIS_ float kx, float ky) OVERRIDE;
+    STDMETHOD_(void, setSkew)(THIS_ float kx, float ky) OVERRIDE;
 
-	STDMETHOD_(void,setSkew2)(THIS_ float kx, float ky, float px, float py) OVERRIDE;
+    STDMETHOD_(void, setSkew2)(THIS_ float kx, float ky, float px, float py) OVERRIDE;
 
   public:
     /** Enum of bit fields for the mask return by getType().
@@ -122,7 +123,6 @@ public:
         // only return the public masks
         return (TypeMask)(fTypeMask & 0xF);
     }
-
 
     bool isScaleTranslate() const
     {
@@ -207,13 +207,12 @@ public:
 
     void setMatrix(const float data[9], int matType = kUnknown_Mask);
 
-	void setTranslate(const SVector2D &v)
+    void setTranslate(const SVector2D &v)
     {
         this->setTranslate(v.fX, v.fY);
     }
 
-
-	/** Set the matrix to scale by 1/divx and 1/divy. Returns false and doesn't
+    /** Set the matrix to scale by 1/divx and 1/divy. Returns false and doesn't
         touch the matrix if either divx or divy is zero.
     */
     bool setIDiv(int divx, int divy);
@@ -226,7 +225,7 @@ public:
      */
     void setSinCos(float sinValue, float cosValue);
 
-	/** Set the matrix to the concatenation of the two specified matrices.
+    /** Set the matrix to the concatenation of the two specified matrices.
         Either of the two matrices may also be the target matrix.
         *this = a * b;
     */
@@ -711,6 +710,5 @@ public:
     static float SFloatSinCos(float radians, float *cosValue);
 };
 
-} // end of namespace SOUI
-
+SNSEND
 #endif

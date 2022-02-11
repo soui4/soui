@@ -7,8 +7,7 @@
 #include "core/SPanel.h"
 #include "STree.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 enum
 {
@@ -265,4 +264,4 @@ class SOUI_EXP STreeCtrl
     SOUI_MSG_MAP_END()
 };
 
-} // namespace SOUI
+SNSEND

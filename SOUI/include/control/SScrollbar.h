@@ -14,8 +14,7 @@
 #include <core/SWnd.h>
 #include <core/SScrollBarHandler.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  * @class     SScrollBar
@@ -266,4 +265,4 @@ class SOUI_EXP SScrollBar
     SScrollBarHandler m_sbHandler;
 };
 
-} // namespace SOUI
+SNSEND

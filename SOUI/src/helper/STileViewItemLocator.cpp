@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "helper/STileViewItemLocator.h"
 
-namespace SOUI
-{
+SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 // STileViewItemLocatorFix
 STileViewItemLocator::STileViewItemLocator(int nItemHei, int nItemWid, int nMarginSize /*= 0*/)
@@ -171,4 +170,4 @@ int STileViewItemLocator::GetDownItem(int iItem)
     return m_adapter->getCount() - 1;
 }
 
-} // namespace SOUI
+SNSEND

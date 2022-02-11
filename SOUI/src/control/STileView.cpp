@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "control/STileView.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class STileViewDataSetObserver : public TObjRefImpl<ILvDataSetObserver> {
   public:
@@ -1034,4 +1033,4 @@ int STileView::GetSel() const
     return m_iSelItem;
 }
 
-} // namespace SOUI
+SNSEND

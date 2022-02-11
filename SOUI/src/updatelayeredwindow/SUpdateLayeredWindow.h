@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 
     struct S_UPDATELAYEREDWINDOWINFO {
         DWORD cbSize;

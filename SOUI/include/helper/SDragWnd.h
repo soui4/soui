@@ -2,8 +2,7 @@
 
 #include "core/SNativeWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SDragWnd : public SNativeWnd {
   public:
@@ -27,4 +26,4 @@ class SDragWnd : public SNativeWnd {
     static SDragWnd *s_pCurDragWnd;
 };
 
-} // namespace SOUI
+SNSEND

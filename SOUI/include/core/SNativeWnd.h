@@ -124,17 +124,17 @@ struct tagThunk // this should come out to 16 bytes
 #error Only AMD64, ARM and X86 supported
 #endif
 
-template <class T>
+template <class T,class Base>
 class TObjRefProxy
     : public T
-    , public TObjRefImpl<SObject> {
+    , public Base {
   public:
     //!添加引用
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) OVERRIDE
     {
-        return TObjRefImpl<SObject>::AddRef();
+        return Base::AddRef();
     }
 
     //!释放引用
@@ -142,7 +142,7 @@ class TObjRefProxy
      */
     STDMETHOD_(long, Release)(THIS) OVERRIDE
     {
-        return TObjRefImpl<SObject>::Release();
+        return Base::Release();
     }
 
     //!释放对象
@@ -150,11 +150,11 @@ class TObjRefProxy
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
     {
-        return TObjRefImpl<SObject>::OnFinalRelease();
+        return Base::OnFinalRelease();
     }
 };
 
-class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd> {
+class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd,TObjRefImpl<SObject>> {
     DEF_SOBJECT_EX(TObjRefImpl<SObject>, L"SNativeWnd", NativeWnd)
   public:
     SNativeWnd();

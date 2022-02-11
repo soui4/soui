@@ -3,8 +3,7 @@
 #include "SComboBase.h"
 #include "SListView.h"
 
-namespace SOUI
-{
+SNSBEGIN
 class SOUI_EXP SComboView : public TComboBaseProxy<IComboView> {
     DEF_SOBJECT(SComboBase, L"comboview")
   public:
@@ -95,4 +94,4 @@ class SOUI_EXP SComboView : public TComboBaseProxy<IComboView> {
     SListView *m_pListBox; /**< SListBox指针 */
 };
 
-} // namespace SOUI
+SNSEND

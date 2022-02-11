@@ -2,8 +2,7 @@
 
 #include <helper/SMenu.h>
 
-namespace SOUI
-{
+SNSBEGIN
 class SMenuBarItem;
 
 class SOUI_EXP SMenuBar : public SWindow {
@@ -39,4 +38,4 @@ class SOUI_EXP SMenuBar : public SWindow {
     static SMenuBar *m_pMenuBar;
 };
 
-} // namespace SOUI
+SNSEND

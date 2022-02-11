@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include "SSingleton2.h"
 #include <souicoll.h>
-namespace SOUI
-{
+SNSBEGIN
 
 template <class TObj, class TKey = SStringA>
 class SCmnMap {
@@ -86,4 +85,4 @@ class SSingletonMap
     , public SCmnMap<TObj, TKey> {
 };
 
-} // namespace SOUI
+SNSEND

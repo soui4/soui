@@ -4,8 +4,7 @@
 #include "Swnd.h"
 #include "interface/sacchelper-i.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 #ifdef SOUI_ENABLE_ACC
 
@@ -84,4 +83,4 @@ class SOUI_EXP SAccessible
     IUNKNOWN_END()
 };
 #endif // SOUI_ENABLE_ACC
-} // namespace SOUI
+SNSEND

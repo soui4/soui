@@ -2,8 +2,7 @@
 #include "control/SDateTimePicker.h"
 #include "helper/STime.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SDateTimePicker::SDateTimePicker()
     : m_pDropDownWnd(NULL)
     , m_pSkinBtn(GETBUILTINSKIN(SKIN_SYS_DROPBTN))
@@ -721,4 +720,4 @@ void SDateTimePicker::DropDown()
     m_pDropDownWnd->SNativeWnd::SetCapture();
 }
 
-} // namespace SOUI
+SNSEND

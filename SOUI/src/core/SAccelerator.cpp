@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "core/SAccelerator.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SAccelerator::SAccelerator(UINT vKey, bool bCtrl, bool bAlt, bool bShift)
     : m_wVK(vKey)
@@ -270,4 +269,4 @@ DWORD SAccelerator::GetAcc() const
     return MAKELONG(m_wVK, m_wModifier);
 }
 
-} // end of namespace SOUI
+SNSEND

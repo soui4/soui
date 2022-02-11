@@ -15,8 +15,7 @@
 #include "core/SItemPanel.h"
 #include "SHeaderCtrl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 //  SMCListView
@@ -243,4 +242,4 @@ class SOUI_EXP SMCListView
     BOOL m_bHotTrack;            /**<  */
 };
 
-} // namespace SOUI
+SNSEND

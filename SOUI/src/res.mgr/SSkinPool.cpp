@@ -4,8 +4,7 @@
 #include "SApp.h"
 #include "helper/SDpiScale.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 // SSkinPool
@@ -232,4 +231,4 @@ SSkinPool *SSkinPoolMgr::GetBuiltinSkinPool()
     return m_bulitinSkinPool;
 }
 
-} // namespace SOUI
+SNSEND

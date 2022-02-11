@@ -2,8 +2,7 @@
 #include "interface/slayout-i.h"
 #include "SouiLayoutParamStruct.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SouiLayoutParam
     : public TObjRefImpl<SObjectImpl<ILayoutParam>>
@@ -102,4 +101,4 @@ class SOUI_EXP SouiLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     CRect GetWindowLayoutRect(SWindow *pWindow);
 };
 
-} // namespace SOUI
+SNSEND

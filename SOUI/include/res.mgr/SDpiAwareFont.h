@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 class SOUI_EXP SDpiAwareFont {
   public:
     SDpiAwareFont(void);
@@ -20,4 +19,4 @@ class SOUI_EXP SDpiAwareFont {
     SAutoRefPtr<IFontS> m_object;
 };
 
-} // namespace SOUI
+SNSEND

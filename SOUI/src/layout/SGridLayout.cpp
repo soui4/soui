@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "layout\SGridLayout.h"
 
-namespace SOUI
-{
+SNSBEGIN
 GridGravity SGridLayoutParam::parseGridGravity(const SStringW &strValue)
 {
     struct ValueMap
@@ -650,4 +649,4 @@ int SGridLayout::CalcCells(const IWindow *pParent) const
     return nCells;
 }
 
-} // namespace SOUI
+SNSEND

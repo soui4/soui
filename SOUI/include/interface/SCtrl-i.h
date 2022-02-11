@@ -17,9 +17,9 @@ SNSBEGIN
 #define INTERFACE ICtrl
 DECLARE_INTERFACE_(ICtrl, IObjRef)
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
 };
 
@@ -27,11 +27,11 @@ DECLARE_INTERFACE_(ICtrl, IObjRef)
 #define INTERFACE IItemPanel
 DECLARE_INTERFACE_IID_(IItemPanel, ICtrl, "176CDF98-260E-4070-91B5-E6E163F909A4")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST PURE;
     STDMETHOD_(void, SetSkin)(THIS_ ISkinObj * pSkin) PURE;
     STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) PURE;
@@ -43,11 +43,11 @@ DECLARE_INTERFACE_IID_(IItemPanel, ICtrl, "176CDF98-260E-4070-91B5-E6E163F909A4"
 #define INTERFACE IImageWnd
 DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
 
     STDMETHOD_(BOOL, SetSkin)
     (THIS_ ISkinObj * pSkin, int iFrame /*= 0*/, BOOL bAutoFree /*= TRUE*/) PURE;
@@ -89,11 +89,11 @@ DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
 #define INTERFACE IAnimateImgWnd
 DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E2595A")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
     /**
      * SAnimateImgWnd::Start
      * @brief    启动动画
@@ -123,11 +123,11 @@ DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E25
 #define INTERFACE IProgress
 DECLARE_INTERFACE_IID_(IProgress, ICtrl, "77407E2D-582B-4ef2-A33A-427C933BAA8C")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
     /**
      * SProgress::SetValue
      * @brief    设置进度条进度值
@@ -178,11 +178,11 @@ DECLARE_INTERFACE_IID_(IProgress, ICtrl, "77407E2D-582B-4ef2-A33A-427C933BAA8C")
 #define INTERFACE IPanel
 DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
@@ -208,31 +208,31 @@ DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
 #define INTERFACE IScrollView
 DECLARE_INTERFACE_IID_(IScrollView, IPanel, "49B024D6-221D-42d4-902B-AFAAC5AFFE41")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
-	STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
+    STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
-	STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
+    STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
-	STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(BOOL, SetScrollRange)
-		(THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollRange)
+    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(BOOL, GetScrollRange)
-		(THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+    STDMETHOD_(BOOL, GetScrollRange)
+    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
-	STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
+    //////////////////////////////////////////////////////////////////////////
 
     STDMETHOD_(SIZE, GetViewSize)(THIS) SCONST PURE;
 
@@ -274,17 +274,17 @@ typedef struct SHDITEM
     BOOL bDpiAware;
     BOOL bVisible;
     float fWeight;
-}SHDITEM, * LPSHDITEM;
+} SHDITEM, *LPSHDITEM;
 
 #undef INTERFACE
 #define INTERFACE IHeaderCtrl
 DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
 
     /**
      * SHeaderCtrl::InsertItem
@@ -374,31 +374,31 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
 #define INTERFACE IListView
 DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
-	STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
+    STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
-	STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
+    STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
-	STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(BOOL, SetScrollRange)
-		(THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollRange)
+    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(BOOL, GetScrollRange)
-		(THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
-	STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(BOOL, GetScrollRange)
+    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+    STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
 
-	//////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter * adapter) PURE;
 
     STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) SCONST PURE;
@@ -420,30 +420,30 @@ DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2"
 #define INTERFACE IMcListView
 DECLARE_INTERFACE_IID_(IMcListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
-	STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
+    STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
-	STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
+    STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
-	STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(BOOL, SetScrollRange)
-		(THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollRange)
+    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(BOOL, GetScrollRange)
-		(THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
-	STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, GetScrollRange)
+    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+    STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
+    //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(BOOL, SetAdapter)(THIS_ IMcAdapter * adapter) PURE;
 
     STDMETHOD_(IMcAdapter *, GetAdapter)(THIS) SCONST PURE;
@@ -475,30 +475,30 @@ DECLARE_INTERFACE_IID_(IMcListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE
 #define INTERFACE ITreeView
 DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
-	STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
+    STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
-	STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
+    STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
-	STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(BOOL, SetScrollRange)
-		(THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollRange)
+    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(BOOL, GetScrollRange)
-		(THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
-	STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, GetScrollRange)
+    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+    STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
+    //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ITvAdapter * adapter) PURE;
 
     STDMETHOD_(ITvAdapter *, GetAdapter)(THIS) SCONST PURE;
@@ -520,30 +520,30 @@ DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B"
 #define INTERFACE ITileView
 DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
-	STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
+    STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
-	STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
+    STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
-	STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(BOOL, SetScrollRange)
-		(THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollRange)
+    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(BOOL, GetScrollRange)
-		(THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
-	STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, GetScrollRange)
+    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+    STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
+    //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter * adapter) PURE;
 
     STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) SCONST PURE;
@@ -565,30 +565,30 @@ DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3"
 #define INTERFACE IListBox
 DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
-	STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
+    STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
-	STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
+    STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
-	STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
-	STDMETHOD_(BOOL, SetScrollRange)
-		(THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+    STDMETHOD_(BOOL, SetScrollRange)
+    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
-	STDMETHOD_(BOOL, GetScrollRange)
-		(THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
-	STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, GetScrollRange)
+    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+    STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
+    //////////////////////////////////////////////////////////////////////////
     /**
      * SListBox::GetCount
      * @brief    获取项个数
@@ -747,11 +747,11 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
 #define INTERFACE IComboBase
 DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::GetCurSel
      * @brief    获取选中值索引
@@ -817,11 +817,11 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
 #define INTERFACE IComboBox
 DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC9CF")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::GetCurSel
      * @brief    获取选中值索引
@@ -881,7 +881,7 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
     STDMETHOD_(BOOL, IsDropdown)(THIS) SCONST PURE;
 
     STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
     /**
      * SComboBox::GetItemData
@@ -936,11 +936,11 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
 #define INTERFACE IComboView
 DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC253D")
 {
-		STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::GetCurSel
      * @brief    获取选中值索引
@@ -1000,7 +1000,7 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
     STDMETHOD_(BOOL, IsDropdown)(THIS) SCONST PURE;
 
     STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(IListView *, GetIListView)(THIS) PURE;
 };
 
@@ -1008,11 +1008,11 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
 #define INTERFACE IDateTimePicker
 DECLARE_INTERFACE_IID_(IDateTimePicker, ICtrl, "6DB1EF42-AED7-4a36-8011-BE2AD7B45953")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
 
     STDMETHOD_(void, SetTime)
     (THIS_ WORD wYear, WORD wMonth, WORD wDay, WORD wHour, WORD wMinute, WORD wSecond) PURE;
@@ -1030,11 +1030,11 @@ typedef int(__cdecl *FunTreeSortCallback)(void *pCtx, const void *phItem1, const
 #define INTERFACE ITreeCtrl
 DECLARE_INTERFACE_IID_(ITreeCtrl, ICtrl, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
 
     STDMETHOD_(HSTREEITEM, InsertItem)
     (THIS_ LPCTSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam,
@@ -1078,11 +1078,11 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, ICtrl, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
 #define INTERFACE IHotKeyCtrl
 DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
 
     /**
      * SHotKeyCtrl::SetRule
@@ -1119,11 +1119,11 @@ DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55
 #define INTERFACE IRichEdit
 DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
 
     STDMETHOD_(DWORD, SaveRtf)(THIS_ LPCTSTR pszFileName) PURE;
 
@@ -1292,11 +1292,11 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
 #define INTERFACE ITabCtrl
 DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
 {
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-	STDMETHOD_(long,Release) (THIS) PURE;
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
 
     /**
      * STabCtrl::GetCurSel

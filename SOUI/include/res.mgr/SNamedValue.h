@@ -6,8 +6,7 @@
 #include "helper/SColor.h"
 #include "layout/SLayoutSize.h"
 
-namespace SOUI
-{
+SNSBEGIN
 #define MAX_NAME 50
 
 template <class T>
@@ -166,4 +165,4 @@ class SOUI_EXP SNamedDimension : public SNamedValue<SLayoutSize, SDimensionParse
         return GetAt(idx);
     }
 };
-} // namespace SOUI
+SNSEND

@@ -17,8 +17,7 @@
 #include "core/SFocusManager.h"
 #include <interface/SCtrl-i.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  * @class      SStatic
@@ -379,7 +378,7 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
     BOOL m_bManaged;               /**< 是否要自动释放当前的m_pSkin对象 */
     int m_iIcon;                   /**< 绘制状态索引 */
     SAutoRefPtr<ISkinObj> m_pSkin; /**< ISkinObj对象 */
-    SAutoRefPtr<IBitmapS> m_pImg;   /**<使用代码设定的图片*/
+    SAutoRefPtr<IBitmapS> m_pImg;  /**<使用代码设定的图片*/
     FilterLevel m_fl;              /**<绘制图片的放大精度*/
     bool m_bKeepAspect;            /**< keep aspect ratio */
 
@@ -872,14 +871,14 @@ class SOUI_EXP SRadioBox : public SWindow {
      * Describe  获取预期大小值
      */
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
-	    /**
+    /**
      * SRadioBox::OnGetDlgCode
      * @brief    获取消息编码
      * @return   返回编码值
      *
      * Describe  获取消息编码
      */
-    STDMETHOD_(UINT,OnGetDlgCode)(THIS) SCONST OVERRIDE
+    STDMETHOD_(UINT, OnGetDlgCode)(THIS) SCONST OVERRIDE
     {
         return 0;
     }
@@ -890,7 +889,7 @@ class SOUI_EXP SRadioBox : public SWindow {
      *
      * Describe  相同名称的单选按钮是否自动添加到同一组中
      */
-	STDMETHOD_(BOOL,IsSiblingsAutoGroupped)(THIS) SCONST OVERRIDE
+    STDMETHOD_(BOOL, IsSiblingsAutoGroupped)(THIS) SCONST OVERRIDE
     {
         return TRUE;
     }
@@ -1076,4 +1075,4 @@ class SOUI_EXP SGroup : public SWindow {
     SOUI_MSG_MAP_END()
 };
 
-} // namespace SOUI
+SNSEND

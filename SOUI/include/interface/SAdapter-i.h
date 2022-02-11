@@ -10,20 +10,20 @@ SNSBEGIN
 #define INTERFACE ILvDataSetObserver
 DECLARE_INTERFACE_(ILvDataSetObserver, IObjRef)
 {
-	//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) PURE;
+    //!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) PURE;
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	//!释放对象
-	/*!
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
      * This method is called when the entire data set has changed,
@@ -41,7 +41,7 @@ DECLARE_INTERFACE_(ILvDataSetObserver, IObjRef)
      * @brief 通知列表项数据变化
      * @param iItem 列表索引
      * @return 无
-    */
+     */
     STDMETHOD_(void, OnItemChanged)(THIS_ int iItem) PURE;
 };
 
@@ -49,20 +49,20 @@ DECLARE_INTERFACE_(ILvDataSetObserver, IObjRef)
 #define INTERFACE ILvAdapter
 DECLARE_INTERFACE_(ILvAdapter, IObjRef)
 {
-	//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) PURE;
+    //!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) PURE;
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	//!释放对象
-	/*!
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
      * Register an observer that is called when changes happen to the data used by this adapter.
@@ -142,7 +142,7 @@ DECLARE_INTERFACE_(ILvAdapter, IObjRef)
      * @param wid int -- 父窗口宽度
      * @param hei int -- 父窗口高度
      * @return SIZE -- 列表项大小
-    */
+     */
     STDMETHOD_(SIZE, getViewDesiredSize)(THIS_ int position, IWindow *pItem, int wid, int hei) PURE;
 
     /**
@@ -162,12 +162,11 @@ DECLARE_INTERFACE_(ILvAdapter, IObjRef)
      */
     STDMETHOD_(void, getItemDesc)(THIS_ int positoin, IStringW *pDesc) PURE;
 
-
     /**
      * @brief init adapter from the specified template xml data
      * @param xmlTemplate IXmlNode*--XML模板
      * @return void
-    */
+     */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) PURE;
 };
 
@@ -175,20 +174,20 @@ DECLARE_INTERFACE_(ILvAdapter, IObjRef)
 #define INTERFACE IMcAdapter
 DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
 {
-		//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) PURE;
+    //!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) PURE;
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	//!释放对象
-	/*!
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
      * Register an observer that is called when changes happen to the data used by this adapter.
@@ -281,26 +280,24 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) PURE;
 
-
     /**
      * @brief 获取一个列在模板中对应的窗口名称
      * @param iCol int--列索引
-     * @param [out] pName IStringW--列名 
+     * @param [out] pName IStringW--列名
      * @return void
-    */
+     */
     STDMETHOD_(void, GetColumnName)(THIS_ int iCol, IStringW *pName) SCONST PURE;
 
     //
     // int iCol: 列序号
     // remark:默认显示
 
-
     /**
      * @brief 由Adapter决定一列是否需要显示
      * @param iCol int--列序号
      * @return TRUE--显示, FALSE--隐藏
      * @remark 默认显示
-    */
+     */
     STDMETHOD_(BOOL, IsColumnVisible)(THIS_ int iCol) SCONST PURE;
 
     /**
@@ -309,29 +306,28 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
      * @param [in, out] pFmts UINT *当前列排序标志
      * @param nCols int 总列数,pFmts数组长度
      * @return TRUE--执行排序，FALSE--没有执行排序
-    */
+     */
     STDMETHOD_(BOOL, OnSort)(THIS_ int iCol, UINT *pFmts, int nCols) PURE;
 };
-
 
 #undef INTERFACE
 #define INTERFACE ITvDataSetObserver
 DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
 {
-	//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) PURE;
+    //!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) PURE;
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	//!释放对象
-	/*!
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
      * This method is called when the entire data set has changed,
@@ -350,8 +346,8 @@ DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
      * @param hBranch HSTREEITEM--target branch
      * @param bInvalidParents TRUE--target's parent became invalid
      * @param bInvalidChildren TRUE--target's children became invalid
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, onBranchInvalidated)
     (THIS_ HSTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren) PURE;
 
@@ -360,8 +356,8 @@ DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
      * @param hBranch  HSTREEITEM--target branch
      * @param bExpandedOld BOOL old expand state
      * @param bExpandedNew BOOL new expand state
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, onBranchExpandedChanged)
     (THIS_ HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
 };
@@ -382,7 +378,7 @@ typedef enum DATA_INDEX
     DATA_INDEX_ITEM_OFFSET,     //当前节点在父节点中的Y方向偏移
     DATA_INDEX_ITEM_USER,       //自定义数据
     DATA_INDEX_NUMBER
-}DATA_INDEX;
+} DATA_INDEX;
 
 enum
 {
@@ -395,20 +391,20 @@ enum
 #define INTERFACE ITvAdapter
 DECLARE_INTERFACE_(ITvAdapter, IObjRef)
 {
-	//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) PURE;
+    //!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) PURE;
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	//!释放对象
-	/*!
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
      * Register an observer that is called when changes happen to the data used by this adapter.
@@ -429,8 +425,8 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @brief 获取hItem中的指定索引的数据
      * @param hItem HSTREEITEM--表项索引
      * @param idx DATA_INDEX--数据类型
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(THIS_ HSTREEITEM hItem, DATA_INDEX idx) SCONST PURE;
 
     /**
@@ -438,8 +434,8 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @param hItem HSTREEITEM--表项索引
      * @param idx DATA_INDEX--数据类型
      * @param data ULONG_PTR--数据
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetItemDataByIndex)
     (THIS_ HSTREEITEM hItem, DATA_INDEX idx, ULONG_PTR data) PURE;
 
@@ -447,42 +443,42 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @brief 获取父级表项
      * @param hItem HSTREEITEM--表项索引
      * @return HSTREEITEM 父级表项
-    */
+     */
     STDMETHOD_(HSTREEITEM, GetParentItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取第一个子项
      * @param hItem HSTREEITEM--表项索引
      * @return HSTREEITEM--第一个子项
-    */
+     */
     STDMETHOD_(HSTREEITEM, GetFirstChildItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取最后一个子项
      * @param hItem HSTREEITEM--表项索引
      * @return HSTREEITEM--最后一个子项
-    */
+     */
     STDMETHOD_(HSTREEITEM, GetLastChildItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取前一个兄弟项
      * @param hItem HSTREEITEM--表项索引
      * @return HSTREEITEM--前一个兄弟项
-    */
+     */
     STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取后一个兄弟项
      * @param hItem HSTREEITEM--表项索引
      * @return HSTREEITEM--后一个兄弟项
-    */
+     */
     STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 是否包含子项
      * @param hItem HSTREEITEM--表项索引
      * @return TRUE--有子项，FALSE--无子项
-    */
+     */
     STDMETHOD_(BOOL, HasChildren)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
@@ -520,23 +516,23 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @brief 展开/折叠子项
      * @param hItem HSTREEITEM--目标项
      * @param code  int TVC_COLLAPSE,TVC_EXPAND,TVC_TOGGLE
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, ExpandItem)(THIS_ HSTREEITEM hItem, UINT code) PURE;
 
     /**
      * @brief 判断表项是否展开
      * @param hItem HSTREEITEM--目标项
      * @return TRUE--展开，FALSE--折叠
-    */
+     */
     STDMETHOD_(BOOL, IsItemExpanded)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 设置表项展开标志
      * @param hItem HSTREEITEM--目标项
      * @param bExpanded TRUE--展开，FALSE--折叠
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetItemExpanded)(THIS_ HSTREEITEM hItem, BOOL bExpanded) PURE;
 
     /**
@@ -556,19 +552,20 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      *        {@link #getItemViewType(int,DWORD)}).
      * @param xmlTemplate the xml template provided by its owner
      */
-    STDMETHOD_(void, getView)(THIS_ HSTREEITEM hItem, IWindow * pItem, IXmlNode * pXmlTemplate) PURE;
+    STDMETHOD_(void, getView)
+    (THIS_ HSTREEITEM hItem, IWindow * pItem, IXmlNode * pXmlTemplate) PURE;
 
     /**
      * @brief 获取表项对应的模板ID
      * @param hItem HSTREEITEM--目标项
      * @return int--模板ID
-    */
+     */
     STDMETHOD_(int, getViewType)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取表项模板数量
      * @return int--模板数量
-    */
+     */
     STDMETHOD_(int, getViewTypeCount)(THIS) SCONST PURE;
 
     /**
@@ -578,22 +575,21 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @param wid int--父窗口宽度
      * @param hei int--你窗口高度
      * @return SIZE--窗口大小
-    */
+     */
     STDMETHOD_(SIZE, getViewDesiredSize)
     (THIS_ HSTREEITEM hItem, IWindow * pItem, int wid, int hei) PURE;
 
     /**
      * @brief 定义行宽度和treeview客户区宽度相同
      * @return TRUE--表项宽度占满父窗口，FALSE--表项宽度和父窗口无关
-    */
+     */
     STDMETHOD_(BOOL, isViewWidthMatchParent)(THIS) SCONST PURE;
-
 
     /**
      * @brief init adapter from the specified template xml data
      * @param pXmlTemplate IXmlNode *--XML模板
      * @return void
-    */
+     */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * pXmlTemplate) PURE;
 };
 

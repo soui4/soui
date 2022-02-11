@@ -6,8 +6,7 @@
 
 #include "helper/STileViewItemLocator.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SOUI_EXP STileView
     : public TPanelProxy<ITileView>
@@ -149,4 +148,4 @@ class SOUI_EXP STileView
     BOOL m_bWantTab;
     BOOL m_bDatasetInvalidated;
 };
-} // namespace SOUI
+SNSEND

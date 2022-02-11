@@ -15,8 +15,7 @@
 #include "Slistbox.h"
 #include "SCmnCtrl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  * @class      SComboBox
@@ -139,4 +138,4 @@ class SOUI_EXP SComboBox : public TComboBaseProxy<IComboBox> {
     SListBox *m_pListBox; /**< SListBox指针 */
 };
 
-} // namespace SOUI
+SNSEND

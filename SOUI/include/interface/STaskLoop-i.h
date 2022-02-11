@@ -15,10 +15,10 @@ DECLARE_INTERFACE_(IRunnable, IObjRef)
 
 typedef enum Priority
 {
-	High = 1,
-	Normal = 0,
-	Low = -1,
-}Priority;
+    High = 1,
+    Normal = 0,
+    Low = -1,
+} Priority;
 
 #undef INTERFACE
 #define INTERFACE ITaskLoop

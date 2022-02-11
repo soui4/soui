@@ -2,8 +2,7 @@
 #include "control/Stabctrl.h"
 #include "animation/SInterpolatorImpl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class STabSlider
     : public SWindow
@@ -1002,4 +1001,4 @@ int STabCtrl::GetItemCount(THIS) const
     return (int)m_lstPages.GetCount();
 }
 
-} // namespace SOUI
+SNSEND

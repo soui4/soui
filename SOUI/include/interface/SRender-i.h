@@ -15,7 +15,7 @@ typedef enum EXPEND_MODE
     EM_NULL = 0, /*<不变*/
     EM_STRETCH,  /*<拉伸*/
     EM_TILE,     /*<平铺*/
-}EXPEND_MODE;
+} EXPEND_MODE;
 
 typedef enum FilterLevel
 {
@@ -23,14 +23,14 @@ typedef enum FilterLevel
     kLow_FilterLevel,
     kMedium_FilterLevel,
     kHigh_FilterLevel
-}FilterLevel;
+} FilterLevel;
 
 typedef enum GradientType
 {
     linear = 0, /*<线性渐变*/
     radial,     /*<辐射渐变*/
     sweep       /*<扫描渐变*/
-}GradientType;
+} GradientType;
 
 typedef enum RopMode
 {
@@ -76,17 +76,17 @@ typedef enum RopMode
     kDstInvert = DSTINVERT,
     kSrcInvert = SRCINVERT,
     kSrcAnd = SRCAND,
-}RopMode;
+} RopMode;
 
 typedef struct fPoint
 {
     float fX, fY;
-}fPoint;
+} fPoint;
 
 typedef struct fRect
 {
     float fLeft, fTop, fRight, fBottom;
-}fRect;
+} fRect;
 
 typedef enum _BlurStyle
 {
@@ -117,7 +117,6 @@ DECLARE_INTERFACE_(IMaskFilter, IObjRef)
     STDMETHOD_(void *, GetPtr)(THIS) PURE;
 };
 
-
 typedef enum _OBJTYPE
 {
     OT_NULL = 0,
@@ -128,8 +127,6 @@ typedef enum _OBJTYPE
     OT_RGN,
     OT_PATH,
 } OBJTYPE;
-
-
 
 /**
  * @struct     IRenderObj
@@ -1070,7 +1067,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     @param direction If not null, set to the rectangle's direction
     @return true if the path specifies a rectangle
     */
-    STDMETHOD_(BOOL, isRect2)(THIS_ BOOL *isClosed, Direction *direction) SCONST PURE;
+    STDMETHOD_(BOOL, isRect2)(THIS_ BOOL * isClosed, Direction * direction) SCONST PURE;
 
     /**
      *  Add a closed rectangle contour to the path
@@ -1453,7 +1450,8 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     /** Draw the specified path frame using current selected pen
     @param path     The path to be drawn
     */
-    STDMETHOD_(HRESULT, DrawPath)(THIS_ const IPathS *path, IPathEffect *pathEffect /*= NULL*/) PURE;
+    STDMETHOD_(HRESULT, DrawPath)
+    (THIS_ const IPathS *path, IPathEffect *pathEffect /*= NULL*/) PURE;
 
     /** Fill the specified path frame using current selected brush
     @param path     The path to be drawn
@@ -1507,7 +1505,8 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
 
     STDMETHOD_(IImgDecoderFactory *, GetImgDecoderFactory)(THIS) PURE;
     STDMETHOD_(void, SetImgDecoderFactory)(THIS_ IImgDecoderFactory * pImgDecoderFac) PURE;
-    STDMETHOD_(BOOL, CreateRenderTarget)(THIS_ IRenderTarget **ppRenderTarget, int nWid, int nHei) PURE;
+    STDMETHOD_(BOOL, CreateRenderTarget)
+    (THIS_ IRenderTarget * *ppRenderTarget, int nWid, int nHei) PURE;
 
     /**
      * CreateFont

@@ -2,8 +2,7 @@
 #include "layout\SLinearLayout.h"
 #include "helper\SplitString.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SLinearLayoutParam::SLinearLayoutParam()
 {
@@ -575,4 +574,4 @@ ILayoutParam *SLinearLayout::CreateLayoutParam() const
     return new SLinearLayoutParam();
 }
 
-} // namespace SOUI
+SNSEND

@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "control\SComboView.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SComboView::SComboView(void)
     : m_pListBox(NULL)
 {
@@ -164,4 +163,4 @@ IListView *SComboView::GetIListView(THIS)
     return GetListView();
 }
 
-} // namespace SOUI
+SNSEND

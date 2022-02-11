@@ -2,8 +2,7 @@
 #include "msaa\SAccProxyCmnCtrl.h"
 #include "control\SCmnCtrl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 #ifdef SOUI_ENABLE_ACC
 
 STDMETHODIMP SAccProxyButton::get_accRole(VARIANT *pvarRole)
@@ -86,4 +85,4 @@ STDMETHODIMP SAccProxySlideBar::get_accRole(VARIANT *pvarRole)
 
 #endif // SOUI_ENABLE_ACC
 
-} // namespace SOUI
+SNSEND

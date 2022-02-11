@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include <interface/STileViewItemLocator-i.h>
 
-namespace SOUI
-{
+SNSBEGIN
 class SOUI_EXP STileViewItemLocator : public TObjRefImpl<ITileViewItemLocator> {
   public:
     STileViewItemLocator(int nItemHei, int nItemWid, int nMarginSize = 0);
@@ -69,4 +68,4 @@ class SOUI_EXP STileViewItemLocator : public TObjRefImpl<ITileViewItemLocator> {
     SAutoRefPtr<ILvAdapter> m_adapter;
 };
 
-} // namespace SOUI
+SNSEND

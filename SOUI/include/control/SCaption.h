@@ -14,8 +14,7 @@
 #pragma once
 #include "core/SWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  * @class      CSCaption
  * @brief      标签类
@@ -93,4 +92,4 @@ class SOUI_EXP SCaption : public SWindow {
   private:
     BOOL m_bIsMaxDown; //最大化时,鼠标左键是否已经按下
 };
-} // namespace SOUI
+SNSEND

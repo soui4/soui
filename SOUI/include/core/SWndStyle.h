@@ -14,8 +14,7 @@
 
 #include "res.mgr/SDpiAwareFont.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SOUI_EXP SwndStyle {
   public:
@@ -132,4 +131,4 @@ class SOUI_EXP SwndStyle {
     SOUI_ATTRS_BREAK()
 };
 
-} // namespace SOUI
+SNSEND

@@ -28,7 +28,6 @@ SNSBEGIN
  */
 class SOUI_EXP STransformation : public ITransformation {
   public:
-
   protected:
     SMatrix mMatrix;
     BYTE mAlpha;
@@ -40,20 +39,20 @@ class SOUI_EXP STransformation : public ITransformation {
   public:
     STransformation();
 
-public:
-	STDMETHOD_(IMatrix *,GetMatrix)(THIS) OVERRIDE;
+  public:
+    STDMETHOD_(IMatrix *, GetMatrix)(THIS) OVERRIDE;
 
-	STDMETHOD_(BYTE,GetAlpha) (THIS) SCONST OVERRIDE;
+    STDMETHOD_(BYTE, GetAlpha)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void,SetAlpha)(THIS_ BYTE alpha) OVERRIDE;
+    STDMETHOD_(void, SetAlpha)(THIS_ BYTE alpha) OVERRIDE;
 
-	STDMETHOD_(void,Compose)(const ITransformation *t) OVERRIDE;
+    STDMETHOD_(void, Compose)(const ITransformation *t) OVERRIDE;
 
-	STDMETHOD_(void,Clear)(THIS) OVERRIDE;
+    STDMETHOD_(void, Clear)(THIS) OVERRIDE;
 
-	STDMETHOD_(void,SetTransformationType)(THIS_ int type) OVERRIDE;
-public:
+    STDMETHOD_(void, SetTransformationType)(THIS_ int type) OVERRIDE;
 
+  public:
     /**
      * Indicates the nature of this transformation.
      *

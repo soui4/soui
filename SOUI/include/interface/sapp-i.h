@@ -19,22 +19,22 @@ SNSBEGIN
 #define INTERFACE IApplication
 DECLARE_INTERFACE_(IApplication, IObjRef)
 {
-		//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) PURE;
+    //!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) PURE;
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	//!释放对象
-	/*!
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-	//////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(HMODULE, GetModule)(THIS) SCONST PURE;
     STDMETHOD_(UINT, LoadSystemNamedResource)(THIS_ IResProvider * pResProvider) PURE;
     STDMETHOD_(ITranslatorMgr *, GetTranslator)(THIS) PURE;
@@ -102,9 +102,9 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @param pNames const LPCWSTR *--控件名表
      * @param nIds const int *--控件ID表
      * @param nCount int--控件数据
-     * @return 
+     * @return
      * @remark 数据表由residbuilder工具自动生成
-    */
+     */
     STDMETHOD_(void, InitXmlNamedID)(THIS_ const LPCWSTR *pNames, const int *nIds, int nCount) PURE;
 
     /**
@@ -112,7 +112,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @param strResId LPCTSTR--资源ID，为type:name格式
      * @return IXmlDoc *--XML Doc
      * @remark 使用完成后调用Rlease释放
-    */
+     */
     STDMETHOD_(IXmlDoc *, LoadXmlDocment)(THIS_ LPCTSTR strResId) PURE;
 
     /**

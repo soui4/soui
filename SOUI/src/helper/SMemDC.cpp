@@ -1,7 +1,6 @@
 ﻿#include "souistd.h"
 #include "helper/SMemDC.h"
-namespace SOUI
-{
+SNSBEGIN
 
 SMemDC::SMemDC()
     : m_bBmpOwner(FALSE)
@@ -96,4 +95,4 @@ BOOL SMemDC::InitDC(HDC hdc, const CRect &rc)
     return TRUE;
 }
 
-} // namespace SOUI
+SNSEND

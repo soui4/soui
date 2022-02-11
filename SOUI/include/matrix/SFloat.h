@@ -136,8 +136,7 @@
 #define SFloatExp(x)                (float)sk_float_exp(x)
 #define SFloatLog(x)                (float)sk_float_log(x)
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  *  Variant of SFloatRoundToInt, that performs the rounding step (adding 0.5) explicitly using
  *  double, to avoid possibly losing the low bit(s) of the answer before calling floor().
@@ -270,6 +269,5 @@ inline bool SFloatsEqual(const float a[], const float b[], int n)
     return true;
 }
 
-} // end of namespace SOUI
-
+SNSEND
 #endif

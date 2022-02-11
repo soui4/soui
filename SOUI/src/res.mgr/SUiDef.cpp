@@ -3,8 +3,7 @@
 #include "helper\SplitString.h"
 #include "helper\SAutoBuf.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 const static WCHAR KNodeUidef[] = L"uidef";
 const static WCHAR KNodeString[] = L"string";
@@ -374,4 +373,4 @@ BOOL SUiDef::CheckFont(const SStringW &strFontName)
     return s_funFontCheck(strFontName);
 }
 
-} // namespace SOUI
+SNSEND

@@ -11,8 +11,7 @@
 
 #pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 
 /*########################################################################
               ------------------------------------------------
@@ -54,4 +53,4 @@ class SOUI_EXP SMenuWndHook {
     static SStringW m_strSkinName;
 };
 
-} // namespace SOUI
+SNSEND

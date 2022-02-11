@@ -13,8 +13,7 @@
 #include "souistd.h"
 #include "control/SCaption.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SCaption::SCaption(void)
     : m_bIsMaxDown(FALSE)
@@ -104,4 +103,4 @@ BOOL SCaption::IsSuppotMaxMove()
     return FALSE;
 }
 
-} // namespace SOUI
+SNSEND

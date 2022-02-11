@@ -14,8 +14,7 @@
 #pragma once
 #include "core/ssingletonmap.h"
 
-namespace SOUI
-{
+SNSBEGIN
 class SOUI_EXP SObjectInfo {
   public:
     SObjectInfo(const SStringW &name = L"", int type = None)
@@ -156,4 +155,4 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
     static void OnFactoryRemoved(const SObjectFactoryPtr &obj);
 };
 
-} // namespace SOUI
+SNSEND

@@ -14,8 +14,7 @@
 #include <core/swnd.h>
 #include <layout/slayoutsize.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  * @class     SSplitPane
@@ -306,4 +305,4 @@ class SOUI_EXP SSplitWnd_Row : public SSplitWnd {
     }
 };
 
-} // namespace SOUI
+SNSEND

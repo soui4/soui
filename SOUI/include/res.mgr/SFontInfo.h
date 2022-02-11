@@ -1,7 +1,6 @@
 #pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  * @union      FONTSTYLE
@@ -34,4 +33,4 @@ struct FontInfo
     SStringW strFaceName;
     SStringW strPropEx;
 };
-} // namespace SOUI
+SNSEND

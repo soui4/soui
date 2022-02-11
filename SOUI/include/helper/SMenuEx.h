@@ -2,8 +2,7 @@
 
 #include <core/shostwnd.h>
 
-namespace SOUI
-{
+SNSBEGIN
 class SMenuExRoot;
 class SMenuEx;
 class SOUI_EXP SMenuExItem : public SWindow {
@@ -121,7 +120,7 @@ class SOUI_EXP SMenuEx : protected SHostWnd {
     END_MSG_MAP()
   protected:
     virtual BOOL _HandleEvent(IEvtArgs *pEvt);
-	STDMETHOD_(LPCWSTR, GetTranslatorContext)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(LPCWSTR, GetTranslatorContext)(THIS) SCONST OVERRIDE;
     STDMETHOD_(int, GetScale)() SCONST OVERRIDE;
 
     SWindow *FindItem(UINT uPos, UINT uFlag);
@@ -144,4 +143,4 @@ class SOUI_EXP SMenuEx : protected SHostWnd {
     HWND m_hParent;
 };
 
-} // namespace SOUI
+SNSEND

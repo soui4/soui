@@ -14,8 +14,7 @@
  * limitations under the License.
  */
 #include <animation/SAnimation.h>
-namespace SOUI
-{
+SNSBEGIN
 /**
  * An animation that controls the scale of an object. You can specify the point
  * to use for the center of scaling.
@@ -133,4 +132,4 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
     SOUI_ATTRS_END()
 };
 
-} // namespace SOUI
+SNSEND

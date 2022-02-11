@@ -143,7 +143,7 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      */
     STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading) PURE;
 
-	/**
+    /**
      * SetAttribute
      * @brief    设置一个对象属性
      * @param    LPCWSTR pszAttr --  属性名

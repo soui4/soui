@@ -3,8 +3,7 @@
 #include <control/Srealwnd.h>
 #include <interface/SRealWndHandler-i.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 SRealWndParam::SRealWndParam()
     : m_dwStyle(WS_CHILD)
@@ -136,4 +135,4 @@ BOOL SRealWnd::OnRelayout(const CRect &rcWnd)
     }
     return TRUE;
 }
-} // namespace SOUI
+SNSEND

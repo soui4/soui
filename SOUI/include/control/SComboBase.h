@@ -4,8 +4,7 @@
 #include "SRichEdit.h"
 #include "SDropDown.h"
 
-namespace SOUI
-{
+SNSBEGIN
 #define IDC_CB_EDIT       -100
 #define IDC_DROPDOWN_LIST -200
 
@@ -462,4 +461,4 @@ class TComboBaseProxy
     }
 };
 
-} // namespace SOUI
+SNSEND

@@ -1,8 +1,7 @@
 #include <souistd.h>
 #include <helper/STaskHandler.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 STaskHandler::STaskHandler()
     : m_taskListLock()
@@ -152,4 +151,4 @@ BOOL STaskHandler::getRunningTaskInfo(char *buf, int bufLen)
     return false;
 }
 
-} // namespace SOUI
+SNSEND

@@ -15,8 +15,7 @@
 #include <core/SWnd.h>
 #include <interface/SAccelerator-i.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 // FocusSearch is an object that implements the algorithm to find the
 // next view to focus.
@@ -199,4 +198,4 @@ class SOUI_EXP SFocusManager : public IAcceleratorMgr {
     AcceleratorMap accelerators_;
 };
 
-} // end of namespace SOUI
+SNSEND

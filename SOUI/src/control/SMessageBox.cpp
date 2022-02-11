@@ -3,8 +3,7 @@
 #include "control/SMessageBox.h"
 #include "control/SCmnCtrl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 static SXmlDoc s_xmlMsgTemplate;
 
@@ -185,4 +184,4 @@ INT_PTR SMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
     return msgBox.MessageBox(hWnd, lpText, lpCaption, uType);
 }
 
-} // namespace SOUI
+SNSEND

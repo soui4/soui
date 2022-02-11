@@ -6,8 +6,7 @@
 #pragma once
 #include <core/swnd.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 //
 // 日期 选择控件
@@ -118,4 +117,4 @@ class SOUI_EXP SDateTimePicker
     STrText m_strCue;
     COLORREF m_crCue;
 };
-} // namespace SOUI
+SNSEND

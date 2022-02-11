@@ -22,7 +22,7 @@
 SNSBEGIN
 
 // SObject Class Name Declaration
-#define DEF_SOBJECT_EX(baseCls, classname, clsType) \
+#define DEF_SOBJECT_EX(baseCls, classname, clsType)     \
   public:                                               \
     typedef baseCls __baseCls;                          \
     static LPCWSTR GetClassName()                       \
@@ -150,8 +150,8 @@ DECLARE_INTERFACE_(IObject, IObjRef)
     /**
      * @brief 设置对象ID
      * @param nID int--对象ID
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetID)(THIS_ int nID) PURE;
 
     /**
@@ -165,8 +165,8 @@ DECLARE_INTERFACE_(IObject, IObjRef)
     /**
      * @brief 设置对象Name
      * @param pszName LPCWSTR -- 对象Name
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetName)(THIS_ LPCWSTR pszName) PURE;
 
     /**

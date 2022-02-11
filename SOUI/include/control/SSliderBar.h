@@ -13,8 +13,7 @@
 #pragma once
 #include "SCmnCtrl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  * @class     SSliderBar
  * @brief     滑块工具条
@@ -177,4 +176,4 @@ class SOUI_EXP SSliderBar : public SProgress {
     SOUI_ATTRS_END()
 };
 
-} // namespace SOUI
+SNSEND

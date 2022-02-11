@@ -2,8 +2,7 @@
 
 #include "core/SSingletonMap.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SOUI_EXP SObjDefAttr
     : public SCmnMap<SXmlNode, SStringW>
@@ -31,4 +30,4 @@ class SOUI_EXP SObjDefAttr
     SXmlDoc m_xmlRoot;
 };
 
-} // namespace SOUI
+SNSEND

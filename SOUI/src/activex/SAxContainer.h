@@ -26,8 +26,7 @@
 #include "atl.mini/scomcli.h"
 #include <MsHtmHst.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 struct IAxHostDelegate
 {
@@ -724,6 +723,6 @@ private:
 };
 
 
-}//end of namespace SOUI
+SNSEND
 
 #endif //ATLACTIVEXCONTAINER_HPP

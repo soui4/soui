@@ -4,8 +4,7 @@
 #include "souistd.h"
 #include "control/Sscrollbar.h"
 
-namespace SOUI
-{
+SNSBEGIN
 /////////////////////////////////////////////////////////////////////////////
 // SScrollBar
 SScrollBar::SScrollBar()
@@ -330,4 +329,4 @@ bool SScrollBar::IsScrollBarEnable(bool bVert) const
     return !IsDisabled(TRUE);
 }
 
-} // namespace SOUI
+SNSEND

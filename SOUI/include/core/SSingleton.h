@@ -15,8 +15,7 @@
 
 #include <assert.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  * @class      SSingleton
@@ -60,4 +59,4 @@ class SSingleton {
     }
 };
 
-} // namespace SOUI
+SNSEND

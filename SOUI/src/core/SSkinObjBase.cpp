@@ -185,9 +185,9 @@ void SSkinObjBase::DrawByState(IRenderTarget *pRT, LPCRECT rcDraw, DWORD dwState
 }
 
 void SSkinObjBase::DrawByState2(IRenderTarget *pRT,
-                               LPCRECT rcDraw,
-                               DWORD dwState,
-                               BYTE byAlpha) const
+                                LPCRECT rcDraw,
+                                DWORD dwState,
+                                BYTE byAlpha) const
 {
     _DrawByState(pRT, rcDraw, dwState, byAlpha);
 }

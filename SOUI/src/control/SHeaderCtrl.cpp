@@ -2,8 +2,7 @@
 #include "control/SHeaderCtrl.h"
 #include "helper/SDragWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SHeaderCtrl::SHeaderCtrl(void)
     : m_bFixWidth(FALSE)
     , m_bItemSwapEnable(TRUE)
@@ -797,4 +796,4 @@ UINT SHeaderCtrl::GetItemCount() const
     return (UINT)m_arrItems.GetCount();
 }
 
-} // end of namespace SOUI
+SNSEND

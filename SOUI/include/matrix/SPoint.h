@@ -11,8 +11,7 @@
 #include <interface/SRender-i.h>
 #include <matrix/SFloat.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 struct SOUI_EXP SPoint : public fPoint
 {
@@ -145,6 +144,5 @@ struct SOUI_EXP SPoint : public fPoint
 };
 
 typedef SPoint SVector2D;
-} // end of namespace SOUI
-
+SNSEND
 #endif

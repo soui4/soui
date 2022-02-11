@@ -17,8 +17,7 @@
 #pragma once
 #include "core/shostwnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SDropDownWnd;
 
@@ -246,4 +245,4 @@ class SOUI_EXP SDropDownWnd
     END_MSG_MAP()
 };
 
-} // end of namespace SOUI
+SNSEND

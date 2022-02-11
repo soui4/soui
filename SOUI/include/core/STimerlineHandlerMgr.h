@@ -3,8 +3,7 @@
 #include <interface/STimelineHandler-i.h>
 #include <souicoll.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 class STimerlineHandlerMgr : public ITimelineHandler {
   public:
@@ -25,4 +24,4 @@ class STimerlineHandlerMgr : public ITimelineHandler {
     TLMAP m_mapHandlers;
 };
 
-} // namespace SOUI
+SNSEND

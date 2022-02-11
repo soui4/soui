@@ -15,8 +15,7 @@
 #include <core/SWnd.h>
 #include <interface/SCtrl-i.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 #define SORT_MASK  (HDF_SORTDOWN | HDF_SORTUP)
 #define ALIGN_MASK (HDF_LEFT | HDF_RIGHT | HDF_CENTER)
@@ -331,4 +330,4 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
     SArray<SHDITEMEX> m_arrItems; /**< 列表项集合 */
     int m_nScale;                 /**< Current Scale */
 };
-} // end of namespace SOUI
+SNSEND

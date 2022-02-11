@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "control/SSplitWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 #define DEF_SEPSIZE 5
 
@@ -574,4 +573,4 @@ void SSplitWnd::SortPriorityList(SplitPaneList &lstPane)
     qsort(lstPane.GetData(), lstPane.GetCount(), sizeof(SSplitPane *), FunComp);
 }
 
-} // namespace SOUI
+SNSEND

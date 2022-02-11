@@ -44,12 +44,12 @@
     }                                                                                              \
     else
 
-#define ATTR_CHAIN_PTR(varname, flag)                                                     \
-    if (FAILED(hRet) && varname != NULL                                                   \
+#define ATTR_CHAIN_PTR(varname, flag)                                                      \
+    if (FAILED(hRet) && varname != NULL                                                    \
         && SUCCEEDED(hRet = varname->ISetAttributeW(&strAttribName, &strValue, bLoading))) \
-    {                                                                                     \
-        hRet |= flag;                                                                     \
-    }                                                                                     \
+    {                                                                                      \
+        hRet |= flag;                                                                      \
+    }                                                                                      \
     else
 
 #define ATTR_CUSTOM(attribname, func)                 \
@@ -348,7 +348,7 @@
 #define ATTR_IMAGE(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        SOUI::IBitmapS *pImg = LOADIMAGE2(strValue);   \
+        SOUI::IBitmapS *pImg = LOADIMAGE2(strValue);  \
         if (!pImg)                                    \
             hRet = E_FAIL;                            \
         else                                          \
@@ -365,7 +365,7 @@
 #define ATTR_IMAGEAUTOREF(attribname, varname, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname))     \
     {                                                     \
-        SOUI::IBitmapS *pImg = LOADIMAGE2(strValue);       \
+        SOUI::IBitmapS *pImg = LOADIMAGE2(strValue);      \
         if (!pImg)                                        \
             hRet = E_FAIL;                                \
         else                                              \

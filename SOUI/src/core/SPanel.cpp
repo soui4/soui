@@ -8,8 +8,7 @@
 
 #define DEF_UPDATEINTERVAL 0
 
-namespace SOUI
-{
+SNSBEGIN
 
 CRect SPanel::GetScrollBarRect(bool bVert) const
 {
@@ -947,4 +946,4 @@ void SScrollView::UpdateChildrenPosition()
     __baseCls::UpdateChildrenPosition();
 }
 
-} // namespace SOUI
+SNSEND

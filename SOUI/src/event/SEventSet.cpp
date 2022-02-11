@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include <event/SEventSet.h>
 
-namespace SOUI
-{
+SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 // SEvent
 
@@ -212,4 +211,4 @@ SStringA SEventSet::getEventScriptHandler(const SStringW &strEventName) const
     }
     return "";
 }
-} // namespace SOUI
+SNSEND

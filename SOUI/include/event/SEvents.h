@@ -133,50 +133,83 @@ typedef enum _SOUI_EVENTS
 } SOUI_EVENTS;
 
 #ifdef __cplusplus
-class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>>
-{
-	DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IEvtArgs>>, L"event", Event)
-public:
-	UINT handled; 
-	BOOL bubbleUp; 
-	int  idFrom; 
-	LPCWSTR nameFrom;
-	IObject *sender; 
+class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
+    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IEvtArgs>>, L"event", Event)
+  public:
+    UINT handled;
+    BOOL bubbleUp;
+    int idFrom;
+    LPCWSTR nameFrom;
+    IObject *sender;
 
-	STDMETHOD_(IObject*,Sender)(THIS){return sender;}
-	STDMETHOD_(int,IdFrom) (THIS) SCONST{ return idFrom;}
-	STDMETHOD_(void,SetIdFrom)(THIS_ int id) {idFrom = id;}
-	STDMETHOD_(LPCWSTR,NameFrom) (THIS) SCONST{return nameFrom;}
-	STDMETHOD_(void,SetNameFrom) (THIS_ LPCWSTR name) {nameFrom = name;}
-	STDMETHOD_(BOOL,IsBubbleUp) (THIS) SCONST{return bubbleUp;}
-	STDMETHOD_(void,SetBubbleUp) (THIS_ BOOL bSet) {bubbleUp = bSet;}
-	STDMETHOD_(UINT,HandleCount)(THIS) SCONST {return handled;}
-	STDMETHOD_(void,IncreaseHandleCount)(THIS) {handled++;}
-	STDMETHOD_(LPVOID,Data)(THIS) {return NULL;}
+    STDMETHOD_(IObject *, Sender)(THIS)
+    {
+        return sender;
+    }
+    STDMETHOD_(int, IdFrom)(THIS) SCONST
+    {
+        return idFrom;
+    }
+    STDMETHOD_(void, SetIdFrom)(THIS_ int id)
+    {
+        idFrom = id;
+    }
+    STDMETHOD_(LPCWSTR, NameFrom)(THIS) SCONST
+    {
+        return nameFrom;
+    }
+    STDMETHOD_(void, SetNameFrom)(THIS_ LPCWSTR name)
+    {
+        nameFrom = name;
+    }
+    STDMETHOD_(BOOL, IsBubbleUp)(THIS) SCONST
+    {
+        return bubbleUp;
+    }
+    STDMETHOD_(void, SetBubbleUp)(THIS_ BOOL bSet)
+    {
+        bubbleUp = bSet;
+    }
+    STDMETHOD_(UINT, HandleCount)(THIS) SCONST
+    {
+        return handled;
+    }
+    STDMETHOD_(void, IncreaseHandleCount)(THIS)
+    {
+        handled++;
+    }
+    STDMETHOD_(LPVOID, Data)(THIS)
+    {
+        return NULL;
+    }
 
-public:
-	SEvtArgs(IObject *pSender)
-		: handled(0)
-		, sender(pSender)
-		, bubbleUp(true)
-	{
-		if(NULL!=sender) {
-			idFrom = sender->GetID();
-			nameFrom = sender->GetName();
-			sender->AddRef();
-		} else {
-			idFrom = 0;
-			nameFrom = NULL;
-		}
-	}
+  public:
+    SEvtArgs(IObject *pSender)
+        : handled(0)
+        , sender(pSender)
+        , bubbleUp(true)
+    {
+        if (NULL != sender)
+        {
+            idFrom = sender->GetID();
+            nameFrom = sender->GetName();
+            sender->AddRef();
+        }
+        else
+        {
+            idFrom = 0;
+            nameFrom = NULL;
+        }
+    }
 
-	virtual ~SEvtArgs(){
-		if(sender)
-		{
-			sender->Release();
-			sender=NULL;
-		}
-	}
+    virtual ~SEvtArgs()
+    {
+        if (sender)
+        {
+            sender->Release();
+            sender = NULL;
+        }
+    }
 };
 
 //定义一组事件定义的宏，简化事件的定义。
@@ -184,7 +217,7 @@ public:
     class api evt                                      \
         : public SEvtArgs                              \
         , public evtData {                             \
-        DEF_SOBJECT(SEvtArgs, L#evt_name)          \
+        DEF_SOBJECT(SEvtArgs, L#evt_name)              \
       public:                                          \
         STDMETHOD_(int, GetID)(THIS) const             \
         {                                              \
@@ -209,7 +242,7 @@ public:
     };
 
 #define EVENTID(x) x::EventID, x::GetClassName()
-#endif//__cplusplus
+#endif //__cplusplus
 
 #define DEF_EVT_STRUCT(n, x) typedef struct n x n;
 
@@ -219,14 +252,14 @@ public:
     DEF_EVT_CLASS(evt, id, name, St##evt, api)
 #else
 #define DEF_EVENT(evt, id, name, x, api) DEF_EVT_STRUCT(St##evt, x)
-#endif//__cplusplus
+#endif //__cplusplus
 
 #define DEF_EVT(evt, id, name, x) DEF_EVENT(evt, id, name, x, SOUI_EXP)
 #define DEF_EVT_EXT(evt, id, x)   DEF_EVENT(evt, id, on_##evt, x, )
 
-DEF_EVT(EventInit, EVT_INIT, on_init, {int fake;});
+DEF_EVT(EventInit, EVT_INIT, on_init, { int fake; });
 
-DEF_EVT(EventExit, EVT_EXIT, on_exit, {int fake;});
+DEF_EVT(EventExit, EVT_EXIT, on_exit, { int fake; });
 
 DEF_EVT(EventTimer, EVT_TIMER, on_timer, { UINT uID; });
 
@@ -242,9 +275,9 @@ DEF_EVT(EventSpinValue2String, EVT_SPIN_VALUE2STRING, on_spin_valuetostring, {
     IStringT *strValue;
 });
 
-DEF_EVT(EventSwndCreate, EVT_CREATE, on_create, {int fake;});
-DEF_EVT(EventSwndInitFinish, EVT_INIT_FINISH, on_init_finish, {int fake;});
-DEF_EVT(EventSwndDestroy, EVT_DESTROY, on_destroy, {int fake;});
+DEF_EVT(EventSwndCreate, EVT_CREATE, on_create, { int fake; });
+DEF_EVT(EventSwndInitFinish, EVT_INIT_FINISH, on_init_finish, { int fake; });
+DEF_EVT(EventSwndDestroy, EVT_DESTROY, on_destroy, { int fake; });
 
 DEF_EVT(EventSwndSize, EVT_SIZE, on_size, { SIZE szWnd; });
 
@@ -260,7 +293,7 @@ inline BOOL EventSwndStateChanged_CheckState(EventSwndStateChanged *pEvt, DWORD 
 }
 #endif
 
-DEF_EVT(EventSwndVisibleChanged, EVT_VISIBLECHANGED, on_visible_changed, {int fake;})
+DEF_EVT(EventSwndVisibleChanged, EVT_VISIBLECHANGED, on_visible_changed, { int fake; })
 
 DEF_EVT(EventKeyDown, EVT_KEYDOWN, on_key_down, {
     UINT nChar;
@@ -268,12 +301,12 @@ DEF_EVT(EventKeyDown, EVT_KEYDOWN, on_key_down, {
     BOOL bCancel;
 });
 
-DEF_EVT(EventSwndMouseLeave, EVT_MOUSE_LEAVE, on_mouse_leave, {int fake;});
+DEF_EVT(EventSwndMouseLeave, EVT_MOUSE_LEAVE, on_mouse_leave, { int fake; });
 
-DEF_EVT(EventSwndMouseHover, EVT_MOUSE_HOVER, on_mouse_hover, {int fake;});
+DEF_EVT(EventSwndMouseHover, EVT_MOUSE_HOVER, on_mouse_hover, { int fake; });
 
 DEF_EVT(EventSwndUpdateTooltip, EVT_UPDATE_TOOLTIP, on_update_tooltip, {
-    IStringT* strToolTip;
+    IStringT *strToolTip;
     BOOL bUpdated;
 });
 
@@ -302,13 +335,13 @@ DEF_EVT(EventItemPanelHover, EVT_ITEMPANEL_HOVER, on_itempanel_hover, {
 });
 
 //注：在EventItemPanelLeave中从IItemPanel中通过GetItemIndex获取表项索引时需要检查索引有效性。
-DEF_EVT(EventItemPanelLeave, EVT_ITEMPANEL_LEAVE, on_itempanel_leave, {int fake;});
+DEF_EVT(EventItemPanelLeave, EVT_ITEMPANEL_LEAVE, on_itempanel_leave, { int fake; });
 
 DEF_EVT(EventLButtonDown, EVT_LBUTTONDOWN, on_mouse_lbutton_down, { POINT pt; });
 
 DEF_EVT(EventLButtonUp, EVT_LBUTTONUP, on_mouse_lbutton_up, { POINT pt; });
 
-DEF_EVT(EventCmd, EVT_CMD, on_command, {int fake;});
+DEF_EVT(EventCmd, EVT_CMD, on_command, { int fake; });
 
 DEF_EVT(EventCtxMenu, EVT_CTXMENU, on_conext_menu, {
     POINT pt;
@@ -417,7 +450,7 @@ DEF_EVT(EventHeaderItemSwap, EVT_HEADER_ITEMSWAP, on_header_item_swap, {
     int iNewIndex;
 });
 
-DEF_EVT(EventHeaderRelayout, EVT_HEADER_RELAYOUT, on_header_relayout, {int fake;});
+DEF_EVT(EventHeaderRelayout, EVT_HEADER_RELAYOUT, on_header_relayout, { int fake; });
 
 DEF_EVT(EventCBSelChange, EVT_CB_SELCHANGE, on_combobox_sel_change, { int nCurSel; });
 
@@ -450,7 +483,7 @@ DEF_EVT(EventCalendarSelDay, EVT_CALENDAR_SELDAY, on_calendar_sel_day, {
     WORD wNewDay;
 });
 
-DEF_EVT(EventCalendarSetDate, EVT_CALENDAR_SETDATE, on_calendar_set_date, {int fake;});
+DEF_EVT(EventCalendarSetDate, EVT_CALENDAR_SETDATE, on_calendar_set_date, { int fake; });
 
 DEF_EVT(EventCalendarExChanged, EVT_CALENDAREX_CHANGED, on_calendarex_changed, {
     WORD iNewDay;
@@ -488,13 +521,11 @@ DEF_EVT(EventTCDbClick, EVT_TC_DBCLICK, on_treectrl_item_dbclick, {
     BOOL bCancel;
 });
 
-DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, { 
-	RECT rcPane; 
-});
+DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, { RECT rcPane; });
 
-DEF_EVT(EventAnimateStart, EVT_ANI_START, on_animate_start, {int fake;});
+DEF_EVT(EventAnimateStart, EVT_ANI_START, on_animate_start, { int fake; });
 
-DEF_EVT(EventAnimateStop, EVT_ANI_STOP, EVT_ANI_STOP, {int fake;});
+DEF_EVT(EventAnimateStop, EVT_ANI_STOP, EVT_ANI_STOP, { int fake; });
 
 DEF_EVT(EventSelectMenu, EVT_SELECTMENU, on_select_menu, {
     UINT m_id;

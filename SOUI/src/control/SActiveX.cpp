@@ -3,8 +3,7 @@
 #include "../activex/SAxContainer.h"
 #include "control/SActiveX.h"
 
-namespace SOUI
-{
+SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 class SAxContainerImpl
     : public SAxContainer
@@ -244,4 +243,4 @@ HRESULT SFlashCtrl::OnAttrUrl(const SStringW &strValue, BOOL bLoading)
     return S_FALSE;
 }
 
-} // end of namespace SOUI
+SNSEND

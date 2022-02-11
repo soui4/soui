@@ -31,10 +31,10 @@ enum
 
 typedef enum GrtFlag
 {
-	GRT_NODRAW = 0,
-	GRT_PAINTBKGND,
-	GRT_OFFSCREEN,
-}GrtFlag;
+    GRT_NODRAW = 0,
+    GRT_PAINTBKGND,
+    GRT_OFFSCREEN,
+} GrtFlag;
 
 /**
  * @struct     ISwndContainer
@@ -68,7 +68,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @param swnd SWND--目标窗口
      * @param pDropTarget IDropTarget*--IDropTarget接口
      * @return TRUE--成功
-    */
+     */
     STDMETHOD_(BOOL, RegisterDragDrop)(THIS_ SWND swnd, IDropTarget * pDropTarget) PURE;
 
     /**
@@ -82,62 +82,61 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @brief 响应事件
      * @param evt IEvtArgs *--事件指针
      * @return TRUE--事件被处理
-    */
+     */
     STDMETHOD_(BOOL, OnFireEvent)(THIS_ IEvtArgs * evt) PURE;
 
     /**
      * @brief 获取当前的Message Loop
      * @return IMessageLoop *--当前的Message Loop
-    */
+     */
     STDMETHOD_(IMessageLoop *, GetMsgLoop)(THIS) PURE;
 
     /**
      * @brief 获取脚本模块
      * @return IScriptModule *--脚本模块
-    */
+     */
     STDMETHOD_(IScriptModule *, GetScriptModule)(THIS) PURE;
 
     /**
      * @brief 获取光标对象
      * @return ICaret *--光标对象
-    */
+     */
     STDMETHOD_(ICaret *, GetCaret)(THIS) PURE;
 
     /**
      * @brief 获取宿主窗口HWND
      * @return HWND--宿主窗口HWND
-    */
+     */
     STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
 
     /**
      * @brief 获取宿主窗口半透明标志
      * @return TRUE--宿主窗口半透明
-    */
+     */
     STDMETHOD_(BOOL, IsTranslucent)(THIS) SCONST PURE;
 
     /**
      * @brief 获取将mouseWheel消息分发到hover窗口的标志
      * @return TRUE--mouseWheel消息发到hover窗口，FALSE--mouseWheel分发到焦点窗口
-    */
+     */
     STDMETHOD_(BOOL, IsSendWheel2Hover)(THIS) SCONST PURE;
 
     /**
      * @brief 获取当前dpi放大倍数
      * @return int--放大倍数
-    */
+     */
     STDMETHOD_(int, GetScale)(THIS) SCONST PURE;
-
 
     /**
      * @brief 获取翻译上下文
      * @return LPCWSTR--翻译上下文
-    */
+     */
     STDMETHOD_(LPCWSTR, GetTranslatorContext)(THIS) SCONST PURE;
 
     /**
      * @brief 获取容器显示位置
      * @return RECT--容器显示位置
-    */
+     */
     STDMETHOD_(RECT, GetContainerRect)(THIS) SCONST PURE;
 
     /**
@@ -145,7 +144,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @param rc RECT--渲染位置
      * @param gdcFlags GrtFlag--请求RT标志
      * @return IRenderTarget *--渲染目标
-    */
+     */
     STDMETHOD_(IRenderTarget *, OnGetRenderTarget)(THIS_ LPCRECT rc, GrtFlag gdcFlags) PURE;
 
     /**
@@ -153,48 +152,48 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @param pRT IRenderTarget*--待释放的IRenderTarget
      * @param rc LPCRECT--显示位置
      * @param gdcFlags GrtFlag--请求RT标志
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, OnReleaseRenderTarget)
     (THIS_ IRenderTarget * pRT, LPCRECT rc, GrtFlag gdcFlags) PURE;
 
     /**
      * @brief 请求重绘
      * @param rc LPCRECT--重绘位置
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, OnRedraw)(THIS_ LPCRECT rc) PURE;
 
     /**
      * @brief 请求刷新
      * @param swnd SWND--刷新窗口
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, OnCavasInvalidate)(THIS_ SWND swnd) PURE;
 
     /**
      * @brief 获取捕获鼠标的Swnd对象
      * @return SWND--捕获鼠标的Swnd对象
-    */
+     */
     STDMETHOD_(SWND, OnGetSwndCapture)(THIS) SCONST PURE;
 
     /**
      * @brief 设置捕获鼠标的Swnd对象
      * @param swnd SWND--捕获鼠标的Swnd对象
      * @return SWND--原捕获鼠标的Swnd对象
-    */
+     */
     STDMETHOD_(SWND, OnSetSwndCapture)(THIS_ SWND swnd) PURE;
 
     /**
      * @brief 释放捕获鼠标的Swnd
      * @return TRUE--成功
-    */
+     */
     STDMETHOD_(BOOL, OnReleaseSwndCapture)(THIS) PURE;
 
     /**
      * @brief 获取Hover的Swnd
      * @return SWND--Hover的Swnd
-    */
+     */
     STDMETHOD_(SWND, GetHover)(THIS) SCONST PURE;
 
     /**
@@ -213,26 +212,26 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
     /**
      * @brief 请求立即更新窗口
      * @return TRUE--成功
-    */
+     */
     STDMETHOD_(BOOL, UpdateWindow)(THIS) PURE;
 
     /**
      * @brief 请求更新tooltip
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, UpdateTooltip)(THIS) PURE;
 
     /**
      * @brief 将当前Frame的矩形坐标转换成最终Host的坐标
      * @param [in,out] rc RECT*--待转换的矩形
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, FrameToHost)(THIS_ RECT * rc) SCONST PURE;
 
     /**
      * @brief 获取加速键管理器
      * @return IAcceleratorMgr *--加速键管理器
-    */
+     */
     STDMETHOD_(IAcceleratorMgr *, GetAcceleratorMgr)(THIS) PURE;
 
     /**
@@ -240,7 +239,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @param swnd SWND--目标窗口
      * @return TRUE--成功
      * @remark 注册为TrackMouseEvent后，该Swnd被其它窗口档住仍然可以捕获hover,leave消息
-    */
+     */
     STDMETHOD_(BOOL, RegisterTrackMouseEvent)(THIS_ SWND swnd) PURE;
 
     /**
@@ -253,27 +252,27 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
 
     /**
      * @brief 标记窗口树的zorder失效
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, MarkWndTreeZorderDirty)(THIS) PURE;
 
     /**
      * @brief 重建窗口树的zorder
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, BuildWndTreeZorder)(THIS) PURE;
 
     /**
      * @brief 启用/关闭输入法
      * @param bEnable BOOL--启用/关闭输入法标志
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, EnableIME)(THIS_ BOOL bEnable) PURE;
 
     /**
      * @brief 更新Cursor
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, OnUpdateCursor)(THIS) PURE;
 };
 

@@ -26,8 +26,7 @@
 #define SK_LEGACY_MATRIX_MATH_ORDER
 #define SiToU8(x) ((uint8_t)(x))
 
-namespace SOUI
-{
+SNSBEGIN
 static inline float SkDoubleToFloat(double x)
 {
     return static_cast<float>(x);
@@ -1806,17 +1805,17 @@ void SMatrix::setMatrix(const float fMat[9], int matType)
 
 void SMatrix::setIdentity()
 {
-	this->reset();
+    this->reset();
 }
 
-IxForm * SMatrix::Data() const
+IxForm *SMatrix::Data() const
 {
-	return (IxForm*)this;
+    return (IxForm *)this;
 }
 
 BOOL SMatrix::isIdentity() const
 {
-	return this->getType() == 0;
+    return this->getType() == 0;
 }
 
-} // end of namespace SOUI
+SNSEND

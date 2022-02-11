@@ -48,14 +48,14 @@
     }
 
 // void OnSetFont(IFont *pFont, BOOL bRedraw)
-#define MSG_WM_SETFONT_EX(func)                      \
-    if (uMsg == WM_SETFONT)                          \
-    {                                                \
-        SetMsgHandled(TRUE);                         \
+#define MSG_WM_SETFONT_EX(func)                       \
+    if (uMsg == WM_SETFONT)                           \
+    {                                                 \
+        SetMsgHandled(TRUE);                          \
         func((IFontS *)wParam, (BOOL)LOWORD(lParam)); \
-        lResult = 0;                                 \
-        if (IsMsgHandled())                          \
-            return TRUE;                             \
+        lResult = 0;                                  \
+        if (IsMsgHandled())                           \
+            return TRUE;                              \
     }
 
 // void OnSetFocus(SWND wndOld)

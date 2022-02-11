@@ -14,8 +14,7 @@
 #pragma once
 #include "swnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 /**
  * @class      SDropTargetDispatcher
@@ -81,4 +80,4 @@ class SDropTargetDispatcher : public IDropTarget {
     SWindow *m_pOwner;
 };
 
-} // namespace SOUI
+SNSEND

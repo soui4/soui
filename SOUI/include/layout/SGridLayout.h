@@ -3,8 +3,7 @@
 #include "interface/slayout-i.h"
 #include "SGridLayoutParamStruct.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 // Int = %d StringA
 #define ATTR_GRIDGRAVITY(attribname, varname, allredraw)        \
@@ -93,4 +92,4 @@ class SOUI_EXP SGridLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     GridGravity m_GravityY; /**<垂直排列方式 */
 };
 
-} // namespace SOUI
+SNSEND

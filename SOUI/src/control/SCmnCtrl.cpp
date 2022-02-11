@@ -13,8 +13,7 @@
 #include <vsstyle.h>
 #endif
 
-namespace SOUI
-{
+SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 // Static Control
@@ -424,7 +423,7 @@ void SButton::OnPaint(IRenderTarget *pRT)
             // lose hover
             m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Normal, m_pBgSkin->GetAlpha());
             m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Hover,
-                                   m_pBgSkin->GetAlpha() - byNewAlpha);
+                                    m_pBgSkin->GetAlpha() - byNewAlpha);
         }
     }
 
@@ -1577,4 +1576,4 @@ SIZE SGroup::GetDesiredSize(int nParentWid, int nParentHei)
     return szRet;
 }
 
-} // namespace SOUI
+SNSEND

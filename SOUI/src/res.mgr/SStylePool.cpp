@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "res.mgr/SStylePool.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 // SStylePool
@@ -168,4 +167,4 @@ STemplatePoolMgr::~STemplatePoolMgr()
     }
     m_lstTemplatePools.RemoveAll();
 }
-} // end of namespace SOUI
+SNSEND

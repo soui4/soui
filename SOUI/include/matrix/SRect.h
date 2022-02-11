@@ -11,8 +11,7 @@
 
 #include "SPoint.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 template <typename T>
 inline void STSwap(T &a, T &b)
@@ -280,6 +279,5 @@ struct SOUI_EXP SQuad
     bool contains(const SPoint &pt) const;
 };
 
-} // end of namespace SOUI
-
+SNSEND
 #endif

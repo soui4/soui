@@ -27,15 +27,15 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
     /**
      * @brief 设置适配器
      * @param pAdapter ITvAdapter *--适配器
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetAdapter)(THIS_ ITvAdapter * pAdapter) PURE;
 
     /**
      * @brief 树列表项数据发生变化后的响应
      * @param hItem HSTREEITEM--树列表项
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, OnBranchChanged)(THIS_ HSTREEITEM hItem) PURE;
 
     /**
@@ -43,8 +43,8 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
      * @param hItem HSTREEITEM--树列表项
      * @param bExpandedOld BOOL--原展开状态标志
      * @param bExpandedNew BOOL--新展开状态标志
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, OnBranchExpandedChanged)
     (THIS_ HSTREEITEM hItem, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
 
@@ -64,14 +64,14 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
      * @brief 从列表项转换为显示位置
      * @param hItem HSTREEITEM--树列表项
      * @return int--显示位置
-    */
+     */
     STDMETHOD_(int, Item2Position)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 显示位置转换成列表项
      * @param position int--显示位置
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(HSTREEITEM, Position2Item)(THIS_ int position) SCONST PURE;
 
     /**
@@ -84,23 +84,23 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
      * @brief 设置表项宽度
      * @param hItem HSTREEITEM--表项
      * @param nWidth int--宽度
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetItemWidth)(THIS_ HSTREEITEM hItem, int nWidth) PURE;
 
     /**
      * @brief 获取表项宽度
      * @param hItem HSTREEITEM--表项
      * @return int--表项宽度
-    */
+     */
     STDMETHOD_(int, GetItemWidth)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 设置表项高度
      * @param hItem HSTREEITEM--表项
      * @param nHeight int--表项高度
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetItemHeight)(THIS_ HSTREEITEM hItem, int nHeight) PURE;
 
     /**

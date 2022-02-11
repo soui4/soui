@@ -12,8 +12,7 @@
 
 #include "SMatrix.h"
 
-namespace SOUI
-{
+SNSBEGIN
 class S3DView;
 class SOUI_EXP SCamera {
   public:
@@ -41,6 +40,5 @@ class SOUI_EXP SCamera {
 
     S3DView *m_priv;
 };
-} // end of namespace SOUI
-
+SNSEND
 #endif

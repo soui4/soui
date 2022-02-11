@@ -15,7 +15,7 @@ typedef struct TIPID
 {
     DWORD dwHi;  // ID1, 用来保存一个SWND。
     DWORD dwLow; // ID2, 用来保存附加数据
-}TIPID;
+} TIPID;
 
 /**
  * @struct    IToolTip

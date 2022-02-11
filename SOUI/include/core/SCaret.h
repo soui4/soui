@@ -3,8 +3,7 @@
 #include <interface/sinterpolator-i.h>
 #include <interface/STimelineHandler-i.h>
 
-namespace SOUI
-{
+SNSBEGIN
 class SOUI_EXP SCaret
     : public TObjRefImpl<SObjectImpl<ICaret>>
     , public ITimelineHandler {
@@ -43,10 +42,10 @@ class SOUI_EXP SCaret
     void Invalidate();
 
   protected:
-    BOOL m_bVisible;                 /**< Is caret visible now */
-    CPoint m_ptCaret;                /**< caret position */
+    BOOL m_bVisible;                  /**< Is caret visible now */
+    CPoint m_ptCaret;                 /**< caret position */
     SAutoRefPtr<IBitmapS> m_bmpCaret; /**< 模拟插入符 */
-    bool m_bDrawCaret;               /**< is caret drawing */
+    bool m_bDrawCaret;                /**< is caret drawing */
     int m_iFrame;
     BYTE m_byAlpha;
 
@@ -58,4 +57,4 @@ class SOUI_EXP SCaret
     ISwndContainer *m_pContainer;
     SWND m_hOwner;
 };
-} // namespace SOUI
+SNSEND

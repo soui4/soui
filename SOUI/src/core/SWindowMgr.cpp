@@ -2,8 +2,7 @@
 #include "core/SWindowMgr.h"
 #include "helper/STimerEx.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 SWindowMgr::SWindowMgr()
@@ -61,4 +60,4 @@ BOOL SWindowMgr::DestroyWindow(SWND swnd)
     return bRet;
 }
 
-} // namespace SOUI
+SNSEND

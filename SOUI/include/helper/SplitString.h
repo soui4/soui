@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 template <class T, class TC>
 size_t SplitString(const T &str, TC cSep, SArray<T> &strLst)
 {
@@ -55,4 +54,4 @@ inline int ParseResID(const SStringT &str, SStringTList &strLst)
     return (int)strLst.GetCount();
 }
 
-} // namespace SOUI
+SNSEND

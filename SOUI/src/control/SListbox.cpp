@@ -12,8 +12,7 @@
 #pragma warning(disable : 4018)
 #pragma warning(disable : 4267)
 
-namespace SOUI
-{
+SNSBEGIN
 
 SListBox::SListBox()
     : m_itemHeight(20.f, SLayoutSize::dp)
@@ -623,4 +622,4 @@ void SListBox::UpdateScrollBar()
     InvalidateRect(NULL);
 }
 
-} // namespace SOUI
+SNSEND

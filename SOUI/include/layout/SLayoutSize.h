@@ -1,7 +1,6 @@
 ﻿#pragma once
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SOUI_EXP SLayoutSize {
   public:
@@ -52,4 +51,4 @@ class SOUI_EXP SLayoutSize {
     static SLayoutSize::Unit defUnit;
 };
 
-} // namespace SOUI
+SNSEND

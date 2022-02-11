@@ -3,8 +3,7 @@
 #include "interface/stooltip-i.h"
 #include "core/SNativeWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 class STipCtrl
     : public IToolTip
     , public SNativeWnd {
@@ -47,4 +46,4 @@ class STipCtrl
 
     TIPID m_id;
 };
-} // namespace SOUI
+SNSEND

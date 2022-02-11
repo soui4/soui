@@ -5,8 +5,7 @@
 
 #include <time.h>
 
-namespace SOUI
-{
+SNSBEGIN
 class SOUI_EXP STimeSpan {
   public:
     STimeSpan();
@@ -84,6 +83,5 @@ class SOUI_EXP STime {
     __time64_t m_time;
 };
 
-} // end of namespace SOUI
-
+SNSEND
 #endif // STime_h__

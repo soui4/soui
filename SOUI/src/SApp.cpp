@@ -38,8 +38,7 @@
 #include "animation/STranslateAnimation.h"
 #include "valueAnimator/SValueAnimator.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SNullTranslator : public TObjRefImpl<ITranslatorMgr> {
   public:
@@ -689,4 +688,4 @@ IResProviderMgr *SApplication::GetResProviderMgr(THIS)
     return this;
 }
 
-} // namespace SOUI
+SNSEND

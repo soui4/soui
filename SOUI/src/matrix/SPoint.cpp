@@ -8,8 +8,7 @@
 #include <souistd.h>
 #include "matrix/SPoint.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 float SPoint::Length(float dx, float dy)
 {
@@ -54,4 +53,4 @@ float SPoint::DotProduct(const SPoint &a, const SPoint &b)
     return a.fX * b.fX + a.fY * b.fY;
 }
 
-} // end of namespace SOUI
+SNSEND

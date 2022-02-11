@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "helper/SAppDir.h"
 
-namespace SOUI
-{
+SNSBEGIN
 SAppDir::SAppDir(HINSTANCE hInst)
 {
     TCHAR szCurrentDir[MAX_PATH] = { 0 };
@@ -21,4 +20,4 @@ const SStringT &SAppDir::AppDir()
 {
     return m_strAppPath;
 }
-} // namespace SOUI
+SNSEND

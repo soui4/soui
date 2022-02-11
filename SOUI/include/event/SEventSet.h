@@ -2,8 +2,7 @@
 
 #include "SEventSlot.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SOUI_EXP SEvent {
   public:
@@ -185,4 +184,4 @@ Return whether the EventSet is muted or not.
     int m_nMuted;
 };
 
-} // namespace SOUI
+SNSEND

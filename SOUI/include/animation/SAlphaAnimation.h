@@ -17,8 +17,7 @@
 #pragma once
 #include <animation/SAnimation.h>
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  * An animation that controls the alpha level of an object.
  * Useful for fading things in and out. This animation ends up
@@ -64,4 +63,4 @@ class SOUI_EXP SAlphaAnimation : public SAnimation {
     STDMETHOD_(BOOL, hasAlpha)(THIS) SCONST OVERRIDE;
 };
 
-} // namespace SOUI
+SNSEND

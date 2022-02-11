@@ -13,8 +13,7 @@
 #pragma once
 #include "core/SPanel.h"
 
-namespace SOUI
-{
+SNSBEGIN
 /**
  * @struct    tagLBITEM
  * @brief     LBitem
@@ -468,4 +467,4 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
     SOUI_MSG_MAP_END()
 };
 
-} // namespace SOUI
+SNSEND

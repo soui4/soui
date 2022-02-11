@@ -3,8 +3,7 @@
 #include "core/SWnd.h"
 #include "core/SWindowMgr.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 //    STimer2
@@ -61,4 +60,4 @@ VOID CALLBACK STimer2::_TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD 
     }
 }
 
-} // namespace SOUI
+SNSEND

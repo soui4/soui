@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "event/SNotifyCenter.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 template <>
 SNotifyCenter *SSingleton<SNotifyCenter>::ms_Singleton = 0;
@@ -206,4 +205,4 @@ void SNotifyCenter::RunOnUIAsync(std::function<void(void)> fn)
 }
 #endif
 
-} // namespace SOUI
+SNSEND

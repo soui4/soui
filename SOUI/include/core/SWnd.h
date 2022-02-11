@@ -46,8 +46,7 @@
 #define ASSERT_UI_THREAD()
 #endif
 
-namespace SOUI
-{
+SNSBEGIN
 
 /////////////////////////////////////////////////////////////////////////
 enum
@@ -168,21 +167,21 @@ enum
 
 class SWindow;
 class SOUI_EXP STrText {
-public:
-	STrText(SWindow *pOwner=NULL);
-	void SetOwner(SWindow *pOwner);
+  public:
+    STrText(SWindow *pOwner = NULL);
+    void SetOwner(SWindow *pOwner);
 
-	void SetText(const SStringT &strText);
+    void SetText(const SStringT &strText);
 
-	SStringT GetText(BOOL bRawText = FALSE) const;
+    SStringT GetText(BOOL bRawText = FALSE) const;
 
-	void TranslateText();
+    void TranslateText();
 
-protected:
-	SWindow *pOwner;
+  protected:
+    SWindow *pOwner;
 
-	SStringT strRaw; //原始字符串
-	SStringT strTr;  //翻译后的字符串
+    SStringT strRaw; //原始字符串
+    SStringT strTr;  //翻译后的字符串
 };
 
 /**
@@ -191,8 +190,7 @@ protected:
  *
  * Describe   SOUI窗口基类,实现窗口的基本接口
  */
-class SOUI_EXP SWindow
-    : public TObjRefImpl<SObjectImpl<IWindow>>{
+class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
     DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IWindow>>, L"window", Window)
     friend class SwndLayoutBuilder;
     friend class SWindowRepos;
@@ -315,7 +313,7 @@ class SOUI_EXP SWindow
     STDMETHOD_(void, SetWindowRgn)(THIS_ IRegionS *pRgn, BOOL bRedraw = TRUE) OVERRIDE;
     STDMETHOD_(IRegionS *, GetWindowRgn)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, SetWindowPath)(THIS_ IPathS *pPath, BOOL bRedraw = TRUE) OVERRIDE;
-	STDMETHOD_(IPathS*, GetWindowPath)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(IPathS *, GetWindowPath)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, SetTimer)(THIS_ char id, UINT uElapse) OVERRIDE;
     STDMETHOD_(void, KillTimer)(THIS_ char id) OVERRIDE;
@@ -364,16 +362,16 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(IWindow *, GetIParent)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(IWindow *, GetIRoot)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(IWindow *, GetIRoot)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, IsIDescendant)(THIS_ const IWindow *pWnd) SCONST OVERRIDE;
 
-	STDMETHOD_(BOOL, AdjustIZOrder)(THIS_ IWindow *pInsertAfter) OVERRIDE;
+    STDMETHOD_(BOOL, AdjustIZOrder)(THIS_ IWindow *pInsertAfter) OVERRIDE;
 
-	STDMETHOD_(void, InsertIChild)
+    STDMETHOD_(void, InsertIChild)
     (THIS_ IWindow *pNewChild, IWindow *pInsertAfter = ICWND_LAST) OVERRIDE;
 
-	STDMETHOD_(BOOL, RemoveIChild)(THIS_ IWindow *pChild) OVERRIDE;
+    STDMETHOD_(BOOL, RemoveIChild)(THIS_ IWindow *pChild) OVERRIDE;
 
     STDMETHOD_(BOOL, DestroyIChild)(THIS_ IWindow *pChild) OVERRIDE;
 
@@ -394,7 +392,7 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BOOL, SetTimer2)(THIS_ UINT_PTR id, UINT uElapse) OVERRIDE;
 
-	STDMETHOD_(void, KillTimer2)(THIS_ UINT_PTR id) OVERRIDE;
+    STDMETHOD_(void, KillTimer2)(THIS_ UINT_PTR id) OVERRIDE;
 
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) OVERRIDE;
 
@@ -415,7 +413,7 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(IWindow *, GetISelectedSiblingInGroup)(THIS) OVERRIDE
+    STDMETHOD_(IWindow *, GetISelectedSiblingInGroup)(THIS) OVERRIDE
     {
         return GetSelectedSiblingInGroup();
     }
@@ -431,7 +429,8 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BOOL, FireCtxMenu)(THIS_ POINT pt) OVERRIDE;
 
-    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT *pt, BOOL bIncludeMsgTransparent = FALSE) SCONST OVERRIDE;
+    STDMETHOD_(SWND, SwndFromPoint)
+    (THIS_ POINT *pt, BOOL bIncludeMsgTransparent = FALSE) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, SubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) OVERRIDE;
 
@@ -467,7 +466,7 @@ class SOUI_EXP SWindow
     SWindow *GetWindow(int uCode) const;
 
     SWindow *GetChild(int iChild) const;
- 
+
     SWindow *GetParent() const;
 
     SWindow *GetRoot() const;
@@ -1264,8 +1263,8 @@ class SOUI_EXP SWindow
 
     LayoutDirtyType m_layoutDirty;         /**< 布局脏标志 参见LayoutDirtyType */
     SAutoRefPtr<IRenderTarget> m_cachedRT; /**< 缓存窗口绘制的RT */
-    SAutoRefPtr<IRegionS> m_clipRgn;        /**< 窗口Region */
-    SAutoRefPtr<IPathS> m_clipPath;         /**< 窗口Path */
+    SAutoRefPtr<IRegionS> m_clipRgn;       /**< 窗口Region */
+    SAutoRefPtr<IPathS> m_clipPath;        /**< 窗口Path */
     SAutoRefPtr<ISkinObj> m_pBgSkin;       /**< 背景skin */
     SAutoRefPtr<ISkinObj> m_pNcSkin;       /**< 非客户区skin */
     ULONG_PTR m_uData;                     /**< 窗口的数据位,可以通过GetUserData获得 */
@@ -1282,15 +1281,15 @@ class SOUI_EXP SWindow
 
     typedef struct GETRTDATA
     {
-        CRect rcRT;               /**< GETRT调用的有效范围 */
-        GrtFlag gdcFlags;         /**< GETRT绘制标志位 */
+        CRect rcRT;                /**< GETRT调用的有效范围 */
+        GrtFlag gdcFlags;          /**< GETRT绘制标志位 */
         SAutoRefPtr<IRegionS> rgn; /**< 保存一个和rcRT对应的IRegion对象 */
         SAutoRefPtr<IRenderTarget> rt;
     } * PGETRTDATA;
 
     PGETRTDATA m_pGetRTData;
 
-    SAutoRefPtr<IRegionS> m_invalidRegion;    /**< 非背景混合窗口的脏区域 */
+    SAutoRefPtr<IRegionS> m_invalidRegion;   /**< 非背景混合窗口的脏区域 */
     SAutoRefPtr<IAttrStorage> m_attrStorage; /**< 属性保存对象 */
 
 #ifdef SOUI_ENABLE_ACC
@@ -1302,42 +1301,4 @@ class SOUI_EXP SWindow
 #endif
 };
 
-template <class T>
-class TWindowProxy
-    : public T
-    , public SWindow {
-  public:
-    STDMETHOD_(long, AddRef)(THIS) OVERRIDE
-    {
-        return SWindow::AddRef();
-    }
-    STDMETHOD_(long, Release)(THIS) OVERRIDE
-    {
-        return SWindow::Release();
-    }
-    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
-    {
-        SWindow::OnFinalRelease();
-    }
-
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) OVERRIDE
-    {
-        return this;
-    }
-
-    STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
-    {
-        if (id == __uuidof(T))
-        {
-            *ppRet = (T *)this;
-            AddRef();
-            return S_OK;
-        }
-        else
-        {
-            return E_NOTIMPL;
-        }
-    }
-};
-
-} // namespace SOUI
+SNSEND

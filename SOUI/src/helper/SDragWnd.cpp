@@ -1,8 +1,7 @@
 ﻿#include "souistd.h"
 #include "helper/SDragWnd.h"
 #include "helper/SMemDC.h"
-namespace SOUI
-{
+SNSBEGIN
 
 SDragWnd *SDragWnd::s_pCurDragWnd = NULL;
 
@@ -88,4 +87,4 @@ void SDragWnd::EndDrag()
     s_pCurDragWnd = NULL;
 }
 
-} // namespace SOUI
+SNSEND

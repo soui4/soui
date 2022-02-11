@@ -16,8 +16,7 @@
 #include <assert.h>
 #include "../SApp.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 #define SINGLETON2_TYPE(x)     \
   public:                      \
@@ -87,4 +86,4 @@ class SSingleton2 {
     }
 };
 
-} // namespace SOUI
+SNSEND

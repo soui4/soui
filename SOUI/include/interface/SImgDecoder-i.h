@@ -187,5 +187,4 @@ DECLARE_INTERFACE_(IImgDecoderFactory, IObjRef)
     STDMETHOD_(LPCWSTR, GetDescription)(THIS) SCONST PURE;
 };
 
-
 SNSEND

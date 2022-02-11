@@ -1,8 +1,7 @@
 #include "souistd.h"
 #include "helper/SDpiScale.h"
 
-namespace SOUI
-{
+SNSBEGIN
 static const int KBuiltinScales[] = { 100, 125, 150, 200, 250, 300 };
 
 int SDpiScale::GetBuiltinScaleCount()
@@ -27,4 +26,4 @@ int SDpiScale::NormalizeScale(int nScale)
     }
     return KBuiltinScales[ARRAYSIZE(KBuiltinScales) - 1];
 }
-} // namespace SOUI
+SNSEND

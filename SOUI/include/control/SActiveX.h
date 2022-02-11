@@ -3,8 +3,7 @@
 #include "activex/flash10t.tlh"
 #include <mshtmhst.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SOUI_EXP SActiveX : public SWindow {
     friend class SAxContainerImpl;
@@ -95,4 +94,4 @@ class SOUI_EXP SFlashCtrl : public SActiveX {
     SComQIPtr<ShockwaveFlashObjects::IShockwaveFlash> flash_;
 };
 
-} // namespace SOUI
+SNSEND

@@ -2,8 +2,7 @@
 #include "core/SObjectFactory.h"
 #include "res.mgr/SObjDefAttr.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SObjectFactoryMgr::SObjectFactoryMgr(void)
 {
@@ -115,4 +114,4 @@ IObject *SObjectFactoryMgr::OnCreateUnknownObject(const SObjectInfo &objInfo) co
     return NULL;
 }
 
-} // namespace SOUI
+SNSEND

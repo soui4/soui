@@ -71,7 +71,7 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
      * @brief 比较翻译的Name
      * @param pszName LPCWSTR--翻译的Name
      * @return TRUE--相同
-    */
+     */
 
     STDMETHOD_(BOOL, NameEqual)(THIS_ LPCWSTR pszName) PURE;
     /**
@@ -98,8 +98,8 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
     /**
      * @brief 获取翻译的默认字体信息
      * @param [out] strFont IStringW *--字体信息
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, getFontInfo)(THIS_ IStringW * strFont) SCONST PURE;
 };
 

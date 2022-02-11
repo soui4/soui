@@ -14,8 +14,7 @@
 #pragma once
 #include "core/SSingletonMap.h"
 #include "core/SDefine.h"
-namespace SOUI
-{
+SNSBEGIN
 
 class SWindow;
 
@@ -48,4 +47,4 @@ class SOUI_EXP SWindowMgr : public SSingletonMap<SWindowMgr, SWindow *, SWND> {
     SWND m_hNextWnd;
 };
 
-} // namespace SOUI
+SNSEND

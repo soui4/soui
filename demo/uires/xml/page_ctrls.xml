@@ -389,7 +389,7 @@
 						<proptext name="text1.2" value="value 1.2" />
 					</propgroup>
 					<propgroup name="group2" description="desc of group2">
-						<propoption name="option2.1" value="1" options="true|false|empty" />
+						<propoption name="option2.1" value="true" options="true|false|empty" />
 						<propsize name="size2.1" value="200,300" childrenTitle="宽|高" />
 						<proptext name="text2.2" value="value 2.2" />
 						<propcolor name="color2.1" value="#00ff00" format="#%02x%02x%02x%02x" />

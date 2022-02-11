@@ -2,8 +2,7 @@
 #include "interface/SListViewItemLocator-i.h"
 #include "control/STree.h"
 
-namespace SOUI
-{
+SNSBEGIN
 class SOUI_EXP SListViewItemLocatorFix : public TObjRefImpl<IListViewItemLocator> {
   public:
     SListViewItemLocatorFix(SLayoutSize nItemHei, SLayoutSize nDividerSize = SLayoutSize());
@@ -93,4 +92,4 @@ class SOUI_EXP SListViewItemLocatorFlex : public TObjRefImpl<IListViewItemLocato
     SAutoRefPtr<ILvAdapter> m_adapter;
 };
 
-} // namespace SOUI
+SNSEND

@@ -4,8 +4,7 @@
 #define COMPILE_MULTIMON_STUBS
 #include <multimon.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 #define TIMERID_DELAY 1
 #define TIMERID_SPAN  2
@@ -199,4 +198,4 @@ void STipCtrl::OnFinalMessage(HWND hWnd)
     SNativeWnd::OnFinalMessage(hWnd);
     delete this;
 }
-} // namespace SOUI
+SNSEND

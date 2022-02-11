@@ -70,8 +70,8 @@ void STransformation::postCompose(STransformation t)
 
 void STransformation::Compose(const ITransformation *t)
 {
-	const STransformation & t2 = *(const STransformation*)t;
-	compose(t2);
+    const STransformation &t2 = *(const STransformation *)t;
+    compose(t2);
 }
 
 void STransformation::compose(const STransformation &t)
@@ -118,9 +118,9 @@ STransformation::STransformation()
     Clear();
 }
 
-IMatrix * STransformation::GetMatrix()
+IMatrix *STransformation::GetMatrix()
 {
-	return &mMatrix;
+    return &mMatrix;
 }
 
 SNSEND

@@ -2,8 +2,7 @@
 #include <helper/swndfinder.h>
 #include <core/Swnd.h>
 
-namespace SOUI
-{
+SNSBEGIN
 SWindowFinder *SSingleton<SWindowFinder>::ms_Singleton = NULL;
 
 SFindInfo::SFindInfo(SWindow *pParent, const SStringW &_strName, int _nDeep)
@@ -72,4 +71,4 @@ void SWindowFinder::CacheResultForID(SWindow *pParent, int nID, int nDeep, SWind
     m_findCache[fi] = pResult->GetSwnd();
 }
 
-} // namespace SOUI
+SNSEND

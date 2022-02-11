@@ -5,8 +5,7 @@
 #pragma warning(disable : 4267 4018)
 
 #define ITEM_MARGIN 4
-namespace SOUI
-{
+SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 //  SListCtrl
 SListCtrl::SListCtrl()
@@ -994,4 +993,4 @@ SHeaderCtrl *SListCtrl::GetHeaderCtrl() const
     return m_pHeader;
 }
 
-} // namespace SOUI
+SNSEND

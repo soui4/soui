@@ -2,8 +2,7 @@
 #include "control/SHotKeyCtrl.h"
 #include <CommCtrl.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 SHotKeyCtrl::SHotKeyCtrl(void)
 {
@@ -242,4 +241,4 @@ HRESULT SHotKeyCtrl::OnAttrHotKey(const SStringW &value, BOOL bLoading)
     return bLoading ? S_OK : S_FALSE;
 }
 
-} // namespace SOUI
+SNSEND

@@ -5,8 +5,7 @@
 #include "core/SNativeWnd.h"
 #include "res.mgr/Sskinpool.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 #define CX_ICON 16 //支持的图标的宽度
 #define CY_ICON 16 //支持的图标的高度
@@ -292,4 +291,4 @@ class SOUI_EXP SMenu {
     SAutoRefPtr<ISkinObj> m_icons;
 };
 
-} // namespace SOUI
+SNSEND

@@ -2,8 +2,7 @@
 
 #include "activex/SBStr.h"
 
-namespace SOUI
-{
+SNSBEGIN
 sbstr::sbstr(const char16 *non_bstr)
     : bstr_(SysAllocString(non_bstr))
 {
@@ -83,4 +82,4 @@ size_t sbstr::ByteLength() const
     return SysStringByteLen(bstr_);
 }
 
-} // namespace SOUI
+SNSEND

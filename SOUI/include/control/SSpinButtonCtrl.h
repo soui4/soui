@@ -1,8 +1,7 @@
 ﻿#pragma once
 #include "core/SWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 class SOUI_EXP SSpinButtonCtrl : public SWindow {
     DEF_SOBJECT(SWindow, L"spinButton")
   public:
@@ -77,4 +76,4 @@ class SOUI_EXP SSpinButtonCtrl : public SWindow {
     };
     ActionButton m_iActionBtn;
 };
-} // namespace SOUI
+SNSEND

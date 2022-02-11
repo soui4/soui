@@ -2,8 +2,7 @@
 #include "core/SwndAccessible.h"
 #pragma comment(lib, "oleacc.lib")
 
-namespace SOUI
-{
+SNSBEGIN
 #ifdef SOUI_ENABLE_ACC
 SAccessible::SAccessible(SWindow *pWnd)
     : m_pWnd(pWnd)
@@ -497,4 +496,4 @@ STDMETHODIMP SAccessible::Invoke(DISPID dispIdMember,
 
 #endif
 // SOUI_ENABLE_ACC
-} // namespace SOUI
+SNSEND

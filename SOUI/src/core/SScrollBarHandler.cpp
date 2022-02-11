@@ -1,8 +1,7 @@
 #include <souistd.h>
 #include <core/SScrollBarHandler.h>
 
-namespace SOUI
-{
+SNSBEGIN
 SScrollBarHandler::SScrollBarHandler(IScrollBarHost *pCB, bool bVert)
     : m_bVert(bVert)
     , m_pSbHost(pCB)
@@ -432,4 +431,4 @@ void SScrollBarHandler::OnContainerChanged(ISwndContainer *pOldContainer,
         pOldContainer->UnregisterTimelineHandler(this);
 }
 
-} // namespace SOUI
+SNSEND

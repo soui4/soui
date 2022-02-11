@@ -6,8 +6,7 @@
 #include <math.h>               // this is where I would normally get the warning message
 #pragma warning(pop)
 
-namespace SOUI
-{
+SNSBEGIN
 enum
 {
     POS_INIT = 0x11000000, //坐标的初始化值
@@ -867,4 +866,4 @@ void SouiLayout::LayoutChildren(IWindow *pParent)
     }
 }
 
-} // namespace SOUI
+SNSEND

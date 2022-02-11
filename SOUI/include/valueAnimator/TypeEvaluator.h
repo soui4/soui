@@ -26,8 +26,7 @@
 #pragma once
 #include <math.h>
 
-namespace SOUI
-{
+SNSBEGIN
 template <typename T>
 class TypeEvaluator {
   public:
@@ -147,4 +146,4 @@ class TypeEvaluator<COLORREF> {
     }
 };
 
-} // namespace SOUI
+SNSEND

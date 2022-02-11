@@ -172,40 +172,40 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(HRESULT, AfterAttribute)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading, HRESULT hr) PURE;
 
-	//////////////////////////////////////////////////////////////////////////
-    
+    //////////////////////////////////////////////////////////////////////////
+
     /**
      * @brief 查询控件接口
      * @param id REFGUID--控件接口ID
      * @param [out] ppRet IObjRef * *--控件接口
      * @return S_OK--成功
-    */
+     */
     STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppRet) PURE;
 
     /**
      * @brief 获取控件容器接口
      * @return ISwndContainer *--控件容器接口
-    */
+     */
     STDMETHOD_(ISwndContainer *, GetContainer)(THIS) PURE;
 
     /**
      * @brief 设置控件容器接口
      * @param pContainer ISwndContainer *--控件容器接口
-     * @return 
+     * @return
      * @remark 内部调用
-    */
+     */
     STDMETHOD_(void, SetContainer)(THIS_ ISwndContainer * pContainer) PURE;
 
     /**
      * @brief 获取SOUI容器句柄
      * @return SWND--SOUI容器句柄
-    */
+     */
     STDMETHOD_(SWND, GetSwnd)(THIS) SCONST PURE;
 
     /**
      * @brief 获取布局对象
      * @return ILayout *--布局对象
-    */
+     */
     STDMETHOD_(ILayout *, GetLayout)(THIS) PURE;
 
     /**
@@ -219,101 +219,101 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param pLayoutParam ILayoutParam *--布局参数对象
      * @return TRUE--成功，FALSE--失败
      * @remark 只有布局参数对象和窗口的布局类型匹配才会设置成功
-    */
+     */
     STDMETHOD_(BOOL, SetLayoutParam)(THIS_ ILayoutParam * pLayoutParam) PURE;
 
     /**
      * @brief 获取当前窗口参与自动布局标志
      * @return TRUE--参与布局,FALSE--不参与布局，需要用户在代码中手动布局
-    */
+     */
     STDMETHOD_(BOOL, IsFloat)(THIS) SCONST PURE;
 
     /**
      * @brief 获取隐藏占位标志
      * @return TRUE--窗口隐藏的时候占有该布局位置，FALSE--隐藏时不占位
-    */
+     */
     STDMETHOD_(BOOL, IsDisplay)(THIS) SCONST PURE;
 
     /**
      * @brief 获取窗口是否处理鼠标消息
      * @return TRUE--鼠标消息透传给父窗口
-    */
+     */
     STDMETHOD_(BOOL, IsMsgTransparent)(THIS) SCONST PURE;
 
     /**
      * @brief 获取窗口是否自动剪裁客户区
      * @return TRUE--自动剪裁客户区
      * @remark 剪裁客户区可以限制窗口及它的子窗口绘制不超过当前窗口客户区，但是要增加一次剪裁操作
-    */
+     */
     STDMETHOD_(BOOL, IsClipClient)(THIS) SCONST PURE;
 
     /**
      * @brief 设置tooltip
      * @param pszText LPCTSTR--tooltip字符串
-     * @return 
+     * @return
      * @remark 支持多语言
-    */
+     */
     STDMETHOD_(void, SetToolTipText)(THIS_ LPCTSTR pszText) PURE;
 
     /**
      * @brief 获取窗口的check状态标志
      * @return TRUE--checked
-    */
+     */
     STDMETHOD_(BOOL, IsChecked)(THIS) SCONST PURE;
 
     /**
      * @brief 设置窗口check状态
      * @param bCheck BOOL--check状态
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetCheck)(THIS_ BOOL bCheck) PURE;
 
     /**
      * @brief 获取窗口的禁用状态
      * @return TRUE--窗口禁用
-    */
+     */
     STDMETHOD_(BOOL, IsDisabled)(THIS_ BOOL bCheckParent) SCONST PURE;
 
     /**
      * @brief 设置窗口启用状态
      * @param bEnable BOOL--启用窗口
      * @param bUpdate BOOL--同时刷新窗口标志
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, EnableWindow)(THIS_ BOOL bEnable, BOOL bUpdate) PURE;
 
     /**
      * @brief 获取窗口的可见标志
      * @return TRUE--可见
-    */
+     */
     STDMETHOD_(BOOL, IsVisible)(THIS_ BOOL bCheckParent) SCONST PURE;
 
     /**
      * @brief 设置窗口可见标志
      * @param bVisible BOOL--可见性
      * @param bUpdate  BOOL--同时刷新窗口标志
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetVisible)(THIS_ BOOL bVisible, BOOL bUpdate) PURE;
 
     /**
      * @brief 获取窗口的用户数据
      * @return ULONG_PTR--用户数据
-    */
+     */
     STDMETHOD_(ULONG_PTR, GetUserData)(THIS) SCONST PURE;
 
     /**
      * @brief 设置窗口用户数据
      * @param uData ULONG_PTR--新用户数据
      * @return ULONG_PTR--原用户数据
-    */
+     */
     STDMETHOD_(ULONG_PTR, SetUserData)(THIS_ ULONG_PTR uData) PURE;
 
     /**
      * @brief 执行调色
      * @param cr COLORREF--目标色调
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, DoColorize)(THIS_ COLORREF cr) PURE;
 
     /**
@@ -328,8 +328,8 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param wParam WPARAM--参数1
      * @param lParam LPARAM--参数2
      * @param [out] pbMsgHandled BOOL*--消息被处理标志
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(LRESULT, SSendMessage)
     (THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL * pbMsgHandled) PURE;
 
@@ -338,8 +338,8 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param uMsg UINT-消息类型
      * @param wParam WPARAM--参数1
      * @param lParam LPARAM--参数2
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SDispatchMessage)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam) PURE;
 
     /**
@@ -347,7 +347,6 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @return TRUE--允许
      */
     STDMETHOD_(BOOL, IsFocusable)(THIS) SCONST PURE;
-
 
     /**
      * @brief 判断是否为焦点窗口
@@ -357,51 +356,51 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * @brief 将当前窗口设置为焦点窗口
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetFocus)(THIS) PURE;
 
     /**
      * @brief 取消焦点
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, KillFocus)(THIS) PURE;
 
     /**
      * @brief 刷新当前窗口客户区
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, Invalidate)(THIS) PURE;
 
     /**
      * @brief 刷新当前窗口指定位置
      * @param lprect LPCRECT--窗口位置
-     * @return 
+     * @return
      * @remark 可以包含非客户区，但是不刷新窗口外位置
-    */
+     */
     STDMETHOD_(void, InvalidateRect)(THIS_ LPCRECT lprect) PURE;
 
     /**
      * @brief 锁住刷新，中断刷新调用
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, LockUpdate)(THIS) PURE;
 
     /**
      * @brief 解锁刷新，恢复刷新调用
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, UnlockUpdate)(THIS) PURE;
 
     /**
      * @brief 获取刷新加锁状态
      * @return TRUE--当前刷新为加锁状态
-    */
+     */
     STDMETHOD_(BOOL, IsUpdateLocked)(THIS) SCONST PURE;
 
     /**
      * @brief 请求立即更新窗口
-     * @return 
+     * @return
      * @remark 通常要刷新一个窗口，应该使用Invalidate/InvalidateRect，这样系统中所有请求都会在
      下一次刷新的时候被重新绘制。但是这可能会出现延时。为了能够立即重新绘制，可以调用Update
     */
@@ -411,9 +410,9 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 设置窗口显示区域
      * @param pRgn IRegionS*--显示区域
      * @param bRedraw BOOL--重新绘制
-     * @return 
+     * @return
      * @remark 区域的左上角坐标为(0,0),在显示过程中会根据窗口真实坐标调整位置
-    */
+     */
     STDMETHOD_(void, SetWindowRgn)(THIS_ IRegionS * pRgn, BOOL bRedraw) PURE;
 
     /**
@@ -454,9 +453,9 @@ DECLARE_INTERFACE_(IWindow, IObject)
     /**
      * @brief 将窗口移动到指定位置
      * @param prect LPCRECT--窗口坐标
-     * @return 
+     * @return
      * remark 容器在容器中的坐标
-    */
+     */
     STDMETHOD_(void, Move)(THIS_ LPCRECT prect) PURE;
 
     /**
@@ -486,7 +485,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param [in,out] pt POINT *--测试坐标
      * @param bIncludeMsgTransparent BOOL--测试消息透传窗口标志
      * @return SWND--包含指定坐标的最顶层窗口
-    */
+     */
     STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT * pt, BOOL bIncludeMsgTransparent) SCONST PURE;
 
     /**
@@ -494,14 +493,14 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param id char--定时器ID，范围从0-127
      * @param uElapse UINT--定时器延时
      * @return TRUE--成功
-    */
+     */
     STDMETHOD_(BOOL, SetTimer)(THIS_ char id, UINT uElapse) PURE;
 
     /**
      * @brief 删除SetTimer创建的定时器
      * @param id char--SetTimer创建的定时器ID
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, KillTimer)(THIS_ char id) PURE;
 
     /**
@@ -529,113 +528,113 @@ DECLARE_INTERFACE_(IWindow, IObject)
     /**
      * @brief 获取鼠标捕获
      * @return SWND--鼠标捕获窗口句柄
-    */
+     */
     STDMETHOD_(SWND, GetCapture)(THIS) SCONST PURE;
 
     /**
      * @brief 设置容器为鼠标捕获
      * @return SWND--前鼠标捕获窗口句柄
-    */
+     */
     STDMETHOD_(SWND, SetCapture)(THIS) PURE;
 
     /**
      * @brief 释放鼠标捕获
      * @return TRUE--释放成功
-    */
+     */
     STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
 
     /**
      * @brief 设置一个窗口动画
      * @param animation IAnimation *--动画对象
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetAnimation)(THIS_ IAnimation * animation) PURE;
 
     /**
      * @brief 立即启动一个动画对象
      * @param animation IAnimation *--动画对象
-     * @return 
+     * @return
      * @remark 和setAnimation不同在于立即启动，而不是等待动画对象中的延时启动时间
-    */
+     */
     STDMETHOD_(void, StartAnimation)(THIS_ IAnimation * animation) PURE;
 
     /**
      * @brief 获取当前正在运行的动画对象
      * @return IAnimation *--动画对象
-    */
+     */
     STDMETHOD_(IAnimation *, GetAnimation)(THIS) SCONST PURE;
 
     /**
      * @brief 清除动画
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, ClearAnimation)(THIS) PURE;
 
     /**
      * @brief 设置窗口透明度
      * @param byAlpha BYTE--透明度,[0,255]
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetAlpha)(THIS_ BYTE byAlpha) PURE;
 
     /**
      * @brief 获取窗口透明度
      * @return BYTE--窗口透明度
-    */
+     */
     STDMETHOD_(BYTE, GetAlpha)(THIS) SCONST PURE;
 
     /**
      * @brief 设置窗口变换矩阵
      * @param mtx const IMatrix *--变换矩阵
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetMatrix)(THIS_ const IMatrix *mtx) PURE;
 
     /**
      * @brief 获取窗口变换矩阵
-    */
+     */
     STDMETHOD_(void, GetMatrix)(THIS_ IMatrix * mtx) SCONST PURE;
 
     /**
      * @brief 获取dpi放大倍数
      * @return int--dpi放大倍数,以100为基数
-    */
+     */
     STDMETHOD_(int, GetScale)(THIS) SCONST PURE;
 
     /**
      * @brief 请求重新布局
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, RequestRelayout)(THIS) PURE;
 
     /**
      * @brief 重新布局当前窗口的子窗口，只在窗口布局脏了才生效
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, UpdateLayout)(THIS) PURE;
 
     /**
      * @brief 强制重新布局子窗口
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) PURE;
 
     /**
      * @brief 获取布局脏标志
      * @return TRUE--布局脏
-    */
+     */
     STDMETHOD_(BOOL, IsLayoutDirty)(THIS) SCONST PURE;
 
     /**
      * @brief 获取窗口响应键盘的标志位
      * @return UINT--响应键盘的标志位
-    */
+     */
     STDMETHOD_(UINT, OnGetDlgCode)(THIS) SCONST PURE;
 
     /**
      * @brief 获取根窗口
      * @return IWindow *--根窗口对象
-    */
+     */
     STDMETHOD_(IWindow *, GetIRoot)(THIS) SCONST PURE;
 
     /**
@@ -648,47 +647,47 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 根据uCode获取与当前窗口在dom树上关联的窗口
      * @param uCode UINT--关联类型
      * @return IWindow *--当前窗口在dom树上关联的窗口
-    */
+     */
     STDMETHOD_(IWindow *, GetIWindow)(THIS_ int uCode) SCONST PURE;
 
     /**
      * @brief 获取子窗口
      * @param iChild int--子窗口序号
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(IWindow *, GetIChild)(THIS_ int iChild) SCONST PURE;
 
     /**
      * @brief 获取子窗口数量
      * @return UINT--子窗口数量
-    */
+     */
     STDMETHOD_(UINT, GetChildrenCount)(THIS) SCONST PURE;
 
     /**
      * @brief 判断一个窗口是不是当前窗口的子孙窗口
      * @param pTest const IWindow *--测试窗口
      * @return TRUE--是子孙窗口
-    */
+     */
     STDMETHOD_(BOOL, IsIDescendant)(THIS_ const IWindow *pTest) SCONST PURE;
 
     /**
      * @brief 设置窗口的Owner
      * @param pOwner IWindow *--Owner窗口
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetIOwner)(THIS_ IWindow * pOwner) PURE;
 
     /**
      * @brief 获取Owner窗口
      * @return IWindow *--Owner窗口
-    */
+     */
     STDMETHOD_(IWindow *, GetIOwner)(THIS) SCONST PURE;
 
     /**
      * @brief 将当前窗口移动到同级兄弟窗口的zorder最顶层
-     * @param  
-     * @return 
-    */
+     * @param
+     * @return
+     */
     STDMETHOD_(void, BringWindowToTop)(THIS) PURE;
 
     /**
@@ -738,7 +737,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param nDeep int--查找深度,-1代码无限
      * @return IWindow*--匹配窗口
      * @remark 采用广度优先算法搜索匹配子窗口
-    */
+     */
     STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep) PURE;
 
     /**
@@ -762,8 +761,8 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * @brief 销毁所有子窗口
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, DestroyAllChildren)(THIS) PURE;
 
     /**
@@ -776,8 +775,8 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取指定窗口的下一个参与布局的窗口对象
      * @param pCurChild const IWindow *--当前窗口
      * @return IWindow *--下一个布局窗口
-    */
-    STDMETHOD_(IWindow *, GetNextLayoutIChild)(THIS_ const IWindow * pCurChild) SCONST PURE;
+     */
+    STDMETHOD_(IWindow *, GetNextLayoutIChild)(THIS_ const IWindow *pCurChild) SCONST PURE;
 
     /**
      * GetChildrenLayoutRect
@@ -787,7 +786,6 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * Describe  通常是客户区，但是tab,group这样的控件不一样
      */
     STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST PURE;
-
 
     /**
      * GetDesiredSize
@@ -803,15 +801,15 @@ DECLARE_INTERFACE_(IWindow, IObject)
     /**
      * @brief 获取窗口背景色
      * @return COLORREF--窗口背景色
-    */
+     */
     STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST PURE;
 
     /**
      * @brief 设计窗口显示文本
      * @param lpszText LPCTSTR--窗口显示文本
-     * @return 
+     * @return
      * @remark 支持自动翻译
-    */
+     */
     STDMETHOD_(void, SetWindowText)(THIS_ LPCTSTR lpszText) PURE;
 
     /**
@@ -820,13 +818,13 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param nBufLen int--缓冲区长度
      * @param bRawText BOOL--获取翻译前文本标志
      * @return int--复制的文本长度，pBuf为NULL时返回总缓冲区长度
-    */
+     */
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR * pBuf, int nBufLen, BOOL bRawText) PURE;
 
     /**
      * @brief 获取窗口状态
      * @return DWORD -- 窗口状态
-    */
+     */
     STDMETHOD_(DWORD, GetState)(THIS) SCONST PURE;
 
     /**
@@ -835,7 +833,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param dwStateRemove DWORD--删除状态位
      * @param bUpdate BOOL--刷新窗口
      * @return DWORD--新状态
-    */
+     */
     STDMETHOD_(DWORD, ModifyState)(THIS_ DWORD dwStateAdd, DWORD dwStateRemove, BOOL bUpdate) PURE;
 
     /**
@@ -859,7 +857,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 同类型兄弟窗口自动成组标志
      * @return TRUE--自动成组
      * @remark 自动成组的窗口在用户按钮方向键时，组内窗口循环顺序获得焦点
-    */
+     */
     STDMETHOD_(BOOL, IsSiblingsAutoGroupped)(THIS) SCONST PURE;
 
     // caret相关方法
@@ -870,29 +868,29 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param nWid int--光标宽度
      * @param nHeight int--光标高度
      * @return TRUE--成功
-    */
+     */
     STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) PURE;
 
     /**
      * @brief 控制光标显示/隐藏
      * @param bShow BOOL--显示标志
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, ShowCaret)(THIS_ BOOL bShow) PURE;
 
     /**
      * @brief 设置光标显示位置
      * @param x int-X
      * @param y int-Y
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetCaretPos)(THIS_ int x, int y) PURE;
 
     /**
      * @brief 设置当前控件是否允许发出事件
      * @param bMute BOOL-允许发出事件标志
-     * @return 
-    */
+     * @return
+     */
     STDMETHOD_(void, SetEventMute)(THIS_ BOOL bMute) PURE;
 
     /**
@@ -900,7 +898,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param evtId DWORD--事件ID
      * @param pSlot const IEvtSlot *--事件处理对象
      * @return TRUE--成功
-    */
+     */
     STDMETHOD_(BOOL, SubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
 
     /**
@@ -915,7 +913,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief  发射一个事件到应用层
      * @param evt IEvtArgs *--事件对象
      * @return TRUE--成功
-    */
+     */
     STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs * evt) PURE;
 
     /**

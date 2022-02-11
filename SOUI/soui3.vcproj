@@ -463,6 +463,8 @@
 			<File
 				RelativePath="include\core\SHostWnd.h" />
 			<File
+				RelativePath="include\proxy\SHostWndProxy.h" />
+			<File
 				RelativePath="include\control\SHotKeyCtrl.h" />
 			<File
 				RelativePath="include\interface\SImgDecoder-i.h" />
@@ -517,6 +519,8 @@
 			<File
 				RelativePath="include\core\SNativeWnd.h" />
 			<File
+				RelativePath="include\proxy\SNativeWndProxy.h" />
+			<File
 				RelativePath="include\event\SNotifyCenter.h" />
 			<File
 				RelativePath="include\res.mgr\SObjDefAttr.h" />
@@ -526,6 +530,8 @@
 				RelativePath="include\core\SObjectFactory.h" />
 			<File
 				RelativePath="include\core\SPanel.h" />
+			<File
+				RelativePath="include\proxy\SPanelProxy.h" />
 			<File
 				RelativePath="include\interface\SPathEffect-i.h" />
 			<File
@@ -634,6 +640,8 @@
 				RelativePath="include\interface\SWindow-i.h" />
 			<File
 				RelativePath="include\core\SWindowMgr.h" />
+			<File
+				RelativePath="include\proxy\SWindowProxy.h" />
 			<File
 				RelativePath="include\core\SWnd.h" />
 			<File

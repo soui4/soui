@@ -2,8 +2,7 @@
 
 #include "core/SSingletonMap.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 typedef struct tagTIMERINFO
 {
@@ -39,4 +38,4 @@ class SOUI_EXP STimer2 : public SSingletonMap<STimer2, TIMERINFO, UINT_PTR> {
     static VOID CALLBACK _TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime);
 };
 
-} // namespace SOUI
+SNSEND
