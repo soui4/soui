@@ -14,6 +14,8 @@ SUBDIRS += soui-sys-resource
 SUBDIRS += soui
 SUBDIRS += components
 SUBDIRS += demo
+SUBDIRS += demo2
 
 soui.depends += utilities4 soui-sys-resource
 demo.depends += soui
+demo2.depends += soui

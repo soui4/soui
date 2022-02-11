@@ -1,314 +1,163 @@
-<?xml version="1.0" encoding="gb2312"?>
+<?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="demo2"
-	ProjectGUID="{5B6EE6CD-C959-4F2C-A80E-B8CD10B94DA6}"
-	TargetFrameworkVersion="196613"
-	>
+	ProjectGUID="{2A220DB1-76D1-3350-91D5-711647D3C67D}"
+	Keyword="Qt4VSv1.0">
 	<Platforms>
 		<Platform
-			Name="Win32"
-		/>
+			Name="Win32" />
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
 	<Configurations>
-		<Configuration
-			Name="Debug|Win32"
-			OutputDirectory="..\bin\"
-			IntermediateDirectory="..\obj\debug\demo2"
-			ConfigurationType="1"
-			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
-			<Tool
-				Name="VCCLCompilerTool"
-				Optimization="0"
-				AdditionalIncludeDirectories="..\config;..\components;..\SOUI\include;..\utilities\include;..\SOUI"
-				PreprocessorDefinitions="WIN32;_WINDOWS;STRICT;_DEBUG"
-				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="true"
-				UsePrecompiledHeader="0"
-				BrowseInformation="1"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
-				DebugInformationFormat="4"
-			/>
-			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_UNICODE;UNICODE;_DEBUG;_DEBUG"
-				Culture="2052"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
-			<Tool
-				Name="VCLinkerTool"
-				AdditionalDependencies="utilities4d.lib soui4d.lib"
-				LinkIncremental="2"
-				SuppressStartupBanner="true"
-				AdditionalLibraryDirectories="..\bin"
-				GenerateDebugInformation="true"
-				SubSystem="2"
-			/>
-			<Tool
-				Name="VCALinkTool"
-			/>
-			<Tool
-				Name="VCManifestTool"
-			/>
-			<Tool
-				Name="VCXDCMakeTool"
-			/>
-			<Tool
-				Name="VCBscMakeTool"
-			/>
-			<Tool
-				Name="VCFxCopTool"
-			/>
-			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
-		</Configuration>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="..\bin\"
-			IntermediateDirectory="..\obj\release\demo2"
-			ConfigurationType="1"
+			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-			/>
+			ConfigurationType="1"
+			IntermediateDirectory="..\obj\release\demo2\"
+			UseOfMfc="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				Optimization="0"
-				WholeProgramOptimization="true"
-				AdditionalIncludeDirectories="..\config;..\components;..\SOUI\include;..\utilities\include;..\SOUI"
-				PreprocessorDefinitions="WIN32;_WINDOWS;NDEBUG"
-				RuntimeLibrary="0"
-				TreatWChar_tAsBuiltInType="true"
-				UsePrecompiledHeader="2"
-				BrowseInformation="1"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
+				AdditionalIncludeDirectories=".,.,..\utilities\include,..\soui\include,..\components,..\config,..\tools\mkspecs\win32-msvc2008"
+				AdditionalOptions="/MP"
+				AssemblerListingLocation="..\obj\release\demo2\"
 				DebugInformationFormat="3"
-			/>
+				DisableSpecificWarnings="4100,4101,4102,4189,4996"
+				ExceptionHandling="1"
+				GeneratePreprocessedFile="0"
+				ObjectFile="..\obj\release\demo2\"
+				Optimization ="1"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST,NDEBUG"
+				ProgramDataBaseFileName="$(IntDir)"
+				RuntimeLibrary="0"
+				SuppressStartupBanner="true"
+				TreatWChar_tAsBuiltInType="true"
+				WarningLevel="3" />
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				Culture="2052"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCCustomBuildTool" />
 			<Tool
 				Name="VCLinkerTool"
 				AdditionalDependencies="utilities4.lib soui4.lib"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\bin"
+				AdditionalOptions="&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot;"
+				DataExecutionPrevention="true"
+				EnableCOMDATFolding="2"
 				GenerateDebugInformation="true"
+				IgnoreImportLibrary="true"
+				LinkIncremental="1"
+				LinkTimeCodeGeneration="0"
+				OptimizeReferences="2"
+				OutputFile="$(OutDir)\demo2.exe"
+				ProgramDatabaseFile=""
+				RandomizedBaseAddress="true"
 				SubSystem="2"
-			/>
+				SuppressStartupBanner="true"
+				TargetMachine="1" />
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCManifestTool" />
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCMIDLTool"
+				DefaultCharType="0"
+				EnableErrorChecks="1"
+				WarningLevel="0" />
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCPostBuildEventTool" />
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCPreBuildEventTool" />
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCPreLinkEventTool" />
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST" />
+		</Configuration>
+		<Configuration
+			Name="Debug|Win32"
+			OutputDirectory="..\bin\"
+			ATLMinimizesCRunTimeLibraryUsage="false"
+			CharacterSet="1"
+			ConfigurationType="1"
+			IntermediateDirectory="..\obj\debug\demo2\"
+			UseOfMfc="0">
 			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCCLCompilerTool"
+				AdditionalIncludeDirectories=".,.,..\utilities\include,..\soui\include,..\components,..\config,..\tools\mkspecs\win32-msvc2008"
+				AdditionalOptions="/MP"
+				AssemblerListingLocation="..\obj\debug\demo2\"
+				DebugInformationFormat="3"
+				DisableSpecificWarnings="4100,4101,4102,4189,4996"
+				ExceptionHandling="1"
+				GeneratePreprocessedFile="0"
+				ObjectFile="..\obj\debug\demo2\"
+				Optimization ="4"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST"
+				ProgramDataBaseFileName="$(IntDir)"
+				RuntimeLibrary="1"
+				SuppressStartupBanner="true"
+				TreatWChar_tAsBuiltInType="true"
+				WarningLevel="3" />
+			<Tool
+				Name="VCCustomBuildTool" />
+			<Tool
+				Name="VCLinkerTool"
+				AdditionalDependencies="utilities4d.lib soui4d.lib"
+				AdditionalLibraryDirectories="..\bin"
+				AdditionalOptions="&quot;/MANIFESTDEPENDENCY:type=&apos;win32&apos; name=&apos;Microsoft.Windows.Common-Controls&apos; version=&apos;6.0.0.0&apos; publicKeyToken=&apos;6595b64144ccf1df&apos; language=&apos;*&apos; processorArchitecture=&apos;*&apos;&quot;"
+				DataExecutionPrevention="true"
+				GenerateDebugInformation="true"
+				IgnoreImportLibrary="true"
+				LinkTimeCodeGeneration="0"
+				OutputFile="$(OutDir)\demo2d.exe"
+				ProgramDatabaseFile=""
+				RandomizedBaseAddress="true"
+				SubSystem="2"
+				SuppressStartupBanner="true"
+				TargetMachine="1" />
+			<Tool
+				Name="VCManifestTool" />
+			<Tool
+				Name="VCMIDLTool"
+				DefaultCharType="0"
+				EnableErrorChecks="1"
+				WarningLevel="0" />
+			<Tool
+				Name="VCPostBuildEventTool" />
+			<Tool
+				Name="VCPreBuildEventTool" />
+			<Tool
+				Name="VCPreLinkEventTool" />
+			<Tool
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST,_DEBUG" />
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
 	<Files>
 		<Filter
-			Name="Source Files"
-			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm"
-			>
-			<File
-				RelativePath=".\ComLoader.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-						ShowIncludes="false"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\demo2.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-			<File
-				RelativePath=".\TestLvAdapter.c"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="0"
-					/>
-				</FileConfiguration>
-			</File>
-		</Filter>
-		<Filter
 			Name="Header Files"
-			Filter="h;hpp;hxx;hm;inl;inc"
-			>
+			Filter="h;hpp;hxx;hm;inl;inc;xsd"
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath=".\ComLoader.h"
-				>
-			</File>
+				RelativePath="+=" />
 			<File
-				RelativePath=".\resource.h"
-				>
-			</File>
+				RelativePath="ComLoader.c" />
 			<File
-				RelativePath=".\TestLvAdapter.h"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="Resource Files"
-			Filter="rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest"
-			>
+				RelativePath="ComLoader.h" />
 			<File
-				RelativePath=".\demo2.rc"
-				>
-			</File>
+				RelativePath="SOURCES" />
 			<File
-				RelativePath=".\res\soui_res.rc2"
-				>
-			</File>
-		</Filter>
-		<Filter
-			Name="SoUI Resource"
-			Filter="idx;xml;png;gif;jpg;ico;lua;bmp"
-			>
+				RelativePath="TestLvAdapter.c" />
 			<File
-				RelativePath=".\uires\values\color.xml"
-				>
-			</File>
+				RelativePath="TestLvAdapter.h" />
 			<File
-				RelativePath=".\uires\xml\dlg_main.xml"
-				>
-			</File>
+				RelativePath="demo2.c" />
 			<File
-				RelativePath=".\uires\xml\dlg_test.xml"
-				>
-			</File>
+				RelativePath="res\resource.h" />
 			<File
-				RelativePath=".\uires\uidef\init.xml"
-				>
-			</File>
-			<File
-				RelativePath=".\uires\values\skin.xml"
-				>
-			</File>
-			<File
-				RelativePath=".\uires\image\soui.ico"
-				>
-			</File>
-			<File
-				RelativePath=".\uires\values\string.xml"
-				>
-			</File>
-			<File
-				RelativePath=".\uires\uires.idx"
-				>
-				<FileConfiguration
-					Name="Debug|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Building SoUI Resource"
-						CommandLine="&quot;..\tools\uiresbuilder.exe&quot; -i &quot;$(InputPath)&quot; -p uires -r .\res\soui_res.rc2 -h .\res\resource.h idtable&#x0D;&#x0A;"
-						Outputs=".\res\soui_res.rc2;"
-					/>
-				</FileConfiguration>
-				<FileConfiguration
-					Name="Release|Win32"
-					>
-					<Tool
-						Name="VCCustomBuildTool"
-						Description="Building SoUI Resource"
-						CommandLine="&quot;..\tools\uiresbuilder.exe&quot; -i &quot;$(InputPath)&quot; -p uires -r .\res\soui_res.rc2 -h .\res\resource.h idtable&#x0D;&#x0A;xcopy &quot;%(RootDir)%(Directory)*.*&quot; &quot;$(TargetDir)uires&quot; /e/y/i&#x0D;&#x0A;"
-						Outputs=".\res\soui_res.rc2;"
-					/>
-				</FileConfiguration>
-			</File>
+				RelativePath="resource.h" />
 		</Filter>
 		<File
-			RelativePath=".\license.txt"
-			>
-		</File>
-		<File
-			RelativePath=".\readme.txt"
-			>
-		</File>
+			RelativePath="demo2.rc" />
 	</Files>
 	<Globals>
 	</Globals>

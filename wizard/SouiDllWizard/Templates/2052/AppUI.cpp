@@ -60,6 +60,7 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 	int nRet = 0;
 
 	SComMgr *pComMgr = new SComMgr;
+	SouiFactory souiFac;
 	TCHAR szCurrentDir[MAX_PATH] = { 0 };
 	GetModuleFileName(NULL, szCurrentDir, sizeof(szCurrentDir));
 
@@ -93,7 +94,7 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 			if (hModSysResource)
 			{
 				CAutoRefPtr<IResProvider> sysResProvider;
-				CreateResProvider(RES_PE, (IObjRef**)&sysResProvider);
+				souiFac.CreateResProvider(RES_PE, (IObjRef**)&sysResProvider);
 				sysResProvider->Init((WPARAM)hModSysResource, 0);
 				theApp->LoadSystemNamedResource(sysResProvider);
 				FreeLibrary(hModSysResource);
@@ -107,7 +108,7 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 		//钩选了复制系统资源选项
 		{
 			CAutoRefPtr<IResProvider> pSysResProvider;
-			CreateResProvider(RES_PE, (IObjRef**)&pSysResProvider);
+			souiFac.CreateResProvider(RES_PE, (IObjRef**)&pSysResProvider);
 			bLoaded = pSysResProvider->Init((WPARAM)m_hInstance, 0);
 			SASSERT(bLoaded);
 			bLoaded = theApp->LoadSystemNamedResource(pSysResProvider);
@@ -120,14 +121,14 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 #if (RES_TYPE != 0)		
 		//选择了仅在Release版本打包资源则在DEBUG下始终使用文件加载
 		{
-			CreateResProvider(RES_FILE, (IObjRef**)&pResProvider);
+			souiFac.CreateResProvider(RES_FILE, (IObjRef**)&pResProvider);
 			bLoaded = pResProvider->Init((LPARAM)_T("uires"), 0);
 			SASSERT(bLoaded);
 		}
 #else
 		{
 [!if ResLoaderType == 0]
-			CreateResProvider(RES_PE, (IObjRef**)&pResProvider);
+			souiFac.CreateResProvider(RES_PE, (IObjRef**)&pResProvider);
 			bLoaded = pResProvider->Init((WPARAM)m_hInstance, 0);
 			SASSERT(bLoaded);
 [!endif]
@@ -148,7 +149,7 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 			SASSERT(bLoaded);
 [!endif]
 [!if ResLoaderType == 3]
-			CreateResProvider(RES_FILE, (IObjRef**)&pResProvider);
+			souiFac.CreateResProvider(RES_FILE, (IObjRef**)&pResProvider);
 			bLoaded = pResProvider->Init((LPARAM)_T("uires"), 0);
 			SASSERT(bLoaded);
 [!endif]
