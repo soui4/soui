@@ -24,8 +24,23 @@ interface IWindow;
  */
 #undef INTERFACE
 #define INTERFACE IRealWndHandler
-DECLARE_INTERFACE_(IRealWndHandler, IObject)
+DECLARE_INTERFACE_(IRealWndHandler, IObjRef)
 {
+	//!添加引用
+	/*!
+	*/
+	STDMETHOD_(long,AddRef) (THIS) PURE;
+
+	//!释放引用
+	/*!
+	*/
+	STDMETHOD_(long,Release) (THIS) PURE;
+
+	//!释放对象
+	/*!
+	*/
+	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+	//---------------------------------------------------
     /**
      * SRealWnd::OnRealWndCreate
      * @brief    窗口创建
