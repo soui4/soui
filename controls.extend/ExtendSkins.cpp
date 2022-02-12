@@ -50,7 +50,7 @@ namespace SOUI
 		else if (strChannel == L".b")
 			m_iMaskChannel = 2;
 
-		IBitmap *pImg = NULL;
+		IBitmapS *pImg = NULL;
 		if (m_iMaskChannel == -1)
 		{//use alpha channel as default
 			m_iMaskChannel = 0;
@@ -78,7 +78,7 @@ namespace SOUI
 
 		m_bmpSkin = NULL;
 		GETRENDERFACTORY->CreateBitmap(&m_bmpSkin);
-		m_bmpSkin->Init(m_size.cx, m_size.cy);
+		m_bmpSkin->Init(m_size.cx, m_size.cy,NULL);
 
 		// 创建画布并把skin选进画布
 		CAutoRefPtr<IRenderTarget> pRTDst;
@@ -91,7 +91,7 @@ namespace SOUI
 			SColor cr(m_crStates[i]);
 			pRTDst->FillSolidRect(&rc, cr.toCOLORREF());
 		}
-		pRTDst->SelectObject(pOldBmp);
+		pRTDst->SelectObject(pOldBmp,NULL);
 
 		//从mask的指定channel中获得alpha通道，与cache按位运算
 		LPBYTE pBitCache = (LPBYTE)m_bmpSkin->LockPixelBits();

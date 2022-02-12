@@ -77,14 +77,14 @@ namespace SOUI
                 if(GetState()&WndState_Hover)
                 {
                     //get hover
-                    m_pBgSkin->DrawByIndex(pRT, rcClient, 0, m_pBgSkin->GetAlpha());
-                    m_pBgSkin->DrawByIndex(pRT, rcClient, 1, byNewAlpha);
+                    m_pBgSkin->DrawByIndex2(pRT, rcClient, 0, m_pBgSkin->GetAlpha());
+                    m_pBgSkin->DrawByIndex2(pRT, rcClient, 1, byNewAlpha);
                 }
                 else
                 {
                     //lose hover
-                    m_pBgSkin->DrawByIndex(pRT, rcClient,0, m_pBgSkin->GetAlpha());
-                    m_pBgSkin->DrawByIndex(pRT, rcClient, 1, m_pBgSkin->GetAlpha()-byNewAlpha);
+                    m_pBgSkin->DrawByIndex2(pRT, rcClient,0, m_pBgSkin->GetAlpha());
+                    m_pBgSkin->DrawByIndex2(pRT, rcClient, 1, m_pBgSkin->GetAlpha()-byNewAlpha);
                 }
             }
         }

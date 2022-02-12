@@ -43,12 +43,13 @@ namespace SOUI
             m_bmpBefore = NULL;
             m_bmpAfter = NULL;
             m_bmpTrans = NULL;
-            EventTurn3d evt(this,m_bTurn2Front);
+            EventTurn3d evt(this);
+			evt.bTurn2Front_ = m_bTurn2Front;
             FireEvent(evt);
             return;      
         }
         
-        IBitmap *pBmp;
+        IBitmapS *pBmp;
         if(m_nFrameIndex <= nMaxBeforeFrame)
         {
             m_3dparam.nOffsetZ = m_nZStep * m_nFrameIndex;
@@ -101,7 +102,7 @@ namespace SOUI
         GETRENDERFACTORY->CreateRenderTarget(&pRTCopy1,rcWnd.Width(),rcWnd.Height());
 
         pRTCopy1->BitBlt(CRect(CPoint(0,0),rcWnd.Size()),pRT,rcWnd.left,rcWnd.top,SRCCOPY);
-        m_bmpBefore = (IBitmap*)pRTCopy1->GetCurrentObject(OT_BITMAP);        
+        m_bmpBefore = (IBitmapS*)pRTCopy1->GetCurrentObject(OT_BITMAP);        
         
         //渲染窗口变化后状态
         pWndFront->SetVisible(FALSE,FALSE);
@@ -113,7 +114,7 @@ namespace SOUI
         CAutoRefPtr<IRenderTarget> pRTCopy2;
         GETRENDERFACTORY->CreateRenderTarget(&pRTCopy2,rcWnd.Width(),rcWnd.Height());
         pRTCopy2->BitBlt(CRect(CPoint(0,0),rcWnd.Size()),pRT,rcWnd.left,rcWnd.top,SRCCOPY);
-        m_bmpAfter = (IBitmap*)pRTCopy2->GetCurrentObject(OT_BITMAP);        
+        m_bmpAfter = (IBitmapS*)pRTCopy2->GetCurrentObject(OT_BITMAP);        
         
         pFrmWnd->ReleaseRenderTarget(pRT);
 
@@ -122,7 +123,7 @@ namespace SOUI
         pFrmWnd->SetVisible(FALSE,FALSE);
 
         GETRENDERFACTORY->CreateBitmap(&m_bmpTrans);
-        m_bmpTrans->Init(rcWnd.Width(),rcWnd.Height());
+        m_bmpTrans->Init(rcWnd.Width(),rcWnd.Height(),NULL);
         
         //让窗口可见
         SetVisible(TRUE,TRUE);
@@ -142,7 +143,7 @@ namespace SOUI
     {
         CRect rcWnd;
         GetWindowRect(&rcWnd);
-        pRT->DrawBitmap(&rcWnd,m_bmpTrans,0,0);
+        pRT->DrawBitmap(&rcWnd,m_bmpTrans,0,0,0xFF);
     }
 
 }

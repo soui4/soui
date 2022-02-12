@@ -226,6 +226,15 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter>> {
         (iCol);
         return TRUE;
     }
+
+	STDMETHOD_(void, InitByTemplate)(THIS_ SXmlNode  xmlTemplate) PURE;
+
+	STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) OVERRIDE
+	{
+		SXmlNode xmlNode(xmlTemplate);
+		InitByTemplate(xmlNode);
+	}
+
 };
 
 class STvObserverMgr {

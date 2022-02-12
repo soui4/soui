@@ -63,8 +63,8 @@ namespace SOUI
 		STabCtrl2(void);
 		~STabCtrl2(void);
     protected:
-		virtual void OnNextFrame();
-        STabPage * CreatePageFromXml(pugi::xml_node xmlPage);
+		virtual void WINAPI OnNextFrame() override;
+        STabPage * CreatePageFromXml(SXmlNode xmlPage);
 
         void OnDestroy();
 		int  OnCreate(void*);
@@ -72,8 +72,8 @@ namespace SOUI
 		void DrawItem(IRenderTarget *pRT,const CRect &rcItem,int iItem,DWORD dwState );
 
 	   virtual void OnStateChanged(DWORD dwOldState,DWORD dwNewState);
-	   bool OnItemHover(IEvtArgs *pEvt);
-	   bool OnItemLeave(IEvtArgs *pEvt);
+	   BOOL OnItemHover(IEvtArgs *pEvt);
+	   BOOL OnItemLeave(IEvtArgs *pEvt);
 	   virtual void OnContainerChanged(ISwndContainer *pOldContainer,ISwndContainer *pNewContainer);
  
         SOUI_MSG_MAP_BEGIN()

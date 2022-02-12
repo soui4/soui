@@ -182,7 +182,7 @@ namespace SOUI
 		//根据状态从style中获得字体，颜色
 		IFontPtr font=m_style.GetTextFont(iState);
 		COLORREF crTxt = m_style.GetTextColor(iState);
-		CAutoRefPtr<IFont> oldFont;
+		SAutoRefPtr<IFontS> oldFont;
 		if(font) pRT->SelectObject(font,(IRenderObj**)&oldFont);
 		COLORREF crOld = 0;
 		if(crTxt != CR_INVALID) crOld = pRT->SetTextColor(crTxt);
@@ -228,7 +228,7 @@ namespace SOUI
 		}
 
 		//恢复字体，颜色
-		if(font) pRT->SelectObject(oldFont);
+		if(font) pRT->SelectObject(oldFont,NULL);
 		if(crTxt!=CR_INVALID) pRT->SetTextColor(crOld);
 	}
 
@@ -267,9 +267,9 @@ namespace SOUI
 		return iRet;
 	}
 
-	bool STabCtrl2::OnItemHover(IEvtArgs *pEvt)
+	BOOL STabCtrl2::OnItemHover(IEvtArgs *pEvt)
 	{
-		bool bRet = true;
+		BOOL bRet = true;
 		EventTabItemHover *pEvt2 = sobj_cast<EventTabItemHover>(pEvt);
 		STabPage2 *pPage = sobj_cast<STabPage2>(m_lstPages.GetAt(pEvt2->iHover));
         pPage->m_aniObj.AnimateIn(m_iInterval);
@@ -279,9 +279,9 @@ namespace SOUI
 		return bRet;
 	}
 
-	bool STabCtrl2::OnItemLeave(IEvtArgs *pEvt)
+	BOOL STabCtrl2::OnItemLeave(IEvtArgs *pEvt)
 	{
-		bool bRet = true;
+		BOOL bRet = true;
 		EventTabItemLeave *pEvt2 = sobj_cast<EventTabItemLeave>(pEvt);
 		STabPage2 *pPage = sobj_cast<STabPage2>(m_lstPages.GetAt(pEvt2->iLeave));
         pPage->m_aniObj.AnimateOut(m_iInterval);
@@ -292,7 +292,7 @@ namespace SOUI
 		return bRet;
 	}
 
-    STabPage * STabCtrl2::CreatePageFromXml(pugi::xml_node xmlPage)
+    STabPage * STabCtrl2::CreatePageFromXml(SXmlNode xmlPage)
     {
         if (wcscmp(xmlPage.name(),STabPage2::GetClassName()) != 0) return NULL;
         return (STabPage *)SApplication::getSingleton().CreateWindowByName(STabPage2::GetClassName());

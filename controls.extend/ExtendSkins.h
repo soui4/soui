@@ -19,9 +19,8 @@ class SColorMask : public SSkinObjBase
 
 public:
     SColorMask();
-    virtual BOOL IgnoreState()  { return FALSE;     }
-    virtual int  GetStates() const    { return STATE_COUNT;}
-    virtual SIZE GetSkinSize() const { return m_size;    }
+    virtual int WINAPI GetStates() const  override { return STATE_COUNT;}
+    virtual SIZE WINAPI GetSkinSize() const override { return m_size;    }
 
     void SetColors(COLORREF cr[4]);
 
@@ -47,8 +46,8 @@ protected:
     //CAutoRefPtr<IBitmap> *  m_pBmpCaches;
 
     SStringW                m_strSkin;
-    CAutoRefPtr<IBitmap>    m_bmpSkin;
-    CAutoRefPtr<IBitmap>    m_bmpMask;
+    SAutoRefPtr<IBitmapS>    m_bmpSkin;
+    SAutoRefPtr<IBitmapS>    m_bmpMask;
     CRect                   m_rcMargin;
     int                     m_iMaskChannel;
 };

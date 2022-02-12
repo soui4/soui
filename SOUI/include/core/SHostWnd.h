@@ -204,6 +204,8 @@ class SOUI_EXP SHostWnd
     };
 
   public:
+	STDMETHOD_(BOOL,InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
+
     STDMETHOD_(BOOL, DestroyWindow)(THIS) OVERRIDE;
 
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) OVERRIDE
@@ -273,7 +275,6 @@ class SOUI_EXP SHostWnd
         return this;
     }
 
-    BOOL WINAPI InitFromXml(IXmlNode *pNode);
 
     BOOL AnimateHostWindow(DWORD dwTime, DWORD dwFlags);
 
@@ -390,7 +391,7 @@ class SOUI_EXP SHostWnd
     HWND m_hSpyWnd;
 #endif
 
-  protected: // IContainer
+  public: // IContainer
     STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt);
 
     STDMETHOD_(RECT, GetContainerRect)() const;

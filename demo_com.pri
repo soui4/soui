@@ -50,7 +50,7 @@ QMAKE_CXXFLAGS += -Fd$(IntDir)
 
 DEPENDPATH += .
 INCLUDEPATH += . \
-			   $(SOUI4PATH)/utilities4/include \
+			   $(SOUI4PATH)/utilities/include \
 			   $(SOUI4PATH)/soui/include \
 			   $(SOUI4PATH)/components \
 			   $(SOUI4PATH)/config

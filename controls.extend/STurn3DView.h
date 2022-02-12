@@ -12,14 +12,9 @@
 
 namespace SOUI
 {
-    class EventTurn3d : public TplIEvtArgs<EventTurn3d>
-    {
-        DEF_SOBJECT(EventTurn3d,L"on_turn3d")
-    public:
-        EventTurn3d(SWindow *pWnd,BOOL bTurn2Front):TplIEvtArgs<EventTurn3d>(pWnd),bTurn2Front_(bTurn2Front){}
-        enum{EventID=EVT_EXTERNAL_BEGIN};
-        BOOL bTurn2Front_;
-    };
+	DEF_EVT_EXT(EventTurn3d,EVT_EXTERNAL_BEGIN+4000,{
+		BOOL bTurn2Front_;
+	});
     
     class STurn3dView : public SWindow
     {
@@ -49,9 +44,9 @@ namespace SOUI
         BOOL             m_bTurn2Front;          //翻转方向
 
         IMAGE3D::PARAM3DTRANSFORM	m_3dparam;
-        CAutoRefPtr<IBitmap>    m_bmpBefore;
-        CAutoRefPtr<IBitmap>    m_bmpAfter;
-        CAutoRefPtr<IBitmap>    m_bmpTrans;
+        SAutoRefPtr<IBitmapS>    m_bmpBefore;
+        SAutoRefPtr<IBitmapS>    m_bmpAfter;
+        SAutoRefPtr<IBitmapS>    m_bmpTrans;
 
         int              m_nFrameIndex;        //翻转到第几帧
         BOOL             m_bTurning;            //正在翻转
