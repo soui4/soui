@@ -68,7 +68,7 @@ namespace SOUI
 
 	class SShellTray :public SWindow, public IShellTrayListener
 	{
-		SOUI_CLASS_NAME(SWindow, L"shellnotifyicon")
+		DEF_SOBJECT(SWindow, L"shellnotifyicon")
 	public:
 		/**
 		 * SShellNotifyIcon::SShellNotifyIcon

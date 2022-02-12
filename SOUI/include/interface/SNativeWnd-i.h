@@ -3,8 +3,6 @@
 #include <interface/SEvtArgs-i.h>
 SNSBEGIN
 
-#undef CreateWindow
-
 typedef BOOL (*FunMsgHandler)(const LPMSG pMsg, LRESULT *pRes, void *ctx);
 
 #undef INTERFACE
@@ -26,7 +24,7 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    STDMETHOD_(HWND, CreateWindow)
+    STDMETHOD_(HWND, CreateNative)
     (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth,
      int nHeight, HWND hWndParent,int nID, LPVOID lpParam) PURE;
 

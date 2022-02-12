@@ -173,7 +173,7 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd,TObjRefImpl<SObject>>
         SetWindowLongPtr(GWL_ID, nID);
     }
 
-    STDMETHOD_(HWND, CreateWindow)
+    STDMETHOD_(HWND, CreateNative)
     (THIS_ LPCTSTR lpWindowName,
      DWORD dwStyle,
      DWORD dwExStyle,

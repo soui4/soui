@@ -195,7 +195,7 @@ BOOL CColourPopup::Create(CPoint p, COLORREF crColour,
 {
     m_crColour = m_crInitialColour = crColour;
 
-	if (!SNativeWnd::CreateWindow(NULL, WS_VISIBLE|WS_POPUP, WS_EX_TOOLWINDOW,
+	if (!CreateNative(NULL, WS_VISIBLE|WS_POPUP, WS_EX_TOOLWINDOW,
                         p.x, p.y, 100, 100, // size updated soon
                         m_hOwner,0, NULL))
         return FALSE;

@@ -78,7 +78,7 @@ ATOM SNativeWnd::RegisterSimpleWnd2(HINSTANCE hInst, LPCTSTR pszSimpleWndName)
     return ::RegisterClassEx(&wcex);
 }
 
-HWND SNativeWnd::CreateWindow(LPCTSTR lpWindowName,
+HWND SNativeWnd::CreateNative(LPCTSTR lpWindowName,
                               DWORD dwStyle,
                               DWORD dwExStyle,
                               int x,

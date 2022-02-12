@@ -39,7 +39,7 @@ BOOL SDragWnd::BeginDrag(HBITMAP hBmp, POINT ptHot, COLORREF crKey, BYTE byAlpha
     BITMAP bm;
     GetObject(hBmp, sizeof(bm), &bm);
 
-    if (!s_pCurDragWnd->CreateWindow(NULL, WS_POPUP,
+    if (!s_pCurDragWnd->CreateNative(NULL, WS_POPUP,
                                      WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST, 0, 0,
                                      bm.bmWidth, bm.bmHeight, 0, 0, NULL))
     {

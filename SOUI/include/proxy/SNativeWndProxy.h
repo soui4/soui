@@ -71,7 +71,7 @@ public:
 		return SNativeWnd::AfterAttribute(strAttribName, strValue, bLoading, hr);
 	}
 
-	STDMETHOD_(HWND, CreateWindow)
+	STDMETHOD_(HWND, CreateNative)
 		(THIS_ LPCTSTR lpWindowName,
 		DWORD dwStyle,
 		DWORD dwExStyle,
@@ -83,7 +83,7 @@ public:
 		int nID,
 		LPVOID lpParam) OVERRIDE
 	{
-		return SNativeWnd::CreateWindow(lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight,
+		return SNativeWnd::CreateNative(lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight,
 			hWndParent,nID, lpParam);
 	}
 

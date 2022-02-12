@@ -13,7 +13,7 @@ namespace SOUI
 	SShellTrayMsgWnd::SShellTrayMsgWnd(IShellTrayListener* shellnotifyicon) :m_ShellNotifyIcon(shellnotifyicon)
 	{
 		MsgTaskbarCreated = RegisterWindowMessage(_T("TaskbarCreated"));
-		CreateWindow(_T("shell_nofity_msg_windows"), 0, 0, 0, 0, 0, 0, HWND_MESSAGE, NULL);
+		CreateNative(_T("shell_nofity_msg_windows"), 0, 0, 0, 0, 0, 0, HWND_MESSAGE,0, NULL);
 	}
 
 	//托盘通知消息处理函数

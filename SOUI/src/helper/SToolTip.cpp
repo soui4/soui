@@ -27,7 +27,7 @@ STipCtrl::~STipCtrl(void)
 
 BOOL STipCtrl::Create()
 {
-    HWND hWnd = SNativeWnd::CreateWindow(
+    HWND hWnd = SNativeWnd::CreateNative(
         _T("soui tooltip"), WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
         WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0, 0, 0, 0, NULL,0, NULL);
     if (!hWnd)

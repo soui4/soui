@@ -24,7 +24,7 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
-    STDMETHOD_(HWND, CreateWindow)
+    STDMETHOD_(HWND, CreateNative)
     (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth,
      int nHeight, HWND hWndParent,int nID, LPVOID lpParam) PURE;
 
@@ -174,7 +174,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
-    STDMETHOD_(HWND, CreateWindow)
+    STDMETHOD_(HWND, CreateNative)
     (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth,
      int nHeight, HWND hWndParent,int nID, LPVOID lpParam) PURE;
 

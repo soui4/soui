@@ -78,7 +78,7 @@ public:
 		return SHostWnd::AfterAttribute(strAttribName, strValue, bLoading, hr);
 	}
 
-	STDMETHOD_(HWND, CreateWindow)
+	STDMETHOD_(HWND, CreateNative)
 		(THIS_ LPCTSTR lpWindowName,
 		DWORD dwStyle,
 		DWORD dwExStyle,
@@ -90,7 +90,7 @@ public:
 		int nID,
 		LPVOID lpParam) OVERRIDE
 	{
-		return SHostWnd::CreateWindow(lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight,
+		return SHostWnd::CreateNative(lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight,
 			hWndParent, nID, lpParam);
 	}
 
