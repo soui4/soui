@@ -26,7 +26,7 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
 
     STDMETHOD_(HWND, CreateNative)
     (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth,
-     int nHeight, HWND hWndParent,int nID, LPVOID lpParam) PURE;
+     int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
 
     STDMETHOD_(HWND, GetHwnd)(THIS) PURE;
 

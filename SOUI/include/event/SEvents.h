@@ -62,8 +62,10 @@ typedef enum _SOUI_EVENTS
 
     //增加4个itempanel相关的事件,经过EVT_OFPANEL到达应用层
     EVT_ITEMPANEL_CLICK,
-    EVT_ITEMPANEL_DBCLICK,
     EVT_ITEMPANEL_RCLICK,
+    EVT_ITEMPANEL_CLICK_UP,
+    EVT_ITEMPANEL_RCLICK_UP,
+    EVT_ITEMPANEL_DBCLICK,
     EVT_ITEMPANEL_HOVER,
     EVT_ITEMPANEL_LEAVE,
 
@@ -325,6 +327,16 @@ DEF_EVT(EventItemPanelDbclick, EVT_ITEMPANEL_DBCLICK, on_itempanel_dbclick, {
 });
 
 DEF_EVT(EventItemPanelClick, EVT_ITEMPANEL_CLICK, on_itempanel_click, {
+    WPARAM wParam;
+    LPARAM lParam;
+});
+
+DEF_EVT(EventItemPanelRclickUp, EVT_ITEMPANEL_RCLICK_UP, on_itemparem_rclick_up, {
+    WPARAM wParam;
+    LPARAM lParam;
+});
+
+DEF_EVT(EventItemPanelClickUp, EVT_ITEMPANEL_CLICK_UP, on_itempanel_click_up, {
     WPARAM wParam;
     LPARAM lParam;
 });

@@ -337,7 +337,7 @@ public: \
 			m_ofn.Flags = dwFlags | OFN_EXPLORER | OFN_ENABLEHOOK | OFN_ENABLESIZING;
 
 			m_ofn.lpstrFilter = lpszFilter;
-			m_ofn.hInstance = SApplication::getSingleton().GetInstance();
+			m_ofn.hInstance = SApplication::getSingleton().GetModule();
 			m_ofn.lpfnHook = (LPOFNHOOKPROC)T::StartWindowProc;
 			m_ofn.hwndOwner = hWndParent;
 
@@ -372,10 +372,10 @@ public: \
 			return bRet ? IDOK : IDCANCEL;
 		}
 		// Attributes
-		SOUI::SNativeWnd GetFileDialogWindow() const
+		HWND GetFileDialogWindow() const
 		{
 			ATLASSERT(::IsWindow(m_hWnd));
-			return SOUI::SNativeWnd(::GetParent(m_hWnd));
+			return ::GetParent(m_hWnd);
 		}
 
 		int GetFilePath(LPTSTR lpstrFilePath, int nLength) const
@@ -383,7 +383,7 @@ public: \
 			ATLASSERT(::IsWindow(m_hWnd));
 			ATLASSERT((m_ofn.Flags & OFN_EXPLORER) != 0);
 
-			return (int)GetFileDialogWindow().SendMessage(CDM_GETFILEPATH, nLength, (LPARAM)lpstrFilePath);
+			return (int)::SendMessage(GetFileDialogWindow(),CDM_GETFILEPATH, nLength, (LPARAM)lpstrFilePath);
 		}
 
 		int GetFolderIDList(LPVOID lpBuff, int nLength) const
@@ -391,7 +391,7 @@ public: \
 			ATLASSERT(::IsWindow(m_hWnd));
 			ATLASSERT((m_ofn.Flags & OFN_EXPLORER) != 0);
 
-			return (int)GetFileDialogWindow().SendMessage(CDM_GETFOLDERIDLIST, nLength, (LPARAM)lpBuff);
+			return (int)::SendMessage(GetFileDialogWindow(),CDM_GETFOLDERIDLIST, nLength, (LPARAM)lpBuff);
 		}
 
 		int GetFolderPath(LPTSTR lpstrFolderPath, int nLength) const
@@ -399,7 +399,7 @@ public: \
 			ATLASSERT(::IsWindow(m_hWnd));
 			ATLASSERT((m_ofn.Flags & OFN_EXPLORER) != 0);
 
-			return (int)GetFileDialogWindow().SendMessage(CDM_GETFOLDERPATH, nLength, (LPARAM)lpstrFolderPath);
+			return (int)::SendMessage(GetFileDialogWindow(),CDM_GETFOLDERPATH, nLength, (LPARAM)lpstrFolderPath);
 		}
 
 		int GetSpec(LPTSTR lpstrSpec, int nLength) const
@@ -407,7 +407,7 @@ public: \
 			ATLASSERT(::IsWindow(m_hWnd));
 			ATLASSERT((m_ofn.Flags & OFN_EXPLORER) != 0);
 
-			return (int)GetFileDialogWindow().SendMessage(CDM_GETSPEC, nLength, (LPARAM)lpstrSpec);
+			return (int)::SendMessage(GetFileDialogWindow(),CDM_GETSPEC, nLength, (LPARAM)lpstrSpec);
 		}
 
 		void SetControlText(int nCtrlID, LPCTSTR lpstrText)
@@ -415,7 +415,7 @@ public: \
 			ATLASSERT(::IsWindow(m_hWnd));
 			ATLASSERT((m_ofn.Flags & OFN_EXPLORER) != 0);
 
-			GetFileDialogWindow().SendMessage(CDM_SETCONTROLTEXT, nCtrlID, (LPARAM)lpstrText);
+			::SendMessage(GetFileDialogWindow(),CDM_SETCONTROLTEXT, nCtrlID, (LPARAM)lpstrText);
 		}
 
 		void SetDefExt(LPCTSTR lpstrExt)
@@ -423,7 +423,7 @@ public: \
 			ATLASSERT(::IsWindow(m_hWnd));
 			ATLASSERT((m_ofn.Flags & OFN_EXPLORER) != 0);
 
-			GetFileDialogWindow().SendMessage(CDM_SETDEFEXT, 0, (LPARAM)lpstrExt);
+			::SendMessage(GetFileDialogWindow(),CDM_SETDEFEXT, 0, (LPARAM)lpstrExt);
 		}
 
 		BOOL GetReadOnlyPref() const	// return TRUE if readonly checked
@@ -437,14 +437,14 @@ public: \
 			ATLASSERT(::IsWindow(m_hWnd));
 			ATLASSERT((m_ofn.Flags & OFN_EXPLORER) != 0);
 
-			GetFileDialogWindow().SendMessage(CDM_HIDECONTROL, nCtrlID);
+			::SendMessage(GetFileDialogWindow(),CDM_HIDECONTROL, nCtrlID);
 		}
 
 		// Special override for common dialogs
 		BOOL EndDialog(INT_PTR /*nRetCode*/ = 0)
 		{
 			ATLASSERT(::IsWindow(m_hWnd));
-			GetFileDialogWindow().SendMessage(WM_COMMAND, MAKEWPARAM(IDCANCEL, 0));
+			::SendMessage(GetFileDialogWindow(),WM_COMMAND, MAKEWPARAM(IDCANCEL, 0));
 			return TRUE;
 		}
 
@@ -1779,7 +1779,7 @@ public: \
 			::GetClientRect(m_hWnd, &rc);
 			HFONT hFont = CreateFont(-12, 0, 0, 0, 0, 0, 0, 0, GB2312_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"宋体");
 			m_pSCheckBtn=new CWindowImpl(this);
-			HWND hWnd = m_pSCheckBtn->Create(L"BUTTON", L"包括子目录", WS_CHILD | BS_CHECKBOX, 20, rc.bottom - 50, 100, 30, m_hWnd,NULL,SApplication::getSingleton().GetInstance());
+			HWND hWnd = m_pSCheckBtn->Create(L"BUTTON", L"包括子目录", WS_CHILD | BS_CHECKBOX, 20, rc.bottom - 50, 100, 30, m_hWnd,NULL,SApplication::getSingleton().GetModule());
 			m_pSCheckBtn->SendMessage(WM_SETFONT, (WPARAM)hFont, 0);
 			m_pSCheckBtn->SendMessage(BM_SETCHECK,m_bIncludeChildDir?BST_CHECKED: BST_UNCHECKED, 0);			
 			m_pSCheckBtn->ShowWindow(TRUE);

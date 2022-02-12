@@ -204,7 +204,7 @@ class SOUI_EXP SHostWnd
     };
 
   public:
-	STDMETHOD_(BOOL,InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
+    STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
 
     STDMETHOD_(BOOL, DestroyWindow)(THIS) OVERRIDE;
 
@@ -274,7 +274,6 @@ class SOUI_EXP SHostWnd
     {
         return this;
     }
-
 
     BOOL AnimateHostWindow(DWORD dwTime, DWORD dwFlags);
 

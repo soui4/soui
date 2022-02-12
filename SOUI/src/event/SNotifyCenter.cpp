@@ -64,7 +64,7 @@ SNotifyCenter::SNotifyCenter(int nInterval)
 {
     m_dwMainTrdID = GetCurrentThreadId();
     m_pReceiver = new SNotifyReceiver(this);
-    m_pReceiver->CreateNative(_T("NotifyReceiver"), WS_POPUP, 0, 0, 0, 0, 0, HWND_MESSAGE,0, NULL);
+    m_pReceiver->CreateNative(_T("NotifyReceiver"), WS_POPUP, 0, 0, 0, 0, 0, HWND_MESSAGE, 0, NULL);
     SASSERT(m_pReceiver->IsWindow());
 }
 

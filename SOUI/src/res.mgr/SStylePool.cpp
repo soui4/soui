@@ -102,7 +102,7 @@ BOOL STemplatePool::Init(SXmlNode xmlNode)
     {
         SStringW strTempName = xmlChild.name();
         SStringW strValue;
-		xmlChild.first_child().ToString(&strValue);
+        xmlChild.first_child().ToString(&strValue);
         AddKeyObject(strTempName, strValue);
     }
     return TRUE;

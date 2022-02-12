@@ -313,7 +313,7 @@ HWND SHostWnd::CreateEx(HWND hWndParent,
         return m_hWnd;
     UpdateAutoSizeCount(true);
     HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight,
-                                         hWndParent,0, NULL);
+                                         hWndParent, 0, NULL);
     UpdateAutoSizeCount(false);
     if (!hWnd)
         return NULL;
@@ -517,7 +517,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             GetMonitorInfo(hMonitor, &info);
             SStringT dummyTitle = SStringT().Format(_T("%s_dummy"), m_hostAttr.m_strTitle.c_str());
             m_dummyWnd->CreateNative(dummyTitle, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
-                                     info.rcWork.left, info.rcWork.top, 1, 1, m_hWnd,0, NULL);
+                                     info.rcWork.left, info.rcWork.top, 1, 1, m_hWnd, 0, NULL);
             m_dummyWnd->SetWindowLongPtr(GWL_EXSTYLE,
                                          m_dummyWnd->GetWindowLongPtr(GWL_EXSTYLE) | WS_EX_LAYERED);
             ::SetLayeredWindowAttributes(m_dummyWnd->m_hWnd, 0, 0, LWA_ALPHA);

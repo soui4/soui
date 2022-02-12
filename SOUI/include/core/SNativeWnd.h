@@ -124,7 +124,7 @@ struct tagThunk // this should come out to 16 bytes
 #error Only AMD64, ARM and X86 supported
 #endif
 
-template <class T,class Base>
+template <class T, class Base>
 class TObjRefProxy
     : public T
     , public Base {
@@ -154,7 +154,7 @@ class TObjRefProxy
     }
 };
 
-class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd,TObjRefImpl<SObject>> {
+class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>> {
     DEF_SOBJECT_EX(TObjRefImpl<SObject>, L"SNativeWnd", NativeWnd)
   public:
     SNativeWnd();
@@ -182,7 +182,7 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd,TObjRefImpl<SObject>>
      int nWidth,
      int nHeight,
      HWND hWndParent,
-	 int nID,
+     int nID,
      LPVOID lpParam) OVERRIDE;
 
     STDMETHOD_(HWND, GetHwnd)(THIS) OVERRIDE;

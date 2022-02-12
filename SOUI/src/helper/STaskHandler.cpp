@@ -28,7 +28,7 @@ void STaskHandler::start(const char *pszName, Priority priority)
 #else
     strcpy_s(szBuf, 100, pszName);
 #endif
-    CreateNative(szBuf, WS_POPUP, 0, 0, 0, 0, 0, HWND_MESSAGE,0, NULL);
+    CreateNative(szBuf, WS_POPUP, 0, 0, 0, 0, 0, HWND_MESSAGE, 0, NULL);
 }
 
 void STaskHandler::stop()

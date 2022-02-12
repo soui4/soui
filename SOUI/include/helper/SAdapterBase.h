@@ -213,9 +213,10 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter>> {
         return FALSE;
     }
 
-	STDMETHOD_(SStringW, GetColumnName)(int iCol) SCONST {
-		return L"";
-	}
+    STDMETHOD_(SStringW, GetColumnName)(int iCol) SCONST
+    {
+        return L"";
+    }
 
     STDMETHOD_(void, GetColumnName)(THIS_ int iCol, IStringW *pName) SCONST
     {
@@ -229,14 +230,15 @@ class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter>> {
         return TRUE;
     }
 
-	STDMETHOD_(void, InitByTemplate)(THIS_ SXmlNode  xmlTemplate) {}
+    STDMETHOD_(void, InitByTemplate)(THIS_ SXmlNode xmlTemplate)
+    {
+    }
 
-	STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) OVERRIDE
-	{
-		SXmlNode xmlNode(xmlTemplate);
-		InitByTemplate(xmlNode);
-	}
-
+    STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode *xmlTemplate) OVERRIDE
+    {
+        SXmlNode xmlNode(xmlTemplate);
+        InitByTemplate(xmlNode);
+    }
 };
 
 class STvObserverMgr {
