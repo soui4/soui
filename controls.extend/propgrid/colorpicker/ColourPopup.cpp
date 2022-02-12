@@ -197,7 +197,7 @@ BOOL CColourPopup::Create(CPoint p, COLORREF crColour,
 
 	if (!SNativeWnd::CreateWindow(NULL, WS_VISIBLE|WS_POPUP, WS_EX_TOOLWINDOW,
                         p.x, p.y, 100, 100, // size updated soon
-                        m_hOwner, NULL))
+                        m_hOwner,0, NULL))
         return FALSE;
 
     // Store the Custom text

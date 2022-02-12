@@ -86,6 +86,7 @@ HWND SNativeWnd::CreateWindow(LPCTSTR lpWindowName,
                               int nWidth,
                               int nHeight,
                               HWND hWndParent,
+							  int nID,
                               LPVOID lpParam)
 {
     SNativeWndHelper::getSingletonPtr()->LockSharePtr(this);
@@ -95,7 +96,7 @@ HWND SNativeWnd::CreateWindow(LPCTSTR lpWindowName,
     // 在::CreateWindow返回之前会去调StarWindowProc函数
     HWND hWnd = ::CreateWindowEx(dwExStyle,
                                  (LPCTSTR)SNativeWndHelper::getSingletonPtr()->GetSimpleWndAtom(),
-                                 lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, 0,
+                                 lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, (HMENU)nID,
                                  SNativeWndHelper::getSingletonPtr()->GetAppInstance(), lpParam);
     SNativeWndHelper::getSingletonPtr()->UnlockSharePtr();
     if (!hWnd)

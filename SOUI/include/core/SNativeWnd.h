@@ -182,6 +182,7 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd,TObjRefImpl<SObject>>
      int nWidth,
      int nHeight,
      HWND hWndParent,
+	 int nID,
      LPVOID lpParam) OVERRIDE;
 
     STDMETHOD_(HWND, GetHwnd)(THIS) OVERRIDE;

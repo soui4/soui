@@ -41,7 +41,7 @@ BOOL SDragWnd::BeginDrag(HBITMAP hBmp, POINT ptHot, COLORREF crKey, BYTE byAlpha
 
     if (!s_pCurDragWnd->CreateWindow(NULL, WS_POPUP,
                                      WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST, 0, 0,
-                                     bm.bmWidth, bm.bmHeight, 0, NULL))
+                                     bm.bmWidth, bm.bmHeight, 0, 0, NULL))
     {
         delete s_pCurDragWnd;
         s_pCurDragWnd = NULL;

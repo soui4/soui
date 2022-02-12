@@ -400,7 +400,7 @@ UINT SMenu::TrackPopupMenu(UINT uFlags, int x, int y, HWND hWnd, LPCRECT prcRect
     UpdateScale(nScale);
 
     SMenuODWnd menuOwner(hWnd, GetMenuAttr(m_hMenu));
-    menuOwner.CreateWindow(NULL, WS_POPUP, WS_EX_NOACTIVATE, 0, 0, 0, 0, NULL, NULL);
+    menuOwner.CreateWindow(NULL, WS_POPUP, WS_EX_NOACTIVATE, 0, 0, 0, 0, NULL, 0,NULL);
     if (IsWindow(hWnd) && IsWindowEnabled(hWnd))
         ::SetForegroundWindow(hWnd);
     UINT uNewFlags = uFlags | TPM_RETURNCMD;

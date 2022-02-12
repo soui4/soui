@@ -87,10 +87,11 @@ public:
 		int nWidth,
 		int nHeight,
 		HWND hWndParent,
+		int nID,
 		LPVOID lpParam) OVERRIDE
 	{
 		return SHostWnd::CreateWindow(lpWindowName, dwStyle, dwExStyle, x, y, nWidth, nHeight,
-			hWndParent, lpParam);
+			hWndParent, nID, lpParam);
 	}
 
 	STDMETHOD_(HWND, GetHwnd)(THIS) OVERRIDE

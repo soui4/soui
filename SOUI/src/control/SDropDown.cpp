@@ -55,7 +55,7 @@ BOOL SDropDownWnd::Create(LPCRECT lpRect, LPVOID lParam, DWORD dwStyle, DWORD dw
     HWND hParent = m_pOwner->GetDropDownOwner()->GetContainer()->GetHostHwnd();
     HWND hWnd = SNativeWnd::CreateWindow(NULL, dwStyle, dwExStyle, lpRect->left, lpRect->top,
                                          lpRect->right - lpRect->left, lpRect->bottom - lpRect->top,
-                                         hParent, 0);
+                                         hParent, 0,NULL);
     if (!hWnd)
         return FALSE;
     m_pOwner->OnCreateDropDown(this);
