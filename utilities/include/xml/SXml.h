@@ -94,7 +94,7 @@ public:
 	SXmlNode(const SXmlNode& src);
 	explicit SXmlNode(LPVOID pData=NULL);
 public:
-	STDMETHOD_(IStringW*,ToString)(THIS) SCONST OVERRIDE;
+	STDMETHOD_(void,ToString)(THIS_ IStringW *out) SCONST OVERRIDE;
 
 	STDMETHOD_(LPVOID,GetPrivPtr)(THIS) SCONST OVERRIDE;
 

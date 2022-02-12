@@ -34,7 +34,8 @@ IFontPtr SFontPool::GetFont(FONTSTYLE style, const SStringW &fontFaceName, SXmlN
     if (strFace.IsEmpty())
         strFace = GetDefFontInfo().strFaceName;
 
-    SStringW strXmlProp = xmlExProp.ToString();
+    SStringW strXmlProp;
+	xmlExProp.ToString(&strXmlProp);
 
     FontInfo info = { style.dwStyle, strFace, strXmlProp };
 

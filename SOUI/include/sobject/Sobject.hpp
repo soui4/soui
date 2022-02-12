@@ -41,11 +41,9 @@ public:
 		SXmlNode xmlNode(pXmlNode);
 
 		if (!xmlNode) return FALSE;
-#if defined(_DEBUG) && defined(PUGIXML_WCHAR_MODE)
+#if defined(_DEBUG)
 		{
-			IStringW *pStr = pXmlNode->ToString();
-			m_strXml=SStringW(pStr);
-			pStr->Release();
+			pXmlNode->ToString(&m_strXml);
 		}
 #endif
 

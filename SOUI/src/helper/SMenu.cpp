@@ -434,7 +434,8 @@ void SMenu::BuildMenu(HMENU menuPopup, SXmlNode xmlNode)
             BOOL bRadio = xmlItem.attribute(L"radio").as_bool(false);
             BOOL bDisable = xmlItem.attribute(L"disable").as_bool(false);
 
-            SStringW str = xmlItem.ToString();
+            SStringW str;
+			xmlItem.ToString(&str);
 
             SXmlNode xmlChild = xmlItem.first_child();
             while (xmlChild && xmlChild.type() == node_pcdata)

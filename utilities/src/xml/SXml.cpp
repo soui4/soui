@@ -213,11 +213,11 @@ SXmlNode::SXmlNode(const SXmlNode& src):_node(src._node)
 }
 
 
-IStringW* SXmlNode::ToString(THIS) SCONST
+void SXmlNode::ToString(THIS_ IStringW *out) SCONST
 {
 	pugi::xml_writer_buff writer;
 	_node.print(writer, L"\t", pugi::format_default, pugi::encoding_utf16);
-	return new SStringW(writer.buffer(), writer.size());
+	out->Assign2(writer.buffer(), writer.size());
 }
 
 LPVOID SXmlNode::GetPrivPtr(THIS) SCONST

@@ -74,7 +74,7 @@ DECLARE_INTERFACE_(IXmlNode,IObjRef)
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
 
-	STDMETHOD_(IStringW*,ToString)(THIS) SCONST PURE;
+	STDMETHOD_(void,ToString)(THIS_ IStringW *out) SCONST PURE;
 
 	STDMETHOD_(LPVOID,GetPrivPtr)(THIS) SCONST PURE;
 
