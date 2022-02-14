@@ -183,7 +183,7 @@ BOOL SEventSet::subscribeEvent(DWORD dwEventID, const StdFunCallback &eventCallb
 {
     if (!isEventPresent(dwEventID))
         return false;
-    return GetEventObject(dwEventID)->subscribe(StdFunctionSlot(eventCallback));
+    return GetEventObject(dwEventID)->subscribe(&StdFunctionSlot(eventCallback));
 }
 #endif
 

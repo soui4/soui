@@ -78,11 +78,12 @@ class StdFunctionSlot : public TObjRefImpl<IEvtSlot> {
     }
     STDMETHOD_(BOOL, Equal)(THIS_ const IEvtSlot *sour) SCONST OVERRIDE
     {
-        SASSERT(psour);
+        SASSERT(sour);
         if (sour->GetSlotType() != SLOT_STDFUNCTOR)
             return FALSE;
         const StdFunctionSlot *psour = static_cast<const StdFunctionSlot *>(sour);
-        return psour->d_function == d_function;
+        SASSERT(psour);
+        return psour->d_function.target_type() == d_function.target_type();
     }
     STDMETHOD_(UINT, GetSlotType)(THIS) SCONST OVERRIDE
     {
