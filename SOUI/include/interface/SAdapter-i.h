@@ -362,11 +362,8 @@ DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
     (THIS_ HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
 };
 
-enum
-{
-    ITEM_NULL = 0,
-    ITEM_ROOT = 0xFFFF0000,
-};
+#define ITEM_NULL  0
+#define ITEM_ROOT  0xFFFF0000
 
 typedef enum DATA_INDEX
 {

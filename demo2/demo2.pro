@@ -27,7 +27,8 @@ else{
 HEADERS += ComLoader.h \
            resource.h \
            TestLvAdapter.h \
-           res/resource.h \
+           res/resource.h
+
 SOURCES += ComLoader.c demo2.c TestLvAdapter.c
 
 RC_FILE += demo2.rc
