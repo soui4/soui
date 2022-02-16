@@ -46,11 +46,11 @@ protected:
 		{
 		}
 
-		virtual IRunnable * clone() const {
+		STDMETHOD_(IRunnable *,clone)(THIS) SCONST {
 			return new StdRunnable(_func);
 		}
 
-		virtual void run()
+		STDMETHOD_(void,run)(THIS)
 		{
 			_func();
 		}
