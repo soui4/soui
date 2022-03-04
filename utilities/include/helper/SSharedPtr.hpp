@@ -11,6 +11,7 @@ SNSBEGIN
 	class PtrDisposer
 	{
 	public:
+		virtual ~PtrDisposer(){}
 		/**
 		* Delete pointer ptr.
 		* @param ptr pointer to be deleted.
