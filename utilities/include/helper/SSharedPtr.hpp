@@ -115,7 +115,7 @@ SNSBEGIN
 		 * Copy constructor.
 		 * @param obj another SharedPtr object.
 		 */
-		SSharedPtr(const SSharedPtr<T> &obj) : _ptr(obj._ptr), _sc(obj._sc)
+		SSharedPtr(const SSharedPtr<T,Disposer> &obj) : _ptr(obj._ptr), _sc(obj._sc)
 		{
 			obj._sc->incRefCount();
 		}
