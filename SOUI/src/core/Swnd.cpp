@@ -1308,7 +1308,7 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     if (IsLayeredWindow())
     { //将绘制到窗口的缓存上的图像返回到上一级RT
         SASSERT(pRTBackup);
-        pRTBackup->AlphaBlend(&rcWnd, pRT, &rcWnd, GetAlpha());
+		OnCommitSurface(pRTBackup,&rcWnd,pRT,&rcWnd,GetAlpha());
         IRenderTarget *p = pRT;
         pRT = pRTBackup;
         p->Release();
@@ -3439,6 +3439,11 @@ BOOL SWindow::UnsubscribeEvent(THIS_ DWORD evtId, const IEvtSlot *pSlot)
 HRESULT SWindow::QueryInterface(THIS_ REFGUID id, IObjRef **ppRet)
 {
     return E_NOINTERFACE;
+}
+
+void SWindow::OnCommitSurface(IRenderTarget *pRtDest,LPCRECT pRcDest,IRenderTarget *pRtSrc,LPCRECT pRcSrc,BYTE alpha)
+{
+	pRtDest->AlphaBlend(pRcDest, pRtSrc, pRcSrc,alpha);
 }
 
 //////////////////////////////////////////////////////////////////////////

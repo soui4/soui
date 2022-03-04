@@ -2,9 +2,9 @@
 
 #include <helper/SCriticalSection.h>
 
-namespace SOUI
-{
-	/**
+SNSBEGIN
+
+/**
 	* This class is used in SSharedPtr to delete a object pointer.
 	*/
 	template <class T>
@@ -18,17 +18,31 @@ namespace SOUI
 		virtual void dispose(T *ptr) = 0;
 	};
 
-	template <class T>
+	template<class T>
+	class DefaultPtrDisposer : public PtrDisposer<T>
+	{
+	public:
+		virtual void dispose(T *ptr)
+		{
+			if (ptr)
+			{
+				delete ptr;
+			}
+		}
+	};
+
+	template <class T,class Disposer=DefaultPtrDisposer<T>>
 	class SSharedCount
 	{
 	public:
-		SSharedCount(T *ptr, PtrDisposer<T> &disposer) : _ptr(ptr), _refCount(1), _cs(), _disposer(disposer)
+		SSharedCount(T *ptr) : _ptr(ptr), _refCount(1), _cs(), _disposer(new Disposer())
 		{
 		}
 
 		~SSharedCount()
 		{
-			_disposer.dispose(_ptr);
+			_disposer->dispose(_ptr);
+			delete _disposer;
 		}
 
 		void incRefCount()
@@ -65,7 +79,7 @@ namespace SOUI
 		T *_ptr;
 		unsigned int _refCount;
 		SCriticalSection _cs;
-		PtrDisposer<T> &_disposer;
+		PtrDisposer<T> *_disposer;
 	};
 
 
@@ -76,28 +90,15 @@ namespace SOUI
 	 * If the object reference count is decreased to 0, the object will be deleted
 	 * automatically.
 	 */
-	template <class T>
+	template <class T,class Disposer=DefaultPtrDisposer<T> >
 	class SSharedPtr
 	{
-	private:
-		class DefaultPtrDisposer : public PtrDisposer<T>
-		{
-		public:
-			virtual void dispose(T *ptr)
-			{
-				if (ptr)
-				{
-					delete ptr;
-				}
-			}
-		};
-
 	public:
 		/**
 		 * Default constructor.
 		 * @param ptr object pointer.
 		 */
-		SSharedPtr() : _ptr(NULL), _sc(new SSharedCount<T>(NULL, _kDefaultPtrDisposer))
+		SSharedPtr() : _ptr(NULL), _sc(new SSharedCount<T,Disposer>(NULL))
 		{
 		}
 
@@ -105,16 +106,7 @@ namespace SOUI
 		 * Constructor.
 		 * @param ptr object pointer.
 		 */
-		SSharedPtr(T *ptr) : _ptr(ptr), _sc(new SSharedCount<T>(ptr, _kDefaultPtrDisposer))
-		{
-		}
-
-		/**
-		 * Constructor with disposer.
-		 * @param ptr object pointer.
-		 * @param disposer object disposer.
-		 */
-		SSharedPtr(T *ptr, PtrDisposer<T> &disposer) : _ptr(ptr), _sc(new SSharedCount<T>(ptr, disposer))
+		SSharedPtr(T *ptr) : _ptr(ptr), _sc(new SSharedCount<T,Disposer>(ptr))
 		{
 		}
 
@@ -141,7 +133,7 @@ namespace SOUI
 		 * @param obj another SharedPtr object.
 		 * @return self object.
 		 */
-		SSharedPtr &operator=(const SSharedPtr<T> &obj)
+		SSharedPtr &operator=(const SSharedPtr<T,Disposer> &obj)
 		{
 			if (this != &obj)
 			{
@@ -221,21 +213,14 @@ namespace SOUI
 		 * Return if the pointer equals to another.
 		 * @return true if equal.
 		 */
-		bool operator==(SSharedPtr<T> obj) const
+		bool operator==(SSharedPtr<T,Disposer> obj) const
 		{
 			return _ptr == obj._ptr;
 		}
 
 	private:
-		//static void *operator new(size_t size);
-
-		static DefaultPtrDisposer _kDefaultPtrDisposer;
-
 		T *_ptr;
-		SSharedCount<T> *_sc;
+		SSharedCount<T,Disposer> *_sc;
 	};
 
-	template <class T>
-	typename SSharedPtr<T>::DefaultPtrDisposer SSharedPtr<T>::_kDefaultPtrDisposer;
-
-}
+SNSEND

@@ -1016,6 +1016,20 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
                                UINT iZorderBegin,
                                UINT iZorderEnd);
 
+	/**
+     * OnCommitSurface
+     * @brief
+     * @param    IRenderTarget * pRtDest -- dest rt
+     * @param    LPCRECT pRcDest -- dest rect
+     * @param    IRenderTarget *pRtSrc -- src rt
+     * @param    LPCRECT pRcSrc -- src rect
+	 * @param    BYTE alpha -- alpha
+     * @return   void
+     *
+     * Describe
+     */
+	virtual void OnCommitSurface(IRenderTarget *pRtDest,LPCRECT pRcDest,IRenderTarget *pRtSrc,LPCRECT pRcSrc,BYTE alpha);
+
   protected: // helper functions
     SWindow *_FindChildByID(int nID, int nDeep);
     SWindow *_FindChildByName(const SStringW &strName, int nDeep);
