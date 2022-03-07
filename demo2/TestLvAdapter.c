@@ -180,6 +180,11 @@ long WINAPI TestLvAdapter_Release(ILvAdapter *pObj)
      */
     void WINAPI TestLvAdapter_InitByTemplate(ILvAdapter *pObj,IXmlNode * xmlTemplate) {}
 
+	HRESULT WINAPI TestLvAdapter_QueryInterface(ILvAdapter *pObj,REFGUID id, IObjRef**ppObj) {
+		return E_NOINTERFACE;
+	}
+
+
 ILvAdapterVtbl vtblTestLv ={
 	TestLvAdapter_AddRef,
 	TestLvAdapter_Release,
@@ -193,7 +198,8 @@ ILvAdapterVtbl vtblTestLv ={
 	TestLvAdapter_getViewDesiredSize,
 	TestLvAdapter_isEmpty,
 	TestLvAdapter_getItemDesc,
-	TestLvAdapter_InitByTemplate
+	TestLvAdapter_InitByTemplate,
+	TestLvAdapter_QueryInterface
 };
 
 BOOL TestLvAdapter_Init(ILvAdapter **pObj)

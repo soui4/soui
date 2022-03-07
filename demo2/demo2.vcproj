@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9,00"
 	Name="demo2"
-	ProjectGUID="{2A220DB1-76D1-3350-91D5-711647D3C67D}"
+	ProjectGUID="{F7715081-DC21-3700-B974-85A87C8AD040}"
 	Keyword="Qt4VSv1.0">
 	<Platforms>
 		<Platform
@@ -134,23 +134,24 @@
 	</Configurations>
 	<Files>
 		<Filter
+			Name="Source Files"
+			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
+			<File
+				RelativePath="ComLoader.c" />
+			<File
+				RelativePath="TestLvAdapter.c" />
+			<File
+				RelativePath="demo2.c" />
+		</Filter>
+		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
 			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="+=" />
-			<File
-				RelativePath="ComLoader.c" />
-			<File
 				RelativePath="ComLoader.h" />
 			<File
-				RelativePath="SOURCES" />
-			<File
-				RelativePath="TestLvAdapter.c" />
-			<File
 				RelativePath="TestLvAdapter.h" />
-			<File
-				RelativePath="demo2.c" />
 			<File
 				RelativePath="res\resource.h" />
 			<File

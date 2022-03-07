@@ -168,6 +168,14 @@ DECLARE_INTERFACE_(ILvAdapter, IObjRef)
      * @return void
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) PURE;
+
+    /**
+     * @brief query user defined interface from adapter
+     * @param REFGUID id-- __uuidof(interface)
+	 * @param [out] IObjRef ** ppObj -- the return interface
+     * @return HRESULT S_OK--SUCCEED
+     */
+	STDMETHOD_(HRESULT,QueryInterface)(THIS_ REFGUID id,IObjRef **ppObj) PURE;
 };
 
 #undef INTERFACE
@@ -588,6 +596,14 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @return void
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * pXmlTemplate) PURE;
+
+	 /**
+     * @brief query user defined interface from adapter
+     * @param REFGUID id-- __uuidof(interface)
+	 * @param [out] IObjRef ** ppObj -- the return interface
+     * @return HRESULT S_OK--SUCCEED
+     */
+	STDMETHOD_(HRESULT,QueryInterface)(THIS_ REFGUID id,IObjRef **ppObj) PURE;
 };
 
 SNSEND

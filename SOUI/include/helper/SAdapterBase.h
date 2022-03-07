@@ -180,6 +180,11 @@ class LvAdatperImpl : public BaseClass {
         return getViewDesiredSize(position, pItemPanel, wid, hei);
     }
 
+	STDMETHOD_(HRESULT,QueryInterface)(THIS_ REFGUID id,IObjRef **ppObj) OVERRIDE
+	{
+		return E_NOINTERFACE;
+	}
+
   protected:
     SLvObserverMgr m_obzMgr;
 };
@@ -583,6 +588,11 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         }
         return ITEM_NULL;
     }
+
+	STDMETHOD_(HRESULT,QueryInterface)(THIS_ REFGUID id,IObjRef **ppObj) OVERRIDE
+	{
+		return E_NOINTERFACE;
+	}
 
   public:
     HSTREEITEM InsertItem(const T &data,
