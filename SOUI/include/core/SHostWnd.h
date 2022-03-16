@@ -452,11 +452,14 @@ class SOUI_EXP SHostWnd
     }
 
     void OnHostShowWindow(BOOL bShow, UINT nStatus);
+	void OnNcPaint(HRGN hRgn);
+
     BEGIN_MSG_MAP_EX(SHostWnd)
     MSG_WM_SHOWWINDOW(OnHostShowWindow)
     MSG_WM_SIZE(OnSize)
     MSG_WM_PRINT(OnPrint)
     MSG_WM_PAINT(OnPaint)
+	MSG_WM_NCPAINT(OnNcPaint)
     MSG_WM_CREATE(OnCreate)
     MSG_WM_DESTROY(OnDestroy)
     MSG_WM_ERASEBKGND(OnEraseBkgnd)

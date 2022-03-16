@@ -193,6 +193,13 @@ BOOL SSpinButtonCtrl::OnBuddyChange(IEvtArgs *pEvt)
     return TRUE;
 }
 
+void SSpinButtonCtrl::OnScaleChanged(int scale)
+{
+    __baseCls::OnScaleChanged(scale);
+    GetScaleSkin(m_pUpSkin, scale);
+    GetScaleSkin(m_pDownSkin, scale);
+}
+
 int SSpinButtonCtrl::OnCreate(void *)
 {
     int nRet = __baseCls::OnCreate(NULL);

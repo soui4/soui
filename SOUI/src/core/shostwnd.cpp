@@ -1087,12 +1087,11 @@ void SHostWnd::UpdateTooltip()
 
 LRESULT SHostWnd::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
 {
+	LPNCCALCSIZE_PARAMS pParam = (LPNCCALCSIZE_PARAMS)lParam;
     if (bCalcValidRects && (SNativeWnd::GetStyle() & WS_CHILDWINDOW))
     {
         //子窗口，相对于父窗口坐标
-        LPNCCALCSIZE_PARAMS pParam = (LPNCCALCSIZE_PARAMS)lParam;
-
-        if (SWP_NOSIZE == (SWP_NOSIZE & pParam->lppos->flags))
+		if (SWP_NOSIZE & pParam->lppos->flags)
             return 0;
 
         CRect rcWindow;
@@ -1120,9 +1119,7 @@ LRESULT SHostWnd::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
     else if (bCalcValidRects)
     {
         // top-level 相对于屏幕坐标
-        LPNCCALCSIZE_PARAMS pParam = (LPNCCALCSIZE_PARAMS)lParam;
-
-        if (SWP_NOSIZE == (SWP_NOSIZE & pParam->lppos->flags))
+        if (SWP_NOSIZE & pParam->lppos->flags)
             return 0;
 
         CRect rcWindow;
@@ -1136,7 +1133,7 @@ LRESULT SHostWnd::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
     }
     else
     {
-        SNativeWnd::GetWindowRect((LPRECT)lParam);
+		DefWindowProc();
     }
 
     return 0;
@@ -1903,6 +1900,10 @@ void SHostWnd::OnSysCommand(UINT nID, CPoint lParam)
     {
         DefWindowProc();
     }
+}
+
+void SHostWnd::OnNcPaint(HRGN hRgn)
+{
 }
 
 //////////////////////////////////////////////////////////////////
