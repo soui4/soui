@@ -57,7 +57,6 @@ set(headers
 	src/utils/SkTextureCompressor_LATC.h
 	src/utils/SkTextureCompressor_R11EAC.h
 	src/utils/SkTFitsIn.h
-#	src/utils/SkThreadPool.h
 	src/utils/SkThreadUtils.h
 	src/utils/SkThreadUtils_win.h
 	src/utils/SkTLogic.h
@@ -170,7 +169,6 @@ set(headers
 	src/gpu/GrAllocator.h
 	src/gpu/GrAllocPool.h
 	src/gpu/GrAtlas.h
-#	src/gpu/GrBinHashKey.h
 	src/gpu/GrBitmapTextContext.h
 	src/gpu/GrBlend.h
 	src/gpu/GrBufferAllocPool.h
@@ -225,7 +223,6 @@ set(headers
 	src/gpu/gl/GrGLCaps.h
 	src/gpu/gl/GrGLContext.h
 	src/gpu/gl/GrGLDefines.h
-#	src/gpu/gl/GrGLEffect.h
 	src/gpu/gl/GrGLIndexBuffer.h
 	src/gpu/gl/GrGLIRect.h
 	src/gpu/gl/GrGLNameAllocator.h
@@ -247,7 +244,6 @@ set(headers
 	src/gpu/gl/GrGLUtil.h
 	src/gpu/gl/GrGLVertexArray.h
 	src/gpu/gl/GrGLVertexBuffer.h
-#	src/gpu/gl/GrGLVertexEffect.h
 	src/gpu/gl/GrGpuGL.h
 	src/gpu/gl/debug/GrBufferObj.h
 	src/gpu/gl/debug/GrDebugGL.h
@@ -302,7 +298,6 @@ set(headers
 	include/core/SkData.h
 	include/core/SkDeque.h
 	include/core/SkDevice.h
-#	include/core/SkDeviceProperties.h
 	include/core/SkDither.h
 	include/core/SkDraw.h
 	include/core/SkDrawFilter.h
@@ -446,16 +441,12 @@ set(headers
 	include/ports/SkFontMgr_indirect.h
 	include/ports/SkFontStyle.h
 	include/ports/SkRemotableFontMgr.h
-#	include/gpu/GrBackendEffectFactory.h
 	include/gpu/GrClipData.h
 	include/gpu/GrColor.h
 	include/gpu/GrConfig.h
 	include/gpu/GrContext.h
 	include/gpu/GrContextFactory.h
 	include/gpu/GrCoordTransform.h
-#	include/gpu/GrEffect.h
-#	include/gpu/GrEffectStage.h
-#	include/gpu/GrEffectUnitTest.h
 	include/gpu/GrFontScaler.h
 	include/gpu/GrGlyph.h
 	include/gpu/GrGpuResource.h
@@ -464,12 +455,10 @@ set(headers
 	include/gpu/GrRect.h
 	include/gpu/GrRenderTarget.h
 	include/gpu/GrSurface.h
-#	include/gpu/GrTBackendEffectFactory.h
 	include/gpu/GrTexture.h
 	include/gpu/GrTextureAccess.h
 	include/gpu/GrTypes.h
 	include/gpu/GrUserConfig.h
-#	include/gpu/SkGpuDevice.h
 	include/gpu/SkGr.h
 	include/gpu/SkGrPixelRef.h
 	include/gpu/SkGrTexturePixelRef.h

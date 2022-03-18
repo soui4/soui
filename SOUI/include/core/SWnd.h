@@ -578,7 +578,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
      *
      * Describe
      */
-    SWindow *FindChildByID(int nID, int nDeep = -1);
+    virtual SWindow *FindChildByID(int nID, int nDeep = -1);
 
     template <class T>
     T *GetLayoutParamT()
@@ -619,7 +619,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
      *
      * Describe
      */
-    SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1);
+    virtual SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1);
 
     SWindow *FindChildByName(LPCSTR strName, int nDeep = -1)
     {

@@ -684,7 +684,9 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
     m_lstUpdatedRect.RemoveAll();
     m_bRendering = FALSE;
 
-    UpdateHost(dc, rcInvalid);
+	IBitmapS * pCache = (IBitmapS*)m_memRT->GetCurrentObject(OT_BITMAP);
+	if(!OnCacheUpdated(pCache,rcInvalid))
+		UpdateHost(dc, rcInvalid);
 }
 
 void SHostWnd::OnPaint(HDC dc)
@@ -979,9 +981,13 @@ void SHostWnd::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdc
         pRT->PopClip();
         if (!m_bRendering)
         {
-            HDC dc = GetDC();
-            UpdateHost(dc, rc);
-            ReleaseDC(dc);
+			IBitmapS * pCache = (IBitmapS*)m_memRT->GetCurrentObject(OT_BITMAP);
+			if(!OnCacheUpdated(pCache,rc))
+			{
+				HDC dc = GetDC();
+				UpdateHost(dc, rc);
+				ReleaseDC(dc);
+			}
         }
         else
         {
@@ -989,6 +995,11 @@ void SHostWnd::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdc
         }
     }
     pRT->Release();
+}
+
+BOOL SHostWnd::OnCacheUpdated(IBitmapS * pCache, LPCRECT pRect)
+{
+	return FALSE;
 }
 
 void SHostWnd::UpdateHost(HDC dc, LPCRECT rcInvalid, BYTE byAlpha)

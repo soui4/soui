@@ -197,7 +197,7 @@ SXmlNode::SXmlNode(LPVOID pData):_node((pugi::xml_node_struct*)pData)
 
 }
 
-SXmlNode::SXmlNode(const IXmlNode * src):_node((pugi::xml_node_struct*)src->GetPrivPtr())
+SXmlNode::SXmlNode(const IXmlNode * src):_node(src?(pugi::xml_node_struct*)src->GetPrivPtr():NULL)
 {
 
 }

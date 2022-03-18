@@ -377,6 +377,9 @@ class SOUI_EXP SHostWnd
     LRESULT OnGetObject(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void OnSysCommand(UINT nID, CPoint lParam);
 
+	void OnHostShowWindow(BOOL bShow, UINT nStatus);
+	void OnNcPaint(HRGN hRgn);
+
 #ifndef DISABLE_SWNDSPY
   protected:
     LRESULT OnSpyMsgSetSpy(UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -441,7 +444,7 @@ class SOUI_EXP SHostWnd
   protected:
     virtual BOOL OnLoadLayoutFromResourceID(const SStringT &resId);
     virtual void OnUserXmlNode(SXmlNode xmlUser);
-
+	virtual BOOL OnCacheUpdated(IBitmapS * pCache, LPCRECT pRect);
   public:
     virtual BOOL onRootResize(IEvtArgs *e);
 
@@ -450,9 +453,6 @@ class SOUI_EXP SHostWnd
     {
         return FALSE;
     }
-
-    void OnHostShowWindow(BOOL bShow, UINT nStatus);
-	void OnNcPaint(HRGN hRgn);
 
     BEGIN_MSG_MAP_EX(SHostWnd)
     MSG_WM_SHOWWINDOW(OnHostShowWindow)

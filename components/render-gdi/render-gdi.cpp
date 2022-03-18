@@ -1265,11 +1265,15 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::FillSolidEllipse(LPCRECT pRect,COLORREF cr)
     {
-        DCBuffer dcBuf(m_hdc,pRect,GetAValue(cr),FALSE);
-        HBRUSH br=::CreateSolidBrush(cr&0x00ffffff);
-        ::Ellipse(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom);
-        ::DeleteObject(br);
-        return S_OK;    
+		DCBuffer dcBuf(m_hdc,pRect,GetAValue(cr),FALSE);
+		HBRUSH br=::CreateSolidBrush(cr&0x00ffffff);
+		HGDIOBJ oldObj=::SelectObject(dcBuf,br);
+		HGDIOBJ oldPen = ::SelectObject(dcBuf, GetStockObject(NULL_PEN));
+		::Ellipse(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom);
+		::SelectObject(dcBuf, oldPen);
+		::SelectObject(dcBuf,oldObj);
+		::DeleteObject(br);
+		return S_OK;    
     }
 
     const float PI = 3.1415926f;
