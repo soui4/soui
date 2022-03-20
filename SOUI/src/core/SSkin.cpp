@@ -44,6 +44,7 @@ int SSkinImgList::GetStates() const
 
 void SSkinImgList::OnInitFinished(IXmlNode *xmlNode)
 {
+	__baseCls::OnInitFinished(xmlNode);
     if (!m_bLazyLoad && !m_strSrc.IsEmpty())
     {
         m_pImg.Attach(LOADIMAGE2(m_strSrc));
@@ -579,6 +580,7 @@ SSkinShape::SSkinShape()
 
 void SSkinShape::OnInitFinished(IXmlNode *pNode)
 {
+	__baseCls::OnInitFinished(pNode);
     SXmlNode xmlNode(pNode);
     SXmlNode xmlSolid = xmlNode.child(L"solid");
     if (xmlSolid)

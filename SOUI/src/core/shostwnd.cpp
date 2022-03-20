@@ -1144,7 +1144,7 @@ LRESULT SHostWnd::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
     }
     else
     {
-		DefWindowProc();
+        SNativeWnd::GetWindowRect((LPRECT)lParam);
     }
 
     return 0;
