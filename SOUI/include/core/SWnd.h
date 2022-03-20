@@ -578,7 +578,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
      *
      * Describe
      */
-    virtual SWindow *FindChildByID(int nID, int nDeep = -1);
+    SWindow *FindChildByID(int nID, int nDeep = -1);
 
     template <class T>
     T *GetLayoutParamT()
@@ -619,7 +619,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
      *
      * Describe
      */
-    virtual SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1);
+    SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1);
 
     SWindow *FindChildByName(LPCSTR strName, int nDeep = -1)
     {
@@ -1031,8 +1031,8 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
 	virtual void OnCommitSurface(IRenderTarget *pRtDest,LPCRECT pRcDest,IRenderTarget *pRtSrc,LPCRECT pRcSrc,BYTE alpha);
 
   protected: // helper functions
-    SWindow *_FindChildByID(int nID, int nDeep);
-    SWindow *_FindChildByName(const SStringW &strName, int nDeep);
+    virtual SWindow *_FindChildByID(int nID, int nDeep);
+    virtual SWindow *_FindChildByName(const SStringW &strName, int nDeep);
 
     void _Update();
 
