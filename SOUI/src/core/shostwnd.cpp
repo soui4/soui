@@ -13,7 +13,6 @@
 
 SNSBEGIN
 
-#define KConstDummyPaint 0x80000000
 
 //////////////////////////////////////////////////////////////////////////
 //    SDummyWnd
@@ -30,7 +29,7 @@ class SDummyWnd : public SNativeWnd {
         PAINTSTRUCT ps;
         ::BeginPaint(m_hWnd, &ps);
         ::EndPaint(m_hWnd, &ps);
-        m_pOwner->OnPrint(NULL, KConstDummyPaint);
+        m_pOwner->OnPrint(NULL);
     }
 
     void OnDestroy()
@@ -667,11 +666,12 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         m_rgnInvalidate->GetRgnBox(&rcInvalid);
         m_rgnInvalidate->Clear();
     }
-
-    if (uFlags != KConstDummyPaint) //由系统发的WM_PAINT或者WM_PRINT产生的重绘请求
-    {
-        rcInvalid = rcWnd;
-    }
+	if(dc)
+	{//由系统发的WM_PAINT或者WM_PRINT产生的重绘请求
+		CRect rcUpdate;
+		::GetClipBox(dc,&rcUpdate);
+		rcInvalid = rcInvalid|rcUpdate;
+	}
 
     //渲染非背景混合窗口,设置m_bRending=TRUE以保证只执行一次UpdateHost
     m_bRendering = TRUE;
@@ -693,7 +693,7 @@ void SHostWnd::OnPaint(HDC dc)
 {
     PAINTSTRUCT ps;
     dc = ::BeginPaint(m_hWnd, &ps);
-    OnPrint(m_hostAttr.m_bTranslucent ? NULL : dc, 0);
+	OnPrint(m_hostAttr.m_bTranslucent ? NULL : dc);
     ::EndPaint(m_hWnd, &ps);
 }
 

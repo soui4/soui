@@ -321,7 +321,7 @@ class SOUI_EXP SHostWnd
     //////////////////////////////////////////////////////////////////////////
     // Message handler
 
-    void OnPrint(HDC dc, UINT uFlags);
+    void OnPrint(HDC dc, UINT uFlags=0);
 
     void OnPaint(HDC dc);
 
