@@ -114,9 +114,25 @@ protected:
 			{
 				strBuf = S_CA2A(SStringA(pBuf,nBufSize),CP_ACP,CP_UTF8);
 			}
+
+            const char* svg_buffer = NULL;
+
 			if(strBuf.Left(4)=="<svg")
 			{
-				NSVGimage *image = nsvgParse((char*)strBuf.c_str(),"px", 96.0f);
+                svg_buffer = strBuf.c_str();
+			}
+            else if (strBuf.Left(5) == "<?xml")
+            {
+                int pos = strBuf.Find("<svg", 5);
+                if (pos != -1)
+                {
+                    svg_buffer = strBuf.c_str() + pos;
+                }
+            }
+
+            if (svg_buffer)
+            {
+                NSVGimage *image = nsvgParse((char*)svg_buffer,"px", 96.0f);
 				IBitmapS *Ret=NULL;
 				if(image)
 				{
@@ -136,7 +152,7 @@ protected:
 
 				}
 				return Ret;
-			}
+            }
 		}
 		return SResLoadFromMemory::LoadImage(pBuf,nBufSize);
 	}
