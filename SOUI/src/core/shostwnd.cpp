@@ -451,6 +451,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         }
     }
 	SXmlNode xmlNcPainter = xmlNode.child(SNcPainter::GetClassName());
+	xmlNcPainter.set_userdata(1);
 	m_pNcPainter->InitFromXml(&xmlNcPainter);
 
     DWORD dwStyle = SNativeWnd::GetStyle();

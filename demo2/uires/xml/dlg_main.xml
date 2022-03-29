@@ -2,7 +2,7 @@
 appWnd="1"
 translucent="0" 
 >
-  <ncpainter borderWidth="5dp" titleHeight="30dp" skinBorder="_skin.sys.wnd.bkgnd" layout="hbox" gravity="center" colorBkgnd="#cccccc">
+  <ncpainter system="false" borderWidth="5dp" titleHeight="30dp" skinBorder="_skin.sys.wnd.bkgnd" layout="hbox" gravity="center" colorBkgnd="#cccccc">
     <icon id="sysid_icon" src="ICON_LOGO:16"/>
     <text id="sysid_title">@string/title</text>
     <window size="0,0" weight="1"/>
@@ -13,15 +13,8 @@ translucent="0"
     </window>
     <imgbtn id="sysid_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
   </ncpainter>
-  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" >
-    <caption pos="0,0,-0,30" show="1" font="adding:0">
-      <icon pos="10,8" src="ICON_LOGO:16"/>
-      <text pos="29,9">@string/title</text>
-      <imgbtn name="btn_close" skin="_skin.sys.btn.close"    pos="-45,0" tip="close" animate="1"/>
-      <imgbtn name="btn_max" skin="_skin.sys.btn.maximize"  pos="-83,0" animate="1" />
-      <imgbtn name="btn_restore" skin="_skin.sys.btn.restore"  pos="-83,0" show="0" animate="1" />
-      <imgbtn name="btn_min" skin="_skin.sys.btn.minimize" pos="-121,0" animate="1" />
-    </caption>
+  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" layout="vbox" gravity="center">
+    <button size="100,30" name="btn_exit" text="Exit"/>
     <window pos="5,[2,-5,-5">
       <listview pos="0,0,300,-0" name="lv_test">
         <template itemHeight="50" layout="hbox" gravity="center">

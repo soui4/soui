@@ -58,6 +58,7 @@ public:
 		ATTR_LAYOUTSIZE(L"titleHeight",m_titleHeight,FALSE)
 		ATTR_LAYOUTSIZE(L"borderWidth",m_borderWidth,FALSE)
 		ATTR_SKIN(L"skinBorder",m_skinBorder,FALSE)
+		ATTR_BOOL(L"system",m_bSysNcPainter,FALSE)
 	SOUI_ATTRS_END()
 
 protected:
@@ -74,6 +75,7 @@ protected:
 	void OnSize(UINT nType, CSize size);
 
 	BEGIN_MSG_MAP_EX(SNcPainter)
+		if(m_bSysNcPainter) return FALSE;
 		MSG_WM_NCCALCSIZE(OnNcCalcSize)
 		MSG_WM_NCACTIVATE(OnNcActivate)
 		MSG_WM_NCHITTEST(OnNcHitTest)
@@ -100,7 +102,7 @@ private:
 	SLayoutSize m_titleHeight;
 	SLayoutSize m_borderWidth;
 	SAutoRefPtr<ISkinObj> m_skinBorder;
-
+	BOOL		m_bSysNcPainter;
 	SOsrPanel * m_root;
 
 	SAutoRefPtr<IRenderTarget> m_memRT;

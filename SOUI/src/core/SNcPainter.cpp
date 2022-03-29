@@ -4,7 +4,7 @@
 
 SNSBEGIN
 
-SNcPainter::SNcPainter(SHostWnd * pHost):m_pHost(pHost),m_root(NULL),m_htPart(0),m_bInPaint(FALSE)
+SNcPainter::SNcPainter(SHostWnd * pHost):m_pHost(pHost),m_root(NULL),m_htPart(0),m_bInPaint(FALSE),m_bSysNcPainter(FALSE)
 {
 }
 
@@ -23,6 +23,7 @@ void SNcPainter::Reset()
 	m_memBottom=NULL;
 	m_memRight=NULL;
 	m_htPart = 0;
+	m_bSysNcPainter=FALSE;
 	if(m_root)
 	{
 		m_root->Release();
@@ -154,8 +155,6 @@ LRESULT SNcPainter::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
 			m_memBottom->Resize(CSize(rcWnd.Width()-2*nBorderWid,nBorderWid));
 			m_memBottom->SetViewportOrg(CPoint(-nBorderWid,-(rcWnd.bottom-nBorderWid)));
 			m_skinBorder->DrawByIndex(m_memBottom,&rcWnd,0);
-
-			SLOGFMTD("onnccalcsize,rcCaption:%d*%d",rcCaption.Width(),rcCaption.Height());
 
 		}else
 		{
@@ -380,7 +379,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
 
 BOOL SNcPainter::IsDrawNc() const
 {
-	return !m_pHost->IsTranslucent() && (m_borderWidth.isValid()||m_titleHeight.isValid());
+	return !m_pHost->IsTranslucent() && !(m_borderWidth.isZero()||m_titleHeight.isZero());
 }
 
 LRESULT SNcPainter::OnSetText(LPCTSTR pszText)
