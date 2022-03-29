@@ -103,13 +103,14 @@ DWORD SState2Index::String2State(const SStringW &strState)
         {
             stateMap[kStateMap[j].pszName] = kStateMap[j].dwValue;
         }
+		bInited=true;
     }
 	SStringWList states;
 	int nStates = SplitString(strState,L'&',states);
 	DWORD dwRet = WndState_Normal;
 	for(int i=0;i<nStates;i++)
 	{
-		SMap<SStringW, DWORD>::CPair *p = stateMap.Lookup(strState);
+		SMap<SStringW, DWORD>::CPair *p = stateMap.Lookup(states[i]);
 		if(p) dwRet |= p->m_value;
 	}
     return dwRet;
