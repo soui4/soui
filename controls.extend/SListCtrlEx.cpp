@@ -34,8 +34,9 @@ namespace SOUI
 		,m_ptTmp(0,0)
 		,m_bMouseDown(FALSE)
 		,m_bStartSelect(FALSE)
-		, m_bCheckBox(FALSE)
-		, m_bMultiSelection(FALSE)
+		,m_bCheckBox(FALSE)
+		,m_bMultiSelection(FALSE)
+		,SHostProxy(this)
 	{
 		m_bFocusable=TRUE;
 		m_evtSet.addEvent(EVENTID(EventOfPanel));
@@ -649,7 +650,7 @@ lblEnd:
 		return m_arrItems[m_iHoverItem]->UpdateToolTip(pt,tipInfo);
 	}
 
-	void SListCtrlEx::OnItemSetCapture(SItemPanel *pItem,BOOL bCapture )
+	void SListCtrlEx::OnItemSetCapture(SOsrPanel *pItem,BOOL bCapture )
 	{
 		if (m_bStartSelect == TRUE)
 			return;
@@ -665,7 +666,7 @@ lblEnd:
 		}
 	}
 	
-	CRect SListCtrlEx::GetItemRect( int iItem )
+	CRect SListCtrlEx::GetItemRect( int iItem ) const
 	{
 		CRect rcClient = GetListRect();
 		CRect rcHead;
@@ -674,13 +675,6 @@ lblEnd:
 		CRect rcRet(CPoint(0,iItem*m_nItemHeight),CSize(rcClient.Width(),m_nItemHeight));
 		rcRet.OffsetRect(rcClient.TopLeft()-m_ptOrigin);
 		return rcRet;
-	}
-
-	BOOL SListCtrlEx::OnItemGetRect(SItemPanel *pItem,CRect &rcItem )
-	{
-		int iItem=pItem->GetItemIndex();
-		rcItem=GetItemRect(iItem);
-		return TRUE;
 	}
 
 	LRESULT SListCtrlEx::OnMouseEvent( UINT uMsg,WPARAM wParam,LPARAM lParam )
@@ -913,7 +907,7 @@ lblEnd:
 		if(m_pHeader) m_pHeader->Move(rcHeader);
 	}
 
-	CRect SListCtrlEx::GetListRect()
+	CRect SListCtrlEx::GetListRect() const
 	{
 		CRect rcList;
 		GetClientRect(&rcList);
@@ -1062,21 +1056,17 @@ lblEnd:
 		return m_pHeader->GetItemCount();
 	}
 
-	BOOL SListCtrlEx::OnItemGetRect(const SItemPanel* pItem, CRect& rcItem) const
+	BOOL SListCtrlEx::OnItemGetRect(const SOsrPanel* pItem, CRect& rcItem) const
 	{
-		return 0;
+		int iItem=pItem->GetItemIndex();
+		rcItem=GetItemRect(iItem);
+		return TRUE;
 	}
 
 	BOOL SListCtrlEx::IsItemRedrawDelay() const
 	{
-		return 0;
+		return m_bItemRedrawDelay;
 	}
-
-    void SListCtrlEx::OnItemRequestRelayout(SItemPanel *pItem)
-    {
-        CRect rcWnd = pItem->GetWindowRect();
-        pItem->Move(rcWnd);
-    }
 
 	void SListCtrlEx::SwapItem(int srcIdx,int desIdx)
 	{

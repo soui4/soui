@@ -262,7 +262,11 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
 
     STDMETHOD_(BOOL, ShowCaret)(THIS) OVERRIDE;
 
-    STDMETHOD_(HWND, SetCapture)(THIS) OVERRIDE;
+	STDMETHOD_(HWND, GetCapture)(THIS) OVERRIDE;
+
+	STDMETHOD_(HWND, SetCapture)(THIS) OVERRIDE;
+
+	STDMETHOD_(BOOL, ReleaseCapture)(THIS) OVERRIDE;
 
     STDMETHOD_(HWND, SetFocus)(THIS) OVERRIDE;
 

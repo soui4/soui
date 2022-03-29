@@ -1,7 +1,18 @@
 ﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="appMain"
 appWnd="1"
-translucent="1" 
+translucent="0" 
 >
+  <ncpainter borderWidth="5dp" titleHeight="30dp" skinBorder="_skin.sys.wnd.bkgnd" layout="hbox" gravity="center" colorBkgnd="#cccccc">
+    <icon id="sysid_icon" src="ICON_LOGO:16"/>
+    <text id="sysid_title">@string/title</text>
+    <window size="0,0" weight="1"/>
+    <imgbtn id="sysid_min" skin="_skin.sys.btn.minimize" animate="1" />
+    <window>
+      <imgbtn id="sysid_max" skin="_skin.sys.btn.maximize"  pos="0,0" animate="1" />
+      <imgbtn id="sysid_restore" skin="_skin.sys.btn.restore"  pos="0,0" show="0" animate="1" />
+    </window>
+    <imgbtn id="sysid_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
+  </ncpainter>
   <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" >
     <caption pos="0,0,-0,30" show="1" font="adding:0">
       <icon pos="10,8" src="ICON_LOGO:16"/>

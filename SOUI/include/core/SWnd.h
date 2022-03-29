@@ -782,10 +782,6 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
 
     virtual SWND SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent = false) const;
 
-    virtual BOOL FireEvent(SEvtArgs &evt)
-    {
-        return FireEvent(&evt);
-    }
     virtual BOOL OnNcHitTest(CPoint pt);
 
     /**
@@ -966,6 +962,10 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
 
     void TransformPointEx(CPoint &pt) const;
 
+	BOOL FireEvent(SEvtArgs &evt)
+	{
+		return FireEvent(&evt);
+	}
   protected: // cache相关方法
     /**
      * IsCacheDirty

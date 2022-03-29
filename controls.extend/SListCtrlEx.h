@@ -26,7 +26,8 @@ namespace SOUI
  */
 #define IDC_LSTCEX_SELECT -300
 class SListCtrlEx :public SScrollView
-    ,public IItemContainer
+	,protected SHostProxy
+    ,protected IItemContainer
 {
 public:
 
@@ -211,7 +212,7 @@ protected:
      *
      * Describe  
      */    
-    virtual void OnItemSetCapture(SItemPanel *pItem,BOOL bCapture);
+    virtual void OnItemSetCapture(SOsrPanel *pItem,BOOL bCapture);
 
     /**
      * SListCtrlEx::OnItemGetRect
@@ -221,7 +222,7 @@ protected:
      *
      * Describe   
      */
-    virtual BOOL OnItemGetRect(SItemPanel *pItem,CRect &rcItem);
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem,CRect &rcItem) const override;
 
     /**
      * SListCtrlEx::IsItemRedrawDelay
@@ -229,9 +230,7 @@ protected:
      *
      * Describe  
      */
-    virtual BOOL IsItemRedrawDelay(){return m_bItemRedrawDelay;}
-
-    virtual void OnItemRequestRelayout(SItemPanel *pItem);
+    virtual BOOL IsItemRedrawDelay() const override;
 	
 protected:
 
@@ -253,7 +252,7 @@ protected:
      *
      * Describe  更新索引
      */
-    CRect    GetItemRect(int iItem);
+    CRect    GetItemRect(int iItem) const;
 
     /**
      * SListCtrlEx::OnPaint
@@ -458,7 +457,7 @@ protected:
 	BOOL    m_bHotTrack;    /**<  */
 
     SXmlDoc m_xmlTempl;     /**< 列表模板XML */
-    SItemPanel   *m_pCapturedFrame;    /**< 当前调用了setcapture的列表项 */
+    SOsrPanel   *m_pCapturedFrame;    /**< 当前调用了setcapture的列表项 */
     ISkinObj     *m_pItemSkin;         /**< 列表项的背景skin */
 	SStringW m_strSelectRangeSkin;         /**< 选择框skin */
     COLORREF     m_crItemBg;           /**< 背景色 */
@@ -476,7 +475,7 @@ protected:
 	int GetTopIndex() const;
 	virtual BOOL OnScroll(BOOL bVertical,UINT uCode,int nPos);
 	void UpdateHeaderCtrl();
-	CRect GetListRect();
+	CRect GetListRect() const;
 	int             m_nHeaderHeight;  /**< 列表头高度 */
 	SHeaderCtrl*  m_pHeader;  /**< 列表头控件 */
 	int InsertColumn(int nIndex, LPCTSTR pszText, int nWidth,UINT fmt, LPARAM lParam=0);
@@ -518,9 +517,6 @@ public:
         MSG_WM_NCCALCSIZE(OnNcCalcSize)
     SOUI_MSG_MAP_END()
 
-        // 通过 IItemContainer 继承
-        virtual BOOL OnItemGetRect(const SItemPanel* pItem, CRect& rcItem) const override;
-    virtual BOOL IsItemRedrawDelay() const override;
 };
 
 }//namespace SOUI

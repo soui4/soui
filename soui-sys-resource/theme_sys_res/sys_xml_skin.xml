@@ -1,4 +1,33 @@
 <skin>
+  <imglist name="_skin.sys.btn.close" src="PNG:SYS_BTN_CLOSE" states="3">
+    <states>
+      <state index="0" value="normal|disable"/>
+      <state index="1" value="hover"/>
+      <state index="2" value="pushdown"/>
+    </states>
+  </imglist>
+  <imglist name="_skin.sys.btn.minimize" src="PNG:SYS_BTN_MINIMIZE" states="3">
+    <states>
+      <state index="0" value="normal|disable"/>
+      <state index="1" value="hover"/>
+      <state index="2" value="pushdown"/>
+    </states>
+  </imglist>
+  <imglist name="_skin.sys.btn.maximize" src="PNG:SYS_BTN_MAXIMIZE" states="3">
+    <states>
+      <state index="0" value="normal|disable"/>
+      <state index="1" value="hover"/>
+      <state index="2" value="pushdown"/>
+    </states>
+  </imglist>
+  <imglist name="_skin.sys.btn.restore" src="PNG:SYS_BTN_RESTORE" states="3">
+    <states>
+      <state index="0" value="normal|disable"/>
+      <state index="1" value="hover"/>
+      <state index="2" value="pushdown"/>
+    </states>
+  </imglist>
+
   <imglist name="_skin.sys.checkbox" src="PNG:SYS_CHECKBOX" states="8" checkAsPushdown="0"/>
   <imglist name="_skin.sys.radio" src="PNG:SYS_RADIO" states="8" checkAsPushdown="0"/>
   <imglist name="_skin.sys.focuscheckbox" src="PNG:SYS_FOCUS_CHECKBOX"/>
@@ -12,9 +41,9 @@
       <state index="0" value="normal"/>
       <state index="1" value="hover"/>
       <state index="2" value="pushdown"/>
-      <state index="3" value="normal|checked"/>
-      <state index="4" value="hover|checked"/>
-      <state index="5" value="pushdown|cheched"/>
+      <state index="3" value="normal&checked"/>
+      <state index="4" value="hover&checked"/>
+      <state index="5" value="pushdown&cheched"/>
     </states>
   </imglist>
   <imglist name="_skin.sys.tree.checkbox" src="PNG:SYS_TREE_CHECKBOX" states="9"/>
@@ -28,11 +57,6 @@
   <imgframe name="_skin.sys.vert.prog.bkgnd" src="PNG:SYS_VERT_PROG_BKGND" margin-y="5"/>
   <imgframe name="_skin.sys.vert.prog.bar" src="PNG:SYS_VERT_PROG_BAR" margin-y="3"/>
   <imglist name="_skin.sys.slider.thumb" src="PNG:SYS_SLIDER_THUMB" states="4"/>
-
-  <imglist name="_skin.sys.btn.close" src="PNG:SYS_BTN_CLOSE" states="3" />
-  <imglist name="_skin.sys.btn.minimize" src="PNG:SYS_BTN_MINIMIZE" states="3" />
-  <imglist name="_skin.sys.btn.maximize" src="PNG:SYS_BTN_MAXIMIZE" states="3" />
-  <imglist name="_skin.sys.btn.restore" src="PNG:SYS_BTN_RESTORE" states="3" />
 
   <imglist name="_skin.sys.menu.check" src="PNG:SYS_MENU_CHECK" states="3" />
   <imglist name="_skin.sys.menu.arrow" src="PNG:SYS_MENU_ARROW" states="2" />

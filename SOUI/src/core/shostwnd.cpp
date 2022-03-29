@@ -282,6 +282,7 @@ SHostWnd::SHostWnd(LPCTSTR pszResName /*= NULL*/)
     , m_dwThreadID(0)
     , m_AniState(0)
     , m_pRoot(new SRootWindow(this))
+	, m_pNcPainter(new SNcPainter(this))
 {
     SwndContainerImpl::SetRoot(m_pRoot);
     m_msgMouse.message = 0;
@@ -419,9 +420,9 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     }
     //加载脚本数据
     SXmlNode xmlScript = xmlNode.child(L"script");
-    xmlScript.set_userdata(1);
     if (m_pScriptModule && xmlScript)
     {
+		xmlScript.set_userdata(1);
         SXmlAttr attrSrc = xmlScript.attribute(L"src");
         if (attrSrc)
         {
@@ -449,6 +450,8 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             }
         }
     }
+	SXmlNode xmlNcPainter = xmlNode.child(SNcPainter::GetClassName());
+	m_pNcPainter->InitFromXml(&xmlNcPainter);
 
     DWORD dwStyle = SNativeWnd::GetStyle();
     DWORD dwExStyle = SNativeWnd::GetExStyle();
@@ -776,6 +779,7 @@ void SHostWnd::OnDestroy()
 
 void SHostWnd::OnSize(UINT nType, CSize size)
 {
+	SetMsgHandled(FALSE);//chain wm_size to ncpainter.
     if (IsIconic())
         return;
 
@@ -962,8 +966,6 @@ IRenderTarget *SHostWnd::OnGetRenderTarget(LPCRECT rc, GrtFlag gdcFlags)
     if (gdcFlags == GRT_NODRAW)
     {
         GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
-        pRT->OffsetViewportOrg(-rc->left, -rc->top, NULL);
-        pRT->ClearRect(rc, 0);
     }
     else
     {
@@ -1034,8 +1036,8 @@ BOOL SHostWnd::OnReleaseSwndCapture()
 {
     if (!SwndContainerImpl::OnReleaseSwndCapture())
         return FALSE;
-    if (::GetCapture() == m_hWnd)
-        ::ReleaseCapture();
+    if (GetCapture() == m_hWnd)
+        ReleaseCapture();
     CPoint pt;
     GetCursorPos(&pt);
     ScreenToClient(&pt);
@@ -1096,60 +1098,6 @@ void SHostWnd::UpdateTooltip()
     }
 }
 
-LRESULT SHostWnd::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
-{
-	LPNCCALCSIZE_PARAMS pParam = (LPNCCALCSIZE_PARAMS)lParam;
-    if (bCalcValidRects && (SNativeWnd::GetStyle() & WS_CHILDWINDOW))
-    {
-        //子窗口，相对于父窗口坐标
-		if (SWP_NOSIZE & pParam->lppos->flags)
-            return 0;
-
-        CRect rcWindow;
-        SNativeWnd::GetWindowRect(rcWindow);
-        POINT point = { rcWindow.left, rcWindow.top };
-        ::ScreenToClient(::GetParent(this->m_hWnd), &point);
-        int w = rcWindow.Width();
-        int h = rcWindow.Height();
-
-        rcWindow.left = point.x;
-        rcWindow.top = point.y;
-        rcWindow.right = rcWindow.left + w;
-        rcWindow.bottom = rcWindow.top + h;
-
-        if (0 == (SWP_NOMOVE & pParam->lppos->flags))
-        {
-            rcWindow.left = pParam->lppos->x;
-            rcWindow.top = pParam->lppos->y;
-        }
-
-        rcWindow.right = rcWindow.left + pParam->lppos->cx;
-        rcWindow.bottom = rcWindow.top + pParam->lppos->cy;
-        pParam->rgrc[0] = rcWindow;
-    }
-    else if (bCalcValidRects)
-    {
-        // top-level 相对于屏幕坐标
-        if (SWP_NOSIZE & pParam->lppos->flags)
-            return 0;
-
-        CRect rcWindow;
-        SNativeWnd::GetWindowRect(rcWindow);
-        rcWindow = CRect(rcWindow.TopLeft(), CSize(pParam->lppos->cx, pParam->lppos->cy));
-        if (0 == (SWP_NOMOVE & pParam->lppos->flags))
-        {
-            rcWindow.MoveToXY(pParam->lppos->x, pParam->lppos->y);
-        }
-        pParam->rgrc[0] = rcWindow;
-    }
-    else
-    {
-        SNativeWnd::GetWindowRect((LPRECT)lParam);
-    }
-
-    return 0;
-}
-
 void SHostWnd::OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
 {
     HMONITOR hMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONULL);
@@ -1170,54 +1118,6 @@ void SHostWnd::OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
         CSize szMin = m_hostAttr.GetMinSize(GetScale());
         lpMMI->ptMinTrackSize = CPoint(szMin.cx, szMin.cy);
     }
-}
-
-BOOL SHostWnd::OnNcActivate(BOOL bActive)
-{
-    return TRUE;
-}
-
-UINT SHostWnd::OnWndNcHitTest(CPoint point)
-{
-    if (m_hostAttr.m_bResizable && !::IsZoomed(m_hWnd))
-    {
-        ScreenToClient(&point);
-        CRect rcMargin = m_hostAttr.GetMargin(GetScale());
-        CRect rcWnd = GetRoot()->GetWindowRect();
-        if (point.x > rcWnd.right - rcMargin.right)
-        {
-            if (point.y > rcWnd.bottom - rcMargin.bottom)
-            {
-                return HTBOTTOMRIGHT;
-            }
-            else if (point.y < rcMargin.top)
-            {
-                return HTTOPRIGHT;
-            }
-            return HTRIGHT;
-        }
-        else if (point.x < rcMargin.left)
-        {
-            if (point.y > rcWnd.bottom - rcMargin.bottom)
-            {
-                return HTBOTTOMLEFT;
-            }
-            else if (point.y < rcMargin.top)
-            {
-                return HTTOPLEFT;
-            }
-            return HTLEFT;
-        }
-        else if (point.y > rcWnd.bottom - rcMargin.bottom)
-        {
-            return HTBOTTOM;
-        }
-        else if (point.y < rcMargin.top)
-        {
-            return HTTOP;
-        }
-    }
-    return HTCLIENT;
 }
 
 void SHostWnd::OnSetFocus(HWND wndOld)
@@ -1673,14 +1573,14 @@ BOOL SHostWnd::DestroyWindow()
 CRect SHostWnd::GetWindowRect() const
 {
     CRect rc;
-    SNativeWnd::GetClientRect(&rc);
+    SNativeWnd::GetWindowRect(&rc);
     return rc;
 }
 
 CRect SHostWnd::GetClientRect() const
 {
     CRect rc;
-    GetRoot()->GetClientRect(&rc);
+	SNativeWnd::GetClientRect(&rc);
     return rc;
 }
 
@@ -1867,7 +1767,7 @@ void SHostWnd::OnUpdateCursor()
 {
     CPoint pt;
     GetCursorPos(&pt);
-    UINT ht = OnWndNcHitTest(pt);
+    UINT ht = m_pNcPainter->OnNcHitTest(pt);
     PostMessage(WM_SETCURSOR, (WPARAM)m_hWnd, MAKELPARAM(ht, WM_MOUSEMOVE));
 }
 
@@ -1911,10 +1811,6 @@ void SHostWnd::OnSysCommand(UINT nID, CPoint lParam)
     {
         DefWindowProc();
     }
-}
-
-void SHostWnd::OnNcPaint(HRGN hRgn)
-{
 }
 
 //////////////////////////////////////////////////////////////////

@@ -79,6 +79,7 @@ class SOUI_EXP STreeViewItemLocator : public TObjRefImpl<ITreeViewItemLocator> {
 
 class SOUI_EXP STreeView
     : public TPanelProxy<ITreeView>
+	, protected SHostProxy
     , protected IItemContainer {
     DEF_SOBJECT(SPanel, L"treeview")
     friend class STreeViewDataSetObserver;
@@ -165,10 +166,9 @@ class SOUI_EXP STreeView
     virtual int GetScrollLineSize(BOOL bVertical);
     virtual BOOL CreateChildren(SXmlNode xmlNode);
 
-    virtual void OnItemSetCapture(SItemPanel *pItem, BOOL bCapture); //设置or释放鼠标捕获
-    virtual BOOL OnItemGetRect(const SItemPanel *pItem, CRect &rcItem) const; //获得表项的显示位置
+    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture); //设置or释放鼠标捕获
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const; //获得表项的显示位置
     virtual BOOL IsItemRedrawDelay() const;                //指示表项的更新方式
-    virtual void OnItemRequestRelayout(SItemPanel *pItem); //列表项请求重新布局
   protected:
     void UpdateScrollBar();
     void UpdateVisibleItems();
@@ -197,8 +197,8 @@ class SOUI_EXP STreeView
 
     SXmlDoc m_xmlTemplate;
 
-    SItemPanel *m_itemCapture;
-    SItemPanel *m_pHoverItem;
+    SOsrPanel *m_itemCapture;
+    SOsrPanel *m_pHoverItem;
 
     HSTREEITEM m_hSelected; /**< 当前选择项 */
 

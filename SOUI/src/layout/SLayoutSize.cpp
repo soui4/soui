@@ -79,6 +79,8 @@ bool SLayoutSize::isSpecifiedSize() const
 
 int SLayoutSize::toPixelSize(int scale) const
 {
+	if(!isValid())
+		return 0;
     if (isMatchParent())
         return SIZE_MATCH_PARENT;
     else if (isWrapContent())

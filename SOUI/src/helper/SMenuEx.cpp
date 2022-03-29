@@ -739,7 +739,6 @@ void SMenuEx::ShowMenu(UINT uFlag, int x, int y)
         {
             SMenuEx *pParent = m_pParent->GetOwnerMenu();
             CRect rcParent = pParent->GetWindowRect();
-            pParent->ClientToScreen2(&rcParent);
             if (rcMenu.right > mi.rcMonitor.right)
             {
                 rcMenu.MoveToX(x - szMenu.cx - rcParent.Width() - subMenuOffset);

@@ -1,29 +1,26 @@
 ﻿//////////////////////////////////////////////////////////////////////////
-//  Class Name: SItemPanel
+//  Class Name: SOsrPanel
 //     Creator: Huang Jianxiong
 //     Version: 2011.10.20 - 1.0 - Create
 //////////////////////////////////////////////////////////////////////////
 
 #pragma once
 #include "souistd.h"
-#include "core/SItempanel.h"
+#include "core/SItemPanel.h"
 
 #pragma warning(disable : 4018)
 
 SNSBEGIN
 
-SItemPanel::SItemPanel(SWindow *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
-    : m_pFrmHost(pFrameHost)
+SOsrPanel::SOsrPanel(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
+    : m_pHostProxy(pFrameHost)
     , m_pItemContainer(pItemContainer)
-    , m_dwData(0)
-    , m_crBk(CR_INVALID)
-    , m_crHover(CR_INVALID)
-    , m_crSelBk(RGBA(0, 0, 128, 255))
-    , m_lpItemIndex(-1)
+	, m_dwData(0)
+	, m_lpItemIndex(-1)
 {
     SetContainer(this);
     SwndContainerImpl::SetRoot(this);
-    SASSERT(m_pFrmHost);
+    SASSERT(m_pHostProxy);
     SASSERT(m_pItemContainer);
     if (xmlNode)
     {
@@ -39,14 +36,14 @@ SItemPanel::SItemPanel(SWindow *pFrameHost, SXmlNode xmlNode, IItemContainer *pI
     m_evtSet.addEvent(EVENTID(EventItemPanelLeave));
 }
 
-void SItemPanel::OnFinalRelease()
+void SOsrPanel::OnFinalRelease()
 {
     AddRef(); //防止重复进入该函数
     SSendMessage(WM_DESTROY);
     __baseCls::OnFinalRelease();
 }
 
-LRESULT SItemPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     AddRef();
 
@@ -131,54 +128,69 @@ LRESULT SItemPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     return lRet;
 }
 
-BOOL SItemPanel::OnFireEvent(IEvtArgs *evt)
+BOOL SOsrPanel::OnFireEvent(IEvtArgs *evt)
 {
-    EventOfPanel evt2(m_pFrmHost);
-    evt2.pPanel = this;
-    evt2.pOrgEvt = evt;
-    return m_pFrmHost->FireEvent(evt2);
+    return m_pHostProxy->OnFireEvent(evt);
 }
 
-RECT SItemPanel::GetContainerRect() const
+RECT SOsrPanel::GetContainerRect() const
 {
     CRect rcItem;
     m_pItemContainer->OnItemGetRect(this, rcItem);
     return rcItem;
 }
 
-IRenderTarget *SItemPanel::OnGetRenderTarget(LPCRECT rc, GrtFlag gdcFlags)
+IRenderTarget *SOsrPanel::OnGetRenderTarget(LPCRECT rc, GrtFlag gdcFlags)
 {
-    IRenderTarget *pRT = NULL;
-    GETRENDERFACTORY->CreateRenderTarget(&pRT, RectWidth(rc), RectHeight(rc));
-    SASSERT(pRT);
-    pRT->OffsetViewportOrg(-rc->left, -rc->top, NULL);
-    pRT->PushClipRect(rc, RGN_AND);
+	IRenderTarget *pRT = NULL;
+	if (m_pItemContainer->IsItemRedrawDelay() || gdcFlags == GRT_NODRAW)
+	{
+		GETRENDERFACTORY->CreateRenderTarget(&pRT, 0,0);
+		return pRT;
+	}
+
+	CRect rcHost(rc);
+	FrameToHost(&rcHost);
+	pRT = m_pHostProxy->OnGetHostRenderTarget(&rcHost,GRT_PAINTBKGND);
+	CRect rcItem=GetItemRect();
+	pRT->OffsetViewportOrg(rcItem.left,rcItem.top,NULL);
+	pRT->PushClipRect(rc,RGN_AND);
+
     return pRT;
 }
 
-void SItemPanel::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags)
+void SOsrPanel::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags)
 {
-    OnRedraw(rc);
-    pRT->PopClip();
-    pRT->Release();
+	if (m_pItemContainer->IsItemRedrawDelay()||gdcFlags == GRT_NODRAW)
+	{
+		pRT->Release();
+		return;
+	}
+	pRT->PopClip();
+
+	CRect rcHost(rc);
+	FrameToHost(&rcHost);
+	CRect rcItem=GetItemRect();
+	pRT->OffsetViewportOrg(-rcItem.left,-rcItem.top,NULL);
+	m_pHostProxy->OnReleaseHostRenderTarget(pRT,&rcHost,GRT_PAINTBKGND);
 }
 
-void SItemPanel::OnRedraw(LPCRECT rc)
+void SOsrPanel::OnRedraw(LPCRECT rc)
 {
-    if (m_pFrmHost->IsUpdateLocked())
+    if (m_pHostProxy->IsHostUpdateLocked())
         return;
 
     CRect rcItem = GetItemRect();
-    if (!rcItem.IsRectNull() && m_pFrmHost->IsVisible(TRUE))
+    if (!rcItem.IsRectNull() && m_pHostProxy->IsHostVisible())
     {
         if (m_pItemContainer->IsItemRedrawDelay())
         {
             CRect rc2(rc);
             rc2.OffsetRect(rcItem.TopLeft());
             rc2.IntersectRect(rc2, rcItem);
-            CRect rcHostClient = m_pFrmHost->GetClientRect();
+            CRect rcHostClient = m_pHostProxy->GetHostRect();
             rc2.IntersectRect(rc2, rcHostClient);
-            m_pFrmHost->InvalidateRect(&rc2);
+            m_pHostProxy->InvalidateHostRect(&rc2);
         }
         else
         {
@@ -192,7 +204,7 @@ void SItemPanel::OnRedraw(LPCRECT rc)
     }
 }
 
-BOOL SItemPanel::OnReleaseSwndCapture()
+BOOL SOsrPanel::OnReleaseSwndCapture()
 {
     if (!SwndContainerImpl::OnReleaseSwndCapture())
         return FALSE;
@@ -200,48 +212,48 @@ BOOL SItemPanel::OnReleaseSwndCapture()
     return TRUE;
 }
 
-SWND SItemPanel::OnSetSwndCapture(SWND swnd)
+SWND SOsrPanel::OnSetSwndCapture(SWND swnd)
 {
     m_pItemContainer->OnItemSetCapture(this, TRUE);
     return SwndContainerImpl::OnSetSwndCapture(swnd);
 }
 
-HWND SItemPanel::GetHostHwnd()
+HWND SOsrPanel::GetHostHwnd()
 {
-    return m_pFrmHost->GetContainer()->GetHostHwnd();
+    return m_pHostProxy->GetHostContainer()->GetHostHwnd();
 }
 
-LPCWSTR SItemPanel::GetTranslatorContext() const
+LPCWSTR SOsrPanel::GetTranslatorContext() const
 {
-    return m_pFrmHost->GetContainer()->GetTranslatorContext();
+    return m_pHostProxy->GetHostContainer()->GetTranslatorContext();
 }
 
-BOOL SItemPanel::IsTranslucent() const
+BOOL SOsrPanel::IsTranslucent() const
 {
-    return m_pFrmHost->GetContainer()->IsTranslucent();
+    return m_pHostProxy->GetHostContainer()->IsTranslucent();
 }
 
-BOOL SItemPanel::IsSendWheel2Hover() const
+BOOL SOsrPanel::IsSendWheel2Hover() const
 {
-    return m_pFrmHost->GetContainer()->IsSendWheel2Hover();
+    return m_pHostProxy->GetHostContainer()->IsSendWheel2Hover();
 }
 
-BOOL SItemPanel::UpdateWindow()
+BOOL SOsrPanel::UpdateWindow()
 {
-    return m_pFrmHost->GetContainer()->UpdateWindow();
+    return m_pHostProxy->GetHostContainer()->UpdateWindow();
 }
 
-void SItemPanel::UpdateTooltip()
+void SOsrPanel::UpdateTooltip()
 {
-    return m_pFrmHost->GetContainer()->UpdateTooltip();
+    return m_pHostProxy->GetHostContainer()->UpdateTooltip();
 }
 
-void SItemPanel::ModifyItemState(DWORD dwStateAdd, DWORD dwStateRemove)
+void SOsrPanel::ModifyItemState(DWORD dwStateAdd, DWORD dwStateRemove)
 {
     ModifyState(dwStateAdd, dwStateRemove, FALSE);
 }
 
-SWND SItemPanel::SwndFromPoint(CPoint &pt, bool bIncludeMsgTransparent)
+SWND SOsrPanel::SwndFromPoint(CPoint &pt, bool bIncludeMsgTransparent)
 {
     SWND hRet = SWindow::SwndFromPoint(pt, bIncludeMsgTransparent);
     if (hRet == m_swnd)
@@ -249,7 +261,7 @@ SWND SItemPanel::SwndFromPoint(CPoint &pt, bool bIncludeMsgTransparent)
     return hRet;
 }
 
-void SItemPanel::Draw(IRenderTarget *pRT, const CRect &rc)
+void SOsrPanel::Draw(IRenderTarget *pRT, const CRect &rc)
 {
     UpdateLayout();
     BuildWndTreeZorder();
@@ -284,44 +296,25 @@ void SItemPanel::Draw(IRenderTarget *pRT, const CRect &rc)
     }
 }
 
-void SItemPanel::SetSkin(ISkinObj *pSkin)
-{
-    m_pBgSkin = pSkin;
-}
 
-void SItemPanel::SetColor(COLORREF crBk, COLORREF crSelBk)
-{
-    m_crBk = crBk;
-    m_crSelBk = crSelBk;
-}
-
-BOOL SItemPanel::NeedRedrawWhenStateChange()
+BOOL SOsrPanel::NeedRedrawWhenStateChange()
 {
     return TRUE;
 }
 
-CRect SItemPanel::GetItemRect() const
+CRect SOsrPanel::GetItemRect() const
 {
     CRect rcItem;
     m_pItemContainer->OnItemGetRect(this, rcItem);
     return rcItem;
 }
-void SItemPanel::SetItemCapture(BOOL bCapture)
+void SOsrPanel::SetItemCapture(BOOL bCapture)
 {
     m_pItemContainer->OnItemSetCapture(this, bCapture);
 }
 
-void SItemPanel::SetItemData(LPARAM dwData)
-{
-    m_dwData = dwData;
-}
 
-LPARAM SItemPanel::GetItemData() const
-{
-    return m_dwData;
-}
-
-BOOL SItemPanel::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
+BOOL SOsrPanel::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
 {
     CRect rcItem = GetItemRect();
     if (m_hHover == m_swnd)
@@ -349,39 +342,25 @@ BOOL SItemPanel::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
     return bRet;
 }
 
-IMessageLoop *SItemPanel::GetMsgLoop()
+IMessageLoop *SOsrPanel::GetMsgLoop()
 {
-    return m_pFrmHost->GetContainer()->GetMsgLoop();
+    return m_pHostProxy->GetHostContainer()->GetMsgLoop();
 }
 
-IScriptModule *SItemPanel::GetScriptModule()
+IScriptModule *SOsrPanel::GetScriptModule()
 {
-    return m_pFrmHost->GetContainer()->GetScriptModule();
+    return m_pHostProxy->GetHostContainer()->GetScriptModule();
 }
 
-void SItemPanel::FrameToHost(RECT *rc) const
+void SOsrPanel::FrameToHost(RECT *rc) const
 {
     CRect rcItem = GetItemRect();
     ::OffsetRect(rc, rcItem.left, rcItem.top);
 }
 
-void SItemPanel::RequestRelayout(SWND hSource, BOOL bSourceResizable)
-{
-    __baseCls::RequestRelayout(hSource, bSourceResizable);
-    m_pItemContainer->OnItemRequestRelayout(this);
-}
-
-SItemPanel *SItemPanel::Create(SWindow *pFrameHost,
-                               SXmlNode xmlNode,
-                               IItemContainer *pItemContainer)
-{
-    SItemPanel *pItem = new SItemPanel(pFrameHost, xmlNode, pItemContainer);
-    SApplication::getSingletonPtr()->SetSwndDefAttr(pItem);
-    return pItem;
-}
 
 //不继承宿主的字体，从指定的字体或者系统字体开始，避免在GetRenderTarget时还需要从宿主窗口到获取当前的文字属性。
-void SItemPanel::BeforePaint(IRenderTarget *pRT, SPainter &painter)
+void SOsrPanel::BeforePaint(IRenderTarget *pRT, SPainter &painter)
 {
     int iState = SState2Index::GetDefIndex(GetState(), true);
     IFontPtr fontText = GetStyle().GetTextFont(iState);
@@ -394,50 +373,38 @@ void SItemPanel::BeforePaint(IRenderTarget *pRT, SPainter &painter)
     painter.oldTextColor = pRT->SetTextColor(crText);
 }
 
-void SItemPanel::OnShowWindow(BOOL bShow, UINT nStatus)
+void SOsrPanel::OnShowWindow(BOOL bShow, UINT nStatus)
 {
     __baseCls::OnShowWindow(bShow, nStatus);
     if (IsVisible(TRUE))
-        m_pFrmHost->GetContainer()->RegisterTimelineHandler(this);
+        m_pHostProxy->GetHostContainer()->RegisterTimelineHandler(this);
     else
-        m_pFrmHost->GetContainer()->UnregisterTimelineHandler(this);
+        m_pHostProxy->GetHostContainer()->UnregisterTimelineHandler(this);
 }
 
-void SItemPanel::OnDestroy()
+void SOsrPanel::OnDestroy()
 {
-    m_pFrmHost->GetContainer()->UnregisterTimelineHandler(this);
+    m_pHostProxy->GetHostContainer()->UnregisterTimelineHandler(this);
     __baseCls::OnDestroy();
 }
 
-int SItemPanel::GetScale() const
+int SOsrPanel::GetScale() const
 {
-    return m_pFrmHost->GetContainer()->GetScale();
+    return m_pHostProxy->GetHostContainer()->GetScale();
 }
 
-void SItemPanel::EnableIME(BOOL bEnable)
+void SOsrPanel::EnableIME(BOOL bEnable)
 {
-    m_pFrmHost->GetContainer()->EnableIME(bEnable);
+    m_pHostProxy->GetHostContainer()->EnableIME(bEnable);
 }
 
-void SItemPanel::OnUpdateCursor()
+void SOsrPanel::OnUpdateCursor()
 {
-    m_pFrmHost->GetContainer()->OnUpdateCursor();
+    m_pHostProxy->GetHostContainer()->OnUpdateCursor();
 }
 
-COLORREF SItemPanel::GetBkgndColor() const
-{
-    if ((m_dwState & WndState_Check) && m_crSelBk != CR_INVALID)
-    {
-        return m_crSelBk;
-    }
-    if ((m_dwState & WndState_Hover) && m_crHover != CR_INVALID)
-    {
-        return m_crHover;
-    }
-    return m_crBk;
-}
 
-BOOL SItemPanel::IsItemInClip(const SMatrix &mtx,
+BOOL SOsrPanel::IsItemInClip(const SMatrix &mtx,
                               const CRect &rcClip,
                               const IRegionS *clipRgn,
                               const CRect &rcItem)
@@ -449,14 +416,80 @@ BOOL SItemPanel::IsItemInClip(const SMatrix &mtx,
     return !rc.IsRectEmpty() && (!clipRgn || clipRgn->RectInRegion(rcItem));
 }
 
-LPARAM SItemPanel::GetItemIndex() const
+LPARAM SOsrPanel::GetItemIndex() const
 {
-    return m_lpItemIndex;
+	return m_lpItemIndex;
 }
 
-void SItemPanel::SetItemIndex(LPARAM lp)
+void SOsrPanel::SetItemIndex(LPARAM lp)
 {
-    m_lpItemIndex = lp;
+	m_lpItemIndex = lp;
 }
+
+void SOsrPanel::SetItemData(LPARAM dwData)
+{
+	m_dwData = dwData;
+}
+
+LPARAM SOsrPanel::GetItemData() const
+{
+	return m_dwData;
+}
+
+
+
+
+//////////////////////////////////////////////////////////////////////////
+SItemPanel *SItemPanel::Create(IHostProxy  *pFrameHost,
+							 SXmlNode xmlNode,
+							 IItemContainer *pItemContainer)
+{
+	SItemPanel *pItem = new SItemPanel(pFrameHost, xmlNode, pItemContainer);
+	SApplication::getSingletonPtr()->SetSwndDefAttr(pItem);
+	return pItem;
+}
+
+
+SItemPanel::SItemPanel(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
+:TOsrPanelProxy<IItemPanel>(pFrameHost,xmlNode,pItemContainer)
+, m_crBk(CR_INVALID)
+, m_crHover(CR_INVALID)
+, m_crSelBk(RGBA(0, 0, 128, 255))
+{
+
+}
+
+void SItemPanel::SetSkin(ISkinObj *pSkin)
+{
+	m_pBgSkin = pSkin;
+}
+
+void SItemPanel::SetColor(COLORREF crBk, COLORREF crSelBk)
+{
+	m_crBk = crBk;
+	m_crSelBk = crSelBk;
+}
+
+COLORREF SItemPanel::GetBkgndColor() const
+{
+	if ((m_dwState & WndState_Check) && m_crSelBk != CR_INVALID)
+	{
+		return m_crSelBk;
+	}
+	if ((m_dwState & WndState_Hover) && m_crHover != CR_INVALID)
+	{
+		return m_crHover;
+	}
+	return m_crBk;
+}
+
+BOOL SItemPanel::OnFireEvent(IEvtArgs *evt)
+{
+	EventOfPanel evt2(m_pHostProxy->GetHost());
+	evt2.pPanel = this;
+	evt2.pOrgEvt = evt;
+	return m_pHostProxy->OnFireEvent(&evt2);
+}
+
 
 SNSEND

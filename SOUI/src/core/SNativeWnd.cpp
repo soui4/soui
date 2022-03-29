@@ -630,6 +630,16 @@ HWND SNativeWnd::SetCapture()
     return ::SetCapture(m_hWnd);
 }
 
+HWND SNativeWnd::GetCapture()
+{
+	return ::GetCapture();
+}
+
+BOOL SNativeWnd::ReleaseCapture()
+{
+	return ::ReleaseCapture();
+}
+
 BOOL SNativeWnd::ShowCaret()
 {
     SASSERT(::IsWindow(m_hWnd));

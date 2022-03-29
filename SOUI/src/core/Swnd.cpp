@@ -1,5 +1,6 @@
 ﻿#include "souistd.h"
 #include "core/SWnd.h"
+#include "core/SNcPainter.h"
 #include "helper/SColor.h"
 #include "helper/SplitString.h"
 #include "layout/SouiLayout.h"
@@ -1541,10 +1542,10 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
         return FALSE;
     if (!m_rcWindow.EqualRect(&rcWnd))
     {
-        m_layoutDirty = dirty_self;
-
         InvalidateRect(m_rcWindow);
         m_rcWindow = rcWnd;
+
+		m_layoutDirty = dirty_self;
 
         if (m_rcWindow.left > m_rcWindow.right)
             m_rcWindow.right = m_rcWindow.left;
@@ -2793,7 +2794,9 @@ HRESULT SWindow::OnAttrID(const SStringW &strValue, BOOL bLoading)
         }
         else
         {
-            m_nID = _wtoi(strValue);
+			m_nID = SNcPainter::toNcBuiltinID(strValue);
+			if(m_nID==0)
+				m_nID = _wtoi(strValue);
         }
     }
     return S_FALSE;

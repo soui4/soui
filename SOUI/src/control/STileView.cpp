@@ -47,6 +47,8 @@ STileView::STileView()
     , m_bPendingUpdate(false)
     , m_iPendingUpdateItem(-2)
     , m_iPendingViewItem(-1)
+	, SHostProxy(this)
+
 {
     m_bFocusable = TRUE;
     m_observer.Attach(new STileViewDataSetObserver(this));
@@ -454,9 +456,6 @@ void STileView::OnDestroy()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void STileView::OnItemRequestRelayout(SItemPanel *pItem)
-{ // do nothing
-}
 
 BOOL STileView::IsItemRedrawDelay() const
 {
@@ -477,7 +476,7 @@ CRect STileView::CalcItemDrawRect(int iItem) const
     return rcItem;
 }
 
-BOOL STileView::OnItemGetRect(const SItemPanel *pItem, CRect &rcItem) const
+BOOL STileView::OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const
 {
     int iPosition = (int)pItem->GetItemIndex();
     if (iPosition < 0 || iPosition >= m_adapter->getCount())
@@ -486,7 +485,7 @@ BOOL STileView::OnItemGetRect(const SItemPanel *pItem, CRect &rcItem) const
     return TRUE;
 }
 
-void STileView::OnItemSetCapture(SItemPanel *pItem, BOOL bCapture)
+void STileView::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
 {
     if (bCapture)
     {
@@ -500,7 +499,7 @@ void STileView::OnItemSetCapture(SItemPanel *pItem, BOOL bCapture)
     }
 }
 
-void STileView::RedrawItem(SItemPanel *pItem)
+void STileView::RedrawItem(SOsrPanel *pItem)
 {
     pItem->InvalidateRect(NULL);
 }
@@ -556,7 +555,7 @@ LRESULT STileView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         SItemPanel *pHover = HitTest(pt);
         if (pHover != m_pHoverItem)
         {
-            SItemPanel *nOldHover = m_pHoverItem;
+            SOsrPanel *nOldHover = m_pHoverItem;
             m_pHoverItem = pHover;
             if (nOldHover)
             {

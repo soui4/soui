@@ -237,6 +237,17 @@ public:
 	{
 		return SNativeWnd::SetCapture();
 	}
+
+	STDMETHOD_(HWND, GetCapture)(THIS) OVERRIDE
+	{
+		return SNativeWnd::GetCapture();
+	}
+
+	STDMETHOD_(BOOL, ReleaseCapture)(THIS) OVERRIDE
+	{
+		return SNativeWnd::ReleaseCapture();
+	}
+
 	STDMETHOD_(HWND, SetFocus)(THIS) OVERRIDE
 	{
 		return SNativeWnd::SetFocus();

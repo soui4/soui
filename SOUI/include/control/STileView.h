@@ -10,6 +10,7 @@ SNSBEGIN
 
 class SOUI_EXP STileView
     : public TPanelProxy<ITileView>
+	, protected SHostProxy
     , protected IItemContainer {
     DEF_SOBJECT(SPanel, L"tileview")
 
@@ -40,10 +41,9 @@ class SOUI_EXP STileView
     SItemPanel *HitTest(CPoint &pt) const;
 
   protected:
-    virtual void OnItemSetCapture(SItemPanel *pItem, BOOL bCapture);
-    virtual BOOL OnItemGetRect(const SItemPanel *pItem, CRect &rcItem) const;
+    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
     virtual BOOL IsItemRedrawDelay() const;
-    virtual void OnItemRequestRelayout(SItemPanel *pItem);
 
   protected:
     void onDataSetChanged();
@@ -69,7 +69,7 @@ class SOUI_EXP STileView
   protected:
     void DispatchMessage2Items(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void UpdateScrollBar();
-    void RedrawItem(SItemPanel *pItem);
+    void RedrawItem(SOsrPanel *pItem);
     SItemPanel *GetItemPanel(int iItem);
     CRect CalcItemDrawRect(int iItem) const; //计算item实际绘制的位置
 
@@ -134,10 +134,10 @@ class SOUI_EXP STileView
 
     int m_iFirstVisible;        //第一个显示项索引
     SList<ItemInfo> m_lstItems; //当前正在显示的项
-    SItemPanel *m_itemCapture;  // The item panel that has been set capture.
+    SOsrPanel *m_itemCapture;  // The item panel that has been set capture.
 
     int m_iSelItem;
-    SItemPanel *m_pHoverItem;
+    SOsrPanel *m_pHoverItem;
 
     SArray<SList<SItemPanel *> *>
         m_itemRecycle; // item回收站,每一种样式在回收站中保持一个列表，以便重复利用

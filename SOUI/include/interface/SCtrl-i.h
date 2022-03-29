@@ -24,19 +24,36 @@ DECLARE_INTERFACE_(ICtrl, IObjRef)
 };
 
 #undef INTERFACE
+#define INTERFACE IOsrPanel
+DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
+{
+	STDMETHOD_(long, AddRef)(THIS) PURE;
+	STDMETHOD_(long, Release)(THIS) PURE;
+	STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+	//////////////////////////////////////////////////////////////////////////
+	STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM index) PURE;
+	STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST PURE;
+	STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
+	STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST PURE;
+};
+
+#undef INTERFACE
 #define INTERFACE IItemPanel
-DECLARE_INTERFACE_IID_(IItemPanel, ICtrl, "176CDF98-260E-4070-91B5-E6E163F909A4")
+DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F909A4")
 {
     STDMETHOD_(long, AddRef)(THIS) PURE;
     STDMETHOD_(long, Release)(THIS) PURE;
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
-    STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST PURE;
+	STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM index) PURE;
+	STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST PURE;
+	STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
+	STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST PURE;
+	//////////////////////////////////////////////////////////////////////////
     STDMETHOD_(void, SetSkin)(THIS_ ISkinObj * pSkin) PURE;
     STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) PURE;
-    STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
-    STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST PURE;
 };
 
 #undef INTERFACE

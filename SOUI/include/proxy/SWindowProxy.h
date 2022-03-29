@@ -7,6 +7,7 @@ class TWindowProxy
 	: public T
 	, public SWindow {
 public:
+
 	STDMETHOD_(long, AddRef)(THIS) OVERRIDE
 	{
 		return SWindow::AddRef();

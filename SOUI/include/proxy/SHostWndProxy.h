@@ -248,6 +248,17 @@ public:
 	{
 		return SHostWnd::SetCapture();
 	}
+
+	STDMETHOD_(HWND, GetCapture)(THIS) OVERRIDE
+	{
+		return SHostWnd::GetCapture();
+	}
+
+	STDMETHOD_(BOOL, ReleaseCapture)(THIS) OVERRIDE
+	{
+		return SHostWnd::ReleaseCapture();
+	}
+
 	STDMETHOD_(HWND, SetFocus)(THIS) OVERRIDE
 	{
 		return SHostWnd::SetFocus();
@@ -347,6 +358,12 @@ public:
 	{
 		return SHostWnd::GetIRoot();
 	}
+
+	STDMETHOD_(INcPainter*,GetNcPainter)(THIS) OVERRIDE
+	{
+		return SHostWnd::GetNcPainter();
+	}
+
 };
 
 SNSEND

@@ -1,5 +1,5 @@
 ﻿//////////////////////////////////////////////////////////////////////////
-//  Class Name: SItemPanel
+//  Class Name: SOsrPanel
 // Description: A Framework wrapping frame to be used in a swindow.
 //     Creator: Huang Jianxiong
 //     Version: 2011.10.20 - 1.0 - Create
@@ -11,48 +11,88 @@
 
 SNSBEGIN
 
-class SItemPanel;
+class SOsrPanel;
 
 struct IItemContainer
 {
-    virtual void OnItemSetCapture(SItemPanel *pItem, BOOL bCapture) = 0; //设置or释放鼠标捕获
-    virtual BOOL OnItemGetRect(const SItemPanel *pItem,
-                               CRect &rcItem) const = 0;       //获得表项的显示位置
+    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture) = 0; //设置or释放鼠标捕获
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem,CRect &rcItem) const = 0;       //获得表项的显示位置
     virtual BOOL IsItemRedrawDelay() const = 0;                //指示表项的更新方式
-    virtual void OnItemRequestRelayout(SItemPanel *pItem) = 0; //列表项请求重新布局
 };
 
-class SOUI_EXP SItemPanel
-    : public SwndContainerImpl
-    , public TWindowProxy<IItemPanel> {
-    DEF_SOBJECT(SWindow, L"itemPanel")
-  public:
-    static SItemPanel *Create(SWindow *pFrameHost,
-                              SXmlNode xmlNode,
-                              IItemContainer *pItemContainer);
+struct IHostProxy{
+	virtual IObject * GetHost() =0;
+	virtual BOOL OnFireEvent(IEvtArgs *e) = 0;
+	virtual BOOL IsHostUpdateLocked() const = 0;
+	virtual BOOL IsHostVisible() const = 0;
+	virtual CRect GetHostRect() const = 0;
+	virtual void InvalidateHostRect(LPCRECT pRc) = 0;
+	virtual IRenderTarget * OnGetHostRenderTarget(LPCRECT rc, GrtFlag gdcFlags) = 0;
+	virtual void OnReleaseHostRenderTarget(IRenderTarget *pRT,LPCRECT rc,GrtFlag gdcFlags) = 0;
+	virtual ISwndContainer * GetHostContainer()=0;
+};
 
-    SWindow *GetHostWindow()
+class SHostProxy : public IHostProxy
+{
+public:
+	explicit SHostProxy(SWindow *pHost):m_pHost(pHost){}
+public:
+	virtual IObject * GetHost() {
+		return m_pHost;
+	}
+	virtual BOOL OnFireEvent(IEvtArgs *e) {
+		return m_pHost->FireEvent(e);
+	}
+	virtual BOOL IsHostUpdateLocked() const {
+		return m_pHost->IsUpdateLocked();
+	}
+	virtual BOOL IsHostVisible() const {
+		return m_pHost->IsVisible(TRUE);
+	}
+	virtual CRect GetHostRect() const 
+	{
+		return m_pHost->GetClientRect();
+	}
+	virtual void InvalidateHostRect(LPCRECT pRc)
+	{
+		m_pHost->InvalidateRect(pRc);
+	}
+	virtual ISwndContainer * GetHostContainer(){
+		return m_pHost->GetContainer();
+	}
+
+	virtual IRenderTarget * OnGetHostRenderTarget(LPCRECT rc, GrtFlag gdcFlags){
+		return m_pHost->GetRenderTarget(rc,gdcFlags);
+	}
+	virtual void OnReleaseHostRenderTarget(IRenderTarget *pRT,LPCRECT rc,GrtFlag gdcFlags)
+	{
+		return m_pHost->ReleaseRenderTarget(pRT);
+	}
+
+protected:
+	SWindow * m_pHost;
+};
+
+class SOUI_EXP SOsrPanel
+    :public TWindowProxy<IOsrPanel>
+	,public SwndContainerImpl
+{
+    DEF_SOBJECT(SWindow, L"osrPanel")
+  public:
+    SOsrPanel(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer);
+    virtual ~SOsrPanel()
     {
-        return m_pFrmHost;
     }
 
-    static BOOL IsItemInClip(const SMatrix &mtx,
-                             const CRect &rcClip,
-                             const IRegionS *clipRgn,
-                             const CRect &rcItem);
-
-  protected:
-    SItemPanel(SWindow *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer);
-    virtual ~SItemPanel()
-    {
-    }
-
-  public:
-    STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST OVERRIDE;
-    STDMETHOD_(void, SetSkin)(THIS_ ISkinObj *pSkin) OVERRIDE;
-    STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) OVERRIDE;
-    STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) OVERRIDE;
-    STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST OVERRIDE;
+	static BOOL IsItemInClip(const SMatrix &mtx,
+		const CRect &rcClip,
+		const IRegionS *clipRgn,
+		const CRect &rcItem);
+public:
+	STDMETHOD_(void,SetItemIndex)(THIS_ LPARAM lp) OVERRIDE;
+	STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST OVERRIDE;
+	STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) OVERRIDE;
+	STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST OVERRIDE;
 
   public:
     STDMETHOD_(void, OnFinalRelease)(THIS);
@@ -92,7 +132,6 @@ class SOUI_EXP SItemPanel
     STDMETHOD_(void, OnUpdateCursor)();
 
   public: // SWindow
-    STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST OVERRIDE;
 
     virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
     virtual void ModifyItemState(DWORD dwStateAdd, DWORD dwStateRemove);
@@ -105,11 +144,9 @@ class SOUI_EXP SItemPanel
 
     virtual BOOL NeedRedrawWhenStateChange();
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
-    virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable);
 
     CRect GetItemRect() const;
     void SetItemCapture(BOOL bCapture);
-    void SetItemIndex(LPARAM lp);
 
   protected:
     void OnShowWindow(BOOL bShow, UINT nStatus);
@@ -119,17 +156,105 @@ class SOUI_EXP SItemPanel
     MSG_WM_SHOWWINDOW(OnShowWindow)
     SOUI_MSG_MAP_END()
   protected:
-    SOUI_ATTRS_BEGIN()
-    ATTR_COLOR(L"colorNormal", m_crBk, FALSE)
-    ATTR_COLOR(L"colorSelected", m_crSelBk, FALSE)
-    ATTR_COLOR(L"colorHover", m_crHover, FALSE)
-    SOUI_ATTRS_END()
-  protected:
-    SWindow *m_pFrmHost;
+    IHostProxy *m_pHostProxy;
     IItemContainer *m_pItemContainer;
-    COLORREF m_crBk, m_crSelBk, m_crHover;
-    LPARAM m_dwData;
-    LPARAM m_lpItemIndex;
+	LPARAM m_lpItemIndex;
+	LPARAM m_dwData;
+};
+
+template <class T>
+class TOsrPanelProxy
+	: public T
+	, public SOsrPanel {
+public:
+	TOsrPanelProxy(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
+		:SOsrPanel(pFrameHost,xmlNode,pItemContainer)
+	{
+
+	}
+
+	STDMETHOD_(long, AddRef)(THIS) OVERRIDE
+	{
+		return SOsrPanel::AddRef();
+	}
+	STDMETHOD_(long, Release)(THIS) OVERRIDE
+	{
+		return SOsrPanel::Release();
+	}
+	STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
+	{
+		SOsrPanel::OnFinalRelease();
+	}
+
+	STDMETHOD_(IWindow *, ToIWindow)(THIS) OVERRIDE
+	{
+		return this;
+	}
+
+	STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
+	{
+		if (id == __uuidof(T))
+		{
+			*ppRet = (T *)this;
+			AddRef();
+			return S_OK;
+		}
+		else
+		{
+			return SOsrPanel::QueryInterface(id,ppRet);
+		}
+	}
+
+	STDMETHOD_(void,SetItemIndex)(THIS_ LPARAM lp) OVERRIDE
+	{
+		return SOsrPanel::SetItemIndex(lp);
+	}
+	STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST OVERRIDE
+	{
+		return SOsrPanel::GetItemIndex();
+	}
+	STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) OVERRIDE
+	{
+		return SOsrPanel::SetItemData(dwData);
+	}
+	STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST OVERRIDE
+	{
+		return SOsrPanel::GetItemData();
+	}
+
+};
+
+class SOUI_EXP SItemPanel : public TOsrPanelProxy<IItemPanel>
+{
+	DEF_SOBJECT(SWindow, L"ItemPanel")
+public:
+	static SItemPanel *Create(IHostProxy *pFrameHost,
+		SXmlNode xmlNode,
+		IItemContainer *pItemContainer);
+
+public:
+	SItemPanel(IHostProxy *pFrameHost=NULL, SXmlNode xmlNode=SXmlNode(), IItemContainer *pItemContainer=NULL);
+	virtual ~SItemPanel()
+	{
+	}
+
+public:
+	STDMETHOD_(void, SetSkin)(THIS_ ISkinObj *pSkin) OVERRIDE;
+	STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) OVERRIDE;
+
+public:
+	SOUI_ATTRS_BEGIN()
+		ATTR_COLOR(L"colorNormal", m_crBk, FALSE)
+		ATTR_COLOR(L"colorSelected", m_crSelBk, FALSE)
+		ATTR_COLOR(L"colorHover", m_crHover, FALSE)
+	SOUI_ATTRS_END()
+
+protected:
+	STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST OVERRIDE;
+	STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt);
+
+protected:
+	COLORREF m_crBk, m_crSelBk, m_crHover;
 };
 
 SNSEND

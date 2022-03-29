@@ -411,6 +411,7 @@ STreeView::STreeView()
     , m_hSelected(ITEM_NULL)
     , m_pVisibleMap(new VISIBLEITEMSMAP)
     , m_bWantTab(FALSE)
+	, SHostProxy(this)
 {
     m_bFocusable = TRUE;
 
@@ -963,7 +964,7 @@ void STreeView::UpdateVisibleItems()
     }
 }
 
-void STreeView::OnItemSetCapture(SItemPanel *pItem, BOOL bCapture)
+void STreeView::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
 {
     if (bCapture)
     {
@@ -977,7 +978,7 @@ void STreeView::OnItemSetCapture(SItemPanel *pItem, BOOL bCapture)
     }
 }
 
-BOOL STreeView::OnItemGetRect(const SItemPanel *pItem, CRect &rcItem) const
+BOOL STreeView::OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const
 {
     HSTREEITEM hItem = (HSTREEITEM)pItem->GetItemIndex();
     if (m_pVisibleMap->Lookup(hItem) == NULL)
@@ -995,10 +996,6 @@ BOOL STreeView::OnItemGetRect(const SItemPanel *pItem, CRect &rcItem) const
 BOOL STreeView::IsItemRedrawDelay() const
 {
     return TRUE;
-}
-
-void STreeView::OnItemRequestRelayout(SItemPanel *pItem)
-{ // do nothing
 }
 
 void STreeView::onBranchChanged(HSTREEITEM hBranch)
@@ -1113,10 +1110,10 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
         }
 
-        SItemPanel *pHover = HitTest(pt);
+        SOsrPanel *pHover = HitTest(pt);
         if (pHover != m_pHoverItem)
         {
-            SItemPanel *oldHover = m_pHoverItem;
+            SOsrPanel *oldHover = m_pHoverItem;
             m_pHoverItem = pHover;
             if (oldHover)
             {

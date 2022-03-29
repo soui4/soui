@@ -54,6 +54,7 @@ SMCListView::SMCListView()
     , m_iPendingUpdateItem(-2)
     , m_iPendingViewItem(-1)
     , m_crGrid(CR_INVALID)
+	, SHostProxy(this)
 {
     m_bFocusable = TRUE;
     m_bClipClient = TRUE;
@@ -812,16 +813,13 @@ void SMCListView::OnDestroy()
 }
 
 //////////////////////////////////////////////////////////////////////////
-void SMCListView::OnItemRequestRelayout(SItemPanel *pItem)
-{ // do nothing
-}
 
 BOOL SMCListView::IsItemRedrawDelay() const
 {
     return TRUE;
 }
 
-BOOL SMCListView::OnItemGetRect(const SItemPanel *pItem, CRect &rcItem) const
+BOOL SMCListView::OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const
 {
     int iPosition = (int)pItem->GetItemIndex();
     if (iPosition < 0 || iPosition >= m_adapter->getCount())
@@ -841,7 +839,7 @@ CRect SMCListView::_OnItemGetRect(int iPosition) const
     return rcItem;
 }
 
-void SMCListView::OnItemSetCapture(SItemPanel *pItem, BOOL bCapture)
+void SMCListView::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
 {
     if (bCapture)
     {
@@ -855,7 +853,7 @@ void SMCListView::OnItemSetCapture(SItemPanel *pItem, BOOL bCapture)
     }
 }
 
-void SMCListView::RedrawItem(SItemPanel *pItem)
+void SMCListView::RedrawItem(SOsrPanel *pItem)
 {
     pItem->InvalidateRect(NULL);
 }
@@ -912,7 +910,7 @@ LRESULT SMCListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         SItemPanel *pHover = HitTest(pt);
         if (pHover != m_pHoverItem)
         {
-            SItemPanel *nOldHover = m_pHoverItem;
+            SOsrPanel *nOldHover = m_pHoverItem;
             m_pHoverItem = pHover;
             if (nOldHover)
             {
