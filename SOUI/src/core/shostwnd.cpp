@@ -542,14 +542,17 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 
     int nWidth = m_szAppSetted.cx;
     int nHeight = m_szAppSetted.cy;
+	CSize szNc = m_pNcPainter->GetNcSize();
+	CSize szRoot = GetRoot()->GetDesiredSize(nWidth, nHeight);
+
     ILayoutParam *pLayoutParam = GetRoot()->GetLayoutParam();
     if (nWidth == 0 && pLayoutParam->IsSpecifiedSize(Horz))
     {
-        nWidth = pLayoutParam->GetSpecifiedSize(Horz).toPixelSize(GetScale());
+        nWidth = pLayoutParam->GetSpecifiedSize(Horz).toPixelSize(GetScale()) + szNc.cx;
     }
     if (nHeight == 0 && pLayoutParam->IsSpecifiedSize(Vert))
     {
-        nHeight = pLayoutParam->GetSpecifiedSize(Vert).toPixelSize(GetScale());
+        nHeight = pLayoutParam->GetSpecifiedSize(Vert).toPixelSize(GetScale()) + szNc.cy;
     }
 
     if (nWidth <= 0 || nHeight <= 0)
@@ -563,8 +566,6 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             nHeight = SIZE_WRAP_CONTENT;
         }
 
-		CSize szNc = m_pNcPainter->GetNcSize();
-        CSize szRoot = GetRoot()->GetDesiredSize(nWidth, nHeight);
         if (nWidth == SIZE_WRAP_CONTENT)
             nWidth = szRoot.cx + szNc.cx;
         if (nHeight == SIZE_WRAP_CONTENT)
