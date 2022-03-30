@@ -52,12 +52,19 @@ void STipCtrl::RelayEvent(const MSG *pMsg)
     case WM_RBUTTONUP:
     case WM_MBUTTONUP:
     case WM_MBUTTONDOWN:
+
+	case WM_NCLBUTTONDOWN:
+	case WM_NCLBUTTONUP:
+	case WM_NCRBUTTONDOWN:
+	case WM_NCRBUTTONUP:
+	case WM_NCMBUTTONUP:
+	case WM_NCMBUTTONDOWN:
         OnTimer(TIMERID_SPAN); // hide tip
         break;
     case WM_MOUSEMOVE:
     {
         CPoint pt(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam));
-        if (!m_rcTarget.PtInRect(pt))
+        if (m_id.bNcTip || !m_rcTarget.PtInRect(pt))
         {
             OnTimer(TIMERID_SPAN); // hide tip
         }
@@ -70,6 +77,27 @@ void STipCtrl::RelayEvent(const MSG *pMsg)
                          SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING | SWP_NOACTIVATE);
         }
     }
+	break;
+	case WM_NCMOUSEMOVE:
+		{
+			CPoint pt(GET_X_LPARAM(pMsg->lParam), GET_Y_LPARAM(pMsg->lParam));
+			CRect rcWnd;
+			::GetWindowRect(pMsg->hwnd,&rcWnd);
+			CPoint pt2(pt);
+			pt2-=rcWnd.TopLeft();
+			if (!m_id.bNcTip || !m_rcTarget.PtInRect(pt2))
+			{
+				OnTimer(TIMERID_SPAN); // hide tip
+			}
+			else if (!IsWindowVisible() && !m_strTip.IsEmpty())
+			{
+				KillTimer(TIMERID_DELAY);
+				SetTimer(TIMERID_DELAY, m_nDelay);
+				SetWindowPos(0, pt.x, pt.y + 24, 0, 0,
+					SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING | SWP_NOACTIVATE);
+			}
+		}
+		break;
     break;
     }
 }

@@ -325,7 +325,7 @@ class SOUI_EXP SHostWnd
     void _UpdateNonBkgndBlendSwnd();
     void _RestoreClickState();
     void _Invalidate(LPCRECT prc);
-
+	void _SetToolTipInfo(const SwndToolTipInfo * info,BOOL bNcTip);
   protected:
     //////////////////////////////////////////////////////////////////////////
     // Message handler

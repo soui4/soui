@@ -565,6 +565,7 @@ LRESULT SNcPainter::OnNcMouseEvent(UINT msg,WPARAM wp,LPARAM lp)
 		lp=MAKELPARAM(pt.x,pt.y);
 		msg += WM_MOUSEMOVE - WM_NCMOUSEMOVE; //translate nc mouse event to normal mouse event.
 		m_root->DoFrameEvent(msg,wp,lp);
+		UpdateToolTip();
 	}else
 	{
 		m_pHost->DefWindowProc();
@@ -575,6 +576,7 @@ LRESULT SNcPainter::OnNcMouseEvent(UINT msg,WPARAM wp,LPARAM lp)
 LRESULT SNcPainter::OnNcMouseLeave(UINT msg,WPARAM wp,LPARAM lp)
 {
 	m_root->DoFrameEvent(WM_MOUSELEAVE,wp,lp);
+	UpdateToolTip();
 	return m_pHost->DefWindowProc();
 }
 
@@ -645,6 +647,27 @@ void SNcPainter::OnSize(UINT nType, CSize size)
 				pMax->SetVisible(TRUE);
 				pRestore->SetVisible(FALSE);
 			}
+		}
+	}
+}
+
+void SNcPainter::UpdateToolTip()
+{
+	{
+		CPoint pt;
+		GetCursorPos(&pt);
+		CRect rcWnd= m_pHost->GetWindowRect();
+		pt-= rcWnd.TopLeft();
+
+		SwndToolTipInfo tipInfo;
+		BOOL bOK = m_root->UpdateToolTip(pt, tipInfo);
+		if (bOK)
+		{
+			m_pHost->_SetToolTipInfo(&tipInfo,TRUE);
+		}
+		else
+		{ // hide tooltip
+			m_pHost->_SetToolTipInfo(NULL,TRUE);
 		}
 	}
 }

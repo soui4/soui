@@ -1089,12 +1089,11 @@ void SHostWnd::UpdateTooltip()
         BOOL bOK = pHover->UpdateToolTip(pt, tipInfo);
         if (bOK)
         {
-            TIPID id = { tipInfo.swnd, tipInfo.dwCookie };
-            m_pTipCtrl->UpdateTip(&id, tipInfo.rcTarget, tipInfo.strTip, GetScale());
+			_SetToolTipInfo(&tipInfo,FALSE);
         }
         else
         { // hide tooltip
-            m_pTipCtrl->ClearTip();
+			_SetToolTipInfo(NULL,FALSE);
         }
     }
 }
@@ -1812,6 +1811,18 @@ void SHostWnd::OnSysCommand(UINT nID, CPoint lParam)
     {
         DefWindowProc();
     }
+}
+
+void SHostWnd::_SetToolTipInfo(const SwndToolTipInfo * info,BOOL bNcTip)
+{
+	if(info)
+	{
+		TIPID id = { info->swnd, info->dwCookie,bNcTip };
+		m_pTipCtrl->UpdateTip(&id, info->rcTarget, info->strTip, GetScale());
+	}else
+	{
+		m_pTipCtrl->ClearTip();
+	}
 }
 
 //////////////////////////////////////////////////////////////////

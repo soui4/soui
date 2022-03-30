@@ -95,7 +95,7 @@ protected:
 	BOOL IsDrawNc() const;
 	void PaintCaption();
 	SWindow* GetSRoot();
-
+	void UpdateToolTip();
 private:
 	SHostWnd * m_pHost;
 

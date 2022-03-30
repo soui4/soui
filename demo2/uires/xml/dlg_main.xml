@@ -14,7 +14,7 @@ translucent="0"
     <imgbtn id="sysid_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
   </ncpainter>
   <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" layout="vbox" gravity="center">
-    <button size="100,30" name="btn_exit" text="Exit"/>
+    <button size="100,30" name="btn_exit" text="Exit" tip="quit"/>
     <window pos="5,[2,-5,-5">
       <listview pos="0,0,300,-0" name="lv_test">
         <template itemHeight="50" layout="hbox" gravity="center">
