@@ -22,6 +22,7 @@ public:
 	~SNcPainter(void);
 
 	static int toNcBuiltinID(const SStringW & str);
+
 public:
 	STDMETHOD_(BOOL,InitFromXml)(THIS_ IXmlNode *pXmlNode) OVERRIDE;
 	STDMETHOD_(IWindow*,GetRoot)(THIS) OVERRIDE;
@@ -52,7 +53,9 @@ protected:
 
 	virtual void OnReleaseHostRenderTarget(IRenderTarget *pRT,LPCRECT rc,GrtFlag gdcFlags);
 
+protected:
 	int GetScale() const;
+	CSize GetNcSize() const;
 public:
 	SOUI_ATTRS_BEGIN()
 		ATTR_LAYOUTSIZE(L"titleHeight",m_titleHeight,FALSE)

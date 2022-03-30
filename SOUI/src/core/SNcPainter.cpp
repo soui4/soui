@@ -14,8 +14,8 @@ SNcPainter::~SNcPainter(void)
 
 void SNcPainter::Reset()
 {
-	m_borderWidth.setInvalid();
-	m_titleHeight.setInvalid();
+	m_borderWidth = SLayoutSize();
+	m_titleHeight = SLayoutSize();
 	m_skinBorder=NULL;
 	m_memRT = NULL;
 	m_memTop=NULL;
@@ -670,6 +670,16 @@ void SNcPainter::UpdateToolTip()
 			m_pHost->_SetToolTipInfo(NULL,TRUE);
 		}
 	}
+}
+
+CSize SNcPainter::GetNcSize() const
+{
+	CSize szRet;
+	int nBorderWid=m_borderWidth.toPixelSize(GetScale());
+	int nTitleHei = m_titleHeight.toPixelSize(GetScale());
+	szRet.cx = nBorderWid*2;
+	szRet.cy = nBorderWid*2 + nTitleHei;
+	return szRet;
 }
 
 

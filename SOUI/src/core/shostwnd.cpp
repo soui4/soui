@@ -563,11 +563,12 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             nHeight = SIZE_WRAP_CONTENT;
         }
 
+		CSize szNc = m_pNcPainter->GetNcSize();
         CSize szRoot = GetRoot()->GetDesiredSize(nWidth, nHeight);
         if (nWidth == SIZE_WRAP_CONTENT)
-            nWidth = szRoot.cx;
+            nWidth = szRoot.cx + szNc.cx;
         if (nHeight == SIZE_WRAP_CONTENT)
-            nHeight = szRoot.cy;
+            nHeight = szRoot.cy + szNc.cy;
         GetRoot()->GetEventSet()->subscribeEvent(EventSwndSize::EventID,
                                                  Subscriber(&SHostWnd::onRootResize, this));
     }
