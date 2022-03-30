@@ -150,6 +150,7 @@ HEADERS += include/SApp.h \
            include/core/SWndContainer-i.h \
            include/core/SWndContainerImpl.h \
            include/core/SWndStyle.h \
+           include/core/SNcPainter.h \
            include/event/SEventCrack.h \
            include/event/SEvents.h \
            include/event/SEventSet.h \
@@ -279,6 +280,7 @@ SOURCES += src/SApp.cpp \
            src/core/SwndAccessible.cpp \
            src/core/SwndContainerImpl.cpp \
            src/core/SwndStyle.cpp \
+           src/core/SNcPainter.cpp \
            src/event/SEventSet.cpp \
            src/event/SNotifyCenter.cpp \
            src/helper/SAppDir.cpp \
