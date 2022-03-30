@@ -554,7 +554,7 @@ void SNcPainter::OnReleaseHostRenderTarget(IRenderTarget *pRT,LPCRECT rc,GrtFlag
 
 LRESULT SNcPainter::OnNcMouseEvent(UINT msg,WPARAM wp,LPARAM lp)
 {
-	if(m_htPart == HTCAPTION)
+	if(m_htPart == HTCAPTION && msg != WM_NCLBUTTONDBLCLK)
 	{
 		CPoint pt(GET_X_LPARAM(lp),GET_Y_LPARAM(lp));
 		CRect rcWnd = m_pHost->GetWindowRect();
