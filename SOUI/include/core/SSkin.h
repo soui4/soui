@@ -234,7 +234,7 @@ class SOUI_EXP SSkinGradation : public SSkinObjBase {
     SOUI_ATTRS_BEGIN()
     ATTR_COLOR(L"colorFrom", m_crFrom, TRUE) //渐变起始颜色
     ATTR_COLOR(L"colorTo", m_crTo, TRUE)     //渐变终止颜色
-    ATTR_INT(L"vertical", m_bVert, TRUE)     //渐变方向,0--水平(默认), 1--垂直
+    ATTR_BOOL(L"vertical", m_bVert, TRUE)     //渐变方向,0--水平, 1--垂直(默认)
     SOUI_ATTRS_END()
 };
 

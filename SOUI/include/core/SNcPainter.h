@@ -4,11 +4,14 @@
 #include <core/SItemPanel.h>
 
 SNSBEGIN
+
+class SNcPanel;
 class SHostWnd;
 class SNcPainter : public TObjRefImpl<SObjectImpl<INcPainter>>, IItemContainer, IHostProxy 
 {
 	DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<INcPainter>>,L"ncpainter",Undef)
 	friend class SHostWnd;
+	friend class SNcPanel;
 	enum{
 		IDC_SYS_ICON=100,
 		IDC_SYS_TITLE=101,
@@ -25,6 +28,7 @@ public:
 
 public:
 	STDMETHOD_(BOOL,InitFromXml)(THIS_ IXmlNode *pXmlNode) OVERRIDE;
+public:
 	STDMETHOD_(IWindow*,GetRoot)(THIS) OVERRIDE;
 
 protected:
@@ -37,7 +41,7 @@ protected:
 	virtual IObject * GetHost();
 
 protected:
-	virtual BOOL OnFireEvent(IEvtArgs *e);
+	virtual BOOL OnHostFireEvent(IEvtArgs *e);
 
 	virtual BOOL IsHostUpdateLocked() const;
 
@@ -97,7 +101,6 @@ protected:
 	void Reset();
 	BOOL IsDrawNc() const;
 	void PaintCaption();
-	SWindow* GetSRoot();
 	void UpdateToolTip();
 private:
 	SHostWnd * m_pHost;
@@ -106,7 +109,6 @@ private:
 	SLayoutSize m_borderWidth;
 	SAutoRefPtr<ISkinObj> m_skinBorder;
 	BOOL		m_bSysNcPainter;
-	SOsrPanel * m_root;
 
 	SAutoRefPtr<IRenderTarget> m_memRT;
 	SAutoRefPtr<IRenderTarget> m_memLeft;
@@ -115,6 +117,38 @@ private:
 	SAutoRefPtr<IRenderTarget> m_memBottom;
 	UINT		  m_htPart;
 	BOOL		  m_bInPaint;
+	BOOL		  m_bLButtonDown;
+	SNcPanel * m_root;
+};
+
+class SNcPanel : public SOsrPanel
+{
+	DEF_SOBJECT(SOsrPanel,L"ncpanel")
+public:
+	SNcPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer);
+
+	void SetActive(BOOL bActive);
+protected:
+	BOOL OnEraseBkgnd(IRenderTarget *pRT);
+	SOUI_MSG_MAP_BEGIN()
+		MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
+	SOUI_MSG_MAP_END()
+
+public:
+	SOUI_ATTRS_BEGIN()
+		ATTR_SKIN(L"skinActive",m_skinActive,FALSE)
+		ATTR_SKIN(L"skinInactive",m_skinInactive,FALSE)
+		ATTR_COLOR(L"colorActiveTitle",m_crActiveTitle,TRUE)
+		ATTR_COLOR(L"colorInactiveTitle",m_crInactiveTitle,TRUE)
+	SOUI_ATTRS_END()
+
+protected:
+	SAutoRefPtr<ISkinObj> m_skinActive;
+	SAutoRefPtr<ISkinObj> m_skinInactive;
+	COLORREF	m_crActiveTitle;
+	COLORREF	m_crInactiveTitle;
+
+	BOOL		  m_bActive;
 };
 
 SNSEND

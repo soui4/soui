@@ -2,7 +2,11 @@
 appWnd="1"
 translucent="0" 
 >
-  <ncpainter system="false" borderWidth="5dp" titleHeight="30dp" skinBorder="_skin.sys.wnd.bkgnd" layout="hbox" gravity="center" colorBkgnd="#cccccc">
+  <ncpainter system="false" borderWidth="5dp" titleHeight="30dp" skinBorder="_skin.sys.wnd.bkgnd" 
+             skinActive="skin_active" skinInactive="skin_inactive"
+             colorActiveTitle="@color/white"
+             colorInactiveTitle="@color/white"
+             layout="hbox" gravity="center" >
     <icon id="sysid_icon" src="ICON_LOGO:16"/>
     <text id="sysid_title">@string/title</text>
     <window size="0,0" weight="1"/>

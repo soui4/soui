@@ -4,12 +4,57 @@
 
 SNSBEGIN
 
-SNcPainter::SNcPainter(SHostWnd * pHost):m_pHost(pHost),m_root(NULL),m_htPart(0),m_bInPaint(FALSE),m_bSysNcPainter(FALSE)
+SNcPanel::SNcPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer) 
+:SOsrPanel(pFrameHost,pItemContainer)
+,m_bActive(FALSE)
+,m_crActiveTitle(RGBA(0,0,0,255))
+,m_crInactiveTitle(RGBA(128,128,128,255))
+
 {
+
+}
+
+BOOL SNcPanel::OnEraseBkgnd(IRenderTarget *pRT)
+{
+	ISkinObj *pSkin=m_bActive?m_skinActive:m_skinInactive;
+	CRect rcClient = GetClientRect();
+	if(pSkin)
+	{
+		pSkin->DrawByIndex(pRT, rcClient, 0);
+	}else
+	{
+		COLORREF crBg = GetBkgndColor();
+		if (CR_INVALID != crBg)
+		{
+			pRT->FillSolidRect(&rcClient, crBg);
+		}
+	}
+	return TRUE;
+}
+
+void SNcPanel::SetActive(BOOL bActive)
+{
+	m_bActive=bActive;
+	SWindow *pTitle = FindChildByID(SNcPainter::IDC_SYS_TITLE);
+	if(pTitle)
+	{
+		COLORREF crTitle = bActive?m_crActiveTitle:m_crInactiveTitle;
+		pTitle->GetStyle().SetTextColor(WndState_Normal,crTitle);
+	}
+}
+
+//////////////////////////////////////////////////////////////////////////
+SNcPainter::SNcPainter(SHostWnd * pHost)
+:m_pHost(pHost)
+,m_bInPaint(FALSE)
+,m_bSysNcPainter(FALSE)
+{
+	m_root = new SNcPanel(this,this);
 }
 
 SNcPainter::~SNcPainter(void)
 {
+	delete m_root;
 }
 
 void SNcPainter::Reset()
@@ -22,13 +67,7 @@ void SNcPainter::Reset()
 	m_memLeft=NULL;
 	m_memBottom=NULL;
 	m_memRight=NULL;
-	m_htPart = 0;
 	m_bSysNcPainter=FALSE;
-	if(m_root)
-	{
-		m_root->Release();
-		m_root = NULL;
-	}
 }
 
 BOOL SNcPainter::InitFromXml(THIS_ IXmlNode *pXmlNode)
@@ -41,24 +80,17 @@ BOOL SNcPainter::InitFromXml(THIS_ IXmlNode *pXmlNode)
 	else
 	{
 		__baseCls::InitFromXml(pXmlNode);
-		SXmlNode xmlNode(pXmlNode);
+		m_root->InitFromXml(pXmlNode);
 		GETRENDERFACTORY->CreateRenderTarget(&m_memRT,0,0);
 		GETRENDERFACTORY->CreateRenderTarget(&m_memLeft,0,0);
 		GETRENDERFACTORY->CreateRenderTarget(&m_memRight,0,0);
 		GETRENDERFACTORY->CreateRenderTarget(&m_memTop,0,0);
 		GETRENDERFACTORY->CreateRenderTarget(&m_memBottom,0,0);
-		m_root = new SOsrPanel(this,xmlNode,this);
 		return TRUE;
 	}
 }
 
 IWindow* SNcPainter::GetRoot(THIS)
-{
-	return m_root;
-}
-
-
-SWindow* SNcPainter::GetSRoot()
 {
 	return m_root;
 }
@@ -175,8 +207,7 @@ BOOL SNcPainter::OnNcActivate(BOOL bActive)
 		m_pHost->DefWindowProc();
 		if(dwStyle&WS_VISIBLE)
 			m_pHost->SetWindowLongPtr(GWL_STYLE,dwStyle);
-
-		m_root->EnableWindow(bActive);
+		m_root->SetActive(bActive);
 		m_pHost->SendMessage(WM_NCPAINT);
 	}
 	return TRUE;
@@ -186,7 +217,7 @@ UINT SNcPainter::OnNcHitTest(CPoint point)
 {
 	if(m_pHost->IsIconic())
 		return 0;
-	m_htPart = HTCLIENT;
+	UINT uRet = HTCLIENT;
 	if(IsDrawNc())
 	{
 		do{
@@ -195,7 +226,7 @@ UINT SNcPainter::OnNcHitTest(CPoint point)
 		m_pHost->ClientToScreen2(&rcClient);
 		if(rcClient.PtInRect(point))
 		{
-			m_htPart = HTCLIENT;
+			uRet = HTCLIENT;
 			break;
 		}
 		CRect rcInner = rcWnd;
@@ -213,11 +244,11 @@ UINT SNcPainter::OnNcHitTest(CPoint point)
 				int nId = pWnd->GetID();
 				if(nId == IDC_SYS_ICON)
 				{
-					m_htPart = HTSYSMENU;
+					uRet = HTSYSMENU;
 					break;
 				}
 			}
-			m_htPart = HTCAPTION;
+			uRet = HTCAPTION;
 			break;
 		}
 
@@ -242,15 +273,15 @@ UINT SNcPainter::OnNcHitTest(CPoint point)
 			{
 				if(rcParts[i].PtInRect(point))
 				{
-					m_htPart = htPart[i];
+					uRet = htPart[i];
 					break;
 				}
 			}
-			if(m_htPart==HTCLIENT)
-				m_htPart = HTBORDER;
+			if(uRet==HTCLIENT)
+				uRet = HTBORDER;
 		}else
 		{
-			m_htPart = HTBORDER;
+			uRet = HTBORDER;
 		}
 		}while(false);
 	}
@@ -264,41 +295,41 @@ UINT SNcPainter::OnNcHitTest(CPoint point)
 		{
 			if (point.y > rcWnd.bottom - rcMargin.bottom)
 			{
-				m_htPart = HTBOTTOMRIGHT;
+				uRet = HTBOTTOMRIGHT;
 			}
 			else if (point.y < rcMargin.top)
 			{
-				m_htPart = HTTOPRIGHT;
+				uRet = HTTOPRIGHT;
 			}else
 			{
-				m_htPart = HTRIGHT;
+				uRet = HTRIGHT;
 			}
 		}
 		else if (point.x < rcMargin.left)
 		{
 			if (point.y > rcWnd.bottom - rcMargin.bottom)
 			{
-				m_htPart = HTBOTTOMLEFT;
+				uRet = HTBOTTOMLEFT;
 			}
 			else if (point.y < rcMargin.top)
 			{
-				m_htPart = HTTOPLEFT;
+				uRet = HTTOPLEFT;
 			}else
 			{
-				m_htPart = HTLEFT;
+				uRet = HTLEFT;
 			}
 		}
 		else if (point.y > rcWnd.bottom - rcMargin.bottom)
 		{
-			m_htPart = HTBOTTOM;
+			uRet = HTBOTTOM;
 		}
 		else if (point.y < rcMargin.top)
 		{
-			m_htPart = HTTOP;
+			uRet = HTTOP;
 		}
 		}while(false);
 	}
-	return m_htPart;
+	return uRet;
 }
 
 void SNcPainter::OnNcPaint(HRGN hRgn)
@@ -396,14 +427,10 @@ LRESULT SNcPainter::OnSetText(LPCTSTR pszText)
 		m_pHost->DefWindowProc();
 		if (dwStyle & WS_VISIBLE)
 			m_pHost->SetWindowLongPtr(GWL_STYLE, dwStyle);
-		SWindow *pRoot = GetSRoot();
-		if(pRoot)
+		SWindow *pTitle = m_root->FindChildByID(IDC_SYS_TITLE);
+		if(pTitle) 
 		{
-			SWindow *pTitle = pRoot->FindChildByID(IDC_SYS_TITLE);
-			if(pTitle) 
-			{
-				pTitle->SetWindowText(pszText);
-			}
+			pTitle->SetWindowText(pszText);
 		}
 		return 0;
 	}
@@ -416,22 +443,13 @@ LRESULT SNcPainter::OnRepaint(UINT msg,WPARAM wp,LPARAM lp)
 		return m_pHost->DefWindowProc();
 	}else
 	{
-		SWindow *pRoot = GetSRoot();
-		if(pRoot)
-		{
-			InvalidateHostRect(NULL);
-		}
+		InvalidateHostRect(NULL);
 	}
 	return 0;
 }
 
 void SNcPainter::OnNcDestroy()
 {
-	if(m_root)
-	{
-		m_root->Release();
-		m_root = NULL;
-	}
 	m_memRT=NULL;
 	m_memTop=NULL;
 	m_memLeft=NULL;
@@ -461,7 +479,7 @@ IObject * SNcPainter::GetHost()
 	return this;
 }
 
-BOOL SNcPainter::OnFireEvent(IEvtArgs *e)
+BOOL SNcPainter::OnHostFireEvent(IEvtArgs *e)
 {
 	EventCmd *e2=sobj_cast<EventCmd>(e);
 	if(e2)
@@ -554,8 +572,10 @@ void SNcPainter::OnReleaseHostRenderTarget(IRenderTarget *pRT,LPCRECT rc,GrtFlag
 
 LRESULT SNcPainter::OnNcMouseEvent(UINT msg,WPARAM wp,LPARAM lp)
 {
-	if(m_htPart == HTCAPTION && msg != WM_NCLBUTTONDBLCLK)
+	if(wp == HTCAPTION && msg != WM_NCLBUTTONDBLCLK)
 	{
+		if(msg==WM_NCLBUTTONUP)
+			m_bLButtonDown=FALSE;
 		CPoint pt(GET_X_LPARAM(lp),GET_Y_LPARAM(lp));
 		CRect rcWnd = m_pHost->GetWindowRect();
 		pt -= rcWnd.TopLeft();
@@ -575,15 +595,23 @@ LRESULT SNcPainter::OnNcMouseEvent(UINT msg,WPARAM wp,LPARAM lp)
 
 LRESULT SNcPainter::OnNcMouseLeave(UINT msg,WPARAM wp,LPARAM lp)
 {
-	m_root->DoFrameEvent(WM_MOUSELEAVE,wp,lp);
+	if(m_bLButtonDown)
+	{
+		CPoint pt;
+		GetCursorPos(&pt);
+		OnNcMouseEvent(WM_NCLBUTTONUP,HTCAPTION,MAKELPARAM(pt.x,pt.y));
+	}
+	m_root->DoFrameEvent(WM_MOUSELEAVE,0,0);
 	UpdateToolTip();
 	return m_pHost->DefWindowProc();
 }
 
-void SNcPainter::OnNcLButtonDown(UINT flag,CPoint pt)
+void SNcPainter::OnNcLButtonDown(UINT nHitTest,CPoint pt)
 {
-	if(m_htPart == HTCAPTION)
+	if(nHitTest == HTCAPTION)
 	{
+		m_bLButtonDown = TRUE;
+
 		CRect rcWnd = m_pHost->GetWindowRect();
 		pt -= rcWnd.TopLeft();
 		int nBorder = m_borderWidth.toPixelSize(GetScale());
@@ -595,7 +623,7 @@ void SNcPainter::OnNcLButtonDown(UINT flag,CPoint pt)
 		if(swnd != 0)
 		{
 			LPARAM lp=MAKELPARAM(pt.x,pt.y);
-			m_root->DoFrameEvent(WM_LBUTTONDOWN,flag,lp);
+			m_root->DoFrameEvent(WM_LBUTTONDOWN,0,lp);
 		}else
 		{
 			m_pHost->DefWindowProc();
@@ -632,7 +660,7 @@ int SNcPainter::toNcBuiltinID(const SStringW & strValue)
 
 void SNcPainter::OnSize(UINT nType, CSize size)
 {
-	if(m_root)
+	if(IsDrawNc())
 	{
 		SWindow *pMax = m_root->FindChildByID(IDC_SYS_MAX);
 		SWindow *pRestore = m_root->FindChildByID(IDC_SYS_RESTORE);
@@ -681,6 +709,7 @@ CSize SNcPainter::GetNcSize() const
 	szRet.cy = nBorderWid*2 + nTitleHei;
 	return szRet;
 }
+
 
 
 SNSEND

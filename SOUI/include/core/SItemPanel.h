@@ -22,7 +22,7 @@ struct IItemContainer
 
 struct IHostProxy{
 	virtual IObject * GetHost() =0;
-	virtual BOOL OnFireEvent(IEvtArgs *e) = 0;
+	virtual BOOL OnHostFireEvent(IEvtArgs *e) = 0;
 	virtual BOOL IsHostUpdateLocked() const = 0;
 	virtual BOOL IsHostVisible() const = 0;
 	virtual CRect GetHostRect() const = 0;
@@ -40,7 +40,7 @@ public:
 	virtual IObject * GetHost() {
 		return m_pHost;
 	}
-	virtual BOOL OnFireEvent(IEvtArgs *e) {
+	virtual BOOL OnHostFireEvent(IEvtArgs *e) {
 		return m_pHost->FireEvent(e);
 	}
 	virtual BOOL IsHostUpdateLocked() const {
@@ -79,7 +79,7 @@ class SOUI_EXP SOsrPanel
 {
     DEF_SOBJECT(SWindow, L"osrPanel")
   public:
-    SOsrPanel(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer);
+    SOsrPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer);
     virtual ~SOsrPanel()
     {
     }
@@ -95,7 +95,8 @@ public:
 	STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST OVERRIDE;
 
   public:
-    STDMETHOD_(void, OnFinalRelease)(THIS);
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE;
+	STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
 
   public: // SwndContainerImpl
     STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt);
@@ -167,8 +168,8 @@ class TOsrPanelProxy
 	: public T
 	, public SOsrPanel {
 public:
-	TOsrPanelProxy(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
-		:SOsrPanel(pFrameHost,xmlNode,pItemContainer)
+	TOsrPanelProxy(IHostProxy *pFrameHost, IItemContainer *pItemContainer)
+		:SOsrPanel(pFrameHost,pItemContainer)
 	{
 
 	}
@@ -233,7 +234,7 @@ public:
 		IItemContainer *pItemContainer);
 
 public:
-	SItemPanel(IHostProxy *pFrameHost=NULL, SXmlNode xmlNode=SXmlNode(), IItemContainer *pItemContainer=NULL);
+	SItemPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer);
 	virtual ~SItemPanel()
 	{
 	}

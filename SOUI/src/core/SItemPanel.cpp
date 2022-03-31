@@ -12,7 +12,7 @@
 
 SNSBEGIN
 
-SOsrPanel::SOsrPanel(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
+SOsrPanel::SOsrPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer)
     : m_pHostProxy(pFrameHost)
     , m_pItemContainer(pItemContainer)
 	, m_dwData(0)
@@ -22,11 +22,6 @@ SOsrPanel::SOsrPanel(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *p
     SwndContainerImpl::SetRoot(this);
     SASSERT(m_pHostProxy);
     SASSERT(m_pItemContainer);
-    if (xmlNode)
-    {
-        InitFromXml(&xmlNode);
-        BuildWndTreeZorder();
-    }
     m_evtSet.addEvent(EVENTID(EventItemPanelClick));
     m_evtSet.addEvent(EVENTID(EventItemPanelRclick));
     m_evtSet.addEvent(EVENTID(EventItemPanelClickUp));
@@ -41,6 +36,16 @@ void SOsrPanel::OnFinalRelease()
     AddRef(); //防止重复进入该函数
     SSendMessage(WM_DESTROY);
     __baseCls::OnFinalRelease();
+}
+
+BOOL SOsrPanel::InitFromXml(THIS_ IXmlNode *pNode)
+{
+	BOOL bRet = __baseCls::InitFromXml(pNode);
+	if(bRet)
+	{
+		BuildWndTreeZorder();
+	}
+	return bRet;
 }
 
 LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -130,7 +135,7 @@ LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 BOOL SOsrPanel::OnFireEvent(IEvtArgs *evt)
 {
-    return m_pHostProxy->OnFireEvent(evt);
+    return m_pHostProxy->OnHostFireEvent(evt);
 }
 
 RECT SOsrPanel::GetContainerRect() const
@@ -444,14 +449,15 @@ SItemPanel *SItemPanel::Create(IHostProxy  *pFrameHost,
 							 SXmlNode xmlNode,
 							 IItemContainer *pItemContainer)
 {
-	SItemPanel *pItem = new SItemPanel(pFrameHost, xmlNode, pItemContainer);
+	SItemPanel *pItem = new SItemPanel(pFrameHost, pItemContainer);
+	pItem->InitFromXml(&xmlNode);
 	SApplication::getSingletonPtr()->SetSwndDefAttr(pItem);
 	return pItem;
 }
 
 
-SItemPanel::SItemPanel(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
-:TOsrPanelProxy<IItemPanel>(pFrameHost,xmlNode,pItemContainer)
+SItemPanel::SItemPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer)
+:TOsrPanelProxy<IItemPanel>(pFrameHost,pItemContainer)
 , m_crBk(CR_INVALID)
 , m_crHover(CR_INVALID)
 , m_crSelBk(RGBA(0, 0, 128, 255))
@@ -488,7 +494,7 @@ BOOL SItemPanel::OnFireEvent(IEvtArgs *evt)
 	EventOfPanel evt2(m_pHostProxy->GetHost());
 	evt2.pPanel = this;
 	evt2.pOrgEvt = evt;
-	return m_pHostProxy->OnFireEvent(&evt2);
+	return m_pHostProxy->OnHostFireEvent(&evt2);
 }
 
 
