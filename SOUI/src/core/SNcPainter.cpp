@@ -48,6 +48,7 @@ SNcPainter::SNcPainter(SHostWnd * pHost)
 :m_pHost(pHost)
 ,m_bInPaint(FALSE)
 ,m_bSysNcPainter(FALSE)
+,m_bLButtonDown(FALSE)
 {
 	m_root = new SNcPanel(this,this);
 }
@@ -68,6 +69,7 @@ void SNcPainter::Reset()
 	m_memBottom=NULL;
 	m_memRight=NULL;
 	m_bSysNcPainter=FALSE;
+	m_bLButtonDown=FALSE;
 }
 
 BOOL SNcPainter::InitFromXml(THIS_ IXmlNode *pXmlNode)
@@ -420,7 +422,6 @@ LRESULT SNcPainter::OnSetText(LPCTSTR pszText)
 		return m_pHost->DefWindowProc();
 	}else
 	{
-		//
 		DWORD dwStyle = m_pHost->GetStyle();
 		if (dwStyle & WS_VISIBLE)
 			m_pHost->SetWindowLongPtr(GWL_STYLE, dwStyle & ~ WS_VISIBLE);
@@ -681,22 +682,20 @@ void SNcPainter::OnSize(UINT nType, CSize size)
 
 void SNcPainter::UpdateToolTip()
 {
-	{
-		CPoint pt;
-		GetCursorPos(&pt);
-		CRect rcWnd= m_pHost->GetWindowRect();
-		pt-= rcWnd.TopLeft();
+	CPoint pt;
+	GetCursorPos(&pt);
+	CRect rcWnd= m_pHost->GetWindowRect();
+	pt-= rcWnd.TopLeft();
 
-		SwndToolTipInfo tipInfo;
-		BOOL bOK = m_root->UpdateToolTip(pt, tipInfo);
-		if (bOK)
-		{
-			m_pHost->_SetToolTipInfo(&tipInfo,TRUE);
-		}
-		else
-		{ // hide tooltip
-			m_pHost->_SetToolTipInfo(NULL,TRUE);
-		}
+	SwndToolTipInfo tipInfo;
+	BOOL bOK = m_root->UpdateToolTip(pt, tipInfo);
+	if (bOK)
+	{
+		m_pHost->_SetToolTipInfo(&tipInfo,TRUE);
+	}
+	else
+	{ // hide tooltip
+		m_pHost->_SetToolTipInfo(NULL,TRUE);
 	}
 }
 
