@@ -1537,4 +1537,15 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
 
     STDMETHOD_(BOOL, CreatePathMeasure)(THIS_ IPathMeasure * *ppPathMeasure) PURE;
 };
+
+#ifdef __cplusplus
+//remove suffix of S for RenderObj to make it compatible with soui3 without conflicted with system interface. 
+typedef IFontS IFont;
+typedef IPenS IPen;
+typedef IBrushS IBrush;
+typedef IBitmapS IBitmap;
+typedef IRegionS IRegion;
+typedef IPathS IPath;
+#endif//__cplusplus
+
 SNSEND
