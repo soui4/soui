@@ -74,7 +74,8 @@ void SNcPainter::Reset()
 
 BOOL SNcPainter::InitFromXml(THIS_ IXmlNode *pXmlNode)
 {
-	if(!pXmlNode)
+	SXmlNode xmlNode(pXmlNode);
+	if(!xmlNode)
 	{
 		Reset();
 		return TRUE;
@@ -83,6 +84,8 @@ BOOL SNcPainter::InitFromXml(THIS_ IXmlNode *pXmlNode)
 	{
 		__baseCls::InitFromXml(pXmlNode);
 		m_root->InitFromXml(pXmlNode);
+		m_memRT = NULL;
+		m_memLeft=m_memRight=m_memTop=m_memBottom=NULL;
 		GETRENDERFACTORY->CreateRenderTarget(&m_memRT,0,0);
 		GETRENDERFACTORY->CreateRenderTarget(&m_memLeft,0,0);
 		GETRENDERFACTORY->CreateRenderTarget(&m_memRight,0,0);
