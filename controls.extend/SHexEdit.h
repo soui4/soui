@@ -205,7 +205,6 @@ SNSBEGIN
 		UINT m_nSelectingBeg;
 		UINT m_nSelectingEnd;
 
-		SOUI::IFontPtr m_pFont;
 		SHexEditAction* m_undo;
 		SHexEditAction* m_redo;
 	protected:
@@ -234,10 +233,10 @@ SNSBEGIN
 
 	public:
 		SOUI_ATTRS_BEGIN()
-			ATTR_INT(L"AddrSize", m_nAdrSize, 8)
-			ATTR_INT(L"BytesPerRow", m_bReadOnly, 16)
+			ATTR_INT(L"AddrSize", m_nAdrSize, FALSE)
+			ATTR_INT(L"BytesPerRow", m_nBytesPerRow, TRUE)
 			ATTR_BOOL(L"AutoBytesPerRow", m_bAutoBytesPerRow, FALSE)
-			ATTR_BOOL(L"readOnly", m_bReadOnly, FALSE)
+			ATTR_BOOL(L"readOnly", m_bReadOnly, TRUE)
 			ATTR_CUSTOM(L"AddrBkColor", OnAttrAddrBkColor)
 			ATTR_CUSTOM(L"HexBkColor", OnAttrHexBkColor)
 			ATTR_CUSTOM(L"AsciiBkColor", OnAttrAsciiBkColor)

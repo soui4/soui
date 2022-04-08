@@ -134,7 +134,7 @@ SNSBEGIN
 		m_tSelectedFousTxtCol = GetSysColor(COLOR_HIGHLIGHTTEXT) | 0xff000000;
 		m_tSelectedFousBkgCol = GetSysColor(COLOR_HIGHLIGHT) | 0xff000000;
 
-		m_pFont = SFontPool::getSingleton().GetFont(L"face:consolas", 1);
+		GetStyle().SetAttribute(L"font",L"face:consolas",TRUE);
 
 		GetEventSet()->addEvent(EVENTID(EventHexEditDataChanged));
 		GetEventSet()->addEvent(EVENTID(EventHexEditSelChanged));
@@ -362,7 +362,6 @@ SNSBEGIN
 		SPainter painter;
 		BeforePaint(pRT, painter);
 
-		pRT->SelectObject(m_pFont,NULL);
 		if (m_bRecalc)
 			CalculatePaintingDetails(pRT);
 
