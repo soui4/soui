@@ -1075,7 +1075,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *  @param dir  The direction to wind the rectangle's contour. Cannot be
      *              kUnknown_Direction.
      */
-    STDMETHOD_(void, addRect)(THIS_ const RECT *rect, Direction dir /*= kCW_Direction*/) PURE;
+    STDMETHOD_(void, addRect)(THIS_ const RECT *rect, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
     /**
      *  Add a closed rectangle contour to the path
@@ -1092,7 +1092,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *              kUnknown_Direction.
      */
     STDMETHOD_(void, addRect2)
-    (THIS_ float left, float top, float right, float bottom, Direction dir /* = kCW_Direction*/)
+    (THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction))
         PURE;
 
     /**
@@ -1102,7 +1102,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *  @param dir  The direction to wind the oval's contour. Cannot be
      *              kUnknown_Direction.
      */
-    STDMETHOD_(void, addOval)(THIS_ const RECT *oval, Direction dir /*= kCW_Direction*/) PURE;
+    STDMETHOD_(void, addOval)(THIS_ const RECT *oval, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
     /**
      *  Add a closed circle contour to the path
@@ -1117,7 +1117,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *              kUnknown_Direction.
      */
     STDMETHOD_(void, addCircle)
-    (THIS_ float x, float y, float radius, Direction dir /*= kCW_Direction*/) PURE;
+    (THIS_ float x, float y, float radius, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
     /** Add the specified arc to the path as a new contour.
 
@@ -1136,7 +1136,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *              kUnknown_Direction.
      */
     STDMETHOD_(void, addRoundRect)
-    (THIS_ const RECT *rect, float rx, float ry, Direction dir /* = kCW_Direction*/) PURE;
+    (THIS_ const RECT *rect, float rx, float ry, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
     /**
      *  Add a closed round-rectangle contour to the path. Each corner receives
@@ -1151,7 +1151,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *       sqaure corner and oversized radii are proportionally scaled down).
      */
     STDMETHOD_(void, addRoundRect2)
-    (THIS_ const RECT *rect, const float radii[], Direction dir /* = kCW_Direction*/) PURE;
+    (THIS_ const RECT *rect, const float radii[], Direction dir DEF_VAL(kCW_Direction)) PURE;
 
     /**
      *  Add a new contour made of just lines. This is just a fast version of
@@ -1319,8 +1319,8 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, GetViewportOrg)(THIS_ LPPOINT lpPoint) PURE;
     STDMETHOD_(HRESULT, SetViewportOrg)(THIS_ POINT pt) PURE;
 
-    STDMETHOD_(HRESULT, PushClipRect)(THIS_ LPCRECT pRect, UINT mode /*=RGN_AND*/) PURE;
-    STDMETHOD_(HRESULT, PushClipRegion)(THIS_ IRegionS * pRegion, UINT mode /*=RGN_AND*/) PURE;
+    STDMETHOD_(HRESULT, PushClipRect)(THIS_ LPCRECT pRect, UINT mode DEF_VAL(RGN_AND)) PURE;
+    STDMETHOD_(HRESULT, PushClipRegion)(THIS_ IRegionS * pRegion, UINT mode DEF_VAL(RGN_AND)) PURE;
     STDMETHOD_(HRESULT, PopClip)(THIS) PURE;
 
     STDMETHOD_(HRESULT, ExcludeClipRect)(THIS_ LPCRECT pRc) PURE;
@@ -1374,16 +1374,16 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, LPCRECT pRcSourMargin,
      UINT expendMode, BYTE byAlpha /*=0xFF*/) PURE;
     STDMETHOD_(HRESULT, BitBlt)
-    (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSour, int xSrc, int ySrc, DWORD dwRop /*=kSrcCopy*/)
+    (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSour, int xSrc, int ySrc, DWORD dwRop DEF_VAL(kSrcCopy))
         PURE;
     STDMETHOD_(HRESULT, AlphaBlend)
     (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSrc, LPCRECT pRcSrc, BYTE byAlpha) PURE;
     STDMETHOD_(IRenderObj *, GetCurrentObject)(THIS_ OBJTYPE uType) PURE;
     //将指定的RenderObj恢复为默认状态
     STDMETHOD_(HRESULT, SelectDefaultObject)
-    (THIS_ OBJTYPE objType, IRenderObj * *pOldObj /* = NULL*/) PURE;
+    (THIS_ OBJTYPE objType, IRenderObj * *pOldObj DEF_VAL(NULL)) PURE;
     STDMETHOD_(HRESULT, SelectObject)
-    (THIS_ IRenderObj * pObj, IRenderObj * *pOldObj /* = NULL*/) PURE;
+    (THIS_ IRenderObj * pObj, IRenderObj * *pOldObj DEF_VAL(NULL)) PURE;
     STDMETHOD_(COLORREF, GetTextColor)(THIS) PURE;
     STDMETHOD_(COLORREF, SetTextColor)(THIS_ COLORREF color) PURE;
     STDMETHOD_(void, SetMaskFilter)(THIS_ IMaskFilter * pMaskFilter) PURE;
@@ -1403,7 +1403,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      * Describe
      */
     STDMETHOD_(HRESULT, SetTransform)
-    (THIS_ const float matrix[9], float oldMatrix[9] /*=NULL*/) PURE;
+    (THIS_ const float matrix[9], float oldMatrix[9] DEF_VAL(NULL)) PURE;
 
     /**
      * SetTransform
@@ -1445,13 +1445,13 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      *  @param doAntiAlias true if the clip should be anti aliased
      */
     STDMETHOD_(HRESULT, PushClipPath)
-    (THIS_ const IPathS *path, UINT mode, BOOL doAntiAlias /*= false*/) PURE;
+    (THIS_ const IPathS *path, UINT mode, BOOL doAntiAlias DEF_VAL(FALSE)) PURE;
 
     /** Draw the specified path frame using current selected pen
     @param path     The path to be drawn
     */
     STDMETHOD_(HRESULT, DrawPath)
-    (THIS_ const IPathS *path, IPathEffect *pathEffect /*= NULL*/) PURE;
+    (THIS_ const IPathS *path, IPathEffect *pathEffect DEF_VAL(NULL)) PURE;
 
     /** Fill the specified path frame using current selected brush
     @param path     The path to be drawn
@@ -1469,11 +1469,11 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     @param byAlpha  This is applied to the offscreen when restore() is called.
     @return The value to pass to restoreToCount() to balance this save()
     */
-    STDMETHOD_(HRESULT, PushLayer)(THIS_ const RECT *pRect, BYTE byAlpha /*=0xFF*/) PURE;
+    STDMETHOD_(HRESULT, PushLayer)(THIS_ const RECT *pRect, BYTE byAlpha DEF_VAL(0xFF)) PURE;
 
     STDMETHOD_(HRESULT, PopLayer)(THIS) PURE;
 
-    STDMETHOD_(HRESULT, SetXfermode)(THIS_ int mode, int *pOldMode /*=NULL*/) PURE;
+    STDMETHOD_(HRESULT, SetXfermode)(THIS_ int mode, int *pOldMode DEF_VAL(NULL)) PURE;
     STDMETHOD_(BOOL, SetAntiAlias)(THIS_ BOOL bAntiAlias) PURE;
     STDMETHOD_(BOOL, GetAntiAlias)(THIS) SCONST PURE;
 };
@@ -1506,7 +1506,7 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
     STDMETHOD_(IImgDecoderFactory *, GetImgDecoderFactory)(THIS) PURE;
     STDMETHOD_(void, SetImgDecoderFactory)(THIS_ IImgDecoderFactory * pImgDecoderFac) PURE;
     STDMETHOD_(BOOL, CreateRenderTarget)
-    (THIS_ IRenderTarget * *ppRenderTarget, int nWid, int nHei) PURE;
+    (THIS_ IRenderTarget * *ppRenderTarget, int nWid DEF_VAL(0), int nHei DEF_VAL(0)) PURE;
 
     /**
      * CreateFont
