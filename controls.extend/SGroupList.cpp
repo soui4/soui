@@ -34,13 +34,15 @@ namespace SOUI {
 			{
 				SStringT strText = S_CW2T(xmlGroup.attribute(L"text").as_string());
 				SStringW strName = xmlGroup.attribute(L"name").as_string();
-				SWindow *pGroup = InsertGroup(-1, strName, strText, xmlGroup.attribute(L"icon").as_int(), xmlGroup.attribute(L"id").as_int());
+				SStringW strTip = xmlGroup.attribute(L"tip").as_string();
+				SWindow *pGroup = InsertGroup(-1, strName, strText, xmlGroup.attribute(L"icon").as_int(), xmlGroup.attribute(L"id").as_int(), strTip);
 				SXmlNode xmlItem = xmlGroup.child(L"item");
 				while (xmlItem)
 				{
 					SStringT strText = S_CW2T(xmlItem.attribute(L"text").as_string());
 					SStringW strName = xmlItem.attribute(L"name").as_string();
-					InsertItem(pGroup, -1, strName, strText, xmlItem.attribute(L"icon").as_int(), xmlItem.attribute(L"id").as_int());
+					SStringW strTip = xmlItem.attribute(L"tip").as_string();
+					InsertItem(pGroup, -1, strName, strText, xmlItem.attribute(L"icon").as_int(), xmlItem.attribute(L"id").as_int(), strTip);
 					xmlItem = xmlItem.next_sibling(L"item");
 				}
 				xmlGroup = xmlGroup.next_sibling(L"group");
@@ -80,7 +82,7 @@ namespace SOUI {
 		return true;
 	}
 
-	SWindow* SGroupList::InsertGroup(int iGroup,const SStringW & name, const SStringT & text, int iIcon, int nID)
+	SWindow * SGroupList::InsertGroup(int iGroup,const SStringW & name, const SStringT & text, int iIcon, int nID, const SStringW &strTip)
 	{
 		SWindow *pInsertAfter = ICWND_FIRST;
 		if (iGroup < 0)
@@ -122,6 +124,7 @@ namespace SOUI {
 		EventGroupListInitGroup evt(this);
 		evt.pItem = pGroup->FindChildByName(L"title");
 		evt.pGroupInfo = pItemInfo;
+		evt.pItem->SetAttribute(L"tip",strTip);
 		FireEvent(evt);
 
 		evt.pItem->GetEventSet()->subscribeEvent(EventCmd::EventID, Subscriber(&SGroupList::OnGroupClick, this));
@@ -131,7 +134,7 @@ namespace SOUI {
 	}
 
 
-	SWindow * SGroupList::InsertItem(SWindow * pGroup, int iItem,const SStringW & name, const SStringT & text, int iIcon, int nID)
+	SWindow * SGroupList::InsertItem(SWindow *pGroup, int iItem,const SStringW & name, const SStringT & text, int iIcon, int nID, const SStringW &strTip)
 	{
 		SWindow *pItemContainer = pGroup->FindChildByName(L"container");
 
@@ -161,6 +164,7 @@ namespace SOUI {
 		pItem->InitFromXml(&SXmlNode(m_itemTemplate));
 		pItem->SetName(name);
 		pItem->SetID(nID);
+		pItem->SetAttribute(L"tip",strTip);
 
 		ItemInfo *pItemInfo = new ItemInfo;
 		pItemInfo->strText = text;

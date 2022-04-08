@@ -15,7 +15,7 @@ namespace SOUI
 		STDMETHOD_(void,OnNextFrame)(THIS_) OVERRIDE;
 		STDMETHOD_(ILayoutParam *,GetLayoutParam)(THIS) SCONST OVERRIDE;
 
-		virtual BOOL OnRelayout(const CRect &rcWnd);
+		virtual BOOL OnRelayout(const CRect &rcWnd) OVERRIDE;
 
 		int GetHeight() const;
 	protected:

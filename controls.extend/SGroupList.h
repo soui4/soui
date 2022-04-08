@@ -44,8 +44,8 @@ namespace SOUI{
 		~SGroupList();
 
 		bool SelectPage(int nID);
-		SWindow * InsertGroup(int iGroup,const SStringW & name,const SStringT & text, int iIcon, int nID);
-		SWindow * InsertItem(SWindow *pGroup,int iItem, const SStringW & name, const SStringT & text, int iIcon, int nID);
+		SWindow * InsertGroup(int iGroup,const SStringW & name,const SStringT & text, int iIcon, int nID, const SStringW &strTip);
+		SWindow * InsertItem(SWindow *pGroup,int iItem, const SStringW & name, const SStringT & text, int iIcon, int nID, const SStringW &strTip);
 	protected:
 		BOOL OnGroupClick(IEvtArgs *e);
 		BOOL OnItemClick(IEvtArgs *e);

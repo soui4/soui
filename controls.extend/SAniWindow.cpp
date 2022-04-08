@@ -46,7 +46,16 @@ namespace SOUI
 		if(nStatus == NormalShow && m_bEnableAni && m_szWnd.cx >0 && m_szWnd.cy>0)
 		{
 			if(m_aniMode != AM_NONE)
+			{
+				if(bShow)
+				{
+					m_aniMode = AM_SHOW;
+				}else
+				{
+					m_aniMode = AM_HIDE;
+				}
 				return;
+			}
 			if(bShow)
 			{
 				SWindow::OnShowWindow(bShow,nStatus);
