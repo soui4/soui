@@ -1315,7 +1315,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, Resize)(THIS_ SIZE sz) PURE;
 
     STDMETHOD_(HRESULT, OffsetViewportOrg)
-    (THIS_ int xOff, int yOff, LPPOINT lpPoint /*=NULL*/) PURE;
+    (THIS_ int xOff, int yOff, LPPOINT lpPoint DEF_VAL(NULL)) PURE;
     STDMETHOD_(HRESULT, GetViewportOrg)(THIS_ LPPOINT lpPoint) PURE;
     STDMETHOD_(HRESULT, SetViewportOrg)(THIS_ POINT pt) PURE;
 
@@ -1327,7 +1327,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, IntersectClipRect)(THIS_ LPCRECT pRc) PURE;
 
     STDMETHOD_(HRESULT, SaveClip)(THIS_ int *pnState) PURE;
-    STDMETHOD_(HRESULT, RestoreClip)(THIS_ int nState /*=-1*/) PURE;
+    STDMETHOD_(HRESULT, RestoreClip)(THIS_ int nState DEF_VAL(-1)) PURE;
 
     STDMETHOD_(HRESULT, GetClipRegion)(THIS_ IRegionS * *ppRegion) PURE;
     STDMETHOD_(HRESULT, GetClipBox)(THIS_ LPRECT prc) PURE;
@@ -1354,25 +1354,25 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
 
     STDMETHOD_(HRESULT, DrawLines)(THIS_ LPPOINT pPt, size_t nCount) PURE;
     STDMETHOD_(HRESULT, GradientFill)
-    (THIS_ LPCRECT pRect, BOOL bVert, COLORREF crBegin, COLORREF crEnd, BYTE byAlpha /*=0xFF*/)
+    (THIS_ LPCRECT pRect, BOOL bVert, COLORREF crBegin, COLORREF crEnd, BYTE byAlpha DEF_VAL(0xFF))
         PURE;
     STDMETHOD_(HRESULT, GradientFillEx)
     (THIS_ LPCRECT pRect, const POINT *pts, COLORREF *colors, float *pos, int nCount,
-     BYTE byAlpha /*=0xFF*/) PURE;
+     BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, GradientFill2)
     (THIS_ LPCRECT pRect, GradientType type, COLORREF crStart, COLORREF crCenter, COLORREF crEnd,
-     float fLinearAngle, float fCenterX, float fCenterY, int nRadius, BYTE byAlpha /*=0xFF*/) PURE;
+     float fLinearAngle, float fCenterX, float fCenterY, int nRadius, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, DrawIconEx)
     (THIS_ int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT diFlags) PURE;
     STDMETHOD_(HRESULT, DrawBitmap)
-    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, int xSrc, int ySrc, BYTE byAlpha /*=0xFF*/)
+    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, int xSrc, int ySrc, BYTE byAlpha DEF_VAL(0xFF))
         PURE;
     STDMETHOD_(HRESULT, DrawBitmapEx)
     (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, UINT expendMode,
-     BYTE byAlpha /*=0xFF*/) PURE;
+     BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, DrawBitmap9Patch)
     (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, LPCRECT pRcSourMargin,
-     UINT expendMode, BYTE byAlpha /*=0xFF*/) PURE;
+     UINT expendMode, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, BitBlt)
     (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSour, int xSrc, int ySrc, DWORD dwRop DEF_VAL(kSrcCopy))
         PURE;
