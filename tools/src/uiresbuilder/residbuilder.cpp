@@ -416,9 +416,14 @@ void ParseLayoutFile(const wchar_t * pszFileName,map<wstring,int> &mapName2ID,in
         TiXmlElement *pXmlNode = xmlLayout.RootElement();
         //避免解析到skin结点
         if(stricmp(pXmlNode->Value(),"soui") == 0)
-            ParseLayout(pXmlNode->FirstChildElement("root"),mapName2ID,nStartId);
+		{
+			ParseLayout(pXmlNode->FirstChildElement("ncPainter"),mapName2ID,nStartId);
+			ParseLayout(pXmlNode->FirstChildElement("root"),mapName2ID,nStartId);
+		}
         else 
-            ParseLayout(pXmlNode,mapName2ID,nStartId);
+		{
+			ParseLayout(pXmlNode,mapName2ID,nStartId);
+		}
     }else
     {
         wprintf(L"!!!err: Load Layout XML Failed! file name: %s\n",pszFileName);
