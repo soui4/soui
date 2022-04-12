@@ -77,6 +77,7 @@ protected:
 	LRESULT OnRepaint(UINT msg,WPARAM wp,LPARAM lp);
 	void OnNcDestroy();
 	void OnNcLButtonDown(UINT flag,CPoint pt);
+	void OnLButtonUp(WPARAM wp,LPARAM lp);
 	LRESULT OnNcMouseEvent(UINT msg,WPARAM wp,LPARAM lp);
 	LRESULT OnNcMouseLeave(UINT msg,WPARAM wp,LPARAM lp);
 	void OnSize(UINT nType, CSize size);

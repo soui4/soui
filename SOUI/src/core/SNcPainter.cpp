@@ -601,9 +601,7 @@ LRESULT SNcPainter::OnNcMouseLeave(UINT msg,WPARAM wp,LPARAM lp)
 {
 	if(m_bLButtonDown)
 	{
-		CPoint pt;
-		GetCursorPos(&pt);
-		OnNcMouseEvent(WM_NCLBUTTONUP,HTCAPTION,MAKELPARAM(pt.x,pt.y));
+		OnNcMouseEvent(WM_NCLBUTTONUP,HTCAPTION,MAKELPARAM(-1,-1));
 	}
 	m_root->DoFrameEvent(WM_MOUSELEAVE,0,0);
 	UpdateToolTip();
@@ -712,6 +710,12 @@ CSize SNcPainter::GetNcSize() const
 	return szRet;
 }
 
-
+void SNcPainter::OnLButtonUp(WPARAM wp,LPARAM lp)
+{
+	if(m_bLButtonDown)
+	{
+		OnNcMouseEvent(WM_NCLBUTTONUP,HTCAPTION,MAKELPARAM(-1,-1));
+	}
+}
 
 SNSEND

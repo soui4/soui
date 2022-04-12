@@ -885,6 +885,10 @@ LRESULT SHostWnd::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             SNativeWnd::SetFocus(); //子窗口情况下才自动获取焦点
         break;
     case WM_LBUTTONUP:
+		if(!(SNativeWnd::GetStyle()&WS_CHILD))
+		{
+			m_pNcPainter->OnLButtonUp(wParam,lParam);
+		}
     case WM_MBUTTONUP:
     case WM_RBUTTONUP:
         m_msgMouse.message = 0;
