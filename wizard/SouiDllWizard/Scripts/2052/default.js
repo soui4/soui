@@ -152,7 +152,7 @@ function AddConfig(proj, strProjectName) {
         var wcharSet = wizard.FindSymbol('WCHAR');
         var mtSet = wizard.FindSymbol('MT');
         // DebugÉèÖÃ
-        var config = proj.Object.Configurations('Debug|Win32');
+        var config = proj.Object.Configurations('Debug');
         config.ConfigurationType = typeDynamicLibrary;
         config.CharacterSet = (unicodeSet == 1) ? charSetUNICODE : charSetMBCS;
         if (WizardVersion >= 10.0) {
@@ -196,7 +196,7 @@ function AddConfig(proj, strProjectName) {
 			resCplTool.PreprocessorDefinitions += ';_DEBUG';	
 		}
         // ReleaseÉèÖÃ
-        var config = proj.Object.Configurations('Release|Win32');
+        var config = proj.Object.Configurations('Release');
         config.ConfigurationType = typeDynamicLibrary;
         config.CharacterSet = (unicodeSet == 1) ? charSetUNICODE : charSetMBCS;
         if (WizardVersion >= 10.0) {
