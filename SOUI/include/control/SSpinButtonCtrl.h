@@ -1,22 +1,24 @@
 ﻿#pragma once
-#include "core/SWnd.h"
+#include <core/SWnd.h>
+#include <interface/SCtrl-i.h>
 
 SNSBEGIN
-class SOUI_EXP SSpinButtonCtrl : public SWindow {
+class SOUI_EXP SSpinButtonCtrl : public TWindowProxy<ISpinButtonCtrl> {
     DEF_SOBJECT(SWindow, L"spinButton")
   public:
     SSpinButtonCtrl(void);
     ~SSpinButtonCtrl(void);
 
-    void SetValue(int nValue);
-    void SetRange(int nMin, int nMax);
-    void SetStep(UINT nStep);
-
-    SWindow *GetBuddy();
-
+	SWindow * GetBuddy() const;
+public:
+	STDMETHOD_(void, SetValue)(THIS_ int nValue) OVERRIDE;
+	STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) OVERRIDE;
+	STDMETHOD_(void, SetStep)(THIS_ UINT nStep) OVERRIDE;
+	STDMETHOD_(int, GetValue)(THIS) SCONST OVERRIDE;
+	STDMETHOD_(IWindow*, GetIBuddy)(THIS) SCONST OVERRIDE;
   protected:
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) OVERRIDE;
-    virtual BOOL NeedRedrawWhenStateChange()
+    virtual BOOL NeedRedrawWhenStateChange() OVERRIDE
     {
         return TRUE;
     }

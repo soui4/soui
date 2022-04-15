@@ -41,9 +41,14 @@ void SSpinButtonCtrl::SetStep(UINT nStep)
     m_uStep = nStep;
 }
 
-SWindow *SSpinButtonCtrl::GetBuddy()
+int SSpinButtonCtrl::GetValue() const
 {
-    return GetParent()->FindChildByName(m_strBuddy);
+	return m_nValue;
+}
+
+IWindow *SSpinButtonCtrl::GetIBuddy() const
+{
+    return GetBuddy();
 }
 
 SIZE SSpinButtonCtrl::GetDesiredSize(int wid, int hei)
@@ -241,6 +246,11 @@ void SSpinButtonCtrl::OnClick()
         }
     }
     OnValueChanged();
+}
+
+SWindow * SSpinButtonCtrl::GetBuddy() const
+{
+	return GetParent()->FindChildByName(m_strBuddy);
 }
 
 SNSEND
