@@ -277,6 +277,7 @@ public:
 			pEnvCfg->strDataTarget = szBuf;
 			//vs 2019
 			CString dataTarget = pEnvCfg->strVsDir + pEnvCfg->strEntryTarget;
+            ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)dataTarget);
 			if(FolderExists(dataTarget))
 			if(CreateDirectory(dataTarget, 0))
 			{
@@ -501,31 +502,37 @@ public:
 			VSENVCFG *pCfg = (VSENVCFG*)vslist.GetItemData(i);
 			//remove entry files
 			CString strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4Wizard.ico");
+            ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
 			BOOL bOK = DeleteFile(strSource);
 			if (bOK)
 			{
 				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4Wizard.vsdir");
+                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
 				bOK = DeleteFile(strSource);
 			}
 			if (bOK)
 			{
 				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4Wizard.vsz");
+                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
 				bOK = DeleteFile(strSource);
 			}
 			// 删除Dll向导文件
 			if (bOK)
 			{
 				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4DllWizard.ico");
+                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
 				bOK = DeleteFile(strSource);
 			}
 			if (bOK)
 			{
 				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4DllWizard.vsdir");
+                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
 				bOK = DeleteFile(strSource);
 			}
 			if (bOK)
 			{
 				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4DllWizard.vsz");
+                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
 				bOK = DeleteFile(strSource);
 			}
 
@@ -533,6 +540,7 @@ public:
 			if (bOK)
 			{
 				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4");
+                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
 				bOK = RemoveDirectory(strSource);
 			}
 
