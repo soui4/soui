@@ -63,7 +63,7 @@
     {                                                                       \
         if (!pRoot)                                                         \
             return FALSE;                                                   \
-        SOUI::SWindow *pWnd = SOUI::sobj_cast<SOUI::SWindow>(pEvt->sender); \
+        SOUI::SWindow *pWnd = SOUI::sobj_cast<SOUI::SWindow>(pEvt->Sender()); \
         if (pWnd && pRoot != pWnd && !pWnd->IsDescendant(pRoot))            \
             return FALSE;                                                   \
     }

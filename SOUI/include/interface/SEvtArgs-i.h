@@ -291,4 +291,5 @@ DECLARE_INTERFACE_(IEvtSlot, IObjRef)
  */
 typedef BOOL (*FunCallback)(IEvtArgs *pEvt, void *Ctx);
 
+#define EventArgs IEvtArgs
 SNSEND

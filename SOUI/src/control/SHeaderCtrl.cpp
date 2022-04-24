@@ -148,7 +148,7 @@ void SHeaderCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, const LPSHDITEMEX p
     if (!pItem->bVisible)
         return;
     if (m_pSkinItem)
-        m_pSkinItem->DrawByIndex(pRT, rcItem, pItem->state);
+        m_pSkinItem->DrawByState(pRT, rcItem, pItem->state);
     UINT align = DT_SINGLELINE | DT_VCENTER;
     if (pItem->fmt & HDF_CENTER)
         align |= DT_CENTER;
