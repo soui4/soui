@@ -394,7 +394,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      */
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
 
-    STDMETHOD_(void, OnInitFinished)(THIS_ SXmlNode xmlNode);
+    STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode) OVERRIDE;
 
     virtual void OnColorize(COLORREF cr);
     virtual void OnScaleChanged(int nScale);

@@ -23,6 +23,7 @@ SET unicode=1
 SET wchar=1
 SET supportxp=0
 SET vsvarbat=
+SET dynamicsoui=1
 
 rem 选择编译版本
 SET /p selected=1.选择编译版本[1=x86;2=x64;3=x86+x64]:
@@ -127,7 +128,7 @@ rem @echo !vsvarbat! %target%
 rem 选择编译类型
 SET /p selected=3.选择SOUI编译模式[1=全模块DLL;2=全模块LIB;3=内核LIB,组件DLL(不能使用LUA脚本模块)]:
 if %selected%==1 (
-	rem do nothing
+	SET dynamicsoui=1
 ) else if %selected%==2 (
 	SET cfg=!cfg! LIB_ALL
 ) else if %selected%==3 (
@@ -195,6 +196,8 @@ echo !configStr!>>.\config\build.cfg
 set configStr=MT=%mt%
 echo !configStr!>>.\config\build.cfg
 set configStr=SUPPORT_XP=%supportxp%
+echo !configStr!>>.\config\build.cfg
+set configStr=DYNAMIC_SOUI=%dynamicsoui%
 echo !configStr!>>.\config\build.cfg
 rem 参数配置完成
 

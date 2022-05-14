@@ -879,7 +879,7 @@ int STabCtrl::HitTest(CPoint pt)
     return -1;
 }
 
-void STabCtrl::OnInitFinished(SXmlNode xmlNode)
+void STabCtrl::OnInitFinished(THIS_ IXmlNode *xmlNode)
 {
     if (m_pSkinTab)
     {

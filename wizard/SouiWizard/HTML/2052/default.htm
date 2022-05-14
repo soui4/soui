@@ -30,15 +30,17 @@
     <symbol name="WIN_STYLES_DLG" type="radio" value="true"></symbol>
     <!-- 系统资源编译到EXE中。-->
     <symbol name='CHECKBOX_SYSRES_BUILTIN' type=checkbox value=false></symbol>
-     <symbol name='CHECKBOX_RES_PACK_ONLAY_RELEASE' type=checkbox value=true></symbol>
+    <symbol name='CHECKBOX_RES_PACK_ONLAY_RELEASE' type=checkbox value=true></symbol>
     <!-- 主窗口半透明。-->
     <symbol name='CHECKBOX_TRANSLUCENT' type=checkbox value=true></symbol>
     <!--编译选项-->
     <SYMBOL NAME="UNICODE" TYPE=select-one VALUE=1></SYMBOL>
     <SYMBOL NAME="WCHAR" TYPE=select-one VALUE=1></SYMBOL>
     <SYMBOL NAME="MT" TYPE=select-one VALUE=1></SYMBOL>
-    <SYMBOL NAME="SUPPORT_XP" TYPE="select-one" VALUE="0"></SYMBOL>    
-    
+    <SYMBOL NAME="SUPPORT_XP" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="DYNAMIC_SOUI" TYPE="select-one" VALUE="0"></SYMBOL>
+    <symbol name="APP_TITLE" type="string" value=""></symbol>
+
     <style type="text/css">
         body {
             background-image: url(../../Images/leftbanner2.png);
@@ -471,7 +473,8 @@
 			keyValue["UNICODE"] = 1;//unicode
 			keyValue["WCHAR"] = 1;//wchar
 			keyValue["MT"] = 1;//static linked to CRT
-			keyValue["SUPPORT_XP"] = 0;//dont support XP
+            keyValue["SUPPORT_XP"] = 0;//dont support XP
+            keyValue["DYNAMIC_SOUI"] = 1;
             var reg2 = /(\w+)=(\d+)/;
 
             if (fso.FileExists(configFile)) {
@@ -489,6 +492,7 @@
             window.external.AddSymbol('WCHAR', keyValue["WCHAR"]);
             window.external.AddSymbol('MT', keyValue["MT"]);
             window.external.AddSymbol('SUPPORT_XP', keyValue["SUPPORT_XP"]);
+            window.external.AddSymbol('DYNAMIC_SOUI', keyValue["DYNAMIC_SOUI"]);
         }
         catch (e) {
             throw e;

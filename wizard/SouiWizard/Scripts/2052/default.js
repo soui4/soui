@@ -466,9 +466,9 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
 		// 设置某些文件的编译选项
 		var files = proj.Object.Files;
 		var file = files.Item('stdafx.cpp');
-		var fileConfig = file.FileConfigurations('Debug');
+		var fileConfig = file.FileConfigurations('Debug|Win32');
 		fileConfig.Tool.UsePrecompiledHeader = 1;
-		fileConfig = file.FileConfigurations('Release');
+		fileConfig = file.FileConfigurations('Release|Win32');
 		fileConfig.Tool.UsePrecompiledHeader = 1;
 
 		var fileConfig64 = file.FileConfigurations('Debug|x64');
@@ -522,12 +522,12 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
 
 		//var ResLoadType = wizard.FindSymbol('ResLoaderType');
 		var file = files.Item('uires.idx');
-		var fileConfig = file.FileConfigurations('Debug');
+		var fileConfig = file.FileConfigurations('Debug|Win32');
 		buildTool = fileConfig.Tool;
 		buildTool.CommandLine = cmdline;
 		buildTool.Description = 'Building SoUI Resource';
 		buildTool.Outputs = outfiles;
-		fileConfig = file.FileConfigurations('Release');
+		fileConfig = file.FileConfigurations('Release|Win32');
 		buildTool = fileConfig.Tool;
 		if (ResLoadType == 0) {
 			buildTool.CommandLine = cmdline;
