@@ -121,6 +121,8 @@ add_subdirectory(components)
 #
 add_subdirectory(demo)
 
+add_subdirectory(demo2)
+
 message(STATUS "COM_LIBS: ${COM_LIBS}")
 message(STATUS "CORE_LIBS: ${CORE_LIBS}")
 ##
