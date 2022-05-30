@@ -12,7 +12,7 @@
 #endif
 
 #define IMPL(class, member, pointer) \
-	(&((class *)0)->member == pointer, ((class *) (((long) pointer) - offsetof(class, member))))
+	(&((class *)0)->member == pointer, ((class *) (((LONG_PTR) pointer) - offsetof(class, member))))
 
 
 

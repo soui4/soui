@@ -19,7 +19,7 @@ translucent="0"
   </ncpainter>
   <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" layout="vbox" gravity="center">
     <button size="100,30" name="btn_exit" text="flash" tip="Flash Window"/>
-    <window pos="5,[2,-5,-5">
+    <window size="-2,0" weight="1">
       <listview pos="0,0,300,-0" name="lv_test">
         <template itemHeight="50" layout="hbox" gravity="center">
           <text name="txt_test"/>
