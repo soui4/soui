@@ -169,7 +169,7 @@ class SOUI_EXP STreeCtrl
     virtual int CalcItemWidth(const LPTVITEM pItem);
     virtual int CalcMaxItemWidth(HSTREEITEM hItem);
 
-    void UpdateContentWidth();
+    virtual void UpdateContentWidth();
 
     int GetItemShowIndex(HSTREEITEM hItemObj);
     BOOL GetItemRect(LPTVITEM pItem, CRect &rcItem);

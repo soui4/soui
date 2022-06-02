@@ -26,13 +26,13 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
 
     STDMETHOD_(HWND, CreateNative)
     (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth,
-     int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
+     int nHeight, HWND hWndParent, int nID DEF_VAL(0), LPVOID lpParam DEF_VAL(0)) PURE;
 
     STDMETHOD_(HWND, GetHwnd)(THIS) PURE;
 
     STDMETHOD_(BOOL, SubclassWindow)(THIS_ HWND hWnd) PURE;
 
-    STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) PURE;
+    STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce DEF_VAL(FALSE)) PURE;
 
     STDMETHOD_(const MSG *, GetCurrentMessage)(THIS) SCONST PURE;
 
@@ -52,22 +52,22 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
 
     STDMETHOD_(BOOL, IsWindowEnabled)(THIS) SCONST PURE;
 
-    STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
+    STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) PURE;
 
-    STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
+    STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) PURE;
 
     STDMETHOD_(BOOL, SetWindowPos)
     (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) PURE;
 
-    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter /*= NULL*/) PURE;
+    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter DEF_VAL(NULL)) PURE;
 
     STDMETHOD_(BOOL, DestroyWindow)(THIS) PURE;
 
     STDMETHOD_(BOOL, IsWindow)(THIS) PURE;
 
-    STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase /*= TRUE*/) PURE;
+    STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase DEF_VAL(TRUE)) PURE;
 
-    STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /* = TRUE*/) PURE;
+    STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase DEF_VAL(TRUE)) PURE;
 
     STDMETHOD_(BOOL, GetWindowRect)(THIS_ LPRECT lpRect) SCONST PURE;
 
@@ -87,7 +87,7 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
 
     STDMETHOD_(UINT_PTR, SetTimer)
     (THIS_ UINT_PTR nIDEvent, UINT nElapse,
-     void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
+     void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) DEF_VAL(NULL)) PURE;
 
     STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) PURE;
 
@@ -112,13 +112,13 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
     STDMETHOD_(HWND, SetFocus)(THIS) PURE;
 
     STDMETHOD_(LRESULT, SendMessage)
-    (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) PURE;
 
     STDMETHOD_(BOOL, PostMessage)
-    (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) PURE;
 
     STDMETHOD_(BOOL, SendNotifyMessage)
-    (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) PURE;
 
     STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) PURE;
 
@@ -131,13 +131,13 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
     STDMETHOD_(BOOL, IsWindowVisible)(THIS) SCONST PURE;
 
     STDMETHOD_(BOOL, MoveWindow)
-    (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/) PURE;
+    (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint DEF_VAL(TRUE)) PURE;
 
-    STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint /*= TRUE*/) PURE;
+    STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint DEF_VAL(TRUE)) PURE;
 
     STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) PURE;
 
-    STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw /*=TRUE*/) PURE;
+    STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw DEF_VAL(TRUE)) PURE;
 
     STDMETHOD_(BOOL, SetLayeredWindowAttributes)
     (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;

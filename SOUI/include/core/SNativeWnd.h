@@ -182,14 +182,14 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
      int nWidth,
      int nHeight,
      HWND hWndParent,
-     int nID,
-     LPVOID lpParam) OVERRIDE;
+     int nID DEF_VAL(0),
+     LPVOID lpParam DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(HWND, GetHwnd)(THIS) OVERRIDE;
 
     STDMETHOD_(BOOL, SubclassWindow)(THIS_ HWND hWnd) OVERRIDE;
 
-    STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce = FALSE) OVERRIDE;
+    STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce DEF_VAL(FALSE)) OVERRIDE;
 
     STDMETHOD_(const MSG *, GetCurrentMessage)(THIS) SCONST OVERRIDE;
 
@@ -209,22 +209,22 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
 
     STDMETHOD_(BOOL, IsWindowEnabled)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0) OVERRIDE;
+    STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) OVERRIDE;
 
-    STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags = 0) OVERRIDE;
+    STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, SetWindowPos)
     (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) OVERRIDE;
 
-    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter = NULL) OVERRIDE;
+    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter DEF_VAL(NULL)) OVERRIDE;
 
     STDMETHOD_(BOOL, DestroyWindow)(THIS) OVERRIDE;
 
     STDMETHOD_(BOOL, IsWindow)(THIS) OVERRIDE;
 
-    STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase = TRUE) OVERRIDE;
+    STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase DEF_VAL(TRUE)) OVERRIDE;
 
-    STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase = TRUE) OVERRIDE;
+    STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase DEF_VAL(TRUE)) OVERRIDE;
 
     STDMETHOD_(BOOL, GetWindowRect)(THIS_ LPRECT lpRect) SCONST OVERRIDE;
 
@@ -246,7 +246,7 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
     STDMETHOD_(UINT_PTR, SetTimer)
     (THIS_ UINT_PTR nIDEvent,
      UINT nElapse,
-     void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) = NULL) OVERRIDE;
+     void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) DEF_VAL(NULL)) OVERRIDE;
 
     STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) OVERRIDE;
 
@@ -271,13 +271,13 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
     STDMETHOD_(HWND, SetFocus)(THIS) OVERRIDE;
 
     STDMETHOD_(LRESULT, SendMessage)
-    (THIS_ UINT message, WPARAM wParam = 0, LPARAM lParam = 0) OVERRIDE;
+    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, PostMessage)
-    (THIS_ UINT message, WPARAM wParam = 0, LPARAM lParam = 0) OVERRIDE;
+    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, SendNotifyMessage)
-    (THIS_ UINT message, WPARAM wParam = 0, LPARAM lParam = 0) OVERRIDE;
+    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) OVERRIDE;
 
@@ -290,13 +290,13 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
     STDMETHOD_(BOOL, IsWindowVisible)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, MoveWindow)
-    (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint = TRUE) OVERRIDE;
+    (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint DEF_VAL(TRUE)) OVERRIDE;
 
-    STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint = TRUE) OVERRIDE;
+    STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint DEF_VAL(TRUE)) OVERRIDE;
 
     STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) OVERRIDE;
 
-    STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw = TRUE) OVERRIDE;
+    STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw DEF_VAL(TRUE)) OVERRIDE;
 
     STDMETHOD_(BOOL, SetLayeredWindowAttributes)
     (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) OVERRIDE;
