@@ -466,6 +466,7 @@ HSTREEITEM STreeCtrl::InsertItem(LPTVITEM pItemObj, HSTREEITEM hParent, HSTREEIT
 
     HSTREEITEM hRet = CSTree<LPTVITEM>::InsertItem(pItemObj, hParent, hInsertAfter);
     pItemObj->hItem = hRet;
+	OnInsertItem(pItemObj);
 
     if (pItemObj->bVisible)
     {
@@ -1365,6 +1366,14 @@ void STreeCtrl::OnNodeFree(LPTVITEM &pItemData)
         m_pListener->OnDeleteItem(this, pItemData->hItem, pItemData->lParam);
     }
     delete pItemData;
+}
+
+void STreeCtrl::OnInsertItem(LPTVITEM & pItemData)
+{
+	if(m_pListener)
+	{
+		m_pListener->OnInsertItem(this,pItemData->hItem);
+	}
 }
 
 void STreeCtrl::SetListener(IListener *pListener)

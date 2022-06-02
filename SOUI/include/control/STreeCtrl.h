@@ -71,10 +71,11 @@ class SOUI_EXP STreeCtrl
     , protected CSTree<LPTVITEM> {
     DEF_SOBJECT(SPanel, L"treectrl")
   public:
-    struct IListener
-    {
-        virtual void OnDeleteItem(STreeCtrl *pTreeCtrl, HSTREEITEM hItem, LPARAM lParam) = 0;
-    };
+	  struct IListener
+	  {
+		  virtual void OnInsertItem(STreeCtrl *pTreeCtrl,HSTREEITEM hItem) = 0;
+		  virtual void OnDeleteItem(STreeCtrl *pTreeCtrl,HSTREEITEM hItem,LPARAM lParam) = 0;
+	  };
 
     STreeCtrl();
 
@@ -191,6 +192,7 @@ class SOUI_EXP STreeCtrl
 
   protected:
     virtual void OnNodeFree(LPTVITEM &pItemData);
+	virtual void OnInsertItem(LPTVITEM & pItemData);
 
   protected:
     HSTREEITEM m_hSelItem;
