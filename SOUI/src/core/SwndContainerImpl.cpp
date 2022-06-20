@@ -3,6 +3,7 @@
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
 #include "core/SwndContainerImpl.h"
+#include "res.mgr/SUiDef.h"
 
 SNSBEGIN
 
@@ -343,7 +344,8 @@ void SwndContainerImpl::OnFrameMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lPara
     {
         if (IsSendWheel2Hover())
         {
-            m_hHover = m_pRoot->SwndFromPoint(CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam)));
+            CPoint pt(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam));
+            m_hHover = m_pRoot->SwndFromPoint(pt);
             pWndTarget = SWindowMgr::GetWindow(m_hHover);
         }
         else
@@ -369,7 +371,7 @@ LRESULT SwndContainerImpl::OnFrameKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lPar
     LRESULT lRet = 0;
     if ((uMsg == WM_KEYDOWN || uMsg == WM_KEYUP) && GetKeyState(VK_MENU) & 0x80)
     {
-        UINT vKey = wParam;
+        UINT vKey = (UINT)wParam;
         if (vKey >= 'a' && vKey <= 'z')
             vKey -= 0x20; //转换成VK
         if (m_focusMgr.OnKeyDown(vKey))

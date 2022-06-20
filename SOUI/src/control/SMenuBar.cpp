@@ -46,7 +46,7 @@ class SMenuBarItem
     void OnTimer(char timerID);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_TIMER(OnTimer)
+    MSG_WM_TIMER_EX(OnTimer)
     SOUI_MSG_MAP_END()
 
     SOUI_ATTRS_BEGIN()

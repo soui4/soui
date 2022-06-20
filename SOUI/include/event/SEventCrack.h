@@ -59,13 +59,13 @@
             return TRUE;                                 \
     }
 
-#define EVENT_CHECK_SENDER_ROOT(pRoot)                                      \
-    {                                                                       \
-        if (!pRoot)                                                         \
-            return FALSE;                                                   \
+#define EVENT_CHECK_SENDER_ROOT(pRoot)                                        \
+    {                                                                         \
+        if (!pRoot)                                                           \
+            return FALSE;                                                     \
         SOUI::SWindow *pWnd = SOUI::sobj_cast<SOUI::SWindow>(pEvt->Sender()); \
-        if (pWnd && pRoot != pWnd && !pWnd->IsDescendant(pRoot))            \
-            return FALSE;                                                   \
+        if (pWnd && pRoot != pWnd && !pWnd->IsDescendant(pRoot))              \
+            return FALSE;                                                     \
     }
 
 // void OnEvent(IEvtArgs *pEvt)

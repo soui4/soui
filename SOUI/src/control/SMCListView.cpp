@@ -54,7 +54,7 @@ SMCListView::SMCListView()
     , m_iPendingUpdateItem(-2)
     , m_iPendingViewItem(-1)
     , m_crGrid(CR_INVALID)
-	, SHostProxy(this)
+    , SHostProxy(this)
 {
     m_bFocusable = TRUE;
     m_bClipClient = TRUE;
@@ -121,7 +121,8 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
         m_lvItemLocator->SetAdapter(adapter);
     if (m_adapter)
     {
-        m_adapter->InitByTemplate(&m_xmlTemplate.root().first_child());
+        SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+        m_adapter->InitByTemplate(&xmlNode);
         m_adapter->registerDataSetObserver(m_observer);
         for (int i = 0; i < m_adapter->getViewTypeCount(); i++)
         {
@@ -670,7 +671,8 @@ void SMCListView::UpdateVisibleItems()
                 m_pHoverItem = ii.pItem;
 
             //应用可以根据ii.pItem的状态来决定如何初始化列表数据
-            m_adapter->getView(iNewLastVisible, ii.pItem, &m_xmlTemplate.root().first_child());
+            SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+            m_adapter->getView(iNewLastVisible, ii.pItem, &xmlNode);
             if (bNewItem)
             {
                 ii.pItem->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
@@ -756,7 +758,8 @@ void SMCListView::UpdateVisibleItem(int iItem)
     SASSERT(m_lvItemLocator->IsFixHeight());
     SItemPanel *pItem = GetItemPanel(iItem);
     SASSERT(pItem);
-    m_adapter->getView(iItem, pItem, &m_xmlTemplate.root().first_child());
+    SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+    m_adapter->getView(iItem, pItem, &xmlNode);
 }
 
 void SMCListView::OnSize(UINT nType, CSize size)
@@ -879,7 +882,8 @@ IItemPanel *SMCListView::HitTest(const POINT *pt) const
     SASSERT(pt);
     if (!pt)
         return NULL;
-    return HitTest(CPoint(*pt));
+    CPoint pt2(*pt);
+    return HitTest(pt2);
 }
 
 LRESULT SMCListView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)

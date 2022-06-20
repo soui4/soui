@@ -32,7 +32,7 @@ class SHostWndAttr : public TObjRefImpl<SObject> {
     };
     friend class SHostWnd;
     friend class SRootWindow;
-	friend class SNcPainter;
+    friend class SNcPainter;
 
   public:
     SHostWndAttr(void);
@@ -154,7 +154,7 @@ class SOUI_EXP SHostWnd
     , protected IHostMsgHandler {
     friend class SDummyWnd;
     friend class SRootWindow;
-	friend class SNcPainter;
+    friend class SNcPainter;
     DEF_SOBJECT(SNativeWnd, L"SHostWnd")
   protected:
     SDummyWnd *m_dummyWnd;   /**<半透明窗口使用的一个响应WM_PAINT消息的窗口*/
@@ -173,15 +173,14 @@ class SOUI_EXP SHostWnd
     SAutoRefPtr<SStylePool> m_privateStylePool;       /**<局部style pool*/
     SAutoRefPtr<SSkinPool> m_privateSkinPool;         /**<局部skin pool*/
     SAutoRefPtr<STemplatePool> m_privateTemplatePool; /**< 局部template pool */
-	SAutoRefPtr<IScriptModule> m_pScriptModule; /**<脚本模块*/
-	SAutoRefPtr<SNcPainter> m_pNcPainter; /**<非客户区绘制模块*/
+    SAutoRefPtr<IScriptModule> m_pScriptModule;       /**<脚本模块*/
+    SAutoRefPtr<SNcPainter> m_pNcPainter;             /**<非客户区绘制模块*/
 
     SList<SWND> m_lstUpdateSwnd;  /**<等待刷新的非背景混合窗口列表*/
     SList<RECT> m_lstUpdatedRect; /**<更新的脏矩形列表*/
     BOOL m_bRendering;            /**<正在渲染过程中*/
 
     MSG m_msgMouse; /**<上一次鼠标按下消息*/
-
 
     int m_nScale; /**<缩放比例 */
 
@@ -221,10 +220,10 @@ class SOUI_EXP SHostWnd
         return m_pRoot;
     }
 
-	STDMETHOD_(INcPainter*,GetNcPainter)(THIS) OVERRIDE
-	{
-		return m_pNcPainter;
-	}
+    STDMETHOD_(INcPainter *, GetNcPainter)(THIS) OVERRIDE
+    {
+        return m_pNcPainter;
+    }
 
     STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) OVERRIDE;
 
@@ -325,12 +324,13 @@ class SOUI_EXP SHostWnd
     void _UpdateNonBkgndBlendSwnd();
     void _RestoreClickState();
     void _Invalidate(LPCRECT prc);
-	void _SetToolTipInfo(const SwndToolTipInfo * info,BOOL bNcTip);
+    void _SetToolTipInfo(const SwndToolTipInfo *info, BOOL bNcTip);
+
   protected:
     //////////////////////////////////////////////////////////////////////////
     // Message handler
 
-    void OnPrint(HDC dc, UINT uFlags=0);
+    void OnPrint(HDC dc, UINT uFlags = 0);
 
     void OnPaint(HDC dc);
 
@@ -362,7 +362,6 @@ class SOUI_EXP SHostWnd
 
     void OnGetMinMaxInfo(LPMINMAXINFO lpMMI);
 
-
     void OnSetFocus(HWND wndOld);
     void OnKillFocus(HWND wndFocus);
 
@@ -381,7 +380,7 @@ class SOUI_EXP SHostWnd
     LRESULT OnGetObject(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void OnSysCommand(UINT nID, CPoint lParam);
 
-	void OnHostShowWindow(BOOL bShow, UINT nStatus);
+    void OnHostShowWindow(BOOL bShow, UINT nStatus);
 #ifndef DISABLE_SWNDSPY
   protected:
     LRESULT OnSpyMsgSetSpy(UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -446,7 +445,8 @@ class SOUI_EXP SHostWnd
   protected:
     virtual BOOL OnLoadLayoutFromResourceID(const SStringT &resId);
     virtual void OnUserXmlNode(SXmlNode xmlUser);
-	virtual BOOL OnCacheUpdated(IBitmapS * pCache, LPCRECT pRect);
+    virtual BOOL OnCacheUpdated(IBitmapS *pCache, LPCRECT pRect);
+
   public:
     virtual BOOL onRootResize(IEvtArgs *e);
 
@@ -486,7 +486,7 @@ class SOUI_EXP SHostWnd
     MSG_WM_WINDOWPOSCHANGED(OnWindowPosChanged)
     MESSAGE_HANDLER_EX(WM_GETOBJECT, OnGetObject)
     MSG_WM_SYSCOMMAND(OnSysCommand)
-	CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
+    CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
 #ifndef DISABLE_SWNDSPY
     MESSAGE_HANDLER_EX(SPYMSG_SETSPY, OnSpyMsgSetSpy)
     MESSAGE_HANDLER_EX(SPYMSG_SWNDENUM, OnSpyMsgSwndEnum)

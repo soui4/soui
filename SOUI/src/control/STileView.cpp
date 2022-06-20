@@ -47,7 +47,7 @@ STileView::STileView()
     , m_bPendingUpdate(false)
     , m_iPendingUpdateItem(-2)
     , m_iPendingViewItem(-1)
-	, SHostProxy(this)
+    , SHostProxy(this)
 
 {
     m_bFocusable = TRUE;
@@ -115,7 +115,8 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
     }
     if (m_adapter)
     {
-        m_adapter->InitByTemplate(&m_xmlTemplate.root().first_child());
+        SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+        m_adapter->InitByTemplate(&xmlNode);
         m_adapter->registerDataSetObserver(m_observer);
         for (int i = 0; i < m_adapter->getViewTypeCount(); i++)
         {
@@ -190,7 +191,8 @@ void STileView::UpdateVisibleItem(int iItem)
 {
     SItemPanel *pItem = GetItemPanel(iItem);
     SASSERT(pItem);
-    m_adapter->getView(iItem, pItem, &m_xmlTemplate.root().first_child());
+    SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+    m_adapter->getView(iItem, pItem, &xmlNode);
 }
 
 void STileView::onItemDataChanged(int iItem)
@@ -360,7 +362,8 @@ void STileView::UpdateVisibleItems()
             if (dwState & WndState_Hover)
                 m_pHoverItem = ii.pItem;
 
-            m_adapter->getView(iNewLastVisible, ii.pItem, &m_xmlTemplate.root().first_child());
+            SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+            m_adapter->getView(iNewLastVisible, ii.pItem, &xmlNode);
             if (bNewItem)
             {
                 ii.pItem->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
@@ -525,7 +528,8 @@ IItemPanel *STileView::HitTest(const POINT *pt) const
     SASSERT(pt);
     if (!pt)
         return NULL;
-    return HitTest(CPoint(*pt));
+    CPoint pt2(*pt);
+    return HitTest(pt2);
 }
 
 LRESULT STileView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)

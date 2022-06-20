@@ -647,7 +647,7 @@ void SPanel::OnScaleChanged(int nScale)
     __baseCls::OnScaleChanged(nScale);
     if (m_pSkinSb)
     {
-        SAutoRefPtr<ISkinObj> pSkin = m_pSkinSb;
+        SAutoRefPtr<ISkinObj> pSkin = (ISkinObj *)m_pSkinSb;
         GetScaleSkin(pSkin, nScale);
         m_pSkinSb = (SSkinScrollbar *)(ISkinObj *)pSkin;
         SSendMessage(WM_NCCALCSIZE);

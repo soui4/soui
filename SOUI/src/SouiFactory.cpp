@@ -61,32 +61,31 @@ STDMETHODIMP_(HRESULT) SouiFactory::CreateXmlDoc(THIS_ IXmlDoc **ppRet)
 
 HRESULT SouiFactory::CreateResProvider(THIS_ BUILTIN_RESTYPE resType, IObjRef **pObj)
 {
-	*pObj = NULL;
-	switch (resType)
-	{
-	case RES_PE:
-		*pObj = new SResProviderPE;
-		break;
-	case RES_FILE:
-		*pObj = new SResProviderFiles;
-		break;
-	default:
-		break;
-	}
-	return *pObj != NULL?S_OK:E_INVALIDARG;
+    *pObj = NULL;
+    switch (resType)
+    {
+    case RES_PE:
+        *pObj = new SResProviderPE;
+        break;
+    case RES_FILE:
+        *pObj = new SResProviderFiles;
+        break;
+    default:
+        break;
+    }
+    return *pObj != NULL ? S_OK : E_INVALIDARG;
 }
 
-HRESULT SouiFactory::CreateFuncSlot(THIS_ FunCallback fun, void *ctx,IEvtSlot **ppSlot)
+HRESULT SouiFactory::CreateFuncSlot(THIS_ FunCallback fun, void *ctx, IEvtSlot **ppSlot)
 {
-	*ppSlot = new FreeFunctionSlot(fun,ctx);
-	return S_OK;
+    *ppSlot = new FreeFunctionSlot(fun, ctx);
+    return S_OK;
 }
-
 
 SNSEND
 
 EXTERN_C HRESULT CreateSouiFactory(IObjRef **ppRet)
 {
-	*ppRet = new SOUI::SouiFactory();
-	return S_OK;
+    *ppRet = new SOUI::SouiFactory();
+    return S_OK;
 }

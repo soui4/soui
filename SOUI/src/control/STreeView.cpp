@@ -411,7 +411,7 @@ STreeView::STreeView()
     , m_hSelected(ITEM_NULL)
     , m_pVisibleMap(new VISIBLEITEMSMAP)
     , m_bWantTab(FALSE)
-	, SHostProxy(this)
+    , SHostProxy(this)
 {
     m_bFocusable = TRUE;
 
@@ -472,7 +472,8 @@ BOOL STreeView::SetAdapter(ITvAdapter *adapter)
 
     if (m_tvItemLocator)
     {
-        m_adapter->InitByTemplate(&m_xmlTemplate.root().first_child());
+        SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+        m_adapter->InitByTemplate(&xmlNode);
 
         m_tvItemLocator->SetAdapter(adapter);
 
@@ -908,7 +909,8 @@ void STreeView::UpdateVisibleItems()
         else
             ii.pItem->ModifyItemState(0, WndState_Hover);
 
-        m_adapter->getView(hItem, ii.pItem, &m_xmlTemplate.root().first_child());
+        SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+        m_adapter->getView(hItem, ii.pItem, &xmlNode);
         if (bNewItem)
         {
             ii.pItem->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
@@ -1024,7 +1026,8 @@ void STreeView::onBranchInvalidated(HSTREEITEM hBranch, BOOL bInvalidParents, BO
             SItemPanel *pItem = GetItemPanel(hParent);
             if (pItem)
             {
-                m_adapter->getView(hParent, pItem, &m_xmlTemplate.root().first_child());
+                SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+                m_adapter->getView(hParent, pItem, &xmlNode);
                 pItem->InvalidateRect(NULL);
             }
             hParent = m_adapter->GetParentItem(hParent);
@@ -1035,7 +1038,8 @@ void STreeView::onBranchInvalidated(HSTREEITEM hBranch, BOOL bInvalidParents, BO
         SItemPanel *pItem = GetItemPanel(hBranch);
         if (pItem)
         {
-            m_adapter->getView(hBranch, pItem, &m_xmlTemplate.root().first_child());
+            SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+            m_adapter->getView(hBranch, pItem, &xmlNode);
             pItem->InvalidateRect(NULL);
         }
     }
@@ -1058,7 +1062,8 @@ void STreeView::onBranchInvalidated(HSTREEITEM hBranch, BOOL bInvalidParents, BO
             }
             if (bInvalid)
             {
-                m_adapter->getView(hBranch, ii.pItem, &m_xmlTemplate.root().first_child());
+                SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+                m_adapter->getView(hBranch, ii.pItem, &xmlNode);
                 ii.pItem->InvalidateRect(NULL);
             }
         }
@@ -1098,7 +1103,8 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     {
         if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN || uMsg == WM_MBUTTONDOWN)
         { //交给panel处理
-            SItemPanel *pPanel = HitTest(CPoint(pt));
+            CPoint pt2(pt);
+            SItemPanel *pPanel = HitTest(pt2);
             if (!pPanel && m_hSelected) // hit in none-item area,so make item to killfocus
             {
                 SItemPanel *pSelItem = GetItemPanel(m_hSelected);
@@ -1224,7 +1230,8 @@ IItemPanel *STreeView::HitTest(const POINT *pt) const
     SASSERT(pt);
     if (!pt)
         return NULL;
-    return HitTest(CPoint(*pt));
+    CPoint pt2(*pt);
+    return HitTest(pt2);
 }
 
 SItemPanel *STreeView::HitTest(CPoint &pt) const

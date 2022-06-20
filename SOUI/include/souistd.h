@@ -4,41 +4,40 @@
 //#define SOUI_ENABLE_ACC
 
 #ifdef DLL_CORE
-# ifdef SOUI_EXPORTS
-#   define SOUI_EXP __declspec(dllexport)
-# else
-#   define SOUI_EXP __declspec(dllimport)
-# endif // SOUI_EXPORTS
+#ifdef SOUI_EXPORTS
+#define SOUI_EXP __declspec(dllexport)
 #else
-#   define SOUI_EXP
+#define SOUI_EXP __declspec(dllimport)
+#endif // SOUI_EXPORTS
+#else
+#define SOUI_EXP
 #endif
 
 // Change these values to use different versions
-#ifndef WINVER 
-#define WINVER        0x0500
-#define _WIN32_WINNT    0x0502
-#endif//WINVER
+#ifndef WINVER
+#define WINVER       0x0500
+#define _WIN32_WINNT 0x0502
+#endif // WINVER
 
 #ifndef _WIN32_IE
-#define _WIN32_IE    0x0601
+#define _WIN32_IE 0x0601
 #endif
 
 #ifndef _RICHEDIT_VER
-#define _RICHEDIT_VER    0x0200
+#define _RICHEDIT_VER 0x0200
 #endif
 
 #ifndef _CRT_NON_CONFORMING_SWPRINTFS
 #define _CRT_NON_CONFORMING_SWPRINTFS
-#endif//_CRT_NON_CONFORMING_SWPRINTFS
+#endif //_CRT_NON_CONFORMING_SWPRINTFS
 
-
-# pragma warning(disable:4661)
-# pragma warning(disable:4251)
-# pragma warning(disable:4100)    //unreferenced formal parameter
-# pragma warning(disable:4355)
+#pragma warning(disable : 4661)
+#pragma warning(disable : 4251)
+#pragma warning(disable : 4100) // unreferenced formal parameter
+#pragma warning(disable : 4355)
 #ifndef WIN32_LEAN_AND_MEAN
-#    define WIN32_LEAN_AND_MEAN
-#  endif
+#define WIN32_LEAN_AND_MEAN
+#endif
 #include <windows.h>
 
 #include <CommCtrl.h>
@@ -77,8 +76,7 @@
 #include <res.mgr/sfontpool.h>
 #include <res.mgr/sresprovider.h>
 
-
 #include <control/souictrls.h>
 #include <control/SMessageBox.h>
 
-#pragma comment(lib,"shlwapi.lib")
+#pragma comment(lib, "shlwapi.lib")

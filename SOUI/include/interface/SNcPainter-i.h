@@ -164,8 +164,8 @@ DECLARE_INTERFACE_(INcPainter, IObject)
     STDMETHOD_(HRESULT, AfterAttribute)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading, HRESULT hr) PURE;
 
-	//--------------------------------------------------------------------------------
-	STDMETHOD_(IWindow*,GetRoot)(THIS) PURE;
+    //--------------------------------------------------------------------------------
+    STDMETHOD_(IWindow *, GetRoot)(THIS) PURE;
 };
 
 SNSEND

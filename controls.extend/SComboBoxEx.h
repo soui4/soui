@@ -3,29 +3,29 @@
 #include "slistboxex.h"
 namespace SOUI
 {
-    
-    class EventOfComoboxExItem : public TplIEvtArgs<EventOfComoboxExItem>
+
+class EventOfComoboxExItem : public TplIEvtArgs<EventOfComoboxExItem> {
+    DEF_SOBJECT(EventOfComoboxExItem, L"on_event_of_comboxex_item")
+  public:
+    EventOfComoboxExItem(SObject *pSender, EventCmd *_pOrgEvt)
+        : TplIEvtArgs<EventOfComoboxExItem>(pSender)
+        , pOrgEvt(_pOrgEvt)
+        , bCancel(FALSE)
     {
-        DEF_SOBJECT(EventOfComoboxExItem,L"on_event_of_comboxex_item")
-    public:
-        EventOfComoboxExItem(SObject *pSender,EventCmd *_pOrgEvt )
-            :TplIEvtArgs<EventOfComoboxExItem>(pSender)
-            ,pOrgEvt(_pOrgEvt)
-            ,bCancel(FALSE)
-        {
+    }
 
-        }
-
-        enum{EventID=EVT_EXTERNAL_BEGIN + 300};
-
-        EventCmd    *  pOrgEvt;
-        BOOL           bCancel;
+    enum
+    {
+        EventID = EVT_EXTERNAL_BEGIN + 300
     };
 
-class  SComboBoxEx : public SComboBase
-{
+    EventCmd *pOrgEvt;
+    BOOL bCancel;
+};
+
+class SComboBoxEx : public SComboBase {
     DEF_SOBJECT(SComboBase, L"comboboxex")
-public:
+  public:
     /**
      * SComboBoxEx::SComboBoxEx
      * @brief    构造函数
@@ -38,23 +38,24 @@ public:
      * @brief    析构函数
      *
      * Describe  析构函数
-     */    
+     */
     virtual ~SComboBoxEx();
 
     /**
      * SComboBoxEx::SetCurSel
      * @brief    设置当前选中
      * @param    int iSel -- 选中索引
-     * 
+     *
      * Describe  设置当前选中
      */
     BOOL SetCurSel(int iSel)
     {
-        if(m_pListBox->SetCurSel(iSel))
+        if (m_pListBox->SetCurSel(iSel))
         {
             OnSelChanged();
             return TRUE;
-        }else
+        }
+        else
         {
             return FALSE;
         }
@@ -64,9 +65,9 @@ public:
      * SComboBoxEx::GetCurSel
      * @brief    获取选中索引
      * @return   返回int -- 选中索引
-     * 
+     *
      * Describe  获取选中索引
-     */ 
+     */
     int GetCurSel() const
     {
         return m_pListBox->GetCurSel();
@@ -76,14 +77,13 @@ public:
      * SComboBox::GetCount
      * @brief    获取下拉项个数
      * @return   返回int
-     * 
+     *
      * Describe  获取下拉项个数
-     */ 
-    int  GetCount() const
+     */
+    int GetCount() const
     {
         return m_pListBox->GetItemCount();
     }
-    
 
     /**
      * SComboBoxEx::GetItemData
@@ -107,9 +107,9 @@ public:
      */
     void SetItemData(UINT iItem, LPARAM lParam)
     {
-        m_pListBox->SetItemData(iItem,lParam);
+        m_pListBox->SetItemData(iItem, lParam);
     }
-    
+
     /**
      * SComboBoxEx::InsertItem
      * @brief    插入新项
@@ -121,21 +121,23 @@ public:
      * Describe  插入新项
      */
 
-    int InsertItem(UINT iPos,LPCTSTR pszText,int iIcon,LPARAM lParam)
+    int InsertItem(UINT iPos, LPCTSTR pszText, int iIcon, LPARAM lParam)
     {
-        int iInserted= m_pListBox->InsertItem(iPos,NULL,lParam);
-        if(iInserted!=-1)
+        int iInserted = m_pListBox->InsertItem(iPos, NULL, lParam);
+        if (iInserted != -1)
         {
-            SWindow *pWnd=m_pListBox->GetItemPanel(iInserted);
-            if(m_uTxtID!=0)
+            SWindow *pWnd = m_pListBox->GetItemPanel(iInserted);
+            if (m_uTxtID != 0)
             {
-                SWindow *pText=pWnd->FindChildByID(m_uTxtID);
-                if(pText) pText->SetWindowText(pszText);
+                SWindow *pText = pWnd->FindChildByID(m_uTxtID);
+                if (pText)
+                    pText->SetWindowText(pszText);
             }
-            if(m_uIconID!=0)
+            if (m_uIconID != 0)
             {
-                SImageWnd *pIcon=pWnd->FindChildByID2<SImageWnd>(m_uIconID);
-                if(pIcon) pIcon->SetIcon(iIcon);
+                SImageWnd *pIcon = pWnd->FindChildByID2<SImageWnd>(m_uIconID);
+                if (pIcon)
+                    pIcon->SetIcon(iIcon);
             }
         }
         return iInserted;
@@ -162,7 +164,7 @@ public:
     {
         return m_pListBox->DeleteAllItems();
     }
-    
+
     /**
      * SComboBoxEx::GetLBText
      * @brief    获取文本
@@ -172,10 +174,12 @@ public:
      */
     SStringT GetLBText(int iItem);
 
-    SListBoxEx * GetListBox(){return m_pListBox;}
+    SListBoxEx *GetListBox()
+    {
+        return m_pListBox;
+    }
 
-protected:
-    
+  protected:
     /**
      * SComboBox::OnSelChanged
      * @brief    下拉列表selected事件
@@ -183,14 +187,15 @@ protected:
      * Describe  下拉列表selected事件
      */
     virtual void OnSelChanged();
-protected:
+
+  protected:
     /**
      * SComboBoxEx::FireEvent
      * @brief    通知消息
-     * @param    IEvtArgs &evt -- 事件对象 
-     * 
+     * @param    IEvtArgs &evt -- 事件对象
+     *
      * Describe  此函数是消息响应函数
-     */ 
+     */
     virtual BOOL FireEvent(IEvtArgs &evt);
 
     /**
@@ -208,8 +213,8 @@ protected:
      * @param    返回int
      *
      * Describe  获取下拉列表高度
-     */    
-    virtual int  GetListBoxHeight();
+     */
+    virtual int GetListBoxHeight();
 
     /**
      * SComboBoxEx::OnDropDown
@@ -229,17 +234,15 @@ protected:
      */
     virtual void OnDestroyDropDown(SDropDownWnd *pDropDown);
 
-protected:
-
+  protected:
     SOUI_ATTRS_BEGIN()
-        ATTR_UINT(L"id_text", m_uTxtID, FALSE)
-        ATTR_UINT(L"id_icon", m_uIconID, FALSE)
+    ATTR_UINT(L"id_text", m_uTxtID, FALSE)
+    ATTR_UINT(L"id_icon", m_uIconID, FALSE)
     SOUI_ATTRS_END()
 
-    SListBoxEx *m_pListBox;  /**< SListBox指针 */
-    UINT   m_uTxtID;  /**< 文本ID */
-    UINT   m_uIconID; /**< 图标ID */
+    SListBoxEx *m_pListBox; /**< SListBox指针 */
+    UINT m_uTxtID;          /**< 文本ID */
+    UINT m_uIconID;         /**< 图标ID */
 };
 
-
-}
+} // namespace SOUI

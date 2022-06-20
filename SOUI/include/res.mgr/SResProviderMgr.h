@@ -3,7 +3,7 @@
 #include <interface/sresprovidermgr-i.h>
 #include <atl.mini/scomcli.h>
 #include <helper/SCriticalSection.h>
-#include <res.mgr/SUiDef.h>
+#include <layout/SLayoutSize.h>
 
 SNSBEGIN
 
@@ -64,8 +64,8 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
     SLayoutSize GetLayoutSize(int idx);
 
   public: // helper
-    // find the match resprovider from tail to head, which contains the specified resource type and
-    // name
+          // find the match resprovider from tail to head, which contains the specified resource
+          // type and name
     IResProvider *GetMatchResProvider(LPCTSTR pszType, LPCTSTR pszResName);
 
     //使用type:name形式的字符串加载图片

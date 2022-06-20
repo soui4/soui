@@ -172,10 +172,10 @@ DECLARE_INTERFACE_(ILvAdapter, IObjRef)
     /**
      * @brief query user defined interface from adapter
      * @param REFGUID id-- __uuidof(interface)
-	 * @param [out] IObjRef ** ppObj -- the return interface
+     * @param [out] IObjRef ** ppObj -- the return interface
      * @return HRESULT S_OK--SUCCEED
      */
-	STDMETHOD_(HRESULT,QueryInterface)(THIS_ REFGUID id,IObjRef **ppObj) PURE;
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppObj) PURE;
 };
 
 #undef INTERFACE
@@ -370,8 +370,8 @@ DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
     (THIS_ HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
 };
 
-#define ITEM_NULL  0
-#define ITEM_ROOT  0xFFFF0000
+#define ITEM_NULL 0
+#define ITEM_ROOT 0xFFFF0000
 
 typedef enum DATA_INDEX
 {
@@ -597,13 +597,13 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * pXmlTemplate) PURE;
 
-	 /**
+    /**
      * @brief query user defined interface from adapter
      * @param REFGUID id-- __uuidof(interface)
-	 * @param [out] IObjRef ** ppObj -- the return interface
+     * @param [out] IObjRef ** ppObj -- the return interface
      * @return HRESULT S_OK--SUCCEED
      */
-	STDMETHOD_(HRESULT,QueryInterface)(THIS_ REFGUID id,IObjRef **ppObj) PURE;
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppObj) PURE;
 };
 
 SNSEND

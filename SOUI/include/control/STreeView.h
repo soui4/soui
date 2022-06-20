@@ -79,7 +79,7 @@ class SOUI_EXP STreeViewItemLocator : public TObjRefImpl<ITreeViewItemLocator> {
 
 class SOUI_EXP STreeView
     : public TPanelProxy<ITreeView>
-	, protected SHostProxy
+    , protected SHostProxy
     , protected IItemContainer {
     DEF_SOBJECT(SPanel, L"treeview")
     friend class STreeViewDataSetObserver;
@@ -168,7 +168,7 @@ class SOUI_EXP STreeView
 
     virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture); //设置or释放鼠标捕获
     virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const; //获得表项的显示位置
-    virtual BOOL IsItemRedrawDelay() const;                //指示表项的更新方式
+    virtual BOOL IsItemRedrawDelay() const; //指示表项的更新方式
   protected:
     void UpdateScrollBar();
     void UpdateVisibleItems();

@@ -44,7 +44,7 @@ int SSkinImgList::GetStates() const
 
 void SSkinImgList::OnInitFinished(IXmlNode *xmlNode)
 {
-	__baseCls::OnInitFinished(xmlNode);
+    __baseCls::OnInitFinished(xmlNode);
     if (!m_bLazyLoad && !m_strSrc.IsEmpty())
     {
         m_pImg.Attach(LOADIMAGE2(m_strSrc));
@@ -72,7 +72,7 @@ UINT SSkinImgList::GetExpandMode() const
         return MAKELONG(EM_NULL, m_filterLevel);
 }
 
-LRESULT SSkinImgList::OnAttrSrc(const SStringW &value, BOOL bLoading)
+HRESULT SSkinImgList::OnAttrSrc(const SStringW &value, BOOL bLoading)
 {
     m_strSrc = value;
     if (!bLoading)
@@ -580,7 +580,7 @@ SSkinShape::SSkinShape()
 
 void SSkinShape::OnInitFinished(IXmlNode *pNode)
 {
-	__baseCls::OnInitFinished(pNode);
+    __baseCls::OnInitFinished(pNode);
     SXmlNode xmlNode(pNode);
     SXmlNode xmlSolid = xmlNode.child(L"solid");
     if (xmlSolid)

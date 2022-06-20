@@ -83,8 +83,8 @@ class StdFunctionSlot : public TObjRefImpl<IEvtSlot> {
             return FALSE;
         const StdFunctionSlot *psour = static_cast<const StdFunctionSlot *>(sour);
         SASSERT(psour);
-        //not: as we don't know how to compare two std::function object, here just return TRUE.
-        //such a behavior will make it's impossible to subscribe a event with two diffent slots.
+        // not: as we don't know how to compare two std::function object, here just return TRUE.
+        // such a behavior will make it's impossible to subscribe a event with two diffent slots.
         return TRUE;
     }
     STDMETHOD_(UINT, GetSlotType)(THIS) SCONST OVERRIDE

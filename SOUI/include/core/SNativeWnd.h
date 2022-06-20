@@ -209,9 +209,11 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
 
     STDMETHOD_(BOOL, IsWindowEnabled)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) OVERRIDE;
+    STDMETHOD_(BOOL, ModifyStyle)
+    (THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) OVERRIDE;
 
-    STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) OVERRIDE;
+    STDMETHOD_(BOOL, ModifyStyleEx)
+    (THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, SetWindowPos)
     (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) OVERRIDE;
@@ -262,11 +264,11 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
 
     STDMETHOD_(BOOL, ShowCaret)(THIS) OVERRIDE;
 
-	STDMETHOD_(HWND, GetCapture)(THIS) OVERRIDE;
+    STDMETHOD_(HWND, GetCapture)(THIS) OVERRIDE;
 
-	STDMETHOD_(HWND, SetCapture)(THIS) OVERRIDE;
+    STDMETHOD_(HWND, SetCapture)(THIS) OVERRIDE;
 
-	STDMETHOD_(BOOL, ReleaseCapture)(THIS) OVERRIDE;
+    STDMETHOD_(BOOL, ReleaseCapture)(THIS) OVERRIDE;
 
     STDMETHOD_(HWND, SetFocus)(THIS) OVERRIDE;
 

@@ -126,7 +126,7 @@ BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
         pBtn->SetID(nID);
 
         SStringT strText = OnGetButtonText(nID);
-		SStringW strAccel;
+        SStringW strAccel;
         if (strText.IsEmpty())
         {
             SStringW strBtnText = g_msgBtnText[uType].btnInfo[i].szText;
@@ -137,15 +137,15 @@ BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
                 strBtnText = nodeTxt.Text();
                 strBtnText.TrimBlank();
                 strBtnText = GETSTRING(strBtnText);
-				strAccel = nodeTxt.attribute(L"accel").as_string();
+                strAccel = nodeTxt.attribute(L"accel").as_string();
             }
             //从翻译引擎中翻译
             strText = S_CW2T(GetRoot()->tr(strBtnText));
         }
-		if(!strAccel.IsEmpty())
-		{
-			pBtn->SetAttribute(L"accel",strAccel,TRUE);
-		}
+        if (!strAccel.IsEmpty())
+        {
+            pBtn->SetAttribute(L"accel", strAccel, TRUE);
+        }
         pBtn->SetWindowText(strText);
     }
 

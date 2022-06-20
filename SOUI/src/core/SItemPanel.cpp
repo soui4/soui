@@ -15,8 +15,8 @@ SNSBEGIN
 SOsrPanel::SOsrPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer)
     : m_pHostProxy(pFrameHost)
     , m_pItemContainer(pItemContainer)
-	, m_dwData(0)
-	, m_lpItemIndex(-1)
+    , m_dwData(0)
+    , m_lpItemIndex(-1)
 {
     SetContainer(this);
     SwndContainerImpl::SetRoot(this);
@@ -40,12 +40,12 @@ void SOsrPanel::OnFinalRelease()
 
 BOOL SOsrPanel::InitFromXml(THIS_ IXmlNode *pNode)
 {
-	BOOL bRet = __baseCls::InitFromXml(pNode);
-	if(bRet)
-	{
-		BuildWndTreeZorder();
-	}
-	return bRet;
+    BOOL bRet = __baseCls::InitFromXml(pNode);
+    if (bRet)
+    {
+        BuildWndTreeZorder();
+    }
+    return bRet;
 }
 
 LRESULT SOsrPanel::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -147,37 +147,37 @@ RECT SOsrPanel::GetContainerRect() const
 
 IRenderTarget *SOsrPanel::OnGetRenderTarget(LPCRECT rc, GrtFlag gdcFlags)
 {
-	IRenderTarget *pRT = NULL;
-	if (m_pItemContainer->IsItemRedrawDelay() || gdcFlags == GRT_NODRAW)
-	{
-		GETRENDERFACTORY->CreateRenderTarget(&pRT, 0,0);
-		return pRT;
-	}
+    IRenderTarget *pRT = NULL;
+    if (m_pItemContainer->IsItemRedrawDelay() || gdcFlags == GRT_NODRAW)
+    {
+        GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
+        return pRT;
+    }
 
-	CRect rcHost(rc);
-	FrameToHost(&rcHost);
-	pRT = m_pHostProxy->OnGetHostRenderTarget(&rcHost,GRT_PAINTBKGND);
-	CRect rcItem=GetItemRect();
-	pRT->OffsetViewportOrg(rcItem.left,rcItem.top,NULL);
-	pRT->PushClipRect(rc,RGN_AND);
+    CRect rcHost(rc);
+    FrameToHost(&rcHost);
+    pRT = m_pHostProxy->OnGetHostRenderTarget(&rcHost, GRT_PAINTBKGND);
+    CRect rcItem = GetItemRect();
+    pRT->OffsetViewportOrg(rcItem.left, rcItem.top, NULL);
+    pRT->PushClipRect(rc, RGN_AND);
 
     return pRT;
 }
 
 void SOsrPanel::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags)
 {
-	if (m_pItemContainer->IsItemRedrawDelay()||gdcFlags == GRT_NODRAW)
-	{
-		pRT->Release();
-		return;
-	}
-	pRT->PopClip();
+    if (m_pItemContainer->IsItemRedrawDelay() || gdcFlags == GRT_NODRAW)
+    {
+        pRT->Release();
+        return;
+    }
+    pRT->PopClip();
 
-	CRect rcHost(rc);
-	FrameToHost(&rcHost);
-	CRect rcItem=GetItemRect();
-	pRT->OffsetViewportOrg(-rcItem.left,-rcItem.top,NULL);
-	m_pHostProxy->OnReleaseHostRenderTarget(pRT,&rcHost,GRT_PAINTBKGND);
+    CRect rcHost(rc);
+    FrameToHost(&rcHost);
+    CRect rcItem = GetItemRect();
+    pRT->OffsetViewportOrg(-rcItem.left, -rcItem.top, NULL);
+    m_pHostProxy->OnReleaseHostRenderTarget(pRT, &rcHost, GRT_PAINTBKGND);
 }
 
 void SOsrPanel::OnRedraw(LPCRECT rc)
@@ -301,7 +301,6 @@ void SOsrPanel::Draw(IRenderTarget *pRT, const CRect &rc)
     }
 }
 
-
 BOOL SOsrPanel::NeedRedrawWhenStateChange()
 {
     return TRUE;
@@ -317,7 +316,6 @@ void SOsrPanel::SetItemCapture(BOOL bCapture)
 {
     m_pItemContainer->OnItemSetCapture(this, bCapture);
 }
-
 
 BOOL SOsrPanel::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
 {
@@ -363,7 +361,6 @@ void SOsrPanel::FrameToHost(RECT *rc) const
     ::OffsetRect(rc, rcItem.left, rcItem.top);
 }
 
-
 //不继承宿主的字体，从指定的字体或者系统字体开始，避免在GetRenderTarget时还需要从宿主窗口到获取当前的文字属性。
 void SOsrPanel::BeforePaint(IRenderTarget *pRT, SPainter &painter)
 {
@@ -408,11 +405,10 @@ void SOsrPanel::OnUpdateCursor()
     m_pHostProxy->GetHostContainer()->OnUpdateCursor();
 }
 
-
 BOOL SOsrPanel::IsItemInClip(const SMatrix &mtx,
-                              const CRect &rcClip,
-                              const IRegionS *clipRgn,
-                              const CRect &rcItem)
+                             const CRect &rcClip,
+                             const IRegionS *clipRgn,
+                             const CRect &rcItem)
 {
     if (!mtx.isIdentity()) // don't clip any item if matrix is not identify.
         return TRUE;
@@ -423,79 +419,73 @@ BOOL SOsrPanel::IsItemInClip(const SMatrix &mtx,
 
 LPARAM SOsrPanel::GetItemIndex() const
 {
-	return m_lpItemIndex;
+    return m_lpItemIndex;
 }
 
 void SOsrPanel::SetItemIndex(LPARAM lp)
 {
-	m_lpItemIndex = lp;
+    m_lpItemIndex = lp;
 }
 
 void SOsrPanel::SetItemData(LPARAM dwData)
 {
-	m_dwData = dwData;
+    m_dwData = dwData;
 }
 
 LPARAM SOsrPanel::GetItemData() const
 {
-	return m_dwData;
+    return m_dwData;
 }
-
-
-
 
 //////////////////////////////////////////////////////////////////////////
-SItemPanel *SItemPanel::Create(IHostProxy  *pFrameHost,
-							 SXmlNode xmlNode,
-							 IItemContainer *pItemContainer)
+SItemPanel *SItemPanel::Create(IHostProxy *pFrameHost,
+                               SXmlNode xmlNode,
+                               IItemContainer *pItemContainer)
 {
-	SItemPanel *pItem = new SItemPanel(pFrameHost, pItemContainer);
-	pItem->InitFromXml(&xmlNode);
-	SApplication::getSingletonPtr()->SetSwndDefAttr(pItem);
-	return pItem;
+    SItemPanel *pItem = new SItemPanel(pFrameHost, pItemContainer);
+    pItem->InitFromXml(&xmlNode);
+    SApplication::getSingletonPtr()->SetSwndDefAttr(pItem);
+    return pItem;
 }
 
-
 SItemPanel::SItemPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer)
-:TOsrPanelProxy<IItemPanel>(pFrameHost,pItemContainer)
-, m_crBk(CR_INVALID)
-, m_crHover(CR_INVALID)
-, m_crSelBk(RGBA(0, 0, 128, 255))
+    : TOsrPanelProxy<IItemPanel>(pFrameHost, pItemContainer)
+    , m_crBk(CR_INVALID)
+    , m_crHover(CR_INVALID)
+    , m_crSelBk(RGBA(0, 0, 128, 255))
 {
-
 }
 
 void SItemPanel::SetSkin(ISkinObj *pSkin)
 {
-	m_pBgSkin = pSkin;
+    m_pBgSkin = pSkin;
 }
 
 void SItemPanel::SetColor(COLORREF crBk, COLORREF crSelBk)
 {
-	m_crBk = crBk;
-	m_crSelBk = crSelBk;
+    m_crBk = crBk;
+    m_crSelBk = crSelBk;
 }
 
 COLORREF SItemPanel::GetBkgndColor() const
 {
-	if ((m_dwState & WndState_Check) && m_crSelBk != CR_INVALID)
-	{
-		return m_crSelBk;
-	}
-	if ((m_dwState & WndState_Hover) && m_crHover != CR_INVALID)
-	{
-		return m_crHover;
-	}
-	return m_crBk;
+    if ((m_dwState & WndState_Check) && m_crSelBk != CR_INVALID)
+    {
+        return m_crSelBk;
+    }
+    if ((m_dwState & WndState_Hover) && m_crHover != CR_INVALID)
+    {
+        return m_crHover;
+    }
+    return m_crBk;
 }
 
 BOOL SItemPanel::OnFireEvent(IEvtArgs *evt)
 {
-	EventOfPanel evt2(m_pHostProxy->GetHost());
-	evt2.pPanel = this;
-	evt2.pOrgEvt = evt;
-	return m_pHostProxy->OnHostFireEvent(&evt2);
+    EventOfPanel evt2(m_pHostProxy->GetHost());
+    evt2.pPanel = this;
+    evt2.pOrgEvt = evt;
+    return m_pHostProxy->OnHostFireEvent(&evt2);
 }
-
 
 SNSEND

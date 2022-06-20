@@ -13,7 +13,6 @@
 
 SNSBEGIN
 
-
 //////////////////////////////////////////////////////////////////////////
 //    SDummyWnd
 //////////////////////////////////////////////////////////////////////////
@@ -282,7 +281,7 @@ SHostWnd::SHostWnd(LPCTSTR pszResName /*= NULL*/)
     , m_dwThreadID(0)
     , m_AniState(0)
     , m_pRoot(new SRootWindow(this))
-	, m_pNcPainter(new SNcPainter(this))
+    , m_pNcPainter(new SNcPainter(this))
 {
     SwndContainerImpl::SetRoot(m_pRoot);
     m_msgMouse.message = 0;
@@ -422,7 +421,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     SXmlNode xmlScript = xmlNode.child(L"script");
     if (m_pScriptModule && xmlScript)
     {
-		xmlScript.set_userdata(1);
+        xmlScript.set_userdata(1);
         SXmlAttr attrSrc = xmlScript.attribute(L"src");
         if (attrSrc)
         {
@@ -450,9 +449,9 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             }
         }
     }
-	SXmlNode xmlNcPainter = xmlNode.child(SNcPainter::GetClassName());
-	xmlNcPainter.set_userdata(1);
-	m_pNcPainter->InitFromXml(&xmlNcPainter);
+    SXmlNode xmlNcPainter = xmlNode.child(SNcPainter::GetClassName());
+    xmlNcPainter.set_userdata(1);
+    m_pNcPainter->InitFromXml(&xmlNcPainter);
 
     DWORD dwStyle = SNativeWnd::GetStyle();
     DWORD dwExStyle = SNativeWnd::GetExStyle();
@@ -542,8 +541,8 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 
     int nWidth = m_szAppSetted.cx;
     int nHeight = m_szAppSetted.cy;
-	CSize szNc = m_pNcPainter->GetNcSize();
-	CSize szRoot = GetRoot()->GetDesiredSize(nWidth, nHeight);
+    CSize szNc = m_pNcPainter->GetNcSize();
+    CSize szRoot = GetRoot()->GetDesiredSize(nWidth, nHeight);
 
     ILayoutParam *pLayoutParam = GetRoot()->GetLayoutParam();
     if (nWidth == 0 && pLayoutParam->IsSpecifiedSize(Horz))
@@ -619,7 +618,7 @@ void SHostWnd::_Redraw()
 
 void SHostWnd::OnPrint(HDC dc, UINT uFlags)
 {
-	if(!(GetRoot()->IsLayoutDirty() || IsWindowVisible()))
+    if (!(GetRoot()->IsLayoutDirty() || IsWindowVisible()))
         return;
     SMatrix mtx = GetRoot()->_GetMatrixEx();
     //刷新前重新布局，会自动检查布局脏标志
@@ -672,12 +671,12 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         m_rgnInvalidate->GetRgnBox(&rcInvalid);
         m_rgnInvalidate->Clear();
     }
-	if(dc)
-	{//由系统发的WM_PAINT或者WM_PRINT产生的重绘请求
-		CRect rcUpdate;
-		::GetClipBox(dc,&rcUpdate);
-		rcInvalid = rcInvalid|rcUpdate;
-	}
+    if (dc)
+    { //由系统发的WM_PAINT或者WM_PRINT产生的重绘请求
+        CRect rcUpdate;
+        ::GetClipBox(dc, &rcUpdate);
+        rcInvalid = rcInvalid | rcUpdate;
+    }
 
     //渲染非背景混合窗口,设置m_bRending=TRUE以保证只执行一次UpdateHost
     m_bRendering = TRUE;
@@ -690,16 +689,16 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
     m_lstUpdatedRect.RemoveAll();
     m_bRendering = FALSE;
 
-	IBitmapS * pCache = (IBitmapS*)m_memRT->GetCurrentObject(OT_BITMAP);
-	if(!OnCacheUpdated(pCache,rcInvalid))
-		UpdateHost(dc, rcInvalid);
+    IBitmapS *pCache = (IBitmapS *)m_memRT->GetCurrentObject(OT_BITMAP);
+    if (!OnCacheUpdated(pCache, rcInvalid))
+        UpdateHost(dc, rcInvalid);
 }
 
 void SHostWnd::OnPaint(HDC dc)
 {
     PAINTSTRUCT ps;
     dc = ::BeginPaint(m_hWnd, &ps);
-	OnPrint(m_hostAttr.m_bTranslucent ? NULL : dc);
+    OnPrint(m_hostAttr.m_bTranslucent ? NULL : dc);
     ::EndPaint(m_hWnd, &ps);
 }
 
@@ -725,7 +724,8 @@ BOOL SHostWnd::OnLoadLayoutFromResourceID(const SStringT &resId)
     SXmlDoc xmlDoc;
     if (LOADXML(xmlDoc, resId))
     {
-        return InitFromXml(&xmlDoc.root().child(L"SOUI"));
+        SXmlNode xmlNode = xmlDoc.root().child(L"SOUI");
+        return InitFromXml(&xmlNode);
     }
     else
     {
@@ -782,7 +782,7 @@ void SHostWnd::OnDestroy()
 
 void SHostWnd::OnSize(UINT nType, CSize size)
 {
-	SetMsgHandled(FALSE);//chain wm_size to ncpainter.
+    SetMsgHandled(FALSE); // chain wm_size to ncpainter.
     if (IsIconic())
         return;
 
@@ -885,10 +885,10 @@ LRESULT SHostWnd::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             SNativeWnd::SetFocus(); //子窗口情况下才自动获取焦点
         break;
     case WM_LBUTTONUP:
-		if(!(SNativeWnd::GetStyle()&WS_CHILD))
-		{
-			m_pNcPainter->OnLButtonUp(wParam,lParam);
-		}
+        if (!(SNativeWnd::GetStyle() & WS_CHILD))
+        {
+            m_pNcPainter->OnLButtonUp(wParam, lParam);
+        }
     case WM_MBUTTONUP:
     case WM_RBUTTONUP:
         m_msgMouse.message = 0;
@@ -990,13 +990,13 @@ void SHostWnd::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdc
         pRT->PopClip();
         if (!m_bRendering)
         {
-			IBitmapS * pCache = (IBitmapS*)m_memRT->GetCurrentObject(OT_BITMAP);
-			if(!OnCacheUpdated(pCache,rc))
-			{
-				HDC dc = GetDC();
-				UpdateHost(dc, rc);
-				ReleaseDC(dc);
-			}
+            IBitmapS *pCache = (IBitmapS *)m_memRT->GetCurrentObject(OT_BITMAP);
+            if (!OnCacheUpdated(pCache, rc))
+            {
+                HDC dc = GetDC();
+                UpdateHost(dc, rc);
+                ReleaseDC(dc);
+            }
         }
         else
         {
@@ -1006,9 +1006,9 @@ void SHostWnd::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdc
     pRT->Release();
 }
 
-BOOL SHostWnd::OnCacheUpdated(IBitmapS * pCache, LPCRECT pRect)
+BOOL SHostWnd::OnCacheUpdated(IBitmapS *pCache, LPCRECT pRect)
 {
-	return FALSE;
+    return FALSE;
 }
 
 void SHostWnd::UpdateHost(HDC dc, LPCRECT rcInvalid, BYTE byAlpha)
@@ -1095,11 +1095,11 @@ void SHostWnd::UpdateTooltip()
         BOOL bOK = pHover->UpdateToolTip(pt, tipInfo);
         if (bOK)
         {
-			_SetToolTipInfo(&tipInfo,FALSE);
+            _SetToolTipInfo(&tipInfo, FALSE);
         }
         else
         { // hide tooltip
-			_SetToolTipInfo(NULL,FALSE);
+            _SetToolTipInfo(NULL, FALSE);
         }
     }
 }
@@ -1586,7 +1586,7 @@ CRect SHostWnd::GetWindowRect() const
 CRect SHostWnd::GetClientRect() const
 {
     CRect rc;
-	SNativeWnd::GetClientRect(&rc);
+    SNativeWnd::GetClientRect(&rc);
     return rc;
 }
 
@@ -1819,16 +1819,17 @@ void SHostWnd::OnSysCommand(UINT nID, CPoint lParam)
     }
 }
 
-void SHostWnd::_SetToolTipInfo(const SwndToolTipInfo * info,BOOL bNcTip)
+void SHostWnd::_SetToolTipInfo(const SwndToolTipInfo *info, BOOL bNcTip)
 {
-	if(info)
-	{
-		TIPID id = { info->swnd, info->dwCookie,bNcTip };
-		m_pTipCtrl->UpdateTip(&id, info->rcTarget, info->strTip, GetScale());
-	}else
-	{
-		m_pTipCtrl->ClearTip();
-	}
+    if (info)
+    {
+        TIPID id = { info->swnd, info->dwCookie, bNcTip };
+        m_pTipCtrl->UpdateTip(&id, info->rcTarget, info->strTip, GetScale());
+    }
+    else
+    {
+        m_pTipCtrl->ClearTip();
+    }
 }
 
 //////////////////////////////////////////////////////////////////
@@ -1846,8 +1847,8 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
     STransformation xform;
     BOOL bMore = m_pHostWnd->m_hostAnimation->getTransformation(STime::GetCurrentTimeMs(), &xform);
     SMatrix mtx = xform.getMatrix();
-    mtx.preTranslate(-m_rcInit.left, -m_rcInit.top);
-    mtx.postTranslate(m_rcInit.left, m_rcInit.top);
+    mtx.preTranslate((int)-m_rcInit.left, (int)-m_rcInit.top);
+    mtx.postTranslate((int)m_rcInit.left, (int)m_rcInit.top);
     if (mtx.rectStaysRect())
     {
         SRect rc = SRect::IMake(m_rcInit);

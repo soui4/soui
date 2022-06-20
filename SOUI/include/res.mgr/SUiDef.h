@@ -1,7 +1,6 @@
 ﻿#pragma once
 #include <core/SSingleton2.h>
 #include <interface/obj-ref-i.h>
-//#include <helper/obj-ref-impl.hpp>
 #include <interface/SResProvider-i.h>
 
 #include <res.mgr/SSkinPool.h>

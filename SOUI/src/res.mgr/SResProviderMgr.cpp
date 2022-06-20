@@ -1,8 +1,8 @@
 ﻿#include "souistd.h"
 #include "res.mgr/SResProviderMgr.h"
 #include "res.mgr/SResProvider.h"
-
 #include "helper/SplitString.h"
+#include <res.mgr/SUiDef.h>
 
 SNSBEGIN
 

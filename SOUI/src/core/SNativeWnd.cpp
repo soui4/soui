@@ -632,12 +632,12 @@ HWND SNativeWnd::SetCapture()
 
 HWND SNativeWnd::GetCapture()
 {
-	return ::GetCapture();
+    return ::GetCapture();
 }
 
 BOOL SNativeWnd::ReleaseCapture()
 {
-	return ::ReleaseCapture();
+    return ::ReleaseCapture();
 }
 
 BOOL SNativeWnd::ShowCaret()

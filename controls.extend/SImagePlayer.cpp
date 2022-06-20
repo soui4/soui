@@ -1,93 +1,97 @@
 #include "stdafx.h"
 #include "SImagePlayer.h"
 
-
 namespace SOUI
 {
 
-SImagePlayer::SImagePlayer() :m_aniSkin(NULL), m_iCurFrame(0),m_nNextInterval(0)
+SImagePlayer::SImagePlayer()
+    : m_aniSkin(NULL)
+    , m_iCurFrame(0)
+    , m_nNextInterval(0)
 {
-
 }
 
 SImagePlayer::~SImagePlayer()
 {
 }
 
-
-void SImagePlayer::OnPaint( IRenderTarget *pRT )
+void SImagePlayer::OnPaint(IRenderTarget *pRT)
 {
-	__super::OnPaint(pRT);
-	if(m_aniSkin)
-	{		
-		m_aniSkin->DrawByIndex(pRT, GetWindowRect(),m_iCurFrame);
-	}
+    __super::OnPaint(pRT);
+    if (m_aniSkin)
+    {
+        m_aniSkin->DrawByIndex(pRT, GetWindowRect(), m_iCurFrame);
+    }
 }
 
-void SImagePlayer::OnShowWindow( BOOL bShow, UINT nStatus )
+void SImagePlayer::OnShowWindow(BOOL bShow, UINT nStatus)
 {
-	__super::OnShowWindow(bShow,nStatus);
-	if(!bShow)
-	{
+    __super::OnShowWindow(bShow, nStatus);
+    if (!bShow)
+    {
         GetContainer()->UnregisterTimelineHandler(this);
-	}else if(m_aniSkin && m_aniSkin->GetStates()>1)
-	{
+    }
+    else if (m_aniSkin && m_aniSkin->GetStates() > 1)
+    {
         GetContainer()->RegisterTimelineHandler(this);
-        if(m_aniSkin->GetFrameDelay()==0)
+        if (m_aniSkin->GetFrameDelay() == 0)
             m_nNextInterval = 90;
         else
-            m_nNextInterval = m_aniSkin->GetFrameDelay()*10;
-	}
+            m_nNextInterval = m_aniSkin->GetFrameDelay() * 10;
+    }
 }
 
 void SImagePlayer::OnNextFrame()
 {
     m_nNextInterval -= 10;
-    if(m_nNextInterval <= 0 && m_aniSkin)
+    if (m_nNextInterval <= 0 && m_aniSkin)
     {
-        int nStates=m_aniSkin->GetStates();
+        int nStates = m_aniSkin->GetStates();
         m_iCurFrame++;
-        m_iCurFrame%=nStates;
+        m_iCurFrame %= nStates;
         Invalidate();
 
-        if(m_aniSkin->GetFrameDelay()==0)
+        if (m_aniSkin->GetFrameDelay() == 0)
             m_nNextInterval = 60;
         else
-            m_nNextInterval =m_aniSkin->GetFrameDelay()*10;	
+            m_nNextInterval = m_aniSkin->GetFrameDelay() * 10;
     }
 }
 
-HRESULT SImagePlayer::OnAttrSkin( const SStringW & strValue, BOOL bLoading )
+HRESULT SImagePlayer::OnAttrSkin(const SStringW &strValue, BOOL bLoading)
 {
-	ISkinObj *pSkin = SSkinPoolMgr::getSingleton().GetSkin(strValue,GetScale());
-	if(!pSkin) return E_FAIL;
-	if(!pSkin->IsClass(SSkinAni::GetClassName())) return S_FALSE;
-	m_aniSkin=static_cast<SSkinAni*>(pSkin);
-    if(!bLoading)
+    ISkinObj *pSkin = SSkinPoolMgr::getSingleton().GetSkin(strValue, GetScale());
+    if (!pSkin)
+        return E_FAIL;
+    if (!pSkin->IsClass(SSkinAni::GetClassName()))
+        return S_FALSE;
+    m_aniSkin = static_cast<SSkinAni *>(pSkin);
+    if (!bLoading)
     {
         m_iCurFrame = 0;
-        if(m_aniSkin->GetFrameDelay()==0)
+        if (m_aniSkin->GetFrameDelay() == 0)
             m_nNextInterval = 90;
         else
-            m_nNextInterval =m_aniSkin->GetFrameDelay()*10;	
+            m_nNextInterval = m_aniSkin->GetFrameDelay() * 10;
     }
-	return bLoading?S_OK:S_FALSE;
+    return bLoading ? S_OK : S_FALSE;
 }
 
-CSize SImagePlayer::GetDesiredSize( LPCRECT /*pRcContainer*/ )
+CSize SImagePlayer::GetDesiredSize(LPCRECT /*pRcContainer*/)
 {
-	CSize sz;
-	if(m_aniSkin) sz=m_aniSkin->GetSkinSize();
-	return sz;
+    CSize sz;
+    if (m_aniSkin)
+        sz = m_aniSkin->GetSkinSize();
+    return sz;
 }
 
-BOOL SImagePlayer::ShowImageFile( LPCTSTR pszFileName )
+BOOL SImagePlayer::ShowImageFile(LPCTSTR pszFileName)
 {
     GetContainer()->UnregisterTimelineHandler(this);
-    return _PlayFile(pszFileName,TRUE);
+    return _PlayFile(pszFileName, TRUE);
 }
 
-int  SImagePlayer::GetFrameCount()
+int SImagePlayer::GetFrameCount()
 {
     if (m_aniSkin)
     {
@@ -99,7 +103,7 @@ int  SImagePlayer::GetFrameCount()
 SIZE SImagePlayer::GetImageSize()
 {
     CSize size = GetDesiredSize(NULL);
-    SIZE sizeRet = {size.cx, size.cy};
+    SIZE sizeRet = { size.cx, size.cy };
     return sizeRet;
 }
 
@@ -119,20 +123,24 @@ void SImagePlayer::Resume()
     }
 }
 
-BOOL SImagePlayer::_PlayFile( LPCTSTR pszFileName, BOOL bGif )
+BOOL SImagePlayer::_PlayFile(LPCTSTR pszFileName, BOOL bGif)
 {
-    SStringW key=S_CT2W(pszFileName);
+    SStringW key = S_CT2W(pszFileName);
     SSkinPool *pBuiltinSkinPool = SSkinPoolMgr::getSingletonPtr()->GetBuiltinSkinPool();
-    ISkinObj *pSkin=pBuiltinSkinPool->GetSkin(key,GetScale());
-    if(pSkin)
+    ISkinObj *pSkin = pBuiltinSkinPool->GetSkin(key, GetScale());
+    if (pSkin)
     {
-        if(!pSkin->IsClass(SSkinAni::GetClassName())) return FALSE;
-        m_aniSkin=static_cast<SSkinAni*>(pSkin);
-    }else
+        if (!pSkin->IsClass(SSkinAni::GetClassName()))
+            return FALSE;
+        m_aniSkin = static_cast<SSkinAni *>(pSkin);
+    }
+    else
     {
-        SSkinAni *pGifSkin = (SSkinAni*)SApplication::getSingleton().CreateSkinByName(SSkinAni::GetClassName());
-        if(!pGifSkin) return FALSE;
-        if(0==pGifSkin->LoadFromFile(pszFileName))
+        SSkinAni *pGifSkin
+            = (SSkinAni *)SApplication::getSingleton().CreateSkinByName(SSkinAni::GetClassName());
+        if (!pGifSkin)
+            return FALSE;
+        if (0 == pGifSkin->LoadFromFile(pszFileName))
         {
             pGifSkin->Release();
             return FALSE;
@@ -140,7 +148,7 @@ BOOL SImagePlayer::_PlayFile( LPCTSTR pszFileName, BOOL bGif )
         SkinKey skey;
         skey.scale = GetScale();
         skey.strName = key;
-        pBuiltinSkinPool->AddKeyObject(skey,pGifSkin);//将创建的skin交给skinpool管理
+        pBuiltinSkinPool->AddKeyObject(skey, pGifSkin); //将创建的skin交给skinpool管理
         m_aniSkin = pGifSkin;
     }
     if (GetLayoutParam()->IsWrapContent(Any))
@@ -156,4 +164,4 @@ void SImagePlayer::OnDestroy()
     GetContainer()->UnregisterTimelineHandler(this);
     __super::OnDestroy();
 }
-}
+} // namespace SOUI

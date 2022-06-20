@@ -38,7 +38,7 @@ INT_PTR SOUI_EXP SMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT 
  */
 class SOUI_EXP SMessageBoxImpl
     : public SHostDialog
-    , SDpiHandler<SMessageBoxImpl> {
+    , public SDpiHandler<SMessageBoxImpl> {
   public:
     /**
      * SMessageBoxImpl::SMessageBoxImpl

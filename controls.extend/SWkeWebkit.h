@@ -2,85 +2,97 @@
 #include <wke.h>
 
 namespace SOUI
-{   
-    class SWkeLoader
+{
+class SWkeLoader {
+  public:
+    typedef void (*FunWkeInit)();
+    typedef void (*FunWkeShutdown)();
+    typedef wkeWebView (*FunWkeCreateWebView)();
+    typedef void (*FunWkeDestroyWebView)(wkeWebView);
+
+  public:
+    SWkeLoader();
+
+    ~SWkeLoader();
+
+    BOOL Init(LPCTSTR pszDll);
+
+    static SWkeLoader *GetInstance();
+
+  public:
+    FunWkeCreateWebView m_funWkeCreateWebView;
+    FunWkeDestroyWebView m_funWkeDestroyWebView;
+
+  protected:
+    HMODULE m_hModWke;
+    FunWkeInit m_funWkeInit;
+    FunWkeShutdown m_funWkeShutdown;
+
+    static SWkeLoader *s_pInst;
+};
+
+const char TM_TICKER = 1;
+class SWkeWebkit
+    : public SWindow
+    , protected wkeBufHandler
+    , protected IIdleHandler {
+    DEF_SOBJECT(SWindow, L"wkeWebkit")
+  public:
+    SWkeWebkit(void);
+    ~SWkeWebkit(void);
+
+    wkeWebView GetWebView()
     {
-    public:
-        typedef void (*FunWkeInit)();
-        typedef void (*FunWkeShutdown)();
-        typedef wkeWebView (*FunWkeCreateWebView)();
-        typedef void (*FunWkeDestroyWebView)(wkeWebView);
-    public:
-        SWkeLoader();
+        return m_pWebView;
+    }
 
-        ~SWkeLoader();
+  protected:
+    virtual void onBufUpdated(const HDC hdc, int x, int y, int cx, int cy);
+    virtual BOOL WINAPI OnIdle();
 
-        BOOL Init(LPCTSTR pszDll);
+  protected:
+    int OnCreate(void *);
+    void OnDestroy();
+    void OnPaint(IRenderTarget *pRT);
+    void OnSize(UINT nType, CSize size);
+    LRESULT OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnMouseWheel(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnKeyDown(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnKeyUp(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnChar(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    LRESULT OnImeStartComposition(UINT uMsg, WPARAM wParam, LPARAM lParam);
+    void OnSetFocus(SWND wndOld);
+    void OnKillFocus(SWND wndFocus);
+    void OnTimer(char cTimerID);
 
-        static SWkeLoader* GetInstance();
-    public:
-        FunWkeCreateWebView m_funWkeCreateWebView;
-        FunWkeDestroyWebView m_funWkeDestroyWebView;
-    protected:
-        HMODULE     m_hModWke;
-        FunWkeInit  m_funWkeInit;
-        FunWkeShutdown m_funWkeShutdown;
-        
-        static SWkeLoader * s_pInst;
-    };
-
-    const char TM_TICKER = 1;
-    class SWkeWebkit : public SWindow, protected wkeBufHandler , protected IIdleHandler
+    virtual BOOL OnSetCursor(const CPoint &pt);
+    virtual UINT WINAPI OnGetDlgCode() const
     {
-        DEF_SOBJECT(SWindow, L"wkeWebkit")
-    public:
-        SWkeWebkit(void);
-        ~SWkeWebkit(void);
+        return SC_WANTALLKEYS;
+    }
+    BOOL OnAttrUrl(SStringW strValue, BOOL bLoading);
+    SOUI_ATTRS_BEGIN()
+    ATTR_CUSTOM(L"url", OnAttrUrl)
+    SOUI_ATTRS_END()
 
-        wkeWebView	GetWebView(){return m_pWebView;}
-    protected:
-        virtual void onBufUpdated (const HDC hdc,int x, int y, int cx, int cy);
-        virtual BOOL WINAPI OnIdle();
-    protected:
-        int OnCreate(void *);
-        void OnDestroy();
-        void OnPaint(IRenderTarget *pRT);
-        void OnSize(UINT nType, CSize size);
-        LRESULT OnMouseEvent(UINT uMsg, WPARAM wParam,LPARAM lParam); 
-        LRESULT OnMouseWheel(UINT uMsg, WPARAM wParam,LPARAM lParam); 
-        LRESULT OnKeyDown(UINT uMsg, WPARAM wParam,LPARAM lParam);
-        LRESULT OnKeyUp(UINT uMsg, WPARAM wParam,LPARAM lParam);
-        LRESULT OnChar(UINT uMsg, WPARAM wParam,LPARAM lParam);
-        LRESULT OnImeStartComposition(UINT uMsg, WPARAM wParam,LPARAM lParam);
-        void OnSetFocus(SWND wndOld);
-        void OnKillFocus(SWND wndFocus);
-        void OnTimer(char cTimerID);
+    SOUI_MSG_MAP_BEGIN()
+    MSG_WM_PAINT_EX(OnPaint)
+    MSG_WM_CREATE(OnCreate)
+    MSG_WM_DESTROY(OnDestroy)
+    MSG_WM_SIZE(OnSize)
+    MSG_WM_TIMER_EX(OnTimer)
+    MSG_WM_SETFOCUS_EX(OnSetFocus)
+    MSG_WM_KILLFOCUS_EX(OnKillFocus)
+    MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST, 0x209, OnMouseEvent)
+    MESSAGE_HANDLER_EX(WM_MOUSEWHEEL, OnMouseWheel)
+    MESSAGE_HANDLER_EX(WM_KEYDOWN, OnKeyDown)
+    MESSAGE_HANDLER_EX(WM_KEYUP, OnKeyUp)
+    MESSAGE_HANDLER_EX(WM_CHAR, OnChar)
+    MESSAGE_HANDLER_EX(WM_IME_STARTCOMPOSITION, OnImeStartComposition)
+    SOUI_MSG_MAP_END()
 
-        virtual BOOL OnSetCursor(const CPoint &pt);
-        virtual UINT WINAPI OnGetDlgCode() const {return SC_WANTALLKEYS;}
-        BOOL OnAttrUrl(SStringW strValue, BOOL bLoading);
-        SOUI_ATTRS_BEGIN()
-            ATTR_CUSTOM(L"url",OnAttrUrl)
-        SOUI_ATTRS_END()
-
-        SOUI_MSG_MAP_BEGIN()
-            MSG_WM_PAINT_EX(OnPaint)
-            MSG_WM_CREATE(OnCreate)
-            MSG_WM_DESTROY(OnDestroy)
-            MSG_WM_SIZE(OnSize)
-            MSG_WM_TIMER_EX(OnTimer)
-            MSG_WM_SETFOCUS_EX(OnSetFocus)
-            MSG_WM_KILLFOCUS_EX(OnKillFocus)
-            MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST,0x209,OnMouseEvent)
-            MESSAGE_HANDLER_EX(WM_MOUSEWHEEL,OnMouseWheel)
-            MESSAGE_HANDLER_EX(WM_KEYDOWN,OnKeyDown)
-            MESSAGE_HANDLER_EX(WM_KEYUP,OnKeyUp)
-            MESSAGE_HANDLER_EX(WM_CHAR,OnChar)
-            MESSAGE_HANDLER_EX(WM_IME_STARTCOMPOSITION,OnImeStartComposition)
-        SOUI_MSG_MAP_END()
-
-    protected:
-        wkeWebView m_pWebView;
-        SStringW m_strUrl;
-    };
-}
+  protected:
+    wkeWebView m_pWebView;
+    SStringW m_strUrl;
+};
+} // namespace SOUI

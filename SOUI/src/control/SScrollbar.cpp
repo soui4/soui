@@ -180,7 +180,7 @@ void SScrollBar::NotifySbCode(int nCode, int nPos)
     FireEvent(evt);
 }
 
-LRESULT SScrollBar::OnAttrVertical(const SStringW &value, BOOL bLoading)
+HRESULT SScrollBar::OnAttrVertical(const SStringW &value, BOOL bLoading)
 {
     bool bVert = STRINGASBOOL(value);
     m_sbHandler.SetVertical(bVert);

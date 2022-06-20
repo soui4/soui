@@ -9,13 +9,15 @@ class SOUI_EXP SSpinButtonCtrl : public TWindowProxy<ISpinButtonCtrl> {
     SSpinButtonCtrl(void);
     ~SSpinButtonCtrl(void);
 
-	SWindow * GetBuddy() const;
-public:
-	STDMETHOD_(void, SetValue)(THIS_ int nValue) OVERRIDE;
-	STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) OVERRIDE;
-	STDMETHOD_(void, SetStep)(THIS_ UINT nStep) OVERRIDE;
-	STDMETHOD_(int, GetValue)(THIS) SCONST OVERRIDE;
-	STDMETHOD_(IWindow*, GetIBuddy)(THIS) SCONST OVERRIDE;
+    SWindow *GetBuddy() const;
+
+  public:
+    STDMETHOD_(void, SetValue)(THIS_ int nValue) OVERRIDE;
+    STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) OVERRIDE;
+    STDMETHOD_(void, SetStep)(THIS_ UINT nStep) OVERRIDE;
+    STDMETHOD_(int, GetValue)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(IWindow *, GetIBuddy)(THIS) SCONST OVERRIDE;
+
   protected:
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) OVERRIDE;
     virtual BOOL NeedRedrawWhenStateChange() OVERRIDE
@@ -26,7 +28,7 @@ public:
 
   protected:
     void OnValueChanged(bool bInit = false);
-	void OnScaleChanged(int scale);
+    void OnScaleChanged(int scale);
     void OnLButtonDown(UINT nFlags, CPoint point);
     void OnLButtonUp(UINT nFlags, CPoint point);
     void OnMouseMove(UINT nFlags, CPoint point);

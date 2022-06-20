@@ -11,7 +11,7 @@ tools\clang-format.exe -i SOUI\include\msaa\*.h -style=file --verbose
 tools\clang-format.exe -i SOUI\include\res.mgr\*.h -style=file --verbose
 tools\clang-format.exe -i SOUI\include\sobject\*.h -style=file --verbose
 tools\clang-format.exe -i SOUI\include\valueAnimator\*.h -style=file --verbose
-
+tools\clang-format.exe -i SOUI\src\*.h -style=file --verbose
 
 tools\clang-format.exe -i SOUI\src\activex\*.cpp -style=file --verbose
 tools\clang-format.exe -i SOUI\src\animation\*.cpp -style=file --verbose
@@ -26,3 +26,4 @@ tools\clang-format.exe -i SOUI\src\msaa\*.cpp -style=file --verbose
 tools\clang-format.exe -i SOUI\src\res.mgr\*.cpp -style=file --verbose
 tools\clang-format.exe -i SOUI\src\updatelayeredwindow\*.cpp -style=file --verbose
 tools\clang-format.exe -i SOUI\src\valueAnimator\*.cpp -style=file --verbose
+tools\clang-format.exe -i SOUI\src\*.cpp -style=file --verbose

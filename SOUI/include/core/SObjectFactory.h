@@ -12,7 +12,8 @@
  */
 
 #pragma once
-#include "core/ssingletonmap.h"
+#include <core/SCmnMap.h>
+#include <core/SObjType.h>
 
 SNSBEGIN
 class SOUI_EXP SObjectInfo {
@@ -120,7 +121,7 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
     // Parameter: SObjectFactory * pWndFactory:窗口工厂指针
     // Parameter: bool bReplace:强制替换原有工厂标志
     //************************************
-    bool RegisterFactory(SObjectFactory &objFactory, bool bReplace = false);
+    bool RegisterFactory(const SObjectFactory &objFactory, bool bReplace = false);
 
     //************************************
     // Method:    UnregisterFactor,反注册APP自定义的窗口类

@@ -1,93 +1,95 @@
 ﻿/**
-* Copyright (C) 2014-2050 SOUI团队
-* All rights reserved.
-* 
-* @file       STabCtrl2.h
-* @brief      
-* @version    v1.0      
-* @author     水木之      
-* @date       2014-07-06
-* 
-* Describe    另一个tabctrl
-*/
+ * Copyright (C) 2014-2050 SOUI团队
+ * All rights reserved.
+ *
+ * @file       STabCtrl2.h
+ * @brief
+ * @version    v1.0
+ * @author     水木之
+ * @date       2014-07-06
+ *
+ * Describe    另一个tabctrl
+ */
 #pragma once
 #include <control/SCmnCtrl.h>
 
 namespace SOUI
 {
-	enum ANI_STATUS{
-		STATUS_NOR=0,
-		STATUS_IN,
-		STATUS_OUT,
-	} ;
-    
-    class SPageAniObj
-    {
-    public:
-        SPageAniObj();
-        void AnimateIn(int nInterval);
+enum ANI_STATUS
+{
+    STATUS_NOR = 0,
+    STATUS_IN,
+    STATUS_OUT,
+};
 
-        void AnimateOut(int nInterval);
+class SPageAniObj {
+  public:
+    SPageAniObj();
+    void AnimateIn(int nInterval);
 
-        BOOL Draw(IRenderTarget *pRT,const CRect &rc);
-        BOOL OnNextFrame(int nIntervel);
+    void AnimateOut(int nInterval);
 
-        ANI_STATUS m_aniStatus;
-        int          m_iFrame;//当前帧
-        int          m_tmWaitFor;
-        ISkinObj    *m_pAniIn;//移入动画
-        ISkinObj    *m_pAniOut;//移出动画
-    };
+    BOOL Draw(IRenderTarget *pRT, const CRect &rc);
+    BOOL OnNextFrame(int nIntervel);
 
-	class STabPage2 : public STabPage
-	{
-		DEF_SOBJECT(STabPage, L"page2")
-        friend class STabCtrl2;
-	public:
-		STabPage2(void);
-		~STabPage2(void);
+    ANI_STATUS m_aniStatus;
+    int m_iFrame; //当前帧
+    int m_tmWaitFor;
+    ISkinObj *m_pAniIn;  //移入动画
+    ISkinObj *m_pAniOut; //移出动画
+};
 
-		protected:
-		SOUI_ATTRS_BEGIN()
-			ATTR_SKIN(L"ani_in",m_aniObj.m_pAniIn,TRUE)
-			ATTR_SKIN(L"ani_out",m_aniObj.m_pAniOut,TRUE)
-		SOUI_ATTRS_END()
+class STabPage2 : public STabPage {
+    DEF_SOBJECT(STabPage, L"page2")
+    friend class STabCtrl2;
 
-        SPageAniObj m_aniObj;
-	 };
+  public:
+    STabPage2(void);
+    ~STabPage2(void);
 
-    class STabCtrl2 : public STabCtrl,protected ITimelineHandler
-    {
-		DEF_SOBJECT(STabCtrl, L"tabctrl2")
-	public:
-		STabCtrl2(void);
-		~STabCtrl2(void);
-    protected:
-		virtual void WINAPI OnNextFrame() override;
-        STabPage * CreatePageFromXml(SXmlNode xmlPage);
+  protected:
+    SOUI_ATTRS_BEGIN()
+    ATTR_SKIN(L"ani_in", m_aniObj.m_pAniIn, TRUE)
+    ATTR_SKIN(L"ani_out", m_aniObj.m_pAniOut, TRUE)
+    SOUI_ATTRS_END()
 
-        void OnDestroy();
-		int  OnCreate(void*);
-		void OnPaint(IRenderTarget *pRT);
-		void DrawItem(IRenderTarget *pRT,const CRect &rcItem,int iItem,DWORD dwState );
+    SPageAniObj m_aniObj;
+};
 
-	   virtual void OnStateChanged(DWORD dwOldState,DWORD dwNewState);
-	   BOOL OnItemHover(IEvtArgs *pEvt);
-	   BOOL OnItemLeave(IEvtArgs *pEvt);
-	   virtual void OnContainerChanged(ISwndContainer *pOldContainer,ISwndContainer *pNewContainer);
- 
-        SOUI_MSG_MAP_BEGIN()
-			MSG_WM_CREATE(OnCreate)
-			MSG_WM_DESTROY(OnDestroy)
-			MSG_WM_PAINT_EX(OnPaint)   
-         SOUI_MSG_MAP_END()
-		
-		ISkinObj *m_pSkinHeadBg;//tab头背景
-        int m_iInterval;//动画间隔 单位毫秒
+class STabCtrl2
+    : public STabCtrl
+    , protected ITimelineHandler {
+    DEF_SOBJECT(STabCtrl, L"tabctrl2")
+  public:
+    STabCtrl2(void);
+    ~STabCtrl2(void);
 
-        SOUI_ATTRS_BEGIN()
-            ATTR_SKIN(L"tabHeadBgSkin", m_pSkinHeadBg, FALSE)
-        SOUI_ATTRS_END()
-    };
+  protected:
+    virtual void WINAPI OnNextFrame() override;
+    STabPage *CreatePageFromXml(SXmlNode xmlPage);
 
-}//namespace SOUI
+    void OnDestroy();
+    int OnCreate(void *);
+    void OnPaint(IRenderTarget *pRT);
+    void DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWORD dwState);
+
+    virtual void OnStateChanged(DWORD dwOldState, DWORD dwNewState);
+    BOOL OnItemHover(IEvtArgs *pEvt);
+    BOOL OnItemLeave(IEvtArgs *pEvt);
+    virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
+
+    SOUI_MSG_MAP_BEGIN()
+    MSG_WM_CREATE(OnCreate)
+    MSG_WM_DESTROY(OnDestroy)
+    MSG_WM_PAINT_EX(OnPaint)
+    SOUI_MSG_MAP_END()
+
+    ISkinObj *m_pSkinHeadBg; // tab头背景
+    int m_iInterval;         //动画间隔 单位毫秒
+
+    SOUI_ATTRS_BEGIN()
+    ATTR_SKIN(L"tabHeadBgSkin", m_pSkinHeadBg, FALSE)
+    SOUI_ATTRS_END()
+};
+
+} // namespace SOUI

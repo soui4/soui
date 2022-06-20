@@ -417,7 +417,8 @@ IAnimation *SApplication::LoadAnimation(LPCTSTR strResId)
     IAnimation *pRet = CreateAnimationByName(xml.root().first_child().name());
     if (!pRet)
         return NULL;
-    pRet->InitFromXml(&xml.root().first_child());
+    SXmlNode xmlNode = xml.root().first_child();
+    pRet->InitFromXml(&xmlNode);
     return pRet;
 }
 
@@ -429,7 +430,8 @@ IValueAnimator *SApplication::LoadValueAnimator(LPCTSTR strResId)
     IValueAnimator *pRet = CreateValueAnimatorByName(xml.root().first_child().name());
     if (!pRet)
         return NULL;
-    pRet->InitFromXml(&xml.root().first_child());
+    SXmlNode xmlNode = xml.root().first_child();
+    pRet->InitFromXml(&xmlNode);
     return pRet;
 }
 

@@ -10,7 +10,7 @@ SNSBEGIN
 
 class SOUI_EXP STileView
     : public TPanelProxy<ITileView>
-	, protected SHostProxy
+    , protected SHostProxy
     , protected IItemContainer {
     DEF_SOBJECT(SPanel, L"tileview")
 
@@ -134,7 +134,7 @@ class SOUI_EXP STileView
 
     int m_iFirstVisible;        //第一个显示项索引
     SList<ItemInfo> m_lstItems; //当前正在显示的项
-    SOsrPanel *m_itemCapture;  // The item panel that has been set capture.
+    SOsrPanel *m_itemCapture;   // The item panel that has been set capture.
 
     int m_iSelItem;
     SOsrPanel *m_pHoverItem;

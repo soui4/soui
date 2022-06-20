@@ -1309,7 +1309,7 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     if (IsLayeredWindow())
     { //将绘制到窗口的缓存上的图像返回到上一级RT
         SASSERT(pRTBackup);
-		OnCommitSurface(pRTBackup,&rcWnd,pRT,&rcWnd,GetAlpha());
+        OnCommitSurface(pRTBackup, &rcWnd, pRT, &rcWnd, GetAlpha());
         IRenderTarget *p = pRT;
         pRT = pRTBackup;
         p->Release();
@@ -1325,8 +1325,8 @@ void SWindow::TransformPoint(CPoint &pt) const
     {
         CRect rc = GetWindowRect();
         SMatrix mtx = xform.getMatrix();
-        mtx.preTranslate(-rc.left, -rc.top);
-        mtx.postTranslate(rc.left, rc.top);
+        mtx.preTranslate((int)-rc.left, (int)-rc.top);
+        mtx.postTranslate((int)rc.left, (int)rc.top);
         if (mtx.invert(&mtx))
         {
             SPoint spt = SPoint::IMake(pt);
@@ -1416,8 +1416,8 @@ void SWindow::InvalidateRect(const CRect &rect, BOOL bFromThis /*=TRUE*/)
     if (xForm.hasMatrix())
     {
         SMatrix mtx = xForm.getMatrix();
-        mtx.preTranslate(-rcWnd.left, -rcWnd.top);
-        mtx.postTranslate(rcWnd.left, rcWnd.top);
+        mtx.preTranslate((int)-rcWnd.left, (int)-rcWnd.top);
+        mtx.postTranslate((int)rcWnd.left, (int)rcWnd.top);
         SRect fRc = SRect::IMake(rcIntersect);
         mtx.mapRect(&fRc);
         rcIntersect = fRc.toRect();
@@ -1545,7 +1545,7 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
         InvalidateRect(m_rcWindow);
         m_rcWindow = rcWnd;
 
-		m_layoutDirty = dirty_self;
+        m_layoutDirty = dirty_self;
 
         if (m_rcWindow.left > m_rcWindow.right)
             m_rcWindow.right = m_rcWindow.left;
@@ -1727,6 +1727,7 @@ void SWindow::OnNcPaint(IRenderTarget *pRT)
     {
         SASSERT(pRT);
         CRect rcClient = SWindow::GetClientRect();
+        CRect rcWnd = GetWindowRect();
 
         pRT->PushClipRect(&rcClient, RGN_DIFF);
 
@@ -1737,14 +1738,14 @@ void SWindow::OnNcPaint(IRenderTarget *pRT)
         {
             if (nState >= m_pNcSkin->GetStates())
                 nState = 0;
-            m_pNcSkin->DrawByIndex(pRT, GetWindowRect(), nState);
+            m_pNcSkin->DrawByIndex(pRT, &rcWnd, nState);
         }
         else
         {
             COLORREF crBg = GetStyle().m_crBorder;
             if (CR_INVALID != crBg)
             {
-                pRT->FillSolidRect(&GetWindowRect(), crBg);
+                pRT->FillSolidRect(&rcWnd, crBg);
             }
         }
         pRT->PopClip();
@@ -2276,8 +2277,8 @@ void SWindow::ReleaseRenderTarget(IRenderTarget *pRT)
             {
                 SMatrix mtx2 = xform.getMatrix();
                 CRect rc = p->GetWindowRect();
-                mtx2.preTranslate(-rc.left, -rc.top);
-                mtx2.postTranslate(rc.left, rc.top);
+                mtx2.preTranslate((int)-rc.left, (int)-rc.top);
+                mtx2.postTranslate((int)rc.left, (int)rc.top);
                 mtx.preConcat(mtx2);
             }
             p = p->GetParent();
@@ -2335,8 +2336,8 @@ bool SWindow::_ApplyMatrix(IRenderTarget *pRT, SMatrix &oriMtx)
     pRT->GetTransform(oriMtx.fMat);
     CRect rcWnd = GetWindowRect();
     SMatrix mtx = xform.getMatrix();
-    mtx.preTranslate(-rcWnd.left, -rcWnd.top);
-    mtx.postTranslate(rcWnd.left, rcWnd.top);
+    mtx.preTranslate((int)-rcWnd.left, (int)-rcWnd.top);
+    mtx.postTranslate((int)rcWnd.left, (int)rcWnd.top);
     mtx.preConcat(oriMtx);
     pRT->SetTransform(mtx.fMat, NULL);
     return true;
@@ -2353,8 +2354,8 @@ SMatrix SWindow::_GetMatrixEx() const
         {
             SMatrix &mtx2 = xform.getMatrix();
             CRect rcWnd = p->GetWindowRect();
-            mtx2.preTranslate(-rcWnd.left, -rcWnd.top);
-            mtx2.postTranslate(rcWnd.left, rcWnd.top);
+            mtx2.preTranslate((int)-rcWnd.left, (int)-rcWnd.top);
+            mtx2.postTranslate((int)rcWnd.left, (int)rcWnd.top);
             mtx.preConcat(mtx2);
         }
         p = p->GetParent();
@@ -2794,9 +2795,9 @@ HRESULT SWindow::OnAttrID(const SStringW &strValue, BOOL bLoading)
         }
         else
         {
-			m_nID = SNcPainter::toNcBuiltinID(strValue);
-			if(m_nID==0)
-				m_nID = _wtoi(strValue);
+            m_nID = SNcPainter::toNcBuiltinID(strValue);
+            if (m_nID == 0)
+                m_nID = _wtoi(strValue);
         }
     }
     return S_FALSE;
@@ -2845,10 +2846,10 @@ HRESULT SWindow::OnAttrText(const SStringW &strValue, BOOL bLoading)
             }
             else if (pszBuf[i + 1] == L'\\')
             {
-				strCvt += strText.Mid(iBegin, i - iBegin);
-				strCvt += L"\\";
+                strCvt += strText.Mid(iBegin, i - iBegin);
+                strCvt += L"\\";
                 i += 2;
-				iBegin = i;
+                iBegin = i;
             }
             else
             {
@@ -3447,9 +3448,13 @@ HRESULT SWindow::QueryInterface(THIS_ REFGUID id, IObjRef **ppRet)
     return E_NOINTERFACE;
 }
 
-void SWindow::OnCommitSurface(IRenderTarget *pRtDest,LPCRECT pRcDest,IRenderTarget *pRtSrc,LPCRECT pRcSrc,BYTE alpha)
+void SWindow::OnCommitSurface(IRenderTarget *pRtDest,
+                              LPCRECT pRcDest,
+                              IRenderTarget *pRtSrc,
+                              LPCRECT pRcSrc,
+                              BYTE alpha)
 {
-	pRtDest->AlphaBlend(pRcDest, pRtSrc, pRcSrc,alpha);
+    pRtDest->AlphaBlend(pRcDest, pRtSrc, pRcSrc, alpha);
 }
 
 //////////////////////////////////////////////////////////////////////////

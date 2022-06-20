@@ -43,7 +43,7 @@ void SSpinButtonCtrl::SetStep(UINT nStep)
 
 int SSpinButtonCtrl::GetValue() const
 {
-	return m_nValue;
+    return m_nValue;
 }
 
 IWindow *SSpinButtonCtrl::GetIBuddy() const
@@ -248,9 +248,9 @@ void SSpinButtonCtrl::OnClick()
     OnValueChanged();
 }
 
-SWindow * SSpinButtonCtrl::GetBuddy() const
+SWindow *SSpinButtonCtrl::GetBuddy() const
 {
-	return GetParent()->FindChildByName(m_strBuddy);
+    return GetParent()->FindChildByName(m_strBuddy);
 }
 
 SNSEND

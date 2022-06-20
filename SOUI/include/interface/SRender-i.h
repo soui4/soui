@@ -1361,7 +1361,8 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, GradientFill2)
     (THIS_ LPCRECT pRect, GradientType type, COLORREF crStart, COLORREF crCenter, COLORREF crEnd,
-     float fLinearAngle, float fCenterX, float fCenterY, int nRadius, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+     float fLinearAngle, float fCenterX, float fCenterY, int nRadius, BYTE byAlpha DEF_VAL(0xFF))
+        PURE;
     STDMETHOD_(HRESULT, DrawIconEx)
     (THIS_ int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT diFlags) PURE;
     STDMETHOD_(HRESULT, DrawBitmap)
@@ -1374,8 +1375,8 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, LPCRECT pRcSourMargin,
      UINT expendMode, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, BitBlt)
-    (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSour, int xSrc, int ySrc, DWORD dwRop DEF_VAL(kSrcCopy))
-        PURE;
+    (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSour, int xSrc, int ySrc,
+     DWORD dwRop DEF_VAL(kSrcCopy)) PURE;
     STDMETHOD_(HRESULT, AlphaBlend)
     (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSrc, LPCRECT pRcSrc, BYTE byAlpha) PURE;
     STDMETHOD_(IRenderObj *, GetCurrentObject)(THIS_ OBJTYPE uType) PURE;
@@ -1539,13 +1540,14 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
 };
 
 #ifdef __cplusplus
-//remove suffix of S for RenderObj to make it compatible with soui3 without conflicted with system interface. 
+// remove suffix of S for RenderObj to make it compatible with soui3 without conflicted with system
+// interface.
 typedef IFontS IFont;
 typedef IPenS IPen;
 typedef IBrushS IBrush;
 typedef IBitmapS IBitmap;
 typedef IRegionS IRegion;
 typedef IPathS IPath;
-#endif//__cplusplus
+#endif //__cplusplus
 
 SNSEND

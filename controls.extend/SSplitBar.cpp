@@ -5,23 +5,23 @@
 namespace SOUI
 {
 
-SSplitBar::SSplitBar():m_bDragging(FALSE)
-    ,m_bResizeHostWnd(FALSE)
-    ,m_nSizeMin(0)
-    ,m_nSizeMax(0)
-    ,m_bVertical(FALSE)
+SSplitBar::SSplitBar()
+    : m_bDragging(FALSE)
+    , m_bResizeHostWnd(FALSE)
+    , m_nSizeMin(0)
+    , m_nSizeMax(0)
+    , m_bVertical(FALSE)
 {
-
 }
 
 SSplitBar::~SSplitBar()
 {
-
 }
 
-LRESULT SSplitBar::OnCreate( LPVOID )
+LRESULT SSplitBar::OnCreate(LPVOID)
 {
-    if(0 != __super::OnCreate(NULL)) return 1;
+    if (0 != __super::OnCreate(NULL))
+        return 1;
     ORIENTATION pi = m_bVertical ? Vert : Horz;
     m_nOrginPos = GetLayoutParam()->GetSpecifiedSize(pi).toPixelSize(GetScale());
     m_nTrackingPos = m_nOrginPos;
@@ -31,12 +31,12 @@ LRESULT SSplitBar::OnCreate( LPVOID )
 
 BOOL SSplitBar::OnSetCursor(const CPoint &pt)
 {
-    HCURSOR hCursor=GETRESPROVIDER->LoadCursor(m_bVertical?IDC_SIZEWE:IDC_SIZENS);
+    HCURSOR hCursor = GETRESPROVIDER->LoadCursor(m_bVertical ? IDC_SIZEWE : IDC_SIZENS);
     SetCursor(hCursor);
     return TRUE;
 }
 
-void SSplitBar::OnLButtonDown(UINT nFlags,CPoint pt)
+void SSplitBar::OnLButtonDown(UINT nFlags, CPoint pt)
 {
     SWindow::OnLButtonDown(nFlags, pt);
 
@@ -44,7 +44,7 @@ void SSplitBar::OnLButtonDown(UINT nFlags,CPoint pt)
     m_bDragging = TRUE;
 }
 
-void SSplitBar::OnLButtonUp(UINT nFlags,CPoint pt)
+void SSplitBar::OnLButtonUp(UINT nFlags, CPoint pt)
 {
     SWindow::OnLButtonUp(nFlags, pt);
 
@@ -54,7 +54,7 @@ void SSplitBar::OnLButtonUp(UINT nFlags,CPoint pt)
     m_nTrackingPos = m_nOrginPos;
 }
 
-void SSplitBar::OnMouseMove(UINT nFlags,CPoint pt)
+void SSplitBar::OnMouseMove(UINT nFlags, CPoint pt)
 {
     SWindow::OnMouseMove(nFlags, pt);
 
@@ -79,16 +79,17 @@ void SSplitBar::OnMouseMove(UINT nFlags,CPoint pt)
 
     // 计算分隔栏新的位置
 
-    //SwndLayout * pLayout = GetLayout();
+    // SwndLayout * pLayout = GetLayout();
     ORIENTATION pi = m_bVertical ? Vert : Horz;
-    SouiLayoutParamStruct* pLayout = (SouiLayoutParamStruct*)GetLayoutParamT<SouiLayoutParam>()->GetRawData();
+    SouiLayoutParamStruct *pLayout
+        = (SouiLayoutParamStruct *)GetLayoutParamT<SouiLayoutParam>()->GetRawData();
 
     int nNewPos = m_nOrginPos + nOffset * pLayout->posLeft.cMinus;
 
     /*
      *  - 有一种情况要特殊处理:既要修改hostwnd的尺寸,top/left又是以-XXX的方式定义。
      *    这里的逻辑比较复杂，我自己也搞得很晕@_@
-     * 
+     *
      *  - 因为在需要修改宿主窗口的情况下，left/top如果以right/bottom为锚点，在修改了hostwnd的尺寸后,
      *    不需要再修改位置信息，否则在逻辑上位置信息会被叠加计算。
      *    举个例子：假如原始的y pos位置是-100，窗口的高度为300，此时y的位置是200(相对底部对齐)
@@ -97,7 +98,7 @@ void SSplitBar::OnMouseMove(UINT nFlags,CPoint pt)
      *
      *  - 在这种情况下，不受maxsize和minisize的控制。因为分隔栏和bottom/right的相对位置不变，所以从
      *    使用的角度讲，是没有超出 [maxsize,minisize] 的范围的
-    */
+     */
 
     HWND hWnd = GetContainer()->GetHostHwnd();
     BOOL bZoomed = ::IsZoomed(hWnd);
@@ -125,12 +126,12 @@ void SSplitBar::OnMouseMove(UINT nFlags,CPoint pt)
     if (bResizeWnd)
         ResizeHostWindow(nWindowOffset);
     else
-        RequestRelayout();      
+        RequestRelayout();
 }
 
 void SSplitBar::ResizeHostWindow(int nOffset)
 {
-    if ( m_bResizeHostWnd && nOffset != 0)
+    if (m_bResizeHostWnd && nOffset != 0)
     {
         HWND hWnd = GetContainer()->GetHostHwnd();
 
@@ -139,23 +140,15 @@ void SSplitBar::ResizeHostWindow(int nOffset)
 
         if (m_bVertical)
         {
-            ::MoveWindow(hWnd, 
-                rcWnd.left, 
-                rcWnd.top, 
-                rcWnd.Width() + nOffset,
-                rcWnd.Height(),
-                TRUE);
+            ::MoveWindow(hWnd, rcWnd.left, rcWnd.top, rcWnd.Width() + nOffset, rcWnd.Height(),
+                         TRUE);
         }
         else
         {
-            ::MoveWindow(hWnd, 
-                rcWnd.left, 
-                rcWnd.top, 
-                rcWnd.Width(),
-                rcWnd.Height() + nOffset,
-                TRUE);
+            ::MoveWindow(hWnd, rcWnd.left, rcWnd.top, rcWnd.Width(), rcWnd.Height() + nOffset,
+                         TRUE);
         }
     }
 }
 
-}//namespace SOUI
+} // namespace SOUI

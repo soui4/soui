@@ -49,7 +49,7 @@ SListView::SListView()
     , m_iPendingUpdateItem(-2)
     , m_iPendingViewItem(-1)
     , m_bVertical(TRUE)
-	, SHostProxy(this)
+    , SHostProxy(this)
 {
     m_bFocusable = TRUE;
     m_observer.Attach(new SListViewDataSetObserver(this));
@@ -114,7 +114,8 @@ BOOL SListView::SetAdapter(ILvAdapter *adapter)
         m_lvItemLocator->SetAdapter(adapter);
     if (m_adapter)
     {
-        m_adapter->InitByTemplate(&m_xmlTemplate.root().first_child());
+        SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+        m_adapter->InitByTemplate(&xmlNode);
         m_adapter->registerDataSetObserver(m_observer);
         for (int i = 0; i < m_adapter->getViewTypeCount(); i++)
         {
@@ -420,7 +421,8 @@ void SListView::UpdateVisibleItems()
             if (dwState & WndState_Hover)
                 m_pHoverItem = ii.pItem;
 
-            m_adapter->getView(iNewLastVisible, ii.pItem, &m_xmlTemplate.root().first_child());
+            SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+            m_adapter->getView(iNewLastVisible, ii.pItem, &xmlNode);
             if (bNewItem)
             {
                 ii.pItem->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
@@ -493,7 +495,8 @@ void SListView::UpdateVisibleItem(int iItem)
     SASSERT(m_lvItemLocator->IsFixHeight());
     SItemPanel *pItem = GetItemPanel(iItem);
     SASSERT(pItem);
-    m_adapter->getView(iItem, pItem, &m_xmlTemplate.root().first_child());
+    SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+    m_adapter->getView(iItem, pItem, &xmlNode);
 }
 
 void SListView::OnSize(UINT nType, CSize size)
@@ -1111,7 +1114,8 @@ IItemPanel *SListView::HitTest(const POINT *pt) const
     SASSERT(pt);
     if (!pt)
         return NULL;
-    return HitTest(CPoint(*pt));
+    CPoint pt2(*pt);
+    return HitTest(pt2);
 }
 
 SNSEND

@@ -103,11 +103,11 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
 
     STDMETHOD_(BOOL, ShowCaret)(THIS) PURE;
 
-	STDMETHOD_(HWND, GetCapture)(THIS) PURE;
+    STDMETHOD_(HWND, GetCapture)(THIS) PURE;
 
-	STDMETHOD_(HWND, SetCapture)(THIS) PURE;
+    STDMETHOD_(HWND, SetCapture)(THIS) PURE;
 
-	STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
+    STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
 
     STDMETHOD_(HWND, SetFocus)(THIS) PURE;
 

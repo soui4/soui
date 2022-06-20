@@ -1,4 +1,4 @@
-#include <souistd.h>
+﻿#include <souistd.h>
 #include <core/SSkinObjBase.h>
 
 SNSBEGIN
@@ -29,7 +29,7 @@ BOOL SState2Index::Init(IXmlNode *pNode)
         for (size_t i = 0; i < nValues; i++)
         {
             DWORD dwState = String2State(lstValues[i]);
-			m_mapOfStates[dwState] = iState;
+            m_mapOfStates[dwState] = iState;
         }
 
         xmlState = xmlState.next_sibling(L"state");
@@ -68,17 +68,18 @@ int SState2Index::GetIndex(DWORD dwState, bool checkAsPushdown) const
     }
     else
     {
-		int nRet = -1;
+        int nRet = -1;
         const SMap<DWORD, int>::CPair *p = m_mapOfStates.Lookup(dwState);
         if (!p)
-		{
-			if((dwState & WndState_Hover) && dwState!=WndState_Hover)
-				dwState &= ~WndState_Hover;
-			p = m_mapOfStates.Lookup(dwState);
-		}
-		if(p)
-			nRet = p->m_value;
-        return nRet;;
+        {
+            if ((dwState & WndState_Hover) && dwState != WndState_Hover)
+                dwState &= ~WndState_Hover;
+            p = m_mapOfStates.Lookup(dwState);
+        }
+        if (p)
+            nRet = p->m_value;
+        return nRet;
+        ;
     }
 }
 
@@ -89,10 +90,8 @@ DWORD SState2Index::String2State(const SStringW &strState)
         LPCWSTR pszName;
         DWORD dwValue;
     } kStateMap[] = {
-        { L"normal", WndState_Normal },     
-		{ L"hover", WndState_Hover },
-        { L"pushdown", WndState_PushDown }, 
-		{ L"disable", WndState_Disable },
+        { L"normal", WndState_Normal },     { L"hover", WndState_Hover },
+        { L"pushdown", WndState_PushDown }, { L"disable", WndState_Disable },
         { L"checked", WndState_Check },
     };
     static SMap<SStringW, DWORD> stateMap;
@@ -103,16 +102,17 @@ DWORD SState2Index::String2State(const SStringW &strState)
         {
             stateMap[kStateMap[j].pszName] = kStateMap[j].dwValue;
         }
-		bInited=true;
+        bInited = true;
     }
-	SStringWList states;
-	int nStates = SplitString(strState,L'&',states);
-	DWORD dwRet = WndState_Normal;
-	for(int i=0;i<nStates;i++)
-	{
-		SMap<SStringW, DWORD>::CPair *p = stateMap.Lookup(states[i]);
-		if(p) dwRet |= p->m_value;
-	}
+    SStringWList states;
+    int nStates = (int)SplitString(strState, L'&', states);
+    DWORD dwRet = WndState_Normal;
+    for (int i = 0; i < nStates; i++)
+    {
+        SMap<SStringW, DWORD>::CPair *p = stateMap.Lookup(states[i]);
+        if (p)
+            dwRet |= p->m_value;
+    }
     return dwRet;
 }
 

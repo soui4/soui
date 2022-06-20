@@ -259,6 +259,11 @@ namespace lua_tinker
       ref2user ( T& t ) : user ( &t ) {}
    };
 
+   // class helper
+   int meta_get(lua_State* L);
+   int meta_set(lua_State* L);
+   void push_meta(lua_State* L, const char* name);
+
    // to lua
    // 值传入lua 
    // 方法：val2user<T> 分配在lua上，而T类型input分配在C++堆上，通过val2user<T>中的指针指向
@@ -1052,12 +1057,6 @@ namespace lua_tinker
 	   lua_remove(L, -2);
 	   return pop<RVal>(L);
    }
-
-
-   // class helper
-   int meta_get ( lua_State *L );
-   int meta_set ( lua_State *L );
-   void push_meta ( lua_State *L, const char* name );
 
    // class init
    template<typename T>

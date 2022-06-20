@@ -21,35 +21,35 @@ public:
 	{
 
 		musicItem abc = { _T(""),_T("天天") ,_T("SOUI就是棒") ,_T("三百年前") };
-		LPCTSTR pszSonger[]={_T("刘德华"),_T("张学友"),_T("启程软件")};
-		for (int i = 0;i < 10;i++)
+		LPCTSTR pszSonger[] = { _T("刘德华"),_T("张学友"),_T("启程软件") };
+		for (int i = 0; i < 10; i++)
 		{
 			abc.songname.Format(_T("第%d个卖炭的"), i);
-			abc.artist = pszSonger[i%3];
+			abc.artist = pszSonger[i % 3];
 			m_musicList.Add(abc);
 		}
 	}
 
-	STDMETHOD_(int,getCount)() OVERRIDE
+	STDMETHOD_(int, getCount)() OVERRIDE
 	{
 		//SAutoLock autolock(updatalock);
 		return m_musicList.GetCount();
 	}
-	void add1(musicItem &item)
+	void add1(musicItem& item)
 	{
 		m_musicList.Add(item);
 		notifyDataSetInvalidated();
 	}
-	void add2(musicItem &item)
+	void add2(musicItem& item)
 	{
 		m_musicList.Add(item);
 		notifyDataSetChanged();
 	}
-	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
-			pItem->InitFromXml(&SXmlNode(xmlTemplate));
+			pItem->InitFromXml(&xmlTemplate);
 		}
 		pItem->FindChildByName(_T("songname"))->SetWindowText(m_musicList[position].songname);
 		pItem->FindChildByName(_T("artist"))->SetWindowText(m_musicList[position].artist);
@@ -65,9 +65,9 @@ public:
 		pItem->GetEventSet()->subscribeEvent(EventSwndStateChanged::EventID, Subscriber(&SMusicListAdapter::OnItemStateChanged, this));
 	}
 
-	BOOL OnItemStateChanged(IEvtArgs *pEvt)
+	BOOL OnItemStateChanged(IEvtArgs* pEvt)
 	{
-		SWindow *pItem = sobj_cast<SWindow>(pEvt->Sender());
+		SWindow* pItem = sobj_cast<SWindow>(pEvt->Sender());
 		if ((pItem->GetState() & WndState_Check) || (pItem->GetState() & WndState_Hover))
 		{
 			pItem = pItem->FindChildByName(_T("playbtn"));
@@ -92,7 +92,7 @@ public:
 		return m_colNames.GetCount();
 	}
 
-	virtual bool SwapItem(long pos, SList<long> &sellist) override
+	virtual bool SwapItem(long pos, SList<long>& sellist) override
 	{
 		SAutoLock autolock(updatalock);
 		SArray<musicItem> _temp_items;
@@ -103,7 +103,7 @@ public:
 		{
 			long posoffset = 0;
 			long idx = sellist.GetNext(_pos);
-			for (size_t i = 0;i<_remove_idxs.GetCount();++i)
+			for (size_t i = 0; i < _remove_idxs.GetCount(); ++i)
 			{
 				if (_remove_idxs[i] < idx)
 					--posoffset;
@@ -125,8 +125,8 @@ public:
 		}
 		return true;
 	}
-	
-	STDMETHOD_(SStringW,GetColumnName)(int iCol) const {
+
+	STDMETHOD_(SStringW, GetColumnName)(int iCol) const {
 		return m_colNames[iCol];
 	}
 
@@ -143,36 +143,36 @@ public:
 		IniColNames(xmlTemplate);
 	}
 	//同步添加方法
-	void add(SStringT &filepath)
+	void add(SStringT& filepath)
 	{
 		//SAutoLock lock(updatalock);
 		musicItem item;
 		item.songname = item.songpath = filepath;
-// 		libZPlay::TID3InfoExW id3_inf;
-// 		if (SLibZplay::getSingleton().GetFileId3(filepath, id3_inf))
-// 		{
-// 			item.songname = id3_inf.Title;
-// 		}
+		// 		libZPlay::TID3InfoExW id3_inf;
+		// 		if (SLibZplay::getSingleton().GetFileId3(filepath, id3_inf))
+		// 		{
+		// 			item.songname = id3_inf.Title;
+		// 		}
 		m_musicList.Add(item);
 		notifyDataSetChanged();
 	}
 	//异步添加，必须到主线程notifyDataSetChanged
-	void addformthread(SStringT &filepath)
+	void addformthread(SStringT& filepath)
 	{
-// 		musicItem item;
-// 		item.songpath = filepath;
-// 		libZPlay::TID3InfoExW id3_inf;
-// 		if (SLibZplay::getSingleton().GetFileId3(filepath, id3_inf))
-// 		{
-// 			item.songname = id3_inf.Title;
-// 			item.artist = id3_inf.Artist;
-// 			item.album = id3_inf.Album;
-// 			updatalock.Enter();
-// 			m_musicList.Add(item);
-// 			updatalock.Leave();
-// 		}
-		//此处不应该postmessage，因为getview里的异步锁会可能让界面假死,因为这个消息可能会很多，加载时会使WM_TIMER无法执行，所以动画可能会失效。
-		//SendMessage(m_nofitywnd, UPDATAMSG, m_id, NULL);
+		// 		musicItem item;
+		// 		item.songpath = filepath;
+		// 		libZPlay::TID3InfoExW id3_inf;
+		// 		if (SLibZplay::getSingleton().GetFileId3(filepath, id3_inf))
+		// 		{
+		// 			item.songname = id3_inf.Title;
+		// 			item.artist = id3_inf.Artist;
+		// 			item.album = id3_inf.Album;
+		// 			updatalock.Enter();
+		// 			m_musicList.Add(item);
+		// 			updatalock.Leave();
+		// 		}
+				//此处不应该postmessage，因为getview里的异步锁会可能让界面假死,因为这个消息可能会很多，加载时会使WM_TIMER无法执行，所以动画可能会失效。
+				//SendMessage(m_nofitywnd, UPDATAMSG, m_id, NULL);
 	}
 private:
 	SCriticalSection updatalock;

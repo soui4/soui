@@ -104,11 +104,11 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 
     STDMETHOD_(BOOL, ShowCaret)(THIS) PURE;
 
-	STDMETHOD_(HWND, GetCapture)(THIS) PURE;
+    STDMETHOD_(HWND, GetCapture)(THIS) PURE;
 
-	STDMETHOD_(HWND, SetCapture)(THIS) PURE;
+    STDMETHOD_(HWND, SetCapture)(THIS) PURE;
 
-	STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
+    STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
 
     STDMETHOD_(HWND, SetFocus)(THIS) PURE;
 
@@ -158,7 +158,7 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
         PURE;
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
-	STDMETHOD_(INcPainter*,GetNcPainter)(THIS) PURE;
+    STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
 };
 
 #undef INTERFACE
@@ -259,11 +259,11 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 
     STDMETHOD_(BOOL, ShowCaret)(THIS) PURE;
 
-	STDMETHOD_(HWND, GetCapture)(THIS) PURE;
+    STDMETHOD_(HWND, GetCapture)(THIS) PURE;
 
-	STDMETHOD_(HWND, SetCapture)(THIS) PURE;
+    STDMETHOD_(HWND, SetCapture)(THIS) PURE;
 
-	STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
+    STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
 
     STDMETHOD_(HWND, SetFocus)(THIS) PURE;
 
@@ -313,7 +313,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
         PURE;
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
-	STDMETHOD_(INcPainter*,GetNcPainter)(THIS) PURE;
+    STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
 
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent /*=NULL*/) PURE;

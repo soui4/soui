@@ -2,13 +2,13 @@
 #include <helper/SAdapterBase.h>
 class CTestAdapterFix : public SAdapterBase
 {
-	int * m_pCbxSel;
+	int* m_pCbxSel;
 public:
 
 	CTestAdapterFix()
 	{
 		m_pCbxSel = new int[getCount()];
-		memset(m_pCbxSel, 0, sizeof(int)*getCount());
+		memset(m_pCbxSel, 0, sizeof(int) * getCount());
 	}
 
 	~CTestAdapterFix()
@@ -21,39 +21,39 @@ public:
 		return 50000;
 	}
 
-	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
 			pItem->InitFromXml(&xmlTemplate);
 		}
 
-		SButton *pBtn = pItem->FindChildByName2<SButton>(L"btn_test");
+		SButton* pBtn = pItem->FindChildByName2<SButton>(L"btn_test");
 		pBtn->SetWindowText(SStringT().Format(_T("button %d"), position));
 		pBtn->GetRoot()->SetUserData(position);
 
 		//由网友“从未来过” 修改的新事件订阅方式,采用模板函数从响应函数中自动提取事件类型，2016.12.13
-		pBtn->GetEventSet()->subscribeEvent(EventCmd::EventID,Subscriber(&CTestAdapterFix::OnButtonClick, this));
+		pBtn->GetEventSet()->subscribeEvent(EventCmd::EventID, Subscriber(&CTestAdapterFix::OnButtonClick, this));
 
-		SComboBox * pCbx = pItem->FindChildByName2<SComboBox>(L"cbx_in_lv");
+		SComboBox* pCbx = pItem->FindChildByName2<SComboBox>(L"cbx_in_lv");
 		if (pCbx)
 		{
 			pCbx->SetCurSel(m_pCbxSel[position]);
-			pCbx->GetEventSet()->subscribeEvent(EventCBSelChange::EventID,Subscriber(&CTestAdapterFix::OnCbxSelChange, this));
+			pCbx->GetEventSet()->subscribeEvent(EventCBSelChange::EventID, Subscriber(&CTestAdapterFix::OnCbxSelChange, this));
 		}
 	}
 
-	BOOL OnCbxSelChange(EventCBSelChange *pEvt)
+	BOOL OnCbxSelChange(EventCBSelChange* pEvt)
 	{
-		SComboBox *pCbx = sobj_cast<SComboBox>(pEvt->Sender());
+		SComboBox* pCbx = sobj_cast<SComboBox>(pEvt->Sender());
 		int iItem = pCbx->GetRoot()->GetUserData();
 		m_pCbxSel[iItem] = pCbx->GetCurSel();
 		return true;
 	}
 
-	BOOL OnButtonClick(EventCmd *pEvt)
+	BOOL OnButtonClick(EventCmd* pEvt)
 	{
-		SButton *pBtn = sobj_cast<SButton>(pEvt->Sender());
+		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetRoot()->GetUserData();
 		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
@@ -78,33 +78,33 @@ public:
 		return 300;
 	}
 
-	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
 			pItem->InitFromXml(&xmlTemplate);
 		}
 
-		SImageWnd *pImg = pItem->FindChildByName2<SImageWnd>(L"btn_icon");
-		pImg->SetIcon(position%9);
-		SWindow *pText = pItem->FindChildByName(L"btn_text");
-		pText->SetWindowText(SStringT().Format(_T("item_%d"),position+1));
+		SImageWnd* pImg = pItem->FindChildByName2<SImageWnd>(L"btn_icon");
+		pImg->SetIcon(position % 9);
+		SWindow* pText = pItem->FindChildByName(L"btn_text");
+		pText->SetWindowText(SStringT().Format(_T("item_%d"), position + 1));
 
-		pImg->GetParent()->GetEventSet()->subscribeEvent(EventCmd::EventID,Subscriber(&CTestAdapterFixHorz::OnButtonClick, this));
+		pImg->GetParent()->GetEventSet()->subscribeEvent(EventCmd::EventID, Subscriber(&CTestAdapterFixHorz::OnButtonClick, this));
 	}
 
 
-	BOOL OnButtonClick(EventCmd *pEvt)
+	BOOL OnButtonClick(EventCmd* pEvt)
 	{
-		SWindow *pBtn = sobj_cast<SWindow>(pEvt->sender);
-		SItemPanel *pItem = (SItemPanel*)pBtn->GetRoot();
+		SWindow* pBtn = sobj_cast<SWindow>(pEvt->sender);
+		SItemPanel* pItem = (SItemPanel*)pBtn->GetRoot();
 		int iItem = pItem->GetItemIndex();
 		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
 	}
 };
 
-const wchar_t * KAttrName_Height[] = {
+const wchar_t* KAttrName_Height[] = {
 	L"oddHeight",
 	L"evenHeight",
 	L"evenSelHeight"
@@ -138,7 +138,7 @@ public:
 		return 12340;
 	}
 
-	virtual int WINAPI getViewTypeCount() override{ return 3; }
+	virtual int WINAPI getViewTypeCount() override { return 3; }
 
 	virtual int WINAPI getItemViewType(int position, DWORD dwState) override
 	{
@@ -150,40 +150,41 @@ public:
 			return 1;//even lines 
 	}
 
-	virtual SIZE WINAPI getViewDesiredSize(int position, SItemPanel *pItem, int nWid,int nHei) override
+	virtual SIZE WINAPI getViewDesiredSize(int position, SItemPanel* pItem, int nWid, int nHei) override
 	{
 		DWORD dwState = pItem->GetState();
 		int viewType = getItemViewType(position, dwState);
 		return CSize(0, m_nItemHeight[viewType]);//cx在listview，mclistview中没有使用，不需要计算
 	}
 
-	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
 			int nViewType = getItemViewType(position, pItem->GetState());
-			pItem->InitFromXml(&xmlTemplate.child(KNodeName_Item[nViewType]));
+			SXmlNode xmlNode = xmlTemplate.child(KNodeName_Item[nViewType]);
+			pItem->InitFromXml(&xmlNode);
 		}
 		pItem->GetEventSet()->subscribeEvent(EventSwndStateChanged::EventID, Subscriber(&CTestAdapterFlex::OnItemStateChanged, this));
 
-		SButton *pBtn = pItem->FindChildByName2<SButton>(L"btn_test");
+		SButton* pBtn = pItem->FindChildByName2<SButton>(L"btn_test");
 		pBtn->SetWindowText(SStringT().Format(_T("button %d"), position));
 		pBtn->SetUserData(position);
 		pBtn->GetEventSet()->subscribeEvent(EVT_CMD, Subscriber(&CTestAdapterFlex::OnButtonClick, this));
 	}
 
-	BOOL OnItemStateChanged(IEvtArgs *e)
+	BOOL OnItemStateChanged(IEvtArgs* e)
 	{
-		EventSwndStateChanged *e2 = sobj_cast<EventSwndStateChanged>(e);
-		if (!EventSwndStateChanged_CheckState(e2,WndState_Hover)) return false;
+		EventSwndStateChanged* e2 = sobj_cast<EventSwndStateChanged>(e);
+		if (!EventSwndStateChanged_CheckState(e2, WndState_Hover)) return false;
 		//通知界面重绘
 		notifyDataSetInvalidated();
 		return true;
 	}
 
-	BOOL OnButtonClick(IEvtArgs *pEvt)
+	BOOL OnButtonClick(IEvtArgs* pEvt)
 	{
-		SButton *pBtn = sobj_cast<SButton>(pEvt->Sender());
+		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetUserData();
 		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
@@ -197,13 +198,13 @@ class CTestMcAdapterFix : public SMcAdapterBase
 public:
 	struct SOFTINFO
 	{
-		const wchar_t * pszSkinName;
-		const wchar_t * pszName;
-		const wchar_t * pszDesc;
+		const wchar_t* pszSkinName;
+		const wchar_t* pszName;
+		const wchar_t* pszDesc;
 		float     fScore;
 		DWORD     dwSize;
-		const wchar_t * pszInstallTime;
-		const wchar_t * pszUseTime;
+		const wchar_t* pszInstallTime;
+		const wchar_t* pszUseTime;
 	};
 
 	SArray<SOFTINFO> m_softInfo;
@@ -287,25 +288,25 @@ public:
 
 	virtual int WINAPI getCount()
 	{
-		return m_softInfo.GetCount()*NUMSCALE;
+		return m_softInfo.GetCount() * NUMSCALE;
 	}
 
 	SStringT getSizeText(DWORD dwSize)
 	{
 		int num1 = dwSize / (1 << 20);
-		dwSize -= num1 *(1 << 20);
+		dwSize -= num1 * (1 << 20);
 		int num2 = dwSize * 100 / (1 << 20);
 		return SStringT().Format(_T("%d.%02dM"), num1, num2);
 	}
 
-	virtual void WINAPI getView(int position, SItemPanel * pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
 			pItem->InitFromXml(&xmlTemplate);
 		}
 
-		SOFTINFO *psi = m_softInfo.GetData() + position%m_softInfo.GetCount();
+		SOFTINFO* psi = m_softInfo.GetData() + position % m_softInfo.GetCount();
 		pItem->FindChildByName(L"img_icon")->SetAttribute(L"skin", psi->pszSkinName);
 		pItem->FindChildByName(L"txt_name")->SetWindowText(S_CW2T(psi->pszName));
 		pItem->FindChildByName(L"txt_desc")->SetWindowText(S_CW2T(psi->pszDesc));
@@ -313,24 +314,24 @@ public:
 		pItem->FindChildByName(L"txt_installtime")->SetWindowText(S_CW2T(psi->pszInstallTime));
 		pItem->FindChildByName(L"txt_usetime")->SetWindowText(S_CW2T(psi->pszUseTime));
 		pItem->FindChildByName(L"txt_size")->SetWindowText(getSizeText(psi->dwSize));
-		SRatingBar *pRatingBar = pItem->FindChildByName2<SRatingBar>(L"rating_score");
+		SRatingBar* pRatingBar = pItem->FindChildByName2<SRatingBar>(L"rating_score");
 		pRatingBar->SetValue(psi->fScore / 2);
 		pItem->FindChildByName(L"txt_index")->SetWindowText(SStringT().Format(_T("第%d行"), position + 1));
 
-		SButton *pBtnUninstall = pItem->FindChildByName2<SButton>(L"btn_uninstall");
+		SButton* pBtnUninstall = pItem->FindChildByName2<SButton>(L"btn_uninstall");
 		CRect rcBtn = pBtnUninstall->GetWindowRect();
 		SMatrix mtx;
 		mtx.setRotate(45);
-		mtx.preTranslate(-rcBtn.Width()/2,-rcBtn.Height()/2);
-		mtx.postTranslate(rcBtn.Width()/2,rcBtn.Height()/2);
+		mtx.preTranslate(-rcBtn.Width() / 2, -rcBtn.Height() / 2);
+		mtx.postTranslate(rcBtn.Width() / 2, rcBtn.Height() / 2);
 		pBtnUninstall->SetMatrix(mtx);
 		pBtnUninstall->SetUserData(position);
 		pBtnUninstall->GetEventSet()->subscribeEvent(EVT_CMD, Subscriber(&CTestMcAdapterFix::OnButtonClick, this));
 	}
 
-	BOOL OnButtonClick(IEvtArgs *pEvt)
+	BOOL OnButtonClick(IEvtArgs* pEvt)
 	{
-		SButton *pBtn = sobj_cast<SButton>(pEvt->Sender());
+		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetUserData();
 
 		if (SMessageBox(NULL, SStringT().Format(_T("Are you sure to uninstall the selected [%d] software?"), iItem), _T("uninstall"), MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
@@ -367,7 +368,7 @@ public:
 			return FALSE;
 
 		UINT fmt = pFmts[iCol];
-		switch (fmt&SORT_MASK)
+		switch (fmt & SORT_MASK)
 		{
 		case 0:fmt = HDF_SORTUP; break;
 		case HDF_SORTDOWN:fmt = HDF_SORTUP; break;
@@ -384,11 +385,11 @@ public:
 		return TRUE;
 	}
 
-	static int __cdecl SortCmp(void *context, const void * p1, const void * p2)
+	static int __cdecl SortCmp(void* context, const void* p1, const void* p2)
 	{
-		SORTCTX *pctx = (SORTCTX*)context;
-		const SOFTINFO *pSI1 = (const SOFTINFO*)p1;
-		const SOFTINFO *pSI2 = (const SOFTINFO*)p2;
+		SORTCTX* pctx = (SORTCTX*)context;
+		const SOFTINFO* pSI1 = (const SOFTINFO*)p1;
+		const SOFTINFO* pSI2 = (const SOFTINFO*)p2;
 		int nRet = 0;
 		switch (pctx->iCol)
 		{
@@ -442,23 +443,23 @@ public:
 		return 50000;
 	}
 
-	virtual void WINAPI getView(int position, SItemPanel *pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
 	{
 		if (pItem->GetChildrenCount() == 0)
 		{
 			pItem->InitFromXml(&xmlTemplate);
 		}
-		SImageWnd *pImg = pItem->FindChildByName2<SImageWnd>(L"img_file_icon");
+		SImageWnd* pImg = pItem->FindChildByName2<SImageWnd>(L"img_file_icon");
 		pImg->SetSkin(GETSKIN(skins[position % 5], pImg->GetScale()));
-		SButton *pBtn = pItem->FindChildByName2<SButton>(L"btn_test");
+		SButton* pBtn = pItem->FindChildByName2<SButton>(L"btn_test");
 		pBtn->SetWindowText(SStringT().Format(_T("btn %d"), position));
 		pBtn->GetRoot()->SetUserData(position);
 		pBtn->GetEventSet()->subscribeEvent(EVT_CMD, Subscriber(&CTestTileAdapter::OnButtonClick, this));
 	}
 
-	BOOL OnButtonClick(IEvtArgs *pEvt)
+	BOOL OnButtonClick(IEvtArgs* pEvt)
 	{
-		SButton *pBtn = sobj_cast<SButton>(pEvt->Sender());
+		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetRoot()->GetUserData();
 		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
@@ -498,31 +499,31 @@ public:
 
 	~CTreeViewAdapter() {}
 
-	virtual void WINAPI getView(HSTREEITEM loc, SItemPanel * pItem, SXmlNode xmlTemplate) {
+	virtual void WINAPI getView(HSTREEITEM loc, SItemPanel* pItem, SXmlNode xmlTemplate) {
 		if (pItem->GetChildrenCount() == 0)
 		{
 			pItem->InitFromXml(&xmlTemplate);
 		}
-		ItemInfo & ii = m_tree.GetItemRef(loc);
-		SWindow * pWnd = pItem->FindChildByID(R.id.btn_test);
+		ItemInfo& ii = m_tree.GetItemRef(loc);
+		SWindow* pWnd = pItem->FindChildByID(R.id.btn_test);
 		SASSERT(pWnd);
 		pWnd->SetWindowText(S_CW2T(ii.data.strName));
-		SWindow *pTxtRed = pItem->FindChildByID(R.id.txt_red);
+		SWindow* pTxtRed = pItem->FindChildByID(R.id.txt_red);
 		SASSERT(pTxtRed);
 		pTxtRed->SetWindowText(ii.data.strTstLong);
 
-		SToggle *pSwitch = pItem->FindChildByID2<SToggle>(R.id.tgl_switch);
+		SToggle* pSwitch = pItem->FindChildByID2<SToggle>(R.id.tgl_switch);
 		SASSERT(pSwitch);
 		pSwitch->SetVisible(HasChildren(loc));
 		pSwitch->SetToggle(IsItemExpanded(loc));
 		pSwitch->GetEventSet()->subscribeEvent(EVT_CMD, Subscriber(&CTreeViewAdapter::OnSwitchClick, this));
 	}
 
-	BOOL OnSwitchClick(IEvtArgs *pEvt)
+	BOOL OnSwitchClick(IEvtArgs* pEvt)
 	{
-		SToggle *pToggle = sobj_cast<SToggle>(pEvt->Sender());
+		SToggle* pToggle = sobj_cast<SToggle>(pEvt->Sender());
 		SASSERT(pToggle);
-		SItemPanel *pItem = sobj_cast<SItemPanel>(pToggle->GetRoot());
+		SItemPanel* pItem = sobj_cast<SItemPanel>(pToggle->GetRoot());
 		SASSERT(pItem);
 		HSTREEITEM loc = (HSTREEITEM)pItem->GetItemIndex();
 		ExpandItem(loc, TVC_TOGGLE);

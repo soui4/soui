@@ -27,15 +27,15 @@ DECLARE_INTERFACE_(ICtrl, IObjRef)
 #define INTERFACE IOsrPanel
 DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
 {
-	STDMETHOD_(long, AddRef)(THIS) PURE;
-	STDMETHOD_(long, Release)(THIS) PURE;
-	STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM index) PURE;
-	STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST PURE;
-	STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
-	STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST PURE;
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM index) PURE;
+    STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST PURE;
+    STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
+    STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST PURE;
 };
 
 #undef INTERFACE
@@ -47,11 +47,11 @@ DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F90
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM index) PURE;
-	STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST PURE;
-	STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
-	STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST PURE;
-	//////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM index) PURE;
+    STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST PURE;
+    STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
+    STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST PURE;
+    //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(void, SetSkin)(THIS_ ISkinObj * pSkin) PURE;
     STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) PURE;
 };
@@ -1407,20 +1407,19 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     STDMETHOD_(int, GetPageIndex)(THIS_ LPCTSTR pszName, BOOL bTitle) PURE;
 };
 
-
 #undef INTERFACE
 #define INTERFACE ISpinButtonCtrl
 DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A03561F8C")
 {
-	STDMETHOD_(long, AddRef)(THIS) PURE;
-	STDMETHOD_(long, Release)(THIS) PURE;
-	STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-	STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(void, SetValue)(THIS_ int nValue) PURE;
-	STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) PURE;
-	STDMETHOD_(void, SetStep)(THIS_ UINT nStep) PURE;
-	STDMETHOD_(int, GetValue)(THIS) SCONST PURE;
-	STDMETHOD_(IWindow*, GetIBuddy)(THIS) SCONST PURE;
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+    STDMETHOD_(long, Release)(THIS) PURE;
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(void, SetValue)(THIS_ int nValue) PURE;
+    STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) PURE;
+    STDMETHOD_(void, SetStep)(THIS_ UINT nStep) PURE;
+    STDMETHOD_(int, GetValue)(THIS) SCONST PURE;
+    STDMETHOD_(IWindow *, GetIBuddy)(THIS) SCONST PURE;
 };
 SNSEND

@@ -74,13 +74,13 @@ void SLayoutSize::setSize(float fSize, Unit unit)
 
 bool SLayoutSize::isSpecifiedSize() const
 {
-    return fSize >= SIZE_SPEC;
+    return fSize >= (float)(int)SIZE_SPEC;
 }
 
 int SLayoutSize::toPixelSize(int scale) const
 {
-	if(!isValid())
-		return 0;
+    if (!isValid())
+        return 0;
     if (isMatchParent())
         return SIZE_MATCH_PARENT;
     else if (isWrapContent())

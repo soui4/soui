@@ -43,7 +43,7 @@ public: \
     } \
     BOOL _ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID);
 
-    
+
 #define BEGIN_MSG_MAP_EX2(theClass) \
     BOOL theClass::_ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID) \
     { \
@@ -57,7 +57,7 @@ public: \
     switch(dwMsgMapID) \
         { \
     case 0:
-    
+
 #define BEGIN_MSG_MAP_EX(theClass) \
 public: \
     BOOL m_bMsgHandled; \
@@ -1737,7 +1737,7 @@ public: \
     if (uMsg == WM_MOUSEHOVER) \
     { \
         SetMsgHandled(TRUE); \
-        func(wParam, _WTYPES_NS::CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))); \
+        func((UINT)wParam, _WTYPES_NS::CPoint(GET_X_LPARAM(lParam), GET_Y_LPARAM(lParam))); \
         lResult = 0; \
         if(IsMsgHandled()) \
             return TRUE; \

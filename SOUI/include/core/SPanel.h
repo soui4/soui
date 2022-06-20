@@ -17,7 +17,6 @@
 #include <core/SScrollBarHandler.h>
 #include <interface/SCtrl-i.h>
 #include <proxy/SWindowProxy.h>
-#include <proxy/SPanelProxy.h>
 
 SNSBEGIN
 
@@ -198,6 +197,11 @@ class SOUI_EXP SPanel
     SOUI_MSG_MAP_END()
 };
 
+SNSEND
+
+#include <proxy/SPanelProxy.h>
+
+SNSBEGIN
 class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
     DEF_SOBJECT(SPanel, L"scrollview")
   public:

@@ -1,7 +1,8 @@
 #include "stdafx.h"
 #include "SDateTimeEdit.h"
 
-namespace SOUI{
+namespace SOUI
+{
 
 /////////////////////////////////////////////////////////////////////////////
 // CDxMaskEdit
@@ -70,10 +71,12 @@ void SMaskEdit::SetPromptChar(TCHAR ch, BOOL bAutoReplace)
         GetMaskState();
 
         for (int i = 0; i < m_strLiteral.GetLength(); i++)
-            if (m_strLiteral[i] == m_chPrompt) m_strLiteral.SetAt(i, ch);
+            if (m_strLiteral[i] == m_chPrompt)
+                m_strLiteral.SetAt(i, ch);
 
         for (int j = 0; j < m_strWindowText.GetLength(); j++)
-            if (m_strWindowText[j] == m_chPrompt) m_strWindowText.SetAt(j, ch);
+            if (m_strWindowText[j] == m_chPrompt)
+                m_strWindowText.SetAt(j, ch);
 
         SetMaskState();
     }
@@ -83,7 +86,7 @@ void SMaskEdit::SetPromptChar(TCHAR ch, BOOL bAutoReplace)
 
 BOOL SMaskEdit::MaskCut()
 {
-    //if (!CanUseMask())
+    // if (!CanUseMask())
     //    return (BOOL)DefWindowProc(WM_CUT, 0, 0);
 
     MaskCopy();
@@ -94,7 +97,7 @@ BOOL SMaskEdit::MaskCut()
 
 BOOL SMaskEdit::MaskCopy()
 {
-    //if (!CanUseMask())
+    // if (!CanUseMask())
     //    return (BOOL)DefWindowProc(WM_COPY, 0, 0);
 
     GetMaskState();
@@ -140,7 +143,7 @@ void SMaskEdit::MaskReplaceSel(LPCTSTR lpszNewText)
 
 BOOL SMaskEdit::MaskPaste()
 {
-    //if (!CanUseMask())
+    // if (!CanUseMask())
     //    return (BOOL)DefWindowProc(WM_PASTE, 0, 0);
 
     GetMaskState();
@@ -156,7 +159,7 @@ BOOL SMaskEdit::MaskPaste()
 
     if (hglbPaste != NULL)
     {
-        TCHAR* lpszClipboard = (TCHAR*)GlobalLock(hglbPaste);
+        TCHAR *lpszClipboard = (TCHAR *)GlobalLock(hglbPaste);
 
         MaskReplaceSel(lpszClipboard);
 
@@ -182,7 +185,7 @@ void SMaskEdit::MaskDeleteSel()
 
 BOOL SMaskEdit::MaskClear()
 {
-    //if (!CanUseMask())
+    // if (!CanUseMask())
     //    return (BOOL)DefWindowProc(WM_CLEAR, 0, 0);
 
     GetMaskState();
@@ -220,14 +223,14 @@ void SMaskEdit::SetMaskedText(LPCTSTR lpszMaskedText, int nPos, BOOL bUpdateWind
     m_strWindowText = m_strWindowText.Left(nPos);
 
     int nIndex = 0;
-    for (; (nPos <  m_strLiteral.GetLength()) && (nIndex < nMaskedTextLength) ; nPos++)
+    for (; (nPos < m_strLiteral.GetLength()) && (nIndex < nMaskedTextLength); nPos++)
     {
         TCHAR uChar = lpszMaskedText[nIndex];
 
         if (IsPromptPos(nPos) && ((uChar == m_chPrompt) || ProcessMask(uChar, nPos)))
         {
             m_strWindowText += (TCHAR)uChar;
-            nIndex ++;
+            nIndex++;
         }
         else
         {
@@ -251,7 +254,7 @@ BOOL SMaskEdit::SetEditMask(LPCTSTR lpszMask, LPCTSTR lpszLiteral, LPCTSTR lpszD
     SASSERT(lpszLiteral);
 
     // initialize the mask for the control.
-    m_strMask    = lpszMask;
+    m_strMask = lpszMask;
     m_strLiteral = lpszLiteral;
 
     SASSERT(m_strMask.GetLength() == m_strLiteral.GetLength());
@@ -294,7 +297,7 @@ TCHAR SMaskEdit::ConvertUnicodeAlpha(TCHAR nChar, BOOL bUpperCase) const
     return strTemp[0];
 }
 
-BOOL SMaskEdit::CheckChar(TCHAR& nChar, int nPos)
+BOOL SMaskEdit::CheckChar(TCHAR &nChar, int nPos)
 {
     // do not use mask
     if (!CanUseMask())
@@ -314,7 +317,7 @@ BOOL SMaskEdit::CheckChar(TCHAR& nChar, int nPos)
     return ProcessMask(nChar, nPos);
 }
 
-BOOL SMaskEdit::ProcessMask(TCHAR& nChar, int nEndPos)
+BOOL SMaskEdit::ProcessMask(TCHAR &nChar, int nEndPos)
 {
     SASSERT(nEndPos < m_strMask.GetLength());
     if (nEndPos < 0 || nEndPos >= m_strMask.GetLength())
@@ -323,37 +326,39 @@ BOOL SMaskEdit::ProcessMask(TCHAR& nChar, int nEndPos)
     // check the key against the mask
     switch (m_strMask.GetAt(nEndPos))
     {
-    case '0':       // digit only //completely changed this
+    case '0': // digit only //completely changed this
         return _istdigit(nChar);
 
-    case '9':       // digit or space
+    case '9': // digit or space
         return _istdigit(nChar) || _istspace(nChar);
 
-    case '#':       // digit or space or '+' or '-'
+    case '#': // digit or space or '+' or '-'
         return _istdigit(nChar) || (_istspace(nChar) || nChar == _T('-') || nChar == _T('+'));
 
-    case 'd':       // decimal
-        return _istdigit(nChar) || (_istspace(nChar) || nChar == _T('-') || nChar == _T('+') || nChar == _T('.') || nChar == _T(','));
+    case 'd': // decimal
+        return _istdigit(nChar)
+            || (_istspace(nChar) || nChar == _T('-') || nChar == _T('+') || nChar == _T('.')
+                || nChar == _T(','));
 
-    case 'L':       // alpha only
+    case 'L': // alpha only
         return IsAlphaChar(nChar);
 
-    case '?':       // alpha or space
+    case '?': // alpha or space
         return IsAlphaChar(nChar) || _istspace(nChar);
 
-    case 'A':       // alpha numeric only
+    case 'A': // alpha numeric only
         return _istalnum(nChar) || IsAlphaChar(nChar);
 
-    case 'a':       // alpha numeric or space
+    case 'a': // alpha numeric or space
         return _istalnum(nChar) || IsAlphaChar(nChar) || _istspace(nChar);
 
-    case '&':       // all print character only
+    case '&': // all print character only
         return IsPrintChar(nChar);
 
-    case 'H':       // hex digit
+    case 'H': // hex digit
         return _istxdigit(nChar);
 
-    case 'X':       // hex digit or space
+    case 'X': // hex digit or space
         return _istxdigit(nChar) || _istspace(nChar);
 
     case '>':
@@ -462,7 +467,7 @@ void SMaskEdit::InsertCharAt(int nPos, TCHAR nChar)
     SetMaskedText(strMaskedText, nPos, FALSE);
 }
 
-BOOL SMaskEdit::CopyToClipboard(const SStringT& strText)
+BOOL SMaskEdit::CopyToClipboard(const SStringT &strText)
 {
     if (!OpenClipboard(NULL))
         return FALSE;
@@ -479,7 +484,7 @@ BOOL SMaskEdit::CopyToClipboard(const SStringT& strText)
         return FALSE;
     }
 
-    LPTSTR lptstrCopy = (TCHAR*)GlobalLock(hglbCopy);
+    LPTSTR lptstrCopy = (TCHAR *)GlobalLock(hglbCopy);
     _tcscpy_s(lptstrCopy, strText.GetLength() + 1, (LPCTSTR)strText);
     GlobalUnlock(hglbCopy);
 
@@ -524,138 +529,139 @@ void SMaskEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     }
 
     BOOL bShift = (::GetKeyState(VK_SHIFT) < 0);
-    BOOL bCtrl  = (::GetKeyState(VK_CONTROL) < 0);
+    BOOL bCtrl = (::GetKeyState(VK_CONTROL) < 0);
 
     switch (nChar)
     {
     case VK_UP:
     case VK_LEFT:
     case VK_HOME:
+    {
+        __super::OnKeyDown(nChar, nRepCnt, nFlags);
+
+        GetMaskState(FALSE);
+
+        int nStartChar = m_nStartChar;
+        CorrectPosition(nStartChar, FALSE);
+
+        if (m_nStartChar < nStartChar)
         {
-            __super::OnKeyDown(nChar, nRepCnt, nFlags);
+            m_nStartChar = nStartChar;
 
-            GetMaskState(FALSE);
-
-            int nStartChar = m_nStartChar;
-            CorrectPosition(nStartChar, FALSE);
-
-            if (m_nStartChar < nStartChar)
-            {
-                m_nStartChar = nStartChar;
-
-                if (!bShift)
-                    m_nEndChar = nStartChar;
-            }
-
-            SetMaskState();
+            if (!bShift)
+                m_nEndChar = nStartChar;
         }
+
+        SetMaskState();
+    }
         return;
 
     case VK_DOWN:
     case VK_RIGHT:
     case VK_END:
+    {
+        __super::OnKeyDown(nChar, nRepCnt, nFlags);
+
+        GetMaskState(FALSE);
+
+        int iEndChar = m_nEndChar;
+        CorrectPosition(iEndChar);
+
+        if (m_nEndChar > iEndChar)
         {
-            __super::OnKeyDown(nChar, nRepCnt, nFlags);
+            m_nEndChar = iEndChar;
 
-            GetMaskState(FALSE);
-
-            int iEndChar = m_nEndChar;
-            CorrectPosition(iEndChar);
-
-            if (m_nEndChar > iEndChar)
-            {
-                m_nEndChar = iEndChar;
-
-                if (!bShift)
-                    m_nStartChar = iEndChar;
-            }
-
-            SetMaskState();
+            if (!bShift)
+                m_nStartChar = iEndChar;
         }
+
+        SetMaskState();
+    }
         return;
 
     case VK_INSERT:
+    {
+        if (bCtrl)
         {
-            if (bCtrl)
-            {
-                MaskCopy();
-            }
-            else if (bShift)
-            {
-                MaskPaste();
-            }
-            else
-            {
-                m_bOverType = !m_bOverType; // set the type-over flag
-            }
+            MaskCopy();
         }
+        else if (bShift)
+        {
+            MaskPaste();
+        }
+        else
+        {
+            m_bOverType = !m_bOverType; // set the type-over flag
+        }
+    }
         return;
 
     case VK_DELETE:
-        {
-            GetMaskState();
+    {
+        GetMaskState();
 
+        if (m_nStartChar == m_nEndChar)
+        {
+            m_nEndChar = m_nStartChar + 1;
+        }
+        else if (bShift)
+        {
+            MaskCopy();
+        }
+
+        MaskDeleteSel();
+        SetMaskState();
+    }
+        return;
+
+    case VK_SPACE:
+    {
+        GetMaskState();
+
+        if (!PosInRange(m_nStartChar) || !IsPromptPos(m_nStartChar))
+        {
+            NotifyPosNotInRange();
+            return;
+        }
+
+        TCHAR chSpace = _T(' ');
+
+        if (!ProcessMask(chSpace, m_nStartChar))
+            chSpace = m_chPrompt;
+
+        ProcessChar(chSpace);
+
+        SetMaskState();
+    }
+        return;
+
+    case VK_BACK:
+    {
+        GetMaskState(FALSE);
+
+        if (((m_nStartChar > 0) || (m_nStartChar == 0 && m_nEndChar != 0))
+            && (m_nStartChar <= m_strLiteral.GetLength()))
+        {
             if (m_nStartChar == m_nEndChar)
             {
-                m_nEndChar = m_nStartChar +1;
-            }
-            else if (bShift)
-            {
-                MaskCopy();
+                m_nStartChar--;
+                CorrectPosition(m_nStartChar, FALSE);
+
+                if (m_bOverType && PosInRange(m_nStartChar))
+                {
+                    m_strWindowText.SetAt(m_nStartChar, m_strDefault[m_nStartChar]);
+                    m_nEndChar = m_nStartChar;
+                }
             }
 
             MaskDeleteSel();
             SetMaskState();
         }
-        return;
-
-    case VK_SPACE:
+        else
         {
-            GetMaskState();
-
-            if (!PosInRange(m_nStartChar) || !IsPromptPos(m_nStartChar))
-            {
-                NotifyPosNotInRange();
-                return;
-            }
-
-            TCHAR chSpace = _T(' ');
-
-            if (!ProcessMask(chSpace, m_nStartChar))
-                chSpace = m_chPrompt;
-
-            ProcessChar(chSpace);
-
-            SetMaskState();
+            NotifyPosNotInRange();
         }
-        return;
-
-    case VK_BACK:
-        {
-            GetMaskState(FALSE);
-
-            if (((m_nStartChar > 0) || (m_nStartChar == 0 && m_nEndChar != 0))  && (m_nStartChar <= m_strLiteral.GetLength()))
-            {
-                if (m_nStartChar == m_nEndChar)
-                {
-                    m_nStartChar--;
-                    CorrectPosition(m_nStartChar, FALSE);
-
-                    if (m_bOverType && PosInRange(m_nStartChar))
-                    {
-                        m_strWindowText.SetAt(m_nStartChar, m_strDefault[m_nStartChar]);
-                        m_nEndChar = m_nStartChar;
-                    }
-                }
-
-                MaskDeleteSel();
-                SetMaskState();
-            }
-            else
-            {
-                NotifyPosNotInRange();
-            }
-        }
+    }
         return;
     }
 
@@ -767,7 +773,7 @@ void SMaskEdit::OnSetFocus(SWND wndOld)
 }
 
 // Some goodies
-BOOL SMaskEdit::CorrectPosition(int& nPos, BOOL bForward)
+BOOL SMaskEdit::CorrectPosition(int &nPos, BOOL bForward)
 {
     int nLen = m_strLiteral.GetLength();
 
@@ -840,7 +846,7 @@ BOOL SMaskEdit::IsPromptPos(int nPos) const
     return IsPromptPos(m_strLiteral, nPos);
 }
 
-BOOL SMaskEdit::IsPromptPos(const SStringT& strLiteral, int nPos) const
+BOOL SMaskEdit::IsPromptPos(const SStringT &strLiteral, int nPos) const
 {
     return (nPos >= 0 && nPos < strLiteral.GetLength()) && (strLiteral[nPos] == m_chPrompt);
 }
@@ -884,7 +890,7 @@ void SMaskEdit::GetMaskState(BOOL bCorrectSelection)
 
 void SMaskEdit::MaskGetSel()
 {
-    SSendMessage(EM_GETSEL,(WPARAM)&m_nStartChar,(LPARAM)&m_nEndChar);
+    SSendMessage(EM_GETSEL, (WPARAM)&m_nStartChar, (LPARAM)&m_nEndChar);
 }
 
 void SMaskEdit::SetMaskState()
@@ -912,8 +918,8 @@ void SMaskEdit::SetMaskState()
 /////////////////////////////////////////////////////////////////////////////
 SDateEdit::SDateEdit()
 {
-    m_bUseMask   = true;
-    m_strMask    = _T("0000/00/00");
+    m_bUseMask = true;
+    m_strMask = _T("0000/00/00");
     m_strLiteral = _T("____/__/__");
     m_strDefault = _T("0000/00/00");
 }
@@ -924,8 +930,8 @@ int SDateEdit::OnCreate(LPVOID)
     if (nRet != 0)
         return nRet;
 
-    __time64_t tm=::_time64(NULL);
-    
+    __time64_t tm = ::_time64(NULL);
+
     SetDateTime(tm);
 
     return 0;
@@ -937,11 +943,11 @@ void SDateEdit::SetDateTime(LPCTSTR strDate)
     SetWindowText(S_CT2W(strDate));
 }
 
-void SDateEdit::SetDateTime(STime tm )
+void SDateEdit::SetDateTime(STime tm)
 {
     TCHAR szBuf[256];
     struct tm ttm;
-    _tcsftime(szBuf,256,_T("%Y/%m/%d"),tm.GetLocalTm(&ttm));
+    _tcsftime(szBuf, 256, _T("%Y/%m/%d"), tm.GetLocalTm(&ttm));
     SetDateTime(szBuf);
 }
 
@@ -951,7 +957,7 @@ SStringT SDateEdit::GetWindowDateTime()
     return strText;
 }
 
-BOOL SDateEdit::ProcessMask(TCHAR& nChar, int nEndPos)
+BOOL SDateEdit::ProcessMask(TCHAR &nChar, int nEndPos)
 {
     // check the key against the mask
     if (m_strMask[nEndPos] == _T('0') && _istdigit((TCHAR)nChar))
@@ -984,13 +990,13 @@ BOOL SDateEdit::ProcessMask(TCHAR& nChar, int nEndPos)
 
 STimeEdit::STimeEdit()
 {
-    m_bMilitary  = false;
-    m_bUseMask   = true;
-    m_strMask    = _T("00:00");
+    m_bMilitary = false;
+    m_bUseMask = true;
+    m_strMask = _T("00:00");
     m_strLiteral = _T("__:__");
     m_strDefault = _T("00:00");
-    m_nHours     = 0;
-    m_nMins      = 0;
+    m_nHours = 0;
+    m_nMins = 0;
 }
 
 int STimeEdit::OnCreate(LPVOID)
@@ -1004,7 +1010,7 @@ int STimeEdit::OnCreate(LPVOID)
     return 0;
 }
 
-BOOL STimeEdit::ProcessMask(TCHAR& nChar, int nEndPos)
+BOOL STimeEdit::ProcessMask(TCHAR &nChar, int nEndPos)
 {
     // check the key against the mask
     if (m_strMask[nEndPos] == _T('0') && _istdigit(nChar))
@@ -1084,4 +1090,4 @@ void STimeEdit::SetTime(int nHours, int nMins)
     SetWindowText(strText);
 }
 
-}//end of namespace SOUI
+} // end of namespace SOUI
