@@ -87,7 +87,7 @@ void SWkeWebkit::OnPaint(IRenderTarget *pRT)
 
 void SWkeWebkit::OnSize(UINT nType, CSize size)
 {
-    __super::OnSize(nType, size);
+    __baseCls::OnSize(nType, size);
     m_pWebView->resize(size.cx, size.cy);
     m_pWebView->tick();
 }
@@ -253,14 +253,14 @@ LRESULT SWkeWebkit::OnImeStartComposition(UINT uMsg, WPARAM wParam, LPARAM lPara
 
 void SWkeWebkit::OnSetFocus(SWND wndOld)
 {
-    __super::OnSetCursor(wndOld);
+    __baseCls::OnSetCursor(wndOld);
     m_pWebView->focus();
 }
 
 void SWkeWebkit::OnKillFocus(SWND wndFocus)
 {
     m_pWebView->unfocus();
-    __super::OnKillFocus(wndFocus);
+    __baseCls::OnKillFocus(wndFocus);
 }
 
 void SWkeWebkit::OnTimer(char cTimerID)

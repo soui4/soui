@@ -876,7 +876,7 @@ void CColourPopup::OnActivateApp(BOOL bActive, DWORD hTask)
 
 void CColourPopup::OnFinalMessage( HWND hWnd )
 {
-	__super::OnFinalMessage(hWnd);
+	SNativeWnd::OnFinalMessage(hWnd);
 	delete this;
 }
 

@@ -87,15 +87,15 @@ void SAniWindow::OnShowWindow(BOOL bShow, UINT nStatus)
 
 int SAniWindow::OnCreate(void *)
 {
-    __super::OnCreate(NULL);
-    m_layoutParamTmp.Attach(__super::GetLayoutParam()->Clone());
+    __baseCls::OnCreate(NULL);
+    m_layoutParamTmp.Attach(__baseCls::GetLayoutParam()->Clone());
 
     return 0;
 }
 
 BOOL SAniWindow::OnRelayout(const CRect &rcWnd)
 {
-    BOOL bRet = __super::OnRelayout(rcWnd);
+    BOOL bRet = __baseCls::OnRelayout(rcWnd);
     if (m_bSaveSize)
     {
         m_szWnd = rcWnd.Size();
@@ -106,7 +106,7 @@ BOOL SAniWindow::OnRelayout(const CRect &rcWnd)
 ILayoutParam *SAniWindow::GetLayoutParam() const
 {
     if (m_aniMode == AM_NONE)
-        return __super::GetLayoutParam();
+        return __baseCls::GetLayoutParam();
     else
         return m_layoutParamTmp;
 }

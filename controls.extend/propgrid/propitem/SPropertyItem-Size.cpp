@@ -99,7 +99,7 @@ namespace SOUI
             IPropertyItem *pHei = GetChildById(CHILD_HEIGHT);
             pHei->SetValue(m_strValue[1]);
         }
-        __super::OnValueChanged();
+        __baseCls::OnValueChanged();
     }
 
     HRESULT SPropertyItemSize::OnAttrValue( const SStringW & strValue,BOOL bLoading )

@@ -38,7 +38,7 @@ namespace SOUI
 
 	void SRoundImage::OnSize(UINT nType, CSize size)
 	{
-		__super::OnSize(nType, size);
+		__baseCls::OnSize(nType, size);
 		m_img = GetRoundImage();
 	}
 

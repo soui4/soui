@@ -19,7 +19,7 @@ STipWnd::~STipWnd()
 
 void STipWnd::OnFinalMessage(HWND hWnd)
 {
-    __super::OnFinalMessage(hWnd);
+    __baseCls::OnFinalMessage(hWnd);
     delete this;
 }
 

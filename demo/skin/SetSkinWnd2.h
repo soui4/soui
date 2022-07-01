@@ -21,7 +21,7 @@ class CSetSkinWnd :
 	BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 protected:
 	virtual void OnFinalMessage(HWND hWnd) {
-		__super::OnFinalMessage(hWnd);
+		SHostWnd::OnFinalMessage(hWnd);
 		delete this;
 	}
 	long NotifUpdataWindow();

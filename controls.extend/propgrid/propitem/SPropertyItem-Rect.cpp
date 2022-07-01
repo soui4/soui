@@ -118,7 +118,7 @@ namespace SOUI
 			pBottom->SetValue(m_strValue[3]);
 
 		}
-        __super::OnValueChanged();
+        __baseCls::OnValueChanged();
     }
 
     HRESULT SPropertyItemRect::OnAttrValue( const SStringW & strValue,BOOL bLoading )

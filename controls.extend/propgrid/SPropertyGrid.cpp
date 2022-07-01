@@ -347,7 +347,7 @@ BOOL SPropertyGrid::CreateChildren(SXmlNode xmlNode)
 
 void SPropertyGrid::OnSize(UINT nType, CSize size)
 {
-    __super::OnSize(nType, size);
+    __baseCls::OnSize(nType, size);
     UpdateChildrenPos();
 }
 
@@ -513,7 +513,7 @@ void SPropertyGrid::OnMouseMove(UINT nFlags, CPoint pt)
 void SPropertyGrid::OnDestroy()
 {
     RemoveAllItems();
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
 BOOL SPropertyGrid::OnSelChanged(IEvtArgs *pEvt)
@@ -612,7 +612,7 @@ void SPropertyGrid::RemoveAllItems()
         pGroup->Release();
     }
     m_lstGroup.RemoveAll();
-    __super::DeleteAll();
+    __baseCls::DeleteAll();
     InvalidateRect(GetWindowRect());
 }
 

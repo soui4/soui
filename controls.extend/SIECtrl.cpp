@@ -121,7 +121,7 @@ void SIECtrl::OnAxActivate(IUnknown *pUnknwn)
 
 int SIECtrl::OnCreate(LPVOID)
 {
-    int nRet = __super::OnCreate(NULL);
+    int nRet = __baseCls::OnCreate(NULL);
     if (GetContainer()->IsTranslucent())
     {
         SLOGFMTD(_T("warning!!! create iectrl failed bacause of host is translucent!"));
@@ -134,7 +134,7 @@ int SIECtrl::OnCreate(LPVOID)
 void SIECtrl::OnDestroy()
 {
     GetContainer()->GetMsgLoop()->RemoveMessageFilter(this);
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
 BOOL SIECtrl::PreTranslateMessage(MSG *pMsg)

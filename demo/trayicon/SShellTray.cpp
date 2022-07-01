@@ -183,7 +183,7 @@ namespace SOUI
 			m_ArrIcon.RemoveAll();
 			m_MsgOnlyWnd->DestroyWindow();
 		}
-		__super::OnFinalRelease();
+		__baseCls::OnFinalRelease();
 	}
 
 

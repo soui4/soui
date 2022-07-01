@@ -13,14 +13,14 @@ SQrCtrl::~SQrCtrl()
 
 void SQrCtrl::SetWindowText(LPCTSTR lpszText)
 {
-	__super::SetWindowText(lpszText);
+	__baseCls::SetWindowText(lpszText);
 	CreateQrImg(GetWindowText());
 }
 
 BOOL SQrCtrl::OnRelayout(const CRect & rcWnd)
 {
 	CRect rcOld = GetClientRect();
-	BOOL bRet = __super::OnRelayout(rcWnd);
+	BOOL bRet = __baseCls::OnRelayout(rcWnd);
 	if(!bRet) return FALSE;
 	CRect rcNew = GetClientRect();
 	if(rcOld.Size() == rcNew.Size())

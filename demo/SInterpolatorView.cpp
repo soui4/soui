@@ -44,7 +44,7 @@ namespace SOUI
 
 	int SInterpolatorView::OnCreate(void*)
 	{
-		int nRet = __super::OnCreate(NULL);
+		int nRet = __baseCls::OnCreate(NULL);
 		if(nRet == 0)
 		{
 			GetContainer()->RegisterTimelineHandler(this);
@@ -55,6 +55,6 @@ namespace SOUI
 	void SInterpolatorView::OnDestroy()
 	{
 		GetContainer()->UnregisterTimelineHandler(this);
-		__super::OnDestroy();
+		__baseCls::OnDestroy();
 	}
 }

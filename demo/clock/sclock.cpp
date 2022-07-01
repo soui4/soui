@@ -9,7 +9,7 @@ SClock::SClock()
 
 void SClock::OnPaint(SOUI::IRenderTarget * pRT)
 {
-	__super::OnPaint(pRT);
+	__baseCls::OnPaint(pRT);
 
 	CRect rcClient;
 	GetClientRect(&rcClient);

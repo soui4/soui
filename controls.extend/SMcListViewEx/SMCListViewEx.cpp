@@ -173,7 +173,7 @@ BOOL SMCListViewEx::CreateChildren(SXmlNode xmlNode)
     InsertChild(m_pHeader);
     m_pHeader->InitFromXml(&xmlHeader);
 
-    if (!__super::CreateChildren(xmlNode))
+    if (!__baseCls::CreateChildren(xmlNode))
         return FALSE;
 
     if (xmlTemplate)
@@ -337,7 +337,7 @@ int SMCListViewEx::GetColumnCount() const
 
 void SMCListViewEx::UpdateChildrenPosition()
 {
-    __super::UpdateChildrenPosition();
+    __baseCls::UpdateChildrenPosition();
     UpdateHeaderCtrl(true);
 }
 
@@ -562,7 +562,7 @@ void SMCListViewEx::OnPaint(IRenderTarget *pRT)
 BOOL SMCListViewEx::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 {
     int nOldPos = bVertical ? m_siVer.nPos : m_siHoz.nPos;
-    __super::OnScroll(bVertical, uCode, nPos);
+    __baseCls::OnScroll(bVertical, uCode, nPos);
     int nNewPos = bVertical ? m_siVer.nPos : m_siHoz.nPos;
     if (nOldPos != nNewPos)
     {
@@ -811,7 +811,7 @@ void SMCListViewEx::UpdateVisibleItem(int iItem)
 
 void SMCListViewEx::OnSize(UINT nType, CSize size)
 {
-    __super::OnSize(nType, size);
+    __baseCls::OnSize(nType, size);
     UpdateScrollBar();
     UpdateHeaderCtrl(true);
 
@@ -853,7 +853,7 @@ void SMCListViewEx::OnDestroy()
         delete pLstTypeItems;
     }
     m_itemRecycle.RemoveAll();
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1113,7 +1113,7 @@ LRESULT SMCListViewEx::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
             // 点击空白区域取消选中
             SetSel(-1, TRUE);
         }
-        __super::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
+        __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
     }
     else if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP || uMsg == WM_MBUTTONUP)
     {
@@ -1147,7 +1147,7 @@ LRESULT SMCListViewEx::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         if (pHover)
             pHover->DoFrameEvent(uMsg, wParam, MAKELPARAM(itempt.x, itempt.y));
         //交给panel处理
-        __super::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
+        __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
     }
     //所有不需要处理的都交给默认处理
     else
@@ -1155,7 +1155,7 @@ LRESULT SMCListViewEx::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         if (pHover)
             pHover->DoFrameEvent(uMsg, wParam, MAKELPARAM(itempt.x, itempt.y));
         //交给panel处理
-        __super::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
+        __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
     }
     SetMsgHandled(TRUE);
     return 0;
@@ -1179,7 +1179,7 @@ LRESULT SMCListViewEx::OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 void SMCListViewEx::OnMouseLeave()
 {
-    __super::OnMouseLeave();
+    __baseCls::OnMouseLeave();
     if (m_pHoverItem)
     {
         m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
@@ -1319,7 +1319,7 @@ BOOL SMCListViewEx::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
                                    MAKELPARAM(pt2.x, pt2.y)))
             return TRUE;
     }
-    return __super::OnMouseWheel(nFlags, zDelta, pt);
+    return __baseCls::OnMouseWheel(nFlags, zDelta, pt);
 }
 
 int SMCListViewEx::GetScrollLineSize(BOOL bVertical)
@@ -1352,7 +1352,7 @@ void SMCListViewEx::SetItemLocator(IListViewItemLocator *pItemLocator)
 BOOL SMCListViewEx::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
 {
     if (!m_pHoverItem)
-        return __super::UpdateToolTip(pt, tipInfo);
+        return __baseCls::UpdateToolTip(pt, tipInfo);
     return m_pHoverItem->UpdateToolTip(pt, tipInfo);
 }
 
@@ -1426,7 +1426,7 @@ UINT SMCListViewEx::OnGetDlgCode()
 
 void SMCListViewEx::OnKillFocus(SWND wndFocus)
 {
-    __super::OnKillFocus(wndFocus);
+    __baseCls::OnKillFocus(wndFocus);
     if (m_bSwap)
     {
         m_bSwap = false;
@@ -1451,7 +1451,7 @@ void SMCListViewEx::OnKillFocus(SWND wndFocus)
 
 void SMCListViewEx::OnSetFocus(SWND wndOld)
 {
-    __super::OnSetFocus(wndOld);
+    __baseCls::OnSetFocus(wndOld);
     if (m_iSelItem == -1)
         return;
 
@@ -1503,7 +1503,7 @@ BOOL SMCListViewEx::OnSetCursor(const CPoint &pt)
     }
     if (!bRet)
     {
-        bRet = __super::OnSetCursor(pt);
+        bRet = __baseCls::OnSetCursor(pt);
     }
     return bRet;
 }
@@ -1522,7 +1522,7 @@ BOOL SMCListViewEx::OnItemClick(IEvtArgs *pEvt)
 
 void SMCListViewEx::OnColorize(COLORREF cr)
 {
-    __super::OnColorize(cr);
+    __baseCls::OnColorize(cr);
     SPOSITION pos = m_lstItems.GetHeadPosition();
     while (pos)
     {
@@ -1533,7 +1533,7 @@ void SMCListViewEx::OnColorize(COLORREF cr)
 
 void SMCListViewEx::OnRebuildFont()
 {
-    __super::OnRebuildFont();
+    __baseCls::OnRebuildFont();
 }
 
 } // namespace SOUI

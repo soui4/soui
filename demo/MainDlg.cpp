@@ -666,12 +666,12 @@ protected:
 	}
 BEGIN_MSG_MAP_EX(SSkiaTestWnd)
 	MSG_WM_LBUTTONDOWN(OnLButtonDown)
-	CHAIN_MSG_MAP(__super)
+	CHAIN_MSG_MAP(__baseCls)
 END_MSG_MAP()
 
 	void OnFinalMessage(HWND hWnd){ 
 	    //演示OnFinalMessage用法,下面new出来的不需要显示调用delete
-	    __super::OnFinalMessage(hWnd);
+	    __baseCls::OnFinalMessage(hWnd);
 	    delete this;
 	}  
 };

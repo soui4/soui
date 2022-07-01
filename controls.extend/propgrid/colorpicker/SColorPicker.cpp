@@ -27,7 +27,7 @@ void SColorPicker::OnPaint( IRenderTarget *pRT)
 
 void SColorPicker::OnLButtonUp( UINT nFlags,CPoint pt )
 {
-	__super::OnLButtonUp(nFlags,pt);
+	__baseCls::OnLButtonUp(nFlags,pt);
 	CColourPopup *pCrPopup = new CColourPopup(GetContainer()->GetHostHwnd(),this);
 	CRect rcWnd;
 	GetWindowRect(rcWnd);

@@ -16,7 +16,7 @@ namespace SOUI
 
 	void S3dWindow::OnShowWindow(BOOL bShow, UINT nStatus)
 	{
-		__super::OnShowWindow(bShow,nStatus);
+		__baseCls::OnShowWindow(bShow,nStatus);
 		if(IsVisible(TRUE))
 		{
 			GetContainer()->RegisterTimelineHandler(this);
@@ -102,7 +102,7 @@ namespace SOUI
 	void S3dWindow::OnDestroy()
 	{
 		GetContainer()->UnregisterTimelineHandler(this);
-		__super::OnDestroy();
+		__baseCls::OnDestroy();
 	}
 
 

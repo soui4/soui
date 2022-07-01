@@ -70,7 +70,7 @@ namespace SOUI
 	{
 		if(!m_path || !m_pathMeasure)
 		{
-			__super::OnPaint(pRT);
+			__baseCls::OnPaint(pRT);
 			return;
 		}
 
