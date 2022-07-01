@@ -393,7 +393,7 @@ STDMETHODIMP SSmileyCtrl::SetClientSite(IOleClientSite *pClientSite)
         if(FAILED(hr)) return E_FAIL;
     }
     
-    return __super::SetClientSite(pClientSite);
+    return IOleObjectImpl<SSmileyCtrl>::SetClientSite(pClientSite);
 }
 
 
