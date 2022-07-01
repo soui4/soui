@@ -86,6 +86,7 @@ HEADERS += MainDlg.h \
           ../controls.extend/shexedit.h \
           ../controls.extend/sbytearray.h \
           ../controls.extend/SMcListViewEx/STabCtrlHeaderBinder.h \
+          ../controls.extend/SCheckBox2.h \
           magnet/magnetframe.h \
           smatrixwindow.h \
           sroundimage.h \
@@ -103,7 +104,6 @@ HEADERS += MainDlg.h \
           qrcode/SQrCtrl.h \
           qrcode/QR_Encode.h \
           SPathView.h \
-          SCheckBox2.h \
 
 SOURCES += demo.cpp \
           MainDlg.cpp \
@@ -147,6 +147,7 @@ SOURCES += demo.cpp \
           ../controls.extend/sgrouplist.cpp \
           ../controls.extend/shexedit.cpp \
           ../controls.extend/sbytearray.cpp \
+          ../controls.extend/SCheckBox2.cpp \
           magnet/magnetframe.cpp \
           smatrixwindow.cpp \ 
           sroundimage.cpp \          
@@ -163,7 +164,6 @@ SOURCES += demo.cpp \
           qrcode/SQrCtrl.cpp \
           qrcode/QR_Encode.cpp \
           SPathView.cpp \
-          SCheckBox2.cpp \
 
 RC_FILE += demo.rc
 

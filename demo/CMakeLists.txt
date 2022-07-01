@@ -51,6 +51,7 @@ set(EXTENDCOTROLS ${EXTENDCOTROLS}
 	${PROJECT_SOURCE_DIR}/controls.extend/SGroupList.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SByteArray.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SHexEdit.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SCheckBox2.h
 )
 
 set(EXTENDCOTROLS ${EXTENDCOTROLS}
@@ -93,6 +94,7 @@ set(EXTENDCOTROLS ${EXTENDCOTROLS}
 	${PROJECT_SOURCE_DIR}/controls.extend/SGroupList.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SByteArray.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SHexEdit.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SCheckBox2.cpp
 )
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})

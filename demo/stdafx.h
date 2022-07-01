@@ -40,10 +40,10 @@
 #include "../controls.extend/SGroupList.h"
 #include "../controls.extend/SAniWindow.h"
 #include "../controls.extend/propgrid/SPropertyGrid.h"
+#include "../controls.extend/SCheckBox2.h"
 
 #include "SInterpolatorView.h"
 #include "SPathView.h"
-#include "SCheckBox2.h"
 
 using namespace SOUI;
 

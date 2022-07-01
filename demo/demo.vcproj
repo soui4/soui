@@ -154,7 +154,7 @@
 			<File
 				RelativePath="qrcode\QR_Encode.cpp" />
 			<File
-				RelativePath="SCheckBox2.cpp" />
+				RelativePath="..\controls.extend\SCheckBox2.cpp" />
 			<File
 				RelativePath="..\controls.extend\SChromeTabCtrl.cpp" />
 			<File
@@ -279,7 +279,7 @@
 			<File
 				RelativePath="qrcode\QR_Encode.h" />
 			<File
-				RelativePath="SCheckBox2.h" />
+				RelativePath="..\controls.extend\SCheckBox2.h" />
 			<File
 				RelativePath="..\controls.extend\SChromeTabCtrl.h" />
 			<File
