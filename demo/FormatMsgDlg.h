@@ -15,7 +15,7 @@ namespace SOUI
 
         EVENT_MAP_BEGIN()
             EVENT_ID_COMMAND(IDOK,OnOK)
-            EVENT_MAP_END()
+        EVENT_MAP_END2(SHostDialog)
 
     };
 

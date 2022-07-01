@@ -39,6 +39,7 @@ INT_PTR SOUI_EXP SMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT 
 class SOUI_EXP SMessageBoxImpl
     : public SHostDialog
     , public SDpiHandler<SMessageBoxImpl> {
+	DEF_SOBJECT(SHostDialog, L"msgbox")
   public:
     /**
      * SMessageBoxImpl::SMessageBoxImpl
@@ -97,7 +98,7 @@ class SOUI_EXP SMessageBoxImpl
 
     EVENT_MAP_BEGIN()
     EVENT_ID_COMMAND_RANGE(IDOK, IDNO, OnBtnClick)
-    EVENT_MAP_END()
+    EVENT_MAP_END2(SHostDialog)
 
     BEGIN_MSG_MAP_EX(SMessageBoxImpl)
     CHAIN_MSG_MAP(SDpiHandler<SMessageBoxImpl>)

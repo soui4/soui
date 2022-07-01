@@ -39,7 +39,8 @@ public:
 		EVENT_ID_RANGE_HANDLER(10, 27, EVT_CMD, OnSetSkin)
 		EVENT_ID_RANGE_HANDLER(30,48,EVT_CMD, OnColor)		
 		EVENT_ID_COMMAND(51,OnBuiltinSkin)
-	EVENT_MAP_END()
+	EVENT_MAP_END2(SHostWnd)
+
 		BEGIN_MSG_MAP_EX(CSetSkinWnd)
 		MSG_WM_INITDIALOG(OnInitDialog)
 		MESSAGE_HANDLER(g_dwSkinChangeMessage, OnSkinChangeMessage)

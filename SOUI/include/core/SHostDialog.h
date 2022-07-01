@@ -43,7 +43,7 @@ class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
     EVENT_MAP_BEGIN()
     EVENT_ID_COMMAND(IDOK, OnOK)
     EVENT_ID_COMMAND(IDCANCEL, OnCancel)
-    EVENT_MAP_END()
+    EVENT_MAP_END2(SHostWnd)
 
     BEGIN_MSG_MAP_EX(SHostDialog)
     MSG_WM_CLOSE(OnCancel)

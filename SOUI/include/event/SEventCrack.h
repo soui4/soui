@@ -37,6 +37,15 @@
     return nCount > 0;                           \
     }
 
+#define EVENT_MAP_END2(baseCls)                          \
+	if (pEvt->IsBubbleUp())                      \
+	{                                            \
+	BOOL bRet = baseCls::_HandleEvent(pEvt); \
+	nCount += bRet ? 1 : 0;                  \
+	}                                            \
+	return nCount > 0;                           \
+	}
+
 #define EVENT_MAP_BREAK() \
     return nCount > 0;    \
     }

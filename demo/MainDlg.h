@@ -281,7 +281,7 @@ protected:
 		EVENT_ID_COMMAND(R.id.btn_set_prop_value,OnSetPropItemValue)
 		EVENT_NAME_HANDLER(L"tgl_left",EventCmd::EventID,OnToggleLeft)
 		EVENT_NAME_COMMAND(L"img_soui",OnSouiClick)
-	EVENT_MAP_END()	
+	EVENT_MAP_END2(SHostWnd)	
 
     //HOST消息及响应函数映射表
 	BEGIN_MSG_MAP_EX(CMainDlg)
