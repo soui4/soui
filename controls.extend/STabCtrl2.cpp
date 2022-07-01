@@ -243,7 +243,7 @@ void STabCtrl2::DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWO
 void STabCtrl2::OnStateChanged(DWORD dwOldState, DWORD dwNewState)
 {
     InvalidateRect(GetTitleRect());
-    __super::OnStateChanged(dwOldState, dwNewState);
+    __baseCls::OnStateChanged(dwOldState, dwNewState);
 }
 
 void STabCtrl2::OnNextFrame()
@@ -263,12 +263,12 @@ void STabCtrl2::OnNextFrame()
 void STabCtrl2::OnDestroy()
 {
     GetContainer()->UnregisterTimelineHandler(this);
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
 int STabCtrl2::OnCreate(void *)
 {
-    int iRet = __super::OnCreate(NULL);
+    int iRet = __baseCls::OnCreate(NULL);
     GetContainer()->RegisterTimelineHandler(this);
     GetEventSet()->subscribeEvent(EventTabItemHover::EventID,
                                   Subscriber(&STabCtrl2::OnItemHover, this));

@@ -459,7 +459,7 @@ void SChromeTabCtrl::OnNextFrame()
 
 int SChromeTabCtrl::OnCreate(LPVOID)
 {
-    int nRet = __super::OnCreate(NULL);
+    int nRet = __baseCls::OnCreate(NULL);
     if (nRet == 0)
         GetContainer()->RegisterTimelineHandler(this);
     return nRet;
@@ -468,7 +468,7 @@ int SChromeTabCtrl::OnCreate(LPVOID)
 void SChromeTabCtrl::OnDestroy()
 {
     GetContainer()->UnregisterTimelineHandler(this);
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
 void SChromeTabCtrl::SetCurSel(int iTab, bool bSendNotify)

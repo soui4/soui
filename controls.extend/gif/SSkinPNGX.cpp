@@ -5,8 +5,7 @@
 #include <interface/srender-i.h>
 
 
-namespace SOUI
-{
+SNSBEGIN
 
 	SSkinPNGX::SSkinPNGX() :m_bVert(FALSE)
 	{
@@ -82,9 +81,9 @@ void SSkinPNGX::_Scale(ISkinObj *pObj, int nScale)
 	SSkinPNGX *pClone = sobj_cast<SSkinPNGX>(pObj);
 	int wid = MulDiv(m_pngx->Width(),nScale,100);
 	int hei = MulDiv(m_pngx->Height(),nScale,100);
-	m_pngx->Scale(&pClone->m_pngx,wid,hei,kHigh_FilterLevel);
+	m_pngx->Scale2(&pClone->m_pngx,wid,hei,kHigh_FilterLevel);
 	pClone->m_nDelays = m_nDelays;
 	pClone->m_bVert = m_bVert;
 }
 
-}//end of namespace SOUI
+SNSEND

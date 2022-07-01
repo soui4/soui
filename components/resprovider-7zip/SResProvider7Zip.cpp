@@ -4,12 +4,15 @@
 #include "SResProvider7Zip.h"
 #include <xml/SXml.h>
 
+namespace CursorIcon_7z{
 extern HICON CURSORICON_LoadFromBuf(const BYTE * bits,DWORD filesize,INT width, INT height,BOOL fCursor, UINT loadflags);
 extern HICON CURSORICON_LoadFromFile( LPCWSTR filename,
 									 INT width, INT height,
 									 BOOL fCursor, UINT loadflags);
+}
 
 using namespace SevenZip;
+using namespace CursorIcon_7z;
 
 SNSBEGIN
 

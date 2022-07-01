@@ -1,41 +1,23 @@
 #pragma once
 #include "core\Swnd.h"
 
+SNSBEGIN
+
 #define EVT_BTNSEL_CHANGING EVT_EXTERNAL_BEGIN + 100
 #define EVT_BTNSEL_CHANGED  EVT_BTNSEL_CHANGING + 1
 
-class EventBtnSelChanging : public TplIEvtArgs<EventBtnSelChanging> {
-    DEF_SOBJECT(TplIEvtArgs<EventBtnSelChanging>, L"on_btn_sel_changing")
-  public:
-    EventBtnSelChanging(SObject *pSender)
-        : TplIEvtArgs<EventBtnSelChanging>(pSender)
-        , bCancel(FALSE)
-    {
-    }
-    enum
-    {
-        EventID = EVT_BTNSEL_CHANGING
-    };
-    int iOldSel;
-    int iNewSel;
-    BOOL bCancel;
-};
-class EventBtnSelChanged : public TplIEvtArgs<EventBtnSelChanged> {
-    DEF_SOBJECT(TplIEvtArgs<EventBtnSelChanged>, L"on_btn_sel_changed")
-  public:
-    EventBtnSelChanged(SObject *pSender)
-        : TplIEvtArgs<EventBtnSelChanged>(pSender)
-        , bCancel(FALSE)
-    {
-    }
-    enum
-    {
-        EventID = EVT_BTNSEL_CHANGED
-    };
-    int iOldSel;
-    int iNewSel;
-    BOOL bCancel;
-};
+DEF_EVT_EXT(EventBtnSelChanging,EVT_BTNSEL_CHANGING,{
+	int iOldSel;
+	int iNewSel;
+	BOOL bCancel;
+});
+
+DEF_EVT_EXT(EventBtnSelChanged,EVT_BTNSEL_CHANGED,{
+	int iOldSel;
+	int iNewSel;
+	BOOL bCancel;
+});
+
 //一个
 class SLoopButton : public SImageButton {
     DEF_SOBJECT(SImageButton, L"loopbtn")
@@ -50,8 +32,8 @@ class SLoopButton : public SImageButton {
     SOUI_ATTRS_END()
 
   protected:
-    virtual void OnStateChanged(DWORD dwOldState, DWORD dwNewState);
-    virtual BOOL NeedRedrawWhenStateChange()
+    virtual void OnStateChanged(DWORD dwOldState, DWORD dwNewState) override;
+    virtual BOOL NeedRedrawWhenStateChange() override
     {
         return m_iSkinStates > 1 ? TRUE : FALSE;
     }
@@ -83,3 +65,5 @@ class SLoopButton : public SImageButton {
     //子图的状态数，不是总共有多少个子图，而是每种状态下的子图数
     int m_iSkinStates;
 };
+
+SNSEND

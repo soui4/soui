@@ -218,7 +218,7 @@ class SMaskEdit : public SEdit {
  * Describe    日期编辑框
  */
 class SDateEdit : public SMaskEdit {
-    DEF_SOBJECT(SDateEdit, L"dateedit")
+    DEF_SOBJECT(SMaskEdit, L"dateedit")
 
   public:
     /**
@@ -281,7 +281,7 @@ class SDateEdit : public SMaskEdit {
  * Describe    时间编辑框
  */
 class STimeEdit : public SDateEdit {
-    DEF_SOBJECT(STimeEdit, L"timeedit")
+    DEF_SOBJECT(SDateEdit, L"timeedit")
 
   public:
     /**

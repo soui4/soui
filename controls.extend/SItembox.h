@@ -13,9 +13,7 @@
 #pragma once
 #include <core/SPanel.h>
 
-namespace SOUI
-{
-
+SNSBEGIN
 /**
  * @class      SItemBox
  * @brief      ItemBox
@@ -201,7 +199,7 @@ class SItemBox : public SScrollView {
      *
      * Describe  更新子节点位置
      */
-    virtual void UpdateChildrenPosition()
+    virtual void WINAPI UpdateChildrenPosition()
     {
     } // leave it empty
 
@@ -243,7 +241,7 @@ class SItemBox : public SScrollView {
      *
      * Describe  获取某项得索引
      */
-    virtual BOOL CreateChildren(pugi::xml_node xmlNode);
+    virtual BOOL CreateChildren(SXmlNode xmlNode) override;
 
     SOUI_ATTRS_BEGIN()
     ATTR_INT(L"itemWidth", m_nItemWid, TRUE)
@@ -257,4 +255,4 @@ class SItemBox : public SScrollView {
     SOUI_MSG_MAP_END()
 };
 
-} // namespace SOUI
+SNSEND

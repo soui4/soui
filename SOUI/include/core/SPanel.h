@@ -249,7 +249,7 @@ class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
     SOUI_MSG_MAP_END()
   protected:
     SLayoutSize m_viewSize[2];
-    POINT m_ptOrigin;
+    CPoint m_ptOrigin;
     SIZE m_szView;
 };
 

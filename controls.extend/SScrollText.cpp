@@ -51,13 +51,13 @@ void SScrollText::OnPaint(IRenderTarget *pRT)
 
 void SScrollText::OnSize(UINT nType, CSize size)
 {
-    __super::OnSize(nType, size);
+    __baseCls::OnSize(nType, size);
     UpdateScrollInfo(size);
 }
 
 void SScrollText::OnShowWindow(BOOL bShow, UINT nStatus)
 {
-    __super::OnShowWindow(bShow, nStatus);
+    __baseCls::OnShowWindow(bShow, nStatus);
     if (m_nScrollWidth > 0)
     {
         if (IsVisible(TRUE))
@@ -74,7 +74,7 @@ void SScrollText::OnShowWindow(BOOL bShow, UINT nStatus)
 
 void SScrollText::SetWindowText(const SStringT &strText)
 {
-    __super::SetWindowText(strText);
+    __baseCls::SetWindowText(strText);
     UpdateScrollInfo(GetClientRect().Size()); //重新计算滚动长度
 }
 

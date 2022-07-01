@@ -1,27 +1,13 @@
 #pragma once
 
 #include "slistboxex.h"
-namespace SOUI
-{
+SNSBEGIN
 
-class EventOfComoboxExItem : public TplIEvtArgs<EventOfComoboxExItem> {
-    DEF_SOBJECT(EventOfComoboxExItem, L"on_event_of_comboxex_item")
-  public:
-    EventOfComoboxExItem(SObject *pSender, EventCmd *_pOrgEvt)
-        : TplIEvtArgs<EventOfComoboxExItem>(pSender)
-        , pOrgEvt(_pOrgEvt)
-        , bCancel(FALSE)
-    {
-    }
+DEF_EVT_EXT(EventOfComoboxExItem,EVT_EXTERNAL_BEGIN + 300,{
+	EventCmd *pOrgEvt;
+	BOOL bCancel;
+});
 
-    enum
-    {
-        EventID = EVT_EXTERNAL_BEGIN + 300
-    };
-
-    EventCmd *pOrgEvt;
-    BOOL bCancel;
-};
 
 class SComboBoxEx : public SComboBase {
     DEF_SOBJECT(SComboBase, L"comboboxex")
@@ -48,7 +34,7 @@ class SComboBoxEx : public SComboBase {
      *
      * Describe  设置当前选中
      */
-    BOOL SetCurSel(int iSel)
+    BOOL WINAPI SetCurSel(int iSel) override
     {
         if (m_pListBox->SetCurSel(iSel))
         {
@@ -68,7 +54,7 @@ class SComboBoxEx : public SComboBase {
      *
      * Describe  获取选中索引
      */
-    int GetCurSel() const
+    int WINAPI GetCurSel() const override
     {
         return m_pListBox->GetCurSel();
     }
@@ -80,7 +66,7 @@ class SComboBoxEx : public SComboBase {
      *
      * Describe  获取下拉项个数
      */
-    int GetCount() const
+    int WINAPI GetCount() const override
     {
         return m_pListBox->GetItemCount();
     }
@@ -196,7 +182,7 @@ class SComboBoxEx : public SComboBase {
      *
      * Describe  此函数是消息响应函数
      */
-    virtual BOOL FireEvent(IEvtArgs &evt);
+    BOOL WINAPI FireEvent(IEvtArgs *evt) override;
 
     /**
      * SComboBoxEx::CreateListBox
@@ -205,7 +191,7 @@ class SComboBoxEx : public SComboBase {
      *
      * Describe  创建下拉列表
      */
-    virtual BOOL CreateListBox(pugi::xml_node xmlNode);
+    BOOL CreateListBox(SXmlNode xmlNode) override;
 
     /**
      * SComboBoxEx::GetListBoxHeight
@@ -214,7 +200,7 @@ class SComboBoxEx : public SComboBase {
      *
      * Describe  获取下拉列表高度
      */
-    virtual int GetListBoxHeight();
+    int GetListBoxHeight() override;
 
     /**
      * SComboBoxEx::OnDropDown
@@ -245,4 +231,4 @@ class SComboBoxEx : public SComboBase {
     UINT m_uIconID;         /**< 图标ID */
 };
 
-} // namespace SOUI
+SNSEND

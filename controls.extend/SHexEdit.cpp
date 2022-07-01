@@ -192,12 +192,12 @@ SHexEdit::~SHexEdit()
 
 void SHexEdit::OnDestroy()
 {
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
 void SHexEdit::OnSize(UINT nType, CSize size)
 {
-    __super::OnSize(nType, size);
+    __baseCls::OnSize(nType, size);
     m_bRecalc = true;
     SetScrollbarRanges();
 }
@@ -415,13 +415,13 @@ void SHexEdit::SetSelectedFocusCol(COLORREF tSelectedFousTxtCol,
 void SHexEdit::OnSetFocus(SWND wndOld)
 {
     SetEditCaretPos(m_nCurrentAddress, m_bHighBits);
-    __super::OnSetFocus(wndOld);
+    __baseCls::OnSetFocus(wndOld);
 }
 
 void SHexEdit::OnKillFocus(SWND wndFocus)
 {
     DestoyEditCaret();
-    __super::OnKillFocus(wndFocus);
+    __baseCls::OnKillFocus(wndFocus);
 }
 
 void SHexEdit::OnPaint(IRenderTarget *pRT)
@@ -1376,7 +1376,7 @@ BOOL SHexEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
             OnHScroll(uCode, nPos, NULL);
     }
     else
-        __super::OnScroll(bVertical, uCode, nPos);
+        __baseCls::OnScroll(bVertical, uCode, nPos);
     return TRUE;
 }
 
@@ -1522,7 +1522,7 @@ void SHexEdit::OnLButtonUp(UINT nFlags, CPoint pt)
 
 void SHexEdit::OnLButtonDown(UINT nFlags, CPoint pt)
 {
-    __super::OnLButtonDown(nFlags, pt);
+    __baseCls::OnLButtonDown(nFlags, pt);
     GetContainer()->OnSetSwndFocus(m_swnd);
 
     GetAddressFromPoint(pt, m_nCurrentAddress, m_bHighBits);

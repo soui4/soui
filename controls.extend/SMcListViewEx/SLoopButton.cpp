@@ -1,6 +1,8 @@
 #include "stdafx.h"
 #include "SLoopButton.h"
 
+SNSBEGIN
+
 SLoopButton::SLoopButton()
     : m_iSkinStates(1)
     , m_iCurState(0)
@@ -48,16 +50,16 @@ void SLoopButton::OnPaint(IRenderTarget *pRT)
         if (GetState() & WndState_Hover)
         {
             // get hover
-            m_pBgSkin->DrawByIndex(pRT, rcClient, (m_iCurState * m_iSkinStates) + 0,
+            m_pBgSkin->DrawByIndex2(pRT, rcClient, (m_iCurState * m_iSkinStates) + 0,
                                    m_pBgSkin->GetAlpha());
-            m_pBgSkin->DrawByIndex(pRT, rcClient, (m_iCurState * m_iSkinStates) + 1, byNewAlpha);
+            m_pBgSkin->DrawByIndex2(pRT, rcClient, (m_iCurState * m_iSkinStates) + 1, byNewAlpha);
         }
         else
         {
             // lose hover
-            m_pBgSkin->DrawByIndex(pRT, rcClient, (m_iCurState * m_iSkinStates) + 0,
+            m_pBgSkin->DrawByIndex2(pRT, rcClient, (m_iCurState * m_iSkinStates) + 0,
                                    m_pBgSkin->GetAlpha());
-            m_pBgSkin->DrawByIndex(pRT, rcClient, (m_iCurState * m_iSkinStates) + 1,
+            m_pBgSkin->DrawByIndex2(pRT, rcClient, (m_iCurState * m_iSkinStates) + 1,
                                    m_pBgSkin->GetAlpha() - byNewAlpha);
         }
     }
@@ -72,11 +74,13 @@ void SLoopButton::OnLButtonUp(UINT nFlags, CPoint pt)
     FireEvent(evt);
     if (evt.bCancel)
     {
-        __super::OnLButtonUp(nFlags, pt);
+        __baseCls::OnLButtonUp(nFlags, pt);
         return;
     }
     Next();
     if (m_iSkinStates < 2 && m_iState > 1)
         Invalidate();
-    __super::OnLButtonUp(nFlags, pt);
+    __baseCls::OnLButtonUp(nFlags, pt);
 }
+
+SNSEND

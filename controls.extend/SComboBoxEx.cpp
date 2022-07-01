@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "SComboBoxEx.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SComboBoxEx::SComboBoxEx()
     : m_uTxtID(0)
@@ -21,7 +20,7 @@ SComboBoxEx::~SComboBoxEx()
     }
 }
 
-BOOL SComboBoxEx::CreateListBox(pugi::xml_node xmlNode)
+BOOL SComboBoxEx::CreateListBox(SXmlNode xmlNode)
 {
     SASSERT(xmlNode);
     //创建列表控件
@@ -29,18 +28,18 @@ BOOL SComboBoxEx::CreateListBox(pugi::xml_node xmlNode)
         = (SListBoxEx *)SApplication::getSingleton().CreateWindowByName(SListBoxEx::GetClassName());
     m_pListBox->SetContainer(GetContainer());
 
-    m_pListBox->InitFromXml(xmlNode.child(L"liststyle"));
+    m_pListBox->InitFromXml(&xmlNode.child(L"liststyle"));
     m_pListBox->SetAttribute(L"pos", L"0,0,-0,-0", TRUE);
     m_pListBox->SetAttribute(L"hotTrack", L"1", TRUE);
     m_pListBox->SetOwner(this); // chain notify message to combobox
     m_pListBox->SetID(IDC_DROPDOWN_LIST);
 
     //初始化列表数据
-    pugi::xml_node xmlNode_Items = xmlNode.child(L"items");
+    SXmlNode xmlNode_Items = xmlNode.child(L"items");
     if (xmlNode_Items)
     {
         int nItems = 0;
-        pugi::xml_node xmlNode_Item = xmlNode_Items.child(L"item");
+        SXmlNode xmlNode_Item = xmlNode_Items.child(L"item");
         while (xmlNode_Item)
         {
             nItems++;
@@ -99,9 +98,9 @@ int SComboBoxEx::GetListBoxHeight()
 
 void SComboBoxEx::OnCreateDropDown(SDropDownWnd *pDropDown)
 {
-    __super::OnCreateDropDown(pDropDown);
-    pDropDown->InsertChild(m_pListBox);
-    pDropDown->UpdateChildrenPosition();
+    __baseCls::OnCreateDropDown(pDropDown);
+    pDropDown->GetRoot()->InsertChild(m_pListBox);
+    pDropDown->GetRoot()->UpdateChildrenPosition();
 
     m_pListBox->SetVisible(TRUE);
     m_pListBox->SetFocus();
@@ -110,10 +109,10 @@ void SComboBoxEx::OnCreateDropDown(SDropDownWnd *pDropDown)
 
 void SComboBoxEx::OnDestroyDropDown(SDropDownWnd *pDropDown)
 {
-    pDropDown->RemoveChild(m_pListBox);
+    pDropDown->GetRoot()->RemoveChild(m_pListBox);
     m_pListBox->SetVisible(FALSE);
     m_pListBox->SetContainer(GetContainer());
-    __super::OnDestroyDropDown(pDropDown);
+    __baseCls::OnDestroyDropDown(pDropDown);
 }
 
 void SComboBoxEx::OnSelChanged()
@@ -127,26 +126,28 @@ void SComboBoxEx::OnSelChanged()
         m_pEdit->GetEventSet()->setMutedState(false);
     }
     Invalidate();
-    __super::OnSelChanged();
+    __baseCls::OnSelChanged();
 }
 
-BOOL SComboBoxEx::FireEvent(IEvtArgs &evt)
+BOOL SComboBoxEx::FireEvent(IEvtArgs *evt)
 {
-    if (evt.idFrom == IDC_DROPDOWN_LIST && m_pDropDownWnd)
+    if (evt->IdFrom() == IDC_DROPDOWN_LIST && m_pDropDownWnd)
     {
-        if (evt.GetID() == EventLBSelChanged::EventID)
+        if (evt->GetID() == EventLBSelChanged::EventID)
         { //列表选中项改变事件
             OnSelChanged();
             return TRUE;
         }
     }
-    if (evt.GetID() == EventOfPanel::EventID)
+    if (evt->GetID() == EventOfPanel::EventID)
     {
         EventOfPanel *pEvtOfPanel = (EventOfPanel *)&evt;
         if (pEvtOfPanel->pOrgEvt->GetID() == EventCmd::EventID)
         {
-            EventOfComoboxExItem evt2(this, (EventCmd *)pEvtOfPanel->pOrgEvt);
-            __super::FireEvent(evt2);
+            EventOfComoboxExItem evt2(this);
+			evt2.bCancel=FALSE;
+			evt2.pOrgEvt = (EventCmd *)pEvtOfPanel->pOrgEvt;
+            __baseCls::FireEvent(&evt2);
             if (!evt2.bCancel)
             { //可以关闭下拉列表
                 CloseUp();
@@ -168,4 +169,4 @@ SStringT SComboBoxEx::GetLBText(int iItem)
     return pText->GetWindowText();
 }
 
-} // namespace SOUI
+SNSEND

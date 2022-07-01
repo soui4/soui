@@ -24,7 +24,7 @@ SGifPlayer::~SGifPlayer()
 
 void SGifPlayer::OnPaint( IRenderTarget *pRT )
 {	
-	__super::OnPaint(pRT);
+	__baseCls::OnPaint(pRT);
 	if (m_aniSkin)
 	{		
 		m_aniSkin->DrawByIndex(pRT, GetWindowRect(),m_iCurFrame);
@@ -33,7 +33,7 @@ void SGifPlayer::OnPaint( IRenderTarget *pRT )
 
 void SGifPlayer::OnShowWindow( BOOL bShow, UINT nStatus )
 {
-	__super::OnShowWindow(bShow,nStatus);
+	__baseCls::OnShowWindow(bShow,nStatus);
 	if(!bShow)
 	{
         GetContainer()->UnregisterTimelineHandler(this);
@@ -140,7 +140,7 @@ BOOL SGifPlayer::_PlayFile( LPCTSTR pszFileName, BOOL bGif )
 void SGifPlayer::OnDestroy()
 {
     GetContainer()->UnregisterTimelineHandler(this);
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
 void SGifPlayer::OnContainerChanged(ISwndContainer *pOldContainer,ISwndContainer *pNewContainer)

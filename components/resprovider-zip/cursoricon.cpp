@@ -29,6 +29,8 @@
 
 #include <windows.h>
 
+namespace CursorIcon_Zip{
+
 #define WARN printf
 #pragma warning(disable:4018)
 #pragma pack(push,1)
@@ -760,3 +762,5 @@ HICON CURSORICON_LoadFromFile( LPCWSTR filename,
 	UnmapViewOfFile( bits );
 	return hIcon;
 }
+
+} //end of namespace

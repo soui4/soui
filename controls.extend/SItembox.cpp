@@ -8,8 +8,7 @@
 #include "stdafx.h"
 #include "sitembox.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SItemBox::SItemBox()
     : m_nItemWid(100)
@@ -301,7 +300,7 @@ CRect SItemBox::GetItemRect(int iItem)
 
 void SItemBox::OnSize(UINT nType, CSize size)
 {
-    __super::OnSize(nType, size);
+    __baseCls::OnSize(nType, size);
     if (GetWindowRect().IsRectEmpty())
         return;
 
@@ -328,7 +327,7 @@ void SItemBox::ReLayout()
 
 BOOL SItemBox::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 {
-    if (!__super::OnScroll(bVertical, uCode, nPos))
+    if (!__baseCls::OnScroll(bVertical, uCode, nPos))
         return FALSE;
 
     ReLayout();
@@ -344,14 +343,14 @@ int SItemBox::GetScrollLineSize(BOOL bVertical)
         return m_nItemWid + m_nSepWid;
 }
 
-BOOL SItemBox::CreateChildren(pugi::xml_node xmlNode)
+BOOL SItemBox::CreateChildren(SXmlNode xmlNode)
 {
     if (!xmlNode)
         return FALSE;
     RemoveAllItems();
 
-    pugi::xml_node xmlParent = xmlNode.parent();
-    pugi::xml_node xmlItem = xmlParent.child(L"item");
+    SXmlNode xmlParent = xmlNode.parent();
+    SXmlNode xmlItem = xmlParent.child(L"item");
 
     while (xmlItem)
     {
@@ -359,7 +358,7 @@ BOOL SItemBox::CreateChildren(pugi::xml_node xmlNode)
 
         InsertChild(pChild);
 
-        pChild->InitFromXml(xmlItem);
+        pChild->InitFromXml(&xmlItem);
         pChild->SetVisible(TRUE);
 
         pChild->GetLayoutParam()->SetSpecifiedSize(Horz, m_nItemWid);
@@ -370,4 +369,4 @@ BOOL SItemBox::CreateChildren(pugi::xml_node xmlNode)
     return TRUE;
 }
 
-} // namespace SOUI
+SNSEND

@@ -524,7 +524,7 @@ void SMaskEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
     if (!CanUseMask())
     {
-        __super::OnKeyDown(nChar, nRepCnt, nFlags);
+        __baseCls::OnKeyDown(nChar, nRepCnt, nFlags);
         return;
     }
 
@@ -537,7 +537,7 @@ void SMaskEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     case VK_LEFT:
     case VK_HOME:
     {
-        __super::OnKeyDown(nChar, nRepCnt, nFlags);
+        __baseCls::OnKeyDown(nChar, nRepCnt, nFlags);
 
         GetMaskState(FALSE);
 
@@ -560,7 +560,7 @@ void SMaskEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     case VK_RIGHT:
     case VK_END:
     {
-        __super::OnKeyDown(nChar, nRepCnt, nFlags);
+        __baseCls::OnKeyDown(nChar, nRepCnt, nFlags);
 
         GetMaskState(FALSE);
 
@@ -665,7 +665,7 @@ void SMaskEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
         return;
     }
 
-    __super::OnKeyDown(nChar, nRepCnt, nFlags);
+    __baseCls::OnKeyDown(nChar, nRepCnt, nFlags);
 }
 
 void SMaskEdit::ProcessChar(TCHAR nChar)
@@ -706,7 +706,7 @@ void SMaskEdit::ProcessChar(TCHAR nChar)
 
 int SMaskEdit::OnCreate(LPVOID)
 {
-    int nRet = __super::OnCreate(NULL);
+    int nRet = __baseCls::OnCreate(NULL);
     if (nRet != 0)
         return nRet;
 
@@ -717,7 +717,7 @@ void SMaskEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
     if (!CanUseMask())
     {
-        __super::OnChar(nChar, nRepCnt, nFlags);
+        __baseCls::OnChar(nChar, nRepCnt, nFlags);
         return;
     }
 
@@ -752,13 +752,13 @@ void SMaskEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
     else
     {
         if (nChar != 127)
-            __super::OnChar(nChar, nRepCnt, nFlags);
+            __baseCls::OnChar(nChar, nRepCnt, nFlags);
     }
 }
 
 void SMaskEdit::OnSetFocus(SWND wndOld)
 {
-    __super::OnSetFocus(wndOld);
+    __baseCls::OnSetFocus(wndOld);
 
     if (!CanUseMask())
     {
@@ -900,7 +900,7 @@ void SMaskEdit::SetMaskState()
     SStringT strWindowText = GetWindowText();
 
     CorrectWindowText();
-    GetContainer()->GetCaret()->SetVisible(FALSE);
+    GetContainer()->GetCaret()->SetVisible(FALSE,m_swnd);
 
     if (strWindowText != m_strWindowText)
     {
@@ -910,7 +910,7 @@ void SMaskEdit::SetMaskState()
     }
 
     SetSel(m_nStartChar, m_nEndChar, FALSE);
-    GetContainer()->GetCaret()->SetVisible(TRUE);
+    GetContainer()->GetCaret()->SetVisible(TRUE,m_swnd);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -926,7 +926,7 @@ SDateEdit::SDateEdit()
 
 int SDateEdit::OnCreate(LPVOID)
 {
-    int nRet = __super::OnCreate(NULL);
+    int nRet = __baseCls::OnCreate(NULL);
     if (nRet != 0)
         return nRet;
 
@@ -1001,7 +1001,7 @@ STimeEdit::STimeEdit()
 
 int STimeEdit::OnCreate(LPVOID)
 {
-    int nRet = __super::OnCreate(NULL);
+    int nRet = __baseCls::OnCreate(NULL);
     if (nRet != 0)
         return nRet;
 

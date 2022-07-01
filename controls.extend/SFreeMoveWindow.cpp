@@ -214,7 +214,7 @@ void SFreeMoveWindow::OnNcMouseMove(UINT nFlags, CPoint pt)
 
 void SFreeMoveWindow::OnNcPaint(IRenderTarget *pRT)
 {
-    __super::OnNcPaint(pRT);
+    __baseCls::OnNcPaint(pRT);
     if (m_pCaptionSkin)
     {
         CRect rcWnd = GetWindowRect();

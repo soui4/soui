@@ -58,7 +58,7 @@ void SEditIP::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
     if (nChar == '.' || isdigit(nChar))
     {
         if (nChar != '.')
-            __super::OnChar(nChar, nRepCnt, nFlags);
+            __baseCls::OnChar(nChar, nRepCnt, nFlags);
 
         if (GetWindowTextLength() > 2 || nChar == '.')
         {
@@ -73,7 +73,7 @@ void SEditIP::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void SEditIP::OnSetFocus(SWND wndOld)
 {
-    __super::OnSetFocus(wndOld);
+    __baseCls::OnSetFocus(wndOld);
     HWND hHost = GetContainer()->GetHostHwnd();
     m_hImcCopy = ImmGetContext(hHost);
     ImmAssociateContext(hHost, NULL);
@@ -81,7 +81,7 @@ void SEditIP::OnSetFocus(SWND wndOld)
 
 void SEditIP::OnKillFocus(SWND wndFocus)
 {
-    __super::OnKillFocus(wndFocus);
+    __baseCls::OnKillFocus(wndFocus);
     HWND hHost = GetContainer()->GetHostHwnd();
     ImmAssociateContext(hHost, m_hImcCopy);
     m_hImcCopy = 0;
@@ -107,7 +107,7 @@ SIPAddressCtrl::~SIPAddressCtrl(void)
 
 void SIPAddressCtrl::OnSize(UINT nType, CSize size)
 {
-    __super::OnSize(nType, size);
+    __baseCls::OnSize(nType, size);
 
     if (!m_editFields[0])
         return;

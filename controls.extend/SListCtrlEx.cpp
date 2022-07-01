@@ -340,7 +340,7 @@ void SListCtrlEx::OnPaint(IRenderTarget *pRT)
 
 void SListCtrlEx::OnSize(UINT nType, CSize size)
 {
-    __super::OnSize(nType, size);
+    __baseCls::OnSize(nType, size);
     Relayout();
 }
 
@@ -416,7 +416,7 @@ void SListCtrlEx::DrawItem(IRenderTarget *pRT, CRect &rcItem, int iItem)
 
 BOOL SListCtrlEx::CreateChildren(SXmlNode xmlNode)
 {
-    if (!__super::CreateChildren(xmlNode))
+    if (!__baseCls::CreateChildren(xmlNode))
         return FALSE;
 
     if (!xmlNode)
@@ -613,7 +613,7 @@ lblEnd:
 
 void SListCtrlEx::OnMouseLeave()
 {
-    __super::OnMouseLeave();
+    __baseCls::OnMouseLeave();
     if (m_iHoverItem != -1)
     {
         int nOldHover = m_iHoverItem;
@@ -641,7 +641,7 @@ BOOL SListCtrlEx::OnSetCursor(const CPoint &pt)
     }
     if (!bRet)
     {
-        bRet = __super::OnSetCursor(pt);
+        bRet = __baseCls::OnSetCursor(pt);
     }
     return bRet;
 }
@@ -693,13 +693,13 @@ UINT SListCtrlEx::OnGetDlgCode()
 void SListCtrlEx::OnDestroy()
 {
     DeleteAllItems(FALSE);
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
 BOOL SListCtrlEx::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
 {
     if (m_iHoverItem == -1)
-        return __super::UpdateToolTip(pt, tipInfo);
+        return __baseCls::UpdateToolTip(pt, tipInfo);
     return m_arrItems[m_iHoverItem]->UpdateToolTip(pt, tipInfo);
 }
 
@@ -880,14 +880,14 @@ void SListCtrlEx::UpdatePanelsIndex(UINT nFirst, UINT nLast)
 
 void SListCtrlEx::OnSetFocus(SWND wndOld)
 {
-    __super::OnSetFocus(wndOld);
+    __baseCls::OnSetFocus(wndOld);
     if (m_iSelItem != -1)
         m_arrItems[m_iSelItem]->DoFrameEvent(WM_SETFOCUS, 0, 0);
 }
 
 void SListCtrlEx::OnKillFocus(SWND wndFocus)
 {
-    __super::OnKillFocus(wndFocus);
+    __baseCls::OnKillFocus(wndFocus);
     if (m_iSelItem != -1)
         m_arrItems[m_iSelItem]->DoFrameEvent(WM_KILLFOCUS, 0, 0);
     if (m_iSelItem != -1)
@@ -896,7 +896,7 @@ void SListCtrlEx::OnKillFocus(SWND wndFocus)
 
 LRESULT SListCtrlEx::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
 {
-    LRESULT lRet = __super::OnNcCalcSize(bCalcValidRects, lParam);
+    LRESULT lRet = __baseCls::OnNcCalcSize(bCalcValidRects, lParam);
     Relayout();
     return lRet;
 }
@@ -920,7 +920,7 @@ void SListCtrlEx::OnViewOriginChanged(CPoint ptOld, CPoint ptNew)
 
 BOOL SListCtrlEx::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
-    return __super::OnMouseWheel(nFlags, zDelta, pt);
+    return __baseCls::OnMouseWheel(nFlags, zDelta, pt);
 }
 
 int SListCtrlEx::GetTopIndex() const
@@ -930,7 +930,7 @@ int SListCtrlEx::GetTopIndex() const
 
 BOOL SListCtrlEx::OnScroll(BOOL bVertical, UINT uCode, int nPos)
 {
-    BOOL bRet = __super::OnScroll(bVertical, uCode, nPos);
+    BOOL bRet = __baseCls::OnScroll(bVertical, uCode, nPos);
 
     if (bVertical)
     {
@@ -984,7 +984,7 @@ int SListCtrlEx::InsertColumn(int nIndex,
 
 void SListCtrlEx::UpdateChildrenPosition()
 {
-    __super::UpdateChildrenPosition();
+    __baseCls::UpdateChildrenPosition();
     UpdateHeaderCtrl();
 }
 //基类SScrollView的UpdateScrollBar需要声明成virtual

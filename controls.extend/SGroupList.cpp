@@ -72,7 +72,7 @@ void SGroupList::OnDestroy()
         }
         pGroup = pGroup->GetWindow(GSW_NEXTSIBLING);
     }
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
 bool SGroupList::SelectPage(int nID)
