@@ -666,7 +666,7 @@ protected:
 	}
 BEGIN_MSG_MAP_EX(SSkiaTestWnd)
 	MSG_WM_LBUTTONDOWN(OnLButtonDown)
-	CHAIN_MSG_MAP(__baseCls)
+	CHAIN_MSG_MAP(SHostWnd)
 END_MSG_MAP()
 
 	void OnFinalMessage(HWND hWnd){ 
