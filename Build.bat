@@ -7,8 +7,8 @@ COLOR 1f
 ECHO.
 ECHO.
 ECHO   ##############################################################
-ECHO   #               »¶Ó­Ê¹ÓÃ SOUI ¹¤³ÌÅäÖÃÏòµ¼                   #
-ECHO   #                                Æô³ÌÈí¼ş 2017.04.01         #
+ECHO   #               æ¬¢è¿ä½¿ç”¨ SOUI å·¥ç¨‹é…ç½®å‘å¯¼                   #
+ECHO   #                                å¯ç¨‹è½¯ä»¶ 2017.04.01         #
 ECHO   ##############################################################
 ECHO.
 ECHO.
@@ -25,8 +25,8 @@ SET supportxp=0
 SET vsvarbat=
 SET dynamicsoui=1
 
-rem Ñ¡Ôñ±àÒë°æ±¾
-SET /p selected=1.Ñ¡Ôñ±àÒë°æ±¾[1=x86;2=x64;3=x86+x64]:
+rem é€‰æ‹©ç¼–è¯‘ç‰ˆæœ¬
+SET /p selected=1.é€‰æ‹©ç¼–è¯‘ç‰ˆæœ¬[1=x86;2=x64;3=x86+x64]:
 if %selected%==1 (
 	SET target=x86
 ) else if %selected%==2 (
@@ -39,22 +39,29 @@ if %selected%==1 (
 	goto error
 )
 
-for /f "skip=2 delims=: tokens=1,*" %%i in ('%windir%\system32\reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion" /v "ProgramFilesDir (x86)"') do ( 
-	    set str=%%i
-		set var=%%j
-		set "var=!var:"=!"
-		if not "!var:~-1!"=="=" set strCMD=!str:~-1!:!var!
-	 )
-	 SET strCMD=%strCMD%\Microsoft Visual Studio\Installer\vswhere.exe
-	
-	 if exist "%strCMD%" (
-	 for /f "delims=" %%i in ('"%strCMD%" -nologo -version [16.0^,18.0] -prerelease -property installationPath -format value') do (
-	    set vs2019path=%%i
-		)
-	 )
+rem é€‰æ‹©å¼€å‘ç¯å¢ƒ
+SET /p selected=2.é€‰æ‹©å¼€å‘ç¯å¢ƒ[1=2005;2=2008;3=2010;4=2012;5=2013;6=2015;7=2017;8=2019;9=2022]:
 
-rem Ñ¡Ôñ¿ª·¢»·¾³
-SET /p selected=2.Ñ¡Ôñ¿ª·¢»·¾³[1=2005;2=2008;3=2010;4=2012;5=2013;6=2015;7=2017;8=2019]:
+for /f "skip=2 delims=: tokens=1,*" %%i in ('%windir%\system32\reg query "HKLM\SOFTWARE\Microsoft\Windows\CurrentVersion" /v "ProgramFilesDir (x86)"') do ( 
+	set str=%%i
+	set var=%%j
+	set "var=!var:"=!"
+	if not "!var:~-1!"=="=" set strCMD=!str:~-1!:!var!
+)
+SET strCMD=%strCMD%\Microsoft Visual Studio\Installer\vswhere.exe
+ECHO å‘½ä»¤ç›®å½•%strCMD%
+SET verSion=[16,17]
+if %selected%==9 (		 
+	SET verSion=[17,18]
+)
+ECHO æŸ¥è¯¢ç‰ˆæœ¬%verSion%
+if exist "%strCMD%" (
+	for /f "delims=" %%i in ('"%strCMD%" -nologo -version !verSion! -prerelease -property installationPath -format value') do (
+		set vs2019path=%%i
+	)
+)
+
+
 
 if %selected%==1 (
 	SET specs=win32-msvc2005
@@ -114,19 +121,27 @@ if %selected%==1 (
 		call !vsvarbat! %target%
 		rem call "!value!" %target%
 		goto toolsetxp
+)else if %selected%==9 (		 
+	  SET specs=win32-msvc2017
+	  SET vs2022path=!vs2019path!\VC\Auxiliary\Build\vcvarsall.bat
+	  ECHO Vs2022 path is:!vs2022path! 
+		SET vsvarbat="!vs2022path!"
+		call !vsvarbat! %target%
+		rem call "!value!" %target%
+		goto toolsetxp
 )else (
 	goto error
 )
 :toolsetxp
-rem XPÖ§³Ö
-SET /p selected=2.ÊÇ·ñÖ§³Öxp[1=Ö§³Ö;2=²»Ö§³Ö]:
+rem XPæ”¯æŒ
+SET /p selected=2.æ˜¯å¦æ”¯æŒxp[1=æ”¯æŒ;2=ä¸æ”¯æŒ]:
 		if %selected%==1 (
 		SET cfg=!cfg! TOOLSET_XP 
 		SET supportxp=1)
 :built
 rem @echo !vsvarbat! %target%
-rem Ñ¡Ôñ±àÒëÀàĞÍ
-SET /p selected=3.Ñ¡ÔñSOUI±àÒëÄ£Ê½[1=È«Ä£¿éDLL;2=È«Ä£¿éLIB;3=ÄÚºËLIB,×é¼şDLL(²»ÄÜÊ¹ÓÃLUA½Å±¾Ä£¿é)]:
+rem é€‰æ‹©ç¼–è¯‘ç±»å‹
+SET /p selected=3.é€‰æ‹©SOUIç¼–è¯‘æ¨¡å¼[1=å…¨æ¨¡å—DLL;2=å…¨æ¨¡å—LIB;3=å†…æ ¸LIB,ç»„ä»¶DLL(ä¸èƒ½ä½¿ç”¨LUAè„šæœ¬æ¨¡å—)]:
 if %selected%==1 (
 	SET dynamicsoui=1
 ) else if %selected%==2 (
@@ -137,8 +152,8 @@ if %selected%==1 (
 	goto error
 )
 
-rem Ñ¡Ôñ×Ö·û¼¯
-SET /p selected=4.Ñ¡Ôñ×Ö·û¼¯[1=UNICODE;2=MBCS]:
+rem é€‰æ‹©å­—ç¬¦é›†
+SET /p selected=4.é€‰æ‹©å­—ç¬¦é›†[1=UNICODE;2=MBCS]:
 
 if %selected%==1 (
 	rem do nothing
@@ -150,8 +165,8 @@ if %selected%==1 (
 	goto error
 )
 
-rem Ñ¡ÔñWCHARÖ§³Ö
-SET /p selected=5.½«WCHAR×÷ÎªÄÚ½¨ÀàĞÍ[1=ÊÇ;2=·ñ]:
+rem é€‰æ‹©WCHARæ”¯æŒ
+SET /p selected=5.å°†WCHARä½œä¸ºå†…å»ºç±»å‹[1=æ˜¯;2=å¦]:
 if %selected%==1 (
 	rem do nothing
 	SET wchar=1
@@ -163,7 +178,7 @@ if %selected%==1 (
 )
 
 rem CRT
-SET /p selected=6.Ñ¡ÔñCRTÁ´½ÓÄ£Ê½[1=¾²Ì¬Á´½Ó(MT);2=¶¯Ì¬Á´½Ó(MD)]:
+SET /p selected=6.é€‰æ‹©CRTé“¾æ¥æ¨¡å¼[1=é™æ€é“¾æ¥(MT);2=åŠ¨æ€é“¾æ¥(MD)]:
 if %selected%==1 (
 	SET mt=1
 	SET cfg=!cfg! USING_MT
@@ -174,8 +189,8 @@ if %selected%==1 (
 	goto error
 )
 
-rem Îªrelease°æ±¾Éú³Éµ÷ÊÔĞÅÏ¢
-SET /p selected=7.ÊÇ·ñÎªrelease°æ±¾Éú³Éµ÷ÊÔĞÅÏ¢[1=Éú³É;2=²»Éú³É]:
+rem ä¸ºreleaseç‰ˆæœ¬ç”Ÿæˆè°ƒè¯•ä¿¡æ¯
+SET /p selected=7.æ˜¯å¦ä¸ºreleaseç‰ˆæœ¬ç”Ÿæˆè°ƒè¯•ä¿¡æ¯[1=ç”Ÿæˆ;2=ä¸ç”Ÿæˆ]:
 if %selected%==1 (
 	SET cfg=!cfg! CAN_DEBUG
 ) else if %selected%==2 (
@@ -185,7 +200,7 @@ if %selected%==1 (
 )
 cd /d %~dp0
 rem @echo %cfg%
-rem ±£´æÏîÄ¿Ä¬ÈÏÅäÖÃ
+rem ä¿å­˜é¡¹ç›®é»˜è®¤é…ç½®
 if exist .\config\build.cfg del .\config\build.cfg
 set configStr=[BuiltConfig]
 echo !configStr!>>.\config\build.cfg
@@ -199,7 +214,7 @@ set configStr=SUPPORT_XP=%supportxp%
 echo !configStr!>>.\config\build.cfg
 set configStr=DYNAMIC_SOUI=%dynamicsoui%
 echo !configStr!>>.\config\build.cfg
-rem ²ÎÊıÅäÖÃÍê³É
+rem å‚æ•°é…ç½®å®Œæˆ
 
 if %specs%==win32-msvc2017 (	
 	tools\qmake2017 -tp vc -r -spec .\tools\mkspecs\%specs% "CONFIG += %cfg%"
@@ -262,7 +277,7 @@ if "%selected%" == "o" (
 goto final
 
 :error
-	ECHO Ñ¡Ôñ´íÎó£¬ÇëÖØĞÂÑ¡Ôñ	
+	ECHO é€‰æ‹©é”™è¯¯ï¼Œè¯·é‡æ–°é€‰æ‹©	
 :final
 
 rem pause
