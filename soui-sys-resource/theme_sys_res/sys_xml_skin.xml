@@ -32,7 +32,7 @@
   <imglist name="_skin.sys.radio" src="PNG:SYS_RADIO" states="8" checkAsPushdown="0"/>
   <imglist name="_skin.sys.focuscheckbox" src="PNG:SYS_FOCUS_CHECKBOX"/>
   <imglist name="_skin.sys.focusradio" src="PNG:SYS_FOCUS_RADIO"/>
-  <button name="_skin.sys.btn.normal" colorBorder="#7D9EBC" colorUp="#FEFEFE" colorDown="#C6E2FD" colorUpHover="#FEFEFE" colorDownHover="#DBEDFE" colorUpPush="#C6E2FD" colorDownPush="#FEFEFE"/>
+    <button name="_skin.sys.btn.normal" colorUp="#ffffff" colorDown="#ffffff" colorUpHover="#ecf5ff" colorDownHover="#ecf5ff" colorUpPush="#ecf5ff" colorDownPush="#ecf5ff" colorUpDisable="#DDDDDDFF" colorDownDisable="#DDDDDDFF" cornerRadius="4" colorBorder="#DCDFE6" colorBorderHover="#c6e2ff" colorBorderPush="#3a8ee6" colorBorderDisable="#DCDFE6"/>
   <scrollbar name="_skin.sys.scrollbar" src="PNG:SYS_SCROLLBAR" margin="3" hasgripper="0"/>
   <imgframe name="_skin.sys.border" src="PNG:SYS_BORDER" states="2" margin-x="2" margin-y="2"/>
   <imgcenter name="_skin.sys.dropbtn" src="PNG:SYS_DROPBTN" states="3"/>
