@@ -32,9 +32,9 @@
   <imglist name="_skin.sys.radio" src="PNG:SYS_RADIO" states="8" checkAsPushdown="0"/>
   <imglist name="_skin.sys.focuscheckbox" src="PNG:SYS_FOCUS_CHECKBOX"/>
   <imglist name="_skin.sys.focusradio" src="PNG:SYS_FOCUS_RADIO"/>
-    <button name="_skin.sys.btn.normal" colorUp="#ffffff" colorDown="#ffffff" colorUpHover="#ecf5ff" colorDownHover="#ecf5ff" colorUpPush="#ecf5ff" colorDownPush="#ecf5ff" colorUpDisable="#DDDDDDFF" colorDownDisable="#DDDDDDFF" cornerRadius="4" colorBorder="#DCDFE6" colorBorderHover="#c6e2ff" colorBorderPush="#3a8ee6" colorBorderDisable="#DCDFE6"/>
+    <button name="_skin.sys.btn.normal" colorUp="#ffffff" colorDown="#ffffff" colorUpHover="#ecf5ff" colorDownHover="#ecf5ff" colorUpPush="#ecf5ff" colorDownPush="#ecf5ff" colorUpDisable="#DDDDDDFF" colorDownDisable="#DDDDDDFF" cornerRadius="4" colorBorder="#1890FF" colorBorderHover="#1890FF" colorBorderPush="#1890FF" colorBorderDisable="#1890FF"/>
   <scrollbar name="_skin.sys.scrollbar" src="PNG:SYS_SCROLLBAR" margin="3" hasgripper="0"/>
-  <imgframe name="_skin.sys.border" src="PNG:SYS_BORDER" states="2" margin-x="2" margin-y="2"/>
+  <imgframe name="_skin.sys.border" src="PNG:SYS_BORDER" states="2" left="5" right="5" top="5" bottom="5"/>
   <imgcenter name="_skin.sys.dropbtn" src="PNG:SYS_DROPBTN" states="3"/>
   <imglist name="_skin.sys.tree.toggle" src="PNG:SYS_TREE_TOGGLE" states="6">
     <states>
@@ -64,7 +64,7 @@
   <imgframe name="_skin.sys.menu.border" src="PNG:SYS_MENU_BORDER" margin-x="2" margin-y="2"/>
   <imgframe name="_skin.sys.menu.skin" src="PNG:SYS_MENU_SKIN" states="2" margin="26,2,5,2"/>
   <imglist name="_skin.sys.icons" src="PNG:SYS_ICONS" states="12"/>
-  <imgframe name="_skin.sys.wnd.bkgnd"  src="PNG:SYS_WND_BKGND" left="5" right="5" top="40" bottom="40"/>
+  <imgframe name="_skin.sys.wnd.bkgnd"  src="PNG:SYS_WND_BKGND" left="5" right="5" top="5" bottom="5"/>
   <imgcenter name="_skin.sys.btn.prev" src="PNG:SYS_BTN_PREV" states="3" />
   <imgcenter name="_skin.sys.btn.next" src="PNG:SYS_BTN_NEXT" states="3" />
   <imgcenter name="_skin.sys.spin.up" src="PNG:SYS_SPIN_UP" states="3" vertical="1" />
