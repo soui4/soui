@@ -22,7 +22,7 @@ public:
 
 		musicItem abc = { _T(""),_T("天天") ,_T("SOUI就是棒") ,_T("三百年前") };
 		LPCTSTR pszSonger[] = { _T("刘德华"),_T("张学友"),_T("启程软件") };
-		for (int i = 0; i < 10; i++)
+		for (int i = 0; i < 1000; i++)
 		{
 			abc.songname.Format(_T("第%d个卖炭的"), i);
 			abc.artist = pszSonger[i % 3];
