@@ -15,6 +15,8 @@
 #include "../controls.extend/SScrollText.h"
 #include "../controls.extend/SCalendar2.h"
 #include "../controls.extend/SHexEdit.h"
+#include "../controls.extend/SRoundImage.h"
+#include "../controls.extend/SStaticGdip.h"
 
 #include "../controls.extend/SMcListViewEx\SHeaderCtrlEx.h"
 #include "../controls.extend/SMcListViewEx\SMcListViewEx.h"
@@ -24,7 +26,6 @@
 #include "SMatrixWindow.h"
 #include "SmileyCreateHook.h"
 #include "clock/sclock.h"
-#include "SRoundImage.h"
 
 //<--定一个filter="demo"的slog输出
 #undef LOG_FILTER
@@ -267,6 +268,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<SGroupList>();
 		theApp->RegisterWindowClass<SRoundImage>();
 		theApp->RegisterWindowClass<SHexEdit>();
+		theApp->RegisterWindowClass<SStaticGdip>();
 		if (SUCCEEDED(CUiAnimation::Init()))
 		{
 			theApp->RegisterWindowClass<SUiAnimationWnd>();//注册动画控件

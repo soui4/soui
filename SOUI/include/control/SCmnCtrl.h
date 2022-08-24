@@ -60,6 +60,9 @@ class SOUI_EXP SStatic : public SWindow {
                             int cchText,
                             LPRECT pRect,
                             UINT uFormat);
+	virtual SIZE OnMeasureText(IRenderTarget *pRT,
+		LPCTSTR pszBuf,
+		int cchText);
 
     void DrawMultiLine(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
 
