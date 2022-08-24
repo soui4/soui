@@ -52,6 +52,8 @@ set(EXTENDCOTROLS ${EXTENDCOTROLS}
 	${PROJECT_SOURCE_DIR}/controls.extend/SByteArray.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SHexEdit.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SCheckBox2.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SRoundImage.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SStaticGdip.h
 )
 
 set(EXTENDCOTROLS ${EXTENDCOTROLS}
@@ -95,6 +97,8 @@ set(EXTENDCOTROLS ${EXTENDCOTROLS}
 	${PROJECT_SOURCE_DIR}/controls.extend/SByteArray.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SHexEdit.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SCheckBox2.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SRoundImage.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SStaticGdip.cpp
 )
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
