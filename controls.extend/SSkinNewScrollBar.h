@@ -42,6 +42,24 @@ class SSkinNewScrollbar : public SSkinScrollbar {
     {
     }
 
+	void _Scale(ISkinObj *skinObj, int nScale) override
+	{
+		__baseCls::_Scale(skinObj, nScale);
+		SSkinNewScrollbar *pRet = sobj_cast<SSkinNewScrollbar>(skinObj);
+		CSize szSkin = GetSkinSize();
+		szSkin.cx = MulDiv(szSkin.cx, nScale, 100);
+		szSkin.cy = MulDiv(szSkin.cy, nScale, 100);
+
+		if (m_pImgHorz)
+		{
+			m_pImgHorz->Scale2(&pRet->m_pImgHorz, szSkin.cx*4, szSkin.cy, kHigh_FilterLevel);
+		}
+		if (m_pImgVert)
+		{
+			m_pImgVert->Scale2(&pRet->m_pImgVert, szSkin.cx*4, szSkin.cy, kHigh_FilterLevel);
+		}
+	}
+
     virtual void _DrawByState(IRenderTarget *pRT,
                               LPCRECT prcDraw,
                               DWORD dwState,
