@@ -3,7 +3,7 @@
 
 namespace SOUI
 {
-	SRoundImage::SRoundImage()
+	SRoundImage::SRoundImage():m_cornerSize(0)
 	{
 	}
 
@@ -23,7 +23,11 @@ namespace SOUI
 		SAutoRefPtr<IBrushS> br;
 		pRT->CreateSolidColorBrush(RGBA(0xBA, 0xB3, 0x99, 0xFF), &br);
 		pRT->SelectObject(br,NULL);
-		pRT->FillEllipse(&rc);
+		if(m_cornerSize==0){
+			pRT->FillEllipse(&rc);
+		}else{
+			pRT->FillRoundRect(&rc,CPoint(m_cornerSize,m_cornerSize));
+		}
 		pRT->SetXfermode(kSrcIn_Mode,NULL);
 		m_pSkin->DrawByIndex(pRT, rc, 0);
 		return (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
@@ -40,6 +44,16 @@ namespace SOUI
 	{
 		__baseCls::OnSize(nType, size);
 		m_img = GetRoundImage();
+	}
+
+	HRESULT SRoundImage::OnAttrCornerSize(const SStringW & value,BOOL bLoading)
+	{
+		m_cornerSize = _wtoi(value);
+		if(!bLoading){
+			m_img = GetRoundImage();
+			return S_OK;
+		}
+		return S_FALSE;
 	}
 
 }

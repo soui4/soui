@@ -6,10 +6,16 @@ namespace SOUI
 		DEF_SOBJECT(SImageWnd,L"roundImg")
 	private:
 		SAutoRefPtr<IBitmapS> m_img;
+		int m_cornerSize;
 	public:
 		SRoundImage();
 		~SRoundImage();
 
+	public:
+		HRESULT OnAttrCornerSize(const SStringW & value,BOOL bLoading);
+		SOUI_ATTRS_BEGIN()
+			ATTR_CUSTOM(L"cornerSize",OnAttrCornerSize)
+		SOUI_ATTRS_END()
 	protected:
 		SAutoRefPtr<IBitmapS> GetRoundImage() const;
 
