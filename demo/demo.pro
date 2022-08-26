@@ -88,6 +88,7 @@ HEADERS += MainDlg.h \
           ../controls.extend/SMcListViewEx/STabCtrlHeaderBinder.h \
           ../controls.extend/SCheckBox2.h \
           ../controls.extend/sroundimage.h \
+          ../controls.extend/sroundwnd.h \
           ../controls.extend/sstaticgdip.h \
           magnet/magnetframe.h \
           smatrixwindow.h \
@@ -150,6 +151,7 @@ SOURCES += demo.cpp \
           ../controls.extend/sbytearray.cpp \
           ../controls.extend/SCheckBox2.cpp \
           ../controls.extend/sroundimage.cpp \
+          ../controls.extend/sroundwnd.cpp \
           ../controls.extend/sstaticgdip.cpp \
           magnet/magnetframe.cpp \
           smatrixwindow.cpp \ 

@@ -17,6 +17,7 @@
 #include "../controls.extend/SHexEdit.h"
 #include "../controls.extend/SRoundImage.h"
 #include "../controls.extend/SStaticGdip.h"
+#include "../controls.extend/SRoundWnd.h"
 
 #include "../controls.extend/SMcListViewEx\SHeaderCtrlEx.h"
 #include "../controls.extend/SMcListViewEx\SMcListViewEx.h"
@@ -267,6 +268,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<SAniWindow>();
 		theApp->RegisterWindowClass<SGroupList>();
 		theApp->RegisterWindowClass<SRoundImage>();
+		theApp->RegisterWindowClass<SRoundWnd>();
 		theApp->RegisterWindowClass<SHexEdit>();
 		theApp->RegisterWindowClass<SStaticGdip>();
 		if (SUCCEEDED(CUiAnimation::Init()))
