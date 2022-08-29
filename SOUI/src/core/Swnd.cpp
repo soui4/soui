@@ -3171,7 +3171,7 @@ LPCWSTR SWindow::GetTrCtx() const
 
 int SWindow::GetScale() const
 {
-    return GetContainer() ? GetContainer()->GetScale() : 100;
+    return GetStyle().GetScale();
 }
 
 void SWindow::OnScaleChanged(int scale)

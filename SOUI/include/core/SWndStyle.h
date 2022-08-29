@@ -53,6 +53,8 @@ class SOUI_EXP SwndStyle {
     }
 
     void SetScale(int nScale);
+	int GetScale() const;
+
     void SetAlign(UINT uAlign);
     void SetVAlign(UINT uAlign);
 
@@ -75,10 +77,6 @@ class SOUI_EXP SwndStyle {
     COLORREF m_crText[4];      /**<文字4种状态下的颜色 */
     SDpiAwareFont m_ftText[4]; /**<文字4种状态下的字体 */
 
-    int GetScale() const
-    {
-        return m_nScale;
-    }
 
     int m_nScale;
 

@@ -144,6 +144,11 @@ void SwndStyle::SetScale(int nScale)
     }
 }
 
+int SwndStyle::GetScale() const
+{
+	return m_nScale;
+}
+
 CRect SwndStyle::GetMargin() const
 {
     CRect rcRet;

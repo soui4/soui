@@ -274,7 +274,6 @@ SHostWnd::SHostWnd(LPCTSTR pszResName /*= NULL*/)
     , m_pTipCtrl(NULL)
     , m_dummyWnd(NULL)
     , m_bRendering(FALSE)
-    , m_nScale(100)
     , m_szAppSetted(0, 0)
     , m_nAutoSizing(0)
     , m_bResizing(false)
@@ -760,7 +759,7 @@ void SHostWnd::OnDestroy()
     GetRoot()->FireEvent(evt);
 
     GetRoot()->SSendMessage(WM_DESTROY);
-
+	GetRoot()->SSendMessage(UM_SETSCALE,100);
     if (m_pTipCtrl)
     {
         GetMsgLoop()->RemoveMessageFilter(m_pTipCtrl);
@@ -770,7 +769,7 @@ void SHostWnd::OnDestroy()
 
     m_memRT = NULL;
     m_rgnInvalidate = NULL;
-    m_nScale = 100; // restore to 100
+
     SHostMgr::getSingletonPtr()->RemoveHostMsgHandler(this);
     // exit app. (copy from wtl)
     if (m_hostAttr.m_byWndType == SHostWndAttr::WT_APPMAIN
@@ -1510,7 +1509,7 @@ IScriptModule *SHostWnd::GetScriptModule()
 
 int SHostWnd::GetScale() const
 {
-    return m_nScale;
+    return GetRoot()->GetScale();
 }
 
 void SHostWnd::OnCavasInvalidate(SWND swnd)

@@ -182,8 +182,6 @@ class SOUI_EXP SHostWnd
 
     MSG m_msgMouse; /**<上一次鼠标按下消息*/
 
-    int m_nScale; /**<缩放比例 */
-
     CSize m_szAppSetted; /**<应用层设置的窗口大小 */
     int m_nAutoSizing;   /**<自动计算大小触发的WM_SIZE消息 */
     bool m_bResizing;    /**<执行WM_SIZE*/
