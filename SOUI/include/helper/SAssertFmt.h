@@ -20,7 +20,7 @@
 
 #define SASSERT_FMTA(expr, format, ...) \
     if (!(expr))                        \
-        SLOGFMTW(format, __VA_ARGS__);
+        SLOGFMTA(format, __VA_ARGS__);
 #endif
 
 #ifdef _UNICODE
