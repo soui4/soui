@@ -330,7 +330,8 @@ BOOL SResProviderMgr::HasResource(LPCTSTR pszType, LPCTSTR pszResName)
     SAutoLock lock(m_cs);
     if (IsFileType(pszType))
     {
-        return ::GetFileAttributes(pszResName) != INVALID_FILE_ATTRIBUTES;
+		SStringT strPath = m_strFilePrefix + pszResName;
+        return ::GetFileAttributes(strPath) != INVALID_FILE_ATTRIBUTES;
     }
     else
     {
