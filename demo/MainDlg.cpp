@@ -1110,7 +1110,7 @@ void CMainDlg::OnMcLvHeaderRelayout(IEvtArgs * e)
 		SWindow *pChk = pHeader->FindChildByName(L"chk_mclv_sel");
 		SASSERT(pChk);
 		CSize szChk = pChk->GetDesiredSize(-1,-1);
-		CRect rc2(CPoint(rc.left + 5, rc.top + (rc.Height()-szChk.cy)/2), szChk);
+		CRect rc2(CPoint(rc.right - 5 - szChk.cx, rc.top + (rc.Height()-szChk.cy)/2), szChk);
 		if (rc2.right >= rc.right - 5) rc2.right = rc.right - 5;
 		pChk->Move(rc2);
 	}

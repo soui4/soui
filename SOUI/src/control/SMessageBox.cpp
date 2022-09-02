@@ -50,22 +50,25 @@ INT_PTR SMessageBoxImpl::MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption
 
 BOOL SMessageBoxImpl::OnSetIcon(UINT uType)
 {
-    SIconWnd *pIcon = (SIconWnd *)FindChildByName(NAME_MSGBOX_ICON);
+    SImageWnd *pIcon = (SImageWnd *)FindChildByName(NAME_MSGBOX_ICON);
     if (!pIcon)
         return FALSE;
     switch (uType & 0xF0)
     {
-    case MB_ICONEXCLAMATION:
-        pIcon->SetIcon(LoadIcon(NULL, IDI_EXCLAMATION));
+	case MB_USERICON://done
+		pIcon->SetIcon(0);
+		break;
+    case MB_ICONWARNING:
+        pIcon->SetIcon(1);
         break;
     case MB_ICONINFORMATION:
-        pIcon->SetIcon(LoadIcon(NULL, IDI_INFORMATION));
+		pIcon->SetIcon(2);
         break;
+	case MB_ICONSTOP:
+		pIcon->SetIcon(3);
+		break;
     case MB_ICONQUESTION:
-        pIcon->SetIcon(LoadIcon(NULL, IDI_QUESTION));
-        break;
-    case MB_ICONHAND:
-        pIcon->SetIcon(LoadIcon(NULL, IDI_HAND));
+        pIcon->SetIcon(4);
         break;
     default:
         pIcon->SetVisible(FALSE, TRUE);

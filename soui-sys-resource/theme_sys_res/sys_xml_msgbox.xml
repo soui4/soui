@@ -19,7 +19,7 @@
     </caption>
 
     <window size="-2,-1" layout="hbox" interval="5" padding="10,10,10,10">
-      <icon name="msgicon" size="32,32" display="0"/>
+      <img name="msgicon" size="49,49" display="0" skin="_skin.sys.msgicon"/>
       <text name="msgtext" size="-1,-2" weight="1" colorText="#0000FF" multilines="1" valign="top" maxWidth="300"/>
     </window>
     <tabctrl size="-2,50" name="btnSwitch"  tabHeight="0">
