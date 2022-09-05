@@ -28,11 +28,11 @@ HRESULT SImageMaskWnd::OnAttrMask(const SStringW &strValue, BOOL bLoading)
     if (strChannel == L".a")
         m_iMaskChannel = 3;
     else if (strChannel == L".r")
-        m_iMaskChannel = 0;
+        m_iMaskChannel = 2;
     else if (strChannel == L".g")
         m_iMaskChannel = 1;
     else if (strChannel == L".b")
-        m_iMaskChannel = 2;
+        m_iMaskChannel = 0;
 
     IBitmapS *pImg = NULL;
     if (m_iMaskChannel == -1)
