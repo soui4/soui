@@ -864,7 +864,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
             }
             else
             {
-                SWindow *pChild = SApplication::getSingleton().CreateWindowByName(xmlChild.name());
+                SWindow *pChild = CreateChildByName(xmlChild.name());
                 if (pChild)
                 {
                     InsertChild(pChild);
@@ -874,6 +874,12 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
         }
     }
     return TRUE;
+}
+
+
+SWindow * SWindow::CreateChildByName(LPCWSTR pszName)
+{
+	return SApplication::getSingleton().CreateWindowByName(pszName);
 }
 
 SStringW SWindow::tr(const SStringW &strSrc) const
@@ -1241,12 +1247,12 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
         bRgnInClient = rcRgnUnionClient == rcClient;
     }
 
-    IRenderTarget *pRTBackup; // backup current RT
+    IRenderTarget* pRTBackup=NULL; // backup current RT
 
     if (IsLayeredWindow())
     { //获得当前LayeredWindow RT来绘制内容
         pRTBackup = pRT;
-
+		pRT=NULL;
         GETRENDERFACTORY->CreateRenderTarget(&pRT, rcWnd.Width(), rcWnd.Height());
         pRT->OffsetViewportOrg(-rcWnd.left, -rcWnd.top, NULL);
         //绘制到窗口的缓存上,需要继承原RT的绘图属性
@@ -1314,9 +1320,8 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     { //将绘制到窗口的缓存上的图像返回到上一级RT
         SASSERT(pRTBackup);
         OnCommitSurface(pRTBackup, &rcWnd, pRT, &rcWnd, GetAlpha());
-        IRenderTarget *p = pRT;
+		pRT->Release();
         pRT = pRTBackup;
-        p->Release();
     }
     if (bMtx)
         pRT->SetTransform(oriMtx.fMat, NULL);
@@ -1773,7 +1778,7 @@ SIZE SWindow::GetDesiredSize(int nParentWid, int nParentHei)
     { //检查设置大小
         szRet.cx = pLayoutParam->GetSpecifiedSize(Horz).toPixelSize(GetScale());
     }
-    else if (pLayoutParam->IsMatchParent(Horz) && nParentWid > 0)
+    else if (pLayoutParam->IsMatchParent(Horz) && nParentWid >= 0)
     {
         szRet.cx = nParentWid;
     }
@@ -1782,7 +1787,7 @@ SIZE SWindow::GetDesiredSize(int nParentWid, int nParentHei)
     { //检查设置大小
         szRet.cy = pLayoutParam->GetSpecifiedSize(Vert).toPixelSize(GetScale());
     }
-    else if (pLayoutParam->IsMatchParent(Vert) && nParentHei > 0)
+    else if (pLayoutParam->IsMatchParent(Vert) && nParentHei >= 0)
     {
         szRet.cy = nParentHei;
     }

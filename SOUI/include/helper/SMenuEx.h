@@ -25,11 +25,12 @@ class SOUI_EXP SMenuExItem : public SWindow {
     void OnSubMenuHided(BOOL bUncheckItem);
 
   protected:
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
+	SWindow * CreateChildByName(LPCWSTR pszName) OVERRIDE;
 
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei);
+    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
 
-    virtual void GetTextRect(LPRECT pRect);
+    void GetTextRect(LPRECT pRect) OVERRIDE;
 
   protected:
     BOOL OnEraseBkgnd(IRenderTarget *pRT);

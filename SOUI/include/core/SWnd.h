@@ -771,6 +771,8 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
 
     virtual BOOL CreateChildren(SXmlNode xmlNode);
 
+	virtual SWindow *CreateChildByName(LPCWSTR pszName);
+
     /**
      * RequestRelayout
      * @brief    请求重新布局

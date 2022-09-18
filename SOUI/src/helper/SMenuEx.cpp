@@ -346,6 +346,15 @@ BOOL SMenuExItem::CreateChildren(SXmlNode xmlNode)
     return TRUE;
 }
 
+SWindow * SMenuExItem::CreateChildByName(LPCWSTR pszName)
+{
+	if(pszName==NULL)
+		return NULL;
+	if(wcsicmp(pszName,SMenuExItem::GetClassName())==0)
+		return NULL;
+	return __baseCls::CreateChildByName(pszName);
+}
+
 void SMenuExItem::OnSubMenuHided(BOOL bUncheckItem)
 {
     m_pOwnerMenu->OnSubMenuHided(bUncheckItem);
