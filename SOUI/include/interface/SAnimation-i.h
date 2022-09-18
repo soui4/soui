@@ -38,7 +38,7 @@ DECLARE_INTERFACE(IAnimationListener)
      *
      * @param animation The started animation.
      */
-    STDMETHOD_(void, onAnimationStart)(THIS_ IAnimation * animation) PURE;
+    STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation * animation) PURE;
 
     /**
      * <p>Notifies the end of the animation. This callback is not invoked
@@ -46,14 +46,14 @@ DECLARE_INTERFACE(IAnimationListener)
      *
      * @param animation The animation which reached its end.
      */
-    STDMETHOD_(void, onAnimationEnd)(THIS_ IAnimation * animation) PURE;
+    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation * animation) PURE;
 
     /**
      * <p>Notifies the repetition of the animation.</p>
      *
      * @param animation The animation which was repeated.
      */
-    STDMETHOD_(void, onAnimationRepeat)(THIS_ IAnimation * animation) PURE;
+    STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation * animation) PURE;
 };
 
 /**

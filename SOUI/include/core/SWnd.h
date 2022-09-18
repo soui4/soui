@@ -190,7 +190,8 @@ class SOUI_EXP STrText {
  *
  * Describe   SOUI窗口基类,实现窗口的基本接口
  */
-class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
+class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
+	                   , protected IAnimationListener {
     DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IWindow>>, L"window", Window)
     friend class SwndLayoutBuilder;
     friend class SWindowRepos;
@@ -698,10 +699,12 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>> {
     STransformation GetTransformation() const;
 
   protected:
-    virtual void OnAnimationStart(IAnimation *pAni);
-    virtual void OnAnimationStop(IAnimation *pAni);
+    STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation * animation);
+    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation * animation);
+	STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation * animation);
+
+  protected:
     virtual void OnAnimationInvalidate(IAnimation *pAni, bool bErase);
-    virtual void OnAnimationUpdate(IAnimation *pAni);
 
   protected:
     virtual void OnContentChanged();

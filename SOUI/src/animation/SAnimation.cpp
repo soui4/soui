@@ -69,7 +69,7 @@ void SAnimation::fireAnimationEnd()
 {
     if (mListener != NULL)
     {
-        mListener->onAnimationEnd(this);
+        mListener->OnAnimationStop(this);
     }
 }
 
@@ -77,7 +77,7 @@ void SAnimation::fireAnimationRepeat()
 {
     if (mListener != NULL)
     {
-        mListener->onAnimationRepeat(this);
+        mListener->OnAnimationRepeat(this);
     }
 }
 
@@ -85,7 +85,7 @@ void SAnimation::fireAnimationStart()
 {
     if (mListener != NULL)
     {
-        mListener->onAnimationStart(this);
+        mListener->OnAnimationStart(this);
     }
 }
 

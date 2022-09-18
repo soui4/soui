@@ -111,6 +111,10 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSetFocus));
     m_evtSet.addEvent(EVENTID(EventKillFocus));
 
+	m_evtSet.addEvent(EVENTID(EventSwndAnimationStart));
+	m_evtSet.addEvent(EVENTID(EventSwndAnimationStop));
+	m_evtSet.addEvent(EVENTID(EventSwndAnimationRepeat));
+	
     IAttrStorageFactory *pAttrFac = SApplication::getSingleton().GetAttrStorageFactory();
     if (pAttrFac)
     {
@@ -2407,10 +2411,10 @@ void SWindow::SetAnimation(IAnimation *animation)
     m_animation = animation;
     if (m_animation)
     {
+		m_animation->setAnimationListener(this);
         if (m_animation->getStartTime() == START_ON_FIRST_FRAME)
         {
             m_animation->startNow();
-            OnAnimationStart(m_animation);
         }
         if (GetContainer())
             GetContainer()->RegisterTimelineHandler(&m_animationHandler);
@@ -2454,6 +2458,7 @@ void SWindow::ClearAnimation()
             m_animation->cancel();
             OnAnimationStop(m_animation);
         }
+		m_animation->setAnimationListener(NULL);
         m_animation = NULL;
     }
 }
@@ -3243,29 +3248,40 @@ BOOL SWindow::SetLayoutParam(ILayoutParam *pLayoutParam)
     return TRUE;
 }
 
-void SWindow::OnAnimationStart(IAnimation *pAni)
+void SWindow::OnAnimationStart(THIS_ IAnimation *pAni)
 {
+	EventSwndAnimationStart evt(this);
+	evt.pAni = pAni;
+	FireEvent(&evt);
+
     m_isAnimating = true;
     m_animationHandler.OnAnimationStart();
     UpdateCacheMode();
 }
 
-void SWindow::OnAnimationStop(IAnimation *pAni)
+void SWindow::OnAnimationStop(THIS_ IAnimation *pAni)
 {
     if (GetContainer())
         GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
-    m_isAnimating = false;
     m_animationHandler.OnAnimationStop();
+	m_isAnimating = false;
     UpdateCacheMode();
+	EventSwndAnimationStop evt(this);
+	evt.pAni = pAni;
+	FireEvent(&evt);
+}
+
+
+void SWindow::OnAnimationRepeat(THIS_ IAnimation * pAni)
+{
+	EventSwndAnimationRepeat evt(this);
+	evt.pAni = pAni;
+	FireEvent(&evt);
 }
 
 void SWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
 {
     InvalidateRect(NULL);
-}
-
-void SWindow::OnAnimationUpdate(IAnimation *pAni)
-{ // do nothing.
 }
 
 COLORREF SWindow::GetBkgndColor() const
@@ -3518,21 +3534,14 @@ const STransformation &SWindow::SAnimationHandler::GetTransformation() const
 
 void SWindow::SAnimationHandler::OnNextFrame()
 {
-    if (!m_pOwner->IsVisible(TRUE))
-        return;
-
     IAnimation *pAni = m_pOwner->GetAnimation();
     SASSERT(pAni);
+	pAni->AddRef();
     m_pOwner->AddRef();
     uint64_t tm = pAni->getStartTime();
-    if (tm == -1)
-    {
-        m_pOwner->OnAnimationStart(pAni);
-    }
     if (tm > 0)
     {
         m_pOwner->OnAnimationInvalidate(pAni, true);
-        pAni->AddRef();
         BOOL bMore = pAni->getTransformation(STime::GetCurrentTimeMs(), &m_transform);
         m_pOwner->OnAnimationInvalidate(pAni, false);
         if (!bMore)
@@ -3545,12 +3554,10 @@ void SWindow::SAnimationHandler::OnNextFrame()
             {
                 m_bFillAfter = false;
             }
-            m_pOwner->OnAnimationStop(pAni);
         }
-        pAni->Release();
     }
-    m_pOwner->OnAnimationUpdate(pAni);
     m_pOwner->Release();
+	pAni->Release();
 }
 
 BOOL SWindow::SAnimationHandler::OnOwnerResize(IEvtArgs *e)

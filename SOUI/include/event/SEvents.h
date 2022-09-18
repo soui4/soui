@@ -42,6 +42,9 @@ typedef enum _SOUI_EVENTS
     EVT_LBUTTONDOWN,
     EVT_LBUTTONUP,
     EVT_UPDATE_TOOLTIP,
+	EVT_ANIMATION_START,
+	EVT_ANIMATION_STOP,
+	EVT_ANIMATION_REPEAT,
 
     EVT_KEYDOWN = 8200,
 
@@ -125,8 +128,8 @@ typedef enum _SOUI_EVENTS
     EVT_HOT_KEY_SET = 23000,
 
     //图片动画开始，结束事件
-    EVT_ANI_START = 22100,
-    EVT_ANI_STOP,
+    EVT_IMAGE_ANI_START = 22100,
+    EVT_IMAGE_ANI_STOP,
 
     EVT_SELECTMENU = 22150,
     EVT_POPMENU,
@@ -296,6 +299,17 @@ inline BOOL EventSwndStateChanged_CheckState(EventSwndStateChanged *pEvt, DWORD 
 #endif
 
 DEF_EVT(EventSwndVisibleChanged, EVT_VISIBLECHANGED, on_visible_changed, { int fake; })
+
+DEF_EVT(EventSwndAnimationStart, EVT_ANIMATION_START, on_animation_start, { 
+	IAnimation *pAni; 
+})
+
+DEF_EVT(EventSwndAnimationStop, EVT_ANIMATION_STOP, on_animation_stop, { 
+	IAnimation *pAni; 
+})
+DEF_EVT(EventSwndAnimationRepeat, EVT_ANIMATION_REPEAT, on_animation_repeat, { 
+	IAnimation *pAni; 
+})
 
 DEF_EVT(EventKeyDown, EVT_KEYDOWN, on_key_down, {
     UINT nChar;
@@ -535,9 +549,9 @@ DEF_EVT(EventTCDbClick, EVT_TC_DBCLICK, on_treectrl_item_dbclick, {
 
 DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, { RECT rcPane; });
 
-DEF_EVT(EventAnimateStart, EVT_ANI_START, on_animate_start, { int fake; });
+DEF_EVT(EventImageAnimateStart, EVT_IMAGE_ANI_START, on_image_animate_start, { int fake; });
 
-DEF_EVT(EventAnimateStop, EVT_ANI_STOP, EVT_ANI_STOP, { int fake; });
+DEF_EVT(EventImageAnimateStop, EVT_IMAGE_ANI_STOP, on_image_animate_stop, { int fake; });
 
 DEF_EVT(EventSelectMenu, EVT_SELECTMENU, on_select_menu, {
     UINT m_id;

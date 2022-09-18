@@ -47,10 +47,9 @@ class CMainDlg : public SHostWnd
 			   , public CThreadObject	//线程对象
 			   , public TAutoEventMapReg<CMainDlg>//通知中心自动注册
 			   , public ISetOrLoadSkinHandler
-,				public IAnimationListener
-,				public IAnimatorListener 
-,				public IAnimatorUpdateListener
-,				public SDpiHandler<CMainDlg>
+               , public IAnimatorListener 
+               , public IAnimatorUpdateListener
+               , public SDpiHandler<CMainDlg>
 {
 public:
 
@@ -109,11 +108,6 @@ protected:
     //DUI菜单响应函数
     void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);
         
-protected:
-	virtual void WINAPI onAnimationStart(IAnimation * animation){}
-	virtual void WINAPI onAnimationRepeat(IAnimation * animation){}
-	virtual void WINAPI onAnimationEnd(IAnimation * animation);
-
 protected:
 	virtual void WINAPI onAnimationStart(IValueAnimator * pAnimator){}
 	virtual void WINAPI onAnimationRepeat(IValueAnimator * pAnimator){}
@@ -218,6 +212,8 @@ protected:
 
 	void OnSetHostAnimation();
 	void OnShellTrayNotify(IEvtArgs * e);
+	void OnAnimationStop(IEvtArgs *e);
+
     //UI控件的事件及响应函数映射表
 	EVENT_MAP_BEGIN()
 		EVENT_ID_HANDLER(R.id.tray_008,EventTrayNotify::EventID,OnShellTrayNotify)
@@ -281,6 +277,7 @@ protected:
 		EVENT_ID_COMMAND(R.id.btn_set_prop_value,OnSetPropItemValue)
 		EVENT_NAME_HANDLER(L"tgl_left",EventCmd::EventID,OnToggleLeft)
 		EVENT_NAME_COMMAND(L"img_soui",OnSouiClick)
+		EVENT_HANDLER(EventSwndAnimationStop::EventID,OnAnimationStop)
 	EVENT_MAP_END2(SHostWnd)	
 
     //HOST消息及响应函数映射表

@@ -153,12 +153,9 @@ void SRootWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
         m_pHostWnd->m_memRT->ClearRect(rcWnd, 0);
     }
     SWindow::OnAnimationInvalidate(pAni, bErase);
+	if(!bErase) Update();
 }
 
-void SRootWindow::OnAnimationUpdate(IAnimation *pAni)
-{
-    Update();
-}
 
 void SRootWindow::OnAnimationStop(IAnimation *pAni)
 {

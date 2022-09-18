@@ -755,8 +755,8 @@ SAnimateImgWnd::SAnimateImgWnd()
     , m_iRepeat(0)
 {
     m_bMsgTransparent = TRUE;
-    GetEventSet()->addEvent(EVENTID(EventAnimateStart));
-    GetEventSet()->addEvent(EVENTID(EventAnimateStop));
+    GetEventSet()->addEvent(EVENTID(EventImageAnimateStart));
+    GetEventSet()->addEvent(EVENTID(EventImageAnimateStop));
 }
 
 void SAnimateImgWnd::OnPaint(IRenderTarget *pRT)
@@ -773,7 +773,7 @@ void SAnimateImgWnd::Start()
             GetContainer()->RegisterTimelineHandler(this);
         m_iRepeat = 0;
         m_bPlaying = TRUE;
-        EventAnimateStart evt(this);
+        EventImageAnimateStart evt(this);
         FireEvent(evt);
     }
 }
@@ -785,7 +785,7 @@ void SAnimateImgWnd::Stop()
         if (IsVisible(TRUE))
             GetContainer()->UnregisterTimelineHandler(this);
         m_bPlaying = FALSE;
-        EventAnimateStop evt(this);
+        EventImageAnimateStop evt(this);
         FireEvent(evt);
     }
 }

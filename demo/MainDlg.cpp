@@ -1021,22 +1021,20 @@ void CMainDlg::OnTimer(UINT_PTR idEvent)
 		SWindow *pAniHost = FindChildByName(L"wnd_ani_host");
 		if (pAniHost && pAniHost->IsVisible(TRUE))
 		{
-			const WCHAR * kLoveXml= L"<include src=\"LAYOUT:xml_love\"/>";
-			BOOL bLoad= pAniHost->CreateChildrenFromXml(kLoveXml);
-			if(bLoad)
+			IAnimation *pAni = SApplication::getSingletonPtr()->LoadAnimation(_T("anim:love"));
+			if(pAni)
 			{
-				SWindow *pLove = pAniHost->GetWindow(GSW_LASTCHILD);
-				pAniHost->UpdateLayout();
-				IAnimation *pAni = SApplication::getSingletonPtr()->LoadAnimation(_T("anim:love"));
-				if(pAni)
+				const WCHAR * kLoveXml= L"<include src=\"LAYOUT:xml_love\"/>";
+				BOOL bLoad= pAniHost->CreateChildrenFromXml(kLoveXml);
+				if(bLoad)
 				{
+					SWindow *pLove = pAniHost->GetWindow(GSW_LASTCHILD);
+					pAniHost->UpdateLayout();
+					pLove->SetUserData(TIMER_SOUI4);
 					pAni->setStartOffset(rand()%100);//random delay max to 100 ms to play the animation.
-					pAni->setUserData((ULONG_PTR)pLove);
-					pAni->setAnimationListener(this);
 					pLove->SetAnimation(pAni);
-					pAni->Release();
 				}
-
+				pAni->Release();
 			}
 		}
 	}
@@ -1171,12 +1169,12 @@ void CMainDlg::InitSoui3Animation()
 	SNativeWnd::SetTimer(TIMER_SOUI4,1000);	//start timer.
 }
 
-void CMainDlg::onAnimationEnd(IAnimation * animation)
+
+void CMainDlg::OnAnimationStop(IEvtArgs *e)
 {
-	if(wcsicmp(animation->GetName(),L"ani_test") == 0)
-	{
-		SWindow *pWnd = (SWindow*)animation->getUserData();
-		pWnd->Destroy();
+	SWindow *pSender = sobj_cast<SWindow>(e->Sender());
+	if(pSender && pSender->GetUserData()==TIMER_SOUI4){
+		pSender->Destroy();
 	}
 }
 

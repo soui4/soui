@@ -126,6 +126,14 @@ public:
 	STDMETHOD_(IXmlNode*, PrevSibling2)(THIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST OVERRIDE;
 
 public:
+	bool operator ==(const SXmlNode &src) const{
+		return _node==src._node;
+	}
+
+	bool operator !=(const SXmlNode &src) const{
+		return _node!=src._node;
+	}
+
 	operator bool() const;
 
 	// Check if node is empty.

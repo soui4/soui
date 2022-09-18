@@ -100,7 +100,7 @@ class SMenuExRoot : public SWindow {
         return GetDesiredSize(-1, maxHei);
     }
 
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei)
+    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE
     {
         CSize szRet = __baseCls::GetDesiredSize(wid, hei);
         if (szRet.cx > m_nMaxWidth.toPixelSize(GetScale()) && !m_nMaxWidth.isWrapContent())
@@ -110,20 +110,18 @@ class SMenuExRoot : public SWindow {
         return szRet;
     }
 
-    virtual BOOL WINAPI InitFromXml(IXmlNode *pNode)
+    STDMETHOD_(BOOL,InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE
     {
         SXmlNode xmlNode(pNode);
         //找到根节点，获取在根节点上配置的全局菜单对象属性
         SXmlNode xmlRoot = xmlNode.root().first_child();
         if (xmlNode != xmlRoot)
         {
-            __baseCls::InitFromXml(&xmlRoot);
-        }
-
-        BOOL bRet = __baseCls::InitFromXml(&xmlNode);
-
-        SetWindowText(_T("")); //防止子菜单显示父级菜单项的文本。
-        return bRet;
+			__baseCls::__baseCls::InitFromXml(&xmlRoot);//IObject::InitFromXml
+		}
+		BOOL bRet = __baseCls::InitFromXml(&xmlNode);
+		SetWindowText(_T("")); //防止子菜单显示父级菜单项的文本。
+		return TRUE;
     }
 
     virtual BOOL CreateChildren(SXmlNode xmlNode)
@@ -909,8 +907,8 @@ void SMenuEx::RunMenu(HWND hRoot)
             }
         }
 
-        TranslateMessage(&msg);
-        DispatchMessage(&msg);
+		//support tooltip.
+		GetMsgLoop()->OnMsg(&msg);
 
         if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP || msg.message == WM_CHAR)
         { //将键盘事件强制发送到最后一级菜单窗口，让菜单处理快速键

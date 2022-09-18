@@ -123,9 +123,9 @@ class SOUI_EXP SRootWindow : public SWindow {
     STDMETHOD_(void, UpdateLayout)(THIS) OVERRIDE;
 
   protected:
+	STDMETHOD_(void,OnAnimationStop)(THIS_ IAnimation *pAni);
+
     virtual void OnAnimationInvalidate(IAnimation *pAni, bool bErase);
-    virtual void OnAnimationUpdate(IAnimation *pAni);
-    virtual void OnAnimationStop(IAnimation *pAni);
 
   protected: // Swindow 虚方法
     virtual void BeforePaint(IRenderTarget *pRT, SPainter &painter);

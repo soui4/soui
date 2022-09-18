@@ -130,21 +130,22 @@ BOOL SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
         mStartTime = currentTime;
     }
 
-    if (!mStarted)
-    {
-        mStarted = true;
-        fireAnimationStart();
-    }
-    t->Clear();
     int64_t startOffset = getStartOffset();
     if (currentTime < (mStartTime + startOffset))
     {
-        return true;
+        return TRUE;
     }
+	if (!mStarted)
+	{
+		mStarted = TRUE;
+		fireAnimationStart();
+	}
+	t->Clear();
+
     int count = (int)mAnimations.GetCount();
     if (!mChildStarted)
     {
-        mChildStarted = true;
+        mChildStarted = TRUE;
         for (int i = count - 1; i >= 0; --i)
         {
             IAnimation *a = mAnimations[i];
@@ -152,8 +153,8 @@ BOOL SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
         }
     }
 
-    BOOL more = false;
-    BOOL ended = true;
+    BOOL more = FALSE;
+    BOOL ended = TRUE;
 
     for (int i = count - 1; i >= 0; --i)
     {
@@ -168,13 +169,11 @@ BOOL SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
 
     if (ended || (currentTime - startOffset - mStartTime) >= mLastEnd)
     {
-        // SLOG_INFO("ended:"<<ended<<" time span:"<<(currentTime - startOffset - mStartTime)<<" cur
-        // time:"<<currentTime<<" start time:"<<mStartTime<<" startOffset:"<<startOffset);
         if (mRepeatCount == mRepeated || isCanceled())
         {
-            mEnded = true;
-            mChildStarted = false;
-            more = false;
+            mEnded = TRUE;
+            mChildStarted = FALSE;
+            more = FALSE;
             fireAnimationEnd();
         }
         else
@@ -187,9 +186,9 @@ BOOL SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
             {
                 mRepeated = 1;
             }
-            mChildStarted = false;
+            mChildStarted = FALSE;
             mStartTime = currentTime;
-            more = true;
+            more = TRUE;
             fireAnimationRepeat();
         }
     }
