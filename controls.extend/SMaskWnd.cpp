@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SMaskWnd.h"
 
 namespace SOUI
@@ -14,18 +14,23 @@ namespace SOUI
 
 	void SMaskWnd::OnCommitSurface(IRenderTarget *pRtDest, LPCRECT pRcDest, IRenderTarget *pRtSrc, LPCRECT pRcSrc, BYTE alpha)
 	{
-		SAutoRefPtr<IRenderTarget> pRT;
-		CRect rcWnd = GetWindowRect();
-		GETRENDERFACTORY->CreateRenderTarget(&pRT, rcWnd.Width(), rcWnd.Height());
-		CRect rc(pRcDest);
-		rc.MoveToXY(0, 0);
-		pRT->BitBlt(&rc, pRtDest, pRcDest->left, pRcDest->top, SRCCOPY);
-		pRT->AlphaBlend(&rc, pRtSrc, pRcSrc, alpha);
-		IBitmapS * pBmp = (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
-		MakeCacheApha(pBmp);
-		pRT->SetXfermode(kSrcIn_Mode, NULL);
-		pRT->AlphaBlend(&rc, pRtSrc, &rc, 255);
-		pRtDest->AlphaBlend(pRcDest, pRT, &rc, alpha);
+		if (m_bmpMaskTemp) {
+			SAutoRefPtr<IRenderTarget> pRT;
+			CRect rcWnd = GetWindowRect();
+			GETRENDERFACTORY->CreateRenderTarget(&pRT, rcWnd.Width(), rcWnd.Height());
+			pRT->OffsetViewportOrg(-rcWnd.left, -rcWnd.top);
+			pRT->ClearRect(&rcWnd, 0);
+			pRT->BitBlt(&rcWnd, pRtDest, pRcDest->left, pRcDest->top, SRCCOPY);
+			pRT->AlphaBlend(&rcWnd, pRtSrc, pRcSrc, alpha);
+			IBitmapS * pBmp = (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
+			MakeCacheApha(pBmp);
+			pRT->SetXfermode(kSrcIn_Mode, NULL);
+			pRT->AlphaBlend(&rcWnd, pRtSrc, &rcWnd, 255);
+			pRtDest->AlphaBlend(pRcDest, pRT, &rcWnd, alpha);
+		}
+		else {
+			__baseCls::OnCommitSurface(pRtDest, pRcDest, pRtSrc, pRcSrc, alpha);
+		}
 	}
 
 	HRESULT SMaskWnd::OnAttrMask(const SStringW &strValue, BOOL bLoading)
@@ -57,14 +62,15 @@ namespace SOUI
 		}
 		m_bmpMask = pImg;
 		pImg->Release();
+		MakeMaskTemp();
 		return S_OK;
 	}
 
 	void SMaskWnd::MakeCacheApha(IBitmapS* cache)
 	{
-		//´ÓmaskµÄÖ¸¶¨channelÖÐ»ñµÃalphaÍ¨µÀ
+		//ä»Žmaskçš„æŒ‡å®šchannelä¸­èŽ·å¾—alphaé€šé“
 		LPBYTE pBitCache = (LPBYTE)cache->LockPixelBits();
-		LPBYTE pBitMask = (LPBYTE)m_bmpMask->LockPixelBits();
+		LPBYTE pBitMask = (LPBYTE)m_bmpMaskTemp->LockPixelBits();
 		LPBYTE pDst = pBitCache;
 		LPBYTE pSrc = pBitMask + m_iMaskChannel;
 		int nPixels = cache->Width() * cache->Height();
@@ -72,12 +78,12 @@ namespace SOUI
 		{
 			BYTE byAlpha = *pSrc;
 			pSrc += 4;
-			//Ô´°ëÍ¸Ã÷£¬mask²»Í¸Ã÷Ê±Ê¹ÓÃÔ´µÄ°ëÍ¸Ã÷ÊôÐÔ
+			//æºåŠé€æ˜Žï¼Œmaskä¸é€æ˜Žæ—¶ä½¿ç”¨æºçš„åŠé€æ˜Žå±žæ€§
 			if (pDst[3] == 0xff || (pDst[3] != 0xFF && byAlpha == 0))
-			{                                       //Ô´²»Í¸Ã÷,»òÕßmaskÈ«Í¸Ã÷
-				*pDst++ = ((*pDst) * byAlpha) >> 8; //×öpremultiply
-				*pDst++ = ((*pDst) * byAlpha) >> 8; //×öpremultiply
-				*pDst++ = ((*pDst) * byAlpha) >> 8; //×öpremultiply
+			{                                       //æºä¸é€æ˜Ž,æˆ–è€…maskå…¨é€æ˜Ž
+				*pDst++ = ((*pDst) * byAlpha) >> 8; //åšpremultiply
+				*pDst++ = ((*pDst) * byAlpha) >> 8; //åšpremultiply
+				*pDst++ = ((*pDst) * byAlpha) >> 8; //åšpremultiply
 				*pDst++ = byAlpha;
 			}
 			else
@@ -86,6 +92,31 @@ namespace SOUI
 			}
 		}
 		cache->UnlockPixelBits(pBitCache);
-		m_bmpMask->UnlockPixelBits(pBitMask);
+		m_bmpMaskTemp->UnlockPixelBits(pBitMask);
 	}
+
+	void SMaskWnd::MakeMaskTemp()
+	{
+		if (m_bmpMask) {
+			CRect rcWnd = GetWindowRect();
+			CRect rccache(CPoint(0, 0), rcWnd.Size());
+			m_bmpMaskTemp = nullptr;
+			GETRENDERFACTORY->CreateBitmap(&m_bmpMaskTemp);
+			m_bmpMaskTemp->Init(rccache.Width(), rccache.Height(), NULL);
+			SAutoRefPtr<IRenderTarget> pRT;
+			GETRENDERFACTORY->CreateRenderTarget(&pRT, rccache.Width(), rccache.Height());
+			SAutoRefPtr<IRenderObj> pOldBmp;
+			pRT->SelectObject(m_bmpMaskTemp, &pOldBmp);
+			CRect rcmask(CPoint(0, 0), m_bmpMask->Size());
+			pRT->DrawBitmapEx(&rccache, m_bmpMask, &rcmask, MAKELONG(EM_STRETCH, kHigh_FilterLevel), 255);
+			pRT->SelectObject(pOldBmp, NULL);
+		}
+	}
+
+	void SMaskWnd::OnSize(UINT nType, CSize size)
+	{
+		__baseCls::OnSize(nType, size);
+		MakeMaskTemp();
+	}
+
 } // namespace SOUI
