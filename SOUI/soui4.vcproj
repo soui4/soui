@@ -711,6 +711,8 @@
 			<File
 				RelativePath="include\interface\smenu-i.h" />
 			<File
+				RelativePath="include\interface\smenuex-i.h" />
+			<File
 				RelativePath="include\interface\smsgloop-i.h" />
 			<File
 				RelativePath="include\interface\sobject-i.h" />

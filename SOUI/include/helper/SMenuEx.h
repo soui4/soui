@@ -1,6 +1,7 @@
 ﻿#pragma once
 
 #include <core/shostwnd.h>
+#include <interface/smenuex-i.h>
 
 SNSBEGIN
 class SMenuExRoot;
@@ -58,7 +59,7 @@ class SOUI_EXP SMenuExItem : public SWindow {
     WCHAR m_cHotKey;
 };
 
-class SOUI_EXP SMenuEx : protected SHostWnd {
+class SOUI_EXP SMenuEx : protected SHostWnd , public IMenuEx {
     friend class SMenuExItem;
     friend class SMenuExRunData;
     friend class SMenuExRoot;
@@ -67,44 +68,80 @@ class SOUI_EXP SMenuEx : protected SHostWnd {
     SMenuEx(void);
     virtual ~SMenuEx(void);
 
-    BOOL LoadMenu(const SStringT &strMenu, HWND hParent = NULL);
-    BOOL LoadMenu(SXmlNode xmlNode, HWND hParent = NULL);
-    UINT TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale = 100);
-    static void ExitPopupMenu(int nCmdId = 0);
+public:
+	
+	//!添加引用
+	/*!
+	*/
+	STDMETHOD_(long,AddRef) (THIS) OVERRIDE{
+		return SHostWnd::AddRef();
+	}
+
+	//!释放引用
+	/*!
+	*/
+	STDMETHOD_(long,Release) (THIS) OVERRIDE{
+		return SHostWnd::Release();
+	}
+
+	//!释放对象
+	/*!
+	*/
+	STDMETHOD_(void,OnFinalRelease) (THIS) OVERRIDE{
+		delete this;
+	}
+
+	//=================================================================
+    STDMETHOD_(BOOL,LoadMenu)(THIS_ LPCTSTR resId) OVERRIDE;
+
+    STDMETHOD_(BOOL,LoadMenu2)(THIS_ IXmlNode *xmlMenu) OVERRIDE;
+
+    STDMETHOD_(BOOL,InsertMenu)(THIS_ UINT uPosition,
+                    UINT uFlags,
+                    int nIDNewItem,
+                    LPCTSTR strText,
+                    int iIcon DEF_VAL(-1)) OVERRIDE;
+
+    STDMETHOD_(BOOL,AppendMenu)(THIS_ UINT uFlags,
+                    int uIDNewItem,
+                    LPCTSTR lpNewItem,
+					int iIcon DEF_VAL(-1)) OVERRIDE;
+
+	STDMETHOD_(BOOL,CheckMenuRadioItem)(THIS_ UINT idFirst,UINT idLast,UINT idCheck,UINT uFlags) OVERRIDE;
+
+    STDMETHOD_(BOOL,CheckMenuItem)(THIS_ UINT uIdCheckItem, UINT uCheck) OVERRIDE;
+
+    STDMETHOD_(BOOL,DeleteMenu)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
+
+    STDMETHOD_(UINT,TrackPopupMenu)(THIS_ UINT uFlags,
+                        int x,
+                        int y,
+                        HWND hWnd,
+                        int nScale DEF_VAL(100)) OVERRIDE;
+
+    STDMETHOD_(void,DestroyMenu)(THIS) OVERRIDE;
+
+    STDMETHOD_(BOOL,ModifyMenuString)(THIS_ UINT uPosition, UINT uFlags, LPCTSTR lpItemString) OVERRIDE;
+
+    STDMETHOD_(BOOL,SetMenuUserData)(THIS_ UINT uPosition, UINT uFlags, ULONG_PTR ulUserData) OVERRIDE;
+
+    STDMETHOD_(ULONG_PTR,GetMenuUserData)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
+
+	STDMETHOD_(DWORD,GetContextHelpId)(THIS) SCONST OVERRIDE;
+
+	STDMETHOD_(void,SetContextHelpId)(THIS_ DWORD dwId) OVERRIDE;
+
+	STDMETHOD_(IMenuEx *,GetSubMenu)(THIS_ int nPos) OVERRIDE;
+
+public:
+    static void EndMenu(int nCmdId = 0);
 
     SMenuExItem *GetParentItem()
     {
         return m_pParent;
     }
-    SMenuEx *GetSubMenu(int nID, BOOL byCmdId = TRUE);
-    SMenuExItem *GetMenuItem(int nID, BOOL byCmdId = TRUE);
-
-    DWORD GetContextHelpId() const;
-
-    void SetContextHelpId(DWORD dwId);
-
-    HWND GetParentWnd()
-    {
-        return m_hParent;
-    }
-    /**
-     * InsertMenu
-     * @brief    插入菜单项
-     * @param uPos -- 插入位置，-1代表append
-     * @param uFlag -- uFlag, MF_BYPOSITION|MF_BYCOMMAND
-     * @param nId -- menu id
-     * @param lpNewItem -- menu string
-     * @return   BOOL, true or false
-     *
-     * Describe
-     */
-    BOOL InsertMenu(UINT uPos, UINT uFlag, int nId, LPCTSTR lpNewItem);
-
-    BOOL DeleteMenu(UINT uPos, UINT uFlag);
-
-    BOOL CheckMenuItem(UINT uPos, UINT uFlag);
-
-    BOOL CheckMenuRadioltem(UINT idFirst, UINT idLast, UINT idCheck, UINT uFlags);
+    SMenuEx *GetSubMenu(int nID, BOOL byCmdId);
+    SMenuExItem *GetMenuItem(int nID, BOOL byCmdId);
 
   protected:
     //创建一个空菜单,不应该在外部调用
@@ -141,7 +178,7 @@ class SOUI_EXP SMenuEx : protected SHostWnd {
     SMenuExItem *m_pCheckItem;
 
     BOOL m_bMenuInitialized;
-    HWND m_hParent;
 };
+
 
 SNSEND

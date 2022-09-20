@@ -266,6 +266,8 @@ public://IMenu
 
     STDMETHOD_(BOOL,CheckMenuItem)(THIS_ UINT uIdCheckItem, UINT uCheck) OVERRIDE;
 
+	STDMETHOD_(BOOL,CheckMenuRadioItem)(THIS_ UINT idFirst,UINT idLast,UINT idCheck,UINT uFlags) OVERRIDE;
+
     STDMETHOD_(BOOL,DeleteMenu)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
 
     STDMETHOD_(UINT,TrackPopupMenu)(THIS_ UINT uFlags,
@@ -282,6 +284,12 @@ public://IMenu
     STDMETHOD_(BOOL,SetMenuUserData)(THIS_ UINT uPosition, UINT uFlags, ULONG_PTR ulUserData) OVERRIDE;
 
     STDMETHOD_(ULONG_PTR,GetMenuUserData)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
+
+	STDMETHOD_(DWORD,GetContextHelpId)(THIS) SCONST OVERRIDE;
+
+	STDMETHOD_(void,SetContextHelpId)(THIS_ DWORD dwId) OVERRIDE;
+
+	STDMETHOD_(HMENU,GetSubMenu)(THIS_ int nPos) OVERRIDE;
 
   protected:
     void UpdateScale(int nScale);

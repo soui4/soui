@@ -83,6 +83,7 @@ HEADERS += include/SApp.h \
            include/interface/SNativeWnd-i.h \
            include/interface/SNcPainter-i.h \
            include/interface/smenu-i.h \
+           include/interface/smenuex-i.h \
            include/proxy/SNativeWndProxy.h \
            include/proxy/SHostWndProxy.h \
            include/proxy/SPanelProxy.h \

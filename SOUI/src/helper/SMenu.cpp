@@ -540,6 +540,11 @@ BOOL SMenu::CheckMenuItem(UINT uIdCheckItem, UINT uCheck)
     return ::CheckMenuItem(m_hMenu, uIdCheckItem, uCheck);
 }
 
+BOOL SMenu::CheckMenuRadioItem(THIS_ UINT idFirst,UINT idLast,UINT idCheck,UINT uFlags)
+{
+	return ::CheckMenuRadioItem(m_hMenu,idFirst,idLast,idCheck,uFlags);
+}
+
 SMenuAttr *SMenu::GetMenuAttr(HMENU hMenu) const
 {
     SASSERT(::IsMenu(hMenu));
@@ -604,6 +609,21 @@ void SMenu::SetIconSkin(ISkinObj* icons)
 HMENU SMenu::GetHMenu() const
 {
 	return m_hMenu;
+}
+
+DWORD SMenu::GetContextHelpId() const
+{
+	return ::GetMenuContextHelpId(m_hMenu);
+}
+
+void SMenu::SetContextHelpId(THIS_ DWORD dwId)
+{
+	::SetMenuContextHelpId(m_hMenu,dwId);
+}
+
+HMENU SMenu::GetSubMenu(THIS_ int nPos)
+{
+	return ::GetSubMenu(m_hMenu,nPos);
 }
 
 SNSEND

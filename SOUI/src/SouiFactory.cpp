@@ -1,5 +1,7 @@
 #include <souistd.h>
 #include <SouiFactory.h>
+#include <helper/SMenu.h>
+#include <helper/SMenuEx.h>
 
 SNSBEGIN
 
@@ -85,6 +87,12 @@ HRESULT SouiFactory::CreateFuncSlot(THIS_ FunCallback fun, void *ctx, IEvtSlot *
 HRESULT SouiFactory::CreateMenu(THIS_ IMenu**ppRet, HMENU hMenu)
 {
 	*ppRet = new SMenu(hMenu);
+	return S_OK;
+}
+
+HRESULT SouiFactory::CreateMenuEx(THIS_ IMenuEx**ppRet)
+{
+	*ppRet = new SMenuEx();
 	return S_OK;
 }
 

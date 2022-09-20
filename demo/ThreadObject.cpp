@@ -51,6 +51,7 @@ BOOL CThreadObject::EndThread(DWORD dwWaitEndMS)
 	if (WAIT_OBJECT_0 != WaitForSingleObject(m_hThread, dwWaitEndMS))
 	{
 		TerminateThread(m_hThread, (DWORD)-1);
+		ResetEvent(m_evtStart); //清除线程启动标志
 	}
 	CloseHandle(m_hThread);
 	m_hThread = 0;
