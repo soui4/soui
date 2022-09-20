@@ -269,12 +269,6 @@ LRESULT SMenuODWnd::OnMenuChar(UINT nChar, UINT nFlags, HMENU hMenu)
 
 //////////////////////////////////////////////////////////////////////////
 
-SMenu::SMenu()
-    : m_hMenu(0)
-    , m_bAttached(false)
-{
-}
-
 SMenu::SMenu(const SMenu &src)
     : m_hMenu(0)
     , m_bAttached(false)
@@ -286,7 +280,9 @@ SMenu::SMenu(HMENU hMenu)
     : m_hMenu(0)
     , m_bAttached(false)
 {
-    Attach(hMenu);
+	if(hMenu){
+		Attach(hMenu);
+	}
 }
 
 SMenu::~SMenu(void)
@@ -295,13 +291,14 @@ SMenu::~SMenu(void)
         DestroyMenu();
 }
 
-BOOL SMenu::LoadMenu(SXmlNode xmlMenu)
+BOOL SMenu::LoadMenu2(IXmlNode * pXmlNode)
 {
     SASSERT(m_hMenu == 0);
     m_hMenu = CreatePopupMenu();
     if (!m_hMenu)
         return FALSE;
 
+	SXmlNode xmlMenu(pXmlNode);
     SMenuAttr *pMenuAttr = new SMenuAttr;
     pMenuAttr->InitFromXml(&xmlMenu);
     SASSERT(pMenuAttr->m_pItemSkin);
@@ -318,7 +315,7 @@ BOOL SMenu::LoadMenu(SXmlNode xmlMenu)
     return TRUE;
 }
 
-BOOL SMenu::LoadMenu(const SStringT &resId)
+BOOL SMenu::LoadMenu(LPCTSTR resId)
 {
     SASSERT(!::IsMenu(m_hMenu));
 
@@ -330,7 +327,7 @@ BOOL SMenu::LoadMenu(const SStringT &resId)
     if (!xmlMenu)
         return FALSE;
 
-    return LoadMenu(xmlMenu);
+    return LoadMenu2(&xmlMenu);
 }
 
 void SMenu::InitMenuItemData(SMenuItemData *itemInfo, const SStringW &strTextW)
@@ -598,10 +595,15 @@ ULONG_PTR SMenu::GetMenuUserData(UINT uPosition, UINT uFlags)
     return pmid->dwUserData;
 }
 
-void SMenu::SetIconSkin(SAutoRefPtr<ISkinObj> icons)
+void SMenu::SetIconSkin(ISkinObj* icons)
 {
     SASSERT(!m_hMenu);
     m_icons = icons;
+}
+
+HMENU SMenu::GetHMenu() const
+{
+	return m_hMenu;
 }
 
 SNSEND

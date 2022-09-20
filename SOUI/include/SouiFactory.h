@@ -26,6 +26,7 @@ class SOUI_EXP SouiFactory : public TObjRefImpl<ISouiFactory> {
     STDMETHOD_(HRESULT, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType, IObjRef **pObj) OVERRIDE;
     STDMETHOD_(HRESULT, CreateFuncSlot)
     (THIS_ FunCallback fun, void *ctx, IEvtSlot **ppSlot) OVERRIDE;
+	STDMETHOD_(HRESULT, CreateMenu)(THIS_ IMenu**ppRet, HMENU hMenu DEF_VAL(NULL)) OVERRIDE;
 };
 
 SNSEND

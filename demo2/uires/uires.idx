@@ -6,7 +6,9 @@
     <file name="XML_MAINWND" path="xml\dlg_main.xml"/>
     <file name="DLG_TEST" path="xml\dlg_test.xml"/>
   </LAYOUT>
-  
+  <SMENU>
+    <file name="menu_test" path="xml\menu_test.xml"/>
+  </SMENU>
   <values>
   	<file name="string" path="values\string.xml"/>
   	<file name="color" path="values\color.xml"/>

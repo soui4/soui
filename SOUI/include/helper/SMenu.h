@@ -2,8 +2,10 @@
 
 #include <core/sobjType.h>
 #include <sobject/Sobject.hpp>
-#include "core/SNativeWnd.h"
-#include "res.mgr/Sskinpool.h"
+#include <core/SNativeWnd.h>
+#include <res.mgr/Sskinpool.h>
+#include <helper/obj-ref-impl.hpp>
+#include <interface/smenu-i.h>
 
 SNSBEGIN
 
@@ -219,22 +221,26 @@ class SMenuODWnd
     SAutoRefPtr<SMenuAttr> m_attr;
 };
 
-class SOUI_EXP SMenu {
+class SOUI_EXP SMenu : public TObjRefImpl<IMenu>{
   public:
-    SMenu();
     SMenu(const SMenu &src);
-    SMenu(HMENU hMenu);
+    SMenu(HMENU hMenu = NULL);
     ~SMenu(void);
 
-    BOOL Attach(HMENU hMenu);
+public:
+	HMENU m_hMenu;
+public://IMenu
+	STDMETHOD_(BOOL,Attach)(THIS_ HMENU hMenu) OVERRIDE;
 
-    HMENU Detach();
+    STDMETHOD_(HMENU,Detach)(THIS) OVERRIDE;
 
-    BOOL LoadMenu(const SStringT &resId);
+	STDMETHOD_(HMENU,GetHMenu)(THIS) SCONST OVERRIDE;
 
-    BOOL LoadMenu(SXmlNode xmlMenu);
+    STDMETHOD_(BOOL,LoadMenu)(THIS_ LPCTSTR resId) OVERRIDE;
 
-    void SetIconSkin(SAutoRefPtr<ISkinObj> icons);
+    STDMETHOD_(BOOL,LoadMenu2)(THIS_ IXmlNode *xmlMenu) OVERRIDE;
+
+    STDMETHOD_(void,SetIconSkin)(THIS_ ISkinObj* icons) OVERRIDE;
 
     /**
      * SMenu::InsertMenu
@@ -245,39 +251,37 @@ class SOUI_EXP SMenu {
      *
      * Describe  hIcon会在菜单退出时自动调用DestroyIcon.
      */
-    BOOL InsertMenu(UINT uPosition,
+    STDMETHOD_(BOOL,InsertMenu)(THIS_ UINT uPosition,
                     UINT uFlags,
                     UINT_PTR nIDNewItem,
                     LPCTSTR strText,
-                    int iIcon = -1,
-                    HICON hIcon = 0);
+                    int iIcon DEF_VAL(-1),
+                    HICON hIcon DEF_VAL(0)) OVERRIDE;
 
-    BOOL AppendMenu(UINT uFlags,
+    STDMETHOD_(BOOL,AppendMenu)(THIS_ UINT uFlags,
                     UINT_PTR uIDNewItem,
                     LPCTSTR lpNewItem,
-                    int iIcon = -1,
-                    HICON hIcon = 0);
+					int iIcon DEF_VAL(-1),
+					HICON hIcon DEF_VAL(0)) OVERRIDE;
 
-    BOOL CheckMenuItem(UINT uIdCheckItem, UINT uCheck);
+    STDMETHOD_(BOOL,CheckMenuItem)(THIS_ UINT uIdCheckItem, UINT uCheck) OVERRIDE;
 
-    BOOL DeleteMenu(UINT uPosition, UINT uFlags);
+    STDMETHOD_(BOOL,DeleteMenu)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
 
-    UINT TrackPopupMenu(UINT uFlags,
+    STDMETHOD_(UINT,TrackPopupMenu)(THIS_ UINT uFlags,
                         int x,
                         int y,
                         HWND hWnd,
-                        LPCRECT prcRect = NULL,
-                        int nScale = 100);
+                        LPCRECT prcRect DEF_VAL(NULL),
+                        int nScale DEF_VAL(100)) OVERRIDE;
 
-    void DestroyMenu();
+    STDMETHOD_(void,DestroyMenu)(THIS) OVERRIDE;
 
-    BOOL ModifyMenuString(UINT uPosition, UINT uFlags, LPCTSTR lpItemString);
+    STDMETHOD_(BOOL,ModifyMenuString)(THIS_ UINT uPosition, UINT uFlags, LPCTSTR lpItemString) OVERRIDE;
 
-    BOOL SetMenuUserData(UINT uPosition, UINT uFlags, ULONG_PTR ulUserData);
+    STDMETHOD_(BOOL,SetMenuUserData)(THIS_ UINT uPosition, UINT uFlags, ULONG_PTR ulUserData) OVERRIDE;
 
-    ULONG_PTR GetMenuUserData(UINT uPosition, UINT uFlags);
-
-    HMENU m_hMenu;
+    STDMETHOD_(ULONG_PTR,GetMenuUserData)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
 
   protected:
     void UpdateScale(int nScale);

@@ -525,6 +525,8 @@
 			<File
 				RelativePath="include\proxy\SNativeWndProxy.h" />
 			<File
+				RelativePath="include\interface\SNcPainter-i.h" />
+			<File
 				RelativePath="include\core\SNcPainter.h" />
 			<File
 				RelativePath="include\event\SNotifyCenter.h" />
@@ -706,6 +708,8 @@
 				RelativePath="include\interface\slog-i.h" />
 			<File
 				RelativePath="include\helper\slog.h" />
+			<File
+				RelativePath="include\interface\smenu-i.h" />
 			<File
 				RelativePath="include\interface\smsgloop-i.h" />
 			<File

@@ -81,6 +81,8 @@ HEADERS += include/SApp.h \
            include/interface/STransform-i.h \
            include/interface/SFactory-i.h \
            include/interface/SNativeWnd-i.h \
+           include/interface/SNcPainter-i.h \
+           include/interface/smenu-i.h \
            include/proxy/SNativeWndProxy.h \
            include/proxy/SHostWndProxy.h \
            include/proxy/SPanelProxy.h \

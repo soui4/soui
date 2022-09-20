@@ -82,6 +82,12 @@ HRESULT SouiFactory::CreateFuncSlot(THIS_ FunCallback fun, void *ctx, IEvtSlot *
     return S_OK;
 }
 
+HRESULT SouiFactory::CreateMenu(THIS_ IMenu**ppRet, HMENU hMenu)
+{
+	*ppRet = new SMenu(hMenu);
+	return S_OK;
+}
+
 SNSEND
 
 EXTERN_C HRESULT CreateSouiFactory(IObjRef **ppRet)

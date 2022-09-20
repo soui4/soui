@@ -7,7 +7,7 @@
 #include <interface/sxml-i.h>
 #include <interface/SResProvider-i.h>
 #include <interface/SEvtArgs-i.h>
-
+#include <interface/smenu-i.h>
 SNSBEGIN
 
 #undef INTERFACE
@@ -40,6 +40,7 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
     STDMETHOD_(HRESULT, CreateXmlDoc)(THIS_ IXmlDoc * *ppRet) PURE;
     STDMETHOD_(HRESULT, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType, IObjRef * *pObj) PURE;
     STDMETHOD_(HRESULT, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx, IEvtSlot **ppSlot) PURE;
+	STDMETHOD_(HRESULT, CreateMenu)(THIS_ IMenu**ppRet, HMENU hMenu DEF_VAL(NULL)) PURE;
 };
 
 SNSEND

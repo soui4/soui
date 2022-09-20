@@ -1070,7 +1070,7 @@ void SRichEdit::OnRButtonDown(UINT nFlags, CPoint point)
     if (xmlMenu)
     {
         SMenu menu;
-        if (menu.LoadMenu(xmlMenu))
+        if (menu.LoadMenu2(&xmlMenu))
         {
             CRect rcCantainer = GetContainer()->GetContainerRect();
             point.Offset(rcCantainer.TopLeft());

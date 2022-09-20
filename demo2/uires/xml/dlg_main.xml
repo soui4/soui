@@ -18,7 +18,12 @@ translucent="0"
     <imgbtn id="sysid_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
   </ncpainter>
   <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" layout="vbox" gravity="center">
-    <button size="100,30" name="btn_exit" text="flash" tip="Flash Window"/>
+    <window size="-2,30" layout="hbox" interval="10">
+      <window size="0,0" weight="1"/>
+      <button size="100,30" name="btn_flash" text="flash" tip="Flash Window"/>
+      <button size="100,30" name="btn_menu" text="menu" tip="Show Menu"/>
+      <window size="0,0" weight="1"/>
+    </window>
     <window size="-2,0" weight="1">
       <listview pos="0,0,300,-0" name="lv_test">
         <template itemHeight="50" layout="hbox" gravity="center">

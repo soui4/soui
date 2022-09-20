@@ -7,6 +7,7 @@ class SMenuExRoot;
 class SMenuEx;
 class SOUI_EXP SMenuExItem : public SWindow {
     DEF_SOBJECT(SWindow, L"menuItem")
+	friend class SMenuEx;
   public:
     SMenuExItem(SMenuEx *pOwnerMenu, ISkinObj *pItemSkin);
 
@@ -22,9 +23,8 @@ class SOUI_EXP SMenuExItem : public SWindow {
 
     WCHAR GetHotKey() const;
 
-    void OnSubMenuHided(BOOL bUncheckItem);
-
   protected:
+	void OnSubMenuHided(BOOL bUncheckItem);
     BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
 	SWindow * CreateChildByName(LPCWSTR pszName) OVERRIDE;
 
