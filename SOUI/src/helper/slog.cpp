@@ -1,6 +1,11 @@
 #include <souistd.h>
 #include <helper/slog.h>
 
+#include <interface/slog-i.h>
+
+#ifndef E_RANGE
+#define E_RANGE 9944
+#endif
 
 SNSBEGIN
 
@@ -58,7 +63,7 @@ Log::~Log() {
 	}
 }
 
-LogStream &Log::stream() {
+SLogStream &Log::stream() {
 	return m_stream;
 }
 
@@ -78,7 +83,18 @@ void Log::setLogEcho(bool bEnable)
 }
 
 //////////////////////////////////////////////////////////////////////////
-LogStream & LogStream::writeWString(const wchar_t *t)
+
+SLogStream::SLogStream(SLogStream &)
+{
+
+}
+
+SLogStream::SLogStream()
+{
+
+}
+
+SLogStream & SLogStream::writeWString(const wchar_t *t)
 {
 #if defined(WIN32) || defined(_WIN64)
 	DWORD dwLen = WideCharToMultiByte(CP_ACP, 0, t, -1, NULL, 0, NULL, NULL);
@@ -98,13 +114,13 @@ LogStream & LogStream::writeWString(const wchar_t *t)
 	return *this;
 }
 
-LogStream & LogStream::writeString(const char *t)
+SLogStream & SLogStream::writeString(const char *t)
 {
 	writeData("%s", t);
 	return *this;
 }
 
-LogStream & LogStream::writeBinary(const LogBinary &t)
+SLogStream & SLogStream::writeBinary(const SLogBinary &t)
 {
 	writeData("%s", "\r\n\t[");
 	for (int i = 0; i < t._len; i++)
@@ -121,7 +137,7 @@ LogStream & LogStream::writeBinary(const LogBinary &t)
 	return *this;
 }
 
-LogStream::LogStream(char *buf, int len)
+SLogStream::SLogStream(char *buf, int len)
 {
 	_begin = buf;
 	_end = buf + len;
@@ -129,7 +145,8 @@ LogStream::LogStream(char *buf, int len)
 	buf[0] = 0;
 }
 
-LogStream & LogStream::writeLongLong(long long t)
+
+SLogStream & SLogStream::writeLongLong(long long t)
 {
 #if defined(WIN32) || defined(_WIN64)
 	writeData("%I64d", t);
@@ -139,7 +156,7 @@ LogStream & LogStream::writeLongLong(long long t)
 	return *this;
 }
 
-LogStream & LogStream::writeULongLong(unsigned long long t)
+SLogStream & SLogStream::writeULongLong(unsigned long long t)
 {
 #if defined(WIN32) || defined(_WIN64)
 	writeData("%I64u", t);
@@ -149,7 +166,7 @@ LogStream & LogStream::writeULongLong(unsigned long long t)
 	return *this;
 }
 
-LogStream & LogStream::writePointer(const void *t)
+SLogStream & SLogStream::writePointer(const void *t)
 {
 #if defined(WIN32) || defined(_WIN64)
 	sizeof(t) == 8 ? writeData("0x%016I64x", (unsigned long long)t)
@@ -161,7 +178,7 @@ LogStream & LogStream::writePointer(const void *t)
 	return *this;
 }
 
-LogStream & LogStream::writeData(const char *fmt, ...)
+SLogStream & SLogStream::writeData(const char *fmt, ...)
 {
 	va_list args;
 	va_start(args, fmt);
@@ -200,5 +217,91 @@ LogStream & LogStream::writeData(const char *fmt, ...)
 
 	return *this;
 }
+
+SLogStream & SLogStream::operator<<(const SLogBinary &binary)
+{
+	return writeBinary(binary);
+}
+
+SLogStream & SLogStream::operator<<(double t)
+{
+	return writeData("%.4lf", t);
+}
+
+SLogStream & SLogStream::operator<<(float t)
+{
+	return writeData("%.4f", t);
+}
+
+SLogStream & SLogStream::operator<<(unsigned long long t)
+{
+	return writeULongLong(t);
+}
+
+SLogStream & SLogStream::operator<<(long long t)
+{
+	return writeLongLong(t);
+}
+
+SLogStream & SLogStream::operator<<(unsigned long t)
+{
+	return writeULongLong(t);
+}
+
+SLogStream & SLogStream::operator<<(long t)
+{
+	return writeLongLong(t);
+}
+
+SLogStream & SLogStream::operator<<(unsigned int t)
+{
+	return writeData("%u", t);
+}
+
+SLogStream & SLogStream::operator<<(int t)
+{
+	return writeData("%d", t);
+}
+
+SLogStream & SLogStream::operator<<(unsigned short t)
+{
+	return writeData("%u", (unsigned int)t);
+}
+
+SLogStream & SLogStream::operator<<(short t)
+{
+	return writeData("%d", (int)t);
+}
+
+SLogStream & SLogStream::operator<<(unsigned char t)
+{
+	return writeData("%u", (unsigned int)t);
+}
+
+SLogStream & SLogStream::operator<<(char t)
+{
+	return writeData("%c", t);
+}
+
+SLogStream & SLogStream::operator<<(bool t)
+{
+	return (t ? writeData("%s", "true") : writeData("%s", "false"));
+}
+
+SLogStream & SLogStream::operator<<(const wchar_t *t)
+{
+	return writeWString(t);
+}
+
+SLogStream & SLogStream::operator<<(const char *t)
+{
+	return writeString(t);
+}
+
+SLogStream & SLogStream::operator<<(const void *t)
+{
+	return writePointer(t);
+}
+
 
 SNSEND

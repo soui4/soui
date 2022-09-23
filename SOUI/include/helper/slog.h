@@ -6,23 +6,12 @@
 #define RetAddr() _ReturnAddress()
 #endif
 
-#include <stdio.h>
-#include <interface/slog-i.h>
-
-#ifndef E_RANGE
-#define E_RANGE 9944
-#endif
 
 SNSBEGIN
-//! optimze from std::stringstream to Log4zStream
-#if defined(WIN32) || defined(_WIN64)
-#pragma warning(push)
-#pragma warning(disable : 4996)
-#endif
 
-class LogBinary {
+class SLogBinary {
   public:
-    LogBinary(const char *buf, int len)
+    SLogBinary(const char *buf, int len)
     {
         _buf = buf;
         _len = len;
@@ -31,124 +20,45 @@ class LogBinary {
     int _len;
 };
 
-class SOUI_EXP LogStream {
+class SOUI_EXP SLogStream {
   public:
-    LogStream(char *buf, int len);
-    int getCurrentLen()
-    {
-        return (int)(_cur - _begin);
-    }
-
-  private:
-    LogStream &writeData(const char *ft, ...);
-    LogStream &writeLongLong(long long t);
-    LogStream &writeULongLong(unsigned long long t);
-    LogStream &writePointer(const void *t);
-    LogStream &writeString(const char *t);
-    LogStream &writeWString(const wchar_t *t);
-    LogStream &writeBinary(const LogBinary &t);
-
+    SLogStream(char *buf, int len);
   public:
-    LogStream &operator<<(const void *t)
-    {
-        return writePointer(t);
-    }
-
-    LogStream &operator<<(const char *t)
-    {
-        return writeString(t);
-    }
+    SLogStream &operator<<(const void *t);
+    SLogStream &operator<<(const char *t);
 #if defined(WIN32) || defined(_WIN64)
-    LogStream &operator<<(const wchar_t *t)
-    {
-        return writeWString(t);
-    }
+    SLogStream &operator<<(const wchar_t *t);
 #endif
-    LogStream &operator<<(bool t)
-    {
-        return (t ? writeData("%s", "true") : writeData("%s", "false"));
-    }
-
-    LogStream &operator<<(char t)
-    {
-        return writeData("%c", t);
-    }
-
-    LogStream &operator<<(unsigned char t)
-    {
-        return writeData("%u", (unsigned int)t);
-    }
-
-    LogStream &operator<<(short t)
-    {
-        return writeData("%d", (int)t);
-    }
-
-    LogStream &operator<<(unsigned short t)
-    {
-        return writeData("%u", (unsigned int)t);
-    }
-
-    LogStream &operator<<(int t)
-    {
-        return writeData("%d", t);
-    }
-
-    LogStream &operator<<(unsigned int t)
-    {
-        return writeData("%u", t);
-    }
-
-    LogStream &operator<<(long t)
-    {
-        return writeLongLong(t);
-    }
-
-    LogStream &operator<<(unsigned long t)
-    {
-        return writeULongLong(t);
-    }
-
-    LogStream &operator<<(long long t)
-    {
-        return writeLongLong(t);
-    }
-
-    LogStream &operator<<(unsigned long long t)
-    {
-        return writeULongLong(t);
-    }
-
-    LogStream &operator<<(float t)
-    {
-        return writeData("%.4f", t);
-    }
-
-    LogStream &operator<<(double t)
-    {
-        return writeData("%.4lf", t);
-    }
-
-    LogStream &operator<<(const LogBinary &binary)
-    {
-        return writeBinary(binary);
-    }
+    SLogStream &operator<<(bool t);
+    SLogStream &operator<<(char t);
+    SLogStream &operator<<(unsigned char t);
+    SLogStream &operator<<(short t);
+    SLogStream &operator<<(unsigned short t);
+    SLogStream &operator<<(int t);
+    SLogStream &operator<<(unsigned int t);
+    SLogStream &operator<<(long t);
+    SLogStream &operator<<(unsigned long t);
+    SLogStream &operator<<(long long t);
+    SLogStream &operator<<(unsigned long long t);
+    SLogStream &operator<<(float t);
+    SLogStream &operator<<(double t);
+    SLogStream &operator<<(const SLogBinary &binary);
+  private:
+	SLogStream &writeData(const char *ft, ...);
+	SLogStream &writeLongLong(long long t);
+	SLogStream &writeULongLong(unsigned long long t);
+	SLogStream &writePointer(const void *t);
+	SLogStream &writeString(const char *t);
+	SLogStream &writeWString(const wchar_t *t);
+	SLogStream &writeBinary(const SLogBinary &t);
 
   private:
-    LogStream()
-    {
-    }
-    LogStream(LogStream &)
-    {
-    }
+    SLogStream();
+    SLogStream(SLogStream &);
     char *_begin;
     char *_end;
     char *_cur;
 };
-
-#if defined(WIN32) || defined(_WIN64)
-#pragma warning(pop)
-#endif
 
 
 	typedef void (*LogCallback)(const char *tag, const char* pLogStr, int level, int loggerId,const char * file,int line,const char *fun,void *retAddr);
@@ -182,7 +92,7 @@ class SOUI_EXP LogStream {
 		Log(int nLoggerId,const char *tag, int level,const char * filename, const char *funcname,int lineIndex,void *pAddr);
 
 		~Log();
-		LogStream & stream();
+		SLogStream & stream();
 
 		static void setLogLevel(int nLevel);
 		static void setLogCallback(LogCallback logCallback);
@@ -197,14 +107,17 @@ class SOUI_EXP LogStream {
 		const char * m_file,* m_func;
 		int m_line;
 		char m_logBuf[MAX_LOGLEN+1];
-		LogStream m_stream;
+		SLogStream m_stream;
 
 		static bool s_enableEcho;
 		static int s_logLevel;
 		static LogCallback gs_logCallback;
 	};
 
+SNSEND
+
 #define SLOG(tag,level,loggerId) SOUI::Log(loggerId,tag,level,__FILE__,__FUNCTION__,__LINE__,RetAddr()).stream()
+
 #define SLOG_FMT(tag,level, loggerId,logformat, ...)                                    \
 	do                                                                                  \
 	{                                                                                   \
@@ -265,4 +178,3 @@ class SOUI_EXP LogStream {
 #define SSLOGFMTE(logformat, ...) SLOG_FMT(kSoui4Tag,SOUI::Log::LOG_ERROR,0,logformat,##__VA_ARGS__)
 #define SSLOGFMTF(logformat, ...) SLOG_FMT(kSoui4Tag,SOUI::Log::LOG_FATAL,0,logformat,##__VA_ARGS__)
 
-SNSEND
