@@ -782,12 +782,11 @@ void SAnimateImgWnd::Stop()
 {
     if (m_bPlaying)
     {
-        if (IsVisible(TRUE))
-            GetContainer()->UnregisterTimelineHandler(this);
         m_bPlaying = FALSE;
         EventImageAnimateStop evt(this);
         FireEvent(evt);
     }
+	GetContainer()->UnregisterTimelineHandler(this);
 }
 
 void SAnimateImgWnd::OnDestroy()

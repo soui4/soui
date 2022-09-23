@@ -50,13 +50,12 @@ class SWindow;
 struct IAccProxy;
 
 interface SOUI_EXP ISystemObjectRegister{
-    virtual void RegisterLayouts(SObjectFactoryMgr * objFactory)
-        const {} virtual void RegisterSkins(SObjectFactoryMgr * objFactory)
-            const {} virtual void RegisterWindows(SObjectFactoryMgr * objFactory)
-                const {} virtual void RegisterInterpolator(SObjectFactoryMgr * objFactory)
-                    const {} virtual void RegisterAnimation(SObjectFactoryMgr * objFactory)
-                        const {} virtual void RegisterValueAnimator(SObjectFactoryMgr * objFactory)
-                            const {}
+    virtual void RegisterLayouts(SObjectFactoryMgr * objFactory) const {} 
+	virtual void RegisterSkins(SObjectFactoryMgr * objFactory)  const {} 
+	virtual void RegisterWindows(SObjectFactoryMgr * objFactory) const {} 
+	virtual void RegisterInterpolator(SObjectFactoryMgr * objFactory) const {} 
+	virtual void RegisterAnimation(SObjectFactoryMgr * objFactory) const {} 
+	virtual void RegisterValueAnimator(SObjectFactoryMgr * objFactory) const {}
 };
 
 class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
