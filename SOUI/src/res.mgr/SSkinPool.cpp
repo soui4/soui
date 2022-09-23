@@ -18,17 +18,17 @@ SSkinPool::~SSkinPool()
 {
 #ifdef _DEBUG
     //查询哪些皮肤运行过程中没有使用过,将结果用输出到Output
-    SLOGFMTD(L"####Detecting Defined Skin Usage BEGIN");
+    SSLOGD()<<"####Detecting Defined Skin Usage BEGIN";
     SPOSITION pos = m_mapNamedObj->GetStartPosition();
     while (pos)
     {
         SkinKey skinKey = m_mapNamedObj->GetNextKey(pos);
         if (!m_mapSkinUseCount.Lookup(skinKey))
         {
-            SLOGFMTD(L"skin of [%s.%d] was not used.", (LPCWSTR)skinKey.strName, skinKey.scale);
+            SSLOGFMTD(L"skin of [%s.%d] was not used.", (LPCWSTR)skinKey.strName, skinKey.scale);
         }
     }
-    SLOGFMTD(L"!!!!Detecting Defined Skin Usage END");
+     SSLOGD()<<"!!!!Detecting Defined Skin Usage END";
 #endif
 }
 

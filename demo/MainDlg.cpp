@@ -38,6 +38,7 @@
 #include "CAdapter.h"
 #include "CDropTarget.h"
 
+#define kLogTag "maindlg"
 
 int CMainDlg::OnCreate( LPCREATESTRUCT lpCreateStruct )
 {
@@ -280,13 +281,13 @@ HRESULT CMainDlg::OnSkinChangeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, B
 	else
 		GetRoot()->DoColorize(0);
 
-	SLOG_INFO("DoColorize spend "<<GetTickCount()-tm1<<" ms");
+	SLOGI()<<"DoColorize spend "<<GetTickCount()-tm1<<" ms";
 	return S_OK;
 }
 
 LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
 {
-	SLOG_INFO("OnInitDialog");
+	SLOGI()<<"OnInitDialog";
 
 	m_bLayoutInited=TRUE;
 	FindChildByID2<SGroupList>(R.id.gl_catalog)->SelectPage(R.id.page_mclistview);
@@ -787,7 +788,7 @@ void CMainDlg::OnMclvCtxMenu(IEvtArgs *pEvt)
         {
             int iItem = pItem->GetItemIndex();
             pListview->SetSel(iItem);
-            SLOGFMTD(_T("当前选中行:%d"),iItem);
+            SLOGI()<<_T("当前选中行:")<<iItem;
         }
         
     }

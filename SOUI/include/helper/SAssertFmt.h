@@ -16,11 +16,11 @@
 #else
 #define SASSERT_FMTW(expr, format, ...) \
     if (!(expr))                        \
-        SLOGFMTW(format, __VA_ARGS__);
+        SSLOGFMTW(format, __VA_ARGS__);
 
 #define SASSERT_FMTA(expr, format, ...) \
     if (!(expr))                        \
-        SLOGFMTA(format, __VA_ARGS__);
+        SSLOGFMTW(format, __VA_ARGS__);
 #endif
 
 #ifdef _UNICODE

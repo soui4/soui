@@ -802,7 +802,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
 
                     if (xmlInclude.next_sibling())
                     {
-                        SLOGFMTD(_T("warning! multi root include layout is not supported!"));
+                        SSLOGD()<<_T("warning! multi root include layout is not supported!");
                     }
                 }
             }

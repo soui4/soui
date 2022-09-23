@@ -124,7 +124,7 @@ int SIECtrl::OnCreate(LPVOID)
     int nRet = __baseCls::OnCreate(NULL);
     if (GetContainer()->IsTranslucent())
     {
-        SLOGFMTD(_T("warning!!! create iectrl failed bacause of host is translucent!"));
+        SSLOGW()<<"warning!!! create iectrl failed bacause of host is translucent!";
         return -1;
     }
     GetContainer()->GetMsgLoop()->AddMessageFilter(this);

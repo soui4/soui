@@ -67,7 +67,6 @@
 #include <soui-version.h>
 
 #include <helper/SLog.h>
-#include <helper/SLogDef.h>
 #include <helper/SAssertFmt.h>
 #include <helper/SAttrCracker.h>
 #include <helper/SColor.h>

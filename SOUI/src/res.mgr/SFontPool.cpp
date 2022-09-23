@@ -256,7 +256,7 @@ FontInfo SFontPool::FontInfoFromString(const SStringW &strFontDesc)
 SStringW SFontPool::FontInfoToString(const FontInfo &fi)
 {
     char szBuf[200];
-    Log4zStream s(szBuf, 200);
+    LogStream s(szBuf, 200);
     s << KFontFace << ":\'" << fi.strFaceName.c_str() << "\'"
       << ",";
     s << KFontSize << ":" << (short)fi.style.attr.cSize << ",";

@@ -84,13 +84,13 @@ BOOL SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
     SStringTList strUiDef;
     if (2 != ParseResID(pszUidef, strUiDef))
     {
-        SLOGFMTD(_T("warning!!!! Add ResProvider Error."));
+        SSLOGW()<<"warning!!!! Add ResProvider Error.";
     }
 
     size_t dwSize = pResProvider->GetRawBufferSize(strUiDef[0], strUiDef[1]);
     if (dwSize == 0)
     {
-        SLOGFMTD(_T("warning!!!! uidef was not found in the specified resprovider"));
+        SSLOGW()<<"warning!!!! uidef was not found in the specified resprovider";
     }
     else
     {
@@ -104,14 +104,14 @@ BOOL SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
 
         if (!bLoad)
         { // load xml failed
-            SLOGFMTD(_T("warning!!! load uidef as xml document failed"));
+            SSLOGD()<<"warning!!! load uidef as xml document failed";
         }
         else
         { // init named objects
             SXmlNode root = docInit.root().child(KNodeUidef, false);
             if (!root)
             {
-                SLOGFMTD(_T("warning!!! \"uidef\" element is not the root element of uidef xml"));
+                SSLOGD()<<"warning!!! \"uidef\" element is not the root element of uidef xml";
             }
             else
             {

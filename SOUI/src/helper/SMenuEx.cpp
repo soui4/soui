@@ -1069,7 +1069,6 @@ void SMenuEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     case VK_LEFT:
         if (m_pParent)
         {
-            SLOG_INFO("hide sub menu");
             HideMenu(TRUE);
         }
         else

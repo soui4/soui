@@ -28,10 +28,8 @@
 #include "SmileyCreateHook.h"
 #include "clock/sclock.h"
 
-//<--定一个filter="demo"的slog输出
-#undef LOG_FILTER
-#define LOG_FILTER "demo"
-#include <helper/SLogDef.h>
+//<--定一个tag="demo"的slog输出
+#define kLogTag "demo"
 //-->
 
 #define NANOSVG_IMPLEMENTATION
@@ -77,12 +75,12 @@ class CAsyncTaskObj
 public:
 	void task1(int a)
 	{
-		SLOG_INFO("task1,a:" << a);
+		SLOGI()<<"task1,a:" << a;
 	}
 
 	void task2(int a, const std::string& b)
 	{
-		SLOG_INFO("task2,a:" << a << " b:" << b.c_str());
+		SLOGI()<<"task2,a:" << a << " b:" << b.c_str();
 	}
 };
 
@@ -225,9 +223,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		SApplication* theApp = new SApplication2(pRenderFactory, hInstance);
 
 		theApp->SetLogManager(pLogMgr);
-		SLOG_INFO("test=" << 200);
-		SLOGFMTE("log output using ansi format,str=%s, tick=%u", "test", GetTickCount());
 		SLOGFMTE(L"log output using unicode format,str=%s, tick=%u", L"中文", GetTickCount());
+		SLOGFMTE("log output using ansi format,str=%s, tick=%u", "test", GetTickCount());
+		SLOGI()<<"test=" << 200;
 
 		//控件注册要放到AddResProvider前： 2016年3月8日
 

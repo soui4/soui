@@ -342,6 +342,8 @@
 			<File
 				RelativePath="src\core\shostwnd.cpp" />
 			<File
+				RelativePath="src\helper\slog.cpp" />
+			<File
 				RelativePath="src\helper\stime.cpp" />
 		</Filter>
 		<Filter
@@ -494,8 +496,6 @@
 				RelativePath="include\helper\SListViewItemLocator.h" />
 			<File
 				RelativePath="include\control\SListbox.h" />
-			<File
-				RelativePath="include\helper\SLogDef.h" />
 			<File
 				RelativePath="include\control\SMCListView.h" />
 			<File

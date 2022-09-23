@@ -72,7 +72,7 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
     }
     if (m_adapter == adapter)
     {
-        SLOG_WARN("the new adapter is same to previous set adapter, same as notifyDatasetChanged");
+		SSLOGW()<<"the new adapter is same to previous set adapter, same as notifyDatasetChanged";
         if (m_adapter)
         {
             onDataSetChanged();

@@ -175,7 +175,6 @@ HEADERS += include/SApp.h \
            include/helper/SIpcParamHelper.hpp \
            include/helper/SListViewItemLocator.h \
            include/helper/slog.h \
-           include/helper/SLogDef.h \
            include/helper/SMemDC.h \
            include/helper/SMenu.h \
            include/helper/SMenuEx.h \
@@ -295,6 +294,7 @@ SOURCES += src/SApp.cpp \
            src/helper/SHostMgr.cpp \
            src/helper/SListViewItemLocator.cpp \
            src/helper/SMemDC.cpp \
+           src/helper/slog.cpp \
            src/helper/SMenu.cpp \
            src/helper/SMenuEx.cpp \
            src/helper/SMenuWndHook.cpp \

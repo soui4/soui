@@ -9,190 +9,8 @@
 #include <stdio.h>
 #include <interface/slog-i.h>
 
-#ifndef GETLOGMGR
-#define GETLOGMGR()                                                                            \
-    SOUI::SApplication::getSingletonPtr() ? SOUI::SApplication::getSingleton().GetLogManager() \
-                                          : NULL
-#endif
-
 #ifndef E_RANGE
 #define E_RANGE 9944
-#endif
-
-#ifndef OUTLOG_LEVEL
-#define OUTLOG_LEVEL 0 // LOG_LEVEL_TRACE
-#endif
-
-//! check VC VERSION. DO NOT TOUCH
-//! format micro cannot support VC6 or VS2003, please use stream input log, like LOGI, LOGD,
-//! LOG_DEBUG, LOG_STREAM ...
-#if _MSC_VER >= 1400 // MSVC >= VS2005
-#define LOG4Z_FORMAT_INPUT_ENABLE
-#endif
-
-#if !defined(WIN32) && !defined(_WIN64)
-#define LOG4Z_FORMAT_INPUT_ENABLE
-#endif
-
-SNSBEGIN
-class Log4zBinary;
-class Log4zStream;
-SNSEND
-
-//! base micro.
-#define SOUI_LOG_STREAM(id_or_name, filter, level, log)                                           \
-    do                                                                                            \
-    {                                                                                             \
-        SOUI::ILog4zManager *pLogMgr = GETLOGMGR();                                               \
-        char *logBuf = (char *)malloc(SOUI::LOG4Z_LOG_BUF_SIZE + 1);                              \
-        logBuf[SOUI::LOG4Z_LOG_BUF_SIZE] = 0;                                                     \
-        SOUI::Log4zStream ss(logBuf, SOUI::LOG4Z_LOG_BUF_SIZE);                                   \
-        ss << log;                                                                                \
-        if (pLogMgr && pLogMgr->prePushLog(id_or_name, level))                                    \
-        {                                                                                         \
-            const void *pAddr = RetAddr();                                                        \
-            pLogMgr->pushLog(id_or_name, level, filter, logBuf, __FILE__, __LINE__, __FUNCTION__, \
-                             pAddr);                                                              \
-        }                                                                                         \
-        else if (level >= OUTLOG_LEVEL)                                                           \
-        {                                                                                         \
-            ss << " " << __FUNCTION__ << " " << __FILE__ << ":" << __LINE__ << "\n";              \
-            OutputDebugStringA(logBuf);                                                           \
-        }                                                                                         \
-        free(logBuf);                                                                             \
-    } while (0)
-
-//! fast micro
-#define LOG_TRACE(id_or_name, filter, log) \
-    SOUI_LOG_STREAM(id_or_name, filter, SOUI::LOG_LEVEL_TRACE, log)
-#define LOG_DEBUG(id_or_name, filter, log) \
-    SOUI_LOG_STREAM(id_or_name, filter, SOUI::LOG_LEVEL_DEBUG, log)
-#define LOG_INFO(id_or_name, filter, log) \
-    SOUI_LOG_STREAM(id_or_name, filter, SOUI::LOG_LEVEL_INFO, log)
-#define LOG_WARN(id_or_name, filter, log) \
-    SOUI_LOG_STREAM(id_or_name, filter, SOUI::LOG_LEVEL_WARN, log)
-#define LOG_ERROR(id_or_name, filter, log) \
-    SOUI_LOG_STREAM(id_or_name, filter, SOUI::LOG_LEVEL_ERROR, log)
-#define LOG_ALARM(id_or_name, filter, log) \
-    SOUI_LOG_STREAM(id_or_name, filter, SOUI::LOG_LEVEL_ALARM, log)
-#define LOG_FATAL(id_or_name, filter, log) \
-    SOUI_LOG_STREAM(id_or_name, filter, SOUI::LOG_LEVEL_FATAL, log)
-
-//! super micro.
-#define LOGT(filter, log) LOG_TRACE(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, log)
-#define LOGD(filter, log) LOG_DEBUG(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, log)
-#define LOGI(filter, log) LOG_INFO(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, log)
-#define LOGW(filter, log) LOG_WARN(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, log)
-#define LOGE(filter, log) LOG_ERROR(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, log)
-#define LOGA(filter, log) LOG_ALARM(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, log)
-#define LOGF(filter, log) LOG_FATAL(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, log)
-
-//! format input log.
-#ifdef LOG4Z_FORMAT_INPUT_ENABLE
-#define LOG_FORMAT(id_or_name, level, filter, logformat, ...)                                     \
-    do                                                                                            \
-    {                                                                                             \
-        SOUI::ILog4zManager *pLogMgr = GETLOGMGR();                                               \
-        char *logbuf = (char *)malloc(SOUI::LOG4Z_LOG_BUF_SIZE + 1);                              \
-        if (sizeof(logformat[0]) == sizeof(char))                                                 \
-        {                                                                                         \
-            int nLen = _snprintf_s(logbuf, SOUI::LOG4Z_LOG_BUF_SIZE, _TRUNCATE,                   \
-                                   (const char *)logformat, ##__VA_ARGS__);                       \
-            logbuf[nLen] = 0;                                                                     \
-        }                                                                                         \
-        else                                                                                      \
-        {                                                                                         \
-            wchar_t *logbufw                                                                      \
-                = (wchar_t *)malloc((SOUI::LOG4Z_LOG_BUF_SIZE + 1) * sizeof(wchar_t));            \
-            int nwLen = _snwprintf_s(logbufw, SOUI::LOG4Z_LOG_BUF_SIZE, _TRUNCATE,                \
-                                     (const wchar_t *)logformat, ##__VA_ARGS__);                  \
-            int ncLen = WideCharToMultiByte(CP_ACP, 0, logbufw, nwLen, NULL, 0, NULL, NULL);      \
-            if (nwLen < SOUI::LOG4Z_LOG_BUF_SIZE)                                                 \
-            {                                                                                     \
-                WideCharToMultiByte(CP_ACP, 0, logbufw, nwLen, logbuf, ncLen, NULL, NULL);        \
-                logbuf[nwLen] = 0;                                                                \
-            }                                                                                     \
-            free(logbufw);                                                                        \
-        }                                                                                         \
-        if (pLogMgr && pLogMgr->prePushLog(id_or_name, level))                                    \
-        {                                                                                         \
-            pLogMgr->pushLog(id_or_name, level, filter, logbuf, __FILE__, __LINE__, __FUNCTION__, \
-                             RetAddr());                                                          \
-        }                                                                                         \
-        else if (level >= OUTLOG_LEVEL)                                                           \
-        {                                                                                         \
-            char *logbuf2 = (char *)malloc(SOUI::LOG4Z_LOG_BUF_SIZE + 1);                         \
-            int nLen = _snprintf_s(logbuf2, SOUI::LOG4Z_LOG_BUF_SIZE, _TRUNCATE, "%s %s %s:%d\n", \
-                                   logbuf, __FUNCTION__, __FILE__, __LINE__);                     \
-            logbuf2[nLen] = 0;                                                                    \
-            OutputDebugStringA(logbuf2);                                                          \
-            free(logbuf2);                                                                        \
-        }                                                                                         \
-        free(logbuf);                                                                             \
-    } while (0)
-
-//! format string
-#define LOGFMT_TRACE(id_or_name, filter, fmt, ...) \
-    LOG_FORMAT(id_or_name, SOUI::LOG_LEVEL_TRACE, filter, fmt, ##__VA_ARGS__)
-#define LOGFMT_DEBUG(id_or_name, filter, fmt, ...) \
-    LOG_FORMAT(id_or_name, SOUI::LOG_LEVEL_DEBUG, filter, fmt, ##__VA_ARGS__)
-#define LOGFMT_INFO(id_or_name, filter, fmt, ...) \
-    LOG_FORMAT(id_or_name, SOUI::LOG_LEVEL_INFO, filter, fmt, ##__VA_ARGS__)
-#define LOGFMT_WARN(id_or_name, filter, fmt, ...) \
-    LOG_FORMAT(id_or_name, SOUI::LOG_LEVEL_WARN, filter, fmt, ##__VA_ARGS__)
-#define LOGFMT_ERROR(id_or_name, filter, fmt, ...) \
-    LOG_FORMAT(id_or_name, SOUI::LOG_LEVEL_ERROR, filter, fmt, ##__VA_ARGS__)
-#define LOGFMT_ALARM(id_or_name, filter, fmt, ...) \
-    LOG_FORMAT(id_or_name, SOUI::LOG_LEVEL_ALARM, filter, fmt, ##__VA_ARGS__)
-#define LOGFMT_FATAL(id_or_name, filter, fmt, ...) \
-    LOG_FORMAT(id_or_name, SOUI::LOG_LEVEL_FATAL, filter, fmt, ##__VA_ARGS__)
-#define LOGFMTT(filter, fmt, ...) \
-    LOGFMT_TRACE(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, fmt, ##__VA_ARGS__)
-#define LOGFMTD(filter, fmt, ...) \
-    LOGFMT_DEBUG(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, fmt, ##__VA_ARGS__)
-#define LOGFMTI(filter, fmt, ...) \
-    LOGFMT_INFO(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, fmt, ##__VA_ARGS__)
-#define LOGFMTW(filter, fmt, ...) \
-    LOGFMT_WARN(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, fmt, ##__VA_ARGS__)
-#define LOGFMTE(filter, fmt, ...) \
-    LOGFMT_ERROR(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, fmt, ##__VA_ARGS__)
-#define LOGFMTA(filter, fmt, ...) \
-    LOGFMT_ALARM(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, fmt, ##__VA_ARGS__)
-#define LOGFMTF(filter, fmt, ...) \
-    LOGFMT_FATAL(SOUI::LOG4Z_MAIN_LOGGER_ID, filter, fmt, ##__VA_ARGS__)
-#else
-inline void empty_log_format_function1(LoggerId id, const char *tag, const char *fmt, ...)
-{
-}
-inline void empty_log_format_function1(const char *name, const char *tag, const char *fmt, ...)
-{
-}
-inline void empty_log_format_function1(LoggerId id, const char *tag, const wchar_t *fmt, ...)
-{
-}
-inline void empty_log_format_function1(const char *name, const char *tag, const wchar_t *fmt, ...)
-{
-}
-inline void empty_log_format_function2(const char *tag, const char *fmt, ...)
-{
-}
-inline void empty_log_format_function2(const char *tag, const wchar_t *fmt, ...)
-{
-}
-#define LOGFMT_TRACE empty_log_format_function1
-#define LOGFMT_DEBUG LOGFMT_TRACE
-#define LOGFMT_INFO  LOGFMT_TRACE
-#define LOGFMT_WARN  LOGFMT_TRACE
-#define LOGFMT_ERROR LOGFMT_TRACE
-#define LOGFMT_ALARM LOGFMT_TRACE
-#define LOGFMT_FATAL LOGFMT_TRACE
-#define LOGFMTT      empty_log_format_function2
-#define LOGFMTD      LOGFMTT
-#define LOGFMTI      LOGFMTT
-#define LOGFMTW      LOGFMTT
-#define LOGFMTE      LOGFMTT
-#define LOGFMTA      LOGFMTT
-#define LOGFMTF      LOGFMTT
 #endif
 
 SNSBEGIN
@@ -202,9 +20,9 @@ SNSBEGIN
 #pragma warning(disable : 4996)
 #endif
 
-class Log4zBinary {
+class LogBinary {
   public:
-    Log4zBinary(const char *buf, int len)
+    LogBinary(const char *buf, int len)
     {
         _buf = buf;
         _len = len;
@@ -213,114 +31,114 @@ class Log4zBinary {
     int _len;
 };
 
-class Log4zStream {
+class SOUI_EXP LogStream {
   public:
-    Log4zStream(char *buf, int len);
+    LogStream(char *buf, int len);
     int getCurrentLen()
     {
         return (int)(_cur - _begin);
     }
 
   private:
-    Log4zStream &writeData(const char *ft, ...);
-    Log4zStream &writeLongLong(long long t);
-    Log4zStream &writeULongLong(unsigned long long t);
-    Log4zStream &writePointer(const void *t);
-    Log4zStream &writeString(const char *t);
-    Log4zStream &writeWString(const wchar_t *t);
-    Log4zStream &writeBinary(const Log4zBinary &t);
+    LogStream &writeData(const char *ft, ...);
+    LogStream &writeLongLong(long long t);
+    LogStream &writeULongLong(unsigned long long t);
+    LogStream &writePointer(const void *t);
+    LogStream &writeString(const char *t);
+    LogStream &writeWString(const wchar_t *t);
+    LogStream &writeBinary(const LogBinary &t);
 
   public:
-    Log4zStream &operator<<(const void *t)
+    LogStream &operator<<(const void *t)
     {
         return writePointer(t);
     }
 
-    Log4zStream &operator<<(const char *t)
+    LogStream &operator<<(const char *t)
     {
         return writeString(t);
     }
 #if defined(WIN32) || defined(_WIN64)
-    Log4zStream &operator<<(const wchar_t *t)
+    LogStream &operator<<(const wchar_t *t)
     {
         return writeWString(t);
     }
 #endif
-    Log4zStream &operator<<(bool t)
+    LogStream &operator<<(bool t)
     {
         return (t ? writeData("%s", "true") : writeData("%s", "false"));
     }
 
-    Log4zStream &operator<<(char t)
+    LogStream &operator<<(char t)
     {
         return writeData("%c", t);
     }
 
-    Log4zStream &operator<<(unsigned char t)
+    LogStream &operator<<(unsigned char t)
     {
         return writeData("%u", (unsigned int)t);
     }
 
-    Log4zStream &operator<<(short t)
+    LogStream &operator<<(short t)
     {
         return writeData("%d", (int)t);
     }
 
-    Log4zStream &operator<<(unsigned short t)
+    LogStream &operator<<(unsigned short t)
     {
         return writeData("%u", (unsigned int)t);
     }
 
-    Log4zStream &operator<<(int t)
+    LogStream &operator<<(int t)
     {
         return writeData("%d", t);
     }
 
-    Log4zStream &operator<<(unsigned int t)
+    LogStream &operator<<(unsigned int t)
     {
         return writeData("%u", t);
     }
 
-    Log4zStream &operator<<(long t)
+    LogStream &operator<<(long t)
     {
         return writeLongLong(t);
     }
 
-    Log4zStream &operator<<(unsigned long t)
+    LogStream &operator<<(unsigned long t)
     {
         return writeULongLong(t);
     }
 
-    Log4zStream &operator<<(long long t)
+    LogStream &operator<<(long long t)
     {
         return writeLongLong(t);
     }
 
-    Log4zStream &operator<<(unsigned long long t)
+    LogStream &operator<<(unsigned long long t)
     {
         return writeULongLong(t);
     }
 
-    Log4zStream &operator<<(float t)
+    LogStream &operator<<(float t)
     {
         return writeData("%.4f", t);
     }
 
-    Log4zStream &operator<<(double t)
+    LogStream &operator<<(double t)
     {
         return writeData("%.4lf", t);
     }
 
-    Log4zStream &operator<<(const Log4zBinary &binary)
+    LogStream &operator<<(const LogBinary &binary)
     {
         return writeBinary(binary);
     }
 
   private:
-    Log4zStream()
+    LogStream()
     {
     }
-    Log4zStream(Log4zStream &)
+    LogStream(LogStream &)
     {
     }
     char *_begin;
@@ -328,130 +146,119 @@ class Log4zStream {
     char *_cur;
 };
 
-inline Log4zStream &Log4zStream::writeData(const char *fmt, ...)
-{
-    va_list args;
-    va_start(args, fmt);
-    if (_cur < _end)
-    {
-        int len = 0;
-        int count = (int)(_end - _cur) - 1;
-#if defined(WIN32) || defined(_WIN64)
-        len = _vsnprintf(_cur, count, fmt, args);
-        if (len == count || (len == -1 && errno == E_RANGE))
-        {
-            len = count;
-            *(_end - 1) = '\0';
-        }
-        else if (len < 0)
-        {
-            *_cur = '\0';
-            len = 0;
-        }
-#else
-        len = vsnprintf(_cur, count, fmt, args);
-        if (len < 0)
-        {
-            *_cur = '\0';
-            len = 0;
-        }
-        else if (len >= count)
-        {
-            len = count;
-            *(_end - 1) = '\0';
-        }
-#endif
-        _cur += len;
-    }
-    va_end(args);
-
-    return *this;
-}
-
-inline Log4zStream::Log4zStream(char *buf, int len)
-{
-    _begin = buf;
-    _end = buf + len;
-    _cur = _begin;
-}
-
-inline Log4zStream &Log4zStream::writeLongLong(long long t)
-{
-#if defined(WIN32) || defined(_WIN64)
-    writeData("%I64d", t);
-#else
-    writeData("%lld", t);
-#endif
-    return *this;
-}
-
-inline Log4zStream &Log4zStream::writeULongLong(unsigned long long t)
-{
-#if defined(WIN32) || defined(_WIN64)
-    writeData("%I64u", t);
-#else
-    writeData("%llu", t);
-#endif
-    return *this;
-}
-
-inline Log4zStream &Log4zStream::writePointer(const void *t)
-{
-#if defined(WIN32) || defined(_WIN64)
-    sizeof(t) == 8 ? writeData("%016I64x", (unsigned long long)t)
-                   : writeData("%08I64x", (unsigned long long)t);
-#else
-    sizeof(t) == 8 ? writeData("%016llx", (unsigned long long)t)
-                   : writeData("%08llx", (unsigned long long)t);
-#endif
-    return *this;
-}
-
-inline Log4zStream &Log4zStream::writeBinary(const Log4zBinary &t)
-{
-    writeData("%s", "\r\n\t[");
-    for (int i = 0; i < t._len; i++)
-    {
-        if (i % 16 == 0)
-        {
-            writeData("%s", "\r\n\t");
-            *this << (void *)(t._buf + i);
-            writeData("%s", ": ");
-        }
-        writeData("%02x ", (unsigned char)t._buf[i]);
-    }
-    writeData("%s", "\r\n\t]\r\n\t");
-    return *this;
-}
-
-inline Log4zStream &Log4zStream::writeString(const char *t)
-{
-    writeData("%s", t);
-    return *this;
-}
-
-inline Log4zStream &Log4zStream::writeWString(const wchar_t *t)
-{
-#if defined(WIN32) || defined(_WIN64)
-    DWORD dwLen = WideCharToMultiByte(CP_ACP, 0, t, -1, NULL, 0, NULL, NULL);
-    if (dwLen < SOUI::LOG4Z_LOG_BUF_SIZE)
-    {
-        char buf[SOUI::LOG4Z_LOG_BUF_SIZE];
-        dwLen = WideCharToMultiByte(CP_ACP, 0, t, -1, buf, dwLen, NULL, NULL);
-        if (dwLen > 0)
-        {
-            buf[dwLen] = 0;
-            writeData("%s", buf);
-        }
-    }
-#else
-    // not support
-#endif
-    return *this;
-}
-
 #if defined(WIN32) || defined(_WIN64)
 #pragma warning(pop)
 #endif
+
+
+	typedef void (*LogCallback)(const char *tag, const char* pLogStr, int level, int loggerId,const char * file,int line,const char *fun,void *retAddr);
+
+	class SOUI_EXP Log
+	{
+	public:
+		enum{
+			MAX_TAGLEN = 100,
+			MAX_LOGLEN = 1024,
+		};
+		enum LogPriority {
+			/** For internal use only.  */
+			LOG_UNKNOWN = 0,
+			/** The default priority, for internal use only.  */
+			LOG_DEFAULT, /* only for SetMinPriority() */
+			/** Verbose logging. Should typically be disabled for a release apk. */
+			LOG_VERBOSE,
+			/** Debug logging. Should typically be disabled for a release apk. */
+			LOG_DEBUG,
+			/** Informational logging. Should typically be disabled for a release apk. */
+			LOG_INFO,
+			/** Warning logging. For use with recoverable failures. */
+			LOG_WARN,
+			/** Error logging. For use with unrecoverable failures. */
+			LOG_ERROR,
+			/** Fatal logging. For use when aborting. */
+			LOG_FATAL,
+		};
+	public:
+		Log(int nLoggerId,const char *tag, int level,const char * filename, const char *funcname,int lineIndex,void *pAddr);
+
+		~Log();
+		LogStream & stream();
+		static void setLogLevel(int nLevel);
+		static void setLogCallback(LogCallback logCallback);
+		static void setLogEcho(bool bEnable);
+		static void DefCallback(const char *tag, const char* pLogStr, int level, int loggerId,const char * file,int line,const char *fun,void *retAddr);
+	private:
+		char m_tag[100];
+		int  m_level;
+		int  m_loggerId;
+		void * m_pAddr;
+		const char * m_file,* m_func;
+		int m_line;
+		char m_logBuf[MAX_LOGLEN+1];
+		LogStream m_stream;
+
+		static bool s_enableEcho;
+		static int s_logLevel;
+		static LogCallback gs_logCallback;
+	};
+
+#define SLOG(tag,level,loggerId) SOUI::Log(loggerId,tag,level,__FILE__,__FUNCTION__,__LINE__,RetAddr()).stream()
+#define SLOG_FMT(tag,level, loggerId,logformat, ...)                                    \
+	do                                                                                  \
+	{                                                                                   \
+		if(sizeof(logformat[0])==sizeof(char)) {                                        \
+			char logbuf[SOUI::Log::MAX_LOGLEN]={0};                                     \
+			int nLen = _snprintf(logbuf, SOUI::Log::MAX_LOGLEN,                         \
+			(const char*)logformat, ##__VA_ARGS__);                                     \
+			SLOG(tag,level,loggerId)<<logbuf;                                           \
+		}else                                                                           \
+		{                                                                               \
+			wchar_t logbuf[SOUI::Log::MAX_LOGLEN]={0};                                  \
+			int nLen = _snwprintf(logbuf, SOUI::Log::MAX_LOGLEN,                        \
+			(const wchar_t*)logformat, ##__VA_ARGS__);                                  \
+			SLOG(tag,level,loggerId)<<logbuf;                                           \
+		}                                                                               \
+	}while(false);
+
+#define SLOGD() SLOG(kLogTag,SOUI::Log::LOG_DEBUG,0)
+#define SLOGI() SLOG(kLogTag,SOUI::Log::LOG_INFO,0)
+#define SLOGW() SLOG(kLogTag,SOUI::Log::LOG_WARN,0)
+#define SLOGE() SLOG(kLogTag,SOUI::Log::LOG_ERROR,0)
+#define SLOGF() SLOG(kLogTag,SOUI::Log::LOG_FATAL,0)
+
+#define SLOGD2(tag) SLOG(tag,SOUI::Log::LOG_DEBUG,0)
+#define SLOGI2(tag) SLOG(tag,SOUI::Log::LOG_INFO,0)
+#define SLOGW2(tag) SLOG(tag,SOUI::Log::LOG_WARN,0)
+#define SLOGE2(tag) SLOG(tag,SOUI::Log::LOG_ERROR,0)
+#define SLOGF2(tag) SLOG(tag,SOUI::Log::LOG_FATAL,0)
+
+
+#define SLOGFMTD2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_DEBUG,0,logformat,##__VA_ARGS__)
+#define SLOGFMTI2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_INFO,0,logformat,##__VA_ARGS__)
+#define SLOGFMTW2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_WARN,0,logformat,##__VA_ARGS__)
+#define SLOGFMTE2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_ERROR,0,logformat,##__VA_ARGS__)
+#define SLOGFMTF2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_FATAL,0,logformat,##__VA_ARGS__)
+
+
+#define SLOGFMTD(logformat, ...) SLOG_FMT(kLogTag,SOUI::Log::LOG_DEBUG,0,logformat,##__VA_ARGS__)
+#define SLOGFMTI(logformat, ...) SLOG_FMT(kLogTag,SOUI::Log::LOG_INFO,0,logformat,##__VA_ARGS__)
+#define SLOGFMTW(logformat, ...) SLOG_FMT(kLogTag,SOUI::Log::LOG_WARN,0,logformat,##__VA_ARGS__)
+#define SLOGFMTE(logformat, ...) SLOG_FMT(kLogTag,SOUI::Log::LOG_ERROR,0,logformat,##__VA_ARGS__)
+#define SLOGFMTF(logformat, ...) SLOG_FMT(kLogTag,SOUI::Log::LOG_FATAL,0,logformat,##__VA_ARGS__)
+
+
+#define kSoui4Tag "soui4"
+
+#define SSLOGD() SLOG(kSoui4Tag,SOUI::Log::LOG_DEBUG,0)
+#define SSLOGI() SLOG(kSoui4Tag,SOUI::Log::LOG_INFO,0)
+#define SSLOGW() SLOG(kSoui4Tag,SOUI::Log::LOG_WARN,0)
+#define SSLOGE() SLOG(kSoui4Tag,SOUI::Log::LOG_ERROR,0)
+#define SSLOGF() SLOG(kSoui4Tag,SOUI::Log::LOG_FATAL,0)
+
+#define SSLOGFMTD(logformat, ...) SLOG_FMT(kSoui4Tag,SOUI::Log::LOG_DEBUG,0,logformat,##__VA_ARGS__)
+#define SSLOGFMTI(logformat, ...) SLOG_FMT(kSoui4Tag,SOUI::Log::LOG_INFO,0,logformat,##__VA_ARGS__)
+#define SSLOGFMTW(logformat, ...) SLOG_FMT(kSoui4Tag,SOUI::Log::LOG_WARN,0,logformat,##__VA_ARGS__)
+#define SSLOGFMTE(logformat, ...) SLOG_FMT(kSoui4Tag,SOUI::Log::LOG_ERROR,0,logformat,##__VA_ARGS__)
+#define SSLOGFMTF(logformat, ...) SLOG_FMT(kSoui4Tag,SOUI::Log::LOG_FATAL,0,logformat,##__VA_ARGS__)
 
 SNSEND

@@ -603,7 +603,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
 
         if (!pTarget || !pTarget->IsClass(T::GetClassName()))
         {
-            SLOGFMTD(
+            SSLOGFMTD(
                 _T("FindChildByID2 Failed, no window of class [%s] with id of [%d] was found within [%d] levels"),
                 T::GetClassName(), nID, nDeep);
             return NULL;
@@ -642,7 +642,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
         SWindow *pTarget = FindChildByName(pszName, nDeep);
         if (!pTarget || !pTarget->IsClass(T::GetClassName()))
         {
-            SLOGFMTD(
+            SSLOGFMTD(
                 _T("FindChildByName2 Failed, no window of class [%s] with name of [%s] was found within [%d] levels"),
                 T::GetClassName(), pszName, nDeep);
             return NULL;

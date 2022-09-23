@@ -25,9 +25,9 @@ void SResProviderMgr::RemoveAll()
     {
         IResProvider *pResProvider = m_lstResPackage.GetNext(pos);
 #ifdef _DEBUG //检查资源使用情况
-        SLOG_DEBUG("++++begin of check resource usage");
+        SSLOGD()<<"++++begin of check resource usage";
         pResProvider->EnumResource(&SResProviderMgr::CheckUsage, (LPARAM)&m_mapResUsageCount);
-        SLOG_DEBUG("----end of check resource usage");
+        SSLOGD()<<"----end of check resource usage";
 #endif
         pResProvider->Release();
     }
@@ -434,7 +434,7 @@ BOOL SResProviderMgr::CheckUsage(LPCTSTR pszName, LPCTSTR pszType, LPARAM lp)
     key.MakeLower();
     if (!mapResUsageCount->Lookup(key))
     { //发现未使用资源
-        SLOGFMTD(_T("resource of [%s] was not used."), (LPCTSTR)key);
+        SSLOGFMTD(_T("resource of [%s] was not used."), (LPCTSTR)key);
     }
     return TRUE;
 }

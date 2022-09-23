@@ -1724,7 +1724,7 @@ bool SHostWnd::StopHostAnimation()
 
 void SHostWnd::OnUserXmlNode(SXmlNode xmlUser)
 {
-    SLOG_DEBUG("unhandled xml node:" << xmlUser.name());
+    SSLOGD()<<"unhandled xml node:" << xmlUser.name();
 }
 
 void SHostWnd::UpdateAutoSizeCount(bool bInc)

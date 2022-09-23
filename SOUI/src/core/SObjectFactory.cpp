@@ -111,7 +111,7 @@ void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
 
 IObject *SObjectFactoryMgr::OnCreateUnknownObject(const SObjectInfo &objInfo) const
 {
-    SLOGFMTD(L"Warning: no object %s of type:%d in SOUI!!", (LPCWSTR)objInfo.mName, objInfo.mType);
+    SSLOGFMTD(L"Warning: no object %s of type:%d in SOUI!!", (LPCWSTR)objInfo.mName, objInfo.mType);
     return NULL;
 }
 
