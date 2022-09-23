@@ -222,35 +222,37 @@ class SOUI_EXP LogStream {
 		}                                                                               \
 	}while(false);
 
+
+//流式输出日志，当kLogTag有效时使用，否则编译失败，kLogTag可以是当前定义的宏，也可以是当前对象的成员变量。
 #define SLOGD() SLOG(kLogTag,SOUI::Log::LOG_DEBUG,0)
 #define SLOGI() SLOG(kLogTag,SOUI::Log::LOG_INFO,0)
 #define SLOGW() SLOG(kLogTag,SOUI::Log::LOG_WARN,0)
 #define SLOGE() SLOG(kLogTag,SOUI::Log::LOG_ERROR,0)
 #define SLOGF() SLOG(kLogTag,SOUI::Log::LOG_FATAL,0)
 
+//流式输出日志，每条日志手动指定tag
 #define SLOGD2(tag) SLOG(tag,SOUI::Log::LOG_DEBUG,0)
 #define SLOGI2(tag) SLOG(tag,SOUI::Log::LOG_INFO,0)
 #define SLOGW2(tag) SLOG(tag,SOUI::Log::LOG_WARN,0)
 #define SLOGE2(tag) SLOG(tag,SOUI::Log::LOG_ERROR,0)
 #define SLOGF2(tag) SLOG(tag,SOUI::Log::LOG_FATAL,0)
 
-
-#define SLOGFMTD2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_DEBUG,0,logformat,##__VA_ARGS__)
-#define SLOGFMTI2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_INFO,0,logformat,##__VA_ARGS__)
-#define SLOGFMTW2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_WARN,0,logformat,##__VA_ARGS__)
-#define SLOGFMTE2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_ERROR,0,logformat,##__VA_ARGS__)
-#define SLOGFMTF2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_FATAL,0,logformat,##__VA_ARGS__)
-
-
+//格式化输出日志，当kLogTag有效时使用，否则编译失败，kLogTag可以是当前定义的宏，也可以是当前对象的成员变量。
 #define SLOGFMTD(logformat, ...) SLOG_FMT(kLogTag,SOUI::Log::LOG_DEBUG,0,logformat,##__VA_ARGS__)
 #define SLOGFMTI(logformat, ...) SLOG_FMT(kLogTag,SOUI::Log::LOG_INFO,0,logformat,##__VA_ARGS__)
 #define SLOGFMTW(logformat, ...) SLOG_FMT(kLogTag,SOUI::Log::LOG_WARN,0,logformat,##__VA_ARGS__)
 #define SLOGFMTE(logformat, ...) SLOG_FMT(kLogTag,SOUI::Log::LOG_ERROR,0,logformat,##__VA_ARGS__)
 #define SLOGFMTF(logformat, ...) SLOG_FMT(kLogTag,SOUI::Log::LOG_FATAL,0,logformat,##__VA_ARGS__)
 
+//格式化输出日志，每条日志手动指定tag
+#define SLOGFMTD2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_DEBUG,0,logformat,##__VA_ARGS__)
+#define SLOGFMTI2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_INFO,0,logformat,##__VA_ARGS__)
+#define SLOGFMTW2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_WARN,0,logformat,##__VA_ARGS__)
+#define SLOGFMTE2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_ERROR,0,logformat,##__VA_ARGS__)
+#define SLOGFMTF2(tag,logformat, ...) SLOG_FMT(tag,SOUI::Log::LOG_FATAL,0,logformat,##__VA_ARGS__)
 
+//SOUI4内部使用的日志输出，自动将TAG定义为soui4
 #define kSoui4Tag "soui4"
-
 #define SSLOGD() SLOG(kSoui4Tag,SOUI::Log::LOG_DEBUG,0)
 #define SSLOGI() SLOG(kSoui4Tag,SOUI::Log::LOG_INFO,0)
 #define SSLOGW() SLOG(kSoui4Tag,SOUI::Log::LOG_WARN,0)
