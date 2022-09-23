@@ -49,6 +49,7 @@ SNcPainter::SNcPainter(SHostWnd *pHost)
     , m_bInPaint(FALSE)
     , m_bSysNcPainter(FALSE)
     , m_bLButtonDown(FALSE)
+	, m_bMouseHover(FALSE)
 {
     m_root = new SNcPanel(this, this);
 }
@@ -598,6 +599,7 @@ LRESULT SNcPainter::OnNcMouseEvent(UINT msg, WPARAM wp, LPARAM lp)
 {
     if (wp == HTCAPTION && msg != WM_NCLBUTTONDBLCLK)
     {
+		m_bMouseHover = TRUE;
         if (msg == WM_NCLBUTTONUP)
             m_bLButtonDown = FALSE;
         CPoint pt(GET_X_LPARAM(lp), GET_Y_LPARAM(lp));
@@ -626,6 +628,7 @@ LRESULT SNcPainter::OnNcMouseLeave(UINT msg, WPARAM wp, LPARAM lp)
     }
     m_root->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
     UpdateToolTip();
+	m_bMouseHover = FALSE;
     return m_pHost->DefWindowProc();
 }
 
@@ -741,6 +744,13 @@ void SNcPainter::OnLButtonUp(WPARAM wp, LPARAM lp)
     {
         OnNcMouseEvent(WM_NCLBUTTONUP, HTCAPTION, MAKELPARAM(-1, -1));
     }
+}
+
+void SNcPainter::OnMouseMove(WPARAM wp, LPARAM lp)
+{
+	if(m_bMouseHover){
+		OnNcMouseLeave(0,0,0);
+	}
 }
 
 SNSEND

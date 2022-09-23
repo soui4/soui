@@ -84,6 +84,7 @@ class SNcPainter
     void OnNcDestroy();
     void OnNcLButtonDown(UINT flag, CPoint pt);
     void OnLButtonUp(WPARAM wp, LPARAM lp);
+	void OnMouseMove(WPARAM wp, LPARAM lp);
     LRESULT OnNcMouseEvent(UINT msg, WPARAM wp, LPARAM lp);
     LRESULT OnNcMouseLeave(UINT msg, WPARAM wp, LPARAM lp);
     void OnSize(UINT nType, CSize size);
@@ -127,6 +128,7 @@ class SNcPainter
     UINT m_htPart;
     BOOL m_bInPaint;
     BOOL m_bLButtonDown;
+	BOOL m_bMouseHover;
     SNcPanel *m_root;
 };
 

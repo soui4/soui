@@ -893,6 +893,7 @@ LRESULT SHostWnd::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         m_msgMouse.message = 0;
         m_msgMouse.wParam = wParam;
         m_msgMouse.lParam = lParam;
+		m_pNcPainter->OnMouseMove(wParam,lParam);
         break;
     case WM_MOUSELEAVE:
         m_msgMouse.message = uMsg;
