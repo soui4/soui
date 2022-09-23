@@ -183,11 +183,13 @@ class SOUI_EXP LogStream {
 
 		~Log();
 		LogStream & stream();
+
 		static void setLogLevel(int nLevel);
 		static void setLogCallback(LogCallback logCallback);
 		static void setLogEcho(bool bEnable);
-		static void DefCallback(const char *tag, const char* pLogStr, int level, int loggerId,const char * file,int line,const char *fun,void *retAddr);
 	private:
+		static void DefCallback(const char *tag, const char* pLogStr, int level, int loggerId,const char * file,int line,const char *fun,void *retAddr);
+
 		char m_tag[100];
 		int  m_level;
 		int  m_loggerId;
