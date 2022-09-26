@@ -45,10 +45,12 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     }
 
   protected:
+	virtual UINT GetExpandMode() const;
+  protected:
     STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
-    virtual void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const;
-    virtual void _Scale(ISkinObj *skinObj, int nScale);
-    virtual UINT GetExpandMode() const;
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
+    void _Scale(ISkinObj *skinObj, int nScale) override;
+
 
     int m_nStates; // skin 状态值
     BOOL m_bTile;
@@ -89,7 +91,7 @@ class SOUI_EXP SSkinImgCenter : public SSkinImgList {
     }
 
   protected:
-    virtual void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha);
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -110,9 +112,9 @@ class SOUI_EXP SSkinImgFrame : public SSkinImgList {
     }
 
   protected:
-    virtual UINT GetExpandMode() const;
-    virtual void _Scale(ISkinObj *skinObj, int nScale);
-    virtual void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const;
+    UINT GetExpandMode() const override;
+    void _Scale(ISkinObj *skinObj, int nScale) override;
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
 
     CRect m_rcMargin;
 
@@ -170,7 +172,7 @@ class SOUI_EXP SSkinButton : public SSkinObjBase {
     void SetColors(COLORREF crUp[4], COLORREF crDown[4], COLORREF crBorder[4]);
 
   protected:
-    virtual void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const;
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
     BTNCOLORS m_colors;
     BTNCOLORS m_colorsBackup;
 
@@ -222,7 +224,7 @@ class SOUI_EXP SSkinGradation : public SSkinObjBase {
     STDMETHOD_(ISkinObj *, Scale)(THIS_ int nScale) OVERRIDE;
 
   protected:
-    virtual void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const;
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
 
     COLORREF m_crFrom;
     COLORREF m_crTo;
@@ -270,19 +272,16 @@ class SOUI_EXP SSkinScrollbar : public SSkinImgList {
     virtual int GetIdealSize() const;
 
   protected:
-    virtual void _DrawByIndex(IRenderTarget *pRT,
+	void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override{}
+
+    void _DrawByState(IRenderTarget *pRT,
                               LPCRECT prcDraw,
                               DWORD dwState,
-                              BYTE byAlpha) const
-    {
-    }
-    virtual void _DrawByState(IRenderTarget *pRT,
-                              LPCRECT prcDraw,
-                              DWORD dwState,
-                              BYTE byAlpha) const;
-    //返回源指定部分在原位图上的位置。
-    virtual CRect GetPartRect(int nSbCode, int nState, BOOL bVertical) const;
-    virtual void _Scale(ISkinObj *skinObj, int nScale);
+                              BYTE byAlpha) const override;
+	void _Scale(ISkinObj *skinObj, int nScale) override;
+
+	//返回源指定部分在原位图上的位置。
+    CRect GetPartRect(int nSbCode, int nState, BOOL bVertical) const;
 
     int m_nMargin;
     BOOL m_bHasGripper;
@@ -306,7 +305,7 @@ class SOUI_EXP SSkinColorRect : public SSkinObjBase {
     STDMETHOD_(ISkinObj *, Scale)(THIS_ int nScale) OVERRIDE;
 
   protected:
-    virtual void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const;
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
 
     SOUI_ATTRS_BEGIN()
     ATTR_COLOR(L"normal", m_crStates[0], FALSE)
@@ -474,9 +473,9 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
   protected:
     STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
 
-    virtual void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const;
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
 
-    virtual void _Scale(ISkinObj *pObj, int nScale);
+    void _Scale(ISkinObj *pObj, int nScale) override;
 
     Shape m_shape;
 
@@ -502,8 +501,8 @@ class SOUI_EXP SSKinGroup : public SSkinObjBase {
     SOUI_ATTRS_END()
 
   protected:
-    virtual void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const;
-    virtual void _Scale(ISkinObj *skinObj, int nScale);
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
+    void _Scale(ISkinObj *skinObj, int nScale) override;
     SAutoRefPtr<ISkinObj> m_skins[4];
 };
 

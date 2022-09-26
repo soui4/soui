@@ -169,7 +169,7 @@ void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
 
 //////////////////////////////////////////////////////////////////////////
 //  SSkinImgCenter
-void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha)
+void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
     SIZE szSkin = GetSkinSize();
     CRect rcTarget = *rcDraw;
