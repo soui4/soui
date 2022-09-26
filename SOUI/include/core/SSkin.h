@@ -271,6 +271,10 @@ class SOUI_EXP SSkinScrollbar : public SSkinImgList {
 
     virtual int GetIdealSize() const;
 
+protected:
+	//返回源指定部分在原位图上的位置。
+	virtual CRect GetPartRect(int nSbCode, int nState, BOOL bVertical) const;
+
   protected:
 	void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override{}
 
@@ -280,8 +284,6 @@ class SOUI_EXP SSkinScrollbar : public SSkinImgList {
                               BYTE byAlpha) const override;
 	void _Scale(ISkinObj *skinObj, int nScale) override;
 
-	//返回源指定部分在原位图上的位置。
-    CRect GetPartRect(int nSbCode, int nState, BOOL bVertical) const;
 
     int m_nMargin;
     BOOL m_bHasGripper;
