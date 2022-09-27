@@ -192,6 +192,7 @@ class SOUI_EXP SHostWnd
     DWORD m_dwThreadID;
     SRootWindow *m_pRoot;
 
+	SAutoRefPtr<IEvtSlot>  m_defEvtSlot;
   public:
     SHostWnd(LPCTSTR pszResName = NULL);
     virtual ~SHostWnd();
@@ -230,6 +231,8 @@ class SOUI_EXP SHostWnd
         OVERRIDE;
     STDMETHOD_(HWND, Create)
     (THIS_ HWND hWndParent, int x = 0, int y = 0, int nWidth = 0, int nHeight = 0) OVERRIDE;
+
+	STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) OVERRIDE;
 
   public:
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1)
@@ -449,10 +452,7 @@ class SOUI_EXP SHostWnd
     virtual BOOL onRootResize(IEvtArgs *e);
 
   public: //事件处理接口
-    virtual BOOL _HandleEvent(IEvtArgs *pEvt)
-    {
-        return FALSE;
-    }
+    virtual BOOL _HandleEvent(IEvtArgs *pEvt);
 
     BEGIN_MSG_MAP_EX(SHostWnd)
     MSG_WM_SHOWWINDOW(OnHostShowWindow)

@@ -159,6 +159,9 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
+
+	STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
+
 };
 
 #undef INTERFACE
@@ -314,6 +317,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
+	STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
 
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent /*=NULL*/) PURE;

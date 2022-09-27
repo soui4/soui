@@ -364,6 +364,10 @@ public:
 		return SHostWnd::GetNcPainter();
 	}
 
+	STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) OVERRIDE{
+		return SHostWnd::SetEventHandler(fun,ctx);
+	}
+
 };
 
 SNSEND

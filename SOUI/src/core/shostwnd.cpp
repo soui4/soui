@@ -1829,6 +1829,19 @@ void SHostWnd::_SetToolTipInfo(const SwndToolTipInfo *info, BOOL bNcTip)
     }
 }
 
+void SHostWnd::SetEventHandler(THIS_ FunCallback fun, void *ctx)
+{
+	m_defEvtSlot.Attach(new FreeFunctionSlot(fun,ctx));
+}
+
+BOOL SHostWnd::_HandleEvent(IEvtArgs *pEvt)
+{
+	if(m_defEvtSlot){
+		return m_defEvtSlot->Run(pEvt);
+	}
+	return FALSE;
+}
+
 //////////////////////////////////////////////////////////////////
 //  SHostWnd::SHostAnimationHandler
 void SHostWnd::SHostAnimationHandler::OnNextFrame()
