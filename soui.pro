@@ -11,6 +11,7 @@ include(cpy-cfg.pri)
 SUBDIRS += third-part
 SUBDIRS += utilities
 SUBDIRS += soui-sys-resource
+SUBDIRS += soui-sys-resource2
 SUBDIRS += soui
 SUBDIRS += components
 SUBDIRS += demo
