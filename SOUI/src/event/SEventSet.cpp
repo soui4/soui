@@ -54,9 +54,17 @@ int SEvent::findSlotFunctor(const IEvtSlot *slot)
 void SEvent::fire(IEvtArgs *args)
 {
     // execute all subscribers, updating the 'handled' state as we go
-    for (int i = (int)m_evtSlots.GetCount() - 1; i >= 0; i--)
+	int slots = (int)m_evtSlots.GetCount();
+	if(slots==0)
+		return;
+	SAutoRefPtr<IEvtSlot> *evtSlots = new SAutoRefPtr<IEvtSlot>[slots];
+	for(int i=0;i<slots;i++)
+	{
+		evtSlots[i]=m_evtSlots[i];
+	}
+    for (int i = slots - 1; i >= 0; i--)
     { // the latest event handler handles the event first.
-        BOOL bHandled = m_evtSlots[i]->Run(args);
+        BOOL bHandled = evtSlots[i]->Run(args);
         if (bHandled)
         {
             args->IncreaseHandleCount();
@@ -64,6 +72,7 @@ void SEvent::fire(IEvtArgs *args)
                 break;
         }
     }
+	delete []evtSlots;
 }
 
 void SEvent::SetScriptHandler(const SStringA &strScriptHandler)
