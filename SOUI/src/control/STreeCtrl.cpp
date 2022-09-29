@@ -268,7 +268,7 @@ BOOL STreeCtrl::SetItemData(HSTREEITEM hItem, LPARAM lParam)
     return FALSE;
 }
 
-BOOL STreeCtrl::ItemHasChildren(HSTREEITEM hItem)
+BOOL STreeCtrl::ItemHasChildren(HSTREEITEM hItem) const
 {
     if (!hItem)
         return FALSE;
@@ -276,16 +276,13 @@ BOOL STreeCtrl::ItemHasChildren(HSTREEITEM hItem)
     return GetChildItem(hItem) != NULL;
 }
 
-BOOL STreeCtrl::GetCheckState(HSTREEITEM hItem) const
+int STreeCtrl::GetCheckState(HSTREEITEM hItem) const
 {
     if (!m_bCheckBox)
-        return FALSE;
+        return 0;
 
     LPTVITEM pItem = CSTree<LPTVITEM>::GetItem(hItem);
-    if (pItem->nCheckBoxValue == STVICheckBox_UnChecked)
-        return FALSE;
-
-    return TRUE;
+	return pItem->nCheckBoxValue;
 }
 
 BOOL STreeCtrl::SetCheckState(HSTREEITEM hItem, BOOL bCheck)

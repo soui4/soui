@@ -20,13 +20,6 @@
 
 SNSBEGIN
 
-enum SbID
-{
-    SSB_NULL = 0,
-    SSB_HORZ = 1,
-    SSB_VERT = 2,
-    SSB_BOTH = (SSB_HORZ | SSB_VERT),
-};
 
 class SOUI_EXP SPanel
     : public TWindowProxy<IPanel>
@@ -111,7 +104,7 @@ class SOUI_EXP SPanel
     SLayoutSize m_nSbTop;    //滚动条距离上边距离
     SLayoutSize m_nSbBottom; //滚动条距离下边距离
 
-    SbID m_dragSb, m_hitSb;
+    ScrollBarID m_dragSb, m_hitSb;
 
     UINT m_wBarVisible; //滚动条显示信息
     UINT m_wBarEnable;  //滚动条可操作信息

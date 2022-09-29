@@ -317,17 +317,24 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      */
     virtual ~SImageWnd();
 
+public:
+	   /**
+     * @brief 设置skin
+     * @param pSkin -- skin对象
+     * @param iFrame -- skin的子图索引 
+     * @param bAutoFree -- 控件管理pSkin标志，为TRUE时调用方可以释放该Skin 
+     * @return BOOL TRUE-成功，FALSE-失败
+    */
+    STDMETHOD_(BOOL, SetSkin)(THIS_ ISkinObj * pSkin, int iFrame DEF_VAL(0), BOOL bAutoFree DEF_VAL(TRUE)) OVERRIDE;
+
     /**
-     * SImageWnd::SetSkin
-     * @param    ISkinObj *pSkin -- 资源
-     * @param    int iFrame -- 皮肤中的帧号
-     * @param    BOOL bAutoFree -- 资源ID
-     * @brief    设置皮肤
-     * @return   返回值BOOL 成功--TRUE 失败--FALSE
+     * SImageWnd::GetSkin
+     * @brief    获取资源
+     * @return   返回值ISkinObj指针
      *
-     * Describe  设置皮肤
+     * Describe  获取资源
      */
-    BOOL WINAPI SetSkin(ISkinObj *pSkin, int iFrame = 0, BOOL bAutoFree = TRUE);
+    STDMETHOD_(ISkinObj *, GetSkin)(THIS) OVERRIDE;
 
     /**
      * SImageWnd::SetImage
@@ -337,31 +344,24 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      *
      * Describe  设置绘制图片
      */
-    void WINAPI SetImage(IBitmapS *pBitmap, FilterLevel fl = kNone_FilterLevel);
+    STDMETHOD_(void, SetImage)(THIS_ IBitmapS * pBitmap, FilterLevel fl DEF_VAL(kNone_FilterLevel)) OVERRIDE;
 
-    IBitmapS *WINAPI GetImage();
+    /**
+     * @brief 获取当前设置的IBitmapS对象
+     * @return IBitmapS * -- 当前设置的IBitmapS对象
+    */
+    STDMETHOD_(IBitmapS *, GetImage)(THIS) OVERRIDE;
 
     /**
      * SImageWnd::SetIcon
-     * @param    int nSubID -- 资源ID
+	 * @param    int nSubID -- 子图在Skin中的索引号
      * @brief    设置图标
      * @return   返回值BOOL 成功--TRUE 失败--FALSE
      *
      * Describe  设置图标
      */
-    BOOL WINAPI SetIcon(int nSubID);
+    STDMETHOD_(BOOL, SetIcon)(THIS_ int nSubID) OVERRIDE;
 
-    /**
-     * SImageWnd::GetSkin
-     * @brief    获取资源
-     * @return   返回值ISkinObj指针
-     *
-     * Describe  获取资源
-     */
-    ISkinObj *WINAPI GetSkin()
-    {
-        return m_pSkin;
-    }
 
   protected:
     virtual void OnColorize(COLORREF cr);

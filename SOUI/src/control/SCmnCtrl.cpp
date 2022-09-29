@@ -744,6 +744,11 @@ void SImageWnd::OnScaleChanged(int scale)
     GetScaleSkin(m_pSkin, scale);
 }
 
+ISkinObj * SImageWnd::GetSkin()
+{
+	return m_pSkin;
+}
+
 SAnimateImgWnd::SAnimateImgWnd()
     : m_pSkin(NULL)
     , m_iCurFrame(0)

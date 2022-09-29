@@ -165,6 +165,11 @@ DECLARE_INTERFACE_(INcPainter, IObject)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading, HRESULT hr) PURE;
 
     //--------------------------------------------------------------------------------
+
+    /**
+     * @brief 获取绘制非客户区的根窗口
+     * @return IWindow *--root
+    */
     STDMETHOD_(IWindow *, GetRoot)(THIS) PURE;
 };
 

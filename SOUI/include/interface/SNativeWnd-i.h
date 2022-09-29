@@ -24,6 +24,20 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
+    /**
+     * @brief 创建HWND
+     * @param lpWindowName --窗口标题
+     * @param dwStyle --窗口Style
+     * @param dwExStyle --窗口ExStyle
+     * @param x --窗口X
+     * @param y --窗口Y
+     * @param nWidth --窗口宽度
+     * @param nHeight --窗口调试
+     * @param hWndParent --父窗口
+     * @param nID -- 窗口ID 
+     * @param lpParam --窗口自定义参数 
+     * @return HWND
+    */
     STDMETHOD_(HWND, CreateNative)
     (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth,
      int nHeight, HWND hWndParent, int nID DEF_VAL(0), LPVOID lpParam DEF_VAL(0)) PURE;

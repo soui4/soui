@@ -17,9 +17,30 @@ SNSBEGIN
 #define INTERFACE ICtrl
 DECLARE_INTERFACE_(ICtrl, IObjRef)
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long,AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long,Release) (THIS) PURE;
+
+	/**
+	 * @brief 释放对象
+	 * @return void
+	*/
+	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+
+	//////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
 };
 
@@ -27,14 +48,57 @@ DECLARE_INTERFACE_(ICtrl, IObjRef)
 #define INTERFACE IOsrPanel
 DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long,AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long,Release) (THIS) PURE;
+
+	/**
+	 * @brief 释放对象
+	 * @return void
+	*/
+	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+
+	//////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 设置在列表中对应的索引
+     * @param index -- 索引值，在listview中它是一个索引号，在treeview中它是一个HTREEITEM值
+     * @return 
+    */
     STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM index) PURE;
+
+    /**
+     * @brief 获取在列表中的索引
+     * @return LPARAM 在列表中的索引
+    */
     STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST PURE;
+
+    /**
+     * @brief 设置列表项的用户数据
+     * @param dwData -- 用户数据
+     * @return 
+    */
     STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
+
+    /**
+     * @brief 获取在列表中的用户数据
+     * @return LPARAM 在列表中的用户数据
+    */
     STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST PURE;
 };
 
@@ -42,17 +106,73 @@ DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
 #define INTERFACE IItemPanel
 DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F909A4")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 设置在列表中对应的索引
+     * @param index -- 索引值，在listview中它是一个索引号，在treeview中它是一个HTREEITEM值
+     * @return
+    */
     STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM index) PURE;
+
+    /**
+     * @brief 获取在列表中的索引
+     * @return LPARAM 在列表中的索引
+    */
     STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST PURE;
+
+    /**
+     * @brief 设置列表项的用户数据
+     * @param dwData -- 用户数据
+     * @return
+    */
     STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
+
+    /**
+     * @brief 获取在列表中的用户数据
+     * @return LPARAM 在列表中的用户数据
+    */
     STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 设置列表项的skin
+     * @param pSkin -- 列表项的skin
+     * @return 
+    */
     STDMETHOD_(void, SetSkin)(THIS_ ISkinObj * pSkin) PURE;
+
+    /**
+     * @brief 设置列表项的颜色配置
+     * @param crBk -- 背景颜色
+     * @param crSelBk -- 选中状态的背景颜色
+     * @return 
+    */
     STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) PURE;
 };
 
@@ -60,14 +180,50 @@ DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F90
 #define INTERFACE IImageWnd
 DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
 
-    STDMETHOD_(BOOL, SetSkin)
-    (THIS_ ISkinObj * pSkin, int iFrame /*= 0*/, BOOL bAutoFree /*= TRUE*/) PURE;
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 设置skin
+     * @param pSkin -- skin对象
+     * @param iFrame -- skin的子图索引 
+     * @param bAutoFree -- 控件管理pSkin标志，为TRUE时调用方可以释放该Skin 
+     * @return BOOL TRUE-成功，FALSE-失败
+    */
+    STDMETHOD_(BOOL, SetSkin)(THIS_ ISkinObj * pSkin, int iFrame DEF_VAL(0), BOOL bAutoFree DEF_VAL(TRUE)) PURE;
+    
+    /**
+     * SImageWnd::GetSkin
+     * @brief    获取资源
+     * @return   返回值ISkinObj指针
+     *
+     * Describe  获取资源
+     */
+    STDMETHOD_(ISkinObj *, GetSkin)(THIS) PURE;
 
     /**
      * SImageWnd::SetImage
@@ -77,14 +233,17 @@ DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
      *
      * Describe  设置绘制图片
      */
-    STDMETHOD_(void, SetImage)
-    (THIS_ IBitmapS * pBitmap, FilterLevel fl /*= kNone_FilterLevel*/) PURE;
+    STDMETHOD_(void, SetImage)(THIS_ IBitmapS * pBitmap, FilterLevel fl DEF_VAL(kNone_FilterLevel)) PURE;
 
+    /**
+     * @brief 获取当前设置的IBitmapS对象
+     * @return IBitmapS * -- 当前设置的IBitmapS对象
+    */
     STDMETHOD_(IBitmapS *, GetImage)(THIS) PURE;
 
     /**
      * SImageWnd::SetIcon
-     * @param    int nSubID -- 资源ID
+     * @param    int nSubID -- 子图在Skin中的索引号
      * @brief    设置图标
      * @return   返回值BOOL 成功--TRUE 失败--FALSE
      *
@@ -92,25 +251,39 @@ DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
      */
     STDMETHOD_(BOOL, SetIcon)(THIS_ int nSubID) PURE;
 
-    /**
-     * SImageWnd::GetSkin
-     * @brief    获取资源
-     * @return   返回值ISkinObj指针
-     *
-     * Describe  获取资源
-     */
-    STDMETHOD_(ISkinObj *, GetSkin)(THIS) PURE;
 };
 
 #undef INTERFACE
 #define INTERFACE IAnimateImgWnd
 DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E2595A")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
     /**
      * SAnimateImgWnd::Start
      * @brief    启动动画
@@ -140,10 +313,31 @@ DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E25
 #define INTERFACE IProgress
 DECLARE_INTERFACE_IID_(IProgress, ICtrl, "77407E2D-582B-4ef2-A33A-427C933BAA8C")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
      * SProgress::SetValue
@@ -191,33 +385,118 @@ DECLARE_INTERFACE_IID_(IProgress, ICtrl, "77407E2D-582B-4ef2-A33A-427C933BAA8C")
     STDMETHOD_(BOOL, IsVertical)(THIS) SCONST PURE;
 };
 
+typedef enum _ScrollBarID
+{
+    SSB_NULL = 0,
+    SSB_HORZ = 1,
+    SSB_VERT = 2,
+    SSB_BOTH = (SSB_HORZ | SSB_VERT),
+}ScrollBarID;
+
 #undef INTERFACE
 #define INTERFACE IPanel
 DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 显示/隐藏滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return 
+    */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
+    /**
+     * @brief Enable/Disable滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
+    /**
+     * @brief 获取滚动条Enable状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-enable
+    */
     STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条数据
+     * @param si --滚动条数据
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return 
+    */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
+    /**
+     * @brief 设置滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nNewPos -- 滚动位置
+     * @param bRedraw -- 重绘标志
+     * @return 
+    */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return 滚动条位置
+    */
     STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nMinPos -- 最小值
+     * @param nMaxPos -- 最大值
+     * @param bRedraw -- 重绘标志
+     * @return TRUE-成功
+    */
     STDMETHOD_(BOOL, SetScrollRange)
     (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param lpMinPos -- 最小值
+     * @param lpMaxPos -- 最大值
+     * @return 
+    */
     STDMETHOD_(BOOL, GetScrollRange)
     (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
+    /**
+     * @brief 查询滚动条启用状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-启用
+    */
     STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
 };
 
@@ -225,42 +504,137 @@ DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
 #define INTERFACE IScrollView
 DECLARE_INTERFACE_IID_(IScrollView, IPanel, "49B024D6-221D-42d4-902B-AFAAC5AFFE41")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+      * @brief 增加引用计数
+      * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 显示/隐藏滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
+    /**
+     * @brief Enable/Disable滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
+    /**
+     * @brief 获取滚动条Enable状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-enable
+    */
     STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条数据
+     * @param si --滚动条数据
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return
+    */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
+    /**
+     * @brief 设置滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nNewPos -- 滚动位置
+     * @param bRedraw -- 重绘标志
+     * @return
+    */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return 滚动条位置
+    */
     STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nMinPos -- 最小值
+     * @param nMaxPos -- 最大值
+     * @param bRedraw -- 重绘标志
+     * @return TRUE-成功
+    */
     STDMETHOD_(BOOL, SetScrollRange)
-    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+        (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param lpMinPos -- 最小值
+     * @param lpMaxPos -- 最大值
+     * @return
+    */
     STDMETHOD_(BOOL, GetScrollRange)
-    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+        (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
+    /**
+     * @brief 查询滚动条启用状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-启用
+    */
     STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @brief 获取视图尺寸
+     * @return SIZE-视图尺寸
+    */
     STDMETHOD_(SIZE, GetViewSize)(THIS) SCONST PURE;
 
+    /**
+     * @brief 设置视图尺寸
+     * @param szView 视图尺寸
+     * @return 
+    */
     STDMETHOD_(void, SetViewSize)(THIS_ SIZE szView) PURE;
 
+    /**
+     * @brief 获取视图原点坐标
+     * @return POINT-原点坐标
+    */
     STDMETHOD_(POINT, GetViewOrigin)(THIS) SCONST PURE;
 
+    /**
+     * @brief 设置视图原点坐标
+     * @param pt 原点坐标
+     * @return 
+    */
     STDMETHOD_(void, SetViewOrigin)(THIS_ POINT pt) PURE;
 };
 
-enum
+typedef enum _HeaderMask
 {
     SHDI_WIDTH = 0x0001,
     SHDI_TEXT = 0x0002,
@@ -270,7 +644,7 @@ enum
     SHDI_VISIBLE = 0x0020,
     SHDI_WEIGHT = 0x0040,
     SHDI_ALL = 0xffff,
-};
+}HeaderMask;
 
 /**
  * @struct    _SHDITEM
@@ -297,10 +671,31 @@ typedef struct SHDITEM
 #define INTERFACE IHeaderCtrl
 DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
@@ -331,6 +726,12 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
      */
     STDMETHOD_(BOOL, GetItem)(THIS_ int iItem, SHDITEM *pItem) SCONST PURE;
 
+    /**
+     * @brief 设置表头项数据
+     * @param iItem --索引号
+     * @param pItem --数据项
+     * @return 
+    */
     STDMETHOD_(BOOL, SetItem)(THIS_ int iItem, const SHDITEM *pItem) PURE;
 
     /**
@@ -350,6 +751,10 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
      */
     STDMETHOD_(int, GetTotalWidth)(THIS_ BOOL bMinWid /*= FALSE*/) SCONST PURE;
 
+    /**
+     * @brief 表头自动填充父窗口宽度标志
+     * @return TRUE-表头自动填充父窗口宽度
+    */
     STDMETHOD_(BOOL, IsAutoResize)(THIS) SCONST PURE;
 
     /**
@@ -380,10 +785,27 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
      */
     STDMETHOD_(void, DeleteAllItems)(THIS) PURE;
 
+    /**
+     * @brief 设置表头项的排序标志
+     * @param iItem --表头项索引
+     * @param sortFlag --排序标志
+     * @remark 排序标志会传递到列表的排序回调接口,用户在回调接口中实现数据排序
+    */
     STDMETHOD_(void, SetItemSort)(THIS_ int iItem, UINT sortFlag) PURE;
 
+    /**
+     * @brief 设置表头项是否隐藏
+     * @param iItem --表头项索引
+     * @param visible -- TRUE-显示，FALSE-隐藏
+     * @return 
+    */
     STDMETHOD_(void, SetItemVisible)(THIS_ int iItem, BOOL visible) PURE;
 
+    /**
+     * @brief 查询表头项是否隐藏
+     * @param iItem --表头项索引
+     * @return BOOL
+    */
     STDMETHOD_(BOOL, IsItemVisible)(THIS_ int iItem) SCONST PURE;
 };
 
@@ -391,45 +813,163 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
 #define INTERFACE IListView
 DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+      * @brief 增加引用计数
+      * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 显示/隐藏滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
+    /**
+     * @brief Enable/Disable滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
+    /**
+     * @brief 获取滚动条Enable状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-enable
+    */
     STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条数据
+     * @param si --滚动条数据
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return
+    */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
+    /**
+     * @brief 设置滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nNewPos -- 滚动位置
+     * @param bRedraw -- 重绘标志
+     * @return
+    */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return 滚动条位置
+    */
     STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nMinPos -- 最小值
+     * @param nMaxPos -- 最大值
+     * @param bRedraw -- 重绘标志
+     * @return TRUE-成功
+    */
     STDMETHOD_(BOOL, SetScrollRange)
-    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+        (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param lpMinPos -- 最小值
+     * @param lpMaxPos -- 最大值
+     * @return
+    */
     STDMETHOD_(BOOL, GetScrollRange)
-    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+        (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+
+    /**
+     * @brief 查询滚动条启用状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-启用
+    */
     STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
 
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 设置列表的Adapter
+     * @param adapter -- Adapter对象
+     * @return BOOL
+     * @remark 通常只应该在列表初始化的时调用一次，列表会增加该Adapter的引用计数
+    */
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter * adapter) PURE;
 
+    /**
+     * @brief 获取控件的Adapter对象
+     * @return ILvAdapter* - Adapter对象
+    */
     STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) SCONST PURE;
 
-    STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
-
+    /**
+     * @brief 设置列表项位置定位器
+     * @param pItemLocator -- 位置定位器
+     * @remark  位置定位器是一个将索引号和列表显示位置相互映射的接口，通过实现位置定位器，用户可以控制列表项的显示大小
+    */
     STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator * pItemLocator) PURE;
 
+    /**
+     * @brief 获取位置定位器
+     * @return IListViewItemLocator *
+    */
+    STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
+
+    /**
+     * @brief 使指定行滚动到视图可见区
+     * @param iItem --行号
+     * @return 
+    */
     STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
 
-    STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify /*= FALSE*/) PURE;
+    /**
+     * @brief 选中指定行
+     * @param iItem --行号
+     * @param bNotify --触发选中状态事件标志
+     * @return 
+    */
+    STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify DEF_VAL(FALSE)) PURE;
 
+    /**
+     * @brief 获取当前选中行
+     * @return int 选中行索引，-1代表当前没有选中行
+    */
     STDMETHOD_(int, GetSel)(THIS) SCONST PURE;
 
+    /**
+     * @brief 热点测试
+     * @param pt -- 输入坐标
+     * @return IItemPanel *--坐标下的ItemPanel
+    */
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
 };
 
@@ -437,54 +977,195 @@ DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2"
 #define INTERFACE IMcListView
 DECLARE_INTERFACE_IID_(IMcListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+      * @brief 增加引用计数
+      * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 显示/隐藏滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
+    /**
+     * @brief Enable/Disable滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
+    /**
+     * @brief 获取滚动条Enable状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-enable
+    */
     STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条数据
+     * @param si --滚动条数据
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return
+    */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
+    /**
+     * @brief 设置滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nNewPos -- 滚动位置
+     * @param bRedraw -- 重绘标志
+     * @return
+    */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return 滚动条位置
+    */
     STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nMinPos -- 最小值
+     * @param nMaxPos -- 最大值
+     * @param bRedraw -- 重绘标志
+     * @return TRUE-成功
+    */
     STDMETHOD_(BOOL, SetScrollRange)
-    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+        (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param lpMinPos -- 最小值
+     * @param lpMaxPos -- 最大值
+     * @return
+    */
     STDMETHOD_(BOOL, GetScrollRange)
-    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+        (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+
+    /**
+     * @brief 查询滚动条启用状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-启用
+    */
     STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
+    /**
+     * @brief 设置列表的Adapter
+     * @param adapter -- Adapter对象
+     * @return BOOL
+     * @remark 通常只应该在列表初始化的时调用一次，列表会增加该Adapter的引用计数
+    */
     STDMETHOD_(BOOL, SetAdapter)(THIS_ IMcAdapter * adapter) PURE;
 
+    /**
+     * @brief 获取控件的Adapter对象
+     * @return ILvAdapter* - Adapter对象
+    */
     STDMETHOD_(IMcAdapter *, GetAdapter)(THIS) SCONST PURE;
 
-    STDMETHOD_(IListViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
-
+    /**
+     * @brief 设置列表项位置定位器
+     * @param pItemLocator -- 位置定位器
+     * @remark  位置定位器是一个将索引号和列表显示位置相互映射的接口，通过实现位置定位器，用户可以控制列表项的显示大小
+    */
     STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator * pItemLocator) PURE;
 
+    /**
+     * @brief 获取位置定位器
+     * @return IListViewItemLocator *
+    */
+    STDMETHOD_(IListViewItemLocator*, GetItemLocator)(THIS) SCONST PURE;
+
+    /**
+     * @brief 使指定行滚动到视图可见区
+     * @param iItem --行号
+     * @return
+    */
     STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
 
+    /**
+     * @brief 选中指定行
+     * @param iItem --行号
+     * @param bNotify --触发选中状态事件标志
+     * @return
+    */
     STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify /*= FALSE*/) PURE;
 
+    /**
+     * @brief 获取当前选中行
+     * @return int 选中行索引，-1代表当前没有选中行
+    */
     STDMETHOD_(int, GetSel)(THIS) SCONST PURE;
 
+    /**
+     * @brief 热点测试
+     * @param pt -- 输入坐标
+     * @return IItemPanel *--坐标下的ItemPanel
+    */
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
 
+    /**
+     * @brief 获取表头控件
+     * @return IHeaderCtrl *--表头控件
+    */
     STDMETHOD_(IHeaderCtrl *, GetIHeaderCtrl)(THIS) SCONST PURE;
 
+    /**
+     * @brief 插入一列
+     * @param nIndex --插入位置,-1代表append
+     * @param pszText --文本
+     * @param nWidth --占用宽度
+     * @param fmt --显示格式
+     * @param lParam --自定义数据
+     * @param bDpiAware --宽度感知dpi缩放
+     * @param fWeight --宽度的weight属性
+     * @return 插入位置
+    */
     STDMETHOD_(int, InsertColumn)
-    (THIS_ int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam /*= 0*/,
-     BOOL bDpiAware /*=TRUE*/, float fWeight /*=0.0f*/) PURE;
+    (THIS_ int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam DEF_VAL(0),
+     BOOL bDpiAware DEF_VAL(TRUE), float fWeight DEF_VAL(0.0f)) PURE;
 
+    /**
+     * @brief 删除列
+     * @param iCol --列索引
+     * @return 
+    */
     STDMETHOD_(void, DeleteColumn)(THIS_ int iCol) PURE;
 
+    /**
+     * @brief 获取列数
+     * @return int 列数
+    */
     STDMETHOD_(int, GetColumnCount)(THIS) SCONST PURE;
 };
 
@@ -492,44 +1173,161 @@ DECLARE_INTERFACE_IID_(IMcListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE
 #define INTERFACE ITreeView
 DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+      * @brief 增加引用计数
+      * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 显示/隐藏滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
+    /**
+     * @brief Enable/Disable滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
+    /**
+     * @brief 获取滚动条Enable状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-enable
+    */
     STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条数据
+     * @param si --滚动条数据
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return
+    */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
+    /**
+     * @brief 设置滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nNewPos -- 滚动位置
+     * @param bRedraw -- 重绘标志
+     * @return
+    */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return 滚动条位置
+    */
     STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nMinPos -- 最小值
+     * @param nMaxPos -- 最大值
+     * @param bRedraw -- 重绘标志
+     * @return TRUE-成功
+    */
     STDMETHOD_(BOOL, SetScrollRange)
-    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+        (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param lpMinPos -- 最小值
+     * @param lpMaxPos -- 最大值
+     * @return
+    */
     STDMETHOD_(BOOL, GetScrollRange)
-    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+        (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+
+    /**
+     * @brief 查询滚动条启用状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-启用
+    */
     STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
+    /**
+     * @brief 设置列表的Adapter
+     * @param adapter -- Adapter对象
+     * @return BOOL
+     * @remark 通常只应该在列表初始化的时调用一次，列表会增加该Adapter的引用计数
+    */
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ITvAdapter * adapter) PURE;
 
+    /**
+     * @brief 获取控件的Adapter对象
+     * @return ILvAdapter* - Adapter对象
+    */
     STDMETHOD_(ITvAdapter *, GetAdapter)(THIS) SCONST PURE;
 
+    /**
+     * @brief 设置列表项位置定位器
+     * @param pItemLocator -- 位置定位器
+     * @remark  位置定位器是一个将索引号和列表显示位置相互映射的接口，通过实现位置定位器，用户可以控制列表项的显示大小
+    */
     STDMETHOD_(void, SetItemLocator)(THIS_ ITreeViewItemLocator * pItemLocator) PURE;
 
+    /**
+     * @brief 获取位置定位器
+     * @return IListViewItemLocator *
+    */
     STDMETHOD_(ITreeViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
 
-    STDMETHOD_(void, SetSel)(THIS_ HSTREEITEM hItem, BOOL bNotify /*= FALSE*/) PURE;
-
-    STDMETHOD_(HSTREEITEM, GetSel)(THIS) SCONST PURE;
-
+    /**
+     * @brief 使指定行滚动到视图可见区
+     * @param hItem --HSTREEITEM
+     * @return
+    */
     STDMETHOD_(void, EnsureVisible)(THIS_ HSTREEITEM hItem) PURE;
 
+    /**
+     * @brief 选中指定行
+     * @param hItem --HSTREEITEM
+     * @param bNotify --触发选中状态事件标志
+     * @return
+    */
+    STDMETHOD_(void, SetSel)(THIS_ HSTREEITEM hItem, BOOL bNotify DEF_VAL(FALSE)) PURE;
+
+    /**
+     * @brief 获取当前选中行
+     * @return HSTREEITEM 选中行索引，0代表当前没有选中行
+    */
+    STDMETHOD_(HSTREEITEM, GetSel)(THIS) SCONST PURE;
+
+    /**
+     * @brief 热点测试
+     * @param pt -- 输入坐标
+     * @return IItemPanel *--坐标下的ItemPanel
+    */
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
 };
 
@@ -537,44 +1335,161 @@ DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B"
 #define INTERFACE ITileView
 DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+      * @brief 增加引用计数
+      * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 显示/隐藏滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
+    /**
+     * @brief Enable/Disable滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
+    /**
+     * @brief 获取滚动条Enable状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-enable
+    */
     STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条数据
+     * @param si --滚动条数据
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return
+    */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
+    /**
+     * @brief 设置滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nNewPos -- 滚动位置
+     * @param bRedraw -- 重绘标志
+     * @return
+    */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return 滚动条位置
+    */
     STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nMinPos -- 最小值
+     * @param nMaxPos -- 最大值
+     * @param bRedraw -- 重绘标志
+     * @return TRUE-成功
+    */
     STDMETHOD_(BOOL, SetScrollRange)
-    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+        (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param lpMinPos -- 最小值
+     * @param lpMaxPos -- 最大值
+     * @return
+    */
     STDMETHOD_(BOOL, GetScrollRange)
-    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+        (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+
+    /**
+     * @brief 查询滚动条启用状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-启用
+    */
     STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
+    /**
+     * @brief 设置列表的Adapter
+     * @param adapter -- Adapter对象
+     * @return BOOL
+     * @remark 通常只应该在列表初始化的时调用一次，列表会增加该Adapter的引用计数
+    */
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter * adapter) PURE;
 
+    /**
+     * @brief 获取控件的Adapter对象
+     * @return ILvAdapter* - Adapter对象
+    */
     STDMETHOD_(ILvAdapter *, GetAdapter)(THIS) SCONST PURE;
 
+    /**
+     * @brief 设置列表项位置定位器
+     * @param pItemLocator -- 位置定位器
+     * @remark  位置定位器是一个将索引号和列表显示位置相互映射的接口，通过实现位置定位器，用户可以控制列表项的显示大小
+    */
     STDMETHOD_(void, SetItemLocator)(THIS_ ITileViewItemLocator * pItemLocator) PURE;
 
+    /**
+     * @brief 获取位置定位器
+     * @return ITileViewItemLocator *
+    */
     STDMETHOD_(ITileViewItemLocator *, GetItemLocator)(THIS) SCONST PURE;
 
-    STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify /*= FALSE*/) PURE;
-
-    STDMETHOD_(int, GetSel)(THIS) SCONST PURE;
-
+    /**
+     * @brief 使指定行滚动到视图可见区
+     * @param iItem --行号
+     * @return
+    */
     STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
 
+    /**
+     * @brief 选中指定行
+     * @param iItem --行号
+     * @param bNotify --触发选中状态事件标志
+     * @return
+    */
+    STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify DEF_VAL(FALSE)) PURE;
+
+    /**
+     * @brief 获取当前选中行
+     * @return int 选中行索引，-1代表当前没有选中行
+    */
+    STDMETHOD_(int, GetSel)(THIS) SCONST PURE;
+
+    /**
+     * @brief 热点测试
+     * @param pt -- 输入坐标
+     * @return IItemPanel *--坐标下的ItemPanel
+    */
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST PURE;
 };
 
@@ -582,28 +1497,106 @@ DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3"
 #define INTERFACE IListBox
 DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+      * @brief 增加引用计数
+      * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 显示/隐藏滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
+    /**
+     * @brief Enable/Disable滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+    */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
+    /**
+     * @brief 获取滚动条Enable状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-enable
+    */
     STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条数据
+     * @param si --滚动条数据
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return
+    */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
+    /**
+     * @brief 设置滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nNewPos -- 滚动位置
+     * @param bRedraw -- 重绘标志
+     * @return
+    */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return 滚动条位置
+    */
     STDMETHOD_(int, GetScrollPos)(THIS_ BOOL bVertical) SCONST PURE;
 
+    /**
+     * @brief 设置滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nMinPos -- 最小值
+     * @param nMaxPos -- 最大值
+     * @param bRedraw -- 重绘标志
+     * @return TRUE-成功
+    */
     STDMETHOD_(BOOL, SetScrollRange)
-    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+        (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
+    /**
+     * @brief 获取滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param lpMinPos -- 最小值
+     * @param lpMaxPos -- 最大值
+     * @return
+    */
     STDMETHOD_(BOOL, GetScrollRange)
-    (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+        (THIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+
+    /**
+     * @brief 查询滚动条启用状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-启用
+    */
     STDMETHOD_(BOOL, HasScrollBar)(THIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
@@ -757,6 +1750,12 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
      */
     STDMETHOD_(void, EnsureVisible)(THIS_ int nIndex) PURE;
 
+    /**
+     * @brief 查找字符串在列表中的位置
+     * @param iFindAfter --开始索引
+     * @param pszText --目标字符串
+     * @return int 找到的索引，-1代表没有找到
+    */
     STDMETHOD_(int, FindString)(THIS_ int iFindAfter, LPCTSTR pszText) SCONST PURE;
 };
 
@@ -764,10 +1763,31 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
 #define INTERFACE IComboBase
 DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::GetCurSel
@@ -796,6 +1816,14 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
      */
     STDMETHOD_(BOOL, SetCurSel)(THIS_ int iSel) PURE;
 
+    /**
+     * @brief 获取指定项文本数据
+     * @param iItem --索引号
+     * @param bRawText --获取原始文本标志
+     * @param[out] str 输出字符串对象
+     * @return BOOL TRUE-成功
+     * @remark bRawText为TRUE时输出未翻译的文本
+    */
     STDMETHOD_(BOOL, GetItemText)(THIS_ int iItem, BOOL bRawText, IStringT *str) SCONST PURE;
 
     /**
@@ -825,8 +1853,19 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
      */
     STDMETHOD_(void, CloseUp)(THIS) PURE;
 
+    /**
+     * @brief 查询DropDown状态标志
+     * @return TRUE-当前ComboBase为下拉列表
+     * @remark 内部使用方法
+    */
     STDMETHOD_(BOOL, IsDropdown)(THIS) SCONST PURE;
 
+    /**
+     * @brief 设置下拉状态标志
+     * @param bDropdown -- TRUE:下拉列表
+     * @return 
+     * @remark 内部使用方法
+    */
     STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) PURE;
 };
 
@@ -834,10 +1873,31 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
 #define INTERFACE IComboBox
 DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC9CF")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::GetCurSel
@@ -866,7 +1926,15 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
      */
     STDMETHOD_(BOOL, SetCurSel)(THIS_ int iSel) PURE;
 
-    STDMETHOD_(BOOL, GetItemText)(THIS_ int iItem, BOOL bRawText, IStringT *str) SCONST PURE;
+    /**
+     * @brief 获取指定项文本数据
+     * @param iItem --索引号
+     * @param bRawText --获取原始文本标志
+     * @param[out] str 输出字符串对象
+     * @return BOOL TRUE-成功
+     * @remark bRawText为TRUE时输出未翻译的文本
+    */
+    STDMETHOD_(BOOL, GetItemText)(THIS_ int iItem, BOOL bRawText, IStringT * str) SCONST PURE;
 
     /**
      * FindString
@@ -877,7 +1945,7 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
      * Describe
      */
     STDMETHOD_(int, FindString)
-    (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+        (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
 
     /**
      * SComboBoxBase::DropDown
@@ -895,8 +1963,19 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
      */
     STDMETHOD_(void, CloseUp)(THIS) PURE;
 
+    /**
+     * @brief 查询DropDown状态标志
+     * @return TRUE-当前ComboBase为下拉列表
+     * @remark 内部使用方法
+    */
     STDMETHOD_(BOOL, IsDropdown)(THIS) SCONST PURE;
 
+    /**
+     * @brief 设置下拉状态标志
+     * @param bDropdown -- TRUE:下拉列表
+     * @return
+     * @remark 内部使用方法
+    */
     STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) PURE;
     //////////////////////////////////////////////////////////////////////////
 
@@ -946,6 +2025,10 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
      */
     STDMETHOD_(void, ResetContent)(THIS) PURE;
 
+    /**
+     * @brief 获取IListBox接口
+     * @return IListBox *
+    */
     STDMETHOD_(IListBox *, GetIListBox)(THIS) PURE;
 };
 
@@ -953,10 +2036,31 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
 #define INTERFACE IComboView
 DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC253D")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::GetCurSel
@@ -985,7 +2089,15 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
      */
     STDMETHOD_(BOOL, SetCurSel)(THIS_ int iSel) PURE;
 
-    STDMETHOD_(BOOL, GetItemText)(THIS_ int iItem, BOOL bRawText, IStringT *str) SCONST PURE;
+    /**
+     * @brief 获取指定项文本数据
+     * @param iItem --索引号
+     * @param bRawText --获取原始文本标志
+     * @param[out] str 输出字符串对象
+     * @return BOOL TRUE-成功
+     * @remark bRawText为TRUE时输出未翻译的文本
+    */
+    STDMETHOD_(BOOL, GetItemText)(THIS_ int iItem, BOOL bRawText, IStringT * str) SCONST PURE;
 
     /**
      * FindString
@@ -996,7 +2108,7 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
      * Describe
      */
     STDMETHOD_(int, FindString)
-    (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+        (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
 
     /**
      * SComboBoxBase::DropDown
@@ -1014,10 +2126,26 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
      */
     STDMETHOD_(void, CloseUp)(THIS) PURE;
 
+    /**
+     * @brief 查询DropDown状态标志
+     * @return TRUE-当前ComboBase为下拉列表
+     * @remark 内部使用方法
+    */
     STDMETHOD_(BOOL, IsDropdown)(THIS) SCONST PURE;
 
+    /**
+     * @brief 设置下拉状态标志
+     * @param bDropdown -- TRUE:下拉列表
+     * @return
+     * @remark 内部使用方法
+    */
     STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) PURE;
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 获取ListView接口
+     * @return IListView *
+    */
     STDMETHOD_(IListView *, GetIListView)(THIS) PURE;
 };
 
@@ -1025,69 +2153,297 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
 #define INTERFACE IDateTimePicker
 DECLARE_INTERFACE_IID_(IDateTimePicker, ICtrl, "6DB1EF42-AED7-4a36-8011-BE2AD7B45953")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 设置时间
+     * @param wYear --年
+     * @param wMonth --月
+     * @param wDay --日
+     * @param wHour --时
+     * @param wMinute --分
+     * @param wSecond --秒
+     * @return 
+    */
     STDMETHOD_(void, SetTime)
     (THIS_ WORD wYear, WORD wMonth, WORD wDay, WORD wHour, WORD wMinute, WORD wSecond) PURE;
+
+    /**
+     * @brief 获取当前时间
+     * @param[out] wYear --年
+     * @param[out] wMonth --月
+     * @param[out] wDay --日
+     * @param[out] wHour --时
+     * @param[out] wMinute --分
+     * @param[out] wSecond --秒
+     * @return
+    */
     STDMETHOD_(void, GetTime)
     (THIS_ WORD * wYear, WORD * wMonth, WORD * wDay, WORD * wHour, WORD * wMinute, WORD * wSecond)
         SCONST PURE;
+
+    /**
+     * @brief 关闭下拉列表
+     * @return 
+    */
     STDMETHOD_(void, CloseUp)(THIS) PURE;
+
+    /**
+     * @brief 显示下拉列表
+     * @return 
+    */
     STDMETHOD_(void, DropDown)(THIS) PURE;
+
+    /**
+     * @brief 清除数据
+     * @return 
+    */
     STDMETHOD_(void, Clear)(THIS) PURE;
 };
 
 typedef int(__cdecl *FunTreeSortCallback)(void *pCtx, const void *phItem1, const void *phItem2);
 
+#define STVI_ROOT  ((HSTREEITEM)0xFFFF0000)            //=TVI_ROOT
+#define STVI_FIRST ((HSTREEITEM)0xFFFF0001)            //=TVI_FIRST
+#define STVI_LAST  ((HSTREEITEM)0xFFFF0002)            //=TVI_LAST
+
 #undef INTERFACE
 #define INTERFACE ITreeCtrl
 DECLARE_INTERFACE_IID_(ITreeCtrl, ICtrl, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 插入一个HSTREEITEM
+     * @param lpszItem --显示文本
+     * @param nImage --图片索引
+     * @param nSelectedImage --选中状态的图片索引
+     * @param lParam --自定义数据
+     * @param hParent --父HSTREEITEM
+     * @param hInsertAfter --前面的兄弟HSTREEITEM
+     * @return HSTREEITEM--新插入HSTREEITEM
+    */
     STDMETHOD_(HSTREEITEM, InsertItem)
     (THIS_ LPCTSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam,
-     HSTREEITEM hParent /*= STVI_ROOT*/, HSTREEITEM hInsertAfter /*= STVI_LAST*/) PURE;
+     HSTREEITEM hParent DEF_VAL(STVI_ROOT), HSTREEITEM hInsertAfter DEF_VAL(STVI_LAST)) PURE;
 
+    /**
+     * @brief 删除一个HSTREEITEM
+     * @param hItem --待删除HSTREEITEM
+     * @return BOOL
+    */
     STDMETHOD_(BOOL, RemoveItem)(THIS_ HSTREEITEM hItem) PURE;
+
+    /**
+     * @brief 删除所有数据
+     * @return 
+    */
     STDMETHOD_(void, RemoveAllItems)(THIS) PURE;
 
+    /**
+     * @brief 获取根节点
+     * @return HSTREEITEM --根节点
+    */
     STDMETHOD_(HSTREEITEM, GetRootItem)(THIS) SCONST PURE;
 
+    /**
+     * @brief 获取指定节点的下一个兄弟结点
+     * @param hItem --指定节点
+     * @return HSTREEITEM--下一个兄弟结点
+    */
     STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+
+    /**
+     * @brief 获取指定节点的上一个兄弟结点
+     * @param hItem --指定节点
+     * @return HSTREEITEM--上一个兄弟结点
+    */
     STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+
+    /**
+     * @brief 获取指定结点的子节点
+     * @param hItem --指定结点
+     * @param bFirst -- TRUE：获取第一个子节点，FALSE:获取最后一个子节点
+     * @return HSTREEITEM--子节点
+    */
     STDMETHOD_(HSTREEITEM, GetChildItem)
-    (THIS_ HSTREEITEM hItem, BOOL bFirst /*= TRUE*/) SCONST PURE;
+    (THIS_ HSTREEITEM hItem, BOOL bFirst DEF_VAL(TRUE)) SCONST PURE;
+
+    /**
+     * @brief 获取指定结点的父节点
+     * @param hItem --指定结点
+     * @return HSTREEITEM--父节点
+    */
     STDMETHOD_(HSTREEITEM, GetParentItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+
+    /**
+     * @brief 获取选中结点
+     * @return HSTREEITEM--选中结点
+    */
     STDMETHOD_(HSTREEITEM, GetSelectedItem)(THIS) SCONST PURE;
+
+    /**
+     * @brief 获取下一个结点
+     * @param hItem -- 当前结点
+     * @return HSTREEITEM--下一个结点
+     * @remark 有子节点时是第一个子节点，否则为下一个兄弟结点，也没有兄弟则是父节点的下一个兄弟
+    */
     STDMETHOD_(HSTREEITEM, GetNextItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
 
+    /**
+     * @brief 排序子节点
+     * @param hItem --当前节点
+     * @param sortFunc --排序回调函数
+     * @param pCtx --回调函数的Context
+     * @return 
+    */
     STDMETHOD_(void, SortChildren)
     (THIS_ HSTREEITEM hItem, FunTreeSortCallback sortFunc, void *pCtx) PURE;
 
-    STDMETHOD_(BOOL, SelectItem)(THIS_ HSTREEITEM hItem, BOOL bEnsureVisible /* = TRUE*/) PURE;
+    /**
+     * @brief 选中指定项
+     * @param hItem --指定项
+     * @param bEnsureVisible --自动滚动到可见区标志
+     * @return 
+    */
+    STDMETHOD_(BOOL, SelectItem)(THIS_ HSTREEITEM hItem, BOOL bEnsureVisible DEF_VAL(TRUE)) PURE;
 
+    /**
+     * @brief 获取指定项的文本数据
+     * @param hItem --指定项
+     * @param[out] strText --文本数据
+     * @return BOOL
+     * @remark 不支持翻译
+    */
     STDMETHOD_(BOOL, GetItemText)(THIS_ HSTREEITEM hItem, IStringT * strText) SCONST PURE;
+
+    /**
+     * @brief 设置文本数据
+     * @param hItem --指定项
+     * @param lpszItem  --文本数据
+     * @return BOOL
+    */
     STDMETHOD_(BOOL, SetItemText)(THIS_ HSTREEITEM hItem, LPCTSTR lpszItem) PURE;
+
+    /**
+     * @brief 获取指定项的图标显示数据
+     * @param hItem --指定项
+     * @param nImage --图片索引
+     * @param nSelectedImage --选中状态图片索引
+     * @return BOOL
+    */
     STDMETHOD_(BOOL, GetItemImage)
     (THIS_ HSTREEITEM hItem, int *nImage, int *nSelectedImage) SCONST PURE;
-    STDMETHOD_(BOOL, SetItemImage)(THIS_ HSTREEITEM hItem, int nImage, int nSelectedImage) PURE;
-    STDMETHOD_(LPARAM, GetItemData)(THIS_ HSTREEITEM hItem) SCONST PURE;
-    STDMETHOD_(BOOL, SetItemData)(THIS_ HSTREEITEM hItem, LPARAM lParam) PURE;
-    STDMETHOD_(BOOL, ItemHasChildren)(THIS_ HSTREEITEM hItem) PURE;
 
-    STDMETHOD_(BOOL, GetCheckState)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    /**
+     * @brief 设置指定项的图片索引
+     * @param hItem --指定项
+     * @param nImage --图片索引
+     * @param nSelectedImage --选中状态图片索引
+     * @return BOOL
+    */
+    STDMETHOD_(BOOL, SetItemImage)(THIS_ HSTREEITEM hItem, int nImage, int nSelectedImage) PURE;
+
+    /**
+     * @brief 获取指定项的自定义数据
+     * @param hItem --指定项
+     * @return LPARAM--自定义数据
+    */
+    STDMETHOD_(LPARAM, GetItemData)(THIS_ HSTREEITEM hItem) SCONST PURE;
+
+    /**
+     * @brief 设置指定项的自定义数据
+     * @param hItem --指定项
+     * @param lParam --自定义数据
+     * @return BOOL
+    */
+    STDMETHOD_(BOOL, SetItemData)(THIS_ HSTREEITEM hItem, LPARAM lParam) PURE;
+
+    /**
+     * @brief 查询指定项是否有子项
+     * @param hItem --指定项
+     * @return BOOL TRUE:有子项
+    */
+    STDMETHOD_(BOOL, ItemHasChildren)(THIS_ HSTREEITEM hItem) SCONST PURE;
+
+    /**
+     * @brief 获取指定项的Check状态
+     * @param hItem --指定项
+     * @return int 0--unchecked,1--checked,2--part checked
+    */
+    STDMETHOD_(int, GetCheckState)(THIS_ HSTREEITEM hItem) SCONST PURE;
+
+    /**
+     * @brief 设置指定项的Check状态
+     * @param hItem --指定项
+     * @param bCheck --TRUE:checked
+     * @return 
+    */
     STDMETHOD_(BOOL, SetCheckState)(THIS_ HSTREEITEM hItem, BOOL bCheck) PURE;
 
-    STDMETHOD_(BOOL, Expand)(THIS_ HSTREEITEM hItem, UINT nCode /*= TVE_EXPAND*/) PURE;
+    /**
+     * @brief 展开或者收缩指定项的子项
+     * @param hItem --指定项
+     * @param nCode --标志位
+     * @return 
+    */
+    STDMETHOD_(BOOL, Expand)(THIS_ HSTREEITEM hItem, UINT nCode DEF_VAL(TVE_EXPAND)) PURE;
+
+    /**
+     * @brief 使指定项滚动到可见区
+     * @param hItem  --指定项
+     * @return 
+    */
     STDMETHOD_(BOOL, EnsureVisible)(THIS_ HSTREEITEM hItem) PURE;
 };
 
@@ -1095,10 +2451,31 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, ICtrl, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
 #define INTERFACE IHotKeyCtrl
 DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
@@ -1136,18 +2513,55 @@ DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55
 #define INTERFACE IRichEdit
 DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
 
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * IRichEdit::SaveRtf
+     * @brief     保存数据到RTF文件
+	 * @param LPCTSTR pszFileName -- 文件名
+     * @return    DWORD 数据长度
+     *
+     * Describe   
+     */
     STDMETHOD_(DWORD, SaveRtf)(THIS_ LPCTSTR pszFileName) PURE;
 
+    /**
+     * IRichEdit::LoadRtf
+     * @brief     从RTF文件加载数据
+	 * @param LPCTSTR pszFileName -- 文件名
+     * @return    DWORD 数据长度
+     *
+     * Describe   
+     */
     STDMETHOD_(DWORD, LoadRtf)(THIS_ LPCTSTR pszFileName) PURE;
 
     /**
-     * SRichEdit::GetWindowTextLength
+     * IRichEdit::GetWindowTextLength
      * @brief     获取窗口标题长度
      * @return    返回int
      *
@@ -1156,26 +2570,26 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(int, GetWindowTextLength)(THIS) SCONST PURE;
 
     /**
-     * SRichEdit::SetSel
+     * IRichEdit::SetSel
      * @brief     设置选中
-     * @param     long nStartChar --
-     * @param     long nEndChar --
-     * @param     BOOL bNoScroll --
+     * @param     long nStartChar -- 开始字符索引
+     * @param     long nEndChar -- 结束字符索引
+     * @param     BOOL bNoScroll -- 禁止滚动标志
      *
      * Describe   设置选中, 支持超长文本
      */
     STDMETHOD_(void, SetSel)(THIS_ long nStartChar, long nEndChar, BOOL bNoScroll) PURE;
     /**
-     * SRichEdit::ReplaceSel
+     * IRichEdit::ReplaceSel
      * @brief     替换选中项
-     * @param     LPCWSTR pszText --
-     * @param     BOOL bCanUndo --
+     * @param     LPCWSTR pszText -- 替换数据
+     * @param     BOOL bCanUndo -- 允许Undo标志
      *
      * Describe   替换选中项
      */
-    STDMETHOD_(void, ReplaceSel)(THIS_ LPCTSTR pszText, BOOL bCanUndo /*= TRUE*/) PURE;
+    STDMETHOD_(void, ReplaceSel)(THIS_ LPCTSTR pszText, BOOL bCanUndo DEF_VAL(TRUE)) PURE;
     /**
-     * SRichEdit::GetWordWrap
+     * IRichEdit::GetWordWrap
      * @brief
      * @return   返回BOOL
      *
@@ -1183,16 +2597,16 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
      */
     STDMETHOD_(BOOL, GetWordWrap)(THIS) SCONST PURE;
     /**
-     * SRichEdit::SetWordWrap
+     * IRichEdit::SetWordWrap
      * @brief
-     * @param     BOOL fWordWrap --
+     * @param     BOOL fWordWrap -- word wrap标志
      *
      * Describe
      */
     STDMETHOD_(void, SetWordWrap)(THIS_ BOOL fWordWrap) PURE;
 
     /**
-     * SRichEdit::GetReadOnly
+     * IRichEdit::GetReadOnly
      * @brief    判断是否只读
      * @return   返回BOOL
      *
@@ -1201,7 +2615,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(BOOL, GetReadOnly)(THIS) SCONST PURE;
 
     /**
-     * SRichEdit::SetReadOnly
+     * IRichEdit::SetReadOnly
      * @brief     设置只读
      * @param     BOOL bReadOnly -- 是否只读
      * @return    返回BOOL
@@ -1211,7 +2625,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(BOOL, SetReadOnly)(THIS_ BOOL bReadOnly) PURE;
 
     /**
-     * SRichEdit::GetLimitText
+     * IRichEdit::GetLimitText
      * @brief     获取最小文本长度
      * @return    返回BOOL
      *
@@ -1220,7 +2634,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(LONG, GetLimitText)(THIS) SCONST PURE;
 
     /**
-     * SRichEdit::SetLimitText
+     * IRichEdit::SetLimitText
      * @brief     设置最小文本长度
      * @param     int nLength -- 长度
      * @return    返回BOOL
@@ -1230,7 +2644,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(BOOL, SetLimitText)(THIS_ int nLength) PURE;
 
     /**
-     * SRichEdit::GetDefaultAlign
+     * IRichEdit::GetDefaultAlign
      * @brief     获取对齐方式
      * @return    返回WORD
      *
@@ -1239,7 +2653,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(WORD, GetDefaultAlign)(THIS) SCONST PURE;
 
     /**
-     * SRichEdit::SetDefaultAlign
+     * IRichEdit::SetDefaultAlign
      * @brief     设置默认对齐方式
      * @param     WORD wNewAlign -- 对齐方式
      *
@@ -1248,7 +2662,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(void, SetDefaultAlign)(THIS_ WORD wNewAlign) PURE;
 
     /**
-     * SRichEdit::GetRichTextFlag
+     * IRichEdit::GetRichTextFlag
      * @brief     获取标志
      * @return    返回BOOL
      *
@@ -1257,7 +2671,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(BOOL, GetRichTextFlag)(THIS) SCONST PURE;
 
     /**
-     * SRichEdit::SetRichTextFlag
+     * IRichEdit::SetRichTextFlag
      * @brief     设置标志
      * @param     BOOL fRich -- 标志
      *
@@ -1266,7 +2680,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(void, SetRichTextFlag)(THIS_ BOOL fRich) PURE;
 
     /**
-     * SRichEdit::SetRichTextFlag
+     * IRichEdit::SetRichTextFlag
      * @brief     设置标志
      * @param     BOOL fRich -- 标志
      * @return    返回LONG
@@ -1276,7 +2690,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(LONG, GetDefaultLeftIndent)(THIS) SCONST PURE;
 
     /**
-     * SRichEdit::SetDefaultLeftIndent
+     * IRichEdit::SetDefaultLeftIndent
      * @brief     设置缩进
      * @param     LONG lNewIndent -- 缩进字符数
      *
@@ -1285,7 +2699,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(void, SetDefaultLeftIndent)(THIS_ LONG lNewIndent) PURE;
 
     /**
-     * SRichEdit::SetSaveSelection
+     * IRichEdit::SetSaveSelection
      * @brief
      * @param     BOOL fSaveSelection
      * @return    返回BOOL
@@ -1295,7 +2709,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(BOOL, SetSaveSelection)(THIS_ BOOL fSaveSelection) PURE;
 
     /**
-     * SRichEdit::SetDefaultTextColor
+     * IRichEdit::SetDefaultTextColor
      * @brief     默认文本颜色
      * @param     COLORREF cr -- 颜色
      * @return    返回COLORREF
@@ -1309,10 +2723,31 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
 #define INTERFACE ITabCtrl
 DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
 {
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
@@ -1409,17 +2844,66 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
 
 #undef INTERFACE
 #define INTERFACE ISpinButtonCtrl
-DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A03561F8C")
-{
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-    STDMETHOD_(long, Release)(THIS) PURE;
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A03561F8C"){
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long, Release) (THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+    */
+    STDMETHOD_(void, OnFinalRelease) (THIS) PURE;
+
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+    */
+    STDMETHOD_(IWindow*, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 设置值
+     * @param nValue --新值 
+     * @return 
+    */
     STDMETHOD_(void, SetValue)(THIS_ int nValue) PURE;
+
+    /**
+     * @brief 设置范围
+     * @param nMin --最小值
+     * @param nMax --最大值
+     * @return 
+    */
     STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) PURE;
+
+    /**
+     * @brief 设置步长
+     * @param nStep --步长
+     * @return 
+    */
     STDMETHOD_(void, SetStep)(THIS_ UINT nStep) PURE;
+
+    /**
+     * @brief 获取值
+     * @return int --当前值
+    */
     STDMETHOD_(int, GetValue)(THIS) SCONST PURE;
+
+    /**
+     * @brief 获取关联的窗口对象
+     * @return IWindow *--关联的窗口对象
+    */
     STDMETHOD_(IWindow *, GetIBuddy)(THIS) SCONST PURE;
 };
 SNSEND

@@ -18,7 +18,7 @@ enum
 
 enum
 {
-    STVICheckBox_UnChecked,  //未选中
+    STVICheckBox_UnChecked=0,  //未选中
     STVICheckBox_Checked,    //选中
     STVICheckBox_PartChecked //部分选中
 };
@@ -87,8 +87,8 @@ class SOUI_EXP STreeCtrl
      int nImage,
      int nSelectedImage,
      LPARAM lParam,
-     HSTREEITEM hParent /*= STVI_ROOT*/,
-     HSTREEITEM hInsertAfter /*= STVI_LAST*/) OVERRIDE;
+     HSTREEITEM hParent = STVI_ROOT,
+     HSTREEITEM hInsertAfter = STVI_LAST) OVERRIDE;
 
     STDMETHOD_(BOOL, RemoveItem)(THIS_ HSTREEITEM hItem) OVERRIDE;
     STDMETHOD_(void, RemoveAllItems)(THIS) OVERRIDE;
@@ -115,9 +115,9 @@ class SOUI_EXP STreeCtrl
     STDMETHOD_(BOOL, SetItemImage)(THIS_ HSTREEITEM hItem, int nImage, int nSelectedImage) OVERRIDE;
     STDMETHOD_(LPARAM, GetItemData)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
     STDMETHOD_(BOOL, SetItemData)(THIS_ HSTREEITEM hItem, LPARAM lParam) OVERRIDE;
-    STDMETHOD_(BOOL, ItemHasChildren)(THIS_ HSTREEITEM hItem) OVERRIDE;
+    STDMETHOD_(BOOL, ItemHasChildren)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
 
-    STDMETHOD_(BOOL, GetCheckState)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+    STDMETHOD_(int, GetCheckState)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
     STDMETHOD_(BOOL, SetCheckState)(THIS_ HSTREEITEM hItem, BOOL bCheck) OVERRIDE;
 
     STDMETHOD_(BOOL, Expand)(THIS_ HSTREEITEM hItem, UINT nCode = TVE_EXPAND) OVERRIDE;

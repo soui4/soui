@@ -3,7 +3,7 @@
 
 SNSBEGIN
 
-interface IWindow;
+typedef struct IWindow IWindow;
 
 #undef INTERFACE
 #define INTERFACE IAccHelper

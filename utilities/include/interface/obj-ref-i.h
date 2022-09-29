@@ -12,18 +12,21 @@
 #define INTERFACE IObjRef
 DECLARE_INTERFACE(IObjRef)
 {
-	//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) PURE;
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long,AddRef) (THIS) PURE;
 
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) PURE;
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long,Release) (THIS) PURE;
 
-	//!释放对象
-	/*!
+	/**
+	 * @brief 释放对象
+	 * @return void
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
 };
