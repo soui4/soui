@@ -13,9 +13,9 @@
       <state index="0" value="normal"/>
       <state index="1" value="hover"/>
       <state index="2" value="pushdown"/>
-      <state index="3" value="normal|checked"/>
-      <state index="4" value="hover|checked"/>
-      <state index="5" value="pushdown|cheched"/>
+      <state index="3" value="normal&checked"/>
+      <state index="4" value="hover&checked"/>
+      <state index="5" value="pushdown&checked"/>
     </states>
   </imglist>
   <imglist name="_skin.sys.tree.checkbox" src="PNG:SYS_TREE_CHECKBOX" states="9"/>
