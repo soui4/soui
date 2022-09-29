@@ -1384,7 +1384,7 @@ IMessageLoop *SHostWnd::GetMsgLoop()
     return SApplication::getSingletonPtr()->GetMsgLoop(m_dwThreadID);
 }
 
-#ifndef DISABLE_SWNDSPY
+#if(!DISABLE_SWNDSPY)
 
 LRESULT SHostWnd::OnSpyMsgSwndEnum(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {

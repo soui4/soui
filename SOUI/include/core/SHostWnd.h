@@ -22,6 +22,15 @@
 #include <proxy/SNativeWndProxy.h>
 SNSBEGIN
 
+//disable swnd spy for release by default.
+#ifndef DISABLE_SWNDSPY
+#ifndef _DEBUG
+#define DISABLE_SWNDSPY 1
+#else
+#define DISABLE_SWNDSPY 0
+#endif
+#endif
+
 class SHostWndAttr : public TObjRefImpl<SObject> {
     DEF_SOBJECT(TObjRefImpl<SObject>, L"SHostWndAttr")
     enum
@@ -382,7 +391,7 @@ class SOUI_EXP SHostWnd
     void OnSysCommand(UINT nID, CPoint lParam);
 
     void OnHostShowWindow(BOOL bShow, UINT nStatus);
-#ifndef DISABLE_SWNDSPY
+#if(!DISABLE_SWNDSPY)
   protected:
     LRESULT OnSpyMsgSetSpy(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -485,12 +494,12 @@ class SOUI_EXP SHostWnd
     MESSAGE_HANDLER_EX(WM_GETOBJECT, OnGetObject)
     MSG_WM_SYSCOMMAND(OnSysCommand)
     CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
-#ifndef DISABLE_SWNDSPY
+#if(!DISABLE_SWNDSPY)
     MESSAGE_HANDLER_EX(SPYMSG_SETSPY, OnSpyMsgSetSpy)
     MESSAGE_HANDLER_EX(SPYMSG_SWNDENUM, OnSpyMsgSwndEnum)
     MESSAGE_HANDLER_EX(SPYMSG_SWNDINFO, OnSpyMsgSwndSpy)
     MESSAGE_HANDLER_EX(SPYMSG_HITTEST, OnSpyMsgHitTest)
-#endif
+#endif//DISABLE_SWNDSPY
     REFLECT_NOTIFY_CODE(NM_CUSTOMDRAW)
     END_MSG_MAP()
 };
