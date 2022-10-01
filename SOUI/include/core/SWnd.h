@@ -1157,7 +1157,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
     MESSAGE_HANDLER_EX(UM_SETSCALE, OnSetScale)
     MESSAGE_HANDLER_EX(UM_SETCOLORIZE, OnSetColorize)
     MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
-    WND_MSG_MAP_END_BASE() //消息不再往基类传递，此外使用WND_MSG_MAP_END_BASE而不是WND_MSG_MAP_END
+    SOUI_MSG_MAP_END_BASE() //消息不再往基类传递，此外使用SOUI_MSG_MAP_END_BASE而不是SOUI_MSG_MAP_END
 
   protected:
     // 属性处理函数
