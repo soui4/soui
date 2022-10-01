@@ -22,7 +22,7 @@
 #include <proxy/SNativeWndProxy.h>
 SNSBEGIN
 
-//disable swnd spy for release by default.
+// disable swnd spy for release by default.
 #ifndef DISABLE_SWNDSPY
 #ifndef _DEBUG
 #define DISABLE_SWNDSPY 1
@@ -65,40 +65,40 @@ class SHostWndAttr : public TObjRefImpl<SObject> {
     void SetSendWheel2Hover(bool value);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)
-    ATTR_STRINGW(L"title", m_strTitle, FALSE)
-    ATTR_LAYOUTSIZE4(L"maxInset", m_rcMaxInset, FALSE)
-    ATTR_LAYOUTSIZE4(L"margin", m_rcMargin, FALSE)
-    ATTR_LAYOUTSIZE2(L"minsize", m_szMin, FALSE)
-    ATTR_DWORD(L"wndStyle", m_dwStyle, FALSE)
-    ATTR_DWORD(L"wndStyleEx", m_dwExStyle, FALSE)
-    ATTR_INT(L"resizable", m_bResizable, FALSE)
-    ATTR_INT(L"translucent", m_bTranslucent, FALSE)
-    ATTR_INT(L"sendWheel2Hover", m_bSendWheel2Hover, FALSE)
-    ATTR_INT(L"appWnd", m_bAppWnd, FALSE)
-    ATTR_INT(L"toolWindow", m_bToolWnd, FALSE)
-    ATTR_ICON(L"smallIcon", m_hAppIconSmall, FALSE)
-    ATTR_ICON(L"bigIcon", m_hAppIconBig, FALSE)
-    ATTR_INT(L"allowSpy", m_bAllowSpy, FALSE)
-    ATTR_ENUM_BEGIN(L"wndType", DWORD, FALSE)
-    ATTR_ENUM_VALUE(L"undefine", WT_UNDEFINE)
-    ATTR_ENUM_VALUE(L"appMain", WT_APPMAIN)
-    ATTR_ENUM_VALUE(L"normal", WT_NORMAL)
-    ATTR_ENUM_END(m_byWndType)
+        ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)
+        ATTR_STRINGW(L"title", m_strTitle, FALSE)
+        ATTR_LAYOUTSIZE4(L"maxInset", m_rcMaxInset, FALSE)
+        ATTR_LAYOUTSIZE4(L"margin", m_rcMargin, FALSE)
+        ATTR_LAYOUTSIZE2(L"minsize", m_szMin, FALSE)
+        ATTR_DWORD(L"wndStyle", m_dwStyle, FALSE)
+        ATTR_DWORD(L"wndStyleEx", m_dwExStyle, FALSE)
+        ATTR_INT(L"resizable", m_bResizable, FALSE)
+        ATTR_INT(L"translucent", m_bTranslucent, FALSE)
+        ATTR_INT(L"sendWheel2Hover", m_bSendWheel2Hover, FALSE)
+        ATTR_INT(L"appWnd", m_bAppWnd, FALSE)
+        ATTR_INT(L"toolWindow", m_bToolWnd, FALSE)
+        ATTR_ICON(L"smallIcon", m_hAppIconSmall, FALSE)
+        ATTR_ICON(L"bigIcon", m_hAppIconBig, FALSE)
+        ATTR_INT(L"allowSpy", m_bAllowSpy, FALSE)
+        ATTR_ENUM_BEGIN(L"wndType", DWORD, FALSE)
+            ATTR_ENUM_VALUE(L"undefine", WT_UNDEFINE)
+            ATTR_ENUM_VALUE(L"appMain", WT_APPMAIN)
+            ATTR_ENUM_VALUE(L"normal", WT_NORMAL)
+        ATTR_ENUM_END(m_byWndType)
     SOUI_ATTRS_END()
 
   protected:
-    SLayoutSize m_rcMargin[4]; //窗口拉伸的边缘检测大小
-    SLayoutSize m_szMin[2];    //窗口最小值
+    SLayoutSize m_rcMargin[4];   //窗口拉伸的边缘检测大小
+    SLayoutSize m_szMin[2];      //窗口最小值
     SLayoutSize m_rcMaxInset[4]; //窗口最大化时超出屏幕的边缘大小。经测试，WS_OVERLAPPED
                                  // style的窗口该属性无效
 
-    DWORD m_byWndType : 8;    //主窗口标志,有该标志的窗口关闭时自动发送WM_QUIT
-    DWORD m_bResizable : 1;   //窗口大小可调节
-    DWORD m_bAppWnd : 1;      // APP窗口，在任务栏上显示按钮
-    DWORD m_bToolWnd : 1;     //设置WS_ES_TOOLWINDOW属性
-    DWORD m_bTranslucent : 1; //窗口的半透明属性
-    DWORD m_bAllowSpy : 1;    //允许spy
+    DWORD m_byWndType : 8;        //主窗口标志,有该标志的窗口关闭时自动发送WM_QUIT
+    DWORD m_bResizable : 1;       //窗口大小可调节
+    DWORD m_bAppWnd : 1;          // APP窗口，在任务栏上显示按钮
+    DWORD m_bToolWnd : 1;         //设置WS_ES_TOOLWINDOW属性
+    DWORD m_bTranslucent : 1;     //窗口的半透明属性
+    DWORD m_bAllowSpy : 1;        //允许spy
     DWORD m_bSendWheel2Hover : 1; //将滚轮消息发送到hover窗口
 
     DWORD m_dwStyle;
@@ -132,7 +132,7 @@ class SOUI_EXP SRootWindow : public SWindow {
     STDMETHOD_(void, UpdateLayout)(THIS) OVERRIDE;
 
   protected:
-	STDMETHOD_(void,OnAnimationStop)(THIS_ IAnimation *pAni);
+    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *pAni);
 
     virtual void OnAnimationInvalidate(IAnimation *pAni, bool bErase);
 
@@ -149,8 +149,8 @@ class SOUI_EXP SRootWindow : public SWindow {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_ANIMATION(L"enterAnimation", m_aniEnter, FALSE)
-    ATTR_ANIMATION(L"exitAnimation", m_aniExit, FALSE)
+        ATTR_ANIMATION(L"enterAnimation", m_aniEnter, FALSE)
+        ATTR_ANIMATION(L"exitAnimation", m_aniExit, FALSE)
     SOUI_ATTRS_END()
   protected:
     SAutoRefPtr<IAnimation> m_aniEnter, m_aniExit;
@@ -201,7 +201,8 @@ class SOUI_EXP SHostWnd
     DWORD m_dwThreadID;
     SRootWindow *m_pRoot;
 
-	SAutoRefPtr<IEvtSlot>  m_defEvtSlot;
+    SAutoRefPtr<IEvtSlot> m_defEvtSlot;
+
   public:
     SHostWnd(LPCTSTR pszResName = NULL);
     virtual ~SHostWnd();
@@ -236,12 +237,11 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) OVERRIDE;
 
     STDMETHOD_(HWND, CreateEx)
-    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)
-        OVERRIDE;
+    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) OVERRIDE;
     STDMETHOD_(HWND, Create)
     (THIS_ HWND hWndParent, int x = 0, int y = 0, int nWidth = 0, int nHeight = 0) OVERRIDE;
 
-	STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) OVERRIDE;
+    STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) OVERRIDE;
 
   public:
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1)
@@ -391,7 +391,7 @@ class SOUI_EXP SHostWnd
     void OnSysCommand(UINT nID, CPoint lParam);
 
     void OnHostShowWindow(BOOL bShow, UINT nStatus);
-#if(!DISABLE_SWNDSPY)
+#if (!DISABLE_SWNDSPY)
   protected:
     LRESULT OnSpyMsgSetSpy(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -464,43 +464,43 @@ class SOUI_EXP SHostWnd
     virtual BOOL _HandleEvent(IEvtArgs *pEvt);
 
     BEGIN_MSG_MAP_EX(SHostWnd)
-    MSG_WM_SHOWWINDOW(OnHostShowWindow)
-    MSG_WM_SIZE(OnSize)
-    MSG_WM_PRINT(OnPrint)
-    MSG_WM_PAINT(OnPaint)
-    MSG_WM_CREATE(OnCreate)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_ERASEBKGND(OnEraseBkgnd)
-    MSG_WM_MOUSELEAVE(OnMouseLeave)
-    MSG_WM_MOUSEMOVE(OnMouseMove)
-    MSG_WM_MOUSEWHEEL(OnMouseWheel)
-    MSG_WM_ACTIVATE(OnActivate)
-    MSG_WM_SETFOCUS(OnSetFocus)
-    MSG_WM_KILLFOCUS(OnKillFocus)
-    MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST, WM_MOUSELAST, OnMouseEvent)
-    MESSAGE_RANGE_HANDLER_EX(WM_KEYFIRST, WM_KEYLAST, OnKeyEvent)
-    MESSAGE_RANGE_HANDLER_EX(WM_IME_STARTCOMPOSITION, WM_IME_KEYLAST, OnKeyEvent)
-    MESSAGE_HANDLER_EX(WM_IME_CHAR, OnKeyEvent)
-    MESSAGE_HANDLER_EX(WM_IME_REQUEST, OnKeyEvent)
-    MESSAGE_HANDLER_EX(WM_ACTIVATEAPP, OnActivateApp)
-    MSG_WM_SETCURSOR(OnSetCursor)
-    MSG_WM_TIMER(OnTimer)
-    MSG_WM_GETMINMAXINFO(OnGetMinMaxInfo)
-    MSG_WM_CAPTURECHANGED(OnCaptureChanged)
-    MESSAGE_HANDLER_EX(UM_SCRIPTTIMER, OnScriptTimer)
-    MESSAGE_HANDLER_EX(UM_MENUEVENT, OnMenuExEvent)
-    MSG_WM_WINDOWPOSCHANGING(OnWindowPosChanging)
-    MSG_WM_WINDOWPOSCHANGED(OnWindowPosChanged)
-    MESSAGE_HANDLER_EX(WM_GETOBJECT, OnGetObject)
-    MSG_WM_SYSCOMMAND(OnSysCommand)
-    CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
-#if(!DISABLE_SWNDSPY)
-    MESSAGE_HANDLER_EX(SPYMSG_SETSPY, OnSpyMsgSetSpy)
-    MESSAGE_HANDLER_EX(SPYMSG_SWNDENUM, OnSpyMsgSwndEnum)
-    MESSAGE_HANDLER_EX(SPYMSG_SWNDINFO, OnSpyMsgSwndSpy)
-    MESSAGE_HANDLER_EX(SPYMSG_HITTEST, OnSpyMsgHitTest)
-#endif//DISABLE_SWNDSPY
-    REFLECT_NOTIFY_CODE(NM_CUSTOMDRAW)
+        MSG_WM_SHOWWINDOW(OnHostShowWindow)
+        MSG_WM_SIZE(OnSize)
+        MSG_WM_PRINT(OnPrint)
+        MSG_WM_PAINT(OnPaint)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_ERASEBKGND(OnEraseBkgnd)
+        MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSEWHEEL(OnMouseWheel)
+        MSG_WM_ACTIVATE(OnActivate)
+        MSG_WM_SETFOCUS(OnSetFocus)
+        MSG_WM_KILLFOCUS(OnKillFocus)
+        MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST, WM_MOUSELAST, OnMouseEvent)
+        MESSAGE_RANGE_HANDLER_EX(WM_KEYFIRST, WM_KEYLAST, OnKeyEvent)
+        MESSAGE_RANGE_HANDLER_EX(WM_IME_STARTCOMPOSITION, WM_IME_KEYLAST, OnKeyEvent)
+        MESSAGE_HANDLER_EX(WM_IME_CHAR, OnKeyEvent)
+        MESSAGE_HANDLER_EX(WM_IME_REQUEST, OnKeyEvent)
+        MESSAGE_HANDLER_EX(WM_ACTIVATEAPP, OnActivateApp)
+        MSG_WM_SETCURSOR(OnSetCursor)
+        MSG_WM_TIMER(OnTimer)
+        MSG_WM_GETMINMAXINFO(OnGetMinMaxInfo)
+        MSG_WM_CAPTURECHANGED(OnCaptureChanged)
+        MESSAGE_HANDLER_EX(UM_SCRIPTTIMER, OnScriptTimer)
+        MESSAGE_HANDLER_EX(UM_MENUEVENT, OnMenuExEvent)
+        MSG_WM_WINDOWPOSCHANGING(OnWindowPosChanging)
+        MSG_WM_WINDOWPOSCHANGED(OnWindowPosChanged)
+        MESSAGE_HANDLER_EX(WM_GETOBJECT, OnGetObject)
+        MSG_WM_SYSCOMMAND(OnSysCommand)
+        CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
+#if (!DISABLE_SWNDSPY)
+        MESSAGE_HANDLER_EX(SPYMSG_SETSPY, OnSpyMsgSetSpy)
+        MESSAGE_HANDLER_EX(SPYMSG_SWNDENUM, OnSpyMsgSwndEnum)
+        MESSAGE_HANDLER_EX(SPYMSG_SWNDINFO, OnSpyMsgSwndSpy)
+        MESSAGE_HANDLER_EX(SPYMSG_HITTEST, OnSpyMsgHitTest)
+#endif // DISABLE_SWNDSPY
+        REFLECT_NOTIFY_CODE(NM_CUSTOMDRAW)
     END_MSG_MAP()
 };
 

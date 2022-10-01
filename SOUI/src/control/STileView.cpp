@@ -72,7 +72,7 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
     }
     if (m_adapter == adapter)
     {
-		SSLOGW()<<"the new adapter is same to previous set adapter, same as notifyDatasetChanged";
+        SSLOGW() << "the new adapter is same to previous set adapter, same as notifyDatasetChanged";
         if (m_adapter)
         {
             onDataSetChanged();
@@ -341,8 +341,7 @@ void STileView::UpdateVisibleItems()
                     //创建一个新的列表项
                     bNewItem = TRUE;
                     ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
-                    ii.pItem->GetEventSet()->subscribeEvent(
-                        EventItemPanelClick::EventID, Subscriber(&STileView::OnItemClick, this));
+                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&STileView::OnItemClick, this));
                 }
                 else
                 {
@@ -731,8 +730,7 @@ BOOL STileView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     {
         CRect rcItem = pSelItem->GetItemRect();
         CPoint pt2 = pt - rcItem.TopLeft();
-        if (pSelItem->DoFrameEvent(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta),
-                                   MAKELPARAM(pt2.x, pt2.y)))
+        if (pSelItem->DoFrameEvent(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta), MAKELPARAM(pt2.x, pt2.y)))
         {
             return TRUE;
         }
@@ -771,9 +769,7 @@ BOOL STileView::CreateChildren(SXmlNode xmlNode)
         m_xmlTemplate.root().append_copy(xmlTemplate);
         {
             //创建一个定位器
-            STileViewItemLocator *pItemLocator = new STileViewItemLocator(
-                xmlTemplate.attribute(L"itemHeight").as_string(L"10dp"),
-                xmlTemplate.attribute(L"itemWidth").as_string(L"10dp"), m_nMarginSize);
+            STileViewItemLocator *pItemLocator = new STileViewItemLocator(xmlTemplate.attribute(L"itemHeight").as_string(L"10dp"), xmlTemplate.attribute(L"itemWidth").as_string(L"10dp"), m_nMarginSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
         }
@@ -924,16 +920,12 @@ BOOL STileView::OnSetCursor(const CPoint &pt)
     if (m_itemCapture)
     {
         CRect rcItem = m_itemCapture->GetItemRect();
-        bRet = m_itemCapture->DoFrameEvent(WM_SETCURSOR, 0,
-                                           MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top))
-            != 0;
+        bRet = m_itemCapture->DoFrameEvent(WM_SETCURSOR, 0, MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top)) != 0;
     }
     else if (m_pHoverItem)
     {
         CRect rcItem = m_pHoverItem->GetItemRect();
-        bRet = m_pHoverItem->DoFrameEvent(WM_SETCURSOR, 0,
-                                          MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top))
-            != 0;
+        bRet = m_pHoverItem->DoFrameEvent(WM_SETCURSOR, 0, MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top)) != 0;
     }
     if (!bRet)
     {

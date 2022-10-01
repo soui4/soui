@@ -58,18 +58,18 @@ class SMenuExRoot : public SWindow {
     HRESULT OnAttrIconPos(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"itemSkin", m_pItemSkin, FALSE)
-    ATTR_SKIN(L"checkSkin", m_pCheckSkin, FALSE)
-    ATTR_SKIN(L"sepSkin", m_pSepSkin, FALSE)
-    ATTR_SKIN(L"arrowSkin", m_pArrowSkin, FALSE)
-    ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHei, FALSE)
-    ATTR_CUSTOM(L"iconPos", OnAttrIconPos)
-    ATTR_SKIN(L"iconSkin", m_pIconSkin, FALSE)
-    ATTR_LAYOUTSIZE(L"iconBarWidth", m_nIconBarWidth, FALSE)
-    ATTR_LAYOUTSIZE(L"textOffset", m_nTextOffset, FALSE)
-    ATTR_LAYOUTSIZE(L"minWidth", m_nMinWidth, FALSE)
-    ATTR_LAYOUTSIZE(L"subMenuOffset", m_nSubMenuOffset, FALSE)
-    ATTR_DWORD(L"contextHelpId", m_dwContextHelpId, FALSE)
+        ATTR_SKIN(L"itemSkin", m_pItemSkin, FALSE)
+        ATTR_SKIN(L"checkSkin", m_pCheckSkin, FALSE)
+        ATTR_SKIN(L"sepSkin", m_pSepSkin, FALSE)
+        ATTR_SKIN(L"arrowSkin", m_pArrowSkin, FALSE)
+        ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHei, FALSE)
+        ATTR_CUSTOM(L"iconPos", OnAttrIconPos)
+        ATTR_SKIN(L"iconSkin", m_pIconSkin, FALSE)
+        ATTR_LAYOUTSIZE(L"iconBarWidth", m_nIconBarWidth, FALSE)
+        ATTR_LAYOUTSIZE(L"textOffset", m_nTextOffset, FALSE)
+        ATTR_LAYOUTSIZE(L"minWidth", m_nMinWidth, FALSE)
+        ATTR_LAYOUTSIZE(L"subMenuOffset", m_nSubMenuOffset, FALSE)
+        ATTR_DWORD(L"contextHelpId", m_dwContextHelpId, FALSE)
     SOUI_ATTRS_END()
 
   public:
@@ -110,18 +110,18 @@ class SMenuExRoot : public SWindow {
         return szRet;
     }
 
-    STDMETHOD_(BOOL,InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE
+    STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE
     {
         SXmlNode xmlNode(pNode);
         //找到根节点，获取在根节点上配置的全局菜单对象属性
         SXmlNode xmlRoot = xmlNode.root().first_child();
         if (xmlNode != xmlRoot)
         {
-			__baseCls::__baseCls::InitFromXml(&xmlRoot);//IObject::InitFromXml
-		}
-		BOOL bRet = __baseCls::InitFromXml(&xmlNode);
-		SetWindowText(_T("")); //防止子菜单显示父级菜单项的文本。
-		return TRUE;
+            __baseCls::__baseCls::InitFromXml(&xmlRoot); // IObject::InitFromXml
+        }
+        BOOL bRet = __baseCls::InitFromXml(&xmlNode);
+        SetWindowText(_T("")); //防止子菜单显示父级菜单项的文本。
+        return TRUE;
     }
 
     virtual BOOL CreateChildren(SXmlNode xmlNode)
@@ -288,8 +288,7 @@ BOOL SMenuExItem::OnEraseBkgnd(IRenderTarget *pRT)
     {
         nState = 2;
     }
-    else if (GetState() & WndState_Check || GetState() & WndState_PushDown
-             || GetState() & WndState_Hover)
+    else if (GetState() & WndState_Check || GetState() & WndState_PushDown || GetState() & WndState_Hover)
     {
         nState = 1;
     }
@@ -306,8 +305,7 @@ void SMenuExItem::GetTextRect(LPRECT pRect)
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
     SASSERT(pMenuRoot);
     int nScale = GetScale();
-    pRect->left += pMenuRoot->m_nIconBarWidth.toPixelSize(nScale)
-        + pMenuRoot->m_nTextOffset.toPixelSize(nScale);
+    pRect->left += pMenuRoot->m_nIconBarWidth.toPixelSize(nScale) + pMenuRoot->m_nTextOffset.toPixelSize(nScale);
     if (m_pSubMenu)
         pRect->right -= pMenuRoot->m_pArrowSkin->GetSkinSize().cx;
 }
@@ -321,8 +319,7 @@ SIZE SMenuExItem::GetDesiredSize(int wid, int hei)
     {
         if (!GetLayoutParam()->IsSpecifiedSize(Horz))
         {
-            szRet.cx += pMenuRoot->m_nIconBarWidth.toPixelSize(GetScale())
-                + pMenuRoot->m_nTextOffset.toPixelSize(GetScale());
+            szRet.cx += pMenuRoot->m_nIconBarWidth.toPixelSize(GetScale()) + pMenuRoot->m_nTextOffset.toPixelSize(GetScale());
             if (m_pSubMenu)
                 szRet.cx += pMenuRoot->m_pArrowSkin->GetSkinSize().cx; //加上子菜单箭头宽度
         }
@@ -346,13 +343,13 @@ BOOL SMenuExItem::CreateChildren(SXmlNode xmlNode)
     return TRUE;
 }
 
-SWindow * SMenuExItem::CreateChildByName(LPCWSTR pszName)
+SWindow *SMenuExItem::CreateChildByName(LPCWSTR pszName)
 {
-	if(pszName==NULL)
-		return NULL;
-	if(wcsicmp(pszName,SMenuExItem::GetClassName())==0)
-		return NULL;
-	return __baseCls::CreateChildByName(pszName);
+    if (pszName == NULL)
+        return NULL;
+    if (wcsicmp(pszName, SMenuExItem::GetClassName()) == 0)
+        return NULL;
+    return __baseCls::CreateChildByName(pszName);
 }
 
 void SMenuExItem::OnSubMenuHided(BOOL bUncheckItem)
@@ -440,8 +437,8 @@ class SMenuExSep : public SMenuExItem {
         (void)pRT;
     }
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
     SOUI_MSG_MAP_END()
 };
 
@@ -583,7 +580,7 @@ SMenuEx::SMenuEx(SMenuExItem *pParent)
 
 SMenuEx::~SMenuEx(void)
 {
-	DestroyMenu();
+    DestroyMenu();
 }
 
 BOOL SMenuEx::LoadMenu(LPCTSTR strMenu)
@@ -595,17 +592,15 @@ BOOL SMenuEx::LoadMenu(LPCTSTR strMenu)
     return LoadMenu2(&xmlMenu.root().first_child());
 }
 
-BOOL SMenuEx::LoadMenu2(IXmlNode * xmlMenu)
+BOOL SMenuEx::LoadMenu2(IXmlNode *xmlMenu)
 {
     if (IsWindow())
         return FALSE;
-	SXmlNode xmlNode(xmlMenu);
-    if (xmlNode.name() != SStringW(SMenuExRoot::GetClassName())
-        && xmlNode.name() != SStringW(SMenuExItem::GetClassName()))
+    SXmlNode xmlNode(xmlMenu);
+    if (xmlNode.name() != SStringW(SMenuExRoot::GetClassName()) && xmlNode.name() != SStringW(SMenuExItem::GetClassName()))
         return FALSE;
 
-    HWND hWnd = CreateEx(NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0,
-                         0, 0, 0);
+    HWND hWnd = CreateEx(NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0, 0, 0, 0);
     SXmlDoc souiXml;
     SXmlNode root = souiXml.root().append_child(L"SOUI");
     root.append_attribute(L"translucent").set_value(1);
@@ -654,8 +649,9 @@ SMenuEx *SMenuEx::GetSubMenu(int nID, BOOL byCmdId)
     return pItem->GetSubMenu();
 }
 
-IMenuEx * SMenuEx::GetSubMenu(THIS_ int nPos){
-	return GetSubMenu(nPos,FALSE);
+IMenuEx *SMenuEx::GetSubMenu(THIS_ int nPos)
+{
+    return GetSubMenu(nPos, FALSE);
 }
 
 UINT SMenuEx::TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale)
@@ -797,8 +793,7 @@ void SMenuEx::ShowMenu(UINT uFlag, int x, int y)
         rcMenu.MoveToX(x + subMenuOffset);
     }
 
-    SetWindowPos(HWND_TOPMOST, rcMenu.left, rcMenu.top, szMenu.cx, szMenu.cy,
-                 SWP_SHOWWINDOW | SWP_NOACTIVATE);
+    SetWindowPos(HWND_TOPMOST, rcMenu.left, rcMenu.top, szMenu.cx, szMenu.cy, SWP_SHOWWINDOW | SWP_NOACTIVATE);
     s_MenuData->PushMenuEx(this);
 }
 
@@ -866,8 +861,7 @@ void SMenuEx::RunMenu(HWND hRoot)
             }
         }
 
-        if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP || msg.message == WM_SYSKEYDOWN
-            || msg.message == WM_SYSKEYUP)
+        if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP || msg.message == WM_SYSKEYDOWN || msg.message == WM_SYSKEYUP)
         { //拦截alt键
             if (msg.wParam == VK_MENU)
             { // handle alt key down, exit menu loop
@@ -875,9 +869,7 @@ void SMenuEx::RunMenu(HWND hRoot)
                 break;
             }
         }
-        else if (msg.message == WM_LBUTTONDOWN || msg.message == WM_RBUTTONDOWN
-                 || msg.message == WM_NCLBUTTONDOWN || msg.message == WM_NCRBUTTONDOWN
-                 || msg.message == WM_LBUTTONDBLCLK)
+        else if (msg.message == WM_LBUTTONDOWN || msg.message == WM_RBUTTONDOWN || msg.message == WM_NCLBUTTONDOWN || msg.message == WM_NCRBUTTONDOWN || msg.message == WM_LBUTTONDBLCLK)
         {
             // click on other window
             if (!s_MenuData->IsMenuWnd(msg.hwnd))
@@ -918,8 +910,8 @@ void SMenuEx::RunMenu(HWND hRoot)
             }
         }
 
-		//support tooltip.
-		GetMsgLoop()->OnMsg(&msg);
+        // support tooltip.
+        GetMsgLoop()->OnMsg(&msg);
 
         if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP || msg.message == WM_CHAR)
         { //将键盘事件强制发送到最后一级菜单窗口，让菜单处理快速键
@@ -1036,8 +1028,7 @@ void SMenuEx::PopupSubMenu(SMenuExItem *pItem, BOOL bCheckFirstItem)
     pSubMenu->ShowMenu(0, rcItem.right, rcItem.top);
     if (bCheckFirstItem)
     {
-        SMenuExRoot *pMenuRoot
-            = sobj_cast<SMenuExRoot>(pSubMenu->GetRoot()->GetWindow(GSW_FIRSTCHILD));
+        SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(pSubMenu->GetRoot()->GetWindow(GSW_FIRSTCHILD));
         SASSERT(pMenuRoot);
         SMenuExItem *pFirstItem = pMenuRoot->GetNextMenuItem(NULL, TRUE);
         if (pFirstItem)
@@ -1164,7 +1155,7 @@ SWindow *SMenuEx::FindItem(UINT uPos, UINT uFlag)
     return pItemRef;
 }
 
-BOOL SMenuEx::InsertMenu(UINT uPos, UINT uFlag, int nId, LPCTSTR lpNewItem,int iIcon)
+BOOL SMenuEx::InsertMenu(UINT uPos, UINT uFlag, int nId, LPCTSTR lpNewItem, int iIcon)
 {
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
     SASSERT(pMenuRoot);
@@ -1173,8 +1164,7 @@ BOOL SMenuEx::InsertMenu(UINT uPos, UINT uFlag, int nId, LPCTSTR lpNewItem,int i
     if (uFlag & MF_BYCOMMAND && !pItemRef)
         return FALSE;
 
-    SMenuExItem *pMenuItem = (SMenuExItem *)pMenuRoot->CreateMenuItem(
-        (uFlag & MF_SEPARATOR) ? SMenuExSep::GetClassName() : SMenuExItem::GetClassName());
+    SMenuExItem *pMenuItem = (SMenuExItem *)pMenuRoot->CreateMenuItem((uFlag & MF_SEPARATOR) ? SMenuExSep::GetClassName() : SMenuExItem::GetClassName());
 
     if (pItemRef)
     {
@@ -1202,7 +1192,7 @@ BOOL SMenuEx::InsertMenu(UINT uPos, UINT uFlag, int nId, LPCTSTR lpNewItem,int i
         }
 
         pMenuItem->SetAttribute(L"ID", SStringW().Format(L"%d", nId));
-		pMenuItem->SetAttribute(L"icon",SStringW().Format(L"%d",iIcon));
+        pMenuItem->SetAttribute(L"icon", SStringW().Format(L"%d", iIcon));
         if (uFlag & MF_CHECKED)
         {
             pMenuItem->SetAttribute(L"check", L"1");
@@ -1214,7 +1204,7 @@ BOOL SMenuEx::InsertMenu(UINT uPos, UINT uFlag, int nId, LPCTSTR lpNewItem,int i
 
 BOOL SMenuEx::AppendMenu(THIS_ UINT uFlags, int uIDNewItem, LPCTSTR lpNewItem, int iIcon)
 {
-	return InsertMenu(-1,uFlags,uIDNewItem,lpNewItem,iIcon);
+    return InsertMenu(-1, uFlags, uIDNewItem, lpNewItem, iIcon);
 }
 
 BOOL SMenuEx::IniNullMenu(SMenuExRoot *ParentRoot)
@@ -1267,7 +1257,6 @@ BOOL SMenuEx::CheckMenuItem(UINT uPos, UINT uFlag)
     }
     return TRUE;
 }
-
 
 BOOL SMenuEx::CheckMenuRadioItem(UINT idFirst, UINT idLast, UINT idCheck, UINT uFlags)
 {
@@ -1360,34 +1349,34 @@ void SMenuEx::SetContextHelpId(DWORD dwId)
 
 void SMenuEx::DestroyMenu()
 {
-	if (IsWindow())
-		DestroyWindow();
+    if (IsWindow())
+        DestroyWindow();
 }
 
 BOOL SMenuEx::ModifyMenuString(THIS_ UINT uPosition, UINT uFlags, LPCTSTR lpItemString)
 {
-	SWindow *pItemRef = FindItem(uPosition, uFlags);
-	if(!pItemRef)
-		return FALSE;
-	pItemRef->SetWindowText(lpItemString);
-	return TRUE;
+    SWindow *pItemRef = FindItem(uPosition, uFlags);
+    if (!pItemRef)
+        return FALSE;
+    pItemRef->SetWindowText(lpItemString);
+    return TRUE;
 }
 
 BOOL SMenuEx::SetMenuUserData(THIS_ UINT uPosition, UINT uFlags, ULONG_PTR ulUserData)
 {
-	SWindow *pItemRef = FindItem(uPosition, uFlags);
-	if(!pItemRef)
-		return FALSE;
-	pItemRef->SetUserData(ulUserData);
-	return TRUE;
+    SWindow *pItemRef = FindItem(uPosition, uFlags);
+    if (!pItemRef)
+        return FALSE;
+    pItemRef->SetUserData(ulUserData);
+    return TRUE;
 }
 
 ULONG_PTR SMenuEx::GetMenuUserData(THIS_ UINT uPosition, UINT uFlags)
 {
-	SWindow *pItemRef = FindItem(uPosition, uFlags);
-	if(!pItemRef)
-		return 0;
-	return pItemRef->GetUserData();
+    SWindow *pItemRef = FindItem(uPosition, uFlags);
+    if (!pItemRef)
+        return 0;
+    return pItemRef->GetUserData();
 }
 
 SNSEND

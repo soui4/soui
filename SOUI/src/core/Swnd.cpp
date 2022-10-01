@@ -111,10 +111,10 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSetFocus));
     m_evtSet.addEvent(EVENTID(EventKillFocus));
 
-	m_evtSet.addEvent(EVENTID(EventSwndAnimationStart));
-	m_evtSet.addEvent(EVENTID(EventSwndAnimationStop));
-	m_evtSet.addEvent(EVENTID(EventSwndAnimationRepeat));
-	
+    m_evtSet.addEvent(EVENTID(EventSwndAnimationStart));
+    m_evtSet.addEvent(EVENTID(EventSwndAnimationStop));
+    m_evtSet.addEvent(EVENTID(EventSwndAnimationRepeat));
+
     IAttrStorageFactory *pAttrFac = SApplication::getSingleton().GetAttrStorageFactory();
     if (pAttrFac)
     {
@@ -262,17 +262,13 @@ void SWindow::TestMainThread()
         // 这是一件很危险的事情
         DWORD dwCurThreadID = GetCurrentThreadId();
         DWORD dwProcID = GetCurrentProcessId();
-        SASSERT_FMT(m_nMainThreadId == dwCurThreadID, _T("ProcessID:%d,请准备好红包再到群里提问"),
-                    dwProcID);
+        SASSERT_FMT(m_nMainThreadId == dwCurThreadID, _T("ProcessID:%d,请准备好红包再到群里提问"), dwProcID);
     }
 #endif
 }
 
 // Send a message to SWindow
-LRESULT SWindow::SSendMessage(UINT Msg,
-                              WPARAM wParam /*= 0*/,
-                              LPARAM lParam /*= 0*/,
-                              BOOL *pbMsgHandled /*=NULL*/)
+LRESULT SWindow::SSendMessage(UINT Msg, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/, BOOL *pbMsgHandled /*=NULL*/)
 {
     LRESULT lResult = 0;
 
@@ -777,8 +773,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                 else
                 {
                     // merger include attribute to xml node.
-                    for (SXmlAttr attr = xmlChild.first_attribute(); attr;
-                         attr = attr.next_attribute())
+                    for (SXmlAttr attr = xmlChild.first_attribute(); attr; attr = attr.next_attribute())
                     {
                         if (wcsicmp(attr.name(), L"src") == 0)
                             continue;
@@ -792,8 +787,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                         }
                     }
                     // create child.
-                    SWindow *pChild
-                        = SApplication::getSingleton().CreateWindowByName(xmlInclude.name());
+                    SWindow *pChild = SApplication::getSingleton().CreateWindowByName(xmlInclude.name());
                     if (pChild)
                     {
                         InsertChild(pChild);
@@ -802,7 +796,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
 
                     if (xmlInclude.next_sibling())
                     {
-                        SSLOGD()<<_T("warning! multi root include layout is not supported!");
+                        SSLOGD() << _T("warning! multi root include layout is not supported!");
                     }
                 }
             }
@@ -822,24 +816,20 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                 if (!strXml.IsEmpty())
                 { // create children by template.
                     SXmlNode xmlData = xmlChild.child(KTempData);
-                    for (SXmlAttr param = xmlData.first_attribute(); param;
-                         param = param.next_attribute())
+                    for (SXmlAttr param = xmlData.first_attribute(); param; param = param.next_attribute())
                     {
                         SStringW strParam = SStringW().Format(KTempParamFmt, param.name());
                         SStringW strValue = param.value();
-                        strValue.Replace(L"\"", L"&#34;"); //防止数据中包含“双引号”，导致破坏XML结构
+                        strValue.Replace(L"\"", L"&#34;");  //防止数据中包含“双引号”，导致破坏XML结构
                         strXml.Replace(strParam, strValue); // replace params to value.
                     }
                     SXmlDoc xmlDoc;
-                    if (xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()),
-                                                   strXml.GetLength() * sizeof(WCHAR), 116,
-                                                   enc_utf16))
+                    if (xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()), strXml.GetLength() * sizeof(WCHAR), 116, enc_utf16))
                     {
                         SXmlNode xmlTemp = xmlDoc.root().first_child();
                         SASSERT(xmlTemp);
                         // merger properties.
-                        for (SXmlAttr attr = xmlChild.first_attribute(); attr;
-                             attr = attr.next_attribute())
+                        for (SXmlAttr attr = xmlChild.first_attribute(); attr; attr = attr.next_attribute())
                         {
                             if (!xmlTemp.attribute(attr.name()))
                             {
@@ -851,8 +841,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                             }
                         }
                         // create child.
-                        SWindow *pChild
-                            = SApplication::getSingleton().CreateWindowByName(xmlTemp.name());
+                        SWindow *pChild = SApplication::getSingleton().CreateWindowByName(xmlTemp.name());
                         if (pChild)
                         {
                             InsertChild(pChild);
@@ -876,10 +865,9 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
     return TRUE;
 }
 
-
-SWindow * SWindow::CreateChildByName(LPCWSTR pszName)
+SWindow *SWindow::CreateChildByName(LPCWSTR pszName)
 {
-	return SApplication::getSingleton().CreateWindowByName(pszName);
+    return SApplication::getSingleton().CreateWindowByName(pszName);
 }
 
 SStringW SWindow::tr(const SStringW &strSrc) const
@@ -1247,12 +1235,12 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
         bRgnInClient = rcRgnUnionClient == rcClient;
     }
 
-    IRenderTarget* pRTBackup=NULL; // backup current RT
+    IRenderTarget *pRTBackup = NULL; // backup current RT
 
     if (IsLayeredWindow())
     { //获得当前LayeredWindow RT来绘制内容
         pRTBackup = pRT;
-		pRT=NULL;
+        pRT = NULL;
         GETRENDERFACTORY->CreateRenderTarget(&pRT, rcWnd.Width(), rcWnd.Height());
         pRT->OffsetViewportOrg(-rcWnd.left, -rcWnd.top, NULL);
         //绘制到窗口的缓存上,需要继承原RT的绘图属性
@@ -1284,8 +1272,7 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     {
         pRT->PushClipRect(rcClient, RGN_AND);
     }
-    if (m_uZorder >= iZorderBegin && m_uZorder < iZorderEnd
-        && (!pRgn || pRgn->IsEmpty() || _WndRectInRgn(rcClient, pRgn)))
+    if (m_uZorder >= iZorderBegin && m_uZorder < iZorderEnd && (!pRgn || pRgn->IsEmpty() || _WndRectInRgn(rcClient, pRgn)))
     { // paint client
         _PaintClient(pRT);
         if (IsFocused())
@@ -1308,8 +1295,7 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     AfterPaint(pRT, painter);
     pRT->RestoreClip(nSave2);
 
-    if (m_uZorder >= iZorderBegin && m_uZorder < iZorderEnd && !bRgnInClient
-        && (!pRgn || pRgn->IsEmpty() || _WndRectInRgn(rcWnd, pRgn)))
+    if (m_uZorder >= iZorderBegin && m_uZorder < iZorderEnd && !bRgnInClient && (!pRgn || pRgn->IsEmpty() || _WndRectInRgn(rcWnd, pRgn)))
     { // paint nonclient
         _PaintNonClient(pRT);
     }
@@ -1320,7 +1306,7 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     { //将绘制到窗口的缓存上的图像返回到上一级RT
         SASSERT(pRTBackup);
         OnCommitSurface(pRTBackup, &rcWnd, pRT, &rcWnd, GetAlpha());
-		pRT->Release();
+        pRT->Release();
         pRT = pRTBackup;
     }
     if (bMtx)
@@ -1483,8 +1469,7 @@ BOOL SWindow::AdjustZOrder(SWindow *pInsertAfter)
         return TRUE;
     if (m_isDestroying)
         return TRUE;
-    if (pInsertAfter != ICWND_FIRST && pInsertAfter != ICWND_LAST
-        && pInsertAfter->GetParent() != pParent)
+    if (pInsertAfter != ICWND_FIRST && pInsertAfter != ICWND_LAST && pInsertAfter->GetParent() != pParent)
     {
         return FALSE;
     }
@@ -1825,11 +1810,9 @@ SIZE SWindow::GetDesiredSize(int nParentWid, int nParentHei)
         rcTest.InflateRect(rcMargin);
         rcTest.InflateRect(rcPadding);
 
-        if (pLayoutParam->IsWrapContent(Horz)
-            || (pLayoutParam->IsMatchParent(Horz) && nParentWid < SIZE_WRAP_CONTENT))
+        if (pLayoutParam->IsWrapContent(Horz) || (pLayoutParam->IsMatchParent(Horz) && nParentWid < SIZE_WRAP_CONTENT))
             szRet.cx = rcTest.Width();
-        if (pLayoutParam->IsWrapContent(Vert)
-            || (pLayoutParam->IsMatchParent(Vert) && nParentHei < SIZE_WRAP_CONTENT))
+        if (pLayoutParam->IsWrapContent(Vert) || (pLayoutParam->IsMatchParent(Vert) && nParentHei < SIZE_WRAP_CONTENT))
             szRet.cy = rcTest.Height();
     }
 
@@ -1853,8 +1836,7 @@ SIZE SWindow::MeasureContent(int nParentWid, int nParentHei)
     {
         int nTestDrawMode = GetTextAlign() & ~(DT_CENTER | DT_RIGHT | DT_VCENTER | DT_BOTTOM);
         rcTest4Text = CRect(0, 0, nParentWid, nParentHei);
-        int nMaxWid
-            = pLayoutParam->IsWrapContent(Horz) ? m_nMaxWidth.toPixelSize(GetScale()) : nParentWid;
+        int nMaxWid = pLayoutParam->IsWrapContent(Horz) ? m_nMaxWidth.toPixelSize(GetScale()) : nParentWid;
         if (nMaxWid == SIZE_WRAP_CONTENT)
         {
             nMaxWid = KWnd_MaxSize;
@@ -2069,8 +2051,7 @@ BOOL SWindow::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
     BOOL bRet = FALSE;
     if (m_pParent)
-        bRet = (BOOL)m_pParent->SSendMessage(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta),
-                                             MAKELPARAM(pt.x, pt.y));
+        bRet = (BOOL)m_pParent->SSendMessage(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta), MAKELPARAM(pt.x, pt.y));
     return bRet;
 }
 
@@ -2132,8 +2113,7 @@ void SWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
 
     if (m_layoutDirty != dirty_self)
     { //需要检测当前窗口是不是内容自适应
-        m_layoutDirty = (hSource == m_swnd || GetLayoutParam()->IsWrapContent(Any)) ? dirty_self
-                                                                                    : dirty_child;
+        m_layoutDirty = (hSource == m_swnd || GetLayoutParam()->IsWrapContent(Any)) ? dirty_self : dirty_child;
     }
 
     SWindow *pParent = GetParent();
@@ -2212,9 +2192,7 @@ SWindow *SWindow::_GetCurrentLayeredWindow()
     return pWnd;
 }
 
-IRenderTarget *SWindow::GetRenderTarget(LPCRECT pRc,
-                                        GrtFlag gdcFlags /*=GRT_NODRAW*/,
-                                        BOOL bClientRT /*=TRUE*/)
+IRenderTarget *SWindow::GetRenderTarget(LPCRECT pRc, GrtFlag gdcFlags /*=GRT_NODRAW*/, BOOL bClientRT /*=TRUE*/)
 {
     CRect rcRT;
     if (bClientRT)
@@ -2416,7 +2394,7 @@ void SWindow::SetAnimation(IAnimation *animation)
     m_animation = animation;
     if (m_animation)
     {
-		m_animation->setAnimationListener(this);
+        m_animation->setAnimationListener(this);
         if (m_animation->getStartTime() == START_ON_FIRST_FRAME)
         {
             m_animation->startNow();
@@ -2463,7 +2441,7 @@ void SWindow::ClearAnimation()
             m_animation->cancel();
             OnAnimationStop(m_animation);
         }
-		m_animation->setAnimationListener(NULL);
+        m_animation->setAnimationListener(NULL);
         m_animation = NULL;
     }
 }
@@ -2495,8 +2473,7 @@ void SWindow::SetAlpha(BYTE byAlpha)
 
 BYTE SWindow::GetAlpha() const
 {
-    return (BYTE)((int)m_transform.GetAlpha() * m_animationHandler.GetTransformation().GetAlpha()
-                  / 255);
+    return (BYTE)((int)m_transform.GetAlpha() * m_animationHandler.GetTransformation().GetAlpha() / 255);
 }
 
 void SWindow::SetMatrix(const IMatrix *mtx)
@@ -2731,8 +2708,7 @@ void SWindow::OnSize(UINT nType, CSize size)
     {
         if (!m_cachedRT)
         {
-            GETRENDERFACTORY->CreateRenderTarget(&m_cachedRT, GetWindowRect().Width(),
-                                                 GetWindowRect().Height());
+            GETRENDERFACTORY->CreateRenderTarget(&m_cachedRT, GetWindowRect().Width(), GetWindowRect().Height());
         }
         else
         {
@@ -2752,8 +2728,7 @@ void SWindow::UpdateCacheMode()
 {
     if (IsDrawToCache() && !m_cachedRT)
     {
-        GETRENDERFACTORY->CreateRenderTarget(&m_cachedRT, GetWindowRect().Width(),
-                                             GetWindowRect().Height());
+        GETRENDERFACTORY->CreateRenderTarget(&m_cachedRT, GetWindowRect().Width(), GetWindowRect().Height());
         MarkCacheDirty(true);
     }
     if (!IsDrawToCache() && m_cachedRT)
@@ -2787,9 +2762,7 @@ HRESULT SWindow::OnAttrID(const SStringW &strValue, BOOL bLoading)
     {
         int id;
         LPCWSTR pszName;
-    } systemID[] = { IDOK,   L"IDOK",   IDCANCEL, L"IDCANCEL", IDCLOSE,  L"IDCLOSE",
-                     IDHELP, L"IDHELP", IDABORT,  L"IDABORT",  IDYES,    L"IDYES",
-                     IDNO,   L"IDNO",   IDRETRY,  L"IDRETRY",  IDIGNORE, L"IDIGNORE" };
+    } systemID[] = { IDOK, L"IDOK", IDCANCEL, L"IDCANCEL", IDCLOSE, L"IDCLOSE", IDHELP, L"IDHELP", IDABORT, L"IDABORT", IDYES, L"IDYES", IDNO, L"IDNO", IDRETRY, L"IDRETRY", IDIGNORE, L"IDIGNORE" };
     if (!strValue.IsEmpty())
     {
         if (strValue.Left(2).CompareNoCase(L"ID") == 0)
@@ -2949,9 +2922,7 @@ IScriptModule *SWindow::GetScriptModule()
     return GetContainer()->GetScriptModule();
 }
 
-HRESULT SWindow::DefAttributeProc(const SStringW &strAttribName,
-                                  const SStringW &strValue,
-                                  BOOL bLoading)
+HRESULT SWindow::DefAttributeProc(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading)
 {
     HRESULT hr = E_FAIL;
     if (GetScriptModule())
@@ -3095,8 +3066,7 @@ LRESULT SWindow::OnUpdateFont(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 HRESULT SWindow::OnAttrLayout(const SStringW &strValue, BOOL bLoading)
 {
-    ILayout *pLayout
-        = (ILayout *)SApplication::getSingleton().CreateObject(SObjectInfo(strValue, Layout));
+    ILayout *pLayout = (ILayout *)SApplication::getSingleton().CreateObject(SObjectInfo(strValue, Layout));
     if (pLayout == NULL)
         return E_INVALIDARG;
 
@@ -3105,10 +3075,7 @@ HRESULT SWindow::OnAttrLayout(const SStringW &strValue, BOOL bLoading)
     return S_OK;
 }
 
-HRESULT SWindow::AfterAttribute(const SStringW &strAttribName,
-                                const SStringW &strValue,
-                                BOOL bLoading,
-                                HRESULT hr)
+HRESULT SWindow::AfterAttribute(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading, HRESULT hr)
 {
     if (m_attrStorage)
     {
@@ -3255,9 +3222,9 @@ BOOL SWindow::SetLayoutParam(ILayoutParam *pLayoutParam)
 
 void SWindow::OnAnimationStart(THIS_ IAnimation *pAni)
 {
-	EventSwndAnimationStart evt(this);
-	evt.pAni = pAni;
-	FireEvent(&evt);
+    EventSwndAnimationStart evt(this);
+    evt.pAni = pAni;
+    FireEvent(&evt);
 
     m_isAnimating = true;
     m_animationHandler.OnAnimationStart();
@@ -3269,19 +3236,18 @@ void SWindow::OnAnimationStop(THIS_ IAnimation *pAni)
     if (GetContainer())
         GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
     m_animationHandler.OnAnimationStop();
-	m_isAnimating = false;
+    m_isAnimating = false;
     UpdateCacheMode();
-	EventSwndAnimationStop evt(this);
-	evt.pAni = pAni;
-	FireEvent(&evt);
+    EventSwndAnimationStop evt(this);
+    evt.pAni = pAni;
+    FireEvent(&evt);
 }
 
-
-void SWindow::OnAnimationRepeat(THIS_ IAnimation * pAni)
+void SWindow::OnAnimationRepeat(THIS_ IAnimation *pAni)
 {
-	EventSwndAnimationRepeat evt(this);
-	evt.pAni = pAni;
-	FireEvent(&evt);
+    EventSwndAnimationRepeat evt(this);
+    evt.pAni = pAni;
+    FireEvent(&evt);
 }
 
 void SWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
@@ -3469,11 +3435,7 @@ HRESULT SWindow::QueryInterface(THIS_ REFGUID id, IObjRef **ppRet)
     return E_NOINTERFACE;
 }
 
-void SWindow::OnCommitSurface(IRenderTarget *pRtDest,
-                              LPCRECT pRcDest,
-                              IRenderTarget *pRtSrc,
-                              LPCRECT pRcSrc,
-                              BYTE alpha)
+void SWindow::OnCommitSurface(IRenderTarget *pRtDest, LPCRECT pRcDest, IRenderTarget *pRtSrc, LPCRECT pRcSrc, BYTE alpha)
 {
     pRtDest->AlphaBlend(pRcDest, pRtSrc, pRcSrc, alpha);
 }
@@ -3506,24 +3468,20 @@ void SWindow::SAnimationHandler::OnAnimationStart()
     {
         m_pPrevSiblingBackup = ICWND_NONE;
     }
-    m_pOwner->GetEventSet()->subscribeEvent(
-        EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
+    m_pOwner->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
     if (m_pOwner->GetParent())
     {
-        m_pOwner->GetParent()->GetEventSet()->subscribeEvent(
-            EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
+        m_pOwner->GetParent()->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
     }
     OnOwnerResize(NULL);
 }
 
 void SWindow::SAnimationHandler::OnAnimationStop()
 {
-    m_pOwner->GetEventSet()->unsubscribeEvent(
-        EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
+    m_pOwner->GetEventSet()->unsubscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
     if (m_pOwner->GetParent())
     {
-        m_pOwner->GetParent()->GetEventSet()->unsubscribeEvent(
-            EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
+        m_pOwner->GetParent()->GetEventSet()->unsubscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
     }
     if (m_pPrevSiblingBackup != ICWND_NONE)
     {
@@ -3541,7 +3499,7 @@ void SWindow::SAnimationHandler::OnNextFrame()
 {
     IAnimation *pAni = m_pOwner->GetAnimation();
     SASSERT(pAni);
-	pAni->AddRef();
+    pAni->AddRef();
     m_pOwner->AddRef();
     uint64_t tm = pAni->getStartTime();
     if (tm > 0)
@@ -3562,7 +3520,7 @@ void SWindow::SAnimationHandler::OnNextFrame()
         }
     }
     m_pOwner->Release();
-	pAni->Release();
+    pAni->Release();
 }
 
 BOOL SWindow::SAnimationHandler::OnOwnerResize(IEvtArgs *e)

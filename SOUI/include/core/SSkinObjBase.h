@@ -50,26 +50,20 @@ class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"alpha", m_byAlpha, TRUE) //皮肤透明度
-    ATTR_BOOL(L"enableColorize", m_bEnableColorize, TRUE)
-    ATTR_BOOL(L"checkAsPushdown", m_checkAsPushdown, TRUE)
-    ATTR_INT(L"scale", m_nScale, FALSE)
-    ATTR_BOOL(L"enableScale", m_bEnableScale, TRUE)
-    ATTR_STRINGW(L"name", m_strName, FALSE)
+        ATTR_INT(L"alpha", m_byAlpha, TRUE) //皮肤透明度
+        ATTR_BOOL(L"enableColorize", m_bEnableColorize, TRUE)
+        ATTR_BOOL(L"checkAsPushdown", m_checkAsPushdown, TRUE)
+        ATTR_INT(L"scale", m_nScale, FALSE)
+        ATTR_BOOL(L"enableScale", m_bEnableScale, TRUE)
+        ATTR_STRINGW(L"name", m_strName, FALSE)
     SOUI_ATTRS_END()
 
   protected:
     STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
 
     virtual void _Scale(ISkinObj *pObj, int nScale);
-    virtual void _DrawByState(IRenderTarget *pRT,
-                              LPCRECT rcDraw,
-                              DWORD dwState,
-                              BYTE byAlpha) const;
-    virtual void _DrawByIndex(IRenderTarget *pRT,
-                              LPCRECT rcDraw,
-                              int iState,
-                              BYTE byAlpha) const = 0;
+    virtual void _DrawByState(IRenderTarget *pRT, LPCRECT rcDraw, DWORD dwState, BYTE byAlpha) const;
+    virtual void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const = 0;
 
     BYTE m_byAlpha;
     COLORREF m_crColorize;

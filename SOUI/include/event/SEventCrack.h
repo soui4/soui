@@ -37,14 +37,14 @@
     return nCount > 0;                           \
     }
 
-#define EVENT_MAP_END2(baseCls)                          \
-	if (pEvt->IsBubbleUp())                      \
-	{                                            \
-	BOOL bRet = baseCls::_HandleEvent(pEvt); \
-	nCount += bRet ? 1 : 0;                  \
-	}                                            \
-	return nCount > 0;                           \
-	}
+#define EVENT_MAP_END2(baseCls)                  \
+    if (pEvt->IsBubbleUp())                      \
+    {                                            \
+        BOOL bRet = baseCls::_HandleEvent(pEvt); \
+        nCount += bRet ? 1 : 0;                  \
+    }                                            \
+    return nCount > 0;                           \
+    }
 
 #define EVENT_MAP_BREAK() \
     return nCount > 0;    \
@@ -178,14 +178,13 @@
     }
 
 // BOOL OnContextMenu(CPoint pt)
-#define EVENT_NAME_CONTEXTMENU(name, func)                            \
-    if (SOUI::EVT_CTXMENU == uCode && pEvt->NameFrom() != NULL        \
-        && wcscmp(pEvt->NameFrom(), name) == 0)                       \
-    {                                                                 \
-        nCount++;                                                     \
-        pEvt->SetBubbleUp(false);                                     \
-        SOUI::EventCtxMenu *pEvtCtxMenu = (SOUI::EventCtxMenu *)pEvt; \
-        pEvtCtxMenu->bCancel = func(pEvtCtxMenu->pt);                 \
-        if (!pEvt->IsBubbleUp())                                      \
-            return TRUE;                                              \
+#define EVENT_NAME_CONTEXTMENU(name, func)                                                             \
+    if (SOUI::EVT_CTXMENU == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
+    {                                                                                                  \
+        nCount++;                                                                                      \
+        pEvt->SetBubbleUp(false);                                                                      \
+        SOUI::EventCtxMenu *pEvtCtxMenu = (SOUI::EventCtxMenu *)pEvt;                                  \
+        pEvtCtxMenu->bCancel = func(pEvtCtxMenu->pt);                                                  \
+        if (!pEvt->IsBubbleUp())                                                                       \
+            return TRUE;                                                                               \
     }

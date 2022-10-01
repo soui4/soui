@@ -53,9 +53,7 @@ SWindow *SDropDownWnd::GetDropDownOwner()
 BOOL SDropDownWnd::Create(LPCRECT lpRect, LPVOID lParam, DWORD dwStyle, DWORD dwExStyle)
 {
     HWND hParent = m_pOwner->GetDropDownOwner()->GetContainer()->GetHostHwnd();
-    HWND hWnd = SNativeWnd::CreateNative(NULL, dwStyle, dwExStyle, lpRect->left, lpRect->top,
-                                         lpRect->right - lpRect->left, lpRect->bottom - lpRect->top,
-                                         hParent, 0, NULL);
+    HWND hWnd = SNativeWnd::CreateNative(NULL, dwStyle, dwExStyle, lpRect->left, lpRect->top, lpRect->right - lpRect->left, lpRect->bottom - lpRect->top, hParent, 0, NULL);
     if (!hWnd)
         return FALSE;
     m_pOwner->OnCreateDropDown(this);
@@ -85,8 +83,7 @@ void SDropDownWnd::OnLButtonUp(UINT nFlags, CPoint point)
         HWND hWnd = m_hWnd;
         CRect rcWnd;
         SNativeWnd::GetClientRect(&rcWnd);
-        SHostWnd::ProcessWindowMessage(m_hWnd, WM_LBUTTONUP, nFlags, MAKELPARAM(point.x, point.y),
-                                       lRes);
+        SHostWnd::ProcessWindowMessage(m_hWnd, WM_LBUTTONUP, nFlags, MAKELPARAM(point.x, point.y), lRes);
         if (::IsWindow(hWnd) && !rcWnd.PtInRect(point))
             EndDropDown(); //强制关闭弹出窗口
     }

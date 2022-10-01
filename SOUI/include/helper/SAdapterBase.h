@@ -337,9 +337,7 @@ class TvAdatperImpl : public BaseClass {
      * or available. Once invoked this adapter is no longer valid and should
      * not report further data set changes.
      */
-    void notifyBranchInvalidated(HSTREEITEM hBranch,
-                                 bool bInvalidParents = true,
-                                 bool bInvalidChildren = true)
+    void notifyBranchInvalidated(HSTREEITEM hBranch, bool bInvalidParents = true, bool bInvalidChildren = true)
     {
         m_obzMgr.notifyInvalidated(hBranch, bInvalidParents, bInvalidChildren);
     }
@@ -597,9 +595,7 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
     }
 
   public:
-    HSTREEITEM InsertItem(const T &data,
-                          HSTREEITEM hParent = STVI_ROOT,
-                          HSTREEITEM hInsertAfter = STVI_LAST)
+    HSTREEITEM InsertItem(const T &data, HSTREEITEM hParent = STVI_ROOT, HSTREEITEM hInsertAfter = STVI_LAST)
     {
         ItemInfo ii = { 0 };
         ii.data = data;

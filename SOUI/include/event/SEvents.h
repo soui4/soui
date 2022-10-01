@@ -42,9 +42,9 @@ typedef enum _SOUI_EVENTS
     EVT_LBUTTONDOWN,
     EVT_LBUTTONUP,
     EVT_UPDATE_TOOLTIP,
-	EVT_ANIMATION_START,
-	EVT_ANIMATION_STOP,
-	EVT_ANIMATION_REPEAT,
+    EVT_ANIMATION_START,
+    EVT_ANIMATION_STOP,
+    EVT_ANIMATION_REPEAT,
 
     EVT_KEYDOWN = 8200,
 
@@ -300,16 +300,10 @@ inline BOOL EventSwndStateChanged_CheckState(EventSwndStateChanged *pEvt, DWORD 
 
 DEF_EVT(EventSwndVisibleChanged, EVT_VISIBLECHANGED, on_visible_changed, { int fake; })
 
-DEF_EVT(EventSwndAnimationStart, EVT_ANIMATION_START, on_animation_start, { 
-	IAnimation *pAni; 
-})
+DEF_EVT(EventSwndAnimationStart, EVT_ANIMATION_START, on_animation_start, { IAnimation *pAni; })
 
-DEF_EVT(EventSwndAnimationStop, EVT_ANIMATION_STOP, on_animation_stop, { 
-	IAnimation *pAni; 
-})
-DEF_EVT(EventSwndAnimationRepeat, EVT_ANIMATION_REPEAT, on_animation_repeat, { 
-	IAnimation *pAni; 
-})
+DEF_EVT(EventSwndAnimationStop, EVT_ANIMATION_STOP, on_animation_stop, { IAnimation *pAni; })
+DEF_EVT(EventSwndAnimationRepeat, EVT_ANIMATION_REPEAT, on_animation_repeat, { IAnimation *pAni; })
 
 DEF_EVT(EventKeyDown, EVT_KEYDOWN, on_key_down, {
     UINT nChar;
@@ -326,9 +320,7 @@ DEF_EVT(EventSwndUpdateTooltip, EVT_UPDATE_TOOLTIP, on_update_tooltip, {
     BOOL bUpdated;
 });
 
-DEF_EVT(EventRadioGroupCheckChanged, EVT_RADIOGROUP_CHECK_CHANGED, on_radiogroup_check_changed, {
-    IWindow *pChecked;
-});
+DEF_EVT(EventRadioGroupCheckChanged, EVT_RADIOGROUP_CHECK_CHANGED, on_radiogroup_check_changed, { IWindow *pChecked; });
 
 DEF_EVT(EventItemPanelRclick, EVT_ITEMPANEL_RCLICK, on_itemparem_rclick, {
     WPARAM wParam;
@@ -482,9 +474,7 @@ DEF_EVT(EventCBSelChange, EVT_CB_SELCHANGE, on_combobox_sel_change, { int nCurSe
 
 DEF_EVT(EventCBDropdown, EVT_CB_DROPDOWN, on_combobox_dropdown, { void *pDropDown; });
 
-DEF_EVT(EventCBBeforeCloseUp, EVT_CB_BEFORE_CLOSEUP, on_combobox_before_closeup, {
-    BOOL bCloseBlock;
-});
+DEF_EVT(EventCBBeforeCloseUp, EVT_CB_BEFORE_CLOSEUP, on_combobox_before_closeup, { BOOL bCloseBlock; });
 
 DEF_EVT(EventLCSelChanging, EVT_LC_SELCHANGING, on_listctrl_sel_changing, {
     int nNewSel;

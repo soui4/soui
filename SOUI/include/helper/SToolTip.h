@@ -31,9 +31,9 @@ class STipCtrl
     void ShowTip(BOOL bShow);
 
     BEGIN_MSG_MAP_EX(STipCtrl)
-    MSG_WM_PAINT(OnPaint)
-    MSG_WM_TIMER(OnTimer)
-    REFLECT_NOTIFICATIONS_EX()
+        MSG_WM_PAINT(OnPaint)
+        MSG_WM_TIMER(OnTimer)
+        REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 
   protected:

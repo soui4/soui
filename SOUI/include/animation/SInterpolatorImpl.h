@@ -36,7 +36,7 @@ class SOUI_EXP SAccelerateInterpolator : public SInterpolatorBase {
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_FLOAT(L"factor", mFactor, FALSE)
+        ATTR_FLOAT(L"factor", mFactor, FALSE)
     SOUI_ATTRS_END()
 };
 
@@ -59,7 +59,7 @@ class SOUI_EXP SDecelerateInterpolator : public SInterpolatorBase {
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_FLOAT(L"factor", mFactor, FALSE)
+        ATTR_FLOAT(L"factor", mFactor, FALSE)
     SOUI_ATTRS_END()
 };
 
@@ -88,7 +88,7 @@ class SOUI_EXP SAnticipateInterpolator : public SInterpolatorBase {
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_FLOAT(L"tension", mTension, FALSE)
+        ATTR_FLOAT(L"tension", mTension, FALSE)
     SOUI_ATTRS_END()
 };
 
@@ -121,8 +121,8 @@ class SOUI_EXP SAnticipateOvershootInterpolator : public SInterpolatorBase {
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_FLOAT(L"tension", mTension, FALSE)
-    ATTR_FLOAT(L"extraTension", mExtraTension, FALSE)
+        ATTR_FLOAT(L"tension", mTension, FALSE)
+        ATTR_FLOAT(L"extraTension", mExtraTension, FALSE)
     SOUI_ATTRS_END()
 };
 
@@ -148,7 +148,7 @@ class SOUI_EXP SCycleInterpolator : public SInterpolatorBase {
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_FLOAT(L"cycles", mCycles, FALSE)
+        ATTR_FLOAT(L"cycles", mCycles, FALSE)
     SOUI_ATTRS_END()
 };
 
@@ -169,7 +169,7 @@ class SOUI_EXP SOvershootInterpolator : public SInterpolatorBase {
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_FLOAT(L"tension", mTension, FALSE)
+        ATTR_FLOAT(L"tension", mTension, FALSE)
     SOUI_ATTRS_END()
 };
 

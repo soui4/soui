@@ -118,8 +118,7 @@ SWND SwndContainerImpl::OnSetSwndCapture(SWND swnd)
 
 void SwndContainerImpl::OnSetSwndFocus(SWND swnd)
 {
-    if (swnd && ::GetFocus() != GetHostHwnd()
-        && !(::GetWindowLongPtr(GetHostHwnd(), GWL_EXSTYLE) & WS_EX_TOOLWINDOW))
+    if (swnd && ::GetFocus() != GetHostHwnd() && !(::GetWindowLongPtr(GetHostHwnd(), GWL_EXSTYLE) & WS_EX_TOOLWINDOW))
     {
         ::SetFocus(GetHostHwnd());
     }
@@ -166,8 +165,7 @@ void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
                 pHover->SSendMessage(WM_MOUSEHOVER, uFlag, MAKELPARAM(pt.x, pt.y));
             }
         }
-        pCapture->SSendMessage(m_bNcHover ? WM_NCMOUSEMOVE : WM_MOUSEMOVE, uFlag,
-                               MAKELPARAM(pt.x, pt.y));
+        pCapture->SSendMessage(m_bNcHover ? WM_NCMOUSEMOVE : WM_MOUSEMOVE, uFlag, MAKELPARAM(pt.x, pt.y));
     }
     else
     { //没有设置鼠标捕获
@@ -219,8 +217,7 @@ void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
             }
         }
         if (pHover && !pHover->IsDisabled(TRUE))
-            pHover->SSendMessage(m_bNcHover ? WM_NCMOUSEMOVE : WM_MOUSEMOVE, uFlag,
-                                 MAKELPARAM(pt2.x, pt2.y));
+            pHover->SSendMessage(m_bNcHover ? WM_NCMOUSEMOVE : WM_MOUSEMOVE, uFlag, MAKELPARAM(pt2.x, pt2.y));
     }
 
     //处理trackMouseEvent属性

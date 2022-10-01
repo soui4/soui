@@ -328,13 +328,7 @@ class SOUI_EXP STextHost : public ITextHost {
      *
      * Describe   Scroll the content of the specified window's client area
      */
-    virtual void TxScrollWindowEx(INT dx,
-                                  INT dy,
-                                  LPCRECT lprcScroll,
-                                  LPCRECT lprcClip,
-                                  HRGN hrgnUpdate,
-                                  LPRECT lprcUpdate,
-                                  UINT fuScroll);
+    virtual void TxScrollWindowEx(INT dx, INT dy, LPCRECT lprcScroll, LPCRECT lprcClip, HRGN hrgnUpdate, LPRECT lprcUpdate, UINT fuScroll);
 
     /**
      * STextHost::TxSetCapture
@@ -1111,29 +1105,29 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
 
   protected:
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_CREATE(OnCreate)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_NCCALCSIZE(OnNcCalcSize)
-    MSG_WM_SETFOCUS_EX(OnSetFocus)
-    MSG_WM_KILLFOCUS_EX(OnKillFocus)
-    MSG_WM_TIMER_EX(OnTimer)
-    MSG_WM_TIMER2(OnTimer2)
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_RBUTTONDOWN(OnRButtonDown)
-    MSG_WM_MOUSEMOVE(OnMouseMove)
-    MSG_WM_MOUSEWHEEL(OnMouseWheel)
-    MSG_WM_KEYDOWN(OnKeyDown)
-    MSG_WM_CHAR(OnChar)
-    MSG_WM_SETFONT_EX(OnSetFont)
-    MESSAGE_HANDLER_EX(WM_LBUTTONDBLCLK, OnButtonClick)
-    MESSAGE_HANDLER_EX(WM_SETTEXT, OnSetText)
-    MESSAGE_HANDLER_EX(EM_SETPARAFORMAT, OnSetParaFormat)
-    MESSAGE_HANDLER_EX(EM_SETCHARFORMAT, OnSetCharFormat)
-    MESSAGE_HANDLER_EX(EM_SETREADONLY, OnSetReadOnly)
-    MESSAGE_HANDLER_EX(EM_EXLIMITTEXT, OnSetLimitText)
-    MESSAGE_HANDLER_EX(EM_GETRECT, OnGetRect)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_NCCALCSIZE(OnNcCalcSize)
+        MSG_WM_SETFOCUS_EX(OnSetFocus)
+        MSG_WM_KILLFOCUS_EX(OnKillFocus)
+        MSG_WM_TIMER_EX(OnTimer)
+        MSG_WM_TIMER2(OnTimer2)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_RBUTTONDOWN(OnRButtonDown)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSEWHEEL(OnMouseWheel)
+        MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_CHAR(OnChar)
+        MSG_WM_SETFONT_EX(OnSetFont)
+        MESSAGE_HANDLER_EX(WM_LBUTTONDBLCLK, OnButtonClick)
+        MESSAGE_HANDLER_EX(WM_SETTEXT, OnSetText)
+        MESSAGE_HANDLER_EX(EM_SETPARAFORMAT, OnSetParaFormat)
+        MESSAGE_HANDLER_EX(EM_SETCHARFORMAT, OnSetCharFormat)
+        MESSAGE_HANDLER_EX(EM_SETREADONLY, OnSetReadOnly)
+        MESSAGE_HANDLER_EX(EM_EXLIMITTEXT, OnSetLimitText)
+        MESSAGE_HANDLER_EX(EM_GETRECT, OnGetRect)
     SOUI_MSG_MAP_END()
 
   protected:
@@ -1165,35 +1159,35 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"style", m_dwStyle, FALSE)
-    ATTR_INT(L"maxBuf", m_cchTextMost, FALSE)
-    ATTR_INT(L"transparent", m_fTransparent, FALSE)
-    ATTR_INT(L"rich", m_fRich, FALSE)
-    ATTR_INT(L"vertical", m_fVertical, FALSE)
-    ATTR_INT(L"wordWrap", m_fWordWrap, FALSE)
-    ATTR_INT(L"allowBeep", m_fAllowBeep, FALSE)
-    ATTR_INT(L"autoWordSel", m_fEnableAutoWordSel, FALSE)
-    ATTR_INT(L"vcenter", m_fSingleLineVCenter, FALSE)
-    ATTR_INT(L"disableCaret", m_fDisableCaret, FALSE)
-    ATTR_BOOL(L"wantTab", m_fWantTab, FALSE)
-    ATTR_BOOL(L"autoSel", m_fAutoSel, FALSE)
-    ATTR_CUSTOM(L"colorText", OnAttrTextColor)
-    ATTR_CUSTOM(L"rtf", OnAttrRTF)
-    ATTR_CUSTOM(L"align", OnAttrAlign)
-    ATTR_CUSTOM(L"notifyChange", OnAttrNotifyChange)
-    ATTR_RE_STYLE(L"wantReturn", ES_WANTRETURN, 0, OnAttrReStyle)
-    ATTR_RE_STYLE(L"number", ES_NUMBER, 0, OnAttrReStyle)
-    ATTR_RE_STYLE(L"upperCase", ES_UPPERCASE, 0, OnAttrReStyle)
-    ATTR_RE_STYLE(L"lowerCase", ES_LOWERCASE, 0, OnAttrReStyle)
-    ATTR_RE_STYLE(L"password", ES_PASSWORD, TXTBIT_USEPASSWORD, OnAttrReStyle)
-    ATTR_RE_STYLE(L"readOnly", ES_READONLY, TXTBIT_READONLY, OnAttrReStyle)
-    ATTR_RE_STYLE(L"multiLines", ES_MULTILINE, TXTBIT_MULTILINE, OnAttrReStyle)
-    ATTR_RE_STYLE(L"autoHscroll", ES_AUTOHSCROLL, TXTBIT_SCROLLBARCHANGE, OnAttrReStyle2)
-    ATTR_RE_STYLE(L"autoVscroll", ES_AUTOVSCROLL, TXTBIT_SCROLLBARCHANGE, OnAttrReStyle2)
-    ATTR_RE_STYLE(L"hscrollBar", WS_HSCROLL, TXTBIT_SCROLLBARCHANGE, OnAttrReStyle2)
-    ATTR_RE_STYLE(L"vscrollBar", WS_VSCROLL, TXTBIT_SCROLLBARCHANGE, OnAttrReStyle2)
-    ATTR_CUSTOM(L"passwordChar", OnAttrPasswordChar)
-    ATTR_CUSTOM(L"enableDragdrop", OnAttrEnableDragdrop)
+        ATTR_INT(L"style", m_dwStyle, FALSE)
+        ATTR_INT(L"maxBuf", m_cchTextMost, FALSE)
+        ATTR_INT(L"transparent", m_fTransparent, FALSE)
+        ATTR_INT(L"rich", m_fRich, FALSE)
+        ATTR_INT(L"vertical", m_fVertical, FALSE)
+        ATTR_INT(L"wordWrap", m_fWordWrap, FALSE)
+        ATTR_INT(L"allowBeep", m_fAllowBeep, FALSE)
+        ATTR_INT(L"autoWordSel", m_fEnableAutoWordSel, FALSE)
+        ATTR_INT(L"vcenter", m_fSingleLineVCenter, FALSE)
+        ATTR_INT(L"disableCaret", m_fDisableCaret, FALSE)
+        ATTR_BOOL(L"wantTab", m_fWantTab, FALSE)
+        ATTR_BOOL(L"autoSel", m_fAutoSel, FALSE)
+        ATTR_CUSTOM(L"colorText", OnAttrTextColor)
+        ATTR_CUSTOM(L"rtf", OnAttrRTF)
+        ATTR_CUSTOM(L"align", OnAttrAlign)
+        ATTR_CUSTOM(L"notifyChange", OnAttrNotifyChange)
+        ATTR_RE_STYLE(L"wantReturn", ES_WANTRETURN, 0, OnAttrReStyle)
+        ATTR_RE_STYLE(L"number", ES_NUMBER, 0, OnAttrReStyle)
+        ATTR_RE_STYLE(L"upperCase", ES_UPPERCASE, 0, OnAttrReStyle)
+        ATTR_RE_STYLE(L"lowerCase", ES_LOWERCASE, 0, OnAttrReStyle)
+        ATTR_RE_STYLE(L"password", ES_PASSWORD, TXTBIT_USEPASSWORD, OnAttrReStyle)
+        ATTR_RE_STYLE(L"readOnly", ES_READONLY, TXTBIT_READONLY, OnAttrReStyle)
+        ATTR_RE_STYLE(L"multiLines", ES_MULTILINE, TXTBIT_MULTILINE, OnAttrReStyle)
+        ATTR_RE_STYLE(L"autoHscroll", ES_AUTOHSCROLL, TXTBIT_SCROLLBARCHANGE, OnAttrReStyle2)
+        ATTR_RE_STYLE(L"autoVscroll", ES_AUTOVSCROLL, TXTBIT_SCROLLBARCHANGE, OnAttrReStyle2)
+        ATTR_RE_STYLE(L"hscrollBar", WS_HSCROLL, TXTBIT_SCROLLBARCHANGE, OnAttrReStyle2)
+        ATTR_RE_STYLE(L"vscrollBar", WS_VSCROLL, TXTBIT_SCROLLBARCHANGE, OnAttrReStyle2)
+        ATTR_CUSTOM(L"passwordChar", OnAttrPasswordChar)
+        ATTR_CUSTOM(L"enableDragdrop", OnAttrEnableDragdrop)
     SOUI_ATTRS_END()
   protected:
     CHARFORMAT2W m_cfDef;   /**< Default character format  */
@@ -1246,8 +1240,8 @@ class SOUI_EXP SEdit : public SRichEdit {
     SStringT GetCueText(BOOL bRawText = FALSE) const;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_COLOR(L"cueColor", m_crCue, TRUE)
-    ATTR_I18NSTRT(L"cueText", m_strCue, TRUE)
+        ATTR_COLOR(L"cueColor", m_crCue, TRUE)
+        ATTR_I18NSTRT(L"cueText", m_strCue, TRUE)
     SOUI_ATTRS_END()
 
   protected:
@@ -1278,9 +1272,9 @@ class SOUI_EXP SEdit : public SRichEdit {
     void OnKillFocus(SWND wndFocus);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_SETFOCUS_EX(OnSetFocus)
-    MSG_WM_KILLFOCUS_EX(OnKillFocus)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_SETFOCUS_EX(OnSetFocus)
+        MSG_WM_KILLFOCUS_EX(OnKillFocus)
     SOUI_MSG_MAP_END()
 
     COLORREF m_crCue;

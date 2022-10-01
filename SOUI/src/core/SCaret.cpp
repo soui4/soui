@@ -84,14 +84,12 @@ void SCaret::OnNextFrame()
         else if (m_iFrame < m_nShowFrames + m_nAniFrames)
         { // fadeout
             int iFrame = m_iFrame - m_nShowFrames;
-            m_byAlpha = (BYTE)(
-                255 * m_AniInterpolator->getInterpolation(1.0f - iFrame * 1.0f / m_nAniFrames));
+            m_byAlpha = (BYTE)(255 * m_AniInterpolator->getInterpolation(1.0f - iFrame * 1.0f / m_nAniFrames));
         }
         else
         { // fadein
             int iFrame = m_iFrame - m_nShowFrames - m_nAniFrames;
-            m_byAlpha
-                = (BYTE)(255 * m_AniInterpolator->getInterpolation(iFrame * 1.0f / m_nAniFrames));
+            m_byAlpha = (BYTE)(255 * m_AniInterpolator->getInterpolation(iFrame * 1.0f / m_nAniFrames));
         }
         Invalidate();
     }

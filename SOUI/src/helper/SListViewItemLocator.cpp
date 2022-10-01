@@ -279,8 +279,7 @@ int SListViewItemLocatorFlex::GetIndexDeep() const
         return 0;
     if (m_adapter->getCount() == 0)
         return 0;
-    return (int)ceil(
-        logbase((m_adapter->getCount() + SEGMENT_SIZE - 1) / SEGMENT_SIZE, INDEX_WIDTH));
+    return (int)ceil(logbase((m_adapter->getCount() + SEGMENT_SIZE - 1) / SEGMENT_SIZE, INDEX_WIDTH));
 }
 
 void SListViewItemLocatorFlex::Clear()

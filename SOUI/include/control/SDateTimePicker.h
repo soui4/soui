@@ -34,8 +34,7 @@ class SOUI_EXP SDateTimePicker
     STDMETHOD_(void, SetTime)
     (THIS_ WORD wYear, WORD wMonth, WORD wDay, WORD wHour, WORD wMinute, WORD wSecond) OVERRIDE;
     STDMETHOD_(void, GetTime)
-    (THIS_ WORD *wYear, WORD *wMonth, WORD *wDay, WORD *wHour, WORD *wMinute, WORD *wSecond)
-        SCONST OVERRIDE;
+    (THIS_ WORD *wYear, WORD *wMonth, WORD *wDay, WORD *wHour, WORD *wMinute, WORD *wSecond) SCONST OVERRIDE;
     STDMETHOD_(void, CloseUp)(THIS) OVERRIDE;
     STDMETHOD_(void, DropDown)(THIS) OVERRIDE;
     STDMETHOD_(void, Clear)(THIS) OVERRIDE;
@@ -77,24 +76,24 @@ class SOUI_EXP SDateTimePicker
 
     HRESULT OnAttrCueText(const SStringW &strValue, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"btnSkin", m_pSkinBtn, TRUE)
-    ATTR_BOOL(L"timeEnable", m_bTimeEnable, TRUE)
-    ATTR_INT(L"dropWidth", m_nDropWidth, TRUE)
-    ATTR_COLOR(L"cueColor", m_crCue, TRUE)
-    ATTR_CUSTOM(L"cueText", OnAttrCueText)
+        ATTR_SKIN(L"btnSkin", m_pSkinBtn, TRUE)
+        ATTR_BOOL(L"timeEnable", m_bTimeEnable, TRUE)
+        ATTR_INT(L"dropWidth", m_nDropWidth, TRUE)
+        ATTR_COLOR(L"cueColor", m_crCue, TRUE)
+        ATTR_CUSTOM(L"cueText", OnAttrCueText)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_MOUSEMOVE(OnMouseMove)
-    MSG_WM_MOUSELEAVE(OnMouseLeave)
-    MSG_WM_MOUSEWHEEL(OnMouseWheel)
-    MSG_WM_KEYDOWN(OnKeyDown)
-    MSG_WM_CHAR(OnChar)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_SETFOCUS_EX(OnSetFocus)
-    MSG_WM_KILLFOCUS_EX(OnKillFocus)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MSG_WM_MOUSEWHEEL(OnMouseWheel)
+        MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_CHAR(OnChar)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_SETFOCUS_EX(OnSetFocus)
+        MSG_WM_KILLFOCUS_EX(OnKillFocus)
     SOUI_MSG_MAP_END()
 
   protected:

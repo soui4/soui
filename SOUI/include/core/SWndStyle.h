@@ -53,7 +53,7 @@ class SOUI_EXP SwndStyle {
     }
 
     void SetScale(int nScale);
-	int GetScale() const;
+    int GetScale() const;
 
     void SetAlign(UINT uAlign);
     void SetVAlign(UINT uAlign);
@@ -77,7 +77,6 @@ class SOUI_EXP SwndStyle {
     COLORREF m_crText[4];      /**<文字4种状态下的颜色 */
     SDpiAwareFont m_ftText[4]; /**<文字4种状态下的字体 */
 
-
     int m_nScale;
 
     HRESULT OnAttrPadding(const SStringW &strValue, BOOL bLoading);
@@ -87,45 +86,45 @@ class SOUI_EXP SwndStyle {
 
     void _ParseLayoutSize4(const SStringW &strValue, SLayoutSize layoutSizes[]);
     SOUI_ATTRS_BEGIN()
-    ATTR_HEX(L"textMode", m_nTextAlign, TRUE)
-    ATTR_BOOL(L"multiLines", m_bMultiLines, TRUE)
-    ATTR_ENUM_BEGIN(L"align", UINT, TRUE)
-    ATTR_ENUM_VALUE(L"left", Align_Left)
-    ATTR_ENUM_VALUE(L"center", Align_Center)
-    ATTR_ENUM_VALUE(L"right", Align_Right)
-    ATTR_ENUM_END(m_uAlign)
-    ATTR_ENUM_BEGIN(L"valign", UINT, TRUE)
-    ATTR_ENUM_VALUE(L"top", VAlign_Top)
-    ATTR_ENUM_VALUE(L"middle", VAlign_Middle)
-    ATTR_ENUM_VALUE(L"bottom", VAlign_Bottom)
-    ATTR_ENUM_END(m_uVAlign)
+        ATTR_HEX(L"textMode", m_nTextAlign, TRUE)
+        ATTR_BOOL(L"multiLines", m_bMultiLines, TRUE)
+        ATTR_ENUM_BEGIN(L"align", UINT, TRUE)
+            ATTR_ENUM_VALUE(L"left", Align_Left)
+            ATTR_ENUM_VALUE(L"center", Align_Center)
+            ATTR_ENUM_VALUE(L"right", Align_Right)
+        ATTR_ENUM_END(m_uAlign)
+        ATTR_ENUM_BEGIN(L"valign", UINT, TRUE)
+            ATTR_ENUM_VALUE(L"top", VAlign_Top)
+            ATTR_ENUM_VALUE(L"middle", VAlign_Middle)
+            ATTR_ENUM_VALUE(L"bottom", VAlign_Bottom)
+        ATTR_ENUM_END(m_uVAlign)
 
-    ATTR_COLOR(L"colorBkgnd", m_crBg, TRUE)
-    ATTR_COLOR(L"colorBorder", m_crBorder, TRUE)
+        ATTR_COLOR(L"colorBkgnd", m_crBg, TRUE)
+        ATTR_COLOR(L"colorBorder", m_crBorder, TRUE)
 
-    ATTR_FONT(L"font", m_ftText[0], TRUE)
-    ATTR_FONT(L"fontHover", m_ftText[1], TRUE)
-    ATTR_FONT(L"fontPush", m_ftText[2], TRUE)
-    ATTR_FONT(L"fontDisable", m_ftText[3], TRUE)
+        ATTR_FONT(L"font", m_ftText[0], TRUE)
+        ATTR_FONT(L"fontHover", m_ftText[1], TRUE)
+        ATTR_FONT(L"fontPush", m_ftText[2], TRUE)
+        ATTR_FONT(L"fontDisable", m_ftText[3], TRUE)
 
-    ATTR_COLOR(L"colorText", m_crText[0], TRUE)
-    ATTR_COLOR(L"colorTextHover", m_crText[1], TRUE)
-    ATTR_COLOR(L"colorTextPush", m_crText[2], TRUE)
-    ATTR_COLOR(L"colorTextDisable", m_crText[3], TRUE)
+        ATTR_COLOR(L"colorText", m_crText[0], TRUE)
+        ATTR_COLOR(L"colorTextHover", m_crText[1], TRUE)
+        ATTR_COLOR(L"colorTextPush", m_crText[2], TRUE)
+        ATTR_COLOR(L"colorTextDisable", m_crText[3], TRUE)
 
-    ATTR_CUSTOM(L"margin-x", OnAttrMarginX)
-    ATTR_CUSTOM(L"margin-y", OnAttrMarginY)
-    ATTR_CUSTOM(L"margin", OnAttrMargin)
-    ATTR_CUSTOM(L"inset", OnAttrPadding)
-    ATTR_CUSTOM(L"padding", OnAttrPadding)
-    ATTR_LAYOUTSIZE(L"padding_left", m_rcInset[0], TRUE)
-    ATTR_LAYOUTSIZE(L"padding_top", m_rcInset[1], TRUE)
-    ATTR_LAYOUTSIZE(L"padding_right", m_rcInset[2], TRUE)
-    ATTR_LAYOUTSIZE(L"padding_bottom", m_rcInset[3], TRUE)
-    ATTR_STRINGT(L"cursor", m_strCursor, FALSE)
-    ATTR_INT(L"dotted", m_bDotted, FALSE)
-    ATTR_INT(L"trackMouseEvent", m_bTrackMouseEvent, FALSE)
-    ATTR_INT(L"blendBackground", m_bBlendBackground, TRUE)
+        ATTR_CUSTOM(L"margin-x", OnAttrMarginX)
+        ATTR_CUSTOM(L"margin-y", OnAttrMarginY)
+        ATTR_CUSTOM(L"margin", OnAttrMargin)
+        ATTR_CUSTOM(L"inset", OnAttrPadding)
+        ATTR_CUSTOM(L"padding", OnAttrPadding)
+        ATTR_LAYOUTSIZE(L"padding_left", m_rcInset[0], TRUE)
+        ATTR_LAYOUTSIZE(L"padding_top", m_rcInset[1], TRUE)
+        ATTR_LAYOUTSIZE(L"padding_right", m_rcInset[2], TRUE)
+        ATTR_LAYOUTSIZE(L"padding_bottom", m_rcInset[3], TRUE)
+        ATTR_STRINGT(L"cursor", m_strCursor, FALSE)
+        ATTR_INT(L"dotted", m_bDotted, FALSE)
+        ATTR_INT(L"trackMouseEvent", m_bTrackMouseEvent, FALSE)
+        ATTR_INT(L"blendBackground", m_bBlendBackground, TRUE)
     SOUI_ATTRS_BREAK()
 };
 

@@ -82,8 +82,7 @@ STDMETHODIMP SAccProxyWindow::get_accDefaultAction(BSTR *pszDefaultAction)
 
 STDMETHODIMP SAccProxyWindow::accSelect(long flagsSelect)
 {
-    if (((flagsSelect & SELFLAG_TAKEFOCUS) > 0)
-        && (::GetFocus() == m_pWnd->GetContainer()->GetHostHwnd()))
+    if (((flagsSelect & SELFLAG_TAKEFOCUS) > 0) && (::GetFocus() == m_pWnd->GetContainer()->GetHostHwnd()))
     {
         m_pWnd->SetFocus();
         return S_OK;

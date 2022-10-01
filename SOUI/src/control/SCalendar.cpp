@@ -45,9 +45,7 @@ WORD const DayOrdinalLeap[13] = { 0, 31, 60, 91, 121, 152, 182, 213, 244, 274, 3
 
 BOOL SCalendarCore::IsLeapYear(WORD wYear, BOOL &bLeapYear)
 {
-    if (wYear < 1600
-        || wYear
-            >= 7000) //压缩算法规定了的年份区间（提取器只能导出此区间的数据，Lunar.dll支持-6000到20000（不含20000）之间的年份）
+    if (wYear < 1600 || wYear >= 7000) //压缩算法规定了的年份区间（提取器只能导出此区间的数据，Lunar.dll支持-6000到20000（不含20000）之间的年份）
     {
         return FALSE;
     }
@@ -185,8 +183,7 @@ short SCalendarCore::GetDayOfWeek(WORD wYear, WORD wMonth, WORD wDay)
     unsigned int DayofWeek = 0;
     uDayOrd++; //一年中的第几天，因为GetDaysNumInYear所得到的是索引，因此要加一
     wYear--;
-    DayofWeek
-        = (wYear + wYear / 4 - wYear / 100 + wYear / 400 + uDayOrd) % 7; //这个只是算星期的通用公式
+    DayofWeek = (wYear + wYear / 4 - wYear / 100 + wYear / 400 + uDayOrd) % 7; //这个只是算星期的通用公式
     return DayofWeek;
 }
 
@@ -220,8 +217,7 @@ SStringT SCalendarCore::FormatYear(WORD iYear)
 
 SStringT SCalendarCore::FormatMonth(WORD iMonth)
 {
-    TCHAR szText[][5] = { _T("一"), _T("二"), _T("三"), _T("四"), _T("五"),   _T("六"),
-                          _T("七"), _T("八"), _T("九"), _T("十"), _T("十一"), _T("十二") };
+    TCHAR szText[][5] = { _T("一"), _T("二"), _T("三"), _T("四"), _T("五"), _T("六"), _T("七"), _T("八"), _T("九"), _T("十"), _T("十一"), _T("十二") };
     SASSERT(iMonth <= 12 && iMonth >= 1);
     return szText[iMonth - 1];
 }
@@ -618,8 +614,7 @@ void SCalendar::DrawWeek(IRenderTarget *pRT, const CRect &rect)
     {
         pRT->SetTextColor(crTxt);
 
-        pRT->DrawText(m_strWeek[i].GetText(FALSE), m_strWeek[i].GetText(FALSE).GetLength(), rcItem,
-                      DT_SINGLELINE | DT_VCENTER | DT_CENTER);
+        pRT->DrawText(m_strWeek[i].GetText(FALSE), m_strWeek[i].GetText(FALSE).GetLength(), rcItem, DT_SINGLELINE | DT_VCENTER | DT_CENTER);
         rcItem.OffsetRect(nWid, 0);
     }
     pRT->SetTextColor(crTxt);
@@ -755,8 +750,7 @@ void SCalendar::DrawYearDecadeCentury(IRenderTarget *pRT, const CRect &rect, int
         sDay.Format(_T("%d-\n%d"), monthYearInfo.iMonthOrYear, monthYearInfo.iMonthOrYear + 9);
         CRect rcTxt = rcItem;
         pRT->DrawText(sDay, sDay.GetLength(), rcTxt, DT_CALCRECT);
-        rcItem.DeflateRect((rcItem.Width() - rcTxt.Width()) / 2,
-                           (rcItem.Height() - rcTxt.Height()) / 2);
+        rcItem.DeflateRect((rcItem.Width() - rcTxt.Width()) / 2, (rcItem.Height() - rcTxt.Height()) / 2);
         pRT->DrawText(sDay, sDay.GetLength(), rcItem, 0);
     }
 
@@ -770,8 +764,7 @@ void SCalendar::OnPaint(IRenderTarget *pRT)
     {
         OnPaintMonth(pRT);
     }
-    else if (m_showType == SHOW_YEAR || m_showType == SHOW_YEAR_DECADE
-             || m_showType == SHOW_YEAR_CENTURY)
+    else if (m_showType == SHOW_YEAR || m_showType == SHOW_YEAR_DECADE || m_showType == SHOW_YEAR_CENTURY)
     {
         OnPaintYearDecadeCentury(pRT);
     }
@@ -1091,8 +1084,7 @@ int SCalendar::HitTest(const CPoint &pt)
 
         return nRow + (nDay_Y / nHei) * 7;
     }
-    else if (m_showType == SHOW_YEAR || m_showType == SHOW_YEAR_DECADE
-             || m_showType == SHOW_YEAR_CENTURY)
+    else if (m_showType == SHOW_YEAR || m_showType == SHOW_YEAR_DECADE || m_showType == SHOW_YEAR_CENTURY)
     {
         //多出星期的高度
         CRect rcDays = m_rcDays;

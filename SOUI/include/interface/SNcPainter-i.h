@@ -169,7 +169,7 @@ DECLARE_INTERFACE_(INcPainter, IObject)
     /**
      * @brief 获取绘制非客户区的根窗口
      * @return IWindow *--root
-    */
+     */
     STDMETHOD_(IWindow *, GetRoot)(THIS) PURE;
 };
 

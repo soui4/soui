@@ -94,10 +94,7 @@ class SOUI_EXP SDropDownWnd
      *
      * Describe  此函数是虚函数，用于指定下拉窗口相关属性。比如样式，大小等
      */
-    virtual BOOL Create(LPCRECT lpRect,
-                        LPVOID lParam,
-                        DWORD dwStyle = WS_POPUP,
-                        DWORD dwExStyle = WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
+    virtual BOOL Create(LPCRECT lpRect, LPVOID lParam, DWORD dwStyle = WS_POPUP, DWORD dwExStyle = WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
 
     /**
      * SDropDownWnd::EndDropDown
@@ -233,15 +230,15 @@ class SOUI_EXP SDropDownWnd
     UINT m_uExitCode;          /**< 退出消息码 */
 
     BEGIN_MSG_MAP_EX(SDropDownWnd)
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_KEYDOWN(OnKeyDown);
-    MSG_WM_KILLFOCUS(OnKillFocus)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_ACTIVATE(OnActivate)
-    MSG_WM_ACTIVATEAPP(OnActivateApp)
-    MSG_WM_MOUSEACTIVATE(OnMouseActivate)
-    CHAIN_MSG_MAP(SHostWnd)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_KEYDOWN(OnKeyDown);
+        MSG_WM_KILLFOCUS(OnKillFocus)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_ACTIVATE(OnActivate)
+        MSG_WM_ACTIVATEAPP(OnActivateApp)
+        MSG_WM_MOUSEACTIVATE(OnMouseActivate)
+        CHAIN_MSG_MAP(SHostWnd)
     END_MSG_MAP()
 };
 

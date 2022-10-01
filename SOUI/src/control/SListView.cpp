@@ -73,7 +73,7 @@ BOOL SListView::SetAdapter(ILvAdapter *adapter)
     }
     if (m_adapter == adapter)
     {
-        SSLOGW()<<"the new adapter is same to previous set adapter, same as notifyDatasetChanged";
+        SSLOGW() << "the new adapter is same to previous set adapter, same as notifyDatasetChanged";
         if (m_adapter)
         {
             onDataSetChanged();
@@ -374,10 +374,9 @@ void SListView::UpdateVisibleItems()
             ItemInfo ii = { NULL, -1 };
             ii.nType = m_adapter->getItemViewType(iNewLastVisible, dwState);
             if (iNewLastVisible >= iOldFirstVisible && iNewLastVisible < iOldLastVisible)
-            { // use the old visible item
-                int iItem
-                    = iNewLastVisible - iOldFirstVisible; //(iNewLastVisible-iNewFirstVisible) +
-                                                          //(iNewFirstVisible-iOldFirstVisible);
+            {                                                   // use the old visible item
+                int iItem = iNewLastVisible - iOldFirstVisible; //(iNewLastVisible-iNewFirstVisible) +
+                                                                //(iNewFirstVisible-iOldFirstVisible);
                 SASSERT(iItem >= 0 && iItem <= (iOldLastVisible - iOldFirstVisible));
                 if (ii.nType == pItemInfos[iItem].nType)
                 {
@@ -393,8 +392,7 @@ void SListView::UpdateVisibleItems()
                 { //创建一个新的列表项
                     bNewItem = TRUE;
                     ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
-                    ii.pItem->GetEventSet()->subscribeEvent(
-                        EventItemPanelClick::EventID, Subscriber(&SListView::OnItemClick, this));
+                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&SListView::OnItemClick, this));
                 }
                 else
                 {
@@ -434,8 +432,7 @@ void SListView::UpdateVisibleItems()
                 if (m_bVertical)
                 {
                     rcItem.bottom = 0;
-                    CSize szItem = m_adapter->getViewDesiredSize(iNewLastVisible, ii.pItem,
-                                                                 rcItem.Width(), rcItem.Height());
+                    CSize szItem = m_adapter->getViewDesiredSize(iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
                     rcItem.bottom = rcItem.top + szItem.cy;
                     ii.pItem->Move(rcItem);
                     m_lvItemLocator->SetItemHeight(iNewLastVisible, szItem.cy);
@@ -443,8 +440,7 @@ void SListView::UpdateVisibleItems()
                 else
                 {
                     rcItem.right = 0;
-                    CSize szItem = m_adapter->getViewDesiredSize(iNewLastVisible, ii.pItem,
-                                                                 rcItem.Width(), rcItem.Height());
+                    CSize szItem = m_adapter->getViewDesiredSize(iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
                     rcItem.right = rcItem.left + szItem.cx;
                     ii.pItem->Move(rcItem);
                     m_lvItemLocator->SetItemHeight(iNewLastVisible, szItem.cx);
@@ -794,8 +790,7 @@ void SListView::EnsureVisible(int iItem)
                 OnScroll(m_bVertical, SB_BOTTOM, 0);
             else
             {
-                int pos = m_lvItemLocator->Item2Position(iItem + 1)
-                    - (m_bVertical ? m_siVer.nPage : m_siHoz.nPage);
+                int pos = m_lvItemLocator->Item2Position(iItem + 1) - (m_bVertical ? m_siVer.nPage : m_siHoz.nPage);
                 OnScroll(m_bVertical, SB_THUMBPOSITION, pos);
             }
         }
@@ -816,8 +811,7 @@ void SListView::EnsureVisible(int iItem)
         }
         else
         {
-            int pos = m_lvItemLocator->Item2Position(iItem + 1)
-                - (m_bVertical ? m_siVer.nPage : m_siHoz.nPage);
+            int pos = m_lvItemLocator->Item2Position(iItem + 1) - (m_bVertical ? m_siVer.nPage : m_siHoz.nPage);
             OnScroll(m_bVertical, SB_THUMBPOSITION, pos);
         }
     }
@@ -830,8 +824,7 @@ BOOL SListView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     {
         CRect rcItem = pSelItem->GetItemRect();
         CPoint pt2 = pt - rcItem.TopLeft();
-        if (pSelItem->DoFrameEvent(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta),
-                                   MAKELPARAM(pt2.x, pt2.y)))
+        if (pSelItem->DoFrameEvent(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta), MAKELPARAM(pt2.x, pt2.y)))
             return TRUE;
     }
     return __baseCls::OnMouseWheel(nFlags, zDelta, pt);
@@ -866,16 +859,14 @@ BOOL SListView::CreateChildren(SXmlNode xmlNode)
         SLayoutSize nItemHei = GETLAYOUTSIZE(xmlTemplate.attribute(kItemSize).value());
         if (nItemHei.fSize > 0.0f)
         { //指定了itemHeight属性时创建一个固定行高的定位器
-            IListViewItemLocator *pItemLocator
-                = new SListViewItemLocatorFix(nItemHei, m_nDividerSize);
+            IListViewItemLocator *pItemLocator = new SListViewItemLocatorFix(nItemHei, m_nDividerSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
         }
         else
         { //创建一个行高可变的行定位器，从defHeight/defWidth属性中获取默认行高
             LPCWSTR kDefSize = m_bVertical ? L"defHeight" : L"defWidth";
-            IListViewItemLocator *pItemLocator = new SListViewItemLocatorFlex(
-                GETLAYOUTSIZE(xmlTemplate.attribute(kDefSize).as_string(L"30dp")), m_nDividerSize);
+            IListViewItemLocator *pItemLocator = new SListViewItemLocatorFlex(GETLAYOUTSIZE(xmlTemplate.attribute(kDefSize).as_string(L"30dp")), m_nDividerSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
         }
@@ -995,16 +986,12 @@ BOOL SListView::OnSetCursor(const CPoint &pt)
     if (m_itemCapture)
     {
         CRect rcItem = m_itemCapture->GetItemRect();
-        bRet = m_itemCapture->DoFrameEvent(WM_SETCURSOR, 0,
-                                           MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top))
-            != 0;
+        bRet = m_itemCapture->DoFrameEvent(WM_SETCURSOR, 0, MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top)) != 0;
     }
     else if (m_pHoverItem)
     {
         CRect rcItem = m_pHoverItem->GetItemRect();
-        bRet = m_pHoverItem->DoFrameEvent(WM_SETCURSOR, 0,
-                                          MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top))
-            != 0;
+        bRet = m_pHoverItem->DoFrameEvent(WM_SETCURSOR, 0, MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top)) != 0;
     }
     if (!bRet)
     {

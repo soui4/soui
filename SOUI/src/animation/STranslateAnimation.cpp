@@ -27,14 +27,7 @@ void STranslateAnimation::applyTransformation(float interpolatedTime, ITransform
     t->SetTransformationType(TYPE_MATRIX);
 }
 
-void STranslateAnimation::init(AniValueType fromXType,
-                               float fromXValue,
-                               AniValueType toXType,
-                               float toXValue,
-                               AniValueType fromYType,
-                               float fromYValue,
-                               AniValueType toYType,
-                               float toYValue)
+void STranslateAnimation::init(AniValueType fromXType, float fromXValue, AniValueType toXType, float toXValue, AniValueType fromYType, float fromYValue, AniValueType toYType, float toYValue)
 {
     mFromXValue = fromXValue;
     mToXValue = toXValue;
@@ -52,10 +45,7 @@ STranslateAnimation::STranslateAnimation()
     init();
 }
 
-void STranslateAnimation::init(float fromXDelta /*=0.0f*/,
-                               float toXDelta /*=0.0f*/,
-                               float fromYDelta /*=0.0f*/,
-                               float toYDelta /*=0.0f*/)
+void STranslateAnimation::init(float fromXDelta /*=0.0f*/, float toXDelta /*=0.0f*/, float fromYDelta /*=0.0f*/, float toYDelta /*=0.0f*/)
 {
     mFromXValue = fromXDelta;
     mToXValue = toXDelta;

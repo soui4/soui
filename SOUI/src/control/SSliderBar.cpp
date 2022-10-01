@@ -39,13 +39,7 @@ int SSliderBar::HitTest(CPoint pt)
     return -1;
 }
 
-SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength,
-                                            int nThumbSize,
-                                            BOOL bThumbInRail,
-                                            int nMin,
-                                            int nMax,
-                                            int nValue,
-                                            UINT uSBCode)
+SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bThumbInRail, int nMin, int nMax, int nValue, UINT uSBCode)
 {
     int nRailLen = nLength - nThumbSize;
 
@@ -100,10 +94,8 @@ CRect SSliderBar::GetPartRect(UINT uSBCode)
 
     if (IsVertical())
     {
-        RANGE r = _GetPartRange(rcClient.Height(), szThumb.cy, m_bThumbInRail, m_nMinValue,
-                                m_nMaxValue, m_nValue, uSBCode);
-        CRect rc(rcClient.left, rcClient.Height() - r.value2, rcClient.right,
-                 rcClient.Height() - r.value1);
+        RANGE r = _GetPartRange(rcClient.Height(), szThumb.cy, m_bThumbInRail, m_nMinValue, m_nMaxValue, m_nValue, uSBCode);
+        CRect rc(rcClient.left, rcClient.Height() - r.value2, rcClient.right, rcClient.Height() - r.value1);
         rc.OffsetRect(0, rcClient.top);
         int nSliderSize = smax(szThumb.cx, szRail.cx);
         rc.DeflateRect((rcClient.Width() - nSliderSize) / 2, 0);
@@ -115,8 +107,7 @@ CRect SSliderBar::GetPartRect(UINT uSBCode)
     }
     else
     {
-        RANGE r = _GetPartRange(rcClient.Width(), szThumb.cx, m_bThumbInRail, m_nMinValue,
-                                m_nMaxValue, m_nValue, uSBCode);
+        RANGE r = _GetPartRange(rcClient.Width(), szThumb.cx, m_bThumbInRail, m_nMinValue, m_nMaxValue, m_nValue, uSBCode);
         CRect rc(r.value1, rcClient.top, r.value2, rcClient.bottom);
         rc.OffsetRect(rcClient.left, 0);
         int nSliderSize = smax(szThumb.cy, szRail.cy);
@@ -186,13 +177,11 @@ void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
         int nValue = 0;
         if (IsVertical())
         {
-            nValue = (rcRail.bottom - point.y) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Height()
-                + m_nMinValue;
+            nValue = (rcRail.bottom - point.y) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Height() + m_nMinValue;
         }
         else
         {
-            nValue = (point.x - rcRail.left) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Width()
-                + m_nMinValue;
+            nValue = (point.x - rcRail.left) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Width() + m_nMinValue;
         }
         SetValue(nValue);
         Invalidate();

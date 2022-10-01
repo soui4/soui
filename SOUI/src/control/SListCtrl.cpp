@@ -56,8 +56,7 @@ int SListCtrl::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, L
 BOOL SListCtrl::CreateChildren(SXmlNode xmlNode)
 {
     SXmlNode xmlHeader = xmlNode.child(L"headerStyle");
-    m_pHeader = sobj_cast<SHeaderCtrl>(SApplication::getSingletonPtr()->CreateWindowByName(
-        xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
+    m_pHeader = sobj_cast<SHeaderCtrl>(SApplication::getSingletonPtr()->CreateWindowByName(xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
     SASSERT(m_pHeader);
     if (!m_pHeader)
         return FALSE;
@@ -68,10 +67,8 @@ BOOL SListCtrl::CreateChildren(SXmlNode xmlNode)
     if (!__baseCls::CreateChildren(xmlNode))
         return FALSE;
 
-    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemChanging::EventID,
-                                             Subscriber(&SListCtrl::OnHeaderSizeChanging, this));
-    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemSwap::EventID,
-                                             Subscriber(&SListCtrl::OnHeaderSwap, this));
+    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemChanging::EventID, Subscriber(&SListCtrl::OnHeaderSizeChanging, this));
+    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemSwap::EventID, Subscriber(&SListCtrl::OnHeaderSwap, this));
 
     return TRUE;
 }
@@ -270,8 +267,7 @@ void SListCtrl::UpdateScrollBar()
         {
             // 小于表头的最小宽度, 需要横向滚动条
             m_wBarVisible |= SSB_HORZ;
-            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth()
-                                                       : 0; //注意同时调整纵向滚动条page信息
+            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; //注意同时调整纵向滚动条page信息
 
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -539,9 +535,7 @@ void SListCtrl::OnPaint(IRenderTarget *pRT)
 
     rcItem.bottom = rcItem.top;
     rcItem.OffsetRect(0, -(m_ptOrigin.y % m_nItemHeight));
-    for (int nItem = nTopItem;
-         nItem <= (nTopItem + GetCountPerPage(TRUE)) && nItem < GetItemCount();
-         rcItem.top = rcItem.bottom, nItem++)
+    for (int nItem = nTopItem; nItem <= (nTopItem + GetCountPerPage(TRUE)) && nItem < GetItemCount(); rcItem.top = rcItem.bottom, nItem++)
     {
         rcItem.bottom = rcItem.top + m_nItemHeight;
 

@@ -405,10 +405,7 @@ void SOsrPanel::OnUpdateCursor()
     m_pHostProxy->GetHostContainer()->OnUpdateCursor();
 }
 
-BOOL SOsrPanel::IsItemInClip(const SMatrix &mtx,
-                             const CRect &rcClip,
-                             const IRegionS *clipRgn,
-                             const CRect &rcItem)
+BOOL SOsrPanel::IsItemInClip(const SMatrix &mtx, const CRect &rcClip, const IRegionS *clipRgn, const CRect &rcItem)
 {
     if (!mtx.isIdentity()) // don't clip any item if matrix is not identify.
         return TRUE;
@@ -438,9 +435,7 @@ LPARAM SOsrPanel::GetItemData() const
 }
 
 //////////////////////////////////////////////////////////////////////////
-SItemPanel *SItemPanel::Create(IHostProxy *pFrameHost,
-                               SXmlNode xmlNode,
-                               IItemContainer *pItemContainer)
+SItemPanel *SItemPanel::Create(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
 {
     SItemPanel *pItem = new SItemPanel(pFrameHost, pItemContainer);
     pItem->InitFromXml(&xmlNode);

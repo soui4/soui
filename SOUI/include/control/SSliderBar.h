@@ -107,13 +107,7 @@ class SOUI_EXP SSliderBar : public SProgress {
      */
     CRect GetPartRect(UINT uSBCode);
 
-    RANGE _GetPartRange(int nLength,
-                        int nThumbSize,
-                        BOOL bThumbInRail,
-                        int nMin,
-                        int nMax,
-                        int nValue,
-                        UINT uSBCode);
+    RANGE _GetPartRange(int nLength, int nThumbSize, BOOL bThumbInRail, int nMin, int nMax, int nValue, UINT uSBCode);
 
     /**
      * SSliderBar::OnPaint
@@ -163,16 +157,16 @@ class SOUI_EXP SSliderBar : public SProgress {
     void OnMouseLeave();
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_MOUSEMOVE(OnMouseMove)
-    MSG_WM_MOUSELEAVE(OnMouseLeave)
-    MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MSG_WM_PAINT_EX(OnPaint)
     SOUI_MSG_MAP_END()
 
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"thumbSkin", m_pSkinThumb, TRUE)
-    ATTR_BOOL(L"thumbInRail", m_bThumbInRail, TRUE)
+        ATTR_SKIN(L"thumbSkin", m_pSkinThumb, TRUE)
+        ATTR_BOOL(L"thumbInRail", m_bThumbInRail, TRUE)
     SOUI_ATTRS_END()
 };
 

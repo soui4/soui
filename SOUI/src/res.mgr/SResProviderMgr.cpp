@@ -25,9 +25,9 @@ void SResProviderMgr::RemoveAll()
     {
         IResProvider *pResProvider = m_lstResPackage.GetNext(pos);
 #ifdef _DEBUG //检查资源使用情况
-        SSLOGD()<<"++++begin of check resource usage";
+        SSLOGD() << "++++begin of check resource usage";
         pResProvider->EnumResource(&SResProviderMgr::CheckUsage, (LPARAM)&m_mapResUsageCount);
-        SSLOGD()<<"----end of check resource usage";
+        SSLOGD() << "----end of check resource usage";
 #endif
         pResProvider->Release();
     }
@@ -111,13 +111,7 @@ LPCTSTR SResProviderMgr::SysCursorName2ID(LPCTSTR pszCursorName)
         LPCTSTR szID;
     };
     static const Cursor2ID cursorMap[] = {
-        { _T("arrow"), IDC_ARROW },       { _T("ibeam"), IDC_IBEAM },
-        { _T("wait"), IDC_WAIT },         { _T("cross"), IDC_CROSS },
-        { _T("uparrow"), IDC_UPARROW },   { _T("size"), IDC_SIZE },
-        { _T("sizenwse"), IDC_SIZENWSE }, { _T("sizenesw"), IDC_SIZENESW },
-        { _T("sizewe"), IDC_SIZEWE },     { _T("sizens"), IDC_SIZENS },
-        { _T("sizeall"), IDC_SIZEALL },   { _T("no"), IDC_NO },
-        { _T("hand"), IDC_HAND },         { _T("help"), IDC_HELP },
+        { _T("arrow"), IDC_ARROW }, { _T("ibeam"), IDC_IBEAM }, { _T("wait"), IDC_WAIT }, { _T("cross"), IDC_CROSS }, { _T("uparrow"), IDC_UPARROW }, { _T("size"), IDC_SIZE }, { _T("sizenwse"), IDC_SIZENWSE }, { _T("sizenesw"), IDC_SIZENESW }, { _T("sizewe"), IDC_SIZEWE }, { _T("sizens"), IDC_SIZENS }, { _T("sizeall"), IDC_SIZEALL }, { _T("no"), IDC_NO }, { _T("hand"), IDC_HAND }, { _T("help"), IDC_HELP },
     };
     SAutoLock lock(m_cs);
     for (int i = 0; i < ARRAYSIZE(cursorMap); i++)
@@ -209,13 +203,11 @@ IBitmapS *SResProviderMgr::LoadImage(LPCTSTR pszType, LPCTSTR pszResName)
         IResProvider *pResProvider = GetMatchResProvider(pszType, pszResName);
         if (!pResProvider)
         {
-            SASSERT_FMT(false, _T("load image failed, resource index %s:%s not found!"), pszType,
-                        pszResName);
+            SASSERT_FMT(false, _T("load image failed, resource index %s:%s not found!"), pszType, pszResName);
             return NULL;
         }
         IBitmapS *pRet = pResProvider->LoadImage(pszType, pszResName);
-        SASSERT_FMT(pRet, _T("load image failed, resource content %s:%s not found!"), pszType,
-                    pszResName);
+        SASSERT_FMT(pRet, _T("load image failed, resource content %s:%s not found!"), pszType, pszResName);
         return pRet;
     }
 }
@@ -297,10 +289,7 @@ HCURSOR SResProviderMgr::LoadCursor(LPCTSTR pszResName, BOOL bFromFile /*= FALSE
     return hRet;
 }
 
-HICON SResProviderMgr::LoadIcon(LPCTSTR pszResName,
-                                int cx /*=0*/,
-                                int cy /*=0*/,
-                                BOOL bFromFile /*= FALSE*/)
+HICON SResProviderMgr::LoadIcon(LPCTSTR pszResName, int cx /*=0*/, int cy /*=0*/, BOOL bFromFile /*= FALSE*/)
 {
     SAutoLock lock(m_cs);
     if (bFromFile)
@@ -330,7 +319,7 @@ BOOL SResProviderMgr::HasResource(LPCTSTR pszType, LPCTSTR pszResName)
     SAutoLock lock(m_cs);
     if (IsFileType(pszType))
     {
-		SStringT strPath = m_strFilePrefix + pszResName;
+        SStringT strPath = m_strFilePrefix + pszResName;
         return ::GetFileAttributes(strPath) != INVALID_FILE_ATTRIBUTES;
     }
     else

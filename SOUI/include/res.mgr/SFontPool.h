@@ -46,9 +46,7 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
 
     static bool CompareElements(INARGTYPE element1, INARGTYPE element2)
     {
-        return element1.strFaceName == element2.strFaceName
-            && element1.strPropEx == element2.strPropEx
-            && element1.style.dwStyle == element2.style.dwStyle;
+        return element1.strFaceName == element2.strFaceName && element1.strPropEx == element2.strPropEx && element1.style.dwStyle == element2.style.dwStyle;
     }
 
     static int CompareElementsOrdered(INARGTYPE element1, INARGTYPE element2)
@@ -101,9 +99,7 @@ class SOUI_EXP SFontPool : public SSingletonMap<SFontPool, IFontPtr, FontInfo> {
      * @return   IFontPtr -- font对象
      * Describe
      */
-    IFontPtr GetFont(FONTSTYLE style,
-                     const SStringW &strFaceName = SStringW(),
-                     SXmlNode xmlExProp = SXmlNode());
+    IFontPtr GetFont(FONTSTYLE style, const SStringW &strFaceName = SStringW(), SXmlNode xmlExProp = SXmlNode());
 
     void SetDefFontInfo(const FontInfo &fontInfo);
 

@@ -39,18 +39,18 @@ class SOUI_EXP SActiveX : public SWindow {
 
     HRESULT OnAttrClsid(const SStringW &strValue, BOOL bLoading);
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST, WM_MOUSELAST, OnMouseEvent)
-    MESSAGE_RANGE_HANDLER_EX(WM_KEYFIRST, WM_KEYLAST, OnKeyEvent)
-    MSG_WM_CREATE(OnCreate)
-    MSG_WM_SIZE(OnSize)
-    MSG_WM_SHOWWINDOW(OnShowWindow)
+        MSG_WM_PAINT_EX(OnPaint)
+        MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST, WM_MOUSELAST, OnMouseEvent)
+        MESSAGE_RANGE_HANDLER_EX(WM_KEYFIRST, WM_KEYLAST, OnKeyEvent)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_SIZE(OnSize)
+        MSG_WM_SHOWWINDOW(OnShowWindow)
     SOUI_MSG_MAP_END()
 
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"clsID", OnAttrClsid)
-    ATTR_DWORD(L"clsCtx", m_clsCtx, FALSE)
-    ATTR_UINT(L"delay", m_bDelayInit, FALSE)
+        ATTR_CUSTOM(L"clsID", OnAttrClsid)
+        ATTR_DWORD(L"clsCtx", m_clsCtx, FALSE)
+        ATTR_UINT(L"delay", m_bDelayInit, FALSE)
     SOUI_ATTRS_END()
 
     virtual void OnInitActiveXFinished()
@@ -86,7 +86,7 @@ class SOUI_EXP SFlashCtrl : public SActiveX {
     HRESULT OnAttrUrl(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"url", OnAttrUrl)
+        ATTR_CUSTOM(L"url", OnAttrUrl)
     SOUI_ATTRS_END()
 
     SStringW m_strUrl;

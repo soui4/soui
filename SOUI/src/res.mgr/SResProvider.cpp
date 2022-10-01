@@ -200,10 +200,7 @@ struct EnumResParam
     LPARAM lParam;
 };
 
-static BOOL CALLBACK EnumResNameProc(HMODULE hModule,
-                                     LPCTSTR lpszType,
-                                     LPTSTR lpszName,
-                                     LONG_PTR lParam)
+static BOOL CALLBACK EnumResNameProc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName, LONG_PTR lParam)
 {
     EnumResParam *enumParam = (EnumResParam *)lParam;
     return enumParam->fun(lpszType, lpszName, enumParam->lParam);
@@ -225,8 +222,7 @@ void SResProviderPE::EnumResource(EnumResCallback funEnumCB, LPARAM lp)
 
 HBITMAP SResLoadFromFile::LoadBitmap(LPCTSTR strPath)
 {
-    return (HBITMAP)::LoadImage(NULL, strPath, IMAGE_BITMAP, 0, 0,
-                                LR_CREATEDIBSECTION | LR_LOADFROMFILE);
+    return (HBITMAP)::LoadImage(NULL, strPath, IMAGE_BITMAP, 0, 0, LR_CREATEDIBSECTION | LR_LOADFROMFILE);
 }
 
 HICON SResLoadFromFile::LoadIcon(LPCTSTR strPath, int cx /*=0*/, int cy /*=0*/)

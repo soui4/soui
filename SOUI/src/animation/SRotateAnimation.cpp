@@ -60,12 +60,7 @@ void SRotateAnimation::initializePivotPoint()
     }
 }
 
-void SRotateAnimation::init(float fromDegrees,
-                            float toDegrees,
-                            AniValueType pivotXType,
-                            float pivotXValue,
-                            AniValueType pivotYType,
-                            float pivotYValue)
+void SRotateAnimation::init(float fromDegrees, float toDegrees, AniValueType pivotXType, float pivotXValue, AniValueType pivotYType, float pivotYValue)
 {
     mFromDegrees = fromDegrees;
     mToDegrees = toDegrees;

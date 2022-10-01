@@ -66,14 +66,7 @@ void SScaleAnimation::initializePivotPoint()
     }
 }
 
-void SScaleAnimation::init(float fromX,
-                           float toX,
-                           float fromY,
-                           float toY,
-                           AniValueType pivotXType,
-                           float pivotXValue,
-                           AniValueType pivotYType,
-                           float pivotYValue)
+void SScaleAnimation::init(float fromX, float toX, float fromY, float toY, AniValueType pivotXType, float pivotXValue, AniValueType pivotYType, float pivotYValue)
 {
     mFromX = fromX;
     mToX = toX;
@@ -87,12 +80,7 @@ void SScaleAnimation::init(float fromX,
     initializePivotPoint();
 }
 
-void SScaleAnimation::init(float fromX,
-                           float toX,
-                           float fromY,
-                           float toY,
-                           float pivotX,
-                           float pivotY)
+void SScaleAnimation::init(float fromX, float toX, float fromY, float toY, float pivotX, float pivotY)
 {
     mFromX = fromX;
     mToX = toX;
@@ -111,10 +99,7 @@ SScaleAnimation::SScaleAnimation()
     init(1.0f, 1.0f, 1.0f, 1.0f, RELATIVE_TO_SELF, 0.5f, RELATIVE_TO_SELF, 0.5f);
 }
 
-void SScaleAnimation::init(float fromX /*=0.0f*/,
-                           float toX /*= 0.0f*/,
-                           float fromY /*= 0.0f*/,
-                           float toY /*= 0.0f*/)
+void SScaleAnimation::init(float fromX /*=0.0f*/, float toX /*= 0.0f*/, float fromY /*= 0.0f*/, float toY /*= 0.0f*/)
 {
     mFromX = fromX;
     mToX = toX;

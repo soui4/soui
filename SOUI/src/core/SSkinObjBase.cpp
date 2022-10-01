@@ -90,9 +90,7 @@ DWORD SState2Index::String2State(const SStringW &strState)
         LPCWSTR pszName;
         DWORD dwValue;
     } kStateMap[] = {
-        { L"normal", WndState_Normal },     { L"hover", WndState_Hover },
-        { L"pushdown", WndState_PushDown }, { L"disable", WndState_Disable },
-        { L"checked", WndState_Check },
+        { L"normal", WndState_Normal }, { L"hover", WndState_Hover }, { L"pushdown", WndState_PushDown }, { L"disable", WndState_Disable }, { L"checked", WndState_Check },
     };
     static SMap<SStringW, DWORD> stateMap;
     static bool bInited = false;
@@ -199,18 +197,12 @@ void SSkinObjBase::DrawByState(IRenderTarget *pRT, LPCRECT rcDraw, DWORD dwState
     DrawByState2(pRT, rcDraw, dwState, GetAlpha());
 }
 
-void SSkinObjBase::DrawByState2(IRenderTarget *pRT,
-                                LPCRECT rcDraw,
-                                DWORD dwState,
-                                BYTE byAlpha) const
+void SSkinObjBase::DrawByState2(IRenderTarget *pRT, LPCRECT rcDraw, DWORD dwState, BYTE byAlpha) const
 {
     _DrawByState(pRT, rcDraw, dwState, byAlpha);
 }
 
-void SSkinObjBase::_DrawByState(IRenderTarget *pRT,
-                                LPCRECT rcDraw,
-                                DWORD dwState,
-                                BYTE byAlpha) const
+void SSkinObjBase::_DrawByState(IRenderTarget *pRT, LPCRECT rcDraw, DWORD dwState, BYTE byAlpha) const
 {
     int idx = State2Index(dwState);
     DrawByIndex2(pRT, rcDraw, idx, byAlpha);

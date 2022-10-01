@@ -32,8 +32,8 @@ class SOUI_EXP SAlphaAnimation : public SAnimation {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_FLOAT(L"fromAlpha", mFromAlpha, FALSE)
-    ATTR_FLOAT(L"toAlpha", mToAlpha, FALSE)
+        ATTR_FLOAT(L"fromAlpha", mFromAlpha, FALSE)
+        ATTR_FLOAT(L"toAlpha", mToAlpha, FALSE)
     SOUI_ATTRS_END()
     /**
      * Constructor to use when building an AlphaAnimation from code

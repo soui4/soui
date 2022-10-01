@@ -208,11 +208,7 @@ void SObjectDefaultRegister::RegisterValueAnimator(SObjectFactoryMgr *objFactory
 template <>
 SApplication *SSingleton<SApplication>::ms_Singleton = 0;
 
-SApplication::SApplication(IRenderFactory *pRendFactory,
-                           HINSTANCE hInst,
-                           LPCTSTR pszHostClassName,
-                           const ISystemObjectRegister &sysObjRegister,
-                           BOOL bImeApp)
+SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTSTR pszHostClassName, const ISystemObjectRegister &sysObjRegister, BOOL bImeApp)
     : m_hInst(hInst)
     , m_RenderFactory(pRendFactory)
     , m_hMainWnd(NULL)
@@ -260,8 +256,7 @@ void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, 
     m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
     m_pSingletons[STextServiceHelper::GetType()] = new STextServiceHelper();
     m_pSingletons[SRicheditMenuDef::GetType()] = new SRicheditMenuDef();
-    m_pSingletons[SNativeWndHelper::GetType()]
-        = new SNativeWndHelper(hInst, pszHostClassName, bImeApp);
+    m_pSingletons[SNativeWndHelper::GetType()] = new SNativeWndHelper(hInst, pszHostClassName, bImeApp);
     m_pSingletons[SHostMgr::GetType()] = new SHostMgr();
 }
 
@@ -340,10 +335,7 @@ void *SApplication::GetInnerSingleton(int nType)
     return m_pSingletons[nType];
 }
 
-BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName,
-                                   LPCTSTR pszType,
-                                   SXmlDoc &xmlDoc,
-                                   IResProvider *pResProvider /* = NULL*/)
+BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc &xmlDoc, IResProvider *pResProvider /* = NULL*/)
 {
     if (!pResProvider)
     {
@@ -354,8 +346,7 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName,
             {
                 XmlParseResult res;
                 xmlDoc.GetParseResult(&res);
-                SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName,
-                             SXmlDoc::GetErrDesc(res.status), res.offset);
+                SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName, SXmlDoc::GetErrDesc(res.status), res.offset);
             }
             return bLoad;
         }
@@ -380,8 +371,7 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName,
     {
         XmlParseResult result;
         xmlDoc.GetParseResult(&result);
-        SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName,
-                     S_CA2W(SXmlDoc::GetErrDesc(result.status)), result.offset);
+        SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName, S_CA2W(SXmlDoc::GetErrDesc(result.status)), result.offset);
     }
     return bLoad;
 }
@@ -467,8 +457,7 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
     // load messagebox template
     {
         SXmlDoc xmlDoc;
-        if (!_LoadXmlDocment(_T("SYS_XML_MSGBOX"), _T("XML"), xmlDoc, pResProvider)
-            || !SetMsgTemplate(xmlDoc.root().child(L"SOUI")))
+        if (!_LoadXmlDocment(_T("SYS_XML_MSGBOX"), _T("XML"), xmlDoc, pResProvider) || !SetMsgTemplate(xmlDoc.root().child(L"SOUI")))
         {
             uRet |= 0x04;
         }

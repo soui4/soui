@@ -97,14 +97,7 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
      *        size.) This value can either be an absolute number if pivotYType
      *        is ABSOLUTE, or a percentage (where 1.0 is 100%) otherwise.
      */
-    void init(float fromX,
-              float toX,
-              float fromY,
-              float toY,
-              AniValueType pivotXType,
-              float pivotXValue,
-              AniValueType pivotYType,
-              float pivotYValue);
+    void init(float fromX, float toX, float fromY, float toY, AniValueType pivotXType, float pivotXValue, AniValueType pivotYType, float pivotYValue);
 
     /**
      * Called at the end of constructor methods to initialize, if possible, values for
@@ -123,12 +116,12 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
     (THIS_ int width, int height, int parentWidth, int parentHeight) OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_FLOAT(L"fromXScale", mFromX, FALSE)
-    ATTR_FLOAT(L"toXScale", mToX, FALSE)
-    ATTR_FLOAT(L"fromYScale", mFromY, FALSE)
-    ATTR_FLOAT(L"toYScale", mToY, FALSE)
-    ATTR_VALUE_DESC(L"pivotX", mPivotXType, mPivotXValue)
-    ATTR_VALUE_DESC(L"pivotY", mPivotYType, mPivotYValue)
+        ATTR_FLOAT(L"fromXScale", mFromX, FALSE)
+        ATTR_FLOAT(L"toXScale", mToX, FALSE)
+        ATTR_FLOAT(L"fromYScale", mFromY, FALSE)
+        ATTR_FLOAT(L"toYScale", mToY, FALSE)
+        ATTR_VALUE_DESC(L"pivotX", mPivotXType, mPivotXValue)
+        ATTR_VALUE_DESC(L"pivotY", mPivotYType, mPivotYValue)
     SOUI_ATTRS_END()
 };
 

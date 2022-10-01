@@ -22,8 +22,7 @@ BOOL SStylePool::Init(SXmlNode xmlStyleRoot)
 
     xmlStyleRoot = m_xmlDoc.root().append_copy(xmlStyleRoot);
 
-    for (SXmlNode xmlChild = xmlStyleRoot.first_child(); xmlChild;
-         xmlChild = xmlChild.next_sibling())
+    for (SXmlNode xmlChild = xmlStyleRoot.first_child(); xmlChild; xmlChild = xmlChild.next_sibling())
     {
         SStringW strClsName = xmlChild.name();
         if (strClsName.CompareNoCase(L"class") == 0)

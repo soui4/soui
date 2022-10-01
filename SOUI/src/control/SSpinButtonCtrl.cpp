@@ -214,8 +214,7 @@ int SSpinButtonCtrl::OnCreate(void *)
 
     SWindow *pBuddy = GetBuddy();
     if (pBuddy)
-        pBuddy->GetEventSet()->subscribeEvent(EVT_RE_NOTIFY,
-                                              Subscriber(&SSpinButtonCtrl::OnBuddyChange, this));
+        pBuddy->GetEventSet()->subscribeEvent(EVT_RE_NOTIFY, Subscriber(&SSpinButtonCtrl::OnBuddyChange, this));
     return 0;
 }
 

@@ -74,8 +74,8 @@ class SOUI_EXP STaskHandler
   private:
     LRESULT OnRunTask(UINT uMsg, WPARAM wp, LPARAM lp);
     BEGIN_MSG_MAP_EX(STaskHandler)
-    MESSAGE_HANDLER_EX(UM_RUN_TASK, OnRunTask)
-    CHAIN_MSG_MAP(SNativeWnd)
+        MESSAGE_HANDLER_EX(UM_RUN_TASK, OnRunTask)
+        CHAIN_MSG_MAP(SNativeWnd)
     END_MSG_MAP()
 
     mutable SCriticalSection m_taskListLock;

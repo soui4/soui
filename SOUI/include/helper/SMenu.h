@@ -23,20 +23,20 @@ class SMenuAttr : public TObjRefImpl<SObject> {
     void SetScale(int scale);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"itemSkin", m_pItemSkin, FALSE)
-    ATTR_SKIN(L"iconSkin", m_pIconSkin, FALSE)
-    ATTR_SKIN(L"sepSkin", m_pSepSkin, FALSE)
-    ATTR_SKIN(L"checkSkin", m_pCheckSkin, FALSE)
-    ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHei, FALSE)
-    ATTR_LAYOUTSIZE(L"iconMargin", m_nIconMargin, FALSE)
-    ATTR_LAYOUTSIZE(L"textMargin", m_nTextMargin, FALSE)
-    ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)
-    ATTR_LAYOUTSIZE2(L"iconSize", m_szIcon, FALSE)
-    ATTR_FONT(L"font", m_dpiFont, FALSE)
-    ATTR_COLOR(L"colorText", m_crTxtNormal, FALSE)
-    ATTR_COLOR(L"colorTextSel", m_crTxtSel, FALSE)
-    ATTR_COLOR(L"cororTextGray", m_crTxtGray, FALSE)
-    ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)
+        ATTR_SKIN(L"itemSkin", m_pItemSkin, FALSE)
+        ATTR_SKIN(L"iconSkin", m_pIconSkin, FALSE)
+        ATTR_SKIN(L"sepSkin", m_pSepSkin, FALSE)
+        ATTR_SKIN(L"checkSkin", m_pCheckSkin, FALSE)
+        ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHei, FALSE)
+        ATTR_LAYOUTSIZE(L"iconMargin", m_nIconMargin, FALSE)
+        ATTR_LAYOUTSIZE(L"textMargin", m_nTextMargin, FALSE)
+        ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)
+        ATTR_LAYOUTSIZE2(L"iconSize", m_szIcon, FALSE)
+        ATTR_FONT(L"font", m_dpiFont, FALSE)
+        ATTR_COLOR(L"colorText", m_crTxtNormal, FALSE)
+        ATTR_COLOR(L"colorTextSel", m_crTxtSel, FALSE)
+        ATTR_COLOR(L"cororTextGray", m_crTxtGray, FALSE)
+        ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)
     SOUI_ATTRS_END()
 
   protected:
@@ -55,7 +55,7 @@ class SMenuAttr : public TObjRefImpl<SObject> {
   protected:
     virtual void WINAPI OnInitFinished(SXmlNode xmlNode);
 
-    SAutoRefPtr<ISkinObj> m_pItemSkin; //菜单项皮肤，包含2种状态：正常状态+选中状态
+    SAutoRefPtr<ISkinObj> m_pItemSkin;  //菜单项皮肤，包含2种状态：正常状态+选中状态
     SAutoRefPtr<ISkinObj> m_pIconSkin;  //菜单图标
     SAutoRefPtr<ISkinObj> m_pSepSkin;   //分割栏皮肤
     SAutoRefPtr<ISkinObj> m_pCheckSkin; //选中状态,包含两种状态:勾选+圈选
@@ -89,16 +89,16 @@ class SOwnerDraw {
   public:
     // Message map and handlers
     BEGIN_MSG_MAP_EX(SOwnerDraw<T>)
-    MESSAGE_HANDLER(WM_DRAWITEM, OnDrawItem)
-    MESSAGE_HANDLER(WM_MEASUREITEM, OnMeasureItem)
-    MESSAGE_HANDLER(WM_COMPAREITEM, OnCompareItem)
-    MESSAGE_HANDLER(WM_DELETEITEM, OnDeleteItem)
-    MESSAGE_HANDLER(WM_MENUCHAR, OnMenuChar)
-    ALT_MSG_MAP(1)
-    MESSAGE_HANDLER(OCM_DRAWITEM, OnDrawItem)
-    MESSAGE_HANDLER(OCM_MEASUREITEM, OnMeasureItem)
-    MESSAGE_HANDLER(OCM_COMPAREITEM, OnCompareItem)
-    MESSAGE_HANDLER(OCM_DELETEITEM, OnDeleteItem)
+        MESSAGE_HANDLER(WM_DRAWITEM, OnDrawItem)
+        MESSAGE_HANDLER(WM_MEASUREITEM, OnMeasureItem)
+        MESSAGE_HANDLER(WM_COMPAREITEM, OnCompareItem)
+        MESSAGE_HANDLER(WM_DELETEITEM, OnDeleteItem)
+        MESSAGE_HANDLER(WM_MENUCHAR, OnMenuChar)
+        ALT_MSG_MAP(1)
+        MESSAGE_HANDLER(OCM_DRAWITEM, OnDrawItem)
+        MESSAGE_HANDLER(OCM_MEASUREITEM, OnMeasureItem)
+        MESSAGE_HANDLER(OCM_COMPAREITEM, OnCompareItem)
+        MESSAGE_HANDLER(OCM_DELETEITEM, OnDeleteItem)
     END_MSG_MAP()
 
     LRESULT OnDrawItem(UINT /*uMsg*/, WPARAM /*wParam*/, LPARAM lParam, BOOL &bHandled)
@@ -210,37 +210,38 @@ class SMenuODWnd
     LRESULT OnMenuChar(UINT nChar, UINT nFlags, HMENU hMenu);
 
     BEGIN_MSG_MAP_EX(SMenuODWnd)
-    MSG_WM_INITMENU(OnInitMenu)
-    MSG_WM_INITMENUPOPUP(OnInitMenuPopup)
-    MSG_WM_MENUSELECT(OnMenuSelect)
-    CHAIN_MSG_MAP(SOwnerDraw<SMenuODWnd>)
-    REFLECT_NOTIFICATIONS_EX()
+        MSG_WM_INITMENU(OnInitMenu)
+        MSG_WM_INITMENUPOPUP(OnInitMenuPopup)
+        MSG_WM_MENUSELECT(OnMenuSelect)
+        CHAIN_MSG_MAP(SOwnerDraw<SMenuODWnd>)
+        REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 
     HWND m_hMenuOwner;
     SAutoRefPtr<SMenuAttr> m_attr;
 };
 
-class SOUI_EXP SMenu : public TObjRefImpl<IMenu>{
+class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
   public:
     SMenu(const SMenu &src);
     SMenu(HMENU hMenu = NULL);
     ~SMenu(void);
 
-public:
-	HMENU m_hMenu;
-public://IMenu
-	STDMETHOD_(BOOL,Attach)(THIS_ HMENU hMenu) OVERRIDE;
+  public:
+    HMENU m_hMenu;
 
-    STDMETHOD_(HMENU,Detach)(THIS) OVERRIDE;
+  public: // IMenu
+    STDMETHOD_(BOOL, Attach)(THIS_ HMENU hMenu) OVERRIDE;
 
-	STDMETHOD_(HMENU,GetHMenu)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(HMENU, Detach)(THIS) OVERRIDE;
 
-    STDMETHOD_(BOOL,LoadMenu)(THIS_ LPCTSTR resId) OVERRIDE;
+    STDMETHOD_(HMENU, GetHMenu)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(BOOL,LoadMenu2)(THIS_ IXmlNode *xmlMenu) OVERRIDE;
+    STDMETHOD_(BOOL, LoadMenu)(THIS_ LPCTSTR resId) OVERRIDE;
 
-    STDMETHOD_(void,SetIconSkin)(THIS_ ISkinObj* icons) OVERRIDE;
+    STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode *xmlMenu) OVERRIDE;
+
+    STDMETHOD_(void, SetIconSkin)(THIS_ ISkinObj *icons) OVERRIDE;
 
     /**
      * SMenu::InsertMenu
@@ -251,45 +252,31 @@ public://IMenu
      *
      * Describe  hIcon会在菜单退出时自动调用DestroyIcon.
      */
-    STDMETHOD_(BOOL,InsertMenu)(THIS_ UINT uPosition,
-                    UINT uFlags,
-                    UINT_PTR nIDNewItem,
-                    LPCTSTR strText,
-                    int iIcon DEF_VAL(-1),
-                    HICON hIcon DEF_VAL(0)) OVERRIDE;
+    STDMETHOD_(BOOL, InsertMenu)(THIS_ UINT uPosition, UINT uFlags, UINT_PTR nIDNewItem, LPCTSTR strText, int iIcon DEF_VAL(-1), HICON hIcon DEF_VAL(0)) OVERRIDE;
 
-    STDMETHOD_(BOOL,AppendMenu)(THIS_ UINT uFlags,
-                    UINT_PTR uIDNewItem,
-                    LPCTSTR lpNewItem,
-					int iIcon DEF_VAL(-1),
-					HICON hIcon DEF_VAL(0)) OVERRIDE;
+    STDMETHOD_(BOOL, AppendMenu)(THIS_ UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem, int iIcon DEF_VAL(-1), HICON hIcon DEF_VAL(0)) OVERRIDE;
 
-    STDMETHOD_(BOOL,CheckMenuItem)(THIS_ UINT uIdCheckItem, UINT uCheck) OVERRIDE;
+    STDMETHOD_(BOOL, CheckMenuItem)(THIS_ UINT uIdCheckItem, UINT uCheck) OVERRIDE;
 
-	STDMETHOD_(BOOL,CheckMenuRadioItem)(THIS_ UINT idFirst,UINT idLast,UINT idCheck,UINT uFlags) OVERRIDE;
+    STDMETHOD_(BOOL, CheckMenuRadioItem)(THIS_ UINT idFirst, UINT idLast, UINT idCheck, UINT uFlags) OVERRIDE;
 
-    STDMETHOD_(BOOL,DeleteMenu)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
+    STDMETHOD_(BOOL, DeleteMenu)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
 
-    STDMETHOD_(UINT,TrackPopupMenu)(THIS_ UINT uFlags,
-                        int x,
-                        int y,
-                        HWND hWnd,
-                        LPCRECT prcRect DEF_VAL(NULL),
-                        int nScale DEF_VAL(100)) OVERRIDE;
+    STDMETHOD_(UINT, TrackPopupMenu)(THIS_ UINT uFlags, int x, int y, HWND hWnd, LPCRECT prcRect DEF_VAL(NULL), int nScale DEF_VAL(100)) OVERRIDE;
 
-    STDMETHOD_(void,DestroyMenu)(THIS) OVERRIDE;
+    STDMETHOD_(void, DestroyMenu)(THIS) OVERRIDE;
 
-    STDMETHOD_(BOOL,ModifyMenuString)(THIS_ UINT uPosition, UINT uFlags, LPCTSTR lpItemString) OVERRIDE;
+    STDMETHOD_(BOOL, ModifyMenuString)(THIS_ UINT uPosition, UINT uFlags, LPCTSTR lpItemString) OVERRIDE;
 
-    STDMETHOD_(BOOL,SetMenuUserData)(THIS_ UINT uPosition, UINT uFlags, ULONG_PTR ulUserData) OVERRIDE;
+    STDMETHOD_(BOOL, SetMenuUserData)(THIS_ UINT uPosition, UINT uFlags, ULONG_PTR ulUserData) OVERRIDE;
 
-    STDMETHOD_(ULONG_PTR,GetMenuUserData)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
+    STDMETHOD_(ULONG_PTR, GetMenuUserData)(THIS_ UINT uPosition, UINT uFlags) OVERRIDE;
 
-	STDMETHOD_(DWORD,GetContextHelpId)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(DWORD, GetContextHelpId)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void,SetContextHelpId)(THIS_ DWORD dwId) OVERRIDE;
+    STDMETHOD_(void, SetContextHelpId)(THIS_ DWORD dwId) OVERRIDE;
 
-	STDMETHOD_(HMENU,GetSubMenu)(THIS_ int nPos) OVERRIDE;
+    STDMETHOD_(HMENU, GetSubMenu)(THIS_ int nPos) OVERRIDE;
 
   protected:
     void UpdateScale(int nScale);

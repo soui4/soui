@@ -39,8 +39,7 @@ DECLARE_INTERFACE(IOutputFileBuilder)
     //生成LOG文件名
     //至少应该包含pszLogName，及curFileIndex这两个参数
     STDMETHOD_(BOOL, buildOutputFile)
-    (THIS_ char *pszFileName, int nLen, struct tm time, const char *pszLogName, unsigned long pid,
-     int curFileIndex) SCONST PURE;
+    (THIS_ char *pszFileName, int nLen, struct tm time, const char *pszLogName, unsigned long pid, int curFileIndex) SCONST PURE;
 };
 
 #undef INTERFACE
@@ -48,8 +47,7 @@ DECLARE_INTERFACE(IOutputFileBuilder)
 DECLARE_INTERFACE(IOutputListener)
 {
     STDMETHOD_(void, onOutputLog)
-    (THIS_ int level, const char *filter, const char *log, int nLogLen, unsigned __int64 time_)
-        PURE;
+    (THIS_ int level, const char *filter, const char *log, int nLogLen, unsigned __int64 time_) PURE;
 };
 
 //! log4z class
@@ -97,12 +95,10 @@ DECLARE_INTERFACE_(ILog4zManager, IObjRef)
 
     //! Push log, thread safe.
     STDMETHOD_(BOOL, pushLog)
-    (THIS_ LoggerId id, int level, const char *filter, const char *log, const char *file, int line,
-     const char *func, const void *pRetAddr) PURE;
+    (THIS_ LoggerId id, int level, const char *filter, const char *log, const char *file, int line, const char *func, const void *pRetAddr) PURE;
 
     STDMETHOD_(BOOL, pushLog2)
-    (THIS_ const char *name, int level, const char *filter, const char *log, const char *file,
-     int line, const char *func, const void *pRetAddr) PURE;
+    (THIS_ const char *name, int level, const char *filter, const char *log, const char *file, int line, const char *func, const void *pRetAddr) PURE;
 
     //! set logger's attribute, thread safe.
     STDMETHOD_(BOOL, enableLogger)(THIS_ LoggerId id, BOOL enable) PURE;

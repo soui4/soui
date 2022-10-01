@@ -40,16 +40,16 @@ class SGridLayoutParam
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"rowSpan", nRowSpan, TRUE)
-    ATTR_INT(L"columnSpan", nColSpan, TRUE)
-    ATTR_CUSTOM(L"width", OnAttrWidth)
-    ATTR_CUSTOM(L"height", OnAttrHeight)
-    ATTR_CUSTOM(L"size", OnAttrSize)
-    ATTR_GRIDGRAVITY(L"layout_xGravity", layoutGravityX, TRUE)
-    ATTR_GRIDGRAVITY(L"layout_yGravity", layoutGravityY, TRUE)
-    ATTR_GRIDGRAVITY(L"layout_gravity", layoutGravityX = layoutGravityY, TRUE)
-    ATTR_FLOAT(L"columnWeight", fColWeight, TRUE)
-    ATTR_FLOAT(L"rowWeight", fRowWeight, TRUE)
+        ATTR_INT(L"rowSpan", nRowSpan, TRUE)
+        ATTR_INT(L"columnSpan", nColSpan, TRUE)
+        ATTR_CUSTOM(L"width", OnAttrWidth)
+        ATTR_CUSTOM(L"height", OnAttrHeight)
+        ATTR_CUSTOM(L"size", OnAttrSize)
+        ATTR_GRIDGRAVITY(L"layout_xGravity", layoutGravityX, TRUE)
+        ATTR_GRIDGRAVITY(L"layout_yGravity", layoutGravityY, TRUE)
+        ATTR_GRIDGRAVITY(L"layout_gravity", layoutGravityX = layoutGravityY, TRUE)
+        ATTR_FLOAT(L"columnWeight", fColWeight, TRUE)
+        ATTR_FLOAT(L"rowWeight", fRowWeight, TRUE)
     SOUI_ATTRS_BREAK()
 
   protected:
@@ -71,14 +71,14 @@ class SOUI_EXP SGridLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     (THIS_ const IWindow *pParent, int nWidth, int nHeight) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"columnCount", m_nCols, TRUE)
-    ATTR_INT(L"rowCount", m_nRows, TRUE)
-    ATTR_LAYOUTSIZE(L"xInterval", m_xInterval, TRUE)
-    ATTR_LAYOUTSIZE(L"yInterval", m_yInterval, TRUE)
-    ATTR_LAYOUTSIZE(L"interval", m_xInterval = m_yInterval, TRUE)
-    ATTR_GRIDGRAVITY(L"xGravity", m_GravityX, TRUE)
-    ATTR_GRIDGRAVITY(L"yGravity", m_GravityY, TRUE)
-    ATTR_GRIDGRAVITY(L"gravity", m_GravityX = m_GravityY, TRUE)
+        ATTR_INT(L"columnCount", m_nCols, TRUE)
+        ATTR_INT(L"rowCount", m_nRows, TRUE)
+        ATTR_LAYOUTSIZE(L"xInterval", m_xInterval, TRUE)
+        ATTR_LAYOUTSIZE(L"yInterval", m_yInterval, TRUE)
+        ATTR_LAYOUTSIZE(L"interval", m_xInterval = m_yInterval, TRUE)
+        ATTR_GRIDGRAVITY(L"xGravity", m_GravityX, TRUE)
+        ATTR_GRIDGRAVITY(L"yGravity", m_GravityY, TRUE)
+        ATTR_GRIDGRAVITY(L"gravity", m_GravityX = m_GravityY, TRUE)
     SOUI_ATTRS_BREAK()
   protected:
     int CalcCells(const IWindow *pParent) const;

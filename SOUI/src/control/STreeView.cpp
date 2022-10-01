@@ -87,12 +87,9 @@ BOOL STreeViewItemLocator::_IsItemVisible(HSTREEITEM hItem) const
     return m_adapter->IsItemVisible(hItem);
 }
 
-HSTREEITEM STreeViewItemLocator::_Position2Item(int position,
-                                                HSTREEITEM hParent,
-                                                int nParentPosition) const
+HSTREEITEM STreeViewItemLocator::_Position2Item(int position, HSTREEITEM hParent, int nParentPosition) const
 {
-    if (position < nParentPosition
-        || position >= (nParentPosition + _GetItemVisibleHeight(hParent)))
+    if (position < nParentPosition || position >= (nParentPosition + _GetItemVisibleHeight(hParent)))
         return ITEM_NULL;
 
     int nItemHeight = GetItemHeight(hParent);
@@ -366,9 +363,7 @@ int STreeViewItemLocator::GetTotalHeight() const
     return (int)m_adapter->GetItemDataByIndex(ITEM_ROOT, DATA_INDEX_BRANCH_HEIGHT);
 }
 
-void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem,
-                                                   BOOL bExpandedOld,
-                                                   BOOL bExpandedNew)
+void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem, BOOL bExpandedOld, BOOL bExpandedNew)
 {
     if (bExpandedNew == bExpandedOld)
         return;
@@ -434,7 +429,7 @@ BOOL STreeView::SetAdapter(ITvAdapter *adapter)
     }
     if (m_adapter == adapter)
     {
-        SSLOGW()<<"the new adapter is same to previous set adapter, same as onBranchChanged";
+        SSLOGW() << "the new adapter is same to previous set adapter, same as onBranchChanged";
         if (m_adapter)
         {
             onBranchChanged(ITEM_ROOT);
@@ -690,12 +685,10 @@ void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     switch (nChar)
     {
     case VK_DOWN:
-        nNewSelItem = (m_hSelected == ITEM_NULL) ? m_adapter->GetFirstVisibleItem()
-                                                 : m_adapter->GetNextVisibleItem(m_hSelected);
+        nNewSelItem = (m_hSelected == ITEM_NULL) ? m_adapter->GetFirstVisibleItem() : m_adapter->GetNextVisibleItem(m_hSelected);
         break;
     case VK_UP:
-        nNewSelItem = (m_hSelected == ITEM_NULL) ? m_adapter->GetFirstVisibleItem()
-                                                 : m_adapter->GetPrevVisibleItem(m_hSelected);
+        nNewSelItem = (m_hSelected == ITEM_NULL) ? m_adapter->GetFirstVisibleItem() : m_adapter->GetPrevVisibleItem(m_hSelected);
         break;
     case VK_PRIOR:
         OnScroll(TRUE, SB_PAGEUP, 0);
@@ -778,8 +771,7 @@ void STreeView::UpdateScrollBar()
         {
             //  需要横向滚动条
             m_wBarVisible |= SSB_HORZ;
-            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth()
-                                                       : 0; //注意同时调整纵向滚动条page信息
+            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; //注意同时调整纵向滚动条page信息
 
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -886,8 +878,7 @@ void STreeView::UpdateVisibleItems()
             { //创建一个新的列表项
                 bNewItem = TRUE;
                 ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
-                ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID,
-                                                        Subscriber(&STreeView::OnItemClick, this));
+                ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&STreeView::OnItemClick, this));
                 // ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelDbclick::EventID,Subscriber(&STreeView::OnItemDblClick,this));
             }
             else
@@ -919,8 +910,7 @@ void STreeView::UpdateVisibleItems()
         }
 
         rcContainer.left = m_tvItemLocator->GetItemIndent(hItem);
-        CSize szItem = m_adapter->getViewDesiredSize(hItem, ii.pItem, rcContainer.Width(),
-                                                     rcContainer.Height());
+        CSize szItem = m_adapter->getViewDesiredSize(hItem, ii.pItem, rcContainer.Width(), rcContainer.Height());
         ii.pItem->Move(CRect(0, 0, szItem.cx, szItem.cy));
         m_tvItemLocator->SetItemWidth(hItem, szItem.cx);
         m_tvItemLocator->SetItemHeight(hItem, szItem.cy);
@@ -1170,8 +1160,7 @@ BOOL STreeView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     {
         CRect rcItem = pSelItem->GetItemRect();
         CPoint pt2 = pt - rcItem.TopLeft();
-        if (pSelItem->DoFrameEvent(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta),
-                                   MAKELPARAM(pt2.x, pt2.y)))
+        if (pSelItem->DoFrameEvent(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta), MAKELPARAM(pt2.x, pt2.y)))
             return TRUE;
     }
     return __baseCls::OnMouseWheel(nFlags, zDelta, pt);
@@ -1288,16 +1277,12 @@ BOOL STreeView::OnSetCursor(const CPoint &pt)
     if (m_itemCapture)
     {
         CRect rcItem = m_itemCapture->GetItemRect();
-        bRet = m_itemCapture->DoFrameEvent(WM_SETCURSOR, 0,
-                                           MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top))
-            != 0;
+        bRet = m_itemCapture->DoFrameEvent(WM_SETCURSOR, 0, MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top)) != 0;
     }
     else if (m_pHoverItem)
     {
         CRect rcItem = m_pHoverItem->GetItemRect();
-        bRet = m_pHoverItem->DoFrameEvent(WM_SETCURSOR, 0,
-                                          MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top))
-            != 0;
+        bRet = m_pHoverItem->DoFrameEvent(WM_SETCURSOR, 0, MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top)) != 0;
     }
     if (!bRet)
     {

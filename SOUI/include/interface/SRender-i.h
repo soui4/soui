@@ -1092,8 +1092,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *              kUnknown_Direction.
      */
     STDMETHOD_(void, addRect2)
-    (THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction))
-        PURE;
+    (THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
     /**
      *  Add a closed oval contour to the path
@@ -1354,29 +1353,21 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
 
     STDMETHOD_(HRESULT, DrawLines)(THIS_ LPPOINT pPt, size_t nCount) PURE;
     STDMETHOD_(HRESULT, GradientFill)
-    (THIS_ LPCRECT pRect, BOOL bVert, COLORREF crBegin, COLORREF crEnd, BYTE byAlpha DEF_VAL(0xFF))
-        PURE;
+    (THIS_ LPCRECT pRect, BOOL bVert, COLORREF crBegin, COLORREF crEnd, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, GradientFillEx)
-    (THIS_ LPCRECT pRect, const POINT *pts, COLORREF *colors, float *pos, int nCount,
-     BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    (THIS_ LPCRECT pRect, const POINT *pts, COLORREF *colors, float *pos, int nCount, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, GradientFill2)
-    (THIS_ LPCRECT pRect, GradientType type, COLORREF crStart, COLORREF crCenter, COLORREF crEnd,
-     float fLinearAngle, float fCenterX, float fCenterY, int nRadius, BYTE byAlpha DEF_VAL(0xFF))
-        PURE;
+    (THIS_ LPCRECT pRect, GradientType type, COLORREF crStart, COLORREF crCenter, COLORREF crEnd, float fLinearAngle, float fCenterX, float fCenterY, int nRadius, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, DrawIconEx)
     (THIS_ int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT diFlags) PURE;
     STDMETHOD_(HRESULT, DrawBitmap)
-    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, int xSrc, int ySrc, BYTE byAlpha DEF_VAL(0xFF))
-        PURE;
+    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, int xSrc, int ySrc, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, DrawBitmapEx)
-    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, UINT expendMode,
-     BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, UINT expendMode, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, DrawBitmap9Patch)
-    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, LPCRECT pRcSourMargin,
-     UINT expendMode, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, LPCRECT pRcSourMargin, UINT expendMode, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, BitBlt)
-    (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSour, int xSrc, int ySrc,
-     DWORD dwRop DEF_VAL(kSrcCopy)) PURE;
+    (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSour, int xSrc, int ySrc, DWORD dwRop DEF_VAL(kSrcCopy)) PURE;
     STDMETHOD_(HRESULT, AlphaBlend)
     (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSrc, LPCRECT pRcSrc, BYTE byAlpha) PURE;
     STDMETHOD_(IRenderObj *, GetCurrentObject)(THIS_ OBJTYPE uType) PURE;
@@ -1529,8 +1520,7 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
     (THIS_ float radius, BlurStyle style, BlurFlags flag, IMaskFilter **ppMaskFilter) PURE;
 
     STDMETHOD_(HRESULT, CreateEmbossMaskFilter)
-    (THIS_ float direction[3], float ambient, float specular, float blurRadius,
-     IMaskFilter **ppMaskFilter) PURE;
+    (THIS_ float direction[3], float ambient, float specular, float blurRadius, IMaskFilter **ppMaskFilter) PURE;
 
     STDMETHOD_(BOOL, CreatePath)(THIS_ IPathS * *ppPath) PURE;
 

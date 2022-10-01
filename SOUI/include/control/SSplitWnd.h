@@ -48,17 +48,17 @@ class SOUI_EXP SSplitPane : public SWindow {
     void Move(CRect rc);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_LAYOUTSIZE(L"idealSize", m_nSizeIdeal, FALSE)
-    ATTR_LAYOUTSIZE(L"minSize", m_nSizeMin, FALSE)
-    ATTR_LAYOUTSIZE(L"maxSize", m_nSizeMax, FALSE)
-    ATTR_INT(L"priority", m_nPriority, FALSE)
+        ATTR_LAYOUTSIZE(L"idealSize", m_nSizeIdeal, FALSE)
+        ATTR_LAYOUTSIZE(L"minSize", m_nSizeMin, FALSE)
+        ATTR_LAYOUTSIZE(L"maxSize", m_nSizeMax, FALSE)
+        ATTR_INT(L"priority", m_nPriority, FALSE)
     SOUI_ATTRS_END()
 
   protected:
     SLayoutSize m_nSizeIdeal; /**< 理想大小 */
     SLayoutSize m_nSizeMin;   /**< 最小大小 */
     SLayoutSize m_nSizeMax;   /**< 最大大小 */
-    int m_nPriority; /**< 优先级,值越大优先级越高,优先级越高，窗格越先到达idealSize  */
+    int m_nPriority;          /**< 优先级,值越大优先级越高,优先级越高，窗格越先到达idealSize  */
 };
 
 /**
@@ -246,10 +246,7 @@ class SOUI_EXP SSplitWnd : public SWindow {
     void FatchPaneSizeInfo(const SplitPaneList &lstPane, PANESIZELIST &lstPaneSize);
 
     //根据计算获得的窗格size信息设置窗格位置
-    int ResetPanesPostion(SplitPaneList &lstPane,
-                          SplitPaneList &lstPanePriority,
-                          PANESIZELIST &lstPaneSize,
-                          int offset);
+    int ResetPanesPostion(SplitPaneList &lstPane, SplitPaneList &lstPanePriority, PANESIZELIST &lstPaneSize, int offset);
 
     //调整列表中控件的高度（宽度）
     int AdjustPanesSize(PANESIZELIST &lstPriority, int remain);
@@ -259,17 +256,17 @@ class SOUI_EXP SSplitWnd : public SWindow {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"sepSize", m_spliterSize, TRUE)
-    ATTR_SKIN(L"sepSkin", m_pSkinSep, TRUE)
-    ATTR_BOOL(L"adjustable", m_bAdjustable, TRUE)
-    ATTR_INT(L"vertical", m_orintation, TRUE)
+        ATTR_INT(L"sepSize", m_spliterSize, TRUE)
+        ATTR_SKIN(L"sepSkin", m_pSkinSep, TRUE)
+        ATTR_BOOL(L"adjustable", m_bAdjustable, TRUE)
+        ATTR_INT(L"vertical", m_orintation, TRUE)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
     SOUI_MSG_MAP_END()
 };
 

@@ -89,8 +89,7 @@ struct IIpcHandle : IObjRef
 
     virtual IIpcConnection *GetIpcConnection() const = 0;
 
-    virtual LRESULT OnMessage(ULONG_PTR idLocal, UINT uMsg, WPARAM wp, LPARAM lp, BOOL &bHandled)
-        = 0;
+    virtual LRESULT OnMessage(ULONG_PTR idLocal, UINT uMsg, WPARAM wp, LPARAM lp, BOOL &bHandled) = 0;
 
     virtual HRESULT ConnectTo(ULONG_PTR idLocal, ULONG_PTR idSvr) = 0;
 
@@ -123,9 +122,7 @@ struct IIpcConnection : IObjRef
     virtual int GetStackSize() const = 0;
     virtual IIpcHandle *GetIpcHandle() = 0;
     virtual bool HandleFun(UINT uFunID, SParamStream &ps) = 0;
-    virtual void BuildShareBufferName(ULONG_PTR idLocal,
-                                      ULONG_PTR idRemote,
-                                      TCHAR szBuf[MAX_PATH]) const = 0;
+    virtual void BuildShareBufferName(ULONG_PTR idLocal, ULONG_PTR idRemote, TCHAR szBuf[MAX_PATH]) const = 0;
 };
 
 struct IIpcSvrCallback
@@ -143,8 +140,7 @@ struct IIpcServer : IObjRef
 {
     virtual HRESULT Init(ULONG_PTR idSvr, IIpcSvrCallback *pCallback) = 0;
     virtual void CheckConnectivity() = 0;
-    virtual LRESULT OnMessage(ULONG_PTR idLocal, UINT uMsg, WPARAM wp, LPARAM lp, BOOL &bHandled)
-        = 0;
+    virtual LRESULT OnMessage(ULONG_PTR idLocal, UINT uMsg, WPARAM wp, LPARAM lp, BOOL &bHandled) = 0;
     virtual void EnumClient(FunEnumConnection funEnum, ULONG_PTR data) = 0;
     virtual BOOL FindConnection(ULONG_PTR idConn) = 0;
 };

@@ -269,8 +269,7 @@ void SSkinButton::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, 
         }
         CRect rcDraw = *prcDraw;
         rcDraw.DeflateRect(1, 1);
-        pRT->GradientFill(rcDraw, TRUE, m_colors.m_crUp[iState], m_colors.m_crDown[iState],
-                          byAlpha);
+        pRT->GradientFill(rcDraw, TRUE, m_colors.m_crUp[iState], m_colors.m_crDown[iState], byAlpha);
         if (nCorner > 2)
         {
             pRT->PopClip();
@@ -356,10 +355,7 @@ SSkinGradation::SSkinGradation()
 {
 }
 
-void SSkinGradation::_DrawByIndex(IRenderTarget *pRT,
-                                  LPCRECT prcDraw,
-                                  int iState,
-                                  BYTE byAlpha) const
+void SSkinGradation::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const
 {
     pRT->GradientFill(prcDraw, m_bVert, m_crFrom, m_crTo, byAlpha);
 }
@@ -442,10 +438,7 @@ CRect SSkinScrollbar::GetPartRect(int nSbCode, int nState, BOOL bVertical) const
     }
 }
 
-void SSkinScrollbar::_DrawByState(IRenderTarget *pRT,
-                                  LPCRECT prcDraw,
-                                  DWORD dwState,
-                                  BYTE byAlpha) const
+void SSkinScrollbar::_DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwState, BYTE byAlpha) const
 {
     if (!GetImage())
         return;
@@ -460,8 +453,7 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT,
 
     CRect rcSour = GetPartRect(nSbCode, nState, bVertical);
 
-    pRT->DrawBitmap9Patch(prcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH,
-                          byAlpha);
+    pRT->DrawBitmap9Patch(prcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
 
     if (nSbCode == SB_THUMBTRACK && m_bHasGripper)
     {
@@ -469,13 +461,10 @@ void SSkinScrollbar::_DrawByState(IRenderTarget *pRT,
         CRect rcDraw = *prcDraw;
 
         if (bVertical)
-            rcDraw.top += (rcDraw.Height() - rcSour.Height()) / 2,
-                rcDraw.bottom = rcDraw.top + rcSour.Height();
+            rcDraw.top += (rcDraw.Height() - rcSour.Height()) / 2, rcDraw.bottom = rcDraw.top + rcSour.Height();
         else
-            rcDraw.left += (rcDraw.Width() - rcSour.Width()) / 2,
-                rcDraw.right = rcDraw.left + rcSour.Width();
-        pRT->DrawBitmap9Patch(&rcDraw, GetImage(), &rcSour, &rcMargin,
-                              m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
+            rcDraw.left += (rcDraw.Width() - rcSour.Width()) / 2, rcDraw.right = rcDraw.left + rcSour.Width();
+        pRT->DrawBitmap9Patch(&rcDraw, GetImage(), &rcSour, &rcMargin, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
     }
 }
 
@@ -514,10 +503,7 @@ SSkinColorRect::~SSkinColorRect()
 {
 }
 
-void SSkinColorRect::_DrawByIndex(IRenderTarget *pRT,
-                                  LPCRECT prcDraw,
-                                  int iState,
-                                  BYTE byAlpha) const
+void SSkinColorRect::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const
 {
     if (iState > 3)
         return;
@@ -644,8 +630,7 @@ SIZE SSkinShape::GetSkinSize() const
     if (!m_shapeSize)
         return CSize();
 
-    SIZE szRet = { m_shapeSize->m_width.toPixelSize(GetScale()),
-                   m_shapeSize->m_height.toPixelSize(GetScale()) };
+    SIZE szRet = { m_shapeSize->m_width.toPixelSize(GetScale()), m_shapeSize->m_height.toPixelSize(GetScale()) };
     return szRet;
 }
 
@@ -732,12 +717,9 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
         case ring:
             if (m_ringParam)
             {
-                POINT ptCenter = { (rcStroke.left + rcStroke.right) / 2,
-                                   (rcStroke.top + rcStroke.bottom) / 2 };
-                int nRadius
-                    = smin(rcStroke.right - rcStroke.left, rcStroke.bottom - rcStroke.top) / 2;
-                RECT rcRing = { ptCenter.x - nRadius, ptCenter.y - nRadius, ptCenter.x + nRadius,
-                                ptCenter.y + nRadius };
+                POINT ptCenter = { (rcStroke.left + rcStroke.right) / 2, (rcStroke.top + rcStroke.bottom) / 2 };
+                int nRadius = smin(rcStroke.right - rcStroke.left, rcStroke.bottom - rcStroke.top) / 2;
+                RECT rcRing = { ptCenter.x - nRadius, ptCenter.y - nRadius, ptCenter.x + nRadius, ptCenter.y + nRadius };
                 pRT->DrawArc(&rcRing, m_ringParam->m_startAngle, m_ringParam->m_sweepAngle, false);
             }
             break;
@@ -753,8 +735,7 @@ int SSkinShape::GetStates() const
 
 void SSkinShape::SGradient::Draw(IRenderTarget *pRT, LPCRECT rcDraw, BYTE byAlpha, int nScale) const
 {
-    pRT->GradientFill2(rcDraw, m_Type, m_crStart, m_crCenter, m_crEnd, m_angle, m_centerX,
-                       m_centerY, m_radius.toPixelSize(nScale), byAlpha);
+    pRT->GradientFill2(rcDraw, m_Type, m_crStart, m_crCenter, m_crEnd, m_angle, m_centerX, m_centerY, m_radius.toPixelSize(nScale), byAlpha);
 }
 
 HRESULT SSkinShape::SCornerSize::OnAttrRadius(const SStringW strValue, BOOL bLoading)

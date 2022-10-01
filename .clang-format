@@ -62,7 +62,7 @@ BreakConstructorInitializersBeforeComma: false
 BreakConstructorInitializers: BeforeComma
 BreakAfterJavaFieldAnnotations: false
 BreakStringLiterals: false
-ColumnLimit:     100
+ColumnLimit:     500
 CommentPragmas:  '^ IWYU pragma:'
 CompactNamespaces: false
 ConstructorInitializerAllOnOneLineOrOnePerLine: false
@@ -99,8 +99,10 @@ IndentWrappedFunctionNames: false
 JavaScriptQuotes: Leave
 JavaScriptWrapImports: true
 KeepEmptyLinesAtTheStartOfBlocks: true
-MacroBlockBegin: ''
-MacroBlockEnd:   ''
+MacroBlockBegin: 'SOUI_ATTRS_BEGIN|BEGIN_MSG_MAP_EX$|EVENT_MAP_BEGIN|SOUI_MSG_MAP_BEGIN$|SOUI_MSG_MAP_BEGIN$|ATTR_ENUM_BEGIN$'
+MacroBlockEnd:   'SOUI_ATTRS_END|END_MSG_MAP$|EVENT_MAP_END|SOUI_MSG_MAP_END$|SOUI_MSG_MAP_END$|SOUI_MSG_MAP_END_BASE$|ATTR_ENUM_END$|SOUI_ATTRS_BREAK$'
+
+
 MaxEmptyLinesToKeep: 1
 NamespaceIndentation: None
 ObjCBinPackProtocolList: Auto
@@ -109,8 +111,8 @@ ObjCSpaceAfterProperty: false
 ObjCSpaceBeforeProtocolList: true
 PenaltyBreakAssignment: 2
 PenaltyBreakBeforeFirstCallParameter: 19
-PenaltyBreakComment: 300
-PenaltyBreakFirstLessLess: 120
+PenaltyBreakComment: 800
+PenaltyBreakFirstLessLess: 300
 PenaltyBreakString: 1000
 PenaltyBreakTemplateDeclaration: 10
 PenaltyExcessCharacter: 1000000

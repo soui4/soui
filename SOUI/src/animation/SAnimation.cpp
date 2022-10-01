@@ -177,9 +177,7 @@ BOOL SAnimation::getTransformation(int64_t currentTime, ITransformation *outTran
     return bMore;
 }
 
-BOOL SAnimation::getTransformation2(uint64_t currentTime,
-                                    ITransformation *outTransformation,
-                                    float scale)
+BOOL SAnimation::getTransformation2(uint64_t currentTime, ITransformation *outTransformation, float scale)
 {
     mScaleFactor = scale;
     return getTransformation(currentTime, outTransformation);

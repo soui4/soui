@@ -48,11 +48,7 @@ class SOUI_EXP SAccessible
     STDMETHODIMP get_accSelection(VARIANT *pvarChildren);
     STDMETHODIMP get_accDefaultAction(VARIANT varChild, BSTR *pszDefaultAction);
     STDMETHODIMP accSelect(long flagsSelect, VARIANT varChild);
-    STDMETHODIMP accLocation(long *pxLeft,
-                             long *pyTop,
-                             long *pcxWidth,
-                             long *pcyHeight,
-                             VARIANT varChild);
+    STDMETHODIMP accLocation(long *pxLeft, long *pyTop, long *pcxWidth, long *pcyHeight, VARIANT varChild);
     STDMETHODIMP accNavigate(long navDir, VARIANT varStart, VARIANT *pvarEndUpAt);
     STDMETHODIMP accHitTest(long xLeft, long yTop, VARIANT *pvarChild);
     STDMETHODIMP accDoDefaultAction(VARIANT varChild);
@@ -62,19 +58,8 @@ class SOUI_EXP SAccessible
     // Implement IDispatch
     STDMETHODIMP GetTypeInfoCount(unsigned int FAR *pctinfo);
     STDMETHODIMP GetTypeInfo(unsigned int iTInfo, LCID lcid, ITypeInfo FAR *FAR *ppTInfo);
-    STDMETHODIMP GetIDsOfNames(REFIID riid,
-                               OLECHAR FAR *FAR *rgszNames,
-                               unsigned int cNames,
-                               LCID lcid,
-                               DISPID FAR *rgDispId);
-    STDMETHODIMP Invoke(DISPID dispIdMember,
-                        REFIID riid,
-                        LCID lcid,
-                        WORD wFlags,
-                        DISPPARAMS FAR *pDispParams,
-                        VARIANT FAR *pVarResult,
-                        EXCEPINFO FAR *pExcepInfo,
-                        unsigned int FAR *puArgErr);
+    STDMETHODIMP GetIDsOfNames(REFIID riid, OLECHAR FAR *FAR *rgszNames, unsigned int cNames, LCID lcid, DISPID FAR *rgDispId);
+    STDMETHODIMP Invoke(DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS FAR *pDispParams, VARIANT FAR *pVarResult, EXCEPINFO FAR *pExcepInfo, unsigned int FAR *puArgErr);
 
   public:
     IUNKNOWN_BEGIN(IAccessible)

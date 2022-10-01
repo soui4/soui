@@ -47,8 +47,7 @@ class CElementTraits<SResID> : public CElementTraitsBase<SResID> {
 
     static bool CompareElements(INARGTYPE element1, INARGTYPE element2)
     {
-        return _tcscmp(element1.szType, element2.szType) == 0
-            && _tcscmp(element1.szName, element2.szName) == 0;
+        return _tcscmp(element1.szType, element2.szType) == 0 && _tcscmp(element1.szName, element2.szName) == 0;
     }
 
     static int CompareElementsOrdered(INARGTYPE element1, INARGTYPE element2)

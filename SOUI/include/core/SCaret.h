@@ -31,12 +31,12 @@ class SOUI_EXP SCaret
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_BOOL(L"animate", m_bAniCaret, FALSE)
-    ATTR_COLOR(L"color", m_crCaret, FALSE)
-    ATTR_INT(L"fadeTime", m_nAniFrames, FALSE)
-    ATTR_INT(L"showTime", m_nShowFrames, FALSE)
-    ATTR_INTERPOLATOR(L"interpolator", m_AniInterpolator, FALSE)
-    ATTR_CHAIN_PTR(m_AniInterpolator, 0)
+        ATTR_BOOL(L"animate", m_bAniCaret, FALSE)
+        ATTR_COLOR(L"color", m_crCaret, FALSE)
+        ATTR_INT(L"fadeTime", m_nAniFrames, FALSE)
+        ATTR_INT(L"showTime", m_nShowFrames, FALSE)
+        ATTR_INTERPOLATOR(L"interpolator", m_AniInterpolator, FALSE)
+        ATTR_CHAIN_PTR(m_AniInterpolator, 0)
     SOUI_ATTRS_END()
   protected:
     void Invalidate();

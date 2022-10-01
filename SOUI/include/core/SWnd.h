@@ -104,8 +104,8 @@ class SStateHelper {
 
 class SOUI_EXP STimerID {
   public:
-    DWORD swnd : 24; //窗口句柄,如果窗口句柄超过24位范围，则不能使用这种方式设置定时器
-    DWORD uTimerID : 7; //定时器ID，一个窗口最多支持128个定时器。
+    DWORD swnd : 24;      //窗口句柄,如果窗口句柄超过24位范围，则不能使用这种方式设置定时器
+    DWORD uTimerID : 7;   //定时器ID，一个窗口最多支持128个定时器。
     DWORD bSwndTimer : 1; //区别通用定时器的标志，标志为1时，表示该定时器为SWND定时器
 
     STimerID(SWND swnd_, char timeId)
@@ -152,9 +152,9 @@ typedef enum tagGW_CODE
 
 struct SwndToolTipInfo
 {
-    SWND swnd;      //拥有tooltip的窗口
-    DWORD dwCookie; // tooltip在窗口内的ID，对应一个窗口不同区域显示不同tip的情况，一般可以不提供
-    CRect rcTarget; // tooltip感应区
+    SWND swnd;       //拥有tooltip的窗口
+    DWORD dwCookie;  // tooltip在窗口内的ID，对应一个窗口不同区域显示不同tip的情况，一般可以不提供
+    CRect rcTarget;  // tooltip感应区
     SStringT strTip; // tip字符串
 };
 
@@ -190,8 +190,9 @@ class SOUI_EXP STrText {
  *
  * Describe   SOUI窗口基类,实现窗口的基本接口
  */
-class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
-	                   , protected IAnimationListener {
+class SOUI_EXP SWindow
+    : public TObjRefImpl<SObjectImpl<IWindow>>
+    , protected IAnimationListener {
     DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IWindow>>, L"window", Window)
     friend class SwndLayoutBuilder;
     friend class SWindowRepos;
@@ -603,9 +604,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
 
         if (!pTarget || !pTarget->IsClass(T::GetClassName()))
         {
-            SSLOGFMTD(
-                _T("FindChildByID2 Failed, no window of class [%s] with id of [%d] was found within [%d] levels"),
-                T::GetClassName(), nID, nDeep);
+            SSLOGFMTD(_T("FindChildByID2 Failed, no window of class [%s] with id of [%d] was found within [%d] levels"), T::GetClassName(), nID, nDeep);
             return NULL;
         }
         return (T *)pTarget;
@@ -642,9 +641,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
         SWindow *pTarget = FindChildByName(pszName, nDeep);
         if (!pTarget || !pTarget->IsClass(T::GetClassName()))
         {
-            SSLOGFMTD(
-                _T("FindChildByName2 Failed, no window of class [%s] with name of [%s] was found within [%d] levels"),
-                T::GetClassName(), pszName, nDeep);
+            SSLOGFMTD(_T("FindChildByName2 Failed, no window of class [%s] with name of [%s] was found within [%d] levels"), T::GetClassName(), pszName, nDeep);
             return NULL;
         }
         return (T *)pTarget;
@@ -699,9 +696,9 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
     STransformation GetTransformation() const;
 
   protected:
-    STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation * animation);
-    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation * animation);
-	STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation * animation);
+    STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation *animation);
+    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *animation);
+    STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation *animation);
 
   protected:
     virtual void OnAnimationInvalidate(IAnimation *pAni, bool bErase);
@@ -771,7 +768,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
 
     virtual BOOL CreateChildren(SXmlNode xmlNode);
 
-	virtual SWindow *CreateChildByName(LPCWSTR pszName);
+    virtual SWindow *CreateChildByName(LPCWSTR pszName);
 
     /**
      * RequestRelayout
@@ -830,11 +827,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
      *
      * Describe  子控件重载该方法来定义具体绘制行为
      */
-    virtual void DrawText(IRenderTarget *pRT,
-                          LPCTSTR pszBuf,
-                          int cchText,
-                          LPRECT pRect,
-                          UINT uFormat);
+    virtual void DrawText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
 
     /**
      * DrawFocus
@@ -898,9 +891,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
      *
      * Describe  使用ReleaseRenderTarget释放
      */
-    IRenderTarget *GetRenderTarget(LPCRECT pRc = NULL,
-                                   GrtFlag gdcFlags = GRT_NODRAW,
-                                   BOOL bClientRT = TRUE);
+    IRenderTarget *GetRenderTarget(LPCRECT pRc = NULL, GrtFlag gdcFlags = GRT_NODRAW, BOOL bClientRT = TRUE);
 
     /**
      * GetRenderTarget
@@ -1017,10 +1008,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
      *
      * Describe
      */
-    virtual void DispatchPaint(IRenderTarget *pRT,
-                               IRegionS *pRgn,
-                               UINT iZorderBegin,
-                               UINT iZorderEnd);
+    virtual void DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegin, UINT iZorderEnd);
 
     /**
      * OnCommitSurface
@@ -1034,11 +1022,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
      *
      * Describe
      */
-    virtual void OnCommitSurface(IRenderTarget *pRtDest,
-                                 LPCRECT pRcDest,
-                                 IRenderTarget *pRtSrc,
-                                 LPCRECT pRcSrc,
-                                 BYTE alpha);
+    virtual void OnCommitSurface(IRenderTarget *pRtDest, LPCRECT pRcDest, IRenderTarget *pRtSrc, LPCRECT pRcSrc, BYTE alpha);
 
   protected: // helper functions
     virtual SWindow *_FindChildByID(int nID, int nDeep);
@@ -1135,28 +1119,28 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
     LRESULT OnUpdateFont(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
-    MSG_WM_NCPAINT_EX(OnNcPaint)
-    MSG_WM_CREATE(OnCreate)
-    MSG_WM_SIZE(OnSize)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_SHOWWINDOW(OnShowWindow)
-    MSG_WM_ENABLE_EX(OnEnable)
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_RBUTTONDOWN(OnRButtonDown)
-    MSG_WM_RBUTTONUP(OnRButtonUp)
-    MSG_WM_MOUSEMOVE(OnMouseMove)
-    MSG_WM_MOUSEHOVER(OnMouseHover)
-    MSG_WM_MOUSELEAVE(OnMouseLeave)
-    MSG_WM_MOUSEWHEEL(OnMouseWheel)
-    MSG_WM_SETFOCUS_EX(OnSetFocus)
-    MSG_WM_KILLFOCUS_EX(OnKillFocus)
-    MESSAGE_HANDLER_EX(UM_SETLANGUAGE, OnSetLanguage)
-    MESSAGE_HANDLER_EX(UM_SETSCALE, OnSetScale)
-    MESSAGE_HANDLER_EX(UM_SETCOLORIZE, OnSetColorize)
-    MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
+        MSG_WM_NCPAINT_EX(OnNcPaint)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_SIZE(OnSize)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_SHOWWINDOW(OnShowWindow)
+        MSG_WM_ENABLE_EX(OnEnable)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_RBUTTONDOWN(OnRButtonDown)
+        MSG_WM_RBUTTONUP(OnRButtonUp)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSEHOVER(OnMouseHover)
+        MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MSG_WM_MOUSEWHEEL(OnMouseWheel)
+        MSG_WM_SETFOCUS_EX(OnSetFocus)
+        MSG_WM_KILLFOCUS_EX(OnKillFocus)
+        MESSAGE_HANDLER_EX(UM_SETLANGUAGE, OnSetLanguage)
+        MESSAGE_HANDLER_EX(UM_SETSCALE, OnSetScale)
+        MESSAGE_HANDLER_EX(UM_SETCOLORIZE, OnSetColorize)
+        MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
     SOUI_MSG_MAP_END_BASE() //消息不再往基类传递，此外使用SOUI_MSG_MAP_END_BASE而不是SOUI_MSG_MAP_END
 
   protected:
@@ -1175,43 +1159,38 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
     HRESULT OnAttrTip(const SStringW &strValue, BOOL bLoading);
     HRESULT OnAttrText(const SStringW &strValue, BOOL bLoading);
 
-    HRESULT DefAttributeProc(const SStringW &strAttribName,
-                             const SStringW &strValue,
-                             BOOL bLoading);
+    HRESULT DefAttributeProc(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading);
 
-    virtual HRESULT AfterAttribute(const SStringW &strAttribName,
-                                   const SStringW &strValue,
-                                   BOOL bLoading,
-                                   HRESULT hr);
+    virtual HRESULT AfterAttribute(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading, HRESULT hr);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"layout", OnAttrLayout)
-    ATTR_CUSTOM(L"class", OnAttrClass) //解析style
-    ATTR_CUSTOM(L"id", OnAttrID)
-    ATTR_CUSTOM(L"name", OnAttrName)
-    ATTR_CUSTOM(L"skin", OnAttrSkin)      //直接获得皮肤对象
-    ATTR_SKIN(L"ncskin", m_pNcSkin, TRUE) //直接获得皮肤对象
-    ATTR_INT(L"data", m_uData, 0)
-    ATTR_CUSTOM(L"text", OnAttrText)
-    ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)
-    ATTR_CUSTOM(L"enable", OnAttrEnable)
-    ATTR_CUSTOM(L"visible", OnAttrVisible)
-    ATTR_CUSTOM(L"show", OnAttrVisible)
-    ATTR_CUSTOM(L"display", OnAttrDisplay)
-    ATTR_CUSTOM(L"cache", OnAttrCache)
-    ATTR_CUSTOM(L"alpha", OnAttrAlpha)
-    ATTR_BOOL(L"layeredWindow", m_bLayeredWindow, TRUE)
-    ATTR_CUSTOM(L"trackMouseEvent", OnAttrTrackMouseEvent)
-    ATTR_CUSTOM(L"tip", OnAttrTip)
-    ATTR_BOOL(L"msgTransparent", m_bMsgTransparent, FALSE)
-    ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)
-    ATTR_BOOL(L"clipClient", m_bClipClient, FALSE)
-    ATTR_BOOL(L"focusable", m_bFocusable, FALSE)
-    ATTR_BOOL(L"drawFocusRect", m_bDrawFocusRect, TRUE)
-    ATTR_BOOL(L"float", m_bFloat, FALSE)
-    ATTR_CHAIN(m_style, HRET_FLAG_STYLE)                   //交给SwndStyle处理
-    ATTR_CHAIN_PTR(m_pLayout, HRET_FLAG_LAYOUT)            //交给Layout处理
-    ATTR_CHAIN_PTR(m_pLayoutParam, HRET_FLAG_LAYOUT_PARAM) //交给LayoutParam处理
+        ATTR_CUSTOM(L"layout", OnAttrLayout)
+        ATTR_CUSTOM(L"class", OnAttrClass) //解析style
+        ATTR_CUSTOM(L"id", OnAttrID)
+        ATTR_CUSTOM(L"name", OnAttrName)
+        ATTR_CUSTOM(L"skin", OnAttrSkin)      //直接获得皮肤对象
+        ATTR_SKIN(L"ncskin", m_pNcSkin, TRUE) //直接获得皮肤对象
+        ATTR_INT(L"data", m_uData, 0)
+        ATTR_CUSTOM(L"text", OnAttrText)
+        ATTR_STRINGW(L"trCtx", m_strTrCtx, FALSE)
+        ATTR_CUSTOM(L"enable", OnAttrEnable)
+        ATTR_CUSTOM(L"visible", OnAttrVisible)
+        ATTR_CUSTOM(L"show", OnAttrVisible)
+        ATTR_CUSTOM(L"display", OnAttrDisplay)
+        ATTR_CUSTOM(L"cache", OnAttrCache)
+        ATTR_CUSTOM(L"alpha", OnAttrAlpha)
+        ATTR_BOOL(L"layeredWindow", m_bLayeredWindow, TRUE)
+        ATTR_CUSTOM(L"trackMouseEvent", OnAttrTrackMouseEvent)
+        ATTR_CUSTOM(L"tip", OnAttrTip)
+        ATTR_BOOL(L"msgTransparent", m_bMsgTransparent, FALSE)
+        ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)
+        ATTR_BOOL(L"clipClient", m_bClipClient, FALSE)
+        ATTR_BOOL(L"focusable", m_bFocusable, FALSE)
+        ATTR_BOOL(L"drawFocusRect", m_bDrawFocusRect, TRUE)
+        ATTR_BOOL(L"float", m_bFloat, FALSE)
+        ATTR_CHAIN(m_style, HRET_FLAG_STYLE)                   //交给SwndStyle处理
+        ATTR_CHAIN_PTR(m_pLayout, HRET_FLAG_LAYOUT)            //交给Layout处理
+        ATTR_CHAIN_PTR(m_pLayoutParam, HRET_FLAG_LAYOUT_PARAM) //交给LayoutParam处理
     SOUI_ATTRS_END()
 
   protected:
@@ -1228,10 +1207,9 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
     virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
 
   private:
-    CRect
-        m_rcWindow; /**<
-                       窗口在容器中的位置,由于它的值包含POS_INIT等，调整为private，不允许派生类中直接访问该变量的值
-                     */
+    CRect m_rcWindow; /**<
+                         窗口在容器中的位置,由于它的值包含POS_INIT等，调整为private，不允许派生类中直接访问该变量的值
+                       */
 
   protected:
     //布局脏标志类型
@@ -1268,7 +1246,7 @@ class SOUI_EXP SWindow : public TObjRefImpl<SObjectImpl<IWindow>>
     SStringW m_strTrCtx;      /**< translate context. empty than use container's tr ctx*/
     int m_nID;                /**< 窗口ID */
     UINT m_uZorder;           /**< 窗口Zorder */
-    int m_nUpdateLockCnt; /**< 暂时锁定更新Count，锁定后，不向宿主发送Invalidate */
+    int m_nUpdateLockCnt;     /**< 暂时锁定更新Count，锁定后，不向宿主发送Invalidate */
 
     DWORD m_dwState;      /**< 窗口在渲染过程中的状态 */
     DWORD m_bVisible : 1; /**< 窗口可见状态 */

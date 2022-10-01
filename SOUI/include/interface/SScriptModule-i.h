@@ -141,22 +141,22 @@ DECLARE_INTERFACE_(IScriptFactory, IObjRef)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
-    */
-    STDMETHOD_(long,AddRef) (THIS) PURE;
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
      * @brief 减少引用计数
      * @return 新引用计数
-    */
-    STDMETHOD_(long,Release) (THIS) PURE;
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	/**
-	 * @brief 释放对象
-	 * @return void
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-	
-	STDMETHOD_(HRESULT, CreateScriptModule)(THIS_ IScriptModule * *ppScriptModule) PURE;
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+    STDMETHOD_(HRESULT, CreateScriptModule)(THIS_ IScriptModule * *ppScriptModule) PURE;
 };
 
 SNSEND

@@ -58,8 +58,7 @@ void SAnimationSet::initialize(int width, int height, int parentWidth, int paren
     bool durationSet = (mFlags & PROPERTY_DURATION_MASK) == PROPERTY_DURATION_MASK;
     bool fillAfterSet = (mFlags & PROPERTY_FILL_AFTER_MASK) == PROPERTY_FILL_AFTER_MASK;
     bool fillBeforeSet = (mFlags & PROPERTY_FILL_BEFORE_MASK) == PROPERTY_FILL_BEFORE_MASK;
-    bool shareInterpolator
-        = (mFlags & PROPERTY_SHARE_INTERPOLATOR_MASK) == PROPERTY_SHARE_INTERPOLATOR_MASK;
+    bool shareInterpolator = (mFlags & PROPERTY_SHARE_INTERPOLATOR_MASK) == PROPERTY_SHARE_INTERPOLATOR_MASK;
 
     if (shareInterpolator)
     {
@@ -135,12 +134,12 @@ BOOL SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
     {
         return TRUE;
     }
-	if (!mStarted)
-	{
-		mStarted = TRUE;
-		fireAnimationStart();
-	}
-	t->Clear();
+    if (!mStarted)
+    {
+        mStarted = TRUE;
+        fireAnimationStart();
+    }
+    t->Clear();
 
     int count = (int)mAnimations.GetCount();
     if (!mChildStarted)

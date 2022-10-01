@@ -9,8 +9,7 @@ GridGravity SGridLayoutParam::parseGridGravity(const SStringW &strValue)
         GridGravity gridGravity;
         LPCWSTR pszGravity;
     } map[] = {
-        { gLeft, L"left" },   { gTop, L"top" },       { gCenter, L"center" },
-        { gRight, L"right" }, { gBottom, L"bottom" }, { gFill, L"fill" },
+        { gLeft, L"left" }, { gTop, L"top" }, { gCenter, L"center" }, { gRight, L"right" }, { gBottom, L"bottom" }, { gFill, L"fill" },
     };
 
     for (int i = 0; i < ARRAYSIZE(map); i++)

@@ -94,10 +94,7 @@ class SOUI_EXP SOsrPanel
     {
     }
 
-    static BOOL IsItemInClip(const SMatrix &mtx,
-                             const CRect &rcClip,
-                             const IRegionS *clipRgn,
-                             const CRect &rcItem);
+    static BOOL IsItemInClip(const SMatrix &mtx, const CRect &rcClip, const IRegionS *clipRgn, const CRect &rcItem);
 
   public:
     STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM lp) OVERRIDE;
@@ -163,8 +160,8 @@ class SOUI_EXP SOsrPanel
     void OnShowWindow(BOOL bShow, UINT nStatus);
     void OnDestroy();
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_SHOWWINDOW(OnShowWindow)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_SHOWWINDOW(OnShowWindow)
     SOUI_MSG_MAP_END()
   protected:
     IHostProxy *m_pHostProxy;
@@ -236,9 +233,7 @@ class TOsrPanelProxy
 class SOUI_EXP SItemPanel : public TOsrPanelProxy<IItemPanel> {
     DEF_SOBJECT(SWindow, L"ItemPanel")
   public:
-    static SItemPanel *Create(IHostProxy *pFrameHost,
-                              SXmlNode xmlNode,
-                              IItemContainer *pItemContainer);
+    static SItemPanel *Create(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer);
 
   public:
     SItemPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer);
@@ -252,9 +247,9 @@ class SOUI_EXP SItemPanel : public TOsrPanelProxy<IItemPanel> {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_COLOR(L"colorNormal", m_crBk, FALSE)
-    ATTR_COLOR(L"colorSelected", m_crSelBk, FALSE)
-    ATTR_COLOR(L"colorHover", m_crHover, FALSE)
+        ATTR_COLOR(L"colorNormal", m_crBk, FALSE)
+        ATTR_COLOR(L"colorSelected", m_crSelBk, FALSE)
+        ATTR_COLOR(L"colorHover", m_crHover, FALSE)
     SOUI_ATTRS_END()
 
   protected:

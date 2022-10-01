@@ -165,12 +165,7 @@ class S3DView {
     SkCamera3D fCamera;
 };
 
-static float SFloatDotDiv(int count,
-                          const float a[],
-                          int step_a,
-                          const float b[],
-                          int step_b,
-                          float denom)
+static float SFloatDotDiv(int count, const float a[], int step_a, const float b[], int step_b, float denom)
 {
     float prod = 0;
     for (int i = 0; i < count; i++)
@@ -458,8 +453,7 @@ void SkCamera3D::patchToMatrix(const SkPatch3D &quilt, SMatrix *matrix) const
     diff.fY = quilt.fOrigin.fY - fLocation.fY;
     diff.fZ = quilt.fOrigin.fZ - fLocation.fZ;
 
-    dot = SkUnit3D::Dot(*SkTCast<const SkUnit3D *>(&diff),
-                        *SkTCast<const SkUnit3D *>(fOrientation.fMat + 6));
+    dot = SkUnit3D::Dot(*SkTCast<const SkUnit3D *>(&diff), *SkTCast<const SkUnit3D *>(fOrientation.fMat + 6));
 
     patchPtr = (const float *)&quilt;
     matrix->set(kMScaleX, SFloatDotDiv(3, patchPtr, 1, mapPtr, 1, dot));

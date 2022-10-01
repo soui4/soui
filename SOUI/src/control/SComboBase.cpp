@@ -68,10 +68,7 @@ BOOL SDropDownWnd_ComboBox::PreTranslateMessage(MSG *pMsg)
 {
     if (SDropDownWnd::PreTranslateMessage(pMsg))
         return TRUE;
-    if (pMsg->message == WM_MOUSEWHEEL
-        || ((pMsg->message == WM_KEYDOWN || pMsg->message == WM_KEYUP)
-            && (pMsg->wParam == VK_UP || pMsg->wParam == VK_DOWN || pMsg->wParam == VK_RETURN
-                || pMsg->wParam == VK_ESCAPE)))
+    if (pMsg->message == WM_MOUSEWHEEL || ((pMsg->message == WM_KEYDOWN || pMsg->message == WM_KEYUP) && (pMsg->wParam == VK_UP || pMsg->wParam == VK_DOWN || pMsg->wParam == VK_RETURN || pMsg->wParam == VK_ESCAPE)))
     { //截获滚轮及上下键消息
         SNativeWnd::SendMessage(pMsg->message, pMsg->wParam, pMsg->lParam);
         return TRUE;
@@ -457,12 +454,9 @@ void SComboBase::DropDown()
     m_pDropDownWnd->Create(rcPopup, 0);
 
     if (m_nAnimTime > 0)
-        m_pDropDownWnd->AnimateHostWindow(m_nAnimTime,
-                                          AW_SLIDE | (bDown ? AW_VER_POSITIVE : AW_VER_NEGATIVE));
+        m_pDropDownWnd->AnimateHostWindow(m_nAnimTime, AW_SLIDE | (bDown ? AW_VER_POSITIVE : AW_VER_NEGATIVE));
     else
-        m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0,
-                                     SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE
-                                         | SWP_NOACTIVATE);
+        m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 
     m_pDropDownWnd->SNativeWnd::SetCapture();
 }

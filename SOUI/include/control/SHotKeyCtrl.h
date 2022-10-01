@@ -184,20 +184,20 @@ class SOUI_EXP SHotKeyCtrl
     HRESULT OnAttrInvalidModifier(const SStringW &value, BOOL bLoading);
     HRESULT OnAttrHotKey(const SStringW &value, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"invalidComb", OnAttrInvalidComb)
-    ATTR_CUSTOM(L"invalidModifier", OnAttrInvalidModifier)
-    ATTR_CUSTOM(L"hotKey", OnAttrHotKey)
+        ATTR_CUSTOM(L"invalidComb", OnAttrInvalidComb)
+        ATTR_CUSTOM(L"invalidModifier", OnAttrInvalidModifier)
+        ATTR_CUSTOM(L"hotKey", OnAttrHotKey)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_SETFOCUS_EX(OnSetFocus)
-    MSG_WM_KILLFOCUS_EX(OnKillFocus)
-    MSG_WM_KEYDOWN(OnKeyDown)
-    MSG_WM_KEYUP(OnKeyUp)
-    MSG_WM_SYSKEYDOWN(OnSysKeyDown)
-    MSG_WM_SYSKEYUP(OnSysKeyUp)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_SETFOCUS_EX(OnSetFocus)
+        MSG_WM_KILLFOCUS_EX(OnKillFocus)
+        MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_KEYUP(OnKeyUp)
+        MSG_WM_SYSKEYDOWN(OnSysKeyDown)
+        MSG_WM_SYSKEYUP(OnSysKeyUp)
     SOUI_MSG_MAP_END()
     WORD m_wInvalidComb;     /**< 无效的组合键 */
     WORD m_wInvalidModifier; /**< 对无效组合键的替换方案,默认方案 */

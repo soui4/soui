@@ -55,18 +55,18 @@ BOOL SMessageBoxImpl::OnSetIcon(UINT uType)
         return FALSE;
     switch (uType & 0xF0)
     {
-	case MB_USERICON://done
-		pIcon->SetIcon(0);
-		break;
+    case MB_USERICON: // done
+        pIcon->SetIcon(0);
+        break;
     case MB_ICONWARNING:
         pIcon->SetIcon(1);
         break;
     case MB_ICONINFORMATION:
-		pIcon->SetIcon(2);
+        pIcon->SetIcon(2);
         break;
-	case MB_ICONSTOP:
-		pIcon->SetIcon(3);
-		break;
+    case MB_ICONSTOP:
+        pIcon->SetIcon(3);
+        break;
     case MB_ICONQUESTION:
         pIcon->SetIcon(4);
         break;
@@ -156,8 +156,7 @@ BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
     SStringWList lstMinSize;
     SplitString(strMinSize, L',', lstMinSize);
     SASSERT(lstMinSize.GetCount() == 2);
-    SLayoutSize szMin[2]
-        = { SLayoutSize::fromString(lstMinSize[0]), SLayoutSize::fromString(lstMinSize[1]) };
+    SLayoutSize szMin[2] = { SLayoutSize::fromString(lstMinSize[0]), SLayoutSize::fromString(lstMinSize[1]) };
 
     SWindow *pTitle = FindChildByName(NAME_MSGBOX_TITLE);
     SASSERT(pTitle);

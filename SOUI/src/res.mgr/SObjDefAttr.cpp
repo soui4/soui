@@ -30,8 +30,7 @@ BOOL SObjDefAttr::Init(SXmlNode xmlNode)
 
 void SObjDefAttr::BuildClassAttribute(SXmlNode &xmlNode, LPCWSTR pszClassName)
 {
-    SObjectInfo baseClassInfo = SApplication::getSingleton().BaseObjectInfoFromObjectInfo(
-        SObjectInfo(pszClassName, Window));
+    SObjectInfo baseClassInfo = SApplication::getSingleton().BaseObjectInfoFromObjectInfo(SObjectInfo(pszClassName, Window));
     if (!baseClassInfo.IsValid())
         return;
 
@@ -54,8 +53,7 @@ SXmlNode SObjDefAttr::GetDefAttribute(LPCWSTR pszClassName)
     SASSERT(pszClassName);
     if (!HasKey(pszClassName))
     {
-        SObjectInfo baseClassInfo = SApplication::getSingleton().BaseObjectInfoFromObjectInfo(
-            SObjectInfo(pszClassName, Window));
+        SObjectInfo baseClassInfo = SApplication::getSingleton().BaseObjectInfoFromObjectInfo(SObjectInfo(pszClassName, Window));
         if (!baseClassInfo.IsValid())
             return SXmlNode();
 

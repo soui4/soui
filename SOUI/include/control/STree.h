@@ -373,9 +373,7 @@ class CSTree {
      *
      * Describe  获取结点中保存的数据
      */
-    HSTREEITEM InsertItem(const T &data,
-                          HSTREEITEM hParent = STVI_ROOT,
-                          HSTREEITEM hInsertAfter = STVI_LAST)
+    HSTREEITEM InsertItem(const T &data, HSTREEITEM hParent = STVI_ROOT, HSTREEITEM hInsertAfter = STVI_LAST)
     {
         HSTREENODE hParentNode = (HSTREENODE)hParent;
         HSTREENODE hInsertAfterNode = (HSTREENODE)hInsertAfter;
@@ -628,9 +626,7 @@ class CSTree {
         return NULL;
     }
 
-    void SortChildren(HSTREEITEM hItem,
-                      int(__cdecl *funSort)(void *, const void *, const void *),
-                      void *pCtx)
+    void SortChildren(HSTREEITEM hItem, int(__cdecl *funSort)(void *, const void *, const void *), void *pCtx)
     {
         int nChilds = GetChildrenCount(hItem);
         if (nChilds > 1)

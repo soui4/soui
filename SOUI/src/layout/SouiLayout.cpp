@@ -236,8 +236,7 @@ HRESULT SouiLayoutParam::OnAttrPos(const SStringW &strValue, BOOL bLoading)
     }
     if (bRet && nCount == 4)
     { //检测X,Y方向上是否为充满父窗口
-        if ((posLeft.pit == PIT_NORMAL && posLeft.nPos.isZero() && posLeft.cMinus == 1)
-            && (posRight.pit == PIT_NORMAL && posRight.nPos.isZero() && posRight.cMinus == -1))
+        if ((posLeft.pit == PIT_NORMAL && posLeft.nPos.isZero() && posLeft.cMinus == 1) && (posRight.pit == PIT_NORMAL && posRight.nPos.isZero() && posRight.cMinus == -1))
         {
             width.setMatchParent();
         }
@@ -253,8 +252,7 @@ HRESULT SouiLayoutParam::OnAttrPos(const SStringW &strValue, BOOL bLoading)
             width.setInvalid();
         }
 
-        if ((posTop.pit == PIT_NORMAL && posTop.nPos.isZero() && posTop.cMinus == 1)
-            && (posBottom.pit == PIT_NORMAL && posBottom.nPos.isZero() && posBottom.cMinus == -1))
+        if ((posTop.pit == PIT_NORMAL && posTop.nPos.isZero() && posTop.cMinus == 1) && (posBottom.pit == PIT_NORMAL && posBottom.nPos.isZero() && posBottom.cMinus == -1))
         {
             height.setMatchParent();
         }
@@ -430,12 +428,7 @@ BOOL SouiLayout::IsWaitingPos(int nPos) const
     return nPos == POS_INIT || nPos == POS_WAIT;
 }
 
-int SouiLayout::PositionItem2Value(SList<WndPos> *pLstChilds,
-                                   SPOSITION position,
-                                   const POS_INFO &pos,
-                                   int nMax,
-                                   BOOL bX,
-                                   int nScale) const
+int SouiLayout::PositionItem2Value(SList<WndPos> *pLstChilds, SPOSITION position, const POS_INFO &pos, int nMax, BOOL bX, int nScale) const
 {
     int nRet = POS_WAIT;
 
@@ -560,9 +553,7 @@ int SouiLayout::PositionItem2Value(SList<WndPos> *pLstChilds,
         {
             if (!wndPosRef.bWaitOffsetY)
             {
-                LONG refPos = (pos.pit == PIT_SIB_TOP)
-                    ? rcRef.top
-                    : rcRef.bottom; // PIT_SIB_TOP == PIT_SIB_LEFT
+                LONG refPos = (pos.pit == PIT_SIB_TOP) ? rcRef.top : rcRef.bottom; // PIT_SIB_TOP == PIT_SIB_LEFT
                 if (IsWaitingPos(refPos))
                     nRet = POS_WAIT;
                 else
@@ -645,15 +636,11 @@ void SouiLayout::CalcPositionEx(SList<WndPos> *pListChildren, int nWidth, int nH
     for (SPOSITION pos = pListChildren->GetHeadPosition(); pos; pListChildren->GetNext(pos))
     {
         WndPos &wndPos = pListChildren->GetAt(pos);
-        const SouiLayoutParam *pLayoutParam
-            = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
-        if (!IsWaitingPos(wndPos.rc.left) && !IsWaitingPos(wndPos.rc.top)
-            && (IsWaitingPos(wndPos.rc.right) && IsWaitingPos(nWidth)
-                || IsWaitingPos(wndPos.rc.bottom) && IsWaitingPos(nHeight)))
+        const SouiLayoutParam *pLayoutParam = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
+        if (!IsWaitingPos(wndPos.rc.left) && !IsWaitingPos(wndPos.rc.top) && (IsWaitingPos(wndPos.rc.right) && IsWaitingPos(nWidth) || IsWaitingPos(wndPos.rc.bottom) && IsWaitingPos(nHeight)))
         {
             int nWid = IsWaitingPos(wndPos.rc.right) ? nWidth : (wndPos.rc.right - wndPos.rc.left);
-            int nHei
-                = IsWaitingPos(wndPos.rc.bottom) ? nHeight : (wndPos.rc.bottom - wndPos.rc.top);
+            int nHei = IsWaitingPos(wndPos.rc.bottom) ? nHeight : (wndPos.rc.bottom - wndPos.rc.top);
             CSize szWnd = wndPos.pWnd->GetDesiredSize(nWid, nHei);
             if (pLayoutParam->IsWrapContent(Horz))
             {
@@ -701,24 +688,19 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
             for (SPOSITION pos = pListChildren->GetHeadPosition(); pos; pListChildren->GetNext(pos))
             {
                 WndPos &wndPos = pListChildren->GetAt(pos);
-                const SouiLayoutParam *pLayoutParam
-                    = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
+                const SouiLayoutParam *pLayoutParam = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
                 int nScale = wndPos.pWnd->GetScale();
                 if (IsWaitingPos(wndPos.rc.left))
                 {
-                    const POS_INFO &posRef
-                        = pLayoutParam->nCount >= 2 ? pLayoutParam->posLeft : posRefLeft;
-                    wndPos.rc.left
-                        = PositionItem2Value(pListChildren, pos, posRef, nWidth, TRUE, nScale);
+                    const POS_INFO &posRef = pLayoutParam->nCount >= 2 ? pLayoutParam->posLeft : posRefLeft;
+                    wndPos.rc.left = PositionItem2Value(pListChildren, pos, posRef, nWidth, TRUE, nScale);
                     if (wndPos.rc.left != POS_WAIT)
                         nResolved++;
                 }
                 if (IsWaitingPos(wndPos.rc.top))
                 {
-                    const POS_INFO &posRef
-                        = pLayoutParam->nCount >= 2 ? pLayoutParam->posTop : posRefTop;
-                    wndPos.rc.top
-                        = PositionItem2Value(pListChildren, pos, posRef, nHeight, FALSE, nScale);
+                    const POS_INFO &posRef = pLayoutParam->nCount >= 2 ? pLayoutParam->posTop : posRefTop;
+                    wndPos.rc.top = PositionItem2Value(pListChildren, pos, posRef, nHeight, FALSE, nScale);
                     if (wndPos.rc.top != POS_WAIT)
                         nResolved++;
                 }
@@ -732,15 +714,13 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
                     {
                         if (!IsWaitingPos(wndPos.rc.left))
                         {
-                            wndPos.rc.right = wndPos.rc.left
-                                + pLayoutParam->GetSpecifiedSize(Horz).toPixelSize(nScale);
+                            wndPos.rc.right = wndPos.rc.left + pLayoutParam->GetSpecifiedSize(Horz).toPixelSize(nScale);
                             nResolved++;
                         }
                     }
                     else if (!pLayoutParam->IsWrapContent(Horz) && pLayoutParam->nCount == 4)
                     {
-                        wndPos.rc.right = PositionItem2Value(
-                            pListChildren, pos, pLayoutParam->posRight, nWidth, TRUE, nScale);
+                        wndPos.rc.right = PositionItem2Value(pListChildren, pos, pLayoutParam->posRight, nWidth, TRUE, nScale);
                         if (wndPos.rc.right != POS_WAIT)
                             nResolved++;
                     }
@@ -755,15 +735,13 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
                     {
                         if (!IsWaitingPos(wndPos.rc.top))
                         {
-                            wndPos.rc.bottom = wndPos.rc.top
-                                + pLayoutParam->GetSpecifiedSize(Vert).toPixelSize(nScale);
+                            wndPos.rc.bottom = wndPos.rc.top + pLayoutParam->GetSpecifiedSize(Vert).toPixelSize(nScale);
                             nResolved++;
                         }
                     }
                     else if (!pLayoutParam->IsWrapContent(Vert) && pLayoutParam->nCount == 4)
                     {
-                        wndPos.rc.bottom = PositionItem2Value(
-                            pListChildren, pos, pLayoutParam->posBottom, nHeight, FALSE, nScale);
+                        wndPos.rc.bottom = PositionItem2Value(pListChildren, pos, pLayoutParam->posBottom, nHeight, FALSE, nScale);
                         if (wndPos.rc.bottom != POS_WAIT)
                             nResolved++;
                     }
@@ -780,24 +758,17 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
             do
             {
                 nResolved = 0;
-                for (SPOSITION pos = pListChildren->GetHeadPosition(); pos;
-                     pListChildren->GetNext(pos))
+                for (SPOSITION pos = pListChildren->GetHeadPosition(); pos; pListChildren->GetNext(pos))
                 {
                     WndPos &wndPos = pListChildren->GetAt(pos);
-                    const SouiLayoutParam *pLayoutParam
-                        = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
+                    const SouiLayoutParam *pLayoutParam = (const SouiLayoutParam *)wndPos.pWnd->GetLayoutParam();
                     if (IsWaitingPos(wndPos.rc.left) || IsWaitingPos(wndPos.rc.top))
                         continue; //至少确定了一个点后才开始计算
 
-                    if ((IsWaitingPos(wndPos.rc.right) && pLayoutParam->IsWrapContent(Horz))
-                        || (IsWaitingPos(wndPos.rc.bottom) && pLayoutParam->IsWrapContent(Vert)))
+                    if ((IsWaitingPos(wndPos.rc.right) && pLayoutParam->IsWrapContent(Horz)) || (IsWaitingPos(wndPos.rc.bottom) && pLayoutParam->IsWrapContent(Vert)))
                     { //
-                        int nWid = IsWaitingPos(wndPos.rc.right)
-                            ? nWidth
-                            : (wndPos.rc.right - wndPos.rc.left);
-                        int nHei = IsWaitingPos(wndPos.rc.bottom)
-                            ? nHeight
-                            : (wndPos.rc.bottom - wndPos.rc.top);
+                        int nWid = IsWaitingPos(wndPos.rc.right) ? nWidth : (wndPos.rc.right - wndPos.rc.left);
+                        int nHei = IsWaitingPos(wndPos.rc.bottom) ? nHeight : (wndPos.rc.bottom - wndPos.rc.top);
                         CSize szWnd = wndPos.pWnd->GetDesiredSize(nWid, nHei);
                         if (pLayoutParam->IsWrapContent(Horz))
                         {

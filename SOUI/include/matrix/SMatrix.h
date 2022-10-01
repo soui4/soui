@@ -638,8 +638,7 @@ class SOUI_EXP SMatrix
 
         kORableMasks = kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask,
 
-        kAllMasks
-        = kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask | kRectStaysRect_Mask
+        kAllMasks = kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask | kRectStaysRect_Mask
     };
 
     mutable uint32_t fTypeMask;

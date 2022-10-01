@@ -131,27 +131,27 @@ class SOUI_EXP STreeView
     void OnSetFocus(SWND wndOld);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_SIZE(OnSize)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_KEYDOWN(OnKeyDown)
-    MSG_WM_KILLFOCUS_EX(OnKillFocus)
-    MSG_WM_SETFOCUS_EX(OnSetFocus)
-    MSG_WM_MOUSEWHEEL(OnMouseWheel)
-    MSG_WM_MOUSELEAVE(OnMouseLeave)
-    MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST, WM_MOUSELAST, OnMouseEvent)
-    MESSAGE_RANGE_HANDLER_EX(WM_KEYFIRST, WM_KEYLAST, OnKeyEvent)
-    MESSAGE_RANGE_HANDLER_EX(WM_IME_STARTCOMPOSITION, WM_IME_KEYLAST, OnKeyEvent)
-    MESSAGE_HANDLER_EX(WM_IME_CHAR, OnKeyEvent)
-    MESSAGE_HANDLER_EX(WM_IME_REQUEST, OnKeyEvent)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_SIZE(OnSize)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_KILLFOCUS_EX(OnKillFocus)
+        MSG_WM_SETFOCUS_EX(OnSetFocus)
+        MSG_WM_MOUSEWHEEL(OnMouseWheel)
+        MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST, WM_MOUSELAST, OnMouseEvent)
+        MESSAGE_RANGE_HANDLER_EX(WM_KEYFIRST, WM_KEYLAST, OnKeyEvent)
+        MESSAGE_RANGE_HANDLER_EX(WM_IME_STARTCOMPOSITION, WM_IME_KEYLAST, OnKeyEvent)
+        MESSAGE_HANDLER_EX(WM_IME_CHAR, OnKeyEvent)
+        MESSAGE_HANDLER_EX(WM_IME_REQUEST, OnKeyEvent)
     SOUI_MSG_MAP_END()
 
   protected:
     HRESULT OnAttrIndent(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"indent", OnAttrIndent)
-    ATTR_INT(L"wantTab", m_bWantTab, FALSE)
+        ATTR_CUSTOM(L"indent", OnAttrIndent)
+        ATTR_INT(L"wantTab", m_bWantTab, FALSE)
     SOUI_ATTRS_END()
   protected:
     virtual UINT WINAPI OnGetDlgCode() const;
@@ -166,9 +166,9 @@ class SOUI_EXP STreeView
     virtual int GetScrollLineSize(BOOL bVertical);
     virtual BOOL CreateChildren(SXmlNode xmlNode);
 
-    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture); //设置or释放鼠标捕获
+    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);          //设置or释放鼠标捕获
     virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const; //获得表项的显示位置
-    virtual BOOL IsItemRedrawDelay() const; //指示表项的更新方式
+    virtual BOOL IsItemRedrawDelay() const;                                  //指示表项的更新方式
   protected:
     void UpdateScrollBar();
     void UpdateVisibleItems();
@@ -188,9 +188,8 @@ class SOUI_EXP STreeView
         SItemPanel *pItem;
         int nType;
     };
-    SArray<SList<SItemPanel *> *>
-        m_itemRecycle; // item回收站,每一种样式在回收站中保持一个列表，以便重复利用
-    SList<ItemInfo> m_visible_items; //可见元素
+    SArray<SList<SItemPanel *> *> m_itemRecycle; // item回收站,每一种样式在回收站中保持一个列表，以便重复利用
+    SList<ItemInfo> m_visible_items;             //可见元素
 
     typedef SMap<HSTREEITEM, ItemInfo> VISIBLEITEMSMAP;
     VISIBLEITEMSMAP *m_pVisibleMap;

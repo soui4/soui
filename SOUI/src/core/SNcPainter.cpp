@@ -49,7 +49,7 @@ SNcPainter::SNcPainter(SHostWnd *pHost)
     , m_bInPaint(FALSE)
     , m_bSysNcPainter(FALSE)
     , m_bLButtonDown(FALSE)
-	, m_bMouseHover(FALSE)
+    , m_bMouseHover(FALSE)
 {
     m_root = new SNcPanel(this, this);
 }
@@ -379,8 +379,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
         CRect rcDraw(0, 0, nBorderWid, rcWnd.bottom);
         {
             HDC memdc = m_memLeft->GetDC(0);
-            BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc,
-                   rcDraw.left, rcDraw.top, SRCCOPY);
+            BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc, rcDraw.left, rcDraw.top, SRCCOPY);
             m_memLeft->ReleaseDC(memdc);
         }
     }
@@ -389,8 +388,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
         CRect rcDraw(nBorderWid, 0, rcWnd.right - nBorderWid, nBorderWid);
         {
             HDC memdc = m_memTop->GetDC(0);
-            BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc,
-                   rcDraw.left, rcDraw.top, SRCCOPY);
+            BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc, rcDraw.left, rcDraw.top, SRCCOPY);
             m_memTop->ReleaseDC(memdc);
         }
     }
@@ -399,8 +397,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
         CRect rcDraw(rcWnd.right - nBorderWid, 0, rcWnd.right, rcWnd.bottom);
         {
             HDC memdc = m_memRight->GetDC(0);
-            BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc,
-                   rcDraw.left, rcDraw.top, SRCCOPY);
+            BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc, rcDraw.left, rcDraw.top, SRCCOPY);
             m_memRight->ReleaseDC(memdc);
         }
     }
@@ -409,8 +406,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
         CRect rcDraw(nBorderWid, rcWnd.bottom - nBorderWid, rcWnd.right - nBorderWid, rcWnd.bottom);
         {
             HDC memdc = m_memBottom->GetDC(0);
-            BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc,
-                   rcDraw.left, rcDraw.top, SRCCOPY);
+            BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc, rcDraw.left, rcDraw.top, SRCCOPY);
             m_memBottom->ReleaseDC(memdc);
         }
     }
@@ -423,8 +419,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
 
         m_root->Draw(m_memRT, rcTitle);
         HDC memdc = m_memRT->GetDC(0);
-        ::BitBlt(hdc, rcTitle.left, rcTitle.top, rcTitle.Width(), rcTitle.Height(), memdc,
-                 rcTitle.left, rcTitle.top, SRCCOPY);
+        ::BitBlt(hdc, rcTitle.left, rcTitle.top, rcTitle.Width(), rcTitle.Height(), memdc, rcTitle.left, rcTitle.top, SRCCOPY);
         m_memRT->ReleaseDC(memdc);
     }
 
@@ -589,8 +584,7 @@ void SNcPainter::OnReleaseHostRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFl
     HDC hdc = ::GetWindowDC(m_pHost->m_hWnd);
     int nBorderWid = m_borderWidth.toPixelSize(GetScale());
     HDC memdc = m_memRT->GetDC(0);
-    ::BitBlt(hdc, rc->left, rc->top, RectWidth(rc), RectHeight(rc), memdc, rc->left, rc->top,
-             SRCCOPY);
+    ::BitBlt(hdc, rc->left, rc->top, RectWidth(rc), RectHeight(rc), memdc, rc->left, rc->top, SRCCOPY);
     m_memRT->ReleaseDC(memdc);
     ::ReleaseDC(m_pHost->m_hWnd, hdc);
 }
@@ -599,7 +593,7 @@ LRESULT SNcPainter::OnNcMouseEvent(UINT msg, WPARAM wp, LPARAM lp)
 {
     if (wp == HTCAPTION && msg != WM_NCLBUTTONDBLCLK)
     {
-		m_bMouseHover = TRUE;
+        m_bMouseHover = TRUE;
         if (msg == WM_NCLBUTTONUP)
             m_bLButtonDown = FALSE;
         CPoint pt(GET_X_LPARAM(lp), GET_Y_LPARAM(lp));
@@ -628,7 +622,7 @@ LRESULT SNcPainter::OnNcMouseLeave(UINT msg, WPARAM wp, LPARAM lp)
     }
     m_root->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
     UpdateToolTip();
-	m_bMouseHover = FALSE;
+    m_bMouseHover = FALSE;
     return m_pHost->DefWindowProc();
 }
 
@@ -668,9 +662,7 @@ int SNcPainter::toNcBuiltinID(const SStringW &strValue)
     {
         int id;
         LPCWSTR pszName;
-    } systemID[] = { IDC_SYS_ICON,  L"sysid_icon",  IDC_SYS_TITLE,   L"sysid_title",
-                     IDC_SYS_CLOSE, L"sysid_close", IDC_SYS_MIN,     L"sysid_min",
-                     IDC_SYS_MAX,   L"sysid_max",   IDC_SYS_RESTORE, L"sysid_restore" };
+    } systemID[] = { IDC_SYS_ICON, L"sysid_icon", IDC_SYS_TITLE, L"sysid_title", IDC_SYS_CLOSE, L"sysid_close", IDC_SYS_MIN, L"sysid_min", IDC_SYS_MAX, L"sysid_max", IDC_SYS_RESTORE, L"sysid_restore" };
     if (!strValue.IsEmpty())
     {
         if (strValue.Left(5).CompareNoCase(L"sysid") == 0)
@@ -748,9 +740,10 @@ void SNcPainter::OnLButtonUp(WPARAM wp, LPARAM lp)
 
 void SNcPainter::OnMouseMove(WPARAM wp, LPARAM lp)
 {
-	if(m_bMouseHover){
-		OnNcMouseLeave(0,0,0);
-	}
+    if (m_bMouseHover)
+    {
+        OnNcMouseLeave(0, 0, 0);
+    }
 }
 
 SNSEND

@@ -55,7 +55,7 @@ DECLARE_INTERFACE_IID_(ICornerPathEffect, IPathEffect, "3C4A07C2-2617-432a-ADFC-
      */
     STDMETHOD_(void *, GetRealPathEffect)(THIS) PURE;
 
-	STDMETHOD_(void, Init)(THIS_ float radius) PURE;
+    STDMETHOD_(void, Init)(THIS_ float radius) PURE;
 };
 
 #undef INTERFACE
@@ -83,7 +83,7 @@ DECLARE_INTERFACE_IID_(IDashPathEffect, IPathEffect, "5FA8CF4C-8C83-4eac-82C0-EE
      */
     STDMETHOD_(void *, GetRealPathEffect)(THIS) PURE;
 
-	STDMETHOD_(void, Init)(THIS_ float intervals[], int count, float phase) PURE;
+    STDMETHOD_(void, Init)(THIS_ float intervals[], int count, float phase) PURE;
 };
 
 #undef INTERFACE
@@ -111,7 +111,7 @@ DECLARE_INTERFACE_IID_(IDiscretePathEffect, IPathEffect, "51D32163-594E-4fbe-B2A
      */
     STDMETHOD_(void *, GetRealPathEffect)(THIS) PURE;
 
-	STDMETHOD_(void, Init)(THIS_ float segmentLength, float deviation) PURE;
+    STDMETHOD_(void, Init)(THIS_ float segmentLength, float deviation) PURE;
 };
 
 SNSEND

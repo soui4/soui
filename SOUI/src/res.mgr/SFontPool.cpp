@@ -54,7 +54,7 @@ IFontPtr SFontPool::GetFont(FONTSTYLE style, const SStringW &fontFaceName, SXmlN
 }
 
 static const WCHAR KFontPropSeprator = L','; //字体属性之间的分隔符，不再支持其它符号。
-static const WCHAR KPropSeprator = L':'; //一个属性name:value对之间的分隔符
+static const WCHAR KPropSeprator = L':';     //一个属性name:value对之间的分隔符
 static const WCHAR KAttrFalse[] = L"0";
 static const WCHAR KFontFace[] = L"face";
 static const WCHAR KFontBold[] = L"bold";
@@ -127,8 +127,7 @@ IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
         }
         else if (strPair[0] == KFontWeight)
         {
-            fntStyle.attr.byWeight
-                = (_wtoi(strPair[1]) + 2) / 4; //+2 for 四舍五入. /4是为了把weight scale到0-250.
+            fntStyle.attr.byWeight = (_wtoi(strPair[1]) + 2) / 4; //+2 for 四舍五入. /4是为了把weight scale到0-250.
         }
         else
         {
@@ -144,8 +143,7 @@ IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
     {
         FONTSTYLE fontStyle(GetDefFontInfo().style);
         SLayoutSize defSize((float)fontStyle.attr.cSize);
-        fntStyle.attr.cSize
-            = defSize.toPixelSize(scale) + cAdding; // cAdding为正代表字体变大，否则变小
+        fntStyle.attr.cSize = defSize.toPixelSize(scale) + cAdding; // cAdding为正代表字体变大，否则变小
     }
 
     return GetFont(fntStyle, strFace, nodePropEx);

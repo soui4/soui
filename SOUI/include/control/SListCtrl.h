@@ -34,8 +34,7 @@ enum
  *
  * Describe   函数指针
  */
-typedef int(__cdecl *PFNLVCOMPAREEX)(void *,
-                                     const void *,
+typedef int(__cdecl *PFNLVCOMPAREEX)(void *, const void *,
                                      const void *); //使用快速排序算法中的比较函数,参考qsort_s
 
 /**
@@ -571,35 +570,35 @@ class SOUI_EXP SListCtrl : public SPanel {
 
   protected:
     SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"headerHeight", m_nHeaderHeight, FALSE)
-    ATTR_INT(L"itemHeight", m_nItemHeight, FALSE)
-    ATTR_BOOL(L"checkBox", m_bCheckBox, TRUE)
-    ATTR_BOOL(L"multiSelection", m_bMultiSelection, TRUE)
-    ATTR_SKIN(L"itemSkin", m_pItemSkin, TRUE)
-    ATTR_SKIN(L"iconSkin", m_pIconSkin, TRUE)
-    ATTR_SKIN(L"checkSkin", m_pCheckSkin, TRUE)
-    ATTR_COLOR(L"colorItemBkgnd", m_crItemBg, FALSE)
-    ATTR_COLOR(L"colorItemBkgnd2", m_crItemBg2, FALSE)
-    ATTR_COLOR(L"colorItemHotBkgnd", m_crItemHotBg, FALSE)
-    ATTR_COLOR(L"colorItemSelBkgnd", m_crItemSelBg, FALSE)
-    ATTR_COLOR(L"colorText", m_crText, FALSE)
-    ATTR_COLOR(L"colorSelText", m_crSelText, FALSE)
-    ATTR_INT(L"icon-x", m_ptIcon.x, FALSE)
-    ATTR_INT(L"icon-y", m_ptIcon.y, FALSE)
-    ATTR_INT(L"text-x", m_ptText.x, FALSE)
-    ATTR_INT(L"text-y", m_ptText.y, FALSE)
-    ATTR_INT(L"hotTrack", m_bHotTrack, FALSE)
+        ATTR_INT(L"headerHeight", m_nHeaderHeight, FALSE)
+        ATTR_INT(L"itemHeight", m_nItemHeight, FALSE)
+        ATTR_BOOL(L"checkBox", m_bCheckBox, TRUE)
+        ATTR_BOOL(L"multiSelection", m_bMultiSelection, TRUE)
+        ATTR_SKIN(L"itemSkin", m_pItemSkin, TRUE)
+        ATTR_SKIN(L"iconSkin", m_pIconSkin, TRUE)
+        ATTR_SKIN(L"checkSkin", m_pCheckSkin, TRUE)
+        ATTR_COLOR(L"colorItemBkgnd", m_crItemBg, FALSE)
+        ATTR_COLOR(L"colorItemBkgnd2", m_crItemBg2, FALSE)
+        ATTR_COLOR(L"colorItemHotBkgnd", m_crItemHotBg, FALSE)
+        ATTR_COLOR(L"colorItemSelBkgnd", m_crItemSelBg, FALSE)
+        ATTR_COLOR(L"colorText", m_crText, FALSE)
+        ATTR_COLOR(L"colorSelText", m_crSelText, FALSE)
+        ATTR_INT(L"icon-x", m_ptIcon.x, FALSE)
+        ATTR_INT(L"icon-y", m_ptIcon.y, FALSE)
+        ATTR_INT(L"text-x", m_ptText.x, FALSE)
+        ATTR_INT(L"text-y", m_ptText.y, FALSE)
+        ATTR_INT(L"hotTrack", m_bHotTrack, FALSE)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_SIZE(OnSize)
-    MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_MOUSEMOVE(OnMouseMove)
-    MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_SIZE(OnSize)
+        MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSELEAVE(OnMouseLeave)
     SOUI_MSG_MAP_END()
 };
 

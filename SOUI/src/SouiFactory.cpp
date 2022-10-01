@@ -14,14 +14,9 @@ SouiFactory::~SouiFactory(void)
 }
 
 STDMETHODIMP_(HRESULT)
-SouiFactory::CreateApp(THIS_ IApplication **ppRet,
-                       IRenderFactory *pRenderFac,
-                       HMODULE hInst,
-                       LPCTSTR pszHostClassName,
-                       BOOL bImeApp)
+SouiFactory::CreateApp(THIS_ IApplication **ppRet, IRenderFactory *pRenderFac, HMODULE hInst, LPCTSTR pszHostClassName, BOOL bImeApp)
 {
-    *ppRet
-        = new SApplication(pRenderFac, hInst, pszHostClassName, SObjectDefaultRegister(), bImeApp);
+    *ppRet = new SApplication(pRenderFac, hInst, pszHostClassName, SObjectDefaultRegister(), bImeApp);
     return S_OK;
 }
 
@@ -84,16 +79,16 @@ HRESULT SouiFactory::CreateFuncSlot(THIS_ FunCallback fun, void *ctx, IEvtSlot *
     return S_OK;
 }
 
-HRESULT SouiFactory::CreateMenu(THIS_ IMenu**ppRet, HMENU hMenu)
+HRESULT SouiFactory::CreateMenu(THIS_ IMenu **ppRet, HMENU hMenu)
 {
-	*ppRet = new SMenu(hMenu);
-	return S_OK;
+    *ppRet = new SMenu(hMenu);
+    return S_OK;
 }
 
-HRESULT SouiFactory::CreateMenuEx(THIS_ IMenuEx**ppRet)
+HRESULT SouiFactory::CreateMenuEx(THIS_ IMenuEx **ppRet)
 {
-	*ppRet = new SMenuEx();
-	return S_OK;
+    *ppRet = new SMenuEx();
+    return S_OK;
 }
 
 SNSEND

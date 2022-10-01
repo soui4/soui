@@ -17,7 +17,7 @@ class SDragWnd : public SNativeWnd {
     void OnPaint(HDC dc);
 
     BEGIN_MSG_MAP_EX(SDragWnd)
-    MSG_WM_PAINT(OnPaint)
+        MSG_WM_PAINT(OnPaint)
     END_MSG_MAP()
 
     CPoint m_ptHot;

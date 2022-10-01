@@ -27,9 +27,7 @@ STipCtrl::~STipCtrl(void)
 
 BOOL STipCtrl::Create()
 {
-    HWND hWnd = SNativeWnd::CreateNative(
-        _T("soui tooltip"), WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP,
-        WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0, 0, 0, 0, NULL, 0, NULL);
+    HWND hWnd = SNativeWnd::CreateNative(_T("soui tooltip"), WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0, 0, 0, 0, NULL, 0, NULL);
     if (!hWnd)
         return FALSE;
 
@@ -73,8 +71,7 @@ void STipCtrl::RelayEvent(const MSG *pMsg)
             KillTimer(TIMERID_DELAY);
             SetTimer(TIMERID_DELAY, m_nDelay);
             ::ClientToScreen(pMsg->hwnd, &pt);
-            SetWindowPos(0, pt.x, pt.y + 24, 0, 0,
-                         SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING | SWP_NOACTIVATE);
+            SetWindowPos(0, pt.x, pt.y + 24, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING | SWP_NOACTIVATE);
         }
     }
     break;
@@ -93,8 +90,7 @@ void STipCtrl::RelayEvent(const MSG *pMsg)
         {
             KillTimer(TIMERID_DELAY);
             SetTimer(TIMERID_DELAY, m_nDelay);
-            SetWindowPos(0, pt.x, pt.y + 24, 0, 0,
-                         SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING | SWP_NOACTIVATE);
+            SetWindowPos(0, pt.x, pt.y + 24, 0, 0, SWP_NOSIZE | SWP_NOZORDER | SWP_NOSENDCHANGING | SWP_NOACTIVATE);
         }
     }
     break;
@@ -171,8 +167,7 @@ void STipCtrl::ShowTip(BOOL bShow)
             rcWnd.OffsetRect(cx - rcWnd.right, 0);
         if (rcWnd.bottom > cy)
             rcWnd.OffsetRect(0, cy - rcWnd.bottom);
-        SetWindowPos(HWND_TOPMOST, rcWnd.left, rcWnd.top, rcWnd.Width(), rcWnd.Height(),
-                     SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
+        SetWindowPos(HWND_TOPMOST, rcWnd.left, rcWnd.top, rcWnd.Width(), rcWnd.Height(), SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
     }
 }
 

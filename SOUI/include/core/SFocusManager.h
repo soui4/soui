@@ -76,18 +76,10 @@ class FocusSearch {
     // |check_starting_view|, |can_go_up| and |can_go_down| controls the
     // traversal of the views hierarchy. |skip_group_id| specifies a group_id,
     // -1 means no group. All views from a group are traversed in one pass.
-    SWindow *FindNextFocusableViewImpl(SWindow *starting_view,
-                                       bool check_starting_view,
-                                       bool can_go_up,
-                                       bool can_go_down,
-                                       SWindow *pSkipGroupOwner);
+    SWindow *FindNextFocusableViewImpl(SWindow *starting_view, bool check_starting_view, bool can_go_up, bool can_go_down, SWindow *pSkipGroupOwner);
 
     // Same as FindNextFocusableViewImpl but returns the previous focusable view.
-    SWindow *FindPreviousFocusableViewImpl(SWindow *starting_view,
-                                           bool check_starting_view,
-                                           bool can_go_up,
-                                           bool can_go_down,
-                                           SWindow *pSkipGroupOwner);
+    SWindow *FindPreviousFocusableViewImpl(SWindow *starting_view, bool check_starting_view, bool can_go_up, bool can_go_down, SWindow *pSkipGroupOwner);
 
     SWindow *root_;
     bool cycle_;

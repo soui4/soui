@@ -13,9 +13,7 @@ FocusSearch::FocusSearch(SWindow *root, bool cycle)
 {
 }
 
-SWindow *FocusSearch::FindNextFocusableView(SWindow *starting_view,
-                                            bool reverse,
-                                            bool check_starting_view)
+SWindow *FocusSearch::FindNextFocusableView(SWindow *starting_view, bool reverse, bool check_starting_view)
 {
     if (root_->GetChildrenCount() == 0)
         return NULL;
@@ -43,13 +41,11 @@ SWindow *FocusSearch::FindNextFocusableView(SWindow *starting_view,
     if (reverse)
     {
         bool can_go_down = !IsFocusable(starting_view);
-        pRet = FindPreviousFocusableViewImpl(starting_view, check_starting_view, true, can_go_down,
-                                             pStartGroupOwner);
+        pRet = FindPreviousFocusableViewImpl(starting_view, check_starting_view, true, can_go_down, pStartGroupOwner);
     }
     else
     {
-        pRet = FindNextFocusableViewImpl(starting_view, check_starting_view, true, true,
-                                         pStartGroupOwner);
+        pRet = FindNextFocusableViewImpl(starting_view, check_starting_view, true, true, pStartGroupOwner);
     }
     if (!pRet && cycle_ && starting_view)
     {
@@ -67,11 +63,7 @@ SWindow *FocusSearch::FindNextFocusableView(SWindow *starting_view,
 //   FindNextFocusableViewImpl on that view).
 // - if the view has no right sibling, go up the parents until you find a parent
 //   with a right sibling and start the search from there.
-SWindow *FocusSearch::FindNextFocusableViewImpl(SWindow *starting_view,
-                                                bool check_starting_view,
-                                                bool can_go_up,
-                                                bool can_go_down,
-                                                SWindow *pSkipGroupOwner)
+SWindow *FocusSearch::FindNextFocusableViewImpl(SWindow *starting_view, bool check_starting_view, bool can_go_up, bool can_go_down, SWindow *pSkipGroupOwner)
 {
     if (check_starting_view)
     {
@@ -139,19 +131,14 @@ SWindow *FocusSearch::FindNextFocusableViewImpl(SWindow *starting_view,
 // - start the search on the left sibling.
 // - if there are no left sibling, start the search on the parent (without going
 //   down).
-SWindow *FocusSearch::FindPreviousFocusableViewImpl(SWindow *starting_view,
-                                                    bool check_starting_view,
-                                                    bool can_go_up,
-                                                    bool can_go_down,
-                                                    SWindow *pSkipGroupOwner)
+SWindow *FocusSearch::FindPreviousFocusableViewImpl(SWindow *starting_view, bool check_starting_view, bool can_go_up, bool can_go_down, SWindow *pSkipGroupOwner)
 {
     if (can_go_down)
     { // find the last focusable window
         SWindow *pChild = starting_view->GetWindow(GSW_LASTCHILD);
         if (pChild)
         {
-            SWindow *pRet
-                = FindPreviousFocusableViewImpl(pChild, true, false, true, pSkipGroupOwner);
+            SWindow *pRet = FindPreviousFocusableViewImpl(pChild, true, false, true, pSkipGroupOwner);
             if (pRet)
                 return pRet;
         }
@@ -241,8 +228,7 @@ BOOL SFocusManager::OnKeyDown(UINT vKey)
 
     // Intercept arrow key messages to switch between grouped views.
     SWindow *pFocusWnd = SWindowMgr::GetWindow(focused_view_);
-    if (pFocusWnd && pFocusWnd->IsSiblingsAutoGroupped()
-        && (vKey == VK_LEFT || vKey == VK_RIGHT || vKey == VK_UP || vKey == VK_DOWN))
+    if (pFocusWnd && pFocusWnd->IsSiblingsAutoGroupped() && (vKey == VK_LEFT || vKey == VK_RIGHT || vKey == VK_UP || vKey == VK_DOWN))
     {
         UINT ucode = (vKey == VK_RIGHT || vKey == VK_DOWN) ? GSW_NEXTSIBLING : GSW_PREVSIBLING;
         SWindow *pNext = pFocusWnd->GetWindow(ucode);
@@ -257,8 +243,7 @@ BOOL SFocusManager::OnKeyDown(UINT vKey)
         }
         if (!pNext)
         {
-            pNext = pFocusWnd->GetParent()->GetWindow(ucode == GSW_NEXTSIBLING ? GSW_FIRSTCHILD
-                                                                               : GSW_LASTCHILD);
+            pNext = pFocusWnd->GetParent()->GetWindow(ucode == GSW_NEXTSIBLING ? GSW_FIRSTCHILD : GSW_LASTCHILD);
             while (pNext)
             {
                 if (pNext->IsSiblingsAutoGroupped())
@@ -272,8 +257,7 @@ BOOL SFocusManager::OnKeyDown(UINT vKey)
         return TRUE;
     }
     // Process keyboard accelerators.
-    SAccelerator accelerator(vKey, GetKeyState(VK_CONTROL) & 0x8000, GetKeyState(VK_MENU) & 0x8000,
-                             GetKeyState(VK_SHIFT) & 0x8000);
+    SAccelerator accelerator(vKey, GetKeyState(VK_CONTROL) & 0x8000, GetKeyState(VK_MENU) & 0x8000, GetKeyState(VK_SHIFT) & 0x8000);
     if (ProcessAccelerator(&accelerator))
     {
         // If a shortcut was activated for this keydown message, do not propagate
@@ -296,9 +280,7 @@ void SFocusManager::AdvanceFocus(bool reverse)
     }
 }
 
-SWindow *SFocusManager::GetNextFocusableView(SWindow *original_starting_view,
-                                             bool bReverse,
-                                             bool bLoop)
+SWindow *SFocusManager::GetNextFocusableView(SWindow *original_starting_view, bool bReverse, bool bLoop)
 {
 
     FocusSearch fs(m_pOwner, bLoop);

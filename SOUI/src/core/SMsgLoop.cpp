@@ -81,12 +81,12 @@ int SMessageLoop::Run()
 
         if (bRet == -1)
         {
-            SSLOGD()<<"::GetMessage returned -1 (error)";
+            SSLOGD() << "::GetMessage returned -1 (error)";
             continue; // error, don't process
         }
         else if (!bRet)
         {
-            SSLOGD()<<"SMessageLoop::Run - exiting,code = "<<(int)m_msg.wParam;
+            SSLOGD() << "SMessageLoop::Run - exiting,code = " << (int)m_msg.wParam;
             break; // WM_QUIT, exit message loop
         }
 

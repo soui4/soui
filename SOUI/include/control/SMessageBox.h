@@ -19,10 +19,9 @@ SNSBEGIN
 #define NAME_MSGBOX_TEXT      L"msgtext"   //文本控件，只需要指定两个坐标
 #define NAME_MSGBOX_TITLE     L"msgtitle"  //标题ID
 #define NAME_MSGBOX_ICON      L"msgicon"   //图标显示控件
-#define NAME_MSGBOX_BTN1 \
-    L"button1st" //第1个按钮ID，按钮ID在显示时会自动修改为如IDOK,IDCANCEL这样的ID。
-#define NAME_MSGBOX_BTN2 L"button2nd" //第2个按钮ID
-#define NAME_MSGBOX_BTN3 L"button3rd" //第3个按钮ID
+#define NAME_MSGBOX_BTN1      L"button1st" //第1个按钮ID，按钮ID在显示时会自动修改为如IDOK,IDCANCEL这样的ID。
+#define NAME_MSGBOX_BTN2      L"button2nd" //第2个按钮ID
+#define NAME_MSGBOX_BTN3      L"button3rd" //第3个按钮ID
 
 BOOL SOUI_EXP SetMsgTemplate(SXmlNode xmlNode);
 
@@ -39,7 +38,7 @@ INT_PTR SOUI_EXP SMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT 
 class SOUI_EXP SMessageBoxImpl
     : public SHostDialog
     , public SDpiHandler<SMessageBoxImpl> {
-	DEF_SOBJECT(SHostDialog, L"msgbox")
+    DEF_SOBJECT(SHostDialog, L"msgbox")
   public:
     /**
      * SMessageBoxImpl::SMessageBoxImpl
@@ -97,14 +96,14 @@ class SOUI_EXP SMessageBoxImpl
     }
 
     EVENT_MAP_BEGIN()
-    EVENT_ID_COMMAND_RANGE(IDOK, IDNO, OnBtnClick)
+        EVENT_ID_COMMAND_RANGE(IDOK, IDNO, OnBtnClick)
     EVENT_MAP_END2(SHostDialog)
 
     BEGIN_MSG_MAP_EX(SMessageBoxImpl)
-    CHAIN_MSG_MAP(SDpiHandler<SMessageBoxImpl>)
-    MSG_WM_INITDIALOG(OnInitDialog)
-    CHAIN_MSG_MAP(SHostDialog)
-    REFLECT_NOTIFICATIONS_EX()
+        CHAIN_MSG_MAP(SDpiHandler<SMessageBoxImpl>)
+        MSG_WM_INITDIALOG(OnInitDialog)
+        CHAIN_MSG_MAP(SHostDialog)
+        REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 };
 

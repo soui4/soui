@@ -47,30 +47,19 @@ class SOUI_EXP SStatic : public SWindow {
      *
      * Describe  对DrawText封装
      */
-    virtual void DrawText(IRenderTarget *pRT,
-                          LPCTSTR pszBuf,
-                          int cchText,
-                          LPRECT pRect,
-                          UINT uFormat);
+    virtual void DrawText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
 
   protected:
-    virtual void OnDrawLine(IRenderTarget *pRT,
-                            LPCTSTR pszBuf,
-                            int iBegin,
-                            int cchText,
-                            LPRECT pRect,
-                            UINT uFormat);
-	virtual SIZE OnMeasureText(IRenderTarget *pRT,
-		LPCTSTR pszBuf,
-		int cchText);
+    virtual void OnDrawLine(IRenderTarget *pRT, LPCTSTR pszBuf, int iBegin, int cchText, LPRECT pRect, UINT uFormat);
+    virtual SIZE OnMeasureText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText);
 
     void DrawMultiLine(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
 
     int m_nLineInter; /**< 行间距 */
     bool m_bWordbreak;
     SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"interHeight", m_nLineInter, TRUE)
-    ATTR_BOOL(L"wordBreak", m_bWordbreak, TRUE)
+        ATTR_INT(L"interHeight", m_nLineInter, TRUE)
+        ATTR_BOOL(L"wordBreak", m_bWordbreak, TRUE)
     SOUI_ATTRS_END()
 };
 
@@ -112,11 +101,7 @@ class SOUI_EXP SLink : public SWindow {
      *
      * Describe  对DrawText封装
      */
-    virtual void DrawText(IRenderTarget *pRT,
-                          LPCTSTR pszBuf,
-                          int cchText,
-                          LPRECT pRect,
-                          UINT uFormat);
+    virtual void DrawText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat);
 
     /**
      * SLink::OnSetCursor
@@ -134,14 +119,14 @@ class SOUI_EXP SLink : public SWindow {
     void OnMouseHover(WPARAM wParam, CPoint ptPos);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_STRINGT(L"href", m_strLinkUrl, FALSE)
+        ATTR_STRINGT(L"href", m_strLinkUrl, FALSE)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_MOUSEMOVE(OnMouseMove)
-    MSG_WM_MOUSEHOVER(OnMouseHover)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSEHOVER(OnMouseHover)
     SOUI_MSG_MAP_END()
 
   protected:
@@ -251,20 +236,20 @@ class SOUI_EXP SButton
     BOOL m_bDisableAccelIfInvisible; /**< disable accel if invisible */
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"accel", OnAttrAccel)
-    ATTR_BOOL(L"animate", m_bAnimate, FALSE)
-    ATTR_INT(L"animateStep", m_nAniStep, FALSE)
-    ATTR_BOOL(L"disableAccelIfInvisible", m_bDisableAccelIfInvisible, FALSE)
+        ATTR_CUSTOM(L"accel", OnAttrAccel)
+        ATTR_BOOL(L"animate", m_bAnimate, FALSE)
+        ATTR_INT(L"animateStep", m_nAniStep, FALSE)
+        ATTR_BOOL(L"disableAccelIfInvisible", m_bDisableAccelIfInvisible, FALSE)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
-    MSG_WM_LBUTTONDBLCLK(OnLButtonDown) //将双击消息处理为单击
-    MSG_WM_KEYDOWN(OnKeyDown)
-    MSG_WM_KEYUP(OnKeyUp)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_SIZE(OnSize)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
+        MSG_WM_LBUTTONDBLCLK(OnLButtonDown) //将双击消息处理为单击
+        MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_KEYUP(OnKeyUp)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_SIZE(OnSize)
     SOUI_MSG_MAP_END()
 };
 
@@ -317,15 +302,15 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      */
     virtual ~SImageWnd();
 
-public:
-	   /**
+  public:
+    /**
      * @brief 设置skin
      * @param pSkin -- skin对象
-     * @param iFrame -- skin的子图索引 
-     * @param bAutoFree -- 控件管理pSkin标志，为TRUE时调用方可以释放该Skin 
+     * @param iFrame -- skin的子图索引
+     * @param bAutoFree -- 控件管理pSkin标志，为TRUE时调用方可以释放该Skin
      * @return BOOL TRUE-成功，FALSE-失败
-    */
-    STDMETHOD_(BOOL, SetSkin)(THIS_ ISkinObj * pSkin, int iFrame DEF_VAL(0), BOOL bAutoFree DEF_VAL(TRUE)) OVERRIDE;
+     */
+    STDMETHOD_(BOOL, SetSkin)(THIS_ ISkinObj *pSkin, int iFrame DEF_VAL(0), BOOL bAutoFree DEF_VAL(TRUE)) OVERRIDE;
 
     /**
      * SImageWnd::GetSkin
@@ -344,24 +329,23 @@ public:
      *
      * Describe  设置绘制图片
      */
-    STDMETHOD_(void, SetImage)(THIS_ IBitmapS * pBitmap, FilterLevel fl DEF_VAL(kNone_FilterLevel)) OVERRIDE;
+    STDMETHOD_(void, SetImage)(THIS_ IBitmapS *pBitmap, FilterLevel fl DEF_VAL(kNone_FilterLevel)) OVERRIDE;
 
     /**
      * @brief 获取当前设置的IBitmapS对象
      * @return IBitmapS * -- 当前设置的IBitmapS对象
-    */
+     */
     STDMETHOD_(IBitmapS *, GetImage)(THIS) OVERRIDE;
 
     /**
      * SImageWnd::SetIcon
-	 * @param    int nSubID -- 子图在Skin中的索引号
+     * @param    int nSubID -- 子图在Skin中的索引号
      * @brief    设置图标
      * @return   返回值BOOL 成功--TRUE 失败--FALSE
      *
      * Describe  设置图标
      */
     STDMETHOD_(BOOL, SetIcon)(THIS_ int nSubID) OVERRIDE;
-
 
   protected:
     virtual void OnColorize(COLORREF cr);
@@ -377,7 +361,7 @@ public:
      */
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
 
-    int m_iTile; /**<绘制是否平铺,0--位伸（默认），1--不变常规绘制, 2--平铺 */
+    int m_iTile;                   /**<绘制是否平铺,0--位伸（默认），1--不变常规绘制, 2--平铺 */
     BOOL m_bManaged;               /**< 是否要自动释放当前的m_pSkin对象 */
     int m_iIcon;                   /**< 绘制状态索引 */
     SAutoRefPtr<ISkinObj> m_pSkin; /**< ISkinObj对象 */
@@ -386,17 +370,17 @@ public:
     bool m_bKeepAspect;            /**< keep aspect ratio */
 
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"skin", m_pSkin, TRUE)
-    ATTR_INT(L"iconIndex", m_iIcon, FALSE)
-    ATTR_INT(L"tile", m_iTile, TRUE)
-    ATTR_BOOL(L"keepAspect", m_bKeepAspect, TRUE)
+        ATTR_SKIN(L"skin", m_pSkin, TRUE)
+        ATTR_INT(L"iconIndex", m_iIcon, FALSE)
+        ATTR_INT(L"tile", m_iTile, TRUE)
+        ATTR_BOOL(L"keepAspect", m_bKeepAspect, TRUE)
     SOUI_ATTRS_END()
 
   protected:
     void OnPaint(IRenderTarget *pRT);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_PAINT_EX(OnPaint)
     SOUI_MSG_MAP_END()
 };
 
@@ -475,16 +459,16 @@ class SOUI_EXP SAnimateImgWnd
     void OnDestroy();
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_SHOWWINDOW(OnShowWindow)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_SHOWWINDOW(OnShowWindow)
     SOUI_MSG_MAP_END()
 
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"skin", m_pSkin, TRUE)
-    ATTR_UINT(L"speed", m_nSpeed, FALSE)
-    ATTR_BOOL(L"autoStart", m_bAutoStart, FALSE)
-    ATTR_INT(L"repeat", m_nRepeat, FALSE)
+        ATTR_SKIN(L"skin", m_pSkin, TRUE)
+        ATTR_UINT(L"speed", m_nSpeed, FALSE)
+        ATTR_BOOL(L"autoStart", m_bAutoStart, FALSE)
+        ATTR_INT(L"repeat", m_nRepeat, FALSE)
     SOUI_ATTRS_END()
 
   protected:
@@ -595,18 +579,18 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
     SAutoRefPtr<ISkinObj> m_pSkinPos; /**< 前景资源 */
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_CREATE(OnCreate)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_CREATE(OnCreate)
     SOUI_MSG_MAP_END()
 
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"bkgndSkin", m_pSkinBg, TRUE)
-    ATTR_SKIN(L"posSkin", m_pSkinPos, TRUE)
-    ATTR_INT(L"min", m_nMinValue, FALSE)
-    ATTR_INT(L"max", m_nMaxValue, FALSE)
-    ATTR_INT(L"value", m_nValue, FALSE)
-    ATTR_BOOL(L"vertical", m_bVertical, FALSE)
-    ATTR_BOOL(L"showPercent", m_bShowPercent, FALSE)
+        ATTR_SKIN(L"bkgndSkin", m_pSkinBg, TRUE)
+        ATTR_SKIN(L"posSkin", m_pSkinPos, TRUE)
+        ATTR_INT(L"min", m_nMinValue, FALSE)
+        ATTR_INT(L"max", m_nMaxValue, FALSE)
+        ATTR_INT(L"value", m_nValue, FALSE)
+        ATTR_BOOL(L"vertical", m_bVertical, FALSE)
+        ATTR_BOOL(L"showPercent", m_bShowPercent, FALSE)
     SOUI_ATTRS_END()
 };
 
@@ -645,25 +629,25 @@ class SOUI_EXP SLine : public SWindow {
     } m_mode;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_COLOR(L"colorLine", m_crLine, FALSE)
-    ATTR_COLOR(L"lineColor", m_crLine, FALSE)
-    ATTR_INT(L"lineSize", m_nLineSize, FALSE)
-    ATTR_ENUM_BEGIN(L"mode", HRMODE, FALSE)
-    ATTR_ENUM_VALUE(L"vertical", HR_VERT)
-    ATTR_ENUM_VALUE(L"horizontal", HR_HORZ)
-    ATTR_ENUM_VALUE(L"tilt", HR_TILT)
-    ATTR_ENUM_END(m_mode)
-    ATTR_ENUM_BEGIN(L"lineStyle", int, FALSE)
-    ATTR_ENUM_VALUE(L"solid", PS_SOLID)           // default
-    ATTR_ENUM_VALUE(L"dash", PS_DASH)             /* -------  */
-    ATTR_ENUM_VALUE(L"dot", PS_DOT)               /* .......  */
-    ATTR_ENUM_VALUE(L"dashdot", PS_DASHDOT)       /* _._._._  */
-    ATTR_ENUM_VALUE(L"dashdotdot", PS_DASHDOTDOT) /* _.._.._  */
-    ATTR_ENUM_END(m_nLineStyle)
+        ATTR_COLOR(L"colorLine", m_crLine, FALSE)
+        ATTR_COLOR(L"lineColor", m_crLine, FALSE)
+        ATTR_INT(L"lineSize", m_nLineSize, FALSE)
+        ATTR_ENUM_BEGIN(L"mode", HRMODE, FALSE)
+            ATTR_ENUM_VALUE(L"vertical", HR_VERT)
+            ATTR_ENUM_VALUE(L"horizontal", HR_HORZ)
+            ATTR_ENUM_VALUE(L"tilt", HR_TILT)
+        ATTR_ENUM_END(m_mode)
+        ATTR_ENUM_BEGIN(L"lineStyle", int, FALSE)
+            ATTR_ENUM_VALUE(L"solid", PS_SOLID)           // default
+            ATTR_ENUM_VALUE(L"dash", PS_DASH)             /* -------  */
+            ATTR_ENUM_VALUE(L"dot", PS_DOT)               /* .......  */
+            ATTR_ENUM_VALUE(L"dashdot", PS_DASHDOT)       /* _._._._  */
+            ATTR_ENUM_VALUE(L"dashdotdot", PS_DASHDOTDOT) /* _.._.._  */
+        ATTR_ENUM_END(m_nLineStyle)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_PAINT_EX(OnPaint)
     SOUI_MSG_MAP_END()
 };
 
@@ -765,16 +749,16 @@ class SOUI_EXP SCheckBox : public SWindow {
     HRESULT OnAttrCheck(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"skin", m_pSkin, FALSE)
-    ATTR_SKIN(L"focusSkin", m_pFocusSkin, FALSE)
-    ATTR_CUSTOM(L"checked", OnAttrCheck)
+        ATTR_SKIN(L"skin", m_pSkin, FALSE)
+        ATTR_SKIN(L"focusSkin", m_pFocusSkin, FALSE)
+        ATTR_CUSTOM(L"checked", OnAttrCheck)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_LBUTTONDBLCLK(OnLButtonDown)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_LBUTTONDBLCLK(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_KEYDOWN(OnKeyDown)
     SOUI_MSG_MAP_END()
 };
 
@@ -822,11 +806,11 @@ class SOUI_EXP SIconWnd : public SWindow {
     HICON m_theIcon; /**< 图标资源句柄 */
 
     SOUI_ATTRS_BEGIN()
-    ATTR_ICON(L"src", m_theIcon, FALSE)
+        ATTR_ICON(L"src", m_theIcon, FALSE)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_PAINT_EX(OnPaint)
     SOUI_MSG_MAP_END()
 };
 
@@ -948,26 +932,26 @@ class SOUI_EXP SRadioBox : public SWindow {
     HRESULT OnAttrCheck(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"skin", m_pSkin, FALSE)
-    ATTR_SKIN(L"focusSkin", m_pFocusSkin, FALSE)
-    ATTR_CUSTOM(L"checked", OnAttrCheck)
-    ATTR_ENUM_BEGIN(L"iconAlign", UINT, TRUE)
-    ATTR_ENUM_VALUE(L"left", SwndStyle::Align_Left)
-    ATTR_ENUM_VALUE(L"center", SwndStyle::Align_Center)
-    ATTR_ENUM_VALUE(L"right", SwndStyle::Align_Right)
-    ATTR_ENUM_END(m_uIconAlign)
-    ATTR_ENUM_BEGIN(L"iconValign", UINT, TRUE)
-    ATTR_ENUM_VALUE(L"top", SwndStyle::VAlign_Top)
-    ATTR_ENUM_VALUE(L"middle", SwndStyle::VAlign_Middle)
-    ATTR_ENUM_VALUE(L"bottom", SwndStyle::VAlign_Bottom)
-    ATTR_ENUM_END(m_uIconVAlign)
-    ATTR_INT(L"sep", m_nRadioBoxSpacing, TRUE)
+        ATTR_SKIN(L"skin", m_pSkin, FALSE)
+        ATTR_SKIN(L"focusSkin", m_pFocusSkin, FALSE)
+        ATTR_CUSTOM(L"checked", OnAttrCheck)
+        ATTR_ENUM_BEGIN(L"iconAlign", UINT, TRUE)
+            ATTR_ENUM_VALUE(L"left", SwndStyle::Align_Left)
+            ATTR_ENUM_VALUE(L"center", SwndStyle::Align_Center)
+            ATTR_ENUM_VALUE(L"right", SwndStyle::Align_Right)
+        ATTR_ENUM_END(m_uIconAlign)
+        ATTR_ENUM_BEGIN(L"iconValign", UINT, TRUE)
+            ATTR_ENUM_VALUE(L"top", SwndStyle::VAlign_Top)
+            ATTR_ENUM_VALUE(L"middle", SwndStyle::VAlign_Middle)
+            ATTR_ENUM_VALUE(L"bottom", SwndStyle::VAlign_Bottom)
+        ATTR_ENUM_END(m_uIconVAlign)
+        ATTR_INT(L"sep", m_nRadioBoxSpacing, TRUE)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_SETFOCUS_EX2(OnSetFocus)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_SETFOCUS_EX2(OnSetFocus)
     SOUI_MSG_MAP_END()
 
   protected:
@@ -1040,7 +1024,7 @@ class SOUI_EXP SToggle : public SCheckBox {
     void OnPaint(IRenderTarget *pRT);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_PAINT_EX(OnPaint)
     SOUI_MSG_MAP_END()
 };
 
@@ -1067,14 +1051,14 @@ class SOUI_EXP SGroup : public SWindow {
     SLayoutSize m_nHeaderHeight;   /**< 头部高度 */
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_COLOR(L"colorLine1", m_crLine1, FALSE)
-    ATTR_COLOR(L"colorLine2", m_crLine2, FALSE)
-    ATTR_LAYOUTSIZE(L"round", m_nRound, FALSE)
-    ATTR_LAYOUTSIZE(L"headerHeight", m_nHeaderHeight, TRUE)
+        ATTR_COLOR(L"colorLine1", m_crLine1, FALSE)
+        ATTR_COLOR(L"colorLine2", m_crLine2, FALSE)
+        ATTR_LAYOUTSIZE(L"round", m_nRound, FALSE)
+        ATTR_LAYOUTSIZE(L"headerHeight", m_nHeaderHeight, TRUE)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_PAINT_EX(OnPaint)
     SOUI_MSG_MAP_END()
 };
 

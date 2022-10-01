@@ -52,10 +52,7 @@ SWindow *SWindowFinder::FindChildByKey(SWindow *pParent, const SFindInfo &fi)
     }
 }
 
-void SWindowFinder::CacheResultForName(SWindow *pParent,
-                                       const SStringW &strName,
-                                       int nDeep,
-                                       SWindow *pResult)
+void SWindowFinder::CacheResultForName(SWindow *pParent, const SStringW &strName, int nDeep, SWindow *pResult)
 {
     SFindInfo fi(pParent, strName, nDeep);
     SASSERT(m_findCache.Lookup(fi) == NULL);

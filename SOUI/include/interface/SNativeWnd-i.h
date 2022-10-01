@@ -34,13 +34,12 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
      * @param nWidth --窗口宽度
      * @param nHeight --窗口调试
      * @param hWndParent --父窗口
-     * @param nID -- 窗口ID 
-     * @param lpParam --窗口自定义参数 
+     * @param nID -- 窗口ID
+     * @param lpParam --窗口自定义参数
      * @return HWND
-    */
+     */
     STDMETHOD_(HWND, CreateNative)
-    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth,
-     int nHeight, HWND hWndParent, int nID DEF_VAL(0), LPVOID lpParam DEF_VAL(0)) PURE;
+    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID DEF_VAL(0), LPVOID lpParam DEF_VAL(0)) PURE;
 
     STDMETHOD_(HWND, GetHwnd)(THIS) PURE;
 
@@ -100,8 +99,7 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
     STDMETHOD_(int, MapWindowRect)(THIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
 
     STDMETHOD_(UINT_PTR, SetTimer)
-    (THIS_ UINT_PTR nIDEvent, UINT nElapse,
-     void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) DEF_VAL(NULL)) PURE;
+    (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) DEF_VAL(NULL)) PURE;
 
     STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) PURE;
 
@@ -157,8 +155,7 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
     (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
 
     STDMETHOD_(BOOL, UpdateLayeredWindow)
-    (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey,
-     BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
+    (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey, BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
 
     STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
 };

@@ -33,8 +33,7 @@ void SCaption::OnLButtonUp(UINT nFlags, CPoint point)
 void SCaption::OnMouseMove(UINT nFlags, CPoint point)
 {
     HWND hHost = GetContainer()->GetHostHwnd();
-    if (WS_MAXIMIZE == (GetWindowLong(hHost, GWL_STYLE) & WS_MAXIMIZE) && m_bIsMaxDown
-        && IsSuppotMaxMove())
+    if (WS_MAXIMIZE == (GetWindowLong(hHost, GWL_STYLE) & WS_MAXIMIZE) && m_bIsMaxDown && IsSuppotMaxMove())
     {
         ::SendMessage(hHost, WM_SYSCOMMAND, SC_MOVE | HTCAPTION, 0);
 
@@ -61,8 +60,7 @@ void SCaption::OnLButtonDblClk(UINT nFlags, CPoint point)
 {
     HWND hHost = GetContainer()->GetHostHwnd();
 
-    if ((GetWindowLong(hHost, GWL_STYLE) & WS_THICKFRAME)
-        && GetWindowLong(hHost, GWL_STYLE) & WS_MAXIMIZEBOX)
+    if ((GetWindowLong(hHost, GWL_STYLE) & WS_THICKFRAME) && GetWindowLong(hHost, GWL_STYLE) & WS_MAXIMIZEBOX)
     {
         if (WS_MAXIMIZE == (GetWindowLong(hHost, GWL_STYLE) & WS_MAXIMIZE))
             ::SendMessage(hHost, WM_SYSCOMMAND, SC_RESTORE | HTCAPTION, 0);

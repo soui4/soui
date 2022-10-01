@@ -42,11 +42,11 @@ class SouiLayoutParam
     HRESULT OnAttrOffset(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"width", OnAttrWidth)
-    ATTR_CUSTOM(L"height", OnAttrHeight)
-    ATTR_CUSTOM(L"pos", OnAttrPos)
-    ATTR_CUSTOM(L"size", OnAttrSize)
-    ATTR_CUSTOM(L"offset", OnAttrOffset)
+        ATTR_CUSTOM(L"width", OnAttrWidth)
+        ATTR_CUSTOM(L"height", OnAttrHeight)
+        ATTR_CUSTOM(L"pos", OnAttrPos)
+        ATTR_CUSTOM(L"size", OnAttrSize)
+        ATTR_CUSTOM(L"offset", OnAttrOffset)
     SOUI_ATTRS_BREAK()
 
   protected:
@@ -84,12 +84,7 @@ class SOUI_EXP SouiLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     void CalcPositionEx(SList<WndPos> *pListChildren, int nWidth, int nHeight) const;
     int CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeight) const;
 
-    int PositionItem2Value(SList<WndPos> *pLstChilds,
-                           SPOSITION position,
-                           const POS_INFO &pos,
-                           int nMax,
-                           BOOL bX,
-                           int nScale) const;
+    int PositionItem2Value(SList<WndPos> *pLstChilds, SPOSITION position, const POS_INFO &pos, int nMax, BOOL bX, int nScale) const;
 
     int CalcChildLeft(SWindow *pWindow, SouiLayoutParam *pParam);
     int CalcChildRight(SWindow *pWindow, SouiLayoutParam *pParam);

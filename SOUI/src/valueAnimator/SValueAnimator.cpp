@@ -205,8 +205,7 @@ bool SValueAnimator::animateBasedOnTime(uint64_t currentTime)
     if (mRunning)
     {
         long scaledDuration = getScaledDuration();
-        float fraction
-            = scaledDuration > 0 ? (float)(currentTime - mStartTime) / scaledDuration : 1.f;
+        float fraction = scaledDuration > 0 ? (float)(currentTime - mStartTime) / scaledDuration : 1.f;
         float lastFraction = mOverallFraction;
         bool newIteration = (int)fraction > (int)lastFraction;
         bool lastIterationFinished = (fraction >= mRepeatCount + 1) && (mRepeatCount != INFINITE);
@@ -511,8 +510,7 @@ long SValueAnimator::getCurrentPlayTime()
 
 bool SValueAnimator::shouldPlayBackward(int iteration, bool inReverse)
 {
-    if (iteration > 0 && mRepeatMode == REVERSE
-        && (iteration < (mRepeatCount + 1) || mRepeatCount == -1))
+    if (iteration > 0 && mRepeatMode == REVERSE && (iteration < (mRepeatCount + 1) || mRepeatCount == -1))
     {
         // if we were seeked to some other iteration in a reversing animator,
         // figure out the correct direction to start playing based on the iteration

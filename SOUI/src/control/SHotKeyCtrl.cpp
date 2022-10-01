@@ -156,8 +156,7 @@ void SHotKeyCtrl::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
     {
         m_bInSetting = FALSE;
     }
-    else if (m_wVK == 0 && (GetKeyState(VK_SHIFT) & 0x8000) == 0
-             && (GetKeyState(VK_MENU) & 0x8000) == 0 && (GetKeyState(VK_CONTROL) & 0x8000) == 0)
+    else if (m_wVK == 0 && (GetKeyState(VK_SHIFT) & 0x8000) == 0 && (GetKeyState(VK_MENU) & 0x8000) == 0 && (GetKeyState(VK_CONTROL) & 0x8000) == 0)
     {
         m_bInSetting = FALSE;
         UpdateModifier();

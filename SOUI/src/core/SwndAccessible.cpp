@@ -19,9 +19,7 @@ HRESULT SAccessible::get_accParent(IDispatch **ppdispParent)
         return CO_E_OBJNOTCONNECTED;
     if (!m_pWnd->GetParent())
     {
-        return AccessibleObjectFromWindow(m_pWnd->GetContainer()->GetHostHwnd(),
-                                          (DWORD)OBJID_WINDOW, IID_IAccessible,
-                                          (void **)ppdispParent);
+        return AccessibleObjectFromWindow(m_pWnd->GetContainer()->GetHostHwnd(), (DWORD)OBJID_WINDOW, IID_IAccessible, (void **)ppdispParent);
     }
     SComPtr<IAccessible> pAcc = m_pWnd->GetParent()->GetAccessible();
     if (!pAcc)
@@ -215,8 +213,7 @@ HRESULT SAccessible::accNavigate(long navDir, VARIANT varStart, VARIANT *pvarEnd
     case NAVDIR_FIRSTCHILD:
         if (m_pWnd->GetChildrenCount() == 0)
             break;
-        if ((varStart.vt == VT_DISPATCH && varStart.pdispVal == NULL)
-            || (varStart.vt == VT_I4 && varStart.lVal == CHILDID_SELF))
+        if ((varStart.vt == VT_DISPATCH && varStart.pdispVal == NULL) || (varStart.vt == VT_I4 && varStart.lVal == CHILDID_SELF))
         {
             pvarEndUpAt->vt = VT_I4;
             pvarEndUpAt->lVal = 1;
@@ -226,8 +223,7 @@ HRESULT SAccessible::accNavigate(long navDir, VARIANT varStart, VARIANT *pvarEnd
     case NAVDIR_LASTCHILD:
         if (m_pWnd->GetChildrenCount() == 0)
             break;
-        if ((varStart.vt == VT_DISPATCH && varStart.pdispVal == NULL)
-            || (varStart.vt == VT_I4 && varStart.lVal == CHILDID_SELF))
+        if ((varStart.vt == VT_DISPATCH && varStart.pdispVal == NULL) || (varStart.vt == VT_I4 && varStart.lVal == CHILDID_SELF))
         {
             pvarEndUpAt->vt = VT_I4;
             pvarEndUpAt->lVal = m_pWnd->GetChildrenCount();
@@ -296,11 +292,7 @@ HRESULT SAccessible::accNavigate(long navDir, VARIANT varStart, VARIANT *pvarEnd
     return hr;
 }
 
-HRESULT SAccessible::accLocation(long *pxLeft,
-                                 long *pyTop,
-                                 long *pcxWidth,
-                                 long *pcyHeight,
-                                 VARIANT varChild)
+HRESULT SAccessible::accLocation(long *pxLeft, long *pyTop, long *pcxWidth, long *pcyHeight, VARIANT varChild)
 {
     if (!m_pWnd)
         return CO_E_OBJNOTCONNECTED;
@@ -369,8 +361,7 @@ HRESULT SAccessible::get_accFocus(VARIANT *pvarChild)
             else
             {
                 pvarChild->vt = VT_DISPATCH;
-                pFocus->GetAccessible()->QueryInterface(IID_IDispatch,
-                                                        (void **)&pvarChild->pdispVal);
+                pFocus->GetAccessible()->QueryInterface(IID_IDispatch, (void **)&pvarChild->pdispVal);
             }
             return S_OK;
         }
@@ -382,8 +373,7 @@ HRESULT SAccessible::get_accFocus(VARIANT *pvarChild)
     else
     {
         pvarChild->vt = VT_DISPATCH;
-        return AccessibleObjectFromWindow(hFocused, OBJID_WINDOW, IID_IAccessible,
-                                          (void **)&pvarChild->pdispVal);
+        return AccessibleObjectFromWindow(hFocused, OBJID_WINDOW, IID_IAccessible, (void **)&pvarChild->pdispVal);
     }
 }
 
@@ -473,23 +463,12 @@ STDMETHODIMP SAccessible::GetTypeInfo(unsigned int iTInfo, LCID lcid, ITypeInfo 
     return E_NOTIMPL;
 }
 
-STDMETHODIMP SAccessible::GetIDsOfNames(REFIID riid,
-                                        OLECHAR **rgszNames,
-                                        unsigned int cNames,
-                                        LCID lcid,
-                                        DISPID *rgDispId)
+STDMETHODIMP SAccessible::GetIDsOfNames(REFIID riid, OLECHAR **rgszNames, unsigned int cNames, LCID lcid, DISPID *rgDispId)
 {
     return E_NOTIMPL;
 }
 
-STDMETHODIMP SAccessible::Invoke(DISPID dispIdMember,
-                                 REFIID riid,
-                                 LCID lcid,
-                                 WORD wFlags,
-                                 DISPPARAMS *pDispParams,
-                                 VARIANT *pVarResult,
-                                 EXCEPINFO *pExcepInfo,
-                                 unsigned int *puArgErr)
+STDMETHODIMP SAccessible::Invoke(DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS *pDispParams, VARIANT *pVarResult, EXCEPINFO *pExcepInfo, unsigned int *puArgErr)
 {
     return E_NOTIMPL;
 }

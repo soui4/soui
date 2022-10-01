@@ -81,7 +81,7 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
     }
     if (m_adapter == adapter)
     {
-        SSLOGW()<<"the new adapter is same to previous set adapter, same as notifyDatasetChanged";
+        SSLOGW() << "the new adapter is same to previous set adapter, same as notifyDatasetChanged";
         if (m_adapter)
         {
             onDataSetChanged();
@@ -133,13 +133,7 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
     return TRUE;
 }
 
-int SMCListView::InsertColumn(int nIndex,
-                              LPCTSTR pszText,
-                              int nWidth,
-                              UINT fmt,
-                              LPARAM lParam,
-                              BOOL bDpiAware /*=TRUE*/,
-                              float fWeight /*=0.0f*/)
+int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=TRUE*/, float fWeight /*=0.0f*/)
 {
     SASSERT(m_pHeader);
 
@@ -155,8 +149,7 @@ BOOL SMCListView::CreateChildren(SXmlNode xmlNode)
     xmlTemplate.set_userdata(1);
     SXmlNode xmlHeader = xmlNode.child(L"headerStyle");
     xmlHeader.set_userdata(1);
-    m_pHeader = sobj_cast<SHeaderCtrl>(SApplication::getSingletonPtr()->CreateWindowByName(
-        xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
+    m_pHeader = sobj_cast<SHeaderCtrl>(SApplication::getSingletonPtr()->CreateWindowByName(xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
     SASSERT(m_pHeader);
     if (!m_pHeader)
         return FALSE;
@@ -171,27 +164,21 @@ BOOL SMCListView::CreateChildren(SXmlNode xmlNode)
         SLayoutSize nItemHei = GETLAYOUTSIZE(xmlTemplate.attribute(L"itemHeight").value());
         if (nItemHei.fSize > 0.0f)
         { //指定了itemHeight属性时创建一个固定行高的定位器
-            IListViewItemLocator *pItemLocator
-                = new SListViewItemLocatorFix(nItemHei, m_nDividerSize);
+            IListViewItemLocator *pItemLocator = new SListViewItemLocatorFix(nItemHei, m_nDividerSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
         }
         else
         { //创建一个行高可变的行定位器，从defHeight属性中获取默认行高
-            IListViewItemLocator *pItemLocator = new SListViewItemLocatorFlex(
-                GETLAYOUTSIZE(xmlTemplate.attribute(L"defHeight").as_string(L"30dp")),
-                m_nDividerSize);
+            IListViewItemLocator *pItemLocator = new SListViewItemLocatorFlex(GETLAYOUTSIZE(xmlTemplate.attribute(L"defHeight").as_string(L"30dp")), m_nDividerSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
         }
     }
 
-    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemChanging::EventID,
-                                             Subscriber(&SMCListView::OnHeaderSizeChanging, this));
-    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemSwap::EventID,
-                                             Subscriber(&SMCListView::OnHeaderSwap, this));
-    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderClick::EventID,
-                                             Subscriber(&SMCListView::OnHeaderClick, this));
+    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemChanging::EventID, Subscriber(&SMCListView::OnHeaderSizeChanging, this));
+    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderItemSwap::EventID, Subscriber(&SMCListView::OnHeaderSwap, this));
+    m_pHeader->GetEventSet()->subscribeEvent(EventHeaderClick::EventID, Subscriber(&SMCListView::OnHeaderClick, this));
 
     return TRUE;
 }
@@ -236,8 +223,7 @@ void SMCListView::UpdateScrollBar()
         {
             // 小于表头的最小宽度, 需要横向滚动条
             m_wBarVisible |= SSB_HORZ;
-            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth()
-                                                       : 0; //注意同时调整纵向滚动条page信息
+            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; //注意同时调整纵向滚动条page信息
 
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -529,8 +515,7 @@ void SMCListView::OnPaint(IRenderTarget *pRT)
                     POINT pts[2] = { { rcItem.left, rcItem.top }, { rcItem.right, rcItem.top } };
                     pRT->DrawLines(pts, 2);
                 }
-                POINT pts[2]
-                    = { { rcItem.left, rcItem.bottom - 1 }, { rcItem.right, rcItem.bottom - 1 } };
+                POINT pts[2] = { { rcItem.left, rcItem.bottom - 1 }, { rcItem.right, rcItem.bottom - 1 } };
                 pRT->DrawLines(pts, 2);
                 pRT->SetAntiAlias(bAntiAlias);
             }
@@ -627,10 +612,9 @@ void SMCListView::UpdateVisibleItems()
             ii.nType = m_adapter->getItemViewType(iNewLastVisible, dwState);
 
             if (iNewLastVisible >= iOldFirstVisible && iNewLastVisible < iOldLastVisible)
-            { // use the old visible item
-                int iItem
-                    = iNewLastVisible - iOldFirstVisible; //(iNewLastVisible-iNewFirstVisible) +
-                                                          //(iNewFirstVisible-iOldFirstVisible);
+            {                                                   // use the old visible item
+                int iItem = iNewLastVisible - iOldFirstVisible; //(iNewLastVisible-iNewFirstVisible) +
+                                                                //(iNewFirstVisible-iOldFirstVisible);
                 SASSERT(iItem >= 0 && iItem <= (iOldLastVisible - iOldFirstVisible));
                 if (pItemInfos[iItem].nType == ii.nType)
                 { //类型相同才能重用
@@ -646,8 +630,7 @@ void SMCListView::UpdateVisibleItems()
                 { //创建一个新的列表项
                     bNewItem = TRUE;
                     ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
-                    ii.pItem->GetEventSet()->subscribeEvent(
-                        EventItemPanelClick::EventID, Subscriber(&SMCListView::OnItemClick, this));
+                    ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&SMCListView::OnItemClick, this));
                 }
                 else
                 {
@@ -682,8 +665,7 @@ void SMCListView::UpdateVisibleItems()
 
             if (!m_lvItemLocator->IsFixHeight())
             { //计算出列表行高度
-                SIZE szView = m_adapter->getViewDesiredSize(iNewLastVisible, ii.pItem,
-                                                            rcItem.Width(), rcItem.Height());
+                SIZE szView = m_adapter->getViewDesiredSize(iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
                 m_lvItemLocator->SetItemHeight(iNewLastVisible, szView.cy);
                 rcItem.bottom = szView.cy;
                 ii.pItem->Move(rcItem);
@@ -1105,8 +1087,7 @@ BOOL SMCListView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     {
         CRect rcItem = pSelItem->GetItemRect();
         CPoint pt2 = pt - rcItem.TopLeft();
-        if (pSelItem->DoFrameEvent(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta),
-                                   MAKELPARAM(pt2.x, pt2.y)))
+        if (pSelItem->DoFrameEvent(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta), MAKELPARAM(pt2.x, pt2.y)))
             return TRUE;
     }
     return __baseCls::OnMouseWheel(nFlags, zDelta, pt);
@@ -1243,16 +1224,12 @@ BOOL SMCListView::OnSetCursor(const CPoint &pt)
     if (m_itemCapture)
     {
         CRect rcItem = m_itemCapture->GetItemRect();
-        bRet = m_itemCapture->DoFrameEvent(WM_SETCURSOR, 0,
-                                           MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top))
-            != 0;
+        bRet = m_itemCapture->DoFrameEvent(WM_SETCURSOR, 0, MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top)) != 0;
     }
     else if (m_pHoverItem)
     {
         CRect rcItem = m_pHoverItem->GetItemRect();
-        bRet = m_pHoverItem->DoFrameEvent(WM_SETCURSOR, 0,
-                                          MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top))
-            != 0;
+        bRet = m_pHoverItem->DoFrameEvent(WM_SETCURSOR, 0, MAKELPARAM(pt.x - rcItem.left, pt.y - rcItem.top)) != 0;
     }
     if (!bRet)
     {

@@ -78,8 +78,7 @@ BOOL SSplitWnd::OnSetCursor(const CPoint &pt)
 {
     if (!m_bAdjustable)
         return FALSE;
-    HCURSOR hCursor
-        = GETRESPROVIDER->LoadCursor((m_orintation == Vertical) ? IDC_SIZEWE : IDC_SIZENS);
+    HCURSOR hCursor = GETRESPROVIDER->LoadCursor((m_orintation == Vertical) ? IDC_SIZEWE : IDC_SIZENS);
     SetCursor(hCursor);
     return TRUE;
 }
@@ -403,8 +402,7 @@ void SSplitWnd::Relayout(const CRect &rc, PANESIZELIST lstPaneSize /*=PANESIZELI
             ++nVisiblePanelCount;
     }
 
-    int remain = ((Vertical == m_orintation) ? rc.Width() : rc.Height()) - actural
-        - (nVisiblePanelCount - 1) * m_spliterSize;
+    int remain = ((Vertical == m_orintation) ? rc.Width() : rc.Height()) - actural - (nVisiblePanelCount - 1) * m_spliterSize;
     AdjustPanesSize(lstPaneSize, remain);
     int nOffset = (Vertical == m_orintation) ? rc.left : rc.top;
     ResetPanesPostion(m_lstPane, m_lstPriority, lstPaneSize, nOffset);
@@ -494,10 +492,7 @@ int SSplitWnd::AdjustPanesSize(PANESIZELIST &lstPriority, int remain)
     return remain;
 }
 
-int SSplitWnd::ResetPanesPostion(SplitPaneList &lstPane,
-                                 SplitPaneList &lstPanePriority,
-                                 PANESIZELIST &lstPaneSize,
-                                 int offset)
+int SSplitWnd::ResetPanesPostion(SplitPaneList &lstPane, SplitPaneList &lstPanePriority, PANESIZELIST &lstPaneSize, int offset)
 {
     CRect rc = GetChildrenLayoutRect();
     for (int i = 0; i < (int)lstPane.GetCount(); i++)

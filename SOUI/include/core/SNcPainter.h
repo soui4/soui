@@ -68,10 +68,10 @@ class SNcPainter
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_LAYOUTSIZE(L"titleHeight", m_titleHeight, FALSE)
-    ATTR_LAYOUTSIZE(L"borderWidth", m_borderWidth, FALSE)
-    ATTR_SKIN(L"skinBorder", m_skinBorder, FALSE)
-    ATTR_BOOL(L"system", m_bSysNcPainter, FALSE)
+        ATTR_LAYOUTSIZE(L"titleHeight", m_titleHeight, FALSE)
+        ATTR_LAYOUTSIZE(L"borderWidth", m_borderWidth, FALSE)
+        ATTR_SKIN(L"skinBorder", m_skinBorder, FALSE)
+        ATTR_BOOL(L"system", m_bSysNcPainter, FALSE)
     SOUI_ATTRS_END()
 
   protected:
@@ -84,26 +84,26 @@ class SNcPainter
     void OnNcDestroy();
     void OnNcLButtonDown(UINT flag, CPoint pt);
     void OnLButtonUp(WPARAM wp, LPARAM lp);
-	void OnMouseMove(WPARAM wp, LPARAM lp);
+    void OnMouseMove(WPARAM wp, LPARAM lp);
     LRESULT OnNcMouseEvent(UINT msg, WPARAM wp, LPARAM lp);
     LRESULT OnNcMouseLeave(UINT msg, WPARAM wp, LPARAM lp);
     void OnSize(UINT nType, CSize size);
 
     BEGIN_MSG_MAP_EX(SNcPainter)
-    if (m_bSysNcPainter)
-        return FALSE;
-    MSG_WM_NCCALCSIZE(OnNcCalcSize)
-    MSG_WM_NCACTIVATE(OnNcActivate)
-    MSG_WM_NCHITTEST(OnNcHitTest)
-    MSG_WM_NCPAINT(OnNcPaint)
-    MSG_WM_NCDESTROY(OnNcDestroy)
-    MSG_WM_SETTEXT(OnSetText)
-    MSG_WM_SIZE(OnSize)
-    MSG_WM_NCLBUTTONDOWN(OnNcLButtonDown)
-    MESSAGE_HANDLER_EX(WM_NCMOUSELEAVE, OnNcMouseLeave)
-    MESSAGE_RANGE_HANDLER_EX(WM_NCMOUSEMOVE, WM_NCMBUTTONDBLCLK, OnNcMouseEvent)
-    MESSAGE_HANDLER_EX(WM_SETTINGCHANGE, OnRepaint)
-    MESSAGE_HANDLER_EX(WM_SYSCOLORCHANGE, OnRepaint)
+        if (m_bSysNcPainter)
+            return FALSE;
+        MSG_WM_NCCALCSIZE(OnNcCalcSize)
+        MSG_WM_NCACTIVATE(OnNcActivate)
+        MSG_WM_NCHITTEST(OnNcHitTest)
+        MSG_WM_NCPAINT(OnNcPaint)
+        MSG_WM_NCDESTROY(OnNcDestroy)
+        MSG_WM_SETTEXT(OnSetText)
+        MSG_WM_SIZE(OnSize)
+        MSG_WM_NCLBUTTONDOWN(OnNcLButtonDown)
+        MESSAGE_HANDLER_EX(WM_NCMOUSELEAVE, OnNcMouseLeave)
+        MESSAGE_RANGE_HANDLER_EX(WM_NCMOUSEMOVE, WM_NCMBUTTONDBLCLK, OnNcMouseEvent)
+        MESSAGE_HANDLER_EX(WM_SETTINGCHANGE, OnRepaint)
+        MESSAGE_HANDLER_EX(WM_SYSCOLORCHANGE, OnRepaint)
     END_MSG_MAP()
 
   protected:
@@ -128,7 +128,7 @@ class SNcPainter
     UINT m_htPart;
     BOOL m_bInPaint;
     BOOL m_bLButtonDown;
-	BOOL m_bMouseHover;
+    BOOL m_bMouseHover;
     SNcPanel *m_root;
 };
 
@@ -142,15 +142,15 @@ class SNcPanel : public SOsrPanel {
   protected:
     BOOL OnEraseBkgnd(IRenderTarget *pRT);
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
+        MSG_WM_ERASEBKGND_EX(OnEraseBkgnd)
     SOUI_MSG_MAP_END()
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"skinActive", m_skinActive, FALSE)
-    ATTR_SKIN(L"skinInactive", m_skinInactive, FALSE)
-    ATTR_COLOR(L"colorActiveTitle", m_crActiveTitle, TRUE)
-    ATTR_COLOR(L"colorInactiveTitle", m_crInactiveTitle, TRUE)
+        ATTR_SKIN(L"skinActive", m_skinActive, FALSE)
+        ATTR_SKIN(L"skinInactive", m_skinInactive, FALSE)
+        ATTR_COLOR(L"colorActiveTitle", m_crActiveTitle, TRUE)
+        ATTR_COLOR(L"colorInactiveTitle", m_crInactiveTitle, TRUE)
     SOUI_ATTRS_END()
 
   protected:

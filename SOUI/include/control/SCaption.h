@@ -84,10 +84,10 @@ class SOUI_EXP SCaption : public SWindow {
     BOOL IsSuppotMaxMove();
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_LBUTTONDBLCLK(OnLButtonDblClk)
-    MSG_WM_MOUSEMOVE(OnMouseMove)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONDBLCLK(OnLButtonDblClk)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
     SOUI_MSG_MAP_END()
   private:
     BOOL m_bIsMaxDown; //最大化时,鼠标左键是否已经按下

@@ -102,8 +102,7 @@ static RGBQUAD RGBtoHSL(RGBQUAD lRGBColor)
         if (L <= (HSLMAX / 2)) /* saturation */
             S = (BYTE)((((cMax - cMin) * HSLMAX) + ((cMax + cMin) / 2)) / (cMax + cMin));
         else
-            S = (BYTE)((((cMax - cMin) * HSLMAX) + ((2 * RGBMAX - cMax - cMin) / 2))
-                       / (2 * RGBMAX - cMax - cMin));
+            S = (BYTE)((((cMax - cMin) * HSLMAX) + ((2 * RGBMAX - cMax - cMin) / 2)) / (2 * RGBMAX - cMax - cMin));
         /* hue */
         Rdelta = (WORD)((((cMax - R) * (HSLMAX / 6)) + ((cMax - cMin) / 2)) / (cMax - cMin));
         Gdelta = (WORD)((((cMax - G) * (HSLMAX / 6)) + ((cMax - cMin) / 2)) / (cMax - cMin));

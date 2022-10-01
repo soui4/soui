@@ -45,12 +45,12 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     }
 
   protected:
-	virtual UINT GetExpandMode() const;
+    virtual UINT GetExpandMode() const;
+
   protected:
     STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
     void _Scale(ISkinObj *skinObj, int nScale) override;
-
 
     int m_nStates; // skin 状态值
     BOOL m_bTile;
@@ -68,18 +68,18 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     HRESULT OnAttrSrc(const SStringW &value, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"src", OnAttrSrc)
-    ATTR_BOOL(L"tile", m_bTile, FALSE) //绘制是否平铺,0--位伸（默认），其它--平铺
-    ATTR_BOOL(L"autoFit", m_bAutoFit, FALSE) // autoFit为0时不自动适应绘图区大小
-    ATTR_BOOL(L"vertical", m_bVertical, FALSE) //子图是否垂直排列，0--水平排列(默认), 其它--垂直排列
-    ATTR_INT(L"states", m_nStates, FALSE) //子图数量,默认为1
-    ATTR_BOOL(L"lazyLoad", m_bLazyLoad, FALSE)
-    ATTR_ENUM_BEGIN(L"filterLevel", FilterLevel, FALSE)
-    ATTR_ENUM_VALUE(L"none", kNone_FilterLevel)
-    ATTR_ENUM_VALUE(L"low", kLow_FilterLevel)
-    ATTR_ENUM_VALUE(L"medium", kMedium_FilterLevel)
-    ATTR_ENUM_VALUE(L"high", kHigh_FilterLevel)
-    ATTR_ENUM_END(m_filterLevel)
+        ATTR_CUSTOM(L"src", OnAttrSrc)
+        ATTR_BOOL(L"tile", m_bTile, FALSE)         //绘制是否平铺,0--位伸（默认），其它--平铺
+        ATTR_BOOL(L"autoFit", m_bAutoFit, FALSE)   // autoFit为0时不自动适应绘图区大小
+        ATTR_BOOL(L"vertical", m_bVertical, FALSE) //子图是否垂直排列，0--水平排列(默认), 其它--垂直排列
+        ATTR_INT(L"states", m_nStates, FALSE)      //子图数量,默认为1
+        ATTR_BOOL(L"lazyLoad", m_bLazyLoad, FALSE)
+        ATTR_ENUM_BEGIN(L"filterLevel", FilterLevel, FALSE)
+            ATTR_ENUM_VALUE(L"none", kNone_FilterLevel)
+            ATTR_ENUM_VALUE(L"low", kLow_FilterLevel)
+            ATTR_ENUM_VALUE(L"medium", kMedium_FilterLevel)
+            ATTR_ENUM_VALUE(L"high", kHigh_FilterLevel)
+        ATTR_ENUM_END(m_filterLevel)
     SOUI_ATTRS_END()
 };
 
@@ -119,14 +119,14 @@ class SOUI_EXP SSkinImgFrame : public SSkinImgList {
     CRect m_rcMargin;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_RECT(L"margin", m_rcMargin, FALSE)                          //九宫格4周
-    ATTR_INT(L"left", m_rcMargin.left, FALSE)                        //九宫格左边距
-    ATTR_INT(L"top", m_rcMargin.top, FALSE)                          //九宫格上边距
-    ATTR_INT(L"right", m_rcMargin.right, FALSE)                      //九宫格右边距
-    ATTR_INT(L"bottom", m_rcMargin.bottom, FALSE)                    //九宫格下边距
-    ATTR_INT(L"margin-x", m_rcMargin.left = m_rcMargin.right, FALSE) //九宫格左右边距
-    ATTR_INT(L"margin-y", m_rcMargin.top = m_rcMargin.bottom, FALSE) //九宫格上下边距
-    ATTR_MARGIN(L"margin2", m_rcMargin, FALSE)
+        ATTR_RECT(L"margin", m_rcMargin, FALSE)                          //九宫格4周
+        ATTR_INT(L"left", m_rcMargin.left, FALSE)                        //九宫格左边距
+        ATTR_INT(L"top", m_rcMargin.top, FALSE)                          //九宫格上边距
+        ATTR_INT(L"right", m_rcMargin.right, FALSE)                      //九宫格右边距
+        ATTR_INT(L"bottom", m_rcMargin.bottom, FALSE)                    //九宫格下边距
+        ATTR_INT(L"margin-x", m_rcMargin.left = m_rcMargin.right, FALSE) //九宫格左右边距
+        ATTR_INT(L"margin-y", m_rcMargin.top = m_rcMargin.bottom, FALSE) //九宫格上下边距
+        ATTR_MARGIN(L"margin2", m_rcMargin, FALSE)
     SOUI_ATTRS_END()
 };
 
@@ -136,7 +136,7 @@ class SOUI_EXP SSkinImgFrame2 : public SSkinImgFrame {
     DEF_SOBJECT(SSkinImgFrame, L"imgframe2")
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"src", OnAttrSrc)
+        ATTR_CUSTOM(L"src", OnAttrSrc)
     SOUI_ATTRS_END()
   protected:
     HRESULT OnAttrSrc(const SStringW &strValue, BOOL bLoading);
@@ -180,20 +180,20 @@ class SOUI_EXP SSkinButton : public SSkinObjBase {
     float m_fCornerPercent; // 圆角 百分比 0.5 半圆
 
     SOUI_ATTRS_BEGIN()
-    ATTR_COLOR(L"colorBorder", m_colors.m_crBorder[0], TRUE)        //正常 边框颜色
-    ATTR_COLOR(L"colorBorderHover", m_colors.m_crBorder[1], TRUE)   //浮动 边框颜色
-    ATTR_COLOR(L"colorBorderPush", m_colors.m_crBorder[2], TRUE)    //下压 边框颜色
-    ATTR_COLOR(L"colorBorderDisable", m_colors.m_crBorder[3], TRUE) //禁用 边框颜色
-    ATTR_COLOR(L"colorUp", m_colors.m_crUp[ST_NORMAL], TRUE)        //正常状态渐变起始颜色
-    ATTR_COLOR(L"colorDown", m_colors.m_crDown[ST_NORMAL], TRUE)    //正常状态渐变终止颜色
-    ATTR_COLOR(L"colorUpHover", m_colors.m_crUp[ST_HOVER], TRUE)    //浮动状态渐变起始颜色
-    ATTR_COLOR(L"colorDownHover", m_colors.m_crDown[ST_HOVER], TRUE) //浮动状态渐变终止颜色
-    ATTR_COLOR(L"colorUpPush", m_colors.m_crUp[ST_PUSHDOWN], TRUE) //下压状态渐变起始颜色
-    ATTR_COLOR(L"colorDownPush", m_colors.m_crDown[ST_PUSHDOWN], TRUE) //下压状态渐变终止颜色
-    ATTR_COLOR(L"colorUpDisable", m_colors.m_crUp[ST_DISABLE], TRUE) //禁用状态渐变起始颜色
-    ATTR_COLOR(L"colorDownDisable", m_colors.m_crDown[ST_DISABLE], TRUE) //禁用状态渐变终止颜色
-    ATTR_INT(L"cornerRadius", m_nCornerRadius, TRUE)                     //圆角大小
-    ATTR_FLOAT(L"cornerPercent", m_fCornerPercent, TRUE) // 圆角 百分比 0.5 半圆 会覆盖 cornerRadius
+        ATTR_COLOR(L"colorBorder", m_colors.m_crBorder[0], TRUE)             //正常 边框颜色
+        ATTR_COLOR(L"colorBorderHover", m_colors.m_crBorder[1], TRUE)        //浮动 边框颜色
+        ATTR_COLOR(L"colorBorderPush", m_colors.m_crBorder[2], TRUE)         //下压 边框颜色
+        ATTR_COLOR(L"colorBorderDisable", m_colors.m_crBorder[3], TRUE)      //禁用 边框颜色
+        ATTR_COLOR(L"colorUp", m_colors.m_crUp[ST_NORMAL], TRUE)             //正常状态渐变起始颜色
+        ATTR_COLOR(L"colorDown", m_colors.m_crDown[ST_NORMAL], TRUE)         //正常状态渐变终止颜色
+        ATTR_COLOR(L"colorUpHover", m_colors.m_crUp[ST_HOVER], TRUE)         //浮动状态渐变起始颜色
+        ATTR_COLOR(L"colorDownHover", m_colors.m_crDown[ST_HOVER], TRUE)     //浮动状态渐变终止颜色
+        ATTR_COLOR(L"colorUpPush", m_colors.m_crUp[ST_PUSHDOWN], TRUE)       //下压状态渐变起始颜色
+        ATTR_COLOR(L"colorDownPush", m_colors.m_crDown[ST_PUSHDOWN], TRUE)   //下压状态渐变终止颜色
+        ATTR_COLOR(L"colorUpDisable", m_colors.m_crUp[ST_DISABLE], TRUE)     //禁用状态渐变起始颜色
+        ATTR_COLOR(L"colorDownDisable", m_colors.m_crDown[ST_DISABLE], TRUE) //禁用状态渐变终止颜色
+        ATTR_INT(L"cornerRadius", m_nCornerRadius, TRUE)                     //圆角大小
+        ATTR_FLOAT(L"cornerPercent", m_fCornerPercent, TRUE)                 // 圆角 百分比 0.5 半圆 会覆盖 cornerRadius
     SOUI_ATTRS_END()
 };
 
@@ -234,9 +234,9 @@ class SOUI_EXP SSkinGradation : public SSkinObjBase {
     COLORREF m_crFromBackup, m_crToBackup;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_COLOR(L"colorFrom", m_crFrom, TRUE) //渐变起始颜色
-    ATTR_COLOR(L"colorTo", m_crTo, TRUE)     //渐变终止颜色
-    ATTR_BOOL(L"vertical", m_bVert, TRUE)    //渐变方向,0--水平, 1--垂直(默认)
+        ATTR_COLOR(L"colorFrom", m_crFrom, TRUE) //渐变起始颜色
+        ATTR_COLOR(L"colorTo", m_crTo, TRUE)     //渐变终止颜色
+        ATTR_BOOL(L"vertical", m_bVert, TRUE)    //渐变方向,0--水平, 1--垂直(默认)
     SOUI_ATTRS_END()
 };
 
@@ -271,28 +271,26 @@ class SOUI_EXP SSkinScrollbar : public SSkinImgList {
 
     virtual int GetIdealSize() const;
 
-protected:
-	//返回源指定部分在原位图上的位置。
-	virtual CRect GetPartRect(int nSbCode, int nState, BOOL bVertical) const;
+  protected:
+    //返回源指定部分在原位图上的位置。
+    virtual CRect GetPartRect(int nSbCode, int nState, BOOL bVertical) const;
 
   protected:
-	void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override{}
+    void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override
+    {
+    }
 
-    void _DrawByState(IRenderTarget *pRT,
-                              LPCRECT prcDraw,
-                              DWORD dwState,
-                              BYTE byAlpha) const override;
-	void _Scale(ISkinObj *skinObj, int nScale) override;
-
+    void _DrawByState(IRenderTarget *pRT, LPCRECT prcDraw, DWORD dwState, BYTE byAlpha) const override;
+    void _Scale(ISkinObj *skinObj, int nScale) override;
 
     int m_nMargin;
     BOOL m_bHasGripper;
     BOOL m_bHasInactive; //有失活状态的箭头时，滚动条皮肤有必须有5行，否则可以是3行或者4行
 
     SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"margin", m_nMargin, FALSE)           //边缘不拉伸大小
-    ATTR_INT(L"hasGripper", m_bHasGripper, FALSE)   //滑块上是否有帮手(gripper)
-    ATTR_INT(L"hasInactive", m_bHasInactive, FALSE) //是否有禁用态
+        ATTR_INT(L"margin", m_nMargin, FALSE)           //边缘不拉伸大小
+        ATTR_INT(L"hasGripper", m_bHasGripper, FALSE)   //滑块上是否有帮手(gripper)
+        ATTR_INT(L"hasInactive", m_bHasInactive, FALSE) //是否有禁用态
     SOUI_ATTRS_END()
 };
 
@@ -310,19 +308,18 @@ class SOUI_EXP SSkinColorRect : public SSkinObjBase {
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_COLOR(L"normal", m_crStates[0], FALSE)
-    ATTR_COLOR(L"hover", m_crStates[1], FALSE)
-    ATTR_COLOR(L"pushdown", m_crStates[2], FALSE)
-    ATTR_COLOR(L"disable", m_crStates[3], FALSE)
-    ATTR_COLOR(L"normalBorder", m_crBorders[0], FALSE)
-    ATTR_COLOR(L"hoverBorder", m_crBorders[1], FALSE)
-    ATTR_COLOR(L"pushdownBorder", m_crBorders[2], FALSE)
-    ATTR_COLOR(L"disableBorder", m_crBorders[3], FALSE)
-    ATTR_INT(L"borderWidth", m_nBorderWidth, FALSE)
-    ATTR_INT(L"cornerRadius", m_nRadius, FALSE)
-    ATTR_FLOAT(L"cornerPercent",
-               m_fCornerPercent,
-               FALSE) // 圆角 百分比 0.5 半圆 会覆盖 cornerRadius
+        ATTR_COLOR(L"normal", m_crStates[0], FALSE)
+        ATTR_COLOR(L"hover", m_crStates[1], FALSE)
+        ATTR_COLOR(L"pushdown", m_crStates[2], FALSE)
+        ATTR_COLOR(L"disable", m_crStates[3], FALSE)
+        ATTR_COLOR(L"normalBorder", m_crBorders[0], FALSE)
+        ATTR_COLOR(L"hoverBorder", m_crBorders[1], FALSE)
+        ATTR_COLOR(L"pushdownBorder", m_crBorders[2], FALSE)
+        ATTR_COLOR(L"disableBorder", m_crBorders[3], FALSE)
+        ATTR_INT(L"borderWidth", m_nBorderWidth, FALSE)
+        ATTR_INT(L"cornerRadius", m_nRadius, FALSE)
+        ATTR_FLOAT(L"cornerPercent", m_fCornerPercent,
+                   FALSE) // 圆角 百分比 0.5 半圆 会覆盖 cornerRadius
     SOUI_ATTRS_END()
 
   protected:
@@ -358,22 +355,22 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         void Draw(IRenderTarget *pRT, LPCRECT rcDraw, BYTE byAlpha, int nScale) const;
 
         SOUI_ATTRS_BEGIN()
-        ATTR_ENUM_BEGIN(L"type", GradientType, TRUE)
-        ATTR_ENUM_VALUE(L"linear", linear)
-        ATTR_ENUM_VALUE(L"radial", radial)
-        ATTR_ENUM_VALUE(L"sweep", sweep)
-        ATTR_ENUM_END(m_Type)
-        ATTR_FLOAT(L"angle", m_angle, TRUE)
-        ATTR_FLOAT(L"centerX", m_centerX, TRUE)
-        ATTR_FLOAT(L"centerY", m_centerY, TRUE)
-        ATTR_COLOR(L"startColor", m_crStart, TRUE)
-        ATTR_COLOR(L"centerColor", m_crCenter, TRUE)
-        ATTR_COLOR(L"endColor", m_crEnd, TRUE)
-        ATTR_LAYOUTSIZE(L"radius", m_radius, TRUE)
+            ATTR_ENUM_BEGIN(L"type", GradientType, TRUE)
+                ATTR_ENUM_VALUE(L"linear", linear)
+                ATTR_ENUM_VALUE(L"radial", radial)
+                ATTR_ENUM_VALUE(L"sweep", sweep)
+            ATTR_ENUM_END(m_Type)
+            ATTR_FLOAT(L"angle", m_angle, TRUE)
+            ATTR_FLOAT(L"centerX", m_centerX, TRUE)
+            ATTR_FLOAT(L"centerY", m_centerY, TRUE)
+            ATTR_COLOR(L"startColor", m_crStart, TRUE)
+            ATTR_COLOR(L"centerColor", m_crCenter, TRUE)
+            ATTR_COLOR(L"endColor", m_crEnd, TRUE)
+            ATTR_LAYOUTSIZE(L"radius", m_radius, TRUE)
         SOUI_ATTRS_END()
       protected:
         GradientType m_Type;
-        float m_angle; //渐变角度，必须为45的倍数，0为从左到右，90为从上到下
+        float m_angle;        //渐变角度，必须为45的倍数，0为从左到右，90为从上到下
         float m_centerX;      //渐变中心X的相当位置，范围为0～1
         float m_centerY;      //渐变中心Y的相当位置，范围为0～1
         COLORREF m_crStart;   //渐变开始点的颜色
@@ -392,14 +389,14 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         }
 
         SOUI_ATTRS_BEGIN()
-        ATTR_LAYOUTSIZE(L"width", m_width, TRUE)
-        ATTR_COLOR(L"color", m_color, TRUE)
-        ATTR_ENUM_BEGIN(L"style", int, TRUE)
-        ATTR_ENUM_VALUE(L"solid", PS_SOLID)
-        ATTR_ENUM_VALUE(L"dash", PS_DASH)
-        ATTR_ENUM_VALUE(L"dashDot", PS_DASHDOT)
-        ATTR_ENUM_VALUE(L"dashDotDot", PS_DASHDOTDOT)
-        ATTR_ENUM_END(m_style)
+            ATTR_LAYOUTSIZE(L"width", m_width, TRUE)
+            ATTR_COLOR(L"color", m_color, TRUE)
+            ATTR_ENUM_BEGIN(L"style", int, TRUE)
+                ATTR_ENUM_VALUE(L"solid", PS_SOLID)
+                ATTR_ENUM_VALUE(L"dash", PS_DASH)
+                ATTR_ENUM_VALUE(L"dashDot", PS_DASHDOT)
+                ATTR_ENUM_VALUE(L"dashDotDot", PS_DASHDOTDOT)
+            ATTR_ENUM_END(m_style)
         SOUI_ATTRS_END()
       public:
         SLayoutSize m_width; //描边的宽度
@@ -414,9 +411,9 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         HRESULT OnAttrRadius(const SStringW strValue, BOOL bLoading);
 
         SOUI_ATTRS_BEGIN()
-        ATTR_CUSTOM(L"radius", OnAttrRadius)
-        ATTR_LAYOUTSIZE(L"radiusX", m_radiusX, TRUE)
-        ATTR_LAYOUTSIZE(L"radiusY", m_radiusY, TRUE)
+            ATTR_CUSTOM(L"radius", OnAttrRadius)
+            ATTR_LAYOUTSIZE(L"radiusX", m_radiusX, TRUE)
+            ATTR_LAYOUTSIZE(L"radiusY", m_radiusY, TRUE)
         SOUI_ATTRS_END()
 
         POINT GetConner(int nScale) const
@@ -433,8 +430,8 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
 
       public:
         SOUI_ATTRS_BEGIN()
-        ATTR_LAYOUTSIZE(L"width", m_width, TRUE)
-        ATTR_LAYOUTSIZE(L"height", m_height, TRUE)
+            ATTR_LAYOUTSIZE(L"width", m_width, TRUE)
+            ATTR_LAYOUTSIZE(L"height", m_height, TRUE)
         SOUI_ATTRS_END()
 
         SLayoutSize m_width, m_height;
@@ -451,8 +448,8 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         }
 
         SOUI_ATTRS_BEGIN()
-        ATTR_FLOAT(L"startAngle", m_startAngle, TRUE)
-        ATTR_FLOAT(L"sweepAngle", m_sweepAngle, TRUE)
+            ATTR_FLOAT(L"startAngle", m_startAngle, TRUE)
+            ATTR_FLOAT(L"sweepAngle", m_sweepAngle, TRUE)
         SOUI_ATTRS_END()
 
         float m_startAngle;
@@ -466,11 +463,11 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     STDMETHOD_(int, GetStates)(THIS) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_ENUM_BEGIN(L"shape", Shape, TRUE)
-    ATTR_ENUM_VALUE(L"rectangle", rectangle)
-    ATTR_ENUM_VALUE(L"oval", oval)
-    ATTR_ENUM_VALUE(L"ring", ring)
-    ATTR_ENUM_END(m_shape)
+        ATTR_ENUM_BEGIN(L"shape", Shape, TRUE)
+            ATTR_ENUM_VALUE(L"rectangle", rectangle)
+            ATTR_ENUM_VALUE(L"oval", oval)
+            ATTR_ENUM_VALUE(L"ring", ring)
+        ATTR_ENUM_END(m_shape)
     SOUI_ATTRS_END()
   protected:
     STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
@@ -496,10 +493,10 @@ class SOUI_EXP SSKinGroup : public SSkinObjBase {
     STDMETHOD_(int, GetStates)(THIS) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"normal", m_skins[0], FALSE)
-    ATTR_SKIN(L"hover", m_skins[1], FALSE)
-    ATTR_SKIN(L"pushDown", m_skins[2], FALSE)
-    ATTR_SKIN(L"disable", m_skins[3], FALSE)
+        ATTR_SKIN(L"normal", m_skins[0], FALSE)
+        ATTR_SKIN(L"hover", m_skins[1], FALSE)
+        ATTR_SKIN(L"pushDown", m_skins[2], FALSE)
+        ATTR_SKIN(L"disable", m_skins[3], FALSE)
     SOUI_ATTRS_END()
 
   protected:

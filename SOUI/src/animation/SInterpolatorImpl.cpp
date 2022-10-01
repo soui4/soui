@@ -102,8 +102,7 @@ float SAnticipateOvershootInterpolator::a(float t, float s)
     return t * t * ((s + 1) * t - s);
 }
 
-SAnticipateOvershootInterpolator::SAnticipateOvershootInterpolator(float tension,
-                                                                   float extraTension)
+SAnticipateOvershootInterpolator::SAnticipateOvershootInterpolator(float tension, float extraTension)
     : mTension(tension)
     , mExtraTension(extraTension)
 {
@@ -171,10 +170,7 @@ SPathInterpolator::SPathInterpolator(float controlX, float controlY)
     initQuad(controlX, controlY);
 }
 
-SPathInterpolator::SPathInterpolator(float controlX1,
-                                     float controlY1,
-                                     float controlX2,
-                                     float controlY2)
+SPathInterpolator::SPathInterpolator(float controlX1, float controlY1, float controlX2, float controlY2)
 {
     initCubic(controlX1, controlY1, controlX2, controlY2);
 }
@@ -215,8 +211,7 @@ void SPathInterpolator::initPath(IPathS *path)
     int componentIndex = 0;
 
     int nLen = numPoints * 3;
-    if (pointComponents[1] != 0 || pointComponents[2] != 0 || pointComponents[nLen - 2] != 1
-        || pointComponents[nLen - 1] != 1)
+    if (pointComponents[1] != 0 || pointComponents[2] != 0 || pointComponents[nLen - 2] != 1 || pointComponents[nLen - 1] != 1)
     {
         goto error;
     }

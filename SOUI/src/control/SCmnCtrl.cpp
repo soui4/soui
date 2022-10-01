@@ -60,12 +60,7 @@ void SStatic::DrawText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT p
     }
 }
 
-void SStatic::OnDrawLine(IRenderTarget *pRT,
-                         LPCTSTR pszBuf,
-                         int iBegin,
-                         int cchText,
-                         LPRECT pRect,
-                         UINT uFormat)
+void SStatic::OnDrawLine(IRenderTarget *pRT, LPCTSTR pszBuf, int iBegin, int cchText, LPRECT pRect, UINT uFormat)
 {
     pRT->DrawText(pszBuf + iBegin, cchText, pRect, uFormat);
 }
@@ -144,18 +139,14 @@ static LPCTSTR WordNext(LPCTSTR pszBuf, bool bWordbreak)
     return p;
 }
 
-void SStatic::DrawMultiLine(IRenderTarget *pRT,
-                            LPCTSTR pszBuf,
-                            int cchText,
-                            LPRECT pRect,
-                            UINT uFormat)
+void SStatic::DrawMultiLine(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat)
 {
     int i = 0, nLine = 1;
     if (cchText == -1)
         cchText = (int)_tcslen(pszBuf);
     LPCTSTR p1 = pszBuf;
     POINT pt = { pRect->left, pRect->top };
-	SIZE szWord = OnMeasureText(pRT,_T("A"), 1);
+    SIZE szWord = OnMeasureText(pRT, _T("A"), 1);
     int nLineHei = szWord.cy;
     int nRight = pRect->right;
     int nLineWid = pRect->right - pRect->left;
@@ -173,8 +164,7 @@ void SStatic::DrawMultiLine(IRenderTarget *pRT,
             if (pLineTail > pLineHead && !(uFormat & DT_CALCRECT))
             {
                 CRect rcText(pRect->left, pt.y, nRight, pt.y + nLineHei);
-                OnDrawLine(pRT, pszBuf, (int)(pLineHead - pszBuf), (int)(pLineTail - pLineHead),
-                           &rcText, uFormat);
+                OnDrawLine(pRT, pszBuf, (int)(pLineHead - pszBuf), (int)(pLineTail - pLineHead), &rcText, uFormat);
             }
             pt.y += nLineHei + m_nLineInter;
             pt.x = pRect->left;
@@ -192,7 +182,7 @@ void SStatic::DrawMultiLine(IRenderTarget *pRT,
             pLineTail = pLineHead = p2;
             continue;
         }
-        szWord= OnMeasureText(pRT,p1, (int)(p2 - p1));
+        szWord = OnMeasureText(pRT, p1, (int)(p2 - p1));
         if (pt.x + szWord.cx > nRight)
         { //检测到一行超过边界时还要保证当前行不为空
 
@@ -201,8 +191,7 @@ void SStatic::DrawMultiLine(IRenderTarget *pRT,
                 if (!(uFormat & DT_CALCRECT))
                 {
                     CRect rcText(pRect->left, pt.y, nRight, pt.y + nLineHei);
-                    OnDrawLine(pRT, pszBuf, (int)(pLineHead - pszBuf), (int)(pLineTail - pLineHead),
-                               &rcText, uFormat);
+                    OnDrawLine(pRT, pszBuf, (int)(pLineHead - pszBuf), (int)(pLineTail - pLineHead), &rcText, uFormat);
                 }
 
                 // modify by baozi 20190312
@@ -229,7 +218,7 @@ void SStatic::DrawMultiLine(IRenderTarget *pRT,
                 while (p3 < p2)
                 {
                     LPCTSTR p4 = CharNext(p3);
-                    szChar = OnMeasureText(pRT,p3, (int)(p4 - p3));
+                    szChar = OnMeasureText(pRT, p3, (int)(p4 - p3));
                     if (szWord.cx + szChar.cx > nLineWid)
                     {
                         if (p3 == p1)
@@ -264,16 +253,15 @@ void SStatic::DrawMultiLine(IRenderTarget *pRT,
     else if (pLineTail > pLineHead)
     {
         CRect rcText(pRect->left, pt.y, nRight, pt.y + nLineHei);
-        OnDrawLine(pRT, pszBuf, (int)(pLineHead - pszBuf), (int)(pLineTail - pLineHead), &rcText,
-                   uFormat);
+        OnDrawLine(pRT, pszBuf, (int)(pLineHead - pszBuf), (int)(pLineTail - pLineHead), &rcText, uFormat);
     }
 }
 
 SIZE SStatic::OnMeasureText(IRenderTarget *pRT, LPCTSTR pszBuf, int cchText)
 {
-	SIZE szRet ={0};
-	pRT->MeasureText(pszBuf,cchText,&szRet);
-	return szRet;
+    SIZE szRet = { 0 };
+    pRT->MeasureText(pszBuf, cchText, &szRet);
+    return szRet;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -428,8 +416,7 @@ void SButton::OnPaint(IRenderTarget *pRT)
         {
             // lose hover
             m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Normal, m_pBgSkin->GetAlpha());
-            m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Hover,
-                                    m_pBgSkin->GetAlpha() - byNewAlpha);
+            m_pBgSkin->DrawByState2(pRT, rcClient, WndState_Hover, m_pBgSkin->GetAlpha() - byNewAlpha);
         }
     }
 
@@ -533,9 +520,7 @@ void SButton::OnStateChanged(DWORD dwOldState, DWORD dwNewState)
     if (GetCapture() == m_swnd) //点击中
         return;
 
-    if (m_bAnimate
-        && ((dwOldState == WndState_Normal && dwNewState == WndState_Hover)
-            || (dwOldState == WndState_Hover && dwNewState == WndState_Normal)))
+    if (m_bAnimate && ((dwOldState == WndState_Normal && dwNewState == WndState_Hover) || (dwOldState == WndState_Hover && dwNewState == WndState_Normal)))
     { //启动动画
         m_byAlphaAni = 50;
         GetContainer()->RegisterTimelineHandler(this);
@@ -744,9 +729,9 @@ void SImageWnd::OnScaleChanged(int scale)
     GetScaleSkin(m_pSkin, scale);
 }
 
-ISkinObj * SImageWnd::GetSkin()
+ISkinObj *SImageWnd::GetSkin()
 {
-	return m_pSkin;
+    return m_pSkin;
 }
 
 SAnimateImgWnd::SAnimateImgWnd()
@@ -791,7 +776,7 @@ void SAnimateImgWnd::Stop()
         EventImageAnimateStop evt(this);
         FireEvent(evt);
     }
-	GetContainer()->UnregisterTimelineHandler(this);
+    GetContainer()->UnregisterTimelineHandler(this);
 }
 
 void SAnimateImgWnd::OnDestroy()
@@ -859,8 +844,7 @@ void SAnimateImgWnd::OnColorize(COLORREF cr)
         m_pSkin->OnColorize(cr);
 }
 
-void SAnimateImgWnd::OnContainerChanged(ISwndContainer *pOldContainer,
-                                        ISwndContainer *pNewContainer)
+void SAnimateImgWnd::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
 {
     if (pOldContainer)
         pOldContainer->UnregisterTimelineHandler(this);
@@ -926,15 +910,11 @@ void SProgress::OnPaint(IRenderTarget *pRT)
     if (IsVertical())
     {
         rcValue.bottom = rcClient.bottom;
-        rcValue.top = rcValue.bottom
-            - (int)(((__int64)rcValue.Height()) * (m_nValue - m_nMinValue)
-                    / (__int64)(m_nMaxValue - m_nMinValue));
+        rcValue.top = rcValue.bottom - (int)(((__int64)rcValue.Height()) * (m_nValue - m_nMinValue) / (__int64)(m_nMaxValue - m_nMinValue));
     }
     else
     {
-        rcValue.right = rcValue.left
-            + (int)(((__int64)rcValue.Width()) * (m_nValue - m_nMinValue)
-                    / (__int64)(m_nMaxValue - m_nMinValue));
+        rcValue.right = rcValue.left + (int)(((__int64)rcValue.Width()) * (m_nValue - m_nMinValue) / (__int64)(m_nMaxValue - m_nMinValue));
     }
     if (m_nValue > m_nMinValue)
     {
@@ -944,10 +924,8 @@ void SProgress::OnPaint(IRenderTarget *pRT)
     if (m_bShowPercent && !IsVertical())
     {
         SStringT strPercent;
-        strPercent.Format(_T("%d%%"),
-                          (int)((m_nValue - m_nMinValue) * 100 / (m_nMaxValue - m_nMinValue)));
-        pRT->DrawText(strPercent, strPercent.GetLength(), GetWindowRect(),
-                      DT_SINGLELINE | DT_CENTER | DT_VCENTER);
+        strPercent.Format(_T("%d%%"), (int)((m_nValue - m_nMinValue) * 100 / (m_nMaxValue - m_nMinValue)));
+        pRT->DrawText(strPercent, strPercent.GetLength(), GetWindowRect(), DT_SINGLELINE | DT_CENTER | DT_VCENTER);
     }
     AfterPaint(pRT, painter);
 }
@@ -1169,8 +1147,7 @@ void SIconWnd::OnPaint(IRenderTarget *pRT)
     CRect rcClient;
     GetClientRect(&rcClient);
     if (m_theIcon)
-        pRT->DrawIconEx(rcClient.left, rcClient.top, m_theIcon, rcClient.Width(), rcClient.Height(),
-                        DI_NORMAL);
+        pRT->DrawIconEx(rcClient.left, rcClient.top, m_theIcon, rcClient.Width(), rcClient.Height(), DI_NORMAL);
 }
 
 SIZE SIconWnd::GetDesiredSize(int wid, int hei)
@@ -1437,8 +1414,7 @@ BOOL SRadioGroup::FireEvent(IEvtArgs *evt)
     {
         return SWindow::FireEvent(evt);
     }
-    if (evt->GetID() == EventSwndStateChanged::EventID && evt->Sender()
-        && evt->Sender()->IsClass(SRadioBox::GetClassName()))
+    if (evt->GetID() == EventSwndStateChanged::EventID && evt->Sender() && evt->Sender()->IsClass(SRadioBox::GetClassName()))
     {
         EventSwndStateChanged *evt2 = sobj_cast<EventSwndStateChanged>(evt);
         if (EventSwndStateChanged_CheckState(evt2, WndState_Check))
@@ -1565,8 +1541,7 @@ void SGroup::OnPaint(IRenderTarget *pRT)
     if (!m_strText.GetText(FALSE).IsEmpty())
     {
         pRT->PopClip();
-        pRT->DrawText(m_strText.GetText(FALSE), m_strText.GetText(FALSE).GetLength(), rcText,
-                      DT_SINGLELINE | DT_VCENTER);
+        pRT->DrawText(m_strText.GetText(FALSE), m_strText.GetText(FALSE).GetLength(), rcText, DT_SINGLELINE | DT_VCENTER);
     }
 
     AfterPaint(pRT, painter);

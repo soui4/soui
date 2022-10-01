@@ -591,16 +591,16 @@ class TValueAnimator : public TObjRefImpl<SObjectImpl<SValueAnimator>> {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_STRINGW(L"name", mName, FALSE)
-    ATTR_INT(L"id", mID, FALSE)
-    ATTR_INT(L"duration", mDuration, FALSE)
-    ATTR_INT(L"repeatCount", mRepeatCount, FALSE)
-    ATTR_ENUM_BEGIN(L"repeatMode", RepeatMode, FALSE)
-    ATTR_ENUM_VALUE(L"reverse", REVERSE)
-    ATTR_ENUM_VALUE(L"restart", RESTART)
-    ATTR_ENUM_END(mRepeatMode)
-    ATTR_INTERPOLATOR(L"interpolator", mInterpolator, FALSE)
-    ATTR_CHAIN_PTR(mInterpolator, 0)
+        ATTR_STRINGW(L"name", mName, FALSE)
+        ATTR_INT(L"id", mID, FALSE)
+        ATTR_INT(L"duration", mDuration, FALSE)
+        ATTR_INT(L"repeatCount", mRepeatCount, FALSE)
+        ATTR_ENUM_BEGIN(L"repeatMode", RepeatMode, FALSE)
+            ATTR_ENUM_VALUE(L"reverse", REVERSE)
+            ATTR_ENUM_VALUE(L"restart", RESTART)
+        ATTR_ENUM_END(mRepeatMode)
+        ATTR_INTERPOLATOR(L"interpolator", mInterpolator, FALSE)
+        ATTR_CHAIN_PTR(mInterpolator, 0)
     SOUI_ATTRS_END()
 };
 
@@ -623,8 +623,8 @@ class SOUI_EXP SIntAnimator : public TValueAnimator<int> {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"valueFrom", mValueEvaluator.mStart, FALSE)
-    ATTR_INT(L"valueTo", mValueEvaluator.mEnd, FALSE)
+        ATTR_INT(L"valueFrom", mValueEvaluator.mStart, FALSE)
+        ATTR_INT(L"valueTo", mValueEvaluator.mEnd, FALSE)
     SOUI_ATTRS_END()
 };
 
@@ -647,8 +647,8 @@ class SOUI_EXP SFloatAnimator : public TValueAnimator<float> {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_FLOAT(L"valueFrom", mValueEvaluator.mStart, FALSE)
-    ATTR_FLOAT(L"valueTo", mValueEvaluator.mEnd, FALSE)
+        ATTR_FLOAT(L"valueFrom", mValueEvaluator.mStart, FALSE)
+        ATTR_FLOAT(L"valueTo", mValueEvaluator.mEnd, FALSE)
     SOUI_ATTRS_END()
 };
 
@@ -690,8 +690,8 @@ class SOUI_EXP SColorAnimator : public TValueAnimator<COLORREF> {
     }
 
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"valueFrom", OnAttrFrom)
-    ATTR_CUSTOM(L"valueTo", OnAttrTo)
+        ATTR_CUSTOM(L"valueFrom", OnAttrFrom)
+        ATTR_CUSTOM(L"valueTo", OnAttrTo)
     SOUI_ATTRS_END()
 };
 

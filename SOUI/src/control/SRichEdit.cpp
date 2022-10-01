@@ -24,8 +24,7 @@ STextServiceHelper::STextServiceHelper()
 {
     m_rich20 = LoadLibrary(_T("riched20.dll"));
     if (m_rich20)
-        m_funCreateTextServices
-            = (PCreateTextServices)GetProcAddress(m_rich20, "CreateTextServices");
+        m_funCreateTextServices = (PCreateTextServices)GetProcAddress(m_rich20, "CreateTextServices");
 }
 
 STextServiceHelper::~STextServiceHelper()
@@ -35,9 +34,7 @@ STextServiceHelper::~STextServiceHelper()
     m_funCreateTextServices = NULL;
 }
 
-HRESULT STextServiceHelper::CreateTextServices(IUnknown *punkOuter,
-                                               ITextHost *pITextHost,
-                                               IUnknown **ppUnk)
+HRESULT STextServiceHelper::CreateTextServices(IUnknown *punkOuter, ITextHost *pITextHost, IUnknown **ppUnk)
 {
     if (!m_funCreateTextServices)
         return E_NOTIMPL;
@@ -309,13 +306,7 @@ void STextHost::TxSetCapture(BOOL fCapture)
         m_pRichEdit->ReleaseCapture();
 }
 
-void STextHost::TxScrollWindowEx(INT dx,
-                                 INT dy,
-                                 LPCRECT lprcScroll,
-                                 LPCRECT lprcClip,
-                                 HRGN hrgnUpdate,
-                                 LPRECT lprcUpdate,
-                                 UINT fuScroll)
+void STextHost::TxScrollWindowEx(INT dx, INT dy, LPCRECT lprcScroll, LPCRECT lprcClip, HRGN hrgnUpdate, LPRECT lprcUpdate, UINT fuScroll)
 {
     m_pRichEdit->Invalidate();
 }
@@ -465,8 +456,7 @@ HRESULT STextHost::TxGetMaxLength(DWORD *plength)
 
 HRESULT STextHost::TxGetScrollBars(DWORD *pdwScrollBar)
 {
-    *pdwScrollBar = m_pRichEdit->m_dwStyle
-        & (WS_VSCROLL | WS_HSCROLL | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_DISABLENOSCROLL);
+    *pdwScrollBar = m_pRichEdit->m_dwStyle & (WS_VSCROLL | WS_HSCROLL | ES_AUTOVSCROLL | ES_AUTOHSCROLL | ES_DISABLENOSCROLL);
 
     return S_OK;
 }
@@ -713,8 +703,7 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
         rt = pRT;
     }
     HDC hdc = rt->GetDC(0);
-    int nOldMode
-        = ::SetGraphicsMode(hdc, GM_COMPATIBLE); // richedit需要将GraphicMode强制设置为GM_COMPATIBLE
+    int nOldMode = ::SetGraphicsMode(hdc, GM_COMPATIBLE); // richedit需要将GraphicMode强制设置为GM_COMPATIBLE
 
     ALPHAINFO ai;
     CGdiAlpha::AlphaBackup(hdc, &rcClient, ai);
@@ -819,8 +808,7 @@ BOOL SRichEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     m_fScrollPending = TRUE;
     SPanel::OnScroll(bVertical, uCode, nPos);
 
-    m_pTxtHost->GetTextService()->TxSendMessage(bVertical ? WM_VSCROLL : WM_HSCROLL,
-                                                MAKEWPARAM(uCode, nPos), 0, &lresult);
+    m_pTxtHost->GetTextService()->TxSendMessage(bVertical ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM(uCode, nPos), 0, &lresult);
     LONG lPos = 0;
     if (bVertical)
     {
@@ -847,8 +835,7 @@ BOOL SRichEdit::OnSetCursor(const CPoint &pt)
         return FALSE;
 
     HDC hdc = GetDC(GetContainer()->GetHostHwnd());
-    m_pTxtHost->GetTextService()->OnTxSetCursor(DVASPECT_CONTENT, -1, NULL, NULL, hdc, NULL,
-                                                &rcClient, pt.x, pt.y);
+    m_pTxtHost->GetTextService()->OnTxSetCursor(DVASPECT_CONTENT, -1, NULL, NULL, hdc, NULL, &rcClient, pt.x, pt.y);
     ReleaseDC(GetContainer()->GetHostHwnd(), hdc);
     return TRUE;
 }
@@ -888,8 +875,7 @@ HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont)
 
     memset(pcf, 0, sizeof(CHARFORMAT2W));
     pcf->cbSize = sizeof(CHARFORMAT2W);
-    pcf->dwMask = CFM_SIZE | CFM_OFFSET | CFM_FACE | CFM_CHARSET | CFM_COLOR | CFM_BOLD | CFM_ITALIC
-        | CFM_UNDERLINE;
+    pcf->dwMask = CFM_SIZE | CFM_OFFSET | CFM_FACE | CFM_CHARSET | CFM_COLOR | CFM_BOLD | CFM_ITALIC | CFM_UNDERLINE;
 
     pcf->crTextColor = pRT->GetTextColor() & 0x00ffffff;
     HDC hdc = GetDC(NULL);
@@ -955,8 +941,7 @@ BOOL SRichEdit::GetWordWrap(void) const
 void SRichEdit::SetWordWrap(BOOL fWordWrap)
 {
     m_fWordWrap = fWordWrap;
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_WORDWRAP,
-                                                         fWordWrap ? TXTBIT_WORDWRAP : 0);
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_WORDWRAP, fWordWrap ? TXTBIT_WORDWRAP : 0);
 }
 
 BOOL SRichEdit::GetReadOnly() const
@@ -1001,8 +986,7 @@ void SRichEdit::SetRichTextFlag(BOOL fRich)
 {
     m_fRich = fRich;
 
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_RICHTEXT,
-                                                         fRich ? TXTBIT_RICHTEXT : 0);
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_RICHTEXT, fRich ? TXTBIT_RICHTEXT : 0);
 }
 
 LONG SRichEdit::GetDefaultLeftIndent() const
@@ -1024,8 +1008,7 @@ BOOL SRichEdit::SetSaveSelection(BOOL fSaveSelection)
     m_fSaveSelection = fSaveSelection;
 
     // notify text services of property change
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(
-        TXTBIT_SAVESELECTION, m_fSaveSelection ? TXTBIT_SAVESELECTION : 0);
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_SAVESELECTION, m_fSaveSelection ? TXTBIT_SAVESELECTION : 0);
 
     return fResult;
 }
@@ -1037,20 +1020,17 @@ void SRichEdit::OnLButtonDown(UINT nFlags, CPoint point)
     {
         SetFocus();
         if (!m_fAutoSel)
-            m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam,
-                                                        GetCurMsg()->lParam, NULL);
+            m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam, GetCurMsg()->lParam, NULL);
     }
     else
     {
-        m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam,
-                                                    GetCurMsg()->lParam, NULL);
+        m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam, GetCurMsg()->lParam, NULL);
     }
 }
 
 void SRichEdit::OnLButtonUp(UINT nFlags, CPoint point)
 {
-    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam,
-                                                GetCurMsg()->lParam, NULL);
+    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam, GetCurMsg()->lParam, NULL);
     ReleaseCapture();
 }
 
@@ -1082,17 +1062,13 @@ void SRichEdit::OnRButtonDown(UINT nFlags, CPoint point)
             BOOL hasSel = dwStart < dwEnd;
             UINT uLen = (UINT)SSendMessage(WM_GETTEXTLENGTH, 0, 0);
             BOOL bReadOnly = m_dwStyle & ES_READONLY;
-            EnableMenuItem(menu.m_hMenu, MENU_CUT,
-                           MF_BYCOMMAND | ((hasSel && (!bReadOnly)) ? 0 : MF_GRAYED));
+            EnableMenuItem(menu.m_hMenu, MENU_CUT, MF_BYCOMMAND | ((hasSel && (!bReadOnly)) ? 0 : MF_GRAYED));
             EnableMenuItem(menu.m_hMenu, MENU_COPY, MF_BYCOMMAND | (hasSel ? 0 : MF_GRAYED));
-            EnableMenuItem(menu.m_hMenu, MENU_PASTE,
-                           MF_BYCOMMAND | ((canPaste && (!bReadOnly)) ? 0 : MF_GRAYED));
-            EnableMenuItem(menu.m_hMenu, MENU_DEL,
-                           MF_BYCOMMAND | ((hasSel && (!bReadOnly)) ? 0 : MF_GRAYED));
+            EnableMenuItem(menu.m_hMenu, MENU_PASTE, MF_BYCOMMAND | ((canPaste && (!bReadOnly)) ? 0 : MF_GRAYED));
+            EnableMenuItem(menu.m_hMenu, MENU_DEL, MF_BYCOMMAND | ((hasSel && (!bReadOnly)) ? 0 : MF_GRAYED));
             EnableMenuItem(menu.m_hMenu, MENU_SELALL, MF_BYCOMMAND | ((uLen > 0) ? 0 : MF_GRAYED));
 
-            UINT uCmd = menu.TrackPopupMenu(TPM_RETURNCMD | TPM_LEFTALIGN, point.x, point.y, hHost,
-                                            NULL, GetScale());
+            UINT uCmd = menu.TrackPopupMenu(TPM_RETURNCMD | TPM_LEFTALIGN, point.x, point.y, hHost, NULL, GetScale());
 
             EventREMenu evt(this);
             evt.uCmd = uCmd;
@@ -1126,8 +1102,7 @@ void SRichEdit::OnRButtonDown(UINT nFlags, CPoint point)
 
 void SRichEdit::OnMouseMove(UINT nFlags, CPoint point)
 {
-    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam,
-                                                GetCurMsg()->lParam, NULL);
+    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam, GetCurMsg()->lParam, NULL);
 }
 
 void SRichEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
@@ -1148,8 +1123,7 @@ void SRichEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
         SetMsgHandled(FALSE);
         return;
     }
-    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam,
-                                                GetCurMsg()->lParam, NULL);
+    m_pTxtHost->GetTextService()->TxSendMessage(GetCurMsg()->uMsg, GetCurMsg()->wParam, GetCurMsg()->lParam, NULL);
 }
 
 #define CTRL(_ch) (_ch - 'A' + 1)
@@ -1171,8 +1145,7 @@ void SRichEdit::OnChar(UINT nChar, UINT nRepCnt, UINT nFlags)
             return;
         break;
     default:
-        if (m_dwStyle & ES_NUMBER && !isdigit(nChar) && nChar != '-' && nChar != '.'
-            && nChar != ',')
+        if (m_dwStyle & ES_NUMBER && !isdigit(nChar) && nChar != '-' && nChar != '.' && nChar != ',')
             return;
         if ((m_dwStyle & ES_UPPERCASE) && nChar >= 'a' && nChar <= 'z')
         {
@@ -1247,9 +1220,7 @@ LRESULT SRichEdit::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
             m_pTxtHost->GetTextService()->TxSendMessage(WM_KILLFOCUS, 0, 0, NULL);
             m_pTxtHost->TxShowCaret(FALSE);
         }
-        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(
-            TXTBIT_EXTENTCHANGE | TXTBIT_CLIENTRECTCHANGE,
-            TXTBIT_EXTENTCHANGE | TXTBIT_CLIENTRECTCHANGE);
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_EXTENTCHANGE | TXTBIT_CLIENTRECTCHANGE, TXTBIT_EXTENTCHANGE | TXTBIT_CLIENTRECTCHANGE);
         if (bFocus)
         {
             m_pTxtHost->m_fUiActive = TRUE;
@@ -1271,8 +1242,7 @@ LRESULT SRichEdit::OnSetLimitText(UINT uMsg, WPARAM wParam, LPARAM lParam)
         m_cchTextMost = cInitTextMax;
     else
         m_cchTextMost = (DWORD)wParam;
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_MAXLENGTHCHANGE,
-                                                         TXTBIT_MAXLENGTHCHANGE);
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_MAXLENGTHCHANGE, TXTBIT_MAXLENGTHCHANGE);
     return 1;
 }
 
@@ -1280,8 +1250,7 @@ LRESULT SRichEdit::OnSetCharFormat(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (wParam == SCF_DEFAULT && !FValidCF((CHARFORMAT2W *)lParam))
     { //设置默认字体只支持CHARFORMAT2W
-        SSLOGFMTD(
-            _T("set default char format failed! only CHARFORMAT2W can be set for default char format"));
+        SSLOGFMTD(_T("set default char format failed! only CHARFORMAT2W can be set for default char format"));
         return 0;
     }
 
@@ -1289,8 +1258,7 @@ LRESULT SRichEdit::OnSetCharFormat(UINT uMsg, WPARAM wParam, LPARAM lParam)
     if (wParam == SCF_DEFAULT)
     {
         m_cfDef = *(CHARFORMAT2W *)lParam;
-        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE,
-                                                             TXTBIT_CHARFORMATCHANGE);
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE, TXTBIT_CHARFORMATCHANGE);
     }
     return 1;
 }
@@ -1318,8 +1286,7 @@ LRESULT SRichEdit::OnSetParaFormat(UINT uMsg, WPARAM wparam, LPARAM lparam)
     if (wparam & SCF_DEFAULT)
     {
         m_pfDef = *(PARAFORMAT2 *)lparam;
-        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_PARAFORMATCHANGE,
-                                                             TXTBIT_PARAFORMATCHANGE);
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_PARAFORMATCHANGE, TXTBIT_PARAFORMATCHANGE);
     }
     else
     {
@@ -1354,8 +1321,7 @@ void SRichEdit::OnSetFont(IFontS *pFont, BOOL bRedraw)
 {
     if (SUCCEEDED(InitDefaultCharFormat(&m_cfDef, pFont)))
     {
-        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE,
-                                                             TXTBIT_CHARFORMATCHANGE);
+        m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE, TXTBIT_CHARFORMATCHANGE);
     }
 }
 
@@ -1521,8 +1487,7 @@ COLORREF SRichEdit::SetDefaultTextColor(COLORREF cr)
 {
     COLORREF crOld = m_cfDef.crTextColor;
     m_cfDef.crTextColor = cr & 0x00ffffff;
-    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE,
-                                                         TXTBIT_CHARFORMATCHANGE);
+    m_pTxtHost->GetTextService()->OnTxPropertyBitsChange(TXTBIT_CHARFORMATCHANGE, TXTBIT_CHARFORMATCHANGE);
     return crOld;
 }
 
@@ -1643,8 +1608,7 @@ BOOL SRichEdit::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     {
         PSWNDMSG p = GetCurMsg();
         LRESULT lResult = 0;
-        return m_pTxtHost->GetTextService()->TxSendMessage(p->uMsg, p->wParam, p->lParam, &lResult)
-            == S_OK;
+        return m_pTxtHost->GetTextService()->TxSendMessage(p->uMsg, p->wParam, p->lParam, &lResult) == S_OK;
     }
 }
 
@@ -1655,10 +1619,7 @@ BOOL SRichEdit::CreateCaret(HBITMAP pBmp, int nWid, int nHeight)
     return SWindow::CreateCaret(pBmp, nWid, nHeight);
 }
 
-HRESULT SRichEdit::OnAttrReStyle(const SStringW &strValue,
-                                 DWORD dwStyle,
-                                 DWORD txtBit,
-                                 BOOL bLoading)
+HRESULT SRichEdit::OnAttrReStyle(const SStringW &strValue, DWORD dwStyle, DWORD txtBit, BOOL bLoading)
 {
     BOOL bValue = STRINGASBOOL(strValue);
     DWORD dwBit = 0;
@@ -1673,10 +1634,7 @@ HRESULT SRichEdit::OnAttrReStyle(const SStringW &strValue,
     return bLoading ? S_FALSE : S_OK;
 }
 
-HRESULT SRichEdit::OnAttrReStyle2(const SStringW &strValue,
-                                  DWORD dwStyle,
-                                  DWORD txtBit,
-                                  BOOL bLoading)
+HRESULT SRichEdit::OnAttrReStyle2(const SStringW &strValue, DWORD dwStyle, DWORD txtBit, BOOL bLoading)
 {
     BOOL bValue = STRINGASBOOL(strValue);
     if (!bValue)
@@ -1761,8 +1719,7 @@ void SEdit::OnPaint(IRenderTarget *pRT)
         CRect rc;
         GetClientRect(&rc);
         CRect rcInsetPixel = GetStyle().GetPadding();
-        rc.DeflateRect(rcInsetPixel.left, rcInsetPixel.top, rcInsetPixel.right,
-                       rcInsetPixel.bottom);
+        rc.DeflateRect(rcInsetPixel.left, rcInsetPixel.top, rcInsetPixel.right, rcInsetPixel.bottom);
         pRT->DrawText(strCue, strCue.GetLength(), &rc, GetCueTextAlign());
 
         pRT->SetTextColor(crOld);

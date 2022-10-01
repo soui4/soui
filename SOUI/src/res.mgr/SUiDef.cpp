@@ -15,10 +15,7 @@ const static WCHAR KNodeTemplate[] = L"template";
 const static WCHAR KNodeObjAttr[] = L"objattr";
 const static WCHAR KDefFontFace[] = L"宋体";
 
-static SXmlNode GetSourceXmlNode(SXmlNode nodeRoot,
-                                 SXmlDoc &docInit,
-                                 IResProvider *pResProvider,
-                                 const wchar_t *pszName)
+static SXmlNode GetSourceXmlNode(SXmlNode nodeRoot, SXmlDoc &docInit, IResProvider *pResProvider, const wchar_t *pszName)
 {
     SXmlNode nodeData = nodeRoot.child(pszName, false);
     if (nodeData)
@@ -84,13 +81,13 @@ BOOL SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
     SStringTList strUiDef;
     if (2 != ParseResID(pszUidef, strUiDef))
     {
-        SSLOGW()<<"warning!!!! Add ResProvider Error.";
+        SSLOGW() << "warning!!!! Add ResProvider Error.";
     }
 
     size_t dwSize = pResProvider->GetRawBufferSize(strUiDef[0], strUiDef[1]);
     if (dwSize == 0)
     {
-        SSLOGW()<<"warning!!!! uidef was not found in the specified resprovider";
+        SSLOGW() << "warning!!!! uidef was not found in the specified resprovider";
     }
     else
     {
@@ -104,14 +101,14 @@ BOOL SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
 
         if (!bLoad)
         { // load xml failed
-            SSLOGD()<<"warning!!! load uidef as xml document failed";
+            SSLOGD() << "warning!!! load uidef as xml document failed";
         }
         else
         { // init named objects
             SXmlNode root = docInit.root().child(KNodeUidef, false);
             if (!root)
             {
-                SSLOGD()<<"warning!!! \"uidef\" element is not the root element of uidef xml";
+                SSLOGD() << "warning!!! \"uidef\" element is not the root element of uidef xml";
             }
             else
             {
@@ -123,19 +120,16 @@ BOOL SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
                 if (xmlFont)
                 {
                     fontStyle.attr.cSize = xmlFont.attribute(L"size").as_int(12);
-                    fontStyle.attr.byCharset
-                        = (BYTE)xmlFont.attribute(L"charset").as_int(DEFAULT_CHARSET);
+                    fontStyle.attr.byCharset = (BYTE)xmlFont.attribute(L"charset").as_int(DEFAULT_CHARSET);
                     fontStyle.attr.fBold = xmlFont.attribute(L"bold").as_bool(false);
                     fontStyle.attr.fUnderline = xmlFont.attribute(L"underline").as_bool(false);
                     fontStyle.attr.fStrike = xmlFont.attribute(L"strike").as_bool(false);
                     fontStyle.attr.fItalic = xmlFont.attribute(L"italic").as_bool(false);
-                    fontStyle.attr.byWeight = (xmlFont.attribute(L"weight").as_uint(0) + 2)
-                        / 4; // scale weight from [0-1000] to [0,250].
+                    fontStyle.attr.byWeight = (xmlFont.attribute(L"weight").as_uint(0) + 2) / 4; // scale weight from [0-1000] to [0,250].
                     defFontInfo.style = fontStyle;
                     defFontInfo.strFaceName = xmlFont.attribute(L"face").value();
 
-                    if (defFontInfo.strFaceName.IsEmpty()
-                        || !SUiDef::CheckFont(defFontInfo.strFaceName))
+                    if (defFontInfo.strFaceName.IsEmpty() || !SUiDef::CheckFont(defFontInfo.strFaceName))
                     {
                         defFontInfo.strFaceName = KDefFontFace;
                     }
@@ -216,8 +210,7 @@ BOOL SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
                 // load named template
                 {
                     SXmlDoc docData;
-                    SXmlNode nodeData
-                        = GetSourceXmlNode(root, docData, pResProvider, KNodeTemplate);
+                    SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeTemplate);
                     if (nodeData)
                     {
                         templatePool.Attach(new STemplatePool);

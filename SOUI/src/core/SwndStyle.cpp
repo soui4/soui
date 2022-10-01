@@ -112,8 +112,7 @@ void SwndStyle::_ParseLayoutSize4(const SStringW &strValue, SLayoutSize layoutSi
     size_t nValues = SplitString(strValue, L',', values);
     if (nValues == 1)
     {
-        layoutSizes[0] = layoutSizes[1] = layoutSizes[2] = layoutSizes[3]
-            = GETLAYOUTSIZE(values[0]);
+        layoutSizes[0] = layoutSizes[1] = layoutSizes[2] = layoutSizes[3] = GETLAYOUTSIZE(values[0]);
     }
     else if (nValues == 2)
     {
@@ -146,7 +145,7 @@ void SwndStyle::SetScale(int nScale)
 
 int SwndStyle::GetScale() const
 {
-	return m_nScale;
+    return m_nScale;
 }
 
 CRect SwndStyle::GetMargin() const

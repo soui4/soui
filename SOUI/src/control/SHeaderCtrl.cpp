@@ -26,13 +26,7 @@ SHeaderCtrl::~SHeaderCtrl(void)
 {
 }
 
-int SHeaderCtrl::InsertItem(int iItem,
-                            LPCTSTR pszText,
-                            int nWidth,
-                            UINT fmt,
-                            LPARAM lParam,
-                            BOOL bDpiAware /*=FALSE*/,
-                            float fWeight /*=0.0f*/)
+int SHeaderCtrl::InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=FALSE*/, float fWeight /*=0.0f*/)
 {
     SASSERT(pszText);
     SASSERT(nWidth >= 0);
@@ -72,8 +66,7 @@ BOOL SHeaderCtrl::GetItem(int iItem, SHDITEM *pItem) const
         return FALSE;
     if (pItem->mask & SHDI_TEXT && pItem->pszText && pItem->cchMaxText)
     {
-        _tcscpy_s(pItem->pszText, pItem->cchMaxText,
-                  m_arrItems[iItem].strText.GetText(FALSE).c_str());
+        _tcscpy_s(pItem->pszText, pItem->cchMaxText, m_arrItems[iItem].strText.GetText(FALSE).c_str());
     }
     if (pItem->mask & SHDI_WIDTH)
     {
@@ -158,16 +151,14 @@ void SHeaderCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, const LPSHDITEMEX p
     BOOL bDrawSortFlag = (pItem->fmt & SORT_MASK) != 0 && m_pSkinSort;
     if (!bDrawSortFlag)
     {
-        pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(),
-                      rcItem, align);
+        pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(), rcItem, align);
         return;
     }
 
     CSize szSort = m_pSkinSort->GetSkinSize();
     rcItem.right -= szSort.cx;
 
-    pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(), rcItem,
-                  align);
+    pRT->DrawText(pItem->strText.GetText(FALSE), pItem->strText.GetText(FALSE).GetLength(), rcItem, align);
     CPoint ptSort;
     ptSort.x = rcItem.right;
     ptSort.y = rcItem.top + (rcItem.Height() - szSort.cy) / 2;
@@ -384,8 +375,7 @@ void SHeaderCtrl::OnMouseMove(UINT nFlags, CPoint pt)
                     if (nTotalWid != rc.Width())
                     { // first adjust, split the remain size into columns based on column weight.
                         int nRemain = rc.Width() - nTotalWid;
-                        for (UINT i = 0;
-                             i < m_arrItems.GetCount() && nRemain > 0 && fTotalWeight > 0.0f; i++)
+                        for (UINT i = 0; i < m_arrItems.GetCount() && nRemain > 0 && fTotalWeight > 0.0f; i++)
                         {
                             if (!m_arrItems[i].bVisible)
                                 continue;

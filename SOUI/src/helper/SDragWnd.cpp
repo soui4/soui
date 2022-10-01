@@ -39,9 +39,7 @@ BOOL SDragWnd::BeginDrag(HBITMAP hBmp, POINT ptHot, COLORREF crKey, BYTE byAlpha
     BITMAP bm;
     GetObject(hBmp, sizeof(bm), &bm);
 
-    if (!s_pCurDragWnd->CreateNative(NULL, WS_POPUP,
-                                     WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST, 0, 0,
-                                     bm.bmWidth, bm.bmHeight, 0, 0, NULL))
+    if (!s_pCurDragWnd->CreateNative(NULL, WS_POPUP, WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST, 0, 0, bm.bmWidth, bm.bmHeight, 0, 0, NULL))
     {
         delete s_pCurDragWnd;
         s_pCurDragWnd = NULL;
@@ -74,9 +72,7 @@ BOOL SDragWnd::BeginDrag(HBITMAP hBmp, POINT ptHot, COLORREF crKey, BYTE byAlpha
 void SDragWnd::DragMove(POINT pt)
 {
     SASSERT(s_pCurDragWnd);
-    s_pCurDragWnd->SetWindowPos(
-        HWND_TOPMOST, pt.x - s_pCurDragWnd->m_ptHot.x, pt.y - s_pCurDragWnd->m_ptHot.y, 0, 0,
-        SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOOWNERZORDER | SWP_SHOWWINDOW | SWP_NOACTIVATE);
+    s_pCurDragWnd->SetWindowPos(HWND_TOPMOST, pt.x - s_pCurDragWnd->m_ptHot.x, pt.y - s_pCurDragWnd->m_ptHot.y, 0, 0, SWP_NOSIZE | SWP_NOSENDCHANGING | SWP_NOOWNERZORDER | SWP_SHOWWINDOW | SWP_NOACTIVATE);
 }
 
 void SDragWnd::EndDrag()

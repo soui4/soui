@@ -23,8 +23,7 @@ BOOL SComboView::CreateListBox(SXmlNode xmlNode)
     //创建列表控件
     SXmlNode listStyle = xmlNode.child(L"listStyle");
     SStringW strListClass = listStyle.attribute(L"wndclass").as_string(SListView::GetClassName());
-    m_pListBox
-        = sobj_cast<SListView>(SApplication::getSingleton().CreateWindowByName(strListClass));
+    m_pListBox = sobj_cast<SListView>(SApplication::getSingleton().CreateWindowByName(strListClass));
     SASSERT(m_pListBox);
 
     m_pListBox->SetContainer(GetContainer());
@@ -46,8 +45,7 @@ int SComboView::GetListBoxHeight()
         IListViewItemLocator *pItemLocator = m_pListBox->GetItemLocator();
         SASSERT(pItemLocator);
         CRect rcMargin = m_pListBox->GetStyle().GetMargin();
-        nDropHeight = smin(nDropHeight,
-                           (int)(pItemLocator->GetTotalHeight() + rcMargin.top + rcMargin.bottom));
+        nDropHeight = smin(nDropHeight, (int)(pItemLocator->GetTotalHeight() + rcMargin.top + rcMargin.bottom));
     }
     return nDropHeight;
 }

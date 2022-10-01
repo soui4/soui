@@ -11,7 +11,7 @@
     return TRUE;                                                             \
     }
 
-#define SOUI_MSG_MAP_END_BASE()                      \
+#define SOUI_MSG_MAP_END_BASE()                     \
     return SwndProc(uMsg, wParam, lParam, lResult); \
     }
 

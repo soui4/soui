@@ -17,11 +17,10 @@
 #pragma once
 
 // Attribute Declaration
-#define SOUI_ATTRS_BEGIN()                                                              \
-  public:                                                                               \
-    virtual HRESULT SetAttribute(const SOUI::SStringW &strAttribName,                   \
-                                 const SOUI::SStringW &strValue, BOOL bLoading = FALSE) \
-    {                                                                                   \
+#define SOUI_ATTRS_BEGIN()                                                                                                   \
+  public:                                                                                                                    \
+    virtual HRESULT SetAttribute(const SOUI::SStringW &strAttribName, const SOUI::SStringW &strValue, BOOL bLoading = FALSE) \
+    {                                                                                                                        \
         HRESULT hRet = E_FAIL;
 
 //从SObject派生的类是属性结尾
@@ -44,12 +43,11 @@
     }                                                                                              \
     else
 
-#define ATTR_CHAIN_PTR(varname, flag)                                                      \
-    if (FAILED(hRet) && varname != NULL                                                    \
-        && SUCCEEDED(hRet = varname->ISetAttributeW(&strAttribName, &strValue, bLoading))) \
-    {                                                                                      \
-        hRet |= flag;                                                                      \
-    }                                                                                      \
+#define ATTR_CHAIN_PTR(varname, flag)                                                                                      \
+    if (FAILED(hRet) && varname != NULL && SUCCEEDED(hRet = varname->ISetAttributeW(&strAttribName, &strValue, bLoading))) \
+    {                                                                                                                      \
+        hRet |= flag;                                                                                                      \
+    }                                                                                                                      \
     else
 
 #define ATTR_CUSTOM(attribname, func)                 \
@@ -59,8 +57,7 @@
     }                                                 \
     else
 
-#define STRINGASBOOL(strValue) \
-    (strValue).CompareNoCase(L"0") != 0 && (strValue).CompareNoCase(L"false") != 0
+#define STRINGASBOOL(strValue) (strValue).CompareNoCase(L"0") != 0 && (strValue).CompareNoCase(L"false") != 0
 
 #define ATTR_BOOL(attribname, varname, allredraw)     \
     if (0 == strAttribName.CompareNoCase(attribname)) \
@@ -130,13 +127,12 @@
     else
 
 // Rect = %d,%d,%d,%d StringA
-#define ATTR_RECT(attribname, varname, allredraw)                                        \
-    if (0 == strAttribName.CompareNoCase(attribname))                                    \
-    {                                                                                    \
-        swscanf_s(strValue, L"%d,%d,%d,%d", &varname.left, &varname.top, &varname.right, \
-                  &varname.bottom);                                                      \
-        hRet = allredraw ? S_OK : S_FALSE;                                               \
-    }                                                                                    \
+#define ATTR_RECT(attribname, varname, allredraw)                                                          \
+    if (0 == strAttribName.CompareNoCase(attribname))                                                      \
+    {                                                                                                      \
+        swscanf_s(strValue, L"%d,%d,%d,%d", &varname.left, &varname.top, &varname.right, &varname.bottom); \
+        hRet = allredraw ? S_OK : S_FALSE;                                                                 \
+    }                                                                                                      \
     else
 
 // Size = %d,%d StringA

@@ -10,12 +10,7 @@ class STabSlider
     DEF_SOBJECT(SWindow, L"tabslider")
 
   public:
-    STabSlider(STabCtrl *pTabCtrl,
-               int iFrom,
-               int iTo,
-               int nSteps,
-               int nType,
-               IInterpolator *pInterpolator)
+    STabSlider(STabCtrl *pTabCtrl, int iFrom, int iTo, int nSteps, int nType, IInterpolator *pInterpolator)
         : m_pTabCtrl(pTabCtrl)
         , m_aniInterpoloator(pInterpolator)
         , m_nSteps(nSteps)
@@ -32,8 +27,7 @@ class STabSlider
             pTabCtrl->InsertChild(this);
             Move(rcPage);
 
-            m_bVertical = pTabCtrl->m_nTabAlign == STabCtrl::AlignLeft
-                || pTabCtrl->m_nTabAlign == STabCtrl::AlignRight;
+            m_bVertical = pTabCtrl->m_nTabAlign == STabCtrl::AlignLeft || pTabCtrl->m_nTabAlign == STabCtrl::AlignRight;
             if (m_bVertical)
             {
                 GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcPage.Width(), rcPage.Height() * 2);
@@ -123,8 +117,7 @@ class STabSlider
             pTabCtrl->InsertChild(this, ICWND_FIRST);
             Move(rcPage);
 
-            m_bVertical = pTabCtrl->m_nTabAlign == STabCtrl::AlignLeft
-                || pTabCtrl->m_nTabAlign == STabCtrl::AlignRight;
+            m_bVertical = pTabCtrl->m_nTabAlign == STabCtrl::AlignLeft || pTabCtrl->m_nTabAlign == STabCtrl::AlignRight;
             if (m_bVertical)
             {
                 GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcPage.Width(), rcPage.Height() * 2);
@@ -251,8 +244,7 @@ class STabSlider
     void OnPaint(IRenderTarget *pRT)
     {
         CRect rcWnd = GetWindowRect();
-        CRect rcSrc(m_ptOffset.x, m_ptOffset.y, m_ptOffset.x + rcWnd.Width(),
-                    m_ptOffset.y + rcWnd.Height());
+        CRect rcSrc(m_ptOffset.x, m_ptOffset.y, m_ptOffset.x + rcWnd.Width(), m_ptOffset.y + rcWnd.Height());
         pRT->AlphaBlend(rcWnd, m_memRT, rcSrc, 255);
     }
 
@@ -279,9 +271,9 @@ class STabSlider
     SAutoRefPtr<IInterpolator> m_aniInterpoloator;
     STabCtrl *m_pTabCtrl;
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_SIZE(OnSize)
-    MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_SIZE(OnSize)
+        MSG_WM_DESTROY(OnDestroy)
     SOUI_MSG_MAP_END()
 };
 
@@ -308,8 +300,7 @@ STabCtrl::STabCtrl()
 
     m_bFocusable = TRUE;
     // create a linear animation interpolator
-    m_aniInterpolator.Attach(
-        SApplication::getSingleton().CreateInterpolatorByName(SLinearInterpolator::GetClassName()));
+    m_aniInterpolator.Attach(SApplication::getSingleton().CreateInterpolatorByName(SLinearInterpolator::GetClassName()));
 
     m_evtSet.addEvent(EVENTID(EventTabSelChanging));
     m_evtSet.addEvent(EVENTID(EventTabSelChanged));
@@ -589,8 +580,7 @@ BOOL STabCtrl::SetCurSel(int nIndex)
     }
     if (m_nAnimateSteps && IsVisible(TRUE) && nOldPage != -1 && nIndex != -1)
     {
-        m_tabSlider = new STabSlider(this, nOldPage, nIndex, m_nAnimateSteps, m_nAniamteType,
-                                     m_aniInterpolator);
+        m_tabSlider = new STabSlider(this, nOldPage, nIndex, m_nAnimateSteps, m_nAniamteType, m_aniInterpolator);
     }
     else
     {
@@ -671,8 +661,7 @@ STabPage *STabCtrl::CreatePageFromXml(SXmlNode xmlPage)
 int STabCtrl::InsertItem(LPCWSTR lpContent, int iInsert /*=-1*/)
 {
     SXmlDoc xmlDoc;
-    if (!xmlDoc.load_buffer(lpContent, wcslen(lpContent) * sizeof(wchar_t), xml_parse_default,
-                            enc_utf16))
+    if (!xmlDoc.load_buffer(lpContent, wcslen(lpContent) * sizeof(wchar_t), xml_parse_default, enc_utf16))
         return -1;
     return InsertItem(xmlDoc.root().first_child(), iInsert);
 }
@@ -735,23 +724,17 @@ BOOL STabCtrl::GetItemRect(int nIndex, CRect &rcItem)
 
     CRect rcTitle = GetTitleRect();
 
-    rcItem = CRect(rcTitle.TopLeft(),
-                   CSize(m_szTab[0].toPixelSize(GetScale()), m_szTab[1].toPixelSize(GetScale())));
+    rcItem = CRect(rcTitle.TopLeft(), CSize(m_szTab[0].toPixelSize(GetScale()), m_szTab[1].toPixelSize(GetScale())));
 
     switch (m_nTabAlign)
     {
     case AlignTop:
     case AlignBottom:
-        rcItem.OffsetRect(m_nTabPos.toPixelSize(GetScale())
-                              + nIndex * (rcItem.Width() + m_nTabInterSize.toPixelSize(GetScale())),
-                          0);
+        rcItem.OffsetRect(m_nTabPos.toPixelSize(GetScale()) + nIndex * (rcItem.Width() + m_nTabInterSize.toPixelSize(GetScale())), 0);
         break;
     case AlignLeft:
     case AlignRight:
-        rcItem.OffsetRect(0,
-                          m_nTabPos.toPixelSize(GetScale())
-                              + nIndex
-                                  * (rcItem.Height() + m_nTabInterSize.toPixelSize(GetScale())));
+        rcItem.OffsetRect(0, m_nTabPos.toPixelSize(GetScale()) + nIndex * (rcItem.Height() + m_nTabInterSize.toPixelSize(GetScale())));
         break;
     }
     rcItem.IntersectRect(rcItem, rcTitle);
@@ -775,9 +758,7 @@ void STabCtrl::DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWOR
     if (crTxt != CR_INVALID)
         crOld = pRT->SetTextColor(crTxt);
 
-    CRect rcIcon(CPoint(m_ptIcon[0].toPixelSize(GetScale()), m_ptIcon[1].toPixelSize(GetScale()))
-                     + rcItem.TopLeft(),
-                 CSize(0, 0));
+    CRect rcIcon(CPoint(m_ptIcon[0].toPixelSize(GetScale()), m_ptIcon[1].toPixelSize(GetScale())) + rcItem.TopLeft(), CSize(0, 0));
     if (m_pSkinIcon)
     {
         rcIcon.right = rcIcon.left + m_pSkinIcon->GetSkinSize().cx;
@@ -791,12 +772,9 @@ void STabCtrl::DrawItem(IRenderTarget *pRT, const CRect &rcItem, int iItem, DWOR
     if (m_ptText[0].toPixelSize(GetScale()) > 0 && m_ptText[1].toPixelSize(GetScale()) > 0)
     { //从指定位置开始绘制文字
         if (m_txtDir == Text_Horz)
-            pRT->TextOut(rcItem.left + m_ptText[0].toPixelSize(GetScale()),
-                         rcItem.top + m_ptText[1].toPixelSize(GetScale()),
-                         GetItem(iItem)->GetTitle(), -1);
+            pRT->TextOut(rcItem.left + m_ptText[0].toPixelSize(GetScale()), rcItem.top + m_ptText[1].toPixelSize(GetScale()), GetItem(iItem)->GetTitle(), -1);
         else
-            TextOutV(pRT, rcItem.left + m_ptText[0].toPixelSize(GetScale()),
-                     rcItem.top + m_ptText[1].toPixelSize(GetScale()), GetItem(iItem)->GetTitle());
+            TextOutV(pRT, rcItem.left + m_ptText[0].toPixelSize(GetScale()), rcItem.top + m_ptText[1].toPixelSize(GetScale()), GetItem(iItem)->GetTitle());
     }
     else
     {
@@ -949,8 +927,7 @@ SIZE STabCtrl::MeasureTextV(IRenderTarget *pRT, const SStringT &strText)
 void STabCtrl::DrawTextV(IRenderTarget *pRT, CRect rcText, const SStringT &strText)
 { // only support horizontal and vertical center
     SIZE szText = MeasureTextV(pRT, strText);
-    TextOutV(pRT, rcText.left + (rcText.Width() - szText.cx) / 2,
-             rcText.top + (rcText.Height() - szText.cy) / 2, strText);
+    TextOutV(pRT, rcText.left + (rcText.Width() - szText.cx) / 2, rcText.top + (rcText.Height() - szText.cy) / 2, strText);
 }
 
 void STabCtrl::OnColorize(COLORREF cr)

@@ -35,9 +35,7 @@ class SNamedValue {
             if (ValueParser::ParseValue(xmlStr.attribute(L"value").as_string(), namedValue.value))
                 m_lstNamedValue.Add(namedValue);
             else
-                SASSERT_FMT(false, _T("parse value failed, name=%s,value=%s"),
-                            S_CW2T(xmlStr.name()).c_str(),
-                            S_CW2T(xmlStr.attribute(L"value").as_string()).c_str());
+                SASSERT_FMT(false, _T("parse value failed, name=%s,value=%s"), S_CW2T(xmlStr.name()).c_str(), S_CW2T(xmlStr.attribute(L"value").as_string()).c_str());
         }
         qsort(m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(), sizeof(NAMEDVALUE), Compare);
         return TRUE;
@@ -47,9 +45,7 @@ class SNamedValue {
     {
         NAMEDVALUE target;
         wcscpy_s(target.strName, MAX_NAME, strName);
-        NAMEDVALUE *pFind
-            = (NAMEDVALUE *)bsearch(&target, m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(),
-                                    sizeof(NAMEDVALUE), Compare);
+        NAMEDVALUE *pFind = (NAMEDVALUE *)bsearch(&target, m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(), sizeof(NAMEDVALUE), Compare);
         if (pFind)
             return pFind->value;
         static const T nullValue = ValueParser::GetNullValue();
@@ -74,17 +70,14 @@ class SNamedValue {
             SArray<NAMEDVALUE> data;
             for (size_t i = 0; i < src.m_lstNamedValue.GetCount(); i++)
             {
-                NAMEDVALUE *pFind = (NAMEDVALUE *)bsearch(
-                    &src.m_lstNamedValue[i], m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(),
-                    sizeof(NAMEDVALUE), Compare);
+                NAMEDVALUE *pFind = (NAMEDVALUE *)bsearch(&src.m_lstNamedValue[i], m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(), sizeof(NAMEDVALUE), Compare);
                 if (!pFind)
                 {
                     data.Add(src.m_lstNamedValue[i]);
                 }
             }
             m_lstNamedValue.Append(data);
-            qsort(m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(), sizeof(NAMEDVALUE),
-                  Compare);
+            qsort(m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(), sizeof(NAMEDVALUE), Compare);
             return data.GetCount();
         }
     }

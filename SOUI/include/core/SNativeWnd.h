@@ -57,8 +57,7 @@ struct tagThunk
     void Init(DWORD_PTR proc, void *pThis)
     {
         m_mov = 0x042444C7;
-        m_this = (DWORD)(
-            ULONG_PTR)pThis; // mov [esp+4], pThis;而esp+4本来是放hWnd,现在被偷着放对象指针了.
+        m_this = (DWORD)(ULONG_PTR)pThis; // mov [esp+4], pThis;而esp+4本来是放hWnd,现在被偷着放对象指针了.
         m_jmp = 0xe9;
         // 跳转到proc指定的入口函数
         m_relproc = (DWORD)((INT_PTR)proc - ((INT_PTR)this + sizeof(tagThunk)));
@@ -174,16 +173,7 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
     }
 
     STDMETHOD_(HWND, CreateNative)
-    (THIS_ LPCTSTR lpWindowName,
-     DWORD dwStyle,
-     DWORD dwExStyle,
-     int x,
-     int y,
-     int nWidth,
-     int nHeight,
-     HWND hWndParent,
-     int nID DEF_VAL(0),
-     LPVOID lpParam DEF_VAL(0)) OVERRIDE;
+    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID DEF_VAL(0), LPVOID lpParam DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(HWND, GetHwnd)(THIS) OVERRIDE;
 
@@ -246,9 +236,7 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
     STDMETHOD_(int, MapWindowRect)(THIS_ HWND hWndTo, LPRECT lpRect) SCONST OVERRIDE;
 
     STDMETHOD_(UINT_PTR, SetTimer)
-    (THIS_ UINT_PTR nIDEvent,
-     UINT nElapse,
-     void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) DEF_VAL(NULL)) OVERRIDE;
+    (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) DEF_VAL(NULL)) OVERRIDE;
 
     STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) OVERRIDE;
 
@@ -304,33 +292,17 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
     (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) OVERRIDE;
 
     STDMETHOD_(BOOL, UpdateLayeredWindow)
-    (THIS_ HDC hdcDst,
-     POINT *pptDst,
-     SIZE *psize,
-     HDC hdcSrc,
-     POINT *pptSrc,
-     COLORREF crKey,
-     BLENDFUNCTION *pblend,
-     DWORD dwFlags) OVERRIDE;
+    (THIS_ HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags) OVERRIDE;
 
     STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) OVERRIDE;
 
     LRESULT DefWindowProc();
     LRESULT ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
     LRESULT ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
-    static BOOL DefaultReflectionHandler(HWND hWnd,
-                                         UINT uMsg,
-                                         WPARAM wParam,
-                                         LPARAM lParam,
-                                         LRESULT &lResult);
+    static BOOL DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult);
 
   public: // EXTRACT FROM BEGIN_MSG_MAP_EX and END_MSG_MAP
-    virtual BOOL ProcessWindowMessage(HWND hWnd,
-                                      UINT uMsg,
-                                      WPARAM wParam,
-                                      LPARAM lParam,
-                                      LRESULT &lResult,
-                                      DWORD dwMsgMapID = 0);
+    virtual BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0);
 
   protected:
     LRESULT DefWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);

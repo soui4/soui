@@ -43,8 +43,7 @@ SDateTimePicker::~SDateTimePicker()
 
 BOOL SDateTimePicker::CreateChildren(SXmlNode xmlNode)
 {
-    m_pCalendar
-        = (SCalendar *)SApplication::getSingleton().CreateWindowByName(SCalendar::GetClassName());
+    m_pCalendar = (SCalendar *)SApplication::getSingleton().CreateWindowByName(SCalendar::GetClassName());
     if (NULL == m_pCalendar)
         return FALSE;
     m_pCalendar->SetContainer(GetContainer());
@@ -56,10 +55,8 @@ BOOL SDateTimePicker::CreateChildren(SXmlNode xmlNode)
     m_pCalendar->SetAttribute(L"pos", L"0,0,-0,-0", TRUE);
     m_pCalendar->SetOwner(this); // chain notify message to SDateTimePicker
 
-    m_pCalendar->GetEventSet()->subscribeEvent(EventCalendarExChanged::EventID,
-                                               Subscriber(&SDateTimePicker::OnDateChanged, this));
-    m_pCalendar->GetEventSet()->subscribeEvent(EventCmd::EventID,
-                                               Subscriber(&SDateTimePicker::OnDateCmd, this));
+    m_pCalendar->GetEventSet()->subscribeEvent(EventCalendarExChanged::EventID, Subscriber(&SDateTimePicker::OnDateChanged, this));
+    m_pCalendar->GetEventSet()->subscribeEvent(EventCmd::EventID, Subscriber(&SDateTimePicker::OnDateCmd, this));
     return TRUE;
 }
 
@@ -206,8 +203,7 @@ void SDateTimePicker::OnPaint(IRenderTarget *pRT)
     if (m_sysTime.wYear == 0)
     {
         COLORREF crOld = pRT->SetTextColor(m_crCue);
-        pRT->DrawText(m_strCue.GetText(FALSE), m_strCue.GetText(FALSE).GetLength(), &rcText,
-                      GetTextAlign());
+        pRT->DrawText(m_strCue.GetText(FALSE), m_strCue.GetText(FALSE).GetLength(), &rcText, GetTextAlign());
         pRT->SetTextColor(crOld);
     }
     else
@@ -364,12 +360,7 @@ void SDateTimePicker::SetTime(const SYSTEMTIME &sysTime)
     Invalidate();
 }
 
-void SDateTimePicker::SetTime(WORD wYear,
-                              WORD wMonth,
-                              WORD wDay,
-                              WORD wHour,
-                              WORD wMinute,
-                              WORD wSecond)
+void SDateTimePicker::SetTime(WORD wYear, WORD wMonth, WORD wDay, WORD wHour, WORD wMinute, WORD wSecond)
 {
     m_sysTime.wYear = wYear;
     m_sysTime.wMonth = wMonth;
@@ -385,12 +376,7 @@ void SDateTimePicker::GetTime(SYSTEMTIME &sysTime)
     sysTime = m_sysTime;
 }
 
-void SDateTimePicker::GetTime(WORD *wYear,
-                              WORD *wMonth,
-                              WORD *wDay,
-                              WORD *wHour,
-                              WORD *wMinute,
-                              WORD *wSecond) const
+void SDateTimePicker::GetTime(WORD *wYear, WORD *wMonth, WORD *wDay, WORD *wHour, WORD *wMinute, WORD *wSecond) const
 {
     if (wYear)
         *wYear = m_sysTime.wYear;
@@ -412,8 +398,7 @@ SStringT SDateTimePicker::GetWindowText(BOOL bRawText)
     SStringT szText;
     szText.Format(_T("%04d-%02d-%02d"), m_sysTime.wYear, m_sysTime.wMonth, m_sysTime.wDay);
     if (m_bTimeEnable)
-        szText.AppendFormat(_T(" %02d:%02d:%02d"), m_sysTime.wHour, m_sysTime.wMinute,
-                            m_sysTime.wSecond);
+        szText.AppendFormat(_T(" %02d:%02d:%02d"), m_sysTime.wHour, m_sysTime.wMinute, m_sysTime.wSecond);
 
     return szText;
 }
@@ -713,9 +698,7 @@ void SDateTimePicker::DropDown()
     bool bDown = CalcPopupRect(nWid.toPixelSize(GetScale()), rcPopup);
     m_pDropDownWnd->Create(rcPopup, 0);
 
-    m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0,
-                                 SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE
-                                     | SWP_NOACTIVATE);
+    m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 
     m_pDropDownWnd->SNativeWnd::SetCapture();
 }

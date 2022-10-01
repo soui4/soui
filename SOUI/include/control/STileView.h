@@ -97,26 +97,26 @@ class SOUI_EXP STileView
     void OnShowWindow(BOOL bShow, UINT nStatus);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_SIZE(OnSize)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_MOUSEWHEEL(OnMouseWheel)
-    MSG_WM_MOUSELEAVE(OnMouseLeave)
-    MSG_WM_KEYDOWN(OnKeyDown)
-    MSG_WM_KILLFOCUS_EX(OnKillFocus)
-    MSG_WM_SETFOCUS_EX(OnSetFocus)
-    MESSAGE_HANDLER_EX(UM_SETSCALE, OnSetScale)
-    MSG_WM_SHOWWINDOW(OnShowWindow)
-    MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST, WM_MOUSELAST, OnMouseEvent)
-    MESSAGE_RANGE_HANDLER_EX(WM_KEYFIRST, WM_KEYLAST, OnKeyEvent)
-    MESSAGE_RANGE_HANDLER_EX(WM_IME_STARTCOMPOSITION, WM_IME_KEYLAST, OnKeyEvent)
-    MESSAGE_HANDLER_EX(WM_IME_CHAR, OnKeyEvent)
-    MESSAGE_HANDLER_EX(WM_IME_REQUEST, OnKeyEvent)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_SIZE(OnSize)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_MOUSEWHEEL(OnMouseWheel)
+        MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MSG_WM_KEYDOWN(OnKeyDown)
+        MSG_WM_KILLFOCUS_EX(OnKillFocus)
+        MSG_WM_SETFOCUS_EX(OnSetFocus)
+        MESSAGE_HANDLER_EX(UM_SETSCALE, OnSetScale)
+        MSG_WM_SHOWWINDOW(OnShowWindow)
+        MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST, WM_MOUSELAST, OnMouseEvent)
+        MESSAGE_RANGE_HANDLER_EX(WM_KEYFIRST, WM_KEYLAST, OnKeyEvent)
+        MESSAGE_RANGE_HANDLER_EX(WM_IME_STARTCOMPOSITION, WM_IME_KEYLAST, OnKeyEvent)
+        MESSAGE_HANDLER_EX(WM_IME_CHAR, OnKeyEvent)
+        MESSAGE_HANDLER_EX(WM_IME_REQUEST, OnKeyEvent)
     SOUI_MSG_MAP_END()
 
     SOUI_ATTRS_BEGIN()
-    ATTR_LAYOUTSIZE(L"marginSize", m_nMarginSize, FALSE)
-    ATTR_BOOL(L"wantTab", m_bWantTab, FALSE)
+        ATTR_LAYOUTSIZE(L"marginSize", m_nMarginSize, FALSE)
+        ATTR_BOOL(L"wantTab", m_bWantTab, FALSE)
     SOUI_ATTRS_END()
   protected:
     SAutoRefPtr<ILvAdapter> m_adapter;
@@ -139,8 +139,7 @@ class SOUI_EXP STileView
     int m_iSelItem;
     SOsrPanel *m_pHoverItem;
 
-    SArray<SList<SItemPanel *> *>
-        m_itemRecycle; // item回收站,每一种样式在回收站中保持一个列表，以便重复利用
+    SArray<SList<SItemPanel *> *> m_itemRecycle; // item回收站,每一种样式在回收站中保持一个列表，以便重复利用
 
     SXmlDoc m_xmlTemplate;
     SLayoutSize m_nMarginSize;

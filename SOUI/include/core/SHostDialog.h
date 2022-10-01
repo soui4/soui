@@ -41,15 +41,15 @@ class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
     }
 
     EVENT_MAP_BEGIN()
-    EVENT_ID_COMMAND(IDOK, OnOK)
-    EVENT_ID_COMMAND(IDCANCEL, OnCancel)
+        EVENT_ID_COMMAND(IDOK, OnOK)
+        EVENT_ID_COMMAND(IDCANCEL, OnCancel)
     EVENT_MAP_END2(SHostWnd)
 
     BEGIN_MSG_MAP_EX(SHostDialog)
-    MSG_WM_CLOSE(OnCancel)
-    MSG_WM_KEYDOWN(OnKeyDown)
-    CHAIN_MSG_MAP(SHostWnd)
-    REFLECT_NOTIFICATIONS_EX()
+        MSG_WM_CLOSE(OnCancel)
+        MSG_WM_KEYDOWN(OnKeyDown)
+        CHAIN_MSG_MAP(SHostWnd)
+        REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 
     INT_PTR m_nRetCode;

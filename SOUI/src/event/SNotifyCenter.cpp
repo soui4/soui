@@ -30,8 +30,8 @@ class SNotifyReceiver : public SNativeWnd {
     void OnTimer(UINT_PTR uID);
 
     BEGIN_MSG_MAP_EX(SNotifyReceiver)
-    MSG_WM_TIMER(OnTimer)
-    MESSAGE_HANDLER_EX(UM_RUNONUISYNC, OnRunOnUISync)
+        MSG_WM_TIMER(OnTimer)
+        MESSAGE_HANDLER_EX(UM_RUNONUISYNC, OnRunOnUISync)
     END_MSG_MAP()
 
   protected:

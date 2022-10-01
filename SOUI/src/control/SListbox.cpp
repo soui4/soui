@@ -379,8 +379,7 @@ void SListBox::DrawItem(IRenderTarget *pRT, CRect &rc, int iItem)
     int nItemHei = m_itemHeight.toPixelSize(GetScale());
     if (pItem->nImage != -1 && m_pIconSkin)
     {
-        int nOffsetX = m_ptIcon[0].toPixelSize(GetScale()),
-            nOffsetY = m_ptIcon[1].toPixelSize(GetScale());
+        int nOffsetX = m_ptIcon[0].toPixelSize(GetScale()), nOffsetY = m_ptIcon[1].toPixelSize(GetScale());
         CSize sizeSkin = m_pIconSkin->GetSkinSize();
         rcIcon.SetRect(0, 0, sizeSkin.cx, sizeSkin.cy);
 
@@ -446,8 +445,7 @@ void SListBox::OnPaint(IRenderTarget *pRT)
     int iFirstVisible = GetTopIndex();
     int nPageItems = (m_rcClient.Height() + nItemHei - 1) / nItemHei + 1;
 
-    for (int iItem = iFirstVisible; iItem < GetCount() && iItem < iFirstVisible + nPageItems;
-         iItem++)
+    for (int iItem = iFirstVisible; iItem < GetCount() && iItem < iFirstVisible + nPageItems; iItem++)
     {
         CRect rcItem(0, 0, m_rcClient.Width(), nItemHei);
         rcItem.OffsetRect(0, nItemHei * iItem - m_siVer.nPos);

@@ -42,8 +42,7 @@ struct SOUI_EXP SRect : public fRect
 
     bool isLargest() const
     {
-        return SK_ScalarMin == fLeft && SK_ScalarMin == fTop && SK_ScalarMax == fRight
-            && SK_ScalarMax == fBottom;
+        return SK_ScalarMin == fLeft && SK_ScalarMin == fTop && SK_ScalarMax == fRight && SK_ScalarMax == fBottom;
     }
 
     /**

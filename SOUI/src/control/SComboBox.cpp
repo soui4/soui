@@ -66,8 +66,7 @@ int SComboBox::GetListBoxHeight()
     {
         int nItemHeight = m_pListBox->GetItemHeight();
         CRect rcMargin = m_pListBox->GetStyle().GetMargin();
-        nDropHeight
-            = smin(nDropHeight, (int)(nItemHeight * GetCount() + rcMargin.top + rcMargin.bottom));
+        nDropHeight = smin(nDropHeight, (int)(nItemHeight * GetCount() + rcMargin.top + rcMargin.bottom));
     }
     return nDropHeight;
 }

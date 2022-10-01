@@ -42,8 +42,8 @@ class SDummyWnd : public SNativeWnd {
     }
 
     BEGIN_MSG_MAP_EX(SDummyWnd)
-    MSG_WM_PAINT(OnPaint)
-    MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_PAINT(OnPaint)
+        MSG_WM_DESTROY(OnDestroy)
     END_MSG_MAP()
   private:
     SHostWnd *m_pOwner;
@@ -153,9 +153,9 @@ void SRootWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
         m_pHostWnd->m_memRT->ClearRect(rcWnd, 0);
     }
     SWindow::OnAnimationInvalidate(pAni, bErase);
-	if(!bErase) Update();
+    if (!bErase)
+        Update();
 }
-
 
 void SRootWindow::OnAnimationStop(IAnimation *pAni)
 {
@@ -202,16 +202,12 @@ void SRootWindow::UpdateLayout()
         int nWid = szAppSet.cx;
         if (nWid <= 0)
         {
-            nWid = GetLayoutParam()->IsSpecifiedSize(Horz)
-                ? GetLayoutParam()->GetSpecifiedSize(Horz).toPixelSize(GetScale())
-                : SIZE_WRAP_CONTENT;
+            nWid = GetLayoutParam()->IsSpecifiedSize(Horz) ? GetLayoutParam()->GetSpecifiedSize(Horz).toPixelSize(GetScale()) : SIZE_WRAP_CONTENT;
         }
         int nHei = szAppSet.cy;
         if (nHei <= 0)
         {
-            nHei = GetLayoutParam()->IsSpecifiedSize(Vert)
-                ? GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale())
-                : SIZE_WRAP_CONTENT;
+            nHei = GetLayoutParam()->IsSpecifiedSize(Vert) ? GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale()) : SIZE_WRAP_CONTENT;
         }
         CSize szRoot = GetDesiredSize(nWid, nHei);
         OnRelayout(CRect(CPoint(), szRoot));
@@ -296,19 +292,12 @@ SHostWnd::~SHostWnd()
     delete m_pRoot;
 }
 
-HWND SHostWnd::CreateEx(HWND hWndParent,
-                        DWORD dwStyle,
-                        DWORD dwExStyle,
-                        int x,
-                        int y,
-                        int nWidth,
-                        int nHeight)
+HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)
 {
     if (NULL != m_hWnd)
         return m_hWnd;
     UpdateAutoSizeCount(true);
-    HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight,
-                                         hWndParent, 0, NULL);
+    HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0, NULL);
     UpdateAutoSizeCount(false);
     if (!hWnd)
         return NULL;
@@ -320,8 +309,7 @@ HWND SHostWnd::CreateEx(HWND hWndParent,
 
 HWND SHostWnd::Create(HWND hWndParent, int x, int y, int nWidth, int nHeight)
 {
-    return CreateEx(hWndParent, WS_CLIPCHILDREN | WS_TABSTOP | WS_OVERLAPPED, 0, x, y, nWidth,
-                    nHeight);
+    return CreateEx(hWndParent, WS_CLIPCHILDREN | WS_TABSTOP | WS_OVERLAPPED, 0, x, y, nWidth, nHeight);
 }
 
 BOOL SHostWnd::onRootResize(IEvtArgs *e)
@@ -332,8 +320,7 @@ BOOL SHostWnd::onRootResize(IEvtArgs *e)
         UpdateAutoSizeCount(true);
         CRect rcWnd(CPoint(), e2->szWnd);
         rcWnd.InflateRect(GetRoot()->GetStyle().GetMargin());
-        SetWindowPos(NULL, 0, 0, rcWnd.Width(), rcWnd.Height(),
-                     SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
+        SetWindowPos(NULL, 0, 0, rcWnd.Width(), rcWnd.Height(), SWP_NOZORDER | SWP_NOMOVE | SWP_NOACTIVATE);
         UpdateAutoSizeCount(false);
     }
     return TRUE;
@@ -514,10 +501,8 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             MONITORINFO info = { sizeof(MONITORINFO) };
             GetMonitorInfo(hMonitor, &info);
             SStringT dummyTitle = SStringT().Format(_T("%s_dummy"), m_hostAttr.m_strTitle.c_str());
-            m_dummyWnd->CreateNative(dummyTitle, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE,
-                                     info.rcWork.left, info.rcWork.top, 1, 1, m_hWnd, 0, NULL);
-            m_dummyWnd->SetWindowLongPtr(GWL_EXSTYLE,
-                                         m_dummyWnd->GetWindowLongPtr(GWL_EXSTYLE) | WS_EX_LAYERED);
+            m_dummyWnd->CreateNative(dummyTitle, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE, info.rcWork.left, info.rcWork.top, 1, 1, m_hWnd, 0, NULL);
+            m_dummyWnd->SetWindowLongPtr(GWL_EXSTYLE, m_dummyWnd->GetWindowLongPtr(GWL_EXSTYLE) | WS_EX_LAYERED);
             ::SetLayeredWindowAttributes(m_dummyWnd->m_hWnd, 0, 0, LWA_ALPHA);
             m_dummyWnd->ShowWindow(SW_SHOWNOACTIVATE);
         }
@@ -565,8 +550,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             nWidth = szRoot.cx + szNc.cx;
         if (nHeight == SIZE_WRAP_CONTENT)
             nHeight = szRoot.cy + szNc.cy;
-        GetRoot()->GetEventSet()->subscribeEvent(EventSwndSize::EventID,
-                                                 Subscriber(&SHostWnd::onRootResize, this));
+        GetRoot()->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SHostWnd::onRootResize, this));
     }
 
     if (nWidth != m_szAppSetted.cx || nHeight != m_szAppSetted.cy)
@@ -756,7 +740,7 @@ void SHostWnd::OnDestroy()
     GetRoot()->FireEvent(evt);
 
     GetRoot()->SSendMessage(WM_DESTROY);
-	GetRoot()->SSendMessage(UM_SETSCALE,100);
+    GetRoot()->SSendMessage(UM_SETSCALE, 100);
     if (m_pTipCtrl)
     {
         GetMsgLoop()->RemoveMessageFilter(m_pTipCtrl);
@@ -769,10 +753,7 @@ void SHostWnd::OnDestroy()
 
     SHostMgr::getSingletonPtr()->RemoveHostMsgHandler(this);
     // exit app. (copy from wtl)
-    if (m_hostAttr.m_byWndType == SHostWndAttr::WT_APPMAIN
-        || (m_hostAttr.m_byWndType == SHostWndAttr::WT_UNDEFINE
-            && (SNativeWnd::GetStyle() & (WS_CHILD | WS_POPUP)) == 0
-            && (SNativeWnd::GetExStyle() & WS_EX_TOOLWINDOW) == 0))
+    if (m_hostAttr.m_byWndType == SHostWndAttr::WT_APPMAIN || (m_hostAttr.m_byWndType == SHostWndAttr::WT_UNDEFINE && (SNativeWnd::GetStyle() & (WS_CHILD | WS_POPUP)) == 0 && (SNativeWnd::GetExStyle() & WS_EX_TOOLWINDOW) == 0))
         ::PostQuitMessage(1);
 }
 
@@ -893,7 +874,7 @@ LRESULT SHostWnd::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         m_msgMouse.message = 0;
         m_msgMouse.wParam = wParam;
         m_msgMouse.lParam = lParam;
-		m_pNcPainter->OnMouseMove(wParam,lParam);
+        m_pNcPainter->OnMouseMove(wParam, lParam);
         break;
     case WM_MOUSELEAVE:
         m_msgMouse.message = uMsg;
@@ -1018,8 +999,7 @@ void SHostWnd::UpdateHost(HDC dc, LPCRECT rcInvalid, BYTE byAlpha)
     else
     {
         HDC hdc = m_memRT->GetDC(0);
-        ::BitBlt(dc, rcInvalid->left, rcInvalid->top, RectWidth(rcInvalid), RectHeight(rcInvalid),
-                 hdc, rcInvalid->left, rcInvalid->top, SRCCOPY);
+        ::BitBlt(dc, rcInvalid->left, rcInvalid->top, RectWidth(rcInvalid), RectHeight(rcInvalid), hdc, rcInvalid->left, rcInvalid->top, SRCCOPY);
         m_memRT->ReleaseDC(hdc);
     }
 }
@@ -1147,8 +1127,7 @@ void SHostWnd::UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlpha, LPC
     CPoint ptSrc;
 
     HDC hdc = pRT->GetDC(0);
-    S_UPDATELAYEREDWINDOWINFO info
-        = { sizeof(info), NULL, &ptDst, &szDst, hdc, &ptSrc, 0, &bf, ULW_ALPHA, &rcDirty };
+    S_UPDATELAYEREDWINDOWINFO info = { sizeof(info), NULL, &ptDst, &szDst, hdc, &ptSrc, 0, &bf, ULW_ALPHA, &rcDirty };
     SWndSurface::SUpdateLayeredWindowIndirect(m_hWnd, &info);
     pRT->ReleaseDC(hdc);
 }
@@ -1262,9 +1241,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
         {
             pRT->ClearRect(rcWnd, 0);
             UpdateLayerFromRenderTarget(pRT, byAlpha);
-            SetWindowPos(HWND_TOP, 0, 0, 0, 0,
-                         SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW
-                             | ((dwFlags & AW_ACTIVATE) ? 0 : SWP_NOACTIVATE));
+            SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW | ((dwFlags & AW_ACTIVATE) ? 0 : SWP_NOACTIVATE));
 
             if (dwFlags & AW_SLIDE)
             {
@@ -1384,7 +1361,7 @@ IMessageLoop *SHostWnd::GetMsgLoop()
     return SApplication::getSingletonPtr()->GetMsgLoop(m_dwThreadID);
 }
 
-#if(!DISABLE_SWNDSPY)
+#if (!DISABLE_SWNDSPY)
 
 LRESULT SHostWnd::OnSpyMsgSwndEnum(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -1609,8 +1586,7 @@ void SHostWnd::OnWindowPosChanged(LPWINDOWPOS lpWndPos)
         MONITORINFO info = { sizeof(MONITORINFO) };
         if (GetMonitorInfo(hMonitor, &info))
         {
-            m_dummyWnd->SetWindowPos(NULL, info.rcWork.left, info.rcWork.top, 0, 0,
-                                     SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+            m_dummyWnd->SetWindowPos(NULL, info.rcWork.left, info.rcWork.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
         }
     }
     //下面这一行不能删除，否则显示不正常。
@@ -1724,7 +1700,7 @@ bool SHostWnd::StopHostAnimation()
 
 void SHostWnd::OnUserXmlNode(SXmlNode xmlUser)
 {
-    SSLOGD()<<"unhandled xml node:" << xmlUser.name();
+    SSLOGD() << "unhandled xml node:" << xmlUser.name();
 }
 
 void SHostWnd::UpdateAutoSizeCount(bool bInc)
@@ -1831,15 +1807,16 @@ void SHostWnd::_SetToolTipInfo(const SwndToolTipInfo *info, BOOL bNcTip)
 
 void SHostWnd::SetEventHandler(THIS_ FunCallback fun, void *ctx)
 {
-	m_defEvtSlot.Attach(new FreeFunctionSlot(fun,ctx));
+    m_defEvtSlot.Attach(new FreeFunctionSlot(fun, ctx));
 }
 
 BOOL SHostWnd::_HandleEvent(IEvtArgs *pEvt)
 {
-	if(m_defEvtSlot){
-		return m_defEvtSlot->Run(pEvt);
-	}
-	return FALSE;
+    if (m_defEvtSlot)
+    {
+        return m_defEvtSlot->Run(pEvt);
+    }
+    return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////
@@ -1864,8 +1841,7 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
         SRect rc = SRect::IMake(m_rcInit);
         mtx.mapRect(&rc);
         CRect rc2 = rc.toRect();
-        ::SetWindowPos(m_pHostWnd->m_hWnd, NULL, rc2.left, rc2.top, rc2.Width(), rc2.Height(),
-                       SWP_NOZORDER | SWP_NOACTIVATE);
+        ::SetWindowPos(m_pHostWnd->m_hWnd, NULL, rc2.left, rc2.top, rc2.Width(), rc2.Height(), SWP_NOZORDER | SWP_NOACTIVATE);
     }
     if (xform.hasAlpha())
     { // change alpha.
@@ -1876,9 +1852,7 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
         }
         else if (m_pHostWnd->GetWindowLongPtr(GWL_EXSTYLE) & WS_EX_LAYERED)
         {
-            ::SetLayeredWindowAttributes(
-                m_pHostWnd->m_hWnd, 0,
-                (BYTE)((int)m_pHostWnd->GetRoot()->GetAlpha() * xform.GetAlpha() / 255), LWA_ALPHA);
+            ::SetLayeredWindowAttributes(m_pHostWnd->m_hWnd, 0, (BYTE)((int)m_pHostWnd->GetRoot()->GetAlpha() * xform.GetAlpha() / 255), LWA_ALPHA);
         }
     }
     if (!bMore)

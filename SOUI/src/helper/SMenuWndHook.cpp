@@ -119,8 +119,7 @@ LRESULT CALLBACK SMenuWndHook::WindowHook(int code, WPARAM wParam, LPARAM lParam
 
         // 是否为菜单类 ----------------------------------------
         TCHAR strClassName[10];
-        int Count
-            = ::GetClassName(hWnd, strClassName, sizeof(strClassName) / sizeof(strClassName[0]));
+        int Count = ::GetClassName(hWnd, strClassName, sizeof(strClassName) / sizeof(strClassName[0]));
         if (Count != 6 || _tcscmp(strClassName, _T("#32768")) != 0)
         {
             break;
@@ -257,10 +256,8 @@ void SMenuWndHook::OnWindowPosChanging(WINDOWPOS *pWindowPos)
     SSkinImgFrame *pBorderSkin = static_cast<SSkinImgFrame *>(pSkin);
     if (!pBorderSkin)
         return;
-    pWindowPos->cx
-        += pBorderSkin->GetMargin().left + pBorderSkin->GetMargin().right - SM_CXMENUBORDER * 2;
-    pWindowPos->cy
-        += pBorderSkin->GetMargin().top + pBorderSkin->GetMargin().bottom - SM_CXMENUBORDER * 2;
+    pWindowPos->cx += pBorderSkin->GetMargin().left + pBorderSkin->GetMargin().right - SM_CXMENUBORDER * 2;
+    pWindowPos->cy += pBorderSkin->GetMargin().top + pBorderSkin->GetMargin().bottom - SM_CXMENUBORDER * 2;
 }
 
 void SMenuWndHook::OnNcCalcsize(BOOL bValidCalc, NCCALCSIZE_PARAMS *lpncsp)

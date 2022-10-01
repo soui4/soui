@@ -20,7 +20,6 @@
 
 SNSBEGIN
 
-
 class SOUI_EXP SPanel
     : public TWindowProxy<IPanel>
     , protected IScrollBarHost {
@@ -122,22 +121,22 @@ class SOUI_EXP SPanel
     BYTE m_bySbThumbTrackMinAlpha;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"sbSkin", OnAttrScrollbarSkin)
-    ATTR_LAYOUTSIZE(L"sbArrowSize", m_nSbArrowSize, FALSE)
-    ATTR_LAYOUTSIZE(L"sbWid", m_nSbWid, TRUE)
-    ATTR_INT(L"sbEnable", m_wBarEnable, TRUE)
-    ATTR_UINT(L"updateInterval", m_dwUpdateInterval, FALSE)
-    ATTR_UINT(L"scrollSpeed", m_nScrollSpeed, FALSE)
+        ATTR_CUSTOM(L"sbSkin", OnAttrScrollbarSkin)
+        ATTR_LAYOUTSIZE(L"sbArrowSize", m_nSbArrowSize, FALSE)
+        ATTR_LAYOUTSIZE(L"sbWid", m_nSbWid, TRUE)
+        ATTR_INT(L"sbEnable", m_wBarEnable, TRUE)
+        ATTR_UINT(L"updateInterval", m_dwUpdateInterval, FALSE)
+        ATTR_UINT(L"scrollSpeed", m_nScrollSpeed, FALSE)
 
-    ATTR_LAYOUTSIZE(L"sbLeft", m_nSbLeft, TRUE)
-    ATTR_LAYOUTSIZE(L"sbRight", m_nSbRight, TRUE)
-    ATTR_LAYOUTSIZE(L"sbTop", m_nSbTop, TRUE)
-    ATTR_LAYOUTSIZE(L"sbBottom", m_nSbBottom, TRUE)
+        ATTR_LAYOUTSIZE(L"sbLeft", m_nSbLeft, TRUE)
+        ATTR_LAYOUTSIZE(L"sbRight", m_nSbRight, TRUE)
+        ATTR_LAYOUTSIZE(L"sbTop", m_nSbTop, TRUE)
+        ATTR_LAYOUTSIZE(L"sbBottom", m_nSbBottom, TRUE)
 
-    ATTR_INT(L"sbFadeFrames", m_fadeFrames, FALSE)
-    ATTR_INT(L"sbTrumbTrackMinAlpha", m_bySbThumbTrackMinAlpha, FALSE)
-    ATTR_INTERPOLATOR(L"sbFadeInterpolator", m_fadeInterpolator, FALSE)
-    ATTR_CHAIN_PTR(m_fadeInterpolator, 0)
+        ATTR_INT(L"sbFadeFrames", m_fadeFrames, FALSE)
+        ATTR_INT(L"sbTrumbTrackMinAlpha", m_bySbThumbTrackMinAlpha, FALSE)
+        ATTR_INTERPOLATOR(L"sbFadeInterpolator", m_fadeInterpolator, FALSE)
+        ATTR_CHAIN_PTR(m_fadeInterpolator, 0)
     SOUI_ATTRS_END()
 
   protected:
@@ -172,21 +171,21 @@ class SOUI_EXP SPanel
     void OnHScroll(UINT nSBCode, UINT nPos, HWND);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_CREATE(OnCreate)
-    MSG_WM_DESTROY(OnDestroy)
-    MSG_WM_NCPAINT_EX(OnNcPaint)
-    MSG_WM_NCCALCSIZE(OnNcCalcSize)
-    MSG_WM_NCLBUTTONDOWN(OnNcLButtonDown)
-    MSG_WM_NCLBUTTONUP(OnNcLButtonUp)
-    MSG_WM_NCLBUTTONDBLCLK(OnNcLButtonDown)
-    MSG_WM_NCMOUSEMOVE(OnNcMouseMove)
-    MSG_WM_NCMOUSELEAVE(OnNcMouseLeave)
-    MSG_WM_MOUSEWHEEL(OnMouseWheel)
-    MSG_WM_TIMER_EX(OnTimer)
-    MSG_WM_SHOWWINDOW(OnShowWindow)
-    MSG_WM_ENABLE_EX(OnEnable)
-    MSG_WM_VSCROLL(OnVScroll)
-    MSG_WM_HSCROLL(OnHScroll)
+        MSG_WM_CREATE(OnCreate)
+        MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_NCPAINT_EX(OnNcPaint)
+        MSG_WM_NCCALCSIZE(OnNcCalcSize)
+        MSG_WM_NCLBUTTONDOWN(OnNcLButtonDown)
+        MSG_WM_NCLBUTTONUP(OnNcLButtonUp)
+        MSG_WM_NCLBUTTONDBLCLK(OnNcLButtonDown)
+        MSG_WM_NCMOUSEMOVE(OnNcMouseMove)
+        MSG_WM_NCMOUSELEAVE(OnNcMouseLeave)
+        MSG_WM_MOUSEWHEEL(OnMouseWheel)
+        MSG_WM_TIMER_EX(OnTimer)
+        MSG_WM_SHOWWINDOW(OnShowWindow)
+        MSG_WM_ENABLE_EX(OnEnable)
+        MSG_WM_VSCROLL(OnVScroll)
+        MSG_WM_HSCROLL(OnHScroll)
     SOUI_MSG_MAP_END()
 };
 
@@ -228,9 +227,9 @@ class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
     HRESULT OnAttrViewSize(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"origin-x", m_ptOrigin.x, FALSE)
-    ATTR_INT(L"origin-y", m_ptOrigin.y, FALSE)
-    ATTR_CUSTOM(L"viewSize", OnAttrViewSize)
+        ATTR_INT(L"origin-x", m_ptOrigin.x, FALSE)
+        ATTR_INT(L"origin-y", m_ptOrigin.y, FALSE)
+        ATTR_CUSTOM(L"viewSize", OnAttrViewSize)
     SOUI_ATTRS_END()
 
   protected:
@@ -238,7 +237,7 @@ class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
     void OnSize(UINT nType, CSize size);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_SIZE(OnSize)
+        MSG_WM_SIZE(OnSize)
     SOUI_MSG_MAP_END()
   protected:
     SLayoutSize m_viewSize[2];

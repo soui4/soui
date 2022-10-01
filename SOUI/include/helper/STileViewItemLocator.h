@@ -5,9 +5,7 @@ SNSBEGIN
 class SOUI_EXP STileViewItemLocator : public TObjRefImpl<ITileViewItemLocator> {
   public:
     STileViewItemLocator(int nItemHei, int nItemWid, int nMarginSize = 0);
-    STileViewItemLocator(LPCWSTR szItemHei,
-                         LPCWSTR szItemWid,
-                         SLayoutSize marginSize = SLayoutSize());
+    STileViewItemLocator(LPCWSTR szItemHei, LPCWSTR szItemWid, SLayoutSize marginSize = SLayoutSize());
 
   public:
     STDMETHOD_(void, SetAdapter)(THIS_ ILvAdapter *pAdapter) OVERRIDE;

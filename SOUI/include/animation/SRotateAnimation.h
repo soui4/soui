@@ -78,12 +78,7 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
      *        pivotYType is ABSOLUTE, or a percentage (where 1.0 is 100%)
      *        otherwise.
      */
-    void init(float fromDegrees,
-              float toDegrees,
-              AniValueType pivotXType,
-              float pivotXValue,
-              AniValueType pivotYType,
-              float pivotYValue);
+    void init(float fromDegrees, float toDegrees, AniValueType pivotXType, float pivotXValue, AniValueType pivotYType, float pivotYValue);
 
     STDMETHOD_(void, initialize)
     (THIS_ int width, int height, int parentWidth, int parentHeight) OVERRIDE;
@@ -103,10 +98,10 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_FLOAT(L"fromDegrees", mFromDegrees, FALSE)
-    ATTR_FLOAT(L"toDegrees", mToDegrees, FALSE)
-    ATTR_VALUE_DESC(L"pivotX", mPivotXType, mPivotXValue)
-    ATTR_VALUE_DESC(L"pivotY", mPivotYType, mPivotYValue)
+        ATTR_FLOAT(L"fromDegrees", mFromDegrees, FALSE)
+        ATTR_FLOAT(L"toDegrees", mToDegrees, FALSE)
+        ATTR_VALUE_DESC(L"pivotX", mPivotXType, mPivotXValue)
+        ATTR_VALUE_DESC(L"pivotY", mPivotYType, mPivotYValue)
     SOUI_ATTRS_END()
 };
 

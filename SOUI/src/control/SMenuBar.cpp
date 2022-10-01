@@ -46,11 +46,11 @@ class SMenuBarItem
     void OnTimer(char timerID);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_TIMER_EX(OnTimer)
+        MSG_WM_TIMER_EX(OnTimer)
     SOUI_MSG_MAP_END()
 
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"src", OnAttrSrc)
+        ATTR_CUSTOM(L"src", OnAttrSrc)
     SOUI_ATTRS_END()
 
     ULONG_PTR m_data;
@@ -105,8 +105,7 @@ UINT SMenuBarItem::PopMenu()
                                                   GetCurrentThreadId()); // m_bLoop may become TRUE
 
     int iRet = 0;
-    iRet = TrackPopupMenu(TPM_RETURNCMD, rcHost.left + rcMenu.left, rcHost.top + rcMenu.bottom + 2,
-                          m_pHostMenu->m_hWnd);
+    iRet = TrackPopupMenu(TPM_RETURNCMD, rcHost.left + rcMenu.left, rcHost.top + rcMenu.bottom + 2, m_pHostMenu->m_hWnd);
 
     SetCheck(FALSE);
     m_pHostMenu->m_bIsShow = FALSE;
@@ -296,8 +295,7 @@ BOOL SMenuBar::CreateChildren(SXmlNode xmlNode)
     SXmlNode xmlTMenus = xmlNode.child(XmlMenus);
     if (xmlTMenus)
     {
-        for (SXmlNode xmlChild = xmlTMenus.first_child(); xmlChild;
-             xmlChild = xmlChild.next_sibling())
+        for (SXmlNode xmlChild = xmlTMenus.first_child(); xmlChild; xmlChild = xmlChild.next_sibling())
         {
             if (_wcsicmp(xmlChild.name(), SMenuBarItem::GetClassName()) != 0)
                 continue;

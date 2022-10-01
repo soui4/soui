@@ -71,13 +71,7 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
      * Describe  插入新项
      */
     STDMETHOD_(int, InsertItem)
-    (THIS_ int iItem,
-     LPCTSTR pszText,
-     int nWidth,
-     UINT fmt,
-     LPARAM lParam,
-     BOOL bDpiAware = FALSE,
-     float fWeight = 0.0f) OVERRIDE;
+    (THIS_ int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware = FALSE, float fWeight = 0.0f) OVERRIDE;
 
     /**
      * SHeaderCtrl::GetItem
@@ -158,11 +152,11 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
     int GetOriItemIndex(int iOrder) const;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_SKIN(L"itemSkin", m_pSkinItem, FALSE)
-    ATTR_SKIN(L"sortSkin", m_pSkinSort, FALSE)
-    ATTR_INT(L"fixWidth", m_bFixWidth, FALSE)
-    ATTR_INT(L"itemSwapEnable", m_bItemSwapEnable, FALSE)
-    ATTR_INT(L"sortHeader", m_bSortHeader, FALSE)
+        ATTR_SKIN(L"itemSkin", m_pSkinItem, FALSE)
+        ATTR_SKIN(L"sortSkin", m_pSkinSort, FALSE)
+        ATTR_INT(L"fixWidth", m_bFixWidth, FALSE)
+        ATTR_INT(L"itemSwapEnable", m_bItemSwapEnable, FALSE)
+        ATTR_INT(L"sortHeader", m_bSortHeader, FALSE)
     SOUI_ATTRS_END()
   protected:
     /**
@@ -306,13 +300,13 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
     void OnActivateApp(BOOL bActive, DWORD dwThreadID);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_MOUSEMOVE(OnMouseMove)
-    MSG_WM_MOUSELEAVE(OnMouseLeave)
-    MSG_WM_ACTIVATEAPP(OnActivateApp)
-    MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_PAINT_EX(OnPaint)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_MOUSEMOVE(OnMouseMove)
+        MSG_WM_MOUSELEAVE(OnMouseLeave)
+        MSG_WM_ACTIVATEAPP(OnActivateApp)
+        MSG_WM_DESTROY(OnDestroy)
     SOUI_MSG_MAP_END()
 
     SAutoRefPtr<ISkinObj> m_pSkinItem; /**< 表头绘制Skin */

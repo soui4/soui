@@ -68,10 +68,7 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
      * @param toYDelta Change in Y coordinate to apply at the end of the
      *        animation
      */
-    void init(float fromXDelta = 0.0f,
-              float toXDelta = 0.0f,
-              float fromYDelta = 0.0f,
-              float toYDelta = 0.0f);
+    void init(float fromXDelta = 0.0f, float toXDelta = 0.0f, float fromYDelta = 0.0f, float toYDelta = 0.0f);
 
     /**
      * Constructor to use when building a TranslateAnimation from code
@@ -101,14 +98,7 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
      *        animation. This value can either be an absolute number if toYType
      *        is ABSOLUTE, or a percentage (where 1.0 is 100%) otherwise.
      */
-    void init(AniValueType fromXType,
-              float fromXValue,
-              AniValueType toXType,
-              float toXValue,
-              AniValueType fromYType,
-              float fromYValue,
-              AniValueType toYType,
-              float toYValue);
+    void init(AniValueType fromXType, float fromXValue, AniValueType toXType, float toXValue, AniValueType fromYType, float fromYValue, AniValueType toYType, float toYValue);
 
   protected:
     STDMETHOD_(void, applyTransformation)
@@ -119,10 +109,10 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
     (THIS_ int width, int height, int parentWidth, int parentHeight) OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-    ATTR_VALUE_DESC(L"fromXDelta", mFromXType, mFromXValue)
-    ATTR_VALUE_DESC(L"toXDelta", mToXType, mToXValue)
-    ATTR_VALUE_DESC(L"fromYDelta", mFromYType, mFromYValue)
-    ATTR_VALUE_DESC(L"toYDelta", mToYType, mToYValue)
+        ATTR_VALUE_DESC(L"fromXDelta", mFromXType, mFromXValue)
+        ATTR_VALUE_DESC(L"toXDelta", mToXType, mToXValue)
+        ATTR_VALUE_DESC(L"fromYDelta", mFromYType, mFromYValue)
+        ATTR_VALUE_DESC(L"toYDelta", mToYType, mToYValue)
     SOUI_ATTRS_END()
 };
 

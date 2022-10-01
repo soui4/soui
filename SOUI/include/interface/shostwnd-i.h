@@ -26,8 +26,7 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(HWND, CreateNative)
-    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth,
-     int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
+    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
 
     STDMETHOD_(HWND, GetHwnd)(THIS) PURE;
 
@@ -87,8 +86,7 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
     STDMETHOD_(int, MapWindowRect)(THIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
 
     STDMETHOD_(UINT_PTR, SetTimer)
-    (THIS_ UINT_PTR nIDEvent, UINT nElapse,
-     void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
+    (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
 
     STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) PURE;
 
@@ -144,24 +142,20 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
     (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
 
     STDMETHOD_(BOOL, UpdateLayeredWindow)
-    (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey,
-     BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
+    (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey, BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
 
     STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
 
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(HWND, CreateEx)
-    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)
-        PURE;
+    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) PURE;
     STDMETHOD_(HWND, Create)
-    (THIS_ HWND hWndParent, int x /*= 0*/, int y /*= 0*/, int nWidth /*= 0*/, int nHeight /*= 0*/)
-        PURE;
+    (THIS_ HWND hWndParent, int x /*= 0*/, int y /*= 0*/, int nWidth /*= 0*/, int nHeight /*= 0*/) PURE;
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
 
-	STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
-
+    STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
 };
 
 #undef INTERFACE
@@ -184,8 +178,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(HWND, CreateNative)
-    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth,
-     int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
+    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
 
     STDMETHOD_(HWND, GetHwnd)(THIS) PURE;
 
@@ -245,8 +238,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
     STDMETHOD_(int, MapWindowRect)(THIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
 
     STDMETHOD_(UINT_PTR, SetTimer)
-    (THIS_ UINT_PTR nIDEvent, UINT nElapse,
-     void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
+    (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
 
     STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) PURE;
 
@@ -302,22 +294,19 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
     (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
 
     STDMETHOD_(BOOL, UpdateLayeredWindow)
-    (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey,
-     BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
+    (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey, BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
 
     STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
 
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(HWND, CreateEx)
-    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)
-        PURE;
+    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) PURE;
     STDMETHOD_(HWND, Create)
-    (THIS_ HWND hWndParent, int x /*= 0*/, int y /*= 0*/, int nWidth /*= 0*/, int nHeight /*= 0*/)
-        PURE;
+    (THIS_ HWND hWndParent, int x /*= 0*/, int y /*= 0*/, int nWidth /*= 0*/, int nHeight /*= 0*/) PURE;
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
-	STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
+    STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
 
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent /*=NULL*/) PURE;

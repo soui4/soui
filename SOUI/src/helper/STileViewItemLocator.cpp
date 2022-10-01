@@ -13,9 +13,7 @@ STileViewItemLocator::STileViewItemLocator(int nItemHei, int nItemWid, int nMarg
 {
 }
 
-STileViewItemLocator::STileViewItemLocator(LPCWSTR szItemHei,
-                                           LPCWSTR szItemWid,
-                                           SLayoutSize marginSize)
+STileViewItemLocator::STileViewItemLocator(LPCWSTR szItemHei, LPCWSTR szItemWid, SLayoutSize marginSize)
     : m_nItemHeight(GETLAYOUTSIZE(szItemHei))
     , m_nItemWidth(GETLAYOUTSIZE(szItemWid))
     , m_nItemMargin(marginSize)
@@ -111,10 +109,8 @@ RECT STileViewItemLocator::GetItemRect(int iItem)
     GetItemRowAndColIndex(iItem, &nRowIdx, &nColIdx);
 
     CRect rect;
-    rect.left = m_nItemMargin.toPixelSize(m_scale)
-        + nColIdx * (m_nItemWidth.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
-    rect.top = m_nItemMargin.toPixelSize(m_scale)
-        + nRowIdx * (m_nItemHeight.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
+    rect.left = m_nItemMargin.toPixelSize(m_scale) + nColIdx * (m_nItemWidth.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
+    rect.top = m_nItemMargin.toPixelSize(m_scale) + nRowIdx * (m_nItemHeight.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
     rect.right = rect.left + m_nItemWidth.toPixelSize(m_scale);
     rect.bottom = rect.top + m_nItemHeight.toPixelSize(m_scale);
     return rect;
@@ -123,8 +119,7 @@ RECT STileViewItemLocator::GetItemRect(int iItem)
 void STileViewItemLocator::SetTileViewWidth(int width, BOOL bDpiAware)
 {
     m_nTileViewWidth.setSize((float)width, bDpiAware ? SLayoutSize::dp : SLayoutSize::px);
-    m_nCountInRow = m_nTileViewWidth.toPixelSize(m_scale)
-        / (m_nItemWidth.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
+    m_nCountInRow = m_nTileViewWidth.toPixelSize(m_scale) / (m_nItemWidth.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
     if (m_nCountInRow == 0)
         m_nCountInRow = 1;
 }

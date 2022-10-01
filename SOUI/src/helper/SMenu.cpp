@@ -165,8 +165,7 @@ void SMenuODWnd::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
         }
         else if (pdmmi->hIcon)
         {
-            pRT->DrawIconEx(rcIcon.left, rcIcon.top, pdmmi->hIcon, rcIcon.Width(), rcIcon.Height(),
-                            DI_NORMAL);
+            pRT->DrawIconEx(rcIcon.left, rcIcon.top, pdmmi->hIcon, rcIcon.Width(), rcIcon.Height(), DI_NORMAL);
         }
         else if (pdmmi->iIcon != -1 && m_attr->m_pIconSkin)
         {
@@ -178,14 +177,11 @@ void SMenuODWnd::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
         CRect rcTxt = rcItem;
         rcTxt.DeflateRect(m_attr->GetTextMargin(), 0);
 
-        COLORREF crOld = pRT->SetTextColor(
-            bDisabled ? m_attr->m_crTxtGray
-                      : (bSelected ? m_attr->m_crTxtSel : m_attr->m_crTxtNormal));
+        COLORREF crOld = pRT->SetTextColor(bDisabled ? m_attr->m_crTxtGray : (bSelected ? m_attr->m_crTxtSel : m_attr->m_crTxtNormal));
 
         SAutoRefPtr<IFontS> oldFont;
         pRT->SelectObject(m_attr->GetFontPtr(), (IRenderObj **)&oldFont);
-        pRT->DrawText(pdmmi->strText, pdmmi->strText.GetLength(), &rcTxt,
-                      DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS);
+        pRT->DrawText(pdmmi->strText, pdmmi->strText.GetLength(), &rcTxt, DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS);
         pRT->SelectObject(oldFont, NULL);
 
         pRT->SetTextColor(crOld);
@@ -237,8 +233,7 @@ void SMenuODWnd::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)
     else
     {
         // separator
-        lpMeasureItemStruct->itemHeight
-            = m_attr->m_pSepSkin ? m_attr->m_pSepSkin->GetSkinSize().cy : 3;
+        lpMeasureItemStruct->itemHeight = m_attr->m_pSepSkin ? m_attr->m_pSepSkin->GetSkinSize().cy : 3;
         lpMeasureItemStruct->itemWidth = 0;
     }
 }
@@ -280,9 +275,10 @@ SMenu::SMenu(HMENU hMenu)
     : m_hMenu(0)
     , m_bAttached(false)
 {
-	if(hMenu){
-		Attach(hMenu);
-	}
+    if (hMenu)
+    {
+        Attach(hMenu);
+    }
 }
 
 SMenu::~SMenu(void)
@@ -291,14 +287,14 @@ SMenu::~SMenu(void)
         DestroyMenu();
 }
 
-BOOL SMenu::LoadMenu2(IXmlNode * pXmlNode)
+BOOL SMenu::LoadMenu2(IXmlNode *pXmlNode)
 {
     SASSERT(m_hMenu == 0);
     m_hMenu = CreatePopupMenu();
     if (!m_hMenu)
         return FALSE;
 
-	SXmlNode xmlMenu(pXmlNode);
+    SXmlNode xmlMenu(pXmlNode);
     SMenuAttr *pMenuAttr = new SMenuAttr;
     pMenuAttr->InitFromXml(&xmlMenu);
     SASSERT(pMenuAttr->m_pItemSkin);
@@ -346,12 +342,7 @@ void SMenu::InitMenuItemData(SMenuItemData *itemInfo, const SStringW &strTextW)
     }
 }
 
-BOOL SMenu::InsertMenu(UINT nPosition,
-                       UINT nFlags,
-                       UINT_PTR nIDNewItem,
-                       LPCTSTR strText,
-                       int iIcon,
-                       HICON hIcon)
+BOOL SMenu::InsertMenu(UINT nPosition, UINT nFlags, UINT_PTR nIDNewItem, LPCTSTR strText, int iIcon, HICON hIcon)
 {
     nFlags |= MF_OWNERDRAW;
     if (nFlags & MF_SEPARATOR)
@@ -540,9 +531,9 @@ BOOL SMenu::CheckMenuItem(UINT uIdCheckItem, UINT uCheck)
     return ::CheckMenuItem(m_hMenu, uIdCheckItem, uCheck);
 }
 
-BOOL SMenu::CheckMenuRadioItem(THIS_ UINT idFirst,UINT idLast,UINT idCheck,UINT uFlags)
+BOOL SMenu::CheckMenuRadioItem(THIS_ UINT idFirst, UINT idLast, UINT idCheck, UINT uFlags)
 {
-	return ::CheckMenuRadioItem(m_hMenu,idFirst,idLast,idCheck,uFlags);
+    return ::CheckMenuRadioItem(m_hMenu, idFirst, idLast, idCheck, uFlags);
 }
 
 SMenuAttr *SMenu::GetMenuAttr(HMENU hMenu) const
@@ -600,7 +591,7 @@ ULONG_PTR SMenu::GetMenuUserData(UINT uPosition, UINT uFlags)
     return pmid->dwUserData;
 }
 
-void SMenu::SetIconSkin(ISkinObj* icons)
+void SMenu::SetIconSkin(ISkinObj *icons)
 {
     SASSERT(!m_hMenu);
     m_icons = icons;
@@ -608,22 +599,22 @@ void SMenu::SetIconSkin(ISkinObj* icons)
 
 HMENU SMenu::GetHMenu() const
 {
-	return m_hMenu;
+    return m_hMenu;
 }
 
 DWORD SMenu::GetContextHelpId() const
 {
-	return ::GetMenuContextHelpId(m_hMenu);
+    return ::GetMenuContextHelpId(m_hMenu);
 }
 
 void SMenu::SetContextHelpId(THIS_ DWORD dwId)
 {
-	::SetMenuContextHelpId(m_hMenu,dwId);
+    ::SetMenuContextHelpId(m_hMenu, dwId);
 }
 
 HMENU SMenu::GetSubMenu(THIS_ int nPos)
 {
-	return ::GetSubMenu(m_hMenu,nPos);
+    return ::GetSubMenu(m_hMenu, nPos);
 }
 
 SNSEND
