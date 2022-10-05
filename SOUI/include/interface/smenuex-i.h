@@ -3,6 +3,7 @@
 #include <interface/obj-ref-i.h>
 #include <interface/sxml-i.h>
 #include <interface/SSkinobj-i.h>
+#include <soui_exp.h>
 
 SNSBEGIN
 
@@ -57,5 +58,7 @@ DECLARE_INTERFACE_(IMenuEx, IObjRef)
 
     STDMETHOD_(IMenuEx *, GetSubMenu)(THIS_ int nPos) PURE;
 };
+
+EXTERN_C void SOUI_EXP EndMenuEx(int nCmdId);
 
 SNSEND

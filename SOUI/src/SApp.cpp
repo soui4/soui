@@ -13,6 +13,7 @@
 #include "helper/SAppDir.h"
 #include "helper/SwndFinder.h"
 #include "helper/SHostMgr.h"
+#include "event/SNotifyCenter.h"
 
 #include "control/Smessagebox.h"
 #include "updatelayeredwindow/SUpdateLayeredWindow.h"
@@ -266,6 +267,9 @@ void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, 
 
 void SApplication::_DestroySingletons()
 {
+	if(m_pSingletons[SNotifyCenter::GetType()])
+		DELETE_SINGLETON(SNotifyCenter);
+
     DELETE_SINGLETON(SHostMgr);
     DELETE_SINGLETON(SNativeWndHelper);
     DELETE_SINGLETON(SRicheditMenuDef);
@@ -328,7 +332,7 @@ IAccessible *SApplication::CreateAccessible(SWindow *pWnd) const
 #endif // SOUI_ENABLE_ACC
 }
 
-void *SApplication::GetInnerSingleton(int nType)
+void *SApplication::GetInnerSingleton(SingletonType nType)
 {
     if (nType < 0 || nType >= SINGLETON_COUNT)
         return NULL;
@@ -677,6 +681,21 @@ IMessageLoop *SApplication::GetMsgLoop(DWORD dwThreadID /*= ::GetCurrentThreadId
 IResProviderMgr *SApplication::GetResProviderMgr(THIS)
 {
     return this;
+}
+
+void SApplication::EnableNotifyCenter(THIS_ BOOL bEnable,int interval)
+{
+	if(bEnable){
+		if(m_pSingletons[SINGLETON_NOTIFYCENTER])
+			return;
+		m_pSingletons[SINGLETON_NOTIFYCENTER] = new SNotifyCenter(interval);
+	}else{
+		if(m_pSingletons[SINGLETON_NOTIFYCENTER])
+		{
+			DELETE_SINGLETON(SNotifyCenter);
+		}
+	}
+
 }
 
 SNSEND

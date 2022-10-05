@@ -1,6 +1,6 @@
 ﻿#include "souistd.h"
-#include "event/SNotifyCenter.h"
-
+#include <event/SNotifyCenter.h>
+#include <helper/SFunctor.hpp>
 SNSBEGIN
 
 template <>
@@ -40,10 +40,8 @@ class SNotifyReceiver : public SNativeWnd {
 
 LRESULT SNotifyReceiver::OnRunOnUISync(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-#ifdef ENABLE_RUNONUI
-    std::function<void(void)> *f = (std::function<void(void)> *)lParam;
-    (*f)();
-#endif //_MSC_VER >= 1700	//VS2012
+	IRunnable * pRunnable = (IRunnable *)lParam;
+	pRunnable->run();
     return 0;
 }
 
@@ -123,17 +121,12 @@ void SNotifyCenter::OnFireEvent(IEvtArgs *e)
 void SNotifyCenter::OnFireEvts()
 {
     SList<IEvtArgs *> evts;
-#ifdef ENABLE_RUNONUI
-    SList<std::function<void(void)> *> cbs;
-#endif
+    SList<SAutoRefPtr<IRunnable>> cbs;
     {
         SAutoLock lock(m_cs);
         evts = m_ayncEvent;
         m_ayncEvent.RemoveAll();
-#ifdef ENABLE_RUNONUI
-        cbs = m_asyncFuns;
-        m_asyncFuns.RemoveAll();
-#endif
+		cbs.Swap(m_asyncRunnable);
         m_bRunning = FALSE;
     }
     {
@@ -145,64 +138,82 @@ void SNotifyCenter::OnFireEvts()
             e->Release();
         }
     }
-#ifdef ENABLE_RUNONUI
     {
         SPOSITION pos = cbs.GetHeadPosition();
         while (pos)
         {
-            std::function<void(void)> *f = cbs.GetNext(pos);
-            (*f)();
-            delete f;
+            SAutoRefPtr<IRunnable> runnable = cbs.GetNext(pos);
+            runnable->run();
         }
     }
-#endif
 }
 
-bool SNotifyCenter::RegisterEventMap(const IEvtSlot &slot)
+BOOL SNotifyCenter::RegisterEventMap(const IEvtSlot *slot)
 {
     for (SPOSITION pos = m_evtHandlerMap.GetHeadPosition(); pos;)
     {
         IEvtSlot *pSlot = m_evtHandlerMap.GetNext(pos);
-        if (pSlot->Equal(&slot))
-            return false;
+        if (pSlot->Equal(slot))
+            return FALSE;
     }
-    m_evtHandlerMap.AddTail(slot.Clone());
-    return true;
+    m_evtHandlerMap.AddTail(slot->Clone());
+    return TRUE;
 }
 
-bool SNotifyCenter::UnregisterEventMap(const IEvtSlot &slot)
+BOOL SNotifyCenter::UnregisterEventMap(const IEvtSlot *slot)
 {
     for (SPOSITION pos = m_evtHandlerMap.GetHeadPosition(); pos;)
     {
         SPOSITION posPrev = pos;
         IEvtSlot *pSlot = m_evtHandlerMap.GetNext(pos);
-        if (pSlot->Equal(&slot))
+        if (pSlot->Equal(slot))
         {
             m_evtHandlerMap.RemoveAt(posPrev);
             pSlot->Release();
-            return true;
+            return TRUE;
         }
     }
-    return false;
+    return FALSE;
+}
+
+
+void SNotifyCenter::RunOnUI(IRunnable * pRunnable,BOOL bSync)
+{
+	if(bSync){
+		m_pReceiver->SendMessage(SNotifyReceiver::UM_RUNONUISYNC, 0, (LPARAM)pRunnable);
+	}else{
+		SAutoLock lock(m_cs);
+		if (!m_bRunning)
+		{
+			m_pReceiver->SetTimer(SNotifyReceiver::TIMERID_ASYNC, m_nInterval, NULL);
+			m_bRunning = TRUE;
+		}
+		m_asyncRunnable.AddTail(pRunnable);
+	}
+}
+
+void SNotifyCenter::RunOnUI2(THIS_ FunRunOnUI fun, WPARAM wp, LPARAM lp,BOOL bSync)
+{
+	IRunnable *pRunable = new StaticSFunctor2<FunRunOnUI,WPARAM,LPARAM>(fun,wp,lp);
+	RunOnUI(pRunable,bSync);
+	pRunable->Release();
 }
 
 #ifdef ENABLE_RUNONUI
 void SNotifyCenter::RunOnUISync(std::function<void(void)> fn)
 {
-    m_pReceiver->SendMessage(SNotifyReceiver::UM_RUNONUISYNC, 0, (LPARAM)&fn);
+	IRunnable *pRunable = new StdRunnable(fn);
+	RunOnUI(pRunable,TRUE);
+	pRunable->Release();
 }
 
 void SNotifyCenter::RunOnUIAsync(std::function<void(void)> fn)
 {
-    SAutoLock lock(m_cs);
-    if (!m_bRunning)
-    {
-        m_pReceiver->SetTimer(SNotifyReceiver::TIMERID_ASYNC, m_nInterval, NULL);
-        m_bRunning = TRUE;
-    }
-    std::function<void(void)> *f = new std::function<void()>(std::move(fn));
-    m_asyncFuns.AddTail(f);
+	IRunnable *pRunable = new StdRunnable(fn);
+	RunOnUI(pRunable,FALSE);
+	pRunable->Release();
 }
+
 #endif
 
 SNSEND

@@ -9,6 +9,7 @@
 #include <interface/SEvtArgs-i.h>
 #include <interface/smenu-i.h>
 #include <interface/smenuex-i.h>
+#include <soui_exp.h>
 SNSBEGIN
 
 #undef INTERFACE
@@ -45,15 +46,5 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
 };
 
 SNSEND
-
-#ifdef DLL_CORE
-#ifdef SOUI_EXPORTS
-#define SOUI_EXP __declspec(dllexport)
-#else
-#define SOUI_EXP __declspec(dllimport)
-#endif // SOUI_EXPORTS
-#else
-#define SOUI_EXP
-#endif
 
 EXTERN_C HRESULT SOUI_EXP CreateSouiFactory(IObjRef **ppRet);

@@ -13,7 +13,28 @@
 #include <interface/SScriptModule-i.h>
 #include <interface/SAnimation-i.h>
 #include <interface/SValueAnimator-i.h>
+#include <interface/SNotifyCenter-i.h>
 SNSBEGIN
+
+typedef enum _SingletonType
+{
+	SINGLETON_UIDEF = 0,
+	SINGLETON_SWNDMGR,
+	SINGLETON_TIMER,
+	SINGLETON_SCRIPTTIMER,
+	SINGLETON_FONTPOOL,
+	SINGLETON_STYLEPOOLMGR,
+	SINGLETON_TEMPLATEPOOLMGR,
+	SINGLETON_SKINPOOLMGR,
+	SINGLETON_WINDOWFINDER,
+	SINGLETON_TEXTSERVICEHELPER,
+	SINGLETON_RICHEDITMENUDEF,
+	SINGLETON_SIMPLEWNDHELPER,
+	SINGLETON_HOSTMGR,
+	SINGLETON_NOTIFYCENTER,
+
+	SINGLETON_COUNT,
+}SingletonType;
 
 #undef INTERFACE
 #define INTERFACE IApplication
@@ -225,6 +246,10 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) PURE;
+
+	STDMETHOD_(void,EnableNotifyCenter)(THIS_ BOOL bEnable,int interval DEF_VAL(20)) PURE;
+
+	STDMETHOD_(void*,GetInnerSingleton)(THIS_ SingletonType type) PURE;
 };
 
 SNSEND

@@ -40,6 +40,7 @@ INCLUDEPATH += . \
 HEADERS += include/SApp.h \
            include/SouiFactory.h \
            include/soui-version.h \
+           include/soui_exp.h \
            include/stdint.h \
            include/interface/sacchelper-i.h \
            include/interface/saccproxy-i.h \
@@ -84,6 +85,8 @@ HEADERS += include/SApp.h \
            include/interface/SNcPainter-i.h \
            include/interface/smenu-i.h \
            include/interface/smenuex-i.h \
+           include/interface/SMessageBox-i.h \
+           include/interface/SNotifyCenter-i.h \
            include/proxy/SNativeWndProxy.h \
            include/proxy/SHostWndProxy.h \
            include/proxy/SPanelProxy.h \
@@ -142,7 +145,6 @@ HEADERS += include/SApp.h \
            include/core/SPanel.h \
            include/core/SScrollBarHandler.h \
            include/core/SSingleton.h \
-           include/core/SSingleton2Type.h \
            include/core/SSingleton2.h \
            include/core/SCmnMap.h \
            include/core/SSingletonMap.h \

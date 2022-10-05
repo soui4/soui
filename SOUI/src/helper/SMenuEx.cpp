@@ -1128,6 +1128,10 @@ void SMenuEx::EndMenu(int nCmdId /*=0*/)
     ::PostMessage(s_MenuData->GetOwner(), WM_NULL, 0, 0);
 }
 
+EXTERN_C void EndMenuEx(int nCmdId){
+	SMenuEx::EndMenu(nCmdId);
+}
+
 SWindow *SMenuEx::FindItem(UINT uPos, UINT uFlag)
 {
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));

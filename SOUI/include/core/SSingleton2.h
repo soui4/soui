@@ -15,13 +15,12 @@
 
 #include <assert.h>
 #include <SApp.h>
-#include <core/SSingleton2Type.h>
 SNSBEGIN
 
 #define SINGLETON2_TYPE(x)     \
   public:                      \
     friend class SApplication; \
-    static int GetType()       \
+    static SingletonType GetType()       \
     {                          \
         return x;              \
     }

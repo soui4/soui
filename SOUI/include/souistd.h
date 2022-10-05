@@ -3,16 +3,6 @@
 //需要IAccessible接口支持打开下面的宏: 2018.10.17
 //#define SOUI_ENABLE_ACC
 
-#ifdef DLL_CORE
-#ifdef SOUI_EXPORTS
-#define SOUI_EXP __declspec(dllexport)
-#else
-#define SOUI_EXP __declspec(dllimport)
-#endif // SOUI_EXPORTS
-#else
-#define SOUI_EXP
-#endif
-
 // Change these values to use different versions
 #ifndef WINVER
 #define WINVER       0x0500
@@ -48,6 +38,7 @@
 
 #include <trace.h>
 #include <utilities.h>
+#include <soui_exp.h>
 
 #include <core/SDefine.h>
 

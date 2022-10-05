@@ -25,12 +25,15 @@ translucent="0"
       <button size="100,30" name="btn_menuex" text="menuex" tip="Show MenuEx"/>
       <window size="0,0" weight="1"/>
     </window>
-    <window size="-2,0" weight="1">
-      <listview pos="0,0,300,-0" name="lv_test">
+    <window size="-2,0" weight="1" layout="hbox">
+      <listview size="0,-2" weight="1" name="lv_test">
         <template itemHeight="50" layout="hbox" gravity="center">
           <text name="txt_test"/>
         </template>
       </listview>
+      <window size="100,-2" layout="vbox">
+        <button size="-2,30" name="btn_add" text="Add"/>
+      </window>
     </window>
   </root>
 </SOUI>

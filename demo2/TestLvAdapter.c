@@ -82,7 +82,8 @@ long WINAPI TestLvAdapter_Release(ILvAdapter *pObj)
      * @return Count of items.
      */
 	int WINAPI TestLvAdapter_getCount(ILvAdapter *pObj){
-		return 100;
+		TestLvAdapter *_thiz = IMPL (TestLvAdapter, adapter, pObj);
+		return _thiz->nItems;
 	}
 
     /**
@@ -207,6 +208,7 @@ BOOL TestLvAdapter_Init(ILvAdapter **pObj)
 	TestLvAdapter *pAdapter = (TestLvAdapter *)malloc(sizeof(TestLvAdapter));
 	pAdapter->adapter.lpVtbl = &vtblTestLv;
 	pAdapter->nRefs = 1;
+	pAdapter->nItems = 5;
 	pAdapter->obz = NULL;
 	*pObj = &pAdapter->adapter;
 	return TRUE;
@@ -237,4 +239,11 @@ void TestLvAdapter_notifyItemChanged(ILvAdapter *pObj,int iItem)
 	{
 		_thiz->obz->lpVtbl->OnItemChanged(_thiz->obz,iItem);
 	}
+}
+
+void TestLvAdapter_Add(ILvAdapter *pObj)
+{
+	TestLvAdapter *_thiz = IMPL (TestLvAdapter, adapter, pObj);
+	_thiz->nItems++;
+	TestLvAdapter_notifyChanged(pObj);
 }

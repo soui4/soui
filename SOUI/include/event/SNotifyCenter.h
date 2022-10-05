@@ -1,8 +1,8 @@
 ﻿#pragma once
 
-#include <core/SSingleton.h>
+#include <core/SSingleton2.h>
 #include <helper/SCriticalSection.h>
-
+#include <interface/SNotifyCenter-i.h>
 #if _MSC_VER >= 1700 // VS2012
 #define ENABLE_RUNONUI
 #endif
@@ -56,14 +56,18 @@ struct INotifyCallback
 class SNotifyReceiver;
 
 class SOUI_EXP SNotifyCenter
-    : public SSingleton<SNotifyCenter>
+    : public SSingleton2<SNotifyCenter>
+    , public INotifyCenter
     , public SEventSet
     , protected INotifyCallback {
-  public:
+	SINGLETON2_TYPE(SINGLETON_NOTIFYCENTER)
+	friend SApplication;
+private:
     SNotifyCenter(int nIntervel = 20);
     ~SNotifyCenter(void);
 
-    /**
+public:
+   /**
      * FireEventSync
      * @brief    触发一个同步通知事件
      * @param    EventArgs *e -- 事件对象
@@ -71,7 +75,7 @@ class SOUI_EXP SNotifyCenter
      *
      * Describe  只能在UI线程中调用
      */
-    void FireEventSync(IEvtArgs *e);
+    STDMETHOD_(void,FireEventSync)(THIS_ IEvtArgs *e) OVERRIDE;
 
     /**
      * FireEventAsync
@@ -82,27 +86,46 @@ class SOUI_EXP SNotifyCenter
      * Describe  可以在非UI线程中调用，EventArgs
      * *e必须是从堆上分配的内存，调用后使用Release释放引用计数
      */
-    void FireEventAsync(IEvtArgs *e);
+    STDMETHOD_(void,FireEventAsync)(THIS_ IEvtArgs *e) OVERRIDE;
 
     /**
      * RegisterEventMap
      * @brief    注册一个处理通知的对象
-     * @param    const ISlotFunctor &slot -- 事件处理对象
+     * @param    const ISlotFunctor *slot -- 事件处理对象
      * @return
      *
      * Describe
      */
-    bool RegisterEventMap(const IEvtSlot &slot);
+    STDMETHOD_(BOOL, RegisterEventMap)(THIS_ const IEvtSlot *slot) OVERRIDE;
 
     /**
      * RegisterEventMap
      * @brief    注销一个处理通知的对象
-     * @param    const ISlotFunctor &slot -- 事件处理对象
+     * @param    const ISlotFunctor *slot -- 事件处理对象
      * @return
      *
      * Describe
      */
-    bool UnregisterEventMap(const IEvtSlot &slot);
+    STDMETHOD_(BOOL, UnregisterEventMap)(THIS_ const IEvtSlot *slot) OVERRIDE;
+
+    /**
+     * RunOnUI
+     * @brief    
+     * @param    IRunnable * pRunnable -- runnable执行体
+	 * @param    BOOL bSync -- 同步执行标志
+     * @return
+     *
+     * Describe
+     */
+	STDMETHOD_(void,RunOnUI)(THIS_ IRunnable * pRunnable,BOOL bSync) OVERRIDE;
+
+	STDMETHOD_(void,RunOnUI2)(THIS_ FunRunOnUI fun, WPARAM wp, LPARAM lp,BOOL bSync) OVERRIDE;
+public:
+
+#ifdef ENABLE_RUNONUI
+	void RunOnUISync(std::function<void(void)> fn);
+	void RunOnUIAsync(std::function<void(void)> fn);
+#endif
 
   protected:
     virtual void OnFireEvent(IEvtArgs *e);
@@ -118,25 +141,21 @@ class SOUI_EXP SNotifyCenter
     SList<IEvtArgs *> m_ayncEvent;
     BOOL m_bRunning;
     int m_nInterval;
-#ifdef ENABLE_RUNONUI
-    SList<std::function<void(void)> *> m_asyncFuns;
 
-  public:
-    void RunOnUISync(std::function<void(void)> fn);
-    void RunOnUIAsync(std::function<void(void)> fn);
-#endif
+	SList<SAutoRefPtr<IRunnable> > m_asyncRunnable;
+
 };
 
 template <class T>
 inline void TAutoEventMapReg<T>::registerNotifyCenter()
 {
-    SNotifyCenter::getSingleton().RegisterEventMap(Subscriber(&_thisClass::OnEvent, this));
+    SNotifyCenter::getSingleton().RegisterEventMap(&Subscriber(&_thisClass::OnEvent, this));
 }
 
 template <class T>
 inline void TAutoEventMapReg<T>::unregisterNotifyCenter()
 {
-    SNotifyCenter::getSingleton().UnregisterEventMap(Subscriber(&_thisClass::OnEvent, this));
+    SNotifyCenter::getSingleton().UnregisterEventMap(&Subscriber(&_thisClass::OnEvent, this));
 }
 
 SNSEND

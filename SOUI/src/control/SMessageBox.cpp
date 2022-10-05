@@ -19,6 +19,12 @@ BOOL SetMsgTemplate(SXmlNode uiRoot)
     return TRUE;
 }
 
+BOOL SetIMsgTemplate(IXmlNode * uiRoot)
+{
+	SXmlNode xmlRoot(uiRoot);
+	return SetMsgTemplate(xmlRoot);
+}
+
 SXmlNode GetMsgTemplate()
 {
     return s_xmlMsgTemplate.root().child(L"SOUI");

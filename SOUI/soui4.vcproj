@@ -513,6 +513,8 @@
 			<File
 				RelativePath="include\helper\SMenuWndHook.h" />
 			<File
+				RelativePath="include\interface\SMessageBox-i.h" />
+			<File
 				RelativePath="include\control\SMessageBox.h" />
 			<File
 				RelativePath="include\core\SMsgLoop.h" />
@@ -528,6 +530,8 @@
 				RelativePath="include\interface\SNcPainter-i.h" />
 			<File
 				RelativePath="include\core\SNcPainter.h" />
+			<File
+				RelativePath="include\interface\SNotifyCenter-i.h" />
 			<File
 				RelativePath="include\event\SNotifyCenter.h" />
 			<File
@@ -578,8 +582,6 @@
 				RelativePath="include\core\SSingleton.h" />
 			<File
 				RelativePath="include\core\SSingleton2.h" />
-			<File
-				RelativePath="include\core\SSingleton2Type.h" />
 			<File
 				RelativePath="include\core\SSingletonMap.h" />
 			<File
@@ -718,6 +720,8 @@
 				RelativePath="include\interface\sobject-i.h" />
 			<File
 				RelativePath="include\soui-version.h" />
+			<File
+				RelativePath="include\soui_exp.h" />
 			<File
 				RelativePath="include\souistd.h">
 				<FileConfiguration

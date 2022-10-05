@@ -377,7 +377,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		COLORREF crRed = GETCOLOR(R.color.red);
 		SStringW strTitle = GETSTRING(R.string.title);
 
-		SNotifyCenter* pNotifyCenter = new SNotifyCenter;
+		theApp->EnableNotifyCenter(TRUE);
 		{
 			SmileyCreateHook  smileyHook;
 			//设置提示窗口布局
@@ -393,7 +393,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
 			nRet = theApp->Run(dlgMain.m_hWnd);
 		}
-		delete pNotifyCenter;
 
 		theApp->UnregisterWindowClass<SGifPlayer>();
 		//应用程序退出

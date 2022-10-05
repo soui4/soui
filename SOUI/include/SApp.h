@@ -23,7 +23,6 @@
 #include <OleAcc.h>
 #include <helper/obj-ref-impl.hpp>
 #include <interface/SSkinobj-i.h>
-#include <core/SSingleton2Type.h>
 
 #define GETRESPROVIDER    SOUI::SApplication::getSingletonPtr()
 #define GETRENDERFACTORY  SOUI::SApplication::getSingleton().GetRenderFactory()
@@ -144,6 +143,9 @@ class SOUI_EXP SApplication
 
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) OVERRIDE;
 
+	STDMETHOD_(void,EnableNotifyCenter)(THIS_ BOOL bEnable,int interval DEF_VAL(20)) OVERRIDE;
+
+	STDMETHOD_(void *,GetInnerSingleton)(THIS_ SingletonType nType) OVERRIDE;
   public:
     /**
      * Init
@@ -223,8 +225,6 @@ class SOUI_EXP SApplication
 
     virtual IAccProxy *CreateAccProxy(SWindow *pWnd) const;
     virtual IAccessible *CreateAccessible(SWindow *pWnd) const;
-
-    void *GetInnerSingleton(int nType);
 
   protected:
     void _CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, BOOL bImeApp);

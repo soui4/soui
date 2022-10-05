@@ -13,6 +13,8 @@
 #pragma once
 #include <core/shostdialog.h>
 #include <helper/SDpiHelper.hpp>
+#include <interface/SMessageBox-i.h>
+
 SNSBEGIN
 //下面是几个在msgbox模板中必须指定的ID。
 #define NAME_MSGBOX_BTNSWITCH L"btnSwitch" //一个包含3个页面的tabctrl
@@ -26,8 +28,6 @@ SNSBEGIN
 BOOL SOUI_EXP SetMsgTemplate(SXmlNode xmlNode);
 
 SXmlNode SOUI_EXP GetMsgTemplate();
-
-INT_PTR SOUI_EXP SMessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType);
 
 /**
  * @class     SMessageBoxImpl
