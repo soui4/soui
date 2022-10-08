@@ -132,7 +132,7 @@ class SOUI_EXP SRootWindow : public SWindow {
     STDMETHOD_(void, UpdateLayout)(THIS) OVERRIDE;
 
   protected:
-    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *pAni);
+    STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *pAni) OVERRIDE;
 
     virtual void OnAnimationInvalidate(IAnimation *pAni, bool bErase);
 
@@ -228,6 +228,14 @@ class SOUI_EXP SHostWnd
     {
         return m_pRoot;
     }
+
+	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep=-1) OVERRIDE{
+		return m_pRoot->FindIChildByID(nId,nDeep);
+	}
+
+	STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep=-1) OVERRIDE{
+		return m_pRoot->FindIChildByName(pszName,nDeep);
+	}
 
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) OVERRIDE
     {

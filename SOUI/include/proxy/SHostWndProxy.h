@@ -359,6 +359,14 @@ public:
 		return SHostWnd::GetIRoot();
 	}
 
+	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep =-1) OVERRIDE{
+		return SHostWnd::FindIChildByID(nId,nDeep);
+	}
+
+	STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep=-1) OVERRIDE{
+		return SHostWnd::FindIChildByName(pszName,nDeep);
+	}
+
 	STDMETHOD_(INcPainter*,GetNcPainter)(THIS) OVERRIDE
 	{
 		return SHostWnd::GetNcPainter();

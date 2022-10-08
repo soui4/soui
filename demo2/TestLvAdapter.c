@@ -247,3 +247,10 @@ void TestLvAdapter_Add(ILvAdapter *pObj)
 	_thiz->nItems++;
 	TestLvAdapter_notifyChanged(pObj);
 }
+
+void TestLvAdapter_Clean(ILvAdapter *pObj)
+{
+	TestLvAdapter *_thiz = IMPL (TestLvAdapter, adapter, pObj);
+	_thiz->nItems=0;
+	TestLvAdapter_notifyChanged(pObj);
+}

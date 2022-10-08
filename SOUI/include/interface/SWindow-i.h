@@ -738,7 +738,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @return IWindow*--匹配窗口
      * @remark 采用广度优先算法搜索匹配子窗口
      */
-    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep) PURE;
+    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep DEF_VAL(-1)) PURE;
 
     /**
      * @brief 根据Name查找子窗口
@@ -747,7 +747,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @return IWindow*--匹配窗口
      * @remark 采用广度优先算法搜索匹配子窗口
      */
-    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep) PURE;
+    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep DEF_VAL(-1)) PURE;
 
     /**
      * DestroyChild

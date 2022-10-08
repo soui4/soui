@@ -19,3 +19,5 @@ void TestLvAdapter_notifyInvalidated(ILvAdapter *ppAdapter);
 void TestLvAdapter_notifyItemChanged(ILvAdapter *ppAdapter,int iItem);
 
 void TestLvAdapter_Add(ILvAdapter *pAdapter);
+
+void TestLvAdapter_Clean(ILvAdapter *pAdapter);

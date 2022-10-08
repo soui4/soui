@@ -153,6 +153,25 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
     (THIS_ HWND hWndParent, int x /*= 0*/, int y /*= 0*/, int nWidth /*= 0*/, int nHeight /*= 0*/) PURE;
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
+
+    /**
+     * @brief 根据ID查找子窗口
+     * @param nId int--子窗口ID
+     * @param nDeep int--查找深度,-1代码无限
+     * @return IWindow*--匹配窗口
+     * @remark 采用广度优先算法搜索匹配子窗口
+     */
+    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep) PURE;
+
+    /**
+     * @brief 根据Name查找子窗口
+     * @param pszName LPCWSTR--子窗口Name
+     * @param nDeep int--查找深度,-1代码无限
+     * @return IWindow*--匹配窗口
+     * @remark 采用广度优先算法搜索匹配子窗口
+     */
+    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep) PURE;
+
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
 
     STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
@@ -305,6 +324,24 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
     (THIS_ HWND hWndParent, int x /*= 0*/, int y /*= 0*/, int nWidth /*= 0*/, int nHeight /*= 0*/) PURE;
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
+	    /**
+     * @brief 根据ID查找子窗口
+     * @param nId int--子窗口ID
+     * @param nDeep int--查找深度,-1代码无限
+     * @return IWindow*--匹配窗口
+     * @remark 采用广度优先算法搜索匹配子窗口
+     */
+    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep DEF_VAL(-1)) PURE;
+
+    /**
+     * @brief 根据Name查找子窗口
+     * @param pszName LPCWSTR--子窗口Name
+     * @param nDeep int--查找深度,-1代码无限
+     * @return IWindow*--匹配窗口
+     * @remark 采用广度优先算法搜索匹配子窗口
+     */
+    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep DEF_VAL(-1)) PURE;
+
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
     STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
 
