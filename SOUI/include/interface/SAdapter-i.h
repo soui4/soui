@@ -288,6 +288,14 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) PURE;
 
+	/**
+     * @brief query user defined interface from adapter
+     * @param REFGUID id-- __uuidof(interface)
+     * @param [out] IObjRef ** ppObj -- the return interface
+     * @return HRESULT S_OK--SUCCEED
+     */
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppObj) PURE;
+
     /**
      * @brief 获取一个列在模板中对应的窗口名称
      * @param iCol int--列索引
