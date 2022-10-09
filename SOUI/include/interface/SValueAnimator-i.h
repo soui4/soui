@@ -334,6 +334,8 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
 
     STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr * pContainer) PURE;
 
+	STDMETHOD_(void, end)(THIS) PURE;
+
     STDMETHOD_(BOOL, isRunning)(THIS) SCONST PURE;
 
     STDMETHOD_(BOOL, isStarted)(THIS) SCONST PURE;

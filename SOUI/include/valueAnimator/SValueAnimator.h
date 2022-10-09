@@ -415,7 +415,7 @@ class SOUI_EXP SValueAnimator
   public:
     STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr *pContainer) OVERRIDE;
 
-    void end();
+	STDMETHOD_(void, end)(THIS) OVERRIDE;
 
     STDMETHOD_(BOOL, isRunning)(THIS) SCONST OVERRIDE;
     ;
