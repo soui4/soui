@@ -324,7 +324,7 @@ BOOL SPropertyGrid::CreateChildren(SXmlNode xmlNode)
 {
     SXmlNode xmlCmdBtn = xmlNode.child(L"cmdbtnstyle");
     SASSERT(xmlCmdBtn);
-    m_pCmdBtn = SApplication::getSingleton().CreateWindowByName(SWindow::GetClassName());
+    m_pCmdBtn = CreateChildByName(SWindow::GetClassName());
     InsertChild(m_pCmdBtn);
     m_pCmdBtn->InitFromXml(&xmlCmdBtn);
     m_pCmdBtn->SetVisible(FALSE);

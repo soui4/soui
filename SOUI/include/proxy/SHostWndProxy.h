@@ -51,31 +51,26 @@ public:
 		return SHostWnd::OnInitFinished(xmlNode);
 	}
 	STDMETHOD_(HRESULT, ISetAttribute)
-		(THIS_ const IStringA *strAttribName, const IStringA *strValue, BOOL bLoading)
+		(THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading)
 	{
 		return SHostWnd::ISetAttribute(strAttribName, strValue, bLoading);
 	}
-	STDMETHOD_(HRESULT, ISetAttributeW)
-		(THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading)
+	STDMETHOD_(HRESULT, SetAttributeA)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading)
 	{
-		return SHostWnd::ISetAttributeW(strAttribName, strValue, bLoading);
+		return SHostWnd::SetAttributeA(pszAttr, pszValue, bLoading);
 	}
-	STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading)
+	STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading)
 	{
 		return SHostWnd::SetAttribute(pszAttr, pszValue, bLoading);
 	}
-	STDMETHOD_(HRESULT, SetAttributeW)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading)
+	STDMETHOD_(BOOL, GetAttribute)(THIS_ LPCWSTR pszAttr, IStringW *pValue) SCONST
 	{
-		return SHostWnd::SetAttributeW(pszAttr, pszValue, bLoading);
-	}
-	STDMETHOD_(BOOL, GetAttribute)(THIS_ const IStringW *strAttr, IStringW *pValue) SCONST
-	{
-		return SHostWnd::GetAttribute(strAttr, pValue);
+		return SHostWnd::GetAttribute(pszAttr, pValue);
 	}
 	STDMETHOD_(HRESULT, AfterAttribute)
-		(THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading, HRESULT hr)
+		(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading, HRESULT hr)
 	{
-		return SHostWnd::AfterAttribute(strAttribName, strValue, bLoading, hr);
+		return SHostWnd::AfterAttribute(pszAttr, pszValue, bLoading, hr);
 	}
 
 	STDMETHOD_(HWND, CreateNative)

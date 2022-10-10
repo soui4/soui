@@ -234,20 +234,22 @@ class SOUI_EXP SWindow
     void SetMsgHandled(BOOL bHandled);
 
   public:
-    STDMETHOD_(LPCWSTR, GetName)() SCONST OVERRIDE
+	STDMETHOD_(void, OnFinalRelease)(THIS);
+
+    STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST OVERRIDE
     {
         return m_strName;
     }
-    STDMETHOD_(void, SetName)(LPCWSTR pszName) OVERRIDE
+    STDMETHOD_(void, SetName)(THIS_ LPCWSTR pszName) OVERRIDE
     {
         m_strName = pszName;
     }
 
-    STDMETHOD_(int, GetID)() SCONST OVERRIDE
+    STDMETHOD_(int, GetID)(THIS) SCONST OVERRIDE
     {
         return m_nID;
     }
-    STDMETHOD_(void, SetID)(int nID) OVERRIDE
+    STDMETHOD_(void, SetID)(THIS_ int nID) OVERRIDE
     {
         m_nID = nID;
     }
@@ -277,11 +279,13 @@ class SOUI_EXP SWindow
     STDMETHOD_(BOOL, IsChecked)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, SetCheck)(THIS_ BOOL bCheck) OVERRIDE;
 
-    STDMETHOD_(BOOL, IsDisabled)(THIS_ BOOL bCheckParent = FALSE) SCONST OVERRIDE;
-    STDMETHOD_(void, EnableWindow)(THIS_ BOOL bEnable, BOOL bUpdate = FALSE) OVERRIDE;
+    STDMETHOD_(BOOL, IsDisabled)(THIS_ BOOL bCheckParent DEF_VAL(FALSE)) SCONST OVERRIDE;
 
-    STDMETHOD_(BOOL, IsVisible)(THIS_ BOOL bCheckParent = FALSE) SCONST OVERRIDE;
-    STDMETHOD_(void, SetVisible)(THIS_ BOOL bVisible, BOOL bUpdate = FALSE) OVERRIDE;
+    STDMETHOD_(void, EnableWindow)(THIS_ BOOL bEnable, BOOL bUpdate DEF_VAL(FALSE)) OVERRIDE;
+
+    STDMETHOD_(BOOL, IsVisible)(THIS_ BOOL bCheckParent DEF_VAL(FALSE)) SCONST OVERRIDE;
+
+    STDMETHOD_(void, SetVisible)(THIS_ BOOL bVisible, BOOL bUpdate DEF_VAL(FALSE)) OVERRIDE;
 
     STDMETHOD_(BOOL, IsMsgTransparent)(THIS) SCONST OVERRIDE;
 
@@ -296,7 +300,7 @@ class SOUI_EXP SWindow
     STDMETHOD_(void, BringWindowToTop)(THIS) OVERRIDE;
     STDMETHOD_(UINT, GetChildrenCount)(THIS) SCONST OVERRIDE;
     STDMETHOD_(LRESULT, SSendMessage)
-    (THIS_ UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0, BOOL *pbMsgHandled = NULL) OVERRIDE;
+    (THIS_ UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0, BOOL *pbMsgHandled DEF_VAL(NULL) ) OVERRIDE;
     STDMETHOD_(void, SDispatchMessage)
     (THIS_ UINT uMsg, WPARAM wParam = 0, LPARAM lParam = 0) OVERRIDE;
 
@@ -312,9 +316,9 @@ class SOUI_EXP SWindow
     STDMETHOD_(BOOL, IsUpdateLocked)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, Update)(THIS) OVERRIDE;
     STDMETHOD_(void, Move)(THIS_ LPCRECT prect) OVERRIDE;
-    STDMETHOD_(void, SetWindowRgn)(THIS_ IRegionS *pRgn, BOOL bRedraw = TRUE) OVERRIDE;
+    STDMETHOD_(void, SetWindowRgn)(THIS_ IRegionS *pRgn, BOOL bRedraw DEF_VAL(TRUE)) OVERRIDE;
     STDMETHOD_(IRegionS *, GetWindowRgn)(THIS) SCONST OVERRIDE;
-    STDMETHOD_(void, SetWindowPath)(THIS_ IPathS *pPath, BOOL bRedraw = TRUE) OVERRIDE;
+    STDMETHOD_(void, SetWindowPath)(THIS_ IPathS *pPath, BOOL bRedraw DEF_VAL(TRUE)) OVERRIDE;
     STDMETHOD_(IPathS *, GetWindowPath)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, SetTimer)(THIS_ char id, UINT uElapse) OVERRIDE;
@@ -379,9 +383,9 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(void, DestroyAllChildren)(THIS) OVERRIDE;
 
-    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep = -1) OVERRIDE;
+    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep DEF_VAL(-1)) OVERRIDE;
 
-    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep = -1) OVERRIDE;
+    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep DEF_VAL(-1)) OVERRIDE;
 
     STDMETHOD_(ISwndContainer *, GetContainer)(THIS) OVERRIDE;
     STDMETHOD_(void, SetContainer)(THIS_ ISwndContainer *pContainer) OVERRIDE;
@@ -390,7 +394,7 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) OVERRIDE;
 
-    STDMETHOD_(void, Move2)(THIS_ int x, int y, int cx = -1, int cy = -1) OVERRIDE;
+    STDMETHOD_(void, Move2)(THIS_ int x, int y, int cx DEF_VAL(-1), int cy DEF_VAL(-1)) OVERRIDE;
 
     STDMETHOD_(BOOL, SetTimer2)(THIS_ UINT_PTR id, UINT uElapse) OVERRIDE;
 
@@ -402,7 +406,7 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(DWORD, GetState)(THIS) SCONST OVERRIDE;
     STDMETHOD_(DWORD, ModifyState)
-    (THIS_ DWORD dwStateAdd, DWORD dwStateRemove, BOOL bUpdate = FALSE) OVERRIDE;
+    (THIS_ DWORD dwStateAdd, DWORD dwStateRemove, BOOL bUpdate DEF_VAL(FALSE)) OVERRIDE;
 
     STDMETHOD_(void, SetIOwner)(THIS_ IWindow *pOwner) OVERRIDE;
     STDMETHOD_(IWindow *, GetIOwner)(THIS) SCONST OVERRIDE;
@@ -411,19 +415,16 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
 
-    STDMETHOD_(BOOL, GetAttribute)(const IStringW *strAttr, IStringW *strValue) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, GetAttribute)(THIS_ LPCWSTR pszName, IStringW *strValue) SCONST OVERRIDE;
 
     STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(IWindow *, GetISelectedSiblingInGroup)(THIS) OVERRIDE
-    {
-        return GetSelectedSiblingInGroup();
-    }
+    STDMETHOD_(IWindow *, GetISelectedSiblingInGroup)(THIS) OVERRIDE;
 
-    STDMETHOD_(IWindow *, GetISelectedChildInGroup)(THIS) OVERRIDE
-    {
-        return GetSelectedChildInGroup();
-    }
+    STDMETHOD_(IWindow *, GetISelectedChildInGroup)(THIS) OVERRIDE;
+
+
+	STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT *pt, BOOL bIncludeMsgTransparent DEF_VAL(FALSE)) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs *evt) OVERRIDE;
 
@@ -431,14 +432,19 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BOOL, FireCtxMenu)(THIS_ POINT pt) OVERRIDE;
 
-    STDMETHOD_(SWND, SwndFromPoint)
-    (THIS_ POINT *pt, BOOL bIncludeMsgTransparent = FALSE) SCONST OVERRIDE;
-
     STDMETHOD_(BOOL, SubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) OVERRIDE;
 
     STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) OVERRIDE;
 
     STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef **ppRet) OVERRIDE;
+
+	STDMETHOD_(BOOL,AddEvent)(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName) OVERRIDE;
+
+	STDMETHOD_(BOOL,RemoveEvent)(THIS_ DWORD dwEventID) OVERRIDE;
+
+	STDMETHOD_(BOOL, SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult) OVERRIDE;
+
+	STDMETHOD_(void, SetSwndProc)(THIS_ FunSwndProc swndProc) OVERRIDE;
 
   public: // caret相关方法
     STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) OVERRIDE;
@@ -1060,21 +1066,6 @@ class SOUI_EXP SWindow
     void GetScaleSkin(SAutoRefPtr<ISkinObj> &pSkin, int nScale);
 
   protected: // Message Handler
-    /**
-     * SwndProc
-     * @brief    默认的消息处理函数
-     * @param    UINT uMsg --  消息类型
-     * @param    WPARAM wParam --  参数1
-     * @param    LPARAM lParam --  参数2
-     * @param    LRESULT & lResult --  消息返回值
-     * @return   BOOL 是否被处理
-     *
-     * Describe  在消息映射表中没有处理的消息进入该函数处理
-     */
-    virtual BOOL SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult)
-    {
-        return FALSE;
-    }
 
     int OnCreate(LPVOID);
 
@@ -1102,9 +1093,7 @@ class SOUI_EXP SWindow
 
     void OnMouseHover(UINT nFlags, CPoint ptPos);
 
-    void OnMouseMove(UINT nFlags, CPoint pt)
-    {
-    }
+    void OnMouseMove(UINT nFlags, CPoint pt);
 
     void OnMouseLeave();
 
@@ -1294,6 +1283,7 @@ class SOUI_EXP SWindow
     SAutoRefPtr<IRegionS> m_invalidRegion;   /**< 非背景混合窗口的脏区域 */
     SAutoRefPtr<IAttrStorage> m_attrStorage; /**< 属性保存对象 */
 
+	FunSwndProc	m_funSwndProc;
 #ifdef SOUI_ENABLE_ACC
     SAutoRefPtr<IAccessible> m_pAcc;
     SAutoRefPtr<IAccProxy> m_pAccProxy;

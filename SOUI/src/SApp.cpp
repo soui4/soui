@@ -213,6 +213,7 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     : m_hInst(hInst)
     , m_RenderFactory(pRendFactory)
     , m_hMainWnd(NULL)
+	, m_cbCreateObj(NULL)
 {
     SWndSurface::Init();
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
@@ -578,13 +579,13 @@ SStringW SApplication::tr(const SStringW &strSrc, const SStringW &strCtx) const
     return strRet;
 }
 
-SWindow *SApplication::CreateWindowByName(LPCWSTR pszWndClass) const
+IWindow *SApplication::CreateWindowByName(LPCWSTR pszWndClass) const
 { //支持使用类似button.ok这样的控件名来创建控件，对于这种格式自动应用button.ok为class属性.
     SStringW strClsName = pszWndClass;
     int nPos = strClsName.ReverseFind(L'.');
     if (nPos != -1)
         strClsName = strClsName.Left(nPos);
-    SWindow *pRet = (SWindow *)CreateObject(SObjectInfo(strClsName, Window));
+    IWindow *pRet = (IWindow *)CreateObject(strClsName, Window);
     if (pRet && nPos != -1)
     {
         pRet->SetAttribute(L"class", pszWndClass, TRUE);
@@ -594,22 +595,22 @@ SWindow *SApplication::CreateWindowByName(LPCWSTR pszWndClass) const
 
 ISkinObj *SApplication::CreateSkinByName(LPCWSTR pszSkinClass) const
 {
-    return (ISkinObj *)CreateObject(SObjectInfo(pszSkinClass, Skin));
+    return (ISkinObj *)CreateObject(pszSkinClass, Skin);
 }
 
 IInterpolator *SApplication::CreateInterpolatorByName(LPCWSTR pszName) const
 {
-    return (IInterpolator *)CreateObject(SObjectInfo(pszName, Interpolator));
+    return (IInterpolator *)CreateObject(pszName, Interpolator);
 }
 
 IAnimation *SApplication::CreateAnimationByName(LPCWSTR pszName) const
 {
-    return (IAnimation *)CreateObject(SObjectInfo(pszName, Animation));
+    return (IAnimation *)CreateObject(pszName, Animation);
 }
 
 IValueAnimator *SApplication::CreateValueAnimatorByName(LPCWSTR pszName) const
 {
-    return (IValueAnimator *)CreateObject(SObjectInfo(pszName, ValueAnimator));
+    return (IValueAnimator *)CreateObject(pszName, ValueAnimator);
 }
 
 void SApplication::SetLogManager(ILog4zManager *pLogMgr)
@@ -696,6 +697,24 @@ void SApplication::EnableNotifyCenter(THIS_ BOOL bEnable,int interval)
 		}
 	}
 
+}
+
+IObject * SApplication::CreateObject(LPCWSTR pszName,SObjectType nType) const
+{
+	if(m_cbCreateObj)
+	{
+		IObject *pRet = m_cbCreateObj(this,pszName,nType);
+		if(pRet){
+			return pRet;
+		}
+	}
+	SObjectInfo objInfo(pszName,nType);
+	return SObjectFactoryMgr::CreateObject(objInfo);
+}
+
+void SApplication::SetCreateObjectCallback(THIS_ FunCreateObject cbCreateObj)
+{
+	m_cbCreateObj = cbCreateObj;
 }
 
 SNSEND

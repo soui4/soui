@@ -206,28 +206,17 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      */
     STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode * xmlNode) PURE;
 
+
     /**
-     * SetAttributeA
+     * ISetAttribute
      * @brief    设置一个对象属性
-     * @param    const IStringA * strAttribName --  属性名
-     * @param    const IStringA * strValue --  属性值
+     * @param    const IStringW *strAttribName --  属性名
+     * @param    const IStringW *strValue --  属性值
      * @param    BOOL bLoading --  对象创建时由系统调用标志
      * @return   HRESULT -- 处理处理结果
      * Describe
      */
     STDMETHOD_(HRESULT, ISetAttribute)
-    (THIS_ const IStringA *strAttribName, const IStringA *strValue, BOOL bLoading) PURE;
-
-    /**
-     * SetAttributeW
-     * @brief    设置一个对象属性
-     * @param    const IStringA *strAttribName --  属性名
-     * @param    const IStringA *strValue --  属性值
-     * @param    BOOL bLoading --  对象创建时由系统调用标志
-     * @return   HRESULT -- 处理处理结果
-     * Describe
-     */
-    STDMETHOD_(HRESULT, ISetAttributeW)
     (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading) PURE;
 
     /**
@@ -239,7 +228,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return   HRESULT -- 处理处理结果
      * Describe
      */
-    STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading) PURE;
+    STDMETHOD_(HRESULT, SetAttributeA)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading DEF_VAL(FALSE)) PURE;
 
     /**
      * SetAttribute
@@ -250,30 +239,29 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return   HRESULT -- 处理处理结果
      * Describe
      */
-    STDMETHOD_(HRESULT, SetAttributeW)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading) PURE;
+    STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading DEF_VAL(FALSE)) PURE;
 
     /**
      * GetAttribute
      * @brief    通过属性名查询属性值
-     * @param    const SStringW & strAttr --  属性名
+     * @param    LPCWSTR strAttr --  属性名
      * @param    IStringW * pValue -- 属性值
      * @return   BOOL, TRUE:获取成功，FALSE:获取失败，属性不存在
      * Describe  默认返回空
      */
-    STDMETHOD_(BOOL, GetAttribute)(THIS_ const IStringW *strAttr, IStringW *pValue) SCONST PURE;
+    STDMETHOD_(BOOL, GetAttribute)(THIS_ LPCWSTR strAttr, IStringW *pValue) SCONST PURE;
 
     /**
      * OnAttribute
      * @brief    属性处理后调用的方法
-     * @param    const SStringW & strAttribName --  属性名
-     * @param    const SStringW & strValue --  属性名
+     * @param    LPCWSTR pszAttr--  属性名
+     * @param    LPCWSTR pszValue --  属性值
      * @param    BOOL bLoading --  对象创建时由系统调用标志
      * @param    HRESULT hr --  属性处理结果
      * Describe  不做处理，直接返回
      */
     STDMETHOD_(HRESULT, AfterAttribute)
-    (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading, HRESULT hr) PURE;
-
+    (THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading, HRESULT hr) PURE;
     //-------------------------------------------------------------------------------------------
 
     STDMETHOD_(IAnimation *, clone)(THIS) SCONST PURE;

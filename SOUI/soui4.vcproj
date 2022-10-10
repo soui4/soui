@@ -537,8 +537,6 @@
 			<File
 				RelativePath="include\res.mgr\SObjDefAttr.h" />
 			<File
-				RelativePath="include\core\SObjType.h" />
-			<File
 				RelativePath="include\core\SObjectFactory.h" />
 			<File
 				RelativePath="include\core\SPanel.h" />

@@ -246,7 +246,7 @@ BOOL SChromeTabCtrl::CreateChildren(SXmlNode xmlNode)
                 continue;
 
             SWindow *pBtn
-                = SApplication::getSingleton().CreateWindowByName(SImageButton::GetClassName());
+                = CreateChildByName(SImageButton::GetClassName());
             m_lstTabOrder[i]->InsertChild(pBtn);
             pBtn->InitFromXml(&xmlCloseBtn);
             pBtn->GetEventSet()->subscribeEvent(
@@ -424,7 +424,7 @@ BOOL SChromeTabCtrl::InsertTab(LPCTSTR pszTitle, int iPos)
     if (xmlCloseBtn && pNewTab->m_bAllowClose)
     {
         SWindow *pBtn
-            = SApplication::getSingleton().CreateWindowByName(SImageButton::GetClassName());
+            = CreateChildByName(SImageButton::GetClassName());
         pNewTab->InsertChild(pBtn);
         pBtn->InitFromXml(&xmlCloseBtn);
         pBtn->GetEventSet()->subscribeEvent(EventCmd::EventID,

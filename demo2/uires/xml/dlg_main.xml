@@ -24,6 +24,7 @@ translucent="0"
       <button size="100,30" name="btn_menu" text="menu" tip="Show Menu"/>
       <button size="100,30" name="btn_menuex" text="menuex" tip="Show MenuEx"/>
       <button size="100,30" name="btn_dialog" text="dialog" tip="Show Dialog"/>
+      <testCtrl size="-1,30" name="testWnd" text="hello c" colorBkgnd="#cccccc"/>
       <window size="0,0" weight="1"/>
     </window>
     <window size="-2,0" weight="1" layout="hbox">

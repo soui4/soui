@@ -141,7 +141,6 @@ HEADERS += include/SApp.h \
            include/core/SMsgLoop.h \
            include/core/SNativeWnd.h \
            include/core/SObjectFactory.h \
-           include/core/SObjType.h \
            include/core/SPanel.h \
            include/core/SScrollBarHandler.h \
            include/core/SSingleton.h \

@@ -13,7 +13,6 @@
 
 #pragma once
 #include <core/SCmnMap.h>
-#include <core/SObjType.h>
 
 SNSBEGIN
 class SOUI_EXP SObjectInfo {
@@ -132,8 +131,6 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
     //************************************
     bool UnregisterFactory(const SObjectInfo &objInfo);
 
-    IObject *CreateObject(const SObjectInfo &objInfo) const;
-
     void SetSwndDefAttr(IObject *pObject) const;
 
     SObjectInfo BaseObjectInfoFromObjectInfo(const SObjectInfo &objInfo);
@@ -151,6 +148,7 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
     }
 
   protected:
+	virtual IObject *CreateObject(const SObjectInfo &objInfo) const;
     virtual IObject *OnCreateUnknownObject(const SObjectInfo &objInfo) const;
 
     static void OnFactoryRemoved(const SObjectFactoryPtr &obj);

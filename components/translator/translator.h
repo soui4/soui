@@ -81,4 +81,4 @@ namespace TRANSLATOR
 
 SNSEND
 
-EXTERN_C BOOL Translator_SCreateInstance(IObjRef **ppTrans);
+EXTERN_C BOOL SOUI_COM_API Translator_SCreateInstance(IObjRef **ppTrans);

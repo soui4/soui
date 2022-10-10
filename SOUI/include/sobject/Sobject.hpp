@@ -34,8 +34,9 @@ public:
 	{
 		return xmlAttr.get_userdata()==1?true:false;
 	}
+	SObjectImpl():m_attrHandler(NULL){}
 
-
+public:
 	STDMETHOD_(BOOL,InitFromXml)(THIS_ IXmlNode * pXmlNode ) OVERRIDE
 	{
 		SXmlNode xmlNode(pXmlNode);
@@ -77,7 +78,7 @@ public:
 	{
 	}
 
-	STDMETHOD_(HRESULT,AfterAttribute)(THIS_ const IStringW * strAttribName,const IStringW * strValue, BOOL bLoading, HRESULT hr) OVERRIDE
+	STDMETHOD_(HRESULT,AfterAttribute)(THIS_ LPCWSTR strAttribName,LPCWSTR strValue, BOOL bLoading, HRESULT hr) OVERRIDE
 	{
 		UNREFERENCED_PARAMETER(strAttribName);
 		UNREFERENCED_PARAMETER(strValue);
@@ -85,27 +86,31 @@ public:
 		return hr;
 	}
 
-	STDMETHOD_(HRESULT,SetAttribute)(THIS_ LPCSTR  pszAttr, LPCSTR  pszValue, BOOL bLoading) OVERRIDE
+	STDMETHOD_(HRESULT,SetAttributeA)(THIS_ LPCSTR  pszAttr, LPCSTR  pszValue, BOOL bLoading) OVERRIDE
 	{
 		return SetAttribute(S_CA2W(pszAttr,CP_UTF8),S_CA2W(pszValue,CP_UTF8),bLoading);
 	}
 
-	STDMETHOD_(HRESULT,SetAttributeW)(THIS_ LPCWSTR  pszAttr, LPCWSTR  pszValue, BOOL bLoading) OVERRIDE
+	STDMETHOD_(HRESULT,SetAttribute)(THIS_ LPCWSTR  pszAttr, LPCWSTR  pszValue, BOOL bLoading) OVERRIDE
 	{
-		return SetAttribute(SStringW(pszAttr),SStringW(pszValue),bLoading);
+		SStringW strName(pszAttr),strValue(pszValue);
+		if(m_attrHandler){
+			HRESULT hr = m_attrHandler(this,&strName,&strValue,bLoading);
+			if(SUCCEEDED(hr))
+				return hr;
+		}
+
+		return SetAttribute(strName,strValue,bLoading);
 	}
 
-	STDMETHOD_(HRESULT,ISetAttribute)(THIS_ const IStringA * strAttribName, const IStringA *  strValue, BOOL bLoading) OVERRIDE
+	STDMETHOD_(HRESULT,ISetAttribute)(THIS_ const IStringW *  strAttr, const IStringW *  strValue, BOOL bLoading) OVERRIDE
 	{
-		SStringA strNameA(strAttribName);
-		SStringA strValueA(strValue);
-		SStringW strNameW=S_CA2W(strNameA);
-		SStringW strValueW=S_CA2W(strValueA);
-		return SetAttribute(strNameW, strValueW, bLoading);
-	}
+		if(m_attrHandler){
+			HRESULT hr = m_attrHandler(this,strAttr,strValue,bLoading);
+			if(SUCCEEDED(hr))
+				return hr;
+		}
 
-	STDMETHOD_(HRESULT,ISetAttributeW)(THIS_ const IStringW *  strAttr, const IStringW *  strValue, BOOL bLoading) OVERRIDE
-	{
 		return SetAttribute(SStringW(strAttr),SStringW(strValue),bLoading);
 	}
 
@@ -126,7 +131,7 @@ public:
 		return FALSE;
 	}
 
-	STDMETHOD_(BOOL,GetAttribute)(THIS_ const IStringW * strAttr, IStringW * pValue) SCONST OVERRIDE
+	STDMETHOD_(BOOL,GetAttribute)(THIS_ LPCWSTR strAttr, IStringW * pValue) SCONST OVERRIDE
 	{
 		UNREFERENCED_PARAMETER(strAttr);
 		UNREFERENCED_PARAMETER(pValue);
@@ -145,6 +150,11 @@ public:
 		UNREFERENCED_PARAMETER(xmlNode);
 	}
 
+	STDMETHOD_(void, SetAttrHandler)(THIS_ FunAttrHandler attrHandler) OVERRIDE{
+		m_attrHandler = attrHandler;
+	}
+
+public:
 	virtual HRESULT SetAttribute(const SStringW &strAttr,const SStringW & strValue,BOOL bLoading)
 	{
 		return DefAttributeProc(strAttr, strValue, bLoading);
@@ -155,10 +165,14 @@ public:
 		return E_FAIL;
 	}
 
+
 #ifdef    _DEBUG
 public:
 	SStringW m_strXml;  //<** XML字符串，用于在调试时观察对象*/
 #endif//_DEBUG
+
+protected:
+	FunAttrHandler m_attrHandler;
 };
 
 

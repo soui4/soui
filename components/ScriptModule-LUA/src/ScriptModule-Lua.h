@@ -137,5 +137,5 @@ class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
 
 SNSEND
 
-EXTERN_C BOOL Script_Lua_SCreateInstance(IObjRef ** ppScript);
+EXTERN_C BOOL SOUI_COM_API Script_Lua_SCreateInstance(IObjRef ** ppScript);
 

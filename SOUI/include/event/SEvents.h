@@ -13,7 +13,6 @@
 
 #pragma once
 
-#include <core/sobjType.h>
 #include <interface/SEvtArgs-i.h>
 #include <interface/sstring-i.h>
 #ifdef __cplusplus

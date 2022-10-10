@@ -113,7 +113,7 @@ SWindow *SGroupList::InsertGroup(int iGroup,
         }
     }
 
-    SWindow *pGroup = SApplication::getSingletonPtr()->CreateWindowByName(
+    SWindow *pGroup = CreateChildByName(
         m_groupTemplate.attribute(L"class_name").as_string(L"window"));
     SASSERT(pGroup);
     InsertChild(pGroup, pInsertAfter);
@@ -173,7 +173,7 @@ SWindow *SGroupList::InsertItem(SWindow *pGroup,
             }
         }
     }
-    SWindow *pItem = SApplication::getSingletonPtr()->CreateWindowByName(
+    SWindow *pItem = CreateChildByName(
         m_itemTemplate.attribute(L"class_name").as_string());
     SASSERT(pItem);
     pItemContainer->InsertChild(pItem, pInsertAfter);

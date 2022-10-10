@@ -791,6 +791,10 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
 
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) OVERRIDE;
 
+	STDMETHOD_(BOOL,SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult) OVERRIDE;
+
+	STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) OVERRIDE;
+
   public:
     /**
      * SRichEdit::GetWindowText
@@ -894,24 +898,10 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      * Describe  设置鼠标位置
      */
     virtual BOOL OnSetCursor(const CPoint &pt);
-    /**
-     * SRichEdit::SwndProc
-     * @brief    窗口处理函数
-     * @param    UINT uMsg --  消息码
-     * @param    WPARAM wParam  --
-     * @param    LPARAM lParam  --
-     * @param    LRESULT &lResult --
-     * @return   返回BOOL
-     *
-     * Describe  窗口处理函数
-     */
-    virtual BOOL SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult);
 
     virtual void OnScaleChanged(int nScale);
 
     virtual void OnRebuildFont();
-
-    STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight);
 
     void OnEnable(BOOL bEnable, UINT nStatus);
     /**

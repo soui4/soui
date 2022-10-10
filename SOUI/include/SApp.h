@@ -146,6 +146,10 @@ class SOUI_EXP SApplication
 	STDMETHOD_(void,EnableNotifyCenter)(THIS_ BOOL bEnable,int interval DEF_VAL(20)) OVERRIDE;
 
 	STDMETHOD_(void *,GetInnerSingleton)(THIS_ SingletonType nType) OVERRIDE;
+
+	STDMETHOD_(IObject *,CreateObject)(THIS_ LPCWSTR pszName,SObjectType nType) SCONST OVERRIDE;
+
+	STDMETHOD_(void,SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) OVERRIDE;
   public:
     /**
      * Init
@@ -217,7 +221,7 @@ class SOUI_EXP SApplication
     int Str2ID(const SStringW &str);
 
     SStringW tr(const SStringW &strSrc, const SStringW &strCtx) const;
-    virtual SWindow *CreateWindowByName(LPCWSTR pszWndClass) const;
+    virtual IWindow *CreateWindowByName(LPCWSTR pszWndClass) const;
     virtual ISkinObj *CreateSkinByName(LPCWSTR pszSkinClass) const;
     virtual IInterpolator *CreateInterpolatorByName(LPCWSTR pszName) const;
     virtual IAnimation *CreateAnimationByName(LPCWSTR pszName) const;
@@ -252,6 +256,8 @@ class SOUI_EXP SApplication
     mutable SCriticalSection m_cs;
     SMap<DWORD, IMessageLoop *> m_msgLoopMap;
     SAutoRefPtr<IMessageLoop> m_pMsgLoop;
+
+	FunCreateObject m_cbCreateObj;
     //一组单例指针
     void *m_pSingletons[SINGLETON_COUNT];
 };

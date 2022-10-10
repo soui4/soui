@@ -84,6 +84,7 @@ SWindow::SWindow()
     , m_animationHandler(this)
     , m_isAnimating(false)
     , m_isDestroying(false)
+	, m_funSwndProc(NULL)
 #ifdef _DEBUG
     , m_nMainThreadId(::GetCurrentThreadId()) // 初始化对象的线程不一定是主线程
 #endif
@@ -136,6 +137,15 @@ SWindow::~SWindow()
 #endif
     SWindowMgr::DestroyWindow(m_swnd);
 }
+
+void SWindow::OnFinalRelease(THIS)
+{
+	if(m_funSwndProc){
+		m_funSwndProc(this,WM_NCDESTROY,0,0,NULL);
+	}
+	delete this;
+}
+
 
 BOOL SWindow::IsMsgHandled() const
 {
@@ -268,33 +278,26 @@ void SWindow::TestMainThread()
 }
 
 // Send a message to SWindow
-LRESULT SWindow::SSendMessage(UINT Msg, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/, BOOL *pbMsgHandled /*=NULL*/)
+LRESULT SWindow::SSendMessage(UINT uMsg, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/, BOOL *pbMsgHandled /*=NULL*/)
 {
     LRESULT lResult = 0;
 
     ASSERT_UI_THREAD();
     SWindow *pOwner = GetOwner();
-    if (pOwner && Msg != WM_DESTROY)
+    if (pOwner && uMsg != WM_DESTROY)
         pOwner->AddRef();
     AddRef();
-    SWNDMSG msgCur = { Msg, wParam, lParam };
+    SWNDMSG msgCur = { uMsg, wParam, lParam };
     SWNDMSG *pOldMsg = m_pCurMsg;
     m_pCurMsg = &msgCur;
 
-    BOOL bOldMsgHandle = IsMsgHandled(); //备分上一个消息的处理状态
-
-    SetMsgHandled(FALSE);
-
-    ProcessSwndMessage(Msg, wParam, lParam, lResult);
-
-    if (pbMsgHandled)
-        *pbMsgHandled = IsMsgHandled();
-
-    SetMsgHandled(bOldMsgHandle); //恢复上一个消息的处理状态
+	BOOL bMsgHandled = SwndProc(uMsg,wParam,lParam,&lResult);
+	if (pbMsgHandled)
+		*pbMsgHandled = bMsgHandled;
 
     m_pCurMsg = pOldMsg;
     Release();
-    if (pOwner && Msg != WM_DESTROY)
+    if (pOwner && uMsg != WM_DESTROY)
         pOwner->Release();
     return lResult;
 }
@@ -787,7 +790,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                         }
                     }
                     // create child.
-                    SWindow *pChild = SApplication::getSingleton().CreateWindowByName(xmlInclude.name());
+                    SWindow *pChild = (SWindow*)SApplication::getSingleton().CreateWindowByName(xmlInclude.name());
                     if (pChild)
                     {
                         InsertChild(pChild);
@@ -841,7 +844,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                             }
                         }
                         // create child.
-                        SWindow *pChild = SApplication::getSingleton().CreateWindowByName(xmlTemp.name());
+                        SWindow *pChild = CreateChildByName(xmlTemp.name());
                         if (pChild)
                         {
                             InsertChild(pChild);
@@ -867,7 +870,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
 
 SWindow *SWindow::CreateChildByName(LPCWSTR pszName)
 {
-    return SApplication::getSingleton().CreateWindowByName(pszName);
+    return (SWindow*)SApplication::getSingleton().CreateWindowByName(pszName);
 }
 
 SStringW SWindow::tr(const SStringW &strSrc) const
@@ -1749,6 +1752,14 @@ void SWindow::OnNcPaint(IRenderTarget *pRT)
 static const int KWnd_MaxSize = 10000;
 SIZE SWindow::GetDesiredSize(int nParentWid, int nParentHei)
 {
+	if(m_funSwndProc){
+		//使用回调函数计算窗口Size
+		SIZE szRet={0};
+		BOOL bRet = m_funSwndProc(this,UM_GETDESIREDSIZE,nParentHei,nParentHei,(LRESULT*)&szRet);
+		if(bRet){
+			return szRet;
+		}
+	}
     //检查当前窗口的MatchParent属性及容器窗口的WrapContent属性。
     ILayoutParam *pLayoutParam = GetLayoutParam();
     bool bSaveHorz = nParentWid == SIZE_WRAP_CONTENT && pLayoutParam->IsMatchParent(Horz);
@@ -2024,6 +2035,10 @@ void SWindow::OnRButtonDown(UINT nFlags, CPoint point)
 }
 
 void SWindow::OnRButtonUp(UINT nFlags, CPoint point)
+{
+}
+
+void SWindow::OnMouseMove(UINT nFlags, CPoint pt)
 {
 }
 
@@ -3066,7 +3081,7 @@ LRESULT SWindow::OnUpdateFont(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 HRESULT SWindow::OnAttrLayout(const SStringW &strValue, BOOL bLoading)
 {
-    ILayout *pLayout = (ILayout *)SApplication::getSingleton().CreateObject(SObjectInfo(strValue, Layout));
+    ILayout *pLayout = (ILayout *)SApplication::getSingleton().CreateObject(strValue, Layout);
     if (pLayout == NULL)
         return E_INVALIDARG;
 
@@ -3103,15 +3118,16 @@ HRESULT SWindow::AfterAttribute(const SStringW &strAttribName, const SStringW &s
     return hr;
 }
 
-BOOL SWindow::GetAttribute(const IStringW *strAttr, IStringW *strValue) const
+BOOL SWindow::GetAttribute(LPCWSTR pszAttr, IStringW *strValue) const
 {
     if (m_attrStorage)
     {
-        return m_attrStorage->OnGetAttribute(strAttr, strValue);
+		SStringW strAttr(pszAttr);
+        return m_attrStorage->OnGetAttribute(&strAttr, strValue);
     }
     else
     {
-        return __baseCls::GetAttribute(strAttr, strValue);
+        return __baseCls::GetAttribute(pszAttr, strValue);
     }
 }
 
@@ -3439,6 +3455,49 @@ void SWindow::OnCommitSurface(IRenderTarget *pRtDest, LPCRECT pRcDest, IRenderTa
 {
     pRtDest->AlphaBlend(pRcDest, pRtSrc, pRcSrc, alpha);
 }
+
+IWindow * SWindow::GetISelectedSiblingInGroup(THIS)
+{
+	return GetSelectedSiblingInGroup();
+}
+
+IWindow * SWindow::GetISelectedChildInGroup(THIS)
+{
+	return GetSelectedChildInGroup();
+}
+
+BOOL SWindow::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult)
+{
+	SASSERT(lResult);
+	BOOL bOldMsgHandle = IsMsgHandled(); //备分上一个消息的处理状态
+	BOOL bRet = FALSE;
+	if(m_funSwndProc){
+		bRet = m_funSwndProc(this,uMsg,wParam,lParam,lResult);
+	}
+	if(!bRet){
+		SetMsgHandled(FALSE);
+		bRet = ProcessSwndMessage(uMsg, wParam, lParam, *lResult);
+	}
+	SetMsgHandled(bOldMsgHandle); //恢复上一个消息的处理状态
+
+	return bRet;
+}
+
+void SWindow::SetSwndProc(FunSwndProc swndProc){
+	m_funSwndProc = swndProc;
+}
+
+
+BOOL SWindow::AddEvent(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName)
+{
+	return m_evtSet.addEvent(dwEventID,pszEventHandlerName);
+}
+
+BOOL SWindow::RemoveEvent(THIS_ DWORD dwEventID)
+{
+	return m_evtSet.removeEvent(dwEventID);
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 static SWindow *ICWND_NONE = (SWindow *)-2;

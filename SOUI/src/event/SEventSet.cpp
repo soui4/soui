@@ -138,15 +138,15 @@ void SEventSet::FireEvent(IEvtArgs *args)
     }
 }
 
-void SEventSet::addEvent(DWORD dwEventID, LPCWSTR pszEventHandlerName)
+BOOL SEventSet::addEvent(DWORD dwEventID, LPCWSTR pszEventHandlerName)
 {
-    if (!isEventPresent(dwEventID))
-    {
-        m_evtArr.Add(new SEvent(dwEventID, pszEventHandlerName));
-    }
+    if (isEventPresent(dwEventID))
+		return FALSE;
+    m_evtArr.Add(new SEvent(dwEventID, pszEventHandlerName));
+    return TRUE;
 }
 
-void SEventSet::removeEvent(DWORD dwEventID)
+BOOL SEventSet::removeEvent(DWORD dwEventID)
 {
     for (UINT i = 0; i < m_evtArr.GetCount(); i++)
     {
@@ -154,9 +154,10 @@ void SEventSet::removeEvent(DWORD dwEventID)
         {
             delete m_evtArr[i];
             m_evtArr.RemoveAt(i);
-            return;
+            return TRUE;
         }
     }
+	return FALSE;
 }
 
 BOOL SEventSet::isEventPresent(DWORD dwEventID)

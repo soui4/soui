@@ -10,167 +10,18 @@ SNSBEGIN
 
 typedef struct ILayout ILayout;
 typedef struct ILayoutParam ILayoutParam;
+typedef struct IWindow IWindow;
+
+#ifndef UM_GETDESIREDSIZE
+#define UM_GETDESIREDSIZE (WM_USER+10000) //wp=parent wid,lp=parent hei, return size
+#endif
+typedef BOOL (* FunSwndProc)(IWindow * pSwnd,UINT uMsg,WPARAM wp,LPARAM lp,LRESULT *pbHandled);
 
 #undef INTERFACE
 #define INTERFACE IWindow
 DECLARE_INTERFACE_(IWindow, IObject)
 {
-
-    //!添加引用
-    /*!
-     */
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-
-    //!释放引用
-    /*!
-     */
-    STDMETHOD_(long, Release)(THIS) PURE;
-
-    //!释放对象
-    /*!
-     */
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-
-    /**
-     * IsClass
-     * @brief    判断this是不是属于指定的类型
-     * @param    LPCWSTR lpszName --  测试类型名
-     * @return   BOOL -- true是测试类型
-     * Describe
-     */
-    STDMETHOD_(BOOL, IsClass)(THIS_ LPCWSTR lpszName) SCONST PURE;
-
-    /**
-     * GetObjectClass
-     * @brief    获得类型名
-     * @return   LPCWSTR -- 类型名
-     * Describe  这是一个虚函数，注意与GetClassName的区别。
-     */
-    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS) SCONST PURE;
-
-    /**
-     * GetObjectType
-     * @brief    获得对象类型
-     * @return   int -- 对象类型
-     * Describe  这是一个虚函数，注意与GetClassType的区别。
-     */
-    STDMETHOD_(int, GetObjectType)(THIS) SCONST PURE;
-
-    /**
-     * GetID
-     * @brief    获取对象ID
-     * @return   int -- 对象ID
-     * Describe
-     */
-    STDMETHOD_(int, GetID)(THIS) SCONST PURE;
-
-    /**
-     * @brief 设置对象ID
-     * @param nID int--对象ID
-     * @return
-     */
-    STDMETHOD_(void, SetID)(THIS_ int nID) PURE;
-
-    /**
-     * GetName
-     * @brief    获取对象Name
-     * @return   LPCWSTR -- 对象Name
-     * Describe
-     */
-    STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST PURE;
-
-    /**
-     * @brief 设置对象Name
-     * @param pszName LPCWSTR -- 对象Name
-     * @return
-     */
-    STDMETHOD_(void, SetName)(THIS_ LPCWSTR pszName) PURE;
-
-    /**
-     * InitFromXml
-     * @brief    从XML结节初始化SObject对象
-     * @param    SXmlNode --  XML结节
-     * @return   BOOL -- 成功返回TRUE
-     * Describe
-     */
-    STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode * xmlNode) PURE;
-
-    /**
-     * OnInitFinished
-     * @brief    属性初始化完成处理接口
-     * @param    SXmlNode xmlNode --  属性节点
-     * @return   void
-     * Describe
-     */
-    STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode * xmlNode) PURE;
-
-    /**
-     * SetAttributeA
-     * @brief    设置一个对象属性
-     * @param    const IStringA * strAttribName --  属性名
-     * @param    const IStringA * strValue --  属性值
-     * @param    BOOL bLoading --  对象创建时由系统调用标志
-     * @return   HRESULT -- 处理处理结果
-     * Describe
-     */
-    STDMETHOD_(HRESULT, ISetAttribute)
-    (THIS_ const IStringA *strAttribName, const IStringA *strValue, BOOL bLoading) PURE;
-
-    /**
-     * SetAttributeW
-     * @brief    设置一个对象属性
-     * @param    const IStringA *strAttribName --  属性名
-     * @param    const IStringA *strValue --  属性值
-     * @param    BOOL bLoading --  对象创建时由系统调用标志
-     * @return   HRESULT -- 处理处理结果
-     * Describe
-     */
-    STDMETHOD_(HRESULT, ISetAttributeW)
-    (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading) PURE;
-
-    /**
-     * SetAttribute
-     * @brief    设置一个对象属性
-     * @param    LPCSTR pszAttr --  属性名
-     * @param    LPCSTR pszValue --  属性值
-     * @param    BOOL bLoading --  对象创建时由系统调用标志
-     * @return   HRESULT -- 处理处理结果
-     * Describe
-     */
-    STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading) PURE;
-
-    /**
-     * SetAttribute
-     * @brief    设置一个对象属性
-     * @param    LPCWSTR pszAttr --  属性名
-     * @param    LPCWSTR pszValue --  属性值
-     * @param    BOOL bLoading --  对象创建时由系统调用标志
-     * @return   HRESULT -- 处理处理结果
-     * Describe
-     */
-    STDMETHOD_(HRESULT, SetAttributeW)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading) PURE;
-
-    /**
-     * GetAttribute
-     * @brief    通过属性名查询属性值
-     * @param    const SStringW & strAttr --  属性名
-     * @param    IStringW * pValue -- 属性值
-     * @return   BOOL, TRUE:获取成功，FALSE:获取失败，属性不存在
-     * Describe  默认返回空
-     */
-    STDMETHOD_(BOOL, GetAttribute)(THIS_ const IStringW *strAttr, IStringW *pValue) SCONST PURE;
-
-    /**
-     * OnAttribute
-     * @brief    属性处理后调用的方法
-     * @param    const SStringW & strAttribName --  属性名
-     * @param    const SStringW & strValue --  属性名
-     * @param    BOOL bLoading --  对象创建时由系统调用标志
-     * @param    HRESULT hr --  属性处理结果
-     * Describe  不做处理，直接返回
-     */
-    STDMETHOD_(HRESULT, AfterAttribute)
-    (THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading, HRESULT hr) PURE;
+#include <interface/SobjectApi.h>
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -448,7 +299,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * Describe
      * @see     Move(LPRECT prect)
      */
-    STDMETHOD_(void, Move2)(THIS_ int x, int y, int cx, int cy) PURE;
+    STDMETHOD_(void, Move2)(THIS_ int x, int y, int cx DEF_VAL(-1), int cy DEF_VAL(-1)) PURE;
 
     /**
      * @brief 将窗口移动到指定位置
@@ -486,7 +337,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param bIncludeMsgTransparent BOOL--测试消息透传窗口标志
      * @return SWND--包含指定坐标的最顶层窗口
      */
-    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT * pt, BOOL bIncludeMsgTransparent) SCONST PURE;
+    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT * pt, BOOL bIncludeMsgTransparent DEF_VAL(FALSE)) SCONST PURE;
 
     /**
      * @brief 设置容器定时器
@@ -834,7 +685,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param bUpdate BOOL--刷新窗口
      * @return DWORD--新状态
      */
-    STDMETHOD_(DWORD, ModifyState)(THIS_ DWORD dwStateAdd, DWORD dwStateRemove, BOOL bUpdate) PURE;
+    STDMETHOD_(DWORD, ModifyState)(THIS_ DWORD dwStateAdd, DWORD dwStateRemove, BOOL bUpdate DEF_VAL(FALSE)) PURE;
 
     /**
      * GetISelectedSiblingInGroup
@@ -910,6 +761,20 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
 
     /**
+     * @brief 增加窗口事件
+     * @param evtId DWORD--事件ID
+     * @param LPCWSTR pszEventHandlerName--字符串标识的事件处理（脚本使用）
+     * @return TRUE--成功
+     */
+	STDMETHOD_(BOOL,AddEvent)(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName) PURE;
+	
+    /**
+     * @brief 删除窗口事件
+     * @param evtId DWORD--事件ID
+     * @return TRUE--成功
+     */
+	STDMETHOD_(BOOL,RemoveEvent)(THIS_ DWORD dwEventID) PURE;
+    /**
      * @brief  发射一个事件到应用层
      * @param evt IEvtArgs *--事件对象
      * @return TRUE--成功
@@ -934,6 +799,21 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * Describe
      */
     STDMETHOD_(BOOL, FireCtxMenu)(THIS_ POINT pt) PURE;
+
+    /**
+     * SwndProc
+     * @brief    默认的消息处理函数
+     * @param    UINT uMsg --  消息类型
+     * @param    WPARAM wParam --  参数1
+     * @param    LPARAM lParam --  参数2
+     * @param    LRESULT & lResult --  消息返回值
+     * @return   BOOL 是否被处理
+     *
+     * Describe  在消息映射表中没有处理的消息进入该函数处理
+     */
+    STDMETHOD_(BOOL, SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult) PURE;
+
+	STDMETHOD_(void, SetSwndProc)(THIS_ FunSwndProc swndProc) PURE;
 };
 
 SNSEND

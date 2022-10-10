@@ -2,7 +2,7 @@
 
 void SetObjAttr(IObject *pObj,LPCSTR pszAttr,LPCSTR pszValue)
 {
-    pObj->SetAttribute(pszAttr,pszValue,FALSE);
+    pObj->SetAttributeA(pszAttr,pszValue,FALSE);
 }
 
 BOOL ExpLua_SObject(lua_State *L)

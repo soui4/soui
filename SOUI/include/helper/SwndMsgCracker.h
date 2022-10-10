@@ -12,7 +12,7 @@
     }
 
 #define SOUI_MSG_MAP_END_BASE()                     \
-    return SwndProc(uMsg, wParam, lParam, lResult); \
+    return FALSE; \
     }
 
 // BOOL OnEraseBkgnd(SOUI::IRenderTarget * pRT)

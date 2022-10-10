@@ -840,8 +840,11 @@ BOOL SRichEdit::OnSetCursor(const CPoint &pt)
     return TRUE;
 }
 
-BOOL SRichEdit::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult)
+BOOL SRichEdit::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult)
 {
+	BOOL bRet = __baseCls::SwndProc(uMsg, wParam, lParam, lResult);
+	if(bRet)
+		return TRUE;
     if (m_pTxtHost && m_pTxtHost->GetTextService())
     {
         if (uMsg == EM_GETRECT)
@@ -850,13 +853,13 @@ BOOL SRichEdit::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResu
             GetClientRect((LPRECT)lParam);
             return TRUE;
         }
-        if (m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wParam, lParam, &lResult) == S_OK)
+        if (m_pTxtHost->GetTextService()->TxSendMessage(uMsg, wParam, lParam, lResult) == S_OK)
         {
             SetMsgHandled(TRUE);
             return TRUE;
         }
     }
-    return __baseCls::SwndProc(uMsg, wParam, lParam, lResult);
+    return bRet;
 }
 
 HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont)

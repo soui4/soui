@@ -94,13 +94,13 @@ void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
         if (attrClass)
         {
             attrClass.set_userdata(1);
-            pObject->SetAttributeW(attrClass.name(), attrClass.value(), TRUE);
+            pObject->SetAttribute(attrClass.name(), attrClass.value(), TRUE);
         }
         for (SXmlAttr attr = defAttr.first_attribute(); attr; attr = attr.next_attribute())
         {
             if (attr.get_userdata())
                 continue;
-            pObject->SetAttributeW(attr.name(), attr.value(), TRUE);
+            pObject->SetAttribute(attr.name(), attr.value(), TRUE);
         }
         if (attrClass)
         {

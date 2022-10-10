@@ -932,6 +932,10 @@ void SHostWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
 
 BOOL SHostWnd::OnFireEvent(IEvtArgs *evt)
 {
+	if (m_defEvtSlot && m_defEvtSlot->Run(evt))
+	{
+		return TRUE;
+	}
     return _HandleEvent(evt);
 }
 
@@ -1566,7 +1570,7 @@ CRect SHostWnd::GetClientRect() const
 
 LRESULT SHostWnd::OnMenuExEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    return _HandleEvent((IEvtArgs *)lParam);
+	return OnFireEvent((IEvtArgs *)lParam);
 }
 
 void SHostWnd::OnWindowPosChanging(LPWINDOWPOS lpWndPos)
@@ -1812,10 +1816,6 @@ void SHostWnd::SetEventHandler(THIS_ FunCallback fun, void *ctx)
 
 BOOL SHostWnd::_HandleEvent(IEvtArgs *pEvt)
 {
-    if (m_defEvtSlot)
-    {
-        return m_defEvtSlot->Run(pEvt);
-    }
     return FALSE;
 }
 

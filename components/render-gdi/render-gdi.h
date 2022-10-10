@@ -425,4 +425,4 @@ namespace RENDER_GDI
 
 SNSEND
 
-EXTERN_C BOOL Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory);
+EXTERN_C BOOL SOUI_COM_API Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory);

@@ -75,5 +75,5 @@ SNSBEGIN
 
 SNSEND
 
-EXTERN_C BOOL Decoder_Wic_SCreateInstance(IObjRef **pImgDecoderFactory);
+EXTERN_C BOOL SOUI_COM_API Decoder_Wic_SCreateInstance(IObjRef **pImgDecoderFactory);
 

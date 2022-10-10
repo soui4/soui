@@ -56,8 +56,8 @@ struct INotifyCallback
 class SNotifyReceiver;
 
 class SOUI_EXP SNotifyCenter
-    : public SSingleton2<SNotifyCenter>
-    , public INotifyCenter
+    : public INotifyCenter
+	, public SSingleton2<SNotifyCenter>
     , public SEventSet
     , protected INotifyCallback {
 	SINGLETON2_TYPE(SINGLETON_NOTIFYCENTER)

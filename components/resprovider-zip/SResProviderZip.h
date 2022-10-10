@@ -51,4 +51,4 @@ namespace RESPROVIDER_ZIP
 
 SNSEND
 
-EXTERN_C BOOL Resp_Zip_SCreateInstance(IObjRef ** ppObj);
+EXTERN_C BOOL SOUI_COM_API Resp_Zip_SCreateInstance(IObjRef ** ppObj);

@@ -36,6 +36,9 @@ typedef enum _SingletonType
 	SINGLETON_COUNT,
 }SingletonType;
 
+typedef struct IApplication IApplication;
+typedef IObject *(* FunCreateObject)(const IApplication * app,LPCWSTR pszName,SObjectType nType);
+
 #undef INTERFACE
 #define INTERFACE IApplication
 DECLARE_INTERFACE_(IApplication, IObjRef)
@@ -247,9 +250,31 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      */
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) PURE;
 
+	/**
+     * @brief 启用NotifyCenter
+	 * @param BOOL bEnable -- 是否启用
+	 * @param int interval -- 处理事件时间间隔
+     * @return void
+     */
 	STDMETHOD_(void,EnableNotifyCenter)(THIS_ BOOL bEnable,int interval DEF_VAL(20)) PURE;
 
+	/**
+     * @brief 获取SApp内部定义的几个单例对象
+	 * @param SingletonType type -- 内部单例类型
+     * @return void * -- 单例类型指针
+	 * @remark 目前主要通过它获取INotifyCenter*,以便C代码使用
+     */
 	STDMETHOD_(void*,GetInnerSingleton)(THIS_ SingletonType type) PURE;
+
+	/**
+     * @brief 设置自定义的CreateObject回调方法
+	 * @param LPCWSTR pszName -- 类型在XML中的名字
+	 * @param SObjectType nType -- 类型ID
+     * @return IObjRef * -- 创建的类型
+     */
+	STDMETHOD_(IObject *,CreateObject)(THIS_ LPCWSTR pszName,SObjectType nType) SCONST PURE;
+
+	STDMETHOD_(void,SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) PURE;
 };
 
 SNSEND

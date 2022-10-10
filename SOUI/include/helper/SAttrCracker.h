@@ -27,7 +27,7 @@
 #define SOUI_ATTRS_END()                                                   \
     if (FAILED(hRet))                                                      \
         return __baseCls::SetAttribute(strAttribName, strValue, bLoading); \
-    return AfterAttribute(&strAttribName, &strValue, bLoading, hRet);      \
+    return AfterAttribute(strAttribName.c_str(), strValue.c_str(), bLoading, hRet);      \
     }
 
 //不交给SObject处理的属性表结尾
@@ -35,6 +35,7 @@
     return E_NOTIMPL;      \
     return hRet;           \
     }
+
 
 #define ATTR_CHAIN(varname, flag)                                                                  \
     if (FAILED(hRet) && SUCCEEDED(hRet = varname.SetAttribute(strAttribName, strValue, bLoading))) \
@@ -44,7 +45,7 @@
     else
 
 #define ATTR_CHAIN_PTR(varname, flag)                                                                                      \
-    if (FAILED(hRet) && varname != NULL && SUCCEEDED(hRet = varname->ISetAttributeW(&strAttribName, &strValue, bLoading))) \
+    if (FAILED(hRet) && varname != NULL && SUCCEEDED(hRet = varname->ISetAttribute(&strAttribName, &strValue, bLoading))) \
     {                                                                                                                      \
         hRet |= flag;                                                                                                      \
     }                                                                                                                      \

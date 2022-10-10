@@ -75,5 +75,5 @@ namespace IMGDECODOR_PNG
 
 SNSEND
 
-EXTERN_C BOOL Decoder_Png_SCreateInstance(IObjRef **ppImgDecoderFactory);
+EXTERN_C BOOL SOUI_COM_API Decoder_Png_SCreateInstance(IObjRef **ppImgDecoderFactory);
 

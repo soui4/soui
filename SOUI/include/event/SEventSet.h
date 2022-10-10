@@ -54,7 +54,7 @@ class SOUI_EXP SEventSet {
 
     \exception AlreadyExistsException    Thrown if an Event already exists named \a name.
     */
-    void addEvent(DWORD dwEventID, LPCWSTR pszEventHandlerName);
+    BOOL addEvent(DWORD dwEventID, LPCWSTR pszEventHandlerName);
 
     /*!
     \brief
@@ -67,7 +67,7 @@ class SOUI_EXP SEventSet {
     \return
         Nothing.
     */
-    void removeEvent(DWORD dwEventID);
+    BOOL removeEvent(DWORD dwEventID);
 
     /*!
     \brief
