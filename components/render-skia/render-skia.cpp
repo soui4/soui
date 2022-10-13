@@ -786,7 +786,7 @@ namespace SOUI
 			SkRect2RECT(rc,&rcSrc);
 		}
 		OffsetRect(&rcSrc,ptSrcOrg.x,ptSrcOrg.y);
-		return DrawBitmapEx(pRcDest,pBmp,&rcSrc,EM_STRETCH,byAlpha);
+		return DrawBitmapEx(pRcDest,pBmp,&rcSrc,MAKELONG(EM_STRETCH,kUndef_FilterLevel),byAlpha);
 	}
 
 	HRESULT SRenderTarget_Skia::DrawBitmapEx( LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,UINT expendMode, BYTE byAlpha/*=0xFF*/ )
@@ -812,7 +812,8 @@ namespace SOUI
 		paint.setAlpha(byAlpha);
 
 		SkPaint::FilterLevel fl = (SkPaint::FilterLevel)HIWORD(expendMode);//SkPaint::kNone_FilterLevel;
-		paint.setFilterLevel(fl);
+		if(fl != kUndef_FilterLevel)
+			paint.setFilterLevel(fl);
 
 		if(expendModeLow == EM_STRETCH)
 		{
@@ -1392,6 +1393,11 @@ namespace SOUI
 		m.preTranslate(-m_ptOrg.fX, -m_ptOrg.fY);
 		m.postTranslate(m_ptOrg.fX, m_ptOrg.fY);
 		m_SkCanvas->setMatrix(m);
+		if(m.isIdentity()){
+			m_paint.setFilterLevel(SkPaint::kNone_FilterLevel);
+		}else{
+			m_paint.setFilterLevel(SkPaint::kHigh_FilterLevel);
+		}
 		return S_OK;
 	}
 

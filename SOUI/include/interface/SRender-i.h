@@ -19,6 +19,7 @@ typedef enum EXPEND_MODE
 
 typedef enum FilterLevel
 {
+	kUndef_FilterLevel = 100,//don't use -1 as filter level will pass to render in word and will get 65535
     kNone_FilterLevel = 0,
     kLow_FilterLevel,
     kMedium_FilterLevel,

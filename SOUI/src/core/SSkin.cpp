@@ -15,7 +15,7 @@ SSkinImgList::SSkinImgList()
     : m_nStates(1)
     , m_bTile(FALSE)
     , m_bVertical(FALSE)
-    , m_filterLevel(kNone_FilterLevel)
+    , m_filterLevel(kUndef_FilterLevel)
     , m_bAutoFit(TRUE)
     , m_bLazyLoad(FALSE)
 {
