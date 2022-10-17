@@ -29,7 +29,7 @@ DECLARE_INTERFACE_(IRunnable, IObjRef)
      * @brief clone当前对象
      * @return IRunnable *--clone得到的新对象
      */
-    STDMETHOD_(IRunnable *, clone)(THIS) SCONST PURE;
+    STDMETHOD_(IRunnable *, clone)(CTHIS) SCONST PURE;
 
     /**
      * @brief 运行该对象
@@ -47,7 +47,7 @@ DECLARE_INTERFACE_(IRunnable, IObjRef)
      * @brief 获取runnable的描述
      * @return const char *--描述
      */
-    STDMETHOD_(const char *, getClassInfo)(THIS) SCONST PURE;
+    STDMETHOD_(const char *, getClassInfo)(CTHIS) SCONST PURE;
 };
 
 typedef enum Priority
@@ -116,7 +116,7 @@ DECLARE_INTERFACE_(ITaskLoop, IObjRef)
      * get the total task number in the task loop queue.
      * @return total task number in task loop queue
      */
-    STDMETHOD_(int, getTaskCount)(THIS) SCONST PURE;
+    STDMETHOD_(int, getTaskCount)(CTHIS) SCONST PURE;
 
     /**
      * get the run loop status.

@@ -93,14 +93,14 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
      * Describe
      */
     STDMETHOD_(int, tr)
-    (THIS_ const IStringW *strSrc, const IStringW *strCtx, wchar_t *pszOut, int nLen) SCONST PURE;
+    (CTHIS_ const IStringW *strSrc, const IStringW *strCtx, wchar_t *pszOut, int nLen) SCONST PURE;
 
     /**
      * @brief 获取翻译的默认字体信息
      * @param [out] strFont IStringW *--字体信息
      * @return
      */
-    STDMETHOD_(void, getFontInfo)(THIS_ IStringW * strFont) SCONST PURE;
+    STDMETHOD_(void, getFontInfo)(CTHIS_ IStringW * strFont) SCONST PURE;
 };
 
 /**
@@ -143,7 +143,7 @@ DECLARE_INTERFACE_(ITranslatorMgr, IObjRef)
      *
      * Describe
      */
-    STDMETHOD_(void, GetLanguage)(THIS_ wchar_t szOut[TR_MAX_NAME_LEN]) SCONST PURE;
+    STDMETHOD_(void, GetLanguage)(CTHIS_ wchar_t szOut[TR_MAX_NAME_LEN]) SCONST PURE;
 
     /**
      * CreateTranslator
@@ -184,7 +184,7 @@ DECLARE_INTERFACE_(ITranslatorMgr, IObjRef)
      * Describe  调用ITranslator的tr接口执行具体翻译过程
      */
     STDMETHOD_(int, tr)
-    (THIS_ const IStringW *strSrc, const IStringW *strCtx, wchar_t *pszOut, int nLen) SCONST PURE;
+    (CTHIS_ const IStringW *strSrc, const IStringW *strCtx, wchar_t *pszOut, int nLen) SCONST PURE;
 };
 
 SNSEND

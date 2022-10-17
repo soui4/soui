@@ -52,33 +52,33 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
      * @brief 获取总高度
      * @return int--总高度
      */
-    STDMETHOD_(int, GetTotalHeight)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetTotalHeight)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取总宽度
      * @return int--总宽度
      */
-    STDMETHOD_(int, GetTotalWidth)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetTotalWidth)(CTHIS) SCONST PURE;
 
     /**
      * @brief 从列表项转换为显示位置
      * @param hItem HSTREEITEM--树列表项
      * @return int--显示位置
      */
-    STDMETHOD_(int, Item2Position)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(int, Item2Position)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 显示位置转换成列表项
      * @param position int--显示位置
      * @return
      */
-    STDMETHOD_(HSTREEITEM, Position2Item)(THIS_ int position) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, Position2Item)(CTHIS_ int position) SCONST PURE;
 
     /**
      * @brief 获取滚动行大小
      * @return int--滚动行大小
      */
-    STDMETHOD_(int, GetScrollLineSize)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetScrollLineSize)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置表项宽度
@@ -93,7 +93,7 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
      * @param hItem HSTREEITEM--表项
      * @return int--表项宽度
      */
-    STDMETHOD_(int, GetItemWidth)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(int, GetItemWidth)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 设置表项高度
@@ -108,14 +108,14 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
      * @param hItem HSTREEITEM--表项
      * @return int--表项高度
      */
-    STDMETHOD_(int, GetItemHeight)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(int, GetItemHeight)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取表项缩进
      * @param hItem HSTREEITEM--表项
      * @return int--表项缩进
      */
-    STDMETHOD_(int, GetItemIndent)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(int, GetItemIndent)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 };
 
 SNSEND

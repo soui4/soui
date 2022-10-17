@@ -31,15 +31,15 @@ enum ENUM_LOG_LEVEL
 DECLARE_INTERFACE(IOutputFileBuilder)
 {
     //每个月创建log文件夹
-    STDMETHOD_(BOOL, monthDir)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, monthDir)(CTHIS) SCONST PURE;
 
     //每天创建log文件
-    STDMETHOD_(BOOL, dayLog)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, dayLog)(CTHIS) SCONST PURE;
 
     //生成LOG文件名
     //至少应该包含pszLogName，及curFileIndex这两个参数
     STDMETHOD_(BOOL, buildOutputFile)
-    (THIS_ char *pszFileName, int nLen, struct tm time, const char *pszLogName, unsigned long pid, int curFileIndex) SCONST PURE;
+    (CTHIS_ char *pszFileName, int nLen, struct tm time, const char *pszLogName, unsigned long pid, int curFileIndex) SCONST PURE;
 };
 
 #undef INTERFACE

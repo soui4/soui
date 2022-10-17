@@ -160,7 +160,7 @@ DECLARE_INTERFACE_(IRenderObj, IObjRef)
      * @return   IRenderFactory * -- 类厂
      * Describe
      */
-    STDMETHOD_(IRenderFactory *, GetRenderFactory)(THIS) SCONST PURE;
+    STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
     /**
      * ObjectType
@@ -168,7 +168,7 @@ DECLARE_INTERFACE_(IRenderObj, IObjRef)
      * @return   const UINT
      * Describe
      */
-    STDMETHOD_(OBJTYPE, ObjectType)(THIS) SCONST PURE;
+    STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 };
 
 /**
@@ -202,7 +202,7 @@ DECLARE_INTERFACE_(IBrushS, IRenderObj)
      * @return   IRenderFactory * -- 类厂
      * Describe
      */
-    STDMETHOD_(IRenderFactory *, GetRenderFactory)(THIS) SCONST PURE;
+    STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
     /**
      * ObjectType
@@ -210,7 +210,7 @@ DECLARE_INTERFACE_(IBrushS, IRenderObj)
      * @return   const UINT
      * Describe
      */
-    STDMETHOD_(OBJTYPE, ObjectType)(THIS) SCONST PURE;
+    STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 };
 
 /**
@@ -244,7 +244,7 @@ DECLARE_INTERFACE_(IPenS, IRenderObj)
      * @return   IRenderFactory * -- 类厂
      * Describe
      */
-    STDMETHOD_(IRenderFactory *, GetRenderFactory)(THIS) SCONST PURE;
+    STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
     /**
      * ObjectType
@@ -252,17 +252,17 @@ DECLARE_INTERFACE_(IPenS, IRenderObj)
      * @return   const UINT
      * Describe
      */
-    STDMETHOD_(OBJTYPE, ObjectType)(THIS) SCONST PURE;
+    STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(int, GetWidth)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetWidth)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, SetWidth)(THIS_ int nWid) PURE;
 
-    STDMETHOD_(int, GetStyle)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetStyle)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, SetStyle)(THIS_ int nStyle) PURE;
 
-    STDMETHOD_(COLORREF, GetColor)(THIS) SCONST PURE;
+    STDMETHOD_(COLORREF, GetColor)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, SetColor)(THIS_ COLORREF cr) PURE;
 };
@@ -298,7 +298,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * @return   IRenderFactory * -- 类厂
      * Describe
      */
-    STDMETHOD_(IRenderFactory *, GetRenderFactory)(THIS) SCONST PURE;
+    STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
     /**
      * ObjectType
@@ -306,7 +306,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * @return   const UINT
      * Describe
      */
-    STDMETHOD_(OBJTYPE, ObjectType)(THIS) SCONST PURE;
+    STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
     /**
      * Init
@@ -353,7 +353,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * @return   UINT -- 图片宽度
      * Describe
      */
-    STDMETHOD_(UINT, Width)(THIS) SCONST PURE;
+    STDMETHOD_(UINT, Width)(CTHIS) SCONST PURE;
 
     /**
      * Height
@@ -361,7 +361,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * @return   UINT -- 图片高度
      * Describe
      */
-    STDMETHOD_(UINT, Height)(THIS) SCONST PURE;
+    STDMETHOD_(UINT, Height)(CTHIS) SCONST PURE;
 
     /**
      * Size
@@ -369,7 +369,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * @return   SIZE -- 图片高度及宽度
      * Describe
      */
-    STDMETHOD_(SIZE, Size)(THIS) SCONST PURE;
+    STDMETHOD_(SIZE, Size)(CTHIS) SCONST PURE;
 
     /**
      * LockPixelBits
@@ -394,7 +394,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * @return   LPVOID -- 位图数据地址
      * Describe
      */
-    STDMETHOD_(const LPVOID, GetPixelBits)(THIS) SCONST PURE;
+    STDMETHOD_(const LPVOID, GetPixelBits)(CTHIS) SCONST PURE;
 
     /**
      * Clone
@@ -403,7 +403,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * @return   HRESULT
      * Describe  成功后，调用者执行IBitmap::Release
      */
-    STDMETHOD_(HRESULT, Clone)(THIS_ IBitmapS * *ppClone) SCONST PURE;
+    STDMETHOD_(HRESULT, Clone)(CTHIS_ IBitmapS * *ppClone) SCONST PURE;
 
     /**
      * Scale
@@ -415,7 +415,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * Describe  成功后，调用者执行IBitmap::Release
      */
     STDMETHOD_(HRESULT, Scale)
-    (THIS_ IBitmapS * *pOutput, int nScale, FilterLevel filterLevel) SCONST PURE;
+    (CTHIS_ IBitmapS * *pOutput, int nScale, FilterLevel filterLevel) SCONST PURE;
 
     /**
      * Scale
@@ -428,7 +428,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * Describe  成功后，调用者执行IBitmap::Release
      */
     STDMETHOD_(HRESULT, Scale2)
-    (THIS_ IBitmapS * *pOutput, int nWid, int nHei, FilterLevel filterLevel) SCONST PURE;
+    (CTHIS_ IBitmapS * *pOutput, int nWid, int nHei, FilterLevel filterLevel) SCONST PURE;
 
     /**
      * 将位图保存到文件
@@ -438,7 +438,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * @return   HRESULT -- S_OK: succeed
      * Describe
      */
-    STDMETHOD_(HRESULT, Save)(THIS_ LPCWSTR pszFileName, const LPVOID pFormat) SCONST PURE;
+    STDMETHOD_(HRESULT, Save)(CTHIS_ LPCWSTR pszFileName, const LPVOID pFormat) SCONST PURE;
 };
 
 typedef IBitmapS *IBitmapPtr;
@@ -480,7 +480,7 @@ DECLARE_INTERFACE_(IFontS, IRenderObj)
      * @return   IRenderFactory * -- 类厂
      * Describe
      */
-    STDMETHOD_(IRenderFactory *, GetRenderFactory)(THIS) SCONST PURE;
+    STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
     /**
      * ObjectType
@@ -488,7 +488,7 @@ DECLARE_INTERFACE_(IFontS, IRenderObj)
      * @return   const UINT
      * Describe
      */
-    STDMETHOD_(OBJTYPE, ObjectType)(THIS) SCONST PURE;
+    STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
     /**
      * LogFont
@@ -496,7 +496,7 @@ DECLARE_INTERFACE_(IFontS, IRenderObj)
      * @return   const LOGFONT * -- 包含字体信息的LOGFONT*
      * Describe
      */
-    STDMETHOD_(const LOGFONT *, LogFont)(THIS) SCONST PURE;
+    STDMETHOD_(const LOGFONT *, LogFont)(CTHIS) SCONST PURE;
 
     /**
      * FamilyName
@@ -504,7 +504,7 @@ DECLARE_INTERFACE_(IFontS, IRenderObj)
      * @return   LPCTSTR -- 字体名
      * Describe
      */
-    STDMETHOD_(LPCTSTR, FamilyName)(THIS) SCONST PURE;
+    STDMETHOD_(LPCTSTR, FamilyName)(CTHIS) SCONST PURE;
 
     /**
      * TextSize
@@ -512,7 +512,7 @@ DECLARE_INTERFACE_(IFontS, IRenderObj)
      * @return   int -- 字体大小
      * Describe
      */
-    STDMETHOD_(int, TextSize)(THIS) SCONST PURE;
+    STDMETHOD_(int, TextSize)(CTHIS) SCONST PURE;
 
     /**
      * IsBold
@@ -520,7 +520,7 @@ DECLARE_INTERFACE_(IFontS, IRenderObj)
      * @return   BOOL -- true为粗体，false正常
      * Describe
      */
-    STDMETHOD_(BOOL, IsBold)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsBold)(CTHIS) SCONST PURE;
 
     /**
      * IsUnderline
@@ -528,7 +528,7 @@ DECLARE_INTERFACE_(IFontS, IRenderObj)
      * @return   BOOL -- true有下划线，false正常
      * Describe
      */
-    STDMETHOD_(BOOL, IsUnderline)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsUnderline)(CTHIS) SCONST PURE;
 
     /**
      * IsItalic
@@ -536,7 +536,7 @@ DECLARE_INTERFACE_(IFontS, IRenderObj)
      * @return   BOOL -- true为斜体，false正常
      * Describe
      */
-    STDMETHOD_(BOOL, IsItalic)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsItalic)(CTHIS) SCONST PURE;
 
     /**
      * StrikeOut
@@ -544,7 +544,7 @@ DECLARE_INTERFACE_(IFontS, IRenderObj)
      * @return   BOOL -- true有删除线
      * Describe
      */
-    STDMETHOD_(BOOL, IsStrikeOut)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsStrikeOut)(CTHIS) SCONST PURE;
 
     STDMETHOD_(BOOL, UpdateFont)(THIS_ const LOGFONT *pLogFont) PURE;
 
@@ -582,7 +582,7 @@ DECLARE_INTERFACE_(IRegionS, IRenderObj)
      * @return   IRenderFactory * -- 类厂
      * Describe
      */
-    STDMETHOD_(IRenderFactory *, GetRenderFactory)(THIS) SCONST PURE;
+    STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
     /**
      * ObjectType
@@ -590,7 +590,7 @@ DECLARE_INTERFACE_(IRegionS, IRenderObj)
      * @return   const UINT
      * Describe
      */
-    STDMETHOD_(OBJTYPE, ObjectType)(THIS) SCONST PURE;
+    STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
     /**
      * CombineRect
@@ -625,7 +625,7 @@ DECLARE_INTERFACE_(IRegionS, IRenderObj)
      * @return   BOOL -- true在region内
      * Describe
      */
-    STDMETHOD_(BOOL, PtInRegion)(THIS_ POINT pt) SCONST PURE;
+    STDMETHOD_(BOOL, PtInRegion)(CTHIS_ POINT pt) SCONST PURE;
 
     /**
      * RectInRegion
@@ -634,7 +634,7 @@ DECLARE_INTERFACE_(IRegionS, IRenderObj)
      * @return   BOOL -- true在region内
      * Describe
      */
-    STDMETHOD_(BOOL, RectInRegion)(THIS_ LPCRECT lprect) SCONST PURE;
+    STDMETHOD_(BOOL, RectInRegion)(CTHIS_ LPCRECT lprect) SCONST PURE;
 
     /**
      * GetRgnBox
@@ -643,7 +643,7 @@ DECLARE_INTERFACE_(IRegionS, IRenderObj)
      * @return   void
      * Describe
      */
-    STDMETHOD_(void, GetRgnBox)(THIS_ LPRECT lprect) SCONST PURE;
+    STDMETHOD_(void, GetRgnBox)(CTHIS_ LPRECT lprect) SCONST PURE;
 
     /**
      * IsEmpty
@@ -651,7 +651,7 @@ DECLARE_INTERFACE_(IRegionS, IRenderObj)
      * @return   BOOL -- true为空
      * Describe
      */
-    STDMETHOD_(BOOL, IsEmpty)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsEmpty)(CTHIS) SCONST PURE;
 
     /**
      * Offset
@@ -676,7 +676,7 @@ DECLARE_INTERFACE_(IRegionS, IRenderObj)
      * @return   BOOL, true-this and testRgn are equal
      * Describe
      */
-    STDMETHOD_(BOOL, IsEqual)(THIS_ const IRegionS *testRgn) SCONST PURE;
+    STDMETHOD_(BOOL, IsEqual)(CTHIS_ const IRegionS *testRgn) SCONST PURE;
 };
 
 typedef enum _xFormIndex
@@ -702,8 +702,8 @@ typedef struct _IxForm
 #define INTERFACE IPathInfo
 DECLARE_INTERFACE_(IPathInfo, IObjRef)
 {
-    STDMETHOD_(int, pointNumber)(THIS) SCONST PURE;
-    STDMETHOD_(const float *, data)(THIS) SCONST PURE;
+    STDMETHOD_(int, pointNumber)(CTHIS) SCONST PURE;
+    STDMETHOD_(const float *, data)(CTHIS) SCONST PURE;
 };
 
 typedef enum _FillType
@@ -780,7 +780,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      * @return   IRenderFactory * -- 类厂
      * Describe
      */
-    STDMETHOD_(IRenderFactory *, GetRenderFactory)(THIS) SCONST PURE;
+    STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
     /**
      * ObjectType
@@ -788,14 +788,14 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      * @return   const UINT
      * Describe
      */
-    STDMETHOD_(OBJTYPE, ObjectType)(THIS) SCONST PURE;
+    STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
     /** Return the path's fill type. This is used to define how "inside" is
     computed. The default value is kWinding_FillType.
 
     @return the path's fill type
     */
-    STDMETHOD_(FillType, getFillType)(THIS) SCONST PURE;
+    STDMETHOD_(FillType, getFillType)(CTHIS) SCONST PURE;
 
     /** Set the path's fill type. This is used to define how "inside" is
     computed. The default value is kWinding_FillType.
@@ -805,7 +805,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     STDMETHOD_(void, setFillType)(THIS_ FillType ft) PURE;
 
     /** Returns true if the filltype is one of the Inverse variants */
-    STDMETHOD_(BOOL, isInverseFillType)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isInverseFillType)(CTHIS) SCONST PURE;
 
     /**
      *  Toggle between inverse and normal filltypes. This reverse the return
@@ -817,7 +817,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *  Return the path's convexity, as stored in the path. If it is currently unknown,
      *  then this function will attempt to compute the convexity (and cache the result).
      */
-    STDMETHOD_(Convexity, getConvexity)(THIS) SCONST PURE;
+    STDMETHOD_(Convexity, getConvexity)(CTHIS) SCONST PURE;
 
     /**
      *  Store a convexity setting in the path. There is no automatic check to
@@ -834,7 +834,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *  Returns true if the path is flagged as being convex. This is not a
      *  confirmed by any analysis, it is just the value set earlier.
      */
-    STDMETHOD_(BOOL, isConvex)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isConvex)(CTHIS) SCONST PURE;
 
     /** Returns true if the path is an oval.
      *
@@ -846,7 +846,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *              optimization for performance and so some paths that are in
      *              fact ovals can report false.
      */
-    STDMETHOD_(BOOL, isOval)(THIS_ RECT * rect) SCONST PURE;
+    STDMETHOD_(BOOL, isOval)(CTHIS_ RECT * rect) SCONST PURE;
 
     /** Clear any lines and curves from the path, making it empty. This frees up
     internal storage associated with those segments.
@@ -865,13 +865,13 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
 
     @return true if the path is empty (contains no lines or curves)
     */
-    STDMETHOD_(BOOL, isEmpty)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isEmpty)(CTHIS) SCONST PURE;
 
     /**
      *  Returns true if all of the points in this path are finite, meaning there
      *  are no infinities and no NaNs.
      */
-    STDMETHOD_(BOOL, isFinite)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isFinite)(CTHIS) SCONST PURE;
 
     /**
      *  Returns true if the path specifies a single line (i.e. it contains just
@@ -879,7 +879,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *  points in line[] to the end-points of the line. If the path is not a
      *  line, returns false and ignores line[].
      */
-    STDMETHOD_(BOOL, isLine)(THIS_ POINT line[2]) SCONST PURE;
+    STDMETHOD_(BOOL, isLine)(CTHIS_ POINT line[2]) SCONST PURE;
 
     /** Returns true if the path specifies a rectangle. If so, and if rect is
     not null, set rect to the bounds of the path. If the path does not
@@ -889,17 +889,17 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     a rectangle
     @return true if the path specifies a rectangle
     */
-    STDMETHOD_(BOOL, isRect)(THIS_ RECT * rect) SCONST PURE;
+    STDMETHOD_(BOOL, isRect)(CTHIS_ RECT * rect) SCONST PURE;
 
     /** Return the number of points in the path
      */
-    STDMETHOD_(int, countPoints)(THIS) SCONST PURE;
+    STDMETHOD_(int, countPoints)(CTHIS) SCONST PURE;
 
     /** Return the point at the specified index. If the index is out of range
     (i.e. is not 0 <= index < countPoints()) then the returned coordinates
     will be (0,0)
     */
-    STDMETHOD_(fPoint, getPoint)(THIS_ int index) SCONST PURE;
+    STDMETHOD_(fPoint, getPoint)(CTHIS_ int index) SCONST PURE;
 
     /** Returns the number of points in the path. Up to max points are copied.
 
@@ -907,11 +907,11 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     @param max The maximum number of points to copy into points
     @return the actual number of points in the path
     */
-    STDMETHOD_(int, getPoints)(THIS_ fPoint points[], int max) SCONST PURE;
+    STDMETHOD_(int, getPoints)(CTHIS_ fPoint points[], int max) SCONST PURE;
 
     /** Return the number of verbs in the path
      */
-    STDMETHOD_(int, countVerbs)(THIS) SCONST PURE;
+    STDMETHOD_(int, countVerbs)(CTHIS) SCONST PURE;
 
     /** Returns the number of verbs in the path. Up to max verbs are copied. The
     verbs are copied as one byte per verb.
@@ -920,14 +920,14 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     @param max The maximum number of verbs to copy into verbs
     @return the actual number of verbs in the path
     */
-    STDMETHOD_(int, getVerbs)(THIS_ BYTE verbs[], int max) SCONST PURE;
+    STDMETHOD_(int, getVerbs)(CTHIS_ BYTE verbs[], int max) SCONST PURE;
 
     /** Returns the bounds of the path's points. If the path contains 0 or 1
     points, the bounds is set to (0,0,0,0), and isEmpty() will return true.
     Note: this bounds may be larger than the actual shape, since curves
     do not extend as far as their control points.
     */
-    STDMETHOD_(RECT, getBounds)(THIS) SCONST PURE;
+    STDMETHOD_(RECT, getBounds)(CTHIS) SCONST PURE;
 
     //  Construction methods
 
@@ -1068,7 +1068,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     @param direction If not null, set to the rectangle's direction
     @return true if the path specifies a rectangle
     */
-    STDMETHOD_(BOOL, isRect2)(THIS_ BOOL * isClosed, Direction * direction) SCONST PURE;
+    STDMETHOD_(BOOL, isRect2)(CTHIS_ BOOL * isClosed, Direction * direction) SCONST PURE;
 
     /**
      *  Add a closed rectangle contour to the path
@@ -1198,7 +1198,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
 
     @param lastPt   The last point on the path is returned here
     */
-    STDMETHOD_(BOOL, getLastPt)(THIS_ POINT * lastPt) SCONST PURE;
+    STDMETHOD_(BOOL, getLastPt)(CTHIS_ POINT * lastPt) SCONST PURE;
 
     /** Set the last point on the path. If no points have been added,
     moveTo(x,y) is automatically called.
@@ -1406,7 +1406,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      *
      * Describe
      */
-    STDMETHOD_(HRESULT, GetTransform)(THIS_ float matrix[9]) SCONST PURE;
+    STDMETHOD_(HRESULT, GetTransform)(CTHIS_ float matrix[9]) SCONST PURE;
 
     /**
      * GetPixel
@@ -1468,7 +1468,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
 
     STDMETHOD_(HRESULT, SetXfermode)(THIS_ int mode, int *pOldMode DEF_VAL(NULL)) PURE;
     STDMETHOD_(BOOL, SetAntiAlias)(THIS_ BOOL bAntiAlias) PURE;
-    STDMETHOD_(BOOL, GetAntiAlias)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, GetAntiAlias)(CTHIS) SCONST PURE;
 };
 
 /**

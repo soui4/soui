@@ -113,31 +113,31 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @brief 获取宿主窗口半透明标志
      * @return TRUE--宿主窗口半透明
      */
-    STDMETHOD_(BOOL, IsTranslucent)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsTranslucent)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取将mouseWheel消息分发到hover窗口的标志
      * @return TRUE--mouseWheel消息发到hover窗口，FALSE--mouseWheel分发到焦点窗口
      */
-    STDMETHOD_(BOOL, IsSendWheel2Hover)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsSendWheel2Hover)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取当前dpi放大倍数
      * @return int--放大倍数
      */
-    STDMETHOD_(int, GetScale)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetScale)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取翻译上下文
      * @return LPCWSTR--翻译上下文
      */
-    STDMETHOD_(LPCWSTR, GetTranslatorContext)(THIS) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetTranslatorContext)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取容器显示位置
      * @return RECT--容器显示位置
      */
-    STDMETHOD_(RECT, GetContainerRect)(THIS) SCONST PURE;
+    STDMETHOD_(RECT, GetContainerRect)(CTHIS) SCONST PURE;
 
     /**
      * @brief 请求IRenderTarget对象
@@ -175,7 +175,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @brief 获取捕获鼠标的Swnd对象
      * @return SWND--捕获鼠标的Swnd对象
      */
-    STDMETHOD_(SWND, OnGetSwndCapture)(THIS) SCONST PURE;
+    STDMETHOD_(SWND, OnGetSwndCapture)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置捕获鼠标的Swnd对象
@@ -194,13 +194,13 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @brief 获取Hover的Swnd
      * @return SWND--Hover的Swnd
      */
-    STDMETHOD_(SWND, GetHover)(THIS) SCONST PURE;
+    STDMETHOD_(SWND, GetHover)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取焦点的Swnd
      * @return SWND--焦点的Swnd
      */
-    STDMETHOD_(SWND, GetFocus)(THIS) SCONST PURE;
+    STDMETHOD_(SWND, GetFocus)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置窗口焦点
@@ -226,7 +226,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @param [in,out] rc RECT*--待转换的矩形
      * @return
      */
-    STDMETHOD_(void, FrameToHost)(THIS_ RECT * rc) SCONST PURE;
+    STDMETHOD_(void, FrameToHost)(CTHIS_ RECT * rc) SCONST PURE;
 
     /**
      * @brief 获取加速键管理器

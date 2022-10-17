@@ -17,7 +17,7 @@ DECLARE_INTERFACE_IID_(IAccHelper, IUnknown, "9FAF3067-6723-40DA-A56B-CDCB11B890
     STDMETHOD_(ULONG, Release)(THIS) PURE;
 
     STDMETHOD_(void, SetOwner)(THIS_ IWindow * pOwner) PURE;
-    STDMETHOD_(IWindow *, GetOwner)(THIS) SCONST PURE;
+    STDMETHOD_(IWindow *, GetOwner)(CTHIS) SCONST PURE;
 };
 
 SNSEND

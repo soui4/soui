@@ -22,7 +22,7 @@
      * @return   BOOL -- true是测试类型
      * Describe
      */
-    STDMETHOD_(BOOL, IsClass)(THIS_ LPCWSTR lpszName) SCONST PURE;
+    STDMETHOD_(BOOL, IsClass)(CTHIS_ LPCWSTR lpszName) SCONST PURE;
 
     /**
      * GetObjectClass
@@ -30,7 +30,7 @@
      * @return   LPCWSTR -- 类型名
      * Describe  这是一个虚函数，注意与GetClassName的区别。
      */
-    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetObjectClass)(CTHIS) SCONST PURE;
 
     /**
      * GetObjectType
@@ -38,7 +38,7 @@
      * @return   int -- 对象类型
      * Describe  这是一个虚函数，注意与GetClassType的区别。
      */
-    STDMETHOD_(int, GetObjectType)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetObjectType)(CTHIS) SCONST PURE;
 
     /**
      * GetID
@@ -46,7 +46,7 @@
      * @return   int -- 对象ID
      * Describe
      */
-    STDMETHOD_(int, GetID)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetID)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置对象ID
@@ -61,7 +61,7 @@
      * @return   LPCWSTR -- 对象Name
      * Describe
      */
-    STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetName)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置对象Name
@@ -131,7 +131,7 @@
      * @return   BOOL, TRUE:获取成功，FALSE:获取失败，属性不存在
      * Describe  默认返回空
      */
-    STDMETHOD_(BOOL, GetAttribute)(THIS_ LPCWSTR strAttr, IStringW *pValue) SCONST PURE;
+    STDMETHOD_(BOOL, GetAttribute)(CTHIS_ LPCWSTR strAttr, IStringW *pValue) SCONST PURE;
 
     /**
      * OnAttribute

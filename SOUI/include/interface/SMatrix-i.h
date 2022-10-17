@@ -11,7 +11,7 @@ DECLARE_INTERFACE(IMatrix)
      * @brief 获取矩阵数据
      * @return IxForm *--矩阵数据
      */
-    STDMETHOD_(IxForm *, Data)(THIS) SCONST PURE;
+    STDMETHOD_(IxForm *, Data)(CTHIS) SCONST PURE;
 
     /**
      * @brief 清空矩阵
@@ -29,7 +29,7 @@ DECLARE_INTERFACE(IMatrix)
      * @brief 判断矩阵是否为单位矩阵
      * @return TRUE--矩阵是单位矩阵
      */
-    STDMETHOD_(BOOL, isIdentity)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isIdentity)(CTHIS) SCONST PURE;
 
     /**
      * @brief Set the matrix to translate by (dx, dy).

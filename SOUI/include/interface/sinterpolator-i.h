@@ -17,6 +17,6 @@ DECLARE_INTERFACE_(IInterpolator, IObject)
      * @return   float -- 输出插值结果
      * Describe
      */
-    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST PURE;
+    STDMETHOD_(float, getInterpolation)(CTHIS_ float input) SCONST PURE;
 };
 SNSEND

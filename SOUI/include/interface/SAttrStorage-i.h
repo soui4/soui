@@ -27,7 +27,7 @@ DECLARE_INTERFACE_(IAttrStorage, IObjRef)
 
     STDMETHOD_(void, OnSetAttribute)
     (THIS_ const IStringW *strName, const IStringW *strValue, BOOL bHandled) PURE;
-    STDMETHOD_(BOOL, OnGetAttribute)(THIS_ const IStringW *strName, IStringW *strValue) SCONST PURE;
+    STDMETHOD_(BOOL, OnGetAttribute)(CTHIS_ const IStringW *strName, IStringW *strValue) SCONST PURE;
 };
 
 #undef INTERFACE
@@ -50,7 +50,7 @@ DECLARE_INTERFACE_(IAttrStorageFactory, IObjRef)
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     STDMETHOD_(HRESULT, CreateAttrStorage)
-    (THIS_ IWindow * owner, IAttrStorage * *ppAttrStorage) SCONST PURE;
+    (CTHIS_ IWindow * owner, IAttrStorage * *ppAttrStorage) SCONST PURE;
 };
 
 SNSEND

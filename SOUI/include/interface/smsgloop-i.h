@@ -56,7 +56,7 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
 
     STDMETHOD_(int, Run)(THIS) PURE;
 
-    STDMETHOD_(BOOL, IsRunning)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsRunning)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, OnMsg)(THIS_ LPMSG pMsg) PURE;
 

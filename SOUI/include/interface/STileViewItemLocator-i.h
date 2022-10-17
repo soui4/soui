@@ -41,7 +41,7 @@ DECLARE_INTERFACE_(ITileViewItemLocator, IObjRef)
      * @param iItem int -- 表项索引
      * @return int--表项高度
      */
-    STDMETHOD_(int, GetItemHeight)(THIS_ int iItem) SCONST PURE;
+    STDMETHOD_(int, GetItemHeight)(CTHIS_ int iItem) SCONST PURE;
 
     /**
      * @brief 设定表项的高度
@@ -122,13 +122,13 @@ DECLARE_INTERFACE_(ITileViewItemLocator, IObjRef)
      * @brief 获取行滚动高度
      * @return int--行滚动高度
      */
-    STDMETHOD_(int, GetScrollLineSize)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetScrollLineSize)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取列表边距
      * @return int--列表边距
      */
-    STDMETHOD_(int, GetMarginSize)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetMarginSize)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置放大倍数
@@ -141,19 +141,19 @@ DECLARE_INTERFACE_(ITileViewItemLocator, IObjRef)
      * @brief 获取列数
      * @return int--列数
      */
-    STDMETHOD_(int, GetCountInRow)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetCountInRow)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取行高
      * @return int--行高
      */
-    STDMETHOD_(int, GetItemLineHeight)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetItemLineHeight)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取表项显示宽度
      * @return int--表项显示宽度
      */
-    STDMETHOD_(int, GetItemWidth)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetItemWidth)(CTHIS) SCONST PURE;
 };
 
 SNSEND

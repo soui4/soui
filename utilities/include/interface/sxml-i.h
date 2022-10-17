@@ -25,17 +25,17 @@ DECLARE_INTERFACE_(IXmlAttr,IObjRef)
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
 
-	STDMETHOD_(LPVOID,GetPrivPtr)(THIS) SCONST PURE;
+	STDMETHOD_(LPVOID,GetPrivPtr)(CTHIS) SCONST PURE;
 
 	// Check if attribute is empty
-	STDMETHOD_(BOOL,Empty)(THIS) SCONST PURE;
+	STDMETHOD_(BOOL,Empty)(CTHIS) SCONST PURE;
 
 	// Get attribute name/value, or "" if attribute is empty
-	STDMETHOD_(const wchar_t*,Name)(THIS) SCONST PURE;
-	STDMETHOD_(const wchar_t*,Value)(THIS) SCONST PURE;
+	STDMETHOD_(const wchar_t*,Name)(CTHIS) SCONST PURE;
+	STDMETHOD_(const wchar_t*,Value)(CTHIS) SCONST PURE;
 
 	STDMETHOD_(BOOL,set_userdata)(THIS_ int data) PURE;
-	STDMETHOD_(int,get_userdata)(THIS) SCONST PURE;
+	STDMETHOD_(int,get_userdata)(CTHIS) SCONST PURE;
 
 	// Get next/previous attribute in the attribute list of the parent node
 	STDMETHOD_(IXmlAttr*,Next)(THIS) PURE;
@@ -74,36 +74,36 @@ DECLARE_INTERFACE_(IXmlNode,IObjRef)
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
 
-	STDMETHOD_(void,ToString)(THIS_ IStringW *out) SCONST PURE;
+	STDMETHOD_(void,ToString)(CTHIS_ IStringW *out) SCONST PURE;
 
-	STDMETHOD_(LPVOID,GetPrivPtr)(THIS) SCONST PURE;
+	STDMETHOD_(LPVOID,GetPrivPtr)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(BOOL,Empty)(THIS) SCONST PURE;
+	STDMETHOD_(BOOL,Empty)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(const wchar_t*,Name)(THIS) SCONST PURE;
+	STDMETHOD_(const wchar_t*,Name)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(const wchar_t*,Value)(THIS) SCONST PURE;
+	STDMETHOD_(const wchar_t*,Value)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(const wchar_t*,Text)(THIS) SCONST PURE;
+	STDMETHOD_(const wchar_t*,Text)(CTHIS) SCONST PURE;
 
 	STDMETHOD_(BOOL,set_userdata)(THIS_ int data) PURE;
-	STDMETHOD_(int,get_userdata)(THIS) SCONST PURE;
+	STDMETHOD_(int,get_userdata)(CTHIS) SCONST PURE;
 
 	// Get attribute list
-	STDMETHOD_(IXmlAttr*,Attribute)(THIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST PURE;
-	STDMETHOD_(IXmlAttr*,FirstAttribute)(THIS) SCONST PURE;
-	STDMETHOD_(IXmlAttr*,LastAttribute)(THIS) SCONST PURE;
+	STDMETHOD_(IXmlAttr*,Attribute)(CTHIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST PURE;
+	STDMETHOD_(IXmlAttr*,FirstAttribute)(CTHIS) SCONST PURE;
+	STDMETHOD_(IXmlAttr*,LastAttribute)(CTHIS) SCONST PURE;
 
 	// Get children list
-	STDMETHOD_(IXmlNode*,Child)(THIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST PURE;
-	STDMETHOD_(IXmlNode*, FirstChild)(THIS) SCONST PURE;
-	STDMETHOD_(IXmlNode*, LastChild)(THIS) SCONST PURE;
+	STDMETHOD_(IXmlNode*,Child)(CTHIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST PURE;
+	STDMETHOD_(IXmlNode*, FirstChild)(CTHIS) SCONST PURE;
+	STDMETHOD_(IXmlNode*, LastChild)(CTHIS) SCONST PURE;
 
 	// Get next/previous sibling in the children list of the parent node
-	STDMETHOD_(IXmlNode*, NextSibling)(THIS) SCONST PURE;
-	STDMETHOD_(IXmlNode*, PrevSibling)(THIS) SCONST PURE;
-	STDMETHOD_(IXmlNode*, NextSibling2)(THIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST PURE;
-	STDMETHOD_(IXmlNode*, PrevSibling2)(THIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST PURE;
+	STDMETHOD_(IXmlNode*, NextSibling)(CTHIS) SCONST PURE;
+	STDMETHOD_(IXmlNode*, PrevSibling)(CTHIS) SCONST PURE;
+	STDMETHOD_(IXmlNode*, NextSibling2)(CTHIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST PURE;
+	STDMETHOD_(IXmlNode*, PrevSibling2)(CTHIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST PURE;
 };
 
 typedef enum _XmlStatus
@@ -247,7 +247,7 @@ DECLARE_INTERFACE_(IXmlDoc,IObjRef)
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
 
 
-	STDMETHOD_(LPVOID,GetPrivPtr)(THIS) SCONST PURE;
+	STDMETHOD_(LPVOID,GetPrivPtr)(CTHIS) SCONST PURE;
 
 	STDMETHOD_(void,Reset)(THIS) PURE;
 
@@ -272,17 +272,17 @@ DECLARE_INTERFACE_(IXmlDoc,IObjRef)
 	// You should allocate the buffer with pugixml allocation function; document will free the buffer when it is no longer needed (you can't use it anymore).
 	STDMETHOD_(BOOL,LoadBufferInplaceOwn)(THIS_ void* contents, size_t size, unsigned int options , XmlEncoding encoding ) PURE;
 
-	STDMETHOD_(void,GetParseResult)(THIS_ XmlParseResult *pResult) SCONST PURE;
+	STDMETHOD_(void,GetParseResult)(CTHIS_ XmlParseResult *pResult) SCONST PURE;
 
 	// Save XML document to writer (semantics is slightly different from xml_node::print, see documentation for details).
-	STDMETHOD_(void,SaveBinary)(THIS_ FILE *f) SCONST PURE;
+	STDMETHOD_(void,SaveBinary)(CTHIS_ FILE *f) SCONST PURE;
 
 	// Save XML to file
-	STDMETHOD_(BOOL,SaveFileA)(THIS_ const char* path, const wchar_t* indent , unsigned int flags, XmlEncoding encoding) SCONST PURE;
-	STDMETHOD_(BOOL,SaveFileW)(THIS_ const wchar_t* path, const wchar_t* indent , unsigned int flags, XmlEncoding encoding) SCONST PURE;
+	STDMETHOD_(BOOL,SaveFileA)(CTHIS_ const char* path, const wchar_t* indent , unsigned int flags, XmlEncoding encoding) SCONST PURE;
+	STDMETHOD_(BOOL,SaveFileW)(CTHIS_ const wchar_t* path, const wchar_t* indent , unsigned int flags, XmlEncoding encoding) SCONST PURE;
 
 	// Get document element
-	STDMETHOD_(IXmlNode *,Root)(THIS) SCONST PURE;
+	STDMETHOD_(IXmlNode *,Root)(CTHIS) SCONST PURE;
 };
 
 SNSEND

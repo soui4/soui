@@ -21,7 +21,7 @@ DECLARE_INTERFACE(IAccelerator)
      * @return   WORD -- 加速键的修饰键
      * Describe
      */
-    STDMETHOD_(WORD, GetModifier)(THIS) SCONST PURE;
+    STDMETHOD_(WORD, GetModifier)(CTHIS) SCONST PURE;
 
     /**
      * GetKey
@@ -29,7 +29,7 @@ DECLARE_INTERFACE(IAccelerator)
      * @return   WORD -- 加速键的主键
      * Describe
      */
-    STDMETHOD_(WORD, GetKey)(THIS) SCONST PURE;
+    STDMETHOD_(WORD, GetKey)(CTHIS) SCONST PURE;
 
     /**
      * GetAcc
@@ -37,7 +37,7 @@ DECLARE_INTERFACE(IAccelerator)
      * @return   DWORD -- 加速键
      * Describe
      */
-    STDMETHOD_(DWORD, GetAcc)(THIS) SCONST PURE;
+    STDMETHOD_(DWORD, GetAcc)(CTHIS) SCONST PURE;
 };
 
 /**

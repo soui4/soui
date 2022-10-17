@@ -176,7 +176,7 @@ DECLARE_INTERFACE_(IImgDecoderFactory, IObjRef)
      * Describe
      */
     STDMETHOD_(HRESULT, SaveImage)
-    (THIS_ BYTE * pBits, int nWid, int nHei, LPCWSTR pszFileName, LPVOID pFormat) SCONST PURE;
+    (CTHIS_ BYTE * pBits, int nWid, int nHei, LPCWSTR pszFileName, LPVOID pFormat) SCONST PURE;
 
     /**
      * GetImgDecoderDesc
@@ -184,7 +184,7 @@ DECLARE_INTERFACE_(IImgDecoderFactory, IObjRef)
      * @return   LPCWSTR
      * Describe
      */
-    STDMETHOD_(LPCWSTR, GetDescription)(THIS) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetDescription)(CTHIS) SCONST PURE;
 };
 
 SNSEND

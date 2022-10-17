@@ -51,7 +51,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取SOUI容器句柄
      * @return SWND--SOUI容器句柄
      */
-    STDMETHOD_(SWND, GetSwnd)(THIS) SCONST PURE;
+    STDMETHOD_(SWND, GetSwnd)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取布局对象
@@ -63,7 +63,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取布局参数对象
      * @return ILayoutParam *--布局参数对象
      */
-    STDMETHOD_(ILayoutParam *, GetLayoutParam)(THIS) SCONST PURE;
+    STDMETHOD_(ILayoutParam *, GetLayoutParam)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置布局参数对象
@@ -77,26 +77,26 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取当前窗口参与自动布局标志
      * @return TRUE--参与布局,FALSE--不参与布局，需要用户在代码中手动布局
      */
-    STDMETHOD_(BOOL, IsFloat)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsFloat)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取隐藏占位标志
      * @return TRUE--窗口隐藏的时候占有该布局位置，FALSE--隐藏时不占位
      */
-    STDMETHOD_(BOOL, IsDisplay)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsDisplay)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取窗口是否处理鼠标消息
      * @return TRUE--鼠标消息透传给父窗口
      */
-    STDMETHOD_(BOOL, IsMsgTransparent)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsMsgTransparent)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取窗口是否自动剪裁客户区
      * @return TRUE--自动剪裁客户区
      * @remark 剪裁客户区可以限制窗口及它的子窗口绘制不超过当前窗口客户区，但是要增加一次剪裁操作
      */
-    STDMETHOD_(BOOL, IsClipClient)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsClipClient)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置tooltip
@@ -110,7 +110,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取窗口的check状态标志
      * @return TRUE--checked
      */
-    STDMETHOD_(BOOL, IsChecked)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsChecked)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置窗口check状态
@@ -123,7 +123,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取窗口的禁用状态
      * @return TRUE--窗口禁用
      */
-    STDMETHOD_(BOOL, IsDisabled)(THIS_ BOOL bCheckParent) SCONST PURE;
+    STDMETHOD_(BOOL, IsDisabled)(CTHIS_ BOOL bCheckParent) SCONST PURE;
 
     /**
      * @brief 设置窗口启用状态
@@ -137,7 +137,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取窗口的可见标志
      * @return TRUE--可见
      */
-    STDMETHOD_(BOOL, IsVisible)(THIS_ BOOL bCheckParent) SCONST PURE;
+    STDMETHOD_(BOOL, IsVisible)(CTHIS_ BOOL bCheckParent) SCONST PURE;
 
     /**
      * @brief 设置窗口可见标志
@@ -151,7 +151,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取窗口的用户数据
      * @return ULONG_PTR--用户数据
      */
-    STDMETHOD_(ULONG_PTR, GetUserData)(THIS) SCONST PURE;
+    STDMETHOD_(ULONG_PTR, GetUserData)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置窗口用户数据
@@ -171,7 +171,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取当前调色的色调
      * @return COLORREF--色调
      */
-    STDMETHOD_(COLORREF, GetColorizeColor)(THIS) SCONST PURE;
+    STDMETHOD_(COLORREF, GetColorizeColor)(CTHIS) SCONST PURE;
 
     /**
      * @brief 发送一个消息
@@ -197,13 +197,13 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取窗口是否允许设置为焦点
      * @return TRUE--允许
      */
-    STDMETHOD_(BOOL, IsFocusable)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsFocusable)(CTHIS) SCONST PURE;
 
     /**
      * @brief 判断是否为焦点窗口
      * @return TRUE--焦点窗口
      */
-    STDMETHOD_(BOOL, IsFocused)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsFocused)(CTHIS) SCONST PURE;
 
     /**
      * @brief 将当前窗口设置为焦点窗口
@@ -247,7 +247,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取刷新加锁状态
      * @return TRUE--当前刷新为加锁状态
      */
-    STDMETHOD_(BOOL, IsUpdateLocked)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsUpdateLocked)(CTHIS) SCONST PURE;
 
     /**
      * @brief 请求立即更新窗口
@@ -270,7 +270,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取窗口显示区域
      * @return IRegionS*--显示区域
      */
-    STDMETHOD_(IRegionS *, GetWindowRgn)(THIS) SCONST PURE;
+    STDMETHOD_(IRegionS *, GetWindowRgn)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置窗口显示区域
@@ -285,7 +285,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取窗口显示区域
      * @return IPathS*--显示区域
      */
-    STDMETHOD_(IPathS *, GetWindowPath)(THIS) SCONST PURE;
+    STDMETHOD_(IPathS *, GetWindowPath)(CTHIS) SCONST PURE;
 
     /**
      * Move2
@@ -314,14 +314,14 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param [out] LPRECT--窗口显示位置
      * @remark SOUI窗口位置左上角不是(0,0),而是宿主窗口中的坐标
      */
-    STDMETHOD_(void, GetWindowRect)(THIS_ LPRECT prect) SCONST PURE;
+    STDMETHOD_(void, GetWindowRect)(CTHIS_ LPRECT prect) SCONST PURE;
 
     /**
      * @brief 获取窗口的显示位置，不包含窗口的非客户区
      * @param [out] LPRECT--窗口客户区显示位置
      * @remark SOUI窗口位置左上角不是(0,0),而是宿主窗口中的坐标
      */
-    STDMETHOD_(void, GetClientRect)(THIS_ LPRECT prect) SCONST PURE;
+    STDMETHOD_(void, GetClientRect)(CTHIS_ LPRECT prect) SCONST PURE;
 
     /**
      * @brief 检测一个点是不是在窗口范围内
@@ -329,7 +329,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param bClientOnly BOOL--测试客户区标志
      * @return TRUE--在窗口范围内
      */
-    STDMETHOD_(BOOL, IsContainPoint)(THIS_ POINT pt, BOOL bClientOnly) SCONST PURE;
+    STDMETHOD_(BOOL, IsContainPoint)(CTHIS_ POINT pt, BOOL bClientOnly) SCONST PURE;
 
     /**
      * @brief 检查pt指向的窗口
@@ -337,7 +337,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param bIncludeMsgTransparent BOOL--测试消息透传窗口标志
      * @return SWND--包含指定坐标的最顶层窗口
      */
-    STDMETHOD_(SWND, SwndFromPoint)(THIS_ POINT * pt, BOOL bIncludeMsgTransparent DEF_VAL(FALSE)) SCONST PURE;
+    STDMETHOD_(SWND, SwndFromPoint)(CTHIS_ POINT * pt, BOOL bIncludeMsgTransparent DEF_VAL(FALSE)) SCONST PURE;
 
     /**
      * @brief 设置容器定时器
@@ -380,7 +380,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取鼠标捕获
      * @return SWND--鼠标捕获窗口句柄
      */
-    STDMETHOD_(SWND, GetCapture)(THIS) SCONST PURE;
+    STDMETHOD_(SWND, GetCapture)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置容器为鼠标捕获
@@ -413,7 +413,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取当前正在运行的动画对象
      * @return IAnimation *--动画对象
      */
-    STDMETHOD_(IAnimation *, GetAnimation)(THIS) SCONST PURE;
+    STDMETHOD_(IAnimation *, GetAnimation)(CTHIS) SCONST PURE;
 
     /**
      * @brief 清除动画
@@ -432,7 +432,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取窗口透明度
      * @return BYTE--窗口透明度
      */
-    STDMETHOD_(BYTE, GetAlpha)(THIS) SCONST PURE;
+    STDMETHOD_(BYTE, GetAlpha)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置窗口变换矩阵
@@ -444,13 +444,13 @@ DECLARE_INTERFACE_(IWindow, IObject)
     /**
      * @brief 获取窗口变换矩阵
      */
-    STDMETHOD_(void, GetMatrix)(THIS_ IMatrix * mtx) SCONST PURE;
+    STDMETHOD_(void, GetMatrix)(CTHIS_ IMatrix * mtx) SCONST PURE;
 
     /**
      * @brief 获取dpi放大倍数
      * @return int--dpi放大倍数,以100为基数
      */
-    STDMETHOD_(int, GetScale)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetScale)(CTHIS) SCONST PURE;
 
     /**
      * @brief 请求重新布局
@@ -474,52 +474,52 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取布局脏标志
      * @return TRUE--布局脏
      */
-    STDMETHOD_(BOOL, IsLayoutDirty)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsLayoutDirty)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取窗口响应键盘的标志位
      * @return UINT--响应键盘的标志位
      */
-    STDMETHOD_(UINT, OnGetDlgCode)(THIS) SCONST PURE;
+    STDMETHOD_(UINT, OnGetDlgCode)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取根窗口
      * @return IWindow *--根窗口对象
      */
-    STDMETHOD_(IWindow *, GetIRoot)(THIS) SCONST PURE;
+    STDMETHOD_(IWindow *, GetIRoot)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取父窗口
      * @return IWindow *--父窗口对象
      */
-    STDMETHOD_(IWindow *, GetIParent)(THIS) SCONST PURE;
+    STDMETHOD_(IWindow *, GetIParent)(CTHIS) SCONST PURE;
 
     /**
      * @brief 根据uCode获取与当前窗口在dom树上关联的窗口
      * @param uCode UINT--关联类型
      * @return IWindow *--当前窗口在dom树上关联的窗口
      */
-    STDMETHOD_(IWindow *, GetIWindow)(THIS_ int uCode) SCONST PURE;
+    STDMETHOD_(IWindow *, GetIWindow)(CTHIS_ int uCode) SCONST PURE;
 
     /**
      * @brief 获取子窗口
      * @param iChild int--子窗口序号
      * @return
      */
-    STDMETHOD_(IWindow *, GetIChild)(THIS_ int iChild) SCONST PURE;
+    STDMETHOD_(IWindow *, GetIChild)(CTHIS_ int iChild) SCONST PURE;
 
     /**
      * @brief 获取子窗口数量
      * @return UINT--子窗口数量
      */
-    STDMETHOD_(UINT, GetChildrenCount)(THIS) SCONST PURE;
+    STDMETHOD_(UINT, GetChildrenCount)(CTHIS) SCONST PURE;
 
     /**
      * @brief 判断一个窗口是不是当前窗口的子孙窗口
      * @param pTest const IWindow *--测试窗口
      * @return TRUE--是子孙窗口
      */
-    STDMETHOD_(BOOL, IsIDescendant)(THIS_ const IWindow *pTest) SCONST PURE;
+    STDMETHOD_(BOOL, IsIDescendant)(CTHIS_ const IWindow *pTest) SCONST PURE;
 
     /**
      * @brief 设置窗口的Owner
@@ -532,7 +532,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取Owner窗口
      * @return IWindow *--Owner窗口
      */
-    STDMETHOD_(IWindow *, GetIOwner)(THIS) SCONST PURE;
+    STDMETHOD_(IWindow *, GetIOwner)(CTHIS) SCONST PURE;
 
     /**
      * @brief 将当前窗口移动到同级兄弟窗口的zorder最顶层
@@ -627,7 +627,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param pCurChild const IWindow *--当前窗口
      * @return IWindow *--下一个布局窗口
      */
-    STDMETHOD_(IWindow *, GetNextLayoutIChild)(THIS_ const IWindow *pCurChild) SCONST PURE;
+    STDMETHOD_(IWindow *, GetNextLayoutIChild)(CTHIS_ const IWindow *pCurChild) SCONST PURE;
 
     /**
      * GetChildrenLayoutRect
@@ -636,7 +636,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      *
      * Describe  通常是客户区，但是tab,group这样的控件不一样
      */
-    STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST PURE;
+    STDMETHOD_(RECT, GetChildrenLayoutRect)(CTHIS) SCONST PURE;
 
     /**
      * GetDesiredSize
@@ -653,7 +653,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取窗口背景色
      * @return COLORREF--窗口背景色
      */
-    STDMETHOD_(COLORREF, GetBkgndColor)(THIS) SCONST PURE;
+    STDMETHOD_(COLORREF, GetBkgndColor)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设计窗口显示文本
@@ -676,7 +676,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取窗口状态
      * @return DWORD -- 窗口状态
      */
-    STDMETHOD_(DWORD, GetState)(THIS) SCONST PURE;
+    STDMETHOD_(DWORD, GetState)(CTHIS) SCONST PURE;
 
     /**
      * @brief 修改窗口状态
@@ -709,7 +709,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @return TRUE--自动成组
      * @remark 自动成组的窗口在用户按钮方向键时，组内窗口循环顺序获得焦点
      */
-    STDMETHOD_(BOOL, IsSiblingsAutoGroupped)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsSiblingsAutoGroupped)(CTHIS) SCONST PURE;
 
     // caret相关方法
 

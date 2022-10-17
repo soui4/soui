@@ -140,7 +140,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return   BOOL -- true是测试类型
      * Describe
      */
-    STDMETHOD_(BOOL, IsClass)(THIS_ LPCWSTR lpszName) SCONST PURE;
+    STDMETHOD_(BOOL, IsClass)(CTHIS_ LPCWSTR lpszName) SCONST PURE;
 
     /**
      * GetObjectClass
@@ -148,7 +148,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return   LPCWSTR -- 类型名
      * Describe  这是一个虚函数，注意与GetClassName的区别。
      */
-    STDMETHOD_(LPCWSTR, GetObjectClass)(THIS) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetObjectClass)(CTHIS) SCONST PURE;
 
     /**
      * GetObjectType
@@ -156,7 +156,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return   int -- 对象类型
      * Describe  这是一个虚函数，注意与GetClassType的区别。
      */
-    STDMETHOD_(int, GetObjectType)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetObjectType)(CTHIS) SCONST PURE;
 
     /**
      * GetID
@@ -164,7 +164,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return   int -- 对象ID
      * Describe
      */
-    STDMETHOD_(int, GetID)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetID)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置对象ID
@@ -179,7 +179,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return   LPCWSTR -- 对象Name
      * Describe
      */
-    STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST PURE;
+    STDMETHOD_(LPCWSTR, GetName)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置对象Name
@@ -249,7 +249,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return   BOOL, TRUE:获取成功，FALSE:获取失败，属性不存在
      * Describe  默认返回空
      */
-    STDMETHOD_(BOOL, GetAttribute)(THIS_ LPCWSTR strAttr, IStringW *pValue) SCONST PURE;
+    STDMETHOD_(BOOL, GetAttribute)(CTHIS_ LPCWSTR strAttr, IStringW *pValue) SCONST PURE;
 
     /**
      * OnAttribute
@@ -264,7 +264,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
     (THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading, HRESULT hr) PURE;
     //-------------------------------------------------------------------------------------------
 
-    STDMETHOD_(IAnimation *, clone)(THIS) SCONST PURE;
+    STDMETHOD_(IAnimation *, clone)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, copy)(THIS_ const IAnimation *src) PURE;
 
@@ -319,9 +319,9 @@ DECLARE_INTERFACE_(IAnimation, IObject)
 
     STDMETHOD_(void, setFillAfter)(THIS_ BOOL bFill) PURE;
 
-    STDMETHOD_(BOOL, getFillBefore)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, getFillBefore)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(BOOL, getFillAfter)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, getFillAfter)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, setStartOffset)(THIS_ long offset) PURE;
 
@@ -331,7 +331,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return true if the animation will take fillBefore into account
      * @attr ref android.R.styleable#Animation_fillEnabled
      */
-    STDMETHOD_(BOOL, isFillEnabled)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isFillEnabled)(CTHIS) SCONST PURE;
 
     /**
      * If fillEnabled is true, the animation will apply the value of fillBefore.
@@ -406,7 +406,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return the {@link Interpolator} associated to this animation
      * @attr ref android.R.styleable#Animation_interpolator
      */
-    STDMETHOD_(IInterpolator *, getInterpolator)(THIS) SCONST PURE;
+    STDMETHOD_(IInterpolator *, getInterpolator)(CTHIS) SCONST PURE;
 
     /**
      * When this animation should start. If the animation has not startet yet,
@@ -415,7 +415,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return the time in milliseconds when the animation should start or
      *         {@link #START_ON_FIRST_FRAME}
      */
-    STDMETHOD_(int64_t, getStartTime)(THIS) SCONST PURE;
+    STDMETHOD_(int64_t, getStartTime)(CTHIS) SCONST PURE;
 
     /**
      * How long this animation should last
@@ -423,7 +423,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return the duration in milliseconds of the animation
      * @attr ref android.R.styleable#Animation_duration
      */
-    STDMETHOD_(long, getDuration)(THIS) SCONST PURE;
+    STDMETHOD_(long, getDuration)(CTHIS) SCONST PURE;
 
     /**
      * When this animation should start, relative to StartTime
@@ -431,7 +431,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return the start offset in milliseconds
      * @attr ref android.R.styleable#Animation_startOffset
      */
-    STDMETHOD_(long, getStartOffset)(THIS) SCONST PURE;
+    STDMETHOD_(long, getStartOffset)(CTHIS) SCONST PURE;
 
     /**
      * Defines what this animation should do when it reaches the end.
@@ -439,7 +439,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return either one of {@link #REVERSE} or {@link #RESTART}
      * @attr ref android.R.styleable#Animation_repeatMode
      */
-    STDMETHOD_(RepeatMode, getRepeatMode)(THIS) SCONST PURE;
+    STDMETHOD_(RepeatMode, getRepeatMode)(CTHIS) SCONST PURE;
 
     /**
      * Defines how many times the animation should repeat. The default value
@@ -448,7 +448,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return the number of times the animation should repeat, or {@link #INFINITE}
      * @attr ref android.R.styleable#Animation_repeatCount
      */
-    STDMETHOD_(int, getRepeatCount)(THIS) SCONST PURE;
+    STDMETHOD_(int, getRepeatCount)(CTHIS) SCONST PURE;
 
     /**
      * Returns the Z ordering mode to use while running the animation as
@@ -458,7 +458,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * {@link #ZORDER_TOP}, or {@link #ZORDER_BOTTOM}.
      * @attr ref android.R.styleable#Animation_zAdjustment
      */
-    STDMETHOD_(ZAdjustment, getZAdjustment)(THIS) SCONST PURE;
+    STDMETHOD_(ZAdjustment, getZAdjustment)(CTHIS) SCONST PURE;
 
     /**
      * <p>Binds an animation listener to this animation. The animation listener
@@ -475,7 +475,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * duration than what is computed here, but generally this should be
      * accurate.
      */
-    STDMETHOD_(long, computeDurationHint)(THIS) SCONST PURE;
+    STDMETHOD_(long, computeDurationHint)(CTHIS) SCONST PURE;
     /**
      * Gets the transformation to apply at a specified point in time. Implementations of this
      * method should always replace the specified STransformation or document they are doing
@@ -509,14 +509,14 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      *
      * @return true if the animation has started, false otherwise
      */
-    STDMETHOD_(BOOL, hasStarted)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, hasStarted)(CTHIS) SCONST PURE;
 
     /**
      * <p>Indicates whether this animation has ended or not.</p>
      *
      * @return true if the animation has ended, false otherwise
      */
-    STDMETHOD_(BOOL, hasEnded)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, hasEnded)(CTHIS) SCONST PURE;
 
     /**
      * Helper for getTransformation. Subclasses should implement this to apply
@@ -536,14 +536,14 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      *
      * @hide
      */
-    STDMETHOD_(BOOL, hasAlpha)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, hasAlpha)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, initialize)
     (THIS_ int width, int height, int parentWidth, int parentHeight) PURE;
 
     STDMETHOD_(void, setUserData)(THIS_ ULONG_PTR data) PURE;
 
-    STDMETHOD_(ULONG_PTR, getUserData)(THIS) SCONST PURE;
+    STDMETHOD_(ULONG_PTR, getUserData)(CTHIS) SCONST PURE;
 };
 
 SNSEND

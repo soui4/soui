@@ -41,7 +41,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * Describe
      */
     STDMETHOD_(void, DrawByState2)
-    (THIS_ IRenderTarget * pRT, LPCRECT rcDraw, DWORD dwState, BYTE byAlpha) SCONST PURE;
+    (CTHIS_ IRenderTarget * pRT, LPCRECT rcDraw, DWORD dwState, BYTE byAlpha) SCONST PURE;
 
     /**
      * DrawByState
@@ -53,7 +53,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * Describe  使用SkinObj的GetAlpha属性绘制
      */
     STDMETHOD_(void, DrawByState)
-    (THIS_ IRenderTarget * pRT, LPCRECT rcDraw, DWORD dwState) SCONST PURE;
+    (CTHIS_ IRenderTarget * pRT, LPCRECT rcDraw, DWORD dwState) SCONST PURE;
 
     /**
      * DrawByIndex
@@ -66,7 +66,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * Describe
      */
     STDMETHOD_(void, DrawByIndex2)
-    (THIS_ IRenderTarget * pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) SCONST PURE;
+    (CTHIS_ IRenderTarget * pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) SCONST PURE;
 
     /**
      * DrawByIndex
@@ -78,7 +78,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * Describe  使用SkinObj的GetAlpha属性绘制
      */
     STDMETHOD_(void, DrawByIndex)
-    (THIS_ IRenderTarget * pRT, LPCRECT rcDraw, int iState) SCONST PURE;
+    (CTHIS_ IRenderTarget * pRT, LPCRECT rcDraw, int iState) SCONST PURE;
 
     /**
      * GetSkinSize
@@ -86,7 +86,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * @return   SIZE -- Skin的默认大小
      * Describe  派生类应该根据skin的特点实现该接口
      */
-    STDMETHOD_(SIZE, GetSkinSize)(THIS) SCONST PURE;
+    STDMETHOD_(SIZE, GetSkinSize)(CTHIS) SCONST PURE;
 
     /**
      * GetStates
@@ -94,7 +94,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * @return   int -- 状态数量
      * Describe  默认为1
      */
-    STDMETHOD_(int, GetStates)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetStates)(CTHIS) SCONST PURE;
 
     /**
      * GetAlpha
@@ -102,7 +102,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * @return   BYTE -- 透明度
      * Describe  [0-255]
      */
-    STDMETHOD_(BYTE, GetAlpha)(THIS) SCONST PURE;
+    STDMETHOD_(BYTE, GetAlpha)(CTHIS) SCONST PURE;
 
     /**
      * SetAlpha
@@ -128,7 +128,7 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
      * @return   int 放大比例
      * Describe
      */
-    STDMETHOD_(int, GetScale)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetScale)(CTHIS) SCONST PURE;
 
     /**
      * Scale

@@ -100,7 +100,7 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
     \return
         String object holding a string that identifies the ScriptModule in use.
     */
-    STDMETHOD_(LPCSTR, getIdentifierString)(THIS) SCONST PURE;
+    STDMETHOD_(LPCSTR, getIdentifierString)(CTHIS) SCONST PURE;
 
     /*!
     \brief

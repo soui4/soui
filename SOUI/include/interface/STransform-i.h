@@ -38,7 +38,7 @@ DECLARE_INTERFACE(ITransformation)
      * @brief 获取透明度
      * @return BYTE--透明度
      */
-    STDMETHOD_(BYTE, GetAlpha)(THIS) SCONST PURE;
+    STDMETHOD_(BYTE, GetAlpha)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置透明度

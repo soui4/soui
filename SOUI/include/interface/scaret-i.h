@@ -39,7 +39,7 @@ DECLARE_INTERFACE_(ICaret, IObject)
      * @brief 获取光标显示状态
      * @return BOOL TRUE-显示
      */
-    STDMETHOD_(BOOL, IsVisible)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsVisible)(CTHIS) SCONST PURE;
 
     /**
      * @brief 绘制光标
@@ -52,7 +52,7 @@ DECLARE_INTERFACE_(ICaret, IObject)
      * @brief 获取光标显示矩形
      * @return RECT
      */
-    STDMETHOD_(RECT, GetRect)(THIS) SCONST PURE;
+    STDMETHOD_(RECT, GetRect)(CTHIS) SCONST PURE;
 };
 
 SNSEND

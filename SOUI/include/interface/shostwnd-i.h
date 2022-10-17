@@ -34,15 +34,15 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 
     STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) PURE;
 
-    STDMETHOD_(const MSG *, GetCurrentMessage)(THIS) SCONST PURE;
+    STDMETHOD_(const MSG *, GetCurrentMessage)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(int, GetDlgCtrlID)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetDlgCtrlID)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(DWORD, GetStyle)(THIS) SCONST PURE;
+    STDMETHOD_(DWORD, GetStyle)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(DWORD, GetExStyle)(THIS) SCONST PURE;
+    STDMETHOD_(DWORD, GetExStyle)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(LONG_PTR, GetWindowLongPtr)(THIS_ int nIndex) SCONST PURE;
+    STDMETHOD_(LONG_PTR, GetWindowLongPtr)(CTHIS_ int nIndex) SCONST PURE;
 
     STDMETHOD_(LONG_PTR, SetWindowLongPtr)(THIS_ int nIndex, LONG_PTR dwNewLong) PURE;
 
@@ -50,7 +50,7 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 
     STDMETHOD_(HWND, SetParent)(THIS_ HWND hWndNewParent) PURE;
 
-    STDMETHOD_(BOOL, IsWindowEnabled)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsWindowEnabled)(CTHIS) SCONST PURE;
 
     STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
 
@@ -69,21 +69,21 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 
     STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /* = TRUE*/) PURE;
 
-    STDMETHOD_(BOOL, GetWindowRect)(THIS_ LPRECT lpRect) SCONST PURE;
+    STDMETHOD_(BOOL, GetWindowRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
-    STDMETHOD_(BOOL, GetClientRect)(THIS_ LPRECT lpRect) SCONST PURE;
+    STDMETHOD_(BOOL, GetClientRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
-    STDMETHOD_(BOOL, ClientToScreen)(THIS_ LPPOINT lpPoint) SCONST PURE;
+    STDMETHOD_(BOOL, ClientToScreen)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
 
-    STDMETHOD_(BOOL, ClientToScreen2)(THIS_ LPRECT lpRect) SCONST PURE;
+    STDMETHOD_(BOOL, ClientToScreen2)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
-    STDMETHOD_(BOOL, ScreenToClient)(THIS_ LPPOINT lpPoint) SCONST PURE;
+    STDMETHOD_(BOOL, ScreenToClient)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
 
-    STDMETHOD_(BOOL, ScreenToClient2)(THIS_ LPRECT lpRect) SCONST PURE;
+    STDMETHOD_(BOOL, ScreenToClient2)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
-    STDMETHOD_(int, MapWindowPoints)(THIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST PURE;
+    STDMETHOD_(int, MapWindowPoints)(CTHIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST PURE;
 
-    STDMETHOD_(int, MapWindowRect)(THIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
+    STDMETHOD_(int, MapWindowRect)(CTHIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
 
     STDMETHOD_(UINT_PTR, SetTimer)
     (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
@@ -121,13 +121,13 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 
     STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) PURE;
 
-    STDMETHOD_(int, GetWindowText)(THIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST PURE;
+    STDMETHOD_(int, GetWindowText)(CTHIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST PURE;
 
-    STDMETHOD_(BOOL, IsIconic)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsIconic)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(BOOL, IsZoomed)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsZoomed)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(BOOL, IsWindowVisible)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsWindowVisible)(CTHIS) SCONST PURE;
 
     STDMETHOD_(BOOL, MoveWindow)
     (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/) PURE;
@@ -205,15 +205,15 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 
     STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) PURE;
 
-    STDMETHOD_(const MSG *, GetCurrentMessage)(THIS) SCONST PURE;
+    STDMETHOD_(const MSG *, GetCurrentMessage)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(int, GetDlgCtrlID)(THIS) SCONST PURE;
+    STDMETHOD_(int, GetDlgCtrlID)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(DWORD, GetStyle)(THIS) SCONST PURE;
+    STDMETHOD_(DWORD, GetStyle)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(DWORD, GetExStyle)(THIS) SCONST PURE;
+    STDMETHOD_(DWORD, GetExStyle)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(LONG_PTR, GetWindowLongPtr)(THIS_ int nIndex) SCONST PURE;
+    STDMETHOD_(LONG_PTR, GetWindowLongPtr)(CTHIS_ int nIndex) SCONST PURE;
 
     STDMETHOD_(LONG_PTR, SetWindowLongPtr)(THIS_ int nIndex, LONG_PTR dwNewLong) PURE;
 
@@ -221,7 +221,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 
     STDMETHOD_(HWND, SetParent)(THIS_ HWND hWndNewParent) PURE;
 
-    STDMETHOD_(BOOL, IsWindowEnabled)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsWindowEnabled)(CTHIS) SCONST PURE;
 
     STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
 
@@ -240,21 +240,21 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 
     STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /* = TRUE*/) PURE;
 
-    STDMETHOD_(BOOL, GetWindowRect)(THIS_ LPRECT lpRect) SCONST PURE;
+    STDMETHOD_(BOOL, GetWindowRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
-    STDMETHOD_(BOOL, GetClientRect)(THIS_ LPRECT lpRect) SCONST PURE;
+    STDMETHOD_(BOOL, GetClientRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
-    STDMETHOD_(BOOL, ClientToScreen)(THIS_ LPPOINT lpPoint) SCONST PURE;
+    STDMETHOD_(BOOL, ClientToScreen)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
 
-    STDMETHOD_(BOOL, ClientToScreen2)(THIS_ LPRECT lpRect) SCONST PURE;
+    STDMETHOD_(BOOL, ClientToScreen2)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
-    STDMETHOD_(BOOL, ScreenToClient)(THIS_ LPPOINT lpPoint) SCONST PURE;
+    STDMETHOD_(BOOL, ScreenToClient)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
 
-    STDMETHOD_(BOOL, ScreenToClient2)(THIS_ LPRECT lpRect) SCONST PURE;
+    STDMETHOD_(BOOL, ScreenToClient2)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
-    STDMETHOD_(int, MapWindowPoints)(THIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST PURE;
+    STDMETHOD_(int, MapWindowPoints)(CTHIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST PURE;
 
-    STDMETHOD_(int, MapWindowRect)(THIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
+    STDMETHOD_(int, MapWindowRect)(CTHIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
 
     STDMETHOD_(UINT_PTR, SetTimer)
     (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
@@ -292,13 +292,13 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 
     STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) PURE;
 
-    STDMETHOD_(int, GetWindowText)(THIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST PURE;
+    STDMETHOD_(int, GetWindowText)(CTHIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST PURE;
 
-    STDMETHOD_(BOOL, IsIconic)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsIconic)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(BOOL, IsZoomed)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsZoomed)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(BOOL, IsWindowVisible)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsWindowVisible)(CTHIS) SCONST PURE;
 
     STDMETHOD_(BOOL, MoveWindow)
     (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/) PURE;

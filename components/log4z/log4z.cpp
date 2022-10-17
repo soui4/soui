@@ -339,11 +339,11 @@ struct LoggerInfo
     std::string _name;    // one logger one name.
     std::string _path;    //path for log file.
     int  _level;        //filter level
-    bool _display;        //display to screen 
-    bool _outfile;        //output to file
+    BOOL _display;        //display to screen 
+    BOOL _outfile;        //output to file
     unsigned int _limitsize; //limit file's size, unit Million byte.
-    bool _enable;        //logger is enable 
-    bool _fileLine;        //enable/disable the log's suffix.(file name:line number)
+    BOOL _enable;        //logger is enable 
+    BOOL _fileLine;        //enable/disable the log's suffix.(file name:line number)
 
     //! runtime info
     time_t _curFileCreateTime;    //file create time
@@ -1494,27 +1494,27 @@ LoggerId LogerManager::findLogger(const char * key)
 
 BOOL LogerManager::enableLogger(LoggerId id, BOOL enable)
 {
-    if (id <0 || id > _lastId) return false;
+    if (id <0 || id > _lastId) return FALSE;
     _loggers[id]._enable = enable;
-    return true;
+    return TRUE;
 }
 BOOL LogerManager::setLoggerLevel(LoggerId id, int level)
 {
-    if (id <0 || id > _lastId || level < LOG_LEVEL_TRACE || level >LOG_LEVEL_FATAL) return false;
+    if (id <0 || id > _lastId || level < LOG_LEVEL_TRACE || level >LOG_LEVEL_FATAL) return FALSE;
     _loggers[id]._level = level;
-    return true;
+    return TRUE;
 }
 BOOL LogerManager::setLoggerDisplay(LoggerId id, BOOL enable)
 {
-    if (id <0 || id > _lastId) return false;
+    if (id <0 || id > _lastId) return FALSE;
     _loggers[id]._display = enable;
-    return true;
+    return TRUE;
 }
 BOOL LogerManager::setLoggerOutFile(LoggerId id, BOOL enable)
 {
-    if (id <0 || id > _lastId) return false;
+    if (id <0 || id > _lastId) return FALSE;
     _loggers[id]._outfile = enable;
-    return true;
+    return TRUE;
 }
 
 void LogerManager::setOutputFileBuilder(IOutputFileBuilder *pOutputFileBuilder)
@@ -1525,39 +1525,39 @@ void LogerManager::setOutputFileBuilder(IOutputFileBuilder *pOutputFileBuilder)
 
 BOOL LogerManager::setLoggerLimitsize(LoggerId id, unsigned int limitsize)
 {
-    if (id <0 || id > _lastId) return false;
+    if (id <0 || id > _lastId) return FALSE;
     if (limitsize == 0 ) {limitsize = (unsigned int)-1;}
     _loggers[id]._limitsize = limitsize;
-    return true;
+    return TRUE;
 }
 BOOL LogerManager::setLoggerFileLine(LoggerId id, BOOL enable)
 {
-    if (id <0 || id > _lastId) return false;
+    if (id <0 || id > _lastId) return FALSE;
     _loggers[id]._fileLine = enable;
-    return true;
+    return TRUE;
 }
 
 BOOL LogerManager::setLoggerName(LoggerId id, const char * name)
 {
-    if (id <0 || id > _lastId) return false;
+    if (id <0 || id > _lastId) return FALSE;
     //the name by main logger is the process name and it's can't change. 
-    if (id == LOG4Z_MAIN_LOGGER_ID) return false; 
+    if (id == LOG4Z_MAIN_LOGGER_ID) return FALSE; 
     
     if (name == NULL || strlen(name) == 0) 
     {
-        return false;
+        return FALSE;
     }
     AutoLock l(_hotLock);
     if (_loggers[id]._name != name)
     {
         _loggers[id]._name = name;
     }
-    return true;
+    return TRUE;
 }
 
 BOOL LogerManager::setLoggerPath(LoggerId id, const char * path)
 {
-    if (id <0 || id > _lastId) return false;
+	if (id <0 || id > _lastId) return FALSE;
     std::string copyPath;
     if (path == NULL || strlen(path) == 0) 
     {
@@ -1581,7 +1581,7 @@ BOOL LogerManager::setLoggerPath(LoggerId id, const char * path)
     {
         _loggers[id]._path = copyPath;
     }
-    return true;
+    return TRUE;
 }
 BOOL LogerManager::setAutoUpdate(int interval)
 {
@@ -1592,8 +1592,7 @@ BOOL LogerManager::updateConfig()
 {
     if (_configFile.empty())
     {
-        //LOGW("log4z update config file error. filename is empty.");
-        return false;
+        return FALSE;
     }
     Log4zFileHandler f;
     f.open(_configFile.c_str(), "rb");
@@ -1602,14 +1601,14 @@ BOOL LogerManager::updateConfig()
         std::cout << " !!! !!! !!! !!!" << std::endl;
         std::cout << " !!! !!! log4z load config file error. filename=" << _configFile << " !!! !!! " << std::endl;
         std::cout << " !!! !!! !!! !!!" << std::endl;
-        return false;
+        return FALSE;
     }
     return configFromStringImpl(f.readContent().c_str(), true);
 }
 
 BOOL LogerManager::isLoggerEnable(LoggerId id)
 {
-    if (id <0 || id > _lastId) return false;
+    if (id <0 || id > _lastId) return FALSE;
     return _loggers[id]._enable;
 }
 

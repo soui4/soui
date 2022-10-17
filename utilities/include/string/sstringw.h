@@ -57,8 +57,8 @@ public:
 	STDMETHOD_(const wchar_t *, c_str)(THIS) SCONST ;
 
 	// string comparison
-	STDMETHOD_(int, Compare)(THIS_ const wchar_t* psz) SCONST ;
-	STDMETHOD_(int, CompareNoCase)(THIS_ const wchar_t* psz) SCONST ;
+	STDMETHOD_(int, Compare)(CTHIS_ const wchar_t* psz) SCONST ;
+	STDMETHOD_(int, CompareNoCase)(CTHIS_ const wchar_t* psz) SCONST ;
 
 	STDMETHOD_(void, TrimBlank)(THIS) ;
 	STDMETHOD_(int, InsertChar)(THIS_ int nIndex, wchar_t ch) ;

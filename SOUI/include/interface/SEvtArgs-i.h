@@ -22,7 +22,7 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
      * @brief 获取事件发送对象ID
      * @return int--事件发送对象ID
      */
-    STDMETHOD_(int, IdFrom)(THIS) SCONST PURE;
+    STDMETHOD_(int, IdFrom)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置事件的发送对象ID
@@ -35,7 +35,7 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
      * @brief 获取事件发送对象Name
      * @return LPCWSTR--事件发送对象Name
      */
-    STDMETHOD_(LPCWSTR, NameFrom)(THIS) SCONST PURE;
+    STDMETHOD_(LPCWSTR, NameFrom)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置事件发送对象Name
@@ -48,7 +48,7 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
      * @brief 获取事件是否需要冒泡传递
      * @return BOOL TRUE--冒泡传递
      */
-    STDMETHOD_(BOOL, IsBubbleUp)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsBubbleUp)(CTHIS) SCONST PURE;
 
     /**
      * @brief 设置事件的冒泡传递
@@ -61,7 +61,7 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
      * @brief 获取事件处理次数
      * @return UINT 事件处理次数
      */
-    STDMETHOD_(UINT, HandleCount)(THIS) SCONST PURE;
+    STDMETHOD_(UINT, HandleCount)(CTHIS) SCONST PURE;
 
     /**
      * @brief 增加事件处理计数
@@ -113,20 +113,20 @@ DECLARE_INTERFACE_(IEvtSlot, IObjRef)
      * @brief clone一个事件槽
      * @return IEvtSlot * clone出来的对象
      */
-    STDMETHOD_(IEvtSlot *, Clone)(THIS) SCONST PURE;
+    STDMETHOD_(IEvtSlot *, Clone)(CTHIS) SCONST PURE;
 
     /**
      * @brief 判断两个IEvtSlot是否相等
      * @param sour IEvtSlot * 比较的IEvtSlot
      * @return
      */
-    STDMETHOD_(BOOL, Equal)(THIS_ const IEvtSlot *sour) SCONST PURE;
+    STDMETHOD_(BOOL, Equal)(CTHIS_ const IEvtSlot *sour) SCONST PURE;
 
     /**
      * @brief 获取IEvtSlot类型
      * @return UINT IEvtSlot类型
      */
-    STDMETHOD_(UINT, GetSlotType)(THIS) SCONST PURE;
+    STDMETHOD_(UINT, GetSlotType)(CTHIS) SCONST PURE;
 };
 
 /**

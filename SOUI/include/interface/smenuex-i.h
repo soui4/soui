@@ -52,7 +52,7 @@ DECLARE_INTERFACE_(IMenuEx, IObjRef)
 
     STDMETHOD_(ULONG_PTR, GetMenuUserData)(THIS_ UINT uPosition, UINT uFlags) PURE;
 
-    STDMETHOD_(DWORD, GetContextHelpId)(THIS) SCONST PURE;
+    STDMETHOD_(DWORD, GetContextHelpId)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, SetContextHelpId)(THIS_ DWORD dwId) PURE;
 

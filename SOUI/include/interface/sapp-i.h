@@ -64,7 +64,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @brief 获取当前app的hModule
      * @return HMODULE--当前app的hModule
      */
-    STDMETHOD_(HMODULE, GetModule)(THIS) SCONST PURE;
+    STDMETHOD_(HMODULE, GetModule)(CTHIS) SCONST PURE;
 
     /**
      * @brief 从指定的ResProvider里加载系统资源
@@ -173,7 +173,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @param DWORD dwThreadID--线程ID
      * @return IMessageLoop *--指定线程的msgloop
      */
-    STDMETHOD_(IMessageLoop *, GetMsgLoop)(THIS_ DWORD dwThreadID) SCONST PURE;
+    STDMETHOD_(IMessageLoop *, GetMsgLoop)(CTHIS_ DWORD dwThreadID) SCONST PURE;
 
     /**
      * @brief 获取IResProviderMgr接口
@@ -272,7 +272,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 	 * @param SObjectType nType -- 类型ID
      * @return IObjRef * -- 创建的类型
      */
-	STDMETHOD_(IObject *,CreateObject)(THIS_ LPCWSTR pszName,SObjectType nType) SCONST PURE;
+	STDMETHOD_(IObject *,CreateObject)(CTHIS_ LPCWSTR pszName,SObjectType nType) SCONST PURE;
 
 	STDMETHOD_(void,SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) PURE;
 };

@@ -62,9 +62,9 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      *
      * @return The length of the animation, in milliseconds.
      */
-    STDMETHOD_(long, getDuration)(THIS) SCONST PURE;
+    STDMETHOD_(long, getDuration)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(long, getTotalDuration)(THIS) SCONST PURE;
+    STDMETHOD_(long, getTotalDuration)(CTHIS) SCONST PURE;
 
     /**
      * Sets the position of the animation to the specified point in time. This time should
@@ -114,7 +114,7 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      *
      * @return the number of milliseconds to delay running the animation
      */
-    STDMETHOD_(long, getStartDelay)(THIS) SCONST PURE;
+    STDMETHOD_(long, getStartDelay)(CTHIS) SCONST PURE;
 
     /**
      * The amount of time, in milliseconds, to delay starting the animation after
@@ -140,7 +140,7 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      *
      * @return the number of times the animation should repeat, or {@link #INFINITE}
      */
-    STDMETHOD_(int, getRepeatCount)(THIS) SCONST PURE;
+    STDMETHOD_(int, getRepeatCount)(CTHIS) SCONST PURE;
 
     /**
      * Defines what this animation should do when it reaches the end. This
@@ -156,7 +156,7 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      *
      * @return either one of {@link #REVERSE} or {@link #RESTART}
      */
-    STDMETHOD_(RepeatMode, getRepeatMode)(THIS) SCONST PURE;
+    STDMETHOD_(RepeatMode, getRepeatMode)(CTHIS) SCONST PURE;
 
     /**
      * Adds a listener to the set of listeners that are sent update events through the life of
@@ -196,7 +196,7 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      *
      * @return The timing interpolator for this IValueAnimator.
      */
-    STDMETHOD_(IInterpolator *, getInterpolator)(THIS) SCONST PURE;
+    STDMETHOD_(IInterpolator *, getInterpolator)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, addListener)(THIS_ IAnimatorListener * p) PURE;
 
@@ -206,9 +206,9 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
 
 	STDMETHOD_(void, end)(THIS) PURE;
 
-    STDMETHOD_(BOOL, isRunning)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isRunning)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(BOOL, isStarted)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isStarted)(CTHIS) SCONST PURE;
 
     /**
      * Plays the IValueAnimator in reverse. If the animation is already running,
@@ -232,9 +232,9 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      *
      * @return Elapsed/interpolated fraction of the animation.
      */
-    STDMETHOD_(float, getAnimatedFraction)(THIS) SCONST PURE;
+    STDMETHOD_(float, getAnimatedFraction)(CTHIS) SCONST PURE;
 
-    STDMETHOD_(IValueAnimator *, clone)(THIS) SCONST PURE;
+    STDMETHOD_(IValueAnimator *, clone)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) PURE;
 };

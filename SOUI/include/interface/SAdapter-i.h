@@ -302,7 +302,7 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
      * @param [out] pName IStringW--列名
      * @return void
      */
-    STDMETHOD_(void, GetColumnName)(THIS_ int iCol, IStringW *pName) SCONST PURE;
+    STDMETHOD_(void, GetColumnName)(CTHIS_ int iCol, IStringW *pName) SCONST PURE;
 
     //
     // int iCol: 列序号
@@ -314,7 +314,7 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
      * @return TRUE--显示, FALSE--隐藏
      * @remark 默认显示
      */
-    STDMETHOD_(BOOL, IsColumnVisible)(THIS_ int iCol) SCONST PURE;
+    STDMETHOD_(BOOL, IsColumnVisible)(CTHIS_ int iCol) SCONST PURE;
 
     /**
      * @brief 排序接口
@@ -440,7 +440,7 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @param idx DATA_INDEX--数据类型
      * @return
      */
-    STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(THIS_ HSTREEITEM hItem, DATA_INDEX idx) SCONST PURE;
+    STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(CTHIS_ HSTREEITEM hItem, DATA_INDEX idx) SCONST PURE;
 
     /**
      * @brief 保存hItem指定索引的数据
@@ -457,73 +457,73 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @param hItem HSTREEITEM--表项索引
      * @return HSTREEITEM 父级表项
      */
-    STDMETHOD_(HSTREEITEM, GetParentItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetParentItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取第一个子项
      * @param hItem HSTREEITEM--表项索引
      * @return HSTREEITEM--第一个子项
      */
-    STDMETHOD_(HSTREEITEM, GetFirstChildItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetFirstChildItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取最后一个子项
      * @param hItem HSTREEITEM--表项索引
      * @return HSTREEITEM--最后一个子项
      */
-    STDMETHOD_(HSTREEITEM, GetLastChildItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetLastChildItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取前一个兄弟项
      * @param hItem HSTREEITEM--表项索引
      * @return HSTREEITEM--前一个兄弟项
      */
-    STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取后一个兄弟项
      * @param hItem HSTREEITEM--表项索引
      * @return HSTREEITEM--后一个兄弟项
      */
-    STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 是否包含子项
      * @param hItem HSTREEITEM--表项索引
      * @return TRUE--有子项，FALSE--无子项
      */
-    STDMETHOD_(BOOL, HasChildren)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(BOOL, HasChildren)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 表项是否当前可见
      * @param hItem HSTREEITEM--表项索引
      * @return TRUE--可见，FALSE--不可见，被折叠
      */
-    STDMETHOD_(BOOL, IsItemVisible)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(BOOL, IsItemVisible)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取第一个可见项
      * @return HSTREEITEM--第一个可见项
      */
-    STDMETHOD_(HSTREEITEM, GetFirstVisibleItem)(THIS) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetFirstVisibleItem)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取最后一个可见项
      * @return HSTREEITEM--最后一个可见项
      */
-    STDMETHOD_(HSTREEITEM, GetLastVisibleItem)(THIS) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetLastVisibleItem)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取前一个可见项
      * @return HSTREEITEM--前一个可见项
      */
-    STDMETHOD_(HSTREEITEM, GetPrevVisibleItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetPrevVisibleItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取后一个可见项
      * @return HSTREEITEM--后一个可见项
      */
-    STDMETHOD_(HSTREEITEM, GetNextVisibleItem)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(HSTREEITEM, GetNextVisibleItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 展开/折叠子项
@@ -538,7 +538,7 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @param hItem HSTREEITEM--目标项
      * @return TRUE--展开，FALSE--折叠
      */
-    STDMETHOD_(BOOL, IsItemExpanded)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(BOOL, IsItemExpanded)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 设置表项展开标志
@@ -573,13 +573,13 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @param hItem HSTREEITEM--目标项
      * @return int--模板ID
      */
-    STDMETHOD_(int, getViewType)(THIS_ HSTREEITEM hItem) SCONST PURE;
+    STDMETHOD_(int, getViewType)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
      * @brief 获取表项模板数量
      * @return int--模板数量
      */
-    STDMETHOD_(int, getViewTypeCount)(THIS) SCONST PURE;
+    STDMETHOD_(int, getViewTypeCount)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取表项大小
@@ -596,7 +596,7 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @brief 定义行宽度和treeview客户区宽度相同
      * @return TRUE--表项宽度占满父窗口，FALSE--表项宽度和父窗口无关
      */
-    STDMETHOD_(BOOL, isViewWidthMatchParent)(THIS) SCONST PURE;
+    STDMETHOD_(BOOL, isViewWidthMatchParent)(CTHIS) SCONST PURE;
 
     /**
      * @brief init adapter from the specified template xml data
