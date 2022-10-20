@@ -806,9 +806,9 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      */
     void SetSel(DWORD dwSelection, BOOL bNoScroll = FALSE);
 
-  protected:
+	int GetWindowTextLength() const;
 
-    int GetWindowTextLength() const;
+  protected:
 
     /**
      * SRichEdit::OnCreate
