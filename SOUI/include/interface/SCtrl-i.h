@@ -2556,15 +2556,6 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
     STDMETHOD_(DWORD, LoadRtf)(THIS_ LPCTSTR pszFileName) PURE;
 
     /**
-     * IRichEdit::GetWindowTextLength
-     * @brief     获取窗口标题长度
-     * @return    返回int
-     *
-     * Describe   获取窗口标题长度
-     */
-    STDMETHOD_(int, GetWindowTextLength)(CTHIS) SCONST PURE;
-
-    /**
      * IRichEdit::SetSel
      * @brief     设置选中
      * @param     long nStartChar -- 开始字符索引

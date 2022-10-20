@@ -623,15 +623,6 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     STDMETHOD_(DWORD, LoadRtf)(THIS_ LPCTSTR pszFileName) OVERRIDE;
 
     /**
-     * SRichEdit::GetWindowTextLength
-     * @brief     获取窗口标题长度
-     * @return    返回int
-     *
-     * Describe   获取窗口标题长度
-     */
-    STDMETHOD_(int, GetWindowTextLength)(THIS) SCONST OVERRIDE;
-
-    /**
      * SRichEdit::SetSel
      * @brief     设置选中
      * @param     long nStartChar --
@@ -816,6 +807,9 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     void SetSel(DWORD dwSelection, BOOL bNoScroll = FALSE);
 
   protected:
+
+    int GetWindowTextLength() const;
+
     /**
      * SRichEdit::OnCreate
      * @brief    创建

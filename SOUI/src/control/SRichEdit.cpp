@@ -1341,10 +1341,16 @@ void SRichEdit::SetWindowText(LPCTSTR lpszText)
 
 int SRichEdit::GetWindowText(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText)
 {
+	if(!pBuf){
+		return GetWindowTextLength();
+	}
     SStringT str = GetWindowText(bRawText);
-    if (nBufLen < str.GetLength() + 1)
+    if (nBufLen < str.GetLength())
         return 0;
-    _tcscpy(pBuf, str.c_str());
+	else if(nBufLen == str.GetLength())
+		_tcsncpy(pBuf, str.c_str(),str.GetLength());
+	else//if(nBufLen > str.GetLength())
+		_tcscpy(pBuf, str.c_str()); //auto append null char
     return str.GetLength();
 }
 
