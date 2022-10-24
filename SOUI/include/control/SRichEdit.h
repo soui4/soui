@@ -14,8 +14,10 @@
 
 #include <Richedit.h>
 #include <TextServ.h>
-#include "core/SPanel.h"
-#include "core/SSingleton2.h"
+#include <core/SPanel.h>
+#include <core/SSingleton2.h>
+#include <proxy/SCtrlProxy.h>
+
 SNSBEGIN
 enum
 {
@@ -1210,7 +1212,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
  *
  * Describe
  */
-class SOUI_EXP SEdit : public SRichEdit {
+class SOUI_EXP SEdit : public TCtrlProxy<IEdit,SRichEdit>  {
     DEF_SOBJECT(SRichEdit, L"edit")
   public:
     /**
@@ -1221,6 +1223,16 @@ class SOUI_EXP SEdit : public SRichEdit {
      */
     SEdit();
 
+public:
+	STDMETHOD_(void,GetCueText)(CTHIS_ IStringT *pStr) SCONST{
+		SStringT str = GetCueText(FALSE);
+		pStr->Copy(&str);
+	}
+
+	STDMETHOD_(COLORREF,GetCueColor)(CTHIS) SCONST{
+		return m_crCue;
+	}
+public:
     SStringT GetCueText(BOOL bRawText = FALSE) const;
 
     SOUI_ATTRS_BEGIN()

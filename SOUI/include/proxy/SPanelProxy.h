@@ -22,7 +22,7 @@ public:
 
 	STDMETHOD_(IWindow *, ToIWindow)(THIS) OVERRIDE
 	{
-		return (SPanel *)this;
+		return (IWindow *)this;
 	}
 
 	STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) OVERRIDE
