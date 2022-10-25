@@ -10,13 +10,37 @@ coins_bet = {0,0,0,0} --下注金额
 bet_rate = 4;		--赔率
 prog_max	 = 200;	--最大步数
 prog_all = {0,0,0,0} --马匹进度
+
+function on_host_msg(nativeWnd,msg, wp,lp,pRes)
+    --slog("test on host msg:" .. msg);
+	if msg == 0x82 then -- 0x82 == WM_NCDESTROY
+		NativeWnd_SetMsgHandler(nativeWnd,"",nativeWnd);
+	end
+	return 0;
+end
+
+function onBtnLrc(e)
+ slog("btn lrc clicked!");
+ local btn = toSWindow(e:Sender());
+ local container = btn:GetContainer();
+ local hwnd = container:GetHostHwnd();
+ local ret = SMessageBox(hwnd,L("onBtnLrc, cancel origin proc?"),L("test"),1);
+ if ret == 1 then
+	 e:SetBubbleUp(0); --block origin behavior.
+ end
+ return 1;
+end
+
 function on_init(args)
 	--初始化全局对象
-	win = getHost(args);
+	slog("on_init");
+	win = getHostFromInitEvent(args);
+	NativeWnd_SetMsgHandler(win,"on_host_msg",win);
+
 	if win == nil then
 		return 0;
 	end
-	local root = toSWindow(args:sender());
+	local root = toSWindow(args:Sender());
 	gamewnd = root:FindChildByNameA("game_wnd",-1);
 	gamecanvas = gamewnd:FindChildByNameA("game_canvas",-1);
 	flag_win = gamewnd:FindChildByNameA("flag_win",-1);
@@ -29,11 +53,16 @@ function on_init(args)
 	--布局
 	on_canvas_size(nil);
 
+	--show how to do SubscribeEvent
+	local btnLrc = root:FindChildByNameA("btn_lrc",-1);
+	local lrcSlot = CreateEventSlot("onBtnLrc");
+	btnLrc:SubscribeEvent(10000,lrcSlot); -- 10000 == EVT_CMD
+
 	math.randomseed(os.time());
 end
 
 function on_exit(args)
-	--SMessageBox(0,T "execute script function: on_exit", T "msgbox", 1);
+	slog("execute script function: on_exit");
 end
 
 function on_timer(args)
@@ -96,7 +125,7 @@ function on_bet(args)
 		return 1;
 	end
 
-	local btn = toSWindow(args:sender());
+	local btn = toSWindow(args:Sender());
 	if coins_all >= 10 then
 	    --id range from 101-104
 		id = btn:GetID()-100;
@@ -149,10 +178,11 @@ function on_canvas_size(args)
 end
 
 function on_run(args)
+
 	if win == nil then
 		return 0;
 	end
-	local btn = toSWindow(args:sender());
+	local btn = toSWindow(args:Sender());
 	if tid == 0 then
 		prog_all = {0,0,0,0};
 		on_canvas_size(nil);
@@ -168,8 +198,8 @@ function on_run(args)
 end
 
 function on_btn_select_cbx(args)
-	local btn = toSWindow(args:sender());
+	local btn = toSWindow(args:Sender());
 	local cbxwnd = btn:GetWindow(2);--get previous sibling
-	local cbx = toComboboxBase(cbxwnd);
+	local cbx = toSComboBase(cbxwnd);
 	cbx:SetCurSel(-1);
 end

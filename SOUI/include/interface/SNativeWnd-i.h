@@ -5,6 +5,11 @@ SNSBEGIN
 
 typedef BOOL (*FunMsgHandler)(const LPMSG pMsg, LRESULT *pRes, void *ctx);
 
+typedef struct _MsgHandlerInfo{
+	FunMsgHandler fun;
+	void * ctx;
+}MsgHandlerInfo;
+
 #undef INTERFACE
 #define INTERFACE INativeWnd
 DECLARE_INTERFACE_(INativeWnd, IObjRef)
@@ -158,6 +163,8 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef)
     (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey, BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
 
     STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
+
+	STDMETHOD_(MsgHandlerInfo *,GetMsgHandler)(THIS) PURE;
 };
 
 SNSEND

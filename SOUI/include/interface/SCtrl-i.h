@@ -1834,6 +1834,7 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
     STDMETHOD_(int, FindString)
     (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
 
+	//////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::DropDown
      * @brief    下拉事件

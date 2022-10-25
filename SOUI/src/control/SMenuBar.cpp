@@ -90,8 +90,8 @@ UINT SMenuBarItem::PopMenu()
 
     // 把弹出事件发送过去
     EventPopMenu evt_pop(m_pHostMenu);
-    evt_pop.m_index = m_iIndex;
-    evt_pop.m_pMenu = this;
+    evt_pop.nMenuIndex = m_iIndex;
+    evt_pop.pMenu = this;
     FireEvent(evt_pop);
 
     SetCheck(TRUE);
@@ -124,8 +124,8 @@ UINT SMenuBarItem::PopMenu()
 
     // 把选择事件发送过去
     EventSelectMenu evt_sel(m_pHostMenu);
-    evt_sel.m_id = iRet;
-    evt_sel.m_pMenu = this;
+    evt_sel.nMenuId = iRet;
+    evt_sel.pMenu = this;
     FireEvent(evt_sel);
 
     return iRet;

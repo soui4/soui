@@ -29,6 +29,24 @@ typedef struct IWindow IWindow;
 DECLARE_INTERFACE_(IScriptModule, IObjRef)
 {
     /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long,AddRef) (THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+    */
+    STDMETHOD_(long,Release) (THIS) PURE;
+
+	/**
+	 * @brief 释放对象
+	 * @return void
+	*/
+	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+
+	/**
      * GetScriptEngine
      * @brief    获得脚本引擎的指针
      * @return   void * -- 脚本引擎的指针
@@ -101,37 +119,6 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
         String object holding a string that identifies the ScriptModule in use.
     */
     STDMETHOD_(LPCSTR, getIdentifierString)(CTHIS) SCONST PURE;
-
-    /*!
-    \brief
-            Subscribes or unsubscribe the named Event to a scripted function
-
-    \param target
-            The target EventSet for the subscription.
-
-    \param uEvent
-            Event ID to subscribe to.
-
-    \param subscriber_name
-            String object containing the name of the script function that is to be subscribed to the
-    Event.
-
-    \return
-    */
-    STDMETHOD_(BOOL, subscribeEvent)
-    (THIS_ IWindow * target, UINT uEvent, LPCSTR subscriber_name) PURE;
-
-    /**
-     * unsubscribeEvent
-     * @brief    取消事件订阅
-     * @param    IWindow * target --  目标窗口
-     * @param    UINT uEvent --  目标事件
-     * @param    LPCSTR subscriber_name --  脚本函数名
-     * @return   bool -- true操作成功
-     * Describe
-     */
-    STDMETHOD_(BOOL, unsubscribeEvent)
-    (THIS_ IWindow * target, UINT uEvent, LPCSTR subscriber_name) PURE;
 };
 
 #undef INTERFACE

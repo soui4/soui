@@ -749,6 +749,11 @@ SWindow *SWindow::FindChildByName(LPCWSTR pszName, int nDeep)
     return pRet;
 }
 
+SWindow * SWindow::FindChildByName(LPCSTR strName, int nDeep /*= -1*/)
+{
+	return FindChildByName(S_CA2W(strName,CP_UTF8), nDeep);
+}
+
 const static wchar_t KLabelInclude[] = L"include"; //文件包含的标签
 const static wchar_t KTempNamespace[] = L"t:";     //模板识别ＮＳ
 const static wchar_t KTempData[] = L"data";        //模板参数
@@ -1599,6 +1604,11 @@ IWindow *SWindow::FindIChildByID(THIS_ int nId, int nDeep)
 IWindow *SWindow::FindIChildByName(THIS_ LPCWSTR pszName, int nDeep)
 {
     return FindChildByName(pszName, nDeep);
+}
+
+IWindow * SWindow::FindIChildByNameA(THIS_ LPCSTR pszName, int nDeep)
+{
+	return FindChildByName(pszName,nDeep);
 }
 
 void SWindow::DestroyAllChildren()

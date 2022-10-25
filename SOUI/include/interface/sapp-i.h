@@ -274,6 +274,11 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      */
 	STDMETHOD_(IObject *,CreateObject)(CTHIS_ LPCWSTR pszName,SObjectType nType) SCONST PURE;
 
+	/**
+     * @brief 设置CreateObject的回调
+	 * @param FunCreateObject cbCreateObj -- CreateObject的回调函数
+     * @return void
+     */
 	STDMETHOD_(void,SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) PURE;
 };
 

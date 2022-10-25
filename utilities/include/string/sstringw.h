@@ -84,24 +84,22 @@ public:
 	STDMETHOD_(LPVOID,GetPrivData)(THIS) SCONST;
 
 
+	STDMETHOD_(void,ToUpper)(THIS) OVERRIDE;
+	STDMETHOD_(void,ToLower)(THIS) OVERRIDE;
+	STDMETHOD_(void,TrimRight)(THIS_ wchar_t chTarget DEF_VAL(VK_SPACE)) OVERRIDE;
+	STDMETHOD_(void,TrimLeft)(THIS_ wchar_t chTarget DEF_VAL(VK_SPACE)) OVERRIDE;
+	STDMETHOD_(void,Trim)(THIS_ wchar_t chTarget DEF_VAL(VK_SPACE)) OVERRIDE;
+	STDMETHOD_(void,AppendChar)(THIS_ wchar_t ch) OVERRIDE;
+	STDMETHOD_(void,AppendStr)(THIS_ const wchar_t *pszStr, int nLen DEF_VAL(-1)) OVERRIDE;
+
 	// simple sub-string extraction
 	SStringW Mid(int nFirst) const;
 	SStringW Mid(int nFirst, int nCount) const;
 	SStringW Right(int nCount) const;
 	SStringW Left(int nCount) const;
 
-	//    string utilities
-	SStringW& MakeUpper();
-	SStringW& MakeLower();
-
-	// remove continuous occcurrences of characters in passed string, starting from right
-	SStringW & TrimRight(wchar_t chTarget = VK_SPACE);
-
-	// remove continuous occurrences of chTarget starting from left
-	SStringW & TrimLeft(wchar_t chTarget = VK_SPACE);
-
-	SStringW & Trim(wchar_t ch = VK_SPACE);
-
+	SStringW & MakeUpper();
+	SStringW & MakeLower();
 
 	static bool IsBlankChar(const wchar_t &c);
 
@@ -123,11 +121,7 @@ public:
 
 	const SStringW& operator+=(const SStringW& src);
 
-	const SStringW& Append(wchar_t ch);
-
-	const SStringW& Append(const wchar_t * psz);
-
-	const SStringW& Append(const SStringW& src);
+	SStringW& Append(const SStringW& src);
 
 	BOOL LoadString(UINT nID,HINSTANCE hInst);
 

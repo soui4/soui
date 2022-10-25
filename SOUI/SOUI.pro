@@ -91,6 +91,7 @@ HEADERS += include/SApp.h \
            include/proxy/SHostWndProxy.h \
            include/proxy/SPanelProxy.h \
            include/proxy/SWindowProxy.h \
+           include/proxy/SCtrlProxy.h \
            include/activex/SBStr.h \
            include/animation/SAlphaAnimation.h \
            include/animation/SAnimation.h \

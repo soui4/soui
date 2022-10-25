@@ -201,7 +201,7 @@ class SOUI_EXP SHostWnd
     DWORD m_dwThreadID;
     SRootWindow *m_pRoot;
 
-    SAutoRefPtr<IEvtSlot> m_defEvtSlot;
+	EventHandlerInfo m_evtHandler;
 
   public:
     SHostWnd(LPCTSTR pszResName = NULL);
@@ -250,6 +250,17 @@ class SOUI_EXP SHostWnd
     (THIS_ HWND hWndParent, int x = 0, int y = 0, int nWidth = 0, int nHeight = 0) OVERRIDE;
 
     STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) OVERRIDE;
+
+	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) OVERRIDE;
+
+	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) OVERRIDE;
+
+	//实现3个供脚本使用的定时器函数
+	STDMETHOD_(UINT, setTimeout)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) OVERRIDE;
+
+	STDMETHOD_(UINT, setInterval)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) OVERRIDE;
+
+	STDMETHOD_(void, clearTimer)(THIS_ UINT uID) OVERRIDE;
 
   public:
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1)
@@ -301,12 +312,6 @@ class SOUI_EXP SHostWnd
         return this;
     }
 
-    BOOL AnimateHostWindow(DWORD dwTime, DWORD dwFlags);
-
-    //实现3个供脚本使用的定时器函数
-    UINT setTimeout(LPCSTR pszScriptFunc, UINT uElapse);
-    UINT setInterval(LPCSTR pszScriptFunc, UINT uElapse);
-    void clearTimer(UINT uID);
 
     CRect GetWindowRect() const;
     CRect GetClientRect() const;

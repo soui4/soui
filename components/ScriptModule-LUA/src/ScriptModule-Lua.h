@@ -91,35 +91,6 @@ class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
     */
     STDMETHOD_(LPCSTR,getIdentifierString)(THIS) SCONST OVERRIDE;
 
-    /*!
-    \brief
-            Subscribes or unsubscribe the named Event to a scripted function
-
-    \param target
-            The target EventSet for the subscription.
-
-    \param uEvent
-            Event ID to subscribe to.
-
-    \param subscriber_name
-            String object containing the name of the script function that is to be subscribed to the Event.
-
-    \return 
-    */
-    STDMETHOD_(BOOL,subscribeEvent)(THIS_ IWindow* target, UINT uEvent, LPCSTR subscriber_name) OVERRIDE;
-
-    /**
-     * unsubscribeEvent
-     * @brief    取消事件订阅
-     * @param    IWindow * target --  目标窗口
-     * @param    UINT uEvent --  目标事件
-     * @param    LPCSTR subscriber_name --  脚本函数名
-     * @return   bool -- true操作成功
-     * Describe  
-     */    
-    STDMETHOD_(BOOL,unsubscribeEvent)(THIS_ IWindow* target, UINT uEvent, LPCSTR subscriber_name ) OVERRIDE;
-
-
     protected:
         lua_State * d_state;
     };

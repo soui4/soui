@@ -543,12 +543,12 @@ DEF_EVT(EventImageAnimateStart, EVT_IMAGE_ANI_START, on_image_animate_start, { i
 DEF_EVT(EventImageAnimateStop, EVT_IMAGE_ANI_STOP, on_image_animate_stop, { int fake; });
 
 DEF_EVT(EventSelectMenu, EVT_SELECTMENU, on_select_menu, {
-    UINT m_id;
-    void *m_pMenu;
+    UINT nMenuId;
+    void *pMenu;
 });
 DEF_EVT(EventPopMenu, EVT_POPMENU, on_pop_menu, {
-    UINT m_index;
-    void *m_pMenu;
+    UINT nMenuIndex;
+    void *pMenu;
 });
 
 DEF_EVT(EventSetHotKey, EVT_HOT_KEY_SET, on_hot_key_set_event, {

@@ -1,15 +1,5 @@
 ﻿#include <control/souictrls.h>
-
-
-SComboBase * toSComboboxBase(IObject *pObj)
-{
-    return sobj_cast<SComboBase>(pObj);
-}
-
-SComboBox * toSCombobox(IObject *pObj)
-{
-    return sobj_cast<SComboBox>(pObj);
-}
+#include "toobj.h"
 
 
 BOOL ExpLua_Ctrls(lua_State *L)
@@ -24,7 +14,7 @@ BOOL ExpLua_Ctrls(lua_State *L)
 		lua_tinker::class_def<SComboBase>(L,"FindString",&SComboBase::FindString);
 		lua_tinker::class_def<SComboBase>(L,"DropDown",&SComboBase::DropDown);
 		lua_tinker::class_def<SComboBase>(L,"CloseUp",&SComboBase::CloseUp);
-		lua_tinker::def(L,"toComboboxBase",toSComboboxBase);
+		DEF_TOOBJ(L,SComboBase);
 		
         lua_tinker::class_add<SComboBox>(L,"SComboBox");
         lua_tinker::class_inh<SComboBox,SComboBase>(L);
@@ -35,7 +25,7 @@ BOOL ExpLua_Ctrls(lua_State *L)
         lua_tinker::class_def<SComboBox>(L,"GetListBox",&SComboBox::GetListBox);
         lua_tinker::class_def<SComboBox>(L,"GetItemData",&SComboBox::GetItemData);
         lua_tinker::class_def<SComboBox>(L,"SetItemData",&SComboBox::SetItemData);
-        lua_tinker::def(L,"toCombobox",toSCombobox);
+		DEF_TOOBJ(L,SComboBox);
 
         
 		return TRUE;

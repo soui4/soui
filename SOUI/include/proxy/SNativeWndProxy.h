@@ -322,6 +322,11 @@ public:
 	{
 		return SNativeWnd::SetMsgHandler(fun, ctx);
 	}
+
+	STDMETHOD_(MsgHandlerInfo *, GetMsgHandler)(THIS) OVERRIDE{
+		return SNativeWnd::GetMsgHandler();
+	}
+
 };
 
 SNSEND

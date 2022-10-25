@@ -10,21 +10,31 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lua_tinker)
 
 set(ScriptModule-lua_header
 	src/stdafx.h
-#	src/require.h
 	src/ScriptModule-Lua.h
-	src/exports/exp_app.h
-	src/exports/exp_Basic.h
-	src/exports/exp_eventArgs.h
-	src/exports/exp_hostwnd.h
-	src/exports/exp_msgbox.h
-	src/exports/exp_pugixml.h
-	src/exports/exp_ResProvider.h
-	src/exports/exp_ScriptModule.h
-	src/exports/exp_strcpcvt.h
-	src/exports/exp_string.h
-	src/exports/exp_Window.h
-	src/exports/exp_Object.h
-	src/exports/exp_ctrls.h
+           src/exports/exp_Basic.h
+           src/exports/exp_ctrls.h
+           src/exports/exp_eventArgs.h
+           src/exports/exp_global.h
+           src/exports/exp_IApp.h
+           src/exports/exp_IContainer.h
+           src/exports/exp_ICtrl.h
+           src/exports/exp_IEvtArgs.h
+           src/exports/exp_IHostWnd.h
+           src/exports/exp_INativeWnd.h
+           src/exports/exp_IObject.h
+           src/exports/exp_IObjRef.h
+           src/exports/exp_IResProvider.h
+           src/exports/exp_IResProviderMgr.h
+           src/exports/exp_IScriptModule.h
+           src/exports/exp_ISouifac.h
+           src/exports/exp_IString.h
+           src/exports/exp_IWindow.h
+           src/exports/exp_IXml.h
+           src/exports/exp_strcpcvt.h
+           src/exports/exp_string.h
+           src/exports/exp_Window.h
+           src/exports/luaFunSlot.h
+           src/exports/toobj.h
 	lua_tinker/lua_tinker.h
 )
 

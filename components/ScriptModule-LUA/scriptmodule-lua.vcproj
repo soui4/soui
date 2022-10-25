@@ -3,7 +3,7 @@
 	ProjectType="Visual C++"
 	Version="9,00"
 	Name="scriptmodule-lua"
-	ProjectGUID="{A284957C-9B5B-3DE6-8EE5-BC266FB878D5}"
+	ProjectGUID="{6F7C5E97-E11F-3925-BD79-00FB8512CE69}"
 	Keyword="Qt4VSv1.0">
 	<Platforms>
 		<Platform
@@ -159,33 +159,51 @@
 			<File
 				RelativePath="src\exports\exp_Basic.h" />
 			<File
-				RelativePath="src\exports\exp_Object.h" />
+				RelativePath="src\exports\exp_IApp.h" />
 			<File
-				RelativePath="src\exports\exp_ResProvider.h" />
+				RelativePath="src\exports\exp_IContainer.h" />
 			<File
-				RelativePath="src\exports\exp_ScriptModule.h" />
+				RelativePath="src\exports\exp_ICtrl.h" />
+			<File
+				RelativePath="src\exports\exp_IEvtArgs.h" />
+			<File
+				RelativePath="src\exports\exp_IHostWnd.h" />
+			<File
+				RelativePath="src\exports\exp_INativeWnd.h" />
+			<File
+				RelativePath="src\exports\exp_IObjRef.h" />
+			<File
+				RelativePath="src\exports\exp_IObject.h" />
+			<File
+				RelativePath="src\exports\exp_IResProvider.h" />
+			<File
+				RelativePath="src\exports\exp_IResProviderMgr.h" />
+			<File
+				RelativePath="src\exports\exp_IScriptModule.h" />
+			<File
+				RelativePath="src\exports\exp_ISouifac.h" />
+			<File
+				RelativePath="src\exports\exp_IString.h" />
+			<File
+				RelativePath="src\exports\exp_IWindow.h" />
+			<File
+				RelativePath="src\exports\exp_IXml.h" />
 			<File
 				RelativePath="src\exports\exp_Window.h" />
-			<File
-				RelativePath="src\exports\exp_app.h" />
 			<File
 				RelativePath="src\exports\exp_ctrls.h" />
 			<File
 				RelativePath="src\exports\exp_eventArgs.h" />
 			<File
-				RelativePath="src\exports\exp_hostwnd.h" />
-			<File
-				RelativePath="src\exports\exp_msgbox.h" />
-			<File
-				RelativePath="src\exports\exp_pugixml.h" />
+				RelativePath="src\exports\exp_global.h" />
 			<File
 				RelativePath="src\exports\exp_strcpcvt.h" />
 			<File
 				RelativePath="src\exports\exp_string.h" />
 			<File
-				RelativePath="lua_tinker\lua_tinker.h" />
+				RelativePath="src\exports\luaFunSlot.h" />
 			<File
-				RelativePath="src\require.h" />
+				RelativePath="lua_tinker\lua_tinker.h" />
 			<File
 				RelativePath="src\stdafx.h">
 				<FileConfiguration
@@ -205,6 +223,8 @@
 						Outputs="src\stdafx.h.cpp" />
 				</FileConfiguration>
 			</File>
+			<File
+				RelativePath="src\exports\toobj.h" />
 		</Filter>
 		<Filter
 			Name="Generated Files"

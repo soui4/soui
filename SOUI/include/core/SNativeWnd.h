@@ -295,6 +295,7 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
     (THIS_ HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags) OVERRIDE;
 
     STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) OVERRIDE;
+	STDMETHOD_(MsgHandlerInfo *,GetMsgHandler)(THIS) OVERRIDE;
 
     LRESULT DefWindowProc();
     LRESULT ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
@@ -311,8 +312,8 @@ class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>
 
     const MSG *m_pCurrentMsg;
     BOOL m_bDestoryed;
-    FunMsgHandler m_fun;
-    void *m_ctx;
+
+	MsgHandlerInfo m_msgHandlerInfo;
 
   public:
     HWND m_hWnd;

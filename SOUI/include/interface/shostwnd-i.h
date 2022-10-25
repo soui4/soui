@@ -6,6 +6,11 @@ SNSBEGIN
 typedef struct IWindow IWindow;
 typedef struct IApplication IApplication;
 
+typedef struct _EventHandlerInfo{
+	FunCallback fun;
+	void * ctx;
+}EventHandlerInfo;
+
 #undef INTERFACE
 #define INTERFACE IHostWnd
 DECLARE_INTERFACE_(IHostWnd, INativeWnd)
@@ -145,12 +150,13 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
     (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey, BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
 
     STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
+	STDMETHOD_(MsgHandlerInfo *,GetMsgHandler)(THIS) PURE;
 
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(HWND, CreateEx)
     (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) PURE;
-    STDMETHOD_(HWND, Create)
-    (THIS_ HWND hWndParent, int x /*= 0*/, int y /*= 0*/, int nWidth /*= 0*/, int nHeight /*= 0*/) PURE;
+	STDMETHOD_(HWND, Create)
+	(THIS_ HWND hWndParent, int x DEF_VAL(0), int y DEF_VAL(0), int nWidth DEF_VAL(0), int nHeight DEF_VAL(0)) PURE;
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
 
@@ -175,6 +181,17 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
 
     STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
+	
+	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) PURE;
+
+	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) PURE;
+
+	//实现3个供脚本使用的定时器函数
+	STDMETHOD_(UINT, setTimeout)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) PURE;
+
+	STDMETHOD_(UINT, setInterval)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) PURE;
+
+	STDMETHOD_(void, clearTimer)(THIS_ UINT uID) PURE;
 };
 
 #undef INTERFACE
@@ -316,12 +333,13 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
     (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey, BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
 
     STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
+	STDMETHOD_(MsgHandlerInfo *,GetMsgHandler)(THIS) PURE;
 
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(HWND, CreateEx)
     (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) PURE;
     STDMETHOD_(HWND, Create)
-    (THIS_ HWND hWndParent, int x /*= 0*/, int y /*= 0*/, int nWidth /*= 0*/, int nHeight /*= 0*/) PURE;
+    (THIS_ HWND hWndParent, int x DEF_VAL(0), int y DEF_VAL(0), int nWidth DEF_VAL(0), int nHeight DEF_VAL(0)) PURE;
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
 	    /**
@@ -344,7 +362,16 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
     STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
+	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) PURE;
 
+	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) PURE;
+
+	//实现3个供脚本使用的定时器函数
+	STDMETHOD_(UINT, setTimeout)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) PURE;
+
+	STDMETHOD_(UINT, setInterval)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) PURE;
+
+	STDMETHOD_(void, clearTimer)(THIS_ UINT uID) PURE;
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent /*=NULL*/) PURE;
     STDMETHOD_(void, EndDialog)(THIS_ INT_PTR nResult) PURE;

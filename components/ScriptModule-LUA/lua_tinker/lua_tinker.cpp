@@ -18,6 +18,21 @@
 #define I64_FMT "ll"
 #endif
 
+#include <stack>
+static std::stack<lua_State *> sCallerState;
+lua_tinker::SaveState::SaveState(lua_State *L){
+	sCallerState.push(L);
+}
+lua_tinker::SaveState::~SaveState(){
+	sCallerState.pop();
+}
+
+lua_State * lua_tinker::get_state(){
+	if(sCallerState.size()==0)
+		return NULL;
+	return sCallerState.top();
+}
+
 
 /*---------------------------------------------------------------------------*/
 /* excution                                                                  */

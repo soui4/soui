@@ -43,9 +43,9 @@ SNativeWnd::SNativeWnd()
     , m_hWnd(NULL)
     , m_pfnSuperWindowProc(::DefWindowProc)
     , m_pThunk(NULL)
-    , m_fun(NULL)
-    , m_ctx(NULL)
 {
+	m_msgHandlerInfo.fun = NULL;
+	m_msgHandlerInfo.ctx = NULL;
 }
 
 SNativeWnd::~SNativeWnd(void)
@@ -116,9 +116,9 @@ LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     const MSG *pOldMsg = pThis->m_pCurrentMsg;
     pThis->m_pCurrentMsg = &msg;
     LRESULT lRes = 0;
-    if (pThis->m_fun)
+    if (pThis->m_msgHandlerInfo.fun)
     {
-        BOOL bHandled = pThis->m_fun(&msg, &lRes, pThis->m_ctx);
+        BOOL bHandled = pThis->m_msgHandlerInfo.fun(&msg, &lRes, pThis->m_msgHandlerInfo.ctx);
         if (bHandled)
             return lRes;
     }
@@ -787,8 +787,13 @@ const MSG *SNativeWnd::GetCurrentMessage() const
 
 void SNativeWnd::SetMsgHandler(THIS_ FunMsgHandler fun, void *ctx)
 {
-    m_fun = fun;
-    m_ctx = ctx;
+	m_msgHandlerInfo.fun = fun;
+	m_msgHandlerInfo.ctx = ctx;
+}
+
+MsgHandlerInfo * SNativeWnd::GetMsgHandler()
+{
+	return &m_msgHandlerInfo;
 }
 
 SNSEND

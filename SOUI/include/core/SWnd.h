@@ -387,6 +387,8 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep DEF_VAL(-1)) OVERRIDE;
 
+	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName, int nDeep DEF_VAL(-1)) OVERRIDE;
+
     STDMETHOD_(ISwndContainer *, GetContainer)(THIS) OVERRIDE;
     STDMETHOD_(void, SetContainer)(THIS_ ISwndContainer *pContainer) OVERRIDE;
 
@@ -445,6 +447,8 @@ class SOUI_EXP SWindow
 	STDMETHOD_(BOOL, SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult) OVERRIDE;
 
 	STDMETHOD_(void, SetSwndProc)(THIS_ FunSwndProc swndProc) OVERRIDE;
+
+	STDMETHOD_(IScriptModule *,GetScriptModule)(THIS) OVERRIDE;
 
   public: // caret相关方法
     STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) OVERRIDE;
@@ -627,10 +631,7 @@ class SOUI_EXP SWindow
      */
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1);
 
-    SWindow *FindChildByName(LPCSTR strName, int nDeep = -1)
-    {
-        return FindChildByName(S_CA2W(strName), nDeep);
-    }
+    SWindow *FindChildByName(LPCSTR strName, int nDeep = -1);
 
     /**
      * FindChildByName2
@@ -951,14 +952,6 @@ class SOUI_EXP SWindow
      * Describe  一般应该和CreateRanderTarget配合使用
      */
     void BeforePaintEx(IRenderTarget *pRT);
-
-    /**
-     * GetScriptModule
-     * @brief    获得脚本模块
-     * @return   IScriptModule * -- 模块模块指针
-     * Describe
-     */
-    IScriptModule *GetScriptModule();
 
     void TransformPoint(CPoint &pt) const;
 

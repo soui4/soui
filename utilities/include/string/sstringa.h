@@ -84,23 +84,22 @@ public:
 	STDMETHOD_(void ,Assign2)(THIS_ LPCSTR src,int nLen) ;
 	STDMETHOD_(LPVOID ,GetPrivData)(THIS) SCONST;
 
+	STDMETHOD_(void,ToUpper)(THIS) OVERRIDE;
+	STDMETHOD_(void,ToLower)(THIS) OVERRIDE;
+	STDMETHOD_(void,TrimRight)(THIS_ char chTarget DEF_VAL(VK_SPACE)) OVERRIDE;
+	STDMETHOD_(void,TrimLeft)(THIS_ char chTarget DEF_VAL(VK_SPACE)) OVERRIDE;
+	STDMETHOD_(void,Trim)(THIS_ char chTarget DEF_VAL(VK_SPACE)) OVERRIDE;
+	STDMETHOD_(void,AppendChar)(THIS_ char ch) OVERRIDE;
+	STDMETHOD_(void,AppendStr)(THIS_ const char *pszStr, int nLen DEF_VAL(-1)) OVERRIDE;
+
 	// simple sub-string extraction
 	SStringA Mid(int nFirst) const;
 	SStringA Mid(int nFirst, int nCount) const;
 	SStringA Right(int nCount) const;
 	SStringA Left(int nCount) const;
 
-	//    string utilities
-	SStringA& MakeUpper();
-	SStringA& MakeLower();
-
-	// remove continuous occcurrences of characters in passed string, starting from right
-	SStringA & TrimRight(char chTarget = VK_SPACE);
-
-	// remove continuous occurrences of chTarget starting from left
-	SStringA & TrimLeft(char chTarget = VK_SPACE);
-
-	SStringA & Trim(char ch = VK_SPACE);
+	SStringA & MakeUpper();
+	SStringA & MakeLower();
 
 	bool StartsWith(const SStringA& prefix, bool IgnoreCase = false) const;
 
@@ -132,11 +131,7 @@ public:
 
 	const SStringA& operator+=(const SStringA& src);
 
-	const SStringA& Append(char ch);
-
-	const SStringA& Append(const char * psz);
-
-	const SStringA& Append(const SStringA& src);
+	SStringA& Append(const SStringA& src);
 
 	static bool IsBlankChar(const char &c);
 

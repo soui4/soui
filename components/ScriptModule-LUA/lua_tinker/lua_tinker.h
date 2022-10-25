@@ -312,6 +312,14 @@ namespace lua_tinker
       >::type::invoke ( L, val );
    }
 
+   class SaveState{
+   public:
+	   SaveState(lua_State *L);
+	   ~SaveState();
+   };
+
+   lua_State * get_state();
+
    // get value from cclosure
    template<typename T>
    T upvalue_ ( lua_State *L )
@@ -378,43 +386,43 @@ namespace lua_tinker
    template<typename RVal, typename T1 = void, typename T2 = void, typename T3 = void, typename T4 = void, typename T5 = void>
    struct functor
    {
-      static int invoke ( lua_State *L ) { push ( L, upvalue_<RVal ( *)( T1, T2, T3, T4, T5 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ), read<T5> ( L, 5 ) ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, upvalue_<RVal (UAPI *)( T1, T2, T3, T4, T5 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ), read<T5> ( L, 5 ) ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal ( *)( T1, T2, T3, T4, T5 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ), read<T5> ( L, 5 ) ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal (UAPI *)( T1, T2, T3, T4, T5 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ), read<T5> ( L, 5 ) ) ); return 1; }
    };
 
    template<typename RVal, typename T1, typename T2, typename T3, typename T4>
    struct functor < RVal, T1, T2, T3, T4 >
    {
-      static int invoke ( lua_State *L ) { push ( L, upvalue_<RVal ( *)( T1, T2, T3, T4 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ) ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, upvalue_<RVal (UAPI *)( T1, T2, T3, T4 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ) ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal ( *)( T1, T2, T3, T4 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ) ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal (UAPI *)( T1, T2, T3, T4 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ) ) ); return 1; }
    };
 
    template<typename RVal, typename T1, typename T2, typename T3>
    struct functor < RVal, T1, T2, T3 >
    {
-      static int invoke ( lua_State *L ) { push ( L, upvalue_<RVal ( *)( T1, T2, T3 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ) ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, upvalue_<RVal (UAPI *)( T1, T2, T3 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ) ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal ( *)( T1, T2, T3 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ) ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal (UAPI *)( T1, T2, T3 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ) ) ); return 1; }
    };
 
    template<typename RVal, typename T1, typename T2>
    struct functor < RVal, T1, T2 >
    {
-      static int invoke ( lua_State *L ) { push ( L, upvalue_<RVal ( *)( T1, T2 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ) ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, upvalue_<RVal (UAPI *)( T1, T2 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ) ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal ( *)( T1, T2 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ) ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal (UAPI *)( T1, T2 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ) ) ); return 1; }
    };
 
    template<typename RVal, typename T1>
    struct functor < RVal, T1 >
    {
-      static int invoke ( lua_State *L ) { push ( L, upvalue_<RVal ( *)( T1 )> ( L )( read<T1> ( L, 1 ) ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, upvalue_<RVal (UAPI *)( T1 )> ( L )( read<T1> ( L, 1 ) ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal ( *)( T1 )> ( L )( read<T1> ( L, 1 ) ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal (UAPI *)( T1 )> ( L )( read<T1> ( L, 1 ) ) ); return 1; }
    };
 
    template<typename RVal>
    struct functor < RVal >
    {
-      static int invoke ( lua_State *L ) { push ( L, upvalue_<RVal ( *)( )> ( L )( ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, upvalue_<RVal (UAPI *)( )> ( L )( ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal ( *)( )> ( L )( ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, upvalue_<RVal (UAPI *)( )> ( L )( ) ); return 1; }
    };
 
    // functor (without return value)
@@ -424,58 +432,58 @@ namespace lua_tinker
    template<typename T1, typename T2, typename T3, typename T4, typename T5>
    struct functor < void, T1, T2, T3, T4, T5 >
    {
-      static int invoke ( lua_State *L ) { upvalue_<void ( *)( T1, T2, T3, T4, T5 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ), read<T5> ( L, 5 ) ); return 0; }
-	  static int invokeU ( lua_State *L ) { upvalue_<void (UAPI *)( T1, T2, T3, T4, T5 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ), read<T5> ( L, 5 ) ); return 0; }
+      static int invoke ( lua_State *L ) { SaveState ss(L);upvalue_<void ( *)( T1, T2, T3, T4, T5 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ), read<T5> ( L, 5 ) ); return 0; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L);upvalue_<void (UAPI *)( T1, T2, T3, T4, T5 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ), read<T5> ( L, 5 ) ); return 0; }
    };
 
    template<typename T1, typename T2, typename T3, typename T4>
    struct functor < void, T1, T2, T3, T4 >
    {
-      static int invoke ( lua_State *L ) { upvalue_<void ( *)( T1, T2, T3, T4 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ) ); return 0; }
-	  static int invokeU ( lua_State *L ) { upvalue_<void (UAPI *)( T1, T2, T3, T4 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ) ); return 0; }
+      static int invoke ( lua_State *L ) { SaveState ss(L);upvalue_<void ( *)( T1, T2, T3, T4 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ) ); return 0; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L);upvalue_<void (UAPI *)( T1, T2, T3, T4 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ), read<T4> ( L, 4 ) ); return 0; }
    };
 
    template<typename T1, typename T2, typename T3>
    struct functor < void, T1, T2, T3 >
    {
-      static int invoke ( lua_State *L ) { upvalue_<void ( *)( T1, T2, T3 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ) ); return 0; }
-	  static int invokeU ( lua_State *L ) { upvalue_<void (UAPI *)( T1, T2, T3 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ) ); return 0; }
+      static int invoke ( lua_State *L ) { SaveState ss(L);upvalue_<void ( *)( T1, T2, T3 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ) ); return 0; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L);upvalue_<void (UAPI *)( T1, T2, T3 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ), read<T3> ( L, 3 ) ); return 0; }
    };
 
    template<typename T1, typename T2>
    struct functor < void, T1, T2 >
    {
-      static int invoke ( lua_State *L ) { upvalue_<void ( *)( T1, T2 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ) ); return 0; }
-	  static int invokeU ( lua_State *L ) { upvalue_<void (UAPI *)( T1, T2 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ) ); return 0; }
+      static int invoke ( lua_State *L ) { SaveState ss(L);upvalue_<void ( *)( T1, T2 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ) ); return 0; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L);upvalue_<void (UAPI *)( T1, T2 )> ( L )( read<T1> ( L, 1 ), read<T2> ( L, 2 ) ); return 0; }
    };
 
    template<typename T1>
    struct functor < void, T1 >
    {
-      static int invoke ( lua_State *L ) { upvalue_<void ( *)( T1 )> ( L )( read<T1> ( L, 1 ) ); return 0; }
-	  static int invokeU ( lua_State *L ) { upvalue_<void (UAPI *)( T1 )> ( L )( read<T1> ( L, 1 ) ); return 0; }
+      static int invoke ( lua_State *L ) { SaveState ss(L);upvalue_<void ( *)( T1 )> ( L )( read<T1> ( L, 1 ) ); return 0; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L);upvalue_<void (UAPI *)( T1 )> ( L )( read<T1> ( L, 1 ) ); return 0; }
    };
 
    template<>
    struct functor < void >
    {
-      static int invoke ( lua_State *L ) { upvalue_<void ( *)( )> ( L )( ); return 0; }
-	  static int invokeU ( lua_State *L ) { upvalue_<void (UAPI *)( )> ( L )( ); return 0; }
+      static int invoke ( lua_State *L ) { SaveState ss(L);upvalue_<void ( *)( )> ( L )( ); return 0; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L);upvalue_<void (UAPI *)( )> ( L )( ); return 0; }
    };
 
    // functor (non-managed)
    template<typename T1>
    struct functor < int, lua_State*, T1 >
    {
-      static int invoke ( lua_State *L ) { return upvalue_<int ( *)( lua_State*, T1 )> ( L )( L, read<T1> ( L, 1 ) ); }
-	  static int invokeU ( lua_State *L ) { return upvalue_<int (UAPI *)( lua_State*, T1 )> ( L )( L, read<T1> ( L, 1 ) ); }
+      static int invoke ( lua_State *L ) { SaveState ss(L);return upvalue_<int ( *)( lua_State*, T1 )> ( L )( L, read<T1> ( L, 1 ) ); }
+	  static int invokeU ( lua_State *L ) {SaveState ss(L); return upvalue_<int (UAPI *)( lua_State*, T1 )> ( L )( L, read<T1> ( L, 1 ) ); }
    };
 
    template<>
    struct functor < int, lua_State* >
    {
-      static int invoke ( lua_State *L ) { return upvalue_<int ( *)( lua_State* )> ( L )( L ); }
-	  static int invokeU ( lua_State *L ) { return upvalue_<int (UAPI *)( lua_State* )> ( L )( L ); }
+      static int invoke ( lua_State *L ) { SaveState ss(L);return upvalue_<int ( *)( lua_State* )> ( L )( L ); }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L);return upvalue_<int (UAPI *)( lua_State* )> ( L )( L ); }
    };
 
    // push_functor
@@ -584,104 +592,445 @@ namespace lua_tinker
    };
 
    // class member functor (with return value)
-   template<typename RVal, typename T, typename T1 = void, typename T2 = void, typename T3 = void, typename T4 = void, typename T5 = void>
-   struct mem_functor
+   template<typename RVal, typename T, 
+   	   typename T1 = void, 
+   	   typename T2 = void,
+   	   typename T3 = void, 
+   	   typename T4 = void, 
+   	   typename T5 = void, 
+   	   typename T6 = void,
+   	   typename T7 = void,
+   	   typename T8 = void,
+   	   typename T9 = void,
+   	   typename T10 = void
+   	   >
+   struct mem_functor 
    {
-      static int invoke ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3, T4, T5 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ), read<T5> ( L, 6 ) ) );; return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3, T4, T5 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ), read<T5> ( L, 6 ) ) );; return 1; }
+	   static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3, T4, T5 ,T6,T7,T8,T9,T10)> ( L ) )( 
+		   read<T1> ( L, 2 ),
+		   read<T2> ( L, 3 ), 
+		   read<T3> ( L, 4 ), 
+		   read<T4> ( L, 5 ), 
+		   read<T5> ( L, 6 ), 
+		   read<T6> ( L, 7 ),
+		   read<T7> ( L, 8 ),
+		   read<T8> ( L, 9 ),
+		   read<T9> ( L, 10 ),
+		   read<T10> ( L, 11 )
+	    ) );; return 1; }
+	   static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3, T4, T5 ,T6,T7,T8,T9,T10)> ( L ) )( 
+		   read<T1> ( L, 2 ),
+		   read<T2> ( L, 3 ), 
+		   read<T3> ( L, 4 ), 
+		   read<T4> ( L, 5 ), 
+		   read<T5> ( L, 6 ), 
+		   read<T6> ( L, 7 ),
+		   read<T7> ( L, 8 ),
+		   read<T8> ( L, 9 ),
+		   read<T9> ( L, 10 ),
+		   read<T10> ( L, 11 )
+	    ) );; return 1; }
+   };
+
+   template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2,
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5, 
+   	   typename T6,
+   	   typename T7,
+   	   typename T8,
+   	   typename T9
+   	   >
+   struct mem_functor  < RVal, T, T1, T2, T3, T4 ,T5,T6,T7,T8,T9>
+   {
+	   static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3, T4, T5 ,T6,T7,T8,T9)> ( L ) )( 
+		   read<T1> ( L, 2 ),
+		   read<T2> ( L, 3 ), 
+		   read<T3> ( L, 4 ), 
+		   read<T4> ( L, 5 ), 
+		   read<T5> ( L, 6 ), 
+		   read<T6> ( L, 7 ),
+		   read<T7> ( L, 8 ),
+		   read<T8> ( L, 9 ),
+		   read<T9> ( L, 10 )
+	    ) );; return 1; }
+	   static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3, T4, T5 ,T6,T7,T8,T9)> ( L ) )( 
+		   read<T1> ( L, 2 ),
+		   read<T2> ( L, 3 ), 
+		   read<T3> ( L, 4 ), 
+		   read<T4> ( L, 5 ), 
+		   read<T5> ( L, 6 ), 
+		   read<T6> ( L, 7 ),
+		   read<T7> ( L, 8 ),
+		   read<T8> ( L, 9 ),
+		   read<T9> ( L, 10 )
+	    ) );; return 1; }
+   };
+
+   template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2,
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5, 
+   	   typename T6,
+   	   typename T7,
+   	   typename T8
+   >
+   struct mem_functor  < RVal, T, T1, T2, T3, T4 ,T5,T6,T7,T8>
+   {
+	   static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3, T4, T5 ,T6,T7,T8)> ( L ) )( 
+		   read<T1> ( L, 2 ),
+		   read<T2> ( L, 3 ), 
+		   read<T3> ( L, 4 ), 
+		   read<T4> ( L, 5 ), 
+		   read<T5> ( L, 6 ), 
+		   read<T6> ( L, 7 ),
+		   read<T7> ( L, 8 ),
+		   read<T8> ( L, 9 )
+	    ) );; return 1; }
+	   static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3, T4, T5 ,T6,T7,T8)> ( L ) )( 
+		   read<T1> ( L, 2 ),
+		   read<T2> ( L, 3 ), 
+		   read<T3> ( L, 4 ), 
+		   read<T4> ( L, 5 ), 
+		   read<T5> ( L, 6 ), 
+		   read<T6> ( L, 7 ),
+		   read<T7> ( L, 8 ),
+		   read<T8> ( L, 9 )
+	    ) );; return 1; }
+   };
+
+   template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2,
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5, 
+   	   typename T6,
+   	   typename T7
+   >
+   struct mem_functor  < RVal, T, T1, T2, T3, T4 ,T5,T6,T7>
+   {
+	   static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3, T4, T5 ,T6,T7)> ( L ) )( 
+		   read<T1> ( L, 2 ),
+		   read<T2> ( L, 3 ), 
+		   read<T3> ( L, 4 ), 
+		   read<T4> ( L, 5 ), 
+		   read<T5> ( L, 6 ), 
+		   read<T6> ( L, 7 ),
+		   read<T7> ( L, 8 )
+	    ) );; return 1; }
+	   static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3, T4, T5 ,T6,T7)> ( L ) )( 
+		   read<T1> ( L, 2 ),
+		   read<T2> ( L, 3 ), 
+		   read<T3> ( L, 4 ), 
+		   read<T4> ( L, 5 ), 
+		   read<T5> ( L, 6 ), 
+		   read<T6> ( L, 7 ),
+		   read<T7> ( L, 8 )
+	    ) );; return 1; }
+   };
+   
+   template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2,
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5, 
+   	   typename T6
+   >
+   struct mem_functor  < RVal, T, T1, T2, T3, T4 ,T5,T6>
+   {
+	   static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3, T4, T5 ,T6)> ( L ) )( 
+		   read<T1> ( L, 2 ),
+		   read<T2> ( L, 3 ), 
+		   read<T3> ( L, 4 ), 
+		   read<T4> ( L, 5 ), 
+		   read<T5> ( L, 6 ), 
+		   read<T6> ( L, 7 )
+	    ) );; return 1; }
+	   static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3, T4, T5 ,T6)> ( L ) )( 
+		   read<T1> ( L, 2 ),
+		   read<T2> ( L, 3 ), 
+		   read<T3> ( L, 4 ), 
+		   read<T4> ( L, 5 ), 
+		   read<T5> ( L, 6 ), 
+		   read<T6> ( L, 7 )
+	    ) );; return 1; }
+   };
+
+   template<typename RVal, typename T, typename T1 , typename T2 , typename T3 , typename T4 , typename T5 >
+   struct mem_functor < RVal, T, T1, T2, T3, T4 ,T5>
+   {
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3, T4, T5 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ), read<T5> ( L, 6 ) ) );; return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3, T4, T5 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ), read<T5> ( L, 6 ) ) );; return 1; }
    };
 
    template<typename RVal, typename T, typename T1, typename T2, typename T3, typename T4>
    struct mem_functor < RVal, T, T1, T2, T3, T4 >
    {
-      static int invoke ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3, T4 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ) ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3, T4 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ) ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3, T4 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ) ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3, T4 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ) ) ); return 1; }
    };
 
    template<typename RVal, typename T, typename T1, typename T2, typename T3>
    struct mem_functor < RVal, T, T1, T2, T3 >
    {
-      static int invoke ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ) ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ) ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2, T3 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ) ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2, T3 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ) ) ); return 1; }
    };
 
    template<typename RVal, typename T, typename T1, typename T2>
    struct mem_functor < RVal, T, T1, T2 >
    {
-      static int invoke ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ) ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ) ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1, T2 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ) ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1, T2 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ) ) ); return 1; }
    };
 
    template<typename RVal, typename T, typename T1>
    struct mem_functor < RVal, T, T1 >
    {
-      static int invoke ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1 )> ( L ) )( read<T1> ( L, 2 ) ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1 )> ( L ) )( read<T1> ( L, 2 ) ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( T1 )> ( L ) )( read<T1> ( L, 2 ) ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( T1 )> ( L ) )( read<T1> ( L, 2 ) ) ); return 1; }
    };
 
    template<typename RVal, typename T>
    struct mem_functor < RVal, T >
    {
-      static int invoke ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( )> ( L ) )( ) ); return 1; }
-	  static int invokeU ( lua_State *L ) { push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( )> ( L ) )( ) ); return 1; }
+      static int invoke ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal ( T::* )( )> ( L ) )( ) ); return 1; }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L); push ( L, ( read<T*> ( L, 1 )->*upvalue_<RVal (UAPI T::* )( )> ( L ) )( ) ); return 1; }
    };
 
+
    // class member functor (without return value)
+   template<typename T, 
+   	   typename T1,
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7, 
+   	   typename T8, 
+   	   typename T9, 
+   	   typename T10 
+   	   >
+   struct mem_functor < void, T, T1, T2, T3, T4, T5,T6,T7,T8,T9,T10 >
+   {
+      static int invoke ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3, T4, T5,T6,T7,T8,T9,T10 )> ( L ) )( 
+      read<T1> ( L, 2 ), 
+      read<T2> ( L, 3 ), 
+      read<T3> ( L, 4 ), 
+      read<T4> ( L, 5 ), 
+      read<T5> ( L, 6 ),
+      read<T6> ( L, 7 ), 
+      read<T7> ( L, 8 ), 
+      read<T8> ( L, 9 ), 
+      read<T9> ( L, 10 ), 
+      read<T10> ( L, 11 )
+       ); return 0; }
+      static int invokeU ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3, T4, T5,T6,T7,T8,T9,T10 )> ( L ) )( 
+      read<T1> ( L, 2 ), 
+      read<T2> ( L, 3 ), 
+      read<T3> ( L, 4 ), 
+      read<T4> ( L, 5 ), 
+      read<T5> ( L, 6 ),
+      read<T6> ( L, 7 ), 
+      read<T7> ( L, 8 ), 
+      read<T8> ( L, 9 ), 
+      read<T9> ( L, 10 ), 
+      read<T10> ( L, 11 )
+       ); return 0; }
+   };
+   
+   template<typename T, 
+   	   typename T1,
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7, 
+   	   typename T8, 
+   	   typename T9
+   	   >
+      struct mem_functor < void, T, T1, T2, T3, T4, T5,T6,T7,T8,T9 >
+   {
+      static int invoke ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3, T4, T5,T6,T7,T8,T9 )> ( L ) )( 
+      read<T1> ( L, 2 ), 
+      read<T2> ( L, 3 ), 
+      read<T3> ( L, 4 ), 
+      read<T4> ( L, 5 ), 
+      read<T5> ( L, 6 ),
+      read<T6> ( L, 7 ), 
+      read<T7> ( L, 8 ), 
+      read<T8> ( L, 9 ), 
+      read<T9> ( L, 10 )
+       ); return 0; }
+      static int invokeU ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3, T4, T5,T6,T7,T8,T9 )> ( L ) )( 
+      read<T1> ( L, 2 ), 
+      read<T2> ( L, 3 ), 
+      read<T3> ( L, 4 ), 
+      read<T4> ( L, 5 ), 
+      read<T5> ( L, 6 ),
+      read<T6> ( L, 7 ), 
+      read<T7> ( L, 8 ), 
+      read<T8> ( L, 9 ), 
+      read<T9> ( L, 10 ) 
+       ); return 0; }
+   };
+
+   template<typename T, 
+   	   typename T1,
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7, 
+   	   typename T8
+   	   >
+      struct mem_functor < void, T, T1, T2, T3, T4, T5,T6,T7,T8 >
+   {
+      static int invoke ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3, T4, T5,T6,T7,T8 )> ( L ) )( 
+      read<T1> ( L, 2 ), 
+      read<T2> ( L, 3 ), 
+      read<T3> ( L, 4 ), 
+      read<T4> ( L, 5 ), 
+      read<T5> ( L, 6 ),
+      read<T6> ( L, 7 ), 
+      read<T7> ( L, 8 ), 
+      read<T8> ( L, 9 )
+       ); return 0; }
+      static int invokeU ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3, T4, T5,T6,T7,T8 )> ( L ) )( 
+      read<T1> ( L, 2 ), 
+      read<T2> ( L, 3 ), 
+      read<T3> ( L, 4 ), 
+      read<T4> ( L, 5 ), 
+      read<T5> ( L, 6 ),
+      read<T6> ( L, 7 ), 
+      read<T7> ( L, 8 ), 
+      read<T8> ( L, 9 ) 
+       ); return 0; }
+   };
+
+   template<typename T, 
+   	   typename T1,
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7
+   	   >
+      struct mem_functor < void, T, T1, T2, T3, T4, T5,T6,T7 >
+   {
+      static int invoke ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3, T4, T5,T6,T7 )> ( L ) )( 
+      read<T1> ( L, 2 ), 
+      read<T2> ( L, 3 ), 
+      read<T3> ( L, 4 ), 
+      read<T4> ( L, 5 ), 
+      read<T5> ( L, 6 ),
+      read<T6> ( L, 7 ), 
+      read<T7> ( L, 8 )
+       ); return 0; }
+      static int invokeU ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3, T4, T5,T6,T7 )> ( L ) )( 
+      read<T1> ( L, 2 ), 
+      read<T2> ( L, 3 ), 
+      read<T3> ( L, 4 ), 
+      read<T4> ( L, 5 ), 
+      read<T5> ( L, 6 ),
+      read<T6> ( L, 7 ), 
+      read<T7> ( L, 8 ) 
+       ); return 0; }
+   };
+
+   template<typename T, 
+   	   typename T1,
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6
+   	   >
+      struct mem_functor < void, T, T1, T2, T3, T4, T5,T6 >
+   {
+      static int invoke ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3, T4, T5,T6 )> ( L ) )( 
+      read<T1> ( L, 2 ), 
+      read<T2> ( L, 3 ), 
+      read<T3> ( L, 4 ), 
+      read<T4> ( L, 5 ), 
+      read<T5> ( L, 6 ),
+      read<T6> ( L, 7 )
+       ); return 0; }
+      static int invokeU ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3, T4, T5,T6 )> ( L ) )( 
+      read<T1> ( L, 2 ), 
+      read<T2> ( L, 3 ), 
+      read<T3> ( L, 4 ), 
+      read<T4> ( L, 5 ), 
+      read<T5> ( L, 6 ),
+      read<T6> ( L, 7 ) 
+       ); return 0; }
+   };
+
    template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
    struct mem_functor < void, T, T1, T2, T3, T4, T5 >
    {
-      static int invoke ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3, T4, T5 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ), read<T5> ( L, 6 ) ); return 0; }
-	  static int invokeU ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3, T4, T5 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ), read<T5> ( L, 6 ) ); return 0; }
+      static int invoke ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3, T4, T5 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ), read<T5> ( L, 6 ) ); return 0; }
+	  static int invokeU ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3, T4, T5 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ), read<T5> ( L, 6 ) ); return 0; }
    };
 
    template<typename T, typename T1, typename T2, typename T3, typename T4>
    struct mem_functor < void, T, T1, T2, T3, T4 >
    {
-      static int invoke ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3, T4 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ) ); return 0; }
-	  static int invokeU ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3, T4 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ) ); return 0; }
+      static int invoke ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3, T4 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ) ); return 0; }
+	  static int invokeU ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3, T4 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ), read<T4> ( L, 5 ) ); return 0; }
    };
 
    template<typename T, typename T1, typename T2, typename T3>
    struct mem_functor < void, T, T1, T2, T3 >
    {
-      static int invoke ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ) ); return 0; }
-	  static int invokeU ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ) ); return 0; }
+      static int invoke ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2, T3 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ) ); return 0; }
+	  static int invokeU ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2, T3 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ), read<T3> ( L, 4 ) ); return 0; }
    };
 
    template<typename T, typename T1, typename T2>
    struct mem_functor < void, T, T1, T2 >
    {
-      static int invoke ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ) ); return 0; }
-	  static int invokeU ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ) ); return 0; }
+      static int invoke ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1, T2 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ) ); return 0; }
+	  static int invokeU ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1, T2 )> ( L ) )( read<T1> ( L, 2 ), read<T2> ( L, 3 ) ); return 0; }
    };
 
    template<typename T, typename T1>
    struct mem_functor < void, T, T1 >
    {
-      static int invoke ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1 )> ( L ) )( read<T1> ( L, 2 ) ); return 0; }
-	  static int invokeU ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1 )> ( L ) )( read<T1> ( L, 2 ) ); return 0; }
+      static int invoke ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void( T::* )( T1 )> ( L ) )( read<T1> ( L, 2 ) ); return 0; }
+	  static int invokeU ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( T1 )> ( L ) )( read<T1> ( L, 2 ) ); return 0; }
    };
 
    template<typename T>
    struct mem_functor < void, T >
    {
-      static int invoke ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void( T::* )( )> ( L ) )( ); return 0; }
-	  static int invokeU ( lua_State *L )  { ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( )> ( L ) )( ); return 0; }
+      static int invoke ( lua_State *L )  { SaveState ss(L);( read<T*> ( L, 1 )->*upvalue_<void( T::* )( )> ( L ) )( ); return 0; }
+	  static int invokeU ( lua_State *L )  {SaveState ss(L); ( read<T*> ( L, 1 )->*upvalue_<void(UAPI T::* )( )> ( L ) )( ); return 0; }
    };
 
    // class member functor (non-managed)
    template<typename T, typename T1>
    struct mem_functor < int, T, lua_State*, T1 >
    {
-      static int invoke ( lua_State *L ) { return ( read<T*> ( L, 1 )->*upvalue_<int( T::* )( lua_State*, T1 )> ( L ) )( L, read<T1> ( L, 2 ) ); }
-	  static int invokeU ( lua_State *L ) { return ( read<T*> ( L, 1 )->*upvalue_<int(UAPI T::* )( lua_State*, T1 )> ( L ) )( L, read<T1> ( L, 2 ) ); }
+      static int invoke ( lua_State *L ) { SaveState ss(L);return ( read<T*> ( L, 1 )->*upvalue_<int( T::* )( lua_State*, T1 )> ( L ) )( L, read<T1> ( L, 2 ) ); }
+	  static int invokeU ( lua_State *L ) {SaveState ss(L); return ( read<T*> ( L, 1 )->*upvalue_<int(UAPI T::* )( lua_State*, T1 )> ( L ) )( L, read<T1> ( L, 2 ) ); }
    };
 
    template<typename T>
    struct mem_functor < int, T, lua_State* >
    {
-      static int invoke ( lua_State *L ) { return ( read<T*> ( L, 1 )->*upvalue_<int( T::* )( lua_State* )> ( L ) )( L ); }
-	  static int invokeU ( lua_State *L ) { return ( read<T*> ( L, 1 )->*upvalue_<int(UAPI T::* )( lua_State* )> ( L ) )( L ); }
+      static int invoke ( lua_State *L ) {SaveState ss(L); return ( read<T*> ( L, 1 )->*upvalue_<int( T::* )( lua_State* )> ( L ) )( L ); }
+	  static int invokeU ( lua_State *L ) { SaveState ss(L);return ( read<T*> ( L, 1 )->*upvalue_<int(UAPI T::* )( lua_State* )> ( L ) )( L ); }
    };
 
    // push_functor
@@ -769,6 +1118,165 @@ namespace lua_tinker
       lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5>::invoke, 1 );
    }
 
+         template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6
+   	   >
+   void push_functor ( lua_State *L, RVal ( T::*func )( T1, T2, T3, T4, T5 ,T6) )
+   {
+      ( void ) func;
+      lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6>::invoke, 1 );
+   }
+
+   template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6
+   	   >
+   void push_functor ( lua_State *L, RVal ( T::*func )( T1, T2, T3, T4, T5,T6 ) const )
+   {
+      ( void ) func;
+      lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6>::invoke, 1 );
+   }
+
+         template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7
+   	   >
+   void push_functor ( lua_State *L, RVal ( T::*func )( T1, T2, T3, T4, T5 ,T6,T7) )
+   {
+      ( void ) func;
+      lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7>::invoke, 1 );
+   }
+
+   template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7
+   	   >
+   void push_functor ( lua_State *L, RVal ( T::*func )( T1, T2, T3, T4, T5,T6,T7 ) const )
+   {
+      ( void ) func;
+      lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7>::invoke, 1 );
+   }
+   
+         template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7,
+   	   typename T8
+   	   >
+   void push_functor ( lua_State *L, RVal ( T::*func )( T1, T2, T3, T4, T5 ,T6,T7,T8) )
+   {
+      ( void ) func;
+      lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T8>::invoke, 1 );
+   }
+
+   template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7,
+   	   typename T8
+   	   >
+   void push_functor ( lua_State *L, RVal ( T::*func )( T1, T2, T3, T4, T5,T6,T7,T8 ) const )
+   {
+      ( void ) func;
+      lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T8>::invoke, 1 );
+   }
+
+      template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7,
+   	   typename T8,
+   	   typename T9
+   	   >
+   void push_functor ( lua_State *L, RVal ( T::*func )( T1, T2, T3, T4, T5 ,T6,T7,T8,T9) )
+   {
+      ( void ) func;
+      lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T8,T9>::invoke, 1 );
+   }
+
+   template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7,
+   	   typename T8,
+   	   typename T9
+   	   >
+   void push_functor ( lua_State *L, RVal ( T::*func )( T1, T2, T3, T4, T5,T6,T7,T8,T9 ) const )
+   {
+      ( void ) func;
+      lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T8,T9>::invoke, 1 );
+   }
+//-------------------------------------
+   template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7,
+   	   typename T8,
+   	   typename T9,
+   	   typename T10
+   	   >
+   void push_functor ( lua_State *L, RVal ( T::*func )( T1, T2, T3, T4, T5 ,T6,T7,T8,T9,T10) )
+   {
+      ( void ) func;
+      lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T8,T9,T10>::invoke, 1 );
+   }
+
+   template<typename RVal, typename T, 
+   	   typename T1, 
+   	   typename T2, 
+   	   typename T3, 
+   	   typename T4, 
+   	   typename T5,
+   	   typename T6,
+   	   typename T7,
+   	   typename T8,
+   	   typename T9,
+   	   typename T10
+   	   >
+   void push_functor ( lua_State *L, RVal ( T::*func )( T1, T2, T3, T4, T5,T6,T7,T8,T9,T10 ) const )
+   {
+      ( void ) func;
+      lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T8,T9,T10>::invoke, 1 );
+   }
 #ifndef _WIN64
    // push_functor
    template<typename RVal, typename T>
@@ -854,6 +1362,177 @@ namespace lua_tinker
 	   ( void ) func;
 	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5>::invokeU, 1 );
    }
+   
+      template<typename RVal, 
+      	  typename T, 
+      	  typename T1, 
+      	  typename T2, 
+      	  typename T3, 
+      	  typename T4, 
+      	  typename T5,
+      	  typename T6
+      	  >
+   void push_functor ( lua_State *L, RVal (UAPI T::*func )( T1, T2, T3, T4, T5,T6 ) )
+   {
+	   ( void ) func;
+	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6>::invokeU, 1 );
+   }
+
+      template<typename RVal, 
+      	  typename T, 
+      	  typename T1, 
+      	  typename T2, 
+      	  typename T3, 
+      	  typename T4, 
+      	  typename T5,
+      	  typename T6
+      	  >
+   void push_functor ( lua_State *L, RVal (UAPI T::*func )( T1, T2, T3, T4, T5,T6 ) const )
+   {
+	   ( void ) func;
+	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6>::invokeU, 1 );
+   }
+
+      template<typename RVal, 
+      	  typename T, 
+      	  typename T1, 
+      	  typename T2, 
+      	  typename T3, 
+      	  typename T4, 
+      	  typename T5,
+      	  typename T6,
+      	  typename T7
+      	  >
+   void push_functor ( lua_State *L, RVal (UAPI T::*func )( T1, T2, T3, T4, T5,T6 ,T7) )
+   {
+	   ( void ) func;
+	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7>::invokeU, 1 );
+   }
+
+      template<typename RVal, 
+      	  typename T, 
+      	  typename T1, 
+      	  typename T2, 
+      	  typename T3, 
+      	  typename T4, 
+      	  typename T5,
+      	  typename T6,
+      	  typename T7
+      	  >
+   void push_functor ( lua_State *L, RVal (UAPI T::*func )( T1, T2, T3, T4, T5,T6 ,T7) const )
+   {
+	   ( void ) func;
+	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7>::invokeU, 1 );
+   }
+   
+      template<typename RVal, 
+      	  typename T, 
+      	  typename T1, 
+      	  typename T2, 
+      	  typename T3, 
+      	  typename T4, 
+      	  typename T5,
+      	  typename T6,
+      	  typename T7,
+      	  typename T8
+      	  >
+   void push_functor ( lua_State *L, RVal (UAPI T::*func )( T1, T2, T3, T4, T5,T6 ,T7,T8) )
+   {
+	   ( void ) func;
+	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T8>::invokeU, 1 );
+   }
+
+      template<typename RVal, 
+      	  typename T, 
+      	  typename T1, 
+      	  typename T2, 
+      	  typename T3, 
+      	  typename T4, 
+      	  typename T5,
+      	  typename T6,
+      	  typename T7,
+      	  typename T8
+      	  >
+   void push_functor ( lua_State *L, RVal (UAPI T::*func )( T1, T2, T3, T4, T5,T6 ,T7,T8) const )
+   {
+	   ( void ) func;
+	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T7,T8>::invokeU, 1 );
+   }
+
+      template<typename RVal, 
+      	  typename T, 
+      	  typename T1, 
+      	  typename T2, 
+      	  typename T3, 
+      	  typename T4, 
+      	  typename T5,
+      	  typename T6,
+      	  typename T7,
+      	  typename T8,
+      	  typename T9
+      	  >
+   void push_functor ( lua_State *L, RVal (UAPI T::*func )( T1, T2, T3, T4, T5,T6 ,T7,T8,T9) )
+   {
+	   ( void ) func;
+	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T8,T9>::invokeU, 1 );
+   }
+
+      template<typename RVal, 
+      	  typename T, 
+      	  typename T1, 
+      	  typename T2, 
+      	  typename T3, 
+      	  typename T4, 
+      	  typename T5,
+      	  typename T6,
+      	  typename T7,
+      	  typename T8,
+      	  typename T9
+      	  >
+   void push_functor ( lua_State *L, RVal (UAPI T::*func )( T1, T2, T3, T4, T5,T6 ,T7,T8,T9) const )
+   {
+	   ( void ) func;
+	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T7,T8,T9>::invokeU, 1 );
+   }
+
+      template<typename RVal, 
+      	  typename T, 
+      	  typename T1, 
+      	  typename T2, 
+      	  typename T3, 
+      	  typename T4, 
+      	  typename T5,
+      	  typename T6,
+      	  typename T7,
+      	  typename T8,
+      	  typename T9,
+      	  typename T10
+      	  >
+   void push_functor ( lua_State *L, RVal (UAPI T::*func )( T1, T2, T3, T4, T5,T6 ,T7,T8,T9,T10) )
+   {
+	   ( void ) func;
+	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T8,T9,T10>::invokeU, 1 );
+   }
+
+      template<typename RVal, 
+      	  typename T, 
+      	  typename T1, 
+      	  typename T2, 
+      	  typename T3, 
+      	  typename T4, 
+      	  typename T5,
+      	  typename T6,
+      	  typename T7,
+      	  typename T8,
+      	  typename T9,
+      	  typename T10 	  
+      	  >
+   void push_functor ( lua_State *L, RVal (UAPI T::*func )( T1, T2, T3, T4, T5,T6 ,T7,T8,T9,T10) const )
+   {
+	   ( void ) func;
+	   lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T7,T8,T9,T10>::invokeU, 1 );
+   }
+
 #endif//_WIN64
    // constructor
    template<typename T, typename T1, typename T2, typename T3, typename T4, typename T5>
@@ -1045,6 +1724,59 @@ namespace lua_tinker
 		   push(L, arg2);
 		   push(L, arg3);
 		   if(lua_pcall(L, 3, 1, errfunc) != 0)
+		   {
+			   lua_pop(L, 1);
+		   }
+	   }
+	   else
+	   {
+		   print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
+	   }
+
+	   lua_remove(L, -2);
+	   return pop<RVal>(L);
+   }
+
+   template<typename RVal, typename T1, typename T2, typename T3, typename T4>
+   RVal call(lua_State* L, const char* name, T1 arg1, T2 arg2, T3 arg3,T4 arg4)
+   {
+	   lua_pushcclosure(L, on_error, 0);
+	   int errfunc = lua_gettop(L);
+	   lua_getglobal(L, name);
+	   if(lua_isfunction(L,-1))
+	   {
+		   push(L, arg1);
+		   push(L, arg2);
+		   push(L, arg3);
+		   push(L, arg4);
+		   if(lua_pcall(L, 4, 1, errfunc) != 0)
+		   {
+			   lua_pop(L, 1);
+		   }
+	   }
+	   else
+	   {
+		   print_error(L, "lua_tinker::call() attempt to call global `%s' (not a function)", name);
+	   }
+
+	   lua_remove(L, -2);
+	   return pop<RVal>(L);
+   }
+
+   template<typename RVal, typename T1, typename T2, typename T3, typename T4, typename T5>
+   RVal call(lua_State* L, const char* name, T1 arg1, T2 arg2, T3 arg3,T4 arg4, T5 arg5)
+   {
+	   lua_pushcclosure(L, on_error, 0);
+	   int errfunc = lua_gettop(L);
+	   lua_getglobal(L, name);
+	   if(lua_isfunction(L,-1))
+	   {
+		   push(L, arg1);
+		   push(L, arg2);
+		   push(L, arg3);
+		   push(L, arg4);
+		   push(L, arg5);
+		   if(lua_pcall(L, 5, 1, errfunc) != 0)
 		   {
 			   lua_pop(L, 1);
 		   }

@@ -6,6 +6,7 @@
 #include "ScriptModule-Lua.h"
 #include <lua_tinker.h>
 #include <string/strcpcvt.h>
+#include "exports/luaFunSlot.h"
 
 extern BOOL SOUI_Export_Lua(lua_State *L);
 
@@ -43,41 +44,6 @@ namespace SOUI
         return 1;
     }
 
-    class LuaFunctionSlot : public TObjRefImpl<IEvtSlot>
-    {
-    public:
-        //! Slot function type.
-        LuaFunctionSlot(lua_State *pLuaState,LPCSTR pszLuaFun) 
-            : m_pLuaState(pLuaState)
-            , m_luaFun(pszLuaFun)
-        {}
-
-
-		STDMETHOD_(BOOL,Run)(THIS_ IEvtArgs *pArg) OVERRIDE
-		{
-			return lua_tinker::call<bool>(m_pLuaState,m_luaFun,pArg);
-		}
-		STDMETHOD_(IEvtSlot*, Clone)(THIS) SCONST OVERRIDE
-		{
-			return new LuaFunctionSlot(m_pLuaState,m_luaFun);
-		}
-		STDMETHOD_(BOOL,Equal)(THIS_ const IEvtSlot * sour) SCONST OVERRIDE
-		{
-			if(sour->GetSlotType()!=GetSlotType()) return false;
-			const LuaFunctionSlot *psour=static_cast<const LuaFunctionSlot*>(sour);
-			SASSERT(psour);
-			return psour->m_luaFun==m_luaFun && psour->m_pLuaState==m_pLuaState;
-		}
-
-		STDMETHOD_(UINT,GetSlotType)(THIS) SCONST OVERRIDE
-		{
-			return SLOT_USER+1;
-		}
-
-    private:
-        SStringA m_luaFun;
-        lua_State *m_pLuaState;
-    };
 
 
     SScriptModule_Lua::SScriptModule_Lua()
@@ -103,6 +69,7 @@ namespace SOUI
         if (d_state)
         {
             lua_close( d_state );
+			d_state = NULL;
         }
     }
 
@@ -134,18 +101,6 @@ namespace SOUI
     void SScriptModule_Lua::executeString( LPCSTR str )
     {
         lua_tinker::dostring(d_state,str);
-    }
-
-    BOOL SScriptModule_Lua::subscribeEvent(IWindow* target, UINT uEvent, LPCSTR subscriber_name )
-    {
-		SWindow *pWnd = (SWindow*)target;
-        return pWnd->GetEventSet()->subscribeEvent(uEvent,LuaFunctionSlot(d_state,subscriber_name));
-    }
-
-    BOOL SScriptModule_Lua::unsubscribeEvent(IWindow* target, UINT uEvent, LPCSTR subscriber_name )
-    {
-		SWindow *pWnd = (SWindow*)target;
-        return pWnd->GetEventSet()->unsubscribeEvent(uEvent,LuaFunctionSlot(d_state,subscriber_name));
     }
 
 

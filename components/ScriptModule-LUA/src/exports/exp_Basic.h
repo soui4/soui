@@ -1,19 +1,7 @@
-﻿//导出基本结构体类型
-UINT rgb(int r,int g,int b)
-{
-    return RGBA(r,g,b,255);
-}
-
-UINT rgba(int r,int g, int b, int a)
-{
-    return RGBA(r,g,b,a);
-}
-
+﻿
 BOOL ExpLua_Basic(lua_State *L)
 {
 	try{
-        lua_tinker::def(L,"RGB",rgb);
-        lua_tinker::def(L,"RGBA",rgba);
 
 		//POINT
 		lua_tinker::class_add<POINT>(L,"POINT");
@@ -52,6 +40,15 @@ BOOL ExpLua_Basic(lua_State *L)
 		lua_tinker::class_add<CSize>(L,"CSize");
 		lua_tinker::class_inh<CSize,SIZE>(L);
 		lua_tinker::class_con<CSize>(L,lua_tinker::constructor<CSize,LONG,LONG>);
+
+		//SIZE
+		lua_tinker::class_add<MSG>(L,"MSG");
+		lua_tinker::class_mem<MSG>(L, "hwnd", &MSG::hwnd);
+		lua_tinker::class_mem<MSG>(L, "message", &MSG::message);
+		lua_tinker::class_mem<MSG>(L, "wParam", &MSG::wParam);
+		lua_tinker::class_mem<MSG>(L, "lParam", &MSG::lParam);
+		lua_tinker::class_mem<MSG>(L, "time", &MSG::time);
+		lua_tinker::class_mem<MSG>(L, "pt", &MSG::pt);
 
 		return TRUE;
 	}catch(...)

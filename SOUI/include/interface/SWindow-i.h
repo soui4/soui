@@ -6,6 +6,7 @@
 #include <interface/SRender-i.h>
 #include <interface/SMatrix-i.h>
 #include <interface/SWndContainer-i.h>
+#include <interface/SScriptModule-i.h>
 SNSBEGIN
 
 typedef struct ILayout ILayout;
@@ -601,6 +602,15 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep DEF_VAL(-1)) PURE;
 
     /**
+     * @brief 根据Name查找子窗口
+     * @param pszName LPCSTR--子窗口Name
+     * @param nDeep int--查找深度,-1代码无限
+     * @return IWindow*--匹配窗口
+     * @remark 采用广度优先算法搜索匹配子窗口
+     */
+    STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName, int nDeep DEF_VAL(-1)) PURE;
+
+    /**
      * DestroyChild
      * @brief    销毁一个子窗口
      * @param    SWindow * pChild --  子窗口对象
@@ -813,7 +823,24 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(BOOL, SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult) PURE;
 
+	 /**
+     * SetSwndProc
+     * @brief    设置消息处理函数
+	 * @param    FunSwndProc swndProc --  消息处理函数
+     * @return   void
+     *
+     * Describe  
+     */
 	STDMETHOD_(void, SetSwndProc)(THIS_ FunSwndProc swndProc) PURE;
+
+	/**
+     * GetScriptModule
+     * @brief    获得脚本模块
+     * @return   IScriptModule * -- 模块模块指针
+     * Describe
+     */
+    STDMETHOD_(IScriptModule *,GetScriptModule)(THIS) PURE;
+
 };
 
 SNSEND

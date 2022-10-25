@@ -428,7 +428,7 @@ void SStringA::Copy(const IStringA *pSrc)
 
 void SStringA::Assign(LPCSTR src)
 {
-	AssignCopy(strlen(src),src);
+	AssignCopy((int)strlen(src),src);
 }
 
 void SStringA::Assign2(LPCSTR src,int nLen)
@@ -825,14 +825,13 @@ bool SStringA::IsBlankChar(const char &c)
 	return false;
 }
 
-SStringA & SStringA::Trim(char ch /*= VK_SPACE*/)
+void SStringA::Trim(char ch /*= VK_SPACE*/)
 {
 	TrimRight(ch);
 	TrimLeft(ch);
-	return *this;
 }
 
-SStringA & SStringA::TrimLeft(char chTarget /*= VK_SPACE*/)
+void SStringA::TrimLeft(char chTarget /*= VK_SPACE*/)
 {
 	CopyBeforeWrite();
 
@@ -850,10 +849,9 @@ SStringA & SStringA::TrimLeft(char chTarget /*= VK_SPACE*/)
 		memmove(m_pszData, psz, (nDataLength + 1) * sizeof(char));
 		pData->nDataLength = nDataLength;
 	}
-	return *this;
 }
 
-SStringA & SStringA::TrimRight(char chTarget /*= VK_SPACE*/)
+void SStringA::TrimRight(char chTarget /*= VK_SPACE*/)
 {
 	CopyBeforeWrite();
 
@@ -880,28 +878,37 @@ SStringA & SStringA::TrimRight(char chTarget /*= VK_SPACE*/)
 		*pszLast = '\0';
 		GetData()->nDataLength = (int)(pszLast - m_pszData);
 	}
-	return *this;
 }
 
-SStringA& SStringA::MakeLower()
+void SStringA::ToLower()
 {
 	CopyBeforeWrite();
 
 	if (m_pszData != NULL)
 		char_traits::StrLower(m_pszData);
-	return *this;
 }
 
-SStringA& SStringA::MakeUpper()
+void SStringA::ToUpper()
 {
 	CopyBeforeWrite();
 
 	if (m_pszData != NULL)
 		char_traits::StrUpper(m_pszData);
+}
+
+SStringA & SStringA::MakeLower()
+{
+	ToLower();
 	return *this;
 }
 
-SOUI::SStringA SStringA::Left(int nCount) const
+SStringA & SStringA::MakeUpper()
+{
+	ToUpper();
+	return *this;
+}
+
+SStringA SStringA::Left(int nCount) const
 {
 	TStringData* pData = GetData();
 	if (nCount < 0)
@@ -914,7 +921,7 @@ SOUI::SStringA SStringA::Left(int nCount) const
 	return dest;
 }
 
-SOUI::SStringA SStringA::Right(int nCount) const
+SStringA SStringA::Right(int nCount) const
 {
 	TStringData* pData = GetData();
 	if (nCount < 0)
@@ -927,7 +934,7 @@ SOUI::SStringA SStringA::Right(int nCount) const
 	return dest;
 }
 
-SOUI::SStringA SStringA::Mid(int nFirst, int nCount) const
+SStringA SStringA::Mid(int nFirst, int nCount) const
 {
 	// out-of-bounds requests return sensible things
 	if (nFirst < 0)
@@ -946,7 +953,7 @@ SOUI::SStringA SStringA::Mid(int nFirst, int nCount) const
 	return dest;
 }
 
-SOUI::SStringA SStringA::Mid(int nFirst) const
+SStringA SStringA::Mid(int nFirst) const
 {
 	return Mid(nFirst, GetData()->nDataLength - nFirst);
 }
@@ -961,24 +968,21 @@ int SStringA::Compare(const char* psz) const
 	return char_traits::Compare(m_pszData, psz);
 }
 
-const SStringA& SStringA::Append(const SStringA& src)
+SStringA & SStringA::Append(const SStringA& src)
 {
-	SStringA strCopy(src);
-	ConcatInPlace(strCopy.GetData()->nDataLength, strCopy.m_pszData);
+	ConcatInPlace(src.GetData()->nDataLength, src.m_pszData);
 	return *this;
 }
 
-const SStringA& SStringA::Append(const char * psz)
+void SStringA::AppendStr(const char * psz, int nLen)
 {
-	SStringA strCopy(psz);
-	ConcatInPlace(strCopy.GetData()->nDataLength, strCopy.m_pszData);
-	return *this;
+	if(nLen < 0) nLen = (int)char_traits::StrLen(psz);
+	ConcatInPlace(nLen, psz);
 }
 
-const SStringA& SStringA::Append(char ch)
+void SStringA::AppendChar(char ch)
 {
 	ConcatInPlace(1, &ch);
-	return *this;
 }
 
 const SStringA& SStringA::operator+=(const SStringA& src)

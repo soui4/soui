@@ -411,6 +411,8 @@
 			<File
 				RelativePath="include\interface\SCtrl-i.h" />
 			<File
+				RelativePath="include\proxy\SCtrlProxy.h" />
+			<File
 				RelativePath="include\helper\SDIBHelper.h" />
 			<File
 				RelativePath="include\control\SDateTimePicker.h" />

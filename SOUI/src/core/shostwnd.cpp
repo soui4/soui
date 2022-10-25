@@ -282,6 +282,8 @@ SHostWnd::SHostWnd(LPCTSTR pszResName /*= NULL*/)
     m_privateTemplatePool.Attach(new STemplatePool);
     m_pRoot->SetContainer(this);
     m_hostAnimationHandler.m_pHostWnd = this;
+	m_evtHandler.fun = NULL;
+	m_evtHandler.ctx = NULL;
 }
 
 SHostWnd::~SHostWnd()
@@ -932,9 +934,10 @@ void SHostWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
 
 BOOL SHostWnd::OnFireEvent(IEvtArgs *evt)
 {
-	if (m_defEvtSlot && m_defEvtSlot->Run(evt))
+	if (m_evtHandler.fun)
 	{
-		return TRUE;
+		if(m_evtHandler.fun(evt,m_evtHandler.ctx))
+			return TRUE;
 	}
     return _HandleEvent(evt);
 }
@@ -1811,13 +1814,20 @@ void SHostWnd::_SetToolTipInfo(const SwndToolTipInfo *info, BOOL bNcTip)
 
 void SHostWnd::SetEventHandler(THIS_ FunCallback fun, void *ctx)
 {
-    m_defEvtSlot.Attach(new FreeFunctionSlot(fun, ctx));
+	m_evtHandler.fun = fun;
+	m_evtHandler.ctx = ctx;
+}
+
+EventHandlerInfo* SHostWnd::GetEventHandler(THIS)
+{
+	return &m_evtHandler;
 }
 
 BOOL SHostWnd::_HandleEvent(IEvtArgs *pEvt)
 {
     return FALSE;
 }
+
 
 //////////////////////////////////////////////////////////////////
 //  SHostWnd::SHostAnimationHandler

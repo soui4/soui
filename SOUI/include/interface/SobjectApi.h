@@ -145,4 +145,11 @@
     STDMETHOD_(HRESULT, AfterAttribute)
     (THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading, HRESULT hr) PURE;
 
+	 /**
+     * SetAttrHandler
+     * @brief    设置属性处理回调方法
+     * @param    FunAttrHandler attrHandler--  属性处理回调方法
+	 * @return   void
+     * Describe  
+     */
 	STDMETHOD_(void, SetAttrHandler)(THIS_ FunAttrHandler attrHandler) PURE;

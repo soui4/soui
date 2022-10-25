@@ -56,6 +56,15 @@ DECLARE_INTERFACE_(IStringA,IObjRef)
 	STDMETHOD_(void ,Assign)(THIS_ LPCSTR src) PURE;
 	STDMETHOD_(void ,Assign2)(THIS_ LPCSTR src,int nLen) PURE;
 	STDMETHOD_(LPVOID,GetPrivData)(CTHIS) SCONST PURE;
+
+	STDMETHOD_(void,ToUpper)(THIS) PURE;
+	STDMETHOD_(void,ToLower)(THIS) PURE;
+	STDMETHOD_(void,TrimRight)(THIS_ char chTarget DEF_VAL(VK_SPACE)) PURE;
+	STDMETHOD_(void,TrimLeft)(THIS_ char chTarget DEF_VAL(VK_SPACE)) PURE;
+	STDMETHOD_(void,Trim)(THIS_ char chTarget DEF_VAL(VK_SPACE)) PURE;
+	STDMETHOD_(void,AppendChar)(THIS_ char ch) PURE;
+	STDMETHOD_(void,AppendStr)(THIS_ const char *pszStr, int nLen DEF_VAL(-1)) PURE;
+
 };
 
 
@@ -112,6 +121,15 @@ DECLARE_INTERFACE_(IStringW,IObjRef)
 	STDMETHOD_(void ,Assign)(THIS_ LPCWSTR src) PURE;
 	STDMETHOD_(void ,Assign2)(THIS_ LPCWSTR src,int nLen) PURE;
 	STDMETHOD_(LPVOID,GetPrivData)(CTHIS) SCONST PURE;
+
+	STDMETHOD_(void,ToUpper)(THIS) PURE;
+	STDMETHOD_(void,ToLower)(THIS) PURE;
+	STDMETHOD_(void,TrimRight)(THIS_ wchar_t chTarget DEF_VAL(VK_SPACE)) PURE;
+	STDMETHOD_(void,TrimLeft)(THIS_ wchar_t chTarget DEF_VAL(VK_SPACE)) PURE;
+	STDMETHOD_(void,Trim)(THIS_ wchar_t chTarget DEF_VAL(VK_SPACE)) PURE;
+	STDMETHOD_(void,AppendChar)(THIS_ wchar_t ch) PURE;
+	STDMETHOD_(void,AppendStr)(THIS_ const wchar_t *pszStr, int nLen DEF_VAL(-1)) PURE;
+
 };
 
 #ifdef _UNICODE
