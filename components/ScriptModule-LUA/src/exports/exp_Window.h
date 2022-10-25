@@ -9,6 +9,7 @@ BOOL ExpLua_Window(lua_State *L)
 
 		lua_tinker::class_def<SWindow>(L,"FindChildByNameA",(SWindow* (SWindow::*)(LPCSTR,int))&SWindow::FindChildByName);
 		lua_tinker::class_def<SWindow>(L,"FindChildByNameW",(SWindow* (SWindow::*)(LPCWSTR,int ))&SWindow::FindChildByName);
+		lua_tinker::class_def<SWindow>(L,"FindChildByID",(SWindow* (SWindow::*)(int,int))&SWindow::FindChildByID);
 		lua_tinker::class_def<SWindow>(L,"GetWindowRect2",(CRect (SWindow::*)() const)&SWindow::GetWindowRect);
 		lua_tinker::class_def<SWindow>(L,"GetClientRect2",(CRect (SWindow::*)()const)&SWindow::GetClientRect);
 		lua_tinker::class_def<SWindow>(L,"GetWindow",(SWindow *(SWindow::*)(int))&SWindow::GetWindow);
