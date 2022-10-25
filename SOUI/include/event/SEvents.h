@@ -231,7 +231,7 @@ class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
         {                                              \
             return evt::GetClassName();                \
         }                                              \
-        STDMETHOD_(LPCVOID, GetData)(THIS)             \
+        STDMETHOD_(LPVOID, Data)(THIS)                 \
         {                                              \
             return (evtData *)this;                    \
         }                                              \

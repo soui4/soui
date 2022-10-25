@@ -202,6 +202,9 @@ int SWindow::GetWindowText(TCHAR *pBuf, int nBufLen, BOOL bRawText)
         return str.GetLength();
     int nRet = smin(nBufLen, str.GetLength());
     _tcsncpy(pBuf, str.c_str(), nRet);
+	if(nBufLen>nRet){
+		pBuf[nRet] = 0;
+	}
     return nRet;
 }
 

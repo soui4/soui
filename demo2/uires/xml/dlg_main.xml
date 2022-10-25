@@ -27,6 +27,10 @@ translucent="0"
       <testCtrl size="-1,30" name="testWnd" text="hello c" colorBkgnd="#cccccc"/>
       <window size="0,0" weight="1"/>
     </window>
+    <window size="-2,30" layout="hbox">
+      <sliderbar size="0,-2" weight="1" name="tst_slider" min="0" max="100" value="50"/>
+      <text size="100,-2" name="txt_pos" colorText="@color/red" text="50"/>
+    </window>
     <window size="-2,0" weight="1" layout="hbox">
       <listview size="0,-2" weight="1" name="lv_test" margin="1,1,1,1" colorBorder="@color/red">
         <template itemHeight="50" layout="hbox" gravity="center">
