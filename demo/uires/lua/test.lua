@@ -57,7 +57,7 @@ function on_init(args)
 	local btnLrc = root:FindChildByNameA("btn_lrc",-1);
 	local lrcSlot = CreateEventSlot("onBtnLrc");
 	btnLrc:SubscribeEvent(10000,lrcSlot); -- 10000 == EVT_CMD
-
+	lrcSlot:Release();
 	math.randomseed(os.time());
 end
 
