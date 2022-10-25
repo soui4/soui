@@ -1,3 +1,4 @@
+#include <string/strcpcvt.h>
 #include "luaFunSlot.h"
 
 //导出基本结构体类型
@@ -98,9 +99,16 @@ IEvtSlot * CreateEventSlot(LPCSTR pszLuaFun){
 BOOL ExpLua_Global(lua_State *L)
 {
 	try{
+		lua_tinker::set_print_callback(slog);
+
 		lua_tinker::def(L,"RGB",rgb);
 		lua_tinker::def(L,"RGBA",rgba);
 		lua_tinker::def(L,"slog",slog);
+
+		lua_tinker::def(L,"S_W2A",&SStrCpCvt::CvtW2A);
+		lua_tinker::def(L,"S_A2W",&SStrCpCvt::CvtA2W);
+		lua_tinker::def(L,"S_A2A",&SStrCpCvt::CvtA2A);
+		lua_tinker::def(L,"S_W2W",&SStrCpCvt::CvtW2W);
 
 		lua_tinker::def(L,"SMessageBox",SMessageBox);
 		lua_tinker::def(L,"theApp",&SApplication::getSingletonPtr);
@@ -112,6 +120,7 @@ BOOL ExpLua_Global(lua_State *L)
 		lua_tinker::def(L,"HostWnd_SetEventHandler",HostWnd_SetEventHandler);
 		
 		lua_tinker::def(L,"CreateEventSlot",CreateEventSlot);
+		lua_tinker::def(L,"CreateSouiFactory",CreateSouiFactory);
 
 		return TRUE;
 	}catch(...)

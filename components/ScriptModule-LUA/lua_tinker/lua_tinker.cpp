@@ -120,6 +120,7 @@ int lua_tinker::on_error ( lua_State *L )
    return 0;
 }
 
+static FunPrint s_funPrint = NULL;
 /*---------------------------------------------------------------------------*/
 void lua_tinker::print_error ( lua_State *L, const char* fmt, ... )
 {
@@ -129,18 +130,27 @@ void lua_tinker::print_error ( lua_State *L, const char* fmt, ... )
    va_start ( args, fmt );
    vsnprintf ( text, sizeof ( text ), fmt, args );
    va_end ( args );
+   if(s_funPrint){
+	   s_funPrint(text);
+   }else{
+	   lua_getglobal ( L, "_ALERT" );
+	   if ( lua_isfunction ( L, -1 ) )
+	   {
+		  lua_pushstring ( L, text );
+		  lua_call ( L, 1, 0 );
+	   }
+	   else
+	   {
+		  printf ( "%s\n", text );
+		  lua_pop ( L, 1 );
+	   }
+   }
+}
 
-   lua_getglobal ( L, "_ALERT" );
-   if ( lua_isfunction ( L, -1 ) )
-   {
-      lua_pushstring ( L, text );
-      lua_call ( L, 1, 0 );
-   }
-   else
-   {
-      printf ( "%s\n", text );
-      lua_pop ( L, 1 );
-   }
+
+void lua_tinker::set_print_callback(FunPrint fun)
+{
+    s_funPrint=fun;
 }
 
 /*---------------------------------------------------------------------------*/

@@ -20,6 +20,8 @@
 #define UAPI __stdcall
 #endif
 
+typedef void (*FunPrint)(const char *msg);
+
 namespace lua_tinker
 {
    // init LuaTinker
@@ -34,6 +36,7 @@ namespace lua_tinker
    void    enum_stack ( lua_State *L );
    int     on_error ( lua_State *L );
    void    print_error ( lua_State *L, const char* fmt, ... );
+   void    set_print_callback(FunPrint fun);
 
    // dynamic type extention
    struct lua_value
@@ -1991,7 +1994,5 @@ namespace lua_tinker
    };
 
 } // namespace lua_tinker
-
-typedef lua_tinker::table LuaTable;
 
 #endif //_LUA_TINKER_H_

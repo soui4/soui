@@ -174,7 +174,7 @@ class SOUI_EXP SApplication
     BOOL LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId);
 
     /**
-     * GetScriptModule
+     * CreateScriptModule
      * @brief    创建脚本模块对象
      * @param [out] IScriptModule **ppScriptModule -- 脚本模块对象
      * @return   HRESULT -- S_OK 创建成功

@@ -45,7 +45,6 @@ namespace SOUI
     }
 
 
-
     SScriptModule_Lua::SScriptModule_Lua()
     {
         d_state = luaL_newstate();
@@ -76,7 +75,7 @@ namespace SOUI
 
     LPCSTR SScriptModule_Lua::getIdentifierString() const
     {
-        return "SOUI.Script.Lua5.1";
+        return "SOUI.Script.Lua5.3";
     }
 
     void SScriptModule_Lua::executeScriptFile( LPCSTR pszScriptFile )

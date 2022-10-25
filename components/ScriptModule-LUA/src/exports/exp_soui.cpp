@@ -13,7 +13,6 @@ using namespace SOUI;
 
 #include "exp_Basic.h"
 #include "exp_string.h"
-#include "exp_strcpcvt.h"
 #include "exp_ixml.h"
 #include "exp_ctrls.h"
 #include "exp_Window.h"
@@ -39,7 +38,6 @@ BOOL SOUI_Export_Lua(lua_State *L)
 	BOOL bRet=TRUE;
 	if(bRet) bRet=ExpLua_Basic(L);
 	if(bRet) bRet=ExpLua_String(L);
-    if(bRet) bRet=ExpLua_StrCpCvt(L);
 	if(bRet) bRet=ExpLua_IObjRef(L);
 	if(bRet) bRet=ExpLua_ISouiFactory(L);
 	if(bRet) bRet=ExpLua_IStringA(L);

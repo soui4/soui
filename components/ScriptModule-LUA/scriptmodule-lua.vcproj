@@ -197,8 +197,6 @@
 			<File
 				RelativePath="src\exports\exp_global.h" />
 			<File
-				RelativePath="src\exports\exp_strcpcvt.h" />
-			<File
 				RelativePath="src\exports\exp_string.h" />
 			<File
 				RelativePath="src\exports\luaFunSlot.h" />

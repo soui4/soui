@@ -833,14 +833,14 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
 	STDMETHOD_(void, SetSwndProc)(THIS_ FunSwndProc swndProc) PURE;
 
-	/**
-     * GetScriptModule
-     * @brief    获得脚本模块
-     * @return   IScriptModule * -- 模块模块指针
-     * Describe
+    /**
+     * GetHostHwnd
+     * @brief    获取Host Hwnd
+     * @return   HWND -- host hwnd
+     *
+     * Describe  
      */
-    STDMETHOD_(IScriptModule *,GetScriptModule)(THIS) PURE;
-
+	STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
 };
 
 SNSEND

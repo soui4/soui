@@ -448,7 +448,7 @@ class SOUI_EXP SWindow
 
 	STDMETHOD_(void, SetSwndProc)(THIS_ FunSwndProc swndProc) OVERRIDE;
 
-	STDMETHOD_(IScriptModule *,GetScriptModule)(THIS) OVERRIDE;
+	STDMETHOD_(HWND, GetHostHwnd)(THIS) OVERRIDE;
 
   public: // caret相关方法
     STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) OVERRIDE;
@@ -689,6 +689,8 @@ class SOUI_EXP SWindow
     }
 
   protected:
+	  IScriptModule * GetScriptModule();
+
     /**
      * InvalidateRect
      * @brief    刷新窗口

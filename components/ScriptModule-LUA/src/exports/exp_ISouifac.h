@@ -18,7 +18,6 @@ BOOL ExpLua_ISouiFactory(lua_State *L)
 		lua_tinker::class_def<ISouiFactory>(L,"CreateMenu",&ISouiFactory::CreateMenu);
 		lua_tinker::class_def<ISouiFactory>(L,"CreateMenuEx",&ISouiFactory::CreateMenuEx);
 
-		lua_tinker::def(L,"CreateSouiFactory",CreateSouiFactory);
 
 		return TRUE;
 	}catch(...)

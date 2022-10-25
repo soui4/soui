@@ -3498,6 +3498,11 @@ void SWindow::SetSwndProc(FunSwndProc swndProc){
 }
 
 
+HWND SWindow::GetHostHwnd(THIS)
+{
+	return GetContainer()->GetHostHwnd();
+}
+
 BOOL SWindow::AddEvent(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName)
 {
 	return m_evtSet.addEvent(dwEventID,pszEventHandlerName);

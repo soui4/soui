@@ -58,7 +58,6 @@ HEADERS += src/ScriptModule-Lua.h \
            src/exports/exp_IString.h \
            src/exports/exp_IWindow.h \
            src/exports/exp_IXml.h \
-           src/exports/exp_strcpcvt.h \
            src/exports/exp_string.h \
            src/exports/exp_Window.h \
            src/exports/luaFunSlot.h \

@@ -22,8 +22,7 @@ end
 function onBtnLrc(e)
  slog("btn lrc clicked!");
  local btn = toSWindow(e:Sender());
- local container = btn:GetContainer();
- local hwnd = container:GetHostHwnd();
+ local hwnd = btn:GetHostHwnd();
  local ret = SMessageBox(hwnd,L("onBtnLrc, cancel origin proc?"),L("test"),1);
  if ret == 1 then
 	 e:SetBubbleUp(0); --block origin behavior.

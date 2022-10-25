@@ -126,7 +126,7 @@ BOOL ExpLua_IWindow(lua_State *L)
 		lua_tinker::class_def<IWindow>(L,"FireCtxMenu",&IWindow::FireCtxMenu);
 		lua_tinker::class_def<IWindow>(L,"SwndProc",&IWindow::SwndProc);
 		lua_tinker::class_def<IWindow>(L,"SetSwndProc",&IWindow::SetSwndProc);
-		lua_tinker::class_def<IWindow>(L,"GetScriptModule",&IWindow::GetScriptModule);
+		lua_tinker::class_def<IWindow>(L,"GetHostHwnd",&IWindow::GetHostHwnd);
 		return TRUE;
 	}catch(...)
 	{
