@@ -48,14 +48,32 @@ IImgX *SResLoadFromMemory::LoadImgX(LPVOID pBuf, size_t size)
 
 //////////////////////////////////////////////////////////////////////////
 SResProviderPE::SResProviderPE()
-    : m_hResInst(0)
+    : m_hResInst(0),m_bOwner(FALSE)
 {
+}
+
+SResProviderPE::~SResProviderPE()
+{
+	if(m_bOwner){
+		FreeLibrary(m_hResInst);
+	}
 }
 
 BOOL SResProviderPE::Init(WPARAM wParam, LPARAM lParam)
 {
-    m_hResInst = (HINSTANCE)wParam;
-    return TRUE;
+	if(lParam == 0)
+	{
+		m_hResInst = (HINSTANCE)wParam;
+		m_bOwner = FALSE;
+		return TRUE;
+	}else{
+		LPCTSTR pszPath = (LPCTSTR)wParam;
+		m_hResInst = LoadLibrary(pszPath);
+		if(!m_hResInst)
+			return FALSE;
+		m_bOwner = TRUE;
+		return TRUE;
+	}
 }
 
 HBITMAP SResProviderPE::LoadBitmap(LPCTSTR pszResName)

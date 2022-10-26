@@ -1,6 +1,6 @@
 #include <interface/SResProviderMgr-i.h>
 
-BOOL ExpLua_IResProviderMgrMgr(lua_State *L)
+BOOL ExpLua_IResProviderMgr(lua_State *L)
 {
 	try{
 		lua_tinker::class_add<IResProviderMgr>(L,"IResProviderMgr");

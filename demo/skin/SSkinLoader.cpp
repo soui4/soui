@@ -45,8 +45,8 @@ void SOUI::SSkinLoader::LoadSkin(SStringT respath,const TCHAR *strXmlSkin /*= _T
 	if (m_pResProvider == NULL)
 	{
 		SouiFactory souiFac;
-		if(souiFac.CreateResProvider(RES_FILE, (IObjRef**)&m_pResProvider))
-			m_theApp->AddResProvider(m_pResProvider, NULL);
+		m_pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
+		m_theApp->AddResProvider(m_pResProvider, NULL);
 	}
 	SASSERT(m_pResProvider);
 	if (!m_pResProvider->Init((WPARAM)respath.GetBuffer(0), NULL))

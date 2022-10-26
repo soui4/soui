@@ -18,7 +18,7 @@ class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
 
         ~SScriptModule_Lua();
 
-		    /**
+	/**
      * GetScriptEngine
      * @brief    获得脚本引擎的指针
      * @return   void * -- 脚本引擎的指针
@@ -90,6 +90,8 @@ class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
         String object holding a string that identifies the ScriptModule in use.
     */
     STDMETHOD_(LPCSTR,getIdentifierString)(THIS) SCONST OVERRIDE;
+
+	STDMETHOD_(int, executeMain)(THIS_ HINSTANCE hInst, LPCSTR pszWorkDir, LPCSTR pszArgs) OVERRIDE;
 
     protected:
         lua_State * d_state;

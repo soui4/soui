@@ -31,20 +31,25 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    STDMETHOD_(HRESULT, CreateApp)
-    (THIS_ IApplication * *ppRet, IRenderFactory * pRenderFac, HMODULE hInst, LPCTSTR pszHostClassName, BOOL bImeApp) PURE;
-    STDMETHOD_(HRESULT, CreateNativeWnd)(THIS_ INativeWnd * *ppRet) PURE;
-    STDMETHOD_(HRESULT, CreateHostWnd)(THIS_ IHostWnd * *ppRet, LPCTSTR pszResID) PURE;
-    STDMETHOD_(HRESULT, CreateHostDialog)(THIS_ IHostDialog * *ppRet, LPCTSTR pszResID) PURE;
-    STDMETHOD_(HRESULT, CreateStringA)(THIS_ IStringA * *ppRet, LPCSTR pszSrc) PURE;
-    STDMETHOD_(HRESULT, CreateStringW)(THIS_ IStringW * *ppRet, LPCWSTR pszStr) PURE;
-    STDMETHOD_(HRESULT, CreateXmlDoc)(THIS_ IXmlDoc * *ppRet) PURE;
-    STDMETHOD_(HRESULT, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType, IObjRef * *pObj) PURE;
-    STDMETHOD_(HRESULT, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx, IEvtSlot **ppSlot) PURE;
-    STDMETHOD_(HRESULT, CreateMenu)(THIS_ IMenu * *ppRet, HMENU hMenu DEF_VAL(NULL)) PURE;
-    STDMETHOD_(HRESULT, CreateMenuEx)(THIS_ IMenuEx * *ppRet) PURE;
+	STDMETHOD_(IApplication *, CreateApp)(THIS_ IRenderFactory *pRenderFac,HMODULE hInst,LPCTSTR pszHostClassName DEF_VAL(_T("SOUIHOST")), BOOL bImeApp DEF_VAL(FALSE)) PURE;
+	STDMETHOD_(INativeWnd *, CreateNativeWnd)(THIS) PURE;
+	STDMETHOD_(IHostWnd *, CreateHostWnd)(THIS_ LPCTSTR pszResID DEF_VAL(NULL)) PURE;
+	STDMETHOD_(IHostDialog *, CreateHostDialog)(THIS_ LPCTSTR pszResID DEF_VAL(NULL)) PURE;
+	STDMETHOD_(IStringA *, CreateStringA)(THIS_ LPCSTR pszSrc) PURE;
+	STDMETHOD_(IStringW *, CreateStringW)(THIS_ LPCWSTR pszSrc) PURE;
+	STDMETHOD_(IXmlDoc *, CreateXmlDoc)(THIS) PURE;
+	STDMETHOD_(IResProvider*, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType) PURE;
+	STDMETHOD_(IEvtSlot *, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx) PURE;
+	STDMETHOD_(IMenu*, CreateMenu)(THIS_  HMENU hMenu DEF_VAL(NULL)) PURE;
+	STDMETHOD_(IMenuEx*,CreateMenuEx)(THIS) PURE;
 };
 
 SNSEND
 
-EXTERN_C HRESULT SOUI_EXP CreateSouiFactory(IObjRef **ppRet);
+#ifdef __cplusplus
+typedef SOUI::ISouiFactory * ISouiFactoryPtr;
+#else
+typedef ISouiFactory * ISouiFactoryPtr;
+#endif
+
+EXTERN_C ISouiFactoryPtr SOUI_EXP CreateSouiFactory();

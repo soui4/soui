@@ -102,6 +102,11 @@ namespace SOUI
         lua_tinker::dostring(d_state,str);
     }
 
+	int SScriptModule_Lua::executeMain(THIS_ HINSTANCE hInst,LPCSTR pszWorkDir, LPCSTR pszArgs)
+	{
+		return lua_tinker::call<int>(d_state,"main",hInst,pszWorkDir, pszArgs);
+	}
+
 
     HRESULT SIScriptFactory::CreateScriptModule( IScriptModule ** ppScriptModule )
     {

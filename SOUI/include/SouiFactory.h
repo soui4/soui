@@ -10,24 +10,17 @@ class SOUI_EXP SouiFactory : public TObjRefImpl<ISouiFactory> {
     ~SouiFactory(void);
 
   public:
-    STDMETHOD_(HRESULT, CreateApp)
-    (THIS_ IApplication **ppRet,
-     IRenderFactory *pRenderFac,
-     HMODULE hInst,
-     LPCTSTR pszHostClassName = _T("SOUIHOST"),
-     BOOL bImeApp = FALSE) OVERRIDE;
-    STDMETHOD_(HRESULT, CreateNativeWnd)(THIS_ INativeWnd **ppRet) OVERRIDE;
-    STDMETHOD_(HRESULT, CreateHostWnd)(THIS_ IHostWnd **ppRet, LPCTSTR pszResID = NULL) OVERRIDE;
-    STDMETHOD_(HRESULT, CreateHostDialog)
-    (THIS_ IHostDialog **ppRet, LPCTSTR pszResID = NULL) OVERRIDE;
-    STDMETHOD_(HRESULT, CreateStringA)(THIS_ IStringA **ppRet, LPCSTR pszSrc) OVERRIDE;
-    STDMETHOD_(HRESULT, CreateStringW)(THIS_ IStringW **ppRet, LPCWSTR pszSrc) OVERRIDE;
-    STDMETHOD_(HRESULT, CreateXmlDoc)(THIS_ IXmlDoc **ppRet) OVERRIDE;
-    STDMETHOD_(HRESULT, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType, IObjRef **pObj) OVERRIDE;
-    STDMETHOD_(HRESULT, CreateFuncSlot)
-    (THIS_ FunCallback fun, void *ctx, IEvtSlot **ppSlot) OVERRIDE;
-	STDMETHOD_(HRESULT, CreateMenu)(THIS_ IMenu**ppRet, HMENU hMenu DEF_VAL(NULL)) OVERRIDE;
-	STDMETHOD_(HRESULT, CreateMenuEx)(THIS_ IMenuEx**ppRet) OVERRIDE;
+    STDMETHOD_(IApplication *, CreateApp)(THIS_ IRenderFactory *pRenderFac,HMODULE hInst,LPCTSTR pszHostClassName DEF_VAL(_T("SOUIHOST")), BOOL bImeApp DEF_VAL(FALSE)) OVERRIDE;
+    STDMETHOD_(INativeWnd *, CreateNativeWnd)(THIS) OVERRIDE;
+    STDMETHOD_(IHostWnd *, CreateHostWnd)(THIS_ LPCTSTR pszResID DEF_VAL(NULL)) OVERRIDE;
+    STDMETHOD_(IHostDialog *, CreateHostDialog)(THIS_ LPCTSTR pszResID DEF_VAL(NULL)) OVERRIDE;
+    STDMETHOD_(IStringA *, CreateStringA)(THIS_ LPCSTR pszSrc) OVERRIDE;
+    STDMETHOD_(IStringW *, CreateStringW)(THIS_ LPCWSTR pszSrc) OVERRIDE;
+    STDMETHOD_(IXmlDoc *, CreateXmlDoc)(THIS) OVERRIDE;
+    STDMETHOD_(IResProvider*, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType) OVERRIDE;
+    STDMETHOD_(IEvtSlot *, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx) OVERRIDE;
+	STDMETHOD_(IMenu*, CreateMenu)(THIS_  HMENU hMenu DEF_VAL(NULL)) OVERRIDE;
+	STDMETHOD_(IMenuEx*,CreateMenuEx)(THIS) OVERRIDE;
 };
 
 SNSEND

@@ -44,7 +44,7 @@ BOOL SOUI_Export_Lua(lua_State *L)
 	if(bRet) bRet=ExpLua_IStringW(L);
 	if(bRet) bRet=ExpLua_IXml(L);
 	if(bRet) bRet=ExpLua_IResProvider(L);
-	if(bRet) bRet=ExpLua_IResProviderMgrMgr(L);
+	if(bRet) bRet=ExpLua_IResProviderMgr(L);
 	if(bRet) bRet=ExpLua_IAppication(L);
 
 	if(bRet) bRet=ExpLua_IObject(L);

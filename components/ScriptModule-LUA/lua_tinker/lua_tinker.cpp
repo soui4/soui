@@ -253,6 +253,60 @@ unsigned long lua_tinker::read(lua_State *L, int index)
    else
       return *( unsigned long* ) lua_touserdata ( L, index );
 }
+
+template<>
+HANDLE lua_tinker::read ( lua_State *L, int index )
+{
+	if(lua_isnumber(L,index))
+		return (HANDLE)(UINT)lua_tonumber(L, index);
+	else
+		return *( HANDLE* ) lua_touserdata ( L, index );
+}
+template<>
+HWND lua_tinker::read(lua_State *L, int index)
+{
+	if(lua_isnumber(L,index))
+		return (HWND)(UINT)lua_tonumber(L, index);
+	else
+		return *(HWND*)lua_touserdata(L, index);
+}
+
+template<>
+HDC lua_tinker::read(lua_State *L, int index)
+{
+	if(lua_isnumber(L,index))
+		return (HDC)(UINT)lua_tonumber(L, index);
+	else
+		return *(HDC*)lua_touserdata(L, index);
+}
+
+template<>
+HICON lua_tinker::read(lua_State *L, int index)
+{
+	if(lua_isnumber(L,index))
+		return (HICON)(UINT)lua_tonumber(L, index);
+	else
+		return *(HICON*)lua_touserdata(L, index);
+}
+
+template<>
+HBITMAP lua_tinker::read(lua_State *L, int index)
+{
+	if(lua_isnumber(L,index))
+		return (HBITMAP)(UINT)lua_tonumber(L, index);
+	else
+		return *(HBITMAP*)lua_touserdata(L, index);
+}
+
+template<>
+HINSTANCE lua_tinker::read(lua_State *L, int index)
+{
+	if(lua_isnumber(L,index))
+		return (HINSTANCE)(UINT)lua_tonumber(L, index);
+	else
+		return *(HINSTANCE*)lua_touserdata(L, index);
+}
+
 #else //__i386__ //32bit
 template<>
 long lua_tinker::read ( lua_State *L, int index )
@@ -265,6 +319,46 @@ unsigned long lua_tinker::read ( lua_State *L, int index )
 {
    return ( unsigned long ) lua_tonumber ( L, index );
 }
+
+template<>
+HANDLE lua_tinker::read ( lua_State *L, int index )
+{
+	return ( HANDLE ) ( UINT )lua_tonumber ( L, index );
+}
+
+template<>
+HWND lua_tinker::read(lua_State *L, int index)
+{
+	return (HWND)(UINT)lua_tonumber(L, index);
+}
+
+template<>
+HDC lua_tinker::read(lua_State *L, int index)
+{
+	return (HDC)(UINT)lua_tonumber(L, index);
+}
+
+template<>
+HICON lua_tinker::read(lua_State *L, int index)
+{
+	return (HICON)(UINT)lua_tonumber(L, index);
+}
+
+template<>
+HBITMAP lua_tinker::read(lua_State *L, int index)
+{
+	return (HBITMAP)(UINT)lua_tonumber(L, index);
+}
+
+template<>
+HINSTANCE lua_tinker::read(lua_State *L, int index)
+{
+	if(lua_isnumber(L,index))
+		return (HINSTANCE)(UINT)lua_tonumber(L, index);
+	else
+		return *(HINSTANCE*)lua_touserdata(L, index);
+}
+
 #endif
 
 template<>
@@ -382,6 +476,55 @@ void lua_tinker::push(lua_State *L, unsigned long ret)
    lua_getglobal ( L, "__u64" );
    lua_setmetatable ( L, -2 );
 }
+
+template<>
+void lua_tinker::push(lua_State *L, HANDLE ret)
+{
+	*( HANDLE* ) lua_newuserdata ( L, sizeof ( HANDLE ) ) = ret;
+	lua_getglobal ( L, "__hdl" );
+	lua_setmetatable ( L, -2 );
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HWND ret)
+{
+	*(HWND*)lua_newuserdata(L, sizeof(HWND)) = ret;
+	lua_getglobal(L,"__hwnd");
+	lua_setmetatable(L, -2);
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HDC ret)
+{
+	*(HDC*)lua_newuserdata(L, sizeof(HDC)) = ret;
+	lua_getglobal(L,"__hdc");
+	lua_setmetatable(L, -2);
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HICON ret)
+{
+	*(HICON*)lua_newuserdata(L, sizeof(HICON)) = ret;
+	lua_getglobal(L,"__hicon");
+	lua_setmetatable(L, -2);
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HBITMAP ret)
+{
+	*(HBITMAP*)lua_newuserdata(L, sizeof(HBITMAP)) = ret;
+	lua_getglobal(L,"__hbmp");
+	lua_setmetatable(L, -2);
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HINSTANCE ret)
+{
+	*(HINSTANCE*)lua_newuserdata(L, sizeof(HINSTANCE)) = ret;
+	lua_getglobal(L,"__hinst");
+	lua_setmetatable(L, -2);
+}
+
 #else //__i386__ 
 template<>
 void lua_tinker::push ( lua_State *L, long ret )
@@ -394,6 +537,42 @@ void lua_tinker::push ( lua_State *L, unsigned long ret )
 {
    lua_pushnumber ( L, ret );
 }
+template<>
+void lua_tinker::push ( lua_State *L, HANDLE ret )
+{
+	lua_pushnumber ( L, ( UINT )ret );
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HWND ret)
+{
+	lua_pushnumber ( L, ( UINT )ret );
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HDC ret)
+{
+	lua_pushnumber ( L, ( UINT )ret );
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HICON ret)
+{
+	lua_pushnumber ( L, ( UINT )ret );
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HBITMAP ret)
+{
+	lua_pushnumber ( L, ( UINT )ret );
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HINSTANCE ret)
+{
+	lua_pushnumber ( L, ( UINT )ret );
+}
+
 #endif
 
 template<>

@@ -27,7 +27,10 @@ BOOL ExpLua_Ctrls(lua_State *L)
         lua_tinker::class_def<SComboBox>(L,"SetItemData",&SComboBox::SetItemData);
 		DEF_TOOBJ(L,SComboBox);
 
-        
+		lua_tinker::class_add<SItemPanel>(L,"SItemPanel");
+		lua_tinker::class_inh<SItemPanel,SWindow>(L);
+		lua_tinker::class_inh<SItemPanel,IItemPanel>(L);
+
 		return TRUE;
 	}catch(...)
 	{

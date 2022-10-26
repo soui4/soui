@@ -1,5 +1,6 @@
 #include <string/strcpcvt.h>
 #include "luaFunSlot.h"
+#include "luaAdapter.h"
 
 //导出基本结构体类型
 UINT rgb(int r,int g,int b)
@@ -96,6 +97,49 @@ IEvtSlot * CreateEventSlot(LPCSTR pszLuaFun){
 	return new LuaFunctionSlot(luaState,pszLuaFun);
 }
 
+ILvAdapter * CreateLvAdapter(void *ctx){
+	lua_State *luaState = lua_tinker::get_state();
+	return new LuaLvAdapter(luaState,ctx);
+}
+
+IMcAdapter * CreateMcAdapter(void *ctx){
+	lua_State *luaState = lua_tinker::get_state();
+	return new LuaMcAdapter(luaState,ctx);
+}
+
+BOOL InitFileResProvider(IResProvider *pResProvider, const char * path)
+{
+	SStringT strPath=S_CA2T(path);
+	return pResProvider->Init((WPARAM)strPath.c_str(),0);
+}
+
+BOOL InitPEResProvider(IResProvider *pResProvider, const char * path)
+{
+	SStringT strPath=S_CA2T(path);
+	return pResProvider->Init((WPARAM)strPath.c_str(),1);
+}
+
+IApplication * GetApp(){
+	return SApplication::getSingletonPtr();
+}
+
+HWND GetNullHwnd(){
+	return NULL;
+}
+
+IHostWnd * GetHostWndFromObject(IObject *pObj)
+{
+	SWindow *pWnd = sobj_cast<SWindow>(pObj);
+	if(!pWnd) return NULL;
+	SWindow *pRoot = pWnd->GetRoot();
+	SRootWindow *pRootWnd = sobj_cast<SRootWindow>(pRoot);
+	if(pRootWnd){
+		return pRootWnd->GetHostWnd();
+	}else{
+		return NULL;
+	}
+}
+
 BOOL ExpLua_Global(lua_State *L)
 {
 	try{
@@ -110,8 +154,14 @@ BOOL ExpLua_Global(lua_State *L)
 		lua_tinker::def(L,"S_A2A",&SStrCpCvt::CvtA2A);
 		lua_tinker::def(L,"S_W2W",&SStrCpCvt::CvtW2W);
 
+		lua_tinker::def(L,"GetActiveWindow",GetActiveWindow);
+		lua_tinker::def(L,"GetNullHwnd",GetNullHwnd);
+		lua_tinker::def(L,"GetHostWndFromObject",GetHostWndFromObject);
+		lua_tinker::def(L,"GetApp",GetApp);
+		
 		lua_tinker::def(L,"SMessageBox",SMessageBox);
-		lua_tinker::def(L,"theApp",&SApplication::getSingletonPtr);
+		lua_tinker::def(L,"InitFileResProvider",InitFileResProvider);
+		lua_tinker::def(L,"InitPEResProvider",InitPEResProvider);
 
 		lua_tinker::def(L,"getHostFromInitEvent",getHostFromInitEvent);
 
@@ -121,6 +171,10 @@ BOOL ExpLua_Global(lua_State *L)
 		
 		lua_tinker::def(L,"CreateEventSlot",CreateEventSlot);
 		lua_tinker::def(L,"CreateSouiFactory",CreateSouiFactory);
+
+		lua_tinker::def(L,"CreateLvAdapter",CreateLvAdapter);
+		lua_tinker::def(L,"CreateMcAdapter",CreateMcAdapter);
+
 
 		return TRUE;
 	}catch(...)

@@ -16,6 +16,13 @@ BOOL ExpLua_IEvtArgs(lua_State *L)
 		lua_tinker::class_def<IEvtArgs>(L,"IncreaseHandleCount",&IEvtArgs::IncreaseHandleCount);
 		lua_tinker::class_def<IEvtArgs>(L,"Data",&IEvtArgs::Data);
 
+		lua_tinker::class_add<IEvtSlot>(L,"IEvtSlot");
+		lua_tinker::class_inh<IEvtSlot,IObject>(L);
+		lua_tinker::class_def<IEvtSlot>(L,"Run",&IEvtSlot::Run);
+		lua_tinker::class_def<IEvtSlot>(L,"Clone",&IEvtSlot::Clone);
+		lua_tinker::class_def<IEvtSlot>(L,"Equal",&IEvtSlot::Equal);
+		lua_tinker::class_def<IEvtSlot>(L,"GetSlotType",&IEvtSlot::GetSlotType);
+
 		return TRUE;
 	}catch(...)
 	{

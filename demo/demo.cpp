@@ -301,7 +301,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		if (hSysResource)
 		{
 			SAutoRefPtr<IResProvider> sysResProvider;
-			souiFac.CreateResProvider(RES_PE, (IObjRef**)&sysResProvider);
+			sysResProvider.Attach(souiFac.CreateResProvider(RES_PE));
 			sysResProvider->Init((WPARAM)hSysResource, 0);
 			theApp->LoadSystemNamedResource(sysResProvider);
 
@@ -313,10 +313,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		//定义一人个资源提供对象,SOUI系统中实现了3种资源加载方式，分别是从文件加载，从EXE的资源加载及从ZIP压缩包加载
 		SAutoRefPtr<IResProvider>   pResProvider;
 #if (RES_TYPE == 0)//从文件加载
-		souiFac.CreateResProvider(RES_FILE, (IObjRef**)&pResProvider);
+		pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
 		if (!pResProvider->Init((LPARAM)_T("uires"), 0))
 		{
-			souiFac.CreateResProvider(RES_PE, (IObjRef**)&pResProvider);
+			pResProvider.Attach(souiFac.CreateResProvider(RES_PE));
 			if (!pResProvider->Init((WPARAM)hInstance, 0))
 			{
 				SASSERT(0);
@@ -326,7 +326,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 			}
 		}
 #elif (RES_TYPE==1)//从EXE资源加载
-		souiFac.CreateResProvider(RES_PE, (IObjRef**)&pResProvider);
+		pResProvider.Attach(souiFac.CreateResProvider(RES_PE));
 		pResProvider->Init((WPARAM)hInstance, 0);
 #elif (RES_TYPE==2)//从ZIP包加载
 		bLoaded = pComMgr->CreateResProvider_ZIP((IObjRef**)&pResProvider);

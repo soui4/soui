@@ -54,9 +54,17 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
      */
     STDMETHOD_(void *, GetScriptEngine)(THIS) PURE;
 
-    /*************************************************************************
-        Abstract interface
-    *************************************************************************/
+	/*!
+    \brief
+        Return identification string for the ScriptModule.  If the internal id string has not been
+        set by the ScriptModule creator, a generic string of "Unknown scripting module" will be
+    returned.
+
+    \return
+        String object holding a string that identifies the ScriptModule in use.
+    */
+    STDMETHOD_(LPCSTR, getIdentifierString)(CTHIS) SCONST PURE;
+
     /*!
     \brief
         Execute a script file.
@@ -109,16 +117,22 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
     */
     STDMETHOD_(BOOL, executeScriptedEventHandler)(THIS_ LPCSTR handler_name, IEvtArgs * pEvt) PURE;
 
-    /*!
+   /*!
     \brief
-        Return identification string for the ScriptModule.  If the internal id string has not been
-        set by the ScriptModule creator, a generic string of "Unknown scripting module" will be
-    returned.
+        Execute main function
 
+    \param hInst
+        HINSTANCE handle of the instance.
+
+	\param pszWorkDir
+		LPCSTR work dir.
+
+    \param pszArgs
+        LPCSTR additional parameters.
     \return
-        String object holding a string that identifies the ScriptModule in use.
+        - int return code.
     */
-    STDMETHOD_(LPCSTR, getIdentifierString)(CTHIS) SCONST PURE;
+	STDMETHOD_(int, executeMain)(THIS_ HINSTANCE hInst,LPCSTR pszWorkDir, LPCSTR pszArgs) PURE;
 };
 
 #undef INTERFACE

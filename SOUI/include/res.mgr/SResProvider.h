@@ -26,6 +26,9 @@ class SOUI_EXP SResLoadFromMemory {
 class SResProviderPE : public TObjRefImpl<IResProvider> {
   public:
     SResProviderPE();
+	~SResProviderPE();
+
+  public:
     STDMETHOD_(BOOL, Init)(THIS_ WPARAM wParam, LPARAM lParam);
     STDMETHOD_(BOOL, HasResource)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
     STDMETHOD_(HICON, LoadIcon)(THIS_ LPCTSTR pszResName, int cx, int cy);
@@ -44,6 +47,7 @@ class SResProviderPE : public TObjRefImpl<IResProvider> {
     HRSRC MyFindResource(LPCTSTR strType, LPCTSTR pszResName);
 
     HINSTANCE m_hResInst;
+	BOOL	  m_bOwner;
 };
 
 class SOUI_EXP SResLoadFromFile {

@@ -352,6 +352,12 @@ namespace lua_tinker
    template<>  long long           read ( lua_State *L, int index );
    template<>  unsigned long long  read ( lua_State *L, int index );
    template<>  table               read ( lua_State *L, int index );
+   template<>  HANDLE              read ( lua_State *L, int index );
+   template<>	HWND				read(lua_State *L, int index);
+   template<>	HDC					read(lua_State *L, int index);
+   template<>	HICON				read(lua_State *L, int index);
+   template<>	HBITMAP				read(lua_State *L, int index);
+   template<>	HINSTANCE			read(lua_State *L, int index);
 
    // push a value to lua stack 
    template<typename T>
@@ -374,6 +380,12 @@ namespace lua_tinker
    template<>  void push ( lua_State *L, long long ret );
    template<>  void push ( lua_State *L, unsigned long long ret );
    template<>  void push ( lua_State *L, table ret );
+   template<>  void push ( lua_State *L, HANDLE ret );
+   template<>	void push(lua_State *L, HWND ret);
+   template<>	void push(lua_State *L, HDC ret);
+   template<>	void push(lua_State *L, HICON ret);
+   template<>	void push(lua_State *L, HBITMAP ret);
+   template<>	void push(lua_State *L, HINSTANCE ret);
 
    // pop a value from lua stack
    template<typename T>
