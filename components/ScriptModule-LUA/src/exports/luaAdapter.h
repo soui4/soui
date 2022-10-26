@@ -5,7 +5,7 @@ SNSBEGIN
 class LuaLvAdapter : public SAdapterBase
 {
 public:
-	LuaLvAdapter(lua_State *luaState,void * ctx):m_luaState(luaState),m_ctx(ctx){}
+	LuaLvAdapter(lua_State *luaState,LPCSTR ctx):m_luaState(luaState),m_ctx(ctx){}
 
 	enum{
 		fid_getView=0,
@@ -29,40 +29,40 @@ public:
 	STDMETHOD_(void, getView)(int position, SItemPanel *pItem, SXmlNode xmlTemplate) OVERRIDE{
 		if(m_luaGetView.IsEmpty())
 			return;
-		lua_tinker::call<void>(m_luaState,m_luaGetView,m_ctx,position,pItem,(IXmlNode*)&xmlTemplate);
+		lua_tinker::call<void>(m_luaState,m_luaGetView,m_ctx,position,(SWindow*)pItem,(IXmlNode*)&xmlTemplate);
 	}
 
 	STDMETHOD_(int, getCount)(THIS) OVERRIDE{
 		if(m_luaGetCount.IsEmpty())
 			return 0;
-		return lua_tinker::call<int>(m_luaState,m_luaGetCount,m_ctx);
+		return lua_tinker::call<int>(m_luaState,m_luaGetCount,m_ctx.c_str());
 	}
 
 	STDMETHOD_(void, InitByTemplate)(IXmlNode *pXmlTemplate) OVERRIDE
 	{
 		if(m_luaInitByTemplate.IsEmpty())
 			return;
-		lua_tinker::call<void>(m_luaState,m_luaInitByTemplate,m_ctx,pXmlTemplate);
+		lua_tinker::call<void>(m_luaState,m_luaInitByTemplate,m_ctx.c_str(),pXmlTemplate);
 	}
 
 	STDMETHOD_(int, getViewTypeCount)() OVERRIDE
 	{
 		if(m_luaGetViewTypeCount.IsEmpty())
 			return 1;
-		return lua_tinker::call<int>(m_luaState,m_luaGetViewTypeCount,m_ctx);
+		return lua_tinker::call<int>(m_luaState,m_luaGetViewTypeCount,m_ctx.c_str());
 	}
 
 	STDMETHOD_(int, getItemViewType)(int position)
 	{
 		if(m_luaGetItemViewType.IsEmpty())
 			return 0;
-		return lua_tinker::call<int>(m_luaState,m_luaGetItemViewType,m_ctx,position);
+		return lua_tinker::call<int>(m_luaState,m_luaGetItemViewType,m_ctx.c_str(),position);
 	}
 
 
 private:
 	lua_State * m_luaState;
-	void * m_ctx;
+	SStringA m_ctx;
 
 	SStringA m_luaGetView;
 	SStringA m_luaGetItemViewType;
@@ -74,7 +74,7 @@ private:
 class LuaMcAdapter : public SMcAdapterBase
 {
 public:
-	LuaMcAdapter(lua_State *luaState,void * ctx):m_luaState(luaState),m_ctx(ctx){}
+	LuaMcAdapter(lua_State *luaState,LPCSTR ctx):m_luaState(luaState),m_ctx(ctx){}
 
 	enum{
 		fid_getView=0,
@@ -104,48 +104,48 @@ public:
 	STDMETHOD_(void, getView)(int position, SItemPanel *pItem, SXmlNode xmlTemplate) OVERRIDE{
 		if(m_luaGetView.IsEmpty())
 			return;
-		lua_tinker::call<void>(m_luaState,m_luaGetView,m_ctx,position,pItem,(IXmlNode*)&xmlTemplate);
+		lua_tinker::call<void>(m_luaState,m_luaGetView,m_ctx.c_str(),position,pItem,(IXmlNode*)&xmlTemplate);
 	}
 
 	STDMETHOD_(int, getCount)(THIS) OVERRIDE{
 		if(m_luaGetCount.IsEmpty())
 			return 0;
-		return lua_tinker::call<int>(m_luaState,m_luaGetCount,m_ctx);
+		return lua_tinker::call<int>(m_luaState,m_luaGetCount,m_ctx.c_str());
 	}
 
 	STDMETHOD_(void, InitByTemplate)(IXmlNode *pXmlTemplate) OVERRIDE
 	{
 		if(m_luaInitByTemplate.IsEmpty())
 			return;
-		lua_tinker::call<void>(m_luaState,m_luaInitByTemplate,m_ctx,pXmlTemplate);
+		lua_tinker::call<void>(m_luaState,m_luaInitByTemplate,m_ctx.c_str(),pXmlTemplate);
 	}
 
 	STDMETHOD_(int, getViewTypeCount)() OVERRIDE
 	{
 		if(m_luaGetViewTypeCount.IsEmpty())
 			return 1;
-		return lua_tinker::call<int>(m_luaState,m_luaGetViewTypeCount,m_ctx);
+		return lua_tinker::call<int>(m_luaState,m_luaGetViewTypeCount,m_ctx.c_str());
 	}
 
 	STDMETHOD_(int, getItemViewType)(int position)
 	{
 		if(m_luaGetItemViewType.IsEmpty())
 			return 0;
-		return lua_tinker::call<int>(m_luaState,m_luaGetItemViewType,m_ctx,position);
+		return lua_tinker::call<int>(m_luaState,m_luaGetItemViewType,m_ctx.c_str(),position);
 	}
 
 	STDMETHOD_(BOOL, OnSort)(int iCol, UINT *pFmts, int nCols) OVERRIDE
 	{
 		if(m_luaOnSort.IsEmpty())
 			return FALSE;
-		return lua_tinker::call<int>(m_luaState,m_luaOnSort,m_ctx,iCol,pFmts,nCols) != 0;;
+		return lua_tinker::call<int>(m_luaState,m_luaOnSort,m_ctx.c_str(),iCol,pFmts,nCols) != 0;;
 	}
 
 	STDMETHOD_(SStringW, GetColumnName)(int iCol) SCONST
 	{
 		if(m_luaGetColumnName.IsEmpty())
 			return L"";
-		const char * pszName = lua_tinker::call<const char*>(m_luaState,m_luaGetColumnName,m_ctx,iCol);
+		const char * pszName = lua_tinker::call<const char*>(m_luaState,m_luaGetColumnName,m_ctx.c_str(),iCol);
 		return S_CA2W(pszName);
 	}
 
@@ -153,12 +153,12 @@ public:
 	{
 		if(m_luaIsColumnVisible.IsEmpty())
 			return TRUE;
-		return lua_tinker::call<int>(m_luaState,m_luaIsColumnVisible,m_ctx,iCol) != 0;;
+		return lua_tinker::call<int>(m_luaState,m_luaIsColumnVisible,m_ctx.c_str(),iCol) != 0;;
 	}
 
 private:
 	lua_State * m_luaState;
-	void * m_ctx;
+	SStringA m_ctx;
 
 	SStringA m_luaGetView;
 	SStringA m_luaGetItemViewType;

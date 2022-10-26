@@ -31,6 +31,7 @@ using namespace SOUI;
 #include "exp_INativeWnd.h"
 #include "exp_IHostWnd.h"
 #include "exp_ICtrl.h"
+#include "exp_IAdapter.h"
 #include "exp_Global.h"
 
 BOOL SOUI_Export_Lua(lua_State *L)
@@ -62,8 +63,11 @@ BOOL SOUI_Export_Lua(lua_State *L)
 	if(bRet) bRet=ExpLua_INativeWnd(L);
 	if(bRet) bRet=ExpLua_IHostWnd(L);
 	if(bRet) bRet=ExpLua_IHostDialog(L);
-
+	
 	if(bRet) bRet=ExpLua_ICtrl(L);
+	if(bRet) bRet=ExpLua_IAdapter(L);
+
+	
 	if(bRet) bRet=ExpLua_Global(L);
 
 	return bRet;

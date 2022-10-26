@@ -29,7 +29,7 @@ BOOL ExpLua_Ctrls(lua_State *L)
 
 		lua_tinker::class_add<SItemPanel>(L,"SItemPanel");
 		lua_tinker::class_inh<SItemPanel,SWindow>(L);
-		lua_tinker::class_inh<SItemPanel,IItemPanel>(L);
+		DEF_TOOBJ(L,SItemPanel);
 
 		return TRUE;
 	}catch(...)
