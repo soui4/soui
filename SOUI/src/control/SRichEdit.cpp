@@ -1360,7 +1360,7 @@ SStringT SRichEdit::GetWindowText(BOOL bRawText)
     SStringW strRet;
     int nLen = GetWindowTextLength();
     wchar_t *pBuf = strRet.GetBufferSetLength(nLen);
-    SSendMessage(WM_GETTEXT, (WPARAM)nLen, (LPARAM)pBuf);
+    SSendMessage(WM_GETTEXT, (WPARAM)nLen+1, (LPARAM)pBuf);
     strRet.ReleaseBuffer();
     return S_CW2T(strRet);
 }
