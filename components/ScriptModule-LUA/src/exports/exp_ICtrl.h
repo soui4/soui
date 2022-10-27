@@ -12,6 +12,8 @@ T1 * QueryICtrl(IWindow *pWnd){
 	return NULL;
 }
 
+#define DEF_QICTRL(L,itype,stype) lua_tinker::def(L,"Qi"#itype,&QueryICtrl<itype,stype>)
+
 BOOL ExpLua_ICtrl(lua_State *L)
 {
 	try{
@@ -26,14 +28,13 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IOsrPanel>(L,"GetItemIndex",&IOsrPanel::GetItemIndex);
 		lua_tinker::class_def<IOsrPanel>(L,"SetItemData",&IOsrPanel::SetItemData);
 		lua_tinker::class_def<IOsrPanel>(L,"GetItemData",&IOsrPanel::GetItemData);
-		lua_tinker::def(L,"QiIOsrPanel",&QueryICtrl<IOsrPanel,SOsrPanel>);
-
+		DEF_QICTRL(L,IOsrPanel,SOsrPanel);
 
 		lua_tinker::class_add<IItemPanel>(L,"IItemPanel");
 		lua_tinker::class_inh<IItemPanel,IOsrPanel>(L);
 		lua_tinker::class_def<IItemPanel>(L,"SetSkin",&IItemPanel::SetSkin);
 		lua_tinker::class_def<IItemPanel>(L,"SetColor",&IItemPanel::SetColor);
-		lua_tinker::def(L,"QiIItemPanel",&QueryICtrl<IItemPanel,SItemPanel>);
+		DEF_QICTRL(L,IItemPanel,SItemPanel);
 
 		lua_tinker::class_add<IImageWnd>(L,"IImageWnd");
 		lua_tinker::class_inh<IImageWnd,ICtrl>(L);
@@ -42,14 +43,14 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IImageWnd>(L,"SetImage",&IImageWnd::SetImage);
 		lua_tinker::class_def<IImageWnd>(L,"GetImage",&IImageWnd::GetImage);
 		lua_tinker::class_def<IImageWnd>(L,"SetIcon",&IImageWnd::SetIcon);
-		lua_tinker::def(L,"QiIImageWnd",&QueryICtrl<IImageWnd,SImageWnd>);
+		DEF_QICTRL(L,IImageWnd,SImageWnd);
 
 		lua_tinker::class_add<IAnimateImgWnd>(L,"IAnimateImgWnd");
 		lua_tinker::class_inh<IAnimateImgWnd,ICtrl>(L);
 		lua_tinker::class_def<IAnimateImgWnd>(L,"Start",&IAnimateImgWnd::Start);
 		lua_tinker::class_def<IAnimateImgWnd>(L,"Stop",&IAnimateImgWnd::Stop);
 		lua_tinker::class_def<IAnimateImgWnd>(L,"IsPlaying",&IAnimateImgWnd::IsPlaying);
-		lua_tinker::def(L,"QiIAnimateImgWnd",&QueryICtrl<IAnimateImgWnd,SAnimateImgWnd>);
+		DEF_QICTRL(L,IAnimateImgWnd,SAnimateImgWnd);
 
 
 		lua_tinker::class_add<IProgress>(L,"IProgress");
@@ -59,7 +60,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IProgress>(L,"SetRange",&IProgress::SetRange);
 		lua_tinker::class_def<IProgress>(L,"GetRange",&IProgress::GetRange);
 		lua_tinker::class_def<IProgress>(L,"IsVertical",&IProgress::IsVertical);
-		lua_tinker::def(L,"QiIProgress",&QueryICtrl<IProgress,SProgress>);
+		DEF_QICTRL(L,IProgress,SProgress);
 
 
 		lua_tinker::class_add<IPanel>(L,"IPanel");
@@ -73,7 +74,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IPanel>(L,"SetScrollRange",&IPanel::SetScrollRange);
 		lua_tinker::class_def<IPanel>(L,"GetScrollRange",&IPanel::GetScrollRange);
 		lua_tinker::class_def<IPanel>(L,"HasScrollBar",&IPanel::HasScrollBar);
-		lua_tinker::def(L,"QiIPanel",&QueryICtrl<IPanel,SPanel>);
+		DEF_QICTRL(L,IPanel,SPanel);
 
 		lua_tinker::class_add<IScrollView>(L,"IScrollView");
 		lua_tinker::class_inh<IScrollView,IPanel>(L);
@@ -81,7 +82,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IScrollView>(L,"SetViewSize",&IScrollView::SetViewSize);
 		lua_tinker::class_def<IScrollView>(L,"GetViewOrigin",&IScrollView::GetViewOrigin);
 		lua_tinker::class_def<IScrollView>(L,"SetViewOrigin",&IScrollView::SetViewOrigin);
-		lua_tinker::def(L,"QiIScrollView",&QueryICtrl<IScrollView,SScrollView>);
+		DEF_QICTRL(L,IScrollView,SScrollView);
 
 
 		lua_tinker::class_add<IHeaderCtrl>(L,"IHeaderCtrl");
@@ -98,7 +99,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IHeaderCtrl>(L,"SetItemSort",&IHeaderCtrl::SetItemSort);
 		lua_tinker::class_def<IHeaderCtrl>(L,"SetItemVisible",&IHeaderCtrl::SetItemVisible);
 		lua_tinker::class_def<IHeaderCtrl>(L,"IsItemVisible",&IHeaderCtrl::IsItemVisible);
-		lua_tinker::def(L,"QiIHeaderCtrl",&QueryICtrl<IHeaderCtrl,SHeaderCtrl>);
+		DEF_QICTRL(L,IHeaderCtrl,SHeaderCtrl);
 
 		lua_tinker::class_add<IListView>(L,"IListView");
 		lua_tinker::class_inh<IListView,IPanel>(L);
@@ -110,7 +111,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IListView>(L,"SetSel",&IListView::SetSel);
 		lua_tinker::class_def<IListView>(L,"GetSel",&IListView::GetSel);
 		lua_tinker::class_def<IListView>(L,"HitTest",&IListView::HitTest);
-		lua_tinker::def(L,"QiIListView",&QueryICtrl<IListView,SListView>);
+		DEF_QICTRL(L,IListView,SListView);
 
 
 		lua_tinker::class_add<IMcListView>(L,"IMcListView");
@@ -127,7 +128,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IMcListView>(L,"InsertColumn",&IMcListView::InsertColumn);
 		lua_tinker::class_def<IMcListView>(L,"DeleteColumn",&IMcListView::DeleteColumn);
 		lua_tinker::class_def<IMcListView>(L,"GetColumnCount",&IMcListView::GetColumnCount);
-		lua_tinker::def(L,"QiIMcListView",&QueryICtrl<IMcListView,SMCListView>);
+		DEF_QICTRL(L,IMcListView,SMCListView);
 
 		lua_tinker::class_add<ITreeView>(L,"ITreeView");
 		lua_tinker::class_inh<ITreeView,IPanel>(L);
@@ -139,7 +140,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<ITreeView>(L,"SetSel",&ITreeView::SetSel);
 		lua_tinker::class_def<ITreeView>(L,"GetSel",&ITreeView::GetSel);
 		lua_tinker::class_def<ITreeView>(L,"HitTest",&ITreeView::HitTest);
-		lua_tinker::def(L,"QiITreeView",&QueryICtrl<ITreeView,STreeView>);
+		DEF_QICTRL(L,ITreeView,STreeView);
 
 		lua_tinker::class_add<ITileView>(L,"ITileView");
 		lua_tinker::class_inh<ITileView,IPanel>(L);
@@ -151,7 +152,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<ITileView>(L,"SetSel",&ITileView::SetSel);
 		lua_tinker::class_def<ITileView>(L,"GetSel",&ITileView::GetSel);
 		lua_tinker::class_def<ITileView>(L,"HitTest",&ITileView::HitTest);
-		lua_tinker::def(L,"QiITileView",&QueryICtrl<ITileView,STileView>);
+		DEF_QICTRL(L,ITileView,STileView);
 
 
 		lua_tinker::class_add<IListBox>(L,"IListBox");
@@ -172,7 +173,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IListBox>(L,"InsertString",&IListBox::InsertString);
 		lua_tinker::class_def<IListBox>(L,"EnsureVisible",&IListBox::EnsureVisible);
 		lua_tinker::class_def<IListBox>(L,"FindString",&IListBox::FindString);
-		lua_tinker::def(L,"QiIListBox",&QueryICtrl<IListBox,SListBox>);
+		DEF_QICTRL(L,IListBox,SListBox);
 
 		lua_tinker::class_add<IComboBase>(L,"IComboBase");
 		lua_tinker::class_inh<IComboBase,IPanel>(L);
@@ -180,7 +181,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IComboBase>(L,"CloseUp",&IComboBase::CloseUp);
 		lua_tinker::class_def<IComboBase>(L,"IsDropdown",&IComboBase::IsDropdown);
 		lua_tinker::class_def<IComboBase>(L,"SetDropdown",&IComboBase::SetDropdown);
-		lua_tinker::def(L,"QiIComboBase",&QueryICtrl<IComboBase,SComboBase>);
+		DEF_QICTRL(L,IComboBase,SComboBase);
 
 		lua_tinker::class_add<IComboBox>(L,"IComboBox");
 		lua_tinker::class_inh<IComboBox,IComboBase>(L);
@@ -190,12 +191,12 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IComboBox>(L,"DeleteString",&IComboBox::DeleteString);
 		lua_tinker::class_def<IComboBox>(L,"ResetContent",&IComboBox::ResetContent);
 		lua_tinker::class_def<IComboBox>(L,"GetIListBox",&IComboBox::GetIListBox);
-		lua_tinker::def(L,"QiIComboBox",&QueryICtrl<IComboBox,SComboBox>);
+		DEF_QICTRL(L,IComboBox,SComboBox);
 
 		lua_tinker::class_add<IComboView>(L,"IComboView");
 		lua_tinker::class_inh<IComboView,IComboBase>(L);
 		lua_tinker::class_def<IComboView>(L,"GetIListView",&IComboView::GetIListView);
-		lua_tinker::def(L,"QiIComboView",&QueryICtrl<IComboView,SComboView>);
+		DEF_QICTRL(L,IComboView,SComboView);
 
 		lua_tinker::class_add<IDateTimePicker>(L,"IDateTimePicker");
 		lua_tinker::class_inh<IDateTimePicker,ICtrl>(L);
@@ -204,7 +205,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IDateTimePicker>(L,"CloseUp",&IDateTimePicker::CloseUp);
 		lua_tinker::class_def<IDateTimePicker>(L,"DropDown",&IDateTimePicker::DropDown);
 		lua_tinker::class_def<IDateTimePicker>(L,"Clear",&IDateTimePicker::Clear);
-		lua_tinker::def(L,"QiIDateTimePicker",&QueryICtrl<IDateTimePicker,SDateTimePicker>);
+		DEF_QICTRL(L,IDateTimePicker,SDateTimePicker);
 
 		lua_tinker::class_add<ITreeCtrl>(L,"ITreeCtrl");
 		lua_tinker::class_inh<ITreeCtrl,ICtrl>(L);
@@ -231,14 +232,14 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<ITreeCtrl>(L,"SetCheckState",&ITreeCtrl:: SetCheckState);
 		lua_tinker::class_def<ITreeCtrl>(L,"Expand",&ITreeCtrl:: Expand);
 		lua_tinker::class_def<ITreeCtrl>(L,"EnsureVisible",&ITreeCtrl:: EnsureVisible);
-		lua_tinker::def(L,"QiITreeCtrl",&QueryICtrl<ITreeCtrl,STreeCtrl>);
+		DEF_QICTRL(L,ITreeCtrl,STreeCtrl);
 
 		lua_tinker::class_add<IHotKeyCtrl>(L,"IHotKeyCtrl");
 		lua_tinker::class_inh<IHotKeyCtrl,ICtrl>(L);
 		lua_tinker::class_def<IHotKeyCtrl>(L,"SetRule",&IHotKeyCtrl:: SetRule);
 		lua_tinker::class_def<IHotKeyCtrl>(L,"SetHotKey",&IHotKeyCtrl:: SetHotKey);
 		lua_tinker::class_def<IHotKeyCtrl>(L,"GetHotKey",&IHotKeyCtrl:: GetHotKey);
-		lua_tinker::def(L,"QiIHotKeyCtrl",&QueryICtrl<IHotKeyCtrl,SHotKeyCtrl>);
+		DEF_QICTRL(L,IHotKeyCtrl,SHotKeyCtrl);
 
 		lua_tinker::class_add<IRichEdit>(L,"IRichEdit");
 		lua_tinker::class_inh<IRichEdit,ICtrl>(L);
@@ -260,13 +261,14 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<IRichEdit>(L,"SetDefaultLeftIndent",&IRichEdit::SetDefaultLeftIndent);
 		lua_tinker::class_def<IRichEdit>(L,"SetSaveSelection",&IRichEdit::SetSaveSelection);
 		lua_tinker::class_def<IRichEdit>(L,"SetDefaultTextColor",&IRichEdit::SetDefaultTextColor);
-		lua_tinker::def(L,"QiIRichEdit",&QueryICtrl<IRichEdit,SRichEdit>);
+		DEF_QICTRL(L,IRichEdit,SRichEdit);
 
 		lua_tinker::class_add<IEdit>(L,"IEdit");
 		lua_tinker::class_inh<IEdit,ICtrl>(L);
 		lua_tinker::class_def<IEdit>(L,"GetCueText",&IEdit::GetCueText);
 		lua_tinker::class_def<IEdit>(L,"GetCueColor",&IEdit::GetCueColor);
 		lua_tinker::def(L,"QiIEdit",&QueryICtrl<IEdit,SEdit>);
+		DEF_QICTRL(L,IEdit,SEdit);
 
 		lua_tinker::class_add<ITabCtrl>(L,"ITabCtrl");
 		lua_tinker::class_inh<ITabCtrl,ICtrl>(L);
@@ -279,7 +281,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<ITabCtrl>(L,"RemoveItem",&ITabCtrl::RemoveItem);
 		lua_tinker::class_def<ITabCtrl>(L,"RemoveAllItems",&ITabCtrl::RemoveAllItems);
 		lua_tinker::class_def<ITabCtrl>(L,"GetPageIndex",&ITabCtrl::GetPageIndex);
-		lua_tinker::def(L,"QiITabCtrl",&QueryICtrl<ITabCtrl,STabCtrl>);
+		DEF_QICTRL(L,ITabCtrl,STabCtrl);
 
 		lua_tinker::class_add<ISpinButtonCtrl>(L,"ISpinButtonCtrl");
 		lua_tinker::class_inh<ISpinButtonCtrl,ICtrl>(L);
@@ -288,7 +290,7 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<ISpinButtonCtrl>(L,"SetStep",&ISpinButtonCtrl::SetStep);
 		lua_tinker::class_def<ISpinButtonCtrl>(L,"GetValue",&ISpinButtonCtrl::GetValue);
 		lua_tinker::class_def<ISpinButtonCtrl>(L,"GetIBuddy",&ISpinButtonCtrl::GetIBuddy);
-		lua_tinker::def(L,"QiISpinButtonCtrl",&QueryICtrl<ISpinButtonCtrl,SSpinButtonCtrl>);
+		DEF_QICTRL(L,ISpinButtonCtrl,SSpinButtonCtrl);
 
 
 		return TRUE;
