@@ -15,6 +15,7 @@
 #include <lua.hpp>
 #include <stdio.h>
 #include <typeinfo>
+#include <lua.h>
 
 #ifndef UAPI
 #define UAPI __stdcall

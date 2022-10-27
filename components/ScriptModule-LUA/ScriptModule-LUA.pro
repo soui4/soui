@@ -19,7 +19,7 @@ DEPENDPATH += . exports
 INCLUDEPATH += . \
 			   ./src \
 			   ./lua_tinker \
-			   ../../third-part/lua-53/src \
+			   ../../third-part/lua-54/src \
 			   ../../soui/include \
 			   ../../utilities/include \
 
@@ -29,10 +29,10 @@ include($$dir/common.pri)
 
 
 CONFIG(debug,debug|release){
-	LIBS += lua-53d.lib soui4d.lib utilities4d.lib
+	LIBS += lua-54d.lib soui4d.lib utilities4d.lib
 }
 else{
-	LIBS += lua-53.lib soui4.lib utilities4.lib
+	LIBS += lua-54.lib soui4.lib utilities4.lib
 }
 
 PRECOMPILED_HEADER = src/stdafx.h

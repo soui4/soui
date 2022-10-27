@@ -94,7 +94,7 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 			if (hModSysResource)
 			{
 				CAutoRefPtr<IResProvider> sysResProvider;
-				souiFac.CreateResProvider(RES_PE, (IObjRef**)&sysResProvider);
+				sysResProvider.Attach(souiFac.CreateResProvider(RES_PE));
 				sysResProvider->Init((WPARAM)hModSysResource, 0);
 				theApp->LoadSystemNamedResource(sysResProvider);
 				FreeLibrary(hModSysResource);
@@ -108,7 +108,7 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 		//钩选了复制系统资源选项
 		{
 			CAutoRefPtr<IResProvider> pSysResProvider;
-			souiFac.CreateResProvider(RES_PE, (IObjRef**)&pSysResProvider);
+			pSysResProvider.Attach(souiFac.CreateResProvider(RES_PE));
 			bLoaded = pSysResProvider->Init((WPARAM)m_hInstance, 0);
 			SASSERT(bLoaded);
 			theApp->LoadSystemNamedResource(pSysResProvider);
@@ -120,14 +120,14 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 #if (RES_TYPE != 0)		
 		//选择了仅在Release版本打包资源则在DEBUG下始终使用文件加载
 		{
-			souiFac.CreateResProvider(RES_FILE, (IObjRef**)&pResProvider);
+			pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
 			bLoaded = pResProvider->Init((LPARAM)_T("uires"), 0);
 			SASSERT(bLoaded);
 		}
 #else
 		{
 [!if ResLoaderType == 0]
-			souiFac.CreateResProvider(RES_PE, (IObjRef**)&pResProvider);
+			pResProvider.Attach(souiFac.CreateResProvider(RES_PE));
 			bLoaded = pResProvider->Init((WPARAM)m_hInstance, 0);
 			SASSERT(bLoaded);
 [!endif]
@@ -148,7 +148,7 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 			SASSERT(bLoaded);
 [!endif]
 [!if ResLoaderType == 3]
-			souiFac.CreateResProvider(RES_FILE, (IObjRef**)&pResProvider);
+			pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
 			bLoaded = pResProvider->Init((LPARAM)_T("uires"), 0);
 			SASSERT(bLoaded);
 [!endif]

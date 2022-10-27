@@ -27,6 +27,6 @@ render-skia.depends += skia
 resprovider-zip.depends += zlib utilities4
 translator.depends += utilities4
 resprovider-7zip.depends += 7z utilities4
-ScriptModule-LUA.depends += soui4 lua-53
+ScriptModule-LUA.depends += soui4 lua-54
 TaskLoop.depends += utilities4
 SIpcObject.depends += utilities4
