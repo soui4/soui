@@ -481,6 +481,7 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
         item.lParam = xmlItem.attribute(L"userData").as_uint(0);
         item.bVisible = xmlItem.attribute(L"visible").as_bool(true);
         item.fmt = 0;
+		item.state = 0;
         SStringW strSort = xmlItem.attribute(L"sortFlag").as_string();
         strSort.MakeLower();
         if (strSort == L"down")
