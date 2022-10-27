@@ -1,388 +1,330 @@
-﻿#include <event/SEvents.h>
+﻿#include <Event/SEvents.h>
 #include "toobj.h"
 
+template<typename T> 
+T* cast_ptr(void* p){
+	return (T*)p;
+}
 
+#define DEF_EVT_DATA(luaState,x) lua_tinker::def(luaState,"to"#x,&cast_ptr<x>)
 
 BOOL ExpLua_EventArgs(lua_State *L)
 {
 	try{
         
-        lua_tinker::class_add<EventTimer>(L,"EventTimer");
-        lua_tinker::class_inh<EventTimer,IEvtArgs>(L);
-        lua_tinker::class_mem<EventTimer>(L,"uID",&EventTimer::uID);
-		DEF_TOOBJ(L,EventTimer);
+        lua_tinker::class_add<StEventTimer>(L,"StEventTimer");
+        lua_tinker::class_mem<StEventTimer>(L,"uID",&StEventTimer::uID);
+		DEF_EVT_DATA(L,StEventTimer);
 
-        lua_tinker::class_add<EventSwndSize>(L,"EventSwndSize");
-        lua_tinker::class_inh<EventSwndSize,IEvtArgs>(L);
-        lua_tinker::class_mem<EventSwndSize>(L,"szWnd",&EventSwndSize::szWnd);
-		DEF_TOOBJ(L,EventSwndSize);
+        lua_tinker::class_add<StEventSwndSize>(L,"StEventSwndSize");
+        lua_tinker::class_mem<StEventSwndSize>(L,"szWnd",&EventSwndSize::szWnd);
+		DEF_EVT_DATA(L,StEventSwndSize);
 
-		lua_tinker::class_add<EventScroll>(L,"EventScroll");
-		lua_tinker::class_inh<EventScroll,IEvtArgs>(L);
-		lua_tinker::class_mem<EventScroll>(L,"nSbCode",&EventScroll::nSbCode);
-		lua_tinker::class_mem<EventScroll>(L,"nPos",&EventScroll::nPos);
-		lua_tinker::class_mem<EventScroll>(L,"bVertical",&EventScroll::bVertical);
-		DEF_TOOBJ(L,EventScroll);
+		lua_tinker::class_add<StEventScroll>(L,"StEventScroll");
+		lua_tinker::class_mem<StEventScroll>(L,"nSbCode",&EventScroll::nSbCode);
+		lua_tinker::class_mem<StEventScroll>(L,"nPos",&EventScroll::nPos);
+		lua_tinker::class_mem<StEventScroll>(L,"bVertical",&EventScroll::bVertical);
+		DEF_EVT_DATA(L,StEventScroll);
 
-		lua_tinker::class_add<EventSpinValue2String>(L,"EventSpinValue2String");
-		lua_tinker::class_inh<EventSpinValue2String,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSpinValue2String>(L,"bInit",&EventSpinValue2String::bInit);
-		lua_tinker::class_mem<EventSpinValue2String>(L,"nValue",&EventSpinValue2String::nValue);
-		lua_tinker::class_mem<EventSpinValue2String>(L,"strValue",&EventSpinValue2String::strValue);
-		DEF_TOOBJ(L,EventSpinValue2String);
+		lua_tinker::class_add<StEventSpinValue2String>(L,"StEventSpinValue2String");
+		lua_tinker::class_mem<StEventSpinValue2String>(L,"bInit",&EventSpinValue2String::bInit);
+		lua_tinker::class_mem<StEventSpinValue2String>(L,"nValue",&EventSpinValue2String::nValue);
+		lua_tinker::class_mem<StEventSpinValue2String>(L,"strValue",&EventSpinValue2String::strValue);
+		DEF_EVT_DATA(L,StEventSpinValue2String);
 
-		lua_tinker::class_add<EventSwndStateChanged>(L,"EventSwndStateChanged");
-		lua_tinker::class_inh<EventSwndStateChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSwndStateChanged>(L,"dwOldState",&EventSwndStateChanged::dwOldState);
-		lua_tinker::class_mem<EventSwndStateChanged>(L,"dwNewState",&EventSwndStateChanged::dwNewState);
-		DEF_TOOBJ(L,EventSwndStateChanged);
+		lua_tinker::class_add<StEventSwndStateChanged>(L,"StEventSwndStateChanged");
+		lua_tinker::class_mem<StEventSwndStateChanged>(L,"dwOldState",&EventSwndStateChanged::dwOldState);
+		lua_tinker::class_mem<StEventSwndStateChanged>(L,"dwNewState",&EventSwndStateChanged::dwNewState);
+		DEF_EVT_DATA(L,StEventSwndStateChanged);
 
-		lua_tinker::class_add<EventSwndAnimationStart>(L,"EventSwndAnimationStart");
-		lua_tinker::class_inh<EventSwndAnimationStart,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSwndAnimationStart>(L,"pAni",&EventSwndAnimationStart::pAni);
-		DEF_TOOBJ(L,EventSwndAnimationStart);
+		lua_tinker::class_add<StEventSwndAnimationStart>(L,"StEventSwndAnimationStart");
+		lua_tinker::class_mem<StEventSwndAnimationStart>(L,"pAni",&EventSwndAnimationStart::pAni);
+		DEF_EVT_DATA(L,StEventSwndAnimationStart);
 
-		lua_tinker::class_add<EventSwndAnimationStop>(L,"EventSwndAnimationStop");
-		lua_tinker::class_inh<EventSwndAnimationStop,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSwndAnimationStop>(L,"pAni",&EventSwndAnimationStop::pAni);
-		lua_tinker::def(L,"toEventSwndAnimationStop",&sobj_cast<EventSwndAnimationStop>);//类型转换
+		lua_tinker::class_add<StEventSwndAnimationStop>(L,"StEventSwndAnimationStop");
+		lua_tinker::class_mem<StEventSwndAnimationStop>(L,"pAni",&EventSwndAnimationStop::pAni);
+		DEF_EVT_DATA(L,StEventSwndAnimationStop);
 
-		lua_tinker::class_add<EventSwndAnimationRepeat>(L,"EventSwndAnimationRepeat");
-		lua_tinker::class_inh<EventSwndAnimationRepeat,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSwndAnimationRepeat>(L,"pAni",&EventSwndAnimationRepeat::pAni);
-		DEF_TOOBJ(L,EventSwndAnimationRepeat);
+		lua_tinker::class_add<StEventSwndAnimationRepeat>(L,"StEventSwndAnimationRepeat");
+		lua_tinker::class_mem<StEventSwndAnimationRepeat>(L,"pAni",&EventSwndAnimationRepeat::pAni);
+		DEF_EVT_DATA(L,StEventSwndAnimationRepeat);
 
-		lua_tinker::class_add<EventKeyDown>(L,"EventKeyDown");
-		lua_tinker::class_inh<EventKeyDown,IEvtArgs>(L);
-		lua_tinker::class_mem<EventKeyDown>(L,"nChar",&EventKeyDown::nChar);
-		lua_tinker::class_mem<EventKeyDown>(L,"nFlags",&EventKeyDown::nFlags);
-		lua_tinker::class_mem<EventKeyDown>(L,"bCancel",&EventKeyDown::bCancel);
-		DEF_TOOBJ(L,EventKeyDown);
+		lua_tinker::class_add<StEventKeyDown>(L,"StEventKeyDown");
+		lua_tinker::class_mem<StEventKeyDown>(L,"nChar",&EventKeyDown::nChar);
+		lua_tinker::class_mem<StEventKeyDown>(L,"nFlags",&EventKeyDown::nFlags);
+		lua_tinker::class_mem<StEventKeyDown>(L,"bCancel",&EventKeyDown::bCancel);
+		DEF_EVT_DATA(L,StEventKeyDown);
 
 
-		lua_tinker::class_add<EventSwndUpdateTooltip>(L,"EventSwndUpdateTooltip");
-		lua_tinker::class_inh<EventSwndUpdateTooltip,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSwndUpdateTooltip>(L,"strToolTip",&EventSwndUpdateTooltip::strToolTip);
-		lua_tinker::class_mem<EventSwndUpdateTooltip>(L,"bUpdated",&EventSwndUpdateTooltip::bUpdated);
-		DEF_TOOBJ(L,EventSwndUpdateTooltip);
+		lua_tinker::class_add<StEventSwndUpdateTooltip>(L,"StEventSwndUpdateTooltip");
+		lua_tinker::class_mem<StEventSwndUpdateTooltip>(L,"strToolTip",&EventSwndUpdateTooltip::strToolTip);
+		lua_tinker::class_mem<StEventSwndUpdateTooltip>(L,"bUpdated",&EventSwndUpdateTooltip::bUpdated);
+		DEF_EVT_DATA(L,StEventSwndUpdateTooltip);
 
 
-		lua_tinker::class_add<EventRadioGroupCheckChanged>(L,"EventRadioGroupCheckChanged");
-		lua_tinker::class_inh<EventRadioGroupCheckChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventRadioGroupCheckChanged>(L,"pChecked",&EventRadioGroupCheckChanged::pChecked);
-		DEF_TOOBJ(L,EventRadioGroupCheckChanged);
+		lua_tinker::class_add<StEventRadioGroupCheckChanged>(L,"StEventRadioGroupCheckChanged");
+		lua_tinker::class_mem<StEventRadioGroupCheckChanged>(L,"pChecked",&EventRadioGroupCheckChanged::pChecked);
+		DEF_EVT_DATA(L,StEventRadioGroupCheckChanged);
 
-		lua_tinker::class_add<EventItemPanelRclick>(L,"EventItemPanelRclick");
-		lua_tinker::class_inh<EventItemPanelRclick,IEvtArgs>(L);
-		lua_tinker::class_mem<EventItemPanelRclick>(L,"wParam",&EventItemPanelRclick::wParam);
-		lua_tinker::class_mem<EventItemPanelRclick>(L,"lParam",&EventItemPanelRclick::lParam);
-		DEF_TOOBJ(L,EventItemPanelRclick);
+		lua_tinker::class_add<StEventItemPanelRclick>(L,"StEventItemPanelRclick");
+		lua_tinker::class_mem<StEventItemPanelRclick>(L,"wParam",&EventItemPanelRclick::wParam);
+		lua_tinker::class_mem<StEventItemPanelRclick>(L,"lParam",&EventItemPanelRclick::lParam);
+		DEF_EVT_DATA(L,StEventItemPanelRclick);
 
-		lua_tinker::class_add<EventItemPanelDbclick>(L,"EventItemPanelDbclick");
-		lua_tinker::class_inh<EventItemPanelDbclick,IEvtArgs>(L);
-		lua_tinker::class_mem<EventItemPanelDbclick>(L,"wParam",&EventItemPanelDbclick::wParam);
-		lua_tinker::class_mem<EventItemPanelDbclick>(L,"lParam",&EventItemPanelDbclick::lParam);
-		DEF_TOOBJ(L,EventItemPanelDbclick);
+		lua_tinker::class_add<StEventItemPanelDbclick>(L,"StEventItemPanelDbclick");
+		lua_tinker::class_mem<StEventItemPanelDbclick>(L,"wParam",&EventItemPanelDbclick::wParam);
+		lua_tinker::class_mem<StEventItemPanelDbclick>(L,"lParam",&EventItemPanelDbclick::lParam);
+		DEF_EVT_DATA(L,StEventItemPanelDbclick);
 
 
-		lua_tinker::class_add<EventItemPanelClick>(L,"EventItemPanelClick");
-		lua_tinker::class_inh<EventItemPanelClick,IEvtArgs>(L);
-		lua_tinker::class_mem<EventItemPanelClick>(L,"wParam",&EventItemPanelClick::wParam);
-		lua_tinker::class_mem<EventItemPanelClick>(L,"lParam",&EventItemPanelClick::lParam);
-		DEF_TOOBJ(L,EventItemPanelClick);
+		lua_tinker::class_add<StEventItemPanelClick>(L,"StEventItemPanelClick");
+		lua_tinker::class_mem<StEventItemPanelClick>(L,"wParam",&EventItemPanelClick::wParam);
+		lua_tinker::class_mem<StEventItemPanelClick>(L,"lParam",&EventItemPanelClick::lParam);
+		DEF_EVT_DATA(L,StEventItemPanelClick);
 
-		lua_tinker::class_add<EventItemPanelRclickUp>(L,"EventItemPanelRclickUp");
-		lua_tinker::class_inh<EventItemPanelRclickUp,IEvtArgs>(L);
-		lua_tinker::class_mem<EventItemPanelRclickUp>(L,"wParam",&EventItemPanelRclickUp::wParam);
-		lua_tinker::class_mem<EventItemPanelRclickUp>(L,"lParam",&EventItemPanelRclickUp::lParam);
-		DEF_TOOBJ(L,EventItemPanelRclickUp);
+		lua_tinker::class_add<StEventItemPanelRclickUp>(L,"StEventItemPanelRclickUp");
+		lua_tinker::class_mem<StEventItemPanelRclickUp>(L,"wParam",&EventItemPanelRclickUp::wParam);
+		lua_tinker::class_mem<StEventItemPanelRclickUp>(L,"lParam",&EventItemPanelRclickUp::lParam);
+		DEF_EVT_DATA(L,StEventItemPanelRclickUp);
 
 		
-		lua_tinker::class_add<EventItemPanelClickUp>(L,"EventItemPanelClickUp");
-		lua_tinker::class_inh<EventItemPanelClickUp,IEvtArgs>(L);
-		lua_tinker::class_mem<EventItemPanelClickUp>(L,"wParam",&EventItemPanelClickUp::wParam);
-		lua_tinker::class_mem<EventItemPanelClickUp>(L,"lParam",&EventItemPanelClickUp::lParam);
-		DEF_TOOBJ(L,EventItemPanelClickUp);
+		lua_tinker::class_add<StEventItemPanelClickUp>(L,"StEventItemPanelClickUp");
+		lua_tinker::class_mem<StEventItemPanelClickUp>(L,"wParam",&EventItemPanelClickUp::wParam);
+		lua_tinker::class_mem<StEventItemPanelClickUp>(L,"lParam",&EventItemPanelClickUp::lParam);
+		DEF_EVT_DATA(L,StEventItemPanelClickUp);
 
-		lua_tinker::class_add<EventItemPanelHover>(L,"EventItemPanelHover");
-		lua_tinker::class_inh<EventItemPanelHover,IEvtArgs>(L);
-		lua_tinker::class_mem<EventItemPanelHover>(L,"wParam",&EventItemPanelHover::wParam);
-		lua_tinker::class_mem<EventItemPanelHover>(L,"lParam",&EventItemPanelHover::lParam);
-		DEF_TOOBJ(L,EventItemPanelHover);
+		lua_tinker::class_add<StEventItemPanelHover>(L,"StEventItemPanelHover");
+		lua_tinker::class_mem<StEventItemPanelHover>(L,"wParam",&EventItemPanelHover::wParam);
+		lua_tinker::class_mem<StEventItemPanelHover>(L,"lParam",&EventItemPanelHover::lParam);
+		DEF_EVT_DATA(L,StEventItemPanelHover);
 
 
-		lua_tinker::class_add<EventLButtonDown>(L,"EventLButtonDown");
-		lua_tinker::class_inh<EventLButtonDown,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLButtonDown>(L,"pt",&EventLButtonDown::pt);
-		DEF_TOOBJ(L,EventLButtonDown);
+		lua_tinker::class_add<StEventLButtonDown>(L,"StEventLButtonDown");
+		lua_tinker::class_mem<StEventLButtonDown>(L,"pt",&EventLButtonDown::pt);
+		DEF_EVT_DATA(L,StEventLButtonDown);
 
-		lua_tinker::class_add<EventLButtonUp>(L,"EventLButtonUp");
-		lua_tinker::class_inh<EventLButtonUp,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLButtonUp>(L,"pt",&EventLButtonUp::pt);
-		DEF_TOOBJ(L,EventLButtonUp);
+		lua_tinker::class_add<StEventLButtonUp>(L,"StEventLButtonUp");
+		lua_tinker::class_mem<StEventLButtonUp>(L,"pt",&EventLButtonUp::pt);
+		DEF_EVT_DATA(L,StEventLButtonUp);
 
-		lua_tinker::class_add<EventCtxMenu>(L,"EventCtxMenu");
-		lua_tinker::class_inh<EventCtxMenu,IEvtArgs>(L);
-		lua_tinker::class_mem<EventCtxMenu>(L,"pt",&EventCtxMenu::pt);
-		lua_tinker::class_mem<EventCtxMenu>(L,"bCancel",&EventCtxMenu::bCancel);
-		DEF_TOOBJ(L,EventCtxMenu);
+		lua_tinker::class_add<StEventCtxMenu>(L,"StEventCtxMenu");
+		lua_tinker::class_mem<StEventCtxMenu>(L,"pt",&EventCtxMenu::pt);
+		lua_tinker::class_mem<StEventCtxMenu>(L,"bCancel",&EventCtxMenu::bCancel);
+		DEF_EVT_DATA(L,StEventCtxMenu);
 
-		lua_tinker::class_add<EventSetFocus>(L,"EventSetFocus");
-		lua_tinker::class_inh<EventSetFocus,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSetFocus>(L,"wndOld",&EventSetFocus::wndOld);
-		DEF_TOOBJ(L,EventSetFocus);
+		lua_tinker::class_add<StEventSetFocus>(L,"StEventSetFocus");
+		lua_tinker::class_mem<StEventSetFocus>(L,"wndOld",&EventSetFocus::wndOld);
+		DEF_EVT_DATA(L,StEventSetFocus);
 
-		lua_tinker::class_add<EventKillFocus>(L,"EventKillFocus");
-		lua_tinker::class_inh<EventKillFocus,IEvtArgs>(L);
-		lua_tinker::class_mem<EventKillFocus>(L,"wndFocus",&EventKillFocus::wndFocus);
-		DEF_TOOBJ(L,EventKillFocus);
+		lua_tinker::class_add<StEventKillFocus>(L,"StEventKillFocus");
+		lua_tinker::class_mem<StEventKillFocus>(L,"wndFocus",&EventKillFocus::wndFocus);
+		DEF_EVT_DATA(L,StEventKillFocus);
 
 
-		lua_tinker::class_add<EventScrollViewOriginChanged>(L,"EventScrollViewOriginChanged");
-		lua_tinker::class_inh<EventScrollViewOriginChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventScrollViewOriginChanged>(L,"ptOldOrigin",&EventScrollViewOriginChanged::ptOldOrigin);
-		lua_tinker::class_mem<EventScrollViewOriginChanged>(L,"ptNewOrigin",&EventScrollViewOriginChanged::ptNewOrigin);
-		DEF_TOOBJ(L,EventScrollViewOriginChanged);
+		lua_tinker::class_add<StEventScrollViewOriginChanged>(L,"StEventScrollViewOriginChanged");
+		lua_tinker::class_mem<StEventScrollViewOriginChanged>(L,"ptOldOrigin",&EventScrollViewOriginChanged::ptOldOrigin);
+		lua_tinker::class_mem<StEventScrollViewOriginChanged>(L,"ptNewOrigin",&EventScrollViewOriginChanged::ptNewOrigin);
+		DEF_EVT_DATA(L,StEventScrollViewOriginChanged);
 
 
-		lua_tinker::class_add<EventScrollViewSizeChanged>(L,"EventScrollViewSizeChanged");
-		lua_tinker::class_inh<EventScrollViewSizeChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventScrollViewSizeChanged>(L,"szOldViewSize",&EventScrollViewSizeChanged::szOldViewSize);
-		lua_tinker::class_mem<EventScrollViewSizeChanged>(L,"szNewViewSize",&EventScrollViewSizeChanged::szNewViewSize);
-		DEF_TOOBJ(L,EventScrollViewSizeChanged);
+		lua_tinker::class_add<StEventScrollViewSizeChanged>(L,"StEventScrollViewSizeChanged");
+		lua_tinker::class_mem<StEventScrollViewSizeChanged>(L,"szOldViewSize",&EventScrollViewSizeChanged::szOldViewSize);
+		lua_tinker::class_mem<StEventScrollViewSizeChanged>(L,"szNewViewSize",&EventScrollViewSizeChanged::szNewViewSize);
+		DEF_EVT_DATA(L,StEventScrollViewSizeChanged);
 
-		lua_tinker::class_add<EventOfEvent>(L,"EventOfEvent");
-		lua_tinker::class_inh<EventOfEvent,IEvtArgs>(L);
-		lua_tinker::class_mem<EventOfEvent>(L,"pOrgEvt",&EventOfEvent::pOrgEvt);
-		DEF_TOOBJ(L,EventOfEvent);
+		lua_tinker::class_add<StEventOfEvent>(L,"StEventOfEvent");
+		lua_tinker::class_mem<StEventOfEvent>(L,"pOrgEvt",&EventOfEvent::pOrgEvt);
+		DEF_EVT_DATA(L,StEventOfEvent);
 
-		lua_tinker::class_add<EventOfPanel>(L,"EventOfPanel");
-		lua_tinker::class_inh<EventOfPanel,IEvtArgs>(L);
-		lua_tinker::class_mem<EventOfPanel>(L,"pPanel",&EventOfPanel::pPanel);
-		lua_tinker::class_mem<EventOfPanel>(L,"pOrgEvt",&EventOfPanel::pOrgEvt);
-		DEF_TOOBJ(L,EventOfPanel);
+		lua_tinker::class_add<StEventOfPanel>(L,"StEventOfPanel");
+		lua_tinker::class_mem<StEventOfPanel>(L,"pPanel",&EventOfPanel::pPanel);
+		lua_tinker::class_mem<StEventOfPanel>(L,"pOrgEvt",&EventOfPanel::pOrgEvt);
+		DEF_EVT_DATA(L,StEventOfPanel);
 
-		lua_tinker::class_add<EventTabSelChanging>(L,"EventTabSelChanging");
-		lua_tinker::class_inh<EventTabSelChanging,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTabSelChanging>(L,"uOldSel",&EventTabSelChanging::uOldSel);
-		lua_tinker::class_mem<EventTabSelChanging>(L,"uNewSel",&EventTabSelChanging::uNewSel);
-		lua_tinker::class_mem<EventTabSelChanging>(L,"bCancel",&EventTabSelChanging::bCancel);
-		DEF_TOOBJ(L,EventTabSelChanging);
+		lua_tinker::class_add<StEventTabSelChanging>(L,"StEventTabSelChanging");
+		lua_tinker::class_mem<StEventTabSelChanging>(L,"uOldSel",&EventTabSelChanging::uOldSel);
+		lua_tinker::class_mem<StEventTabSelChanging>(L,"uNewSel",&EventTabSelChanging::uNewSel);
+		lua_tinker::class_mem<StEventTabSelChanging>(L,"bCancel",&EventTabSelChanging::bCancel);
+		DEF_EVT_DATA(L,StEventTabSelChanging);
 
-		lua_tinker::class_add<EventTabSelChanged>(L,"EventTabSelChanged");
-		lua_tinker::class_inh<EventTabSelChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTabSelChanged>(L,"uOldSel",&EventTabSelChanged::uOldSel);
-		lua_tinker::class_mem<EventTabSelChanged>(L,"uNewSel",&EventTabSelChanged::uNewSel);
-		DEF_TOOBJ(L,EventTabSelChanged);
+		lua_tinker::class_add<StEventTabSelChanged>(L,"StEventTabSelChanged");
+		lua_tinker::class_mem<StEventTabSelChanged>(L,"uOldSel",&EventTabSelChanged::uOldSel);
+		lua_tinker::class_mem<StEventTabSelChanged>(L,"uNewSel",&EventTabSelChanged::uNewSel);
+		DEF_EVT_DATA(L,StEventTabSelChanged);
 
-		lua_tinker::class_add<EventTabItemHover>(L,"EventTabItemHover");
-		lua_tinker::class_inh<EventTabItemHover,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTabItemHover>(L,"iHover",&EventTabItemHover::iHover);
-		DEF_TOOBJ(L,EventTabItemHover);
+		lua_tinker::class_add<StEventTabItemHover>(L,"StEventTabItemHover");
+		lua_tinker::class_mem<StEventTabItemHover>(L,"iHover",&EventTabItemHover::iHover);
+		DEF_EVT_DATA(L,StEventTabItemHover);
 
-		lua_tinker::class_add<EventTabItemLeave>(L,"EventTabItemLeave");
-		lua_tinker::class_inh<EventTabItemLeave,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTabItemLeave>(L,"iLeave",&EventTabItemLeave::iLeave);
-		DEF_TOOBJ(L,EventTabItemLeave);
+		lua_tinker::class_add<StEventTabItemLeave>(L,"StEventTabItemLeave");
+		lua_tinker::class_mem<StEventTabItemLeave>(L,"iLeave",&EventTabItemLeave::iLeave);
+		DEF_EVT_DATA(L,StEventTabItemLeave);
 
-		lua_tinker::class_add<EventLBSelChanging>(L,"EventLBSelChanging");
-		lua_tinker::class_inh<EventLBSelChanging,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLBSelChanging>(L,"nNewSel",&EventLBSelChanging::nNewSel);
-		lua_tinker::class_mem<EventLBSelChanging>(L,"nOldSel",&EventLBSelChanging::nOldSel);
-		lua_tinker::class_mem<EventLBSelChanging>(L,"bCancel",&EventLBSelChanging::bCancel);
-		DEF_TOOBJ(L,EventLBSelChanging);
+		lua_tinker::class_add<StEventLBSelChanging>(L,"StEventLBSelChanging");
+		lua_tinker::class_mem<StEventLBSelChanging>(L,"nNewSel",&EventLBSelChanging::nNewSel);
+		lua_tinker::class_mem<StEventLBSelChanging>(L,"nOldSel",&EventLBSelChanging::nOldSel);
+		lua_tinker::class_mem<StEventLBSelChanging>(L,"bCancel",&EventLBSelChanging::bCancel);
+		DEF_EVT_DATA(L,StEventLBSelChanging);
 
-		lua_tinker::class_add<EventLBSelChanged>(L,"EventLBSelChanged");
-		lua_tinker::class_inh<EventLBSelChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLBSelChanged>(L,"nNewSel",&EventLBSelChanged::nNewSel);
-		lua_tinker::class_mem<EventLBSelChanged>(L,"nOldSel",&EventLBSelChanged::nOldSel);
-		DEF_TOOBJ(L,EventLBSelChanged);
+		lua_tinker::class_add<StEventLBSelChanged>(L,"StEventLBSelChanged");
+		lua_tinker::class_mem<StEventLBSelChanged>(L,"nNewSel",&EventLBSelChanged::nNewSel);
+		lua_tinker::class_mem<StEventLBSelChanged>(L,"nOldSel",&EventLBSelChanged::nOldSel);
+		DEF_EVT_DATA(L,StEventLBSelChanged);
 
-		lua_tinker::class_add<EventLBDbClick>(L,"EventLBDbClick");
-		lua_tinker::class_inh<EventLBDbClick,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLBDbClick>(L,"nCurSel",&EventLBDbClick::nCurSel);
-		DEF_TOOBJ(L,EventLBDbClick);
+		lua_tinker::class_add<StEventLBDbClick>(L,"StEventLBDbClick");
+		lua_tinker::class_mem<StEventLBDbClick>(L,"nCurSel",&EventLBDbClick::nCurSel);
+		DEF_EVT_DATA(L,StEventLBDbClick);
 
-		lua_tinker::class_add<EventLVSelChanged>(L,"EventLVSelChanged");
-		lua_tinker::class_inh<EventLVSelChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLVSelChanged>(L,"iOldSel",&EventLVSelChanged::iOldSel);
-		lua_tinker::class_mem<EventLVSelChanged>(L,"iNewSel",&EventLVSelChanged::iNewSel);
-		DEF_TOOBJ(L,EventLVSelChanged);
+		lua_tinker::class_add<StEventLVSelChanged>(L,"StEventLVSelChanged");
+		lua_tinker::class_mem<StEventLVSelChanged>(L,"iOldSel",&EventLVSelChanged::iOldSel);
+		lua_tinker::class_mem<StEventLVSelChanged>(L,"iNewSel",&EventLVSelChanged::iNewSel);
+		DEF_EVT_DATA(L,StEventLVSelChanged);
 
-		lua_tinker::class_add<EventLVSelChanging>(L,"EventLVSelChanging");
-		lua_tinker::class_inh<EventLVSelChanging,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLVSelChanging>(L,"iOldSel",&EventLVSelChanging::iOldSel);
-		lua_tinker::class_mem<EventLVSelChanging>(L,"iNewSel",&EventLVSelChanging::iNewSel);
-		lua_tinker::class_mem<EventLVSelChanging>(L,"bCancel",&EventLVSelChanging::bCancel);
-		DEF_TOOBJ(L,EventLVSelChanging);
+		lua_tinker::class_add<StEventLVSelChanging>(L,"StEventLVSelChanging");
+		lua_tinker::class_mem<StEventLVSelChanging>(L,"iOldSel",&EventLVSelChanging::iOldSel);
+		lua_tinker::class_mem<StEventLVSelChanging>(L,"iNewSel",&EventLVSelChanging::iNewSel);
+		lua_tinker::class_mem<StEventLVSelChanging>(L,"bCancel",&EventLVSelChanging::bCancel);
+		DEF_EVT_DATA(L,StEventLVSelChanging);
 
-		lua_tinker::class_add<EventTVSelChanged>(L,"EventTVSelChanged");
-		lua_tinker::class_inh<EventTVSelChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTVSelChanged>(L,"hOldSel",&EventTVSelChanged::hOldSel);
-		lua_tinker::class_mem<EventTVSelChanged>(L,"hNewSel",&EventTVSelChanged::hNewSel);
-		DEF_TOOBJ(L,EventTVSelChanged);
+		lua_tinker::class_add<StEventTVSelChanged>(L,"StEventTVSelChanged");
+		lua_tinker::class_mem<StEventTVSelChanged>(L,"hOldSel",&EventTVSelChanged::hOldSel);
+		lua_tinker::class_mem<StEventTVSelChanged>(L,"hNewSel",&EventTVSelChanged::hNewSel);
+		DEF_EVT_DATA(L,StEventTVSelChanged);
 
-		lua_tinker::class_add<EventTVSelChanging>(L,"EventTVSelChanging");
-		lua_tinker::class_inh<EventTVSelChanging,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTVSelChanging>(L,"hOldSel",&EventTVSelChanging::hOldSel);
-		lua_tinker::class_mem<EventTVSelChanging>(L,"hNewSel",&EventTVSelChanging::hNewSel);
-		lua_tinker::class_mem<EventTVSelChanging>(L,"bCancel",&EventTVSelChanging::bCancel);
-		DEF_TOOBJ(L,EventTVSelChanging);
+		lua_tinker::class_add<StEventTVSelChanging>(L,"StEventTVSelChanging");
+		lua_tinker::class_mem<StEventTVSelChanging>(L,"hOldSel",&EventTVSelChanging::hOldSel);
+		lua_tinker::class_mem<StEventTVSelChanging>(L,"hNewSel",&EventTVSelChanging::hNewSel);
+		lua_tinker::class_mem<StEventTVSelChanging>(L,"bCancel",&EventTVSelChanging::bCancel);
+		DEF_EVT_DATA(L,StEventTVSelChanging);
 
-		lua_tinker::class_add<EventRENotify>(L,"EventRENotify");
-		lua_tinker::class_inh<EventRENotify,IEvtArgs>(L);
-		lua_tinker::class_mem<EventRENotify>(L,"iNotify",&EventRENotify::iNotify);
-		lua_tinker::class_mem<EventRENotify>(L,"pv",&EventRENotify::pv);
-		lua_tinker::class_mem<EventRENotify>(L,"hr",&EventRENotify::hr);
-		DEF_TOOBJ(L,EventRENotify);
+		lua_tinker::class_add<StEventRENotify>(L,"StEventRENotify");
+		lua_tinker::class_mem<StEventRENotify>(L,"iNotify",&EventRENotify::iNotify);
+		lua_tinker::class_mem<StEventRENotify>(L,"pv",&EventRENotify::pv);
+		lua_tinker::class_mem<StEventRENotify>(L,"hr",&EventRENotify::hr);
+		DEF_EVT_DATA(L,StEventRENotify);
 
 
-		lua_tinker::class_add<EventREMenu>(L,"EventREMenu");
-		lua_tinker::class_inh<EventREMenu,IEvtArgs>(L);
-		lua_tinker::class_mem<EventREMenu>(L,"uCmd",&EventREMenu::uCmd);
-		DEF_TOOBJ(L,EventREMenu);
+		lua_tinker::class_add<StEventREMenu>(L,"StEventREMenu");
+		lua_tinker::class_mem<StEventREMenu>(L,"uCmd",&EventREMenu::uCmd);
+		DEF_EVT_DATA(L,StEventREMenu);
 
-		lua_tinker::class_add<EventSliderPos>(L,"EventSliderPos");
-		lua_tinker::class_inh<EventSliderPos,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSliderPos>(L,"nPos",&EventSliderPos::nPos);
-		DEF_TOOBJ(L,EventSliderPos);
+		lua_tinker::class_add<StEventSliderPos>(L,"StEventSliderPos");
+		lua_tinker::class_mem<StEventSliderPos>(L,"nPos",&EventSliderPos::nPos);
+		DEF_EVT_DATA(L,StEventSliderPos);
 
-		lua_tinker::class_add<EventHeaderClick>(L,"EventHeaderClick");
-		lua_tinker::class_inh<EventHeaderClick,IEvtArgs>(L);
-		lua_tinker::class_mem<EventHeaderClick>(L,"iItem",&EventHeaderClick::iItem);
-		DEF_TOOBJ(L,EventHeaderClick);
+		lua_tinker::class_add<StEventHeaderClick>(L,"StEventHeaderClick");
+		lua_tinker::class_mem<StEventHeaderClick>(L,"iItem",&EventHeaderClick::iItem);
+		DEF_EVT_DATA(L,StEventHeaderClick);
 
-		lua_tinker::class_add<EventHeaderItemChanging>(L,"EventHeaderItemChanging");
-		lua_tinker::class_inh<EventHeaderItemChanging,IEvtArgs>(L);
-		lua_tinker::class_mem<EventHeaderItemChanging>(L,"iItem",&EventHeaderItemChanging::iItem);
-		lua_tinker::class_mem<EventHeaderItemChanging>(L,"nWidth",&EventHeaderItemChanging::nWidth);
-		DEF_TOOBJ(L,EventHeaderItemChanging);
+		lua_tinker::class_add<StEventHeaderItemChanging>(L,"StEventHeaderItemChanging");
+		lua_tinker::class_mem<StEventHeaderItemChanging>(L,"iItem",&EventHeaderItemChanging::iItem);
+		lua_tinker::class_mem<StEventHeaderItemChanging>(L,"nWidth",&EventHeaderItemChanging::nWidth);
+		DEF_EVT_DATA(L,StEventHeaderItemChanging);
 
-		lua_tinker::class_add<EventHeaderItemChanged>(L,"EventHeaderItemChanged");
-		lua_tinker::class_inh<EventHeaderItemChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventHeaderItemChanged>(L,"iItem",&EventHeaderItemChanged::iItem);
-		lua_tinker::class_mem<EventHeaderItemChanged>(L,"nWidth",&EventHeaderItemChanged::nWidth);
-		DEF_TOOBJ(L,EventHeaderItemChanged);
+		lua_tinker::class_add<StEventHeaderItemChanged>(L,"StEventHeaderItemChanged");
+		lua_tinker::class_mem<StEventHeaderItemChanged>(L,"iItem",&EventHeaderItemChanged::iItem);
+		lua_tinker::class_mem<StEventHeaderItemChanged>(L,"nWidth",&EventHeaderItemChanged::nWidth);
+		DEF_EVT_DATA(L,StEventHeaderItemChanged);
 
-		lua_tinker::class_add<EventHeaderItemSwap>(L,"EventHeaderItemSwap");
-		lua_tinker::class_inh<EventHeaderItemSwap,IEvtArgs>(L);
-		lua_tinker::class_mem<EventHeaderItemSwap>(L,"iOldIndex",&EventHeaderItemSwap::iOldIndex);
-		lua_tinker::class_mem<EventHeaderItemSwap>(L,"iNewIndex",&EventHeaderItemSwap::iNewIndex);
-		DEF_TOOBJ(L,EventHeaderItemSwap);
+		lua_tinker::class_add<StEventHeaderItemSwap>(L,"StEventHeaderItemSwap");
+		lua_tinker::class_mem<StEventHeaderItemSwap>(L,"iOldIndex",&EventHeaderItemSwap::iOldIndex);
+		lua_tinker::class_mem<StEventHeaderItemSwap>(L,"iNewIndex",&EventHeaderItemSwap::iNewIndex);
+		DEF_EVT_DATA(L,StEventHeaderItemSwap);
 
 
-		lua_tinker::class_add<EventCBSelChange>(L,"EventCBSelChange");
-		lua_tinker::class_inh<EventCBSelChange,IEvtArgs>(L);
-		lua_tinker::class_mem<EventCBSelChange>(L,"nCurSel",&EventCBSelChange::nCurSel);
-		DEF_TOOBJ(L,EventCBSelChange);
+		lua_tinker::class_add<StEventCBSelChange>(L,"StEventCBSelChange");
+		lua_tinker::class_mem<StEventCBSelChange>(L,"nCurSel",&EventCBSelChange::nCurSel);
+		DEF_EVT_DATA(L,StEventCBSelChange);
 
-		lua_tinker::class_add<EventCBDropdown>(L,"EventCBDropdown");
-		lua_tinker::class_inh<EventCBDropdown,IEvtArgs>(L);
-		lua_tinker::class_mem<EventCBDropdown>(L,"pDropDown",&EventCBDropdown::pDropDown);
-		DEF_TOOBJ(L,EventCBDropdown);
+		lua_tinker::class_add<StEventCBDropdown>(L,"StEventCBDropdown");
+		lua_tinker::class_mem<StEventCBDropdown>(L,"pDropDown",&EventCBDropdown::pDropDown);
+		DEF_EVT_DATA(L,StEventCBDropdown);
 
-		lua_tinker::class_add<EventCBBeforeCloseUp>(L,"EventCBBeforeCloseUp");
-		lua_tinker::class_inh<EventCBBeforeCloseUp,IEvtArgs>(L);
-		lua_tinker::class_mem<EventCBBeforeCloseUp>(L,"bCloseBlock",&EventCBBeforeCloseUp::bCloseBlock);
-		DEF_TOOBJ(L,EventCBBeforeCloseUp);
+		lua_tinker::class_add<StEventCBBeforeCloseUp>(L,"StEventCBBeforeCloseUp");
+		lua_tinker::class_mem<StEventCBBeforeCloseUp>(L,"bCloseBlock",&EventCBBeforeCloseUp::bCloseBlock);
+		DEF_EVT_DATA(L,StEventCBBeforeCloseUp);
 
-		lua_tinker::class_add<EventLCSelChanging>(L,"EventLCSelChanging");
-		lua_tinker::class_inh<EventLCSelChanging,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLCSelChanging>(L,"nNewSel",&EventLCSelChanging::nNewSel);
-		lua_tinker::class_mem<EventLCSelChanging>(L,"nOldSel",&EventLCSelChanging::nOldSel);
-		lua_tinker::class_mem<EventLCSelChanging>(L,"bCancel",&EventLCSelChanging::bCancel);
-		DEF_TOOBJ(L,EventLCSelChanging);
+		lua_tinker::class_add<StEventLCSelChanging>(L,"StEventLCSelChanging");
+		lua_tinker::class_mem<StEventLCSelChanging>(L,"nNewSel",&EventLCSelChanging::nNewSel);
+		lua_tinker::class_mem<StEventLCSelChanging>(L,"nOldSel",&EventLCSelChanging::nOldSel);
+		lua_tinker::class_mem<StEventLCSelChanging>(L,"bCancel",&EventLCSelChanging::bCancel);
+		DEF_EVT_DATA(L,StEventLCSelChanging);
 
-		lua_tinker::class_add<EventLCSelChanged>(L,"EventLCSelChanged");
-		lua_tinker::class_inh<EventLCSelChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLCSelChanged>(L,"nNewSel",&EventLCSelChanged::nNewSel);
-		lua_tinker::class_mem<EventLCSelChanged>(L,"nOldSel",&EventLCSelChanged::nOldSel);
-		DEF_TOOBJ(L,EventLCSelChanged);
+		lua_tinker::class_add<StEventLCSelChanged>(L,"StEventLCSelChanged");
+		lua_tinker::class_mem<StEventLCSelChanged>(L,"nNewSel",&EventLCSelChanged::nNewSel);
+		lua_tinker::class_mem<StEventLCSelChanged>(L,"nOldSel",&EventLCSelChanged::nOldSel);
+		DEF_EVT_DATA(L,StEventLCSelChanged);
 
-		lua_tinker::class_add<EventLCDbClick>(L,"EventLCDbClick");
-		lua_tinker::class_inh<EventLCDbClick,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLCDbClick>(L,"nCurSel",&EventLCDbClick::nCurSel);
-		DEF_TOOBJ(L,EventLCDbClick);
+		lua_tinker::class_add<StEventLCDbClick>(L,"StEventLCDbClick");
+		lua_tinker::class_mem<StEventLCDbClick>(L,"nCurSel",&EventLCDbClick::nCurSel);
+		DEF_EVT_DATA(L,StEventLCDbClick);
 
-		lua_tinker::class_add<EventLCItemDeleted>(L,"EventLCItemDeleted");
-		lua_tinker::class_inh<EventLCItemDeleted,IEvtArgs>(L);
-		lua_tinker::class_mem<EventLCItemDeleted>(L,"nItem",&EventLCItemDeleted::nItem);
-		lua_tinker::class_mem<EventLCItemDeleted>(L,"dwData",&EventLCItemDeleted::dwData);
-		DEF_TOOBJ(L,EventLCItemDeleted);
+		lua_tinker::class_add<StEventLCItemDeleted>(L,"StEventLCItemDeleted");
+		lua_tinker::class_mem<StEventLCItemDeleted>(L,"nItem",&EventLCItemDeleted::nItem);
+		lua_tinker::class_mem<StEventLCItemDeleted>(L,"dwData",&EventLCItemDeleted::dwData);
+		DEF_EVT_DATA(L,StEventLCItemDeleted);
 
-		lua_tinker::class_add<EventCalendarSelDay>(L,"EventCalendarSelDay");
-		lua_tinker::class_inh<EventCalendarSelDay,IEvtArgs>(L);
-		lua_tinker::class_mem<EventCalendarSelDay>(L,"wOldDay",&EventCalendarSelDay::wOldDay);
-		lua_tinker::class_mem<EventCalendarSelDay>(L,"wNewDay",&EventCalendarSelDay::wNewDay);
-		DEF_TOOBJ(L,EventCalendarSelDay);
+		lua_tinker::class_add<StEventCalendarSelDay>(L,"StEventCalendarSelDay");
+		lua_tinker::class_mem<StEventCalendarSelDay>(L,"wOldDay",&EventCalendarSelDay::wOldDay);
+		lua_tinker::class_mem<StEventCalendarSelDay>(L,"wNewDay",&EventCalendarSelDay::wNewDay);
+		DEF_EVT_DATA(L,StEventCalendarSelDay);
 
-		lua_tinker::class_add<EventCalendarExChanged>(L,"EventCalendarExChanged");
-		lua_tinker::class_inh<EventCalendarExChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventCalendarExChanged>(L,"iNewDay",&EventCalendarExChanged::iNewDay);
-		lua_tinker::class_mem<EventCalendarExChanged>(L,"iNewMonth",&EventCalendarExChanged::iNewMonth);
-		lua_tinker::class_mem<EventCalendarExChanged>(L,"iNewYear",&EventCalendarExChanged::iNewYear);
-		lua_tinker::class_mem<EventCalendarExChanged>(L,"nBtnType",&EventCalendarExChanged::nBtnType);
-		DEF_TOOBJ(L,EventCalendarExChanged);
+		lua_tinker::class_add<StEventCalendarExChanged>(L,"StEventCalendarExChanged");
+		lua_tinker::class_mem<StEventCalendarExChanged>(L,"iNewDay",&EventCalendarExChanged::iNewDay);
+		lua_tinker::class_mem<StEventCalendarExChanged>(L,"iNewMonth",&EventCalendarExChanged::iNewMonth);
+		lua_tinker::class_mem<StEventCalendarExChanged>(L,"iNewYear",&EventCalendarExChanged::iNewYear);
+		lua_tinker::class_mem<StEventCalendarExChanged>(L,"nBtnType",&EventCalendarExChanged::nBtnType);
+		DEF_EVT_DATA(L,StEventCalendarExChanged);
 
-		lua_tinker::class_add<EventDateTimeChanged>(L,"EventDateTimeChanged");
-		lua_tinker::class_inh<EventDateTimeChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventDateTimeChanged>(L,"newTime",&EventDateTimeChanged::newTime);
-		DEF_TOOBJ(L,EventDateTimeChanged);
+		lua_tinker::class_add<StEventDateTimeChanged>(L,"StEventDateTimeChanged");
+		lua_tinker::class_mem<StEventDateTimeChanged>(L,"newTime",&EventDateTimeChanged::newTime);
+		DEF_EVT_DATA(L,StEventDateTimeChanged);
 
-		lua_tinker::class_add<EventTCSelChanging>(L,"EventTCSelChanging");
-		lua_tinker::class_inh<EventTCSelChanging,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTCSelChanging>(L,"hOldSel",&EventTCSelChanging::hOldSel);
-		lua_tinker::class_mem<EventTCSelChanging>(L,"hNewSel",&EventTCSelChanging::hNewSel);
-		lua_tinker::class_mem<EventTCSelChanging>(L,"bCancel",&EventTCSelChanging::bCancel);
-		DEF_TOOBJ(L,EventTCSelChanging);
+		lua_tinker::class_add<StEventTCSelChanging>(L,"StEventTCSelChanging");
+		lua_tinker::class_mem<StEventTCSelChanging>(L,"hOldSel",&EventTCSelChanging::hOldSel);
+		lua_tinker::class_mem<StEventTCSelChanging>(L,"hNewSel",&EventTCSelChanging::hNewSel);
+		lua_tinker::class_mem<StEventTCSelChanging>(L,"bCancel",&EventTCSelChanging::bCancel);
+		DEF_EVT_DATA(L,StEventTCSelChanging);
 
 
-		lua_tinker::class_add<EventTCSelChanged>(L,"EventTCSelChanged");
-		lua_tinker::class_inh<EventTCSelChanged,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTCSelChanged>(L,"hOldSel",&EventTCSelChanged::hOldSel);
-		lua_tinker::class_mem<EventTCSelChanged>(L,"hNewSel",&EventTCSelChanged::hNewSel);
-		DEF_TOOBJ(L,EventTCSelChanged);
+		lua_tinker::class_add<StEventTCSelChanged>(L,"StEventTCSelChanged");
+		lua_tinker::class_mem<StEventTCSelChanged>(L,"hOldSel",&EventTCSelChanged::hOldSel);
+		lua_tinker::class_mem<StEventTCSelChanged>(L,"hNewSel",&EventTCSelChanged::hNewSel);
+		DEF_EVT_DATA(L,StEventTCSelChanged);
 
-		lua_tinker::class_add<EventTCCheckState>(L,"EventTCCheckState");
-		lua_tinker::class_inh<EventTCCheckState,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTCCheckState>(L,"hItem",&EventTCCheckState::hItem);
-		lua_tinker::class_mem<EventTCCheckState>(L,"uCheckState",&EventTCCheckState::uCheckState);
-		DEF_TOOBJ(L,EventTCCheckState);
+		lua_tinker::class_add<StEventTCCheckState>(L,"StEventTCCheckState");
+		lua_tinker::class_mem<StEventTCCheckState>(L,"hItem",&EventTCCheckState::hItem);
+		lua_tinker::class_mem<StEventTCCheckState>(L,"uCheckState",&EventTCCheckState::uCheckState);
+		DEF_EVT_DATA(L,StEventTCCheckState);
 
-		lua_tinker::class_add<EventTCExpand>(L,"EventTCExpand");
-		lua_tinker::class_inh<EventTCExpand,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTCExpand>(L,"hItem",&EventTCExpand::hItem);
-		lua_tinker::class_mem<EventTCExpand>(L,"bCollapsed",&EventTCExpand::bCollapsed);
-		DEF_TOOBJ(L,EventTCExpand);
+		lua_tinker::class_add<StEventTCExpand>(L,"StEventTCExpand");
+		lua_tinker::class_mem<StEventTCExpand>(L,"hItem",&EventTCExpand::hItem);
+		lua_tinker::class_mem<StEventTCExpand>(L,"bCollapsed",&EventTCExpand::bCollapsed);
+		DEF_EVT_DATA(L,StEventTCExpand);
 
-		lua_tinker::class_add<EventTCDbClick>(L,"EventTCDbClick");
-		lua_tinker::class_inh<EventTCDbClick,IEvtArgs>(L);
-		lua_tinker::class_mem<EventTCDbClick>(L,"hItem",&EventTCDbClick::hItem);
-		lua_tinker::class_mem<EventTCDbClick>(L,"bCancel",&EventTCDbClick::bCancel);
-		DEF_TOOBJ(L,EventTCDbClick);
+		lua_tinker::class_add<StEventTCDbClick>(L,"StEventTCDbClick");
+		lua_tinker::class_mem<StEventTCDbClick>(L,"hItem",&EventTCDbClick::hItem);
+		lua_tinker::class_mem<StEventTCDbClick>(L,"bCancel",&EventTCDbClick::bCancel);
+		DEF_EVT_DATA(L,StEventTCDbClick);
 
-		lua_tinker::class_add<EventSplitPaneMoved>(L,"EventSplitPaneMoved");
-		lua_tinker::class_inh<EventSplitPaneMoved,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSplitPaneMoved>(L,"rcPane",&EventSplitPaneMoved::rcPane);
-		DEF_TOOBJ(L,EventSplitPaneMoved);
+		lua_tinker::class_add<StEventSplitPaneMoved>(L,"StEventSplitPaneMoved");
+		lua_tinker::class_mem<StEventSplitPaneMoved>(L,"rcPane",&EventSplitPaneMoved::rcPane);
+		DEF_EVT_DATA(L,StEventSplitPaneMoved);
 
-		lua_tinker::class_add<EventSelectMenu>(L,"EventSelectMenu");
-		lua_tinker::class_inh<EventSelectMenu,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSelectMenu>(L,"nMenuId",&EventSelectMenu::nMenuId);
-		lua_tinker::class_mem<EventSelectMenu>(L,"pMenu",&EventSelectMenu::pMenu);
-		DEF_TOOBJ(L,EventSelectMenu);
+		lua_tinker::class_add<StEventSelectMenu>(L,"StEventSelectMenu");
+		lua_tinker::class_mem<StEventSelectMenu>(L,"nMenuId",&EventSelectMenu::nMenuId);
+		lua_tinker::class_mem<StEventSelectMenu>(L,"pMenu",&EventSelectMenu::pMenu);
+		DEF_EVT_DATA(L,StEventSelectMenu);
 
-		lua_tinker::class_add<EventPopMenu>(L,"EventPopMenu");
-		lua_tinker::class_inh<EventPopMenu,IEvtArgs>(L);
-		lua_tinker::class_mem<EventPopMenu>(L,"nMenuIndex",&EventPopMenu::nMenuIndex);
-		lua_tinker::class_mem<EventPopMenu>(L,"pMenu",&EventPopMenu::pMenu);
-		DEF_TOOBJ(L,EventPopMenu);
+		lua_tinker::class_add<StEventPopMenu>(L,"StEventPopMenu");
+		lua_tinker::class_mem<StEventPopMenu>(L,"nMenuIndex",&EventPopMenu::nMenuIndex);
+		lua_tinker::class_mem<StEventPopMenu>(L,"pMenu",&EventPopMenu::pMenu);
+		DEF_EVT_DATA(L,StEventPopMenu);
 
-		lua_tinker::class_add<EventSetHotKey>(L,"EventSetHotKey");
-		lua_tinker::class_inh<EventSetHotKey,IEvtArgs>(L);
-		lua_tinker::class_mem<EventSetHotKey>(L,"vKey",&EventSetHotKey::vKey);
-		lua_tinker::class_mem<EventSetHotKey>(L,"wModifiers",&EventSetHotKey::wModifiers);
-		DEF_TOOBJ(L,EventSetHotKey);
+		lua_tinker::class_add<StEventSetHotKey>(L,"StEventSetHotKey");
+		lua_tinker::class_mem<StEventSetHotKey>(L,"vKey",&EventSetHotKey::vKey);
+		lua_tinker::class_mem<StEventSetHotKey>(L,"wModifiers",&EventSetHotKey::wModifiers);
+		DEF_EVT_DATA(L,StEventSetHotKey);
 
 		return TRUE;
 	}catch(...)
