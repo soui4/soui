@@ -12,6 +12,7 @@ BOOL ExpLua_IHostWnd(lua_State *L)
 		lua_tinker::class_def<IHostWnd>(L,"GetIRoot",&IHostWnd::GetIRoot);
 		lua_tinker::class_def<IHostWnd>(L,"FindIChildByID",&IHostWnd::FindIChildByID);
 		lua_tinker::class_def<IHostWnd>(L,"FindIChildByName",&IHostWnd::FindIChildByName);
+		lua_tinker::class_def<IHostWnd>(L,"FindIChildByNameA",&IHostWnd::FindIChildByNameA);
 		lua_tinker::class_def<IHostWnd>(L,"GetNcPainter",&IHostWnd::GetNcPainter);
 		lua_tinker::class_def<IHostWnd>(L,"SetEventHandler",&IHostWnd::SetEventHandler);
 		lua_tinker::class_def<IHostWnd>(L,"GetEventHandler",&IHostWnd::GetEventHandler);

@@ -237,6 +237,10 @@ class SOUI_EXP SHostWnd
 		return m_pRoot->FindIChildByName(pszName,nDeep);
 	}
 
+	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName, int nDeep=-1) OVERRIDE{
+		return m_pRoot->FindIChildByNameA(pszName,nDeep);
+	}
+
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) OVERRIDE
     {
         return m_pNcPainter;

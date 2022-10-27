@@ -1,405 +1,261 @@
 <?xml version="1.0" encoding="Windows-1252"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="9.00"
+	Version="9,00"
 	Name="scriptmodule-lua"
 	ProjectGUID="{6F7C5E97-E11F-3925-BD79-00FB8512CE69}"
-	Keyword="Qt4VSv1.0"
-	TargetFrameworkVersion="0"
-	>
+	Keyword="Qt4VSv1.0">
 	<Platforms>
 		<Platform
-			Name="Win32"
-		/>
+			Name="Win32" />
 	</Platforms>
-	<ToolFiles>
-	</ToolFiles>
 	<Configurations>
 		<Configuration
 			Name="Release|Win32"
 			OutputDirectory="..\..\bin\"
-			IntermediateDirectory="..\..\obj\release\scriptmodule-lua\"
-			ConfigurationType="2"
-			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				WarningLevel="0"
-				DefaultCharType="0"
-				EnableErrorChecks="1"
-			/>
+			ConfigurationType="2"
+			IntermediateDirectory="..\..\obj\release\scriptmodule-lua\"
+			UseOfMfc="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP"
-				Optimization="1"
 				AdditionalIncludeDirectories=".,.,src,lua_tinker,..\..\third-part\lua-53\src,..\..\soui\include,..\..\utilities\include,..\..\config,..\..\tools\mkspecs\win32-msvc2008"
-				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST,NDEBUG"
-				GeneratePreprocessedFile="0"
-				ExceptionHandling="1"
-				RuntimeLibrary="0"
-				TreatWChar_tAsBuiltInType="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="src\stdafx.h"
-				PrecompiledHeaderFile="$(IntDir)\scriptmodule-lua.pch"
+				AdditionalOptions="/MP"
 				AssemblerListingLocation="..\..\obj\release\scriptmodule-lua\"
-				ObjectFile="..\..\obj\release\scriptmodule-lua\"
-				ProgramDataBaseFileName="$(IntDir)"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4100,4101,4102,4189,4996"
+				ExceptionHandling="1"
 				ForcedIncludeFiles="src\stdafx.h"
-			/>
+				GeneratePreprocessedFile="0"
+				ObjectFile="..\..\obj\release\scriptmodule-lua\"
+				Optimization ="1"
+				PrecompiledHeaderFile="$(IntDir)\scriptmodule-lua.pch"
+				PrecompiledHeaderThrough="src\stdafx.h"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST,NDEBUG"
+				ProgramDataBaseFileName="$(IntDir)"
+				RuntimeLibrary="0"
+				SuppressStartupBanner="true"
+				TreatWChar_tAsBuiltInType="true"
+				UsePrecompiledHeader="2"
+				WarningLevel="3" />
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCCustomBuildTool" />
 			<Tool
 				Name="VCLinkerTool"
-				IgnoreImportLibrary="true"
 				AdditionalDependencies="lua-53.lib soui4.lib utilities4.lib"
-				OutputFile="$(OutDir)\scriptmodule-lua.dll"
-				LinkIncremental="1"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\bin"
-				GenerateDebugInformation="true"
-				ProgramDatabaseFile=""
-				SubSystem="2"
-				OptimizeReferences="2"
+				DataExecutionPrevention="true"
 				EnableCOMDATFolding="2"
+				GenerateDebugInformation="true"
+				IgnoreImportLibrary="true"
+				LinkIncremental="1"
 				LinkTimeCodeGeneration="0"
-				TargetMachine="1"
-			/>
+				OptimizeReferences="2"
+				OutputFile="$(OutDir)\scriptmodule-lua.dll"
+				ProgramDatabaseFile=""
+				RandomizedBaseAddress="true"
+				SubSystem="2"
+				SuppressStartupBanner="true"
+				TargetMachine="1" />
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCManifestTool" />
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCMIDLTool"
+				DefaultCharType="0"
+				EnableErrorChecks="1"
+				WarningLevel="0" />
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCPostBuildEventTool" />
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCPreBuildEventTool" />
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCPreLinkEventTool" />
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST" />
 		</Configuration>
 		<Configuration
 			Name="Debug|Win32"
 			OutputDirectory="..\..\bin\"
-			IntermediateDirectory="..\..\obj\debug\scriptmodule-lua\"
-			ConfigurationType="2"
-			UseOfMFC="0"
 			ATLMinimizesCRunTimeLibraryUsage="false"
 			CharacterSet="1"
-			>
-			<Tool
-				Name="VCPreBuildEventTool"
-			/>
-			<Tool
-				Name="VCCustomBuildTool"
-			/>
-			<Tool
-				Name="VCXMLDataGeneratorTool"
-			/>
-			<Tool
-				Name="VCWebServiceProxyGeneratorTool"
-			/>
-			<Tool
-				Name="VCMIDLTool"
-				WarningLevel="0"
-				DefaultCharType="0"
-				EnableErrorChecks="1"
-			/>
+			ConfigurationType="2"
+			IntermediateDirectory="..\..\obj\debug\scriptmodule-lua\"
+			UseOfMfc="0">
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalOptions="/MP"
-				Optimization="4"
 				AdditionalIncludeDirectories=".,.,src,lua_tinker,..\..\third-part\lua-53\src,..\..\soui\include,..\..\utilities\include,..\..\config,..\..\tools\mkspecs\win32-msvc2008"
-				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST"
-				GeneratePreprocessedFile="0"
-				ExceptionHandling="1"
-				RuntimeLibrary="1"
-				TreatWChar_tAsBuiltInType="true"
-				UsePrecompiledHeader="2"
-				PrecompiledHeaderThrough="src\stdafx.h"
-				PrecompiledHeaderFile="$(IntDir)\scriptmodule-luad.pch"
+				AdditionalOptions="/MP"
 				AssemblerListingLocation="..\..\obj\debug\scriptmodule-lua\"
-				ObjectFile="..\..\obj\debug\scriptmodule-lua\"
-				ProgramDataBaseFileName="$(IntDir)"
-				WarningLevel="3"
-				SuppressStartupBanner="true"
 				DebugInformationFormat="3"
 				DisableSpecificWarnings="4100,4101,4102,4189,4996"
+				ExceptionHandling="1"
 				ForcedIncludeFiles="src\stdafx.h"
-			/>
+				GeneratePreprocessedFile="0"
+				ObjectFile="..\..\obj\debug\scriptmodule-lua\"
+				Optimization ="4"
+				PrecompiledHeaderFile="$(IntDir)\scriptmodule-luad.pch"
+				PrecompiledHeaderThrough="src\stdafx.h"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST"
+				ProgramDataBaseFileName="$(IntDir)"
+				RuntimeLibrary="1"
+				SuppressStartupBanner="true"
+				TreatWChar_tAsBuiltInType="true"
+				UsePrecompiledHeader="2"
+				WarningLevel="3" />
 			<Tool
-				Name="VCManagedResourceCompilerTool"
-			/>
-			<Tool
-				Name="VCResourceCompilerTool"
-				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST,_DEBUG"
-			/>
-			<Tool
-				Name="VCPreLinkEventTool"
-			/>
+				Name="VCCustomBuildTool" />
 			<Tool
 				Name="VCLinkerTool"
-				IgnoreImportLibrary="true"
 				AdditionalDependencies="lua-53d.lib soui4d.lib utilities4d.lib"
-				OutputFile="$(OutDir)\scriptmodule-luad.dll"
-				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\bin"
+				DataExecutionPrevention="true"
 				GenerateDebugInformation="true"
-				ProgramDatabaseFile=""
-				SubSystem="2"
+				IgnoreImportLibrary="true"
 				LinkTimeCodeGeneration="0"
-				TargetMachine="1"
-			/>
+				OutputFile="$(OutDir)\scriptmodule-luad.dll"
+				ProgramDatabaseFile=""
+				RandomizedBaseAddress="true"
+				SubSystem="2"
+				SuppressStartupBanner="true"
+				TargetMachine="1" />
 			<Tool
-				Name="VCALinkTool"
-			/>
+				Name="VCManifestTool" />
 			<Tool
-				Name="VCManifestTool"
-			/>
+				Name="VCMIDLTool"
+				DefaultCharType="0"
+				EnableErrorChecks="1"
+				WarningLevel="0" />
 			<Tool
-				Name="VCXDCMakeTool"
-			/>
+				Name="VCPostBuildEventTool" />
 			<Tool
-				Name="VCBscMakeTool"
-			/>
+				Name="VCPreBuildEventTool" />
 			<Tool
-				Name="VCFxCopTool"
-			/>
+				Name="VCPreLinkEventTool" />
 			<Tool
-				Name="VCAppVerifierTool"
-			/>
-			<Tool
-				Name="VCPostBuildEventTool"
-			/>
+				Name="VCResourceCompilerTool"
+				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST,_DEBUG" />
 		</Configuration>
 	</Configurations>
-	<References>
-	</References>
 	<Files>
 		<Filter
 			Name="Source Files"
 			Filter="cpp;c;cxx;def;odl;idl;hpj;bat;asm;asmx"
-			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}"
-			>
+			UniqueIdentifier="{4FC737F1-C7A5-4376-A066-2A32D752A2FF}">
 			<File
-				RelativePath="src\exports\exp_soui.cpp"
-				>
-			</File>
+				RelativePath="src\ScriptModule-Lua.cpp" />
 			<File
-				RelativePath="lua_tinker\lua_tinker.cpp"
-				>
-			</File>
+				RelativePath="src\exports\exp_soui.cpp" />
 			<File
-				RelativePath="src\ScriptModule-Lua.cpp"
-				>
-			</File>
+				RelativePath="lua_tinker\lua_tinker.cpp" />
 		</Filter>
 		<Filter
 			Name="Header Files"
 			Filter="h;hpp;hxx;hm;inl;inc;xsd"
-			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}"
-			>
+			UniqueIdentifier="{93995380-89BD-4b04-88EB-625FBE52EBFB}">
 			<File
-				RelativePath="src\exports\exp_Basic.h"
-				>
-			</File>
+				RelativePath="src\ScriptModule-Lua.h" />
 			<File
-				RelativePath="src\exports\exp_ctrls.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_Basic.h" />
 			<File
-				RelativePath="src\exports\exp_eventArgs.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IApp.h" />
 			<File
-				RelativePath="src\exports\exp_global.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IContainer.h" />
 			<File
-				RelativePath=".\src\exports\exp_IAdapter.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_ICtrl.h" />
 			<File
-				RelativePath="src\exports\exp_IApp.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IEvtArgs.h" />
 			<File
-				RelativePath="src\exports\exp_IContainer.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IHostWnd.h" />
 			<File
-				RelativePath="src\exports\exp_ICtrl.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IMenu.h" />
 			<File
-				RelativePath="src\exports\exp_IEvtArgs.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IMenuEx.h" />
 			<File
-				RelativePath="src\exports\exp_IHostWnd.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_INativeWnd.h" />
 			<File
-				RelativePath="src\exports\exp_INativeWnd.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IObjRef.h" />
 			<File
-				RelativePath="src\exports\exp_IObject.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IObject.h" />
 			<File
-				RelativePath="src\exports\exp_IObjRef.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IResProvider.h" />
 			<File
-				RelativePath="src\exports\exp_IResProvider.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IResProviderMgr.h" />
 			<File
-				RelativePath="src\exports\exp_IResProviderMgr.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IScriptModule.h" />
 			<File
-				RelativePath="src\exports\exp_IScriptModule.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_ISouifac.h" />
 			<File
-				RelativePath="src\exports\exp_ISouifac.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IString.h" />
 			<File
-				RelativePath="src\exports\exp_IString.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IWindow.h" />
 			<File
-				RelativePath="src\exports\exp_IWindow.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_IXml.h" />
 			<File
-				RelativePath="src\exports\exp_IXml.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_SysApi.h" />
 			<File
-				RelativePath="src\exports\exp_string.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_Window.h" />
 			<File
-				RelativePath="src\exports\exp_Window.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_ctrls.h" />
 			<File
-				RelativePath="lua_tinker\lua_tinker.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_eventArgs.h" />
 			<File
-				RelativePath=".\src\exports\luaAdapter.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_global.h" />
 			<File
-				RelativePath="src\exports\luaFunSlot.h"
-				>
-			</File>
+				RelativePath="src\exports\exp_string.h" />
 			<File
-				RelativePath="src\ScriptModule-Lua.h"
-				>
-			</File>
+				RelativePath="src\exports\luaFunSlot.h" />
 			<File
-				RelativePath="src\stdafx.h"
-				>
+				RelativePath="lua_tinker\lua_tinker.h" />
+			<File
+				RelativePath="src\stdafx.h">
 				<FileConfiguration
-					Name="Release|Win32"
-					>
+					Name="Release|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
+						CommandLine="echo /*-------------------------------------------------------------------- >src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * Precompiled header source file used by Visual Studio.NET to generate>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * the .pch file.>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo *>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * Due to issues with the dependencies checker within the IDE, it>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * sometimes fails to recompile the PCH file, if we force the IDE to>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * create the PCH file directly from the header file.>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo *>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * This file is auto-generated by qmake since no PRECOMPILED_SOURCE was>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * specified, and is used as the common stdafx.cpp. The file is only>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * generated when creating .vcproj project files, and is not used for>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * command line compilations by nmake.>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo *>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * WARNING: All changes made in this file will be lost.>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo --------------------------------------------------------------------*/>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo #include &quot;stdafx.h&quot;>>src\stdafx.h.cpp"
 						Description="Generating precompiled header source file &apos;src\stdafx.h.cpp&apos; ..."
-						CommandLine="echo /*-------------------------------------------------------------------- &gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * Precompiled header source file used by Visual Studio.NET to generate&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * the .pch file.&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo *&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * Due to issues with the dependencies checker within the IDE, it&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * sometimes fails to recompile the PCH file, if we force the IDE to&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * create the PCH file directly from the header file.&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo *&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * This file is auto-generated by qmake since no PRECOMPILED_SOURCE was&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * specified, and is used as the common stdafx.cpp. The file is only&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * generated when creating .vcproj project files, and is not used for&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * command line compilations by nmake.&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo *&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * WARNING: All changes made in this file will be lost.&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo --------------------------------------------------------------------*/&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo #include &quot;stdafx.h&quot;&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;"
-						Outputs="src\stdafx.h.cpp"
-					/>
+						Outputs="src\stdafx.h.cpp" />
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCustomBuildTool"
+						CommandLine="echo /*-------------------------------------------------------------------- >src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * Precompiled header source file used by Visual Studio.NET to generate>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * the .pch file.>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo *>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * Due to issues with the dependencies checker within the IDE, it>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * sometimes fails to recompile the PCH file, if we force the IDE to>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * create the PCH file directly from the header file.>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo *>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * This file is auto-generated by qmake since no PRECOMPILED_SOURCE was>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * specified, and is used as the common stdafx.cpp. The file is only>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * generated when creating .vcproj project files, and is not used for>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * command line compilations by nmake.>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo *>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo * WARNING: All changes made in this file will be lost.>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo --------------------------------------------------------------------*/>>src\stdafx.h.cpp&#x000D;&#x000A;if errorlevel 1 goto VCReportError&#x000D;&#x000A;echo #include &quot;stdafx.h&quot;>>src\stdafx.h.cpp"
 						Description="Generating precompiled header source file &apos;src\stdafx.h.cpp&apos; ..."
-						CommandLine="echo /*-------------------------------------------------------------------- &gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * Precompiled header source file used by Visual Studio.NET to generate&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * the .pch file.&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo *&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * Due to issues with the dependencies checker within the IDE, it&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * sometimes fails to recompile the PCH file, if we force the IDE to&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * create the PCH file directly from the header file.&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo *&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * This file is auto-generated by qmake since no PRECOMPILED_SOURCE was&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * specified, and is used as the common stdafx.cpp. The file is only&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * generated when creating .vcproj project files, and is not used for&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * command line compilations by nmake.&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo *&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo * WARNING: All changes made in this file will be lost.&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo --------------------------------------------------------------------*/&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;if errorlevel 1 goto VCReportError&#x0D;&#x0A;echo #include &quot;stdafx.h&quot;&gt;&gt;src\stdafx.h.cpp&#x0D;&#x0A;"
-						Outputs="src\stdafx.h.cpp"
-					/>
+						Outputs="src\stdafx.h.cpp" />
 				</FileConfiguration>
 			</File>
 			<File
-				RelativePath="src\exports\toobj.h"
-				>
-			</File>
+				RelativePath="src\exports\toobj.h" />
 		</Filter>
 		<Filter
 			Name="Generated Files"
 			Filter="cpp;c;cxx;moc;h;def;odl;idl;res;"
-			UniqueIdentifier="{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}"
-			>
+			UniqueIdentifier="{71ED8ED8-ACB9-4CE9-BBE1-E00B30144E11}">
 			<File
-				RelativePath="src\stdafx.h.cpp"
-				>
+				RelativePath="src\stdafx.h.cpp">
 				<FileConfiguration
-					Name="Release|Win32"
-					>
+					Name="Release|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-						PrecompiledHeaderThrough="stdafx.h"
 						ForcedIncludeFiles="$(NOINHERIT)"
-					/>
+						PrecompiledHeaderThrough="stdafx.h"
+						UsePrecompiledHeader="1" />
 				</FileConfiguration>
 				<FileConfiguration
-					Name="Debug|Win32"
-					>
+					Name="Debug|Win32">
 					<Tool
 						Name="VCCLCompilerTool"
-						UsePrecompiledHeader="1"
-						PrecompiledHeaderThrough="stdafx.h"
 						ForcedIncludeFiles="$(NOINHERIT)"
-					/>
+						PrecompiledHeaderThrough="stdafx.h"
+						UsePrecompiledHeader="1" />
 				</FileConfiguration>
 			</File>
 		</Filter>
 		<File
-			RelativePath="src\ScriptModule-Lua.rc"
-			>
-		</File>
+			RelativePath="src\ScriptModule-Lua.rc" />
 	</Files>
 	<Globals>
 	</Globals>

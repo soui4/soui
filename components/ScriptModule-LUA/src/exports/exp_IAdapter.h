@@ -54,7 +54,41 @@ BOOL ExpLua_IAdapter(lua_State *L)
 		lua_tinker::class_def<LuaMcAdapter>(L,"notifyItemDataChanged",&LuaMcAdapter::notifyItemDataChanged);
 		lua_tinker::class_def<LuaMcAdapter>(L,"initCallback",&LuaMcAdapter::initCallback);
 
-		
+		lua_tinker::class_add<ITvAdapter>(L,"ITvAdapter");
+		lua_tinker::class_inh<ITvAdapter,IObjRef>(L);
+		lua_tinker::class_def<ITvAdapter>(L,"registerDataSetObserver",&ITvAdapter::registerDataSetObserver);
+		lua_tinker::class_def<ITvAdapter>(L,"unregisterDataSetObserver",&ITvAdapter::unregisterDataSetObserver);
+		lua_tinker::class_def<ITvAdapter>(L,"GetItemDataByIndex",&ITvAdapter::GetItemDataByIndex);
+		lua_tinker::class_def<ITvAdapter>(L,"SetItemDataByIndex",&ITvAdapter::SetItemDataByIndex);
+		lua_tinker::class_def<ITvAdapter>(L,"GetParentItem",&ITvAdapter::GetParentItem);
+		lua_tinker::class_def<ITvAdapter>(L,"GetFirstChildItem",&ITvAdapter::GetFirstChildItem);
+		lua_tinker::class_def<ITvAdapter>(L,"GetLastChildItem",&ITvAdapter::GetLastChildItem);
+		lua_tinker::class_def<ITvAdapter>(L,"GetPrevSiblingItem",&ITvAdapter::GetPrevSiblingItem);
+		lua_tinker::class_def<ITvAdapter>(L,"GetNextSiblingItem",&ITvAdapter::GetNextSiblingItem);
+		lua_tinker::class_def<ITvAdapter>(L,"HasChildren",&ITvAdapter::HasChildren);
+		lua_tinker::class_def<ITvAdapter>(L,"IsItemVisible",&ITvAdapter::IsItemVisible);
+		lua_tinker::class_def<ITvAdapter>(L,"GetFirstVisibleItem",&ITvAdapter::GetFirstVisibleItem);
+		lua_tinker::class_def<ITvAdapter>(L,"GetLastVisibleItem",&ITvAdapter::GetLastVisibleItem);
+		lua_tinker::class_def<ITvAdapter>(L,"GetPrevVisibleItem",&ITvAdapter::GetPrevVisibleItem);
+		lua_tinker::class_def<ITvAdapter>(L,"GetNextVisibleItem",&ITvAdapter::GetNextVisibleItem);
+		lua_tinker::class_def<ITvAdapter>(L,"ExpandItem",&ITvAdapter::ExpandItem);
+		lua_tinker::class_def<ITvAdapter>(L,"IsItemExpanded",&ITvAdapter::IsItemExpanded);
+		lua_tinker::class_def<ITvAdapter>(L,"SetItemExpanded",&ITvAdapter::SetItemExpanded);
+		lua_tinker::class_def<ITvAdapter>(L,"getView",&ITvAdapter::getView);
+		lua_tinker::class_def<ITvAdapter>(L,"getViewType",&ITvAdapter::getViewType);
+		lua_tinker::class_def<ITvAdapter>(L,"getViewTypeCount",&ITvAdapter::getViewTypeCount);
+		lua_tinker::class_def<ITvAdapter>(L,"getViewDesiredSize",&ITvAdapter::getViewDesiredSize);
+		lua_tinker::class_def<ITvAdapter>(L,"isViewWidthMatchParent",&ITvAdapter::isViewWidthMatchParent);
+		lua_tinker::class_def<ITvAdapter>(L,"InitByTemplate",&ITvAdapter::InitByTemplate);
+		lua_tinker::class_def<ITvAdapter>(L,"QueryInterface",&ITvAdapter::QueryInterface);
+
+		lua_tinker::class_add<LuaTvAdapter>(L,"LuaTvAdapter");
+		lua_tinker::class_inh<LuaTvAdapter,ITvAdapter>(L);
+		lua_tinker::class_def<LuaTvAdapter>(L,"notifyBranchChanged",&LuaTvAdapter::notifyBranchChanged);
+		lua_tinker::class_def<LuaTvAdapter>(L,"notifyBranchInvalidated",&LuaTvAdapter::notifyBranchInvalidated);
+		lua_tinker::class_def<LuaTvAdapter>(L,"notifyBranchExpandChanged",&LuaTvAdapter::notifyBranchExpandChanged);
+		lua_tinker::class_def<LuaTvAdapter>(L,"initCallback",&LuaTvAdapter::initCallback);
+
 		return TRUE;
 	}catch(...)
 	{

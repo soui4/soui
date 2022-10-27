@@ -51,6 +51,9 @@ HEADERS += src/ScriptModule-Lua.h \
            src/exports/exp_INativeWnd.h \
            src/exports/exp_IObject.h \
            src/exports/exp_IObjRef.h \
+           src/exports/exp_IMenu.h \
+           src/exports/exp_IMenuEx.h \
+           src/exports/exp_SysApi.h \
            src/exports/exp_IResProvider.h \
            src/exports/exp_IResProviderMgr.h \
            src/exports/exp_IScriptModule.h \

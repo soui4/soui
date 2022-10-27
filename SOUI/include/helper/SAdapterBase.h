@@ -121,7 +121,9 @@ class LvAdatperImpl : public BaseClass {
         getView(position, pItemPanel, xmlTemplate);
     }
 
-    STDMETHOD_(void, getView)(int position, SItemPanel *pItem, SXmlNode xmlTemplate) PURE;
+	STDMETHOD_(void, getView)(int position, SItemPanel *pItem, SXmlNode xmlTemplate) {
+		SASSERT(FALSE);
+	}
 
     STDMETHOD_(int, getItemViewType)(int position)
     {

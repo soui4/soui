@@ -1,4 +1,5 @@
 #include <string/strcpcvt.h>
+#include <interface/SWindow-i.h>
 #include "luaFunSlot.h"
 #include "luaAdapter.h"
 
@@ -97,14 +98,19 @@ IEvtSlot * CreateEventSlot(LPCSTR pszLuaFun){
 	return new LuaFunctionSlot(luaState,pszLuaFun);
 }
 
-ILvAdapter * CreateLvAdapter(void *ctx){
+LuaLvAdapter * CreateLvAdapter(LPCSTR ctx){
 	lua_State *luaState = lua_tinker::get_state();
 	return new LuaLvAdapter(luaState,ctx);
 }
 
-IMcAdapter * CreateMcAdapter(void *ctx){
+LuaMcAdapter * CreateMcAdapter(LPCSTR ctx){
 	lua_State *luaState = lua_tinker::get_state();
 	return new LuaMcAdapter(luaState,ctx);
+}
+
+LuaTvAdapter * CreateTvAdapter(LPCSTR ctx){
+	lua_State *luaState = lua_tinker::get_state();
+	return new LuaTvAdapter(luaState,ctx);
 }
 
 BOOL InitFileResProvider(IResProvider *pResProvider, const char * path)
@@ -121,6 +127,12 @@ BOOL InitPEResProvider(IResProvider *pResProvider, const char * path)
 
 IApplication * GetApp(){
 	return SApplication::getSingletonPtr();
+}
+
+void LuaConnect(IWindow *pWnd, int idEvt,LPCSTR pszFun){
+	IEvtSlot * pSlot = CreateEventSlot(pszFun);
+	pWnd->SubscribeEvent(idEvt,pSlot);
+	pSlot->Release();
 }
 
 HWND GetNullHwnd(){
@@ -154,9 +166,9 @@ BOOL ExpLua_Global(lua_State *L)
 		lua_tinker::def(L,"S_A2A",&SStrCpCvt::CvtA2A);
 		lua_tinker::def(L,"S_W2W",&SStrCpCvt::CvtW2W);
 
-		lua_tinker::def(L,"GetActiveWindow",GetActiveWindow);
 		lua_tinker::def(L,"GetNullHwnd",GetNullHwnd);
 		lua_tinker::def(L,"GetHostWndFromObject",GetHostWndFromObject);
+		lua_tinker::def(L,"LuaConnect",LuaConnect);
 		lua_tinker::def(L,"GetApp",GetApp);
 		
 		lua_tinker::def(L,"SMessageBox",SMessageBox);
@@ -174,6 +186,7 @@ BOOL ExpLua_Global(lua_State *L)
 
 		lua_tinker::def(L,"CreateLvAdapter",CreateLvAdapter);
 		lua_tinker::def(L,"CreateMcAdapter",CreateMcAdapter);
+		lua_tinker::def(L,"CreateTvAdapter",CreateTvAdapter);
 
 
 		return TRUE;
