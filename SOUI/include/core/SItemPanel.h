@@ -231,7 +231,7 @@ class TOsrPanelProxy
 };
 
 class SOUI_EXP SItemPanel : public TOsrPanelProxy<IItemPanel> {
-    DEF_SOBJECT(SWindow, L"ItemPanel")
+    DEF_SOBJECT(SOsrPanel, L"ItemPanel")
   public:
     static SItemPanel *Create(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer);
 

@@ -176,7 +176,9 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
      * @return IWindow*--匹配窗口
      * @remark 采用广度优先算法搜索匹配子窗口
      */
-    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep) PURE;
+    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep DEF_VAL(-1)) PURE;
+
+	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName, int nDeep DEF_VAL(-1)) PURE;
 
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
 
@@ -359,6 +361,8 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      * @remark 采用广度优先算法搜索匹配子窗口
      */
     STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep DEF_VAL(-1)) PURE;
+
+	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName, int nDeep DEF_VAL(-1)) PURE;
 
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
     STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;

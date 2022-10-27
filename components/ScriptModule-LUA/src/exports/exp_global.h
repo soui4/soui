@@ -108,6 +108,11 @@ LuaMcAdapter * CreateMcAdapter(LPCSTR ctx){
 	return new LuaMcAdapter(luaState,ctx);
 }
 
+LuaTvAdapter * CreateTvAdapter(LPCSTR ctx){
+	lua_State *luaState = lua_tinker::get_state();
+	return new LuaTvAdapter(luaState,ctx);
+}
+
 BOOL InitFileResProvider(IResProvider *pResProvider, const char * path)
 {
 	SStringT strPath=S_CA2T(path);
@@ -181,6 +186,7 @@ BOOL ExpLua_Global(lua_State *L)
 
 		lua_tinker::def(L,"CreateLvAdapter",CreateLvAdapter);
 		lua_tinker::def(L,"CreateMcAdapter",CreateMcAdapter);
+		lua_tinker::def(L,"CreateTvAdapter",CreateTvAdapter);
 
 
 		return TRUE;

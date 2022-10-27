@@ -365,6 +365,10 @@ public:
 		return SHostWnd::FindIChildByName(pszName,nDeep);
 	}
 
+	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName, int nDeep=-1) OVERRIDE{
+		return SHostWnd::FindIChildByNameA(pszName,nDeep);
+	}
+
 	STDMETHOD_(INcPainter*,GetNcPainter)(THIS) OVERRIDE
 	{
 		return SHostWnd::GetNcPainter();
