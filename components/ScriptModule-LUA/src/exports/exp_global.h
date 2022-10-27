@@ -2,6 +2,7 @@
 #include <interface/SWindow-i.h>
 #include "luaFunSlot.h"
 #include "luaAdapter.h"
+#include "luaAnimationListener.h"
 
 //导出基本结构体类型
 UINT rgb(int r,int g,int b)
@@ -98,20 +99,36 @@ IEvtSlot * CreateEventSlot(LPCSTR pszLuaFun){
 	return new LuaFunctionSlot(luaState,pszLuaFun);
 }
 
-LuaLvAdapter * CreateLvAdapter(LPCSTR ctx){
+LuaLvAdapter * CreateLvAdapter(int ctx){
 	lua_State *luaState = lua_tinker::get_state();
 	return new LuaLvAdapter(luaState,ctx);
 }
 
-LuaMcAdapter * CreateMcAdapter(LPCSTR ctx){
+LuaMcAdapter * CreateMcAdapter(int ctx){
 	lua_State *luaState = lua_tinker::get_state();
 	return new LuaMcAdapter(luaState,ctx);
 }
 
-LuaTvAdapter * CreateTvAdapter(LPCSTR ctx){
+LuaTvAdapter * CreateTvAdapter(int ctx){
 	lua_State *luaState = lua_tinker::get_state();
 	return new LuaTvAdapter(luaState,ctx);
 }
+
+LuaAnimationListener * CreateAnimationListener(int ctx){
+	lua_State *luaState = lua_tinker::get_state();
+	return new LuaAnimationListener(luaState,ctx);
+}
+
+LuaAnimatorListener * CreateValueAnimatorListener(int ctx){
+	lua_State *luaState = lua_tinker::get_state();
+	return new LuaAnimatorListener(luaState,ctx);
+}
+
+LuaAnimatorUpdateListener * CreateValueAnimatorUpdateListener(int ctx){
+	lua_State *luaState = lua_tinker::get_state();
+	return new LuaAnimatorUpdateListener(luaState,ctx);
+}
+
 
 BOOL InitFileResProvider(IResProvider *pResProvider, const char * path)
 {
@@ -188,6 +205,9 @@ BOOL ExpLua_Global(lua_State *L)
 		lua_tinker::def(L,"CreateMcAdapter",CreateMcAdapter);
 		lua_tinker::def(L,"CreateTvAdapter",CreateTvAdapter);
 
+		lua_tinker::def(L,"CreateAnimationListener",CreateAnimationListener);
+		lua_tinker::def(L,"CreateValueAnimatorListener",CreateValueAnimatorListener);
+		lua_tinker::def(L,"CreateValueAnimatorUpdateListener",CreateValueAnimatorUpdateListener);
 
 		return TRUE;
 	}catch(...)

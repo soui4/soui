@@ -34,6 +34,10 @@ set(ScriptModule-lua_header
            src/exports/exp_Window.h
            src/exports/exp_IMenu.h
            src/exports/exp_IMenuEx.h
+           src/exports/exp_IAnimation.h
+           src/exports/exp_IInterpolator.h
+           src/exports/exp_IValueAnimator.h
+           src/exports/luaAnimationListener.h
            src/exports/exp_SysApi.h
            src/exports/luaFunSlot.h
            src/exports/toobj.h

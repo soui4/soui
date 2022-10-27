@@ -34,6 +34,9 @@ using namespace SOUI;
 #include "exp_IAdapter.h"
 #include "exp_IMenu.h"
 #include "exp_IMenuEx.h"
+#include "exp_IAnimation.h"
+#include "exp_IValueAnimator.h"
+#include "exp_IInterpolator.h"
 #include "exp_Global.h"
 #include "exp_SysApi.h"
 
@@ -71,6 +74,9 @@ BOOL SOUI_Export_Lua(lua_State *L)
 	
 	if(bRet) bRet=ExpLua_ICtrl(L);
 	if(bRet) bRet=ExpLua_IAdapter(L);
+	if(bRet) bRet=ExpLua_IAnimation(L);
+	if(bRet) bRet=ExpLua_IValueAnimator(L);
+	if(bRet) bRet=ExpLua_IInterpolator(L);
 
 	
 	if(bRet) bRet=ExpLua_Global(L);
