@@ -1,5 +1,8 @@
 #include <string/strcpcvt.h>
 #include <interface/SWindow-i.h>
+#include <interface/smenu-i.h>
+#include <interface/smenuex-i.h>
+
 #include "luaFunSlot.h"
 #include "luaAdapter.h"
 #include "luaAnimationListener.h"
@@ -152,9 +155,14 @@ void LuaConnect(IWindow *pWnd, int idEvt,LPCSTR pszFun){
 	pSlot->Release();
 }
 
-HWND GetNullHwnd(){
-	return NULL;
+int TrackPopupIMenu(IMenu *pMenu,UINT flag,int x,int y, int scale){
+	return pMenu->TrackPopupMenu(flag,x,y,NULL,NULL,scale);
 }
+
+int TrackPopupIMenuEx(IMenuEx *pMenu,UINT flag,int x,int y, int scale){
+	return pMenu->TrackPopupMenu(flag,x,y,NULL,scale);
+}
+
 
 IHostWnd * GetHostWndFromObject(IObject *pObj)
 {
@@ -167,6 +175,15 @@ IHostWnd * GetHostWndFromObject(IObject *pObj)
 	}else{
 		return NULL;
 	}
+}
+
+
+void SClientToScreen(INativeWnd *pWnd,CRect & rc){
+	pWnd->ClientToScreen2(&rc);
+}
+
+void SScreenToClient(INativeWnd *pWnd,CRect & rc){
+	pWnd->ScreenToClient2(&rc);
 }
 
 BOOL ExpLua_Global(lua_State *L)
@@ -183,11 +200,12 @@ BOOL ExpLua_Global(lua_State *L)
 		lua_tinker::def(L,"S_A2A",&SStrCpCvt::CvtA2A);
 		lua_tinker::def(L,"S_W2W",&SStrCpCvt::CvtW2W);
 
-		lua_tinker::def(L,"GetNullHwnd",GetNullHwnd);
 		lua_tinker::def(L,"GetHostWndFromObject",GetHostWndFromObject);
 		lua_tinker::def(L,"LuaConnect",LuaConnect);
 		lua_tinker::def(L,"GetApp",GetApp);
-		
+		lua_tinker::def(L,"TrackPopupIMenu",TrackPopupIMenu);
+		lua_tinker::def(L,"TrackPopupIMenuEx",TrackPopupIMenuEx);
+
 		lua_tinker::def(L,"SMessageBox",SMessageBox);
 		lua_tinker::def(L,"InitFileResProvider",InitFileResProvider);
 		lua_tinker::def(L,"InitPEResProvider",InitPEResProvider);
@@ -208,6 +226,9 @@ BOOL ExpLua_Global(lua_State *L)
 		lua_tinker::def(L,"CreateAnimationListener",CreateAnimationListener);
 		lua_tinker::def(L,"CreateValueAnimatorListener",CreateValueAnimatorListener);
 		lua_tinker::def(L,"CreateValueAnimatorUpdateListener",CreateValueAnimatorUpdateListener);
+
+		lua_tinker::def(L,"SScreenToClient",SScreenToClient);
+		lua_tinker::def(L,"SClientToScreen",SClientToScreen);
 
 		return TRUE;
 	}catch(...)
