@@ -159,6 +159,10 @@
 			<File
 				RelativePath="src\exports\exp_Basic.h" />
 			<File
+				RelativePath="src\exports\exp_IAdapter.h" />
+			<File
+				RelativePath="src\exports\exp_IAnimation.h" />
+			<File
 				RelativePath="src\exports\exp_IApp.h" />
 			<File
 				RelativePath="src\exports\exp_IContainer.h" />
@@ -168,6 +172,8 @@
 				RelativePath="src\exports\exp_IEvtArgs.h" />
 			<File
 				RelativePath="src\exports\exp_IHostWnd.h" />
+			<File
+				RelativePath="src\exports\exp_IInterpolator.h" />
 			<File
 				RelativePath="src\exports\exp_IMenu.h" />
 			<File
@@ -189,6 +195,8 @@
 			<File
 				RelativePath="src\exports\exp_IString.h" />
 			<File
+				RelativePath="src\exports\exp_IValueAnimator.h" />
+			<File
 				RelativePath="src\exports\exp_IWindow.h" />
 			<File
 				RelativePath="src\exports\exp_IXml.h" />
@@ -204,6 +212,10 @@
 				RelativePath="src\exports\exp_global.h" />
 			<File
 				RelativePath="src\exports\exp_string.h" />
+			<File
+				RelativePath="src\exports\luaAdapter.h" />
+			<File
+				RelativePath="src\exports\luaAnimationListener.h" />
 			<File
 				RelativePath="src\exports\luaFunSlot.h" />
 			<File
