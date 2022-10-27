@@ -272,6 +272,16 @@ HWND lua_tinker::read(lua_State *L, int index)
 }
 
 template<>
+HMENU lua_tinker::read(lua_State *L, int index)
+{
+	if(lua_isnumber(L,index))
+		return (HMENU)(UINT)lua_tonumber(L, index);
+	else
+		return *(HMENU*)lua_touserdata(L, index);
+}
+
+
+template<>
 HDC lua_tinker::read(lua_State *L, int index)
 {
 	if(lua_isnumber(L,index))
@@ -330,6 +340,12 @@ template<>
 HWND lua_tinker::read(lua_State *L, int index)
 {
 	return (HWND)(UINT)lua_tonumber(L, index);
+}
+
+template<>
+HMENU lua_tinker::read(lua_State *L, int index)
+{
+	return (HMENU)(UINT)lua_tonumber(L, index);
 }
 
 template<>
@@ -494,6 +510,14 @@ void lua_tinker::push(lua_State *L, HWND ret)
 }
 
 template<>
+void lua_tinker::push(lua_State *L, HMENU ret)
+{
+	*(HMENU*)lua_newuserdata(L, sizeof(HMENU)) = ret;
+	lua_getglobal(L,"__hmenu");
+	lua_setmetatable(L, -2);
+}
+
+template<>
 void lua_tinker::push(lua_State *L, HDC ret)
 {
 	*(HDC*)lua_newuserdata(L, sizeof(HDC)) = ret;
@@ -545,6 +569,12 @@ void lua_tinker::push ( lua_State *L, HANDLE ret )
 
 template<>
 void lua_tinker::push(lua_State *L, HWND ret)
+{
+	lua_pushnumber ( L, ( UINT )ret );
+}
+
+template<>
+void lua_tinker::push(lua_State *L, HMENU ret)
 {
 	lua_pushnumber ( L, ( UINT )ret );
 }

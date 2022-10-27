@@ -32,7 +32,10 @@ using namespace SOUI;
 #include "exp_IHostWnd.h"
 #include "exp_ICtrl.h"
 #include "exp_IAdapter.h"
+#include "exp_IMenu.h"
+#include "exp_IMenuEx.h"
 #include "exp_Global.h"
+#include "exp_SysApi.h"
 
 BOOL SOUI_Export_Lua(lua_State *L)
 {
@@ -47,6 +50,8 @@ BOOL SOUI_Export_Lua(lua_State *L)
 	if(bRet) bRet=ExpLua_IResProvider(L);
 	if(bRet) bRet=ExpLua_IResProviderMgr(L);
 	if(bRet) bRet=ExpLua_IAppication(L);
+	if(bRet) bRet=ExpLua_IMenu(L);
+	if(bRet) bRet=ExpLua_IMenuEx(L);
 
 	if(bRet) bRet=ExpLua_IObject(L);
 	if(bRet) bRet=ExpLua_IWindow(L);
@@ -69,6 +74,7 @@ BOOL SOUI_Export_Lua(lua_State *L)
 
 	
 	if(bRet) bRet=ExpLua_Global(L);
+	if(bRet) bRet=ExpLua_SysApi(L);
 
 	return bRet;
 }

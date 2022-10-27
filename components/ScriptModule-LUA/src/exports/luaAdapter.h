@@ -29,6 +29,7 @@ public:
 	STDMETHOD_(void, getView)(int position, SItemPanel *pItem, SXmlNode xmlTemplate) OVERRIDE{
 		if(m_luaGetView.IsEmpty())
 			return;
+		//todo: 不知道为什么,这里传一个SItemPanel到lua后,lua不能正确识别.尽管已经导出了SItemPanel对象到lua
 		lua_tinker::call<void>(m_luaState,m_luaGetView,m_ctx,position,(SWindow*)pItem,(IXmlNode*)&xmlTemplate);
 	}
 
@@ -104,7 +105,8 @@ public:
 	STDMETHOD_(void, getView)(int position, SItemPanel *pItem, SXmlNode xmlTemplate) OVERRIDE{
 		if(m_luaGetView.IsEmpty())
 			return;
-		lua_tinker::call<void>(m_luaState,m_luaGetView,m_ctx.c_str(),position,pItem,(IXmlNode*)&xmlTemplate);
+		//todo: 不知道为什么,这里传一个SItemPanel到lua后,lua不能正确识别.尽管已经导出了SItemPanel对象到lua
+		lua_tinker::call<void>(m_luaState,m_luaGetView,m_ctx.c_str(),position,(SWindow*)pItem,(IXmlNode*)&xmlTemplate);
 	}
 
 	STDMETHOD_(int, getCount)(THIS) OVERRIDE{

@@ -124,7 +124,7 @@ IApplication * GetApp(){
 	return SApplication::getSingletonPtr();
 }
 
-void SubscribeWindowEvent(IWindow *pWnd, int idEvt,LPCSTR pszFun){
+void LuaConnect(IWindow *pWnd, int idEvt,LPCSTR pszFun){
 	IEvtSlot * pSlot = CreateEventSlot(pszFun);
 	pWnd->SubscribeEvent(idEvt,pSlot);
 	pSlot->Release();
@@ -161,10 +161,9 @@ BOOL ExpLua_Global(lua_State *L)
 		lua_tinker::def(L,"S_A2A",&SStrCpCvt::CvtA2A);
 		lua_tinker::def(L,"S_W2W",&SStrCpCvt::CvtW2W);
 
-		lua_tinker::def(L,"GetActiveWindow",GetActiveWindow);
 		lua_tinker::def(L,"GetNullHwnd",GetNullHwnd);
 		lua_tinker::def(L,"GetHostWndFromObject",GetHostWndFromObject);
-		lua_tinker::def(L,"SubscribeWindowEvent",SubscribeWindowEvent);
+		lua_tinker::def(L,"LuaConnect",LuaConnect);
 		lua_tinker::def(L,"GetApp",GetApp);
 		
 		lua_tinker::def(L,"SMessageBox",SMessageBox);

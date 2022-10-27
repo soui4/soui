@@ -32,6 +32,9 @@ set(ScriptModule-lua_header
            src/exports/exp_IXml.h
            src/exports/exp_string.h
            src/exports/exp_Window.h
+           src/exports/exp_IMenu.h
+           src/exports/exp_IMenuEx.h
+           src/exports/exp_SysApi.h
            src/exports/luaFunSlot.h
            src/exports/toobj.h
 	lua_tinker/lua_tinker.h

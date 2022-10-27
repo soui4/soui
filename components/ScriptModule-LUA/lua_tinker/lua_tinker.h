@@ -354,6 +354,7 @@ namespace lua_tinker
    template<>  table               read ( lua_State *L, int index );
    template<>  HANDLE              read ( lua_State *L, int index );
    template<>	HWND				read(lua_State *L, int index);
+   template<>	HMENU				read(lua_State *L, int index);
    template<>	HDC					read(lua_State *L, int index);
    template<>	HICON				read(lua_State *L, int index);
    template<>	HBITMAP				read(lua_State *L, int index);
@@ -382,6 +383,7 @@ namespace lua_tinker
    template<>  void push ( lua_State *L, table ret );
    template<>  void push ( lua_State *L, HANDLE ret );
    template<>	void push(lua_State *L, HWND ret);
+   template<>	void push(lua_State *L, HMENU ret);
    template<>	void push(lua_State *L, HDC ret);
    template<>	void push(lua_State *L, HICON ret);
    template<>	void push(lua_State *L, HBITMAP ret);

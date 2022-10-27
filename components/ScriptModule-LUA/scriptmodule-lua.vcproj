@@ -274,6 +274,14 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\exports\exp_IMenu.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\exports\exp_IMenuEx.h"
+				>
+			</File>
+			<File
 				RelativePath="src\exports\exp_INativeWnd.h"
 				>
 			</File>
@@ -315,6 +323,10 @@
 			</File>
 			<File
 				RelativePath="src\exports\exp_string.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\exports\exp_SysApi.h"
 				>
 			</File>
 			<File
