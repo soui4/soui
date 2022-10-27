@@ -44,6 +44,7 @@ int SHeaderCtrl::InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LP
     item.state = 0;
     item.iOrder = iItem;
     item.lParam = lParam;
+	item.bVisible = TRUE;
     m_arrItems.InsertAt(iItem, item);
     //需要更新列的序号
     for (size_t i = 0; i < GetItemCount(); i++)
