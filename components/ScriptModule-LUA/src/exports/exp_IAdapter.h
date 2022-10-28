@@ -27,6 +27,7 @@ BOOL ExpLua_IAdapter(lua_State *L)
 		lua_tinker::class_def<LuaLvAdapter>(L,"notifyDataSetInvalidated",&LuaLvAdapter::notifyDataSetInvalidated);
 		lua_tinker::class_def<LuaLvAdapter>(L,"notifyItemDataChanged",&LuaLvAdapter::notifyItemDataChanged);
 		lua_tinker::class_def<LuaLvAdapter>(L,"initCallback",&LuaLvAdapter::initCallback);
+		lua_tinker::class_def<LuaLvAdapter>(L,"getContext",&LuaLvAdapter::getContext);
 		DEF_CAST_OBJREF(L,LuaLvAdapter);
 
 		lua_tinker::class_add<IMcAdapter>(L,"IMcAdapter");
@@ -53,6 +54,7 @@ BOOL ExpLua_IAdapter(lua_State *L)
 		lua_tinker::class_def<LuaMcAdapter>(L,"notifyDataSetInvalidated",&LuaMcAdapter::notifyDataSetInvalidated);
 		lua_tinker::class_def<LuaMcAdapter>(L,"notifyItemDataChanged",&LuaMcAdapter::notifyItemDataChanged);
 		lua_tinker::class_def<LuaMcAdapter>(L,"initCallback",&LuaMcAdapter::initCallback);
+		lua_tinker::class_def<LuaMcAdapter>(L,"getContext",&LuaMcAdapter::getContext);
 		DEF_CAST_OBJREF(L,LuaMcAdapter);
 
 		lua_tinker::class_add<ITvAdapter>(L,"ITvAdapter");
@@ -89,6 +91,7 @@ BOOL ExpLua_IAdapter(lua_State *L)
 		lua_tinker::class_def<LuaTvAdapter>(L,"notifyBranchInvalidated",&LuaTvAdapter::notifyBranchInvalidated);
 		lua_tinker::class_def<LuaTvAdapter>(L,"notifyBranchExpandChanged",&LuaTvAdapter::notifyBranchExpandChanged);
 		lua_tinker::class_def<LuaTvAdapter>(L,"initCallback",&LuaTvAdapter::initCallback);
+		lua_tinker::class_def<LuaTvAdapter>(L,"getContext",&LuaTvAdapter::getContext);
 		DEF_CAST_OBJREF(L,LuaTvAdapter);
 
 		return TRUE;

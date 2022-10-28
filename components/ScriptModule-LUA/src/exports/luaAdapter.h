@@ -25,6 +25,10 @@ case fid_getItemViewType:m_luaGetItemViewType=pszCbName;break;
 default:lua_tinker::print_error(m_luaState,"unknown fid: %d",fid);break;
 		}
 	}
+
+	int getContext() const{
+		return m_ctx;
+	}
 public:
 	STDMETHOD_(void, getView)(int position, IWindow *pItem, IXmlNode * xmlTemplate) OVERRIDE{
 		if(m_luaGetView.IsEmpty())
@@ -100,6 +104,10 @@ case fid_getColumnName:m_luaGetColumnName=pszCbName;break;
 case fid_IsColumnVisible:m_luaIsColumnVisible=pszCbName;break;
 default:lua_tinker::print_error(m_luaState,"unknown fid: %d",fid);break;
 		}
+	}
+
+	int getContext() const{
+		return m_ctx;
 	}
 public:
 	STDMETHOD_(void, getView)(int position, IWindow *pItem, IXmlNode * xmlTemplate) OVERRIDE{
@@ -196,7 +204,11 @@ case fid_isViewWidthMatchParent:m_luaIsViewWidthMatchParent=pszCbName;break;
 default:lua_tinker::print_error(m_luaState,"unknown fid: %d",fid);break;
 		}
 	}
-	
+
+	int getContext() const{
+		return m_ctx;
+	}
+
 public:
 	STDMETHOD_(void, getView)(THIS_ HSTREEITEM hItem, IWindow *pItem, IXmlNode *pXmlTemplate) OVERRIDE
 	{
