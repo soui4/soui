@@ -101,10 +101,10 @@
     <states>
       <state index="0" value="normal"/>
       <state index="1" value="hover"/>
-      <state index="2" value="hover|pushdown"/>
-      <state index="3" value="normal|checked"/>
-      <state index="4" value="hover|checked"/>
-      <state index="5" value="hover|pushdown|checked"/>
+      <state index="2" value="hover&pushdown"/>
+      <state index="3" value="normal&checked"/>
+      <state index="4" value="hover&checked"/>
+      <state index="5" value="hover&pushdown&checked"/>
     </states>
   </imglist>
   <imglist name="svg_tiger" src="svg:tiger"/>
