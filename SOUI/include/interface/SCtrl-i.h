@@ -2927,4 +2927,47 @@ DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A0356
      */
     STDMETHOD_(IWindow *, GetIBuddy)(CTHIS) SCONST PURE;
 };
+
+#undef INTERFACE
+#define INTERFACE IIconWnd
+DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
+{
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+     */
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+	/**
+     * @brief    SetIcon
+     * @param    HICON hIcon -- 图标资源句柄
+     * @return   void
+     *
+     * Describe  图标资源
+     */
+    STDMETHOD_(void, SetIcon)(THIS_ HICON hIcon) PURE;
+};
+
 SNSEND

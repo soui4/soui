@@ -769,7 +769,7 @@ class SOUI_EXP SCheckBox : public SWindow {
  * Describe    图标控件
  * Usage: <icon src="icon:16" />
  */
-class SOUI_EXP SIconWnd : public SWindow {
+class SOUI_EXP SIconWnd : public TWindowProxy<IIconWnd> {
     DEF_SOBJECT(SWindow, L"icon")
   public:
     /**
@@ -781,37 +781,26 @@ class SOUI_EXP SIconWnd : public SWindow {
     SIconWnd();
     virtual ~SIconWnd();
 
-    void OnPaint(IRenderTarget *pRT);
-    /**
-     * SIconWnd::AttachIcon
-     * @brief    附加图标资源
-     * @param    HICON hIcon -- 图标资源句柄
-     * @return   返回值 HICON
-     *
-     * Describe  附加图标资源
-     */
-    void SetIcon(HICON hIcon);
+  public:
+	STDMETHOD_(void, SetIcon)(THIS_ HICON hIcon) OVERRIDE;
 
   protected:
-    /**
-     * SIconWnd::GetDesiredSize
-     * @brief    获取预期大小
-     * @param    int wid -- 容器宽度
-     * @param    int hei -- 容器高度
-     * @return   返回值 CSize对象
-     *
-     * Describe  根据矩形的大小，获取预期大小(解释有点不对)
-     */
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
-    HICON m_theIcon; /**< 图标资源句柄 */
+	STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
 
+	void OnPaint(IRenderTarget *pRT);
+
+	SOUI_MSG_MAP_BEGIN()
+		MSG_WM_PAINT_EX(OnPaint)
+	SOUI_MSG_MAP_END()
+
+public:
     SOUI_ATTRS_BEGIN()
         ATTR_ICON(L"src", m_theIcon, FALSE)
     SOUI_ATTRS_END()
 
-    SOUI_MSG_MAP_BEGIN()
-        MSG_WM_PAINT_EX(OnPaint)
-    SOUI_MSG_MAP_END()
+
+protected:
+	HICON m_theIcon; /**< 图标资源句柄 */
 };
 
 /**

@@ -292,6 +292,10 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_def<ISpinButtonCtrl>(L,"GetIBuddy",&ISpinButtonCtrl::GetIBuddy);
 		DEF_QICTRL(L,ISpinButtonCtrl,SSpinButtonCtrl);
 
+		lua_tinker::class_add<IIconWnd>(L,"IIconWnd");
+		lua_tinker::class_inh<IIconWnd,ICtrl>(L);
+		lua_tinker::class_def<IIconWnd>(L,"SetIcon",&IIconWnd::SetIcon);
+		DEF_QICTRL(L,IIconWnd,SIconWnd);
 
 		return TRUE;
 	}catch(...)
