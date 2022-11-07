@@ -217,6 +217,7 @@ class SOUI_EXP STreeCtrl
         ATTR_BOOL(L"rightClickSel", m_bRightClickSel, TRUE)
         ATTR_SKIN(L"itemBkgndSkin", m_pItemBgSkin, TRUE)
         ATTR_SKIN(L"itemSelSkin", m_pItemSelSkin, TRUE)
+		ATTR_SKIN(L"lineSkin", m_pLineSkin, TRUE)
         ATTR_SKIN(L"toggleSkin", m_pToggleSkin, TRUE)
         ATTR_SKIN(L"iconSkin", m_pIconSkin, TRUE)
         ATTR_SKIN(L"checkSkin", m_pCheckSkin, TRUE)

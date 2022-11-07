@@ -116,6 +116,10 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
      * @return int--表项缩进
      */
     STDMETHOD_(int, GetItemIndent)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
+
+	STDMETHOD_(int, GetIndent)(CTHIS) SCONST PURE;
+
+	STDMETHOD_(void, SetIndent)(THIS_ int nIndent) PURE;
 };
 
 SNSEND
