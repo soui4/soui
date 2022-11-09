@@ -107,6 +107,7 @@ BOOL SHeaderCtrl::SetItem(int iItem, const SHDITEM *pItem)
         item.fmt = pItem->fmt;
     if (pItem->mask & SHDI_VISIBLE)
         item.bVisible = pItem->bVisible;
+	Invalidate();
     return TRUE;
 }
 
@@ -636,45 +637,47 @@ int SHeaderCtrl::GetTotalWidth(BOOL bMinWid) const
 
 int SHeaderCtrl::GetItemWidth(int iItem) const
 {
-    if (iItem < 0 || (UINT)iItem >= m_arrItems.GetCount())
-        return -1;
-    if (!m_arrItems[iItem].bVisible)
-        return 0;
-    const SHDITEM &item = m_arrItems[iItem];
-    if (SLayoutSize::fequal(item.fWeight, 0.0f))
-        return item.cx;
-    else
-    {
-        CRect rc = GetClientRect();
-        if (rc.IsRectEmpty())
-        {
-            return item.cx;
+	if (iItem < 0 || (UINT)iItem >= m_arrItems.GetCount()) 
+		return -1;
+	if(!m_arrItems[iItem].bVisible)
+		return 0;
+	const SHDITEM & item = m_arrItems[iItem];
+	if(SLayoutSize::fequal(item.fWeight,0.0f))
+		return item.cx;
+	else
+	{
+		CRect rc = GetClientRect();
+		if(rc.IsRectEmpty())
+		{
+			return item.cx;
         }
         else
-        {
-            float fTotalWeight = 0.0f;
-            int nTotalWidth = 0;
-            for (UINT i = 0; i < m_arrItems.GetCount(); i++)
-            {
-                if (!m_arrItems[i].bVisible)
-                    continue;
-                fTotalWeight += m_arrItems[i].fWeight;
-                nTotalWidth += m_arrItems[i].cx;
-            }
-            int nRemain = rc.Width() - nTotalWidth;
-            if (nRemain <= 0)
-            {
-                return m_arrItems[iItem].cx;
-            }
-            for (int i = 0; i < iItem; i++)
-            {
-                int nAppend = (int)(nRemain * m_arrItems[i].fWeight / fTotalWeight);
-                nRemain -= nAppend;
-                fTotalWeight -= m_arrItems[i].fWeight;
-            }
-            return item.cx + (int)(nRemain * item.fWeight / fTotalWeight);
-        }
-    }
+		{
+			float fTotalWeight = 0.0f;
+			int   nTotalWidth = 0;
+			for(UINT i=0;i<m_arrItems.GetCount();i++)
+			{
+				if(!m_arrItems[i].bVisible)
+					continue;
+				fTotalWeight += m_arrItems[i].fWeight;
+				nTotalWidth += m_arrItems[i].cx;
+			}
+			int nRemain=rc.Width()-nTotalWidth;
+			if(nRemain<=0)
+			{
+				return m_arrItems[iItem].cx;
+			}
+			for(int i=0;i<iItem;i++)
+			{
+				if (!m_arrItems[i].bVisible)
+					continue;
+				int nAppend = (int)(nRemain * m_arrItems[i].fWeight/fTotalWeight);
+				nRemain-=nAppend;
+				fTotalWeight-=m_arrItems[i].fWeight;
+			}
+			return item.cx + (int)(nRemain*item.fWeight/fTotalWeight);
+		}
+	}
 }
 
 void SHeaderCtrl::OnActivateApp(BOOL bActive, DWORD dwThreadID)
