@@ -21,7 +21,7 @@ SNSBEGIN
  *
  * Describe   tab标签页面
  */
-class SOUI_EXP STabPage : public SWindow {
+class SOUI_EXP STabPage : public TWindowProxy<ITabPage>{
     DEF_SOBJECT(SWindow, L"page")
     friend class STabCtrl;
 
@@ -47,39 +47,26 @@ class SOUI_EXP STabPage : public SWindow {
     virtual ~STabPage()
     {
     }
-    /**
-     * STabPage::GetTitle
-     * @brief    获取标题
-     * @return   LPCTSTR --- 标题
-     *
-     * Describe  获取标题
-     */
-    LPCTSTR GetTitle()
-    {
-        return m_strTitle.GetText(FALSE);
-    }
-    /**
-     * STabPage::SetTitle
-     * @brief    设置标题
-     * @param    LPCTSTR lpszTitle --- 标题
-     *
-     * Describe  设置标题
-     */
-    void SetTitle(LPCTSTR lpszTitle)
-    {
-        m_strTitle.SetText(lpszTitle);
-    }
+public:
+	STDMETHOD_(LPCTSTR,GetTitle)(CTHIS) SCONST OVERRIDE
+	{
+		return m_strTitle.GetText(FALSE);
+	}
+	STDMETHOD_(void,SetTitle)(THIS_ LPCTSTR lpszTitle) OVERRIDE  
+	{
+		m_strTitle.SetText(lpszTitle);
+	}
 
-    int GetIconIndex() const
-    {
-        return m_iIcon;
-    }
+	STDMETHOD_(int,GetIconIndex)(CTHIS) SCONST OVERRIDE{
+		return m_iIcon;
+	}
 
-    void SetIconIndex(int iIcon)
+    STDMETHOD_(void,SetIconIndex)(THIS_ int iIcon) OVERRIDE
     {
         m_iIcon = iIcon;
     }
 
+protected:
     /**
      * OnUpdateToolTip
      * @brief    处理tooltip
@@ -224,7 +211,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      *
      * Describe  获取当前选中
      */
-    STDMETHOD_(IWindow *, GetPage)(THIS_ int nIndex) OVERRIDE;
+    STDMETHOD_(ITabPage *, GetPage)(THIS_ int nIndex) OVERRIDE;
 
     /**
      * STabCtrl::RemoveItem

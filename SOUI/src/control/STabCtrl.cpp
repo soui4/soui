@@ -536,7 +536,7 @@ STabPage *STabCtrl::GetPage(LPCTSTR pszName, BOOL bTitle /*=TRUE*/)
     return m_lstPages[iPage];
 }
 
-IWindow *STabCtrl::GetPage(int iPage)
+ITabPage *STabCtrl::GetPage(int iPage)
 {
     if (iPage < 0 || iPage >= GetItemCount())
         return NULL;

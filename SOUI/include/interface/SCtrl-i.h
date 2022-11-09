@@ -2707,6 +2707,60 @@ DECLARE_INTERFACE_IID_(IRichEdit, ICtrl, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
 };
 
 #undef INTERFACE
+#define INTERFACE ITabPage
+DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
+{
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+     */
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+	/**
+     * STabPage::GetTitle
+     * @brief    获取标题
+     * @return   LPCTSTR --- 标题
+     *
+     * Describe  获取标题
+     */
+    STDMETHOD_(LPCTSTR,GetTitle)(CTHIS) SCONST PURE;
+    /**
+     * STabPage::SetTitle
+     * @brief    设置标题
+     * @param    LPCTSTR lpszTitle --- 标题
+     *
+     * Describe  设置标题
+     */
+    STDMETHOD_(void,SetTitle)(THIS_ LPCTSTR lpszTitle) PURE;
+
+    STDMETHOD_(int,GetIconIndex)(CTHIS) SCONST PURE;
+
+    STDMETHOD_(void,SetIconIndex)(THIS_ int iIcon) PURE;
+};
+
+#undef INTERFACE
 #define INTERFACE ITabCtrl
 DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
 {
@@ -2795,7 +2849,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
      *
      * Describe  获取当前选中
      */
-    STDMETHOD_(IWindow *, GetPage)(THIS_ int nIndex) PURE;
+    STDMETHOD_(ITabPage *, GetPage)(THIS_ int nIndex) PURE;
 
     /**
      * STabCtrl::RemoveItem
