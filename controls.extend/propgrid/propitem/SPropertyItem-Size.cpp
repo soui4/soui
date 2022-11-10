@@ -23,34 +23,33 @@ namespace SOUI
     }
 
 
-    void SPropertyItemSize::SetValue( const SStringT & strValue )
-    {
-		if(m_bDigit)
+	void SPropertyItemSize::SetValue(const SStringT& strValue)
+	{
+		if (m_bDigit)
 		{
 			SIZE sz;
-			if(_stscanf(strValue,_T("%d,%d"),&sz.cx,&sz.cy)==2)
+			if (_stscanf(strValue, _T("%d,%d"), &sz.cx, &sz.cy) == 2)
 			{
 				//如果值有变化，就发送通知
-				if (sz.cy != m_szValue.cy || sz.cy != m_szValue.cy)
+				if (sz.cx != m_szValue.cx || sz.cy != m_szValue.cy)
 				{
-
 					m_szValue = sz;
-					m_strValue[0].Format(_T("%d"),sz.cx);
-					m_strValue[1].Format(_T("%d"),sz.cy);
+					m_strValue[0].Format(_T("%d"), sz.cx);
+					m_strValue[1].Format(_T("%d"), sz.cy);
 					OnValueChanged();
 				}
 			}
 		}else
 		{
 			SStringTList lstValue;
-			if(2==SplitString(strValue,_T(','),lstValue))
+			if (2 == SplitString(strValue, _T(','), lstValue))
 			{
-				m_strValue[0]=lstValue[0];
-				m_strValue[1]=lstValue[1];
+				m_strValue[0] = lstValue[0];
+				m_strValue[1] = lstValue[1];
 				OnValueChanged();
 			}
 		}
-    }
+	}
 
 	SStringT SPropertyItemSize::GetValue() const
 	{
