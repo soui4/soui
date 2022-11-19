@@ -13,6 +13,7 @@ BOOL ExpLua_IObject(lua_State *L)
 		lua_tinker::class_def<IObject>(L,"GetID",&IObject::GetID);
 		lua_tinker::class_def<IObject>(L,"SetID",&IObject::SetID);
 		lua_tinker::class_def<IObject>(L,"GetName",&IObject::GetName);
+		lua_tinker::class_def<IObject>(L,"GetNameA",&IObject::GetNameA);
 		lua_tinker::class_def<IObject>(L,"SetName",&IObject::SetName);
 
 		lua_tinker::class_def<IObject>(L,"InitFromXml",&IObject::InitFromXml);

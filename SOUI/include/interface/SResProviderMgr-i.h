@@ -9,6 +9,8 @@ DECLARE_INTERFACE(IResProviderMgr)
 {
     STDMETHOD_(void, AddResProvider)(THIS_ IResProvider * pResProvider, LPCTSTR pszUidef DEF_VAL(_T("uidef:xml_init"))) PURE;
 
+	STDMETHOD_(void, AddResProviderA)(THIS_ IResProvider * pResProvider, LPCSTR pszUidef DEF_VAL("uidef:xml_init")) PURE;
+
     STDMETHOD_(void, RemoveResProvider)(THIS_ IResProvider * pResProvider) PURE;
 
     STDMETHOD_(void, RemoveAll)(THIS) PURE;

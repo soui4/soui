@@ -50,17 +50,6 @@ class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
         size of buffer
     */
     STDMETHOD_(void,executeScriptBuffer)(THIS_ LPCSTR buff, size_t sz)  OVERRIDE;
-    /*!
-    \brief
-        Execute script code contained in the given String object.
-
-    \param str
-        String object holding the valid script code that should be executed.
-
-    \return
-        Nothing.
-    */
-    STDMETHOD_(void,executeString)(THIS_ LPCSTR str) OVERRIDE;
 
 
     /*!
@@ -71,8 +60,8 @@ class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
     \param handler_name
         String object holding the name of the scripted handler function.
 
-    \param IEvtArgs *pEvt
-        IEvtArgs based object that should be passed, by any appropriate means, to the scripted function.
+    \param pEvt
+        IEvtArgs * based object that should be passed, by any appropriate means, to the scripted function.
 
     \return
         - true if the event was handled.

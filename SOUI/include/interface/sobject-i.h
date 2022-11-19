@@ -16,6 +16,7 @@
 #include <interface/obj-ref-i.h>
 #include <interface/sstring-i.h>
 #include <interface/sxml-i.h>
+#include <stdint.h>
 
 #pragma warning(disable : 4275)
 //////////////////////////////////////////////////////////////////////////

@@ -15,10 +15,10 @@
 #include <utilities-def.h>
 #include <interface/obj-ref-i.h>
 #include <interface/SEvtArgs-i.h>
+#include <stdint.h>
 
 SNSBEGIN
 
-typedef struct IWindow IWindow;
 /*!
 \brief
     Abstract interface required for all scripting support modules to be used with
@@ -86,17 +86,6 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
         size of buffer
     */
     STDMETHOD_(void, executeScriptBuffer)(THIS_ LPCSTR buff, size_t sz) PURE;
-    /*!
-    \brief
-        Execute script code contained in the given String object.
-
-    \param str
-        String object holding the valid script code that should be executed.
-
-    \return
-        Nothing.
-    */
-    STDMETHOD_(void, executeString)(THIS_ LPCSTR str) PURE;
 
     /*!
     \brief
@@ -107,8 +96,8 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
     \param handler_name
         String object holding the name of the scripted handler function.
 
-    \param IEvtArgs *pEvt
-        IEvtArgs based object that should be passed, by any appropriate means, to the scripted
+    \param pEvt
+        IEvtArgs * based object that should be passed, by any appropriate means, to the scripted
     function.
 
     \return

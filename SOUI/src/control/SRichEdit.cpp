@@ -6,6 +6,7 @@
 #include "helper/SAutoBuf.h"
 #include <gdialpha.h>
 #include <WinSCard.h>
+#include <helper/STimer.h>
 
 #ifndef LY_PER_INCH
 #define LY_PER_INCH 1440
@@ -313,12 +314,12 @@ void STextHost::TxScrollWindowEx(INT dx, INT dy, LPCRECT lprcScroll, LPCRECT lpr
 
 void STextHost::TxKillTimer(UINT idTimer)
 {
-    m_pRichEdit->KillTimer2(idTimer);
+    m_pRichEdit->OnTxKillTimer(idTimer);
 }
 
 BOOL STextHost::TxSetTimer(UINT idTimer, UINT uTimeout)
 {
-    return m_pRichEdit->SetTimer2(idTimer, uTimeout);
+    return m_pRichEdit->OnTxSetTimer(idTimer, uTimeout);
 }
 
 BOOL STextHost::TxSetCaretPos(INT x, INT y)
@@ -678,6 +679,7 @@ void SRichEdit::OnDestroy()
         m_pTxtHost->Release();
         m_pTxtHost = NULL;
     }
+	m_mapTimer.RemoveAll();
     __baseCls::OnDestroy();
 }
 
@@ -783,11 +785,6 @@ void SRichEdit::OnTimer(char idEvent)
     {
         __baseCls::OnTimer(idEvent);
     }
-}
-
-void SRichEdit::OnTimer2(UINT_PTR idEvent)
-{
-    m_pTxtHost->GetTextService()->TxSendMessage(WM_TIMER, idEvent, 0, NULL);
 }
 
 UINT SRichEdit::OnGetDlgCode() const
@@ -1467,27 +1464,27 @@ HRESULT SRichEdit::OnAttrRTF(const SStringW &strValue, BOOL bLoading)
     {
         SStringTList lstSrc;
         int nSegs = ParseResID(S_CW2T(strValue), lstSrc);
-
-        if (nSegs == 2)
-        { // load from resource
-            size_t dwSize = GETRESPROVIDER->GetRawBufferSize(lstSrc[0], lstSrc[1]);
-            if (dwSize)
-            {
-                EDITSTREAM es;
-                MemBlock mb = { NULL, 0 };
-                SAutoBuf mybuf;
-                mb.pBuf = (LPCBYTE)mybuf.Allocate(dwSize);
-                mb.nRemains = (DWORD)dwSize;
-                GETRESPROVIDER->GetRawBuffer(lstSrc[0], lstSrc[1], mybuf, dwSize);
-                es.dwCookie = (DWORD_PTR)&mb;
-                es.pfnCallback = EditStreamInCallback_MemBlock;
-                SSendMessage(EM_STREAMIN, SF_RTF, (LPARAM)&es);
-            }
-        }
-        else
-        { // load from file
-            LoadRtf(lstSrc[0]);
-        }
+		LPCTSTR pszType=NULL;
+		LPCTSTR pszName=NULL;
+		if(lstSrc.GetCount()==2){
+			pszType=lstSrc[0];
+			pszName=lstSrc[1];
+		}else{
+			pszName=lstSrc[0];
+		}
+		size_t dwSize = GETRESPROVIDER->GetRawBufferSize(pszType, pszName);
+		if (dwSize)
+		{
+			EDITSTREAM es;
+			MemBlock mb = { NULL, 0 };
+			SAutoBuf mybuf;
+			mb.pBuf = (LPCBYTE)mybuf.Allocate(dwSize);
+			mb.nRemains = (DWORD)dwSize;
+			GETRESPROVIDER->GetRawBuffer(pszType, pszName, mybuf, dwSize);
+			es.dwCookie = (DWORD_PTR)&mb;
+			es.pfnCallback = EditStreamInCallback_MemBlock;
+			SSendMessage(EM_STREAMIN, SF_RTF, (LPARAM)&es);
+		}
         return S_FALSE;
     }
 }
@@ -1678,6 +1675,34 @@ LRESULT SRichEdit::OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp)
 {
     GetClientRect((LPRECT)lp);
     return TRUE;
+}
+
+BOOL SRichEdit::OnTxSetTimer(UINT idTimer, UINT uTimeout)
+{
+	SMap<UINT,SAutoRefPtr<ITimer>>::CPair *p =m_mapTimer.Lookup(idTimer);
+	if(p){
+		p->m_value->KillTimer();
+		p->m_value->StartTimer(uTimeout,TRUE);
+		return TRUE;
+	}
+	STimer *timer = new STimer(&Subscriber(&SRichEdit::OnTimeout,this));
+	timer->StartTimer(uTimeout,TRUE);
+	m_mapTimer[idTimer] = timer;
+	timer->Release();
+
+	return TRUE;
+}
+
+void SRichEdit::OnTxKillTimer(UINT idTimer)
+{
+	m_mapTimer.RemoveKey(idTimer);
+}
+
+BOOL SRichEdit::OnTimeout(IEvtArgs *e)
+{
+	EventTimer *e2=sobj_cast<EventTimer>(e);
+	m_pTxtHost->GetTextService()->TxSendMessage(WM_TIMER, e2->uID, 0, NULL);
+	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////

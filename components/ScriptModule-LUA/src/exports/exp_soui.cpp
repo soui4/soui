@@ -19,6 +19,7 @@ using namespace SOUI;
 #include "exp_IObjRef.h"
 #include "exp_ISouifac.h"
 #include "exp_IString.h"
+#include "exp_ITimer.h"
 #include "exp_IApp.h"
 #include "exp_IResProvider.h"
 #include "exp_IResProviderMgr.h"
@@ -55,6 +56,7 @@ BOOL SOUI_Export_Lua(lua_State *L)
 	if(bRet) bRet=ExpLua_IAppication(L);
 	if(bRet) bRet=ExpLua_IMenu(L);
 	if(bRet) bRet=ExpLua_IMenuEx(L);
+	if(bRet) bRet=ExpLua_ITimer(L);
 
 	if(bRet) bRet=ExpLua_IObject(L);
 	if(bRet) bRet=ExpLua_IWindow(L);

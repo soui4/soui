@@ -63,6 +63,8 @@
      */
     STDMETHOD_(LPCWSTR, GetName)(CTHIS) SCONST PURE;
 
+	STDMETHOD_(LPCSTR, GetNameA)(CTHIS) SCONST PURE;
+
     /**
      * @brief 设置对象Name
      * @param pszName LPCWSTR -- 对象Name
@@ -153,3 +155,4 @@
      * Describe  
      */
 	STDMETHOD_(void, SetAttrHandler)(THIS_ FunAttrHandler attrHandler) PURE;
+

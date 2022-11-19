@@ -99,6 +99,8 @@ class SOUI_EXP SMenuEx
     //=================================================================
     STDMETHOD_(BOOL, LoadMenu)(THIS_ LPCTSTR resId) OVERRIDE;
 
+	STDMETHOD_(BOOL, LoadMenuA)(THIS_ LPCSTR resId) OVERRIDE;
+
     STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode *xmlMenu) OVERRIDE;
 
     STDMETHOD_(BOOL, InsertMenu)(THIS_ UINT uPosition, UINT uFlags, int nIDNewItem, LPCTSTR strText, int iIcon DEF_VAL(-1)) OVERRIDE;

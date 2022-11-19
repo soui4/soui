@@ -349,6 +349,9 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
             , m_angle(0.0f)
             , m_centerX(0.5f)
             , m_centerY(0.5f)
+            , m_crCenter(RGBA(255,0,0,255))
+            , m_crEnd(RGBA(0,0,255,255))
+            , m_crStart(RGBA(0,255,0,255))
         {
         }
 

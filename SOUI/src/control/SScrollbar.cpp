@@ -187,7 +187,7 @@ HRESULT SScrollBar::OnAttrVertical(const SStringW &value, BOOL bLoading)
     return bLoading ? S_FALSE : S_OK;
 }
 
-void SScrollBar::OnScrollUpdateThumbTrack(bool bVert, int nPos)
+void SScrollBar::OnScrollUpdateThumbTrack(BOOL bVert, int nPos)
 {
     CRect rcOldThumb = m_sbHandler.GetPartRect(SB_THUMBTRACK);
     m_si.nTrackPos = nPos;
@@ -201,7 +201,7 @@ void SScrollBar::OnScrollUpdateThumbTrack(bool bVert, int nPos)
     NotifySbCode(SB_THUMBTRACK, m_si.nTrackPos);
 }
 
-void SScrollBar::OnScrollCommand(bool bVert, int iCmd, int nPos)
+void SScrollBar::OnScrollCommand(BOOL bVert, int iCmd, int nPos)
 {
     int nOldPos = m_si.nPos;
     switch (iCmd)
@@ -234,32 +234,32 @@ void SScrollBar::OnScrollCommand(bool bVert, int iCmd, int nPos)
     }
 }
 
-void SScrollBar::OnScrollSetTimer(bool bVert, char id, UINT uElapse)
+void SScrollBar::OnScrollSetTimer(BOOL bVert, char id, UINT uElapse)
 {
     SetTimer(id, uElapse);
 }
 
-void SScrollBar::OnScrollKillTimer(bool bVert, char id)
+void SScrollBar::OnScrollKillTimer(BOOL bVert, char id)
 {
     KillTimer(id);
 }
 
-CRect SScrollBar::GetScrollBarRect(bool bVert) const
+CRect SScrollBar::GetScrollBarRect(BOOL bVert) const
 {
     return GetClientRect();
 }
 
-ISkinObj *SScrollBar::GetScrollBarSkin(bool bVert) const
+ISkinObj *SScrollBar::GetScrollBarSkin(BOOL bVert) const
 {
     return m_pSkin;
 }
 
-const SCROLLINFO *SScrollBar::GetScrollBarInfo(bool bVert) const
+const SCROLLINFO *SScrollBar::GetScrollBarInfo(BOOL bVert) const
 {
     return &m_si;
 }
 
-int SScrollBar::GetScrollBarArrowSize(bool bVert) const
+int SScrollBar::GetScrollBarArrowSize(BOOL bVert) const
 {
     return m_uAllowSize;
 }
@@ -283,7 +283,7 @@ BYTE SScrollBar::GetScrollThumbTrackMinAlpha() const
     return m_byThumbTrackMinAlpha;
 }
 
-void SScrollBar::OnScrollUpdatePart(bool bVert, int iPart)
+void SScrollBar::OnScrollUpdatePart(BOOL bVert, int iPart)
 {
     if (iPart == -1)
     {
@@ -324,7 +324,7 @@ ISwndContainer *SScrollBar::GetScrollBarContainer()
     return GetContainer();
 }
 
-bool SScrollBar::IsScrollBarEnable(bool bVert) const
+BOOL SScrollBar::IsScrollBarEnable(BOOL bVert) const
 {
     return !IsDisabled(TRUE);
 }

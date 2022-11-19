@@ -259,32 +259,47 @@ SHostWnd *SRootWindow::GetHostWnd() const
 //////////////////////////////////////////////////////////////////////////
 // SHostWnd
 //////////////////////////////////////////////////////////////////////////
-SHostWnd::SHostWnd(LPCTSTR pszResName /*= NULL*/)
-    : m_strXmlLayout(pszResName)
-    , m_bTrackFlag(FALSE)
-    , m_bNeedRepaint(FALSE)
-    , m_bNeedAllRepaint(TRUE)
-    , m_pTipCtrl(NULL)
-    , m_dummyWnd(NULL)
-    , m_bRendering(FALSE)
-    , m_szAppSetted(0, 0)
-    , m_nAutoSizing(0)
-    , m_bResizing(false)
-    , m_dwThreadID(0)
-    , m_AniState(0)
-    , m_pRoot(new SRootWindow(this))
-    , m_pNcPainter(new SNcPainter(this))
+SHostWnd::SHostWnd(LPCWSTR pszResName /*= NULL*/)
 {
-    SwndContainerImpl::SetRoot(m_pRoot);
-    m_msgMouse.message = 0;
-    m_privateStylePool.Attach(new SStylePool);
-    m_privateSkinPool.Attach(new SSkinPool);
-    m_privateTemplatePool.Attach(new STemplatePool);
-    m_pRoot->SetContainer(this);
-    m_hostAnimationHandler.m_pHostWnd = this;
+	if(pszResName)
+		m_strXmlLayout = S_CW2T(pszResName);
+	_Init();
+}
+
+SHostWnd::SHostWnd(LPCSTR pszResName)
+{
+	if(pszResName)
+		m_strXmlLayout = S_CA2T(pszResName);
+	_Init();
+}
+
+void SHostWnd::_Init()
+{
+	m_bTrackFlag=(FALSE)
+		, m_bNeedRepaint=(FALSE)
+		, m_bNeedAllRepaint=(TRUE)
+		, m_pTipCtrl=(NULL)
+		, m_dummyWnd=(NULL)
+		, m_bRendering=(FALSE)
+		, m_szAppSetted = CSize(0, 0)
+		, m_nAutoSizing=(0)
+		, m_bResizing=(false)
+		, m_dwThreadID=(0)
+		, m_AniState=(0)
+		, m_pRoot = (new SRootWindow(this))
+		, m_pNcPainter.Attach(new SNcPainter(this));
+
+	SwndContainerImpl::SetRoot(m_pRoot);
+	m_msgMouse.message = 0;
+	m_privateStylePool.Attach(new SStylePool);
+	m_privateSkinPool.Attach(new SSkinPool);
+	m_privateTemplatePool.Attach(new STemplatePool);
+	m_pRoot->SetContainer(this);
+	m_hostAnimationHandler.m_pHostWnd = this;
 	m_evtHandler.fun = NULL;
 	m_evtHandler.ctx = NULL;
 }
+
 
 SHostWnd::~SHostWnd()
 {
@@ -412,13 +427,21 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         {
             SStringT strSrc = S_CW2T(attrSrc.value());
             SStringTList lstSrc;
-            if (ParseResID(strSrc, lstSrc) == 2)
+            ParseResID(strSrc, lstSrc);
+			LPCTSTR pszType=NULL;
+			LPCTSTR pszName=NULL;
+			if(lstSrc.GetCount()==2){
+				pszType=lstSrc[0];
+				pszName=lstSrc[1];
+			}else{
+				pszName=strSrc;
+			}
             {
-                size_t dwSize = SApplication::getSingleton().GetRawBufferSize(lstSrc[0], lstSrc[1]);
+                size_t dwSize = SApplication::getSingleton().GetRawBufferSize(pszType, pszName);
                 if (dwSize)
                 {
                     SAutoBuf buff(dwSize);
-                    SApplication::getSingleton().GetRawBuffer(lstSrc[0], lstSrc[1], buff, dwSize);
+                    SApplication::getSingleton().GetRawBuffer(pszType, pszName, buff, dwSize);
                     m_pScriptModule->executeScriptBuffer(buff, dwSize);
                 }
             }
@@ -1506,32 +1529,6 @@ void SHostWnd::OnCavasInvalidate(SWND swnd)
         }
         m_lstUpdateSwnd.AddTail(swnd);
     }
-}
-
-LRESULT SHostWnd::OnScriptTimer(UINT uMsg, WPARAM wParam, LPARAM lParam)
-{
-    if (m_pScriptModule)
-    {
-        EventTimer evt(GetRoot());
-        evt.uID = (UINT)wParam;
-        m_pScriptModule->executeScriptedEventHandler((LPCSTR)lParam, &evt);
-    }
-    return 0;
-}
-
-UINT SHostWnd::setTimeout(LPCSTR pszScriptFunc, UINT uElapse)
-{
-    return SScriptTimer::getSingleton().SetTimer(m_hWnd, pszScriptFunc, uElapse, FALSE);
-}
-
-UINT SHostWnd::setInterval(LPCSTR pszScriptFunc, UINT uElapse)
-{
-    return SScriptTimer::getSingleton().SetTimer(m_hWnd, pszScriptFunc, uElapse, TRUE);
-}
-
-void SHostWnd::clearTimer(UINT uID)
-{
-    SScriptTimer::getSingleton().ClearTimer(uID);
 }
 
 //////////////////////////////////////////////////////////////////////////

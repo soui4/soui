@@ -4,6 +4,7 @@ gamewnd = nil;
 gamecanvas = nil;
 players = {};
 flag_win = nil;
+runTimer = nil;
 
 coins_all = 100;	--现有资金
 coins_bet = {0,0,0,0} --下注金额
@@ -58,10 +59,16 @@ function on_init(args)
 	btnLrc:SubscribeEvent(10000,lrcSlot); -- 10000 == EVT_CMD
 	lrcSlot:Release();
 	math.randomseed(os.time());
+	local souiFac = CreateSouiFactory();
+	local timerSlot = CreateEventSlot("on_timer");
+	runTimer = souiFac:CreateTimer(timerSlot);
+	timerSlot:Release();
+	souiFac:Release();
 end
 
 function on_exit(args)
 	slog("execute script function: on_exit");
+	runTimer:Release();
 end
 
 function on_timer(args)
@@ -185,11 +192,11 @@ function on_run(args)
 	if tid == 0 then
 		prog_all = {0,0,0,0};
 		on_canvas_size(nil);
-		tid = win:setInterval("on_timer",50);
+		tid = runTimer:StartTimer(50,1);
 		btn:SetWindowText(T"stop");
 		flag_win:SetVisible(0,1);
 	else
-		win:clearTimer(tid);
+		runTimer:KillTimer();
 		btn:SetWindowText(T"run");
 		tid = 0;
 	end

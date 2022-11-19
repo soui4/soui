@@ -20,8 +20,7 @@ typedef enum _SingletonType
 {
 	SINGLETON_UIDEF = 0,
 	SINGLETON_SWNDMGR,
-	SINGLETON_TIMER,
-	SINGLETON_SCRIPTTIMER,
+	SINGLETON_TIMERGENERATOR,
 	SINGLETON_FONTPOOL,
 	SINGLETON_STYLEPOOLMGR,
 	SINGLETON_TEMPLATEPOOLMGR,
@@ -148,6 +147,13 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      */
     STDMETHOD_(int, Run)(THIS_ HWND hMainWnd) PURE;
 
+	/**
+     * @brief 退出消息循环
+     * @return void
+	 * @param int nCode -- thread quit code
+	 * @remark 调用PostQuitMessage
+     */
+	STDMETHOD_(void, Quit)(THIS_ int nCode) PURE;
     /**
      * @brief 获取程序主窗口
      * @return HWND--在Run方法中设定的窗口
@@ -234,6 +240,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IXmlDoc *, LoadXmlDocment)(THIS_ LPCTSTR strResId) PURE;
+	STDMETHOD_(IXmlDoc *, LoadXmlDocmentA)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 从资源加载动画资源
@@ -242,6 +249,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IAnimation *, LoadAnimation)(THIS_ LPCTSTR strResId) PURE;
+	STDMETHOD_(IAnimation *, LoadAnimationA)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 从资源加载数值动画资源
@@ -249,6 +257,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) PURE;
+	STDMETHOD_(IValueAnimator *, LoadValueAnimatorA)(THIS_ LPCSTR strResId) PURE;
 
 	/**
      * @brief 启用NotifyCenter

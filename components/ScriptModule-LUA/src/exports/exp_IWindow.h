@@ -58,8 +58,6 @@ BOOL ExpLua_IWindow(lua_State *L)
 		lua_tinker::class_def<IWindow>(L,"SwndFromPoint",&IWindow::SwndFromPoint);
 		lua_tinker::class_def<IWindow>(L,"SetTimer",&IWindow::SetTimer);
 		lua_tinker::class_def<IWindow>(L,"KillTimer",&IWindow::KillTimer);
-		lua_tinker::class_def<IWindow>(L,"SetTimer2",&IWindow::SetTimer2);
-		lua_tinker::class_def<IWindow>(L,"KillTimer2",&IWindow::KillTimer2);
 		lua_tinker::class_def<IWindow>(L,"GetCapture",&IWindow::GetCapture);
 		lua_tinker::class_def<IWindow>(L,"SetCapture",&IWindow::SetCapture);
 		lua_tinker::class_def<IWindow>(L,"ReleaseCapture",&IWindow::ReleaseCapture);

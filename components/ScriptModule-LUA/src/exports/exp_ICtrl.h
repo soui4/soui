@@ -267,7 +267,6 @@ BOOL ExpLua_ICtrl(lua_State *L)
 		lua_tinker::class_inh<IEdit,ICtrl>(L);
 		lua_tinker::class_def<IEdit>(L,"GetCueText",&IEdit::GetCueText);
 		lua_tinker::class_def<IEdit>(L,"GetCueColor",&IEdit::GetCueColor);
-		lua_tinker::def(L,"QiIEdit",&QueryICtrl<IEdit,SEdit>);
 		DEF_QICTRL(L,IEdit,SEdit);
 
 		lua_tinker::class_add<ITabCtrl>(L,"ITabCtrl");

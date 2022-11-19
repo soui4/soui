@@ -1021,11 +1021,11 @@ private:
         public __SPOSITION
     {
     public:
-        CNode()
+        CNode():m_pNext(NULL), m_pPrev(NULL)
         {
         }
         CNode( INARGTYPE element ) :
-            m_element( element )
+            m_element( element ),m_pNext(NULL),m_pPrev(NULL)
         {
         }
         ~CNode()

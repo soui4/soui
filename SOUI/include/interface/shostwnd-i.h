@@ -187,13 +187,6 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) PURE;
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) PURE;
-
-	//实现3个供脚本使用的定时器函数
-	STDMETHOD_(UINT, setTimeout)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) PURE;
-
-	STDMETHOD_(UINT, setInterval)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) PURE;
-
-	STDMETHOD_(void, clearTimer)(THIS_ UINT uID) PURE;
 };
 
 #undef INTERFACE
@@ -370,12 +363,6 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) PURE;
 
-	//实现3个供脚本使用的定时器函数
-	STDMETHOD_(UINT, setTimeout)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) PURE;
-
-	STDMETHOD_(UINT, setInterval)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) PURE;
-
-	STDMETHOD_(void, clearTimer)(THIS_ UINT uID) PURE;
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent /*=NULL*/) PURE;
     STDMETHOD_(void, EndDialog)(THIS_ INT_PTR nResult) PURE;

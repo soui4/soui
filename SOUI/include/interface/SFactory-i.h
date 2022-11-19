@@ -9,6 +9,7 @@
 #include <interface/SEvtArgs-i.h>
 #include <interface/smenu-i.h>
 #include <interface/smenuex-i.h>
+#include <interface/STimer-i.h>
 #include <soui_exp.h>
 SNSBEGIN
 
@@ -42,6 +43,7 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
 	STDMETHOD_(IEvtSlot *, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx) PURE;
 	STDMETHOD_(IMenu*, CreateMenu)(THIS_  HMENU hMenu DEF_VAL(NULL)) PURE;
 	STDMETHOD_(IMenuEx*,CreateMenuEx)(THIS) PURE;
+	STDMETHOD_(ITimer*,CreateTimer)(THIS_ IEvtSlot *pEvtSlot) PURE;
 };
 
 SNSEND

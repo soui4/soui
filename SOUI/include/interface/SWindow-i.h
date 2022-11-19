@@ -107,6 +107,14 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(void, SetToolTipText)(THIS_ LPCTSTR pszText) PURE;
 
+	/**
+     * @brief 设置tooltip
+     * @param pszText LPCSTR--tooltip字符串
+     * @return
+     * @remark 支持多语言
+     */
+    STDMETHOD_(void, SetToolTipTextA)(THIS_ LPCSTR pszText) PURE;
+
     /**
      * @brief 获取窗口的check状态标志
      * @return TRUE--checked
@@ -355,27 +363,6 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(void, KillTimer)(THIS_ char id) PURE;
 
-    /**
-     * SetTimer2
-     * @brief    利用函数定时器来模拟一个兼容窗口定时器
-     * @param    UINT_PTR id --  定时器ID
-     * @param    UINT uElapse --  延时(MS)
-     * @return   BOOL
-     *
-     * Describe  由于SetTimer只支持0-127的定时器ID，SetTimer2提供设置其它timerid
-     *           能够使用SetTimer时尽量不用SetTimer2，在Kill时效率会比较低
-     */
-    STDMETHOD_(BOOL, SetTimer2)(THIS_ UINT_PTR id, UINT uElapse) PURE;
-
-    /**
-     * KillTimer2
-     * @brief    删除一个SetTimer2设置的定时器
-     * @param    UINT_PTR id --  SetTimer2设置的定时器ID
-     * @return   void
-     *
-     * Describe  需要枚举定时器列表
-     */
-    STDMETHOD_(void, KillTimer2)(THIS_ UINT_PTR id) PURE;
 
     /**
      * @brief 获取鼠标捕获
@@ -674,6 +661,14 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(void, SetWindowText)(THIS_ LPCTSTR lpszText) PURE;
 
     /**
+     * @brief 设计窗口显示文本
+     * @param lpszText LPCSTR--窗口显示文本
+     * @return
+     * @remark 支持自动翻译
+     */
+	STDMETHOD_(void, SetWindowTextA)(THIS_ LPCSTR lpszText) PURE;
+
+    /**
      * @brief 获取窗口显示文本
      * @param pBuf TCHAR*--缓冲区
      * @param nBufLen int--缓冲区长度
@@ -681,6 +676,8 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @return int--复制的文本长度，pBuf为NULL时返回总缓冲区长度
      */
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR * pBuf, int nBufLen, BOOL bRawText) PURE;
+
+	STDMETHOD_(int, GetWindowTextA)(THIS_ IStringA *pStr, BOOL bRawText) PURE;
 
     /**
      * @brief 获取窗口状态

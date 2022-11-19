@@ -58,6 +58,7 @@ HEADERS += src/ScriptModule-Lua.h \
            src/exports/exp_IScriptModule.h \
            src/exports/exp_ISouifac.h \
            src/exports/exp_IString.h \
+           src/exports/exp_ITimer.h \
            src/exports/exp_IWindow.h \
            src/exports/exp_IAdapter.h \
            src/exports/exp_IXml.h \

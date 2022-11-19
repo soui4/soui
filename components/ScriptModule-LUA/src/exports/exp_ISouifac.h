@@ -17,6 +17,7 @@ BOOL ExpLua_ISouiFactory(lua_State *L)
 		lua_tinker::class_def<ISouiFactory>(L,"CreateFuncSlot",&ISouiFactory::CreateFuncSlot);
 		lua_tinker::class_def<ISouiFactory>(L,"CreateMenu",&ISouiFactory::CreateMenu);
 		lua_tinker::class_def<ISouiFactory>(L,"CreateMenuEx",&ISouiFactory::CreateMenuEx);
+		lua_tinker::class_def<ISouiFactory>(L,"CreateTimer",&ISouiFactory::CreateTimer);
 
 
 		return TRUE;

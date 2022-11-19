@@ -96,7 +96,7 @@ protected:
     }
 public:
     typedef T _PtrClass;
-    ~SComPtrBase() throw()
+    ~SComPtrBase()
     {
         if (p)
             p->Release();

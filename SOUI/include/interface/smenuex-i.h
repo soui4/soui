@@ -30,6 +30,8 @@ DECLARE_INTERFACE_(IMenuEx, IObjRef)
     //=================================================================
     STDMETHOD_(BOOL, LoadMenu)(THIS_ LPCTSTR resId) PURE;
 
+	STDMETHOD_(BOOL, LoadMenuA)(THIS_ LPCSTR resId) PURE;
+
     STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode * xmlMenu) PURE;
 
     STDMETHOD_(BOOL, InsertMenu)(THIS_ UINT uPosition, UINT uFlags, int id, LPCTSTR strText, int iIcon DEF_VAL(-1)) PURE;

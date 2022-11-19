@@ -166,6 +166,14 @@ BOOL SResProviderZip::Init( WPARAM wParam,LPARAM lParam )
 
 SStringT SResProviderZip::_GetFilePath( LPCTSTR pszResName,LPCTSTR pszType )
 {
+	if(!pszType)
+	{//no type, enum files
+		int idx = m_zipFile.GetFileIndex(pszResName);
+		if(idx!=-1) 
+			return pszResName;
+		else
+			return _T("");
+	}
 	SResID resID(pszType,pszResName);
 	SMap<SResID,SStringT>::CPair *p = m_mapFiles.Lookup(resID);
 	if(!p) return _T("");

@@ -135,6 +135,12 @@ BOOL SResProvider7Zip::Init( WPARAM wParam,LPARAM lParam )
 
 SStringT SResProvider7Zip::_GetFilePath( LPCTSTR pszResName,LPCTSTR pszType )
 {
+	if(!pszType){
+		//pszResName is a path
+		if(m_zipFile.IsFileExist(pszResName))
+			return _T("");
+		return pszResName;
+	}
 	SResID resID(pszType,pszResName);
 	SMap<SResID,SStringT>::CPair *p = m_mapFiles.Lookup(resID);
 	if(!p) return _T("");

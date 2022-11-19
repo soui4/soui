@@ -17,6 +17,7 @@
 #include <core/SPanel.h>
 #include <core/SSingleton2.h>
 #include <proxy/SCtrlProxy.h>
+#include <interface/STimer-i.h>
 
 SNSBEGIN
 enum
@@ -857,15 +858,8 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      * Describe  定时器
      */
     void OnTimer(char idEvent);
-    /**
-     * SRichEdit::OnTimer2
-     * @brief    定时器
-     * @param    UINT_PTR idEvent
-     *
-     * Describe  定时器
-     */
-    void OnTimer2(UINT_PTR idEvent);
-    /**
+
+	/**
      * SRichEdit::OnGetDlgCode
      * @brief    获取窗口消息码
      * @return   返回UINT
@@ -1089,6 +1083,9 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
 
     BOOL OnTxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw);
 
+	BOOL OnTxSetTimer(UINT idTimer, UINT uTimeout);
+	void OnTxKillTimer(UINT idTimer);
+	BOOL OnTimeout(IEvtArgs *e);
   protected:
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_CREATE(OnCreate)
@@ -1098,7 +1095,6 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
         MSG_WM_SETFOCUS_EX(OnSetFocus)
         MSG_WM_KILLFOCUS_EX(OnKillFocus)
         MSG_WM_TIMER_EX(OnTimer)
-        MSG_WM_TIMER2(OnTimer2)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_RBUTTONDOWN(OnRButtonDown)
@@ -1204,6 +1200,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     BYTE m_byDbcsLeadByte;         /**< DBCS输入时的中文头字节*/
     SStringW m_strRtfSrc;          /**< 在XML中指定的RTF数据源*/
     STextHost *m_pTxtHost;         /**< Host of Richedit*/
+	SMap<UINT,SAutoRefPtr<ITimer>> m_mapTimer;/**< map of timer to id*/
 };
 
 /**

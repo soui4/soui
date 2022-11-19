@@ -6,8 +6,7 @@
 #include "res.mgr/sfontpool.h"
 #include "res.mgr/SUiDef.h"
 
-#include "helper/STimerEx.h"
-#include "helper/SScriptTimer.h"
+#include "helper/STimerGenerator.h"
 #include "helper/SAutoBuf.h"
 #include "helper/SToolTip.h"
 #include "helper/SAppDir.h"
@@ -249,8 +248,7 @@ void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, 
 {
     m_pSingletons[SUiDef::GetType()] = new SUiDef();
     m_pSingletons[SWindowMgr::GetType()] = new SWindowMgr();
-    m_pSingletons[STimer2::GetType()] = new STimer2();
-    m_pSingletons[SScriptTimer::GetType()] = new SScriptTimer();
+    m_pSingletons[STimerGenerator::GetType()] = new STimerGenerator();
     m_pSingletons[SFontPool::GetType()] = new SFontPool(m_RenderFactory);
     m_pSingletons[SSkinPoolMgr::GetType()] = new SSkinPoolMgr();
     m_pSingletons[SStylePoolMgr::GetType()] = new SStylePoolMgr();
@@ -280,8 +278,7 @@ void SApplication::_DestroySingletons()
     DELETE_SINGLETON(STemplatePoolMgr);
     DELETE_SINGLETON(SSkinPoolMgr);
     DELETE_SINGLETON(SFontPool);
-    DELETE_SINGLETON(SScriptTimer);
-    DELETE_SINGLETON(STimer2);
+    DELETE_SINGLETON(STimerGenerator);
     DELETE_SINGLETON(SWindowMgr);
     DELETE_SINGLETON(SUiDef);
 }
@@ -344,21 +341,34 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc 
 {
     if (!pResProvider)
     {
-        if (IsFileType(pszType))
-        {
-            bool bLoad = xmlDoc.load_file(pszXmlName, xml_parse_default, enc_auto);
-            if (!bLoad)
-            {
-                XmlParseResult res;
-                xmlDoc.GetParseResult(&res);
-                SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName, SXmlDoc::GetErrDesc(res.status), res.offset);
-            }
-            return bLoad;
-        }
-        else
-        {
-            pResProvider = GetMatchResProvider(pszType, pszXmlName);
-        }
+		if(!pszType){
+			SPOSITION pos = m_lstResPackage.GetHeadPosition();
+			while(pos){
+				IResProvider *pResP = m_lstResPackage.GetNext(pos);
+				if(pResP->HasResource(NULL,pszXmlName))
+				{
+					pResProvider = pResP;
+					break;
+				}
+			}
+		}
+		if(!pResProvider){
+			if (IsFileType(pszType))
+			{
+				bool bLoad = xmlDoc.load_file(pszXmlName, xml_parse_default, enc_auto);
+				if (!bLoad)
+				{
+					XmlParseResult res;
+					xmlDoc.GetParseResult(&res);
+					SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName, SXmlDoc::GetErrDesc(res.status), res.offset);
+				}
+				return bLoad;
+			}
+			else
+			{
+				pResProvider = GetMatchResProvider(pszType, pszXmlName);
+			}
+		}
     }
     if (!pResProvider)
         return FALSE;
@@ -399,9 +409,10 @@ IXmlDoc *SApplication::LoadXmlDocment(LPCTSTR strResId)
 BOOL SApplication::LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId)
 {
     SStringTList strLst;
-    if (2 != ParseResID(strResId, strLst))
-        return FALSE;
-    return _LoadXmlDocment(strLst[1], strLst[0], xmlDoc);
+    if (2 == ParseResID(strResId, strLst))
+	    return _LoadXmlDocment(strLst[1], strLst[0], xmlDoc);
+	else
+		return _LoadXmlDocment(strResId, NULL, xmlDoc);
 }
 
 IAnimation *SApplication::LoadAnimation(LPCTSTR strResId)
@@ -481,6 +492,12 @@ int SApplication::Run(HWND hMainWnd)
     }
     return nRet;
 }
+
+void SApplication::Quit(int nCode)
+{
+	PostQuitMessage(nCode);
+}
+
 
 HMODULE SApplication::GetModule() const
 {

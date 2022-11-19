@@ -282,4 +282,11 @@ static std::string WString2String(const std::wstring &wstr)
 		std::string fileName = WString2String(pszFileName);
 		return m_fileStreams.GetFileSize(fileName.c_str());
 	} 
+
+	BOOL CZipArchive::IsFileExist( LPCTSTR pszFileName )
+	{
+		std::string fileName = WString2String(pszFileName);
+		return m_fileStreams.GetFilePtr(fileName.c_str())!=NULL;
+	} 
+	
 	}//end of ns

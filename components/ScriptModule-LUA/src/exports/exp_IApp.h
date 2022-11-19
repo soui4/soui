@@ -20,6 +20,7 @@ BOOL ExpLua_IAppication(lua_State *L)
 		lua_tinker::class_def<IApplication>(L,"SetAttrStorageFactory",&IApplication::SetAttrStorageFactory);
 		lua_tinker::class_def<IApplication>(L,"GetAttrStorageFactory",&IApplication::GetAttrStorageFactory);
 		lua_tinker::class_def<IApplication>(L,"Run",&IApplication::Run);
+		lua_tinker::class_def<IApplication>(L,"Quit",&IApplication::Quit);
 
 		lua_tinker::class_def<IApplication>(L,"GetMainWnd",&IApplication::GetMainWnd);
 		lua_tinker::class_def<IApplication>(L,"AddMsgLoop",&IApplication::AddMsgLoop);

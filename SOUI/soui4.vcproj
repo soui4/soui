@@ -274,8 +274,6 @@
 			<File
 				RelativePath="src\animation\SRotateAnimation.cpp" />
 			<File
-				RelativePath="src\helper\SScriptTimer.cpp" />
-			<File
 				RelativePath="src\core\SScrollBarHandler.cpp" />
 			<File
 				RelativePath="src\control\SScrollbar.cpp" />
@@ -302,7 +300,9 @@
 			<File
 				RelativePath="src\helper\STileViewItemLocator.cpp" />
 			<File
-				RelativePath="src\helper\STimerEx.cpp" />
+				RelativePath="src\helper\STimer.cpp" />
+			<File
+				RelativePath="src\helper\STimerGenerator.cpp" />
 			<File
 				RelativePath="src\core\STimerlineHandlerMgr.cpp" />
 			<File
@@ -573,8 +573,6 @@
 			<File
 				RelativePath="include\interface\SScriptModule-i.h" />
 			<File
-				RelativePath="include\helper\SScriptTimer.h" />
-			<File
 				RelativePath="include\core\SScrollBarHandler.h" />
 			<File
 				RelativePath="include\control\SScrollbar.h" />
@@ -617,7 +615,9 @@
 			<File
 				RelativePath="include\interface\STimelineHandler-i.h" />
 			<File
-				RelativePath="include\helper\STimerEx.h" />
+				RelativePath="include\helper\STimer.h" />
+			<File
+				RelativePath="include\helper\STimerGenerator.h" />
 			<File
 				RelativePath="include\core\STimerlineHandlerMgr.h" />
 			<File
@@ -670,6 +670,8 @@
 				RelativePath="include\animation\ScaleAnimation.h" />
 			<File
 				RelativePath="include\sobject\Sobject.hpp" />
+			<File
+				RelativePath="include\interface\SobjectApi.h" />
 			<File
 				RelativePath="include\control\SouiCtrls.h" />
 			<File
@@ -743,6 +745,8 @@
 			</File>
 			<File
 				RelativePath="include\stdint.h" />
+			<File
+				RelativePath="include\interface\stimer-i.h" />
 			<File
 				RelativePath="include\interface\stooltip-i.h" />
 			<File

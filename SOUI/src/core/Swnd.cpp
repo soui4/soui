@@ -195,6 +195,16 @@ SStringT SWindow::GetWindowText(BOOL bRawText /*=FALSE*/)
     return m_strText.GetText(bRawText);
 }
 
+
+
+int SWindow::GetWindowTextA(THIS_ IStringA *pStr, BOOL bRawText)
+{
+	SStringT strText = GetWindowText(bRawText);
+	SStringA strA = S_CT2A(strText);
+	pStr->Copy(&strA);
+	return pStr->GetLength();
+}
+
 int SWindow::GetWindowText(TCHAR *pBuf, int nBufLen, BOOL bRawText)
 {
     SStringT str = GetWindowText(bRawText);
@@ -239,6 +249,12 @@ void SWindow::SetWindowText(LPCTSTR lpszText)
     m_strText.SetText(lpszText);
     accNotifyEvent(EVENT_OBJECT_NAMECHANGE);
     OnContentChanged();
+}
+
+void SWindow::SetWindowTextA(THIS_ LPCSTR lpszText)
+{
+	SStringT str=S_CA2T(lpszText);
+	return SetWindowText(str);
 }
 
 void SWindow::SetEventMute(BOOL bMute)
@@ -406,15 +422,6 @@ void SWindow::KillTimer(char id)
     ::KillTimer(GetContainer()->GetHostHwnd(), DWORD(timerID));
 }
 
-BOOL SWindow::SetTimer2(UINT_PTR id, UINT uElapse)
-{
-    return STimer2::SetTimer(m_swnd, id, uElapse);
-}
-
-void SWindow::KillTimer2(UINT_PTR id)
-{
-    STimer2::KillTimer(m_swnd, id);
-}
 
 SWND SWindow::GetSwnd() const
 {
@@ -3165,6 +3172,12 @@ void SWindow::SetToolTipText(LPCTSTR pszText)
     { //请求更新显示的tip
         GetContainer()->UpdateTooltip();
     }
+}
+
+void SWindow::SetToolTipTextA(LPCSTR pszText)
+{
+	SStringT str=S_CA2T(pszText);
+	return SetToolTipText(str);
 }
 
 LPCWSTR SWindow::GetTrCtx() const

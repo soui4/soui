@@ -17,6 +17,9 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
     STDMETHOD_(void, AddResProvider)
     (THIS_ IResProvider *pResProvider, LPCTSTR pszUidef DEF_VAL(_T("uidef:xml_init"))) OVERRIDE;
 
+	STDMETHOD_(void, AddResProviderA)
+		(THIS_ IResProvider *pResProvider, LPCSTR pszUidef DEF_VAL("uidef:xml_init")) OVERRIDE;
+
     STDMETHOD_(void, RemoveResProvider)(THIS_ IResProvider *pResProvider) OVERRIDE;
 
     STDMETHOD_(void, RemoveAll)(THIS) OVERRIDE;

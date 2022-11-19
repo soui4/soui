@@ -8,7 +8,11 @@ class THostWndProxy
 	: public T
 	, public SHostWnd {
 public:
-	THostWndProxy(LPCTSTR pszResId)
+	THostWndProxy(LPCWSTR pszResId)
+		: SHostWnd(pszResId)
+	{
+	}
+	THostWndProxy(LPCSTR pszResId)
 		: SHostWnd(pszResId)
 	{
 	}
@@ -384,20 +388,6 @@ public:
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) OVERRIDE{
 		return SHostWnd::AnimateHostWindow(dwTime,dwFlags);
-	}
-
-	STDMETHOD_(UINT, setTimeout)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) OVERRIDE{
-		return SHostWnd::setTimeout(pszScriptFunc,uElapse);
-	}
-
-
-	STDMETHOD_(UINT, setInterval)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) OVERRIDE{
-		return SHostWnd::setInterval(pszScriptFunc,uElapse);
-	}
-
-
-	STDMETHOD_(void, clearTimer)(THIS_ UINT uID) OVERRIDE{
-		return SHostWnd::clearTimer(uID);
 	}
 };
 

@@ -64,6 +64,18 @@ public:
 	{
 		return NULL;
 	}
+
+	STDMETHOD_(LPCSTR,GetNameA)(THIS) SCONST OVERRIDE
+	{
+		static SStringA str;
+		LPCWSTR pszName=GetName();
+		if(pszName)
+			str=S_CW2A(pszName);
+		else
+			str.Empty();
+		return str.c_str();
+	}
+
 	STDMETHOD_(void,SetName)(THIS_ LPCWSTR pszName) OVERRIDE
 	{
 	}

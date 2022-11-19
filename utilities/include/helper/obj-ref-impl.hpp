@@ -86,7 +86,7 @@ public:
 		}
 	}
 
-	~SAutoRefPtr() throw()
+	~SAutoRefPtr()
 	{
 		if (p)
 		{

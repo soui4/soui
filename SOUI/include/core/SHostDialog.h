@@ -24,13 +24,14 @@ SNSBEGIN
 class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
     DEF_SOBJECT(SHostWnd, L"hostDialog")
   public:
-    SHostDialog(LPCTSTR pszXmlName = NULL);
+    SHostDialog(LPCWSTR pszXmlName = NULL);
+	SHostDialog(LPCSTR pszXmlName);
     ~SHostDialog(void);
 
   public:
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent = NULL) OVERRIDE;
     STDMETHOD_(void, EndDialog)(THIS_ INT_PTR nResult) OVERRIDE;
-
+    SHostWnd* toSHostWnd() { return this; }
   protected:
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
     void OnOK();

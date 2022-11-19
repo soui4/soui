@@ -525,7 +525,7 @@ public:
 
     BOOL operator !=(const RECT& rect) const
     {
-        return !::EqualRect(this, &rect);
+        return ::EqualRect(this, &rect)==0;
     }
 
     void operator +=(POINT point)

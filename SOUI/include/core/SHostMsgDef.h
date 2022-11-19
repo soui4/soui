@@ -4,7 +4,6 @@
 
 #define HOSTMSG_BASE (WM_USER + 10000)
 
-#define UM_SCRIPTTIMER (HOSTMSG_BASE + 201) //脚本定时器消息
 #define UM_MENUEVENT   (HOSTMSG_BASE + 202) //模拟菜单控件事件，wparam:0, lparam:EventArg *
 
 #define SPYMSG_BASE   (HOSTMSG_BASE + 1000)

@@ -713,6 +713,9 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
     STDMETHOD_(int, InsertItem)
     (THIS_ int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=FALSE*/, float fWeight /*=0.0f*/) PURE;
 
+	STDMETHOD_(int, InsertItemA)
+		(THIS_ int iItem, LPCSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=FALSE*/, float fWeight /*=0.0f*/) PURE;
+
     /**
      * SHeaderCtrl::GetItem
      * @brief    获得新项
@@ -1822,6 +1825,7 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
      * @remark bRawText为TRUE时输出未翻译的文本
      */
     STDMETHOD_(BOOL, GetItemText)(CTHIS_ int iItem, BOOL bRawText, IStringT *str) SCONST PURE;
+	STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ int iItem, BOOL bRawText, IStringA *str) SCONST PURE;
 
     /**
      * FindString
@@ -1833,6 +1837,8 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
      */
     STDMETHOD_(int, FindString)
     (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+	STDMETHOD_(int, FindStringA)
+		(THIS_ LPCSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
 
 	//////////////////////////////////////////////////////////////////////////
     /**
@@ -1934,6 +1940,8 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
      */
     STDMETHOD_(BOOL, GetItemText)(CTHIS_ int iItem, BOOL bRawText, IStringT *str) SCONST PURE;
 
+	STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ int iItem, BOOL bRawText, IStringA *str) SCONST PURE;
+
     /**
      * FindString
      * @brief    查找字符串位置
@@ -1944,6 +1952,8 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
      */
     STDMETHOD_(int, FindString)
     (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+	STDMETHOD_(int, FindStringA)
+		(THIS_ LPCSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
 
     /**
      * SComboBoxBase::DropDown
@@ -2007,6 +2017,7 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
      * Describe  插入新项
      */
     STDMETHOD_(int, InsertItem)(THIS_ int iPos, LPCTSTR pszText, int iIcon, LPARAM lParam) PURE;
+	STDMETHOD_(int, InsertItemA)(THIS_ int iPos, LPCSTR pszText, int iIcon, LPARAM lParam) PURE;
     /**
      * SComboBox::DeleteString
      * @brief    删除某一项
@@ -2273,6 +2284,9 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, ICtrl, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
     STDMETHOD_(HSTREEITEM, InsertItem)
     (THIS_ LPCTSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam, HSTREEITEM hParent DEF_VAL(STVI_ROOT), HSTREEITEM hInsertAfter DEF_VAL(STVI_LAST)) PURE;
 
+	STDMETHOD_(HSTREEITEM, InsertItemA)
+		(THIS_ LPCSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam, HSTREEITEM hParent DEF_VAL(STVI_ROOT), HSTREEITEM hInsertAfter DEF_VAL(STVI_LAST)) PURE;
+
     /**
      * @brief 删除一个HSTREEITEM
      * @param hItem --待删除HSTREEITEM
@@ -2362,6 +2376,7 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, ICtrl, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
      * @remark 不支持翻译
      */
     STDMETHOD_(BOOL, GetItemText)(CTHIS_ HSTREEITEM hItem, IStringT * strText) SCONST PURE;
+    STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ HSTREEITEM hItem, IStringA* strText) SCONST PURE;
 
     /**
      * @brief 设置文本数据
@@ -2370,6 +2385,7 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, ICtrl, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
      * @return BOOL
      */
     STDMETHOD_(BOOL, SetItemText)(THIS_ HSTREEITEM hItem, LPCTSTR lpszItem) PURE;
+    STDMETHOD_(BOOL, SetItemTextA)(THIS_ HSTREEITEM hItem, LPCSTR lpszItem) PURE;
 
     /**
      * @brief 获取指定项的图标显示数据

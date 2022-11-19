@@ -6,11 +6,18 @@ SNSBEGIN
 
 #define RC_INIT 0xcccccccc
 
-SHostDialog::SHostDialog(LPCTSTR pszXmlName)
+SHostDialog::SHostDialog(LPCWSTR pszXmlName)
     : THostWndProxy<IHostDialog>(pszXmlName)
     , m_nRetCode(RC_INIT)
 {
     SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop);
+}
+
+SHostDialog::SHostDialog(LPCSTR pszXmlName)
+: THostWndProxy<IHostDialog>(pszXmlName)
+, m_nRetCode(RC_INIT)
+{
+	SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop);
 }
 
 SHostDialog::~SHostDialog(void)

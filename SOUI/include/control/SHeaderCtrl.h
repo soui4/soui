@@ -73,6 +73,13 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
     STDMETHOD_(int, InsertItem)
     (THIS_ int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware = FALSE, float fWeight = 0.0f) OVERRIDE;
 
+	STDMETHOD_(int, InsertItemA)
+		(THIS_ int iItem, LPCSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware = FALSE, float fWeight = 0.0f) OVERRIDE
+	{
+		SStringT str = S_CA2T(pszText);
+		return InsertItem(iItem,str,nWidth,fmt,lParam,bDpiAware,fWeight);
+	}
+
     /**
      * SHeaderCtrl::GetItem
      * @brief    获得新项

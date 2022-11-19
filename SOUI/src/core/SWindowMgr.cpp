@@ -1,6 +1,5 @@
 ﻿#include "souistd.h"
 #include "core/SWindowMgr.h"
-#include "helper/STimerEx.h"
 
 SNSBEGIN
 
@@ -53,7 +52,6 @@ BOOL SWindowMgr::DestroyWindow(SWND swnd)
     ::EnterCriticalSection(&getSingleton().m_lockWndMap);
 
     BOOL bRet = getSingleton().RemoveKeyObject(swnd);
-    STimer2::KillTimer(swnd);
 
     ::LeaveCriticalSection(&getSingleton().m_lockWndMap);
 

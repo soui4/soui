@@ -326,6 +326,13 @@ BOOL SMenu::LoadMenu(LPCTSTR resId)
     return LoadMenu2(&xmlMenu);
 }
 
+
+BOOL SMenu::LoadMenuA(THIS_ LPCSTR resId)
+{
+	SStringT strResId = S_CA2T(resId);
+	return LoadMenu(strResId);
+}
+
 void SMenu::InitMenuItemData(SMenuItemData *itemInfo, const SStringW &strTextW)
 {
     SMenuAttr *pMenuAttr = GetMenuAttr(m_hMenu);

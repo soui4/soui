@@ -122,6 +122,11 @@ class SOUI_EXP SComboBase
   public:
     STDMETHOD_(int, FindString)
     (THIS_ LPCTSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE;
+	STDMETHOD_(int, FindStringA)
+		(THIS_ LPCSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE{
+			SStringT str = S_CA2T(pszFind);
+			return FindString(str,nAfter,bPartMatch);
+	}
 
     STDMETHOD_(void, DropDown)(THIS) OVERRIDE;
 
@@ -439,6 +444,12 @@ class TComboBaseProxy
     {
         return SComboBase::FindString(pszFind, nAfter, bPartMatch);
     }
+
+	STDMETHOD_(int, FindStringA)
+		(THIS_ LPCSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE
+	{
+		return SComboBase::FindStringA(pszFind, nAfter, bPartMatch);
+	}
 
     STDMETHOD_(void, DropDown)(THIS) OVERRIDE
     {

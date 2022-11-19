@@ -17,9 +17,6 @@ BOOL ExpLua_IHostWnd(lua_State *L)
 		lua_tinker::class_def<IHostWnd>(L,"SetEventHandler",&IHostWnd::SetEventHandler);
 		lua_tinker::class_def<IHostWnd>(L,"GetEventHandler",&IHostWnd::GetEventHandler);
 		lua_tinker::class_def<IHostWnd>(L,"AnimateHostWindow",&IHostWnd::AnimateHostWindow);
-		lua_tinker::class_def<IHostWnd>(L,"setTimeout",&IHostWnd::setTimeout);
-		lua_tinker::class_def<IHostWnd>(L,"setInterval",&IHostWnd::setInterval);
-		lua_tinker::class_def<IHostWnd>(L,"clearTimer",&IHostWnd::clearTimer);
         lua_tinker::class_def<IHostWnd>(L,"GetRoot",&IHostWnd::GetIRoot);
 
 		return TRUE;

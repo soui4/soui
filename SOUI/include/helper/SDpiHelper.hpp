@@ -19,6 +19,7 @@ namespace SOUI{
 			DWORD dwVerInfoSize = GetFileVersionInfoSize(pszFileName, &dwResHandle);
 			if (!dwVerInfoSize) return FALSE;
 			pBuf = malloc(dwVerInfoSize);
+			if (!pBuf) return FALSE;
 			GetFileVersionInfo(pszFileName, dwResHandle, dwVerInfoSize, pBuf);
 			UINT nVersionLen;
 			VS_FIXEDFILEINFO *pstFileVersion;

@@ -54,12 +54,24 @@ class SOUI_EXP SComboBox : public TComboBaseProxy<IComboBox> {
     STDMETHOD_(BOOL, SetItemData)(THIS_ UINT iItem, LPARAM lParam) OVERRIDE;
 
     STDMETHOD_(int, InsertItem)(THIS_ int iPos, LPCTSTR pszText, int iIcon, LPARAM lParam) OVERRIDE;
+	STDMETHOD_(int, InsertItemA)(THIS_ int iPos, LPCSTR pszText, int iIcon, LPARAM lParam) OVERRIDE{
+		SStringT str=S_CA2T(pszText);
+		return InsertItem(iPos,str,iIcon,lParam);
+	}
 
     STDMETHOD_(BOOL, DeleteString)(THIS_ int iPos) OVERRIDE;
 
     STDMETHOD_(void, ResetContent)(THIS) OVERRIDE;
 
     STDMETHOD_(BOOL, GetItemText)(int iItem, BOOL bRawText, IStringT *str) SCONST OVERRIDE;
+
+	STDMETHOD_(BOOL, GetItemTextA)(int iItem, BOOL bRawText, IStringA *str) SCONST OVERRIDE{
+		SStringT strBuf;
+		BOOL bRet = GetItemText(iItem,bRawText,&strBuf);
+		SStringA strBufA=S_CT2A(strBuf);
+		str->Copy(&strBufA);
+		return bRet;
+	}
 
     STDMETHOD_(IListBox *, GetIListBox)(THIS) OVERRIDE;
 

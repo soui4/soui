@@ -2,6 +2,7 @@
 #include <SouiFactory.h>
 #include <helper/SMenu.h>
 #include <helper/SMenuEx.h>
+#include <helper/STimer.h>
 
 SNSBEGIN
 
@@ -79,6 +80,11 @@ IMenu * SouiFactory::CreateMenu(THIS_  HMENU hMenu)
 IMenuEx * SouiFactory::CreateMenuEx(THIS)
 {
     return new SMenuEx();
+}
+
+STDMETHODIMP_(ITimer*) SouiFactory::CreateTimer(THIS_ IEvtSlot *pSlot)
+{
+	return new STimer(pSlot);
 }
 
 SNSEND

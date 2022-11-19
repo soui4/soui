@@ -35,6 +35,8 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
 
     STDMETHOD_(BOOL, LoadMenu)(THIS_ LPCTSTR resId) PURE;
 
+	STDMETHOD_(BOOL, LoadMenuA)(THIS_ LPCSTR resId) PURE;
+
     STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode * xmlMenu) PURE;
 
     STDMETHOD_(void, SetIconSkin)(THIS_ ISkinObj * icons) PURE;

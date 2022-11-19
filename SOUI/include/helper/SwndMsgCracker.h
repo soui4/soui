@@ -124,14 +124,3 @@
             return TRUE;      \
     }
 
-#define WM_TIMER2 (WM_USER + 5432) //定义一个与HWND定时器兼容的SOUI定时器
-
-#define MSG_WM_TIMER2(func)  \
-    if (uMsg == WM_TIMER2)   \
-    {                        \
-        SetMsgHandled(TRUE); \
-        func(wParam);        \
-        lResult = 0;         \
-        if (IsMsgHandled())  \
-            return TRUE;     \
-    }

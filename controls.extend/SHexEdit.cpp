@@ -116,7 +116,7 @@ BOOL SHexEditAction::append(const SByteArray &replaceData, const SByteArray &ins
 #define CONTROL_BORDER_SPACEV 0
 
 // boundaries and special values
-#define MOUSEREP_TIMER_TID    0x400
+#define MOUSEREP_TIMER_TID    10
 #define MOUSEREP_TIMER_ELAPSE 0x5
 
 // macros
@@ -1036,7 +1036,7 @@ void SHexEdit::DestoyEditCaret()
     ShowCaret(FALSE);
 }
 
-void SHexEdit::OnTimer(UINT nTimerID)
+void SHexEdit::OnTimer(char nTimerID)
 {
     if (m_bIsMouseRepActive && (nTimerID == MOUSEREP_TIMER_TID))
     {
@@ -1068,7 +1068,7 @@ void SHexEdit::StartMouseRepeat(const CPoint &cPoint, int iDelta, WORD nSpeed)
     {
         m_bIsMouseRepActive = true;
         m_nMouseRepCounter = nSpeed;
-        SetTimer2(MOUSEREP_TIMER_TID, MOUSEREP_TIMER_ELAPSE);
+        SetTimer(MOUSEREP_TIMER_TID, MOUSEREP_TIMER_ELAPSE);
     }
 }
 
@@ -1077,7 +1077,7 @@ void SHexEdit::StopMouseRepeat()
     if (m_bIsMouseRepActive)
     {
         m_bIsMouseRepActive = false;
-        KillTimer2(MOUSEREP_TIMER_TID);
+        KillTimer(MOUSEREP_TIMER_TID);
     }
 }
 

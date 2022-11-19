@@ -73,6 +73,7 @@ public:
 	 
 	BOOL GetFile(LPCTSTR pszFileName, CZipFile& file); 
 	DWORD GetFileSize(LPCTSTR pszFileName);
+	BOOL IsFileExist( LPCTSTR pszFileName );
 	 
 protected:
 	BOOL OpenZip();

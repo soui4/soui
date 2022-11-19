@@ -10,21 +10,20 @@ struct IScrollBarHost
         kTime_Wait = 200,
         kTime_Go = 100,
     };
-
-    virtual CRect GetScrollBarRect(bool bVert) const = 0;
-    virtual ISkinObj *GetScrollBarSkin(bool bVert) const = 0;
-    virtual const SCROLLINFO *GetScrollBarInfo(bool bVert) const = 0;
-    virtual int GetScrollBarArrowSize(bool bVert) const = 0;
-    virtual void OnScrollUpdatePart(bool bVert, int iPart) = 0;
-    virtual void OnScrollUpdateThumbTrack(bool bVert, int nPos) = 0;
-    virtual ISwndContainer *GetScrollBarContainer() = 0;
-    virtual bool IsScrollBarEnable(bool bVert) const = 0;
-    virtual void OnScrollCommand(bool bVert, int iCmd, int nPos) = 0;
-    virtual void OnScrollSetTimer(bool bVert, char id, UINT uElapse) = 0;
-    virtual void OnScrollKillTimer(bool bVert, char id) = 0;
-    virtual const IInterpolator *GetScrollInterpolator() const = 0;
-    virtual int GetScrollFadeFrames() const = 0;
-    virtual BYTE GetScrollThumbTrackMinAlpha() const = 0;
+    STDMETHOD_(CRect, GetScrollBarRect)(CTHIS_ BOOL bVert) SCONST PURE;
+    STDMETHOD_(ISkinObj*,GetScrollBarSkin)(CTHIS_ BOOL bVert) SCONST PURE;
+    STDMETHOD_(const SCROLLINFO *,GetScrollBarInfo)(CTHIS_ BOOL bVert) SCONST PURE;
+    STDMETHOD_(int,GetScrollBarArrowSize)(CTHIS_ BOOL bVert) SCONST PURE;
+    STDMETHOD_(void,OnScrollUpdatePart)(THIS_ BOOL bVert, int iPart) PURE;
+    STDMETHOD_(void,OnScrollUpdateThumbTrack)(THIS_ BOOL bVert, int nPos) PURE;
+    STDMETHOD_(ISwndContainer*, GetScrollBarContainer)(THIS) PURE;
+    STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST PURE;
+    STDMETHOD_(void,OnScrollCommand)(THIS_ BOOL bVert, int iCmd, int nPos) PURE;
+    STDMETHOD_(void,OnScrollSetTimer)(THIS_ BOOL bVert, char id, UINT uElapse) PURE;
+    STDMETHOD_(void,OnScrollKillTimer)(THIS_ BOOL bVert, char id) PURE;
+    STDMETHOD_(const IInterpolator *,GetScrollInterpolator)(CTHIS) SCONST PURE;
+    STDMETHOD_(int,GetScrollFadeFrames)(CTHIS) SCONST PURE;
+    STDMETHOD_(BYTE,GetScrollThumbTrackMinAlpha)(CTHIS) SCONST PURE;
 };
 
 class SOUI_EXP SScrollBarHandler : ITimelineHandler {

@@ -118,6 +118,7 @@ class SOUI_EXP SApplication
     STDMETHOD_(IAttrStorageFactory *, GetAttrStorageFactory)(THIS) OVERRIDE;
 
     STDMETHOD_(int, Run)(THIS_ HWND hMainWnd) OVERRIDE;
+	STDMETHOD_(void,Quit)(THIS_ int nCode) OVERRIDE;
     STDMETHOD_(HWND, GetMainWnd)(THIS) OVERRIDE;
 
     STDMETHOD_(BOOL, AddMsgLoop)(THIS_ IMessageLoop *pMsgLoop) OVERRIDE;
@@ -138,10 +139,22 @@ class SOUI_EXP SApplication
     (THIS_ const LPCWSTR *pNames, const int *nIds, int nCount) OVERRIDE;
 
     STDMETHOD_(IXmlDoc *, LoadXmlDocment)(THIS_ LPCTSTR strResId) OVERRIDE;
+	STDMETHOD_(IXmlDoc *, LoadXmlDocmentA)(THIS_ LPCSTR strResId) OVERRIDE{
+		SStringT str = S_CA2T(strResId);
+		return LoadXmlDocment(str);
+	}
 
     STDMETHOD_(IAnimation *, LoadAnimation)(THIS_ LPCTSTR strResId) OVERRIDE;
+	STDMETHOD_(IAnimation *, LoadAnimationA)(THIS_ LPCSTR strResId) OVERRIDE{
+		SStringT str = S_CA2T(strResId);
+		return LoadAnimation(str);
+	}
 
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) OVERRIDE;
+	STDMETHOD_(IValueAnimator *, LoadValueAnimatorA)(THIS_ LPCSTR strResId) OVERRIDE{
+		SStringT str = S_CA2T(strResId);
+		return LoadValueAnimator(str);
+	}
 
 	STDMETHOD_(void,EnableNotifyCenter)(THIS_ BOOL bEnable,int interval DEF_VAL(20)) OVERRIDE;
 

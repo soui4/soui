@@ -592,6 +592,12 @@ BOOL SMenuEx::LoadMenu(LPCTSTR strMenu)
     return LoadMenu2(&xmlMenu.root().first_child());
 }
 
+BOOL SMenuEx::LoadMenuA(THIS_ LPCSTR resId)
+{
+	SStringT strResId = S_CA2T(resId);
+	return LoadMenu(strResId);
+}
+
 BOOL SMenuEx::LoadMenu2(IXmlNode *xmlMenu)
 {
     if (IsWindow())

@@ -76,6 +76,14 @@ void SResProviderMgr::AddResProvider(IResProvider *pResProvider, LPCTSTR pszUide
     }
 }
 
+void SResProviderMgr::AddResProviderA(IResProvider *pResProvider, LPCSTR pszUidef)
+{
+	if(!pszUidef)
+		return AddResProvider(pResProvider,NULL);
+	SStringT strUiDef = S_CA2T(pszUidef);
+	return AddResProvider(pResProvider,strUiDef.c_str());
+}
+
 void SResProviderMgr::RemoveResProvider(IResProvider *pResProvider)
 {
     SAutoLock lock(m_cs);
@@ -125,6 +133,16 @@ LPCTSTR SResProviderMgr::SysCursorName2ID(LPCTSTR pszCursorName)
 BOOL SResProviderMgr::GetRawBuffer(LPCTSTR strType, LPCTSTR pszResName, LPVOID pBuf, size_t size)
 {
     SAutoLock lock(m_cs);
+    if (!strType)
+    {//support res src by resource path.
+        SPOSITION pos = m_lstResPackage.GetHeadPosition();
+        while (pos) {
+            IResProvider* pRes = m_lstResPackage.GetNext(pos);
+            if (pRes->HasResource(NULL, pszResName))
+                return pRes->GetRawBuffer(strType, pszResName,pBuf,size);
+        }
+        return FALSE;
+    }
     if (IsFileType(strType))
     {
         SStringT strPath = m_strFilePrefix + pszResName;
@@ -145,6 +163,16 @@ BOOL SResProviderMgr::GetRawBuffer(LPCTSTR strType, LPCTSTR pszResName, LPVOID p
 size_t SResProviderMgr::GetRawBufferSize(LPCTSTR strType, LPCTSTR pszResName)
 {
     SAutoLock lock(m_cs);
+    if (!strType)
+    {//support res src by resource path.
+        SPOSITION pos = m_lstResPackage.GetHeadPosition();
+        while (pos) {
+            IResProvider* pRes = m_lstResPackage.GetNext(pos);
+            if (pRes->HasResource(NULL, pszResName))
+                return pRes->GetRawBufferSize(strType, pszResName);
+        }
+        return 0;
+    }
     if (IsFileType(strType))
     {
         SStringT strPath = m_strFilePrefix + pszResName;
@@ -166,6 +194,17 @@ size_t SResProviderMgr::GetRawBufferSize(LPCTSTR strType, LPCTSTR pszResName)
 IImgX *SResProviderMgr::LoadImgX(LPCTSTR strType, LPCTSTR pszResName)
 {
     SAutoLock lock(m_cs);
+	if (!strType)
+	{//support res src by resource path.
+		SPOSITION pos = m_lstResPackage.GetHeadPosition();
+		while(pos){
+			IResProvider *pRes = m_lstResPackage.GetNext(pos);
+			IImgX *img = pRes->LoadImgX(NULL,pszResName);
+			if(img) return img;
+		}
+		return NULL;
+	}
+
     if (IsFileType(strType))
     {
         SStringT strPath = m_strFilePrefix + pszResName;
@@ -186,9 +225,17 @@ IImgX *SResProviderMgr::LoadImgX(LPCTSTR strType, LPCTSTR pszResName)
 
 IBitmapS *SResProviderMgr::LoadImage(LPCTSTR pszType, LPCTSTR pszResName)
 {
-    if (!pszType)
-        return NULL;
     SAutoLock lock(m_cs);
+	if (!pszType)
+	{//support res src by resource path.
+		SPOSITION pos = m_lstResPackage.GetHeadPosition();
+		while(pos){
+			IResProvider *pRes = m_lstResPackage.GetNext(pos);
+			IBitmapS *bmp = pRes->LoadImage(NULL,pszResName);
+			if(bmp) return bmp;
+		}
+		return NULL;
+	}
     if (IsFileType(pszType))
     {
         SStringT strPath = m_strFilePrefix + pszResName;
@@ -336,7 +383,7 @@ IBitmapS *SResProviderMgr::LoadImage2(const SStringW &strImgID)
     if (nSegs == 2)
         return LoadImage(strLst[0], strLst[1]);
     else
-        return NULL;
+        return LoadImage(NULL, strImgID);
 }
 
 HICON SResProviderMgr::LoadIcon2(const SStringW &strIconID)

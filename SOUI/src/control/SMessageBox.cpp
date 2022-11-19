@@ -33,7 +33,7 @@ SXmlNode GetMsgTemplate()
 //////////////////////////////////////////////////////////////////////////
 
 SMessageBoxImpl::SMessageBoxImpl()
-    : SHostDialog(NULL)
+    : SHostDialog()
 {
 }
 

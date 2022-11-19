@@ -195,6 +195,8 @@
 			<File
 				RelativePath="src\exports\exp_IString.h" />
 			<File
+				RelativePath="src\exports\exp_ITimer.h" />
+			<File
 				RelativePath="src\exports\exp_IValueAnimator.h" />
 			<File
 				RelativePath="src\exports\exp_IWindow.h" />

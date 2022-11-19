@@ -18,7 +18,7 @@
 #include <layout/SLayoutsize.h>
 #include <helper/SplitString.h>
 #include <helper/SWndSpy.h>
-#include <helper/SScriptTimer.h>
+#include <helper/STimerGenerator.h>
 #include <proxy/SNativeWndProxy.h>
 SNSBEGIN
 
@@ -204,7 +204,8 @@ class SOUI_EXP SHostWnd
 	EventHandlerInfo m_evtHandler;
 
   public:
-    SHostWnd(LPCTSTR pszResName = NULL);
+    SHostWnd(LPCWSTR pszResName = NULL);
+	SHostWnd(LPCSTR pszResName);
     virtual ~SHostWnd();
 
   public:
@@ -258,13 +259,6 @@ class SOUI_EXP SHostWnd
 	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) OVERRIDE;
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) OVERRIDE;
-
-	//实现3个供脚本使用的定时器函数
-	STDMETHOD_(UINT, setTimeout)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) OVERRIDE;
-
-	STDMETHOD_(UINT, setInterval)(THIS_ LPCSTR pszScriptFunc, UINT uElapse) OVERRIDE;
-
-	STDMETHOD_(void, clearTimer)(THIS_ UINT uID) OVERRIDE;
 
   public:
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1)
@@ -352,7 +346,7 @@ class SOUI_EXP SHostWnd
     void _RestoreClickState();
     void _Invalidate(LPCRECT prc);
     void _SetToolTipInfo(const SwndToolTipInfo *info, BOOL bNcTip);
-
+	void _Init();
   protected:
     //////////////////////////////////////////////////////////////////////////
     // Message handler
@@ -396,8 +390,6 @@ class SOUI_EXP SHostWnd
     void UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlpha, LPCRECT prcDirty = NULL);
 
     void OnCaptureChanged(HWND wnd);
-
-    LRESULT OnScriptTimer(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     LRESULT OnMenuExEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
@@ -504,7 +496,6 @@ class SOUI_EXP SHostWnd
         MSG_WM_TIMER(OnTimer)
         MSG_WM_GETMINMAXINFO(OnGetMinMaxInfo)
         MSG_WM_CAPTURECHANGED(OnCaptureChanged)
-        MESSAGE_HANDLER_EX(UM_SCRIPTTIMER, OnScriptTimer)
         MESSAGE_HANDLER_EX(UM_MENUEVENT, OnMenuExEvent)
         MSG_WM_WINDOWPOSCHANGING(OnWindowPosChanging)
         MSG_WM_WINDOWPOSCHANGED(OnWindowPosChanged)

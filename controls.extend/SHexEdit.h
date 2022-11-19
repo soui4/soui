@@ -110,7 +110,7 @@ class SHexEdit : public SPanel {
     void SetEditCaretPos(UINT nOffset, bool bHighBits);
     void CreateEditCaret(UINT nCaretHeight, UINT nCaretWidth);
     void DestoyEditCaret();
-    void OnTimer(UINT nTimerID);
+    void OnTimer(char nTimerID);
     void StartMouseRepeat(const CPoint &cPoint, int iDelta, WORD nSpeed);
     void StopMouseRepeat();
     void SetScrollPositionY(UINT nPosition, bool bUpdate = false);
@@ -237,9 +237,9 @@ class SHexEdit : public SPanel {
     MSG_WM_LBUTTONUP(OnLButtonUp)
     MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
     MSG_WM_CHAR(OnChar)
+	MSG_WM_TIMER_EX(OnTimer)
     MSG_WM_KEYDOWN(OnKeyDown)
     MSG_WM_SYSKEYDOWN(OnSysKeyDown)
-    MSG_WM_TIMER2(OnTimer)
     SOUI_MSG_MAP_END()
 
   protected:

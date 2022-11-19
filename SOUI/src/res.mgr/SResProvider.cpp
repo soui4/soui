@@ -191,7 +191,7 @@ LPVOID SResProviderPE::GetRawBufferPtr(LPCTSTR strType, LPCTSTR pszResName)
 
 BOOL SResProviderPE::HasResource(LPCTSTR strType, LPCTSTR pszResName)
 {
-    SASSERT(strType);
+    if(!strType) return FALSE;
     return MyFindResource(strType, pszResName) != NULL;
 }
 
@@ -322,6 +322,14 @@ SResProviderFiles::SResProviderFiles()
 
 SStringT SResProviderFiles::GetRes(LPCTSTR strType, LPCTSTR pszResName)
 {
+	if(!strType){
+		//pszResName is relative path
+		SStringT strRet = m_strPath + _T("\\") + pszResName;
+        DWORD dwAttr = GetFileAttributes(strRet);
+		if(dwAttr ==INVALID_FILE_ATTRIBUTES || (dwAttr & FILE_ATTRIBUTE_ARCHIVE) == 0)
+			strRet = _T("");
+        return strRet;
+	}
     SResID resID(strType, pszResName);
     SMap<SResID, SStringT>::CPair *p = m_mapFiles.Lookup(resID);
     if (!p)
@@ -428,9 +436,8 @@ BOOL SResProviderFiles::Init(WPARAM wParam, LPARAM lParam)
 
 BOOL SResProviderFiles::HasResource(LPCTSTR strType, LPCTSTR pszResName)
 {
-    SResID resID(strType, pszResName);
-    SMap<SResID, SStringT>::CPair *p = m_mapFiles.Lookup(resID);
-    return (p != NULL);
+    SStringT resPath = GetRes(strType, pszResName);
+    return !resPath.IsEmpty();
 }
 
 void SResProviderFiles::EnumResource(EnumResCallback funEnumCB, LPARAM lp)

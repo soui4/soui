@@ -57,6 +57,7 @@ HEADERS += include/SApp.h \
            include/interface/STreeViewItemLocator-i.h \
            include/interface/STileViewItemLocator-i.h \
            include/interface/slog-i.h \
+           include/interface/SobjectApi.h \
            include/interface/sobject-i.h \
            include/interface/SPathEffect-i.h \
            include/interface/SRender-i.h \
@@ -85,6 +86,7 @@ HEADERS += include/SApp.h \
            include/interface/SNcPainter-i.h \
            include/interface/smenu-i.h \
            include/interface/smenuex-i.h \
+           include/interface/stimer-i.h \
            include/interface/SMessageBox-i.h \
            include/interface/SNotifyCenter-i.h \
            include/proxy/SNativeWndProxy.h \
@@ -183,11 +185,11 @@ HEADERS += include/SApp.h \
            include/helper/SMenuWndHook.h \
            include/helper/SplitString.h \
            include/helper/SResID.h \
-           include/helper/SScriptTimer.h \
+           include/helper/STimer.h \
+           include/helper/STimerGenerator.h \
            include/helper/STaskHandler.h \
            include/helper/STileViewItemLocator.h \
            include/helper/STime.h \
-           include/helper/STimerEx.h \
            include/helper/SToolTip.h \
            include/helper/SUnknown.h \
            include/helper/SwndFinder.h \
@@ -300,11 +302,11 @@ SOURCES += src/SApp.cpp \
            src/helper/SMenu.cpp \
            src/helper/SMenuEx.cpp \
            src/helper/SMenuWndHook.cpp \
-           src/helper/SScriptTimer.cpp \
+           src/helper/STimer.cpp \
+           src/helper/STimerGenerator.cpp \
            src/helper/STaskHandler.cpp \
            src/helper/STileViewItemLocator.cpp \
            src/helper/stime.cpp \
-           src/helper/STimerEx.cpp \
            src/helper/SToolTip.cpp \
            src/helper/SwndFinder.cpp \
            src/layout/SGridLayout.cpp \

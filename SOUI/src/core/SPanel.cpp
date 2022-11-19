@@ -10,7 +10,7 @@
 
 SNSBEGIN
 
-CRect SPanel::GetScrollBarRect(bool bVert) const
+CRect SPanel::GetScrollBarRect(BOOL bVert) const
 {
     CRect rcSb;
     if (!HasScrollBar(bVert))
@@ -51,17 +51,17 @@ CRect SPanel::GetScrollBarRect(bool bVert) const
     return rcSb;
 }
 
-ISkinObj *SPanel::GetScrollBarSkin(bool bVert) const
+ISkinObj *SPanel::GetScrollBarSkin(BOOL bVert) const
 {
     return m_pSkinSb;
 }
 
-const SCROLLINFO *SPanel::GetScrollBarInfo(bool bVert) const
+const SCROLLINFO *SPanel::GetScrollBarInfo(BOOL bVert) const
 {
     return bVert ? (&m_siVer) : (&m_siHoz);
 }
 
-int SPanel::GetScrollBarArrowSize(bool bVert) const
+int SPanel::GetScrollBarArrowSize(BOOL bVert) const
 {
     if (m_nSbArrowSize.isValid())
         return m_nSbArrowSize.toPixelSize(GetScale());
@@ -71,7 +71,7 @@ int SPanel::GetScrollBarArrowSize(bool bVert) const
     return m_pSkinSb->GetIdealSize();
 }
 
-void SPanel::OnScrollUpdatePart(bool bVert, int iPart)
+void SPanel::OnScrollUpdatePart(BOOL bVert, int iPart)
 {
     SScrollBarHandler &sbHandler = bVert ? m_sbVert : m_sbHorz;
     if (iPart == -1)
@@ -113,12 +113,7 @@ ISwndContainer *SPanel::GetScrollBarContainer()
     return GetContainer();
 }
 
-bool SPanel::IsScrollBarEnable(bool bVert) const
-{
-    return !!(m_wBarEnable & (bVert ? SSB_VERT : SSB_HORZ));
-}
-
-void SPanel::OnScrollUpdateThumbTrack(bool bVert, int nPos)
+void SPanel::OnScrollUpdateThumbTrack(BOOL bVert, int nPos)
 {
     SScrollBarHandler &sbHandler = bVert ? m_sbVert : m_sbHorz;
     SCROLLINFO &si = bVert ? m_siVer : m_siHoz;
@@ -134,18 +129,18 @@ void SPanel::OnScrollUpdateThumbTrack(bool bVert, int nPos)
     OnScroll(bVert, SB_THUMBTRACK, nPos);
 }
 
-void SPanel::OnScrollCommand(bool bVert, int iCmd, int nPos)
+void SPanel::OnScrollCommand(BOOL bVert, int iCmd, int nPos)
 {
     SASSERT(iCmd != SB_THUMBTRACK);
     OnScroll(bVert, iCmd, nPos);
 }
 
-void SPanel::OnScrollSetTimer(bool bVert, char id, UINT uElapse)
+void SPanel::OnScrollSetTimer(BOOL bVert, char id, UINT uElapse)
 {
     SetTimer(id, uElapse);
 }
 
-void SPanel::OnScrollKillTimer(bool bVert, char id)
+void SPanel::OnScrollKillTimer(BOOL bVert, char id)
 {
     KillTimer(id);
 }
