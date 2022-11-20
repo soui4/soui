@@ -183,9 +183,8 @@ void SResProvider7Zip::EnumResource(EnumResCallback funEnumCB,LPARAM lp)
 
 BOOL SResProvider7Zip::HasResource( LPCTSTR strType,LPCTSTR pszResName )
 {
-	SResID resID(strType,pszResName);
-	SMap<SResID,SStringT>::CPair *p = m_mapFiles.Lookup(resID);
-	return p!=NULL;
+	SStringT strPath = _GetFilePath(pszResName,strType);
+	return !strPath.IsEmpty();
 }
 
 BOOL SResProvider7Zip::_LoadSkin()

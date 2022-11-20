@@ -208,9 +208,8 @@ BOOL SResProviderZip::GetRawBuffer( LPCTSTR strType,LPCTSTR pszResName,LPVOID pB
 
 BOOL SResProviderZip::HasResource( LPCTSTR strType,LPCTSTR pszResName )
 {
-	SResID resID(strType,pszResName);
-	SMap<SResID,SStringT>::CPair *p = m_mapFiles.Lookup(resID);
-	return p!=NULL;
+	SStringT strPath = _GetFilePath(pszResName, strType);
+	return !strPath.IsEmpty();
 }
 
 BOOL SResProviderZip::_LoadSkin()
