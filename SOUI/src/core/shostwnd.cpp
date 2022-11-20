@@ -373,8 +373,6 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     //为了能够重入，先销毁原有的SOUI窗口
     GetRoot()->SSendMessage(WM_DESTROY);
     m_bFirstShow = TRUE;
-    // create new script module
-    SApplication::getSingleton().CreateScriptModule(&m_pScriptModule);
 
     m_hostAttr.Init();
     m_hostAttr.InitFromXml(pNode);
@@ -419,43 +417,46 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     }
     //加载脚本数据
     SXmlNode xmlScript = xmlNode.child(L"script");
-    if (m_pScriptModule && xmlScript)
-    {
+    if (xmlScript)
+	{    // create new script module
+		SApplication::getSingleton().CreateScriptModule(&m_pScriptModule);
         xmlScript.set_userdata(1);
-        SXmlAttr attrSrc = xmlScript.attribute(L"src");
-        if (attrSrc)
-        {
-            SStringT strSrc = S_CW2T(attrSrc.value());
-            SStringTList lstSrc;
-            ParseResID(strSrc, lstSrc);
-			LPCTSTR pszType=NULL;
-			LPCTSTR pszName=NULL;
-			if(lstSrc.GetCount()==2){
-				pszType=lstSrc[0];
-				pszName=lstSrc[1];
-			}else{
-				pszName=strSrc;
+		if(m_pScriptModule){
+			SXmlAttr attrSrc = xmlScript.attribute(L"src");
+			if (attrSrc)
+			{
+				SStringT strSrc = S_CW2T(attrSrc.value());
+				SStringTList lstSrc;
+				ParseResID(strSrc, lstSrc);
+				LPCTSTR pszType=NULL;
+				LPCTSTR pszName=NULL;
+				if(lstSrc.GetCount()==2){
+					pszType=lstSrc[0];
+					pszName=lstSrc[1];
+				}else{
+					pszName=strSrc;
+				}
+				{
+					size_t dwSize = SApplication::getSingleton().GetRawBufferSize(pszType, pszName);
+					if (dwSize)
+					{
+						SAutoBuf buff(dwSize);
+						SApplication::getSingleton().GetRawBuffer(pszType, pszName, buff, dwSize);
+						m_pScriptModule->executeScriptBuffer(buff, dwSize);
+					}
+				}
 			}
-            {
-                size_t dwSize = SApplication::getSingleton().GetRawBufferSize(pszType, pszName);
-                if (dwSize)
-                {
-                    SAutoBuf buff(dwSize);
-                    SApplication::getSingleton().GetRawBuffer(pszType, pszName, buff, dwSize);
-                    m_pScriptModule->executeScriptBuffer(buff, dwSize);
-                }
-            }
-        }
-        else
-        {
-            //从script节点的cdata中获取脚本
-            SStringW strScript = xmlScript.child_value();
-            if (!strScript.IsEmpty())
-            {
-                SStringA utf8Script = S_CW2A(strScript, CP_UTF8);
-                m_pScriptModule->executeScriptBuffer(utf8Script, utf8Script.GetLength());
-            }
-        }
+			else
+			{
+				//从script节点的cdata中获取脚本
+				SStringW strScript = xmlScript.child_value();
+				if (!strScript.IsEmpty())
+				{
+					SStringA utf8Script = S_CW2A(strScript, CP_UTF8);
+					m_pScriptModule->executeScriptBuffer(utf8Script, utf8Script.GetLength());
+				}
+			}
+		}
     }
     SXmlNode xmlNcPainter = xmlNode.child(SNcPainter::GetClassName());
     xmlNcPainter.set_userdata(1);
