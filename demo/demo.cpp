@@ -333,7 +333,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), _T("resprovider_zip"));
 
 		ZIPRES_PARAM param;
-		param.ZipFile(pRenderFactory, _T("uires.zip"), "souizip");
+		ZipFile(&param,pRenderFactory, _T("uires.zip"), "souizip");
 		bLoaded = pResProvider->Init((WPARAM)&param, 0);
 		SASSERT(bLoaded);
 #endif

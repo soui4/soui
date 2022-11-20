@@ -127,7 +127,7 @@ BOOL SResProvider7Zip::Init( WPARAM wParam,LPARAM lParam )
 		m_childDir.TrimRight(L'/');
 		m_childDir += L"\\";
 	}
-	if (zipParam->type == ZIP7RES_PARAM::ZIPFILE)
+	if (zipParam->type == ZIP7_FILE)
 		return _Init(zipParam->pszZipFile,zipParam->pszPsw);
 	else
 		return _Init(zipParam->peInfo.hInst,zipParam->peInfo.pszResName,zipParam->peInfo.pszResType,zipParam->pszPsw);

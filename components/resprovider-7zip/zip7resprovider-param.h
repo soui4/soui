@@ -3,9 +3,10 @@
 namespace SOUI
 {
     struct IRenderFactory;
+    typedef enum { ZIP7_FILE, ZIP7_PEDATA } ZIP7_TYPE;
     struct ZIP7RES_PARAM
     {
-        enum {ZIPFILE,PEDATA} type;
+        ZIP7_TYPE type;
         IRenderFactory *pRenderFac;
         union{
             LPCTSTR pszZipFile;
@@ -18,23 +19,25 @@ namespace SOUI
         };
         LPCSTR          pszPsw; 
 		LPCTSTR			pszChildDir;
-        void ZipFile(IRenderFactory *_pRenderFac,LPCTSTR _pszFile,LPCSTR _pszPsw =NULL, LPCTSTR _pszChildDir = NULL)
-        {
-            type=ZIPFILE;
-            pszZipFile = _pszFile;
-			pszChildDir = _pszChildDir;
-            pRenderFac = _pRenderFac;
-            pszPsw     = _pszPsw;
-        }
-        void ZipResource(IRenderFactory *_pRenderFac,HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszResType=_T("zip"),LPCSTR _pszPsw =NULL, LPCTSTR _pszChildDir = NULL)
-        {
-            type=PEDATA;
-            pRenderFac = _pRenderFac;
-			pszChildDir = _pszChildDir;
-            peInfo.hInst=hInst;
-            peInfo.pszResName=pszResName;
-            peInfo.pszResType=pszResType;
-            pszPsw     = _pszPsw;
-        }
     };
+    
+         inline   void Zip7File(ZIP7RES_PARAM *param,IRenderFactory *_pRenderFac,LPCTSTR _pszFile,LPCSTR _pszPsw =NULL, LPCTSTR _pszChildDir = NULL)
+        {
+            param->type=ZIP7_FILE;
+            param->pszZipFile = _pszFile;
+			param->pszChildDir = _pszChildDir;
+            param->pRenderFac = _pRenderFac;
+            param->pszPsw     = _pszPsw;
+        }
+       inline  void Zip7Resource(ZIP7RES_PARAM *param,IRenderFactory *_pRenderFac,HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszResType=_T("zip"),LPCSTR _pszPsw =NULL, LPCTSTR _pszChildDir = NULL)
+        {
+            param->type=ZIP7_PEDATA;
+            param->pRenderFac = _pRenderFac;
+			param->pszChildDir = _pszChildDir;
+            param->peInfo.hInst=hInst;
+            param->peInfo.pszResName=pszResName;
+            param->peInfo.pszResType=pszResType;
+            param->pszPsw     = _pszPsw;
+        }
+
 }
