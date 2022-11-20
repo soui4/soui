@@ -725,13 +725,23 @@ IObject * SApplication::CreateObject(LPCWSTR pszName,SObjectType nType) const
 			return pRet;
 		}
 	}
-	SObjectInfo objInfo(pszName,nType);
+	SObjectInfo objInfo = ObjInfo_New(pszName,nType);
 	return SObjectFactoryMgr::CreateObject(objInfo);
 }
 
 void SApplication::SetCreateObjectCallback(THIS_ FunCreateObject cbCreateObj)
 {
 	m_cbCreateObj = cbCreateObj;
+}
+
+BOOL SApplication::RegisterObjFactory(THIS_ const IObjectFactory *objFac,BOOL bReplace)
+{
+	return RegisterFactory(objFac,bReplace);
+}
+
+BOOL SApplication::UnregisterObjFactory(THIS_ const IObjectFactory *objFac)
+{
+	return UnregisterFactory(objFac->GetObjectInfo());
 }
 
 SNSEND

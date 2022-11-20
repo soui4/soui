@@ -163,6 +163,10 @@ class SOUI_EXP SApplication
 	STDMETHOD_(IObject *,CreateObject)(THIS_ LPCWSTR pszName,SObjectType nType) SCONST OVERRIDE;
 
 	STDMETHOD_(void,SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) OVERRIDE;
+
+	STDMETHOD_(BOOL,RegisterObjFactory)(THIS_ const IObjectFactory *objFac,BOOL bReplace DEF_VAL(FALSE)) OVERRIDE;
+	STDMETHOD_(BOOL,UnregisterObjFactory)(THIS_ const IObjectFactory *objFac) OVERRIDE;
+
   public:
     /**
      * Init
@@ -201,33 +205,33 @@ class SOUI_EXP SApplication
     SStringT GetAppDir() const;
 
     template <class T>
-    bool RegisterWindowClass()
+    BOOL RegisterWindowClass()
     {
         if (T::GetClassType() != Window)
-            return false;
+            return FALSE;
         return TplRegisterFactory<T>();
     }
 
     template <class T>
-    bool UnregisterWindowClass()
+    BOOL UnregisterWindowClass()
     {
         if (T::GetClassType() != Window)
-            return false;
+            return FALSE;
         return TplUnregisterFactory<T>();
     }
     template <class T>
-    bool RegisterSkinClass()
+    BOOL RegisterSkinClass()
     {
         if (T::GetClassType() != Skin)
-            return false;
+            return FALSE;
         return TplRegisterFactory<T>();
     }
 
     template <class T>
-    bool UnregisterSkinClass()
+    BOOL UnregisterSkinClass()
     {
         if (T::GetClassType() != Skin)
-            return false;
+            return FALSE;
         return TplUnregisterFactory<T>();
     }
 

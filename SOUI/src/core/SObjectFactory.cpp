@@ -5,6 +5,22 @@
 
 SNSBEGIN
 
+
+SObjectInfo ObjInfo_New(LPCWSTR name,int type){
+	SObjectInfo ret;
+	SStringW strName(name);
+	strName.MakeLower();
+	SASSERT(strName.GetLength()<MAX_OBJNAME);
+	wcscpy(ret.szName,strName.c_str());
+	ret.nType = type;
+	return ret;
+}
+
+BOOL ObjInfo_IsValid(const SObjectInfo* pObjInfo)
+{
+	return pObjInfo->nType >= None && pObjInfo->szName[0]!=0;
+}
+
 SObjectFactoryMgr::SObjectFactoryMgr(void)
 {
     m_pFunOnKeyRemoved = OnFactoryRemoved;
@@ -18,21 +34,21 @@ SObjectFactoryMgr::SObjectFactoryMgr(void)
 // Parameter: SObjectFactory * pWndFactory:窗口工厂指针
 // Parameter: bool bReplace:强制替换原有工厂标志
 //************************************
-bool SObjectFactoryMgr::RegisterFactory(const SObjectFactory &objFactory, bool bReplace)
+BOOL SObjectFactoryMgr::RegisterFactory(const IObjectFactory *objFactory, BOOL bReplace)
 {
-    if (HasKey(objFactory.GetObjectInfo()))
+    if (HasKey(objFactory->GetObjectInfo()))
     {
         if (!bReplace)
-            return false;
-        RemoveKeyObject(objFactory.GetObjectInfo());
+            return FALSE;
+        RemoveKeyObject(objFactory->GetObjectInfo());
     }
-    AddKeyObject(objFactory.GetObjectInfo(), objFactory.Clone());
-    return true;
+    AddKeyObject(objFactory->GetObjectInfo(), objFactory->Clone());
+    return TRUE;
 }
 
 void SObjectFactoryMgr::OnFactoryRemoved(const SObjectFactoryPtr &obj)
 {
-    delete obj;
+    obj->Release();
 }
 
 //************************************
@@ -43,9 +59,9 @@ void SObjectFactoryMgr::OnFactoryRemoved(const SObjectFactoryPtr &obj)
 // Parameter: SWindowFactory * pWndFactory
 //************************************
 
-bool SObjectFactoryMgr::UnregisterFactory(const SObjectInfo &objInfo)
+BOOL SObjectFactoryMgr::UnregisterFactory(const SObjectInfo &objInfo)
 {
-    return RemoveKeyObject(objInfo);
+    return (BOOL)RemoveKeyObject(objInfo);
 }
 
 IObject *SObjectFactoryMgr::CreateObject(const SObjectInfo &objInfo) const
@@ -68,10 +84,10 @@ SObjectInfo SObjectFactoryMgr::BaseObjectInfoFromObjectInfo(const SObjectInfo &o
     }
 
     SStringW strBaseClass = GetKeyObject(objInfo)->BaseClassName();
-    if (strBaseClass == objInfo.mName)
+    if (strBaseClass == objInfo.szName)
         return SObjectInfo();
 
-    return SObjectInfo(strBaseClass, objInfo.mType);
+    return ObjInfo_New(strBaseClass, objInfo.nType);
 }
 
 void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
@@ -111,7 +127,7 @@ void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
 
 IObject *SObjectFactoryMgr::OnCreateUnknownObject(const SObjectInfo &objInfo) const
 {
-    SSLOGFMTD(L"Warning: no object %s of type:%d in SOUI!!", (LPCWSTR)objInfo.mName, objInfo.mType);
+    SSLOGFMTD(L"Warning: no object %s of type:%d in SOUI!!", objInfo.szName, objInfo.nType);
     return NULL;
 }
 

@@ -13,37 +13,12 @@
 
 #pragma once
 #include <core/SCmnMap.h>
-
+#include <helper/obj-ref-impl.hpp>
 SNSBEGIN
-class SOUI_EXP SObjectInfo {
-  public:
-    SObjectInfo(const SStringW &name = L"", int type = None)
-        : mName(name)
-        , mType(type)
-    {
-        mName.MakeLower();
-    }
 
-    bool operator==(const SObjectInfo &src) const
-    {
-        return src.mType == mType && src.mName.Compare(mName) == 0;
-    }
+SOUI_EXP SObjectInfo  ObjInfo_New(LPCWSTR name,int type);
 
-    bool IsValid() const
-    {
-        return mType >= None && !mName.IsEmpty();
-    }
-
-    ULONG Hash() const
-    {
-        ULONG uRet = CElementTraits<SStringW>::Hash(mName);
-        uRet = (uRet << 5) + mType;
-        return uRet;
-    }
-
-    SStringW mName;
-    int mType;
-};
+SOUI_EXP BOOL ObjInfo_IsValid(const SObjectInfo* pObjInfo);
 
 /**
  * @class     CElementTraits< SObjectInfo >
@@ -56,57 +31,52 @@ class CElementTraits<SObjectInfo> : public CElementTraitsBase<SObjectInfo> {
   public:
     static ULONG Hash(INARGTYPE objInfo)
     {
-        return objInfo.Hash();
+		ULONG uRet = CElementTraits<SStringW>::Hash(objInfo.szName);
+		uRet = (uRet << 5) + objInfo.nType;
+		return uRet;
     }
 
     static bool CompareElements(INARGTYPE obj1, INARGTYPE obj2)
     {
-        return obj1 == obj2;
+        return obj1.nType == obj2.nType && wcsicmp(obj1.szName,obj2.szName)== 0;
     }
-};
-
-class SObjectFactory {
-  public:
-    virtual ~SObjectFactory()
-    {
-    }
-    virtual IObject *NewObject() const = 0;
-    virtual LPCWSTR BaseClassName() const = 0;
-    virtual SObjectInfo GetObjectInfo() const = 0;
-    virtual SObjectFactory *Clone() const = 0;
 };
 
 template <typename T>
-class TplSObjectFactory : public SObjectFactory {
+class TplSObjectFactory : public TObjRefImpl<IObjectFactory>{
   public:
     //! Default constructor.
     TplSObjectFactory()
     {
     }
+	
+	STDMETHOD_(void,OnFinalRelease)(THIS){
+		delete this;
+	}
 
-    LPCWSTR BaseClassName() const
+	STDMETHOD_(LPCWSTR,BaseClassName)(CTHIS) SCONST OVERRIDE
     {
         return T::BaseClassName();
     }
 
-    virtual IObject *NewObject() const
+    STDMETHOD_(IObject *,NewObject)(CTHIS) SCONST OVERRIDE
     {
         return new T;
     }
 
-    virtual TplSObjectFactory *Clone() const
+    STDMETHOD_(IObjectFactory *,Clone)(CTHIS) SCONST OVERRIDE
     {
         return new TplSObjectFactory<T>();
     }
 
     // 通过 SObjectFactory 继承
-    virtual SObjectInfo GetObjectInfo() const
+    STDMETHOD_(SObjectInfo,GetObjectInfo)(CTHIS) SCONST OVERRIDE
     {
-        return SObjectInfo(T::GetClassName(), T::GetClassType());
+        return ObjInfo_New(T::GetClassName(), T::GetClassType());
     }
 };
 
-typedef SObjectFactory *SObjectFactoryPtr;
+typedef IObjectFactory * SObjectFactoryPtr;
 
 class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo> {
   public:
@@ -120,7 +90,7 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
     // Parameter: SObjectFactory * pWndFactory:窗口工厂指针
     // Parameter: bool bReplace:强制替换原有工厂标志
     //************************************
-    bool RegisterFactory(const SObjectFactory &objFactory, bool bReplace = false);
+    BOOL RegisterFactory(const IObjectFactory *objFactory, BOOL bReplace = false);
 
     //************************************
     // Method:    UnregisterFactor,反注册APP自定义的窗口类
@@ -129,22 +99,22 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
     // Qualifier:
     // Parameter: SWindowFactory * pWndFactory
     //************************************
-    bool UnregisterFactory(const SObjectInfo &objInfo);
+    BOOL UnregisterFactory(const SObjectInfo &objInfo);
 
     void SetSwndDefAttr(IObject *pObject) const;
 
     SObjectInfo BaseObjectInfoFromObjectInfo(const SObjectInfo &objInfo);
 
     template <class T>
-    bool TplRegisterFactory()
+    BOOL TplRegisterFactory()
     {
-        return RegisterFactory(TplSObjectFactory<T>());
+        return RegisterFactory(&TplSObjectFactory<T>());
     }
 
     template <class T>
-    bool TplUnregisterFactory()
+    BOOL TplUnregisterFactory()
     {
-        return UnregisterFactory(SObjectInfo(T::GetClassName(), T::GetClassType()));
+        return UnregisterFactory(ObjInfo_New(T::GetClassName(), T::GetClassType()));
     }
 
   protected:

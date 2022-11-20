@@ -14,6 +14,7 @@
 #include <interface/SAnimation-i.h>
 #include <interface/SValueAnimator-i.h>
 #include <interface/SNotifyCenter-i.h>
+#include <interface/SObjFactory-i.h>
 SNSBEGIN
 
 typedef enum _SingletonType
@@ -289,6 +290,9 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @return void
      */
 	STDMETHOD_(void,SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) PURE;
+
+	STDMETHOD_(BOOL,RegisterObjFactory)(THIS_ const IObjectFactory *objFac,BOOL bReplace DEF_VAL(FALSE)) PURE;
+	STDMETHOD_(BOOL,UnregisterObjFactory)(THIS_ const IObjectFactory *objFac) PURE;
 };
 
 SNSEND
