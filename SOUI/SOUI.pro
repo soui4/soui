@@ -89,6 +89,7 @@ HEADERS += include/SApp.h \
            include/interface/stimer-i.h \
            include/interface/SMessageBox-i.h \
            include/interface/SNotifyCenter-i.h \
+           include/interface/SObjFactory-i.h \
            include/proxy/SNativeWndProxy.h \
            include/proxy/SHostWndProxy.h \
            include/proxy/SPanelProxy.h \

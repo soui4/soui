@@ -191,6 +191,8 @@
 			<File
 				RelativePath="include\wtl.mini\msgcrack.h" />
 			<File
+				RelativePath="include\interface\obj-ref-i.h" />
+			<File
 				RelativePath="include\pugixml\pugiconfig.hpp" />
 			<File
 				RelativePath="include\pugixml\pugixml.hpp" />

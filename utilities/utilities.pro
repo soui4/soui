@@ -43,6 +43,7 @@ HEADERS += resource.h \
            include/helper/SNoCopyable.hpp \
            include/helper/SSemaphore.h \
            include/helper/SSharedPtr.hpp \
+           include/interface/obj-ref-i.h \
            include/interface/sstring-i.h \
            include/interface/sxml-i.h \
            include/pugixml/pugiconfig.hpp \
