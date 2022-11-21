@@ -265,15 +265,7 @@ class SOUI_EXP SImageButton : public SButton {
     SImageButton();
 
   protected:
-    /**
-     * SButton::GetDesiredSize
-     * @brief    获得期望的大小值
-     * @param    int wid -- 容器宽度
-     * @param    int hei -- 容器高度
-     *
-     * Describe  根据内容窗体矩形大小，计算出适合的大小
-     */
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
+    SIZE MeasureContent(int wid, int hei) override;
 };
 
 /**
@@ -433,15 +425,7 @@ class SOUI_EXP SAnimateImgWnd
     }
 
   protected:
-    /**
-     * SAnimateImgWnd::GetDesiredSize
-     * @brief    获取预期大小
-     * @param    LPRECT pRcContainer  --  内容矩形框
-     * @return   返回值 CSize对象
-     *
-     * Describe  根据矩形的大小，获取预期大小(解释有点不对)
-     */
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
+    virtual SIZE MeasureContent(int wid, int hei);
     STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
     virtual void OnColorize(COLORREF cr);
     virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
@@ -678,16 +662,8 @@ class SOUI_EXP SCheckBox : public SWindow {
      * Describe  获取复选框矩形
      */
     CRect GetCheckRect();
-    /**
-     * SCheckBox::GetDesiredSize
-     * @brief    获取预期大小
-     * @param    int wid -- 容器宽度
-     * @param    int hei -- 容器高度
-     * @return   返回值 CSize对象
-     *
-     * Describe  根据矩形的大小，获取预期大小(解释有点不对)
-     */
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
+
+    SIZE MeasureContent(int wid, int hei) override;
     /**
      * SCheckBox::GetTextRect
      * @brief    获取文本大小
@@ -777,7 +753,7 @@ class SOUI_EXP SIconWnd : public TWindowProxy<IIconWnd> {
 	STDMETHOD_(void, SetIcon)(THIS_ HICON hIcon) OVERRIDE;
 
   protected:
-	STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
+	SIZE MeasureContent(int wid, int hei) override;
 
 	void OnPaint(IRenderTarget *pRT);
 
@@ -831,14 +807,8 @@ class SOUI_EXP SRadioBox : public SWindow {
      * Describe
      */
     virtual void GetTextRect(LPRECT pRect);
-    /**
-     * SRadioBox::GetDesiredSize
-     * @brief    获取预期大小值
-     * @param    LPRECT pRcContainer -- 内容窗口Rect
-     *
-     * Describe  获取预期大小值
-     */
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
+    
+    SIZE MeasureContent(int wid, int hei) OVERRIDE;
     /**
      * SRadioBox::OnGetDlgCode
      * @brief    获取消息编码
@@ -995,7 +965,7 @@ class SOUI_EXP SToggle : public SCheckBox {
     BOOL GetToggle();
 
   protected:
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) OVERRIDE;
+    SIZE MeasureContent(int nParentWid, int nParentHei) override;
     virtual BOOL NeedRedrawWhenStateChange()
     {
         return TRUE;

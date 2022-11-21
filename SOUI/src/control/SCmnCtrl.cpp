@@ -564,16 +564,10 @@ SImageButton::SImageButton()
     m_bDrawFocusRect = FALSE;
 }
 
-SIZE SImageButton::GetDesiredSize(int wid, int hei)
+SIZE SImageButton::MeasureContent(int wid, int hei)
 {
     SASSERT(m_pBgSkin);
-    CSize szRet = SButton::GetDesiredSize(wid, hei);
-    CSize szSkin = m_pBgSkin->GetSkinSize();
-    if (GetLayoutParam()->IsWrapContent(Horz))
-        szRet.cx = szSkin.cx;
-    if (GetLayoutParam()->IsWrapContent(Vert))
-        szRet.cy = szSkin.cy;
-    return szRet;
+	return m_pBgSkin->GetSkinSize();
 }
 //////////////////////////////////////////////////////////////////////////
 // Image Control
@@ -788,7 +782,7 @@ void SAnimateImgWnd::OnDestroy()
     __baseCls::OnDestroy();
 }
 
-SIZE SAnimateImgWnd::GetDesiredSize(int wid, int hei)
+SIZE SAnimateImgWnd::MeasureContent(int wid, int hei)
 {
     CSize szRet;
     if (m_pSkin)
@@ -1077,11 +1071,11 @@ void SCheckBox::DrawFocus(IRenderTarget *pRT)
     }
 }
 
-SIZE SCheckBox::GetDesiredSize(int wid, int hei)
+SIZE SCheckBox::MeasureContent(int wid, int hei)
 {
     SASSERT(m_pSkin);
     CSize szCheck = m_pSkin->GetSkinSize();
-    CSize szRet = __baseCls::GetDesiredSize(wid, hei);
+    CSize szRet = __baseCls::MeasureContent(wid, hei);
     szRet.cx += szCheck.cx + CheckBoxSpacing;
     szRet.cy = smax(szRet.cy, szCheck.cy);
     return szRet;
@@ -1153,7 +1147,7 @@ void SIconWnd::OnPaint(IRenderTarget *pRT)
         pRT->DrawIconEx(rcClient.left, rcClient.top, m_theIcon, rcClient.Width(), rcClient.Height(), DI_NORMAL);
 }
 
-SIZE SIconWnd::GetDesiredSize(int wid, int hei)
+SIZE SIconWnd::MeasureContent(int wid, int hei)
 {
     if (!m_theIcon)
         return CSize();
@@ -1273,9 +1267,9 @@ void SRadioBox::DrawFocus(IRenderTarget *pRT)
     }
 }
 
-SIZE SRadioBox::GetDesiredSize(int wid, int hei)
+SIZE SRadioBox::MeasureContent(int wid, int hei)
 {
-    CSize szRet = __baseCls::GetDesiredSize(wid, hei);
+    CSize szRet = __baseCls::MeasureContent(wid, hei);
     CSize szRaio = m_pSkin->GetSkinSize();
     szRet.cx += szRaio.cx + m_nRadioBoxSpacing;
     szRet.cy = smax(szRet.cy, szRaio.cy);
@@ -1466,7 +1460,7 @@ void SToggle::OnPaint(IRenderTarget *pRT)
     m_pSkin->DrawByState(pRT, GetWindowRect(), GetState());
 }
 
-SIZE SToggle::GetDesiredSize(int wid, int hei)
+SIZE SToggle::MeasureContent(int wid, int hei)
 {
     CSize sz;
     if (m_pSkin)
@@ -1560,7 +1554,8 @@ RECT SGroup::GetChildrenLayoutRect() const
 SIZE SGroup::GetDesiredSize(int nParentWid, int nParentHei)
 {
     CSize szRet = __baseCls::GetDesiredSize(nParentWid, nParentHei);
-    szRet.cy += m_nHeaderHeight.toPixelSize(GetScale());
+	if(GetLayoutParam()->IsWrapContent(Vert))
+		szRet.cy += m_nHeaderHeight.toPixelSize(GetScale());
     return szRet;
 }
 
