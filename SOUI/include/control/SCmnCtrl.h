@@ -351,15 +351,7 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
     virtual void OnColorize(COLORREF cr);
 
     virtual void OnScaleChanged(int scale);
-    /**
-     * SImageWnd::GetDesiredSize
-     * @brief    获取预期大小
-     * @param    LPRECT pRcContainer  --  内容矩形框
-     * @return   返回值 CSize对象
-     *
-     * Describe  根据矩形的大小，获取预期大小(解释有点不对)
-     */
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
+	virtual SIZE MeasureContent(int nParentWid, int nParentHei);
 
     int m_iTile;                   /**<绘制是否平铺,0--位伸（默认），1--不变常规绘制, 2--平铺 */
     BOOL m_bManaged;               /**< 是否要自动释放当前的m_pSkin对象 */

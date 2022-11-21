@@ -706,13 +706,16 @@ BOOL SImageWnd::SetIcon(int nSubID)
     return TRUE;
 }
 
-SIZE SImageWnd::GetDesiredSize(int wid, int hei)
+SIZE SImageWnd::MeasureContent(int wid, int hei)
 {
     CSize szRet;
     if (m_pImg)
         szRet = m_pImg->Size();
     else if (m_pSkin)
         szRet = m_pSkin->GetSkinSize();
+	CRect rcPadding = GetStyle().GetPadding();
+	szRet.cx += rcPadding.left + rcPadding.right;
+	szRet.cy += rcPadding.top + rcPadding.bottom;
     return szRet;
 }
 

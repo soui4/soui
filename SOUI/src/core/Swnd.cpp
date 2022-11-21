@@ -1054,7 +1054,6 @@ void SWindow::_PaintClient(IRenderTarget *pRT)
             if (IsCacheDirty())
             {
                 pRTCache->ClearRect(&rcWnd, 0);
-                pRTCache->AlphaBlend(rcWnd, pRT, rcWnd, 255);
 
                 SAutoRefPtr<IFontS> oldFont;
                 COLORREF crOld = pRT->GetTextColor();
