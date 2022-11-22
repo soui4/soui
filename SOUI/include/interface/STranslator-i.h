@@ -65,7 +65,8 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
      *
      * Describe
      */
-    STDMETHOD_(void, GetName)(THIS_ wchar_t szBuf[TR_MAX_NAME_LEN]) PURE;
+    STDMETHOD_(void, GetName)(CTHIS_ wchar_t szBuf[TR_MAX_NAME_LEN]) SCONST PURE;
+    STDMETHOD_(void, GetNameA)(CTHIS_ IStringA *str) SCONST PURE;
 
     /**
      * @brief 比较翻译的Name
@@ -73,7 +74,9 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
      * @return TRUE--相同
      */
 
-    STDMETHOD_(BOOL, NameEqual)(THIS_ LPCWSTR pszName) PURE;
+    STDMETHOD_(BOOL, NameEqual)(CTHIS_ LPCWSTR pszName)SCONST  PURE;
+    STDMETHOD_(BOOL, NameEqualA)(CTHIS_ const IStringA * str)SCONST  PURE;
+
     /**
      * guid
      * @brief    获取翻译资源的ID
@@ -81,7 +84,7 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
      *
      * Describe
      */
-    STDMETHOD_(GUID, guid)(THIS) PURE;
+    STDMETHOD_(GUID, guid)(CTHIS)SCONST  PURE;
     /**
      * tr
      * @brief    执行翻译的接口
@@ -127,14 +130,17 @@ DECLARE_INTERFACE_(ITranslatorMgr, IObjRef)
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+	STDMETHOD_(BOOL,IsValid)(CTHIS) SCONST PURE;
     /**
      * SetLanguage
      * @brief    设置翻译模块当前接受的语言
-     * @param [in] const SStringW & strLang --  翻译语言
+     * @param [in] LPCWSTR pszLang --  翻译语言
      *
      * Describe 自动清除语言和目标语言不同的模块
      */
-    STDMETHOD_(void, SetLanguage)(THIS_ const IStringW *strLang) PURE;
+    STDMETHOD_(void, SetLanguage)(THIS_ LPCWSTR pszLang) PURE;
+    STDMETHOD_(void, SetLanguageA)(THIS_ LPCSTR pszLang) PURE;
 
     /**
      * GetLanguage
@@ -144,6 +150,7 @@ DECLARE_INTERFACE_(ITranslatorMgr, IObjRef)
      * Describe
      */
     STDMETHOD_(void, GetLanguage)(CTHIS_ wchar_t szOut[TR_MAX_NAME_LEN]) SCONST PURE;
+    STDMETHOD_(void, GetLanguageA)(CTHIS_ IStringA *out) SCONST PURE;
 
     /**
      * CreateTranslator

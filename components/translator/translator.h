@@ -39,11 +39,13 @@ public:
 	~STranslator();
 
 	STDMETHOD_(BOOL,Load)(THIS_ LPVOID pData,UINT uType);
-	STDMETHOD_(void, GetName)(THIS_ wchar_t szBuf[TR_MAX_NAME_LEN]);
-	STDMETHOD_( BOOL, NameEqual)(THIS_ LPCWSTR pszName);
-	STDMETHOD_(GUID,guid)(THIS);
-	STDMETHOD_(int,tr)(THIS_ const IStringW * strSrc,const IStringW * strCtx,wchar_t *pszOut,int nLen) SCONST;
-	STDMETHOD_(void,getFontInfo)(THIS_ IStringW * strFont) SCONST;
+	STDMETHOD_(void, GetName)(CTHIS_ wchar_t szBuf[TR_MAX_NAME_LEN]) SCONST;
+	STDMETHOD_(void, GetNameA)(CTHIS_ IStringA *out) SCONST;
+	STDMETHOD_( BOOL, NameEqual)(CTHIS_ LPCWSTR pszName) SCONST;
+	STDMETHOD_( BOOL, NameEqualA)(CTHIS_ const IStringA *strName) SCONST;
+	STDMETHOD_(GUID,guid)(CTHIS) SCONST;
+	STDMETHOD_(int,tr)(CTHIS_ const IStringW * strSrc,const IStringW * strCtx,wchar_t *pszOut,int nLen) SCONST;
+	STDMETHOD_(void,getFontInfo)(CTHIS_ IStringW * strFont) SCONST;
 protected:
 	BOOL LoadFromXml(SXmlNode xmlLang);
 
@@ -59,8 +61,13 @@ public:
 	STranslatorMgr(void);
 	~STranslatorMgr(void);
 
-	STDMETHOD_(void ,SetLanguage)(THIS_ const IStringW * strLang);
+	STDMETHOD_(BOOL,IsValid)(CTHIS) SCONST {
+		return TRUE;
+	}
+	STDMETHOD_(void ,SetLanguage)(THIS_ LPCWSTR strLang);
+	STDMETHOD_(void ,SetLanguageA)(THIS_ LPCSTR strLang);
 	STDMETHOD_(void,GetLanguage)(THIS_ wchar_t szOut[TR_MAX_NAME_LEN]) SCONST;
+	STDMETHOD_(void,GetLanguageA)(THIS_ IStringA * out) SCONST;
 	STDMETHOD_(BOOL,CreateTranslator)(THIS_ ITranslator ** ppTranslator);
 	STDMETHOD_(BOOL,InstallTranslator)(THIS_ ITranslator * ppTranslator);
 	STDMETHOD_(BOOL,UninstallTranslator)(THIS_ REFGUID id);

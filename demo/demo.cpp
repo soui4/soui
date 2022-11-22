@@ -358,7 +358,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 				langCN->getFontInfo(&strFont);
 				if (!strFont.IsEmpty())
 				{//从翻译文件中获取并设置程序的字体信息
-					SFontPool::getSingletonPtr()->SetDefFontInfo(strFont);
+					theApp->SetDefaultFontInfo(strFont);
 				}
 			}
 		}

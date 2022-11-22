@@ -91,18 +91,18 @@ STranslator::~STranslator()
 	delete m_arrEntry;
 }
 
-void STranslator::GetName(wchar_t szName[TR_MAX_NAME_LEN])
+void STranslator::GetName(wchar_t szName[TR_MAX_NAME_LEN]) const
 {
 	wcscpy_s(szName,TR_MAX_NAME_LEN,m_szLangName);
 }
 
 
-BOOL STranslator::NameEqual(LPCWSTR pszName)
+BOOL STranslator::NameEqual(LPCWSTR pszName) const
 {
 	return wcscmp(m_szLangName,pszName) == 0;
 }
 
-GUID STranslator::guid()
+GUID STranslator::guid() const
 {
 	return m_guid;
 }
@@ -202,6 +202,21 @@ void STranslator::getFontInfo(IStringW *strFont) const
 	strFont->Copy(&m_strFontInfo);
 }
 
+void STranslator::GetNameA(CTHIS_ IStringA *out) const
+{
+	wchar_t buf[TR_MAX_NAME_LEN]={0};
+	GetName(buf);
+	SStringA str=S_CW2A(buf,CP_UTF8);
+	out->Copy(&str);
+}
+
+BOOL STranslator::NameEqualA(CTHIS_ const IStringA *strName) const
+{
+	SStringA str(strName);
+	SStringW strW=S_CA2W(str,CP_UTF8);
+	return NameEqual(strW);
+}
+
 //////////////////////////////////////////////////////////////////////////
 //  STranslator
 BOOL STranslatorMgr::InstallTranslator(ITranslator *pTranslator)
@@ -281,9 +296,9 @@ BOOL STranslatorMgr::CreateTranslator( ITranslator ** ppTranslator )
 }
 
 
-void STranslatorMgr::SetLanguage(const IStringW * strLang)
+void STranslatorMgr::SetLanguage(LPCWSTR strLang)
 {
-	if (strLang->Compare(m_szLangName)!=0)
+	if (wcsicmp(m_szLangName,strLang)!=0)
 	{
 		SPOSITION pos = m_lstLang->GetHeadPosition();
 		while (pos)
@@ -293,12 +308,25 @@ void STranslatorMgr::SetLanguage(const IStringW * strLang)
 		}
 		m_lstLang->RemoveAll();
 	}
-	wcscpy_s(m_szLangName,TR_MAX_NAME_LEN, strLang->c_str());
+	wcscpy_s(m_szLangName,TR_MAX_NAME_LEN, strLang);
 }
+
+void STranslatorMgr::SetLanguageA(THIS_ LPCSTR pszLang)
+{
+	SStringW strLang = S_CA2W(pszLang,CP_UTF8);
+	SetLanguage(strLang);
+}
+
 
 void STranslatorMgr::GetLanguage(wchar_t szName[TR_MAX_NAME_LEN]) const
 {
 	wcscpy_s(szName,TR_MAX_NAME_LEN,m_szLangName);
+}
+
+void STranslatorMgr::GetLanguageA(THIS_ IStringA * out) const
+{
+	SStringA str=S_CW2A(m_szLangName,CP_UTF8);
+	out->Copy(&str);
 }
 
 //////////////////////////////////////////////////////////////////////////

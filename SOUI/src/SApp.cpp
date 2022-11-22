@@ -42,13 +42,24 @@ SNSBEGIN
 
 class SNullTranslator : public TObjRefImpl<ITranslatorMgr> {
   public:
-    STDMETHOD_(void, SetLanguage)(THIS_ const IStringW *strLang)
+	  STDMETHOD_(BOOL,IsValid)(CTHIS) SCONST {
+		  return FALSE;
+	  }
+
+    STDMETHOD_(void, SetLanguage)(THIS_ LPCWSTR strLang)
     {
     }
+	STDMETHOD_(void, SetLanguageA)(THIS_ LPCSTR strLang)
+	{
+	}
     STDMETHOD_(void, GetLanguage)(THIS_ wchar_t szOut[TR_MAX_NAME_LEN]) SCONST
     {
         szOut[0] = 0;
     }
+	STDMETHOD_(void, GetLanguageA)(THIS_ IStringA *out) SCONST
+	{
+	}
+
     STDMETHOD_(BOOL, CreateTranslator)(THIS_ ITranslator **ppTranslator)
     {
         return FALSE;
@@ -742,6 +753,11 @@ BOOL SApplication::RegisterObjFactory(THIS_ const IObjectFactory *objFac,BOOL bR
 BOOL SApplication::UnregisterObjFactory(THIS_ const IObjectFactory *objFac)
 {
 	return UnregisterFactory(objFac->GetObjectInfo());
+}
+
+void SApplication::SetDefaultFontInfo(THIS_ LPCWSTR pszFontInfo)
+{
+	SFontPool::getSingletonPtr()->SetDefFontInfo(pszFontInfo);
 }
 
 SNSEND
