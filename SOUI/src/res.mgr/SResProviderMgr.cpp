@@ -80,7 +80,7 @@ void SResProviderMgr::AddResProviderA(IResProvider *pResProvider, LPCSTR pszUide
 {
 	if(!pszUidef)
 		return AddResProvider(pResProvider,NULL);
-	SStringT strUiDef = S_CA2T(pszUidef);
+	SStringT strUiDef = S_CA2T(pszUidef,CP_UTF8);
 	return AddResProvider(pResProvider,strUiDef.c_str());
 }
 

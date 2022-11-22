@@ -200,7 +200,7 @@ SStringT SWindow::GetWindowText(BOOL bRawText /*=FALSE*/)
 int SWindow::GetWindowTextA(THIS_ IStringA *pStr, BOOL bRawText)
 {
 	SStringT strText = GetWindowText(bRawText);
-	SStringA strA = S_CT2A(strText);
+	SStringA strA = S_CT2A(strText,CP_UTF8);
 	pStr->Copy(&strA);
 	return pStr->GetLength();
 }
@@ -253,7 +253,7 @@ void SWindow::SetWindowText(LPCTSTR lpszText)
 
 void SWindow::SetWindowTextA(THIS_ LPCSTR lpszText)
 {
-	SStringT str=S_CA2T(lpszText);
+	SStringT str=S_CA2T(lpszText,CP_UTF8);
 	return SetWindowText(str);
 }
 
@@ -3175,7 +3175,7 @@ void SWindow::SetToolTipText(LPCTSTR pszText)
 
 void SWindow::SetToolTipTextA(LPCSTR pszText)
 {
-	SStringT str=S_CA2T(pszText);
+	SStringT str=S_CA2T(pszText,CP_UTF8);
 	return SetToolTipText(str);
 }
 

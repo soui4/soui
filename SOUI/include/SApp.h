@@ -140,19 +140,19 @@ class SOUI_EXP SApplication
 
     STDMETHOD_(IXmlDoc *, LoadXmlDocment)(THIS_ LPCTSTR strResId) OVERRIDE;
 	STDMETHOD_(IXmlDoc *, LoadXmlDocmentA)(THIS_ LPCSTR strResId) OVERRIDE{
-		SStringT str = S_CA2T(strResId);
+		SStringT str = S_CA2T(strResId,CP_UTF8);
 		return LoadXmlDocment(str);
 	}
 
     STDMETHOD_(IAnimation *, LoadAnimation)(THIS_ LPCTSTR strResId) OVERRIDE;
 	STDMETHOD_(IAnimation *, LoadAnimationA)(THIS_ LPCSTR strResId) OVERRIDE{
-		SStringT str = S_CA2T(strResId);
+		SStringT str = S_CA2T(strResId,CP_UTF8);
 		return LoadAnimation(str);
 	}
 
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) OVERRIDE;
 	STDMETHOD_(IValueAnimator *, LoadValueAnimatorA)(THIS_ LPCSTR strResId) OVERRIDE{
-		SStringT str = S_CA2T(strResId);
+		SStringT str = S_CA2T(strResId,CP_UTF8);
 		return LoadValueAnimator(str);
 	}
 

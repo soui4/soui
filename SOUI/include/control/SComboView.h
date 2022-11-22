@@ -22,7 +22,7 @@ class SOUI_EXP SComboView : public TComboBaseProxy<IComboView> {
 	STDMETHOD_(BOOL, GetItemTextA)(int iItem, BOOL bRawText, IStringA *str) SCONST OVERRIDE{
 		SStringT strBuf;
 		BOOL bRet = GetItemText(iItem,bRawText,&strBuf);
-		SStringA strBufA = S_CT2A(strBuf);
+		SStringA strBufA = S_CT2A(strBuf,CP_UTF8);
 		str->Copy(&strBufA);
 		return bRet;
 	}

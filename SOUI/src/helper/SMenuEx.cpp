@@ -594,7 +594,7 @@ BOOL SMenuEx::LoadMenu(LPCTSTR strMenu)
 
 BOOL SMenuEx::LoadMenuA(THIS_ LPCSTR resId)
 {
-	SStringT strResId = S_CA2T(resId);
+	SStringT strResId = S_CA2T(resId,CP_UTF8);
 	return LoadMenu(strResId);
 }
 

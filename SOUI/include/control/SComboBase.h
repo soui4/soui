@@ -124,7 +124,7 @@ class SOUI_EXP SComboBase
     (THIS_ LPCTSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE;
 	STDMETHOD_(int, FindStringA)
 		(THIS_ LPCSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE{
-			SStringT str = S_CA2T(pszFind);
+			SStringT str = S_CA2T(pszFind,CP_UTF8);
 			return FindString(str,nAfter,bPartMatch);
 	}
 

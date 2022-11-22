@@ -269,7 +269,7 @@ SHostWnd::SHostWnd(LPCWSTR pszResName /*= NULL*/)
 SHostWnd::SHostWnd(LPCSTR pszResName)
 {
 	if(pszResName)
-		m_strXmlLayout = S_CA2T(pszResName);
+		m_strXmlLayout = S_CA2T(pszResName,CP_UTF8);
 	_Init();
 }
 
