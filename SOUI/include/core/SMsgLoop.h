@@ -6,7 +6,7 @@ SNSBEGIN
 
 class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
   public:
-    SMessageLoop();
+    SMessageLoop(IMessageLoop * pParentLoop);
     virtual ~SMessageLoop();
 
   public:
@@ -38,6 +38,8 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
     STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE;
 
+	STDMETHOD_(void, ExecutePendingTask)() OVERRIDE;
+
   public:
     static BOOL IsIdleMessage(MSG *pMsg);
 
@@ -52,6 +54,7 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
     SList<IRunnable *> m_runnables;
     SCriticalSection m_csRunningQueue;
     SList<IRunnable *> m_runningQueue;
+	SAutoRefPtr<IMessageLoop> m_parentLoop;
     DWORD m_tid;
 };
 

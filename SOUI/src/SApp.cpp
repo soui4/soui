@@ -104,9 +104,9 @@ class SDefToolTipFactory : public TObjRefImpl<IToolTipFactory> {
 
 class SDefMsgLoopFactory : public TObjRefImpl<IMsgLoopFactory> {
   public:
-    STDMETHOD_(HRESULT, CreateMsgLoop)(THIS_ IMessageLoop **ppRet) OVERRIDE
+    STDMETHOD_(HRESULT, CreateMsgLoop)(THIS_ IMessageLoop **ppRet, IMessageLoop *pParentLoop) OVERRIDE
     {
-        *ppRet = new SMessageLoop;
+        *ppRet = new SMessageLoop(pParentLoop);
         return S_OK;
     }
 };

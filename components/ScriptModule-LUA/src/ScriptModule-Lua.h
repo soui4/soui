@@ -11,12 +11,17 @@ extern "C"
 
 SNSBEGIN
 
-class SScriptModule_Lua : public TObjRefImpl<IScriptModule>
+class SScriptModule_Lua : public TObjRefImpl<IScriptModule>, public IIdleHandler
     {
     public:
         SScriptModule_Lua(void);
 
         ~SScriptModule_Lua();
+
+		STDMETHOD_(BOOL, OnIdle)(THIS) {return FALSE;}
+
+		STDMETHOD_(IIdleHandler*, getIdleHandler)(THIS) {return this;}
+
 
 	/**
      * GetScriptEngine

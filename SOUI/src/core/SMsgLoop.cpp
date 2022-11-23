@@ -17,9 +17,10 @@ BOOL RemoveElementFromArray(SArray<T> &arr, T ele)
     return TRUE;
 }
 
-SMessageLoop::SMessageLoop()
+SMessageLoop::SMessageLoop(IMessageLoop * pParentLoop)
     : m_bRunning(FALSE)
     , m_tid(0)
+	, m_parentLoop(pParentLoop)
 {
 }
 
@@ -54,21 +55,7 @@ int SMessageLoop::Run()
     m_bQuit = FALSE;
     for (;;)
     {
-        {
-            m_cs.Enter();
-            m_runningQueue.Swap(m_runnables);
-            m_cs.Leave();
-            for (;;)
-            {
-                SAutoLock lock(m_csRunningQueue);
-                if (m_runningQueue.IsEmpty())
-                    break;
-                IRunnable *pRunnable = m_runningQueue.GetHead();
-                m_runningQueue.RemoveHead();
-                pRunnable->run();
-                pRunnable->Release();
-            }
-        }
+        ExecutePendingTask();
         while (bDoIdle && !::PeekMessage(&m_msg, NULL, 0, 0, PM_NOREMOVE))
         {
             if (!OnIdle(nIdleCount++))
@@ -116,7 +103,7 @@ exit_loop:
     return (int)m_msg.wParam;
 }
 
-BOOL SMessageLoop::OnIdle(int /*nIdleCount*/)
+BOOL SMessageLoop::OnIdle(int nIdleCount)
 {
     for (size_t i = 0; i < m_aIdleHandler.GetCount(); i++)
     {
@@ -124,6 +111,9 @@ BOOL SMessageLoop::OnIdle(int /*nIdleCount*/)
         if (pIdleHandler != NULL)
             pIdleHandler->OnIdle();
     }
+	if(m_parentLoop){
+		m_parentLoop->OnIdle(nIdleCount);
+	}
     return FALSE; // don't continue
 }
 
@@ -136,6 +126,9 @@ BOOL SMessageLoop::PreTranslateMessage(MSG *pMsg)
         if (pMessageFilter != NULL && pMessageFilter->PreTranslateMessage(pMsg))
             return TRUE;
     }
+	if(m_parentLoop){
+		m_parentLoop->PreTranslateMessage(pMsg);
+	}
     return FALSE; // not translated
 }
 
@@ -224,6 +217,26 @@ int SMessageLoop::RemoveTasksForObject(void *pObj)
 BOOL SMessageLoop::IsRunning(THIS) const
 {
     return m_bRunning;
+}
+
+void SMessageLoop::ExecutePendingTask()
+{
+	m_cs.Enter();
+	m_runningQueue.Swap(m_runnables);
+	m_cs.Leave();
+	for (;;)
+	{
+		SAutoLock lock(m_csRunningQueue);
+		if (m_runningQueue.IsEmpty())
+			break;
+		IRunnable *pRunnable = m_runningQueue.GetHead();
+		m_runningQueue.RemoveHead();
+		pRunnable->run();
+		pRunnable->Release();
+	}
+	if(m_parentLoop){
+		m_parentLoop->ExecutePendingTask();
+	}
 }
 
 SNSEND

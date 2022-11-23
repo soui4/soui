@@ -365,6 +365,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     // free old script module
     if (m_pScriptModule)
     {
+		GetMsgLoop()->RemoveIdleHandler(m_pScriptModule->getIdleHandler());
         EventExit evt(GetRoot());
         GetRoot()->FireEvent(evt);
         m_pScriptModule = NULL;
@@ -420,6 +421,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     if (xmlScript)
 	{    // create new script module
 		SApplication::getSingleton().CreateScriptModule(&m_pScriptModule);
+		GetMsgLoop()->AddIdleHandler(m_pScriptModule->getIdleHandler());
         xmlScript.set_userdata(1);
 		if(m_pScriptModule){
 			SXmlAttr attrSrc = xmlScript.attribute(L"src");
@@ -773,7 +775,10 @@ void SHostWnd::OnDestroy()
         DestroyTooltip(m_pTipCtrl);
         m_pTipCtrl = NULL;
     }
-
+	if(m_pScriptModule){
+		GetMsgLoop()->RemoveIdleHandler(m_pScriptModule->getIdleHandler());
+		m_pScriptModule=NULL;
+	}
     m_memRT = NULL;
     m_rgnInvalidate = NULL;
 

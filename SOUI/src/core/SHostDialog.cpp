@@ -17,7 +17,7 @@ SHostDialog::SHostDialog(LPCSTR pszXmlName)
 : THostWndProxy<IHostDialog>(pszXmlName)
 , m_nRetCode(RC_INIT)
 {
-	SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop);
+	SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop,SApplication::getSingletonPtr()->GetMsgLoop());
 }
 
 SHostDialog::~SHostDialog(void)

@@ -15,6 +15,7 @@
 #include <utilities-def.h>
 #include <interface/obj-ref-i.h>
 #include <interface/SEvtArgs-i.h>
+#include <interface/smsgloop-i.h>
 #include <stdint.h>
 
 SNSBEGIN
@@ -122,6 +123,8 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
         - int return code.
     */
 	STDMETHOD_(int, executeMain)(THIS_ HINSTANCE hInst,LPCSTR pszWorkDir, LPCSTR pszArgs) PURE;
+
+    STDMETHOD_(IIdleHandler*, getIdleHandler)(THIS) PURE;
 };
 
 #undef INTERFACE

@@ -65,13 +65,15 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
     STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable * runable) PURE;
 
     STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) PURE;
+
+	STDMETHOD_(void, ExecutePendingTask)() PURE;
 };
 
 #undef INTERFACE
 #define INTERFACE IMsgLoopFactory
 DECLARE_INTERFACE_(IMsgLoopFactory, IObjRef)
 {
-    STDMETHOD_(HRESULT, CreateMsgLoop)(THIS_ IMessageLoop * *ppMsgLoop) PURE;
+    STDMETHOD_(HRESULT, CreateMsgLoop)(THIS_ IMessageLoop * *ppMsgLoop, IMessageLoop *pParentLoop DEF_VAL(NULL)) PURE;
 };
 
 SNSEND
