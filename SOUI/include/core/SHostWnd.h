@@ -213,6 +213,8 @@ class SOUI_EXP SHostWnd
     {
         kPulseTimer = 4321, // soui timer. don't use it in app
         kPulseInterval = 10,
+		kNcCheckTimer = 4322,
+		kNcCheckInterval=50,
     };
 
   public:

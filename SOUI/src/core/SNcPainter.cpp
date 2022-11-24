@@ -594,6 +594,7 @@ LRESULT SNcPainter::OnNcMouseEvent(UINT msg, WPARAM wp, LPARAM lp)
     if (wp == HTCAPTION && msg != WM_NCLBUTTONDBLCLK)
     {
         m_bMouseHover = TRUE;
+		m_pHost->SetTimer(SHostWnd::kNcCheckTimer,SHostWnd::kNcCheckInterval,NULL);
         if (msg == WM_NCLBUTTONUP)
             m_bLButtonDown = FALSE;
         CPoint pt(GET_X_LPARAM(lp), GET_Y_LPARAM(lp));
@@ -623,6 +624,7 @@ LRESULT SNcPainter::OnNcMouseLeave(UINT msg, WPARAM wp, LPARAM lp)
     m_root->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
     UpdateToolTip();
     m_bMouseHover = FALSE;
+	m_pHost->KillTimer(SHostWnd::kNcCheckTimer);
     return m_pHost->DefWindowProc();
 }
 
@@ -744,6 +746,20 @@ void SNcPainter::OnMouseMove(WPARAM wp, LPARAM lp)
     {
         OnNcMouseLeave(0, 0, 0);
     }
+}
+
+void SNcPainter::OnTimer(UINT_PTR tid)
+{
+	if(tid == SHostWnd::kNcCheckTimer){
+		POINT pt;
+		::GetCursorPos(&pt);
+		HWND hHover = ::WindowFromPoint(pt);
+		if(hHover!=m_pHost->m_hWnd){
+			OnMouseMove(0,0);
+		}
+	}else{
+		SetMsgHandled(FALSE);
+	}
 }
 
 SNSEND

@@ -88,7 +88,7 @@ class SNcPainter
     LRESULT OnNcMouseEvent(UINT msg, WPARAM wp, LPARAM lp);
     LRESULT OnNcMouseLeave(UINT msg, WPARAM wp, LPARAM lp);
     void OnSize(UINT nType, CSize size);
-
+	void OnTimer(UINT_PTR tid);
     BEGIN_MSG_MAP_EX(SNcPainter)
         if (m_bSysNcPainter)
             return FALSE;
@@ -104,6 +104,7 @@ class SNcPainter
         MESSAGE_RANGE_HANDLER_EX(WM_NCMOUSEMOVE, WM_NCMBUTTONDBLCLK, OnNcMouseEvent)
         MESSAGE_HANDLER_EX(WM_SETTINGCHANGE, OnRepaint)
         MESSAGE_HANDLER_EX(WM_SYSCOLORCHANGE, OnRepaint)
+		MSG_WM_TIMER(OnTimer)
     END_MSG_MAP()
 
   protected:
