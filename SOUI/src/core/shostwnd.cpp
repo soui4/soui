@@ -2,11 +2,11 @@
 
 #include "SApp.h"
 #include "core/SHostWnd.h"
+#include "core/SHostPresenter.h"
 #include "helper/SAutoBuf.h"
 #include "helper/SColor.h"
 #include "helper/SplitString.h"
 #include "helper/STime.h"
-#include "../updatelayeredwindow/SUpdateLayeredWindow.h"
 #include <helper/SHostMgr.h>
 #include <Imm.h>
 #pragma comment(lib, "imm32.lib")
@@ -280,7 +280,6 @@ void SHostWnd::_Init()
 		, m_bNeedAllRepaint=(TRUE)
 		, m_pTipCtrl=(NULL)
 		, m_dummyWnd=(NULL)
-		, m_bRendering=(FALSE)
 		, m_szAppSetted = CSize(0, 0)
 		, m_nAutoSizing=(0)
 		, m_bResizing=(false)
@@ -668,7 +667,12 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         m_memRT->ClearRect(rcInvalid, 0);
 
         BuildWndTreeZorder();
+		int clipState=0;
+		m_memRT->SaveClip(&clipState); 
+		_ExcludeVideoCanvasFromPaint(m_memRT);	//exclude video canvas region from normal paint routine.
         GetRoot()->RedrawRegion(m_memRT, pRgnUpdate);
+		m_memRT->RestoreClip(clipState);
+		_PaintVideoCanvasForeground(m_memRT);		//paint foreground of video canvas.
 
         m_memRT->PopClip();
 
@@ -685,21 +689,7 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         ::GetClipBox(dc, &rcUpdate);
         rcInvalid = rcInvalid | rcUpdate;
     }
-
-    //渲染非背景混合窗口,设置m_bRending=TRUE以保证只执行一次UpdateHost
-    m_bRendering = TRUE;
-    _UpdateNonBkgndBlendSwnd();
-    SPOSITION pos = m_lstUpdatedRect.GetHeadPosition();
-    while (pos)
-    {
-        rcInvalid = rcInvalid | m_lstUpdatedRect.GetNext(pos);
-    }
-    m_lstUpdatedRect.RemoveAll();
-    m_bRendering = FALSE;
-
-    IBitmapS *pCache = (IBitmapS *)m_memRT->GetCurrentObject(OT_BITMAP);
-    if (!OnCacheUpdated(pCache, rcInvalid))
-        UpdateHost(dc, rcInvalid);
+    UpdatePresenter(dc, m_memRT,rcInvalid);
 }
 
 void SHostWnd::OnPaint(HDC dc)
@@ -744,6 +734,7 @@ BOOL SHostWnd::OnLoadLayoutFromResourceID(const SStringT &resId)
 
 int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+	m_presenter.Attach(CreatePresenter());
     m_dwThreadID = GetCurrentThreadId();
     SHostMgr::getSingletonPtr()->AddHostMsgHandler(this);
     UpdateAutoSizeCount(true);
@@ -759,11 +750,14 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     if (m_pTipCtrl)
         GetMsgLoop()->AddMessageFilter(m_pTipCtrl);
     UpdateAutoSizeCount(false);
+	m_presenter->OnHostCreate();
     return 0;
 }
 
 void SHostWnd::OnDestroy()
 {
+	m_presenter->OnHostDestroy();
+	m_presenter = NULL;
     EventExit evt(GetRoot());
     GetRoot()->FireEvent(evt);
 
@@ -807,7 +801,7 @@ void SHostWnd::OnSize(UINT nType, CSize size)
     _Redraw();
     if (m_nAutoSizing && bDirty)
         GetRoot()->m_layoutDirty = SWindow::dirty_self;
-
+	m_presenter->OnHostResize(size);
     m_bResizing = FALSE;
 }
 
@@ -1002,42 +996,21 @@ void SHostWnd::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdc
     if (gdcFlags != GRT_NODRAW)
     {
         pRT->PopClip();
-        if (!m_bRendering)
-        {
-            IBitmapS *pCache = (IBitmapS *)m_memRT->GetCurrentObject(OT_BITMAP);
-            if (!OnCacheUpdated(pCache, rc))
-            {
-                HDC dc = GetDC();
-                UpdateHost(dc, rc);
-                ReleaseDC(dc);
-            }
-        }
-        else
-        {
-            m_lstUpdatedRect.AddTail(*rc);
-        }
+		UpdatePresenter(0,m_memRT,rc);
     }
     pRT->Release();
 }
 
-BOOL SHostWnd::OnCacheUpdated(IBitmapS *pCache, LPCRECT pRect)
+void SHostWnd::UpdatePresenter(HDC dc,IRenderTarget*pRT, LPCRECT rcInvalid, BYTE byAlpha)
 {
-    return FALSE;
+	byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
+	m_presenter->OnHostPresent(dc,pRT,rcInvalid,byAlpha);
 }
 
-void SHostWnd::UpdateHost(HDC dc, LPCRECT rcInvalid, BYTE byAlpha)
+void SHostWnd::UpdateAlpha(BYTE byAlpha)
 {
-    byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
-    if (m_hostAttr.m_bTranslucent)
-    {
-        UpdateLayerFromRenderTarget(m_memRT, byAlpha, rcInvalid);
-    }
-    else
-    {
-        HDC hdc = m_memRT->GetDC(0);
-        ::BitBlt(dc, rcInvalid->left, rcInvalid->top, RectWidth(rcInvalid), RectHeight(rcInvalid), hdc, rcInvalid->left, rcInvalid->top, SRCCOPY);
-        m_memRT->ReleaseDC(hdc);
-    }
+	byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
+	m_presenter->OnHostAlpha(byAlpha);
 }
 
 void SHostWnd::OnRedraw(LPCRECT rc)
@@ -1149,26 +1122,7 @@ void SHostWnd::OnKillFocus(HWND wndFocus)
     DoFrameEvent(WM_KILLFOCUS, 0, 0);
 }
 
-void SHostWnd::UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlpha, LPCRECT prcDirty)
-{
-    SASSERT(IsTranslucent());
-    CRect rc;
-    SNativeWnd::GetWindowRect(&rc);
-    CRect rcDirty = prcDirty ? (*prcDirty) : CRect(0, 0, rc.Width(), rc.Height());
-    BLENDFUNCTION bf = { AC_SRC_OVER, 0, byAlpha, AC_SRC_ALPHA };
-
-    //注意：下面这几个参数不能直接在info参数里直接使用&rc.Size()，否则会被编译器优化掉，导致参数错误
-    CPoint ptDst = rc.TopLeft();
-    CSize szDst = rc.Size();
-    CPoint ptSrc;
-
-    HDC hdc = pRT->GetDC(0);
-    S_UPDATELAYEREDWINDOWINFO info = { sizeof(info), NULL, &ptDst, &szDst, hdc, &ptSrc, 0, &bf, ULW_ALPHA, &rcDirty };
-    SWndSurface::SUpdateLayeredWindowIndirect(m_hWnd, &info);
-    pRT->ReleaseDC(hdc);
-}
-
-BOOL _BitBlt(IRenderTarget *pRTDst, IRenderTarget *pRTSrc, CRect rcDst, CPoint ptSrc)
+static BOOL _BitBlt(IRenderTarget *pRTDst, IRenderTarget *pRTSrc, CRect rcDst, CPoint ptSrc)
 {
     return S_OK == pRTDst->BitBlt(&rcDst, pRTSrc, ptSrc.x, ptSrc.y, SRCCOPY);
 }
@@ -1238,7 +1192,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     if (dwFlags & AW_HOR_NEGATIVE)
                         ptAnchor.x = rcWnd.right - rcShow.Width();
                     _BitBlt(pRT, m_memRT, rcShow, ptAnchor);
-                    UpdateLayerFromRenderTarget(pRT, byAlpha);
+                    UpdatePresenter(0,pRT,&rcWnd, byAlpha);
                     Sleep(10);
                 }
                 ShowWindow(SW_HIDE);
@@ -1253,7 +1207,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     rcShow.DeflateRect(xStep, yStep);
                     pRT->ClearRect(rcWnd, 0);
                     _BitBlt(pRT, m_memRT, rcShow, rcShow.TopLeft());
-                    UpdateLayerFromRenderTarget(pRT, byAlpha);
+                    UpdatePresenter(0,pRT,rcWnd, byAlpha);
                     Sleep(10);
                 }
                 ShowWindow(SW_HIDE);
@@ -1265,7 +1219,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 for (int i = 0; i < nSteps; i++)
                 {
                     byAlpha2 -= 255 / nSteps;
-                    UpdateLayerFromRenderTarget(m_memRT, byAlpha2);
+                    UpdatePresenter(0,m_memRT,&rcWnd, byAlpha2);
                     Sleep(10);
                 }
                 ShowWindow(SW_HIDE);
@@ -1276,7 +1230,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
         else
         {
             pRT->ClearRect(rcWnd, 0);
-            UpdateLayerFromRenderTarget(pRT, byAlpha);
+			UpdatePresenter(0,pRT,&rcWnd,byAlpha);
             SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW | ((dwFlags & AW_ACTIVATE) ? 0 : SWP_NOACTIVATE));
 
             if (dwFlags & AW_SLIDE)
@@ -1322,10 +1276,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     if (dwFlags & AW_HOR_POSITIVE)
                         ptAnchor.x = rcWnd.right - rcShow.Width();
                     _BitBlt(pRT, m_memRT, rcShow, ptAnchor);
-                    UpdateLayerFromRenderTarget(pRT, byAlpha);
+                    UpdatePresenter(0,pRT,&rcWnd, byAlpha);
                     Sleep(10);
                 }
-                UpdateLayerFromRenderTarget(m_memRT, byAlpha);
+                UpdatePresenter(0,m_memRT,&rcWnd, byAlpha);
 
                 return TRUE;
             }
@@ -1340,10 +1294,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     rcShow.InflateRect(xStep, yStep);
                     pRT->ClearRect(rcWnd, 0);
                     _BitBlt(pRT, m_memRT, rcShow, rcShow.TopLeft());
-                    UpdateLayerFromRenderTarget(pRT, byAlpha);
+                    UpdatePresenter(0,pRT,&rcWnd, byAlpha);
                     Sleep(10);
                 }
-                UpdateLayerFromRenderTarget(m_memRT, byAlpha);
+                UpdatePresenter(0,m_memRT,&rcWnd, byAlpha);
                 return TRUE;
             }
             else if (dwFlags & AW_BLEND)
@@ -1352,10 +1306,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 for (int i = 0; i < nSteps; i++)
                 {
                     byAlpha2 += byAlpha / nSteps;
-                    UpdateLayerFromRenderTarget(m_memRT, byAlpha2);
+                    UpdatePresenter(0,m_memRT, &rcWnd,byAlpha2);
                     Sleep(10);
                 }
-                UpdateLayerFromRenderTarget(m_memRT, byAlpha);
+                UpdatePresenter(0,m_memRT, &rcWnd,byAlpha);
                 return TRUE;
             }
         }
@@ -1394,7 +1348,9 @@ LPCWSTR SHostWnd::GetTranslatorContext() const
 
 IMessageLoop *SHostWnd::GetMsgLoop()
 {
-    return SApplication::getSingletonPtr()->GetMsgLoop(m_dwThreadID);
+	DWORD tid = m_dwThreadID;
+	if(tid == 0) tid = GetCurrentThreadId();
+    return SApplication::getSingletonPtr()->GetMsgLoop(tid);
 }
 
 #if (!DISABLE_SWNDSPY)
@@ -1483,22 +1439,6 @@ LRESULT SHostWnd::OnSpyMsgHitTest(UINT uMsg, WPARAM wParam, LPARAM lParam)
 }
 #endif // DISABLE_SWNDSPY
 
-void SHostWnd::_UpdateNonBkgndBlendSwnd()
-{
-    SList<SWND> lstUpdateSwnd = m_lstUpdateSwnd;
-    m_lstUpdateSwnd.RemoveAll();
-
-    SPOSITION pos = lstUpdateSwnd.GetHeadPosition();
-    while (pos)
-    {
-        SWindow *pWnd = SWindowMgr::getSingleton().GetWindow(lstUpdateSwnd.GetNext(pos));
-        if (pWnd)
-        {
-            pWnd->_Update();
-        }
-    }
-}
-
 void SHostWnd::OnCaptureChanged(HWND wnd)
 {
     if (wnd == m_hWnd)
@@ -1521,20 +1461,6 @@ IScriptModule *SHostWnd::GetScriptModule()
 int SHostWnd::GetScale() const
 {
     return GetRoot()->GetScale();
-}
-
-void SHostWnd::OnCavasInvalidate(SWND swnd)
-{
-    SASSERT(SWindowMgr::getSingleton().GetWindow(swnd));
-
-    if (!m_lstUpdateSwnd.Find(swnd))
-    { //防止重复加入
-        if (m_lstUpdateSwnd.IsEmpty())
-        { //请求刷新窗口
-            _Invalidate(NULL);
-        }
-        m_lstUpdateSwnd.AddTail(swnd);
-    }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1831,6 +1757,44 @@ BOOL SHostWnd::_HandleEvent(IEvtArgs *pEvt)
     return FALSE;
 }
 
+void SHostWnd::_ExcludeVideoCanvasFromPaint(IRenderTarget *pRT)
+{
+	SPOSITION pos = m_lstVideoCanvas.GetHeadPosition();
+	while(pos){
+		SWND swnd = m_lstVideoCanvas.GetNext(pos);
+		SWindow *pWnd = SWindowMgr::GetWindow(swnd);
+		if(pWnd && pWnd->IsVisible(TRUE)){
+			CRect rcCanvas;
+			pWnd->GetVisibleRect(&rcCanvas);
+			pRT->PushClipRect(&rcCanvas,RGN_DIFF);
+		}
+	}
+}
+
+void SHostWnd::_PaintVideoCanvasForeground(IRenderTarget *pRT)
+{
+	SPOSITION pos = m_lstVideoCanvas.GetHeadPosition();
+	while(pos){
+		SWND swnd = m_lstVideoCanvas.GetNext(pos);
+		SWindow *pWnd = SWindowMgr::GetWindow(swnd);
+		if(pWnd && pWnd->IsVisible(TRUE)){
+			CRect rcCanvas;
+			pWnd->GetVisibleRect(&rcCanvas);
+			if(!rcCanvas.IsRectEmpty())
+				pWnd->PaintForeground(pRT,&rcCanvas);
+		}
+	}
+}
+
+IHostPresenter* SHostWnd::GetPresenter(THIS)
+{
+	return m_presenter;
+}
+
+IHostPresenter* SHostWnd::CreatePresenter()
+{
+	return new SHostPresenter(this);
+}
 
 //////////////////////////////////////////////////////////////////
 //  SHostWnd::SHostAnimationHandler
@@ -1858,15 +1822,14 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
     }
     if (xform.hasAlpha())
     { // change alpha.
-        if (m_pHostWnd->IsTranslucent())
-        {
-            CRect rcWnd = m_pHostWnd->GetRoot()->GetWindowRect();
-            m_pHostWnd->UpdateHost(0, rcWnd, xform.GetAlpha());
-        }
-        else if (m_pHostWnd->GetWindowLongPtr(GWL_EXSTYLE) & WS_EX_LAYERED)
-        {
-            ::SetLayeredWindowAttributes(m_pHostWnd->m_hWnd, 0, (BYTE)((int)m_pHostWnd->GetRoot()->GetAlpha() * xform.GetAlpha() / 255), LWA_ALPHA);
-        }
+		if(m_pHostWnd->IsTranslucent()){
+			CRect rcWnd =m_pHostWnd->GetClientRect();
+			IRenderTarget *pRT = m_pHostWnd->m_memRT;
+			m_pHostWnd->UpdatePresenter(0,pRT,&rcWnd,xform.GetAlpha());
+		}else if(m_pHostWnd->GetExStyle() & WS_EX_LAYERED)
+		{
+			m_pHostWnd->UpdateAlpha(xform.GetAlpha());
+		}
     }
     if (!bMore)
     {

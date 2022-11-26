@@ -18,7 +18,7 @@ SwndStyle::SwndStyle()
     , m_strCursor(_T("arrow"))
     , m_bDotted(0)
     , m_bTrackMouseEvent(0)
-    , m_bBlendBackground(1)
+    , m_bVideoCanvas(0)
     , m_nScale(100)
     , m_bMultiLines(FALSE)
 {

@@ -37,6 +37,7 @@
 #include "animation/SAlphaAnimation.h"
 #include "animation/STranslateAnimation.h"
 #include "valueAnimator/SValueAnimator.h"
+#include "core/SHostPresenter.h"
 
 SNSBEGIN
 
@@ -110,6 +111,7 @@ class SDefMsgLoopFactory : public TObjRefImpl<IMsgLoopFactory> {
         return S_OK;
     }
 };
+
 
 void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) const
 {
@@ -236,8 +238,9 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     SAppDir appDir(hInst);
     m_strAppDir = appDir.AppDir();
 
-    GetMsgLoopFactory()->CreateMsgLoop(&m_pMsgLoop);
-    AddMsgLoop(m_pMsgLoop);
+    SAutoRefPtr<IMessageLoop> pMsgLoop;
+    GetMsgLoopFactory()->CreateMsgLoop(&pMsgLoop);
+    AddMsgLoop(pMsgLoop);
     sysObjRegister.RegisterLayouts(this);
     sysObjRegister.RegisterSkins(this);
     sysObjRegister.RegisterWindows(this);
@@ -248,9 +251,6 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
 
 SApplication::~SApplication(void)
 {
-    RemoveMsgLoop();
-    m_pMsgLoop = NULL;
-
     SResProviderMgr::RemoveAll();
     _DestroySingletons();
 }
@@ -496,7 +496,9 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
 int SApplication::Run(HWND hMainWnd)
 {
     m_hMainWnd = hMainWnd;
-    int nRet = m_pMsgLoop->Run();
+	SAutoRefPtr<IMessageLoop> pMsgLoop = GetMsgLoop(GetCurrentThreadId());
+	SASSERT(pMsgLoop);
+    int nRet = pMsgLoop->Run();
     if (::IsWindow(m_hMainWnd))
     {
         DestroyWindow(m_hMainWnd);
@@ -570,8 +572,10 @@ HWND SApplication::GetMainWnd()
 BOOL SApplication::SetMsgLoopFactory(IMsgLoopFactory *pMsgLoopFac)
 {
     m_msgLoopFactory = pMsgLoopFac;
-    m_pMsgLoop = NULL;
-    m_msgLoopFactory->CreateMsgLoop(&m_pMsgLoop);
+	RemoveMsgLoop();
+    SAutoRefPtr<IMessageLoop> pMsgLoop;
+    m_msgLoopFactory->CreateMsgLoop(&pMsgLoop);
+	AddMsgLoop(pMsgLoop);
     return TRUE;
 }
 
@@ -680,20 +684,17 @@ BOOL SApplication::AddMsgLoop(IMessageLoop *pMsgLoop)
         return false; // in map yet
 
     m_msgLoopMap[dwThreadID] = pMsgLoop;
-    pMsgLoop->AddRef();
-
     return true;
 }
 
 BOOL SApplication::RemoveMsgLoop()
 {
     SAutoLock autoLock(m_cs);
-    SMap<DWORD, IMessageLoop *>::CPair *p = m_msgLoopMap.Lookup(::GetCurrentThreadId());
+    MsgLoopMap::CPair *p = m_msgLoopMap.Lookup(::GetCurrentThreadId());
     if (!p)
     {
         return FALSE;
     }
-    p->m_value->Release();
     m_msgLoopMap.RemoveKey(p->m_key);
     return TRUE;
 }
@@ -701,7 +702,7 @@ BOOL SApplication::RemoveMsgLoop()
 IMessageLoop *SApplication::GetMsgLoop(DWORD dwThreadID /*= ::GetCurrentThreadId()*/) const
 {
     SAutoLock autoLock(m_cs);
-    const SMap<DWORD, IMessageLoop *>::CPair *p = m_msgLoopMap.Lookup(dwThreadID);
+    const MsgLoopMap::CPair *p = m_msgLoopMap.Lookup(dwThreadID);
     if (!p)
         return NULL;
     return p->m_value;

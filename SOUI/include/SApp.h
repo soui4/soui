@@ -167,7 +167,6 @@ class SOUI_EXP SApplication
 	STDMETHOD_(BOOL,RegisterObjFactory)(THIS_ const IObjectFactory *objFac,BOOL bReplace DEF_VAL(FALSE)) OVERRIDE;
 	STDMETHOD_(BOOL,UnregisterObjFactory)(THIS_ const IObjectFactory *objFac) OVERRIDE;
 	STDMETHOD_(void,SetDefaultFontInfo)(THIS_ LPCWSTR pszFontInfo) OVERRIDE;
-
   public:
     /**
      * Init
@@ -272,8 +271,8 @@ class SOUI_EXP SApplication
     HWND m_hMainWnd;
 
     mutable SCriticalSection m_cs;
-    SMap<DWORD, IMessageLoop *> m_msgLoopMap;
-    SAutoRefPtr<IMessageLoop> m_pMsgLoop;
+	typedef SMap<DWORD, SAutoRefPtr<IMessageLoop> > MsgLoopMap;
+    MsgLoopMap m_msgLoopMap;
 
 	FunCreateObject m_cbCreateObj;
     //一组单例指针

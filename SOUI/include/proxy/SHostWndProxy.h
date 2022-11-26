@@ -361,6 +361,14 @@ public:
 		return SHostWnd::GetIRoot();
 	}
 
+	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST OVERRIDE{
+		return SHostWnd::IsTranslucent();
+	}
+	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) OVERRIDE{
+		return SHostWnd::GetPresenter();
+	}
+
+
 	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep =-1) OVERRIDE{
 		return SHostWnd::FindIChildByID(nId,nDeep);
 	}

@@ -15,6 +15,7 @@
 #include <interface/SValueAnimator-i.h>
 #include <interface/SNotifyCenter-i.h>
 #include <interface/SObjFactory-i.h>
+#include <interface/SHostPresenter-i.h>
 SNSBEGIN
 
 typedef enum _SingletonType

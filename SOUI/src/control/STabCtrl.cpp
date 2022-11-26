@@ -163,7 +163,7 @@ class STabSlider
             }
             pt -= rcPage.TopLeft();
             m_memRT->SetViewportOrg(pt);
-            PaintForeground2(m_memRT, &rcPage);
+            PaintForeground(m_memRT, &rcPage,GetParent());
 
             pTabCtrl->GetItem(iFrom)->SetVisible(FALSE);
 
@@ -194,7 +194,7 @@ class STabSlider
             m_memRT->SetViewportOrg(pt);
 
             pTabCtrl->GetItem(iTo)->SetVisible(TRUE);
-            PaintForeground2(m_memRT, &rcPage);
+            PaintForeground(m_memRT, &rcPage,GetParent());
 
             m_memRT->SetViewportOrg(CPoint());
 

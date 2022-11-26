@@ -68,6 +68,8 @@ end
 
 function on_exit(args)
 	slog("execute script function: on_exit");
+	win = getHostFromInitEvent(args);
+	NativeWnd_SetMsgHandler(win,"",0);--remove msg handler
 	runTimer:Release();
 end
 

@@ -165,13 +165,6 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
     STDMETHOD_(void, OnRedraw)(THIS_ LPCRECT rc) PURE;
 
     /**
-     * @brief 请求刷新
-     * @param swnd SWND--刷新窗口
-     * @return
-     */
-    STDMETHOD_(void, OnCavasInvalidate)(THIS_ SWND swnd) PURE;
-
-    /**
      * @brief 获取捕获鼠标的Swnd对象
      * @return SWND--捕获鼠标的Swnd对象
      */
@@ -274,6 +267,21 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @return
      */
     STDMETHOD_(void, OnUpdateCursor)(THIS) PURE;
+
+	/**
+     * @brief 注册VideoCanvas窗口
+     * @param SWND swnd--VideoCanvas handle
+     * @return BOOL
+     */
+    STDMETHOD_(BOOL, RegisterVideoCanvas)(THIS_ SWND swnd) PURE;
+
+    /**
+     * @brief 注销VideoCanvas窗口
+     * @param SWND swnd--VideoCanvas handle
+     * @return BOOL
+     */
+    STDMETHOD_(BOOL, UnregisterVideoCanvas)(THIS_ SWND swnd) PURE;
+
 };
 
 SNSEND

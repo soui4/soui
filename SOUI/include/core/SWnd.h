@@ -294,6 +294,8 @@ class SOUI_EXP SWindow
     STDMETHOD_(ULONG_PTR, GetUserData)(THIS) SCONST OVERRIDE;
     STDMETHOD_(ULONG_PTR, SetUserData)(THIS_ ULONG_PTR uData) OVERRIDE;
     STDMETHOD_(void, GetWindowRect)(THIS_ LPRECT prect) SCONST OVERRIDE;
+	STDMETHOD_(BOOL,IsVideoCanvas)(CTHIS) SCONST OVERRIDE;
+	STDMETHOD_(void, GetVisibleRect)(CTHIS_ LPRECT prect) SCONST OVERRIDE;
     STDMETHOD_(void, GetClientRect)(THIS_ LPRECT prect) SCONST OVERRIDE;
     STDMETHOD_(BOOL, IsContainPoint)(THIS_ POINT pt, BOOL bClientOnly) SCONST OVERRIDE;
     STDMETHOD_(void, DoColorize)(THIS_ COLORREF cr) OVERRIDE;
@@ -579,7 +581,6 @@ class SOUI_EXP SWindow
     CRect GetWindowRect() const;
 
     virtual CRect GetClientRect() const;
-
   public: //窗口树结构相关方法
     /**
      * FindChildByID
@@ -939,12 +940,12 @@ class SOUI_EXP SWindow
      * @brief    画窗口的前景内容
      * @param    IRenderTarget * pRT --  目标RT
      * @param    LPRECT pRc --  目标位置
+	 * @param    SWindow *pStartFrom -- 绘制开始窗口,默认NULL从root开始
      * @return   void
      *
      * Describe  目标位置必须在窗口位置内,不包括当前窗口的子窗口
      */
-    void PaintForeground(IRenderTarget *pRT, LPRECT pRc);
-    void PaintForeground2(IRenderTarget *pRT, LPRECT pRc);
+    void PaintForeground(IRenderTarget *pRT, LPRECT pRc,SWindow *pStartFrom=NULL);
     /**
      * BeforePaintEx
      * @brief    为DC准备好当前窗口的绘图环境,从顶层窗口开始设置
@@ -1028,8 +1029,6 @@ class SOUI_EXP SWindow
   protected: // helper functions
     virtual SWindow *_FindChildByID(int nID, int nDeep);
     virtual SWindow *_FindChildByName(const SStringW &strName, int nDeep);
-
-    void _Update();
 
     /**
      * _GetCurrentRenderContainer
@@ -1138,6 +1137,7 @@ class SOUI_EXP SWindow
     HRESULT OnAttrLayout(const SStringW &strValue, BOOL bLoading);
     HRESULT OnAttrClass(const SStringW &strValue, BOOL bLoading);
     HRESULT OnAttrTrackMouseEvent(const SStringW &strValue, BOOL bLoading);
+	HRESULT OnAttrVideoCanvas(const SStringW &strValue, BOOL bLoading);
     HRESULT OnAttrID(const SStringW &strValue, BOOL bLoading);
     HRESULT OnAttrName(const SStringW &strValue, BOOL bLoading);
     HRESULT OnAttrTip(const SStringW &strValue, BOOL bLoading);
@@ -1165,6 +1165,7 @@ class SOUI_EXP SWindow
         ATTR_CUSTOM(L"alpha", OnAttrAlpha)
         ATTR_BOOL(L"layeredWindow", m_bLayeredWindow, TRUE)
         ATTR_CUSTOM(L"trackMouseEvent", OnAttrTrackMouseEvent)
+		ATTR_CUSTOM(L"videoCanvas",OnAttrVideoCanvas)
         ATTR_CUSTOM(L"tip", OnAttrTip)
         ATTR_BOOL(L"msgTransparent", m_bMsgTransparent, FALSE)
         ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)
@@ -1275,7 +1276,6 @@ class SOUI_EXP SWindow
 
     PGETRTDATA m_pGetRTData;
 
-    SAutoRefPtr<IRegionS> m_invalidRegion;   /**< 非背景混合窗口的脏区域 */
     SAutoRefPtr<IAttrStorage> m_attrStorage; /**< 属性保存对象 */
 
 	FunSwndProc	m_funSwndProc;

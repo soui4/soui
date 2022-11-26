@@ -10,6 +10,6 @@
 #pragma once
 
 #define SOUI_VER1 4
-#define SOUI_VER2 1
-#define SOUI_VER3 2
+#define SOUI_VER2 2
+#define SOUI_VER3 1
 #define SOUI_VER4 0

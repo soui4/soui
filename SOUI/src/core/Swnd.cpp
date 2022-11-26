@@ -1434,27 +1434,15 @@ void SWindow::InvalidateRect(const CRect &rect, BOOL bFromThis /*=TRUE*/)
         mtx.mapRect(&fRc);
         rcIntersect = fRc.toRect();
     }
+	if (GetParent())
+	{
+		GetParent()->InvalidateRect(rcIntersect, FALSE);
+	}
+	else
+	{
+		GetContainer()->OnRedraw(rcIntersect);
+	}
 
-    if (!GetStyle().m_bBlendBackground)
-    { //非背景混合窗口，直接发消息支宿主窗口来启动刷新
-        if (!m_invalidRegion)
-        {
-            GETRENDERFACTORY->CreateRegion(&m_invalidRegion);
-        }
-        m_invalidRegion->CombineRect(rcIntersect, RGN_OR);
-        GetContainer()->OnCavasInvalidate(m_swnd); //请求刷新窗口
-    }
-    else
-    {
-        if (GetParent())
-        {
-            GetParent()->InvalidateRect(rcIntersect, FALSE);
-        }
-        else
-        {
-            GetContainer()->OnRedraw(rcIntersect);
-        }
-    }
 }
 
 void SWindow::LockUpdate()
@@ -1594,8 +1582,9 @@ int SWindow::OnCreate(LPVOID)
     SASSERT(GetContainer());
     if (GetStyle().m_bTrackMouseEvent)
         GetContainer()->RegisterTrackMouseEvent(m_swnd);
-    else
-        GetContainer()->UnregisterTrackMouseEvent(m_swnd);
+	if (GetStyle().m_bVideoCanvas)
+		GetContainer()->RegisterVideoCanvas(m_swnd);
+
 
     GetStyle().SetScale(GetScale());
 
@@ -1656,7 +1645,12 @@ void SWindow::OnDestroy()
         }
     }
 #endif
-    DestroyAllChildren();
+	if (GetStyle().m_bTrackMouseEvent)
+		GetContainer()->UnregisterTrackMouseEvent(m_swnd);
+	if (GetStyle().m_bVideoCanvas)
+		GetContainer()->UnregisterVideoCanvas(m_swnd);
+
+	DestroyAllChildren();
     ClearAnimation();
     m_style = SwndStyle();
     m_isDestroying = false;
@@ -2587,7 +2581,7 @@ void SWindow::PaintBackground(IRenderTarget *pRT, LPRECT pRc)
     pRT->PopClip();
 }
 
-void SWindow::PaintForeground(IRenderTarget *pRT, LPRECT pRc)
+void SWindow::PaintForeground(IRenderTarget *pRT, LPRECT pRc,SWindow *pStartFrom/*=NULL*/)
 {
     CRect rcDraw = GetWindowRect();
     if (pRc)
@@ -2599,24 +2593,8 @@ void SWindow::PaintForeground(IRenderTarget *pRT, LPRECT pRc)
 
     SASSERT(GetContainer());
     GetContainer()->BuildWndTreeZorder();
-    GetRoot()->_PaintRegion(pRT, pRgn, (UINT)m_uZorder + 1, (UINT)ZORDER_MAX);
-
-    pRT->PopClip();
-}
-
-void SWindow::PaintForeground2(IRenderTarget *pRT, LPRECT pRc)
-{
-    CRect rcDraw = GetWindowRect();
-    if (pRc)
-        rcDraw.IntersectRect(rcDraw, pRc);
-    SAutoRefPtr<IRegionS> pRgn;
-    GETRENDERFACTORY->CreateRegion(&pRgn);
-    pRgn->CombineRect(&rcDraw, RGN_COPY);
-    pRT->PushClipRect(&rcDraw, RGN_AND);
-
-    SASSERT(GetContainer());
-    GetContainer()->BuildWndTreeZorder();
-    GetParent()->_PaintRegion(pRT, pRgn, (UINT)m_uZorder + 1, (UINT)ZORDER_MAX);
+	if(!pStartFrom) pStartFrom = GetRoot();
+    pStartFrom->_PaintRegion(pRT, pRgn, (UINT)m_uZorder + 1, (UINT)ZORDER_MAX);
 
     pRT->PopClip();
 }
@@ -2734,6 +2712,22 @@ HRESULT SWindow::OnAttrTrackMouseEvent(const SStringW &strValue, BOOL bLoading)
         }
     }
     return S_FALSE;
+}
+
+HRESULT SWindow::OnAttrVideoCanvas(const SStringW &strValue, BOOL bLoading)
+{
+	GetStyle().m_bVideoCanvas = STRINGASBOOL(strValue);
+	if (!bLoading)
+	{
+		if (GetContainer())
+		{
+			if (GetStyle().m_bVideoCanvas)
+				GetContainer()->RegisterVideoCanvas(m_swnd);
+			else
+				GetContainer()->UnregisterVideoCanvas(m_swnd);
+		}
+	}
+	return S_FALSE;
 }
 
 void SWindow::OnSize(UINT nType, CSize size)
@@ -2899,36 +2893,6 @@ SWindow *SWindow::GetSelectedChildInGroup()
     if (!pChild)
         return NULL;
     return pChild->GetSelectedSiblingInGroup();
-}
-
-void SWindow::_Update()
-{
-    SASSERT(!GetStyle().m_bBlendBackground);
-
-    if (!GetStyle().m_bBlendBackground && m_invalidRegion && !m_invalidRegion->IsEmpty())
-    {
-        if (m_invalidRegion)
-        {
-            //刷新非背景混合的窗口
-            CRect rcDirty;
-            m_invalidRegion->GetRgnBox(&rcDirty);
-            SAutoRefPtr<IRegionS> tmpRegin = m_invalidRegion;
-            m_invalidRegion = NULL;
-
-            if (IsVisible(TRUE))
-            { //可能已经不可见了。
-                IRenderTarget *pRT = GetRenderTarget(rcDirty, GRT_OFFSCREEN);
-
-                pRT->PushClipRegion(tmpRegin, RGN_AND);
-                SSendMessage(WM_ERASEBKGND, (WPARAM)pRT);
-                SSendMessage(WM_PAINT, (WPARAM)pRT);
-                PaintForeground(pRT, rcDirty); //画前景
-                pRT->PopClip();
-
-                ReleaseRenderTarget(pRT);
-            }
-        }
-    }
 }
 
 bool SWindow::IsDrawToCache() const
@@ -3320,12 +3284,16 @@ void SWindow::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *
         if (GetCapture() == m_swnd)
             ReleaseCapture();
         pOldContainer->UnregisterTimelineHandler(&m_animationHandler);
+		if(GetStyle().m_bVideoCanvas)
+			pOldContainer->UnregisterVideoCanvas(m_swnd);
     }
     m_pContainer = pNewContainer;
     if (pNewContainer)
     {
         if (GetStyle().m_bTrackMouseEvent)
             pNewContainer->RegisterTrackMouseEvent(m_swnd);
+		if(GetStyle().m_bVideoCanvas)
+			pNewContainer->RegisterVideoCanvas(m_swnd);
     }
 }
 
@@ -3526,6 +3494,30 @@ BOOL SWindow::AddEvent(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName)
 BOOL SWindow::RemoveEvent(THIS_ DWORD dwEventID)
 {
 	return m_evtSet.removeEvent(dwEventID);
+}
+
+void SWindow::GetVisibleRect(LPRECT prc) const
+{
+	SASSERT(prc);
+	CRect rcWnd;
+	*prc = rcWnd;
+	if(!IsVisible(TRUE)) 
+		return;
+	rcWnd = GetWindowRect();
+	SWindow *pParent = GetParent();
+	while(pParent){
+		CRect rcParent = pParent->GetClientRect();
+		rcWnd = rcWnd & rcParent;
+		if(rcWnd.IsRectEmpty())
+			break;
+		pParent = pParent->GetParent();
+	}
+	*prc = rcWnd;
+}
+
+BOOL SWindow::IsVideoCanvas(CTHIS) const
+{
+	return GetStyle().m_bVideoCanvas;
 }
 
 

@@ -12,6 +12,7 @@
 #include <interface/stooltip-i.h>
 #include <interface/SHostMsgHandler-i.h>
 #include <interface/shostwnd-i.h>
+#include <interface/SHostPresenter-i.h>
 #include <core/SCaret.h>
 #include <core/SNcPainter.h>
 #include <core/SHostMsgDef.h>
@@ -185,10 +186,6 @@ class SOUI_EXP SHostWnd
     SAutoRefPtr<IScriptModule> m_pScriptModule;       /**<脚本模块*/
     SAutoRefPtr<SNcPainter> m_pNcPainter;             /**<非客户区绘制模块*/
 
-    SList<SWND> m_lstUpdateSwnd;  /**<等待刷新的非背景混合窗口列表*/
-    SList<RECT> m_lstUpdatedRect; /**<更新的脏矩形列表*/
-    BOOL m_bRendering;            /**<正在渲染过程中*/
-
     MSG m_msgMouse; /**<上一次鼠标按下消息*/
 
     CSize m_szAppSetted; /**<应用层设置的窗口大小 */
@@ -202,7 +199,7 @@ class SOUI_EXP SHostWnd
     SRootWindow *m_pRoot;
 
 	EventHandlerInfo m_evtHandler;
-
+	SAutoRefPtr<IHostPresenter> m_presenter;
   public:
     SHostWnd(LPCWSTR pszResName = NULL);
 	SHostWnd(LPCSTR pszResName);
@@ -231,6 +228,9 @@ class SOUI_EXP SHostWnd
     {
         return m_pRoot;
     }
+	
+	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST OVERRIDE;
+	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) OVERRIDE;
 
 	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep=-1) OVERRIDE{
 		return m_pRoot->FindIChildByID(nId,nDeep);
@@ -344,11 +344,12 @@ class SOUI_EXP SHostWnd
 
   protected: //辅助函数
     void _Redraw();
-    void _UpdateNonBkgndBlendSwnd();
     void _RestoreClickState();
     void _Invalidate(LPCRECT prc);
     void _SetToolTipInfo(const SwndToolTipInfo *info, BOOL bNcTip);
 	void _Init();
+	void _ExcludeVideoCanvasFromPaint(IRenderTarget *pRT);
+	void _PaintVideoCanvasForeground(IRenderTarget *pRT);
   protected:
     //////////////////////////////////////////////////////////////////////////
     // Message handler
@@ -388,8 +389,8 @@ class SOUI_EXP SHostWnd
     void OnSetFocus(HWND wndOld);
     void OnKillFocus(HWND wndFocus);
 
-    void UpdateHost(HDC dc, LPCRECT rc, BYTE byAlpha = 255);
-    void UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlpha, LPCRECT prcDirty = NULL);
+	void UpdateAlpha(BYTE byAlpha);
+    void UpdatePresenter(HDC dc,IRenderTarget *pRT, LPCRECT rc, BYTE byAlpha = 255);
 
     void OnCaptureChanged(HWND wnd);
 
@@ -434,7 +435,7 @@ class SOUI_EXP SHostWnd
 
     STDMETHOD_(SWND, OnSetSwndCapture)(SWND swnd);
 
-    STDMETHOD_(BOOL, IsTranslucent)() const;
+	//STDMETHOD_(BOOL, IsTranslucent)() const; same as IHostWnd::IsTranslucent
 
     STDMETHOD_(BOOL, IsSendWheel2Hover)() const;
 
@@ -451,8 +452,6 @@ class SOUI_EXP SHostWnd
 
     STDMETHOD_(int, GetScale)() const;
 
-    STDMETHOD_(void, OnCavasInvalidate)(SWND swnd);
-
     STDMETHOD_(void, EnableIME)(BOOL bEnable);
     STDMETHOD_(void, OnUpdateCursor)();
 
@@ -462,12 +461,11 @@ class SOUI_EXP SHostWnd
   protected:
     virtual IToolTip *CreateTooltip() const;
     virtual void DestroyTooltip(IToolTip *pTooltip) const;
-
+	virtual IHostPresenter* CreatePresenter();
   protected:
     virtual BOOL OnLoadLayoutFromResourceID(const SStringT &resId);
     virtual void OnUserXmlNode(SXmlNode xmlUser);
-    virtual BOOL OnCacheUpdated(IBitmapS *pCache, LPCRECT pRect);
-
+	
   public:
     virtual BOOL onRootResize(IEvtArgs *e);
 

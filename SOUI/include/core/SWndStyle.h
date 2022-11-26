@@ -39,7 +39,7 @@ class SOUI_EXP SwndStyle {
 
     DWORD m_bDotted : 1;          /**<支持省略号显示文本 */
     DWORD m_bTrackMouseEvent : 1; /**<监视鼠标进入及移出消息 */
-    DWORD m_bBlendBackground : 1; /**<渲染窗口内容和背景混合标志 */
+    DWORD m_bVideoCanvas : 1;     /**<视频渲染画布 */
 
     UINT GetTextAlign() const;
     int GetStates();
@@ -123,8 +123,6 @@ class SOUI_EXP SwndStyle {
         ATTR_LAYOUTSIZE(L"padding_bottom", m_rcInset[3], TRUE)
         ATTR_STRINGT(L"cursor", m_strCursor, FALSE)
         ATTR_INT(L"dotted", m_bDotted, FALSE)
-        ATTR_INT(L"trackMouseEvent", m_bTrackMouseEvent, FALSE)
-        ATTR_INT(L"blendBackground", m_bBlendBackground, TRUE)
     SOUI_ATTRS_BREAK()
 };
 

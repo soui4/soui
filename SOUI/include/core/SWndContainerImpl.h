@@ -78,10 +78,9 @@ class SOUI_EXP SwndContainerImpl
 
     STDMETHOD_(ICaret *, GetCaret)(THIS) OVERRIDE;
 
-    STDMETHOD_(void, OnCavasInvalidate)(SWND swnd) OVERRIDE
-    {
-    }
+    STDMETHOD_(BOOL, RegisterVideoCanvas)(THIS_ SWND swnd) OVERRIDE;
 
+    STDMETHOD_(BOOL, UnregisterVideoCanvas)(THIS_ SWND swnd) OVERRIDE;
   public: // ITimelineHandler
     STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
 
@@ -120,6 +119,7 @@ class SOUI_EXP SwndContainerImpl
     BOOL m_bZorderDirty;
 
     SList<SWND> m_lstTrackMouseEvtWnd;
+	SList<SWND> m_lstVideoCanvas;
     SAutoRefPtr<ICaret> m_caret;
 
     STimerlineHandlerMgr m_timelineHandlerMgr;

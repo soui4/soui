@@ -332,6 +332,12 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(void, GetClientRect)(CTHIS_ LPRECT prect) SCONST PURE;
 
+	/**
+     * @brief 获取窗口的经过父窗口剪裁后的显示位置
+     * @param [out] LPRECT--窗口客户区显示位置
+     * @remark 不计算子窗口及兄弟窗口的剪裁
+     */
+	STDMETHOD_(void, GetVisibleRect)(CTHIS_ LPRECT prect) SCONST PURE;
     /**
      * @brief 检测一个点是不是在窗口范围内
      * @param pt POINT--被检查坐标
@@ -838,6 +844,15 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * Describe  
      */
 	STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
+
+	/**
+     * IsVideoCanvas
+     * @brief    查询窗口是否为视频窗口
+     * @return   BOOL -- TRUE:是视频窗口
+     *
+     * Describe  
+     */
+	STDMETHOD_(BOOL,IsVideoCanvas)(CTHIS) SCONST PURE;
 };
 
 SNSEND

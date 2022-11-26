@@ -471,6 +471,7 @@ ICaret *SwndContainerImpl::GetCaret()
     return m_caret;
 }
 
+
 void SwndContainerImpl::_BuildWndTreeZorder(IWindow *pWnd, UINT &iOrder)
 {
     ((SWindow *)pWnd)->m_uZorder = iOrder++;
@@ -497,6 +498,21 @@ void SwndContainerImpl::OnNextFrame()
     if (!m_pRoot->IsVisible(FALSE))
         return;
     m_timelineHandlerMgr.OnNextFrame();
+}
+
+BOOL SwndContainerImpl::RegisterVideoCanvas(SWND swnd){
+	SPOSITION pos = m_lstVideoCanvas.Find(swnd);
+	if(pos) return FALSE;
+	m_lstVideoCanvas.AddTail(swnd);
+	return TRUE;
+}
+
+BOOL SwndContainerImpl::UnregisterVideoCanvas(SWND swnd){
+	SPOSITION pos = m_lstVideoCanvas.Find(swnd);
+	if(!pos) return FALSE;
+	
+	m_lstVideoCanvas.RemoveAt(pos);
+	return TRUE;	
 }
 
 SNSEND

@@ -5,6 +5,7 @@ SNSBEGIN
 
 typedef struct IWindow IWindow;
 typedef struct IApplication IApplication;
+typedef struct IHostPresenter IHostPresenter;
 
 typedef struct _EventHandlerInfo{
 	FunCallback fun;
@@ -159,7 +160,8 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 	(THIS_ HWND hWndParent, int x DEF_VAL(0), int y DEF_VAL(0), int nWidth DEF_VAL(0), int nHeight DEF_VAL(0)) PURE;
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
-
+	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST PURE;
+	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) PURE;
     /**
      * @brief 根据ID查找子窗口
      * @param nId int--子窗口ID
@@ -167,7 +169,7 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
      * @return IWindow*--匹配窗口
      * @remark 采用广度优先算法搜索匹配子窗口
      */
-    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep) PURE;
+    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep DEF_VAL(-1)) PURE;
 
     /**
      * @brief 根据Name查找子窗口
@@ -337,7 +339,10 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
     (THIS_ HWND hWndParent, int x DEF_VAL(0), int y DEF_VAL(0), int nWidth DEF_VAL(0), int nHeight DEF_VAL(0)) PURE;
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
-	    /**
+	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST PURE;
+	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) PURE;
+
+	/**
      * @brief 根据ID查找子窗口
      * @param nId int--子窗口ID
      * @param nDeep int--查找深度,-1代码无限
