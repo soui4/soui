@@ -297,6 +297,7 @@ void SHostWnd::_Init()
 	m_hostAnimationHandler.m_pHostWnd = this;
 	m_evtHandler.fun = NULL;
 	m_evtHandler.ctx = NULL;
+	m_funCreatePresenter = NULL;
 }
 
 
@@ -1793,7 +1794,16 @@ IHostPresenter* SHostWnd::GetPresenter(THIS)
 
 IHostPresenter* SHostWnd::CreatePresenter()
 {
-	return new SHostPresenter(this);
+	if(m_funCreatePresenter){
+		return m_funCreatePresenter(this);
+	}else{
+		return new SHostPresenter(this);
+	}
+}
+
+void SHostWnd::SetCreatePresenterCallback(THIS_ FunCreatePresenter fun)
+{
+	m_funCreatePresenter = fun;
 }
 
 //////////////////////////////////////////////////////////////////

@@ -397,6 +397,10 @@ public:
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) OVERRIDE{
 		return SHostWnd::AnimateHostWindow(dwTime,dwFlags);
 	}
+
+	STDMETHOD_(void, SetCreatePresenterCallback)(THIS_ FunCreatePresenter fun) OVERRIDE{
+		return SHostWnd::SetCreatePresenterCallback(fun);
+	}
 };
 
 SNSEND

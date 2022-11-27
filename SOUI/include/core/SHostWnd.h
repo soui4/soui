@@ -200,6 +200,7 @@ class SOUI_EXP SHostWnd
 
 	EventHandlerInfo m_evtHandler;
 	SAutoRefPtr<IHostPresenter> m_presenter;
+	FunCreatePresenter	m_funCreatePresenter;
   public:
     SHostWnd(LPCWSTR pszResName = NULL);
 	SHostWnd(LPCSTR pszResName);
@@ -262,6 +263,7 @@ class SOUI_EXP SHostWnd
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) OVERRIDE;
 
+	STDMETHOD_(void, SetCreatePresenterCallback)(THIS_ FunCreatePresenter fun) OVERRIDE;
   public:
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1)
     {
