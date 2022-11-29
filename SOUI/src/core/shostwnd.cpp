@@ -1782,7 +1782,11 @@ void SHostWnd::_PaintVideoCanvasForeground(IRenderTarget *pRT)
 			CRect rcCanvas;
 			pWnd->GetVisibleRect(&rcCanvas);
 			if(!rcCanvas.IsRectEmpty())
+			{
+				pWnd->SSendMessage(WM_ERASEBKGND, (WPARAM)pRT);
+				pWnd->SSendMessage(WM_PAINT, (WPARAM)pRT);
 				pWnd->PaintForeground(pRT,&rcCanvas);
+			}
 		}
 	}
 }

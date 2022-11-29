@@ -675,12 +675,12 @@ void SApplication::SetAttrStorageFactory(IAttrStorageFactory *pAttrStorageFactor
     m_pAttrStroageFactory = pAttrStorageFactory;
 }
 
-BOOL SApplication::AddMsgLoop(IMessageLoop *pMsgLoop)
+BOOL SApplication::AddMsgLoop(IMessageLoop *pMsgLoop,BOOL bReplace)
 {
     SAutoLock autoLock(m_cs);
     SASSERT(pMsgLoop != NULL);
     DWORD dwThreadID = ::GetCurrentThreadId();
-    if (m_msgLoopMap.Lookup(dwThreadID) != NULL)
+    if (m_msgLoopMap.Lookup(dwThreadID) != NULL && !bReplace)
         return false; // in map yet
 
     m_msgLoopMap[dwThreadID] = pMsgLoop;

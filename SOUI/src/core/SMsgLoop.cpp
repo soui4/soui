@@ -53,39 +53,40 @@ int SMessageLoop::Run()
     m_bRunning = TRUE;
     m_tid = GetCurrentThreadId();
     m_bQuit = FALSE;
-    for (;;)
+    for (;!m_bQuit;)
     {
-        ExecutePendingTask();
-        while (bDoIdle && !::PeekMessage(&m_msg, NULL, 0, 0, PM_NOREMOVE))
-        {
-            if (!OnIdle(nIdleCount++))
-                bDoIdle = FALSE;
-            if (m_bQuit)
-                goto exit_loop;
-        }
+		if(bDoIdle){
+			while (!::PeekMessage(&m_msg, NULL, 0, 0, PM_NOREMOVE))
+			{
+				ExecutePendingTask();
+				if (!OnIdle(nIdleCount++))
+					bDoIdle = FALSE;
+				if (m_bQuit)
+					goto exit_loop;
+			}
+		}else{
+			ExecutePendingTask();
+		}
+        bRet = OnWaitMessage();
+		if(!bRet){
+			SSLOGD() << "OnWaitMessage returned FALSE (error)";
+			continue; // error, don't process
+		}
 
-        bRet = ::GetMessage(&m_msg, NULL, 0, 0);
-
-        if (bRet == -1)
-        {
-            SSLOGD() << "::GetMessage returned -1 (error)";
-            continue; // error, don't process
-        }
-        else if (!bRet)
-        {
-            SSLOGD() << "SMessageLoop::Run - exiting,code = " << (int)m_msg.wParam;
-            break; // WM_QUIT, exit message loop
-        }
-
-        OnMsg(&m_msg);
-
-        if (IsIdleMessage(&m_msg))
-        {
-            bDoIdle = TRUE;
-            nIdleCount = 0;
-        }
-        if (m_bQuit)
-            break;
+        while(PeekMessage(&m_msg,NULL,0,0,PM_REMOVE))
+		{
+			if(m_msg.message == WM_QUIT)
+			{
+				m_bQuit = TRUE;
+				break;
+			}
+			ExecutePendingTask();
+			OnMsg(&m_msg);
+			bDoIdle = IsIdleMessage(&m_msg);
+			if(bDoIdle){
+				nIdleCount = 0;
+			}
+		}
     }
 
 exit_loop:
@@ -105,16 +106,19 @@ exit_loop:
 
 BOOL SMessageLoop::OnIdle(int nIdleCount)
 {
+	BOOL bContinue=FALSE;//default set to don't continue
     for (size_t i = 0; i < m_aIdleHandler.GetCount(); i++)
     {
         IIdleHandler *pIdleHandler = m_aIdleHandler[i];
         if (pIdleHandler != NULL)
-            pIdleHandler->OnIdle();
+            if(pIdleHandler->OnIdle())
+				bContinue=TRUE;
     }
 	if(m_parentLoop){
-		m_parentLoop->OnIdle(nIdleCount);
+		if(m_parentLoop->OnIdle(nIdleCount))
+			bContinue = TRUE;
 	}
-    return FALSE; // don't continue
+    return bContinue;
 }
 
 BOOL SMessageLoop::PreTranslateMessage(MSG *pMsg)
@@ -237,6 +241,11 @@ void SMessageLoop::ExecutePendingTask()
 	if(m_parentLoop){
 		m_parentLoop->ExecutePendingTask();
 	}
+}
+
+BOOL SMessageLoop::OnWaitMessage()
+{
+	return WaitMessage();
 }
 
 SNSEND

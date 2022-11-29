@@ -121,7 +121,7 @@ class SOUI_EXP SApplication
 	STDMETHOD_(void,Quit)(THIS_ int nCode) OVERRIDE;
     STDMETHOD_(HWND, GetMainWnd)(THIS) OVERRIDE;
 
-    STDMETHOD_(BOOL, AddMsgLoop)(THIS_ IMessageLoop *pMsgLoop) OVERRIDE;
+    STDMETHOD_(BOOL, AddMsgLoop)(THIS_ IMessageLoop *pMsgLoop,BOOL bReplace DEF_VAL(FALSE)) OVERRIDE;
     STDMETHOD_(BOOL, RemoveMsgLoop)(THIS) OVERRIDE;
 
     STDMETHOD_(IMessageLoop *, GetMsgLoop)

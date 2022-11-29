@@ -165,10 +165,11 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
     /**
      * @brief 将当前UI线程的msgLoop保存到SApp中
      * @param IMessageLoop *pMsgLoop -- msgLoop
+	 * @param BOOL bReplace -- 替换标志
      * @return BOOL TRUE-成功
      * @remark 在多UI线程程序中，需要将工作线程的msgLoop交给SApp管理
      */
-    STDMETHOD_(BOOL, AddMsgLoop)(THIS_ IMessageLoop * pMsgLoop) PURE;
+    STDMETHOD_(BOOL, AddMsgLoop)(THIS_ IMessageLoop * pMsgLoop,BOOL bReplace DEF_VAL(FALSE)) PURE;
 
     /**
      * @brief 从SApp中删除当前线程的msgLoop
