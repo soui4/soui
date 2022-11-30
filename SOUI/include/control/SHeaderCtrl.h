@@ -146,6 +146,9 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
 
     STDMETHOD_(BOOL, IsItemVisible)(THIS_ int iItem) SCONST OVERRIDE;
 
+	STDMETHOD_(int,GetOriItemIndex)(CTHIS_ int iOrder) SCONST OVERRIDE;
+	STDMETHOD_(void,GetItemRect)(CTHIS_ int iItem,LPRECT prc) SCONST OVERRIDE;
+
   public:
     /**
      * SHeaderCtrl::GetItemRect
@@ -154,9 +157,7 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
      *
      * Describe  获取表头项得位置
      */
-    CRect GetItemRect(UINT iItem) const;
-
-    int GetOriItemIndex(int iOrder) const;
+    CRect GetItemRect(int iItem) const;
 
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"itemSkin", m_pSkinItem, FALSE)

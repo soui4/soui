@@ -204,14 +204,14 @@ void SHeaderCtrl::OnDestroy()
     SWindow::OnDestroy();
 }
 
-CRect SHeaderCtrl::GetItemRect(UINT iItem) const
+CRect SHeaderCtrl::GetItemRect(int iItem) const
 {
     CRect rcClient;
     GetClientRect(&rcClient);
     if (!m_arrItems[iItem].bVisible)
         return CRect();
     CRect rcItem(rcClient.left, rcClient.top, rcClient.left, rcClient.bottom);
-    for (UINT i = 0; i <= iItem && i < m_arrItems.GetCount(); i++)
+    for (int i = 0; i <= iItem && i < (int)m_arrItems.GetCount(); i++)
     {
         if (!m_arrItems[i].bVisible)
             continue;
@@ -219,6 +219,11 @@ CRect SHeaderCtrl::GetItemRect(UINT iItem) const
         rcItem.right = rcItem.left + GetItemWidth(i);
     }
     return rcItem;
+}
+
+void SHeaderCtrl::GetItemRect (CTHIS_ int iItem, LPRECT prc) SCONST
+{
+	*prc = GetItemRect(iItem);
 }
 
 int SHeaderCtrl::GetOriItemIndex(int iOrder) const

@@ -3,7 +3,7 @@
 #include <helper/obj-ref-impl.hpp>
 SNSBEGIN
 
-class SHostPresenter : public TObjRefImpl<IHostPresenter>
+class SOUI_EXP SHostPresenter : public TObjRefImpl<IHostPresenter>
 {
 protected:
 	IHostWnd *m_pHostWnd;

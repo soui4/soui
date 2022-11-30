@@ -808,6 +808,24 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
      * @return BOOL
      */
     STDMETHOD_(BOOL, IsItemVisible)(CTHIS_ int iItem) SCONST PURE;
+
+    /**
+     * @brief    获取表头项
+     * @param    int iOrder  -- show order
+	 * @return   int item index
+     *
+     * Describe  获取表头项得位置
+     */
+	STDMETHOD_(int,GetOriItemIndex)(CTHIS_ int iOrder) SCONST PURE;
+
+	/**
+     * @brief    获取表头项得位置
+     * @param    int iItem  --  索引
+	 * @param    LPRECT prc  --  表头项得位置
+     *
+     * Describe  获取表头项得位置
+     */
+	STDMETHOD_(void, GetItemRect)(CTHIS_ int iItem,LPRECT prc) SCONST PURE;
 };
 
 #undef INTERFACE
