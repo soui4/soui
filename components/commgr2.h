@@ -22,6 +22,7 @@
 #define COM_7ZIPRESPROVIDER _T("resprovider-7zipd.dll")
 #define COM_TASKLOOP _T("taskloopd.dll")
 #define COM_IPCOBJ _T("sipcobjectd.dll")
+#define COM_HTTPCLIENT _T("httpclientd.dll")
 #else
 #define COM_RENDER_GDI  _T("render-gdi.dll")
 #define COM_RENDER_SKIA _T("render-skia.dll")
@@ -32,6 +33,7 @@
 #define COM_7ZIPRESPROVIDER _T("resprovider-7zip.dll")
 #define COM_TASKLOOP _T("taskloop.dll")
 #define COM_IPCOBJ _T("sipcobject.dll")
+#define COM_HTTPCLIENT _T("httpclient.dll")
 #endif	// _DEBUG
 
 
@@ -83,6 +85,9 @@
 #if(SCOM_MASK&scom_mask_ipcobject)
 	#pragma comment(lib,"sipcobjectd")
 #endif
+#if(SCOM_MASK&scom_mask_ipcobject)
+	#pragma comment(lib,"httpclientd")
+#endif
 #if(SCOM_MASK&scom_mask_script_lua)
 	#pragma comment(lib,"lua-54d")
 	#pragma comment(lib,"ScriptModule-LUAd")
@@ -129,6 +134,9 @@
 #endif
 #if(SCOM_MASK&scom_mask_ipcobject)
 	#pragma comment(lib,"sipcobject")
+#endif
+#if(SCOM_MASK&scom_mask_ipcobject)
+	#pragma comment(lib,"httpclient")
 #endif
 #if(SCOM_MASK&scom_mask_script_lua)
 	#pragma comment(lib,"lua-54")
@@ -188,6 +196,9 @@ namespace SOUI
 		BOOL SCreateInstance(IObjRef **);
 	}
 	namespace IPC {
+		BOOL SCreateInstance(IObjRef **);
+	}
+	namespace HttpClient {
 		BOOL SCreateInstance(IObjRef **);
 	}
 }//end of soui
@@ -286,6 +297,13 @@ public:
 		return IPC::SCreateInstance(ppObj);
 	}
 #endif
+#if(SCOM_MASK&scom_mask_httpclient)
+	BOOL CreateHttpClient(IObjRef **ppObj)
+	{
+		return HttpClient::SCreateInstance(ppObj);
+	}
+#endif
+
 	SStringT m_strImgDecoder;
 };
 
@@ -368,6 +386,11 @@ public:
 	BOOL CreateIpcObject(IObjRef **ppObj)
 	{
 		return ipcLoader.CreateInstance(m_strDllPath + COM_IPCOBJ, ppObj);
+	}
+
+	BOOL CreateHttpClient(IObjRef **ppObj)
+	{
+		return ipcLoader.CreateInstance(m_strDllPath + COM_HTTPCLIENT, ppObj);
 	}
 protected:
     //SComLoader实现从DLL的指定函数创建符号SOUI要求的类COM组件。

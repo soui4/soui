@@ -90,6 +90,8 @@ HEADERS += include/SApp.h \
            include/interface/SMessageBox-i.h \
            include/interface/SNotifyCenter-i.h \
            include/interface/SObjFactory-i.h \
+           include/interface/SHostPresenter-i.h \
+           include/interface/SHttpClient-i.h \
            include/proxy/SNativeWndProxy.h \
            include/proxy/SHostWndProxy.h \
            include/proxy/SPanelProxy.h \
@@ -161,6 +163,7 @@ HEADERS += include/SApp.h \
            include/core/SWndContainerImpl.h \
            include/core/SWndStyle.h \
            include/core/SNcPainter.h \
+           include/core/SHostPresenter.h \
            include/event/SEventCrack.h \
            include/event/SEvents.h \
            include/event/SEventSet.h \
@@ -290,6 +293,7 @@ SOURCES += src/SApp.cpp \
            src/core/SwndContainerImpl.cpp \
            src/core/SwndStyle.cpp \
            src/core/SNcPainter.cpp \
+           src/core/SHostPresenter.cpp \
            src/event/SEventSet.cpp \
            src/event/SNotifyCenter.cpp \
            src/helper/SAppDir.cpp \

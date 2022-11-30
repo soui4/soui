@@ -18,6 +18,7 @@ add_subdirectory(log4z)
 add_subdirectory(resprovider-7zip)
 add_subdirectory(TaskLoop)
 add_subdirectory(SIpcObject)
+add_subdirectory(httpclient)
 
 #include(CheckCXXCompilerFlag)
 #CHECK_CXX_COMPILER_FLAG("-std=c++11" COMPILER_SUPPORTS_CXX11)

@@ -750,7 +750,7 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
      *
      * Describe  获得所有宽度
      */
-    STDMETHOD_(int, GetTotalWidth)(CTHIS_ BOOL bMinWid /*= FALSE*/) SCONST PURE;
+    STDMETHOD_(int, GetTotalWidth)(CTHIS_ BOOL bMinWid DEF_VAL(FALSE)) SCONST PURE;
 
     /**
      * @brief 表头自动填充父窗口宽度标志

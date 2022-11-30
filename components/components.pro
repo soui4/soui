@@ -21,6 +21,7 @@ SUBDIRS += log4z
 SUBDIRS += resprovider-7zip
 SUBDIRS += TaskLoop
 SUBDIRS += SIpcObject
+SUBDIRS += httpclient
 
 imgdecoder-png.depends += zlib png
 render-skia.depends += skia
@@ -30,3 +31,4 @@ resprovider-7zip.depends += 7z utilities4
 ScriptModule-LUA.depends += soui4 lua-54
 TaskLoop.depends += utilities4
 SIpcObject.depends += utilities4
+httpclient.depends += utilities4

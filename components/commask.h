@@ -17,6 +17,7 @@
 #define scom_mask_script_lua  (1 << 11)
 
 #define scom_mask_ipcobject   (1<<12)
+#define scom_mask_httpclient   (1<<13)
 
 #define scom_mask_scom_all  (0xffffffff)
 
