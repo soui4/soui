@@ -278,7 +278,7 @@ BOOL CWinHttp::Request(IStringA *out, LPCSTR lpUrl, RequestType type, LPCSTR lpP
 	if ( !bFinish )
 		strRet.clear();
 	out->Assign2(strRet.c_str(),strRet.length());
-	return strRet.empty();
+	return !strRet.empty();
 }
 
 BOOL CWinHttp::QueryRawHeaders( OUT std::wstring& strHeaders )
