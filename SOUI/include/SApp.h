@@ -167,6 +167,11 @@ class SOUI_EXP SApplication
 	STDMETHOD_(BOOL,RegisterObjFactory)(THIS_ const IObjectFactory *objFac,BOOL bReplace DEF_VAL(FALSE)) OVERRIDE;
 	STDMETHOD_(BOOL,UnregisterObjFactory)(THIS_ const IObjectFactory *objFac) OVERRIDE;
 	STDMETHOD_(void,SetDefaultFontInfo)(THIS_ LPCWSTR pszFontInfo) OVERRIDE;
+
+	STDMETHOD_(BOOL,CreateTaskLoop)(THIS_ int nCount DEF_VAL(1)) OVERRIDE;
+	STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) OVERRIDE;
+	STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) OVERRIDE;
+
   public:
     /**
      * Init
@@ -275,6 +280,8 @@ class SOUI_EXP SApplication
     MsgLoopMap m_msgLoopMap;
 
 	FunCreateObject m_cbCreateObj;
+	FunCrateTaskLoop m_cbCreateTaskLoop;
+	SArray<SAutoRefPtr<ITaskLoop>> m_lstTaskLoop;//task loop list
     //一组单例指针
     void *m_pSingletons[SINGLETON_COUNT];
 };

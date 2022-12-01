@@ -226,6 +226,7 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     , m_RenderFactory(pRendFactory)
     , m_hMainWnd(NULL)
 	, m_cbCreateObj(NULL)
+	, m_cbCreateTaskLoop(NULL)
 {
     SWndSurface::Init();
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
@@ -760,5 +761,35 @@ void SApplication::SetDefaultFontInfo(THIS_ LPCWSTR pszFontInfo)
 {
 	SFontPool::getSingletonPtr()->SetDefFontInfo(pszFontInfo);
 }
+
+
+void SApplication::SetCreateTaskLoopCallback(THIS_ FunCrateTaskLoop cbCreateTaskLoop)
+{
+	m_cbCreateTaskLoop = cbCreateTaskLoop;
+}
+
+BOOL SApplication::CreateTaskLoop(THIS_ int nCount)
+{
+	if(!m_cbCreateTaskLoop)
+		return FALSE;
+	if(!m_lstTaskLoop.IsEmpty())
+		return FALSE;
+	m_lstTaskLoop.SetCount(nCount);
+	for(int i=0;i<nCount;i++){
+		m_lstTaskLoop[i].Attach(m_cbCreateTaskLoop());
+	}
+	return TRUE;
+}
+
+ITaskLoop * SApplication::GetTaskLoop(THIS_ int iTaskLoop)
+{
+	if(iTaskLoop >=0 && iTaskLoop < (int)m_lstTaskLoop.GetCount()){
+		return m_lstTaskLoop[iTaskLoop];
+	}else{
+		return NULL;
+	}
+}
+
+
 
 SNSEND

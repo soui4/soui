@@ -16,6 +16,8 @@
 #include <interface/SNotifyCenter-i.h>
 #include <interface/SObjFactory-i.h>
 #include <interface/SHostPresenter-i.h>
+#include <interface/STaskLoop-i.h>
+
 SNSBEGIN
 
 typedef enum _SingletonType
@@ -39,6 +41,7 @@ typedef enum _SingletonType
 
 typedef struct IApplication IApplication;
 typedef IObject *(* FunCreateObject)(const IApplication * app,LPCWSTR pszName,SObjectType nType);
+typedef ITaskLoop * (*FunCrateTaskLoop)();
 
 #undef INTERFACE
 #define INTERFACE IApplication
@@ -297,6 +300,10 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 	STDMETHOD_(BOOL,UnregisterObjFactory)(THIS_ const IObjectFactory *objFac) PURE;
 
 	STDMETHOD_(void,SetDefaultFontInfo)(THIS_ LPCWSTR pszFontInfo) PURE;
+
+	STDMETHOD_(BOOL,CreateTaskLoop)(THIS_ int nCount DEF_VAL(1)) PURE;
+	STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) PURE;
+	STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) PURE;
 };
 
 SNSEND
