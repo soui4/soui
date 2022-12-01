@@ -396,9 +396,9 @@ class SOUI_EXP SWindow
     STDMETHOD_(ISwndContainer *, GetContainer)(THIS) OVERRIDE;
     STDMETHOD_(void, SetContainer)(THIS_ ISwndContainer *pContainer) OVERRIDE;
 
-    STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT* prc) SCONST OVERRIDE;
 
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int nParentWid, int nParentHei) OVERRIDE;
 
     STDMETHOD_(void, Move2)(THIS_ int x, int y, int cx DEF_VAL(-1), int cy DEF_VAL(-1)) OVERRIDE;
 

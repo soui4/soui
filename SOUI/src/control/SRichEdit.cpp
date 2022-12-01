@@ -1052,7 +1052,8 @@ void SRichEdit::OnRButtonDown(UINT nFlags, CPoint point)
         SMenu menu;
         if (menu.LoadMenu2(&xmlMenu))
         {
-            CRect rcCantainer = GetContainer()->GetContainerRect();
+            CRect rcCantainer ;
+			GetContainer()->GetContainerRect(&rcCantainer);
             point.Offset(rcCantainer.TopLeft());
             HWND hHost = GetContainer()->GetHostHwnd();
             ::ClientToScreen(hHost, &point);

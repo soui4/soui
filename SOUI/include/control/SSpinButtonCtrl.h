@@ -19,7 +19,7 @@ class SOUI_EXP SSpinButtonCtrl : public TWindowProxy<ISpinButtonCtrl> {
     STDMETHOD_(IWindow *, GetIBuddy)(THIS) SCONST OVERRIDE;
 
   protected:
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int nParentWid, int nParentHei) OVERRIDE;
     virtual BOOL NeedRedrawWhenStateChange() OVERRIDE
     {
         return TRUE;

@@ -432,7 +432,8 @@ void SListView::UpdateVisibleItems()
                 if (m_bVertical)
                 {
                     rcItem.bottom = 0;
-                    CSize szItem = m_adapter->getViewDesiredSize(iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
+                    CSize szItem ;
+					m_adapter->getViewDesiredSize(&szItem,iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
                     rcItem.bottom = rcItem.top + szItem.cy;
                     ii.pItem->Move(rcItem);
                     m_lvItemLocator->SetItemHeight(iNewLastVisible, szItem.cy);
@@ -440,7 +441,8 @@ void SListView::UpdateVisibleItems()
                 else
                 {
                     rcItem.right = 0;
-                    CSize szItem = m_adapter->getViewDesiredSize(iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
+                    CSize szItem ;
+					m_adapter->getViewDesiredSize(&szItem,iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
                     rcItem.right = rcItem.left + szItem.cx;
                     ii.pItem->Move(rcItem);
                     m_lvItemLocator->SetItemHeight(iNewLastVisible, szItem.cx);

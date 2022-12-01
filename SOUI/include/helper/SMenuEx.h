@@ -30,7 +30,7 @@ class SOUI_EXP SMenuExItem : public SWindow {
     BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
     SWindow *CreateChildByName(LPCWSTR pszName) OVERRIDE;
 
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int wid, int hei) OVERRIDE;
 
     void GetTextRect(LPRECT pRect) OVERRIDE;
 

@@ -216,7 +216,7 @@ class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
     virtual void OnViewOriginChanged(CPoint ptOld, CPoint ptNew);
 
   protected:
-    STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT *prc) SCONST OVERRIDE;
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
 
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);

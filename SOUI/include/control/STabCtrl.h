@@ -323,7 +323,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      *
      * Describe
      */
-    STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT *prc) SCONST OVERRIDE;
 
     /**
      * GetTitleRect

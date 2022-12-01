@@ -171,17 +171,15 @@ class LvAdatperImpl : public BaseClass {
         InitByTemplate(xmlTempalte);
     }
 
-    STDMETHOD_(SIZE, getViewDesiredSize)(int position, SItemPanel *pItem, int wid, int hei)
+    STDMETHOD_(void, getViewDesiredSize)(SIZE *ret,int position, SItemPanel *pItem, int wid, int hei)
     {
-        (position);
-        (pItem);
-        return pItem->GetDesiredSize(wid, hei);
+        pItem->GetDesiredSize(ret,wid, hei);
     }
 
-    STDMETHOD_(SIZE, getViewDesiredSize)(int position, IWindow *pItem, int wid, int hei) OVERRIDE
+    STDMETHOD_(void, getViewDesiredSize)(SIZE *ret,int position, IWindow *pItem, int wid, int hei) OVERRIDE
     {
         SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pItem);
-        return getViewDesiredSize(position, pItemPanel, wid, hei);
+        getViewDesiredSize(ret,position, pItemPanel, wid, hei);
     }
 
     STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef **ppObj) OVERRIDE
@@ -462,16 +460,16 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return getView(hItem, pItemPanel, xmlTemplate);
     }
 
-    STDMETHOD_(SIZE, getViewDesiredSize)(HSTREEITEM hItem, SItemPanel *pItem, int wid, int hei)
+    STDMETHOD_(void, getViewDesiredSize)(SIZE *ret,HSTREEITEM hItem, SItemPanel *pItem, int wid, int hei)
     {
-        return pItem->GetDesiredSize(wid, hei);
+        pItem->GetDesiredSize(ret,wid, hei);
     }
 
-    STDMETHOD_(SIZE, getViewDesiredSize)
-    (HSTREEITEM hItem, IWindow *pItem, int wid, int hei) OVERRIDE
+    STDMETHOD_(void, getViewDesiredSize)
+    (SIZE *ret,HSTREEITEM hItem, IWindow *pItem, int wid, int hei) OVERRIDE
     {
         SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pItem);
-        return getViewDesiredSize(hItem, pItemPanel, wid, hei);
+        getViewDesiredSize(ret,hItem, pItemPanel, wid, hei);
     }
 
     STDMETHOD_(void, InitByTemplate)(SXmlNode xmlTemplate)

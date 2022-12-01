@@ -154,8 +154,8 @@ long WINAPI TestLvAdapter_Release(ILvAdapter *pObj)
 		return 1;
 	}
 
-    SIZE WINAPI TestLvAdapter_getViewDesiredSize(ILvAdapter *pObj, int position, IWindow *pItem, int wid, int hei) {
-		return pItem->lpVtbl->GetDesiredSize(pItem,wid,hei);
+    void WINAPI TestLvAdapter_getViewDesiredSize(ILvAdapter *pObj, SIZE *ret,int position, IWindow *pItem, int wid, int hei) {
+		pItem->lpVtbl->GetDesiredSize(pItem,ret,wid,hei);
 	}
 
 

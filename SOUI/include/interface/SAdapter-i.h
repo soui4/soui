@@ -137,13 +137,14 @@ DECLARE_INTERFACE_(ILvAdapter, IObjRef)
 
     /**
      * @brief 计算列表项显示大小
+	 * @param [output] SIZE* ret -- 列表项大小
      * @param position int -- 列表项索引
      * @param pItem IWindow -- 列表项窗口
      * @param wid int -- 父窗口宽度
      * @param hei int -- 父窗口高度
-     * @return SIZE -- 列表项大小
+     * @return void
      */
-    STDMETHOD_(SIZE, getViewDesiredSize)(THIS_ int position, IWindow *pItem, int wid, int hei) PURE;
+    STDMETHOD_(void, getViewDesiredSize)(THIS_ SIZE* ret, int position, IWindow *pItem, int wid, int hei) PURE;
 
     /**
      * @brief 判断数据是否为空
@@ -268,7 +269,17 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
      */
     STDMETHOD_(int, getViewTypeCount)(THIS) PURE;
 
-    STDMETHOD_(SIZE, getViewDesiredSize)(THIS_ int position, IWindow *pItem, int wid, int hei) PURE;
+    /**
+     * @brief 计算列表项显示大小
+	 * @param [output] SIZE* ret -- 列表项大小
+     * @param position int -- 列表项索引
+     * @param pItem IWindow -- 列表项窗口
+     * @param wid int -- 父窗口宽度
+     * @param hei int -- 父窗口高度
+     * @return void
+     */
+    STDMETHOD_(void, getViewDesiredSize)(THIS_ SIZE* ret, int position, IWindow *pItem, int wid, int hei) PURE;
+
 
     /**
      * @return true if this adapter doesn't contain any data.  This is used to determine
@@ -583,14 +594,15 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
 
     /**
      * @brief 获取表项大小
+	 * @param SIZE *ret -- 窗口大小
      * @param hItem HSTREEITEM--目标项
      * @param pItem IWindow *--窗口指针
      * @param wid int--父窗口宽度
      * @param hei int--你窗口高度
-     * @return SIZE--窗口大小
+     * @return void
      */
-    STDMETHOD_(SIZE, getViewDesiredSize)
-    (THIS_ HSTREEITEM hItem, IWindow * pItem, int wid, int hei) PURE;
+    STDMETHOD_(void, getViewDesiredSize)
+    (THIS_ SIZE *ret, HSTREEITEM hItem, IWindow * pItem, int wid, int hei) PURE;
 
     /**
      * @brief 定义行宽度和treeview客户区宽度相同

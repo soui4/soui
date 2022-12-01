@@ -97,17 +97,18 @@ class SMenuExRoot : public SWindow {
         MONITORINFO monitorInfo = { sizeof(MONITORINFO), 0 };
         GetMonitorInfo(hMonitor, &monitorInfo);
         int maxHei = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
-        return GetDesiredSize(-1, maxHei);
+		CSize szRet;
+        GetDesiredSize(&szRet,-1, maxHei);
+		return szRet;
     }
 
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int wid, int hei) OVERRIDE
     {
-        CSize szRet = __baseCls::GetDesiredSize(wid, hei);
-        if (szRet.cx > m_nMaxWidth.toPixelSize(GetScale()) && !m_nMaxWidth.isWrapContent())
-            szRet.cx = m_nMaxWidth.toPixelSize(GetScale());
-        if (szRet.cx < m_nMinWidth.toPixelSize(GetScale()))
-            szRet.cx = m_nMinWidth.toPixelSize(GetScale());
-        return szRet;
+        __baseCls::GetDesiredSize(psz,wid, hei);
+        if (psz->cx > m_nMaxWidth.toPixelSize(GetScale()) && !m_nMaxWidth.isWrapContent())
+            psz->cx = m_nMaxWidth.toPixelSize(GetScale());
+        if (psz->cx < m_nMinWidth.toPixelSize(GetScale()))
+            psz->cx = m_nMinWidth.toPixelSize(GetScale());
     }
 
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE
@@ -141,9 +142,9 @@ class SMenuExRoot : public SWindow {
         return TRUE;
     }
 
-    STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST OVERRIDE
+    STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT *prc) SCONST OVERRIDE
     {
-        return GetClientRect();
+        GetClientRect(prc);
     }
 
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE
@@ -310,9 +311,10 @@ void SMenuExItem::GetTextRect(LPRECT pRect)
         pRect->right -= pMenuRoot->m_pArrowSkin->GetSkinSize().cx;
 }
 
-SIZE SMenuExItem::GetDesiredSize(int wid, int hei)
+void SMenuExItem::GetDesiredSize(SIZE *psz,int wid, int hei)
 {
-    CSize szRet = __baseCls::GetDesiredSize(wid, hei);
+    CSize szRet;
+	__baseCls::GetDesiredSize(&szRet,wid, hei);
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
     SASSERT(pMenuRoot);
     if (GetChildrenCount() == 0)
@@ -328,7 +330,7 @@ SIZE SMenuExItem::GetDesiredSize(int wid, int hei)
     {
         szRet.cy = smax(szRet.cy, pMenuRoot->m_nItemHei.toPixelSize(GetScale()));
     }
-    return szRet;
+	*psz = szRet;
 }
 
 BOOL SMenuExItem::CreateChildren(SXmlNode xmlNode)
@@ -398,7 +400,7 @@ class SMenuExSep : public SMenuExItem {
         m_bDisable = TRUE;
     }
 
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int wid, int hei) OVERRIDE
     {
         SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
         (void)pMenuRoot;
@@ -421,7 +423,7 @@ class SMenuExSep : public SMenuExItem {
             szRet.cy = GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale());
         }
         szRet.cy += m_style.GetMargin().top + m_style.GetMargin().bottom;
-        return szRet;
+        *psz= szRet;
     }
 
   protected:

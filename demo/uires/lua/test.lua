@@ -112,7 +112,8 @@ function on_timer(args)
 			local rcPlayer = players[win_id]:GetWindowRect2();
 			local widPlayer = rcPlayer:Width();
 			local heiPlayer = rcPlayer:Height();
-			local szFlag = flag_win:GetDesiredSize(widPlayer,heiPlayer);
+			local szFlag = CSize(0,0); 
+			flag_win:GetDesiredSize(szFlag,widPlayer,heiPlayer);
 			rcPlayer.right = rcPlayer.left + szFlag.cx;
 			rcPlayer.bottom = rcPlayer.top + szFlag.cy;
 			rcPlayer:OffsetRect(-szFlag.cx,-szFlag.cy/3);
@@ -156,7 +157,8 @@ function on_canvas_size(args)
 	local heiCanvas = rcCanvas:Height();
 	local widCanvas = rcCanvas:Width();
 
-	local szPlayer = players[1]:GetDesiredSize(widCanvas,heiCanvas);
+	local szPlayer =CSize(0,0);
+	players[1]:GetDesiredSize(szPlayer,widCanvas,heiCanvas);
 
 	local wid = szPlayer.cx;
 	local hei = szPlayer.cy;
@@ -177,7 +179,8 @@ function on_canvas_size(args)
 		local rcPlayer = players[win_id]:GetWindowRect2();
 		local widPlayer = rcPlayer:Width();
 		local heiPlayer = rcPlayer:Height();
-		local szFlag = flag_win:GetDesiredSize(widPlayer,heiPlayer);
+		local szFlag = CSize(0,0);
+		flag_win:GetDesiredSize(szFlag,widPlayer,heiPlayer);
 		flag_win:Move2(rcPlayer.left-szFlag.cx,rcPlayer.top-szFlag.cy/3,-1,-1);
 	end
 

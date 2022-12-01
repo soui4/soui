@@ -137,7 +137,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @brief 获取容器显示位置
      * @return RECT--容器显示位置
      */
-    STDMETHOD_(RECT, GetContainerRect)(CTHIS) SCONST PURE;
+    STDMETHOD_(void, GetContainerRect)(CTHIS_ RECT *ret) SCONST PURE;
 
     /**
      * @brief 请求IRenderTarget对象

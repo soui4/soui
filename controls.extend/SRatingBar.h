@@ -11,7 +11,7 @@ class SRatingBar : public SWindow {
     void SetValue(float fValue);
 
   protected:
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) OVERRIDE;
+	virtual SIZE MeasureContent(int nParentWid, int nParentHei) override;
 
     void DrawStars(IRenderTarget *pRT, CRect rc, BOOL bForeground);
 

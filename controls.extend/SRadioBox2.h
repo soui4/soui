@@ -11,12 +11,12 @@ class SRadioBox2 : public SRadioBox {
     ~SRadioBox2(void);
 
   protected:
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE
+    SIZE MeasureContent(int wid, int hei) override
     {
         if (m_pSkin)
             return m_pSkin->GetSkinSize();
         else
-            return SWindow::GetDesiredSize(wid, hei);
+            return SWindow::MeasureContent(wid, hei);
     }
     virtual void GetTextRect(LPRECT pRect)
     {

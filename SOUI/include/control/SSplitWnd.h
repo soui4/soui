@@ -166,7 +166,7 @@ class SOUI_EXP SSplitWnd : public SWindow {
     void RemoveItem(SSplitPane *pane);
 
   protected:
-    STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT* prc) SCONST OVERRIDE;
 
     /**
      * SSplitWnd::UpdateChildrenPosition

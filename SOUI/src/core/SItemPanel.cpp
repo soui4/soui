@@ -138,11 +138,11 @@ BOOL SOsrPanel::OnFireEvent(IEvtArgs *evt)
     return m_pHostProxy->OnHostFireEvent(evt);
 }
 
-RECT SOsrPanel::GetContainerRect() const
+void SOsrPanel::GetContainerRect(RECT *ret) const
 {
-    CRect rcItem;
+	CRect rcItem;
     m_pItemContainer->OnItemGetRect(this, rcItem);
-    return rcItem;
+	*ret = rcItem;
 }
 
 IRenderTarget *SOsrPanel::OnGetRenderTarget(LPCRECT rc, GrtFlag gdcFlags)

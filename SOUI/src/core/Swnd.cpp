@@ -1763,14 +1763,13 @@ void SWindow::OnNcPaint(IRenderTarget *pRT)
 }
 
 static const int KWnd_MaxSize = 10000;
-SIZE SWindow::GetDesiredSize(int nParentWid, int nParentHei)
+void SWindow::GetDesiredSize(SIZE *psz , int nParentWid, int nParentHei)
 {
 	if(m_funSwndProc){
 		//使用回调函数计算窗口Size
-		SIZE szRet={0};
-		BOOL bRet = m_funSwndProc(this,UM_GETDESIREDSIZE,nParentHei,nParentHei,(LRESULT*)&szRet);
+		BOOL bRet = m_funSwndProc(this,UM_GETDESIREDSIZE,nParentHei,nParentHei,(LRESULT*)psz);
 		if(bRet){
-			return szRet;
+			return;
 		}
 	}
     //检查当前窗口的MatchParent属性及容器窗口的WrapContent属性。
@@ -1845,7 +1844,7 @@ SIZE SWindow::GetDesiredSize(int nParentWid, int nParentHei)
     if (bSaveVert)
         pLayoutParam->SetMatchParent(Vert);
 
-    return szRet;
+	*psz = szRet;
 }
 
 SIZE SWindow::MeasureContent(int nParentWid, int nParentHei)
@@ -2083,12 +2082,12 @@ BOOL SWindow::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     return bRet;
 }
 
-RECT SWindow::GetChildrenLayoutRect() const
+void SWindow::GetChildrenLayoutRect( RECT* prc) const
 {
     CRect rcRet;
     GetClientRect(rcRet);
     rcRet.DeflateRect(GetStyle().GetPadding());
-    return rcRet;
+    *prc = rcRet;
 }
 
 void SWindow::UpdateChildrenPosition()
@@ -2102,7 +2101,9 @@ void SWindow::UpdateChildrenPosition()
         {
             if (pChild->m_bFloat)
             {
-                pChild->OnUpdateFloatPosition(GetChildrenLayoutRect());
+				RECT rcChild;
+				GetChildrenLayoutRect(&rcChild);
+                pChild->OnUpdateFloatPosition(rcChild);
                 if (pChild->m_layoutDirty != dirty_clean)
                 {
                     pChild->UpdateChildrenPosition();

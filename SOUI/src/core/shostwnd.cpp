@@ -209,7 +209,8 @@ void SRootWindow::UpdateLayout()
         {
             nHei = GetLayoutParam()->IsSpecifiedSize(Vert) ? GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale()) : SIZE_WRAP_CONTENT;
         }
-        CSize szRoot = GetDesiredSize(nWid, nHei);
+        CSize szRoot;
+		GetDesiredSize(&szRoot,nWid, nHei);
         OnRelayout(CRect(CPoint(), szRoot));
     }
     else
@@ -420,10 +421,10 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     SXmlNode xmlScript = xmlNode.child(L"script");
     if (xmlScript)
 	{    // create new script module
+		xmlScript.set_userdata(1);
 		SApplication::getSingleton().CreateScriptModule(&m_pScriptModule);
-		GetMsgLoop()->AddIdleHandler(m_pScriptModule->getIdleHandler());
-        xmlScript.set_userdata(1);
 		if(m_pScriptModule){
+			GetMsgLoop()->AddIdleHandler(m_pScriptModule->getIdleHandler());
 			SXmlAttr attrSrc = xmlScript.attribute(L"src");
 			if (attrSrc)
 			{
@@ -551,7 +552,8 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     int nWidth = m_szAppSetted.cx;
     int nHeight = m_szAppSetted.cy;
     CSize szNc = m_pNcPainter->GetNcSize();
-    CSize szRoot = GetRoot()->GetDesiredSize(nWidth, nHeight);
+    CSize szRoot;
+	GetRoot()->GetDesiredSize(&szRoot,nWidth, nHeight);
 
     ILayoutParam *pLayoutParam = GetRoot()->GetLayoutParam();
     if (nWidth == 0 && pLayoutParam->IsSpecifiedSize(Horz))
@@ -966,9 +968,9 @@ BOOL SHostWnd::OnFireEvent(IEvtArgs *evt)
     return _HandleEvent(evt);
 }
 
-RECT SHostWnd::GetContainerRect() const
+void SHostWnd::GetContainerRect(RECT *ret) const
 {
-    return GetRoot()->GetWindowRect();
+    *ret = GetRoot()->GetWindowRect();
 }
 
 HWND SHostWnd::GetHostHwnd()

@@ -21,7 +21,8 @@ class STabSlider
 
         pTabCtrl->GetRoot()->UpdateLayout();
 
-        CRect rcPage = pTabCtrl->GetChildrenLayoutRect();
+        CRect rcPage ;
+		pTabCtrl->GetChildrenLayoutRect(&rcPage);
         if (nType == 0)
         {
             pTabCtrl->InsertChild(this);
@@ -359,7 +360,8 @@ void STabCtrl::OnPaint(IRenderTarget *pRT)
     }
     if (m_pSkinFrame)
     {
-        CRect rcPage = GetChildrenLayoutRect();
+        CRect rcPage ;
+		GetChildrenLayoutRect(&rcPage);
         m_pSkinFrame->DrawByState(pRT, rcPage, WndState_Normal);
     }
 
@@ -373,7 +375,7 @@ void STabCtrl::OnPaint(IRenderTarget *pRT)
     AfterPaint(pRT, painter);
 }
 
-RECT STabCtrl::GetChildrenLayoutRect() const
+void STabCtrl::GetChildrenLayoutRect(RECT *prc) const
 {
     CRect rcRet;
     GetClientRect(rcRet);
@@ -393,7 +395,7 @@ RECT STabCtrl::GetChildrenLayoutRect() const
         rcRet.bottom -= m_szTab[1].toPixelSize(GetScale());
         break;
     }
-    return rcRet;
+    *prc = rcRet;
 }
 
 void STabCtrl::OnLButtonDown(UINT nFlags, CPoint point)
@@ -682,7 +684,8 @@ int STabCtrl::InsertItem(SXmlNode xmlNode, int iInsert /*=-1*/, BOOL bLoading /*
 
     if (!bLoading)
     {
-        CRect rcPage = GetChildrenLayoutRect();
+        CRect rcPage ;
+		GetChildrenLayoutRect(&rcPage);
         pChild->Move(&rcPage);
         pChild->SetVisible(FALSE, FALSE);
         if (m_nCurrentPage >= iInsert)
@@ -871,7 +874,8 @@ void STabCtrl::OnInitFinished(THIS_ IXmlNode *xmlNode)
 
 void STabCtrl::UpdateChildrenPosition()
 {
-    CRect rcPage = GetChildrenLayoutRect();
+    CRect rcPage ;
+	GetChildrenLayoutRect(&rcPage);
     for (size_t i = 0; i < m_lstPages.GetCount(); i++)
     {
         m_lstPages[i]->Move(rcPage);

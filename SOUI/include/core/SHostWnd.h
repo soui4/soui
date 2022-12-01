@@ -421,7 +421,7 @@ class SOUI_EXP SHostWnd
   public: // IContainer
     STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt);
 
-    STDMETHOD_(RECT, GetContainerRect)() const;
+    STDMETHOD_(void, GetContainerRect)(CTHIS_ RECT *ret) const;
 
     STDMETHOD_(HWND, GetHostHwnd)();
 

@@ -542,7 +542,7 @@ int SComboBase::FindString(LPCTSTR pszFind, int iFindAfter /*=-1*/, BOOL bPartMa
     return -1;
 }
 
-SIZE SComboBase::GetDesiredSize(int nParentWid, int nParentHei)
+void SComboBase::GetDesiredSize(SIZE *psz,int nParentWid, int nParentHei)
 {
     CSize szRet(-1, -1);
     if (GetLayoutParam()->IsSpecifiedSize(Horz))
@@ -564,7 +564,10 @@ SIZE SComboBase::GetDesiredSize(int nParentWid, int nParentHei)
     }
 
     if (szRet.cx != -1 && szRet.cy != -1)
-        return szRet;
+	{
+		*psz=szRet;
+		return;
+	}
     int nTestDrawMode = GetTextAlign() & ~(DT_CENTER | DT_RIGHT | DT_VCENTER | DT_BOTTOM);
 
     CRect rcPadding = GetStyle().GetPadding();
@@ -593,7 +596,7 @@ SIZE SComboBase::GetDesiredSize(int nParentWid, int nParentHei)
     if (GetLayoutParam()->IsWrapContent(Vert))
         szRet.cy = rcTest.Height();
 
-    return szRet;
+	*psz=szRet;
 }
 
 SStringT SComboBase::GetWindowText(BOOL bRawText /*=TRUE*/)

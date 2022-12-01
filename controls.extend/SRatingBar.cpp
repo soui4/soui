@@ -30,7 +30,7 @@ void SRatingBar::OnPaint(IRenderTarget *pRT)
     pRT->PopClip();
 }
 
-SIZE SRatingBar::GetDesiredSize(int wid, int hei)
+SIZE SRatingBar::MeasureContent(int wid, int hei)
 {
     if (!m_pStar)
         return CSize(16, 16);

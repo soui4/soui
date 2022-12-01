@@ -107,38 +107,38 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
 
   public: // SwndContainerImpl
-    STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt);
+    STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt) OVERRIDE;
 
-    STDMETHOD_(RECT, GetContainerRect)() const;
+    STDMETHOD_(void, GetContainerRect)(RECT *ret) const OVERRIDE;
 
-    STDMETHOD_(IRenderTarget *, OnGetRenderTarget)(LPCRECT rc, GrtFlag gdcFlags);
+    STDMETHOD_(IRenderTarget *, OnGetRenderTarget)(LPCRECT rc, GrtFlag gdcFlags) OVERRIDE;
 
-    STDMETHOD_(void, OnReleaseRenderTarget)(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags);
+    STDMETHOD_(void, OnReleaseRenderTarget)(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags) OVERRIDE;
 
-    STDMETHOD_(void, OnRedraw)(LPCRECT rc);
+    STDMETHOD_(void, OnRedraw)(LPCRECT rc) OVERRIDE;
 
-    STDMETHOD_(BOOL, OnReleaseSwndCapture)();
+    STDMETHOD_(BOOL, OnReleaseSwndCapture)() OVERRIDE;
 
-    STDMETHOD_(SWND, OnSetSwndCapture)(SWND swnd);
-    STDMETHOD_(HWND, GetHostHwnd)();
-    STDMETHOD_(LPCWSTR, GetTranslatorContext)() const;
-    STDMETHOD_(void, FrameToHost)(RECT *rc) const;
-    STDMETHOD_(BOOL, IsTranslucent)() const;
-    STDMETHOD_(BOOL, IsSendWheel2Hover)() const;
+    STDMETHOD_(SWND, OnSetSwndCapture)(SWND swnd) OVERRIDE;
+    STDMETHOD_(HWND, GetHostHwnd)() OVERRIDE;
+    STDMETHOD_(LPCWSTR, GetTranslatorContext)() const OVERRIDE;
+    STDMETHOD_(void, FrameToHost)(RECT *rc) const OVERRIDE;
+    STDMETHOD_(BOOL, IsTranslucent)() const OVERRIDE;
+    STDMETHOD_(BOOL, IsSendWheel2Hover)() const OVERRIDE;
 
-    STDMETHOD_(BOOL, UpdateWindow)();
+    STDMETHOD_(BOOL, UpdateWindow)() OVERRIDE;
 
-    STDMETHOD_(void, UpdateTooltip)();
+    STDMETHOD_(void, UpdateTooltip)() OVERRIDE;
 
-    STDMETHOD_(IMessageLoop *, GetMsgLoop)();
+    STDMETHOD_(IMessageLoop *, GetMsgLoop)() OVERRIDE;
 
-    STDMETHOD_(IScriptModule *, GetScriptModule)();
+    STDMETHOD_(IScriptModule *, GetScriptModule)() OVERRIDE;
 
-    STDMETHOD_(int, GetScale)() const;
+    STDMETHOD_(int, GetScale)() const OVERRIDE;
 
-    STDMETHOD_(void, EnableIME)(BOOL bEnable);
+    STDMETHOD_(void, EnableIME)(BOOL bEnable) OVERRIDE;
 
-    STDMETHOD_(void, OnUpdateCursor)();
+    STDMETHOD_(void, OnUpdateCursor)() OVERRIDE;
 
   public: // SWindow
     virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);

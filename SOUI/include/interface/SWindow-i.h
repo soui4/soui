@@ -635,11 +635,12 @@ DECLARE_INTERFACE_(IWindow, IObject)
     /**
      * GetChildrenLayoutRect
      * @brief    获得子窗口的布局空间
-     * @return   CRect
+	 * @param  LPRECT prc--布局位置
+     * @return   void
      *
      * Describe  通常是客户区，但是tab,group这样的控件不一样
      */
-    STDMETHOD_(RECT, GetChildrenLayoutRect)(CTHIS) SCONST PURE;
+    STDMETHOD_(void, GetChildrenLayoutRect)(CTHIS_ RECT* prc) SCONST PURE;
 
     /**
      * GetDesiredSize
@@ -650,7 +651,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      *
      * Describe
      */
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) PURE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE* pSize, int nParentWid, int nParentHei) PURE;
 
     /**
      * @brief 获取窗口背景色

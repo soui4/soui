@@ -927,14 +927,15 @@ HRESULT SScrollView::OnAttrViewSize(const SStringW &strValue, BOOL bLoading)
     return S_FALSE;
 }
 
-RECT SScrollView::GetChildrenLayoutRect() const
+void SScrollView::GetChildrenLayoutRect(RECT *prc) const
 {
-    CRect rcRet = __baseCls::GetChildrenLayoutRect();
+    CRect rcRet;
+	__baseCls::GetChildrenLayoutRect(&rcRet);
     CRect rcPadding = GetStyle().GetPadding();
     rcRet.OffsetRect(-m_ptOrigin.x, -m_ptOrigin.y);
     rcRet.right = rcRet.left + m_szView.cx - rcPadding.left - rcPadding.right;
     rcRet.bottom = rcRet.top + m_szView.cy - rcPadding.top - rcPadding.bottom;
-    return rcRet;
+    *prc = rcRet;
 }
 
 void SScrollView::UpdateChildrenPosition()

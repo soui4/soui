@@ -867,7 +867,7 @@ SProgress::SProgress()
     m_bFocusable = TRUE;
 }
 
-SIZE SProgress::GetDesiredSize(int wid, int hei)
+void SProgress::GetDesiredSize(SIZE *psz,int wid, int hei)
 {
     CSize szRet;
     SIZE sizeBg = m_pSkinBg->GetSkinSize();
@@ -888,7 +888,7 @@ SIZE SProgress::GetDesiredSize(int wid, int hei)
         else
             szRet.cx = sizeBg.cx + rcMargin.left + rcMargin.right;
     }
-    return szRet;
+	*psz = szRet;
 }
 
 void SProgress::OnPaint(IRenderTarget *pRT)
@@ -1544,19 +1544,17 @@ void SGroup::OnPaint(IRenderTarget *pRT)
     AfterPaint(pRT, painter);
 }
 
-RECT SGroup::GetChildrenLayoutRect() const
+void SGroup::GetChildrenLayoutRect(RECT *prc) const
 {
-    CRect rcLayout = SWindow::GetChildrenLayoutRect();
-    rcLayout.top += m_nHeaderHeight.toPixelSize(GetScale());
-    return rcLayout;
+    __baseCls:GetChildrenLayoutRect(prc);
+    prc->top += m_nHeaderHeight.toPixelSize(GetScale());
 }
 
-SIZE SGroup::GetDesiredSize(int nParentWid, int nParentHei)
+void SGroup::GetDesiredSize(SIZE *psz,int nParentWid, int nParentHei)
 {
-    CSize szRet = __baseCls::GetDesiredSize(nParentWid, nParentHei);
+    __baseCls::GetDesiredSize(psz,nParentWid, nParentHei);
 	if(GetLayoutParam()->IsWrapContent(Vert))
-		szRet.cy += m_nHeaderHeight.toPixelSize(GetScale());
-    return szRet;
+		psz->cy += m_nHeaderHeight.toPixelSize(GetScale());
 }
 
 SNSEND

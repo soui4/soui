@@ -935,7 +935,8 @@ void STreeView::UpdateVisibleItems()
         }
 
         rcContainer.left = m_tvItemLocator->GetItemIndent(hItem);
-        CSize szItem = m_adapter->getViewDesiredSize(hItem, ii.pItem, rcContainer.Width(), rcContainer.Height());
+        CSize szItem;
+		m_adapter->getViewDesiredSize(&szItem,hItem, ii.pItem, rcContainer.Width(), rcContainer.Height());
         ii.pItem->Move(CRect(0, 0, szItem.cx, szItem.cy));
         m_tvItemLocator->SetItemWidth(hItem, szItem.cx);
         m_tvItemLocator->SetItemHeight(hItem, szItem.cy);

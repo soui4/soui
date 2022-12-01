@@ -139,7 +139,7 @@ class SOUI_EXP SComboBase
   public:
     STDMETHOD_(void, SetWindowText)(LPCTSTR pszText) OVERRIDE;
 
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei) OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int nParentWid, int nParentHei) OVERRIDE;
 
     STDMETHOD_(void, SetFocus)(THIS) OVERRIDE;
 

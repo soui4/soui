@@ -537,7 +537,7 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
      *
      * Describe  根据矩形的大小，获取预期大小(解释有点不对)
      */
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int wid, int hei) OVERRIDE;
     virtual void OnColorize(COLORREF cr);
     virtual void OnScaleChanged(int scale);
 
@@ -992,8 +992,8 @@ class SOUI_EXP SGroup : public SWindow {
     SGroup();
 
   protected:
-    STDMETHOD_(RECT, GetChildrenLayoutRect)(THIS) SCONST OVERRIDE;
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int wid, int hei) OVERRIDE;
+    STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT *prc) SCONST OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int wid, int hei) OVERRIDE;
 
     void OnPaint(IRenderTarget *pRT);
 

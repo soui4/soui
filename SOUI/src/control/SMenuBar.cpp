@@ -40,7 +40,7 @@ class SMenuBarItem
     {
         delete this;
     }
-    STDMETHOD_(SIZE, GetDesiredSize)(THIS_ int nParentWid, int nParentHei);
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE * psz,int nParentWid, int nParentHei);
     BOOL OnCmd(IEvtArgs *e);
 
     void OnTimer(char timerID);
@@ -136,12 +136,11 @@ HRESULT SMenuBarItem::OnAttrSrc(const SStringW &strValue, BOOL bLoading)
     return LoadMenu(S_CW2T(strValue)) ? S_OK : E_INVALIDARG;
 }
 
-SIZE SMenuBarItem::GetDesiredSize(int nParentWid, int nParentHei)
+void SMenuBarItem::GetDesiredSize(SIZE *psz,int nParentWid, int nParentHei)
 {
-    CSize size = SWindow::GetDesiredSize(nParentWid, nParentHei);
-    size.cx += 13;
-    size.cy += 3;
-    return size;
+    SWindow::GetDesiredSize(psz,nParentWid, nParentHei);
+    psz->cx += 13;
+    psz->cy += 3;
 }
 
 BOOL SMenuBarItem::OnCmd(IEvtArgs *e)
