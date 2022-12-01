@@ -768,7 +768,7 @@ void SApplication::SetCreateTaskLoopCallback(THIS_ FunCrateTaskLoop cbCreateTask
 	m_cbCreateTaskLoop = cbCreateTaskLoop;
 }
 
-BOOL SApplication::CreateTaskLoop(THIS_ int nCount)
+BOOL SApplication::CreateTaskLoop(THIS_ int nCount ,Priority priority, BOOL bAutoStart)
 {
 	if(!m_cbCreateTaskLoop)
 		return FALSE;
@@ -777,6 +777,9 @@ BOOL SApplication::CreateTaskLoop(THIS_ int nCount)
 	m_lstTaskLoop.SetCount(nCount);
 	for(int i=0;i<nCount;i++){
 		m_lstTaskLoop[i].Attach(m_cbCreateTaskLoop());
+		if(bAutoStart && m_lstTaskLoop[i]){
+			m_lstTaskLoop[i]->start(SStringA().Format("taskloop_%d",i).c_str(),priority);
+		}
 	}
 	return TRUE;
 }

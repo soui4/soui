@@ -75,7 +75,7 @@ BOOL CWinHttp::ConnectHttpServer(LPCSTR lpIP, WORD wPort)
 	return m_hConnect != NULL;
 }
 
-BOOL CWinHttp::CreateHttpRequest(LPCSTR lpPage, HttpRequest type, DWORD dwFlag/*=0*/)
+BOOL CWinHttp::CreateHttpRequest(LPCSTR lpPage, RequestType type, DWORD dwFlag/*=0*/)
 {
 	LPCWSTR pVerb = (type == Hr_Get)?L"GET":L"POST";
 	SStringW strUri = S_CA2W(lpPage,CP_UTF8);
@@ -135,7 +135,8 @@ BOOL CWinHttp::DownloadFile( LPCSTR lpUrl, LPCSTR lpFilePath )
 		return false;
 	}
 	void* lpBuff = malloc(HTTP_READBUF_LEN);
-	while( true )
+	BOOL bCancel = FALSE;
+	while( !bCancel )
 	{
 		if ( dwBytesToRead>HTTP_READBUF_LEN )
 		{
@@ -149,7 +150,14 @@ BOOL CWinHttp::DownloadFile( LPCSTR lpUrl, LPCSTR lpFilePath )
 			break;
 		dwRecvSize += dwReadSize;
 		if( m_pCallback )
-			m_pCallback->OnDownloadCallback(m_lpParam, DS_Loading, dwFileSize, dwRecvSize);
+		{
+			BOOL bRet = m_pCallback->OnDownloadCallback(m_lpParam, DS_Loading, dwFileSize, dwRecvSize);
+			if(!bRet){
+				m_error = Hir_UserCancel;
+				bCancel = TRUE;
+				break;
+			}
+		}
 		if ( !::WinHttpQueryDataAvailable(m_hRequest, &dwBytesToRead) )
 			break;
 		if ( dwBytesToRead<= 0 )
@@ -235,7 +243,7 @@ int CWinHttp::QueryStatusCode()
 	return http_code;
 }
 
-BOOL CWinHttp::Request(IStringA *out, LPCSTR lpUrl, HttpRequest type, LPCSTR lpPostData /*= NULL*/, LPCSTR lpHeader/*=NULL*/ )
+BOOL CWinHttp::Request(IStringA *out, LPCSTR lpUrl, RequestType type, LPCSTR lpPostData /*= NULL*/, LPCSTR lpHeader/*=NULL*/ )
 {
 	if ( !InitConnect(lpUrl, type, lpPostData, lpHeader) )
 		return FALSE;
@@ -341,7 +349,7 @@ static void ParseUrl( LPCSTR lpUrl, string& strHostName, string& strPage, WORD& 
 	strPage=strTemp.substr(nPos, strTemp.size()-nPos);
 }
 
-BOOL CWinHttp::InitConnect( LPCSTR lpUrl, HttpRequest type, LPCSTR lpPostData/*=NULL*/, LPCSTR lpHeader/*=NULL*/ )
+BOOL CWinHttp::InitConnect( LPCSTR lpUrl, RequestType type, LPCSTR lpPostData/*=NULL*/, LPCSTR lpHeader/*=NULL*/ )
 {
 	Close();
 	if ( !Init() )

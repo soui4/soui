@@ -13,11 +13,11 @@
 
 SNSBEGIN
 
-typedef enum HttpRequest
+typedef enum RequestType
 {
 	Hr_Post,
 	Hr_Get,
-}HttpRequest;
+}RequestType;
 //Ã¶¾ÙÏÂÔØ×´Ì¬
 typedef enum DownloadState
 {
@@ -73,8 +73,7 @@ DECLARE_INTERFACE_(IHttpCallback, IObjRef){
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
 	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(void,OnDownloadCallback)(THIS_ void* pParam, DownloadState state, uint64_t nTotalSize, uint64_t nLoadSize) PURE;
-	STDMETHOD_(BOOL,IsNeedStop)(CTHIS) SCONST PURE;
+	STDMETHOD_(BOOL,OnDownloadCallback)(THIS_ void* pParam, DownloadState state, uint64_t nTotalSize, uint64_t nLoadSize) PURE;
 };
 
 #undef INTERFACE
@@ -103,7 +102,7 @@ DECLARE_INTERFACE_(IHttpClient, IObjRef){
 	STDMETHOD_(BOOL,DownloadFile)(THIS_ LPCSTR lpUrl, LPCSTR lpFilePath) PURE;
 	STDMETHOD_(BOOL,DownloadToMem)(THIS_ LPCSTR lpUrl, OUT void** ppBuffer, OUT int* nSize) PURE;
 	STDMETHOD_(HttpError,GetErrorCode)(CTHIS) SCONST PURE;
-	STDMETHOD_(BOOL,Request)(THIS_ IStringA *result,LPCSTR lpUrl, HttpRequest type, LPCSTR lpPostData DEF_VAL(NULL), LPCSTR lpHeader DEF_VAL(NULL)) PURE;
+	STDMETHOD_(BOOL,Request)(THIS_ IStringA *result,LPCSTR lpUrl, RequestType type, LPCSTR lpPostData DEF_VAL(NULL), LPCSTR lpHeader DEF_VAL(NULL)) PURE;
 	STDMETHOD_(void,SetTimeOut)(THIS_ int dwConnectTime,  int dwSendTime, int dwRecvTime) PURE;		
 	STDMETHOD_(int,GetHttpCode)(CTHIS) SCONST PURE;
 };

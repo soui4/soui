@@ -16,7 +16,7 @@ public:
 	
 	STDMETHOD_(void,SetHeader)(LPCSTR pszKey,LPCSTR pszValue);
 	STDMETHOD_(void,SetTimeOut)(int dwConnectTime,  int dwSendTime, int dwRecvTime);
-	STDMETHOD_(BOOL,Request)(IStringA *out,LPCSTR lpUrl, HttpRequest type, LPCSTR lpPostData = NULL, LPCSTR lpHeader=NULL);
+	STDMETHOD_(BOOL,Request)(IStringA *out,LPCSTR lpUrl, RequestType type, LPCSTR lpPostData = NULL, LPCSTR lpHeader=NULL);
 	STDMETHOD_(HttpError, GetErrorCode)() const { return m_error;	}
 	STDMETHOD_(void,SetDownloadCallback)(IHttpCallback* pCallback, void* pParam)		{ m_pCallback = pCallback; m_lpParam = pParam; }
 	STDMETHOD_(BOOL,DownloadFile)(LPCSTR lpUrl, LPCSTR lpFilePath);
@@ -26,9 +26,9 @@ protected:
 	BOOL	Init();
 	void	Close();
 	//init
-	BOOL	InitConnect(LPCSTR lpUrl, HttpRequest type, LPCSTR lpPostData=NULL, LPCSTR lpHeader=NULL);
+	BOOL	InitConnect(LPCSTR lpUrl, RequestType type, LPCSTR lpPostData=NULL, LPCSTR lpHeader=NULL);
 	BOOL	ConnectHttpServer(LPCSTR lpIP, WORD wPort);
-	BOOL	CreateHttpRequest(LPCSTR lpPage, HttpRequest type, DWORD dwFlag=0);
+	BOOL	CreateHttpRequest(LPCSTR lpPage, RequestType type, DWORD dwFlag=0);
 	BOOL	SendHttpRequest(LPCSTR lpPostData=NULL, LPCSTR lpHeader=NULL);
 	//query 
 	BOOL	QueryRawHeaders(OUT std::wstring& strHeaders);

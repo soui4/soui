@@ -301,7 +301,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 
 	STDMETHOD_(void,SetDefaultFontInfo)(THIS_ LPCWSTR pszFontInfo) PURE;
 
-	STDMETHOD_(BOOL,CreateTaskLoop)(THIS_ int nCount DEF_VAL(1)) PURE;
+	STDMETHOD_(BOOL,CreateTaskLoop)(THIS_ int nCount,Priority priority,BOOL bAutoStart DEF_VAL(TRUE)) PURE;
 	STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) PURE;
 	STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) PURE;
 };

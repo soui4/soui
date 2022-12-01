@@ -80,7 +80,7 @@ void CHttpHeader::setRange(__int64 range)
 	http_headers.insert(std::make_pair(HEADER_RANGE, std::string(buffer)));
 }
 
-std::string CHttpHeader::toString(HttpRequest type)
+std::string CHttpHeader::toString(RequestType type)
 {
 	//Ìî³äÄ¬ÈÏÖµ
 	if (http_version_.empty()) {

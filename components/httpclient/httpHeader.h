@@ -30,7 +30,7 @@ public:
 	void setRange(__int64 range);
 
 	//转成http请求头
-	std::string toString(HttpRequest type);
+	std::string toString(RequestType type);
 	//转成http请求头列表
 	std::string toHttpHeaders();
 
