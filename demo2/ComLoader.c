@@ -121,7 +121,7 @@ struct SComInfo s_comInfo[]={
 #pragma comment(lib,"sipcobjectd")
 #endif
 #if(SCOM_MASK&scom_mask_script_lua)
-#pragma comment(lib,"lua-53d")
+#pragma comment(lib,"lua-54d")
 #pragma comment(lib,"scriptmodule-luad")
 #endif
 #else//_DEBUG
@@ -167,7 +167,7 @@ struct SComInfo s_comInfo[]={
 #pragma comment(lib,"sipcobject")
 #endif
 #if(SCOM_MASK&scom_mask_script_lua)
-#pragma comment(lib,"lua-53")
+#pragma comment(lib,"lua-54")
 #pragma comment(lib,"scriptmodule-lua")
 #endif
 #endif//_DEBUG
