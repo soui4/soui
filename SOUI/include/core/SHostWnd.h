@@ -200,7 +200,6 @@ class SOUI_EXP SHostWnd
 
 	EventHandlerInfo m_evtHandler;
 	SAutoRefPtr<IHostPresenter> m_presenter;
-	FunCreatePresenter	m_funCreatePresenter;
   public:
     SHostWnd(LPCWSTR pszResName = NULL);
 	SHostWnd(LPCSTR pszResName);
@@ -233,6 +232,8 @@ class SOUI_EXP SHostWnd
 	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST OVERRIDE;
 	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) OVERRIDE;
 
+	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) OVERRIDE;
+
 	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep=-1) OVERRIDE{
 		return m_pRoot->FindIChildByID(nId,nDeep);
 	}
@@ -262,8 +263,6 @@ class SOUI_EXP SHostWnd
 	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) OVERRIDE;
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) OVERRIDE;
-
-	STDMETHOD_(void, SetCreatePresenterCallback)(THIS_ FunCreatePresenter fun) OVERRIDE;
   public:
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1)
     {
@@ -463,7 +462,6 @@ class SOUI_EXP SHostWnd
   protected:
     virtual IToolTip *CreateTooltip() const;
     virtual void DestroyTooltip(IToolTip *pTooltip) const;
-	virtual IHostPresenter* CreatePresenter();
   protected:
     virtual BOOL OnLoadLayoutFromResourceID(const SStringT &resId);
     virtual void OnUserXmlNode(SXmlNode xmlUser);

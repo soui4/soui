@@ -368,6 +368,9 @@ public:
 		return SHostWnd::GetPresenter();
 	}
 
+	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) OVERRIDE{
+		return SHostWnd::SetPresenter(pPresenter);
+	}
 
 	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep =-1) OVERRIDE{
 		return SHostWnd::FindIChildByID(nId,nDeep);
@@ -396,10 +399,6 @@ public:
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) OVERRIDE{
 		return SHostWnd::AnimateHostWindow(dwTime,dwFlags);
-	}
-
-	STDMETHOD_(void, SetCreatePresenterCallback)(THIS_ FunCreatePresenter fun) OVERRIDE{
-		return SHostWnd::SetCreatePresenterCallback(fun);
 	}
 };
 

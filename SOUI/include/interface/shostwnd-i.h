@@ -13,8 +13,6 @@ typedef struct _EventHandlerInfo{
 	void * ctx;
 }EventHandlerInfo;
 
-typedef IHostPresenter* (*FunCreatePresenter)(IHostWnd *);
-
 #undef INTERFACE
 #define INTERFACE IHostWnd
 DECLARE_INTERFACE_(IHostWnd, INativeWnd)
@@ -165,6 +163,8 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
 	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST PURE;
 	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) PURE;
+	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) PURE;
+
     /**
      * @brief 根据ID查找子窗口
      * @param nId int--子窗口ID
@@ -192,7 +192,6 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) PURE;
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) PURE;
-	STDMETHOD_(void, SetCreatePresenterCallback)(THIS_ FunCreatePresenter fun) PURE;
 };
 
 #undef INTERFACE
@@ -345,6 +344,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
 	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST PURE;
 	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) PURE;
+	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) PURE;
 
 	/**
      * @brief 根据ID查找子窗口
@@ -371,7 +371,6 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) PURE;
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) PURE;
-	STDMETHOD_(void, SetCreatePresenterCallback)(THIS_ FunCreatePresenter fun) PURE;
 
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent /*=NULL*/) PURE;

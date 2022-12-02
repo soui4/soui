@@ -298,7 +298,6 @@ void SHostWnd::_Init()
 	m_hostAnimationHandler.m_pHostWnd = this;
 	m_evtHandler.fun = NULL;
 	m_evtHandler.ctx = NULL;
-	m_funCreatePresenter = NULL;
 }
 
 
@@ -737,7 +736,10 @@ BOOL SHostWnd::OnLoadLayoutFromResourceID(const SStringT &resId)
 
 int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	m_presenter.Attach(CreatePresenter());
+	if(!m_presenter)
+	{
+		m_presenter.Attach(new SHostPresenter(this));
+	}
     m_dwThreadID = GetCurrentThreadId();
     SHostMgr::getSingletonPtr()->AddHostMsgHandler(this);
     UpdateAutoSizeCount(true);
@@ -1798,18 +1800,8 @@ IHostPresenter* SHostWnd::GetPresenter(THIS)
 	return m_presenter;
 }
 
-IHostPresenter* SHostWnd::CreatePresenter()
-{
-	if(m_funCreatePresenter){
-		return m_funCreatePresenter(this);
-	}else{
-		return new SHostPresenter(this);
-	}
-}
-
-void SHostWnd::SetCreatePresenterCallback(THIS_ FunCreatePresenter fun)
-{
-	m_funCreatePresenter = fun;
+void SHostWnd::SetPresenter(THIS_ IHostPresenter* pPresenter){
+	m_presenter = pPresenter;
 }
 
 //////////////////////////////////////////////////////////////////
