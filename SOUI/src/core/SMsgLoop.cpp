@@ -179,7 +179,7 @@ BOOL SMessageLoop::PostTask(IRunnable *runable)
     if (m_tid == 0)
         return FALSE;
     m_runnables.AddTail(runable->clone());
-    if (m_runnables.GetCount() == 1)
+    if (m_runnables.GetCount() > 5)
     {
         PostThreadMessage(m_tid, WM_NULL, 0, 0);
     }

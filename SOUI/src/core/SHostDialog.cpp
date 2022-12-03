@@ -10,14 +10,12 @@ SHostDialog::SHostDialog(LPCWSTR pszXmlName)
     : THostWndProxy<IHostDialog>(pszXmlName)
     , m_nRetCode(RC_INIT)
 {
-    SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop);
 }
 
 SHostDialog::SHostDialog(LPCSTR pszXmlName)
 : THostWndProxy<IHostDialog>(pszXmlName)
 , m_nRetCode(RC_INIT)
 {
-	SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop,SApplication::getSingletonPtr()->GetMsgLoop());
 }
 
 SHostDialog::~SHostDialog(void)
@@ -27,6 +25,9 @@ SHostDialog::~SHostDialog(void)
 
 INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
 {
+	SASSERT(!m_MsgLoop);
+	SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop,SApplication::getSingletonPtr()->GetMsgLoop());
+
     if (!hParent)
     {
         hParent = ::GetActiveWindow();
@@ -81,12 +82,17 @@ INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
 
     if (IsWindow())
         SNativeWnd::DestroyWindow();
-
+	m_MsgLoop = NULL;
     return m_nRetCode;
 }
 
 void SHostDialog::EndDialog(INT_PTR nResult)
 {
+	if(!m_MsgLoop)
+	{
+		SSLOGW()<<"dialog is not show by DoModal";
+		return;
+	}
     SASSERT(nResult != RC_INIT);
     if (m_nRetCode == RC_INIT)
     {
@@ -95,6 +101,14 @@ void SHostDialog::EndDialog(INT_PTR nResult)
         SNativeWnd::SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
         PostMessage(WM_NULL);
     }
+}
+
+IMessageLoop * SHostDialog::GetMsgLoop(THIS)
+{
+	if(m_MsgLoop)
+		return m_MsgLoop;
+	else
+		return SHostWnd::GetMsgLoop();
 }
 
 void SHostDialog::OnOK()

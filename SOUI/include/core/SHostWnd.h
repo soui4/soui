@@ -233,6 +233,7 @@ class SOUI_EXP SHostWnd
 	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) OVERRIDE;
 
 	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) OVERRIDE;
+	STDMETHOD_(IMessageLoop *, GetMsgLoop)(THIS) OVERRIDE;
 
 	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep=-1) OVERRIDE{
 		return m_pRoot->FindIChildByID(nId,nDeep);
@@ -447,7 +448,7 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(BOOL, RegisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
 
-    STDMETHOD_(IMessageLoop *, GetMsgLoop)();
+	//STDMETHOD_(IMessageLoop *, GetMsgLoop)(); same as IHostWnd::GetMsgLoop
 
     STDMETHOD_(IScriptModule *, GetScriptModule)();
 

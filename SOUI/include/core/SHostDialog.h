@@ -29,17 +29,15 @@ class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
     ~SHostDialog(void);
 
   public:
+    STDMETHOD_(IMessageLoop *, GetMsgLoop)(THIS) OVERRIDE;
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent = NULL) OVERRIDE;
     STDMETHOD_(void, EndDialog)(THIS_ INT_PTR nResult) OVERRIDE;
+
     SHostWnd* toSHostWnd() { return this; }
   protected:
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
     void OnOK();
     void OnCancel();
-    STDMETHOD_(IMessageLoop *, GetMsgLoop)()
-    {
-        return m_MsgLoop;
-    }
 
     EVENT_MAP_BEGIN()
         EVENT_ID_COMMAND(IDOK, OnOK)

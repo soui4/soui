@@ -372,6 +372,10 @@ public:
 		return SHostWnd::SetPresenter(pPresenter);
 	}
 
+	STDMETHOD_(IMessageLoop*,GetMsgLoop)(THIS) OVERRIDE{
+		return SHostWnd::GetMsgLoop();
+	}
+
 	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep =-1) OVERRIDE{
 		return SHostWnd::FindIChildByID(nId,nDeep);
 	}

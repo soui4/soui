@@ -1,6 +1,8 @@
 #pragma once
 #include <interface/SNativeWnd-i.h>
 #include <interface/SNcPainter-i.h>
+#include <interface/smsgloop-i.h>
+
 SNSBEGIN
 
 typedef struct IWindow IWindow;
@@ -164,6 +166,7 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST PURE;
 	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) PURE;
 	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) PURE;
+	STDMETHOD_(IMessageLoop*,GetMsgLoop)(THIS) PURE;
 
     /**
      * @brief 根据ID查找子窗口
@@ -345,6 +348,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST PURE;
 	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) PURE;
 	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) PURE;
+	STDMETHOD_(IMessageLoop*,GetMsgLoop)(THIS) PURE;
 
 	/**
      * @brief 根据ID查找子窗口
