@@ -1546,7 +1546,7 @@ void SGroup::OnPaint(IRenderTarget *pRT)
 
 void SGroup::GetChildrenLayoutRect(RECT *prc) const
 {
-    __baseCls:GetChildrenLayoutRect(prc);
+	__baseCls::GetChildrenLayoutRect(prc);
     prc->top += m_nHeaderHeight.toPixelSize(GetScale());
 }
 
