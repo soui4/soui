@@ -14,14 +14,14 @@ public:
 	CWinHttp(void);
 	virtual ~CWinHttp(void);
 	
-	STDMETHOD_(void,SetHeader)(LPCSTR pszKey,LPCSTR pszValue);
-	STDMETHOD_(void,SetTimeOut)(int dwConnectTime,  int dwSendTime, int dwRecvTime);
-	STDMETHOD_(BOOL,Request)(IStringA *out,LPCSTR lpUrl, RequestType type, LPCSTR lpPostData = NULL, LPCSTR lpHeader=NULL);
-	STDMETHOD_(HttpError, GetErrorCode)() const { return m_error;	}
-	STDMETHOD_(void,SetDownloadCallback)(IHttpCallback* pCallback, void* pParam)		{ m_pCallback = pCallback; m_lpParam = pParam; }
-	STDMETHOD_(BOOL,DownloadFile)(LPCSTR lpUrl, LPCSTR lpFilePath);
-	STDMETHOD_(BOOL,DownloadToMem)(LPCSTR lpUrl, OUT void** ppBuffer, OUT int* nSize);
-	STDMETHOD_(int,GetHttpCode)(CTHIS)SCONST {return m_httpCode;}
+	STDMETHOD_(void,SetHeader)(THIS_ LPCSTR pszKey,LPCSTR pszValue) OVERRIDE;
+	STDMETHOD_(void,SetTimeOut)(THIS_ int dwConnectTime,  int dwSendTime, int dwRecvTime) OVERRIDE;
+	STDMETHOD_(BOOL,Request)(THIS_ IStringA *out,LPCSTR lpUrl, RequestType type, LPCSTR lpPostData = NULL, LPCSTR lpHeader=NULL) OVERRIDE;
+	STDMETHOD_(HttpError, GetErrorCode)(CTHIS) SCONST OVERRIDE{ return m_error;	}
+	STDMETHOD_(void,SetDownloadCallback)(THIS_ IHttpCallback* pCallback)  OVERRIDE{ m_pCallback = pCallback; }
+	STDMETHOD_(BOOL,DownloadFile)(THIS_ LPCSTR lpUrl, LPCSTR lpFilePath)  OVERRIDE;
+	STDMETHOD_(BOOL,DownloadToMem)(THIS_ LPCSTR lpUrl, OUT void** ppBuffer, OUT int* nSize) OVERRIDE;
+	STDMETHOD_(int,GetHttpCode)(CTHIS) SCONST  OVERRIDE{return m_httpCode;}
 protected:
 	BOOL	Init();
 	void	Close();
@@ -36,7 +36,6 @@ protected:
 	int QueryStatusCode();
 private:
 
-	void*	m_lpParam;
 	HttpError	m_error;
 	IHttpCallback*	m_pCallback;
 

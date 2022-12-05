@@ -73,7 +73,7 @@ DECLARE_INTERFACE_(IHttpCallback, IObjRef){
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
 	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(BOOL,OnDownloadCallback)(THIS_ void* pParam, DownloadState state, uint64_t nTotalSize, uint64_t nLoadSize) PURE;
+	STDMETHOD_(BOOL,OnDownloadCallback)(THIS_ DownloadState state, uint64_t nTotalSize, uint64_t nLoadSize) PURE;
 };
 
 #undef INTERFACE
@@ -97,8 +97,8 @@ DECLARE_INTERFACE_(IHttpClient, IObjRef){
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
 	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(void,SetHeader)(LPCSTR pszKey,LPCSTR pszValue) PURE;
-	STDMETHOD_(void,SetDownloadCallback)(THIS_ IHttpCallback* pCallback, void* pParam) PURE;
+	STDMETHOD_(void,SetHeader)(THIS_ LPCSTR pszKey,LPCSTR pszValue) PURE;
+	STDMETHOD_(void,SetDownloadCallback)(THIS_ IHttpCallback* pCallback) PURE;
 	STDMETHOD_(BOOL,DownloadFile)(THIS_ LPCSTR lpUrl, LPCSTR lpFilePath) PURE;
 	STDMETHOD_(BOOL,DownloadToMem)(THIS_ LPCSTR lpUrl, OUT void** ppBuffer, OUT int* nSize) PURE;
 	STDMETHOD_(HttpError,GetErrorCode)(CTHIS) SCONST PURE;

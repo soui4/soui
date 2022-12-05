@@ -31,7 +31,6 @@ CWinHttp::CWinHttp(void)
 	,m_nConnTimeout(5000)
 	,m_nSendTimeout(5000)
 	,m_nRecvTimeout(5000)
-	, m_lpParam(NULL)
 	, m_error(Hir_Success)
 	, m_pCallback(NULL)
 {
@@ -151,7 +150,7 @@ BOOL CWinHttp::DownloadFile( LPCSTR lpUrl, LPCSTR lpFilePath )
 		dwRecvSize += dwReadSize;
 		if( m_pCallback )
 		{
-			BOOL bRet = m_pCallback->OnDownloadCallback(m_lpParam, DS_Loading, dwFileSize, dwRecvSize);
+			BOOL bRet = m_pCallback->OnDownloadCallback(DS_Loading, dwFileSize, dwRecvSize);
 			if(!bRet){
 				m_error = Hir_UserCancel;
 				bCancel = TRUE;
