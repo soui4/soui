@@ -150,11 +150,11 @@ public:
 			return 1;//even lines 
 	}
 
-	virtual SIZE WINAPI getViewDesiredSize(int position, SItemPanel* pItem, int nWid, int nHei) override
+	virtual void WINAPI getViewDesiredSize(SIZE *retSize,int position, SItemPanel *pItem, int nWid, int nHei) override
 	{
 		DWORD dwState = pItem->GetState();
 		int viewType = getItemViewType(position, dwState);
-		return CSize(0, m_nItemHeight[viewType]);//cx在listview，mclistview中没有使用，不需要计算
+        *retSize = CSize(0, m_nItemHeight[viewType]); // cx在listview，mclistview中没有使用，不需要计算
 	}
 
 	virtual void WINAPI getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
