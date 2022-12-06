@@ -478,19 +478,20 @@ BOOL STreeView::SetAdapter(ITvAdapter *adapter)
         m_pVisibleMap->RemoveAll();
     }
 
-    if (m_tvItemLocator)
-    {
-        SXmlNode xmlNode = m_xmlTemplate.root().first_child();
-        m_adapter->InitByTemplate(&xmlNode);
+	if (m_tvItemLocator)
+		m_tvItemLocator->SetAdapter(adapter);
 
-        m_tvItemLocator->SetAdapter(adapter);
+	if(adapter)
+	{
+		SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+		m_adapter->InitByTemplate(&xmlNode);
+		for (int i = 0; i < m_adapter->getViewTypeCount(); i++)
+		{
+			m_itemRecycle.Add(new SList<SItemPanel*>());
+		}
+		onBranchChanged(ITEM_ROOT);
+	}
 
-        for (int i = 0; i < m_adapter->getViewTypeCount(); i++)
-        {
-            m_itemRecycle.Add(new SList<SItemPanel *>());
-        }
-    }
-    onBranchChanged(ITEM_ROOT);
     return TRUE;
 }
 
