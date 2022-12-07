@@ -413,6 +413,7 @@ void STileView::UpdateVisibleItems()
     delete[] pItemInfos;
 
     m_iFirstVisible = iNewFirstVisible;
+	InvalidateRect(NULL);
 }
 
 void STileView::OnSize(UINT nType, CSize size)

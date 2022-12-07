@@ -12,4 +12,4 @@
 #define SOUI_VER1 4
 #define SOUI_VER2 3
 #define SOUI_VER3 0
-#define SOUI_VER4 2
+#define SOUI_VER4 3

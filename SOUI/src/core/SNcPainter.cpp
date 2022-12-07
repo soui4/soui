@@ -463,7 +463,7 @@ LRESULT SNcPainter::OnRepaint(UINT msg, WPARAM wp, LPARAM lp)
     }
     else
     {
-        InvalidateHostRect(NULL);
+        InvalidateHostRect(NULL,FALSE);
     }
     return 0;
 }
@@ -550,17 +550,17 @@ CRect SNcPainter::GetHostRect() const
     return rcItem;
 }
 
-void SNcPainter::InvalidateHostRect(LPCRECT pRc)
+void SNcPainter::InvalidateHostRect(LPCRECT pRc,BOOL bClip)
 {
     if (m_bInPaint)
         return;
     m_memRT->SaveClip(NULL);
     if (pRc)
-        m_memRT->PushClipRect(pRc, RGN_OR);
+		m_memRT->PushClipRect(pRc, bClip?RGN_DIFF:RGN_OR);
     else
     {
         CRect rc = m_root->GetClientRect();
-        m_memRT->PushClipRect(&rc, RGN_OR);
+        m_memRT->PushClipRect(&rc, bClip?RGN_DIFF:RGN_OR);
     }
     m_pHost->SendMessage(WM_NCPAINT);
     m_memRT->PopClip();

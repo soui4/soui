@@ -140,7 +140,7 @@ HSTREEITEM STreeViewItemLocator::_Position2Item(int position, HSTREEITEM hParent
 int STreeViewItemLocator::_GetItemVisibleWidth(HSTREEITEM hItem) const
 {
     int nRet = GetItemWidth(hItem);
-    if (m_adapter->GetFirstChildItem(hItem) != ITEM_NULL)
+    if (m_adapter->IsItemExpanded(hItem) && m_adapter->GetFirstChildItem(hItem) != ITEM_NULL)
     {
         int nIndent = m_adapter->GetParentItem(hItem) == ITEM_ROOT ? 0 : m_nIndent;
         nRet = smax(nRet, _GetBranchWidth(hItem) + nIndent);
@@ -378,7 +378,7 @@ void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem, BOOL bExpan
 {
     if (bExpandedNew == bExpandedOld)
         return;
-
+	int nOldBranchWidth= _GetBranchWidth(hItem);
     int nBranchHei = _GetBranchHeight(hItem);
     HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
     while (hParent != ITEM_NULL)
@@ -389,6 +389,11 @@ void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem, BOOL bExpan
         hParent = m_adapter->GetParentItem(hParent);
     }
     _UpdateSiblingsOffset(hItem);
+
+	int nNewBranchWidth = _GetItemVisibleWidth(hItem);
+	if (nOldBranchWidth == nNewBranchWidth)
+		return;
+	_UpdateBranchWidth(hItem, nOldBranchWidth, nNewBranchWidth);
 }
 
 void STreeViewItemLocator::OnBranchChanged(HSTREEITEM hItem)
@@ -854,7 +859,7 @@ void STreeView::UpdateScrollBar()
     //  重新计算客户区及非客户区
     SSendMessage(WM_NCCALCSIZE);
 
-    Invalidate();
+    InvalidateRect(NULL);
 }
 
 void STreeView::UpdateVisibleItems()
@@ -981,7 +986,9 @@ void STreeView::UpdateVisibleItems()
     { // update scroll range
         UpdateScrollBar();
         UpdateVisibleItems(); //根据新的滚动条状态重新记算显示列表项
-    }
+	}else{
+		InvalidateRect(NULL);
+	}
 }
 
 void STreeView::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)

@@ -733,7 +733,9 @@ void SMCListView::UpdateVisibleItems()
     { // update scroll range
         UpdateScrollBar();
         UpdateVisibleItems(); //根据新的滚动条状态重新记录显示列表项
-    }
+	}else{
+		InvalidateRect(NULL);
+	}
 }
 
 void SMCListView::UpdateVisibleItem(int iItem)

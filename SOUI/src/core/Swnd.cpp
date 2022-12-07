@@ -1109,34 +1109,12 @@ void SWindow::_PaintNonClient(IRenderTarget *pRT)
 
 void SWindow::_RedrawNonClient()
 {
-    SAutoRefPtr<IRegionS> rgn;
-    GETRENDERFACTORY->CreateRegion(&rgn);
     CRect rcWnd = GetWindowRect();
     CRect rcClient = SWindow::GetClientRect();
     if (rcWnd == rcClient)
         return;
-    rgn->CombineRect(&rcWnd, RGN_COPY);
-    rgn->CombineRect(&rcClient, RGN_DIFF);
-    if (m_clipRgn)
-    {
-        m_clipRgn->Offset(GetWindowRect().TopLeft());
-        rgn->CombineRgn(m_clipRgn, RGN_AND);
-        m_clipRgn->Offset(-GetWindowRect().TopLeft());
-    }
-    if (!rgn->IsEmpty())
-    {
-        IRenderTarget *pRT = GetRenderTarget(GRT_OFFSCREEN, rgn); //不自动画背景
-        if (m_clipPath)
-        {
-            m_clipPath->offset((float)rcWnd.left, (float)rcWnd.top);
-            pRT->PushClipPath(m_clipPath, RGN_AND, true);
-            m_clipPath->offset(-(float)rcWnd.left, -(float)rcWnd.top);
-        }
-        PaintBackground(pRT, &rcWnd);
-        SSendMessage(WM_NCPAINT, (WPARAM)pRT);
-        PaintForeground(pRT, &rcWnd);
-        ReleaseRenderTarget(pRT);
-    }
+	InvalidateRect(rcWnd,TRUE,FALSE);//invalid window rect
+	InvalidateRect(rcClient,TRUE,TRUE);//but clip client rect
 }
 
 SAutoRefPtr<IRegionS> SWindow::_ConvertRect2RenderRegion(const CRect &rc) const
@@ -1333,7 +1311,7 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
 void SWindow::TransformPoint(CPoint &pt) const
 {
     STransformation xform = GetTransformation();
-    if (xform.hasMatrix())
+    if (xform.hasMatrix() && !xform.getMatrix().isIdentity())
     {
         CRect rc = GetWindowRect();
         SMatrix mtx = xform.getMatrix();
@@ -1410,7 +1388,7 @@ void SWindow::InvalidateRect(LPCRECT lprect)
     }
 }
 
-void SWindow::InvalidateRect(const CRect &rect, BOOL bFromThis /*=TRUE*/)
+void SWindow::InvalidateRect(const CRect &rect, BOOL bFromThis /*=TRUE*/,BOOL bClip/*=FALSE*/)
 {
     ASSERT_UI_THREAD();
     if (!IsVisible(TRUE) || IsUpdateLocked() || !GetContainer())
@@ -1422,10 +1400,10 @@ void SWindow::InvalidateRect(const CRect &rect, BOOL bFromThis /*=TRUE*/)
     CRect rcIntersect = rect & rcWnd;
     if (rcIntersect.IsRectEmpty())
         return;
-    MarkCacheDirty(true);
+    if(!bClip) MarkCacheDirty(true);
 
     STransformation xForm = GetTransformation();
-    if (xForm.hasMatrix())
+    if (xForm.hasMatrix() && !xForm.getMatrix().isIdentity())
     {
         SMatrix mtx = xForm.getMatrix();
         mtx.preTranslate((int)-rcWnd.left, (int)-rcWnd.top);
@@ -1436,11 +1414,11 @@ void SWindow::InvalidateRect(const CRect &rect, BOOL bFromThis /*=TRUE*/)
     }
 	if (GetParent())
 	{
-		GetParent()->InvalidateRect(rcIntersect, FALSE);
+		GetParent()->InvalidateRect(rcIntersect, FALSE,bClip);
 	}
 	else
 	{
-		GetContainer()->OnRedraw(rcIntersect);
+		GetContainer()->OnRedraw(rcIntersect,bClip);
 	}
 
 }
@@ -2289,7 +2267,7 @@ void SWindow::ReleaseRenderTarget(IRenderTarget *pRT)
         while (p)
         {
             STransformation xform = p->GetTransformation();
-            if (xform.hasMatrix())
+            if (xform.hasMatrix() && !xform.getMatrix().isIdentity())
             {
                 SMatrix mtx2 = xform.getMatrix();
                 CRect rc = p->GetWindowRect();
@@ -2347,7 +2325,7 @@ void SWindow::ReleaseRenderTarget(IRenderTarget *pRT)
 bool SWindow::_ApplyMatrix(IRenderTarget *pRT, SMatrix &oriMtx)
 {
     STransformation xform = GetTransformation();
-    if (!xform.hasMatrix())
+    if (!xform.hasMatrix() || xform.getMatrix().isIdentity())
         return false;
     pRT->GetTransform(oriMtx.fMat);
     CRect rcWnd = GetWindowRect();
@@ -2366,7 +2344,7 @@ SMatrix SWindow::_GetMatrixEx() const
     while (p)
     {
         STransformation xform = p->GetTransformation();
-        if (xform.hasMatrix())
+        if (xform.hasMatrix() && !xform.getMatrix().isIdentity())
         {
             SMatrix &mtx2 = xform.getMatrix();
             CRect rcWnd = p->GetWindowRect();

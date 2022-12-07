@@ -180,7 +180,7 @@ void SOsrPanel::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gd
     m_pHostProxy->OnReleaseHostRenderTarget(pRT, &rcHost, GRT_PAINTBKGND);
 }
 
-void SOsrPanel::OnRedraw(LPCRECT rc)
+void SOsrPanel::OnRedraw(LPCRECT rc,BOOL bClip)
 {
     if (m_pHostProxy->IsHostUpdateLocked())
         return;
@@ -195,10 +195,11 @@ void SOsrPanel::OnRedraw(LPCRECT rc)
             rc2.IntersectRect(rc2, rcItem);
             CRect rcHostClient = m_pHostProxy->GetHostRect();
             rc2.IntersectRect(rc2, rcHostClient);
-            m_pHostProxy->InvalidateHostRect(&rc2);
+            m_pHostProxy->InvalidateHostRect(&rc2,bClip);
         }
         else
         {
+			//hjx: todo, if matrix was applied, following logic maybe error.
             IRenderTarget *pRT = OnGetRenderTarget(rc, GRT_PAINTBKGND);
             SAutoRefPtr<IRegionS> rgn;
             GETRENDERFACTORY->CreateRegion(&rgn);
@@ -271,34 +272,14 @@ void SOsrPanel::Draw(IRenderTarget *pRT, const CRect &rc)
     UpdateLayout();
     BuildWndTreeZorder();
 
-    float fMat[9];
-    pRT->GetTransform(fMat);
-    SMatrix mtx(fMat);
-    if (mtx.isIdentity())
-    {
-        SPainter painter;
-        BeforePaint(pRT, painter);
-        pRT->OffsetViewportOrg(rc.left, rc.top, NULL);
-        SAutoRefPtr<IRegionS> rgn;
-        pRT->GetClipRegion(&rgn);
-        RedrawRegion(pRT, rgn);
-        pRT->OffsetViewportOrg(-rc.left, -rc.top, NULL);
-        AfterPaint(pRT, painter);
-    }
-    else
-    { // draw to cache
-        IRenderTarget *pMemRT = NULL;
-        CRect rcMem = rc;
-        rcMem.MoveToXY(0, 0);
-        GETRENDERFACTORY->CreateRenderTarget(&pMemRT, rc.Width(), rc.Height());
-        pMemRT->AlphaBlend(rcMem, pRT, rc, 255);
-        SPainter painter;
-        BeforePaint(pMemRT, painter);
-        RedrawRegion(pMemRT, NULL);
-        AfterPaint(pMemRT, painter);
-        pRT->AlphaBlend(rc, pMemRT, rcMem, 255);
-        pMemRT->Release();
-    }
+	SPainter painter;
+	BeforePaint(pRT, painter);
+	pRT->OffsetViewportOrg(rc.left, rc.top, NULL);
+	SAutoRefPtr<IRegionS> rgn;
+	pRT->GetClipRegion(&rgn);
+	RedrawRegion(pRT, rgn);
+	pRT->OffsetViewportOrg(-rc.left, -rc.top, NULL);
+	AfterPaint(pRT, painter);
 }
 
 BOOL SOsrPanel::NeedRedrawWhenStateChange()

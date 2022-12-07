@@ -201,6 +201,7 @@ class SOUI_EXP SWindow
     friend class SGridLayout;
     friend class SLinearLayout;
     friend class SouiLayout;
+	friend class SHostProxy;
 
     class SAnimationHandler : public ITimelineHandler {
       private:
@@ -702,7 +703,7 @@ class SOUI_EXP SWindow
      *
      * Describe
      */
-    void InvalidateRect(const CRect &rect, BOOL bFromThis = TRUE);
+    void InvalidateRect(const CRect &rect, BOOL bFromThis = TRUE,BOOL bClip=FALSE);
     STransformation GetTransformation() const;
 
   protected:

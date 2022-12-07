@@ -28,7 +28,7 @@ struct IHostProxy
     virtual BOOL IsHostUpdateLocked() const = 0;
     virtual BOOL IsHostVisible() const = 0;
     virtual CRect GetHostRect() const = 0;
-    virtual void InvalidateHostRect(LPCRECT pRc) = 0;
+    virtual void InvalidateHostRect(LPCRECT pRc,BOOL bClip) = 0;
     virtual IRenderTarget *OnGetHostRenderTarget(LPCRECT rc, GrtFlag gdcFlags) = 0;
     virtual void OnReleaseHostRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags) = 0;
     virtual ISwndContainer *GetHostContainer() = 0;
@@ -62,9 +62,9 @@ class SHostProxy : public IHostProxy {
     {
         return m_pHost->GetClientRect();
     }
-    virtual void InvalidateHostRect(LPCRECT pRc)
+    virtual void InvalidateHostRect(LPCRECT pRc,BOOL bClip)
     {
-        m_pHost->InvalidateRect(pRc);
+        m_pHost->InvalidateRect(pRc,TRUE,bClip);
     }
     virtual ISwndContainer *GetHostContainer()
     {
@@ -115,7 +115,7 @@ class SOUI_EXP SOsrPanel
 
     STDMETHOD_(void, OnReleaseRenderTarget)(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags) OVERRIDE;
 
-    STDMETHOD_(void, OnRedraw)(LPCRECT rc) OVERRIDE;
+    STDMETHOD_(void, OnRedraw)(LPCRECT rc,BOOL bClip) OVERRIDE;
 
     STDMETHOD_(BOOL, OnReleaseSwndCapture)() OVERRIDE;
 

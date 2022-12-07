@@ -162,7 +162,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @param rc LPCRECT--重绘位置
      * @return
      */
-    STDMETHOD_(void, OnRedraw)(THIS_ LPCRECT rc) PURE;
+    STDMETHOD_(void, OnRedraw)(THIS_ LPCRECT rc,BOOL bClip) PURE;
 
     /**
      * @brief 获取捕获鼠标的Swnd对象

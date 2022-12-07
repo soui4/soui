@@ -54,7 +54,7 @@ class SNcPainter
 
     virtual CRect GetHostRect() const;
 
-    virtual void InvalidateHostRect(LPCRECT pRc);
+    virtual void InvalidateHostRect(LPCRECT pRc,BOOL bClip);
 
     virtual ISwndContainer *GetHostContainer();
 

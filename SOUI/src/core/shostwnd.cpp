@@ -249,7 +249,7 @@ void SRootWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
             break;
         rcSour = pSource->GetWindowRect();
     }
-    m_pHostWnd->OnRedraw(rcSour);
+    m_pHostWnd->OnRedraw(rcSour,FALSE);
 }
 
 SHostWnd *SRootWindow::GetHostWnd() const
@@ -1018,12 +1018,12 @@ void SHostWnd::UpdateAlpha(BYTE byAlpha)
 	m_presenter->OnHostAlpha(byAlpha);
 }
 
-void SHostWnd::OnRedraw(LPCRECT rc)
+void SHostWnd::OnRedraw(LPCRECT rc,BOOL bClip)
 {
     if (!IsWindow())
         return;
 
-    m_rgnInvalidate->CombineRect(rc, RGN_OR);
+	m_rgnInvalidate->CombineRect(rc, bClip?RGN_DIFF:RGN_OR);
 
     m_bNeedRepaint = TRUE;
 

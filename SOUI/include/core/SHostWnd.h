@@ -431,7 +431,7 @@ class SOUI_EXP SHostWnd
 
     STDMETHOD_(void, OnReleaseRenderTarget)(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags);
 
-    STDMETHOD_(void, OnRedraw)(LPCRECT rc);
+    STDMETHOD_(void, OnRedraw)(LPCRECT rc,BOOL bClip);
 
     STDMETHOD_(BOOL, OnReleaseSwndCapture)();
 
