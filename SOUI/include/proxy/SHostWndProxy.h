@@ -404,6 +404,11 @@ public:
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) OVERRIDE{
 		return SHostWnd::AnimateHostWindow(dwTime,dwFlags);
 	}
+
+	STDMETHOD_(void,EnableDragDrop)(THIS) OVERRIDE{
+		return SHostWnd::EnableDragDrop();
+	}
+
 };
 
 SNSEND

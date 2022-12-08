@@ -3499,6 +3499,16 @@ BOOL SWindow::IsVideoCanvas(CTHIS) const
 	return GetStyle().m_bVideoCanvas;
 }
 
+BOOL SWindow::RegisterDragDrop(THIS_ IDropTarget *pDragTarget)
+{
+	return GetContainer()->RegisterDragDrop(m_swnd,pDragTarget);
+}
+
+BOOL SWindow::UnregisterDragDrop(THIS)
+{
+	return GetContainer()->UnregisterDragDrop(m_swnd);
+}
+
 
 //////////////////////////////////////////////////////////////////////////
 static SWindow *ICWND_NONE = (SWindow *)-2;

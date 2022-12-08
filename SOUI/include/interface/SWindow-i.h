@@ -854,6 +854,9 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * Describe  
      */
 	STDMETHOD_(BOOL,IsVideoCanvas)(CTHIS) SCONST PURE;
+
+	STDMETHOD_(BOOL,RegisterDragDrop)(THIS_ IDropTarget *pDragTarget) PURE;
+	STDMETHOD_(BOOL,UnregisterDragDrop)(THIS) PURE;
 };
 
 SNSEND

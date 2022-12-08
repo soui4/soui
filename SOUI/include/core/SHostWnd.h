@@ -264,6 +264,7 @@ class SOUI_EXP SHostWnd
 	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) OVERRIDE;
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) OVERRIDE;
+	STDMETHOD_(void,EnableDragDrop)(THIS) OVERRIDE;
   public:
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1)
     {

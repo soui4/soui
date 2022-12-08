@@ -195,6 +195,7 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) PURE;
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) PURE;
+	STDMETHOD_(void,EnableDragDrop)(THIS) PURE;
 };
 
 #undef INTERFACE
@@ -375,6 +376,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) PURE;
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) PURE;
+	STDMETHOD_(void,EnableDragDrop)(THIS) PURE;
 
     //////////////////////////////////////////////////////////////////////////
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent /*=NULL*/) PURE;

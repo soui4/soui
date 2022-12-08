@@ -453,6 +453,9 @@ class SOUI_EXP SWindow
 
 	STDMETHOD_(HWND, GetHostHwnd)(THIS) OVERRIDE;
 
+	STDMETHOD_(BOOL,RegisterDragDrop)(THIS_ IDropTarget *pDragTarget) OVERRIDE;
+	STDMETHOD_(BOOL,UnregisterDragDrop)(THIS) OVERRIDE;
+
   public: // caret相关方法
     STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) OVERRIDE;
     STDMETHOD_(void, ShowCaret)(THIS_ BOOL bShow) OVERRIDE;

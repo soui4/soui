@@ -1804,6 +1804,11 @@ void SHostWnd::SetPresenter(THIS_ IHostPresenter* pPresenter){
 	m_presenter = pPresenter;
 }
 
+void SHostWnd::EnableDragDrop(THIS)
+{
+	::RegisterDragDrop(m_hWnd,GetDropTarget());
+}
+
 //////////////////////////////////////////////////////////////////
 //  SHostWnd::SHostAnimationHandler
 void SHostWnd::SHostAnimationHandler::OnNextFrame()
