@@ -235,16 +235,16 @@ class SOUI_EXP SHostWnd
 	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) OVERRIDE;
 	STDMETHOD_(IMessageLoop *, GetMsgLoop)(THIS) OVERRIDE;
 
-	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep=-1) OVERRIDE{
-		return m_pRoot->FindIChildByID(nId,nDeep);
+	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId) OVERRIDE{
+		return m_pRoot->FindIChildByID(nId);
 	}
 
-	STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep=-1) OVERRIDE{
-		return m_pRoot->FindIChildByName(pszName,nDeep);
+	STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName) OVERRIDE{
+		return m_pRoot->FindIChildByName(pszName);
 	}
 
-	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName, int nDeep=-1) OVERRIDE{
-		return m_pRoot->FindIChildByNameA(pszName,nDeep);
+	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName) OVERRIDE{
+		return m_pRoot->FindIChildByNameA(pszName);
 	}
 
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) OVERRIDE

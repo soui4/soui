@@ -388,11 +388,11 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(void, DestroyAllChildren)(THIS) OVERRIDE;
 
-    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep DEF_VAL(-1)) OVERRIDE;
+    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId) OVERRIDE;
 
-    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep DEF_VAL(-1)) OVERRIDE;
+    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName) OVERRIDE;
 
-	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName, int nDeep DEF_VAL(-1)) OVERRIDE;
+	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName) OVERRIDE;
 
     STDMETHOD_(ISwndContainer *, GetContainer)(THIS) OVERRIDE;
     STDMETHOD_(void, SetContainer)(THIS_ ISwndContainer *pContainer) OVERRIDE;

@@ -579,29 +579,26 @@ DECLARE_INTERFACE_(IWindow, IObject)
     /**
      * @brief 根据ID查找子窗口
      * @param nId int--子窗口ID
-     * @param nDeep int--查找深度,-1代码无限
      * @return IWindow*--匹配窗口
      * @remark 采用广度优先算法搜索匹配子窗口
      */
-    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep DEF_VAL(-1)) PURE;
+    STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId) PURE;
 
     /**
      * @brief 根据Name查找子窗口
      * @param pszName LPCWSTR--子窗口Name
-     * @param nDeep int--查找深度,-1代码无限
      * @return IWindow*--匹配窗口
      * @remark 采用广度优先算法搜索匹配子窗口
      */
-    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep DEF_VAL(-1)) PURE;
+    STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName) PURE;
 
     /**
      * @brief 根据Name查找子窗口
      * @param pszName LPCSTR--子窗口Name
-     * @param nDeep int--查找深度,-1代码无限
      * @return IWindow*--匹配窗口
      * @remark 采用广度优先算法搜索匹配子窗口
      */
-    STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName, int nDeep DEF_VAL(-1)) PURE;
+    STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName) PURE;
 
     /**
      * DestroyChild

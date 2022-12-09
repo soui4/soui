@@ -910,7 +910,6 @@ void STreeView::UpdateVisibleItems()
                 bNewItem = TRUE;
                 ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
                 ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&STreeView::OnItemClick, this));
-                // ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelDbclick::EventID,Subscriber(&STreeView::OnItemDblClick,this));
             }
             else
             {

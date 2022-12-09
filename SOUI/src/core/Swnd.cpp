@@ -1572,19 +1572,19 @@ int SWindow::OnCreate(LPVOID)
     return 0;
 }
 
-IWindow *SWindow::FindIChildByID(THIS_ int nId, int nDeep)
+IWindow *SWindow::FindIChildByID(THIS_ int nId)
 {
-    return FindChildByID(nId, nDeep);
+    return FindChildByID(nId,-1);
 }
 
-IWindow *SWindow::FindIChildByName(THIS_ LPCWSTR pszName, int nDeep)
+IWindow *SWindow::FindIChildByName(THIS_ LPCWSTR pszName)
 {
-    return FindChildByName(pszName, nDeep);
+    return FindChildByName(pszName, -1);
 }
 
-IWindow * SWindow::FindIChildByNameA(THIS_ LPCSTR pszName, int nDeep)
+IWindow * SWindow::FindIChildByNameA(THIS_ LPCSTR pszName)
 {
-	return FindChildByName(pszName,nDeep);
+	return FindChildByName(pszName,-1);
 }
 
 void SWindow::DestroyAllChildren()

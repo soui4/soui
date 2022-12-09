@@ -376,16 +376,16 @@ public:
 		return SHostWnd::GetMsgLoop();
 	}
 
-	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId, int nDeep =-1) OVERRIDE{
-		return SHostWnd::FindIChildByID(nId,nDeep);
+	STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId) OVERRIDE{
+		return SHostWnd::FindIChildByID(nId);
 	}
 
-	STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName, int nDeep=-1) OVERRIDE{
-		return SHostWnd::FindIChildByName(pszName,nDeep);
+	STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName) OVERRIDE{
+		return SHostWnd::FindIChildByName(pszName);
 	}
 
-	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName, int nDeep=-1) OVERRIDE{
-		return SHostWnd::FindIChildByNameA(pszName,nDeep);
+	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName) OVERRIDE{
+		return SHostWnd::FindIChildByNameA(pszName);
 	}
 
 	STDMETHOD_(INcPainter*,GetNcPainter)(THIS) OVERRIDE
