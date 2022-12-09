@@ -82,7 +82,8 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
     if (m_adapter)
     {
         m_adapter->unregisterDataSetObserver(m_observer);
-
+    }
+    {
         // free all itemPanels in recycle
         for (size_t i = 0; i < m_itemRecycle.GetCount(); i++)
         {
@@ -105,6 +106,10 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
             ii.pItem->Destroy();
         }
         m_lstItems.RemoveAll();
+		m_pHoverItem = NULL;
+		m_itemCapture = NULL;
+		m_iSelItem = -1;
+		m_iFirstVisible = -1;
     }
 
     m_adapter = adapter;
@@ -746,7 +751,7 @@ int STileView::GetScrollLineSize(BOOL bVertical)
 
 SItemPanel *STileView::GetItemPanel(int iItem)
 {
-    if (iItem < 0 || iItem >= m_adapter->getCount())
+    if (!m_adapter || iItem < 0 || iItem >= m_adapter->getCount())
     {
         return NULL;
     }

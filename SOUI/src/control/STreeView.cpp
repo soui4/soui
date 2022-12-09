@@ -458,7 +458,8 @@ BOOL STreeView::SetAdapter(ITvAdapter *adapter)
     if (m_adapter)
     {
         m_adapter->registerDataSetObserver(m_observer);
-
+    }
+    {
         // free all itemPanels in recycle
         for (size_t i = 0; i < m_itemRecycle.GetCount(); i++)
         {
@@ -474,14 +475,18 @@ BOOL STreeView::SetAdapter(ITvAdapter *adapter)
         m_itemRecycle.RemoveAll();
 
         // free all visible itemPanels
-        SPOSITION pos = m_pVisibleMap->GetStartPosition();
+        SPOSITION pos = m_visible_items.GetHeadPosition();
         while (pos)
         {
-            ItemInfo ii = m_pVisibleMap->GetNext(pos)->m_value;
+            ItemInfo ii = m_visible_items.GetNext(pos);
             ii.pItem->Destroy();
         }
+		m_visible_items.RemoveAll();
         m_pVisibleMap->RemoveAll();
-    }
+		m_pHoverItem = NULL;
+		m_itemCapture = NULL;
+		m_hSelected = NULL;
+	}
 
 	if (m_tvItemLocator)
 		m_tvItemLocator->SetAdapter(adapter);
@@ -588,6 +593,7 @@ void STreeView::OnDestroy()
         ii.pItem->Release();
     }
     m_visible_items.RemoveAll();
+	m_pVisibleMap->RemoveAll();
 
     for (int i = 0; i < (int)m_itemRecycle.GetCount(); i++)
     {
@@ -870,6 +876,28 @@ void STreeView::UpdateVisibleItems()
     if (hItem == ITEM_NULL)
     {
         //如果没有可显示的，则移除所有item
+		SPOSITION pos = m_visible_items.GetHeadPosition();
+		while(pos){
+			ItemInfo ii = m_visible_items.GetNext(pos);
+
+			if (ii.pItem == m_pHoverItem)
+			{
+				m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
+				m_pHoverItem = NULL;
+			}
+
+			ii.pItem->GetEventSet()->setMutedState(true);
+			if ((HSTREEITEM)ii.pItem->GetItemIndex() == m_hSelected)
+			{
+				ii.pItem->ModifyItemState(0, WndState_Check);
+				ii.pItem->GetFocusManager()->ClearFocus();
+				m_hSelected = NULL;
+			}
+			ii.pItem->SetVisible(FALSE); //防止执行SItemPanel::OnTimeFrame()
+			ii.pItem->GetEventSet()->setMutedState(false);
+
+			m_itemRecycle[ii.nType]->AddTail(ii.pItem);
+		}
         m_visible_items.RemoveAll();
         m_pVisibleMap->RemoveAll();
         return;
@@ -969,6 +997,7 @@ void STreeView::UpdateVisibleItems()
         {
             ii.pItem->ModifyItemState(0, WndState_Check);
             ii.pItem->GetFocusManager()->ClearFocus();
+			m_hSelected = NULL;
         }
         ii.pItem->SetVisible(FALSE); //防止执行SItemPanel::OnTimeFrame()
         ii.pItem->GetEventSet()->setMutedState(false);
