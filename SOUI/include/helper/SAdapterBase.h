@@ -619,6 +619,12 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return ii.data;
     }
 
+    void SetItemData(HSTREEITEM hItem, const T &data)
+    {
+        SASSERT(hItem != STVI_ROOT);
+        ItemInfo& ii = m_tree.GetItemRef((HSTREEITEM)hItem);
+        ii.data = data;
+    }
   protected:
     CSTree<ItemInfo> m_tree;
     ULONG_PTR m_rootUserData[DATA_INDEX_NUMBER];
