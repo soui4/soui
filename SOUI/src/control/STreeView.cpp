@@ -26,6 +26,9 @@ class STreeViewDataSetObserver : public TObjRefImpl<ITvDataSetObserver> {
         m_pOwner->onBranchExpandedChanged(hBranch, bExpandedOld, bExpandedNew);
     }
 
+	STDMETHOD_(void, notifyItemBeforeRemove)(THIS_ HSTREEITEM hItem) OVERRIDE{
+		m_pOwner->onItemBeforeRemove(hItem);
+	}
   protected:
     STreeView *m_pOwner;
 };
@@ -1137,6 +1140,33 @@ void STreeView::onBranchExpandedChanged(HSTREEITEM hBranch, BOOL bExpandedOld, B
     UpdateScrollBar();
     UpdateVisibleItems();
 }
+
+
+void STreeView::onItemBeforeRemove(HSTREEITEM hItem)
+{
+	if (m_adapter == NULL)
+	{
+		return;
+	}
+	if(m_hSelected == hItem || m_adapter->IsDecendentItem(hItem,m_hSelected)){
+		m_hSelected = NULL;
+	}
+
+    if (m_pHoverItem) {
+        HSTREEITEM hHover = m_pHoverItem->GetItemIndex();
+        if (hHover == hItem || m_adapter->IsDecendentItem(hItem, hHover)) {
+            m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
+            m_pHoverItem = NULL;
+        }
+    }
+    if (m_itemCapture) {
+        HSTREEITEM hCapture = m_itemCapture->GetItemIndex();
+        if (hCapture == hItem || m_adapter->IsDecendentItem(hItem, hCapture)) {
+            m_itemCapture = NULL;
+        }
+    }
+}
+
 
 LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {

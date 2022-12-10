@@ -116,7 +116,7 @@ class SOUI_EXP STreeView
     void onBranchChanged(HSTREEITEM hBranch);
     void onBranchInvalidated(HSTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren);
     void onBranchExpandedChanged(HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew);
-
+	void onItemBeforeRemove(HSTREEITEM hItem);
   protected:
     void OnPaint(IRenderTarget *pRT);
     void OnSize(UINT nType, CSize size);

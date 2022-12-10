@@ -387,6 +387,16 @@ DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
      */
     STDMETHOD_(void, onBranchExpandedChanged)
     (THIS_ HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
+
+
+	/**
+     * @brief This method is called when the specified tree item is going to be removed
+     * @param hItem  HSTREEITEM--target item
+     * @return
+     */
+	STDMETHOD_(void, notifyItemBeforeRemove)
+		(THIS_ HSTREEITEM hItem) PURE;
+
 };
 
 #define ITEM_NULL 0
@@ -523,6 +533,14 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @return HSTREEITEM--最后一个可见项
      */
     STDMETHOD_(HSTREEITEM, GetLastVisibleItem)(CTHIS) SCONST PURE;
+
+	/**
+     * @brief 测试一个节点是否为另一个节点的子孙节点
+     * @param HSTREEITEM--hItem 父节点
+	 * @param HSTREEITEM--hChild 被测试的子节点
+	 * @return TRUE--是子孙节点
+     */
+	STDMETHOD_(BOOL,IsDecendentItem)(CTHIS_ HSTREEITEM hItem,HSTREEITEM hChild) SCONST PURE;
 
     /**
      * @brief 获取前一个可见项

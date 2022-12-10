@@ -320,6 +320,14 @@ class STvObserverMgr {
         }
     }
 
+	void notifyItemBeforeRemove(HSTREEITEM hItem){
+		SPOSITION pos = m_lstObserver.GetHeadPosition();
+		while (pos)
+		{
+			ITvDataSetObserver *pObserver = m_lstObserver.GetNext(pos);
+			pObserver->notifyItemBeforeRemove(hItem);
+		}
+	}
   protected:
     SList<ITvDataSetObserver *> m_lstObserver;
 };
@@ -346,6 +354,11 @@ class TvAdatperImpl : public BaseClass {
     {
         m_obzMgr.notifyExpandChanged(hBranch, bExpandedOld, bExpandedNew);
     }
+	
+	//notify the item will be removed
+	void notifyItemBeforeRemove(HSTREEITEM hItem){
+		m_obzMgr.notifyItemBeforeRemove(hItem);
+	}
 
     STDMETHOD_(void, registerDataSetObserver)(ITvDataSetObserver *observer) OVERRIDE
     {
@@ -437,6 +450,16 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         SASSERT(hItem != ITEM_NULL && hItem != ITEM_ROOT);
         return (HSTREEITEM)m_tree.GetNextSiblingItem((HSTREEITEM)hItem);
     }
+
+	STDMETHOD_(BOOL,IsDecendentItem)(CTHIS_ HSTREEITEM hItem,HSTREEITEM hChild) const OVERRIDE{
+		HSTREEITEM hParent = GetParentItem(hChild);
+		while(hParent){
+			if(hParent == hItem)
+				return TRUE;
+			hParent = GetParentItem(hParent);
+		}
+		return FALSE;
+	}
 
     STDMETHOD_(int, getViewType)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -602,9 +625,17 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return m_tree.InsertItem(ii, hParent, hInsertAfter);
     }
 
-    void DeleteItem(HSTREEITEM hItem)
+    void DeleteItem(HSTREEITEM hItem,bool bNotifyChange)
     {
-        m_tree.DeleteItem(hItem);
+		HSTREEITEM hParent = GetParentItem(hItem);
+		if(!hParent) hParent = STVI_ROOT;
+		if(bNotifyChange){
+			notifyItemBeforeRemove(hItem);
+		}
+		m_tree.DeleteItem(hItem);
+		if(bNotifyChange) {
+			notifyBranchChanged(hParent);
+		}
     }
 
     BOOL DeleteItemEx(HSTREEITEM hItem)
