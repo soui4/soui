@@ -100,6 +100,8 @@ DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
      * @return LPARAM 在列表中的用户数据
      */
     STDMETHOD_(LPARAM, GetItemData)(CTHIS) SCONST PURE;
+
+	STDMETHOD_(void,PtToHost)(THIS_ POINT *pt) SCONST PURE;
 };
 
 #undef INTERFACE

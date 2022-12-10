@@ -415,6 +415,13 @@ LPARAM SOsrPanel::GetItemData() const
     return m_dwData;
 }
 
+void SOsrPanel::PtToHost(THIS_ POINT *pt) const
+{
+	CRect rcItem = GetItemRect();
+	pt->x += rcItem.left;
+	pt->y += rcItem.top;
+}
+
 //////////////////////////////////////////////////////////////////////////
 SItemPanel *SItemPanel::Create(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
 {

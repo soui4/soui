@@ -101,7 +101,7 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(LPARAM, GetItemIndex)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) OVERRIDE;
     STDMETHOD_(LPARAM, GetItemData)(THIS) SCONST OVERRIDE;
-
+	STDMETHOD_(void,PtToHost)(THIS_ POINT *pt) SCONST OVERRIDE;
   public:
     STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE;
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
@@ -228,6 +228,10 @@ class TOsrPanelProxy
     {
         return SOsrPanel::GetItemData();
     }
+	STDMETHOD_(void,PtToHost)(THIS_ POINT *pt) SCONST OVERRIDE{
+		return SOsrPanel::PtToHost(pt);
+	}
+
 };
 
 class SOUI_EXP SItemPanel : public TOsrPanelProxy<IItemPanel> {
