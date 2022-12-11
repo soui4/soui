@@ -1,5 +1,8 @@
 ﻿#include "Zip7Archive.h"
 #include <assert.h>
+#include <string/sstringa.h>
+#include <string/sstringw.h>
+#include <string/strcpcvt.h>
 
 #include "SevenZip/SevenZipExtractor.h"
 #include "SevenZip/SevenZipExtractorMemory.h"
@@ -7,71 +10,13 @@
 
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
-
 #include <crtdbg.h>
 #include <tchar.h>
 #include <malloc.h>
 
+using namespace SOUI;
+
 namespace SevenZip{
-
-static std::wstring StdStringtoWideString(const std::string &stdstring)
-{
-	const char* str = stdstring.c_str();
-	size_t len = stdstring.length();
-	unsigned int code_page = CP_ACP;
-
-	std::wstring buf;
-	int rc_chars = MultiByteToWideChar(code_page,
-		0,
-		str,
-		len,
-		NULL,
-		0);
-
-	if (len == -1)
-		--rc_chars;
-	if (rc_chars == 0)
-		return buf;
-
-	buf.resize(rc_chars);
-	MultiByteToWideChar(code_page,
-		0,
-		str,
-		len,
-		const_cast<wchar_t*>(buf.c_str()),
-		rc_chars);
-
-	return buf;
-}
-
-
-static std::string WString2String(const std::wstring &wstr)
-{
-	int len = wstr.length();
-	const wchar_t *pStr = wstr.c_str();
-	std::string buf;
-	 
-
-	if (len < 0 && len != -1)
-	{
-		return buf;
-	}
-
-	// figure out how many narrow characters we are going to get
-	int nChars = WideCharToMultiByte(CP_ACP, 0,	pStr, len, NULL, 0, NULL, NULL);
-	if (len == -1)
-		--nChars;
-	if (nChars == 0)
-		return "";
-
-	// convert the wide string to a narrow string
-	// nb: slightly naughty to write directly into the string like this
-	buf.resize(nChars);
-	WideCharToMultiByte(CP_ACP, 0, pStr, len, const_cast<char*>(buf.c_str()), nChars, NULL, NULL);
-
-	return buf;
-}
-
 
     CZipFile::CZipFile(DWORD dwSize/*=0*/)
 		: m_dwPos(0)
@@ -217,7 +162,7 @@ static std::string WString2String(const std::wstring &wstr)
 
 	BOOL CZipArchive::GetFile(LPCTSTR pszFileName, CZipFile& file)
 	{
-		std::string fileName = WString2String(pszFileName);
+		SStringA fileName = S_CT2A(pszFileName);
 		if (m_fileStreams.GetFile(fileName.c_str(),file.getBlob()))
 			return TRUE;
 
@@ -226,7 +171,8 @@ static std::string WString2String(const std::wstring &wstr)
 	 
 	BOOL CZipArchive::Open(LPCTSTR pszFileName,LPCSTR pszPassword)
 	{
-		std::wstring s_pwd = StdStringtoWideString(pszPassword);
+		SStringT strPsw = S_CA2T(pszPassword);
+		TString s_pwd = strPsw.c_str();
 		SevenZip::SevenZipPassword pwd(true, s_pwd);
 		CFileStream fileStreams;
 		SevenZip::SevenZipExtractorMemory decompress;
@@ -279,14 +225,40 @@ static std::string WString2String(const std::wstring &wstr)
  
 	DWORD CZipArchive::GetFileSize( LPCTSTR pszFileName )
 	{
-		std::string fileName = WString2String(pszFileName);
+		SStringA fileName = S_CT2A(pszFileName);
 		return m_fileStreams.GetFileSize(fileName.c_str());
 	} 
 
 	BOOL CZipArchive::IsFileExist( LPCTSTR pszFileName )
 	{
-		std::string fileName = WString2String(pszFileName);
+		SStringA fileName = S_CT2A(pszFileName);
 		return m_fileStreams.GetFilePtr(fileName.c_str())!=NULL;
 	} 
-	
+
+	int CZipArchive::GetFileCount()
+	{
+		return m_fileStreams.GetFileCount();
+	}
+
+	unsigned int CZipArchive::GetFirstFilePos()
+	{
+		return m_fileStreams.First();
+	}
+
+	unsigned int CZipArchive::GetNextFilePos(unsigned int pos)
+	{
+		return m_fileStreams.Next(pos);
+	}
+
+	bool CZipArchive::Eof(unsigned int pos)
+	{
+		return m_fileStreams.Eof(pos);
+	}
+
+	std::string CZipArchive::GetFileName(unsigned int pos)
+	{
+		return m_fileStreams.getParamName(pos);
+	}
+
+
 	}//end of ns

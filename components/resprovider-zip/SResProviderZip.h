@@ -31,13 +31,15 @@ public:
 	STDMETHOD_(size_t,GetRawBufferSize)(THIS_ LPCTSTR pszType,LPCTSTR pszResName);
 	STDMETHOD_(BOOL,GetRawBuffer)(THIS_ LPCTSTR pszType,LPCTSTR pszResName,LPVOID pBuf,size_t size);
 	STDMETHOD_(void,EnumResource)(THIS_ EnumResCallback funEnumCB,LPARAM lp);
+	STDMETHOD_(void, EnumFile)(THIS_ EnumFileCallback funEnumCB, LPARAM lp);
 protected:
     BOOL _Init(LPCTSTR pszZipFile ,LPCSTR pszPsw);
     BOOL _Init(LPBYTE pBytes, DWORD dwByteCounts, LPCSTR pszPsw);    
     BOOL _Init(HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType ,LPCSTR pszPsw);
 	BOOL _LoadSkin();
 	SStringT _GetFilePath(LPCTSTR pszResName,LPCTSTR pszType);
-	
+	void _EnumFile(LPCTSTR pszPath,EnumFileCallback funEnumCB, LPARAM lp);
+
 	SMap<SResID,SStringT> m_mapFiles;
     SAutoRefPtr<IRenderFactory> m_renderFactory;
 	CZipArchive m_zipFile;

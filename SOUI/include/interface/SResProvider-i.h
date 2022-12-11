@@ -29,6 +29,7 @@ typedef enum BUILTIN_RESTYPE
 } BUILTIN_RESTYPE;
 
 typedef BOOL(CALLBACK *EnumResCallback)(LPCTSTR pszType, LPCTSTR pszName, LPARAM lp);
+typedef BOOL(CALLBACK *EnumFileCallback)(LPCTSTR pszFileName, LPARAM lp);
 
 /**
  * @struct     IResProvider
@@ -156,6 +157,15 @@ DECLARE_INTERFACE_(IResProvider, IObjRef)
      * Describe
      */
     STDMETHOD_(void, EnumResource)(THIS_ EnumResCallback funEnumCB, LPARAM lp) PURE;
+
+	/**
+     * EnumFile
+     * @brief    枚举资源文件,返回文件路径
+     * @param    EnumResCallback funEnumCB --  枚举使用的回调函数
+     * @return   void
+     * Describe
+     */
+	STDMETHOD_(void, EnumFile)(THIS_ EnumFileCallback funEnumCB, LPARAM lp) PURE;
 };
 
 SNSEND

@@ -40,6 +40,7 @@ class SResProviderPE : public TObjRefImpl<IResProvider> {
     STDMETHOD_(BOOL, GetRawBuffer)
     (THIS_ LPCTSTR pszType, LPCTSTR pszResName, LPVOID pBuf, size_t size);
     STDMETHOD_(void, EnumResource)(THIS_ EnumResCallback funEnumCB, LPARAM lp);
+	STDMETHOD_(void, EnumFile)(THIS_ EnumFileCallback funEnumCB, LPARAM lp);
 
   protected:
     LPVOID GetRawBufferPtr(LPCTSTR strType, LPCTSTR pszResName);
@@ -65,19 +66,22 @@ class SResProviderFiles : public TObjRefImpl<IResProvider> {
   public:
     SResProviderFiles();
 
-    STDMETHOD_(BOOL, Init)(THIS_ WPARAM wParam, LPARAM lParam);
-    STDMETHOD_(BOOL, HasResource)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
-    STDMETHOD_(HICON, LoadIcon)(THIS_ LPCTSTR pszResName, int cx, int cy);
-    STDMETHOD_(HBITMAP, LoadBitmap)(THIS_ LPCTSTR pszResName);
-    STDMETHOD_(HCURSOR, LoadCursor)(THIS_ LPCTSTR pszResName);
-    STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
-    STDMETHOD_(IImgX *, LoadImgX)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
-    STDMETHOD_(size_t, GetRawBufferSize)(THIS_ LPCTSTR pszType, LPCTSTR pszResName);
+    STDMETHOD_(BOOL, Init)(THIS_ WPARAM wParam, LPARAM lParam) OVERRIDE;
+    STDMETHOD_(BOOL, HasResource)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) OVERRIDE;
+    STDMETHOD_(HICON, LoadIcon)(THIS_ LPCTSTR pszResName, int cx, int cy) OVERRIDE;
+    STDMETHOD_(HBITMAP, LoadBitmap)(THIS_ LPCTSTR pszResName) OVERRIDE;
+    STDMETHOD_(HCURSOR, LoadCursor)(THIS_ LPCTSTR pszResName) OVERRIDE;
+    STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) OVERRIDE;
+    STDMETHOD_(IImgX *, LoadImgX)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) OVERRIDE;
+    STDMETHOD_(size_t, GetRawBufferSize)(THIS_ LPCTSTR pszType, LPCTSTR pszResName) OVERRIDE;
     STDMETHOD_(BOOL, GetRawBuffer)
-    (THIS_ LPCTSTR pszType, LPCTSTR pszResName, LPVOID pBuf, size_t size);
-    STDMETHOD_(void, EnumResource)(THIS_ EnumResCallback funEnumCB, LPARAM lp);
+    (THIS_ LPCTSTR pszType, LPCTSTR pszResName, LPVOID pBuf, size_t size) OVERRIDE;
+    STDMETHOD_(void, EnumResource)(THIS_ EnumResCallback funEnumCB, LPARAM lp) OVERRIDE;
+	STDMETHOD_(void, EnumFile)(THIS_ EnumFileCallback funEnumCB, LPARAM lp) OVERRIDE;
 
   protected:
+	void _EnumFile(LPCTSTR pszPath,EnumFileCallback funEnumCB, LPARAM lp);
+
     SStringT GetRes(LPCTSTR strType, LPCTSTR pszResName);
 
     SStringT m_strPath;

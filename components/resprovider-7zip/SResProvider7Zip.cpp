@@ -214,6 +214,18 @@ BOOL SResProvider7Zip::_LoadSkin()
 	return TRUE;
 }
 
+void SResProvider7Zip::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
+{
+	unsigned int pos = m_zipFile.GetFirstFilePos();
+	while(!m_zipFile.Eof(pos)){
+		std::string name = m_zipFile.GetFileName(pos);
+		SStringT str = S_CA2T(name.c_str());
+		if(!funEnumCB(str.c_str(),lp))
+			break;
+		pos = m_zipFile.GetNextFilePos(pos);
+	}
+}
+
 namespace RESPROVIDER_7ZIP
 {
 	BOOL SCreateInstance( IObjRef ** ppObj )

@@ -239,6 +239,42 @@ BOOL SResProviderZip::_LoadSkin()
 	return TRUE;
 }
 
+void SResProviderZip::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
+{
+	_EnumFile(NULL,funEnumCB,lp);
+}
+
+void SResProviderZip::_EnumFile(LPCTSTR pszPath,EnumFileCallback funEnumCB, LPARAM lp)
+{
+	ZIP_FIND_DATA wfd;
+	SStringT strFilter;
+	if(pszPath)
+		strFilter = SStringT(pszPath)+_T("\\*.*");
+	else
+		strFilter = _T("*.*");
+	HANDLE hFind= m_zipFile.FindFirstFile(strFilter.c_str(),&wfd);
+	if(hFind!=INVALID_HANDLE_VALUE){
+		do{
+			SStringT strPath;
+			if(pszPath==NULL)
+				strPath = wfd.szFileName;
+			else
+				strPath = SStringT().Format(_T("%s\\%s"),pszPath,wfd.szFileName);
+			if(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
+				if(_tcscmp(wfd.szFileName,_T("."))==0 ||
+					_tcscmp(wfd.szFileName,_T(".."))==0
+					)
+					continue;
+				_EnumFile(strPath.c_str(),funEnumCB,lp);
+			}else {
+				if(!funEnumCB(strPath.c_str(),lp))
+					break;
+			}
+		}while(m_zipFile.FindNextFile(hFind,&wfd));
+		m_zipFile.FindClose(hFind);
+	}
+}
+
 
 namespace RESPROVIDER_ZIP
 {

@@ -6,7 +6,7 @@
 #error ZipArchive requires C++ compilation (use a .cpp suffix)
 #endif
 
-#ifdef ZIP_WILDCARD
+#ifndef ZIP_DISABLE_WILDCARD
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
 #endif
@@ -593,7 +593,7 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 			TCHAR szFile[MAX_PATH] = { 0 };
 			::OemToCharBuff(fh->GetName(), szFile, fh->fnameLen);
 
-#ifdef ZIP_WILDCARD
+#ifndef ZIP_DISABLE_WILDCARD
 			if (::PathMatchSpec(szFile, pFF->szSearch) != NULL)
 #else
 			if (_tcsicmp(szFile, pFF->szSearch) == 0)

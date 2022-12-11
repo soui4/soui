@@ -235,6 +235,27 @@ void SResProviderPE::EnumResource(EnumResCallback funEnumCB, LPARAM lp)
     EnumResourceTypes(m_hResInst, EnumResTypeProc, (LONG_PTR)&param);
 }
 
+struct EnumFileParam
+{
+	EnumFileCallback fun;
+	LPARAM lParam;
+};
+static BOOL CALLBACK EnumResFileProc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName, LONG_PTR lParam)
+{
+	EnumFileParam *enumParam = (EnumFileParam *)lParam;
+	SStringT strPath=SStringT().Format(_T("%s:%s"),lpszType,lpszName);
+	return enumParam->fun(strPath.c_str(), enumParam->lParam);
+}
+
+static BOOL CALLBACK EnumResTypeProc2(HMODULE hModule, LPTSTR lpszType, LONG_PTR lParam)
+{
+	return EnumResourceNames(hModule, lpszType, EnumResFileProc, lParam);
+}
+void SResProviderPE::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
+{
+	EnumFileParam param = { funEnumCB, lp };
+	EnumResourceTypes(m_hResInst, EnumResTypeProc2, (LONG_PTR)&param);
+}
 //////////////////////////////////////////////////////////////////////////
 //
 
@@ -449,6 +470,42 @@ void SResProviderFiles::EnumResource(EnumResCallback funEnumCB, LPARAM lp)
         if (!funEnumCB(id.szName, id.szType, lp))
             break;
     }
+}
+
+void SResProviderFiles::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
+{
+	_EnumFile(NULL,funEnumCB,lp);
+}
+
+void SResProviderFiles::_EnumFile(LPCTSTR pszPath,EnumFileCallback funEnumCB, LPARAM lp)
+{
+	WIN32_FIND_DATA wfd;
+	SStringT strFilter;
+	if(pszPath)
+		strFilter = m_strPath + _T("\\")+pszPath+_T("\\*.*");
+	else
+		strFilter = m_strPath + _T("\\*.*");
+	HANDLE hFind= FindFirstFile(strFilter.c_str(),&wfd);
+	if(hFind!=INVALID_HANDLE_VALUE){
+		do{
+			SStringT strPath;
+			if(pszPath==NULL)
+				strPath = wfd.cFileName;
+			else
+				strPath = SStringT().Format(_T("%s\\%s"),pszPath,wfd.cFileName);
+			if(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
+				if(_tcscmp(wfd.cFileName,_T("."))==0 ||
+					_tcscmp(wfd.cFileName,_T(".."))==0
+					)
+					continue;
+				_EnumFile(strPath.c_str(),funEnumCB,lp);
+			}else if(wfd.dwFileAttributes & (FILE_ATTRIBUTE_ARCHIVE|FILE_ATTRIBUTE_NORMAL|FILE_ATTRIBUTE_READONLY)){
+				if(!funEnumCB(strPath.c_str(),lp))
+					break;
+			}
+		}while(FindNextFile(hFind,&wfd));
+		FindClose(hFind);
+	}
 }
 
 SNSEND

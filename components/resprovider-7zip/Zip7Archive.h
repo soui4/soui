@@ -15,17 +15,6 @@
 #include "SevenZip/FileStream.h"
 namespace SevenZip{
 
-typedef struct ZIP_FIND_DATA
-{
-	TCHAR		szFileName[MAX_PATH];
-	TCHAR		szComment[64];
-	DWORD		nFileSizeCompressed;
-	DWORD		nFileSizeUncompressed;
-	FILETIME	ftCreationDate;
-	DWORD		dwFileAttributes;
-	int			nIndex;
-} ZIP_FIND_DATA, *LPZIP_FIND_DATA;
-
 class CZipFile;
 class CZipArchive;
 
@@ -74,7 +63,13 @@ public:
 	BOOL GetFile(LPCTSTR pszFileName, CZipFile& file); 
 	DWORD GetFileSize(LPCTSTR pszFileName);
 	BOOL IsFileExist( LPCTSTR pszFileName );
-	 
+	
+	int GetFileCount();
+	unsigned int GetFirstFilePos();
+	unsigned int GetNextFilePos(unsigned int pos);
+	bool Eof(unsigned int pos);
+
+	std::string GetFileName(unsigned int pos);
 protected:
 	BOOL OpenZip();
 	void CloseFile();
