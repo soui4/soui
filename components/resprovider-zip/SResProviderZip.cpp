@@ -112,6 +112,8 @@ BOOL SResProviderZip::_Init( LPCTSTR pszZipFile ,LPCSTR pszPsw)
 {
 	if(!m_zipFile.Open(pszZipFile)) return FALSE;
 	m_zipFile.SetPassword(pszPsw);
+	if (!m_renderFactory)
+		return TRUE;
 	return _LoadSkin();
 }
 

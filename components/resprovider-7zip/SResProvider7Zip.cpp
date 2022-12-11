@@ -106,6 +106,8 @@ IImgX   * SResProvider7Zip::LoadImgX( LPCTSTR strType,LPCTSTR pszResName )
 BOOL SResProvider7Zip::_Init( LPCTSTR pszZipFile ,LPCSTR pszPsw)
 {
 	if (!m_zipFile.Open(pszZipFile, pszPsw)) return FALSE;
+	if (!m_renderFactory)
+		return TRUE;
 	return _LoadSkin();
 }
 
@@ -113,6 +115,8 @@ BOOL SResProvider7Zip::_Init( HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType
 {
 	if(!m_zipFile.Open(hInst,pszResName,pszType)) return FALSE;
 	m_zipFile.SetPassword(pszPsw);
+	if (!m_renderFactory)
+		return TRUE;
 	return _LoadSkin();
 }
 

@@ -21,9 +21,10 @@ typedef enum RequestType
 //Ã¶¾ÙÏÂÔØ×´Ì¬
 typedef enum DownloadState
 {
-	DS_Loading = 0,
-	DS_Fialed,
+	DS_Start = 0,
+	DS_Loading,
 	DS_Finished,
+	DS_Failed,
 }DownloadState;
 
 /******************************************************

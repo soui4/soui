@@ -116,6 +116,14 @@ BOOL CWinHttp::DownloadFile( LPCSTR lpUrl, LPCSTR lpFilePath )
 		m_error = Hir_QueryErr;
 		return false; 
 	}
+	if( m_pCallback )
+	{
+		BOOL bRet = m_pCallback->OnDownloadCallback(DS_Start, dwFileSize, 0);
+		if(!bRet){
+			m_error = Hir_UserCancel;
+			return false;
+		}
+	}
 	wstring strHeaders;
 	BOOL bQuery = QueryRawHeaders(strHeaders);
 	if ( bQuery && (strHeaders.find(L"404")!=wstring::npos) )
@@ -177,6 +185,10 @@ BOOL CWinHttp::DownloadFile( LPCSTR lpUrl, LPCSTR lpFilePath )
 	{//ÏÂÔØÊ§°Ü£¬É¾³ýÎÄ¼þ
 		DeleteFile(strPath.c_str());
 	}
+	if(m_pCallback){
+		m_pCallback->OnDownloadCallback(bRet?DS_Finished:DS_Failed, 0, 0);
+	}
+
 	return bRet;
 }
 
