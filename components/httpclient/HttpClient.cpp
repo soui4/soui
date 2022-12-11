@@ -105,6 +105,12 @@ BOOL CWinHttp::DownloadFile( LPCSTR lpUrl, LPCSTR lpFilePath )
 	DWORD dwBytesToRead = 0, dwFileSize = 0, dwReadSize=0, dwRecvSize =0;
 	if ( !InitConnect(lpUrl, Hr_Get) )
 		return false;
+	m_httpCode = QueryStatusCode();
+	if (m_httpCode == HTTP_STATUS_NOT_FOUND) {
+		m_error = Hir_404;
+		return FALSE;
+	}
+
 	if ( !QueryContentLength(dwFileSize) )
 	{
 		m_error = Hir_QueryErr;
