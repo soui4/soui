@@ -99,7 +99,7 @@ protected:
 		{
 			if (_tcscmp(pszType, _T("svg")) != 0)
 			{
-				return SApplication::LoadImage(pszType, pszResName);
+				return SResProviderMgr::LoadImage(pszType, pszResName);
 			}
 			const unsigned char bom16[2] = { 0xff,0xfe };
 			const unsigned char bom8[3] = { 0xef,0xbb,0xbf };

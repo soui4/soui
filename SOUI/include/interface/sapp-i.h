@@ -265,6 +265,9 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) PURE;
 	STDMETHOD_(IValueAnimator *, LoadValueAnimatorA)(THIS_ LPCSTR strResId) PURE;
 
+	STDMETHOD_(IBitmapS *,LoadImage)(THIS_ LPCTSTR strResId) PURE;
+	STDMETHOD_(IBitmapS *,LoadImageA)(THIS_ LPCSTR strResId) PURE;
+
 	/**
      * @brief ∆Ù”√NotifyCenter
 	 * @param BOOL bEnable --  «∑Ò∆Ù”√

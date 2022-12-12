@@ -149,6 +149,14 @@ class SOUI_EXP SApplication
 		SStringT str = S_CA2T(strResId,CP_UTF8);
 		return LoadAnimation(str);
 	}
+	STDMETHOD_(IBitmapS *,LoadImage)(THIS_ LPCTSTR strResId) OVERRIDE{
+		SStringW wcsResId = S_CT2W(strResId);
+		return SResProviderMgr::LoadImage2(wcsResId);
+	}
+	STDMETHOD_(IBitmapS *,LoadImageA)(THIS_ LPCSTR strResId) OVERRIDE{
+		SStringT str = S_CA2T(strResId,CP_UTF8);
+		return LoadImage(str);
+	}
 
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) OVERRIDE;
 	STDMETHOD_(IValueAnimator *, LoadValueAnimatorA)(THIS_ LPCSTR strResId) OVERRIDE{
