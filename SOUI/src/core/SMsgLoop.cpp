@@ -55,24 +55,20 @@ int SMessageLoop::Run()
     m_bQuit = FALSE;
     for (;!m_bQuit;)
     {
-		if(bDoIdle){
-			while (!::PeekMessage(&m_msg, NULL, 0, 0, PM_NOREMOVE))
-			{
-				ExecutePendingTask();
-				if (!OnIdle(nIdleCount++))
-					bDoIdle = FALSE;
-				if (m_bQuit)
-					goto exit_loop;
-			}
-		}else{
-			ExecutePendingTask();
-		}
-        bRet = OnWaitMessage();
+        while (bDoIdle && !::PeekMessage(&m_msg, NULL, 0, 0, PM_NOREMOVE))
+        {
+            if (!OnIdle(nIdleCount++))
+                bDoIdle = FALSE;
+            if (m_bQuit)
+                goto exit_loop;
+        }
+
+		bRet = OnWaitMessage();
 		if(!bRet){
 			SSLOGD() << "OnWaitMessage returned FALSE (error)";
 			continue; // error, don't process
 		}
-
+		
         while(PeekMessage(&m_msg,NULL,0,0,PM_REMOVE))
 		{
 			if(m_msg.message == WM_QUIT)
