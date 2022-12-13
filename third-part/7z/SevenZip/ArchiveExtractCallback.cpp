@@ -156,7 +156,6 @@ namespace SevenZip
 
             if (m_isDir)
             {
-                wprintf_s(L"DirBegin:%s\n", m_absPath.c_str());
                 FileSys::CreateDirectoryTree(m_absPath);
                 *outStream = NULL;
                 return S_OK;
@@ -177,7 +176,6 @@ namespace SevenZip
                 } 
             }
 
-            wprintf_s(L"FileBegin:%s\n", m_absPath.c_str());
             if (m_overwriteMode == OverwriteMode::kRollBack)
             {
                 TString BackupPath;
@@ -273,7 +271,6 @@ namespace SevenZip
 
             if (m_absPath.empty())
             {
-                wprintf_s(L"AllDone\n");
                 if (m_callback)
                     m_callback->OnEnd(m_directory);
                 return S_OK;
@@ -297,7 +294,6 @@ namespace SevenZip
                 SetFileAttributes(m_absPath.c_str(), m_attrib);
             }
 
-            wprintf_s(L"FileDone:%s\n", m_absPath.c_str());
             if (m_callback)
             {
                 if(!m_callback->OnFileDone(m_absPath, m_newFileSize))

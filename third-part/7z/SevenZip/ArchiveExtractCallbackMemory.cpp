@@ -155,7 +155,6 @@ namespace SevenZip
 
 			if (m_isDir)
 			{
-				wprintf_s(L"DirBegin:%s\n", m_absPath.c_str());
 				*outStream = NULL;
 				return S_OK;
 			}
@@ -214,14 +213,12 @@ namespace SevenZip
 
             if (m_absPath.empty())
             {
-                wprintf_s(L"AllDone\n");
                 if (m_callback)
                     m_callback->OnEnd(L"");
                 return S_OK;
             }
 			  
 
-            wprintf_s(L"FileDone:%s\n", m_absPath.c_str());
             if (m_callback)
             {
                 if(!m_callback->OnFileDone(m_absPath, m_newFileSize))
