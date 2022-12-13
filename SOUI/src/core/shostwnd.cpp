@@ -423,7 +423,9 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 		xmlScript.set_userdata(1);
 		SApplication::getSingleton().CreateScriptModule(&m_pScriptModule);
 		if(m_pScriptModule){
-			GetMsgLoop()->AddIdleHandler(m_pScriptModule->getIdleHandler());
+			IIdleHandler *pIdleHandler = m_pScriptModule->getIdleHandler();
+			if(pIdleHandler)
+				GetMsgLoop()->AddIdleHandler(pIdleHandler);
 			SXmlAttr attrSrc = xmlScript.attribute(L"src");
 			if (attrSrc)
 			{
@@ -775,7 +777,9 @@ void SHostWnd::OnDestroy()
         m_pTipCtrl = NULL;
     }
 	if(m_pScriptModule){
-		GetMsgLoop()->RemoveIdleHandler(m_pScriptModule->getIdleHandler());
+		IIdleHandler *pIdleHandler = m_pScriptModule->getIdleHandler();
+		if(pIdleHandler)
+			GetMsgLoop()->RemoveIdleHandler(pIdleHandler);
 		m_pScriptModule=NULL;
 	}
     m_memRT = NULL;
