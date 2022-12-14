@@ -189,7 +189,6 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 		}
 [!endif]
 
-		SNotifyCenter *pNotifyCenter = new SNotifyCenter;
 		// BLOCK: Run application
 		{
 			CMainDlg dlgMain;
@@ -200,7 +199,6 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 
 			nRet = theApp->Run(dlgMain.m_hWnd);
 		}
-		delete pNotifyCenter;
 		delete theApp;
 	}
 
