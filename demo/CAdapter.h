@@ -483,7 +483,7 @@ public:
 		TreeItemData data;
 		data.strName = L"name root";
 		data.nAge = 100;
-
+		data.strTstLong = _T("name root");
 		HSTREEITEM hRoot = InsertItem(data);
 		SetItemExpanded(hRoot, FALSE);
 		for (int i = 0; i < 100; i++)

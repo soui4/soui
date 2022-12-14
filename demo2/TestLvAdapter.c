@@ -109,7 +109,7 @@ long WINAPI TestLvAdapter_Release(ILvAdapter *pObj)
 		{
 			pItem->lpVtbl->InitFromXml(pItem,xmlTemplate);
 		}
-		pText = pItem->lpVtbl->FindIChildByName(pItem,L"txt_test",-1);
+		pText = pItem->lpVtbl->FindIChildByName(pItem,L"txt_test");
 		if(pText)
 		{
 			TCHAR szBuf[100];
