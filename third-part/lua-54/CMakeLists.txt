@@ -70,10 +70,8 @@ set(sources
 source_group("Header Files" FILES ${headers})
 source_group("Source Files" FILES ${sources})
 
-add_library(lua STATIC ${sources} ${headers})
-set_target_properties(lua PROPERTIES OUTPUT_NAME lua-54)
-# set_target_properties(lua PROPERTIES PREFIX lib)
-set(COM_LIBS ${COM_LIBS} lua CACHE INTERNAL "com_lib")
-set_target_properties (lua PROPERTIES
+add_library(lua-54 STATIC ${sources} ${headers})
+set(COM_LIBS ${COM_LIBS} lua-54 CACHE INTERNAL "com_lib")
+set_target_properties (lua-54 PROPERTIES
     FOLDER third-part
 )
