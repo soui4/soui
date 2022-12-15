@@ -44,6 +44,7 @@ typedef enum _SOUI_EVENTS
     EVT_ANIMATION_START,
     EVT_ANIMATION_STOP,
     EVT_ANIMATION_REPEAT,
+	EVT_POS,
 
     EVT_KEYDOWN = 8200,
 
@@ -284,6 +285,7 @@ DEF_EVT(EventSwndInitFinish, EVT_INIT_FINISH, on_init_finish, { int fake; });
 DEF_EVT(EventSwndDestroy, EVT_DESTROY, on_destroy, { int fake; });
 
 DEF_EVT(EventSwndSize, EVT_SIZE, on_size, { SIZE szWnd; });
+DEF_EVT(EventSwndPos, EVT_POS, on_pos, { RECT rcWnd; });
 
 DEF_EVT(EventSwndStateChanged, EVT_STATECHANGED, on_state_changed, {
     DWORD dwOldState;
@@ -297,7 +299,7 @@ inline BOOL EventSwndStateChanged_CheckState(EventSwndStateChanged *pEvt, DWORD 
 }
 #endif
 
-DEF_EVT(EventSwndVisibleChanged, EVT_VISIBLECHANGED, on_visible_changed, { int fake; })
+DEF_EVT(EventSwndVisibleChanged, EVT_VISIBLECHANGED, on_visible_changed, { BOOL bVisible; })
 
 DEF_EVT(EventSwndAnimationStart, EVT_ANIMATION_START, on_animation_start, { IAnimation *pAni; })
 

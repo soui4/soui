@@ -172,8 +172,9 @@ BOOL SMessageLoop::AddMessageFilter(IMsgFilter *pMessageFilter)
 BOOL SMessageLoop::PostTask(IRunnable *runable)
 {
     SAutoLock lock(m_cs);
-    if (m_tid == 0)
-        return FALSE;
+	if (m_tid == 0){
+		SSLOGW()<<"msg loop not running now! pending task size:"<<m_runnables.GetCount();
+	}
     m_runnables.AddTail(runable->clone());
     if (m_runnables.GetCount() > 5)
     {

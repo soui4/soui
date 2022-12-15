@@ -84,6 +84,14 @@ public:
 	*/
 	STDMETHOD_(BOOL,getRunningTaskInfo)(THIS_ char *buf, int bufLen) OVERRIDE;
 
+	/**
+     * set a task to run repeat.
+     * @param pTask the to be run task object.
+     * @param intervel heart beat interval
+     * @return void
+	 * @remark task loop will hold a clone of the pTask.
+     */
+	STDMETHOD_(void,setHeartBeatTask)(THIS_ IRunnable *pTask, int intervel) OVERRIDE;
 private:
 	class TaskItem
 	{
@@ -107,8 +115,6 @@ private:
 	};
 
 
-
-
 	void runLoopProc();
 
 	mutable SCriticalSection m_taskListLock;
@@ -124,6 +130,10 @@ private:
 	TaskItem m_runningItem;
 	long m_nextTaskID;
 
+	SCriticalSection m_csHeartBeatTask;
+	SAutoRefPtr<IRunnable> m_heartBeatTask;
+	unsigned int	m_nHeartBeatInterval;
+	unsigned int	m_tsTick,m_tsCheck;
 };
 
 namespace TASKLOOP

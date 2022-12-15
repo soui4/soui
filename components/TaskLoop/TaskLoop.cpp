@@ -4,6 +4,7 @@
 #include <cassert>
 #include <deque>
 #include <limits>
+#pragma comment(lib,"Winmm.lib")
 
 namespace SOUI
 {
@@ -16,13 +17,17 @@ namespace SOUI
 		m_items(),
 		m_hasRunningItem(false),
 		m_runningItem(NULL,0),
-		m_nextTaskID(0)
+		m_nextTaskID(0),
+		m_nHeartBeatInterval(INFINITE)
 	{
 	}
 
 	STaskLoop::~STaskLoop()
 	{
 		stop();
+		if(m_nHeartBeatInterval!=INFINITE){
+			timeEndPeriod(1);
+		}
 	}
 
 	void STaskLoop::start(const char * pszName,Priority priority)
@@ -38,7 +43,6 @@ namespace SOUI
 	void STaskLoop::stop()
 	{
 		int taskNum = getTaskCount();
-
 		m_thread.stop();
 		m_itemsSem.notify();
 		m_thread.waitForStop();
@@ -105,15 +109,18 @@ namespace SOUI
 
 	void STaskLoop::runLoopProc()
 	{
+		unsigned int interval=INFINITE;
+		{
+			SAutoLock autoLock(m_csHeartBeatTask);
+			interval = m_nHeartBeatInterval;
+		}
 		while (true)
 		{
 			if (m_thread.isStopping())
 			{
 				break;
 			}
-
-			m_itemsSem.wait(INFINITE);
-
+			m_itemsSem.wait(interval);
 			{
 				SAutoLock autoLock(m_taskListLock);
 				SAutoLock autoRunningLock(m_runningLock);
@@ -148,6 +155,44 @@ namespace SOUI
 					m_hasRunningItem = false;
 					m_runingItemInfo.clear();
 					m_runningItem = TaskItem(NULL,0);
+				}
+			}
+			{
+				SAutoLock autoLock(m_csHeartBeatTask);
+				if(m_heartBeatTask){
+					unsigned int tsNow = timeGetTime();
+					BOOL bTick = FALSE;
+					if(m_tsTick == -1)
+						bTick = TRUE;
+					else{
+						unsigned int diff = 0;
+						if(tsNow>=m_tsTick){
+							diff = tsNow-m_tsTick;
+						}else{//time round
+							diff = (INFINITE-m_tsTick) + tsNow;
+						}
+						if(diff >= m_nHeartBeatInterval)
+							bTick = TRUE;
+					}
+					if(bTick){
+						interval = m_nHeartBeatInterval;//reset interval
+						m_tsTick = tsNow;
+						m_heartBeatTask->run();
+					}else if(m_tsCheck!=-1){
+						unsigned int diff = 0;						
+						if(tsNow>=m_tsCheck)
+							diff = tsNow-m_tsCheck;
+						else
+							diff = INFINITE-m_tsCheck+tsNow;
+						SASSERT(interval>=diff);
+						if(interval < diff){
+							interval = 0;
+						}else
+						{
+							interval -= diff;
+						}
+					}
+					m_tsCheck = tsNow;
 				}
 			}
 		}// end of while
@@ -214,6 +259,14 @@ namespace SOUI
 				m_runningItem = TaskItem(NULL,0);
 			}
 		}
+		{
+			SAutoLock autoLock(m_csHeartBeatTask);
+			if(m_heartBeatTask && m_heartBeatTask->getObject() == object){
+				m_heartBeatTask=NULL;
+				m_nHeartBeatInterval = INFINITE;
+				timeEndPeriod(1);
+			}
+		}
 	}
 
 	BOOL STaskLoop::cancelTask(long taskId)
@@ -250,6 +303,23 @@ namespace SOUI
 			return false;
 		strcat_s(buf,bufLen-1,m_runingItemInfo.c_str());
 		return true;
+	}
+
+	void STaskLoop::setHeartBeatTask(THIS_ IRunnable *pTask, int intervel)
+	{
+		SAutoLock autoLock(m_csHeartBeatTask);
+		if(pTask){
+			m_nHeartBeatInterval = intervel;
+			m_heartBeatTask.Attach(pTask->clone());
+			timeBeginPeriod(1);
+			m_tsCheck = -1;
+			m_tsTick = -1;
+			m_itemsSem.notify();//stop previous wait.
+		}else{
+			m_heartBeatTask = NULL;
+			m_nHeartBeatInterval=INFINITE;
+			timeEndPeriod(1);
+		}
 	}
 
 

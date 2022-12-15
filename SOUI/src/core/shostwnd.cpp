@@ -742,6 +742,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 	{
 		m_presenter.Attach(new SHostPresenter(this));
 	}
+    m_presenter->OnHostCreate();
     m_dwThreadID = GetCurrentThreadId();
     SHostMgr::getSingletonPtr()->AddHostMsgHandler(this);
     UpdateAutoSizeCount(true);
@@ -757,7 +758,6 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     if (m_pTipCtrl)
         GetMsgLoop()->AddMessageFilter(m_pTipCtrl);
     UpdateAutoSizeCount(false);
-	m_presenter->OnHostCreate();
     return 0;
 }
 

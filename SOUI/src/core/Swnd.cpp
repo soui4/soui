@@ -99,6 +99,7 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSwndInitFinish));
     m_evtSet.addEvent(EVENTID(EventSwndDestroy));
     m_evtSet.addEvent(EVENTID(EventSwndSize));
+	m_evtSet.addEvent(EVENTID(EventSwndPos));
     m_evtSet.addEvent(EVENTID(EventSwndMouseHover));
     m_evtSet.addEvent(EVENTID(EventSwndMouseLeave));
     m_evtSet.addEvent(EVENTID(EventSwndStateChanged));
@@ -1549,8 +1550,12 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
         m_layoutDirty = dirty_self;
     }
 
-    CRect rcClient;
-    GetClientRect(&rcClient);
+	EventSwndPos evt(this);
+	evt.rcWnd = m_rcWindow;
+	FireEvent(evt);
+
+	CRect rcClient;
+	GetClientRect(&rcClient);
     SSendMessage(WM_SIZE, 0, MAKELPARAM(rcClient.Width(), rcClient.Height()));
     return TRUE;
 }
@@ -1950,6 +1955,7 @@ void SWindow::OnShowWindow(BOOL bShow, UINT nStatus)
     }
 
     EventSwndVisibleChanged evtShow(this);
+	evtShow.bVisible = bShow;
     FireEvent(evtShow);
 }
 
