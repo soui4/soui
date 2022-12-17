@@ -76,6 +76,8 @@ void SComboBox::OnCreateDropDown(SDropDownWnd *pDropDown)
     __baseCls::OnCreateDropDown(pDropDown);
     pDropDown->GetRoot()->InsertChild(m_pListBox);
     pDropDown->GetRoot()->UpdateChildrenPosition();
+	pDropDown->GetRoot()->SDispatchMessage(UM_SETSCALE,GetScale(),0);
+	pDropDown->GetRoot()->SDispatchMessage(UM_SETCOLORIZE,m_crColorize,0);
 
     m_pListBox->SetVisible(TRUE);
     m_pListBox->SetFocus();
