@@ -848,6 +848,12 @@ void SAnimateImgWnd::OnContainerChanged(ISwndContainer *pOldContainer, ISwndCont
     SWindow::OnContainerChanged(pOldContainer, pNewContainer);
 }
 
+void SAnimateImgWnd::OnScaleChanged(int scale)
+{
+	__baseCls::OnScaleChanged(scale);
+	GetScaleSkin(m_pSkin, scale);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Progress Control
 // Use id attribute to process click event

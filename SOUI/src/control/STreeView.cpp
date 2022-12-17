@@ -1398,8 +1398,8 @@ HRESULT STreeView::OnAttrIndent(const SStringW &strValue, BOOL bLoading)
 {
     if (!bLoading)
         return E_FAIL;
-	int nIndent = _wtoi(strValue);
-    m_tvItemLocator->SetIndent(nIndent);
+	m_indent.parseString(strValue);
+    m_tvItemLocator->SetIndent(m_indent.toPixelSize(GetScale()));
     return S_OK;
 }
 
@@ -1412,7 +1412,9 @@ void STreeView::OnColorize(COLORREF cr)
 void STreeView::OnScaleChanged(int nScale)
 {
     __baseCls::OnScaleChanged(nScale);
-    DispatchMessage2Items(UM_SETSCALE, nScale, 0);
+	GetScaleSkin(m_pLineSkin,nScale);
+	m_tvItemLocator->SetIndent(m_indent.toPixelSize(nScale));
+	UpdateVisibleItems();
 }
 
 HRESULT STreeView::OnLanguageChanged()

@@ -212,5 +212,6 @@ class SOUI_EXP STreeView
     BOOL m_bWantTab; /**< want tab */
 	BOOL m_bHasLines; /**< has lines*/
 	SAutoRefPtr<ISkinObj> m_pLineSkin;
+	SLayoutSize	m_indent;
 };
 SNSEND

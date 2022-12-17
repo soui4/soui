@@ -429,6 +429,7 @@ class SOUI_EXP SAnimateImgWnd
     STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
     virtual void OnColorize(COLORREF cr);
     virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
+	void OnScaleChanged(int scale) override;
     void OnPaint(IRenderTarget *pRT);
 
     void OnShowWindow(BOOL bShow, UINT nStatus);
