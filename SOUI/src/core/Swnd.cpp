@@ -3608,7 +3608,7 @@ BOOL SWindow::SAnimationHandler::OnOwnerResize(IEvtArgs *e)
     {
         szParent = p->GetWindowRect().Size();
     }
-    m_pOwner->GetAnimation()->initialize(szOwner.cx, szOwner.cy, szParent.cx, szParent.cy);
+    m_pOwner->GetAnimation()->initialize(szOwner.cx, szOwner.cy, szParent.cx, szParent.cy,m_pOwner->GetScale());
     return true;
 }
 

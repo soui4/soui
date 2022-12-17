@@ -3,12 +3,12 @@
 #include <animation/STranslateAnimation.h>
 SNSBEGIN
 
-void STranslateAnimation::initialize(int width, int height, int parentWidth, int parentHeight)
+void STranslateAnimation::initialize(int width, int height, int parentWidth, int parentHeight,int nScale)
 {
-    mFromXDelta = (float)resolveSize(mFromXType, mFromXValue, width, parentWidth);
-    mToXDelta = (float)resolveSize(mToXType, mToXValue, width, parentWidth);
-    mFromYDelta = (float)resolveSize(mFromYType, mFromYValue, height, parentHeight);
-    mToYDelta = (float)resolveSize(mToYType, mToYValue, height, parentHeight);
+    mFromXDelta = (float)resolveSize(mFromXValue, width, parentWidth,nScale);
+    mToXDelta = (float)resolveSize(mToXValue, width, parentWidth,nScale);
+    mFromYDelta = (float)resolveSize(mFromYValue, height, parentHeight,nScale);
+    mToYDelta = (float)resolveSize(mToYValue, height, parentHeight,nScale);
 }
 
 void STranslateAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
@@ -27,35 +27,18 @@ void STranslateAnimation::applyTransformation(float interpolatedTime, ITransform
     t->SetTransformationType(TYPE_MATRIX);
 }
 
-void STranslateAnimation::init(AniValueType fromXType, float fromXValue, AniValueType toXType, float toXValue, AniValueType fromYType, float fromYValue, AniValueType toYType, float toYValue)
+void STranslateAnimation::init(const SValueDescription & fromX, const SValueDescription & toX, const SValueDescription & fromY,  const SValueDescription & toY)
 {
-    mFromXValue = fromXValue;
-    mToXValue = toXValue;
-    mFromYValue = fromYValue;
-    mToYValue = toYValue;
-
-    mFromXType = fromXType;
-    mToXType = toXType;
-    mFromYType = fromYType;
-    mToYType = toYType;
+    mFromXValue = fromX;
+    mToXValue = toX;
+    mFromYValue = fromY;
+    mToYValue = toY;
 }
 
 STranslateAnimation::STranslateAnimation()
 {
-    init();
+	mFromXValue = mToXValue = mFromYValue = mToYValue =SValueDescription();
 }
 
-void STranslateAnimation::init(float fromXDelta /*=0.0f*/, float toXDelta /*=0.0f*/, float fromYDelta /*=0.0f*/, float toYDelta /*=0.0f*/)
-{
-    mFromXValue = fromXDelta;
-    mToXValue = toXDelta;
-    mFromYValue = fromYDelta;
-    mToYValue = toYDelta;
-
-    mFromXType = ABSOLUTE_VALUE;
-    mToXType = ABSOLUTE_VALUE;
-    mFromYType = ABSOLUTE_VALUE;
-    mToYType = ABSOLUTE_VALUE;
-}
 
 SNSEND

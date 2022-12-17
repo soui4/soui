@@ -27,14 +27,12 @@
 #include <animation/STransformation.h>
 #include <sobject/sobject.hpp>
 
-#define ATTR_VALUE_DESC(attribname, varType, varValue)                          \
-    if (0 == strAttribName.CompareNoCase(attribname))                           \
-    {                                                                           \
-        SValueDescription desc = SOUI::SValueDescription::parseValue(strValue); \
-        varType = desc.type;                                                    \
-        varValue = desc.value;                                                  \
-        hRet = S_FALSE;                                                         \
-    }                                                                           \
+#define ATTR_VALUE_DESC(attribname, desc)                          \
+    if (0 == strAttribName.CompareNoCase(attribname))              \
+    {                                                              \
+        desc = SOUI::SValueDescription::parseValue(strValue);      \
+        hRet = S_FALSE;                                            \
+    }                                                              \
     else
 
 SNSBEGIN
@@ -43,6 +41,7 @@ SNSBEGIN
  */
 class SOUI_EXP SValueDescription {
   public:
+	  SValueDescription(AniValueType _type=ABSOLUTE_VALUE,float _value=0.0f):type(_type),value(_value){}
     /**
      * One of Animation.ABSOLUTE_VALUE, Animation.RELATIVE_TO_SELF, or
      * Animation.RELATIVE_TO_PARENT.
@@ -52,10 +51,9 @@ class SOUI_EXP SValueDescription {
     /**
      * The absolute or relative dimension for this Description.
      */
-    float value;
-
+	SLayoutSize  value;
     /**
-     * Size descriptions can appear inthree forms:
+     * Size descriptions can appear in three forms:
      * <ol>
      * <li>An absolute size. This is represented by a number.</li>
      * <li>A size relative to the size of the object being animated. This
@@ -261,7 +259,7 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
     STDMETHOD_(BOOL, hasAlpha)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(void, initialize)
-    (THIS_ int width, int height, int parentWidth, int parentHeight) OVERRIDE;
+    (THIS_ int width, int height, int parentWidth, int parentHeight,int nScale) OVERRIDE;
 
     STDMETHOD_(void, setUserData)(THIS_ ULONG_PTR data) OVERRIDE;
 
@@ -287,7 +285,7 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
      * @param parentSize The size of the parent of the object being animated
      * @return The dimension to use for the animation
      */
-    int resolveSize(AniValueType type, float value, int size, int parentSize);
+    int resolveSize(const SValueDescription & value, int size, int parentSize, int nScale);
 
     /**
      * Gurantees that this animation has an interpolator. Will use

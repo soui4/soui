@@ -29,10 +29,8 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
     float mFromY;
     float mToY;
 
-    AniValueType mPivotXType;
-    AniValueType mPivotYType;
-    float mPivotXValue;
-    float mPivotYValue;
+	SValueDescription mPivotXDesc;
+	SValueDescription mPivotYDesc;
 
     float mPivotX;
     float mPivotY;
@@ -51,26 +49,6 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
      * @param toY Vertical scaling factor to apply at the end of the animation
      */
   public:
-    void init(float fromX = 1.0f, float toX = 1.0f, float fromY = 1.0f, float toY = 1.0f);
-
-    /**
-     * Constructor to use when building a ScaleAnimation from code
-     *
-     * @param fromX Horizontal scaling factor to apply at the start of the
-     *        animation
-     * @param toX Horizontal scaling factor to apply at the end of the animation
-     * @param fromY Vertical scaling factor to apply at the start of the
-     *        animation
-     * @param toY Vertical scaling factor to apply at the end of the animation
-     * @param pivotX The X coordinate of the point about which the object is
-     *        being scaled, specified as an absolute number where 0 is the left
-     *        edge. (This point remains fixed while the object changes size.)
-     * @param pivotY The Y coordinate of the point about which the object is
-     *        being scaled, specified as an absolute number where 0 is the top
-     *        edge. (This point remains fixed while the object changes size.)
-     */
-    void init(float fromX, float toX, float fromY, float toY, float pivotX, float pivotY);
-
     /**
      * Constructor to use when building a ScaleAnimation from code
      *
@@ -97,14 +75,7 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
      *        size.) This value can either be an absolute number if pivotYType
      *        is ABSOLUTE, or a percentage (where 1.0 is 100%) otherwise.
      */
-    void init(float fromX, float toX, float fromY, float toY, AniValueType pivotXType, float pivotXValue, AniValueType pivotYType, float pivotYValue);
-
-    /**
-     * Called at the end of constructor methods to initialize, if possible, values for
-     * the pivot point. This is only possible for ABSOLUTE pivot values.
-     */
-  private:
-    void initializePivotPoint();
+    void init(float fromX, float toX, float fromY, float toY, const SValueDescription & pivotX, const SValueDescription & pivotY);
 
   protected:
     STDMETHOD_(void, applyTransformation)
@@ -113,15 +84,15 @@ class SOUI_EXP SScaleAnimation : public SAnimation {
 
   public:
     STDMETHOD_(void, initialize)
-    (THIS_ int width, int height, int parentWidth, int parentHeight) OVERRIDE;
+    (THIS_ int width, int height, int parentWidth, int parentHeight,int nScale) OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
         ATTR_FLOAT(L"fromXScale", mFromX, FALSE)
         ATTR_FLOAT(L"toXScale", mToX, FALSE)
         ATTR_FLOAT(L"fromYScale", mFromY, FALSE)
         ATTR_FLOAT(L"toYScale", mToY, FALSE)
-        ATTR_VALUE_DESC(L"pivotX", mPivotXType, mPivotXValue)
-        ATTR_VALUE_DESC(L"pivotY", mPivotYType, mPivotYValue)
+        ATTR_VALUE_DESC(L"pivotX", mPivotXDesc)
+        ATTR_VALUE_DESC(L"pivotY", mPivotYDesc)
     SOUI_ATTRS_END()
 };
 

@@ -1,5 +1,5 @@
 #pragma once
-#include "SDpiScale.h"
+#include <helper/SDpiScale.h>
 #include <WinUser.h>
 #include <wtl.mini/msgcrack.h>
 #include <wtl.mini/souimisc.h>
@@ -145,6 +145,7 @@ namespace SOUI{
 			if (nScale != pT->GetRoot()->GetScale()) //As ShostWnd::GetScale is under protect, here, we using SWindow::GetScale.
 			{
 				pT->GetRoot()->SDispatchMessage(UM_SETSCALE, nScale, 0);
+				pT->GetNcPainter()->GetRoot()->SDispatchMessage(UM_SETSCALE, nScale, 0);
 				pT->UpdateAutoSizeCount(true);
 				pT->SetWindowPos(
 					NULL,

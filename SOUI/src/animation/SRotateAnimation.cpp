@@ -11,10 +11,10 @@ SRotateAnimation::SRotateAnimation()
     mPivotY = 0.0f;
 }
 
-void SRotateAnimation::initialize(int width, int height, int parentWidth, int parentHeight)
+void SRotateAnimation::initialize(int width, int height, int parentWidth, int parentHeight,int nScale)
 {
-    mPivotX = (float)resolveSize(mPivotXType, mPivotXValue, width, parentWidth);
-    mPivotY = (float)resolveSize(mPivotYType, mPivotYValue, height, parentHeight);
+    mPivotX = (float)resolveSize(mPivotXDesc, width, parentWidth,nScale);
+    mPivotY = (float)resolveSize(mPivotYDesc, height, parentHeight,nScale);
 }
 
 void SRotateAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
@@ -41,47 +41,19 @@ void SRotateAnimation::copy(const IAnimation *src)
     SAnimation::copy(src);
     mFromDegrees = src2->mFromDegrees;
     mToDegrees = src2->mToDegrees;
-    mPivotXType = src2->mPivotXType;
-    mPivotYType = src2->mPivotYType;
-    mPivotXValue = src2->mPivotXValue;
-    mPivotYValue = src2->mPivotYValue;
-    initializePivotPoint();
+    mPivotXDesc = src2->mPivotXDesc;
+    mPivotYDesc = src2->mPivotYDesc;
 }
 
-void SRotateAnimation::initializePivotPoint()
-{
-    if (mPivotXType == ABSOLUTE_VALUE)
-    {
-        mPivotX = mPivotXValue;
-    }
-    if (mPivotYType == ABSOLUTE_VALUE)
-    {
-        mPivotY = mPivotYValue;
-    }
-}
 
-void SRotateAnimation::init(float fromDegrees, float toDegrees, AniValueType pivotXType, float pivotXValue, AniValueType pivotYType, float pivotYValue)
+void SRotateAnimation::init(float fromDegrees, float toDegrees, const SValueDescription & pivotX, const SValueDescription & pivotY)
 {
     mFromDegrees = fromDegrees;
     mToDegrees = toDegrees;
 
-    mPivotXValue = pivotXValue;
-    mPivotXType = pivotXType;
-    mPivotYValue = pivotYValue;
-    mPivotYType = pivotYType;
-    initializePivotPoint();
+    mPivotXDesc = pivotX;
+    mPivotYDesc = pivotY;
 }
 
-void SRotateAnimation::init(float fromDegrees, float toDegrees, float pivotX, float pivotY)
-{
-    mFromDegrees = fromDegrees;
-    mToDegrees = toDegrees;
-
-    mPivotXType = ABSOLUTE_VALUE;
-    mPivotYType = ABSOLUTE_VALUE;
-    mPivotXValue = pivotX;
-    mPivotYValue = pivotY;
-    initializePivotPoint();
-}
 
 SNSEND

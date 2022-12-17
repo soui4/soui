@@ -26,49 +26,19 @@ SNSBEGIN
 class SOUI_EXP STranslateAnimation : public SAnimation {
     DEF_SOBJECT(SAnimation, L"translate")
 
-  private:
-    AniValueType mFromXType;
-    AniValueType mToXType;
-
-    AniValueType mFromYType;
-    AniValueType mToYType;
-
   protected:
-    /** @hide */
-    float mFromXValue;
-    /** @hide */
-    float mToXValue;
+    SValueDescription mFromXValue;
+    SValueDescription mToXValue;
+    SValueDescription mFromYValue;
+    SValueDescription mToYValue;
 
-    /** @hide */
-    float mFromYValue;
-    /** @hide */
-    float mToYValue;
-
-    /** @hide */
     float mFromXDelta;
-    /** @hide */
     float mToXDelta;
-    /** @hide */
     float mFromYDelta;
-    /** @hide */
     float mToYDelta;
-
   public:
     STranslateAnimation();
 
-    /**
-     * Constructor to use when building a TranslateAnimation from code
-     *
-     * @param fromXDelta Change in X coordinate to apply at the start of the
-     *        animation
-     * @param toXDelta Change in X coordinate to apply at the end of the
-     *        animation
-     * @param fromYDelta Change in Y coordinate to apply at the start of the
-     *        animation
-     * @param toYDelta Change in Y coordinate to apply at the end of the
-     *        animation
-     */
-    void init(float fromXDelta = 0.0f, float toXDelta = 0.0f, float fromYDelta = 0.0f, float toYDelta = 0.0f);
 
     /**
      * Constructor to use when building a TranslateAnimation from code
@@ -98,7 +68,7 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
      *        animation. This value can either be an absolute number if toYType
      *        is ABSOLUTE, or a percentage (where 1.0 is 100%) otherwise.
      */
-    void init(AniValueType fromXType, float fromXValue, AniValueType toXType, float toXValue, AniValueType fromYType, float fromYValue, AniValueType toYType, float toYValue);
+    void init(const SValueDescription & fromX, const SValueDescription & toX, const SValueDescription & fromY,  const SValueDescription & toY);
 
   protected:
     STDMETHOD_(void, applyTransformation)
@@ -106,13 +76,13 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
 
   public:
     STDMETHOD_(void, initialize)
-    (THIS_ int width, int height, int parentWidth, int parentHeight) OVERRIDE;
+    (THIS_ int width, int height, int parentWidth, int parentHeight,int nScale) OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-        ATTR_VALUE_DESC(L"fromXDelta", mFromXType, mFromXValue)
-        ATTR_VALUE_DESC(L"toXDelta", mToXType, mToXValue)
-        ATTR_VALUE_DESC(L"fromYDelta", mFromYType, mFromYValue)
-        ATTR_VALUE_DESC(L"toYDelta", mToYType, mToYValue)
+        ATTR_VALUE_DESC(L"fromXDelta",  mFromXValue)
+        ATTR_VALUE_DESC(L"toXDelta", mToXValue)
+        ATTR_VALUE_DESC(L"fromYDelta", mFromYValue)
+        ATTR_VALUE_DESC(L"toYDelta",  mToYValue)
     SOUI_ATTRS_END()
 };
 

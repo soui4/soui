@@ -11,22 +11,22 @@ SValueDescription SValueDescription::parseValue(const SStringW &value)
     if (value.IsEmpty())
     {
         d.type = ABSOLUTE_VALUE;
-        d.value = 0.0f;
+        d.value = SLayoutSize(0.0f);
     }
     else if (value.EndsWith(L"%", true))
     {
         d.type = RELATIVE_TO_SELF;
-        d.value = (float)_wtof(value.Left(value.GetLength() - 1)) / 100;
+		d.value = SLayoutSize((float)_wtof(value.Left(value.GetLength() - 1)) / 100,SLayoutSize::px);
     }
     else if (value.EndsWith(L"%p", true))
     {
         d.type = RELATIVE_TO_PARENT;
-        d.value = (float)_wtof(value.Left(value.GetLength() - 2)) / 100;
+        d.value = SLayoutSize((float)_wtof(value.Left(value.GetLength() - 2)) / 100,SLayoutSize::px);
     }
     else
     {
         d.type = ABSOLUTE_VALUE;
-        d.value = (float)_wtof(value);
+		d.value.parseString (value);
     }
     return d;
 }
@@ -37,17 +37,18 @@ BOOL SAnimation::hasAlpha() const
     return false;
 }
 
-int SAnimation::resolveSize(AniValueType type, float value, int size, int parentSize)
+int SAnimation::resolveSize(const SValueDescription & value, int size, int parentSize, int nScale)
 {
-    switch (type)
+	int nValue = value.value.toPixelSize(nScale);
+    switch (value.type)
     {
     case RELATIVE_TO_SELF:
-        return (int)(size * value);
+        return (int)(size * nValue);
     case RELATIVE_TO_PARENT:
-        return (int)(parentSize * value);
+        return (int)(parentSize * nValue);
     case ABSOLUTE_VALUE:
     default:
-        return (int)value;
+        return nValue;
     }
 }
 
@@ -395,7 +396,7 @@ IAnimation *SAnimation::clone() const
     return pRet;
 }
 
-void SAnimation::initialize(int width, int height, int parentWidth, int parentHeight)
+void SAnimation::initialize(int width, int height, int parentWidth, int parentHeight,int nScale)
 {
 }
 

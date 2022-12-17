@@ -31,10 +31,8 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
     float mFromDegrees;
     float mToDegrees;
 
-    AniValueType mPivotXType;
-    AniValueType mPivotYType;
-    float mPivotXValue;
-    float mPivotYValue;
+    SValueDescription mPivotXDesc;
+    SValueDescription mPivotYDesc;
 
     float mPivotX;
     float mPivotY;
@@ -51,7 +49,6 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
      */
     SRotateAnimation();
 
-    void init(float fromDegrees, float toDegrees, float pivotX = 0.0f, float pivotY = 0.0f);
 
     /**
      * Constructor to use when building a RotateAnimation from code
@@ -78,17 +75,10 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
      *        pivotYType is ABSOLUTE, or a percentage (where 1.0 is 100%)
      *        otherwise.
      */
-    void init(float fromDegrees, float toDegrees, AniValueType pivotXType, float pivotXValue, AniValueType pivotYType, float pivotYValue);
+    void init(float fromDegrees, float toDegrees, const SValueDescription & pivotX, const SValueDescription & pivotY);
 
     STDMETHOD_(void, initialize)
-    (THIS_ int width, int height, int parentWidth, int parentHeight) OVERRIDE;
-
-    /**
-     * Called at the end of constructor methods to initialize, if possible, values for
-     * the pivot point. This is only possible for ABSOLUTE pivot values.
-     */
-  private:
-    void initializePivotPoint();
+    (THIS_ int width, int height, int parentWidth, int parentHeight,int nScale) OVERRIDE;
 
   protected:
     STDMETHOD_(void, applyTransformation)
@@ -100,8 +90,8 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
     SOUI_ATTRS_BEGIN()
         ATTR_FLOAT(L"fromDegrees", mFromDegrees, FALSE)
         ATTR_FLOAT(L"toDegrees", mToDegrees, FALSE)
-        ATTR_VALUE_DESC(L"pivotX", mPivotXType, mPivotXValue)
-        ATTR_VALUE_DESC(L"pivotY", mPivotYType, mPivotYValue)
+        ATTR_VALUE_DESC(L"pivotX", mPivotXDesc)
+        ATTR_VALUE_DESC(L"pivotY", mPivotYDesc)
     SOUI_ATTRS_END()
 };
 

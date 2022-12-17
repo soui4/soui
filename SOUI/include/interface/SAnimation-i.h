@@ -395,7 +395,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
     STDMETHOD_(BOOL, hasAlpha)(CTHIS) SCONST PURE;
 
     STDMETHOD_(void, initialize)
-    (THIS_ int width, int height, int parentWidth, int parentHeight) PURE;
+    (THIS_ int width, int height, int parentWidth, int parentHeight,int nScale) PURE;
 
     STDMETHOD_(void, setUserData)(THIS_ ULONG_PTR data) PURE;
 

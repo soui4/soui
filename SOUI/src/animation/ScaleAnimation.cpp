@@ -4,10 +4,10 @@
 
 SNSBEGIN
 
-void SScaleAnimation::initialize(int width, int height, int parentWidth, int parentHeight)
+void SScaleAnimation::initialize(int width, int height, int parentWidth, int parentHeight,int nScale)
 {
-    mPivotX = (float)resolveSize(mPivotXType, mPivotXValue, width, parentWidth);
-    mPivotY = (float)resolveSize(mPivotYType, mPivotYValue, height, parentHeight);
+    mPivotX = (float)resolveSize(mPivotXDesc, width, parentWidth,nScale);
+    mPivotY = (float)resolveSize(mPivotYDesc, height, parentHeight,nScale);
 }
 
 void SScaleAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
@@ -47,66 +47,27 @@ void SScaleAnimation::copy(const IAnimation *src)
     mFromY = src2->mFromY;
     mToY = src2->mToY;
 
-    mPivotXType = src2->mPivotXType;
-    mPivotYType = src2->mPivotYType;
-    mPivotXValue = src2->mPivotXValue;
-    mPivotYValue = src2->mPivotYValue;
-    initializePivotPoint();
+    mPivotXDesc = src2->mPivotXDesc;
+    mPivotYDesc = src2->mPivotYDesc;
 }
 
-void SScaleAnimation::initializePivotPoint()
-{
-    if (mPivotXType == ABSOLUTE_VALUE)
-    {
-        mPivotX = mPivotXValue;
-    }
-    if (mPivotYType == ABSOLUTE_VALUE)
-    {
-        mPivotY = mPivotYValue;
-    }
-}
 
-void SScaleAnimation::init(float fromX, float toX, float fromY, float toY, AniValueType pivotXType, float pivotXValue, AniValueType pivotYType, float pivotYValue)
+void SScaleAnimation::init(float fromX, float toX, float fromY, float toY, const SValueDescription & pivotX, const SValueDescription & pivotY)
 {
     mFromX = fromX;
     mToX = toX;
     mFromY = fromY;
     mToY = toY;
 
-    mPivotXValue = pivotXValue;
-    mPivotXType = pivotXType;
-    mPivotYValue = pivotYValue;
-    mPivotYType = pivotYType;
-    initializePivotPoint();
+	mPivotXDesc = pivotX;
+	mPivotYDesc = pivotY;
 }
 
-void SScaleAnimation::init(float fromX, float toX, float fromY, float toY, float pivotX, float pivotY)
-{
-    mFromX = fromX;
-    mToX = toX;
-    mFromY = fromY;
-    mToY = toY;
-
-    mPivotXType = ABSOLUTE_VALUE;
-    mPivotYType = ABSOLUTE_VALUE;
-    mPivotXValue = pivotX;
-    mPivotYValue = pivotY;
-    initializePivotPoint();
-}
 
 SScaleAnimation::SScaleAnimation()
 {
-    init(1.0f, 1.0f, 1.0f, 1.0f, RELATIVE_TO_SELF, 0.5f, RELATIVE_TO_SELF, 0.5f);
+    init(1.0f, 1.0f, 1.0f, 1.0f, SValueDescription(RELATIVE_TO_SELF, 0.5f),SValueDescription(RELATIVE_TO_SELF, 0.5f));
 }
 
-void SScaleAnimation::init(float fromX /*=0.0f*/, float toX /*= 0.0f*/, float fromY /*= 0.0f*/, float toY /*= 0.0f*/)
-{
-    mFromX = fromX;
-    mToX = toX;
-    mFromY = fromY;
-    mToY = toY;
-    mPivotX = 0;
-    mPivotY = 0;
-}
 
 SNSEND

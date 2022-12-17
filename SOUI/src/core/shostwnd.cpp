@@ -1628,7 +1628,7 @@ bool SHostWnd::StartHostAnimation(IAnimation *pAni)
         GetMonitorInfo(hMonitor, &info);
         rcParent = info.rcWork;
     }
-    m_hostAnimation->initialize(rcWnd.Width(), rcWnd.Height(), rcParent.Width(), rcParent.Height());
+    m_hostAnimation->initialize(rcWnd.Width(), rcWnd.Height(), rcParent.Width(), rcParent.Height(),GetScale());
     m_hostAnimationHandler.m_rcInit = rcWnd;
     RegisterTimelineHandler(&m_hostAnimationHandler);
     return true;
