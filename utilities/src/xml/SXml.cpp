@@ -1,6 +1,7 @@
 #include <xml/SXml.h>
 #include <pugixml/pugixml.hpp>
 #include <string/sstringw.h>
+#include <string/strcpcvt.h>
 SNSBEGIN
 
 
@@ -190,6 +191,31 @@ SXmlAttr SXmlAttr::previous_attribute() const
 	return _attr.previous_attribute();
 }
 
+int SXmlAttr::AsInt(THIS_ int def)
+{
+	return as_int(def);
+}
+
+unsigned int SXmlAttr::AsUint(THIS_ int def)
+{
+	return as_uint(def);
+}
+
+float SXmlAttr::AsFloat(THIS_ float def)
+{
+	return as_float(def);
+}
+
+double SXmlAttr::AsDouble(THIS_ double def)
+{
+	return as_double(def);
+}
+
+BOOL SXmlAttr::AsBool(THIS_ BOOL def)
+{
+	return !!as_bool(!!def);
+}
+
 //////////////////////////////////////////////////////////////////////////
 
 SXmlNode::SXmlNode(LPVOID pData):_node((pugi::xml_node_struct*)pData)
@@ -325,6 +351,7 @@ IXmlNode * SXmlNode::toIXmlNode(pugi::xml_node node)
 		return NULL;
 	}
 }
+
 
 SXmlNode::operator bool() const
 {
@@ -611,7 +638,8 @@ BOOL SXmlDoc::SaveFileW(THIS_ const wchar_t* path, const wchar_t* indent , unsig
 
 BOOL SXmlDoc::SaveFileA(THIS_ const char* path, const wchar_t* indent , unsigned int flags, XmlEncoding encoding) SCONST
 {
-	return _doc->save_file(path,indent,flags,(pugi::xml_encoding)encoding);
+	SStringW strPath = S_CA2W(path,CP_UTF8);
+	return SaveFileW(strPath.c_str(),indent,flags,encoding);
 }
 
 void SXmlDoc::SaveBinary(THIS_ FILE *f) SCONST
@@ -645,8 +673,8 @@ BOOL SXmlDoc::LoadFileW(THIS_ const wchar_t* path, unsigned int options , XmlEnc
 
 BOOL SXmlDoc::LoadFileA(THIS_ const char* path, unsigned int options, XmlEncoding encoding)
 {
-	_result = _doc->load_file(path,options,(pugi::xml_encoding)encoding);
-	return _result;
+	SStringW strPath = S_CA2W(path,CP_UTF8);
+	return LoadFileW(strPath.c_str(),options,encoding);
 }
 
 BOOL SXmlDoc::LoadString(THIS_ const wchar_t* contents, unsigned int options)

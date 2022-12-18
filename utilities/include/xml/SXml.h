@@ -19,7 +19,7 @@ public:
 	SXmlAttr(pugi::xml_attribute attr);
 	SXmlAttr(const IXmlAttr * src);
 	SXmlAttr(const SXmlAttr& src);
-	explicit SXmlAttr(LPVOID pData);
+	explicit SXmlAttr(LPVOID pData=NULL);
 public:
 	STDMETHOD_(LPVOID,GetPrivPtr)(THIS) SCONST OVERRIDE;
 
@@ -36,6 +36,12 @@ public:
 	// Get next/previous attribute in the attribute list of the parent node
 	STDMETHOD_(IXmlAttr*,Next)(THIS) OVERRIDE;
 	STDMETHOD_(IXmlAttr*,Prev)(THIS) OVERRIDE;
+
+	STDMETHOD_(int,AsInt)(THIS_ int def DEF_VAL(0)) OVERRIDE;
+	STDMETHOD_(unsigned int,AsUint)(THIS_ int def DEF_VAL(0)) OVERRIDE;
+	STDMETHOD_(float,AsFloat)(THIS_ float def DEF_VAL(0.0f)) OVERRIDE;
+	STDMETHOD_(double,AsDouble)(THIS_ double def DEF_VAL(0.0)) OVERRIDE;
+	STDMETHOD_(BOOL,AsBool)(THIS_ BOOL def DEF_VAL(FALSE)) OVERRIDE;
 
 public:
 	operator bool() const;
@@ -125,6 +131,43 @@ public:
 	STDMETHOD_(IXmlNode*, NextSibling2)(THIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST OVERRIDE;
 	STDMETHOD_(IXmlNode*, PrevSibling2)(THIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST OVERRIDE;
 
+	STDMETHOD_(IXmlNode*, AppendChild)(THIS_ const wchar_t* name) OVERRIDE{
+		return toIXmlNode(append_child(name)._node);
+	}
+	STDMETHOD_(IXmlNode*, PrependChild)(THIS_ const wchar_t* name) OVERRIDE{
+		return toIXmlNode(prepend_child(name)._node);
+	}
+	STDMETHOD_(IXmlNode*, AppendCopyNode)(THIS_ const IXmlNode* proto) OVERRIDE{
+		return toIXmlNode(append_copy(SXmlNode(proto))._node);
+	}
+	STDMETHOD_(IXmlNode*, PrependCopyNode)(THIS_ const IXmlNode* proto) OVERRIDE{
+		return toIXmlNode(prepend_copy(SXmlNode(proto))._node);
+	}
+
+	STDMETHOD_(IXmlAttr*, AppendAttribute)(THIS_ const wchar_t* name) OVERRIDE{
+		return SXmlAttr::toIXmlAttr(append_attribute(name)._attr);
+	}
+	STDMETHOD_(IXmlAttr*, PrependAttribute)(THIS_ const wchar_t* name) OVERRIDE{
+		return SXmlAttr::toIXmlAttr(prepend_attribute(name)._attr);
+	}
+	STDMETHOD_(IXmlAttr*, AppendCopyAttribute)(THIS_ const IXmlAttr* proto) OVERRIDE{
+		SXmlAttr attr(proto);
+		return SXmlAttr::toIXmlAttr(append_copy(attr)._attr);
+	}
+	STDMETHOD_(IXmlAttr*, PrependCopyAttribute)(THIS_ const IXmlAttr* proto) OVERRIDE{
+		SXmlAttr attr(proto);
+		return SXmlAttr::toIXmlAttr(prepend_copy(attr)._attr);
+	}
+
+	STDMETHOD_(BOOL, RemoveAttribute)(THIS_ const wchar_t* name) OVERRIDE{
+		return !!remove_attribute(name);
+	}
+	STDMETHOD_(BOOL, RemoveChild)(THIS_ const wchar_t* name) OVERRIDE{
+		return !!remove_child(name);
+	}
+	STDMETHOD_(BOOL, RemoveAllChilden)(THIS_ const wchar_t* name) OVERRIDE{
+		return !!remove_children();
+	}
 public:
 	bool operator ==(const SXmlNode &src) const{
 		return _node==src._node;
