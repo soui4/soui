@@ -188,6 +188,7 @@ BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
     SetWindowPos(0, 0, 0, szWnd.cx, szWnd.cy, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
 
     CenterWindow();
+    SetMsgHandled(FALSE);//chain to dpihandler.
     return 0;
 }
 

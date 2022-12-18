@@ -100,8 +100,8 @@ class SOUI_EXP SMessageBoxImpl
     EVENT_MAP_END2(SHostDialog)
 
     BEGIN_MSG_MAP_EX(SMessageBoxImpl)
-        CHAIN_MSG_MAP(SDpiHandler<SMessageBoxImpl>)
         MSG_WM_INITDIALOG(OnInitDialog)
+        CHAIN_MSG_MAP(SDpiHandler<SMessageBoxImpl>)
         CHAIN_MSG_MAP(SHostDialog)
         REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
