@@ -158,7 +158,8 @@ void STabCtrl2::OnPaint(IRenderTarget *pRT)
 
     if (m_pSkinFrame)
     {
-        CRect rcPage = GetChildrenLayoutRect();
+        CRect rcPage;
+		GetChildrenLayoutRect(&rcPage);
         m_pSkinFrame->DrawByIndex(pRT, rcPage, WndState_Normal);
     }
 
