@@ -307,6 +307,17 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 	STDMETHOD_(BOOL,CreateTaskLoop)(THIS_ int nCount,Priority priority,BOOL bAutoStart DEF_VAL(TRUE)) PURE;
 	STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) PURE;
 	STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) PURE;
+
+	 /**
+     * CreateScriptModule
+     * @brief    创建脚本模块对象
+     * @param [out] IScriptModule **ppScriptModule -- 脚本模块对象
+     * @return   HRESULT -- S_OK 创建成功
+     *
+     * Describe
+     */
+    STDMETHOD_(HRESULT,CreateScriptModule)(THIS_ IScriptModule **ppScriptModule) PURE;
+
 };
 
 SNSEND

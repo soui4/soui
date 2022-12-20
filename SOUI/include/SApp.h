@@ -179,6 +179,7 @@ class SOUI_EXP SApplication
 	STDMETHOD_(BOOL,CreateTaskLoop)(THIS_ int nCount,Priority priority,BOOL bAutoStart DEF_VAL(TRUE)) OVERRIDE;
 	STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) OVERRIDE;
 	STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) OVERRIDE;
+	STDMETHOD_(HRESULT,CreateScriptModule)(THIS_ IScriptModule **ppScriptModule) OVERRIDE;
 
   public:
     /**
@@ -203,15 +204,6 @@ class SOUI_EXP SApplication
      */
     BOOL LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId);
 
-    /**
-     * CreateScriptModule
-     * @brief    创建脚本模块对象
-     * @param [out] IScriptModule **ppScriptModule -- 脚本模块对象
-     * @return   HRESULT -- S_OK 创建成功
-     *
-     * Describe
-     */
-    HRESULT CreateScriptModule(IScriptModule **ppScriptModule);
 
     void SetAppDir(const SStringT &strAppDir);
 
