@@ -161,38 +161,24 @@ namespace SOUI
 				SAutoLock autoLock(m_csHeartBeatTask);
 				if(m_heartBeatTask){
 					unsigned int tsNow = timeGetTime();
-					BOOL bTick = FALSE;
+					unsigned int elapse = 0;
 					if(m_tsTick == -1)
-						bTick = TRUE;
-					else{
-						unsigned int diff = 0;
+					{
+						elapse = m_nHeartBeatInterval;
+					}else{
 						if(tsNow>=m_tsTick){
-							diff = tsNow-m_tsTick;
+							elapse = tsNow-m_tsTick;
 						}else{//time round
-							diff = (INFINITE-m_tsTick) + tsNow;
+							elapse = (INFINITE-m_tsTick) + tsNow;
 						}
-						if(diff >= m_nHeartBeatInterval)
-							bTick = TRUE;
 					}
-					if(bTick){
+					if(elapse >= m_nHeartBeatInterval){
 						interval = m_nHeartBeatInterval;//reset interval
 						m_tsTick = tsNow;
 						m_heartBeatTask->run();
-					}else if(m_tsCheck!=-1){
-						unsigned int diff = 0;						
-						if(tsNow>=m_tsCheck)
-							diff = tsNow-m_tsCheck;
-						else
-							diff = INFINITE-m_tsCheck+tsNow;
-						SASSERT(interval>=diff);
-						if(interval < diff){
-							interval = 0;
-						}else
-						{
-							interval -= diff;
-						}
+					}else{
+						interval = m_nHeartBeatInterval - elapse;
 					}
-					m_tsCheck = tsNow;
 				}
 			}
 		}// end of while
@@ -312,7 +298,6 @@ namespace SOUI
 			m_nHeartBeatInterval = intervel;
 			m_heartBeatTask.Attach(pTask->clone());
 			timeBeginPeriod(1);
-			m_tsCheck = -1;
 			m_tsTick = -1;
 			m_itemsSem.notify();//stop previous wait.
 		}else{

@@ -133,7 +133,7 @@ private:
 	SCriticalSection m_csHeartBeatTask;
 	SAutoRefPtr<IRunnable> m_heartBeatTask;
 	unsigned int	m_nHeartBeatInterval;
-	unsigned int	m_tsTick,m_tsCheck;
+	unsigned int	m_tsTick;
 };
 
 namespace TASKLOOP
