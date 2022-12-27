@@ -90,8 +90,7 @@
 //   AtlTaskDialog()
 
 
-namespace SOUI
-{
+SNSBEGIN
 
 	///////////////////////////////////////////////////////////////////////////////
 	// CFileDialogImpl - used for File Open or File Save As
@@ -299,7 +298,7 @@ public: \
 
 
 	template <class T>
-	class CFileDialogImpl : public SOUI::SNativeWnd
+	class CFileDialogImpl : public SNativeWnd
 	{
 	public:
 		OPENFILENAME m_ofn;
@@ -359,7 +358,7 @@ public: \
 			ATLASSERT(m_hWnd == NULL);
 
 			//ModuleHelper::AddCreateWndData(&m_thunk.cd, (ATL::CDialogImplBase*)this);
-			SOUI::SNativeWndHelper::getSingletonPtr()->LockSharePtr(this);
+			SNativeWndHelper::getSingletonPtr()->LockSharePtr(this);
 			m_pThunk = (tagThunk*)HeapAlloc(SNativeWndHelper::getSingletonPtr()->GetHeap(), HEAP_ZERO_MEMORY, sizeof(tagThunk));
 			BOOL bRet;
 			if (m_bOpenFileDialog)
@@ -6674,6 +6673,7 @@ namespace WTL
 
 #endif // ((_WIN32_WINNT >= 0x0600) || defined(_WTL_TASKDIALOG)) && !defined(_WIN32_WCE)
 #endif // complete
-}; // namespace WTL
+
+SNSEND
 
 #endif // __ATLDLGS_H__

@@ -186,6 +186,9 @@ BOOL SAnimation::getTransformation2(uint64_t currentTime, ITransformation *outTr
 
 long SAnimation::computeDurationHint() const
 {
+	if(getRepeatCount()<0){
+		return INT_MAX;
+	}
     return getStartOffset() + getDuration() * (getRepeatCount() + 1);
 }
 
