@@ -1577,7 +1577,12 @@ DWORD SRichEdit::LoadRtf(LPCTSTR pszFileName)
 void SRichEdit::OnScaleChanged(int nScale)
 {
     __baseCls::OnScaleChanged(nScale);
-    OnSetFont(NULL, FALSE); //更新默认字体
+	if (!m_fRich && m_fSingleLineVCenter && !(m_dwStyle & ES_MULTILINE))
+	{//单行居中的放大，做特殊处理
+		OnSetFont(NULL, FALSE);
+	}else{
+		SSendMessage(EM_SETZOOM,nScale,100);
+	}
 }
 
 void SRichEdit::OnRebuildFont()
