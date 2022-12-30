@@ -39,6 +39,8 @@
 #include "valueAnimator/SValueAnimator.h"
 #include "core/SHostPresenter.h"
 
+#pragma comment(lib, "shlwapi.lib")
+
 SNSBEGIN
 
 class SNullTranslator : public TObjRefImpl<ITranslatorMgr> {
