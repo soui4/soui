@@ -20,6 +20,13 @@
 
 SNSBEGIN
 
+#ifndef ENABLE_SOBJ_XML
+#ifdef _DEBUG
+#define ENABLE_SOBJ_XML 1
+#else
+#define ENABLE_SOBJ_XML 0
+#endif
+#endif
 
 template<class T>
 class SObjectImpl : public T
@@ -42,7 +49,7 @@ public:
 		SXmlNode xmlNode(pXmlNode);
 
 		if (!xmlNode) return FALSE;
-#if defined(_DEBUG)
+#if ENABLE_SOBJ_XML
 		{
 			pXmlNode->ToString(&m_strXml);
 		}
@@ -178,10 +185,10 @@ public:
 	}
 
 
-#ifdef    _DEBUG
+#if ENABLE_SOBJ_XML
 public:
 	SStringW m_strXml;  //<** XML字符串，用于在调试时观察对象*/
-#endif//_DEBUG
+#endif//ENABLE_SOBJ_XML
 
 protected:
 	FunAttrHandler m_attrHandler;
