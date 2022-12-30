@@ -1658,6 +1658,7 @@ void SHostWnd::UpdateAutoSizeCount(bool bInc)
 
 void SHostWnd::OnHostMsg(BOOL bRelayout, UINT uMsg, WPARAM wp, LPARAM lp)
 {
+	GetNcPainter()->GetRoot()->SDispatchMessage(uMsg,wp,lp);
     GetRoot()->SDispatchMessage(uMsg, wp, lp);
     if (bRelayout)
     {
