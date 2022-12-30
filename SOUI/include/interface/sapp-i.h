@@ -271,6 +271,9 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 	STDMETHOD_(ITranslator *,LoadTranslator)(THIS_ LPCTSTR strResId) PURE;
 	STDMETHOD_(ITranslator *,LoadTranslatorA)(THIS_ LPCSTR strResId) PURE;
 
+	STDMETHOD_(BOOL,InstallTranslator)(THIS_ ITranslator * trModule) PURE;
+	STDMETHOD_(BOOL,UnnstallTranslator)(THIS_  REFGUID langId) PURE;
+
 	/**
      * @brief ∆Ù”√NotifyCenter
 	 * @param BOOL bEnable --  «∑Ò∆Ù”√

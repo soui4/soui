@@ -1448,6 +1448,7 @@ void STreeView::OnRebuildFont()
 {
     __baseCls::OnRebuildFont();
     DispatchMessage2Items(UM_UPDATEFONT, 0, 0);
+	UpdateVisibleItems();//防止因为字体大小变化后，列表项大小发生变化没有更新。其它view不需要这个过程。
 }
 
 ITvAdapter *STreeView::GetAdapter() const

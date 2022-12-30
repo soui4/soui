@@ -48,6 +48,7 @@ public:
 	STDMETHOD_(void,getFontInfo)(CTHIS_ IStringW * strFont) SCONST;
 protected:
 	BOOL LoadFromXml(SXmlNode xmlLang);
+	SStringW StrEscape(SStringW src);
 
 	wchar_t	 m_szLangName[TR_MAX_NAME_LEN];
 	GUID     m_guid;

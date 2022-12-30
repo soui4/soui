@@ -469,6 +469,32 @@ ITranslator * SApplication::LoadTranslator(THIS_ LPCTSTR strResId)
 	return pRet;
 }
 
+BOOL SApplication::InstallTranslator(THIS_ ITranslator * trModule)
+{
+	ITranslatorMgr * pTransMgr = GetTranslator();
+	if(!pTransMgr)
+		return FALSE;
+	if(!pTransMgr->InstallTranslator(trModule))
+		return FALSE;
+
+	SStringW strFontInfo;
+	trModule->getFontInfo(&strFontInfo);
+	if(!strFontInfo.IsEmpty())
+	{
+		SFontPool::getSingletonPtr()->SetDefFontInfo(strFontInfo);
+	}
+	SHostMgr::getSingletonPtr()->DispatchMessage(true,UM_SETLANGUAGE);
+	return TRUE;
+}
+
+BOOL SApplication::UnnstallTranslator(THIS_ REFGUID langId)
+{
+	ITranslatorMgr * pTransMgr = GetTranslator();
+	if(!pTransMgr)
+		return FALSE;
+	return pTransMgr->UninstallTranslator(langId);
+}
+
 UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
 {
     UINT uRet = 0;
@@ -808,6 +834,7 @@ ITaskLoop * SApplication::GetTaskLoop(THIS_ int iTaskLoop)
 		return NULL;
 	}
 }
+
 
 
 SNSEND
