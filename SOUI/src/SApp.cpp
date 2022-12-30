@@ -455,6 +455,20 @@ IValueAnimator *SApplication::LoadValueAnimator(LPCTSTR strResId)
     return pRet;
 }
 
+ITranslator * SApplication::LoadTranslator(THIS_ LPCTSTR strResId)
+{
+	if(!GetTranslator())
+		return NULL;
+	SXmlDoc xml;
+	if (!LoadXmlDocment(xml, strResId))
+		return NULL;
+	ITranslator *pRet = NULL;
+	if(!GetTranslator()->CreateTranslator(&pRet))
+		return NULL;
+	pRet->Load(&xml.root().child(L"language"),1);//LD_XML==1
+	return pRet;
+}
+
 UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
 {
     UINT uRet = 0;
@@ -794,7 +808,6 @@ ITaskLoop * SApplication::GetTaskLoop(THIS_ int iTaskLoop)
 		return NULL;
 	}
 }
-
 
 
 SNSEND
