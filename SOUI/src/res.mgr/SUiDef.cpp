@@ -150,7 +150,7 @@ BOOL SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
                     SStringW strUnit = xmlUnit.attribute(L"defUnit").as_string(L"px");
                     SLayoutSize::Unit unit = SLayoutSize::unitFromString(strUnit);
                     if (unit != SLayoutSize::unknow)
-                        SLayoutSize::setDefUnit(unit);
+                        SLayoutSize::defUnit = unit;
                 }
 
                 xmlCaret.Reset();

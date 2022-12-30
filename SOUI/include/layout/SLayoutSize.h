@@ -44,7 +44,6 @@ class SOUI_EXP SLayoutSize {
     bool valueEqual(float value);
 
     static SLayoutSize fromString(const SStringW &strSize);
-    static Unit setDefUnit(Unit unit);
     static bool fequal(float a, float b);
 
     static Unit unitFromString(const SStringW &strUnit);

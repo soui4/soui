@@ -883,6 +883,10 @@ HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont)
     ReleaseDC(NULL, hdc);
     const LOGFONT *plf = pFont->LogFont();
     pcf->yHeight = abs(MulDiv(pFont->TextSize(), LY_PER_INCH, yPixPerInch));
+	if(SLayoutSize::defUnit != SLayoutSize::px && IsRichScale()){
+		//rich scale 的情况下，edit内部已经对文字进行了放大，不再放大默认字体。
+		pcf->yHeight /=(GetScale()/100);
+	}
     pcf->yOffset = 0;
     pcf->dwEffects = 0;
     if (pFont->IsBold())
@@ -1188,7 +1192,7 @@ LRESULT SRichEdit::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
 
     CRect rcInsetPixel = GetStyle().GetPadding();
 
-    if (!m_fRich && m_fSingleLineVCenter && !(m_dwStyle & ES_MULTILINE))
+    if (!IsRichScale())
     {
         rcInsetPixel.top = rcInsetPixel.bottom = (m_rcClient.Height() - m_nFontHeight) / 2;
     }
@@ -1577,11 +1581,11 @@ DWORD SRichEdit::LoadRtf(LPCTSTR pszFileName)
 void SRichEdit::OnScaleChanged(int nScale)
 {
     __baseCls::OnScaleChanged(nScale);
-	if (!m_fRich && m_fSingleLineVCenter && !(m_dwStyle & ES_MULTILINE))
-	{//单行居中的放大，做特殊处理
-		OnSetFont(NULL, FALSE);
-	}else{
+	if (IsRichScale())
+	{
 		SSendMessage(EM_SETZOOM,nScale,100);
+	}else{//单行居中的放大，做特殊处理
+		OnSetFont(NULL, FALSE);
 	}
 }
 
@@ -1709,6 +1713,11 @@ BOOL SRichEdit::OnTimeout(IEvtArgs *e)
 	EventTimer *e2=sobj_cast<EventTimer>(e);
 	m_pTxtHost->GetTextService()->TxSendMessage(WM_TIMER, e2->uID, 0, NULL);
 	return TRUE;
+}
+
+BOOL SRichEdit::IsRichScale() const
+{
+	return m_fRich || !m_fSingleLineVCenter || (m_dwStyle & ES_MULTILINE);
 }
 
 //////////////////////////////////////////////////////////////////////////

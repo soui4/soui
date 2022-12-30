@@ -98,7 +98,6 @@ IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
         {
             SLayoutSize sz = GETLAYOUTSIZE(strPair[1]);
             cAdding = (short)sz.toPixelSize(scale);
-            ;
         }
         else if (strPair[0] == KFontSize)
         {

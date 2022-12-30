@@ -91,21 +91,13 @@ class SOUI_EXP SFontPool : public SSingletonMap<SFontPool, IFontPtr, FontInfo> {
      */
     IFontPtr GetFont(const SStringW &strFont, int scale);
 
-    /**
-     * GetFont
-     * @brief    获得与指定的font key对应的IFontPtr
-     * @param    FONTSTYLE style --  字体风格
-     * @param    LPCTSTR strFaceName --  字体名
-     * @return   IFontPtr -- font对象
-     * Describe
-     */
-    IFontPtr GetFont(FONTSTYLE style, const SStringW &strFaceName = SStringW(), SXmlNode xmlExProp = SXmlNode());
-
     void SetDefFontInfo(const FontInfo &fontInfo);
 
     void SetDefFontInfo(const SStringW &strFontInfo);
 
   protected:
+    IFontPtr GetFont(FONTSTYLE style, const SStringW &strFaceName, SXmlNode xmlExProp);
+
     const FontInfo &GetDefFontInfo() const;
 
     static void OnKeyRemoved(const IFontPtr &obj);

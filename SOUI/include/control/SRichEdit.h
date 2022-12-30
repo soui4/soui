@@ -893,6 +893,8 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
 
     virtual void OnRebuildFont();
 
+	BOOL IsRichScale() const;
+
     void OnEnable(BOOL bEnable, UINT nStatus);
     /**
      * SRichEdit::InitDefaultCharFormat

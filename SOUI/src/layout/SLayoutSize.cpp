@@ -153,15 +153,6 @@ SLayoutSize SLayoutSize::fromString(const SStringW &strSize)
     return ret;
 }
 
-SLayoutSize::Unit SLayoutSize::setDefUnit(SLayoutSize::Unit unit)
-{
-    if (unit == unknow)
-        return unknow;
-    Unit ret = defUnit;
-    defUnit = unit;
-    return ret;
-}
-
 SLayoutSize::Unit SLayoutSize::unitFromString(const SStringW &strUnit)
 {
     Unit ret = unknow;
