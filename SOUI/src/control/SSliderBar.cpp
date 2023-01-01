@@ -41,10 +41,10 @@ int SSliderBar::HitTest(CPoint pt)
 
 SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bThumbInRail, int nMin, int nMax, int nValue, UINT uSBCode)
 {
-    int nRailLen = nLength - nThumbSize;
+    int64_t nRailLen = nLength - nThumbSize;
 
     int nHalfThumb = nThumbSize / 2;
-    int nSelect = nRailLen * (nValue - nMin) / (nMax - nMin);
+    int64_t nSelect = nRailLen * (nValue - nMin) / (nMax - nMin);
 
     RANGE rRet = { 0 };
     switch (uSBCode)
@@ -66,7 +66,7 @@ SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bT
         break;
     case SC_SELECT:
         rRet.value1 = 0;
-        rRet.value2 = nSelect;
+        rRet.value2 = (int)nSelect;
         if (!bThumbInRail)
         {
             rRet.value1 += nHalfThumb;
@@ -74,8 +74,8 @@ SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bT
         rRet.value2 += nHalfThumb;
         break;
     case SC_THUMB:
-        rRet.value1 = nSelect;
-        rRet.value2 = nSelect + nThumbSize;
+        rRet.value1 = (int)nSelect;
+        rRet.value2 = (int)nSelect + nThumbSize;
         break;
     }
 
@@ -177,11 +177,11 @@ void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
         int nValue = 0;
         if (IsVertical())
         {
-            nValue = (rcRail.bottom - point.y) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Height() + m_nMinValue;
+            nValue = ((int64_t)(rcRail.bottom - point.y)) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Height() + m_nMinValue;
         }
         else
         {
-            nValue = (point.x - rcRail.left) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Width() + m_nMinValue;
+            nValue = ((int64_t)(point.x - rcRail.left)) * (m_nMaxValue - m_nMinValue + 1) / rcRail.Width() + m_nMinValue;
         }
         SetValue(nValue);
         Invalidate();
