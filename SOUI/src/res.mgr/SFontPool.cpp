@@ -37,7 +37,7 @@ IFontPtr SFontPool::GetFont(FONTSTYLE style, const SStringW &fontFaceName, SXmlN
     SStringW strXmlProp;
     xmlExProp.ToString(&strXmlProp);
 
-    FontInfo info = { style.dwStyle, strFace, strXmlProp };
+    FontInfo info = { style.syle, strFace, strXmlProp };
 
     SAutoLock autoLock(m_cs);
 
@@ -65,6 +65,8 @@ static const WCHAR KFontAdding[] = L"adding";
 static const WCHAR KFontSize[] = L"size";
 static const WCHAR KFontCharset[] = L"charset";
 static const WCHAR KFontWeight[] = L"weight";
+static const WCHAR KFontEscapement[] = L"escapement";
+static const WCHAR KFontPitchAndFamily[] = L"pitchandfamily";
 
 IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
 {
@@ -127,8 +129,15 @@ IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
         else if (strPair[0] == KFontWeight)
         {
             fntStyle.attr.byWeight = (_wtoi(strPair[1]) + 2) / 4; //+2 for 四舍五入. /4是为了把weight scale到0-250.
-        }
-        else
+		}else if(strPair[0] == KFontEscapement){
+			int fescapement = (int)(_wtof(strPair[1])*10);
+			fescapement %= 3600;
+			if(fescapement < 0) fescapement+= 3600;
+			//make sure fescapement is between [0,3600)
+			fntStyle.attr.fEscapement = fescapement;
+		}else if(strPair[0] == KFontPitchAndFamily){
+			fntStyle.attr.fPitchAndFamily = _wtoi(strPair[1]);
+		}else
         {
             nodePropEx.append_attribute(strPair[0]).set_value(strPair[1]);
         }
@@ -165,12 +174,14 @@ IFontPtr SFontPool::_CreateFont(const FontInfo &fontInfo, SXmlNode xmlExProp)
     lfNew.lfCharSet = fontInfo.style.attr.byCharset;
 
     //优先使用weigth属性.
-    lfNew.lfWeight = fontInfo.style.attr.byWeight * 4;
+    lfNew.lfWeight = (long)(fontInfo.style.attr.byWeight * 4);
     if (lfNew.lfWeight == 0) //没有weight属性时检查bold属性.
         lfNew.lfWeight = (fontInfo.style.attr.fBold ? FW_BOLD : FW_NORMAL);
     lfNew.lfUnderline = (FALSE != fontInfo.style.attr.fUnderline);
     lfNew.lfItalic = (FALSE != fontInfo.style.attr.fItalic);
     lfNew.lfStrikeOut = (FALSE != fontInfo.style.attr.fStrike);
+	lfNew.lfEscapement = lfNew.lfOrientation = fontInfo.style.attr.fEscapement;
+	lfNew.lfPitchAndFamily = fontInfo.style.attr.fPitchAndFamily;
     lfNew.lfHeight = -abs((short)fontInfo.style.attr.cSize);
     lfNew.lfQuality = CLEARTYPE_QUALITY;
 

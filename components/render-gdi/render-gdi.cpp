@@ -892,10 +892,33 @@ namespace SOUI
     HRESULT SRenderTarget_GDI::TextOut( int x, int y, LPCTSTR lpszString, int nCount)
     {
         if(nCount<0) nCount = _tcslen(lpszString);
-        SIZE sz;
-        MeasureText(lpszString,nCount,&sz);
-        RECT rc={x,y,x+sz.cx,y+sz.cy};
-        return DrawText(lpszString,nCount,&rc,DT_LEFT|DT_SINGLELINE);
+		SIZE sz;
+		MeasureText(lpszString,nCount,&sz);
+		int escape = m_curFont->LogFont()->lfEscapement;
+		if(escape != 0){
+			//calc bound rect
+			RECT rc;
+			if(escape == 900){
+				RECT rc2 = {x, y-sz.cx, x+sz.cy, y};
+				rc = rc2;
+			}else if(escape == 1800){
+				RECT rc2 = {x-sz.cx, y-sz.cy, x, y};
+				rc = rc2;
+			}else if(escape == 2700){
+				RECT rc2 = {x-sz.cy, y, x, y+sz.cx};
+				rc = rc2;
+			}else{
+				RECT rc2 = {0,0, m_curBmp->Width(),m_curBmp->Height()};
+				rc = rc2;
+			}
+			DCBuffer dcBuf(m_hdc,&rc,m_curColor.a);
+			::TextOut(dcBuf,x,y,lpszString,nCount);
+		}else{
+			RECT rc={x,y,x+sz.cx,y+sz.cy};
+			DCBuffer dcBuf(m_hdc,&rc,m_curColor.a);
+			::TextOut(dcBuf,x,y,lpszString,nCount);
+		}
+		return S_OK;
     }
 
     HRESULT SRenderTarget_GDI::DrawIconEx( int xLeft, int yTop, HICON hIcon, int cxWidth,int cyWidth,UINT diFlags )

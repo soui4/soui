@@ -710,9 +710,23 @@ namespace SOUI
 		txtPaint.getFontMetrics(&metrics);
 		SkScalar fx = m_ptOrg.fX + x;
 		SkScalar fy = m_ptOrg.fY + y;
+		
+		SkMatrix oldMtx = m_SkCanvas->getTotalMatrix();
+		if(m_curFont->LogFont()->lfEscapement!=0){
+			SkMatrix mtx = oldMtx;
+			mtx.postTranslate(-fx,-fy);
+			float degree = (float)m_curFont->LogFont()->lfEscapement;
+			degree /= 10;
+			degree = 360.f-degree;//change to clockwise.
+			mtx.postRotate(degree);
+			mtx.postTranslate(fx,fy);
+			m_SkCanvas->setMatrix(mtx);
+		}
 		fy -= metrics.fTop;
-
 		m_SkCanvas->drawText((LPCWSTR)strW,strW.GetLength()*2,fx,fy,txtPaint);
+		if(m_curFont->LogFont()->lfEscapement!=0){
+			m_SkCanvas->setMatrix(oldMtx);
+		}
 		return S_OK;
 	}
 
@@ -2089,7 +2103,7 @@ namespace SOUI
 		if(plf->lfItalic) style |= SkTypeface::kItalic;
 		if(plf->lfWeight == FW_BOLD) style |= SkTypeface::kBold;
 		m_skFont->unref();
-		m_skFont=SkTypeface::CreateFromName(strFace,(SkTypeface::Style)style);
+		m_skFont=SkTypeface::CreateFromName(strFace,(SkTypeface::Style)style,plf->lfCharSet);
 
 		return TRUE;
 	}

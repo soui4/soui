@@ -278,12 +278,13 @@ void SkTextLayoutEx::drawText(SkCanvas *canvas,const wchar_t* text, size_t lengt
 		canvas->drawText(text,length*sizeof(wchar_t),x,y,paint);
 	}else
 	{
+		//font fallback. 
 #ifdef UNICODE
 		SOUI::SStringA strFace=SOUI::S_CT2A(L"宋体",CP_UTF8);
 #else
 		SOUI::SStringA strFace="宋体";
 #endif
-		SkTypeface * font2=SkTypeface::CreateFromName(strFace,pfont->style());
+		SkTypeface * font2=SkTypeface::CreateFromName(strFace,pfont->style(),DEFAULT_CHARSET);
 		paint.setTypeface(font2);
 		canvas->drawText(text,length*sizeof(wchar_t),x,y,paint);
 		paint.setTypeface(pfont);

@@ -40,13 +40,13 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
     {
         ULONG uRet = SOUI::CElementTraits<SStringW>::Hash(fontKey.strFaceName);
         uRet = (uRet << 5) + SOUI::CElementTraits<SStringW>::Hash(fontKey.strPropEx);
-        uRet = (uRet << 5) + (UINT)fontKey.style.dwStyle + 1;
+        uRet = (uRet << 5) + (UINT)fontKey.style.syle + 1;
         return uRet;
     }
 
     static bool CompareElements(INARGTYPE element1, INARGTYPE element2)
     {
-        return element1.strFaceName == element2.strFaceName && element1.strPropEx == element2.strPropEx && element1.style.dwStyle == element2.style.dwStyle;
+        return element1.strFaceName == element2.strFaceName && element1.strPropEx == element2.strPropEx && element1.style.syle == element2.style.syle;
     }
 
     static int CompareElementsOrdered(INARGTYPE element1, INARGTYPE element2)
@@ -55,7 +55,7 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
         if (nRet == 0)
             nRet = element1.strPropEx.Compare(element2.strPropEx);
         if (nRet == 0)
-            nRet = element1.style.dwStyle - element2.style.dwStyle;
+            nRet = (int)(element1.style.syle - element2.style.syle);
         return nRet;
     }
 };
