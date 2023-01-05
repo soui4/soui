@@ -713,13 +713,14 @@ namespace SOUI
 		
 		SkMatrix oldMtx = m_SkCanvas->getTotalMatrix();
 		if(m_curFont->LogFont()->lfEscapement!=0){
-			SkMatrix mtx = oldMtx;
-			mtx.postTranslate(-fx,-fy);
+			SkMatrix mtx;
 			float degree = (float)m_curFont->LogFont()->lfEscapement;
 			degree /= 10;
 			degree = 360.f-degree;//change to clockwise.
-			mtx.postRotate(degree);
+			mtx.setRotate(degree);
+			mtx.preTranslate(-fx,-fy);
 			mtx.postTranslate(fx,fy);
+			mtx.postConcat(oldMtx);
 			m_SkCanvas->setMatrix(mtx);
 		}
 		fy -= metrics.fTop;
