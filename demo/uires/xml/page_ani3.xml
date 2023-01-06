@@ -14,7 +14,7 @@
       <img pos="0,0,-0,-0" skin="skin_girl" name="img_girl"/>
       <include pos="0,0,-0,-0" src="layout:treectrl" name="tree_test"/>
     </window>
-    <toggle size="-1,-1" name="tgl_left" skin="skin_btn_expand" checked="true"/>
+    <toggle size="-1,-1" name="tgl_left" skin="skin_btn_expand" checked="true" tip="close or show treectrl"/>
   </window>
   <button pos="-0,0,@180,@30" offset="-1,0" name="btn_ani_hostwnd" text="SetHostAnimation"/>
 </window>

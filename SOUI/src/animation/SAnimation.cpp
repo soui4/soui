@@ -39,16 +39,21 @@ BOOL SAnimation::hasAlpha() const
 
 int SAnimation::resolveSize(const SValueDescription & value, int size, int parentSize, int nScale)
 {
-	int nValue = value.value.toPixelSize(nScale);
+	float fValue = 0.0f;
+	if (value.value.unit == SLayoutSize::px)
+		fValue = value.value.fSize;
+	else
+		fValue = value.value.fSize * nScale / 100;
+
     switch (value.type)
     {
     case RELATIVE_TO_SELF:
-        return (int)(size * nValue);
+        return (int)(size * fValue);
     case RELATIVE_TO_PARENT:
-        return (int)(parentSize * nValue);
+        return (int)(parentSize * fValue);
     case ABSOLUTE_VALUE:
     default:
-        return nValue;
+        return (int)fValue;
     }
 }
 
