@@ -95,7 +95,7 @@ struct tagThunk
     }
 };
 #pragma pack(pop)
-#elif defined(_ARM_)
+#elif defined(_M_ARM)
 #pragma pack(push, 4)
 struct tagThunk // this should come out to 16 bytes
 {
@@ -119,8 +119,35 @@ struct tagThunk // this should come out to 16 bytes
     }
 };
 #pragma pack(pop)
+#elif defined(_M_ARM64)
+#pragma pack(push, 4)
+struct tagThunk // this should come out to 16 bytes
+{
+    ULONG   m_ldr_r16;      // ldr  x16, [pc, #24]
+    ULONG   m_ldr_r0;       // ldr  x0, [pc, #12]
+    ULONG   m_br;           // br   x16
+    ULONG   m_pad;
+    ULONG64	m_pThis;
+    ULONG64	m_pFunc;
+    void Init(DWORD_PTR proc, void *pThis)
+    {
+        m_ldr_r16 = 0x580000D0;
+        m_ldr_r0 = 0x58000060;
+        m_br = 0xd61f0200;
+        m_pThis = (ULONG64)pThis;
+        m_pFunc = (ULONG64)proc;
+        // write block from data cache and
+        //  flush from instruction cache
+        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+    }
+    void *GetCodeAddress()
+    {
+        return this;
+    }
+};
+#pragma pack(pop)
 #else
-#error Only AMD64, ARM and X86 supported
+#error Only AMD64, ARM, ARM64 and X86 supported
 #endif
 
 template <class T, class Base>

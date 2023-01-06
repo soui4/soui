@@ -1,6 +1,11 @@
 ﻿#include "stdafx.h"
 #include "SmileyCreateHook.h"
+#ifdef _M_ARM64
+#define Mhook_SetHook(a, b) (0)
+#define Mhook_Unhook(a) (0);
+#else
 #include "mhook.h"
+#endif
 
 typedef HRESULT (STDAPICALLTYPE *_CoCreateInstance)(
     __in     REFCLSID rclsid,

@@ -463,11 +463,18 @@ SET (7ZLIB_SRCS
 	CPP/7zip/Crypto/7zAesRegister.cpp
 )
 
+if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
+SET (7ZLIB_SRCS
+	${7ZLIB_SRCS}
+	C/7zCrcOpt.c
+)
+else()
 ENABLE_LANGUAGE(ASM_MASM)
 set(7ZIP_ASMS
 	Asm/x86/7zCrcOpt.asm
 	Asm/x86/AesOpt.asm
 )
+endif()
 
 if (CMAKE_CL_64)
 add_definitions(-Dx64)

@@ -110,7 +110,11 @@ source_group("Resource Files" FILES ${CURRENT_RC})
 source_group("Extend Cotrols" FILES ${EXTENDCOTROLS})
 
 if (CMAKE_CL_64)
+    if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
+    link_directories(${PROJECT_SOURCE_DIR}/bin64a)
+    else()
     link_directories(${PROJECT_SOURCE_DIR}/bin64)
+    endif()
 else ()
     link_directories(${PROJECT_SOURCE_DIR}/bin)
 endif ()
@@ -118,7 +122,11 @@ add_executable(demo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${
 
 set_target_properties(demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 add_dependencies(demo soui-sys-resource ${COM_LIBS})
+if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
+target_link_libraries(demo soui4 utilities4 smiley)
+else()
 target_link_libraries(demo soui4 utilities4 mhook smiley)
+endif()
 set_target_properties (demo PROPERTIES
     FOLDER demos
 )
