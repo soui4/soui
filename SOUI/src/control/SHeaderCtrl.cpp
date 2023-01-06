@@ -503,7 +503,15 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
             item.fmt |= HDF_CENTER;
         else if (strAlign == L"right")
             item.fmt |= HDF_RIGHT;
-
+		else{
+			int align = GetStyle().GetTextAlign();
+			if(align & DT_CENTER)
+				item.fmt |= HDF_CENTER;
+			else if(align & DT_RIGHT)
+				item.fmt |= HDF_RIGHT;
+			else
+				item.fmt |= HDF_LEFT;
+		}
         m_arrItems.InsertAt(m_arrItems.GetCount(), item);
 
         xmlItem = xmlItem.next_sibling(L"item");
