@@ -47,14 +47,14 @@
 	<tabctrl pos="[0,0,-0,-0" name="tab_ctrls" font="style:StrokeAndFill,blurStyle:solid,blurRadius:3" animateSteps="10" animateType="1" tabHeight="0">
     <page title="mclistview">
       <mclistview name="mclv_test" colorBkgnd="@color/white" pos="10,10,-10,-10" headerHeight="30" colorGrid="@color/red">
-        <headerStyle wndclass="header" align="center" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSkin="skin_lcex_header" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
+        <headerStyle wndclass="header" name="mclv_test_header" sortSkin="skin_lcex_header_arrow" itemSkin="skin_lcex_header" itemSwapEnable="1" fixWidth="0" font="underline:0,adding:-3" sortHeader="1" colorBkgnd="#ffffff">
           <items>
             <item weight="480">@string/mccol_1</item>
-            <item weight="95">@string/mccol_2</item>
-            <item weight="100">@string/mccol_3</item>
-            <item weight="100">@string/mccol_4</item>
-            <item weight="100">@string/mccol_5</item>
-            <item weight="100">@string/mccol_6</item>
+            <item weight="95" align="center">@string/mccol_2</item>
+            <item weight="100" align="center">@string/mccol_3</item>
+            <item weight="100" align="center">@string/mccol_4</item>
+            <item weight="100" align="center">@string/mccol_5</item>
+            <item weight="100" align="center">@string/mccol_6</item>
           </items>
           <check name="chk_mclv_sel" text="全选" />
         </headerStyle>
