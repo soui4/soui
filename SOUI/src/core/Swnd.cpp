@@ -225,6 +225,14 @@ BOOL SWindow::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
     tipInfo.dwCookie = 0;
     tipInfo.rcTarget = GetWindowRect();
 
+	SMatrix mtx = _GetMatrixEx();
+	if (!mtx.isIdentity())
+	{
+		SRect src = SRect::IMake(tipInfo.rcTarget);
+		mtx.mapRect(&src);
+		tipInfo.rcTarget = src.toRect();
+	}
+
     SStringT strTip;
     EventSwndUpdateTooltip evt(this);
     evt.bUpdated = FALSE;
