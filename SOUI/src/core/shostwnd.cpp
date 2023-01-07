@@ -1545,7 +1545,7 @@ LRESULT SHostWnd::OnGetObject(UINT uMsg, WPARAM wParam, LPARAM lParam)
     DWORD dwObjectId = lParam;
     if (dwObjectId == OBJID_CLIENT)
     {
-        pAcc = GetAccessible();
+        pAcc = GetRoot()->GetAccessible();
     }
     else
     {

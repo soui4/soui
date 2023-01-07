@@ -24,14 +24,13 @@ class SOUI_EXP SAccessible
 
   public:
     // Implement IAccHelper
-    void SetOwner(SWindow *pWnd)
-    {
-        m_pWnd = pWnd;
-    }
-    SWindow *GetOwner() const
-    {
-        return m_pWnd;
-    }
+	STDMETHOD_(void, SetOwner)(THIS_ IWindow * pOwner) OVERRIDE{
+		m_pWnd = (SWindow*)pOwner;
+	}
+	STDMETHOD_(IWindow *, GetOwner)(CTHIS) SCONST OVERRIDE{
+		return m_pWnd;
+	}
+
     // Implement IAccessible
     STDMETHODIMP get_accParent(IDispatch **ppdispParent);
     STDMETHODIMP get_accChildCount(long *pcountChildren);
