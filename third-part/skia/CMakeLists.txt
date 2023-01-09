@@ -618,22 +618,17 @@ set(srcs
     "src/core/SkBitmapCache.cpp" 
     "src/core/SkBitmapDevice.cpp" 
     "src/core/SkBitmapFilter.cpp" 
-    "src/opts/SkBitmapFilter_opts_SSE2.cpp" 
     "src/utils/SkBitmapHasher.cpp" 
     "src/core/SkBitmapHeap.cpp" 
     "src/core/SkBitmapProcShader.cpp" 
     "src/core/SkBitmapProcState.cpp" 
     "src/core/SkBitmapProcState_matrixProcs.cpp" 
-    "src/opts/SkBitmapProcState_opts_SSE2.cpp" 
-    "src/opts/SkBitmapProcState_opts_SSSE3.cpp" 
     "src/core/SkBitmapScaler.cpp" 
     "src/effects/SkBitmapSource.cpp" 
     "src/core/SkBitmap_scroll.cpp" 
     "src/core/SkBlitMask_D32.cpp" 
-    "src/opts/SkBlitRect_opts_SSE2.cpp" 
     "src/core/SkBlitRow_D16.cpp" 
     "src/core/SkBlitRow_D32.cpp" 
-    "src/opts/SkBlitRow_opts_SSE2.cpp" 
     "src/core/SkBlitter.cpp" 
     "src/core/SkBlitter_A8.cpp" 
     "src/core/SkBlitter_ARGB32.cpp" 
@@ -641,8 +636,6 @@ set(srcs
     "src/core/SkBlitter_Sprite.cpp" 
     "src/effects/SkBlurDrawLooper.cpp" 
     "src/effects/SkBlurImageFilter.cpp" 
-    "src/opts/SkBlurImage_opts_SSE2.cpp" 
-    "src/opts/SkBlurImage_opts_SSE4.cpp" 
     "src/effects/SkBlurMask.cpp" 
     "src/effects/SkBlurMaskFilter.cpp" 
     "src/utils/SkBoundaryPatch.cpp" 
@@ -777,7 +770,6 @@ set(srcs
     "src/core/SkMetaData.cpp" 
     "src/core/SkMipMap.cpp" 
     "src/effects/SkMorphologyImageFilter.cpp" 
-    "src/opts/SkMorphology_opts_SSE2.cpp" 
     "src/core/SkMultiPictureDraw.cpp" 
     "src/utils/SkNWayCanvas.cpp" 
     "src/gpu/gl/win/SkNativeGLContext_win.cpp" 
@@ -908,7 +900,6 @@ set(srcs
     "src/core/SkTypefaceCache.cpp" 
     "src/core/SkUnPreMultiply.cpp" 
     "src/core/SkUtils.cpp" 
-    "src/opts/SkUtils_opts_SSE2.cpp" 
     "src/core/SkValidatingReadBuffer.cpp" 
     "src/core/SkVertState.cpp" 
     "src/utils/win/SkWGL_win.cpp" 
@@ -916,9 +907,36 @@ set(srcs
     "src/core/SkWriter32.cpp" 
     "src/core/SkXfermode.cpp" 
     "src/effects/SkXfermodeImageFilter.cpp" 
-    "src/opts/SkXfermode_opts_SSE2.cpp" 
-    "src/opts/opts_check_x86.cpp" 
+
+
 )
+if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
+set(srcs
+    ${srcs}
+    "src/opts/SkXfermode_opts_none.cpp"
+    "src/opts/SkBitmapProcState_opts_none.cpp"
+    "src/opts/SkBlitRow_opts_none.cpp"
+    "src/opts/SkBlurImage_opts_none.cpp"
+    "src/opts/SkMorphology_opts_none.cpp"
+    "src/opts/SkUtils_opts_none.cpp"
+    "src/opts/SkBlitMask_opts_none.cpp"
+)
+else()
+set(srcs
+    ${srcs}
+    "src/opts/opts_check_x86.cpp"
+    "src/opts/SkXfermode_opts_SSE2.cpp"
+    "src/opts/SkBitmapFilter_opts_SSE2.cpp"
+    "src/opts/SkBitmapProcState_opts_SSE2.cpp"
+    "src/opts/SkBitmapProcState_opts_SSSE3.cpp"
+    "src/opts/SkBlitRect_opts_SSE2.cpp"
+    "src/opts/SkBlitRow_opts_SSE2.cpp"
+    "src/opts/SkBlurImage_opts_SSE2.cpp"
+    "src/opts/SkBlurImage_opts_SSE4.cpp"
+    "src/opts/SkMorphology_opts_SSE2.cpp"
+    "src/opts/SkUtils_opts_SSE2.cpp"
+)
+endif()
 
 source_group("Header Files" FILES ${headers})
 source_group("Source Files" FILES ${srcs})
