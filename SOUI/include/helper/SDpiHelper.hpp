@@ -15,7 +15,6 @@ namespace SOUI{
 		{
 			DWORD dwResHandle;
 			void *pBuf;
-			BOOL bRet = FALSE;
 			DWORD dwVerInfoSize = GetFileVersionInfoSize(pszFileName, &dwResHandle);
 			if (!dwVerInfoSize) return FALSE;
 			pBuf = malloc(dwVerInfoSize);
@@ -132,8 +131,6 @@ namespace SOUI{
 		{
 			if(!IsDpiAware())
 				return;
-			T *pT = static_cast<T*>(this);
-
 			int nScale = dpi * 100 / 96;
 			nScale = SDpiScale::NormalizeScale(nScale);
 			HandleScaleChange(nScale, desRect);
