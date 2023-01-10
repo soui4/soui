@@ -625,7 +625,7 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return m_tree.InsertItem(ii, hParent, hInsertAfter);
     }
 
-    void DeleteItem(HSTREEITEM hItem,BOOL bNotifyChange)
+    void DeleteItem(HSTREEITEM hItem,BOOL bNotifyChange = TRUE)
     {
 		HSTREEITEM hParent = GetParentItem(hItem);
 		if(!hParent) hParent = STVI_ROOT;
