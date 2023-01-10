@@ -390,7 +390,7 @@ public:
 
 	BOOL CreateHttpClient(IObjRef **ppObj)
 	{
-		return ipcLoader.CreateInstance(m_strDllPath + COM_HTTPCLIENT, ppObj);
+		return httpClientLoader.CreateInstance(m_strDllPath + COM_HTTPCLIENT, ppObj);
 	}
 protected:
     //SComLoader实现从DLL的指定函数创建符号SOUI要求的类COM组件。
@@ -403,6 +403,7 @@ protected:
     SComLoader zip7ResLoader;
 	SComLoader taskLoopLoader;
 	SComLoader ipcLoader;
+    SComLoader httpClientLoader;
 
     SStringT m_strImgDecoder;
 	SStringT m_strDllPath;
