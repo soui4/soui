@@ -264,7 +264,7 @@ ISmileySource * CreateSource2()
 HRESULT CMainDlg::OnSkinChangeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL bHandled)
 {
 	STabCtrl *pMainTab = FindChildByName2<STabCtrl>("tab_main");
-	if(SSkinPoolMgr::getSingletonPtr()->GetSkin(L"tab_icon",100))
+	if(GETSKIN(L"tab_icon",100))
 	{
 		pMainTab->SetAttribute(L"iconSkin",L"tab_icon");
 	}else

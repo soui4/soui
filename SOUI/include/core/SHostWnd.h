@@ -180,9 +180,8 @@ class SOUI_EXP SHostWnd
 
     SAutoRefPtr<IRegionS> m_rgnInvalidate;            /**<脏区域*/
     SAutoRefPtr<IRenderTarget> m_memRT;               /**<绘制缓存*/
-    SAutoRefPtr<SStylePool> m_privateStylePool;       /**<局部style pool*/
-    SAutoRefPtr<SSkinPool> m_privateSkinPool;         /**<局部skin pool*/
-    SAutoRefPtr<STemplatePool> m_privateTemplatePool; /**< 局部template pool */
+	SAutoRefPtr<IUiDefInfo> m_privateUiDefInfo;       /** 局部uidefinfo*/
+
     SAutoRefPtr<IScriptModule> m_pScriptModule;       /**<脚本模块*/
     SAutoRefPtr<SNcPainter> m_pNcPainter;             /**<非客户区绘制模块*/
 

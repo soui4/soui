@@ -21,8 +21,7 @@
 #include <event/SEventSlot.h>
 #include <event/SEvents.h>
 #include <event/SEventSet.h>
-#include <res.mgr/SStylePool.h>
-#include <res.mgr/SSkinPool.h>
+#include <res.mgr/SUiDef.h>
 #include <core/SwndStyle.h>
 #include <core/SSkin.h>
 #include <animation/SAnimation.h>

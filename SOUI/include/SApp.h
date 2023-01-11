@@ -37,9 +37,6 @@
 #define TR(p1, p2)        SOUI::SApplication::getSingleton().tr(p1, p2)
 #define STR2ID(p1)        SOUI::SApplication::getSingleton().Str2ID(p1)
 
-#define GETCOLOR(x)      SOUI::SApplication::getSingleton().GetColor(x)
-#define GETSTRING(x)     SOUI::SApplication::getSingleton().GetString(x)
-#define GETLAYOUTSIZE(x) SOUI::SApplication::getSingleton().GetLayoutSize(x)
 
 #define CREATEINTERPOLATOR(x) SOUI::SApplication::getSingleton().CreateInterpolatorByName(x)
 
@@ -207,11 +204,12 @@ class SOUI_EXP SApplication
      * @brief    从资源中加载一个XML Document。
      * @param [out] SXmlDoc & xmlDoc --  输出的xml_document对象
      * @param    const SStringT & strResId --  XML文件在资源中的type:name
+	 * @param IResProvider *pResProvider -- 指定的资源包
      * @return   BOOL true-加载成功, false-加载失败
      *
      * Describe
      */
-    BOOL LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId);
+    BOOL LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId,IResProvider *pResProvider=NULL);
 
 
     void SetAppDir(const SStringT &strAppDir);

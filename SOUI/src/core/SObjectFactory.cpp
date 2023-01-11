@@ -99,7 +99,7 @@ void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
 
     //检索并设置类的默认属性
     SXmlNode defAttr;
-    SObjDefAttr *pDefObjAttr = SUiDef::getSingleton().GetUiDef()->GetObjDefAttr();
+    SObjDefAttr *pDefObjAttr = GETUIDEF->GetUiDef()->GetObjDefAttr();
     if (pDefObjAttr)
         defAttr = pDefObjAttr->GetDefAttribute(pszClassName);
 

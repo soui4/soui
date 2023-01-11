@@ -838,7 +838,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
             if (strName.StartsWith(KTempNamespace))
             {
                 strName = strName.Right(strName.GetLength() - 2);
-                SStringW strXml = GETTEMPLATEPOOLMR->GetTemplateString(strName);
+                SStringW strXml = GETUIDEF->GetTemplateString(strName);
                 SASSERT(!strXml.IsEmpty());
                 if (!strXml.IsEmpty())
                 { // create children by template.

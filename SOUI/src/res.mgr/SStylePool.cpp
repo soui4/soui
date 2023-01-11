@@ -7,11 +7,11 @@ SNSBEGIN
 // SStylePool
 
 // Get style object from pool by class name
-SXmlNode SStylePool::GetStyle(LPCWSTR lpszName)
+SXmlNode SStylePool::GetStyle(const SStringW &strName)
 {
-    if (!HasKey(lpszName))
+    if (!HasKey(strName))
         return SXmlNode();
-    return GetKeyObject(lpszName);
+    return GetKeyObject(strName);
 }
 
 // Load style-pool from xml tree
@@ -39,58 +39,6 @@ BOOL SStylePool::Init(SXmlNode xmlStyleRoot)
     return TRUE;
 }
 
-//////////////////////////////////////////////////////////////////////////
-// SStylePoolMgr
-SXmlNode SStylePoolMgr::GetStyle(LPCWSTR lpszName)
-{
-    SPOSITION pos = m_lstStylePools.GetTailPosition();
-    while (pos)
-    {
-        SStylePool *pStylePool = m_lstStylePools.GetPrev(pos);
-        SXmlNode style = pStylePool->GetStyle(lpszName);
-        if (style)
-            return style;
-    }
-    return SXmlNode();
-}
-
-void SStylePoolMgr::PushStylePool(SStylePool *pStylePool)
-{
-    m_lstStylePools.AddTail(pStylePool);
-    pStylePool->AddRef();
-}
-
-SStylePool *SStylePoolMgr::PopStylePool(SStylePool *pStylePool)
-{
-    SStylePool *pRet = NULL;
-    if (pStylePool)
-    {
-        SPOSITION pos = m_lstStylePools.Find(pStylePool);
-        if (pos)
-        {
-            pRet = m_lstStylePools.GetAt(pos);
-            m_lstStylePools.RemoveAt(pos);
-        }
-    }
-    else
-    {
-        pRet = m_lstStylePools.RemoveTail();
-    }
-    if (pRet)
-        pRet->Release();
-    return pRet;
-}
-
-SStylePoolMgr::~SStylePoolMgr()
-{
-    SPOSITION pos = m_lstStylePools.GetHeadPosition();
-    while (pos)
-    {
-        SStylePool *p = m_lstStylePools.GetNext(pos);
-        p->Release();
-    }
-    m_lstStylePools.RemoveAll();
-}
 
 /////////////////////////////////////////////////////////////////////
 BOOL STemplatePool::Init(SXmlNode xmlNode)
@@ -114,57 +62,5 @@ SStringW STemplatePool::GetTemplateString(const SStringW &strName) const
     return strRet;
 }
 
-/////////////////////////////////////////////////////////////////////////////
-//////////////////////////////////////////////////////////////////////////
-// STemplatePoolMgr
-SStringW STemplatePoolMgr::GetTemplateString(const SStringW &strName)
-{
-    SPOSITION pos = m_lstTemplatePools.GetTailPosition();
-    while (pos)
-    {
-        STemplatePool *pStylePool = m_lstTemplatePools.GetPrev(pos);
-        SStringW strRet = pStylePool->GetTemplateString(strName);
-        if (!strRet.IsEmpty())
-            return strRet;
-    }
-    return SStringW();
-}
 
-void STemplatePoolMgr::PushTemplatePool(STemplatePool *pStylePool)
-{
-    m_lstTemplatePools.AddTail(pStylePool);
-    pStylePool->AddRef();
-}
-
-STemplatePool *STemplatePoolMgr::PopTemplatePool(STemplatePool *pStylePool)
-{
-    STemplatePool *pRet = NULL;
-    if (pStylePool)
-    {
-        SPOSITION pos = m_lstTemplatePools.Find(pStylePool);
-        if (pos)
-        {
-            pRet = m_lstTemplatePools.GetAt(pos);
-            m_lstTemplatePools.RemoveAt(pos);
-        }
-    }
-    else
-    {
-        pRet = m_lstTemplatePools.RemoveTail();
-    }
-    if (pRet)
-        pRet->Release();
-    return pRet;
-}
-
-STemplatePoolMgr::~STemplatePoolMgr()
-{
-    SPOSITION pos = m_lstTemplatePools.GetHeadPosition();
-    while (pos)
-    {
-        STemplatePool *p = m_lstTemplatePools.GetNext(pos);
-        p->Release();
-    }
-    m_lstTemplatePools.RemoveAll();
-}
 SNSEND

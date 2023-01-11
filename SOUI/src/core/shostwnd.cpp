@@ -291,9 +291,7 @@ void SHostWnd::_Init()
 
 	SwndContainerImpl::SetRoot(m_pRoot);
 	m_msgMouse.message = 0;
-	m_privateStylePool.Attach(new SStylePool);
-	m_privateSkinPool.Attach(new SSkinPool);
-	m_privateTemplatePool.Attach(new STemplatePool);
+
 	m_pRoot->SetContainer(this);
 	m_hostAnimationHandler.m_pHostWnd = this;
 	m_evtHandler.fun = NULL;
@@ -303,9 +301,6 @@ void SHostWnd::_Init()
 
 SHostWnd::~SHostWnd()
 {
-    GETSTYLEPOOLMGR->PopStylePool(m_privateStylePool);
-    GETSKINPOOLMGR->PopSkinPool(m_privateSkinPool);
-    GETTEMPLATEPOOLMR->PopTemplatePool(m_privateTemplatePool);
     delete m_pRoot;
 }
 
@@ -377,46 +372,20 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 
     m_hostAttr.Init();
     m_hostAttr.InitFromXml(pNode);
-    if (m_privateStylePool->GetCount())
-    {
-        m_privateStylePool->RemoveAll();
-        GETSTYLEPOOLMGR->PopStylePool(m_privateStylePool);
-    }
-    SXmlNode xmlNode(pNode);
 
-    SXmlNode xmlStyle = xmlNode.child(L"style");
-    xmlStyle.set_userdata(1);
-    m_privateStylePool->Init(xmlStyle);
-    if (m_privateStylePool->GetCount())
-    {
-        GETSTYLEPOOLMGR->PushStylePool(m_privateStylePool);
-    }
-    if (m_privateSkinPool->GetCount())
-    {
-        m_privateSkinPool->RemoveAll();
-        GETSKINPOOLMGR->PopSkinPool(m_privateSkinPool);
-    }
-    SXmlNode xmlSkin = xmlNode.child(L"skin");
-    xmlSkin.set_userdata(1);
-    m_privateSkinPool->LoadSkins(xmlSkin); //从xmlNode加加载私有skin
-    if (m_privateSkinPool->GetCount())
-    {
-        GETSKINPOOLMGR->PushSkinPool(m_privateSkinPool);
-    }
-
-    if (m_privateTemplatePool->GetCount())
-    {
-        m_privateTemplatePool->RemoveAll();
-        GETTEMPLATEPOOLMR->PopTemplatePool(m_privateTemplatePool);
-    }
-    SXmlNode xmlTemplate = xmlNode.child(L"template");
-    xmlTemplate.set_userdata(1);
-    m_privateTemplatePool->Init(xmlTemplate);
-    if (m_privateTemplatePool->GetCount())
-    {
-        GETTEMPLATEPOOLMR->PushTemplatePool(m_privateTemplatePool);
-    }
+	if(m_privateUiDefInfo){
+		GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
+		m_privateUiDefInfo = NULL;
+	}
+	SUiDefInfo * pUiDefInfo = new SUiDefInfo;
+	if(pUiDefInfo->Init(pNode,FALSE)){//init private uidef info.
+		m_privateUiDefInfo = pUiDefInfo;
+		GETUIDEF->PushUiDefInfo(pUiDefInfo);
+	}
+	pUiDefInfo->Release();
+	
     //加载脚本数据
+	SXmlNode xmlNode(pNode);
     SXmlNode xmlScript = xmlNode.child(L"script");
     if (xmlScript)
 	{    // create new script module
@@ -763,6 +732,10 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void SHostWnd::OnDestroy()
 {
+	if(m_privateUiDefInfo){
+		GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
+		m_privateUiDefInfo = NULL;
+	}
 	m_presenter->OnHostDestroy();
 	m_presenter = NULL;
     EventExit evt(GetRoot());

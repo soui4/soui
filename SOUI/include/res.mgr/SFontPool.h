@@ -61,11 +61,7 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
 };
 
 typedef IFontS *IFontPtr;
-
-struct IDefFontListener
-{
-    virtual void OnDefFontChanged() = 0;
-};
+typedef BOOL (*FunFontCheck)(const SStringW &strFontName);
 
 /**
  * @class      SFontPool
@@ -78,9 +74,10 @@ class SOUI_EXP SFontPool : public SSingletonMap<SFontPool, IFontPtr, FontInfo> {
   public:
     SFontPool(IRenderFactory *pRendFactory);
 
-    static SStringW FontInfoToString(const FontInfo &fontInfo);
-    static FontInfo FontInfoFromString(const SStringW &strFontInfo);
-
+public:
+	static void SetFontChecker(FunFontCheck fontCheck);
+	static BOOL CheckFont(const SStringW &strFontName);
+public:
     /**
      * GetFont
      * @brief    获得与指定的strFont对应的IFontPtr
@@ -96,19 +93,19 @@ class SOUI_EXP SFontPool : public SSingletonMap<SFontPool, IFontPtr, FontInfo> {
     void SetDefFontInfo(const SStringW &strFontInfo);
 
   protected:
-    IFontPtr GetFont(FONTSTYLE style, const SStringW &strFaceName, SXmlNode xmlExProp);
+	static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo & defFontInfo);
 
     const FontInfo &GetDefFontInfo() const;
 
     static void OnKeyRemoved(const IFontPtr &obj);
 
-    IFontPtr _CreateFont(const LOGFONT &lf);
-
-    IFontPtr _CreateFont(const FontInfo &fontInfo, SXmlNode xmlExProp);
+    IFontPtr _CreateFont(const FontInfo &fontInfo,int scale);
 
     SAutoRefPtr<IRenderFactory> m_RenderFactory;
     FontInfo m_defFontInfo;
     SCriticalSection m_cs;
+
+	static FunFontCheck s_funFontCheck;
 };
 
 SNSEND

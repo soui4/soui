@@ -48,24 +48,6 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
     STDMETHOD_(BOOL, GetRawBuffer)
     (THIS_ LPCTSTR pszType, LPCTSTR pszResName, LPVOID pBuf, size_t size) OVERRIDE;
 
-  public:
-    //从字符串返回颜色值，字符串可以是：@color/red
-    //(red是在资源包中的颜色表定义的颜色名)，也可以是rgba(r,g,b,a)，也可以是rgb(r,g,b)，还可以是#ff0000(ff)这样的格式
-    COLORREF GetColor(const SStringW &strColor);
-    //获取资源包中的颜色表中固定索引号的颜色，只支持从第一个资源包中查询
-    COLORREF GetColor(int idx);
-
-    //从字符串名返回字符串值，字符串可以是：@string/title
-    //(title是在资源包中的字符串表定义的命名字符串)
-    SStringW GetString(const SStringW &strString);
-    //获取资源包中的字符串表中固定索引号的字符串，只支持从第一个资源包中查询
-    SStringW GetString(int idx);
-
-    //从字符串名返回LayoutSize，字符串可以是：@dim/something
-    //(something是在资源包中的Dim表定义的命名字符串)
-    SLayoutSize GetLayoutSize(const SStringW &strSize);
-    SLayoutSize GetLayoutSize(int idx);
-
   public: // helper
           // find the match resprovider from tail to head, which contains the specified resource
           // type and name

@@ -19,7 +19,7 @@ SwndContainerImpl::SwndContainerImpl()
     , m_pRoot(NULL)
 {
     m_caret.Attach(new SCaret(this));
-    SXmlNode xmlCaret = SUiDef::getSingletonPtr()->GetUiDef()->GetCaretInfo();
+    SXmlNode xmlCaret = GETUIDEF->GetUiDef()->GetCaretInfo();
     if (xmlCaret)
     {
         m_caret->InitFromXml(&xmlCaret);

@@ -5,6 +5,7 @@
 
 #include "res.mgr/sfontpool.h"
 #include "res.mgr/SUiDef.h"
+#include "res.mgr/SObjDefAttr.h"
 
 #include "helper/STimerGenerator.h"
 #include "helper/SAutoBuf.h"
@@ -17,7 +18,6 @@
 #include "control/Smessagebox.h"
 #include "updatelayeredwindow/SUpdateLayeredWindow.h"
 #include "helper/splitstring.h"
-#include "res.mgr/SObjDefAttr.h"
 
 #include "core/SSkin.h"
 #include "control/souictrls.h"
@@ -264,13 +264,12 @@ void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, 
     m_pSingletons[SWindowMgr::GetType()] = new SWindowMgr();
     m_pSingletons[STimerGenerator::GetType()] = new STimerGenerator();
     m_pSingletons[SFontPool::GetType()] = new SFontPool(m_RenderFactory);
-    m_pSingletons[SSkinPoolMgr::GetType()] = new SSkinPoolMgr();
-    m_pSingletons[SStylePoolMgr::GetType()] = new SStylePoolMgr();
-    m_pSingletons[STemplatePoolMgr::GetType()] = new STemplatePoolMgr();
+
     m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
     m_pSingletons[STextServiceHelper::GetType()] = new STextServiceHelper();
     m_pSingletons[SRicheditMenuDef::GetType()] = new SRicheditMenuDef();
     m_pSingletons[SNativeWndHelper::GetType()] = new SNativeWndHelper(hInst, pszHostClassName, bImeApp);
+
     m_pSingletons[SHostMgr::GetType()] = new SHostMgr();
 }
 
@@ -288,13 +287,11 @@ void SApplication::_DestroySingletons()
     DELETE_SINGLETON(SRicheditMenuDef);
     DELETE_SINGLETON(STextServiceHelper);
     DELETE_SINGLETON(SWindowFinder);
-    DELETE_SINGLETON(SStylePoolMgr);
-    DELETE_SINGLETON(STemplatePoolMgr);
-    DELETE_SINGLETON(SSkinPoolMgr);
+    
     DELETE_SINGLETON(SFontPool);
+	DELETE_SINGLETON(SUiDef);
     DELETE_SINGLETON(STimerGenerator);
     DELETE_SINGLETON(SWindowMgr);
-    DELETE_SINGLETON(SUiDef);
 }
 
 IAccProxy *SApplication::CreateAccProxy(SWindow *pWnd) const
@@ -420,13 +417,13 @@ IXmlDoc *SApplication::LoadXmlDocment(LPCTSTR strResId)
     }
 }
 
-BOOL SApplication::LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId)
+BOOL SApplication::LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId,IResProvider *pResProvider/*=NULL*/)
 {
     SStringTList strLst;
     if (2 == ParseResID(strResId, strLst))
-	    return _LoadXmlDocment(strLst[1], strLst[0], xmlDoc);
+	    return _LoadXmlDocment(strLst[1], strLst[0], xmlDoc,pResProvider);
 	else
-		return _LoadXmlDocment(strResId, NULL, xmlDoc);
+		return _LoadXmlDocment(strResId, NULL, xmlDoc, pResProvider);
 }
 
 IAnimation *SApplication::LoadAnimation(LPCTSTR strResId)
@@ -504,7 +501,7 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
         SXmlDoc xmlDoc;
         if (_LoadXmlDocment(_T("SYS_XML_SKIN"), _T("XML"), xmlDoc, pResProvider))
         {
-            SSkinPool *p = SSkinPoolMgr::getSingletonPtr()->GetBuiltinSkinPool();
+            SSkinPool *p = GETUIDEF->GetBuiltinSkinPool();
             p->LoadSkins(xmlDoc.root().child(L"skin"));
         }
         else

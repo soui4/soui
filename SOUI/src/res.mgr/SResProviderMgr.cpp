@@ -70,9 +70,7 @@ void SResProviderMgr::AddResProvider(IResProvider *pResProvider, LPCTSTR pszUide
     pResProvider->AddRef();
     if (pszUidef)
     {
-        IUiDefInfo *pUiDef = SUiDef::getSingleton().CreateUiDefInfo(pResProvider, pszUidef);
-        SUiDef::getSingleton().SetUiDef(pUiDef, true);
-        pUiDef->Release();
+		GETUIDEF->InitDefUiDef(pResProvider, pszUidef);
     }
 }
 
@@ -409,56 +407,6 @@ BOOL SResProviderMgr::IsFileType(LPCTSTR pszType)
     return _tcsicmp(pszType, KTypeFile) == 0;
 }
 
-static SNamedColor emptyColor;
-static SNamedString emptyString;
-static SNamedDimension emptyDim;
-
-COLORREF SResProviderMgr::GetColor(const SStringW &strColor)
-{
-    if (SUiDef::getSingleton().GetUiDef() == NULL)
-        return emptyColor.Get(strColor);
-    return SUiDef::getSingleton().GetUiDef()->GetNamedColor().Get(strColor);
-}
-
-COLORREF SResProviderMgr::GetColor(int idx)
-{
-    if (SUiDef::getSingleton().GetUiDef() == NULL)
-        return emptyColor.Get(idx);
-
-    return SUiDef::getSingleton().GetUiDef()->GetNamedColor().Get(idx);
-}
-
-SStringW SResProviderMgr::GetString(const SStringW &strString)
-{
-    if (SUiDef::getSingleton().GetUiDef() == NULL)
-        return emptyString.Get(strString);
-
-    return SUiDef::getSingleton().GetUiDef()->GetNamedString().Get(strString);
-}
-
-SStringW SResProviderMgr::GetString(int idx)
-{
-    if (SUiDef::getSingleton().GetUiDef() == NULL)
-        return emptyString.Get(idx);
-
-    return SUiDef::getSingleton().GetUiDef()->GetNamedString().Get(idx);
-}
-
-SLayoutSize SResProviderMgr::GetLayoutSize(const SStringW &strSize)
-{
-    if (SUiDef::getSingleton().GetUiDef() == NULL)
-        return emptyDim.Get(strSize);
-
-    return SUiDef::getSingleton().GetUiDef()->GetNamedDimension().Get(strSize);
-}
-
-SLayoutSize SResProviderMgr::GetLayoutSize(int idx)
-{
-    if (SUiDef::getSingleton().GetUiDef() == NULL)
-        return emptyDim.Get(idx);
-
-    return SUiDef::getSingleton().GetUiDef()->GetNamedDimension().Get(idx);
-}
 
 #ifdef _DEBUG
 BOOL SResProviderMgr::CheckUsage(LPCTSTR pszName, LPCTSTR pszType, LPARAM lp)

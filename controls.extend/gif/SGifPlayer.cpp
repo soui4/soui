@@ -73,7 +73,7 @@ void SGifPlayer::OnNextFrame()
 
 HRESULT SGifPlayer::OnAttrSkin( const SStringW & strValue, BOOL bLoading )
 {
-	ISkinObj *pSkin = SSkinPoolMgr::getSingleton().GetSkin(strValue,GetScale());
+	ISkinObj *pSkin = GETSKIN(strValue,GetScale());
 	if(!pSkin) return E_FAIL;
 	if(!pSkin->IsClass(SSkinAni::GetClassName())) return S_FALSE;
 	m_aniSkin=static_cast<SSkinAni*>(pSkin);

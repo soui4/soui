@@ -396,8 +396,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
 		theApp->UnregisterWindowClass<SGifPlayer>();
 		//应用程序退出
-		delete theApp;
 		delete SkinLoader;
+		delete theApp;
 		if (pLogMgr)
 		{
 			pLogMgr->stop();

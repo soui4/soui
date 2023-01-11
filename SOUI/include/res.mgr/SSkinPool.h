@@ -16,11 +16,6 @@
 #include <interface/Sskinobj-i.h>
 #include <helper/obj-ref-impl.hpp>
 
-#define GETSKIN(p1, scale)         SOUI::SSkinPoolMgr::getSingleton().GetSkin(p1, scale)
-#define GETBUILTINSKIN(p1)         SOUI::SSkinPoolMgr::getSingleton().GetBuiltinSkin(p1, 100)
-#define GETBUILTINSKIN2(p1, scale) SOUI::SSkinPoolMgr::getSingleton().GetBuiltinSkin(p1, scale)
-#define GETSKINPOOLMGR             SOUI::SSkinPoolMgr::getSingletonPtr()
-#define GETTEMPLATEPOOLMR          SOUI::STemplatePoolMgr::getSingletonPtr()
 SNSBEGIN
 //系统内置皮肤名称
 enum SYS_SKIN
@@ -150,74 +145,5 @@ class SOUI_EXP SSkinPool
 #endif
 };
 
-/**
- * @class      SSkinPoolMgr
- * @brief      管理一个name和ISkinObj的映射表的列表
- *
- * Describe
- */
-class SOUI_EXP SSkinPoolMgr : public SSingleton2<SSkinPoolMgr> {
-    SINGLETON2_TYPE(SINGLETON_SKINPOOLMGR)
-  public:
-    SSkinPoolMgr();
-    ~SSkinPoolMgr();
-
-    /**
-     * GetSkin
-     * @brief    获得与指定name匹配的SkinObj
-     * @param    LPCWSTR strSkinName --    Name of Skin Object
-     * @return   ISkinObj*  -- 找到的Skin Object
-     * Describe
-     */
-    ISkinObj *GetSkin(const SStringW &strSkinName, int nScale);
-
-    /**
-     * PushSkinPool
-     * @brief    向列表中增加一个新的SSkinPool对象
-     * @param    SSkinPool * pSkinPool --    SSkinPool对象
-     * @return   void
-     * Describe
-     */
-    void PushSkinPool(SSkinPool *pSkinPool);
-
-    /**
-     * PopSkinPool
-     * @brief    弹出一个SSkinPool对象
-     * @param    SSkinPool * pSkinPool --   准备弹出的SSkinPool对象
-     * @return   SSkinPool *    在列表中找到后弹出的SSkinPool对象
-     * Describe  内建SkinPool不用调用PopSkinPool
-     */
-    SSkinPool *PopSkinPool(SSkinPool *pSkinPool);
-
-    /**
-     * GetBuiltinSkin
-     * @brief    获得SOUI系统内建的命名SkinObj
-     * @param    SYS_SKIN uID --  内建SKIN的ID
-     * @return   ISkinObj * 与SKINID对应的ISkinObj
-     * Describe  可能返回失败
-     */
-    ISkinObj *GetBuiltinSkin(SYS_SKIN uID, int nScale);
-
-    /**
-     * GetBuiltinSkinPool
-     * @brief    获得管理内建SkinPool对象
-     * @return   SSkinPool * -- 内建SkinPool指针
-     * Describe
-     */
-    SSkinPool *GetBuiltinSkinPool();
-
-    /**
-     * GetUserSkinPool
-     * @brief    获得用户管理的SkinPool对象，该SkinPool对象管理用户在运行时创建的SkinObj对象
-     * @return   SSkinPool * -- User SkinPool指针
-     * Describe
-     */
-    SSkinPool *GetUserSkinPool();
-
-  protected:
-    SList<SSkinPool *> m_lstSkinPools;
-    SAutoRefPtr<SSkinPool> m_bulitinSkinPool;
-    SAutoRefPtr<SSkinPool> m_userSkinPool;
-};
 
 SNSEND

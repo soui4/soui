@@ -19,8 +19,10 @@ union FONTSTYLE {
         uint64_t fBold : 1;      //粗体标志位
         uint64_t fStrike : 1;    //删除线标志位
 		uint64_t fEscapement : 12;   //角度, 以0.1角度为单位
-		uint64_t fPitchAndFamily:8;	 //pitch and family
-        uint64_t cSize : 24;     //字体大小，为short有符号类型
+		uint64_t reserved : 13;   //reserved
+		uint64_t szIsAdding : 1;   //cSize is adding
+		uint64_t szUnit:2;		//cSize unit,(0-3)
+        uint64_t nSize : 16;     //字体大小，为short有符号类型
     } attr;
 
     FONTSTYLE(uint64_t _style = 0)

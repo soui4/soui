@@ -13,6 +13,7 @@ SNSBEGIN
 const wchar_t KPrefixString[] = L"@string/";
 const wchar_t KPrefixColor[] = L"@color/";
 const wchar_t KPrefixDimension[] = L"@dim/";
+const wchar_t KPrefixFont[] = L"@font/";
 
 int SIntParser::GetNullValue()
 {
@@ -37,20 +38,36 @@ bool SStringParser::ParseValue(const SStringW &strValue, SStringW &value)
     return true;
 }
 
-SStringW SNamedString::Get(const SStringW &strValue) const
+BOOL SNamedString::Get(const SStringW &strValue,SStringW &ret) const
 {
     if (strValue.IsEmpty())
-        return strValue;
+        return FALSE;
     if (strValue.Left(ARRAYSIZE(KPrefixString) - 1) == KPrefixString)
     {
-        return String2Value(strValue.Mid(ARRAYSIZE(KPrefixString) - 1));
+        return FindValue(strValue.Mid(ARRAYSIZE(KPrefixString) - 1),ret);
     }
     else
     {
-        return strValue;
+		ret = strValue;
+		return TRUE;
     }
 }
 
+
+BOOL SNamedFont::Get(const SStringW &strValue,SStringW &ret) const
+{
+	if (strValue.IsEmpty())
+		return FALSE;
+	if (strValue.Left(ARRAYSIZE(KPrefixFont) - 1) == KPrefixFont)
+	{
+		return FindValue(strValue.Mid(ARRAYSIZE(KPrefixFont) - 1),ret);
+	}
+	else
+	{
+		ret = strValue;
+		return TRUE;
+	}
+}
 //////////////////////////////////////////////////////////////////////////
 
 COLORREF SColorParser::GetNullValue()
@@ -105,17 +122,15 @@ bool SColorParser::ParseValue(const SStringW &strValue, COLORREF &value)
     }
 }
 
-COLORREF SNamedColor::Get(const SStringW &strValue) const
+BOOL SNamedColor::Get(const SStringW &strValue,COLORREF &cr) const
 {
     if (strValue.Left(ARRAYSIZE(KPrefixColor) - 1) == KPrefixColor)
     {
-        return String2Value(strValue.Mid(ARRAYSIZE(KPrefixColor) - 1));
+        return FindValue(strValue.Mid(ARRAYSIZE(KPrefixColor) - 1),cr);
     }
     else
     {
-        COLORREF crRet = SColorParser::GetNullValue();
-        SColorParser::ParseValue(strValue, crRet);
-        return crRet;
+        return SColorParser::ParseValue(strValue, cr);
     }
 }
 
@@ -131,17 +146,17 @@ SLayoutSize SDimensionParser::GetNullValue()
     return SLayoutSize();
 }
 
-SLayoutSize SNamedDimension::Get(const SStringW &strValue) const
+BOOL SNamedDimension::Get(const SStringW &strValue,SLayoutSize & ret) const
 {
     if (strValue.Left(ARRAYSIZE(KPrefixDimension) - 1) == KPrefixDimension)
     {
-        return String2Value(strValue.Mid(ARRAYSIZE(KPrefixDimension) - 1));
+        return FindValue(strValue.Mid(ARRAYSIZE(KPrefixDimension) - 1),ret);
     }
     else
     {
-        SLayoutSize dimRet = SDimensionParser::GetNullValue();
-        SDimensionParser::ParseValue(strValue, dimRet);
-        return dimRet;
+        ret = SDimensionParser::GetNullValue();
+        SDimensionParser::ParseValue(strValue, ret);
+        return TRUE;
     }
 }
 
