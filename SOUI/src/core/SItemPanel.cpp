@@ -271,12 +271,19 @@ void SOsrPanel::Draw(IRenderTarget *pRT, const CRect &rc)
 {
     UpdateLayout();
     BuildWndTreeZorder();
-
 	SPainter painter;
 	BeforePaint(pRT, painter);
 	pRT->OffsetViewportOrg(rc.left, rc.top, NULL);
+	//没有矩阵变换的时候才启用clip region.
 	SAutoRefPtr<IRegionS> rgn;
-	pRT->GetClipRegion(&rgn);
+	SMatrix mtx;
+	pRT->GetTransform(mtx.fMat);
+	mtx.dirtyMatrixTypeCache();
+	if(mtx.isIdentity())
+	{
+		pRT->GetClipRegion(&rgn);
+	}
+
 	RedrawRegion(pRT, rgn);
 	pRT->OffsetViewportOrg(-rc.left, -rc.top, NULL);
 	AfterPaint(pRT, painter);
