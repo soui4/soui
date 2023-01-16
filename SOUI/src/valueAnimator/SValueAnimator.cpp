@@ -78,8 +78,8 @@ void SValueAnimator::animateValue(float fraction)
     fraction = mInterpolator->getInterpolation(fraction);
     mCurrentFraction = fraction;
     onEvaluateValue(fraction);
-    int numListeners = mUpdateListeners.GetCount();
-    for (int i = 0; i < numListeners; ++i)
+    size_t numListeners = mUpdateListeners.GetCount();
+    for (size_t i = 0; i < numListeners; ++i)
     {
         mUpdateListeners[i]->onAnimationUpdate(this);
     }
@@ -178,8 +178,8 @@ void SValueAnimator::animateBasedOnPlayTime(long currentPlayTime, long lastPlayT
 
         if (iteration != lastIteration)
         {
-            int numListeners = mListeners.GetCount();
-            for (int i = 0; i < numListeners; ++i)
+            size_t numListeners = mListeners.GetCount();
+            for (size_t i = 0; i < numListeners; ++i)
             {
                 mListeners[i]->onAnimationRepeat(this);
             }
@@ -292,8 +292,8 @@ void SValueAnimator::endAnimation()
     if (notify)
     {
         SArray<IAnimatorListener *> tmpListeners = mListeners;
-        int numListeners = tmpListeners.GetCount();
-        for (int i = 0; i < numListeners; ++i)
+        size_t numListeners = tmpListeners.GetCount();
+        for (size_t i = 0; i < numListeners; ++i)
         {
             tmpListeners[i]->onAnimationEnd(this);
         }
@@ -410,8 +410,8 @@ void SValueAnimator::notifyStartListeners()
 {
     AddRef();
     SArray<IAnimatorListener *> tmpListeners = mListeners;
-    int numListeners = tmpListeners.GetCount();
-    for (int i = 0; i < numListeners; ++i)
+    size_t numListeners = tmpListeners.GetCount();
+    for (size_t i = 0; i < numListeners; ++i)
     {
         tmpListeners[i]->onAnimationStart(this);
     }

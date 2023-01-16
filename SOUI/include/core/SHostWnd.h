@@ -73,14 +73,15 @@ class SHostWndAttr : public TObjRefImpl<SObject> {
         ATTR_LAYOUTSIZE2(L"minsize", m_szMin, FALSE)
         ATTR_DWORD(L"wndStyle", m_dwStyle, FALSE)
         ATTR_DWORD(L"wndStyleEx", m_dwExStyle, FALSE)
-        ATTR_INT(L"resizable", m_bResizable, FALSE)
-        ATTR_INT(L"translucent", m_bTranslucent, FALSE)
-        ATTR_INT(L"sendWheel2Hover", m_bSendWheel2Hover, FALSE)
-        ATTR_INT(L"appWnd", m_bAppWnd, FALSE)
-        ATTR_INT(L"toolWindow", m_bToolWnd, FALSE)
+        ATTR_BOOL(L"resizable", m_bResizable, FALSE)
+        ATTR_BOOL(L"translucent", m_bTranslucent, FALSE)
+        ATTR_BOOL(L"sendWheel2Hover", m_bSendWheel2Hover, FALSE)
+        ATTR_BOOL(L"appWnd", m_bAppWnd, FALSE)
+        ATTR_BOOL(L"toolWindow", m_bToolWnd, FALSE)
         ATTR_ICON(L"smallIcon", m_hAppIconSmall, FALSE)
         ATTR_ICON(L"bigIcon", m_hAppIconBig, FALSE)
-        ATTR_INT(L"allowSpy", m_bAllowSpy, FALSE)
+        ATTR_BOOL(L"allowSpy", m_bAllowSpy, FALSE)
+		ATTR_BOOL(L"hasMsgLoop", m_bHasMsgLoop, FALSE)
         ATTR_ENUM_BEGIN(L"wndType", DWORD, FALSE)
             ATTR_ENUM_VALUE(L"undefine", WT_UNDEFINE)
             ATTR_ENUM_VALUE(L"appMain", WT_APPMAIN)
@@ -101,7 +102,7 @@ class SHostWndAttr : public TObjRefImpl<SObject> {
     DWORD m_bTranslucent : 1;     //窗口的半透明属性
     DWORD m_bAllowSpy : 1;        //允许spy
     DWORD m_bSendWheel2Hover : 1; //将滚轮消息发送到hover窗口
-
+	DWORD m_bHasMsgLoop : 1;	  //窗口有的MsgLoop标志，主要影响tooltip的RelayEvent时机
     DWORD m_dwStyle;
     DWORD m_dwExStyle;
 

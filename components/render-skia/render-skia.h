@@ -11,7 +11,7 @@
 #include <string/tstring.h>
 #include <string/strcpcvt.h>
 #include <souicoll.h>
-
+#include <core/SkShader.h>
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -145,35 +145,30 @@ protected:
 class SBrush_Skia : public TSkiaRenderObjImpl<IBrushS,OT_BRUSH>
 {
 public:
-	static SBrush_Skia * CreateSolidBrush(IRenderFactory * pRenderFac,COLORREF cr){
-		return new SBrush_Skia(pRenderFac,cr);
+	SBrush_Skia(IRenderFactory * pRenderFac,COLORREF cr);
+	SBrush_Skia(IRenderFactory * pRenderFac,SkBitmap bmp,TileMode xtm,TileMode ytm);
+	SBrush_Skia(IRenderFactory * pRenderFac,BOOL bVert,const COLORREF *crs, const float *pos, int nCount,TileMode tileMode);
+
+	~SBrush_Skia();
+
+public:
+	STDMETHOD_(BrushType,GetBrushType)(CTHIS) SCONST OVERRIDE{
+		return m_brushType;
 	}
-
-	static SBrush_Skia * CreateBitmapBrush(IRenderFactory * pRenderFac,SkBitmap bmp)
-	{
-		return new SBrush_Skia(pRenderFac,bmp);
-	}
-
-	SkBitmap GetBitmap(){return m_bmp;}
-
-	COLORREF GetColor() {return m_cr;}
-
-	BOOL IsBitmap(){return m_fBmp;}
+	void InitPaint(SkPaint & paint,const SkRect & skrc);
 protected:
-	SBrush_Skia(IRenderFactory * pRenderFac,COLORREF cr)
-		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_cr(cr),m_fBmp(FALSE)
-	{
+	BrushType m_brushType;
 
-	}
-	SBrush_Skia(IRenderFactory * pRenderFac,SkBitmap bmp)
-		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_bmp(bmp),m_fBmp(TRUE)
-	{
+	SkColor m_cr;		//颜色画刷
+	SkBitmap  m_bmp;	//位图画刷
+	SkShader::TileMode m_xtm,m_ytm;
+	//gradient info
+	BOOL	  m_bVert;
+	SkColor  *m_lstColor;
+	float    *m_lstPos;
+	SkShader::TileMode  m_tileMode;
+	int		  m_nCount;
 
-	}
-
-	COLORREF m_cr;		//颜色画刷
-	SkBitmap m_bmp;		//位图画刷
-	BOOL	 m_fBmp;
 };
 
 //////////////////////////////////////////////////////////////////////////
@@ -333,7 +328,7 @@ public:
 
 	STDMETHOD_(int,getVerbs)(THIS_ BYTE verbs[], int max) SCONST OVERRIDE;
 
-	STDMETHOD_(RECT,getBounds)(THIS) SCONST OVERRIDE;
+	STDMETHOD_(void,getBounds)(CTHIS_ LPRECT prc) SCONST OVERRIDE;
 
 	STDMETHOD_(void,moveTo)(THIS_ float x, float y) OVERRIDE;
 
@@ -405,6 +400,7 @@ public:
 
 	STDMETHOD_(IPathInfo*, approximate)(THIS_ float acceptableError) OVERRIDE;
 
+	STDMETHOD_(IPathS *, clone)(CTHIS) SCONST OVERRIDE;
 protected:
 	SkPath      m_skPath;
 };
@@ -434,7 +430,8 @@ public:
 	STDMETHOD_(HRESULT,CreateCompatibleRenderTarget)(THIS_ SIZE szTarget,IRenderTarget **ppRenderTarget) OVERRIDE;
 	STDMETHOD_(HRESULT,CreatePen)(THIS_ int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateSolidColorBrush)(THIS_ COLORREF cr,IBrushS ** ppBrush) OVERRIDE;
-	STDMETHOD_(HRESULT,CreateBitmapBrush)(THIS_ IBitmapS *pBmp,IBrushS ** ppBrush ) OVERRIDE;
+	STDMETHOD_(HRESULT,CreateBitmapBrush)(THIS_ IBitmapS *pBmp,TileMode xtm,TileMode ytm, IBrushS ** ppBrush ) OVERRIDE;
+	STDMETHOD_(HRESULT,CreateGradientBrush)(THIS_ BOOL bVert, const COLORREF *crs, const float *pos, int nCount,TileMode tileMode, IBrushS * *ppBrush) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateRegion)(THIS_ IRegionS ** ppRegion ) OVERRIDE;
 
 	STDMETHOD_(HRESULT,Resize)(THIS_ SIZE sz) OVERRIDE;
@@ -477,7 +474,7 @@ public:
 
 	STDMETHOD_(HRESULT,DrawLines)(THIS_ LPPOINT pPt,size_t nCount) OVERRIDE;
 	STDMETHOD_(HRESULT,GradientFill)(THIS_ LPCRECT pRect,BOOL bVert,COLORREF crBegin,COLORREF crEnd,BYTE byAlpha/*=0xFF*/) OVERRIDE;
-	STDMETHOD_(HRESULT,GradientFillEx)(THIS_ LPCRECT pRect,const POINT* pts,COLORREF *colors,float *pos,int nCount,BYTE byAlpha/*=0xFF*/ ) OVERRIDE;
+	STDMETHOD_(HRESULT,GradientFillEx)(THIS_ LPCRECT pRect,BOOL bVert,COLORREF *colors,float *pos,int nCount,BYTE byAlpha/*=0xFF*/ ) OVERRIDE;
 	STDMETHOD_(HRESULT,GradientFill2)(THIS_ LPCRECT pRect,GradientType type,COLORREF crStart,COLORREF crCenter,COLORREF crEnd,float fLinearAngle,float fCenterX,float fCenterY,int nRadius,BYTE byAlpha/*=0xFF*/) OVERRIDE;
 	STDMETHOD_(HRESULT,DrawIconEx)(THIS_ int xLeft, int yTop, HICON hIcon, int cxWidth,int cyWidth,UINT diFlags) OVERRIDE;
 	STDMETHOD_(HRESULT,DrawBitmap)(THIS_ LPCRECT pRcDest,const IBitmapS *pBitmap,int xSrc,int ySrc,BYTE byAlpha/*=0xFF*/) OVERRIDE;
@@ -511,7 +508,6 @@ public:
 
 protected:
 	bool SetPaintXferMode(SkPaint & paint,int nRopMode);
-
 protected:
 	SkCanvas *m_SkCanvas;
 	SColor            m_curColor;

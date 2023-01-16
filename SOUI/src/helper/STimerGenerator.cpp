@@ -27,7 +27,7 @@ VOID CALLBACK STimerGenerator::_TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent
             STimerGenerator::getSingleton().ClearTimer(idEvent);
         }
 		EventTimer evt(NULL);
-		evt.uID = idEvent;
+		evt.uID = (UINT)idEvent;
         ti.pEvtSlot->Run(&evt);
     }
     else

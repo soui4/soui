@@ -76,14 +76,15 @@ void SHostWndAttr::Init()
     m_byWndType = WT_UNDEFINE;
     m_bAllowSpy = TRUE;
     m_bSendWheel2Hover = FALSE;
+	m_bHasMsgLoop = TRUE;
     m_dwStyle = (0);
     m_dwExStyle = (0);
     if (m_hAppIconSmall)
         DestroyIcon(m_hAppIconSmall);
     if (m_hAppIconBig)
         DestroyIcon(m_hAppIconBig);
-    m_hAppIconSmall = (NULL);
-    m_hAppIconBig = (NULL);
+    m_hAppIconSmall = NULL;
+    m_hAppIconBig = NULL;
 }
 
 LPCWSTR SHostWndAttr::GetTrCtx() const
@@ -724,7 +725,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     OnLoadLayoutFromResourceID(m_strXmlLayout);
 
     m_pTipCtrl = CreateTooltip();
-    if (m_pTipCtrl)
+    if (m_pTipCtrl && m_hostAttr.m_bHasMsgLoop)
         GetMsgLoop()->AddMessageFilter(m_pTipCtrl);
     UpdateAutoSizeCount(false);
     return 0;
@@ -745,7 +746,8 @@ void SHostWnd::OnDestroy()
     GetRoot()->SSendMessage(UM_SETSCALE, 100);
     if (m_pTipCtrl)
     {
-        GetMsgLoop()->RemoveMessageFilter(m_pTipCtrl);
+		if(m_hostAttr.m_bHasMsgLoop)
+			GetMsgLoop()->RemoveMessageFilter(m_pTipCtrl);
         DestroyTooltip(m_pTipCtrl);
         m_pTipCtrl = NULL;
     }
@@ -1051,6 +1053,9 @@ void SHostWnd::UpdateTooltip()
 {
     if (!m_pTipCtrl)
         return;
+	if(!m_hostAttr.m_bHasMsgLoop){
+		m_pTipCtrl->RelayEvent((LPMSG)GetCurrentMessage());
+	}
     SWindow *pHover = SWindowMgr::GetWindow(m_hHover);
     if (m_msgMouse.message != 0 || !pHover)
     {

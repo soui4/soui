@@ -53,6 +53,8 @@ SFontPool::SFontPool(IRenderFactory *pRendFactory)
     : m_RenderFactory(pRendFactory)
 {
     m_pFunOnKeyRemoved = OnKeyRemoved;
+	FontInfo emptyInfo;
+	m_defFontInfo = FontInfoFromString(L"face:宋体,size:16",emptyInfo);
 }
 
 void SFontPool::OnKeyRemoved(const IFontPtr &obj)
@@ -140,7 +142,7 @@ const FontInfo &SFontPool::GetDefFontInfo() const
     return m_defFontInfo;
 }
 
-void SFontPool::SetDefFontInfo(const FontInfo &fontInfo)
+void SFontPool::_SetDefFontInfo(const FontInfo &fontInfo)
 {
     SAutoLock autoLock(m_cs);
     m_defFontInfo = fontInfo;
@@ -150,12 +152,14 @@ void SFontPool::SetDefFontInfo(const FontInfo &fontInfo)
 
 void SFontPool::SetDefFontInfo(const SStringW &strFontInfo)
 {
+	if(strFontInfo.IsEmpty())
+		return;
 	FontInfo emptyDefFont;
     FontInfo fi = FontInfoFromString(strFontInfo,emptyDefFont);
 	if(!CheckFont(fi.strFaceName)){//make sure default font face is valid.
 		fi.strFaceName = KDefFontFace;
 	}
-    SetDefFontInfo(fi);
+    _SetDefFontInfo(fi);
 }
 
 FontInfo SFontPool::FontInfoFromString(const SStringW &strFontDesc, const FontInfo & defFontInfo)
@@ -172,11 +176,11 @@ FontInfo SFontPool::FontInfoFromString(const SStringW &strFontDesc, const FontIn
 	SStringW fontDesc2 = strFontDesc;
 	fontDesc2.MakeLower();
 	SArray<SStringW> strLst;
-    UINT nSeg = SplitString(fontDesc2, KFontPropSeprator, strLst);
-    for (UINT i = 0; i < nSeg; i++)
+    size_t nSeg = SplitString(fontDesc2, KFontPropSeprator, strLst);
+    for (size_t i = 0; i < nSeg; i++)
     {
         SArray<SStringW> kv;
-        UINT n = SplitString(strLst[i], KPropSeprator, kv);
+        size_t n = SplitString(strLst[i], KPropSeprator, kv);
         if (n != 2)
             continue;
         if (kv[0] == KFontFace)

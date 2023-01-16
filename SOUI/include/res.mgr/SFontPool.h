@@ -88,8 +88,6 @@ public:
      */
     IFontPtr GetFont(const SStringW &strFont, int scale);
 
-    void SetDefFontInfo(const FontInfo &fontInfo);
-
     void SetDefFontInfo(const SStringW &strFontInfo);
 
   protected:
@@ -100,6 +98,7 @@ public:
     static void OnKeyRemoved(const IFontPtr &obj);
 
     IFontPtr _CreateFont(const FontInfo &fontInfo,int scale);
+	void _SetDefFontInfo(const FontInfo &fontInfo);
 
     SAutoRefPtr<IRenderFactory> m_RenderFactory;
     FontInfo m_defFontInfo;

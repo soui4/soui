@@ -23,7 +23,7 @@ void STaskHandler::start(const char *pszName, Priority priority)
         return;
     TCHAR szBuf[101];
 #ifdef _UNICODE
-    int nLen = MultiByteToWideChar(CP_ACP, 0, pszName, strlen(pszName), szBuf, 100);
+    int nLen = MultiByteToWideChar(CP_ACP, 0, pszName, (int)strlen(pszName), szBuf, 100);
     szBuf[nLen] = 0;
 #else
     strcpy_s(szBuf, 100, pszName);

@@ -652,16 +652,22 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::CreateSolidColorBrush( COLORREF cr,IBrushS ** ppBrush )
     {
-        *ppBrush = SBrush_GDI::CreateSolidBrush(m_pRenderFactory,cr);
+        *ppBrush = new SBrush_GDI(m_pRenderFactory,cr);
         return S_OK;
     }
 
-    HRESULT SRenderTarget_GDI::CreateBitmapBrush( IBitmapS *pBmp,IBrushS ** ppBrush )
+    HRESULT SRenderTarget_GDI::CreateBitmapBrush( IBitmapS *pBmp,TileMode xtm,TileMode ytm,IBrushS ** ppBrush )
     {
         SBitmap_GDI *pBmpSkia = (SBitmap_GDI*)pBmp;
-        *ppBrush = SBrush_GDI::CreateBitmapBrush(m_pRenderFactory,pBmpSkia->GetBitmap());
+		(xtm),(ytm);
+        *ppBrush = new SBrush_GDI(m_pRenderFactory,pBmpSkia->GetBitmap());
         return S_OK;
     }
+
+	HRESULT SRenderTarget_GDI::CreateGradientBrush(THIS_ BOOL bVert,const COLORREF *crs, const float *pos, int nCount,TileMode tilemode, IBrushS * *ppBrush)
+	{
+		return E_NOTIMPL;//todo:hjx
+	}
 
     HRESULT SRenderTarget_GDI::Resize( SIZE sz )
     {
@@ -823,7 +829,7 @@ namespace SOUI
     HRESULT SRenderTarget_GDI::FillRectangle(LPCRECT pRect)
     {
         BYTE byAlpha=0xFF;
-        if(!m_curBrush->IsBitmap()) byAlpha = GetAValue(m_curBrush->GetColor());
+        if(m_curBrush->GetBrushType() == Brush_Color) byAlpha = GetAValue(m_curBrush->GetColor());
 
         DCBuffer dcBuf(m_hdc,pRect,byAlpha,FALSE);
         
@@ -845,7 +851,7 @@ namespace SOUI
     HRESULT SRenderTarget_GDI::FillRoundRect( LPCRECT pRect,POINT pt )
     {
         BYTE byAlpha=0xFF;
-        if(!m_curBrush->IsBitmap()) byAlpha = GetAValue(m_curBrush->GetColor());
+        if(m_curBrush->GetBrushType() == Brush_Color) byAlpha = GetAValue(m_curBrush->GetColor());
         DCBuffer dcBuf(m_hdc,pRect,byAlpha);
 
         HGDIOBJ oldPen=::SelectObject(dcBuf,GetStockObject(NULL_PEN));
@@ -1216,10 +1222,10 @@ namespace SOUI
         return S_OK;
     }
     
-    HRESULT SRenderTarget_GDI::GradientFillEx( LPCRECT pRect,const POINT* pts,COLORREF *colors,float *pos,int nCount,BYTE byAlpha/*=0xFF */ )
+    HRESULT SRenderTarget_GDI::GradientFillEx( LPCRECT pRect,BOOL bVert,COLORREF *colors,float *pos,int nCount,BYTE byAlpha/*=0xFF */ )
     {
 		(pRect);
-		(pts);
+		(bVert);
 		(colors);
 		(pos);
 		(nCount);
@@ -1280,7 +1286,7 @@ namespace SOUI
     HRESULT SRenderTarget_GDI::FillEllipse( LPCRECT pRect )
     {
         BYTE byAlpha=0xFF;
-        if(!m_curBrush->IsBitmap()) byAlpha = GetAValue(m_curBrush->GetColor());
+        if(m_curBrush->GetBrushType() == Brush_Color) byAlpha = GetAValue(m_curBrush->GetColor());
         DCBuffer dcBuf(m_hdc,pRect,byAlpha);
 		HGDIOBJ oldPen =::SelectObject(dcBuf,GetStockObject(NULL_PEN));
         ::Ellipse(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom);
@@ -1332,7 +1338,7 @@ namespace SOUI
     HRESULT SRenderTarget_GDI::FillArc( LPCRECT pRect,float startAngle,float sweepAngle )
     {
         BYTE byAlpha=0xFF;
-        if(!m_curBrush->IsBitmap()) byAlpha = GetAValue(m_curBrush->GetColor());
+        if(m_curBrush->GetBrushType() == Brush_Color) byAlpha = GetAValue(m_curBrush->GetColor());
         DCBuffer dcBuf(m_hdc,pRect,byAlpha);
 
         HGDIOBJ oldPen=::SelectObject(dcBuf,GetStockObject(NULL_PEN));

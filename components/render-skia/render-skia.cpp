@@ -356,14 +356,20 @@ namespace SOUI
 
 	HRESULT SRenderTarget_Skia::CreateSolidColorBrush( COLORREF cr,IBrushS ** ppBrush )
 	{
-		*ppBrush = SBrush_Skia::CreateSolidBrush(m_pRenderFactory,cr);
+		*ppBrush = new SBrush_Skia(m_pRenderFactory,cr);
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::CreateBitmapBrush( IBitmapS *pBmp,IBrushS ** ppBrush )
+	HRESULT SRenderTarget_Skia::CreateBitmapBrush( IBitmapS *pBmp,TileMode xtm,TileMode ytm, IBrushS ** ppBrush )
 	{
 		SBitmap_Skia *pBmpSkia = (SBitmap_Skia*)pBmp;
-		*ppBrush = SBrush_Skia::CreateBitmapBrush(m_pRenderFactory,pBmpSkia->GetSkBitmap());
+		*ppBrush = new SBrush_Skia(m_pRenderFactory,pBmpSkia->GetSkBitmap(),xtm,ytm);
+		return S_OK;
+	}
+
+	HRESULT SRenderTarget_Skia::CreateGradientBrush(THIS_ BOOL bVert,const COLORREF *crs, const float *pos, int nCount,TileMode tileMode, IBrushS * *ppBrush)
+	{
+		*ppBrush = new SBrush_Skia(m_pRenderFactory,bVert,crs,pos,nCount,tileMode);
 		return S_OK;
 	}
 
@@ -576,22 +582,15 @@ namespace SOUI
 		return S_OK;
 	}
 
+
 	HRESULT SRenderTarget_Skia::FillRectangle(LPCRECT pRect)
 	{
 		SkPaint paint=m_paint;
-		if(m_curBrush->IsBitmap())
-		{
-			paint.setFilterBitmap(true);
-			paint.setShader(SkShader::CreateBitmapShader(m_curBrush->GetBitmap(),SkShader::kRepeat_TileMode,SkShader::kRepeat_TileMode))->unref();
-		}else
-		{
-			paint.setFilterBitmap(false);
-			paint.setColor(SColor(m_curBrush->GetColor()).toARGB());
-		}
 		paint.setStyle(SkPaint::kFill_Style);
 
 		SkRect skrc=toSkRect(pRect);
 		skrc.offset(m_ptOrg);
+		m_curBrush->InitPaint(paint,skrc);
 		InflateSkRect(&skrc,-0.5f,-0.5f);
 		m_SkCanvas->drawRect(skrc,paint);
 		return S_OK;
@@ -624,20 +623,12 @@ namespace SOUI
 	{
 		SkPaint paint=m_paint;
 
-		if(m_curBrush->IsBitmap())
-		{
-			paint.setFilterBitmap(true);
-			paint.setShader(SkShader::CreateBitmapShader(m_curBrush->GetBitmap(),SkShader::kRepeat_TileMode,SkShader::kRepeat_TileMode))->unref();
-		}else
-		{
-			paint.setFilterBitmap(false);
-			paint.setColor(SColor(m_curBrush->GetColor()).toARGB());
-		}
 		paint.setStyle(SkPaint::kFill_Style);
 
 		SkRect skrc=toSkRect(pRect);
 		InflateSkRect(&skrc,-0.5f,-0.5f);//要缩小0.5显示效果才和GDI一致。
 		skrc.offset(m_ptOrg);
+		m_curBrush->InitPaint(paint,skrc);
 
 		m_SkCanvas->drawRoundRect(skrc,(SkScalar)pt.x,(SkScalar)pt.y,paint);
 		return S_OK;
@@ -1112,16 +1103,28 @@ namespace SOUI
 		}
 	}
 
-	HRESULT SRenderTarget_Skia::GradientFillEx( LPCRECT pRect,const POINT* pts,COLORREF *colors,float *pos,int nCount,BYTE byAlpha/*=0xFF*/ )
+	HRESULT SRenderTarget_Skia::GradientFillEx( LPCRECT pRect,BOOL bVert,COLORREF *colors,float *pos,int nCount,BYTE byAlpha/*=0xFF*/ )
 	{
 		SkRect skrc = toSkRect(pRect);
 		skrc.offset(m_ptOrg);
-		SkPoint *skPts = new SkPoint[nCount];
+		SkScalar wid = skrc.width();
+		SkScalar hei = skrc.height();
+		SkScalar halfWid = wid/2;
+		SkScalar halfHei = hei/2;
+
+		SkPoint skPts[2];
+		if(bVert){
+			skPts[0].set(halfWid,0.0f);
+			skPts[1].set(halfWid,hei);
+		}else
+		{//水平方向
+			skPts[0].set(0.f ,halfHei);
+			skPts[1].set(wid,halfHei);
+		}
+
 		SkColor *skColors= new SkColor[nCount];
 		for(int i=0;i<nCount;i++)
 		{
-			skPts[i].iset(pts[i].x,pts[i].y);
-			skPts[i].offset(m_ptOrg.x(),m_ptOrg.y());
 			skColors[i] = SColor(colors[i],byAlpha).toARGB();
 		}
 
@@ -1132,7 +1135,6 @@ namespace SOUI
 		m_SkCanvas->drawRect(skrc,paint);
 
 		delete []skColors;
-		delete []skPts;
 		return S_OK;
 	}
 
@@ -1159,18 +1161,15 @@ namespace SOUI
 		SkScalar halfHei = hei/2;
 		if(type == linear)
 		{
-
-			SkPoint *skPts = new SkPoint[3];
-			skPts[1].set(halfWid,halfHei);
-
+			SkPoint skPts[2];
 			if(fequal(fLinearAngle,90.0f) || fequal(fLinearAngle,270.0f))
 			{//90度
 				skPts[0].set(halfWid,0.0f);
-				skPts[2].set(halfWid,hei);
+				skPts[1].set(halfWid,hei);
 			}else if(fequal(fLinearAngle,0.0f) || fequal(fLinearAngle,180.0f))
 			{//水平方向
 				skPts[0].set(0.f ,halfHei);
-				skPts[2].set(wid,halfHei);
+				skPts[1].set(wid,halfHei);
 			}else
 			{//其它角度
 
@@ -1192,15 +1191,14 @@ namespace SOUI
 				if(pt2a.fY > halfHei)
 				{//using pt1a,pt2a
 					skPts[0] = pt1a;
-					skPts[2] = pt2a;
+					skPts[1] = pt2a;
 				}else
 				{//using pt1b,pt2b
 					skPts[0]=pt1b;
-					skPts[2]=pt2b;
+					skPts[1]=pt2b;
 				}
 			}
 			pShader = SkGradientShader::CreateLinear(skPts, skColors, NULL,3,SkShader::kRepeat_TileMode);
-			delete []skPts;
 		}else if(type == radial)
 		{
 			SkPoint skCenter;
@@ -1239,26 +1237,24 @@ namespace SOUI
 		skrc.offset(m_ptOrg);
 
 		SkPoint pts[2];
-		pts[0].set(skrc.left(),skrc.top());
-
-		if (bVert)
-		{
-			pts[1].set(skrc.left(),skrc.bottom());
-		}
-		else
-		{
-			pts[1].set(skrc.right(),skrc.top());
+		if(bVert)
+		{//90度
+			pts[0].set(skrc.centerX(),skrc.fTop);
+			pts[1].set(skrc.centerX(),skrc.fBottom);
+		}else
+		{//水平方向
+			pts[0].set(skrc.fLeft,skrc.centerY());
+			pts[1].set(skrc.fRight,skrc.centerY());
 		}
 
 		SColor cr1(crBegin,byAlpha);
 		SColor cr2(crEnd,byAlpha);
 
 		const SkColor colors[2] = {cr1.toARGB(),cr2.toARGB()};
-		SkShader *pShader = SkGradientShader::CreateLinear(pts, colors, NULL,2,SkShader::kMirror_TileMode);
 		SkPaint paint=m_paint;
+		SkShader *pShader = SkGradientShader::CreateLinear(pts, colors, NULL,2,SkShader::kMirror_TileMode);
 		paint.setShader(pShader);
 		pShader->unref();
-
 		m_SkCanvas->drawRect(skrc,paint);
 		return S_OK;
 
@@ -1324,19 +1320,10 @@ namespace SOUI
 	HRESULT SRenderTarget_Skia::FillEllipse( LPCRECT pRect )
 	{
 		SkPaint paint=m_paint;
-		if(m_curBrush->IsBitmap())
-		{
-			paint.setFilterBitmap(true);
-			paint.setShader(SkShader::CreateBitmapShader(m_curBrush->GetBitmap(),SkShader::kRepeat_TileMode,SkShader::kRepeat_TileMode))->unref();
-		}else
-		{
-			paint.setFilterBitmap(false);
-			paint.setColor(SColor(m_curBrush->GetColor()).toARGB());
-		}
 		paint.setStyle(SkPaint::kFill_Style);
-
 		SkRect skrc=toSkRect(pRect);
 		skrc.offset(m_ptOrg);
+		m_curBrush->InitPaint(paint,skrc);
 		m_SkCanvas->drawOval(skrc,paint);
 		return S_OK;
 	}
@@ -1380,18 +1367,10 @@ namespace SOUI
 	HRESULT SRenderTarget_Skia::FillArc( LPCRECT pRect,float startAngle,float sweepAngle )
 	{
 		SkPaint paint=m_paint;
-		if(m_curBrush->IsBitmap())
-		{
-			paint.setFilterBitmap(true);
-			paint.setShader(SkShader::CreateBitmapShader(m_curBrush->GetBitmap(),SkShader::kRepeat_TileMode,SkShader::kRepeat_TileMode))->unref();
-		}else
-		{
-			paint.setFilterBitmap(false);
-			paint.setColor(SColor(m_curBrush->GetColor()).toARGB());
-		}
 		paint.setStyle(SkPaint::kFill_Style);
 		SkRect skrc=toSkRect(pRect);
 		skrc.offset(m_ptOrg);
+		m_curBrush->InitPaint(paint,skrc);
 		m_SkCanvas->drawArc(skrc,startAngle, sweepAngle,true,paint);
 		return S_OK;
 	}
@@ -1513,20 +1492,13 @@ namespace SOUI
 		const SPath_Skia * path2 = (const SPath_Skia *)path;
 
 		SkPaint paint=m_paint;
-
-		if(m_curBrush->IsBitmap())
-		{
-			paint.setFilterBitmap(true);
-			paint.setShader(SkShader::CreateBitmapShader(m_curBrush->GetBitmap(),SkShader::kRepeat_TileMode,SkShader::kRepeat_TileMode))->unref();
-		}else
-		{
-			paint.setFilterBitmap(false);
-			paint.setColor(SColor(m_curBrush->GetColor()).toARGB());
-		}
 		paint.setStyle(SkPaint::kFill_Style);
 
 		SkPath skPath;
 		path2->m_skPath.offset(m_ptOrg.fX,m_ptOrg.fY,&skPath);
+		const SkRect &rcBound = skPath.getBounds();
+		m_curBrush->InitPaint(paint,rcBound);
+
 		m_SkCanvas->drawPath(skPath,paint);
 
 		return S_OK;
@@ -2144,6 +2116,78 @@ namespace SOUI
 		return &m_lf;
 	}
 
+	//////////////////////////////////////////////////////////////////////////
+
+	SBrush_Skia::SBrush_Skia(IRenderFactory * pRenderFac,BOOL bVert,const COLORREF *crs, const float *pos, int nCount,TileMode tileMode) 
+		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Shader),m_lstPos(NULL),m_lstColor(NULL)
+	{
+		m_bVert = bVert;
+		m_tileMode = (SkShader::TileMode)tileMode;
+		m_nCount = nCount;
+		m_lstColor = new SkColor[nCount];
+		for(int i=0;i<nCount;i++){
+			SColor tmp(crs[i]);
+			m_lstColor[i] = tmp.toARGB();
+		}
+		if(pos){
+			m_lstPos = new float[nCount];
+			memcpy(m_lstPos,pos,sizeof(float)*nCount);
+		}
+	}
+
+	SBrush_Skia::SBrush_Skia(IRenderFactory * pRenderFac,SkBitmap bmp,TileMode xtm,TileMode ytm)
+		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Bitmap),m_lstPos(NULL),m_lstColor(NULL)
+	{
+		m_bmp = bmp;
+		m_xtm = (SkShader::TileMode)xtm;
+		m_ytm = (SkShader::TileMode)ytm;
+	}
+
+	SBrush_Skia::SBrush_Skia(IRenderFactory * pRenderFac,COLORREF cr) 
+		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Color),m_lstPos(NULL),m_lstColor(NULL)
+	{
+		SColor tmp(cr);
+		m_cr = tmp.toARGB();
+	}
+
+	SBrush_Skia::~SBrush_Skia()
+	{
+		if(m_brushType == Brush_Shader){
+			SASSERT(m_lstColor);
+			delete []m_lstColor;
+			if(m_lstPos){
+				delete []m_lstPos;
+			}
+		}
+	}
+
+	void SBrush_Skia::InitPaint(SkPaint & paint,const SkRect & skrc)
+	{
+		if(m_brushType == Brush_Color)
+		{
+			paint.setFilterBitmap(false);
+			paint.setColor(m_cr);
+		}
+		if(m_brushType == Brush_Bitmap){
+			paint.setShader(SkShader::CreateBitmapShader(m_bmp,m_xtm,m_ytm))->unref();
+		}else//if(m_brushType == Brush_Shader)
+		{
+			SkPoint pts[2];
+			float halfWid = skrc.width()/2;
+			float halfHei = skrc.height()/2;
+			if(m_bVert)
+			{//90度
+				pts[0].set(skrc.centerX(),skrc.fTop);
+				pts[1].set(skrc.centerX(),skrc.fBottom);
+			}else
+			{//水平方向
+				pts[0].set(skrc.fLeft,skrc.centerY());
+				pts[1].set(skrc.fRight,skrc.centerY());
+			}
+			paint.setShader(SkGradientShader::CreateLinear(pts, m_lstColor, m_lstPos,m_nCount,m_tileMode))->unref();
+		}
+	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 	static int s_cPath =0;
@@ -2297,12 +2341,10 @@ namespace SOUI
 		return m_skPath.getVerbs(verbs,max);
 	}
 
-	RECT SPath_Skia::getBounds() const
+	void SPath_Skia::getBounds(LPRECT prc) const
 	{
 		const SkRect &rc = m_skPath.getBounds();
-		RECT rcRet;
-		SkRect2RECT(rc,&rcRet);
-		return rcRet;
+		SkRect2RECT(rc,prc);
 	}
 
 	void SPath_Skia::moveTo(float x, float y)
@@ -2684,6 +2726,13 @@ namespace SOUI
 		}
 
 		return pInfo;
+	}
+
+	IPathS * SPath_Skia::clone(CTHIS) const
+	{
+		SPath_Skia * ret = new SPath_Skia(GetRenderFactory());
+		ret->m_skPath = m_skPath;
+		return ret;
 	}
 
 	SPathInfo_Skia::SPathInfo_Skia(int points):mPoints(points),mData(new float[points*3])
