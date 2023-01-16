@@ -108,6 +108,18 @@ UINT SUiDefInfo::Init(IXmlNode *pNode,BOOL bGlobalDomain,IResProvider *pResProvi
 		if (xmlFont)
 		{
 			defFontInfo = xmlFont.attribute(L"value").as_string();
+		}else{
+			xmlFont = root.child(KNodeFont);//compatible to 4.4
+			SXmlAttr attr = xmlFont.first_attribute();
+			while(attr){
+				if(!defFontInfo.IsEmpty())
+					defFontInfo+=L",";
+				if(SStringW(attr.name()).CompareNoCase(L"face")==0){
+					defFontInfo += SStringW().Format(L"face:\'%s\'",attr.value());
+				}else
+					defFontInfo += SStringW().Format(L"%s:%s",attr.name(),attr.value());
+				attr = attr.next_attribute();
+			}
 		}
 
 		// load SWindow default attribute
