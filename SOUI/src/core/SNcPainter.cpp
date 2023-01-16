@@ -412,6 +412,8 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
     }
 
     { // draw title
+        if(m_root->IsLayoutDirty())
+            m_root->UpdateLayout();
         CRect rcClip;
         m_memRT->GetClipBox(&rcClip);
         CRect rcTitle(nBorderWid, nBorderWid, rcWnd.Width() - nBorderWid, nTitleHei + nBorderWid);
@@ -491,7 +493,7 @@ BOOL SNcPainter::OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const
 
 BOOL SNcPainter::IsItemRedrawDelay() const
 {
-    return FALSE;
+    return TRUE;
 }
 
 IObject *SNcPainter::GetHost()
@@ -564,6 +566,12 @@ void SNcPainter::InvalidateHostRect(LPCRECT pRc,BOOL bClip)
     }
     m_pHost->SendMessage(WM_NCPAINT);
     m_memRT->PopClip();
+}
+
+void SNcPainter::OnLayoutDirty()
+{
+    if (!m_memLeft) return;//make sure init is done
+    m_pHost->SendMessage(WM_NCPAINT,1,0);
 }
 
 ISwndContainer *SNcPainter::GetHostContainer()

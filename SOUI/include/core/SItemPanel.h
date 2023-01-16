@@ -32,6 +32,7 @@ struct IHostProxy
     virtual IRenderTarget *OnGetHostRenderTarget(LPCRECT rc, GrtFlag gdcFlags) = 0;
     virtual void OnReleaseHostRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags) = 0;
     virtual ISwndContainer *GetHostContainer() = 0;
+	virtual void OnLayoutDirty() = 0;
 };
 
 class SHostProxy : public IHostProxy {
@@ -80,6 +81,7 @@ class SHostProxy : public IHostProxy {
         return m_pHost->ReleaseRenderTarget(pRT);
     }
 
+	virtual void OnLayoutDirty(){}
   protected:
     SWindow *m_pHost;
 };
@@ -152,6 +154,7 @@ class SOUI_EXP SOsrPanel
 
     virtual BOOL NeedRedrawWhenStateChange();
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
+	virtual void RequestRelayout(SWND hSource, BOOL bSourceResizable);
 
     CRect GetItemRect() const;
     void SetItemCapture(BOOL bCapture);

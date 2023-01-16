@@ -62,6 +62,8 @@ class SNcPainter
 
     virtual void OnReleaseHostRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags);
 
+	virtual void OnLayoutDirty();
+
   protected:
     int GetScale() const;
     CSize GetNcSize() const;

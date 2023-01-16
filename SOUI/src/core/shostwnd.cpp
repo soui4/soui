@@ -601,7 +601,6 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
 {
     if (!(GetRoot()->IsLayoutDirty() || IsWindowVisible()))
         return;
-    SMatrix mtx = GetRoot()->_GetMatrixEx();
     //刷新前重新布局，会自动检查布局脏标志
     GetRoot()->UpdateLayout();
 

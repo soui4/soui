@@ -429,6 +429,14 @@ void SOsrPanel::PtToHost(THIS_ POINT *pt) const
 	pt->y += rcItem.top;
 }
 
+void SOsrPanel::RequestRelayout(SWND hSource, BOOL bSourceResizable)
+{
+	__baseCls::RequestRelayout(hSource,bSourceResizable);
+	if(IsLayoutDirty()){
+		m_pHostProxy->OnLayoutDirty();
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 SItemPanel *SItemPanel::Create(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
 {
