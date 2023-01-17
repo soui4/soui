@@ -9,15 +9,16 @@
 
 SNSBEGIN
 
-void Log::DefCallback(const char *tag, const char *pLogStr, int level, int loggerId, const char *file, int line, const char *fun, void *retAddr)
+void Log::DefCallback(const char *tag, const char *pLogStr, int level, const char *file, int line, const char *fun, void *retAddr)
 {
     SApplication *theApp = SApplication::getSingletonPtr();
-    ILog4zManager *pLogMgr = theApp ? theApp->GetLogManager() : NULL;
-    if (pLogMgr && pLogMgr->prePushLog(loggerId, level))
+    ILogMgr *pLogMgr = theApp ? theApp->GetLogManager() : NULL;
+    bool bLog = false;
+    if (pLogMgr && pLogMgr->prePushLog(level))
     {
-        pLogMgr->pushLog(loggerId, level, tag, pLogStr, file, line, fun, retAddr);
+        bLog = pLogMgr->pushLog(level, tag, pLogStr, file, line, fun, retAddr);
     }
-    if (Log::s_enableEcho)
+    if (!bLog || Log::s_enableEcho)
     {
         const int kMaxLog = Log::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);
@@ -33,9 +34,8 @@ int Log::s_logLevel = Log::LOG_INFO;
 bool Log::s_enableEcho = true;
 LogCallback Log::gs_logCallback = Log::DefCallback;
 
-Log::Log(int nLoggerId, const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr)
+Log::Log(const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr)
     : m_level(level)
-    , m_loggerId(nLoggerId)
     , m_pAddr(pAddr)
     , m_file(filename)
     , m_func(funcname)
@@ -53,7 +53,7 @@ Log::~Log()
 
     if (gs_logCallback)
     {
-        gs_logCallback(m_tag, m_logBuf, m_level, m_loggerId, m_file, m_line, m_func, m_pAddr);
+        gs_logCallback(m_tag, m_logBuf, m_level, m_file, m_line, m_func, m_pAddr);
     }
     else if (s_enableEcho)
     {

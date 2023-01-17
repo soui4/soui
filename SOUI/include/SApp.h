@@ -107,8 +107,8 @@ class SOUI_EXP SApplication
     STDMETHOD_(BOOL, SetMsgLoopFactory)(THIS_ IMsgLoopFactory *pMsgLoopFac) OVERRIDE;
     STDMETHOD_(IMsgLoopFactory *, GetMsgLoopFactory)(THIS) OVERRIDE;
 
-    STDMETHOD_(void, SetLogManager)(THIS_ ILog4zManager *pLogMgr) OVERRIDE;
-    STDMETHOD_(ILog4zManager *, GetLogManager)(THIS) OVERRIDE;
+    STDMETHOD_(void, SetLogManager)(THIS_ ILogMgr *pLogMgr) OVERRIDE;
+    STDMETHOD_(ILogMgr *, GetLogManager)(THIS) OVERRIDE;
 
     STDMETHOD_(void, SetAttrStorageFactory)
     (THIS_ IAttrStorageFactory *pAttrStorageFactory) OVERRIDE;
@@ -273,7 +273,7 @@ class SOUI_EXP SApplication
     SAutoRefPtr<ITranslatorMgr> m_translator;
     SAutoRefPtr<IToolTipFactory> m_tooltipFactory;
     SAutoRefPtr<IMsgLoopFactory> m_msgLoopFactory;
-    SAutoRefPtr<ILog4zManager> m_logManager; // log manager
+    SAutoRefPtr<ILogMgr> m_logManager; // log manager
     SAutoRefPtr<IAttrStorageFactory> m_pAttrStroageFactory;
 
     SNamedID m_namedID;

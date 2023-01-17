@@ -120,13 +120,13 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @param ILog4zManager *pLogMgr --日志输出模块
      * @return
      */
-    STDMETHOD_(void, SetLogManager)(THIS_ ILog4zManager * pLogMgr) PURE;
+    STDMETHOD_(void, SetLogManager)(THIS_ ILogMgr * pLogMgr) PURE;
 
     /**
      * @brief 获取日志输出模块
      * @return  ILog4zManager *--日志输出模块
      */
-    STDMETHOD_(ILog4zManager *, GetLogManager)(THIS) PURE;
+    STDMETHOD_(ILogMgr *, GetLogManager)(THIS) PURE;
 
     /**
      * @brief 设置属性持久久类厂

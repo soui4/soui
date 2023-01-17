@@ -5,13 +5,10 @@
 
 SNSBEGIN
 
-typedef int LoggerId;
-
 //! the max log content length.
 enum
 {
     LOG4Z_LOG_BUF_SIZE = 10240,
-    LOG4Z_MAIN_LOGGER_ID = 0,
 };
 
 //! LOG Level
@@ -28,8 +25,23 @@ enum ENUM_LOG_LEVEL
 
 #undef INTERFACE
 #define INTERFACE IOutputFileBuilder
-DECLARE_INTERFACE(IOutputFileBuilder)
+DECLARE_INTERFACE_(IOutputFileBuilder,IObjRef)
 {
+	//!添加引用
+    /*!
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    //!释放引用
+    /*!
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    //!释放对象
+    /*!
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
     //每个月创建log文件夹
     STDMETHOD_(BOOL, monthDir)(CTHIS) SCONST PURE;
 
@@ -42,18 +54,11 @@ DECLARE_INTERFACE(IOutputFileBuilder)
     (CTHIS_ char *pszFileName, int nLen, struct tm time, const char *pszLogName, unsigned long pid, int curFileIndex) SCONST PURE;
 };
 
-#undef INTERFACE
-#define INTERFACE IOutputListener
-DECLARE_INTERFACE(IOutputListener)
-{
-    STDMETHOD_(void, onOutputLog)
-    (THIS_ int level, const char *filter, const char *log, int nLogLen, unsigned __int64 time_) PURE;
-};
 
 //! log4z class
 #undef INTERFACE
-#define INTERFACE ILog4zManager
-DECLARE_INTERFACE_(ILog4zManager, IObjRef)
+#define INTERFACE ILogMgr
+DECLARE_INTERFACE_(ILogMgr, IObjRef)
 {
     //!添加引用
     /*!
@@ -75,10 +80,6 @@ DECLARE_INTERFACE_(ILog4zManager, IObjRef)
     STDMETHOD_(BOOL, config)(THIS_ const char *configPath) PURE;
     STDMETHOD_(BOOL, configFromString)(THIS_ const char *configContent) PURE;
 
-    //! Create or overwrite logger.
-    //! Needs to be called before ILog4zManager::Start, OR Do not call.
-    STDMETHOD_(LoggerId, createLogger)(THIS_ const char *key) PURE;
-
     //! Start Log Thread. This method can only be called once by one process.
     STDMETHOD_(BOOL, start)(THIS) PURE;
 
@@ -86,42 +87,26 @@ DECLARE_INTERFACE_(ILog4zManager, IObjRef)
     //! Default no need to call and no recommended.
     STDMETHOD_(BOOL, stop)(THIS) PURE;
 
-    //! Find logger. thread safe.
-    STDMETHOD_(LoggerId, findLogger)(THIS_ const char *key) PURE;
-
     // pre-check the log filter. if filter out return false.
-    STDMETHOD_(BOOL, prePushLog)(THIS_ LoggerId id, int level) PURE;
-    STDMETHOD_(BOOL, prePushLog2)(THIS_ const char *name, int level) PURE;
+    STDMETHOD_(BOOL, prePushLog)(THIS_ int level) PURE;
 
     //! Push log, thread safe.
     STDMETHOD_(BOOL, pushLog)
-    (THIS_ LoggerId id, int level, const char *filter, const char *log, const char *file, int line, const char *func, const void *pRetAddr) PURE;
+    (THIS_ int level, const char *filter, const char *log, const char *file, int line, const char *func, const void *pRetAddr) PURE;
 
-    STDMETHOD_(BOOL, pushLog2)
-    (THIS_ const char *name, int level, const char *filter, const char *log, const char *file, int line, const char *func, const void *pRetAddr) PURE;
-
-    //! set logger's attribute, thread safe.
-    STDMETHOD_(BOOL, enableLogger)(THIS_ LoggerId id, BOOL enable) PURE;
-    STDMETHOD_(BOOL, setLoggerName)(THIS_ LoggerId id, const char *name) PURE;
-    STDMETHOD_(BOOL, setLoggerPath)(THIS_ LoggerId id, const char *path) PURE;
-    STDMETHOD_(BOOL, setLoggerLevel)(THIS_ LoggerId id, int nLevel) PURE;
-    STDMETHOD_(BOOL, setLoggerFileLine)(THIS_ LoggerId id, BOOL enable) PURE;
-    STDMETHOD_(BOOL, setLoggerDisplay)(THIS_ LoggerId id, BOOL enable) PURE;
-    STDMETHOD_(BOOL, setLoggerOutFile)(THIS_ LoggerId id, BOOL enable) PURE;
-    STDMETHOD_(BOOL, setLoggerLimitsize)(THIS_ LoggerId id, unsigned int limitsize) PURE;
+    //! set logger's attribute
+	STDMETHOD_(BOOL, isLoggerEnable)(CTHIS) SCONST PURE;
+    STDMETHOD_(BOOL, enableLogger)(THIS_ BOOL enable) PURE;
+	STDMETHOD_(BOOL, setLoggerName)(THIS_ const char *name) PURE;
+    STDMETHOD_(BOOL, setLoggerPath)(THIS_ const char *path) PURE;
+    STDMETHOD_(BOOL, setLoggerLevel)(THIS_ int nLevel) PURE;
+    STDMETHOD_(BOOL, setLoggerFileLine)(THIS_ BOOL enable) PURE;
+    STDMETHOD_(BOOL, setLoggerDisplay)(THIS_ BOOL enable) PURE;
+    STDMETHOD_(BOOL, setLoggerOutFile)(THIS_ BOOL enable) PURE;
+    STDMETHOD_(BOOL, setLoggerLimitsize)(THIS_ unsigned int limitsize) PURE;
 
     //设置LOG输出到文件的规则
     STDMETHOD_(void, setOutputFileBuilder)(THIS_ IOutputFileBuilder * pOutputFileBuilder) PURE;
-
-    //! Update logger's attribute from config file, thread safe.
-    STDMETHOD_(BOOL, setAutoUpdate)
-    (THIS_ int interval /*per second, 0 is disable auto update*/) PURE;
-    STDMETHOD_(BOOL, updateConfig)(THIS) PURE;
-
-    //! Log4z status statistics, thread safe.
-    STDMETHOD_(BOOL, isLoggerEnable)(THIS_ LoggerId id) PURE;
-    STDMETHOD_(unsigned int, getStatusActiveLoggers)(THIS) PURE;
-    STDMETHOD_(void, setOutputListener)(THIS_ IOutputListener * pListener) PURE;
 };
 
 SNSEND

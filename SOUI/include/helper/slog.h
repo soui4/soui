@@ -61,7 +61,7 @@ class SOUI_EXP SLogStream {
     char *_cur;
 };
 
-typedef void (*LogCallback)(const char *tag, const char *pLogStr, int level, int loggerId, const char *file, int line, const char *fun, void *retAddr);
+typedef void (*LogCallback)(const char *tag, const char *pLogStr, int level, const char *file, int line, const char *fun, void *retAddr);
 
 class SOUI_EXP Log {
   public:
@@ -91,7 +91,7 @@ class SOUI_EXP Log {
     };
 
   public:
-    Log(int nLoggerId, const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr);
+    Log(const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr);
 
     ~Log();
     SLogStream &stream();
@@ -101,11 +101,10 @@ class SOUI_EXP Log {
     static void setLogEcho(bool bEnable);
 
   private:
-    static void DefCallback(const char *tag, const char *pLogStr, int level, int loggerId, const char *file, int line, const char *fun, void *retAddr);
+    static void DefCallback(const char *tag, const char *pLogStr, int level, const char *file, int line, const char *fun, void *retAddr);
 
     char m_tag[100];
     int m_level;
-    int m_loggerId;
     void *m_pAddr;
     const char *m_file, *m_func;
     int m_line;
@@ -119,63 +118,63 @@ class SOUI_EXP Log {
 
 SNSEND
 
-#define SLOG(tag, level, loggerId) SOUI::Log(loggerId, tag, level, __FILE__, __FUNCTION__, __LINE__, RetAddr()).stream()
+#define SLOG(tag, level) SOUI::Log(tag, level, __FILE__, __FUNCTION__, __LINE__, RetAddr()).stream()
 
-#define SLOG_FMT(tag, level, loggerId, logformat, ...)                                                       \
+#define SLOG_FMT(tag, level, logformat, ...)                                                       \
     do                                                                                                       \
     {                                                                                                        \
         if (sizeof(logformat[0]) == sizeof(char))                                                            \
         {                                                                                                    \
             char logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                                      \
             int nLen = _snprintf(logbuf, SOUI::Log::MAX_LOGLEN, (const char *)logformat, ##__VA_ARGS__);     \
-            SLOG(tag, level, loggerId) << logbuf;                                                            \
+            SLOG(tag, level) << logbuf;                                                            \
         }                                                                                                    \
         else                                                                                                 \
         {                                                                                                    \
             wchar_t logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                                   \
             int nLen = _snwprintf(logbuf, SOUI::Log::MAX_LOGLEN, (const wchar_t *)logformat, ##__VA_ARGS__); \
-            SLOG(tag, level, loggerId) << logbuf;                                                            \
+            SLOG(tag, level) << logbuf;                                                            \
         }                                                                                                    \
     } while (false);
 
 //流式输出日志，当kLogTag有效时使用，否则编译失败，kLogTag可以是当前定义的宏，也可以是当前对象的成员变量。
-#define SLOGD() SLOG(kLogTag, SOUI::Log::LOG_DEBUG, 0)
-#define SLOGI() SLOG(kLogTag, SOUI::Log::LOG_INFO, 0)
-#define SLOGW() SLOG(kLogTag, SOUI::Log::LOG_WARN, 0)
-#define SLOGE() SLOG(kLogTag, SOUI::Log::LOG_ERROR, 0)
-#define SLOGF() SLOG(kLogTag, SOUI::Log::LOG_FATAL, 0)
+#define SLOGD() SLOG(kLogTag, SOUI::Log::LOG_DEBUG)
+#define SLOGI() SLOG(kLogTag, SOUI::Log::LOG_INFO)
+#define SLOGW() SLOG(kLogTag, SOUI::Log::LOG_WARN)
+#define SLOGE() SLOG(kLogTag, SOUI::Log::LOG_ERROR)
+#define SLOGF() SLOG(kLogTag, SOUI::Log::LOG_FATAL)
 
 //流式输出日志，每条日志手动指定tag
-#define SLOGD2(tag) SLOG(tag, SOUI::Log::LOG_DEBUG, 0)
-#define SLOGI2(tag) SLOG(tag, SOUI::Log::LOG_INFO, 0)
-#define SLOGW2(tag) SLOG(tag, SOUI::Log::LOG_WARN, 0)
-#define SLOGE2(tag) SLOG(tag, SOUI::Log::LOG_ERROR, 0)
-#define SLOGF2(tag) SLOG(tag, SOUI::Log::LOG_FATAL, 0)
+#define SLOGD2(tag) SLOG(tag, SOUI::Log::LOG_DEBUG)
+#define SLOGI2(tag) SLOG(tag, SOUI::Log::LOG_INFO)
+#define SLOGW2(tag) SLOG(tag, SOUI::Log::LOG_WARN)
+#define SLOGE2(tag) SLOG(tag, SOUI::Log::LOG_ERROR)
+#define SLOGF2(tag) SLOG(tag, SOUI::Log::LOG_FATAL)
 
 //格式化输出日志，当kLogTag有效时使用，否则编译失败，kLogTag可以是当前定义的宏，也可以是当前对象的成员变量。
-#define SLOGFMTD(logformat, ...) SLOG_FMT(kLogTag, SOUI::Log::LOG_DEBUG, 0, logformat, ##__VA_ARGS__)
-#define SLOGFMTI(logformat, ...) SLOG_FMT(kLogTag, SOUI::Log::LOG_INFO, 0, logformat, ##__VA_ARGS__)
-#define SLOGFMTW(logformat, ...) SLOG_FMT(kLogTag, SOUI::Log::LOG_WARN, 0, logformat, ##__VA_ARGS__)
-#define SLOGFMTE(logformat, ...) SLOG_FMT(kLogTag, SOUI::Log::LOG_ERROR, 0, logformat, ##__VA_ARGS__)
-#define SLOGFMTF(logformat, ...) SLOG_FMT(kLogTag, SOUI::Log::LOG_FATAL, 0, logformat, ##__VA_ARGS__)
+#define SLOGFMTD(logformat, ...) SLOG_FMT(kLogTag, SOUI::Log::LOG_DEBUG, logformat, ##__VA_ARGS__)
+#define SLOGFMTI(logformat, ...) SLOG_FMT(kLogTag, SOUI::Log::LOG_INFO, logformat, ##__VA_ARGS__)
+#define SLOGFMTW(logformat, ...) SLOG_FMT(kLogTag, SOUI::Log::LOG_WARN, logformat, ##__VA_ARGS__)
+#define SLOGFMTE(logformat, ...) SLOG_FMT(kLogTag, SOUI::Log::LOG_ERROR, logformat, ##__VA_ARGS__)
+#define SLOGFMTF(logformat, ...) SLOG_FMT(kLogTag, SOUI::Log::LOG_FATAL, logformat, ##__VA_ARGS__)
 
 //格式化输出日志，每条日志手动指定tag
-#define SLOGFMTD2(tag, logformat, ...) SLOG_FMT(tag, SOUI::Log::LOG_DEBUG, 0, logformat, ##__VA_ARGS__)
-#define SLOGFMTI2(tag, logformat, ...) SLOG_FMT(tag, SOUI::Log::LOG_INFO, 0, logformat, ##__VA_ARGS__)
-#define SLOGFMTW2(tag, logformat, ...) SLOG_FMT(tag, SOUI::Log::LOG_WARN, 0, logformat, ##__VA_ARGS__)
-#define SLOGFMTE2(tag, logformat, ...) SLOG_FMT(tag, SOUI::Log::LOG_ERROR, 0, logformat, ##__VA_ARGS__)
-#define SLOGFMTF2(tag, logformat, ...) SLOG_FMT(tag, SOUI::Log::LOG_FATAL, 0, logformat, ##__VA_ARGS__)
+#define SLOGFMTD2(tag, logformat, ...) SLOG_FMT(tag, SOUI::Log::LOG_DEBUG, logformat, ##__VA_ARGS__)
+#define SLOGFMTI2(tag, logformat, ...) SLOG_FMT(tag, SOUI::Log::LOG_INFO, logformat, ##__VA_ARGS__)
+#define SLOGFMTW2(tag, logformat, ...) SLOG_FMT(tag, SOUI::Log::LOG_WARN, logformat, ##__VA_ARGS__)
+#define SLOGFMTE2(tag, logformat, ...) SLOG_FMT(tag, SOUI::Log::LOG_ERROR, logformat, ##__VA_ARGS__)
+#define SLOGFMTF2(tag, logformat, ...) SLOG_FMT(tag, SOUI::Log::LOG_FATAL, logformat, ##__VA_ARGS__)
 
 // SOUI4内部使用的日志输出，自动将TAG定义为soui4
 #define kSoui4Tag "soui4"
-#define SSLOGD()  SLOG(kSoui4Tag, SOUI::Log::LOG_DEBUG, 0)
-#define SSLOGI()  SLOG(kSoui4Tag, SOUI::Log::LOG_INFO, 0)
-#define SSLOGW()  SLOG(kSoui4Tag, SOUI::Log::LOG_WARN, 0)
-#define SSLOGE()  SLOG(kSoui4Tag, SOUI::Log::LOG_ERROR, 0)
-#define SSLOGF()  SLOG(kSoui4Tag, SOUI::Log::LOG_FATAL, 0)
+#define SSLOGD()  SLOG(kSoui4Tag, SOUI::Log::LOG_DEBUG)
+#define SSLOGI()  SLOG(kSoui4Tag, SOUI::Log::LOG_INFO)
+#define SSLOGW()  SLOG(kSoui4Tag, SOUI::Log::LOG_WARN)
+#define SSLOGE()  SLOG(kSoui4Tag, SOUI::Log::LOG_ERROR)
+#define SSLOGF()  SLOG(kSoui4Tag, SOUI::Log::LOG_FATAL)
 
-#define SSLOGFMTD(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::Log::LOG_DEBUG, 0, logformat, ##__VA_ARGS__)
-#define SSLOGFMTI(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::Log::LOG_INFO, 0, logformat, ##__VA_ARGS__)
-#define SSLOGFMTW(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::Log::LOG_WARN, 0, logformat, ##__VA_ARGS__)
-#define SSLOGFMTE(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::Log::LOG_ERROR, 0, logformat, ##__VA_ARGS__)
-#define SSLOGFMTF(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::Log::LOG_FATAL, 0, logformat, ##__VA_ARGS__)
+#define SSLOGFMTD(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::Log::LOG_DEBUG,logformat, ##__VA_ARGS__)
+#define SSLOGFMTI(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::Log::LOG_INFO, logformat, ##__VA_ARGS__)
+#define SSLOGFMTW(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::Log::LOG_WARN, logformat, ##__VA_ARGS__)
+#define SSLOGFMTE(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::Log::LOG_ERROR,logformat, ##__VA_ARGS__)
+#define SSLOGFMTF(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::Log::LOG_FATAL,logformat, ##__VA_ARGS__)

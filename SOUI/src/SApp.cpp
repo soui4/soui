@@ -685,12 +685,12 @@ IValueAnimator *SApplication::CreateValueAnimatorByName(LPCWSTR pszName) const
     return (IValueAnimator *)CreateObject(pszName, ValueAnimator);
 }
 
-void SApplication::SetLogManager(ILog4zManager *pLogMgr)
+void SApplication::SetLogManager(ILogMgr *pLogMgr)
 {
     m_logManager = pLogMgr;
 }
 
-ILog4zManager *SApplication::GetLogManager()
+ILogMgr *SApplication::GetLogManager()
 {
     return m_logManager;
 }

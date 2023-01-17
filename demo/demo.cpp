@@ -189,7 +189,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		SAutoRefPtr<IRenderFactory> pRenderFactory;         //UI渲染模块，由render-gdi.dll或者render-skia.dll提供
 		SAutoRefPtr<ITranslatorMgr> trans;                  //多语言翻译模块，由translator.dll提供
 		SAutoRefPtr<IScriptFactory> pScriptLua;              //lua脚本模块，由scriptmodule-lua.dll提供
-		SAutoRefPtr<ILog4zManager>  pLogMgr;                //log4z对象
+		SAutoRefPtr<ILogMgr>  pLogMgr;                //log4z对象
 
 		BOOL bLoaded = FALSE;
 		//从各组件中显式创建上述组件对象
@@ -208,10 +208,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		if (pComMgr->CreateLog4z((IObjRef**)&pLogMgr) && pLogMgr)
 		{
 			//uncomment next line to disable log mgr to output debug string.
-			pLogMgr->setLoggerDisplay(LOG4Z_MAIN_LOGGER_ID, false);
+			pLogMgr->setLoggerName("demo");
 
 			//uncomment next line to record info level log.
-			pLogMgr->setLoggerLevel(LOG4Z_MAIN_LOGGER_ID, LOG_LEVEL_INFO);
+			pLogMgr->setLoggerLevel(LOG_LEVEL_INFO);
 			pLogMgr->start();
 		}
 
