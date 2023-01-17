@@ -36,5 +36,6 @@ struct FontInfo
     FONTSTYLE style;
     SStringW strFaceName;
     SStringW strPropEx;
+	int		 scale;
 };
 SNSEND

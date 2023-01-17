@@ -82,7 +82,7 @@ IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
 	SAutoLock autoLock(m_cs);
 	SStringW strFontDesc = GETUIDEF->GetFontDesc(strFont);
 	FontInfo info = FontInfoFromString(strFontDesc,m_defFontInfo);
-
+	info.scale = scale;
 	IFontPtr hftRet=NULL;
 	if (HasKey(info))
 	{
@@ -90,14 +90,14 @@ IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
 	}
 	else
 	{
-		hftRet = _CreateFont(info,scale);
+		hftRet = _CreateFont(info);
 		AddKeyObject(info, hftRet);
 	}
 	return hftRet;
 }
 
 
-IFontPtr SFontPool::_CreateFont(const FontInfo &fontInfo,int scale)
+IFontPtr SFontPool::_CreateFont(const FontInfo &fontInfo)
 {
     LOGFONT lfNew = { 0 };
 
@@ -113,13 +113,13 @@ IFontPtr SFontPool::_CreateFont(const FontInfo &fontInfo,int scale)
 	lfNew.lfEscapement = lfNew.lfOrientation = fontInfo.style.attr.fEscapement;
 	if(fontInfo.style.attr.szIsAdding){
 		SLayoutSize defFontSize((float)(short)m_defFontInfo.style.attr.nSize,(SLayoutSize::Unit)m_defFontInfo.style.attr.szUnit);
-		lfNew.lfHeight = -defFontSize.toPixelSize(scale);
+		lfNew.lfHeight = -defFontSize.toPixelSize(fontInfo.scale);
 		SLayoutSize layoutSize((float)(short)fontInfo.style.attr.nSize,(SLayoutSize::Unit)fontInfo.style.attr.szUnit);
-		lfNew.lfHeight -= layoutSize.toPixelSize(scale);
+		lfNew.lfHeight -= layoutSize.toPixelSize(fontInfo.scale);
 
 	}else{
 		SLayoutSize layoutSize((float)(int)fontInfo.style.attr.nSize,(SLayoutSize::Unit)fontInfo.style.attr.szUnit);
-		lfNew.lfHeight = -layoutSize.toPixelSize(scale);
+		lfNew.lfHeight = -layoutSize.toPixelSize(fontInfo.scale);
 	}
     lfNew.lfQuality = CLEARTYPE_QUALITY;
 

@@ -40,7 +40,7 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
     {
         ULONG uRet = SOUI::CElementTraits<SStringW>::Hash(fontKey.strFaceName);
         uRet = (uRet << 5) + SOUI::CElementTraits<SStringW>::Hash(fontKey.strPropEx);
-        uRet = (uRet << 5) + (UINT)fontKey.style.syle + 1;
+        uRet = (uRet << 5) + (UINT)fontKey.style.syle + 1 + fontKey.scale;
         return uRet;
     }
 
@@ -97,7 +97,7 @@ public:
 
     static void OnKeyRemoved(const IFontPtr &obj);
 
-    IFontPtr _CreateFont(const FontInfo &fontInfo,int scale);
+    IFontPtr _CreateFont(const FontInfo &fontInfo);
 	void _SetDefFontInfo(const FontInfo &fontInfo);
 
     SAutoRefPtr<IRenderFactory> m_RenderFactory;
