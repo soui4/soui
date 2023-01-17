@@ -97,8 +97,8 @@ DECLARE_INTERFACE_(ILogMgr, IObjRef)
     //! set logger's attribute
 	STDMETHOD_(BOOL, isLoggerEnable)(CTHIS) SCONST PURE;
     STDMETHOD_(BOOL, enableLogger)(THIS_ BOOL enable) PURE;
-	STDMETHOD_(BOOL, setLoggerName)(THIS_ const char *name) PURE;
-    STDMETHOD_(BOOL, setLoggerPath)(THIS_ const char *path) PURE;
+	STDMETHOD_(BOOL, setLoggerName)(THIS_ const char *name_u8) PURE;
+    STDMETHOD_(BOOL, setLoggerPath)(THIS_ const char *path_u8) PURE;
     STDMETHOD_(BOOL, setLoggerLevel)(THIS_ int nLevel) PURE;
     STDMETHOD_(BOOL, setLoggerFileLine)(THIS_ BOOL enable) PURE;
     STDMETHOD_(BOOL, setLoggerDisplay)(THIS_ BOOL enable) PURE;

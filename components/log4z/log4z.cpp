@@ -148,7 +148,10 @@ public:
     inline bool open(const char *path, const char * mod)
     {
         if (_file != NULL){fclose(_file);_file = NULL;}
-        _file = fopen(path, mod);
+		wchar_t path2[1000],mod2[10];
+		MultiByteToWideChar(CP_UTF8,0,path,-1,path2,1000);
+		MultiByteToWideChar(CP_UTF8,0,mod,-1,mod2,10);
+        _file = _wfopen(path2, mod2);
         return _file != NULL;
     }
     inline void close()
