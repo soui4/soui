@@ -108,13 +108,13 @@ SNSEND
         if (sizeof(logformat[0]) == sizeof(char))                                                            \
         {                                                                                                    \
             char logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                                      \
-            int nLen = _snprintf(logbuf, SOUI::Log::MAX_LOGLEN, (const char *)logformat, ##__VA_ARGS__);     \
+            _snprintf(logbuf, SOUI::Log::MAX_LOGLEN, (const char *)logformat, ##__VA_ARGS__);     \
             SLOG(tag, level) << logbuf;                                                            \
         }                                                                                                    \
         else                                                                                                 \
         {                                                                                                    \
             wchar_t logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                                   \
-            int nLen = _snwprintf(logbuf, SOUI::Log::MAX_LOGLEN, (const wchar_t *)logformat, ##__VA_ARGS__); \
+            _snwprintf(logbuf, SOUI::Log::MAX_LOGLEN, (const wchar_t *)logformat, ##__VA_ARGS__); \
             SLOG(tag, level) << logbuf;                                                            \
         }                                                                                                    \
     } while (false);
