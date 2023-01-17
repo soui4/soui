@@ -46,7 +46,10 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
 
     static bool CompareElements(INARGTYPE element1, INARGTYPE element2)
     {
-        return element1.strFaceName == element2.strFaceName && element1.strPropEx == element2.strPropEx && element1.style.syle == element2.style.syle;
+        return element1.strFaceName == element2.strFaceName 
+			&& element1.strPropEx == element2.strPropEx 
+			&& element1.style.syle == element2.style.syle
+			&& element1.scale == element2.scale;
     }
 
     static int CompareElementsOrdered(INARGTYPE element1, INARGTYPE element2)
@@ -56,6 +59,9 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
             nRet = element1.strPropEx.Compare(element2.strPropEx);
         if (nRet == 0)
             nRet = (int)(element1.style.syle - element2.style.syle);
+		if (nRet == 0)
+			nRet = (int)(element1.scale - element2.scale);
+
         return nRet;
     }
 };
