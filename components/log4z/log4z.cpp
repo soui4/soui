@@ -95,7 +95,7 @@ static const char* const LOG4Z_DEFAULT_NAME = "soui";
 //! default log filter level
 static const int LOG4Z_DEFAULT_LEVEL = SOUI::LOG_LEVEL_DEBUG;
 //! default logger display
-static const bool LOG4Z_DEFAULT_DISPLAY = true;
+static const bool LOG4Z_DEFAULT_DISPLAY = false;
 //! default logger output to file
 static const bool LOG4Z_DEFAULT_OUTFILE = true;
 //! default logger output file limit size, unit M byte.
@@ -1348,11 +1348,10 @@ bool LogerManager::openLogger(LogData * pLog)
 
 		std::string name = pLogger->_name;
 		char buf[MAX_PATH];
-		const int KMaxLogIndex = 5;
-		m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,name.c_str(),_pid,KMaxLogIndex);        		
+		m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,name.c_str(),_pid,LOG4Z_MAX_LOG_INDEX);        		
 		std::string path = pLogger->_path+buf;
 		remove(path.c_str());
-		for(int i=KMaxLogIndex;i>0;i--)//max to 5 log index.
+		for(int i=LOG4Z_MAX_LOG_INDEX;i>0;i--)//max to 5 log index.
 		{
 			m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,name.c_str(),_pid,i-1);        		
 			std::string pathOld = pLogger->_path+buf;
