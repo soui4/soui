@@ -30,7 +30,7 @@ void Log::DefCallback(const char *tag, const char *pLogStr, int level, const cha
 }
 
 //////////////////////////////////////////////////////////////////////////
-int Log::s_logLevel = Log::LOG_INFO;
+int Log::s_logLevel = LOG_LEVEL_INFO;
 bool Log::s_enableEcho = true;
 LogCallback Log::gs_logCallback = Log::DefCallback;
 
