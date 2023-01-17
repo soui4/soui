@@ -89,20 +89,21 @@ using namespace SOUI;
 //! -----------------default logger config, can change on this.-----------
 //////////////////////////////////////////////////////////////////////////
 //! default logger output file.
-const char* const LOG4Z_DEFAULT_PATH = "./log/";
+static const char* const LOG4Z_DEFAULT_PATH = "./log/";
 
-const char* const LOG4Z_DEFAULT_NAME = "soui";
+static const char* const LOG4Z_DEFAULT_NAME = "soui";
 //! default log filter level
-const int LOG4Z_DEFAULT_LEVEL = SOUI::LOG_LEVEL_DEBUG;
+static const int LOG4Z_DEFAULT_LEVEL = SOUI::LOG_LEVEL_DEBUG;
 //! default logger display
-const bool LOG4Z_DEFAULT_DISPLAY = true;
+static const bool LOG4Z_DEFAULT_DISPLAY = true;
 //! default logger output to file
-const bool LOG4Z_DEFAULT_OUTFILE = true;
+static const bool LOG4Z_DEFAULT_OUTFILE = true;
 //! default logger output file limit size, unit M byte.
-const int LOG4Z_DEFAULT_LIMITSIZE = 100;
+static const int LOG4Z_DEFAULT_LIMITSIZE = 100;
 //! default logger show suffix (file name and line number) 
-const bool LOG4Z_DEFAULT_SHOWSUFFIX = true;
+static const bool LOG4Z_DEFAULT_SHOWSUFFIX = true;
 
+static const int LOG4Z_MAX_LOG_INDEX = 5;
 
 static const char *const LOG_STRING[]=
 {
@@ -148,7 +149,7 @@ public:
     inline bool open(const char *path, const char * mod)
     {
         if (_file != NULL){fclose(_file);_file = NULL;}
-		wchar_t path2[1000],mod2[10];
+		wchar_t path2[1000]={0},mod2[10]={0};
 		MultiByteToWideChar(CP_UTF8,0,path,-1,path2,1000);
 		MultiByteToWideChar(CP_UTF8,0,mod,-1,mod2,10);
         _file = _wfopen(path2, mod2);
@@ -336,7 +337,6 @@ struct LogData
 struct LoggerInfo 
 {
     //! attribute
-    std::string _key;   //logger key
     std::string _name;    // one logger one name.
     std::string _path;    //path for log file.
     int  _level;        //filter level
@@ -347,7 +347,6 @@ struct LoggerInfo
     BOOL _fileLine;        //enable/disable the log's suffix.(file name:line number)
 
     //! runtime info
-    time_t _curFileCreateTime;    //file create time
     unsigned int _curWriteLen;  //current file length
     Log4zFileHandler    _handle;        //file handle.
     
@@ -362,8 +361,6 @@ struct LoggerInfo
 
         _limitsize = LOG4Z_DEFAULT_LIMITSIZE;
         _fileLine = LOG4Z_DEFAULT_SHOWSUFFIX;
-
-        _curFileCreateTime = 0;
         _curWriteLen = 0;
     }
 };
@@ -372,17 +369,7 @@ class OutoutFileBuilder : public TObjRefImpl<IOutputFileBuilder>
 {
 public:
 
-	STDMETHOD_(BOOL,monthDir)(THIS) SCONST OVERRIDE
-    {
-        return false;
-    }
-
-	STDMETHOD_(BOOL,dayLog)(THIS) SCONST OVERRIDE
-    {
-        return false;
-    }
-
-	STDMETHOD_(BOOL,buildOutputFile)(THIS_ char *pszFileName,int nLen,tm time,const char * pszLogName,unsigned long pid,int curFileIndex) SCONST OVERRIDE
+	STDMETHOD_(BOOL,buildOutputFile)(THIS_ char *pszFileName,int nLen,const char * pszLogName,unsigned long pid,int curFileIndex) SCONST OVERRIDE
     {
         sprintf_s(pszFileName,nLen,"%s-%d.log",pszLogName,curFileIndex);
         return true;
@@ -453,8 +440,7 @@ private:
     unsigned int _pid;
     std::string _proName;
     
-    // the last used id of _loggers
-    LoggerInfo _loggers;
+    LoggerInfo _loggerInfo;
 
     //! log queue
     std::list<LogData *> _logs;
@@ -462,15 +448,6 @@ private:
 
     //show color lock
     LockHelper _scLock;
-    //status statistics
-    //write file
-    unsigned long long _ullStatusTotalWriteFileCount;
-    unsigned long long _ullStatusTotalWriteFileBytes;
-
-    //Log queue statistics
-    unsigned long long _ullStatusTotalPushLog;
-    unsigned long long _ullStatusTotalPopLog;
-
     SAutoRefPtr<IOutputFileBuilder> m_pOutputFileBuilder;
 };
 
@@ -783,7 +760,9 @@ static bool parseConfigFromString(std::string content, LoggerInfo & outInfo)
 bool isDirectory(std::string path)
 {
 #if defined (WIN32) || defined(_WIN64)
-    return PathIsDirectoryA(path.c_str()) ? true : false;
+	wchar_t szPath[1000]={0};
+	MultiByteToWideChar(CP_UTF8,0,path.c_str(),path.length(),szPath,1000);
+    return PathIsDirectoryW(szPath) ? true : false;
 #else
     DIR * pdir = opendir(path.c_str());
     if (pdir == NULL)
@@ -815,7 +794,9 @@ bool createRecursionDir(std::string path)
         {
             bool ret = false;
 #if defined (WIN32) || defined(_WIN64)
-            ret = CreateDirectoryA(cur.c_str(), NULL) ? true : false;
+			wchar_t szPath[1000]={0};
+			MultiByteToWideChar(CP_UTF8,0,cur.c_str(),cur.length(),szPath,1000);
+            ret = CreateDirectoryW(szPath, NULL) ? true : false;
 #else
             ret = (mkdir(cur.c_str(), S_IRWXU|S_IRWXG|S_IRWXO) == 0);
 #endif
@@ -1119,15 +1100,10 @@ LogerManager::LogerManager()
 {
     _runing = false;
 
-    _ullStatusTotalPushLog = 0;
-    _ullStatusTotalPopLog = 0;
-    _ullStatusTotalWriteFileCount = 0;
-    _ullStatusTotalWriteFileBytes = 0;
-    
     _pid = getProcessID();
     _proName = getProcessName();
-    _loggers._enable = true;
-    _loggers._name = "soui4";
+    _loggerInfo._enable = true;
+    _loggerInfo._name = "soui4";
     m_pOutputFileBuilder.Attach(new OutoutFileBuilder());
 }
 
@@ -1178,13 +1154,13 @@ BOOL LogerManager::config(const char* configPath)
         std::cout << " !!! !!! !!! !!!" << std::endl;
         return false;
     }
-    return parseConfigFromString(f.readContent().c_str(),_loggers);
+    return parseConfigFromString(f.readContent().c_str(),_loggerInfo);
 }
 
 //! read configure and create with overwriting
 BOOL LogerManager::configFromString(const char* configContent)
 {
-    return parseConfigFromString(configContent,_loggers);
+    return parseConfigFromString(configContent,_loggerInfo);
 }
 
 
@@ -1209,11 +1185,11 @@ BOOL LogerManager::stop()
 
 BOOL LogerManager::prePushLog(int level)
 {
-    if (!_runing || !_loggers._enable)
+    if (!_runing || !_loggerInfo._enable)
     {
         return false;
     }
-    if (level < _loggers._level)
+    if (level < _loggerInfo._level)
     {
         return false;
     }
@@ -1272,30 +1248,29 @@ BOOL LogerManager::pushLog(int level, const char * filter, const char * log, con
     
     AutoLock l(_logLock);
     _logs.push_back(pLog);
-    _ullStatusTotalPushLog ++;
     return true;
 }
 
 
 BOOL LogerManager::enableLogger(BOOL enable)
 {
-    _loggers._enable = enable;
+    _loggerInfo._enable = enable;
     return TRUE;
 }
 BOOL LogerManager::setLoggerLevel(int level)
 {
     if (level < LOG_LEVEL_TRACE || level >LOG_LEVEL_FATAL) return FALSE;
-    _loggers._level = level;
+    _loggerInfo._level = level;
     return TRUE;
 }
 BOOL LogerManager::setLoggerDisplay(BOOL enable)
 {
-    _loggers._display = enable;
+    _loggerInfo._display = enable;
     return TRUE;
 }
 BOOL LogerManager::setLoggerOutFile(BOOL enable)
 {
-    _loggers._outfile = enable;
+    _loggerInfo._outfile = enable;
     return TRUE;
 }
 
@@ -1308,19 +1283,19 @@ void LogerManager::setOutputFileBuilder(IOutputFileBuilder *pOutputFileBuilder)
 BOOL LogerManager::setLoggerLimitsize(unsigned int limitsize)
 {
     if (limitsize == 0 ) {limitsize = (unsigned int)-1;}
-    _loggers._limitsize = limitsize;
+    _loggerInfo._limitsize = limitsize;
     return TRUE;
 }
 BOOL LogerManager::setLoggerFileLine( BOOL enable)
 {
-    _loggers._fileLine = enable;
+    _loggerInfo._fileLine = enable;
     return TRUE;
 }
 
 BOOL LogerManager::setLoggerName(const char * name)
 {
 	AutoLock l(_hotLock);
-	_loggers._name = name;
+	_loggerInfo._name = name;
 	return TRUE;
 }
 
@@ -1345,19 +1320,19 @@ BOOL LogerManager::setLoggerPath(const char * path)
     }
 
     AutoLock l(_hotLock);
-	_loggers._path = copyPath;
+	_loggerInfo._path = copyPath;
     return TRUE;
 }
 
 
 BOOL LogerManager::isLoggerEnable() const
 {
-    return _loggers._enable;
+    return _loggerInfo._enable;
 }
 
 bool LogerManager::openLogger(LogData * pLog)
 {
-    LoggerInfo * pLogger = &_loggers;
+    LoggerInfo * pLogger = &_loggerInfo;
     if (!pLogger->_enable || !pLogger->_outfile || pLog->_level < pLogger->_level)
     {
         return false;
@@ -1373,59 +1348,51 @@ bool LogerManager::openLogger(LogData * pLog)
 
 		std::string name = pLogger->_name;
 		char buf[MAX_PATH];
-		tm t = timeToTm(pLogger->_curFileCreateTime);
-
 		const int KMaxLogIndex = 5;
-		m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,t,name.c_str(),_pid,KMaxLogIndex);        		
+		m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,name.c_str(),_pid,KMaxLogIndex);        		
 		std::string path = pLogger->_path+buf;
 		remove(path.c_str());
 		for(int i=KMaxLogIndex;i>0;i--)//max to 5 log index.
 		{
-			m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,t,name.c_str(),_pid,i-1);        		
+			m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,name.c_str(),_pid,i-1);        		
 			std::string pathOld = pLogger->_path+buf;
-			m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,t,name.c_str(),_pid,i);        		
+			m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,name.c_str(),_pid,i);        		
 			std::string pathNew = pLogger->_path+buf;
 			rename(pathOld.c_str(),pathNew.c_str());
 		}
     }
     if (!pLogger->_handle.isOpen())
     {
-        pLogger->_curFileCreateTime = pLog->_time;
         pLogger->_curWriteLen = 0;
 
-        tm t = timeToTm(pLogger->_curFileCreateTime);
         std::string name;
         std::string path;
         _hotLock.lock();
         name = pLogger->_name;
         path = pLogger->_path;
         _hotLock.unLock();
-        
-        char buf[MAX_PATH] = { 0 };
-        if (!isDirectory(path))
-        {
-            createRecursionDir(path);
-        }
-        
-        m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,t,name.c_str(),_pid,0);        
+		if (!isDirectory(path))
+		{
+			createRecursionDir(path);
+		}
+        char buf[MAX_PATH] = { 0 };        
+        m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,name.c_str(),_pid,0);        
         path += buf;
-
-        pLogger->_handle.open(path.c_str(), "ab");
-        if (!pLogger->_handle.isOpen())
-        {
-            pLogger->_outfile = false;
-            return false;
-        }
+		pLogger->_handle.open(path.c_str(), "ab");
+		if (!pLogger->_handle.isOpen())
+		{
+			pLogger->_outfile = false;
+			return false;
+		}
 		pLogger->_curWriteLen = pLogger->_handle.size();
-    }
+	}
     return true;
 }
 bool LogerManager::closeLogger()
 {
-    LoggerInfo * pLogger = &_loggers;
-    if (pLogger->_handle.isOpen())
+    if (_loggerInfo._handle.isOpen())
     {
-        pLogger->_handle.close();
+        _loggerInfo._handle.close();
         return true;
     }
     return false;
@@ -1446,13 +1413,13 @@ void LogerManager::run()
 {
     _runing = true;
     pushLog(LOG_LEVEL_ALARM, "logger", "-----------------  log4z thread started!   ----------------------------", __FILE__, __LINE__ , __FUNCTION__,_ReturnAddress());
-	if (_loggers._enable)
+	if (_loggerInfo._enable)
 	{
 		std::stringstream ss;
-		ss  <<" name=" <<_loggers._name
-			<<" path=" <<_loggers._path
-			<<" level=" << _loggers._level
-			<<" display=" << _loggers._display;
+		ss  <<" name=" <<_loggerInfo._name
+			<<" path=" <<_loggerInfo._path
+			<<" level=" << _loggerInfo._level
+			<<" display=" << _loggerInfo._display;
 		pushLog(LOG_LEVEL_ALARM, "logger", ss.str().c_str(), __FILE__, __LINE__ , __FUNCTION__,_ReturnAddress());
 	}
 
@@ -1466,10 +1433,8 @@ void LogerManager::run()
     {
         while(popLog(pLog))
         {
-            //
-            _ullStatusTotalPopLog ++;
             //discard
-            if (!_loggers._enable || pLog->_level <_loggers._level  )
+            if (!_loggerInfo._enable || pLog->_level <_loggerInfo._level  )
             {
                 delete pLog;
                 pLog = NULL;
@@ -1480,7 +1445,7 @@ void LogerManager::run()
 			//format log
 			{
 				tm tt = timeToTm(pLog->_time/1000);
-				if (pLog->_file.empty() || !_loggers._fileLine)
+				if (pLog->_file.empty() || !_loggerInfo._fileLine)
 				{
 #if defined (WIN32) || defined(_WIN64)
 
@@ -1548,7 +1513,7 @@ void LogerManager::run()
 
 			}
 
-            if (_loggers._display)
+            if (_loggerInfo._display)
             {
                 showColorText(pszBuf, pLog->_level);
 #if defined (WIN32) || defined(_WIN64)
@@ -1556,7 +1521,7 @@ void LogerManager::run()
 #endif
             }
 
-            if (_loggers._outfile)
+            if (_loggerInfo._outfile)
             {
                 if (!openLogger(pLog))
                 {
@@ -1565,29 +1530,22 @@ void LogerManager::run()
                     continue;
                 }
 
-                _loggers._handle.write(pszBuf, nContentLen);
-                _loggers._curWriteLen += (unsigned int)nContentLen;
+                _loggerInfo._handle.write(pszBuf, nContentLen);
+                _loggerInfo._curWriteLen += (unsigned int)nContentLen;
                 needFlush ++;
-                _ullStatusTotalWriteFileCount++;
-                _ullStatusTotalWriteFileBytes += nContentLen;
-            }
-            else
-            {
-                _ullStatusTotalWriteFileCount++;
-                _ullStatusTotalWriteFileBytes += nContentLen;
             }
 
             delete pLog;
             pLog = NULL;
         }
-		if (_loggers._enable && needFlush > 0)
+		if (_loggerInfo._enable && needFlush > 0)
 		{
-			_loggers._handle.flush();
+			_loggerInfo._handle.flush();
 			needFlush = 0;
 		}
-		if(!_loggers._enable && _loggers._handle.isOpen())
+		if(!_loggerInfo._enable && _loggerInfo._handle.isOpen())
 		{
-			_loggers._handle.close();
+			_loggerInfo._handle.close();
 		}
 
 		//! delay. 
