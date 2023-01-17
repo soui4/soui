@@ -13,7 +13,7 @@ void Log::DefCallback(const char *tag, const char *pLogStr, int level, const cha
 {
     SApplication *theApp = SApplication::getSingletonPtr();
     ILogMgr *pLogMgr = theApp ? theApp->GetLogManager() : NULL;
-    bool bLog = false;
+    BOOL bLog = false;
     if (pLogMgr && pLogMgr->prePushLog(level))
     {
         bLog = pLogMgr->pushLog(level, tag, pLogStr, file, line, fun, retAddr);
