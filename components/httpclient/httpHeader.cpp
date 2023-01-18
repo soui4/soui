@@ -76,7 +76,7 @@ void CHttpHeader::setRange(__int64 range)
 		return;
 	}
 	char buffer[64] = { 0 };
-	sprintf_s(buffer, "bytes=%i64d-", range);
+	sprintf_s(buffer, "bytes=%lld-", range);
 	http_headers.insert(std::make_pair(HEADER_RANGE, std::string(buffer)));
 }
 

@@ -2167,8 +2167,7 @@ namespace SOUI
 		{
 			paint.setFilterBitmap(false);
 			paint.setColor(m_cr);
-		}
-		if(m_brushType == Brush_Bitmap){
+		}else if(m_brushType == Brush_Bitmap){
 			paint.setShader(SkShader::CreateBitmapShader(m_bmp,m_xtm,m_ytm))->unref();
 		}else//if(m_brushType == Brush_Shader)
 		{
