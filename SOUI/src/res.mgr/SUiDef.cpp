@@ -404,6 +404,7 @@ ISkinObj *SUiDef::GetSkin(const SStringW &strSkinName, int nScale)
 		{
 			IUiDefInfo * pUiInfo = m_lstUiDefInfo.GetPrev(pos);
 			SSkinPool *pSkinPool = pUiInfo->GetSkinPool();
+			if(!pSkinPool) continue;
 			if (ISkinObj *pSkin = pSkinPool->GetSkin(strSkinName, nScale))
 			{
 				return pSkin;
@@ -444,6 +445,7 @@ SXmlNode SUiDef::GetStyle(const SStringW & strName)
 	{
 		IUiDefInfo * pUiInfo = m_lstUiDefInfo.GetPrev(pos);
 		SStylePool *pStylePool = pUiInfo->GetStylePool();
+		if(!pStylePool) continue;
 		SXmlNode style = pStylePool->GetStyle(strName);
 		if (style)
 			return style;
@@ -458,8 +460,9 @@ SStringW SUiDef::GetTemplateString(const SStringW &strName)
 	while (pos)
 	{
 		IUiDefInfo * pUiInfo = m_lstUiDefInfo.GetPrev(pos);
-		STemplatePool *pStylePool = pUiInfo->GetTemplatePool();
-		SStringW strRet = pStylePool->GetTemplateString(strName);
+		STemplatePool *pPool = pUiInfo->GetTemplatePool();
+		if(!pPool) continue;
+		SStringW strRet = pPool->GetTemplateString(strName);
 		if (!strRet.IsEmpty())
 			return strRet;
 	}
