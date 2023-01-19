@@ -812,8 +812,7 @@ void SPropertyGrid::SetOrderType(SPropertyGrid::ORDERTYPE type)
         }
     }
 }
-
-LRESULT SPropertyGrid::OnAttrOrderType(const SStringW &strValue, BOOL bLoading)
+HRESULT SPropertyGrid::OnAttrOrderType(const SStringW &strValue, BOOL bLoading)
 {
     ORDERTYPE orderType;
     if (strValue.CompareNoCase(L"name") == 0)

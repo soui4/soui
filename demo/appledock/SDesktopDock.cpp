@@ -2,6 +2,8 @@
 #include "SDesktopDock.h"
 #include <math.h>
 #include <ShellAPI.h>
+#pragma warning(disable : 4244)
+
 /*
 by 多点
 @20150510 qq:4361031

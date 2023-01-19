@@ -2,6 +2,7 @@
 #include "SByteArray.h"
 #include <ctype.h>
 #include <algorithm>
+#pragma warning(disable : 4267)
 
 namespace SOUI
 {

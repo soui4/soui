@@ -1096,7 +1096,7 @@ error:
 }
 
 // We roll our own string to float because the std library one uses locale and messes things up.
-static double nsvg__atof(const char* s)
+static float nsvg__atof(const char* s)
 {
 	char* cur = (char*)s;
 	char* end = NULL;
@@ -1139,7 +1139,7 @@ static double nsvg__atof(const char* s)
 
 	// A valid number should have integer or fractional part.
 	if (!hasIntPart && !hasFracPart)
-		return 0.0;
+		return 0.0f;
 
 	// Parse optional exponent
 	if (*cur == 'e' || *cur == 'E') {
@@ -1151,7 +1151,7 @@ static double nsvg__atof(const char* s)
 		}
 	}
 
-	return res * sign;
+	return (float)(res * sign);
 }
 
 

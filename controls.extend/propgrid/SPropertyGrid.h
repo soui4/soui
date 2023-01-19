@@ -82,7 +82,7 @@ namespace SOUI
 		void EnumProp(FunEnumProp funEnum,void* opaque);
 
 	protected:
-		LRESULT OnAttrOrderType(const SStringW &strValue,BOOL bLoading);
+		HRESULT OnAttrOrderType(const SStringW &strValue,BOOL bLoading);
 
 		SOUI_ATTRS_BEGIN()
 			ATTR_INT(L"titleWidth",m_nTitleWidth,TRUE)

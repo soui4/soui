@@ -91,7 +91,7 @@ class SNamedValue {
     }
 
 	UINT GetCount() const{
-		return m_lstNamedValue.GetCount();
+		return (UINT)m_lstNamedValue.GetCount();
 	}
   protected:
     static int Compare(const void *p1, const void *p2)
