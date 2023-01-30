@@ -24,8 +24,23 @@ DECLARE_INTERFACE_(ITimer, IObjRef)
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     //////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(UINT,StartTimer)(THIS_ int nElapse,BOOL bRepeat) PURE;
 
+	/**
+     * StartTimer
+     * @brief    启动定时器
+     * @param    int nElapse --  延时(ms)
+	 * @param    BOOL bRepeat -- 重复标志
+     * @return   BOOL, TRUE--成功
+     * Describe
+     */
+	STDMETHOD_(BOOL,StartTimer)(THIS_ int nElapse,BOOL bRepeat) PURE;
+
+	/**
+     * KillTimer
+     * @brief    停止定时器
+     * @return   void
+     * Describe
+     */
 	STDMETHOD_(void,KillTimer)(THIS) PURE;
 };
 

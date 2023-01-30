@@ -2775,15 +2775,16 @@ DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
     //////////////////////////////////////////////////////////////////////////
 
 	/**
-     * STabPage::GetTitle
+     * GetTitle
      * @brief    获取标题
      * @return   LPCTSTR --- 标题
      *
      * Describe  获取标题
      */
     STDMETHOD_(LPCTSTR,GetTitle)(CTHIS) SCONST PURE;
+
     /**
-     * STabPage::SetTitle
+     * SetTitle
      * @brief    设置标题
      * @param    LPCTSTR lpszTitle --- 标题
      *
@@ -2791,8 +2792,19 @@ DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
      */
     STDMETHOD_(void,SetTitle)(THIS_ LPCTSTR lpszTitle) PURE;
 
+    /**
+     * GetIconIndex
+     * @brief    获取图标索引
+     * @return   int, 图标索引
+     */
     STDMETHOD_(int,GetIconIndex)(CTHIS) SCONST PURE;
 
+    /**
+     * SetIconIndex
+     * @brief    设置图标索引
+	 * @param    int iIcon -- 图标索引
+     * @return   void
+     */
     STDMETHOD_(void,SetIconIndex)(THIS_ int iIcon) PURE;
 };
 
@@ -2828,7 +2840,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * STabCtrl::GetCurSel
+     * ITabCtrl::GetCurSel
      * @brief    获取当前选中
      * @return   返回int
      *
@@ -2837,7 +2849,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     STDMETHOD_(int, GetCurSel)(CTHIS) SCONST PURE;
 
     /**
-     * STabCtrl::SetCurSel
+     * ITabCtrl::SetCurSel
      * @brief    设置当前选中
      * @param    int nIndex -- 索引
      * @return   返回BOOL
@@ -2847,7 +2859,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     STDMETHOD_(BOOL, SetCurSel)(THIS_ int nIndex) PURE;
 
     /**
-     * STabCtrl::SetItemTitle
+     * ITabCtrl::SetItemTitle
      * @brief    设置标题
      * @param    int nIndex  -- 索引
      * @param    LPCTSTR lpszTitle  -- 标题
@@ -2858,7 +2870,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     STDMETHOD_(BOOL, SetItemTitle)(THIS_ int nIndex, LPCTSTR lpszTitle) PURE;
 
     /**
-     * STabCtrl::InsertItem
+     * ITabCtrl::InsertItem
      * @brief    插入tab页面
      * @param    LPCWSTR lpContent  -- XML描述的page信息
      * @param    int iInsert  -- 位置
@@ -2869,7 +2881,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     STDMETHOD_(int, InsertItem)(THIS_ LPCWSTR lpContent, int iInsert /* = -1*/) PURE;
 
     /**
-     * STabCtrl::GetItemCount
+     * ITabCtrl::GetItemCount
      * @brief    获取tab页面数
      * @return   返回int
      *
@@ -2878,7 +2890,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     STDMETHOD_(int, GetItemCount)(CTHIS) SCONST PURE;
 
     /**
-     * STabCtrl::GetItem
+     * ITabCtrl::GetItem
      * @brief    获取指定tab页面
      * @param    int nIndex -- 索引
      * @return   返回int
@@ -2888,7 +2900,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     STDMETHOD_(ITabPage *, GetPage)(THIS_ int nIndex) PURE;
 
     /**
-     * STabCtrl::RemoveItem
+     * ITabCtrl::RemoveItem
      * @brief    删除指定tab页面
      * @param    int nIndex -- 索引
      * @param    int nSelPage -- 选中页面
@@ -2899,7 +2911,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     STDMETHOD_(BOOL, RemoveItem)(THIS_ int nIndex, int iSelPage /*= 0*/) PURE;
 
     /**
-     * STabCtrl::RemoveAllItems
+     * ITabCtrl::RemoveAllItems
      * @brief    删除所有页面
      *
      * Describe  删除所有页面
@@ -2907,7 +2919,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     STDMETHOD_(void, RemoveAllItems)(THIS) PURE;
 
     /**
-     * STabCtrl::GetPageIndex
+     * ITabCtrl::GetPageIndex
      * @brief    获取指定页面的索引
      * @param    LPCTSTR pszName -- 查询字符串
      * @param    BOOL bTitle --
@@ -2948,7 +2960,20 @@ DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560"){
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 获取提示字符串
+	 * @param[out] IStringT *pStr--提示字符串
+     * @return void
+	 * @remark 设置使用SetAttribute
+     */
 	STDMETHOD_(void,GetCueText)(CTHIS_ IStringT *pStr) SCONST PURE;
+
+    /**
+     * @brief 获取提示字符串颜色
+     * @return COLORREF--提示字符串颜色
+	 * @remark 设置使用SetAttribute
+     */
 	STDMETHOD_(COLORREF,GetCueColor)(CTHIS) SCONST PURE;
 };
 

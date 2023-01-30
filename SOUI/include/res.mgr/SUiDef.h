@@ -91,12 +91,49 @@ class SOUI_EXP SUiDef : public SSingleton2<SUiDef> {
     ~SUiDef(void);
 
 public:
+	/**
+     * InitDefUiDef
+     * @brief    初始化默认UiDef
+     * @param    IResProvider *pResProvider --  定义uidef的资源包
+	 * @param    LPCTSTR pszUiDef --  定义uidef的资源ID
+     * @return   BOOL, TRUE--成功
+     * Describe
+     */
 	BOOL InitDefUiDef(IResProvider *pResProvider, LPCTSTR pszUiDef);
 
+	/**
+     * GetUiDef
+     * @brief    获取默认UiDef
+     * @return   IUiDefInfo * --默认uidef
+     * Describe
+     */
     IUiDefInfo *GetUiDef();
+
+	/**
+     * SetUiDef
+     * @brief    设置默认UiDef
+	 * @param    IUiDefInfo * --默认uidef
+	 * @param    bool bUpdateDefFont --更新默认字体标志
+     * @return   void
+     * Describe
+     */
     void SetUiDef(IUiDefInfo *pUiDefInfo, bool bUpdateDefFont);
 public:
+    /**
+     * PushUiDefInfo
+     * @brief    Push一个UiDef对象
+	 * @param    IUiDefInfo * --新的uidef
+     * @return   void
+     * Describe soui的uidef对象是一个列表,每一个界面可以有自己的uidef对象
+     */
 	void PushUiDefInfo(IUiDefInfo *pUiDefInfo);
+
+	/** PushUiDefInfo
+	* @brief    Pop一个UiDef对象
+	* @param    IUiDefInfo * --新的uidef
+	* @return   BOOL, TRUE--成功
+	* Describe soui的uidef对象是一个列表,每一个界面可以有自己的uidef对象
+	*/
 	BOOL PopUiDefInfo(IUiDefInfo *pUiDefInfo);
 
 	/**

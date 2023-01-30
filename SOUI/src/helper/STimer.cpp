@@ -13,10 +13,11 @@ STimer::~STimer(void)
 	KillTimer();
 }
 
-UINT STimer::StartTimer(THIS_ int nElapse,BOOL bRepeat)
+BOOL STimer::StartTimer(THIS_ int nElapse,BOOL bRepeat)
 {
+	KillTimer();
 	m_uTimerId = STimerGenerator::getSingletonPtr()->SetTimer(m_evtSlot,nElapse,bRepeat);
-	return m_uTimerId;
+	return m_uTimerId !=0;
 }
 
 void STimer::KillTimer(THIS)

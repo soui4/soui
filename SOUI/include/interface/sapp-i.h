@@ -256,19 +256,43 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 
     /**
      * @brief 从资源加载数值动画资源
+	 * @param strResId LPCTSTR--动画资源ID
      * @return IValueAnimator* 数值动画对象
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) PURE;
 	STDMETHOD_(IValueAnimator *, LoadValueAnimatorA)(THIS_ LPCSTR strResId) PURE;
 
+    /**
+     * @brief 从资源加载图片
+	 * @param strResId LPCTSTR--图片资源ID
+     * @return IBitmapS* 图片对象
+     * @remark 使用完成后调用Rlease释放
+     */
 	STDMETHOD_(IBitmapS *,LoadImage)(THIS_ LPCTSTR strResId) PURE;
 	STDMETHOD_(IBitmapS *,LoadImageA)(THIS_ LPCSTR strResId) PURE;
 
+    /**
+     * @brief 从资源加载翻译包
+	 * @param strResId LPCTSTR--翻译包资源ID
+     * @return ITranslator* 翻译包对象
+     * @remark 使用完成后调用Rlease释放
+     */
 	STDMETHOD_(ITranslator *,LoadTranslator)(THIS_ LPCTSTR strResId) PURE;
 	STDMETHOD_(ITranslator *,LoadTranslatorA)(THIS_ LPCSTR strResId) PURE;
 
+    /**
+     * @brief 使用翻译包
+	 * @param ITranslator * trModule--翻译包
+     * @return BOOL, TRUE--成功
+     */
 	STDMETHOD_(BOOL,InstallTranslator)(THIS_ ITranslator * trModule) PURE;
+
+	/**
+     * @brief 卸载翻译包
+	 * @param REFGUID langId--翻译包ID
+     * @return BOOL, TRUE--成功
+     */
 	STDMETHOD_(BOOL,UnnstallTranslator)(THIS_  REFGUID langId) PURE;
 
 	/**
@@ -302,13 +326,49 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      */
 	STDMETHOD_(void,SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) PURE;
 
+	/**
+     * @brief 注册扩展对象
+	 * @param const IObjectFactory *objFac -- 对象类厂
+	 * @param BOOL bReplace -- 替换已有类厂标志
+     * @return BOOL, TRUE--成功
+     */
 	STDMETHOD_(BOOL,RegisterObjFactory)(THIS_ const IObjectFactory *objFac,BOOL bReplace DEF_VAL(FALSE)) PURE;
+
+	/**
+     * @brief 反注册扩展对象
+	 * @param const IObjectFactory *objFac -- 对象类厂
+     * @return BOOL, TRUE--成功
+     */
 	STDMETHOD_(BOOL,UnregisterObjFactory)(THIS_ const IObjectFactory *objFac) PURE;
 
+	/**
+     * @brief 设置默认字体
+	 * @param LPCWSTR pszFontInfo -- 字体描述, 参考fontpool
+     * @return void
+     */
 	STDMETHOD_(void,SetDefaultFontInfo)(THIS_ LPCWSTR pszFontInfo) PURE;
 
+	/**
+     * @brief 创建TaskLoop对象
+	 * @param int nCount -- taskloop对象数量
+	 * @param Priority priority -- taskloop的线程优先级
+	 * @param BOOL bAutoStart -- 自动启动标志
+     * @return BOOL, TRUE--成功
+     */
 	STDMETHOD_(BOOL,CreateTaskLoop)(THIS_ int nCount,Priority priority,BOOL bAutoStart DEF_VAL(TRUE)) PURE;
+
+	/**
+     * @brief 获取TaskLoop对象
+	 * @param int iTaskLoop -- taskloop索引
+     * @return ITaskLoop * -- taskloop接口,失败返回NULL
+     */
 	STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) PURE;
+
+	/**
+     * @brief 设置创建TaskLoop对象的回调接口
+	 * @param FunCrateTaskLoop cbCreateTaskLoop -- 创建TaskLoop对象的回调接口
+     * @return void
+     */
 	STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) PURE;
 
 	 /**
