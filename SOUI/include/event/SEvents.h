@@ -38,6 +38,7 @@ typedef enum _SOUI_EVENTS
     EVT_SIZE,
     EVT_VISIBLECHANGED,
     EVT_STATECHANGED,
+	EVT_CAPTURECHANGED,
     EVT_LBUTTONDOWN,
     EVT_LBUTTONUP,
     EVT_UPDATE_TOOLTIP,
@@ -262,35 +263,35 @@ class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
 #define DEF_EVT(evt, id, name, x) DEF_EVENT(evt, id, name, x, SOUI_EXP)
 #define DEF_EVT_EXT(evt, id, x)   DEF_EVENT(evt, id, on_##evt, x, )
 
-DEF_EVT(EventInit, EVT_INIT, on_init, { int fake; });
+DEF_EVT(EventInit, EVT_INIT, on_init, { int fake; })
 
-DEF_EVT(EventExit, EVT_EXIT, on_exit, { int fake; });
+DEF_EVT(EventExit, EVT_EXIT, on_exit, { int fake; })
 
-DEF_EVT(EventTimer, EVT_TIMER, on_timer, { UINT uID; });
+DEF_EVT(EventTimer, EVT_TIMER, on_timer, { UINT uID; })
 
 DEF_EVT(EventScroll, EVT_SCROLL, on_scroll, {
     int nSbCode;
     int nPos;
     BOOL bVertical;
-});
+})
 
 DEF_EVT(EventSpinValue2String, EVT_SPIN_VALUE2STRING, on_spin_valuetostring, {
     BOOL bInit;
     int nValue;
     IStringT *strValue;
-});
+})
 
-DEF_EVT(EventSwndCreate, EVT_CREATE, on_create, { int fake; });
-DEF_EVT(EventSwndInitFinish, EVT_INIT_FINISH, on_init_finish, { int fake; });
-DEF_EVT(EventSwndDestroy, EVT_DESTROY, on_destroy, { int fake; });
+DEF_EVT(EventSwndCreate, EVT_CREATE, on_create, { int fake; })
+DEF_EVT(EventSwndInitFinish, EVT_INIT_FINISH, on_init_finish, { int fake; })
+DEF_EVT(EventSwndDestroy, EVT_DESTROY, on_destroy, { int fake; })
 
-DEF_EVT(EventSwndSize, EVT_SIZE, on_size, { SIZE szWnd; });
-DEF_EVT(EventSwndPos, EVT_POS, on_pos, { RECT rcWnd; });
+DEF_EVT(EventSwndSize, EVT_SIZE, on_size, { SIZE szWnd; })
+DEF_EVT(EventSwndPos, EVT_POS, on_pos, { RECT rcWnd; })
 
 DEF_EVT(EventSwndStateChanged, EVT_STATECHANGED, on_state_changed, {
     DWORD dwOldState;
     DWORD dwNewState;
-});
+})
 
 #ifdef __cplusplus
 inline BOOL EventSwndStateChanged_CheckState(EventSwndStateChanged *pEvt, DWORD dwState)
@@ -298,6 +299,8 @@ inline BOOL EventSwndStateChanged_CheckState(EventSwndStateChanged *pEvt, DWORD 
     return (pEvt->dwOldState & dwState) != (pEvt->dwNewState & dwState);
 }
 #endif
+
+DEF_EVT(EventSwndCaptureChanged, EVT_CAPTURECHANGED, on_capture_changed, {BOOL bCaptured;})
 
 DEF_EVT(EventSwndVisibleChanged, EVT_VISIBLECHANGED, on_visible_changed, { BOOL bVisible; })
 
@@ -310,252 +313,252 @@ DEF_EVT(EventKeyDown, EVT_KEYDOWN, on_key_down, {
     UINT nChar;
     UINT nFlags;
     BOOL bCancel;
-});
+})
 
-DEF_EVT(EventSwndMouseLeave, EVT_MOUSE_LEAVE, on_mouse_leave, { int fake; });
+DEF_EVT(EventSwndMouseLeave, EVT_MOUSE_LEAVE, on_mouse_leave, { int fake; })
 
-DEF_EVT(EventSwndMouseHover, EVT_MOUSE_HOVER, on_mouse_hover, { int fake; });
+DEF_EVT(EventSwndMouseHover, EVT_MOUSE_HOVER, on_mouse_hover, { int fake; })
 
 DEF_EVT(EventSwndUpdateTooltip, EVT_UPDATE_TOOLTIP, on_update_tooltip, {
     IStringT *strToolTip;
     BOOL bUpdated;
-});
+})
 
-DEF_EVT(EventRadioGroupCheckChanged, EVT_RADIOGROUP_CHECK_CHANGED, on_radiogroup_check_changed, { IWindow *pChecked; });
+DEF_EVT(EventRadioGroupCheckChanged, EVT_RADIOGROUP_CHECK_CHANGED, on_radiogroup_check_changed, { IWindow *pChecked; })
 
 DEF_EVT(EventItemPanelRclick, EVT_ITEMPANEL_RCLICK, on_itemparem_rclick, {
     WPARAM wParam;
     LPARAM lParam;
-});
+})
 
 DEF_EVT(EventItemPanelDbclick, EVT_ITEMPANEL_DBCLICK, on_itempanel_dbclick, {
     WPARAM wParam;
     LPARAM lParam;
-});
+})
 
 DEF_EVT(EventItemPanelClick, EVT_ITEMPANEL_CLICK, on_itempanel_click, {
     WPARAM wParam;
     LPARAM lParam;
-});
+})
 
 DEF_EVT(EventItemPanelRclickUp, EVT_ITEMPANEL_RCLICK_UP, on_itemparem_rclick_up, {
     WPARAM wParam;
     LPARAM lParam;
-});
+})
 
 DEF_EVT(EventItemPanelClickUp, EVT_ITEMPANEL_CLICK_UP, on_itempanel_click_up, {
     WPARAM wParam;
     LPARAM lParam;
-});
+})
 
 DEF_EVT(EventItemPanelHover, EVT_ITEMPANEL_HOVER, on_itempanel_hover, {
     WPARAM wParam;
     LPARAM lParam;
-});
+})
 
 //注：在EventItemPanelLeave中从IItemPanel中通过GetItemIndex获取表项索引时需要检查索引有效性。
-DEF_EVT(EventItemPanelLeave, EVT_ITEMPANEL_LEAVE, on_itempanel_leave, { int fake; });
+DEF_EVT(EventItemPanelLeave, EVT_ITEMPANEL_LEAVE, on_itempanel_leave, { int fake; })
 
-DEF_EVT(EventLButtonDown, EVT_LBUTTONDOWN, on_mouse_lbutton_down, { POINT pt; });
+DEF_EVT(EventLButtonDown, EVT_LBUTTONDOWN, on_mouse_lbutton_down, { POINT pt; })
 
-DEF_EVT(EventLButtonUp, EVT_LBUTTONUP, on_mouse_lbutton_up, { POINT pt; });
+DEF_EVT(EventLButtonUp, EVT_LBUTTONUP, on_mouse_lbutton_up, { POINT pt; })
 
-DEF_EVT(EventCmd, EVT_CMD, on_command, { int fake; });
+DEF_EVT(EventCmd, EVT_CMD, on_command, { int fake; })
 
 DEF_EVT(EventCtxMenu, EVT_CTXMENU, on_conext_menu, {
     POINT pt;
     BOOL bCancel;
-});
+})
 
-DEF_EVT(EventSetFocus, EVT_SETFOCUS, on_set_focus, { SWND wndOld; });
+DEF_EVT(EventSetFocus, EVT_SETFOCUS, on_set_focus, { SWND wndOld; })
 
-DEF_EVT(EventKillFocus, EVT_KILLFOCUS, on_kill_focus, { SWND wndFocus; });
+DEF_EVT(EventKillFocus, EVT_KILLFOCUS, on_kill_focus, { SWND wndFocus; })
 
 DEF_EVT(EventScrollViewOriginChanged, EVT_SCROLLVIEW_ORIGINCHANGED, on_scrollview_origin_changed, {
     POINT ptOldOrigin;
     POINT ptNewOrigin;
-});
+})
 
 DEF_EVT(EventScrollViewSizeChanged, EVT_SCROLLVIEW_SIZECHANGED, on_scrollview_size_changed, {
     SIZE szOldViewSize;
     SIZE szNewViewSize;
-});
+})
 
-DEF_EVT(EventOfEvent, EVT_OFEVENT, on_event_of_event, { IEvtArgs *pOrgEvt; });
+DEF_EVT(EventOfEvent, EVT_OFEVENT, on_event_of_event, { IEvtArgs *pOrgEvt; })
 
 DEF_EVT(EventOfPanel, EVT_OFPANEL, on_event_of_panel, {
     IWindow *pPanel;
     IEvtArgs *pOrgEvt;
-});
+})
 
 DEF_EVT(EventTabSelChanging, EVT_TAB_SELCHANGING, on_tab_sel_changing, {
     UINT uOldSel;
     UINT uNewSel;
     BOOL bCancel;
-});
+})
 
 DEF_EVT(EventTabSelChanged, EVT_TAB_SELCHANGED, on_tab_sel_changed, {
     UINT uOldSel;
     UINT uNewSel;
-});
+})
 
-DEF_EVT(EventTabItemHover, EVT_TAB_ITEMHOVER, on_tab_item_hover, { int iHover; });
+DEF_EVT(EventTabItemHover, EVT_TAB_ITEMHOVER, on_tab_item_hover, { int iHover; })
 
-DEF_EVT(EventTabItemLeave, EVT_TAB_ITEMLEAVE, on_tab_item_leave, { int iLeave; });
+DEF_EVT(EventTabItemLeave, EVT_TAB_ITEMLEAVE, on_tab_item_leave, { int iLeave; })
 
 DEF_EVT(EventLBSelChanging, EVT_LB_SELCHANGING, on_listbox_sel_changing, {
     int nNewSel;
     int nOldSel;
     BOOL bCancel;
-});
+})
 
 DEF_EVT(EventLBSelChanged, EVT_LB_SELCHANGED, on_listbox_sel_changed, {
     int nNewSel;
     int nOldSel;
-});
+})
 
-DEF_EVT(EventLBDbClick, EVT_LB_DBCLICK, on_listbox_item_dbclick, { int nCurSel; });
+DEF_EVT(EventLBDbClick, EVT_LB_DBCLICK, on_listbox_item_dbclick, { int nCurSel; })
 
 DEF_EVT(EventLVSelChanged, EVT_LV_SELCHANGED, on_listview_select_changed, {
     int iOldSel; //原选中项
     int iNewSel; //新选中项
-});
+})
 
 DEF_EVT(EventLVSelChanging, EVT_LV_SELCHANGING, on_listview_select_changing, {
     int iOldSel; //原选中项
     int iNewSel; //新选中项
     BOOL bCancel;
-});
+})
 
 DEF_EVT(EventTVSelChanged, EVT_TV_SELCHANGED, on_treeview_select_changed, {
     ULONG_PTR hOldSel; //原选中项
     ULONG_PTR hNewSel; //新选中项
-});
+})
 
 DEF_EVT(EventTVSelChanging, EVT_TV_SELCHANGING, on_treeview_select_changing, {
     ULONG_PTR hOldSel; //原选中项
     ULONG_PTR hNewSel; //新选中项
     BOOL bCancel;
-});
+})
 
 DEF_EVT(EventRENotify, EVT_RE_NOTIFY, on_richedit_notify, {
     DWORD iNotify;
     LPVOID pv;
     HRESULT hr;
-});
+})
 
-DEF_EVT(EventREMenu, EVT_RE_MENU, on_richedit_menu, { UINT uCmd; });
+DEF_EVT(EventREMenu, EVT_RE_MENU, on_richedit_menu, { UINT uCmd; })
 
-DEF_EVT(EventSliderPos, EVT_SLIDER_POS, on_slider_pos, { int nPos; });
+DEF_EVT(EventSliderPos, EVT_SLIDER_POS, on_slider_pos, { int nPos; })
 
 //点击表头
-DEF_EVT(EventHeaderClick, EVT_HEADER_CLICK, on_header_click, { int iItem; });
+DEF_EVT(EventHeaderClick, EVT_HEADER_CLICK, on_header_click, { int iItem; })
 
 //表头宽度改变中
 DEF_EVT(EventHeaderItemChanging, EVT_HEADER_ITEMCHANGING, on_header_item_changing, {
     int iItem;
     int nWidth;
-});
+})
 
 //表头宽度改变
 DEF_EVT(EventHeaderItemChanged, EVT_HEADER_ITEMCHANGED, on_header_item_changed, {
     int iItem;
     int nWidth;
-});
+})
 
 //拖动表项调整位置
 DEF_EVT(EventHeaderItemSwap, EVT_HEADER_ITEMSWAP, on_header_item_swap, {
     int iOldIndex;
     int iNewIndex;
-});
+})
 
-DEF_EVT(EventHeaderRelayout, EVT_HEADER_RELAYOUT, on_header_relayout, { int fake; });
+DEF_EVT(EventHeaderRelayout, EVT_HEADER_RELAYOUT, on_header_relayout, { int fake; })
 
-DEF_EVT(EventCBSelChange, EVT_CB_SELCHANGE, on_combobox_sel_change, { int nCurSel; });
+DEF_EVT(EventCBSelChange, EVT_CB_SELCHANGE, on_combobox_sel_change, { int nCurSel; })
 
-DEF_EVT(EventCBDropdown, EVT_CB_DROPDOWN, on_combobox_dropdown, { void *pDropDown; });
+DEF_EVT(EventCBDropdown, EVT_CB_DROPDOWN, on_combobox_dropdown, { void *pDropDown; })
 
-DEF_EVT(EventCBBeforeCloseUp, EVT_CB_BEFORE_CLOSEUP, on_combobox_before_closeup, { BOOL bCloseBlock; });
+DEF_EVT(EventCBBeforeCloseUp, EVT_CB_BEFORE_CLOSEUP, on_combobox_before_closeup, { BOOL bCloseBlock; })
 
 DEF_EVT(EventLCSelChanging, EVT_LC_SELCHANGING, on_listctrl_sel_changing, {
     int nNewSel;
     int nOldSel;
     BOOL bCancel;
-});
+})
 
 DEF_EVT(EventLCSelChanged, EVT_LC_SELCHANGED, on_listctrl_sel_changed, {
     int nNewSel;
     int nOldSel;
-});
+})
 
-DEF_EVT(EventLCDbClick, EVT_LC_DBCLICK, on_listctrl_item_dbclick, { int nCurSel; });
+DEF_EVT(EventLCDbClick, EVT_LC_DBCLICK, on_listctrl_item_dbclick, { int nCurSel; })
 
 DEF_EVT(EventLCItemDeleted, EVT_LC_ITEMDELETED, on_listctrl_del_item, {
     int nItem;
     LPARAM dwData;
-});
+})
 
 DEF_EVT(EventCalendarSelDay, EVT_CALENDAR_SELDAY, on_calendar_sel_day, {
     WORD wOldDay;
     WORD wNewDay;
-});
+})
 
-DEF_EVT(EventCalendarSetDate, EVT_CALENDAR_SETDATE, on_calendar_set_date, { int fake; });
+DEF_EVT(EventCalendarSetDate, EVT_CALENDAR_SETDATE, on_calendar_set_date, { int fake; })
 
 DEF_EVT(EventCalendarExChanged, EVT_CALENDAREX_CHANGED, on_calendarex_changed, {
     WORD iNewDay;
     WORD iNewMonth;
     WORD iNewYear;
     int nBtnType; // 按钮 类型
-});
+})
 
-DEF_EVT(EventDateTimeChanged, EVT_DATETIME_CHANGED, on_datetime_changed, { SYSTEMTIME newTime; });
+DEF_EVT(EventDateTimeChanged, EVT_DATETIME_CHANGED, on_datetime_changed, { SYSTEMTIME newTime; })
 
 DEF_EVT(EventTCSelChanging, EVT_TC_SELCHANGING, on_treectrl_sel_changing, {
     HSTREEITEM hOldSel;
     HSTREEITEM hNewSel;
     BOOL bCancel;
-});
+})
 
 DEF_EVT(EventTCSelChanged, EVT_TC_SELCHANGED, on_treectrl_sel_changed, {
     HSTREEITEM hOldSel;
     HSTREEITEM hNewSel;
-});
+})
 
 DEF_EVT(EventTCCheckState, EVT_TC_CHECKSTATE, on_treectrl_item_check, {
     HSTREEITEM hItem;
     UINT uCheckState;
-});
+})
 
 DEF_EVT(EventTCExpand, EVT_TC_EXPAND, on_treectrl_item_expand, {
     HSTREEITEM hItem;
     BOOL bCollapsed;
-});
+})
 
 //双击treectrl的叶子节点 add by zhaosheng
 DEF_EVT(EventTCDbClick, EVT_TC_DBCLICK, on_treectrl_item_dbclick, {
     HSTREEITEM hItem; //双击选中的节点
     BOOL bCancel;
-});
+})
 
-DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, { RECT rcPane; });
+DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, { RECT rcPane; })
 
-DEF_EVT(EventImageAnimateStart, EVT_IMAGE_ANI_START, on_image_animate_start, { int fake; });
+DEF_EVT(EventImageAnimateStart, EVT_IMAGE_ANI_START, on_image_animate_start, { int fake; })
 
-DEF_EVT(EventImageAnimateStop, EVT_IMAGE_ANI_STOP, on_image_animate_stop, { int fake; });
+DEF_EVT(EventImageAnimateStop, EVT_IMAGE_ANI_STOP, on_image_animate_stop, { int fake; })
 
 DEF_EVT(EventSelectMenu, EVT_SELECTMENU, on_select_menu, {
     UINT nMenuId;
     void *pMenu;
-});
+})
 DEF_EVT(EventPopMenu, EVT_POPMENU, on_pop_menu, {
     UINT nMenuIndex;
     void *pMenu;
-});
+})
 
 DEF_EVT(EventSetHotKey, EVT_HOT_KEY_SET, on_hot_key_set_event, {
     WORD vKey;
     WORD wModifiers;
-});
+})
 
 SNSEND

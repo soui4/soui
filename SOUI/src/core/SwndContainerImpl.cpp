@@ -100,12 +100,18 @@ LRESULT SwndContainerImpl::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 BOOL SwndContainerImpl::OnReleaseSwndCapture()
 {
+    SWindow *pWnd = SWindowMgr::GetWindow(m_hCapture);
+    if(pWnd){
+        pWnd->OnCaptureChanged(FALSE);
+    }
     m_hCapture = NULL;
     return TRUE;
 }
 
 SWND SwndContainerImpl::OnSetSwndCapture(SWND swnd)
 {
+    if(m_hCapture == swnd)
+        return swnd;
     SWindow *pWnd = SWindowMgr::GetWindow(swnd);
     SASSERT(pWnd);
     if (pWnd->IsDisabled(TRUE))
@@ -113,6 +119,7 @@ SWND SwndContainerImpl::OnSetSwndCapture(SWND swnd)
 
     SWND hRet = m_hCapture;
     m_hCapture = swnd;
+    pWnd->OnCaptureChanged(TRUE);
     return hRet;
 }
 

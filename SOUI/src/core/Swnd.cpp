@@ -104,6 +104,7 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSwndMouseLeave));
     m_evtSet.addEvent(EVENTID(EventSwndStateChanged));
     m_evtSet.addEvent(EVENTID(EventSwndVisibleChanged));
+	m_evtSet.addEvent(EVENTID(EventSwndCaptureChanged));
     m_evtSet.addEvent(EVENTID(EventSwndUpdateTooltip));
     m_evtSet.addEvent(EVENTID(EventLButtonDown));
     m_evtSet.addEvent(EVENTID(EventLButtonUp));
@@ -445,20 +446,6 @@ IWindow *SWindow::GetIParent() const
 IWindow *SWindow::GetIRoot() const
 {
     return GetRoot();
-}
-
-BOOL SWindow::IsDescendant(const SWindow *pWnd) const
-{
-    if (!pWnd)
-        return FALSE;
-    const SWindow *pParent = GetParent();
-    while (pParent)
-    {
-        if (pParent == pWnd)
-            return TRUE;
-        pParent = pParent->GetParent();
-    }
-    return FALSE;
 }
 
 BOOL SWindow::Destroy()
@@ -2378,6 +2365,14 @@ SWND SWindow::GetCapture() const
     return GetContainer()->OnGetSwndCapture();
 }
 
+
+void SWindow::OnCaptureChanged(BOOL bCaptured)
+{
+	EventSwndCaptureChanged evt(this);
+	evt.bCaptured = bCaptured;
+	FireEvent(&evt);
+}
+
 SWND SWindow::SetCapture()
 {
     if (!GetContainer())
@@ -3387,9 +3382,18 @@ SWindow *SWindow::GetNextLayoutChild(const SWindow *pCurChild) const
     return pRet;
 }
 
-BOOL SWindow::IsIDescendant(THIS_ const IWindow *pWnd) const
+BOOL SWindow::IsDescendant(THIS_ const IWindow *pWnd) const
 {
-    return IsDescendant((const SWindow *)pWnd);
+	if (!pWnd)
+		return FALSE;
+	const IWindow *pParent = GetIParent();
+	while (pParent)
+	{
+		if (pParent == pWnd)
+			return TRUE;
+		pParent = pParent->GetIParent();
+	}
+	return FALSE;
 }
 
 BOOL SWindow::AdjustIZOrder(THIS_ IWindow *pInsertAfter)

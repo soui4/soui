@@ -374,7 +374,7 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(IWindow *, GetIRoot)(THIS) SCONST OVERRIDE;
 
-    STDMETHOD_(BOOL, IsIDescendant)(THIS_ const IWindow *pWnd) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, IsDescendant)(THIS_ const IWindow *pWnd) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, AdjustIZOrder)(THIS_ IWindow *pInsertAfter) OVERRIDE;
 
@@ -489,8 +489,6 @@ class SOUI_EXP SWindow
     SWindow *GetRoot() const;
 
     SWindow *GetNextLayoutChild(const SWindow *pCurChild) const;
-
-    BOOL IsDescendant(const SWindow *pWnd) const;
 
     /**
      * AdjustZOrder
@@ -735,6 +733,7 @@ class SOUI_EXP SWindow
     virtual void OnStateChanging(DWORD dwOldState, DWORD dwNewState);
     virtual void OnStateChanged(DWORD dwOldState, DWORD dwNewState);
 
+	virtual void OnCaptureChanged(BOOL bCaptured);
     /**
      * OnRelayout
      * @brief    窗口位置发生变化

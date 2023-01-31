@@ -83,7 +83,7 @@ BOOL ExpLua_IWindow(lua_State *L)
 		lua_tinker::class_def<IWindow>(L,"GetIWindow",&IWindow::GetIWindow);
 		lua_tinker::class_def<IWindow>(L,"GetIChild",&IWindow::GetIChild);
 		lua_tinker::class_def<IWindow>(L,"GetChildrenCount",&IWindow::GetChildrenCount);
-		lua_tinker::class_def<IWindow>(L,"IsIDescendant",&IWindow::IsIDescendant);
+		lua_tinker::class_def<IWindow>(L,"IsDescendant",&IWindow::IsDescendant);
 		lua_tinker::class_def<IWindow>(L,"SetIOwner",&IWindow::SetIOwner);
 		lua_tinker::class_def<IWindow>(L,"GetIOwner",&IWindow::GetIOwner);
 		lua_tinker::class_def<IWindow>(L,"BringWindowToTop",&IWindow::BringWindowToTop);

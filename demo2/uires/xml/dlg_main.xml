@@ -8,7 +8,7 @@ translucent="0"
              colorInactiveTitle="@color/white"
              layout="hbox" gravity="center" >
     <icon id="sysid_icon" src="ICON_LOGO:16"/>
-    <text id="sysid_title">@string/title</text>
+    <text id="sysid_title"/>
     <window size="0,0" weight="1"/>
     <imgbtn id="sysid_min" skin="_skin.sys.btn.minimize" animate="1" />
     <window>

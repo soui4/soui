@@ -513,7 +513,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param pTest const IWindow *--测试窗口
      * @return TRUE--是子孙窗口
      */
-    STDMETHOD_(BOOL, IsIDescendant)(CTHIS_ const IWindow *pTest) SCONST PURE;
+    STDMETHOD_(BOOL, IsDescendant)(CTHIS_ const IWindow *pTest) SCONST PURE;
 
     /**
      * @brief 设置窗口的Owner
