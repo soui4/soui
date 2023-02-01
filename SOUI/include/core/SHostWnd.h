@@ -346,6 +346,7 @@ class SOUI_EXP SHostWnd
     virtual void OnHostAnimationStoped(IAnimation *pAni);
 
   protected: //辅助函数
+    void _RedrawRegion(IRegionS *pRgn, CRect &rcInvalid);
     void _Redraw();
     void _RestoreClickState();
     void _Invalidate(LPCRECT prc);
@@ -420,43 +421,41 @@ class SOUI_EXP SHostWnd
 #endif
 
   public: // IContainer
-    STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt);
+    STDMETHOD_(BOOL, OnFireEvent)(IEvtArgs *evt) OVERRIDE;
 
-    STDMETHOD_(void, GetContainerRect)(CTHIS_ RECT *ret) const;
+    STDMETHOD_(void, GetContainerRect)(CTHIS_ RECT *ret) const OVERRIDE;
 
-    STDMETHOD_(HWND, GetHostHwnd)();
+    STDMETHOD_(HWND, GetHostHwnd)() OVERRIDE;
 
-    STDMETHOD_(LPCWSTR, GetTranslatorContext)() const;
+    STDMETHOD_(LPCWSTR, GetTranslatorContext)() const OVERRIDE;
 
-    STDMETHOD_(IRenderTarget *, OnGetRenderTarget)(LPCRECT rc, GrtFlag gdcFlags);
+	STDMETHOD_(void, UpdateRegion)(IRegionS *rgn) OVERRIDE;
 
-    STDMETHOD_(void, OnReleaseRenderTarget)(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags);
+    STDMETHOD_(void, OnRedraw)(LPCRECT rc,BOOL bClip) OVERRIDE;
 
-    STDMETHOD_(void, OnRedraw)(LPCRECT rc,BOOL bClip);
+    STDMETHOD_(BOOL, OnReleaseSwndCapture)() OVERRIDE;
 
-    STDMETHOD_(BOOL, OnReleaseSwndCapture)();
-
-    STDMETHOD_(SWND, OnSetSwndCapture)(SWND swnd);
+    STDMETHOD_(SWND, OnSetSwndCapture)(SWND swnd) OVERRIDE;
 
 	//STDMETHOD_(BOOL, IsTranslucent)() const; same as IHostWnd::IsTranslucent
 
-    STDMETHOD_(BOOL, IsSendWheel2Hover)() const;
+    STDMETHOD_(BOOL, IsSendWheel2Hover)() const OVERRIDE;
 
-    STDMETHOD_(BOOL, UpdateWindow)();
+    STDMETHOD_(BOOL, UpdateWindow)() OVERRIDE;
 
-    STDMETHOD_(void, UpdateTooltip)();
+    STDMETHOD_(void, UpdateTooltip)() OVERRIDE;
 
     STDMETHOD_(BOOL, RegisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
 
 	//STDMETHOD_(IMessageLoop *, GetMsgLoop)(); same as IHostWnd::GetMsgLoop
 
-    STDMETHOD_(IScriptModule *, GetScriptModule)();
+    STDMETHOD_(IScriptModule *, GetScriptModule)() OVERRIDE;
 
-    STDMETHOD_(int, GetScale)() const;
+    STDMETHOD_(int, GetScale)() const OVERRIDE;
 
-    STDMETHOD_(void, EnableIME)(BOOL bEnable);
-    STDMETHOD_(void, OnUpdateCursor)();
+    STDMETHOD_(void, EnableIME)(BOOL bEnable) OVERRIDE;
+    STDMETHOD_(void, OnUpdateCursor)() OVERRIDE;
 
   protected:
     STDMETHOD_(void, OnHostMsg)(THIS_ BOOL bRelayout, UINT uMsg, WPARAM wp, LPARAM lp) OVERRIDE;

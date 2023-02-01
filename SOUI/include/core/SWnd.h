@@ -1273,7 +1273,7 @@ class SOUI_EXP SWindow
         CRect rcRT;                /**< GETRT调用的有效范围 */
         GrtFlag gdcFlags;          /**< GETRT绘制标志位 */
         SAutoRefPtr<IRegionS> rgn; /**< 保存一个和rcRT对应的IRegion对象 */
-        SAutoRefPtr<IRenderTarget> rt;
+        SAutoRefPtr<IRenderTarget> rt;/**< 保存GetRenderTarget时创建的对象,重绘时使用它的缓存绘制 */
     } * PGETRTDATA;
 
     PGETRTDATA m_pGetRTData;

@@ -145,39 +145,11 @@ void SOsrPanel::GetContainerRect(RECT *ret) const
 	*ret = rcItem;
 }
 
-IRenderTarget *SOsrPanel::OnGetRenderTarget(LPCRECT rc, GrtFlag gdcFlags)
+void SOsrPanel::UpdateRegion(IRegionS *rgn)
 {
-    IRenderTarget *pRT = NULL;
-    if (m_pItemContainer->IsItemRedrawDelay() || gdcFlags == GRT_NODRAW)
-    {
-        GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
-        return pRT;
-    }
-
-    CRect rcHost(rc);
-    FrameToHost(&rcHost);
-    pRT = m_pHostProxy->OnGetHostRenderTarget(&rcHost, GRT_PAINTBKGND);
-    CRect rcItem = GetItemRect();
-    pRT->OffsetViewportOrg(rcItem.left, rcItem.top, NULL);
-    pRT->PushClipRect(rc, RGN_AND);
-
-    return pRT;
-}
-
-void SOsrPanel::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags)
-{
-    if (m_pItemContainer->IsItemRedrawDelay() || gdcFlags == GRT_NODRAW)
-    {
-        pRT->Release();
-        return;
-    }
-    pRT->PopClip();
-
-    CRect rcHost(rc);
-    FrameToHost(&rcHost);
-    CRect rcItem = GetItemRect();
-    pRT->OffsetViewportOrg(-rcItem.left, -rcItem.top, NULL);
-    m_pHostProxy->OnReleaseHostRenderTarget(pRT, &rcHost, GRT_PAINTBKGND);
+	CRect rc = GetItemRect();
+	rgn->Offset(rc.TopLeft());
+	m_pHostProxy->GetHostContainer()->UpdateRegion(rgn);
 }
 
 void SOsrPanel::OnRedraw(LPCRECT rc,BOOL bClip)
@@ -199,13 +171,10 @@ void SOsrPanel::OnRedraw(LPCRECT rc,BOOL bClip)
         }
         else
         {
-			//hjx: todo, if matrix was applied, following logic maybe error.
-            IRenderTarget *pRT = OnGetRenderTarget(rc, GRT_PAINTBKGND);
-            SAutoRefPtr<IRegionS> rgn;
-            GETRENDERFACTORY->CreateRegion(&rgn);
-            rgn->CombineRect(rc, RGN_COPY);
-            RedrawRegion(pRT, rgn);
-            OnReleaseRenderTarget(pRT, rc, GRT_PAINTBKGND);
+			SAutoRefPtr<IRegionS> rgn;
+			GETRENDERFACTORY->CreateRegion(&rgn);
+			rgn->CombineRect(rc, RGN_COPY);
+			UpdateRegion(rgn);
         }
     }
 }

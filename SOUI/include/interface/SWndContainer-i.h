@@ -140,22 +140,11 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
     STDMETHOD_(void, GetContainerRect)(CTHIS_ RECT *ret) SCONST PURE;
 
     /**
-     * @brief 请求IRenderTarget对象
-     * @param rc RECT--渲染位置
-     * @param gdcFlags GrtFlag--请求RT标志
-     * @return IRenderTarget *--渲染目标
+     * @brief 刷新指定区域的内存位图
+     * @param IRegion *rgn--刷新位置
+     * @return void
      */
-    STDMETHOD_(IRenderTarget *, OnGetRenderTarget)(THIS_ LPCRECT rc, GrtFlag gdcFlags) PURE;
-
-    /**
-     * @brief 释放通过OnGetRenderTarget请求获得的IRenderTarget
-     * @param pRT IRenderTarget*--待释放的IRenderTarget
-     * @param rc LPCRECT--显示位置
-     * @param gdcFlags GrtFlag--请求RT标志
-     * @return
-     */
-    STDMETHOD_(void, OnReleaseRenderTarget)
-    (THIS_ IRenderTarget * pRT, LPCRECT rc, GrtFlag gdcFlags) PURE;
+	STDMETHOD_(void,UpdateRegion)(THIS_ IRegionS *rgn) PURE;
 
     /**
      * @brief 请求重绘

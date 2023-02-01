@@ -597,6 +597,40 @@ void SHostWnd::_Redraw()
     _Invalidate(NULL);
 }
 
+
+void SHostWnd::_RedrawRegion(IRegionS *pRgnUpdate, CRect &rcInvalid)
+{
+	CRect rcWnd = m_pRoot->GetWindowRect();
+
+	SPainter painter;
+	m_pRoot->BeforePaint(m_memRT, painter);
+
+	if (!pRgnUpdate->IsEmpty())
+	{
+		pRgnUpdate->GetRgnBox(&rcInvalid);
+		rcInvalid.IntersectRect(rcInvalid, rcWnd);
+		m_memRT->PushClipRegion(pRgnUpdate, RGN_COPY);
+	}
+	else
+	{
+		rcInvalid = rcWnd;
+		m_memRT->PushClipRect(&rcInvalid, RGN_COPY);
+	}
+	//清除残留的alpha值
+	m_memRT->ClearRect(rcInvalid, 0);
+
+	int clipState=0;
+	m_memRT->SaveClip(&clipState); 
+	_ExcludeVideoCanvasFromPaint(m_memRT);	//exclude video canvas region from normal paint routine.
+	GetRoot()->RedrawRegion(m_memRT, pRgnUpdate);
+	m_memRT->RestoreClip(clipState);
+	_PaintVideoCanvasForeground(m_memRT);		//paint foreground of video canvas.
+
+	m_memRT->PopClip();
+
+	m_pRoot->AfterPaint(m_memRT, painter);
+}
+
 void SHostWnd::OnPrint(HDC dc, UINT uFlags)
 {
     if (!(GetRoot()->IsLayoutDirty() || IsWindowVisible()))
@@ -612,44 +646,16 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
     }
 
     CRect rcInvalid;
-    CRect rcWnd = GetRoot()->GetWindowRect();
     if (m_bNeedRepaint)
     {
         m_bNeedRepaint = FALSE;
+		BuildWndTreeZorder();
+		// m_rgnInvalidate有可能在RedrawRegion时被修改，必须生成一个临时的区域对象
+		SAutoRefPtr<IRegionS> pRgnUpdate = m_rgnInvalidate;
+		m_rgnInvalidate = NULL;
+		GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
 
-        SPainter painter;
-        GetRoot()->BeforePaint(m_memRT, painter);
-
-        // m_rgnInvalidate有可能在RedrawRegion时被修改，必须生成一个临时的区域对象
-        SAutoRefPtr<IRegionS> pRgnUpdate = m_rgnInvalidate;
-        m_rgnInvalidate = NULL;
-        GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
-
-        if (!pRgnUpdate->IsEmpty())
-        {
-            pRgnUpdate->GetRgnBox(&rcInvalid);
-            rcInvalid.IntersectRect(rcInvalid, rcWnd);
-            m_memRT->PushClipRegion(pRgnUpdate, RGN_COPY);
-        }
-        else
-        {
-            rcInvalid = rcWnd;
-            m_memRT->PushClipRect(&rcInvalid, RGN_COPY);
-        }
-        //清除残留的alpha值
-        m_memRT->ClearRect(rcInvalid, 0);
-
-        BuildWndTreeZorder();
-		int clipState=0;
-		m_memRT->SaveClip(&clipState); 
-		_ExcludeVideoCanvasFromPaint(m_memRT);	//exclude video canvas region from normal paint routine.
-        GetRoot()->RedrawRegion(m_memRT, pRgnUpdate);
-		m_memRT->RestoreClip(clipState);
-		_PaintVideoCanvasForeground(m_memRT);		//paint foreground of video canvas.
-
-        m_memRT->PopClip();
-
-        GetRoot()->AfterPaint(m_memRT, painter);
+		_RedrawRegion(pRgnUpdate,rcInvalid);
     }
     else
     { //缓存已经更新好了，只需要重新更新到窗口
@@ -958,32 +964,6 @@ HWND SHostWnd::GetHostHwnd()
     return m_hWnd;
 }
 
-IRenderTarget *SHostWnd::OnGetRenderTarget(LPCRECT rc, GrtFlag gdcFlags)
-{
-    IRenderTarget *pRT = NULL;
-    if (gdcFlags == GRT_NODRAW)
-    {
-        GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
-    }
-    else
-    {
-        pRT = m_memRT;
-        pRT->PushClipRect(rc, RGN_COPY);
-        pRT->AddRef();
-    }
-    return pRT;
-}
-
-void SHostWnd::OnReleaseRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags)
-{
-    if (gdcFlags != GRT_NODRAW)
-    {
-        pRT->PopClip();
-		UpdatePresenter(0,m_memRT,rc);
-    }
-    pRT->Release();
-}
-
 void SHostWnd::UpdatePresenter(HDC dc,IRenderTarget*pRT, LPCRECT rcInvalid, BYTE byAlpha)
 {
 	byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
@@ -1007,6 +987,15 @@ void SHostWnd::OnRedraw(LPCRECT rc,BOOL bClip)
 
     _Invalidate(rc);
 }
+
+
+void SHostWnd::UpdateRegion(IRegionS *rgn)
+{
+	CRect rcInvalid;
+	_RedrawRegion(rgn,rcInvalid);
+	UpdatePresenter(0,m_memRT,rcInvalid);
+}
+
 
 BOOL SHostWnd::OnReleaseSwndCapture()
 {
