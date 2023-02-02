@@ -2262,7 +2262,55 @@ void SWindow::ReleaseRenderTarget(IRenderTarget *pRT)
     SASSERT(m_pGetRTData);
     if (m_pGetRTData->gdcFlags != GRT_NODRAW)
     {
-        GetContainer()->UpdateRegion(m_pGetRTData->rgn);
+        SMatrix mtx;
+        SWindow *p = this;
+        while (p)
+        {
+            STransformation xform = p->GetTransformation();
+            if (xform.hasMatrix() && !xform.getMatrix().isIdentity())
+            {
+                SMatrix mtx2 = xform.getMatrix();
+                CRect rc = p->GetWindowRect();
+                mtx2.preTranslate((int)-rc.left, (int)-rc.top);
+                mtx2.postTranslate((int)rc.left, (int)rc.top);
+                mtx.preConcat(mtx2);
+            }
+            p = p->GetParent();
+        }
+
+        CRect rcRT = m_pGetRTData->rcRT;
+        if (!mtx.isIdentity())
+        {
+            SRect sRcRT = SRect::IMake(rcRT);
+            mtx.mapRect(&sRcRT);
+            rcRT = sRcRT.toRect();
+        }
+
+        SASSERT(GetContainer());
+        SWindow *pRoot = GetRoot();
+        SAutoRefPtr<IRegionS> rgn;
+        GETRENDERFACTORY->CreateRegion(&rgn);
+        if (!mtx.isIdentity())
+        {
+            SRect sRcRT = SRect::IMake(m_pGetRTData->rcRT);
+            SPoint quad[4];
+            mtx.mapRectToQuad(quad, sRcRT);
+            POINT pts[4];
+            for (int i = 0; i < 4; i++)
+            {
+                pts[i] = quad[i].toPoint();
+            }
+            rgn->CombinePolygon(pts, 4, WINDING, RGN_COPY);
+        }
+        else
+        {
+            rgn->CombineRect(rcRT, RGN_COPY);
+        }
+        if (mtx.isIdentity())
+        { // todo: if matrix transform existed, combine getrt.rgn to the root rgn will not work.
+            rgn->CombineRgn(m_pGetRTData->rgn, RGN_AND);
+        }
+        GetContainer()->UpdateRegion(rgn);
     }
     delete m_pGetRTData;
     m_pGetRTData = NULL;
