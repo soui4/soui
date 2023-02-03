@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 namespace SOUI
 {
@@ -23,19 +23,19 @@ class SButtonEx : public SButton {
 
   public:
     SOUI_ATTRS_BEGIN()
-    ATTR_POINT(L"pushOffset", m_ptPushOffet, TRUE) //ÏÂÑ¹×´Ì¬ÕûÌåÆ«ÒÆ
-    ATTR_SKIN(L"icon", m_pIcon, TRUE)              //Í¼±êSKIN
-    ATTR_INT(L"iconIndex", m_iIcon, TRUE)          //Í¼±êÔÚSkinÖĞµÄË÷Òı
-    ATTR_ENUM_BEGIN(L"drawMode", int, TRUE)
-    ATTR_ENUM_VALUE(L"freeDraw", FREE_DRAW)
-    ATTR_ENUM_VALUE(L"vertIconText", VERT_ICON_TEXT)
-    ATTR_ENUM_VALUE(L"vertTextIcon", VERT_TEXT_ICON)
-    ATTR_ENUM_VALUE(L"horzIconText", HORZ_ICON_TEXT)
-    ATTR_ENUM_VALUE(L"horzTextIcon", HORZ_TEXT_ICON)
-    ATTR_ENUM_END(m_drawMode)
-    ATTR_INT(L"sepSize", m_nSepSize, TRUE) // FREE_DRAWÊ±ÎŞĞ§
-    ATTR_POINT(L"iconPos", m_ptIcon, TRUE) //Í¼±êÏÔÊ¾Î»ÖÃ,FREE_DRAWÊ±ÓĞĞ§
-    ATTR_POINT(L"textPos", m_ptText, TRUE) //ÎÄ±¾ÏÔÊ¾Î»ÖÃ,FREE_DRAWÊ±ÓĞĞ§
+        ATTR_LAYOUTSIZE2(L"pushOffset", m_ptPushOffet, FALSE) //ä¸‹å‹çŠ¶æ€æ•´ä½“åç§»
+        ATTR_SKIN(L"icon", m_pIcon, FALSE)              //å›¾æ ‡SKIN
+        ATTR_INT(L"iconIndex", m_iIcon, FALSE)          //å›¾æ ‡åœ¨Skinä¸­çš„ç´¢å¼•
+        ATTR_ENUM_BEGIN(L"drawMode", int, FALSE)
+            ATTR_ENUM_VALUE(L"freeDraw", FREE_DRAW)
+            ATTR_ENUM_VALUE(L"vertIconText", VERT_ICON_TEXT)
+            ATTR_ENUM_VALUE(L"vertTextIcon", VERT_TEXT_ICON)
+            ATTR_ENUM_VALUE(L"horzIconText", HORZ_ICON_TEXT)
+            ATTR_ENUM_VALUE(L"horzTextIcon", HORZ_TEXT_ICON)
+        ATTR_ENUM_END(m_drawMode)
+        ATTR_LAYOUTSIZE(L"sepSize", m_nSepSize, FALSE) // FREE_DRAWæ—¶æ— æ•ˆ
+        ATTR_LAYOUTSIZE2(L"iconPos", m_ptIcon, FALSE) //å›¾æ ‡æ˜¾ç¤ºä½ç½®,FREE_DRAWæ—¶æœ‰æ•ˆ
+        ATTR_LAYOUTSIZE2(L"textPos", m_ptText, FALSE) //æ–‡æœ¬æ˜¾ç¤ºä½ç½®,FREE_DRAWæ—¶æœ‰æ•ˆ
     SOUI_ATTRS_END()
 
   protected:
@@ -45,23 +45,25 @@ class SButtonEx : public SButton {
     CSize GetIconSize();
     void DrawIcon(IRenderTarget *pRT, CRect rcIcon);
 
+    void OnScaleChanged(int scale);
+
   protected:
     void OnPaint(IRenderTarget *pRT);
 
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)
+	    MSG_WM_PAINT_EX(OnPaint)
     SOUI_MSG_MAP_END()
 
   protected:
     HICON m_hIcon;
-    int m_nIconSize;
+    SLayoutSize m_nIconSize;
 
-    ISkinObj *m_pIcon;
-    int m_iIcon; //-1´ú±ím_pIconÊÇÒ»¸ö¶ÀÕ¼µÄÆ¤·ô
-    CPoint m_ptIcon;
-    CPoint m_ptText;
-    CPoint m_ptPushOffet;
-    int m_nSepSize;
+    SAutoRefPtr<ISkinObj> m_pIcon;
+    int m_iIcon; //-1ä»£è¡¨m_pIconæ˜¯ä¸€ä¸ªç‹¬å çš„çš®è‚¤
+    SLayoutSize m_ptIcon[2];
+    SLayoutSize m_ptText[2];
+    SLayoutSize m_ptPushOffet[2];
+    SLayoutSize m_nSepSize;
     int m_drawMode;
     bool m_bIconVisible;
 };
