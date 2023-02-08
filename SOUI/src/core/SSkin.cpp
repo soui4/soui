@@ -257,22 +257,32 @@ void SSkinButton::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, 
     // 只有 在 需要渐变的情况下 才 需要 这个
     if (m_colors.m_crUp[iState] != m_colors.m_crDown[iState])
     {
-        SAutoRefPtr<IRegionS> rgnClip;
-        if (nCorner > 2)
-        {
-            CRect rcDraw(*prcDraw);
-            rcDraw.right++, rcDraw.bottom++;
-            GETRENDERFACTORY->CreateRegion(&rgnClip);
-            CPoint ptCorner(nCorner * 2, nCorner * 2);
-            rgnClip->CombineRoundRect(&rcDraw, ptCorner, RGN_COPY);
-            pRT->PushClipRegion(rgnClip, RGN_AND);
-        }
         CRect rcDraw = *prcDraw;
         rcDraw.DeflateRect(1, 1);
-        pRT->GradientFill(rcDraw, TRUE, m_colors.m_crUp[iState], m_colors.m_crDown[iState], byAlpha);
-        if (nCorner > 2)
+        SAutoRefPtr<IBrushS> brush;
+        COLORREF crs[2]={m_colors.m_crUp[iState],m_colors.m_crDown[iState]};
+        if(S_OK==pRT->CreateGradientBrush(TRUE,crs,NULL,2,kRepeat_TileMode,&brush)){
+            //skia
+            SAutoRefPtr<IRenderObj> oldBrush;
+            pRT->SelectObject(brush,&oldBrush);
+            pRT->FillRoundRect(&rcDraw,CPoint(nCorner,nCorner));
+            pRT->SelectObject(oldBrush);
+        }else
         {
-            pRT->PopClip();
+            //gdi
+            SAutoRefPtr<IRegionS> rgnClip;
+            if (nCorner > 2)
+            {
+                GETRENDERFACTORY->CreateRegion(&rgnClip);
+                CPoint ptCorner(nCorner, nCorner);
+                rgnClip->CombineRoundRect(&rcDraw, ptCorner, RGN_COPY);
+                pRT->PushClipRegion(rgnClip, RGN_AND);
+            }
+            pRT->GradientFill(rcDraw, TRUE, m_colors.m_crUp[iState], m_colors.m_crDown[iState], byAlpha);
+            if (nCorner > 2)
+            {
+                pRT->PopClip();
+            }
         }
     }
     else
