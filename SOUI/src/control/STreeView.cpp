@@ -1148,7 +1148,7 @@ void STreeView::onItemBeforeRemove(HSTREEITEM hItem)
 	{
 		return;
 	}
-	if(m_hSelected == hItem || m_adapter->IsDecendentItem(hItem,m_hSelected)){
+	if(m_hSelected && (m_hSelected == hItem || m_adapter->IsDecendentItem(hItem,m_hSelected))){
 		m_hSelected = NULL;
 	}
 
