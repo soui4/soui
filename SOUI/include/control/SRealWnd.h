@@ -23,30 +23,6 @@
 
 SNSBEGIN
 
-/**
- * @class     SRealWndParam
- * @brief     RealWnd窗口参数
- *
- * Describe   RealWnd窗口参数
- */
-class SOUI_EXP SRealWndParam {
-  public:
-    /**
-     * SRealWndParam::SRealWndParam
-     * @brief    构造函数
-     *
-     * Describe  构造函数
-     */
-    SRealWndParam();
-    /**
-     * SRealWndParam::~SRealWndParam
-     * @brief    析构函数
-     *
-     * Describe  析构函数
-     */
-    ~SRealWndParam();
-
-};
 
 /**
  * @class     SRealWnd
