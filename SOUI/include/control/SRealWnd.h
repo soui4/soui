@@ -11,7 +11,8 @@
  * Describe
  */
 #pragma once
-#include "core/Swnd.h"
+#include <interface/sctrl-i.h>
+#include <proxy/SWindowProxy.h>
 
 //////////////////////////////////////////////////////////////////////////
 // Real Window Control
@@ -45,11 +46,6 @@ class SOUI_EXP SRealWndParam {
      */
     ~SRealWndParam();
 
-    SStringT m_strClassName;  /**< 类名 */
-    SStringT m_strWindowName; /**< 窗口名 */
-    DWORD m_dwStyle;          /**< 窗口样式 */
-    DWORD m_dwExStyle;        /**< 窗口扩展样式 */
-    SXmlDoc m_xmlParams;      /**< 文档 */
 };
 
 /**
@@ -58,7 +54,7 @@ class SOUI_EXP SRealWndParam {
  *
  * Describe
  */
-class SOUI_EXP SRealWnd : public SWindow {
+class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd>{
     DEF_SOBJECT(SWindow, L"realwnd")
   public:
     /**
@@ -76,6 +72,31 @@ class SOUI_EXP SRealWnd : public SWindow {
      */
     virtual ~SRealWnd();
 
+public:
+	STDMETHOD_(const IStringT*, GetRealClassName)(CTHIS) SCONST OVERRIDE
+	{
+		return &m_strClassName;
+	}
+
+	STDMETHOD_(const IStringT*, GetRealWindowName)(CTHIS) SCONST OVERRIDE
+	{
+		return &m_strWindowName;
+	}
+
+	STDMETHOD_(DWORD, GetRealStyle)(CTHIS) SCONST OVERRIDE
+	{
+		return m_dwStyle;
+	}
+
+	STDMETHOD_(DWORD, GetRealStyleEx)(CTHIS) SCONST OVERRIDE
+	{
+		return m_dwExStyle;
+	}
+
+	STDMETHOD_(IXmlNode*, GetRealParam)(CTHIS) OVERRIDE{
+		return m_xmlParams.Root();
+	}
+
     /**
      * SRealWnd::GetRealHwnd
      * @brief    获取窗口句柄
@@ -84,19 +105,8 @@ class SOUI_EXP SRealWnd : public SWindow {
      *
      * Describe  获取窗口句柄
      */
-    const HWND GetRealHwnd(BOOL bAutoCreate = TRUE);
+	STDMETHOD_(HWND, GetRealHwnd)(THIS_ BOOL bAutoCreate = TRUE) OVERRIDE;
 
-    /**
-     * SRealWnd::GetRealWndParam
-     * @brief    获取窗口参数
-     * @return   返回SRealWndParam
-     *
-     * Describe  获取窗口参数
-     */
-    const SRealWndParam &GetRealWndParam()
-    {
-        return m_realwndParam;
-    }
 
     /**
      * SRealWnd::SetData
@@ -105,7 +115,7 @@ class SOUI_EXP SRealWnd : public SWindow {
      *
      * Describe  获取附加数据
      */
-    void SetData(LPVOID lpData)
+    STDMETHOD_(void,SetData)(THIS_ LPVOID lpData)
     {
         m_lpData = lpData;
     }
@@ -117,16 +127,16 @@ class SOUI_EXP SRealWnd : public SWindow {
      *
      * Describe  获取附加数据
      */
-    const LPVOID GetData()
+    STDMETHOD_(LPVOID,GetData)(THIS) 
     {
         return m_lpData;
     }
 
     SOUI_ATTRS_BEGIN()
-        ATTR_STRINGT(L"wndclass", m_realwndParam.m_strClassName, FALSE)
-        ATTR_STRINGT(L"wndname", m_realwndParam.m_strWindowName, FALSE)
-        ATTR_HEX(L"style", m_realwndParam.m_dwStyle, FALSE)
-        ATTR_HEX(L"exstyle", m_realwndParam.m_dwExStyle, FALSE)
+        ATTR_STRINGT(L"wndclass", m_strClassName, FALSE)
+        ATTR_STRINGT(L"wndname", m_strWindowName, FALSE)
+        ATTR_HEX(L"style", m_dwStyle, FALSE)
+        ATTR_HEX(L"exstyle", m_dwExStyle, FALSE)
         ATTR_BOOL(L"init", m_bInit, FALSE)
     SOUI_ATTRS_END()
   protected:
@@ -201,8 +211,13 @@ class SOUI_EXP SRealWnd : public SWindow {
         MSG_WM_SHOWWINDOW(OnShowWindow)
     SOUI_MSG_MAP_END()
 
-    SRealWndParam m_realwndParam; /**< 窗口参数 */
-    BOOL m_bInit;                 /**< 是否初始化 */
+	SStringT m_strClassName;  /**< 类名 */
+	SStringT m_strWindowName; /**< 窗口名 */
+	DWORD m_dwStyle;          /**< 窗口样式 */
+	DWORD m_dwExStyle;        /**< 窗口扩展样式 */
+	SXmlDoc m_xmlParams;      /**< 文档 */
+
+	BOOL m_bInit;                 /**< 是否初始化 */
 
     HWND m_hRealWnd; /**< 窗口句柄 */
     LPVOID m_lpData; /**< 附加参数 */

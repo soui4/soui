@@ -87,7 +87,7 @@ DECLARE_INTERFACE_(IRealWndHandler, IObjRef)
      *
      * Describe  调整窗口大小
      */
-    STDMETHOD_(BOOL, OnRealWndPosition)(THIS_ IWindow * pRealWnd, RECT rcWnd) PURE;
+    STDMETHOD_(BOOL, OnRealWndPosition)(THIS_ IWindow * pRealWnd, const RECT *rcWnd) PURE;
 };
 
 SNSEND

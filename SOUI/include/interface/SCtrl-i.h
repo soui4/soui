@@ -3085,4 +3085,77 @@ DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
     STDMETHOD_(void, SetIcon)(THIS_ HICON hIcon) PURE;
 };
 
+
+#undef INTERFACE
+#define INTERFACE IRealWnd
+DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
+{
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+     */
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    STDMETHOD_(const IStringT*, GetRealClassName)(CTHIS) SCONST PURE;
+
+	STDMETHOD_(const IStringT*, GetRealWindowName)(CTHIS) SCONST PURE;
+
+	STDMETHOD_(DWORD, GetRealStyle)(CTHIS) SCONST PURE;
+
+	STDMETHOD_(DWORD, GetRealStyleEx)(CTHIS) SCONST PURE;
+
+	STDMETHOD_(IXmlNode*, GetRealParam)(CTHIS) PURE;
+
+	/**
+     * SRealWnd::GetRealHwnd
+     * @brief    获取窗口句柄
+     * @param    BOOL bAutoCreate -- 自动创建
+     * @return   返回HWND
+     *
+     * Describe  获取窗口句柄
+     */
+	STDMETHOD_(HWND, GetRealHwnd)(THIS_ BOOL bAutoCreate DEF_VAL(TRUE)) PURE;
+
+
+    /**
+     * SRealWnd::SetData
+     * @brief    获取附加数据
+     * @param    LPVOID lpData -- 附加数据
+     *
+     * Describe  获取附加数据
+     */
+    STDMETHOD_(void,SetData)(THIS_ LPVOID lpData) PURE;
+
+    /**
+     * SRealWnd::GetData
+     * @brief    获取附加数据
+     * @return   返回LPVOID
+     *
+     * Describe  获取附加数据
+     */
+    STDMETHOD_(LPVOID,GetData)(THIS) PURE;
+};
+
 SNSEND

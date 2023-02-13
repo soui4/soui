@@ -5,16 +5,6 @@
 
 SNSBEGIN
 
-SRealWndParam::SRealWndParam()
-    : m_dwStyle(WS_CHILD)
-    , m_dwExStyle(0)
-{
-}
-
-SRealWndParam::~SRealWndParam()
-{
-}
-
 SRealWnd::SRealWnd()
     : m_bInit(FALSE)
     , m_lpData(0)
@@ -63,7 +53,7 @@ void SRealWnd::OnDestroy()
 BOOL SRealWnd::InitFromXml(IXmlNode *pNode)
 {
     SXmlNode xmlNode(pNode);
-    m_realwndParam.m_xmlParams.root().append_copy(xmlNode.child(L"params"));
+    m_xmlParams.root().append_copy(xmlNode.child(L"params"));
     BOOL bRet = __baseCls::InitFromXml(pNode);
     if (bRet)
     {
@@ -73,7 +63,7 @@ BOOL SRealWnd::InitFromXml(IXmlNode *pNode)
     return bRet;
 }
 
-const HWND SRealWnd::GetRealHwnd(BOOL bAutoCreate /*=TRUE*/)
+HWND SRealWnd::GetRealHwnd(BOOL bAutoCreate /*=TRUE*/)
 {
     if (!bAutoCreate)
         return m_hRealWnd;
@@ -88,7 +78,7 @@ const HWND SRealWnd::GetRealHwnd(BOOL bAutoCreate /*=TRUE*/)
 
 BOOL SRealWnd::InitRealWnd()
 {
-    m_realwndParam.m_dwStyle |= WS_CHILD;
+    m_dwStyle |= WS_CHILD;
 
     IRealWndHandler *pRealWndHandler = GETREALWNDHANDLER;
 
