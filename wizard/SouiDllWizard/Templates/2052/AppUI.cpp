@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include "AppUI.h"
 #include "MainDlg.h"
+#pragma comment(lib, "shlwapi.lib")
 
 //从PE文件加载，注意从文件加载路径位置
 #define RES_TYPE 0
