@@ -15,15 +15,15 @@ SNSBEGIN
  * Describe
  */
 class SOUI_EXP SComboEdit : public SEdit {
+	DEF_SOBJECT(SEdit,L"ComboEdit")
   public:
     /**
      * SComboEdit::SComboEdit
-     * @param    SComboBoxBase *pOwner  -- 暂无
      * @brief    构造函数
      *
      * Describe  构造函数
      */
-    SComboEdit(SWindow *pOwner);
+    SComboEdit();
 
     /**
      * SComboEdit::~SComboEdit
@@ -69,8 +69,6 @@ class SOUI_EXP SComboEdit : public SEdit {
      * Describe  此函数是消息响应函数
      */
     STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs *evt) OVERRIDE;
-
-    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE;
 
     void OnKillFocus(SWND wndFocus);
 

@@ -8,9 +8,8 @@ const wchar_t *KStyle_Edit = L"editStyle";         //编辑框风格
 
 //////////////////////////////////////////////////////////////////////////
 // CComboEdit
-SComboEdit::SComboEdit(SWindow *pOwner)
+SComboEdit::SComboEdit()
 {
-    SetOwner(pOwner);
 }
 
 SComboEdit::~SComboEdit()
@@ -57,10 +56,6 @@ void SComboEdit::OnKillFocus(SWND wndFocus)
     GetOwner()->SSendMessage(WM_KILLFOCUS, wndFocus);
 }
 
-void SComboEdit::OnFinalRelease()
-{
-    delete this;
-}
 
 //////////////////////////////////////////////////////////////////////////
 // SDropDownWnd_ComboBox
@@ -113,11 +108,12 @@ BOOL SComboBase::CreateChildren(SXmlNode xmlNode)
     SASSERT(m_pSkinBtn);
     m_xmlDropdownStyle.root().append_copy(xmlNode.child(KStyle_Dropdown));
     //创建edit对象
-    m_pEdit = new SComboEdit(this);
-    SApplication::getSingleton().SetSwndDefAttr(m_pEdit);
-
+	SXmlNode xmlEditStyle = xmlNode.child(KStyle_Edit);
+	SStringW strEditClass = xmlEditStyle.attribute(L"wndclass").as_string(SComboEdit::GetClassName());
+	m_pEdit = sobj_cast<SComboEdit>(CreateChildByName(strEditClass));
+	SASSERT(m_pEdit);
+	m_pEdit->SetOwner(this);
     InsertChild(m_pEdit);
-    SXmlNode xmlEditStyle = xmlNode.child(KStyle_Edit);
     m_pEdit->GetEventSet()->setMutedState(true);
     if (xmlEditStyle)
         m_pEdit->InitFromXml(&xmlEditStyle);

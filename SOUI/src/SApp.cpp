@@ -153,6 +153,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SRichEdit>();
     objFactory->TplRegisterFactory<SEdit>();
     objFactory->TplRegisterFactory<SHotKeyCtrl>();
+	objFactory->TplRegisterFactory<SComboEdit>();
     objFactory->TplRegisterFactory<SComboBox>();
     objFactory->TplRegisterFactory<SSpinButtonCtrl>();
     objFactory->TplRegisterFactory<SListView>();
