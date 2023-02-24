@@ -1692,11 +1692,11 @@ BOOL SRichEdit::OnTxSetTimer(UINT idTimer, UINT uTimeout)
 	SMap<UINT,SAutoRefPtr<ITimer>>::CPair *p =m_mapTimer.Lookup(idTimer);
 	if(p){
 		p->m_value->KillTimer();
-		p->m_value->StartTimer(uTimeout,TRUE);
+		p->m_value->StartTimer(uTimeout,TRUE,idTimer);
 		return TRUE;
 	}
 	STimer *timer = new STimer(&Subscriber(&SRichEdit::OnTimeout,this));
-	timer->StartTimer(uTimeout,TRUE);
+	timer->StartTimer(uTimeout,TRUE,idTimer);
 	m_mapTimer[idTimer] = timer;
 	timer->Release();
 
@@ -1711,7 +1711,7 @@ void SRichEdit::OnTxKillTimer(UINT idTimer)
 BOOL SRichEdit::OnTimeout(IEvtArgs *e)
 {
 	EventTimer *e2=sobj_cast<EventTimer>(e);
-	m_pTxtHost->GetTextService()->TxSendMessage(WM_TIMER, e2->uID, 0, NULL);
+	m_pTxtHost->GetTextService()->TxSendMessage(WM_TIMER, e2->uData, 0, NULL);
 	return TRUE;
 }
 

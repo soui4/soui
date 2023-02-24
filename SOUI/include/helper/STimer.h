@@ -11,7 +11,7 @@ public:
 	~STimer(void);
 
 public:
-	STDMETHOD_(BOOL,StartTimer)(THIS_ int nElapse,BOOL bRepeat) OVERRIDE;
+	STDMETHOD_(BOOL,StartTimer)(THIS_ int nElapse,BOOL bRepeat,LPARAM uData DEF_VAL(0)) OVERRIDE;
 
 	STDMETHOD_(void,KillTimer)(THIS) OVERRIDE;
 

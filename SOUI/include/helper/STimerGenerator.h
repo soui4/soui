@@ -8,6 +8,7 @@ struct TIMERINFO
 {
 	SAutoRefPtr<IEvtSlot> pEvtSlot;
     BOOL bRepeat;
+	LPARAM uData;
 };
 
 class STimerGenerator : public SSingletonMap<STimerGenerator, TIMERINFO, UINT_PTR> {
@@ -15,7 +16,7 @@ class STimerGenerator : public SSingletonMap<STimerGenerator, TIMERINFO, UINT_PT
   public:
     ~STimerGenerator();
 
-    UINT SetTimer(IEvtSlot *pEvtSlot, UINT nElapse, BOOL bRepeat);
+    UINT SetTimer(IEvtSlot *pEvtSlot, UINT nElapse, BOOL bRepeat,LPARAM uData);
 
     void ClearTimer(UINT_PTR uID);
 

@@ -267,7 +267,7 @@ DEF_EVT(EventInit, EVT_INIT, on_init, { int fake; })
 
 DEF_EVT(EventExit, EVT_EXIT, on_exit, { int fake; })
 
-DEF_EVT(EventTimer, EVT_TIMER, on_timer, { UINT uID; })
+DEF_EVT(EventTimer, EVT_TIMER, on_timer, { UINT uID; LPARAM uData; })
 
 DEF_EVT(EventScroll, EVT_SCROLL, on_scroll, {
     int nSbCode;

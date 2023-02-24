@@ -28,6 +28,7 @@ VOID CALLBACK STimerGenerator::_TimerProc(HWND hwnd, UINT uMsg, UINT_PTR idEvent
         }
 		EventTimer evt(NULL);
 		evt.uID = (UINT)idEvent;
+		evt.uData = ti.uData;
         ti.pEvtSlot->Run(&evt);
     }
     else
@@ -42,12 +43,12 @@ void STimerGenerator::ClearTimer(UINT_PTR uID)
     RemoveKeyObject(uID);
 }
 
-UINT STimerGenerator::SetTimer(IEvtSlot *pEvtSlot, UINT nElapse, BOOL bRepeat)
+UINT STimerGenerator::SetTimer(IEvtSlot *pEvtSlot, UINT nElapse, BOOL bRepeat,LPARAM uData)
 {
     UINT_PTR uID = ::SetTimer(NULL, 0, nElapse, _TimerProc);
     if (uID != 0)
     {
-		TIMERINFO ti = { pEvtSlot, bRepeat };
+		TIMERINFO ti = { pEvtSlot, bRepeat,uData };
         AddKeyObject(uID, ti);
     }
     return (UINT)uID;
