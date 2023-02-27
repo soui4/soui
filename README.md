@@ -77,6 +77,8 @@ soui可以使用cmake或者qmake进行编译（前提:安装好Visual Studio）�
 ### UI可视化设计
 
 `SOUI4 Editor`,仓库地址https://github.com/soui4-demo/SouiEditor
+### SOUI4JS
+`SOUI4的JavaScript导出版本，实现使用js开发客户端程序的框架，完美解决性能和灵活性的矛盾`,仓库地址(https://github.com/soui4/soui4js)
 
 使用教程见文档
 

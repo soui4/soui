@@ -211,6 +211,8 @@ BOOL CWinHttp::DownloadToMem(LPCSTR lpUrl, OUT void** ppBuffer, OUT int* nSize)
 		if ( !::WinHttpQueryDataAvailable(m_hRequest, &dwBytesToRead) )
 			throw Hir_QueryErr;
 		lpFileMem = (BYTE*)malloc(dwLength);
+		if(!lpFileMem)
+			throw Hir_BufferErr;
 		lpBuff = malloc(HTTP_READBUF_LEN);
 		while( true )
 		{
@@ -243,8 +245,10 @@ BOOL CWinHttp::DownloadToMem(LPCSTR lpUrl, OUT void** ppBuffer, OUT int* nSize)
 		*ppBuffer = lpFileMem;
 		*nSize = dwRecvSize;
 	}
-	else
+	else if(lpFileMem)
+	{
 		free(lpFileMem);
+	}
 	return bResult;
 }
 
