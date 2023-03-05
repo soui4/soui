@@ -144,9 +144,8 @@ int STreeViewItemLocator::_GetItemVisibleWidth(HSTREEITEM hItem) const
 {
     int nRet = GetItemWidth(hItem);
     if (m_adapter->IsItemExpanded(hItem) && m_adapter->GetFirstChildItem(hItem) != ITEM_NULL)
-    {
-        int nIndent = m_adapter->GetParentItem(hItem) == ITEM_ROOT ? 0 : m_nIndent;
-        nRet = smax(nRet, _GetBranchWidth(hItem) + nIndent);
+    {//branch wid includes indent size of its children.
+        nRet = smax(nRet, _GetBranchWidth(hItem));
     }
     return nRet;
 }
@@ -394,9 +393,7 @@ void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem, BOOL bExpan
     _UpdateSiblingsOffset(hItem);
 
 	int nNewBranchWidth = _GetItemVisibleWidth(hItem);
-	if (nOldBranchWidth == nNewBranchWidth)
-		return;
-	_UpdateBranchWidth(hItem, nOldBranchWidth, nNewBranchWidth);
+    _UpdateBranchWidth(hItem, nOldBranchWidth, nNewBranchWidth);
 }
 
 void STreeViewItemLocator::OnBranchChanged(HSTREEITEM hItem)
