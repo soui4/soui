@@ -149,7 +149,7 @@ const IInterpolator *SPanel::GetScrollInterpolator() const
 {
     if (m_fadeFrames > 0 && !m_fadeInterpolator)
     {
-        m_fadeInterpolator = CREATEINTERPOLATOR(L"Accelerate");
+        m_fadeInterpolator.Attach(CREATEINTERPOLATOR(L"Accelerate"));
     }
     return m_fadeInterpolator;
 }
