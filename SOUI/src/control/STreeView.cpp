@@ -912,10 +912,6 @@ void STreeView::UpdateVisibleItems()
     m_pVisibleMap = new VISIBLEITEMSMAP;
 
     CRect rcClient = GetClientRect();
-    CRect rcContainer = rcClient;
-    rcContainer.MoveToXY(0, 0);
-    rcContainer.bottom = 10000;
-
     int nOffset = m_tvItemLocator->Item2Position(hItem) - m_siVer.nPos;
 
     m_visible_items.RemoveAll();
@@ -967,9 +963,8 @@ void STreeView::UpdateVisibleItems()
             ii.pItem->DoColorize(GetColorizeColor());
         }
 
-        rcContainer.left = m_tvItemLocator->GetItemIndent(hItem);
         CSize szItem;
-		m_adapter->getViewDesiredSize(&szItem,hItem, ii.pItem, rcContainer.Width(), rcContainer.Height());
+		m_adapter->getViewDesiredSize(&szItem,hItem, ii.pItem, -1, -1);
         ii.pItem->Move(CRect(0, 0, szItem.cx, szItem.cy));
         m_tvItemLocator->SetItemWidth(hItem, szItem.cx);
         m_tvItemLocator->SetItemHeight(hItem, szItem.cy);
