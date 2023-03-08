@@ -32,7 +32,7 @@ SNSBEGIN
 #endif
 #endif
 
-class SHostWndAttr : public TObjRefImpl<SObject> {
+class SOUI_EXP SHostWndAttr : public TObjRefImpl<SObject> {
     DEF_SOBJECT(TObjRefImpl<SObject>, L"SHostWndAttr")
     enum
     {
