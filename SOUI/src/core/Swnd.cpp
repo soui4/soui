@@ -658,6 +658,11 @@ BOOL SWindow::IsMsgTransparent() const
     return m_bMsgTransparent;
 }
 
+BOOL SWindow::IsMsgTransparentSelf() const
+{
+    return m_bMsgTransparentSelf;
+}
+
 const SwndStyle &SWindow::GetStyle() const
 {
     return m_style;
@@ -1018,6 +1023,10 @@ SWND SWindow::SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent) const
         }
 
         pChild = pChild->GetWindow(GSW_PREVSIBLING);
+    }
+    if (IsMsgTransparentSelf() && !bIncludeMsgTransparent)
+    {
+        return NULL;
     }
     pt = pt2; // update pt;
     return m_swnd;

@@ -18,7 +18,8 @@ BOOL ExpLua_IWindow(lua_State *L)
 		lua_tinker::class_def<IWindow>(L,"SetLayoutParam",&IWindow::SetLayoutParam);
 		lua_tinker::class_def<IWindow>(L,"IsFloat",&IWindow::IsFloat);
 		lua_tinker::class_def<IWindow>(L,"IsDisplay",&IWindow::IsDisplay);
-		lua_tinker::class_def<IWindow>(L,"IsMsgTransparent",&IWindow::IsMsgTransparent);
+        lua_tinker::class_def<IWindow>(L,"IsMsgTransparent", &IWindow::IsMsgTransparent);
+        lua_tinker::class_def<IWindow>(L,"IsMsgTransparentSelf", &IWindow::IsMsgTransparentSelf);
 		lua_tinker::class_def<IWindow>(L,"IsClipClient",&IWindow::IsClipClient);
 		lua_tinker::class_def<IWindow>(L,"SetToolTipText",&IWindow::SetToolTipText);
 		lua_tinker::class_def<IWindow>(L,"IsChecked",&IWindow::IsChecked);

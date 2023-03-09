@@ -91,6 +91,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @return TRUE--鼠标消息透传给父窗口
      */
     STDMETHOD_(BOOL, IsMsgTransparent)(CTHIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsMsgTransparentSelf)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取窗口是否自动剪裁客户区

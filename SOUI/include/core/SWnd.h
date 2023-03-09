@@ -290,6 +290,7 @@ class SOUI_EXP SWindow
     STDMETHOD_(void, SetVisible)(THIS_ BOOL bVisible, BOOL bUpdate DEF_VAL(FALSE)) OVERRIDE;
 
     STDMETHOD_(BOOL, IsMsgTransparent)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, IsMsgTransparentSelf)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(ULONG_PTR, GetUserData)(THIS) SCONST OVERRIDE;
     STDMETHOD_(ULONG_PTR, SetUserData)(THIS_ ULONG_PTR uData) OVERRIDE;
@@ -1170,6 +1171,7 @@ class SOUI_EXP SWindow
 		ATTR_CUSTOM(L"videoCanvas",OnAttrVideoCanvas)
         ATTR_CUSTOM(L"tip", OnAttrTip)
         ATTR_BOOL(L"msgTransparent", m_bMsgTransparent, FALSE)
+        ATTR_BOOL(L"msgTransparentSelf", m_bMsgTransparentSelf, FALSE)
         ATTR_LAYOUTSIZE(L"maxWidth", m_nMaxWidth, FALSE)
         ATTR_BOOL(L"clipClient", m_bClipClient, FALSE)
         ATTR_BOOL(L"focusable", m_bFocusable, FALSE)
@@ -1243,6 +1245,7 @@ class SOUI_EXP SWindow
     m_bClipClient : 1;           /**<
                                     窗口绘制时做clip客户区处理的标志,由于clip可能增加计算量，只在绘制可能走出客户区时才设置*/
     DWORD m_bMsgTransparent : 1; /**< 接收消息标志 TRUE-不处理消息 */
+    DWORD m_bMsgTransparentSelf : 1; /**< 接收消息标志 TRUE-不处理消息本身消息但是依旧处理child消息 */
     DWORD m_bFocusable : 1;      /**< 窗口可获得焦点标志 */
     DWORD m_bDrawFocusRect : 1;  /**< 绘制默认的焦点虚框 */
     DWORD m_bCacheDraw : 1;      /**< 支持窗口内容的Cache标志 */
