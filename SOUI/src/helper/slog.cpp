@@ -98,14 +98,14 @@ SLogStream::SLogStream()
 {
 }
 
-SLogStream &SLogStream::writeWString(const wchar_t *t)
+SLogStream &SLogStream::writeWString(const wchar_t *t,int nLen)
 {
 #if defined(WIN32) || defined(_WIN64)
-    DWORD dwLen = WideCharToMultiByte(CP_ACP, 0, t, -1, NULL, 0, NULL, NULL);
+    DWORD dwLen = WideCharToMultiByte(CP_ACP, 0, t, nLen, NULL, 0, NULL, NULL);
     if (dwLen < Log::MAX_LOGLEN)
     {
         char buf[Log::MAX_LOGLEN];
-        dwLen = WideCharToMultiByte(CP_ACP, 0, t, -1, buf, dwLen, NULL, NULL);
+        dwLen = WideCharToMultiByte(CP_ACP, 0, t, nLen, buf, dwLen, NULL, NULL);
         if (dwLen > 0)
         {
             buf[dwLen] = 0;
@@ -282,6 +282,11 @@ SLogStream &SLogStream::operator<<(unsigned char t)
 SLogStream &SLogStream::operator<<(char t)
 {
     return writeData("%c", t);
+}
+
+SLogStream &SLogStream::operator<<(wchar_t t)
+{
+	return writeWString(&t, 1);
 }
 
 SLogStream &SLogStream::operator<<(bool t)

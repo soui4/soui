@@ -27,11 +27,10 @@ class SOUI_EXP SLogStream {
   public:
     SLogStream &operator<<(const void *t);
     SLogStream &operator<<(const char *t);
-#if defined(WIN32) || defined(_WIN64)
     SLogStream &operator<<(const wchar_t *t);
-#endif
     SLogStream &operator<<(bool t);
     SLogStream &operator<<(char t);
+	SLogStream &operator<<(wchar_t t);
     SLogStream &operator<<(unsigned char t);
     SLogStream &operator<<(short t);
     SLogStream &operator<<(unsigned short t);
@@ -51,7 +50,7 @@ class SOUI_EXP SLogStream {
     SLogStream &writeULongLong(unsigned long long t);
     SLogStream &writePointer(const void *t);
     SLogStream &writeString(const char *t);
-    SLogStream &writeWString(const wchar_t *t);
+    SLogStream &writeWString(const wchar_t *t,int nLen = -1);
     SLogStream &writeBinary(const SLogBinary &t);
 
   private:

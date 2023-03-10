@@ -96,8 +96,10 @@ public:
 
     void SetDefFontInfo(const SStringW &strFontInfo);
 
-  protected:
+public:
 	static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo & defFontInfo);
+	static SStringW FontInfoToString(const FontInfo & fi);
+  protected:
 
     const FontInfo &GetDefFontInfo() const;
 
