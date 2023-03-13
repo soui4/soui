@@ -202,6 +202,8 @@
 			<File
 				RelativePath="src\res.mgr\SFontPool.cpp" />
 			<File
+				RelativePath="src\control\SFrame.cpp" />
+			<File
 				RelativePath="src\layout\SGridLayout.cpp" />
 			<File
 				RelativePath="src\control\SHeaderCtrl.cpp" />
@@ -454,6 +456,8 @@
 				RelativePath="include\res.mgr\SFontInfo.h" />
 			<File
 				RelativePath="include\res.mgr\SFontPool.h" />
+			<File
+				RelativePath="include\control\SFrame.h" />
 			<File
 				RelativePath="include\helper\SFunctor.hpp" />
 			<File

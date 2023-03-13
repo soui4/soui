@@ -48,20 +48,23 @@
   <root skin="_skin.sys.wnd.bkgnd" cache="1" on_init="on_init" on_exit="on_exit"
         enterAnimation="anim:alpha_in" exitAnimation="anim:alpha_out">
     <window pos="1,1,-1,-1" id="9527" skin="demoskinbk" cache="1" colorBkgnd="#169ada"/>
-    <caption pos="0,0,-0,30" font="adding:2" focusable="1" layout="hbox" gravity="center" padding_left="10">
-      <icon src="ICON_LOGO:16"/>
-      <text name="txt_title" extend_left="5"/>
-      <text text="QQ群:" extend_left="5"/>
-      <text text="229313785" colorText="@color/red"/>
-      <window size="0,0" weight="1" visible="0"/>
-      <imgbtn name="btn_skin" skin="skin_btn_skin"  animate="1"/>
-      <imgbtn name="btn_menu" skin="skin_btn_menu" animate="1" />
-      <imgbtn id="5" skin="_skin.sys.btn.minimize"  animate="1" />
-      <window size="-1,-1">
-        <imgbtn id="2" skin="_skin.sys.btn.maximize"  pos="0,0" animate="1" />
-        <imgbtn id="3" skin="_skin.sys.btn.restore"  pos="0,0" show="0" animate="1" />
-      </window>
-      <imgbtn id="1" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
+    <caption pos="0,0,-0,30" font="adding:2" layout="hbox" gravity="center" padding_left="10">
+      <frame size="-2,-2" layout="hbox" gravity="center">       
+        <!--show where a frame widget can be used-->
+        <icon src="ICON_LOGO:16"/>
+        <text name="txt_title" extend_left="5"/>
+        <text text="QQ群:" extend_left="5"/>
+        <text text="229313785" colorText="@color/red"/>
+        <window size="0,0" weight="1" visible="0"/>
+        <imgbtn name="btn_skin" skin="skin_btn_skin"  animate="1"/>
+        <imgbtn name="btn_menu" skin="skin_btn_menu" animate="1" />
+        <imgbtn id="5" skin="_skin.sys.btn.minimize"  animate="1" />
+        <window size="-1,-1">
+          <imgbtn id="2" skin="_skin.sys.btn.maximize"  pos="0,0" animate="1" />
+          <imgbtn id="3" skin="_skin.sys.btn.restore"  pos="0,0" show="0" animate="1" />
+        </window>
+        <imgbtn id="1" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
+      </frame>
     </caption>
     <tabctrl name="tab_main" pos="5,30,-5,-5" interpolator="Decelerate" curSel="0" focusable="0" animateSteps="30" animateType="1" tabHeight="75" tabSkin="skin_tab_main" text-y="50" iconSkin="skin_page_icons" icon-x="10" colorTextHover="#ff0000" fontHover="italic:1">
       <page title="soui ctrl">

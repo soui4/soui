@@ -164,6 +164,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SMenuBar>();
     objFactory->TplRegisterFactory<SCalendar>();
     objFactory->TplRegisterFactory<SDateTimePicker>();
+	objFactory->TplRegisterFactory<SFrame>();
 }
 
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const

@@ -114,6 +114,7 @@ HEADERS += include/SApp.h \
            include/control/SComboBox.h \
            include/control/SComboView.h \
            include/control/SDateTimePicker.h \
+           include/control/SFrame.h \
            include/control/SDropDown.h \
            include/control/SHeaderCtrl.h \
            include/control/SHotKeyCtrl.h \
@@ -253,6 +254,7 @@ SOURCES += src/SApp.cpp \
            src/control/SComboBox.cpp \
            src/control/SComboView.cpp \
            src/control/SDateTimePicker.cpp \
+           src/control/SFrame.cpp \
            src/control/SDropDown.cpp \
            src/control/SHeaderCtrl.cpp \
            src/control/SHotKeyCtrl.cpp \
