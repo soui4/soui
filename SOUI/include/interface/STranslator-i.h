@@ -131,6 +131,11 @@ DECLARE_INTERFACE_(ITranslatorMgr, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
+	/**
+     * IsValid
+	 * @brief 判断是否有效
+     * @return TRUE-有效
+	*/
 	STDMETHOD_(BOOL,IsValid)(CTHIS) SCONST PURE;
     /**
      * SetLanguage

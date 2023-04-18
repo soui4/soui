@@ -101,6 +101,11 @@ DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
      */
     STDMETHOD_(LPARAM, GetItemData)(CTHIS) SCONST PURE;
 
+	/**
+	 * @brief 将panel的坐标转换为host坐标
+     * @param[in,out] POINT *pt 窗口坐标
+     * @return void
+	*/
 	STDMETHOD_(void,PtToHost)(THIS_ POINT *pt) SCONST PURE;
 };
 
@@ -160,6 +165,13 @@ DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F90
      * @return LPARAM 在列表中的用户数据
      */
     STDMETHOD_(LPARAM, GetItemData)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief 将panel的坐标转换为host坐标
+     * @param[in,out] POINT *pt 窗口坐标
+     * @return void
+    */
+    STDMETHOD_(void, PtToHost)(THIS_ POINT * pt) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
@@ -2262,7 +2274,7 @@ typedef int(__cdecl *FunTreeSortCallback)(void *pCtx, const void *phItem1, const
 
 #undef INTERFACE
 #define INTERFACE ITreeCtrl
-DECLARE_INTERFACE_IID_(ITreeCtrl, ICtrl, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
+DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
 {
     /**
      * @brief 增加引用计数
@@ -2289,6 +2301,82 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, ICtrl, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
      * @return IWindow*接口
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 显示/隐藏滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+     */
+    STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
+
+    /**
+     * @brief Enable/Disable滚动条
+     * @param wBar 滚动条标志,see ScrollBarID
+     * @param bShow TRUE-显示，FALSE-隐藏
+     * @return
+     */
+    STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
+
+    /**
+     * @brief 获取滚动条Enable状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-enable
+     */
+    STDMETHOD_(BOOL, IsScrollBarEnable)(CTHIS_ BOOL bVertical) SCONST PURE;
+
+    /**
+     * @brief 设置滚动条数据
+     * @param si --滚动条数据
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return
+     */
+    STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
+
+    /**
+     * @brief 设置滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nNewPos -- 滚动位置
+     * @param bRedraw -- 重绘标志
+     * @return
+     */
+    STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
+
+    /**
+     * @brief 获取滚动条位置
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return 滚动条位置
+     */
+    STDMETHOD_(int, GetScrollPos)(CTHIS_ BOOL bVertical) SCONST PURE;
+
+    /**
+     * @brief 设置滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param nMinPos -- 最小值
+     * @param nMaxPos -- 最大值
+     * @param bRedraw -- 重绘标志
+     * @return TRUE-成功
+     */
+    STDMETHOD_(BOOL, SetScrollRange)
+    (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
+
+    /**
+     * @brief 获取滚动条范围
+     * @param bVertical -- TRUE-垂直滚动条
+     * @param lpMinPos -- 最小值
+     * @param lpMaxPos -- 最大值
+     * @return
+     */
+    STDMETHOD_(BOOL, GetScrollRange)
+    (CTHIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
+
+    /**
+     * @brief 查询滚动条启用状态
+     * @param bVertical -- TRUE-垂直滚动条
+     * @return TRUE-启用
+     */
+    STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
