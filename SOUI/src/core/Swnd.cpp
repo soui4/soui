@@ -2449,7 +2449,9 @@ void SWindow::ClearAnimation()
         {
             m_animation->cancel();
             OnAnimationStop(m_animation);
-        }
+		}else if (GetContainer()){
+			GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
+		}
         m_animation->setAnimationListener(NULL);
         m_animation = NULL;
     }
