@@ -175,6 +175,7 @@ void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
     objFactory->TplRegisterFactory<SSkinImgFrame2>();
     objFactory->TplRegisterFactory<SSkinButton>();
     objFactory->TplRegisterFactory<SSkinGradation>();
+	objFactory->TplRegisterFactory<SSkinGradation2>();
     objFactory->TplRegisterFactory<SSkinScrollbar>();
     objFactory->TplRegisterFactory<SSkinColorRect>();
     objFactory->TplRegisterFactory<SSkinShape>();

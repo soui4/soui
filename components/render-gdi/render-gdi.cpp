@@ -1222,7 +1222,7 @@ namespace SOUI
         return S_OK;
     }
     
-    HRESULT SRenderTarget_GDI::GradientFillEx( LPCRECT pRect,BOOL bVert,COLORREF *colors,float *pos,int nCount,BYTE byAlpha/*=0xFF */ )
+    HRESULT SRenderTarget_GDI::GradientFillEx( LPCRECT pRect,BOOL bVert,const COLORREF *colors,const float *pos,int nCount,BYTE byAlpha/*=0xFF */ )
     {
 		(pRect);
 		(bVert);

@@ -32,8 +32,8 @@ HEADERS += resource.h \
            include/soui_mem_wrapper.h \
            include/souicoll.h \
            include/trace.h \
-           include/utilities4-def.h \
-           include/utilities4.h \
+           include/utilities-def.h \
+           include/utilities.h \
            include/atl.mini/atldef.h \
            include/atl.mini/SComCli.h \
            include/atl.mini/SComHelper.h \

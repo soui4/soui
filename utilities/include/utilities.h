@@ -11,4 +11,5 @@ int UTILITIES_API RectHeight(LPCRECT rc) ;
 void UTILITIES_API SHiMetricToPixel(const SIZEL * lpSizeInHiMetric, LPSIZEL lpSizeInPix);
 void UTILITIES_API SPixelToHiMetric(const SIZEL * lpSizeInPix, LPSIZEL lpSizeInHiMetric);
 
+int UTILITIES_API Str2Int(LPCWSTR src,BOOL supportHex);
 SNSEND

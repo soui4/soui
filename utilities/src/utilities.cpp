@@ -1,6 +1,7 @@
 ﻿#include "utilities.h"
 #include "string/strcpcvt.h"
-
+#include <shlwapi.h>
+#pragma comment(lib,"shlwapi.lib")
 SNSBEGIN
 
 int RectWidth(LPCRECT rc) {return rc->right-rc->left;}
@@ -36,6 +37,13 @@ void SPixelToHiMetric(const SIZEL * lpSizeInPix, LPSIZEL lpSizeInHiMetric)
 
 	lpSizeInHiMetric->cx = MAP_PIX_TO_LOGHIM(lpSizeInPix->cx, nPixelsPerInchX);
 	lpSizeInHiMetric->cy = MAP_PIX_TO_LOGHIM(lpSizeInPix->cy, nPixelsPerInchY);
+}
+
+int Str2Int(LPCWSTR src,BOOL supportHex)
+{
+	int nRet = 0;
+	::StrToIntExW(src, supportHex?STIF_SUPPORT_HEX:STIF_DEFAULT, &nRet);
+	return nRet;
 }
 
 

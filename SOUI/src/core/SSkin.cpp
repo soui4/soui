@@ -361,7 +361,6 @@ SSkinGradation::SSkinGradation()
     : m_bVert(TRUE)
     , m_crFrom(CR_INVALID)
     , m_crTo(CR_INVALID)
-    , m_crColorize(0)
 {
 }
 
@@ -370,32 +369,51 @@ void SSkinGradation::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
     pRT->GradientFill(prcDraw, m_bVert, m_crFrom, m_crTo, byAlpha);
 }
 
-void SSkinGradation::OnColorize(COLORREF cr)
-{
-    if (!m_bEnableColorize)
-        return;
-    if (m_crColorize == cr)
-        return;
-    if (m_crColorize != 0)
-    {
-        m_crFrom = m_crFromBackup;
-        m_crTo = m_crToBackup;
-    }
-    else
-    {
-        m_crFromBackup = m_crFrom;
-        m_crToBackup = m_crTo;
-    }
-    m_crColorize = cr;
-    SDIBHelper::Colorize(m_crFrom, cr);
-    SDIBHelper::Colorize(m_crTo, cr);
-}
 
 ISkinObj *SSkinGradation::Scale(int nScale)
 {
     return NULL;
 }
 
+//////////////////////////////////////////////////////////////////////////
+
+SSkinGradation2::SSkinGradation2():m_bVert(TRUE)
+{
+	m_bEnableScale = false;
+}
+
+HRESULT SSkinGradation2::OnAttrColors(const SStringW& value,BOOL bLoading)
+{
+	SStringWList lstInfo;
+	SplitString(value,',',lstInfo);
+	if(lstInfo.GetCount()<2)
+		return E_INVALIDARG;
+
+	m_arrColors.RemoveAll();
+	m_arrPos.RemoveAll();
+	for(UINT i =0;i<lstInfo.GetCount();i++){
+		SStringWList lstColorInfo;
+		SplitString(lstInfo[i],'|',lstColorInfo);
+		if(lstColorInfo.GetCount()==2){
+			COLORREF cr = GETCOLOR(lstColorInfo[0]);
+			m_arrColors.Add(cr);
+			float pos = (float)_wtof(lstColorInfo[1]);
+			m_arrPos.Add(pos);
+		}
+	}
+	return S_OK;
+}
+
+
+void SSkinGradation2::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const
+{
+	pRT->GradientFillEx(prcDraw,m_bVert,m_arrColors.GetData(),m_arrPos.GetData(),m_arrColors.GetCount(),GetAlpha());
+}
+
+ISkinObj *SSkinGradation2::Scale(int nScale)
+{
+    return NULL;
+}
 //////////////////////////////////////////////////////////////////////////
 // SScrollbarSkin
 SSkinScrollbar::SSkinScrollbar()

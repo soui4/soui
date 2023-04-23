@@ -616,7 +616,7 @@ class SOUI_EXP SWindow
 
         if (!pTarget || !pTarget->IsClass(T::GetClassName()))
         {
-            SSLOGFMTD(_T("FindChildByID2 Failed, no window of class [%s] with id of [%d] was found within [%d] levels"), T::GetClassName(), nID, nDeep);
+			SSLOGW()<<"FindChildByID2 Failed, no window of class "<<T::GetClassName()<<" with id of "<<nID<<" was found within "<< nDeep<<" levels";
             return NULL;
         }
         return (T *)pTarget;
@@ -650,7 +650,7 @@ class SOUI_EXP SWindow
         SWindow *pTarget = FindChildByName(pszName, nDeep);
         if (!pTarget || !pTarget->IsClass(T::GetClassName()))
         {
-            SSLOGFMTD(_T("FindChildByName2 Failed, no window of class [%s] with name of [%s] was found within [%d] levels"), T::GetClassName(), pszName, nDeep);
+			SSLOGW()<<"FindChildByName2 Failed, no window of class "<<T::GetClassName()<<" with name of "<<pszName<<" was found within "<< nDeep<<" levels";
             return NULL;
         }
         return (T *)pTarget;
@@ -1239,15 +1239,14 @@ class SOUI_EXP SWindow
     DWORD m_bVisible : 1; /**< 窗口可见状态 */
     DWORD m_bDisable : 1; /**< 窗口禁用状状态 */
     DWORD m_bDisplay : 1; /**< 窗口隐藏时是否占位，不占位时启动重新布局 */
-    DWORD
-    m_bClipClient : 1;           /**<
-                                    窗口绘制时做clip客户区处理的标志,由于clip可能增加计算量，只在绘制可能走出客户区时才设置*/
+    DWORD m_bClipClient : 1;     /**<窗口绘制时做clip客户区处理的标志,由于clip可能增加计算量，只在绘制可能走出客户区时才设置*/
     DWORD m_bMsgTransparent : 1; /**< 接收消息标志 TRUE-不处理消息 */
     DWORD m_bFocusable : 1;      /**< 窗口可获得焦点标志 */
     DWORD m_bDrawFocusRect : 1;  /**< 绘制默认的焦点虚框 */
     DWORD m_bCacheDraw : 1;      /**< 支持窗口内容的Cache标志 */
     DWORD m_bCacheDirty : 1;     /**< 缓存窗口脏标志 */
     DWORD m_bLayeredWindow : 1;  /**< 指示是否是一个分层窗口 */
+	DWORD m_isLoading:1;         /**< loading状态标志 */
     DWORD m_bMsgHandled : 1;
 
     LayoutDirtyType m_layoutDirty;         /**< 布局脏标志 参见LayoutDirtyType */

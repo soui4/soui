@@ -1103,7 +1103,7 @@ namespace SOUI
 		}
 	}
 
-	HRESULT SRenderTarget_Skia::GradientFillEx( LPCRECT pRect,BOOL bVert,COLORREF *colors,float *pos,int nCount,BYTE byAlpha/*=0xFF*/ )
+	HRESULT SRenderTarget_Skia::GradientFillEx( LPCRECT pRect,BOOL bVert,const COLORREF *colors,const float *pos,int nCount,BYTE byAlpha/*=0xFF*/ )
 	{
 		SkRect skrc = toSkRect(pRect);
 		skrc.offset(m_ptOrg);

@@ -84,7 +84,8 @@ SWindow::SWindow()
     , m_animationHandler(this)
     , m_isAnimating(false)
     , m_isDestroying(false)
-	, m_funSwndProc(NULL)
+    , m_isLoading(false)
+    , m_funSwndProc(NULL)
 #ifdef _DEBUG
     , m_nMainThreadId(::GetCurrentThreadId()) // 初始化对象的线程不一定是主线程
 #endif
@@ -876,6 +877,13 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
             }
         }
     }
+    if(!m_isLoading){
+        //动态创建子窗口，同步窗口的的属性
+        if(GetScale() != 100)
+            SDispatchMessage(UM_SETSCALE,GetScale(),0);
+        if(m_crColorize!=0)
+            SDispatchMessage(UM_SETCOLORIZE,GetColorizeColor());
+    }
     return TRUE;
 }
 
@@ -895,6 +903,7 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
     ASSERT_UI_THREAD();
     SXmlNode xmlNode(pNode);
     SASSERT(m_pContainer);
+    m_isLoading = true;
     if (xmlNode)
     {
         if (m_pLayoutParam)
@@ -966,6 +975,7 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
 
     EventSwndInitFinish evt(this);
     FireEvent(&evt);
+    m_isLoading = false;
     return TRUE;
 }
 

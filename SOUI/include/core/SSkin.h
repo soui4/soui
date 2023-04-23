@@ -220,7 +220,7 @@ class SOUI_EXP SSkinGradation : public SSkinObjBase {
     }
 
   public:
-    STDMETHOD_(void, OnColorize)(THIS_ COLORREF cr) OVERRIDE;
+
     STDMETHOD_(ISkinObj *, Scale)(THIS_ int nScale) OVERRIDE;
 
   protected:
@@ -230,14 +230,35 @@ class SOUI_EXP SSkinGradation : public SSkinObjBase {
     COLORREF m_crTo;
     BOOL m_bVert;
 
-    COLORREF m_crColorize;
-    COLORREF m_crFromBackup, m_crToBackup;
-
     SOUI_ATTRS_BEGIN()
         ATTR_COLOR(L"colorFrom", m_crFrom, TRUE) //渐变起始颜色
         ATTR_COLOR(L"colorTo", m_crTo, TRUE)     //渐变终止颜色
         ATTR_BOOL(L"vertical", m_bVert, TRUE)    //渐变方向,0--水平, 1--垂直(默认)
     SOUI_ATTRS_END()
+};
+
+
+class SOUI_EXP SSkinGradation2 : public SSkinObjBase {
+	DEF_SOBJECT(SSkinObjBase, L"gradation2")
+public:
+	SSkinGradation2();
+
+  public:
+    STDMETHOD_(ISkinObj *, Scale)(THIS_ int nScale) OVERRIDE;
+protected:
+	void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
+
+	BOOL m_bVert;
+	
+	SArray<COLORREF> m_arrColors;
+	SArray<float>    m_arrPos;
+protected:
+	HRESULT OnAttrColors(const SStringW& value,BOOL bLoading);
+
+	SOUI_ATTRS_BEGIN()
+		ATTR_CUSTOM(L"colors", OnAttrColors)
+		ATTR_BOOL(L"vertical", m_bVert, TRUE)    //渐变方向,0--水平, 1--垂直(默认)
+	SOUI_ATTRS_END()
 };
 
 //////////////////////////////////////////////////////////////////////////

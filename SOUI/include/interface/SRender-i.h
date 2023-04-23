@@ -1390,7 +1390,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, GradientFill)
     (THIS_ LPCRECT pRect, BOOL bVert, COLORREF crBegin, COLORREF crEnd, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, GradientFillEx)
-    (THIS_ LPCRECT pRect, BOOL bVert, COLORREF *colors, float *pos, int nCount, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    (THIS_ LPCRECT pRect, BOOL bVert, const COLORREF *colors, const float *pos, int nCount, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, GradientFill2)
     (THIS_ LPCRECT pRect, GradientType type, COLORREF crStart, COLORREF crCenter, COLORREF crEnd, float fLinearAngle, float fCenterX, float fCenterY, int nRadius, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, DrawIconEx)

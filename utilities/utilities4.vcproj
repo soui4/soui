@@ -225,9 +225,9 @@
 			<File
 				RelativePath="include\string\tstring.h" />
 			<File
-				RelativePath="include\utilities4-def.h" />
+				RelativePath="include\utilities-def.h" />
 			<File
-				RelativePath="include\utilities4.h" />
+				RelativePath="include\utilities.h" />
 		</Filter>
 		<File
 			RelativePath="utilities.rc" />
