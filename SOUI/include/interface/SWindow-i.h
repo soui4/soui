@@ -256,7 +256,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取刷新加锁状态
      * @return TRUE--当前刷新为加锁状态
      */
-    STDMETHOD_(BOOL, IsUpdateLocked)(CTHIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsUpdateLocked)(CTHIS_ BOOL bCheckParent DEF_VAL(FALSE)) SCONST PURE;
 
     /**
      * @brief 请求立即更新窗口

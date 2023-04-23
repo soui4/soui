@@ -955,7 +955,9 @@ void STreeView::UpdateVisibleItems()
             ii.pItem->ModifyItemState(0, WndState_Hover);
 
         SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+        ii.pItem->LockUpdate();
         m_adapter->getView(hItem, ii.pItem, &xmlNode);
+        ii.pItem->UnlockUpdate();
         if (bNewItem)
         {
             ii.pItem->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
@@ -964,7 +966,7 @@ void STreeView::UpdateVisibleItems()
         }
 
         CSize szItem;
-		m_adapter->getViewDesiredSize(&szItem,hItem, ii.pItem, -1, -1);
+        m_adapter->getViewDesiredSize(&szItem,hItem, ii.pItem, -1, -1);
         ii.pItem->Move(CRect(0, 0, szItem.cx, szItem.cy));
         m_tvItemLocator->SetItemWidth(hItem, szItem.cx);
         m_tvItemLocator->SetItemHeight(hItem, szItem.cy);

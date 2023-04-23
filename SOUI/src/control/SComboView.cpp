@@ -32,6 +32,7 @@ BOOL SComboView::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SetAttribute(L"pos", L"0,0,-0,-0", TRUE);
     m_pListBox->SetAttribute(L"hotTrack", L"1", TRUE);
     m_pListBox->SetOwner(this); // chain notify message to combobox
+	m_pListBox->SetVisible(FALSE);
     m_pListBox->SetID(IDC_DROPDOWN_LIST);
 
     return TRUE;

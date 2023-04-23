@@ -425,7 +425,9 @@ void SListView::UpdateVisibleItems()
                 m_pHoverItem = ii.pItem;
 
             SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+            ii.pItem->LockUpdate();
             m_adapter->getView(iNewLastVisible, ii.pItem, &xmlNode);
+            ii.pItem->UnlockUpdate();
             if (bNewItem)
             {
                 ii.pItem->SDispatchMessage(UM_SETSCALE, GetScale(), 0);

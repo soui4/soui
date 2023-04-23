@@ -1418,14 +1418,14 @@ void SWindow::InvalidateRect(const CRect &rect, BOOL bFromThis /*=TRUE*/,BOOL bC
         mtx.mapRect(&fRc);
         rcIntersect = fRc.toRect();
     }
-	if (GetParent())
-	{
-		GetParent()->InvalidateRect(rcIntersect, FALSE,bClip);
-	}
-	else
-	{
-		GetContainer()->OnRedraw(rcIntersect,bClip);
-	}
+    if (GetParent())
+    {
+        GetParent()->InvalidateRect(rcIntersect, FALSE,bClip);
+    }
+    else
+    {
+        GetContainer()->OnRedraw(rcIntersect,bClip);
+    }
 
 }
 
@@ -1440,9 +1440,14 @@ void SWindow::UnlockUpdate()
     SASSERT(m_nUpdateLockCnt >= 0);
 }
 
-BOOL SWindow::IsUpdateLocked() const
+BOOL SWindow::IsUpdateLocked(BOOL bCheckParent) const
 {
-    return m_nUpdateLockCnt > 0;
+    BOOL bLocked = m_nUpdateLockCnt > 0;
+    if(bLocked)
+        return TRUE;
+    if(!bCheckParent || !GetParent())
+        return bLocked;
+    return GetParent()->IsUpdateLocked(TRUE);
 }
 
 void SWindow::BringWindowToTop()
@@ -2235,14 +2240,13 @@ IRenderTarget *SWindow::GetRenderTarget(GrtFlag gdcFlags, IRegionS *pRgn)
 {
     SASSERT(!m_pGetRTData);
 
-    if (IsUpdateLocked())
+    BOOL bRenderValid = GetContainer() && IsVisible(TRUE) && !IsUpdateLocked(TRUE);
+    if (!bRenderValid)
     { // return a empty render target
         IRenderTarget *pRT = NULL;
         GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
         return pRT;
     }
-
-    SASSERT(GetContainer());
 
     GetContainer()->BuildWndTreeZorder();
 
@@ -2265,11 +2269,8 @@ IRenderTarget *SWindow::GetRenderTarget(GrtFlag gdcFlags, IRegionS *pRgn)
 void SWindow::ReleaseRenderTarget(IRenderTarget *pRT)
 {
 	pRT->Release();
-    if (IsUpdateLocked())
-    {
-        return;
-    }
-    SASSERT(m_pGetRTData);
+	if(!m_pGetRTData)
+		return;
     if (m_pGetRTData->gdcFlags != GRT_NODRAW)
     {
         SMatrix mtx;

@@ -660,7 +660,9 @@ void SMCListView::UpdateVisibleItems()
 
             //应用可以根据ii.pItem的状态来决定如何初始化列表数据
             SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+            ii.pItem->LockUpdate();
             m_adapter->getView(iNewLastVisible, ii.pItem, &xmlNode);
+            ii.pItem->UnlockUpdate();
             if (bNewItem)
             {
                 ii.pItem->SDispatchMessage(UM_SETSCALE, GetScale(), 0);

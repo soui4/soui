@@ -317,7 +317,7 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(void, LockUpdate)(THIS) OVERRIDE;
     STDMETHOD_(void, UnlockUpdate)(THIS) OVERRIDE;
-    STDMETHOD_(BOOL, IsUpdateLocked)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, IsUpdateLocked)(CTHIS_ BOOL bCheckParent DEF_VAL(FALSE)) SCONST OVERRIDE;
     STDMETHOD_(void, Update)(THIS) OVERRIDE;
     STDMETHOD_(void, Move)(THIS_ LPCRECT prect) OVERRIDE;
     STDMETHOD_(void, SetWindowRgn)(THIS_ IRegionS *pRgn, BOOL bRedraw DEF_VAL(TRUE)) OVERRIDE;

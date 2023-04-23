@@ -315,7 +315,7 @@ void SListBox::RedrawItem(int iItem)
         CRect rcItem(0, 0, rcClient.Width(), nItemHei);
         rcItem.OffsetRect(0, nItemHei * iItem - m_siVer.nPos);
         rcItem.OffsetRect(rcClient.TopLeft());
-		InvalidateRect(rcItem);
+        InvalidateRect(rcItem);
     }
 }
 
