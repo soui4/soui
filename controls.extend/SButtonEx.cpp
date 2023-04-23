@@ -32,7 +32,6 @@ CSize SButtonEx::GetDesiredSize(LPCRECT pRcContainer)
 
 CSize SButtonEx::GetDesiredSize(IRenderTarget *pRT, LPCRECT pRcContainer)
 {
-    SASSERT(m_pIcon);
     CSize szIcon = GetIconSize();
     CSize szText;
     pRT->MeasureText(GetWindowText(), GetWindowText().GetLength(), &szText);
@@ -173,11 +172,11 @@ CSize SButtonEx::GetIconSize()
 {
     if (m_hIcon)
         return CSize(m_nIconSize.toPixelSize(GetScale()), m_nIconSize.toPixelSize(GetScale()));
-    else
+    else if(m_pIcon)
     {
-       CSize skinsize =  m_pIcon->GetSkinSize();
-       return CSize(SLayoutSize((float)skinsize.cx).toPixelSize(GetScale()), SLayoutSize((float)skinsize.cy).toPixelSize(GetScale()));
+       return  m_pIcon->GetSkinSize();
     }
+    return CSize();
 }
 
 void SButtonEx::DrawIcon(IRenderTarget *pRT, CRect rcIcon)
@@ -189,7 +188,7 @@ void SButtonEx::DrawIcon(IRenderTarget *pRT, CRect rcIcon)
         pRT->DrawIconEx(rcIcon.left, rcIcon.top, m_hIcon, rcIcon.Width(), rcIcon.Height(),
                         DI_NORMAL);
     }
-    else
+    else if(m_pIcon)
     {
         int iState = m_iIcon != -1 ? m_iIcon : SState2Index::GetDefIndex(GetState(), true);
         m_pIcon->DrawByIndex(pRT, rcIcon, iState);
@@ -200,7 +199,8 @@ void SButtonEx::OnScaleChanged(int scale)
 {
     __super::OnScaleChanged(scale);
 
-    GetScaleSkin(m_pIcon, scale);
+    if(m_pIcon)
+        GetScaleSkin(m_pIcon, scale);
 }
 
 void SButtonEx::SetIconVisible(bool bVisible)
