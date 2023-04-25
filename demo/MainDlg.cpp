@@ -314,19 +314,17 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
     SetMainWnd(m_hWnd);
     
     InitListCtrl();
-	SWindow *pEdit1 = FindChildByName(L"edit_drop_top");
 
     //设置标题
     SStringW strTitle = SStringW().Format(GETSTRING(R.string.title),SOUI_VER1,SOUI_VER2,SOUI_VER3,SOUI_VER4);
     FindChildByID(R.id.txt_title)->SetWindowText(S_CW2T(GetRoot()->tr(strTitle)));
     
     //演示在SOUI中的拖放
-    SWindow *pEdit2 = FindChildByName(L"edit_drop_bottom");
-    if(pEdit1 && pEdit2)
+	SEdit *pEdit1 = FindChildByName2<SEdit>(L"edit_drop_top");
+    if(pEdit1)
     {
         HRESULT hr=::RegisterDragDrop(m_hWnd,GetDropTarget());
         RegisterDragDrop(pEdit1->GetSwnd(),new CTestDropTarget1(pEdit1));
-        RegisterDragDrop(pEdit2->GetSwnd(),new CTestDropTarget1(pEdit2));
     }
     
     SRichEdit *pEdit = FindChildByName2<SRichEdit>(L"re_gifhost");

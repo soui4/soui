@@ -68,9 +68,9 @@ protected:
 class CTestDropTarget1 : public CTestDropTarget
 {
 protected:
-	SWindow *m_pEdit;
+	SEdit *m_pEdit;
 public:
-	CTestDropTarget1(SWindow *pEdit) :m_pEdit(pEdit)
+	CTestDropTarget1(SEdit *pEdit) :m_pEdit(pEdit)
 	{
 		if (m_pEdit) m_pEdit->AddRef();
 	}
@@ -102,16 +102,21 @@ public:
 			return S_FALSE;
 		}
 
-		bool success = false;
-		TCHAR filename[MAX_PATH];
-		success = !!DragQueryFile(hdrop, 0, filename, MAX_PATH);
+		int nFiles = DragQueryFile(hdrop, -1, NULL, 0); 
+		for(int i=0;i<nFiles;i++){
+			bool success = false;
+			TCHAR filename[MAX_PATH];
+			int bufLen = DragQueryFile(hdrop, i, filename, MAX_PATH);
+			if (bufLen>0 && m_pEdit)
+			{
+				_tcscpy(filename+bufLen,_T("\n"));
+				m_pEdit->SetSel(-1,-1,false);
+				m_pEdit->ReplaceSel(filename,false);
+			}
+		}
 		DragFinish(hdrop);
 		GlobalUnlock(medium.hGlobal);
-
-		if (success && m_pEdit)
-		{
-			m_pEdit->SetWindowText(filename);
-		}
+		m_pEdit->Update();
 
 		*pdwEffect = DROPEFFECT_LINK;
 		return S_OK;

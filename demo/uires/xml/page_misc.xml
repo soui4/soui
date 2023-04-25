@@ -3,10 +3,9 @@
     <page title="script" colorBorder="#ff0000" margin-x="1" margin-y="1">
       <include src="layout:page_script"/>
     </page>
-    <page title="drag drop">
-      <edit name="edit_drop_top" pos="10,10,-10,]-10" cueText="draging a file to me to see what will happen"/>
-      <text pos ="10,|0" offset="0,-0.5" colorText="RGB(255,0,0)"  colorBkgnd="RGB(0,255,0)">show how to implement dragdrop in soui</text>
-      <edit name="edit_drop_bottom" pos="10,[10,-10,-10" cueText="draging a file to me to see what will happen"/>
+    <page title="drag drop" layout="vbox" interval="5">
+      <text size="-2,-1" offset="0,-0.5" colorText="RGB(255,0,0)"  colorBkgnd="RGB(0,255,0)">show how to implement dragdrop in soui</text>
+      <edit name="edit_drop_top" size="-2,0" weight="1" multilines="1" cueText="draging a file to me to see what will happen"  vscrollbar="1"  margin="2,2"/>
     </page>
     <page title="animation" font="adding:10" clipClient="1">
       <text pos="|0,|0" offset="-0.5,-0.5" colorText="#ff0000">动画效果只在Vista及以上版本的操作系统能够演示</text>
