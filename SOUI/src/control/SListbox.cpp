@@ -275,6 +275,7 @@ void SListBox::LoadItemAttribute(SXmlNode xmlNode, LPLBITEM pItem)
     pItem->nImage = xmlNode.attribute(L"icon").as_int(pItem->nImage);
     pItem->lParam = xmlNode.attribute(L"data").as_uint((UINT)pItem->lParam);
     SStringW strText = GETSTRING(xmlNode.attribute(L"text").value());
+	if(strText.IsEmpty()) strText = GetXmlText(xmlNode);
     pItem->strText.SetText(S_CW2T(strText));
 }
 

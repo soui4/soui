@@ -478,9 +478,11 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
         item.strText.SetOwner(this);
         item.mask = 0xFFFFFFFF;
         item.iOrder = iOrder++;
-        SStringW strText = xmlItem.Text();
-        strText.TrimBlank();
-        item.strText.SetText(S_CW2T(GETSTRING(strText)));
+        SStringW strText = xmlItem.attribute(L"text").as_string();
+		if(strText.IsEmpty()){
+			strText = SWindow::GetXmlText(xmlItem);;
+		}
+        item.strText.SetText(S_CW2T(strText));
         SLayoutSize szItem = GETLAYOUTSIZE(xmlItem.attribute(L"width").as_string(L"50"));
         item.cx = szItem.toPixelSize(GetScale());
         item.fWeight = xmlItem.attribute(L"weight").as_float();

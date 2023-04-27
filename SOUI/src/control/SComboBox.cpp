@@ -46,6 +46,7 @@ BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
         {
 
             SStringW strText = xmlNode_Item.attribute(L"text").value();
+			if(strText.IsEmpty()) strText = GetXmlText(xmlNode_Item);
             int iIcon = xmlNode_Item.attribute(L"icon").as_int(0);
             LPARAM lParam = xmlNode_Item.attribute(L"data").as_int(0);
             m_pListBox->AddString(S_CW2T(strText), iIcon, lParam);

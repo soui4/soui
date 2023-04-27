@@ -175,6 +175,7 @@ class SOUI_EXP STrText {
 
     void TranslateText();
 
+	static SStringW EscapeString(const SStringW & str);
   protected:
     SWindow *pOwner;
 
@@ -231,6 +232,9 @@ class SOUI_EXP SWindow
     BOOL IsMsgHandled() const;
 
     void SetMsgHandled(BOOL bHandled);
+
+  public:
+	static SStringW GetXmlText(const SXmlNode &xmlNode);
 
   public:
 	STDMETHOD_(void, OnFinalRelease)(THIS);

@@ -412,16 +412,17 @@ void SMenu::BuildMenu(HMENU menuPopup, SXmlNode xmlNode)
 
     while (xmlItem)
     {
-        if (wcscmp(L"item", xmlItem.name()) == 0)
+        if (wcsicmp(L"item", xmlItem.name()) == 0)
         {
             SMenuItemData *pdmmi = new SMenuItemData;
             pdmmi->iIcon = xmlItem.attribute(L"icon").as_int(-1);
             pdmmi->dwUserData = xmlItem.append_attribute(L"userData").as_uint();
-            SStringW strText = xmlItem.Text();
-            strText.TrimBlank();
-            if (strText.IsEmpty())
-                strText = xmlItem.attribute(L"text").as_string();
-            strText = TR(GETSTRING(strText), L"");
+			SStringW strText = xmlItem.attribute(L"text").as_string();
+			if(strText.IsEmpty()){
+				strText = SWindow::GetXmlText(xmlItem);;
+			}
+            strText = TR(strText, GetMenuAttr(menuPopup)->m_strTrCtx);
+			strText = STrText::EscapeString(strText);
             InitMenuItemData(pdmmi, strText);
 
             int nID = xmlItem.attribute(L"id").as_int(0);

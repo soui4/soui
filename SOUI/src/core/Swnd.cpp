@@ -39,7 +39,57 @@ void STrText::TranslateText()
 {
     if (pOwner == NULL)
         return;
-    strTr = S_CW2T(pOwner->tr(strRaw));
+	SStringW str = pOwner->tr(strRaw);
+	str = EscapeString(str);
+    strTr = S_CW2T(str);
+}
+
+SStringW STrText::EscapeString(const SStringW & strValue)
+{
+	if(strValue.IsEmpty())
+		return strValue;
+	SStringW strText = strValue;
+	SStringW strCvt;
+	LPCWSTR pszBuf = strText;
+	int i = 0;
+	int iBegin = i;
+	while (i < strText.GetLength())
+	{
+		if (pszBuf[i] == L'\\' && i + 1 < strText.GetLength())
+		{
+			if (pszBuf[i + 1] == L'n')
+			{
+				strCvt += strText.Mid(iBegin, i - iBegin);
+				strCvt += L"\n";
+				i += 2;
+				iBegin = i;
+			}
+			else if (pszBuf[i + 1] == L't')
+			{
+				strCvt += strText.Mid(iBegin, i - iBegin);
+				strCvt += L"\t";
+				i += 2;
+				iBegin = i;
+			}
+			else if (pszBuf[i + 1] == L'\\')
+			{
+				strCvt += strText.Mid(iBegin, i - iBegin);
+				strCvt += L"\\";
+				i += 2;
+				iBegin = i;
+			}
+			else
+			{
+				i += 1;
+			}
+		}
+		else
+		{
+			i += 1;
+		}
+	}
+	strCvt += strText.Mid(iBegin);
+	return strCvt;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -930,21 +980,13 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
         MarkAttributeHandled(attrClass, false);
         MarkAttributeHandled(attrLayout, false);
 
-        SStringW strText = xmlNode.Text();
-        strText.TrimBlank();
-        if (!strText.IsEmpty())
-        {
-            OnAttrText(strText, TRUE);
-        }
-        else if (m_strText.GetText(TRUE).IsEmpty())
-        { // try to apply cdata as text
-            SStringW strCData = xmlNode.child_value();
-            strCData.TrimBlank();
-            if (!strCData.IsEmpty())
-            {
-                OnAttrText(strCData, TRUE);
-            }
-        }
+		if (m_strText.GetText(TRUE).IsEmpty()){
+			SStringW strText = GetXmlText(xmlNode);
+			if (!strText.IsEmpty())
+			{
+				OnAttrText(strText, TRUE);
+			}
+		}
     }
 
     //发送WM_CREATE消息
@@ -2824,50 +2866,22 @@ HRESULT SWindow::OnAttrTip(const SStringW &strValue, BOOL bLoading)
     return S_FALSE;
 }
 
+
+SStringW SWindow::GetXmlText(const SXmlNode &xmlNode)
+{
+	SStringW strText = xmlNode.Text();
+	strText.TrimBlank();
+	if (strText.IsEmpty()){
+		strText = xmlNode.child_value();
+		strText.TrimBlank();
+	}
+	return strText;
+}
+
 HRESULT SWindow::OnAttrText(const SStringW &strValue, BOOL bLoading)
 {
-    SStringW strText = GETSTRING(strValue);
-    SStringW strCvt;
-    LPCWSTR pszBuf = strText;
-    int i = 0;
-    int iBegin = i;
-    while (i < strText.GetLength())
-    {
-        if (pszBuf[i] == L'\\' && i + 1 < strText.GetLength())
-        {
-            if (pszBuf[i + 1] == L'n')
-            {
-                strCvt += strText.Mid(iBegin, i - iBegin);
-                strCvt += L"\n";
-                i += 2;
-                iBegin = i;
-            }
-            else if (pszBuf[i + 1] == L't')
-            {
-                strCvt += strText.Mid(iBegin, i - iBegin);
-                strCvt += L"\t";
-                i += 2;
-                iBegin = i;
-            }
-            else if (pszBuf[i + 1] == L'\\')
-            {
-                strCvt += strText.Mid(iBegin, i - iBegin);
-                strCvt += L"\\";
-                i += 2;
-                iBegin = i;
-            }
-            else
-            {
-                i += 1;
-            }
-        }
-        else
-        {
-            i += 1;
-        }
-    }
-    strCvt += strText.Mid(iBegin);
-    SStringT strCvt2 = S_CW2T(strCvt);
+	SStringW strText = GETSTRING(strValue);
+    SStringT strCvt2 = S_CW2T(strText);
     if (bLoading)
         m_strText.SetText(strCvt2);
     else
