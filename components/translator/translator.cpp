@@ -154,8 +154,8 @@ BOOL STranslator::LoadFromXml( SXmlNode xmlLang )
 		{
 			SASSERT(nodeStr);
 			SStrMap * strMap= new SStrMap;
-			strMap->strSource=StrEscape(nodeStr.child(L"source").Text());
-			strMap->strTranslation=StrEscape(nodeStr.child(L"translation").Text());
+			strMap->strSource=nodeStr.child(L"source").Text();
+			strMap->strTranslation=nodeStr.child(L"translation").Text();
 			strMapEntry->m_arrStrMap.SetAt(j,strMap);
 			nodeStr=nodeStr.next_sibling(L"message");
 		}
@@ -215,51 +215,6 @@ BOOL STranslator::NameEqualA(CTHIS_ const IStringA *strName) const
 	SStringA str(strName);
 	SStringW strW=S_CA2W(str,CP_UTF8);
 	return NameEqual(strW);
-}
-
-SStringW STranslator::StrEscape(SStringW strText)
-{
-	SStringW strCvt;
-	LPCWSTR pszBuf = strText;
-	int i = 0;
-	int iBegin = i;
-	while (i < strText.GetLength())
-	{
-		if (pszBuf[i] == L'\\' && i + 1 < strText.GetLength())
-		{
-			if (pszBuf[i + 1] == L'n')
-			{
-				strCvt += strText.Mid(iBegin, i - iBegin);
-				strCvt += L"\n";
-				i += 2;
-				iBegin = i;
-			}
-			else if (pszBuf[i + 1] == L't')
-			{
-				strCvt += strText.Mid(iBegin, i - iBegin);
-				strCvt += L"\t";
-				i += 2;
-				iBegin = i;
-			}
-			else if (pszBuf[i + 1] == L'\\')
-			{
-				strCvt += strText.Mid(iBegin, i - iBegin);
-				strCvt += L"\\";
-				i += 2;
-				iBegin = i;
-			}
-			else
-			{
-				i += 1;
-			}
-		}
-		else
-		{
-			i += 1;
-		}
-	}
-	strCvt += strText.Mid(iBegin);
-	return strCvt;
 }
 
 //////////////////////////////////////////////////////////////////////////
