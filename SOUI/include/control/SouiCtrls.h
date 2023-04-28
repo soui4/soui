@@ -25,3 +25,4 @@
 #include "SMenuBar.h"
 #include "SDateTimePicker.h"
 #include "SFrame.h"
+#include "SStackView.h"

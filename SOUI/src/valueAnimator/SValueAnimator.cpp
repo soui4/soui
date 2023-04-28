@@ -341,11 +341,12 @@ BOOL SValueAnimator::isRunning() const
 
 void SValueAnimator::end()
 {
+	if(!mStarted)
+		return;
     if (!mRunning)
     {
         // Special case if the animation has not yet started; get it ready for ending
         startAnimation();
-        mStarted = true;
     }
     animateValue(shouldPlayBackward(mRepeatCount, mReversing) ? 0.f : 1.f);
     endAnimation();

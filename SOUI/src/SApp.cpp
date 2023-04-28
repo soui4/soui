@@ -39,7 +39,6 @@
 #include "valueAnimator/SValueAnimator.h"
 #include "core/SHostPresenter.h"
 
-#pragma comment(lib, "shlwapi.lib")
 
 SNSBEGIN
 
@@ -165,6 +164,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SCalendar>();
     objFactory->TplRegisterFactory<SDateTimePicker>();
 	objFactory->TplRegisterFactory<SFrame>();
+	objFactory->TplRegisterFactory<SStackView>();
 }
 
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const

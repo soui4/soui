@@ -51,6 +51,10 @@
     }                                                                                                                      \
     else
 
+#define ATTR_CHAIN_CLASS(cls)                                                                  \
+	if (FAILED(hRet)) \
+		hRet = cls::SetAttribute(strAttribName, strValue, bLoading); \
+
 #define ATTR_CUSTOM(attribname, func)                 \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \

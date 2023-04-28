@@ -497,8 +497,9 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * @brief 获取子窗口
-     * @param iChild int--子窗口序号
-     * @return
+     * @param iChild int--子窗口序号,[0,childCount]
+     * @return IWindow *--子窗口
+	 * @remark iChild==0返回self, 1返回第一个子窗口
      */
     STDMETHOD_(IWindow *, GetIChild)(CTHIS_ int iChild) SCONST PURE;
 

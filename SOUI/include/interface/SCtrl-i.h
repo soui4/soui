@@ -3246,4 +3246,48 @@ DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
     STDMETHOD_(LPVOID,GetData)(THIS) PURE;
 };
 
+typedef enum _StackViewAniStyle{
+	kAniNone=0,
+	kFadeInOut,
+	kMoveInOut,
+	kPushInOut
+}StackViewAniStyle;
+
+#undef INTERFACE
+#define INTERFACE IStackView
+DECLARE_INTERFACE_IID_(IStackView, ICtrl, "1A7172D8-F45B-45fe-A73E-2B7F07E7EB70")
+{
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+     */
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+	STDMETHOD_(BOOL,SelectView)(THIS_ int iView) PURE;
+	STDMETHOD_(void,SetAniStyle)(THIS_ StackViewAniStyle aniStyle) PURE;
+	STDMETHOD_(void,SetAniDir)(THIS_ BOOL bVert) PURE;	
+};
+
 SNSEND

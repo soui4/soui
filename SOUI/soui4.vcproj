@@ -294,6 +294,8 @@
 			<File
 				RelativePath="src\control\SSplitWnd.cpp" />
 			<File
+				RelativePath="src\control\SStackView.cpp" />
+			<File
 				RelativePath="src\res.mgr\SStylePool.cpp" />
 			<File
 				RelativePath="src\control\STabCtrl.cpp" />
@@ -610,6 +612,8 @@
 				RelativePath="include\control\SSpinButtonCtrl.h" />
 			<File
 				RelativePath="include\control\SSplitWnd.h" />
+			<File
+				RelativePath="include\control\SStackView.h" />
 			<File
 				RelativePath="include\res.mgr\SStylePool.h" />
 			<File

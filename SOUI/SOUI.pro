@@ -136,6 +136,7 @@ HEADERS += include/SApp.h \
            include/control/STree.h \
            include/control/STreeCtrl.h \
            include/control/STreeView.h \
+           include/control/SStackView.h \
            include/core/SAccelerator.h \
            include/core/SCaret.h \
            include/core/SDefine.h \
@@ -274,6 +275,7 @@ SOURCES += src/SApp.cpp \
            src/control/STileView.cpp \
            src/control/STreeCtrl.cpp \
            src/control/STreeView.cpp \
+           src/control/SStackView.cpp \
            src/core/SAccelerator.cpp \
            src/core/SCaret.cpp \
            src/core/SDropTargetDispatcher.cpp \

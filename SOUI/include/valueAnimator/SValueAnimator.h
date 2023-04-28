@@ -1,3 +1,4 @@
+#pragma once
 /*
  * Copyright (C) 2010 The Android Open Source Project
  *
