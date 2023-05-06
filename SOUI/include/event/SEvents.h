@@ -41,6 +41,7 @@ typedef enum _SOUI_EVENTS
 	EVT_CAPTURECHANGED,
     EVT_LBUTTONDOWN,
     EVT_LBUTTONUP,
+	EVT_DBCLICK,
     EVT_UPDATE_TOOLTIP,
     EVT_ANIMATION_START,
     EVT_ANIMATION_STOP,
@@ -360,6 +361,8 @@ DEF_EVT(EventItemPanelHover, EVT_ITEMPANEL_HOVER, on_itempanel_hover, {
 DEF_EVT(EventItemPanelLeave, EVT_ITEMPANEL_LEAVE, on_itempanel_leave, { int fake; })
 
 DEF_EVT(EventLButtonDown, EVT_LBUTTONDOWN, on_mouse_lbutton_down, { POINT pt; })
+
+DEF_EVT(EventDbClick, EVT_DBCLICK, on_mouse_dbclick, { POINT pt; })
 
 DEF_EVT(EventLButtonUp, EVT_LBUTTONUP, on_mouse_lbutton_up, { POINT pt; })
 

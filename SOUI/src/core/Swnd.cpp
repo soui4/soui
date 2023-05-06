@@ -159,6 +159,7 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSwndUpdateTooltip));
     m_evtSet.addEvent(EVENTID(EventLButtonDown));
     m_evtSet.addEvent(EVENTID(EventLButtonUp));
+	m_evtSet.addEvent(EVENTID(EventDbClick));
 
     m_evtSet.addEvent(EVENTID(EventCmd));
     m_evtSet.addEvent(EVENTID(EventCtxMenu));
@@ -2084,6 +2085,13 @@ void SWindow::OnRButtonDown(UINT nFlags, CPoint point)
 
 void SWindow::OnRButtonUp(UINT nFlags, CPoint point)
 {
+}
+
+void SWindow::OnDbClick(UINT nFlags, CPoint point)
+{
+	EventDbClick evt(this);
+	evt.pt = point;
+	FireEvent(evt);
 }
 
 void SWindow::OnMouseMove(UINT nFlags, CPoint pt)

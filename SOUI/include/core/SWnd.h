@@ -1091,6 +1091,8 @@ class SOUI_EXP SWindow
 
     void OnRButtonUp(UINT nFlags, CPoint point);
 
+	void OnDbClick(UINT nFlags, CPoint point);
+
     void OnMouseHover(UINT nFlags, CPoint ptPos);
 
     void OnMouseMove(UINT nFlags, CPoint pt);
@@ -1120,6 +1122,7 @@ class SOUI_EXP SWindow
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_RBUTTONDOWN(OnRButtonDown)
         MSG_WM_RBUTTONUP(OnRButtonUp)
+		MSG_WM_LBUTTONDBLCLK(OnDbClick)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_MOUSEHOVER(OnMouseHover)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
