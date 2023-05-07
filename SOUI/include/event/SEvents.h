@@ -360,11 +360,11 @@ DEF_EVT(EventItemPanelHover, EVT_ITEMPANEL_HOVER, on_itempanel_hover, {
 //注：在EventItemPanelLeave中从IItemPanel中通过GetItemIndex获取表项索引时需要检查索引有效性。
 DEF_EVT(EventItemPanelLeave, EVT_ITEMPANEL_LEAVE, on_itempanel_leave, { int fake; })
 
-DEF_EVT(EventLButtonDown, EVT_LBUTTONDOWN, on_mouse_lbutton_down, { POINT pt; })
+DEF_EVT(EventLButtonDown, EVT_LBUTTONDOWN, on_mouse_lbutton_down, { POINT pt;UINT uFlags; })
 
-DEF_EVT(EventDbClick, EVT_DBCLICK, on_mouse_dbclick, { POINT pt; })
+DEF_EVT(EventDbClick, EVT_DBCLICK, on_mouse_dbclick, { POINT pt; UINT uFlags;})
 
-DEF_EVT(EventLButtonUp, EVT_LBUTTONUP, on_mouse_lbutton_up, { POINT pt; })
+DEF_EVT(EventLButtonUp, EVT_LBUTTONUP, on_mouse_lbutton_up, { POINT pt;UINT uFlags; })
 
 DEF_EVT(EventCmd, EVT_CMD, on_command, { int fake; })
 

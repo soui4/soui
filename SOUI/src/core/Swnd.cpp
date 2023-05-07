@@ -2054,6 +2054,7 @@ void SWindow::OnLButtonDown(UINT nFlags, CPoint pt)
 
     EventLButtonDown evtLButtonDown(this);
     evtLButtonDown.pt = pt;
+	evtLButtonDown.uFlags = nFlags;
     FireEvent(evtLButtonDown);
 }
 
@@ -2070,6 +2071,7 @@ void SWindow::OnLButtonUp(UINT nFlags, CPoint pt)
 
     EventLButtonUp evtLButtonUp(this);
     evtLButtonUp.pt = pt;
+	evtLButtonUp.uFlags = nFlags;
     FireEvent(evtLButtonUp);
 
     if (GetID() || GetName())
@@ -2091,6 +2093,7 @@ void SWindow::OnDbClick(UINT nFlags, CPoint point)
 {
 	EventDbClick evt(this);
 	evt.pt = point;
+	evt.uFlags = nFlags;
 	FireEvent(evt);
 }
 
