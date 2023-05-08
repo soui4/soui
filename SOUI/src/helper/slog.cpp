@@ -22,7 +22,8 @@ void Log::DefCallback(const char *tag, const char *pLogStr, int level, const cha
     {
         const int kMaxLog = Log::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);
-        int nLen = _snprintf_s(logbuf2, kMaxLog, _TRUNCATE, "%s,%s %s %s:%d\n", tag, pLogStr, fun, file, line);
+		DWORD tid = GetCurrentThreadId();
+        int nLen = _snprintf_s(logbuf2, kMaxLog, _TRUNCATE, "pid=%u,%s,%s %s %s:%d\n",tid, tag, pLogStr, fun, file, line);
         logbuf2[nLen] = 0;
         OutputDebugStringA(logbuf2);
         free(logbuf2);
