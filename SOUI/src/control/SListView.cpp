@@ -1116,4 +1116,16 @@ IItemPanel *SListView::HitTest(const POINT *pt) const
     return HitTest(pt2);
 }
 
+void SListView::GetDesiredSize(THIS_ SIZE *psz,int nParentWid, int nParentHei)
+{
+	__baseCls::GetDesiredSize(psz,nParentWid,nParentHei);
+	ILayoutParam *pLayoutParam = GetLayoutParam();
+	if(pLayoutParam->IsWrapContent(Vert) && m_lvItemLocator && m_lvItemLocator->IsFixHeight()){
+		CRect rcPadding = GetStyle().GetPadding();
+		psz->cy = m_lvItemLocator->GetTotalHeight() + rcPadding.top + rcPadding.bottom;
+		if(nParentHei>0 && psz->cy>nParentHei)
+			psz->cy = nParentHei;
+	}
+}
+
 SNSEND

@@ -1008,7 +1008,7 @@ DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2"
 
 #undef INTERFACE
 #define INTERFACE IMcListView
-DECLARE_INTERFACE_IID_(IMcListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
+DECLARE_INTERFACE_IID_(IMcListView, IPanel, "485AB4B5-6018-4710-BF8E-751FDE53E335")
 {
     /**
      * @brief 增加引用计数
@@ -1789,6 +1789,10 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
      * @return int 找到的索引，-1代表没有找到
      */
     STDMETHOD_(int, FindString)(CTHIS_ int iFindAfter, LPCTSTR pszText) SCONST PURE;
+
+	STDMETHOD_(BOOL, SetItemImage)(THIS_ int nIndex,int iImage) PURE;
+
+	STDMETHOD_(int, GetItemImage)(THIS_ int nIndex) PURE;
 };
 
 #undef INTERFACE
