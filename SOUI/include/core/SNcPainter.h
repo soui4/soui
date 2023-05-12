@@ -29,7 +29,7 @@ class SNcPainter
     ~SNcPainter(void);
 
     static int toNcBuiltinID(const SStringW &str);
-
+	static void updateSystemButton(SWindow *pRoot,UINT nResizeMode);
   public:
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pXmlNode) OVERRIDE;
 

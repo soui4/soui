@@ -774,6 +774,7 @@ void SHostWnd::OnDestroy()
 void SHostWnd::OnSize(UINT nType, CSize size)
 {
     SetMsgHandled(FALSE); // chain wm_size to ncpainter.
+	SNcPainter::updateSystemButton(GetRoot(),nType);
     if (IsIconic())
         return;
 
@@ -949,6 +950,31 @@ BOOL SHostWnd::OnFireEvent(IEvtArgs *evt)
 	if (m_evtHandler.fun)
 	{
 		if(m_evtHandler.fun(evt,m_evtHandler.ctx))
+			return TRUE;
+	}
+	EventCmd *e2 = sobj_cast<EventCmd>(evt);
+	if (e2)
+	{
+		bool bSysBtn = true;
+		switch (e2->idFrom)
+		{
+		case SNcPainter::IDC_SYS_CLOSE:
+			PostMessage(WM_SYSCOMMAND, SC_CLOSE);
+			break;
+		case SNcPainter::IDC_SYS_MIN:
+			PostMessage(WM_SYSCOMMAND, SC_MINIMIZE);
+			break;
+		case SNcPainter::IDC_SYS_MAX:
+			PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE);
+			break;
+		case SNcPainter::IDC_SYS_RESTORE:
+			PostMessage(WM_SYSCOMMAND, SC_RESTORE);
+			break;
+		default:
+			bSysBtn = false;
+			break;
+		}
+		if (bSysBtn)
 			return TRUE;
 	}
     return _HandleEvent(evt);

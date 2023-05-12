@@ -503,31 +503,6 @@ IObject *SNcPainter::GetHost()
 
 BOOL SNcPainter::OnHostFireEvent(IEvtArgs *e)
 {
-    EventCmd *e2 = sobj_cast<EventCmd>(e);
-    if (e2)
-    {
-        bool bSysBtn = true;
-        switch (e2->idFrom)
-        {
-        case IDC_SYS_CLOSE:
-            m_pHost->PostMessage(WM_SYSCOMMAND, SC_CLOSE);
-            break;
-        case IDC_SYS_MIN:
-            m_pHost->PostMessage(WM_SYSCOMMAND, SC_MINIMIZE);
-            break;
-        case IDC_SYS_MAX:
-            m_pHost->PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE);
-            break;
-        case IDC_SYS_RESTORE:
-            m_pHost->PostMessage(WM_SYSCOMMAND, SC_RESTORE);
-            break;
-        default:
-            bSysBtn = false;
-            break;
-        }
-        if (bSysBtn)
-            return TRUE;
-    }
     return m_pHost->OnFireEvent(e);
 }
 
@@ -693,21 +668,7 @@ void SNcPainter::OnSize(UINT nType, CSize size)
 {
     if (IsDrawNc())
     {
-        SWindow *pMax = m_root->FindChildByID(IDC_SYS_MAX);
-        SWindow *pRestore = m_root->FindChildByID(IDC_SYS_RESTORE);
-        if (pMax && pRestore)
-        {
-            if (nType == SIZE_MAXIMIZED)
-            {
-                pMax->SetVisible(FALSE);
-                pRestore->SetVisible(TRUE);
-            }
-            else if (nType == SIZE_RESTORED)
-            {
-                pMax->SetVisible(TRUE);
-                pRestore->SetVisible(FALSE);
-            }
-        }
+		updateSystemButton(m_root,nType);
     }
 }
 
@@ -767,6 +728,25 @@ void SNcPainter::OnTimer(UINT_PTR tid)
 		}
 	}else{
 		SetMsgHandled(FALSE);
+	}
+}
+
+void SNcPainter::updateSystemButton(SWindow *pRoot,UINT nResizeMode)
+{
+	SWindow *pMax = pRoot->FindChildByID(IDC_SYS_MAX);
+	SWindow *pRestore = pRoot->FindChildByID(IDC_SYS_RESTORE);
+	if (pMax && pRestore)
+	{
+		if (nResizeMode == SIZE_MAXIMIZED)
+		{
+			pMax->SetVisible(FALSE);
+			pRestore->SetVisible(TRUE);
+		}
+		else if (nResizeMode == SIZE_RESTORED)
+		{
+			pMax->SetVisible(TRUE);
+			pRestore->SetVisible(FALSE);
+		}
 	}
 }
 
