@@ -2374,7 +2374,8 @@ void SWindow::ReleaseRenderTarget(IRenderTarget *pRT)
         { // todo: if matrix transform existed, combine getrt.rgn to the root rgn will not work.
             rgn->CombineRgn(m_pGetRTData->rgn, RGN_AND);
         }
-        GetContainer()->UpdateRegion(rgn);
+        if(!rgn->IsEmpty())
+            GetContainer()->UpdateRegion(rgn);
     }
     delete m_pGetRTData;
     m_pGetRTData = NULL;
