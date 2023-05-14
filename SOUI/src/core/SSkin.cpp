@@ -543,20 +543,24 @@ void SSkinColorRect::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
         int nH = prcDraw->bottom - prcDraw->top;
         nCorner = (nW < nH) ? (int)(nW * m_fCornerPercent) : (int)(nH * m_fCornerPercent);
     }
-
-    if (m_crStates[iState] == CR_INVALID)
-        iState = 0;
-    SColor cr(m_crStates[iState]);
-    cr.updateAlpha(byAlpha);
-    if (nCorner > 0)
-        pRT->FillSolidRoundRect(prcDraw, CPoint(nCorner, nCorner), cr.toCOLORREF());
-    else
-        pRT->FillSolidRect(prcDraw, cr.toCOLORREF());
-
-    if (m_crBorders[iState] != CR_INVALID && m_nBorderWidth > 0)
+	int iBgColor = iState;
+    if (m_crStates[iBgColor] == CR_INVALID)
+        iBgColor = 0;
+	if(m_crStates[iBgColor] != CR_INVALID){
+		SColor cr(m_crStates[iBgColor]);
+		cr.updateAlpha(byAlpha);
+		if (nCorner > 0)
+			pRT->FillSolidRoundRect(prcDraw, CPoint(nCorner, nCorner), cr.toCOLORREF());
+		else
+			pRT->FillSolidRect(prcDraw, cr.toCOLORREF());
+	}
+	int iBorderColor = iState;
+	if (m_crBorders[iBorderColor] == CR_INVALID)
+		iBorderColor = 0;
+    if (m_crBorders[iBorderColor] != CR_INVALID && m_nBorderWidth > 0)
     {
         SAutoRefPtr<IPenS> pen, oldPen;
-        pRT->CreatePen(PS_SOLID, m_crBorders[iState], m_nBorderWidth, (IPenS **)&pen);
+        pRT->CreatePen(PS_SOLID, m_crBorders[iBorderColor], m_nBorderWidth, (IPenS **)&pen);
         pRT->SelectObject(pen, (IRenderObj **)&oldPen);
         if (nCorner > 0)
             pRT->DrawRoundRect(prcDraw, CPoint(nCorner, nCorner));
