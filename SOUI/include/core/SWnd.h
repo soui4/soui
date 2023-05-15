@@ -169,7 +169,7 @@ class SOUI_EXP STrText {
     STrText(SWindow *pOwner = NULL);
     void SetOwner(SWindow *pOwner);
 
-    void SetText(const SStringT &strText);
+    void SetText(const SStringT &strText,bool bAutoEscape=true);
 
     SStringT GetText(BOOL bRawText = FALSE) const;
 
@@ -180,6 +180,7 @@ class SOUI_EXP STrText {
     SWindow *pOwner;
 
     SStringT strRaw; //原始字符串
+	bool bAutoEscape;
     SStringT strTr;  //翻译后的字符串
 };
 

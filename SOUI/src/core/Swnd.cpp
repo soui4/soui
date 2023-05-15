@@ -16,6 +16,7 @@ SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 STrText::STrText(SWindow *pOwner_ /*= NULL*/)
     : pOwner(pOwner_)
+	, bAutoEscape(true)
 {
 }
 
@@ -29,9 +30,10 @@ SStringT STrText::GetText(BOOL bRawText) const
     return bRawText ? strRaw : strTr;
 }
 
-void STrText::SetText(const SStringT &strText)
+void STrText::SetText(const SStringT &strText,bool bEscape/*=true*/)
 {
     strRaw = strText;
+	bAutoEscape = bEscape;
     TranslateText();
 }
 
@@ -40,7 +42,7 @@ void STrText::TranslateText()
     if (pOwner == NULL)
         return;
 	SStringW str = pOwner->tr(strRaw);
-	str = EscapeString(str);
+	if(bAutoEscape) str = EscapeString(str);
     strTr = S_CW2T(str);
 }
 
@@ -308,7 +310,7 @@ BOOL SWindow::UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo)
 
 void SWindow::SetWindowText(LPCTSTR lpszText)
 {
-    m_strText.SetText(lpszText);
+    m_strText.SetText(lpszText,false);
     accNotifyEvent(EVENT_OBJECT_NAMECHANGE);
     OnContentChanged();
 }
