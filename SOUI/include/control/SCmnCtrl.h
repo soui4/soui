@@ -763,12 +763,16 @@ class SOUI_EXP SIconWnd : public TWindowProxy<IIconWnd> {
 	SOUI_MSG_MAP_END()
 
 public:
+
     SOUI_ATTRS_BEGIN()
-        ATTR_ICON(L"src", m_theIcon, FALSE)
+		ATTR_CUSTOM(L"src",OnAttrIcon)
     SOUI_ATTRS_END()
-
-
 protected:
+	HRESULT OnAttrIcon(const SStringW &value,BOOL bLoading);
+
+	void OnScaleChanged(int scale) override;
+protected:
+	SStringW m_strIconSrc;
 	HICON m_theIcon; /**< 图标资源句柄 */
 };
 

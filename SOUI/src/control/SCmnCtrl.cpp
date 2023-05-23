@@ -1177,6 +1177,31 @@ void SIconWnd::SetIcon(HICON hIcon)
     Invalidate();
 }
 
+HRESULT SIconWnd::OnAttrIcon(const SStringW &value,BOOL bLoading)
+{
+	m_theIcon = LOADICON2(value);
+	m_strIconSrc = value;
+	return bLoading?S_FALSE:S_OK;
+}
+
+void SIconWnd::OnScaleChanged(int scale)
+{
+	if(!m_strIconSrc.IsEmpty()){
+		SStringT strIconID2 = S_CW2T(m_strIconSrc);
+		SStringTList strLst;
+		int nSegs = ParseResID(strIconID2, strLst);
+		if (nSegs == 2)
+		{
+			int cx = _ttoi(strLst[1])*scale/100;
+			HICON hNew = SApplication::getSingletonPtr()->GetResProviderMgr()->LoadIcon(strLst[0], cx, cx);
+			if(hNew){
+				if(m_theIcon) DestroyIcon(m_theIcon);
+				m_theIcon = hNew;
+			}
+		}
+	}
+}
+
 //////////////////////////////////////////////////////////////////////////
 // Radio Box
 //
