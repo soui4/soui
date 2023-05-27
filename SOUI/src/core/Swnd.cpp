@@ -3517,6 +3517,11 @@ HWND SWindow::GetHostHwnd(THIS)
 	return GetContainer()->GetHostHwnd();
 }
 
+ITimelineHandlersMgr * SWindow::GetTimelineHandlersMgr(THIS)
+{
+	return GetContainer();
+}
+
 BOOL SWindow::AddEvent(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName)
 {
 	return m_evtSet.addEvent(dwEventID,pszEventHandlerName);

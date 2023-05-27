@@ -844,6 +844,15 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
 	STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
 
+    /**
+     * GetTimelineHandlersMgr
+     * @brief    获取ITimelineHandlersMgr
+     * @return   ITimelineHandlersMgr* -- 时间线管理器
+     *
+     * Describe  
+     */
+	STDMETHOD_(ITimelineHandlersMgr *,GetTimelineHandlersMgr)(THIS) PURE;
+
 	/**
      * IsVideoCanvas
      * @brief    查询窗口是否为视频窗口

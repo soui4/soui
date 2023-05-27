@@ -457,6 +457,8 @@ class SOUI_EXP SWindow
 
 	STDMETHOD_(HWND, GetHostHwnd)(THIS) OVERRIDE;
 
+	STDMETHOD_(ITimelineHandlersMgr *,GetTimelineHandlersMgr)(THIS) OVERRIDE;
+
 	STDMETHOD_(BOOL,RegisterDragDrop)(THIS_ IDropTarget *pDragTarget) OVERRIDE;
 	STDMETHOD_(BOOL,UnregisterDragDrop)(THIS) OVERRIDE;
 
