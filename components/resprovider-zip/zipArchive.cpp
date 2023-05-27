@@ -297,10 +297,11 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 			}
 			// Convert UNIX slash to Windows backslash in ANSI string
 			LPSTR pszName = fh->GetName();
-			for(int j = 0; j < fh->fnameLen; j++, pszName++)
+			for (int j = 0; j < fh->fnameLen; j++, pszName++)
+			{
 				if (*pszName == '/')
-					*pszName='\\';
-
+					*pszName = '\\';
+			}
 			// Get next header
 			pData += sizeof(ZipDirFileHeader) + fh->fnameLen + fh->xtraLen + fh->cmntLen;
 		}
@@ -616,7 +617,7 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 				if (fh->flag & (16|32|64))
 					dwFlags |= FILE_ATTRIBUTE_OFFLINE; // unsupported compression used
 				if (dwFlags == 0)
-					dwFlags = (fh->compression == LOCAL_COMP_STORE) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
+					dwFlags = (fh->extAttr == 16) ? FILE_ATTRIBUTE_DIRECTORY : FILE_ATTRIBUTE_NORMAL;
 
 				// Ready for next entry...
 				pFF->nPos++;

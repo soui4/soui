@@ -262,13 +262,7 @@ void SResProviderZip::_EnumFile(LPCTSTR pszPath,EnumFileCallback funEnumCB, LPAR
 				strPath = wfd.szFileName;
 			else
 				strPath = SStringT().Format(_T("%s\\%s"),pszPath,wfd.szFileName);
-			if(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
-				if(_tcscmp(wfd.szFileName,_T("."))==0 ||
-					_tcscmp(wfd.szFileName,_T(".."))==0
-					)
-					continue;
-				_EnumFile(strPath.c_str(),funEnumCB,lp);
-			}else {
+			if(!(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)){
 				if(!funEnumCB(strPath.c_str(),lp))
 					break;
 			}

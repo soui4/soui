@@ -141,7 +141,7 @@ SStringT SResProvider7Zip::_GetFilePath( LPCTSTR pszResName,LPCTSTR pszType )
 {
 	if(!pszType){
 		//pszResName is a path
-		if(m_zipFile.IsFileExist(pszResName))
+		if(!m_zipFile.IsFileExist(pszResName))
 			return _T("");
 		return pszResName;
 	}
