@@ -1032,6 +1032,14 @@ BOOL SWindow::CreateChildrenFromXml(LPCWSTR pszXml)
     return CreateChildren(xmlDoc.root());
 }
 
+BOOL SWindow::CreateChildrenFromResId(LPCTSTR pszResId)
+{
+	SXmlDoc xmlDoc;
+	if(!LOADXML(xmlDoc,pszResId))
+		return FALSE;
+	return CreateChildren(xmlDoc.root());
+}
+
 SWND SWindow::SwndFromPoint(POINT *pt, BOOL bIncludeMsgTransparent) const
 {
     if (!pt)

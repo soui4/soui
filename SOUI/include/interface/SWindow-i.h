@@ -568,7 +568,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(BOOL, RemoveIChild)(THIS_ IWindow * pChild) PURE;
 
     /**
-     * CreateChildren
+     * CreateChildrenFromXml
      * @brief    从XML创建子窗口
      * @param    LPCWSTR pszXml --  合法的utf16编码XML字符串
      * @return   BOOL 是否创建成功
@@ -576,6 +576,16 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * Describe
      */
     STDMETHOD_(BOOL, CreateChildrenFromXml)(THIS_ LPCWSTR pszXml) PURE;
+
+	/**
+     * CreateChildrenFromResId
+     * @brief    从XML资源创建子窗口
+     * @param    LPCTSTR pszResId --  XML资源ID
+     * @return   BOOL 是否创建成功
+     *
+     * Describe
+     */
+	STDMETHOD_(BOOL, CreateChildrenFromResId)(THIS_ LPCTSTR pszResId) PURE;
 
     /**
      * @brief 根据ID查找子窗口
