@@ -16,12 +16,12 @@ class SNcPainter
     friend class SNcPanel;
     enum
     {
-        IDC_SYS_ICON = 100,
-        IDC_SYS_TITLE = 101,
-        IDC_SYS_CLOSE = 102,
-        IDC_SYS_MIN = 103,
-        IDC_SYS_MAX = 104,
-        IDC_SYS_RESTORE = 105,
+        IDC_SYS_ICON = -100,
+        IDC_SYS_TITLE = -101,
+        IDC_SYS_CLOSE = -102,
+        IDC_SYS_MIN = -103,
+        IDC_SYS_MAX = -104,
+        IDC_SYS_RESTORE = -105,
     };
 
   public:

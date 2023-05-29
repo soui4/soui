@@ -76,7 +76,7 @@ public:
 	SStackView(void);
 	~SStackView(void);
 
-	STDMETHOD_(BOOL,SelectView)(THIS_ int iView) OVERRIDE;
+	STDMETHOD_(BOOL,SelectView)(THIS_ int iView,BOOL enableAnimate DEF_VAL(TRUE)) OVERRIDE;
 	STDMETHOD_(void,SetAniStyle)(THIS_ StackViewAniStyle aniStyle) OVERRIDE;
 	STDMETHOD_(void,SetAniDir)(THIS_ BOOL bVert) OVERRIDE;	
 protected:

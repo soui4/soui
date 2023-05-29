@@ -14,26 +14,25 @@ SStackView::~SStackView(void)
 {
 }
 
-BOOL SStackView::SelectView(int iSel)
+BOOL SStackView::SelectView(int iSel,BOOL enableAnimate)
 {
 	if(iSel<0 || iSel>=(int)GetChildrenCount())
-		return FALSE;
+		iSel = -1;
 	if(m_animator.isStarted())
 		m_animator.end();
 	if(iSel == m_iSel)
 		return TRUE;
-
 	m_animator.SetFrom(m_iSel);
 	m_animator.SetTo(iSel);
 	m_animator.start(GetContainer());
+	if(!enableAnimate){
+		m_animator.end();
+	}
 	return TRUE;
 }
 
 void SStackView::OnInitFinished(THIS_ IXmlNode * xmlNode)
 {
-	if(m_iSel == -1){
-		m_iSel = GetChildrenCount()-1;
-	}
 	int idx = 0;
 	SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
 	while(pChild){
@@ -100,8 +99,8 @@ void SViewSwitchAnimator::start(THIS_ ITimelineHandlersMgr *pTimerlineMgr)
 		end();
 	CRect rc;
 	m_pOwner->GetChildrenLayoutRect(&rc);
-	m_pFrom = m_pOwner->GetChild(m_iFrom+1);
-	m_pTo = m_pOwner->GetChild(m_iTo + 1);
+	m_pFrom = m_iFrom==-1?NULL:m_pOwner->GetChild(m_iFrom+1);
+	m_pTo = m_iTo==-1?NULL:m_pOwner->GetChild(m_iTo + 1);
 	if(m_pTo){
 		m_pTo->Move(rc);
 		m_pTo->SetVisible(TRUE,FALSE);
