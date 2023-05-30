@@ -374,6 +374,7 @@ DEF_EVT(EventMouseClick, EVT_MOUSE_CLICK, on_mouse_click, {
 	POINT pt;
 	UINT uFlags; 
 	MouseClickId clickId;
+	BOOL bHover;
 })
 
 DEF_EVT(EventCmd, EVT_CMD, on_command, { int fake; })
