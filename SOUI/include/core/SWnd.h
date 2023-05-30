@@ -1094,10 +1094,6 @@ class SOUI_EXP SWindow
 
     void OnRButtonDown(UINT nFlags, CPoint point);
 
-    void OnRButtonUp(UINT nFlags, CPoint point);
-
-	void OnDbClick(UINT nFlags, CPoint point);
-
     void OnMouseHover(UINT nFlags, CPoint ptPos);
 
     void OnMouseMove(UINT nFlags, CPoint pt);
@@ -1105,6 +1101,8 @@ class SOUI_EXP SWindow
     void OnMouseLeave();
 
     BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+	
+	LRESULT OnMouseClick(UINT uMsg,WPARAM wParam,LPARAM lParam);
 
     void OnSetFocus(SWND wndOld);
     void OnKillFocus(SWND wndFocus);
@@ -1123,11 +1121,10 @@ class SOUI_EXP SWindow
         MSG_WM_DESTROY(OnDestroy)
         MSG_WM_SHOWWINDOW(OnShowWindow)
         MSG_WM_ENABLE_EX(OnEnable)
+		MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN,WM_MBUTTONDBLCLK,OnMouseClick)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
         MSG_WM_RBUTTONDOWN(OnRButtonDown)
-        MSG_WM_RBUTTONUP(OnRButtonUp)
-		MSG_WM_LBUTTONDBLCLK(OnDbClick)
         MSG_WM_MOUSEMOVE(OnMouseMove)
         MSG_WM_MOUSEHOVER(OnMouseHover)
         MSG_WM_MOUSELEAVE(OnMouseLeave)

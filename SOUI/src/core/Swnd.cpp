@@ -159,10 +159,7 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSwndVisibleChanged));
 	m_evtSet.addEvent(EVENTID(EventSwndCaptureChanged));
     m_evtSet.addEvent(EVENTID(EventSwndUpdateTooltip));
-    m_evtSet.addEvent(EVENTID(EventLButtonDown));
-    m_evtSet.addEvent(EVENTID(EventLButtonUp));
-	m_evtSet.addEvent(EVENTID(EventDbClick));
-
+	m_evtSet.addEvent(EVENTID(EventMouseClick));
     m_evtSet.addEvent(EVENTID(EventCmd));
     m_evtSet.addEvent(EVENTID(EventCtxMenu));
     m_evtSet.addEvent(EVENTID(EventSetFocus));
@@ -2061,11 +2058,6 @@ void SWindow::OnLButtonDown(UINT nFlags, CPoint pt)
         SetFocus();
     SetCapture();
     ModifyState(WndState_PushDown, 0, TRUE);
-
-    EventLButtonDown evtLButtonDown(this);
-    evtLButtonDown.pt = pt;
-	evtLButtonDown.uFlags = nFlags;
-    FireEvent(evtLButtonDown);
 }
 
 void SWindow::OnLButtonUp(UINT nFlags, CPoint pt)
@@ -2079,11 +2071,6 @@ void SWindow::OnLButtonUp(UINT nFlags, CPoint pt)
     if (!GetWindowRect().PtInRect(pt))
         return;
 
-    EventLButtonUp evtLButtonUp(this);
-    evtLButtonUp.pt = pt;
-	evtLButtonUp.uFlags = nFlags;
-    FireEvent(evtLButtonUp);
-
     if (GetID() || GetName())
     {
         FireCommand();
@@ -2093,18 +2080,6 @@ void SWindow::OnLButtonUp(UINT nFlags, CPoint pt)
 void SWindow::OnRButtonDown(UINT nFlags, CPoint point)
 {
     FireCtxMenu(point);
-}
-
-void SWindow::OnRButtonUp(UINT nFlags, CPoint point)
-{
-}
-
-void SWindow::OnDbClick(UINT nFlags, CPoint point)
-{
-	EventDbClick evt(this);
-	evt.pt = point;
-	evt.uFlags = nFlags;
-	FireEvent(evt);
 }
 
 void SWindow::OnMouseMove(UINT nFlags, CPoint pt)
@@ -2137,6 +2112,19 @@ BOOL SWindow::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
     if (m_pParent)
         bRet = (BOOL)m_pParent->SSendMessage(WM_MOUSEWHEEL, MAKEWPARAM(nFlags, zDelta), MAKELPARAM(pt.x, pt.y));
     return bRet;
+}
+
+LRESULT SWindow::OnMouseClick(UINT uMsg,WPARAM wParam,LPARAM lParam)
+{
+	SetMsgHandled(FALSE);
+
+	EventMouseClick evt(this);
+	evt.clickId = MouseClickId(uMsg - WM_LBUTTONDOWN);
+	evt.uFlags = wParam;
+	evt.pt.x = GET_X_LPARAM(lParam);
+	evt.pt.y = GET_Y_LPARAM(lParam);
+	FireEvent(&evt);
+	return 0;
 }
 
 void SWindow::GetChildrenLayoutRect( RECT* prc) const

@@ -93,13 +93,11 @@ BOOL ExpLua_EventArgs(lua_State *L)
 		DEF_CAST_PVOID(L,StEventItemPanelHover);
 
 
-		lua_tinker::class_add<StEventLButtonDown>(L,"StEventLButtonDown");
-		lua_tinker::class_mem<StEventLButtonDown>(L,"pt",&EventLButtonDown::pt);
-		DEF_CAST_PVOID(L,StEventLButtonDown);
-
-		lua_tinker::class_add<StEventLButtonUp>(L,"StEventLButtonUp");
-		lua_tinker::class_mem<StEventLButtonUp>(L,"pt",&EventLButtonUp::pt);
-		DEF_CAST_PVOID(L,StEventLButtonUp);
+		lua_tinker::class_add<StEventMouseClick>(L,"StEventMouseClick");
+		lua_tinker::class_mem<StEventMouseClick>(L,"pt",&EventMouseClick::pt);
+		lua_tinker::class_mem<StEventMouseClick>(L,"clickId",&EventMouseClick::clickId);
+		lua_tinker::class_mem<StEventMouseClick>(L,"uFlags",&EventMouseClick::uFlags);
+		DEF_CAST_PVOID(L,StEventMouseClick);
 
 		lua_tinker::class_add<StEventCtxMenu>(L,"StEventCtxMenu");
 		lua_tinker::class_mem<StEventCtxMenu>(L,"pt",&EventCtxMenu::pt);

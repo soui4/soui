@@ -39,9 +39,7 @@ typedef enum _SOUI_EVENTS
     EVT_VISIBLECHANGED,
     EVT_STATECHANGED,
 	EVT_CAPTURECHANGED,
-    EVT_LBUTTONDOWN,
-    EVT_LBUTTONUP,
-	EVT_DBCLICK,
+	EVT_MOUSE_CLICK,
     EVT_UPDATE_TOOLTIP,
     EVT_ANIMATION_START,
     EVT_ANIMATION_STOP,
@@ -138,6 +136,18 @@ typedef enum _SOUI_EVENTS
 
     EVT_EXTERNAL_BEGIN = 10000000,
 } SOUI_EVENTS;
+
+typedef enum _MouseClickId{
+	MOUSE_LBTN_DOWN = 0,
+	MOUSE_LBTN_UP,
+	MOUSE_LBTN_DBCLICK,
+	MOUSE_RBTN_DOWN,
+	MOUSE_RBTN_UP,
+	MOUSE_RBTN_DBCLICK,
+	MOUSE_MBTN_DOWN,
+	MOUSE_MBTN_UP,
+	MOUSE_MBTN_DBCLICK,
+}MouseClickId;
 
 #ifdef __cplusplus
 class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
@@ -360,11 +370,11 @@ DEF_EVT(EventItemPanelHover, EVT_ITEMPANEL_HOVER, on_itempanel_hover, {
 //注：在EventItemPanelLeave中从IItemPanel中通过GetItemIndex获取表项索引时需要检查索引有效性。
 DEF_EVT(EventItemPanelLeave, EVT_ITEMPANEL_LEAVE, on_itempanel_leave, { int fake; })
 
-DEF_EVT(EventLButtonDown, EVT_LBUTTONDOWN, on_mouse_lbutton_down, { POINT pt;UINT uFlags; })
-
-DEF_EVT(EventDbClick, EVT_DBCLICK, on_mouse_dbclick, { POINT pt; UINT uFlags;})
-
-DEF_EVT(EventLButtonUp, EVT_LBUTTONUP, on_mouse_lbutton_up, { POINT pt;UINT uFlags; })
+DEF_EVT(EventMouseClick, EVT_MOUSE_CLICK, on_mouse_click, { 
+	POINT pt;
+	UINT uFlags; 
+	MouseClickId clickId;
+})
 
 DEF_EVT(EventCmd, EVT_CMD, on_command, { int fake; })
 
