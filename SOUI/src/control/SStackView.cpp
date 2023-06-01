@@ -40,17 +40,6 @@ IWindow* SStackView::GetCurView(CTHIS) const
 	return pRet;
 }
 
-void SStackView::OnInitFinished(THIS_ IXmlNode * xmlNode)
-{
-	int idx = 0;
-	SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
-	while(pChild){
-		pChild->SetVisible(idx==m_iSel);
-		pChild = pChild->GetWindow(GSW_NEXTSIBLING);
-		idx ++;
-	}
-}
-
 void SStackView::UpdateChildrenPosition(THIS)
 {
 	if(m_iSel !=-1)
@@ -99,6 +88,33 @@ void SStackView::SetAniStyle(THIS_ StackViewAniStyle aniStyle)
 void SStackView::SetAniDir(THIS_ BOOL bVert)
 {
 	m_animator.SetAniDir(bVert);
+}
+
+SIZE SStackView::MeasureContent(int nParentWid, int nParentHei)
+{
+	SIZE ret={0};
+	SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
+	while(pChild){
+		SIZE szChild = pChild->MeasureContent(nParentWid,nParentHei);
+		if(ret.cx<szChild.cx) ret.cx = szChild.cx;
+		if(ret.cy<szChild.cy) ret.cy = szChild.cy;
+		pChild = pChild->GetWindow(GSW_NEXTSIBLING);
+	}
+	return ret;
+}
+
+BOOL SStackView::CreateChildren(SXmlNode xmlNode)
+{
+	BOOL bRet = __baseCls::CreateChildren(xmlNode);
+	if(!bRet) return FALSE;
+	int idx = 0;
+	SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
+	while(pChild){
+		pChild->SetVisible(idx==m_iSel);
+		pChild = pChild->GetWindow(GSW_NEXTSIBLING);
+		idx ++;
+	}
+	return TRUE;
 }
 
 //////////////////////////////////////////////////////////////////////////

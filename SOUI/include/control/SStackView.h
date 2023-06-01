@@ -99,9 +99,10 @@ protected:
 		MSG_WM_SIZE(OnSize)
 	SOUI_MSG_MAP_END()
 protected:
-	STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode * xmlNode) OVERRIDE;
 	STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
 
+	BOOL CreateChildren(SXmlNode xmlNode) override;
+	SIZE MeasureContent(int nParentWid, int nParentHei) override;
 	void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer) override;
 protected:
 	int m_iSel;

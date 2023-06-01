@@ -378,7 +378,11 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
             hWndCenter = ::GetWindow(m_hWnd, GW_OWNER);
 
         if (hWndCenter == NULL)
+        {
             hWndCenter = ::GetActiveWindow();
+            if (hWndCenter == m_hWnd)
+                hWndCenter = NULL;
+        }
     }
 
     // get coordinates of the window relative to its parent
