@@ -79,6 +79,7 @@ public:
 	STDMETHOD_(BOOL,SelectView)(THIS_ int iView,BOOL enableAnimate DEF_VAL(TRUE)) OVERRIDE;
 	STDMETHOD_(void,SetAniStyle)(THIS_ StackViewAniStyle aniStyle) OVERRIDE;
 	STDMETHOD_(void,SetAniDir)(THIS_ BOOL bVert) OVERRIDE;	
+	STDMETHOD_(IWindow*,GetCurView)(CTHIS) SCONST OVERRIDE;
 protected:
 	STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator * pAnimator) OVERRIDE{}
 	STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator * pAnimator) OVERRIDE{}

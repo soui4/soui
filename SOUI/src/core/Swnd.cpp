@@ -121,6 +121,7 @@ SWindow::SWindow()
     , m_bCacheDraw(FALSE)
     , m_bCacheDirty(TRUE)
     , m_layoutDirty(dirty_self)
+	, m_bHoverAware(TRUE)
     , m_bLayeredWindow(FALSE)
     , m_bMsgHandled(FALSE)
     , m_uData(0)
@@ -1218,6 +1219,10 @@ static bool RgnInRgn(const IRegionS *r1, IRegionS *r2)
 
 bool SWindow::_WndRectInRgn(const CRect &rc, const IRegionS *rgn) const
 {
+	CRect rc2;
+	rgn->GetRgnBox(&rc2);
+	if(!rc2.IntersectRect(rc2,rc))
+		return false;
     SAutoRefPtr<IRegionS> rgn2 = _ConvertRect2RenderRegion(rc);
     return RgnInRgn(rgn, rgn2);
 }
@@ -1714,10 +1719,7 @@ BOOL SWindow::OnEraseBkgnd(IRenderTarget *pRT)
     }
     else
     {
-        int idx = SState2Index::GetDefIndex(GetState(), true);
-        if (idx >= m_pBgSkin->GetStates())
-            idx = 0;
-        m_pBgSkin->DrawByIndex(pRT, rcClient, idx);
+		m_pBgSkin->DrawByState(pRT, rcClient, GetState());
     }
     return TRUE;
 }
@@ -2088,6 +2090,8 @@ void SWindow::OnMouseMove(UINT nFlags, CPoint pt)
 
 void SWindow::OnMouseHover(UINT nFlags, CPoint ptPos)
 {
+	if(!m_bHoverAware)
+		return;
     if (GetCapture() == m_swnd)
         ModifyState(WndState_PushDown, 0, FALSE);
     ModifyState(WndState_Hover, 0, TRUE);
@@ -2098,6 +2102,8 @@ void SWindow::OnMouseHover(UINT nFlags, CPoint ptPos)
 
 void SWindow::OnMouseLeave()
 {
+	if(!m_bHoverAware)
+		return;
     if (GetCapture() == m_swnd)
         ModifyState(0, WndState_PushDown, FALSE);
     ModifyState(0, WndState_Hover, TRUE);

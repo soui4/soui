@@ -31,6 +31,15 @@ BOOL SStackView::SelectView(int iSel,BOOL enableAnimate)
 	return TRUE;
 }
 
+IWindow* SStackView::GetCurView(CTHIS) const
+{
+	SWindow * pRet = m_animator.GetToWindow();
+	if(!pRet && m_iSel!=-1){
+		pRet = GetChild(m_iSel+1);
+	}
+	return pRet;
+}
+
 void SStackView::OnInitFinished(THIS_ IXmlNode * xmlNode)
 {
 	int idx = 0;

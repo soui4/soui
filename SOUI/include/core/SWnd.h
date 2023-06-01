@@ -1183,6 +1183,7 @@ class SOUI_EXP SWindow
         ATTR_BOOL(L"clipClient", m_bClipClient, FALSE)
         ATTR_BOOL(L"focusable", m_bFocusable, FALSE)
         ATTR_BOOL(L"drawFocusRect", m_bDrawFocusRect, TRUE)
+		ATTR_BOOL(L"hoverAware",m_bHoverAware,FALSE)
         ATTR_BOOL(L"float", m_bFloat, FALSE)
         ATTR_CHAIN(m_style, HRET_FLAG_STYLE)                   //交给SwndStyle处理
         ATTR_CHAIN_PTR(m_pLayout, HRET_FLAG_LAYOUT)            //交给Layout处理
@@ -1256,6 +1257,7 @@ class SOUI_EXP SWindow
     DWORD m_bCacheDirty : 1;     /**< 缓存窗口脏标志 */
     DWORD m_bLayeredWindow : 1;  /**< 指示是否是一个分层窗口 */
 	DWORD m_isLoading:1;         /**< loading状态标志 */
+	DWORD m_bHoverAware:1;		 /**< 感知Hover状态标志 */
     DWORD m_bMsgHandled : 1;
 
     LayoutDirtyType m_layoutDirty;         /**< 布局脏标志 参见LayoutDirtyType */

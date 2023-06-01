@@ -79,7 +79,6 @@ int SState2Index::GetIndex(DWORD dwState, bool checkAsPushdown) const
         if (p)
             nRet = p->m_value;
         return nRet;
-        ;
     }
 }
 
