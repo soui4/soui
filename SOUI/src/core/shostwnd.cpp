@@ -277,6 +277,7 @@ SHostWnd::SHostWnd(LPCSTR pszResName)
 
 void SHostWnd::_Init()
 {
+	SApplication::getSingletonPtr()->AddRef();
 	m_bTrackFlag=(FALSE)
 		, m_bNeedRepaint=(FALSE)
 		, m_bNeedAllRepaint=(TRUE)
@@ -303,6 +304,7 @@ void SHostWnd::_Init()
 SHostWnd::~SHostWnd()
 {
     delete m_pRoot;
+	SApplication::getSingletonPtr()->Release();
 }
 
 HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)
