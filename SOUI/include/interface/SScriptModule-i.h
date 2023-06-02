@@ -74,7 +74,7 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
         String object holding the filename of the script file that is to be executed
 
     */
-    STDMETHOD_(void, executeScriptFile)(THIS_ LPCSTR pszScriptFile) PURE;
+    STDMETHOD_(BOOL, executeScriptFile)(THIS_ LPCSTR pszScriptFile) PURE;
 
     /*!
     \brief

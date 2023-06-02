@@ -75,12 +75,13 @@ namespace SOUI
 
     LPCSTR SScriptModule_Lua::getIdentifierString() const
     {
-        return "SOUI.Script.Lua5.3";
+        return "SOUI.Script.Lua5.4";
     }
 
-    void SScriptModule_Lua::executeScriptFile( LPCSTR pszScriptFile )
+    BOOL SScriptModule_Lua::executeScriptFile( LPCSTR pszScriptFile )
     {
         lua_tinker::dofile(d_state,pszScriptFile);
+		return TRUE;
     }
 
 
