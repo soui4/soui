@@ -1719,7 +1719,10 @@ BOOL SWindow::OnEraseBkgnd(IRenderTarget *pRT)
     }
     else
     {
-		m_pBgSkin->DrawByState(pRT, rcClient, GetState());
+        int idx = SState2Index::GetDefIndex(GetState(), true);
+        if (idx >= m_pBgSkin->GetStates())
+            idx = 0;
+        m_pBgSkin->DrawByIndex(pRT, rcClient, idx);
     }
     return TRUE;
 }
