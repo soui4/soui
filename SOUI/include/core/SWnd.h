@@ -755,6 +755,7 @@ class SOUI_EXP SWindow
 
   public: // Virtual functions
     virtual SIZE MeasureContent(int nParentWid, int nParentHei);
+	virtual SIZE MeasureChildren(int nParentWid, int nParentHei);
 
     /**
      * OnUpdateToolTip
@@ -1197,9 +1198,11 @@ class SOUI_EXP SWindow
 
     virtual void OnRebuildFont();
 
-    virtual void OnInsertChild(SWindow *pChild);
+	virtual void OnBeforeInsertChild(SWindow *pChild);
+    virtual void OnAfterInsertChild(SWindow *pChild);
 
-    virtual void OnRemoveChild(SWindow *pChild);
+    virtual void OnBeforeRemoveChild(SWindow *pChild);
+	virtual void OnAfterRemoveChild(SWindow *pChild);
 
     virtual void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
 

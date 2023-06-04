@@ -3365,10 +3365,11 @@ DECLARE_INTERFACE_IID_(IStackView, ICtrl, "1A7172D8-F45B-45fe-A73E-2B7F07E7EB70"
 
     //////////////////////////////////////////////////////////////////////////
 
-	STDMETHOD_(BOOL,SelectView)(THIS_ int iView,BOOL enableAnimate DEF_VAL(TRUE)) PURE;
+	STDMETHOD_(BOOL,SelectPage)(THIS_ int iView,BOOL enableAnimate DEF_VAL(TRUE)) PURE;
 	STDMETHOD_(void,SetAniStyle)(THIS_ StackViewAniStyle aniStyle) PURE;
 	STDMETHOD_(void,SetAniDir)(THIS_ BOOL bVert) PURE;	
-	STDMETHOD_(IWindow*,GetCurView)(CTHIS) SCONST PURE;
+	STDMETHOD_(IWindow*,GetSelPage)(CTHIS) SCONST PURE;
+	STDMETHOD_(IWindow*,GetPage)(CTHIS_ int iPage) SCONST PURE;
 };
 
 SNSEND

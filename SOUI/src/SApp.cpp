@@ -165,6 +165,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SDateTimePicker>();
 	objFactory->TplRegisterFactory<SFrame>();
 	objFactory->TplRegisterFactory<SStackView>();
+	objFactory->TplRegisterFactory<SStackPage>();
 }
 
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const

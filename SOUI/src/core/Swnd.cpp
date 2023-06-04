@@ -539,6 +539,7 @@ void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /*=ICWND_LAS
     ASSERT_UI_THREAD();
     if (pNewChild->GetParent() == this)
         return;
+	OnBeforeInsertChild(pNewChild);
     pNewChild->SetContainer(GetContainer());
     pNewChild->m_pParent = this;
     pNewChild->m_pPrevSibling = pNewChild->m_pNextSibling = NULL;
@@ -594,7 +595,7 @@ void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /*=ICWND_LAS
 
     //只在插入新控件时需要标记zorder失效,删除控件不需要标记
     GetContainer()->MarkWndTreeZorderDirty();
-    OnInsertChild(pNewChild);
+    OnAfterInsertChild(pNewChild);
 }
 
 BOOL SWindow::RemoveChild(SWindow *pChild)
@@ -603,7 +604,7 @@ BOOL SWindow::RemoveChild(SWindow *pChild)
     if (this != pChild->GetParent())
         return FALSE;
 
-    OnRemoveChild(pChild);
+    OnBeforeRemoveChild(pChild);
     pChild->SetContainer(NULL);
 
     SWindow *pPrevSib = pChild->m_pPrevSibling;
@@ -624,6 +625,7 @@ BOOL SWindow::RemoveChild(SWindow *pChild)
     pChild->m_pPrevSibling = NULL;
     m_nChildrenCount--;
 
+	OnAfterRemoveChild(pChild);
     return TRUE;
 }
 
@@ -1873,7 +1875,7 @@ void SWindow::GetDesiredSize(SIZE *psz , int nParentWid, int nParentHei)
                 if (szParent.cy < 0)
                     szParent.cy = 0;
             }
-            szChilds = GetLayout()->MeasureChildren(this, szParent.cx, szParent.cy);
+            szChilds = MeasureChildren(szParent.cx, szParent.cy);
         }
 
         CRect rcTest(0, 0, smax(szChilds.cx, szContent.cx), smax(szChilds.cy, szContent.cy));
@@ -1924,6 +1926,11 @@ SIZE SWindow::MeasureContent(int nParentWid, int nParentHei)
         DrawText(pRT, strText, strText.GetLength(), rcTest4Text, nTestDrawMode | DT_CALCRECT);
     }
     return rcTest4Text.Size();
+}
+
+SIZE SWindow::MeasureChildren(int nParentWid, int nParentHei)
+{
+	return GetLayout()->MeasureChildren(this, nParentWid, nParentHei);
 }
 
 void SWindow::GetTextRect(LPRECT pRect)
@@ -1982,7 +1989,7 @@ void SWindow::OnShowWindow(BOOL bShow, UINT nStatus)
         bShow = m_pParent->IsVisible(TRUE);
     }
     if (bShow)
-    { // delay reflesh layout of children.
+    { // delay refresh layout of children.
         UpdateLayout();
     }
     if (bShow)
@@ -2211,8 +2218,7 @@ void SWindow::UpdateLayout()
 {
     if (m_layoutDirty == dirty_clean)
         return;
-    if (GetChildrenCount())
-        UpdateChildrenPosition();
+    UpdateChildrenPosition();
     m_layoutDirty = dirty_clean;
 }
 
@@ -2613,7 +2619,17 @@ IWindow *SWindow::GetIWindow(int uCode) const
 
 IWindow *SWindow::GetIChild(int iChild) const
 {
-    return GetChild(iChild);
+	if (iChild == CHILDID_SELF)
+		return (IWindow *)this;
+	IWindow *pChild = GetIWindow(GSW_FIRSTCHILD);
+	for (int i = 0; i < iChild - 1 && pChild; i++)
+	{
+		pChild = pChild->GetIWindow(GSW_NEXTSIBLING);
+		if (!pChild)
+			return NULL;
+	}
+
+	return pChild;
 }
 
 void SWindow::PaintBackground(IRenderTarget *pRT, LPRECT pRc)
@@ -3293,11 +3309,19 @@ COLORREF SWindow::GetBkgndColor() const
     return GetStyle().m_crBg;
 }
 
-void SWindow::OnRemoveChild(SWindow *pChild)
+void SWindow::OnBeforeRemoveChild(SWindow *pChild)
 {
 }
 
-void SWindow::OnInsertChild(SWindow *pChild)
+void SWindow::OnAfterInsertChild(SWindow *pChild)
+{
+}
+
+void SWindow::OnBeforeInsertChild(SWindow *pChild)
+{
+}
+
+void SWindow::OnAfterRemoveChild(SWindow *pChild)
 {
 }
 
@@ -3379,17 +3403,7 @@ SWindow *SWindow::GetWindow(int uCode) const
 
 SWindow *SWindow::GetChild(int iChild) const
 {
-    if (iChild == CHILDID_SELF)
-        return (SWindow *)this;
-    SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
-    for (int i = 0; i < iChild - 1 && pChild; i++)
-    {
-        pChild = pChild->GetWindow(GSW_NEXTSIBLING);
-        if (!pChild)
-            return NULL;
-    }
-
-    return pChild;
+	return (SWindow*)GetIChild(iChild);
 }
 
 SWindow *SWindow::GetParent() const
@@ -3571,7 +3585,6 @@ BOOL SWindow::UnregisterDragDrop(THIS)
 {
 	return GetContainer()->UnregisterDragDrop(m_swnd);
 }
-
 
 //////////////////////////////////////////////////////////////////////////
 static SWindow *ICWND_NONE = (SWindow *)-2;

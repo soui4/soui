@@ -1456,12 +1456,12 @@ BOOL SRadioGroup::FireEvent(IEvtArgs *evt)
     return GetContainer()->OnFireEvent(evt);
 }
 
-void SRadioGroup::OnInsertChild(SWindow *pChild)
+void SRadioGroup::OnAfterInsertChild(SWindow *pChild)
 {
     pChild->SetOwner(this);
 }
 
-void SRadioGroup::OnRemoveChild(SWindow *pChild)
+void SRadioGroup::OnBeforeRemoveChild(SWindow *pChild)
 {
     pChild->SetOwner(NULL);
 }

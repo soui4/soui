@@ -931,8 +931,8 @@ class SOUI_EXP SRadioGroup : public SWindow {
   protected:
     STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs *evt) OVERRIDE;
 
-    virtual void OnInsertChild(SWindow *pChild);
-    virtual void OnRemoveChild(SWindow *pChild);
+    virtual void OnAfterInsertChild(SWindow *pChild);
+    virtual void OnBeforeRemoveChild(SWindow *pChild);
 };
 
 /**
