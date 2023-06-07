@@ -2218,7 +2218,8 @@ void SWindow::UpdateLayout()
 {
     if (m_layoutDirty == dirty_clean)
         return;
-    UpdateChildrenPosition();
+    if (GetChildrenCount())
+        UpdateChildrenPosition();
     m_layoutDirty = dirty_clean;
 }
 
