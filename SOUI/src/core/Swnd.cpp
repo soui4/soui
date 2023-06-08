@@ -169,12 +169,6 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSwndAnimationStart));
     m_evtSet.addEvent(EVENTID(EventSwndAnimationStop));
     m_evtSet.addEvent(EVENTID(EventSwndAnimationRepeat));
-
-    IAttrStorageFactory *pAttrFac = SApplication::getSingleton().GetAttrStorageFactory();
-    if (pAttrFac)
-    {
-        pAttrFac->CreateAttrStorage(this, &m_attrStorage);
-    }
 }
 
 SWindow::~SWindow()
@@ -2884,6 +2878,12 @@ HRESULT SWindow::OnAttrID(const SStringW &strValue, BOOL bLoading)
                 m_nID = _wtoi(strValue);
         }
     }
+	IAttrStorageFactory *pAttrFac = SApplication::getSingleton().GetAttrStorageFactory();
+	if (pAttrFac && !m_attrStorage)
+	{
+		pAttrFac->CreateAttrStorage(this, &m_attrStorage);
+	}
+
     return S_FALSE;
 }
 
@@ -2894,6 +2894,11 @@ HRESULT SWindow::OnAttrName(const SStringW &strValue, BOOL bLoading)
     {
         m_nID = STR2ID(strValue);
     }
+	IAttrStorageFactory *pAttrFac = SApplication::getSingleton().GetAttrStorageFactory();
+	if (pAttrFac && !m_attrStorage)
+	{
+		pAttrFac->CreateAttrStorage(this, &m_attrStorage);
+	}
     return S_FALSE;
 }
 
