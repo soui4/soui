@@ -169,6 +169,12 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSwndAnimationStart));
     m_evtSet.addEvent(EVENTID(EventSwndAnimationStop));
     m_evtSet.addEvent(EVENTID(EventSwndAnimationRepeat));
+
+    IAttrStorageFactory *pAttrFac = SApplication::getSingleton().GetAttrStorageFactory();
+    if (pAttrFac)
+    {
+        pAttrFac->CreateAttrStorage(this, &m_attrStorage);
+    }
 }
 
 SWindow::~SWindow()
