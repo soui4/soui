@@ -482,7 +482,7 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
 		if(strText.IsEmpty()){
 			strText = SWindow::GetXmlText(xmlItem);;
 		}
-        item.strText.SetText(S_CW2T(strText));
+        item.strText.SetText(S_CW2T(GETSTRING(strText)));
         SLayoutSize szItem = GETLAYOUTSIZE(xmlItem.attribute(L"width").as_string(L"50"));
         item.cx = szItem.toPixelSize(GetScale());
         item.fWeight = xmlItem.attribute(L"weight").as_float();

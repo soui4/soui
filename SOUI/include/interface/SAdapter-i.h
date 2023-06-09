@@ -400,7 +400,7 @@ DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
 };
 
 #define ITEM_NULL 0
-#define ITEM_ROOT 0xFFFF0000
+#define ITEM_ROOT STVI_ROOT
 
 typedef enum DATA_INDEX
 {

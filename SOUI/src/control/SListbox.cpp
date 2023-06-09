@@ -294,7 +294,7 @@ void SListBox::LoadItemAttribute(SXmlNode xmlNode, LPLBITEM pItem)
     pItem->lParam = xmlNode.attribute(L"data").as_uint((UINT)pItem->lParam);
     SStringW strText = GETSTRING(xmlNode.attribute(L"text").value());
 	if(strText.IsEmpty()) strText = GetXmlText(xmlNode);
-    pItem->strText.SetText(S_CW2T(strText));
+    pItem->strText.SetText(S_CW2T(GETSTRING(strText)));
 }
 
 int SListBox::InsertItem(int nIndex, LPLBITEM pItem)
