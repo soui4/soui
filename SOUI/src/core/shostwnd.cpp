@@ -699,7 +699,10 @@ void SHostWnd::DestroyTooltip(IToolTip *pTooltip) const
 BOOL SHostWnd::OnLoadLayoutFromResourceID(const SStringT &resId)
 {
     if (resId.IsEmpty())
-        return FALSE;
+	{
+		SSLOGW()<<"resId is empty, return TRUE";
+		return TRUE;
+	}
     SXmlDoc xmlDoc;
     if (LOADXML(xmlDoc, resId))
     {
