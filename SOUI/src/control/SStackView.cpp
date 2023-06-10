@@ -173,9 +173,9 @@ void SStackView::BuildChildsArray()
 	m_childs.SetCount(nChilds);
 	SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
 	for(int i=0;i<nChilds;i++){
+		SASSERT(pChild);
 		m_childs[i]=pChild;
 		pChild=pChild->GetWindow(GSW_NEXTSIBLING);
-		SASSERT(pChild);
 	}
 }
 
