@@ -744,6 +744,7 @@ SAnimateImgWnd::SAnimateImgWnd()
     m_bMsgTransparent = TRUE;
     GetEventSet()->addEvent(EVENTID(EventImageAnimateStart));
     GetEventSet()->addEvent(EVENTID(EventImageAnimateStop));
+	GetEventSet()->addEvent(EVENTID(EventImageAnimateRepeat));
 }
 
 void SAnimateImgWnd::OnPaint(IRenderTarget *pRT)
@@ -827,7 +828,10 @@ void SAnimateImgWnd::OnNextFrame()
                 if (m_nRepeat != -1 && ++m_iRepeat == m_nRepeat)
                 { //检查重复次数
                     Stop();
-                }
+				}else{
+					EventImageAnimateRepeat evt(this);
+					FireEvent(evt);
+				}
             }
         }
         m_iTimeFrame++;

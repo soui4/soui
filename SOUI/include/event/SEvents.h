@@ -130,6 +130,7 @@ typedef enum _SOUI_EVENTS
     //图片动画开始，结束事件
     EVT_IMAGE_ANI_START = 22100,
     EVT_IMAGE_ANI_STOP,
+	EVT_IMAGE_ANI_REPEAT,
 
     EVT_SELECTMENU = 22150,
     EVT_POPMENU,
@@ -560,6 +561,8 @@ DEF_EVT(EventSplitPaneMoved, EVT_SPLIT_PANE_MOVED, on_split_pane_moved, { RECT r
 DEF_EVT(EventImageAnimateStart, EVT_IMAGE_ANI_START, on_image_animate_start, { int fake; })
 
 DEF_EVT(EventImageAnimateStop, EVT_IMAGE_ANI_STOP, on_image_animate_stop, { int fake; })
+
+DEF_EVT(EventImageAnimateRepeat, EVT_IMAGE_ANI_REPEAT, on_image_animate_repeat, { int fake; })
 
 DEF_EVT(EventSelectMenu, EVT_SELECTMENU, on_select_menu, {
     UINT nMenuId;
