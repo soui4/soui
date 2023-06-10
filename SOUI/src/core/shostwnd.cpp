@@ -729,7 +729,8 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
     m_szAppSetted.cx = lpCreateStruct->cx;
     m_szAppSetted.cy = lpCreateStruct->cy;
-    OnLoadLayoutFromResourceID(m_strXmlLayout);
+    if(!OnLoadLayoutFromResourceID(m_strXmlLayout))
+		return -1;
 
     m_pTipCtrl = CreateTooltip();
     if (m_pTipCtrl && m_hostAttr.m_bHasMsgLoop)
