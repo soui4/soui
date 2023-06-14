@@ -6,7 +6,7 @@
 SNSBEGIN
 
 class SOUI_EXP SInterpolatorBase : public TObjRefImpl<SObjectImpl<IInterpolator>> {
-    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IInterpolator>>, L"interpolator_base", Interpolator)
+    DEF_SOBJECT_EX(SObjectImpl<IInterpolator>, L"interpolator_base", Interpolator)
 };
 
 class SOUI_EXP SLinearInterpolator : public SInterpolatorBase {

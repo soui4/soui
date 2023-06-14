@@ -1176,12 +1176,10 @@ void SWindow::_RedrawNonClient()
 	InvalidateRect(rcClient,TRUE,TRUE);//but clip client rect
 }
 
-SAutoRefPtr<IRegionS> SWindow::_ConvertRect2RenderRegion(const CRect &rc) const
+static SAutoRefPtr<IRegionS> ConvertRect2RenderRegion(const CRect &rc,const SMatrix &mtx)
 {
     SAutoRefPtr<IRegionS> pRet;
     GETRENDERFACTORY->CreateRegion(&pRet);
-    SMatrix mtx = _GetMatrixEx();
-
     if (!mtx.isIdentity())
     {
         SRect sRc = SRect::IMake(rc);
@@ -1223,9 +1221,11 @@ bool SWindow::_WndRectInRgn(const CRect &rc, const IRegionS *rgn) const
 {
 	CRect rc2;
 	rgn->GetRgnBox(&rc2);
-	if(!rc2.IntersectRect(rc2,rc))
+
+	SMatrix mtx = _GetMatrixEx();
+	if (mtx.isIdentity() && !rc2.IntersectRect(rc2,rc))
 		return false;
-    SAutoRefPtr<IRegionS> rgn2 = _ConvertRect2RenderRegion(rc);
+    SAutoRefPtr<IRegionS> rgn2 = ConvertRect2RenderRegion(rc,mtx);
     return RgnInRgn(rgn, rgn2);
 }
 

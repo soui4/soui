@@ -61,7 +61,7 @@ SNSBEGIN
     {                                                   \
         if (wcscmp(GetClassName(), lpszName) == 0)      \
             return TRUE;                                \
-        return baseCls::IsClass(lpszName);              \
+        return __baseCls::IsClass(lpszName);              \
     }
 
 #define DEF_SOBJECT(baseCls, classname) DEF_SOBJECT_EX(baseCls, classname, 0)

@@ -61,7 +61,7 @@ class SouiLayoutParam
 };
 
 class SOUI_EXP SouiLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
-    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<ILayout>>, L"SouiLayout", Layout)
+    DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"SouiLayout", Layout)
   public:
     SouiLayout(void);
     ~SouiLayout(void);

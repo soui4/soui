@@ -32,6 +32,22 @@ template<class T>
 class SObjectImpl : public T
 {
 public:
+	static LPCWSTR GetClassName()
+    {
+		return T::GetClassName();
+    }
+
+    /**
+     * GetClassType
+     * @brief    获得对象类型
+     * @return   int -- 类型
+     * Describe  静态函数
+     */
+    static int GetClassType()
+    {
+        return T::GetClassType();
+    }
+
 	static void MarkAttributeHandled(SXmlAttr xmlAttr, bool bHandled)
 	{
 		xmlAttr.set_userdata(bHandled?1:0);
@@ -135,19 +151,18 @@ public:
 
 	STDMETHOD_(LPCWSTR,GetObjectClass)(THIS_) SCONST OVERRIDE
 	{
-		return NULL;
+		return GetClassName();
 	}
 
 	STDMETHOD_(int,GetObjectType)(THIS)  SCONST OVERRIDE
 	{
-		return 0;
+		return GetClassType();
 	}
 
 
 	STDMETHOD_(BOOL,IsClass)(THIS_ LPCWSTR lpszName) SCONST OVERRIDE
 	{
-		UNREFERENCED_PARAMETER(lpszName);
-		return FALSE;
+		return wcscmp(lpszName, GetClassName()) == 0;
 	}
 
 	STDMETHOD_(BOOL,GetAttribute)(THIS_ LPCWSTR strAttr, IStringW * pValue) SCONST OVERRIDE

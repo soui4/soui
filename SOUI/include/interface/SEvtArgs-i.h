@@ -8,6 +8,29 @@ SNSBEGIN
 #define INTERFACE IEvtArgs
 DECLARE_INTERFACE_(IEvtArgs, IObject)
 {
+#ifdef __cplusplus
+    /**
+     * GetClassName
+     * @brief    获得对象类型名称
+     * @return   LPCWSTR -- 类名
+     * Describe  静态函数
+     */
+    static LPCWSTR GetClassName()
+    {
+        return L"IEvtArgs";
+    }
+
+    /**
+     * GetClassType
+     * @brief    获得对象类型
+     * @return   int -- 类型
+     * Describe  静态函数
+     */
+    static int GetClassType()
+    {
+        return Interpolator;
+    }
+#endif
 #include <interface/SobjectApi.h>
 
     //-------------------------------------------------------------------------------------------

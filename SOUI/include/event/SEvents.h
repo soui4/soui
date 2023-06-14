@@ -152,7 +152,7 @@ typedef enum _MouseClickId{
 
 #ifdef __cplusplus
 class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
-    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IEvtArgs>>, L"event", Event)
+    DEF_SOBJECT_EX(SObjectImpl<IEvtArgs>, L"event", Event)
   public:
     UINT handled;
     BOOL bubbleUp;

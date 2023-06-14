@@ -548,7 +548,7 @@ class SOUI_EXP SValueAnimator
 
 template <class T>
 class TValueAnimator : public TObjRefImpl<SObjectImpl<SValueAnimator>> {
-    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<SValueAnimator>>, L"valueAnimator", ValueAnimator)
+    DEF_SOBJECT_EX(SObjectImpl<SValueAnimator>, L"valueAnimator", ValueAnimator)
   protected:
     TypeEvaluator<T> mValueEvaluator;
     T mValue;

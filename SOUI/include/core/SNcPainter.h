@@ -11,7 +11,7 @@ class SNcPainter
     : public TObjRefImpl<SObjectImpl<INcPainter>>
     , IItemContainer
     , IHostProxy {
-    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<INcPainter>>, L"ncpainter", Undef)
+    DEF_SOBJECT_EX(SObjectImpl<INcPainter>, L"ncpainter", Undef)
     friend class SHostWnd;
     friend class SNcPanel;
     enum

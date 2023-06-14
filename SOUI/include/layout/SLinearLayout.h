@@ -55,7 +55,7 @@ class SLinearLayoutParam
 };
 
 class SOUI_EXP SLinearLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
-    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<ILayout>>, L"linearLayout", Layout)
+    DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"linearLayout", Layout)
   public:
     SLinearLayout(void);
     ~SLinearLayout(void);

@@ -59,7 +59,7 @@ class SGridLayoutParam
 };
 
 class SOUI_EXP SGridLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
-    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<ILayout>>, L"gridLayout", Layout)
+    DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"gridLayout", Layout)
   public:
     SGridLayout(void);
     ~SGridLayout(void);

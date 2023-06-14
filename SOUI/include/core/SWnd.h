@@ -193,7 +193,7 @@ class SOUI_EXP STrText {
 class SOUI_EXP SWindow
     : public TObjRefImpl<SObjectImpl<IWindow>>
     , protected IAnimationListener {
-    DEF_SOBJECT_EX(TObjRefImpl<SObjectImpl<IWindow>>, L"window", Window)
+    DEF_SOBJECT_EX(SObjectImpl<IWindow>, L"window", Window)
     friend class SwndLayoutBuilder;
     friend class SWindowRepos;
     friend class SHostWnd;
@@ -1052,7 +1052,6 @@ class SOUI_EXP SWindow
 
     bool _ApplyMatrix(IRenderTarget *pRT, SMatrix &oriMtx);
     SMatrix _GetMatrixEx() const;
-    SAutoRefPtr<IRegionS> _ConvertRect2RenderRegion(const CRect &rc) const;
     bool _WndRectInRgn(const CRect &rc, const IRegionS *rgn) const;
 
     //将窗口内容绘制到RenderTarget上

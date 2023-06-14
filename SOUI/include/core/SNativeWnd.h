@@ -181,7 +181,7 @@ class TObjRefProxy
 };
 
 class SOUI_EXP SNativeWnd : public TObjRefProxy<INativeWnd, TObjRefImpl<SObject>> {
-    DEF_SOBJECT_EX(TObjRefImpl<SObject>, L"SNativeWnd", NativeWnd)
+    DEF_SOBJECT_EX(SObject, L"SNativeWnd", NativeWnd)
   public:
     SNativeWnd();
     virtual ~SNativeWnd(void);

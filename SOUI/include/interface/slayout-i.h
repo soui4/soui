@@ -29,6 +29,29 @@ enum
 #define INTERFACE ILayoutParam
 DECLARE_INTERFACE_(ILayoutParam, IObject)
 {
+#ifdef __cplusplus
+    /**
+     * GetClassName
+     * @brief    获得对象类型名称
+     * @return   LPCWSTR -- 类名
+     * Describe  静态函数
+     */
+    static LPCWSTR GetClassName()
+    {
+        return L"ILayout";
+    }
+
+    /**
+     * GetClassType
+     * @brief    获得对象类型
+     * @return   int -- 类型
+     * Describe  静态函数
+     */
+    static int GetClassType()
+    {
+        return Layout;
+    }
+#endif
 #include <interface/SobjectApi.h>
 
     //----------------------------------------------------------
