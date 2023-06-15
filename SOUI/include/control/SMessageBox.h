@@ -38,7 +38,6 @@ SXmlNode SOUI_EXP GetMsgTemplate();
 class SOUI_EXP SMessageBoxImpl
     : public SHostDialog
     , public SDpiHandler<SMessageBoxImpl> {
-    DEF_SOBJECT(SHostDialog, L"msgbox")
   public:
     /**
      * SMessageBoxImpl::SMessageBoxImpl

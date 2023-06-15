@@ -174,10 +174,6 @@ protected:
 
 	virtual UINT Run();
 
-	//Event Sender ID
-	enum {SENDER_ID = 30000};
-	virtual int WINAPI GetID() const {return SENDER_ID;}
-
 	void OnBtnStartNotifyThread();
 	void OnBtnStopNotifyThread();
 
@@ -240,9 +236,9 @@ protected:
 		EVENT_ID_COMMAND(R.id.btn_open_wrap_content,OnBtnOpenWrapContent)
         //-->
 		//<--通知中心事件
-		EVENT_ID_HANDLER(SENDER_ID,EventThreadStart::EventID,OnEventThreadStart)
-		EVENT_ID_HANDLER(SENDER_ID,EventThreadStop::EventID,OnEventThreadStop)
-		EVENT_ID_HANDLER(SENDER_ID,EventThread::EventID,OnEventThread)
+		EVENT_HANDLER(EventThreadStart::EventID,OnEventThreadStart)
+		EVENT_HANDLER(EventThreadStop::EventID,OnEventThreadStop)
+		EVENT_HANDLER(EventThread::EventID,OnEventThread)
 		//-->
 		EVENT_NAME_COMMAND(L"btn_create_by_temp",OnBtnCreateByTemp)
         EVENT_NAME_COMMAND(L"btn_webkit_back",OnBtnWebkitBackward)

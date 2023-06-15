@@ -8,9 +8,7 @@ SNSBEGIN
 #define INTERFACE IEvtArgs
 DECLARE_INTERFACE_(IEvtArgs, IObject)
 {
-#ifdef __cplusplus
-DEF_OBJ_CLS(IEvtArgs,SOUI::Event)
-#endif
+	DEF_OBJ_BASE(IEvtArgs,Event)
 #include <interface/SobjectApi.h>
 
     //-------------------------------------------------------------------------------------------

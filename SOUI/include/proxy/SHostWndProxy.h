@@ -38,44 +38,6 @@ public:
 	{
 		return SHostWnd::SetID(nID);
 	}
-	STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST
-	{
-		return SHostWnd::GetName();
-	}
-	STDMETHOD_(void, SetName)(THIS_ LPCWSTR pszName)
-	{
-		return SHostWnd::SetName(pszName);
-	}
-	STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *xmlNode)
-	{
-		return SHostWnd::InitFromXml(xmlNode);
-	}
-	STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode)
-	{
-		return SHostWnd::OnInitFinished(xmlNode);
-	}
-	STDMETHOD_(HRESULT, ISetAttribute)
-		(THIS_ const IStringW *strAttribName, const IStringW *strValue, BOOL bLoading)
-	{
-		return SHostWnd::ISetAttribute(strAttribName, strValue, bLoading);
-	}
-	STDMETHOD_(HRESULT, SetAttributeA)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading)
-	{
-		return SHostWnd::SetAttributeA(pszAttr, pszValue, bLoading);
-	}
-	STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading)
-	{
-		return SHostWnd::SetAttribute(pszAttr, pszValue, bLoading);
-	}
-	STDMETHOD_(BOOL, GetAttribute)(THIS_ LPCWSTR pszAttr, IStringW *pValue) SCONST
-	{
-		return SHostWnd::GetAttribute(pszAttr, pValue);
-	}
-	STDMETHOD_(HRESULT, AfterAttribute)
-		(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading, HRESULT hr)
-	{
-		return SHostWnd::AfterAttribute(pszAttr, pszValue, bLoading, hr);
-	}
 
 	STDMETHOD_(HWND, CreateNative)
 		(THIS_ LPCTSTR lpWindowName,

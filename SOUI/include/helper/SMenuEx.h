@@ -66,7 +66,7 @@ class SOUI_EXP SMenuEx
     friend class SMenuExItem;
     friend class SMenuExRunData;
     friend class SMenuExRoot;
-    DEF_SOBJECT(SHostWnd, L"smenuex")
+	typedef SHostWnd __baseCls;
   public:
     SMenuEx(void);
     virtual ~SMenuEx(void);

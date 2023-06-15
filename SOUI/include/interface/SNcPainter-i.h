@@ -7,6 +7,7 @@ SNSBEGIN
 #define INTERFACE INcPainter
 DECLARE_INTERFACE_(INcPainter, IObject)
 {
+	DEF_OBJ_BASE(INcPainter,Undef)
 #include <interface/SobjectApi.h>
 
     //--------------------------------------------------------------------------------

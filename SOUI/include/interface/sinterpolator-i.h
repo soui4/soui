@@ -6,9 +6,7 @@ SNSBEGIN
 #define INTERFACE IInterpolator
 DECLARE_INTERFACE_(IInterpolator, IObject)
 {
-#ifdef __cplusplus
-DEF_OBJ_CLS(IInterpolator,SOUI::Interpolator)
-#endif
+	DEF_OBJ_BASE(IInterpolator,Interpolator)
 #include <interface/SobjectApi.h>
 
     //----------------------------------------------------------------------------------

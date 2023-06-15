@@ -56,8 +56,9 @@
 SNSBEGIN
 
 class SOUI_EXP SValueAnimator
-    : public IValueAnimator
+    : public TObjRefImpl<SObjectImpl<IValueAnimator>>
     , ITimelineHandler {
+		DEF_SOBJECT(SObjectImpl<IValueAnimator>,L"valueAnimator")
   protected:
     /**
      * The first time that the animation's animateFrame() method is called. This time is used to
@@ -547,8 +548,7 @@ class SOUI_EXP SValueAnimator
 };
 
 template <class T>
-class TValueAnimator : public TObjRefImpl<SObjectImpl<SValueAnimator>> {
-    DEF_SOBJECT(SObjectImpl<SValueAnimator>, L"valueAnimator")
+class TValueAnimator : public SValueAnimator {
   protected:
     TypeEvaluator<T> mValueEvaluator;
     T mValue;

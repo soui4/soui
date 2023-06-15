@@ -3,6 +3,7 @@
 namespace SOUI
 {
 class STipWnd : public SHostWnd {
+	typedef SHostWnd __baseCls;
   public:
     STipWnd(const SStringT &strLayout);
     ~STipWnd();

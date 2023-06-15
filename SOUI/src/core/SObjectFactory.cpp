@@ -18,7 +18,7 @@ SObjectInfo ObjInfo_New(LPCWSTR name,int type){
 
 BOOL ObjInfo_IsValid(const SObjectInfo* pObjInfo)
 {
-	return pObjInfo->nType >= None && pObjInfo->szName[0]!=0;
+	return pObjInfo->nType >= Undef && pObjInfo->szName[0]!=0;
 }
 
 SObjectFactoryMgr::SObjectFactoryMgr(void)

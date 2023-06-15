@@ -671,7 +671,7 @@ END_MSG_MAP()
 
 	void OnFinalMessage(HWND hWnd){ 
 	    //演示OnFinalMessage用法,下面new出来的不需要显示调用delete
-	    __baseCls::OnFinalMessage(hWnd);
+	    SHostWnd::OnFinalMessage(hWnd);
 	    delete this;
 	}  
 };
@@ -933,7 +933,7 @@ UINT CMainDlg::Run()
 			pOutput->AppendFormatText(strMsg);
 		);
 #else
-		EventThread *pEvt = new EventThread(this);
+		EventThread *pEvt = new EventThread(NULL);
 		pEvt->nData = nSleep;
 		SNotifyCenter::getSingleton().FireEventAsync(pEvt);
 		pEvt->Release();
@@ -950,7 +950,7 @@ void CMainDlg::OnBtnStartNotifyThread()
 	SNotifyCenter::getSingleton().addEvent(EVENTID(EventThreadStop));
 	SNotifyCenter::getSingleton().addEvent(EVENTID(EventThread));
 
-	EventThreadStart evt(this);
+	EventThreadStart evt(NULL);
 	SNotifyCenter::getSingleton().FireEventSync(&evt);
 	BeginThread();	
 }
@@ -960,7 +960,7 @@ void CMainDlg::OnBtnStopNotifyThread()
 	if(!IsRunning()) return;
 
 	EndThread();
-	EventThreadStop evt(this);
+	EventThreadStop evt(NULL);
 	SNotifyCenter::getSingleton().FireEventSync(&evt);
 
 	SNotifyCenter::getSingleton().removeEvent(EventThreadStart::EventID);

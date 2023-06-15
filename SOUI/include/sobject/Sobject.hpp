@@ -32,22 +32,14 @@ template<class T>
 class SObjectImpl : public T
 {
 public:
-	static LPCWSTR GetClassName()
-    {
-		return T::GetClassName();
-    }
-
-    /**
-     * GetClassType
-     * @brief    获得对象类型
-     * @return   int -- 类型
-     * Describe  静态函数
-     */
-    static int GetClassType()
-    {
-        return T::GetClassType();
-    }
-
+	static int GetClassType(){
+		return T::GetClassType();
+	}
+	static LPCWSTR GetClassName()                       
+	{                                                   
+		return T::GetClassName();                               
+	}                                              
+public:
 	static void MarkAttributeHandled(SXmlAttr xmlAttr, bool bHandled)
 	{
 		xmlAttr.set_userdata(bHandled?1:0);
@@ -208,7 +200,6 @@ public:
 protected:
 	FunAttrHandler m_attrHandler;
 };
-
 
 typedef SObjectImpl<IObject> SObject;
 

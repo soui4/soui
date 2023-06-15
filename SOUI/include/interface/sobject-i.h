@@ -22,29 +22,32 @@
 //////////////////////////////////////////////////////////////////////////
 SNSBEGIN
 
-#define DEF_OBJ_CLS(cls,clsType) \
-    static LPCWSTR GetClassName() \
-    {\
-	return L#cls;\
-    }\
-    static int GetClassType()\
-    {\
-        return clsType;\
-    }\
+#ifdef __cplusplus
+#define DEF_OBJ_BASE(clsName,clsType) \
+static int GetClassType()                           \
+{                                                   \
+	return clsType;               \
+}                                                   \
+	static LPCWSTR GetClassName()                       \
+{                                                   \
+	return L#clsName;                               \
+}                                                   
+#else
+#define DEF_OBJ_BASE(clsName,clsType) 
+#endif
 
 // SObject Class Name Declaration
-#define DEF_SOBJECT(baseCls, classname)              \
+#define DEF_SOBJECT(baseCls, clsName)      \
   public:                                               \
     typedef baseCls __baseCls;                          \
     static LPCWSTR GetClassName()                       \
     {                                                   \
-        return classname;                               \
+        return clsName;                               \
     }                                                   \
-                                                        \
-    static int GetClassType()                           \
-    {                                                   \
+	static int GetClassType()                       \
+	{                                                   \
 		return __baseCls::GetClassType();               \
-    }                                                   \
+	}                                                   \
                                                         \
     static LPCWSTR BaseClassName()                      \
     {                                                   \
@@ -53,12 +56,7 @@ SNSBEGIN
                                                         \
     virtual LPCWSTR WINAPI GetObjectClass() const       \
     {                                                   \
-        return classname;                               \
-    }                                                   \
-                                                        \
-    virtual int WINAPI GetObjectType() const            \
-    {                                                   \
-        return __baseCls::GetObjectType();              \
+        return clsName;                               \
     }                                                   \
                                                         \
     virtual BOOL WINAPI IsClass(LPCWSTR lpszName) const \
@@ -76,9 +74,7 @@ typedef HRESULT (*FunAttrHandler)(IObject * pObj,const IStringW * attrName,const
 
 typedef enum _SObjectType
 {
-	None = -1,
 	Undef = 0,
-	NativeWnd,
 	Window,
 	Skin,
 	Layout,
@@ -100,9 +96,7 @@ typedef enum _SObjectType
 #define INTERFACE IObject
 DECLARE_INTERFACE_(IObject, IObjRef)
 {
-#ifdef __cplusplus
-	DEF_OBJ_CLS(IObject,SOUI::Undef)
-#endif
+	DEF_OBJ_BASE(IObject,Undef)
 	#include <interface/SobjectApi.h>
 };
 

@@ -8,7 +8,7 @@ SNSBEGIN
 class SLinearLayoutParam
     : public TObjRefImpl<SObjectImpl<ILayoutParam>>
     , protected SLinearLayoutParamStruct {
-    DEF_SOBJECT(TObjRefImpl<SObjectImpl<ILayoutParam>>, L"LinearLayoutParam")
+    DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"LinearLayoutParam")
 
     friend class SLinearLayout;
 
