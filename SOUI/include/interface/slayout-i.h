@@ -30,27 +30,7 @@ enum
 DECLARE_INTERFACE_(ILayoutParam, IObject)
 {
 #ifdef __cplusplus
-    /**
-     * GetClassName
-     * @brief    获得对象类型名称
-     * @return   LPCWSTR -- 类名
-     * Describe  静态函数
-     */
-    static LPCWSTR GetClassName()
-    {
-        return L"ILayout";
-    }
-
-    /**
-     * GetClassType
-     * @brief    获得对象类型
-     * @return   int -- 类型
-     * Describe  静态函数
-     */
-    static int GetClassType()
-    {
-        return Layout;
-    }
+DEF_OBJ_CLS(ILayoutParam,SOUI::LayoutParam)
 #endif
 #include <interface/SobjectApi.h>
 
@@ -130,6 +110,9 @@ DECLARE_INTERFACE_(ILayoutParam, IObject)
 #define INTERFACE ILayout
 DECLARE_INTERFACE_(ILayout, IObject)
 {
+#ifdef __cplusplus
+DEF_OBJ_CLS(ILayout,SOUI::Layout)
+#endif
 #include <interface/SobjectApi.h>
     //------------------------------------------------------------------------
 

@@ -7,7 +7,7 @@ SNSBEGIN
 class SouiLayoutParam
     : public TObjRefImpl<SObjectImpl<ILayoutParam>>
     , protected SouiLayoutParamStruct {
-    DEF_SOBJECT(TObjRefImpl<SObjectImpl<ILayoutParam>>, L"SouiLayoutParam")
+    DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"SouiLayoutParam")
 
     friend class SouiLayout;
 
@@ -61,7 +61,7 @@ class SouiLayoutParam
 };
 
 class SOUI_EXP SouiLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
-    DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"SouiLayout", Layout)
+    DEF_SOBJECT(SObjectImpl<ILayout>, L"SouiLayout")
   public:
     SouiLayout(void);
     ~SouiLayout(void);

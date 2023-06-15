@@ -193,7 +193,7 @@ class SOUI_EXP STrText {
 class SOUI_EXP SWindow
     : public TObjRefImpl<SObjectImpl<IWindow>>
     , protected IAnimationListener {
-    DEF_SOBJECT_EX(SObjectImpl<IWindow>, L"window", Window)
+    DEF_SOBJECT(SObjectImpl<IWindow>, L"window")
     friend class SwndLayoutBuilder;
     friend class SWindowRepos;
     friend class SHostWnd;

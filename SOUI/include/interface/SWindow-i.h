@@ -23,27 +23,7 @@ typedef BOOL (* FunSwndProc)(IWindow * pSwnd,UINT uMsg,WPARAM wp,LPARAM lp,LRESU
 DECLARE_INTERFACE_(IWindow, IObject)
 {
 #ifdef __cplusplus
-    /**
-     * GetClassName
-     * @brief    获得对象类型名称
-     * @return   LPCWSTR -- 类名
-     * Describe  静态函数
-     */
-    static LPCWSTR GetClassName()
-    {
-        return L"IWindow";
-    }
-
-    /**
-     * GetClassType
-     * @brief    获得对象类型
-     * @return   int -- 类型
-     * Describe  静态函数
-     */
-    static int GetClassType()
-    {
-        return Window;
-    }
+DEF_OBJ_CLS(IWindow,SOUI::Window)
 #endif
 #include <interface/SobjectApi.h>
 

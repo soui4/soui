@@ -119,27 +119,7 @@ typedef enum ZAdjustment
 DECLARE_INTERFACE_(IAnimation, IObject)
 {
 #ifdef __cplusplus
-    /**
-     * GetClassName
-     * @brief    获得对象类型名称
-     * @return   LPCWSTR -- 类名
-     * Describe  静态函数
-     */
-    static LPCWSTR GetClassName()
-    {
-        return L"IAnimation";
-    }
-
-    /**
-     * GetClassType
-     * @brief    获得对象类型
-     * @return   int -- 类型
-     * Describe  静态函数
-     */
-    static int GetClassType()
-    {
-        return Animation;
-    }
+	DEF_OBJ_CLS(IAnimation,SOUI::Animation)
 #endif
 
 	#include <interface/SobjectApi.h>

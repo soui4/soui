@@ -68,7 +68,7 @@ class SOUI_EXP SValueDescription {
 };
 
 class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
-    DEF_SOBJECT_EX(SObjectImpl<IAnimation>, L"animation", Animation)
+    DEF_SOBJECT(SObjectImpl<IAnimation>, L"animation")
   protected:
     /**
      * Set by {@link #getTransformation(long, STransformation)} when the animation ends.

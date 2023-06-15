@@ -7,27 +7,7 @@ SNSBEGIN
 DECLARE_INTERFACE_(IInterpolator, IObject)
 {
 #ifdef __cplusplus
-    /**
-     * GetClassName
-     * @brief    获得对象类型名称
-     * @return   LPCWSTR -- 类名
-     * Describe  静态函数
-     */
-    static LPCWSTR GetClassName()
-    {
-        return L"IInterpolator";
-    }
-
-    /**
-     * GetClassType
-     * @brief    获得对象类型
-     * @return   int -- 类型
-     * Describe  静态函数
-     */
-    static int GetClassType()
-    {
-        return Interpolator;
-    }
+DEF_OBJ_CLS(IInterpolator,SOUI::Interpolator)
 #endif
 #include <interface/SobjectApi.h>
 

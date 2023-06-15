@@ -28,27 +28,7 @@ SNSBEGIN
 DECLARE_INTERFACE_(ISkinObj, IObject)
 {
 #ifdef __cplusplus
-    /**
-     * GetClassName
-     * @brief    获得对象类型名称
-     * @return   LPCWSTR -- 类名
-     * Describe  静态函数
-     */
-    static LPCWSTR GetClassName()
-    {
-        return L"ISkin";
-    }
-
-    /**
-     * GetClassType
-     * @brief    获得对象类型
-     * @return   int -- 类型
-     * Describe  静态函数
-     */
-    static int GetClassType()
-    {
-        return Skin;
-    }
+DEF_OBJ_CLS(ISkinObj,SOUI::Skin)
 #endif
 #include <interface/SobjectApi.h>
     //------------------------------------------------------------------------
