@@ -847,8 +847,12 @@ void SAnimateImgWnd::OnColorize(COLORREF cr)
 
 void SAnimateImgWnd::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
 {
-    if (pOldContainer)
-        pOldContainer->UnregisterTimelineHandler(this);
+	if(IsPlaying()){
+		if (pOldContainer)
+			pOldContainer->UnregisterTimelineHandler(this);
+		if (pNewContainer)
+			pNewContainer->RegisterTimelineHandler(this);
+	}
     SWindow::OnContainerChanged(pOldContainer, pNewContainer);
 }
 
