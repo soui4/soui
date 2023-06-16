@@ -69,7 +69,7 @@ INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
         // hide the window before enabling the parent, etc.
         if (IsWindow())
         {
-            SNativeWnd::SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
+			ShowHostWnd(SW_HIDE,TRUE);
         }
 
         if (bEnableParent)
@@ -98,7 +98,6 @@ void SHostDialog::EndDialog(INT_PTR nResult)
     {
         m_nRetCode = nResult;
         m_MsgLoop->Quit();
-        SNativeWnd::SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
         PostMessage(WM_NULL);
     }
 }

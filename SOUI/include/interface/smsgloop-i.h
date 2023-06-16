@@ -67,6 +67,13 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
     STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) PURE;
 
 	STDMETHOD_(void, ExecutePendingTask)() PURE;
+
+	STDMETHOD_(BOOL,PeekMsg)(THIS_ LPMSG pMsg,UINT wMsgFilterMin,UINT wMsgFilterMax,BOOL bRemove) PURE;
+
+	STDMETHOD_(BOOL,WaitMsg)(THIS) PURE;
+
+	STDMETHOD_(void,HandleMsg)(THIS) PURE;
+
 };
 
 #undef INTERFACE

@@ -374,6 +374,9 @@ public:
 	STDMETHOD_(void,EnableDragDrop)(THIS) OVERRIDE{
 		return SHostWnd::EnableDragDrop();
 	}
+	STDMETHOD_(void,ShowHostWnd)(THIS_ int uShowCmd,BOOL bWaitAniDone) OVERRIDE{
+		return SHostWnd::ShowHostWnd(uShowCmd,bWaitAniDone);
+	}
 
 };
 

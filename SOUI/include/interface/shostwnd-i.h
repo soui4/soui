@@ -151,6 +151,14 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 	 * @return 
 	*/
 	STDMETHOD_(void,EnableDragDrop)(THIS) PURE;
+
+    /**
+	 * @brief 显示或者隐藏HostWnd
+	 * @param uShowCmd 和ShowWindow参数相同
+	 * @param bWaitAniDone 当窗口有配置进出动画时，等待动画完成标志
+	 * @return 
+	*/
+	STDMETHOD_(void,ShowHostWnd)(THIS_ int uShowCmd,BOOL bWaitAniDone) PURE;
 };
 
 #undef INTERFACE
@@ -290,6 +298,14 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 	 * @return 
 	*/
 	STDMETHOD_(void,EnableDragDrop)(THIS) PURE;
+
+    /**
+	 * @brief 显示或者隐藏HostWnd
+	 * @param uShowCmd 和ShowWindow参数相同
+	 * @param bWaitAniDone 当窗口有配置进出动画时，等待动画完成标志
+	 * @return 
+	*/
+	STDMETHOD_(void,ShowHostWnd)(THIS_ int uShowCmd,BOOL bWaitAniDone) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**

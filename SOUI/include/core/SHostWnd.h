@@ -112,14 +112,6 @@ class SOUI_EXP SHostWndAttr : public TObjRefImpl<SObject> {
     HICON m_hAppIconBig;
 };
 
-enum AniState
-{
-    Ani_none = 0,
-    Ani_win = 1,
-    Ani_host = 2,
-    Ani_both = (Ani_win | Ani_host),
-};
-
 class SOUI_EXP SRootWindow : public SWindow {
     DEF_SOBJECT(SWindow, L"root")
     friend class SHostWnd;
@@ -264,6 +256,8 @@ class SOUI_EXP SHostWnd
 
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) OVERRIDE;
 	STDMETHOD_(void,EnableDragDrop)(THIS) OVERRIDE;
+
+	STDMETHOD_(void,ShowHostWnd)(THIS_ int uShowCmd,BOOL bWaitAniDone) OVERRIDE;
   public:
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1)
     {
@@ -405,7 +399,6 @@ class SOUI_EXP SHostWnd
     LRESULT OnGetObject(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void OnSysCommand(UINT nID, CPoint lParam);
 
-    void OnHostShowWindow(BOOL bShow, UINT nStatus);
 #if (!DISABLE_SWNDSPY)
   protected:
     LRESULT OnSpyMsgSetSpy(UINT uMsg, WPARAM wParam, LPARAM lParam);
@@ -473,7 +466,6 @@ class SOUI_EXP SHostWnd
     virtual BOOL _HandleEvent(IEvtArgs *pEvt);
 
     BEGIN_MSG_MAP_EX(SHostWnd)
-        MSG_WM_SHOWWINDOW(OnHostShowWindow)
         MSG_WM_SIZE(OnSize)
         MSG_WM_PRINT(OnPrint)
         MSG_WM_PAINT(OnPaint)

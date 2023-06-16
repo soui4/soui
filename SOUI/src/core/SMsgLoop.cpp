@@ -46,56 +46,33 @@ void SMessageLoop::Quit()
 
 int SMessageLoop::Run()
 {
-    BOOL bDoIdle = TRUE;
-    int nIdleCount = 0;
     BOOL bRet;
-
     m_bRunning = TRUE;
+	m_bDoIdle = TRUE;
+	m_nIdleCount = 0;
     m_tid = GetCurrentThreadId();
     m_bQuit = FALSE;
-    for (;!m_bQuit;)
-    {
-        while (bDoIdle && !::PeekMessage(&m_msg, NULL, 0, 0, PM_NOREMOVE))
-        {
-            if (!OnIdle(nIdleCount++))
-                bDoIdle = FALSE;
-            if (m_bQuit)
-                goto exit_loop;
-        }
-
-		bRet = OnWaitMessage();
+    do{
+		bRet = WaitMsg();
+		if(m_bQuit)
+			break;
 		if(!bRet){
-			SSLOGD() << "OnWaitMessage returned FALSE (error)";
+			SSLOGD() << "WaitMsg returned FALSE (error)";
 			continue; // error, don't process
-		}
-		
-        while(PeekMessage(&m_msg,NULL,0,0,PM_REMOVE))
-		{
-			if(m_msg.message == WM_QUIT)
-			{
-				m_bQuit = TRUE;
-				break;
-			}
-			ExecutePendingTask();
-			OnMsg(&m_msg);
-			bDoIdle = IsIdleMessage(&m_msg);
-			if(bDoIdle){
-				nIdleCount = 0;
-			}
-		}
-    }
+		}		
+		HandleMsg();
+    }while(!m_bQuit);
 
-exit_loop:
-{
-    SAutoLock lock(m_cs);
-    SPOSITION pos = m_runnables.GetHeadPosition();
-    while (pos)
-    {
-        IRunnable *pRunnable = m_runnables.GetNext(pos);
-        pRunnable->Release();
-    }
-    m_runnables.RemoveAll();
-}
+	{
+		SAutoLock lock(m_cs);
+		SPOSITION pos = m_runnables.GetHeadPosition();
+		while (pos)
+		{
+			IRunnable *pRunnable = m_runnables.GetNext(pos);
+			pRunnable->Release();
+		}
+		m_runnables.RemoveAll();
+	}
     m_bRunning = FALSE;
     return (int)m_msg.wParam;
 }
@@ -240,9 +217,41 @@ void SMessageLoop::ExecutePendingTask()
 	}
 }
 
-BOOL SMessageLoop::OnWaitMessage()
+BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg,UINT wMsgFilterMin,UINT wMsgFilterMax,BOOL bRemove)
 {
-	return WaitMessage();
+	return ::PeekMessage(pMsg,0,wMsgFilterMin,wMsgFilterMax,bRemove?PM_REMOVE:PM_NOREMOVE);
+}
+
+BOOL SMessageLoop::WaitMsg(THIS)
+{
+	MSG msg;
+	while (m_bDoIdle && !PeekMsg(&msg, 0, 0, FALSE))
+	{
+		if (!OnIdle(m_nIdleCount++))
+			m_bDoIdle = FALSE;
+		if (m_bQuit)
+			return FALSE;
+	}
+	return ::WaitMessage();
+}
+
+void SMessageLoop::HandleMsg(THIS)
+{
+	MSG msg;
+	while(PeekMsg(&msg,0,0,TRUE))
+	{
+		if(msg.message == WM_QUIT)
+		{
+			m_bQuit = TRUE;
+			break;
+		}
+		ExecutePendingTask();
+		OnMsg(&msg);
+		m_bDoIdle = IsIdleMessage(&msg);
+		if(m_bDoIdle){
+			m_nIdleCount = 0;
+		}
+	}
 }
 
 SNSEND

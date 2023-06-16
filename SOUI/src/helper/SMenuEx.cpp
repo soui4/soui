@@ -841,6 +841,8 @@ void SMenuEx::RunMenu(HWND hRoot)
     BOOL bMsgQuit(FALSE);
     HWND hCurMenu(NULL);
 
+	SAutoRefPtr<IMessageLoop> msgLoop;
+	SApplication::getSingletonPtr()->GetMsgLoopFactory()->CreateMsgLoop(&msgLoop,GetMsgLoop());
     for (;;)
     {
 
@@ -857,7 +859,7 @@ void SMenuEx::RunMenu(HWND hRoot)
 
         for (;;)
         { //获取菜单相关消息，抄自wine代码
-            if (PeekMessage(&msg, NULL, 0, 0, PM_NOREMOVE))
+            if (msgLoop->PeekMsg(&msg, 0, 0, FALSE))
             {
                 if (!CallMsgFilter(&msg, MSGF_MENU))
                     break;
@@ -865,7 +867,7 @@ void SMenuEx::RunMenu(HWND hRoot)
             }
             else
             {
-                WaitMessage();
+                msgLoop->WaitMsg();
             }
         }
 
@@ -897,7 +899,7 @@ void SMenuEx::RunMenu(HWND hRoot)
         }
 
         //移除消息队列中当前的消息。
-        PeekMessage(&msg, NULL, msg.message, msg.message, PM_REMOVE);
+        msgLoop->PeekMsg(&msg, msg.message, msg.message, TRUE);
 
         //拦截非菜单窗口的MouseMove消息
         if (msg.message == WM_MOUSEMOVE)
@@ -918,8 +920,7 @@ void SMenuEx::RunMenu(HWND hRoot)
             }
         }
 
-        // support tooltip.
-        GetMsgLoop()->OnMsg(&msg);
+        msgLoop->OnMsg(&msg);
 
         if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP || msg.message == WM_CHAR)
         { //将键盘事件强制发送到最后一级菜单窗口，让菜单处理快速键

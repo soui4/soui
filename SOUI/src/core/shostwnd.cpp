@@ -139,6 +139,22 @@ void SHostWndAttr::SetSendWheel2Hover(bool value)
 // SRootWindow
 //////////////////////////////////////////////////////////////////////////
 
+enum{
+	kAni4Destroy=1,
+	kAni4Hide = 2,
+};
+
+enum AniState
+{
+	Ani_none = 0,
+	Ani_win_enter = 1,
+	Ani_win_exit = 2,
+	Ani_win = (Ani_win_enter|Ani_win_exit),
+	Ani_host = 4,
+	Ani_All = (Ani_win | Ani_host),
+};
+
+
 SRootWindow::SRootWindow(SHostWnd *pHostWnd)
     : m_pHostWnd(pHostWnd)
 {
@@ -164,10 +180,16 @@ void SRootWindow::OnAnimationStop(IAnimation *pAni)
     if (pAni == m_aniEnter || pAni == m_aniExit)
     {
         m_pHostWnd->m_AniState &= ~Ani_win;
-    }
-    if (pAni == m_aniExit && m_pHostWnd->m_AniState == Ani_none)
-    {
-        m_pHostWnd->SNativeWnd::DestroyWindow();
+		if(pAni == m_aniExit){
+			ULONG_PTR data = pAni->getUserData();
+			if(data==kAni4Destroy)
+				m_pHostWnd->SNativeWnd::DestroyWindow();
+			else if(data == kAni4Hide)
+			{
+				m_pHostWnd->SNativeWnd::SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
+			}
+			pAni->setUserData(0);
+		}
     }
 }
 
@@ -1483,8 +1505,9 @@ BOOL SHostWnd::DestroyWindow()
     }
     if (m_pRoot->m_aniExit && !IsIconic())
     {
+		m_pRoot->m_aniExit->setUserData(kAni4Destroy);//mark for destroy
         GetRoot()->StartAnimation(m_pRoot->m_aniExit);
-        m_AniState |= Ani_win;
+        m_AniState |= Ani_win_exit;
         return TRUE;
     }
     else
@@ -1516,9 +1539,13 @@ void SHostWnd::OnWindowPosChanging(LPWINDOWPOS lpWndPos)
 { //默认不处理该消息，同时防止系统处理该消息
     if (lpWndPos->flags & SWP_SHOWWINDOW && m_bFirstShow)
     {
-        OnHostShowWindow(TRUE, 0);
-        m_bFirstShow = FALSE;
-    }
+		if(m_pRoot->m_aniEnter){
+			m_AniState |= Ani_win_enter;
+			m_pRoot->StartAnimation(m_pRoot->m_aniEnter);
+			OnNextFrame();
+		}
+		m_bFirstShow = FALSE;
+	}
 }
 
 void SHostWnd::OnWindowPosChanged(LPWINDOWPOS lpWndPos)
@@ -1702,17 +1729,6 @@ BOOL SHostWnd::ShowWindow(int nCmdShow)
     return bRet;
 }
 
-void SHostWnd::OnHostShowWindow(BOOL bShow, UINT nStatus)
-{
-    DefWindowProc();
-    if (bShow && m_pRoot->m_aniEnter && m_bFirstShow)
-    {
-        GetRoot()->StartAnimation(m_pRoot->m_aniEnter);
-        m_AniState |= Ani_win;
-        OnNextFrame();
-    }
-}
-
 void SHostWnd::OnHostAnimationStarted(IAnimation *pAni)
 {
 }
@@ -1810,6 +1826,45 @@ void SHostWnd::SetPresenter(THIS_ IHostPresenter* pPresenter){
 void SHostWnd::EnableDragDrop(THIS)
 {
 	::RegisterDragDrop(m_hWnd,GetDropTarget());
+}
+
+void SHostWnd::ShowHostWnd(THIS_ int nShowCmd,BOOL bWaitAniDone)
+{
+	if(nShowCmd!=SW_HIDE)
+	{
+		if(IsWindowVisible())
+			return;
+		ShowWindow(nShowCmd);
+		if(m_pRoot->m_aniEnter){
+			m_AniState |= Ani_win_enter;
+			m_pRoot->StartAnimation(m_pRoot->m_aniEnter);
+			OnNextFrame();
+		}else{
+			bWaitAniDone = FALSE;
+		}
+	}else{
+		//hide
+		if(!IsWindowVisible())
+			return;
+		if(m_AniState & Ani_win)
+			m_pRoot->ClearAnimation();
+		if(m_pRoot->m_aniExit){
+			m_AniState |= Ani_win_exit;
+			m_pRoot->m_aniExit->setUserData(kAni4Hide);//mark for hide
+			m_pRoot->StartAnimation(m_pRoot->m_aniExit);
+		}else{
+			SNativeWnd::SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
+			bWaitAniDone = FALSE;
+		}
+	}
+	if(bWaitAniDone){
+		SAutoRefPtr<IMessageLoop> msgLoop;
+		SApplication::getSingletonPtr()->GetMsgLoopFactory()->CreateMsgLoop(&msgLoop,GetMsgLoop());
+		for(;m_AniState & Ani_win;){
+			msgLoop->WaitMsg();
+			msgLoop->HandleMsg();
+		}
+	}
 }
 
 //////////////////////////////////////////////////////////////////

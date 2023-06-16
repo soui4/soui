@@ -40,8 +40,12 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
 	STDMETHOD_(void, ExecutePendingTask)() OVERRIDE;
 
-  protected:
-	virtual BOOL OnWaitMessage();
+	STDMETHOD_(BOOL,PeekMsg)(THIS_ LPMSG pMsg,UINT wMsgFilterMin,UINT wMsgFilterMax,BOOL bRemove) OVERRIDE;
+
+	STDMETHOD_(BOOL,WaitMsg)(THIS) OVERRIDE;
+
+	STDMETHOD_(void,HandleMsg)(THIS) OVERRIDE;
+
   public:
     static BOOL IsIdleMessage(MSG *pMsg);
 
@@ -52,6 +56,9 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
     BOOL m_bRunning;
     BOOL m_bQuit;
+	BOOL m_bDoIdle ;
+	int m_nIdleCount ;
+
     SCriticalSection m_cs;
     SList<IRunnable *> m_runnables;
     SCriticalSection m_csRunningQueue;
