@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 #include <interface/SNativeWnd-i.h>
 #include <interface/SNcPainter-i.h>
 #include <interface/smsgloop-i.h>
@@ -19,180 +19,137 @@ typedef struct _EventHandlerInfo{
 #define INTERFACE IHostWnd
 DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 {
-    //!��������
-    /*!
-     */
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-
-    //!�ͷ�����
-    /*!
-     */
-    STDMETHOD_(long, Release)(THIS) PURE;
-
-    //!�ͷŶ���
-    /*!
-     */
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+#include "SNativeWndApi.h"
     //////////////////////////////////////////////////////////////////////////
-    STDMETHOD_(HWND, CreateNative)
-    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
-
-    STDMETHOD_(HWND, GetHwnd)(THIS) PURE;
-
-    STDMETHOD_(BOOL, SubclassWindow)(THIS_ HWND hWnd) PURE;
-
-    STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) PURE;
-
-    STDMETHOD_(const MSG *, GetCurrentMessage)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(int, GetDlgCtrlID)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(DWORD, GetStyle)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(DWORD, GetExStyle)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(LONG_PTR, GetWindowLongPtr)(CTHIS_ int nIndex) SCONST PURE;
-
-    STDMETHOD_(LONG_PTR, SetWindowLongPtr)(THIS_ int nIndex, LONG_PTR dwNewLong) PURE;
-
-    STDMETHOD_(HWND, GetParent)(THIS) PURE;
-
-    STDMETHOD_(HWND, SetParent)(THIS_ HWND hWndNewParent) PURE;
-
-    STDMETHOD_(BOOL, IsWindowEnabled)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
-
-    STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
-
-    STDMETHOD_(BOOL, SetWindowPos)
-    (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) PURE;
-
-    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter /*= NULL*/) PURE;
-
-    STDMETHOD_(BOOL, DestroyWindow)(THIS) PURE;
-
-    STDMETHOD_(BOOL, IsWindow)(THIS) PURE;
-
-    STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase /*= TRUE*/) PURE;
-
-    STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /* = TRUE*/) PURE;
-
-    STDMETHOD_(BOOL, GetWindowRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-    STDMETHOD_(BOOL, GetClientRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-    STDMETHOD_(BOOL, ClientToScreen)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
-
-    STDMETHOD_(BOOL, ClientToScreen2)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-    STDMETHOD_(BOOL, ScreenToClient)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
-
-    STDMETHOD_(BOOL, ScreenToClient2)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-    STDMETHOD_(int, MapWindowPoints)(CTHIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST PURE;
-
-    STDMETHOD_(int, MapWindowRect)(CTHIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
-
-    STDMETHOD_(UINT_PTR, SetTimer)
-    (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
-
-    STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) PURE;
-
-    STDMETHOD_(HDC, GetDC)(THIS) PURE;
-
-    STDMETHOD_(HDC, GetWindowDC)(THIS) PURE;
-
-    STDMETHOD_(int, ReleaseDC)(THIS_ HDC hDC) PURE;
-
-    STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP hBitmap) PURE;
-
-    STDMETHOD_(BOOL, HideCaret)(THIS) PURE;
-
-    STDMETHOD_(BOOL, ShowCaret)(THIS) PURE;
-
-    STDMETHOD_(HWND, GetCapture)(THIS) PURE;
-
-    STDMETHOD_(HWND, SetCapture)(THIS) PURE;
-
-    STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
-
-    STDMETHOD_(HWND, SetFocus)(THIS) PURE;
-
-    STDMETHOD_(LRESULT, SendMessage)
-    (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
-
-    STDMETHOD_(BOOL, PostMessage)
-    (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
-
-    STDMETHOD_(BOOL, SendNotifyMessage)
-    (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
-
-    STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) PURE;
-
-    STDMETHOD_(int, GetWindowText)(CTHIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST PURE;
-
-    STDMETHOD_(BOOL, IsIconic)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(BOOL, IsZoomed)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(BOOL, IsWindowVisible)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(BOOL, MoveWindow)
-    (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/) PURE;
-
-    STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint /*= TRUE*/) PURE;
-
-    STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) PURE;
-
-    STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw /*=TRUE*/) PURE;
-
-    STDMETHOD_(BOOL, SetLayeredWindowAttributes)
-    (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
-
-    STDMETHOD_(BOOL, UpdateLayeredWindow)
-    (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey, BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
-
-    STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
-	STDMETHOD_(MsgHandlerInfo *,GetMsgHandler)(THIS) PURE;
-
-    //////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * @brief 创建窗口
+     * @param hWndParent 父窗口
+     * @param dwStyle style
+     * @param dwExStyle exStyle
+     * @param x 
+     * @param y 
+     * @param nWidth 
+     * @param nHeight 
+     * @return HWND
+    */
     STDMETHOD_(HWND, CreateEx)
     (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) PURE;
+
+	/**
+	 * @brief 创建窗口
+	 * @param hWndParent 
+     * @param x
+     * @param y
+     * @param nWidth
+     * @param nHeight
+     * @return HWND
+	*/
 	STDMETHOD_(HWND, Create)
 	(THIS_ HWND hWndParent, int x DEF_VAL(0), int y DEF_VAL(0), int nWidth DEF_VAL(0), int nHeight DEF_VAL(0)) PURE;
+
+    /**
+     * @brief 设置窗口布局资源ID
+     * @param pszLayoutId 布局资源ID
+     * @return 
+    */
     STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
+
+    /**
+     * @brief 从XML初始化窗口
+     * @param pNode XML数据
+     * @return TRUE-成功
+    */
+    STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode* pNode) PURE;
+
+    /**
+     * @brief 获取Dui Root
+     * @return Dui Root
+    */
     STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
+
+	/**
+	 * @brief 查询窗口的半透明标志
+	 * @return TRUE-窗口半透明
+	*/
 	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST PURE;
+
+	/**
+	 * @brief 获取窗口的上屏对象
+	 * @return IHostPresenter* - 上屏对象
+	*/
 	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) PURE;
+
+	/**
+	 * @brief 设置窗口上屏对象
+	 * @param pPresenter 上屏对象 
+	 * @return 
+	*/
 	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) PURE;
+
+	/**
+	 * @brief 获取窗口所属的msgloop对象
+	 * @param  
+	 * @return 
+	*/
 	STDMETHOD_(IMessageLoop*,GetMsgLoop)(THIS) PURE;
 
     /**
-     * @brief ����ID�����Ӵ���
-     * @param nId int--�Ӵ���ID
-     * @return IWindow*--ƥ�䴰��
-     * @remark ���ù�������㷨����ƥ���Ӵ���
+     * @brief 根据ID查找子窗口
+     * @param nId int--子窗口ID
+     * @return IWindow*--匹配窗口
+     * @remark 采用广度优先算法搜索匹配子窗口
      */
     STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId) PURE;
 
     /**
-     * @brief ����Name�����Ӵ���
-     * @param pszName LPCWSTR--�Ӵ���Name
-     * @return IWindow*--ƥ�䴰��
-     * @remark ���ù�������㷨����ƥ���Ӵ���
+     * @brief 根据Name查找子窗口
+     * @param pszName LPCWSTR--子窗口Name
+     * @return IWindow*--匹配窗口
+     * @remark 采用广度优先算法搜索匹配子窗口
      */
     STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName) PURE;
 
+	/**
+	 * @brief 根据Name查找子窗口
+	 * @param pszName LPCSTR--子窗口Name(utf8)
+	 * @return 
+	*/
 	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName) PURE;
 
+    /**
+     * @brief 获取非客户区的绘制对象
+     * @return INcPainter *
+    */
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
 
+    /**
+     * @brief 设置事件处理对象 
+     * @param fun 事件处理对象
+     * @param ctx 事件处理对象Context
+     * @return 
+    */
     STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
 	
+	/**
+	 * @brief 获取事件处理对象
+	 * @return EventHandlerInfo*
+	*/
 	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) PURE;
 
+	/**
+	 * @brief 动画显示/隐藏窗口
+	 * @param dwTime 
+	 * @param dwFlags 
+	 * @return 
+     * @remark 参考API AnimateWindow
+	*/
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) PURE;
+
+	/**
+	 * @brief 让窗口支持DragDrop
+	 * @return 
+	*/
 	STDMETHOD_(void,EnableDragDrop)(THIS) PURE;
 };
 
@@ -200,182 +157,153 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 #define INTERFACE IHostDialog
 DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 {
-    //!��������
-    /*!
-     */
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-
-    //!�ͷ�����
-    /*!
-     */
-    STDMETHOD_(long, Release)(THIS) PURE;
-
-    //!�ͷŶ���
-    /*!
-     */
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    //////////////////////////////////////////////////////////////////////////
-    STDMETHOD_(HWND, CreateNative)
-    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
-
-    STDMETHOD_(HWND, GetHwnd)(THIS) PURE;
-
-    STDMETHOD_(BOOL, SubclassWindow)(THIS_ HWND hWnd) PURE;
-
-    STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) PURE;
-
-    STDMETHOD_(const MSG *, GetCurrentMessage)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(int, GetDlgCtrlID)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(DWORD, GetStyle)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(DWORD, GetExStyle)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(LONG_PTR, GetWindowLongPtr)(CTHIS_ int nIndex) SCONST PURE;
-
-    STDMETHOD_(LONG_PTR, SetWindowLongPtr)(THIS_ int nIndex, LONG_PTR dwNewLong) PURE;
-
-    STDMETHOD_(HWND, GetParent)(THIS) PURE;
-
-    STDMETHOD_(HWND, SetParent)(THIS_ HWND hWndNewParent) PURE;
-
-    STDMETHOD_(BOOL, IsWindowEnabled)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
-
-    STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
-
-    STDMETHOD_(BOOL, SetWindowPos)
-    (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) PURE;
-
-    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter /*= NULL*/) PURE;
-
-    STDMETHOD_(BOOL, DestroyWindow)(THIS) PURE;
-
-    STDMETHOD_(BOOL, IsWindow)(THIS) PURE;
-
-    STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase /*= TRUE*/) PURE;
-
-    STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /* = TRUE*/) PURE;
-
-    STDMETHOD_(BOOL, GetWindowRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-    STDMETHOD_(BOOL, GetClientRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-    STDMETHOD_(BOOL, ClientToScreen)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
-
-    STDMETHOD_(BOOL, ClientToScreen2)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-    STDMETHOD_(BOOL, ScreenToClient)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
-
-    STDMETHOD_(BOOL, ScreenToClient2)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-    STDMETHOD_(int, MapWindowPoints)(CTHIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST PURE;
-
-    STDMETHOD_(int, MapWindowRect)(CTHIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
-
-    STDMETHOD_(UINT_PTR, SetTimer)
-    (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
-
-    STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) PURE;
-
-    STDMETHOD_(HDC, GetDC)(THIS) PURE;
-
-    STDMETHOD_(HDC, GetWindowDC)(THIS) PURE;
-
-    STDMETHOD_(int, ReleaseDC)(THIS_ HDC hDC) PURE;
-
-    STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP hBitmap) PURE;
-
-    STDMETHOD_(BOOL, HideCaret)(THIS) PURE;
-
-    STDMETHOD_(BOOL, ShowCaret)(THIS) PURE;
-
-    STDMETHOD_(HWND, GetCapture)(THIS) PURE;
-
-    STDMETHOD_(HWND, SetCapture)(THIS) PURE;
-
-    STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
-
-    STDMETHOD_(HWND, SetFocus)(THIS) PURE;
-
-    STDMETHOD_(LRESULT, SendMessage)
-    (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
-
-    STDMETHOD_(BOOL, PostMessage)
-    (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
-
-    STDMETHOD_(BOOL, SendNotifyMessage)
-    (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
-
-    STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) PURE;
-
-    STDMETHOD_(int, GetWindowText)(CTHIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST PURE;
-
-    STDMETHOD_(BOOL, IsIconic)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(BOOL, IsZoomed)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(BOOL, IsWindowVisible)(CTHIS) SCONST PURE;
-
-    STDMETHOD_(BOOL, MoveWindow)
-    (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/) PURE;
-
-    STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint /*= TRUE*/) PURE;
-
-    STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) PURE;
-
-    STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw /*=TRUE*/) PURE;
-
-    STDMETHOD_(BOOL, SetLayeredWindowAttributes)
-    (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
-
-    STDMETHOD_(BOOL, UpdateLayeredWindow)
-    (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey, BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
-
-    STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
-	STDMETHOD_(MsgHandlerInfo *,GetMsgHandler)(THIS) PURE;
+#include "SNativeWndApi.h"
 
     //////////////////////////////////////////////////////////////////////////
+    
+    /**
+     * @brief 创建窗口
+     * @param hWndParent 父窗口
+     * @param dwStyle style
+     * @param dwExStyle exStyle
+     * @param x 
+     * @param y 
+     * @param nWidth 
+     * @param nHeight 
+     * @return HWND
+    */
     STDMETHOD_(HWND, CreateEx)
     (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) PURE;
-    STDMETHOD_(HWND, Create)
-    (THIS_ HWND hWndParent, int x DEF_VAL(0), int y DEF_VAL(0), int nWidth DEF_VAL(0), int nHeight DEF_VAL(0)) PURE;
-    STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
-    STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
-	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST PURE;
-	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) PURE;
-	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) PURE;
-	STDMETHOD_(IMessageLoop*,GetMsgLoop)(THIS) PURE;
 
 	/**
-     * @brief ����ID�����Ӵ���
-     * @param nId int--�Ӵ���ID
-     * @return IWindow*--ƥ�䴰��
-     * @remark ���ù�������㷨����ƥ���Ӵ���
+	 * @brief 创建窗口
+	 * @param hWndParent 
+     * @param x
+     * @param y
+     * @param nWidth
+     * @param nHeight
+     * @return HWND
+	*/
+	STDMETHOD_(HWND, Create)
+	(THIS_ HWND hWndParent, int x DEF_VAL(0), int y DEF_VAL(0), int nWidth DEF_VAL(0), int nHeight DEF_VAL(0)) PURE;
+
+    /**
+     * @brief 设置窗口布局资源ID
+     * @param pszLayoutId 布局资源ID
+     * @return 
+    */
+    STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) PURE;
+
+    /**
+     * @brief 从XML初始化窗口
+     * @param pNode XML数据
+     * @return TRUE-成功
+    */
+    STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode* pNode) PURE;
+
+    /**
+     * @brief 获取Dui Root
+     * @return Dui Root
+    */
+    STDMETHOD_(IWindow *, GetIRoot)(THIS) PURE;
+
+	/**
+	 * @brief 查询窗口的半透明标志
+	 * @return TRUE-窗口半透明
+	*/
+	STDMETHOD_(BOOL,IsTranslucent)(CTHIS) SCONST PURE;
+
+	/**
+	 * @brief 获取窗口的上屏对象
+	 * @return IHostPresenter* - 上屏对象
+	*/
+	STDMETHOD_(IHostPresenter*,GetPresenter)(THIS) PURE;
+
+	/**
+	 * @brief 设置窗口上屏对象
+	 * @param pPresenter 上屏对象 
+	 * @return 
+	*/
+	STDMETHOD_(void,SetPresenter)(THIS_ IHostPresenter* pPresenter) PURE;
+
+	/**
+	 * @brief 获取窗口所属的msgloop对象
+	 * @param  
+	 * @return 
+	*/
+	STDMETHOD_(IMessageLoop*,GetMsgLoop)(THIS) PURE;
+
+    /**
+     * @brief 根据ID查找子窗口
+     * @param nId int--子窗口ID
+     * @return IWindow*--匹配窗口
+     * @remark 采用广度优先算法搜索匹配子窗口
      */
     STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId) PURE;
 
     /**
-     * @brief ����Name�����Ӵ���
-     * @param pszName LPCWSTR--�Ӵ���Name
-     * @return IWindow*--ƥ�䴰��
-     * @remark ���ù�������㷨����ƥ���Ӵ���
+     * @brief 根据Name查找子窗口
+     * @param pszName LPCWSTR--子窗口Name
+     * @return IWindow*--匹配窗口
+     * @remark 采用广度优先算法搜索匹配子窗口
      */
     STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName) PURE;
 
+	/**
+	 * @brief 根据Name查找子窗口
+	 * @param pszName LPCSTR--子窗口Name(utf8)
+	 * @return 
+	*/
 	STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName) PURE;
 
+    /**
+     * @brief 获取非客户区的绘制对象
+     * @return INcPainter *
+    */
     STDMETHOD_(INcPainter *, GetNcPainter)(THIS) PURE;
+
+    /**
+     * @brief 设置事件处理对象 
+     * @param fun 事件处理对象
+     * @param ctx 事件处理对象Context
+     * @return 
+    */
     STDMETHOD_(void, SetEventHandler)(THIS_ FunCallback fun, void *ctx) PURE;
+	
+	/**
+	 * @brief 获取事件处理对象
+	 * @return EventHandlerInfo*
+	*/
 	STDMETHOD_(EventHandlerInfo*,GetEventHandler)(THIS) PURE;
 
+	/**
+	 * @brief 动画显示/隐藏窗口
+	 * @param dwTime 
+	 * @param dwFlags 
+	 * @return 
+     * @remark 参考API AnimateWindow
+	*/
 	STDMETHOD_(BOOL, AnimateHostWindow)(THIS_ DWORD dwTime, DWORD dwFlags) PURE;
-	STDMETHOD_(void,EnableDragDrop)(THIS) PURE;
 
+	/**
+	 * @brief 让窗口支持DragDrop
+	 * @return 
+	*/
+	STDMETHOD_(void,EnableDragDrop)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 启动一个模式窗口
+     * @param hParent 窗口的Owner
+     * @return 
+    */
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent /*=NULL*/) PURE;
+
+    /**
+     * @brief 退出当前模式窗口
+     * @param nResult DoModal的返回值
+     * @return 
+    */
     STDMETHOD_(void, EndDialog)(THIS_ INT_PTR nResult) PURE;
 };
 

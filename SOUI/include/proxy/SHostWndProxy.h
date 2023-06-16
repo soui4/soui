@@ -125,7 +125,7 @@ public:
 	{
 		return SHostWnd::DestroyWindow();
 	}
-	STDMETHOD_(BOOL, IsWindow)(THIS) OVERRIDE
+	STDMETHOD_(BOOL, IsWindow)(CTHIS) SCONST OVERRIDE
 	{
 		return SHostWnd::IsWindow();
 	}
@@ -311,6 +311,10 @@ public:
 		(THIS_ HWND hWndParent, int x = 0, int y = 0, int nWidth = 0, int nHeight = 0)
 	{
 		return SHostWnd::Create(hWndParent, x, y, nWidth, nHeight);
+	}
+
+	STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE{
+		return SHostWnd::InitFromXml(pNode);
 	}
 
 	STDMETHOD_(void, SetLayoutId)(THIS_ LPCTSTR pszLayoutId) OVERRIDE

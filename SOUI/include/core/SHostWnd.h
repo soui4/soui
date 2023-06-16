@@ -214,7 +214,7 @@ class SOUI_EXP SHostWnd
     };
 
   public:
-    STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode);
+    STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
 
     STDMETHOD_(BOOL, DestroyWindow)(THIS) OVERRIDE;
 

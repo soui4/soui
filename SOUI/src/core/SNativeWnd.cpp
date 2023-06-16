@@ -719,7 +719,7 @@ BOOL SNativeWnd::Invalidate(BOOL bErase /*= TRUE*/)
     return ::InvalidateRect(m_hWnd, NULL, bErase);
 }
 
-BOOL SNativeWnd::IsWindow()
+BOOL SNativeWnd::IsWindow() SCONST
 {
     return ::IsWindow(m_hWnd);
 }

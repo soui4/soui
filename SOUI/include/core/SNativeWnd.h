@@ -238,7 +238,7 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
 
     STDMETHOD_(BOOL, DestroyWindow)(THIS) OVERRIDE;
 
-    STDMETHOD_(BOOL, IsWindow)(THIS) OVERRIDE;
+    STDMETHOD_(BOOL, IsWindow)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase DEF_VAL(TRUE)) OVERRIDE;
 

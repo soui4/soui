@@ -110,7 +110,7 @@ public:
 	{
 		return SNativeWnd::CenterWindow(hWndCenter);
 	}
-	STDMETHOD_(BOOL, IsWindow)(THIS) OVERRIDE
+	STDMETHOD_(BOOL, IsWindow)(CTHIS) SCONST OVERRIDE
 	{
 		return SNativeWnd::IsWindow();
 	}
