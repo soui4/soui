@@ -384,7 +384,7 @@ BOOL CWinHttp::InitConnect( LPCSTR lpUrl, RequestType type, LPCSTR lpPostData/*=
 		return false;
 	}
 	BOOL bHttps=FALSE;
-	if (wPort == INTERNET_DEFAULT_HTTPS_PORT)
+	if (wPort == INTERNET_DEFAULT_HTTPS_PORT || strncmp(lpUrl,"https",5)==0)
 		bHttps = true;
 
 	if ( !CreateHttpRequest(strPage.c_str(), type, bHttps?WINHTTP_FLAG_SECURE:0) )
