@@ -541,6 +541,8 @@
 			<File
 				RelativePath="include\core\SNativeWnd.h" />
 			<File
+				RelativePath="include\interface\SNativeWndApi.h" />
+			<File
 				RelativePath="include\proxy\SNativeWndProxy.h" />
 			<File
 				RelativePath="include\interface\SNcPainter-i.h" />

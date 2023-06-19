@@ -83,6 +83,7 @@ HEADERS += include/SApp.h \
            include/interface/STransform-i.h \
            include/interface/SFactory-i.h \
            include/interface/SNativeWnd-i.h \
+           include/interface/SNativeWndApi.h \
            include/interface/SNcPainter-i.h \
            include/interface/smenu-i.h \
            include/interface/smenuex-i.h \
