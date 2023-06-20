@@ -165,25 +165,10 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
      */
 
     ULONG_PTR mUserData;
-
-    SStringW mName;
-
-    int mID;
-
   public:
     SAnimation();
 
     ~SAnimation();
-
-    STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST OVERRIDE
-    {
-        return mName;
-    }
-
-    STDMETHOD_(int, GetID)(THIS) SCONST OVERRIDE
-    {
-        return mID;
-    }
 
     STDMETHOD_(IAnimation *, clone)(THIS) SCONST OVERRIDE;
 
@@ -306,8 +291,6 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
 
   public:
     SOUI_ATTRS_BEGIN()
-        ATTR_STRINGW(L"name", mName, FALSE)
-        ATTR_INT(L"id", mID, FALSE)
         ATTR_INT(L"duration", mDuration, FALSE)
         ATTR_INT(L"startOffset", mStartOffset, FALSE)
         ATTR_BOOL(L"fillEnable", mFillEnabled, FALSE)

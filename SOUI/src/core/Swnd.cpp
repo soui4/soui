@@ -100,7 +100,6 @@ SStringW STrText::EscapeString(const SStringW & strValue)
 
 SWindow::SWindow()
     : m_swnd(SWindowMgr::NewWindow(this))
-    , m_nID(0)
     , m_pContainer(NULL)
     , m_pParent(NULL)
     , m_pFirstChild(NULL)

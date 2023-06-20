@@ -55,7 +55,6 @@ class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
         ATTR_BOOL(L"checkAsPushdown", m_checkAsPushdown, TRUE)
         ATTR_INT(L"scale", m_nScale, FALSE)
         ATTR_BOOL(L"enableScale", m_bEnableScale, TRUE)
-        ATTR_STRINGW(L"name", m_strName, FALSE)
     SOUI_ATTRS_END()
 
   protected:
@@ -71,9 +70,6 @@ class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
     int m_nScale;
     bool m_bEnableScale;
     bool m_checkAsPushdown;
-
-    SStringW m_strName;
-
     SState2Index m_state2Index;
 };
 

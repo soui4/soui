@@ -553,23 +553,10 @@ class TValueAnimator : public SValueAnimator {
     TypeEvaluator<T> mValueEvaluator;
     T mValue;
 
-    int mID;
-    SStringW mName;
-
   public:
     TValueAnimator(T from, T to)
         : mValueEvaluator(from, to)
     {
-    }
-
-    STDMETHOD_(LPCWSTR, GetName)(THIS) const
-    {
-        return mName;
-    }
-
-    STDMETHOD_(int, GetID)(THIS) const
-    {
-        return mID;
     }
 
     T getValue() const
@@ -578,12 +565,6 @@ class TValueAnimator : public SValueAnimator {
     }
 
   protected:
-    virtual void copy(const IValueAnimator *pSrc)
-    {
-        SValueAnimator::copy(pSrc);
-        mName = pSrc->GetName();
-        mID = pSrc->GetID();
-    }
 
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) OVERRIDE
     {
@@ -592,8 +573,6 @@ class TValueAnimator : public SValueAnimator {
 
   public:
     SOUI_ATTRS_BEGIN()
-        ATTR_STRINGW(L"name", mName, FALSE)
-        ATTR_INT(L"id", mID, FALSE)
         ATTR_INT(L"duration", mDuration, FALSE)
         ATTR_INT(L"repeatCount", mRepeatCount, FALSE)
         ATTR_ENUM_BEGIN(L"repeatMode", RepeatMode, FALSE)

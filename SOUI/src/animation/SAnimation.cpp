@@ -390,8 +390,8 @@ void SAnimation::copy(const IAnimation *src)
     mInterpolator = src2->mInterpolator;
 
     mUserData = src2->mUserData;
-    mID = src2->mID;
-    mName = src2->mName;
+    m_nID = src2->m_nID;
+    m_strName = src2->m_strName;
 }
 
 IAnimation *SAnimation::clone() const
@@ -409,7 +409,6 @@ void SAnimation::initialize(int width, int height, int parentWidth, int parentHe
 }
 
 SAnimation::SAnimation()
-    : mID(0)
 {
     reset();
 }

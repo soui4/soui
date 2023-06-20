@@ -61,6 +61,8 @@ void SValueAnimator::copy(const IValueAnimator *pSrc)
     mRepeatCount = pSrc2->mRepeatCount;
     mRepeatMode = pSrc2->mRepeatMode;
     mInterpolator = pSrc2->mInterpolator;
+	m_strName = pSrc2->m_strName;
+	m_nID = pSrc2->m_nID;
 }
 
 void SValueAnimator::removeAnimationCallback()

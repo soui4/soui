@@ -240,24 +240,6 @@ class SOUI_EXP SWindow
   public:
 	STDMETHOD_(void, OnFinalRelease)(THIS);
 
-    STDMETHOD_(LPCWSTR, GetName)(THIS) SCONST OVERRIDE
-    {
-        return m_strName;
-    }
-    STDMETHOD_(void, SetName)(THIS_ LPCWSTR pszName) OVERRIDE
-    {
-        m_strName = pszName;
-    }
-
-    STDMETHOD_(int, GetID)(THIS) SCONST OVERRIDE
-    {
-        return m_nID;
-    }
-    STDMETHOD_(void, SetID)(THIS_ int nID) OVERRIDE
-    {
-        m_nID = nID;
-    }
-
     STDMETHOD_(SWND, GetSwnd)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(ILayout *, GetLayout)(THIS) OVERRIDE
@@ -1241,9 +1223,7 @@ class SOUI_EXP SWindow
     SwndStyle m_style;        /**< 窗口Style，是一组窗口属性 */
     STrText m_strText;        /**< 窗口文字 */
     STrText m_strToolTipText; /**< 窗口ToolTip */
-    SStringW m_strName;       /**< 窗口名称 */
     SStringW m_strTrCtx;      /**< translate context. empty than use container's tr ctx*/
-    int m_nID;                /**< 窗口ID */
     UINT m_uZorder;           /**< 窗口Zorder */
     int m_nUpdateLockCnt;     /**< 暂时锁定更新Count，锁定后，不向宿主发送Invalidate */
 

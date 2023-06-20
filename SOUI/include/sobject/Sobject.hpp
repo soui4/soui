@@ -49,7 +49,7 @@ public:
 	{
 		return xmlAttr.get_userdata()==1?true:false;
 	}
-	SObjectImpl():m_attrHandler(NULL){}
+	SObjectImpl():m_attrHandler(NULL),m_nID(0){}
 
 public:
 	STDMETHOD_(BOOL,InitFromXml)(THIS_ IXmlNode * pXmlNode ) OVERRIDE
@@ -77,32 +77,30 @@ public:
 
 	STDMETHOD_(LPCWSTR,GetName)(THIS) SCONST OVERRIDE
 	{
-		return NULL;
+		return m_strName;
 	}
 
 	STDMETHOD_(LPCSTR,GetNameA)(THIS) SCONST OVERRIDE
 	{
 		static SStringA str;
-		LPCWSTR pszName=GetName();
-		if(pszName)
-			str=S_CW2A(pszName);
-		else
-			str.Empty();
+		str = S_CW2A(m_strName,CP_UTF8);
 		return str.c_str();
 	}
 
 	STDMETHOD_(void,SetName)(THIS_ LPCWSTR pszName) OVERRIDE
 	{
+		m_strName = pszName;
 	}
 
 	
 	STDMETHOD_(int,GetID)(THIS) SCONST OVERRIDE
 	{
-		return 0;
+		return m_nID;
 	}
 
 	STDMETHOD_(void,SetID)(THIS_ int nID) OVERRIDE
 	{
+		m_nID = nID;
 	}
 
 	STDMETHOD_(HRESULT,AfterAttribute)(THIS_ LPCWSTR strAttribName,LPCWSTR strValue, BOOL bLoading, HRESULT hr) OVERRIDE
@@ -188,6 +186,10 @@ public:
 
 	virtual HRESULT DefAttributeProc(const SStringW &strAttr,const SStringW & strValue,BOOL bLoading)
 	{
+		if(strAttr.CompareNoCase(L"name")==0)
+			m_strName = strValue;
+		else if(strAttr.CompareNoCase(L"id")==0)
+			m_nID = _wtoi(strValue);
 		return E_FAIL;
 	}
 
@@ -198,6 +200,9 @@ public:
 #endif//ENABLE_SOBJ_XML
 
 protected:
+	SStringW m_strName;       /**< 名称 */
+	int m_nID;                /**< ID */
+
 	FunAttrHandler m_attrHandler;
 };
 
