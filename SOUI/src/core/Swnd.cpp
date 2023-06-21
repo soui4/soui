@@ -894,25 +894,27 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                     if (xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()), strXml.GetLength() * sizeof(WCHAR), 116, enc_utf16))
                     {
                         SXmlNode xmlTemp = xmlDoc.root().first_child();
-                        SASSERT(xmlTemp);
+                        while(xmlTemp){
                         // merger properties.
-                        for (SXmlAttr attr = xmlChild.first_attribute(); attr; attr = attr.next_attribute())
-                        {
-                            if (!xmlTemp.attribute(attr.name()))
+                            for (SXmlAttr attr = xmlChild.first_attribute(); attr; attr = attr.next_attribute())
                             {
-                                xmlTemp.append_attribute(attr.name()).set_value(attr.value());
+                                if (!xmlTemp.attribute(attr.name()))
+                                {
+                                    xmlTemp.append_attribute(attr.name()).set_value(attr.value());
+                                }
+                                else
+                                {
+                                    xmlTemp.attribute(attr.name()).set_value(attr.value());
+                                }
                             }
-                            else
+                            // create child.
+                            SWindow *pChild = CreateChildByName(xmlTemp.name());
+                            if (pChild)
                             {
-                                xmlTemp.attribute(attr.name()).set_value(attr.value());
+                                InsertChild(pChild);
+                                pChild->InitFromXml(&xmlTemp);
                             }
-                        }
-                        // create child.
-                        SWindow *pChild = CreateChildByName(xmlTemp.name());
-                        if (pChild)
-                        {
-                            InsertChild(pChild);
-                            pChild->InitFromXml(&xmlTemp);
+                            xmlTemp = xmlTemp.next_sibling();
                         }
                     }
                     strXml.ReleaseBuffer();

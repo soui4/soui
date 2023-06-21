@@ -48,8 +48,14 @@ BOOL STemplatePool::Init(SXmlNode xmlNode)
     for (SXmlNode xmlChild = xmlNode.first_child(); xmlChild; xmlChild = xmlChild.next_sibling())
     {
         SStringW strTempName = xmlChild.name();
+        SXmlNode xmlNode = xmlChild.first_child();
         SStringW strValue;
-        xmlChild.first_child().ToString(&strValue);
+        while(xmlNode){
+            SStringW strXml;
+            xmlNode.ToString(&strXml);
+            strValue += strXml;
+            xmlNode = xmlNode.next_sibling();
+        }
         AddKeyObject(strTempName, strValue);
     }
     return TRUE;
