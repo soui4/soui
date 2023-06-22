@@ -821,6 +821,7 @@ const static wchar_t KTempParamFmt[] = L"{{%s}}";  //模板数据替换格式
 BOOL SWindow::CreateChildren(SXmlNode xmlNode)
 {
     ASSERT_UI_THREAD();
+	BOOL bRet = FALSE;
     for (SXmlNode xmlChild = xmlNode.first_child(); xmlChild; xmlChild = xmlChild.next_sibling())
     {
         if (xmlChild.type() != node_element)
@@ -835,7 +836,8 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                 SXmlNode xmlInclude = xmlDoc.root().first_child();
                 if (wcsicmp(xmlInclude.name(), KLabelInclude) == 0)
                 { // compatible with 2.9.0.1
-                    CreateChildren(xmlInclude);
+                    CreateChilds(xmlInclude);
+                    bRet = TRUE;
                 }
                 else
                 {
@@ -853,18 +855,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                             xmlInclude.append_attribute(attr.name()).set_value(attr.value());
                         }
                     }
-                    // create child.
-                    SWindow *pChild = (SWindow*)SApplication::getSingleton().CreateWindowByName(xmlInclude.name());
-                    if (pChild)
-                    {
-                        InsertChild(pChild);
-                        pChild->InitFromXml(&xmlInclude);
-                    }
-
-                    if (xmlInclude.next_sibling())
-                    {
-                        SSLOGD() << _T("warning! multi root include layout is not supported!");
-                    }
+                    bRet = CreateChild(xmlInclude);
                 }
             }
             else
@@ -893,41 +884,15 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                     SXmlDoc xmlDoc;
                     if (xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()), strXml.GetLength() * sizeof(WCHAR), 116, enc_utf16))
                     {
-                        SXmlNode xmlTemp = xmlDoc.root().first_child();
-                        while(xmlTemp){
-                        // merger properties.
-                            for (SXmlAttr attr = xmlChild.first_attribute(); attr; attr = attr.next_attribute())
-                            {
-                                if (!xmlTemp.attribute(attr.name()))
-                                {
-                                    xmlTemp.append_attribute(attr.name()).set_value(attr.value());
-                                }
-                                else
-                                {
-                                    xmlTemp.attribute(attr.name()).set_value(attr.value());
-                                }
-                            }
-                            // create child.
-                            SWindow *pChild = CreateChildByName(xmlTemp.name());
-                            if (pChild)
-                            {
-                                InsertChild(pChild);
-                                pChild->InitFromXml(&xmlTemp);
-                            }
-                            xmlTemp = xmlTemp.next_sibling();
-                        }
+						CreateChilds(xmlDoc.root());
+						bRet = TRUE;
                     }
                     strXml.ReleaseBuffer();
                 }
             }
             else
             {
-                SWindow *pChild = CreateChildByName(xmlChild.name());
-                if (pChild)
-                {
-                    InsertChild(pChild);
-                    pChild->InitFromXml(&xmlChild);
-                }
+                bRet = CreateChild(xmlChild);
             }
         }
     }
@@ -939,6 +904,27 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
             SDispatchMessage(UM_SETCOLORIZE,GetColorizeColor());
     }
     return TRUE;
+}
+
+
+BOOL SWindow::CreateChild(SXmlNode xmlChild)
+{
+	SWindow *pChild = CreateChildByName(xmlChild.name());
+	if (!pChild){
+		return FALSE;
+	}
+	InsertChild(pChild);
+	pChild->InitFromXml(&xmlChild);
+	return TRUE;
+}
+
+
+void SWindow::CreateChilds(SXmlNode xmlNode)
+{
+	for (SXmlNode xmlChild = xmlNode.first_child(); xmlChild; xmlChild = xmlChild.next_sibling())
+	{
+		CreateChild(xmlChild);
+	}
 }
 
 SWindow *SWindow::CreateChildByName(LPCWSTR pszName)

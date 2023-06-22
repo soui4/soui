@@ -682,21 +682,11 @@ class SOUI_EXP SWindow
     }
 
   protected:
-	  IScriptModule * GetScriptModule();
-
-    /**
-     * InvalidateRect
-     * @brief    刷新窗口
-     * @param    const CRect & rect --  刷新区域
-     * @param    BOOL bFromThis --
-     * 是否是由本窗口触发的刷新，子窗口的刷新导致父窗口刷新时bFromThis为FALSE
-     * @return   void
-     *
-     * Describe
-     */
+	IScriptModule * GetScriptModule();
     void InvalidateRect(const CRect &rect, BOOL bFromThis = TRUE,BOOL bClip=FALSE);
     STransformation GetTransformation() const;
-
+    BOOL CreateChild(SXmlNode xmlChild);
+	void CreateChilds(SXmlNode xmlNode);
   protected:
     STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation *animation);
     STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *animation);

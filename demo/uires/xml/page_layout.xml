@@ -122,11 +122,11 @@
       </window>
       <richedit name="re_temp_input" size="-2,100" class="cls_edit" multiLines="1" vscrollBar="1" sbSkin="skin_vscrollbar" wordWrap="1"  autoVscroll="1" hscrollBar="0">
         <![CDATA[
-        <t:g.block size="-1,-1">
+        <t:g.block>
            <data name="tpl_soime" color="#ff0000" text="soime.cn!"/>
         </t:g.block>
-        <t:g.block size="-2,-1">
-           <data name="tpl_soui" color="#0000ff" text="ui520.cn"/>
+        <t:g.block>
+           <data name="tpl_soui" color="#0000ff" text="soui4js.com"/>
         </t:g.block>
         ]]>
       </richedit>
