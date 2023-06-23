@@ -1572,6 +1572,9 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
 {
     if (m_rcWindow.EqualRect(&rcWnd) && m_layoutDirty == dirty_clean)
         return FALSE;
+    CRect rcLayout;
+    GetChildrenLayoutRect(&rcLayout);
+	CPoint ptDiff=(rcWnd.left- m_rcWindow.left,rcWnd.top- m_rcWindow.top);
     if (!m_rcWindow.EqualRect(&rcWnd))
     {
         InvalidateRect(m_rcWindow);
@@ -1588,7 +1591,22 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
 
         SSendMessage(WM_NCCALCSIZE); //计算非客户区大小
     }
+	//keep relative position of float children
+	if(ptDiff.x!=0 || ptDiff.y!=0){
+        CRect rcLayout2;
+        GetChildrenLayoutRect(&rcLayout2);
 
+		SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
+		while(pChild){
+			if(pChild->IsFloat()){
+				CRect rcChild = pChild->GetWindowRect();
+                CPoint ptRelative(rcChild.left - rcLayout.left, rcChild.top - rcLayout.top);//relative pos
+                rcChild.MoveToXY(rcLayout2.left + ptRelative.x, rcLayout2.top + ptRelative.y);
+				pChild->Move(rcChild);
+			}
+			pChild=pChild->GetWindow(GSW_NEXTSIBLING);
+		}
+	}
     // only if window is visible now, we do relayout.
     if (IsVisible(FALSE))
     {
