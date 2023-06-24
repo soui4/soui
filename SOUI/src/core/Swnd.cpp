@@ -836,7 +836,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                 SXmlNode xmlInclude = xmlDoc.root().first_child();
                 if (wcsicmp(xmlInclude.name(), KLabelInclude) == 0)
                 { // compatible with 2.9.0.1
-                    CreateChilds(xmlInclude);
+                    CreateChildren(xmlInclude);
                     bRet = TRUE;
                 }
                 else
