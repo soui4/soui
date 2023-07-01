@@ -14,15 +14,15 @@ typedef struct ILayoutParam ILayoutParam;
 typedef struct IWindow IWindow;
 
 #ifndef UM_GETDESIREDSIZE
-#define UM_GETDESIREDSIZE (WM_USER+10000) //wp=parent wid,lp=parent hei, return size
+#define UM_GETDESIREDSIZE (WM_USER + 10000) // wp=parent wid,lp=parent hei, return size
 #endif
-typedef BOOL (* FunSwndProc)(IWindow * pSwnd,UINT uMsg,WPARAM wp,LPARAM lp,LRESULT *pbHandled);
+typedef BOOL (*FunSwndProc)(IWindow *pSwnd, UINT uMsg, WPARAM wp, LPARAM lp, LRESULT *pbHandled);
 
 #undef INTERFACE
 #define INTERFACE IWindow
 DECLARE_INTERFACE_(IWindow, IObject)
 {
-	DEF_OBJ_BASE(IWindow,Window)
+    DEF_OBJ_BASE(IWindow, Window)
 #include <interface/SobjectApi.h>
 
     //////////////////////////////////////////////////////////////////////////
@@ -108,7 +108,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(void, SetToolTipText)(THIS_ LPCTSTR pszText) PURE;
 
-	/**
+    /**
      * @brief 设置tooltip
      * @param pszText LPCSTR--tooltip字符串
      * @return
@@ -333,12 +333,12 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(void, GetClientRect)(CTHIS_ LPRECT prect) SCONST PURE;
 
-	/**
+    /**
      * @brief 获取窗口的经过父窗口剪裁后的显示位置
      * @param [out] LPRECT--窗口客户区显示位置
      * @remark 不计算子窗口及兄弟窗口的剪裁
      */
-	STDMETHOD_(void, GetVisibleRect)(CTHIS_ LPRECT prect) SCONST PURE;
+    STDMETHOD_(void, GetVisibleRect)(CTHIS_ LPRECT prect) SCONST PURE;
     /**
      * @brief 检测一个点是不是在窗口范围内
      * @param pt POINT--被检查坐标
@@ -369,7 +369,6 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @return
      */
     STDMETHOD_(void, KillTimer)(THIS_ char id) PURE;
-
 
     /**
      * @brief 获取鼠标捕获
@@ -500,7 +499,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @brief 获取子窗口
      * @param iChild int--子窗口序号,[0,childCount]
      * @return IWindow *--子窗口
-	 * @remark iChild==0返回self, 1返回第一个子窗口
+     * @remark iChild==0返回self, 1返回第一个子窗口
      */
     STDMETHOD_(IWindow *, GetIChild)(CTHIS_ int iChild) SCONST PURE;
 
@@ -578,7 +577,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(BOOL, CreateChildrenFromXml)(THIS_ LPCWSTR pszXml) PURE;
 
-	/**
+    /**
      * CreateChildrenFromResId
      * @brief    从XML资源创建子窗口
      * @param    LPCTSTR pszResId --  XML资源ID
@@ -586,7 +585,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      *
      * Describe
      */
-	STDMETHOD_(BOOL, CreateChildrenFromResId)(THIS_ LPCTSTR pszResId) PURE;
+    STDMETHOD_(BOOL, CreateChildrenFromResId)(THIS_ LPCTSTR pszResId) PURE;
 
     /**
      * @brief 根据ID查找子窗口
@@ -644,12 +643,12 @@ DECLARE_INTERFACE_(IWindow, IObject)
     /**
      * GetChildrenLayoutRect
      * @brief    获得子窗口的布局空间
-	 * @param  LPRECT prc--布局位置
+     * @param  LPRECT prc--布局位置
      * @return   void
      *
      * Describe  通常是客户区，但是tab,group这样的控件不一样
      */
-    STDMETHOD_(void, GetChildrenLayoutRect)(CTHIS_ RECT* prc) SCONST PURE;
+    STDMETHOD_(void, GetChildrenLayoutRect)(CTHIS_ RECT * prc) SCONST PURE;
 
     /**
      * GetDesiredSize
@@ -660,7 +659,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      *
      * Describe
      */
-    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE* pSize, int nParentWid, int nParentHei) PURE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE * pSize, int nParentWid, int nParentHei) PURE;
 
     /**
      * @brief 获取窗口背景色
@@ -682,7 +681,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @return
      * @remark 支持自动翻译
      */
-	STDMETHOD_(void, SetWindowTextA)(THIS_ LPCSTR lpszText) PURE;
+    STDMETHOD_(void, SetWindowTextA)(THIS_ LPCSTR lpszText) PURE;
 
     /**
      * @brief 获取窗口显示文本
@@ -693,7 +692,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR * pBuf, int nBufLen, BOOL bRawText) PURE;
 
-	STDMETHOD_(int, GetWindowTextA)(THIS_ IStringA *pStr, BOOL bRawText) PURE;
+    STDMETHOD_(int, GetWindowTextA)(THIS_ IStringA * pStr, BOOL bRawText) PURE;
 
     /**
      * @brief 获取窗口状态
@@ -789,14 +788,14 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param LPCWSTR pszEventHandlerName--字符串标识的事件处理（脚本使用）
      * @return TRUE--成功
      */
-	STDMETHOD_(BOOL,AddEvent)(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName) PURE;
-	
+    STDMETHOD_(BOOL, AddEvent)(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName) PURE;
+
     /**
      * @brief 删除窗口事件
      * @param evtId DWORD--事件ID
      * @return TRUE--成功
      */
-	STDMETHOD_(BOOL,RemoveEvent)(THIS_ DWORD dwEventID) PURE;
+    STDMETHOD_(BOOL, RemoveEvent)(THIS_ DWORD dwEventID) PURE;
     /**
      * @brief  发射一个事件到应用层
      * @param evt IEvtArgs *--事件对象
@@ -834,47 +833,47 @@ DECLARE_INTERFACE_(IWindow, IObject)
      *
      * Describe  在消息映射表中没有处理的消息进入该函数处理
      */
-    STDMETHOD_(BOOL, SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult) PURE;
+    STDMETHOD_(BOOL, SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT * lResult) PURE;
 
-	 /**
+    /**
      * SetSwndProc
      * @brief    设置消息处理函数
-	 * @param    FunSwndProc swndProc --  消息处理函数
+     * @param    FunSwndProc swndProc --  消息处理函数
      * @return   void
      *
-     * Describe  
+     * Describe
      */
-	STDMETHOD_(void, SetSwndProc)(THIS_ FunSwndProc swndProc) PURE;
+    STDMETHOD_(void, SetSwndProc)(THIS_ FunSwndProc swndProc) PURE;
 
     /**
      * GetHostHwnd
      * @brief    获取Host Hwnd
      * @return   HWND -- host hwnd
      *
-     * Describe  
+     * Describe
      */
-	STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
+    STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
 
     /**
      * GetTimelineHandlersMgr
      * @brief    获取ITimelineHandlersMgr
      * @return   ITimelineHandlersMgr* -- 时间线管理器
      *
-     * Describe  
+     * Describe
      */
-	STDMETHOD_(ITimelineHandlersMgr *,GetTimelineHandlersMgr)(THIS) PURE;
+    STDMETHOD_(ITimelineHandlersMgr *, GetTimelineHandlersMgr)(THIS) PURE;
 
-	/**
+    /**
      * IsVideoCanvas
      * @brief    查询窗口是否为视频窗口
      * @return   BOOL -- TRUE:是视频窗口
      *
-     * Describe  
+     * Describe
      */
-	STDMETHOD_(BOOL,IsVideoCanvas)(CTHIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsVideoCanvas)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(BOOL,RegisterDragDrop)(THIS_ IDropTarget *pDragTarget) PURE;
-	STDMETHOD_(BOOL,UnregisterDragDrop)(THIS) PURE;
+    STDMETHOD_(BOOL, RegisterDragDrop)(THIS_ IDropTarget * pDragTarget) PURE;
+    STDMETHOD_(BOOL, UnregisterDragDrop)(THIS) PURE;
 };
 
 SNSEND

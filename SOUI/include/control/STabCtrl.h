@@ -21,7 +21,7 @@ SNSBEGIN
  *
  * Describe   tab标签页面
  */
-class SOUI_EXP STabPage : public TWindowProxy<ITabPage>{
+class SOUI_EXP STabPage : public TWindowProxy<ITabPage> {
     DEF_SOBJECT(SWindow, L"page")
     friend class STabCtrl;
 
@@ -47,26 +47,28 @@ class SOUI_EXP STabPage : public TWindowProxy<ITabPage>{
     virtual ~STabPage()
     {
     }
-public:
-	STDMETHOD_(LPCTSTR,GetTitle)(CTHIS) SCONST OVERRIDE
-	{
-		return m_strTitle.GetText(FALSE);
-	}
-	STDMETHOD_(void,SetTitle)(THIS_ LPCTSTR lpszTitle) OVERRIDE  
-	{
-		m_strTitle.SetText(lpszTitle);
-	}
 
-	STDMETHOD_(int,GetIconIndex)(CTHIS) SCONST OVERRIDE{
-		return m_iIcon;
-	}
+  public:
+    STDMETHOD_(LPCTSTR, GetTitle)(CTHIS) SCONST OVERRIDE
+    {
+        return m_strTitle.GetText(FALSE);
+    }
+    STDMETHOD_(void, SetTitle)(THIS_ LPCTSTR lpszTitle) OVERRIDE
+    {
+        m_strTitle.SetText(lpszTitle);
+    }
 
-    STDMETHOD_(void,SetIconIndex)(THIS_ int iIcon) OVERRIDE
+    STDMETHOD_(int, GetIconIndex)(CTHIS) SCONST OVERRIDE
+    {
+        return m_iIcon;
+    }
+
+    STDMETHOD_(void, SetIconIndex)(THIS_ int iIcon) OVERRIDE
     {
         m_iIcon = iIcon;
     }
 
-protected:
+  protected:
     /**
      * OnUpdateToolTip
      * @brief    处理tooltip

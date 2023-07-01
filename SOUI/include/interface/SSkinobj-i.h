@@ -27,7 +27,7 @@ SNSBEGIN
 #define INTERFACE ISkinObj
 DECLARE_INTERFACE_(ISkinObj, IObject)
 {
-	DEF_OBJ_BASE(ISkinObj,Skin)
+    DEF_OBJ_BASE(ISkinObj, Skin)
 #include <interface/SobjectApi.h>
     //------------------------------------------------------------------------
 

@@ -259,31 +259,9 @@ void SSkinButton::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, 
     {
         CRect rcDraw = *prcDraw;
         rcDraw.DeflateRect(1, 1);
-        SAutoRefPtr<IBrushS> brush;
-        COLORREF crs[2]={m_colors.m_crUp[iState],m_colors.m_crDown[iState]};
-        if(S_OK==pRT->CreateGradientBrush(TRUE,crs,NULL,2,kRepeat_TileMode,&brush)){
-            //skia
-            SAutoRefPtr<IRenderObj> oldBrush;
-            pRT->SelectObject(brush,&oldBrush);
-            pRT->FillRoundRect(&rcDraw,CPoint(nCorner,nCorner));
-            pRT->SelectObject(oldBrush);
-        }else
-        {
-            //gdi
-            SAutoRefPtr<IRegionS> rgnClip;
-            if (nCorner > 2)
-            {
-                GETRENDERFACTORY->CreateRegion(&rgnClip);
-                CPoint ptCorner(nCorner, nCorner);
-                rgnClip->CombineRoundRect(&rcDraw, ptCorner, RGN_COPY);
-                pRT->PushClipRegion(rgnClip, RGN_AND);
-            }
-            pRT->GradientFill(rcDraw, TRUE, m_colors.m_crUp[iState], m_colors.m_crDown[iState], byAlpha);
-            if (nCorner > 2)
-            {
-                pRT->PopClip();
-            }
-        }
+        CPoint ptCorner(nCorner, nCorner);
+        GradientItem gradients[2] = { m_colors.m_crUp[iState], 0.0f, m_colors.m_crDown[iState], 1.0f };
+        pRT->DrawGradientRect(rcDraw, TRUE, ptCorner, gradients, 2, byAlpha);
     }
     else
     {
@@ -366,9 +344,9 @@ SSkinGradation::SSkinGradation()
 
 void SSkinGradation::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const
 {
-    pRT->GradientFill(prcDraw, m_bVert, m_crFrom, m_crTo, byAlpha);
+    GradientItem gradients[2] = { m_crFrom, 0.0f, m_crTo, 1.0f };
+    pRT->DrawGradientRect(prcDraw, m_bVert, CPoint(), gradients, 2, byAlpha);
 }
-
 
 ISkinObj *SSkinGradation::Scale(int nScale)
 {
@@ -376,38 +354,108 @@ ISkinObj *SSkinGradation::Scale(int nScale)
 }
 
 //////////////////////////////////////////////////////////////////////////
-
-SSkinGradation2::SSkinGradation2():m_bVert(TRUE)
+SGradientDesc::SGradientDesc()
 {
-	m_bEnableScale = false;
+    // set default to linear gradient
+    m_type = linear;
+    m_angle = 0.0f;
+    m_radius = SLayoutSize(100);
+    m_centerX = m_centerY = 0.5;
 }
 
-HRESULT SSkinGradation2::OnAttrColors(const SStringW& value,BOOL bLoading)
+static int GradientItemCmp(const void *_p1, const void *_p2)
 {
-	SStringWList lstInfo;
-	SplitString(value,',',lstInfo);
-	if(lstInfo.GetCount()<2)
-		return E_INVALIDARG;
-
-	m_arrColors.RemoveAll();
-	m_arrPos.RemoveAll();
-	for(UINT i =0;i<lstInfo.GetCount();i++){
-		SStringWList lstColorInfo;
-		SplitString(lstInfo[i],'|',lstColorInfo);
-		if(lstColorInfo.GetCount()==2){
-			COLORREF cr = GETCOLOR(lstColorInfo[0]);
-			m_arrColors.Add(cr);
-			float pos = (float)_wtof(lstColorInfo[1]);
-			m_arrPos.Add(pos);
-		}
-	}
-	return S_OK;
+    const GradientItem *p1 = (const GradientItem *)_p1;
+    const GradientItem *p2 = (const GradientItem *)_p2;
+    float diff = p1->pos - p2->pos;
+    if (diff > 0.0f)
+        return 1;
+    else if (diff < 0.0f)
+        return -1;
+    else
+        return 0;
 }
 
+static BOOL ParseGradientColors(const SStringW &value, SArray<GradientItem> &output)
+{
+    SStringWList lstInfo;
+    SplitString(value, ',', lstInfo);
+
+    for (UINT i = 0; i < lstInfo.GetCount(); i++)
+    {
+        SStringWList lstColorInfo;
+        SplitString(lstInfo[i], '|', lstColorInfo);
+        GradientItem gradient;
+        if (lstColorInfo.GetCount() == 2)
+        {
+            gradient.cr = GETCOLOR(lstColorInfo[0]);
+            gradient.pos = (float)_wtof(lstColorInfo[1]);
+        }
+        else
+        {
+            gradient.cr = GETCOLOR(lstColorInfo[0]);
+            gradient.pos = 1.0f * i / (lstInfo.GetCount() - 1);
+        }
+        output.Add(gradient);
+    }
+    qsort(output.GetData(), output.GetCount(), sizeof(GradientItem), GradientItemCmp);
+    if (output.GetCount() < 2)
+        return FALSE;
+    output[0].pos = 0.0f;
+    output[output.GetCount() - 1].pos = 1.0f;
+    return TRUE;
+}
+
+HRESULT SGradientDesc::OnAttrColors(const SStringW &value, BOOL bLoading)
+{
+    m_arrGradient.RemoveAll();
+    return ParseGradientColors(value, m_arrGradient) ? S_FALSE : E_INVALIDARG;
+}
+
+GradientInfo SGradientDesc::GetGradientInfo(int nScale) const
+{
+    GradientInfo ret;
+    ret.type = m_type;
+    switch (ret.type)
+    {
+    case linear:
+        ret.angle = m_angle;
+        break;
+    case radial:
+        ret.radius = (float)m_radius.toPixelSize(nScale);
+        break;
+    case sweep:
+        ret.center.fX = m_centerX;
+        ret.center.fY = m_centerY;
+        break;
+    }
+    return ret;
+}
+
+//////////////////////////////////////////////////////////////////////////
+SSkinGradation2::SSkinGradation2()
+{
+    m_ptCorner = SPoint::Make(0.f, 0.f);
+    m_szCorner[0].setInvalid();
+    m_szCorner[1].setInvalid();
+    m_bEnableScale = false;
+}
 
 void SSkinGradation2::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const
 {
-	pRT->GradientFillEx(prcDraw,m_bVert,m_arrColors.GetData(),m_arrPos.GetData(),m_arrColors.GetCount(),GetAlpha());
+    CRect rc(prcDraw);
+    CPoint ptCorner;
+    if (m_szCorner[0].isValid() && m_szCorner[1].isValid())
+    {
+        ptCorner.x = m_szCorner[0].toPixelSize(GetScale());
+        ptCorner.y = m_szCorner[1].toPixelSize(GetScale());
+    }
+    else
+    {
+        ptCorner.x = (int)(rc.Width() / 2 * m_ptCorner.fX);
+        ptCorner.y = (int)(rc.Height() / 2 * m_ptCorner.fY);
+    }
+    pRT->DrawGradientRectEx(prcDraw, ptCorner, m_arrGradient.GetData(), m_arrGradient.GetCount(), &GetGradientInfo(GetScale()), GetAlpha());
 }
 
 ISkinObj *SSkinGradation2::Scale(int nScale)
@@ -543,20 +591,21 @@ void SSkinColorRect::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iStat
         int nH = prcDraw->bottom - prcDraw->top;
         nCorner = (nW < nH) ? (int)(nW * m_fCornerPercent) : (int)(nH * m_fCornerPercent);
     }
-	int iBgColor = iState;
+    int iBgColor = iState;
     if (m_crStates[iBgColor] == CR_INVALID)
         iBgColor = 0;
-	if(m_crStates[iBgColor] != CR_INVALID){
-		SColor cr(m_crStates[iBgColor]);
-		cr.updateAlpha(byAlpha);
-		if (nCorner > 0)
-			pRT->FillSolidRoundRect(prcDraw, CPoint(nCorner, nCorner), cr.toCOLORREF());
-		else
-			pRT->FillSolidRect(prcDraw, cr.toCOLORREF());
-	}
-	int iBorderColor = iState;
-	if (m_crBorders[iBorderColor] == CR_INVALID)
-		iBorderColor = 0;
+    if (m_crStates[iBgColor] != CR_INVALID)
+    {
+        SColor cr(m_crStates[iBgColor]);
+        cr.updateAlpha(byAlpha);
+        if (nCorner > 0)
+            pRT->FillSolidRoundRect(prcDraw, CPoint(nCorner, nCorner), cr.toCOLORREF());
+        else
+            pRT->FillSolidRect(prcDraw, cr.toCOLORREF());
+    }
+    int iBorderColor = iState;
+    if (m_crBorders[iBorderColor] == CR_INVALID)
+        iBorderColor = 0;
     if (m_crBorders[iBorderColor] != CR_INVALID && m_nBorderWidth > 0)
     {
         SAutoRefPtr<IPenS> pen, oldPen;
@@ -591,8 +640,7 @@ ISkinObj *SSkinColorRect::Scale(int nScale)
 //////////////////////////////////////////////////////////////////////////
 
 SSkinShape::SSkinShape()
-    : m_crSolid(CR_INVALID)
-    , m_shape(rectangle)
+    : m_shape(rectangle)
 {
 }
 
@@ -600,16 +648,26 @@ void SSkinShape::OnInitFinished(IXmlNode *pNode)
 {
     __baseCls::OnInitFinished(pNode);
     SXmlNode xmlNode(pNode);
-    SXmlNode xmlSolid = xmlNode.child(L"solid");
+    SXmlNode xmlSolid = xmlNode.child(SShapeSolid::GetClassName());
     if (xmlSolid)
     {
-        m_crSolid = GETCOLOR(xmlSolid.attribute(L"color").as_string());
+        if (!m_solid)
+            m_solid.Attach(new SShapeSolid());
+        m_solid->InitFromXml(&xmlSolid);
     }
-    SXmlNode xmlGrident = xmlNode.child(SGradient::GetClassName());
+    SXmlNode xmlBitmap = xmlNode.child(SShapeBitmap::GetClassName());
+    if (xmlBitmap)
+    {
+        if (!m_bitmap)
+            m_bitmap.Attach(new SShapeBitmap());
+        m_bitmap->InitFromXml(&xmlBitmap);
+    }
+
+    SXmlNode xmlGrident = xmlNode.child(SGradientBrush::GetClassName());
     if (xmlGrident)
     {
         if (!m_gradient)
-            m_gradient.Attach(new SGradient());
+            m_gradient.Attach(new SGradientBrush());
         m_gradient->InitFromXml(&xmlGrident);
     }
     SXmlNode xmlSize = xmlNode.child(SShapeSize::GetClassName());
@@ -633,6 +691,14 @@ void SSkinShape::OnInitFinished(IXmlNode *pNode)
             m_cornerSize.Attach(new SCornerSize());
         m_cornerSize->InitFromXml(&xmlConner);
     }
+    SXmlNode xmlRatioConner = xmlNode.child(SRatioCornerSize::GetClassName());
+    if (xmlRatioConner)
+    {
+        if (!m_ratioCornerSize)
+            m_ratioCornerSize.Attach(new SRatioCornerSize());
+        m_ratioCornerSize->InitFromXml(&xmlRatioConner);
+    }
+
     SXmlNode xmlRing = xmlNode.child(SShapeRing::GetClassName());
     if (xmlRing)
     {
@@ -648,12 +714,13 @@ void SSkinShape::_Scale(ISkinObj *pObj, int nScale)
 
     SSkinShape *pRet = sobj_cast<SSkinShape>(pObj);
     SASSERT(pRet);
+    pRet->m_solid = m_solid;
+    pRet->m_bitmap = m_bitmap; // todo:hjx
+    pRet->m_gradient = m_gradient;
     pRet->m_shape = m_shape;
-    pRet->m_crSolid = m_crSolid;
     pRet->m_shapeSize = m_shapeSize;
     pRet->m_cornerSize = m_cornerSize;
     pRet->m_stroke = m_stroke;
-    pRet->m_gradient = m_gradient;
     pRet->m_ringParam = m_ringParam;
 }
 
@@ -662,98 +729,83 @@ SIZE SSkinShape::GetSkinSize() const
     if (!m_shapeSize)
         return CSize();
 
-    SIZE szRet = { m_shapeSize->m_width.toPixelSize(GetScale()), m_shapeSize->m_height.toPixelSize(GetScale()) };
-    return szRet;
+    return CSize(m_shapeSize->m_width.toPixelSize(GetScale()), m_shapeSize->m_height.toPixelSize(GetScale()));
 }
 
 void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
-    POINT ptConner = { 0, 0 };
-    if (m_cornerSize)
+    CRect rcDest(rcDraw);
+    SAutoRefPtr<IBrushS> pBrush, oldBrush;
+    if (m_solid)
     {
-        ptConner = m_cornerSize->GetConner(GetScale());
+        pBrush = m_solid->CreateBrush(pRT, byAlpha);
+    }
+    else if (m_gradient != NULL)
+    {
+        pBrush = m_gradient->CreateBrush(pRT, GetScale(), byAlpha);
+    }
+    else if (m_bitmap)
+    {
+        pBrush = m_bitmap->CreateBrush(pRT, byAlpha);
     }
 
-    RECT rcDest = *rcDraw;
-    if (m_crSolid != CR_INVALID)
+    SAutoRefPtr<IPenS> pPen, oldPen;
+    if (m_stroke != NULL)
     {
-        SAutoRefPtr<IBrushS> brush, oldBrush;
-        pRT->CreateSolidColorBrush(m_crSolid, &brush);
-        pRT->SelectObject(brush, (IRenderObj **)&oldBrush);
+        int nPenWidth = m_stroke->m_width.toPixelSize(GetScale());
+        SColor color(m_stroke->m_color, byAlpha);
+        pRT->CreatePen(m_stroke->GetStyle(), color.toCOLORREF(), nPenWidth, &pPen);
+        rcDest.DeflateRect(nPenWidth / 2, nPenWidth / 2);
+    }
 
+    CPoint ptCorner = GetCornerSize(rcDest);
+    if (pBrush)
+    {
+        pRT->SelectObject(pBrush, (IRenderObj **)&oldBrush);
         switch (m_shape)
         {
         case rectangle:
-            if (m_cornerSize)
-                pRT->FillSolidRoundRect(&rcDest, ptConner, m_crSolid);
+            if (ptCorner.x != 0 || ptCorner.y != 0)
+                pRT->FillRoundRect(&rcDest, ptCorner);
             else
-                pRT->FillSolidRect(&rcDest, m_crSolid);
+                pRT->FillRectangle(&rcDest);
             break;
         case oval:
             pRT->FillEllipse(&rcDest);
             break;
-        case ring:
-            break;
         }
         pRT->SelectObject(oldBrush, NULL);
     }
-
-    if (m_gradient != NULL)
+    if (pPen)
     {
-        SAutoRefPtr<IRegionS> region;
-        pRT->CreateRegion(&region);
-        RECT rcGradient = rcDest;
-        // set clip
-        switch (m_shape)
-        {
-        case rectangle:
-            if (m_cornerSize)
-            {
-                region->CombineRoundRect(&rcGradient, ptConner, RGN_COPY);
-            }
-            break;
-        case oval:
-            region->CombineEllipse(&rcGradient, RGN_COPY);
-            break;
-        case ring:
-            break;
-        }
-        if (!region->IsEmpty())
-            pRT->PushClipRegion(region, RGN_AND);
-
-        m_gradient->Draw(pRT, &rcGradient, byAlpha, GetScale());
-
-        if (!region->IsEmpty())
-            pRT->PopClip();
-    }
-
-    if (m_stroke != NULL)
-    {
-        SAutoRefPtr<IPenS> pPen, oldPen;
-        int nPenWidth = m_stroke->m_width.toPixelSize(GetScale());
-        pRT->CreatePen(m_stroke->m_style, m_stroke->m_color, nPenWidth, &pPen);
         pRT->SelectObject(pPen, (IRenderObj **)&oldPen);
-        RECT rcStroke = rcDest;
-        ::InflateRect(&rcStroke, -nPenWidth / 2, -nPenWidth / 2);
+        ptCorner = GetCornerSize(rcDest);
         switch (m_shape)
         {
         case rectangle:
-            if (m_cornerSize)
-                pRT->DrawRoundRect(&rcStroke, ptConner);
+            if (ptCorner.x != 0 || ptCorner.y != 0)
+                pRT->DrawRoundRect(&rcDest, ptCorner);
             else
-                pRT->DrawRectangle(&rcStroke);
+                pRT->DrawRectangle(&rcDest);
             break;
         case oval:
-            pRT->DrawEllipse(&rcStroke);
+            pRT->DrawEllipse(&rcDest);
             break;
         case ring:
-            if (m_ringParam)
-            {
-                POINT ptCenter = { (rcStroke.left + rcStroke.right) / 2, (rcStroke.top + rcStroke.bottom) / 2 };
-                int nRadius = smin(rcStroke.right - rcStroke.left, rcStroke.bottom - rcStroke.top) / 2;
-                RECT rcRing = { ptCenter.x - nRadius, ptCenter.y - nRadius, ptCenter.x + nRadius, ptCenter.y + nRadius };
-                pRT->DrawArc(&rcRing, m_ringParam->m_startAngle, m_ringParam->m_sweepAngle, false);
-            }
+			{
+				POINT ptCenter = { (rcDest.left + rcDest.right) / 2, (rcDest.top + rcDest.bottom) / 2 };
+				int nRadius = smin(rcDest.right - rcDest.left, rcDest.bottom - rcDest.top) / 2;
+				RECT rcRing = { ptCenter.x - nRadius, ptCenter.y - nRadius, ptCenter.x + nRadius, ptCenter.y + nRadius };
+				float startAngle = 0;
+				float endAngle = 360;
+				if (m_ringParam)
+				{
+					startAngle = m_ringParam->m_startAngle;
+					endAngle = m_ringParam->m_sweepAngle;
+				}
+				pRT->DrawArc(&rcRing, startAngle, endAngle, false);
+
+			}
             break;
         }
         pRT->SelectObject(oldPen, NULL);
@@ -765,9 +817,60 @@ int SSkinShape::GetStates() const
     return 1;
 }
 
-void SSkinShape::SGradient::Draw(IRenderTarget *pRT, LPCRECT rcDraw, BYTE byAlpha, int nScale) const
+POINT SSkinShape::GetCornerSize(const CRect &rc) const
 {
-    pRT->GradientFill2(rcDraw, m_Type, m_crStart, m_crCenter, m_crEnd, m_angle, m_centerX, m_centerY, m_radius.toPixelSize(nScale), byAlpha);
+    if (m_cornerSize)
+        return m_cornerSize->GetConner(GetScale());
+    if (m_ratioCornerSize)
+        return m_ratioCornerSize->GetConner(rc);
+    return CPoint();
+}
+
+
+SSkinShape::SStroke::SStroke() : m_color(CR_INVALID)
+, m_style(PS_SOLID)
+, m_endStyle(0)
+, m_joinStyle(0)
+{
+
+}
+
+int SSkinShape::SStroke::GetStyle() const
+{
+	int ret = m_style | m_endStyle|m_joinStyle;
+	if(m_endStyle || m_joinStyle){
+		ret |= PS_GEOMETRIC;
+	}
+	return ret;
+}
+
+
+IBrushS *SSkinShape::SShapeSolid::CreateBrush(IRenderTarget *pRT, BYTE byAlpha)
+{
+    if (m_crSolid == CR_INVALID)
+        return NULL;
+    SColor color(m_crSolid, byAlpha);
+    IBrushS *ret = NULL;
+    pRT->CreateSolidColorBrush(color.toCOLORREF(), &ret);
+    return ret;
+}
+
+IBrushS *SSkinShape::SShapeBitmap::CreateBrush(IRenderTarget *pRT, BYTE byAlpha)
+{
+    if (!m_pImg)
+        return NULL;
+    IBrushS *ret = NULL;
+    pRT->CreateBitmapBrush(m_pImg, m_tileX, m_tileY, &ret);
+    return ret;
+}
+
+IBrushS *SSkinShape::SGradientBrush::CreateBrush(IRenderTarget *pRT, int nScale, BYTE byAlpha) const
+{
+    if (m_arrGradient.GetCount() < 2)
+        return NULL;
+    IBrushS *ret = NULL;
+    pRT->CreateGradientBrush(m_arrGradient.GetData(), m_arrGradient.GetCount(), &GetGradientInfo(nScale), byAlpha, kRepeat_TileMode, &ret);
+    return ret;
 }
 
 HRESULT SSkinShape::SCornerSize::OnAttrRadius(const SStringW strValue, BOOL bLoading)
@@ -783,6 +886,26 @@ HRESULT SSkinShape::SCornerSize::OnAttrRadius(const SStringW strValue, BOOL bLoa
     {
         m_radiusX = GETLAYOUTSIZE(values[0]);
         m_radiusY = GETLAYOUTSIZE(values[1]);
+        return S_OK;
+    }
+    return E_INVALIDARG;
+}
+
+HRESULT SSkinShape::SRatioCornerSize::OnAttrRadius(const SStringW strValue, BOOL bLoading)
+{
+    SStringWList values;
+    size_t nValues = SplitString(strValue, L',', values);
+    if (nValues == 1)
+    {
+        swscanf_s(strValue.c_str(), L"%f", &m_radius.fX);
+        m_radius.fY = m_radius.fX;
+        ;
+        return S_OK;
+    }
+    else if (nValues == 2)
+    {
+        swscanf_s(values[0].c_str(), L"%f", &m_radius.fX);
+        swscanf_s(values[1].c_str(), L"%f", &m_radius.fY);
         return S_OK;
     }
     return E_INVALIDARG;

@@ -141,7 +141,7 @@ void SEventSet::FireEvent(IEvtArgs *args)
 BOOL SEventSet::addEvent(DWORD dwEventID, LPCWSTR pszEventHandlerName)
 {
     if (isEventPresent(dwEventID))
-		return FALSE;
+        return FALSE;
     m_evtArr.Add(new SEvent(dwEventID, pszEventHandlerName));
     return TRUE;
 }
@@ -157,7 +157,7 @@ BOOL SEventSet::removeEvent(DWORD dwEventID)
             return TRUE;
         }
     }
-	return FALSE;
+    return FALSE;
 }
 
 BOOL SEventSet::isEventPresent(DWORD dwEventID)

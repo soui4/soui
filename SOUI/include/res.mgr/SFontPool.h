@@ -46,10 +46,7 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
 
     static bool CompareElements(INARGTYPE element1, INARGTYPE element2)
     {
-        return element1.strFaceName == element2.strFaceName 
-			&& element1.strPropEx == element2.strPropEx 
-			&& element1.style.syle == element2.style.syle
-			&& element1.scale == element2.scale;
+        return element1.strFaceName == element2.strFaceName && element1.strPropEx == element2.strPropEx && element1.style.syle == element2.style.syle && element1.scale == element2.scale;
     }
 
     static int CompareElementsOrdered(INARGTYPE element1, INARGTYPE element2)
@@ -59,8 +56,8 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
             nRet = element1.strPropEx.Compare(element2.strPropEx);
         if (nRet == 0)
             nRet = (int)(element1.style.syle - element2.style.syle);
-		if (nRet == 0)
-			nRet = (int)(element1.scale - element2.scale);
+        if (nRet == 0)
+            nRet = (int)(element1.scale - element2.scale);
 
         return nRet;
     }
@@ -80,10 +77,11 @@ class SOUI_EXP SFontPool : public SSingletonMap<SFontPool, IFontPtr, FontInfo> {
   public:
     SFontPool(IRenderFactory *pRendFactory);
 
-public:
-	static void SetFontChecker(FunFontCheck fontCheck);
-	static BOOL CheckFont(const SStringW &strFontName);
-public:
+  public:
+    static void SetFontChecker(FunFontCheck fontCheck);
+    static BOOL CheckFont(const SStringW &strFontName);
+
+  public:
     /**
      * GetFont
      * @brief    获得与指定的strFont对应的IFontPtr
@@ -96,23 +94,23 @@ public:
 
     void SetDefFontInfo(const SStringW &strFontInfo);
 
-public:
-	static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo & defFontInfo);
-	static SStringW FontInfoToString(const FontInfo & fi);
-  protected:
+  public:
+    static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo &defFontInfo);
+    static SStringW FontInfoToString(const FontInfo &fi);
 
+  protected:
     const FontInfo &GetDefFontInfo() const;
 
     static void OnKeyRemoved(const IFontPtr &obj);
 
     IFontPtr _CreateFont(const FontInfo &fontInfo);
-	void _SetDefFontInfo(const FontInfo &fontInfo);
+    void _SetDefFontInfo(const FontInfo &fontInfo);
 
     SAutoRefPtr<IRenderFactory> m_RenderFactory;
     FontInfo m_defFontInfo;
     SCriticalSection m_cs;
 
-	static FunFontCheck s_funFontCheck;
+    static FunFontCheck s_funFontCheck;
 };
 
 SNSEND

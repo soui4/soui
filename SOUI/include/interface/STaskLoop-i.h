@@ -132,15 +132,14 @@ DECLARE_INTERFACE_(ITaskLoop, IObjRef)
      */
     STDMETHOD_(BOOL, getRunningTaskInfo)(THIS_ char *buf, int bufLen) PURE;
 
-
-	/**
+    /**
      * set a task to run repeat.
      * @param pTask the to be run task object.
      * @param intervel heart beat interval
      * @return void
-	 * @remark task loop will hold a clone of the pTask. set pTask to null to stop heart beat.
+     * @remark task loop will hold a clone of the pTask. set pTask to null to stop heart beat.
      */
-	STDMETHOD_(void,setHeartBeatTask)(THIS_ IRunnable *pTask, int intervel) PURE;
+    STDMETHOD_(void, setHeartBeatTask)(THIS_ IRunnable * pTask, int intervel) PURE;
 };
 
 SNSEND

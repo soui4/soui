@@ -42,7 +42,7 @@ BOOL SSplitWnd::ShowPane(UINT iPane)
         return FALSE;
 
     m_lstPane[iPane]->SetVisible(TRUE);
-	UpdateChildrenPosition();
+    UpdateChildrenPosition();
     return TRUE;
 }
 
@@ -52,7 +52,7 @@ BOOL SSplitWnd::HidePane(UINT iPane)
         return FALSE;
 
     m_lstPane[iPane]->SetVisible(FALSE);
-	UpdateChildrenPosition();
+    UpdateChildrenPosition();
     return TRUE;
 }
 
@@ -89,7 +89,7 @@ void SSplitWnd::OnPaint(IRenderTarget *pRT)
         return;
 
     CRect rcClient;
-	GetChildrenLayoutRect(&rcClient);
+    GetChildrenLayoutRect(&rcClient);
 
     CRect rcSep = rcClient;
     if (m_orintation == Vertical)
@@ -301,8 +301,8 @@ void SSplitWnd::OnMouseMove(UINT nFlags, CPoint pt)
         diff *= -1;
     }
     //根据新分配的窗口大小重置窗口位置
-    CRect rcClient ;
-	GetChildrenLayoutRect(&rcClient);
+    CRect rcClient;
+    GetChildrenLayoutRect(&rcClient);
     int nOffset = m_orintation == Vertical ? rcClient.left : rcClient.top;
     nOffset = ResetPanesPostion(lstPane1, lstPriority1, lstPaneSize1, nOffset);
     ResetPanesPostion(lstPane2, lstPriority2, lstPaneSize2, nOffset);
@@ -329,9 +329,9 @@ SSplitPane *SSplitWnd::GetPane(UINT iPane)
 
 void SSplitWnd::UpdateChildrenPosition()
 {
-	RECT rcLayout;
-	GetChildrenLayoutRect(&rcLayout);
-	Relayout(rcLayout);
+    RECT rcLayout;
+    GetChildrenLayoutRect(&rcLayout);
+    Relayout(rcLayout);
 }
 
 void SSplitWnd::RemoveItem(SSplitPane *pane)
@@ -345,14 +345,14 @@ void SSplitWnd::RemoveItem(SSplitPane *pane)
     index = m_lstPriority.Find(pane);
     m_lstPriority.RemoveAt(index);
 
-	UpdateChildrenPosition();
+    UpdateChildrenPosition();
 }
 
 void SSplitWnd::GetChildrenLayoutRect(RECT *prc) const
 {
     CRect rc = GetClientRect();
     rc.DeflateRect(GetStyle().GetPadding());
-	*prc = rc;
+    *prc = rc;
 }
 
 int SSplitWnd::InsertItem(SSplitPane *pane, int index /*= -1 */)
@@ -373,8 +373,8 @@ int SSplitWnd::InsertItem(SSplitPane *pane, int index /*= -1 */)
     m_lstPriority.Add(pane);
     SortPriorityList(m_lstPriority);
 
-    CRect rcContainer ;
-	GetChildrenLayoutRect(&rcContainer);
+    CRect rcContainer;
+    GetChildrenLayoutRect(&rcContainer);
 
     if (!rcContainer.IsRectEmpty())
     {
@@ -498,8 +498,8 @@ int SSplitWnd::AdjustPanesSize(PANESIZELIST &lstPriority, int remain)
 
 int SSplitWnd::ResetPanesPostion(SplitPaneList &lstPane, SplitPaneList &lstPanePriority, PANESIZELIST &lstPaneSize, int offset)
 {
-    CRect rc ;
-	GetChildrenLayoutRect(&rc);
+    CRect rc;
+    GetChildrenLayoutRect(&rc);
     for (int i = 0; i < (int)lstPane.GetCount(); i++)
     {
         int idx = lstPanePriority.Find(lstPane[i]);

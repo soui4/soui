@@ -39,7 +39,6 @@ BOOL SStylePool::Init(SXmlNode xmlStyleRoot)
     return TRUE;
 }
 
-
 /////////////////////////////////////////////////////////////////////
 BOOL STemplatePool::Init(SXmlNode xmlNode)
 {
@@ -50,7 +49,8 @@ BOOL STemplatePool::Init(SXmlNode xmlNode)
         SStringW strTempName = xmlChild.name();
         SXmlNode xmlNode = xmlChild.first_child();
         SStringW strValue;
-        while(xmlNode){
+        while (xmlNode)
+        {
             SStringW strXml;
             xmlNode.ToString(&strXml);
             strValue += strXml;
@@ -67,6 +67,5 @@ SStringW STemplatePool::GetTemplateString(const SStringW &strName) const
     GetKeyObject(strName, strRet);
     return strRet;
 }
-
 
 SNSEND

@@ -5,20 +5,20 @@
 
 SNSBEGIN
 
-
-SObjectInfo ObjInfo_New(LPCWSTR name,int type){
-	SObjectInfo ret;
-	SStringW strName(name);
-	strName.MakeLower();
-	SASSERT(strName.GetLength()<MAX_OBJNAME);
-	wcscpy(ret.szName,strName.c_str());
-	ret.nType = type;
-	return ret;
+SObjectInfo ObjInfo_New(LPCWSTR name, int type)
+{
+    SObjectInfo ret;
+    SStringW strName(name);
+    strName.MakeLower();
+    SASSERT(strName.GetLength() < MAX_OBJNAME);
+    wcscpy(ret.szName, strName.c_str());
+    ret.nType = type;
+    return ret;
 }
 
-BOOL ObjInfo_IsValid(const SObjectInfo* pObjInfo)
+BOOL ObjInfo_IsValid(const SObjectInfo *pObjInfo)
 {
-	return pObjInfo->nType >= Undef && pObjInfo->szName[0]!=0;
+    return pObjInfo->nType >= Undef && pObjInfo->szName[0] != 0;
 }
 
 SObjectFactoryMgr::SObjectFactoryMgr(void)

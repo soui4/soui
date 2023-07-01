@@ -24,7 +24,7 @@ SNSBEGIN
 class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
   public:
     SHostDialog(LPCWSTR pszXmlName = NULL);
-	SHostDialog(LPCSTR pszXmlName);
+    SHostDialog(LPCSTR pszXmlName);
     ~SHostDialog(void);
 
   public:
@@ -32,7 +32,11 @@ class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
     STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent = NULL) OVERRIDE;
     STDMETHOD_(void, EndDialog)(THIS_ INT_PTR nResult) OVERRIDE;
 
-    SHostWnd* toSHostWnd() { return this; }
+    SHostWnd *toSHostWnd()
+    {
+        return this;
+    }
+
   protected:
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
     void OnOK();

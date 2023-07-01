@@ -5,37 +5,54 @@
 namespace SOUI
 {
 
-void GradientFillRect(HDC hdc, const RECT *rcFill, COLORREF cr1, COLORREF cr2,BOOL bVert)
+#define GetAValue(rgb)   (LOBYTE((rgb) >> 24))
+
+void GradientFillRect(HDC hdc, const RECT *rcFill,const GradientItem * items, int nCount,BOOL bVert,BYTE byAlpha)
 {
-	HDC hdc1=hdc;
+	TRIVERTEX        vert[10] ;
+	GRADIENT_RECT  grect[10];
+	TRIVERTEX * pVert = nCount<=10?vert:(TRIVERTEX * )malloc(sizeof(TRIVERTEX)*nCount);
+	GRADIENT_RECT *gRect=nCount<=10?grect:(GRADIENT_RECT*)malloc(sizeof(GRADIENT_RECT)*nCount);
 
-	TRIVERTEX        vert[2] ;
-	vert [0] .x      = rcFill->left;
-	vert [0] .y      = rcFill->top;
-	vert [0] .Red    = GetRValue(cr1)<<8;
-	vert [0] .Green  = GetGValue(cr1)<<8;
-	vert [0] .Blue   = GetBValue(cr1)<<8;
-	vert [0] .Alpha  = 0xff00;
+	int x = rcFill->left;
+	int y = rcFill->top;
+	int nWid = rcFill->right-rcFill->left;
+	int nHei = rcFill->bottom-rcFill->top;
+	
+	for(int i=0;i<nCount;i++){
+		pVert [i] .Red    = GetRValue(items[i].cr)<<8;
+		pVert [i] .Green  = GetGValue(items[i].cr)<<8;
+		pVert [i] .Blue   = GetBValue(items[i].cr)<<8;
+		pVert [i] .Alpha  = ((GetAValue(items[i].cr)*(255-byAlpha))/255)<<8; 
 
-	vert [1] .x      = rcFill->right;
-	vert [1] .y      = rcFill->bottom; 
-	vert [1] .Red    = GetRValue(cr2)<<8;
-	vert [1] .Green  = GetGValue(cr2)<<8;
-	vert [1] .Blue   = GetBValue(cr2)<<8;
-	vert [1] .Alpha  = 0xff00;
-
-	GRADIENT_RECT    gRect={0,1};
-	GradientFill(hdc1,vert,2,&gRect,1,bVert?GRADIENT_FILL_RECT_V:GRADIENT_FILL_RECT_H);
+		if(bVert){
+			pVert [i] .x      = i%2==0?rcFill->left:rcFill->right;
+			pVert [i] .y      = y + (long)(nHei * items[i].pos);
+		}else{
+			pVert [i] .x      = x + (long)(nWid * items[i].pos);
+			pVert [i] .y      = i%2==0?rcFill->top:rcFill->bottom;
+		}
+		gRect[i].UpperLeft=i;
+		gRect[i].LowerRight=i+1;
+	}
+	GradientFill(hdc,pVert,nCount,gRect,nCount-1,bVert?GRADIENT_FILL_RECT_V:GRADIENT_FILL_RECT_H);
+	if(pVert != vert){
+		free(pVert);
+		free(gRect);
+	}
+	
 }
 
 void GradientFillRectH(HDC hdc, const RECT *rcFill, COLORREF crLeft, COLORREF crRight)
 {
-    GradientFillRect(hdc, rcFill, crLeft,crRight,FALSE);
+	GradientItem items[]={crLeft,0.0f,crRight,1.0f};;
+    GradientFillRect(hdc, rcFill, items,2,FALSE,0xff);
 }
 
 void GradientFillRectV( HDC hdc,const RECT *rcFill, COLORREF crTop, COLORREF crBottom)
 {
-	GradientFillRect(hdc, rcFill, crTop,crBottom,TRUE);
+	GradientItem items[]={crTop,0.0f,crBottom,1.0f};;
+	GradientFillRect(hdc, rcFill, items,2,TRUE,0xff);
 }
 
 }//namespace DuiEngine

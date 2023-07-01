@@ -25,24 +25,24 @@ DECLARE_INTERFACE_(ITimer, IObjRef)
 
     //////////////////////////////////////////////////////////////////////////
 
-	/**
+    /**
      * StartTimer
      * @brief    启动定时器
      * @param    int nElapse --  延时(ms)
-	 * @param    BOOL bRepeat -- 重复标志
-	 * @param    LPARAM uData -- Timer 自定义参数
+     * @param    BOOL bRepeat -- 重复标志
+     * @param    LPARAM uData -- Timer 自定义参数
      * @return   BOOL, TRUE--成功
      * Describe
      */
-	STDMETHOD_(BOOL,StartTimer)(THIS_ int nElapse,BOOL bRepeat,LPARAM uData DEF_VAL(0)) PURE;
+    STDMETHOD_(BOOL, StartTimer)(THIS_ int nElapse, BOOL bRepeat, LPARAM uData DEF_VAL(0)) PURE;
 
-	/**
+    /**
      * KillTimer
      * @brief    停止定时器
      * @return   void
      * Describe
      */
-	STDMETHOD_(void,KillTimer)(THIS) PURE;
+    STDMETHOD_(void, KillTimer)(THIS) PURE;
 };
 
 SNSEND

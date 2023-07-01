@@ -23,14 +23,13 @@
 
 SNSBEGIN
 
-
 /**
  * @class     SRealWnd
  * @brief
  *
  * Describe
  */
-class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd>{
+class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
     DEF_SOBJECT(SWindow, L"realwnd")
   public:
     /**
@@ -48,30 +47,31 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd>{
      */
     virtual ~SRealWnd();
 
-public:
-	STDMETHOD_(const IStringT*, GetRealClassName)(CTHIS) SCONST OVERRIDE
-	{
-		return &m_strClassName;
-	}
+  public:
+    STDMETHOD_(const IStringT *, GetRealClassName)(CTHIS) SCONST OVERRIDE
+    {
+        return &m_strClassName;
+    }
 
-	STDMETHOD_(const IStringT*, GetRealWindowName)(CTHIS) SCONST OVERRIDE
-	{
-		return &m_strWindowName;
-	}
+    STDMETHOD_(const IStringT *, GetRealWindowName)(CTHIS) SCONST OVERRIDE
+    {
+        return &m_strWindowName;
+    }
 
-	STDMETHOD_(DWORD, GetRealStyle)(CTHIS) SCONST OVERRIDE
-	{
-		return m_dwStyle;
-	}
+    STDMETHOD_(DWORD, GetRealStyle)(CTHIS) SCONST OVERRIDE
+    {
+        return m_dwStyle;
+    }
 
-	STDMETHOD_(DWORD, GetRealStyleEx)(CTHIS) SCONST OVERRIDE
-	{
-		return m_dwExStyle;
-	}
+    STDMETHOD_(DWORD, GetRealStyleEx)(CTHIS) SCONST OVERRIDE
+    {
+        return m_dwExStyle;
+    }
 
-	STDMETHOD_(IXmlNode*, GetRealParam)(CTHIS) OVERRIDE{
-		return m_xmlParams.Root();
-	}
+    STDMETHOD_(IXmlNode *, GetRealParam)(CTHIS) OVERRIDE
+    {
+        return m_xmlParams.Root();
+    }
 
     /**
      * SRealWnd::GetRealHwnd
@@ -81,8 +81,7 @@ public:
      *
      * Describe  获取窗口句柄
      */
-	STDMETHOD_(HWND, GetRealHwnd)(THIS_ BOOL bAutoCreate = TRUE) OVERRIDE;
-
+    STDMETHOD_(HWND, GetRealHwnd)(THIS_ BOOL bAutoCreate = TRUE) OVERRIDE;
 
     /**
      * SRealWnd::SetData
@@ -91,7 +90,7 @@ public:
      *
      * Describe  获取附加数据
      */
-    STDMETHOD_(void,SetData)(THIS_ LPVOID lpData)
+    STDMETHOD_(void, SetData)(THIS_ LPVOID lpData)
     {
         m_lpData = lpData;
     }
@@ -103,7 +102,7 @@ public:
      *
      * Describe  获取附加数据
      */
-    STDMETHOD_(LPVOID,GetData)(THIS) 
+    STDMETHOD_(LPVOID, GetData)(THIS)
     {
         return m_lpData;
     }
@@ -187,13 +186,13 @@ public:
         MSG_WM_SHOWWINDOW(OnShowWindow)
     SOUI_MSG_MAP_END()
 
-	SStringT m_strClassName;  /**< 类名 */
-	SStringT m_strWindowName; /**< 窗口名 */
-	DWORD m_dwStyle;          /**< 窗口样式 */
-	DWORD m_dwExStyle;        /**< 窗口扩展样式 */
-	SXmlDoc m_xmlParams;      /**< 文档 */
+    SStringT m_strClassName;  /**< 类名 */
+    SStringT m_strWindowName; /**< 窗口名 */
+    DWORD m_dwStyle;          /**< 窗口样式 */
+    DWORD m_dwExStyle;        /**< 窗口扩展样式 */
+    SXmlDoc m_xmlParams;      /**< 文档 */
 
-	BOOL m_bInit;                 /**< 是否初始化 */
+    BOOL m_bInit; /**< 是否初始化 */
 
     HWND m_hRealWnd; /**< 窗口句柄 */
     LPVOID m_lpData; /**< 附加参数 */

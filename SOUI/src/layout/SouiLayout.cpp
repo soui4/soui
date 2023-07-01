@@ -641,8 +641,8 @@ void SouiLayout::CalcPositionEx(SList<WndPos> *pListChildren, int nWidth, int nH
         {
             int nWid = IsWaitingPos(wndPos.rc.right) ? nWidth : (wndPos.rc.right - wndPos.rc.left);
             int nHei = IsWaitingPos(wndPos.rc.bottom) ? nHeight : (wndPos.rc.bottom - wndPos.rc.top);
-            CSize szWnd ;
-			wndPos.pWnd->GetDesiredSize(&szWnd,nWid, nHei);
+            CSize szWnd;
+            wndPos.pWnd->GetDesiredSize(&szWnd, nWid, nHei);
             if (pLayoutParam->IsWrapContent(Horz))
             {
                 wndPos.rc.right = wndPos.rc.left + szWnd.cx;
@@ -770,8 +770,8 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
                     { //
                         int nWid = IsWaitingPos(wndPos.rc.right) ? nWidth : (wndPos.rc.right - wndPos.rc.left);
                         int nHei = IsWaitingPos(wndPos.rc.bottom) ? nHeight : (wndPos.rc.bottom - wndPos.rc.top);
-                        CSize szWnd ;
-						wndPos.pWnd->GetDesiredSize(&szWnd,nWid, nHei);
+                        CSize szWnd;
+                        wndPos.pWnd->GetDesiredSize(&szWnd, nWid, nHei);
                         if (pLayoutParam->IsWrapContent(Horz))
                         {
                             wndPos.rc.right = wndPos.rc.left + szWnd.cx;
@@ -825,8 +825,8 @@ void SouiLayout::LayoutChildren(IWindow *pParent)
     if (lstWndPos.IsEmpty())
         return;
 
-    CRect rcParent ;
-	pParent->GetChildrenLayoutRect(&rcParent);
+    CRect rcParent;
+    pParent->GetChildrenLayoutRect(&rcParent);
     //计算子窗口位置
     CalcPostion(&lstWndPos, rcParent.Width(), rcParent.Height());
 

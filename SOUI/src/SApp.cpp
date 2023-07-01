@@ -39,28 +39,28 @@
 #include "valueAnimator/SValueAnimator.h"
 #include "core/SHostPresenter.h"
 
-
 SNSBEGIN
 
 class SNullTranslator : public TObjRefImpl<ITranslatorMgr> {
   public:
-	  STDMETHOD_(BOOL,IsValid)(CTHIS) SCONST {
-		  return FALSE;
-	  }
+    STDMETHOD_(BOOL, IsValid)(CTHIS) SCONST
+    {
+        return FALSE;
+    }
 
     STDMETHOD_(void, SetLanguage)(THIS_ LPCWSTR strLang)
     {
     }
-	STDMETHOD_(void, SetLanguageA)(THIS_ LPCSTR strLang)
-	{
-	}
+    STDMETHOD_(void, SetLanguageA)(THIS_ LPCSTR strLang)
+    {
+    }
     STDMETHOD_(void, GetLanguage)(THIS_ wchar_t szOut[TR_MAX_NAME_LEN]) SCONST
     {
         szOut[0] = 0;
     }
-	STDMETHOD_(void, GetLanguageA)(THIS_ IStringA *out) SCONST
-	{
-	}
+    STDMETHOD_(void, GetLanguageA)(THIS_ IStringA *out) SCONST
+    {
+    }
 
     STDMETHOD_(BOOL, CreateTranslator)(THIS_ ITranslator **ppTranslator)
     {
@@ -113,7 +113,6 @@ class SDefMsgLoopFactory : public TObjRefImpl<IMsgLoopFactory> {
     }
 };
 
-
 void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) const
 {
     objFactory->TplRegisterFactory<SWindow>();
@@ -152,7 +151,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SRichEdit>();
     objFactory->TplRegisterFactory<SEdit>();
     objFactory->TplRegisterFactory<SHotKeyCtrl>();
-	objFactory->TplRegisterFactory<SComboEdit>();
+    objFactory->TplRegisterFactory<SComboEdit>();
     objFactory->TplRegisterFactory<SComboBox>();
     objFactory->TplRegisterFactory<SSpinButtonCtrl>();
     objFactory->TplRegisterFactory<SListView>();
@@ -163,9 +162,9 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SMenuBar>();
     objFactory->TplRegisterFactory<SCalendar>();
     objFactory->TplRegisterFactory<SDateTimePicker>();
-	objFactory->TplRegisterFactory<SFrame>();
-	objFactory->TplRegisterFactory<SStackView>();
-	objFactory->TplRegisterFactory<SStackPage>();
+    objFactory->TplRegisterFactory<SFrame>();
+    objFactory->TplRegisterFactory<SStackView>();
+    objFactory->TplRegisterFactory<SStackPage>();
 }
 
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
@@ -176,7 +175,7 @@ void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
     objFactory->TplRegisterFactory<SSkinImgFrame2>();
     objFactory->TplRegisterFactory<SSkinButton>();
     objFactory->TplRegisterFactory<SSkinGradation>();
-	objFactory->TplRegisterFactory<SSkinGradation2>();
+    objFactory->TplRegisterFactory<SSkinGradation2>();
     objFactory->TplRegisterFactory<SSkinScrollbar>();
     objFactory->TplRegisterFactory<SSkinColorRect>();
     objFactory->TplRegisterFactory<SSkinShape>();
@@ -231,8 +230,8 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     : m_hInst(hInst)
     , m_RenderFactory(pRendFactory)
     , m_hMainWnd(NULL)
-	, m_cbCreateObj(NULL)
-	, m_cbCreateTaskLoop(NULL)
+    , m_cbCreateObj(NULL)
+    , m_cbCreateTaskLoop(NULL)
 {
     SWndSurface::Init();
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
@@ -283,17 +282,17 @@ void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, 
 
 void SApplication::_DestroySingletons()
 {
-	if(m_pSingletons[SNotifyCenter::GetType()])
-		DELETE_SINGLETON(SNotifyCenter);
+    if (m_pSingletons[SNotifyCenter::GetType()])
+        DELETE_SINGLETON(SNotifyCenter);
 
     DELETE_SINGLETON(SHostMgr);
     DELETE_SINGLETON(SNativeWndHelper);
     DELETE_SINGLETON(SRicheditMenuDef);
     DELETE_SINGLETON(STextServiceHelper);
     DELETE_SINGLETON(SWindowFinder);
-    
+
     DELETE_SINGLETON(SFontPool);
-	DELETE_SINGLETON(SUiDef);
+    DELETE_SINGLETON(SUiDef);
     DELETE_SINGLETON(STimerGenerator);
     DELETE_SINGLETON(SWindowMgr);
 }
@@ -356,34 +355,37 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc 
 {
     if (!pResProvider)
     {
-		if(!pszType){
-			SPOSITION pos = m_lstResPackage.GetHeadPosition();
-			while(pos){
-				IResProvider *pResP = m_lstResPackage.GetNext(pos);
-				if(pResP->HasResource(NULL,pszXmlName))
-				{
-					pResProvider = pResP;
-					break;
-				}
-			}
-		}
-		if(!pResProvider){
-			if (IsFileType(pszType))
-			{
-				bool bLoad = xmlDoc.load_file(pszXmlName, xml_parse_default, enc_auto);
-				if (!bLoad)
-				{
-					XmlParseResult res;
-					xmlDoc.GetParseResult(&res);
-					SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName, SXmlDoc::GetErrDesc(res.status), res.offset);
-				}
-				return bLoad;
-			}
-			else
-			{
-				pResProvider = GetMatchResProvider(pszType, pszXmlName);
-			}
-		}
+        if (!pszType)
+        {
+            SPOSITION pos = m_lstResPackage.GetHeadPosition();
+            while (pos)
+            {
+                IResProvider *pResP = m_lstResPackage.GetNext(pos);
+                if (pResP->HasResource(NULL, pszXmlName))
+                {
+                    pResProvider = pResP;
+                    break;
+                }
+            }
+        }
+        if (!pResProvider)
+        {
+            if (IsFileType(pszType))
+            {
+                bool bLoad = xmlDoc.load_file(pszXmlName, xml_parse_default, enc_auto);
+                if (!bLoad)
+                {
+                    XmlParseResult res;
+                    xmlDoc.GetParseResult(&res);
+                    SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName, SXmlDoc::GetErrDesc(res.status), res.offset);
+                }
+                return bLoad;
+            }
+            else
+            {
+                pResProvider = GetMatchResProvider(pszType, pszXmlName);
+            }
+        }
     }
     if (!pResProvider)
         return FALSE;
@@ -421,13 +423,13 @@ IXmlDoc *SApplication::LoadXmlDocment(LPCTSTR strResId)
     }
 }
 
-BOOL SApplication::LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId,IResProvider *pResProvider/*=NULL*/)
+BOOL SApplication::LoadXmlDocment(SXmlDoc &xmlDoc, const SStringT &strResId, IResProvider *pResProvider /*=NULL*/)
 {
     SStringTList strLst;
     if (2 == ParseResID(strResId, strLst))
-	    return _LoadXmlDocment(strLst[1], strLst[0], xmlDoc,pResProvider);
-	else
-		return _LoadXmlDocment(strResId, NULL, xmlDoc, pResProvider);
+        return _LoadXmlDocment(strLst[1], strLst[0], xmlDoc, pResProvider);
+    else
+        return _LoadXmlDocment(strResId, NULL, xmlDoc, pResProvider);
 }
 
 IAnimation *SApplication::LoadAnimation(LPCTSTR strResId)
@@ -456,44 +458,44 @@ IValueAnimator *SApplication::LoadValueAnimator(LPCTSTR strResId)
     return pRet;
 }
 
-ITranslator * SApplication::LoadTranslator(THIS_ LPCTSTR strResId)
+ITranslator *SApplication::LoadTranslator(THIS_ LPCTSTR strResId)
 {
-	if(!GetTranslator())
-		return NULL;
-	SXmlDoc xml;
-	if (!LoadXmlDocment(xml, strResId))
-		return NULL;
-	ITranslator *pRet = NULL;
-	if(!GetTranslator()->CreateTranslator(&pRet))
-		return NULL;
-	pRet->Load(&xml.root().child(L"language"),1);//LD_XML==1
-	return pRet;
+    if (!GetTranslator())
+        return NULL;
+    SXmlDoc xml;
+    if (!LoadXmlDocment(xml, strResId))
+        return NULL;
+    ITranslator *pRet = NULL;
+    if (!GetTranslator()->CreateTranslator(&pRet))
+        return NULL;
+    pRet->Load(&xml.root().child(L"language"), 1); // LD_XML==1
+    return pRet;
 }
 
-BOOL SApplication::InstallTranslator(THIS_ ITranslator * trModule)
+BOOL SApplication::InstallTranslator(THIS_ ITranslator *trModule)
 {
-	ITranslatorMgr * pTransMgr = GetTranslator();
-	if(!pTransMgr)
-		return FALSE;
-	if(!pTransMgr->InstallTranslator(trModule))
-		return FALSE;
+    ITranslatorMgr *pTransMgr = GetTranslator();
+    if (!pTransMgr)
+        return FALSE;
+    if (!pTransMgr->InstallTranslator(trModule))
+        return FALSE;
 
-	SStringW strFontInfo;
-	trModule->getFontInfo(&strFontInfo);
-	if(!strFontInfo.IsEmpty())
-	{
-		SFontPool::getSingletonPtr()->SetDefFontInfo(strFontInfo);
-	}
-	SHostMgr::getSingletonPtr()->DispatchMessage(true,UM_SETLANGUAGE);
-	return TRUE;
+    SStringW strFontInfo;
+    trModule->getFontInfo(&strFontInfo);
+    if (!strFontInfo.IsEmpty())
+    {
+        SFontPool::getSingletonPtr()->SetDefFontInfo(strFontInfo);
+    }
+    SHostMgr::getSingletonPtr()->DispatchMessage(true, UM_SETLANGUAGE);
+    return TRUE;
 }
 
 BOOL SApplication::UnnstallTranslator(THIS_ REFGUID langId)
 {
-	ITranslatorMgr * pTransMgr = GetTranslator();
-	if(!pTransMgr)
-		return FALSE;
-	return pTransMgr->UninstallTranslator(langId);
+    ITranslatorMgr *pTransMgr = GetTranslator();
+    if (!pTransMgr)
+        return FALSE;
+    return pTransMgr->UninstallTranslator(langId);
 }
 
 UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
@@ -540,8 +542,8 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
 int SApplication::Run(HWND hMainWnd)
 {
     m_hMainWnd = hMainWnd;
-	SAutoRefPtr<IMessageLoop> pMsgLoop = GetMsgLoop(GetCurrentThreadId());
-	SASSERT(pMsgLoop);
+    SAutoRefPtr<IMessageLoop> pMsgLoop = GetMsgLoop(GetCurrentThreadId());
+    SASSERT(pMsgLoop);
     int nRet = pMsgLoop->Run();
     if (::IsWindow(m_hMainWnd))
     {
@@ -552,9 +554,8 @@ int SApplication::Run(HWND hMainWnd)
 
 void SApplication::Quit(int nCode)
 {
-	PostQuitMessage(nCode);
+    PostQuitMessage(nCode);
 }
-
 
 HMODULE SApplication::GetModule() const
 {
@@ -616,10 +617,10 @@ HWND SApplication::GetMainWnd()
 BOOL SApplication::SetMsgLoopFactory(IMsgLoopFactory *pMsgLoopFac)
 {
     m_msgLoopFactory = pMsgLoopFac;
-	RemoveMsgLoop();
+    RemoveMsgLoop();
     SAutoRefPtr<IMessageLoop> pMsgLoop;
     m_msgLoopFactory->CreateMsgLoop(&pMsgLoop);
-	AddMsgLoop(pMsgLoop);
+    AddMsgLoop(pMsgLoop);
     return TRUE;
 }
 
@@ -719,7 +720,7 @@ void SApplication::SetAttrStorageFactory(IAttrStorageFactory *pAttrStorageFactor
     m_pAttrStroageFactory = pAttrStorageFactory;
 }
 
-BOOL SApplication::AddMsgLoop(IMessageLoop *pMsgLoop,BOOL bReplace)
+BOOL SApplication::AddMsgLoop(IMessageLoop *pMsgLoop, BOOL bReplace)
 {
     SAutoLock autoLock(m_cs);
     SASSERT(pMsgLoop != NULL);
@@ -757,85 +758,90 @@ IResProviderMgr *SApplication::GetResProviderMgr(THIS)
     return this;
 }
 
-void SApplication::EnableNotifyCenter(THIS_ BOOL bEnable,int interval)
+void SApplication::EnableNotifyCenter(THIS_ BOOL bEnable, int interval)
 {
-	if(bEnable){
-		if(m_pSingletons[SINGLETON_NOTIFYCENTER])
-			return;
-		m_pSingletons[SINGLETON_NOTIFYCENTER] = new SNotifyCenter(interval);
-	}else{
-		if(m_pSingletons[SINGLETON_NOTIFYCENTER])
-		{
-			DELETE_SINGLETON(SNotifyCenter);
-		}
-	}
-
+    if (bEnable)
+    {
+        if (m_pSingletons[SINGLETON_NOTIFYCENTER])
+            return;
+        m_pSingletons[SINGLETON_NOTIFYCENTER] = new SNotifyCenter(interval);
+    }
+    else
+    {
+        if (m_pSingletons[SINGLETON_NOTIFYCENTER])
+        {
+            DELETE_SINGLETON(SNotifyCenter);
+        }
+    }
 }
 
-IObject * SApplication::CreateObject(LPCWSTR pszName,SObjectType nType) const
+IObject *SApplication::CreateObject(LPCWSTR pszName, SObjectType nType) const
 {
-	if(m_cbCreateObj)
-	{
-		IObject *pRet = m_cbCreateObj(this,pszName,nType);
-		if(pRet){
-			return pRet;
-		}
-	}
-	SObjectInfo objInfo = ObjInfo_New(pszName,nType);
-	return SObjectFactoryMgr::CreateObject(objInfo);
+    if (m_cbCreateObj)
+    {
+        IObject *pRet = m_cbCreateObj(this, pszName, nType);
+        if (pRet)
+        {
+            return pRet;
+        }
+    }
+    SObjectInfo objInfo = ObjInfo_New(pszName, nType);
+    return SObjectFactoryMgr::CreateObject(objInfo);
 }
 
 void SApplication::SetCreateObjectCallback(THIS_ FunCreateObject cbCreateObj)
 {
-	m_cbCreateObj = cbCreateObj;
+    m_cbCreateObj = cbCreateObj;
 }
 
-BOOL SApplication::RegisterObjFactory(THIS_ const IObjectFactory *objFac,BOOL bReplace)
+BOOL SApplication::RegisterObjFactory(THIS_ const IObjectFactory *objFac, BOOL bReplace)
 {
-	return RegisterFactory(objFac,bReplace);
+    return RegisterFactory(objFac, bReplace);
 }
 
 BOOL SApplication::UnregisterObjFactory(THIS_ const IObjectFactory *objFac)
 {
-	return UnregisterFactory(objFac->GetObjectInfo());
+    return UnregisterFactory(objFac->GetObjectInfo());
 }
 
 void SApplication::SetDefaultFontInfo(THIS_ LPCWSTR pszFontInfo)
 {
-	SFontPool::getSingletonPtr()->SetDefFontInfo(pszFontInfo);
+    SFontPool::getSingletonPtr()->SetDefFontInfo(pszFontInfo);
 }
-
 
 void SApplication::SetCreateTaskLoopCallback(THIS_ FunCrateTaskLoop cbCreateTaskLoop)
 {
-	m_cbCreateTaskLoop = cbCreateTaskLoop;
+    m_cbCreateTaskLoop = cbCreateTaskLoop;
 }
 
-BOOL SApplication::CreateTaskLoop(THIS_ int nCount ,Priority priority, BOOL bAutoStart)
+BOOL SApplication::CreateTaskLoop(THIS_ int nCount, Priority priority, BOOL bAutoStart)
 {
-	if(!m_cbCreateTaskLoop)
-		return FALSE;
-	if(!m_lstTaskLoop.IsEmpty())
-		return FALSE;
-	m_lstTaskLoop.SetCount(nCount);
-	for(int i=0;i<nCount;i++){
-		m_lstTaskLoop[i].Attach(m_cbCreateTaskLoop());
-		if(bAutoStart && m_lstTaskLoop[i]){
-			m_lstTaskLoop[i]->start(SStringA().Format("taskloop_%d",i).c_str(),priority);
-		}
-	}
-	return TRUE;
+    if (!m_cbCreateTaskLoop)
+        return FALSE;
+    if (!m_lstTaskLoop.IsEmpty())
+        return FALSE;
+    m_lstTaskLoop.SetCount(nCount);
+    for (int i = 0; i < nCount; i++)
+    {
+        m_lstTaskLoop[i].Attach(m_cbCreateTaskLoop());
+        if (bAutoStart && m_lstTaskLoop[i])
+        {
+            m_lstTaskLoop[i]->start(SStringA().Format("taskloop_%d", i).c_str(), priority);
+        }
+    }
+    return TRUE;
 }
 
-ITaskLoop * SApplication::GetTaskLoop(THIS_ int iTaskLoop)
+ITaskLoop *SApplication::GetTaskLoop(THIS_ int iTaskLoop)
 {
-	if(iTaskLoop >=0 && iTaskLoop < (int)m_lstTaskLoop.GetCount()){
-		return m_lstTaskLoop[iTaskLoop];
-	}else{
-		return NULL;
-	}
+    if (iTaskLoop >= 0 && iTaskLoop < (int)m_lstTaskLoop.GetCount())
+    {
+        return m_lstTaskLoop[iTaskLoop];
+    }
+    else
+    {
+        return NULL;
+    }
 }
-
-
 
 SNSEND

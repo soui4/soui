@@ -48,32 +48,36 @@ IImgX *SResLoadFromMemory::LoadImgX(LPVOID pBuf, size_t size)
 
 //////////////////////////////////////////////////////////////////////////
 SResProviderPE::SResProviderPE()
-    : m_hResInst(0),m_bOwner(FALSE)
+    : m_hResInst(0)
+    , m_bOwner(FALSE)
 {
 }
 
 SResProviderPE::~SResProviderPE()
 {
-	if(m_bOwner){
-		FreeLibrary(m_hResInst);
-	}
+    if (m_bOwner)
+    {
+        FreeLibrary(m_hResInst);
+    }
 }
 
 BOOL SResProviderPE::Init(WPARAM wParam, LPARAM lParam)
 {
-	if(lParam == 0)
-	{
-		m_hResInst = (HINSTANCE)wParam;
-		m_bOwner = FALSE;
-		return TRUE;
-	}else{
-		LPCTSTR pszPath = (LPCTSTR)wParam;
-		m_hResInst = LoadLibrary(pszPath);
-		if(!m_hResInst)
-			return FALSE;
-		m_bOwner = TRUE;
-		return TRUE;
-	}
+    if (lParam == 0)
+    {
+        m_hResInst = (HINSTANCE)wParam;
+        m_bOwner = FALSE;
+        return TRUE;
+    }
+    else
+    {
+        LPCTSTR pszPath = (LPCTSTR)wParam;
+        m_hResInst = LoadLibrary(pszPath);
+        if (!m_hResInst)
+            return FALSE;
+        m_bOwner = TRUE;
+        return TRUE;
+    }
 }
 
 HBITMAP SResProviderPE::LoadBitmap(LPCTSTR pszResName)
@@ -191,7 +195,8 @@ LPVOID SResProviderPE::GetRawBufferPtr(LPCTSTR strType, LPCTSTR pszResName)
 
 BOOL SResProviderPE::HasResource(LPCTSTR strType, LPCTSTR pszResName)
 {
-    if(!strType) return FALSE;
+    if (!strType)
+        return FALSE;
     return MyFindResource(strType, pszResName) != NULL;
 }
 
@@ -237,24 +242,24 @@ void SResProviderPE::EnumResource(EnumResCallback funEnumCB, LPARAM lp)
 
 struct EnumFileParam
 {
-	EnumFileCallback fun;
-	LPARAM lParam;
+    EnumFileCallback fun;
+    LPARAM lParam;
 };
 static BOOL CALLBACK EnumResFileProc(HMODULE hModule, LPCTSTR lpszType, LPTSTR lpszName, LONG_PTR lParam)
 {
-	EnumFileParam *enumParam = (EnumFileParam *)lParam;
-	SStringT strPath=SStringT().Format(_T("%s:%s"),lpszType,lpszName);
-	return enumParam->fun(strPath.c_str(), enumParam->lParam);
+    EnumFileParam *enumParam = (EnumFileParam *)lParam;
+    SStringT strPath = SStringT().Format(_T("%s:%s"), lpszType, lpszName);
+    return enumParam->fun(strPath.c_str(), enumParam->lParam);
 }
 
 static BOOL CALLBACK EnumResTypeProc2(HMODULE hModule, LPTSTR lpszType, LONG_PTR lParam)
 {
-	return EnumResourceNames(hModule, lpszType, EnumResFileProc, lParam);
+    return EnumResourceNames(hModule, lpszType, EnumResFileProc, lParam);
 }
 void SResProviderPE::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
 {
-	EnumFileParam param = { funEnumCB, lp };
-	EnumResourceTypes(m_hResInst, EnumResTypeProc2, (LONG_PTR)&param);
+    EnumFileParam param = { funEnumCB, lp };
+    EnumResourceTypes(m_hResInst, EnumResTypeProc2, (LONG_PTR)&param);
 }
 //////////////////////////////////////////////////////////////////////////
 //
@@ -343,14 +348,15 @@ SResProviderFiles::SResProviderFiles()
 
 SStringT SResProviderFiles::GetRes(LPCTSTR strType, LPCTSTR pszResName)
 {
-	if(!strType){
-		//pszResName is relative path
-		SStringT strRet = m_strPath + _T("\\") + pszResName;
+    if (!strType)
+    {
+        // pszResName is relative path
+        SStringT strRet = m_strPath + _T("\\") + pszResName;
         DWORD dwAttr = GetFileAttributes(strRet);
-		if(dwAttr ==INVALID_FILE_ATTRIBUTES || (dwAttr & FILE_ATTRIBUTE_ARCHIVE) == 0)
-			strRet = _T("");
+        if (dwAttr == INVALID_FILE_ATTRIBUTES || (dwAttr & FILE_ATTRIBUTE_ARCHIVE) == 0)
+            strRet = _T("");
         return strRet;
-	}
+    }
     SResID resID(strType, pszResName);
     SMap<SResID, SStringT>::CPair *p = m_mapFiles.Lookup(resID);
     if (!p)
@@ -474,38 +480,41 @@ void SResProviderFiles::EnumResource(EnumResCallback funEnumCB, LPARAM lp)
 
 void SResProviderFiles::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
 {
-	_EnumFile(NULL,funEnumCB,lp);
+    _EnumFile(NULL, funEnumCB, lp);
 }
 
-void SResProviderFiles::_EnumFile(LPCTSTR pszPath,EnumFileCallback funEnumCB, LPARAM lp)
+void SResProviderFiles::_EnumFile(LPCTSTR pszPath, EnumFileCallback funEnumCB, LPARAM lp)
 {
-	WIN32_FIND_DATA wfd;
-	SStringT strFilter;
-	if(pszPath)
-		strFilter = m_strPath + _T("\\")+pszPath+_T("\\*.*");
-	else
-		strFilter = m_strPath + _T("\\*.*");
-	HANDLE hFind= FindFirstFile(strFilter.c_str(),&wfd);
-	if(hFind!=INVALID_HANDLE_VALUE){
-		do{
-			SStringT strPath;
-			if(pszPath==NULL)
-				strPath = wfd.cFileName;
-			else
-				strPath = SStringT().Format(_T("%s\\%s"),pszPath,wfd.cFileName);
-			if(wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY){
-				if(_tcscmp(wfd.cFileName,_T("."))==0 ||
-					_tcscmp(wfd.cFileName,_T(".."))==0
-					)
-					continue;
-				_EnumFile(strPath.c_str(),funEnumCB,lp);
-			}else if(wfd.dwFileAttributes & (FILE_ATTRIBUTE_ARCHIVE|FILE_ATTRIBUTE_NORMAL|FILE_ATTRIBUTE_READONLY)){
-				if(!funEnumCB(strPath.c_str(),lp))
-					break;
-			}
-		}while(FindNextFile(hFind,&wfd));
-		FindClose(hFind);
-	}
+    WIN32_FIND_DATA wfd;
+    SStringT strFilter;
+    if (pszPath)
+        strFilter = m_strPath + _T("\\") + pszPath + _T("\\*.*");
+    else
+        strFilter = m_strPath + _T("\\*.*");
+    HANDLE hFind = FindFirstFile(strFilter.c_str(), &wfd);
+    if (hFind != INVALID_HANDLE_VALUE)
+    {
+        do
+        {
+            SStringT strPath;
+            if (pszPath == NULL)
+                strPath = wfd.cFileName;
+            else
+                strPath = SStringT().Format(_T("%s\\%s"), pszPath, wfd.cFileName);
+            if (wfd.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY)
+            {
+                if (_tcscmp(wfd.cFileName, _T(".")) == 0 || _tcscmp(wfd.cFileName, _T("..")) == 0)
+                    continue;
+                _EnumFile(strPath.c_str(), funEnumCB, lp);
+            }
+            else if (wfd.dwFileAttributes & (FILE_ATTRIBUTE_ARCHIVE | FILE_ATTRIBUTE_NORMAL | FILE_ATTRIBUTE_READONLY))
+            {
+                if (!funEnumCB(strPath.c_str(), lp))
+                    break;
+            }
+        } while (FindNextFile(hFind, &wfd));
+        FindClose(hFind);
+    }
 }
 
 SNSEND

@@ -69,7 +69,8 @@ class SOUI_EXP SMCListView
 
     STDMETHOD_(int, GetColumnCount)(THIS) SCONST OVERRIDE;
 
-	STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int nParentWid, int nParentHei) OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
+
   public:
     SItemPanel *HitTest(CPoint &pt) const;
 

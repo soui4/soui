@@ -679,7 +679,7 @@ void SRichEdit::OnDestroy()
         m_pTxtHost->Release();
         m_pTxtHost = NULL;
     }
-	m_mapTimer.RemoveAll();
+    m_mapTimer.RemoveAll();
     __baseCls::OnDestroy();
 }
 
@@ -839,9 +839,9 @@ BOOL SRichEdit::OnSetCursor(const CPoint &pt)
 
 BOOL SRichEdit::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult)
 {
-	BOOL bRet = __baseCls::SwndProc(uMsg, wParam, lParam, lResult);
-	if(bRet)
-		return TRUE;
+    BOOL bRet = __baseCls::SwndProc(uMsg, wParam, lParam, lResult);
+    if (bRet)
+        return TRUE;
     if (m_pTxtHost && m_pTxtHost->GetTextService())
     {
         if (uMsg == EM_GETRECT)
@@ -883,10 +883,11 @@ HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont)
     ReleaseDC(NULL, hdc);
     const LOGFONT *plf = pFont->LogFont();
     pcf->yHeight = abs(MulDiv(pFont->TextSize(), LY_PER_INCH, yPixPerInch));
-	if(SLayoutSize::defUnit != SLayoutSize::px && IsRichScale()){
-		//rich scale 的情况下，edit内部已经对文字进行了放大，不再放大默认字体。
-		pcf->yHeight /=(GetScale()/100);
-	}
+    if (SLayoutSize::defUnit != SLayoutSize::px && IsRichScale())
+    {
+        // rich scale 的情况下，edit内部已经对文字进行了放大，不再放大默认字体。
+        pcf->yHeight /= (GetScale() / 100);
+    }
     pcf->yOffset = 0;
     pcf->dwEffects = 0;
     if (pFont->IsBold())
@@ -1056,8 +1057,8 @@ void SRichEdit::OnRButtonDown(UINT nFlags, CPoint point)
         SMenu menu;
         if (menu.LoadMenu2(&xmlMenu))
         {
-            CRect rcCantainer ;
-			GetContainer()->GetContainerRect(&rcCantainer);
+            CRect rcCantainer;
+            GetContainer()->GetContainerRect(&rcCantainer);
             point.Offset(rcCantainer.TopLeft());
             HWND hHost = GetContainer()->GetHostHwnd();
             ::ClientToScreen(hHost, &point);
@@ -1343,16 +1344,17 @@ void SRichEdit::SetWindowText(LPCTSTR lpszText)
 
 int SRichEdit::GetWindowText(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText)
 {
-	if(!pBuf){
-		return GetWindowTextLength();
-	}
+    if (!pBuf)
+    {
+        return GetWindowTextLength();
+    }
     SStringT str = GetWindowText(bRawText);
     if (nBufLen < str.GetLength())
         return 0;
-	else if(nBufLen == str.GetLength())
-		_tcsncpy(pBuf, str.c_str(),str.GetLength());
-	else//if(nBufLen > str.GetLength())
-		_tcscpy(pBuf, str.c_str()); //auto append null char
+    else if (nBufLen == str.GetLength())
+        _tcsncpy(pBuf, str.c_str(), str.GetLength());
+    else                            // if(nBufLen > str.GetLength())
+        _tcscpy(pBuf, str.c_str()); // auto append null char
     return str.GetLength();
 }
 
@@ -1362,7 +1364,7 @@ SStringT SRichEdit::GetWindowText(BOOL bRawText)
     SStringW strRet;
     int nLen = GetWindowTextLength();
     wchar_t *pBuf = strRet.GetBufferSetLength(nLen);
-    SSendMessage(WM_GETTEXT, (WPARAM)nLen+1, (LPARAM)pBuf);
+    SSendMessage(WM_GETTEXT, (WPARAM)nLen + 1, (LPARAM)pBuf);
     strRet.ReleaseBuffer();
     return S_CW2T(strRet);
 }
@@ -1469,27 +1471,30 @@ HRESULT SRichEdit::OnAttrRTF(const SStringW &strValue, BOOL bLoading)
     {
         SStringTList lstSrc;
         int nSegs = ParseResID(S_CW2T(strValue), lstSrc);
-		LPCTSTR pszType=NULL;
-		LPCTSTR pszName=NULL;
-		if(lstSrc.GetCount()==2){
-			pszType=lstSrc[0];
-			pszName=lstSrc[1];
-		}else{
-			pszName=lstSrc[0];
-		}
-		size_t dwSize = GETRESPROVIDER->GetRawBufferSize(pszType, pszName);
-		if (dwSize)
-		{
-			EDITSTREAM es;
-			MemBlock mb = { NULL, 0 };
-			SAutoBuf mybuf;
-			mb.pBuf = (LPCBYTE)mybuf.Allocate(dwSize);
-			mb.nRemains = (DWORD)dwSize;
-			GETRESPROVIDER->GetRawBuffer(pszType, pszName, mybuf, dwSize);
-			es.dwCookie = (DWORD_PTR)&mb;
-			es.pfnCallback = EditStreamInCallback_MemBlock;
-			SSendMessage(EM_STREAMIN, SF_RTF, (LPARAM)&es);
-		}
+        LPCTSTR pszType = NULL;
+        LPCTSTR pszName = NULL;
+        if (lstSrc.GetCount() == 2)
+        {
+            pszType = lstSrc[0];
+            pszName = lstSrc[1];
+        }
+        else
+        {
+            pszName = lstSrc[0];
+        }
+        size_t dwSize = GETRESPROVIDER->GetRawBufferSize(pszType, pszName);
+        if (dwSize)
+        {
+            EDITSTREAM es;
+            MemBlock mb = { NULL, 0 };
+            SAutoBuf mybuf;
+            mb.pBuf = (LPCBYTE)mybuf.Allocate(dwSize);
+            mb.nRemains = (DWORD)dwSize;
+            GETRESPROVIDER->GetRawBuffer(pszType, pszName, mybuf, dwSize);
+            es.dwCookie = (DWORD_PTR)&mb;
+            es.pfnCallback = EditStreamInCallback_MemBlock;
+            SSendMessage(EM_STREAMIN, SF_RTF, (LPARAM)&es);
+        }
         return S_FALSE;
     }
 }
@@ -1581,12 +1586,14 @@ DWORD SRichEdit::LoadRtf(LPCTSTR pszFileName)
 void SRichEdit::OnScaleChanged(int nScale)
 {
     __baseCls::OnScaleChanged(nScale);
-	if (IsRichScale())
-	{
-		SSendMessage(EM_SETZOOM,nScale,100);
-	}else{//单行居中的放大，做特殊处理
-		OnSetFont(NULL, FALSE);
-	}
+    if (IsRichScale())
+    {
+        SSendMessage(EM_SETZOOM, nScale, 100);
+    }
+    else
+    { //单行居中的放大，做特殊处理
+        OnSetFont(NULL, FALSE);
+    }
 }
 
 void SRichEdit::OnRebuildFont()
@@ -1689,35 +1696,36 @@ LRESULT SRichEdit::OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp)
 
 BOOL SRichEdit::OnTxSetTimer(UINT idTimer, UINT uTimeout)
 {
-	SMap<UINT,SAutoRefPtr<ITimer>>::CPair *p =m_mapTimer.Lookup(idTimer);
-	if(p){
-		p->m_value->KillTimer();
-		p->m_value->StartTimer(uTimeout,TRUE,idTimer);
-		return TRUE;
-	}
-	STimer *timer = new STimer(&Subscriber(&SRichEdit::OnTimeout,this));
-	timer->StartTimer(uTimeout,TRUE,idTimer);
-	m_mapTimer[idTimer] = timer;
-	timer->Release();
+    SMap<UINT, SAutoRefPtr<ITimer>>::CPair *p = m_mapTimer.Lookup(idTimer);
+    if (p)
+    {
+        p->m_value->KillTimer();
+        p->m_value->StartTimer(uTimeout, TRUE, idTimer);
+        return TRUE;
+    }
+    STimer *timer = new STimer(&Subscriber(&SRichEdit::OnTimeout, this));
+    timer->StartTimer(uTimeout, TRUE, idTimer);
+    m_mapTimer[idTimer] = timer;
+    timer->Release();
 
-	return TRUE;
+    return TRUE;
 }
 
 void SRichEdit::OnTxKillTimer(UINT idTimer)
 {
-	m_mapTimer.RemoveKey(idTimer);
+    m_mapTimer.RemoveKey(idTimer);
 }
 
 BOOL SRichEdit::OnTimeout(IEvtArgs *e)
 {
-	EventTimer *e2=sobj_cast<EventTimer>(e);
-	m_pTxtHost->GetTextService()->TxSendMessage(WM_TIMER, e2->uData, 0, NULL);
-	return TRUE;
+    EventTimer *e2 = sobj_cast<EventTimer>(e);
+    m_pTxtHost->GetTextService()->TxSendMessage(WM_TIMER, e2->uData, 0, NULL);
+    return TRUE;
 }
 
 BOOL SRichEdit::IsRichScale() const
 {
-	return m_fRich || !m_fSingleLineVCenter || (m_dwStyle & ES_MULTILINE);
+    return m_fRich || !m_fSingleLineVCenter || (m_dwStyle & ES_MULTILINE);
 }
 
 //////////////////////////////////////////////////////////////////////////

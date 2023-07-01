@@ -17,10 +17,10 @@ BOOL RemoveElementFromArray(SArray<T> &arr, T ele)
     return TRUE;
 }
 
-SMessageLoop::SMessageLoop(IMessageLoop * pParentLoop)
+SMessageLoop::SMessageLoop(IMessageLoop *pParentLoop)
     : m_bRunning(FALSE)
     , m_tid(0)
-	, m_parentLoop(pParentLoop)
+    , m_parentLoop(pParentLoop)
 {
 }
 
@@ -48,49 +48,52 @@ int SMessageLoop::Run()
 {
     BOOL bRet;
     m_bRunning = TRUE;
-	m_bDoIdle = TRUE;
-	m_nIdleCount = 0;
+    m_bDoIdle = TRUE;
+    m_nIdleCount = 0;
     m_tid = GetCurrentThreadId();
     m_bQuit = FALSE;
-    do{
-		bRet = WaitMsg();
-		if(m_bQuit)
-			break;
-		if(!bRet){
-			SSLOGD() << "WaitMsg returned FALSE (error)";
-			continue; // error, don't process
-		}		
-		HandleMsg();
-    }while(!m_bQuit);
+    do
+    {
+        bRet = WaitMsg();
+        if (m_bQuit)
+            break;
+        if (!bRet)
+        {
+            SSLOGD() << "WaitMsg returned FALSE (error)";
+            continue; // error, don't process
+        }
+        HandleMsg();
+    } while (!m_bQuit);
 
-	{
-		SAutoLock lock(m_cs);
-		SPOSITION pos = m_runnables.GetHeadPosition();
-		while (pos)
-		{
-			IRunnable *pRunnable = m_runnables.GetNext(pos);
-			pRunnable->Release();
-		}
-		m_runnables.RemoveAll();
-	}
+    {
+        SAutoLock lock(m_cs);
+        SPOSITION pos = m_runnables.GetHeadPosition();
+        while (pos)
+        {
+            IRunnable *pRunnable = m_runnables.GetNext(pos);
+            pRunnable->Release();
+        }
+        m_runnables.RemoveAll();
+    }
     m_bRunning = FALSE;
     return (int)m_msg.wParam;
 }
 
 BOOL SMessageLoop::OnIdle(int nIdleCount)
 {
-	BOOL bContinue=FALSE;//default set to don't continue
+    BOOL bContinue = FALSE; // default set to don't continue
     for (size_t i = 0; i < m_aIdleHandler.GetCount(); i++)
     {
         IIdleHandler *pIdleHandler = m_aIdleHandler[i];
         if (pIdleHandler != NULL)
-            if(pIdleHandler->OnIdle())
-				bContinue=TRUE;
+            if (pIdleHandler->OnIdle())
+                bContinue = TRUE;
     }
-	if(m_parentLoop){
-		if(m_parentLoop->OnIdle(nIdleCount))
-			bContinue = TRUE;
-	}
+    if (m_parentLoop)
+    {
+        if (m_parentLoop->OnIdle(nIdleCount))
+            bContinue = TRUE;
+    }
     return bContinue;
 }
 
@@ -103,9 +106,10 @@ BOOL SMessageLoop::PreTranslateMessage(MSG *pMsg)
         if (pMessageFilter != NULL && pMessageFilter->PreTranslateMessage(pMsg))
             return TRUE;
     }
-	if(m_parentLoop){
-		m_parentLoop->PreTranslateMessage(pMsg);
-	}
+    if (m_parentLoop)
+    {
+        m_parentLoop->PreTranslateMessage(pMsg);
+    }
     return FALSE; // not translated
 }
 
@@ -149,9 +153,10 @@ BOOL SMessageLoop::AddMessageFilter(IMsgFilter *pMessageFilter)
 BOOL SMessageLoop::PostTask(IRunnable *runable)
 {
     SAutoLock lock(m_cs);
-	if (m_tid == 0){
-		SSLOGW()<<"msg loop not running now! pending task size:"<<m_runnables.GetCount();
-	}
+    if (m_tid == 0)
+    {
+        SSLOGW() << "msg loop not running now! pending task size:" << m_runnables.GetCount();
+    }
     m_runnables.AddTail(runable->clone());
     if (m_runnables.GetCount() > 5)
     {
@@ -199,59 +204,61 @@ BOOL SMessageLoop::IsRunning(THIS) const
 
 void SMessageLoop::ExecutePendingTask()
 {
-	m_cs.Enter();
-	m_runningQueue.Swap(m_runnables);
-	m_cs.Leave();
-	for (;;)
-	{
-		SAutoLock lock(m_csRunningQueue);
-		if (m_runningQueue.IsEmpty())
-			break;
-		IRunnable *pRunnable = m_runningQueue.GetHead();
-		m_runningQueue.RemoveHead();
-		pRunnable->run();
-		pRunnable->Release();
-	}
-	if(m_parentLoop){
-		m_parentLoop->ExecutePendingTask();
-	}
+    m_cs.Enter();
+    m_runningQueue.Swap(m_runnables);
+    m_cs.Leave();
+    for (;;)
+    {
+        SAutoLock lock(m_csRunningQueue);
+        if (m_runningQueue.IsEmpty())
+            break;
+        IRunnable *pRunnable = m_runningQueue.GetHead();
+        m_runningQueue.RemoveHead();
+        pRunnable->run();
+        pRunnable->Release();
+    }
+    if (m_parentLoop)
+    {
+        m_parentLoop->ExecutePendingTask();
+    }
 }
 
-BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg,UINT wMsgFilterMin,UINT wMsgFilterMax,BOOL bRemove)
+BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilterMax, BOOL bRemove)
 {
-	return ::PeekMessage(pMsg,0,wMsgFilterMin,wMsgFilterMax,bRemove?PM_REMOVE:PM_NOREMOVE);
+    return ::PeekMessage(pMsg, 0, wMsgFilterMin, wMsgFilterMax, bRemove ? PM_REMOVE : PM_NOREMOVE);
 }
 
 BOOL SMessageLoop::WaitMsg(THIS)
 {
-	MSG msg;
-	while (m_bDoIdle && !PeekMsg(&msg, 0, 0, FALSE))
-	{
-		if (!OnIdle(m_nIdleCount++))
-			m_bDoIdle = FALSE;
-		if (m_bQuit)
-			return FALSE;
-	}
-	return ::WaitMessage();
+    MSG msg;
+    while (m_bDoIdle && !PeekMsg(&msg, 0, 0, FALSE))
+    {
+        if (!OnIdle(m_nIdleCount++))
+            m_bDoIdle = FALSE;
+        if (m_bQuit)
+            return FALSE;
+    }
+    return ::WaitMessage();
 }
 
 void SMessageLoop::HandleMsg(THIS)
 {
-	MSG msg;
-	while(PeekMsg(&msg,0,0,TRUE))
-	{
-		if(msg.message == WM_QUIT)
-		{
-			m_bQuit = TRUE;
-			break;
-		}
-		ExecutePendingTask();
-		OnMsg(&msg);
-		m_bDoIdle = IsIdleMessage(&msg);
-		if(m_bDoIdle){
-			m_nIdleCount = 0;
-		}
-	}
+    MSG msg;
+    while (PeekMsg(&msg, 0, 0, TRUE))
+    {
+        if (msg.message == WM_QUIT)
+        {
+            m_bQuit = TRUE;
+            break;
+        }
+        ExecutePendingTask();
+        OnMsg(&msg);
+        m_bDoIdle = IsIdleMessage(&msg);
+        if (m_bDoIdle)
+        {
+            m_nIdleCount = 0;
+        }
+    }
 }
 
 SNSEND

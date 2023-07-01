@@ -106,10 +106,10 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
             ii.pItem->Destroy();
         }
         m_lstItems.RemoveAll();
-		m_pHoverItem = NULL;
-		m_itemCapture = NULL;
-		m_iSelItem = -1;
-		m_iFirstVisible = -1;
+        m_pHoverItem = NULL;
+        m_itemCapture = NULL;
+        m_iSelItem = -1;
+        m_iFirstVisible = -1;
     }
 
     m_adapter = adapter;
@@ -420,7 +420,7 @@ void STileView::UpdateVisibleItems()
     delete[] pItemInfos;
 
     m_iFirstVisible = iNewFirstVisible;
-	InvalidateRect(NULL);
+    InvalidateRect(NULL);
 }
 
 void STileView::OnSize(UINT nType, CSize size)

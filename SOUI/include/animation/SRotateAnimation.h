@@ -49,7 +49,6 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
      */
     SRotateAnimation();
 
-
     /**
      * Constructor to use when building a RotateAnimation from code
      *
@@ -75,10 +74,10 @@ class SOUI_EXP SRotateAnimation : public SAnimation {
      *        pivotYType is ABSOLUTE, or a percentage (where 1.0 is 100%)
      *        otherwise.
      */
-    void init(float fromDegrees, float toDegrees, const SValueDescription & pivotX, const SValueDescription & pivotY);
+    void init(float fromDegrees, float toDegrees, const SValueDescription &pivotX, const SValueDescription &pivotY);
 
     STDMETHOD_(void, initialize)
-    (THIS_ int width, int height, int parentWidth, int parentHeight,int nScale) OVERRIDE;
+    (THIS_ int width, int height, int parentWidth, int parentHeight, int nScale) OVERRIDE;
 
   protected:
     STDMETHOD_(void, applyTransformation)

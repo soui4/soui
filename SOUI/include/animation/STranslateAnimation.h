@@ -36,9 +36,9 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
     float mToXDelta;
     float mFromYDelta;
     float mToYDelta;
+
   public:
     STranslateAnimation();
-
 
     /**
      * Constructor to use when building a TranslateAnimation from code
@@ -68,7 +68,7 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
      *        animation. This value can either be an absolute number if toYType
      *        is ABSOLUTE, or a percentage (where 1.0 is 100%) otherwise.
      */
-    void init(const SValueDescription & fromX, const SValueDescription & toX, const SValueDescription & fromY,  const SValueDescription & toY);
+    void init(const SValueDescription &fromX, const SValueDescription &toX, const SValueDescription &fromY, const SValueDescription &toY);
 
   protected:
     STDMETHOD_(void, applyTransformation)
@@ -76,13 +76,13 @@ class SOUI_EXP STranslateAnimation : public SAnimation {
 
   public:
     STDMETHOD_(void, initialize)
-    (THIS_ int width, int height, int parentWidth, int parentHeight,int nScale) OVERRIDE;
+    (THIS_ int width, int height, int parentWidth, int parentHeight, int nScale) OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
-        ATTR_VALUE_DESC(L"fromXDelta",  mFromXValue)
+        ATTR_VALUE_DESC(L"fromXDelta", mFromXValue)
         ATTR_VALUE_DESC(L"toXDelta", mToXValue)
         ATTR_VALUE_DESC(L"fromYDelta", mFromYValue)
-        ATTR_VALUE_DESC(L"toYDelta",  mToYValue)
+        ATTR_VALUE_DESC(L"toYDelta", mToYValue)
     SOUI_ATTRS_END()
 };
 

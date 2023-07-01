@@ -212,11 +212,12 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
 
     STDMETHOD_(int, FindString)(THIS_ int iFindAfter, LPCTSTR pszText) SCONST OVERRIDE;
 
-	STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int nParentWid, int nParentHei) OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
 
-	STDMETHOD_(BOOL, SetItemImage)(THIS_ int nIndex,int iImage) OVERRIDE;
+    STDMETHOD_(BOOL, SetItemImage)(THIS_ int nIndex, int iImage) OVERRIDE;
 
-	STDMETHOD_(int, GetItemImage)(THIS_ int nIndex) OVERRIDE;
+    STDMETHOD_(int, GetItemImage)(THIS_ int nIndex) OVERRIDE;
+
   public:
     /**
      * SListBox::GetText

@@ -30,7 +30,7 @@ class SOUI_EXP SMenuExItem : public SWindow {
     BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE;
     SWindow *CreateChildByName(LPCWSTR pszName) OVERRIDE;
 
-    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int wid, int hei) OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int wid, int hei) OVERRIDE;
 
     void GetTextRect(LPRECT pRect) OVERRIDE;
 
@@ -66,7 +66,8 @@ class SOUI_EXP SMenuEx
     friend class SMenuExItem;
     friend class SMenuExRunData;
     friend class SMenuExRoot;
-	typedef SHostWnd __baseCls;
+    typedef SHostWnd __baseCls;
+
   public:
     SMenuEx(void);
     virtual ~SMenuEx(void);
@@ -99,7 +100,7 @@ class SOUI_EXP SMenuEx
     //=================================================================
     STDMETHOD_(BOOL, LoadMenu)(THIS_ LPCTSTR resId) OVERRIDE;
 
-	STDMETHOD_(BOOL, LoadMenuA)(THIS_ LPCSTR resId) OVERRIDE;
+    STDMETHOD_(BOOL, LoadMenuA)(THIS_ LPCSTR resId) OVERRIDE;
 
     STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode *xmlMenu) OVERRIDE;
 

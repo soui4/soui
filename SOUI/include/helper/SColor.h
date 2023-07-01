@@ -26,7 +26,8 @@ class SColor {
         r = GetRValue(cr);
         g = GetGValue(cr);
         b = GetBValue(cr);
-        a = alpha;
+        a = GetAValue(cr);
+        updateAlpha(alpha);
     }
 
     SColor(COLORREF cr)
@@ -62,13 +63,19 @@ class SColor {
         r = GetRValue(cr);
         g = GetGValue(cr);
         b = GetBValue(cr);
-        a = alpha;
+        a = GetAValue(cr);
+        updateAlpha(alpha);
     }
 
     void updateAlpha(BYTE alpha)
     {
         if (alpha != 0xFF)
-            a = (a * alpha) >> 8;
+        {
+            if (a == 0xFF)
+                a = alpha;
+            else
+                a = (a * alpha) / 0xFF;
+        }
     }
 
     DWORD b : 8;

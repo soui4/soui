@@ -15,7 +15,7 @@ SNSBEGIN
  * Describe
  */
 class SOUI_EXP SComboEdit : public SEdit {
-	DEF_SOBJECT(SEdit,L"ComboEdit")
+    DEF_SOBJECT(SEdit, L"ComboEdit")
   public:
     /**
      * SComboEdit::SComboEdit
@@ -120,11 +120,12 @@ class SOUI_EXP SComboBase
   public:
     STDMETHOD_(int, FindString)
     (THIS_ LPCTSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE;
-	STDMETHOD_(int, FindStringA)
-		(THIS_ LPCSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE{
-			SStringT str = S_CA2T(pszFind,CP_UTF8);
-			return FindString(str,nAfter,bPartMatch);
-	}
+    STDMETHOD_(int, FindStringA)
+    (THIS_ LPCSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE
+    {
+        SStringT str = S_CA2T(pszFind, CP_UTF8);
+        return FindString(str, nAfter, bPartMatch);
+    }
 
     STDMETHOD_(void, DropDown)(THIS) OVERRIDE;
 
@@ -137,7 +138,7 @@ class SOUI_EXP SComboBase
   public:
     STDMETHOD_(void, SetWindowText)(LPCTSTR pszText) OVERRIDE;
 
-    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int nParentWid, int nParentHei) OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
 
     STDMETHOD_(void, SetFocus)(THIS) OVERRIDE;
 
@@ -443,11 +444,11 @@ class TComboBaseProxy
         return SComboBase::FindString(pszFind, nAfter, bPartMatch);
     }
 
-	STDMETHOD_(int, FindStringA)
-		(THIS_ LPCSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE
-	{
-		return SComboBase::FindStringA(pszFind, nAfter, bPartMatch);
-	}
+    STDMETHOD_(int, FindStringA)
+    (THIS_ LPCSTR pszFind, int nAfter = -1, BOOL bPartMatch = TRUE) OVERRIDE
+    {
+        return SComboBase::FindStringA(pszFind, nAfter, bPartMatch);
+    }
 
     STDMETHOD_(void, DropDown)(THIS) OVERRIDE
     {

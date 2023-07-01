@@ -126,7 +126,7 @@ class SOUI_EXP SAnimationSet : public SAnimation {
      * @see android.view.animation.Animation#initialize(int, int, int, int)
      */
     STDMETHOD_(void, initialize)
-    (THIS_ int width, int height, int parentWidth, int parentHeight,int nScale) OVERRIDE;
+    (THIS_ int width, int height, int parentWidth, int parentHeight, int nScale) OVERRIDE;
 
     STDMETHOD_(void, copy)(THIS_ const IAnimation *src) OVERRIDE;
 

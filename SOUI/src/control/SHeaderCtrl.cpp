@@ -44,7 +44,7 @@ int SHeaderCtrl::InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LP
     item.state = 0;
     item.iOrder = iItem;
     item.lParam = lParam;
-	item.bVisible = TRUE;
+    item.bVisible = TRUE;
     m_arrItems.InsertAt(iItem, item);
     //需要更新列的序号
     for (size_t i = 0; i < GetItemCount(); i++)
@@ -107,7 +107,7 @@ BOOL SHeaderCtrl::SetItem(int iItem, const SHDITEM *pItem)
         item.fmt = pItem->fmt;
     if (pItem->mask & SHDI_VISIBLE)
         item.bVisible = pItem->bVisible;
-	Invalidate();
+    Invalidate();
     return TRUE;
 }
 
@@ -221,9 +221,9 @@ CRect SHeaderCtrl::GetItemRect(int iItem) const
     return rcItem;
 }
 
-void SHeaderCtrl::GetItemRect (CTHIS_ int iItem, LPRECT prc) SCONST
+void SHeaderCtrl::GetItemRect(CTHIS_ int iItem, LPRECT prc) SCONST
 {
-	*prc = GetItemRect(iItem);
+    *prc = GetItemRect(iItem);
 }
 
 int SHeaderCtrl::GetOriItemIndex(int iOrder) const
@@ -479,9 +479,11 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
         item.mask = 0xFFFFFFFF;
         item.iOrder = iOrder++;
         SStringW strText = xmlItem.attribute(L"text").as_string();
-		if(strText.IsEmpty()){
-			strText = SWindow::GetXmlText(xmlItem);;
-		}
+        if (strText.IsEmpty())
+        {
+            strText = SWindow::GetXmlText(xmlItem);
+            ;
+        }
         item.strText.SetText(S_CW2T(GETSTRING(strText)));
         SLayoutSize szItem = GETLAYOUTSIZE(xmlItem.attribute(L"width").as_string(L"50"));
         item.cx = szItem.toPixelSize(GetScale());
@@ -490,7 +492,7 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
         item.lParam = xmlItem.attribute(L"userData").as_uint(0);
         item.bVisible = xmlItem.attribute(L"visible").as_bool(true);
         item.fmt = 0;
-		item.state = 0;
+        item.state = 0;
         SStringW strSort = xmlItem.attribute(L"sortFlag").as_string();
         strSort.MakeLower();
         if (strSort == L"down")
@@ -505,15 +507,16 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
             item.fmt |= HDF_CENTER;
         else if (strAlign == L"right")
             item.fmt |= HDF_RIGHT;
-		else{
-			int align = GetStyle().GetTextAlign();
-			if(align & DT_CENTER)
-				item.fmt |= HDF_CENTER;
-			else if(align & DT_RIGHT)
-				item.fmt |= HDF_RIGHT;
-			else
-				item.fmt |= HDF_LEFT;
-		}
+        else
+        {
+            int align = GetStyle().GetTextAlign();
+            if (align & DT_CENTER)
+                item.fmt |= HDF_CENTER;
+            else if (align & DT_RIGHT)
+                item.fmt |= HDF_RIGHT;
+            else
+                item.fmt |= HDF_LEFT;
+        }
         m_arrItems.InsertAt(m_arrItems.GetCount(), item);
 
         xmlItem = xmlItem.next_sibling(L"item");
@@ -652,47 +655,47 @@ int SHeaderCtrl::GetTotalWidth(BOOL bMinWid) const
 
 int SHeaderCtrl::GetItemWidth(int iItem) const
 {
-	if (iItem < 0 || (UINT)iItem >= m_arrItems.GetCount()) 
-		return -1;
-	if(!m_arrItems[iItem].bVisible)
-		return 0;
-	const SHDITEM & item = m_arrItems[iItem];
-	if(SLayoutSize::fequal(item.fWeight,0.0f))
-		return item.cx;
-	else
-	{
-		CRect rc = GetClientRect();
-		if(rc.IsRectEmpty())
-		{
-			return item.cx;
+    if (iItem < 0 || (UINT)iItem >= m_arrItems.GetCount())
+        return -1;
+    if (!m_arrItems[iItem].bVisible)
+        return 0;
+    const SHDITEM &item = m_arrItems[iItem];
+    if (SLayoutSize::fequal(item.fWeight, 0.0f))
+        return item.cx;
+    else
+    {
+        CRect rc = GetClientRect();
+        if (rc.IsRectEmpty())
+        {
+            return item.cx;
         }
         else
-		{
-			float fTotalWeight = 0.0f;
-			int   nTotalWidth = 0;
-			for(UINT i=0;i<m_arrItems.GetCount();i++)
-			{
-				if(!m_arrItems[i].bVisible)
-					continue;
-				fTotalWeight += m_arrItems[i].fWeight;
-				nTotalWidth += m_arrItems[i].cx;
-			}
-			int nRemain=rc.Width()-nTotalWidth;
-			if(nRemain<=0)
-			{
-				return m_arrItems[iItem].cx;
-			}
-			for(int i=0;i<iItem;i++)
-			{
-				if (!m_arrItems[i].bVisible)
-					continue;
-				int nAppend = (int)(nRemain * m_arrItems[i].fWeight/fTotalWeight);
-				nRemain-=nAppend;
-				fTotalWeight-=m_arrItems[i].fWeight;
-			}
-			return item.cx + (int)(nRemain*item.fWeight/fTotalWeight);
-		}
-	}
+        {
+            float fTotalWeight = 0.0f;
+            int nTotalWidth = 0;
+            for (UINT i = 0; i < m_arrItems.GetCount(); i++)
+            {
+                if (!m_arrItems[i].bVisible)
+                    continue;
+                fTotalWeight += m_arrItems[i].fWeight;
+                nTotalWidth += m_arrItems[i].cx;
+            }
+            int nRemain = rc.Width() - nTotalWidth;
+            if (nRemain <= 0)
+            {
+                return m_arrItems[iItem].cx;
+            }
+            for (int i = 0; i < iItem; i++)
+            {
+                if (!m_arrItems[i].bVisible)
+                    continue;
+                int nAppend = (int)(nRemain * m_arrItems[i].fWeight / fTotalWeight);
+                nRemain -= nAppend;
+                fTotalWeight -= m_arrItems[i].fWeight;
+            }
+            return item.cx + (int)(nRemain * item.fWeight / fTotalWeight);
+        }
+    }
 }
 
 void SHeaderCtrl::OnActivateApp(BOOL bActive, DWORD dwThreadID)

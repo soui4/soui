@@ -785,9 +785,9 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
 
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) OVERRIDE;
 
-	STDMETHOD_(BOOL,SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult) OVERRIDE;
+    STDMETHOD_(BOOL, SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult) OVERRIDE;
 
-	STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) OVERRIDE;
+    STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) OVERRIDE;
 
   public:
     /**
@@ -809,10 +809,9 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      */
     void SetSel(DWORD dwSelection, BOOL bNoScroll = FALSE);
 
-	int GetWindowTextLength() const;
+    int GetWindowTextLength() const;
 
   protected:
-
     /**
      * SRichEdit::OnCreate
      * @brief    创建
@@ -859,7 +858,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      */
     void OnTimer(char idEvent);
 
-	/**
+    /**
      * SRichEdit::OnGetDlgCode
      * @brief    获取窗口消息码
      * @return   返回UINT
@@ -893,7 +892,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
 
     virtual void OnRebuildFont();
 
-	BOOL IsRichScale() const;
+    BOOL IsRichScale() const;
 
     void OnEnable(BOOL bEnable, UINT nStatus);
     /**
@@ -1085,9 +1084,10 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
 
     BOOL OnTxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw);
 
-	BOOL OnTxSetTimer(UINT idTimer, UINT uTimeout);
-	void OnTxKillTimer(UINT idTimer);
-	BOOL OnTimeout(IEvtArgs *e);
+    BOOL OnTxSetTimer(UINT idTimer, UINT uTimeout);
+    void OnTxKillTimer(UINT idTimer);
+    BOOL OnTimeout(IEvtArgs *e);
+
   protected:
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_CREATE(OnCreate)
@@ -1184,25 +1184,25 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     int m_nFontHeight;      /**< 单行文字输出高度          */
     DWORD m_dwStyle;
 
-    UINT m_fEnableAutoWordSel : 1; /**< enable Word style auto word selection?  */
-    UINT m_fWordWrap : 1;          /**< Whether control should word wrap */
-    UINT m_fRich : 1;              /**< Whether control is rich text */
-    UINT m_fSaveSelection : 1;     /**< Whether to save the selection when inactive */
-    UINT m_fTransparent : 1;       /**< Whether control is transparent */
-    UINT m_fVertical : 1;          /**< Whether control is layout following vertical */
-    UINT m_fAllowBeep : 1;         /**< Whether message beep is allowed in the control */
-    UINT m_fWantTab : 1;           /**< Whether control will deal with tab input */
-    UINT m_fSingleLineVCenter : 1; /**< Whether control that is single line will be vertical
-                                      centered */
-    UINT m_fScrollPending : 1;     /**< Whether scroll is activated by richedit or by panelex */
-    UINT m_fEnableDragDrop : 1;    /**< 允许在该控件中使用拖放 */
-    UINT m_fAutoSel : 1;           /**< 有焦点时自动全选 */
-    UINT m_fNotifyChange : 1;      /**< receive re_notify when data changed */
-    UINT m_fDisableCaret : 1;      /**< disable caret flag */
-    BYTE m_byDbcsLeadByte;         /**< DBCS输入时的中文头字节*/
-    SStringW m_strRtfSrc;          /**< 在XML中指定的RTF数据源*/
-    STextHost *m_pTxtHost;         /**< Host of Richedit*/
-	SMap<UINT,SAutoRefPtr<ITimer>> m_mapTimer;/**< map of timer to id*/
+    UINT m_fEnableAutoWordSel : 1;              /**< enable Word style auto word selection?  */
+    UINT m_fWordWrap : 1;                       /**< Whether control should word wrap */
+    UINT m_fRich : 1;                           /**< Whether control is rich text */
+    UINT m_fSaveSelection : 1;                  /**< Whether to save the selection when inactive */
+    UINT m_fTransparent : 1;                    /**< Whether control is transparent */
+    UINT m_fVertical : 1;                       /**< Whether control is layout following vertical */
+    UINT m_fAllowBeep : 1;                      /**< Whether message beep is allowed in the control */
+    UINT m_fWantTab : 1;                        /**< Whether control will deal with tab input */
+    UINT m_fSingleLineVCenter : 1;              /**< Whether control that is single line will be vertical
+                                                   centered */
+    UINT m_fScrollPending : 1;                  /**< Whether scroll is activated by richedit or by panelex */
+    UINT m_fEnableDragDrop : 1;                 /**< 允许在该控件中使用拖放 */
+    UINT m_fAutoSel : 1;                        /**< 有焦点时自动全选 */
+    UINT m_fNotifyChange : 1;                   /**< receive re_notify when data changed */
+    UINT m_fDisableCaret : 1;                   /**< disable caret flag */
+    BYTE m_byDbcsLeadByte;                      /**< DBCS输入时的中文头字节*/
+    SStringW m_strRtfSrc;                       /**< 在XML中指定的RTF数据源*/
+    STextHost *m_pTxtHost;                      /**< Host of Richedit*/
+    SMap<UINT, SAutoRefPtr<ITimer>> m_mapTimer; /**< map of timer to id*/
 };
 
 /**
@@ -1211,7 +1211,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
  *
  * Describe
  */
-class SOUI_EXP SEdit : public TCtrlProxy<IEdit,SRichEdit>  {
+class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
     DEF_SOBJECT(SRichEdit, L"edit")
   public:
     /**
@@ -1222,16 +1222,19 @@ class SOUI_EXP SEdit : public TCtrlProxy<IEdit,SRichEdit>  {
      */
     SEdit();
 
-public:
-	STDMETHOD_(void,GetCueText)(CTHIS_ IStringT *pStr) SCONST{
-		SStringT str = GetCueText(FALSE);
-		pStr->Copy(&str);
-	}
+  public:
+    STDMETHOD_(void, GetCueText)(CTHIS_ IStringT *pStr) SCONST
+    {
+        SStringT str = GetCueText(FALSE);
+        pStr->Copy(&str);
+    }
 
-	STDMETHOD_(COLORREF,GetCueColor)(CTHIS) SCONST{
-		return m_crCue;
-	}
-public:
+    STDMETHOD_(COLORREF, GetCueColor)(CTHIS) SCONST
+    {
+        return m_crCue;
+    }
+
+  public:
     SStringT GetCueText(BOOL bRawText = FALSE) const;
 
     SOUI_ATTRS_BEGIN()

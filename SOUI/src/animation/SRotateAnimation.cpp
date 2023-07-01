@@ -11,10 +11,10 @@ SRotateAnimation::SRotateAnimation()
     mPivotY = 0.0f;
 }
 
-void SRotateAnimation::initialize(int width, int height, int parentWidth, int parentHeight,int nScale)
+void SRotateAnimation::initialize(int width, int height, int parentWidth, int parentHeight, int nScale)
 {
-    mPivotX = (float)resolveSize(mPivotXDesc, width, parentWidth,nScale);
-    mPivotY = (float)resolveSize(mPivotYDesc, height, parentHeight,nScale);
+    mPivotX = (float)resolveSize(mPivotXDesc, width, parentWidth, nScale);
+    mPivotY = (float)resolveSize(mPivotYDesc, height, parentHeight, nScale);
 }
 
 void SRotateAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
@@ -45,8 +45,7 @@ void SRotateAnimation::copy(const IAnimation *src)
     mPivotYDesc = src2->mPivotYDesc;
 }
 
-
-void SRotateAnimation::init(float fromDegrees, float toDegrees, const SValueDescription & pivotX, const SValueDescription & pivotY)
+void SRotateAnimation::init(float fromDegrees, float toDegrees, const SValueDescription &pivotX, const SValueDescription &pivotY)
 {
     mFromDegrees = fromDegrees;
     mToDegrees = toDegrees;
@@ -54,6 +53,5 @@ void SRotateAnimation::init(float fromDegrees, float toDegrees, const SValueDesc
     mPivotXDesc = pivotX;
     mPivotYDesc = pivotY;
 }
-
 
 SNSEND

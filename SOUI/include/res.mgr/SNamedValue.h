@@ -43,22 +43,23 @@ class SNamedValue {
 
     T String2Value(const SStringW &strName) const
     {
-		T ret;
-		if(FindValue(strName,ret))
-			return ret;
+        T ret;
+        if (FindValue(strName, ret))
+            return ret;
         static const T nullValue = ValueParser::GetNullValue();
         return nullValue;
     }
 
-	BOOL FindValue(const SStringW &strName,T & value) const{
-		NAMEDVALUE target;
-		wcscpy_s(target.strName, MAX_NAME, strName);
-		NAMEDVALUE *pFind = (NAMEDVALUE *)bsearch(&target, m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(), sizeof(NAMEDVALUE), Compare);
-		if (!pFind) 
-			return FALSE;
-		value = pFind->value;
-		return TRUE;
-	}
+    BOOL FindValue(const SStringW &strName, T &value) const
+    {
+        NAMEDVALUE target;
+        wcscpy_s(target.strName, MAX_NAME, strName);
+        NAMEDVALUE *pFind = (NAMEDVALUE *)bsearch(&target, m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(), sizeof(NAMEDVALUE), Compare);
+        if (!pFind)
+            return FALSE;
+        value = pFind->value;
+        return TRUE;
+    }
 
     T GetAt(const int idx) const
     {
@@ -90,9 +91,11 @@ class SNamedValue {
         }
     }
 
-	UINT GetCount() const{
-		return (UINT)m_lstNamedValue.GetCount();
-	}
+    UINT GetCount() const
+    {
+        return (UINT)m_lstNamedValue.GetCount();
+    }
+
   protected:
     static int Compare(const void *p1, const void *p2)
     {
@@ -131,7 +134,7 @@ class SOUI_EXP SColorParser {
 class SOUI_EXP SNamedColor : public SNamedValue<COLORREF, SColorParser> {
   public:
     //自动转换@color/namedcolor
-    BOOL Get(const SStringW &strValue,COLORREF &cr) const;
+    BOOL Get(const SStringW &strValue, COLORREF &cr) const;
     COLORREF Get(int idx) const
     {
         return GetAt(idx);
@@ -147,7 +150,7 @@ class SOUI_EXP SStringParser {
 class SOUI_EXP SNamedString : public SNamedValue<SStringW, SStringParser> {
   public:
     //自动转换@string/namedstring
-    BOOL Get(const SStringW &strValue,SStringW &ret) const;
+    BOOL Get(const SStringW &strValue, SStringW &ret) const;
     SStringW Get(int idx) const
     {
         return GetAt(idx);
@@ -155,13 +158,13 @@ class SOUI_EXP SNamedString : public SNamedValue<SStringW, SStringParser> {
 };
 
 class SOUI_EXP SNamedFont : public SNamedValue<SStringW, SStringParser> {
-public:
-	//自动转换@font/namedfont
-	BOOL Get(const SStringW &strValue,SStringW &ret) const;
-	SStringW Get(int idx) const
-	{
-		return GetAt(idx);
-	}
+  public:
+    //自动转换@font/namedfont
+    BOOL Get(const SStringW &strValue, SStringW &ret) const;
+    SStringW Get(int idx) const
+    {
+        return GetAt(idx);
+    }
 };
 
 class SOUI_EXP SDimensionParser {
@@ -173,7 +176,7 @@ class SOUI_EXP SDimensionParser {
 class SOUI_EXP SNamedDimension : public SNamedValue<SLayoutSize, SDimensionParser> {
   public:
     //自动转换@dim/namedDimension
-    BOOL Get(const SStringW &strValue,SLayoutSize & ret) const;
+    BOOL Get(const SStringW &strValue, SLayoutSize &ret) const;
     SLayoutSize Get(int idx) const
     {
         return GetAt(idx);

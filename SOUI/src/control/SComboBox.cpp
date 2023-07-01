@@ -33,7 +33,7 @@ BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SetAttribute(L"pos", L"0,0,-0,-0", TRUE);
     m_pListBox->SetAttribute(L"hotTrack", L"1", TRUE);
     m_pListBox->SetOwner(this); // chain notify message to combobox
-	m_pListBox->SetVisible(FALSE);
+    m_pListBox->SetVisible(FALSE);
     m_pListBox->SetID(IDC_DROPDOWN_LIST);
     m_pListBox->SSendMessage(UM_SETSCALE, GetScale());
 
@@ -46,7 +46,8 @@ BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
         {
 
             SStringW strText = xmlNode_Item.attribute(L"text").value();
-			if(strText.IsEmpty()) strText = GetXmlText(xmlNode_Item);
+            if (strText.IsEmpty())
+                strText = GetXmlText(xmlNode_Item);
             int iIcon = xmlNode_Item.attribute(L"icon").as_int(0);
             LPARAM lParam = xmlNode_Item.attribute(L"data").as_int(0);
             m_pListBox->AddString(S_CW2T(GETSTRING(strText)), iIcon, lParam);
@@ -78,8 +79,8 @@ void SComboBox::OnCreateDropDown(SDropDownWnd *pDropDown)
     __baseCls::OnCreateDropDown(pDropDown);
     pDropDown->GetRoot()->InsertChild(m_pListBox);
     pDropDown->GetRoot()->UpdateChildrenPosition();
-	pDropDown->GetRoot()->SDispatchMessage(UM_SETSCALE,GetScale(),0);
-	pDropDown->GetRoot()->SDispatchMessage(UM_SETCOLORIZE,m_crColorize,0);
+    pDropDown->GetRoot()->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
+    pDropDown->GetRoot()->SDispatchMessage(UM_SETCOLORIZE, m_crColorize, 0);
 
     m_pListBox->SetVisible(TRUE);
     m_pListBox->SetFocus();

@@ -1,8 +1,9 @@
 ﻿#pragma once
 
-#include "SSkinObjBase.h"
-#include "../layout/SLayoutSize.h"
-#include "../helper/SplitString.h"
+#include <core/SSkinObjBase.h>
+#include <layout/SLayoutSize.h>
+#include <helper/SplitString.h>
+#include <matrix/SPoint.h>
 
 SNSBEGIN
 
@@ -237,27 +238,51 @@ class SOUI_EXP SSkinGradation : public SSkinObjBase {
     SOUI_ATTRS_END()
 };
 
-
-class SOUI_EXP SSkinGradation2 : public SSkinObjBase {
-	DEF_SOBJECT(SSkinObjBase, L"gradation2")
+class SOUI_EXP SGradientDesc{
 public:
-	SSkinGradation2();
-
-  public:
-    STDMETHOD_(ISkinObj *, Scale)(THIS_ int nScale) OVERRIDE;
+	SGradientDesc();
 protected:
-	void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
-
-	BOOL m_bVert;
-	
-	SArray<COLORREF> m_arrColors;
-	SArray<float>    m_arrPos;
+	SArray<GradientItem> m_arrGradient;
+	SLayoutSize  m_radius;
+	GradientType m_type;
+	float		 m_angle;
+	float		 m_centerX;
+	float		 m_centerY;
+	GradientInfo  GetGradientInfo(int nScale) const;
 protected:
 	HRESULT OnAttrColors(const SStringW& value,BOOL bLoading);
 
 	SOUI_ATTRS_BEGIN()
 		ATTR_CUSTOM(L"colors", OnAttrColors)
-		ATTR_BOOL(L"vertical", m_bVert, TRUE)    //渐变方向,0--水平, 1--垂直(默认)
+		ATTR_ENUM_BEGIN(L"type",GradientType,TRUE)
+			ATTR_ENUM_VALUE(L"linear",linear)
+			ATTR_ENUM_VALUE(L"radial",radial)
+			ATTR_ENUM_VALUE(L"sweep",sweep)
+		ATTR_ENUM_END(m_type)
+		ATTR_LAYOUTSIZE(L"radius",m_radius,TRUE)
+		ATTR_FLOAT(L"angle",m_angle,TRUE)
+		ATTR_FLOAT(L"centerX",m_centerX,TRUE)
+		ATTR_FLOAT(L"centerY",m_centerY,TRUE)
+	SOUI_ATTRS_BREAK()
+};
+
+class SOUI_EXP SSkinGradation2 : public SSkinObjBase , SGradientDesc{
+	DEF_SOBJECT(SSkinObjBase, L"gradation2")
+public:
+	SSkinGradation2();
+
+public:
+    STDMETHOD_(ISkinObj *, Scale)(THIS_ int nScale) OVERRIDE;
+protected:
+	void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
+
+	SPoint m_ptCorner;
+	SLayoutSize m_szCorner[2];
+protected:
+	SOUI_ATTRS_BEGIN()
+		ATTR_SPOINT(L"ratio_corners",m_ptCorner,TRUE)
+		ATTR_LAYOUTSIZE2(L"corners",m_szCorner,TRUE)
+		ATTR_CHAIN_CLASS(SGradientDesc)
 	SOUI_ATTRS_END()
 };
 
@@ -362,55 +387,62 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         ring
     };
 
-    class SGradient : public TObjRefImpl<SObject> {
+	class SShapeSolid : public TObjRefImpl<SObject> {
+		DEF_SOBJECT(TObjRefImpl<SObject>, L"solid")
+
+	public:
+		SShapeSolid():m_crSolid(CR_INVALID){}
+		SOUI_ATTRS_BEGIN()
+			ATTR_COLOR(L"color", m_crSolid, TRUE)
+		SOUI_ATTRS_END()
+
+		IBrushS * CreateBrush(IRenderTarget *pRT,BYTE byAlpha);
+	protected:
+		COLORREF m_crSolid;
+	};
+	
+	class SShapeBitmap : public TObjRefImpl<SObject>{
+		DEF_SOBJECT(TObjRefImpl<SObject>, L"bitmap")
+	public:
+		SShapeBitmap():m_tileX(kRepeat_TileMode),m_tileY(kRepeat_TileMode){}
+		SOUI_ATTRS_BEGIN()
+			ATTR_IMAGEAUTOREF(L"src", m_pImg, TRUE)
+			ATTR_ENUM_BEGIN(L"tileX",TileMode,TRUE)
+				ATTR_ENUM_VALUE(L"clamp",kClamp_TileMode)
+				ATTR_ENUM_VALUE(L"repeat",kRepeat_TileMode)
+				ATTR_ENUM_VALUE(L"mirror",kMirror_TileMode)
+			ATTR_ENUM_END(m_tileX)
+			ATTR_ENUM_BEGIN(L"tileY",TileMode,TRUE)
+				ATTR_ENUM_VALUE(L"clamp",kClamp_TileMode)
+				ATTR_ENUM_VALUE(L"repeat",kRepeat_TileMode)
+				ATTR_ENUM_VALUE(L"mirror",kMirror_TileMode)
+			ATTR_ENUM_END(m_tileY)
+		SOUI_ATTRS_END()
+
+		IBrushS * CreateBrush(IRenderTarget *pRT,BYTE byAlpha);
+	protected:
+		SAutoRefPtr<IBitmapS> m_pImg;
+		TileMode m_tileX,m_tileY;
+	};
+
+    class SGradientBrush : public TObjRefImpl<SObject>,SGradientDesc {
         DEF_SOBJECT(TObjRefImpl<SObject>, L"gradient")
       public:
-        SGradient()
-            : m_Type(linear)
-            , m_angle(0.0f)
-            , m_centerX(0.5f)
-            , m_centerY(0.5f)
-            , m_crCenter(RGBA(255,0,0,255))
-            , m_crEnd(RGBA(0,0,255,255))
-            , m_crStart(RGBA(0,255,0,255))
+        SGradientBrush()
         {
         }
 
-        void Draw(IRenderTarget *pRT, LPCRECT rcDraw, BYTE byAlpha, int nScale) const;
-
-        SOUI_ATTRS_BEGIN()
-            ATTR_ENUM_BEGIN(L"type", GradientType, TRUE)
-                ATTR_ENUM_VALUE(L"linear", linear)
-                ATTR_ENUM_VALUE(L"radial", radial)
-                ATTR_ENUM_VALUE(L"sweep", sweep)
-            ATTR_ENUM_END(m_Type)
-            ATTR_FLOAT(L"angle", m_angle, TRUE)
-            ATTR_FLOAT(L"centerX", m_centerX, TRUE)
-            ATTR_FLOAT(L"centerY", m_centerY, TRUE)
-            ATTR_COLOR(L"startColor", m_crStart, TRUE)
-            ATTR_COLOR(L"centerColor", m_crCenter, TRUE)
-            ATTR_COLOR(L"endColor", m_crEnd, TRUE)
-            ATTR_LAYOUTSIZE(L"radius", m_radius, TRUE)
-        SOUI_ATTRS_END()
-      protected:
-        GradientType m_Type;
-        float m_angle;        //渐变角度，必须为45的倍数，0为从左到右，90为从上到下
-        float m_centerX;      //渐变中心X的相当位置，范围为0～1
-        float m_centerY;      //渐变中心Y的相当位置，范围为0～1
-        COLORREF m_crStart;   //渐变开始点的颜色
-        COLORREF m_crCenter;  //渐变中间点的颜色，在开始与结束点之间
-        COLORREF m_crEnd;     //渐变结束点的颜色
-        SLayoutSize m_radius; //渐变的半径，只有当渐变类型为radial时才能使用
+		IBrushS * CreateBrush(IRenderTarget *pRT, int nScale,BYTE byAlpha) const;
+	public:
+		SOUI_ATTRS_BEGIN()
+			ATTR_CHAIN_CLASS(SGradientDesc)
+		SOUI_ATTRS_END()
     };
 
     class SStroke : public TObjRefImpl<SObject> {
         DEF_SOBJECT(TObjRefImpl<SObject>, L"stroke")
       public:
-        SStroke()
-            : m_color(CR_INVALID)
-            , m_style(PS_SOLID)
-        {
-        }
+        SStroke();
 
         SOUI_ATTRS_BEGIN()
             ATTR_LAYOUTSIZE(L"width", m_width, TRUE)
@@ -421,11 +453,27 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
                 ATTR_ENUM_VALUE(L"dashDot", PS_DASHDOT)
                 ATTR_ENUM_VALUE(L"dashDotDot", PS_DASHDOTDOT)
             ATTR_ENUM_END(m_style)
+
+			ATTR_ENUM_BEGIN(L"endStyle", int, TRUE)
+				ATTR_ENUM_VALUE(L"flat", PS_ENDCAP_FLAT)
+				ATTR_ENUM_VALUE(L"round", PS_ENDCAP_ROUND)
+				ATTR_ENUM_VALUE(L"square", PS_ENDCAP_SQUARE)
+			ATTR_ENUM_END(m_endStyle)
+			ATTR_ENUM_BEGIN(L"joinStyle", int, TRUE)
+				ATTR_ENUM_VALUE(L"round", PS_JOIN_ROUND)
+				ATTR_ENUM_VALUE(L"bevel", PS_JOIN_BEVEL)
+				ATTR_ENUM_VALUE(L"miter", PS_JOIN_MITER)
+			ATTR_ENUM_END(m_joinStyle)
         SOUI_ATTRS_END()
       public:
         SLayoutSize m_width; //描边的宽度
         COLORREF m_color;    //描边的颜色
+
+		int GetStyle() const;
+	private:
         int m_style;         //线型
+		int m_endStyle;
+		int m_joinStyle;
     };
 
     class SCornerSize : public TObjRefImpl<SObject> {
@@ -442,12 +490,34 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
 
         POINT GetConner(int nScale) const
         {
-            POINT pt = { m_radiusX.toPixelSize(nScale), m_radiusY.toPixelSize(nScale) };
-            return pt;
+            return CPoint(m_radiusX.toPixelSize(nScale), m_radiusY.toPixelSize(nScale) );
         }
 
         SLayoutSize m_radiusX, m_radiusY;
     };
+
+	class SRatioCornerSize : public TObjRefImpl<SObject> {
+		DEF_SOBJECT(TObjRefImpl<SObject>, L"ratio_corners")
+
+	public:
+		SRatioCornerSize(){
+			m_radius.fX = m_radius.fY = 0.0f;
+		}
+		HRESULT OnAttrRadius(const SStringW strValue, BOOL bLoading);
+
+		SOUI_ATTRS_BEGIN()
+			ATTR_CUSTOM(L"radius", OnAttrRadius)
+			ATTR_FLOAT(L"radiusX", m_radius.fX, TRUE)
+			ATTR_FLOAT(L"radiusY", m_radius.fY, TRUE)
+		SOUI_ATTRS_END()
+
+		POINT GetConner(const CRect& rc) const
+		{
+			return CPoint((int)(rc.Width()/2*m_radius.fX),(int)(rc.Height()/2*m_radius.fY));
+		}
+
+		SPoint m_radius;//range from [0,1]
+	};
 
     class SShapeSize : public TObjRefImpl<SObject> {
         DEF_SOBJECT(TObjRefImpl<SObject>, L"size")
@@ -499,14 +569,17 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
 
     void _Scale(ISkinObj *pObj, int nScale) override;
+	POINT GetCornerSize(const CRect & rc) const;
 
     Shape m_shape;
 
-    COLORREF m_crSolid;
+	SAutoRefPtr<SShapeSolid> m_solid;
+	SAutoRefPtr<SShapeBitmap> m_bitmap;
+	SAutoRefPtr<SGradientBrush> m_gradient;
     SAutoRefPtr<SShapeSize> m_shapeSize;
     SAutoRefPtr<SCornerSize> m_cornerSize;
+	SAutoRefPtr<SRatioCornerSize> m_ratioCornerSize;
     SAutoRefPtr<SStroke> m_stroke;
-    SAutoRefPtr<SGradient> m_gradient;
     SAutoRefPtr<SShapeRing> m_ringParam;
 };
 

@@ -115,10 +115,10 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
             ii.pItem->Destroy();
         }
         m_lstItems.RemoveAll();
-		m_pHoverItem = NULL;
-		m_itemCapture = NULL;
-		m_iSelItem = -1;
-		m_iFirstVisible = -1;
+        m_pHoverItem = NULL;
+        m_itemCapture = NULL;
+        m_iSelItem = -1;
+        m_iFirstVisible = -1;
     }
 
     m_adapter = adapter;
@@ -672,8 +672,8 @@ void SMCListView::UpdateVisibleItems()
 
             if (!m_lvItemLocator->IsFixHeight())
             { //计算出列表行高度
-                SIZE szView ;
-				m_adapter->getViewDesiredSize(&szView,iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
+                SIZE szView;
+                m_adapter->getViewDesiredSize(&szView, iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
                 m_lvItemLocator->SetItemHeight(iNewLastVisible, szView.cy);
                 rcItem.bottom = szView.cy;
                 ii.pItem->Move(rcItem);
@@ -740,9 +740,11 @@ void SMCListView::UpdateVisibleItems()
     { // update scroll range
         UpdateScrollBar();
         UpdateVisibleItems(); //根据新的滚动条状态重新记录显示列表项
-	}else{
-		InvalidateRect(NULL);
-	}
+    }
+    else
+    {
+        InvalidateRect(NULL);
+    }
 }
 
 void SMCListView::UpdateVisibleItem(int iItem)
@@ -1360,16 +1362,17 @@ IHeaderCtrl *SMCListView::GetIHeaderCtrl() const
     return GetHeaderCtrl();
 }
 
-void SMCListView::GetDesiredSize(THIS_ SIZE *psz,int nParentWid, int nParentHei)
+void SMCListView::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei)
 {
-	__baseCls::GetDesiredSize(psz,nParentWid,nParentHei);
-	ILayoutParam *pLayoutParam = GetLayoutParam();
-	if(pLayoutParam->IsWrapContent(Vert) && m_lvItemLocator && m_lvItemLocator->IsFixHeight()){
-		CRect rcPadding = GetStyle().GetPadding();
-		psz->cy = m_lvItemLocator->GetTotalHeight() + rcPadding.top + rcPadding.bottom;
-		if(nParentHei>0 && psz->cy>nParentHei)
-			psz->cy = nParentHei;
-	}
+    __baseCls::GetDesiredSize(psz, nParentWid, nParentHei);
+    ILayoutParam *pLayoutParam = GetLayoutParam();
+    if (pLayoutParam->IsWrapContent(Vert) && m_lvItemLocator && m_lvItemLocator->IsFixHeight())
+    {
+        CRect rcPadding = GetStyle().GetPadding();
+        psz->cy = m_lvItemLocator->GetTotalHeight() + rcPadding.top + rcPadding.bottom;
+        if (nParentHei > 0 && psz->cy > nParentHei)
+            psz->cy = nParentHei;
+    }
 }
 
 SNSEND

@@ -101,12 +101,12 @@ DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
      */
     STDMETHOD_(LPARAM, GetItemData)(CTHIS) SCONST PURE;
 
-	/**
-	 * @brief 将panel的坐标转换为host坐标
+    /**
+     * @brief 将panel的坐标转换为host坐标
      * @param[in,out] POINT *pt 窗口坐标
      * @return void
-	*/
-	STDMETHOD_(void,PtToHost)(THIS_ POINT *pt) SCONST PURE;
+     */
+    STDMETHOD_(void, PtToHost)(THIS_ POINT * pt) SCONST PURE;
 };
 
 #undef INTERFACE
@@ -170,7 +170,7 @@ DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F90
      * @brief 将panel的坐标转换为host坐标
      * @param[in,out] POINT *pt 窗口坐标
      * @return void
-    */
+     */
     STDMETHOD_(void, PtToHost)(THIS_ POINT * pt) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
 
@@ -727,8 +727,8 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
     STDMETHOD_(int, InsertItem)
     (THIS_ int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=FALSE*/, float fWeight /*=0.0f*/) PURE;
 
-	STDMETHOD_(int, InsertItemA)
-		(THIS_ int iItem, LPCSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=FALSE*/, float fWeight /*=0.0f*/) PURE;
+    STDMETHOD_(int, InsertItemA)
+    (THIS_ int iItem, LPCSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=FALSE*/, float fWeight /*=0.0f*/) PURE;
 
     /**
      * SHeaderCtrl::GetItem
@@ -826,20 +826,20 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
     /**
      * @brief    获取表头项
      * @param    int iOrder  -- show order
-	 * @return   int item index
+     * @return   int item index
      *
      * Describe  获取表头项得位置
      */
-	STDMETHOD_(int,GetOriItemIndex)(CTHIS_ int iOrder) SCONST PURE;
+    STDMETHOD_(int, GetOriItemIndex)(CTHIS_ int iOrder) SCONST PURE;
 
-	/**
+    /**
      * @brief    获取表头项得位置
      * @param    int iItem  --  索引
-	 * @param    LPRECT prc  --  表头项得位置
+     * @param    LPRECT prc  --  表头项得位置
      *
      * Describe  获取表头项得位置
      */
-	STDMETHOD_(void, GetItemRect)(CTHIS_ int iItem,LPRECT prc) SCONST PURE;
+    STDMETHOD_(void, GetItemRect)(CTHIS_ int iItem, LPRECT prc) SCONST PURE;
 };
 
 #undef INTERFACE
@@ -1790,9 +1790,9 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
      */
     STDMETHOD_(int, FindString)(CTHIS_ int iFindAfter, LPCTSTR pszText) SCONST PURE;
 
-	STDMETHOD_(BOOL, SetItemImage)(THIS_ int nIndex,int iImage) PURE;
+    STDMETHOD_(BOOL, SetItemImage)(THIS_ int nIndex, int iImage) PURE;
 
-	STDMETHOD_(int, GetItemImage)(THIS_ int nIndex) PURE;
+    STDMETHOD_(int, GetItemImage)(THIS_ int nIndex) PURE;
 };
 
 #undef INTERFACE
@@ -1861,7 +1861,7 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
      * @remark bRawText为TRUE时输出未翻译的文本
      */
     STDMETHOD_(BOOL, GetItemText)(CTHIS_ int iItem, BOOL bRawText, IStringT *str) SCONST PURE;
-	STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ int iItem, BOOL bRawText, IStringA *str) SCONST PURE;
+    STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ int iItem, BOOL bRawText, IStringA *str) SCONST PURE;
 
     /**
      * FindString
@@ -1873,10 +1873,10 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
      */
     STDMETHOD_(int, FindString)
     (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
-	STDMETHOD_(int, FindStringA)
-		(THIS_ LPCSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+    STDMETHOD_(int, FindStringA)
+    (THIS_ LPCSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
 
-	//////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::DropDown
      * @brief    下拉事件
@@ -1976,7 +1976,7 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
      */
     STDMETHOD_(BOOL, GetItemText)(CTHIS_ int iItem, BOOL bRawText, IStringT *str) SCONST PURE;
 
-	STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ int iItem, BOOL bRawText, IStringA *str) SCONST PURE;
+    STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ int iItem, BOOL bRawText, IStringA *str) SCONST PURE;
 
     /**
      * FindString
@@ -1988,8 +1988,8 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
      */
     STDMETHOD_(int, FindString)
     (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
-	STDMETHOD_(int, FindStringA)
-		(THIS_ LPCSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+    STDMETHOD_(int, FindStringA)
+    (THIS_ LPCSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
 
     /**
      * SComboBoxBase::DropDown
@@ -2053,7 +2053,7 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
      * Describe  插入新项
      */
     STDMETHOD_(int, InsertItem)(THIS_ int iPos, LPCTSTR pszText, int iIcon, LPARAM lParam) PURE;
-	STDMETHOD_(int, InsertItemA)(THIS_ int iPos, LPCSTR pszText, int iIcon, LPARAM lParam) PURE;
+    STDMETHOD_(int, InsertItemA)(THIS_ int iPos, LPCSTR pszText, int iIcon, LPARAM lParam) PURE;
     /**
      * SComboBox::DeleteString
      * @brief    删除某一项
@@ -2402,8 +2402,8 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A"
     STDMETHOD_(HSTREEITEM, InsertItem)
     (THIS_ LPCTSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam, HSTREEITEM hParent DEF_VAL(STVI_ROOT), HSTREEITEM hInsertAfter DEF_VAL(STVI_LAST)) PURE;
 
-	STDMETHOD_(HSTREEITEM, InsertItemA)
-		(THIS_ LPCSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam, HSTREEITEM hParent DEF_VAL(STVI_ROOT), HSTREEITEM hInsertAfter DEF_VAL(STVI_LAST)) PURE;
+    STDMETHOD_(HSTREEITEM, InsertItemA)
+    (THIS_ LPCSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam, HSTREEITEM hParent DEF_VAL(STVI_ROOT), HSTREEITEM hInsertAfter DEF_VAL(STVI_LAST)) PURE;
 
     /**
      * @brief 删除一个HSTREEITEM
@@ -2494,7 +2494,7 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A"
      * @remark 不支持翻译
      */
     STDMETHOD_(BOOL, GetItemText)(CTHIS_ HSTREEITEM hItem, IStringT * strText) SCONST PURE;
-    STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ HSTREEITEM hItem, IStringA* strText) SCONST PURE;
+    STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ HSTREEITEM hItem, IStringA * strText) SCONST PURE;
 
     /**
      * @brief 设置文本数据
@@ -2744,7 +2744,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
      * @return TRUE-启用
      */
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
-	//////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
     /**
      * IRichEdit::SaveRtf
@@ -2948,14 +2948,14 @@ DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
 
     //////////////////////////////////////////////////////////////////////////
 
-	/**
+    /**
      * GetTitle
      * @brief    获取标题
      * @return   LPCTSTR --- 标题
      *
      * Describe  获取标题
      */
-    STDMETHOD_(LPCTSTR,GetTitle)(CTHIS) SCONST PURE;
+    STDMETHOD_(LPCTSTR, GetTitle)(CTHIS) SCONST PURE;
 
     /**
      * SetTitle
@@ -2964,22 +2964,22 @@ DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
      *
      * Describe  设置标题
      */
-    STDMETHOD_(void,SetTitle)(THIS_ LPCTSTR lpszTitle) PURE;
+    STDMETHOD_(void, SetTitle)(THIS_ LPCTSTR lpszTitle) PURE;
 
     /**
      * GetIconIndex
      * @brief    获取图标索引
      * @return   int, 图标索引
      */
-    STDMETHOD_(int,GetIconIndex)(CTHIS) SCONST PURE;
+    STDMETHOD_(int, GetIconIndex)(CTHIS) SCONST PURE;
 
     /**
      * SetIconIndex
      * @brief    设置图标索引
-	 * @param    int iIcon -- 图标索引
+     * @param    int iIcon -- 图标索引
      * @return   void
      */
-    STDMETHOD_(void,SetIconIndex)(THIS_ int iIcon) PURE;
+    STDMETHOD_(void, SetIconIndex)(THIS_ int iIcon) PURE;
 };
 
 #undef INTERFACE
@@ -3107,8 +3107,9 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
 
 #undef INTERFACE
 #define INTERFACE IEdit
-DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560"){
-	/**
+DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560")
+{
+    /**
      * @brief 增加引用计数
      * @return 新引用计数
      */
@@ -3137,18 +3138,18 @@ DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560"){
 
     /**
      * @brief 获取提示字符串
-	 * @param[out] IStringT *pStr--提示字符串
+     * @param[out] IStringT *pStr--提示字符串
      * @return void
-	 * @remark 设置使用SetAttribute
+     * @remark 设置使用SetAttribute
      */
-	STDMETHOD_(void,GetCueText)(CTHIS_ IStringT *pStr) SCONST PURE;
+    STDMETHOD_(void, GetCueText)(CTHIS_ IStringT * pStr) SCONST PURE;
 
     /**
      * @brief 获取提示字符串颜色
      * @return COLORREF--提示字符串颜色
-	 * @remark 设置使用SetAttribute
+     * @remark 设置使用SetAttribute
      */
-	STDMETHOD_(COLORREF,GetCueColor)(CTHIS) SCONST PURE;
+    STDMETHOD_(COLORREF, GetCueColor)(CTHIS) SCONST PURE;
 };
 
 #undef INTERFACE
@@ -3249,7 +3250,7 @@ DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
 
     //////////////////////////////////////////////////////////////////////////
 
-	/**
+    /**
      * @brief    SetIcon
      * @param    HICON hIcon -- 图标资源句柄
      * @return   void
@@ -3258,7 +3259,6 @@ DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
      */
     STDMETHOD_(void, SetIcon)(THIS_ HICON hIcon) PURE;
 };
-
 
 #undef INTERFACE
 #define INTERFACE IRealWnd
@@ -3292,17 +3292,17 @@ DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
 
     //////////////////////////////////////////////////////////////////////////
 
-    STDMETHOD_(const IStringT*, GetRealClassName)(CTHIS) SCONST PURE;
+    STDMETHOD_(const IStringT *, GetRealClassName)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(const IStringT*, GetRealWindowName)(CTHIS) SCONST PURE;
+    STDMETHOD_(const IStringT *, GetRealWindowName)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(DWORD, GetRealStyle)(CTHIS) SCONST PURE;
+    STDMETHOD_(DWORD, GetRealStyle)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(DWORD, GetRealStyleEx)(CTHIS) SCONST PURE;
+    STDMETHOD_(DWORD, GetRealStyleEx)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(IXmlNode*, GetRealParam)(CTHIS) PURE;
+    STDMETHOD_(IXmlNode *, GetRealParam)(CTHIS) PURE;
 
-	/**
+    /**
      * SRealWnd::GetRealHwnd
      * @brief    获取窗口句柄
      * @param    BOOL bAutoCreate -- 自动创建
@@ -3310,8 +3310,7 @@ DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
      *
      * Describe  获取窗口句柄
      */
-	STDMETHOD_(HWND, GetRealHwnd)(THIS_ BOOL bAutoCreate DEF_VAL(TRUE)) PURE;
-
+    STDMETHOD_(HWND, GetRealHwnd)(THIS_ BOOL bAutoCreate DEF_VAL(TRUE)) PURE;
 
     /**
      * SRealWnd::SetData
@@ -3320,7 +3319,7 @@ DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
      *
      * Describe  获取附加数据
      */
-    STDMETHOD_(void,SetData)(THIS_ LPVOID lpData) PURE;
+    STDMETHOD_(void, SetData)(THIS_ LPVOID lpData) PURE;
 
     /**
      * SRealWnd::GetData
@@ -3329,15 +3328,16 @@ DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
      *
      * Describe  获取附加数据
      */
-    STDMETHOD_(LPVOID,GetData)(THIS) PURE;
+    STDMETHOD_(LPVOID, GetData)(THIS) PURE;
 };
 
-typedef enum _StackViewAniStyle{
-	kAniNone=0,
-	kFadeInOut,
-	kMoveInOut,
-	kPushInOut
-}StackViewAniStyle;
+typedef enum _StackViewAniStyle
+{
+    kAniNone = 0,
+    kFadeInOut,
+    kMoveInOut,
+    kPushInOut
+} StackViewAniStyle;
 
 #undef INTERFACE
 #define INTERFACE IStackView
@@ -3371,11 +3371,11 @@ DECLARE_INTERFACE_IID_(IStackView, ICtrl, "1A7172D8-F45B-45fe-A73E-2B7F07E7EB70"
 
     //////////////////////////////////////////////////////////////////////////
 
-	STDMETHOD_(BOOL,SelectPage)(THIS_ int iView,BOOL enableAnimate DEF_VAL(TRUE)) PURE;
-	STDMETHOD_(void,SetAniStyle)(THIS_ StackViewAniStyle aniStyle) PURE;
-	STDMETHOD_(void,SetAniDir)(THIS_ BOOL bVert) PURE;	
-	STDMETHOD_(IWindow*,GetSelPage)(CTHIS) SCONST PURE;
-	STDMETHOD_(IWindow*,GetPage)(CTHIS_ int iPage) SCONST PURE;
+    STDMETHOD_(BOOL, SelectPage)(THIS_ int iView, BOOL enableAnimate DEF_VAL(TRUE)) PURE;
+    STDMETHOD_(void, SetAniStyle)(THIS_ StackViewAniStyle aniStyle) PURE;
+    STDMETHOD_(void, SetAniDir)(THIS_ BOOL bVert) PURE;
+    STDMETHOD_(IWindow *, GetSelPage)(CTHIS) SCONST PURE;
+    STDMETHOD_(IWindow *, GetPage)(CTHIS_ int iPage) SCONST PURE;
 };
 
 SNSEND

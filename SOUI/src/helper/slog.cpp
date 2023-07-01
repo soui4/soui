@@ -22,8 +22,8 @@ void Log::DefCallback(const char *tag, const char *pLogStr, int level, const cha
     {
         const int kMaxLog = Log::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);
-		DWORD tid = GetCurrentThreadId();
-        int nLen = _snprintf_s(logbuf2, kMaxLog, _TRUNCATE, "tid=%u,%s,%s %s %s:%d\n",tid, tag, pLogStr, fun, file, line);
+        DWORD tid = GetCurrentThreadId();
+        int nLen = _snprintf_s(logbuf2, kMaxLog, _TRUNCATE, "tid=%u,%s,%s %s %s:%d\n", tid, tag, pLogStr, fun, file, line);
         logbuf2[nLen] = 0;
         OutputDebugStringA(logbuf2);
         free(logbuf2);
@@ -99,7 +99,7 @@ SLogStream::SLogStream()
 {
 }
 
-SLogStream &SLogStream::writeWString(const wchar_t *t,int nLen)
+SLogStream &SLogStream::writeWString(const wchar_t *t, int nLen)
 {
 #if defined(WIN32) || defined(_WIN64)
     DWORD dwLen = WideCharToMultiByte(CP_ACP, 0, t, nLen, NULL, 0, NULL, NULL);
@@ -287,7 +287,7 @@ SLogStream &SLogStream::operator<<(char t)
 
 SLogStream &SLogStream::operator<<(wchar_t t)
 {
-	return writeWString(&t, 1);
+    return writeWString(&t, 1);
 }
 
 SLogStream &SLogStream::operator<<(bool t)

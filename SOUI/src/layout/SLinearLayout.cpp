@@ -208,8 +208,8 @@ SLinearLayout::~SLinearLayout(void)
 
 void SLinearLayout::LayoutChildren(IWindow *pParent)
 {
-    CRect rcParent ;
-	pParent->GetChildrenLayoutRect(&rcParent);
+    CRect rcParent;
+    pParent->GetChildrenLayoutRect(&rcParent);
 
     SIZE *pSize = new SIZE[pParent->GetChildrenCount()];
     IWindow **pChilds = new IWindow *[pParent->GetChildrenCount()];
@@ -256,8 +256,8 @@ void SLinearLayout::LayoutChildren(IWindow *pParent)
 
             if (szChild.cx == SIZE_WRAP_CONTENT || szChild.cy == SIZE_WRAP_CONTENT)
             {
-                CSize szCalc ;
-				pChild->GetDesiredSize(&szCalc,szChild.cx, szChild.cy);
+                CSize szCalc;
+                pChild->GetDesiredSize(&szCalc, szChild.cx, szChild.cy);
                 if (szChild.cx == SIZE_WRAP_CONTENT)
                 {
                     szChild.cx = szCalc.cx;
@@ -316,8 +316,8 @@ void SLinearLayout::LayoutChildren(IWindow *pParent)
                     else
                         nWid = SIZE_WRAP_CONTENT;
 
-                    CSize szCalc ;
-					pChild->GetDesiredSize(&szCalc,nWid, nHei);
+                    CSize szCalc;
+                    pChild->GetDesiredSize(&szCalc, nWid, nHei);
                     if (orienOther == Vert)
                     {
                         szCalc.cy += pLinearLayoutParam->extend_top.toPixelSize(nScale) + pLinearLayoutParam->extend_bottom.toPixelSize(nScale);
@@ -430,8 +430,8 @@ SIZE SLinearLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHei
             {
                 int nWid = szChild.cx, nHei = szChild.cy;
 
-                CSize szCalc ;
-				((IWindow *)pChild)->GetDesiredSize(&szCalc,nWid, nHei);
+                CSize szCalc;
+                ((IWindow *)pChild)->GetDesiredSize(&szCalc, nWid, nHei);
                 if (szChild.cx == SIZE_WRAP_CONTENT)
                 {
                     szChild.cx = szCalc.cx;
@@ -496,8 +496,8 @@ SIZE SLinearLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHei
                         else
                             nWid = SIZE_WRAP_CONTENT;
 
-                        CSize szCalc ;
-						pChild->GetDesiredSize(&szCalc,nWid, nHei);
+                        CSize szCalc;
+                        pChild->GetDesiredSize(&szCalc, nWid, nHei);
                         if (orienOther == Vert)
                         {
                             szCalc.cy += pLinearLayoutParam->extend_top.toPixelSize(nScale) + pLinearLayoutParam->extend_bottom.toPixelSize(nScale);

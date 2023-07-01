@@ -71,7 +71,7 @@ int SSkinPool::LoadSkins(SXmlNode xmlNode)
         xmlSkin = xmlSkin.next_sibling();
     }
 
-	GETUIDEF->PopSkinPool(this);
+    GETUIDEF->PopSkinPool(this);
 
     return nLoaded;
 }
@@ -126,6 +126,5 @@ void SSkinPool::OnKeyRemoved(const SSkinPtr &obj)
 {
     obj->Release();
 }
-
 
 SNSEND

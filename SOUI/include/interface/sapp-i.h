@@ -22,23 +22,23 @@ SNSBEGIN
 
 typedef enum _SingletonType
 {
-	SINGLETON_UIDEF = 0,
-	SINGLETON_SWNDMGR,
-	SINGLETON_TIMERGENERATOR,
-	SINGLETON_FONTPOOL,
-	SINGLETON_WINDOWFINDER,
-	SINGLETON_TEXTSERVICEHELPER,
-	SINGLETON_RICHEDITMENUDEF,
-	SINGLETON_SIMPLEWNDHELPER,
-	SINGLETON_HOSTMGR,
-	SINGLETON_NOTIFYCENTER,
+    SINGLETON_UIDEF = 0,
+    SINGLETON_SWNDMGR,
+    SINGLETON_TIMERGENERATOR,
+    SINGLETON_FONTPOOL,
+    SINGLETON_WINDOWFINDER,
+    SINGLETON_TEXTSERVICEHELPER,
+    SINGLETON_RICHEDITMENUDEF,
+    SINGLETON_SIMPLEWNDHELPER,
+    SINGLETON_HOSTMGR,
+    SINGLETON_NOTIFYCENTER,
 
-	SINGLETON_COUNT,
-}SingletonType;
+    SINGLETON_COUNT,
+} SingletonType;
 
 typedef struct IApplication IApplication;
-typedef IObject *(* FunCreateObject)(const IApplication * app,LPCWSTR pszName,SObjectType nType);
-typedef ITaskLoop * (*FunCrateTaskLoop)();
+typedef IObject *(*FunCreateObject)(const IApplication *app, LPCWSTR pszName, SObjectType nType);
+typedef ITaskLoop *(*FunCrateTaskLoop)();
 
 #undef INTERFACE
 #define INTERFACE IApplication
@@ -149,13 +149,13 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      */
     STDMETHOD_(int, Run)(THIS_ HWND hMainWnd) PURE;
 
-	/**
+    /**
      * @brief 退出消息循环
      * @return void
-	 * @param int nCode -- thread quit code
-	 * @remark 调用PostQuitMessage
+     * @param int nCode -- thread quit code
+     * @remark 调用PostQuitMessage
      */
-	STDMETHOD_(void, Quit)(THIS_ int nCode) PURE;
+    STDMETHOD_(void, Quit)(THIS_ int nCode) PURE;
     /**
      * @brief 获取程序主窗口
      * @return HWND--在Run方法中设定的窗口
@@ -165,11 +165,11 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
     /**
      * @brief 将当前UI线程的msgLoop保存到SApp中
      * @param IMessageLoop *pMsgLoop -- msgLoop
-	 * @param BOOL bReplace -- 替换标志
+     * @param BOOL bReplace -- 替换标志
      * @return BOOL TRUE-成功
      * @remark 在多UI线程程序中，需要将工作线程的msgLoop交给SApp管理
      */
-    STDMETHOD_(BOOL, AddMsgLoop)(THIS_ IMessageLoop * pMsgLoop,BOOL bReplace DEF_VAL(FALSE)) PURE;
+    STDMETHOD_(BOOL, AddMsgLoop)(THIS_ IMessageLoop * pMsgLoop, BOOL bReplace DEF_VAL(FALSE)) PURE;
 
     /**
      * @brief 从SApp中删除当前线程的msgLoop
@@ -243,7 +243,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IXmlDoc *, LoadXmlDocment)(THIS_ LPCTSTR strResId) PURE;
-	STDMETHOD_(IXmlDoc *, LoadXmlDocmentA)(THIS_ LPCSTR strResId) PURE;
+    STDMETHOD_(IXmlDoc *, LoadXmlDocmentA)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 从资源加载动画资源
@@ -252,126 +252,126 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IAnimation *, LoadAnimation)(THIS_ LPCTSTR strResId) PURE;
-	STDMETHOD_(IAnimation *, LoadAnimationA)(THIS_ LPCSTR strResId) PURE;
+    STDMETHOD_(IAnimation *, LoadAnimationA)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 从资源加载数值动画资源
-	 * @param strResId LPCTSTR--动画资源ID
+     * @param strResId LPCTSTR--动画资源ID
      * @return IValueAnimator* 数值动画对象
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) PURE;
-	STDMETHOD_(IValueAnimator *, LoadValueAnimatorA)(THIS_ LPCSTR strResId) PURE;
+    STDMETHOD_(IValueAnimator *, LoadValueAnimatorA)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 从资源加载图片
-	 * @param strResId LPCTSTR--图片资源ID
+     * @param strResId LPCTSTR--图片资源ID
      * @return IBitmapS* 图片对象
      * @remark 使用完成后调用Rlease释放
      */
-	STDMETHOD_(IBitmapS *,LoadImage)(THIS_ LPCTSTR strResId) PURE;
-	STDMETHOD_(IBitmapS *,LoadImageA)(THIS_ LPCSTR strResId) PURE;
+    STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR strResId) PURE;
+    STDMETHOD_(IBitmapS *, LoadImageA)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 从资源加载翻译包
-	 * @param strResId LPCTSTR--翻译包资源ID
+     * @param strResId LPCTSTR--翻译包资源ID
      * @return ITranslator* 翻译包对象
      * @remark 使用完成后调用Rlease释放
      */
-	STDMETHOD_(ITranslator *,LoadTranslator)(THIS_ LPCTSTR strResId) PURE;
-	STDMETHOD_(ITranslator *,LoadTranslatorA)(THIS_ LPCSTR strResId) PURE;
+    STDMETHOD_(ITranslator *, LoadTranslator)(THIS_ LPCTSTR strResId) PURE;
+    STDMETHOD_(ITranslator *, LoadTranslatorA)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 使用翻译包
-	 * @param ITranslator * trModule--翻译包
+     * @param ITranslator * trModule--翻译包
      * @return BOOL, TRUE--成功
      */
-	STDMETHOD_(BOOL,InstallTranslator)(THIS_ ITranslator * trModule) PURE;
+    STDMETHOD_(BOOL, InstallTranslator)(THIS_ ITranslator * trModule) PURE;
 
-	/**
+    /**
      * @brief 卸载翻译包
-	 * @param REFGUID langId--翻译包ID
+     * @param REFGUID langId--翻译包ID
      * @return BOOL, TRUE--成功
      */
-	STDMETHOD_(BOOL,UnnstallTranslator)(THIS_  REFGUID langId) PURE;
+    STDMETHOD_(BOOL, UnnstallTranslator)(THIS_ REFGUID langId) PURE;
 
-	/**
+    /**
      * @brief 启用NotifyCenter
-	 * @param BOOL bEnable -- 是否启用
-	 * @param int interval -- 处理事件时间间隔
+     * @param BOOL bEnable -- 是否启用
+     * @param int interval -- 处理事件时间间隔
      * @return void
      */
-	STDMETHOD_(void,EnableNotifyCenter)(THIS_ BOOL bEnable,int interval DEF_VAL(20)) PURE;
+    STDMETHOD_(void, EnableNotifyCenter)(THIS_ BOOL bEnable, int interval DEF_VAL(20)) PURE;
 
-	/**
+    /**
      * @brief 获取SApp内部定义的几个单例对象
-	 * @param SingletonType type -- 内部单例类型
+     * @param SingletonType type -- 内部单例类型
      * @return void * -- 单例类型指针
-	 * @remark 目前主要通过它获取INotifyCenter*,以便C代码使用
+     * @remark 目前主要通过它获取INotifyCenter*,以便C代码使用
      */
-	STDMETHOD_(void*,GetInnerSingleton)(THIS_ SingletonType type) PURE;
+    STDMETHOD_(void *, GetInnerSingleton)(THIS_ SingletonType type) PURE;
 
-	/**
+    /**
      * @brief 设置自定义的CreateObject回调方法
-	 * @param LPCWSTR pszName -- 类型在XML中的名字
-	 * @param SObjectType nType -- 类型ID
+     * @param LPCWSTR pszName -- 类型在XML中的名字
+     * @param SObjectType nType -- 类型ID
      * @return IObjRef * -- 创建的类型
      */
-	STDMETHOD_(IObject *,CreateObject)(CTHIS_ LPCWSTR pszName,SObjectType nType) SCONST PURE;
+    STDMETHOD_(IObject *, CreateObject)(CTHIS_ LPCWSTR pszName, SObjectType nType) SCONST PURE;
 
-	/**
+    /**
      * @brief 设置CreateObject的回调
-	 * @param FunCreateObject cbCreateObj -- CreateObject的回调函数
+     * @param FunCreateObject cbCreateObj -- CreateObject的回调函数
      * @return void
      */
-	STDMETHOD_(void,SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) PURE;
+    STDMETHOD_(void, SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) PURE;
 
-	/**
+    /**
      * @brief 注册扩展对象
-	 * @param const IObjectFactory *objFac -- 对象类厂
-	 * @param BOOL bReplace -- 替换已有类厂标志
+     * @param const IObjectFactory *objFac -- 对象类厂
+     * @param BOOL bReplace -- 替换已有类厂标志
      * @return BOOL, TRUE--成功
      */
-	STDMETHOD_(BOOL,RegisterObjFactory)(THIS_ const IObjectFactory *objFac,BOOL bReplace DEF_VAL(FALSE)) PURE;
+    STDMETHOD_(BOOL, RegisterObjFactory)(THIS_ const IObjectFactory *objFac, BOOL bReplace DEF_VAL(FALSE)) PURE;
 
-	/**
+    /**
      * @brief 反注册扩展对象
-	 * @param const IObjectFactory *objFac -- 对象类厂
+     * @param const IObjectFactory *objFac -- 对象类厂
      * @return BOOL, TRUE--成功
      */
-	STDMETHOD_(BOOL,UnregisterObjFactory)(THIS_ const IObjectFactory *objFac) PURE;
+    STDMETHOD_(BOOL, UnregisterObjFactory)(THIS_ const IObjectFactory *objFac) PURE;
 
-	/**
+    /**
      * @brief 设置默认字体
-	 * @param LPCWSTR pszFontInfo -- 字体描述, 参考fontpool
+     * @param LPCWSTR pszFontInfo -- 字体描述, 参考fontpool
      * @return void
      */
-	STDMETHOD_(void,SetDefaultFontInfo)(THIS_ LPCWSTR pszFontInfo) PURE;
+    STDMETHOD_(void, SetDefaultFontInfo)(THIS_ LPCWSTR pszFontInfo) PURE;
 
-	/**
+    /**
      * @brief 创建TaskLoop对象
-	 * @param int nCount -- taskloop对象数量
-	 * @param Priority priority -- taskloop的线程优先级
-	 * @param BOOL bAutoStart -- 自动启动标志
+     * @param int nCount -- taskloop对象数量
+     * @param Priority priority -- taskloop的线程优先级
+     * @param BOOL bAutoStart -- 自动启动标志
      * @return BOOL, TRUE--成功
      */
-	STDMETHOD_(BOOL,CreateTaskLoop)(THIS_ int nCount,Priority priority,BOOL bAutoStart DEF_VAL(TRUE)) PURE;
+    STDMETHOD_(BOOL, CreateTaskLoop)(THIS_ int nCount, Priority priority, BOOL bAutoStart DEF_VAL(TRUE)) PURE;
 
-	/**
+    /**
      * @brief 获取TaskLoop对象
-	 * @param int iTaskLoop -- taskloop索引
+     * @param int iTaskLoop -- taskloop索引
      * @return ITaskLoop * -- taskloop接口,失败返回NULL
      */
-	STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) PURE;
+    STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) PURE;
 
-	/**
+    /**
      * @brief 设置创建TaskLoop对象的回调接口
-	 * @param FunCrateTaskLoop cbCreateTaskLoop -- 创建TaskLoop对象的回调接口
+     * @param FunCrateTaskLoop cbCreateTaskLoop -- 创建TaskLoop对象的回调接口
      * @return void
      */
-	STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) PURE;
+    STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) PURE;
 
-	 /**
+    /**
      * CreateScriptModule
      * @brief    创建脚本模块对象
      * @param [out] IScriptModule **ppScriptModule -- 脚本模块对象
@@ -379,8 +379,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      *
      * Describe
      */
-    STDMETHOD_(HRESULT,CreateScriptModule)(THIS_ IScriptModule **ppScriptModule) PURE;
-
+    STDMETHOD_(HRESULT, CreateScriptModule)(THIS_ IScriptModule * *ppScriptModule) PURE;
 };
 
 SNSEND

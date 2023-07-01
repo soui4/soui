@@ -11,17 +11,17 @@ SFrame::~SFrame(void)
 {
 }
 
-SWND SFrame::SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent) const 
+SWND SFrame::SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent) const
 {
-	SWND ret = __baseCls::SwndFromPoint(pt,bIncludeMsgTransparent);
-	if(ret == m_swnd)
-		ret = NULL;
-	return ret;
+    SWND ret = __baseCls::SwndFromPoint(pt, bIncludeMsgTransparent);
+    if (ret == m_swnd)
+        ret = NULL;
+    return ret;
 }
 
 BOOL SFrame::IsFocusable(THIS) const
 {
-	return FALSE;
+    return FALSE;
 }
 
 SNSEND

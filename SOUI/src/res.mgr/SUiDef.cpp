@@ -27,198 +27,205 @@ static SXmlNode GetSourceXmlNode(SXmlNode nodeRoot, SXmlDoc &docInit, IResProvid
         SXmlAttr attrSrc = nodeData.attribute(L"src", false);
         if (attrSrc)
         { //优先从src属性里获取数据
-			if(SApplication::getSingletonPtr()->LoadXmlDocment(docInit,attrSrc.as_string(),pResProvider)){
-				nodeData = docInit.root().child(pszName);
-			}
+            if (SApplication::getSingletonPtr()->LoadXmlDocment(docInit, attrSrc.as_string(), pResProvider))
+            {
+                nodeData = docInit.root().child(pszName);
+            }
         }
     }
     return nodeData;
 }
 
-
 UINT SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
 {
-	UINT bRet = 0;
-	SStringTList strUiDef;
-	if (2 != ParseResID(pszUidef, strUiDef))
-	{
-		SSLOGW() << "warning!!!! Add ResProvider Error.";
-	}
+    UINT bRet = 0;
+    SStringTList strUiDef;
+    if (2 != ParseResID(pszUidef, strUiDef))
+    {
+        SSLOGW() << "warning!!!! Add ResProvider Error.";
+    }
 
-	size_t dwSize = pResProvider->GetRawBufferSize(strUiDef[0], strUiDef[1]);
-	if (dwSize == 0)
-	{
-		SSLOGW() << "warning!!!! uidef was not found in the specified resprovider";
-	}
-	else
-	{
-		SXmlDoc docInit;
-		SAutoBuf strXml;
-		strXml.Allocate(dwSize);
+    size_t dwSize = pResProvider->GetRawBufferSize(strUiDef[0], strUiDef[1]);
+    if (dwSize == 0)
+    {
+        SSLOGW() << "warning!!!! uidef was not found in the specified resprovider";
+    }
+    else
+    {
+        SXmlDoc docInit;
+        SAutoBuf strXml;
+        strXml.Allocate(dwSize);
 
-		pResProvider->GetRawBuffer(strUiDef[0], strUiDef[1], strXml, dwSize);
+        pResProvider->GetRawBuffer(strUiDef[0], strUiDef[1], strXml, dwSize);
 
-		bool bLoad = docInit.load_buffer(strXml, strXml.size(), xml_parse_default, enc_auto);
+        bool bLoad = docInit.load_buffer(strXml, strXml.size(), xml_parse_default, enc_auto);
 
-		if (!bLoad)
-		{ // load xml failed
-			SSLOGD() << "warning!!! load uidef as xml document failed";
-		}
-		else
-		{ // init named objects
-			SXmlNode root = docInit.root().child(KNodeUidef, false);
-			if (!root)
-			{
-				SSLOGD() << "warning!!! \"uidef\" element is not the root element of uidef xml";
-			}else{
-				bRet = Init(&root,TRUE,pResProvider);
-			}
-		}
-	}
-	return bRet;
+        if (!bLoad)
+        { // load xml failed
+            SSLOGD() << "warning!!! load uidef as xml document failed";
+        }
+        else
+        { // init named objects
+            SXmlNode root = docInit.root().child(KNodeUidef, false);
+            if (!root)
+            {
+                SSLOGD() << "warning!!! \"uidef\" element is not the root element of uidef xml";
+            }
+            else
+            {
+                bRet = Init(&root, TRUE, pResProvider);
+            }
+        }
+    }
+    return bRet;
 }
 
-UINT SUiDefInfo::Init(IXmlNode *pNode,BOOL bGlobalDomain,IResProvider *pResProvider)
+UINT SUiDefInfo::Init(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResProvider)
 {
-	UINT uRet = 0;
-	GETUIDEF->PushUiDefInfo(this);	//make it possible for a uidef element to ref other uidef element in the same package.
+    UINT uRet = 0;
+    GETUIDEF->PushUiDefInfo(this); // make it possible for a uidef element to ref other uidef element in the same package.
 
-	SXmlNode root(pNode);
-	if(bGlobalDomain){
-		// parse default Unit
-		SXmlNode xmlUnit;
-		xmlUnit = root.child(KNodeDefUnit);
-		if (xmlUnit)
-		{
-			SStringW strUnit = xmlUnit.attribute(L"defUnit").as_string(L"px");
-			SLayoutSize::Unit unit = SLayoutSize::unitFromString(strUnit);
-			if (unit != SLayoutSize::unknow)
-				SLayoutSize::defUnit = unit;
-		}
+    SXmlNode root(pNode);
+    if (bGlobalDomain)
+    {
+        // parse default Unit
+        SXmlNode xmlUnit;
+        xmlUnit = root.child(KNodeDefUnit);
+        if (xmlUnit)
+        {
+            SStringW strUnit = xmlUnit.attribute(L"defUnit").as_string(L"px");
+            SLayoutSize::Unit unit = SLayoutSize::unitFromString(strUnit);
+            if (unit != SLayoutSize::unknow)
+                SLayoutSize::defUnit = unit;
+        }
 
-		xmlCaret.Reset();
-		SXmlNode xmlCaretNode = root.child(KNodeCaret);
-		if (xmlCaretNode)
-			xmlCaret.root().append_copy(xmlCaretNode);
+        xmlCaret.Reset();
+        SXmlNode xmlCaretNode = root.child(KNodeCaret);
+        if (xmlCaretNode)
+            xmlCaret.root().append_copy(xmlCaretNode);
 
+        // parse default font
+        SXmlNode xmlFont;
+        xmlFont = root.child(KNodeDefFont);
+        if (xmlFont)
+        {
+            defFontInfo = xmlFont.attribute(L"value").as_string();
+        }
+        else
+        {
+            xmlFont = root.child(KNodeFont); // compatible to 4.4
+            SXmlAttr attr = xmlFont.first_attribute();
+            while (attr)
+            {
+                if (!defFontInfo.IsEmpty())
+                    defFontInfo += L",";
+                if (SStringW(attr.name()).CompareNoCase(L"face") == 0)
+                {
+                    defFontInfo += SStringW().Format(L"face:\'%s\'", attr.value());
+                }
+                else
+                    defFontInfo += SStringW().Format(L"%s:%s", attr.name(), attr.value());
+                attr = attr.next_attribute();
+            }
+        }
 
-		// parse default font
-		SXmlNode xmlFont;
-		xmlFont = root.child(KNodeDefFont);
-		if (xmlFont)
-		{
-			defFontInfo = xmlFont.attribute(L"value").as_string();
-		}else{
-			xmlFont = root.child(KNodeFont);//compatible to 4.4
-			SXmlAttr attr = xmlFont.first_attribute();
-			while(attr){
-				if(!defFontInfo.IsEmpty())
-					defFontInfo+=L",";
-				if(SStringW(attr.name()).CompareNoCase(L"face")==0){
-					defFontInfo += SStringW().Format(L"face:\'%s\'",attr.value());
-				}else
-					defFontInfo += SStringW().Format(L"%s:%s",attr.name(),attr.value());
-				attr = attr.next_attribute();
-			}
-		}
+        // load SWindow default attribute
+        SXmlDoc docData;
+        SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeObjAttr);
+        if (nodeData)
+        {
+            objDefAttr.Attach(new SObjDefAttr);
+            objDefAttr->Init(nodeData);
+            nodeData.set_userdata(1);
+        }
 
-		// load SWindow default attribute
-		SXmlDoc docData;
-		SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeObjAttr);
-		if (nodeData)
-		{
-			objDefAttr.Attach(new SObjDefAttr);
-			objDefAttr->Init(nodeData);
-			nodeData.set_userdata(1);
-		}
+        uRet |= UDI_GLOBAL;
+    }
+    // load named string
+    {
+        SXmlDoc docData;
+        SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeString);
+        if (nodeData)
+        {
+            namedString.Init(nodeData);
+            nodeData.set_userdata(1);
+            uRet |= UDI_STRING;
+        }
+    }
 
-		uRet |= UDI_GLOBAL;
-	}
-	// load named string
-	{
-		SXmlDoc docData;
-		SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeString);
-		if (nodeData)
-		{
-			namedString.Init(nodeData);
-			nodeData.set_userdata(1);
-			uRet |= UDI_STRING;
-		}
-	}
+    // load named color
+    {
+        SXmlDoc docData;
+        SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeColor);
+        if (nodeData)
+        {
+            namedColor.Init(nodeData);
+            nodeData.set_userdata(1);
+            uRet |= UDI_COLOR;
+        }
+    }
 
-	// load named color
-	{
-		SXmlDoc docData;
-		SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeColor);
-		if (nodeData)
-		{
-			namedColor.Init(nodeData);
-			nodeData.set_userdata(1);
-			uRet |= UDI_COLOR;
-		}
-	}
+    // load named dimension
+    {
+        SXmlDoc docData;
+        SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeDim);
+        if (nodeData)
+        {
+            namedDim.Init(nodeData);
+            nodeData.set_userdata(1);
+            uRet |= UDI_DIMENSION;
+        }
+    }
+    // load named font
+    {
+        SXmlDoc docData;
+        SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeFont);
+        if (nodeData)
+        {
+            namedFont.Init(nodeData);
+            nodeData.set_userdata(1);
+            uRet |= UDI_FONT;
+        }
+    }
+    // load named skin
+    {
+        SXmlDoc docData;
+        SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeSkin);
+        if (nodeData)
+        {
+            pSkinPool.Attach(new SSkinPool);
+            pSkinPool->LoadSkins(nodeData);
+            nodeData.set_userdata(1);
+            uRet |= UDI_SKIN;
+        }
+    }
+    // load named style
+    {
+        SXmlDoc docData;
+        SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeStyle);
+        if (nodeData)
+        {
+            pStylePool.Attach(new SStylePool);
+            pStylePool->Init(nodeData);
+            nodeData.set_userdata(1);
+            uRet |= UDI_STYLE;
+        }
+    }
+    // load named template
+    {
+        SXmlDoc docData;
+        SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeTemplate);
+        if (nodeData)
+        {
+            templatePool.Attach(new STemplatePool);
+            templatePool->Init(nodeData);
+            nodeData.set_userdata(1);
+            uRet |= UDI_TEMPLATE;
+        }
+    }
+    GETUIDEF->PopUiDefInfo(this);
 
-	// load named dimension
-	{
-		SXmlDoc docData;
-		SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeDim);
-		if (nodeData)
-		{
-			namedDim.Init(nodeData);
-			nodeData.set_userdata(1);
-			uRet |= UDI_DIMENSION;
-		}
-	}
-	// load named font
-	{
-		SXmlDoc docData;
-		SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeFont);
-		if (nodeData)
-		{
-			namedFont.Init(nodeData);
-			nodeData.set_userdata(1);
-			uRet |= UDI_FONT;
-		}
-	}
-	// load named skin
-	{
-		SXmlDoc docData;
-		SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeSkin);
-		if (nodeData)
-		{
-			pSkinPool.Attach(new SSkinPool);
-			pSkinPool->LoadSkins(nodeData);
-			nodeData.set_userdata(1);
-			uRet |= UDI_SKIN;
-		}
-	}
-	// load named style
-	{
-		SXmlDoc docData;
-		SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeStyle);
-		if (nodeData)
-		{
-			pStylePool.Attach(new SStylePool);
-			pStylePool->Init(nodeData);
-			nodeData.set_userdata(1);
-			uRet |= UDI_STYLE;
-		}
-	}
-	// load named template
-	{
-		SXmlDoc docData;
-		SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeTemplate);
-		if (nodeData)
-		{
-			templatePool.Attach(new STemplatePool);
-			templatePool->Init(nodeData);
-			nodeData.set_userdata(1);
-			uRet |= UDI_TEMPLATE;
-		}
-	}
-	GETUIDEF->PopUiDefInfo(this);
-
-	return uRet;
+    return uRet;
 }
 
 SSkinPool *SUiDefInfo::GetSkinPool()
@@ -244,7 +251,7 @@ SNamedDimension &SUiDefInfo::GetNamedDimension()
 
 SNamedFont &SUiDefInfo::GetNamedFont()
 {
-	return namedFont;
+    return namedFont;
 }
 
 SObjDefAttr *SUiDefInfo::GetObjDefAttr()
@@ -268,284 +275,288 @@ STemplatePool *SUiDefInfo::GetTemplatePool()
 //////////////////////////////////////////////////////////////////////////
 SUiDef::SUiDef(void)
 {
-	SAutoLock autolock(m_cs);
-	IUiDefInfo *emptyUiInfo = new SUiDefInfo();
-	SetUiDef(emptyUiInfo,false);//set empty uiinfo
-	emptyUiInfo->Release();
+    SAutoLock autolock(m_cs);
+    IUiDefInfo *emptyUiInfo = new SUiDefInfo();
+    SetUiDef(emptyUiInfo, false); // set empty uiinfo
+    emptyUiInfo->Release();
 
-	m_bulitinSkinPool.Attach(new SSkinPool);
-	m_lstSkinPools.AddTail(m_bulitinSkinPool);
-	m_bulitinSkinPool->AddRef();
+    m_bulitinSkinPool.Attach(new SSkinPool);
+    m_lstSkinPools.AddTail(m_bulitinSkinPool);
+    m_bulitinSkinPool->AddRef();
 }
 
 SUiDef::~SUiDef(void)
 {
-	SAutoLock autolock(m_cs);
-	{
-		SPOSITION pos = m_lstUiDefInfo.GetHeadPosition();
-		while (pos)
-		{
-			IObjRef *p = m_lstUiDefInfo.GetNext(pos);
-			p->Release();
-		}
-		m_lstUiDefInfo.RemoveAll();
-		m_defUiDefInfo = NULL;
-	}
-	{
-		SPOSITION pos = m_lstSkinPools.GetHeadPosition();
-		while (pos)
-		{
-			SSkinPool *p = m_lstSkinPools.GetNext(pos);
-			p->Release();
-		}
-		m_lstSkinPools.RemoveAll();
-		m_bulitinSkinPool = NULL;
-	}
+    SAutoLock autolock(m_cs);
+    {
+        SPOSITION pos = m_lstUiDefInfo.GetHeadPosition();
+        while (pos)
+        {
+            IObjRef *p = m_lstUiDefInfo.GetNext(pos);
+            p->Release();
+        }
+        m_lstUiDefInfo.RemoveAll();
+        m_defUiDefInfo = NULL;
+    }
+    {
+        SPOSITION pos = m_lstSkinPools.GetHeadPosition();
+        while (pos)
+        {
+            SSkinPool *p = m_lstSkinPools.GetNext(pos);
+            p->Release();
+        }
+        m_lstSkinPools.RemoveAll();
+        m_bulitinSkinPool = NULL;
+    }
 }
 
-
-BOOL SUiDef::InitDefUiDef(IResProvider *pResProvider, LPCTSTR pszUiDef){
-	SUiDefInfo *pRet = new SUiDefInfo();
-	UINT uRet = pRet->Init(pResProvider, pszUiDef);
-	if(uRet==0)
-	{
-		pRet->Release();
-		return FALSE;
-	}
-	SetUiDef(pRet,true);
-	pRet->Release();
-	return TRUE;
-}
-
-IUiDefInfo * SUiDef::GetUiDef()
+BOOL SUiDef::InitDefUiDef(IResProvider *pResProvider, LPCTSTR pszUiDef)
 {
-	SAutoLock autolock(m_cs);
-	return m_defUiDefInfo;
+    SUiDefInfo *pRet = new SUiDefInfo();
+    UINT uRet = pRet->Init(pResProvider, pszUiDef);
+    if (uRet == 0)
+    {
+        pRet->Release();
+        return FALSE;
+    }
+    SetUiDef(pRet, true);
+    pRet->Release();
+    return TRUE;
+}
+
+IUiDefInfo *SUiDef::GetUiDef()
+{
+    SAutoLock autolock(m_cs);
+    return m_defUiDefInfo;
 }
 
 void SUiDef::SetUiDef(IUiDefInfo *pUiDefInfo, bool bUpdateDefFont)
 {
-	SAutoLock autolock(m_cs);
-	SASSERT(pUiDefInfo);
-	if(m_defUiDefInfo){
-		SASSERT(m_lstUiDefInfo.GetHead() == m_defUiDefInfo);
-		IUiDefInfo *defUI = m_lstUiDefInfo.RemoveHead();
-		defUI->Release();
-		m_defUiDefInfo=NULL;
-	}
+    SAutoLock autolock(m_cs);
+    SASSERT(pUiDefInfo);
+    if (m_defUiDefInfo)
+    {
+        SASSERT(m_lstUiDefInfo.GetHead() == m_defUiDefInfo);
+        IUiDefInfo *defUI = m_lstUiDefInfo.RemoveHead();
+        defUI->Release();
+        m_defUiDefInfo = NULL;
+    }
     m_defUiDefInfo = pUiDefInfo;
-	//add to uidef list.
-	m_lstUiDefInfo.AddHead(pUiDefInfo);
-	pUiDefInfo->AddRef();
+    // add to uidef list.
+    m_lstUiDefInfo.AddHead(pUiDefInfo);
+    pUiDefInfo->AddRef();
 
     if (bUpdateDefFont)
         SFontPool::getSingletonPtr()->SetDefFontInfo(m_defUiDefInfo->GetDefFontInfo());
 }
 
-
 void SUiDef::PushUiDefInfo(IUiDefInfo *pUiDefInfo)
 {
-	SAutoLock autolock(m_cs);
-	m_lstUiDefInfo.AddTail(pUiDefInfo);
-	pUiDefInfo->AddRef();
+    SAutoLock autolock(m_cs);
+    m_lstUiDefInfo.AddTail(pUiDefInfo);
+    pUiDefInfo->AddRef();
 }
 
 BOOL SUiDef::PopUiDefInfo(IUiDefInfo *pUiDefInfo)
 {
-	SAutoLock autolock(m_cs);
-	SPOSITION pos = m_lstUiDefInfo.Find(pUiDefInfo);
-	if (!pos)
-		return FALSE;
-	m_lstUiDefInfo.RemoveAt(pos);
-	pUiDefInfo->Release();
-	return TRUE;
+    SAutoLock autolock(m_cs);
+    SPOSITION pos = m_lstUiDefInfo.Find(pUiDefInfo);
+    if (!pos)
+        return FALSE;
+    m_lstUiDefInfo.RemoveAt(pos);
+    pUiDefInfo->Release();
+    return TRUE;
 }
 
 void SUiDef::PushSkinPool(SSkinPool *pSkinPool)
 {
-	SAutoLock autolock(m_cs);
-	if (pSkinPool == m_bulitinSkinPool)
-		return;
-	m_lstSkinPools.AddTail(pSkinPool);
-	pSkinPool->AddRef();
+    SAutoLock autolock(m_cs);
+    if (pSkinPool == m_bulitinSkinPool)
+        return;
+    m_lstSkinPools.AddTail(pSkinPool);
+    pSkinPool->AddRef();
 }
 
 BOOL SUiDef::PopSkinPool(SSkinPool *pSkinPool)
 {
-	SAutoLock autolock(m_cs);
-	if (pSkinPool == m_bulitinSkinPool)
-		return FALSE;
-	SPOSITION pos = m_lstSkinPools.Find(pSkinPool);
-	if (!pos)
-		return FALSE;
+    SAutoLock autolock(m_cs);
+    if (pSkinPool == m_bulitinSkinPool)
+        return FALSE;
+    SPOSITION pos = m_lstSkinPools.Find(pSkinPool);
+    if (!pos)
+        return FALSE;
 
-	m_lstSkinPools.RemoveAt(pos);
-	pSkinPool->Release();
-	return TRUE;
+    m_lstSkinPools.RemoveAt(pos);
+    pSkinPool->Release();
+    return TRUE;
 }
 
 ISkinObj *SUiDef::GetSkin(const SStringW &strSkinName, int nScale)
 {
-	SAutoLock autolock(m_cs);
-	{
-		SPOSITION pos = m_lstSkinPools.GetTailPosition();
-		while (pos)
-		{
-			SSkinPool *pSkinPool = m_lstSkinPools.GetPrev(pos);
-			if (ISkinObj *pSkin = pSkinPool->GetSkin(strSkinName, nScale))
-			{
-				return pSkin;
-			}
-		}
-	}
-	{
-		SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
-		while (pos)
-		{
-			IUiDefInfo * pUiInfo = m_lstUiDefInfo.GetPrev(pos);
-			SSkinPool *pSkinPool = pUiInfo->GetSkinPool();
-			if(!pSkinPool) continue;
-			if (ISkinObj *pSkin = pSkinPool->GetSkin(strSkinName, nScale))
-			{
-				return pSkin;
-			}
-		}
-	}
+    SAutoLock autolock(m_cs);
+    {
+        SPOSITION pos = m_lstSkinPools.GetTailPosition();
+        while (pos)
+        {
+            SSkinPool *pSkinPool = m_lstSkinPools.GetPrev(pos);
+            if (ISkinObj *pSkin = pSkinPool->GetSkin(strSkinName, nScale))
+            {
+                return pSkin;
+            }
+        }
+    }
+    {
+        SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
+        while (pos)
+        {
+            IUiDefInfo *pUiInfo = m_lstUiDefInfo.GetPrev(pos);
+            SSkinPool *pSkinPool = pUiInfo->GetSkinPool();
+            if (!pSkinPool)
+                continue;
+            if (ISkinObj *pSkin = pSkinPool->GetSkin(strSkinName, nScale))
+            {
+                return pSkin;
+            }
+        }
+    }
 
-	if (wcscmp(strSkinName, L"") != 0)
-	{
-		SASSERT_FMTW(FALSE, L"GetSkin[%s] Failed!", strSkinName.c_str());
-	}
-	return NULL;
+    if (wcscmp(strSkinName, L"") != 0)
+    {
+        SASSERT_FMTW(FALSE, L"GetSkin[%s] Failed!", strSkinName.c_str());
+    }
+    return NULL;
 }
 
 static const wchar_t *BUILDIN_SKIN_NAMES[] = {
-	L"_skin.sys.checkbox",      L"_skin.sys.radio",        L"_skin.sys.focuscheckbox", L"_skin.sys.focusradio",   L"_skin.sys.btn.normal",  L"_skin.sys.scrollbar",   L"_skin.sys.border",     L"_skin.sys.dropbtn",  L"_skin.sys.tree.toggle", L"_skin.sys.tree.checkbox", L"_skin.sys.tree.lines", L"_skin.sys.tab.page", L"_skin.sys.header",    L"_skin.sys.split.vert", L"_skin.sys.split.horz", L"_skin.sys.prog.bkgnd", L"_skin.sys.prog.bar", L"_skin.sys.vert.prog.bkgnd",
-	L"_skin.sys.vert.prog.bar", L"_skin.sys.slider.thumb", L"_skin.sys.btn.close",     L"_skin.sys.btn.minimize", L"_skin.sys.btn.maxmize", L"_skin.sys.btn.restore", L"_skin.sys.menu.check", L"_skin.sys.menu.sep", L"_skin.sys.menu.arrow",  L"_skin.sys.menu.border",   L"_skin.sys.menu.skin",  L"_skin.sys.icons",    L"_skin.sys.wnd.bkgnd", L"_skin.sys.btn.prev",   L"_skin.sys.btn.next",   L"_skin.sys.spin.down",  L"_skin.sys.spin.up",
+    L"_skin.sys.checkbox", L"_skin.sys.radio", L"_skin.sys.focuscheckbox", L"_skin.sys.focusradio", L"_skin.sys.btn.normal", L"_skin.sys.scrollbar", L"_skin.sys.border", L"_skin.sys.dropbtn", L"_skin.sys.tree.toggle", L"_skin.sys.tree.checkbox", L"_skin.sys.tree.lines", L"_skin.sys.tab.page", L"_skin.sys.header", L"_skin.sys.split.vert", L"_skin.sys.split.horz", L"_skin.sys.prog.bkgnd", L"_skin.sys.prog.bar", L"_skin.sys.vert.prog.bkgnd", L"_skin.sys.vert.prog.bar", L"_skin.sys.slider.thumb", L"_skin.sys.btn.close", L"_skin.sys.btn.minimize", L"_skin.sys.btn.maxmize", L"_skin.sys.btn.restore", L"_skin.sys.menu.check", L"_skin.sys.menu.sep", L"_skin.sys.menu.arrow", L"_skin.sys.menu.border", L"_skin.sys.menu.skin", L"_skin.sys.icons", L"_skin.sys.wnd.bkgnd", L"_skin.sys.btn.prev", L"_skin.sys.btn.next", L"_skin.sys.spin.down", L"_skin.sys.spin.up",
 };
 
 ISkinObj *SUiDef::GetBuiltinSkin(SYS_SKIN uID, int nScale)
 {
-	SAutoLock autolock(m_cs);
-	return GetBuiltinSkinPool()->GetSkin(BUILDIN_SKIN_NAMES[uID], nScale);
+    SAutoLock autolock(m_cs);
+    return GetBuiltinSkinPool()->GetSkin(BUILDIN_SKIN_NAMES[uID], nScale);
 }
-
 
 SSkinPool *SUiDef::GetBuiltinSkinPool()
 {
-	SAutoLock autolock(m_cs);
-	return m_bulitinSkinPool;
+    SAutoLock autolock(m_cs);
+    return m_bulitinSkinPool;
 }
 
-SXmlNode SUiDef::GetStyle(const SStringW & strName)
+SXmlNode SUiDef::GetStyle(const SStringW &strName)
 {
-	SAutoLock autolock(m_cs);
-	SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
-	while (pos)
-	{
-		IUiDefInfo * pUiInfo = m_lstUiDefInfo.GetPrev(pos);
-		SStylePool *pStylePool = pUiInfo->GetStylePool();
-		if(!pStylePool) continue;
-		SXmlNode style = pStylePool->GetStyle(strName);
-		if (style)
-			return style;
-	}
-	return SXmlNode();
+    SAutoLock autolock(m_cs);
+    SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
+    while (pos)
+    {
+        IUiDefInfo *pUiInfo = m_lstUiDefInfo.GetPrev(pos);
+        SStylePool *pStylePool = pUiInfo->GetStylePool();
+        if (!pStylePool)
+            continue;
+        SXmlNode style = pStylePool->GetStyle(strName);
+        if (style)
+            return style;
+    }
+    return SXmlNode();
 }
 
 SStringW SUiDef::GetTemplateString(const SStringW &strName)
 {
-	SAutoLock autolock(m_cs);
-	SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
-	while (pos)
-	{
-		IUiDefInfo * pUiInfo = m_lstUiDefInfo.GetPrev(pos);
-		STemplatePool *pPool = pUiInfo->GetTemplatePool();
-		if(!pPool) continue;
-		SStringW strRet = pPool->GetTemplateString(strName);
-		if (!strRet.IsEmpty())
-			return strRet;
-	}
-	return SStringW();
+    SAutoLock autolock(m_cs);
+    SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
+    while (pos)
+    {
+        IUiDefInfo *pUiInfo = m_lstUiDefInfo.GetPrev(pos);
+        STemplatePool *pPool = pUiInfo->GetTemplatePool();
+        if (!pPool)
+            continue;
+        SStringW strRet = pPool->GetTemplateString(strName);
+        if (!strRet.IsEmpty())
+            return strRet;
+    }
+    return SStringW();
 }
 
 COLORREF SUiDef::GetColor(const SStringW &strColor)
 {
-	SAutoLock autolock(m_cs);
-	COLORREF cr=CR_INVALID;
-	SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
-	while(pos){
-		IUiDefInfo *pUiDefInfo = m_lstUiDefInfo.GetPrev(pos);
-		if(pUiDefInfo->GetNamedColor().Get(strColor,cr))
-			return cr;
-	}
-	return cr;
+    SAutoLock autolock(m_cs);
+    COLORREF cr = CR_INVALID;
+    SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
+    while (pos)
+    {
+        IUiDefInfo *pUiDefInfo = m_lstUiDefInfo.GetPrev(pos);
+        if (pUiDefInfo->GetNamedColor().Get(strColor, cr))
+            return cr;
+    }
+    return cr;
 }
 
 COLORREF SUiDef::GetColor(int idx)
 {
-	SAutoLock autolock(m_cs);
-	return GetUiDef()->GetNamedColor().Get(idx);
+    SAutoLock autolock(m_cs);
+    return GetUiDef()->GetNamedColor().Get(idx);
 }
 
 SStringW SUiDef::GetString(const SStringW &strString)
 {
-	SAutoLock autolock(m_cs);
-	SStringW ret;
-	SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
-	while(pos){
-		IUiDefInfo *pUiDefInfo = m_lstUiDefInfo.GetPrev(pos);
-		if(pUiDefInfo->GetNamedString().Get(strString,ret))
-			return ret;
-	}
-	ret = strString;
-	return ret;
+    SAutoLock autolock(m_cs);
+    SStringW ret;
+    SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
+    while (pos)
+    {
+        IUiDefInfo *pUiDefInfo = m_lstUiDefInfo.GetPrev(pos);
+        if (pUiDefInfo->GetNamedString().Get(strString, ret))
+            return ret;
+    }
+    ret = strString;
+    return ret;
 }
 
 SStringW SUiDef::GetString(int idx)
 {
-	SAutoLock autolock(m_cs);
-	return GetUiDef()->GetNamedString().Get(idx);
+    SAutoLock autolock(m_cs);
+    return GetUiDef()->GetNamedString().Get(idx);
 }
 
 SLayoutSize SUiDef::GetLayoutSize(const SStringW &strSize)
 {
-	SAutoLock autolock(m_cs);
-	SLayoutSize ret;
-	SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
-	while(pos){
-		IUiDefInfo *pUiDefInfo = m_lstUiDefInfo.GetPrev(pos);
-		if(pUiDefInfo->GetNamedDimension().Get(strSize,ret))
-			return ret;
-	}
-	return ret;
+    SAutoLock autolock(m_cs);
+    SLayoutSize ret;
+    SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
+    while (pos)
+    {
+        IUiDefInfo *pUiDefInfo = m_lstUiDefInfo.GetPrev(pos);
+        if (pUiDefInfo->GetNamedDimension().Get(strSize, ret))
+            return ret;
+    }
+    return ret;
 }
 
 SLayoutSize SUiDef::GetLayoutSize(int idx)
 {
-	SAutoLock autolock(m_cs);
-	return GetUiDef()->GetNamedDimension().Get(idx);
+    SAutoLock autolock(m_cs);
+    return GetUiDef()->GetNamedDimension().Get(idx);
 }
 
 SStringW SUiDef::GetFontDesc(const SStringW &strFont)
 {
-	SAutoLock autolock(m_cs);
-	SStringW ret;
-	SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
-	while(pos){
-		IUiDefInfo *pUiDefInfo = m_lstUiDefInfo.GetPrev(pos);
-		if(pUiDefInfo->GetNamedFont().Get(strFont,ret))
-			return ret;
-	}
-	ret = strFont;
-	return ret;
+    SAutoLock autolock(m_cs);
+    SStringW ret;
+    SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
+    while (pos)
+    {
+        IUiDefInfo *pUiDefInfo = m_lstUiDefInfo.GetPrev(pos);
+        if (pUiDefInfo->GetNamedFont().Get(strFont, ret))
+            return ret;
+    }
+    ret = strFont;
+    return ret;
 }
 
 SStringW SUiDef::GetFontDesc(int idx)
 {
-	SAutoLock autolock(m_cs);
-	return GetUiDef()->GetNamedFont().Get(idx);
+    SAutoLock autolock(m_cs);
+    return GetUiDef()->GetNamedFont().Get(idx);
 }
-
 
 SNSEND

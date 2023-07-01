@@ -412,7 +412,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
     }
 
     { // draw title
-        if(m_root->IsLayoutDirty())
+        if (m_root->IsLayoutDirty())
             m_root->UpdateLayout();
         CRect rcClip;
         m_memRT->GetClipBox(&rcClip);
@@ -465,7 +465,7 @@ LRESULT SNcPainter::OnRepaint(UINT msg, WPARAM wp, LPARAM lp)
     }
     else
     {
-        InvalidateHostRect(NULL,FALSE);
+        InvalidateHostRect(NULL, FALSE);
     }
     return 0;
 }
@@ -527,17 +527,17 @@ CRect SNcPainter::GetHostRect() const
     return rcItem;
 }
 
-void SNcPainter::InvalidateHostRect(LPCRECT pRc,BOOL bClip)
+void SNcPainter::InvalidateHostRect(LPCRECT pRc, BOOL bClip)
 {
     if (m_bInPaint)
         return;
     m_memRT->SaveClip(NULL);
     if (pRc)
-		m_memRT->PushClipRect(pRc, bClip?RGN_DIFF:RGN_OR);
+        m_memRT->PushClipRect(pRc, bClip ? RGN_DIFF : RGN_OR);
     else
     {
         CRect rc = m_root->GetClientRect();
-        m_memRT->PushClipRect(&rc, bClip?RGN_DIFF:RGN_OR);
+        m_memRT->PushClipRect(&rc, bClip ? RGN_DIFF : RGN_OR);
     }
     m_pHost->SendMessage(WM_NCPAINT);
     m_memRT->PopClip();
@@ -545,8 +545,9 @@ void SNcPainter::InvalidateHostRect(LPCRECT pRc,BOOL bClip)
 
 void SNcPainter::OnLayoutDirty()
 {
-    if (!m_memLeft) return;//make sure init is done
-    m_pHost->SendMessage(WM_NCPAINT,1,0);
+    if (!m_memLeft)
+        return; // make sure init is done
+    m_pHost->SendMessage(WM_NCPAINT, 1, 0);
 }
 
 ISwndContainer *SNcPainter::GetHostContainer()
@@ -577,7 +578,7 @@ LRESULT SNcPainter::OnNcMouseEvent(UINT msg, WPARAM wp, LPARAM lp)
     if (wp == HTCAPTION && msg != WM_NCLBUTTONDBLCLK)
     {
         m_bMouseHover = TRUE;
-		m_pHost->SetTimer(SHostWnd::kNcCheckTimer,SHostWnd::kNcCheckInterval,NULL);
+        m_pHost->SetTimer(SHostWnd::kNcCheckTimer, SHostWnd::kNcCheckInterval, NULL);
         if (msg == WM_NCLBUTTONUP)
             m_bLButtonDown = FALSE;
         CPoint pt(GET_X_LPARAM(lp), GET_Y_LPARAM(lp));
@@ -607,7 +608,7 @@ LRESULT SNcPainter::OnNcMouseLeave(UINT msg, WPARAM wp, LPARAM lp)
     m_root->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
     UpdateToolTip();
     m_bMouseHover = FALSE;
-	m_pHost->KillTimer(SHostWnd::kNcCheckTimer);
+    m_pHost->KillTimer(SHostWnd::kNcCheckTimer);
     return m_pHost->DefWindowProc();
 }
 
@@ -668,7 +669,7 @@ void SNcPainter::OnSize(UINT nType, CSize size)
 {
     if (IsDrawNc())
     {
-		updateSystemButton(m_root,nType);
+        updateSystemButton(m_root, nType);
     }
 }
 
@@ -719,35 +720,39 @@ void SNcPainter::OnMouseMove(WPARAM wp, LPARAM lp)
 
 void SNcPainter::OnTimer(UINT_PTR tid)
 {
-	if(tid == SHostWnd::kNcCheckTimer){
-		POINT pt;
-		::GetCursorPos(&pt);
-		HWND hHover = ::WindowFromPoint(pt);
-		if(hHover!=m_pHost->m_hWnd){
-			OnMouseMove(0,0);
-		}
-	}else{
-		SetMsgHandled(FALSE);
-	}
+    if (tid == SHostWnd::kNcCheckTimer)
+    {
+        POINT pt;
+        ::GetCursorPos(&pt);
+        HWND hHover = ::WindowFromPoint(pt);
+        if (hHover != m_pHost->m_hWnd)
+        {
+            OnMouseMove(0, 0);
+        }
+    }
+    else
+    {
+        SetMsgHandled(FALSE);
+    }
 }
 
-void SNcPainter::updateSystemButton(SWindow *pRoot,UINT nResizeMode)
+void SNcPainter::updateSystemButton(SWindow *pRoot, UINT nResizeMode)
 {
-	SWindow *pMax = pRoot->FindChildByID(IDC_SYS_MAX);
-	SWindow *pRestore = pRoot->FindChildByID(IDC_SYS_RESTORE);
-	if (pMax && pRestore)
-	{
-		if (nResizeMode == SIZE_MAXIMIZED)
-		{
-			pMax->SetVisible(FALSE);
-			pRestore->SetVisible(TRUE);
-		}
-		else if (nResizeMode == SIZE_RESTORED)
-		{
-			pMax->SetVisible(TRUE);
-			pRestore->SetVisible(FALSE);
-		}
-	}
+    SWindow *pMax = pRoot->FindChildByID(IDC_SYS_MAX);
+    SWindow *pRestore = pRoot->FindChildByID(IDC_SYS_RESTORE);
+    if (pMax && pRestore)
+    {
+        if (nResizeMode == SIZE_MAXIMIZED)
+        {
+            pMax->SetVisible(FALSE);
+            pRestore->SetVisible(TRUE);
+        }
+        else if (nResizeMode == SIZE_RESTORED)
+        {
+            pMax->SetVisible(TRUE);
+            pRestore->SetVisible(FALSE);
+        }
+    }
 }
 
 SNSEND

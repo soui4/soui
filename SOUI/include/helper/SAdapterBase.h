@@ -121,9 +121,10 @@ class LvAdatperImpl : public BaseClass {
         getView(position, pItemPanel, xmlTemplate);
     }
 
-	STDMETHOD_(void, getView)(int position, SItemPanel *pItem, SXmlNode xmlTemplate) {
-		SASSERT(FALSE);
-	}
+    STDMETHOD_(void, getView)(int position, SItemPanel *pItem, SXmlNode xmlTemplate)
+    {
+        SASSERT(FALSE);
+    }
 
     STDMETHOD_(int, getItemViewType)(int position)
     {
@@ -171,15 +172,15 @@ class LvAdatperImpl : public BaseClass {
         InitByTemplate(xmlTempalte);
     }
 
-    STDMETHOD_(void, getViewDesiredSize)(SIZE *ret,int position, SItemPanel *pItem, int wid, int hei)
+    STDMETHOD_(void, getViewDesiredSize)(SIZE *ret, int position, SItemPanel *pItem, int wid, int hei)
     {
-        pItem->GetDesiredSize(ret,wid, hei);
+        pItem->GetDesiredSize(ret, wid, hei);
     }
 
-    STDMETHOD_(void, getViewDesiredSize)(SIZE *ret,int position, IWindow *pItem, int wid, int hei) OVERRIDE
+    STDMETHOD_(void, getViewDesiredSize)(SIZE *ret, int position, IWindow *pItem, int wid, int hei) OVERRIDE
     {
         SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pItem);
-        getViewDesiredSize(ret,position, pItemPanel, wid, hei);
+        getViewDesiredSize(ret, position, pItemPanel, wid, hei);
     }
 
     STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef **ppObj) OVERRIDE
@@ -320,14 +321,16 @@ class STvObserverMgr {
         }
     }
 
-	void notifyItemBeforeRemove(HSTREEITEM hItem){
-		SPOSITION pos = m_lstObserver.GetHeadPosition();
-		while (pos)
-		{
-			ITvDataSetObserver *pObserver = m_lstObserver.GetNext(pos);
-			pObserver->notifyItemBeforeRemove(hItem);
-		}
-	}
+    void notifyItemBeforeRemove(HSTREEITEM hItem)
+    {
+        SPOSITION pos = m_lstObserver.GetHeadPosition();
+        while (pos)
+        {
+            ITvDataSetObserver *pObserver = m_lstObserver.GetNext(pos);
+            pObserver->notifyItemBeforeRemove(hItem);
+        }
+    }
+
   protected:
     SList<ITvDataSetObserver *> m_lstObserver;
 };
@@ -354,11 +357,12 @@ class TvAdatperImpl : public BaseClass {
     {
         m_obzMgr.notifyExpandChanged(hBranch, bExpandedOld, bExpandedNew);
     }
-	
-	//notify the item will be removed
-	void notifyItemBeforeRemove(HSTREEITEM hItem){
-		m_obzMgr.notifyItemBeforeRemove(hItem);
-	}
+
+    // notify the item will be removed
+    void notifyItemBeforeRemove(HSTREEITEM hItem)
+    {
+        m_obzMgr.notifyItemBeforeRemove(hItem);
+    }
 
     STDMETHOD_(void, registerDataSetObserver)(ITvDataSetObserver *observer) OVERRIDE
     {
@@ -451,15 +455,17 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return (HSTREEITEM)m_tree.GetNextSiblingItem((HSTREEITEM)hItem);
     }
 
-	STDMETHOD_(BOOL,IsDecendentItem)(CTHIS_ HSTREEITEM hItem,HSTREEITEM hChild) const OVERRIDE{
-		HSTREEITEM hParent = GetParentItem(hChild);
-		while(hParent){
-			if(hParent == hItem)
-				return TRUE;
-			hParent = GetParentItem(hParent);
-		}
-		return FALSE;
-	}
+    STDMETHOD_(BOOL, IsDecendentItem)(CTHIS_ HSTREEITEM hItem, HSTREEITEM hChild) const OVERRIDE
+    {
+        HSTREEITEM hParent = GetParentItem(hChild);
+        while (hParent)
+        {
+            if (hParent == hItem)
+                return TRUE;
+            hParent = GetParentItem(hParent);
+        }
+        return FALSE;
+    }
 
     STDMETHOD_(int, getViewType)(HSTREEITEM hItem) const OVERRIDE
     {
@@ -483,16 +489,16 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return getView(hItem, pItemPanel, xmlTemplate);
     }
 
-    STDMETHOD_(void, getViewDesiredSize)(SIZE *ret,HSTREEITEM hItem, SItemPanel *pItem, int wid, int hei)
+    STDMETHOD_(void, getViewDesiredSize)(SIZE *ret, HSTREEITEM hItem, SItemPanel *pItem, int wid, int hei)
     {
-        pItem->GetDesiredSize(ret,wid, hei);
+        pItem->GetDesiredSize(ret, wid, hei);
     }
 
     STDMETHOD_(void, getViewDesiredSize)
-    (SIZE *ret,HSTREEITEM hItem, IWindow *pItem, int wid, int hei) OVERRIDE
+    (SIZE *ret, HSTREEITEM hItem, IWindow *pItem, int wid, int hei) OVERRIDE
     {
         SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pItem);
-        getViewDesiredSize(ret,hItem, pItemPanel, wid, hei);
+        getViewDesiredSize(ret, hItem, pItemPanel, wid, hei);
     }
 
     STDMETHOD_(void, InitByTemplate)(SXmlNode xmlTemplate)
@@ -625,17 +631,20 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return m_tree.InsertItem(ii, hParent, hInsertAfter);
     }
 
-    void DeleteItem(HSTREEITEM hItem,BOOL bNotifyChange = TRUE)
+    void DeleteItem(HSTREEITEM hItem, BOOL bNotifyChange = TRUE)
     {
-		HSTREEITEM hParent = GetParentItem(hItem);
-		if(!hParent) hParent = STVI_ROOT;
-		if(bNotifyChange){
-			notifyItemBeforeRemove(hItem);
-		}
-		m_tree.DeleteItem(hItem);
-		if(bNotifyChange) {
-			notifyBranchChanged(hParent);
-		}
+        HSTREEITEM hParent = GetParentItem(hItem);
+        if (!hParent)
+            hParent = STVI_ROOT;
+        if (bNotifyChange)
+        {
+            notifyItemBeforeRemove(hItem);
+        }
+        m_tree.DeleteItem(hItem);
+        if (bNotifyChange)
+        {
+            notifyBranchChanged(hParent);
+        }
     }
 
     BOOL DeleteItemEx(HSTREEITEM hItem)
@@ -653,9 +662,10 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
     void SetItemData(HSTREEITEM hItem, const T &data)
     {
         SASSERT(hItem != STVI_ROOT);
-        ItemInfo& ii = m_tree.GetItemRef((HSTREEITEM)hItem);
+        ItemInfo &ii = m_tree.GetItemRef((HSTREEITEM)hItem);
         ii.data = data;
     }
+
   protected:
     CSTree<ItemInfo> m_tree;
     ULONG_PTR m_rootUserData[DATA_INDEX_NUMBER];

@@ -85,20 +85,20 @@ class SOUI_EXP SScrollBar
     int GetMin();
 
   protected:
-	  STDMETHOD_(CRect, GetScrollBarRect)(CTHIS_ BOOL bVert) SCONST OVERRIDE;
-	  STDMETHOD_(ISkinObj*,GetScrollBarSkin)(CTHIS_ BOOL bVert) SCONST OVERRIDE;
-	  STDMETHOD_(const SCROLLINFO *,GetScrollBarInfo)(CTHIS_ BOOL bVert) SCONST OVERRIDE;
-	  STDMETHOD_(int,GetScrollBarArrowSize)(CTHIS_ BOOL bVert) SCONST OVERRIDE;
-	  STDMETHOD_(void,OnScrollUpdatePart)(THIS_ BOOL bVert, int iPart) OVERRIDE;
-	  STDMETHOD_(void,OnScrollUpdateThumbTrack)(THIS_ BOOL bVert, int nPos) OVERRIDE;
-	  STDMETHOD_(ISwndContainer*, GetScrollBarContainer)(THIS) OVERRIDE;
-	  STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST OVERRIDE;
-	  STDMETHOD_(void,OnScrollCommand)(THIS_ BOOL bVert, int iCmd, int nPos) OVERRIDE;
-	  STDMETHOD_(void,OnScrollSetTimer)(THIS_ BOOL bVert, char id, UINT uElapse) OVERRIDE;
-	  STDMETHOD_(void,OnScrollKillTimer)(THIS_ BOOL bVert, char id) OVERRIDE;
-	  STDMETHOD_(const IInterpolator *,GetScrollInterpolator)(CTHIS) SCONST OVERRIDE;
-	  STDMETHOD_(int,GetScrollFadeFrames)(CTHIS) SCONST OVERRIDE;
-	  STDMETHOD_(BYTE,GetScrollThumbTrackMinAlpha)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(CRect, GetScrollBarRect)(CTHIS_ BOOL bVert) SCONST OVERRIDE;
+    STDMETHOD_(ISkinObj *, GetScrollBarSkin)(CTHIS_ BOOL bVert) SCONST OVERRIDE;
+    STDMETHOD_(const SCROLLINFO *, GetScrollBarInfo)(CTHIS_ BOOL bVert) SCONST OVERRIDE;
+    STDMETHOD_(int, GetScrollBarArrowSize)(CTHIS_ BOOL bVert) SCONST OVERRIDE;
+    STDMETHOD_(void, OnScrollUpdatePart)(THIS_ BOOL bVert, int iPart) OVERRIDE;
+    STDMETHOD_(void, OnScrollUpdateThumbTrack)(THIS_ BOOL bVert, int nPos) OVERRIDE;
+    STDMETHOD_(ISwndContainer *, GetScrollBarContainer)(THIS) OVERRIDE;
+    STDMETHOD_(BOOL, IsScrollBarEnable)(THIS_ BOOL bVertical) SCONST OVERRIDE;
+    STDMETHOD_(void, OnScrollCommand)(THIS_ BOOL bVert, int iCmd, int nPos) OVERRIDE;
+    STDMETHOD_(void, OnScrollSetTimer)(THIS_ BOOL bVert, char id, UINT uElapse) OVERRIDE;
+    STDMETHOD_(void, OnScrollKillTimer)(THIS_ BOOL bVert, char id) OVERRIDE;
+    STDMETHOD_(const IInterpolator *, GetScrollInterpolator)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(int, GetScrollFadeFrames)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(BYTE, GetScrollThumbTrackMinAlpha)(CTHIS) SCONST OVERRIDE;
 
   protected:
     /**

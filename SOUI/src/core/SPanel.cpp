@@ -930,7 +930,7 @@ HRESULT SScrollView::OnAttrViewSize(const SStringW &strValue, BOOL bLoading)
 void SScrollView::GetChildrenLayoutRect(RECT *prc) const
 {
     CRect rcRet;
-	__baseCls::GetChildrenLayoutRect(&rcRet);
+    __baseCls::GetChildrenLayoutRect(&rcRet);
     CRect rcPadding = GetStyle().GetPadding();
     rcRet.OffsetRect(-m_ptOrigin.x, -m_ptOrigin.y);
     rcRet.right = rcRet.left + m_szView.cx - rcPadding.left - rcPadding.right;

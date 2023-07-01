@@ -117,9 +117,9 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
      */
     STDMETHOD_(int, GetItemIndent)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
-	STDMETHOD_(int, GetIndent)(CTHIS) SCONST PURE;
+    STDMETHOD_(int, GetIndent)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(void, SetIndent)(THIS_ int nIndent) PURE;
+    STDMETHOD_(void, SetIndent)(THIS_ int nIndent) PURE;
 };
 
 SNSEND

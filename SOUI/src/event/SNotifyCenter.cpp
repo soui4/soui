@@ -40,8 +40,8 @@ class SNotifyReceiver : public SNativeWnd {
 
 LRESULT SNotifyReceiver::OnRunOnUISync(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	IRunnable * pRunnable = (IRunnable *)lParam;
-	pRunnable->run();
+    IRunnable *pRunnable = (IRunnable *)lParam;
+    pRunnable->run();
     return 0;
 }
 
@@ -126,7 +126,7 @@ void SNotifyCenter::OnFireEvts()
         SAutoLock lock(m_cs);
         evts = m_ayncEvent;
         m_ayncEvent.RemoveAll();
-		cbs.Swap(m_asyncRunnable);
+        cbs.Swap(m_asyncRunnable);
         m_bRunning = FALSE;
     }
     {
@@ -176,42 +176,44 @@ BOOL SNotifyCenter::UnregisterEventMap(const IEvtSlot *slot)
     return FALSE;
 }
 
-
-void SNotifyCenter::RunOnUI(IRunnable * pRunnable,BOOL bSync)
+void SNotifyCenter::RunOnUI(IRunnable *pRunnable, BOOL bSync)
 {
-	if(bSync){
-		m_pReceiver->SendMessage(SNotifyReceiver::UM_RUNONUISYNC, 0, (LPARAM)pRunnable);
-	}else{
-		SAutoLock lock(m_cs);
-		if (!m_bRunning)
-		{
-			m_pReceiver->SetTimer(SNotifyReceiver::TIMERID_ASYNC, m_nInterval, NULL);
-			m_bRunning = TRUE;
-		}
-		m_asyncRunnable.AddTail(pRunnable);
-	}
+    if (bSync)
+    {
+        m_pReceiver->SendMessage(SNotifyReceiver::UM_RUNONUISYNC, 0, (LPARAM)pRunnable);
+    }
+    else
+    {
+        SAutoLock lock(m_cs);
+        if (!m_bRunning)
+        {
+            m_pReceiver->SetTimer(SNotifyReceiver::TIMERID_ASYNC, m_nInterval, NULL);
+            m_bRunning = TRUE;
+        }
+        m_asyncRunnable.AddTail(pRunnable);
+    }
 }
 
-void SNotifyCenter::RunOnUI2(THIS_ FunRunOnUI fun, WPARAM wp, LPARAM lp,BOOL bSync)
+void SNotifyCenter::RunOnUI2(THIS_ FunRunOnUI fun, WPARAM wp, LPARAM lp, BOOL bSync)
 {
-	IRunnable *pRunable = new StaticSFunctor2<FunRunOnUI,WPARAM,LPARAM>(fun,wp,lp);
-	RunOnUI(pRunable,bSync);
-	pRunable->Release();
+    IRunnable *pRunable = new StaticSFunctor2<FunRunOnUI, WPARAM, LPARAM>(fun, wp, lp);
+    RunOnUI(pRunable, bSync);
+    pRunable->Release();
 }
 
 #ifdef ENABLE_RUNONUI
 void SNotifyCenter::RunOnUISync(std::function<void(void)> fn)
 {
-	IRunnable *pRunable = new StdRunnable(fn);
-	RunOnUI(pRunable,TRUE);
-	pRunable->Release();
+    IRunnable *pRunable = new StdRunnable(fn);
+    RunOnUI(pRunable, TRUE);
+    pRunable->Release();
 }
 
 void SNotifyCenter::RunOnUIAsync(std::function<void(void)> fn)
 {
-	IRunnable *pRunable = new StdRunnable(fn);
-	RunOnUI(pRunable,FALSE);
-	pRunable->Release();
+    IRunnable *pRunable = new StdRunnable(fn);
+    RunOnUI(pRunable, FALSE);
+    pRunable->Release();
 }
 
 #endif

@@ -454,16 +454,16 @@ HSTREEITEM STreeCtrl::InsertItem(LPTVITEM pItemObj, HSTREEITEM hParent, HSTREEIT
     HSTREEITEM hRet = CSTree<LPTVITEM>::InsertItem(pItemObj, hParent, hInsertAfter);
     pItemObj->hItem = hRet;
     OnInsertItem(pItemObj);
-	if (bCheckState)
-		CheckState(hParent);
+    if (bCheckState)
+        CheckState(hParent);
     if (pItemObj->bVisible)
     {
         m_nVisibleItems++;
 
         int nViewWidth = CalcItemWidth(pItemObj);
         m_nContentWidth = smax(nViewWidth, m_nContentWidth);
-		UpdateScrollBar();
-	}
+        UpdateScrollBar();
+    }
 
     return hRet;
 }
@@ -787,7 +787,7 @@ void STreeCtrl::RedrawItem(HSTREEITEM hItem)
 
         CRect rcItem(0, 0, CalcItemWidth(pItem), m_nItemHei);
         rcItem.OffsetRect(rcClient.left - m_siHoz.nPos, rcClient.top + m_nItemHei * iItem - m_siVer.nPos);
-		InvalidateRect(&rcItem);
+        InvalidateRect(&rcItem);
     }
 }
 

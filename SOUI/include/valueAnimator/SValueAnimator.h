@@ -58,7 +58,7 @@ SNSBEGIN
 class SOUI_EXP SValueAnimator
     : public TObjRefImpl<SObjectImpl<IValueAnimator>>
     , ITimelineHandler {
-		DEF_SOBJECT(SObjectImpl<IValueAnimator>,L"valueAnimator")
+    DEF_SOBJECT(SObjectImpl<IValueAnimator>, L"valueAnimator")
   protected:
     /**
      * The first time that the animation's animateFrame() method is called. This time is used to
@@ -417,7 +417,7 @@ class SOUI_EXP SValueAnimator
   public:
     STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr *pContainer) OVERRIDE;
 
-	STDMETHOD_(void, end)(THIS) OVERRIDE;
+    STDMETHOD_(void, end)(THIS) OVERRIDE;
 
     STDMETHOD_(BOOL, isRunning)(THIS) SCONST OVERRIDE;
     ;
@@ -565,7 +565,6 @@ class TValueAnimator : public SValueAnimator {
     }
 
   protected:
-
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) OVERRIDE
     {
         mValue = mValueEvaluator.evaluate(fraction);

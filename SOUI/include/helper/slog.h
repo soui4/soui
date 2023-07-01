@@ -30,7 +30,7 @@ class SOUI_EXP SLogStream {
     SLogStream &operator<<(const wchar_t *t);
     SLogStream &operator<<(bool t);
     SLogStream &operator<<(char t);
-	SLogStream &operator<<(wchar_t t);
+    SLogStream &operator<<(wchar_t t);
     SLogStream &operator<<(unsigned char t);
     SLogStream &operator<<(short t);
     SLogStream &operator<<(unsigned short t);
@@ -50,7 +50,7 @@ class SOUI_EXP SLogStream {
     SLogStream &writeULongLong(unsigned long long t);
     SLogStream &writePointer(const void *t);
     SLogStream &writeString(const char *t);
-    SLogStream &writeWString(const wchar_t *t,int nLen = -1);
+    SLogStream &writeWString(const wchar_t *t, int nLen = -1);
     SLogStream &writeBinary(const SLogBinary &t);
 
   private:
@@ -101,21 +101,21 @@ SNSEND
 
 #define SLOG(tag, level) SOUI::Log(tag, level, __FILE__, __FUNCTION__, __LINE__, RetAddr()).stream()
 
-#define SLOG_FMT(tag, level, logformat, ...)                                                       \
-    do                                                                                                       \
-    {                                                                                                        \
-        if (sizeof(logformat[0]) == sizeof(char))                                                            \
-        {                                                                                                    \
-            char logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                                      \
+#define SLOG_FMT(tag, level, logformat, ...)                                                      \
+    do                                                                                            \
+    {                                                                                             \
+        if (sizeof(logformat[0]) == sizeof(char))                                                 \
+        {                                                                                         \
+            char logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                           \
             _snprintf(logbuf, SOUI::Log::MAX_LOGLEN, (const char *)logformat, ##__VA_ARGS__);     \
-            SLOG(tag, level) << logbuf;                                                            \
-        }                                                                                                    \
-        else                                                                                                 \
-        {                                                                                                    \
-            wchar_t logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                                   \
+            SLOG(tag, level) << logbuf;                                                           \
+        }                                                                                         \
+        else                                                                                      \
+        {                                                                                         \
+            wchar_t logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                        \
             _snwprintf(logbuf, SOUI::Log::MAX_LOGLEN, (const wchar_t *)logformat, ##__VA_ARGS__); \
-            SLOG(tag, level) << logbuf;                                                            \
-        }                                                                                                    \
+            SLOG(tag, level) << logbuf;                                                           \
+        }                                                                                         \
     } while (false);
 
 //流式输出日志，当kLogTag有效时使用，否则编译失败，kLogTag可以是当前定义的宏，也可以是当前对象的成员变量。
@@ -154,8 +154,8 @@ SNSEND
 #define SSLOGE()  SLOG(kSoui4Tag, SOUI::LOG_LEVEL_ERROR)
 #define SSLOGF()  SLOG(kSoui4Tag, SOUI::LOG_LEVEL_FATAL)
 
-#define SSLOGFMTD(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_DEBUG,logformat, ##__VA_ARGS__)
+#define SSLOGFMTD(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_DEBUG, logformat, ##__VA_ARGS__)
 #define SSLOGFMTI(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_INFO, logformat, ##__VA_ARGS__)
 #define SSLOGFMTW(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_WARN, logformat, ##__VA_ARGS__)
-#define SSLOGFMTE(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_ERROR,logformat, ##__VA_ARGS__)
-#define SSLOGFMTF(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_FATAL,logformat, ##__VA_ARGS__)
+#define SSLOGFMTE(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_ERROR, logformat, ##__VA_ARGS__)
+#define SSLOGFMTF(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_FATAL, logformat, ##__VA_ARGS__)

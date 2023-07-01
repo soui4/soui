@@ -367,9 +367,9 @@ namespace SOUI
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::CreateGradientBrush(THIS_ BOOL bVert,const COLORREF *crs, const float *pos, int nCount,TileMode tileMode, IBrushS * *ppBrush)
+	HRESULT SRenderTarget_Skia::CreateGradientBrush(THIS_ const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha,TileMode tileMode,IBrushS * *ppBrush)
 	{
-		*ppBrush = new SBrush_Skia(m_pRenderFactory,bVert,crs,pos,nCount,tileMode);
+		*ppBrush = new SBrush_Skia(m_pRenderFactory,pGradients,nCount,info,byAlpha,tileMode);
 		return S_OK;
 	}
 
@@ -1103,77 +1103,41 @@ namespace SOUI
 		}
 	}
 
-	HRESULT SRenderTarget_Skia::GradientFillEx( LPCRECT pRect,BOOL bVert,const COLORREF *colors,const float *pos,int nCount,BYTE byAlpha/*=0xFF*/ )
-	{
-		SkRect skrc = toSkRect(pRect);
-		skrc.offset(m_ptOrg);
-		SkScalar wid = skrc.width();
-		SkScalar hei = skrc.height();
-		SkScalar halfWid = wid/2;
-		SkScalar halfHei = hei/2;
-
-		SkPoint skPts[2];
-		if(bVert){
-			skPts[0].set(halfWid,0.0f);
-			skPts[1].set(halfWid,hei);
-		}else
-		{//水平方向
-			skPts[0].set(0.f ,halfHei);
-			skPts[1].set(wid,halfHei);
-		}
-
-		SkColor *skColors= new SkColor[nCount];
-		for(int i=0;i<nCount;i++)
-		{
-			skColors[i] = SColor(colors[i],byAlpha).toARGB();
-		}
-
-		SkShader *pShader = SkGradientShader::CreateLinear(skPts, skColors, pos,nCount,SkShader::kMirror_TileMode);
-		SkPaint paint=m_paint;
-		paint.setShader(pShader)->unref();
-
-		m_SkCanvas->drawRect(skrc,paint);
-
-		delete []skColors;
-		return S_OK;
-	}
-
 	static bool fequal(float a,float b)
 	{
 		return fabs(a-b)< 0.0000001f;
 	}
 
-	HRESULT SRenderTarget_Skia::GradientFill2(LPCRECT pRect,GradientType type,COLORREF crStart,COLORREF crCenter,COLORREF crEnd,float fLinearAngle,float fCenterX,float fCenterY,int nRadius,BYTE byAlpha/*=0xff*/)
-	{
-		SkRect skrc = toSkRect(pRect);
-		skrc.offset(m_ptOrg);
+	static SkShader * CreateShader(const SkRect &skrc,const GradientInfo * info,const GradientItem *pGradients,int nCount,BYTE byAlpha,SkShader::TileMode tileMode){
+		SkColor stack_colors[3];
+		SkScalar stack_pos[3];
+		SkColor *skColors= nCount<=3?stack_colors:new SkColor[nCount];
+		SkScalar *pos = nCount<=3?stack_pos: new SkScalar[nCount];
+		for(int i=0;i<nCount;i++){
+			skColors[i]=SColor(pGradients[i].cr,byAlpha).toARGB();
+			pos[i]=pGradients[i].pos;
+		}
 
-		SkColor *skColors= new SkColor[3];
-
-		skColors[0]=SColor(crStart,byAlpha).toARGB();
-		skColors[1]=SColor(crCenter,byAlpha).toARGB();
-		skColors[2]=SColor(crEnd,byAlpha).toARGB();
-
-		SkShader *pShader = NULL;
 		SkScalar wid = skrc.width();
 		SkScalar hei = skrc.height();
 		SkScalar halfWid = wid/2;
 		SkScalar halfHei = hei/2;
-		if(type == linear)
+		SkShader * pShader = NULL;
+		if(info->type == linear)
 		{
 			SkPoint skPts[2];
-			if(fequal(fLinearAngle,90.0f) || fequal(fLinearAngle,270.0f))
+			if(fequal(info->angle,90.0f) || fequal(info->angle,270.0f))
 			{//90度
 				skPts[0].set(halfWid,0.0f);
 				skPts[1].set(halfWid,hei);
-			}else if(fequal(fLinearAngle,0.0f) || fequal(fLinearAngle,180.0f))
+			}else if(fequal(info->angle,0.0f) || fequal(info->angle,180.0f))
 			{//水平方向
 				skPts[0].set(0.f ,halfHei);
 				skPts[1].set(wid,halfHei);
 			}else
 			{//其它角度
 
-				float angleInRadians = PI*fLinearAngle/180;
+				float angleInRadians = PI*info->angle/180;
 				double tanAngle = tan(angleInRadians);
 
 				SkPoint pt1a,pt2a;//与左右两条边相交的位置
@@ -1198,21 +1162,33 @@ namespace SOUI
 					skPts[1]=pt2b;
 				}
 			}
-			pShader = SkGradientShader::CreateLinear(skPts, skColors, NULL,3,SkShader::kRepeat_TileMode);
-		}else if(type == radial)
+			SkPoint::Offset(skPts,2,skrc.fLeft,skrc.fTop);
+			pShader = SkGradientShader::CreateLinear(skPts, skColors, pos,nCount,tileMode);
+		}else if(info->type == radial)
 		{
 			SkPoint skCenter;
 			skCenter.set(halfWid,halfHei);
-			pShader = SkGradientShader::CreateRadial(skCenter,SkScalar(nRadius),skColors,NULL,3,SkShader::kRepeat_TileMode);
-		}else if(type==sweep)
+			SkPoint::Offset(&skCenter,1,skrc.fLeft,skrc.fTop);
+			pShader = SkGradientShader::CreateRadial(skCenter,info->radius ,skColors, pos,nCount,tileMode);
+		}else if(info->type==sweep)
 		{
-			SkPoint skCenter;
-			skCenter.set(halfWid,halfHei);
-			pShader = SkGradientShader::CreateSweep(SkScalar(+fCenterX*wid),SkScalar(fCenterY*hei),skColors,NULL,3);
+			SkScalar centerX = skrc.fLeft+skrc.width()*info->center.fX;
+			SkScalar centerY = skrc.fTop+skrc.height()*info->center.fY;
+			pShader = SkGradientShader::CreateSweep(centerX,centerY, skColors, pos,nCount);
 		}
+		if(nCount>3){
+			delete []skColors;
+			delete []pos;
+		}
+		return pShader;
+	}
 
-		delete []skColors;
 
+	HRESULT SRenderTarget_Skia::DrawGradientRectEx(THIS_ LPCRECT pRect, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha)
+	{
+		SkRect skrc = toSkRect(pRect);
+		skrc.offset(m_ptOrg);
+		SkShader *pShader = CreateShader(skrc,info,pGradients,nCount,byAlpha,SkShader::kRepeat_TileMode);
 		if(!pShader)
 		{
 			return E_INVALIDARG;
@@ -1220,44 +1196,16 @@ namespace SOUI
 
 		SkPaint paint=m_paint;
 		paint.setShader(pShader)->unref();
-
-		SkPoint skOffset = {skrc.left(),skrc.top()};
-
-		m_SkCanvas->translate(skOffset.x(),skOffset.y());
-		skrc.offset(-skOffset.x(),-skOffset.y());
-		m_SkCanvas->drawRect(skrc,paint);
-		m_SkCanvas->translate(-skOffset.x(),-skOffset.y());
+		if(ptRoundCorner.x==0 && ptRoundCorner.y==0)
+			m_SkCanvas->drawRect(skrc,paint);
+		else
+			m_SkCanvas->drawRoundRect(skrc,(SkScalar)ptRoundCorner.x,(SkScalar)ptRoundCorner.y,paint);
 		return S_OK;
 	}
 
-
-	HRESULT SRenderTarget_Skia::GradientFill( LPCRECT pRect,BOOL bVert,COLORREF crBegin,COLORREF crEnd,BYTE byAlpha/*=0xFF*/ )
-	{
-		SkRect skrc = toSkRect(pRect);
-		skrc.offset(m_ptOrg);
-
-		SkPoint pts[2];
-		if(bVert)
-		{//90度
-			pts[0].set(skrc.centerX(),skrc.fTop);
-			pts[1].set(skrc.centerX(),skrc.fBottom);
-		}else
-		{//水平方向
-			pts[0].set(skrc.fLeft,skrc.centerY());
-			pts[1].set(skrc.fRight,skrc.centerY());
-		}
-
-		SColor cr1(crBegin,byAlpha);
-		SColor cr2(crEnd,byAlpha);
-
-		const SkColor colors[2] = {cr1.toARGB(),cr2.toARGB()};
-		SkPaint paint=m_paint;
-		SkShader *pShader = SkGradientShader::CreateLinear(pts, colors, NULL,2,SkShader::kMirror_TileMode);
-		paint.setShader(pShader);
-		pShader->unref();
-		m_SkCanvas->drawRect(skrc,paint);
-		return S_OK;
-
+	HRESULT SRenderTarget_Skia::DrawGradientRect(THIS_ LPCRECT pRect,  BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha){
+		GradientInfo info={linear,{bVert?90.0f:0.0f}};
+		return DrawGradientRectEx(pRect,ptRoundCorner,pGradients,nCount,&info,byAlpha);
 	}
 
 	HRESULT SRenderTarget_Skia::FillSolidRect( LPCRECT pRect,COLORREF cr )
@@ -2118,25 +2066,18 @@ namespace SOUI
 
 	//////////////////////////////////////////////////////////////////////////
 
-	SBrush_Skia::SBrush_Skia(IRenderFactory * pRenderFac,BOOL bVert,const COLORREF *crs, const float *pos, int nCount,TileMode tileMode) 
-		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Shader),m_lstPos(NULL),m_lstColor(NULL)
+	SBrush_Skia::SBrush_Skia(IRenderFactory * pRenderFac,const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha,TileMode tileMode) 
+		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Shader)
 	{
-		m_bVert = bVert;
 		m_tileMode = (SkShader::TileMode)tileMode;
-		m_nCount = nCount;
-		m_lstColor = new SkColor[nCount];
-		for(int i=0;i<nCount;i++){
-			SColor tmp(crs[i]);
-			m_lstColor[i] = tmp.toARGB();
-		}
-		if(pos){
-			m_lstPos = new float[nCount];
-			memcpy(m_lstPos,pos,sizeof(float)*nCount);
-		}
+		m_byAlpha = byAlpha;
+		m_gradInfo = *info;
+		m_arrGradItem.SetCount(nCount);
+		memcpy(m_arrGradItem.GetData(),pGradients,sizeof(GradientItem)*nCount);
 	}
 
 	SBrush_Skia::SBrush_Skia(IRenderFactory * pRenderFac,SkBitmap bmp,TileMode xtm,TileMode ytm)
-		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Bitmap),m_lstPos(NULL),m_lstColor(NULL)
+		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Bitmap)
 	{
 		m_bmp = bmp;
 		m_xtm = (SkShader::TileMode)xtm;
@@ -2144,7 +2085,7 @@ namespace SOUI
 	}
 
 	SBrush_Skia::SBrush_Skia(IRenderFactory * pRenderFac,COLORREF cr) 
-		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Color),m_lstPos(NULL),m_lstColor(NULL)
+		:TSkiaRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Color)
 	{
 		SColor tmp(cr);
 		m_cr = tmp.toARGB();
@@ -2152,13 +2093,6 @@ namespace SOUI
 
 	SBrush_Skia::~SBrush_Skia()
 	{
-		if(m_brushType == Brush_Shader){
-			SASSERT(m_lstColor);
-			delete []m_lstColor;
-			if(m_lstPos){
-				delete []m_lstPos;
-			}
-		}
 	}
 
 	void SBrush_Skia::InitPaint(SkPaint & paint,const SkRect & skrc)
@@ -2168,22 +2102,15 @@ namespace SOUI
 			paint.setFilterBitmap(false);
 			paint.setColor(m_cr);
 		}else if(m_brushType == Brush_Bitmap){
-			paint.setShader(SkShader::CreateBitmapShader(m_bmp,m_xtm,m_ytm))->unref();
+			SkMatrix mtx;
+			mtx.setTranslate(skrc.fLeft,skrc.fTop);
+			paint.setShader(SkShader::CreateBitmapShader(m_bmp,m_xtm,m_ytm,&mtx))->unref();
 		}else//if(m_brushType == Brush_Shader)
 		{
-			SkPoint pts[2];
-			float halfWid = skrc.width()/2;
-			float halfHei = skrc.height()/2;
-			if(m_bVert)
-			{//90度
-				pts[0].set(skrc.centerX(),skrc.fTop);
-				pts[1].set(skrc.centerX(),skrc.fBottom);
-			}else
-			{//水平方向
-				pts[0].set(skrc.fLeft,skrc.centerY());
-				pts[1].set(skrc.fRight,skrc.centerY());
-			}
-			paint.setShader(SkGradientShader::CreateLinear(pts, m_lstColor, m_lstPos,m_nCount,m_tileMode))->unref();
+			SkShader *pShader = CreateShader(skrc,&m_gradInfo,m_arrGradItem.GetData(),m_arrGradItem.GetCount(),m_byAlpha,m_tileMode);
+			if(!pShader)
+				return;
+			paint.setShader(pShader)->unref();
 		}
 	}
 

@@ -13,8 +13,8 @@ SHostDialog::SHostDialog(LPCWSTR pszXmlName)
 }
 
 SHostDialog::SHostDialog(LPCSTR pszXmlName)
-: THostWndProxy<IHostDialog>(pszXmlName)
-, m_nRetCode(RC_INIT)
+    : THostWndProxy<IHostDialog>(pszXmlName)
+    , m_nRetCode(RC_INIT)
 {
 }
 
@@ -25,8 +25,8 @@ SHostDialog::~SHostDialog(void)
 
 INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
 {
-	SASSERT(!m_MsgLoop);
-	SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop,SApplication::getSingletonPtr()->GetMsgLoop());
+    SASSERT(!m_MsgLoop);
+    SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop, SApplication::getSingletonPtr()->GetMsgLoop());
 
     if (!hParent)
     {
@@ -69,7 +69,7 @@ INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
         // hide the window before enabling the parent, etc.
         if (IsWindow())
         {
-			ShowHostWnd(SW_HIDE,TRUE);
+            ShowHostWnd(SW_HIDE, TRUE);
         }
 
         if (bEnableParent)
@@ -82,17 +82,17 @@ INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
 
     if (IsWindow())
         SNativeWnd::DestroyWindow();
-	m_MsgLoop = NULL;
+    m_MsgLoop = NULL;
     return m_nRetCode;
 }
 
 void SHostDialog::EndDialog(INT_PTR nResult)
 {
-	if(!m_MsgLoop)
-	{
-		SSLOGW()<<"dialog is not show by DoModal";
-		return;
-	}
+    if (!m_MsgLoop)
+    {
+        SSLOGW() << "dialog is not show by DoModal";
+        return;
+    }
     SASSERT(nResult != RC_INIT);
     if (m_nRetCode == RC_INIT)
     {
@@ -102,12 +102,12 @@ void SHostDialog::EndDialog(INT_PTR nResult)
     }
 }
 
-IMessageLoop * SHostDialog::GetMsgLoop(THIS)
+IMessageLoop *SHostDialog::GetMsgLoop(THIS)
 {
-	if(m_MsgLoop)
-		return m_MsgLoop;
-	else
-		return SHostWnd::GetMsgLoop();
+    if (m_MsgLoop)
+        return m_MsgLoop;
+    else
+        return SHostWnd::GetMsgLoop();
 }
 
 void SHostDialog::OnOK()

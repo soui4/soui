@@ -54,7 +54,6 @@ class SOUI_EXP SStylePool
     SXmlDoc m_xmlDoc;
 };
 
-
 class SOUI_EXP STemplatePool
     : public SCmnMap<SStringW, SStringW>
     , public TObjRefImpl<IObjRef> {

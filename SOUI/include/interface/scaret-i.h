@@ -7,7 +7,7 @@ SNSBEGIN
 #define INTERFACE ICaret
 DECLARE_INTERFACE_(ICaret, IObject)
 {
-	DEF_OBJ_BASE(ICaret,Undef)
+    DEF_OBJ_BASE(ICaret, Undef)
 #include <interface/SobjectApi.h>
     //-----------------------------------------------------------------------------------
 

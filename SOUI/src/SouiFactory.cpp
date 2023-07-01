@@ -25,17 +25,17 @@ STDMETHODIMP_(INativeWnd *) SouiFactory::CreateNativeWnd(THIS)
     return new SNativeWnd();
 }
 
-STDMETHODIMP_(IHostWnd *) SouiFactory::CreateHostWnd(THIS_  LPCTSTR pszResID)
+STDMETHODIMP_(IHostWnd *) SouiFactory::CreateHostWnd(THIS_ LPCTSTR pszResID)
 {
     return new SHostWnd(pszResID);
 }
 
-STDMETHODIMP_(IHostDialog *) SouiFactory::CreateHostDialog(THIS_  LPCTSTR pszResID)
+STDMETHODIMP_(IHostDialog *) SouiFactory::CreateHostDialog(THIS_ LPCTSTR pszResID)
 {
     return new SHostDialog(pszResID);
 }
 
-STDMETHODIMP_(IStringA *) SouiFactory::CreateStringA(THIS_  LPCSTR pszSrc)
+STDMETHODIMP_(IStringA *) SouiFactory::CreateStringA(THIS_ LPCSTR pszSrc)
 {
     return new SStringA(pszSrc);
 }
@@ -50,9 +50,9 @@ STDMETHODIMP_(IXmlDoc *) SouiFactory::CreateXmlDoc(THIS)
     return new SXmlDoc();
 }
 
-IResProvider * SouiFactory::CreateResProvider(THIS_ BUILTIN_RESTYPE resType)
+IResProvider *SouiFactory::CreateResProvider(THIS_ BUILTIN_RESTYPE resType)
 {
-    IResProvider * pObj = NULL;
+    IResProvider *pObj = NULL;
     switch (resType)
     {
     case RES_PE:
@@ -67,24 +67,24 @@ IResProvider * SouiFactory::CreateResProvider(THIS_ BUILTIN_RESTYPE resType)
     return pObj;
 }
 
-IEvtSlot * SouiFactory::CreateFuncSlot(THIS_ FunCallback fun, void *ctx)
+IEvtSlot *SouiFactory::CreateFuncSlot(THIS_ FunCallback fun, void *ctx)
 {
     return new FreeFunctionSlot(fun, ctx);
 }
 
-IMenu * SouiFactory::CreateMenu(THIS_  HMENU hMenu)
+IMenu *SouiFactory::CreateMenu(THIS_ HMENU hMenu)
 {
     return new SMenu(hMenu);
 }
 
-IMenuEx * SouiFactory::CreateMenuEx(THIS)
+IMenuEx *SouiFactory::CreateMenuEx(THIS)
 {
     return new SMenuEx();
 }
 
-STDMETHODIMP_(ITimer*) SouiFactory::CreateTimer(THIS_ IEvtSlot *pSlot)
+STDMETHODIMP_(ITimer *) SouiFactory::CreateTimer(THIS_ IEvtSlot *pSlot)
 {
-	return new STimer(pSlot);
+    return new STimer(pSlot);
 }
 
 SNSEND

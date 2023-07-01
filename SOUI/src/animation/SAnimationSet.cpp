@@ -53,7 +53,7 @@ HRESULT SAnimationSet::OnAttrStartOffset(const SStringW &value, BOOL bLoading)
     return S_FALSE;
 }
 
-void SAnimationSet::initialize(int width, int height, int parentWidth, int parentHeight,int nScale)
+void SAnimationSet::initialize(int width, int height, int parentWidth, int parentHeight, int nScale)
 {
     bool durationSet = (mFlags & PROPERTY_DURATION_MASK) == PROPERTY_DURATION_MASK;
     bool fillAfterSet = (mFlags & PROPERTY_FILL_AFTER_MASK) == PROPERTY_FILL_AFTER_MASK;
@@ -91,7 +91,7 @@ void SAnimationSet::initialize(int width, int height, int parentWidth, int paren
         {
             a->setInterpolator(interpolator);
         }
-        a->initialize(width, height, parentWidth, parentHeight,nScale);
+        a->initialize(width, height, parentWidth, parentHeight, nScale);
     }
 }
 

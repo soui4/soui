@@ -567,7 +567,7 @@ SImageButton::SImageButton()
 SIZE SImageButton::MeasureContent(int wid, int hei)
 {
     SASSERT(m_pBgSkin);
-	return m_pBgSkin->GetSkinSize();
+    return m_pBgSkin->GetSkinSize();
 }
 //////////////////////////////////////////////////////////////////////////
 // Image Control
@@ -707,9 +707,9 @@ SIZE SImageWnd::MeasureContent(int wid, int hei)
         szRet = m_pImg->Size();
     else if (m_pSkin)
         szRet = m_pSkin->GetSkinSize();
-	CRect rcPadding = GetStyle().GetPadding();
-	szRet.cx += rcPadding.left + rcPadding.right;
-	szRet.cy += rcPadding.top + rcPadding.bottom;
+    CRect rcPadding = GetStyle().GetPadding();
+    szRet.cx += rcPadding.left + rcPadding.right;
+    szRet.cy += rcPadding.top + rcPadding.bottom;
     return szRet;
 }
 
@@ -744,7 +744,7 @@ SAnimateImgWnd::SAnimateImgWnd()
     m_bMsgTransparent = TRUE;
     GetEventSet()->addEvent(EVENTID(EventImageAnimateStart));
     GetEventSet()->addEvent(EVENTID(EventImageAnimateStop));
-	GetEventSet()->addEvent(EVENTID(EventImageAnimateRepeat));
+    GetEventSet()->addEvent(EVENTID(EventImageAnimateRepeat));
 }
 
 void SAnimateImgWnd::OnPaint(IRenderTarget *pRT)
@@ -828,10 +828,12 @@ void SAnimateImgWnd::OnNextFrame()
                 if (m_nRepeat != -1 && ++m_iRepeat == m_nRepeat)
                 { //检查重复次数
                     Stop();
-				}else{
-					EventImageAnimateRepeat evt(this);
-					FireEvent(evt);
-				}
+                }
+                else
+                {
+                    EventImageAnimateRepeat evt(this);
+                    FireEvent(evt);
+                }
             }
         }
         m_iTimeFrame++;
@@ -847,19 +849,20 @@ void SAnimateImgWnd::OnColorize(COLORREF cr)
 
 void SAnimateImgWnd::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer)
 {
-	if(IsPlaying()){
-		if (pOldContainer)
-			pOldContainer->UnregisterTimelineHandler(this);
-		if (pNewContainer)
-			pNewContainer->RegisterTimelineHandler(this);
-	}
+    if (IsPlaying())
+    {
+        if (pOldContainer)
+            pOldContainer->UnregisterTimelineHandler(this);
+        if (pNewContainer)
+            pNewContainer->RegisterTimelineHandler(this);
+    }
     SWindow::OnContainerChanged(pOldContainer, pNewContainer);
 }
 
 void SAnimateImgWnd::OnScaleChanged(int scale)
 {
-	__baseCls::OnScaleChanged(scale);
-	GetScaleSkin(m_pSkin, scale);
+    __baseCls::OnScaleChanged(scale);
+    GetScaleSkin(m_pSkin, scale);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -881,7 +884,7 @@ SProgress::SProgress()
     m_bFocusable = TRUE;
 }
 
-void SProgress::GetDesiredSize(SIZE *psz,int wid, int hei)
+void SProgress::GetDesiredSize(SIZE *psz, int wid, int hei)
 {
     CSize szRet;
     SIZE sizeBg = m_pSkinBg->GetSkinSize();
@@ -902,7 +905,7 @@ void SProgress::GetDesiredSize(SIZE *psz,int wid, int hei)
         else
             szRet.cx = sizeBg.cx + rcMargin.left + rcMargin.right;
     }
-	*psz = szRet;
+    *psz = szRet;
 }
 
 void SProgress::OnPaint(IRenderTarget *pRT)
@@ -1185,29 +1188,32 @@ void SIconWnd::SetIcon(HICON hIcon)
     Invalidate();
 }
 
-HRESULT SIconWnd::OnAttrIcon(const SStringW &value,BOOL bLoading)
+HRESULT SIconWnd::OnAttrIcon(const SStringW &value, BOOL bLoading)
 {
-	m_theIcon = LOADICON2(value);
-	m_strIconSrc = value;
-	return bLoading?S_FALSE:S_OK;
+    m_theIcon = LOADICON2(value);
+    m_strIconSrc = value;
+    return bLoading ? S_FALSE : S_OK;
 }
 
 void SIconWnd::OnScaleChanged(int scale)
 {
-	if(!m_strIconSrc.IsEmpty()){
-		SStringT strIconID2 = S_CW2T(m_strIconSrc);
-		SStringTList strLst;
-		int nSegs = ParseResID(strIconID2, strLst);
-		if (nSegs == 2)
-		{
-			int cx = _ttoi(strLst[1])*scale/100;
-			HICON hNew = SApplication::getSingletonPtr()->GetResProviderMgr()->LoadIcon(strLst[0], cx, cx);
-			if(hNew){
-				if(m_theIcon) DestroyIcon(m_theIcon);
-				m_theIcon = hNew;
-			}
-		}
-	}
+    if (!m_strIconSrc.IsEmpty())
+    {
+        SStringT strIconID2 = S_CW2T(m_strIconSrc);
+        SStringTList strLst;
+        int nSegs = ParseResID(strIconID2, strLst);
+        if (nSegs == 2)
+        {
+            int cx = _ttoi(strLst[1]) * scale / 100;
+            HICON hNew = SApplication::getSingletonPtr()->GetResProviderMgr()->LoadIcon(strLst[0], cx, cx);
+            if (hNew)
+            {
+                if (m_theIcon)
+                    DestroyIcon(m_theIcon);
+                m_theIcon = hNew;
+            }
+        }
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1585,15 +1591,15 @@ void SGroup::OnPaint(IRenderTarget *pRT)
 
 void SGroup::GetChildrenLayoutRect(RECT *prc) const
 {
-	__baseCls::GetChildrenLayoutRect(prc);
+    __baseCls::GetChildrenLayoutRect(prc);
     prc->top += m_nHeaderHeight.toPixelSize(GetScale());
 }
 
-void SGroup::GetDesiredSize(SIZE *psz,int nParentWid, int nParentHei)
+void SGroup::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 {
-    __baseCls::GetDesiredSize(psz,nParentWid, nParentHei);
-	if(GetLayoutParam()->IsWrapContent(Vert))
-		psz->cy += m_nHeaderHeight.toPixelSize(GetScale());
+    __baseCls::GetDesiredSize(psz, nParentWid, nParentHei);
+    if (GetLayoutParam()->IsWrapContent(Vert))
+        psz->cy += m_nHeaderHeight.toPixelSize(GetScale());
 }
 
 SNSEND

@@ -76,7 +76,7 @@ void SHostWndAttr::Init()
     m_byWndType = WT_UNDEFINE;
     m_bAllowSpy = TRUE;
     m_bSendWheel2Hover = FALSE;
-	m_bHasMsgLoop = TRUE;
+    m_bHasMsgLoop = TRUE;
     m_dwStyle = (0);
     m_dwExStyle = (0);
     if (m_hAppIconSmall)
@@ -139,21 +139,21 @@ void SHostWndAttr::SetSendWheel2Hover(bool value)
 // SRootWindow
 //////////////////////////////////////////////////////////////////////////
 
-enum{
-	kAni4Destroy=1,
-	kAni4Hide = 2,
+enum
+{
+    kAni4Destroy = 1,
+    kAni4Hide = 2,
 };
 
 enum AniState
 {
-	Ani_none = 0,
-	Ani_win_enter = 1,
-	Ani_win_exit = 2,
-	Ani_win = (Ani_win_enter|Ani_win_exit),
-	Ani_host = 4,
-	Ani_All = (Ani_win | Ani_host),
+    Ani_none = 0,
+    Ani_win_enter = 1,
+    Ani_win_exit = 2,
+    Ani_win = (Ani_win_enter | Ani_win_exit),
+    Ani_host = 4,
+    Ani_All = (Ani_win | Ani_host),
 };
-
 
 SRootWindow::SRootWindow(SHostWnd *pHostWnd)
     : m_pHostWnd(pHostWnd)
@@ -180,16 +180,17 @@ void SRootWindow::OnAnimationStop(IAnimation *pAni)
     if (pAni == m_aniEnter || pAni == m_aniExit)
     {
         m_pHostWnd->m_AniState &= ~Ani_win;
-		if(pAni == m_aniExit){
-			ULONG_PTR data = pAni->getUserData();
-			if(data==kAni4Destroy)
-				m_pHostWnd->SNativeWnd::DestroyWindow();
-			else if(data == kAni4Hide)
-			{
-				m_pHostWnd->SNativeWnd::SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
-			}
-			pAni->setUserData(0);
-		}
+        if (pAni == m_aniExit)
+        {
+            ULONG_PTR data = pAni->getUserData();
+            if (data == kAni4Destroy)
+                m_pHostWnd->SNativeWnd::DestroyWindow();
+            else if (data == kAni4Hide)
+            {
+                m_pHostWnd->SNativeWnd::SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
+            }
+            pAni->setUserData(0);
+        }
     }
 }
 
@@ -233,7 +234,7 @@ void SRootWindow::UpdateLayout()
             nHei = GetLayoutParam()->IsSpecifiedSize(Vert) ? GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale()) : SIZE_WRAP_CONTENT;
         }
         CSize szRoot;
-		GetDesiredSize(&szRoot,nWid, nHei);
+        GetDesiredSize(&szRoot, nWid, nHei);
         OnRelayout(CRect(CPoint(), szRoot));
     }
     else
@@ -272,7 +273,7 @@ void SRootWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
             break;
         rcSour = pSource->GetWindowRect();
     }
-    m_pHostWnd->OnRedraw(rcSour,FALSE);
+    m_pHostWnd->OnRedraw(rcSour, FALSE);
 }
 
 SHostWnd *SRootWindow::GetHostWnd() const
@@ -285,48 +286,36 @@ SHostWnd *SRootWindow::GetHostWnd() const
 //////////////////////////////////////////////////////////////////////////
 SHostWnd::SHostWnd(LPCWSTR pszResName /*= NULL*/)
 {
-	if(pszResName)
-		m_strXmlLayout = S_CW2T(pszResName);
-	_Init();
+    if (pszResName)
+        m_strXmlLayout = S_CW2T(pszResName);
+    _Init();
 }
 
 SHostWnd::SHostWnd(LPCSTR pszResName)
 {
-	if(pszResName)
-		m_strXmlLayout = S_CA2T(pszResName,CP_UTF8);
-	_Init();
+    if (pszResName)
+        m_strXmlLayout = S_CA2T(pszResName, CP_UTF8);
+    _Init();
 }
 
 void SHostWnd::_Init()
 {
-	SApplication::getSingletonPtr()->AddRef();
-	m_bTrackFlag=(FALSE)
-		, m_bNeedRepaint=(FALSE)
-		, m_bNeedAllRepaint=(TRUE)
-		, m_pTipCtrl=(NULL)
-		, m_dummyWnd=(NULL)
-		, m_szAppSetted = CSize(0, 0)
-		, m_nAutoSizing=(0)
-		, m_bResizing=(false)
-		, m_dwThreadID=(0)
-		, m_AniState=(0)
-		, m_pRoot = (new SRootWindow(this))
-		, m_pNcPainter.Attach(new SNcPainter(this));
+    SApplication::getSingletonPtr()->AddRef();
+    m_bTrackFlag = (FALSE), m_bNeedRepaint = (FALSE), m_bNeedAllRepaint = (TRUE), m_pTipCtrl = (NULL), m_dummyWnd = (NULL), m_szAppSetted = CSize(0, 0), m_nAutoSizing = (0), m_bResizing = (false), m_dwThreadID = (0), m_AniState = (0), m_pRoot = (new SRootWindow(this)), m_pNcPainter.Attach(new SNcPainter(this));
 
-	SwndContainerImpl::SetRoot(m_pRoot);
-	m_msgMouse.message = 0;
+    SwndContainerImpl::SetRoot(m_pRoot);
+    m_msgMouse.message = 0;
 
-	m_pRoot->SetContainer(this);
-	m_hostAnimationHandler.m_pHostWnd = this;
-	m_evtHandler.fun = NULL;
-	m_evtHandler.ctx = NULL;
+    m_pRoot->SetContainer(this);
+    m_hostAnimationHandler.m_pHostWnd = this;
+    m_evtHandler.fun = NULL;
+    m_evtHandler.ctx = NULL;
 }
-
 
 SHostWnd::~SHostWnd()
 {
     delete m_pRoot;
-	SApplication::getSingletonPtr()->Release();
+    SApplication::getSingletonPtr()->Release();
 }
 
 HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)
@@ -385,7 +374,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     // free old script module
     if (m_pScriptModule)
     {
-		GetMsgLoop()->RemoveIdleHandler(m_pScriptModule->getIdleHandler());
+        GetMsgLoop()->RemoveIdleHandler(m_pScriptModule->getIdleHandler());
         EventExit evt(GetRoot());
         GetRoot()->FireEvent(evt);
         m_pScriptModule = NULL;
@@ -398,63 +387,69 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     m_hostAttr.Init();
     m_hostAttr.InitFromXml(pNode);
 
-	if(m_privateUiDefInfo){
-		GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
-		m_privateUiDefInfo = NULL;
-	}
-	SUiDefInfo * pUiDefInfo = new SUiDefInfo;
-	if(pUiDefInfo->Init(pNode,FALSE)){//init private uidef info.
-		m_privateUiDefInfo = pUiDefInfo;
-		GETUIDEF->PushUiDefInfo(pUiDefInfo);
-	}
-	pUiDefInfo->Release();
-	
+    if (m_privateUiDefInfo)
+    {
+        GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
+        m_privateUiDefInfo = NULL;
+    }
+    SUiDefInfo *pUiDefInfo = new SUiDefInfo;
+    if (pUiDefInfo->Init(pNode, FALSE))
+    { // init private uidef info.
+        m_privateUiDefInfo = pUiDefInfo;
+        GETUIDEF->PushUiDefInfo(pUiDefInfo);
+    }
+    pUiDefInfo->Release();
+
     //加载脚本数据
-	SXmlNode xmlNode(pNode);
+    SXmlNode xmlNode(pNode);
     SXmlNode xmlScript = xmlNode.child(L"script");
     if (xmlScript)
-	{    // create new script module
-		xmlScript.set_userdata(1);
-		SApplication::getSingleton().CreateScriptModule(&m_pScriptModule);
-		if(m_pScriptModule){
-			IIdleHandler *pIdleHandler = m_pScriptModule->getIdleHandler();
-			if(pIdleHandler)
-				GetMsgLoop()->AddIdleHandler(pIdleHandler);
-			SXmlAttr attrSrc = xmlScript.attribute(L"src");
-			if (attrSrc)
-			{
-				SStringT strSrc = S_CW2T(attrSrc.value());
-				SStringTList lstSrc;
-				ParseResID(strSrc, lstSrc);
-				LPCTSTR pszType=NULL;
-				LPCTSTR pszName=NULL;
-				if(lstSrc.GetCount()==2){
-					pszType=lstSrc[0];
-					pszName=lstSrc[1];
-				}else{
-					pszName=strSrc;
-				}
-				{
-					size_t dwSize = SApplication::getSingleton().GetRawBufferSize(pszType, pszName);
-					if (dwSize)
-					{
-						SAutoBuf buff(dwSize);
-						SApplication::getSingleton().GetRawBuffer(pszType, pszName, buff, dwSize);
-						m_pScriptModule->executeScriptBuffer(buff, dwSize);
-					}
-				}
-			}
-			else
-			{
-				//从script节点的cdata中获取脚本
-				SStringW strScript = xmlScript.child_value();
-				if (!strScript.IsEmpty())
-				{
-					SStringA utf8Script = S_CW2A(strScript, CP_UTF8);
-					m_pScriptModule->executeScriptBuffer(utf8Script, utf8Script.GetLength());
-				}
-			}
-		}
+    { // create new script module
+        xmlScript.set_userdata(1);
+        SApplication::getSingleton().CreateScriptModule(&m_pScriptModule);
+        if (m_pScriptModule)
+        {
+            IIdleHandler *pIdleHandler = m_pScriptModule->getIdleHandler();
+            if (pIdleHandler)
+                GetMsgLoop()->AddIdleHandler(pIdleHandler);
+            SXmlAttr attrSrc = xmlScript.attribute(L"src");
+            if (attrSrc)
+            {
+                SStringT strSrc = S_CW2T(attrSrc.value());
+                SStringTList lstSrc;
+                ParseResID(strSrc, lstSrc);
+                LPCTSTR pszType = NULL;
+                LPCTSTR pszName = NULL;
+                if (lstSrc.GetCount() == 2)
+                {
+                    pszType = lstSrc[0];
+                    pszName = lstSrc[1];
+                }
+                else
+                {
+                    pszName = strSrc;
+                }
+                {
+                    size_t dwSize = SApplication::getSingleton().GetRawBufferSize(pszType, pszName);
+                    if (dwSize)
+                    {
+                        SAutoBuf buff(dwSize);
+                        SApplication::getSingleton().GetRawBuffer(pszType, pszName, buff, dwSize);
+                        m_pScriptModule->executeScriptBuffer(buff, dwSize);
+                    }
+                }
+            }
+            else
+            {
+                //从script节点的cdata中获取脚本
+                SStringW strScript = xmlScript.child_value();
+                if (!strScript.IsEmpty())
+                {
+                    SStringA utf8Script = S_CW2A(strScript, CP_UTF8);
+                    m_pScriptModule->executeScriptBuffer(utf8Script, utf8Script.GetLength());
+                }
+            }
+        }
     }
     SXmlNode xmlNcPainter = xmlNode.child(SNcPainter::GetClassName());
     xmlNcPainter.set_userdata(1);
@@ -548,7 +543,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     int nHeight = m_szAppSetted.cy;
     CSize szNc = m_pNcPainter->GetNcSize();
     CSize szRoot;
-	GetRoot()->GetDesiredSize(&szRoot,nWidth, nHeight);
+    GetRoot()->GetDesiredSize(&szRoot, nWidth, nHeight);
 
     ILayoutParam *pLayoutParam = GetRoot()->GetLayoutParam();
     if (nWidth == 0 && pLayoutParam->IsSpecifiedSize(Horz))
@@ -621,38 +616,37 @@ void SHostWnd::_Redraw()
     _Invalidate(NULL);
 }
 
-
 void SHostWnd::_RedrawRegion(IRegionS *pRgnUpdate, CRect &rcInvalid)
 {
-	CRect rcWnd = m_pRoot->GetWindowRect();
+    CRect rcWnd = m_pRoot->GetWindowRect();
 
-	SPainter painter;
-	m_pRoot->BeforePaint(m_memRT, painter);
+    SPainter painter;
+    m_pRoot->BeforePaint(m_memRT, painter);
 
-	if (!pRgnUpdate->IsEmpty())
-	{
-		pRgnUpdate->GetRgnBox(&rcInvalid);
-		rcInvalid.IntersectRect(rcInvalid, rcWnd);
-		m_memRT->PushClipRegion(pRgnUpdate, RGN_COPY);
-	}
-	else
-	{
-		rcInvalid = rcWnd;
-		m_memRT->PushClipRect(&rcInvalid, RGN_COPY);
-	}
-	//清除残留的alpha值
-	m_memRT->ClearRect(rcInvalid, 0);
+    if (!pRgnUpdate->IsEmpty())
+    {
+        pRgnUpdate->GetRgnBox(&rcInvalid);
+        rcInvalid.IntersectRect(rcInvalid, rcWnd);
+        m_memRT->PushClipRegion(pRgnUpdate, RGN_COPY);
+    }
+    else
+    {
+        rcInvalid = rcWnd;
+        m_memRT->PushClipRect(&rcInvalid, RGN_COPY);
+    }
+    //清除残留的alpha值
+    m_memRT->ClearRect(rcInvalid, 0);
 
-	int clipState=0;
-	m_memRT->SaveClip(&clipState); 
-	_ExcludeVideoCanvasFromPaint(m_memRT);	//exclude video canvas region from normal paint routine.
-	GetRoot()->RedrawRegion(m_memRT, pRgnUpdate);
-	m_memRT->RestoreClip(clipState);
-	_PaintVideoCanvasForeground(m_memRT);		//paint foreground of video canvas.
+    int clipState = 0;
+    m_memRT->SaveClip(&clipState);
+    _ExcludeVideoCanvasFromPaint(m_memRT); // exclude video canvas region from normal paint routine.
+    GetRoot()->RedrawRegion(m_memRT, pRgnUpdate);
+    m_memRT->RestoreClip(clipState);
+    _PaintVideoCanvasForeground(m_memRT); // paint foreground of video canvas.
 
-	m_memRT->PopClip();
+    m_memRT->PopClip();
 
-	m_pRoot->AfterPaint(m_memRT, painter);
+    m_pRoot->AfterPaint(m_memRT, painter);
 }
 
 void SHostWnd::OnPrint(HDC dc, UINT uFlags)
@@ -673,13 +667,13 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
     if (m_bNeedRepaint)
     {
         m_bNeedRepaint = FALSE;
-		BuildWndTreeZorder();
-		// m_rgnInvalidate有可能在RedrawRegion时被修改，必须生成一个临时的区域对象
-		SAutoRefPtr<IRegionS> pRgnUpdate = m_rgnInvalidate;
-		m_rgnInvalidate = NULL;
-		GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
+        BuildWndTreeZorder();
+        // m_rgnInvalidate有可能在RedrawRegion时被修改，必须生成一个临时的区域对象
+        SAutoRefPtr<IRegionS> pRgnUpdate = m_rgnInvalidate;
+        m_rgnInvalidate = NULL;
+        GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
 
-		_RedrawRegion(pRgnUpdate,rcInvalid);
+        _RedrawRegion(pRgnUpdate, rcInvalid);
     }
     else
     { //缓存已经更新好了，只需要重新更新到窗口
@@ -692,7 +686,7 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         ::GetClipBox(dc, &rcUpdate);
         rcInvalid = rcInvalid | rcUpdate;
     }
-    UpdatePresenter(dc, m_memRT,rcInvalid);
+    UpdatePresenter(dc, m_memRT, rcInvalid);
 }
 
 void SHostWnd::OnPaint(HDC dc)
@@ -721,10 +715,10 @@ void SHostWnd::DestroyTooltip(IToolTip *pTooltip) const
 BOOL SHostWnd::OnLoadLayoutFromResourceID(const SStringT &resId)
 {
     if (resId.IsEmpty())
-	{
-		SSLOGW()<<"resId is empty, return TRUE";
-		return TRUE;
-	}
+    {
+        SSLOGW() << "resId is empty, return TRUE";
+        return TRUE;
+    }
     SXmlDoc xmlDoc;
     if (LOADXML(xmlDoc, resId))
     {
@@ -740,10 +734,10 @@ BOOL SHostWnd::OnLoadLayoutFromResourceID(const SStringT &resId)
 
 int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-	if(!m_presenter)
-	{
-		m_presenter.Attach(new SHostPresenter(this));
-	}
+    if (!m_presenter)
+    {
+        m_presenter.Attach(new SHostPresenter(this));
+    }
     m_presenter->OnHostCreate();
     m_dwThreadID = GetCurrentThreadId();
     SHostMgr::getSingletonPtr()->AddHostMsgHandler(this);
@@ -754,8 +748,8 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
     m_szAppSetted.cx = lpCreateStruct->cx;
     m_szAppSetted.cy = lpCreateStruct->cy;
-    if(!OnLoadLayoutFromResourceID(m_strXmlLayout))
-		return -1;
+    if (!OnLoadLayoutFromResourceID(m_strXmlLayout))
+        return -1;
 
     m_pTipCtrl = CreateTooltip();
     if (m_pTipCtrl && m_hostAttr.m_bHasMsgLoop)
@@ -766,12 +760,13 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void SHostWnd::OnDestroy()
 {
-	if(m_privateUiDefInfo){
-		GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
-		m_privateUiDefInfo = NULL;
-	}
-	m_presenter->OnHostDestroy();
-	m_presenter = NULL;
+    if (m_privateUiDefInfo)
+    {
+        GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
+        m_privateUiDefInfo = NULL;
+    }
+    m_presenter->OnHostDestroy();
+    m_presenter = NULL;
     EventExit evt(GetRoot());
     GetRoot()->FireEvent(evt);
 
@@ -779,17 +774,18 @@ void SHostWnd::OnDestroy()
     GetRoot()->SSendMessage(UM_SETSCALE, 100);
     if (m_pTipCtrl)
     {
-		if(m_hostAttr.m_bHasMsgLoop)
-			GetMsgLoop()->RemoveMessageFilter(m_pTipCtrl);
+        if (m_hostAttr.m_bHasMsgLoop)
+            GetMsgLoop()->RemoveMessageFilter(m_pTipCtrl);
         DestroyTooltip(m_pTipCtrl);
         m_pTipCtrl = NULL;
     }
-	if(m_pScriptModule){
-		IIdleHandler *pIdleHandler = m_pScriptModule->getIdleHandler();
-		if(pIdleHandler)
-			GetMsgLoop()->RemoveIdleHandler(pIdleHandler);
-		m_pScriptModule=NULL;
-	}
+    if (m_pScriptModule)
+    {
+        IIdleHandler *pIdleHandler = m_pScriptModule->getIdleHandler();
+        if (pIdleHandler)
+            GetMsgLoop()->RemoveIdleHandler(pIdleHandler);
+        m_pScriptModule = NULL;
+    }
     m_memRT = NULL;
     m_rgnInvalidate = NULL;
 
@@ -802,7 +798,7 @@ void SHostWnd::OnDestroy()
 void SHostWnd::OnSize(UINT nType, CSize size)
 {
     SetMsgHandled(FALSE); // chain wm_size to ncpainter.
-	SNcPainter::updateSystemButton(GetRoot(),nType);
+    SNcPainter::updateSystemButton(GetRoot(), nType);
     if (IsIconic())
         return;
 
@@ -819,7 +815,7 @@ void SHostWnd::OnSize(UINT nType, CSize size)
     _Redraw();
     if (m_nAutoSizing && bDirty)
         GetRoot()->m_layoutDirty = SWindow::dirty_self;
-	m_presenter->OnHostResize(size);
+    m_presenter->OnHostResize(size);
     m_bResizing = FALSE;
 }
 
@@ -975,36 +971,36 @@ void SHostWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
 
 BOOL SHostWnd::OnFireEvent(IEvtArgs *evt)
 {
-	if (m_evtHandler.fun)
-	{
-		if(m_evtHandler.fun(evt,m_evtHandler.ctx))
-			return TRUE;
-	}
-	EventCmd *e2 = sobj_cast<EventCmd>(evt);
-	if (e2)
-	{
-		bool bSysBtn = true;
-		switch (e2->idFrom)
-		{
-		case SNcPainter::IDC_SYS_CLOSE:
-			PostMessage(WM_SYSCOMMAND, SC_CLOSE);
-			break;
-		case SNcPainter::IDC_SYS_MIN:
-			PostMessage(WM_SYSCOMMAND, SC_MINIMIZE);
-			break;
-		case SNcPainter::IDC_SYS_MAX:
-			PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE);
-			break;
-		case SNcPainter::IDC_SYS_RESTORE:
-			PostMessage(WM_SYSCOMMAND, SC_RESTORE);
-			break;
-		default:
-			bSysBtn = false;
-			break;
-		}
-		if (bSysBtn)
-			return TRUE;
-	}
+    if (m_evtHandler.fun)
+    {
+        if (m_evtHandler.fun(evt, m_evtHandler.ctx))
+            return TRUE;
+    }
+    EventCmd *e2 = sobj_cast<EventCmd>(evt);
+    if (e2)
+    {
+        bool bSysBtn = true;
+        switch (e2->idFrom)
+        {
+        case SNcPainter::IDC_SYS_CLOSE:
+            PostMessage(WM_SYSCOMMAND, SC_CLOSE);
+            break;
+        case SNcPainter::IDC_SYS_MIN:
+            PostMessage(WM_SYSCOMMAND, SC_MINIMIZE);
+            break;
+        case SNcPainter::IDC_SYS_MAX:
+            PostMessage(WM_SYSCOMMAND, SC_MAXIMIZE);
+            break;
+        case SNcPainter::IDC_SYS_RESTORE:
+            PostMessage(WM_SYSCOMMAND, SC_RESTORE);
+            break;
+        default:
+            bSysBtn = false;
+            break;
+        }
+        if (bSysBtn)
+            return TRUE;
+    }
     return _HandleEvent(evt);
 }
 
@@ -1018,38 +1014,36 @@ HWND SHostWnd::GetHostHwnd()
     return m_hWnd;
 }
 
-void SHostWnd::UpdatePresenter(HDC dc,IRenderTarget*pRT, LPCRECT rcInvalid, BYTE byAlpha)
+void SHostWnd::UpdatePresenter(HDC dc, IRenderTarget *pRT, LPCRECT rcInvalid, BYTE byAlpha)
 {
-	byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
-	m_presenter->OnHostPresent(dc,pRT,rcInvalid,byAlpha);
+    byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
+    m_presenter->OnHostPresent(dc, pRT, rcInvalid, byAlpha);
 }
 
 void SHostWnd::UpdateAlpha(BYTE byAlpha)
 {
-	byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
-	m_presenter->OnHostAlpha(byAlpha);
+    byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
+    m_presenter->OnHostAlpha(byAlpha);
 }
 
-void SHostWnd::OnRedraw(LPCRECT rc,BOOL bClip)
+void SHostWnd::OnRedraw(LPCRECT rc, BOOL bClip)
 {
     if (!IsWindow())
         return;
 
-	m_rgnInvalidate->CombineRect(rc, bClip?RGN_DIFF:RGN_OR);
+    m_rgnInvalidate->CombineRect(rc, bClip ? RGN_DIFF : RGN_OR);
 
     m_bNeedRepaint = TRUE;
 
     _Invalidate(rc);
 }
 
-
 void SHostWnd::UpdateRegion(IRegionS *rgn)
 {
-	CRect rcInvalid;
-	_RedrawRegion(rgn,rcInvalid);
-	UpdatePresenter(0,m_memRT,rcInvalid);
+    CRect rcInvalid;
+    _RedrawRegion(rgn, rcInvalid);
+    UpdatePresenter(0, m_memRT, rcInvalid);
 }
-
 
 BOOL SHostWnd::OnReleaseSwndCapture()
 {
@@ -1095,9 +1089,10 @@ void SHostWnd::UpdateTooltip()
 {
     if (!m_pTipCtrl)
         return;
-	if(!m_hostAttr.m_bHasMsgLoop){
-		m_pTipCtrl->RelayEvent((LPMSG)GetCurrentMessage());
-	}
+    if (!m_hostAttr.m_bHasMsgLoop)
+    {
+        m_pTipCtrl->RelayEvent((LPMSG)GetCurrentMessage());
+    }
     SWindow *pHover = SWindowMgr::GetWindow(m_hHover);
     if (m_msgMouse.message != 0 || !pHover)
     {
@@ -1221,7 +1216,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     if (dwFlags & AW_HOR_NEGATIVE)
                         ptAnchor.x = rcWnd.right - rcShow.Width();
                     _BitBlt(pRT, m_memRT, rcShow, ptAnchor);
-                    UpdatePresenter(0,pRT,&rcWnd, byAlpha);
+                    UpdatePresenter(0, pRT, &rcWnd, byAlpha);
                     Sleep(10);
                 }
                 ShowWindow(SW_HIDE);
@@ -1236,7 +1231,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     rcShow.DeflateRect(xStep, yStep);
                     pRT->ClearRect(rcWnd, 0);
                     _BitBlt(pRT, m_memRT, rcShow, rcShow.TopLeft());
-                    UpdatePresenter(0,pRT,rcWnd, byAlpha);
+                    UpdatePresenter(0, pRT, rcWnd, byAlpha);
                     Sleep(10);
                 }
                 ShowWindow(SW_HIDE);
@@ -1248,7 +1243,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 for (int i = 0; i < nSteps; i++)
                 {
                     byAlpha2 -= 255 / nSteps;
-                    UpdatePresenter(0,m_memRT,&rcWnd, byAlpha2);
+                    UpdatePresenter(0, m_memRT, &rcWnd, byAlpha2);
                     Sleep(10);
                 }
                 ShowWindow(SW_HIDE);
@@ -1259,7 +1254,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
         else
         {
             pRT->ClearRect(rcWnd, 0);
-			UpdatePresenter(0,pRT,&rcWnd,byAlpha);
+            UpdatePresenter(0, pRT, &rcWnd, byAlpha);
             SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_SHOWWINDOW | ((dwFlags & AW_ACTIVATE) ? 0 : SWP_NOACTIVATE));
 
             if (dwFlags & AW_SLIDE)
@@ -1305,10 +1300,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     if (dwFlags & AW_HOR_POSITIVE)
                         ptAnchor.x = rcWnd.right - rcShow.Width();
                     _BitBlt(pRT, m_memRT, rcShow, ptAnchor);
-                    UpdatePresenter(0,pRT,&rcWnd, byAlpha);
+                    UpdatePresenter(0, pRT, &rcWnd, byAlpha);
                     Sleep(10);
                 }
-                UpdatePresenter(0,m_memRT,&rcWnd, byAlpha);
+                UpdatePresenter(0, m_memRT, &rcWnd, byAlpha);
 
                 return TRUE;
             }
@@ -1323,10 +1318,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     rcShow.InflateRect(xStep, yStep);
                     pRT->ClearRect(rcWnd, 0);
                     _BitBlt(pRT, m_memRT, rcShow, rcShow.TopLeft());
-                    UpdatePresenter(0,pRT,&rcWnd, byAlpha);
+                    UpdatePresenter(0, pRT, &rcWnd, byAlpha);
                     Sleep(10);
                 }
-                UpdatePresenter(0,m_memRT,&rcWnd, byAlpha);
+                UpdatePresenter(0, m_memRT, &rcWnd, byAlpha);
                 return TRUE;
             }
             else if (dwFlags & AW_BLEND)
@@ -1335,10 +1330,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 for (int i = 0; i < nSteps; i++)
                 {
                     byAlpha2 += byAlpha / nSteps;
-                    UpdatePresenter(0,m_memRT, &rcWnd,byAlpha2);
+                    UpdatePresenter(0, m_memRT, &rcWnd, byAlpha2);
                     Sleep(10);
                 }
-                UpdatePresenter(0,m_memRT, &rcWnd,byAlpha);
+                UpdatePresenter(0, m_memRT, &rcWnd, byAlpha);
                 return TRUE;
             }
         }
@@ -1377,8 +1372,9 @@ LPCWSTR SHostWnd::GetTranslatorContext() const
 
 IMessageLoop *SHostWnd::GetMsgLoop()
 {
-	DWORD tid = m_dwThreadID;
-	if(tid == 0) tid = GetCurrentThreadId();
+    DWORD tid = m_dwThreadID;
+    if (tid == 0)
+        tid = GetCurrentThreadId();
     return SApplication::getSingletonPtr()->GetMsgLoop(tid);
 }
 
@@ -1505,7 +1501,7 @@ BOOL SHostWnd::DestroyWindow()
     }
     if (m_pRoot->m_aniExit && !IsIconic())
     {
-		m_pRoot->m_aniExit->setUserData(kAni4Destroy);//mark for destroy
+        m_pRoot->m_aniExit->setUserData(kAni4Destroy); // mark for destroy
         GetRoot()->StartAnimation(m_pRoot->m_aniExit);
         m_AniState |= Ani_win_exit;
         return TRUE;
@@ -1532,20 +1528,21 @@ CRect SHostWnd::GetClientRect() const
 
 LRESULT SHostWnd::OnMenuExEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	return OnFireEvent((IEvtArgs *)lParam);
+    return OnFireEvent((IEvtArgs *)lParam);
 }
 
 void SHostWnd::OnWindowPosChanging(LPWINDOWPOS lpWndPos)
 { //默认不处理该消息，同时防止系统处理该消息
     if (lpWndPos->flags & SWP_SHOWWINDOW && m_bFirstShow)
     {
-		if(m_pRoot->m_aniEnter){
-			m_AniState |= Ani_win_enter;
-			m_pRoot->StartAnimation(m_pRoot->m_aniEnter);
-			OnNextFrame();
-		}
-		m_bFirstShow = FALSE;
-	}
+        if (m_pRoot->m_aniEnter)
+        {
+            m_AniState |= Ani_win_enter;
+            m_pRoot->StartAnimation(m_pRoot->m_aniEnter);
+            OnNextFrame();
+        }
+        m_bFirstShow = FALSE;
+    }
 }
 
 void SHostWnd::OnWindowPosChanged(LPWINDOWPOS lpWndPos)
@@ -1653,7 +1650,7 @@ bool SHostWnd::StartHostAnimation(IAnimation *pAni)
         GetMonitorInfo(hMonitor, &info);
         rcParent = info.rcWork;
     }
-    m_hostAnimation->initialize(rcWnd.Width(), rcWnd.Height(), rcParent.Width(), rcParent.Height(),GetScale());
+    m_hostAnimation->initialize(rcWnd.Width(), rcWnd.Height(), rcParent.Width(), rcParent.Height(), GetScale());
     m_hostAnimationHandler.m_rcInit = rcWnd;
     RegisterTimelineHandler(&m_hostAnimationHandler);
     return true;
@@ -1683,7 +1680,7 @@ void SHostWnd::UpdateAutoSizeCount(bool bInc)
 
 void SHostWnd::OnHostMsg(BOOL bRelayout, UINT uMsg, WPARAM wp, LPARAM lp)
 {
-	GetNcPainter()->GetRoot()->SDispatchMessage(uMsg,wp,lp);
+    GetNcPainter()->GetRoot()->SDispatchMessage(uMsg, wp, lp);
     GetRoot()->SDispatchMessage(uMsg, wp, lp);
     if (bRelayout)
     {
@@ -1767,13 +1764,13 @@ void SHostWnd::_SetToolTipInfo(const SwndToolTipInfo *info, BOOL bNcTip)
 
 void SHostWnd::SetEventHandler(THIS_ FunCallback fun, void *ctx)
 {
-	m_evtHandler.fun = fun;
-	m_evtHandler.ctx = ctx;
+    m_evtHandler.fun = fun;
+    m_evtHandler.ctx = ctx;
 }
 
-EventHandlerInfo* SHostWnd::GetEventHandler(THIS)
+EventHandlerInfo *SHostWnd::GetEventHandler(THIS)
 {
-	return &m_evtHandler;
+    return &m_evtHandler;
 }
 
 BOOL SHostWnd::_HandleEvent(IEvtArgs *pEvt)
@@ -1783,88 +1780,103 @@ BOOL SHostWnd::_HandleEvent(IEvtArgs *pEvt)
 
 void SHostWnd::_ExcludeVideoCanvasFromPaint(IRenderTarget *pRT)
 {
-	SPOSITION pos = m_lstVideoCanvas.GetHeadPosition();
-	while(pos){
-		SWND swnd = m_lstVideoCanvas.GetNext(pos);
-		SWindow *pWnd = SWindowMgr::GetWindow(swnd);
-		if(pWnd && pWnd->IsVisible(TRUE)){
-			CRect rcCanvas;
-			pWnd->GetVisibleRect(&rcCanvas);
-			pRT->PushClipRect(&rcCanvas,RGN_DIFF);
-		}
-	}
+    SPOSITION pos = m_lstVideoCanvas.GetHeadPosition();
+    while (pos)
+    {
+        SWND swnd = m_lstVideoCanvas.GetNext(pos);
+        SWindow *pWnd = SWindowMgr::GetWindow(swnd);
+        if (pWnd && pWnd->IsVisible(TRUE))
+        {
+            CRect rcCanvas;
+            pWnd->GetVisibleRect(&rcCanvas);
+            pRT->PushClipRect(&rcCanvas, RGN_DIFF);
+        }
+    }
 }
 
 void SHostWnd::_PaintVideoCanvasForeground(IRenderTarget *pRT)
 {
-	SPOSITION pos = m_lstVideoCanvas.GetHeadPosition();
-	while(pos){
-		SWND swnd = m_lstVideoCanvas.GetNext(pos);
-		SWindow *pWnd = SWindowMgr::GetWindow(swnd);
-		if(pWnd && pWnd->IsVisible(TRUE)){
-			CRect rcCanvas;
-			pWnd->GetVisibleRect(&rcCanvas);
-			if(!rcCanvas.IsRectEmpty())
-			{
-				pWnd->SSendMessage(WM_ERASEBKGND, (WPARAM)pRT);
-				pWnd->SSendMessage(WM_PAINT, (WPARAM)pRT);
-				pWnd->PaintForeground(pRT,&rcCanvas);
-			}
-		}
-	}
+    SPOSITION pos = m_lstVideoCanvas.GetHeadPosition();
+    while (pos)
+    {
+        SWND swnd = m_lstVideoCanvas.GetNext(pos);
+        SWindow *pWnd = SWindowMgr::GetWindow(swnd);
+        if (pWnd && pWnd->IsVisible(TRUE))
+        {
+            CRect rcCanvas;
+            pWnd->GetVisibleRect(&rcCanvas);
+            if (!rcCanvas.IsRectEmpty())
+            {
+                pWnd->SSendMessage(WM_ERASEBKGND, (WPARAM)pRT);
+                pWnd->SSendMessage(WM_PAINT, (WPARAM)pRT);
+                pWnd->PaintForeground(pRT, &rcCanvas);
+            }
+        }
+    }
 }
 
-IHostPresenter* SHostWnd::GetPresenter(THIS)
+IHostPresenter *SHostWnd::GetPresenter(THIS)
 {
-	return m_presenter;
+    return m_presenter;
 }
 
-void SHostWnd::SetPresenter(THIS_ IHostPresenter* pPresenter){
-	m_presenter = pPresenter;
+void SHostWnd::SetPresenter(THIS_ IHostPresenter *pPresenter)
+{
+    m_presenter = pPresenter;
 }
 
 void SHostWnd::EnableDragDrop(THIS)
 {
-	::RegisterDragDrop(m_hWnd,GetDropTarget());
+    ::RegisterDragDrop(m_hWnd, GetDropTarget());
 }
 
-void SHostWnd::ShowHostWnd(THIS_ int nShowCmd,BOOL bWaitAniDone)
+void SHostWnd::ShowHostWnd(THIS_ int nShowCmd, BOOL bWaitAniDone)
 {
-	if(nShowCmd!=SW_HIDE)
-	{
-		if(IsWindowVisible())
-			return;
-		ShowWindow(nShowCmd);
-		if(m_pRoot->m_aniEnter){
-			m_AniState |= Ani_win_enter;
-			m_pRoot->StartAnimation(m_pRoot->m_aniEnter);
-			OnNextFrame();
-		}else{
-			bWaitAniDone = FALSE;
-		}
-	}else{
-		//hide
-		if(!IsWindowVisible())
-			return;
-		if(m_AniState & Ani_win)
-			m_pRoot->ClearAnimation();
-		if(m_pRoot->m_aniExit){
-			m_AniState |= Ani_win_exit;
-			m_pRoot->m_aniExit->setUserData(kAni4Hide);//mark for hide
-			m_pRoot->StartAnimation(m_pRoot->m_aniExit);
-		}else{
-			SNativeWnd::SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
-			bWaitAniDone = FALSE;
-		}
-	}
-	if(bWaitAniDone){
-		SAutoRefPtr<IMessageLoop> msgLoop;
-		SApplication::getSingletonPtr()->GetMsgLoopFactory()->CreateMsgLoop(&msgLoop,GetMsgLoop());
-		for(;m_AniState & Ani_win;){
-			msgLoop->WaitMsg();
-			msgLoop->HandleMsg();
-		}
-	}
+    if (nShowCmd != SW_HIDE)
+    {
+        if (IsWindowVisible())
+            return;
+        ShowWindow(nShowCmd);
+        if (m_pRoot->m_aniEnter)
+        {
+            m_AniState |= Ani_win_enter;
+            m_pRoot->StartAnimation(m_pRoot->m_aniEnter);
+            OnNextFrame();
+        }
+        else
+        {
+            bWaitAniDone = FALSE;
+        }
+    }
+    else
+    {
+        // hide
+        if (!IsWindowVisible())
+            return;
+        if (m_AniState & Ani_win)
+            m_pRoot->ClearAnimation();
+        if (m_pRoot->m_aniExit)
+        {
+            m_AniState |= Ani_win_exit;
+            m_pRoot->m_aniExit->setUserData(kAni4Hide); // mark for hide
+            m_pRoot->StartAnimation(m_pRoot->m_aniExit);
+        }
+        else
+        {
+            SNativeWnd::SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOSIZE | SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
+            bWaitAniDone = FALSE;
+        }
+    }
+    if (bWaitAniDone)
+    {
+        SAutoRefPtr<IMessageLoop> msgLoop;
+        SApplication::getSingletonPtr()->GetMsgLoopFactory()->CreateMsgLoop(&msgLoop, GetMsgLoop());
+        for (; m_AniState & Ani_win;)
+        {
+            msgLoop->WaitMsg();
+            msgLoop->HandleMsg();
+        }
+    }
 }
 
 //////////////////////////////////////////////////////////////////
@@ -1893,14 +1905,16 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
     }
     if (xform.hasAlpha())
     { // change alpha.
-		if(m_pHostWnd->IsTranslucent()){
-			CRect rcWnd =m_pHostWnd->GetClientRect();
-			IRenderTarget *pRT = m_pHostWnd->m_memRT;
-			m_pHostWnd->UpdatePresenter(0,pRT,&rcWnd,xform.GetAlpha());
-		}else if(m_pHostWnd->GetExStyle() & WS_EX_LAYERED)
-		{
-			m_pHostWnd->UpdateAlpha(xform.GetAlpha());
-		}
+        if (m_pHostWnd->IsTranslucent())
+        {
+            CRect rcWnd = m_pHostWnd->GetClientRect();
+            IRenderTarget *pRT = m_pHostWnd->m_memRT;
+            m_pHostWnd->UpdatePresenter(0, pRT, &rcWnd, xform.GetAlpha());
+        }
+        else if (m_pHostWnd->GetExStyle() & WS_EX_LAYERED)
+        {
+            m_pHostWnd->UpdateAlpha(xform.GetAlpha());
+        }
     }
     if (!bMore)
     {

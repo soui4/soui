@@ -97,14 +97,14 @@ class SMenuExRoot : public SWindow {
         MONITORINFO monitorInfo = { sizeof(MONITORINFO), 0 };
         GetMonitorInfo(hMonitor, &monitorInfo);
         int maxHei = monitorInfo.rcMonitor.bottom - monitorInfo.rcMonitor.top;
-		CSize szRet;
-        GetDesiredSize(&szRet,-1, maxHei);
-		return szRet;
+        CSize szRet;
+        GetDesiredSize(&szRet, -1, maxHei);
+        return szRet;
     }
 
-    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int wid, int hei) OVERRIDE
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int wid, int hei) OVERRIDE
     {
-        __baseCls::GetDesiredSize(psz,wid, hei);
+        __baseCls::GetDesiredSize(psz, wid, hei);
         if (psz->cx > m_nMaxWidth.toPixelSize(GetScale()) && !m_nMaxWidth.isWrapContent())
             psz->cx = m_nMaxWidth.toPixelSize(GetScale());
         if (psz->cx < m_nMinWidth.toPixelSize(GetScale()))
@@ -311,10 +311,10 @@ void SMenuExItem::GetTextRect(LPRECT pRect)
         pRect->right -= pMenuRoot->m_pArrowSkin->GetSkinSize().cx;
 }
 
-void SMenuExItem::GetDesiredSize(SIZE *psz,int wid, int hei)
+void SMenuExItem::GetDesiredSize(SIZE *psz, int wid, int hei)
 {
     CSize szRet;
-	__baseCls::GetDesiredSize(&szRet,wid, hei);
+    __baseCls::GetDesiredSize(&szRet, wid, hei);
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
     SASSERT(pMenuRoot);
     if (GetChildrenCount() == 0)
@@ -330,7 +330,7 @@ void SMenuExItem::GetDesiredSize(SIZE *psz,int wid, int hei)
     {
         szRet.cy = smax(szRet.cy, pMenuRoot->m_nItemHei.toPixelSize(GetScale()));
     }
-	*psz = szRet;
+    *psz = szRet;
 }
 
 BOOL SMenuExItem::CreateChildren(SXmlNode xmlNode)
@@ -400,7 +400,7 @@ class SMenuExSep : public SMenuExItem {
         m_bDisable = TRUE;
     }
 
-    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int wid, int hei) OVERRIDE
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int wid, int hei) OVERRIDE
     {
         SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
         (void)pMenuRoot;
@@ -423,7 +423,7 @@ class SMenuExSep : public SMenuExItem {
             szRet.cy = GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale());
         }
         szRet.cy += m_style.GetMargin().top + m_style.GetMargin().bottom;
-        *psz= szRet;
+        *psz = szRet;
     }
 
   protected:
@@ -596,8 +596,8 @@ BOOL SMenuEx::LoadMenu(LPCTSTR strMenu)
 
 BOOL SMenuEx::LoadMenuA(THIS_ LPCSTR resId)
 {
-	SStringT strResId = S_CA2T(resId,CP_UTF8);
-	return LoadMenu(strResId);
+    SStringT strResId = S_CA2T(resId, CP_UTF8);
+    return LoadMenu(strResId);
 }
 
 BOOL SMenuEx::LoadMenu2(IXmlNode *xmlMenu)
@@ -841,8 +841,8 @@ void SMenuEx::RunMenu(HWND hRoot)
     BOOL bMsgQuit(FALSE);
     HWND hCurMenu(NULL);
 
-	SAutoRefPtr<IMessageLoop> msgLoop;
-	SApplication::getSingletonPtr()->GetMsgLoopFactory()->CreateMsgLoop(&msgLoop,GetMsgLoop());
+    SAutoRefPtr<IMessageLoop> msgLoop;
+    SApplication::getSingletonPtr()->GetMsgLoopFactory()->CreateMsgLoop(&msgLoop, GetMsgLoop());
     for (;;)
     {
 
@@ -1137,8 +1137,9 @@ void SMenuEx::EndMenu(int nCmdId /*=0*/)
     ::PostMessage(s_MenuData->GetOwner(), WM_NULL, 0, 0);
 }
 
-EXTERN_C void EndMenuEx(int nCmdId){
-	SMenuEx::EndMenu(nCmdId);
+EXTERN_C void EndMenuEx(int nCmdId)
+{
+    SMenuEx::EndMenu(nCmdId);
 }
 
 SWindow *SMenuEx::FindItem(UINT uPos, UINT uFlag)

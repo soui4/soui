@@ -39,8 +39,8 @@ CRect SScrollBarHandler::GetPartRect(int iPart) const
     SASSERT(m_pSbHost->GetScrollBarSkin(m_bVert));
     const SCROLLINFO *pSi = m_pSbHost->GetScrollBarInfo(m_bVert);
     __int64 nTrackPos = pSi->nTrackPos;
-	if(pSi->nPage == 0)
-		return CRect();
+    if (pSi->nPage == 0)
+        return CRect();
     int nMax = pSi->nMax;
     if (nMax < pSi->nMin + (int)pSi->nPage - 1)
         nMax = pSi->nMin + pSi->nPage - 1;

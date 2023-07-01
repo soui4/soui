@@ -26,9 +26,11 @@ class STreeViewDataSetObserver : public TObjRefImpl<ITvDataSetObserver> {
         m_pOwner->onBranchExpandedChanged(hBranch, bExpandedOld, bExpandedNew);
     }
 
-	STDMETHOD_(void, notifyItemBeforeRemove)(THIS_ HSTREEITEM hItem) OVERRIDE{
-		m_pOwner->onItemBeforeRemove(hItem);
-	}
+    STDMETHOD_(void, notifyItemBeforeRemove)(THIS_ HSTREEITEM hItem) OVERRIDE
+    {
+        m_pOwner->onItemBeforeRemove(hItem);
+    }
+
   protected:
     STreeView *m_pOwner;
 };
@@ -144,7 +146,7 @@ int STreeViewItemLocator::_GetItemVisibleWidth(HSTREEITEM hItem) const
 {
     int nRet = GetItemWidth(hItem);
     if (m_adapter->IsItemExpanded(hItem) && m_adapter->GetFirstChildItem(hItem) != ITEM_NULL)
-    {//branch wid includes indent size of its children.
+    { // branch wid includes indent size of its children.
         nRet = smax(nRet, _GetBranchWidth(hItem));
     }
     return nRet;
@@ -290,14 +292,13 @@ int STreeViewItemLocator::GetItemIndent(HSTREEITEM hItem) const
 
 int STreeViewItemLocator::GetIndent() const
 {
-	return m_nIndent;
+    return m_nIndent;
 }
 
 void STreeViewItemLocator::SetIndent(int nIndent)
 {
-	m_nIndent =nIndent;
+    m_nIndent = nIndent;
 }
-
 
 int STreeViewItemLocator::GetItemHeight(HSTREEITEM hItem) const
 {
@@ -380,7 +381,7 @@ void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem, BOOL bExpan
 {
     if (bExpandedNew == bExpandedOld)
         return;
-	int nOldBranchWidth= _GetBranchWidth(hItem);
+    int nOldBranchWidth = _GetBranchWidth(hItem);
     int nBranchHei = _GetBranchHeight(hItem);
     HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
     while (hParent != ITEM_NULL)
@@ -392,7 +393,7 @@ void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem, BOOL bExpan
     }
     _UpdateSiblingsOffset(hItem);
 
-	int nNewBranchWidth = _GetItemVisibleWidth(hItem);
+    int nNewBranchWidth = _GetItemVisibleWidth(hItem);
     _UpdateBranchWidth(hItem, nOldBranchWidth, nNewBranchWidth);
 }
 
@@ -422,8 +423,8 @@ STreeView::STreeView()
     , m_hSelected(ITEM_NULL)
     , m_pVisibleMap(new VISIBLEITEMSMAP)
     , m_bWantTab(FALSE)
-	, m_pLineSkin(GETBUILTINSKIN(SKIN_SYS_TREE_LINES))
-	, m_bHasLines(FALSE)
+    , m_pLineSkin(GETBUILTINSKIN(SKIN_SYS_TREE_LINES))
+    , m_bHasLines(FALSE)
     , SHostProxy(this)
 {
     m_bFocusable = TRUE;
@@ -481,26 +482,26 @@ BOOL STreeView::SetAdapter(ITvAdapter *adapter)
             ItemInfo ii = m_visible_items.GetNext(pos);
             ii.pItem->Destroy();
         }
-		m_visible_items.RemoveAll();
+        m_visible_items.RemoveAll();
         m_pVisibleMap->RemoveAll();
-		m_pHoverItem = NULL;
-		m_itemCapture = NULL;
-		m_hSelected = NULL;
-	}
+        m_pHoverItem = NULL;
+        m_itemCapture = NULL;
+        m_hSelected = NULL;
+    }
 
-	if (m_tvItemLocator)
-		m_tvItemLocator->SetAdapter(adapter);
+    if (m_tvItemLocator)
+        m_tvItemLocator->SetAdapter(adapter);
 
-	if(adapter)
-	{
-		SXmlNode xmlNode = m_xmlTemplate.root().first_child();
-		m_adapter->InitByTemplate(&xmlNode);
-		for (int i = 0; i < m_adapter->getViewTypeCount(); i++)
-		{
-			m_itemRecycle.Add(new SList<SItemPanel*>());
-		}
-		onBranchChanged(ITEM_ROOT);
-	}
+    if (adapter)
+    {
+        SXmlNode xmlNode = m_xmlTemplate.root().first_child();
+        m_adapter->InitByTemplate(&xmlNode);
+        for (int i = 0; i < m_adapter->getViewTypeCount(); i++)
+        {
+            m_itemRecycle.Add(new SList<SItemPanel *>());
+        }
+        onBranchChanged(ITEM_ROOT);
+    }
 
     return TRUE;
 }
@@ -534,7 +535,7 @@ void STreeView::OnPaint(IRenderTarget *pRT)
     pRT->GetTransform(fMat);
     SMatrix mtx(fMat);
 
-	int nIndent = m_tvItemLocator->GetIndent();
+    int nIndent = m_tvItemLocator->GetIndent();
     for (SPOSITION pos = m_visible_items.GetHeadPosition(); pos;)
     {
         ItemInfo ii = m_visible_items.GetNext(pos);
@@ -543,20 +544,22 @@ void STreeView::OnPaint(IRenderTarget *pRT)
         {
             pt.y = m_tvItemLocator->Item2Position(hItem) - m_siVer.nPos;
         }
-		pt.x = -m_siHoz.nPos;
+        pt.x = -m_siHoz.nPos;
 
         CSize szItem(m_tvItemLocator->GetItemWidth(hItem), m_tvItemLocator->GetItemHeight(hItem));
-		if(m_bHasLines){
-			CRect rcItem(pt, CSize(rcClient.Width(),szItem.cy));
-			rcItem.OffsetRect(rcClient.TopLeft());
-			DrawLines(pRT,rcItem,hItem);
-		}
+        if (m_bHasLines)
+        {
+            CRect rcItem(pt, CSize(rcClient.Width(), szItem.cy));
+            rcItem.OffsetRect(rcClient.TopLeft());
+            DrawLines(pRT, rcItem, hItem);
+        }
 
         pt.x = m_tvItemLocator->GetItemIndent(hItem) - m_siHoz.nPos;
 
         CRect rcItem(pt, szItem);
         rcItem.OffsetRect(rcClient.TopLeft());
-		if(m_bHasLines) rcItem.OffsetRect(nIndent,0);
+        if (m_bHasLines)
+            rcItem.OffsetRect(nIndent, 0);
         if (SItemPanel::IsItemInClip(mtx, rcClip, rgnClip, rcItem))
         { // draw the item
             ii.pItem->Draw(pRT, rcItem);
@@ -593,7 +596,7 @@ void STreeView::OnDestroy()
         ii.pItem->Release();
     }
     m_visible_items.RemoveAll();
-	m_pVisibleMap->RemoveAll();
+    m_pVisibleMap->RemoveAll();
 
     for (int i = 0; i < (int)m_itemRecycle.GetCount(); i++)
     {
@@ -632,7 +635,8 @@ void STreeView::EnsureVisible(HSTREEITEM hItem)
         OnScroll(TRUE, SB_THUMBPOSITION, nPos + nHeight - m_siVer.nPage);
     }
     int nIndent = m_tvItemLocator->GetItemIndent(hItem);
-	if(m_bHasLines) nIndent += m_tvItemLocator->GetIndent();
+    if (m_bHasLines)
+        nIndent += m_tvItemLocator->GetIndent();
     int nWidth = m_tvItemLocator->GetItemWidth(hItem);
 
     if (nIndent + nWidth <= m_siHoz.nPos)
@@ -786,7 +790,8 @@ void STreeView::UpdateScrollBar()
 {
     CSize szView;
     szView.cx = m_tvItemLocator->GetTotalWidth();
-	if(m_bHasLines) szView.cx += m_tvItemLocator->GetIndent();
+    if (m_bHasLines)
+        szView.cx += m_tvItemLocator->GetIndent();
     szView.cy = m_tvItemLocator->GetTotalHeight();
 
     CRect rcClient;
@@ -876,28 +881,29 @@ void STreeView::UpdateVisibleItems()
     if (hItem == ITEM_NULL)
     {
         //如果没有可显示的，则移除所有item
-		SPOSITION pos = m_visible_items.GetHeadPosition();
-		while(pos){
-			ItemInfo ii = m_visible_items.GetNext(pos);
+        SPOSITION pos = m_visible_items.GetHeadPosition();
+        while (pos)
+        {
+            ItemInfo ii = m_visible_items.GetNext(pos);
 
-			if (ii.pItem == m_pHoverItem)
-			{
-				m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
-				m_pHoverItem = NULL;
-			}
+            if (ii.pItem == m_pHoverItem)
+            {
+                m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
+                m_pHoverItem = NULL;
+            }
 
-			ii.pItem->GetEventSet()->setMutedState(true);
-			if ((HSTREEITEM)ii.pItem->GetItemIndex() == m_hSelected)
-			{
-				ii.pItem->ModifyItemState(0, WndState_Check);
-				ii.pItem->GetFocusManager()->ClearFocus();
-				m_hSelected = NULL;
-			}
-			ii.pItem->SetVisible(FALSE); //防止执行SItemPanel::OnTimeFrame()
-			ii.pItem->GetEventSet()->setMutedState(false);
+            ii.pItem->GetEventSet()->setMutedState(true);
+            if ((HSTREEITEM)ii.pItem->GetItemIndex() == m_hSelected)
+            {
+                ii.pItem->ModifyItemState(0, WndState_Check);
+                ii.pItem->GetFocusManager()->ClearFocus();
+                m_hSelected = NULL;
+            }
+            ii.pItem->SetVisible(FALSE); //防止执行SItemPanel::OnTimeFrame()
+            ii.pItem->GetEventSet()->setMutedState(false);
 
-			m_itemRecycle[ii.nType]->AddTail(ii.pItem);
-		}
+            m_itemRecycle[ii.nType]->AddTail(ii.pItem);
+        }
         m_visible_items.RemoveAll();
         m_pVisibleMap->RemoveAll();
         return;
@@ -905,7 +911,8 @@ void STreeView::UpdateVisibleItems()
 
     CSize szOldView;
     szOldView.cx = m_tvItemLocator->GetTotalWidth();
-	if(m_bHasLines) szOldView.cx += m_tvItemLocator->GetIndent();
+    if (m_bHasLines)
+        szOldView.cx += m_tvItemLocator->GetIndent();
     szOldView.cy = m_tvItemLocator->GetTotalHeight();
 
     VISIBLEITEMSMAP *pMapOld = m_pVisibleMap;
@@ -966,7 +973,7 @@ void STreeView::UpdateVisibleItems()
         }
 
         CSize szItem;
-        m_adapter->getViewDesiredSize(&szItem,hItem, ii.pItem, -1, -1);
+        m_adapter->getViewDesiredSize(&szItem, hItem, ii.pItem, -1, -1);
         ii.pItem->Move(CRect(0, 0, szItem.cx, szItem.cy));
         m_tvItemLocator->SetItemWidth(hItem, szItem.cx);
         m_tvItemLocator->SetItemHeight(hItem, szItem.cy);
@@ -994,7 +1001,7 @@ void STreeView::UpdateVisibleItems()
         {
             ii.pItem->ModifyItemState(0, WndState_Check);
             ii.pItem->GetFocusManager()->ClearFocus();
-			m_hSelected = NULL;
+            m_hSelected = NULL;
         }
         ii.pItem->SetVisible(FALSE); //防止执行SItemPanel::OnTimeFrame()
         ii.pItem->GetEventSet()->setMutedState(false);
@@ -1005,15 +1012,18 @@ void STreeView::UpdateVisibleItems()
 
     CSize szNewView;
     szNewView.cx = m_tvItemLocator->GetTotalWidth();
-	if(m_bHasLines) szNewView.cx += m_tvItemLocator->GetIndent();
+    if (m_bHasLines)
+        szNewView.cx += m_tvItemLocator->GetIndent();
     szNewView.cy = m_tvItemLocator->GetTotalHeight();
     if (szOldView != szNewView)
     { // update scroll range
         UpdateScrollBar();
         UpdateVisibleItems(); //根据新的滚动条状态重新记算显示列表项
-	}else{
-		InvalidateRect(NULL);
-	}
+    }
+    else
+    {
+        InvalidateRect(NULL);
+    }
 }
 
 void STreeView::OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture)
@@ -1042,9 +1052,10 @@ BOOL STreeView::OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const
     rcItem.bottom = rcItem.top + m_tvItemLocator->GetItemHeight(hItem);
     rcItem.left += m_tvItemLocator->GetItemIndent(hItem) - m_siHoz.nPos;
     rcItem.right = rcItem.left + m_tvItemLocator->GetItemWidth(hItem);
-	if(m_bHasLines){
-		rcItem.OffsetRect(m_tvItemLocator->GetIndent(),0);
-	}
+    if (m_bHasLines)
+    {
+        rcItem.OffsetRect(m_tvItemLocator->GetIndent(), 0);
+    }
     return TRUE;
 }
 
@@ -1135,32 +1146,35 @@ void STreeView::onBranchExpandedChanged(HSTREEITEM hBranch, BOOL bExpandedOld, B
     UpdateVisibleItems();
 }
 
-
 void STreeView::onItemBeforeRemove(HSTREEITEM hItem)
 {
-	if (m_adapter == NULL)
-	{
-		return;
-	}
-	if(m_hSelected && (m_hSelected == hItem || m_adapter->IsDecendentItem(hItem,m_hSelected))){
-		m_hSelected = NULL;
-	}
+    if (m_adapter == NULL)
+    {
+        return;
+    }
+    if (m_hSelected && (m_hSelected == hItem || m_adapter->IsDecendentItem(hItem, m_hSelected)))
+    {
+        m_hSelected = NULL;
+    }
 
-    if (m_pHoverItem) {
+    if (m_pHoverItem)
+    {
         HSTREEITEM hHover = m_pHoverItem->GetItemIndex();
-        if (hHover == hItem || m_adapter->IsDecendentItem(hItem, hHover)) {
+        if (hHover == hItem || m_adapter->IsDecendentItem(hItem, hHover))
+        {
             m_pHoverItem->DoFrameEvent(WM_MOUSELEAVE, 0, 0);
             m_pHoverItem = NULL;
         }
     }
-    if (m_itemCapture) {
+    if (m_itemCapture)
+    {
         HSTREEITEM hCapture = m_itemCapture->GetItemIndex();
-        if (hCapture == hItem || m_adapter->IsDecendentItem(hItem, hCapture)) {
+        if (hCapture == hItem || m_adapter->IsDecendentItem(hItem, hCapture))
+        {
             m_itemCapture = NULL;
         }
     }
 }
-
 
 LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
@@ -1392,7 +1406,7 @@ HRESULT STreeView::OnAttrIndent(const SStringW &strValue, BOOL bLoading)
 {
     if (!bLoading)
         return E_FAIL;
-	m_indent.parseString(strValue);
+    m_indent.parseString(strValue);
     m_tvItemLocator->SetIndent(m_indent.toPixelSize(GetScale()));
     return S_OK;
 }
@@ -1406,9 +1420,9 @@ void STreeView::OnColorize(COLORREF cr)
 void STreeView::OnScaleChanged(int nScale)
 {
     __baseCls::OnScaleChanged(nScale);
-	GetScaleSkin(m_pLineSkin,nScale);
-	m_tvItemLocator->SetIndent(m_indent.toPixelSize(nScale));
-	UpdateVisibleItems();
+    GetScaleSkin(m_pLineSkin, nScale);
+    m_tvItemLocator->SetIndent(m_indent.toPixelSize(nScale));
+    UpdateVisibleItems();
 }
 
 HRESULT STreeView::OnLanguageChanged()
@@ -1442,7 +1456,7 @@ void STreeView::OnRebuildFont()
 {
     __baseCls::OnRebuildFont();
     DispatchMessage2Items(UM_UPDATEFONT, 0, 0);
-	UpdateVisibleItems();//防止因为字体大小变化后，列表项大小发生变化没有更新。其它view不需要这个过程。
+    UpdateVisibleItems(); //防止因为字体大小变化后，列表项大小发生变化没有更新。其它view不需要这个过程。
 }
 
 ITvAdapter *STreeView::GetAdapter() const
@@ -1467,97 +1481,100 @@ HSTREEITEM STreeView::GetSel() const
 
 void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
 {
-	int nIndent = m_tvItemLocator->GetIndent();
-	if (nIndent == 0 || !m_pLineSkin || !m_bHasLines)
-		return;
-	SList<HSTREEITEM> lstParent;
-	HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
-	while (hParent && hParent != STVI_ROOT)
-	{
-		lstParent.AddHead(hParent);
-		hParent = m_adapter->GetParentItem(hParent);
-	}
-	// draw parent flags.
-	enum
-	{
-		plus,
-		plus_join,
-		plus_bottom,
-		minus,
-		minus_join,
-		minus_bottom,
-		line,
-		line_join,
-		line_bottom
-	}; // 9 line states
-	CRect rcLine = rc;
-	rcLine.right = rcLine.left + nIndent;
-	//	rcLine.DeflateRect(0, (rcLine.Height() - m_nIndent) / 2);
-	SPOSITION pos = lstParent.GetHeadPosition();
-	while (pos)
-	{
-		HSTREEITEM hParent = lstParent.GetNext(pos);
-		HSTREEITEM hNextSibling = m_adapter->GetNextSiblingItem(hParent);
-		if (hNextSibling)
-		{
-			m_pLineSkin->DrawByIndex(pRT, rcLine, line);
-		}
-		rcLine.OffsetRect(nIndent, 0);
-	}
-	BOOL hasNextSibling = m_adapter->GetNextSiblingItem(hItem) != NULL;
-	BOOL hasPervSibling = m_adapter->GetPrevSiblingItem(hItem) != NULL;
-	BOOL hasChild = m_adapter->HasChildren(hItem);
-	int iLine = -1;
-	if (hasChild)
-	{ // test if is collapsed
-		if (!m_adapter->IsItemExpanded(hItem))
-		{
-			if (lstParent.IsEmpty() && !hasPervSibling) // no parent
-				iLine = plus;
-			else if (hasNextSibling)
-				iLine = plus_join;
-			else
-				iLine = plus_bottom;
-		}
-		else
-		{
-			if (lstParent.IsEmpty() && !hasPervSibling) // no parent
-				iLine = minus;
-			else if (hasNextSibling)
-				iLine = minus_join;
-			else
-				iLine = minus_bottom;
-		}
-	}
-	else
-	{
-		if (hasNextSibling)
-			iLine = line_join;
-		else
-			iLine = line_bottom;
-	}
-	m_pLineSkin->DrawByIndex(pRT, rcLine, iLine);
+    int nIndent = m_tvItemLocator->GetIndent();
+    if (nIndent == 0 || !m_pLineSkin || !m_bHasLines)
+        return;
+    SList<HSTREEITEM> lstParent;
+    HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
+    while (hParent && hParent != STVI_ROOT)
+    {
+        lstParent.AddHead(hParent);
+        hParent = m_adapter->GetParentItem(hParent);
+    }
+    // draw parent flags.
+    enum
+    {
+        plus,
+        plus_join,
+        plus_bottom,
+        minus,
+        minus_join,
+        minus_bottom,
+        line,
+        line_join,
+        line_bottom
+    }; // 9 line states
+    CRect rcLine = rc;
+    rcLine.right = rcLine.left + nIndent;
+    //	rcLine.DeflateRect(0, (rcLine.Height() - m_nIndent) / 2);
+    SPOSITION pos = lstParent.GetHeadPosition();
+    while (pos)
+    {
+        HSTREEITEM hParent = lstParent.GetNext(pos);
+        HSTREEITEM hNextSibling = m_adapter->GetNextSiblingItem(hParent);
+        if (hNextSibling)
+        {
+            m_pLineSkin->DrawByIndex(pRT, rcLine, line);
+        }
+        rcLine.OffsetRect(nIndent, 0);
+    }
+    BOOL hasNextSibling = m_adapter->GetNextSiblingItem(hItem) != NULL;
+    BOOL hasPervSibling = m_adapter->GetPrevSiblingItem(hItem) != NULL;
+    BOOL hasChild = m_adapter->HasChildren(hItem);
+    int iLine = -1;
+    if (hasChild)
+    { // test if is collapsed
+        if (!m_adapter->IsItemExpanded(hItem))
+        {
+            if (lstParent.IsEmpty() && !hasPervSibling) // no parent
+                iLine = plus;
+            else if (hasNextSibling)
+                iLine = plus_join;
+            else
+                iLine = plus_bottom;
+        }
+        else
+        {
+            if (lstParent.IsEmpty() && !hasPervSibling) // no parent
+                iLine = minus;
+            else if (hasNextSibling)
+                iLine = minus_join;
+            else
+                iLine = minus_bottom;
+        }
+    }
+    else
+    {
+        if (hasNextSibling)
+            iLine = line_join;
+        else
+            iLine = line_bottom;
+    }
+    m_pLineSkin->DrawByIndex(pRT, rcLine, iLine);
 }
 
 void STreeView::OnLButtonDown(UINT nFlags, CPoint pt)
 {
-	if(m_bHasLines){
-		CPoint pt2 =pt;
-		int nIndent = m_tvItemLocator->GetIndent();
-		pt.x += nIndent;
-		SItemPanel * pHoverItem = HitTest(pt);
-		if(pHoverItem){
-			CRect rcItem=pHoverItem->GetItemRect();
-			CRect rcLine(CPoint(rcItem.left-nIndent,rcItem.top+(rcItem.Height()-nIndent)/2),CSize(nIndent,nIndent));
-			if(rcLine.PtInRect(pt2)){//switch toggle state
-				HSTREEITEM hItem = (HSTREEITEM)pHoverItem->GetItemIndex();
-				if(m_adapter->HasChildren(hItem))
-					m_adapter->ExpandItem(hItem,TVC_TOGGLE);
-				return;
-			}
-		}
-	}
-	SetMsgHandled(FALSE);
+    if (m_bHasLines)
+    {
+        CPoint pt2 = pt;
+        int nIndent = m_tvItemLocator->GetIndent();
+        pt.x += nIndent;
+        SItemPanel *pHoverItem = HitTest(pt);
+        if (pHoverItem)
+        {
+            CRect rcItem = pHoverItem->GetItemRect();
+            CRect rcLine(CPoint(rcItem.left - nIndent, rcItem.top + (rcItem.Height() - nIndent) / 2), CSize(nIndent, nIndent));
+            if (rcLine.PtInRect(pt2))
+            { // switch toggle state
+                HSTREEITEM hItem = (HSTREEITEM)pHoverItem->GetItemIndex();
+                if (m_adapter->HasChildren(hItem))
+                    m_adapter->ExpandItem(hItem, TVC_TOGGLE);
+                return;
+            }
+        }
+    }
+    SetMsgHandled(FALSE);
 }
 
 SNSEND

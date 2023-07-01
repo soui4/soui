@@ -11,8 +11,8 @@
     return TRUE;                                                             \
     }
 
-#define SOUI_MSG_MAP_END_BASE()                     \
-    return FALSE; \
+#define SOUI_MSG_MAP_END_BASE() \
+    return FALSE;               \
     }
 
 // BOOL OnEraseBkgnd(SOUI::IRenderTarget * pRT)
@@ -123,4 +123,3 @@
         if (IsMsgHandled())   \
             return TRUE;      \
     }
-

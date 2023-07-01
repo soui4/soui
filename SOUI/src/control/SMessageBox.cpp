@@ -19,10 +19,10 @@ BOOL SetMsgTemplate(SXmlNode uiRoot)
     return TRUE;
 }
 
-BOOL SetIMsgTemplate(IXmlNode * uiRoot)
+BOOL SetIMsgTemplate(IXmlNode *uiRoot)
 {
-	SXmlNode xmlRoot(uiRoot);
-	return SetMsgTemplate(xmlRoot);
+    SXmlNode xmlRoot(uiRoot);
+    return SetMsgTemplate(xmlRoot);
 }
 
 SXmlNode GetMsgTemplate()
@@ -188,7 +188,7 @@ BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
     SetWindowPos(0, 0, 0, szWnd.cx, szWnd.cy, SWP_NOMOVE | SWP_NOACTIVATE | SWP_NOZORDER);
 
     CenterWindow();
-    SetMsgHandled(FALSE);//chain to dpihandler.
+    SetMsgHandled(FALSE); // chain to dpihandler.
     return 0;
 }
 

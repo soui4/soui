@@ -145,5 +145,4 @@ class SOUI_EXP SSkinPool
 #endif
 };
 
-
 SNSEND

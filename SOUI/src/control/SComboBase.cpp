@@ -56,7 +56,6 @@ void SComboEdit::OnKillFocus(SWND wndFocus)
     GetOwner()->SSendMessage(WM_KILLFOCUS, wndFocus);
 }
 
-
 //////////////////////////////////////////////////////////////////////////
 // SDropDownWnd_ComboBox
 BOOL SDropDownWnd_ComboBox::PreTranslateMessage(MSG *pMsg)
@@ -108,11 +107,11 @@ BOOL SComboBase::CreateChildren(SXmlNode xmlNode)
     SASSERT(m_pSkinBtn);
     m_xmlDropdownStyle.root().append_copy(xmlNode.child(KStyle_Dropdown));
     //创建edit对象
-	SXmlNode xmlEditStyle = xmlNode.child(KStyle_Edit);
-	SStringW strEditClass = xmlEditStyle.attribute(L"wndclass").as_string(SComboEdit::GetClassName());
-	m_pEdit = sobj_cast<SComboEdit>(CreateChildByName(strEditClass));
-	SASSERT(m_pEdit);
-	m_pEdit->SetOwner(this);
+    SXmlNode xmlEditStyle = xmlNode.child(KStyle_Edit);
+    SStringW strEditClass = xmlEditStyle.attribute(L"wndclass").as_string(SComboEdit::GetClassName());
+    m_pEdit = sobj_cast<SComboEdit>(CreateChildByName(strEditClass));
+    SASSERT(m_pEdit);
+    m_pEdit->SetOwner(this);
     InsertChild(m_pEdit);
     m_pEdit->GetEventSet()->setMutedState(true);
     if (xmlEditStyle)
@@ -538,7 +537,7 @@ int SComboBase::FindString(LPCTSTR pszFind, int iFindAfter /*=-1*/, BOOL bPartMa
     return -1;
 }
 
-void SComboBase::GetDesiredSize(SIZE *psz,int nParentWid, int nParentHei)
+void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 {
     CSize szRet(-1, -1);
     if (GetLayoutParam()->IsSpecifiedSize(Horz))
@@ -560,10 +559,10 @@ void SComboBase::GetDesiredSize(SIZE *psz,int nParentWid, int nParentHei)
     }
 
     if (szRet.cx != -1 && szRet.cy != -1)
-	{
-		*psz=szRet;
-		return;
-	}
+    {
+        *psz = szRet;
+        return;
+    }
     int nTestDrawMode = GetTextAlign() & ~(DT_CENTER | DT_RIGHT | DT_VCENTER | DT_BOTTOM);
 
     CRect rcPadding = GetStyle().GetPadding();
@@ -592,7 +591,7 @@ void SComboBase::GetDesiredSize(SIZE *psz,int nParentWid, int nParentHei)
     if (GetLayoutParam()->IsWrapContent(Vert))
         szRet.cy = rcTest.Height();
 
-	*psz=szRet;
+    *psz = szRet;
 }
 
 SStringT SComboBase::GetWindowText(BOOL bRawText /*=TRUE*/)

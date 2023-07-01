@@ -51,7 +51,7 @@ IWindow *SSpinButtonCtrl::GetIBuddy() const
     return GetBuddy();
 }
 
-void SSpinButtonCtrl::GetDesiredSize(SIZE *psz,int wid, int hei)
+void SSpinButtonCtrl::GetDesiredSize(SIZE *psz, int wid, int hei)
 {
     CSize szRet;
     if (GetLayoutParam()->IsSpecifiedSize(Horz))
@@ -70,7 +70,7 @@ void SSpinButtonCtrl::GetDesiredSize(SIZE *psz,int wid, int hei)
     {
         szRet.cy = m_pDownSkin->GetSkinSize().cy + m_pUpSkin->GetSkinSize().cy;
     }
-	*psz = szRet;
+    *psz = szRet;
 }
 
 HRESULT SSpinButtonCtrl::OnAttrValue(const SStringW &strValue, BOOL bLoading)

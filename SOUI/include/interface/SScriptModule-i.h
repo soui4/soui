@@ -32,22 +32,22 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
-    */
-    STDMETHOD_(long,AddRef) (THIS) PURE;
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
      * @brief 减少引用计数
      * @return 新引用计数
-    */
-    STDMETHOD_(long,Release) (THIS) PURE;
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	/**
-	 * @brief 释放对象
-	 * @return void
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-	/**
+    /**
      * GetScriptEngine
      * @brief    获得脚本引擎的指针
      * @return   void * -- 脚本引擎的指针
@@ -55,7 +55,7 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
      */
     STDMETHOD_(void *, GetScriptEngine)(THIS) PURE;
 
-	/*!
+    /*!
     \brief
         Return identification string for the ScriptModule.  If the internal id string has not been
         set by the ScriptModule creator, a generic string of "Unknown scripting module" will be
@@ -107,24 +107,24 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
     */
     STDMETHOD_(BOOL, executeScriptedEventHandler)(THIS_ LPCSTR handler_name, IEvtArgs * pEvt) PURE;
 
-   /*!
-    \brief
-        Execute main function
+    /*!
+     \brief
+         Execute main function
 
-    \param hInst
-        HINSTANCE handle of the instance.
+     \param hInst
+         HINSTANCE handle of the instance.
 
-	\param pszWorkDir
-		LPCSTR work dir.
+     \param pszWorkDir
+         LPCSTR work dir.
 
-    \param pszArgs
-        LPCSTR additional parameters.
-    \return
-        - int return code.
-    */
-	STDMETHOD_(int, executeMain)(THIS_ HINSTANCE hInst,LPCSTR pszWorkDir, LPCSTR pszArgs) PURE;
+     \param pszArgs
+         LPCSTR additional parameters.
+     \return
+         - int return code.
+     */
+    STDMETHOD_(int, executeMain)(THIS_ HINSTANCE hInst, LPCSTR pszWorkDir, LPCSTR pszArgs) PURE;
 
-    STDMETHOD_(IIdleHandler*, getIdleHandler)(THIS) PURE;
+    STDMETHOD_(IIdleHandler *, getIdleHandler)(THIS) PURE;
 };
 
 #undef INTERFACE

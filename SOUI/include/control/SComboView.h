@@ -19,13 +19,14 @@ class SOUI_EXP SComboView : public TComboBaseProxy<IComboView> {
 
     STDMETHOD_(BOOL, GetItemText)(int iItem, BOOL bRawText, IStringT *str) SCONST OVERRIDE;
 
-	STDMETHOD_(BOOL, GetItemTextA)(int iItem, BOOL bRawText, IStringA *str) SCONST OVERRIDE{
-		SStringT strBuf;
-		BOOL bRet = GetItemText(iItem,bRawText,&strBuf);
-		SStringA strBufA = S_CT2A(strBuf,CP_UTF8);
-		str->Copy(&strBufA);
-		return bRet;
-	}
+    STDMETHOD_(BOOL, GetItemTextA)(int iItem, BOOL bRawText, IStringA *str) SCONST OVERRIDE
+    {
+        SStringT strBuf;
+        BOOL bRet = GetItemText(iItem, bRawText, &strBuf);
+        SStringA strBufA = S_CT2A(strBuf, CP_UTF8);
+        str->Copy(&strBufA);
+        return bRet;
+    }
 
     STDMETHOD_(IListView *, GetIListView)(THIS) OVERRIDE;
 

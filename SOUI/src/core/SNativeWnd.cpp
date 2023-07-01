@@ -44,8 +44,8 @@ SNativeWnd::SNativeWnd()
     , m_pfnSuperWindowProc(::DefWindowProc)
     , m_pThunk(NULL)
 {
-	m_msgHandlerInfo.fun = NULL;
-	m_msgHandlerInfo.ctx = NULL;
+    m_msgHandlerInfo.fun = NULL;
+    m_msgHandlerInfo.ctx = NULL;
 }
 
 SNativeWnd::~SNativeWnd(void)
@@ -791,13 +791,13 @@ const MSG *SNativeWnd::GetCurrentMessage() const
 
 void SNativeWnd::SetMsgHandler(THIS_ FunMsgHandler fun, void *ctx)
 {
-	m_msgHandlerInfo.fun = fun;
-	m_msgHandlerInfo.ctx = ctx;
+    m_msgHandlerInfo.fun = fun;
+    m_msgHandlerInfo.ctx = ctx;
 }
 
-MsgHandlerInfo * SNativeWnd::GetMsgHandler()
+MsgHandlerInfo *SNativeWnd::GetMsgHandler()
 {
-	return &m_msgHandlerInfo;
+    return &m_msgHandlerInfo;
 }
 
 SNSEND

@@ -72,24 +72,26 @@ HRESULT STDMETHODCALLTYPE SDropTargetDispatcher::DragOver(/* [in] */ DWORD grfKe
 {
     *pdwEffect = DROPEFFECT_NONE;
     CPoint pt2 = PointL2FrameClient(pt);
-	CPoint pt3 = pt2;
+    CPoint pt3 = pt2;
     SWND hHover = m_pOwner->SwndFromPoint(pt2);
 
     if (hHover != m_hHover)
     {
         DTMAP::CPair *pPairOld = m_mapDropTarget.Lookup(m_hHover);
-		DTMAP::CPair *pPairNew = m_mapDropTarget.Lookup(hHover);
-		if(pPairOld && !pPairNew){
-			SWindow *pOldWnd = SWindowMgr::GetWindow(m_hHover);
-			if(pOldWnd){
-				CRect rcWnd = pOldWnd->GetWindowRect();
-				if(rcWnd.PtInRect(pt3))
-				{
-					pPairOld->m_value->DragOver(grfKeyState, pt, pdwEffect);
-					return S_OK;
-				}
-			}
-		}
+        DTMAP::CPair *pPairNew = m_mapDropTarget.Lookup(hHover);
+        if (pPairOld && !pPairNew)
+        {
+            SWindow *pOldWnd = SWindowMgr::GetWindow(m_hHover);
+            if (pOldWnd)
+            {
+                CRect rcWnd = pOldWnd->GetWindowRect();
+                if (rcWnd.PtInRect(pt3))
+                {
+                    pPairOld->m_value->DragOver(grfKeyState, pt, pdwEffect);
+                    return S_OK;
+                }
+            }
+        }
         if (m_hHover && pPairOld)
             pPairOld->m_value->DragLeave();
         m_hHover = hHover;

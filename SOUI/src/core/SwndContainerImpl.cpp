@@ -101,7 +101,8 @@ LRESULT SwndContainerImpl::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 BOOL SwndContainerImpl::OnReleaseSwndCapture()
 {
     SWindow *pWnd = SWindowMgr::GetWindow(m_hCapture);
-    if(pWnd){
+    if (pWnd)
+    {
         pWnd->OnCaptureChanged(FALSE);
     }
     m_hCapture = NULL;
@@ -110,7 +111,7 @@ BOOL SwndContainerImpl::OnReleaseSwndCapture()
 
 SWND SwndContainerImpl::OnSetSwndCapture(SWND swnd)
 {
-    if(m_hCapture == swnd)
+    if (m_hCapture == swnd)
         return swnd;
     SWindow *pWnd = SWindowMgr::GetWindow(swnd);
     SASSERT(pWnd);
@@ -478,7 +479,6 @@ ICaret *SwndContainerImpl::GetCaret()
     return m_caret;
 }
 
-
 void SwndContainerImpl::_BuildWndTreeZorder(IWindow *pWnd, UINT &iOrder)
 {
     ((SWindow *)pWnd)->m_uZorder = iOrder++;
@@ -507,19 +507,23 @@ void SwndContainerImpl::OnNextFrame()
     m_timelineHandlerMgr.OnNextFrame();
 }
 
-BOOL SwndContainerImpl::RegisterVideoCanvas(SWND swnd){
-	SPOSITION pos = m_lstVideoCanvas.Find(swnd);
-	if(pos) return FALSE;
-	m_lstVideoCanvas.AddTail(swnd);
-	return TRUE;
+BOOL SwndContainerImpl::RegisterVideoCanvas(SWND swnd)
+{
+    SPOSITION pos = m_lstVideoCanvas.Find(swnd);
+    if (pos)
+        return FALSE;
+    m_lstVideoCanvas.AddTail(swnd);
+    return TRUE;
 }
 
-BOOL SwndContainerImpl::UnregisterVideoCanvas(SWND swnd){
-	SPOSITION pos = m_lstVideoCanvas.Find(swnd);
-	if(!pos) return FALSE;
-	
-	m_lstVideoCanvas.RemoveAt(pos);
-	return TRUE;	
+BOOL SwndContainerImpl::UnregisterVideoCanvas(SWND swnd)
+{
+    SPOSITION pos = m_lstVideoCanvas.Find(swnd);
+    if (!pos)
+        return FALSE;
+
+    m_lstVideoCanvas.RemoveAt(pos);
+    return TRUE;
 }
 
 SNSEND

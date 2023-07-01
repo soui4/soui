@@ -278,8 +278,8 @@ SIZE SGridLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHeigh
             }
 
         //计算出网络大小
-        CSize szCell ;
-		((IWindow *)pCell)->GetDesiredSize(&szCell,SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
+        CSize szCell;
+        ((IWindow *)pCell)->GetDesiredSize(&szCell, SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
         //填充网格,把大小平均分散到网格中。
         szCell.cx /= colSpan;
         szCell.cy /= rowSpan;
@@ -364,8 +364,8 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
     else if (nCols == -1)
         nCols = (nCells + nRows - 1) / nRows;
 
-    CRect rcParent ;
-	pParent->GetChildrenLayoutRect(&rcParent);
+    CRect rcParent;
+    pParent->GetChildrenLayoutRect(&rcParent);
     int xInter = m_xInterval.toPixelSize(pParent->GetScale());
     int yInter = m_yInterval.toPixelSize(pParent->GetScale());
 
@@ -417,8 +417,8 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
             }
 
         //计算出网络大小,强制使用-1,-1代表自适应大小
-        CSize szCell ;
-		pCell->GetDesiredSize(&szCell,SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
+        CSize szCell;
+        pCell->GetDesiredSize(&szCell, SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
         //填充网格,把大小平均分散到网格中。
         szCell.cx /= colSpan;
         szCell.cy /= rowSpan;

@@ -30,8 +30,9 @@ class SOUI_EXP STreeViewItemLocator : public TObjRefImpl<ITreeViewItemLocator> {
     STDMETHOD_(void, SetItemHeight)(THIS_ HSTREEITEM hItem, int nHeight) OVERRIDE;
     STDMETHOD_(int, GetItemHeight)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
     STDMETHOD_(int, GetItemIndent)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
-	STDMETHOD_(int, GetIndent)(CTHIS) SCONST OVERRIDE;
-	STDMETHOD_(void, SetIndent)(THIS_ int nIndent) OVERRIDE;
+    STDMETHOD_(int, GetIndent)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(void, SetIndent)(THIS_ int nIndent) OVERRIDE;
+
   protected:
     BOOL IsItemExpanded(HSTREEITEM hItem) const;
 
@@ -116,7 +117,8 @@ class SOUI_EXP STreeView
     void onBranchChanged(HSTREEITEM hBranch);
     void onBranchInvalidated(HSTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren);
     void onBranchExpandedChanged(HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew);
-	void onItemBeforeRemove(HSTREEITEM hItem);
+    void onItemBeforeRemove(HSTREEITEM hItem);
+
   protected:
     void OnPaint(IRenderTarget *pRT);
     void OnSize(UINT nType, CSize size);
@@ -130,7 +132,7 @@ class SOUI_EXP STreeView
 
     void OnKillFocus(SWND wndFocus);
     void OnSetFocus(SWND wndOld);
-	void OnLButtonDown(UINT nFlags, CPoint pt);
+    void OnLButtonDown(UINT nFlags, CPoint pt);
 
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
@@ -141,8 +143,8 @@ class SOUI_EXP STreeView
         MSG_WM_SETFOCUS_EX(OnSetFocus)
         MSG_WM_MOUSEWHEEL(OnMouseWheel)
         MSG_WM_MOUSELEAVE(OnMouseLeave)
-		MSG_WM_LBUTTONDOWN(OnLButtonDown)
-		MSG_WM_LBUTTONDBLCLK(OnLButtonDown)
+        MSG_WM_LBUTTONDOWN(OnLButtonDown)
+        MSG_WM_LBUTTONDBLCLK(OnLButtonDown)
         MESSAGE_RANGE_HANDLER_EX(WM_MOUSEFIRST, WM_MOUSELAST, OnMouseEvent)
         MESSAGE_RANGE_HANDLER_EX(WM_KEYFIRST, WM_KEYLAST, OnKeyEvent)
         MESSAGE_RANGE_HANDLER_EX(WM_IME_STARTCOMPOSITION, WM_IME_KEYLAST, OnKeyEvent)
@@ -156,8 +158,8 @@ class SOUI_EXP STreeView
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"indent", OnAttrIndent)
         ATTR_INT(L"wantTab", m_bWantTab, FALSE)
-		ATTR_BOOL(L"hasLines", m_bHasLines, TRUE)
-		ATTR_SKIN(L"lineSkin", m_pLineSkin, TRUE)
+        ATTR_BOOL(L"hasLines", m_bHasLines, TRUE)
+        ATTR_SKIN(L"lineSkin", m_pLineSkin, TRUE)
     SOUI_ATTRS_END()
   protected:
     virtual UINT WINAPI OnGetDlgCode() const;
@@ -176,7 +178,8 @@ class SOUI_EXP STreeView
     virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const; //获得表项的显示位置
     virtual BOOL IsItemRedrawDelay() const;                                  //指示表项的更新方式
 
-	virtual void DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem);
+    virtual void DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem);
+
   protected:
     void UpdateScrollBar();
     void UpdateVisibleItems();
@@ -209,9 +212,9 @@ class SOUI_EXP STreeView
 
     HSTREEITEM m_hSelected; /**< 当前选择项 */
 
-    BOOL m_bWantTab; /**< want tab */
-	BOOL m_bHasLines; /**< has lines*/
-	SAutoRefPtr<ISkinObj> m_pLineSkin;
-	SLayoutSize	m_indent;
+    BOOL m_bWantTab;  /**< want tab */
+    BOOL m_bHasLines; /**< has lines*/
+    SAutoRefPtr<ISkinObj> m_pLineSkin;
+    SLayoutSize m_indent;
 };
 SNSEND

@@ -35,7 +35,7 @@ class SOUI_EXP SListView
 
     SItemPanel *HitTest(CPoint &pt) const;
 
-	STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz,int nParentWid, int nParentHei) OVERRIDE;
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
 
   protected:
     virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);

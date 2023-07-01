@@ -70,16 +70,16 @@ void SResProviderMgr::AddResProvider(IResProvider *pResProvider, LPCTSTR pszUide
     pResProvider->AddRef();
     if (pszUidef)
     {
-		GETUIDEF->InitDefUiDef(pResProvider, pszUidef);
+        GETUIDEF->InitDefUiDef(pResProvider, pszUidef);
     }
 }
 
 void SResProviderMgr::AddResProviderA(IResProvider *pResProvider, LPCSTR pszUidef)
 {
-	if(!pszUidef)
-		return AddResProvider(pResProvider,NULL);
-	SStringT strUiDef = S_CA2T(pszUidef,CP_UTF8);
-	return AddResProvider(pResProvider,strUiDef.c_str());
+    if (!pszUidef)
+        return AddResProvider(pResProvider, NULL);
+    SStringT strUiDef = S_CA2T(pszUidef, CP_UTF8);
+    return AddResProvider(pResProvider, strUiDef.c_str());
 }
 
 void SResProviderMgr::RemoveResProvider(IResProvider *pResProvider)
@@ -132,12 +132,13 @@ BOOL SResProviderMgr::GetRawBuffer(LPCTSTR strType, LPCTSTR pszResName, LPVOID p
 {
     SAutoLock lock(m_cs);
     if (!strType)
-    {//support res src by resource path.
+    { // support res src by resource path.
         SPOSITION pos = m_lstResPackage.GetHeadPosition();
-        while (pos) {
-            IResProvider* pRes = m_lstResPackage.GetNext(pos);
+        while (pos)
+        {
+            IResProvider *pRes = m_lstResPackage.GetNext(pos);
             if (pRes->HasResource(NULL, pszResName))
-                return pRes->GetRawBuffer(strType, pszResName,pBuf,size);
+                return pRes->GetRawBuffer(strType, pszResName, pBuf, size);
         }
         return FALSE;
     }
@@ -162,10 +163,11 @@ size_t SResProviderMgr::GetRawBufferSize(LPCTSTR strType, LPCTSTR pszResName)
 {
     SAutoLock lock(m_cs);
     if (!strType)
-    {//support res src by resource path.
+    { // support res src by resource path.
         SPOSITION pos = m_lstResPackage.GetHeadPosition();
-        while (pos) {
-            IResProvider* pRes = m_lstResPackage.GetNext(pos);
+        while (pos)
+        {
+            IResProvider *pRes = m_lstResPackage.GetNext(pos);
             if (pRes->HasResource(NULL, pszResName))
                 return pRes->GetRawBufferSize(strType, pszResName);
         }
@@ -192,16 +194,18 @@ size_t SResProviderMgr::GetRawBufferSize(LPCTSTR strType, LPCTSTR pszResName)
 IImgX *SResProviderMgr::LoadImgX(LPCTSTR strType, LPCTSTR pszResName)
 {
     SAutoLock lock(m_cs);
-	if (!strType)
-	{//support res src by resource path.
-		SPOSITION pos = m_lstResPackage.GetHeadPosition();
-		while(pos){
-			IResProvider *pRes = m_lstResPackage.GetNext(pos);
-			IImgX *img = pRes->LoadImgX(NULL,pszResName);
-			if(img) return img;
-		}
-		return NULL;
-	}
+    if (!strType)
+    { // support res src by resource path.
+        SPOSITION pos = m_lstResPackage.GetHeadPosition();
+        while (pos)
+        {
+            IResProvider *pRes = m_lstResPackage.GetNext(pos);
+            IImgX *img = pRes->LoadImgX(NULL, pszResName);
+            if (img)
+                return img;
+        }
+        return NULL;
+    }
 
     if (IsFileType(strType))
     {
@@ -224,16 +228,18 @@ IImgX *SResProviderMgr::LoadImgX(LPCTSTR strType, LPCTSTR pszResName)
 IBitmapS *SResProviderMgr::LoadImage(LPCTSTR pszType, LPCTSTR pszResName)
 {
     SAutoLock lock(m_cs);
-	if (!pszType)
-	{//support res src by resource path.
-		SPOSITION pos = m_lstResPackage.GetHeadPosition();
-		while(pos){
-			IResProvider *pRes = m_lstResPackage.GetNext(pos);
-			IBitmapS *bmp = pRes->LoadImage(NULL,pszResName);
-			if(bmp) return bmp;
-		}
-		return NULL;
-	}
+    if (!pszType)
+    { // support res src by resource path.
+        SPOSITION pos = m_lstResPackage.GetHeadPosition();
+        while (pos)
+        {
+            IResProvider *pRes = m_lstResPackage.GetNext(pos);
+            IBitmapS *bmp = pRes->LoadImage(NULL, pszResName);
+            if (bmp)
+                return bmp;
+        }
+        return NULL;
+    }
     if (IsFileType(pszType))
     {
         SStringT strPath = m_strFilePrefix + pszResName;
@@ -406,7 +412,6 @@ BOOL SResProviderMgr::IsFileType(LPCTSTR pszType)
         return FALSE;
     return _tcsicmp(pszType, KTypeFile) == 0;
 }
-
 
 #ifdef _DEBUG
 BOOL SResProviderMgr::CheckUsage(LPCTSTR pszName, LPCTSTR pszType, LPARAM lp)

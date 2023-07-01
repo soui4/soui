@@ -137,21 +137,21 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @brief 获取容器显示位置
      * @return RECT--容器显示位置
      */
-    STDMETHOD_(void, GetContainerRect)(CTHIS_ RECT *ret) SCONST PURE;
+    STDMETHOD_(void, GetContainerRect)(CTHIS_ RECT * ret) SCONST PURE;
 
     /**
      * @brief 刷新指定区域的内存位图
      * @param IRegion *rgn--刷新位置
      * @return void
      */
-	STDMETHOD_(void,UpdateRegion)(THIS_ IRegionS *rgn) PURE;
+    STDMETHOD_(void, UpdateRegion)(THIS_ IRegionS * rgn) PURE;
 
     /**
      * @brief 请求重绘
      * @param rc LPCRECT--重绘位置
      * @return
      */
-    STDMETHOD_(void, OnRedraw)(THIS_ LPCRECT rc,BOOL bClip) PURE;
+    STDMETHOD_(void, OnRedraw)(THIS_ LPCRECT rc, BOOL bClip) PURE;
 
     /**
      * @brief 获取捕获鼠标的Swnd对象
@@ -257,7 +257,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      */
     STDMETHOD_(void, OnUpdateCursor)(THIS) PURE;
 
-	/**
+    /**
      * @brief 注册VideoCanvas窗口
      * @param SWND swnd--VideoCanvas handle
      * @return BOOL
@@ -270,7 +270,6 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @return BOOL
      */
     STDMETHOD_(BOOL, UnregisterVideoCanvas)(THIS_ SWND swnd) PURE;
-
 };
 
 SNSEND

@@ -19,7 +19,7 @@ typedef enum EXPEND_MODE
 
 typedef enum FilterLevel
 {
-	kUndef_FilterLevel = 100,//don't use -1 as filter level will pass to render in word and will get 65535
+    kUndef_FilterLevel = 100, // don't use -1 as filter level will pass to render in word and will get 65535
     kNone_FilterLevel = 0,
     kLow_FilterLevel,
     kMedium_FilterLevel,
@@ -171,27 +171,28 @@ DECLARE_INTERFACE_(IRenderObj, IObjRef)
     STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 };
 
-typedef enum _BrushType{
-	Brush_Color =0,	//颜色画刷
-	Brush_Bitmap,	//位图画刷
-	Brush_Shader,	//渐变画刷
-}BrushType;
+typedef enum _BrushType
+{
+    Brush_Color = 0, //颜色画刷
+    Brush_Bitmap,    //位图画刷
+    Brush_Shader,    //渐变画刷
+} BrushType;
 
+typedef enum _TileMode
+{
+    /** replicate the edge color if the shader draws outside of its
+     *  original bounds
+     */
+    kClamp_TileMode = 0,
 
-typedef enum _TileMode {
-        /** replicate the edge color if the shader draws outside of its
-         *  original bounds
-         */
-        kClamp_TileMode = 0,
+    /** repeat the shader's image horizontally and vertically */
+    kRepeat_TileMode,
 
-        /** repeat the shader's image horizontally and vertically */
-        kRepeat_TileMode,
-
-        /** repeat the shader's image horizontally and vertically, alternating
-         *  mirror images so that adjacent images always seam
-         */
-        kMirror_TileMode,
-    } TileMode;
+    /** repeat the shader's image horizontally and vertically, alternating
+     *  mirror images so that adjacent images always seam
+     */
+    kMirror_TileMode,
+} TileMode;
 
 /**
  * @struct     IBrush
@@ -240,7 +241,7 @@ DECLARE_INTERFACE_(IBrushS, IRenderObj)
      * @return   BrushType
      * Describe
      */
-	STDMETHOD_(BrushType,GetBrushType)(CTHIS) SCONST PURE;
+    STDMETHOD_(BrushType, GetBrushType)(CTHIS) SCONST PURE;
 };
 
 /**
@@ -1250,7 +1251,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     // NULL can be returned if the Path is empty.
     STDMETHOD_(IPathInfo *, approximate)(THIS_ float acceptableError) PURE;
 
-	STDMETHOD_(IPathS *, clone)(CTHIS) SCONST PURE;
+    STDMETHOD_(IPathS *, clone)(CTHIS) SCONST PURE;
 };
 
 #undef INTERFACE
@@ -1312,6 +1313,26 @@ DECLARE_INTERFACE_(IPathMeasure, IObjRef)
     (THIS_ float startD, float stopD, IPathS *dst, BOOL startWithMoveTo) PURE;
 };
 
+typedef struct _GradientItem
+{
+    COLORREF cr;
+    float pos;
+} GradientItem;
+
+typedef struct _GradientInfo
+{
+    GradientType type;
+    union {
+        float angle;  // for linear
+        float radius; // radical
+        struct
+        {
+            float fX;
+            float fY;
+        } center; // sweep;
+    };
+} GradientInfo;
+
 /**
  * @struct     IRenderTarget
  * @brief      RenderTarget对象
@@ -1337,12 +1358,12 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    STDMETHOD_(HRESULT, CreateCompatibleRenderTarget)
-    (THIS_ SIZE szTarget, IRenderTarget * *ppRenderTarget) PURE;
+    STDMETHOD_(HRESULT, CreateCompatibleRenderTarget)(THIS_ SIZE szTarget, IRenderTarget * *ppRenderTarget) PURE;
+
     STDMETHOD_(HRESULT, CreatePen)(THIS_ int iStyle, COLORREF cr, int cWidth, IPenS **ppPen) PURE;
     STDMETHOD_(HRESULT, CreateSolidColorBrush)(THIS_ COLORREF cr, IBrushS * *ppBrush) PURE;
-	STDMETHOD_(HRESULT,CreateBitmapBrush)(THIS_ IBitmapS *pBmp,TileMode xtm,TileMode ytm, IBrushS ** ppBrush ) PURE;
-	STDMETHOD_(HRESULT,CreateGradientBrush)(THIS_ BOOL bVert, const COLORREF *crs, const float *pos, int nCount,TileMode tileMode, IBrushS * *ppBrush) PURE;
+    STDMETHOD_(HRESULT, CreateBitmapBrush)(THIS_ IBitmapS * pBmp, TileMode xtm, TileMode ytm, IBrushS * *ppBrush) PURE;
+    STDMETHOD_(HRESULT, CreateGradientBrush)(THIS_ const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha, TileMode tileMode, IBrushS **ppBrush) PURE;
 
     STDMETHOD_(HRESULT, CreateRegion)(THIS_ IRegionS * *ppRegion) PURE;
 
@@ -1387,12 +1408,10 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, FillArc)(THIS_ LPCRECT pRect, float startAngle, float sweepAngle) PURE;
 
     STDMETHOD_(HRESULT, DrawLines)(THIS_ LPPOINT pPt, size_t nCount) PURE;
-    STDMETHOD_(HRESULT, GradientFill)
-    (THIS_ LPCRECT pRect, BOOL bVert, COLORREF crBegin, COLORREF crEnd, BYTE byAlpha DEF_VAL(0xFF)) PURE;
-    STDMETHOD_(HRESULT, GradientFillEx)
-    (THIS_ LPCRECT pRect, BOOL bVert, const COLORREF *colors, const float *pos, int nCount, BYTE byAlpha DEF_VAL(0xFF)) PURE;
-    STDMETHOD_(HRESULT, GradientFill2)
-    (THIS_ LPCRECT pRect, GradientType type, COLORREF crStart, COLORREF crCenter, COLORREF crEnd, float fLinearAngle, float fCenterX, float fCenterY, int nRadius, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    STDMETHOD_(HRESULT, DrawGradientRect)
+    (THIS_ LPCRECT pRect, BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    STDMETHOD_(HRESULT, DrawGradientRectEx)
+    (THIS_ LPCRECT pRect, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, DrawIconEx)
     (THIS_ int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT diFlags) PURE;
     STDMETHOD_(HRESULT, DrawBitmap)

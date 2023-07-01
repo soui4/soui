@@ -4,10 +4,10 @@
 
 SNSBEGIN
 
-void SScaleAnimation::initialize(int width, int height, int parentWidth, int parentHeight,int nScale)
+void SScaleAnimation::initialize(int width, int height, int parentWidth, int parentHeight, int nScale)
 {
-    mPivotX = (float)resolveSize(mPivotXDesc, width, parentWidth,nScale);
-    mPivotY = (float)resolveSize(mPivotYDesc, height, parentHeight,nScale);
+    mPivotX = (float)resolveSize(mPivotXDesc, width, parentWidth, nScale);
+    mPivotY = (float)resolveSize(mPivotYDesc, height, parentHeight, nScale);
 }
 
 void SScaleAnimation::applyTransformation(float interpolatedTime, ITransformation *t)
@@ -51,23 +51,20 @@ void SScaleAnimation::copy(const IAnimation *src)
     mPivotYDesc = src2->mPivotYDesc;
 }
 
-
-void SScaleAnimation::init(float fromX, float toX, float fromY, float toY, const SValueDescription & pivotX, const SValueDescription & pivotY)
+void SScaleAnimation::init(float fromX, float toX, float fromY, float toY, const SValueDescription &pivotX, const SValueDescription &pivotY)
 {
     mFromX = fromX;
     mToX = toX;
     mFromY = fromY;
     mToY = toY;
 
-	mPivotXDesc = pivotX;
-	mPivotYDesc = pivotY;
+    mPivotXDesc = pivotX;
+    mPivotYDesc = pivotY;
 }
-
 
 SScaleAnimation::SScaleAnimation()
 {
-    init(1.0f, 1.0f, 1.0f, 1.0f, SValueDescription(RELATIVE_TO_SELF, 0.5f),SValueDescription(RELATIVE_TO_SELF, 0.5f));
+    init(1.0f, 1.0f, 1.0f, 1.0f, SValueDescription(RELATIVE_TO_SELF, 0.5f), SValueDescription(RELATIVE_TO_SELF, 0.5f));
 }
-
 
 SNSEND

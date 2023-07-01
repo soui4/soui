@@ -108,10 +108,10 @@ BOOL SListView::SetAdapter(ILvAdapter *adapter)
             ii.pItem->Destroy();
         }
         m_lstItems.RemoveAll();
-		m_pHoverItem = NULL;
-		m_itemCapture = NULL;
-		m_iSelItem = -1;
-		m_iFirstVisible = -1;
+        m_pHoverItem = NULL;
+        m_itemCapture = NULL;
+        m_iSelItem = -1;
+        m_iFirstVisible = -1;
     }
 
     m_adapter = adapter;
@@ -439,8 +439,8 @@ void SListView::UpdateVisibleItems()
                 if (m_bVertical)
                 {
                     rcItem.bottom = 0;
-                    CSize szItem ;
-					m_adapter->getViewDesiredSize(&szItem,iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
+                    CSize szItem;
+                    m_adapter->getViewDesiredSize(&szItem, iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
                     rcItem.bottom = rcItem.top + szItem.cy;
                     ii.pItem->Move(rcItem);
                     m_lvItemLocator->SetItemHeight(iNewLastVisible, szItem.cy);
@@ -448,8 +448,8 @@ void SListView::UpdateVisibleItems()
                 else
                 {
                     rcItem.right = 0;
-                    CSize szItem ;
-					m_adapter->getViewDesiredSize(&szItem,iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
+                    CSize szItem;
+                    m_adapter->getViewDesiredSize(&szItem, iNewLastVisible, ii.pItem, rcItem.Width(), rcItem.Height());
                     rcItem.right = rcItem.left + szItem.cx;
                     ii.pItem->Move(rcItem);
                     m_lvItemLocator->SetItemHeight(iNewLastVisible, szItem.cx);
@@ -492,9 +492,11 @@ void SListView::UpdateVisibleItems()
     { // update scroll range
         UpdateScrollBar();
         UpdateVisibleItems(); //根据新的滚动条状态重新记录显示列表项
-	}else{
-		InvalidateRect(NULL);
-	}
+    }
+    else
+    {
+        InvalidateRect(NULL);
+    }
 }
 
 void SListView::UpdateVisibleItem(int iItem)
@@ -1116,16 +1118,17 @@ IItemPanel *SListView::HitTest(const POINT *pt) const
     return HitTest(pt2);
 }
 
-void SListView::GetDesiredSize(THIS_ SIZE *psz,int nParentWid, int nParentHei)
+void SListView::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei)
 {
-	__baseCls::GetDesiredSize(psz,nParentWid,nParentHei);
-	ILayoutParam *pLayoutParam = GetLayoutParam();
-	if(pLayoutParam->IsWrapContent(Vert) && m_lvItemLocator && m_lvItemLocator->IsFixHeight()){
-		CRect rcPadding = GetStyle().GetPadding();
-		psz->cy = m_lvItemLocator->GetTotalHeight() + rcPadding.top + rcPadding.bottom;
-		if(nParentHei>0 && psz->cy>nParentHei)
-			psz->cy = nParentHei;
-	}
+    __baseCls::GetDesiredSize(psz, nParentWid, nParentHei);
+    ILayoutParam *pLayoutParam = GetLayoutParam();
+    if (pLayoutParam->IsWrapContent(Vert) && m_lvItemLocator && m_lvItemLocator->IsFixHeight())
+    {
+        CRect rcPadding = GetStyle().GetPadding();
+        psz->cy = m_lvItemLocator->GetTotalHeight() + rcPadding.top + rcPadding.bottom;
+        if (nParentHei > 0 && psz->cy > nParentHei)
+            psz->cy = nParentHei;
+    }
 }
 
 SNSEND

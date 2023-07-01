@@ -25,9 +25,9 @@ enum ENUM_LOG_LEVEL
 
 #undef INTERFACE
 #define INTERFACE IOutputFileBuilder
-DECLARE_INTERFACE_(IOutputFileBuilder,IObjRef)
+DECLARE_INTERFACE_(IOutputFileBuilder, IObjRef)
 {
-	//!添加引用
+    //!添加引用
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
@@ -42,13 +42,11 @@ DECLARE_INTERFACE_(IOutputFileBuilder,IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-
     //生成LOG文件名
     //至少应该包含pszLogName，及curFileIndex这两个参数
     STDMETHOD_(BOOL, buildOutputFile)
     (CTHIS_ char *pszFileName, int nLen, const char *pszLogName, unsigned long pid, int curFileIndex) SCONST PURE;
 };
-
 
 //! log4z class
 #undef INTERFACE
@@ -90,9 +88,9 @@ DECLARE_INTERFACE_(ILogMgr, IObjRef)
     (THIS_ int level, const char *filter, const char *log, const char *file, int line, const char *func, const void *pRetAddr) PURE;
 
     //! set logger's attribute
-	STDMETHOD_(BOOL, isLoggerEnable)(CTHIS) SCONST PURE;
+    STDMETHOD_(BOOL, isLoggerEnable)(CTHIS) SCONST PURE;
     STDMETHOD_(BOOL, enableLogger)(THIS_ BOOL enable) PURE;
-	STDMETHOD_(BOOL, setLoggerName)(THIS_ const char *name_u8) PURE;
+    STDMETHOD_(BOOL, setLoggerName)(THIS_ const char *name_u8) PURE;
     STDMETHOD_(BOOL, setLoggerPath)(THIS_ const char *path_u8) PURE;
     STDMETHOD_(BOOL, setLoggerLevel)(THIS_ int nLevel) PURE;
     STDMETHOD_(BOOL, setLoggerFileLine)(THIS_ BOOL enable) PURE;

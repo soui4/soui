@@ -73,12 +73,12 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
     STDMETHOD_(int, InsertItem)
     (THIS_ int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware = FALSE, float fWeight = 0.0f) OVERRIDE;
 
-	STDMETHOD_(int, InsertItemA)
-		(THIS_ int iItem, LPCSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware = FALSE, float fWeight = 0.0f) OVERRIDE
-	{
-		SStringT str = S_CA2T(pszText,CP_UTF8);
-		return InsertItem(iItem,str,nWidth,fmt,lParam,bDpiAware,fWeight);
-	}
+    STDMETHOD_(int, InsertItemA)
+    (THIS_ int iItem, LPCSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware = FALSE, float fWeight = 0.0f) OVERRIDE
+    {
+        SStringT str = S_CA2T(pszText, CP_UTF8);
+        return InsertItem(iItem, str, nWidth, fmt, lParam, bDpiAware, fWeight);
+    }
 
     /**
      * SHeaderCtrl::GetItem
@@ -146,8 +146,8 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
 
     STDMETHOD_(BOOL, IsItemVisible)(THIS_ int iItem) SCONST OVERRIDE;
 
-	STDMETHOD_(int,GetOriItemIndex)(CTHIS_ int iOrder) SCONST OVERRIDE;
-	STDMETHOD_(void,GetItemRect)(CTHIS_ int iItem,LPRECT prc) SCONST OVERRIDE;
+    STDMETHOD_(int, GetOriItemIndex)(CTHIS_ int iOrder) SCONST OVERRIDE;
+    STDMETHOD_(void, GetItemRect)(CTHIS_ int iItem, LPRECT prc) SCONST OVERRIDE;
 
   public:
     /**

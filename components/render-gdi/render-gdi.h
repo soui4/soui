@@ -193,20 +193,9 @@ public:
 
 	COLORREF GetColor() const {return m_cr;}
 public:
-	SBrush_GDI(IRenderFactory * pRenderFac,COLORREF cr)
-		:TGdiRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_cr(cr),m_brushType(Brush_Color)
-	{
-		m_hBrush = ::CreateSolidBrush(m_cr&0x00ffffff);
-	}
-	SBrush_GDI(IRenderFactory * pRenderFac,HBITMAP hBmp)
-		:TGdiRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Bitmap)
-	{
-		m_hBrush = ::CreatePatternBrush(hBmp);
-	}
-	~SBrush_GDI()
-	{
-		DeleteObject(m_hBrush);
-	}
+	SBrush_GDI(IRenderFactory * pRenderFac,COLORREF cr);
+	SBrush_GDI(IRenderFactory * pRenderFac,HBITMAP hBmp);
+	~SBrush_GDI();
 
 protected:
 	HBRUSH   m_hBrush;
@@ -321,7 +310,7 @@ public:
 	STDMETHOD_(HRESULT,CreatePen)(THIS_ int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateSolidColorBrush)(THIS_ COLORREF cr,IBrushS ** ppBrush) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateBitmapBrush)(THIS_ IBitmapS *pBmp,TileMode xtm,TileMode ytm, IBrushS ** ppBrush ) OVERRIDE;
-	STDMETHOD_(HRESULT,CreateGradientBrush)(THIS_ BOOL bVert, const COLORREF *crs, const float *pos, int nCount,TileMode tileMode, IBrushS * *ppBrush) OVERRIDE;
+	STDMETHOD_(HRESULT,CreateGradientBrush)(THIS_ const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha,TileMode tileMode, IBrushS * *ppBrush) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateRegion)(THIS_ IRegionS ** ppRegion ) OVERRIDE;
 
 	STDMETHOD_(HRESULT,Resize)(THIS_ SIZE sz) OVERRIDE;
@@ -363,9 +352,9 @@ public:
 	STDMETHOD_(HRESULT,FillArc)(THIS_ LPCRECT pRect,float startAngle,float sweepAngle) OVERRIDE;
 
 	STDMETHOD_(HRESULT,DrawLines)(THIS_ LPPOINT pPt,size_t nCount) OVERRIDE;
-	STDMETHOD_(HRESULT,GradientFill)(THIS_ LPCRECT pRect,BOOL bVert,COLORREF crBegin,COLORREF crEnd,BYTE byAlpha/*=0xFF*/) OVERRIDE;
-	STDMETHOD_(HRESULT,GradientFillEx)(THIS_ LPCRECT pRect,BOOL bVert,const COLORREF *colors,const float *pos,int nCount,BYTE byAlpha/*=0xFF*/ ) OVERRIDE;
-	STDMETHOD_(HRESULT,GradientFill2)(THIS_ LPCRECT pRect,GradientType type,COLORREF crStart,COLORREF crCenter,COLORREF crEnd,float fLinearAngle,float fCenterX,float fCenterY,int nRadius,BYTE byAlpha/*=0xFF*/) OVERRIDE;
+	STDMETHOD_(HRESULT, DrawGradientRect)(THIS_ LPCRECT pRect,  BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha DEF_VAL(0xFF)) OVERRIDE;
+	STDMETHOD_(HRESULT, DrawGradientRectEx)
+		(THIS_ LPCRECT pRect, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF)) OVERRIDE;
 	STDMETHOD_(HRESULT,DrawIconEx)(THIS_ int xLeft, int yTop, HICON hIcon, int cxWidth,int cyWidth,UINT diFlags) OVERRIDE;
 	STDMETHOD_(HRESULT,DrawBitmap)(THIS_ LPCRECT pRcDest,const IBitmapS *pBitmap,int xSrc,int ySrc,BYTE byAlpha/*=0xFF*/) OVERRIDE;
 	STDMETHOD_(HRESULT,DrawBitmapEx)(THIS_ LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,UINT expendMode, BYTE byAlpha/*=0xFF*/) OVERRIDE;

@@ -109,22 +109,21 @@ BOOL SListBox::SetItemData(int nIndex, LPARAM lParam)
     return TRUE;
 }
 
-
-BOOL SListBox::SetItemImage(THIS_ int nIndex,int iImage)
+BOOL SListBox::SetItemImage(THIS_ int nIndex, int iImage)
 {
-	if (nIndex < 0 || nIndex >= GetCount())
-		return FALSE;
+    if (nIndex < 0 || nIndex >= GetCount())
+        return FALSE;
 
-	m_arrItems[nIndex]->nImage = iImage;
-	return TRUE;
+    m_arrItems[nIndex]->nImage = iImage;
+    return TRUE;
 }
 
 int SListBox::GetItemImage(THIS_ int nIndex)
 {
-	if (nIndex < 0 || nIndex >= GetCount())
-		return -1;
+    if (nIndex < 0 || nIndex >= GetCount())
+        return -1;
 
-	return m_arrItems[nIndex]->nImage;
+    return m_arrItems[nIndex]->nImage;
 }
 
 BOOL SListBox::GetIText(int nIndex, BOOL bRawText, IStringT *str) const
@@ -293,7 +292,8 @@ void SListBox::LoadItemAttribute(SXmlNode xmlNode, LPLBITEM pItem)
     pItem->nImage = xmlNode.attribute(L"icon").as_int(pItem->nImage);
     pItem->lParam = xmlNode.attribute(L"data").as_uint((UINT)pItem->lParam);
     SStringW strText = GETSTRING(xmlNode.attribute(L"text").value());
-	if(strText.IsEmpty()) strText = GetXmlText(xmlNode);
+    if (strText.IsEmpty())
+        strText = GetXmlText(xmlNode);
     pItem->strText.SetText(S_CW2T(GETSTRING(strText)));
 }
 
@@ -634,16 +634,17 @@ void SListBox::UpdateScrollBar()
     InvalidateRect(NULL);
 }
 
-void SListBox::GetDesiredSize(THIS_ SIZE *psz,int nParentWid, int nParentHei)
+void SListBox::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei)
 {
-	__baseCls::GetDesiredSize(psz,nParentWid,nParentHei);
-	ILayoutParam *pLayoutParam = GetLayoutParam();
-	if(pLayoutParam->IsWrapContent(Vert)){
-		CRect rcPadding = GetStyle().GetPadding();
-		psz->cy = GetItemHeight() * GetCount() + rcPadding.top + rcPadding.bottom;
-		if(nParentHei>0 && psz->cy>nParentHei)
-			psz->cy = nParentHei;
-	}
+    __baseCls::GetDesiredSize(psz, nParentWid, nParentHei);
+    ILayoutParam *pLayoutParam = GetLayoutParam();
+    if (pLayoutParam->IsWrapContent(Vert))
+    {
+        CRect rcPadding = GetStyle().GetPadding();
+        psz->cy = GetItemHeight() * GetCount() + rcPadding.top + rcPadding.bottom;
+        if (nParentHei > 0 && psz->cy > nParentHei)
+            psz->cy = nParentHei;
+    }
 }
 
 SNSEND

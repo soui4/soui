@@ -205,7 +205,50 @@ namespace SOUI
 	}
 
 
-    
+	//////////////////////////////////////////////////////////////////////////
+
+	SBrush_GDI::SBrush_GDI(IRenderFactory * pRenderFac,HBITMAP hBmp) :TGdiRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_brushType(Brush_Bitmap)
+	{
+		BITMAP bmp;
+		::GetObject(hBmp,sizeof(bmp),&bmp);
+		if(bmp.bmBits){
+			BITMAPINFO *pBuf = (BITMAPINFO*)malloc(sizeof(BITMAPINFO)+bmp.bmWidthBytes * bmp.bmHeight);
+	
+			BITMAPINFO &bmpInfo = *pBuf;
+			memset(&bmpInfo, 0, sizeof(BITMAPINFO));
+			bmpInfo.bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
+			bmpInfo.bmiHeader.biWidth = bmp.bmWidth;
+			bmpInfo.bmiHeader.biHeight = -bmp.bmHeight;
+			bmpInfo.bmiHeader.biPlanes = bmp.bmPlanes;
+			bmpInfo.bmiHeader.biBitCount = bmp.bmBitsPixel;
+			bmpInfo.bmiHeader.biCompression = BI_RGB;
+			bmpInfo.bmiHeader.biSizeImage = bmp.bmWidthBytes * bmp.bmHeight;
+			COLORREF *crTable= (COLORREF*)(pBuf+1);
+			memcpy(crTable,bmp.bmBits,bmpInfo.bmiHeader.biSizeImage);
+			//需要下面这一段，清空颜色表的alpha，GDI才支持。
+			for(int i=0;i<bmp.bmHeight;i++){
+				for(int j=0;j<bmp.bmWidth;j++){
+					*crTable &= 0x00ffffff;
+					crTable++;
+				}
+			}
+			m_hBrush = CreateDIBPatternBrushPt(pBuf,DIB_RGB_COLORS);
+			free(pBuf);
+		}else{
+			m_hBrush=NULL;
+		}
+	}
+
+	SBrush_GDI::SBrush_GDI(IRenderFactory * pRenderFac,COLORREF cr) :TGdiRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_cr(cr),m_brushType(Brush_Color)
+	{
+		m_hBrush = ::CreateSolidBrush(m_cr&0x00ffffff);
+	}
+
+	SBrush_GDI::~SBrush_GDI()
+	{
+		if(m_hBrush) DeleteObject(m_hBrush);
+	}
+
     //////////////////////////////////////////////////////////////////////////
     //  SBitmap_GDI
     HBITMAP SBitmap_GDI::CreateGDIBitmap( int nWid,int nHei,void ** ppBits )
@@ -504,7 +547,7 @@ namespace SOUI
 
 	void SRegion_GDI::CombineRoundRect(LPCRECT lprect, POINT ptRadius, int nCombineMode)
 	{
-		HRGN hRgn = ::CreateRoundRectRgn(lprect->left,lprect->top,lprect->right,lprect->bottom,ptRadius.x,ptRadius.y);
+		HRGN hRgn = ::CreateRoundRectRgn(lprect->left,lprect->top,lprect->right,lprect->bottom,ptRadius.x*2,ptRadius.y*2);
 		::CombineRgn(m_hRgn,hRgn,NULL,nCombineMode);
 		DeleteObject(hRgn);
 	}
@@ -664,7 +707,7 @@ namespace SOUI
         return S_OK;
     }
 
-	HRESULT SRenderTarget_GDI::CreateGradientBrush(THIS_ BOOL bVert,const COLORREF *crs, const float *pos, int nCount,TileMode tilemode, IBrushS * *ppBrush)
+	HRESULT SRenderTarget_GDI::CreateGradientBrush(THIS_ const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha,TileMode tileMode, IBrushS * *ppBrush)
 	{
 		return E_NOTIMPL;//todo:hjx
 	}
@@ -855,7 +898,7 @@ namespace SOUI
         DCBuffer dcBuf(m_hdc,pRect,byAlpha);
 
         HGDIOBJ oldPen=::SelectObject(dcBuf,GetStockObject(NULL_PEN));
-        ::RoundRect(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,pt.x,pt.y);
+        ::RoundRect(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,pt.x*2,pt.y*2);
         ::SelectObject(dcBuf,oldPen);
         return S_OK;
     }
@@ -1209,28 +1252,36 @@ namespace SOUI
         }
     }
 
-    HRESULT SRenderTarget_GDI::GradientFill( LPCRECT pRect,BOOL bVert,COLORREF crBegin,COLORREF crEnd,BYTE byAlpha/*=0xFF*/ )
+
+    HRESULT SRenderTarget_GDI::DrawGradientRect(THIS_ LPCRECT pRect,  BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha)
     {
-        if(byAlpha!=0xFF)
-        {
-            DCBuffer dcBuf(m_hdc,pRect,byAlpha,FALSE);
-            GradientFillRect(dcBuf,pRect,crBegin,crEnd,bVert);
-        }else
-        {
-            GradientFillRect(m_hdc,pRect,crBegin,crEnd,bVert);
-        }
+		DCBuffer dcBuf(m_hdc,pRect,byAlpha,FALSE);
+		if (ptRoundCorner.x == 0 && ptRoundCorner.y == 0)
+		{
+			GradientFillRect(dcBuf,pRect,pGradients,nCount,bVert,0xFF);
+		}
+		else{
+			int wid = pRect->right-pRect->left;
+			int hei = pRect->bottom-pRect->top;
+			HBITMAP hBmp = SBitmap_GDI::CreateGDIBitmap(wid,hei,NULL);
+			HDC hMemDC = ::CreateCompatibleDC(m_hdc);
+			::SetBkMode(hMemDC,TRANSPARENT);
+			HGDIOBJ hOldBmp = ::SelectObject(hMemDC,hBmp);	
+			::SetViewportOrgEx(hMemDC,-pRect->left,-pRect->top,NULL);
+			GradientFillRect(hMemDC,pRect,pGradients,nCount,bVert,0xFF);
+			::SelectObject(hMemDC,hOldBmp);
+			DeleteDC(hMemDC);
+
+			HBRUSH hbr = ::CreatePatternBrush(hBmp);
+
+			HGDIOBJ oldBr = ::SelectObject(dcBuf,hbr);
+			::SelectObject(dcBuf,GetStockObject(NULL_PEN));
+			::RoundRect(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,ptRoundCorner.x*2,ptRoundCorner.y*2);
+			::SelectObject(dcBuf,oldBr);
+			::DeleteObject(hbr);
+			::DeleteObject(hBmp);
+		}
         return S_OK;
-    }
-    
-    HRESULT SRenderTarget_GDI::GradientFillEx( LPCRECT pRect,BOOL bVert,const COLORREF *colors,const float *pos,int nCount,BYTE byAlpha/*=0xFF */ )
-    {
-		(pRect);
-		(bVert);
-		(colors);
-		(pos);
-		(nCount);
-		(byAlpha);
-        return E_NOTIMPL;
     }
 
     //通过一个内存位图来填充位置的alpha值
@@ -1423,10 +1474,14 @@ namespace SOUI
 		return crRet;
 	}
 
-	HRESULT SRenderTarget_GDI::GradientFill2(LPCRECT pRect,GradientType type,COLORREF crStart,COLORREF crCenter,COLORREF crEnd,float fLinearAngle,float fCenterX,float fCenterY,int nRadius,BYTE byAlpha/*=0xff*/)
-	{
-		(pRect), (type), (crStart), (crCenter), (crEnd), (fLinearAngle), (fCenterX), (fCenterY), (nRadius), (byAlpha);
-		return E_NOTIMPL;
+	HRESULT SRenderTarget_GDI::DrawGradientRectEx(THIS_ LPCRECT pRect, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha){
+			if(info->type == linear){
+				if(info->angle == 0.f)
+					return DrawGradientRect(pRect,FALSE,ptRoundCorner,pGradients,nCount,byAlpha);
+				else if(info->angle == 90.f)
+					return DrawGradientRect(pRect,TRUE,ptRoundCorner,pGradients,nCount,byAlpha);
+			}
+			return E_NOTIMPL;
 	}
 
 	HRESULT SRenderTarget_GDI::CreateRegion(IRegionS ** ppRegion)

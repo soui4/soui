@@ -16,17 +16,17 @@ SValueDescription SValueDescription::parseValue(const SStringW &value)
     else if (value.EndsWith(L"%", true))
     {
         d.type = RELATIVE_TO_SELF;
-		d.value = SLayoutSize((float)_wtof(value.Left(value.GetLength() - 1)) / 100,SLayoutSize::px);
+        d.value = SLayoutSize((float)_wtof(value.Left(value.GetLength() - 1)) / 100, SLayoutSize::px);
     }
     else if (value.EndsWith(L"%p", true))
     {
         d.type = RELATIVE_TO_PARENT;
-        d.value = SLayoutSize((float)_wtof(value.Left(value.GetLength() - 2)) / 100,SLayoutSize::px);
+        d.value = SLayoutSize((float)_wtof(value.Left(value.GetLength() - 2)) / 100, SLayoutSize::px);
     }
     else
     {
         d.type = ABSOLUTE_VALUE;
-		d.value.parseString (value);
+        d.value.parseString(value);
     }
     return d;
 }
@@ -37,13 +37,13 @@ BOOL SAnimation::hasAlpha() const
     return false;
 }
 
-int SAnimation::resolveSize(const SValueDescription & value, int size, int parentSize, int nScale)
+int SAnimation::resolveSize(const SValueDescription &value, int size, int parentSize, int nScale)
 {
-	float fValue = 0.0f;
-	if (value.value.unit == SLayoutSize::px)
-		fValue = value.value.fSize;
-	else
-		fValue = value.value.fSize * nScale / 100;
+    float fValue = 0.0f;
+    if (value.value.unit == SLayoutSize::px)
+        fValue = value.value.fSize;
+    else
+        fValue = value.value.fSize * nScale / 100;
 
     switch (value.type)
     {
@@ -191,9 +191,10 @@ BOOL SAnimation::getTransformation2(uint64_t currentTime, ITransformation *outTr
 
 long SAnimation::computeDurationHint() const
 {
-	if(getRepeatCount()<0){
-		return INT_MAX;
-	}
+    if (getRepeatCount() < 0)
+    {
+        return INT_MAX;
+    }
     return getStartOffset() + getDuration() * (getRepeatCount() + 1);
 }
 
@@ -404,7 +405,7 @@ IAnimation *SAnimation::clone() const
     return pRet;
 }
 
-void SAnimation::initialize(int width, int height, int parentWidth, int parentHeight,int nScale)
+void SAnimation::initialize(int width, int height, int parentWidth, int parentHeight, int nScale)
 {
 }
 

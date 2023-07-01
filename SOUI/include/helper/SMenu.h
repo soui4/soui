@@ -238,7 +238,7 @@ class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
 
     STDMETHOD_(BOOL, LoadMenu)(THIS_ LPCTSTR resId) OVERRIDE;
 
-	STDMETHOD_(BOOL, LoadMenuA)(THIS_ LPCSTR resId) OVERRIDE;
+    STDMETHOD_(BOOL, LoadMenuA)(THIS_ LPCSTR resId) OVERRIDE;
 
     STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode *xmlMenu) OVERRIDE;
 

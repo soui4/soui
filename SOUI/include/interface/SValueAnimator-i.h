@@ -44,7 +44,7 @@ DECLARE_INTERFACE(IAnimatorListener)
 #define INTERFACE IValueAnimator
 DECLARE_INTERFACE_(IValueAnimator, IObject)
 {
-	DEF_OBJ_BASE(IValueAnimator,ValueAnimator)
+    DEF_OBJ_BASE(IValueAnimator, ValueAnimator)
 #include <interface/SobjectApi.h>
 
     /**
@@ -205,7 +205,7 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
 
     STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr * pContainer) PURE;
 
-	STDMETHOD_(void, end)(THIS) PURE;
+    STDMETHOD_(void, end)(THIS) PURE;
 
     STDMETHOD_(BOOL, isRunning)(CTHIS) SCONST PURE;
 

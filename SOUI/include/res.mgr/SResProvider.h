@@ -26,7 +26,7 @@ class SOUI_EXP SResLoadFromMemory {
 class SResProviderPE : public TObjRefImpl<IResProvider> {
   public:
     SResProviderPE();
-	~SResProviderPE();
+    ~SResProviderPE();
 
   public:
     STDMETHOD_(BOOL, Init)(THIS_ WPARAM wParam, LPARAM lParam);
@@ -40,7 +40,7 @@ class SResProviderPE : public TObjRefImpl<IResProvider> {
     STDMETHOD_(BOOL, GetRawBuffer)
     (THIS_ LPCTSTR pszType, LPCTSTR pszResName, LPVOID pBuf, size_t size);
     STDMETHOD_(void, EnumResource)(THIS_ EnumResCallback funEnumCB, LPARAM lp);
-	STDMETHOD_(void, EnumFile)(THIS_ EnumFileCallback funEnumCB, LPARAM lp);
+    STDMETHOD_(void, EnumFile)(THIS_ EnumFileCallback funEnumCB, LPARAM lp);
 
   protected:
     LPVOID GetRawBufferPtr(LPCTSTR strType, LPCTSTR pszResName);
@@ -48,7 +48,7 @@ class SResProviderPE : public TObjRefImpl<IResProvider> {
     HRSRC MyFindResource(LPCTSTR strType, LPCTSTR pszResName);
 
     HINSTANCE m_hResInst;
-	BOOL	  m_bOwner;
+    BOOL m_bOwner;
 };
 
 class SOUI_EXP SResLoadFromFile {
@@ -77,10 +77,10 @@ class SResProviderFiles : public TObjRefImpl<IResProvider> {
     STDMETHOD_(BOOL, GetRawBuffer)
     (THIS_ LPCTSTR pszType, LPCTSTR pszResName, LPVOID pBuf, size_t size) OVERRIDE;
     STDMETHOD_(void, EnumResource)(THIS_ EnumResCallback funEnumCB, LPARAM lp) OVERRIDE;
-	STDMETHOD_(void, EnumFile)(THIS_ EnumFileCallback funEnumCB, LPARAM lp) OVERRIDE;
+    STDMETHOD_(void, EnumFile)(THIS_ EnumFileCallback funEnumCB, LPARAM lp) OVERRIDE;
 
   protected:
-	void _EnumFile(LPCTSTR pszPath,EnumFileCallback funEnumCB, LPARAM lp);
+    void _EnumFile(LPCTSTR pszPath, EnumFileCallback funEnumCB, LPARAM lp);
 
     SStringT GetRes(LPCTSTR strType, LPCTSTR pszResName);
 

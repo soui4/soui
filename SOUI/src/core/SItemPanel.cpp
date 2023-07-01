@@ -140,19 +140,19 @@ BOOL SOsrPanel::OnFireEvent(IEvtArgs *evt)
 
 void SOsrPanel::GetContainerRect(RECT *ret) const
 {
-	CRect rcItem;
+    CRect rcItem;
     m_pItemContainer->OnItemGetRect(this, rcItem);
-	*ret = rcItem;
+    *ret = rcItem;
 }
 
 void SOsrPanel::UpdateRegion(IRegionS *rgn)
 {
-	CRect rc = GetItemRect();
-	rgn->Offset(rc.TopLeft());
-	m_pHostProxy->GetHostContainer()->UpdateRegion(rgn);
+    CRect rc = GetItemRect();
+    rgn->Offset(rc.TopLeft());
+    m_pHostProxy->GetHostContainer()->UpdateRegion(rgn);
 }
 
-void SOsrPanel::OnRedraw(LPCRECT rc,BOOL bClip)
+void SOsrPanel::OnRedraw(LPCRECT rc, BOOL bClip)
 {
     if (m_pHostProxy->IsHostUpdateLocked())
         return;
@@ -167,14 +167,14 @@ void SOsrPanel::OnRedraw(LPCRECT rc,BOOL bClip)
             rc2.IntersectRect(rc2, rcItem);
             CRect rcHostClient = m_pHostProxy->GetHostRect();
             rc2.IntersectRect(rc2, rcHostClient);
-            m_pHostProxy->InvalidateHostRect(&rc2,bClip);
+            m_pHostProxy->InvalidateHostRect(&rc2, bClip);
         }
         else
         {
-			SAutoRefPtr<IRegionS> rgn;
-			GETRENDERFACTORY->CreateRegion(&rgn);
-			rgn->CombineRect(rc, RGN_COPY);
-			UpdateRegion(rgn);
+            SAutoRefPtr<IRegionS> rgn;
+            GETRENDERFACTORY->CreateRegion(&rgn);
+            rgn->CombineRect(rc, RGN_COPY);
+            UpdateRegion(rgn);
         }
     }
 }
@@ -240,22 +240,22 @@ void SOsrPanel::Draw(IRenderTarget *pRT, const CRect &rc)
 {
     UpdateLayout();
     BuildWndTreeZorder();
-	SPainter painter;
-	BeforePaint(pRT, painter);
-	pRT->OffsetViewportOrg(rc.left, rc.top, NULL);
-	//没有矩阵变换的时候才启用clip region.
-	SAutoRefPtr<IRegionS> rgn;
-	SMatrix mtx;
-	pRT->GetTransform(mtx.fMat);
-	mtx.dirtyMatrixTypeCache();
-	if(mtx.isIdentity())
-	{
-		pRT->GetClipRegion(&rgn);
-	}
+    SPainter painter;
+    BeforePaint(pRT, painter);
+    pRT->OffsetViewportOrg(rc.left, rc.top, NULL);
+    //没有矩阵变换的时候才启用clip region.
+    SAutoRefPtr<IRegionS> rgn;
+    SMatrix mtx;
+    pRT->GetTransform(mtx.fMat);
+    mtx.dirtyMatrixTypeCache();
+    if (mtx.isIdentity())
+    {
+        pRT->GetClipRegion(&rgn);
+    }
 
-	RedrawRegion(pRT, rgn);
-	pRT->OffsetViewportOrg(-rc.left, -rc.top, NULL);
-	AfterPaint(pRT, painter);
+    RedrawRegion(pRT, rgn);
+    pRT->OffsetViewportOrg(-rc.left, -rc.top, NULL);
+    AfterPaint(pRT, painter);
 }
 
 BOOL SOsrPanel::NeedRedrawWhenStateChange()
@@ -393,17 +393,18 @@ LPARAM SOsrPanel::GetItemData() const
 
 void SOsrPanel::PtToHost(THIS_ POINT *pt) const
 {
-	CRect rcItem = GetItemRect();
-	pt->x += rcItem.left;
-	pt->y += rcItem.top;
+    CRect rcItem = GetItemRect();
+    pt->x += rcItem.left;
+    pt->y += rcItem.top;
 }
 
 void SOsrPanel::RequestRelayout(SWND hSource, BOOL bSourceResizable)
 {
-	__baseCls::RequestRelayout(hSource,bSourceResizable);
-	if(IsLayoutDirty()){
-		m_pHostProxy->OnLayoutDirty();
-	}
+    __baseCls::RequestRelayout(hSource, bSourceResizable);
+    if (IsLayoutDirty())
+    {
+        m_pHostProxy->OnLayoutDirty();
+    }
 }
 
 //////////////////////////////////////////////////////////////////////////

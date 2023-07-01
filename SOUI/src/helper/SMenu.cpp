@@ -326,11 +326,10 @@ BOOL SMenu::LoadMenu(LPCTSTR resId)
     return LoadMenu2(&xmlMenu);
 }
 
-
 BOOL SMenu::LoadMenuA(THIS_ LPCSTR resId)
 {
-	SStringT strResId = S_CA2T(resId,CP_UTF8);
-	return LoadMenu(strResId);
+    SStringT strResId = S_CA2T(resId, CP_UTF8);
+    return LoadMenu(strResId);
 }
 
 void SMenu::InitMenuItemData(SMenuItemData *itemInfo, const SStringW &strTextW)
@@ -417,12 +416,14 @@ void SMenu::BuildMenu(HMENU menuPopup, SXmlNode xmlNode)
             SMenuItemData *pdmmi = new SMenuItemData;
             pdmmi->iIcon = xmlItem.attribute(L"icon").as_int(-1);
             pdmmi->dwUserData = xmlItem.append_attribute(L"userData").as_uint();
-			SStringW strText = xmlItem.attribute(L"text").as_string();
-			if(strText.IsEmpty()){
-				strText = SWindow::GetXmlText(xmlItem);;
-			}
+            SStringW strText = xmlItem.attribute(L"text").as_string();
+            if (strText.IsEmpty())
+            {
+                strText = SWindow::GetXmlText(xmlItem);
+                ;
+            }
             strText = TR(strText, GetMenuAttr(menuPopup)->m_strTrCtx);
-			strText = STrText::EscapeString(strText);
+            strText = STrText::EscapeString(strText);
             InitMenuItemData(pdmmi, strText);
 
             int nID = xmlItem.attribute(L"id").as_int(0);

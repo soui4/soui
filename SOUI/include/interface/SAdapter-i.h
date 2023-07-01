@@ -137,14 +137,14 @@ DECLARE_INTERFACE_(ILvAdapter, IObjRef)
 
     /**
      * @brief 计算列表项显示大小
-	 * @param [output] SIZE* ret -- 列表项大小
+     * @param [output] SIZE* ret -- 列表项大小
      * @param position int -- 列表项索引
      * @param pItem IWindow -- 列表项窗口
      * @param wid int -- 父窗口宽度
      * @param hei int -- 父窗口高度
      * @return void
      */
-    STDMETHOD_(void, getViewDesiredSize)(THIS_ SIZE* ret, int position, IWindow *pItem, int wid, int hei) PURE;
+    STDMETHOD_(void, getViewDesiredSize)(THIS_ SIZE * ret, int position, IWindow *pItem, int wid, int hei) PURE;
 
     /**
      * @brief 判断数据是否为空
@@ -271,15 +271,14 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
 
     /**
      * @brief 计算列表项显示大小
-	 * @param [output] SIZE* ret -- 列表项大小
+     * @param [output] SIZE* ret -- 列表项大小
      * @param position int -- 列表项索引
      * @param pItem IWindow -- 列表项窗口
      * @param wid int -- 父窗口宽度
      * @param hei int -- 父窗口高度
      * @return void
      */
-    STDMETHOD_(void, getViewDesiredSize)(THIS_ SIZE* ret, int position, IWindow *pItem, int wid, int hei) PURE;
-
+    STDMETHOD_(void, getViewDesiredSize)(THIS_ SIZE * ret, int position, IWindow *pItem, int wid, int hei) PURE;
 
     /**
      * @return true if this adapter doesn't contain any data.  This is used to determine
@@ -299,7 +298,7 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
      */
     STDMETHOD_(void, InitByTemplate)(THIS_ IXmlNode * xmlTemplate) PURE;
 
-	/**
+    /**
      * @brief query user defined interface from adapter
      * @param REFGUID id-- __uuidof(interface)
      * @param [out] IObjRef ** ppObj -- the return interface
@@ -388,15 +387,13 @@ DECLARE_INTERFACE_(ITvDataSetObserver, IObjRef)
     STDMETHOD_(void, onBranchExpandedChanged)
     (THIS_ HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew) PURE;
 
-
-	/**
+    /**
      * @brief This method is called when the specified tree item is going to be removed
      * @param hItem  HSTREEITEM--target item
      * @return
      */
-	STDMETHOD_(void, notifyItemBeforeRemove)
-		(THIS_ HSTREEITEM hItem) PURE;
-
+    STDMETHOD_(void, notifyItemBeforeRemove)
+    (THIS_ HSTREEITEM hItem) PURE;
 };
 
 #define ITEM_NULL 0
@@ -534,13 +531,13 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      */
     STDMETHOD_(HSTREEITEM, GetLastVisibleItem)(CTHIS) SCONST PURE;
 
-	/**
+    /**
      * @brief 测试一个节点是否为另一个节点的子孙节点
      * @param HSTREEITEM--hItem 父节点
-	 * @param HSTREEITEM--hChild 被测试的子节点
-	 * @return TRUE--是子孙节点
+     * @param HSTREEITEM--hChild 被测试的子节点
+     * @return TRUE--是子孙节点
      */
-	STDMETHOD_(BOOL,IsDecendentItem)(CTHIS_ HSTREEITEM hItem,HSTREEITEM hChild) SCONST PURE;
+    STDMETHOD_(BOOL, IsDecendentItem)(CTHIS_ HSTREEITEM hItem, HSTREEITEM hChild) SCONST PURE;
 
     /**
      * @brief 获取前一个可见项
@@ -612,7 +609,7 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
 
     /**
      * @brief 获取表项大小
-	 * @param SIZE *ret -- 窗口大小
+     * @param SIZE *ret -- 窗口大小
      * @param hItem HSTREEITEM--目标项
      * @param pItem IWindow *--窗口指针
      * @param wid int--父窗口宽度
@@ -620,7 +617,7 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @return void
      */
     STDMETHOD_(void, getViewDesiredSize)
-    (THIS_ SIZE *ret, HSTREEITEM hItem, IWindow * pItem, int wid, int hei) PURE;
+    (THIS_ SIZE * ret, HSTREEITEM hItem, IWindow * pItem, int wid, int hei) PURE;
 
     /**
      * @brief 定义行宽度和treeview客户区宽度相同

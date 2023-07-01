@@ -4,7 +4,7 @@
 
 #define HOSTMSG_BASE (WM_USER + 10000)
 
-#define UM_MENUEVENT   (HOSTMSG_BASE + 202) //模拟菜单控件事件，wparam:0, lparam:EventArg *
+#define UM_MENUEVENT (HOSTMSG_BASE + 202) //模拟菜单控件事件，wparam:0, lparam:EventArg *
 
 #define SPYMSG_BASE   (HOSTMSG_BASE + 1000)
 #define SPYMSG_SETSPY (SPYMSG_BASE + 0) //设置SPY消息接收窗口句柄

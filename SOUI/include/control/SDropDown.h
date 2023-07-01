@@ -63,7 +63,8 @@ struct ISDropDownOwner
 class SOUI_EXP SDropDownWnd
     : public SHostWnd
     , public IMsgFilter {
-	typedef SHostWnd __baseCls;
+    typedef SHostWnd __baseCls;
+
   public:
     /**
      * SDropDownWnd::SDropDownWnd

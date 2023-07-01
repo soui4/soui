@@ -24,10 +24,10 @@
         HRESULT hRet = E_FAIL;
 
 //从SObject派生的类是属性结尾
-#define SOUI_ATTRS_END()                                                   \
-    if (FAILED(hRet))                                                      \
-        return __baseCls::SetAttribute(strAttribName, strValue, bLoading); \
-    return AfterAttribute(strAttribName.c_str(), strValue.c_str(), bLoading, hRet);      \
+#define SOUI_ATTRS_END()                                                            \
+    if (FAILED(hRet))                                                               \
+        return __baseCls::SetAttribute(strAttribName, strValue, bLoading);          \
+    return AfterAttribute(strAttribName.c_str(), strValue.c_str(), bLoading, hRet); \
     }
 
 //不交给SObject处理的属性表结尾
@@ -36,7 +36,6 @@
     return hRet;           \
     }
 
-
 #define ATTR_CHAIN(varname, flag)                                                                  \
     if (FAILED(hRet) && SUCCEEDED(hRet = varname.SetAttribute(strAttribName, strValue, bLoading))) \
     {                                                                                              \
@@ -44,16 +43,16 @@
     }                                                                                              \
     else
 
-#define ATTR_CHAIN_PTR(varname, flag)                                                                                      \
+#define ATTR_CHAIN_PTR(varname, flag)                                                                                     \
     if (FAILED(hRet) && varname != NULL && SUCCEEDED(hRet = varname->ISetAttribute(&strAttribName, &strValue, bLoading))) \
-    {                                                                                                                      \
-        hRet |= flag;                                                                                                      \
-    }                                                                                                                      \
+    {                                                                                                                     \
+        hRet |= flag;                                                                                                     \
+    }                                                                                                                     \
     else
 
-#define ATTR_CHAIN_CLASS(cls)                                                                  \
-	if (FAILED(hRet)) \
-		hRet = cls::SetAttribute(strAttribName, strValue, bLoading); \
+#define ATTR_CHAIN_CLASS(cls) \
+    if (FAILED(hRet))         \
+        hRet = cls::SetAttribute(strAttribName, strValue, bLoading);
 
 #define ATTR_CUSTOM(attribname, func)                 \
     if (0 == strAttribName.CompareNoCase(attribname)) \
@@ -73,13 +72,13 @@
     else
 
 // Int = %d StringA
-#define ATTR_INT(attribname, varname, allredraw)          \
-    if (0 == strAttribName.CompareNoCase(attribname))     \
-    {                                                     \
-	    int nRet = Str2Int(strValue,TRUE);                \
-        varname = nRet;                                   \
-        hRet = allredraw ? S_OK : S_FALSE;                \
-    }                                                     \
+#define ATTR_INT(attribname, varname, allredraw)      \
+    if (0 == strAttribName.CompareNoCase(attribname)) \
+    {                                                 \
+        int nRet = Str2Int(strValue, TRUE);           \
+        varname = nRet;                               \
+        hRet = allredraw ? S_OK : S_FALSE;            \
+    }                                                 \
     else
 
 #define ATTR_LAYOUTSIZE(attribname, varname, allredraw) \
@@ -157,6 +156,15 @@
     }                                                          \
     else
 
+// Point = %d,%d StringA
+#define ATTR_SPOINT(attribname, varname, allredraw)              \
+    if (0 == strAttribName.CompareNoCase(attribname))            \
+    {                                                            \
+        swscanf_s(strValue, L"%f,%f", &varname.fX, &varname.fY); \
+        hRet = allredraw ? S_OK : S_FALSE;                       \
+    }                                                            \
+    else
+
 // Float = %f StringA
 #define ATTR_FLOAT(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
@@ -167,33 +175,33 @@
     else
 
 // UInt = %u StringA
-#define ATTR_UINT(attribname, varname, allredraw)         \
-    if (0 == strAttribName.CompareNoCase(attribname))     \
-    {                                                     \
-	    int nRet = Str2Int(strValue,TRUE);                \
-        varname = (UINT)nRet;                             \
-        hRet = allredraw ? S_OK : S_FALSE;                \
-    }                                                     \
+#define ATTR_UINT(attribname, varname, allredraw)     \
+    if (0 == strAttribName.CompareNoCase(attribname)) \
+    {                                                 \
+        int nRet = Str2Int(strValue, TRUE);           \
+        varname = (UINT)nRet;                         \
+        hRet = allredraw ? S_OK : S_FALSE;            \
+    }                                                 \
     else
 
 // DWORD = %u StringA
-#define ATTR_DWORD(attribname, varname, allredraw)        \
-    if (0 == strAttribName.CompareNoCase(attribname))     \
-    {                                                     \
-	    int nRet = Str2Int(strValue,TRUE);                \
-        varname = (DWORD)nRet;                            \
-        hRet = allredraw ? S_OK : S_FALSE;                \
-    }                                                     \
+#define ATTR_DWORD(attribname, varname, allredraw)    \
+    if (0 == strAttribName.CompareNoCase(attribname)) \
+    {                                                 \
+        int nRet = Str2Int(strValue, TRUE);           \
+        varname = (DWORD)nRet;                        \
+        hRet = allredraw ? S_OK : S_FALSE;            \
+    }                                                 \
     else
 
 // WORD = %u StringA
-#define ATTR_WORD(attribname, varname, allredraw)         \
-    if (0 == strAttribName.CompareNoCase(attribname))     \
-    {                                                     \
-        int nRet = Str2Int(strValue,TRUE);                \
-        varname = (WORD)nRet;                             \
-        hRet = allredraw ? S_OK : S_FALSE;                \
-    }                                                     \
+#define ATTR_WORD(attribname, varname, allredraw)     \
+    if (0 == strAttribName.CompareNoCase(attribname)) \
+    {                                                 \
+        int nRet = Str2Int(strValue, TRUE);           \
+        varname = (WORD)nRet;                         \
+        hRet = allredraw ? S_OK : S_FALSE;            \
+    }                                                 \
     else
 
 // bool = 0 or 1 StringA
@@ -258,13 +266,13 @@
     else
 
 // DWORD = 0x08x StringA
-#define ATTR_HEX(attribname, varname, allredraw)          \
-    if (0 == strAttribName.CompareNoCase(attribname))     \
-    {                                                     \
-	    int nRet = Str2Int(strValue,TRUE);                \
-        varname = nRet;                                   \
-        hRet = allredraw ? S_OK : S_FALSE;                \
-    }                                                     \
+#define ATTR_HEX(attribname, varname, allredraw)      \
+    if (0 == strAttribName.CompareNoCase(attribname)) \
+    {                                                 \
+        int nRet = Str2Int(strValue, TRUE);           \
+        varname = nRet;                               \
+        hRet = allredraw ? S_OK : S_FALSE;            \
+    }                                                 \
     else
 
 // COLORREF = #06X or #08x or rgba(r,g,b,a) or rgb(r,g,b)
