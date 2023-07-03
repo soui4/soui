@@ -53,6 +53,7 @@ typedef enum _SOUI_EVENTS
     EVT_MOUSE_LEAVE,
 
     EVT_CMD = 10000,
+	EVT_MENU_CMD,
     EVT_CTXMENU,
 
     //增加两个滚动VIEW的事件
@@ -383,6 +384,8 @@ DEF_EVT(EventMouseClick, EVT_MOUSE_CLICK, on_mouse_click, {
 })
 
 DEF_EVT(EventCmd, EVT_CMD, on_command, { int fake; })
+
+DEF_EVT(EventMenuCmd, EVT_MENU_CMD, on_menu_command, { int menuId; })
 
 DEF_EVT(EventCtxMenu, EVT_CTXMENU, on_conext_menu, {
     POINT pt;

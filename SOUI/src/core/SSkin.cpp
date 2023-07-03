@@ -455,7 +455,7 @@ void SSkinGradation2::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iSta
         ptCorner.x = (int)(rc.Width() / 2 * m_ptCorner.fX);
         ptCorner.y = (int)(rc.Height() / 2 * m_ptCorner.fY);
     }
-    pRT->DrawGradientRectEx(prcDraw, ptCorner, m_arrGradient.GetData(), m_arrGradient.GetCount(), &GetGradientInfo(GetScale()), GetAlpha());
+    pRT->DrawGradientRectEx(prcDraw, ptCorner, m_arrGradient.GetData(), (int)m_arrGradient.GetCount(), &GetGradientInfo(GetScale()), GetAlpha());
 }
 
 ISkinObj *SSkinGradation2::Scale(int nScale)
@@ -869,7 +869,7 @@ IBrushS *SSkinShape::SGradientBrush::CreateBrush(IRenderTarget *pRT, int nScale,
     if (m_arrGradient.GetCount() < 2)
         return NULL;
     IBrushS *ret = NULL;
-    pRT->CreateGradientBrush(m_arrGradient.GetData(), m_arrGradient.GetCount(), &GetGradientInfo(nScale), byAlpha, kRepeat_TileMode, &ret);
+    pRT->CreateGradientBrush(m_arrGradient.GetData(), (int)m_arrGradient.GetCount(), &GetGradientInfo(nScale), byAlpha, kRepeat_TileMode, &ret);
     return ret;
 }
 

@@ -160,6 +160,7 @@ SRootWindow::SRootWindow(SHostWnd *pHostWnd)
 {
     GetEventSet()->addEvent(EVENTID(EventInit));
     GetEventSet()->addEvent(EVENTID(EventExit));
+	GetEventSet()->addEvent(EVENTID(EventMenuCmd));
 }
 
 void SRootWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
@@ -279,6 +280,13 @@ void SRootWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
 SHostWnd *SRootWindow::GetHostWnd() const
 {
     return m_pHostWnd;
+}
+
+void SRootWindow::FireMenuCmd(int menuID)
+{
+	EventMenuCmd evt(this);
+	evt.menuId = menuID;
+	FireEvent(evt);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -1877,6 +1885,17 @@ void SHostWnd::ShowHostWnd(THIS_ int nShowCmd, BOOL bWaitAniDone)
             msgLoop->HandleMsg();
         }
     }
+}
+
+void SHostWnd::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
+{
+	if(uNotifyCode == 0){
+		//for menu, translate to evt_menu_cmd
+		m_pRoot->FireMenuCmd(nID);
+	}else
+	{
+		SetMsgHandled(FALSE);
+	}
 }
 
 //////////////////////////////////////////////////////////////////

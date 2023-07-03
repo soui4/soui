@@ -122,6 +122,7 @@ class SOUI_EXP SRootWindow : public SWindow {
   public:
     SHostWnd *GetHostWnd() const;
 
+	void FireMenuCmd(int menuID);
   public:
     STDMETHOD_(void, UpdateLayout)(THIS) OVERRIDE;
 
@@ -398,6 +399,7 @@ class SOUI_EXP SHostWnd
 
     LRESULT OnGetObject(UINT uMsg, WPARAM wParam, LPARAM lParam);
     void OnSysCommand(UINT nID, CPoint lParam);
+	void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);
 
 #if (!DISABLE_SWNDSPY)
   protected:
@@ -492,6 +494,7 @@ class SOUI_EXP SHostWnd
         MSG_WM_WINDOWPOSCHANGING(OnWindowPosChanging)
         MSG_WM_WINDOWPOSCHANGED(OnWindowPosChanged)
         MESSAGE_HANDLER_EX(WM_GETOBJECT, OnGetObject)
+		MSG_WM_COMMAND(OnCommand)
         MSG_WM_SYSCOMMAND(OnSysCommand)
         CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
 #if (!DISABLE_SWNDSPY)
