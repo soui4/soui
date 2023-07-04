@@ -532,11 +532,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	string strIndexFile;
 	string strRes;		//rc2文件名
 	string strHeadFile; // head file
+	string strJsFile;//js name and id file
     BOOL bBuildIDMap=FALSE;  //Build ID map
 	int c;
 
 	printf("%s\n",GetCommandLineA());
-	while ((c = getopt(argc, argv, _T("i:r:p:h:"))) != EOF || optarg!=NULL)
+	while ((c = getopt(argc, argv, _T("i:r:p:h:j:"))) != EOF || optarg!=NULL)
 	{
 		switch (c)
 		{
@@ -544,6 +545,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		case 'r':strRes=optarg;break;
 		case 'p':strSkinPath=optarg;break;
 		case 'h':strHeadFile=optarg;break;
+		case 'j':strJsFile = optarg;break;
         case EOF:
             if(_tcscmp(optarg ,_T("idtable"))==0) bBuildIDMap = TRUE;
             optind ++;
@@ -554,11 +556,12 @@ int _tmain(int argc, _TCHAR* argv[])
 	if(strIndexFile.empty())
 	{
 		printf("not specify input file, using -i to define the input file\n");
-		printf("usage: uiresbuilder -p uires -i uires\\uires.idx -r .\\uires\\winres.rc2 -h .\\uires\\resource.h\n");
+		printf("usage: uiresbuilder -p uires -i uires\\uires.idx -r .\\uires\\winres.rc2 -h .\\uires\\resource.h -j .\\uires\\R.js idtable\n");
         printf("\tparam -i : define uires.idx path\n");
         printf("\tparam -p : define path of uires folder\n");
         printf("\tparam -r : define path of output .rc2 file\n");
         printf("\tparam -h : define path of output resource.h file\n");
+		printf("\tparam -j : define path of output R.js file\n");
 		return 1;
 	}
 
@@ -666,7 +669,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	}
 
     //输入name,id定义,只解析资源中layout资源的XML资源
-	if (!strHeadFile.empty())
+	if (!strHeadFile.empty() || !strJsFile.empty())
 	{
 	    map<wstring,int> mapNameID;
         map<string,int> mapString;
@@ -693,13 +696,21 @@ int _tmain(int argc, _TCHAR* argv[])
 
 		wstring strNameStruct, strNameData,	//.name
 		        strIdStruct,strIdData ;     //.id
-
+		
 		int nNames = mapNameID.size();
 		strNameStruct = L"\tstruct _name{\r\n";
         strNameData = L"\t{\r\n";
         strIdStruct = L"\tstruct _id{\r\n";
 		strIdData = L"\t{\r\n";
         
+		wstring strJsId, strJsName; //js id and name.
+		strJsId = L"\tid:{\r\n";
+		strJsName = L"\tname:{\r\n";
+
+		wstring arrJsId, arrJsName; //js id and name.
+		arrJsId = L"\tid_arr:[\r\n";
+		arrJsName = L"\tname_arr:[\r\n";
+		
 		map<wstring,int>::iterator it=mapNameID.begin();
 		int idx = 0;
 		while(it!=mapNameID.end())
@@ -718,12 +729,32 @@ int _tmain(int argc, _TCHAR* argv[])
 				strNameData += szBuf;
 				swprintf(szBuf, L"\t\t%d\r\n",it->second);
 				strIdData += szBuf;
+
+				swprintf(szBuf,L"\t\t%s:\"%s\"\r\n",it->first.c_str(),it->first.c_str());
+				strJsName += szBuf;
+				swprintf(szBuf, L"\t\t%s:%d\r\n",it->first.c_str(),it->second);
+				strJsId += szBuf;
+
+				swprintf(szBuf,L"\t\t\"%s\"\r\n",it->first.c_str());
+				arrJsName += szBuf;
+				swprintf(szBuf, L"\t\t%d\r\n",it->second);
+				arrJsId += szBuf;
 			}
 			else{
 				swprintf(szBuf,L"\t\tL\"%s\",\r\n",it->first.c_str());
 				strNameData += szBuf;
 				swprintf(szBuf, L"\t\t%d,\r\n",it->second);
 				strIdData += szBuf;
+
+				swprintf(szBuf,L"\t\t%s:\"%s\",\r\n",it->first.c_str(),it->first.c_str());
+				strJsName += szBuf;
+				swprintf(szBuf, L"\t\t%s:%d,\r\n",it->first.c_str(),it->second);
+				strJsId += szBuf;
+
+				swprintf(szBuf,L"\t\t\"%s\",\r\n",it->first.c_str());
+				arrJsName += szBuf;
+				swprintf(szBuf, L"\t\t%d,\r\n",it->second);
+				arrJsId += szBuf;
 			}
 
 			it ++;
@@ -734,6 +765,11 @@ int _tmain(int argc, _TCHAR* argv[])
 		strNameData += L"\t}\r\n";
 		strIdData += L"\t}\r\n";
 		
+		strJsId += L"\t}";
+		strJsName += L"\t}";
+
+		arrJsId += L"\t]";
+		arrJsName += L"\t]";
 		
         wstring strStringStruct,strStringData;          //.string
 		int nStrings = mapString.size();
@@ -786,41 +822,61 @@ int _tmain(int argc, _TCHAR* argv[])
 			strColorData +=  L"\t}\r\n";
         }
 
-		wstring strOut = RB_HEADER_ID;
-
-		wstring strRStructAll;
-		wstring strRDataAll;
-		if(nNames)
+		if(!strHeadFile.empty()) 
 		{
-			strRStructAll += strNameStruct + strIdStruct;
-			strRDataAll += strNameData + L"\t,\r\n" + strIdData + L"\t,\r\n";
-		}
-		if(nColors)
-		{
-			strRStructAll += strColorStruct;
-			strRDataAll += strColorData + L"\t,\r\n";
-		}
-		if(nStrings)
-		{
-			strRStructAll += strStringStruct;
-			strRDataAll += strStringData + L"\t\r\n";
-		}
+			wstring strOut = RB_HEADER_ID;
 
-		strOut += strFiles;
-		strOut += L"\r\n";
-	
-		strOut += L"#ifndef _R_H_\r\n"
-				  L"#define _R_H_\r\n";
-		strOut += L"struct _R{\r\n" + strRStructAll + L"\r\n};\r\n";
-		strOut += L"#endif//_R_H_\r\n";
+			wstring strRStructAll;
+			wstring strRDataAll;
+			if(nNames)
+			{
+				strRStructAll += strNameStruct + strIdStruct;
+				strRDataAll += strNameData + L"\t,\r\n" + strIdData + L"\t,\r\n";
+			}
+			if(nColors)
+			{
+				strRStructAll += strColorStruct;
+				strRDataAll += strColorData + L"\t,\r\n";
+			}
+			if(nStrings)
+			{
+				strRStructAll += strStringStruct;
+				strRDataAll += strStringData + L"\t\r\n";
+			}
 
-		strOut += L"#ifdef INIT_R_DATA\r\n";
-		strOut += L"struct _R R={\r\n"+strRDataAll + L"};\r\n";
-		strOut += L"#else\r\n";
-		strOut += L"extern struct _R R;\r\n";
-		strOut += L"#endif//INIT_R_DATA\r\n";
+			strOut += strFiles;
+			strOut += L"\r\n";
 
-		WriteFile(tmResource, strHeadFile, strOut, FALSE);
+			strOut += L"#ifndef _R_H_\r\n"
+				L"#define _R_H_\r\n";
+			strOut += L"struct _R{\r\n" + strRStructAll + L"\r\n};\r\n";
+			strOut += L"#endif//_R_H_\r\n";
+
+			strOut += L"#ifdef INIT_R_DATA\r\n";
+			strOut += L"struct _R R={\r\n"+strRDataAll + L"};\r\n";
+			strOut += L"#else\r\n";
+			strOut += L"extern struct _R R;\r\n";
+			strOut += L"#endif//INIT_R_DATA\r\n";
+
+			WriteFile(tmResource, strHeadFile, strOut, FALSE);
+		}
+		if(!strJsFile.empty()){
+			wstring strOut = RB_HEADER_ID;
+			if(nNames)
+			{
+				strOut += L"export const R={\r\n";
+				strOut += strJsName;
+				strOut += L",\r\n";
+				strOut += strJsId;
+				strOut += L",\r\n";
+				strOut += arrJsName;
+				strOut += L",\r\n";
+				strOut += arrJsId;
+				strOut += L"\r\n";
+				strOut += L"};";
+			}
+			WriteFile(tmResource, strJsFile, strOut, FALSE);
+		}
 	}
 
 	return 0;
