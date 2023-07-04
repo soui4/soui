@@ -98,34 +98,57 @@ wstring BuildPath(LPCWSTR pszPath)
 }
 
 #define STAMP_FORMAT	L"//stamp:0000000000000000\r\n"
+#define STAMP_FORMAT2_U8	"//stamp:%08x%08x\r\n"
 #define STAMP_FORMAT2	L"//stamp:%08x%08x\r\n"
 
 #pragma pack(push,1)
 
+static const char kBomU8[3]={0xef,0xbb,0xbf};
+static const char kBomU16[2]={0xff,0xfe};
 class FILEHEAD
 {
 public:
-	char szBom[2];
-	WCHAR szHeadLine[ARRAYSIZE(STAMP_FORMAT)];
-
-	FILEHEAD(__int64 ts=0)
-	{
-		szBom[0]=0xFF,szBom[1]=0xFE;
-		swprintf(szHeadLine,STAMP_FORMAT2,(ULONG)((ts>>32)&0xffffffff),(ULONG)(ts&0xffffffff));		
+	static void WriteTimeStamp(__int64 ts,FILE *f,BOOL bUtf8){
+		if(bUtf8){
+			fwrite(kBomU8,1,3,f);
+			fprintf(f,STAMP_FORMAT2_U8,(ULONG)((ts>>32)&0xffffffff),(ULONG)(ts&0xffffffff));
+		}
+		else{
+			fwrite(kBomU16,1,2,f);
+			fwprintf(f,STAMP_FORMAT2,(ULONG)((ts>>32)&0xffffffff),(ULONG)(ts&0xffffffff));		
+		}
 	}
+
 	static __int64 ExactTimeStamp(LPCSTR pszFile)
 	{
 		__int64 ts=0;
 		FILE *f=fopen(pszFile,"rb");
 		if(f)
 		{
-			FILEHEAD head;
-			fread(&head,sizeof(FILEHEAD),1,f);
-			DWORD dHi=0,dLow=0;
-			if(wcsncmp(head.szHeadLine,STAMP_FORMAT2,8)==0)
-			{
-				swscanf(head.szHeadLine,STAMP_FORMAT2,&dHi,&dLow);
-				ts=((__int64)dHi)<<32|dLow;
+			char szBom[3];
+			//read bom
+			fread(szBom,1,3,f);
+			if(memcpy(szBom,kBomU16,2)==0){
+				//utf16
+				fseek(f,-1,SEEK_CUR);
+				WCHAR szHeadLine[ARRAYSIZE(STAMP_FORMAT)];
+				fread(szHeadLine,sizeof(szHeadLine),1,f);
+				DWORD dHi=0,dLow=0;
+				if(wcsncmp(szHeadLine,STAMP_FORMAT2,8)==0)
+				{
+					swscanf(szHeadLine,STAMP_FORMAT2,&dHi,&dLow);
+					ts=((__int64)dHi)<<32|dLow;
+				}
+			}else if(memcpy(szBom,kBomU8,3)){
+				//utf8
+				char szHeadLine[ARRAYSIZE(STAMP_FORMAT)];
+				fread(szHeadLine,sizeof(szHeadLine),1,f);
+				DWORD dHi=0,dLow=0;
+				if(strncmp(szHeadLine,STAMP_FORMAT2_U8,8)==0)
+				{
+					sscanf(szHeadLine,STAMP_FORMAT2_U8,&dHi,&dLow);
+					ts=((__int64)dHi)<<32|dLow;
+				}
 			}
 			fclose(f);
 		}
@@ -134,9 +157,8 @@ public:
 };
 #pragma  pack(pop)
 
-void WriteFile(__int64 tmIdx, const std::string &strRes, const std::wstring &strOut, BOOL bWithHead = FALSE)
+void WriteFile(__int64 tmIdx, const std::string &strRes, const std::wstring &strOut, BOOL bUtf8=FALSE)
 {
-	//__int64 tmIdx=GetLastWriteTime(strIndexFile.c_str());
 	__int64 tmSave=FILEHEAD::ExactTimeStamp(strRes.c_str());
 	//write output string to target res file
 	if(tmIdx!=tmSave)
@@ -144,11 +166,18 @@ void WriteFile(__int64 tmIdx, const std::string &strRes, const std::wstring &str
 		FILE * f=_tfopen(strRes.c_str(),_T("wb"));
 		if(f)
 		{
-			FILEHEAD tmStamp(tmIdx);
-			fwrite(&tmStamp,sizeof(FILEHEAD)-sizeof(WCHAR),1,f);//写UTF16文件头及时间。-sizeof(WCHAR)用来去除stamp最后一个\0
-			if (bWithHead)
-				fwrite(RB_HEADER_RC,sizeof(WCHAR),wcslen(RB_HEADER_RC),f);
-			fwrite(strOut.c_str(),sizeof(WCHAR),strOut.length(),f);
+			FILEHEAD::WriteTimeStamp(tmIdx,f,bUtf8);//写UTF16文件头及时间。-sizeof(WCHAR)用来去除stamp最后一个\0
+			if(!bUtf8)
+			{
+				fwrite(strOut.c_str(),sizeof(WCHAR),strOut.length(),f);
+			}else{
+				int len = WideCharToMultiByte(CP_UTF8,0,strOut.c_str(),strOut.length(),NULL,0,NULL,NULL);
+				char *buf=new char[len+1];
+				WideCharToMultiByte(CP_UTF8,0,strOut.c_str(),strOut.length(),buf,len,NULL,NULL);
+				buf[len]=0;
+				fwrite(buf,1,len,f);
+				delete []buf;
+			}
 			fclose(f);
 			printf("build %s succeed!\n",strRes.c_str());
 		}
@@ -655,6 +684,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	{//编译资源.rc2文件
 		//build output string by wide char
 		wstring strOut;
+		strOut += RB_HEADER_RC;
 		vector<IDMAPRECORD>::iterator it2=vecIdMapRecord.begin();
 		while(it2!=vecIdMapRecord.end())
 		{
@@ -665,7 +695,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			it2++;
 		}
         __int64 tmIdx=GetLastWriteTime(strIndexFile.c_str());
-		WriteFile(tmIdx, strRes, strOut, TRUE);
+		WriteFile(tmIdx, strRes, strOut);
 	}
 
     //输入name,id定义,只解析资源中layout资源的XML资源
@@ -858,7 +888,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			strOut += L"extern struct _R R;\r\n";
 			strOut += L"#endif//INIT_R_DATA\r\n";
 
-			WriteFile(tmResource, strHeadFile, strOut, FALSE);
+			WriteFile(tmResource, strHeadFile, strOut);
 		}
 		if(!strJsFile.empty()){
 			wstring strOut = RB_HEADER_ID;
@@ -875,7 +905,7 @@ int _tmain(int argc, _TCHAR* argv[])
 				strOut += L"\r\n";
 				strOut += L"};";
 			}
-			WriteFile(tmResource, strJsFile, strOut, FALSE);
+			WriteFile(tmResource, strJsFile, strOut, TRUE);
 		}
 	}
 
