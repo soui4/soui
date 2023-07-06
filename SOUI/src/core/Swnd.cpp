@@ -3231,6 +3231,14 @@ void SWindow::OnScaleChanged(int scale)
 
     //标记布局脏
     m_layoutDirty = dirty_self;
+
+    if(m_animation && m_animation->hasEnded()){
+        //动画结束状态下，重新刷新动画结束位置
+        long tmDuration = m_animation->getDuration();
+        long tmOffset = m_animation->getStartOffset();
+        m_animation->setStartTime(STime::GetCurrentTimeMs()-tmDuration-tmOffset);
+        m_animationHandler.OnNextFrame();
+    }
 }
 
 void SWindow::GetScaleSkin(SAutoRefPtr<ISkinObj> &pSkin, int nScale)
