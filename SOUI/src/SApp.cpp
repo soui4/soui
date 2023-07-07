@@ -388,12 +388,16 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc 
         }
     }
     if (!pResProvider)
-        return FALSE;
-
+	{
+		SSLOGW()<<"load xml failed: "<< pszType<<":"<<pszXmlName<<" not found in respovider list";
+		return FALSE;
+	}
     size_t dwSize = pResProvider->GetRawBufferSize(pszType, pszXmlName);
     if (dwSize == 0)
+	{
+		SSLOGW()<<"load xml failed: "<< pszType<<":"<<pszXmlName<<" pResProvider->GetRawBufferSize return 0";
         return FALSE;
-
+	}
     SAutoBuf strXml;
     strXml.Allocate(dwSize);
     pResProvider->GetRawBuffer(pszType, pszXmlName, strXml, dwSize);
