@@ -963,7 +963,10 @@ void STileView::OnColorize(COLORREF cr)
 void STileView::OnScaleChanged(int nScale)
 {
     __baseCls::OnScaleChanged(nScale);
+	if (m_tvItemLocator)
+		m_tvItemLocator->SetScale(nScale);
     DispatchMessage2Items(UM_SETSCALE, nScale, 0);
+	UpdateVisibleItems();
 }
 
 HRESULT STileView::OnLanguageChanged()

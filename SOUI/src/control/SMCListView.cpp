@@ -1280,6 +1280,7 @@ void SMCListView::OnScaleChanged(int nScale)
     if (m_lvItemLocator)
         m_lvItemLocator->SetScale(nScale);
     DispatchMessage2Items(UM_SETSCALE, nScale, 0);
+	UpdateVisibleItems();
 }
 
 HRESULT SMCListView::OnLanguageChanged()

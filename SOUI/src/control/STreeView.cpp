@@ -1422,6 +1422,7 @@ void STreeView::OnScaleChanged(int nScale)
     __baseCls::OnScaleChanged(nScale);
     GetScaleSkin(m_pLineSkin, nScale);
     m_tvItemLocator->SetIndent(m_indent.toPixelSize(nScale));
+	DispatchMessage2Items(UM_SETSCALE,nScale,0);
     UpdateVisibleItems();
 }
 
