@@ -50,6 +50,11 @@ class TypeEvaluator : public TObjRefImpl<IObjRef> {
         mEnd = end;
     }
 
+	void copy(const TypeEvaluator<T> *src){
+		mStart = src->mStart;
+		mEnd = src->mEnd;
+	}
+
     /**
      * This function returns the result of linearly interpolating the start and end values, with
      * <code>fraction</code> representing the proportion between the start and end values. The
@@ -61,8 +66,7 @@ class TypeEvaluator : public TObjRefImpl<IObjRef> {
      * @return A linear interpolation between the start and end values, given the
      *         <code>fraction</code> parameter.
      */
-  public:
-    virtual T evaluate(float fraction) const
+    T evaluate(float fraction) const
     {
         return (T)(mStart + fraction * (mEnd - mStart));
     }
@@ -148,10 +152,29 @@ class TypeEvaluator<COLORREF> {
 
         return RGBA(round(r), round(g), round(b), round(a));
     }
+
+	void copy(const TypeEvaluator<COLORREF>  *src){
+
+		startA = src->startA;
+		startR= src->startR;
+		startG= src->startG;
+		startB= src->startB;
+
+		endA= src->endA;
+		endR= src->endR;
+		endG= src->endG;
+		endB= src->endB;
+	}
+
+	void setRange(COLORREF from,COLORREF to){
+		setStart(from);
+		setEnd(to);
+	}
 };
 
 template <>
 class TypeEvaluator<RECT> {
+public:
     RECT mStart;
     RECT mEnd;
 
@@ -165,7 +188,7 @@ class TypeEvaluator<RECT> {
     {
     }
 
-    virtual RECT evaluate(float fraction) const
+    RECT evaluate(float fraction) const
     {
         RECT ret;
         ret.left = (LONG)(mStart.left + fraction * (mEnd.left - mStart.left));
@@ -180,10 +203,16 @@ class TypeEvaluator<RECT> {
         mStart = start;
         mEnd = end;
     }
+
+	void copy(const TypeEvaluator<RECT>  *src){
+		mStart = src->mStart;
+		mEnd = src->mEnd;
+	}
 };
 
 template <>
 class TypeEvaluator<POINT> {
+public:
     POINT mStart;
     POINT mEnd;
 
@@ -197,17 +226,28 @@ class TypeEvaluator<POINT> {
     {
     }
 
-    virtual POINT evaluate(float fraction) const
+    POINT evaluate(float fraction) const
     {
         POINT ret;
         ret.x = (LONG)(mStart.x + fraction * (mEnd.x - mStart.x));
         ret.y = (LONG)(mStart.y + fraction * (mEnd.y - mStart.y));
         return ret;
     }
+
+	void copy(const TypeEvaluator<POINT>  *src){
+		mStart = src->mStart;
+		mEnd = src->mEnd;
+	}
+	void setRange(POINT from,POINT to){
+		mStart = from;
+		mEnd = to;
+	}
+
 };
 
 template <>
 class TypeEvaluator<SIZE> {
+public:
     SIZE mStart;
     SIZE mEnd;
 
@@ -221,13 +261,23 @@ class TypeEvaluator<SIZE> {
     {
     }
 
-    virtual SIZE evaluate(float fraction) const
+    SIZE evaluate(float fraction) const
     {
         SIZE ret;
         ret.cx = (LONG)(mStart.cx + fraction * (mEnd.cx - mStart.cx));
         ret.cy = (LONG)(mStart.cy + fraction * (mEnd.cy - mStart.cy));
         return ret;
     }
+
+	void copy(const TypeEvaluator<SIZE>  *src){
+		mStart = src->mStart;
+		mEnd = src->mEnd;
+	}
+	void setRange(SIZE from,SIZE to){
+		mStart = from;
+		mEnd = to;
+	}
+
 };
 
 SNSEND

@@ -626,4 +626,26 @@ void SValueAnimator::setDuration(long duration)
     }
 }
 
+IValueAnimator * SValueAnimator::clone(THIS) const
+{
+	IValueAnimator *pRet = SApplication::getSingletonPtr()->CreateValueAnimatorByName(GetObjectClass());
+	pRet->copy(this);
+	return pRet;
+}
+
+//////////////////////////////////////////////////////////////////////////
+
+HRESULT SColorAnimator::OnAttrFrom(const SStringW &strValue, BOOL bLoading)
+{
+	COLORREF crStart = GETCOLOR(strValue);
+	mValueEvaluator.setStart(crStart);
+	return S_FALSE;
+}
+HRESULT SColorAnimator::OnAttrTo(const SStringW &strValue, BOOL bLoading)
+{
+	COLORREF crEnd = GETCOLOR(strValue);
+	mValueEvaluator.setEnd(crEnd);
+	return S_FALSE;
+}
+
 SNSEND

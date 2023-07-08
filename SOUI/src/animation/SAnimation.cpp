@@ -397,7 +397,7 @@ void SAnimation::copy(const IAnimation *src)
 
 IAnimation *SAnimation::clone() const
 {
-    IAnimation *pRet = SApplication::getSingletonPtr()->CreateAnimationByName(GetClassName());
+    IAnimation *pRet = SApplication::getSingletonPtr()->CreateAnimationByName(GetObjectClass());
     if (pRet)
     {
         pRet->copy(this);

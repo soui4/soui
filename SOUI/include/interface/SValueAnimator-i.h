@@ -237,6 +237,8 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
 
     STDMETHOD_(IValueAnimator *, clone)(CTHIS) SCONST PURE;
 
+	STDMETHOD_(void, copy)(THIS_ const IValueAnimator *src) PURE;
+
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) PURE;
 };
 
