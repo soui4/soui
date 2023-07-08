@@ -46,11 +46,13 @@ SValueAnimator::SValueAnimator()
 
 SValueAnimator::~SValueAnimator()
 {
+	removeAnimationCallback();
 }
 
 void SValueAnimator::addAnimationCallback()
 {
-    mContainer->RegisterTimelineHandler(this);
+	SASSERT(mContainer);
+	mContainer->RegisterTimelineHandler(this);
 }
 
 void SValueAnimator::copy(const IValueAnimator *pSrc)
@@ -67,7 +69,11 @@ void SValueAnimator::copy(const IValueAnimator *pSrc)
 
 void SValueAnimator::removeAnimationCallback()
 {
-    mContainer->UnregisterTimelineHandler(this);
+	if(mContainer)
+	{
+		mContainer->UnregisterTimelineHandler(this);
+		mContainer = NULL;
+	}
 }
 
 void SValueAnimator::OnNextFrame()
