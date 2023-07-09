@@ -654,4 +654,88 @@ HRESULT SColorAnimator::OnAttrTo(const SStringW &strValue, BOOL bLoading)
 	return S_FALSE;
 }
 
+
+//////////////////////////////////////////////////////////////////////////
+SAnimatorGroup::SAnimatorGroup() :m_listener(NULL)
+{
+
+}
+
+SAnimatorGroup::~SAnimatorGroup()
+{
+	SPOSITION pos =m_lstAnimator.GetStartPosition();
+	while(pos){
+		IValueAnimator *ani =m_lstAnimator.GetNextKey(pos);
+		ani->removeListener(this);
+		ani->Release();
+	}		
+	m_lstAnimator.RemoveAll();
+}
+
+BOOL SAnimatorGroup::AddAnimator(IValueAnimator* ani)
+{
+	AnimatorStateMap::CPair* it = m_lstAnimator.Lookup(ani);
+	if (it)
+		return FALSE;
+
+	AniState state = idle;
+	if (ani->isRunning())
+		state = running;
+	else if (ani->isStarted())
+		state = started;
+	else
+		state = idle;
+	m_lstAnimator[ani]=state;
+	ani->addListener(this);
+	ani->AddRef();
+	return TRUE;
+}
+
+BOOL SAnimatorGroup::RemoveAnimator(IValueAnimator* ani)
+{
+	if(!m_lstAnimator.RemoveKey(ani))
+		return FALSE;
+	ani->removeListener(this);
+	ani->Release();
+	return TRUE;
+}
+
+void SAnimatorGroup::onAnimationStart(THIS_ IValueAnimator* pAnimator)
+{
+	AnimatorStateMap::CPair* it = m_lstAnimator.Lookup(pAnimator);
+	if (!it){
+		SSLOGW()<<"onAnimationStart error, animator is not found!";
+		return;
+	}
+	it->m_value = running;
+}
+
+void SAnimatorGroup::onAnimationEnd(THIS_ IValueAnimator* pAnimator)
+{
+	AnimatorStateMap::CPair* it = m_lstAnimator.Lookup(pAnimator);
+	if (!it){
+		SSLOGW()<<"onAnimationStart error, animator is not found!";
+		return;
+	}
+	it->m_value = idle;
+	bool bAllStop = true;
+	SPOSITION pos = m_lstAnimator.GetStartPosition();
+	while(pos){
+		AniState state = m_lstAnimator.GetNextValue(pos);
+		if(state != idle){
+			bAllStop = false;
+			break;
+		}
+	}
+
+	if(bAllStop && m_listener){
+		m_listener->OnAnimatorGroupEnd(this);
+	}
+}
+
+void SAnimatorGroup::SetListener(THIS_ IAnimatorGroupListerer*listener)
+{
+	m_listener = listener;
+}
+
 SNSEND

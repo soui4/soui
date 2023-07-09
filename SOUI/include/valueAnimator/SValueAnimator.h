@@ -681,4 +681,32 @@ class SOUI_EXP SColorAnimator : public TValueAnimator<COLORREF> {
     SOUI_ATTRS_END()
 };
 
+
+class SOUI_EXP SAnimatorGroup :  public TObjRefImpl<IAnimatorGroup> ,public IAnimatorListener{
+public:
+	enum AniState{
+		idle,
+		started,
+		running,
+	};
+	SAnimatorGroup();
+
+	~SAnimatorGroup();
+
+	STDMETHOD_(BOOL,AddAnimator)(THIS_ IValueAnimator* ani) OVERRIDE;
+
+	STDMETHOD_(BOOL,RemoveAnimator)(THIS_ IValueAnimator* ani) OVERRIDE;
+
+	STDMETHOD_(void,SetListener)(THIS_ IAnimatorGroupListerer*listener) OVERRIDE;
+
+protected:
+	STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator* pAnimator);
+	STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator* pAnimator) {}
+	STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator* pAnimator);
+
+protected:
+	typedef SMap<IValueAnimator*, AniState> AnimatorStateMap;
+	AnimatorStateMap m_lstAnimator;
+	IAnimatorGroupListerer * m_listener;
+};
 SNSEND

@@ -82,9 +82,14 @@ IMenuEx *SouiFactory::CreateMenuEx(THIS)
     return new SMenuEx();
 }
 
-STDMETHODIMP_(ITimer *) SouiFactory::CreateTimer(THIS_ IEvtSlot *pSlot)
+ITimer * SouiFactory::CreateTimer(THIS_ IEvtSlot *pSlot)
 {
     return new STimer(pSlot);
+}
+
+IAnimatorGroup* SouiFactory::CreateAnimatorGroup(THIS)
+{
+	return new SAnimatorGroup();
 }
 
 SNSEND

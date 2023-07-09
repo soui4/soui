@@ -10,6 +10,8 @@
 #include <interface/smenu-i.h>
 #include <interface/smenuex-i.h>
 #include <interface/STimer-i.h>
+#include <interface/SValueAnimator-i.h>
+
 #include <soui_exp.h>
 SNSBEGIN
 
@@ -105,6 +107,12 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
      * @return ITimer * -- 定时器对象
      */
     STDMETHOD_(ITimer *, CreateTimer)(THIS_ IEvtSlot * pEvtSlot) PURE;
+
+    /** CreateAnimatorGroup
+     * @brief 创建动画组
+     * @return IAnimatorGroup * -- 动画组
+     */
+	STDMETHOD_(IAnimatorGroup*,CreateAnimatorGroup)(THIS) PURE;
 };
 
 SNSEND
