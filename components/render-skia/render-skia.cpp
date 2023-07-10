@@ -529,13 +529,45 @@ namespace SOUI
 			txtPaint.setTextAlign(SkPaint::kLeft_Align);
 		SkRect skrc=toSkRect(pRc);
 		skrc.offset(m_ptOrg);
-		skrc=DrawText_Skia(m_SkCanvas,strW,strW.GetLength(),skrc,txtPaint,uFormat);
 		if(uFormat & DT_CALCRECT)
 		{
+			skrc=DrawText_Skia(m_SkCanvas,strW,strW.GetLength(),skrc,txtPaint,uFormat);
 			pRc->left=(int)skrc.fLeft;
 			pRc->top=(int)skrc.fTop;
 			pRc->right=(int)skrc.fRight;
 			pRc->bottom=(int)skrc.fBottom;
+		}else if(m_curFont->LogFont()->lfEscapement!=0){
+			//calc draw size
+			SkRect skrcContent=DrawText_Skia(m_SkCanvas,strW,strW.GetLength(),skrc,txtPaint,uFormat|DT_CALCRECT);
+			if(uFormat&DT_CENTER){
+				skrc.fLeft += (skrc.width()-skrcContent.width())/2;
+			}else if(uFormat&DT_RIGHT){
+				skrc.fLeft += skrc.width()-skrcContent.width();
+			}
+			skrc.fRight = skrc.fLeft+skrcContent.width();
+			if(uFormat&DT_VCENTER){
+				skrc.fTop+=(skrc.height()-skrcContent.height())/2;
+			}else if(uFormat&DT_BOTTOM){
+				skrc.fTop+=skrc.height()-skrcContent.height();
+			}
+			skrc.fBottom=skrc.fTop+skrcContent.height();
+
+			SkMatrix oldMtx = m_SkCanvas->getTotalMatrix();
+			SkScalar fx = skrc.fLeft;
+			SkScalar fy = skrc.fTop;
+			SkMatrix mtx;
+			float degree = (float)m_curFont->LogFont()->lfEscapement;
+			degree /= 10;
+			degree = 360.f-degree;//change to clockwise.
+			mtx.setRotate(degree);
+			mtx.preTranslate(-fx,-fy);
+			mtx.postTranslate(fx,fy);
+			mtx.postConcat(oldMtx);
+			m_SkCanvas->setMatrix(mtx);
+			skrc=DrawText_Skia(m_SkCanvas,strW,strW.GetLength(),skrc,txtPaint,uFormat);
+			m_SkCanvas->setMatrix(oldMtx);
+		}else{
+			DrawText_Skia(m_SkCanvas,strW,strW.GetLength(),skrc,txtPaint,uFormat);
 		}
 		return S_OK;
 	}
