@@ -144,7 +144,6 @@ HEADERS += include/SApp.h \
            include/core/SDropTargetDispatcher.h \
            include/core/SFocusManager.h \
            include/core/SHostDialog.h \
-           include/core/SHostMsgDef.h \
            include/core/SHostWnd.h \
            include/core/SItemPanel.h \
            include/core/SMsgLoop.h \

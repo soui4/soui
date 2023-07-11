@@ -15,7 +15,6 @@
 #include <interface/SHostPresenter-i.h>
 #include <core/SCaret.h>
 #include <core/SNcPainter.h>
-#include <core/SHostMsgDef.h>
 #include <layout/SLayoutsize.h>
 #include <helper/SplitString.h>
 #include <helper/SWndSpy.h>

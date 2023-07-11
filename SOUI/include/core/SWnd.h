@@ -57,13 +57,7 @@ enum
     NormalEnable = 0,
     ParentEnable = 1
 }; //提供WM_ENABLE消息识别是父窗口可用还是直接操作当前窗口
-enum
-{
-    UM_SETSCALE = (WM_USER + 1000),
-    UM_SETLANGUAGE,
-    UM_SETCOLORIZE,
-    UM_UPDATEFONT,
-};
+
 // State Define
 enum WndState
 {

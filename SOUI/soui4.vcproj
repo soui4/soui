@@ -473,8 +473,6 @@
 			<File
 				RelativePath="include\helper\SHostMgr.h" />
 			<File
-				RelativePath="include\core\SHostMsgDef.h" />
-			<File
 				RelativePath="include\interface\SHostMsgHandler-i.h" />
 			<File
 				RelativePath="include\interface\SHostPresenter-i.h" />
