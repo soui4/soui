@@ -174,7 +174,7 @@ void SHotKeyCtrl::OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void SHotKeyCtrl::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-    if (GetKeyState(VK_MENU) & 0x8000)
+    if (GetKeyState(VK_MENU) & 0x8000 || nChar == VK_F10)
         OnKeyDown(nChar, nRepCnt, nFlags);
     else
         SetMsgHandled(FALSE);
@@ -182,7 +182,7 @@ void SHotKeyCtrl::OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 
 void SHotKeyCtrl::OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-    if (nChar == VK_MENU || GetKeyState(VK_MENU) & 0x8000)
+    if (nChar == VK_MENU || GetKeyState(VK_MENU) & 0x8000 || nChar == VK_F10)
         OnKeyUp(nChar, nRepCnt, nFlags);
     else
         SetMsgHandled(FALSE);
