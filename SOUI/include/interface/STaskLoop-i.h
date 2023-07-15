@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __STASKLOOP_I__H__
+#define __STASKLOOP_I__H__
 #include <interface/obj-ref-i.h>
 
 SNSBEGIN
@@ -8,44 +9,44 @@ SNSBEGIN
 DECLARE_INTERFACE_(IRunnable, IObjRef)
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief cloneµ±Ç°¶ÔÏó
-     * @return IRunnable *--cloneµÃµ½µÄĞÂ¶ÔÏó
+     * @brief cloneå½“å‰å¯¹è±¡
+     * @return IRunnable *--cloneå¾—åˆ°çš„æ–°å¯¹è±¡
      */
     STDMETHOD_(IRunnable *, clone)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÔËĞĞ¸Ã¶ÔÏó
+     * @brief è¿è¡Œè¯¥å¯¹è±¡
      * @return
      */
     STDMETHOD_(void, run)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡¸ÃRunnableµÄËŞÖ÷
-     * @return void *--ËŞÖ÷Ö¸Õë£¬¶ÔÓÚFreeFunction¶ÔÏó£¬¸ÃÖµÎªNULL
+     * @brief è·å–è¯¥Runnableçš„å®¿ä¸»
+     * @return void *--å®¿ä¸»æŒ‡é’ˆï¼Œå¯¹äºFreeFunctionå¯¹è±¡ï¼Œè¯¥å€¼ä¸ºNULL
      */
     STDMETHOD_(void *, getObject)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡runnableµÄÃèÊö
-     * @return const char *--ÃèÊö
+     * @brief è·å–runnableçš„æè¿°
+     * @return const char *--æè¿°
      */
     STDMETHOD_(const char *, getClassInfo)(CTHIS) SCONST PURE;
 };
@@ -61,17 +62,17 @@ typedef enum Priority
 #define INTERFACE ITaskLoop
 DECLARE_INTERFACE_(ITaskLoop, IObjRef)
 {
-    //!Ìí¼ÓÒıÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒıÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -143,3 +144,4 @@ DECLARE_INTERFACE_(ITaskLoop, IObjRef)
 };
 
 SNSEND
+#endif // __STASKLOOP_I__H__

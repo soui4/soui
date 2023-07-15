@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __STREEVIEWITEMLOCATOR_I__H__
+#define __STREEVIEWITEMLOCATOR_I__H__
 
 #include <interface/SAdapter-i.h>
 
@@ -123,3 +124,4 @@ DECLARE_INTERFACE_(ITreeViewItemLocator, IObjRef)
 };
 
 SNSEND
+#endif // __STREEVIEWITEMLOCATOR_I__H__

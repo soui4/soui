@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SLISTVIEW__H__
+#define __SLISTVIEW__H__
 
 #include "core/SItemPanel.h"
 #include "interface/SAdapter-i.h"
@@ -147,3 +148,4 @@ class SOUI_EXP SListView
     BOOL m_bVertical;
 };
 SNSEND
+#endif // __SLISTVIEW__H__

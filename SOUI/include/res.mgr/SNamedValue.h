@@ -2,7 +2,8 @@
 //   File Name: SNamedValue.h
 //////////////////////////////////////////////////////////////////////////
 
-#pragma once
+#ifndef __SNAMEDVALUE__H__
+#define __SNAMEDVALUE__H__
 #include "helper/SColor.h"
 #include "layout/SLayoutSize.h"
 
@@ -35,7 +36,7 @@ class SNamedValue {
             if (ValueParser::ParseValue(xmlStr.attribute(L"value").as_string(), namedValue.value))
                 m_lstNamedValue.Add(namedValue);
             else
-                SASSERT_FMT(false, _T("parse value failed, name=%s,value=%s"), S_CW2T(xmlStr.name()).c_str(), S_CW2T(xmlStr.attribute(L"value").as_string()).c_str());
+                SASSERT_FMTW(false, L"parse value failed, name=%s,value=%s", xmlStr.name(), xmlStr.attribute(L"value").as_string());
         }
         qsort(m_lstNamedValue.GetData(), m_lstNamedValue.GetCount(), sizeof(NAMEDVALUE), Compare);
         return TRUE;
@@ -183,3 +184,5 @@ class SOUI_EXP SNamedDimension : public SNamedValue<SLayoutSize, SDimensionParse
     }
 };
 SNSEND
+
+#endif // __SNAMEDVALUE__H__

@@ -11,7 +11,8 @@
  * Describe    SOUI的窗口面板，实现在非客户区的滚动条支持
  */
 
-#pragma once
+#ifndef __SPANEL__H__
+#define __SPANEL__H__
 
 #include <core/SWnd.h>
 #include <core/SScrollBarHandler.h>
@@ -246,3 +247,5 @@ class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
 };
 
 SNSEND
+
+#endif // __SPANEL__H__

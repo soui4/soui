@@ -126,7 +126,7 @@ HRESULT STDMETHODCALLTYPE SDropTargetDispatcher::Drop(/* [unique][in] */ IDataOb
     DTMAP::CPair *pPair = m_mapDropTarget.Lookup(m_hHover);
     if (m_hHover && pPair)
         pPair->m_value->Drop(pDataObj, grfKeyState, pt, pdwEffect);
-    m_hHover = NULL;
+    m_hHover = 0;
     m_pDataObj->Release();
     m_pDataObj = NULL;
     return S_OK;

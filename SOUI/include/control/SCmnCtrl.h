@@ -11,7 +11,8 @@
  * Describe    此文件中定义了很多通用控件:静态文本，超链接，按钮，单选按钮等
  */
 
-#pragma once
+#ifndef __SCMNCTRL__H__
+#define __SCMNCTRL__H__
 #include "core/SWnd.h"
 #include "core/SAccelerator.h"
 #include "core/SFocusManager.h"
@@ -1019,3 +1020,5 @@ class SOUI_EXP SGroup : public SWindow {
 };
 
 SNSEND
+
+#endif // __SCMNCTRL__H__

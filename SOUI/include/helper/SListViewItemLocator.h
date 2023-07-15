@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SLISTVIEWITEMLOCATOR__H__
+#define __SLISTVIEWITEMLOCATOR__H__
 #include "interface/SListViewItemLocator-i.h"
 #include "control/STree.h"
 
@@ -93,3 +94,4 @@ class SOUI_EXP SListViewItemLocatorFlex : public TObjRefImpl<IListViewItemLocato
 };
 
 SNSEND
+#endif // __SLISTVIEWITEMLOCATOR__H__

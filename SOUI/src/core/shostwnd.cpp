@@ -365,7 +365,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     SASSERT(pNode);
     if (pNode->Empty())
     {
-        SASSERT_FMTA(FALSE, "Null XML node");
+        SASSERT_FMTA(FALSE, "Null XML node",0);
         return FALSE;
     }
     if (!SNativeWnd::IsWindow())
@@ -551,6 +551,8 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     int nHeight = m_szAppSetted.cy;
     CSize szNc = m_pNcPainter->GetNcSize();
     CSize szRoot;
+	if(nWidth==0) nWidth = SIZE_WRAP_CONTENT;
+	if(nHeight==0) nHeight = SIZE_WRAP_CONTENT;
     GetRoot()->GetDesiredSize(&szRoot, nWidth, nHeight);
 
     ILayoutParam *pLayoutParam = GetRoot()->GetLayoutParam();

@@ -11,6 +11,10 @@ add_definitions(
 	-D_7ZIP_LARGE_PAGES
 	-D_7ZIP_ST_9
 )
+add_definitions(
+	-D_UNICODE
+	-DUNICODE
+)
 
 set (7ZLIB_HEADERS
 	SevenZip/SevenZipExtractorMemory.h

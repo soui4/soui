@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SHOSTWND_I__H__
+#define __SHOSTWND_I__H__
 #include <interface/SNativeWnd-i.h>
 #include <interface/SNcPainter-i.h>
 #include <interface/smsgloop-i.h>
@@ -325,3 +326,5 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 };
 
 SNSEND
+
+#endif // __SHOSTWND_I__H__

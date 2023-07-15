@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -23,7 +23,8 @@
  * @see ValueAnimator#setEvaluator(TypeEvaluator)
  */
 
-#pragma once
+#ifndef __TYPEEVALUATOR__H__
+#define __TYPEEVALUATOR__H__
 #include <math.h>
 #include <helper/obj-ref-impl.hpp>
 
@@ -281,3 +282,4 @@ public:
 };
 
 SNSEND
+#endif // __TYPEEVALUATOR__H__

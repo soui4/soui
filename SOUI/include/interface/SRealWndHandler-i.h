@@ -10,7 +10,8 @@
  *
  * Describe     提供RealWnd的创建及销毁管理
  */
-#pragma once
+#ifndef __SREALWNDHANDLER_I__H__
+#define __SREALWNDHANDLER_I__H__
 #include <interface/obj-ref-i.h>
 
 SNSBEGIN
@@ -91,3 +92,4 @@ DECLARE_INTERFACE_(IRealWndHandler, IObjRef)
 };
 
 SNSEND
+#endif // __SREALWNDHANDLER_I__H__

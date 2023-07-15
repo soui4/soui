@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SSTACKVIEW__H__
+#define __SSTACKVIEW__H__
 #include <valueAnimator/SValueAnimator.h>
 
 SNSBEGIN
@@ -170,3 +171,5 @@ class SOUI_EXP SStackView
 };
 
 SNSEND
+
+#endif // __SSTACKVIEW__H__

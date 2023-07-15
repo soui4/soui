@@ -137,7 +137,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<STabCtrl>();
     objFactory->TplRegisterFactory<STabPage>();
     objFactory->TplRegisterFactory<SActiveX>();
-    objFactory->TplRegisterFactory<SFlashCtrl>();
+    //objFactory->TplRegisterFactory<SFlashCtrl>();
     objFactory->TplRegisterFactory<SSplitPane>();
     objFactory->TplRegisterFactory<SSplitWnd>();
     objFactory->TplRegisterFactory<SSplitWnd_Col>();
@@ -475,7 +475,8 @@ ITranslator *SApplication::LoadTranslator(THIS_ LPCTSTR strResId)
     ITranslator *pRet = NULL;
     if (!GetTranslator()->CreateTranslator(&pRet))
         return NULL;
-    pRet->Load(&xml.root().child(L"language"), 1); // LD_XML==1
+    SXmlNode xmlNode = xml.root().child(L"language");
+    pRet->Load(&xmlNode, 1); // LD_XML==1
     return pRet;
 }
 

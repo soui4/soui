@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SWNDACCESSIBLE__H__
+#define __SWNDACCESSIBLE__H__
 #include <oleacc.h>
 #include <helper/SUnknown.h>
 #include "Swnd.h"
@@ -68,3 +69,5 @@ class SOUI_EXP SAccessible
 };
 #endif // SOUI_ENABLE_ACC
 SNSEND
+
+#endif // __SWNDACCESSIBLE__H__

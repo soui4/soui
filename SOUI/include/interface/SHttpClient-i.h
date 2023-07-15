@@ -1,12 +1,13 @@
-/*****************************************************************
- *HTTP´¦ÀíÀà£¬Ö÷ÒªÓÃÓÚHTTP GET/POST¡¢ÏÂÔØ£¨Ö§³ÖÖØ¶¨Ïò£©¹¦ÄÜ
- *Author£º	JelinYao
- *Date£º		2015/2/14 12:11
- *Email£º	mailto://jelinyao@163.com
+ï»¿/*****************************************************************
+ *HTTPå¤„ç†ç±»ï¼Œä¸»è¦ç”¨äºHTTP GET/POSTã€ä¸‹è½½ï¼ˆæ”¯æŒé‡å®šå‘ï¼‰åŠŸèƒ½
+ *Authorï¼š	JelinYao
+ *Dateï¼š		2015/2/14 12:11
+ *Emailï¼š	mailto://jelinyao@163.com
  */
 /*****************************************************************
  */
-#pragma once
+#ifndef __SHTTPCLIENT_I__H__
+#define __SHTTPCLIENT_I__H__
 #include <interface/obj-ref-i.h>
 #include <interface/sstring-i.h>
 #include <stdint.h>
@@ -18,7 +19,7 @@ typedef enum RequestType
     Hr_Post,
     Hr_Get,
 } RequestType;
-//Ã¶¾ÙÏÂÔØ×´Ì¬
+//æšä¸¾ä¸‹è½½çŠ¶æ€
 typedef enum DownloadState
 {
     DS_Start = 0,
@@ -28,26 +29,26 @@ typedef enum DownloadState
 } DownloadState;
 
 /******************************************************
- *¶¨Òå´íÎóĞÅÏ¢
+ *å®šä¹‰é”™è¯¯ä¿¡æ¯
  *
  ******************************************************/
 typedef enum HttpError
 {
-    Hir_Success = 0,   //³É¹¦
-    Hir_InitErr,       //³õÊ¼»¯Ê§°Ü
-    Hir_ConnectErr,    //Á¬½ÓHTTP·şÎñÆ÷Ê§°Ü
-    Hir_SendErr,       //·¢ËÍÇëÇóÊ§°Ü
-    Hir_QueryErr,      //²éÑ¯HTTPÇëÇóÍ·Ê§°Ü
-    Hir_404,           //Ò³Ãæ²»´æÔÚ
-    Hir_IllegalUrl,    //ÎŞĞ§µÄURL
-    Hir_CreateFileErr, //´´½¨ÎÄ¼şÊ§°Ü
-    Hir_DownloadErr,   //ÏÂÔØÊ§°Ü
-    Hir_QueryIPErr,    //»ñÈ¡ÓòÃû¶ÔÓ¦µÄµØÖ·Ê§°Ü
-    Hir_SocketErr,     //Ì×½Ó×Ö´íÎó
-    Hir_UserCancel,    //ÓÃ»§È¡ÏûÏÂÔØ
-    Hir_BufferErr,     //ÎÄ¼şÌ«´ó£¬»º³åÇø²»×ã
-    Hir_HeaderErr,     // HTTPÇëÇóÍ·´íÎó
-    Hir_ParamErr,      //²ÎÊı´íÎó£¬¿ÕÖ¸Õë£¬¿Õ×Ö·û¡­¡­
+    Hir_Success = 0,   //æˆåŠŸ
+    Hir_InitErr,       //åˆå§‹åŒ–å¤±è´¥
+    Hir_ConnectErr,    //è¿æ¥HTTPæœåŠ¡å™¨å¤±è´¥
+    Hir_SendErr,       //å‘é€è¯·æ±‚å¤±è´¥
+    Hir_QueryErr,      //æŸ¥è¯¢HTTPè¯·æ±‚å¤´å¤±è´¥
+    Hir_404,           //é¡µé¢ä¸å­˜åœ¨
+    Hir_IllegalUrl,    //æ— æ•ˆçš„URL
+    Hir_CreateFileErr, //åˆ›å»ºæ–‡ä»¶å¤±è´¥
+    Hir_DownloadErr,   //ä¸‹è½½å¤±è´¥
+    Hir_QueryIPErr,    //è·å–åŸŸåå¯¹åº”çš„åœ°å€å¤±è´¥
+    Hir_SocketErr,     //å¥—æ¥å­—é”™è¯¯
+    Hir_UserCancel,    //ç”¨æˆ·å–æ¶ˆä¸‹è½½
+    Hir_BufferErr,     //æ–‡ä»¶å¤ªå¤§ï¼Œç¼“å†²åŒºä¸è¶³
+    Hir_HeaderErr,     // HTTPè¯·æ±‚å¤´é”™è¯¯
+    Hir_ParamErr,      //å‚æ•°é”™è¯¯ï¼Œç©ºæŒ‡é’ˆï¼Œç©ºå­—ç¬¦â€¦â€¦
     Hir_UnknowErr,
 
 } HttpError;
@@ -57,19 +58,19 @@ typedef enum HttpError
 DECLARE_INTERFACE_(IHttpCallback, IObjRef)
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -82,19 +83,19 @@ DECLARE_INTERFACE_(IHttpCallback, IObjRef)
 DECLARE_INTERFACE_(IHttpClient, IObjRef)
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -110,3 +111,5 @@ DECLARE_INTERFACE_(IHttpClient, IObjRef)
 };
 
 SNSEND
+
+#endif // __SHTTPCLIENT_I__H__

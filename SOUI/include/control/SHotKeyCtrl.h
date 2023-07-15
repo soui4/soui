@@ -10,7 +10,8 @@
  *
  * Describe    热键控件
  */
-#pragma once
+#ifndef __SHOTKEYCTRL__H__
+#define __SHOTKEYCTRL__H__
 #include "core/SWnd.h"
 #include "core/SAccelerator.h"
 
@@ -205,3 +206,5 @@ class SOUI_EXP SHotKeyCtrl
     BOOL m_bInSetting; /**< 正在设置中 */
 };
 SNSEND
+
+#endif // __SHOTKEYCTRL__H__

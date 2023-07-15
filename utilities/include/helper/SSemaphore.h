@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SSEMAPHORE__H__
+#define __SSEMAPHORE__H__
 #include <utilities-def.h>
 #include <helper/SNoCopyable.hpp>
 
@@ -53,3 +54,5 @@ private:
 };
 
 }
+
+#endif // __SSEMAPHORE__H__

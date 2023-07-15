@@ -2,6 +2,7 @@
 
 #ifndef __COMMON_DYNAMIC_BUFFER_H
 #define __COMMON_DYNAMIC_BUFFER_H
+#include <cstddef>
 
 template <class T> class CDynamicBuffer
 {

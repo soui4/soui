@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SDEFINE__H__
+#define __SDEFINE__H__
 
 // DISALLOW_COPY_AND_ASSIGN禁用拷贝和赋值构造函数.
 // 需要在类的private:访问控制域中使用.
@@ -34,3 +35,5 @@
 // SWindow Handle
 typedef DWORD SWND;
 typedef ULONG_PTR HSTREEITEM;
+
+#endif // __SDEFINE__H__

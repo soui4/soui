@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __STIMER_I__H__
+#define __STIMER_I__H__
 #include <interface/obj-ref-i.h>
 #include <interface/SEvtArgs-i.h>
 
@@ -8,17 +9,17 @@ SNSBEGIN
 #define INTERFACE ITimer
 DECLARE_INTERFACE_(ITimer, IObjRef)
 {
-    //!Ìí¼ÓÒıÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒıÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -27,18 +28,18 @@ DECLARE_INTERFACE_(ITimer, IObjRef)
 
     /**
      * StartTimer
-     * @brief    Æô¶¯¶¨Ê±Æ÷
-     * @param    int nElapse --  ÑÓÊ±(ms)
-     * @param    BOOL bRepeat -- ÖØ¸´±êÖ¾
-     * @param    LPARAM uData -- Timer ×Ô¶¨Òå²ÎÊı
-     * @return   BOOL, TRUE--³É¹¦
+     * @brief    å¯åŠ¨å®šæ—¶å™¨
+     * @param    int nElapse --  å»¶æ—¶(ms)
+     * @param    BOOL bRepeat -- é‡å¤æ ‡å¿—
+     * @param    LPARAM uData -- Timer è‡ªå®šä¹‰å‚æ•°
+     * @return   BOOL, TRUE--æˆåŠŸ
      * Describe
      */
     STDMETHOD_(BOOL, StartTimer)(THIS_ int nElapse, BOOL bRepeat, LPARAM uData DEF_VAL(0)) PURE;
 
     /**
      * KillTimer
-     * @brief    Í£Ö¹¶¨Ê±Æ÷
+     * @brief    åœæ­¢å®šæ—¶å™¨
      * @return   void
      * Describe
      */
@@ -46,3 +47,4 @@ DECLARE_INTERFACE_(ITimer, IObjRef)
 };
 
 SNSEND
+#endif // __STIMER_I__H__

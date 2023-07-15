@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SMSGLOOP__H__
+#define __SMSGLOOP__H__
 #include <interface/smsgloop-i.h>
 #include <souicoll.h>
 
@@ -68,3 +69,4 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 };
 
 SNSEND
+#endif // __SMSGLOOP__H__

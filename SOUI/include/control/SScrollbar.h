@@ -10,7 +10,8 @@
  *
  * Describe
  */
-#pragma once
+#ifndef __SSCROLLBAR__H__
+#define __SSCROLLBAR__H__
 #include <core/SWnd.h>
 #include <core/SScrollBarHandler.h>
 
@@ -255,3 +256,5 @@ class SOUI_EXP SScrollBar
 };
 
 SNSEND
+
+#endif // __SSCROLLBAR__H__

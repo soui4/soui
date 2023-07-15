@@ -127,9 +127,9 @@ BOOL SResProvider7Zip::Init( WPARAM wParam,LPARAM lParam )
 	m_childDir = zipParam->pszChildDir;
 	if (!m_childDir.IsEmpty())
 	{
-		m_childDir.TrimRight(L'\\');
-		m_childDir.TrimRight(L'/');
-		m_childDir += L"\\";
+		m_childDir.TrimRight(_T('\\'));
+		m_childDir.TrimRight(_T('/'));
+		m_childDir += _T("\\");
 	}
 	if (zipParam->type == ZIP7_FILE)
 		return _Init(zipParam->pszZipFile,zipParam->pszPsw);
@@ -164,7 +164,8 @@ BOOL SResProvider7Zip::GetRawBuffer( LPCTSTR strType,LPCTSTR pszResName,LPVOID p
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return FALSE;
 	CZipFile zf;
-	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
+	if(!m_zipFile.GetFile(strPath,zf)) 
+		return FALSE;
 	if(size<zf.GetSize())
 	{
 		SetLastError(ERROR_INSUFFICIENT_BUFFER);

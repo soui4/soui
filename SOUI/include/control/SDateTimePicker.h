@@ -3,7 +3,8 @@
 月 和 年 一般也用的少。 选择也可以。
 */
 
-#pragma once
+#ifndef __SDATETIMEPICKER__H__
+#define __SDATETIMEPICKER__H__
 #include <core/swnd.h>
 
 SNSBEGIN
@@ -117,3 +118,4 @@ class SOUI_EXP SDateTimePicker
     COLORREF m_crCue;
 };
 SNSEND
+#endif // __SDATETIMEPICKER__H__

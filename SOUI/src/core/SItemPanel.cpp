@@ -3,8 +3,6 @@
 //     Creator: Huang Jianxiong
 //     Version: 2011.10.20 - 1.0 - Create
 //////////////////////////////////////////////////////////////////////////
-
-#pragma once
 #include "souistd.h"
 #include "core/SItemPanel.h"
 
@@ -232,7 +230,7 @@ SWND SOsrPanel::SwndFromPoint(CPoint &pt, bool bIncludeMsgTransparent)
 {
     SWND hRet = SWindow::SwndFromPoint(pt, bIncludeMsgTransparent);
     if (hRet == m_swnd)
-        hRet = NULL;
+        hRet = 0;
     return hRet;
 }
 

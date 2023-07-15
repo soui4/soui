@@ -2,7 +2,6 @@
 
 
 #include <vector>
-#include <atlbase.h>
 #include "SevenZipArchive.h"
 #include "FileInfo.h"
 #include "CompressionFormat.h"

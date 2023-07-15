@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SWNDMSGCRACKER__H__
+#define __SWNDMSGCRACKER__H__
 
 #define SOUI_MSG_MAP_BEGIN()                                                                   \
   protected:                                                                                   \
@@ -123,3 +124,5 @@
         if (IsMsgHandled())   \
             return TRUE;      \
     }
+
+#endif // __SWNDMSGCRACKER__H__

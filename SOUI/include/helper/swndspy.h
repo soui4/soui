@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SWNDSPY__H__
+#define __SWNDSPY__H__
 
 #define SWND_MAX_NAME  250
 #define SWND_MAX_CLASS 50
@@ -17,3 +18,4 @@ struct SWNDINFO
     wchar_t szXmlStr[SWND_MAX_XML + 1];
 };
 #pragma pack(pop)
+#endif // __SWNDSPY__H__

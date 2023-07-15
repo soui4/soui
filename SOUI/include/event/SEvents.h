@@ -11,7 +11,8 @@
  * Describe    SOUI系统中使用的事件系统
  */
 
-#pragma once
+#ifndef __SEVENTS__H__
+#define __SEVENTS__H__
 
 #include <interface/SEvtArgs-i.h>
 #include <interface/sstring-i.h>
@@ -237,7 +238,7 @@ class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
     class api evt                                      \
         : public SEvtArgs                              \
         , public evtData {                             \
-        DEF_SOBJECT(SEvtArgs, L#evt_name)              \
+        DEF_SOBJECT(SEvtArgs, WIDESTR(evt_name))       \
       public:                                          \
         STDMETHOD_(int, GetID)(THIS) const             \
         {                                              \
@@ -586,3 +587,5 @@ DEF_EVT(EventSetHotKey, EVT_HOT_KEY_SET, on_hot_key_set_event, {
 })
 
 SNSEND
+
+#endif // __SEVENTS__H__

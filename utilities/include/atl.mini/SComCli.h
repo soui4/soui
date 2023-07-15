@@ -11,7 +11,7 @@
 #ifndef __SCOMCLI_H__
 #define __SCOMCLI_H__
 
-#pragma once
+
 
 #include <unknwn.h>
 

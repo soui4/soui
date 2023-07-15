@@ -591,7 +591,8 @@ BOOL SMenuEx::LoadMenu(LPCTSTR strMenu)
     BOOL bLoad = LOADXML(xmlMenu, strMenu);
     if (!bLoad)
         return FALSE;
-    return LoadMenu2(&xmlMenu.root().first_child());
+    SXmlNode xmlNode = xmlMenu.root().first_child();
+    return LoadMenu2(&xmlNode);
 }
 
 BOOL SMenuEx::LoadMenuA(THIS_ LPCSTR resId)

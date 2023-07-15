@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SUNKNOWN__H__
+#define __SUNKNOWN__H__
 
 #define IUNKNOWN_BEGIN2(iid, cls)                                    \
     STDMETHODIMP_(ULONG) AddRef(void)                                \
@@ -82,3 +83,4 @@ class SOUI_EXP SUnknown {
   private:
     volatile LONG m_cRef;
 };
+#endif // __SUNKNOWN__H__

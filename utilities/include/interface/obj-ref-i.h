@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __OBJ_REF_I__H__
+#define __OBJ_REF_I__H__
 
 #include <utilities-def.h>
 
@@ -30,3 +31,5 @@ DECLARE_INTERFACE(IObjRef)
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
 };
+
+#endif // __OBJ_REF_I__H__

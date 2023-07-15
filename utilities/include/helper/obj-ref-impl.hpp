@@ -59,16 +59,12 @@ template <class T>
 class SAutoRefPtr
 {
 public:
-	SAutoRefPtr() throw()
+	SAutoRefPtr() 
 	{
 		p = NULL;
 	}
-	SAutoRefPtr(int nNull) throw()
-	{
-		(void)nNull;
-		p = NULL;
-	}
-	SAutoRefPtr(T* lp) throw()
+
+	SAutoRefPtr(T* lp) 
 	{
 		p = lp;
 		if (p != NULL)
@@ -77,7 +73,7 @@ public:
 		}
 	}
 
-	SAutoRefPtr(const SAutoRefPtr & src) throw()
+	SAutoRefPtr(const SAutoRefPtr & src)
 	{
 		p=src.p;
 		if(p)
@@ -94,12 +90,12 @@ public:
 		}
 	}
 
-	T* operator->() const throw()
+	T* operator->() const
 	{
 		return p;
 	}
 
-	operator T*() const throw()
+	operator T*() const 
 	{
 		return p;
 	}
@@ -109,16 +105,16 @@ public:
 	}
 	//The assert on operator& usually indicates a bug.  If this is really
 	//what is needed, however, take the address of the p member explicitly.
-	T** operator&() throw()
+	T** operator&() 
 	{
 	    SASSERT(p==NULL);
 		return &p;
 	}
-	bool operator!() const throw()
+	bool operator!() const 
 	{
 		return (p == NULL);
 	}
-	bool operator<(T* pT) const throw()
+	bool operator<(T* pT) const 
 	{
 		return p < pT;
 	}
@@ -126,12 +122,12 @@ public:
 	{
 		return !operator==(pT);
 	}
-	bool operator==(T* pT) const throw()
+	bool operator==(T* pT) const 
 	{
 		return p == pT;
 	}
 
-	T* operator=(T* lp) throw()
+	T* operator=(T* lp) 
 	{
 		if(*this!=lp)
 		{
@@ -148,7 +144,7 @@ public:
 		return *this;
 	}
 
-	T* operator=(const SAutoRefPtr<T>& lp) throw()
+	T* operator=(const SAutoRefPtr<T>& lp) 
 	{
 		if(*this!=lp)
 		{
@@ -166,7 +162,7 @@ public:
 	}
 
 	// Release the interface and set to NULL
-	void Release() throw()
+	void Release() 
 	{
 		T* pTemp = p;
 		if (pTemp)
@@ -177,7 +173,7 @@ public:
 	}
 
 	// Attach to an existing interface (does not AddRef)
-	void Attach(T* p2) throw()
+	void Attach(T* p2) 
 	{
 		if (p)
 		{
@@ -186,13 +182,13 @@ public:
 		p = p2;
 	}
 	// Detach the interface (does not Release)
-	T* Detach() throw()
+	T* Detach() 
 	{
 		T* pt = p;
 		p = NULL;
 		return pt;
 	}
-	HRESULT CopyTo(T** ppT) throw()
+	HRESULT CopyTo(T** ppT) 
 	{
 		if (ppT == NULL)
 			return E_POINTER;

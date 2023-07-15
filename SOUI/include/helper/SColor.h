@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SCOLOR__H__
+#define __SCOLOR__H__
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
@@ -83,3 +84,4 @@ class SColor {
     DWORD r : 8;
     DWORD a : 8;
 };
+#endif // __SCOLOR__H__

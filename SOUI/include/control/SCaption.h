@@ -11,7 +11,8 @@
  * Describe    此类完成标题栏控件
  */
 
-#pragma once
+#ifndef __SCAPTION__H__
+#define __SCAPTION__H__
 #include "core/SWnd.h"
 
 SNSBEGIN
@@ -93,3 +94,5 @@ class SOUI_EXP SCaption : public SWindow {
     BOOL m_bIsMaxDown; //最大化时,鼠标左键是否已经按下
 };
 SNSEND
+
+#endif // __SCAPTION__H__

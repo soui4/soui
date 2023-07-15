@@ -11,7 +11,8 @@
  * Describe    DUI窗口容器接口
  */
 
-#pragma once
+#ifndef __SWNDCONTAINER_I__H__
+#define __SWNDCONTAINER_I__H__
 
 #include <core/SDefine.h>
 #include <interface/SEvtArgs-i.h>
@@ -273,3 +274,5 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
 };
 
 SNSEND
+
+#endif // __SWNDCONTAINER_I__H__

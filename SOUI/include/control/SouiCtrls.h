@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SOUICTRLS__H__
+#define __SOUICTRLS__H__
 #include "core/SPanel.h"
 #include "SCmnCtrl.h"
 #include "SCaption.h"
@@ -26,3 +27,4 @@
 #include "SDateTimePicker.h"
 #include "SFrame.h"
 #include "SStackView.h"
+#endif // __SOUICTRLS__H__

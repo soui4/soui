@@ -5,7 +5,8 @@
 //     Version: 2011.10.20 - 1.0 - Create
 //////////////////////////////////////////////////////////////////////////
 
-#pragma once
+#ifndef __SITEMPANEL__H__
+#define __SITEMPANEL__H__
 
 #include "SwndContainerImpl.h"
 
@@ -255,3 +256,4 @@ class SOUI_EXP SItemPanel : public TOsrPanelProxy<IItemPanel> {
 };
 
 SNSEND
+#endif // __SITEMPANEL__H__

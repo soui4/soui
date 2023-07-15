@@ -11,7 +11,8 @@
  * Describe
  */
 
-#pragma once
+#ifndef __SIMGDECODER_I__H__
+#define __SIMGDECODER_I__H__
 
 #include <interface/obj-ref-i.h>
 
@@ -188,3 +189,4 @@ DECLARE_INTERFACE_(IImgDecoderFactory, IObjRef)
 };
 
 SNSEND
+#endif // __SIMGDECODER_I__H__

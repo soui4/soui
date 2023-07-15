@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SDPISCALE__H__
+#define __SDPISCALE__H__
 SNSBEGIN
 class SOUI_EXP SDpiScale {
   public:
@@ -8,7 +9,7 @@ class SOUI_EXP SDpiScale {
 
     /**
      * NormalizeScale
-     * @brief    ±ê×¼»¯·Å´ó±ÈÀı, Ñ¡Ôñ±È×Ô¼ºÖ¸¶¨±ÈÀıĞ¡Ò»ºÅµÄ±ÈÀı
+     * @brief    æ ‡å‡†åŒ–æ”¾å¤§æ¯”ä¾‹, é€‰æ‹©æ¯”è‡ªå·±æŒ‡å®šæ¯”ä¾‹å°ä¸€å·çš„æ¯”ä¾‹
      * @param [in] nScale -- input scale
      * @return   int -- normalized scale
      *
@@ -18,3 +19,5 @@ class SOUI_EXP SDpiScale {
 };
 
 SNSEND
+
+#endif // __SDPISCALE__H__

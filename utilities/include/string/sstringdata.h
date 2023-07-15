@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SSTRINGDATA__H__
+#define __SSTRINGDATA__H__
 #include "utilities-def.h"
 
 SNSBEGIN
@@ -24,3 +25,4 @@ struct TStringData
 };
 
 SNSEND
+#endif // __SSTRINGDATA__H__

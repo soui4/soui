@@ -29,6 +29,8 @@
 
 #include <windows.h>
 
+#define smax(a,b) (a)>(b)?(a):(b)
+
 namespace CursorIcon_Zip{
 
 #define WARN printf
@@ -162,7 +164,7 @@ static int bitmap_info_size( const BITMAPINFO * info, WORD coloruse )
         if (!colors && (info->bmiHeader.biBitCount <= 8))
             colors = 1 << info->bmiHeader.biBitCount;
         if (info->bmiHeader.biCompression == BI_BITFIELDS) masks = 3;
-        size = max( info->bmiHeader.biSize, sizeof(BITMAPINFOHEADER) + masks * sizeof(DWORD) );
+        size = smax( info->bmiHeader.biSize, sizeof(BITMAPINFOHEADER) + masks * sizeof(DWORD) );
         return size + colors * ((coloruse == DIB_RGB_COLORS) ? sizeof(RGBQUAD) : sizeof(WORD));
     }
 }
@@ -614,7 +616,7 @@ static HICON create_icon_from_bmi( const BITMAPINFO *bmi, DWORD maxsize, HMODULE
     if (!screen_dc) screen_dc = CreateDCW( DISPLAYW, NULL, NULL, NULL );
     if (!screen_dc) return 0;
 
-    if (!(bmi_copy = (BITMAPINFO*)HeapAlloc( GetProcessHeap(), 0, max( size, FIELD_OFFSET( BITMAPINFO, bmiColors[2] )))))
+    if (!(bmi_copy = (BITMAPINFO*)HeapAlloc( GetProcessHeap(), 0, smax( size, FIELD_OFFSET( BITMAPINFO, bmiColors[2] )))))
         return 0;
     if (!(hdc = CreateCompatibleDC( 0 ))) goto done;
 
@@ -710,6 +712,8 @@ done:
 	return hObj;
 }
 
+#define MYFIELD_OFFSET(type, field)    ((LONG)(LONG_PTR)&(((type *)0)->field))
+
 HICON CURSORICON_LoadFromBuf(const BYTE * bits,DWORD filesize,INT width, INT height,BOOL fCursor, UINT loadflags)
 {
 	const CURSORICONFILEDIRENTRY *entry;
@@ -724,7 +728,8 @@ HICON CURSORICON_LoadFromBuf(const BYTE * bits,DWORD filesize,INT width, INT hei
 	}
 
 	dir = (const CURSORICONFILEDIR*) bits;
-	if ( filesize < FIELD_OFFSET( CURSORICONFILEDIR, idEntries[dir->idCount] ))
+
+	if ( filesize < MYFIELD_OFFSET( CURSORICONFILEDIR, idEntries[dir->idCount] ))
 		return 0;
 
 	if(!(loadflags & LR_MONOCHROME))

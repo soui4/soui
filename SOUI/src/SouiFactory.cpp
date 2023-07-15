@@ -98,3 +98,4 @@ EXTERN_C ISouiFactoryPtr CreateSouiFactory()
 {
     return new SOUI::SouiFactory();
 }
+

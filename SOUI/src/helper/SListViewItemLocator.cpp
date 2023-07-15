@@ -345,6 +345,6 @@ HSTREEITEM SListViewItemLocatorFlex::Offset2Branch(HSTREEITEM hParent, int nOffs
             return Offset2Branch(hItem, nOffset);
         }
     }
-    return NULL;
+    return 0;
 }
 SNSEND

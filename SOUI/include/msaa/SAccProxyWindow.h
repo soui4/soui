@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SACCPROXYWINDOW__H__
+#define __SACCPROXYWINDOW__H__
 #include "interface/saccproxy-i.h"
 
 SNSBEGIN
@@ -34,3 +35,5 @@ class SOUI_EXP SAccProxyWindow : public TObjRefImpl<IAccProxy> {
 
 #endif
 SNSEND
+
+#endif // __SACCPROXYWINDOW__H__

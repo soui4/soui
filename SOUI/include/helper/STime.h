@@ -1,7 +1,7 @@
 ﻿#ifndef STime_h__
 #define STime_h__
 
-#pragma once
+
 
 #include <time.h>
 

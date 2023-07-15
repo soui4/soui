@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SOBJDEFATTR__H__
+#define __SOBJDEFATTR__H__
 
 #include "core/SSingletonMap.h"
 
@@ -31,3 +32,5 @@ class SOUI_EXP SObjDefAttr
 };
 
 SNSEND
+
+#endif // __SOBJDEFATTR__H__

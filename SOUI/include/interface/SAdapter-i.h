@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SADAPTER_I__H__
+#define __SADAPTER_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <interface/SWindow-i.h>
@@ -642,3 +643,4 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
 };
 
 SNSEND
+#endif // __SADAPTER_I__H__

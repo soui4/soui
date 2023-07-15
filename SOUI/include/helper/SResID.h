@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SRESID__H__
+#define __SRESID__H__
 
 #include <tchar.h>
 #define MAX_RES_TYPE 30  //资源类型预定义，最大长度不超过10
@@ -60,3 +61,4 @@ class CElementTraits<SResID> : public CElementTraitsBase<SResID> {
 };
 
 SNSEND
+#endif // __SRESID__H__

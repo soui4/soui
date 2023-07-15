@@ -357,7 +357,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
         return;
     // paint non client.
     CRect rcWnd = m_pHost->GetWindowRect();
-    if ((WORD)hRgn > 1 && !::RectInRegion(hRgn, &rcWnd))
+    if ((UINT_PTR)hRgn > 1 && !::RectInRegion(hRgn, &rcWnd))
     {
         m_pHost->DefWindowProc(); // just do default thing
         return;                   // and quit

@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SOUILAYOUT__H__
+#define __SOUILAYOUT__H__
 #include "interface/slayout-i.h"
 #include "SouiLayoutParamStruct.h"
 
@@ -97,3 +98,5 @@ class SOUI_EXP SouiLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
 };
 
 SNSEND
+
+#endif // __SOUILAYOUT__H__

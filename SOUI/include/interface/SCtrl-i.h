@@ -1,7 +1,8 @@
+ï»¿/************************************************************************/
+/*   è¿™é‡Œå®šä¹‰æ§ä»¶æ“ä½œæ¥å£,æ‰€æœ‰æ¥å£éƒ½ä»IObjRefç»§æ‰¿,å¹¶ä¸”æŒ‡å®šè‡ªå·±çš„æ¥å£ID  */
 /************************************************************************/
-/*   ÕâÀï¶¨Òå¿Ø¼ş²Ù×÷½Ó¿Ú,ËùÓĞ½Ó¿Ú¶¼´ÓIObjRef¼Ì³Ğ,²¢ÇÒÖ¸¶¨×Ô¼ºµÄ½Ó¿ÚID  */
-/************************************************************************/
-#pragma once
+#ifndef __SCTRL_I__H__
+#define __SCTRL_I__H__
 #include <interface/SWindow-i.h>
 #include <interface/SSkinobj-i.h>
 #include <interface/SRender-i.h>
@@ -18,19 +19,19 @@ SNSBEGIN
 DECLARE_INTERFACE_(ICtrl, IObjRef)
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -38,8 +39,8 @@ DECLARE_INTERFACE_(ICtrl, IObjRef)
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
 };
@@ -49,19 +50,19 @@ DECLARE_INTERFACE_(ICtrl, IObjRef)
 DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -69,41 +70,41 @@ DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÉèÖÃÔÚÁĞ±íÖĞ¶ÔÓ¦µÄË÷Òı
-     * @param index -- Ë÷ÒıÖµ£¬ÔÚlistviewÖĞËüÊÇÒ»¸öË÷ÒıºÅ£¬ÔÚtreeviewÖĞËüÊÇÒ»¸öHTREEITEMÖµ
+     * @brief è®¾ç½®åœ¨åˆ—è¡¨ä¸­å¯¹åº”çš„ç´¢å¼•
+     * @param index -- ç´¢å¼•å€¼ï¼Œåœ¨listviewä¸­å®ƒæ˜¯ä¸€ä¸ªç´¢å¼•å·ï¼Œåœ¨treeviewä¸­å®ƒæ˜¯ä¸€ä¸ªHTREEITEMå€¼
      * @return
      */
     STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM index) PURE;
 
     /**
-     * @brief »ñÈ¡ÔÚÁĞ±íÖĞµÄË÷Òı
-     * @return LPARAM ÔÚÁĞ±íÖĞµÄË÷Òı
+     * @brief è·å–åœ¨åˆ—è¡¨ä¸­çš„ç´¢å¼•
+     * @return LPARAM åœ¨åˆ—è¡¨ä¸­çš„ç´¢å¼•
      */
     STDMETHOD_(LPARAM, GetItemIndex)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÁĞ±íÏîµÄÓÃ»§Êı¾İ
-     * @param dwData -- ÓÃ»§Êı¾İ
+     * @brief è®¾ç½®åˆ—è¡¨é¡¹çš„ç”¨æˆ·æ•°æ®
+     * @param dwData -- ç”¨æˆ·æ•°æ®
      * @return
      */
     STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
 
     /**
-     * @brief »ñÈ¡ÔÚÁĞ±íÖĞµÄÓÃ»§Êı¾İ
-     * @return LPARAM ÔÚÁĞ±íÖĞµÄÓÃ»§Êı¾İ
+     * @brief è·å–åœ¨åˆ—è¡¨ä¸­çš„ç”¨æˆ·æ•°æ®
+     * @return LPARAM åœ¨åˆ—è¡¨ä¸­çš„ç”¨æˆ·æ•°æ®
      */
     STDMETHOD_(LPARAM, GetItemData)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ½«panelµÄ×ø±ê×ª»»Îªhost×ø±ê
-     * @param[in,out] POINT *pt ´°¿Ú×ø±ê
+     * @brief å°†panelçš„åæ ‡è½¬æ¢ä¸ºhoståæ ‡
+     * @param[in,out] POINT *pt çª—å£åæ ‡
      * @return void
      */
     STDMETHOD_(void, PtToHost)(THIS_ POINT * pt) SCONST PURE;
@@ -114,19 +115,19 @@ DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
 DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F909A4")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -134,57 +135,57 @@ DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F90
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÉèÖÃÔÚÁĞ±íÖĞ¶ÔÓ¦µÄË÷Òı
-     * @param index -- Ë÷ÒıÖµ£¬ÔÚlistviewÖĞËüÊÇÒ»¸öË÷ÒıºÅ£¬ÔÚtreeviewÖĞËüÊÇÒ»¸öHTREEITEMÖµ
+     * @brief è®¾ç½®åœ¨åˆ—è¡¨ä¸­å¯¹åº”çš„ç´¢å¼•
+     * @param index -- ç´¢å¼•å€¼ï¼Œåœ¨listviewä¸­å®ƒæ˜¯ä¸€ä¸ªç´¢å¼•å·ï¼Œåœ¨treeviewä¸­å®ƒæ˜¯ä¸€ä¸ªHTREEITEMå€¼
      * @return
      */
     STDMETHOD_(void, SetItemIndex)(THIS_ LPARAM index) PURE;
 
     /**
-     * @brief »ñÈ¡ÔÚÁĞ±íÖĞµÄË÷Òı
-     * @return LPARAM ÔÚÁĞ±íÖĞµÄË÷Òı
+     * @brief è·å–åœ¨åˆ—è¡¨ä¸­çš„ç´¢å¼•
+     * @return LPARAM åœ¨åˆ—è¡¨ä¸­çš„ç´¢å¼•
      */
     STDMETHOD_(LPARAM, GetItemIndex)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÁĞ±íÏîµÄÓÃ»§Êı¾İ
-     * @param dwData -- ÓÃ»§Êı¾İ
+     * @brief è®¾ç½®åˆ—è¡¨é¡¹çš„ç”¨æˆ·æ•°æ®
+     * @param dwData -- ç”¨æˆ·æ•°æ®
      * @return
      */
     STDMETHOD_(void, SetItemData)(THIS_ LPARAM dwData) PURE;
 
     /**
-     * @brief »ñÈ¡ÔÚÁĞ±íÖĞµÄÓÃ»§Êı¾İ
-     * @return LPARAM ÔÚÁĞ±íÖĞµÄÓÃ»§Êı¾İ
+     * @brief è·å–åœ¨åˆ—è¡¨ä¸­çš„ç”¨æˆ·æ•°æ®
+     * @return LPARAM åœ¨åˆ—è¡¨ä¸­çš„ç”¨æˆ·æ•°æ®
      */
     STDMETHOD_(LPARAM, GetItemData)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ½«panelµÄ×ø±ê×ª»»Îªhost×ø±ê
-     * @param[in,out] POINT *pt ´°¿Ú×ø±ê
+     * @brief å°†panelçš„åæ ‡è½¬æ¢ä¸ºhoståæ ‡
+     * @param[in,out] POINT *pt çª—å£åæ ‡
      * @return void
      */
     STDMETHOD_(void, PtToHost)(THIS_ POINT * pt) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÉèÖÃÁĞ±íÏîµÄskin
-     * @param pSkin -- ÁĞ±íÏîµÄskin
+     * @brief è®¾ç½®åˆ—è¡¨é¡¹çš„skin
+     * @param pSkin -- åˆ—è¡¨é¡¹çš„skin
      * @return
      */
     STDMETHOD_(void, SetSkin)(THIS_ ISkinObj * pSkin) PURE;
 
     /**
-     * @brief ÉèÖÃÁĞ±íÏîµÄÑÕÉ«ÅäÖÃ
-     * @param crBk -- ±³¾°ÑÕÉ«
-     * @param crSelBk -- Ñ¡ÖĞ×´Ì¬µÄ±³¾°ÑÕÉ«
+     * @brief è®¾ç½®åˆ—è¡¨é¡¹çš„é¢œè‰²é…ç½®
+     * @param crBk -- èƒŒæ™¯é¢œè‰²
+     * @param crSelBk -- é€‰ä¸­çŠ¶æ€çš„èƒŒæ™¯é¢œè‰²
      * @return
      */
     STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) PURE;
@@ -195,19 +196,19 @@ DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F90
 DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -215,53 +216,53 @@ DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÉèÖÃskin
-     * @param pSkin -- skin¶ÔÏó
-     * @param iFrame -- skinµÄ×ÓÍ¼Ë÷Òı
-     * @param bAutoFree -- ¿Ø¼ş¹ÜÀípSkin±êÖ¾£¬ÎªTRUEÊ±µ÷ÓÃ·½¿ÉÒÔÊÍ·Å¸ÃSkin
-     * @return BOOL TRUE-³É¹¦£¬FALSE-Ê§°Ü
+     * @brief è®¾ç½®skin
+     * @param pSkin -- skinå¯¹è±¡
+     * @param iFrame -- skinçš„å­å›¾ç´¢å¼•
+     * @param bAutoFree -- æ§ä»¶ç®¡ç†pSkinæ ‡å¿—ï¼Œä¸ºTRUEæ—¶è°ƒç”¨æ–¹å¯ä»¥é‡Šæ”¾è¯¥Skin
+     * @return BOOL TRUE-æˆåŠŸï¼ŒFALSE-å¤±è´¥
      */
     STDMETHOD_(BOOL, SetSkin)(THIS_ ISkinObj * pSkin, int iFrame DEF_VAL(0), BOOL bAutoFree DEF_VAL(TRUE)) PURE;
 
     /**
      * SImageWnd::GetSkin
-     * @brief    »ñÈ¡×ÊÔ´
-     * @return   ·µ»ØÖµISkinObjÖ¸Õë
+     * @brief    è·å–èµ„æº
+     * @return   è¿”å›å€¼ISkinObjæŒ‡é’ˆ
      *
-     * Describe  »ñÈ¡×ÊÔ´
+     * Describe  è·å–èµ„æº
      */
     STDMETHOD_(ISkinObj *, GetSkin)(THIS) PURE;
 
     /**
      * SImageWnd::SetImage
-     * @param    IBitmap * pBitmap -- Í¼Æ¬¶ÔÏó
+     * @param    IBitmap * pBitmap -- å›¾ç‰‡å¯¹è±¡
      * @param    FilterLevel fl -- FilterLevel
      * @return   void
      *
-     * Describe  ÉèÖÃ»æÖÆÍ¼Æ¬
+     * Describe  è®¾ç½®ç»˜åˆ¶å›¾ç‰‡
      */
     STDMETHOD_(void, SetImage)(THIS_ IBitmapS * pBitmap, FilterLevel fl DEF_VAL(kNone_FilterLevel)) PURE;
 
     /**
-     * @brief »ñÈ¡µ±Ç°ÉèÖÃµÄIBitmapS¶ÔÏó
-     * @return IBitmapS * -- µ±Ç°ÉèÖÃµÄIBitmapS¶ÔÏó
+     * @brief è·å–å½“å‰è®¾ç½®çš„IBitmapSå¯¹è±¡
+     * @return IBitmapS * -- å½“å‰è®¾ç½®çš„IBitmapSå¯¹è±¡
      */
     STDMETHOD_(IBitmapS *, GetImage)(THIS) PURE;
 
     /**
      * SImageWnd::SetIcon
-     * @param    int nSubID -- ×ÓÍ¼ÔÚSkinÖĞµÄË÷ÒıºÅ
-     * @brief    ÉèÖÃÍ¼±ê
-     * @return   ·µ»ØÖµBOOL ³É¹¦--TRUE Ê§°Ü--FALSE
+     * @param    int nSubID -- å­å›¾åœ¨Skinä¸­çš„ç´¢å¼•å·
+     * @brief    è®¾ç½®å›¾æ ‡
+     * @return   è¿”å›å€¼BOOL æˆåŠŸ--TRUE å¤±è´¥--FALSE
      *
-     * Describe  ÉèÖÃÍ¼±ê
+     * Describe  è®¾ç½®å›¾æ ‡
      */
     STDMETHOD_(BOOL, SetIcon)(THIS_ int nSubID) PURE;
 };
@@ -271,19 +272,19 @@ DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
 DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E2595A")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -291,33 +292,33 @@ DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E25
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
      * SAnimateImgWnd::Start
-     * @brief    Æô¶¯¶¯»­
+     * @brief    å¯åŠ¨åŠ¨ç”»
      *
-     * Describe  Æô¶¯¶¯»­
+     * Describe  å¯åŠ¨åŠ¨ç”»
      */
     STDMETHOD_(void, Start)(THIS) PURE;
     /**
      * SAnimateImgWnd::Stop
-     * @brief    Í£Ö¹¶¯»­
+     * @brief    åœæ­¢åŠ¨ç”»
      *
-     * Describe  Í£Ö¹¶¯»­
+     * Describe  åœæ­¢åŠ¨ç”»
      */
     STDMETHOD_(void, Stop)(THIS) PURE;
 
     /**
      * SAnimateImgWnd::IsPlaying
-     * @brief    ÅĞ¶Ï¶¯»­ÔËĞĞ×´Ì¬
-     * @return   ·µ»ØÖµÊÇ¶¯»­×´Ì¬ TRUE -- ÔËĞĞÖĞ
+     * @brief    åˆ¤æ–­åŠ¨ç”»è¿è¡ŒçŠ¶æ€
+     * @return   è¿”å›å€¼æ˜¯åŠ¨ç”»çŠ¶æ€ TRUE -- è¿è¡Œä¸­
      *
-     * Describe  ÅĞ¶Ï¶¯»­ÔËĞĞ×´Ì¬
+     * Describe  åˆ¤æ–­åŠ¨ç”»è¿è¡ŒçŠ¶æ€
      */
     STDMETHOD_(BOOL, IsPlaying)(CTHIS) SCONST PURE;
 };
@@ -327,19 +328,19 @@ DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E25
 DECLARE_INTERFACE_IID_(IProgress, ICtrl, "77407E2D-582B-4ef2-A33A-427C933BAA8C")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -347,53 +348,53 @@ DECLARE_INTERFACE_IID_(IProgress, ICtrl, "77407E2D-582B-4ef2-A33A-427C933BAA8C")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
      * SProgress::SetValue
-     * @brief    ÉèÖÃ½ø¶ÈÌõ½ø¶ÈÖµ
-     * @param    int nValue  --  ½ø¶ÈÖµ
-     * @return   ·µ»ØÖµÊÇ TRUE -- ÉèÖÃ³É¹¦
+     * @brief    è®¾ç½®è¿›åº¦æ¡è¿›åº¦å€¼
+     * @param    int nValue  --  è¿›åº¦å€¼
+     * @return   è¿”å›å€¼æ˜¯ TRUE -- è®¾ç½®æˆåŠŸ
      *
-     * Describe  ÉèÖÃ½ø¶ÈÌõ½ø¶ÈÖµ
+     * Describe  è®¾ç½®è¿›åº¦æ¡è¿›åº¦å€¼
      */
     STDMETHOD_(BOOL, SetValue)(THIS_ int nValue) PURE;
     /**
      * SProgress::GetValue
-     * @brief    »ñÈ¡½ø¶ÈÖµ
-     * @return   ·µ»ØÖµÊÇint
+     * @brief    è·å–è¿›åº¦å€¼
+     * @return   è¿”å›å€¼æ˜¯int
      *
-     * Describe  »ñÈ¡½ø¶ÈÖµ
+     * Describe  è·å–è¿›åº¦å€¼
      */
     STDMETHOD_(int, GetValue)(CTHIS) SCONST PURE;
 
     /**
      * SProgress::SetRange
-     * @param    int nMin  --  ½ø¶È×îĞ¡Öµ
-     * @param    int nMax  --  ½ø¶È×î´óÖµ
-     * @brief    ÉèÖÃ½ø¶ÈÖµ×îĞ¡´óÖµ
+     * @param    int nMin  --  è¿›åº¦æœ€å°å€¼
+     * @param    int nMax  --  è¿›åº¦æœ€å¤§å€¼
+     * @brief    è®¾ç½®è¿›åº¦å€¼æœ€å°å¤§å€¼
      *
-     * Describe  ÉèÖÃ½ø¶ÈÖµ
+     * Describe  è®¾ç½®è¿›åº¦å€¼
      */
     STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) PURE;
     /**
      * SProgress::GetRange
-     * @param    int nMin  --  ½ø¶È×îĞ¡Öµ
-     * @param    int nMax  --  ½ø¶È×î´óÖµ
-     * @brief    »ñÈ¡½ø¶ÈÖµ×îĞ¡´óÖµ
+     * @param    int nMin  --  è¿›åº¦æœ€å°å€¼
+     * @param    int nMax  --  è¿›åº¦æœ€å¤§å€¼
+     * @brief    è·å–è¿›åº¦å€¼æœ€å°å¤§å€¼
      *
-     * Describe  »ñÈ¡½ø¶ÈÖµ
+     * Describe  è·å–è¿›åº¦å€¼
      */
     STDMETHOD_(void, GetRange)(CTHIS_ int *pMin, int *pMax) SCONST PURE;
     /**
      * SProgress::IsVertical
-     * @brief    ÅĞ¶Ï½ø¶ÈÌõÊÇ·ñÎªÊúÖ±×´Ì¬
-     * @return   ·µ»ØÖµÊÇ TRUE -- ÊúÖ±×´Ì¬
+     * @brief    åˆ¤æ–­è¿›åº¦æ¡æ˜¯å¦ä¸ºç«–ç›´çŠ¶æ€
+     * @return   è¿”å›å€¼æ˜¯ TRUE -- ç«–ç›´çŠ¶æ€
      *
-     * Describe  »ñÈ¡½ø¶ÈÖµ
+     * Describe  è·å–è¿›åº¦å€¼
      */
     STDMETHOD_(BOOL, IsVertical)(CTHIS) SCONST PURE;
 };
@@ -411,19 +412,19 @@ typedef enum _ScrollBarID
 DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -431,84 +432,84 @@ DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÏÔÊ¾/Òş²Ø¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief æ˜¾ç¤º/éšè—æ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
     /**
-     * @brief Enable/Disable¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief Enable/Disableæ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõEnable×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è·å–æ»šåŠ¨æ¡EnableçŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return TRUE-enable
      */
     STDMETHOD_(BOOL, IsScrollBarEnable)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÊı¾İ
-     * @param si --¹ö¶¯ÌõÊı¾İ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è®¾ç½®æ»šåŠ¨æ¡æ•°æ®
+     * @param si --æ»šåŠ¨æ¡æ•°æ®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return
      */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nNewPos -- ¹ö¶¯Î»ÖÃ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
+     * @brief è®¾ç½®æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nNewPos -- æ»šåŠ¨ä½ç½®
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
      * @return
      */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return ¹ö¶¯ÌõÎ»ÖÃ
+     * @brief è·å–æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return æ»šåŠ¨æ¡ä½ç½®
      */
     STDMETHOD_(int, GetScrollPos)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nMinPos -- ×îĞ¡Öµ
-     * @param nMaxPos -- ×î´óÖµ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
-     * @return TRUE-³É¹¦
+     * @brief è®¾ç½®æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nMinPos -- æœ€å°å€¼
+     * @param nMaxPos -- æœ€å¤§å€¼
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
+     * @return TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetScrollRange)
     (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param lpMinPos -- ×îĞ¡Öµ
-     * @param lpMaxPos -- ×î´óÖµ
+     * @brief è·å–æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param lpMinPos -- æœ€å°å€¼
+     * @param lpMaxPos -- æœ€å¤§å€¼
      * @return
      */
     STDMETHOD_(BOOL, GetScrollRange)
     (CTHIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
     /**
-     * @brief ²éÑ¯¹ö¶¯ÌõÆôÓÃ×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return TRUE-ÆôÓÃ
+     * @brief æŸ¥è¯¢æ»šåŠ¨æ¡å¯ç”¨çŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return TRUE-å¯ç”¨
      */
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
 };
@@ -518,19 +519,19 @@ DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
 DECLARE_INTERFACE_IID_(IScrollView, IPanel, "49B024D6-221D-42d4-902B-AFAAC5AFFE41")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -538,110 +539,110 @@ DECLARE_INTERFACE_IID_(IScrollView, IPanel, "49B024D6-221D-42d4-902B-AFAAC5AFFE4
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÏÔÊ¾/Òş²Ø¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief æ˜¾ç¤º/éšè—æ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
     /**
-     * @brief Enable/Disable¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief Enable/Disableæ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõEnable×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è·å–æ»šåŠ¨æ¡EnableçŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return TRUE-enable
      */
     STDMETHOD_(BOOL, IsScrollBarEnable)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÊı¾İ
-     * @param si --¹ö¶¯ÌõÊı¾İ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è®¾ç½®æ»šåŠ¨æ¡æ•°æ®
+     * @param si --æ»šåŠ¨æ¡æ•°æ®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return
      */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nNewPos -- ¹ö¶¯Î»ÖÃ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
+     * @brief è®¾ç½®æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nNewPos -- æ»šåŠ¨ä½ç½®
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
      * @return
      */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return ¹ö¶¯ÌõÎ»ÖÃ
+     * @brief è·å–æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return æ»šåŠ¨æ¡ä½ç½®
      */
     STDMETHOD_(int, GetScrollPos)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nMinPos -- ×îĞ¡Öµ
-     * @param nMaxPos -- ×î´óÖµ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
-     * @return TRUE-³É¹¦
+     * @brief è®¾ç½®æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nMinPos -- æœ€å°å€¼
+     * @param nMaxPos -- æœ€å¤§å€¼
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
+     * @return TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetScrollRange)
     (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param lpMinPos -- ×îĞ¡Öµ
-     * @param lpMaxPos -- ×î´óÖµ
+     * @brief è·å–æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param lpMinPos -- æœ€å°å€¼
+     * @param lpMaxPos -- æœ€å¤§å€¼
      * @return
      */
     STDMETHOD_(BOOL, GetScrollRange)
     (CTHIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
     /**
-     * @brief ²éÑ¯¹ö¶¯ÌõÆôÓÃ×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return TRUE-ÆôÓÃ
+     * @brief æŸ¥è¯¢æ»šåŠ¨æ¡å¯ç”¨çŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return TRUE-å¯ç”¨
      */
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief »ñÈ¡ÊÓÍ¼³ß´ç
-     * @return SIZE-ÊÓÍ¼³ß´ç
+     * @brief è·å–è§†å›¾å°ºå¯¸
+     * @return SIZE-è§†å›¾å°ºå¯¸
      */
     STDMETHOD_(SIZE, GetViewSize)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÊÓÍ¼³ß´ç
-     * @param szView ÊÓÍ¼³ß´ç
+     * @brief è®¾ç½®è§†å›¾å°ºå¯¸
+     * @param szView è§†å›¾å°ºå¯¸
      * @return
      */
     STDMETHOD_(void, SetViewSize)(THIS_ SIZE szView) PURE;
 
     /**
-     * @brief »ñÈ¡ÊÓÍ¼Ô­µã×ø±ê
-     * @return POINT-Ô­µã×ø±ê
+     * @brief è·å–è§†å›¾åŸç‚¹åæ ‡
+     * @return POINT-åŸç‚¹åæ ‡
      */
     STDMETHOD_(POINT, GetViewOrigin)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÊÓÍ¼Ô­µã×ø±ê
-     * @param pt Ô­µã×ø±ê
+     * @brief è®¾ç½®è§†å›¾åŸç‚¹åæ ‡
+     * @param pt åŸç‚¹åæ ‡
      * @return
      */
     STDMETHOD_(void, SetViewOrigin)(THIS_ POINT pt) PURE;
@@ -661,9 +662,9 @@ typedef enum _HeaderMask
 
 /**
  * @struct    _SHDITEM
- * @brief     ÁĞ±íÍ·Ïî
+ * @brief     åˆ—è¡¨å¤´é¡¹
  *
- * Describe   ÁĞ±íÍ·Ïî
+ * Describe   åˆ—è¡¨å¤´é¡¹
  */
 typedef struct SHDITEM
 {
@@ -685,19 +686,19 @@ typedef struct SHDITEM
 DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -705,24 +706,24 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
      * SHeaderCtrl::InsertItem
-     * @brief    ²åÈëĞÂÏî
-     * @param    int iItem --  ĞÂÏîË÷Òı
-     * @param    LPCTSTR pszText  --  ĞÂÏî±êÌâ
-     * @param    int nWidth  -- ¿í¶È
+     * @brief    æ’å…¥æ–°é¡¹
+     * @param    int iItem --  æ–°é¡¹ç´¢å¼•
+     * @param    LPCTSTR pszText  --  æ–°é¡¹æ ‡é¢˜
+     * @param    int nWidth  -- å®½åº¦
      * @param    BOOL bDpiAware -- dpi aware
      * @param    UINT fmt -- format flag
-     * @param    LPARAM lParam -- ¸½¼Ó²ÎÊı
-     * @return   ·µ»Øint
+     * @param    LPARAM lParam -- é™„åŠ å‚æ•°
+     * @return   è¿”å›int
      *
-     * Describe  ²åÈëĞÂÏî
+     * Describe  æ’å…¥æ–°é¡¹
      */
     STDMETHOD_(int, InsertItem)
     (THIS_ int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=FALSE*/, float fWeight /*=0.0f*/) PURE;
@@ -732,112 +733,112 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
 
     /**
      * SHeaderCtrl::GetItem
-     * @brief    »ñµÃĞÂÏî
-     * @param    int iItem  --  Ë÷Òı
-     * @param    SHDITEM *pItem  -- ·µ»ØÁĞ±íÏî½á¹¹
-     * @return   ·µ»ØBOOL
+     * @brief    è·å¾—æ–°é¡¹
+     * @param    int iItem  --  ç´¢å¼•
+     * @param    SHDITEM *pItem  -- è¿”å›åˆ—è¡¨é¡¹ç»“æ„
+     * @return   è¿”å›BOOL
      *
-     * Describe  »ñµÃĞÂÏî
+     * Describe  è·å¾—æ–°é¡¹
      */
     STDMETHOD_(BOOL, GetItem)(CTHIS_ int iItem, SHDITEM *pItem) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ±íÍ·ÏîÊı¾İ
-     * @param iItem --Ë÷ÒıºÅ
-     * @param pItem --Êı¾İÏî
+     * @brief è®¾ç½®è¡¨å¤´é¡¹æ•°æ®
+     * @param iItem --ç´¢å¼•å·
+     * @param pItem --æ•°æ®é¡¹
      * @return
      */
     STDMETHOD_(BOOL, SetItem)(THIS_ int iItem, const SHDITEM *pItem) PURE;
 
     /**
      * SHeaderCtrl::GetItemCount
-     * @brief    »ñÈ¡ÁĞ±íÏî¸öÊı
-     * @return   ·µ»Øint
+     * @brief    è·å–åˆ—è¡¨é¡¹ä¸ªæ•°
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡ÁĞ±íÏî¸öÊı
+     * Describe  è·å–åˆ—è¡¨é¡¹ä¸ªæ•°
      */
     STDMETHOD_(UINT, GetItemCount)(CTHIS) SCONST PURE;
     /**
      * SHeaderCtrl::GetTotalWidth
-     * @brief    »ñµÃËùÓĞ¿í¶È
-     * @return   ·µ»Øint
+     * @brief    è·å¾—æ‰€æœ‰å®½åº¦
+     * @return   è¿”å›int
      *
-     * Describe  »ñµÃËùÓĞ¿í¶È
+     * Describe  è·å¾—æ‰€æœ‰å®½åº¦
      */
     STDMETHOD_(int, GetTotalWidth)(CTHIS_ BOOL bMinWid DEF_VAL(FALSE)) SCONST PURE;
 
     /**
-     * @brief ±íÍ·×Ô¶¯Ìî³ä¸¸´°¿Ú¿í¶È±êÖ¾
-     * @return TRUE-±íÍ·×Ô¶¯Ìî³ä¸¸´°¿Ú¿í¶È
+     * @brief è¡¨å¤´è‡ªåŠ¨å¡«å……çˆ¶çª—å£å®½åº¦æ ‡å¿—
+     * @return TRUE-è¡¨å¤´è‡ªåŠ¨å¡«å……çˆ¶çª—å£å®½åº¦
      */
     STDMETHOD_(BOOL, IsAutoResize)(CTHIS) SCONST PURE;
 
     /**
      * SHeaderCtrl::GetItemWidth
-     * @brief    »ñµÃÖ¸¶¨Ïî¿í¶È
-     * @param    int iItem  --  Ë÷Òı
-     * @return   ·µ»Øint
+     * @brief    è·å¾—æŒ‡å®šé¡¹å®½åº¦
+     * @param    int iItem  --  ç´¢å¼•
+     * @return   è¿”å›int
      *
-     * Describe  »ñµÃĞÂÏî
+     * Describe  è·å¾—æ–°é¡¹
      */
     STDMETHOD_(int, GetItemWidth)(CTHIS_ int iItem) SCONST PURE;
 
     /**
      * SHeaderCtrl::DeleteItem
-     * @brief    É¾³ıÖ¸¶¨Ïî
-     * @param    int iItem  --  Ë÷Òı
-     * @return   ·µ»ØBOOL
+     * @brief    åˆ é™¤æŒ‡å®šé¡¹
+     * @param    int iItem  --  ç´¢å¼•
+     * @return   è¿”å›BOOL
      *
-     * Describe  É¾³ıÖ¸¶¨Ïî
+     * Describe  åˆ é™¤æŒ‡å®šé¡¹
      */
     STDMETHOD_(BOOL, DeleteItem)(THIS_ int iItem) PURE;
 
     /**
      * SHeaderCtrl::DeleteAllItems
-     * @brief    É¾³ıËùÓĞÏî
+     * @brief    åˆ é™¤æ‰€æœ‰é¡¹
      *
-     * Describe  »ñµÃĞÂÏî
+     * Describe  è·å¾—æ–°é¡¹
      */
     STDMETHOD_(void, DeleteAllItems)(THIS) PURE;
 
     /**
-     * @brief ÉèÖÃ±íÍ·ÏîµÄÅÅĞò±êÖ¾
-     * @param iItem --±íÍ·ÏîË÷Òı
-     * @param sortFlag --ÅÅĞò±êÖ¾
-     * @remark ÅÅĞò±êÖ¾»á´«µİµ½ÁĞ±íµÄÅÅĞò»Øµ÷½Ó¿Ú,ÓÃ»§ÔÚ»Øµ÷½Ó¿ÚÖĞÊµÏÖÊı¾İÅÅĞò
+     * @brief è®¾ç½®è¡¨å¤´é¡¹çš„æ’åºæ ‡å¿—
+     * @param iItem --è¡¨å¤´é¡¹ç´¢å¼•
+     * @param sortFlag --æ’åºæ ‡å¿—
+     * @remark æ’åºæ ‡å¿—ä¼šä¼ é€’åˆ°åˆ—è¡¨çš„æ’åºå›è°ƒæ¥å£,ç”¨æˆ·åœ¨å›è°ƒæ¥å£ä¸­å®ç°æ•°æ®æ’åº
      */
     STDMETHOD_(void, SetItemSort)(THIS_ int iItem, UINT sortFlag) PURE;
 
     /**
-     * @brief ÉèÖÃ±íÍ·ÏîÊÇ·ñÒş²Ø
-     * @param iItem --±íÍ·ÏîË÷Òı
-     * @param visible -- TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief è®¾ç½®è¡¨å¤´é¡¹æ˜¯å¦éšè—
+     * @param iItem --è¡¨å¤´é¡¹ç´¢å¼•
+     * @param visible -- TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(void, SetItemVisible)(THIS_ int iItem, BOOL visible) PURE;
 
     /**
-     * @brief ²éÑ¯±íÍ·ÏîÊÇ·ñÒş²Ø
-     * @param iItem --±íÍ·ÏîË÷Òı
+     * @brief æŸ¥è¯¢è¡¨å¤´é¡¹æ˜¯å¦éšè—
+     * @param iItem --è¡¨å¤´é¡¹ç´¢å¼•
      * @return BOOL
      */
     STDMETHOD_(BOOL, IsItemVisible)(CTHIS_ int iItem) SCONST PURE;
 
     /**
-     * @brief    »ñÈ¡±íÍ·Ïî
+     * @brief    è·å–è¡¨å¤´é¡¹
      * @param    int iOrder  -- show order
      * @return   int item index
      *
-     * Describe  »ñÈ¡±íÍ·ÏîµÃÎ»ÖÃ
+     * Describe  è·å–è¡¨å¤´é¡¹å¾—ä½ç½®
      */
     STDMETHOD_(int, GetOriItemIndex)(CTHIS_ int iOrder) SCONST PURE;
 
     /**
-     * @brief    »ñÈ¡±íÍ·ÏîµÃÎ»ÖÃ
-     * @param    int iItem  --  Ë÷Òı
-     * @param    LPRECT prc  --  ±íÍ·ÏîµÃÎ»ÖÃ
+     * @brief    è·å–è¡¨å¤´é¡¹å¾—ä½ç½®
+     * @param    int iItem  --  ç´¢å¼•
+     * @param    LPRECT prc  --  è¡¨å¤´é¡¹å¾—ä½ç½®
      *
-     * Describe  »ñÈ¡±íÍ·ÏîµÃÎ»ÖÃ
+     * Describe  è·å–è¡¨å¤´é¡¹å¾—ä½ç½®
      */
     STDMETHOD_(void, GetItemRect)(CTHIS_ int iItem, LPRECT prc) SCONST PURE;
 };
@@ -847,19 +848,19 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
 DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -867,141 +868,141 @@ DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2"
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÏÔÊ¾/Òş²Ø¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief æ˜¾ç¤º/éšè—æ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
     /**
-     * @brief Enable/Disable¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief Enable/Disableæ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõEnable×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è·å–æ»šåŠ¨æ¡EnableçŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return TRUE-enable
      */
     STDMETHOD_(BOOL, IsScrollBarEnable)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÊı¾İ
-     * @param si --¹ö¶¯ÌõÊı¾İ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è®¾ç½®æ»šåŠ¨æ¡æ•°æ®
+     * @param si --æ»šåŠ¨æ¡æ•°æ®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return
      */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nNewPos -- ¹ö¶¯Î»ÖÃ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
+     * @brief è®¾ç½®æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nNewPos -- æ»šåŠ¨ä½ç½®
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
      * @return
      */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return ¹ö¶¯ÌõÎ»ÖÃ
+     * @brief è·å–æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return æ»šåŠ¨æ¡ä½ç½®
      */
     STDMETHOD_(int, GetScrollPos)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nMinPos -- ×îĞ¡Öµ
-     * @param nMaxPos -- ×î´óÖµ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
-     * @return TRUE-³É¹¦
+     * @brief è®¾ç½®æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nMinPos -- æœ€å°å€¼
+     * @param nMaxPos -- æœ€å¤§å€¼
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
+     * @return TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetScrollRange)
     (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param lpMinPos -- ×îĞ¡Öµ
-     * @param lpMaxPos -- ×î´óÖµ
+     * @brief è·å–æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param lpMinPos -- æœ€å°å€¼
+     * @param lpMaxPos -- æœ€å¤§å€¼
      * @return
      */
     STDMETHOD_(BOOL, GetScrollRange)
     (CTHIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
     /**
-     * @brief ²éÑ¯¹ö¶¯ÌõÆôÓÃ×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return TRUE-ÆôÓÃ
+     * @brief æŸ¥è¯¢æ»šåŠ¨æ¡å¯ç”¨çŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return TRUE-å¯ç”¨
      */
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÉèÖÃÁĞ±íµÄAdapter
-     * @param adapter -- Adapter¶ÔÏó
+     * @brief è®¾ç½®åˆ—è¡¨çš„Adapter
+     * @param adapter -- Adapterå¯¹è±¡
      * @return BOOL
-     * @remark Í¨³£Ö»Ó¦¸ÃÔÚÁĞ±í³õÊ¼»¯µÄÊ±µ÷ÓÃÒ»´Î£¬ÁĞ±í»áÔö¼Ó¸ÃAdapterµÄÒıÓÃ¼ÆÊı
+     * @remark é€šå¸¸åªåº”è¯¥åœ¨åˆ—è¡¨åˆå§‹åŒ–çš„æ—¶è°ƒç”¨ä¸€æ¬¡ï¼Œåˆ—è¡¨ä¼šå¢åŠ è¯¥Adapterçš„å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter * adapter) PURE;
 
     /**
-     * @brief »ñÈ¡¿Ø¼şµÄAdapter¶ÔÏó
-     * @return ILvAdapter* - Adapter¶ÔÏó
+     * @brief è·å–æ§ä»¶çš„Adapterå¯¹è±¡
+     * @return ILvAdapter* - Adapterå¯¹è±¡
      */
     STDMETHOD_(ILvAdapter *, GetAdapter)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÁĞ±íÏîÎ»ÖÃ¶¨Î»Æ÷
-     * @param pItemLocator -- Î»ÖÃ¶¨Î»Æ÷
-     * @remark  Î»ÖÃ¶¨Î»Æ÷ÊÇÒ»¸ö½«Ë÷ÒıºÅºÍÁĞ±íÏÔÊ¾Î»ÖÃÏà»¥Ó³ÉäµÄ½Ó¿Ú£¬Í¨¹ıÊµÏÖÎ»ÖÃ¶¨Î»Æ÷£¬ÓÃ»§¿ÉÒÔ¿ØÖÆÁĞ±íÏîµÄÏÔÊ¾´óĞ¡
+     * @brief è®¾ç½®åˆ—è¡¨é¡¹ä½ç½®å®šä½å™¨
+     * @param pItemLocator -- ä½ç½®å®šä½å™¨
+     * @remark  ä½ç½®å®šä½å™¨æ˜¯ä¸€ä¸ªå°†ç´¢å¼•å·å’Œåˆ—è¡¨æ˜¾ç¤ºä½ç½®ç›¸äº’æ˜ å°„çš„æ¥å£ï¼Œé€šè¿‡å®ç°ä½ç½®å®šä½å™¨ï¼Œç”¨æˆ·å¯ä»¥æ§åˆ¶åˆ—è¡¨é¡¹çš„æ˜¾ç¤ºå¤§å°
      */
     STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator * pItemLocator) PURE;
 
     /**
-     * @brief »ñÈ¡Î»ÖÃ¶¨Î»Æ÷
+     * @brief è·å–ä½ç½®å®šä½å™¨
      * @return IListViewItemLocator *
      */
     STDMETHOD_(IListViewItemLocator *, GetItemLocator)(CTHIS) SCONST PURE;
 
     /**
-     * @brief Ê¹Ö¸¶¨ĞĞ¹ö¶¯µ½ÊÓÍ¼¿É¼ûÇø
-     * @param iItem --ĞĞºÅ
+     * @brief ä½¿æŒ‡å®šè¡Œæ»šåŠ¨åˆ°è§†å›¾å¯è§åŒº
+     * @param iItem --è¡Œå·
      * @return
      */
     STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
 
     /**
-     * @brief Ñ¡ÖĞÖ¸¶¨ĞĞ
-     * @param iItem --ĞĞºÅ
-     * @param bNotify --´¥·¢Ñ¡ÖĞ×´Ì¬ÊÂ¼ş±êÖ¾
+     * @brief é€‰ä¸­æŒ‡å®šè¡Œ
+     * @param iItem --è¡Œå·
+     * @param bNotify --è§¦å‘é€‰ä¸­çŠ¶æ€äº‹ä»¶æ ‡å¿—
      * @return
      */
     STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify DEF_VAL(FALSE)) PURE;
 
     /**
-     * @brief »ñÈ¡µ±Ç°Ñ¡ÖĞĞĞ
-     * @return int Ñ¡ÖĞĞĞË÷Òı£¬-1´ú±íµ±Ç°Ã»ÓĞÑ¡ÖĞĞĞ
+     * @brief è·å–å½“å‰é€‰ä¸­è¡Œ
+     * @return int é€‰ä¸­è¡Œç´¢å¼•ï¼Œ-1ä»£è¡¨å½“å‰æ²¡æœ‰é€‰ä¸­è¡Œ
      */
     STDMETHOD_(int, GetSel)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÈÈµã²âÊÔ
-     * @param pt -- ÊäÈë×ø±ê
-     * @return IItemPanel *--×ø±êÏÂµÄItemPanel
+     * @brief çƒ­ç‚¹æµ‹è¯•
+     * @param pt -- è¾“å…¥åæ ‡
+     * @return IItemPanel *--åæ ‡ä¸‹çš„ItemPanel
      */
     STDMETHOD_(IItemPanel *, HitTest)(CTHIS_ const POINT *pt) SCONST PURE;
 };
@@ -1011,19 +1012,19 @@ DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2"
 DECLARE_INTERFACE_IID_(IMcListView, IPanel, "485AB4B5-6018-4710-BF8E-751FDE53E335")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -1031,172 +1032,172 @@ DECLARE_INTERFACE_IID_(IMcListView, IPanel, "485AB4B5-6018-4710-BF8E-751FDE53E33
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÏÔÊ¾/Òş²Ø¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief æ˜¾ç¤º/éšè—æ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
     /**
-     * @brief Enable/Disable¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief Enable/Disableæ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõEnable×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è·å–æ»šåŠ¨æ¡EnableçŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return TRUE-enable
      */
     STDMETHOD_(BOOL, IsScrollBarEnable)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÊı¾İ
-     * @param si --¹ö¶¯ÌõÊı¾İ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è®¾ç½®æ»šåŠ¨æ¡æ•°æ®
+     * @param si --æ»šåŠ¨æ¡æ•°æ®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return
      */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nNewPos -- ¹ö¶¯Î»ÖÃ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
+     * @brief è®¾ç½®æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nNewPos -- æ»šåŠ¨ä½ç½®
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
      * @return
      */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return ¹ö¶¯ÌõÎ»ÖÃ
+     * @brief è·å–æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return æ»šåŠ¨æ¡ä½ç½®
      */
     STDMETHOD_(int, GetScrollPos)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nMinPos -- ×îĞ¡Öµ
-     * @param nMaxPos -- ×î´óÖµ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
-     * @return TRUE-³É¹¦
+     * @brief è®¾ç½®æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nMinPos -- æœ€å°å€¼
+     * @param nMaxPos -- æœ€å¤§å€¼
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
+     * @return TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetScrollRange)
     (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param lpMinPos -- ×îĞ¡Öµ
-     * @param lpMaxPos -- ×î´óÖµ
+     * @brief è·å–æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param lpMinPos -- æœ€å°å€¼
+     * @param lpMaxPos -- æœ€å¤§å€¼
      * @return
      */
     STDMETHOD_(BOOL, GetScrollRange)
     (CTHIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
     /**
-     * @brief ²éÑ¯¹ö¶¯ÌõÆôÓÃ×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return TRUE-ÆôÓÃ
+     * @brief æŸ¥è¯¢æ»šåŠ¨æ¡å¯ç”¨çŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return TRUE-å¯ç”¨
      */
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
-     * @brief ÉèÖÃÁĞ±íµÄAdapter
-     * @param adapter -- Adapter¶ÔÏó
+     * @brief è®¾ç½®åˆ—è¡¨çš„Adapter
+     * @param adapter -- Adapterå¯¹è±¡
      * @return BOOL
-     * @remark Í¨³£Ö»Ó¦¸ÃÔÚÁĞ±í³õÊ¼»¯µÄÊ±µ÷ÓÃÒ»´Î£¬ÁĞ±í»áÔö¼Ó¸ÃAdapterµÄÒıÓÃ¼ÆÊı
+     * @remark é€šå¸¸åªåº”è¯¥åœ¨åˆ—è¡¨åˆå§‹åŒ–çš„æ—¶è°ƒç”¨ä¸€æ¬¡ï¼Œåˆ—è¡¨ä¼šå¢åŠ è¯¥Adapterçš„å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(BOOL, SetAdapter)(THIS_ IMcAdapter * adapter) PURE;
 
     /**
-     * @brief »ñÈ¡¿Ø¼şµÄAdapter¶ÔÏó
-     * @return ILvAdapter* - Adapter¶ÔÏó
+     * @brief è·å–æ§ä»¶çš„Adapterå¯¹è±¡
+     * @return ILvAdapter* - Adapterå¯¹è±¡
      */
     STDMETHOD_(IMcAdapter *, GetAdapter)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÁĞ±íÏîÎ»ÖÃ¶¨Î»Æ÷
-     * @param pItemLocator -- Î»ÖÃ¶¨Î»Æ÷
-     * @remark  Î»ÖÃ¶¨Î»Æ÷ÊÇÒ»¸ö½«Ë÷ÒıºÅºÍÁĞ±íÏÔÊ¾Î»ÖÃÏà»¥Ó³ÉäµÄ½Ó¿Ú£¬Í¨¹ıÊµÏÖÎ»ÖÃ¶¨Î»Æ÷£¬ÓÃ»§¿ÉÒÔ¿ØÖÆÁĞ±íÏîµÄÏÔÊ¾´óĞ¡
+     * @brief è®¾ç½®åˆ—è¡¨é¡¹ä½ç½®å®šä½å™¨
+     * @param pItemLocator -- ä½ç½®å®šä½å™¨
+     * @remark  ä½ç½®å®šä½å™¨æ˜¯ä¸€ä¸ªå°†ç´¢å¼•å·å’Œåˆ—è¡¨æ˜¾ç¤ºä½ç½®ç›¸äº’æ˜ å°„çš„æ¥å£ï¼Œé€šè¿‡å®ç°ä½ç½®å®šä½å™¨ï¼Œç”¨æˆ·å¯ä»¥æ§åˆ¶åˆ—è¡¨é¡¹çš„æ˜¾ç¤ºå¤§å°
      */
     STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator * pItemLocator) PURE;
 
     /**
-     * @brief »ñÈ¡Î»ÖÃ¶¨Î»Æ÷
+     * @brief è·å–ä½ç½®å®šä½å™¨
      * @return IListViewItemLocator *
      */
     STDMETHOD_(IListViewItemLocator *, GetItemLocator)(CTHIS) SCONST PURE;
 
     /**
-     * @brief Ê¹Ö¸¶¨ĞĞ¹ö¶¯µ½ÊÓÍ¼¿É¼ûÇø
-     * @param iItem --ĞĞºÅ
+     * @brief ä½¿æŒ‡å®šè¡Œæ»šåŠ¨åˆ°è§†å›¾å¯è§åŒº
+     * @param iItem --è¡Œå·
      * @return
      */
     STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
 
     /**
-     * @brief Ñ¡ÖĞÖ¸¶¨ĞĞ
-     * @param iItem --ĞĞºÅ
-     * @param bNotify --´¥·¢Ñ¡ÖĞ×´Ì¬ÊÂ¼ş±êÖ¾
+     * @brief é€‰ä¸­æŒ‡å®šè¡Œ
+     * @param iItem --è¡Œå·
+     * @param bNotify --è§¦å‘é€‰ä¸­çŠ¶æ€äº‹ä»¶æ ‡å¿—
      * @return
      */
     STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify /*= FALSE*/) PURE;
 
     /**
-     * @brief »ñÈ¡µ±Ç°Ñ¡ÖĞĞĞ
-     * @return int Ñ¡ÖĞĞĞË÷Òı£¬-1´ú±íµ±Ç°Ã»ÓĞÑ¡ÖĞĞĞ
+     * @brief è·å–å½“å‰é€‰ä¸­è¡Œ
+     * @return int é€‰ä¸­è¡Œç´¢å¼•ï¼Œ-1ä»£è¡¨å½“å‰æ²¡æœ‰é€‰ä¸­è¡Œ
      */
     STDMETHOD_(int, GetSel)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÈÈµã²âÊÔ
-     * @param pt -- ÊäÈë×ø±ê
-     * @return IItemPanel *--×ø±êÏÂµÄItemPanel
+     * @brief çƒ­ç‚¹æµ‹è¯•
+     * @param pt -- è¾“å…¥åæ ‡
+     * @return IItemPanel *--åæ ‡ä¸‹çš„ItemPanel
      */
     STDMETHOD_(IItemPanel *, HitTest)(CTHIS_ const POINT *pt) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡±íÍ·¿Ø¼ş
-     * @return IHeaderCtrl *--±íÍ·¿Ø¼ş
+     * @brief è·å–è¡¨å¤´æ§ä»¶
+     * @return IHeaderCtrl *--è¡¨å¤´æ§ä»¶
      */
     STDMETHOD_(IHeaderCtrl *, GetIHeaderCtrl)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ²åÈëÒ»ÁĞ
-     * @param nIndex --²åÈëÎ»ÖÃ,-1´ú±íappend
-     * @param pszText --ÎÄ±¾
-     * @param nWidth --Õ¼ÓÃ¿í¶È
-     * @param fmt --ÏÔÊ¾¸ñÊ½
-     * @param lParam --×Ô¶¨ÒåÊı¾İ
-     * @param bDpiAware --¿í¶È¸ĞÖªdpiËõ·Å
-     * @param fWeight --¿í¶ÈµÄweightÊôĞÔ
-     * @return ²åÈëÎ»ÖÃ
+     * @brief æ’å…¥ä¸€åˆ—
+     * @param nIndex --æ’å…¥ä½ç½®,-1ä»£è¡¨append
+     * @param pszText --æ–‡æœ¬
+     * @param nWidth --å ç”¨å®½åº¦
+     * @param fmt --æ˜¾ç¤ºæ ¼å¼
+     * @param lParam --è‡ªå®šä¹‰æ•°æ®
+     * @param bDpiAware --å®½åº¦æ„ŸçŸ¥dpiç¼©æ”¾
+     * @param fWeight --å®½åº¦çš„weightå±æ€§
+     * @return æ’å…¥ä½ç½®
      */
     STDMETHOD_(int, InsertColumn)
     (THIS_ int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam DEF_VAL(0), BOOL bDpiAware DEF_VAL(TRUE), float fWeight DEF_VAL(0.0f)) PURE;
 
     /**
-     * @brief É¾³ıÁĞ
-     * @param iCol --ÁĞË÷Òı
+     * @brief åˆ é™¤åˆ—
+     * @param iCol --åˆ—ç´¢å¼•
      * @return
      */
     STDMETHOD_(void, DeleteColumn)(THIS_ int iCol) PURE;
 
     /**
-     * @brief »ñÈ¡ÁĞÊı
-     * @return int ÁĞÊı
+     * @brief è·å–åˆ—æ•°
+     * @return int åˆ—æ•°
      */
     STDMETHOD_(int, GetColumnCount)(CTHIS) SCONST PURE;
 };
@@ -1206,19 +1207,19 @@ DECLARE_INTERFACE_IID_(IMcListView, IPanel, "485AB4B5-6018-4710-BF8E-751FDE53E33
 DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -1226,139 +1227,139 @@ DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B"
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÏÔÊ¾/Òş²Ø¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief æ˜¾ç¤º/éšè—æ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
     /**
-     * @brief Enable/Disable¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief Enable/Disableæ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõEnable×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è·å–æ»šåŠ¨æ¡EnableçŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return TRUE-enable
      */
     STDMETHOD_(BOOL, IsScrollBarEnable)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÊı¾İ
-     * @param si --¹ö¶¯ÌõÊı¾İ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è®¾ç½®æ»šåŠ¨æ¡æ•°æ®
+     * @param si --æ»šåŠ¨æ¡æ•°æ®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return
      */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nNewPos -- ¹ö¶¯Î»ÖÃ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
+     * @brief è®¾ç½®æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nNewPos -- æ»šåŠ¨ä½ç½®
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
      * @return
      */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return ¹ö¶¯ÌõÎ»ÖÃ
+     * @brief è·å–æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return æ»šåŠ¨æ¡ä½ç½®
      */
     STDMETHOD_(int, GetScrollPos)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nMinPos -- ×îĞ¡Öµ
-     * @param nMaxPos -- ×î´óÖµ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
-     * @return TRUE-³É¹¦
+     * @brief è®¾ç½®æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nMinPos -- æœ€å°å€¼
+     * @param nMaxPos -- æœ€å¤§å€¼
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
+     * @return TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetScrollRange)
     (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param lpMinPos -- ×îĞ¡Öµ
-     * @param lpMaxPos -- ×î´óÖµ
+     * @brief è·å–æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param lpMinPos -- æœ€å°å€¼
+     * @param lpMaxPos -- æœ€å¤§å€¼
      * @return
      */
     STDMETHOD_(BOOL, GetScrollRange)
     (CTHIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
     /**
-     * @brief ²éÑ¯¹ö¶¯ÌõÆôÓÃ×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return TRUE-ÆôÓÃ
+     * @brief æŸ¥è¯¢æ»šåŠ¨æ¡å¯ç”¨çŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return TRUE-å¯ç”¨
      */
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
-     * @brief ÉèÖÃÁĞ±íµÄAdapter
-     * @param adapter -- Adapter¶ÔÏó
+     * @brief è®¾ç½®åˆ—è¡¨çš„Adapter
+     * @param adapter -- Adapterå¯¹è±¡
      * @return BOOL
-     * @remark Í¨³£Ö»Ó¦¸ÃÔÚÁĞ±í³õÊ¼»¯µÄÊ±µ÷ÓÃÒ»´Î£¬ÁĞ±í»áÔö¼Ó¸ÃAdapterµÄÒıÓÃ¼ÆÊı
+     * @remark é€šå¸¸åªåº”è¯¥åœ¨åˆ—è¡¨åˆå§‹åŒ–çš„æ—¶è°ƒç”¨ä¸€æ¬¡ï¼Œåˆ—è¡¨ä¼šå¢åŠ è¯¥Adapterçš„å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ITvAdapter * adapter) PURE;
 
     /**
-     * @brief »ñÈ¡¿Ø¼şµÄAdapter¶ÔÏó
-     * @return ILvAdapter* - Adapter¶ÔÏó
+     * @brief è·å–æ§ä»¶çš„Adapterå¯¹è±¡
+     * @return ILvAdapter* - Adapterå¯¹è±¡
      */
     STDMETHOD_(ITvAdapter *, GetAdapter)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÁĞ±íÏîÎ»ÖÃ¶¨Î»Æ÷
-     * @param pItemLocator -- Î»ÖÃ¶¨Î»Æ÷
-     * @remark  Î»ÖÃ¶¨Î»Æ÷ÊÇÒ»¸ö½«Ë÷ÒıºÅºÍÁĞ±íÏÔÊ¾Î»ÖÃÏà»¥Ó³ÉäµÄ½Ó¿Ú£¬Í¨¹ıÊµÏÖÎ»ÖÃ¶¨Î»Æ÷£¬ÓÃ»§¿ÉÒÔ¿ØÖÆÁĞ±íÏîµÄÏÔÊ¾´óĞ¡
+     * @brief è®¾ç½®åˆ—è¡¨é¡¹ä½ç½®å®šä½å™¨
+     * @param pItemLocator -- ä½ç½®å®šä½å™¨
+     * @remark  ä½ç½®å®šä½å™¨æ˜¯ä¸€ä¸ªå°†ç´¢å¼•å·å’Œåˆ—è¡¨æ˜¾ç¤ºä½ç½®ç›¸äº’æ˜ å°„çš„æ¥å£ï¼Œé€šè¿‡å®ç°ä½ç½®å®šä½å™¨ï¼Œç”¨æˆ·å¯ä»¥æ§åˆ¶åˆ—è¡¨é¡¹çš„æ˜¾ç¤ºå¤§å°
      */
     STDMETHOD_(void, SetItemLocator)(THIS_ ITreeViewItemLocator * pItemLocator) PURE;
 
     /**
-     * @brief »ñÈ¡Î»ÖÃ¶¨Î»Æ÷
+     * @brief è·å–ä½ç½®å®šä½å™¨
      * @return IListViewItemLocator *
      */
     STDMETHOD_(ITreeViewItemLocator *, GetItemLocator)(CTHIS) SCONST PURE;
 
     /**
-     * @brief Ê¹Ö¸¶¨ĞĞ¹ö¶¯µ½ÊÓÍ¼¿É¼ûÇø
+     * @brief ä½¿æŒ‡å®šè¡Œæ»šåŠ¨åˆ°è§†å›¾å¯è§åŒº
      * @param hItem --HSTREEITEM
      * @return
      */
     STDMETHOD_(void, EnsureVisible)(THIS_ HSTREEITEM hItem) PURE;
 
     /**
-     * @brief Ñ¡ÖĞÖ¸¶¨ĞĞ
+     * @brief é€‰ä¸­æŒ‡å®šè¡Œ
      * @param hItem --HSTREEITEM
-     * @param bNotify --´¥·¢Ñ¡ÖĞ×´Ì¬ÊÂ¼ş±êÖ¾
+     * @param bNotify --è§¦å‘é€‰ä¸­çŠ¶æ€äº‹ä»¶æ ‡å¿—
      * @return
      */
     STDMETHOD_(void, SetSel)(THIS_ HSTREEITEM hItem, BOOL bNotify DEF_VAL(FALSE)) PURE;
 
     /**
-     * @brief »ñÈ¡µ±Ç°Ñ¡ÖĞĞĞ
-     * @return HSTREEITEM Ñ¡ÖĞĞĞË÷Òı£¬0´ú±íµ±Ç°Ã»ÓĞÑ¡ÖĞĞĞ
+     * @brief è·å–å½“å‰é€‰ä¸­è¡Œ
+     * @return HSTREEITEM é€‰ä¸­è¡Œç´¢å¼•ï¼Œ0ä»£è¡¨å½“å‰æ²¡æœ‰é€‰ä¸­è¡Œ
      */
     STDMETHOD_(HSTREEITEM, GetSel)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÈÈµã²âÊÔ
-     * @param pt -- ÊäÈë×ø±ê
-     * @return IItemPanel *--×ø±êÏÂµÄItemPanel
+     * @brief çƒ­ç‚¹æµ‹è¯•
+     * @param pt -- è¾“å…¥åæ ‡
+     * @return IItemPanel *--åæ ‡ä¸‹çš„ItemPanel
      */
     STDMETHOD_(IItemPanel *, HitTest)(CTHIS_ const POINT *pt) SCONST PURE;
 };
@@ -1368,19 +1369,19 @@ DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B"
 DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -1388,139 +1389,139 @@ DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3"
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÏÔÊ¾/Òş²Ø¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief æ˜¾ç¤º/éšè—æ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
     /**
-     * @brief Enable/Disable¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief Enable/Disableæ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõEnable×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è·å–æ»šåŠ¨æ¡EnableçŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return TRUE-enable
      */
     STDMETHOD_(BOOL, IsScrollBarEnable)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÊı¾İ
-     * @param si --¹ö¶¯ÌõÊı¾İ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è®¾ç½®æ»šåŠ¨æ¡æ•°æ®
+     * @param si --æ»šåŠ¨æ¡æ•°æ®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return
      */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nNewPos -- ¹ö¶¯Î»ÖÃ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
+     * @brief è®¾ç½®æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nNewPos -- æ»šåŠ¨ä½ç½®
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
      * @return
      */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return ¹ö¶¯ÌõÎ»ÖÃ
+     * @brief è·å–æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return æ»šåŠ¨æ¡ä½ç½®
      */
     STDMETHOD_(int, GetScrollPos)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nMinPos -- ×îĞ¡Öµ
-     * @param nMaxPos -- ×î´óÖµ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
-     * @return TRUE-³É¹¦
+     * @brief è®¾ç½®æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nMinPos -- æœ€å°å€¼
+     * @param nMaxPos -- æœ€å¤§å€¼
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
+     * @return TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetScrollRange)
     (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param lpMinPos -- ×îĞ¡Öµ
-     * @param lpMaxPos -- ×î´óÖµ
+     * @brief è·å–æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param lpMinPos -- æœ€å°å€¼
+     * @param lpMaxPos -- æœ€å¤§å€¼
      * @return
      */
     STDMETHOD_(BOOL, GetScrollRange)
     (CTHIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
     /**
-     * @brief ²éÑ¯¹ö¶¯ÌõÆôÓÃ×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return TRUE-ÆôÓÃ
+     * @brief æŸ¥è¯¢æ»šåŠ¨æ¡å¯ç”¨çŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return TRUE-å¯ç”¨
      */
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
-     * @brief ÉèÖÃÁĞ±íµÄAdapter
-     * @param adapter -- Adapter¶ÔÏó
+     * @brief è®¾ç½®åˆ—è¡¨çš„Adapter
+     * @param adapter -- Adapterå¯¹è±¡
      * @return BOOL
-     * @remark Í¨³£Ö»Ó¦¸ÃÔÚÁĞ±í³õÊ¼»¯µÄÊ±µ÷ÓÃÒ»´Î£¬ÁĞ±í»áÔö¼Ó¸ÃAdapterµÄÒıÓÃ¼ÆÊı
+     * @remark é€šå¸¸åªåº”è¯¥åœ¨åˆ—è¡¨åˆå§‹åŒ–çš„æ—¶è°ƒç”¨ä¸€æ¬¡ï¼Œåˆ—è¡¨ä¼šå¢åŠ è¯¥Adapterçš„å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ILvAdapter * adapter) PURE;
 
     /**
-     * @brief »ñÈ¡¿Ø¼şµÄAdapter¶ÔÏó
-     * @return ILvAdapter* - Adapter¶ÔÏó
+     * @brief è·å–æ§ä»¶çš„Adapterå¯¹è±¡
+     * @return ILvAdapter* - Adapterå¯¹è±¡
      */
     STDMETHOD_(ILvAdapter *, GetAdapter)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÁĞ±íÏîÎ»ÖÃ¶¨Î»Æ÷
-     * @param pItemLocator -- Î»ÖÃ¶¨Î»Æ÷
-     * @remark  Î»ÖÃ¶¨Î»Æ÷ÊÇÒ»¸ö½«Ë÷ÒıºÅºÍÁĞ±íÏÔÊ¾Î»ÖÃÏà»¥Ó³ÉäµÄ½Ó¿Ú£¬Í¨¹ıÊµÏÖÎ»ÖÃ¶¨Î»Æ÷£¬ÓÃ»§¿ÉÒÔ¿ØÖÆÁĞ±íÏîµÄÏÔÊ¾´óĞ¡
+     * @brief è®¾ç½®åˆ—è¡¨é¡¹ä½ç½®å®šä½å™¨
+     * @param pItemLocator -- ä½ç½®å®šä½å™¨
+     * @remark  ä½ç½®å®šä½å™¨æ˜¯ä¸€ä¸ªå°†ç´¢å¼•å·å’Œåˆ—è¡¨æ˜¾ç¤ºä½ç½®ç›¸äº’æ˜ å°„çš„æ¥å£ï¼Œé€šè¿‡å®ç°ä½ç½®å®šä½å™¨ï¼Œç”¨æˆ·å¯ä»¥æ§åˆ¶åˆ—è¡¨é¡¹çš„æ˜¾ç¤ºå¤§å°
      */
     STDMETHOD_(void, SetItemLocator)(THIS_ ITileViewItemLocator * pItemLocator) PURE;
 
     /**
-     * @brief »ñÈ¡Î»ÖÃ¶¨Î»Æ÷
+     * @brief è·å–ä½ç½®å®šä½å™¨
      * @return ITileViewItemLocator *
      */
     STDMETHOD_(ITileViewItemLocator *, GetItemLocator)(CTHIS) SCONST PURE;
 
     /**
-     * @brief Ê¹Ö¸¶¨ĞĞ¹ö¶¯µ½ÊÓÍ¼¿É¼ûÇø
-     * @param iItem --ĞĞºÅ
+     * @brief ä½¿æŒ‡å®šè¡Œæ»šåŠ¨åˆ°è§†å›¾å¯è§åŒº
+     * @param iItem --è¡Œå·
      * @return
      */
     STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) PURE;
 
     /**
-     * @brief Ñ¡ÖĞÖ¸¶¨ĞĞ
-     * @param iItem --ĞĞºÅ
-     * @param bNotify --´¥·¢Ñ¡ÖĞ×´Ì¬ÊÂ¼ş±êÖ¾
+     * @brief é€‰ä¸­æŒ‡å®šè¡Œ
+     * @param iItem --è¡Œå·
+     * @param bNotify --è§¦å‘é€‰ä¸­çŠ¶æ€äº‹ä»¶æ ‡å¿—
      * @return
      */
     STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify DEF_VAL(FALSE)) PURE;
 
     /**
-     * @brief »ñÈ¡µ±Ç°Ñ¡ÖĞĞĞ
-     * @return int Ñ¡ÖĞĞĞË÷Òı£¬-1´ú±íµ±Ç°Ã»ÓĞÑ¡ÖĞĞĞ
+     * @brief è·å–å½“å‰é€‰ä¸­è¡Œ
+     * @return int é€‰ä¸­è¡Œç´¢å¼•ï¼Œ-1ä»£è¡¨å½“å‰æ²¡æœ‰é€‰ä¸­è¡Œ
      */
     STDMETHOD_(int, GetSel)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÈÈµã²âÊÔ
-     * @param pt -- ÊäÈë×ø±ê
-     * @return IItemPanel *--×ø±êÏÂµÄItemPanel
+     * @brief çƒ­ç‚¹æµ‹è¯•
+     * @param pt -- è¾“å…¥åæ ‡
+     * @return IItemPanel *--åæ ‡ä¸‹çš„ItemPanel
      */
     STDMETHOD_(IItemPanel *, HitTest)(CTHIS_ const POINT *pt) SCONST PURE;
 };
@@ -1530,19 +1531,19 @@ DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3"
 DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -1550,118 +1551,118 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÏÔÊ¾/Òş²Ø¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief æ˜¾ç¤º/éšè—æ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
     /**
-     * @brief Enable/Disable¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief Enable/Disableæ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõEnable×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è·å–æ»šåŠ¨æ¡EnableçŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return TRUE-enable
      */
     STDMETHOD_(BOOL, IsScrollBarEnable)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÊı¾İ
-     * @param si --¹ö¶¯ÌõÊı¾İ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è®¾ç½®æ»šåŠ¨æ¡æ•°æ®
+     * @param si --æ»šåŠ¨æ¡æ•°æ®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return
      */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nNewPos -- ¹ö¶¯Î»ÖÃ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
+     * @brief è®¾ç½®æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nNewPos -- æ»šåŠ¨ä½ç½®
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
      * @return
      */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return ¹ö¶¯ÌõÎ»ÖÃ
+     * @brief è·å–æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return æ»šåŠ¨æ¡ä½ç½®
      */
     STDMETHOD_(int, GetScrollPos)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nMinPos -- ×îĞ¡Öµ
-     * @param nMaxPos -- ×î´óÖµ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
-     * @return TRUE-³É¹¦
+     * @brief è®¾ç½®æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nMinPos -- æœ€å°å€¼
+     * @param nMaxPos -- æœ€å¤§å€¼
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
+     * @return TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetScrollRange)
     (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param lpMinPos -- ×îĞ¡Öµ
-     * @param lpMaxPos -- ×î´óÖµ
+     * @brief è·å–æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param lpMinPos -- æœ€å°å€¼
+     * @param lpMaxPos -- æœ€å¤§å€¼
      * @return
      */
     STDMETHOD_(BOOL, GetScrollRange)
     (CTHIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
     /**
-     * @brief ²éÑ¯¹ö¶¯ÌõÆôÓÃ×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return TRUE-ÆôÓÃ
+     * @brief æŸ¥è¯¢æ»šåŠ¨æ¡å¯ç”¨çŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return TRUE-å¯ç”¨
      */
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
      * SListBox::GetCount
-     * @brief    »ñÈ¡Ïî¸öÊı
-     * @return   ·µ»Øint
+     * @brief    è·å–é¡¹ä¸ªæ•°
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡Ïî¸öÊı
+     * Describe  è·å–é¡¹ä¸ªæ•°
      */
     STDMETHOD_(int, GetCount)(CTHIS) SCONST PURE;
 
     /**
      * SListBox::GetCurSel
-     * @brief    »ñÈ¡µ±Ç°Ñ¡ÖĞÏîË÷Òı
-     * @return   ·µ»Øint
+     * @brief    è·å–å½“å‰é€‰ä¸­é¡¹ç´¢å¼•
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡µ±Ç°Ñ¡ÖĞÏîË÷Òı
+     * Describe  è·å–å½“å‰é€‰ä¸­é¡¹ç´¢å¼•
      */
     STDMETHOD_(int, GetCurSel)(CTHIS) SCONST PURE;
 
     /**
      * SListBox::SetCurSel
-     * @brief    ÉèÖÃÑ¡ÖĞÏî
-     * @param    int nIndex -- ´ıÑ¡ÖĞË÷Òı
+     * @brief    è®¾ç½®é€‰ä¸­é¡¹
+     * @param    int nIndex -- å¾…é€‰ä¸­ç´¢å¼•
      *
-     * Describe  ÉèÖÃÑ¡ÖĞÏî
+     * Describe  è®¾ç½®é€‰ä¸­é¡¹
      */
     STDMETHOD_(BOOL, SetCurSel)(THIS_ int nIndex, BOOL bNotifyChange /* = FALSE*/) PURE;
 
     /**
      * SListBox::GetTopIndex
-     * @brief    »ñÈ¡µÚÒ»Ìõ¿É¼û¼ÇÂ¼Ë÷Òı
-     * @return   ·µ»Øint
+     * @brief    è·å–ç¬¬ä¸€æ¡å¯è§è®°å½•ç´¢å¼•
+     * @return   è¿”å›int
      *
      * Describe
      */
@@ -1669,8 +1670,8 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
 
     /**
      * SListBox::SetTopIndex
-     * @brief    ÉèÖÃµÚÒ»Ìõ¿É¼û¼ÇÂ¼Ë÷Òı
-     * @param    int nIndex -- µÚÒ»Ìõ¿É¼û¼ÇÂ¼Ë÷Òı
+     * @brief    è®¾ç½®ç¬¬ä¸€æ¡å¯è§è®°å½•ç´¢å¼•
+     * @param    int nIndex -- ç¬¬ä¸€æ¡å¯è§è®°å½•ç´¢å¼•
      *
      * Describe
      */
@@ -1678,115 +1679,115 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
 
     /**
      * SListBox::GetItemHeight
-     * @brief    »ñÈ¡¸ß¶È
-     * @return   ·µ»Øint
+     * @brief    è·å–é«˜åº¦
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡¸ß¶È
+     * Describe  è·å–é«˜åº¦
      */
     STDMETHOD_(int, GetItemHeight)(CTHIS) SCONST PURE;
 
     /**
      * SListBox::SetItemHeight
-     * @brief    ÉèÖÃÖ¸¶¨Ïî¸ß¶È
-     * @param    int cyItemHeight -- ¸ß¶È
-     * @return   ·µ»Ø
+     * @brief    è®¾ç½®æŒ‡å®šé¡¹é«˜åº¦
+     * @param    int cyItemHeight -- é«˜åº¦
+     * @return   è¿”å›
      *
-     * Describe  ÉèÖÃÖ¸¶¨Ïî¸ß¶È
+     * Describe  è®¾ç½®æŒ‡å®šé¡¹é«˜åº¦
      */
     STDMETHOD_(void, SetItemHeight)(THIS_ int nItemHeight) PURE;
 
     /**
      * SListBox::GetItemData
-     * @brief    »ñÈ¡¸½¼ÓÊı¾İ
-     * @param    int nIndex -- Ñ¡ÏîË÷Òı
-     * @return   ·µ»ØLPARAM
+     * @brief    è·å–é™„åŠ æ•°æ®
+     * @param    int nIndex -- é€‰é¡¹ç´¢å¼•
+     * @return   è¿”å›LPARAM
      *
-     * Describe  »ñÈ¡¸½¼ÓÊı¾İ
+     * Describe  è·å–é™„åŠ æ•°æ®
      */
     STDMETHOD_(LPARAM, GetItemData)(CTHIS_ int nIndex) SCONST PURE;
 
     /**
      * SListBox::SetItemData
-     * @brief    ÉèÖÃÑ¡Ïî¸½¼ÓÊı¾İ
-     * @param    int nIndex -- Ñ¡ÏîË÷Òı
-     * @param    LPARAM lParam  -- ¸½¼ÓÊı¾İ
-     * @return   ·µ»ØBOOL
+     * @brief    è®¾ç½®é€‰é¡¹é™„åŠ æ•°æ®
+     * @param    int nIndex -- é€‰é¡¹ç´¢å¼•
+     * @param    LPARAM lParam  -- é™„åŠ æ•°æ®
+     * @return   è¿”å›BOOL
      *
-     * Describe  ÉèÖÃÑ¡Ïî¸½¼ÓÊı¾İ
+     * Describe  è®¾ç½®é€‰é¡¹é™„åŠ æ•°æ®
      */
     STDMETHOD_(BOOL, SetItemData)(THIS_ int nIndex, LPARAM lParam) PURE;
 
     /**
      * SListBox::GetText
-     * @brief    »ñÈ¡Ö¸¶¨ÏîÎÄ±¾
-     * @param    int nIndex -- Ñ¡ÏîË÷Òı
-     * @param    BOOL bRawText -- Ô­Ê¼Êı¾İ±êÖ¾
-     * @return   SStringT,ÁĞ±íÏîµÄÔ­Ê¼×Ö·û´®
+     * @brief    è·å–æŒ‡å®šé¡¹æ–‡æœ¬
+     * @param    int nIndex -- é€‰é¡¹ç´¢å¼•
+     * @param    BOOL bRawText -- åŸå§‹æ•°æ®æ ‡å¿—
+     * @return   SStringT,åˆ—è¡¨é¡¹çš„åŸå§‹å­—ç¬¦ä¸²
      *
-     * Describe  »ñÈ¡Ö¸¶¨ÏîÎÄ±¾
+     * Describe  è·å–æŒ‡å®šé¡¹æ–‡æœ¬
      */
     STDMETHOD_(BOOL, GetIText)
     (CTHIS_ int nIndex, BOOL bRawText /*= FALSE*/, IStringT *str) SCONST PURE;
 
     /**
      * SListBox::DeleteAll
-     * @brief    É¾³ıËùÓĞ
+     * @brief    åˆ é™¤æ‰€æœ‰
      *
-     * Describe  É¾³ıËùÓĞ
+     * Describe  åˆ é™¤æ‰€æœ‰
      */
     STDMETHOD_(void, DeleteAll)(THIS) PURE;
 
     /**
      * SListBox::DeleteString
-     * @brief    ÉèÖÃÖ¸¶¨ÏîÎÄ±¾
-     * @param    int nIndex -- Ñ¡ÏîË÷Òı
-     * @return   ·µ»ØBOOL
+     * @brief    è®¾ç½®æŒ‡å®šé¡¹æ–‡æœ¬
+     * @param    int nIndex -- é€‰é¡¹ç´¢å¼•
+     * @return   è¿”å›BOOL
      *
-     * Describe  ÉèÖÃÖ¸¶¨ÏîÎÄ±¾
+     * Describe  è®¾ç½®æŒ‡å®šé¡¹æ–‡æœ¬
      */
     STDMETHOD_(BOOL, DeleteString)(THIS_ int nIndex) PURE;
 
     /**
      * SListBox::AddString
-     * @brief    Ìí¼ÓÎÄ±¾
-     * @param    LPCTSTR lpszItem -- ÎÄ±¾
-     * @param    int nImage -- Í¼±ê
-     * @param    LPARAM lParam -- ¸½¼ÓÊı¾İ
-     * @return   ·µ»Øint Ë÷Òı
+     * @brief    æ·»åŠ æ–‡æœ¬
+     * @param    LPCTSTR lpszItem -- æ–‡æœ¬
+     * @param    int nImage -- å›¾æ ‡
+     * @param    LPARAM lParam -- é™„åŠ æ•°æ®
+     * @return   è¿”å›int ç´¢å¼•
      *
-     * Describe  Ìí¼ÓÎÄ±¾
+     * Describe  æ·»åŠ æ–‡æœ¬
      */
     STDMETHOD_(int, AddString)
     (THIS_ LPCTSTR lpszItem, int nImage /*= -1*/, LPARAM lParam /*= 0*/) PURE;
 
     /**
      * SListBox::InsertString
-     * @brief    ²åÈëÎÄ±¾
-     * @param    int nIndex  -- Ë÷Òı
-     * @param    LPCTSTR lpszItem -- ÎÄ±¾
-     * @param    int nImage -- Í¼±ê
-     * @param    LPARAM lParam -- ¸½¼ÓÊı¾İ
-     * @return   ·µ»Øint Ë÷Òı
+     * @brief    æ’å…¥æ–‡æœ¬
+     * @param    int nIndex  -- ç´¢å¼•
+     * @param    LPCTSTR lpszItem -- æ–‡æœ¬
+     * @param    int nImage -- å›¾æ ‡
+     * @param    LPARAM lParam -- é™„åŠ æ•°æ®
+     * @return   è¿”å›int ç´¢å¼•
      *
-     * Describe  ÔÚÄ³Ïî²åÈëÎÄ±¾
+     * Describe  åœ¨æŸé¡¹æ’å…¥æ–‡æœ¬
      */
     STDMETHOD_(int, InsertString)
     (THIS_ int nIndex, LPCTSTR lpszItem, int nImage /*= -1*/, LPARAM lParam /*= 0*/) PURE;
 
     /**
      * SListBox::EnsureVisible
-     * @brief    ÉèÖÃÄ³ÏîÏÔÊ¾
-     * @param    int nIndex  -- Ë÷Òı
+     * @brief    è®¾ç½®æŸé¡¹æ˜¾ç¤º
+     * @param    int nIndex  -- ç´¢å¼•
      *
-     * Describe  ÉèÖÃÄ³ÏîÏÔÊ¾
+     * Describe  è®¾ç½®æŸé¡¹æ˜¾ç¤º
      */
     STDMETHOD_(void, EnsureVisible)(THIS_ int nIndex) PURE;
 
     /**
-     * @brief ²éÕÒ×Ö·û´®ÔÚÁĞ±íÖĞµÄÎ»ÖÃ
-     * @param iFindAfter --¿ªÊ¼Ë÷Òı
-     * @param pszText --Ä¿±ê×Ö·û´®
-     * @return int ÕÒµ½µÄË÷Òı£¬-1´ú±íÃ»ÓĞÕÒµ½
+     * @brief æŸ¥æ‰¾å­—ç¬¦ä¸²åœ¨åˆ—è¡¨ä¸­çš„ä½ç½®
+     * @param iFindAfter --å¼€å§‹ç´¢å¼•
+     * @param pszText --ç›®æ ‡å­—ç¬¦ä¸²
+     * @return int æ‰¾åˆ°çš„ç´¢å¼•ï¼Œ-1ä»£è¡¨æ²¡æœ‰æ‰¾åˆ°
      */
     STDMETHOD_(int, FindString)(CTHIS_ int iFindAfter, LPCTSTR pszText) SCONST PURE;
 
@@ -1800,19 +1801,19 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
 DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -1820,55 +1821,55 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::GetCurSel
-     * @brief    »ñÈ¡Ñ¡ÖĞÖµË÷Òı
-     * @return   ·µ»Øint
+     * @brief    è·å–é€‰ä¸­å€¼ç´¢å¼•
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡µ±Ç°Ñ¡ÖĞË÷Òı
+     * Describe  è·å–å½“å‰é€‰ä¸­ç´¢å¼•
      */
     STDMETHOD_(int, GetCurSel)(CTHIS) SCONST PURE;
 
     /**
      * SComboBoxBase::GetCount
-     * @brief    »ñÈ¡ÏÂÀ­Ïî¸öÊı
-     * @return   ·µ»Øint
+     * @brief    è·å–ä¸‹æ‹‰é¡¹ä¸ªæ•°
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡ÏÂÀ­Ïî¸öÊı
+     * Describe  è·å–ä¸‹æ‹‰é¡¹ä¸ªæ•°
      */
     STDMETHOD_(int, GetCount)(CTHIS) SCONST PURE;
 
     /**
      * SComboBoxBase::SetCurSel
-     * @brief    ÉèÖÃµ±Ç°Ñ¡ÖĞ
-     * @param    int iSel -- Ñ¡ÖĞË÷Òı
+     * @brief    è®¾ç½®å½“å‰é€‰ä¸­
+     * @param    int iSel -- é€‰ä¸­ç´¢å¼•
      *
-     * Describe  ÉèÖÃµ±Ç°Ñ¡ÖĞ
+     * Describe  è®¾ç½®å½“å‰é€‰ä¸­
      */
     STDMETHOD_(BOOL, SetCurSel)(THIS_ int iSel) PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨ÏîÎÄ±¾Êı¾İ
-     * @param iItem --Ë÷ÒıºÅ
-     * @param bRawText --»ñÈ¡Ô­Ê¼ÎÄ±¾±êÖ¾
-     * @param[out] str Êä³ö×Ö·û´®¶ÔÏó
-     * @return BOOL TRUE-³É¹¦
-     * @remark bRawTextÎªTRUEÊ±Êä³öÎ´·­ÒëµÄÎÄ±¾
+     * @brief è·å–æŒ‡å®šé¡¹æ–‡æœ¬æ•°æ®
+     * @param iItem --ç´¢å¼•å·
+     * @param bRawText --è·å–åŸå§‹æ–‡æœ¬æ ‡å¿—
+     * @param[out] str è¾“å‡ºå­—ç¬¦ä¸²å¯¹è±¡
+     * @return BOOL TRUE-æˆåŠŸ
+     * @remark bRawTextä¸ºTRUEæ—¶è¾“å‡ºæœªç¿»è¯‘çš„æ–‡æœ¬
      */
     STDMETHOD_(BOOL, GetItemText)(CTHIS_ int iItem, BOOL bRawText, IStringT *str) SCONST PURE;
     STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ int iItem, BOOL bRawText, IStringA *str) SCONST PURE;
 
     /**
      * FindString
-     * @brief    ²éÕÒ×Ö·û´®Î»ÖÃ
-     * @param    LPCTSTR pszFind --  ²éÕÒÄ¿±ê
-     * @param    int nAfter --  ¿ªÊ¼Î»ÖÃ
-     * @return   int -- Ä¿±êË÷Òı£¬Ê§°Ü·µ»Ø-1¡£
+     * @brief    æŸ¥æ‰¾å­—ç¬¦ä¸²ä½ç½®
+     * @param    LPCTSTR pszFind --  æŸ¥æ‰¾ç›®æ ‡
+     * @param    int nAfter --  å¼€å§‹ä½ç½®
+     * @return   int -- ç›®æ ‡ç´¢å¼•ï¼Œå¤±è´¥è¿”å›-1ã€‚
      * Describe
      */
     STDMETHOD_(int, FindString)
@@ -1879,32 +1880,32 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
     //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::DropDown
-     * @brief    ÏÂÀ­ÊÂ¼ş
+     * @brief    ä¸‹æ‹‰äº‹ä»¶
      *
-     * Describe  ÏÂÀ­ÊÂ¼ş
+     * Describe  ä¸‹æ‹‰äº‹ä»¶
      */
     STDMETHOD_(void, DropDown)(THIS) PURE;
 
     /**
      * SComboBoxBase::CloseUp
-     * @brief    ÏÂÀ­¹Ø±Õ
+     * @brief    ä¸‹æ‹‰å…³é—­
      *
-     * Describe  ÏÂÀ­¹Ø±Õ
+     * Describe  ä¸‹æ‹‰å…³é—­
      */
     STDMETHOD_(void, CloseUp)(THIS) PURE;
 
     /**
-     * @brief ²éÑ¯DropDown×´Ì¬±êÖ¾
-     * @return TRUE-µ±Ç°ComboBaseÎªÏÂÀ­ÁĞ±í
-     * @remark ÄÚ²¿Ê¹ÓÃ·½·¨
+     * @brief æŸ¥è¯¢DropDownçŠ¶æ€æ ‡å¿—
+     * @return TRUE-å½“å‰ComboBaseä¸ºä¸‹æ‹‰åˆ—è¡¨
+     * @remark å†…éƒ¨ä½¿ç”¨æ–¹æ³•
      */
     STDMETHOD_(BOOL, IsDropdown)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÏÂÀ­×´Ì¬±êÖ¾
-     * @param bDropdown -- TRUE:ÏÂÀ­ÁĞ±í
+     * @brief è®¾ç½®ä¸‹æ‹‰çŠ¶æ€æ ‡å¿—
+     * @param bDropdown -- TRUE:ä¸‹æ‹‰åˆ—è¡¨
      * @return
-     * @remark ÄÚ²¿Ê¹ÓÃ·½·¨
+     * @remark å†…éƒ¨ä½¿ç”¨æ–¹æ³•
      */
     STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) PURE;
 };
@@ -1914,19 +1915,19 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
 DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC9CF")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -1934,45 +1935,45 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::GetCurSel
-     * @brief    »ñÈ¡Ñ¡ÖĞÖµË÷Òı
-     * @return   ·µ»Øint
+     * @brief    è·å–é€‰ä¸­å€¼ç´¢å¼•
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡µ±Ç°Ñ¡ÖĞË÷Òı
+     * Describe  è·å–å½“å‰é€‰ä¸­ç´¢å¼•
      */
     STDMETHOD_(int, GetCurSel)(CTHIS) SCONST PURE;
 
     /**
      * SComboBoxBase::GetCount
-     * @brief    »ñÈ¡ÏÂÀ­Ïî¸öÊı
-     * @return   ·µ»Øint
+     * @brief    è·å–ä¸‹æ‹‰é¡¹ä¸ªæ•°
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡ÏÂÀ­Ïî¸öÊı
+     * Describe  è·å–ä¸‹æ‹‰é¡¹ä¸ªæ•°
      */
     STDMETHOD_(int, GetCount)(CTHIS) SCONST PURE;
 
     /**
      * SComboBoxBase::SetCurSel
-     * @brief    ÉèÖÃµ±Ç°Ñ¡ÖĞ
-     * @param    int iSel -- Ñ¡ÖĞË÷Òı
+     * @brief    è®¾ç½®å½“å‰é€‰ä¸­
+     * @param    int iSel -- é€‰ä¸­ç´¢å¼•
      *
-     * Describe  ÉèÖÃµ±Ç°Ñ¡ÖĞ
+     * Describe  è®¾ç½®å½“å‰é€‰ä¸­
      */
     STDMETHOD_(BOOL, SetCurSel)(THIS_ int iSel) PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨ÏîÎÄ±¾Êı¾İ
-     * @param iItem --Ë÷ÒıºÅ
-     * @param bRawText --»ñÈ¡Ô­Ê¼ÎÄ±¾±êÖ¾
-     * @param[out] str Êä³ö×Ö·û´®¶ÔÏó
-     * @return BOOL TRUE-³É¹¦
-     * @remark bRawTextÎªTRUEÊ±Êä³öÎ´·­ÒëµÄÎÄ±¾
+     * @brief è·å–æŒ‡å®šé¡¹æ–‡æœ¬æ•°æ®
+     * @param iItem --ç´¢å¼•å·
+     * @param bRawText --è·å–åŸå§‹æ–‡æœ¬æ ‡å¿—
+     * @param[out] str è¾“å‡ºå­—ç¬¦ä¸²å¯¹è±¡
+     * @return BOOL TRUE-æˆåŠŸ
+     * @remark bRawTextä¸ºTRUEæ—¶è¾“å‡ºæœªç¿»è¯‘çš„æ–‡æœ¬
      */
     STDMETHOD_(BOOL, GetItemText)(CTHIS_ int iItem, BOOL bRawText, IStringT *str) SCONST PURE;
 
@@ -1980,10 +1981,10 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
 
     /**
      * FindString
-     * @brief    ²éÕÒ×Ö·û´®Î»ÖÃ
-     * @param    LPCTSTR pszFind --  ²éÕÒÄ¿±ê
-     * @param    int nAfter --  ¿ªÊ¼Î»ÖÃ
-     * @return   int -- Ä¿±êË÷Òı£¬Ê§°Ü·µ»Ø-1¡£
+     * @brief    æŸ¥æ‰¾å­—ç¬¦ä¸²ä½ç½®
+     * @param    LPCTSTR pszFind --  æŸ¥æ‰¾ç›®æ ‡
+     * @param    int nAfter --  å¼€å§‹ä½ç½®
+     * @return   int -- ç›®æ ‡ç´¢å¼•ï¼Œå¤±è´¥è¿”å›-1ã€‚
      * Describe
      */
     STDMETHOD_(int, FindString)
@@ -1993,85 +1994,85 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
 
     /**
      * SComboBoxBase::DropDown
-     * @brief    ÏÂÀ­ÊÂ¼ş
+     * @brief    ä¸‹æ‹‰äº‹ä»¶
      *
-     * Describe  ÏÂÀ­ÊÂ¼ş
+     * Describe  ä¸‹æ‹‰äº‹ä»¶
      */
     STDMETHOD_(void, DropDown)(THIS) PURE;
 
     /**
      * SComboBoxBase::CloseUp
-     * @brief    ÏÂÀ­¹Ø±Õ
+     * @brief    ä¸‹æ‹‰å…³é—­
      *
-     * Describe  ÏÂÀ­¹Ø±Õ
+     * Describe  ä¸‹æ‹‰å…³é—­
      */
     STDMETHOD_(void, CloseUp)(THIS) PURE;
 
     /**
-     * @brief ²éÑ¯DropDown×´Ì¬±êÖ¾
-     * @return TRUE-µ±Ç°ComboBaseÎªÏÂÀ­ÁĞ±í
-     * @remark ÄÚ²¿Ê¹ÓÃ·½·¨
+     * @brief æŸ¥è¯¢DropDownçŠ¶æ€æ ‡å¿—
+     * @return TRUE-å½“å‰ComboBaseä¸ºä¸‹æ‹‰åˆ—è¡¨
+     * @remark å†…éƒ¨ä½¿ç”¨æ–¹æ³•
      */
     STDMETHOD_(BOOL, IsDropdown)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÏÂÀ­×´Ì¬±êÖ¾
-     * @param bDropdown -- TRUE:ÏÂÀ­ÁĞ±í
+     * @brief è®¾ç½®ä¸‹æ‹‰çŠ¶æ€æ ‡å¿—
+     * @param bDropdown -- TRUE:ä¸‹æ‹‰åˆ—è¡¨
      * @return
-     * @remark ÄÚ²¿Ê¹ÓÃ·½·¨
+     * @remark å†…éƒ¨ä½¿ç”¨æ–¹æ³•
      */
     STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
      * SComboBox::GetItemData
-     * @brief    »ñÈ¡¸½¼ÓÊı¾İ
-     * @param    UINT iItem -- Ñ¡ÏîÖµ
+     * @brief    è·å–é™„åŠ æ•°æ®
+     * @param    UINT iItem -- é€‰é¡¹å€¼
      *
-     * Describe  »ñÈ¡¸½¼ÓÊı¾İ
+     * Describe  è·å–é™„åŠ æ•°æ®
      */
     STDMETHOD_(LPARAM, GetItemData)(CTHIS_ UINT iItem) SCONST PURE;
 
     /**
      * SComboBox::SetItemData
-     * @brief    ÉèÖÃ¸½¼ÓÊı¾İ
-     * @param    UINT iItem -- Ë÷ÒıÖµ
-     * @param    LPARAM lParam -- ¸½¼ÓÖµ
+     * @brief    è®¾ç½®é™„åŠ æ•°æ®
+     * @param    UINT iItem -- ç´¢å¼•å€¼
+     * @param    LPARAM lParam -- é™„åŠ å€¼
      *
-     * Describe  ÉèÖÃ¸½¼ÓÊı¾İ
+     * Describe  è®¾ç½®é™„åŠ æ•°æ®
      */
     STDMETHOD_(BOOL, SetItemData)(THIS_ UINT iItem, LPARAM lParam) PURE;
 
     /**
      * SComboBox::InsertItem
-     * @brief    ²åÈëĞÂÏî
-     * @param    UINT iPos -- Î»ÖÃ
-     * @param    LPCTSTR pszText -- ÎÄ±¾Öµ
-     * @param    int iIcon -- Í¼±ê
-     * @param    LPARAM lParam -- ¸½¼ÓÖµ
+     * @brief    æ’å…¥æ–°é¡¹
+     * @param    UINT iPos -- ä½ç½®
+     * @param    LPCTSTR pszText -- æ–‡æœ¬å€¼
+     * @param    int iIcon -- å›¾æ ‡
+     * @param    LPARAM lParam -- é™„åŠ å€¼
      *
-     * Describe  ²åÈëĞÂÏî
+     * Describe  æ’å…¥æ–°é¡¹
      */
     STDMETHOD_(int, InsertItem)(THIS_ int iPos, LPCTSTR pszText, int iIcon, LPARAM lParam) PURE;
     STDMETHOD_(int, InsertItemA)(THIS_ int iPos, LPCSTR pszText, int iIcon, LPARAM lParam) PURE;
     /**
      * SComboBox::DeleteString
-     * @brief    É¾³ıÄ³Ò»Ïî
-     * @param    UINT iItem -- Ë÷ÒıÖµ
+     * @brief    åˆ é™¤æŸä¸€é¡¹
+     * @param    UINT iItem -- ç´¢å¼•å€¼
      *
-     * Describe  É¾³ıÄ³Ò»Ïî
+     * Describe  åˆ é™¤æŸä¸€é¡¹
      */
     STDMETHOD_(BOOL, DeleteString)(THIS_ int iPos) PURE;
     /**
      * SComboBox::ResetContent
-     * @brief    É¾³ıËùÓĞÏî
+     * @brief    åˆ é™¤æ‰€æœ‰é¡¹
      *
-     * Describe  ÉèÖÃ¸½¼ÓÊı¾İ
+     * Describe  è®¾ç½®é™„åŠ æ•°æ®
      */
     STDMETHOD_(void, ResetContent)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡IListBox½Ó¿Ú
+     * @brief è·å–IListBoxæ¥å£
      * @return IListBox *
      */
     STDMETHOD_(IListBox *, GetIListBox)(THIS) PURE;
@@ -2082,19 +2083,19 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
 DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC253D")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -2102,54 +2103,54 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
      * SComboBoxBase::GetCurSel
-     * @brief    »ñÈ¡Ñ¡ÖĞÖµË÷Òı
-     * @return   ·µ»Øint
+     * @brief    è·å–é€‰ä¸­å€¼ç´¢å¼•
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡µ±Ç°Ñ¡ÖĞË÷Òı
+     * Describe  è·å–å½“å‰é€‰ä¸­ç´¢å¼•
      */
     STDMETHOD_(int, GetCurSel)(CTHIS) SCONST PURE;
 
     /**
      * SComboBoxBase::GetCount
-     * @brief    »ñÈ¡ÏÂÀ­Ïî¸öÊı
-     * @return   ·µ»Øint
+     * @brief    è·å–ä¸‹æ‹‰é¡¹ä¸ªæ•°
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡ÏÂÀ­Ïî¸öÊı
+     * Describe  è·å–ä¸‹æ‹‰é¡¹ä¸ªæ•°
      */
     STDMETHOD_(int, GetCount)(CTHIS) SCONST PURE;
 
     /**
      * SComboBoxBase::SetCurSel
-     * @brief    ÉèÖÃµ±Ç°Ñ¡ÖĞ
-     * @param    int iSel -- Ñ¡ÖĞË÷Òı
+     * @brief    è®¾ç½®å½“å‰é€‰ä¸­
+     * @param    int iSel -- é€‰ä¸­ç´¢å¼•
      *
-     * Describe  ÉèÖÃµ±Ç°Ñ¡ÖĞ
+     * Describe  è®¾ç½®å½“å‰é€‰ä¸­
      */
     STDMETHOD_(BOOL, SetCurSel)(THIS_ int iSel) PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨ÏîÎÄ±¾Êı¾İ
-     * @param iItem --Ë÷ÒıºÅ
-     * @param bRawText --»ñÈ¡Ô­Ê¼ÎÄ±¾±êÖ¾
-     * @param[out] str Êä³ö×Ö·û´®¶ÔÏó
-     * @return BOOL TRUE-³É¹¦
-     * @remark bRawTextÎªTRUEÊ±Êä³öÎ´·­ÒëµÄÎÄ±¾
+     * @brief è·å–æŒ‡å®šé¡¹æ–‡æœ¬æ•°æ®
+     * @param iItem --ç´¢å¼•å·
+     * @param bRawText --è·å–åŸå§‹æ–‡æœ¬æ ‡å¿—
+     * @param[out] str è¾“å‡ºå­—ç¬¦ä¸²å¯¹è±¡
+     * @return BOOL TRUE-æˆåŠŸ
+     * @remark bRawTextä¸ºTRUEæ—¶è¾“å‡ºæœªç¿»è¯‘çš„æ–‡æœ¬
      */
     STDMETHOD_(BOOL, GetItemText)(CTHIS_ int iItem, BOOL bRawText, IStringT *str) SCONST PURE;
 
     /**
      * FindString
-     * @brief    ²éÕÒ×Ö·û´®Î»ÖÃ
-     * @param    LPCTSTR pszFind --  ²éÕÒÄ¿±ê
-     * @param    int nAfter --  ¿ªÊ¼Î»ÖÃ
-     * @return   int -- Ä¿±êË÷Òı£¬Ê§°Ü·µ»Ø-1¡£
+     * @brief    æŸ¥æ‰¾å­—ç¬¦ä¸²ä½ç½®
+     * @param    LPCTSTR pszFind --  æŸ¥æ‰¾ç›®æ ‡
+     * @param    int nAfter --  å¼€å§‹ä½ç½®
+     * @return   int -- ç›®æ ‡ç´¢å¼•ï¼Œå¤±è´¥è¿”å›-1ã€‚
      * Describe
      */
     STDMETHOD_(int, FindString)
@@ -2157,38 +2158,38 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
 
     /**
      * SComboBoxBase::DropDown
-     * @brief    ÏÂÀ­ÊÂ¼ş
+     * @brief    ä¸‹æ‹‰äº‹ä»¶
      *
-     * Describe  ÏÂÀ­ÊÂ¼ş
+     * Describe  ä¸‹æ‹‰äº‹ä»¶
      */
     STDMETHOD_(void, DropDown)(THIS) PURE;
 
     /**
      * SComboBoxBase::CloseUp
-     * @brief    ÏÂÀ­¹Ø±Õ
+     * @brief    ä¸‹æ‹‰å…³é—­
      *
-     * Describe  ÏÂÀ­¹Ø±Õ
+     * Describe  ä¸‹æ‹‰å…³é—­
      */
     STDMETHOD_(void, CloseUp)(THIS) PURE;
 
     /**
-     * @brief ²éÑ¯DropDown×´Ì¬±êÖ¾
-     * @return TRUE-µ±Ç°ComboBaseÎªÏÂÀ­ÁĞ±í
-     * @remark ÄÚ²¿Ê¹ÓÃ·½·¨
+     * @brief æŸ¥è¯¢DropDownçŠ¶æ€æ ‡å¿—
+     * @return TRUE-å½“å‰ComboBaseä¸ºä¸‹æ‹‰åˆ—è¡¨
+     * @remark å†…éƒ¨ä½¿ç”¨æ–¹æ³•
      */
     STDMETHOD_(BOOL, IsDropdown)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÏÂÀ­×´Ì¬±êÖ¾
-     * @param bDropdown -- TRUE:ÏÂÀ­ÁĞ±í
+     * @brief è®¾ç½®ä¸‹æ‹‰çŠ¶æ€æ ‡å¿—
+     * @param bDropdown -- TRUE:ä¸‹æ‹‰åˆ—è¡¨
      * @return
-     * @remark ÄÚ²¿Ê¹ÓÃ·½·¨
+     * @remark å†…éƒ¨ä½¿ç”¨æ–¹æ³•
      */
     STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief »ñÈ¡ListView½Ó¿Ú
+     * @brief è·å–ListViewæ¥å£
      * @return IListView *
      */
     STDMETHOD_(IListView *, GetIListView)(THIS) PURE;
@@ -2199,19 +2200,19 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
 DECLARE_INTERFACE_IID_(IDateTimePicker, ICtrl, "6DB1EF42-AED7-4a36-8011-BE2AD7B45953")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -2219,52 +2220,52 @@ DECLARE_INTERFACE_IID_(IDateTimePicker, ICtrl, "6DB1EF42-AED7-4a36-8011-BE2AD7B4
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÉèÖÃÊ±¼ä
-     * @param wYear --Äê
-     * @param wMonth --ÔÂ
-     * @param wDay --ÈÕ
-     * @param wHour --Ê±
-     * @param wMinute --·Ö
-     * @param wSecond --Ãë
+     * @brief è®¾ç½®æ—¶é—´
+     * @param wYear --å¹´
+     * @param wMonth --æœˆ
+     * @param wDay --æ—¥
+     * @param wHour --æ—¶
+     * @param wMinute --åˆ†
+     * @param wSecond --ç§’
      * @return
      */
     STDMETHOD_(void, SetTime)
     (THIS_ WORD wYear, WORD wMonth, WORD wDay, WORD wHour, WORD wMinute, WORD wSecond) PURE;
 
     /**
-     * @brief »ñÈ¡µ±Ç°Ê±¼ä
-     * @param[out] wYear --Äê
-     * @param[out] wMonth --ÔÂ
-     * @param[out] wDay --ÈÕ
-     * @param[out] wHour --Ê±
-     * @param[out] wMinute --·Ö
-     * @param[out] wSecond --Ãë
+     * @brief è·å–å½“å‰æ—¶é—´
+     * @param[out] wYear --å¹´
+     * @param[out] wMonth --æœˆ
+     * @param[out] wDay --æ—¥
+     * @param[out] wHour --æ—¶
+     * @param[out] wMinute --åˆ†
+     * @param[out] wSecond --ç§’
      * @return
      */
     STDMETHOD_(void, GetTime)
     (CTHIS_ WORD * wYear, WORD * wMonth, WORD * wDay, WORD * wHour, WORD * wMinute, WORD * wSecond) SCONST PURE;
 
     /**
-     * @brief ¹Ø±ÕÏÂÀ­ÁĞ±í
+     * @brief å…³é—­ä¸‹æ‹‰åˆ—è¡¨
      * @return
      */
     STDMETHOD_(void, CloseUp)(THIS) PURE;
 
     /**
-     * @brief ÏÔÊ¾ÏÂÀ­ÁĞ±í
+     * @brief æ˜¾ç¤ºä¸‹æ‹‰åˆ—è¡¨
      * @return
      */
     STDMETHOD_(void, DropDown)(THIS) PURE;
 
     /**
-     * @brief Çå³ıÊı¾İ
+     * @brief æ¸…é™¤æ•°æ®
      * @return
      */
     STDMETHOD_(void, Clear)(THIS) PURE;
@@ -2287,19 +2288,19 @@ typedef int(__cdecl *FunTreeSortCallback)(void *pCtx, const void *phItem1, const
 DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -2307,97 +2308,97 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A"
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÏÔÊ¾/Òş²Ø¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief æ˜¾ç¤º/éšè—æ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
     /**
-     * @brief Enable/Disable¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief Enable/Disableæ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõEnable×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è·å–æ»šåŠ¨æ¡EnableçŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return TRUE-enable
      */
     STDMETHOD_(BOOL, IsScrollBarEnable)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÊı¾İ
-     * @param si --¹ö¶¯ÌõÊı¾İ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è®¾ç½®æ»šåŠ¨æ¡æ•°æ®
+     * @param si --æ»šåŠ¨æ¡æ•°æ®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return
      */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nNewPos -- ¹ö¶¯Î»ÖÃ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
+     * @brief è®¾ç½®æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nNewPos -- æ»šåŠ¨ä½ç½®
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
      * @return
      */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return ¹ö¶¯ÌõÎ»ÖÃ
+     * @brief è·å–æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return æ»šåŠ¨æ¡ä½ç½®
      */
     STDMETHOD_(int, GetScrollPos)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nMinPos -- ×îĞ¡Öµ
-     * @param nMaxPos -- ×î´óÖµ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
-     * @return TRUE-³É¹¦
+     * @brief è®¾ç½®æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nMinPos -- æœ€å°å€¼
+     * @param nMaxPos -- æœ€å¤§å€¼
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
+     * @return TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetScrollRange)
     (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param lpMinPos -- ×îĞ¡Öµ
-     * @param lpMaxPos -- ×î´óÖµ
+     * @brief è·å–æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param lpMinPos -- æœ€å°å€¼
+     * @param lpMaxPos -- æœ€å¤§å€¼
      * @return
      */
     STDMETHOD_(BOOL, GetScrollRange)
     (CTHIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
     /**
-     * @brief ²éÑ¯¹ö¶¯ÌõÆôÓÃ×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return TRUE-ÆôÓÃ
+     * @brief æŸ¥è¯¢æ»šåŠ¨æ¡å¯ç”¨çŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return TRUE-å¯ç”¨
      */
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ²åÈëÒ»¸öHSTREEITEM
-     * @param lpszItem --ÏÔÊ¾ÎÄ±¾
-     * @param nImage --Í¼Æ¬Ë÷Òı
-     * @param nSelectedImage --Ñ¡ÖĞ×´Ì¬µÄÍ¼Æ¬Ë÷Òı
-     * @param lParam --×Ô¶¨ÒåÊı¾İ
-     * @param hParent --¸¸HSTREEITEM
-     * @param hInsertAfter --Ç°ÃæµÄĞÖµÜHSTREEITEM
-     * @return HSTREEITEM--ĞÂ²åÈëHSTREEITEM
+     * @brief æ’å…¥ä¸€ä¸ªHSTREEITEM
+     * @param lpszItem --æ˜¾ç¤ºæ–‡æœ¬
+     * @param nImage --å›¾ç‰‡ç´¢å¼•
+     * @param nSelectedImage --é€‰ä¸­çŠ¶æ€çš„å›¾ç‰‡ç´¢å¼•
+     * @param lParam --è‡ªå®šä¹‰æ•°æ®
+     * @param hParent --çˆ¶HSTREEITEM
+     * @param hInsertAfter --å‰é¢çš„å…„å¼ŸHSTREEITEM
+     * @return HSTREEITEM--æ–°æ’å…¥HSTREEITEM
      */
     STDMETHOD_(HSTREEITEM, InsertItem)
     (THIS_ LPCTSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam, HSTREEITEM hParent DEF_VAL(STVI_ROOT), HSTREEITEM hInsertAfter DEF_VAL(STVI_LAST)) PURE;
@@ -2406,172 +2407,172 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A"
     (THIS_ LPCSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam, HSTREEITEM hParent DEF_VAL(STVI_ROOT), HSTREEITEM hInsertAfter DEF_VAL(STVI_LAST)) PURE;
 
     /**
-     * @brief É¾³ıÒ»¸öHSTREEITEM
-     * @param hItem --´ıÉ¾³ıHSTREEITEM
+     * @brief åˆ é™¤ä¸€ä¸ªHSTREEITEM
+     * @param hItem --å¾…åˆ é™¤HSTREEITEM
      * @return BOOL
      */
     STDMETHOD_(BOOL, RemoveItem)(THIS_ HSTREEITEM hItem) PURE;
 
     /**
-     * @brief É¾³ıËùÓĞÊı¾İ
+     * @brief åˆ é™¤æ‰€æœ‰æ•°æ®
      * @return
      */
     STDMETHOD_(void, RemoveAllItems)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡¸ù½Úµã
-     * @return HSTREEITEM --¸ù½Úµã
+     * @brief è·å–æ ¹èŠ‚ç‚¹
+     * @return HSTREEITEM --æ ¹èŠ‚ç‚¹
      */
     STDMETHOD_(HSTREEITEM, GetRootItem)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨½ÚµãµÄÏÂÒ»¸öĞÖµÜ½áµã
-     * @param hItem --Ö¸¶¨½Úµã
-     * @return HSTREEITEM--ÏÂÒ»¸öĞÖµÜ½áµã
+     * @brief è·å–æŒ‡å®šèŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªå…„å¼Ÿç»“ç‚¹
+     * @param hItem --æŒ‡å®šèŠ‚ç‚¹
+     * @return HSTREEITEM--ä¸‹ä¸€ä¸ªå…„å¼Ÿç»“ç‚¹
      */
     STDMETHOD_(HSTREEITEM, GetNextSiblingItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨½ÚµãµÄÉÏÒ»¸öĞÖµÜ½áµã
-     * @param hItem --Ö¸¶¨½Úµã
-     * @return HSTREEITEM--ÉÏÒ»¸öĞÖµÜ½áµã
+     * @brief è·å–æŒ‡å®šèŠ‚ç‚¹çš„ä¸Šä¸€ä¸ªå…„å¼Ÿç»“ç‚¹
+     * @param hItem --æŒ‡å®šèŠ‚ç‚¹
+     * @return HSTREEITEM--ä¸Šä¸€ä¸ªå…„å¼Ÿç»“ç‚¹
      */
     STDMETHOD_(HSTREEITEM, GetPrevSiblingItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨½áµãµÄ×Ó½Úµã
-     * @param hItem --Ö¸¶¨½áµã
-     * @param bFirst -- TRUE£º»ñÈ¡µÚÒ»¸ö×Ó½Úµã£¬FALSE:»ñÈ¡×îºóÒ»¸ö×Ó½Úµã
-     * @return HSTREEITEM--×Ó½Úµã
+     * @brief è·å–æŒ‡å®šç»“ç‚¹çš„å­èŠ‚ç‚¹
+     * @param hItem --æŒ‡å®šç»“ç‚¹
+     * @param bFirst -- TRUEï¼šè·å–ç¬¬ä¸€ä¸ªå­èŠ‚ç‚¹ï¼ŒFALSE:è·å–æœ€åä¸€ä¸ªå­èŠ‚ç‚¹
+     * @return HSTREEITEM--å­èŠ‚ç‚¹
      */
     STDMETHOD_(HSTREEITEM, GetChildItem)
     (CTHIS_ HSTREEITEM hItem, BOOL bFirst DEF_VAL(TRUE)) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨½áµãµÄ¸¸½Úµã
-     * @param hItem --Ö¸¶¨½áµã
-     * @return HSTREEITEM--¸¸½Úµã
+     * @brief è·å–æŒ‡å®šç»“ç‚¹çš„çˆ¶èŠ‚ç‚¹
+     * @param hItem --æŒ‡å®šç»“ç‚¹
+     * @return HSTREEITEM--çˆ¶èŠ‚ç‚¹
      */
     STDMETHOD_(HSTREEITEM, GetParentItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡Ñ¡ÖĞ½áµã
-     * @return HSTREEITEM--Ñ¡ÖĞ½áµã
+     * @brief è·å–é€‰ä¸­ç»“ç‚¹
+     * @return HSTREEITEM--é€‰ä¸­ç»“ç‚¹
      */
     STDMETHOD_(HSTREEITEM, GetSelectedItem)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡ÏÂÒ»¸ö½áµã
-     * @param hItem -- µ±Ç°½áµã
-     * @return HSTREEITEM--ÏÂÒ»¸ö½áµã
-     * @remark ÓĞ×Ó½ÚµãÊ±ÊÇµÚÒ»¸ö×Ó½Úµã£¬·ñÔòÎªÏÂÒ»¸öĞÖµÜ½áµã£¬Ò²Ã»ÓĞĞÖµÜÔòÊÇ¸¸½ÚµãµÄÏÂÒ»¸öĞÖµÜ
+     * @brief è·å–ä¸‹ä¸€ä¸ªç»“ç‚¹
+     * @param hItem -- å½“å‰ç»“ç‚¹
+     * @return HSTREEITEM--ä¸‹ä¸€ä¸ªç»“ç‚¹
+     * @remark æœ‰å­èŠ‚ç‚¹æ—¶æ˜¯ç¬¬ä¸€ä¸ªå­èŠ‚ç‚¹ï¼Œå¦åˆ™ä¸ºä¸‹ä¸€ä¸ªå…„å¼Ÿç»“ç‚¹ï¼Œä¹Ÿæ²¡æœ‰å…„å¼Ÿåˆ™æ˜¯çˆ¶èŠ‚ç‚¹çš„ä¸‹ä¸€ä¸ªå…„å¼Ÿ
      */
     STDMETHOD_(HSTREEITEM, GetNextItem)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief ÅÅĞò×Ó½Úµã
-     * @param hItem --µ±Ç°½Úµã
-     * @param sortFunc --ÅÅĞò»Øµ÷º¯Êı
-     * @param pCtx --»Øµ÷º¯ÊıµÄContext
+     * @brief æ’åºå­èŠ‚ç‚¹
+     * @param hItem --å½“å‰èŠ‚ç‚¹
+     * @param sortFunc --æ’åºå›è°ƒå‡½æ•°
+     * @param pCtx --å›è°ƒå‡½æ•°çš„Context
      * @return
      */
     STDMETHOD_(void, SortChildren)
     (THIS_ HSTREEITEM hItem, FunTreeSortCallback sortFunc, void *pCtx) PURE;
 
     /**
-     * @brief Ñ¡ÖĞÖ¸¶¨Ïî
-     * @param hItem --Ö¸¶¨Ïî
-     * @param bEnsureVisible --×Ô¶¯¹ö¶¯µ½¿É¼ûÇø±êÖ¾
+     * @brief é€‰ä¸­æŒ‡å®šé¡¹
+     * @param hItem --æŒ‡å®šé¡¹
+     * @param bEnsureVisible --è‡ªåŠ¨æ»šåŠ¨åˆ°å¯è§åŒºæ ‡å¿—
      * @return
      */
     STDMETHOD_(BOOL, SelectItem)(THIS_ HSTREEITEM hItem, BOOL bEnsureVisible DEF_VAL(TRUE)) PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨ÏîµÄÎÄ±¾Êı¾İ
-     * @param hItem --Ö¸¶¨Ïî
-     * @param[out] strText --ÎÄ±¾Êı¾İ
+     * @brief è·å–æŒ‡å®šé¡¹çš„æ–‡æœ¬æ•°æ®
+     * @param hItem --æŒ‡å®šé¡¹
+     * @param[out] strText --æ–‡æœ¬æ•°æ®
      * @return BOOL
-     * @remark ²»Ö§³Ö·­Òë
+     * @remark ä¸æ”¯æŒç¿»è¯‘
      */
     STDMETHOD_(BOOL, GetItemText)(CTHIS_ HSTREEITEM hItem, IStringT * strText) SCONST PURE;
     STDMETHOD_(BOOL, GetItemTextA)(CTHIS_ HSTREEITEM hItem, IStringA * strText) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÎÄ±¾Êı¾İ
-     * @param hItem --Ö¸¶¨Ïî
-     * @param lpszItem  --ÎÄ±¾Êı¾İ
+     * @brief è®¾ç½®æ–‡æœ¬æ•°æ®
+     * @param hItem --æŒ‡å®šé¡¹
+     * @param lpszItem  --æ–‡æœ¬æ•°æ®
      * @return BOOL
      */
     STDMETHOD_(BOOL, SetItemText)(THIS_ HSTREEITEM hItem, LPCTSTR lpszItem) PURE;
     STDMETHOD_(BOOL, SetItemTextA)(THIS_ HSTREEITEM hItem, LPCSTR lpszItem) PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨ÏîµÄÍ¼±êÏÔÊ¾Êı¾İ
-     * @param hItem --Ö¸¶¨Ïî
-     * @param nImage --Í¼Æ¬Ë÷Òı
-     * @param nSelectedImage --Ñ¡ÖĞ×´Ì¬Í¼Æ¬Ë÷Òı
+     * @brief è·å–æŒ‡å®šé¡¹çš„å›¾æ ‡æ˜¾ç¤ºæ•°æ®
+     * @param hItem --æŒ‡å®šé¡¹
+     * @param nImage --å›¾ç‰‡ç´¢å¼•
+     * @param nSelectedImage --é€‰ä¸­çŠ¶æ€å›¾ç‰‡ç´¢å¼•
      * @return BOOL
      */
     STDMETHOD_(BOOL, GetItemImage)
     (CTHIS_ HSTREEITEM hItem, int *nImage, int *nSelectedImage) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÖ¸¶¨ÏîµÄÍ¼Æ¬Ë÷Òı
-     * @param hItem --Ö¸¶¨Ïî
-     * @param nImage --Í¼Æ¬Ë÷Òı
-     * @param nSelectedImage --Ñ¡ÖĞ×´Ì¬Í¼Æ¬Ë÷Òı
+     * @brief è®¾ç½®æŒ‡å®šé¡¹çš„å›¾ç‰‡ç´¢å¼•
+     * @param hItem --æŒ‡å®šé¡¹
+     * @param nImage --å›¾ç‰‡ç´¢å¼•
+     * @param nSelectedImage --é€‰ä¸­çŠ¶æ€å›¾ç‰‡ç´¢å¼•
      * @return BOOL
      */
     STDMETHOD_(BOOL, SetItemImage)(THIS_ HSTREEITEM hItem, int nImage, int nSelectedImage) PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨ÏîµÄ×Ô¶¨ÒåÊı¾İ
-     * @param hItem --Ö¸¶¨Ïî
-     * @return LPARAM--×Ô¶¨ÒåÊı¾İ
+     * @brief è·å–æŒ‡å®šé¡¹çš„è‡ªå®šä¹‰æ•°æ®
+     * @param hItem --æŒ‡å®šé¡¹
+     * @return LPARAM--è‡ªå®šä¹‰æ•°æ®
      */
     STDMETHOD_(LPARAM, GetItemData)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÖ¸¶¨ÏîµÄ×Ô¶¨ÒåÊı¾İ
-     * @param hItem --Ö¸¶¨Ïî
-     * @param lParam --×Ô¶¨ÒåÊı¾İ
+     * @brief è®¾ç½®æŒ‡å®šé¡¹çš„è‡ªå®šä¹‰æ•°æ®
+     * @param hItem --æŒ‡å®šé¡¹
+     * @param lParam --è‡ªå®šä¹‰æ•°æ®
      * @return BOOL
      */
     STDMETHOD_(BOOL, SetItemData)(THIS_ HSTREEITEM hItem, LPARAM lParam) PURE;
 
     /**
-     * @brief ²éÑ¯Ö¸¶¨ÏîÊÇ·ñÓĞ×ÓÏî
-     * @param hItem --Ö¸¶¨Ïî
-     * @return BOOL TRUE:ÓĞ×ÓÏî
+     * @brief æŸ¥è¯¢æŒ‡å®šé¡¹æ˜¯å¦æœ‰å­é¡¹
+     * @param hItem --æŒ‡å®šé¡¹
+     * @return BOOL TRUE:æœ‰å­é¡¹
      */
     STDMETHOD_(BOOL, ItemHasChildren)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨ÏîµÄCheck×´Ì¬
-     * @param hItem --Ö¸¶¨Ïî
+     * @brief è·å–æŒ‡å®šé¡¹çš„CheckçŠ¶æ€
+     * @param hItem --æŒ‡å®šé¡¹
      * @return int 0--unchecked,1--checked,2--part checked
      */
     STDMETHOD_(int, GetCheckState)(CTHIS_ HSTREEITEM hItem) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÖ¸¶¨ÏîµÄCheck×´Ì¬
-     * @param hItem --Ö¸¶¨Ïî
+     * @brief è®¾ç½®æŒ‡å®šé¡¹çš„CheckçŠ¶æ€
+     * @param hItem --æŒ‡å®šé¡¹
      * @param bCheck --TRUE:checked
      * @return
      */
     STDMETHOD_(BOOL, SetCheckState)(THIS_ HSTREEITEM hItem, BOOL bCheck) PURE;
 
     /**
-     * @brief Õ¹¿ª»òÕßÊÕËõÖ¸¶¨ÏîµÄ×ÓÏî
-     * @param hItem --Ö¸¶¨Ïî
-     * @param nCode --±êÖ¾Î»
+     * @brief å±•å¼€æˆ–è€…æ”¶ç¼©æŒ‡å®šé¡¹çš„å­é¡¹
+     * @param hItem --æŒ‡å®šé¡¹
+     * @param nCode --æ ‡å¿—ä½
      * @return
      */
     STDMETHOD_(BOOL, Expand)(THIS_ HSTREEITEM hItem, UINT nCode DEF_VAL(TVE_EXPAND)) PURE;
 
     /**
-     * @brief Ê¹Ö¸¶¨Ïî¹ö¶¯µ½¿É¼ûÇø
-     * @param hItem  --Ö¸¶¨Ïî
+     * @brief ä½¿æŒ‡å®šé¡¹æ»šåŠ¨åˆ°å¯è§åŒº
+     * @param hItem  --æŒ‡å®šé¡¹
      * @return
      */
     STDMETHOD_(BOOL, EnsureVisible)(THIS_ HSTREEITEM hItem) PURE;
@@ -2582,19 +2583,19 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A"
 DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -2602,39 +2603,39 @@ DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
      * SHotKeyCtrl::SetRule
-     * @brief    ÉèÖÃ¹æÔò
+     * @brief    è®¾ç½®è§„åˆ™
      * @param    WORD wInvalidComp --
      * @param    WORD wModifier  --
      *
-     * Describe  ÉèÖÃ¹æÔò
+     * Describe  è®¾ç½®è§„åˆ™
      */
     STDMETHOD_(void, SetRule)(THIS_ WORD wInvalidComp, WORD wModifier) PURE;
 
     /**
      * SHotKeyCtrl::SetHotKey
-     * @brief    ÉèÖÃÈÈ¼ü
+     * @brief    è®¾ç½®çƒ­é”®
      * @param    WORD vKey --
      * @param    WORD wModifiers  --
      *
-     * Describe  ÉèÖÃÈÈ¼ü
+     * Describe  è®¾ç½®çƒ­é”®
      */
     STDMETHOD_(void, SetHotKey)(THIS_ WORD wKey, WORD wModifiers) PURE;
 
     /**
      * SHotKeyCtrl::GetHotKey
-     * @brief    »ñÈ¡ÈÈ¼ü
+     * @brief    è·å–çƒ­é”®
      * @param    WORD &vKey --
      * @param    WORD wModifiers  --
      *
-     * Describe  »ñÈ¡ÈÈ¼ü
+     * Describe  è·å–çƒ­é”®
      */
     STDMETHOD_(void, GetHotKey)(CTHIS_ WORD * wKey, WORD * wModifers) SCONST PURE;
 };
@@ -2644,19 +2645,19 @@ DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55
 DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -2664,93 +2665,93 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÏÔÊ¾/Òş²Ø¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief æ˜¾ç¤º/éšè—æ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, ShowScrollBar)(THIS_ int wBar, BOOL bShow) PURE;
 
     /**
-     * @brief Enable/Disable¹ö¶¯Ìõ
-     * @param wBar ¹ö¶¯Ìõ±êÖ¾,see ScrollBarID
-     * @param bShow TRUE-ÏÔÊ¾£¬FALSE-Òş²Ø
+     * @brief Enable/Disableæ»šåŠ¨æ¡
+     * @param wBar æ»šåŠ¨æ¡æ ‡å¿—,see ScrollBarID
+     * @param bShow TRUE-æ˜¾ç¤ºï¼ŒFALSE-éšè—
      * @return
      */
     STDMETHOD_(BOOL, EnableScrollBar)(THIS_ int wBar, BOOL bEnable) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõEnable×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è·å–æ»šåŠ¨æ¡EnableçŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return TRUE-enable
      */
     STDMETHOD_(BOOL, IsScrollBarEnable)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÊı¾İ
-     * @param si --¹ö¶¯ÌõÊı¾İ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
+     * @brief è®¾ç½®æ»šåŠ¨æ¡æ•°æ®
+     * @param si --æ»šåŠ¨æ¡æ•°æ®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
      * @return
      */
     STDMETHOD_(void, SetScrollInfo)(THIS_ SCROLLINFO si, BOOL bVertical) PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nNewPos -- ¹ö¶¯Î»ÖÃ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
+     * @brief è®¾ç½®æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nNewPos -- æ»šåŠ¨ä½ç½®
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
      * @return
      */
     STDMETHOD_(BOOL, SetScrollPos)(THIS_ BOOL bVertical, int nNewPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯ÌõÎ»ÖÃ
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return ¹ö¶¯ÌõÎ»ÖÃ
+     * @brief è·å–æ»šåŠ¨æ¡ä½ç½®
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return æ»šåŠ¨æ¡ä½ç½®
      */
     STDMETHOD_(int, GetScrollPos)(CTHIS_ BOOL bVertical) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param nMinPos -- ×îĞ¡Öµ
-     * @param nMaxPos -- ×î´óÖµ
-     * @param bRedraw -- ÖØ»æ±êÖ¾
-     * @return TRUE-³É¹¦
+     * @brief è®¾ç½®æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param nMinPos -- æœ€å°å€¼
+     * @param nMaxPos -- æœ€å¤§å€¼
+     * @param bRedraw -- é‡ç»˜æ ‡å¿—
+     * @return TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetScrollRange)
     (THIS_ BOOL bVertical, int nMinPos, int nMaxPos, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡¹ö¶¯Ìõ·¶Î§
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @param lpMinPos -- ×îĞ¡Öµ
-     * @param lpMaxPos -- ×î´óÖµ
+     * @brief è·å–æ»šåŠ¨æ¡èŒƒå›´
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @param lpMinPos -- æœ€å°å€¼
+     * @param lpMaxPos -- æœ€å¤§å€¼
      * @return
      */
     STDMETHOD_(BOOL, GetScrollRange)
     (CTHIS_ BOOL bVertical, LPINT lpMinPos, LPINT lpMaxPos) SCONST PURE;
 
     /**
-     * @brief ²éÑ¯¹ö¶¯ÌõÆôÓÃ×´Ì¬
-     * @param bVertical -- TRUE-´¹Ö±¹ö¶¯Ìõ
-     * @return TRUE-ÆôÓÃ
+     * @brief æŸ¥è¯¢æ»šåŠ¨æ¡å¯ç”¨çŠ¶æ€
+     * @param bVertical -- TRUE-å‚ç›´æ»šåŠ¨æ¡
+     * @return TRUE-å¯ç”¨
      */
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
      * IRichEdit::SaveRtf
-     * @brief     ±£´æÊı¾İµ½RTFÎÄ¼ş
-     * @param LPCTSTR pszFileName -- ÎÄ¼şÃû
-     * @return    DWORD Êı¾İ³¤¶È
+     * @brief     ä¿å­˜æ•°æ®åˆ°RTFæ–‡ä»¶
+     * @param LPCTSTR pszFileName -- æ–‡ä»¶å
+     * @return    DWORD æ•°æ®é•¿åº¦
      *
      * Describe
      */
@@ -2758,9 +2759,9 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
 
     /**
      * IRichEdit::LoadRtf
-     * @brief     ´ÓRTFÎÄ¼ş¼ÓÔØÊı¾İ
-     * @param LPCTSTR pszFileName -- ÎÄ¼şÃû
-     * @return    DWORD Êı¾İ³¤¶È
+     * @brief     ä»RTFæ–‡ä»¶åŠ è½½æ•°æ®
+     * @param LPCTSTR pszFileName -- æ–‡ä»¶å
+     * @return    DWORD æ•°æ®é•¿åº¦
      *
      * Describe
      */
@@ -2768,27 +2769,27 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
 
     /**
      * IRichEdit::SetSel
-     * @brief     ÉèÖÃÑ¡ÖĞ
-     * @param     long nStartChar -- ¿ªÊ¼×Ö·ûË÷Òı
-     * @param     long nEndChar -- ½áÊø×Ö·ûË÷Òı
-     * @param     BOOL bNoScroll -- ½ûÖ¹¹ö¶¯±êÖ¾
+     * @brief     è®¾ç½®é€‰ä¸­
+     * @param     long nStartChar -- å¼€å§‹å­—ç¬¦ç´¢å¼•
+     * @param     long nEndChar -- ç»“æŸå­—ç¬¦ç´¢å¼•
+     * @param     BOOL bNoScroll -- ç¦æ­¢æ»šåŠ¨æ ‡å¿—
      *
-     * Describe   ÉèÖÃÑ¡ÖĞ, Ö§³Ö³¬³¤ÎÄ±¾
+     * Describe   è®¾ç½®é€‰ä¸­, æ”¯æŒè¶…é•¿æ–‡æœ¬
      */
     STDMETHOD_(void, SetSel)(THIS_ long nStartChar, long nEndChar, BOOL bNoScroll) PURE;
     /**
      * IRichEdit::ReplaceSel
-     * @brief     Ìæ»»Ñ¡ÖĞÏî
-     * @param     LPCWSTR pszText -- Ìæ»»Êı¾İ
-     * @param     BOOL bCanUndo -- ÔÊĞíUndo±êÖ¾
+     * @brief     æ›¿æ¢é€‰ä¸­é¡¹
+     * @param     LPCWSTR pszText -- æ›¿æ¢æ•°æ®
+     * @param     BOOL bCanUndo -- å…è®¸Undoæ ‡å¿—
      *
-     * Describe   Ìæ»»Ñ¡ÖĞÏî
+     * Describe   æ›¿æ¢é€‰ä¸­é¡¹
      */
     STDMETHOD_(void, ReplaceSel)(THIS_ LPCTSTR pszText, BOOL bCanUndo DEF_VAL(TRUE)) PURE;
     /**
      * IRichEdit::GetWordWrap
      * @brief
-     * @return   ·µ»ØBOOL
+     * @return   è¿”å›BOOL
      *
      * Describe
      */
@@ -2796,7 +2797,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
     /**
      * IRichEdit::SetWordWrap
      * @brief
-     * @param     BOOL fWordWrap -- word wrap±êÖ¾
+     * @param     BOOL fWordWrap -- word wrapæ ‡å¿—
      *
      * Describe
      */
@@ -2804,94 +2805,94 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
 
     /**
      * IRichEdit::GetReadOnly
-     * @brief    ÅĞ¶ÏÊÇ·ñÖ»¶Á
-     * @return   ·µ»ØBOOL
+     * @brief    åˆ¤æ–­æ˜¯å¦åªè¯»
+     * @return   è¿”å›BOOL
      *
-     * Describe  ÅĞ¶ÏÊÇ·ñÖ»¶Á
+     * Describe  åˆ¤æ–­æ˜¯å¦åªè¯»
      */
     STDMETHOD_(BOOL, GetReadOnly)(CTHIS) SCONST PURE;
 
     /**
      * IRichEdit::SetReadOnly
-     * @brief     ÉèÖÃÖ»¶Á
-     * @param     BOOL bReadOnly -- ÊÇ·ñÖ»¶Á
-     * @return    ·µ»ØBOOL
+     * @brief     è®¾ç½®åªè¯»
+     * @param     BOOL bReadOnly -- æ˜¯å¦åªè¯»
+     * @return    è¿”å›BOOL
      *
-     * Describe   ÉèÖÃÖ»¶Á
+     * Describe   è®¾ç½®åªè¯»
      */
     STDMETHOD_(BOOL, SetReadOnly)(THIS_ BOOL bReadOnly) PURE;
 
     /**
      * IRichEdit::GetLimitText
-     * @brief     »ñÈ¡×îĞ¡ÎÄ±¾³¤¶È
-     * @return    ·µ»ØBOOL
+     * @brief     è·å–æœ€å°æ–‡æœ¬é•¿åº¦
+     * @return    è¿”å›BOOL
      *
-     * Describe   »ñÈ¡×îĞ¡ÎÄ±¾³¤¶È
+     * Describe   è·å–æœ€å°æ–‡æœ¬é•¿åº¦
      */
     STDMETHOD_(LONG, GetLimitText)(CTHIS) SCONST PURE;
 
     /**
      * IRichEdit::SetLimitText
-     * @brief     ÉèÖÃ×îĞ¡ÎÄ±¾³¤¶È
-     * @param     int nLength -- ³¤¶È
-     * @return    ·µ»ØBOOL
+     * @brief     è®¾ç½®æœ€å°æ–‡æœ¬é•¿åº¦
+     * @param     int nLength -- é•¿åº¦
+     * @return    è¿”å›BOOL
      *
-     * Describe   ÉèÖÃ×îĞ¡ÎÄ±¾³¤¶È
+     * Describe   è®¾ç½®æœ€å°æ–‡æœ¬é•¿åº¦
      */
     STDMETHOD_(BOOL, SetLimitText)(THIS_ int nLength) PURE;
 
     /**
      * IRichEdit::GetDefaultAlign
-     * @brief     »ñÈ¡¶ÔÆë·½Ê½
-     * @return    ·µ»ØWORD
+     * @brief     è·å–å¯¹é½æ–¹å¼
+     * @return    è¿”å›WORD
      *
-     * Describe   ÉèÖÃ×îĞ¡ÎÄ±¾³¤¶È
+     * Describe   è®¾ç½®æœ€å°æ–‡æœ¬é•¿åº¦
      */
     STDMETHOD_(WORD, GetDefaultAlign)(CTHIS) SCONST PURE;
 
     /**
      * IRichEdit::SetDefaultAlign
-     * @brief     ÉèÖÃÄ¬ÈÏ¶ÔÆë·½Ê½
-     * @param     WORD wNewAlign -- ¶ÔÆë·½Ê½
+     * @brief     è®¾ç½®é»˜è®¤å¯¹é½æ–¹å¼
+     * @param     WORD wNewAlign -- å¯¹é½æ–¹å¼
      *
-     * Describe   ÉèÖÃÄ¬ÈÏ¶ÔÆë·½Ê½
+     * Describe   è®¾ç½®é»˜è®¤å¯¹é½æ–¹å¼
      */
     STDMETHOD_(void, SetDefaultAlign)(THIS_ WORD wNewAlign) PURE;
 
     /**
      * IRichEdit::GetRichTextFlag
-     * @brief     »ñÈ¡±êÖ¾
-     * @return    ·µ»ØBOOL
+     * @brief     è·å–æ ‡å¿—
+     * @return    è¿”å›BOOL
      *
-     * Describe   »ñÈ¡±êÖ¾
+     * Describe   è·å–æ ‡å¿—
      */
     STDMETHOD_(BOOL, GetRichTextFlag)(CTHIS) SCONST PURE;
 
     /**
      * IRichEdit::SetRichTextFlag
-     * @brief     ÉèÖÃ±êÖ¾
-     * @param     BOOL fRich -- ±êÖ¾
+     * @brief     è®¾ç½®æ ‡å¿—
+     * @param     BOOL fRich -- æ ‡å¿—
      *
-     * Describe   ÉèÖÃ±êÖ¾
+     * Describe   è®¾ç½®æ ‡å¿—
      */
     STDMETHOD_(void, SetRichTextFlag)(THIS_ BOOL fRich) PURE;
 
     /**
      * IRichEdit::SetRichTextFlag
-     * @brief     ÉèÖÃ±êÖ¾
-     * @param     BOOL fRich -- ±êÖ¾
-     * @return    ·µ»ØLONG
+     * @brief     è®¾ç½®æ ‡å¿—
+     * @param     BOOL fRich -- æ ‡å¿—
+     * @return    è¿”å›LONG
      *
-     * Describe   ÉèÖÃ±êÖ¾
+     * Describe   è®¾ç½®æ ‡å¿—
      */
     STDMETHOD_(LONG, GetDefaultLeftIndent)(CTHIS) SCONST PURE;
 
     /**
      * IRichEdit::SetDefaultLeftIndent
-     * @brief     ÉèÖÃËõ½ø
-     * @param     LONG lNewIndent -- Ëõ½ø×Ö·ûÊı
+     * @brief     è®¾ç½®ç¼©è¿›
+     * @param     LONG lNewIndent -- ç¼©è¿›å­—ç¬¦æ•°
      *
-     * Describe   ÉèÖÃËõ½ø
+     * Describe   è®¾ç½®ç¼©è¿›
      */
     STDMETHOD_(void, SetDefaultLeftIndent)(THIS_ LONG lNewIndent) PURE;
 
@@ -2899,7 +2900,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
      * IRichEdit::SetSaveSelection
      * @brief
      * @param     BOOL fSaveSelection
-     * @return    ·µ»ØBOOL
+     * @return    è¿”å›BOOL
      *
      * Describe
      */
@@ -2907,11 +2908,11 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
 
     /**
      * IRichEdit::SetDefaultTextColor
-     * @brief     Ä¬ÈÏÎÄ±¾ÑÕÉ«
-     * @param     COLORREF cr -- ÑÕÉ«
-     * @return    ·µ»ØCOLORREF
+     * @brief     é»˜è®¤æ–‡æœ¬é¢œè‰²
+     * @param     COLORREF cr -- é¢œè‰²
+     * @return    è¿”å›COLORREF
      *
-     * Describe   ÉèÖÃÄ¬ÈÏÎÄ±¾ÑÕÉ«
+     * Describe   è®¾ç½®é»˜è®¤æ–‡æœ¬é¢œè‰²
      */
     STDMETHOD_(COLORREF, SetDefaultTextColor)(THIS_ COLORREF cr) PURE;
 };
@@ -2921,19 +2922,19 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
 DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -2941,8 +2942,8 @@ DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
 
@@ -2950,33 +2951,33 @@ DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
 
     /**
      * GetTitle
-     * @brief    »ñÈ¡±êÌâ
-     * @return   LPCTSTR --- ±êÌâ
+     * @brief    è·å–æ ‡é¢˜
+     * @return   LPCTSTR --- æ ‡é¢˜
      *
-     * Describe  »ñÈ¡±êÌâ
+     * Describe  è·å–æ ‡é¢˜
      */
     STDMETHOD_(LPCTSTR, GetTitle)(CTHIS) SCONST PURE;
 
     /**
      * SetTitle
-     * @brief    ÉèÖÃ±êÌâ
-     * @param    LPCTSTR lpszTitle --- ±êÌâ
+     * @brief    è®¾ç½®æ ‡é¢˜
+     * @param    LPCTSTR lpszTitle --- æ ‡é¢˜
      *
-     * Describe  ÉèÖÃ±êÌâ
+     * Describe  è®¾ç½®æ ‡é¢˜
      */
     STDMETHOD_(void, SetTitle)(THIS_ LPCTSTR lpszTitle) PURE;
 
     /**
      * GetIconIndex
-     * @brief    »ñÈ¡Í¼±êË÷Òı
-     * @return   int, Í¼±êË÷Òı
+     * @brief    è·å–å›¾æ ‡ç´¢å¼•
+     * @return   int, å›¾æ ‡ç´¢å¼•
      */
     STDMETHOD_(int, GetIconIndex)(CTHIS) SCONST PURE;
 
     /**
      * SetIconIndex
-     * @brief    ÉèÖÃÍ¼±êË÷Òı
-     * @param    int iIcon -- Í¼±êË÷Òı
+     * @brief    è®¾ç½®å›¾æ ‡ç´¢å¼•
+     * @param    int iIcon -- å›¾æ ‡ç´¢å¼•
      * @return   void
      */
     STDMETHOD_(void, SetIconIndex)(THIS_ int iIcon) PURE;
@@ -2987,19 +2988,19 @@ DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
 DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -3007,98 +3008,98 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
      * ITabCtrl::GetCurSel
-     * @brief    »ñÈ¡µ±Ç°Ñ¡ÖĞ
-     * @return   ·µ»Øint
+     * @brief    è·å–å½“å‰é€‰ä¸­
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡µ±Ç°Ñ¡ÖĞ
+     * Describe  è·å–å½“å‰é€‰ä¸­
      */
     STDMETHOD_(int, GetCurSel)(CTHIS) SCONST PURE;
 
     /**
      * ITabCtrl::SetCurSel
-     * @brief    ÉèÖÃµ±Ç°Ñ¡ÖĞ
-     * @param    int nIndex -- Ë÷Òı
-     * @return   ·µ»ØBOOL
+     * @brief    è®¾ç½®å½“å‰é€‰ä¸­
+     * @param    int nIndex -- ç´¢å¼•
+     * @return   è¿”å›BOOL
      *
-     * Describe  »ñÈ¡µ±Ç°Ñ¡ÖĞ
+     * Describe  è·å–å½“å‰é€‰ä¸­
      */
     STDMETHOD_(BOOL, SetCurSel)(THIS_ int nIndex) PURE;
 
     /**
      * ITabCtrl::SetItemTitle
-     * @brief    ÉèÖÃ±êÌâ
-     * @param    int nIndex  -- Ë÷Òı
-     * @param    LPCTSTR lpszTitle  -- ±êÌâ
-     * @return   ·µ»ØBOOL
+     * @brief    è®¾ç½®æ ‡é¢˜
+     * @param    int nIndex  -- ç´¢å¼•
+     * @param    LPCTSTR lpszTitle  -- æ ‡é¢˜
+     * @return   è¿”å›BOOL
      *
-     * Describe  »ñÈ¡µ±Ç°Ñ¡ÖĞ
+     * Describe  è·å–å½“å‰é€‰ä¸­
      */
     STDMETHOD_(BOOL, SetItemTitle)(THIS_ int nIndex, LPCTSTR lpszTitle) PURE;
 
     /**
      * ITabCtrl::InsertItem
-     * @brief    ²åÈëtabÒ³Ãæ
-     * @param    LPCWSTR lpContent  -- XMLÃèÊöµÄpageĞÅÏ¢
-     * @param    int iInsert  -- Î»ÖÃ
-     * @return   ·µ»Ø²åÈëÎ»ÖÃ
+     * @brief    æ’å…¥tabé¡µé¢
+     * @param    LPCWSTR lpContent  -- XMLæè¿°çš„pageä¿¡æ¯
+     * @param    int iInsert  -- ä½ç½®
+     * @return   è¿”å›æ’å…¥ä½ç½®
      *
-     * Describe  ²åÈëtabÒ³Ãæ
+     * Describe  æ’å…¥tabé¡µé¢
      */
     STDMETHOD_(int, InsertItem)(THIS_ LPCWSTR lpContent, int iInsert /* = -1*/) PURE;
 
     /**
      * ITabCtrl::GetItemCount
-     * @brief    »ñÈ¡tabÒ³ÃæÊı
-     * @return   ·µ»Øint
+     * @brief    è·å–tabé¡µé¢æ•°
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡tabÒ³ÃæÊı
+     * Describe  è·å–tabé¡µé¢æ•°
      */
     STDMETHOD_(int, GetItemCount)(CTHIS) SCONST PURE;
 
     /**
      * ITabCtrl::GetItem
-     * @brief    »ñÈ¡Ö¸¶¨tabÒ³Ãæ
-     * @param    int nIndex -- Ë÷Òı
-     * @return   ·µ»Øint
+     * @brief    è·å–æŒ‡å®štabé¡µé¢
+     * @param    int nIndex -- ç´¢å¼•
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡µ±Ç°Ñ¡ÖĞ
+     * Describe  è·å–å½“å‰é€‰ä¸­
      */
     STDMETHOD_(ITabPage *, GetPage)(THIS_ int nIndex) PURE;
 
     /**
      * ITabCtrl::RemoveItem
-     * @brief    É¾³ıÖ¸¶¨tabÒ³Ãæ
-     * @param    int nIndex -- Ë÷Òı
-     * @param    int nSelPage -- Ñ¡ÖĞÒ³Ãæ
-     * @return   É¾³ıÖ¸¶¨tabÒ³Ãæ
+     * @brief    åˆ é™¤æŒ‡å®štabé¡µé¢
+     * @param    int nIndex -- ç´¢å¼•
+     * @param    int nSelPage -- é€‰ä¸­é¡µé¢
+     * @return   åˆ é™¤æŒ‡å®štabé¡µé¢
      *
-     * Describe  »ñÈ¡µ±Ç°Ñ¡ÖĞ
+     * Describe  è·å–å½“å‰é€‰ä¸­
      */
     STDMETHOD_(BOOL, RemoveItem)(THIS_ int nIndex, int iSelPage /*= 0*/) PURE;
 
     /**
      * ITabCtrl::RemoveAllItems
-     * @brief    É¾³ıËùÓĞÒ³Ãæ
+     * @brief    åˆ é™¤æ‰€æœ‰é¡µé¢
      *
-     * Describe  É¾³ıËùÓĞÒ³Ãæ
+     * Describe  åˆ é™¤æ‰€æœ‰é¡µé¢
      */
     STDMETHOD_(void, RemoveAllItems)(THIS) PURE;
 
     /**
      * ITabCtrl::GetPageIndex
-     * @brief    »ñÈ¡Ö¸¶¨Ò³ÃæµÄË÷Òı
-     * @param    LPCTSTR pszName -- ²éÑ¯×Ö·û´®
+     * @brief    è·å–æŒ‡å®šé¡µé¢çš„ç´¢å¼•
+     * @param    LPCTSTR pszName -- æŸ¥è¯¢å­—ç¬¦ä¸²
      * @param    BOOL bTitle --
-     * TRUE:pszName´ú±íµÄÊÇpageµÄtitleÊôĞÔ,FALSE£ºpszName´ú±íµÄÊÇpageµÄnameÊôĞÔ
-     * @return   ÕÒµ½µÄÒ³ÃæË÷ÒıºÅ
+     * TRUE:pszNameä»£è¡¨çš„æ˜¯pageçš„titleå±æ€§,FALSEï¼špszNameä»£è¡¨çš„æ˜¯pageçš„nameå±æ€§
+     * @return   æ‰¾åˆ°çš„é¡µé¢ç´¢å¼•å·
      *
      * Describe
      */
@@ -3110,19 +3111,19 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
 DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -3130,24 +3131,24 @@ DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief »ñÈ¡ÌáÊ¾×Ö·û´®
-     * @param[out] IStringT *pStr--ÌáÊ¾×Ö·û´®
+     * @brief è·å–æç¤ºå­—ç¬¦ä¸²
+     * @param[out] IStringT *pStr--æç¤ºå­—ç¬¦ä¸²
      * @return void
-     * @remark ÉèÖÃÊ¹ÓÃSetAttribute
+     * @remark è®¾ç½®ä½¿ç”¨SetAttribute
      */
     STDMETHOD_(void, GetCueText)(CTHIS_ IStringT * pStr) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡ÌáÊ¾×Ö·û´®ÑÕÉ«
-     * @return COLORREF--ÌáÊ¾×Ö·û´®ÑÕÉ«
-     * @remark ÉèÖÃÊ¹ÓÃSetAttribute
+     * @brief è·å–æç¤ºå­—ç¬¦ä¸²é¢œè‰²
+     * @return COLORREF--æç¤ºå­—ç¬¦ä¸²é¢œè‰²
+     * @remark è®¾ç½®ä½¿ç”¨SetAttribute
      */
     STDMETHOD_(COLORREF, GetCueColor)(CTHIS) SCONST PURE;
 };
@@ -3157,19 +3158,19 @@ DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560")
 DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A03561F8C")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -3177,43 +3178,43 @@ DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A0356
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ÉèÖÃÖµ
-     * @param nValue --ĞÂÖµ
+     * @brief è®¾ç½®å€¼
+     * @param nValue --æ–°å€¼
      * @return
      */
     STDMETHOD_(void, SetValue)(THIS_ int nValue) PURE;
 
     /**
-     * @brief ÉèÖÃ·¶Î§
-     * @param nMin --×îĞ¡Öµ
-     * @param nMax --×î´óÖµ
+     * @brief è®¾ç½®èŒƒå›´
+     * @param nMin --æœ€å°å€¼
+     * @param nMax --æœ€å¤§å€¼
      * @return
      */
     STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) PURE;
 
     /**
-     * @brief ÉèÖÃ²½³¤
-     * @param nStep --²½³¤
+     * @brief è®¾ç½®æ­¥é•¿
+     * @param nStep --æ­¥é•¿
      * @return
      */
     STDMETHOD_(void, SetStep)(THIS_ UINT nStep) PURE;
 
     /**
-     * @brief »ñÈ¡Öµ
-     * @return int --µ±Ç°Öµ
+     * @brief è·å–å€¼
+     * @return int --å½“å‰å€¼
      */
     STDMETHOD_(int, GetValue)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡¹ØÁªµÄ´°¿Ú¶ÔÏó
-     * @return IWindow *--¹ØÁªµÄ´°¿Ú¶ÔÏó
+     * @brief è·å–å…³è”çš„çª—å£å¯¹è±¡
+     * @return IWindow *--å…³è”çš„çª—å£å¯¹è±¡
      */
     STDMETHOD_(IWindow *, GetIBuddy)(CTHIS) SCONST PURE;
 };
@@ -3223,19 +3224,19 @@ DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A0356
 DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -3243,8 +3244,8 @@ DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
 
@@ -3252,10 +3253,10 @@ DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
 
     /**
      * @brief    SetIcon
-     * @param    HICON hIcon -- Í¼±ê×ÊÔ´¾ä±ú
+     * @param    HICON hIcon -- å›¾æ ‡èµ„æºå¥æŸ„
      * @return   void
      *
-     * Describe  Í¼±ê×ÊÔ´
+     * Describe  å›¾æ ‡èµ„æº
      */
     STDMETHOD_(void, SetIcon)(THIS_ HICON hIcon) PURE;
 };
@@ -3265,19 +3266,19 @@ DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
 DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -3285,8 +3286,8 @@ DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
 
@@ -3304,29 +3305,29 @@ DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
 
     /**
      * SRealWnd::GetRealHwnd
-     * @brief    »ñÈ¡´°¿Ú¾ä±ú
-     * @param    BOOL bAutoCreate -- ×Ô¶¯´´½¨
-     * @return   ·µ»ØHWND
+     * @brief    è·å–çª—å£å¥æŸ„
+     * @param    BOOL bAutoCreate -- è‡ªåŠ¨åˆ›å»º
+     * @return   è¿”å›HWND
      *
-     * Describe  »ñÈ¡´°¿Ú¾ä±ú
+     * Describe  è·å–çª—å£å¥æŸ„
      */
     STDMETHOD_(HWND, GetRealHwnd)(THIS_ BOOL bAutoCreate DEF_VAL(TRUE)) PURE;
 
     /**
      * SRealWnd::SetData
-     * @brief    »ñÈ¡¸½¼ÓÊı¾İ
-     * @param    LPVOID lpData -- ¸½¼ÓÊı¾İ
+     * @brief    è·å–é™„åŠ æ•°æ®
+     * @param    LPVOID lpData -- é™„åŠ æ•°æ®
      *
-     * Describe  »ñÈ¡¸½¼ÓÊı¾İ
+     * Describe  è·å–é™„åŠ æ•°æ®
      */
     STDMETHOD_(void, SetData)(THIS_ LPVOID lpData) PURE;
 
     /**
      * SRealWnd::GetData
-     * @brief    »ñÈ¡¸½¼ÓÊı¾İ
-     * @return   ·µ»ØLPVOID
+     * @brief    è·å–é™„åŠ æ•°æ®
+     * @return   è¿”å›LPVOID
      *
-     * Describe  »ñÈ¡¸½¼ÓÊı¾İ
+     * Describe  è·å–é™„åŠ æ•°æ®
      */
     STDMETHOD_(LPVOID, GetData)(THIS) PURE;
 };
@@ -3344,19 +3345,19 @@ typedef enum _StackViewAniStyle
 DECLARE_INTERFACE_IID_(IStackView, ICtrl, "1A7172D8-F45B-45fe-A73E-2B7F07E7EB70")
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -3364,8 +3365,8 @@ DECLARE_INTERFACE_IID_(IStackView, ICtrl, "1A7172D8-F45B-45fe-A73E-2B7F07E7EB70"
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ×ª»»ÎªIWindow*½Ó¿Ú
-     * @return IWindow*½Ó¿Ú
+     * @brief è½¬æ¢ä¸ºIWindow*æ¥å£
+     * @return IWindow*æ¥å£
      */
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
 
@@ -3379,3 +3380,4 @@ DECLARE_INTERFACE_IID_(IStackView, ICtrl, "1A7172D8-F45B-45fe-A73E-2B7F07E7EB70"
 };
 
 SNSEND
+#endif // __SCTRL_I__H__

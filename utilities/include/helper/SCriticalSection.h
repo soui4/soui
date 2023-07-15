@@ -11,7 +11,8 @@
 * Describe    CriticalSection 包装
 */
 
-#pragma once
+#ifndef __SCRITICALSECTION__H__
+#define __SCRITICALSECTION__H__
 #include <utilities-def.h>
 #include <Windows.h>
 
@@ -45,3 +46,5 @@ namespace SOUI
         SCriticalSection & m_cs;
     };
 }
+
+#endif // __SCRITICALSECTION__H__

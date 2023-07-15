@@ -42,7 +42,7 @@ struct IAxHostDelegate
  * ActiveXSite class
  */
 template<class T>
-class S_NO_VTABLE ActiveXSite : public IOleClientSite,
+class  ActiveXSite : public IOleClientSite,
 	public IOleControlSite,
 	public IOleInPlaceSiteWindowless,
 	public IAdviseSink
@@ -680,7 +680,7 @@ private:
 /**
  * ActiveXContainerImpl
  */
-class S_NO_VTABLE SAxContainer : public IOleContainer,
+class  SAxContainer : public IOleContainer,
 	public IBindHost,
 	public IServiceProvider,
 	public MinimumIDispatchImpl,

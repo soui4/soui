@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SRESPROVIDERMGR_I__H__
+#define __SRESPROVIDERMGR_I__H__
 #include <interface/SResProvider-i.h>
 
 SNSBEGIN
@@ -39,3 +40,4 @@ DECLARE_INTERFACE(IResProviderMgr)
 };
 
 SNSEND
+#endif // __SRESPROVIDERMGR_I__H__

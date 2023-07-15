@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SMENUEX__H__
+#define __SMENUEX__H__
 
 #include <core/shostwnd.h>
 #include <interface/smenuex-i.h>
@@ -178,3 +179,5 @@ class SOUI_EXP SMenuEx
 };
 
 SNSEND
+
+#endif // __SMENUEX__H__

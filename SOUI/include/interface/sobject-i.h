@@ -12,7 +12,8 @@
  *             and implement attributes dispatcher described in XML.
  */
 
-#pragma once
+#ifndef __SOBJECT_I__H__
+#define __SOBJECT_I__H__
 #include <interface/obj-ref-i.h>
 #include <interface/sstring-i.h>
 #include <interface/sxml-i.h>
@@ -22,6 +23,9 @@
 //////////////////////////////////////////////////////////////////////////
 SNSBEGIN
 
+#define WIDESTR_HELPER(x) L##x
+#define WIDESTR(x) WIDESTR_HELPER(#x)
+
 #ifdef __cplusplus
 #define DEF_OBJ_BASE(clsName, clsType) \
     static int GetClassType()          \
@@ -30,7 +34,7 @@ SNSBEGIN
     }                                  \
     static LPCWSTR GetClassName()      \
     {                                  \
-        return L#clsName;              \
+        return WIDESTR(clsName);              \
     }
 #else
 #define DEF_OBJ_BASE(clsName, clsType)
@@ -119,3 +123,5 @@ T *sobj_cast(const IObject *pObj)
 #endif
 
 SNSEND
+
+#endif // __SOBJECT_I__H__

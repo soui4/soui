@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SACCPROXYCMNCTRL__H__
+#define __SACCPROXYCMNCTRL__H__
 
 #include "SAccProxyWindow.h"
 
@@ -70,3 +71,5 @@ class SOUI_EXP SAccProxySlideBar : public SAccProxyProgress {
 };
 #endif
 SNSEND
+
+#endif // __SACCPROXYCMNCTRL__H__

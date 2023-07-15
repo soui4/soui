@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SXML__H__
+#define __SXML__H__
 #include <utilities.h>
 #include <utilities-def.h>
 #include <interface/sxml-i.h>
@@ -358,3 +359,5 @@ public:
 
 
 SNSEND
+
+#endif // __SXML__H__

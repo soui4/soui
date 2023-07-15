@@ -1,4 +1,5 @@
-﻿#pragma  once
+﻿#ifndef __STRCPCVT__H__
+#define __STRCPCVT__H__
 
 #ifndef CP_ACP
 #define CP_ACP 0
@@ -42,3 +43,5 @@ namespace SOUI
 #define S_CW2T S_CW2A
 #define S_CT2W S_CA2W
 #endif // UNICODE
+
+#endif // __STRCPCVT__H__

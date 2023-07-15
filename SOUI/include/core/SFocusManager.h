@@ -11,7 +11,8 @@
  * Describe    SOUI中DUI窗口的焦点管理模块
  */
 
-#pragma once
+#ifndef __SFOCUSMANAGER__H__
+#define __SFOCUSMANAGER__H__
 #include <core/SWnd.h>
 #include <interface/SAccelerator-i.h>
 
@@ -191,3 +192,4 @@ class SOUI_EXP SFocusManager : public IAcceleratorMgr {
 };
 
 SNSEND
+#endif // __SFOCUSMANAGER__H__

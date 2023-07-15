@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __UTILITIES__H__
+#define __UTILITIES__H__
 
 #include "utilities-def.h"
 #include <windows.h>
@@ -13,3 +14,4 @@ void UTILITIES_API SPixelToHiMetric(const SIZEL * lpSizeInPix, LPSIZEL lpSizeInH
 
 int UTILITIES_API Str2Int(LPCWSTR src,BOOL supportHex);
 SNSEND
+#endif // __UTILITIES__H__

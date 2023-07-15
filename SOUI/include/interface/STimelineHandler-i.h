@@ -1,10 +1,11 @@
-#pragma once
+ï»¿#ifndef __STIMELINEHANDLER_I__H__
+#define __STIMELINEHANDLER_I__H__
 #include <utilities-def.h>
 
 SNSBEGIN
 /**
  * @struct     ITimelineHandler
- * @brief      Ê±¼äÖá´¦Àí½Ó¿Ú
+ * @brief      æ—¶é—´è½´å¤„ç†æ¥å£
  *
  * Describe
  */
@@ -13,7 +14,7 @@ SNSBEGIN
 DECLARE_INTERFACE(ITimelineHandler)
 {
     /**
-     * @brief ÏÂÒ»¸ö¶¯»­Ö¡´¦Àí½Ó¿Ú
+     * @brief ä¸‹ä¸€ä¸ªåŠ¨ç”»å¸§å¤„ç†æ¥å£
      * @return
      */
     STDMETHOD_(void, OnNextFrame)(THIS) PURE;
@@ -24,17 +25,18 @@ DECLARE_INTERFACE(ITimelineHandler)
 DECLARE_INTERFACE(ITimelineHandlersMgr)
 {
     /**
-     * @brief ×¢²á¶¯»­Ö¡´¦Àí½Ó¿Ú
-     * @param pHandler ITimelineHandler *--¶¯»­Ö¡´¦Àí½Ó¿Ú
-     * @return TRUE--³É¹¦
+     * @brief æ³¨å†ŒåŠ¨ç”»å¸§å¤„ç†æ¥å£
+     * @param pHandler ITimelineHandler *--åŠ¨ç”»å¸§å¤„ç†æ¥å£
+     * @return TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, RegisterTimelineHandler)(THIS_ ITimelineHandler * pHandler) PURE;
 
     /**
-     * @brief ×¢Ïú¶¯»­Ö¡´¦Àí½Ó¿Ú
-     * @param pHandler ITimelineHandler *--¶¯»­Ö¡´¦Àí½Ó¿Ú
-     * @return TRUE--³É¹¦
+     * @brief æ³¨é”€åŠ¨ç”»å¸§å¤„ç†æ¥å£
+     * @param pHandler ITimelineHandler *--åŠ¨ç”»å¸§å¤„ç†æ¥å£
+     * @return TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler * pHandler) PURE;
 };
 SNSEND
+#endif // __STIMELINEHANDLER_I__H__

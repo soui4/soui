@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SSCROLLBARHANDLER__H__
+#define __SSCROLLBARHANDLER__H__
 SNSBEGIN
 
 struct IScrollBarHost
@@ -104,3 +105,5 @@ class SOUI_EXP SScrollBarHandler : ITimelineHandler {
 };
 
 SNSEND
+
+#endif // __SSCROLLBARHANDLER__H__

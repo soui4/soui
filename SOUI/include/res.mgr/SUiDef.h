@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SUIDEF__H__
+#define __SUIDEF__H__
 #include <core/SSingleton2.h>
 #include <interface/obj-ref-i.h>
 #include <interface/SResProvider-i.h>
@@ -234,3 +235,5 @@ class SOUI_EXP SUiDef : public SSingleton2<SUiDef> {
 };
 
 SNSEND
+
+#endif // __SUIDEF__H__

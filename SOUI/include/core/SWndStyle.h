@@ -10,7 +10,8 @@
  *
  * Describe    SOUI窗口风格管理
  */
-#pragma once
+#ifndef __SWNDSTYLE__H__
+#define __SWNDSTYLE__H__
 
 #include "res.mgr/SDpiAwareFont.h"
 
@@ -127,3 +128,4 @@ class SOUI_EXP SwndStyle {
 };
 
 SNSEND
+#endif // __SWNDSTYLE__H__

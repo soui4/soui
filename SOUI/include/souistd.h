@@ -1,6 +1,4 @@
-﻿#include <core-def.h>
-#include <com-def.h>
-//需要IAccessible接口支持打开下面的宏: 2018.10.17
+﻿//需要IAccessible接口支持打开下面的宏: 2018.10.17
 //#define SOUI_ENABLE_ACC
 
 // Change these values to use different versions
@@ -25,6 +23,9 @@
 #pragma warning(disable : 4251)
 #pragma warning(disable : 4100) // unreferenced formal parameter
 #pragma warning(disable : 4355)
+
+#include <config.h>
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif

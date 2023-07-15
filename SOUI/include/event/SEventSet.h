@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SEVENTSET__H__
+#define __SEVENTSET__H__
 
 #include "SEventSlot.h"
 
@@ -185,3 +186,5 @@ Return whether the EventSet is muted or not.
 };
 
 SNSEND
+
+#endif // __SEVENTSET__H__

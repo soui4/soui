@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SSINGLETONMAP__H__
+#define __SSINGLETONMAP__H__
 #include "SSingleton2.h"
 #include "SCmnMap.h"
 SNSBEGIN
@@ -10,3 +11,4 @@ class SSingletonMap
 };
 
 SNSEND
+#endif // __SSINGLETONMAP__H__

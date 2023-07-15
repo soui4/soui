@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SNCPAINTER_I__H__
+#define __SNCPAINTER_I__H__
 #include <interface/SWindow-i.h>
 
 SNSBEGIN
@@ -13,10 +14,11 @@ DECLARE_INTERFACE_(INcPainter, IObject)
     //--------------------------------------------------------------------------------
 
     /**
-     * @brief »ñÈ¡»æÖÆ·Ç¿Í»§ÇøµÄ¸ù´°¿Ú
+     * @brief è·å–ç»˜åˆ¶éå®¢æˆ·åŒºçš„æ ¹çª—å£
      * @return IWindow *--root
      */
     STDMETHOD_(IWindow *, GetRoot)(THIS) PURE;
 };
 
 SNSEND
+#endif // __SNCPAINTER_I__H__

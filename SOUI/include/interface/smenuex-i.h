@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SMENUEX_I__H__
+#define __SMENUEX_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <interface/sxml-i.h>
@@ -12,17 +13,17 @@ SNSBEGIN
 DECLARE_INTERFACE_(IMenuEx, IObjRef)
 {
 
-    //!Ìí¼ÓÒýÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒýÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -167,3 +168,4 @@ DECLARE_INTERFACE_(IMenuEx, IObjRef)
 EXTERN_C void SOUI_EXP EndMenuEx(int nCmdId);
 
 SNSEND
+#endif // __SMENUEX_I__H__

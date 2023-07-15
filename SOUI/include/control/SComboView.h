@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SCOMBOVIEW__H__
+#define __SCOMBOVIEW__H__
 
 #include "SComboBase.h"
 #include "SListView.h"
@@ -104,3 +105,5 @@ class SOUI_EXP SComboView : public TComboBaseProxy<IComboView> {
 };
 
 SNSEND
+
+#endif // __SCOMBOVIEW__H__

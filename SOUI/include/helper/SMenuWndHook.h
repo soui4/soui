@@ -9,7 +9,8 @@
     Created:    7/4/2003 17:37
   ########################################################################*/
 
-#pragma once
+#ifndef __SMENUWNDHOOK__H__
+#define __SMENUWNDHOOK__H__
 
 SNSBEGIN
 
@@ -54,3 +55,4 @@ class SOUI_EXP SMenuWndHook {
 };
 
 SNSEND
+#endif // __SMENUWNDHOOK__H__

@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SRESPROVIDERMGR__H__
+#define __SRESPROVIDERMGR__H__
 
 #include <interface/sresprovidermgr-i.h>
 #include <atl.mini/scomcli.h>
@@ -84,3 +85,4 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
 };
 
 SNSEND
+#endif // __SRESPROVIDERMGR__H__

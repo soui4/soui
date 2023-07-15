@@ -957,7 +957,7 @@ namespace SOUI
 				RECT rc2 = {x-sz.cy, y, x, y+sz.cx};
 				rc = rc2;
 			}else{
-				RECT rc2 = {0,0, m_curBmp->Width(),m_curBmp->Height()};
+				RECT rc2 = {0,0, (long)m_curBmp->Width(),(long)m_curBmp->Height()};
 				rc = rc2;
 			}
 			DCBuffer dcBuf(m_hdc,&rc,m_curColor.a);

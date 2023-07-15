@@ -3,7 +3,8 @@
 //    Description: Real Container of SWindow
 //////////////////////////////////////////////////////////////////////////
 
-#pragma once
+#ifndef __SHOSTWND__H__
+#define __SHOSTWND__H__
 
 #include <core/SWndContainerImpl.h>
 #include <core/SNativeWnd.h>
@@ -151,6 +152,7 @@ class SOUI_EXP SRootWindow : public SWindow {
     SHostWnd *m_pHostWnd;
 };
 
+class SDummyWnd;
 class SOUI_EXP SHostWnd
     : public TNativeWndProxy<IHostWnd>
     , public SwndContainerImpl
@@ -507,3 +509,4 @@ class SOUI_EXP SHostWnd
 };
 
 SNSEND
+#endif // __SHOSTWND__H__

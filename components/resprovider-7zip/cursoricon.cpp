@@ -724,6 +724,8 @@ done:
 	return hObj;
 }
 
+#define MYFIELD_OFFSET(type, field)    ((LONG)(LONG_PTR)&(((type *)0)->field))
+
 HICON CURSORICON_LoadFromBuf(const BYTE * bits,DWORD filesize,INT width, INT height,BOOL fCursor, UINT loadflags)
 {
 	const CURSORICONFILEDIRENTRY *entry;
@@ -738,7 +740,7 @@ HICON CURSORICON_LoadFromBuf(const BYTE * bits,DWORD filesize,INT width, INT hei
 	}
 
 	dir = (const CURSORICONFILEDIR*) bits;
-	if ( filesize < FIELD_OFFSET( CURSORICONFILEDIR, idEntries[dir->idCount] ))
+	if ( filesize < MYFIELD_OFFSET( CURSORICONFILEDIR, idEntries[dir->idCount] ))
 		return 0;
 
 	if(!(loadflags & LR_MONOCHROME))

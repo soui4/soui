@@ -11,7 +11,8 @@
  * Describe    SOUI加速键管理模块
  */
 
-#pragma once
+#ifndef __SACCELERATOR__H__
+#define __SACCELERATOR__H__
 
 #include <interface/SAccelerator-i.h>
 
@@ -91,3 +92,4 @@ class SOUI_EXP SAccelerator : public IAccelerator {
 };
 
 SNSEND
+#endif // __SACCELERATOR__H__

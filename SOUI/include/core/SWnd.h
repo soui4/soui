@@ -11,7 +11,8 @@
  * Describe    SOUI基础DUI窗口模块
  */
 
-#pragma once
+#ifndef __SWND__H__
+#define __SWND__H__
 #include <core/SWindowMgr.h>
 #include <interface/SwndContainer-i.h>
 #include <interface/slayout-i.h>
@@ -1267,3 +1268,4 @@ class SOUI_EXP SWindow
 };
 
 SNSEND
+#endif // __SWND__H__

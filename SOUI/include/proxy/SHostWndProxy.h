@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SHOSTWNDPROXY__H__
+#define __SHOSTWNDPROXY__H__
 
 SNSBEGIN
 
@@ -381,3 +382,4 @@ public:
 };
 
 SNSEND
+#endif // __SHOSTWNDPROXY__H__

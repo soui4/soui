@@ -13,7 +13,8 @@
  * SOUI的Dialog模块
 */
 
-#pragma once
+#ifndef __SHOSTDIALOG__H__
+#define __SHOSTDIALOG__H__
 
 #include <core/shostwnd.h>
 #include <core/smsgloop.h>
@@ -60,3 +61,4 @@ class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
 };
 
 SNSEND
+#endif // __SHOSTDIALOG__H__

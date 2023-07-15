@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __STILEVIEWITEMLOCATOR_I__H__
+#define __STILEVIEWITEMLOCATOR_I__H__
 #include <interface/SAdapter-i.h>
 
 SNSBEGIN
@@ -7,153 +8,154 @@ SNSBEGIN
 #define INTERFACE ITileViewItemLocator
 DECLARE_INTERFACE_(ITileViewItemLocator, IObjRef)
 {
-    //!Ìí¼ÓÒıÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒıÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     //--------------------------------------------------
 
     /**
-     * @brief ÉèÖÃ¹ØÁªµÄÊÊÅäÆ÷
-     * @param pAdapter ILvAdapter *--ÊÊÅäÆ÷Ö¸Õë
+     * @brief è®¾ç½®å…³è”çš„é€‚é…å™¨
+     * @param pAdapter ILvAdapter *--é€‚é…å™¨æŒ‡é’ˆ
      * @return void
      */
     STDMETHOD_(void, SetAdapter)(THIS_ ILvAdapter * pAdapter) PURE;
 
     /**
-     * @brief Êı¾İ¼¯·¢Éú±ä»¯ºóµÄÏìÓ¦·½·¨
+     * @brief æ•°æ®é›†å‘ç”Ÿå˜åŒ–åçš„å“åº”æ–¹æ³•
      * @return
      */
     STDMETHOD_(void, OnDataSetChanged)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡±íÏî¸ß¶È
-     * @param iItem int -- ±íÏîË÷Òı
-     * @return int--±íÏî¸ß¶È
+     * @brief è·å–è¡¨é¡¹é«˜åº¦
+     * @param iItem int -- è¡¨é¡¹ç´¢å¼•
+     * @return int--è¡¨é¡¹é«˜åº¦
      */
     STDMETHOD_(int, GetItemHeight)(CTHIS_ int iItem) SCONST PURE;
 
     /**
-     * @brief Éè¶¨±íÏîµÄ¸ß¶È
-     * @param iItem int--±íÏîË÷Òı
-     * @param nHeight int--±íÏî¸ß¶È
+     * @brief è®¾å®šè¡¨é¡¹çš„é«˜åº¦
+     * @param iItem int--è¡¨é¡¹ç´¢å¼•
+     * @param nHeight int--è¡¨é¡¹é«˜åº¦
      * @return
      */
     STDMETHOD_(void, SetItemHeight)(THIS_ int iItem, int nHeight) PURE;
 
     /**
-     * @brief »ñÈ¡±íÏîµÄÏÔÊ¾Î»ÖÃ
-     * @param iItem int--±íÏîË÷Òı
-     * @return RECT--±íÏîÏÔÊ¾¾ØĞÎ
-     * @remark »ñÈ¡itemµÄCRect(Ïà¶ÔÓÚTileView)
+     * @brief è·å–è¡¨é¡¹çš„æ˜¾ç¤ºä½ç½®
+     * @param iItem int--è¡¨é¡¹ç´¢å¼•
+     * @return RECT--è¡¨é¡¹æ˜¾ç¤ºçŸ©å½¢
+     * @remark è·å–itemçš„CRect(ç›¸å¯¹äºTileView)
      */
     STDMETHOD_(RECT, GetItemRect)(THIS_ int iItem) PURE;
 
     /**
-     * @brief ÉèÖÃTileView¿í¶È
-     * @param width int--¿í¶È
+     * @brief è®¾ç½®TileViewå®½åº¦
+     * @param width int--å®½åº¦
      * @param bDpiAware BOOL--dpi aware flag
      * @return
-     * @remark ÔÚTileViewµÄOnSizeÖĞµ÷ÓÃ
+     * @remark åœ¨TileViewçš„OnSizeä¸­è°ƒç”¨
      */
     STDMETHOD_(void, SetTileViewWidth)(THIS_ int width, BOOL bDpiAware) PURE;
 
     /**
-     * @brief »ñÈ¡itemµÄĞĞ¡¢ÁĞÎ»ÖÃ
-     * @param iItem int--±íÏîË÷Òı
-     * @param [out] row int*--ĞĞºÅ
-     * @param [out] col int*--ÁĞºÅ
+     * @brief è·å–itemçš„è¡Œã€åˆ—ä½ç½®
+     * @param iItem int--è¡¨é¡¹ç´¢å¼•
+     * @param [out] row int*--è¡Œå·
+     * @param [out] col int*--åˆ—å·
      * @return
      */
     STDMETHOD_(void, GetItemRowAndColIndex)(THIS_ int iItem, int *row, int *col) PURE;
 
     /**
-     * @brief ÊÇ·ñÎªÒ»ĞĞµÄ×îºóÒ»¸öÔªËØ
-     * @param iItem int--±íÏîË÷Òı
-     * @return TRUE--ÊÇ
+     * @brief æ˜¯å¦ä¸ºä¸€è¡Œçš„æœ€åä¸€ä¸ªå…ƒç´ 
+     * @param iItem int--è¡¨é¡¹ç´¢å¼•
+     * @return TRUE--æ˜¯
      */
     STDMETHOD_(BOOL, IsLastInRow)(THIS_ int iItem) PURE;
 
     /**
-     * @brief »ñÈ¡ÉÏÒ»ĞĞ£¬Í¬Ò»ÁĞµÄÔªËØindex
-     * @param iItem int--±íÏîË÷Òı
-     * @return int--ÉÏÒ»ĞĞ£¬Í¬Ò»ÁĞµÄÔªËØindex
+     * @brief è·å–ä¸Šä¸€è¡Œï¼ŒåŒä¸€åˆ—çš„å…ƒç´ index
+     * @param iItem int--è¡¨é¡¹ç´¢å¼•
+     * @return int--ä¸Šä¸€è¡Œï¼ŒåŒä¸€åˆ—çš„å…ƒç´ index
      */
     STDMETHOD_(int, GetUpItem)(THIS_ int iItem) PURE;
 
     /**
-     * @brief »ñÈ¡ÏÂÒ»ĞĞ£¬Í¬Ò»ÁĞµÄÔªËØindex
-     * @param iItem int--±íÏîË÷Òı
-     * @return int--ÏÂÒ»ĞĞ£¬Í¬Ò»ÁĞµÄÔªËØindex
+     * @brief è·å–ä¸‹ä¸€è¡Œï¼ŒåŒä¸€åˆ—çš„å…ƒç´ index
+     * @param iItem int--è¡¨é¡¹ç´¢å¼•
+     * @return int--ä¸‹ä¸€è¡Œï¼ŒåŒä¸€åˆ—çš„å…ƒç´ index
      */
     STDMETHOD_(int, GetDownItem)(THIS_ int iItem) PURE;
 
     /**
-     * @brief ¼ÆËãÁĞ±íÏÔÊ¾×Ü¸ß¶È
-     * @return int--ÁĞ±íÏÔÊ¾×Ü¸ß¶È
+     * @brief è®¡ç®—åˆ—è¡¨æ˜¾ç¤ºæ€»é«˜åº¦
+     * @return int--åˆ—è¡¨æ˜¾ç¤ºæ€»é«˜åº¦
      */
     STDMETHOD_(int, GetTotalHeight)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡±íÏîÔÚ¹ö¶¯ÌõÉÏµÄYÎ»ÖÃ
-     * @param iItem int--±íÏîË÷Òı
-     * @return int--YÖáÎ»ÖÃ
+     * @brief è·å–è¡¨é¡¹åœ¨æ»šåŠ¨æ¡ä¸Šçš„Yä½ç½®
+     * @param iItem int--è¡¨é¡¹ç´¢å¼•
+     * @return int--Yè½´ä½ç½®
      */
     STDMETHOD_(int, Item2Position)(THIS_ int iItem) PURE;
 
     /**
-     * @brief ½«¹ö¶¯ÌõÎ»ÖÃ×ª»»³É±íÏîË÷Òı
-     * @param position int--¹ö¶¯ÌõÎ»ÖÃ
-     * @return int--±íÏîË÷Òı
+     * @brief å°†æ»šåŠ¨æ¡ä½ç½®è½¬æ¢æˆè¡¨é¡¹ç´¢å¼•
+     * @param position int--æ»šåŠ¨æ¡ä½ç½®
+     * @return int--è¡¨é¡¹ç´¢å¼•
      */
     STDMETHOD_(int, Position2Item)(THIS_ int position) PURE;
 
     /**
-     * @brief »ñÈ¡ĞĞ¹ö¶¯¸ß¶È
-     * @return int--ĞĞ¹ö¶¯¸ß¶È
+     * @brief è·å–è¡Œæ»šåŠ¨é«˜åº¦
+     * @return int--è¡Œæ»šåŠ¨é«˜åº¦
      */
     STDMETHOD_(int, GetScrollLineSize)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡ÁĞ±í±ß¾à
-     * @return int--ÁĞ±í±ß¾à
+     * @brief è·å–åˆ—è¡¨è¾¹è·
+     * @return int--åˆ—è¡¨è¾¹è·
      */
     STDMETHOD_(int, GetMarginSize)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ·Å´ó±¶Êı
-     * @param scale int--·Å´ó±¶Êı£¬ÒÔ100Îª»ùÊı
+     * @brief è®¾ç½®æ”¾å¤§å€æ•°
+     * @param scale int--æ”¾å¤§å€æ•°ï¼Œä»¥100ä¸ºåŸºæ•°
      * @return
      */
     STDMETHOD_(int, SetScale)(THIS_ int scale) PURE;
 
     /**
-     * @brief »ñÈ¡ÁĞÊı
-     * @return int--ÁĞÊı
+     * @brief è·å–åˆ—æ•°
+     * @return int--åˆ—æ•°
      */
     STDMETHOD_(int, GetCountInRow)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡ĞĞ¸ß
-     * @return int--ĞĞ¸ß
+     * @brief è·å–è¡Œé«˜
+     * @return int--è¡Œé«˜
      */
     STDMETHOD_(int, GetItemLineHeight)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡±íÏîÏÔÊ¾¿í¶È
-     * @return int--±íÏîÏÔÊ¾¿í¶È
+     * @brief è·å–è¡¨é¡¹æ˜¾ç¤ºå®½åº¦
+     * @return int--è¡¨é¡¹æ˜¾ç¤ºå®½åº¦
      */
     STDMETHOD_(int, GetItemWidth)(CTHIS) SCONST PURE;
 };
 
 SNSEND
+#endif // __STILEVIEWITEMLOCATOR_I__H__

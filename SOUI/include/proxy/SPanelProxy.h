@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SPANELPROXY__H__
+#define __SPANELPROXY__H__
 
 SNSBEGIN
 
@@ -88,3 +89,4 @@ public:
 };
 
 SNSEND
+#endif // __SPANELPROXY__H__

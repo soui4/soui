@@ -9,10 +9,10 @@
 SNSBEGIN
 
 //定义3种系统资源类型
-static const TCHAR KTypeBitmap[] = _T("BITMAP");
-static const TCHAR KTypeCursor[] = _T("CURSOR");
-static const TCHAR KTypeIcon[] = _T("ICON");
-static const TCHAR KTypeHtml[] = _T("HTML");
+const TCHAR KTypeBitmap[] = _T("BITMAP");
+const TCHAR KTypeCursor[] = _T("CURSOR");
+const TCHAR KTypeIcon[] = _T("ICON");
+const TCHAR KTypeHtml[] = _T("HTML");
 
 //////////////////////////////////////////////////////////////////////////
 IBitmapS *SResLoadFromMemory::LoadImage(LPVOID pBuf, size_t size)

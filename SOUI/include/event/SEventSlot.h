@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SEVENTSLOT__H__
+#define __SEVENTSLOT__H__
 
 #include <interface/SEvtArgs-i.h>
 #include <helper/obj-ref-impl.hpp>
@@ -155,3 +156,4 @@ inline FreeFunctionSlot Subscriber(FunCallback pFn, void *ctx)
 }
 
 SNSEND
+#endif // __SEVENTSLOT__H__

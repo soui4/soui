@@ -11,7 +11,8 @@
  * Describe    SOUI系统中使用的单件模块
  */
 
-#pragma once
+#ifndef __SSINGLETON2__H__
+#define __SSINGLETON2__H__
 
 #include <assert.h>
 #include <SApp.h>
@@ -67,3 +68,4 @@ class SSingleton2 {
 };
 
 SNSEND
+#endif // __SSINGLETON2__H__

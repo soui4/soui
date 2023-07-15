@@ -11,7 +11,8 @@
  * Describe
  */
 
-#pragma once
+#ifndef __STRANSLATOR_I__H__
+#define __STRANSLATOR_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <interface/sstring-i.h>
@@ -200,3 +201,4 @@ DECLARE_INTERFACE_(ITranslatorMgr, IObjRef)
 };
 
 SNSEND
+#endif // __STRANSLATOR_I__H__

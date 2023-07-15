@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __STOOLTIP_I__H__
+#define __STOOLTIP_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <interface/smsgloop-i.h>
@@ -111,3 +112,4 @@ DECLARE_INTERFACE_(IToolTipFactory, IObjRef)
 };
 
 SNSEND
+#endif // __STOOLTIP_I__H__

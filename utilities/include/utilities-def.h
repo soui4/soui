@@ -1,4 +1,4 @@
-﻿#include <core-def.h>
+﻿#include <config.h>
 
 #ifdef DLL_CORE
 #ifdef UTILITIES_EXPORTS
@@ -17,7 +17,6 @@
 #endif
 
 #include <ObjBase.h>
-#include <com-def.h>
 
 #ifdef LIB_SOUI_COM
 #define SOUI_COM_API

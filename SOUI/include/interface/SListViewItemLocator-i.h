@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SLISTVIEWITEMLOCATOR_I__H__
+#define __SLISTVIEWITEMLOCATOR_I__H__
 
 #include <interface/SAdapter-i.h>
 
@@ -101,3 +102,4 @@ DECLARE_INTERFACE_(IListViewItemLocator, IObjRef)
 };
 
 SNSEND
+#endif // __SLISTVIEWITEMLOCATOR_I__H__

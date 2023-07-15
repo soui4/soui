@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SNOTIFYCENTER_I__H__
+#define __SNOTIFYCENTER_I__H__
 #include <utilities-def.h>
 #include <interface/SEvtArgs-i.h>
 #include <interface/STaskLoop-i.h>
@@ -13,29 +14,29 @@ DECLARE_INTERFACE(INotifyCenter)
 {
     /**
      * FireEventSync
-     * @brief    ´¥·¢Ò»¸öÍ¬²½Í¨ÖªÊÂ¼ş
-     * @param    EventArgs *e -- ÊÂ¼ş¶ÔÏó
+     * @brief    è§¦å‘ä¸€ä¸ªåŒæ­¥é€šçŸ¥äº‹ä»¶
+     * @param    EventArgs *e -- äº‹ä»¶å¯¹è±¡
      * @return
      *
-     * Describe  Ö»ÄÜÔÚUIÏß³ÌÖĞµ÷ÓÃ
+     * Describe  åªèƒ½åœ¨UIçº¿ç¨‹ä¸­è°ƒç”¨
      */
     STDMETHOD_(void, FireEventSync)(THIS_ IEvtArgs * e) PURE;
 
     /**
      * FireEventAsync
-     * @brief    ´¥·¢Ò»¸öÒì²½Í¨ÖªÊÂ¼ş
-     * @param    EventArgs *e -- ÊÂ¼ş¶ÔÏó
+     * @brief    è§¦å‘ä¸€ä¸ªå¼‚æ­¥é€šçŸ¥äº‹ä»¶
+     * @param    EventArgs *e -- äº‹ä»¶å¯¹è±¡
      * @return
      *
-     * Describe  ¿ÉÒÔÔÚ·ÇUIÏß³ÌÖĞµ÷ÓÃ£¬EventArgs
-     * *e±ØĞëÊÇ´Ó¶ÑÉÏ·ÖÅäµÄÄÚ´æ£¬µ÷ÓÃºóÊ¹ÓÃReleaseÊÍ·ÅÒıÓÃ¼ÆÊı
+     * Describe  å¯ä»¥åœ¨éUIçº¿ç¨‹ä¸­è°ƒç”¨ï¼ŒEventArgs
+     * *eå¿…é¡»æ˜¯ä»å †ä¸Šåˆ†é…çš„å†…å­˜ï¼Œè°ƒç”¨åä½¿ç”¨Releaseé‡Šæ”¾å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(void, FireEventAsync)(THIS_ IEvtArgs * e) PURE;
 
     /**
      * RegisterEventMap
-     * @brief    ×¢²áÒ»¸ö´¦ÀíÍ¨ÖªµÄ¶ÔÏó
-     * @param    const ISlotFunctor *slot -- ÊÂ¼ş´¦Àí¶ÔÏó
+     * @brief    æ³¨å†Œä¸€ä¸ªå¤„ç†é€šçŸ¥çš„å¯¹è±¡
+     * @param    const ISlotFunctor *slot -- äº‹ä»¶å¤„ç†å¯¹è±¡
      * @return
      *
      * Describe
@@ -44,8 +45,8 @@ DECLARE_INTERFACE(INotifyCenter)
 
     /**
      * RegisterEventMap
-     * @brief    ×¢ÏúÒ»¸ö´¦ÀíÍ¨ÖªµÄ¶ÔÏó
-     * @param    const ISlotFunctor *slot -- ÊÂ¼ş´¦Àí¶ÔÏó
+     * @brief    æ³¨é”€ä¸€ä¸ªå¤„ç†é€šçŸ¥çš„å¯¹è±¡
+     * @param    const ISlotFunctor *slot -- äº‹ä»¶å¤„ç†å¯¹è±¡
      * @return
      *
      * Describe
@@ -55,8 +56,8 @@ DECLARE_INTERFACE(INotifyCenter)
     /**
      * RunOnUI
      * @brief
-     * @param    IRunnable * pRunnable -- runnableÖ´ĞĞÌå
-     * @param    BOOL bSync -- Í¬²½Ö´ĞĞ±êÖ¾
+     * @param    IRunnable * pRunnable -- runnableæ‰§è¡Œä½“
+     * @param    BOOL bSync -- åŒæ­¥æ‰§è¡Œæ ‡å¿—
      * @return
      *
      * Describe
@@ -69,7 +70,7 @@ DECLARE_INTERFACE(INotifyCenter)
      * @param    FunRunOnUI fun -- callback function
      * @param    WPARAM wp -- param 1
      * @param    LPARAM wp -- param 2
-     * @param    BOOL bSync -- Í¬²½Ö´ĞĞ±êÖ¾
+     * @param    BOOL bSync -- åŒæ­¥æ‰§è¡Œæ ‡å¿—
      * @return
      *
      * Describe
@@ -78,3 +79,4 @@ DECLARE_INTERFACE(INotifyCenter)
 };
 
 SNSEND
+#endif // __SNOTIFYCENTER_I__H__

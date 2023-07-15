@@ -10,7 +10,8 @@
  *
  * Describe    interface of SSkinObj
  */
-#pragma once
+#ifndef __SSKINOBJ_I__H__
+#define __SSKINOBJ_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <interface/SRender-i.h>
@@ -142,3 +143,4 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
 };
 
 SNSEND
+#endif // __SSKINOBJ_I__H__

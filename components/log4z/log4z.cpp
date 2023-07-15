@@ -65,7 +65,7 @@
 #include <libproc.h>
 #endif
 
-
+#include <algorithm>
 #include <string>
 #include <iostream>
 #include <fstream>

@@ -1,10 +1,11 @@
-﻿#pragma once
+﻿#ifndef __SACTIVEX__H__
+#define __SACTIVEX__H__
 #include "core/SWnd.h"
-#include "activex/flash10t.tlh"
 #include <mshtmhst.h>
 
 SNSBEGIN
 
+class SAxContainerImpl;
 class SOUI_EXP SActiveX : public SWindow {
     friend class SAxContainerImpl;
 
@@ -68,30 +69,6 @@ class SOUI_EXP SActiveX : public SWindow {
     BOOL m_bDelayInit;
 };
 
-class SOUI_EXP SFlashCtrl : public SActiveX {
-  public:
-    DEF_SOBJECT(SActiveX, L"flash")
-    SFlashCtrl();
-
-    ShockwaveFlashObjects::IShockwaveFlash *GetFlashInterface() const
-    {
-        return flash_;
-    }
-
-    BOOL Play(LPCWSTR pszUrl);
-
-  protected:
-    virtual void OnAxActivate(IUnknown *pUnknwn);
-
-    HRESULT OnAttrUrl(const SStringW &strValue, BOOL bLoading);
-
-    SOUI_ATTRS_BEGIN()
-        ATTR_CUSTOM(L"url", OnAttrUrl)
-    SOUI_ATTRS_END()
-
-    SStringW m_strUrl;
-
-    SComQIPtr<ShockwaveFlashObjects::IShockwaveFlash> flash_;
-};
-
 SNSEND
+
+#endif // __SACTIVEX__H__

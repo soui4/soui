@@ -1,7 +1,7 @@
 ﻿#ifndef __TSTRINGA_H__
 #define __TSTRINGA_H__
 
-#pragma once
+
 
 #include <windows.h>
 #include <utilities-def.h>

@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2006 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef __STRANSFORMATION__H__
+#define __STRANSFORMATION__H__
 #include <interface/SRender-i.h>
 #include <matrix/SMatrix.h>
 #include <interface/STransform-i.h>
@@ -106,3 +107,4 @@ class SOUI_EXP STransformation : public ITransformation {
 };
 
 SNSEND
+#endif // __STRANSFORMATION__H__

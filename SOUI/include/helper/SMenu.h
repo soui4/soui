@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SMENU__H__
+#define __SMENU__H__
 
 #include <sobject/Sobject.hpp>
 #include <core/SNativeWnd.h>
@@ -163,12 +164,12 @@ class SOwnerDraw {
             // return default height for a system font
             T *pT = static_cast<T *>(this);
             HWND hWnd = pT->GetDlgItem(lpMeasureItemStruct->CtlID);
-            HDC dc = GetDC(hWnd);
+            HDC dc = ::GetDC(hWnd);
             TEXTMETRIC tm = { 0 };
             GetTextMetrics(dc, &tm);
 
             lpMeasureItemStruct->itemHeight = tm.tmHeight;
-            ReleaseDC(dc);
+            ::ReleaseDC(hWnd,dc);
         }
         else
             lpMeasureItemStruct->itemHeight = ::GetSystemMetrics(SM_CYMENU);
@@ -293,3 +294,4 @@ class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
 };
 
 SNSEND
+#endif // __SMENU__H__

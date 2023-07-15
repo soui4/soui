@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SOBJFACTORY_I__H__
+#define __SOBJFACTORY_I__H__
 #include <interface/obj-ref-i.h>
 SNSBEGIN
 
@@ -15,19 +16,19 @@ typedef struct _SObjectInfo
 DECLARE_INTERFACE_(IObjectFactory, IObjRef)
 {
     /**
-     * @brief Ôö¼ÓÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å¢åŠ å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief ¼õÉÙÒıÓÃ¼ÆÊı
-     * @return ĞÂÒıÓÃ¼ÆÊı
+     * @brief å‡å°‘å¼•ç”¨è®¡æ•°
+     * @return æ–°å¼•ç”¨è®¡æ•°
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·Å¶ÔÏó
+     * @brief é‡Šæ”¾å¯¹è±¡
      * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -39,3 +40,4 @@ DECLARE_INTERFACE_(IObjectFactory, IObjRef)
 };
 
 SNSEND
+#endif // __SOBJFACTORY_I__H__

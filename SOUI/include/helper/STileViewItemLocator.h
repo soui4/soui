@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __STILEVIEWITEMLOCATOR__H__
+#define __STILEVIEWITEMLOCATOR__H__
 #include <interface/STileViewItemLocator-i.h>
 
 SNSBEGIN
@@ -67,3 +68,5 @@ class SOUI_EXP STileViewItemLocator : public TObjRefImpl<ITileViewItemLocator> {
 };
 
 SNSEND
+
+#endif // __STILEVIEWITEMLOCATOR__H__

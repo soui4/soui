@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SWINDOW_I__H__
+#define __SWINDOW_I__H__
 
 #include <interface/sobject-i.h>
 #include <interface/sstring-i.h>
@@ -14,7 +15,7 @@ typedef struct ILayoutParam ILayoutParam;
 typedef struct IWindow IWindow;
 
 /************************************************************************/
-/* Í³Ò»¶¨ÒåsouiÖĞÊ¹ÓÃµ½µÄ×Ô¶¨ÒåÏûÏ¢                                                                     */
+/* ç»Ÿä¸€å®šä¹‰souiä¸­ä½¿ç”¨åˆ°çš„è‡ªå®šä¹‰æ¶ˆæ¯                                                                     */
 /************************************************************************/
 enum
 {
@@ -24,11 +25,11 @@ enum
 	UM_SETCOLORIZE,
 	UM_UPDATEFONT,
 	UM_GETDESIREDSIZE,// wp=parent wid,lp=parent hei, return size
-	UM_MENUEVENT,	//Ä£Äâ²Ëµ¥¿Ø¼şÊÂ¼ş£¬wparam:0, lparam:EventArg *
-	SPYMSG_BASE = UM_SOUI_BEGIN + 50,	//ºÍÀÏ°æ±¾±£³ÖÒ»ÖÂ(10000+1000)
-	SPYMSG_SETSPY = SPYMSG_BASE,  //ÉèÖÃSPYÏûÏ¢½ÓÊÕ´°¿Ú¾ä±ú
-	SPYMSG_SWNDENUM,//Ã¶¾Ù´°¿ÚÁĞ±í,wparam:SWND,lparam:SWindow::GetWindow
-	SPYMSG_SWNDINFO,//»ñÈ¡´°¿ÚÊôĞÔ£¬wparam:swnd
+	UM_MENUEVENT,	//æ¨¡æ‹Ÿèœå•æ§ä»¶äº‹ä»¶ï¼Œwparam:0, lparam:EventArg *
+	SPYMSG_BASE = UM_SOUI_BEGIN + 50,	//å’Œè€ç‰ˆæœ¬ä¿æŒä¸€è‡´(10000+1000)
+	SPYMSG_SETSPY = SPYMSG_BASE,  //è®¾ç½®SPYæ¶ˆæ¯æ¥æ”¶çª—å£å¥æŸ„
+	SPYMSG_SWNDENUM,//æšä¸¾çª—å£åˆ—è¡¨,wparam:SWND,lparam:SWindow::GetWindow
+	SPYMSG_SWNDINFO,//è·å–çª—å£å±æ€§ï¼Œwparam:swnd
 	SPYMSG_HITTEST,// lparam:pos
 	UM_SOUI_END,
 };
@@ -45,278 +46,278 @@ DECLARE_INTERFACE_(IWindow, IObject)
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief ²éÑ¯¿Ø¼ş½Ó¿Ú
-     * @param id REFGUID--¿Ø¼ş½Ó¿ÚID
-     * @param [out] ppRet IObjRef * *--¿Ø¼ş½Ó¿Ú
-     * @return S_OK--³É¹¦
+     * @brief æŸ¥è¯¢æ§ä»¶æ¥å£
+     * @param id REFGUID--æ§ä»¶æ¥å£ID
+     * @param [out] ppRet IObjRef * *--æ§ä»¶æ¥å£
+     * @return S_OK--æˆåŠŸ
      */
     STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppRet) PURE;
 
     /**
-     * @brief »ñÈ¡¿Ø¼şÈİÆ÷½Ó¿Ú
-     * @return ISwndContainer *--¿Ø¼şÈİÆ÷½Ó¿Ú
+     * @brief è·å–æ§ä»¶å®¹å™¨æ¥å£
+     * @return ISwndContainer *--æ§ä»¶å®¹å™¨æ¥å£
      */
     STDMETHOD_(ISwndContainer *, GetContainer)(THIS) PURE;
 
     /**
-     * @brief ÉèÖÃ¿Ø¼şÈİÆ÷½Ó¿Ú
-     * @param pContainer ISwndContainer *--¿Ø¼şÈİÆ÷½Ó¿Ú
+     * @brief è®¾ç½®æ§ä»¶å®¹å™¨æ¥å£
+     * @param pContainer ISwndContainer *--æ§ä»¶å®¹å™¨æ¥å£
      * @return
-     * @remark ÄÚ²¿µ÷ÓÃ
+     * @remark å†…éƒ¨è°ƒç”¨
      */
     STDMETHOD_(void, SetContainer)(THIS_ ISwndContainer * pContainer) PURE;
 
     /**
-     * @brief »ñÈ¡SOUIÈİÆ÷¾ä±ú
-     * @return SWND--SOUIÈİÆ÷¾ä±ú
+     * @brief è·å–SOUIå®¹å™¨å¥æŸ„
+     * @return SWND--SOUIå®¹å™¨å¥æŸ„
      */
     STDMETHOD_(SWND, GetSwnd)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡²¼¾Ö¶ÔÏó
-     * @return ILayout *--²¼¾Ö¶ÔÏó
+     * @brief è·å–å¸ƒå±€å¯¹è±¡
+     * @return ILayout *--å¸ƒå±€å¯¹è±¡
      */
     STDMETHOD_(ILayout *, GetLayout)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡²¼¾Ö²ÎÊı¶ÔÏó
-     * @return ILayoutParam *--²¼¾Ö²ÎÊı¶ÔÏó
+     * @brief è·å–å¸ƒå±€å‚æ•°å¯¹è±¡
+     * @return ILayoutParam *--å¸ƒå±€å‚æ•°å¯¹è±¡
      */
     STDMETHOD_(ILayoutParam *, GetLayoutParam)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ²¼¾Ö²ÎÊı¶ÔÏó
-     * @param pLayoutParam ILayoutParam *--²¼¾Ö²ÎÊı¶ÔÏó
-     * @return TRUE--³É¹¦£¬FALSE--Ê§°Ü
-     * @remark Ö»ÓĞ²¼¾Ö²ÎÊı¶ÔÏóºÍ´°¿ÚµÄ²¼¾ÖÀàĞÍÆ¥Åä²Å»áÉèÖÃ³É¹¦
+     * @brief è®¾ç½®å¸ƒå±€å‚æ•°å¯¹è±¡
+     * @param pLayoutParam ILayoutParam *--å¸ƒå±€å‚æ•°å¯¹è±¡
+     * @return TRUE--æˆåŠŸï¼ŒFALSE--å¤±è´¥
+     * @remark åªæœ‰å¸ƒå±€å‚æ•°å¯¹è±¡å’Œçª—å£çš„å¸ƒå±€ç±»å‹åŒ¹é…æ‰ä¼šè®¾ç½®æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetLayoutParam)(THIS_ ILayoutParam * pLayoutParam) PURE;
 
     /**
-     * @brief »ñÈ¡µ±Ç°´°¿Ú²ÎÓë×Ô¶¯²¼¾Ö±êÖ¾
-     * @return TRUE--²ÎÓë²¼¾Ö,FALSE--²»²ÎÓë²¼¾Ö£¬ĞèÒªÓÃ»§ÔÚ´úÂëÖĞÊÖ¶¯²¼¾Ö
+     * @brief è·å–å½“å‰çª—å£å‚ä¸è‡ªåŠ¨å¸ƒå±€æ ‡å¿—
+     * @return TRUE--å‚ä¸å¸ƒå±€,FALSE--ä¸å‚ä¸å¸ƒå±€ï¼Œéœ€è¦ç”¨æˆ·åœ¨ä»£ç ä¸­æ‰‹åŠ¨å¸ƒå±€
      */
     STDMETHOD_(BOOL, IsFloat)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡Òş²ØÕ¼Î»±êÖ¾
-     * @return TRUE--´°¿ÚÒş²ØµÄÊ±ºòÕ¼ÓĞ¸Ã²¼¾ÖÎ»ÖÃ£¬FALSE--Òş²ØÊ±²»Õ¼Î»
+     * @brief è·å–éšè—å ä½æ ‡å¿—
+     * @return TRUE--çª—å£éšè—çš„æ—¶å€™å æœ‰è¯¥å¸ƒå±€ä½ç½®ï¼ŒFALSE--éšè—æ—¶ä¸å ä½
      */
     STDMETHOD_(BOOL, IsDisplay)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚÊÇ·ñ´¦ÀíÊó±êÏûÏ¢
-     * @return TRUE--Êó±êÏûÏ¢Í¸´«¸ø¸¸´°¿Ú
+     * @brief è·å–çª—å£æ˜¯å¦å¤„ç†é¼ æ ‡æ¶ˆæ¯
+     * @return TRUE--é¼ æ ‡æ¶ˆæ¯é€ä¼ ç»™çˆ¶çª—å£
      */
     STDMETHOD_(BOOL, IsMsgTransparent)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚÊÇ·ñ×Ô¶¯¼ô²Ã¿Í»§Çø
-     * @return TRUE--×Ô¶¯¼ô²Ã¿Í»§Çø
-     * @remark ¼ô²Ã¿Í»§Çø¿ÉÒÔÏŞÖÆ´°¿Ú¼°ËüµÄ×Ó´°¿Ú»æÖÆ²»³¬¹ıµ±Ç°´°¿Ú¿Í»§Çø£¬µ«ÊÇÒªÔö¼ÓÒ»´Î¼ô²Ã²Ù×÷
+     * @brief è·å–çª—å£æ˜¯å¦è‡ªåŠ¨å‰ªè£å®¢æˆ·åŒº
+     * @return TRUE--è‡ªåŠ¨å‰ªè£å®¢æˆ·åŒº
+     * @remark å‰ªè£å®¢æˆ·åŒºå¯ä»¥é™åˆ¶çª—å£åŠå®ƒçš„å­çª—å£ç»˜åˆ¶ä¸è¶…è¿‡å½“å‰çª—å£å®¢æˆ·åŒºï¼Œä½†æ˜¯è¦å¢åŠ ä¸€æ¬¡å‰ªè£æ“ä½œ
      */
     STDMETHOD_(BOOL, IsClipClient)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃtooltip
-     * @param pszText LPCTSTR--tooltip×Ö·û´®
+     * @brief è®¾ç½®tooltip
+     * @param pszText LPCTSTR--tooltipå­—ç¬¦ä¸²
      * @return
-     * @remark Ö§³Ö¶àÓïÑÔ
+     * @remark æ”¯æŒå¤šè¯­è¨€
      */
     STDMETHOD_(void, SetToolTipText)(THIS_ LPCTSTR pszText) PURE;
 
     /**
-     * @brief ÉèÖÃtooltip
-     * @param pszText LPCSTR--tooltip×Ö·û´®
+     * @brief è®¾ç½®tooltip
+     * @param pszText LPCSTR--tooltipå­—ç¬¦ä¸²
      * @return
-     * @remark Ö§³Ö¶àÓïÑÔ
+     * @remark æ”¯æŒå¤šè¯­è¨€
      */
     STDMETHOD_(void, SetToolTipTextA)(THIS_ LPCSTR pszText) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚµÄcheck×´Ì¬±êÖ¾
+     * @brief è·å–çª—å£çš„checkçŠ¶æ€æ ‡å¿—
      * @return TRUE--checked
      */
     STDMETHOD_(BOOL, IsChecked)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ´°¿Úcheck×´Ì¬
-     * @param bCheck BOOL--check×´Ì¬
+     * @brief è®¾ç½®çª—å£checkçŠ¶æ€
+     * @param bCheck BOOL--checkçŠ¶æ€
      * @return
      */
     STDMETHOD_(void, SetCheck)(THIS_ BOOL bCheck) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚµÄ½ûÓÃ×´Ì¬
-     * @return TRUE--´°¿Ú½ûÓÃ
+     * @brief è·å–çª—å£çš„ç¦ç”¨çŠ¶æ€
+     * @return TRUE--çª—å£ç¦ç”¨
      */
     STDMETHOD_(BOOL, IsDisabled)(CTHIS_ BOOL bCheckParent) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ´°¿ÚÆôÓÃ×´Ì¬
-     * @param bEnable BOOL--ÆôÓÃ´°¿Ú
-     * @param bUpdate BOOL--Í¬Ê±Ë¢ĞÂ´°¿Ú±êÖ¾
+     * @brief è®¾ç½®çª—å£å¯ç”¨çŠ¶æ€
+     * @param bEnable BOOL--å¯ç”¨çª—å£
+     * @param bUpdate BOOL--åŒæ—¶åˆ·æ–°çª—å£æ ‡å¿—
      * @return
      */
     STDMETHOD_(void, EnableWindow)(THIS_ BOOL bEnable, BOOL bUpdate) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚµÄ¿É¼û±êÖ¾
-     * @return TRUE--¿É¼û
+     * @brief è·å–çª—å£çš„å¯è§æ ‡å¿—
+     * @return TRUE--å¯è§
      */
     STDMETHOD_(BOOL, IsVisible)(CTHIS_ BOOL bCheckParent) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ´°¿Ú¿É¼û±êÖ¾
-     * @param bVisible BOOL--¿É¼ûĞÔ
-     * @param bUpdate  BOOL--Í¬Ê±Ë¢ĞÂ´°¿Ú±êÖ¾
+     * @brief è®¾ç½®çª—å£å¯è§æ ‡å¿—
+     * @param bVisible BOOL--å¯è§æ€§
+     * @param bUpdate  BOOL--åŒæ—¶åˆ·æ–°çª—å£æ ‡å¿—
      * @return
      */
     STDMETHOD_(void, SetVisible)(THIS_ BOOL bVisible, BOOL bUpdate) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚµÄÓÃ»§Êı¾İ
-     * @return ULONG_PTR--ÓÃ»§Êı¾İ
+     * @brief è·å–çª—å£çš„ç”¨æˆ·æ•°æ®
+     * @return ULONG_PTR--ç”¨æˆ·æ•°æ®
      */
     STDMETHOD_(ULONG_PTR, GetUserData)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ´°¿ÚÓÃ»§Êı¾İ
-     * @param uData ULONG_PTR--ĞÂÓÃ»§Êı¾İ
-     * @return ULONG_PTR--Ô­ÓÃ»§Êı¾İ
+     * @brief è®¾ç½®çª—å£ç”¨æˆ·æ•°æ®
+     * @param uData ULONG_PTR--æ–°ç”¨æˆ·æ•°æ®
+     * @return ULONG_PTR--åŸç”¨æˆ·æ•°æ®
      */
     STDMETHOD_(ULONG_PTR, SetUserData)(THIS_ ULONG_PTR uData) PURE;
 
     /**
-     * @brief Ö´ĞĞµ÷É«
-     * @param cr COLORREF--Ä¿±êÉ«µ÷
+     * @brief æ‰§è¡Œè°ƒè‰²
+     * @param cr COLORREF--ç›®æ ‡è‰²è°ƒ
      * @return
      */
     STDMETHOD_(void, DoColorize)(THIS_ COLORREF cr) PURE;
 
     /**
-     * @brief »ñÈ¡µ±Ç°µ÷É«µÄÉ«µ÷
-     * @return COLORREF--É«µ÷
+     * @brief è·å–å½“å‰è°ƒè‰²çš„è‰²è°ƒ
+     * @return COLORREF--è‰²è°ƒ
      */
     STDMETHOD_(COLORREF, GetColorizeColor)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ·¢ËÍÒ»¸öÏûÏ¢
-     * @param uMsg UINT-ÏûÏ¢ÀàĞÍ
-     * @param wParam WPARAM--²ÎÊı1
-     * @param lParam LPARAM--²ÎÊı2
-     * @param [out] pbMsgHandled BOOL*--ÏûÏ¢±»´¦Àí±êÖ¾
+     * @brief å‘é€ä¸€ä¸ªæ¶ˆæ¯
+     * @param uMsg UINT-æ¶ˆæ¯ç±»å‹
+     * @param wParam WPARAM--å‚æ•°1
+     * @param lParam LPARAM--å‚æ•°2
+     * @param [out] pbMsgHandled BOOL*--æ¶ˆæ¯è¢«å¤„ç†æ ‡å¿—
      * @return
      */
     STDMETHOD_(LRESULT, SSendMessage)
     (THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL * pbMsgHandled) PURE;
 
     /**
-     * @brief ·Ö·¢Ò»¸öÏûÏ¢µ½µ±Ç°´°¿Ú¼°ËüËùÓĞ×Ó´°¿Ú
-     * @param uMsg UINT-ÏûÏ¢ÀàĞÍ
-     * @param wParam WPARAM--²ÎÊı1
-     * @param lParam LPARAM--²ÎÊı2
+     * @brief åˆ†å‘ä¸€ä¸ªæ¶ˆæ¯åˆ°å½“å‰çª—å£åŠå®ƒæ‰€æœ‰å­çª—å£
+     * @param uMsg UINT-æ¶ˆæ¯ç±»å‹
+     * @param wParam WPARAM--å‚æ•°1
+     * @param lParam LPARAM--å‚æ•°2
      * @return
      */
     STDMETHOD_(void, SDispatchMessage)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚÊÇ·ñÔÊĞíÉèÖÃÎª½¹µã
-     * @return TRUE--ÔÊĞí
+     * @brief è·å–çª—å£æ˜¯å¦å…è®¸è®¾ç½®ä¸ºç„¦ç‚¹
+     * @return TRUE--å…è®¸
      */
     STDMETHOD_(BOOL, IsFocusable)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÅĞ¶ÏÊÇ·ñÎª½¹µã´°¿Ú
-     * @return TRUE--½¹µã´°¿Ú
+     * @brief åˆ¤æ–­æ˜¯å¦ä¸ºç„¦ç‚¹çª—å£
+     * @return TRUE--ç„¦ç‚¹çª—å£
      */
     STDMETHOD_(BOOL, IsFocused)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ½«µ±Ç°´°¿ÚÉèÖÃÎª½¹µã´°¿Ú
+     * @brief å°†å½“å‰çª—å£è®¾ç½®ä¸ºç„¦ç‚¹çª—å£
      * @return
      */
     STDMETHOD_(void, SetFocus)(THIS) PURE;
 
     /**
-     * @brief È¡Ïû½¹µã
+     * @brief å–æ¶ˆç„¦ç‚¹
      * @return
      */
     STDMETHOD_(void, KillFocus)(THIS) PURE;
 
     /**
-     * @brief Ë¢ĞÂµ±Ç°´°¿Ú¿Í»§Çø
+     * @brief åˆ·æ–°å½“å‰çª—å£å®¢æˆ·åŒº
      * @return
      */
     STDMETHOD_(void, Invalidate)(THIS) PURE;
 
     /**
-     * @brief Ë¢ĞÂµ±Ç°´°¿ÚÖ¸¶¨Î»ÖÃ
-     * @param lprect LPCRECT--´°¿ÚÎ»ÖÃ
+     * @brief åˆ·æ–°å½“å‰çª—å£æŒ‡å®šä½ç½®
+     * @param lprect LPCRECT--çª—å£ä½ç½®
      * @return
-     * @remark ¿ÉÒÔ°üº¬·Ç¿Í»§Çø£¬µ«ÊÇ²»Ë¢ĞÂ´°¿ÚÍâÎ»ÖÃ
+     * @remark å¯ä»¥åŒ…å«éå®¢æˆ·åŒºï¼Œä½†æ˜¯ä¸åˆ·æ–°çª—å£å¤–ä½ç½®
      */
     STDMETHOD_(void, InvalidateRect)(THIS_ LPCRECT lprect) PURE;
 
     /**
-     * @brief Ëø×¡Ë¢ĞÂ£¬ÖĞ¶ÏË¢ĞÂµ÷ÓÃ
+     * @brief é”ä½åˆ·æ–°ï¼Œä¸­æ–­åˆ·æ–°è°ƒç”¨
      * @return
      */
     STDMETHOD_(void, LockUpdate)(THIS) PURE;
 
     /**
-     * @brief ½âËøË¢ĞÂ£¬»Ö¸´Ë¢ĞÂµ÷ÓÃ
+     * @brief è§£é”åˆ·æ–°ï¼Œæ¢å¤åˆ·æ–°è°ƒç”¨
      * @return
      */
     STDMETHOD_(void, UnlockUpdate)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡Ë¢ĞÂ¼ÓËø×´Ì¬
-     * @return TRUE--µ±Ç°Ë¢ĞÂÎª¼ÓËø×´Ì¬
+     * @brief è·å–åˆ·æ–°åŠ é”çŠ¶æ€
+     * @return TRUE--å½“å‰åˆ·æ–°ä¸ºåŠ é”çŠ¶æ€
      */
     STDMETHOD_(BOOL, IsUpdateLocked)(CTHIS_ BOOL bCheckParent DEF_VAL(FALSE)) SCONST PURE;
 
     /**
-     * @brief ÇëÇóÁ¢¼´¸üĞÂ´°¿Ú
+     * @brief è¯·æ±‚ç«‹å³æ›´æ–°çª—å£
      * @return
-     * @remark Í¨³£ÒªË¢ĞÂÒ»¸ö´°¿Ú£¬Ó¦¸ÃÊ¹ÓÃInvalidate/InvalidateRect£¬ÕâÑùÏµÍ³ÖĞËùÓĞÇëÇó¶¼»áÔÚ
-     ÏÂÒ»´ÎË¢ĞÂµÄÊ±ºò±»ÖØĞÂ»æÖÆ¡£µ«ÊÇÕâ¿ÉÄÜ»á³öÏÖÑÓÊ±¡£ÎªÁËÄÜ¹»Á¢¼´ÖØĞÂ»æÖÆ£¬¿ÉÒÔµ÷ÓÃUpdate
+     * @remark é€šå¸¸è¦åˆ·æ–°ä¸€ä¸ªçª—å£ï¼Œåº”è¯¥ä½¿ç”¨Invalidate/InvalidateRectï¼Œè¿™æ ·ç³»ç»Ÿä¸­æ‰€æœ‰è¯·æ±‚éƒ½ä¼šåœ¨
+     ä¸‹ä¸€æ¬¡åˆ·æ–°çš„æ—¶å€™è¢«é‡æ–°ç»˜åˆ¶ã€‚ä½†æ˜¯è¿™å¯èƒ½ä¼šå‡ºç°å»¶æ—¶ã€‚ä¸ºäº†èƒ½å¤Ÿç«‹å³é‡æ–°ç»˜åˆ¶ï¼Œå¯ä»¥è°ƒç”¨Update
     */
     STDMETHOD_(void, Update)(THIS) PURE;
 
     /**
-     * @brief ÉèÖÃ´°¿ÚÏÔÊ¾ÇøÓò
-     * @param pRgn IRegionS*--ÏÔÊ¾ÇøÓò
-     * @param bRedraw BOOL--ÖØĞÂ»æÖÆ
+     * @brief è®¾ç½®çª—å£æ˜¾ç¤ºåŒºåŸŸ
+     * @param pRgn IRegionS*--æ˜¾ç¤ºåŒºåŸŸ
+     * @param bRedraw BOOL--é‡æ–°ç»˜åˆ¶
      * @return
-     * @remark ÇøÓòµÄ×óÉÏ½Ç×ø±êÎª(0,0),ÔÚÏÔÊ¾¹ı³ÌÖĞ»á¸ù¾İ´°¿ÚÕæÊµ×ø±êµ÷ÕûÎ»ÖÃ
+     * @remark åŒºåŸŸçš„å·¦ä¸Šè§’åæ ‡ä¸º(0,0),åœ¨æ˜¾ç¤ºè¿‡ç¨‹ä¸­ä¼šæ ¹æ®çª—å£çœŸå®åæ ‡è°ƒæ•´ä½ç½®
      */
     STDMETHOD_(void, SetWindowRgn)(THIS_ IRegionS * pRgn, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚÏÔÊ¾ÇøÓò
-     * @return IRegionS*--ÏÔÊ¾ÇøÓò
+     * @brief è·å–çª—å£æ˜¾ç¤ºåŒºåŸŸ
+     * @return IRegionS*--æ˜¾ç¤ºåŒºåŸŸ
      */
     STDMETHOD_(IRegionS *, GetWindowRgn)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ´°¿ÚÏÔÊ¾ÇøÓò
-     * @param pRgn IPathS*--ÏÔÊ¾ÇøÓò
-     * @param bRedraw BOOL--ÖØĞÂ»æÖÆ
+     * @brief è®¾ç½®çª—å£æ˜¾ç¤ºåŒºåŸŸ
+     * @param pRgn IPathS*--æ˜¾ç¤ºåŒºåŸŸ
+     * @param bRedraw BOOL--é‡æ–°ç»˜åˆ¶
      * @return
-     * @remark ÇøÓòµÄ×óÉÏ½Ç×ø±êÎª(0,0),ÔÚÏÔÊ¾¹ı³ÌÖĞ»á¸ù¾İ´°¿ÚÕæÊµ×ø±êµ÷ÕûÎ»ÖÃ
+     * @remark åŒºåŸŸçš„å·¦ä¸Šè§’åæ ‡ä¸º(0,0),åœ¨æ˜¾ç¤ºè¿‡ç¨‹ä¸­ä¼šæ ¹æ®çª—å£çœŸå®åæ ‡è°ƒæ•´ä½ç½®
      */
     STDMETHOD_(void, SetWindowPath)(THIS_ IPathS * pPath, BOOL bRedraw) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚÏÔÊ¾ÇøÓò
-     * @return IPathS*--ÏÔÊ¾ÇøÓò
+     * @brief è·å–çª—å£æ˜¾ç¤ºåŒºåŸŸ
+     * @return IPathS*--æ˜¾ç¤ºåŒºåŸŸ
      */
     STDMETHOD_(IPathS *, GetWindowPath)(CTHIS) SCONST PURE;
 
     /**
      * Move2
-     * @brief    ½«´°¿ÚÒÆ¶¯µ½Ö¸¶¨Î»ÖÃ
+     * @brief    å°†çª—å£ç§»åŠ¨åˆ°æŒ‡å®šä½ç½®
      * @param    int x --  left
      * @param    int y --  top
      * @param    int cx --  width
@@ -329,225 +330,225 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(void, Move2)(THIS_ int x, int y, int cx DEF_VAL(-1), int cy DEF_VAL(-1)) PURE;
 
     /**
-     * @brief ½«´°¿ÚÒÆ¶¯µ½Ö¸¶¨Î»ÖÃ
-     * @param prect LPCRECT--´°¿Ú×ø±ê
+     * @brief å°†çª—å£ç§»åŠ¨åˆ°æŒ‡å®šä½ç½®
+     * @param prect LPCRECT--çª—å£åæ ‡
      * @return
-     * remark ÈİÆ÷ÔÚÈİÆ÷ÖĞµÄ×ø±ê
+     * remark å®¹å™¨åœ¨å®¹å™¨ä¸­çš„åæ ‡
      */
     STDMETHOD_(void, Move)(THIS_ LPCRECT prect) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚµÄÏÔÊ¾Î»ÖÃ£¬°üº¬´°¿ÚµÄ·Ç¿Í»§Çø
-     * @param [out] LPRECT--´°¿ÚÏÔÊ¾Î»ÖÃ
-     * @remark SOUI´°¿ÚÎ»ÖÃ×óÉÏ½Ç²»ÊÇ(0,0),¶øÊÇËŞÖ÷´°¿ÚÖĞµÄ×ø±ê
+     * @brief è·å–çª—å£çš„æ˜¾ç¤ºä½ç½®ï¼ŒåŒ…å«çª—å£çš„éå®¢æˆ·åŒº
+     * @param [out] LPRECT--çª—å£æ˜¾ç¤ºä½ç½®
+     * @remark SOUIçª—å£ä½ç½®å·¦ä¸Šè§’ä¸æ˜¯(0,0),è€Œæ˜¯å®¿ä¸»çª—å£ä¸­çš„åæ ‡
      */
     STDMETHOD_(void, GetWindowRect)(CTHIS_ LPRECT prect) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚµÄÏÔÊ¾Î»ÖÃ£¬²»°üº¬´°¿ÚµÄ·Ç¿Í»§Çø
-     * @param [out] LPRECT--´°¿Ú¿Í»§ÇøÏÔÊ¾Î»ÖÃ
-     * @remark SOUI´°¿ÚÎ»ÖÃ×óÉÏ½Ç²»ÊÇ(0,0),¶øÊÇËŞÖ÷´°¿ÚÖĞµÄ×ø±ê
+     * @brief è·å–çª—å£çš„æ˜¾ç¤ºä½ç½®ï¼Œä¸åŒ…å«çª—å£çš„éå®¢æˆ·åŒº
+     * @param [out] LPRECT--çª—å£å®¢æˆ·åŒºæ˜¾ç¤ºä½ç½®
+     * @remark SOUIçª—å£ä½ç½®å·¦ä¸Šè§’ä¸æ˜¯(0,0),è€Œæ˜¯å®¿ä¸»çª—å£ä¸­çš„åæ ‡
      */
     STDMETHOD_(void, GetClientRect)(CTHIS_ LPRECT prect) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚµÄ¾­¹ı¸¸´°¿Ú¼ô²ÃºóµÄÏÔÊ¾Î»ÖÃ
-     * @param [out] LPRECT--´°¿Ú¿Í»§ÇøÏÔÊ¾Î»ÖÃ
-     * @remark ²»¼ÆËã×Ó´°¿Ú¼°ĞÖµÜ´°¿ÚµÄ¼ô²Ã
+     * @brief è·å–çª—å£çš„ç»è¿‡çˆ¶çª—å£å‰ªè£åçš„æ˜¾ç¤ºä½ç½®
+     * @param [out] LPRECT--çª—å£å®¢æˆ·åŒºæ˜¾ç¤ºä½ç½®
+     * @remark ä¸è®¡ç®—å­çª—å£åŠå…„å¼Ÿçª—å£çš„å‰ªè£
      */
     STDMETHOD_(void, GetVisibleRect)(CTHIS_ LPRECT prect) SCONST PURE;
     /**
-     * @brief ¼ì²âÒ»¸öµãÊÇ²»ÊÇÔÚ´°¿Ú·¶Î§ÄÚ
-     * @param pt POINT--±»¼ì²é×ø±ê
-     * @param bClientOnly BOOL--²âÊÔ¿Í»§Çø±êÖ¾
-     * @return TRUE--ÔÚ´°¿Ú·¶Î§ÄÚ
+     * @brief æ£€æµ‹ä¸€ä¸ªç‚¹æ˜¯ä¸æ˜¯åœ¨çª—å£èŒƒå›´å†…
+     * @param pt POINT--è¢«æ£€æŸ¥åæ ‡
+     * @param bClientOnly BOOL--æµ‹è¯•å®¢æˆ·åŒºæ ‡å¿—
+     * @return TRUE--åœ¨çª—å£èŒƒå›´å†…
      */
     STDMETHOD_(BOOL, IsContainPoint)(CTHIS_ POINT pt, BOOL bClientOnly) SCONST PURE;
 
     /**
-     * @brief ¼ì²éptÖ¸ÏòµÄ´°¿Ú
-     * @param [in,out] pt POINT *--²âÊÔ×ø±ê
-     * @param bIncludeMsgTransparent BOOL--²âÊÔÏûÏ¢Í¸´«´°¿Ú±êÖ¾
-     * @return SWND--°üº¬Ö¸¶¨×ø±êµÄ×î¶¥²ã´°¿Ú
+     * @brief æ£€æŸ¥ptæŒ‡å‘çš„çª—å£
+     * @param [in,out] pt POINT *--æµ‹è¯•åæ ‡
+     * @param bIncludeMsgTransparent BOOL--æµ‹è¯•æ¶ˆæ¯é€ä¼ çª—å£æ ‡å¿—
+     * @return SWND--åŒ…å«æŒ‡å®šåæ ‡çš„æœ€é¡¶å±‚çª—å£
      */
     STDMETHOD_(SWND, SwndFromPoint)(CTHIS_ POINT * pt, BOOL bIncludeMsgTransparent DEF_VAL(FALSE)) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÈİÆ÷¶¨Ê±Æ÷
-     * @param id char--¶¨Ê±Æ÷ID£¬·¶Î§´Ó0-127
-     * @param uElapse UINT--¶¨Ê±Æ÷ÑÓÊ±
-     * @return TRUE--³É¹¦
+     * @brief è®¾ç½®å®¹å™¨å®šæ—¶å™¨
+     * @param id char--å®šæ—¶å™¨IDï¼ŒèŒƒå›´ä»0-127
+     * @param uElapse UINT--å®šæ—¶å™¨å»¶æ—¶
+     * @return TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetTimer)(THIS_ char id, UINT uElapse) PURE;
 
     /**
-     * @brief É¾³ıSetTimer´´½¨µÄ¶¨Ê±Æ÷
-     * @param id char--SetTimer´´½¨µÄ¶¨Ê±Æ÷ID
+     * @brief åˆ é™¤SetTimeråˆ›å»ºçš„å®šæ—¶å™¨
+     * @param id char--SetTimeråˆ›å»ºçš„å®šæ—¶å™¨ID
      * @return
      */
     STDMETHOD_(void, KillTimer)(THIS_ char id) PURE;
 
     /**
-     * @brief »ñÈ¡Êó±ê²¶»ñ
-     * @return SWND--Êó±ê²¶»ñ´°¿Ú¾ä±ú
+     * @brief è·å–é¼ æ ‡æ•è·
+     * @return SWND--é¼ æ ‡æ•è·çª—å£å¥æŸ„
      */
     STDMETHOD_(SWND, GetCapture)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÈİÆ÷ÎªÊó±ê²¶»ñ
-     * @return SWND--Ç°Êó±ê²¶»ñ´°¿Ú¾ä±ú
+     * @brief è®¾ç½®å®¹å™¨ä¸ºé¼ æ ‡æ•è·
+     * @return SWND--å‰é¼ æ ‡æ•è·çª—å£å¥æŸ„
      */
     STDMETHOD_(SWND, SetCapture)(THIS) PURE;
 
     /**
-     * @brief ÊÍ·ÅÊó±ê²¶»ñ
-     * @return TRUE--ÊÍ·Å³É¹¦
+     * @brief é‡Šæ”¾é¼ æ ‡æ•è·
+     * @return TRUE--é‡Šæ”¾æˆåŠŸ
      */
     STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
 
     /**
-     * @brief ÉèÖÃÒ»¸ö´°¿Ú¶¯»­
-     * @param animation IAnimation *--¶¯»­¶ÔÏó
+     * @brief è®¾ç½®ä¸€ä¸ªçª—å£åŠ¨ç”»
+     * @param animation IAnimation *--åŠ¨ç”»å¯¹è±¡
      * @return
      */
     STDMETHOD_(void, SetAnimation)(THIS_ IAnimation * animation) PURE;
 
     /**
-     * @brief Á¢¼´Æô¶¯Ò»¸ö¶¯»­¶ÔÏó
-     * @param animation IAnimation *--¶¯»­¶ÔÏó
+     * @brief ç«‹å³å¯åŠ¨ä¸€ä¸ªåŠ¨ç”»å¯¹è±¡
+     * @param animation IAnimation *--åŠ¨ç”»å¯¹è±¡
      * @return
-     * @remark ºÍsetAnimation²»Í¬ÔÚÓÚÁ¢¼´Æô¶¯£¬¶ø²»ÊÇµÈ´ı¶¯»­¶ÔÏóÖĞµÄÑÓÊ±Æô¶¯Ê±¼ä
+     * @remark å’ŒsetAnimationä¸åŒåœ¨äºç«‹å³å¯åŠ¨ï¼Œè€Œä¸æ˜¯ç­‰å¾…åŠ¨ç”»å¯¹è±¡ä¸­çš„å»¶æ—¶å¯åŠ¨æ—¶é—´
      */
     STDMETHOD_(void, StartAnimation)(THIS_ IAnimation * animation) PURE;
 
     /**
-     * @brief »ñÈ¡µ±Ç°ÕıÔÚÔËĞĞµÄ¶¯»­¶ÔÏó
-     * @return IAnimation *--¶¯»­¶ÔÏó
+     * @brief è·å–å½“å‰æ­£åœ¨è¿è¡Œçš„åŠ¨ç”»å¯¹è±¡
+     * @return IAnimation *--åŠ¨ç”»å¯¹è±¡
      */
     STDMETHOD_(IAnimation *, GetAnimation)(CTHIS) SCONST PURE;
 
     /**
-     * @brief Çå³ı¶¯»­
+     * @brief æ¸…é™¤åŠ¨ç”»
      * @return
      */
     STDMETHOD_(void, ClearAnimation)(THIS) PURE;
 
     /**
-     * @brief ÉèÖÃ´°¿ÚÍ¸Ã÷¶È
-     * @param byAlpha BYTE--Í¸Ã÷¶È,[0,255]
+     * @brief è®¾ç½®çª—å£é€æ˜åº¦
+     * @param byAlpha BYTE--é€æ˜åº¦,[0,255]
      * @return
      */
     STDMETHOD_(void, SetAlpha)(THIS_ BYTE byAlpha) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚÍ¸Ã÷¶È
-     * @return BYTE--´°¿ÚÍ¸Ã÷¶È
+     * @brief è·å–çª—å£é€æ˜åº¦
+     * @return BYTE--çª—å£é€æ˜åº¦
      */
     STDMETHOD_(BYTE, GetAlpha)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ´°¿Ú±ä»»¾ØÕó
-     * @param mtx const IMatrix *--±ä»»¾ØÕó
+     * @brief è®¾ç½®çª—å£å˜æ¢çŸ©é˜µ
+     * @param mtx const IMatrix *--å˜æ¢çŸ©é˜µ
      * @return
      */
     STDMETHOD_(void, SetMatrix)(THIS_ const IMatrix *mtx) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿Ú±ä»»¾ØÕó
+     * @brief è·å–çª—å£å˜æ¢çŸ©é˜µ
      */
     STDMETHOD_(void, GetMatrix)(CTHIS_ IMatrix * mtx) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡dpi·Å´ó±¶Êı
-     * @return int--dpi·Å´ó±¶Êı,ÒÔ100Îª»ùÊı
+     * @brief è·å–dpiæ”¾å¤§å€æ•°
+     * @return int--dpiæ”¾å¤§å€æ•°,ä»¥100ä¸ºåŸºæ•°
      */
     STDMETHOD_(int, GetScale)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÇëÇóÖØĞÂ²¼¾Ö
+     * @brief è¯·æ±‚é‡æ–°å¸ƒå±€
      * @return
      */
     STDMETHOD_(void, RequestRelayout)(THIS) PURE;
 
     /**
-     * @brief ÖØĞÂ²¼¾Öµ±Ç°´°¿ÚµÄ×Ó´°¿Ú£¬Ö»ÔÚ´°¿Ú²¼¾ÖÔàÁË²ÅÉúĞ§
+     * @brief é‡æ–°å¸ƒå±€å½“å‰çª—å£çš„å­çª—å£ï¼Œåªåœ¨çª—å£å¸ƒå±€è„äº†æ‰ç”Ÿæ•ˆ
      * @return
      */
     STDMETHOD_(void, UpdateLayout)(THIS) PURE;
 
     /**
-     * @brief Ç¿ÖÆÖØĞÂ²¼¾Ö×Ó´°¿Ú
+     * @brief å¼ºåˆ¶é‡æ–°å¸ƒå±€å­çª—å£
      * @return
      */
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡²¼¾ÖÔà±êÖ¾
-     * @return TRUE--²¼¾ÖÔà
+     * @brief è·å–å¸ƒå±€è„æ ‡å¿—
+     * @return TRUE--å¸ƒå±€è„
      */
     STDMETHOD_(BOOL, IsLayoutDirty)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚÏìÓ¦¼üÅÌµÄ±êÖ¾Î»
-     * @return UINT--ÏìÓ¦¼üÅÌµÄ±êÖ¾Î»
+     * @brief è·å–çª—å£å“åº”é”®ç›˜çš„æ ‡å¿—ä½
+     * @return UINT--å“åº”é”®ç›˜çš„æ ‡å¿—ä½
      */
     STDMETHOD_(UINT, OnGetDlgCode)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡¸ù´°¿Ú
-     * @return IWindow *--¸ù´°¿Ú¶ÔÏó
+     * @brief è·å–æ ¹çª—å£
+     * @return IWindow *--æ ¹çª—å£å¯¹è±¡
      */
     STDMETHOD_(IWindow *, GetIRoot)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡¸¸´°¿Ú
-     * @return IWindow *--¸¸´°¿Ú¶ÔÏó
+     * @brief è·å–çˆ¶çª—å£
+     * @return IWindow *--çˆ¶çª—å£å¯¹è±¡
      */
     STDMETHOD_(IWindow *, GetIParent)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ¸ù¾İuCode»ñÈ¡Óëµ±Ç°´°¿ÚÔÚdomÊ÷ÉÏ¹ØÁªµÄ´°¿Ú
-     * @param uCode UINT--¹ØÁªÀàĞÍ
-     * @return IWindow *--µ±Ç°´°¿ÚÔÚdomÊ÷ÉÏ¹ØÁªµÄ´°¿Ú
+     * @brief æ ¹æ®uCodeè·å–ä¸å½“å‰çª—å£åœ¨domæ ‘ä¸Šå…³è”çš„çª—å£
+     * @param uCode UINT--å…³è”ç±»å‹
+     * @return IWindow *--å½“å‰çª—å£åœ¨domæ ‘ä¸Šå…³è”çš„çª—å£
      */
     STDMETHOD_(IWindow *, GetIWindow)(CTHIS_ int uCode) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡×Ó´°¿Ú
-     * @param iChild int--×Ó´°¿ÚĞòºÅ,[0,childCount]
-     * @return IWindow *--×Ó´°¿Ú
-     * @remark iChild==0·µ»Øself, 1·µ»ØµÚÒ»¸ö×Ó´°¿Ú
+     * @brief è·å–å­çª—å£
+     * @param iChild int--å­çª—å£åºå·,[0,childCount]
+     * @return IWindow *--å­çª—å£
+     * @remark iChild==0è¿”å›self, 1è¿”å›ç¬¬ä¸€ä¸ªå­çª—å£
      */
     STDMETHOD_(IWindow *, GetIChild)(CTHIS_ int iChild) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡×Ó´°¿ÚÊıÁ¿
-     * @return UINT--×Ó´°¿ÚÊıÁ¿
+     * @brief è·å–å­çª—å£æ•°é‡
+     * @return UINT--å­çª—å£æ•°é‡
      */
     STDMETHOD_(UINT, GetChildrenCount)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÅĞ¶ÏÒ»¸ö´°¿ÚÊÇ²»ÊÇµ±Ç°´°¿ÚµÄ×ÓËï´°¿Ú
-     * @param pTest const IWindow *--²âÊÔ´°¿Ú
-     * @return TRUE--ÊÇ×ÓËï´°¿Ú
+     * @brief åˆ¤æ–­ä¸€ä¸ªçª—å£æ˜¯ä¸æ˜¯å½“å‰çª—å£çš„å­å­™çª—å£
+     * @param pTest const IWindow *--æµ‹è¯•çª—å£
+     * @return TRUE--æ˜¯å­å­™çª—å£
      */
     STDMETHOD_(BOOL, IsDescendant)(CTHIS_ const IWindow *pTest) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃ´°¿ÚµÄOwner
-     * @param pOwner IWindow *--Owner´°¿Ú
+     * @brief è®¾ç½®çª—å£çš„Owner
+     * @param pOwner IWindow *--Ownerçª—å£
      * @return
      */
     STDMETHOD_(void, SetIOwner)(THIS_ IWindow * pOwner) PURE;
 
     /**
-     * @brief »ñÈ¡Owner´°¿Ú
-     * @return IWindow *--Owner´°¿Ú
+     * @brief è·å–Ownerçª—å£
+     * @return IWindow *--Ownerçª—å£
      */
     STDMETHOD_(IWindow *, GetIOwner)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ½«µ±Ç°´°¿ÚÒÆ¶¯µ½Í¬¼¶ĞÖµÜ´°¿ÚµÄzorder×î¶¥²ã
+     * @brief å°†å½“å‰çª—å£ç§»åŠ¨åˆ°åŒçº§å…„å¼Ÿçª—å£çš„zorderæœ€é¡¶å±‚
      * @param
      * @return
      */
@@ -555,40 +556,40 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * AdjustZOrder
-     * @brief    µ÷Õû´°¿ÚZĞò
-     * @param    SWindow *pInsertAfter --  ²åÈëÔÚÕâ¸ö´°¿ÚÖ®ºó
-     * @return   bool,  pInsertAfterÓëthis·ÇÍ¬¼¶´°¿Ú·µ»ØÊ§°Ü
+     * @brief    è°ƒæ•´çª—å£Zåº
+     * @param    SWindow *pInsertAfter --  æ’å…¥åœ¨è¿™ä¸ªçª—å£ä¹‹å
+     * @return   bool,  pInsertAfterä¸thiséåŒçº§çª—å£è¿”å›å¤±è´¥
      *
-     * Describe  pInsertAfter¿ÉÒÔÎªNULL£¬»òÊÇÓëthisÍ¬Ò»¼¶µÄĞÖµÜ´°¿Ú
+     * Describe  pInsertAfterå¯ä»¥ä¸ºNULLï¼Œæˆ–æ˜¯ä¸thisåŒä¸€çº§çš„å…„å¼Ÿçª—å£
      */
     STDMETHOD_(BOOL, AdjustIZOrder)(THIS_ IWindow * pInsertAfter) PURE;
 
     /**
      * InsertChild
-     * @brief    ÔÚ´°¿ÚÊ÷ÖĞ²åÈëÒ»¸ö×Ó´°¿Ú
-     * @param    SWindow * pNewChild --  ×Ó´°¿Ú¶ÔÏó
-     * @param    SWindow * pInsertAfter --  ²åÈëÎ»ÖÃ
+     * @brief    åœ¨çª—å£æ ‘ä¸­æ’å…¥ä¸€ä¸ªå­çª—å£
+     * @param    SWindow * pNewChild --  å­çª—å£å¯¹è±¡
+     * @param    SWindow * pInsertAfter --  æ’å…¥ä½ç½®
      * @return   void
      *
-     * Describe  Ò»°ãÓÃÓÚUI³õÊ¼»¯µÄÊ±ºò´´½¨£¬²åÈëµÄ´°¿Ú²»»á×Ô¶¯½øÈë²¼¾ÖÁ÷³Ì
+     * Describe  ä¸€èˆ¬ç”¨äºUIåˆå§‹åŒ–çš„æ—¶å€™åˆ›å»ºï¼Œæ’å…¥çš„çª—å£ä¸ä¼šè‡ªåŠ¨è¿›å…¥å¸ƒå±€æµç¨‹
      */
     STDMETHOD_(void, InsertIChild)(THIS_ IWindow * pNewChild, IWindow * pInsertAfter) PURE;
 
     /**
      * RemoveChild
-     * @brief    ´Ó´°¿ÚÊ÷ÖĞÒÆ³ıÒ»¸ö×Ó´°¿Ú¶ÔÏó
-     * @param    SWindow * pChild --  ×Ó´°¿Ú¶ÔÏó
+     * @brief    ä»çª—å£æ ‘ä¸­ç§»é™¤ä¸€ä¸ªå­çª—å£å¯¹è±¡
+     * @param    SWindow * pChild --  å­çª—å£å¯¹è±¡
      * @return   BOOL
      *
-     * Describe  ×Ó´°¿Ú²»»á×Ô¶¯ÊÍ·Å
+     * Describe  å­çª—å£ä¸ä¼šè‡ªåŠ¨é‡Šæ”¾
      */
     STDMETHOD_(BOOL, RemoveIChild)(THIS_ IWindow * pChild) PURE;
 
     /**
      * CreateChildrenFromXml
-     * @brief    ´ÓXML´´½¨×Ó´°¿Ú
-     * @param    LPCWSTR pszXml --  ºÏ·¨µÄutf16±àÂëXML×Ö·û´®
-     * @return   BOOL ÊÇ·ñ´´½¨³É¹¦
+     * @brief    ä»XMLåˆ›å»ºå­çª—å£
+     * @param    LPCWSTR pszXml --  åˆæ³•çš„utf16ç¼–ç XMLå­—ç¬¦ä¸²
+     * @return   BOOL æ˜¯å¦åˆ›å»ºæˆåŠŸ
      *
      * Describe
      */
@@ -596,82 +597,82 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * CreateChildrenFromResId
-     * @brief    ´ÓXML×ÊÔ´´´½¨×Ó´°¿Ú
-     * @param    LPCTSTR pszResId --  XML×ÊÔ´ID
-     * @return   BOOL ÊÇ·ñ´´½¨³É¹¦
+     * @brief    ä»XMLèµ„æºåˆ›å»ºå­çª—å£
+     * @param    LPCTSTR pszResId --  XMLèµ„æºID
+     * @return   BOOL æ˜¯å¦åˆ›å»ºæˆåŠŸ
      *
      * Describe
      */
     STDMETHOD_(BOOL, CreateChildrenFromResId)(THIS_ LPCTSTR pszResId) PURE;
 
     /**
-     * @brief ¸ù¾İID²éÕÒ×Ó´°¿Ú
-     * @param nId int--×Ó´°¿ÚID
-     * @return IWindow*--Æ¥Åä´°¿Ú
-     * @remark ²ÉÓÃ¹ã¶ÈÓÅÏÈËã·¨ËÑË÷Æ¥Åä×Ó´°¿Ú
+     * @brief æ ¹æ®IDæŸ¥æ‰¾å­çª—å£
+     * @param nId int--å­çª—å£ID
+     * @return IWindow*--åŒ¹é…çª—å£
+     * @remark é‡‡ç”¨å¹¿åº¦ä¼˜å…ˆç®—æ³•æœç´¢åŒ¹é…å­çª—å£
      */
     STDMETHOD_(IWindow *, FindIChildByID)(THIS_ int nId) PURE;
 
     /**
-     * @brief ¸ù¾İName²éÕÒ×Ó´°¿Ú
-     * @param pszName LPCWSTR--×Ó´°¿ÚName
-     * @return IWindow*--Æ¥Åä´°¿Ú
-     * @remark ²ÉÓÃ¹ã¶ÈÓÅÏÈËã·¨ËÑË÷Æ¥Åä×Ó´°¿Ú
+     * @brief æ ¹æ®NameæŸ¥æ‰¾å­çª—å£
+     * @param pszName LPCWSTR--å­çª—å£Name
+     * @return IWindow*--åŒ¹é…çª—å£
+     * @remark é‡‡ç”¨å¹¿åº¦ä¼˜å…ˆç®—æ³•æœç´¢åŒ¹é…å­çª—å£
      */
     STDMETHOD_(IWindow *, FindIChildByName)(THIS_ LPCWSTR pszName) PURE;
 
     /**
-     * @brief ¸ù¾İName²éÕÒ×Ó´°¿Ú
-     * @param pszName LPCSTR--×Ó´°¿ÚName
-     * @return IWindow*--Æ¥Åä´°¿Ú
-     * @remark ²ÉÓÃ¹ã¶ÈÓÅÏÈËã·¨ËÑË÷Æ¥Åä×Ó´°¿Ú
+     * @brief æ ¹æ®NameæŸ¥æ‰¾å­çª—å£
+     * @param pszName LPCSTR--å­çª—å£Name
+     * @return IWindow*--åŒ¹é…çª—å£
+     * @remark é‡‡ç”¨å¹¿åº¦ä¼˜å…ˆç®—æ³•æœç´¢åŒ¹é…å­çª—å£
      */
     STDMETHOD_(IWindow *, FindIChildByNameA)(THIS_ LPCSTR pszName) PURE;
 
     /**
      * DestroyChild
-     * @brief    Ïú»ÙÒ»¸ö×Ó´°¿Ú
-     * @param    SWindow * pChild --  ×Ó´°¿Ú¶ÔÏó
+     * @brief    é”€æ¯ä¸€ä¸ªå­çª—å£
+     * @param    SWindow * pChild --  å­çª—å£å¯¹è±¡
      * @return   BOOL
      *
-     * Describe  ÏÈµ÷ÓÃRemoveChild£¬ÔÙµ÷ÓÃpChild->ReleaseÀ´ÊÍ·Å×Ó´°¿Ú¶ÔÏó
+     * Describe  å…ˆè°ƒç”¨RemoveChildï¼Œå†è°ƒç”¨pChild->Releaseæ¥é‡Šæ”¾å­çª—å£å¯¹è±¡
      */
     STDMETHOD_(BOOL, DestroyIChild)(THIS_ IWindow * pChild) PURE;
 
     /**
-     * @brief Ïú»ÙËùÓĞ×Ó´°¿Ú
+     * @brief é”€æ¯æ‰€æœ‰å­çª—å£
      * @return
      */
     STDMETHOD_(void, DestroyAllChildren)(THIS) PURE;
 
     /**
-     * @brief Ïú»Ù´°¿Ú
-     * @return TRUE--³É¹¦
+     * @brief é”€æ¯çª—å£
+     * @return TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, Destroy)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨´°¿ÚµÄÏÂÒ»¸ö²ÎÓë²¼¾ÖµÄ´°¿Ú¶ÔÏó
-     * @param pCurChild const IWindow *--µ±Ç°´°¿Ú
-     * @return IWindow *--ÏÂÒ»¸ö²¼¾Ö´°¿Ú
+     * @brief è·å–æŒ‡å®šçª—å£çš„ä¸‹ä¸€ä¸ªå‚ä¸å¸ƒå±€çš„çª—å£å¯¹è±¡
+     * @param pCurChild const IWindow *--å½“å‰çª—å£
+     * @return IWindow *--ä¸‹ä¸€ä¸ªå¸ƒå±€çª—å£
      */
     STDMETHOD_(IWindow *, GetNextLayoutIChild)(CTHIS_ const IWindow *pCurChild) SCONST PURE;
 
     /**
      * GetChildrenLayoutRect
-     * @brief    »ñµÃ×Ó´°¿ÚµÄ²¼¾Ö¿Õ¼ä
-     * @param  LPRECT prc--²¼¾ÖÎ»ÖÃ
+     * @brief    è·å¾—å­çª—å£çš„å¸ƒå±€ç©ºé—´
+     * @param  LPRECT prc--å¸ƒå±€ä½ç½®
      * @return   void
      *
-     * Describe  Í¨³£ÊÇ¿Í»§Çø£¬µ«ÊÇtab,groupÕâÑùµÄ¿Ø¼ş²»Ò»Ñù
+     * Describe  é€šå¸¸æ˜¯å®¢æˆ·åŒºï¼Œä½†æ˜¯tab,groupè¿™æ ·çš„æ§ä»¶ä¸ä¸€æ ·
      */
     STDMETHOD_(void, GetChildrenLayoutRect)(CTHIS_ RECT * prc) SCONST PURE;
 
     /**
      * GetDesiredSize
-     * @brief    µ±Ã»ÓĞÖ¸¶¨´°¿Ú´óĞ¡Ê±£¬Í¨¹ıÈçÆ¤·ô¼ÆËã´°¿ÚµÄÆÚÍû´óĞ¡
-     * @param    int nParentWid -- ÈİÆ÷¿í¶È£¬<0´ú±íÈİÆ÷¿í¶ÈÒÀÀµµ±Ç°´°¿Ú¿í¶È
-     * @param    int nParentHei -- ÈİÆ÷¸ß¶È£¬<0´ú±íÈİÆ÷¸ß¶ÈÒÀÀµµ±Ç°´°¿Ú¸ß¶È
+     * @brief    å½“æ²¡æœ‰æŒ‡å®šçª—å£å¤§å°æ—¶ï¼Œé€šè¿‡å¦‚çš®è‚¤è®¡ç®—çª—å£çš„æœŸæœ›å¤§å°
+     * @param    int nParentWid -- å®¹å™¨å®½åº¦ï¼Œ<0ä»£è¡¨å®¹å™¨å®½åº¦ä¾èµ–å½“å‰çª—å£å®½åº¦
+     * @param    int nParentHei -- å®¹å™¨é«˜åº¦ï¼Œ<0ä»£è¡¨å®¹å™¨é«˜åº¦ä¾èµ–å½“å‰çª—å£é«˜åº¦
      * @return   CSize
      *
      * Describe
@@ -679,97 +680,97 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE * pSize, int nParentWid, int nParentHei) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿Ú±³¾°É«
-     * @return COLORREF--´°¿Ú±³¾°É«
+     * @brief è·å–çª—å£èƒŒæ™¯è‰²
+     * @return COLORREF--çª—å£èƒŒæ™¯è‰²
      */
     STDMETHOD_(COLORREF, GetBkgndColor)(CTHIS) SCONST PURE;
 
     /**
-     * @brief Éè¼Æ´°¿ÚÏÔÊ¾ÎÄ±¾
-     * @param lpszText LPCTSTR--´°¿ÚÏÔÊ¾ÎÄ±¾
+     * @brief è®¾è®¡çª—å£æ˜¾ç¤ºæ–‡æœ¬
+     * @param lpszText LPCTSTR--çª—å£æ˜¾ç¤ºæ–‡æœ¬
      * @return
-     * @remark Ö§³Ö×Ô¶¯·­Òë
+     * @remark æ”¯æŒè‡ªåŠ¨ç¿»è¯‘
      */
     STDMETHOD_(void, SetWindowText)(THIS_ LPCTSTR lpszText) PURE;
 
     /**
-     * @brief Éè¼Æ´°¿ÚÏÔÊ¾ÎÄ±¾
-     * @param lpszText LPCSTR--´°¿ÚÏÔÊ¾ÎÄ±¾
+     * @brief è®¾è®¡çª—å£æ˜¾ç¤ºæ–‡æœ¬
+     * @param lpszText LPCSTR--çª—å£æ˜¾ç¤ºæ–‡æœ¬
      * @return
-     * @remark Ö§³Ö×Ô¶¯·­Òë
+     * @remark æ”¯æŒè‡ªåŠ¨ç¿»è¯‘
      */
     STDMETHOD_(void, SetWindowTextA)(THIS_ LPCSTR lpszText) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿ÚÏÔÊ¾ÎÄ±¾
-     * @param pBuf TCHAR*--»º³åÇø
-     * @param nBufLen int--»º³åÇø³¤¶È
-     * @param bRawText BOOL--»ñÈ¡·­ÒëÇ°ÎÄ±¾±êÖ¾
-     * @return int--¸´ÖÆµÄÎÄ±¾³¤¶È£¬pBufÎªNULLÊ±·µ»Ø×Ü»º³åÇø³¤¶È
+     * @brief è·å–çª—å£æ˜¾ç¤ºæ–‡æœ¬
+     * @param pBuf TCHAR*--ç¼“å†²åŒº
+     * @param nBufLen int--ç¼“å†²åŒºé•¿åº¦
+     * @param bRawText BOOL--è·å–ç¿»è¯‘å‰æ–‡æœ¬æ ‡å¿—
+     * @return int--å¤åˆ¶çš„æ–‡æœ¬é•¿åº¦ï¼ŒpBufä¸ºNULLæ—¶è¿”å›æ€»ç¼“å†²åŒºé•¿åº¦
      */
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR * pBuf, int nBufLen, BOOL bRawText) PURE;
 
     STDMETHOD_(int, GetWindowTextA)(THIS_ IStringA * pStr, BOOL bRawText) PURE;
 
     /**
-     * @brief »ñÈ¡´°¿Ú×´Ì¬
-     * @return DWORD -- ´°¿Ú×´Ì¬
+     * @brief è·å–çª—å£çŠ¶æ€
+     * @return DWORD -- çª—å£çŠ¶æ€
      */
     STDMETHOD_(DWORD, GetState)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ĞŞ¸Ä´°¿Ú×´Ì¬
-     * @param dwStateAdd DWORD--Ôö¼Ó×´Ì¬Î»
-     * @param dwStateRemove DWORD--É¾³ı×´Ì¬Î»
-     * @param bUpdate BOOL--Ë¢ĞÂ´°¿Ú
-     * @return DWORD--ĞÂ×´Ì¬
+     * @brief ä¿®æ”¹çª—å£çŠ¶æ€
+     * @param dwStateAdd DWORD--å¢åŠ çŠ¶æ€ä½
+     * @param dwStateRemove DWORD--åˆ é™¤çŠ¶æ€ä½
+     * @param bUpdate BOOL--åˆ·æ–°çª—å£
+     * @return DWORD--æ–°çŠ¶æ€
      */
     STDMETHOD_(DWORD, ModifyState)(THIS_ DWORD dwStateAdd, DWORD dwStateRemove, BOOL bUpdate DEF_VAL(FALSE)) PURE;
 
     /**
      * GetISelectedSiblingInGroup
-     * @brief    »ñµÃÔÚÒ»¸ögroupÖĞÑ¡ÖĞ×´Ì¬µÄ´°¿Ú
+     * @brief    è·å¾—åœ¨ä¸€ä¸ªgroupä¸­é€‰ä¸­çŠ¶æ€çš„çª—å£
      * @return   SWindow *
      *
-     * Describe  ²»ÊÇgroupÖĞµÄ´°¿ÚÊ±·µ»ØNULL
+     * Describe  ä¸æ˜¯groupä¸­çš„çª—å£æ—¶è¿”å›NULL
      */
     STDMETHOD_(IWindow *, GetISelectedSiblingInGroup)(THIS) PURE;
 
     /**
      * GetSelectedChildInGroup
-     * @brief    »ñÈ¡ÓĞÑ¡Ôñ×´Ì¬µÄ×Ó´°¿Ú
-     * @return   IWindow * -- Ñ¡ÖĞ×´Ì¬´°¿Ú
+     * @brief    è·å–æœ‰é€‰æ‹©çŠ¶æ€çš„å­çª—å£
+     * @return   IWindow * -- é€‰ä¸­çŠ¶æ€çª—å£
      * Describe
      */
     STDMETHOD_(IWindow *, GetISelectedChildInGroup)(THIS) PURE;
 
     /**
-     * @brief Í¬ÀàĞÍĞÖµÜ´°¿Ú×Ô¶¯³É×é±êÖ¾
-     * @return TRUE--×Ô¶¯³É×é
-     * @remark ×Ô¶¯³É×éµÄ´°¿ÚÔÚÓÃ»§°´Å¥·½Ïò¼üÊ±£¬×éÄÚ´°¿ÚÑ­»·Ë³Ğò»ñµÃ½¹µã
+     * @brief åŒç±»å‹å…„å¼Ÿçª—å£è‡ªåŠ¨æˆç»„æ ‡å¿—
+     * @return TRUE--è‡ªåŠ¨æˆç»„
+     * @remark è‡ªåŠ¨æˆç»„çš„çª—å£åœ¨ç”¨æˆ·æŒ‰é’®æ–¹å‘é”®æ—¶ï¼Œç»„å†…çª—å£å¾ªç¯é¡ºåºè·å¾—ç„¦ç‚¹
      */
     STDMETHOD_(BOOL, IsSiblingsAutoGroupped)(CTHIS) SCONST PURE;
 
-    // caretÏà¹Ø·½·¨
+    // caretç›¸å…³æ–¹æ³•
 
     /**
-     * @brief ´´½¨¹â±ê
-     * @param pBmp ´´½¨¹â±êµÄÎ»Í¼,¿ÉÎªnull
-     * @param nWid int--¹â±ê¿í¶È
-     * @param nHeight int--¹â±ê¸ß¶È
-     * @return TRUE--³É¹¦
+     * @brief åˆ›å»ºå…‰æ ‡
+     * @param pBmp åˆ›å»ºå…‰æ ‡çš„ä½å›¾,å¯ä¸ºnull
+     * @param nWid int--å…‰æ ‡å®½åº¦
+     * @param nHeight int--å…‰æ ‡é«˜åº¦
+     * @return TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) PURE;
 
     /**
-     * @brief ¿ØÖÆ¹â±êÏÔÊ¾/Òş²Ø
-     * @param bShow BOOL--ÏÔÊ¾±êÖ¾
+     * @brief æ§åˆ¶å…‰æ ‡æ˜¾ç¤º/éšè—
+     * @param bShow BOOL--æ˜¾ç¤ºæ ‡å¿—
      * @return
      */
     STDMETHOD_(void, ShowCaret)(THIS_ BOOL bShow) PURE;
 
     /**
-     * @brief ÉèÖÃ¹â±êÏÔÊ¾Î»ÖÃ
+     * @brief è®¾ç½®å…‰æ ‡æ˜¾ç¤ºä½ç½®
      * @param x int-X
      * @param y int-Y
      * @return
@@ -777,53 +778,53 @@ DECLARE_INTERFACE_(IWindow, IObject)
     STDMETHOD_(void, SetCaretPos)(THIS_ int x, int y) PURE;
 
     /**
-     * @brief ÉèÖÃµ±Ç°¿Ø¼şÊÇ·ñÔÊĞí·¢³öÊÂ¼ş
-     * @param bMute BOOL-ÔÊĞí·¢³öÊÂ¼ş±êÖ¾
+     * @brief è®¾ç½®å½“å‰æ§ä»¶æ˜¯å¦å…è®¸å‘å‡ºäº‹ä»¶
+     * @param bMute BOOL-å…è®¸å‘å‡ºäº‹ä»¶æ ‡å¿—
      * @return
      */
     STDMETHOD_(void, SetEventMute)(THIS_ BOOL bMute) PURE;
 
     /**
-     * @brief ¶©ÔÄ´°¿ÚÊÂ¼ş
-     * @param evtId DWORD--ÊÂ¼şID
-     * @param pSlot const IEvtSlot *--ÊÂ¼ş´¦Àí¶ÔÏó
-     * @return TRUE--³É¹¦
+     * @brief è®¢é˜…çª—å£äº‹ä»¶
+     * @param evtId DWORD--äº‹ä»¶ID
+     * @param pSlot const IEvtSlot *--äº‹ä»¶å¤„ç†å¯¹è±¡
+     * @return TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, SubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
 
     /**
-     * @brief È¡Ïû´°¿ÚÊÂ¼ş¶©ÔÄ
-     * @param evtId DWORD--ÊÂ¼şID
-     * @param pSlot const IEvtSlot *--ÊÂ¼ş´¦Àí¶ÔÏó
-     * @return TRUE--³É¹¦
+     * @brief å–æ¶ˆçª—å£äº‹ä»¶è®¢é˜…
+     * @param evtId DWORD--äº‹ä»¶ID
+     * @param pSlot const IEvtSlot *--äº‹ä»¶å¤„ç†å¯¹è±¡
+     * @return TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) PURE;
 
     /**
-     * @brief Ôö¼Ó´°¿ÚÊÂ¼ş
-     * @param evtId DWORD--ÊÂ¼şID
-     * @param LPCWSTR pszEventHandlerName--×Ö·û´®±êÊ¶µÄÊÂ¼ş´¦Àí£¨½Å±¾Ê¹ÓÃ£©
-     * @return TRUE--³É¹¦
+     * @brief å¢åŠ çª—å£äº‹ä»¶
+     * @param evtId DWORD--äº‹ä»¶ID
+     * @param LPCWSTR pszEventHandlerName--å­—ç¬¦ä¸²æ ‡è¯†çš„äº‹ä»¶å¤„ç†ï¼ˆè„šæœ¬ä½¿ç”¨ï¼‰
+     * @return TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, AddEvent)(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName) PURE;
 
     /**
-     * @brief É¾³ı´°¿ÚÊÂ¼ş
-     * @param evtId DWORD--ÊÂ¼şID
-     * @return TRUE--³É¹¦
+     * @brief åˆ é™¤çª—å£äº‹ä»¶
+     * @param evtId DWORD--äº‹ä»¶ID
+     * @return TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, RemoveEvent)(THIS_ DWORD dwEventID) PURE;
     /**
-     * @brief  ·¢ÉäÒ»¸öÊÂ¼şµ½Ó¦ÓÃ²ã
-     * @param evt IEvtArgs *--ÊÂ¼ş¶ÔÏó
-     * @return TRUE--³É¹¦
+     * @brief  å‘å°„ä¸€ä¸ªäº‹ä»¶åˆ°åº”ç”¨å±‚
+     * @param evt IEvtArgs *--äº‹ä»¶å¯¹è±¡
+     * @return TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs * evt) PURE;
 
     /**
      * FireCommand
-     * @brief    ¼¤»î´°¿ÚµÄEVT_CMDÊÂ¼ş
-     * @return   BOOL-- true:EVT_CMDÊÂ¼ş±»´¦Àí
+     * @brief    æ¿€æ´»çª—å£çš„EVT_CMDäº‹ä»¶
+     * @return   BOOL-- true:EVT_CMDäº‹ä»¶è¢«å¤„ç†
      *
      * Describe
      */
@@ -831,9 +832,9 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * FireCtxMenu
-     * @brief    ¼¤»î¿ì½İ²Ëµ¥ÊÂ¼ş
-     * @param    CPoint pt --  Êó±êµã»÷Î»ÖÃ
-     * @return   BOOL -- true:Íâ²¿´¦ÀíÁË¿ì½İ²Ëµ¥ÊÂ¼ş
+     * @brief    æ¿€æ´»å¿«æ·èœå•äº‹ä»¶
+     * @param    CPoint pt --  é¼ æ ‡ç‚¹å‡»ä½ç½®
+     * @return   BOOL -- true:å¤–éƒ¨å¤„ç†äº†å¿«æ·èœå•äº‹ä»¶
      *
      * Describe
      */
@@ -841,21 +842,21 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * SwndProc
-     * @brief    Ä¬ÈÏµÄÏûÏ¢´¦Àíº¯Êı
-     * @param    UINT uMsg --  ÏûÏ¢ÀàĞÍ
-     * @param    WPARAM wParam --  ²ÎÊı1
-     * @param    LPARAM lParam --  ²ÎÊı2
-     * @param    LRESULT & lResult --  ÏûÏ¢·µ»ØÖµ
-     * @return   BOOL ÊÇ·ñ±»´¦Àí
+     * @brief    é»˜è®¤çš„æ¶ˆæ¯å¤„ç†å‡½æ•°
+     * @param    UINT uMsg --  æ¶ˆæ¯ç±»å‹
+     * @param    WPARAM wParam --  å‚æ•°1
+     * @param    LPARAM lParam --  å‚æ•°2
+     * @param    LRESULT & lResult --  æ¶ˆæ¯è¿”å›å€¼
+     * @return   BOOL æ˜¯å¦è¢«å¤„ç†
      *
-     * Describe  ÔÚÏûÏ¢Ó³Éä±íÖĞÃ»ÓĞ´¦ÀíµÄÏûÏ¢½øÈë¸Ãº¯Êı´¦Àí
+     * Describe  åœ¨æ¶ˆæ¯æ˜ å°„è¡¨ä¸­æ²¡æœ‰å¤„ç†çš„æ¶ˆæ¯è¿›å…¥è¯¥å‡½æ•°å¤„ç†
      */
     STDMETHOD_(BOOL, SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT * lResult) PURE;
 
     /**
      * SetSwndProc
-     * @brief    ÉèÖÃÏûÏ¢´¦Àíº¯Êı
-     * @param    FunSwndProc swndProc --  ÏûÏ¢´¦Àíº¯Êı
+     * @brief    è®¾ç½®æ¶ˆæ¯å¤„ç†å‡½æ•°
+     * @param    FunSwndProc swndProc --  æ¶ˆæ¯å¤„ç†å‡½æ•°
      * @return   void
      *
      * Describe
@@ -864,7 +865,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * GetHostHwnd
-     * @brief    »ñÈ¡Host Hwnd
+     * @brief    è·å–Host Hwnd
      * @return   HWND -- host hwnd
      *
      * Describe
@@ -873,8 +874,8 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * GetTimelineHandlersMgr
-     * @brief    »ñÈ¡ITimelineHandlersMgr
-     * @return   ITimelineHandlersMgr* -- Ê±¼äÏß¹ÜÀíÆ÷
+     * @brief    è·å–ITimelineHandlersMgr
+     * @return   ITimelineHandlersMgr* -- æ—¶é—´çº¿ç®¡ç†å™¨
      *
      * Describe
      */
@@ -882,8 +883,8 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * IsVideoCanvas
-     * @brief    ²éÑ¯´°¿ÚÊÇ·ñÎªÊÓÆµ´°¿Ú
-     * @return   BOOL -- TRUE:ÊÇÊÓÆµ´°¿Ú
+     * @brief    æŸ¥è¯¢çª—å£æ˜¯å¦ä¸ºè§†é¢‘çª—å£
+     * @return   BOOL -- TRUE:æ˜¯è§†é¢‘çª—å£
      *
      * Describe
      */
@@ -894,3 +895,4 @@ DECLARE_INTERFACE_(IWindow, IObject)
 };
 
 SNSEND
+#endif // __SWINDOW_I__H__

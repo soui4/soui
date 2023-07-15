@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __STIMERGENERATOR__H__
+#define __STIMERGENERATOR__H__
 
 #include "core/SSingletonMap.h"
 
@@ -24,3 +25,4 @@ class STimerGenerator : public SSingletonMap<STimerGenerator, TIMERINFO, UINT_PT
 };
 
 SNSEND
+#endif // __STIMERGENERATOR__H__

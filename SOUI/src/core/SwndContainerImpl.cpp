@@ -12,8 +12,8 @@ SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 SwndContainerImpl::SwndContainerImpl()
-    : m_hCapture(NULL)
-    , m_hHover(NULL)
+    : m_hCapture(0)
+    , m_hHover(0)
     , m_bNcHover(FALSE)
     , m_bZorderDirty(TRUE)
     , m_pRoot(NULL)
@@ -105,7 +105,7 @@ BOOL SwndContainerImpl::OnReleaseSwndCapture()
     {
         pWnd->OnCaptureChanged(FALSE);
     }
-    m_hCapture = NULL;
+    m_hCapture = 0;
     return TRUE;
 }
 
@@ -155,7 +155,7 @@ void SwndContainerImpl::OnFrameMouseMove(UINT uFlag, CPoint pt)
     { //有窗口设置了鼠标捕获,不需要判断是否有TrackMouseEvent属性,也不需要判断客户区与非客户区的变化
         pCapture->TransformPointEx(pt);
         SWindow *pHover = pCapture->IsContainPoint(pt, FALSE) ? pCapture : NULL;
-        SWND hHover = pHover ? pHover->GetSwnd() : NULL;
+        SWND hHover = pHover ? pHover->GetSwnd() : 0;
         if (hHover != m_hHover)
         { //检测鼠标是否在捕获窗口间移动
             SWindow *pOldHover = SWindowMgr::GetWindow(m_hHover);
@@ -290,7 +290,7 @@ void SwndContainerImpl::OnFrameMouseLeave()
             pWnd->SSendMessage(WM_MOUSELEAVE);
         }
     }
-    m_hHover = NULL;
+    m_hHover = 0;
 }
 
 BOOL SwndContainerImpl::OnFrameSetCursor(const CPoint &pt)

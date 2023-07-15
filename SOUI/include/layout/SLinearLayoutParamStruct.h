@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SLINEARLAYOUTPARAMSTRUCT__H__
+#define __SLINEARLAYOUTPARAMSTRUCT__H__
 
 #include "SLayoutSize.h"
 SNSBEGIN
@@ -22,3 +23,4 @@ struct SLinearLayoutParamStruct
     Gravity gravity;
 };
 SNSEND
+#endif // __SLINEARLAYOUTPARAMSTRUCT__H__

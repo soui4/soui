@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SNOTIFYCENTER__H__
+#define __SNOTIFYCENTER__H__
 
 #include <core/SSingleton2.h>
 #include <helper/SCriticalSection.h>
@@ -159,3 +160,5 @@ inline void TAutoEventMapReg<T>::unregisterNotifyCenter()
 }
 
 SNSEND
+
+#endif // __SNOTIFYCENTER__H__

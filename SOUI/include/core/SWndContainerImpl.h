@@ -11,7 +11,8 @@
  * Describe    SOUI窗口容器的实现
  */
 
-#pragma once
+#ifndef __SWNDCONTAINERIMPL__H__
+#define __SWNDCONTAINERIMPL__H__
 
 #include <core/SDropTargetDispatcher.h>
 #include <core/SFocusManager.h>
@@ -126,3 +127,5 @@ class SOUI_EXP SwndContainerImpl
 };
 
 SNSEND
+
+#endif // __SWNDCONTAINERIMPL__H__

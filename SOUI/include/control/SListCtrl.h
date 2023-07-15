@@ -10,7 +10,8 @@
  *
  * Describe    ListCtrl控件
  */
-#pragma once
+#ifndef __SLISTCTRL__H__
+#define __SLISTCTRL__H__
 #include "core/SPanel.h"
 #include "SHeaderCtrl.h"
 
@@ -603,3 +604,5 @@ class SOUI_EXP SListCtrl : public SPanel {
 };
 
 SNSEND
+
+#endif // __SLISTCTRL__H__

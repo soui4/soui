@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __STIMERLINEHANDLERMGR__H__
+#define __STIMERLINEHANDLERMGR__H__
 
 #include <interface/STimelineHandler-i.h>
 #include <souicoll.h>
@@ -25,3 +26,5 @@ class STimerlineHandlerMgr : public ITimelineHandler {
 };
 
 SNSEND
+
+#endif // __STIMERLINEHANDLERMGR__H__

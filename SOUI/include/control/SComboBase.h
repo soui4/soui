@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SCOMBOBASE__H__
+#define __SCOMBOBASE__H__
 
 #include "core/SWnd.h"
 #include "SRichEdit.h"
@@ -472,3 +473,4 @@ class TComboBaseProxy
 };
 
 SNSEND
+#endif // __SCOMBOBASE__H__

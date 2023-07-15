@@ -1,7 +1,8 @@
 ﻿/*
 SOUI窗口布局接口
 */
-#pragma once
+#ifndef __SLAYOUT_I__H__
+#define __SLAYOUT_I__H__
 
 #include <interface/sobject-i.h>
 
@@ -144,3 +145,4 @@ DECLARE_INTERFACE_(ILayout, IObject)
 };
 
 SNSEND
+#endif // __SLAYOUT_I__H__

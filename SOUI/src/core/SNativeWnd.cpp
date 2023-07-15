@@ -6,7 +6,7 @@ SNSBEGIN
 SNativeWndHelper::SNativeWndHelper(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp)
     : m_hInst(hInst)
     , m_sharePtr(NULL)
-    , m_atom(NULL)
+    , m_atom(0)
 {
     InitializeCriticalSection(&m_cs);
     m_hHeap = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE, 0, 0);
@@ -256,7 +256,7 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     switch (uMsg)
     {
     case WM_COMMAND:
-        if (lParam != NULL) // not from a menu
+        if (lParam != 0) // not from a menu
             hWndChild = (HWND)lParam;
         break;
     case WM_NOTIFY:

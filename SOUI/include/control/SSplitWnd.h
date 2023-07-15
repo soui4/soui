@@ -10,7 +10,8 @@
  *
  * Describe
  */
-#pragma once
+#ifndef __SSPLITWND__H__
+#define __SSPLITWND__H__
 #include <core/swnd.h>
 #include <layout/slayoutsize.h>
 
@@ -303,3 +304,5 @@ class SOUI_EXP SSplitWnd_Row : public SSplitWnd {
 };
 
 SNSEND
+
+#endif // __SSPLITWND__H__

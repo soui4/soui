@@ -486,7 +486,7 @@ BOOL STreeView::SetAdapter(ITvAdapter *adapter)
         m_pVisibleMap->RemoveAll();
         m_pHoverItem = NULL;
         m_itemCapture = NULL;
-        m_hSelected = NULL;
+        m_hSelected = 0;
     }
 
     if (m_tvItemLocator)
@@ -897,7 +897,7 @@ void STreeView::UpdateVisibleItems()
             {
                 ii.pItem->ModifyItemState(0, WndState_Check);
                 ii.pItem->GetFocusManager()->ClearFocus();
-                m_hSelected = NULL;
+                m_hSelected = 0;
             }
             ii.pItem->SetVisible(FALSE); //防止执行SItemPanel::OnTimeFrame()
             ii.pItem->GetEventSet()->setMutedState(false);
@@ -1001,7 +1001,7 @@ void STreeView::UpdateVisibleItems()
         {
             ii.pItem->ModifyItemState(0, WndState_Check);
             ii.pItem->GetFocusManager()->ClearFocus();
-            m_hSelected = NULL;
+            m_hSelected = 0;
         }
         ii.pItem->SetVisible(FALSE); //防止执行SItemPanel::OnTimeFrame()
         ii.pItem->GetEventSet()->setMutedState(false);
@@ -1154,7 +1154,7 @@ void STreeView::onItemBeforeRemove(HSTREEITEM hItem)
     }
     if (m_hSelected && (m_hSelected == hItem || m_adapter->IsDecendentItem(hItem, m_hSelected)))
     {
-        m_hSelected = NULL;
+        m_hSelected = 0;
     }
 
     if (m_pHoverItem)
@@ -1519,8 +1519,8 @@ void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
         }
         rcLine.OffsetRect(nIndent, 0);
     }
-    BOOL hasNextSibling = m_adapter->GetNextSiblingItem(hItem) != NULL;
-    BOOL hasPervSibling = m_adapter->GetPrevSiblingItem(hItem) != NULL;
+    BOOL hasNextSibling = m_adapter->GetNextSiblingItem(hItem) != 0;
+    BOOL hasPervSibling = m_adapter->GetPrevSiblingItem(hItem) != 0;
     BOOL hasChild = m_adapter->HasChildren(hItem);
     int iLine = -1;
     if (hasChild)

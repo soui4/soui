@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SAPPDIR__H__
+#define __SAPPDIR__H__
 
 SNSBEGIN
 class SOUI_EXP SAppDir {
@@ -12,3 +13,5 @@ class SOUI_EXP SAppDir {
 };
 
 SNSEND
+
+#endif // __SAPPDIR__H__

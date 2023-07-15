@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SWNDFINDER__H__
+#define __SWNDFINDER__H__
 
 #include <core/SSingleton2.h>
 
@@ -93,3 +94,4 @@ class SWindowFinder : public SSingleton2<SWindowFinder> {
 };
 
 SNSEND
+#endif // __SWNDFINDER__H__

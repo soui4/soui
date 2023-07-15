@@ -16,12 +16,8 @@
  *                       2.2  2008-10-16 修改一个遍历接口的问题
  *                       2.3  2011-10-17 将数据释放的接口从回调函数改成虚函数
  */
-#if !defined(AFX_STREE_H__D2332B4E_2C7E_4357_BE22_EC55BF496C1C__INCLUDED_)
-#define AFX_STREE_H__D2332B4E_2C7E_4357_BE22_EC55BF496C1C__INCLUDED_
-
-#if _MSC_VER > 1000
-#pragma once
-#endif // _MSC_VER > 1000
+#ifndef __STREE__H__
+#define __STREE__H__
 
 #ifndef SASSERT
 #define SASSERT(x)
@@ -187,7 +183,7 @@ class CSTree {
     {
         int nRet = -1;
         if (hItem == STVI_ROOT)
-            hItem = NULL;
+            hItem = 0;
         while (hItem)
         {
             nRet++;
@@ -390,7 +386,7 @@ class CSTree {
         if (hInsertAfterNode != STVN_FIRST && hInsertAfterNode != STVN_LAST)
         {
             if (hInsertAfterNode->hParent != hParentNode)
-                return NULL;
+                return 0;
             if (hInsertAfterNode->hNextSibling == NULL)
                 hInsertAfterNode = STVN_LAST;
         }
@@ -590,7 +586,7 @@ class CSTree {
                 return hRet;
             hParent = GetParentItem(hParent);
         }
-        return NULL;
+        return 0;
     }
 
     /**
@@ -730,4 +726,4 @@ class CSTree {
     HSTREENODE m_hRootLast;  /**< 最后一个根节点 */
 };
 
-#endif // !defined(AFX_STREE_H__D2332B4E_2C7E_4357_BE22_EC55BF496C1C__INCLUDED_)
+#endif // __STREE__H__

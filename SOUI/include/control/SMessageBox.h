@@ -10,7 +10,8 @@
  *
  * Describe
  */
-#pragma once
+#ifndef __SMESSAGEBOX__H__
+#define __SMESSAGEBOX__H__
 #include <core/shostdialog.h>
 #include <helper/SDpiHelper.hpp>
 #include <interface/SMessageBox-i.h>
@@ -107,3 +108,5 @@ class SOUI_EXP SMessageBoxImpl
 };
 
 SNSEND
+
+#endif // __SMESSAGEBOX__H__

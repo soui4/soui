@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include "../config/com-def.h"
+#include "../config/config.h"
 #include "ComLoader.h"
 #include <tchar.h>
 #include <commask.h>
@@ -73,7 +73,9 @@ struct SComInfo s_comInfo[]={
 	}
 #else
 
+#ifdef _MSC_VER
 #pragma message("LIB_SOUI_COM")
+#endif
 
 #pragma comment(lib,"Usp10")
 #pragma comment(lib,"opengl32")

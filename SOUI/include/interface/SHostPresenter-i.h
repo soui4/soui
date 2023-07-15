@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SHOSTPRESENTER_I__H__
+#define __SHOSTPRESENTER_I__H__
 #include <interface/shostwnd-i.h>
 SNSBEGIN
 
@@ -6,17 +7,17 @@ SNSBEGIN
 #define INTERFACE IHostPresenter
 DECLARE_INTERFACE_(IHostPresenter, IObjRef)
 {
-    //!Ìí¼ÓÒýÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒýÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -31,3 +32,4 @@ DECLARE_INTERFACE_(IHostPresenter, IObjRef)
 };
 
 SNSEND
+#endif // __SHOSTPRESENTER_I__H__

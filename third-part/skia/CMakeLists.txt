@@ -28,6 +28,7 @@ add_definitions (
     -DSK_IGNORE_ETC1_SUPPORT
     )
 
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
 #
 # TODO
 # 由于源文件太多，且有很多没有使用到，使用其他过滤手段没有方法过滤

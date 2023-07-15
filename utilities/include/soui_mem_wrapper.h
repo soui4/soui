@@ -6,7 +6,8 @@
 	
 	purpose:	包装内存动态分配
 *********************************************************************/
-#pragma once
+#ifndef __SOUI_MEM_WRAPPER__H__
+#define __SOUI_MEM_WRAPPER__H__
 #include "utilities-def.h"
 
 namespace SOUI
@@ -20,3 +21,5 @@ namespace SOUI
         static void   SouiFree(void *p);
     };
 }
+
+#endif // __SOUI_MEM_WRAPPER__H__

@@ -11,7 +11,8 @@
  * Describe    dragdrop分发模块
  */
 
-#pragma once
+#ifndef __SDROPTARGETDISPATCHER__H__
+#define __SDROPTARGETDISPATCHER__H__
 #include "swnd.h"
 
 SNSBEGIN
@@ -81,3 +82,5 @@ class SDropTargetDispatcher : public IDropTarget {
 };
 
 SNSEND
+
+#endif // __SDROPTARGETDISPATCHER__H__

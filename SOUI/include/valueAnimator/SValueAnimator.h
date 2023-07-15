@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SVALUEANIMATOR__H__
+#define __SVALUEANIMATOR__H__
 /*
  * Copyright (C) 2010 The Android Open Source Project
  *
@@ -710,3 +711,4 @@ protected:
 	IAnimatorGroupListerer * m_listener;
 };
 SNSEND
+#endif // __SVALUEANIMATOR__H__

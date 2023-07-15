@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SMENUBAR__H__
+#define __SMENUBAR__H__
 
 #include <helper/SMenu.h>
 
@@ -39,3 +40,4 @@ class SOUI_EXP SMenuBar : public SWindow {
 };
 
 SNSEND
+#endif // __SMENUBAR__H__

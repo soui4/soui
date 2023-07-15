@@ -10,7 +10,8 @@
  *
  * Describe
  */
-#pragma once
+#ifndef __SLISTBOX__H__
+#define __SLISTBOX__H__
 #include "core/SPanel.h"
 
 SNSBEGIN
@@ -30,7 +31,7 @@ typedef struct tagLBITEM
         : strText(pOwner)
     {
         nImage = -1;
-        lParam = NULL;
+        lParam = 0;
     }
 
 } LBITEM, *LPLBITEM;
@@ -474,3 +475,4 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
 };
 
 SNSEND
+#endif // __SLISTBOX__H__

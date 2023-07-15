@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __STRANSFORM_I__H__
+#define __STRANSFORM_I__H__
 
 #include <interface/SMatrix-i.h>
 SNSBEGIN
@@ -29,43 +30,44 @@ enum
 DECLARE_INTERFACE(ITransformation)
 {
     /**
-     * @brief »ñÈ¡±ä»»¾ØÕó
-     * @return IMatrix *--±ä»»¾ØÕó
+     * @brief è·å–å˜æ¢çŸ©é˜µ
+     * @return IMatrix *--å˜æ¢çŸ©é˜µ
      */
     STDMETHOD_(IMatrix *, GetMatrix)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡Í¸Ã÷¶È
-     * @return BYTE--Í¸Ã÷¶È
+     * @brief è·å–é€æ˜åº¦
+     * @return BYTE--é€æ˜åº¦
      */
     STDMETHOD_(BYTE, GetAlpha)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃÍ¸Ã÷¶È
-     * @param alpha BYTE--Í¸Ã÷¶È
+     * @brief è®¾ç½®é€æ˜åº¦
+     * @param alpha BYTE--é€æ˜åº¦
      * @return
      */
     STDMETHOD_(void, SetAlpha)(THIS_ BYTE alpha) PURE;
 
     /**
-     * @brief Çå¿Õ±ä»»¾ØÕó¼°Í¸Ã÷¶È
+     * @brief æ¸…ç©ºå˜æ¢çŸ©é˜µåŠé€æ˜åº¦
      * @return
      */
     STDMETHOD_(void, Clear)(THIS) PURE;
 
     /**
-     * @brief ÉèÖÃ±ä»¯ÀàĞÍ
-     * @param type int--ÀàĞÍ
+     * @brief è®¾ç½®å˜åŒ–ç±»å‹
+     * @param type int--ç±»å‹
      * @return
      */
     STDMETHOD_(void, SetTransformationType)(THIS_ int type) PURE;
 
     /**
-     * @brief ×éºÏ±ä»»¾ØÕó¼°Í¸Ã÷¶È
-     * @param t ITransformation *--±ä»»¶ÔÏó
+     * @brief ç»„åˆå˜æ¢çŸ©é˜µåŠé€æ˜åº¦
+     * @param t ITransformation *--å˜æ¢å¯¹è±¡
      * @return
      */
     STDMETHOD_(void, Compose)(const ITransformation *t) PURE;
 };
 
 SNSEND
+#endif // __STRANSFORM_I__H__

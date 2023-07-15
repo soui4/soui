@@ -1,28 +1,29 @@
-#pragma once
+ï»¿#ifndef __SFONTINFO__H__
+#define __SFONTINFO__H__
 
 SNSBEGIN
 
 /**
  * @union      FONTSTYLE
- * @brief      FONTµÄ·ç¸ñ
+ * @brief      FONTçš„é£æ ¼
  *
  * Describe
  */
 union FONTSTYLE {
-    uint64_t syle; // DWORD°æ±¾µÄ·ç¸ñ
+    uint64_t syle; // DWORDç‰ˆæœ¬çš„é£æ ¼
     struct
     {
-        uint64_t byCharset : 8;    //×Ö·û¼¯
+        uint64_t byCharset : 8;    //å­—ç¬¦é›†
         uint64_t byWeight : 8;     // weight/4
-        uint64_t fItalic : 1;      //Ğ±Ìå±êÖ¾Î»
-        uint64_t fUnderline : 1;   //ÏÂ»®Ïß±êÖ¾Î»
-        uint64_t fBold : 1;        //´ÖÌå±êÖ¾Î»
-        uint64_t fStrike : 1;      //É¾³ıÏß±êÖ¾Î»
-        uint64_t fEscapement : 12; //½Ç¶È, ÒÔ0.1½Ç¶ÈÎªµ¥Î»
+        uint64_t fItalic : 1;      //æ–œä½“æ ‡å¿—ä½
+        uint64_t fUnderline : 1;   //ä¸‹åˆ’çº¿æ ‡å¿—ä½
+        uint64_t fBold : 1;        //ç²—ä½“æ ‡å¿—ä½
+        uint64_t fStrike : 1;      //åˆ é™¤çº¿æ ‡å¿—ä½
+        uint64_t fEscapement : 12; //è§’åº¦, ä»¥0.1è§’åº¦ä¸ºå•ä½
         uint64_t reserved : 13;    // reserved
         uint64_t szIsAdding : 1;   // cSize is adding
         uint64_t szUnit : 2;       // cSize unit,(0-3)
-        uint64_t nSize : 16;       //×ÖÌå´óĞ¡£¬ÎªshortÓĞ·ûºÅÀàĞÍ
+        uint64_t nSize : 16;       //å­—ä½“å¤§å°ï¼Œä¸ºshortæœ‰ç¬¦å·ç±»å‹
     } attr;
 
     FONTSTYLE(uint64_t _style = 0)
@@ -39,3 +40,4 @@ struct FontInfo
     int scale;
 };
 SNSEND
+#endif // __SFONTINFO__H__

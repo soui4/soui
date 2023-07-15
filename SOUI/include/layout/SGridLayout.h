@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SGRIDLAYOUT__H__
+#define __SGRIDLAYOUT__H__
 
 #include "interface/slayout-i.h"
 #include "SGridLayoutParamStruct.h"
@@ -93,3 +94,5 @@ class SOUI_EXP SGridLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
 };
 
 SNSEND
+
+#endif // __SGRIDLAYOUT__H__

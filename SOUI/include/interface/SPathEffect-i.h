@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SPATHEFFECT_I__H__
+#define __SPATHEFFECT_I__H__
 
 #include <interface/obj-ref-i.h>
 
@@ -8,24 +9,24 @@ SNSBEGIN
 #define INTERFACE IPathEffect
 DECLARE_INTERFACE_(IPathEffect, IObjRef)
 {
-    //!Ìí¼ÓÒıÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒıÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡PathEffectµÄÔ­Ê¼¶ÔÏóÖ¸Õë
-     * @return void* Ô­Ê¼¶ÔÏóÖ¸Õë
+     * @brief è·å–PathEffectçš„åŸå§‹å¯¹è±¡æŒ‡é’ˆ
+     * @return void* åŸå§‹å¯¹è±¡æŒ‡é’ˆ
      */
     STDMETHOD_(void *, GetRealPathEffect)(THIS) PURE;
 };
@@ -34,24 +35,24 @@ DECLARE_INTERFACE_(IPathEffect, IObjRef)
 #define INTERFACE ICornerPathEffect
 DECLARE_INTERFACE_IID_(ICornerPathEffect, IPathEffect, "3C4A07C2-2617-432a-ADFC-8921D8B2E2BD")
 {
-    //!Ìí¼ÓÒıÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒıÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡PathEffectµÄÔ­Ê¼¶ÔÏóÖ¸Õë
-     * @return void* Ô­Ê¼¶ÔÏóÖ¸Õë
+     * @brief è·å–PathEffectçš„åŸå§‹å¯¹è±¡æŒ‡é’ˆ
+     * @return void* åŸå§‹å¯¹è±¡æŒ‡é’ˆ
      */
     STDMETHOD_(void *, GetRealPathEffect)(THIS) PURE;
 
@@ -62,24 +63,24 @@ DECLARE_INTERFACE_IID_(ICornerPathEffect, IPathEffect, "3C4A07C2-2617-432a-ADFC-
 #define INTERFACE IDashPathEffect
 DECLARE_INTERFACE_IID_(IDashPathEffect, IPathEffect, "5FA8CF4C-8C83-4eac-82C0-EE160E04D78C")
 {
-    //!Ìí¼ÓÒıÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒıÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡PathEffectµÄÔ­Ê¼¶ÔÏóÖ¸Õë
-     * @return void* Ô­Ê¼¶ÔÏóÖ¸Õë
+     * @brief è·å–PathEffectçš„åŸå§‹å¯¹è±¡æŒ‡é’ˆ
+     * @return void* åŸå§‹å¯¹è±¡æŒ‡é’ˆ
      */
     STDMETHOD_(void *, GetRealPathEffect)(THIS) PURE;
 
@@ -90,24 +91,24 @@ DECLARE_INTERFACE_IID_(IDashPathEffect, IPathEffect, "5FA8CF4C-8C83-4eac-82C0-EE
 #define INTERFACE IDashPathEffect
 DECLARE_INTERFACE_IID_(IDiscretePathEffect, IPathEffect, "51D32163-594E-4fbe-B2A5-8A07DEDDBEAB")
 {
-    //!Ìí¼ÓÒıÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒıÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡PathEffectµÄÔ­Ê¼¶ÔÏóÖ¸Õë
-     * @return void* Ô­Ê¼¶ÔÏóÖ¸Õë
+     * @brief è·å–PathEffectçš„åŸå§‹å¯¹è±¡æŒ‡é’ˆ
+     * @return void* åŸå§‹å¯¹è±¡æŒ‡é’ˆ
      */
     STDMETHOD_(void *, GetRealPathEffect)(THIS) PURE;
 
@@ -115,3 +116,4 @@ DECLARE_INTERFACE_IID_(IDiscretePathEffect, IPathEffect, "51D32163-594E-4fbe-B2A
 };
 
 SNSEND
+#endif // __SPATHEFFECT_I__H__

@@ -198,7 +198,8 @@ BOOL SResProviderZip::GetRawBuffer( LPCTSTR strType,LPCTSTR pszResName,LPVOID pB
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return FALSE;
 	CZipFile zf;
-	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
+	if(!m_zipFile.GetFile(strPath,zf))
+		return FALSE;
 	if(size<zf.GetSize())
 	{
 		SetLastError(ERROR_INSUFFICIENT_BUFFER);

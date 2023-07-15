@@ -1,11 +1,12 @@
-//
+﻿//
 // stdint.h
 //
 //      Copyright (c) Microsoft Corporation. All rights reserved.
 //
 // The C Standard Library <stdint.h> header.
 //
-#pragma once
+#ifndef __STDINT__H__
+#define __STDINT__H__
 #define _STDINT
 
 #ifndef RC_INVOKED
@@ -133,3 +134,5 @@ typedef unsigned long long uintmax_t;
  * Copyright (c) 1992-2012 by P.J. Plauger.  ALL RIGHTS RESERVED.
  * Consult your license regarding permissions and restrictions.
 V6.00:0009 */
+
+#endif // __STDINT__H__

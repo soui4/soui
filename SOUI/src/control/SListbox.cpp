@@ -4,8 +4,6 @@
 //     Creator: JinHui
 //     Version: 2012.12.18 - 1.0 - Create
 //////////////////////////////////////////////////////////////////////////
-
-#pragma once
 #include "souistd.h"
 #include "control/Slistbox.h"
 

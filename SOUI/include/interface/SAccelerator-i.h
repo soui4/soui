@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SACCELERATOR_I__H__
+#define __SACCELERATOR_I__H__
 #include <utilities-def.h>
 
 SNSBEGIN
@@ -17,24 +18,24 @@ DECLARE_INTERFACE(IAccelerator)
 {
     /**
      * GetModifier
-     * @brief    »ñµÃ¼ÓËÙ¼üµÄĞŞÊÎÎ»
-     * @return   WORD -- ¼ÓËÙ¼üµÄĞŞÊÎ¼ü
+     * @brief    è·å¾—åŠ é€Ÿé”®çš„ä¿®é¥°ä½
+     * @return   WORD -- åŠ é€Ÿé”®çš„ä¿®é¥°é”®
      * Describe
      */
     STDMETHOD_(WORD, GetModifier)(CTHIS) SCONST PURE;
 
     /**
      * GetKey
-     * @brief    »ñµÃ¼ÓËÙ¼üµÄÖ÷¼ü
-     * @return   WORD -- ¼ÓËÙ¼üµÄÖ÷¼ü
+     * @brief    è·å¾—åŠ é€Ÿé”®çš„ä¸»é”®
+     * @return   WORD -- åŠ é€Ÿé”®çš„ä¸»é”®
      * Describe
      */
     STDMETHOD_(WORD, GetKey)(CTHIS) SCONST PURE;
 
     /**
      * GetAcc
-     * @brief    »ñµÃ¼ÓËÙ¼ü
-     * @return   DWORD -- ¼ÓËÙ¼ü
+     * @brief    è·å¾—åŠ é€Ÿé”®
+     * @return   DWORD -- åŠ é€Ÿé”®
      * Describe
      */
     STDMETHOD_(DWORD, GetAcc)(CTHIS) SCONST PURE;
@@ -42,9 +43,9 @@ DECLARE_INTERFACE(IAccelerator)
 
 /**
  * @struct     IAcceleratorTarget
- * @brief      ¼ÓËÙ¼ü°´ÏÂµÄ´¦Àí½Ó¿Ú
+ * @brief      åŠ é€Ÿé”®æŒ‰ä¸‹çš„å¤„ç†æ¥å£
  *
- * Describe ÏëÒª×¢²á¼üÅÌ¼ÓËÙ¼üµÄÀàĞèÒªÊµÏÖ±¾½Ó¿Ú
+ * Describe æƒ³è¦æ³¨å†Œé”®ç›˜åŠ é€Ÿé”®çš„ç±»éœ€è¦å®ç°æœ¬æ¥å£
  */
 #undef INTERFACE
 #define INTERFACE IAcceleratorTarget
@@ -53,8 +54,8 @@ DECLARE_INTERFACE(IAcceleratorTarget)
     /**
      * OnAcceleratorPressed
      * @brief
-     * @param    const CAccelerator & accelerator --  °´ÏÂµÄ¼ÓËÙ¼ü
-     * @return   bool -- ¼ÓËÙ¼ü±»´¦Àí·µ»Øtrue
+     * @param    const CAccelerator & accelerator --  æŒ‰ä¸‹çš„åŠ é€Ÿé”®
+     * @return   bool -- åŠ é€Ÿé”®è¢«å¤„ç†è¿”å›true
      * Describe
      */
     STDMETHOD_(BOOL, OnAcceleratorPressed)(THIS_ const IAccelerator *acc) PURE;
@@ -62,7 +63,7 @@ DECLARE_INTERFACE(IAcceleratorTarget)
 
 /**
  * @struct     IAcceleratorMgr
- * @brief      ¼ÓËÙ¼ü¹ÜÀí½Ó¿Ú
+ * @brief      åŠ é€Ÿé”®ç®¡ç†æ¥å£
  *
  * Describe
  */
@@ -91,3 +92,4 @@ DECLARE_INTERFACE(IAcceleratorMgr)
 };
 
 SNSEND
+#endif // __SACCELERATOR_I__H__

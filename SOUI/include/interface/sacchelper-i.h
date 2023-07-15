@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SACCHELPER_I__H__
+#define __SACCHELPER_I__H__
 #include <utilities-def.h>
 
 SNSBEGIN
@@ -21,3 +22,4 @@ DECLARE_INTERFACE_IID_(IAccHelper, IUnknown, "9FAF3067-6723-40DA-A56B-CDCB11B890
 };
 
 SNSEND
+#endif // __SACCHELPER_I__H__

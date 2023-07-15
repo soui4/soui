@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SNATIVEWND__H__
+#define __SNATIVEWND__H__
 #include <interface/SNativeWnd-i.h>
 #include <sobject/Sobject.hpp>
 
@@ -355,3 +356,4 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
 };
 
 SNSEND
+#endif // __SNATIVEWND__H__

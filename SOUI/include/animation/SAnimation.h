@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2006 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,8 @@
  * other objects. See the {@link android.view.animation animation package
  * description file}.
  */
-#pragma once
+#ifndef __SANIMATION__H__
+#define __SANIMATION__H__
 
 #include <interface/SAnimation-i.h>
 #include <helper/obj-ref-impl.hpp>
@@ -317,3 +318,4 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
 };
 
 SNSEND
+#endif // __SANIMATION__H__

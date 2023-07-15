@@ -251,7 +251,7 @@ namespace SOUI
 
 	HRESULT SRenderFactory_Skia::CreateEmbossMaskFilter(float direction[3], float ambient, float specular, float blurRadius,IMaskFilter ** ppMaskFilter)
 	{
-		SkMaskFilter *pMaskFilter=SkBlurMaskFilter::CreateEmboss(direction,ambient,specular,SkBlurMaskFilter::ConvertRadiusToSigma(blurRadius));
+		SkMaskFilter *pMaskFilter=SkBlurMaskFilter::CreateEmboss(SkBlurMask::ConvertRadiusToSigma(blurRadius),direction,ambient,specular);
 		if(!pMaskFilter)
 			return E_OUTOFMEMORY;
 		*ppMaskFilter = new SMaskFilter_Skia(pMaskFilter);
@@ -670,7 +670,7 @@ namespace SOUI
 	{
 		SkPaint paint=m_paint;
 
-		paint.setFilterBitmap(false);
+		paint.setFilterLevel(SkPaint::kNone_FilterLevel);
 		paint.setColor(SColor(cr).toARGB());
 		paint.setStyle(SkPaint::kFill_Style);
 
@@ -850,7 +850,7 @@ namespace SOUI
 		paint.setAlpha(byAlpha);
 
 		SkPaint::FilterLevel fl = (SkPaint::FilterLevel)HIWORD(expendMode);//SkPaint::kNone_FilterLevel;
-		if(fl != kUndef_FilterLevel)
+		if(SOUI::FilterLevel(fl) != SOUI::kUndef_FilterLevel)
 			paint.setFilterLevel(fl);
 
 		if(expendModeLow == EM_STRETCH)
@@ -1311,7 +1311,7 @@ namespace SOUI
 	HRESULT SRenderTarget_Skia::FillSolidEllipse(LPCRECT pRect,COLORREF cr)
 	{
 		SkPaint paint=m_paint;
-		paint.setFilterBitmap(false);
+		paint.setFilterLevel(SkPaint::kNone_FilterLevel);
 		paint.setColor(SColor(cr).toARGB());
 		paint.setStyle(SkPaint::kFill_Style);
 
@@ -2035,7 +2035,7 @@ namespace SOUI
 			pAttr = pAttr->Next();
 		}
 		
-		if(blurStyle != kNone_BlurFlag && blurRadius > 0.0f)
+		if(blurStyle != SOUI::kNone_BLurStyle && blurRadius > 0.0f)
 		{
 			GetRenderFactory()->CreateBlurMaskFilter(blurRadius,blurStyle,blurFlags,&m_maskFilter);
 		}
@@ -2131,7 +2131,7 @@ namespace SOUI
 	{
 		if(m_brushType == Brush_Color)
 		{
-			paint.setFilterBitmap(false);
+			paint.setFilterLevel(SkPaint::kNone_FilterLevel);
 			paint.setColor(m_cr);
 		}else if(m_brushType == Brush_Bitmap){
 			SkMatrix mtx;

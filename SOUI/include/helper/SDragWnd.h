@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SDRAGWND__H__
+#define __SDRAGWND__H__
 
 #include "core/SNativeWnd.h"
 
@@ -27,3 +28,5 @@ class SDragWnd : public SNativeWnd {
 };
 
 SNSEND
+
+#endif // __SDRAGWND__H__

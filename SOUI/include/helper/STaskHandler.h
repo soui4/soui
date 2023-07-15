@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __STASKHANDLER__H__
+#define __STASKHANDLER__H__
 
 #include <interface/STaskLoop-i.h>
 //#include <helper/SSharedPtr.hpp>
@@ -85,3 +86,4 @@ class SOUI_EXP STaskHandler
     DWORD m_dwThreadID;
 };
 SNSEND
+#endif // __STASKHANDLER__H__

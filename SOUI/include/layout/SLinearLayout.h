@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SLINEARLAYOUT__H__
+#define __SLINEARLAYOUT__H__
 
 #include "interface/slayout-i.h"
 #include "SLinearLayoutParamStruct.h"
@@ -107,3 +108,5 @@ class SHBox : public SLinearLayout {
     }
 };
 SNSEND
+
+#endif // __SLINEARLAYOUT__H__

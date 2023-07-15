@@ -11,7 +11,8 @@
  * Describe    此类完成日历控件
  */
 
-#pragma once
+#ifndef __SCALENDAR__H__
+#define __SCALENDAR__H__
 #include "core/SWnd.h"
 
 SNSBEGIN
@@ -266,3 +267,5 @@ class SOUI_EXP SCalendar : public SWindow {
     wMonthOrYearInfo m_arrMonthOrYear[12];
 };
 SNSEND
+
+#endif // __SCALENDAR__H__

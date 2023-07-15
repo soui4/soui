@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SNCPAINTER__H__
+#define __SNCPAINTER__H__
 #include <sobject/Sobject.hpp>
 #include <interface/SNcPainter-i.h>
 #include <core/SItemPanel.h>
@@ -166,3 +167,5 @@ class SNcPanel : public SOsrPanel {
 };
 
 SNSEND
+
+#endif // __SNCPAINTER__H__

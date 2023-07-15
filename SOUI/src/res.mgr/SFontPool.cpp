@@ -2,8 +2,6 @@
 //  Class Name: SFontPool
 // Description: Font Pool
 //////////////////////////////////////////////////////////////////////////
-
-#pragma once
 #include "souistd.h"
 #include "res.mgr/sfontpool.h"
 #include "helper/SplitString.h"

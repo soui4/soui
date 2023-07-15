@@ -11,6 +11,8 @@
 
 using namespace Gdiplus;
 
+#define smax(a,b) (a)>(b)?(a):(b)
+
 namespace SOUI
 {
     //////////////////////////////////////////////////////////////////////////
@@ -138,8 +140,8 @@ namespace SOUI
     {
         GUID   pageGuid = FrameDimensionTime;
         // Get the number of frames in the first dimension.
-        m_nFrameCount = max(1, bmpSrc->GetFrameCount(&pageGuid));
-        
+        m_nFrameCount = bmpSrc->GetFrameCount(&pageGuid);
+        if(m_nFrameCount == 0) m_nFrameCount = 1;
         SIZE imSize={(LONG)bmpSrc->GetWidth(),(LONG)bmpSrc->GetHeight()};
 
         if (m_nFrameCount>1)
@@ -160,7 +162,7 @@ namespace SOUI
                 g.Clear(Color(0,0,0,0));
                 g.DrawImage(bmpSrc,0,0,imSize.cx,imSize.cy);
                 
-                int nFrameDelay =10*max(((int*) pDelays->value)[i], 10);
+                int nFrameDelay =10*smax(((int*) pDelays->value)[i], 10);
                 
                 BitmapData* bitmapData = new BitmapData;
                 Rect rect(0,0, imSize.cx,imSize.cy);
@@ -287,7 +289,7 @@ namespace SOUI
         
         Bitmap bmp(nWid,nHei,nWid*4,PixelFormat32bppPARGB,pBits);
         Image *gdipImg = &bmp;
-        return Ok == gdipImg->Save(pszFileName,&clsidEncoder)?S_OK:E_FAIL;
+        return Ok == gdipImg->Save(pszFileName,&clsidEncoder,NULL)?S_OK:E_FAIL;
     }
 
     LPCWSTR SImgDecoderFactory_GDIP::GetDescription() const

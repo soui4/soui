@@ -7,9 +7,7 @@
  * soui version: ${SOUI_VER1}.${SOUI_VER2}.${SOUI_VER3}.${SOUI_VER4}
  */
 
-#pragma once
-
 #define SOUI_VER1 4
 #define SOUI_VER2 5
-#define SOUI_VER3 3
-#define SOUI_VER4 9
+#define SOUI_VER3 4
+#define SOUI_VER4 0

@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SCARET_I__H__
+#define __SCARET_I__H__
 #include <interface/sobject-i.h>
 
 SNSBEGIN
@@ -12,16 +13,16 @@ DECLARE_INTERFACE_(ICaret, IObject)
     //-----------------------------------------------------------------------------------
 
     /**
-     * @brief ³õÊ¼»¯¹â±ê
-     * @param hBmp --¹â±êµÄÎ»Í¼£¬¿ÉÒÔÎª¿Õ
-     * @param nWid --¹â±ê¿í¶È
-     * @param nHei --¹â±ê¸ß¶È
-     * @return BOOL TRUE-³É¹¦
+     * @brief åˆå§‹åŒ–å…‰æ ‡
+     * @param hBmp --å…‰æ ‡çš„ä½å›¾ï¼Œå¯ä»¥ä¸ºç©º
+     * @param nWid --å…‰æ ‡å®½åº¦
+     * @param nHei --å…‰æ ‡é«˜åº¦
+     * @return BOOL TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, Init)(THIS_ HBITMAP hBmp, int nWid, int nHei) PURE;
 
     /**
-     * @brief ÉèÖÃ¹â±êÎ»ÖÃ
+     * @brief è®¾ç½®å…‰æ ‡ä½ç½®
      * @param x -- X
      * @param y -- Y
      * @return
@@ -29,31 +30,32 @@ DECLARE_INTERFACE_(ICaret, IObject)
     STDMETHOD_(void, SetPosition)(THIS_ int x, int y) PURE;
 
     /**
-     * @brief ÉèÖÃ¹â±êÏÔÊ¾×´Ì¬
-     * @param bVisible --ÏÔÊ¾×´Ì¬
-     * @param owner --¹â±êµÄËŞÖ÷
-     * @return BOOL TRUE-³É¹¦
+     * @brief è®¾ç½®å…‰æ ‡æ˜¾ç¤ºçŠ¶æ€
+     * @param bVisible --æ˜¾ç¤ºçŠ¶æ€
+     * @param owner --å…‰æ ‡çš„å®¿ä¸»
+     * @return BOOL TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetVisible)(THIS_ BOOL bVisible, SWND owner) PURE;
 
     /**
-     * @brief »ñÈ¡¹â±êÏÔÊ¾×´Ì¬
-     * @return BOOL TRUE-ÏÔÊ¾
+     * @brief è·å–å…‰æ ‡æ˜¾ç¤ºçŠ¶æ€
+     * @return BOOL TRUE-æ˜¾ç¤º
      */
     STDMETHOD_(BOOL, IsVisible)(CTHIS) SCONST PURE;
 
     /**
-     * @brief »æÖÆ¹â±ê
-     * @param pRT --»æÖÆ¹â±êµÄRenderTarget
+     * @brief ç»˜åˆ¶å…‰æ ‡
+     * @param pRT --ç»˜åˆ¶å…‰æ ‡çš„RenderTarget
      * @return
      */
     STDMETHOD_(void, Draw)(THIS_ IRenderTarget * pRT) PURE;
 
     /**
-     * @brief »ñÈ¡¹â±êÏÔÊ¾¾ØĞÎ
+     * @brief è·å–å…‰æ ‡æ˜¾ç¤ºçŸ©å½¢
      * @return RECT
      */
     STDMETHOD_(RECT, GetRect)(CTHIS) SCONST PURE;
 };
 
 SNSEND
+#endif // __SCARET_I__H__

@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SOUIFACTORY__H__
+#define __SOUIFACTORY__H__
 #include <interface/SFactory-i.h>
 #include <helper/obj-ref-impl.hpp>
 
@@ -27,3 +28,4 @@ class SOUI_EXP SouiFactory : public TObjRefImpl<ISouiFactory> {
 };
 
 SNSEND
+#endif // __SOUIFACTORY__H__

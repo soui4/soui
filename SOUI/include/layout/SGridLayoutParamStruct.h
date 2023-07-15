@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SGRIDLAYOUTPARAMSTRUCT__H__
+#define __SGRIDLAYOUTPARAMSTRUCT__H__
 
 #include "SLayoutSize.h"
 
@@ -33,3 +34,4 @@ struct SGridLayoutParamStruct
 };
 
 SNSEND
+#endif // __SGRIDLAYOUTPARAMSTRUCT__H__

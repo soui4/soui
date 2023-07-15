@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SINTERPOLATOR_I__H__
+#define __SINTERPOLATOR_I__H__
 #include <interface/sobject-i.h>
 SNSBEGIN
 
@@ -21,3 +22,4 @@ DECLARE_INTERFACE_(IInterpolator, IObject)
     STDMETHOD_(float, getInterpolation)(CTHIS_ float input) SCONST PURE;
 };
 SNSEND
+#endif // __SINTERPOLATOR_I__H__

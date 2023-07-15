@@ -13,9 +13,9 @@ STreeCtrl::STreeCtrl()
     : m_nItemHei(20)
     , m_nIndent(18)
     , m_nItemMargin(4)
-    , m_hSelItem(NULL)
-    , m_hHoverItem(NULL)
-    , m_hCaptureItem(NULL)
+    , m_hSelItem(0)
+    , m_hHoverItem(0)
+    , m_hCaptureItem(0)
     , m_pItemBgSkin(NULL)
     , m_pItemSelSkin(NULL)
     , m_pIconSkin(NULL)
@@ -54,12 +54,12 @@ STreeCtrl::~STreeCtrl()
 
 HSTREEITEM STreeCtrl::InsertItem(LPCTSTR lpszItem, HSTREEITEM hParent, HSTREEITEM hInsertAfter)
 {
-    return InsertItem(lpszItem, -1, -1, NULL, hParent, hInsertAfter);
+    return InsertItem(lpszItem, -1, -1, 0, hParent, hInsertAfter);
 }
 
 HSTREEITEM STreeCtrl::InsertItem(LPCTSTR lpszItem, int nImage, int nSelectedImage, HSTREEITEM hParent, HSTREEITEM hInsertAfter)
 {
-    return InsertItem(lpszItem, nImage, nSelectedImage, NULL, hParent, hInsertAfter);
+    return InsertItem(lpszItem, nImage, nSelectedImage, 0, hParent, hInsertAfter);
 }
 
 HSTREEITEM STreeCtrl::InsertItem(LPCTSTR lpszItem, int nImage, int nSelectedImage, LPARAM lParam, HSTREEITEM hParent, HSTREEITEM hInsertAfter)
@@ -94,11 +94,11 @@ BOOL STreeCtrl::RemoveItem(HSTREEITEM hItem)
     }
 
     if (IsAncestor(hItem, m_hHoverItem))
-        m_hHoverItem = NULL;
+        m_hHoverItem = 0;
     if (IsAncestor(hItem, m_hSelItem))
-        m_hSelItem = NULL;
+        m_hSelItem = 0;
     if (IsAncestor(hItem, m_hCaptureItem))
-        m_hCaptureItem = NULL;
+        m_hCaptureItem = 0;
 
     DeleteItem(hItem);
 
@@ -135,9 +135,9 @@ void STreeCtrl::RemoveAllItems()
 {
     DeleteAllItems();
     m_nVisibleItems = 0;
-    m_hSelItem = NULL;
-    m_hHoverItem = NULL;
-    m_hCaptureItem = NULL;
+    m_hSelItem = 0;
+    m_hHoverItem = 0;
+    m_hCaptureItem = 0;
     m_nContentWidth = 0;
     UpdateScrollBar();
 }
@@ -263,7 +263,7 @@ BOOL STreeCtrl::ItemHasChildren(HSTREEITEM hItem) const
     if (!hItem)
         return FALSE;
 
-    return GetChildItem(hItem) != NULL;
+    return GetChildItem(hItem) != 0;
 }
 
 int STreeCtrl::GetCheckState(HSTREEITEM hItem) const
@@ -738,9 +738,9 @@ HSTREEITEM STreeCtrl::HitTest(CPoint &pt)
     pt2.y -= rcClient.top - m_siVer.nPos;
     int iItem = pt2.y / m_nItemHei;
     if (iItem >= m_nVisibleItems)
-        return NULL;
+        return 0;
 
-    HSTREEITEM hRet = NULL;
+    HSTREEITEM hRet = 0;
 
     int iVisible = -1;
     HSTREEITEM hItem = CSTree<LPTVITEM>::GetNextItem(STVI_ROOT);
@@ -902,9 +902,9 @@ void STreeCtrl::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
         }
         rcLine.OffsetRect(m_nIndent, 0);
     }
-    bool hasNextSibling = GetNextSiblingItem(hItem) != NULL;
-    bool hasPervSibling = GetPrevSiblingItem(hItem) != NULL;
-    bool hasChild = GetChildItem(hItem) != NULL;
+    bool hasNextSibling = GetNextSiblingItem(hItem) != 0;
+    bool hasPervSibling = GetPrevSiblingItem(hItem) != 0;
+    bool hasChild = GetChildItem(hItem) != 0;
     int iLine = -1;
     if (hasChild)
     { // test if is collapsed
@@ -1210,7 +1210,7 @@ void STreeCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
     if (m_hCaptureItem)
     {
         ItemLButtonUp(m_hCaptureItem, nFlags, pt);
-        m_hCaptureItem = NULL;
+        m_hCaptureItem = 0;
         return;
     }
 
@@ -1244,7 +1244,7 @@ void STreeCtrl::OnMouseLeave()
     if (m_hHoverItem)
     {
         ItemMouseLeave(m_hHoverItem);
-        m_hHoverItem = NULL;
+        m_hHoverItem = 0;
     }
 }
 
@@ -1293,8 +1293,8 @@ int STreeCtrl::CalcItemWidth(const LPTVITEM pItemObj)
 
 void STreeCtrl::SortChildren(HSTREEITEM hItem, FunTreeSortCallback sortFunc, void *pCtx)
 {
-    m_hHoverItem = NULL;
-    m_hCaptureItem = NULL;
+    m_hHoverItem = 0;
+    m_hCaptureItem = 0;
     CSTree<LPTVITEM>::SortChildren(hItem, sortFunc, pCtx);
 }
 

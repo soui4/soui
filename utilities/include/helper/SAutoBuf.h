@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SAUTOBUF__H__
+#define __SAUTOBUF__H__
 
 namespace SOUI{
 
@@ -36,3 +37,5 @@ namespace SOUI{
 	};
 
 }
+
+#endif // __SAUTOBUF__H__

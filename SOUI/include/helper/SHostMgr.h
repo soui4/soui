@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SHOSTMGR__H__
+#define __SHOSTMGR__H__
 #include <interface/SHostMsgHandler-i.h>
 #include <core/SSingleton2.h>
 
@@ -23,3 +24,5 @@ class SOUI_EXP SHostMgr : public SSingleton2<SHostMgr> {
     SCriticalSection m_cs;
 };
 SNSEND
+
+#endif // __SHOSTMGR__H__

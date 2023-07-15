@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SMSGLOOP_I__H__
+#define __SMSGLOOP_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <interface/STaskLoop-i.h>
@@ -23,17 +24,17 @@ DECLARE_INTERFACE(IIdleHandler)
 #define INTERFACE IMessageLoop
 DECLARE_INTERFACE_(IMessageLoop, IObjRef)
 {
-    //!Ìí¼ÓÒýÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒýÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -83,3 +84,4 @@ DECLARE_INTERFACE_(IMsgLoopFactory, IObjRef)
 };
 
 SNSEND
+#endif // __SMSGLOOP_I__H__

@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SPLITSTRING__H__
+#define __SPLITSTRING__H__
 
 SNSBEGIN
 template <class T, class TC>
@@ -53,3 +54,4 @@ inline int ParseResID(const SStringT &str, SStringTList &strLst)
 }
 
 SNSEND
+#endif // __SPLITSTRING__H__

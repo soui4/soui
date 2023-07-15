@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SSTRING_I__H__
+#define __SSTRING_I__H__
 #include <utilities-def.h>
 #include <interface/obj-ref-i.h>
 SNSBEGIN
@@ -7,17 +8,17 @@ SNSBEGIN
 #define INTERFACE IStringA
 DECLARE_INTERFACE_(IStringA,IObjRef)
 {
-	//!Ìí¼ÓÒýÓÃ
+	//!æ·»åŠ å¼•ç”¨
 	/*!
 	*/
 	STDMETHOD_(long,AddRef) (THIS) PURE;
 
-	//!ÊÍ·ÅÒýÓÃ
+	//!é‡Šæ”¾å¼•ç”¨
 	/*!
 	*/
 	STDMETHOD_(long,Release) (THIS) PURE;
 
-	//!ÊÍ·Å¶ÔÏó
+	//!é‡Šæ”¾å¯¹è±¡
 	/*!
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
@@ -72,17 +73,17 @@ DECLARE_INTERFACE_(IStringA,IObjRef)
 #define INTERFACE IStringW
 DECLARE_INTERFACE_(IStringW,IObjRef)
 {
-	//!Ìí¼ÓÒýÓÃ
+	//!æ·»åŠ å¼•ç”¨
 	/*!
 	*/
 	STDMETHOD_(long,AddRef) (THIS) PURE;
 
-	//!ÊÍ·ÅÒýÓÃ
+	//!é‡Šæ”¾å¼•ç”¨
 	/*!
 	*/
 	STDMETHOD_(long,Release) (THIS) PURE;
 
-	//!ÊÍ·Å¶ÔÏó
+	//!é‡Šæ”¾å¯¹è±¡
 	/*!
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
@@ -139,3 +140,4 @@ DECLARE_INTERFACE_(IStringW,IObjRef)
 #endif
 
 SNSEND
+#endif // __SSTRING_I__H__

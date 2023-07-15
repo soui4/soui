@@ -344,7 +344,7 @@ void SWindow::TestMainThread()
 #ifdef _DEBUG
     if (IsBadWritePtr(this, sizeof(SWindow)))
     {
-        SASSERT_FMT(FALSE, _T("this is null!!!"));
+        SASSERT_FMTA(FALSE, "this is null!!!",0);
     }
     else
     {
@@ -352,7 +352,7 @@ void SWindow::TestMainThread()
         // 这是一件很危险的事情
         DWORD dwCurThreadID = GetCurrentThreadId();
         DWORD dwProcID = GetCurrentProcessId();
-        SASSERT_FMT(m_nMainThreadId == dwCurThreadID, _T("ProcessID:%d,请准备好红包再到群里提问"), dwProcID);
+        SASSERT_FMTW(m_nMainThreadId == dwCurThreadID, L"ProcessID:%d,请准备好红包再到群里提问", dwProcID);
     }
 #endif
 }
@@ -1044,14 +1044,14 @@ SWND SWindow::SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent) const
     TransformPoint(pt2);
 
     if (!IsContainPoint(pt2, FALSE))
-        return NULL;
+        return 0;
 
     if (!IsContainPoint(pt2, TRUE))
     {
         pt = pt2;      // update pt;
         return m_swnd; //只在鼠标位于客户区时，才继续搜索子窗口
     }
-    SWND swndChild = NULL;
+    SWND swndChild = 0;
 
     SWindow *pChild = GetWindow(GSW_LASTCHILD);
     while (pChild)
@@ -2025,7 +2025,7 @@ void SWindow::OnShowWindow(BOOL bShow, UINT nStatus)
     if (!IsVisible(TRUE))
     {
         if (IsFocused() && GetContainer())
-            GetContainer()->OnSetSwndFocus(NULL); //窗口隐藏时自动失去焦点
+            GetContainer()->OnSetSwndFocus(0); //窗口隐藏时自动失去焦点
         if (GetCapture() == m_swnd)
             ReleaseCapture(); //窗口隐藏时自动失去Capture
     }
@@ -2069,7 +2069,7 @@ void SWindow::OnEnable(BOOL bEnable, UINT nStatus)
     }
     if (IsDisabled(TRUE) && IsFocused() && GetContainer())
     {
-        GetContainer()->OnSetSwndFocus(NULL);
+        GetContainer()->OnSetSwndFocus(0);
     }
 }
 
@@ -2605,7 +2605,7 @@ void SWindow::KillFocus()
     {
         if (!GetContainer())
             return;
-        GetContainer()->OnSetSwndFocus(NULL);
+        GetContainer()->OnSetSwndFocus(0);
     }
 }
 
@@ -3361,7 +3361,7 @@ void SWindow::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *
     if (pOldContainer)
     {
         if (IsFocused())
-            pOldContainer->OnSetSwndFocus(NULL);
+            pOldContainer->OnSetSwndFocus(0);
         if (GetStyle().m_bTrackMouseEvent)
             pOldContainer->UnregisterTrackMouseEvent(m_swnd);
         if (GetCapture() == m_swnd)

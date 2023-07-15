@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SDEF__H__
+#define __SDEF__H__
 
 
 #ifdef __cplusplus
@@ -17,3 +18,5 @@
 #define CTHIS const THIS
 #endif
 
+
+#endif // __SDEF__H__

@@ -10,7 +10,8 @@
  *
  * Describe
  */
-#pragma once
+#ifndef __SSLIDERBAR__H__
+#define __SSLIDERBAR__H__
 #include "SCmnCtrl.h"
 
 SNSBEGIN
@@ -171,3 +172,5 @@ class SOUI_EXP SSliderBar : public SProgress {
 };
 
 SNSEND
+
+#endif // __SSLIDERBAR__H__

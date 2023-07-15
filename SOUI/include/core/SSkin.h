@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SSKIN__H__
+#define __SSKIN__H__
 
 #include <core/SSkinObjBase.h>
 #include <layout/SLayoutSize.h>
@@ -603,3 +604,4 @@ class SOUI_EXP SSKinGroup : public SSkinObjBase {
 };
 
 SNSEND
+#endif // __SSKIN__H__

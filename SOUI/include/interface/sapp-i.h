@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SAPP_I__H__
+#define __SAPP_I__H__
 #include <interface/obj-ref-i.h>
 #include <interface/SResProvider-i.h>
 #include <interface/STranslator-i.h>
@@ -44,17 +45,17 @@ typedef ITaskLoop *(*FunCrateTaskLoop)();
 #define INTERFACE IApplication
 DECLARE_INTERFACE_(IApplication, IObjRef)
 {
-    //!Ìí¼ÓÒıÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒıÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -62,137 +63,137 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
     //////////////////////////////////////////////////////////////////////////
 
     /**
-     * @brief »ñÈ¡µ±Ç°appµÄhModule
-     * @return HMODULE--µ±Ç°appµÄhModule
+     * @brief è·å–å½“å‰appçš„hModule
+     * @return HMODULE--å½“å‰appçš„hModule
      */
     STDMETHOD_(HMODULE, GetModule)(CTHIS) SCONST PURE;
 
     /**
-     * @brief ´ÓÖ¸¶¨µÄResProviderÀï¼ÓÔØÏµÍ³×ÊÔ´
-     * @param pResProvider Ìá¹©ÏµÍ³×ÊÔ´µÄ×ÊÔ´°ü
-     * @return UINT 0-³É¹¦,ÆäËü-Ê§°Ü
+     * @brief ä»æŒ‡å®šçš„ResProvideré‡ŒåŠ è½½ç³»ç»Ÿèµ„æº
+     * @param pResProvider æä¾›ç³»ç»Ÿèµ„æºçš„èµ„æºåŒ…
+     * @return UINT 0-æˆåŠŸ,å…¶å®ƒ-å¤±è´¥
      */
     STDMETHOD_(UINT, LoadSystemNamedResource)(THIS_ IResProvider * pResProvider) PURE;
 
     /**
-     * @brief »ñÈ¡·­Òë½Ó¿Ú
-     * @return ITranslatorMgr *--·­Òë½Ó¿Ú
+     * @brief è·å–ç¿»è¯‘æ¥å£
+     * @return ITranslatorMgr *--ç¿»è¯‘æ¥å£
      */
     STDMETHOD_(ITranslatorMgr *, GetTranslator)(THIS) PURE;
 
     /**
-     * @brief ÉèÖÃ·­Òë½Ó¿Ú
-     * @param pTrans -- ·­Òë½Ó¿Ú
+     * @brief è®¾ç½®ç¿»è¯‘æ¥å£
+     * @param pTrans -- ç¿»è¯‘æ¥å£
      * @return void
-     * @remark ·­Òë½Ó¿Ú¿ÉÒÔÍ¨¹ı¼ÓÔØ·­ÒëÄ£¿éÀ´´´½¨
+     * @remark ç¿»è¯‘æ¥å£å¯ä»¥é€šè¿‡åŠ è½½ç¿»è¯‘æ¨¡å—æ¥åˆ›å»º
      */
     STDMETHOD_(void, SetTranslator)(THIS_ ITranslatorMgr * pTrans) PURE;
 
     /**
-     * @brief »ñÈ¡ToolTipÀà³§
-     * @return IToolTipFactory *--ToolTipÀà³§
+     * @brief è·å–ToolTipç±»å‚
+     * @return IToolTipFactory *--ToolTipç±»å‚
      */
     STDMETHOD_(IToolTipFactory *, GetToolTipFactory)(THIS) PURE;
 
     /**
-     * @brief ÉèÖÃtooltipÀà³§
-     * @param IToolTipFactory * pToolTipFac -- tooltipÀà³§
+     * @brief è®¾ç½®tooltipç±»å‚
+     * @param IToolTipFactory * pToolTipFac -- tooltipç±»å‚
      * @return void
-     * @remark Í¨¹ıÊµÏÖtooltipÀà³§¿ÉÒÔ×Ô¶¨ÒåtooltipµÄÏÔÊ¾Ğ§¹û
+     * @remark é€šè¿‡å®ç°tooltipç±»å‚å¯ä»¥è‡ªå®šä¹‰tooltipçš„æ˜¾ç¤ºæ•ˆæœ
      */
     STDMETHOD_(void, SetToolTipFactory)(THIS_ IToolTipFactory * pToolTipFac) PURE;
 
     /**
-     * @brief Éè¶¨MsgLoopÀà³§
-     * @param IMsgLoopFactory * pMsgLoopFac -- MsgLoopÀà³§
-     * @return BOOL TRUE-³É¹¦
+     * @brief è®¾å®šMsgLoopç±»å‚
+     * @param IMsgLoopFactory * pMsgLoopFac -- MsgLoopç±»å‚
+     * @return BOOL TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, SetMsgLoopFactory)(THIS_ IMsgLoopFactory * pMsgLoopFac) PURE;
 
     /**
-     * @brief »ñÈ¡µ±Ç°µÄMsgLoopÀà³§
-     * @return IMsgLoopFactory *--MsgLoopÀà³§
+     * @brief è·å–å½“å‰çš„MsgLoopç±»å‚
+     * @return IMsgLoopFactory *--MsgLoopç±»å‚
      */
     STDMETHOD_(IMsgLoopFactory *, GetMsgLoopFactory)(THIS) PURE;
 
     /**
-     * @brief ÉèÖÃÈÕÖ¾Êä³öÄ£¿é
-     * @param ILog4zManager *pLogMgr --ÈÕÖ¾Êä³öÄ£¿é
+     * @brief è®¾ç½®æ—¥å¿—è¾“å‡ºæ¨¡å—
+     * @param ILog4zManager *pLogMgr --æ—¥å¿—è¾“å‡ºæ¨¡å—
      * @return
      */
     STDMETHOD_(void, SetLogManager)(THIS_ ILogMgr * pLogMgr) PURE;
 
     /**
-     * @brief »ñÈ¡ÈÕÖ¾Êä³öÄ£¿é
-     * @return  ILog4zManager *--ÈÕÖ¾Êä³öÄ£¿é
+     * @brief è·å–æ—¥å¿—è¾“å‡ºæ¨¡å—
+     * @return  ILog4zManager *--æ—¥å¿—è¾“å‡ºæ¨¡å—
      */
     STDMETHOD_(ILogMgr *, GetLogManager)(THIS) PURE;
 
     /**
-     * @brief ÉèÖÃÊôĞÔ³Ö¾Ã¾ÃÀà³§
-     * @param IAttrStorageFactory* pAttrStorageFactory --ÊôĞÔ³Ö¾Ã¾ÃÀà³§
+     * @brief è®¾ç½®å±æ€§æŒä¹…ä¹…ç±»å‚
+     * @param IAttrStorageFactory* pAttrStorageFactory --å±æ€§æŒä¹…ä¹…ç±»å‚
      * @remark
-     * ÊµÏÖ¸Ã½Ó¿Ú²¢ÉèÖÃ¸øSApp£¬¿ÉÒÔ±£´æSObjectÍ¨¹ıSetAttributeÉèÖÃµÄÊôĞÔ£¬ÔÚGetAttributeÊ±Ìá¹©Êı¾İ
+     * å®ç°è¯¥æ¥å£å¹¶è®¾ç½®ç»™SAppï¼Œå¯ä»¥ä¿å­˜SObjecté€šè¿‡SetAttributeè®¾ç½®çš„å±æ€§ï¼Œåœ¨GetAttributeæ—¶æä¾›æ•°æ®
      */
     STDMETHOD_(void, SetAttrStorageFactory)(THIS_ IAttrStorageFactory * pAttrStorageFactory) PURE;
 
     /**
-     * @brief »ñÈ¡ÊôĞÔ³Ö¾Ã¾ÃÀà³§
-     * @return IAttrStorageFactory *--ÊôĞÔ³Ö¾Ã¾ÃÀà³§
+     * @brief è·å–å±æ€§æŒä¹…ä¹…ç±»å‚
+     * @return IAttrStorageFactory *--å±æ€§æŒä¹…ä¹…ç±»å‚
      */
     STDMETHOD_(IAttrStorageFactory *, GetAttrStorageFactory)(THIS) PURE;
 
     /**
-     * @brief ½øÈëÏûÏ¢Ñ­»·ÔËĞĞ³ÌĞò
-     * @param HWND hMainWnd -- Ö÷´°¿Ú¾ä±ú
-     * @return int -- ³ÌĞòÍË³öµÄ·µ»ØÖµ
+     * @brief è¿›å…¥æ¶ˆæ¯å¾ªç¯è¿è¡Œç¨‹åº
+     * @param HWND hMainWnd -- ä¸»çª—å£å¥æŸ„
+     * @return int -- ç¨‹åºé€€å‡ºçš„è¿”å›å€¼
      */
     STDMETHOD_(int, Run)(THIS_ HWND hMainWnd) PURE;
 
     /**
-     * @brief ÍË³öÏûÏ¢Ñ­»·
+     * @brief é€€å‡ºæ¶ˆæ¯å¾ªç¯
      * @return void
      * @param int nCode -- thread quit code
-     * @remark µ÷ÓÃPostQuitMessage
+     * @remark è°ƒç”¨PostQuitMessage
      */
     STDMETHOD_(void, Quit)(THIS_ int nCode) PURE;
     /**
-     * @brief »ñÈ¡³ÌĞòÖ÷´°¿Ú
-     * @return HWND--ÔÚRun·½·¨ÖĞÉè¶¨µÄ´°¿Ú
+     * @brief è·å–ç¨‹åºä¸»çª—å£
+     * @return HWND--åœ¨Runæ–¹æ³•ä¸­è®¾å®šçš„çª—å£
      */
     STDMETHOD_(HWND, GetMainWnd)(THIS) PURE;
 
     /**
-     * @brief ½«µ±Ç°UIÏß³ÌµÄmsgLoop±£´æµ½SAppÖĞ
+     * @brief å°†å½“å‰UIçº¿ç¨‹çš„msgLoopä¿å­˜åˆ°SAppä¸­
      * @param IMessageLoop *pMsgLoop -- msgLoop
-     * @param BOOL bReplace -- Ìæ»»±êÖ¾
-     * @return BOOL TRUE-³É¹¦
-     * @remark ÔÚ¶àUIÏß³Ì³ÌĞòÖĞ£¬ĞèÒª½«¹¤×÷Ïß³ÌµÄmsgLoop½»¸øSApp¹ÜÀí
+     * @param BOOL bReplace -- æ›¿æ¢æ ‡å¿—
+     * @return BOOL TRUE-æˆåŠŸ
+     * @remark åœ¨å¤šUIçº¿ç¨‹ç¨‹åºä¸­ï¼Œéœ€è¦å°†å·¥ä½œçº¿ç¨‹çš„msgLoopäº¤ç»™SAppç®¡ç†
      */
     STDMETHOD_(BOOL, AddMsgLoop)(THIS_ IMessageLoop * pMsgLoop, BOOL bReplace DEF_VAL(FALSE)) PURE;
 
     /**
-     * @brief ´ÓSAppÖĞÉ¾³ıµ±Ç°Ïß³ÌµÄmsgLoop
-     * @return BOOL TRUE-³É¹¦
+     * @brief ä»SAppä¸­åˆ é™¤å½“å‰çº¿ç¨‹çš„msgLoop
+     * @return BOOL TRUE-æˆåŠŸ
      */
     STDMETHOD_(BOOL, RemoveMsgLoop)(THIS) PURE;
 
     /**
-     * @brief »ñÈ¡Ö¸¶¨UIÏß³ÌµÄmsgLoop
-     * @param DWORD dwThreadID--Ïß³ÌID
-     * @return IMessageLoop *--Ö¸¶¨Ïß³ÌµÄmsgloop
+     * @brief è·å–æŒ‡å®šUIçº¿ç¨‹çš„msgLoop
+     * @param DWORD dwThreadID--çº¿ç¨‹ID
+     * @return IMessageLoop *--æŒ‡å®šçº¿ç¨‹çš„msgloop
      */
     STDMETHOD_(IMessageLoop *, GetMsgLoop)(CTHIS_ DWORD dwThreadID) SCONST PURE;
 
     /**
-     * @brief »ñÈ¡IResProviderMgr½Ó¿Ú
-     * @return IResProviderMgr *--IResProviderMgr½Ó¿Ú
+     * @brief è·å–IResProviderMgræ¥å£
+     * @return IResProviderMgr *--IResProviderMgræ¥å£
      */
     STDMETHOD_(IResProviderMgr *, GetResProviderMgr)(THIS) PURE;
 
     /**
      * GetRealWndHander
-     * @brief    »ñµÃRealWndHander
+     * @brief    è·å¾—RealWndHander
      * @return   IRealWndHandler * -- RealWndHander
      * Describe
      */
@@ -200,8 +201,8 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 
     /**
      * SetRealWndHandler
-     * @brief    ÉèÖÃRealWnd´¦Àí½Ó¿Ú
-     * @param    IRealWndHandler * pRealHandler --  RealWnd´¦Àí½Ó¿Ú
+     * @brief    è®¾ç½®RealWndå¤„ç†æ¥å£
+     * @param    IRealWndHandler * pRealHandler --  RealWndå¤„ç†æ¥å£
      * @return   void
      * Describe
      */
@@ -209,8 +210,8 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 
     /**
      * GetRenderFactory
-     * @brief    »ñµÃµ±Ç°µÄäÖÈ¾Ä£¿é
-     * @return   IRenderFactory * äÖÈ¾Ä£¿éÖ¸Õë
+     * @brief    è·å¾—å½“å‰çš„æ¸²æŸ“æ¨¡å—
+     * @return   IRenderFactory * æ¸²æŸ“æ¨¡å—æŒ‡é’ˆ
      *
      * Describe
      */
@@ -218,8 +219,8 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 
     /**
      * SetScriptModule
-     * @brief    ÉèÖÃSOUIÖĞÊ¹ÓÃµÄ½Å±¾Ä£¿éÀà³§
-     * @param    IScriptFactory *pScriptModule --  ½Å±¾Ä£¿éÀà³§
+     * @brief    è®¾ç½®SOUIä¸­ä½¿ç”¨çš„è„šæœ¬æ¨¡å—ç±»å‚
+     * @param    IScriptFactory *pScriptModule --  è„šæœ¬æ¨¡å—ç±»å‚
      * @return   void
      *
      * Describe
@@ -227,155 +228,155 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
     STDMETHOD_(void, SetScriptFactory)(THIS_ IScriptFactory * pScriptModule) PURE;
 
     /**
-     * @brief ³õÊ¼»¯XML×ÊÔ´µÄname-idÓ³Éä±í
-     * @param pNames const LPCWSTR *--¿Ø¼şÃû±í
-     * @param nIds const int *--¿Ø¼şID±í
-     * @param nCount int--¿Ø¼şÊı¾İ
+     * @brief åˆå§‹åŒ–XMLèµ„æºçš„name-idæ˜ å°„è¡¨
+     * @param pNames const LPCWSTR *--æ§ä»¶åè¡¨
+     * @param nIds const int *--æ§ä»¶IDè¡¨
+     * @param nCount int--æ§ä»¶æ•°æ®
      * @return
-     * @remark Êı¾İ±íÓÉresidbuilder¹¤¾ß×Ô¶¯Éú³É
+     * @remark æ•°æ®è¡¨ç”±residbuilderå·¥å…·è‡ªåŠ¨ç”Ÿæˆ
      */
     STDMETHOD_(void, InitXmlNamedID)(THIS_ const LPCWSTR *pNames, const int *nIds, int nCount) PURE;
 
     /**
-     * @brief ´Ó×ÊÔ´ID¼ÓÔØXML
-     * @param strResId LPCTSTR--×ÊÔ´ID£¬Îªtype:name¸ñÊ½
+     * @brief ä»èµ„æºIDåŠ è½½XML
+     * @param strResId LPCTSTR--èµ„æºIDï¼Œä¸ºtype:nameæ ¼å¼
      * @return IXmlDoc *--XML Doc
-     * @remark Ê¹ÓÃÍê³Éºóµ÷ÓÃRleaseÊÍ·Å
+     * @remark ä½¿ç”¨å®Œæˆåè°ƒç”¨Rleaseé‡Šæ”¾
      */
     STDMETHOD_(IXmlDoc *, LoadXmlDocment)(THIS_ LPCTSTR strResId) PURE;
     STDMETHOD_(IXmlDoc *, LoadXmlDocmentA)(THIS_ LPCSTR strResId) PURE;
 
     /**
-     * @brief ´Ó×ÊÔ´¼ÓÔØ¶¯»­×ÊÔ´
-     * @param strResId LPCTSTR--¶¯»­×ÊÔ´ID
-     * @return IAnimation* ¶¯»­¶ÔÏó
-     * @remark Ê¹ÓÃÍê³Éºóµ÷ÓÃRleaseÊÍ·Å
+     * @brief ä»èµ„æºåŠ è½½åŠ¨ç”»èµ„æº
+     * @param strResId LPCTSTR--åŠ¨ç”»èµ„æºID
+     * @return IAnimation* åŠ¨ç”»å¯¹è±¡
+     * @remark ä½¿ç”¨å®Œæˆåè°ƒç”¨Rleaseé‡Šæ”¾
      */
     STDMETHOD_(IAnimation *, LoadAnimation)(THIS_ LPCTSTR strResId) PURE;
     STDMETHOD_(IAnimation *, LoadAnimationA)(THIS_ LPCSTR strResId) PURE;
 
     /**
-     * @brief ´Ó×ÊÔ´¼ÓÔØÊıÖµ¶¯»­×ÊÔ´
-     * @param strResId LPCTSTR--¶¯»­×ÊÔ´ID
-     * @return IValueAnimator* ÊıÖµ¶¯»­¶ÔÏó
-     * @remark Ê¹ÓÃÍê³Éºóµ÷ÓÃRleaseÊÍ·Å
+     * @brief ä»èµ„æºåŠ è½½æ•°å€¼åŠ¨ç”»èµ„æº
+     * @param strResId LPCTSTR--åŠ¨ç”»èµ„æºID
+     * @return IValueAnimator* æ•°å€¼åŠ¨ç”»å¯¹è±¡
+     * @remark ä½¿ç”¨å®Œæˆåè°ƒç”¨Rleaseé‡Šæ”¾
      */
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) PURE;
     STDMETHOD_(IValueAnimator *, LoadValueAnimatorA)(THIS_ LPCSTR strResId) PURE;
 
     /**
-     * @brief ´Ó×ÊÔ´¼ÓÔØÍ¼Æ¬
-     * @param strResId LPCTSTR--Í¼Æ¬×ÊÔ´ID
-     * @return IBitmapS* Í¼Æ¬¶ÔÏó
-     * @remark Ê¹ÓÃÍê³Éºóµ÷ÓÃRleaseÊÍ·Å
+     * @brief ä»èµ„æºåŠ è½½å›¾ç‰‡
+     * @param strResId LPCTSTR--å›¾ç‰‡èµ„æºID
+     * @return IBitmapS* å›¾ç‰‡å¯¹è±¡
+     * @remark ä½¿ç”¨å®Œæˆåè°ƒç”¨Rleaseé‡Šæ”¾
      */
     STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR strResId) PURE;
     STDMETHOD_(IBitmapS *, LoadImageA)(THIS_ LPCSTR strResId) PURE;
 
     /**
-     * @brief ´Ó×ÊÔ´¼ÓÔØ·­Òë°ü
-     * @param strResId LPCTSTR--·­Òë°ü×ÊÔ´ID
-     * @return ITranslator* ·­Òë°ü¶ÔÏó
-     * @remark Ê¹ÓÃÍê³Éºóµ÷ÓÃRleaseÊÍ·Å
+     * @brief ä»èµ„æºåŠ è½½ç¿»è¯‘åŒ…
+     * @param strResId LPCTSTR--ç¿»è¯‘åŒ…èµ„æºID
+     * @return ITranslator* ç¿»è¯‘åŒ…å¯¹è±¡
+     * @remark ä½¿ç”¨å®Œæˆåè°ƒç”¨Rleaseé‡Šæ”¾
      */
     STDMETHOD_(ITranslator *, LoadTranslator)(THIS_ LPCTSTR strResId) PURE;
     STDMETHOD_(ITranslator *, LoadTranslatorA)(THIS_ LPCSTR strResId) PURE;
 
     /**
-     * @brief Ê¹ÓÃ·­Òë°ü
-     * @param ITranslator * trModule--·­Òë°ü
-     * @return BOOL, TRUE--³É¹¦
+     * @brief ä½¿ç”¨ç¿»è¯‘åŒ…
+     * @param ITranslator * trModule--ç¿»è¯‘åŒ…
+     * @return BOOL, TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, InstallTranslator)(THIS_ ITranslator * trModule) PURE;
 
     /**
-     * @brief Ğ¶ÔØ·­Òë°ü
-     * @param REFGUID langId--·­Òë°üID
-     * @return BOOL, TRUE--³É¹¦
+     * @brief å¸è½½ç¿»è¯‘åŒ…
+     * @param REFGUID langId--ç¿»è¯‘åŒ…ID
+     * @return BOOL, TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, UnnstallTranslator)(THIS_ REFGUID langId) PURE;
 
     /**
-     * @brief ÆôÓÃNotifyCenter
-     * @param BOOL bEnable -- ÊÇ·ñÆôÓÃ
-     * @param int interval -- ´¦ÀíÊÂ¼şÊ±¼ä¼ä¸ô
+     * @brief å¯ç”¨NotifyCenter
+     * @param BOOL bEnable -- æ˜¯å¦å¯ç”¨
+     * @param int interval -- å¤„ç†äº‹ä»¶æ—¶é—´é—´éš”
      * @return void
      */
     STDMETHOD_(void, EnableNotifyCenter)(THIS_ BOOL bEnable, int interval DEF_VAL(20)) PURE;
 
     /**
-     * @brief »ñÈ¡SAppÄÚ²¿¶¨ÒåµÄ¼¸¸öµ¥Àı¶ÔÏó
-     * @param SingletonType type -- ÄÚ²¿µ¥ÀıÀàĞÍ
-     * @return void * -- µ¥ÀıÀàĞÍÖ¸Õë
-     * @remark Ä¿Ç°Ö÷ÒªÍ¨¹ıËü»ñÈ¡INotifyCenter*,ÒÔ±ãC´úÂëÊ¹ÓÃ
+     * @brief è·å–SAppå†…éƒ¨å®šä¹‰çš„å‡ ä¸ªå•ä¾‹å¯¹è±¡
+     * @param SingletonType type -- å†…éƒ¨å•ä¾‹ç±»å‹
+     * @return void * -- å•ä¾‹ç±»å‹æŒ‡é’ˆ
+     * @remark ç›®å‰ä¸»è¦é€šè¿‡å®ƒè·å–INotifyCenter*,ä»¥ä¾¿Cä»£ç ä½¿ç”¨
      */
     STDMETHOD_(void *, GetInnerSingleton)(THIS_ SingletonType type) PURE;
 
     /**
-     * @brief ÉèÖÃ×Ô¶¨ÒåµÄCreateObject»Øµ÷·½·¨
-     * @param LPCWSTR pszName -- ÀàĞÍÔÚXMLÖĞµÄÃû×Ö
-     * @param SObjectType nType -- ÀàĞÍID
-     * @return IObjRef * -- ´´½¨µÄÀàĞÍ
+     * @brief è®¾ç½®è‡ªå®šä¹‰çš„CreateObjectå›è°ƒæ–¹æ³•
+     * @param LPCWSTR pszName -- ç±»å‹åœ¨XMLä¸­çš„åå­—
+     * @param SObjectType nType -- ç±»å‹ID
+     * @return IObjRef * -- åˆ›å»ºçš„ç±»å‹
      */
     STDMETHOD_(IObject *, CreateObject)(CTHIS_ LPCWSTR pszName, SObjectType nType) SCONST PURE;
 
     /**
-     * @brief ÉèÖÃCreateObjectµÄ»Øµ÷
-     * @param FunCreateObject cbCreateObj -- CreateObjectµÄ»Øµ÷º¯Êı
+     * @brief è®¾ç½®CreateObjectçš„å›è°ƒ
+     * @param FunCreateObject cbCreateObj -- CreateObjectçš„å›è°ƒå‡½æ•°
      * @return void
      */
     STDMETHOD_(void, SetCreateObjectCallback)(THIS_ FunCreateObject cbCreateObj) PURE;
 
     /**
-     * @brief ×¢²áÀ©Õ¹¶ÔÏó
-     * @param const IObjectFactory *objFac -- ¶ÔÏóÀà³§
-     * @param BOOL bReplace -- Ìæ»»ÒÑÓĞÀà³§±êÖ¾
-     * @return BOOL, TRUE--³É¹¦
+     * @brief æ³¨å†Œæ‰©å±•å¯¹è±¡
+     * @param const IObjectFactory *objFac -- å¯¹è±¡ç±»å‚
+     * @param BOOL bReplace -- æ›¿æ¢å·²æœ‰ç±»å‚æ ‡å¿—
+     * @return BOOL, TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, RegisterObjFactory)(THIS_ const IObjectFactory *objFac, BOOL bReplace DEF_VAL(FALSE)) PURE;
 
     /**
-     * @brief ·´×¢²áÀ©Õ¹¶ÔÏó
-     * @param const IObjectFactory *objFac -- ¶ÔÏóÀà³§
-     * @return BOOL, TRUE--³É¹¦
+     * @brief åæ³¨å†Œæ‰©å±•å¯¹è±¡
+     * @param const IObjectFactory *objFac -- å¯¹è±¡ç±»å‚
+     * @return BOOL, TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, UnregisterObjFactory)(THIS_ const IObjectFactory *objFac) PURE;
 
     /**
-     * @brief ÉèÖÃÄ¬ÈÏ×ÖÌå
-     * @param LPCWSTR pszFontInfo -- ×ÖÌåÃèÊö, ²Î¿¼fontpool
+     * @brief è®¾ç½®é»˜è®¤å­—ä½“
+     * @param LPCWSTR pszFontInfo -- å­—ä½“æè¿°, å‚è€ƒfontpool
      * @return void
      */
     STDMETHOD_(void, SetDefaultFontInfo)(THIS_ LPCWSTR pszFontInfo) PURE;
 
     /**
-     * @brief ´´½¨TaskLoop¶ÔÏó
-     * @param int nCount -- taskloop¶ÔÏóÊıÁ¿
-     * @param Priority priority -- taskloopµÄÏß³ÌÓÅÏÈ¼¶
-     * @param BOOL bAutoStart -- ×Ô¶¯Æô¶¯±êÖ¾
-     * @return BOOL, TRUE--³É¹¦
+     * @brief åˆ›å»ºTaskLoopå¯¹è±¡
+     * @param int nCount -- taskloopå¯¹è±¡æ•°é‡
+     * @param Priority priority -- taskloopçš„çº¿ç¨‹ä¼˜å…ˆçº§
+     * @param BOOL bAutoStart -- è‡ªåŠ¨å¯åŠ¨æ ‡å¿—
+     * @return BOOL, TRUE--æˆåŠŸ
      */
     STDMETHOD_(BOOL, CreateTaskLoop)(THIS_ int nCount, Priority priority, BOOL bAutoStart DEF_VAL(TRUE)) PURE;
 
     /**
-     * @brief »ñÈ¡TaskLoop¶ÔÏó
-     * @param int iTaskLoop -- taskloopË÷Òı
-     * @return ITaskLoop * -- taskloop½Ó¿Ú,Ê§°Ü·µ»ØNULL
+     * @brief è·å–TaskLoopå¯¹è±¡
+     * @param int iTaskLoop -- taskloopç´¢å¼•
+     * @return ITaskLoop * -- taskloopæ¥å£,å¤±è´¥è¿”å›NULL
      */
     STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) PURE;
 
     /**
-     * @brief ÉèÖÃ´´½¨TaskLoop¶ÔÏóµÄ»Øµ÷½Ó¿Ú
-     * @param FunCrateTaskLoop cbCreateTaskLoop -- ´´½¨TaskLoop¶ÔÏóµÄ»Øµ÷½Ó¿Ú
+     * @brief è®¾ç½®åˆ›å»ºTaskLoopå¯¹è±¡çš„å›è°ƒæ¥å£
+     * @param FunCrateTaskLoop cbCreateTaskLoop -- åˆ›å»ºTaskLoopå¯¹è±¡çš„å›è°ƒæ¥å£
      * @return void
      */
     STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) PURE;
 
     /**
      * CreateScriptModule
-     * @brief    ´´½¨½Å±¾Ä£¿é¶ÔÏó
-     * @param [out] IScriptModule **ppScriptModule -- ½Å±¾Ä£¿é¶ÔÏó
-     * @return   HRESULT -- S_OK ´´½¨³É¹¦
+     * @brief    åˆ›å»ºè„šæœ¬æ¨¡å—å¯¹è±¡
+     * @param [out] IScriptModule **ppScriptModule -- è„šæœ¬æ¨¡å—å¯¹è±¡
+     * @return   HRESULT -- S_OK åˆ›å»ºæˆåŠŸ
      *
      * Describe
      */
@@ -383,3 +384,4 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 };
 
 SNSEND
+#endif // __SAPP_I__H__

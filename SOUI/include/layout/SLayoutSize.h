@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SLAYOUTSIZE__H__
+#define __SLAYOUTSIZE__H__
 
 SNSBEGIN
 
@@ -51,3 +52,4 @@ class SOUI_EXP SLayoutSize {
 };
 
 SNSEND
+#endif // __SLAYOUTSIZE__H__

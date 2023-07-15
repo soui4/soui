@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __TRACE__H__
+#define __TRACE__H__
 
 #include "utilities-def.h"
 
@@ -17,3 +18,5 @@ namespace SOUI
 #else
 #define STRACE STRACEA
 #endif
+
+#endif // __TRACE__H__

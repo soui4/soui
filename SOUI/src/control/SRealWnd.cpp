@@ -1,5 +1,4 @@
-﻿#pragma once
-#include <souistd.h>
+﻿#include <souistd.h>
 #include <control/Srealwnd.h>
 #include <interface/SRealWndHandler-i.h>
 

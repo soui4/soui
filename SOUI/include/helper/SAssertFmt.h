@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SASSERTFMT__H__
+#define __SASSERTFMT__H__
 
 #ifdef _DEBUG
 #include <crtdbg.h>
@@ -20,3 +21,4 @@
 #else
 #define SASSERT_FMT SASSERT_FMTA
 #endif //_UNICODE
+#endif // __SASSERTFMT__H__

@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __STOOLTIP__H__
+#define __STOOLTIP__H__
 
 #include "interface/stooltip-i.h"
 #include "core/SNativeWnd.h"
@@ -47,3 +48,5 @@ class STipCtrl
     TIPID m_id;
 };
 SNSEND
+
+#endif // __STOOLTIP__H__

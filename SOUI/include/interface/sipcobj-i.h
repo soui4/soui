@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SIPCOBJ_I__H__
+#define __SIPCOBJ_I__H__
 
 #include <interface/obj-ref-i.h>
 
@@ -152,3 +153,4 @@ struct IIpcFactory : IObjRef
 };
 
 SNSEND
+#endif // __SIPCOBJ_I__H__

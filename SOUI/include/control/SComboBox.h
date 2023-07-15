@@ -10,7 +10,8 @@
  *
  * Describe    ComboBox控件
  */
-#pragma once
+#ifndef __SCOMBOBOX__H__
+#define __SCOMBOBOX__H__
 #include "SComboBase.h"
 #include "Slistbox.h"
 #include "SCmnCtrl.h"
@@ -153,3 +154,5 @@ class SOUI_EXP SComboBox : public TComboBaseProxy<IComboBox> {
 };
 
 SNSEND
+
+#endif // __SCOMBOBOX__H__

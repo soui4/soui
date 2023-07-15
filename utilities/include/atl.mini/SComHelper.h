@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SCOMHELPER__H__
+#define __SCOMHELPER__H__
 
 #include <Unknwn.h>
 
@@ -94,3 +95,5 @@ namespace SOUI
         volatile LONG m_cRef;
     };
 }
+
+#endif // __SCOMHELPER__H__

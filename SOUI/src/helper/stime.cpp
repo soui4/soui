@@ -16,7 +16,7 @@ STimeSpan::STimeSpan(__time64_t time)
 
 STimeSpan::STimeSpan(LONG lDays, int nHours, int nMins, int nSecs)
 {
-    m_timeSpan = nSecs + 60 * (nMins + 60 * (nHours + __int64(24) * lDays));
+    m_timeSpan = nSecs + 60 * (nMins + 60 * (nHours + int64_t(24) * lDays));
 }
 
 LONGLONG STimeSpan::GetDays() const

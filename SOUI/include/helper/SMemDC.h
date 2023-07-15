@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SMEMDC__H__
+#define __SMEMDC__H__
 
 SNSBEGIN
 
@@ -43,3 +44,4 @@ class SOUI_EXP SMemDC {
 };
 
 SNSEND
+#endif // __SMEMDC__H__

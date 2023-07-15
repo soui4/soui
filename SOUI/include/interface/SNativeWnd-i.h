@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SNATIVEWND_I__H__
+#define __SNATIVEWND_I__H__
 #include <interface/obj-ref-i.h>
 #include <interface/SEvtArgs-i.h>
 SNSBEGIN
@@ -18,3 +19,4 @@ DECLARE_INTERFACE_(INativeWnd, IObjRef){
 };
 
 SNSEND
+#endif // __SNATIVEWND_I__H__

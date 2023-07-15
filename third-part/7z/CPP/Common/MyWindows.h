@@ -7,7 +7,7 @@
 
 #include <windows.h>
 #include <cguid.h>
-#include <atlconv.h>
+//#include <atlconv.h>
 //#include <combaseapi.h>
 #include <shellapi.h>
 

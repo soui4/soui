@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SDPIAWAREFONT__H__
+#define __SDPIAWAREFONT__H__
 
 SNSBEGIN
 class SOUI_EXP SDpiAwareFont {
@@ -20,3 +21,5 @@ class SOUI_EXP SDpiAwareFont {
 };
 
 SNSEND
+
+#endif // __SDPIAWAREFONT__H__

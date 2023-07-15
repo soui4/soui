@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __GDIALPHA__H__
+#define __GDIALPHA__H__
 
 #include "utilities-def.h"
 #include <windows.h>
@@ -36,3 +37,4 @@ public:
 };
 
 }//namespace SOUI
+#endif // __GDIALPHA__H__

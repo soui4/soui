@@ -102,14 +102,9 @@ namespace intl
 	{
 	private:
 
-		typedef typename EnumerationValue< TEnum, TEnumClass, DefaultValue > ThisClass;
-
 		TEnum m_value;
 
 	public:
-
-		typedef typename TEnum Enum;
-
 		EnumerationValue():
 			m_value( DefaultValue )
 		{}
@@ -118,9 +113,9 @@ namespace intl
 			m_value( value )
 		{}
 
-		static ThisClass Parse( const TString& string )
+		static EnumerationValue Parse( const TString& string )
 		{
-			return ThisClass( TEnumClass::Parse( string, DefaultValue ) );
+			return EnumerationValue( TEnumClass::Parse( string, DefaultValue ) );
 		}
 
 		const TEnum& GetValue() const
@@ -138,18 +133,18 @@ namespace intl
 			return m_value;
 		}
 	
-		ThisClass& operator=( const TEnum& value )
+		EnumerationValue& operator=( const TEnum& value )
 		{
 			m_value = value;
 			return *this;
 		}
 
-		bool operator==( const ThisClass& that ) const
+		bool operator==( const EnumerationValue& that ) const
 		{
 			return that.m_value == m_value;
 		}
 
-		bool operator!=( const ThisClass& that ) const
+		bool operator!=( const EnumerationValue& that ) const
 		{
 			return !operator==( that );
 		}
@@ -164,7 +159,7 @@ namespace intl
 			return !operator==( value );
 		}
 
-		bool operator< ( const ThisClass& that ) const
+		bool operator< ( const EnumerationValue& that ) const
 		{
 			return m_value < that.m_value;
 		}

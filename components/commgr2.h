@@ -2,7 +2,7 @@
 
 #pragma  once
 
-#include <com-def.h>
+#include <config.h>
 #include <string/tstring.h>
 #include <commask.h>
 

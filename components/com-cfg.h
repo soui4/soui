@@ -2,7 +2,7 @@
 
 #pragma  once
 
-#include <com-def.h>
+#include <config.h>
 #include <string/tstring.h>
 
 #define COM_IMGDECODER  _T("imgdecoder-gdip")

@@ -11,7 +11,8 @@
  * Describe    SOUI应用程序入口
  */
 
-#pragma once
+#ifndef __SAPP__H__
+#define __SAPP__H__
 #include <core/ssingleton.h>
 #include <interface/sapp-i.h>
 
@@ -294,3 +295,4 @@ class SOUI_EXP SApplication
 };
 
 SNSEND
+#endif // __SAPP__H__

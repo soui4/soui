@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SHOSTMSGHANDLER_I__H__
+#define __SHOSTMSGHANDLER_I__H__
 
 SNSBEGIN
 
@@ -7,15 +8,16 @@ SNSBEGIN
 DECLARE_INTERFACE(IHostMsgHandler)
 {
     /**
-     * @brief ÏìÓ¦ËŞÖ÷ÏûÏ¢
-     * @param bRelayout BOOL--ÖØ²¼¾Ö±êÖ¾
-     * @param uMsg UINT--ÏûÏ¢ID
-     * @param wp WPARAM--ÏûÏ¢²ÎÊı1
-     * @param lp LPARAM--ÏûÏ¢²ÎÊı2
+     * @brief å“åº”å®¿ä¸»æ¶ˆæ¯
+     * @param bRelayout BOOL--é‡å¸ƒå±€æ ‡å¿—
+     * @param uMsg UINT--æ¶ˆæ¯ID
+     * @param wp WPARAM--æ¶ˆæ¯å‚æ•°1
+     * @param lp LPARAM--æ¶ˆæ¯å‚æ•°2
      * @return
-     * @remark Ä¿Ç°Ö»ĞŞ¸ÄÏµÍ³×ÖÌåÊ±Ê¹ÓÃ
+     * @remark ç›®å‰åªä¿®æ”¹ç³»ç»Ÿå­—ä½“æ—¶ä½¿ç”¨
      */
     STDMETHOD_(void, OnHostMsg)(THIS_ BOOL bRelayout, UINT uMsg, WPARAM wp, LPARAM lp) PURE;
 };
 
 SNSEND
+#endif // __SHOSTMSGHANDLER_I__H__

@@ -4,6 +4,8 @@
 #define __COMMON_MY_BUFFER_H
 
 #include "Defs.h"
+#include <cstddef>
+#include <memory>
 
 template <class T> class CBuffer
 {

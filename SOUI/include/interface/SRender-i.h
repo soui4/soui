@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SRENDER_I__H__
+#define __SRENDER_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <interface/sobject-i.h>
@@ -1595,3 +1596,4 @@ typedef IPathS IPath;
 #endif //__cplusplus
 
 SNSEND
+#endif // __SRENDER_I__H__

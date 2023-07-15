@@ -10,7 +10,8 @@
  *
  * Describe
  */
-#pragma once
+#ifndef __SREALWND__H__
+#define __SREALWND__H__
 #include <interface/sctrl-i.h>
 #include <proxy/SWindowProxy.h>
 
@@ -199,3 +200,4 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
 };
 
 SNSEND
+#endif // __SREALWND__H__

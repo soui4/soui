@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SHOSTPRESENTER__H__
+#define __SHOSTPRESENTER__H__
 #include <interface/SHostPresenter-i.h>
 #include <helper/obj-ref-impl.hpp>
 SNSBEGIN
@@ -23,3 +24,5 @@ class SOUI_EXP SHostPresenter : public TObjRefImpl<IHostPresenter> {
 };
 
 SNSEND
+
+#endif // __SHOSTPRESENTER__H__

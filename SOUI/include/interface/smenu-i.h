@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SMENU_I__H__
+#define __SMENU_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <interface/sxml-i.h>
@@ -11,17 +12,17 @@ SNSBEGIN
 DECLARE_INTERFACE_(IMenu, IObjRef)
 {
 
-    //!Ìí¼ÓÒýÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒýÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -29,7 +30,7 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
     //=================================================================
 
     /**
-     * @brief attachµ½hmenu
+     * @brief attachåˆ°hmenu
      * @param hMenu
      * @return TRUE-SUCCEED
      */
@@ -192,3 +193,4 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
 };
 
 SNSEND
+#endif // __SMENU_I__H__

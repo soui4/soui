@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SADAPTERBASE__H__
+#define __SADAPTERBASE__H__
 
 #include "interface/SAdapter-i.h"
 #include <souicoll.h>
@@ -671,3 +672,5 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
     ULONG_PTR m_rootUserData[DATA_INDEX_NUMBER];
 };
 SNSEND
+
+#endif // __SADAPTERBASE__H__

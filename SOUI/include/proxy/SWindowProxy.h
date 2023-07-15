@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SWINDOWPROXY__H__
+#define __SWINDOWPROXY__H__
 
 SNSBEGIN
 
@@ -42,3 +43,4 @@ public:
 };
 
 SNSEND
+#endif // __SWINDOWPROXY__H__

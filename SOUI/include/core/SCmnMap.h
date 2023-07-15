@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SCMNMAP__H__
+#define __SCMNMAP__H__
 #include <souicoll.h>
 SNSBEGIN
 
@@ -79,3 +80,4 @@ class SCmnMap {
 };
 
 SNSEND
+#endif // __SCMNMAP__H__

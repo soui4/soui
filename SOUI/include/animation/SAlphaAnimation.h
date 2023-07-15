@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2006 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef __SALPHAANIMATION__H__
+#define __SALPHAANIMATION__H__
 #include <animation/SAnimation.h>
 
 SNSBEGIN
@@ -64,3 +65,5 @@ class SOUI_EXP SAlphaAnimation : public SAnimation {
 };
 
 SNSEND
+
+#endif // __SALPHAANIMATION__H__

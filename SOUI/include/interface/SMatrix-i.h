@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SMATRIX_I__H__
+#define __SMATRIX_I__H__
 #include <interface/SRender-i.h>
 
 SNSBEGIN
@@ -8,26 +9,26 @@ SNSBEGIN
 DECLARE_INTERFACE(IMatrix)
 {
     /**
-     * @brief »ñÈ¡¾ØÕóÊı¾İ
-     * @return IxForm *--¾ØÕóÊı¾İ
+     * @brief è·å–çŸ©é˜µæ•°æ®
+     * @return IxForm *--çŸ©é˜µæ•°æ®
      */
     STDMETHOD_(IxForm *, Data)(CTHIS) SCONST PURE;
 
     /**
-     * @brief Çå¿Õ¾ØÕó
+     * @brief æ¸…ç©ºçŸ©é˜µ
      * @return
      */
     STDMETHOD_(void, reset)(THIS) PURE;
 
     /**
-     * @brief ½«¾ØÕóÉè¶¨Îªµ¥Î»¾ØÕó
+     * @brief å°†çŸ©é˜µè®¾å®šä¸ºå•ä½çŸ©é˜µ
      * @return
      */
     STDMETHOD_(void, setIdentity)(THIS) PURE;
 
     /**
-     * @brief ÅĞ¶Ï¾ØÕóÊÇ·ñÎªµ¥Î»¾ØÕó
-     * @return TRUE--¾ØÕóÊÇµ¥Î»¾ØÕó
+     * @brief åˆ¤æ–­çŸ©é˜µæ˜¯å¦ä¸ºå•ä½çŸ©é˜µ
+     * @return TRUE--çŸ©é˜µæ˜¯å•ä½çŸ©é˜µ
      */
     STDMETHOD_(BOOL, isIdentity)(CTHIS) SCONST PURE;
 
@@ -98,3 +99,4 @@ DECLARE_INTERFACE(IMatrix)
 };
 
 SNSEND
+#endif // __SMATRIX_I__H__

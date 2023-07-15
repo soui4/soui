@@ -11,7 +11,8 @@
  * Describe    SOUI系统中的DUI窗口管理模块
  */
 
-#pragma once
+#ifndef __SWINDOWMGR__H__
+#define __SWINDOWMGR__H__
 #include "core/SSingletonMap.h"
 #include "core/SDefine.h"
 SNSBEGIN
@@ -48,3 +49,4 @@ class SOUI_EXP SWindowMgr : public SSingletonMap<SWindowMgr, SWindow *, SWND> {
 };
 
 SNSEND
+#endif // __SWINDOWMGR__H__

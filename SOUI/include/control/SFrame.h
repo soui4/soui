@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SFRAME__H__
+#define __SFRAME__H__
 #include <core/SWnd.h>
 
 SNSBEGIN
@@ -17,3 +18,4 @@ class SOUI_EXP SFrame : public SWindow {
 };
 
 SNSEND
+#endif // __SFRAME__H__

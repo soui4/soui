@@ -15,7 +15,7 @@ SWND SFrame::SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent) const
 {
     SWND ret = __baseCls::SwndFromPoint(pt, bIncludeMsgTransparent);
     if (ret == m_swnd)
-        ret = NULL;
+        ret = 0;
     return ret;
 }
 

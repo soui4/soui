@@ -13,7 +13,7 @@
 
 #ifndef _SRESPROVIDERBASE_
 #define _SRESPROVIDERBASE_
-#pragma once
+
 
 #include <interface/obj-ref-i.h>
 #include <interface/SRender-i.h>

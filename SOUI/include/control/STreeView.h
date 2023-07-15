@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __STREEVIEW__H__
+#define __STREEVIEW__H__
 
 #include "core/Swnd.h"
 #include "core/SItemPanel.h"
@@ -218,3 +219,4 @@ class SOUI_EXP STreeView
     SLayoutSize m_indent;
 };
 SNSEND
+#endif // __STREEVIEW__H__

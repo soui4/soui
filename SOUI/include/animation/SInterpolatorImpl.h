@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SINTERPOLATORIMPL__H__
+#define __SINTERPOLATORIMPL__H__
 
 #include <interface/sinterpolator-i.h>
 #include <helper/obj-ref-impl.hpp>
@@ -231,3 +232,4 @@ class SPathInterpolator : public SInterpolatorBase {
 };
 
 SNSEND
+#endif // __SINTERPOLATORIMPL__H__

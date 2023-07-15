@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SCARET__H__
+#define __SCARET__H__
 #include <interface/scaret-i.h>
 #include <interface/sinterpolator-i.h>
 #include <interface/STimelineHandler-i.h>
@@ -58,3 +59,5 @@ class SOUI_EXP SCaret
     SWND m_hOwner;
 };
 SNSEND
+
+#endif // __SCARET__H__

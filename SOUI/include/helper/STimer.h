@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __STIMER__H__
+#define __STIMER__H__
 #include <interface/STimer-i.h>
 #include <helper/obj-ref-impl.hpp>
 
@@ -20,3 +21,4 @@ class SOUI_EXP STimer : public TObjRefImpl<ITimer> {
 };
 
 SNSEND
+#endif // __STIMER__H__

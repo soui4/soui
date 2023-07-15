@@ -1,8 +1,6 @@
 ﻿//////////////////////////////////////////////////////////////////////////
 //   File Name: SSkinPool
 //////////////////////////////////////////////////////////////////////////
-
-#pragma once
 #include "souistd.h"
 #include "core/Sskin.h"
 #include "helper/SDIBHelper.h"
@@ -455,7 +453,8 @@ void SSkinGradation2::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iSta
         ptCorner.x = (int)(rc.Width() / 2 * m_ptCorner.fX);
         ptCorner.y = (int)(rc.Height() / 2 * m_ptCorner.fY);
     }
-    pRT->DrawGradientRectEx(prcDraw, ptCorner, m_arrGradient.GetData(), (int)m_arrGradient.GetCount(), &GetGradientInfo(GetScale()), GetAlpha());
+    GradientInfo info = GetGradientInfo(GetScale());
+    pRT->DrawGradientRectEx(prcDraw, ptCorner, m_arrGradient.GetData(), (int)m_arrGradient.GetCount(), &info, GetAlpha());
 }
 
 ISkinObj *SSkinGradation2::Scale(int nScale)
@@ -869,7 +868,8 @@ IBrushS *SSkinShape::SGradientBrush::CreateBrush(IRenderTarget *pRT, int nScale,
     if (m_arrGradient.GetCount() < 2)
         return NULL;
     IBrushS *ret = NULL;
-    pRT->CreateGradientBrush(m_arrGradient.GetData(), (int)m_arrGradient.GetCount(), &GetGradientInfo(nScale), byAlpha, kRepeat_TileMode, &ret);
+    GradientInfo info = GetGradientInfo(nScale);
+    pRT->CreateGradientBrush(m_arrGradient.GetData(), (int)m_arrGradient.GetCount(), &info, byAlpha, kRepeat_TileMode, &ret);
     return ret;
 }
 

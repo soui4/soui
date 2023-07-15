@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2006 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -14,7 +14,8 @@
  * limitations under the License.
  */
 
-#pragma once
+#ifndef __SANIMATIONSET__H__
+#define __SANIMATIONSET__H__
 #include <animation/SAnimation.h>
 #include <souicoll.h>
 
@@ -148,3 +149,4 @@ class SOUI_EXP SAnimationSet : public SAnimation {
 };
 
 SNSEND
+#endif // __SANIMATIONSET__H__

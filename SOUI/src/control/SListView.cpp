@@ -68,7 +68,7 @@ BOOL SListView::SetAdapter(ILvAdapter *adapter)
 {
     if (!m_lvItemLocator)
     {
-        SASSERT_FMT(FALSE, _T("error: A item locator is in need before setting adapter!!!"));
+        SASSERT_FMTA(FALSE, "error: A item locator is in need before setting adapter!!!",0);
         return FALSE;
     }
     if (m_adapter == adapter)

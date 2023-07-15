@@ -262,9 +262,9 @@ namespace SevenZip
         {
             if (m_overwriteMode == OverwriteMode::kRollBack && operationResult != S_OK)
             {
-                _ASSERT_EXPR(FALSE,L"begin rollback");
+                //_ASSERT_EXPR(FALSE,L"begin rollback");
                 bool succ = ProcessRollBack(); succ;
-                _ASSERT_EXPR(succ, L"rollback error!");
+                //_ASSERT_EXPR(succ, L"rollback error!");
                 return E_FAIL;
             }
             

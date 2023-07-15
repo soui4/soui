@@ -1,4 +1,4 @@
-/*
+﻿/*
  * Copyright (C) 2006 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -19,7 +19,8 @@
  * other objects. See the {@link android.view.animation animation package
  * description file}.
  */
-#pragma once
+#ifndef __SANIMATION_I__H__
+#define __SANIMATION_I__H__
 
 #include <interface/sinterpolator-i.h>
 #include <interface/sobject-i.h>
@@ -404,3 +405,4 @@ DECLARE_INTERFACE_(IAnimation, IObject)
 };
 
 SNSEND
+#endif // __SANIMATION_I__H__

@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SXML_I__H__
+#define __SXML_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <interface/sstring-i.h>
@@ -10,17 +11,17 @@ SNSBEGIN
 #define INTERFACE IXmlAttr
 DECLARE_INTERFACE_(IXmlAttr,IObjRef)
 {
-	//!Ìí¼ÓÒýÓÃ
+	//!æ·»åŠ å¼•ç”¨
 	/*!
 	*/
 	STDMETHOD_(long,AddRef) (THIS) PURE;
 
-	//!ÊÍ·ÅÒýÓÃ
+	//!é‡Šæ”¾å¼•ç”¨
 	/*!
 	*/
 	STDMETHOD_(long,Release) (THIS) PURE;
 
-	//!ÊÍ·Å¶ÔÏó
+	//!é‡Šæ”¾å¯¹è±¡
 	/*!
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
@@ -65,17 +66,17 @@ typedef enum _XmlNodeType
 #define INTERFACE IXmlNode
 DECLARE_INTERFACE_(IXmlNode,IObjRef)
 {
-	//!Ìí¼ÓÒýÓÃ
+	//!æ·»åŠ å¼•ç”¨
 	/*!
 	*/
 	STDMETHOD_(long,AddRef) (THIS) PURE;
 
-	//!ÊÍ·ÅÒýÓÃ
+	//!é‡Šæ”¾å¼•ç”¨
 	/*!
 	*/
 	STDMETHOD_(long,Release) (THIS) PURE;
 
-	//!ÊÍ·Å¶ÔÏó
+	//!é‡Šæ”¾å¯¹è±¡
 	/*!
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
@@ -251,17 +252,17 @@ typedef struct _XmlParseResult
 #define INTERFACE IXmlDoc
 DECLARE_INTERFACE_(IXmlDoc,IObjRef)
 {
-	//!Ìí¼ÓÒýÓÃ
+	//!æ·»åŠ å¼•ç”¨
 	/*!
 	*/
 	STDMETHOD_(long,AddRef) (THIS) PURE;
 
-	//!ÊÍ·ÅÒýÓÃ
+	//!é‡Šæ”¾å¼•ç”¨
 	/*!
 	*/
 	STDMETHOD_(long,Release) (THIS) PURE;
 
-	//!ÊÍ·Å¶ÔÏó
+	//!é‡Šæ”¾å¯¹è±¡
 	/*!
 	*/
 	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
@@ -313,3 +314,5 @@ typedef SOUI::IXmlDoc * IXmlDocPtr;
 typedef IXmlDoc * IXmlDocPtr;
 #endif
 
+
+#endif // __SXML_I__H__

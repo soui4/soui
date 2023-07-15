@@ -1,4 +1,5 @@
-#pragma once
+﻿#ifndef __SNATIVEWNDPROXY__H__
+#define __SNATIVEWNDPROXY__H__
 
 SNSBEGIN
 
@@ -291,3 +292,4 @@ public:
 };
 
 SNSEND
+#endif // __SNATIVEWNDPROXY__H__

@@ -10,7 +10,8 @@
  *
  * Describe    扩展列表框
  */
-#pragma once
+#ifndef __STABCTRL__H__
+#define __STABCTRL__H__
 #include <core/SWnd.h>
 #include <helper/SplitString.h>
 
@@ -92,6 +93,7 @@ class SOUI_EXP STabPage : public TWindowProxy<ITabPage> {
     int m_iIcon;
 };
 
+class STabSlider;
 /**
  * @class     STabCtrl
  * @brief     tab控件
@@ -499,3 +501,4 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
 };
 
 SNSEND
+#endif // __STABCTRL__H__

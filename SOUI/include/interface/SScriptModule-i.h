@@ -11,7 +11,8 @@
  * Describe
  */
 
-#pragma once
+#ifndef __SSCRIPTMODULE_I__H__
+#define __SSCRIPTMODULE_I__H__
 #include <utilities-def.h>
 #include <interface/obj-ref-i.h>
 #include <interface/SEvtArgs-i.h>
@@ -153,3 +154,5 @@ DECLARE_INTERFACE_(IScriptFactory, IObjRef)
 };
 
 SNSEND
+
+#endif // __SSCRIPTMODULE_I__H__

@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SLOG_I__H__
+#define __SLOG_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <time.h>
@@ -103,3 +104,4 @@ DECLARE_INTERFACE_(ILogMgr, IObjRef)
 };
 
 SNSEND
+#endif // __SLOG_I__H__

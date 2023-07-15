@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __STILEVIEW__H__
+#define __STILEVIEW__H__
 
 #include "core/SWnd.h"
 #include "core/SItemPanel.h"
@@ -148,3 +149,5 @@ class SOUI_EXP STileView
     BOOL m_bDatasetInvalidated;
 };
 SNSEND
+
+#endif // __STILEVIEW__H__

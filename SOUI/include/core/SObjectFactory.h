@@ -11,7 +11,8 @@
  * Describe    SOUI窗口类厂管理器
  */
 
-#pragma once
+#ifndef __SOBJECTFACTORY__H__
+#define __SOBJECTFACTORY__H__
 #include <core/SCmnMap.h>
 #include <helper/obj-ref-impl.hpp>
 SNSBEGIN
@@ -108,7 +109,8 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
     template <class T>
     BOOL TplRegisterFactory()
     {
-        return RegisterFactory(&TplSObjectFactory<T>());
+        TplSObjectFactory<T> fac;
+        return RegisterFactory(&fac);
     }
 
     template <class T>
@@ -125,3 +127,4 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
 };
 
 SNSEND
+#endif // __SOBJECTFACTORY__H__

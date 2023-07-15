@@ -11,7 +11,8 @@
  * Describe    SOUI字体管理模块
  */
 
-#pragma once
+#ifndef __SFONTPOOL__H__
+#define __SFONTPOOL__H__
 
 #include <core/ssingletonmap.h>
 #include <interface/SRender-i.h>
@@ -114,3 +115,5 @@ class SOUI_EXP SFontPool : public SSingletonMap<SFontPool, IFontPtr, FontInfo> {
 };
 
 SNSEND
+
+#endif // __SFONTPOOL__H__

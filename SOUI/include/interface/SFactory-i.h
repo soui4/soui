@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SFACTORY_I__H__
+#define __SFACTORY_I__H__
 
 #include <interface/obj-ref-i.h>
 #include <interface/sapp-i.h>
@@ -19,17 +20,17 @@ SNSBEGIN
 #define INTERFACE ISouiFactory
 DECLARE_INTERFACE_(ISouiFactory, IObjRef)
 {
-    //!Ìí¼ÓÒıÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒıÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -37,80 +38,80 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
     //////////////////////////////////////////////////////////////////////////
 
     /** CreateApp
-     * @brief ´´½¨IApp¶ÔÏó
-     * @return IApplication * -- App¶ÔÏó
+     * @brief åˆ›å»ºIAppå¯¹è±¡
+     * @return IApplication * -- Appå¯¹è±¡
      */
     STDMETHOD_(IApplication *, CreateApp)(THIS_ IRenderFactory * pRenderFac, HMODULE hInst, LPCTSTR pszHostClassName DEF_VAL(_T("SOUIHOST")), BOOL bImeApp DEF_VAL(FALSE)) PURE;
 
     /** CreateNativeWnd
-     * @brief ´´½¨´°¿Ú¶ÔÏó
-     * @return INativeWnd * -- ´°¿Ú¶ÔÏó
+     * @brief åˆ›å»ºçª—å£å¯¹è±¡
+     * @return INativeWnd * -- çª—å£å¯¹è±¡
      */
     STDMETHOD_(INativeWnd *, CreateNativeWnd)(THIS) PURE;
 
     /** CreateHostWnd
-     * @brief ´´½¨SOUI´°¿Ú¶ÔÏó
-     * @return IHostWnd * -- SOUI´°¿Ú¶ÔÏó
+     * @brief åˆ›å»ºSOUIçª—å£å¯¹è±¡
+     * @return IHostWnd * -- SOUIçª—å£å¯¹è±¡
      */
     STDMETHOD_(IHostWnd *, CreateHostWnd)(THIS_ LPCTSTR pszResID DEF_VAL(NULL)) PURE;
 
     /** CreateHostDialog
-     * @brief ´´½¨SOUI¶Ô»°¿ò¶ÔÏó
-     * @return IHostDialog * -- SOUI¶Ô»°¿ò¶ÔÏó
+     * @brief åˆ›å»ºSOUIå¯¹è¯æ¡†å¯¹è±¡
+     * @return IHostDialog * -- SOUIå¯¹è¯æ¡†å¯¹è±¡
      */
     STDMETHOD_(IHostDialog *, CreateHostDialog)(THIS_ LPCTSTR pszResID DEF_VAL(NULL)) PURE;
 
     /** CreateStringA
-     * @brief ´´½¨IStringA¶ÔÏó
-     * @return IStringA * -- ×Ö·û´®¶ÔÏó
+     * @brief åˆ›å»ºIStringAå¯¹è±¡
+     * @return IStringA * -- å­—ç¬¦ä¸²å¯¹è±¡
      */
     STDMETHOD_(IStringA *, CreateStringA)(THIS_ LPCSTR pszSrc) PURE;
 
     /** CreateStringW
-     * @brief ´´½¨IStringW¶ÔÏó
-     * @return IStringW * -- ×Ö·û´®¶ÔÏó
+     * @brief åˆ›å»ºIStringWå¯¹è±¡
+     * @return IStringW * -- å­—ç¬¦ä¸²å¯¹è±¡
      */
     STDMETHOD_(IStringW *, CreateStringW)(THIS_ LPCWSTR pszSrc) PURE;
 
     /** CreateXmlDoc
-     * @brief ´´½¨IXmlDoc¶ÔÏó
-     * @return IXmlDoc * -- Xml¶ÔÏó
+     * @brief åˆ›å»ºIXmlDocå¯¹è±¡
+     * @return IXmlDoc * -- Xmlå¯¹è±¡
      */
     STDMETHOD_(IXmlDoc *, CreateXmlDoc)(THIS) PURE;
 
     /** CreateResProvider
-     * @brief ´´½¨IResProvider¶ÔÏó
-     * @return IResProvider * -- ×ÊÔ´°ü¶ÔÏó
+     * @brief åˆ›å»ºIResProviderå¯¹è±¡
+     * @return IResProvider * -- èµ„æºåŒ…å¯¹è±¡
      */
     STDMETHOD_(IResProvider *, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType) PURE;
 
     /** CreateFuncSlot
-     * @brief ´´½¨IEvtSlot¶ÔÏó
-     * @return IEvtSlot * -- Event Slot¶ÔÏó
+     * @brief åˆ›å»ºIEvtSlotå¯¹è±¡
+     * @return IEvtSlot * -- Event Slotå¯¹è±¡
      */
     STDMETHOD_(IEvtSlot *, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx) PURE;
 
     /** CreateMenu
-     * @brief ´´½¨Menu¶ÔÏó
-     * @return IMenu * -- Menu¶ÔÏó
+     * @brief åˆ›å»ºMenuå¯¹è±¡
+     * @return IMenu * -- Menuå¯¹è±¡
      */
     STDMETHOD_(IMenu *, CreateMenu)(THIS_ HMENU hMenu DEF_VAL(NULL)) PURE;
 
     /** CreateMenuEx
-     * @brief ´´½¨MenuEx¶ÔÏó
-     * @return IMenuEx * -- MenuEx¶ÔÏó
+     * @brief åˆ›å»ºMenuExå¯¹è±¡
+     * @return IMenuEx * -- MenuExå¯¹è±¡
      */
     STDMETHOD_(IMenuEx *, CreateMenuEx)(THIS) PURE;
 
     /** CreateTimer
-     * @brief ´´½¨¶¨Ê±Æ÷¶ÔÏó
-     * @return ITimer * -- ¶¨Ê±Æ÷¶ÔÏó
+     * @brief åˆ›å»ºå®šæ—¶å™¨å¯¹è±¡
+     * @return ITimer * -- å®šæ—¶å™¨å¯¹è±¡
      */
     STDMETHOD_(ITimer *, CreateTimer)(THIS_ IEvtSlot * pEvtSlot) PURE;
 
     /** CreateAnimatorGroup
-     * @brief ´´½¨¶¯»­×é
-     * @return IAnimatorGroup * -- ¶¯»­×é
+     * @brief åˆ›å»ºåŠ¨ç”»ç»„
+     * @return IAnimatorGroup * -- åŠ¨ç”»ç»„
      */
 	STDMETHOD_(IAnimatorGroup*,CreateAnimatorGroup)(THIS) PURE;
 };
@@ -124,3 +125,5 @@ typedef ISouiFactory *ISouiFactoryPtr;
 #endif
 
 EXTERN_C ISouiFactoryPtr SOUI_EXP CreateSouiFactory();
+
+#endif // __SFACTORY_I__H__

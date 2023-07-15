@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SSKINOBJBASE__H__
+#define __SSKINOBJBASE__H__
 
 #include <interface/Sskinobj-i.h>
 #include <helper/obj-ref-impl.hpp>
@@ -74,3 +75,4 @@ class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
 };
 
 SNSEND
+#endif // __SSKINOBJBASE__H__

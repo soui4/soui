@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SDIBHELPER__H__
+#define __SDIBHELPER__H__
 
 #include "interface/SRender-i.h"
 
@@ -22,3 +23,4 @@ class SOUI_EXP SDIBHelper {
 };
 
 SNSEND
+#endif // __SDIBHELPER__H__

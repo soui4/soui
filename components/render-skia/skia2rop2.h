@@ -39,7 +39,7 @@ enum Xfer_Rop2{
     virtual void flatten(SkWriteBuffer&);
     
 #ifndef SK_IGNORE_TO_STRING
-    void ProcXfermode::toString(SkString* str) const {
+    void toString(SkString* str) const {
 		(str);
 //         this->INHERITED::toString(str);
     }

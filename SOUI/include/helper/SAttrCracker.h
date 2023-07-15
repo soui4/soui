@@ -14,7 +14,7 @@
 #ifndef _SATTRCRACK_H
 #define _SATTRCRACK_H
 
-#pragma once
+
 
 // Attribute Declaration
 #define SOUI_ATTRS_BEGIN()                                                                                                   \

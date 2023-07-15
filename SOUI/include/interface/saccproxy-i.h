@@ -1,4 +1,5 @@
-#pragma once
+ï»¿#ifndef __SACCPROXY_I__H__
+#define __SACCPROXY_I__H__
 
 #include <interface/obj-ref-i.h>
 
@@ -8,17 +9,17 @@ SNSBEGIN
 #define INTERFACE IAccProxy
 DECLARE_INTERFACE_(IAccProxy, IObjRef)
 {
-    //!Ìí¼ÓÒýÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒýÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -38,3 +39,4 @@ DECLARE_INTERFACE_(IAccProxy, IObjRef)
 };
 
 SNSEND
+#endif // __SACCPROXY_I__H__

@@ -10,7 +10,8 @@
  *
  * Describe    RichEdit控件
  */
-#pragma once
+#ifndef __SRICHEDIT__H__
+#define __SRICHEDIT__H__
 
 #include <Richedit.h>
 #include <TextServ.h>
@@ -1279,3 +1280,5 @@ class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
     STrText m_strCue;
 };
 SNSEND
+
+#endif // __SRICHEDIT__H__

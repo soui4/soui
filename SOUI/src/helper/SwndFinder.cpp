@@ -3,7 +3,6 @@
 #include <core/Swnd.h>
 
 SNSBEGIN
-SWindowFinder *SSingleton<SWindowFinder>::ms_Singleton = NULL;
 
 SFindInfo::SFindInfo(SWindow *pParent, const SStringW &_strName, int _nDeep)
     : hParent(pParent->GetSwnd())

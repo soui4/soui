@@ -1,7 +1,7 @@
 ﻿#ifndef __TSTRING_H__
 #define __TSTRING_H__
 
-#pragma once
+
 #include <utilities-def.h>
 
 #include "sstringa.h"

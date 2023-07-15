@@ -7,35 +7,6 @@
 # 
 #
 # 目前支持编译的库/可执行程序:
-# 
-# ---third-part
-# third-part/png
-# third-part/zlib
-# third-part/skia
-# third-part/png
-# third-part/lua
-# 
-# ---core---
-# SOUI
-# utilities4
-# soui-sys-resource
-#
-# ---components---
-# components/imagedecoder-gdip
-# components/imagedecoder-png
-# components/imagedecoder-stb
-# components/imagedecoder-wic
-# components/render-gdi
-# components/render-skia
-# components/resprovider-zip
-# components/translator
-# components/ScriptMode-Lua
-# components/log4z
-#
-# ---demos---
-# demos/360
-# demos/360Preview
-# demos/PCManager
 #
 # __cmake/cotire.cmake
 # @ https://github.com/sakra/cotire
@@ -97,8 +68,7 @@ option(XP_TOOLSET "" ON)
 
 config_compiler_and_linker()
 
-configure_file("config/core-def.h.in" "${PROJECT_SOURCE_DIR}/config/core-def.h" @ONLY)
-configure_file("config/com-def.h.in" "${PROJECT_SOURCE_DIR}/config/com-def.h" @ONLY)
+configure_file("config/config.h.in" "${PROJECT_SOURCE_DIR}/config/config.h" @ONLY)
 configure_file("config/build.cfg.in" "${PROJECT_SOURCE_DIR}/config/build.cfg" @ONLY)
 
 #
@@ -120,10 +90,7 @@ add_subdirectory(components)
 #
 #
 add_subdirectory(demo)
-
 add_subdirectory(demo2)
 
-message(STATUS "COM_LIBS: ${COM_LIBS}")
-message(STATUS "CORE_LIBS: ${CORE_LIBS}")
 ##
 ##

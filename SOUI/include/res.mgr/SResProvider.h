@@ -3,7 +3,8 @@
 // Description: Resource Provider
 //////////////////////////////////////////////////////////////////////////
 
-#pragma once
+#ifndef __SRESPROVIDER__H__
+#define __SRESPROVIDER__H__
 
 #include <interface/SResProvider-i.h>
 #include <helper/SResID.h>
@@ -89,3 +90,4 @@ class SResProviderFiles : public TObjRefImpl<IResProvider> {
 };
 
 SNSEND
+#endif // __SRESPROVIDER__H__

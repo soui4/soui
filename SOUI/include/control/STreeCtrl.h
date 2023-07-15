@@ -3,7 +3,8 @@
 //     Version: 2012.12.16 - 1.1 - Create
 //////////////////////////////////////////////////////////////////////////
 
-#pragma once
+#ifndef __STREECTRL__H__
+#define __STREECTRL__H__
 #include "core/SPanel.h"
 #include "STree.h"
 
@@ -51,9 +52,9 @@ typedef struct tagTVITEM
     {
         nImage = -1;
         nSelectedImage = -1;
-        lParam = NULL;
+        lParam = 0;
 
-        hItem = NULL;
+        hItem = 0;
         bCollapsed = FALSE;
         bVisible = TRUE;
         bHasChildren = FALSE;
@@ -274,3 +275,5 @@ class SOUI_EXP STreeCtrl
 };
 
 SNSEND
+
+#endif // __STREECTRL__H__

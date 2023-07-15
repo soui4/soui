@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef __SOUILAYOUTPARAMSTRUCT__H__
+#define __SOUILAYOUTPARAMSTRUCT__H__
 
 #include "SLayoutSize.h"
 
@@ -52,3 +53,5 @@ struct SouiLayoutParamStruct
     SLayoutSize height; /**<使用height属性定义的高 nCount==0 时有效*/
 };
 SNSEND
+
+#endif // __SOUILAYOUTPARAMSTRUCT__H__

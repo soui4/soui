@@ -10,7 +10,8 @@
  *
  * Describe
  */
-#pragma once
+#ifndef __SHEADERCTRL__H__
+#define __SHEADERCTRL__H__
 
 #include <core/SWnd.h>
 #include <interface/SCtrl-i.h>
@@ -333,3 +334,4 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
     int m_nScale;                 /**< Current Scale */
 };
 SNSEND
+#endif // __SHEADERCTRL__H__
