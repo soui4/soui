@@ -72,7 +72,7 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 [![CMake Test](https://github.com/soui4/soui/actions/workflows/cmaketest.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/cmaketest.yml)
 
-soui可以使用cmake或者qmake进行编译（前提:安装好Visual Studio），具体编译方法查看附带[编译文档](./doc/build.md)
+如果为他vs2008编译，可以直接打开soui.08.sln来编译，包含了32位及64位两种配置。其它版本VS可以使用cmake生成对应版本VS工程再编译，运动在cmake中统一修改配置。具体编译方法查看附带[编译文档](./doc/build.md)
 
 ### UI可视化设计
 
