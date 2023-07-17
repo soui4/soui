@@ -422,7 +422,7 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         if (hItem == ITEM_ROOT)
             return ITEM_NULL;
         HSTREEITEM hParent = m_tree.GetParentItem((HSTREEITEM)hItem);
-        if (hParent == NULL)
+        if (hParent == 0)
             hParent = ITEM_ROOT;
         return (HSTREEITEM)hParent;
     }

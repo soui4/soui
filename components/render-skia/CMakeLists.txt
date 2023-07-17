@@ -38,6 +38,7 @@ target_include_directories(render-skia
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/config
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/core
+  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/src/core
 )
 
 set(COM_LIBS ${COM_LIBS} render-skia)

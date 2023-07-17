@@ -14,8 +14,8 @@ Abstract:
 --*/
 
 /*
-Ô­ÓÐ winHttp.h ÎÄ¼þÓëWininet.h ÎÄ¼þ¶¨Òå²»¼æÈÝ£¬Õâ¸ö°æ±¾ÊÇÐÞ¸Ä°æ¡£
-±£Ö¤¿ÉÒÔÔÚ°üº¬wininet.hÎÄ¼þµÄ´úÂëÖÐ°üº¬winhttp.h
+Ô­ï¿½ï¿½ winHttp.h ï¿½Ä¼ï¿½ï¿½ï¿½Wininet.h ï¿½Ä¼ï¿½ï¿½ï¿½ï¿½å²»ï¿½ï¿½ï¿½Ý£ï¿½ï¿½ï¿½ï¿½ï¿½æ±¾ï¿½ï¿½ï¿½Þ¸Ä°æ¡£
+ï¿½ï¿½Ö¤ï¿½ï¿½ï¿½ï¿½ï¿½Ú°ï¿½ï¿½ï¿½wininet.hï¿½Ä¼ï¿½ï¿½Ä´ï¿½ï¿½ï¿½ï¿½Ð°ï¿½ï¿½ï¿½winhttp.h
 */
 
 
@@ -52,7 +52,7 @@ extern "C" {
 
 #endif
 
-#define BOOLAPI WINHTTPAPI BOOL WINAPI
+//#define BOOLAPI WINHTTPAPI BOOL WINAPI
 //
 // types
 //
@@ -299,6 +299,17 @@ typedef struct
 //
 
 #define WINHTTP_TIME_FORMAT_BUFSIZE   62
+
+#ifndef __in
+#define __in
+#define __out
+#define __inout
+#define __out_ecount_full_opt(x)
+#define __out_data_source(x)
+#endif
+#ifndef __out_bcount
+#define __out_bcount(x)
+#endif
 
 BOOLAPI
 WinHttpTimeFromSystemTime

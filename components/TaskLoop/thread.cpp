@@ -4,6 +4,48 @@
 #include <interface\STaskLoop-i.h>
 #include <process.h>
 
+
+#ifdef _MSC_VER
+// we have undocumented Win32 APIs to set thread name.
+const DWORD MS_VC_EXCEPTION = 0x406D1388;
+#pragma pack(push,8)
+typedef struct tagTHREADNAME_INFO
+{
+	DWORD dwType; // Must be 0x1000.
+	LPCSTR szName; // Pointer to name (in user addr space).
+	DWORD dwThreadID; // Thread ID (-1=caller thread).
+	DWORD dwFlags; // Reserved for future use, must be zero.
+} THREADNAME_INFO;
+#pragma pack(pop)
+static void SetThreadName(const char *threadName)
+{
+	THREADNAME_INFO info;
+	info.dwType = 0x1000;
+	info.szName = threadName;
+	info.dwThreadID = ::GetCurrentThreadId();
+	info.dwFlags = 0;
+#pragma warning(push)
+#pragma warning(disable: 6320 6322)
+	__try
+	{
+		RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR *)&info);
+	}
+	__except (EXCEPTION_EXECUTE_HANDLER)
+	{
+	}
+
+#pragma warning(pop)
+}
+#else
+#include <pthread.h>
+static void SetThreadName(const char *threadName)
+{
+	pthread_setname_np(pthread_self(), threadName);
+}
+
+#endif
+
+
 SNSBEGIN
 
 class ThreadPrivate
@@ -140,41 +182,9 @@ std::string Thread::getName()
 	return _name;
 }
 
-// we have undocumented Win32 APIs to set thread name.
-const DWORD MS_VC_EXCEPTION = 0x406D1388;
-#pragma pack(push,8)
-typedef struct tagTHREADNAME_INFO
-{
-	DWORD dwType; // Must be 0x1000.
-	LPCSTR szName; // Pointer to name (in user addr space).
-	DWORD dwThreadID; // Thread ID (-1=caller thread).
-	DWORD dwFlags; // Reserved for future use, must be zero.
-} THREADNAME_INFO;
-#pragma pack(pop)
-static void SetThreadName(DWORD dwThreadID, const char *threadName)
-{
-	THREADNAME_INFO info;
-	info.dwType = 0x1000;
-	info.szName = threadName;
-	info.dwThreadID = dwThreadID;
-	info.dwFlags = 0;
-#pragma warning(push)
-#pragma warning(disable: 6320 6322)
-
-	__try
-	{
-		RaiseException(MS_VC_EXCEPTION, 0, sizeof(info) / sizeof(ULONG_PTR), (ULONG_PTR *)&info);
-	}
-	__except (EXCEPTION_EXECUTE_HANDLER)
-	{
-	}
-
-#pragma warning(pop)
-}
-
 void Thread::setThreadName(const std::string &name)
 {
-	SetThreadName(::GetCurrentThreadId(), name.c_str());
+	SetThreadName(name.c_str());
 }
 
 void Thread::setPriority(ThreadPriority priorityLevel)

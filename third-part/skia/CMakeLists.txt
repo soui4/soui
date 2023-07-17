@@ -5,23 +5,23 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/config)
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/core)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/core)
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/gpu)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gpu)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/images)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/utils/win)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/ports)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/text)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/effects)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/sfnt)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/pathops)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/views)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/core)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/image)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/opts)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/lazy)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/views)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/sfnt)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gpu)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/utils)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/core)
 
 add_definitions (
     -D_CRT_SECURE_NO_WARNINGS

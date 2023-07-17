@@ -1,5 +1,6 @@
 ﻿//IObjRef的实现类
-#pragma  once
+#ifndef __OBJ_REF_IMPL_HPP
+#define __OBJ_REF_IMPL_HPP
 #include <sdef.h>
 
 #ifndef SASSERT
@@ -209,3 +210,5 @@ protected:
 #define CAutoRefPtr SAutoRefPtr	//for compatible
 
 SNSEND
+
+#endif //__OBJ_REF_IMPL_HPP

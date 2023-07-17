@@ -595,7 +595,7 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 			::OemToCharBuff(fh->GetName(), szFile, fh->fnameLen);
 
 #ifndef ZIP_DISABLE_WILDCARD
-			if (::PathMatchSpec(szFile, pFF->szSearch) != NULL)
+			if (::PathMatchSpec(szFile, pFF->szSearch) != 0)
 #else
 			if (_tcsicmp(szFile, pFF->szSearch) == 0)
 #endif
