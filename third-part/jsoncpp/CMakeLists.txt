@@ -33,8 +33,7 @@ source_group("Header Files" FILES ${JSONCPP_HEADERS})
 source_group("Source Files" FILES ${JSONCPP_SRCS})
 
 ADD_LIBRARY (jsoncpp STATIC ${JSONCPP_SRCS} ${JSONCPP_HEADERS})
-set(COM_LIBS ${COM_LIBS} jsoncpp CACHE INTERNAL "com_lib")
+set(COM_LIBS ${COM_LIBS} jsoncpp)
 set_target_properties (jsoncpp PROPERTIES
     FOLDER third-part
 )
-cotire(jsoncpp)

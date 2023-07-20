@@ -22,9 +22,6 @@ else()
     add_library(render-gdi STATIC ${render-gdi_src} ${render-gdi_header})
 endif()
 
-target_compile_definitions(render-gdi
-  PUBLIC SOUI_RENDER_USE_GDI
-)
 target_include_directories(render-gdi
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE ${PROJECT_SOURCE_DIR}/config
@@ -32,8 +29,7 @@ target_include_directories(render-gdi
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
 )
 
-set(COM_LIBS ${COM_LIBS} render-gdi CACHE INTERNAL "com_lib")
+set(COM_LIBS ${COM_LIBS} render-gdi)
 set_target_properties (render-gdi PROPERTIES
     FOLDER components/render
 )
-cotire(render-gdi)

@@ -30,10 +30,7 @@ include_directories(
   ${gtest_SOURCE_DIR})
   
 ########################################################################
-#SET(CMAKE_CXX_FLAGS_DEBUG "/D_DEBUG /MDd /Zi /Ob0 /Od /RTC1")# 直接抄gui的默认，然后 改成mtd
-#SET(CMAKE_CXX_FLAGS_RELEASE "/MD /O2 /Ob2 /D NDEBUG")
 add_library(gtest STATIC src/gtest-all.cc src/gtest_main.cc)
 set_target_properties (gtest PROPERTIES
     FOLDER third-part
 )
-cotire(gtest)

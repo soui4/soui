@@ -61,8 +61,7 @@ source_group("Header Files" FILES ${libpng_headers})
 source_group("Source Files" FILES ${libpng_sources})
 
 add_library(png STATIC ${libpng_sources} ${libpng_headers})
-set(COM_LIBS ${COM_LIBS} png CACHE INTERNAL "com_lib")
+set(COM_LIBS ${COM_LIBS} png)
 set_target_properties (png PROPERTIES
     FOLDER third-part
 )
-cotire(png)

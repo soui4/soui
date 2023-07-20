@@ -29,8 +29,7 @@ target_include_directories(imgdecoder-gdip
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-set(COM_LIBS ${COM_LIBS} imgdecoder-gdip CACHE INTERNAL "com_lib")
+set(COM_LIBS ${COM_LIBS} imgdecoder-gdip)
 set_target_properties (imgdecoder-gdip PROPERTIES
     FOLDER components/imgdecoder
 )
-cotire(imgdecoder-gdip)

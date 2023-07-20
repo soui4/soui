@@ -23,7 +23,4 @@ else()
     add_library(utilities4 STATIC ${CURRENT_SRCS} ${CURRENT_HEADERS})
 endif()
 
-
-set_target_properties(utilities4 PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "stdafx.h")
-
-set(CORE_LIBS ${CORE_LIBS} utilities4 CACHE INTERNAL "core_lib")
+set(CORE_LIBS ${CORE_LIBS} utilities4)

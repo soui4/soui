@@ -15,4 +15,3 @@ ADD_LIBRARY (smiley STATIC ${SMILEY_SRCS} ${SMILEY_HEADERS})
 set_target_properties (smiley PROPERTIES
     FOLDER third-part
 )
-cotire(smiley)

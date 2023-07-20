@@ -36,7 +36,4 @@ target_include_directories(soui4
 )
 target_link_libraries(soui4 utilities4)
 
-set_target_properties(soui4 PROPERTIES COTIRE_CXX_PREFIX_HEADER_INIT "include/souistd.h")
-cotire(soui4)
-
-set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")
+target_precompile_headers(soui4 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/souistd.h")

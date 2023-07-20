@@ -22,8 +22,7 @@ source_group("Source Files" FILES ${SQLITE_SRC})
 
 add_library(sqlite3 STATIC ${SQLITE_HEADER} ${SQLITE_SRC})
 
-set(COM_LIBS ${COM_LIBS} sqlite3 CACHE INTERNAL "com_lib")
+set(COM_LIBS ${COM_LIBS} sqlite3)
 set_target_properties (sqlite3 PROPERTIES
     FOLDER third-part
 )
-cotire(sqlite3)

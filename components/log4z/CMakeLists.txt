@@ -22,8 +22,7 @@ else()
     add_library(log4z STATIC ${log4z_src} ${log4z_header})
 endif()
 
-set(COM_LIBS ${COM_LIBS} log4z CACHE INTERNAL "com_lib")
+set(COM_LIBS ${COM_LIBS} log4z )
 set_target_properties (log4z PROPERTIES
     FOLDER components
 )
-cotire(log4z)

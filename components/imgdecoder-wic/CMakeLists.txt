@@ -30,8 +30,7 @@ target_include_directories(imgdecoder-wic
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
 )
 
-set(COM_LIBS ${COM_LIBS} imgdecoder-wic CACHE INTERNAL "com_lib")
+set(COM_LIBS ${COM_LIBS} imgdecoder-wic )
 set_target_properties (imgdecoder-wic PROPERTIES
     FOLDER components/imgdecoder
 )
-cotire(imgdecoder-wic)

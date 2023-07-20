@@ -10,19 +10,12 @@ set(RCS_MAIN soui-sys-resource.rc)
 set(HDRS_MAIN resource.h)
 
 source_group("Header Files" FILES ${HDRS_MAIN})
-source_group("Source Files" FILES ${SRCS_MAIN})
 source_group("Resource Files" FILES ${RCS_MAIN})
 
 if (NOT ENABLE_SOUI_CORE_LIB)
-   
-    add_library(soui-sys-resource SHARED ${SRCS_MAIN} ${HDRS_MAIN} ${RCS_MAIN})
-
+    add_library(soui-sys-resource SHARED  ${HDRS_MAIN} ${RCS_MAIN})
 else()
-    add_library(soui-sys-resource STATIC ${SRCS_MAIN} ${HDRS_MAIN} ${RCS_MAIN})
+    add_library(soui-sys-resource STATIC  ${HDRS_MAIN} ${RCS_MAIN})
 endif()
 
-
 set_target_properties(soui-sys-resource PROPERTIES LINK_FLAGS "/NOENTRY")
-
-# add_library(soui-sys-resource SHARED soui-sys-resource.rc)
-cotire(soui-sys-resource)

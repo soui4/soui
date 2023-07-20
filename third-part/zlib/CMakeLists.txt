@@ -39,8 +39,7 @@ source_group("Header Files" FILES ${ZLIB_HEADERS})
 source_group("Source Files" FILES ${ZLIB_SRCS})
 
 ADD_LIBRARY (zlib STATIC ${ZLIB_SRCS} ${ZLIB_HEADERS})
-set(COM_LIBS ${COM_LIBS} zlib CACHE INTERNAL "com_lib")
+set(COM_LIBS ${COM_LIBS} zlib)
 set_target_properties (zlib PROPERTIES
     FOLDER third-part
 )
-cotire(zlib)

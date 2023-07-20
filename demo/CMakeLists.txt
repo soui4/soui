@@ -120,7 +120,7 @@ else ()
 endif ()
 add_executable(demo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${EXTENDCOTROLS})
 
-set_target_properties(demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+#set_target_properties(demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 add_dependencies(demo soui-sys-resource ${COM_LIBS})
 if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
 target_link_libraries(demo soui4 utilities4 smiley)
@@ -130,4 +130,3 @@ endif()
 set_target_properties (demo PROPERTIES
     FOLDER demos
 )
-cotire(demo)
