@@ -119,11 +119,12 @@ BOOL SComboView::GetItemText(int iItem, BOOL bRawText, IStringT *str) const
     ILvAdapter *pAdapter = m_pListBox->GetAdapter();
     if (!pAdapter || iItem == -1)
         return FALSE;
-    SStringT strDesc;
+    SStringW strDesc;
     pAdapter->getItemDesc(iItem, &strDesc);
     if (!bRawText)
-        strDesc = S_CW2T(tr(S_CT2W(strDesc)));
-    str->Copy(&strDesc);
+        strDesc = tr(strDesc);
+    SStringT ret = S_CW2T(strDesc);
+    str->Copy(&ret);
     return TRUE;
 }
 

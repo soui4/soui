@@ -27,7 +27,7 @@ static SXmlNode GetSourceXmlNode(SXmlNode nodeRoot, SXmlDoc &docInit, IResProvid
         SXmlAttr attrSrc = nodeData.attribute(L"src", false);
         if (attrSrc)
         { //优先从src属性里获取数据
-            if (SApplication::getSingletonPtr()->LoadXmlDocment(docInit, attrSrc.as_string(), pResProvider))
+            if (SApplication::getSingletonPtr()->LoadXmlDocment(docInit, S_CW2T(attrSrc.as_string()), pResProvider))
             {
                 nodeData = docInit.root().child(pszName);
             }

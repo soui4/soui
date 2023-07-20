@@ -169,8 +169,8 @@ typedef struct		// duplicate with wininet.h
 }
 URL_COMPONENTS, * LPURL_COMPONENTS;
 */
-typedef URL_COMPONENTS URL_COMPONENTSW;
-typedef LPURL_COMPONENTS LPURL_COMPONENTSW;  // duplicate wininet.h
+//typedef URL_COMPONENTS URL_COMPONENTSW;
+//typedef LPURL_COMPONENTS LPURL_COMPONENTSW;  // duplicate wininet.h
 
 #pragma warning( default : 4121 )   // restore alignment warning
 

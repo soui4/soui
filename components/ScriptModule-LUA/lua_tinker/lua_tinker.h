@@ -16,6 +16,7 @@
 #include <stdio.h>
 #include <typeinfo>
 #include <lua.h>
+#include <Windows.h>
 
 #ifndef UAPI
 #define UAPI __stdcall

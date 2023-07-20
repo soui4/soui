@@ -255,10 +255,10 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(void, SetWindowText)(THIS_ LPCTSTR lpszText) OVERRIDE;
 
-	STDMETHOD_(void, SetWindowTextA)(THIS_ LPCSTR lpszText) OVERRIDE;
+	STDMETHOD_(void, SetWindowTextU8)(THIS_ LPCSTR lpszText) OVERRIDE;
 
     STDMETHOD_(void, SetToolTipText)(THIS_ LPCTSTR pszText) OVERRIDE;
-	STDMETHOD_(void, SetToolTipTextA)(THIS_ LPCSTR pszText) OVERRIDE;
+	STDMETHOD_(void, SetToolTipTextU8)(THIS_ LPCSTR pszText) OVERRIDE;
 
     STDMETHOD_(BOOL, IsChecked)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, SetCheck)(THIS_ BOOL bCheck) OVERRIDE;
@@ -386,7 +386,7 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) OVERRIDE;
 
-	STDMETHOD_(int, GetWindowTextA)(THIS_ IStringA *pStr, BOOL bRawText) OVERRIDE;
+	STDMETHOD_(int, GetWindowTextU8)(THIS_ IStringA *pStr, BOOL bRawText) OVERRIDE;
 
     STDMETHOD_(void, SetEventMute)(THIS_ BOOL bMute) OVERRIDE;
 

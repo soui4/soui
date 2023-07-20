@@ -246,7 +246,7 @@ void SRootWindow::UpdateLayout()
 
 HRESULT SRootWindow::OnLanguageChanged()
 {
-    SStringW str = tr(m_pHostWnd->m_hostAttr.m_strTitle);
+    SStringT str = S_CW2T(tr(m_pHostWnd->m_hostAttr.m_strTitle));     
     m_pHostWnd->SetWindowText(str);
     return 3;
 }

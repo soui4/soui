@@ -26,7 +26,6 @@ namespace SevenZip
     {
         m_archivePath = archivePath;
         return true;
-        //return DetectCompressionFormat();
     }
 
     void SevenZipArchive::SetCompressionFormat(const CompressionFormatEnum& format)

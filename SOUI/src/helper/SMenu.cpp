@@ -326,7 +326,7 @@ BOOL SMenu::LoadMenu(LPCTSTR resId)
     return LoadMenu2(&xmlMenu);
 }
 
-BOOL SMenu::LoadMenuA(THIS_ LPCSTR resId)
+BOOL SMenu::LoadMenuU8(THIS_ LPCSTR resId)
 {
     SStringT strResId = S_CA2T(resId, CP_UTF8);
     return LoadMenu(strResId);

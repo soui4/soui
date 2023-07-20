@@ -387,7 +387,7 @@ IBitmapS *SResProviderMgr::LoadImage2(const SStringW &strImgID)
     if (nSegs == 2)
         return LoadImage(strLst[0], strLst[1]);
     else
-        return LoadImage(NULL, strImgID);
+        return LoadImage(NULL, strLst[0]);
 }
 
 HICON SResProviderMgr::LoadIcon2(const SStringW &strIconID)

@@ -496,7 +496,7 @@ void SHexEdit::CalculatePaintingDetails(IRenderTarget *pRT)
     if (m_tPaintDetails.nCharacterWidth == 0)
     {
         SIZE sz;
-        pRT->MeasureText(L"D", 1, &sz);
+        pRT->MeasureText(_T("D"), 1, &sz);
 
         m_tPaintDetails.nCharacterWidth = sz.cx;
         m_tPaintDetails.nLineHeight = sz.cy;

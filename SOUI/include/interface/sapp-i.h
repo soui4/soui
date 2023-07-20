@@ -244,7 +244,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IXmlDoc *, LoadXmlDocment)(THIS_ LPCTSTR strResId) PURE;
-    STDMETHOD_(IXmlDoc *, LoadXmlDocmentA)(THIS_ LPCSTR strResId) PURE;
+    STDMETHOD_(IXmlDoc *, LoadXmlDocmentU8)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 从资源加载动画资源
@@ -253,7 +253,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IAnimation *, LoadAnimation)(THIS_ LPCTSTR strResId) PURE;
-    STDMETHOD_(IAnimation *, LoadAnimationA)(THIS_ LPCSTR strResId) PURE;
+    STDMETHOD_(IAnimation *, LoadAnimationU8)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 从资源加载数值动画资源
@@ -262,7 +262,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IValueAnimator *, LoadValueAnimator)(THIS_ LPCTSTR strResId) PURE;
-    STDMETHOD_(IValueAnimator *, LoadValueAnimatorA)(THIS_ LPCSTR strResId) PURE;
+    STDMETHOD_(IValueAnimator *, LoadValueAnimatorU8)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 从资源加载图片
@@ -271,7 +271,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(IBitmapS *, LoadImage)(THIS_ LPCTSTR strResId) PURE;
-    STDMETHOD_(IBitmapS *, LoadImageA)(THIS_ LPCSTR strResId) PURE;
+    STDMETHOD_(IBitmapS *, LoadImageU8)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 从资源加载翻译包
@@ -280,7 +280,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @remark 使用完成后调用Rlease释放
      */
     STDMETHOD_(ITranslator *, LoadTranslator)(THIS_ LPCTSTR strResId) PURE;
-    STDMETHOD_(ITranslator *, LoadTranslatorA)(THIS_ LPCSTR strResId) PURE;
+    STDMETHOD_(ITranslator *, LoadTranslatorU8)(THIS_ LPCSTR strResId) PURE;
 
     /**
      * @brief 使用翻译包

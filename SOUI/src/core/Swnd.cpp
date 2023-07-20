@@ -41,7 +41,7 @@ void STrText::TranslateText()
 {
     if (pOwner == NULL)
         return;
-    SStringW str = pOwner->tr(strRaw);
+    SStringW str = pOwner->tr(S_CT2W(strRaw));
     if (bAutoEscape)
         str = EscapeString(str);
     strTr = S_CW2T(str);
@@ -249,7 +249,7 @@ SStringT SWindow::GetWindowText(BOOL bRawText /*=FALSE*/)
     return m_strText.GetText(bRawText);
 }
 
-int SWindow::GetWindowTextA(THIS_ IStringA *pStr, BOOL bRawText)
+int SWindow::GetWindowTextU8(THIS_ IStringA *pStr, BOOL bRawText)
 {
     SStringT strText = GetWindowText(bRawText);
     SStringA strA = S_CT2A(strText, CP_UTF8);
@@ -312,7 +312,7 @@ void SWindow::SetWindowText(LPCTSTR lpszText)
     OnContentChanged();
 }
 
-void SWindow::SetWindowTextA(THIS_ LPCSTR lpszText)
+void SWindow::SetWindowTextU8(THIS_ LPCSTR lpszText)
 {
     SStringT str = S_CA2T(lpszText, CP_UTF8);
     return SetWindowText(str);
@@ -3204,7 +3204,7 @@ void SWindow::SetToolTipText(LPCTSTR pszText)
     }
 }
 
-void SWindow::SetToolTipTextA(LPCSTR pszText)
+void SWindow::SetToolTipTextU8(LPCSTR pszText)
 {
     SStringT str = S_CA2T(pszText, CP_UTF8);
     return SetToolTipText(str);

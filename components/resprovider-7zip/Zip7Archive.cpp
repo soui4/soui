@@ -171,12 +171,13 @@ namespace SevenZip{
 	 
 	BOOL CZipArchive::Open(LPCTSTR pszFileName,LPCSTR pszPassword)
 	{
-		SStringT strPsw = S_CA2T(pszPassword);
+		SStringW strPsw = S_CA2W(pszPassword);
 		TString s_pwd = strPsw.c_str();
 		SevenZip::SevenZipPassword pwd(true, s_pwd);
 		CFileStream fileStreams;
 		SevenZip::SevenZipExtractorMemory decompress;
-		decompress.SetArchivePath(pszFileName);
+		SStringW strFilename = S_CT2W(pszFileName);
+		decompress.SetArchivePath(strFilename.c_str());
 		 
 		return (S_OK == decompress.ExtractArchive(m_fileStreams, NULL, &pwd));
 	}

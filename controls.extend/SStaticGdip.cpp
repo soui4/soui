@@ -43,10 +43,11 @@ void SStaticGdip::OnDrawLine(IRenderTarget * pRT, LPCTSTR pszBuf, int iBegin, in
 		IFontPtr curFont = (IFontPtr)pRT->GetCurrentObject(OT_FONT);
 		Gdiplus::Font font(hdc,curFont->LogFont());
 
+		SStringW str = S_CT2W(SStringT(pszBuf + iBegin, cchText));
 		if(uFormat & DT_CALCRECT){
 			Gdiplus::PointF pt(0,0);
 			Gdiplus::RectF rcOut;
-			graphics.MeasureString(pszBuf+iBegin,cchText,&font,pt,&rcOut);
+			graphics.MeasureString(str, str.GetLength(),&font,pt,&rcOut);
 			pRect->right = pRect->left + (long)rcOut.GetRight();
 			pRect->bottom = pRect->left + (long)rcOut.GetBottom();
 		}else{
@@ -61,7 +62,7 @@ void SStaticGdip::OnDrawLine(IRenderTarget * pRT, LPCTSTR pszBuf, int iBegin, in
 
 			COLORREF cr = pRT->GetTextColor();
 			Gdiplus::SolidBrush brush(Gdiplus::Color((cr>>24)&0xff,cr & 0xff, (cr>>8)&0xff,(cr>>16)&0xff));
-			graphics.DrawString(pszBuf+iBegin,cchText,&font,pt,&format,&brush);
+			graphics.DrawString(str, str.GetLength(),&font,pt,&format,&brush);
 		}
 	}
 	pRT->ReleaseDC(hdc);
@@ -78,7 +79,8 @@ SIZE SStaticGdip::OnMeasureText(IRenderTarget *pRT,LPCTSTR pszText,int cchLen)
 		Gdiplus::Font font(hdc,curFont->LogFont());
 		Gdiplus::PointF pt(0,0);
 		Gdiplus::RectF rcOut;
-		graphics.MeasureString(pszText,cchLen,&font,pt,&rcOut);
+		SStringW str = S_CT2W(SStringT(pszText, cchLen));
+		graphics.MeasureString(str, str.GetLength(),&font,pt,&rcOut);
 		szRet.cx = (long)rcOut.GetRight();
 		szRet.cy = (long)rcOut.GetBottom();
 	}

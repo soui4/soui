@@ -128,11 +128,11 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * @brief 设置tooltip
-     * @param pszText LPCSTR--tooltip字符串
+     * @param pszText LPCSTR--tooltip字符串(utf8)
      * @return
      * @remark 支持多语言
      */
-    STDMETHOD_(void, SetToolTipTextA)(THIS_ LPCSTR pszText) PURE;
+    STDMETHOD_(void, SetToolTipTextU8)(THIS_ LPCSTR pszText) PURE;
 
     /**
      * @brief 获取窗口的check状态标志
@@ -695,11 +695,11 @@ DECLARE_INTERFACE_(IWindow, IObject)
 
     /**
      * @brief 设计窗口显示文本
-     * @param lpszText LPCSTR--窗口显示文本
+     * @param lpszText LPCSTR--窗口显示文本(utf8)
      * @return
      * @remark 支持自动翻译
      */
-    STDMETHOD_(void, SetWindowTextA)(THIS_ LPCSTR lpszText) PURE;
+    STDMETHOD_(void, SetWindowTextU8)(THIS_ LPCSTR lpszText) PURE;
 
     /**
      * @brief 获取窗口显示文本
@@ -710,7 +710,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR * pBuf, int nBufLen, BOOL bRawText) PURE;
 
-    STDMETHOD_(int, GetWindowTextA)(THIS_ IStringA * pStr, BOOL bRawText) PURE;
+    STDMETHOD_(int, GetWindowTextU8)(THIS_ IStringA * pStr, BOOL bRawText) PURE;
 
     /**
      * @brief 获取窗口状态

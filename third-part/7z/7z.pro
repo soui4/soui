@@ -15,6 +15,10 @@ CONFIG += staticlib
 dir = ../..
 include($$dir/common.pri)
 
+#force using unicode for 7z
+CharacterSet = 1
+DEFINES += UNICODE
+
 DEFINES += _CRT_SECURE_NO_WARNINGS
 DEFINES += EXTERNAL_CODECS
 DEFINES += NO_REGISTRY

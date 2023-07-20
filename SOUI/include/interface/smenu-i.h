@@ -60,7 +60,7 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
      * @param resId resource id
      * @return TRUE-SUCCEED
      */
-    STDMETHOD_(BOOL, LoadMenuA)(THIS_ LPCSTR resId) PURE;
+    STDMETHOD_(BOOL, LoadMenuU8)(THIS_ LPCSTR resId) PURE;
 
     /**
      * @brief load menu from IXmlNode object

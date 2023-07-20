@@ -12,7 +12,7 @@
 
 static std::string tolowerstring(std::string& str)
 {
-	transform(str.begin(), str.end(), str.begin(), ::towlower);
+	transform(str.begin(), str.end(), str.begin(), ::tolower);
 	return str;
 }
 

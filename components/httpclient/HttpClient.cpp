@@ -328,7 +328,7 @@ BOOL CWinHttp::QueryContentLength( OUT DWORD& dwLength )
 	DWORD dwSize = 30*sizeof(wchar_t);
 	if ( ::WinHttpQueryHeaders(m_hRequest, WINHTTP_QUERY_CONTENT_LENGTH, WINHTTP_HEADER_NAME_BY_INDEX, szBuffer, &dwSize, WINHTTP_NO_HEADER_INDEX) )
 	{
-		TCHAR *p = NULL;
+		wchar_t*p = NULL;
 		dwLength = wcstoul(szBuffer, &p, 10);
 		bRet = true;
 	}
