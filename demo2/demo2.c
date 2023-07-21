@@ -271,9 +271,13 @@ BOOL LoadRenderFac(IRenderFactory ** ppRenderFac){
 }
 
 //加载系统资源
-BOOL LoadSystemRes(IApplication *pApp,ISouiFactory *pSourFac)
+BOOL LoadSystemRes(IApplication *pApp,HINSTANCE hInstance, ISouiFactory *pSourFac)
 {
+#if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
+	HMODULE hModSysResource = hInstance;
+#else
 	HMODULE hModSysResource = LoadLibrary(SYS_NAMED_RESOURCE);
+#endif
 	if (hModSysResource)
 	{
 		IResProvider * sysResProvider = pSourFac->lpVtbl->CreateResProvider(pSourFac,RES_PE);
@@ -358,7 +362,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrC
 		theApp=souiFac->lpVtbl->CreateApp(souiFac,pRenderFac,hInstance,L"test",FALSE);
 		theApp->lpVtbl->SetCreateObjectCallback(theApp,DemoC_CreateObject);
 
-		if(!LoadSystemRes(theApp,souiFac))
+		if(!LoadSystemRes(theApp, hInstance,souiFac))
 			return -2;
 		if(!LoadUserRes(theApp,souiFac))
 			return -3;
