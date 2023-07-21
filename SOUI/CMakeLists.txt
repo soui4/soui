@@ -34,6 +34,6 @@ target_include_directories(soui4
   PUBLIC ${PROJECT_SOURCE_DIR}/config
   PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
 )
-target_link_libraries(soui4 utilities4)
+target_link_libraries(soui4 utilities4 imm32.lib oleacc.lib version.lib)
 
 target_precompile_headers(soui4 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/souistd.h")
