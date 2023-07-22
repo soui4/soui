@@ -74,7 +74,15 @@ void TestCtrl_OnPaint(PTestCtrl pCtrl,IRenderTarget *pRT)
 {
 	RECT rc;
 	pCtrl->base->lpVtbl->GetClientRect(pCtrl->base,&rc);
+#ifdef _UNICODE
 	pRT->lpVtbl->DrawText(pRT,pCtrl->szText,-1,&rc,DT_CENTER|DT_VCENTER|DT_SINGLELINE);
+#else
+	{
+		char szBuf[200];
+		WideCharToMultiByte(CP_ACP,0,pCtrl->szText,-1,szBuf,200,NULL,NULL);
+		pRT->lpVtbl->DrawText(pRT,szBuf,-1,&rc,DT_CENTER|DT_VCENTER|DT_SINGLELINE);
+	}
+#endif
 }
 
 BOOL TestCtrl_SwndProc(IWindow *pWnd,UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult){
@@ -359,7 +367,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrC
 
 		if(!LoadRenderFac(&pRenderFac))
 			return -1;
-		theApp=souiFac->lpVtbl->CreateApp(souiFac,pRenderFac,hInstance,L"test",FALSE);
+		theApp=souiFac->lpVtbl->CreateApp(souiFac,pRenderFac,hInstance,_T("test"),FALSE);
 		theApp->lpVtbl->SetCreateObjectCallback(theApp,DemoC_CreateObject);
 
 		if(!LoadSystemRes(theApp, hInstance,souiFac))

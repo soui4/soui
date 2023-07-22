@@ -31,7 +31,10 @@ else()
 endif()
 
 add_dependencies(resprovider-7zip 7z)
+if(MSVC)
 set_target_properties(resprovider-7zip PROPERTIES LINK_FLAGS "/SAFESEH:NO") 
+endif()
+
 set(COM_LIBS ${COM_LIBS} resprovider-7zip)
 set_target_properties (resprovider-7zip PROPERTIES
     FOLDER components

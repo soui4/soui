@@ -220,6 +220,7 @@ namespace SOUI
 	BOOL SRenderFactory_Skia::CreatePathEffect(REFGUID guidEffect,IPathEffect ** ppPathEffect)
 	{
 		* ppPathEffect = NULL;
+		#ifdef _MSC_VER
 		if(guidEffect == __uuidof(ICornerPathEffect))
 		{
 			*ppPathEffect = (IPathEffect*) new SPathEffect_Corner();
@@ -230,6 +231,7 @@ namespace SOUI
 		{
 			*ppPathEffect = (IPathEffect *) new SPathEffect_Discrete();
 		}
+		#endif //_MSC_VER
 		return (*ppPathEffect) != NULL;
 	}
 

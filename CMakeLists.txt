@@ -118,6 +118,13 @@ else(USE_UNICODE)
     set(BUILD_CONF_UNICODE "0")
 endif(USE_UNICODE)
 
+if(NOT MSVC)
+    set(CMAKE_RC_COMPILER_INIT windres)
+    enable_language(RC)
+    set(CMAKE_RC_COMPILE_OBJECT
+        "<CMAKE_RC_COMPILER> <FLAGS> -O coff <DEFINES> -c 936 -i <SOURCE> -o <OBJECT>")
+    set(CMAKE_RC_CREATE_SHARED_LIBRARY "${CMAKE_C_CREATE_SHARED_LIBRARY}")
+endif()
 #
 # 支持xp环境
 #

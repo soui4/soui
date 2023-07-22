@@ -29,7 +29,13 @@ endif ()
 add_executable(demo2 WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
 
 #set_target_properties(demo2 PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
-set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+if(MSVC)
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
+else()
+	target_link_libraries(demo2 -municode)
+
+endif()
+
 add_dependencies(demo2 soui-sys-resource render-gdi imgdecoder-gdip)
 target_link_libraries(demo2 soui4 utilities4)
 set_target_properties (demo2 PROPERTIES

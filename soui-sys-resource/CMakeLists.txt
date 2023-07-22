@@ -17,5 +17,6 @@ if (NOT ENABLE_SOUI_CORE_LIB)
 else()
     add_library(soui-sys-resource STATIC  ${HDRS_MAIN} ${RCS_MAIN})
 endif()
-
-set_target_properties(soui-sys-resource PROPERTIES LINK_FLAGS "/NOENTRY")
+if(MSVC)
+    set_target_properties(soui-sys-resource PROPERTIES LINK_FLAGS "/NOENTRY")
+endif()

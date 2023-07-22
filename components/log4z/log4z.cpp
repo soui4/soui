@@ -1408,6 +1408,17 @@ bool LogerManager::popLog(LogData *& log)
     return true;
 }
 
+#ifdef _MSC_VER
+#if _MSC_VER <= 1400
+#define RetAddr() NULL
+#else
+#include <intrin.h>
+#define RetAddr() _ReturnAddress()
+#endif
+#else
+#define RetAddr() __builtin_return_address(0)
+#endif
+
 void LogerManager::run()
 {
     _runing = true;

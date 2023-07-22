@@ -26,3 +26,4 @@ set(COM_LIBS ${COM_LIBS} log4z )
 set_target_properties (log4z PROPERTIES
     FOLDER components
 )
+target_link_libraries(log4z shlwapi)
