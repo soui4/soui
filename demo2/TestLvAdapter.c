@@ -113,7 +113,11 @@ long WINAPI TestLvAdapter_Release(ILvAdapter *pObj)
 		if(pText)
 		{
 			TCHAR szBuf[100];
+#ifdef _MSC_VER
 			_stprintf(szBuf,_T("item %d"),position);
+#else
+			_stprintf(szBuf,100,_T("item %d"),position);
+#endif
 			pText->lpVtbl->SetWindowText(pText,szBuf);
 		}
 	}

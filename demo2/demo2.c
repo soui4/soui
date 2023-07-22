@@ -246,7 +246,11 @@ BOOL OnSliderPos(IEvtArgs *evt, void *Ctx)
 	int nPos = data->nPos;
 	IWindow *pTxt = pHostWnd->lpVtbl->FindIChildByID(pHostWnd,R.id.txt_pos);
 	TCHAR szPos[50];
+#ifdef _MSC_VER
 	_stprintf(szPos,_T("%d"),nPos);
+#else
+	_stprintf(szPos,50,_T("%d"),nPos);
+#endif
 	pTxt->lpVtbl->SetWindowText(pTxt,szPos);
 	return TRUE;
 }
@@ -305,7 +309,7 @@ BOOL LoadUserRes(IApplication *pApp,ISouiFactory *pSourFac)
 		//选择了仅在Release版本打包资源则在DEBUG下始终使用文件加载
 		{
 			pResProvider = pSourFac->lpVtbl->CreateResProvider(pSourFac,RES_FILE );
-			bLoaded = pResProvider->lpVtbl->Init(pResProvider,(LPARAM)_T("uires"), 0);
+			bLoaded = pResProvider->lpVtbl->Init(pResProvider,(LPARAM)L"uires", 0);
 			SASSERT(bLoaded);
 			if(!bLoaded) break;
 		}
@@ -320,7 +324,7 @@ BOOL LoadUserRes(IApplication *pApp,ISouiFactory *pSourFac)
 		pApp->lpVtbl->InitXmlNamedID(pApp,(const LPCWSTR*)&R.name, (const int*)&R.id,sizeof(R.id)/sizeof(int));
 		{
 			IResProviderMgr *pResMgr = pApp->lpVtbl->GetResProviderMgr(pApp);
-			pResMgr->lpVtbl->AddResProvider(pResMgr,pResProvider,_T("uidef:xml_init"));
+			pResMgr->lpVtbl->AddResProvider(pResMgr,pResProvider,L"uidef:xml_init");
 			pResProvider->lpVtbl->Release(pResProvider);
 		}
 	}while(FALSE);
@@ -359,7 +363,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrC
 
 		if(!LoadRenderFac(&pRenderFac))
 			return -1;
-		theApp=souiFac->lpVtbl->CreateApp(souiFac,pRenderFac,hInstance,L"test",FALSE);
+		theApp=souiFac->lpVtbl->CreateApp(souiFac,pRenderFac,hInstance,_T("test"),FALSE);
 		theApp->lpVtbl->SetCreateObjectCallback(theApp,DemoC_CreateObject);
 
 		if(!LoadSystemRes(theApp, hInstance,souiFac))

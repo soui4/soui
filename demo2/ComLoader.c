@@ -20,6 +20,7 @@ struct SComInfo
 	HMODULE hMod;
 };
 
+#ifdef _MSC_VER
 #ifdef _DEBUG
 struct SComInfo s_comInfo[]={
 	{Decoder_Png,_T("imgdecoder-pngd.dll"),NULL},
@@ -51,6 +52,39 @@ struct SComInfo s_comInfo[]={
 	{Translator,_T("translator.dll"),NULL},
 };
 #endif
+#else
+#ifdef _DEBUG
+struct SComInfo s_comInfo[]={
+	{Decoder_Png,_T("libimgdecoder-pngd.dll"),NULL},
+	{Decoder_Gdip,_T("libimgdecoder-gdipd.dll"),NULL},
+	{Decoder_Wic,_T("libimgdecoder-wicd.dll"),NULL},
+	{Decoder_Stb,_T("libimgdecoder-stbd.dll"),NULL},
+	{Render_Gdi,_T("librender-gdid.dll"),NULL},
+	{Render_Skia,_T("librender-skiad.dll"),NULL},
+	{Log4Z,_T("liblog4zd.dll"),NULL},
+	{Resprovider_7Zip,_T("libresprovider-7zipd.dll"),NULL},
+	{Resprovider_Zip,_T("libresprovider-zipd.dll"),NULL},
+	{Script_Lua,_T("libscriptmodule-luad.dll"),NULL},
+	{TaskLoop,_T("libTaskLoopd.dll"),NULL},
+	{Translator,_T("libtranslatord.dll"),NULL},
+};
+#else
+struct SComInfo s_comInfo[]={
+	{Decoder_Png,_T("libimgdecoder-png.dll"),NULL},
+	{Decoder_Gdip,_T("libimgdecoder-gdip.dll"),NULL},
+	{Decoder_Wic,_T("libimgdecoder-wic.dll"),NULL},
+	{Decoder_Stb,_T("libimgdecoder-stb.dll"),NULL},
+	{Render_Gdi,_T("librender-gdi.dll"),NULL},
+	{Render_Skia,_T("librender-skia.dll"),NULL},
+	{Log4Z,_T("liblog4z.dll"),NULL},
+	{Resprovider_7Zip,_T("libresprovider-7zip.dll"),NULL},
+	{Resprovider_Zip,_T("libresprovider-zip.dll"),NULL},
+	{Script_Lua,_T("libscriptmodule-lua.dll"),NULL},
+	{TaskLoop,_T("libTaskLoop.dll"),NULL},
+	{Translator,_T("libtranslator.dll"),NULL},
+};
+#endif
+#endif //_MSC_VER
 	BOOL LoadComObj(SComID id,IObjRef ** ppObj)
 	{
 		FunCreateInstance fun=NULL;

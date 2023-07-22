@@ -191,7 +191,7 @@ class TOsrPanelProxy
 
     STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
     {
-        if (id == __uuidof(T))
+		if (id == __UUIDOF((T*)this))
         {
             *ppRet = (T *)this;
             AddRef();

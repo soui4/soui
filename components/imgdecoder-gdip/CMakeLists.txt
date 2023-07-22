@@ -33,3 +33,4 @@ set(COM_LIBS ${COM_LIBS} imgdecoder-gdip)
 set_target_properties (imgdecoder-gdip PROPERTIES
     FOLDER components/imgdecoder
 )
+target_link_libraries(imgdecoder-gdip gdiplus.lib)

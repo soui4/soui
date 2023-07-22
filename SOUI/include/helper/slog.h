@@ -1,11 +1,18 @@
 ﻿#ifndef __SLOG__H__
 #define __SLOG__H__
+
+#ifdef _MSC_VER
 #if _MSC_VER <= 1400
 #define RetAddr() NULL
 #else
 #include <intrin.h>
 #define RetAddr() _ReturnAddress()
 #endif
+#else
+#define RetAddr() __builtin_return_address(0)
+#endif
+
+
 #include <interface/slog-i.h>
 
 SNSBEGIN

@@ -11,6 +11,7 @@
 #include <interface/SListViewItemLocator-i.h>
 #include <interface/STreeViewItemLocator-i.h>
 #include <interface/STileViewItemLocator-i.h>
+#include <initguid.h>
 
 SNSBEGIN
 
@@ -45,9 +46,26 @@ DECLARE_INTERFACE_(ICtrl, IObjRef)
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
 };
 
+
+#define UUIDOF(iface) IID_##iface
+
+#ifdef __cplusplus
+#define DEF_IFACE_GUID(iface,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) DEFINE_GUID(IID_##iface,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8);
+#define DEC_INTERFACE_IID_(iface, baseiface, l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) \
+DEF_IFACE_GUID(iface,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8);\
+interface  DECLSPEC_NOVTABLE iface : public baseiface
+
+#define DEC_INTERFACE_IID(iface, l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8) \
+DEF_IFACE_GUID(iface,l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8);\
+interface DECLSPEC_NOVTABLE iface
+#else
+#define DEC_INTERFACE_IID(iface, l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8)               DECLARE_INTERFACE(iface)
+#define DEC_INTERFACE_IID_(iface, baseiface, l,w1,w2,b1,b2,b3,b4,b5,b6,b7,b8)   DECLARE_INTERFACE_(iface, baseiface)
+#endif
+
 #undef INTERFACE
 #define INTERFACE IOsrPanel
-DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
+DEC_INTERFACE_IID_(IOsrPanel, ICtrl, 0x85A3CD3C,0xD665,0x454b,0xAA,0xBC,0xEE,0x83,0x89,0xBB,0xD9,0x14)
 {
     /**
      * @brief 增加引用计数
@@ -112,7 +130,7 @@ DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
 
 #undef INTERFACE
 #define INTERFACE IItemPanel
-DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F909A4")
+DEC_INTERFACE_IID_(IItemPanel, IOsrPanel, 0x176CDF98,0x260E,0x4070,0x91,0xB5,0xE6,0xE1,0x63,0xF9,0x09,0xA4)
 {
     /**
      * @brief 增加引用计数
@@ -193,7 +211,7 @@ DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F90
 
 #undef INTERFACE
 #define INTERFACE IImageWnd
-DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
+DEC_INTERFACE_IID_(IImageWnd, ICtrl, 0x42148B05,0x6223,0x46f6,0xB9,0x03,0xD4,0x2D,0x84,0x03,0x85,0x46)
 {
     /**
      * @brief 增加引用计数
@@ -269,7 +287,7 @@ DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
 
 #undef INTERFACE
 #define INTERFACE IAnimateImgWnd
-DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E2595A")
+DEC_INTERFACE_IID_(IAnimateImgWnd, ICtrl, 0x374A5086,0xAD38,0x4f15,0x83,0xE0,0x00,0x28,0x22,0xE2,0x59,0x5A)
 {
     /**
      * @brief 增加引用计数
@@ -325,7 +343,7 @@ DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E25
 
 #undef INTERFACE
 #define INTERFACE IProgress
-DECLARE_INTERFACE_IID_(IProgress, ICtrl, "77407E2D-582B-4ef2-A33A-427C933BAA8C")
+DEC_INTERFACE_IID_(IProgress, ICtrl, 0x77407E2D,0x582B,0x4ef2,0xA3,0x3A,0x42,0x7C,0x93,0x3B,0xAA,0x8C)
 {
     /**
      * @brief 增加引用计数
@@ -409,7 +427,7 @@ typedef enum _ScrollBarID
 
 #undef INTERFACE
 #define INTERFACE IPanel
-DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
+DEC_INTERFACE_IID_(IPanel, ICtrl, 0xB1A97BB7,0x64BE,0x408f,0xAC,0x7C,0x21,0x97,0xCC,0x2F,0x4D,0xD0)
 {
     /**
      * @brief 增加引用计数
@@ -516,7 +534,7 @@ DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
 
 #undef INTERFACE
 #define INTERFACE IScrollView
-DECLARE_INTERFACE_IID_(IScrollView, IPanel, "49B024D6-221D-42d4-902B-AFAAC5AFFE41")
+DEC_INTERFACE_IID_(IScrollView, IPanel, 0x49B024D6,0x221D,0x42d4,0x90,0x2B,0xAF,0xAA,0xC5,0xAF,0xFE,0x41)
 {
     /**
      * @brief 增加引用计数
@@ -683,7 +701,7 @@ typedef struct SHDITEM
 
 #undef INTERFACE
 #define INTERFACE IHeaderCtrl
-DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45")
+DEC_INTERFACE_IID_(IHeaderCtrl, ICtrl, 0x60A8788F,0xC775,0x424f,0xAA,0x82,0xDC,0xA9,0xCE,0xCE,0x3D,0x45)
 {
     /**
      * @brief 增加引用计数
@@ -845,7 +863,7 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
 
 #undef INTERFACE
 #define INTERFACE IListView
-DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
+DEC_INTERFACE_IID_(IListView, IPanel, 0xE584B16A,0x6BDB,0x4afb,0x8B,0xCC,0x3A,0x1A,0xBA,0xCD,0x2F,0xE2)
 {
     /**
      * @brief 增加引用计数
@@ -1009,7 +1027,7 @@ DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2"
 
 #undef INTERFACE
 #define INTERFACE IMcListView
-DECLARE_INTERFACE_IID_(IMcListView, IPanel, "485AB4B5-6018-4710-BF8E-751FDE53E335")
+DEC_INTERFACE_IID_(IMcListView, IPanel, 0x485AB4B5,0x6018,0x4710,0xBF,0x8E,0x75,0x1F,0xDE,0x53,0xE3,0x35)
 {
     /**
      * @brief 增加引用计数
@@ -1204,7 +1222,7 @@ DECLARE_INTERFACE_IID_(IMcListView, IPanel, "485AB4B5-6018-4710-BF8E-751FDE53E33
 
 #undef INTERFACE
 #define INTERFACE ITreeView
-DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B")
+DEC_INTERFACE_IID_(ITreeView, IPanel, 0x4FB8BF5D,0x950C,0x4f05,0x86,0x1C,0xFB,0xEB,0x11,0x9E,0x4C,0x2B)
 {
     /**
      * @brief 增加引用计数
@@ -1366,7 +1384,7 @@ DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B"
 
 #undef INTERFACE
 #define INTERFACE ITileView
-DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3")
+DEC_INTERFACE_IID_(ITileView, IPanel, 0x3718C98E,0x9177,0x4afb,0x98,0x6F,0x94,0xB0,0x3A,0x78,0xF2,0xC3)
 {
     /**
      * @brief 增加引用计数
@@ -1528,7 +1546,7 @@ DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3"
 
 #undef INTERFACE
 #define INTERFACE IListBox
-DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
+DEC_INTERFACE_IID_(IListBox, IPanel, 0x4A36DC8A,0x7378,0x4a2d,0xA3,0xAF,0xD0,0x4B,0x07,0x12,0xAC,0xCD)
 {
     /**
      * @brief 增加引用计数
@@ -1798,7 +1816,7 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
 
 #undef INTERFACE
 #define INTERFACE IComboBase
-DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC")
+DEC_INTERFACE_IID_(IComboBase, ICtrl, 0x2BF10693,0xBEBD,0x4497,0xB6,0xB5,0x53,0x80,0xBA,0x84,0x01,0xEC)
 {
     /**
      * @brief 增加引用计数
@@ -1912,7 +1930,7 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
 
 #undef INTERFACE
 #define INTERFACE IComboBox
-DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC9CF")
+DEC_INTERFACE_IID_(IComboBox, IComboBase, 0xAC6C72BB,0x51BE,0x4216,0xAD,0xA5,0xB3,0x94,0x28,0x3D,0xC9,0xCF)
 {
     /**
      * @brief 增加引用计数
@@ -2080,7 +2098,7 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
 
 #undef INTERFACE
 #define INTERFACE IComboView
-DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC253D")
+DEC_INTERFACE_IID_(IComboView, IComboBase, 0xEADE040E,0x0D6A,0x47a3,0x88,0x2F,0xF7,0x0A,0x94,0xFC,0x25,0x3D)
 {
     /**
      * @brief 增加引用计数
@@ -2197,7 +2215,7 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
 
 #undef INTERFACE
 #define INTERFACE IDateTimePicker
-DECLARE_INTERFACE_IID_(IDateTimePicker, ICtrl, "6DB1EF42-AED7-4a36-8011-BE2AD7B45953")
+DEC_INTERFACE_IID_(IDateTimePicker, ICtrl, 0x6DB1EF42,0xAED7,0x4a36,0x80,0x11,0xBE,0x2A,0xD7,0xB4,0x59,0x53)
 {
     /**
      * @brief 增加引用计数
@@ -2285,7 +2303,7 @@ typedef int(__cdecl *FunTreeSortCallback)(void *pCtx, const void *phItem1, const
 
 #undef INTERFACE
 #define INTERFACE ITreeCtrl
-DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
+DEC_INTERFACE_IID_(ITreeCtrl, IPanel, 0x8FACB4B5,0xDD66,0x4755,0xAF,0xD0,0x7D,0xA8,0xBB,0x15,0x61,0x1A)
 {
     /**
      * @brief 增加引用计数
@@ -2580,7 +2598,7 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A"
 
 #undef INTERFACE
 #define INTERFACE IHotKeyCtrl
-DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55")
+DEC_INTERFACE_IID_(IHotKeyCtrl, ICtrl, 0x8839DDF0,0x84CE,0x4bca,0x8B,0xE4,0xFF,0x55,0x92,0x8E,0x3A,0x55)
 {
     /**
      * @brief 增加引用计数
@@ -2642,7 +2660,7 @@ DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55
 
 #undef INTERFACE
 #define INTERFACE IRichEdit
-DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
+DEC_INTERFACE_IID_(IRichEdit, IPanel, 0x6B72BCCE,0x9D42,0x4fb8,0x9C,0xF4,0xF8,0xF9,0x60,0x5A,0xCA,0x9A)
 {
     /**
      * @brief 增加引用计数
@@ -2919,7 +2937,7 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
 
 #undef INTERFACE
 #define INTERFACE ITabPage
-DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
+DEC_INTERFACE_IID_(ITabPage, ICtrl, 0x7E1C8BBF,0x1F87,0x4174,0xA3,0x0C,0x6C,0xE3,0xE4,0xA4,0x7A,0x13)
 {
     /**
      * @brief 增加引用计数
@@ -2985,7 +3003,7 @@ DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
 
 #undef INTERFACE
 #define INTERFACE ITabCtrl
-DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
+DEC_INTERFACE_IID_(ITabCtrl, ICtrl, 0xCAD40CB4,0xA0E5,0x4bea,0x9C,0xE6,0x8D,0xFC,0x45,0xDE,0xFF,0xD4)
 {
     /**
      * @brief 增加引用计数
@@ -3108,7 +3126,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
 
 #undef INTERFACE
 #define INTERFACE IEdit
-DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560")
+DEC_INTERFACE_IID_(IEdit, ICtrl, 0xE682E0FF,0x1B1C,0x4a15,0xAB,0x43,0x55,0x2E,0x70,0x5B,0x25,0x60)
 {
     /**
      * @brief 增加引用计数
@@ -3155,7 +3173,7 @@ DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560")
 
 #undef INTERFACE
 #define INTERFACE ISpinButtonCtrl
-DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A03561F8C")
+DEC_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, 0xC04997B9,0xE2AA,0x48bf,0xAE,0xA5,0xFF,0x1A,0x03,0x56,0x1F,0x8C)
 {
     /**
      * @brief 增加引用计数
@@ -3221,7 +3239,7 @@ DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A0356
 
 #undef INTERFACE
 #define INTERFACE IIconWnd
-DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
+DEC_INTERFACE_IID_(IIconWnd, ICtrl, 0x8BBD8033,0x9955,0x41FD,0x8C,0x3D,0x19,0xFE,0x70,0x2A,0x9D,0xB0)
 {
     /**
      * @brief 增加引用计数
@@ -3263,7 +3281,7 @@ DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
 
 #undef INTERFACE
 #define INTERFACE IRealWnd
-DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
+DEC_INTERFACE_IID_(IRealWnd, ICtrl, 0x3E9F9B19,0x68D1,0x47f1,0x90,0x11,0x2F,0x8B,0x98,0xC0,0xA6,0x28)
 {
     /**
      * @brief 增加引用计数
@@ -3342,7 +3360,7 @@ typedef enum _StackViewAniStyle
 
 #undef INTERFACE
 #define INTERFACE IStackView
-DECLARE_INTERFACE_IID_(IStackView, ICtrl, "1A7172D8-F45B-45fe-A73E-2B7F07E7EB70")
+DEC_INTERFACE_IID_(IStackView, ICtrl, 0x1A7172D8,0xF45B,0x45fe,0xA7,0x3E,0x2B,0x7F,0x07,0xE7,0xEB,0x70)
 {
     /**
      * @brief 增加引用计数
@@ -3378,6 +3396,42 @@ DECLARE_INTERFACE_IID_(IStackView, ICtrl, "1A7172D8-F45B-45fe-A73E-2B7F07E7EB70"
     STDMETHOD_(IWindow *, GetSelPage)(CTHIS) SCONST PURE;
     STDMETHOD_(IWindow *, GetPage)(CTHIS_ int iPage) SCONST PURE;
 };
+
+
+#ifdef __cplusplus
+template<typename T>
+GUID __UUIDOF(T *){
+	return IID_IUnknown;
+}
+
+inline GUID __UUIDOF(IOsrPanel*){return IID_IOsrPanel;}
+inline GUID __UUIDOF(IItemPanel*){return IID_IItemPanel;}
+inline GUID __UUIDOF(IImageWnd*){return IID_IImageWnd;}
+inline GUID __UUIDOF(IAnimateImgWnd*){return IID_IAnimateImgWnd;}
+inline GUID __UUIDOF(IProgress*){return IID_IProgress;}
+inline GUID __UUIDOF(IPanel*){return IID_IPanel;}
+inline GUID __UUIDOF(IScrollView*){return IID_IScrollView;}
+inline GUID __UUIDOF(IHeaderCtrl*){return IID_IHeaderCtrl;}
+inline GUID __UUIDOF(IListView*){return IID_IListView;}
+inline GUID __UUIDOF(IMcListView*){return IID_IMcListView;}
+inline GUID __UUIDOF(ITreeView*){return IID_ITreeView;}
+inline GUID __UUIDOF(ITileView*){return IID_ITileView;}
+inline GUID __UUIDOF(IListBox*){return IID_IListBox;}
+inline GUID __UUIDOF(IComboBase*){return IID_IComboBase;}
+inline GUID __UUIDOF(IComboBox*){return IID_IComboBox;}
+inline GUID __UUIDOF(IComboView*){return IID_IComboView;}
+inline GUID __UUIDOF(IDateTimePicker*){return IID_IDateTimePicker;}
+inline GUID __UUIDOF(ITreeCtrl*){return IID_ITreeCtrl;}
+inline GUID __UUIDOF(IHotKeyCtrl*){return IID_IHotKeyCtrl;}
+inline GUID __UUIDOF(IRichEdit*){return IID_IRichEdit;}
+inline GUID __UUIDOF(ITabPage*){return IID_ITabPage;}
+inline GUID __UUIDOF(ITabCtrl*){return IID_ITabCtrl;}
+inline GUID __UUIDOF(IEdit*){return IID_IEdit;}
+inline GUID __UUIDOF(ISpinButtonCtrl*){return IID_ISpinButtonCtrl;}
+inline GUID __UUIDOF(IIconWnd*){return IID_IIconWnd;}
+inline GUID __UUIDOF(IRealWnd*){return IID_IRealWnd;}
+inline GUID __UUIDOF(IStackView*){return IID_IStackView;}
+#endif
 
 SNSEND
 #endif // __SCTRL_I__H__

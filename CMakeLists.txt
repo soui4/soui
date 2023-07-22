@@ -88,6 +88,10 @@ option(ENABLE_SOUI_COM_LIB "Enable compile 'components' as static lib" OFF)
 #
 option(XP_TOOLSET "" ON)
 
+#强制编译dll版本
+set(ENABLE_SOUI_CORE_LIB OFF)
+set(ENABLE_SOUI_COM_LIB OFF)
+
 #
 # 修正编译参数
 #
@@ -158,7 +162,7 @@ add_subdirectory(components)
 
 #
 #
-add_subdirectory(demo)
+#add_subdirectory(demo)
 add_subdirectory(demo2)
 
 ##

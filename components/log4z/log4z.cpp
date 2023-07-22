@@ -1408,10 +1408,21 @@ bool LogerManager::popLog(LogData *& log)
     return true;
 }
 
+#ifdef _MSC_VER
+#if _MSC_VER <= 1400
+#define RetAddr() NULL
+#else
+#include <intrin.h>
+#define RetAddr() _ReturnAddress()
+#endif
+#else
+#define RetAddr() __builtin_return_address(0)
+#endif
+
 void LogerManager::run()
 {
     _runing = true;
-    pushLog(LOG_LEVEL_ALARM, "logger", "-----------------  log4z thread started!   ----------------------------", __FILE__, __LINE__ , __FUNCTION__,_ReturnAddress());
+    pushLog(LOG_LEVEL_ALARM, "logger", "-----------------  log4z thread started!   ----------------------------", __FILE__, __LINE__ , __FUNCTION__,RetAddr());
 	if (_loggerInfo._enable)
 	{
 		std::stringstream ss;
@@ -1419,7 +1430,7 @@ void LogerManager::run()
 			<<" path=" <<_loggerInfo._path
 			<<" level=" << _loggerInfo._level
 			<<" display=" << _loggerInfo._display;
-		pushLog(LOG_LEVEL_ALARM, "logger", ss.str().c_str(), __FILE__, __LINE__ , __FUNCTION__,_ReturnAddress());
+		pushLog(LOG_LEVEL_ALARM, "logger", ss.str().c_str(), __FILE__, __LINE__ , __FUNCTION__,RetAddr());
 	}
 
 
