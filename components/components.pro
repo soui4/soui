@@ -6,8 +6,6 @@ TARGET = $$TARGET"64"
 DEPENDPATH += .
 INCLUDEPATH += .
 
-include(../cpy-cfg.pri)
-
 SUBDIRS += imgdecoder-wic
 SUBDIRS += render-gdi
 SUBDIRS += render-skia
