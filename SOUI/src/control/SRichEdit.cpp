@@ -1339,8 +1339,11 @@ void SRichEdit::SetWindowText(LPCTSTR lpszText)
     SStringW str = S_CT2W(lpszText);
     SSendMessage(WM_SETTEXT, 0, (LPARAM)(LPCWSTR)str);
 #endif
-	//setwindowtext会导致zoom丢失，需要重新设置。
-	SSendMessage(EM_SETZOOM, GetScale(),100);
+	if(IsRichScale())
+	{
+		//setwindowtext会导致zoom丢失，需要重新设置。
+		SSendMessage(EM_SETZOOM, GetScale(),100);
+	}
     Invalidate();
 }
 
