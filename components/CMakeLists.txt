@@ -15,7 +15,7 @@ add_subdirectory(translator)
 #add_subdirectory(ScriptModule-Lua)
 
 add_subdirectory(log4z)
-#add_subdirectory(resprovider-7zip)
+add_subdirectory(resprovider-7zip)
 add_subdirectory(TaskLoop)
 add_subdirectory(SIpcObject)
 add_subdirectory(httpclient)
