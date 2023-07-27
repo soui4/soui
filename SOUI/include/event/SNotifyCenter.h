@@ -150,13 +150,15 @@ class SOUI_EXP SNotifyCenter
 template <class T>
 inline void TAutoEventMapReg<T>::registerNotifyCenter()
 {
-    SNotifyCenter::getSingleton().RegisterEventMap(&Subscriber(&_thisClass::OnEvent, this));
+    MemberFunctionSlot slot = Subscriber(&_thisClass::OnEvent, this);
+    SNotifyCenter::getSingleton().RegisterEventMap(&slot);
 }
 
 template <class T>
 inline void TAutoEventMapReg<T>::unregisterNotifyCenter()
 {
-    SNotifyCenter::getSingleton().UnregisterEventMap(&Subscriber(&_thisClass::OnEvent, this));
+    MemberFunctionSlot slot = Subscriber(&_thisClass::OnEvent, this);
+    SNotifyCenter::getSingleton().UnregisterEventMap(&slot);
 }
 
 SNSEND
