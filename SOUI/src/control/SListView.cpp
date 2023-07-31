@@ -773,7 +773,7 @@ void SListView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     if (nNewSelItem != -1)
     {
         EnsureVisible(nNewSelItem);
-        SetSel(nNewSelItem);
+        SetSel(nNewSelItem,TRUE);
     }
 }
 
