@@ -358,7 +358,9 @@ void SViewSwitchAnimator::start(THIS_ ITimelineHandlersMgr *pTimerlineMgr)
             m_pTo->SetAlpha(255);
         if (m_pFrom)
             m_pFrom->SetAlpha(255);
-    }
+	}else{
+		m_pTo->Move(rc);
+	}
     initEvaluator();
     __baseCls::start(pTimerlineMgr);
     if (m_aniStyle == kAniNone)
