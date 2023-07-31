@@ -238,7 +238,7 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
 
     STDMETHOD_(IValueAnimator *, clone)(CTHIS) SCONST PURE;
 
-	STDMETHOD_(void, copy)(THIS_ const IValueAnimator *src) PURE;
+    STDMETHOD_(void, copy)(THIS_ const IValueAnimator *src) PURE;
 
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) PURE;
 };
@@ -247,38 +247,39 @@ typedef struct IAnimatorGroup IAnimatorGroup;
 
 #undef INTERFACE
 #define INTERFACE IAnimatorGroupListerer
-DECLARE_INTERFACE(IAnimatorGroupListerer){
-	STDMETHOD_(void,OnAnimatorGroupEnd)(THIS_ IAnimatorGroup* pGroup) PURE;
+DECLARE_INTERFACE(IAnimatorGroupListerer)
+{
+    STDMETHOD_(void, OnAnimatorGroupEnd)(THIS_ IAnimatorGroup * pGroup) PURE;
 };
 
 #undef INTERFACE
 #define INTERFACE IAnimatorGroup
 DECLARE_INTERFACE_(IAnimatorGroup, IObjRef)
 {
-	/**
+    /**
      * @brief 增加引用计数
      * @return 新引用计数
-    */
-    STDMETHOD_(long,AddRef) (THIS) PURE;
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
      * @brief 减少引用计数
      * @return 新引用计数
-    */
-    STDMETHOD_(long,Release) (THIS) PURE;
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	/**
-	 * @brief 释放对象
-	 * @return void
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-	//////////////////////////////////////////////////////////////////////////
-	STDMETHOD_(BOOL,AddAnimator)(THIS_ IValueAnimator* ani) PURE;
+    //////////////////////////////////////////////////////////////////////////
+    STDMETHOD_(BOOL, AddAnimator)(THIS_ IValueAnimator * ani) PURE;
 
-	STDMETHOD_(BOOL,RemoveAnimator)(THIS_ IValueAnimator* ani) PURE;
+    STDMETHOD_(BOOL, RemoveAnimator)(THIS_ IValueAnimator * ani) PURE;
 
-	STDMETHOD_(void,SetListener)(THIS_ IAnimatorGroupListerer*listener) PURE;
+    STDMETHOD_(void, SetListener)(THIS_ IAnimatorGroupListerer * listener) PURE;
 };
 
 SNSEND

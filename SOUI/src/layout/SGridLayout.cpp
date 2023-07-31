@@ -180,7 +180,7 @@ SLayoutSize SGridLayoutParam::GetSpecifiedSize(ORIENTATION orientation) const
     case Any:
     case Both:
     default:
-        SASSERT_FMTA(FALSE, "GetSpecifiedSize can only be applied for Horz or Vert",0);
+        SASSERT_FMTA(FALSE, "GetSpecifiedSize can only be applied for Horz or Vert", 0);
         return SLayoutSize();
     }
 }

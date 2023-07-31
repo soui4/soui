@@ -19,19 +19,19 @@ typedef struct IWindow IWindow;
 /************************************************************************/
 enum
 {
-	UM_SOUI_BEGIN = (WM_USER + 10950),
-	UM_SETSCALE ,
-	UM_SETLANGUAGE,
-	UM_SETCOLORIZE,
-	UM_UPDATEFONT,
-	UM_GETDESIREDSIZE,// wp=parent wid,lp=parent hei, return size
-	UM_MENUEVENT,	//模拟菜单控件事件，wparam:0, lparam:EventArg *
-	SPYMSG_BASE = UM_SOUI_BEGIN + 50,	//和老版本保持一致(10000+1000)
-	SPYMSG_SETSPY = SPYMSG_BASE,  //设置SPY消息接收窗口句柄
-	SPYMSG_SWNDENUM,//枚举窗口列表,wparam:SWND,lparam:SWindow::GetWindow
-	SPYMSG_SWNDINFO,//获取窗口属性，wparam:swnd
-	SPYMSG_HITTEST,// lparam:pos
-	UM_SOUI_END,
+    UM_SOUI_BEGIN = (WM_USER + 10950),
+    UM_SETSCALE,
+    UM_SETLANGUAGE,
+    UM_SETCOLORIZE,
+    UM_UPDATEFONT,
+    UM_GETDESIREDSIZE,                // wp=parent wid,lp=parent hei, return size
+    UM_MENUEVENT,                     //模拟菜单控件事件，wparam:0, lparam:EventArg *
+    SPYMSG_BASE = UM_SOUI_BEGIN + 50, //和老版本保持一致(10000+1000)
+    SPYMSG_SETSPY = SPYMSG_BASE,      //设置SPY消息接收窗口句柄
+    SPYMSG_SWNDENUM,                  //枚举窗口列表,wparam:SWND,lparam:SWindow::GetWindow
+    SPYMSG_SWNDINFO,                  //获取窗口属性，wparam:swnd
+    SPYMSG_HITTEST,                   // lparam:pos
+    UM_SOUI_END,
 };
 
 typedef BOOL (*FunSwndProc)(IWindow *pSwnd, UINT uMsg, WPARAM wp, LPARAM lp, LRESULT *pbHandled);

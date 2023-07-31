@@ -113,7 +113,7 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
      * @brief 创建动画组
      * @return IAnimatorGroup * -- 动画组
      */
-	STDMETHOD_(IAnimatorGroup*,CreateAnimatorGroup)(THIS) PURE;
+    STDMETHOD_(IAnimatorGroup *, CreateAnimatorGroup)(THIS) PURE;
 };
 
 SNSEND

@@ -723,7 +723,7 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
                                          NULL,             // Clipping rectangle for metafiles
                                          &rcClient,        // Update rectangle
                                          NULL,             // Call back function
-                                         0,             // Call back parameter
+                                         0,                // Call back parameter
                                          TXTVIEW_ACTIVE);
     CGdiAlpha::AlphaRestore(ai);
     ::SetGraphicsMode(hdc, nOldMode);
@@ -1256,7 +1256,7 @@ LRESULT SRichEdit::OnSetCharFormat(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     if (wParam == SCF_DEFAULT && !FValidCF((CHARFORMAT2W *)lParam))
     { //设置默认字体只支持CHARFORMAT2W
-        SSLOGI()<<"set default char format failed! only CHARFORMAT2W can be set for default char format";
+        SSLOGI() << "set default char format failed! only CHARFORMAT2W can be set for default char format";
         return 0;
     }
 
@@ -1339,11 +1339,11 @@ void SRichEdit::SetWindowText(LPCTSTR lpszText)
     SStringW str = S_CT2W(lpszText);
     SSendMessage(WM_SETTEXT, 0, (LPARAM)(LPCWSTR)str);
 #endif
-	if(IsRichScale())
-	{
-		//setwindowtext会导致zoom丢失，需要重新设置。
-		SSendMessage(EM_SETZOOM, GetScale(),100);
-	}
+    if (IsRichScale())
+    {
+        // setwindowtext会导致zoom丢失，需要重新设置。
+        SSendMessage(EM_SETZOOM, GetScale(), 100);
+    }
     Invalidate();
 }
 
@@ -1708,7 +1708,7 @@ BOOL SRichEdit::OnTxSetTimer(UINT idTimer, UINT uTimeout)
         p->m_value->StartTimer(uTimeout, TRUE, idTimer);
         return TRUE;
     }
-    MemberFunctionSlot<SRichEdit, IEvtArgs> slot= Subscriber(&SRichEdit::OnTimeout, this);
+    MemberFunctionSlot<SRichEdit, IEvtArgs> slot = Subscriber(&SRichEdit::OnTimeout, this);
     STimer *timer = new STimer(&slot);
     timer->StartTimer(uTimeout, TRUE, idTimer);
     m_mapTimer[idTimer] = timer;

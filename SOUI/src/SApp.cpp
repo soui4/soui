@@ -137,7 +137,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<STabCtrl>();
     objFactory->TplRegisterFactory<STabPage>();
     objFactory->TplRegisterFactory<SActiveX>();
-    //objFactory->TplRegisterFactory<SFlashCtrl>();
+    // objFactory->TplRegisterFactory<SFlashCtrl>();
     objFactory->TplRegisterFactory<SSplitPane>();
     objFactory->TplRegisterFactory<SSplitWnd>();
     objFactory->TplRegisterFactory<SSplitWnd_Col>();
@@ -219,9 +219,9 @@ void SObjectDefaultRegister::RegisterValueAnimator(SObjectFactoryMgr *objFactory
     objFactory->TplRegisterFactory<SIntAnimator>();
     objFactory->TplRegisterFactory<SFloatAnimator>();
     objFactory->TplRegisterFactory<SColorAnimator>();
-	objFactory->TplRegisterFactory<SPointAnimator>();
-	objFactory->TplRegisterFactory<SSizeAnimator>();
-	objFactory->TplRegisterFactory<SRectAnimator>();
+    objFactory->TplRegisterFactory<SPointAnimator>();
+    objFactory->TplRegisterFactory<SSizeAnimator>();
+    objFactory->TplRegisterFactory<SRectAnimator>();
 }
 //////////////////////////////////////////////////////////////////////////
 // SApplication
@@ -391,16 +391,16 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc 
         }
     }
     if (!pResProvider)
-	{
-		SSLOGW()<<"load xml failed: "<< pszType<<":"<<pszXmlName<<" not found in respovider list";
-		return FALSE;
-	}
+    {
+        SSLOGW() << "load xml failed: " << pszType << ":" << pszXmlName << " not found in respovider list";
+        return FALSE;
+    }
     size_t dwSize = pResProvider->GetRawBufferSize(pszType, pszXmlName);
     if (dwSize == 0)
-	{
-		SSLOGW()<<"load xml failed: "<< pszType<<":"<<pszXmlName<<" pResProvider->GetRawBufferSize return 0";
+    {
+        SSLOGW() << "load xml failed: " << pszType << ":" << pszXmlName << " pResProvider->GetRawBufferSize return 0";
         return FALSE;
-	}
+    }
     SAutoBuf strXml;
     strXml.Allocate(dwSize);
     pResProvider->GetRawBuffer(pszType, pszXmlName, strXml, dwSize);

@@ -67,7 +67,7 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
 {
     if (!m_tvItemLocator)
     {
-        SASSERT_FMTA(FALSE, "error: A item locator is in need before setting adapter!!!",0);
+        SASSERT_FMTA(FALSE, "error: A item locator is in need before setting adapter!!!", 0);
         return FALSE;
     }
     if (m_adapter == adapter)
@@ -702,7 +702,7 @@ void STileView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     if (nNewSelItem != -1)
     {
         EnsureVisible(nNewSelItem);
-        SetSel(nNewSelItem,TRUE);
+        SetSel(nNewSelItem, TRUE);
     }
 }
 
@@ -963,10 +963,10 @@ void STileView::OnColorize(COLORREF cr)
 void STileView::OnScaleChanged(int nScale)
 {
     __baseCls::OnScaleChanged(nScale);
-	if (m_tvItemLocator)
-		m_tvItemLocator->SetScale(nScale);
+    if (m_tvItemLocator)
+        m_tvItemLocator->SetScale(nScale);
     DispatchMessage2Items(UM_SETSCALE, nScale, 0);
-	UpdateVisibleItems();
+    UpdateVisibleItems();
 }
 
 HRESULT STileView::OnLanguageChanged()

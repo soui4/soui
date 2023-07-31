@@ -24,7 +24,7 @@
 SNSBEGIN
 
 #define WIDESTR_HELPER(x) L##x
-#define WIDESTR(x) WIDESTR_HELPER(#x)
+#define WIDESTR(x)        WIDESTR_HELPER(#x)
 
 #ifdef __cplusplus
 #define DEF_OBJ_BASE(clsName, clsType) \
@@ -34,7 +34,7 @@ SNSBEGIN
     }                                  \
     static LPCWSTR GetClassName()      \
     {                                  \
-        return WIDESTR(clsName);              \
+        return WIDESTR(clsName);       \
     }
 #else
 #define DEF_OBJ_BASE(clsName, clsType)

@@ -7,7 +7,7 @@ SNSBEGIN
 
 class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
   public:
-    SMessageLoop(IMessageLoop * pParentLoop);
+    SMessageLoop(IMessageLoop *pParentLoop);
     virtual ~SMessageLoop();
 
   public:
@@ -39,13 +39,13 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
     STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE;
 
-	STDMETHOD_(void, ExecutePendingTask)() OVERRIDE;
+    STDMETHOD_(void, ExecutePendingTask)() OVERRIDE;
 
-	STDMETHOD_(BOOL,PeekMsg)(THIS_ LPMSG pMsg,UINT wMsgFilterMin,UINT wMsgFilterMax,BOOL bRemove) OVERRIDE;
+    STDMETHOD_(BOOL, PeekMsg)(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilterMax, BOOL bRemove) OVERRIDE;
 
-	STDMETHOD_(BOOL,WaitMsg)(THIS) OVERRIDE;
+    STDMETHOD_(BOOL, WaitMsg)(THIS) OVERRIDE;
 
-	STDMETHOD_(void,HandleMsg)(THIS) OVERRIDE;
+    STDMETHOD_(void, HandleMsg)(THIS) OVERRIDE;
 
   public:
     static BOOL IsIdleMessage(MSG *pMsg);
@@ -57,14 +57,14 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
     BOOL m_bRunning;
     BOOL m_bQuit;
-	BOOL m_bDoIdle ;
-	int m_nIdleCount ;
+    BOOL m_bDoIdle;
+    int m_nIdleCount;
 
     SCriticalSection m_cs;
     SList<IRunnable *> m_runnables;
     SCriticalSection m_csRunningQueue;
     SList<IRunnable *> m_runningQueue;
-	SAutoRefPtr<IMessageLoop> m_parentLoop;
+    SAutoRefPtr<IMessageLoop> m_parentLoop;
     DWORD m_tid;
 };
 

@@ -160,7 +160,7 @@ SRootWindow::SRootWindow(SHostWnd *pHostWnd)
 {
     GetEventSet()->addEvent(EVENTID(EventInit));
     GetEventSet()->addEvent(EVENTID(EventExit));
-	GetEventSet()->addEvent(EVENTID(EventMenuCmd));
+    GetEventSet()->addEvent(EVENTID(EventMenuCmd));
 }
 
 void SRootWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
@@ -246,7 +246,7 @@ void SRootWindow::UpdateLayout()
 
 HRESULT SRootWindow::OnLanguageChanged()
 {
-    SStringT str = S_CW2T(tr(m_pHostWnd->m_hostAttr.m_strTitle));     
+    SStringT str = S_CW2T(tr(m_pHostWnd->m_hostAttr.m_strTitle));
     m_pHostWnd->SetWindowText(str);
     return 3;
 }
@@ -284,9 +284,9 @@ SHostWnd *SRootWindow::GetHostWnd() const
 
 void SRootWindow::FireMenuCmd(int menuID)
 {
-	EventMenuCmd evt(this);
-	evt.menuId = menuID;
-	FireEvent(evt);
+    EventMenuCmd evt(this);
+    evt.menuId = menuID;
+    FireEvent(evt);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -365,7 +365,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     SASSERT(pNode);
     if (pNode->Empty())
     {
-        SASSERT_FMTA(FALSE, "Null XML node",0);
+        SASSERT_FMTA(FALSE, "Null XML node", 0);
         return FALSE;
     }
     if (!SNativeWnd::IsWindow())
@@ -551,8 +551,10 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     int nHeight = m_szAppSetted.cy;
     CSize szNc = m_pNcPainter->GetNcSize();
     CSize szRoot;
-	if(nWidth==0) nWidth = SIZE_WRAP_CONTENT;
-	if(nHeight==0) nHeight = SIZE_WRAP_CONTENT;
+    if (nWidth == 0)
+        nWidth = SIZE_WRAP_CONTENT;
+    if (nHeight == 0)
+        nHeight = SIZE_WRAP_CONTENT;
     GetRoot()->GetDesiredSize(&szRoot, nWidth, nHeight);
 
     ILayoutParam *pLayoutParam = GetRoot()->GetLayoutParam();
@@ -1891,13 +1893,15 @@ void SHostWnd::ShowHostWnd(THIS_ int nShowCmd, BOOL bWaitAniDone)
 
 void SHostWnd::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 {
-	if(uNotifyCode == 0){
-		//for menu, translate to evt_menu_cmd
-		m_pRoot->FireMenuCmd(nID);
-	}else
-	{
-		SetMsgHandled(FALSE);
-	}
+    if (uNotifyCode == 0)
+    {
+        // for menu, translate to evt_menu_cmd
+        m_pRoot->FireMenuCmd(nID);
+    }
+    else
+    {
+        SetMsgHandled(FALSE);
+    }
 }
 
 //////////////////////////////////////////////////////////////////

@@ -761,6 +761,7 @@ void SAnimateImgWnd::Start()
             GetContainer()->RegisterTimelineHandler(this);
         m_iRepeat = 0;
         m_bPlaying = TRUE;
+        m_iCurFrame = 0;
         EventImageAnimateStart evt(this);
         FireEvent(evt);
     }

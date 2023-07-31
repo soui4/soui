@@ -8,6 +8,7 @@ SStackView::SStackView(void)
     , m_animator(this)
     , m_aniStyle(kAniNone)
     , m_bVertAni(FALSE)
+    , m_isSamePageSize(TRUE)
 {
     m_bClipClient = true;
     m_animator.addListener(this);
@@ -43,11 +44,35 @@ BOOL SStackView::SelectPage(int iSel, BOOL enableAnimate)
     m_iSel = iSel;
     if (m_iSel != -2)
     {
+        if (!m_isSamePageSize)
+        {
+            CRect rcLayout;
+            GetChildrenLayoutRect(&rcLayout);
+            IWindow *pPage = GetSelPage();
+            if (pPage)
+            {
+                CSize szPage = GetChildSize(pPage);
+                m_animator.SetOwnerSizeRange(rcLayout.Size(), szPage);
+            }
+        }
+        else
+        {
+            m_animator.DisableOwnerResize();
+        }
         m_animator.start(GetContainer());
         if (!enableAnimate)
         {
             m_animator.end();
         }
+    }
+    else
+    {
+        for (UINT i = 0; i < GetChildrenCount(); i++)
+        {
+            IWindow *pChild = GetPage(i);
+            pChild->SetVisible(TRUE, FALSE);
+        }
+        Invalidate();
     }
     return TRUE;
 }
@@ -56,7 +81,7 @@ IWindow *SStackView::GetSelPage(CTHIS) const
 {
     if (m_iSel < 0)
         return NULL;
-    return GetIChild(m_iSel);
+    return GetPage(m_iSel);
 }
 
 IWindow *SStackView::GetPage(CTHIS_ int iPage) const
@@ -68,16 +93,44 @@ IWindow *SStackView::GetPage(CTHIS_ int iPage) const
 
 void SStackView::UpdateChildrenPosition(THIS)
 {
-    if (m_animator.isStarted())
-        m_animator.end();
-    // note: childs array is not ready now!
-    RECT rc;
+    CRect rc;
     GetChildrenLayoutRect(&rc);
-    SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
-    while (pChild)
+    if (m_animator.isRunning())
     {
-        pChild->Move(&rc);
-        pChild = pChild->GetWindow(GSW_NEXTSIBLING);
+        m_animator.OnNextFrame();
+        if (m_animator.GetAniStyle() == kFadeInOut)
+        {
+            IWindow *pFrom = GetPage(m_animator.GetFrom());
+            if (pFrom)
+            {
+                CSize szPage = GetChildSize(pFrom);
+                pFrom->Move(CRect(rc.TopLeft(), szPage));
+            }
+            IWindow *pTo = GetPage(m_animator.GetTo());
+            if (pTo)
+            {
+                CSize szPage = GetChildSize(pTo);
+                pTo->Move(CRect(rc.TopLeft(), szPage));
+            }
+        }
+        return;
+    }
+    if (m_iSel == -2)
+    {
+        for (UINT i = 0; i < m_childs.GetCount(); i++)
+        {
+            CSize szPage = GetChildSize(m_childs[i]);
+            CRect rcPage(rc.TopLeft(), szPage);
+            m_childs[i]->Move(&rcPage);
+        }
+    }
+    else
+    {
+        IWindow *pPage = GetSelPage();
+        if (pPage)
+        {
+            pPage->Move(&rc);
+        }
     }
 }
 
@@ -119,32 +172,49 @@ void SStackView::SetAniDir(THIS_ BOOL bVert)
 
 SIZE SStackView::MeasureChildren(int nParentWid, int nParentHei)
 {
-    SIZE ret = { 0 };
-    SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
-    BOOL getSize = FALSE;
-    while (pChild)
+    if (!m_isSamePageSize)
     {
-        if (pChild->GetLayoutParam()->IsWrapContent(Any))
+        if (m_animator.isRunning())
         {
-            SIZE szChild;
-            pChild->GetDesiredSize(&szChild, nParentWid, nParentHei);
-            if (pChild->GetLayoutParam()->IsWrapContent(Horz) && ret.cx < szChild.cx)
-                ret.cx = szChild.cx;
-            if (pChild->GetLayoutParam()->IsWrapContent(Vert) && ret.cy < szChild.cy)
-                ret.cy = szChild.cy;
-            getSize = TRUE;
+            return m_animator.GetOwnerSize();
         }
-        pChild = pChild->GetWindow(GSW_NEXTSIBLING);
+        else
+        {
+            IWindow *pPage = GetSelPage();
+            SIZE szRet = { 0 };
+            pPage->GetDesiredSize(&szRet, nParentWid, nParentHei);
+            return szRet;
+        }
     }
-    if (!getSize)
+    else
     {
+        SIZE ret = { 0 };
         SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
-        if (pChild)
+        BOOL getSize = FALSE;
+        while (pChild)
         {
-            pChild->GetDesiredSize(&ret, nParentWid, nParentHei);
+            if (!pChild->GetLayoutParam()->IsMatchParent(Both))
+            {
+                SIZE szChild;
+                pChild->GetDesiredSize(&szChild, nParentWid, nParentHei);
+                if (ret.cx < szChild.cx)
+                    ret.cx = szChild.cx;
+                if (ret.cy < szChild.cy)
+                    ret.cy = szChild.cy;
+                getSize = TRUE;
+            }
+            pChild = pChild->GetWindow(GSW_NEXTSIBLING);
         }
+        if (!getSize)
+        {
+            SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
+            if (pChild)
+            {
+                pChild->GetDesiredSize(&ret, nParentWid, nParentHei);
+            }
+        }
+        return ret;
     }
-    return ret;
 }
 
 BOOL SStackView::CreateChildren(SXmlNode xmlNode)
@@ -163,35 +233,51 @@ BOOL SStackView::CreateChildren(SXmlNode xmlNode)
             idx++;
         }
     }
-    BuildChildsArray();
+    BuildChildsArray(FALSE);
     return TRUE;
 }
 
 void SStackView::OnAfterInsertChild(SWindow *pChild)
 {
+    // set default size to match parent
     if (m_isLoading)
         return;
 
-    BuildChildsArray();
+    BuildChildsArray(TRUE);
 }
 
 void SStackView::OnAfterRemoveChild(SWindow *pChild)
 {
-    BuildChildsArray();
+    BuildChildsArray(TRUE);
 }
 
-void SStackView::BuildChildsArray()
+void SStackView::BuildChildsArray(BOOL updateSel)
 {
     if (m_animator.isStarted())
         m_animator.end();
+    IWindow *pSel = GetSelPage();
     int nChilds = GetChildrenCount();
     m_childs.SetCount(nChilds);
+    int iSel = -1;
     SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
     for (int i = 0; i < nChilds; i++)
     {
         SASSERT(pChild);
         m_childs[i] = pChild;
+        if (pSel == pChild)
+            iSel = i;
         pChild = pChild->GetWindow(GSW_NEXTSIBLING);
+    }
+    if (updateSel)
+    {
+        if (iSel != -1)
+        {
+            m_iSel = iSel;
+        }
+        else if (m_iSel >= 0)
+        {
+            m_iSel = -1;
+        }
     }
 }
 
@@ -228,6 +314,28 @@ BOOL SStackView::IsVertChildAnimate(int iChild) const
         return m_bVertAni;
 }
 
+CSize SStackView::GetChildSize(IWindow *pPage) const
+{
+    CRect rc;
+    GetChildrenLayoutRect(&rc);
+    CSize szPage = rc.Size();
+    if (!m_isSamePageSize)
+    {
+        ILayoutParam *pLayoutParam = GetLayoutParam();
+        SASSERT(pPage);
+        if (pLayoutParam->IsWrapContent(Any))
+        {
+            int nParentWid = -1, nParentHei = -1;
+            if (!pLayoutParam->IsWrapContent(Horz))
+                nParentWid = rc.Width();
+            if (!pLayoutParam->IsWrapContent(Vert))
+                nParentHei = rc.Height();
+            pPage->GetDesiredSize(&szPage, nParentWid, nParentHei);
+        }
+    }
+    return szPage;
+}
+
 //////////////////////////////////////////////////////////////////////////
 void SViewSwitchAnimator::start(THIS_ ITimelineHandlersMgr *pTimerlineMgr)
 {
@@ -239,7 +347,6 @@ void SViewSwitchAnimator::start(THIS_ ITimelineHandlersMgr *pTimerlineMgr)
     m_pTo = m_pOwner->GetPage(m_iTo);
     if (m_pTo)
     {
-        m_pTo->Move(rc);
         m_pTo->SetVisible(TRUE, FALSE);
     }
     m_aniStyle = m_pOwner->GetChildAnimateStyle(m_iTo);
@@ -263,6 +370,10 @@ void SViewSwitchAnimator::start(THIS_ ITimelineHandlersMgr *pTimerlineMgr)
 
 void SViewSwitchAnimator::onEvaluateValue(THIS_ float fraction)
 {
+    if (m_isOwnerResize)
+    {
+        m_pOwner->RequestRelayout();
+    }
     if (m_aniStyle == kAniNone)
         return;
     if (m_aniStyle == kFadeInOut)
@@ -281,7 +392,9 @@ void SViewSwitchAnimator::onEvaluateValue(THIS_ float fraction)
             m_pFrom->Move(&rc1);
         RECT rc2 = m_evalRcTo.evaluate(fraction);
         if (m_pTo)
+        {
             m_pTo->Move(&rc2);
+        }
     }
 }
 
@@ -396,6 +509,17 @@ void SViewSwitchAnimator::initEvaluator()
             }
         }
     }
+}
+
+void SViewSwitchAnimator::SetOwnerSizeRange(SIZE szFrom, SIZE szTo)
+{
+    m_evalOwnerSize.setRange(szFrom, szTo);
+    m_isOwnerResize = szFrom.cx != szTo.cx || szFrom.cy != szTo.cy;
+}
+
+SIZE SViewSwitchAnimator::GetOwnerSize() const
+{
+    return m_evalOwnerSize.evaluate(getAnimatedFraction());
 }
 
 SNSEND

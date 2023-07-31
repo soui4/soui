@@ -17,9 +17,9 @@
 #include <helper/obj-ref-impl.hpp>
 SNSBEGIN
 
-SOUI_EXP SObjectInfo  ObjInfo_New(LPCWSTR name,int type);
+SOUI_EXP SObjectInfo ObjInfo_New(LPCWSTR name, int type);
 
-SOUI_EXP BOOL ObjInfo_IsValid(const SObjectInfo* pObjInfo);
+SOUI_EXP BOOL ObjInfo_IsValid(const SObjectInfo *pObjInfo);
 
 /**
  * @class     CElementTraits< SObjectInfo >
@@ -32,52 +32,53 @@ class CElementTraits<SObjectInfo> : public CElementTraitsBase<SObjectInfo> {
   public:
     static ULONG Hash(INARGTYPE objInfo)
     {
-		ULONG uRet = CElementTraits<SStringW>::Hash(objInfo.szName);
-		uRet = (uRet << 5) + objInfo.nType;
-		return uRet;
+        ULONG uRet = CElementTraits<SStringW>::Hash(objInfo.szName);
+        uRet = (uRet << 5) + objInfo.nType;
+        return uRet;
     }
 
     static bool CompareElements(INARGTYPE obj1, INARGTYPE obj2)
     {
-        return obj1.nType == obj2.nType && wcsicmp(obj1.szName,obj2.szName)== 0;
+        return obj1.nType == obj2.nType && wcsicmp(obj1.szName, obj2.szName) == 0;
     }
 };
 
 template <typename T>
-class TplSObjectFactory : public TObjRefImpl<IObjectFactory>{
+class TplSObjectFactory : public TObjRefImpl<IObjectFactory> {
   public:
     //! Default constructor.
     TplSObjectFactory()
     {
     }
-	
-	STDMETHOD_(void,OnFinalRelease)(THIS){
-		delete this;
-	}
 
-	STDMETHOD_(LPCWSTR,BaseClassName)(CTHIS) SCONST OVERRIDE
+    STDMETHOD_(void, OnFinalRelease)(THIS)
+    {
+        delete this;
+    }
+
+    STDMETHOD_(LPCWSTR, BaseClassName)(CTHIS) SCONST OVERRIDE
     {
         return T::BaseClassName();
     }
 
-    STDMETHOD_(IObject *,NewObject)(CTHIS) SCONST OVERRIDE
+    STDMETHOD_(IObject *, NewObject)(CTHIS) SCONST OVERRIDE
     {
         return new T;
     }
 
-    STDMETHOD_(IObjectFactory *,Clone)(CTHIS) SCONST OVERRIDE
+    STDMETHOD_(IObjectFactory *, Clone)(CTHIS) SCONST OVERRIDE
     {
         return new TplSObjectFactory<T>();
     }
 
     // 通过 SObjectFactory 继承
-    STDMETHOD_(SObjectInfo,GetObjectInfo)(CTHIS) SCONST OVERRIDE
+    STDMETHOD_(SObjectInfo, GetObjectInfo)(CTHIS) SCONST OVERRIDE
     {
         return ObjInfo_New(T::GetClassName(), T::GetClassType());
     }
 };
 
-typedef IObjectFactory * SObjectFactoryPtr;
+typedef IObjectFactory *SObjectFactoryPtr;
 
 class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo> {
   public:
@@ -120,7 +121,7 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
     }
 
   protected:
-	virtual IObject *CreateObject(const SObjectInfo &objInfo) const;
+    virtual IObject *CreateObject(const SObjectInfo &objInfo) const;
     virtual IObject *OnCreateUnknownObject(const SObjectInfo &objInfo) const;
 
     static void OnFactoryRemoved(const SObjectFactoryPtr &obj);

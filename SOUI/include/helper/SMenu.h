@@ -169,7 +169,7 @@ class SOwnerDraw {
             GetTextMetrics(dc, &tm);
 
             lpMeasureItemStruct->itemHeight = tm.tmHeight;
-            ::ReleaseDC(hWnd,dc);
+            ::ReleaseDC(hWnd, dc);
         }
         else
             lpMeasureItemStruct->itemHeight = ::GetSystemMetrics(SM_CYMENU);

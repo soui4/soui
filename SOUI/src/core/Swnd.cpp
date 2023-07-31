@@ -344,7 +344,7 @@ void SWindow::TestMainThread()
 #ifdef _DEBUG
     if (IsBadWritePtr(this, sizeof(SWindow)))
     {
-        SASSERT_FMTA(FALSE, "this is null!!!",0);
+        SASSERT_FMTA(FALSE, "this is null!!!", 0);
     }
     else
     {
@@ -2100,6 +2100,10 @@ void SWindow::OnLButtonUp(UINT nFlags, CPoint pt)
 
 void SWindow::OnRButtonDown(UINT nFlags, CPoint point)
 {
+}
+
+void SWindow::OnRButtonUp(UINT nFlags, CPoint point)
+{
     FireCtxMenu(point);
 }
 
@@ -3232,11 +3236,12 @@ void SWindow::OnScaleChanged(int scale)
     //标记布局脏
     m_layoutDirty = dirty_self;
 
-    if(m_animation && m_animation->hasEnded()){
+    if (m_animation && m_animation->hasEnded())
+    {
         //动画结束状态下，重新刷新动画结束位置
         long tmDuration = m_animation->getDuration();
         long tmOffset = m_animation->getStartOffset();
-        m_animation->setStartTime(STime::GetCurrentTimeMs()-tmDuration-tmOffset);
+        m_animation->setStartTime(STime::GetCurrentTimeMs() - tmDuration - tmOffset);
         m_animationHandler.OnNextFrame();
     }
 }

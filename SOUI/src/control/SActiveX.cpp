@@ -15,9 +15,10 @@ class SAxContainerImpl
         SetAxHost(this);
     }
 
-	~SAxContainerImpl(){
-		Clear();
-	}
+    ~SAxContainerImpl()
+    {
+        Clear();
+    }
 
   protected:
     virtual HWND GetAxHostWindow() const
@@ -211,6 +212,5 @@ void SActiveX::SetExternalUIHandler(IDocHostUIHandler *pUiHandler)
     if (m_axContainer)
         m_axContainer->SetExternalUIHandler(pUiHandler);
 }
-
 
 SNSEND

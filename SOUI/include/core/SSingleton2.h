@@ -18,12 +18,12 @@
 #include <SApp.h>
 SNSBEGIN
 
-#define SINGLETON2_TYPE(x)     \
-  public:                      \
-    friend class SApplication; \
-    static SingletonType GetType()       \
-    {                          \
-        return x;              \
+#define SINGLETON2_TYPE(x)         \
+  public:                          \
+    friend class SApplication;     \
+    static SingletonType GetType() \
+    {                              \
+        return x;                  \
     }
 
 /**

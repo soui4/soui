@@ -124,12 +124,12 @@ struct tagThunk // this should come out to 16 bytes
 #pragma pack(push, 4)
 struct tagThunk // this should come out to 16 bytes
 {
-    ULONG   m_ldr_r16;      // ldr  x16, [pc, #24]
-    ULONG   m_ldr_r0;       // ldr  x0, [pc, #12]
-    ULONG   m_br;           // br   x16
-    ULONG   m_pad;
-    ULONG64	m_pThis;
-    ULONG64	m_pFunc;
+    ULONG m_ldr_r16; // ldr  x16, [pc, #24]
+    ULONG m_ldr_r0;  // ldr  x0, [pc, #12]
+    ULONG m_br;      // br   x16
+    ULONG m_pad;
+    ULONG64 m_pThis;
+    ULONG64 m_pFunc;
     void Init(DWORD_PTR proc, void *pThis)
     {
         m_ldr_r16 = 0x580000D0;
@@ -322,7 +322,7 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
     (THIS_ HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags) OVERRIDE;
 
     STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) OVERRIDE;
-	STDMETHOD_(MsgHandlerInfo *,GetMsgHandler)(THIS) OVERRIDE;
+    STDMETHOD_(MsgHandlerInfo *, GetMsgHandler)(THIS) OVERRIDE;
 
     LRESULT DefWindowProc();
     LRESULT ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
@@ -340,7 +340,7 @@ class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
     const MSG *m_pCurrentMsg;
     BOOL m_bDestoryed;
 
-	MsgHandlerInfo m_msgHandlerInfo;
+    MsgHandlerInfo m_msgHandlerInfo;
 
   public:
     HWND m_hWnd;

@@ -76,7 +76,7 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
 {
     if (!m_lvItemLocator)
     {
-        SASSERT_FMTA(FALSE, "error: A item locator is in need before setting adapter!!!",0);
+        SASSERT_FMTA(FALSE, "error: A item locator is in need before setting adapter!!!", 0);
         return FALSE;
     }
     if (m_adapter == adapter)
@@ -1280,7 +1280,7 @@ void SMCListView::OnScaleChanged(int nScale)
     if (m_lvItemLocator)
         m_lvItemLocator->SetScale(nScale);
     DispatchMessage2Items(UM_SETSCALE, nScale, 0);
-	UpdateVisibleItems();
+    UpdateVisibleItems();
 }
 
 HRESULT SMCListView::OnLanguageChanged()

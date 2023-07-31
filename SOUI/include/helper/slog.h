@@ -12,7 +12,6 @@
 #define RetAddr() __builtin_return_address(0)
 #endif
 
-
 #include <interface/slog-i.h>
 
 SNSBEGIN
@@ -109,41 +108,40 @@ SNSEND
 
 #define SLOG(tag, level) SOUI::Log(tag, level, __FILE__, __FUNCTION__, __LINE__, RetAddr()).stream()
 #ifdef _MSC_VER
-#define SLOG_FMT(tag, level, logformat, ...)                                                      \
-    do                                                                                            \
-    {                                                                                             \
-        if (sizeof(logformat[0]) == sizeof(char))                                                 \
-        {                                                                                         \
-            char logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                           \
+#define SLOG_FMT(tag, level, logformat, ...)                                                    \
+    do                                                                                          \
+    {                                                                                           \
+        if (sizeof(logformat[0]) == sizeof(char))                                               \
+        {                                                                                       \
+            char logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                         \
             _snprintf(logbuf, SOUI::Log::MAX_LOGLEN, (const char *)logformat, __VA_ARGS__);     \
-            SLOG(tag, level) << logbuf;                                                           \
-        }                                                                                         \
-        else                                                                                      \
-        {                                                                                         \
-            wchar_t logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                        \
+            SLOG(tag, level) << logbuf;                                                         \
+        }                                                                                       \
+        else                                                                                    \
+        {                                                                                       \
+            wchar_t logbuf[SOUI::Log::MAX_LOGLEN] = { 0 };                                      \
             _snwprintf(logbuf, SOUI::Log::MAX_LOGLEN, (const wchar_t *)logformat, __VA_ARGS__); \
-            SLOG(tag, level) << logbuf;                                                           \
-        }                                                                                         \
+            SLOG(tag, level) << logbuf;                                                         \
+        }                                                                                       \
     } while (false);
 #else
-//todo: mingw32 目前识别宏可变参数还有问题
-#define SLOG_FMT(tag, level, logformat, ...)                                                      \
-    do                                                                                            \
-    {                                                                                             \
-        if (sizeof(logformat[0]) == sizeof(char))                                                 \
-        {                                                                                         \
-            char logbuf[1024] = { 0 };                                                            \
-            snprintf(logbuf, 1024, (const char *)logformat, __VA_ARGS__);                         \
-            SLOG(tag, level) << logbuf;                                                           \
-        }                                                                                         \
-        else                                                                                      \
-        {                                                                                         \
-            wchar_t logbuf[1024] = { 0 };                                                         \
-            snwprintf(logbuf, 1024, (const wchar_t *)logformat, __VA_ARGS__);                     \
-            SLOG(tag, level) << logbuf;                                                           \
-        }                                                                                         \
+// todo: mingw32 目前识别宏可变参数还有问题
+#define SLOG_FMT(tag, level, logformat, ...)                                  \
+    do                                                                        \
+    {                                                                         \
+        if (sizeof(logformat[0]) == sizeof(char))                             \
+        {                                                                     \
+            char logbuf[1024] = { 0 };                                        \
+            snprintf(logbuf, 1024, (const char *)logformat, __VA_ARGS__);     \
+            SLOG(tag, level) << logbuf;                                       \
+        }                                                                     \
+        else                                                                  \
+        {                                                                     \
+            wchar_t logbuf[1024] = { 0 };                                     \
+            snwprintf(logbuf, 1024, (const wchar_t *)logformat, __VA_ARGS__); \
+            SLOG(tag, level) << logbuf;                                       \
+        }                                                                     \
     } while (false);
-
 
 #endif
 
@@ -188,6 +186,5 @@ SNSEND
 #define SSLOGFMTW(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_WARN, logformat, __VA_ARGS__)
 #define SSLOGFMTE(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_ERROR, logformat, __VA_ARGS__)
 #define SSLOGFMTF(logformat, ...) SLOG_FMT(kSoui4Tag, SOUI::LOG_LEVEL_FATAL, logformat, __VA_ARGS__)
-
 
 #endif // __SLOG__H__

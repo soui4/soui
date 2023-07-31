@@ -1,8 +1,6 @@
 ﻿#ifndef STime_h__
 #define STime_h__
 
-
-
 #include <time.h>
 
 SNSBEGIN

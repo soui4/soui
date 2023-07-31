@@ -54,7 +54,7 @@ typedef enum _SOUI_EVENTS
     EVT_MOUSE_LEAVE,
 
     EVT_CMD = 10000,
-	EVT_MENU_CMD,
+    EVT_MENU_CMD,
     EVT_CTXMENU,
 
     //增加两个滚动VIEW的事件

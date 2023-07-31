@@ -13,6 +13,7 @@ class SOUI_EXP SViewSwitchAnimator : public TValueAnimator<float> {
         , m_pOwner(pOwner)
         , m_iFrom(-1)
         , m_iTo(-1)
+        , m_isOwnerResize(FALSE)
     {
     }
 
@@ -47,6 +48,24 @@ class SOUI_EXP SViewSwitchAnimator : public TValueAnimator<float> {
 
     void OnOwnerResize();
 
+    void SetOwnerSizeRange(SIZE szFrom, SIZE szTo);
+
+    BOOL IsOwnerResize() const
+    {
+        return m_isOwnerResize;
+    }
+    void DisableOwnerResize()
+    {
+        m_isOwnerResize = FALSE;
+    }
+
+    SIZE GetOwnerSize() const;
+
+    StackViewAniStyle GetAniStyle() const
+    {
+        return m_aniStyle;
+    }
+
   protected:
     void initEvaluator();
 
@@ -60,6 +79,8 @@ class SOUI_EXP SViewSwitchAnimator : public TValueAnimator<float> {
 
     TypeEvaluator<RECT> m_evalRcFrom, m_evalRcTo;
     TypeEvaluator<BYTE> m_evalAlphaFrom, m_evalAlphaTo;
+    TypeEvaluator<SIZE> m_evalOwnerSize;
+    BOOL m_isOwnerResize;
 };
 
 class SOUI_EXP SStackPage : public SWindow {
@@ -136,6 +157,7 @@ class SOUI_EXP SStackView
             ATTR_ENUM_VALUE(L"move", kMoveInOut)
             ATTR_ENUM_VALUE(L"push", kPushInOut)
         ATTR_ENUM_END(m_aniStyle)
+        ATTR_BOOL(L"samePageSize", m_isSamePageSize, FALSE)
         ATTR_CHAIN_CLASS(__baseCls)
         ATTR_CHAIN(m_animator, 0) // chain attributes to animator
     SOUI_ATTRS_BREAK()
@@ -157,9 +179,10 @@ class SOUI_EXP SStackView
     void OnAfterRemoveChild(SWindow *pChild) override;
 
   protected:
-    void BuildChildsArray();
+    void BuildChildsArray(BOOL updateSel);
     StackViewAniStyle GetChildAnimateStyle(int iChild) const;
     BOOL IsVertChildAnimate(int iChild) const;
+    CSize GetChildSize(IWindow *pPage) const;
 
   protected:
     int m_iSel;
@@ -168,6 +191,7 @@ class SOUI_EXP SStackView
 
     BOOL m_bVertAni;
     StackViewAniStyle m_aniStyle;
+    BOOL m_isSamePageSize;
 };
 
 SNSEND

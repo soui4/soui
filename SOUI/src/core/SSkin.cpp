@@ -791,21 +791,20 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
             pRT->DrawEllipse(&rcDest);
             break;
         case ring:
-			{
-				POINT ptCenter = { (rcDest.left + rcDest.right) / 2, (rcDest.top + rcDest.bottom) / 2 };
-				int nRadius = smin(rcDest.right - rcDest.left, rcDest.bottom - rcDest.top) / 2;
-				RECT rcRing = { ptCenter.x - nRadius, ptCenter.y - nRadius, ptCenter.x + nRadius, ptCenter.y + nRadius };
-				float startAngle = 0;
-				float endAngle = 360;
-				if (m_ringParam)
-				{
-					startAngle = m_ringParam->m_startAngle;
-					endAngle = m_ringParam->m_sweepAngle;
-				}
-				pRT->DrawArc(&rcRing, startAngle, endAngle, false);
-
-			}
-            break;
+        {
+            POINT ptCenter = { (rcDest.left + rcDest.right) / 2, (rcDest.top + rcDest.bottom) / 2 };
+            int nRadius = smin(rcDest.right - rcDest.left, rcDest.bottom - rcDest.top) / 2;
+            RECT rcRing = { ptCenter.x - nRadius, ptCenter.y - nRadius, ptCenter.x + nRadius, ptCenter.y + nRadius };
+            float startAngle = 0;
+            float endAngle = 360;
+            if (m_ringParam)
+            {
+                startAngle = m_ringParam->m_startAngle;
+                endAngle = m_ringParam->m_sweepAngle;
+            }
+            pRT->DrawArc(&rcRing, startAngle, endAngle, false);
+        }
+        break;
         }
         pRT->SelectObject(oldPen, NULL);
     }
@@ -825,24 +824,23 @@ POINT SSkinShape::GetCornerSize(const CRect &rc) const
     return CPoint();
 }
 
-
-SSkinShape::SStroke::SStroke() : m_color(CR_INVALID)
-, m_style(PS_SOLID)
-, m_endStyle(0)
-, m_joinStyle(0)
+SSkinShape::SStroke::SStroke()
+    : m_color(CR_INVALID)
+    , m_style(PS_SOLID)
+    , m_endStyle(0)
+    , m_joinStyle(0)
 {
-
 }
 
 int SSkinShape::SStroke::GetStyle() const
 {
-	int ret = m_style | m_endStyle|m_joinStyle;
-	if(m_endStyle || m_joinStyle){
-		ret |= PS_GEOMETRIC;
-	}
-	return ret;
+    int ret = m_style | m_endStyle | m_joinStyle;
+    if (m_endStyle || m_joinStyle)
+    {
+        ret |= PS_GEOMETRIC;
+    }
+    return ret;
 }
-
 
 IBrushS *SSkinShape::SShapeSolid::CreateBrush(IRenderTarget *pRT, BYTE byAlpha)
 {

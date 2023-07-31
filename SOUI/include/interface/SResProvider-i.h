@@ -14,7 +14,6 @@
 #ifndef _SRESPROVIDERBASE_
 #define _SRESPROVIDERBASE_
 
-
 #include <interface/obj-ref-i.h>
 #include <interface/SRender-i.h>
 
