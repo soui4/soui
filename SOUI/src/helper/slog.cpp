@@ -11,8 +11,7 @@ SNSBEGIN
 
 void Log::DefCallback(const char *tag, const char *pLogStr, int level, const char *file, int line, const char *fun, void *retAddr)
 {
-    SApplication *theApp = SApplication::getSingletonPtr();
-    ILogMgr *pLogMgr = theApp ? theApp->GetLogManager() : NULL;
+    ILogMgr *pLogMgr = GETLOGMGR();
     BOOL bLog = false;
     if (pLogMgr && pLogMgr->prePushLog(level))
     {

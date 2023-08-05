@@ -2149,7 +2149,7 @@ LRESULT SWindow::OnMouseClick(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
     EventMouseClick evt(this);
     evt.clickId = MouseClickId(uMsg - WM_LBUTTONDOWN);
-    evt.uFlags = wParam;
+    evt.uFlags = (UINT)wParam;
     evt.pt.x = GET_X_LPARAM(lParam);
     evt.pt.y = GET_Y_LPARAM(lParam);
     evt.bHover = GetClientRect().PtInRect(evt.pt);

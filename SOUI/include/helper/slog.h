@@ -14,6 +14,10 @@
 
 #include <interface/slog-i.h>
 
+#ifndef GETLOGMGR
+#define GETLOGMGR() SOUI::SApplication::getSingletonPtr()?SOUI::SApplication::getSingleton().GetLogManager():NULL
+#endif
+
 SNSBEGIN
 
 class SLogBinary {
