@@ -215,7 +215,7 @@ class SOUI_EXP STabCtrl : public TWindowProxy<ITabCtrl> {
      *
      * Describe  获取当前选中
      */
-    STDMETHOD_(ITabPage *, GetPage)(THIS_ int nIndex) OVERRIDE;
+    STDMETHOD_(IWindow *, GetPage)(THIS_ int nIndex) OVERRIDE;
 
     /**
      * STabCtrl::RemoveItem

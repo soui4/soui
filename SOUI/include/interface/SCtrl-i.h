@@ -3072,7 +3072,7 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
      *
      * Describe  获取当前选中
      */
-    STDMETHOD_(ITabPage *, GetPage)(THIS_ int nIndex) PURE;
+    STDMETHOD_(IWindow *, GetPage)(THIS_ int nIndex) PURE;
 
     /**
      * ITabCtrl::RemoveItem
