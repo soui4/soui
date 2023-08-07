@@ -15,6 +15,8 @@ namespace SevenZip
 
         virtual bool SetArchivePath(const TString& archivePath);
 
+		virtual bool SetArchiveData(HGLOBAL hData,DWORD dwSize);
+
 		virtual bool ReadInArchiveMetadata();
 
 		virtual void SetCompressionFormat(const CompressionFormatEnum& format);
@@ -37,6 +39,8 @@ namespace SevenZip
 		bool m_ReadMetadata;
 		bool m_OverrideCompressionFormat;
 		TString m_archivePath;
+		HGLOBAL m_hData;
+		DWORD   m_dwDataSize;
 		CompressionFormatEnum m_compressionFormat;
 		CompressionLevelEnum m_compressionLevel;
 		size_t m_numberofitems;

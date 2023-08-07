@@ -113,8 +113,7 @@ BOOL SResProvider7Zip::_Init( LPCTSTR pszZipFile ,LPCSTR pszPsw)
 
 BOOL SResProvider7Zip::_Init( HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType  ,LPCSTR pszPsw)
 {
-	if(!m_zipFile.Open(hInst,pszResName,pszType)) return FALSE;
-	m_zipFile.SetPassword(pszPsw);
+	if(!m_zipFile.Open(hInst,pszResName,pszPsw,pszType)) return FALSE;
 	if (!m_renderFactory)
 		return TRUE;
 	return _LoadSkin();

@@ -117,8 +117,6 @@ namespace SevenZip{
 		m_blob.ClearContent();
 		m_dwPos = 0;
 	}
-
-
 	//////////////////////////////////////////////////////////////////////////
 	//CZipArchive
 	//////////////////////////////////////////////////////////////////////////
@@ -131,32 +129,14 @@ namespace SevenZip{
 		Close();
 	}
 
-	BOOL CZipArchive::OpenZip()
-	{ 
-		m_szPassword[0] = '\0';
-
-		return TRUE;
-	}
 	void CZipArchive::Close()
 	{
-		CloseFile();
-		 
+		CloseFile(); 
 	}
 	BOOL CZipArchive::IsOpen() const
 	{
 		return TRUE;
 	} 
-
-	BOOL CZipArchive::SetPassword(LPCSTR pstrPassword)
-	{
-        if(!pstrPassword) return FALSE;
-
-		if (::lstrlenA(pstrPassword) >= sizeof(m_szPassword)-1)
-			return FALSE;
-
-		::lstrcpyA(m_szPassword, pstrPassword);
-		return TRUE;
-	}
 
 	// ZIP File API
 
@@ -171,10 +151,9 @@ namespace SevenZip{
 	 
 	BOOL CZipArchive::Open(LPCTSTR pszFileName,LPCSTR pszPassword)
 	{
-		SStringW strPsw = S_CA2W(pszPassword);
+		SStringW strPsw = S_CA2W(pszPassword,CP_UTF8);
 		TString s_pwd = strPsw.c_str();
 		SevenZip::SevenZipPassword pwd(true, s_pwd);
-		CFileStream fileStreams;
 		SevenZip::SevenZipExtractorMemory decompress;
 		SStringW strFilename = S_CT2W(pszFileName);
 		decompress.SetArchivePath(strFilename.c_str());
@@ -182,7 +161,7 @@ namespace SevenZip{
 		return (S_OK == decompress.ExtractArchive(m_fileStreams, NULL, &pwd));
 	}
 
-	BOOL CZipArchive::Open(HMODULE hModule, LPCTSTR pszName, LPCTSTR pszPassword, LPCTSTR pszType)
+	BOOL CZipArchive::Open(HMODULE hModule, LPCTSTR pszName, LPCSTR pszPassword, LPCTSTR pszType)
 	{
 		HRSRC hResInfo = ::FindResource(hModule, pszName, pszType);
 		if (hResInfo == NULL)
@@ -196,20 +175,13 @@ namespace SevenZip{
 		if (hResData == NULL)
 			return FALSE;
 
-		BYTE* pData = (BYTE*)::LockResource(hResData);
-		if (pData == NULL)
-			return FALSE;
+		SStringW strPsw = S_CA2W(pszPassword,CP_UTF8);
+		TString s_pwd = strPsw.c_str();
+		SevenZip::SevenZipPassword pwd(true, s_pwd);
+		SevenZip::SevenZipExtractorMemory decompress;
+		decompress.SetArchiveData(hResData,dwLength);
 
-		Close();
-
-		m_fileRes.Attach(pData, dwLength);
-
-		BOOL bOK=OpenZip();
-		if(!bOK)
-		{
-			m_fileRes.Detach();
-		}
-		return bOK;
+		return (S_OK == decompress.ExtractArchive(m_fileStreams, NULL, &pwd));
 	}
 
 	void CZipArchive::CloseFile()

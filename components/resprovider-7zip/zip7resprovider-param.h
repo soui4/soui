@@ -1,7 +1,8 @@
-﻿#pragma once
+﻿#ifndef _zip7resprovider_param_h
+#define _zip7resprovider_param_h
 
-namespace SOUI
-{
+SNSBEGIN
+
     struct IRenderFactory;
     typedef enum { ZIP7_FILE, ZIP7_PEDATA } ZIP7_TYPE;
     struct ZIP7RES_PARAM
@@ -29,7 +30,7 @@ namespace SOUI
             param->pRenderFac = _pRenderFac;
             param->pszPsw     = _pszPsw;
         }
-       inline  void Zip7Resource(ZIP7RES_PARAM *param,IRenderFactory *_pRenderFac,HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszResType=_T("zip"),LPCSTR _pszPsw =NULL, LPCTSTR _pszChildDir = NULL)
+       inline  void Zip7Resource(ZIP7RES_PARAM *param,IRenderFactory *_pRenderFac,HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszResType=_T("7z"),LPCSTR _pszPsw =NULL, LPCTSTR _pszChildDir = NULL)
         {
             param->type=ZIP7_PEDATA;
             param->pRenderFac = _pRenderFac;
@@ -40,4 +41,5 @@ namespace SOUI
             param->pszPsw     = _pszPsw;
         }
 
-}
+SNSEND
+#endif //_zip7resprovider_param_h

@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef _zipresprovider_param_h
+#define _zipresprovider_param_h
 
 SNSBEGIN
 
@@ -52,3 +53,5 @@ SNSBEGIN
 		param->pszPsw = _pszPsw;			
 	}
 SNSEND
+
+#endif

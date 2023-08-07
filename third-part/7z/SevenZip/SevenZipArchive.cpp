@@ -11,6 +11,7 @@ namespace SevenZip
 		, m_OverrideCompressionFormat(false)
 		, m_EncryptFileName(false)
 		, m_numberofitems(0)
+		, m_hData(NULL)
 	{
 		 
 	}
@@ -27,6 +28,15 @@ namespace SevenZip
         m_archivePath = archivePath;
         return true;
     }
+
+
+	bool SevenZipArchive::SetArchiveData(HGLOBAL hData,DWORD dwSize)
+	{
+		m_hData=hData;
+		m_dwDataSize = dwSize;
+		return true;
+	}
+
 
     void SevenZipArchive::SetCompressionFormat(const CompressionFormatEnum& format)
 	{

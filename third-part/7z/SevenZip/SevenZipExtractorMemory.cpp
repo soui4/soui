@@ -13,6 +13,150 @@ namespace SevenZip
 
     using namespace intl;
 
+
+	//////////////////////////////////////////////////////////////////////////
+
+	class CResStream : public IStream{
+	protected:
+		int m_nRef;
+		const BYTE * m_pBufPtr;
+		UINT		 m_szBuf;
+		UINT			 m_nPos;
+
+		CResStream(HGLOBAL hRes,DWORD dwSize):m_nRef(0){
+			m_pBufPtr = (const BYTE *)LockResource(hRes);
+			m_szBuf = dwSize;
+			m_nPos = 0;
+		}
+	public:
+		static IStream * CreateResStream(HGLOBAL hRes,DWORD dwSize){
+			return new CResStream(hRes,dwSize);
+		}
+	public:
+		virtual HRESULT STDMETHODCALLTYPE QueryInterface( 
+			/* [in] */ REFIID riid,
+			/* [iid_is][out] */ __RPC__deref_out void __RPC_FAR *__RPC_FAR *ppvObject) {
+				HRESULT hRet = S_OK;
+				if(riid == IID_IUnknown){
+					*ppvObject = this;
+					AddRef();
+				}else if(riid == IID_ISequentialInStream)
+				{
+					*ppvObject = this;
+					AddRef();
+				}else if(riid == IID_IStream){
+					*ppvObject = this;
+					AddRef();
+				}else{
+					hRet = E_NOINTERFACE;
+				}
+				return hRet;
+		}
+
+		virtual ULONG STDMETHODCALLTYPE AddRef( void){
+			return ++m_nRef;
+		}
+
+		virtual ULONG STDMETHODCALLTYPE Release( void){
+			if(--m_nRef==0){
+				delete this;
+			}
+			return m_nRef;
+		}
+
+
+		virtual /* [local] */ HRESULT STDMETHODCALLTYPE Read( 
+			/* [length_is][size_is][out] */ void *pv,
+			/* [in] */ ULONG cb,
+			/* [out] */ ULONG *pcbRead){
+				UINT remain = m_szBuf-m_nPos;
+				if(cb>remain) cb = remain;
+				memcpy(pv,m_pBufPtr+m_nPos,cb);
+				m_nPos+=cb;
+				if(pcbRead) *pcbRead = cb;
+				return S_OK;
+		}
+
+		virtual /* [local] */ HRESULT STDMETHODCALLTYPE Write( 
+			/* [size_is][in] */ const void *pv,
+			/* [in] */ ULONG cb,
+			/* [out] */ ULONG *pcbWritten){
+				return E_FAIL;
+		}
+
+
+		virtual /* [local] */ HRESULT STDMETHODCALLTYPE Seek( 
+			/* [in] */ LARGE_INTEGER dlibMove,
+			/* [in] */ DWORD dwOrigin,
+			/* [out] */ ULARGE_INTEGER *plibNewPosition){
+				switch(dwOrigin){
+					case STREAM_SEEK_SET:
+						m_nPos = dlibMove.QuadPart;
+						break;
+					case STREAM_SEEK_CUR:
+						m_nPos += dlibMove.QuadPart;
+						break;
+					case STREAM_SEEK_END:
+						m_nPos = m_szBuf+dlibMove.QuadPart;
+						break;
+				}
+				if(plibNewPosition){
+					plibNewPosition->QuadPart = m_nPos;
+				}
+				return S_OK;
+		}
+
+		virtual HRESULT STDMETHODCALLTYPE SetSize( 
+			/* [in] */ ULARGE_INTEGER libNewSize){
+				return E_FAIL;
+		}
+
+		virtual /* [local] */ HRESULT STDMETHODCALLTYPE CopyTo( 
+			/* [unique][in] */ IStream *pstm,
+			/* [in] */ ULARGE_INTEGER cb,
+			/* [out] */ ULARGE_INTEGER *pcbRead,
+			/* [out] */ ULARGE_INTEGER *pcbWritten){
+				return E_FAIL;
+		}
+		virtual HRESULT STDMETHODCALLTYPE Commit( 
+			/* [in] */ DWORD grfCommitFlags){
+				return E_FAIL;
+		}
+
+		virtual HRESULT STDMETHODCALLTYPE Revert( void) {
+			return E_FAIL;
+		}
+
+		virtual HRESULT STDMETHODCALLTYPE LockRegion( 
+			/* [in] */ ULARGE_INTEGER libOffset,
+			/* [in] */ ULARGE_INTEGER cb,
+			/* [in] */ DWORD dwLockType) {
+				return E_FAIL;
+		}
+
+		virtual HRESULT STDMETHODCALLTYPE UnlockRegion( 
+			/* [in] */ ULARGE_INTEGER libOffset,
+			/* [in] */ ULARGE_INTEGER cb,
+			/* [in] */ DWORD dwLockType) {
+				return E_FAIL;
+		}
+
+		virtual HRESULT STDMETHODCALLTYPE Stat( 
+			/* [out] */ __RPC__out STATSTG *pstatstg,
+			/* [in] */ DWORD grfStatFlag) {
+				pstatstg->cbSize.QuadPart = m_szBuf;
+				return S_OK;
+		}
+
+		virtual HRESULT STDMETHODCALLTYPE Clone( 
+			/* [out] */ __RPC__deref_out_opt IStream **ppstm) {
+				return E_FAIL;
+		}
+
+	};
+
+
+
     SevenZipExtractorMemory::SevenZipExtractorMemory()
         : SevenZipArchive()        
     {
@@ -26,8 +170,15 @@ namespace SevenZip
 	HRESULT SevenZipExtractorMemory::ExtractArchive(CFileStream &fileStreams, ProgressCallback* callback, SevenZipPassword *pSevenZipPassword)
     {
         DetectCompressionFormat();
-        CMyComPtr< IStream > fileStream = FileSys::OpenFileToRead(m_archivePath);
-
+		
+        CMyComPtr< IStream > fileStream;
+		if(m_hData)
+		{
+			fileStream = CResStream::CreateResStream(m_hData,m_dwDataSize);
+		}
+		else{
+			fileStream = FileSys::OpenFileToRead(m_archivePath);
+		}
         if (fileStream == NULL)
         {
             LPVOID msgBuf;

@@ -45,21 +45,16 @@ protected:
 //	ZIP Archive class, load files from a zip archive
 class CZipArchive
 {
-protected: 
-	CZipFile		m_fileRes;	
-	char			m_szPassword[64];
 public:
 	CZipArchive();
 	~CZipArchive();
 
 	BOOL Open(LPCTSTR pszFileName, LPCSTR pszPassword);
-	BOOL Open(HMODULE hModule, LPCTSTR pszName, LPCTSTR pszPassword, LPCTSTR pszType = _T("ZIP"));
+	BOOL Open(HMODULE hModule, LPCTSTR pszName, LPCSTR pszPassword, LPCTSTR pszType = _T("7Z"));
 
 	void Close();
 	BOOL IsOpen() const;
-	
-	BOOL SetPassword(LPCSTR pstrPassword);
-	 
+		 
 	BOOL GetFile(LPCTSTR pszFileName, CZipFile& file); 
 	DWORD GetFileSize(LPCTSTR pszFileName);
 	BOOL IsFileExist( LPCTSTR pszFileName );
@@ -71,7 +66,6 @@ public:
 
 	std::string GetFileName(unsigned int pos);
 protected:
-	BOOL OpenZip();
 	void CloseFile();
 
 	DWORD ReadFile(void* pBuffer, DWORD dwBytes);
