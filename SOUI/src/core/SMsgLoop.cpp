@@ -46,23 +46,23 @@ void SMessageLoop::Quit()
 
 int SMessageLoop::Run()
 {
-    BOOL bRet;
     m_bRunning = TRUE;
     m_bDoIdle = TRUE;
     m_nIdleCount = 0;
     m_tid = GetCurrentThreadId();
     m_bQuit = FALSE;
+	int nRet = 0;
     do
     {
-        bRet = WaitMsg();
+        BOOL bGetMsg = WaitMsg();
         if (m_bQuit)
             break;
-        if (!bRet)
+        if (!bGetMsg)
         {
             SSLOGD() << "WaitMsg returned FALSE (error)";
             continue; // error, don't process
         }
-        HandleMsg();
+        nRet = HandleMsg();
     } while (!m_bQuit);
 
     {
@@ -76,7 +76,7 @@ int SMessageLoop::Run()
         m_runnables.RemoveAll();
     }
     m_bRunning = FALSE;
-    return (int)m_msg.wParam;
+    return nRet;
 }
 
 BOOL SMessageLoop::OnIdle(int nIdleCount)
@@ -241,9 +241,9 @@ BOOL SMessageLoop::WaitMsg(THIS)
     return ::WaitMessage();
 }
 
-void SMessageLoop::HandleMsg(THIS)
+int SMessageLoop::HandleMsg(THIS)
 {
-    MSG msg;
+	MSG msg={0};
     while (PeekMsg(&msg, 0, 0, TRUE))
     {
         if (msg.message == WM_QUIT)
@@ -259,6 +259,7 @@ void SMessageLoop::HandleMsg(THIS)
             m_nIdleCount = 0;
         }
     }
+	return (int)msg.wParam;
 }
 
 SNSEND

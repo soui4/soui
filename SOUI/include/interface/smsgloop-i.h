@@ -73,7 +73,7 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
 
     STDMETHOD_(BOOL, WaitMsg)(THIS) PURE;
 
-    STDMETHOD_(void, HandleMsg)(THIS) PURE;
+    STDMETHOD_(int, HandleMsg)(THIS) PURE;
 };
 
 #undef INTERFACE

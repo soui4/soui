@@ -45,7 +45,7 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
     STDMETHOD_(BOOL, WaitMsg)(THIS) OVERRIDE;
 
-    STDMETHOD_(void, HandleMsg)(THIS) OVERRIDE;
+    STDMETHOD_(int, HandleMsg)(THIS) OVERRIDE;
 
   public:
     static BOOL IsIdleMessage(MSG *pMsg);
@@ -53,7 +53,6 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
   protected:
     SArray<IMsgFilter *> m_aMsgFilter;
     SArray<IIdleHandler *> m_aIdleHandler;
-    MSG m_msg;
 
     BOOL m_bRunning;
     BOOL m_bQuit;
