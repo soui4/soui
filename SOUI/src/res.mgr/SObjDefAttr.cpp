@@ -8,6 +8,9 @@ BOOL SObjDefAttr::Init(SXmlNode xmlNode)
 {
     if (!xmlNode)
         return FALSE;
+	//clear old data
+	RemoveAll();
+	m_xmlRoot.root().RemoveAllChilden();
 
     m_xmlRoot.root().append_copy(xmlNode);
 

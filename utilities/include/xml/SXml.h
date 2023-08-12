@@ -166,7 +166,7 @@ public:
 	STDMETHOD_(BOOL, RemoveChild)(THIS_ const wchar_t* name) OVERRIDE{
 		return !!remove_child(name);
 	}
-	STDMETHOD_(BOOL, RemoveAllChilden)(THIS_ const wchar_t* name) OVERRIDE{
+	STDMETHOD_(BOOL, RemoveAllChilden)(THIS) OVERRIDE{
 		return !!remove_children();
 	}
 public:

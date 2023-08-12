@@ -124,7 +124,7 @@ DECLARE_INTERFACE_(IXmlNode,IObjRef)
 
 	STDMETHOD_(BOOL, RemoveAttribute)(THIS_ const wchar_t* name) PURE;
 	STDMETHOD_(BOOL, RemoveChild)(THIS_ const wchar_t* name) PURE;
-	STDMETHOD_(BOOL, RemoveAllChilden)(THIS_ const wchar_t* name) PURE;
+	STDMETHOD_(BOOL, RemoveAllChilden)(THIS) PURE;
 };
 
 typedef enum _XmlStatus

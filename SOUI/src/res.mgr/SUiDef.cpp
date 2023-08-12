@@ -36,6 +36,43 @@ static SXmlNode GetSourceXmlNode(SXmlNode nodeRoot, SXmlDoc &docInit, IResProvid
     return nodeData;
 }
 
+
+class SUiDefInfo : public TObjRefImpl<IUiDefInfo> {
+	friend class SUiDef;
+private:
+	SUiDefInfo()
+	{
+	}
+
+public:
+	UINT Init(IResProvider *pResProvide, LPCTSTR pszUidef) override;
+	UINT Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResProvider = NULL) override;
+	SSkinPool *GetSkinPool() override;
+	SStylePool *GetStylePool() override;
+	STemplatePool *GetTemplatePool() override;
+	SObjDefAttr *GetObjDefAttr() override;
+	SNamedColor &GetNamedColor() override;
+	SNamedString &GetNamedString() override;
+	SNamedDimension &GetNamedDimension() override;
+	SNamedFont &GetNamedFont() override;
+	SStringW GetDefFontInfo() override;
+	SXmlNode GetCaretInfo() override;
+
+protected:
+	SAutoRefPtr<SSkinPool> pSkinPool;
+	SAutoRefPtr<SStylePool> pStylePool;
+	SAutoRefPtr<SObjDefAttr> objDefAttr;
+	SAutoRefPtr<STemplatePool> templatePool;
+
+	SNamedColor namedColor;
+	SNamedString namedString;
+	SNamedDimension namedDim;
+	SNamedFont namedFont;
+
+	SStringW defFontInfo;
+	SXmlDoc xmlCaret;
+};
+
 UINT SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
 {
     UINT bRet = 0;
@@ -73,14 +110,14 @@ UINT SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
             }
             else
             {
-                bRet = Init(&root, TRUE, pResProvider);
+                bRet = Init2(&root, TRUE, pResProvider);
             }
         }
     }
     return bRet;
 }
 
-UINT SUiDefInfo::Init(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResProvider)
+UINT SUiDefInfo::Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResProvider)
 {
     UINT uRet = 0;
     GETUIDEF->PushUiDefInfo(this); // make it possible for a uidef element to ref other uidef element in the same package.
@@ -276,7 +313,7 @@ STemplatePool *SUiDefInfo::GetTemplatePool()
 SUiDef::SUiDef(void)
 {
     SAutoLock autolock(m_cs);
-    IUiDefInfo *emptyUiInfo = new SUiDefInfo();
+	IUiDefInfo *emptyUiInfo = CreateUiDefInfo();
     SetUiDef(emptyUiInfo, false); // set empty uiinfo
     emptyUiInfo->Release();
 
@@ -312,7 +349,7 @@ SUiDef::~SUiDef(void)
 
 BOOL SUiDef::InitDefUiDef(IResProvider *pResProvider, LPCTSTR pszUiDef)
 {
-    SUiDefInfo *pRet = new SUiDefInfo();
+	IUiDefInfo *pRet = CreateUiDefInfo();
     UINT uRet = pRet->Init(pResProvider, pszUiDef);
     if (uRet == 0)
     {
@@ -360,12 +397,20 @@ void SUiDef::PushUiDefInfo(IUiDefInfo *pUiDefInfo)
 BOOL SUiDef::PopUiDefInfo(IUiDefInfo *pUiDefInfo)
 {
     SAutoLock autolock(m_cs);
-    SPOSITION pos = m_lstUiDefInfo.Find(pUiDefInfo);
-    if (!pos)
-        return FALSE;
-    m_lstUiDefInfo.RemoveAt(pos);
-    pUiDefInfo->Release();
-    return TRUE;
+	if(!pUiDefInfo){
+		if(m_lstUiDefInfo.IsEmpty())
+			return FALSE;
+		pUiDefInfo = m_lstUiDefInfo.RemoveTail();
+		pUiDefInfo->Release();
+		return TRUE;
+	}else{
+		SPOSITION pos = m_lstUiDefInfo.Find(pUiDefInfo);
+		if (!pos)
+			return FALSE;
+		m_lstUiDefInfo.RemoveAt(pos);
+		pUiDefInfo->Release();
+		return TRUE;
+	}
 }
 
 void SUiDef::PushSkinPool(SSkinPool *pSkinPool)
@@ -558,5 +603,11 @@ SStringW SUiDef::GetFontDesc(int idx)
     SAutoLock autolock(m_cs);
     return GetUiDef()->GetNamedFont().Get(idx);
 }
+
+IUiDefInfo * SUiDef::CreateUiDefInfo()
+{
+	return new SUiDefInfo();
+}
+
 
 SNSEND

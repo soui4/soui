@@ -94,13 +94,11 @@ class SOUI_EXP SFontPool : public SSingletonMap<SFontPool, IFontPtr, FontInfo> {
     IFontPtr GetFont(const SStringW &strFont, int scale);
 
     void SetDefFontInfo(const SStringW &strFontInfo);
-
+	const FontInfo &GetDefFontInfo() const;
   public:
     static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo &defFontInfo);
     static SStringW FontInfoToString(const FontInfo &fi);
-
   protected:
-    const FontInfo &GetDefFontInfo() const;
 
     static void OnKeyRemoved(const IFontPtr &obj);
 

@@ -400,8 +400,8 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
         m_privateUiDefInfo = NULL;
     }
-    SUiDefInfo *pUiDefInfo = new SUiDefInfo;
-    if (pUiDefInfo->Init(pNode, FALSE))
+	IUiDefInfo *pUiDefInfo = SUiDef::CreateUiDefInfo();
+    if (pUiDefInfo->Init2(pNode, FALSE))
     { // init private uidef info.
         m_privateUiDefInfo = pUiDefInfo;
         GETUIDEF->PushUiDefInfo(pUiDefInfo);
