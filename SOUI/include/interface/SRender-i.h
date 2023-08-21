@@ -1413,6 +1413,9 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     (THIS_ LPCRECT pRect, BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, DrawGradientRectEx)
     (THIS_ LPCRECT pRect, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    STDMETHOD_(HRESULT, DrawGradientPath)
+    (THIS_ const IPathS* path, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    
     STDMETHOD_(HRESULT, DrawIconEx)
     (THIS_ int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT diFlags) PURE;
     STDMETHOD_(HRESULT, DrawBitmap)

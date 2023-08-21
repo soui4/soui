@@ -1237,6 +1237,44 @@ namespace SOUI
 		return S_OK;
 	}
 
+	HRESULT SRenderTarget_Skia::DrawGradientPath(THIS_ const IPathS* path, const GradientItem *pGradients, int nCount, const GradientInfo *info,BYTE byAlpha)
+	{
+		RECT rc={0};
+		path->getBounds(&rc);
+		SkRect skrc = toSkRect(&rc);
+		skrc.offset(m_ptOrg);
+		SkShader *pShader = CreateShader(skrc,info,pGradients,nCount,byAlpha,SkShader::kClamp_TileMode);
+		if(!pShader)
+		{
+			return E_INVALIDARG;
+		}
+
+		const SPath_Skia * path2 = (const SPath_Skia *)path;
+		SkPaint paint=m_paint;
+
+		SLineDashEffect skDash(m_curPen->GetStyle());
+		paint.setPathEffect(skDash.Get());
+		SStrokeCap strokeCap(m_curPen->GetStyle());
+		paint.setStrokeCap(strokeCap.Get());
+		SStrokeJoin strokeJoin(m_curPen->GetStyle());
+		paint.setStrokeJoin(strokeJoin.Get());
+		paint.setStyle(SkPaint::kStroke_Style);
+		if(m_bAntiAlias)
+		{
+			paint.setStrokeWidth((SkScalar)m_curPen->GetWidth()-0.5f);
+		}else
+		{
+			paint.setStrokeWidth((SkScalar)m_curPen->GetWidth());
+		}
+		paint.setShader(pShader)->unref();
+
+		SkPath skPath;
+		path2->m_skPath.offset(m_ptOrg.fX,m_ptOrg.fY,&skPath);
+		m_SkCanvas->drawPath(skPath,paint);
+
+		return S_OK;
+	}
+
 	HRESULT SRenderTarget_Skia::DrawGradientRect(THIS_ LPCRECT pRect,  BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha){
 		GradientInfo info={linear,{bVert?90.0f:0.0f}};
 		return DrawGradientRectEx(pRect,ptRoundCorner,pGradients,nCount,&info,byAlpha);

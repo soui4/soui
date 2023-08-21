@@ -1484,6 +1484,12 @@ namespace SOUI
 			return E_NOTIMPL;
 	}
 
+
+	HRESULT SRenderTarget_GDI::DrawGradientPath(THIS_ const IPathS* path, const GradientItem *pGradients, int nCount,const GradientInfo *info, BYTE byAlpha)
+	{
+		return E_NOTIMPL;
+	}
+
 	HRESULT SRenderTarget_GDI::CreateRegion(IRegionS ** ppRegion)
 	{
 		return m_pRenderFactory->CreateRegion(ppRegion)?S_OK:E_OUTOFMEMORY;
