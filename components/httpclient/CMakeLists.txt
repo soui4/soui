@@ -33,6 +33,7 @@ else()
     add_library(httpclient STATIC ${srcs} ${headers})
 endif()
 
+set(COM_LIBS ${COM_LIBS} httpclient CACHE INTERNAL "com_lib")
 set_target_properties (httpclient PROPERTIES
     FOLDER components
 )

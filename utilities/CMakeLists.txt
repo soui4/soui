@@ -24,3 +24,4 @@ else()
 endif()
 
 set(CORE_LIBS ${CORE_LIBS} utilities4)
+set(CORE_LIBS ${CORE_LIBS} utilities4 CACHE INTERNAL "core_lib")

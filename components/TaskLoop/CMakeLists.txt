@@ -29,7 +29,7 @@ else()
     add_library(TaskLoop STATIC ${TaskLoop_src} ${TaskLoop_header})
 endif()
 
-set(COM_LIBS ${COM_LIBS} TaskLoop)
+set(COM_LIBS ${COM_LIBS} TaskLoop CACHE INTERNAL "com_lib")
 set_target_properties (TaskLoop PROPERTIES
     FOLDER components
 )

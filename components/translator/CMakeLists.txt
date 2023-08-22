@@ -29,7 +29,7 @@ else()
     add_library(translator STATIC ${translator_src} ${translator_header})
 endif()
 
-set(COM_LIBS ${COM_LIBS} translator)
+set(COM_LIBS ${COM_LIBS} translator CACHE INTERNAL "com_lib")
 set_target_properties (translator PROPERTIES
     FOLDER components
 )

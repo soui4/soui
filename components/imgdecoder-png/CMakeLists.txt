@@ -41,7 +41,7 @@ target_include_directories(imgdecoder-png
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/zlib
 )
 
-set(COM_LIBS ${COM_LIBS} imgdecoder-png)
+set(COM_LIBS ${COM_LIBS} imgdecoder-png CACHE INTERNAL "com_lib")
 set_target_properties (imgdecoder-png PROPERTIES
     FOLDER components/imgdecoder
 )

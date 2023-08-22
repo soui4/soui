@@ -28,7 +28,7 @@ else()
     add_library(resprovider-zip STATIC ${resprovider-zip_src} ${resprovider-zip_header})
 endif()
 
-set(COM_LIBS ${COM_LIBS} resprovider-zip )
+set(COM_LIBS ${COM_LIBS} resprovider-zip CACHE INTERNAL "com_lib")
 set_target_properties (resprovider-zip PROPERTIES
     FOLDER components
 )

@@ -37,3 +37,4 @@ target_include_directories(soui4
 target_link_libraries(soui4 utilities4)
 
 target_precompile_headers(soui4 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/souistd.h")
+set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")

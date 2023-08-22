@@ -29,6 +29,9 @@ else()
     add_library(render-skia STATIC ${render-skia_src} ${render-skia_header})
 endif()
 
+target_compile_definitions(render-skia
+  PUBLIC SOUI_RENDER_USE_SKIA
+)
 target_include_directories(render-skia
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE ${PROJECT_SOURCE_DIR}/config
@@ -41,7 +44,7 @@ target_include_directories(render-skia
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/src/core
 )
 
-set(COM_LIBS ${COM_LIBS} render-skia)
+set(COM_LIBS ${COM_LIBS} render-skia CACHE INTERNAL "com_lib")
 set_target_properties (render-skia PROPERTIES
     FOLDER components/render
 )

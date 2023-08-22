@@ -63,7 +63,7 @@ endif()
 
 if (NOT ENABLE_SOUI_CORE_LIB)
 	message(STATUS "[DLL_CORE] ScriptModule-Lua: ON")
-    set(COM_LIBS ${COM_LIBS} ScriptModule-Lua)
+    set(COM_LIBS ${COM_LIBS} ScriptModule-Lua CACHE INTERNAL "com_lib")
 else()
 	message(STATUS "[LIB_CORE] ScriptModule-Lua: OFF")
 endif()

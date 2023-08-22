@@ -31,6 +31,7 @@ else()
     add_library(SIpcObject STATIC ${SIpcObject_src} ${SIpcObject_header})
 endif()
 
+set(COM_LIBS ${COM_LIBS} SIpcObject CACHE INTERNAL "com_lib")
 set_target_properties (SIpcObject PROPERTIES
     FOLDER components
 )
