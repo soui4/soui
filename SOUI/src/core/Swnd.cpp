@@ -1159,6 +1159,7 @@ void SWindow::_RedrawNonClient()
     CRect rcClient = SWindow::GetClientRect();
     if (rcWnd == rcClient)
         return;
+	Update();
     InvalidateRect(rcWnd, TRUE, FALSE);   // invalid window rect
     InvalidateRect(rcClient, TRUE, TRUE); // but clip client rect
 }
