@@ -1086,10 +1086,12 @@ BOOL SHostWnd::IsSendWheel2Hover() const
     return m_hostAttr.m_bSendWheel2Hover;
 }
 
-BOOL SHostWnd::UpdateWindow()
+BOOL SHostWnd::UpdateWindow(BOOL bForce)
 {
     if (m_bResizing)
         return FALSE;
+	if(!m_bNeedRepaint && !bForce)
+		return FALSE;
     if (m_dummyWnd)
         ::UpdateWindow(m_dummyWnd->m_hWnd);
     else

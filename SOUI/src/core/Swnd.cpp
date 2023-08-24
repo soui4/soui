@@ -1412,11 +1412,11 @@ void SWindow::RedrawRegion(IRenderTarget *pRT, IRegionS *pRgn)
     DispatchPaint(pRT, pRgn, (UINT)ZORDER_MIN, (UINT)ZORDER_MAX);
 }
 
-void SWindow::Update()
+void SWindow::Update(BOOL bForce)
 {
     if (!GetContainer())
         return;
-    GetContainer()->UpdateWindow();
+    GetContainer()->UpdateWindow(bForce);
 }
 
 void SWindow::Invalidate()

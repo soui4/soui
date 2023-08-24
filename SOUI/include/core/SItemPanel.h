@@ -120,7 +120,7 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(BOOL, IsTranslucent)() const OVERRIDE;
     STDMETHOD_(BOOL, IsSendWheel2Hover)() const OVERRIDE;
 
-    STDMETHOD_(BOOL, UpdateWindow)() OVERRIDE;
+    STDMETHOD_(BOOL, UpdateWindow)(BOOL bForce) OVERRIDE;
 
     STDMETHOD_(void, UpdateTooltip)() OVERRIDE;
 

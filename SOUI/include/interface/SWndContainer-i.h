@@ -194,9 +194,10 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
 
     /**
      * @brief 请求立即更新窗口
+	 * @param BOOL bForce, TRUE-强制刷新，FALSE-有invalid region才刷新
      * @return TRUE--成功
      */
-    STDMETHOD_(BOOL, UpdateWindow)(THIS) PURE;
+    STDMETHOD_(BOOL, UpdateWindow)(THIS_ BOOL bForce) PURE;
 
     /**
      * @brief 请求更新tooltip

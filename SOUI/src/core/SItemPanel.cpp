@@ -211,9 +211,9 @@ BOOL SOsrPanel::IsSendWheel2Hover() const
     return m_pHostProxy->GetHostContainer()->IsSendWheel2Hover();
 }
 
-BOOL SOsrPanel::UpdateWindow()
+BOOL SOsrPanel::UpdateWindow(BOOL bForce)
 {
-    return m_pHostProxy->GetHostContainer()->UpdateWindow();
+    return m_pHostProxy->GetHostContainer()->UpdateWindow(bForce);
 }
 
 void SOsrPanel::UpdateTooltip()
