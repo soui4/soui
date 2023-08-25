@@ -772,11 +772,6 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 
 void SHostWnd::OnDestroy()
 {
-    if (m_privateUiDefInfo)
-    {
-        GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
-        m_privateUiDefInfo = NULL;
-    }
     m_presenter->OnHostDestroy();
     m_presenter = NULL;
     EventExit evt(GetRoot());
@@ -798,6 +793,12 @@ void SHostWnd::OnDestroy()
             GetMsgLoop()->RemoveIdleHandler(pIdleHandler);
         m_pScriptModule = NULL;
     }
+	if (m_privateUiDefInfo)
+	{
+		GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
+		m_privateUiDefInfo = NULL;
+	}
+
     m_memRT = NULL;
     m_rgnInvalidate = NULL;
 
