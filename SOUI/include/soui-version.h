@@ -8,6 +8,6 @@
  */
 
 #define SOUI_VER1 4
-#define SOUI_VER2 5
-#define SOUI_VER3 4
-#define SOUI_VER4 3
+#define SOUI_VER2 6
+#define SOUI_VER3 0
+#define SOUI_VER4 0

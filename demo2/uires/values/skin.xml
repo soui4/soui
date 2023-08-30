@@ -15,4 +15,5 @@
   <colorrect name="TrayMenu_menu_bkgnd" hover="#cccccc" />
   <colorrect name="TrayMenu_menu_sep" normal="#cccccc" />
   <imgframe name="TrayMenu_border" src="ImgTrayMenu:png_menu_border" margin="2,2,2,2" />
+  <imgframe name="skin_item_bk" src="img:png_item_bk" states="3" margin="2,2,2,2"/>
 </skin>

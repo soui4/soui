@@ -82,7 +82,7 @@ void SWkeWebkit::OnPaint(IRenderTarget *pRT)
                m_pWebView->getViewDC(), rcInvalid.left - rcClient.left,
                rcInvalid.top - rcClient.top, SRCCOPY);
     }
-    pRT->ReleaseDC(hdc);
+    pRT->ReleaseDC(hdc,&rcInvalid);
 }
 
 void SWkeWebkit::OnSize(UINT nType, CSize size)

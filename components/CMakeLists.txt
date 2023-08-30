@@ -9,6 +9,7 @@ add_subdirectory(imgdecoder-wic)
 
 add_subdirectory(render-gdi)
 add_subdirectory(render-skia)
+add_subdirectory(render-d2d)
 add_subdirectory(resprovider-zip)
 
 add_subdirectory(translator)

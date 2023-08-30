@@ -32,6 +32,8 @@ namespace SOUI{
 			MSG_WM_PAINT_EX(OnPaint)
 		SOUI_MSG_MAP_END()
 	protected:
+		void updatePath();
+
 		int m_nLineWidth;
 		int m_nLineStyle;
 		COLORREF m_crLine;
@@ -40,7 +42,6 @@ namespace SOUI{
 
 		SArray<POINT> m_lstPoints;
 		SAutoRefPtr<IPathS> m_path;
-		SAutoRefPtr<IPathMeasure> m_pathMeasure;
 	};
 
 

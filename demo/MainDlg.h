@@ -24,7 +24,7 @@ using namespace SOUI;
 
 extern UINT g_dwSkinChangeMessage;
 //演示使用SNotifyCenter的异步事件
-DEF_EVT_EXT(EventThread,EVT_EXTERNAL_BEGIN + 301,{
+DEF_EVT_EXT(EventThread,EVT_EXTERNAL_BEGIN + 30000,{
 int nData;
 });
 

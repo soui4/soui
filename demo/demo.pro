@@ -106,6 +106,7 @@ HEADERS += MainDlg.h \
           qrcode/SQrCtrl.h \
           qrcode/QR_Encode.h \
           SPathView.h \
+          FpsWnd.h \
 
 SOURCES += demo.cpp \
           MainDlg.cpp \
@@ -168,6 +169,7 @@ SOURCES += demo.cpp \
           qrcode/SQrCtrl.cpp \
           qrcode/QR_Encode.cpp \
           SPathView.cpp \
+          FpsWnd.cpp \
 
 RC_FILE += demo.rc
 

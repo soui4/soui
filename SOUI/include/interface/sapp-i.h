@@ -217,6 +217,16 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      */
     STDMETHOD_(IRenderFactory *, GetRenderFactory)(THIS) PURE;
 
+	/**
+     * SetRenderFactory
+     * @brief    设置渲染模块
+	 * @param IRenderFactory * renderFac 渲染模块指针
+     * @return   TRUE-成功
+     *
+     * Describe 只在IApp初始化时调用，renderFac不支持动态切换
+     */
+	STDMETHOD_(BOOL, SetRenderFactory)(THIS_ IRenderFactory * renderFac) PURE;
+
     /**
      * SetScriptModule
      * @brief    设置SOUI中使用的脚本模块类厂

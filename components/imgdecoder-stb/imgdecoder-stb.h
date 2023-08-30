@@ -57,7 +57,8 @@ SNSBEGIN
         ~SImgDecoderFactory_STB();
         
 		STDMETHOD_(BOOL,CreateImgX)(THIS_ IImgX **ppImgDecoder) OVERRIDE;
-		STDMETHOD_(HRESULT,SaveImage)(THIS_ BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, LPVOID pFormat) SCONST OVERRIDE;
+		STDMETHOD_(HRESULT,SaveImage)(THIS_ BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, const void* pFormat) SCONST OVERRIDE;
+		STDMETHOD_(HRESULT,SaveImage2)(THIS_ BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, ImgFmt imgFmt) SCONST OVERRIDE;
 		STDMETHOD_(LPCWSTR,GetDescription)(THIS) SCONST OVERRIDE;
     };
     

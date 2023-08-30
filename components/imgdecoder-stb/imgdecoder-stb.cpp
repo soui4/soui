@@ -149,11 +149,15 @@ namespace SOUI
         return DESC_IMGDECODER;
     }
 
-	HRESULT SImgDecoderFactory_STB::SaveImage(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, LPVOID pFormat) SCONST
+	HRESULT SImgDecoderFactory_STB::SaveImage(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, const void * pFormat) SCONST
 	{
 		return E_NOTIMPL;
 	}
 
+	HRESULT SImgDecoderFactory_STB::SaveImage2(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
+	{
+		return E_NOTIMPL;
+	}
 
     //////////////////////////////////////////////////////////////////////////
     BOOL IMGDECODOR_STB::SCreateInstance( IObjRef **pImgDecoderFactory )

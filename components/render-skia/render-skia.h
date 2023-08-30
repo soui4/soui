@@ -27,6 +27,8 @@ public:
 	STDMETHOD_(void,SetImgDecoderFactory)(THIS_ IImgDecoderFactory *pImgDecoderFac) OVERRIDE;
 	STDMETHOD_(BOOL,CreateRenderTarget)(THIS_ IRenderTarget ** ppRenderTarget,int nWid,int nHei) OVERRIDE;
 
+	STDMETHOD_(BOOL,CreateRenderTarget2)(THIS_ IRenderTarget ** ppRenderTarget,HWND hWnd) OVERRIDE;
+
 	STDMETHOD_(BOOL,CreateFont)(THIS_ IFontS ** ppFont, const LOGFONT *lf) OVERRIDE;
 
 	STDMETHOD_(BOOL,CreateBitmap)(THIS_ IBitmapS ** ppBitmap) OVERRIDE;
@@ -36,8 +38,6 @@ public:
 	STDMETHOD_(BOOL,CreatePath)(THIS_ IPathS ** ppPath) OVERRIDE;
 
 	STDMETHOD_(BOOL,CreatePathEffect)(THIS_ REFGUID guidEffect,IPathEffect ** ppPathEffect) OVERRIDE;
-
-	STDMETHOD_(BOOL,CreatePathMeasure)(THIS_ IPathMeasure ** ppPathMeasure) OVERRIDE;
 
 	STDMETHOD_(HRESULT,CreateBlurMaskFilter)(THIS_ float radius, BlurStyle style,BlurFlags flag,IMaskFilter ** ppMaskFilter) OVERRIDE;
 
@@ -206,6 +206,7 @@ public:
 	STDMETHOD_(HRESULT,Scale2)(THIS_ IBitmapS **pOutput,int nWid,int nHei,FilterLevel filterLevel) SCONST OVERRIDE;
 
 	STDMETHOD_(HRESULT,Save)(THIS_ LPCWSTR pszFileName,const LPVOID pFormat) SCONST OVERRIDE;
+	STDMETHOD_(HRESULT, Save2)(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST OVERRIDE;
 
 public:
 	const SkBitmap & GetSkBitmap() const{return m_bitmap;}
@@ -249,8 +250,6 @@ public:
 	STDMETHOD_(void,Offset)(THIS_ POINT pt) OVERRIDE;
 
 	STDMETHOD_(void,Clear)(THIS) OVERRIDE;
-
-	STDMETHOD_(BOOL,IsEqual)(THIS_ const IRegionS * testRgn) SCONST OVERRIDE;
 protected:
 	SkRegion GetRegion() const;
 
@@ -261,25 +260,6 @@ protected:
 
 protected:
 	SkRegion    m_rgn;
-};
-
-
-//////////////////////////////////////////////////////////////////////////
-//	SPath_Skia
-
-class SPathInfo_Skia : public TObjRefImpl<IPathInfo>
-{
-public:
-	SPathInfo_Skia(int points);
-	~SPathInfo_Skia();
-public:
-	STDMETHOD_(int,pointNumber)(THIS) SCONST OVERRIDE;
-	STDMETHOD_(const float *,data)(THIS) SCONST OVERRIDE;
-public:
-	float * buffer();
-private:
-	int mPoints;
-	float * mData;
 };
 
 class SPath_Skia: public TSkiaRenderObjImpl<IPathS,OT_PATH>
@@ -294,39 +274,9 @@ public:
 
 	STDMETHOD_(void,setFillType)(THIS_ FillType ft) OVERRIDE;
 
-	STDMETHOD_(BOOL,isInverseFillType)(THIS) SCONST OVERRIDE;
-
-	STDMETHOD_(void,toggleInverseFillType)(THIS) OVERRIDE;
-
-	STDMETHOD_(Convexity,getConvexity)(THIS) SCONST OVERRIDE;
-
-	STDMETHOD_(void,setConvexity)(THIS_ Convexity c) OVERRIDE;
-
-	STDMETHOD_(BOOL,isConvex)(THIS) SCONST OVERRIDE;
-
-	STDMETHOD_(BOOL,isOval)(THIS_ RECT* rect) SCONST OVERRIDE;
-
 	STDMETHOD_(void,reset)(THIS) OVERRIDE;
 
-	STDMETHOD_(void,rewind)(THIS) OVERRIDE;
-
 	STDMETHOD_(BOOL,isEmpty)(THIS) SCONST OVERRIDE;
-
-	STDMETHOD_(BOOL,isFinite)(THIS) SCONST OVERRIDE;
-
-	STDMETHOD_(BOOL,isLine)(THIS_ POINT line[2]) SCONST OVERRIDE;
-
-	STDMETHOD_(BOOL,isRect)(THIS_ RECT* rect) SCONST OVERRIDE;
-
-	STDMETHOD_(int,countPoints)(THIS_ ) SCONST OVERRIDE;
-
-	STDMETHOD_(fPoint,getPoint)(THIS_ int index) SCONST OVERRIDE;
-
-	STDMETHOD_(int,getPoints)(THIS_ fPoint points[], int max) SCONST OVERRIDE;
-
-	STDMETHOD_(int,countVerbs)(THIS) SCONST OVERRIDE;
-
-	STDMETHOD_(int,getVerbs)(THIS_ BYTE verbs[], int max) SCONST OVERRIDE;
 
 	STDMETHOD_(void,getBounds)(CTHIS_ LPRECT prc) SCONST OVERRIDE;
 
@@ -353,16 +303,6 @@ public:
 	STDMETHOD_(void,rCubicTo)(THIS_ float x1, float y1, float x2, float y2,
 		float x3, float y3) OVERRIDE;
 
-	STDMETHOD_(void,arcTo)(THIS_ const RECT* oval, float startAngle, float sweepAngle,
-		BOOL forceMoveTo) OVERRIDE;
-
-	STDMETHOD_(void,arcTo2)(THIS_ float x1, float y1, float x2, float y2,
-		float radius) OVERRIDE;
-
-	STDMETHOD_(void,close)(THIS) OVERRIDE;
-
-	STDMETHOD_(BOOL,isRect2)(THIS_ BOOL* isClosed, Direction* direction) SCONST OVERRIDE;
-
 	STDMETHOD_(void,addRect)(THIS_ const RECT* rect, Direction dir /*= kCW_Direction*/) OVERRIDE;
 
 	STDMETHOD_(void,addRect2)(THIS_ float left, float top, float right, float bottom,
@@ -370,37 +310,54 @@ public:
 
 	STDMETHOD_(void,addOval)(THIS_ const RECT * oval, Direction dir/*= kCW_Direction*/) OVERRIDE;
 
+	STDMETHOD_(void,addOval2)(THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction)) OVERRIDE;
+
 	STDMETHOD_(void,addCircle)(THIS_ float x, float y, float radius,
 		Direction dir /*= kCW_Direction*/) OVERRIDE;
 
 	STDMETHOD_(void,addArc)(THIS_ const RECT* oval, float startAngle, float sweepAngle) OVERRIDE;
 
+	STDMETHOD_(void,addArc2)(THIS_ float left, float top, float right, float bottom,float startAngle, float sweepAngle) OVERRIDE;
+
 	STDMETHOD_(void,addRoundRect)(THIS_ const RECT* rect, float rx, float ry,
 		Direction dir/* = kCW_Direction*/) OVERRIDE;
 
-	STDMETHOD_(void,addRoundRect2)(THIS_ const RECT* rect, const float radii[],
+	STDMETHOD_(void,addRoundRect2)(THIS_ float left, float top,float right,float bottom, float rx,float ry,
 		Direction dir/* = kCW_Direction*/) OVERRIDE;
 
 	STDMETHOD_(void,addPoly)(THIS_ const POINT pts[], int count, BOOL close) OVERRIDE;
-
-	STDMETHOD_(void,addPath)(THIS_ const IPathS * src, float dx, float dy,
-		AddPathMode mode /*= kAppend_AddPathMode*/) OVERRIDE;
-
-	STDMETHOD_(void,reverseAddPath)(THIS_ const IPathS* src) OVERRIDE;
 
 	STDMETHOD_(void,offset)(THIS_ float dx, float dy) OVERRIDE;
 
 	STDMETHOD_(void,transform)(THIS_ const IxForm * matrix) OVERRIDE;
 
-	STDMETHOD_(BOOL,getLastPt)(THIS_ POINT* lastPt) SCONST OVERRIDE;
-
-	STDMETHOD_(void,setLastPt)(THIS_ float x, float y) OVERRIDE;
+	STDMETHOD_(BOOL,getLastPt)(THIS_ fPoint* lastPt) SCONST OVERRIDE;
 
 	STDMETHOD_(void,addString)(THIS_ LPCTSTR pszText,int nLen, float x,float y, const IFontS *pFont) OVERRIDE;
 
-	STDMETHOD_(IPathInfo*, approximate)(THIS_ float acceptableError) OVERRIDE;
-
 	STDMETHOD_(IPathS *, clone)(CTHIS) SCONST OVERRIDE;
+
+	STDMETHOD_(BOOL,beginFigure)(THIS_ float x,float y,BOOL bFill)OVERRIDE {
+		moveTo(x,y);
+		return TRUE;
+	}
+
+	STDMETHOD_(BOOL,endFigure)(THIS_ BOOL bClose) OVERRIDE{
+		if(bClose){
+			m_skPath.close();
+		}
+		return TRUE;
+	}
+	STDMETHOD_(float,getLength)(CTHIS) SCONST OVERRIDE;
+
+	STDMETHOD_(BOOL,getPosTan)(CTHIS_ float distance, fPoint *pos, fPoint *vec) SCONST OVERRIDE;
+
+	STDMETHOD_(void,close)(THIS) OVERRIDE;
+
+	STDMETHOD_(BOOL, hitTest)(CTHIS_ float x,float y) SCONST OVERRIDE;
+
+	STDMETHOD_(BOOL, hitTestStroke)(CTHIS_ float x,float y,float strokeSize) SCONST OVERRIDE;
+
 protected:
 	SkPath      m_skPath;
 };
@@ -426,8 +383,10 @@ class SRenderTarget_Skia: public TObjRefImpl<IRenderTarget>
 public:
 	SRenderTarget_Skia(IRenderFactory* pRenderFactory,int nWid,int nHei);
 	~SRenderTarget_Skia();
+	STDMETHOD_(void, BeginDraw)(THIS) OVERRIDE{}
+	STDMETHOD_(void, EndDraw)(THIS) OVERRIDE{}
+	STDMETHOD_(BOOL,IsOffscreen)(CTHIS) SCONST {return TRUE;}
 
-	STDMETHOD_(HRESULT,CreateCompatibleRenderTarget)(THIS_ SIZE szTarget,IRenderTarget **ppRenderTarget) OVERRIDE;
 	STDMETHOD_(HRESULT,CreatePen)(THIS_ int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateSolidColorBrush)(THIS_ COLORREF cr,IBrushS ** ppBrush) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateBitmapBrush)(THIS_ IBitmapS *pBmp,TileMode xtm,TileMode ytm, IBrushS ** ppBrush ) OVERRIDE;
@@ -445,7 +404,6 @@ public:
 	STDMETHOD_(HRESULT,PopClip)(THIS) OVERRIDE;
 
 	STDMETHOD_(HRESULT,ExcludeClipRect)(THIS_ LPCRECT pRc) OVERRIDE;
-	STDMETHOD_(HRESULT,IntersectClipRect)(THIS_ LPCRECT pRc) OVERRIDE;
 
 	STDMETHOD_(HRESULT,SaveClip)(THIS_ int *pnState) OVERRIDE;
 	STDMETHOD_(HRESULT,RestoreClip)(THIS_ int nState/*=-1*/) OVERRIDE;
@@ -492,7 +450,7 @@ public:
 	STDMETHOD_(void,SetMaskFilter)(THIS_ IMaskFilter *pMaskFilter) OVERRIDE;
 	STDMETHOD_(IMaskFilter *,GetMaskFilter)(THIS) OVERRIDE;
 	STDMETHOD_(HDC,GetDC)(THIS_ UINT uFlag) OVERRIDE;
-	STDMETHOD_(void,ReleaseDC)(THIS_ HDC hdc) OVERRIDE;
+	STDMETHOD_(void,ReleaseDC)(THIS_ HDC hdc,LPCRECT pRc) OVERRIDE;
 	STDMETHOD_(HRESULT,SetTransform)(THIS_ const float matrix[9], float oldMatrix[9]/*=NULL*/) OVERRIDE;
 	STDMETHOD_(HRESULT,GetTransform)(THIS_ float matrix[9]) SCONST OVERRIDE;
 	STDMETHOD_(COLORREF,GetPixel)(THIS_ int x, int y) OVERRIDE;
@@ -500,8 +458,6 @@ public:
 	STDMETHOD_(HRESULT,PushClipPath)(THIS_ const IPathS * path, UINT mode, BOOL doAntiAlias = false) OVERRIDE;
 	STDMETHOD_(HRESULT,DrawPath)(THIS_ const IPathS * path,IPathEffect * pathEffect=NULL) OVERRIDE;
 	STDMETHOD_(HRESULT,FillPath)(THIS_ const IPathS * path) OVERRIDE;
-	STDMETHOD_(HRESULT,PushLayer)(THIS_ const RECT * pRect,BYTE byAlpha/*=0xFF*/) OVERRIDE;
-	STDMETHOD_(HRESULT,PopLayer)(THIS) OVERRIDE;
 	STDMETHOD_(HRESULT,SetXfermode)(THIS_ int mode,int *pOldMode=NULL) OVERRIDE;
 	STDMETHOD_(BOOL,SetAntiAlias)(THIS_ BOOL bAntiAlias) OVERRIDE;
 	STDMETHOD_(BOOL,GetAntiAlias)(THIS) SCONST OVERRIDE;
@@ -512,6 +468,7 @@ protected:
 	bool SetPaintXferMode(SkPaint & paint,int nRopMode);
 protected:
 	SkCanvas *m_SkCanvas;
+	int		  m_lastSave;
 	SColor            m_curColor;
 	SAutoRefPtr<SBitmap_Skia> m_curBmp;
 	SAutoRefPtr<SPen_Skia> m_curPen;

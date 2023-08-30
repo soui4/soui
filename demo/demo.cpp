@@ -27,6 +27,7 @@
 #include "SMatrixWindow.h"
 #include "SmileyCreateHook.h"
 #include "clock/sclock.h"
+#include "FpsWnd.h"
 
 //<--定一个tag="demo"的slog输出
 #define kLogTag "demo"
@@ -182,6 +183,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 			goto exit;
 		}
 
+		//定义一个唯一的SApplication对象，SApplication管理整个应用程序的资源
+		SApplication* theApp = new SApplication2(NULL, hInstance);
+
 
 		//定义一组类SOUI系统中使用的类COM组件
 		//SAutoRefPtr是一个SOUI系统中使用的智能指针类
@@ -194,9 +198,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		BOOL bLoaded = FALSE;
 		//从各组件中显式创建上述组件对象
 		if (nType == IDYES)
-		{
 			bLoaded = pComMgr->CreateRender_Skia((IObjRef**)&pRenderFactory);
-		}
 		else
 			bLoaded = pComMgr->CreateRender_GDI((IObjRef**)&pRenderFactory);
 		SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), nType == IDYES ? _T("render_skia") : _T("render_gdi"));
@@ -217,10 +219,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
 		//为渲染模块设置它需要引用的图片解码模块
 		pRenderFactory->SetImgDecoderFactory(pImgDecoderFactory);
-
-
-		//定义一个唯一的SApplication对象，SApplication管理整个应用程序的资源
-		SApplication* theApp = new SApplication2(pRenderFactory, hInstance);
+		theApp->SetRenderFactory(pRenderFactory);
+		pRenderFactory = NULL;
 
 		theApp->SetLogManager(pLogMgr);
 		SLOGFMTE(L"log output using unicode format,str=%s, tick=%u", L"中文", GetTickCount());
@@ -278,6 +278,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<SCalendar2>();//注册SCalendar2
 
 		theApp->RegisterWindowClass<SShellTray>();
+		theApp->RegisterWindowClass<FpsWnd>();
 
 		SSkinGif::Gdiplus_Startup();
 

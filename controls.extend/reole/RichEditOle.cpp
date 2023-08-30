@@ -674,7 +674,7 @@ HRESULT STDMETHODCALLTYPE  CSmileyHost::OnTimer( int nInterval )
     }
     CGdiAlpha::AlphaRestore(ai);
 
-    pRT->ReleaseDC(hdc);
+    pRT->ReleaseDC(hdc,rcClient);
     m_pHost->ReleaseRenderTarget(pRT);
 
     return S_OK;

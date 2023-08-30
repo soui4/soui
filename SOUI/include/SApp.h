@@ -97,6 +97,7 @@ class SOUI_EXP SApplication
 
   public:
     STDMETHOD_(IRenderFactory *, GetRenderFactory)(THIS) OVERRIDE;
+	STDMETHOD_(BOOL, SetRenderFactory)(THIS_ IRenderFactory * renderFac) OVERRIDE;
 
     STDMETHOD_(HMODULE, GetModule)(THIS) SCONST OVERRIDE;
     STDMETHOD_(UINT, LoadSystemNamedResource)(THIS_ IResProvider *pResProvider) OVERRIDE;

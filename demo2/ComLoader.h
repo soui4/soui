@@ -8,6 +8,7 @@ typedef enum _SComID{
 	Decoder_Stb,
 	Render_Gdi,
 	Render_Skia,
+	Render_D2D,
 	Log4Z,
 	Resprovider_7Zip,
 	Resprovider_Zip,

@@ -183,10 +183,15 @@ SNSBEGIN
         return TRUE;
     }
     
-	HRESULT SImgDecoderFactory_WIC::SaveImage(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, LPVOID pFormat) SCONST
+	HRESULT SImgDecoderFactory_WIC::SaveImage(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, const void* pFormat) SCONST
     {
         return E_NOTIMPL;
     }
+
+	HRESULT SImgDecoderFactory_WIC::SaveImage2(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
+	{
+		return E_NOTIMPL;
+	}
 
     LPCWSTR SImgDecoderFactory_WIC::GetDescription() const
     {

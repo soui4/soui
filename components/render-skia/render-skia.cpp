@@ -1,10 +1,11 @@
-﻿#include <core\SkShader.h>
-#include <core\SkDevice.h>
-#include <effects\SkDashPathEffect.h>
-#include <effects\SkGradientShader.h>
-#include <effects\SkBlurMaskFilter.h>
-#include "../skia/src/effects/SkBlurMask.h"
-#include "../skia/include/core/SkGraphics.h"
+﻿#include <core/SkShader.h>
+#include <core/SkDevice.h>
+#include <effects/SkDashPathEffect.h>
+#include <effects/SkGradientShader.h>
+#include <effects/SkBlurMaskFilter.h>
+#include <core/SkGraphics.h>
+#include <core/SkPathMeasure.h>
+#include <src/effects/SkBlurMask.h>
 
 #include <gdialpha.h>
 
@@ -15,7 +16,6 @@
 
 #include "skia2rop2.h"
 #include "PathEffect-Skia.h"
-#include "PathMeasure-Skia.h"
 
 #include <tchar.h>
 #include <algorithm>
@@ -235,12 +235,6 @@ namespace SOUI
 		return (*ppPathEffect) != NULL;
 	}
 
-	BOOL SRenderFactory_Skia::CreatePathMeasure(IPathMeasure ** ppPathMeasure)
-	{
-		*ppPathMeasure = new SPathMeasure_Skia;
-		return TRUE;
-	}
-
 	HRESULT SRenderFactory_Skia::CreateBlurMaskFilter(float radius, BlurStyle style,BlurFlags flag,IMaskFilter ** ppMaskFilter)
 	{
 		SkMaskFilter *pMaskFilter = SkBlurMaskFilter::Create(::SkBlurStyle(style),SkBlurMaskFilter::ConvertRadiusToSigma(radius),flag);
@@ -258,6 +252,13 @@ namespace SOUI
 			return E_OUTOFMEMORY;
 		*ppMaskFilter = new SMaskFilter_Skia(pMaskFilter);
 		return S_OK;
+	}
+
+	BOOL SRenderFactory_Skia::CreateRenderTarget2(THIS_ IRenderTarget ** ppRenderTarget,HWND hWnd)
+	{
+		RECT rc;
+		::GetClientRect(hWnd,&rc);
+		return CreateRenderTarget(ppRenderTarget,rc.right,rc.bottom);
 	}
 
 	//----------------------------------------------------------------------------------------------
@@ -308,6 +309,7 @@ namespace SOUI
 		,m_uGetDCFlag(0)
 		,m_bAntiAlias(true)
 		,m_xferMode(kSrcOver_Mode)
+		,m_lastSave(0)
 	{
 		m_ptOrg.fX=m_ptOrg.fY=0.0f;
 		m_pRenderFactory = pRenderFactory;
@@ -341,13 +343,6 @@ namespace SOUI
 	SRenderTarget_Skia::~SRenderTarget_Skia()
 	{
 		if(m_SkCanvas) delete m_SkCanvas;
-	}
-
-	HRESULT SRenderTarget_Skia::CreateCompatibleRenderTarget( SIZE szTarget,IRenderTarget **ppRenderTarget )
-	{
-		SRenderTarget_Skia *pRT = new SRenderTarget_Skia(m_pRenderFactory,szTarget.cx,szTarget.cy);
-		*ppRenderTarget = pRT;
-		return S_OK;
 	}
 
 	HRESULT SRenderTarget_Skia::CreatePen( int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen )
@@ -426,23 +421,17 @@ namespace SOUI
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::IntersectClipRect( LPCRECT pRc )
-	{
-		SkRect skrc=toSkRect(pRc);
-		skrc.offset(m_ptOrg);
-		m_SkCanvas->clipRect(skrc,SkRegion::kIntersect_Op);
-		return S_OK;
-	}
-
 	HRESULT SRenderTarget_Skia::SaveClip( int *pnState )
 	{
-		int nState=m_SkCanvas->save();
-		if(pnState) *pnState=nState;
+		m_lastSave=m_SkCanvas->save();
+		if(pnState) *pnState=m_lastSave;
 		return S_OK;
 	}
 
 	HRESULT SRenderTarget_Skia::RestoreClip( int nState/*=-1*/ )
 	{
+		if(nState == -1)
+			nState = m_lastSave;
 		m_SkCanvas->restoreToCount(nState);
 		return S_OK;
 	}
@@ -781,7 +770,7 @@ namespace SOUI
 		if(ii.hbmColor) DeleteObject(ii.hbmColor);
 		if(ii.hbmMask) DeleteObject(ii.hbmMask);
 
-		ReleaseDC(hdc);
+		ReleaseDC(hdc,NULL);
 		return bRet?S_OK:S_FALSE;
 	}
 
@@ -1029,7 +1018,6 @@ namespace SOUI
 
 	HRESULT SRenderTarget_Skia::OffsetViewportOrg( int xOff, int yOff, LPPOINT lpPoint )
 	{
-		SkMatrix mtx=m_SkCanvas->getTotalMatrix();
 		SkPoint ptOff={(SkScalar)xOff,(SkScalar)yOff};
 		if(lpPoint)
 		{
@@ -1127,7 +1115,7 @@ namespace SOUI
 		return m_hGetDC;
 	}
 
-	void SRenderTarget_Skia::ReleaseDC( HDC hdc )
+	void SRenderTarget_Skia::ReleaseDC( HDC hdc ,LPCRECT pRc)
 	{
 		if(hdc == m_hGetDC)
 		{
@@ -1524,27 +1512,6 @@ namespace SOUI
 		return S_OK;
 	}
 
-	HRESULT SRenderTarget_Skia::PushLayer(const RECT * pRect,BYTE byAlpha)
-	{
-		int nLayerId = -1;
-		SkRect skBound = toSkRect(pRect);
-		if(byAlpha==0xFF)
-			nLayerId = m_SkCanvas->saveLayer(&skBound,NULL);
-		else
-			nLayerId = m_SkCanvas->saveLayerAlpha(&skBound,byAlpha);
-		m_lstLayerId.AddTail(nLayerId);
-		return S_OK;
-	}
-
-	HRESULT SRenderTarget_Skia::PopLayer()
-	{
-		if(m_lstLayerId.IsEmpty())
-			return E_INVALIDARG;
-		int nLayerID = m_lstLayerId.RemoveTail();
-		m_SkCanvas->restoreToCount(nLayerID);
-		return S_OK;
-	}
-
 	HRESULT SRenderTarget_Skia::SetXfermode(int mode,int *pOldMode/* =NULL */)
 	{
 		if(pOldMode) *pOldMode = m_xferMode;
@@ -1834,6 +1801,12 @@ namespace SOUI
 		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage(pBits,Width(),Height(),pszFileName,pFormat);
 	}
 
+	HRESULT SBitmap_Skia::Save2(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
+	{
+		LPBYTE pBits = (LPBYTE)GetPixelBits();
+		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2(pBits,Width(),Height(),pszFileName,imgFmt);
+	}
+
 	//////////////////////////////////////////////////////////////////////////
 	static int s_cRgn =0;
 	SRegion_Skia::SRegion_Skia( IRenderFactory *pRenderFac )
@@ -1931,12 +1904,6 @@ namespace SOUI
 	BOOL SRegion_Skia::IsEmpty() const
 	{
 		return m_rgn.isEmpty();
-	}
-
-	BOOL SRegion_Skia::IsEqual(const IRegionS *testRgn) const
-	{
-		const SRegion_Skia * pRgnTest = (const SRegion_Skia*)testRgn;
-		return m_rgn == pRgnTest->m_rgn;
 	}
 
 	void SRegion_Skia::Offset( POINT pt )
@@ -2211,132 +2178,14 @@ namespace SOUI
 		m_skPath.setFillType((SkPath::FillType)ft);
 	}
 
-	BOOL SPath_Skia::isInverseFillType() const
-	{
-		return m_skPath.isInverseFillType();
-	}
-
-	void SPath_Skia::toggleInverseFillType()
-	{
-		m_skPath.toggleInverseFillType();
-	}
-
-	Convexity SPath_Skia::getConvexity() const
-	{
-		return (Convexity)m_skPath.getConvexity();
-	}
-
-	void SPath_Skia::setConvexity(Convexity c)
-	{
-		m_skPath.setConvexity((SkPath::Convexity)c);
-	}
-
-	BOOL SPath_Skia::isConvex() const
-	{
-		return m_skPath.isConvex();
-	}
-
-	BOOL SPath_Skia::isOval(RECT* rect) const
-	{
-		SkRect skRect;
-		bool bRet = m_skPath.isOval(&skRect);
-		if(rect && bRet)
-		{
-			SkRect2RECT(skRect,rect);
-		}
-		return bRet;
-	}
-
 	void SPath_Skia::reset()
 	{
 		m_skPath.reset();
 	}
 
-	void SPath_Skia::rewind()
-	{
-		m_skPath.rewind();
-	}
-
 	BOOL SPath_Skia::isEmpty() const
 	{
 		return m_skPath.isEmpty();
-	}
-
-	BOOL SPath_Skia::isFinite() const
-	{
-		return m_skPath.isFinite();
-	}
-
-	BOOL SPath_Skia::isLine(POINT line[2]) const
-	{
-		SkPoint skLine[2];
-		bool bRet = m_skPath.isLine(skLine);
-		if(bRet)
-		{
-			line[0].x = (int)skLine[0].fX;
-			line[0].y = (int)skLine[0].fY;
-			line[1].x = (int)skLine[1].fX;
-			line[1].x = (int)skLine[1].fY;
-		}
-		return bRet;
-	}
-
-	BOOL SPath_Skia::isRect(RECT* rect) const
-	{
-		SkRect skRect;
-		bool bRet = m_skPath.isRect(&skRect);
-		if(rect && bRet)
-		{
-			SkRect2RECT(skRect,rect);
-		}
-		return bRet;
-	}
-
-	BOOL SPath_Skia::isRect2(BOOL* isClosed, Direction* direction) const
-	{
-		bool temp=false;
-		bool bRet = m_skPath.isRect(&temp,(SkPath::Direction*)direction);
-		if(isClosed)
-		{
-			*isClosed = temp?TRUE:FALSE;
-		}
-		return !!bRet;
-	}
-
-	int SPath_Skia::countPoints() const
-	{
-		return m_skPath.countPoints();
-	}
-
-	fPoint SPath_Skia::getPoint(int index) const
-	{
-		SkPoint ret = m_skPath.getPoint(index);
-		fPoint pt = {ret.fX,ret.fY};
-		return pt;
-	}
-
-	int SPath_Skia::getPoints(fPoint points[], int max) const
-	{
-		SASSERT(points);
-		SkPoint *pts = new SkPoint[max];
-		int nRet = m_skPath.getPoints(pts,max);
-		for(int i=0;i<nRet;i++)
-		{
-			points[i].fX = pts[i].fX;
-			points[i].fY = pts[i].fY;
-		}
-		delete []pts;
-		return nRet;
-	}
-
-	int SPath_Skia::countVerbs() const
-	{
-		return m_skPath.countVerbs();
-	}
-
-	int SPath_Skia::getVerbs(BYTE verbs[], int max) const
-	{
-		return m_skPath.getVerbs(verbs,max);
 	}
 
 	void SPath_Skia::getBounds(LPRECT prc) const
@@ -2395,20 +2244,8 @@ namespace SOUI
 		m_skPath.rCubicTo(dx1,dy1,dx2,dy2,dx3,dy3);
 	}
 
-	void SPath_Skia::arcTo(const RECT* oval, float startAngle, float sweepAngle, BOOL forceMoveTo)
-	{
-		SkRect skOval = toSkRect(oval);
-		m_skPath.arcTo(skOval,startAngle,sweepAngle,!!forceMoveTo);
-	}
-
-	void SPath_Skia::arcTo2(float x1, float y1, float x2, float y2, float radius)
-	{
-		m_skPath.arcTo(x1,y1,x2,y2,radius);
-	}
-
 	void SPath_Skia::close()
 	{
-		m_skPath.close();
 	}
 
 	void SPath_Skia::addRect(const RECT* rect, Direction dir /*= kCW_Direction*/)
@@ -2428,6 +2265,12 @@ namespace SOUI
 		m_skPath.addOval(skRc,(SkPath::Direction)dir);
 	}
 
+	void SPath_Skia::addOval2(THIS_ float left, float top, float right, float bottom, Direction dir)
+	{
+		SkRect skRc = {left,top,right,bottom};
+		m_skPath.addOval(skRc,(SkPath::Direction)dir);
+	}
+
 	void SPath_Skia::addCircle(float x, float y, float radius, Direction dir /*= kCW_Direction*/)
 	{
 		m_skPath.addCircle(x,y,radius,(SkPath::Direction)dir);
@@ -2439,16 +2282,22 @@ namespace SOUI
 		m_skPath.addArc(skRc,startAngle,sweepAngle);
 	}
 
+	void SPath_Skia::addArc2(THIS_ float left, float top, float right, float bottom,float startAngle, float sweepAngle)
+	{
+		SkRect skRc = {left,top,right,bottom};
+		m_skPath.addArc(skRc,startAngle,sweepAngle);
+	}
+
 	void SPath_Skia::addRoundRect(const RECT* rect, float rx, float ry, Direction dir /*= kCW_Direction*/)
 	{
 		SkRect skRc = toSkRect(rect);
 		m_skPath.addRoundRect(skRc,rx,ry,(SkPath::Direction)dir);
 	}
 
-	void SPath_Skia::addRoundRect2(const RECT* rect, const float radii[], Direction dir /*= kCW_Direction*/)
+	void SPath_Skia::addRoundRect2(float left, float top,float right,float bottom, float rx,float ry, Direction dir /*= kCW_Direction*/)
 	{
-		SkRect skRc = toSkRect(rect);
-		m_skPath.addRoundRect(skRc,radii,(SkPath::Direction)dir);
+		SkRect skRc = {left,top,right,bottom};
+		m_skPath.addRoundRect(skRc,rx,ry,(SkPath::Direction)dir);
 	}
 
 	void SPath_Skia::addPoly(const POINT pts[], int count, BOOL close)
@@ -2462,18 +2311,6 @@ namespace SOUI
 
 		m_skPath.addPoly(skPts,count,!!close);
 		delete []skPts;
-	}
-
-	void SPath_Skia::addPath(const IPathS * src, float dx, float dy, AddPathMode mode /*= kAppend_AddPathMode*/)
-	{
-		const SPath_Skia *skSrc = (const SPath_Skia*)src;
-		m_skPath.addPath(skSrc->m_skPath,dx,dy,(SkPath::AddPathMode)mode);
-	}
-
-	void SPath_Skia::reverseAddPath(const IPathS* src)
-	{
-		const SPath_Skia *skSrc = (const SPath_Skia*)src;
-		m_skPath.reverseAddPath(skSrc->m_skPath);
 	}
 
 	void SPath_Skia::offset(float dx, float dy)
@@ -2496,21 +2333,16 @@ namespace SOUI
 		m_skPath.transform(mat);
 	}
 
-	BOOL SPath_Skia::getLastPt(POINT* lastPt) const
+	BOOL SPath_Skia::getLastPt(fPoint* lastPt) const
 	{
 		SkPoint pt;
 		bool bRet = m_skPath.getLastPt(&pt);
 		if(lastPt)
 		{
-			lastPt->x = (int)pt.fX;
-			lastPt->y = (int)pt.fY;
+			lastPt->fX = pt.fX;
+			lastPt->fY = pt.fY;
 		}
 		return bRet;
-	}
-
-	void SPath_Skia::setLastPt(float x, float y)
-	{
-		m_skPath.setLastPt(x,y);
 	}
 
 	void SPath_Skia::addString(LPCTSTR pszText,int nLen, float x,float y, const IFontS *pFont)
@@ -2675,57 +2507,6 @@ namespace SOUI
 			}
 	}
 
-	IPathInfo* SPath_Skia::approximate(float acceptableError)
-	{
-		SkPath::Iter pathIter(m_skPath, false);
-		SkPath::Verb verb;
-		SkPoint points[4];
-		std::vector<SkPoint> segmentPoints;
-		std::vector<float> lengths;
-		float errorSquared = acceptableError * acceptableError;
-
-		while ((verb = pathIter.next(points, false)) != SkPath::kDone_Verb) {
-			createVerbSegments(verb, points, segmentPoints, lengths, errorSquared);
-		}
-
-		if (segmentPoints.empty()) {
-			int numVerbs = m_skPath.countVerbs();
-			if (numVerbs == 1) {
-				addMove(segmentPoints, lengths, m_skPath.getPoint(0));
-			}
-			else {
-				// Invalid or empty path. Fall back to point(0,0)
-				addMove(segmentPoints, lengths, SkPoint());
-			}
-		}
-
-		float totalLength = lengths.back();
-		if (totalLength == 0) {
-			// Lone Move instructions should still be able to animate at the same value.
-			segmentPoints.push_back(segmentPoints.back());
-			lengths.push_back(1);
-			totalLength = 1;
-		}
-
-		size_t numPoints = segmentPoints.size();
-		size_t approximationArraySize = numPoints * 3;
-
-		int nLen = approximationArraySize;
-
-		SPathInfo_Skia * pInfo = new SPathInfo_Skia(numPoints);
-		float* approximation = pInfo->buffer();
-
-		int approximationIndex = 0;
-		for (size_t i = 0; i < numPoints; i++) {
-			const SkPoint& point = segmentPoints[i];
-			approximation[approximationIndex++] = lengths[i] / totalLength;
-			approximation[approximationIndex++] = point.x();
-			approximation[approximationIndex++] = point.y();
-		}
-
-		return pInfo;
-	}
-
 	IPathS * SPath_Skia::clone(CTHIS) const
 	{
 		SPath_Skia * ret = new SPath_Skia(GetRenderFactory());
@@ -2733,29 +2514,28 @@ namespace SOUI
 		return ret;
 	}
 
-	SPathInfo_Skia::SPathInfo_Skia(int points):mPoints(points),mData(new float[points*3])
+	float SPath_Skia::getLength(CTHIS) const
 	{
-
+		SkPathMeasure pathMeasure;
+		pathMeasure.setPath(&m_skPath,false);
+		return pathMeasure.getLength();
 	}
 
-	SPathInfo_Skia::~SPathInfo_Skia()
+	BOOL SPath_Skia::getPosTan(CTHIS_ float distance, fPoint *pos, fPoint *vec) const
 	{
-		delete []mData;
+		SkPathMeasure pathMeasure;
+		pathMeasure.setPath(&m_skPath,false);
+		return pathMeasure.getPosTan(distance,(SkPoint*)pos,(SkPoint*)vec);
 	}
 
-	int SPathInfo_Skia::pointNumber() const
+	BOOL SPath_Skia::hitTest(CTHIS_ float x,float y) const
 	{
-		return mPoints;
+		return m_skPath.contains(x,y);
 	}
 
-	const float * SPathInfo_Skia::data() const
+	BOOL SPath_Skia::hitTestStroke(CTHIS_ float x,float y,float strokeSize) const
 	{
-		return mData;
-	}
-
-	float * SPathInfo_Skia::buffer()
-	{
-		return mData;
+		return FALSE;
 	}
 
 	//--------------------------------------------------------------------------------

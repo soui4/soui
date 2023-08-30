@@ -168,7 +168,9 @@ void SRootWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
     if (bErase)
     {
         CRect rcWnd = GetClientRect();
+        m_pHostWnd->m_memRT->BeginDraw();
         m_pHostWnd->m_memRT->ClearRect(rcWnd, 0);
+        m_pHostWnd->m_memRT->EndDraw();
     }
     SWindow::OnAnimationInvalidate(pAni, bErase);
     if (!bErase)
@@ -544,6 +546,14 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             ModifyStyleEx(0, WS_EX_LAYERED);
         ::SetLayeredWindowAttributes(m_hWnd, 0, GetRoot()->GetAlpha(), LWA_ALPHA);
     }
+	m_memRT = NULL;
+	if(m_hostAttr.m_bTranslucent){
+		CRect rcWnd;
+		SNativeWnd::GetWindowRect(&rcWnd);
+		GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcWnd.Width(), rcWnd.Height());
+	}else{
+		GETRENDERFACTORY->CreateRenderTarget2(&m_memRT, m_hWnd);
+	}
 
     BuildWndTreeZorder();
 
@@ -630,6 +640,7 @@ void SHostWnd::_Redraw()
 
 void SHostWnd::_RedrawRegion(IRegionS *pRgnUpdate, CRect &rcInvalid)
 {
+	m_memRT->BeginDraw();
     CRect rcWnd = m_pRoot->GetWindowRect();
 
     SPainter painter;
@@ -656,9 +667,10 @@ void SHostWnd::_RedrawRegion(IRegionS *pRgnUpdate, CRect &rcInvalid)
     m_memRT->RestoreClip(clipState);
     _PaintVideoCanvasForeground(m_memRT); // paint foreground of video canvas.
 
-    m_memRT->PopClip();
+	m_memRT->PopClip();
 
     m_pRoot->AfterPaint(m_memRT, painter);
+	m_memRT->EndDraw();
 }
 
 void SHostWnd::OnPrint(HDC dc, UINT uFlags)
@@ -698,7 +710,7 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         ::GetClipBox(dc, &rcUpdate);
         rcInvalid = rcInvalid | rcUpdate;
     }
-    UpdatePresenter(dc, m_memRT, rcInvalid);
+    UpdatePresenter(dc, m_memRT, rcInvalid,255,uFlags);
 }
 
 void SHostWnd::OnPaint(HDC dc)
@@ -755,7 +767,8 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     SHostMgr::getSingletonPtr()->AddHostMsgHandler(this);
     UpdateAutoSizeCount(true);
     m_memRT = NULL;
-    GETRENDERFACTORY->CreateRenderTarget(&m_memRT, 0, 0);
+	CRect rcWnd = GetClientRect();
+    GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcWnd.Width(), rcWnd.Height());
     m_rgnInvalidate = NULL;
     GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
     m_szAppSetted.cx = lpCreateStruct->cx;
@@ -1027,10 +1040,11 @@ HWND SHostWnd::GetHostHwnd()
     return m_hWnd;
 }
 
-void SHostWnd::UpdatePresenter(HDC dc, IRenderTarget *pRT, LPCRECT rcInvalid, BYTE byAlpha)
+void SHostWnd::UpdatePresenter(HDC dc, IRenderTarget *pRT, LPCRECT rcInvalid, BYTE byAlpha ,UINT uFlag)
 {
-    byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
-    m_presenter->OnHostPresent(dc, pRT, rcInvalid, byAlpha);
+	byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
+	if(pRT->IsOffscreen() || uFlag!=0)
+		m_presenter->OnHostPresent(dc, pRT, rcInvalid, byAlpha);
 }
 
 void SHostWnd::UpdateAlpha(BYTE byAlpha)
@@ -1224,6 +1238,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 {
                     *x += xStepLen;
                     *y += yStepLen;
+					pRT->BeginDraw();
                     pRT->ClearRect(rcWnd, 0);
                     CPoint ptAnchor;
                     if (dwFlags & AW_VER_NEGATIVE)
@@ -1231,6 +1246,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     if (dwFlags & AW_HOR_NEGATIVE)
                         ptAnchor.x = rcWnd.right - rcShow.Width();
                     _BitBlt(pRT, m_memRT, rcShow, ptAnchor);
+					pRT->EndDraw();
                     UpdatePresenter(0, pRT, &rcWnd, byAlpha);
                     Sleep(10);
                 }
@@ -1244,8 +1260,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 for (int i = 0; i < nSteps; i++)
                 {
                     rcShow.DeflateRect(xStep, yStep);
+					pRT->BeginDraw();
                     pRT->ClearRect(rcWnd, 0);
-                    _BitBlt(pRT, m_memRT, rcShow, rcShow.TopLeft());
+					_BitBlt(pRT, m_memRT, rcShow, rcShow.TopLeft());
+					pRT->EndDraw();
                     UpdatePresenter(0, pRT, rcWnd, byAlpha);
                     Sleep(10);
                 }
@@ -1308,6 +1326,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 {
                     *x += xStepLen;
                     *y += yStepLen;
+					pRT->BeginDraw();
                     pRT->ClearRect(rcWnd, 0);
                     CPoint ptAnchor;
                     if (dwFlags & AW_VER_POSITIVE)
@@ -1315,6 +1334,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     if (dwFlags & AW_HOR_POSITIVE)
                         ptAnchor.x = rcWnd.right - rcShow.Width();
                     _BitBlt(pRT, m_memRT, rcShow, ptAnchor);
+					pRT->EndDraw();
                     UpdatePresenter(0, pRT, &rcWnd, byAlpha);
                     Sleep(10);
                 }
@@ -1331,8 +1351,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 for (int i = 0; i < nSteps; i++)
                 {
                     rcShow.InflateRect(xStep, yStep);
+					pRT->BeginDraw();
                     pRT->ClearRect(rcWnd, 0);
                     _BitBlt(pRT, m_memRT, rcShow, rcShow.TopLeft());
+					pRT->EndDraw();
                     UpdatePresenter(0, pRT, &rcWnd, byAlpha);
                     Sleep(10);
                 }

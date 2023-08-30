@@ -8,14 +8,12 @@ set(render-skia_header
 	render-skia.h
 	skia2rop2.h
 	patheffect-skia.h
-	pathmeasure-skia.h
 )
 set(render-skia_src
 	drawtext-skia.cpp
 	render-skia.cpp
 	skia2rop2.cpp
 	patheffect-skia.cpp
-	pathmeasure-skia.cpp
 )
 
 source_group("Header Files" FILES ${render-skia_header})

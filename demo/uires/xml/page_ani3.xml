@@ -17,4 +17,5 @@
     <toggle size="-1,-1" name="tgl_left" skin="skin_btn_expand" checked="true" tip="close or show treectrl"/>
   </window>
   <button pos="-0,0,@180,@30" offset="-1,0" name="btn_ani_hostwnd" text="SetHostAnimation"/>
+  <fps pos="-1,[10,@100,@30" offset="-1,0" colorText="@color/red"/>
 </window>

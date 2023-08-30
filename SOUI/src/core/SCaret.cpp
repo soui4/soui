@@ -44,14 +44,17 @@ BOOL SCaret::Init(HBITMAP hBmp, int nWid, int nHei)
         GetObject(hBmp, sizeof(bm), &bm);
         StretchBlt(hdc, 0, 0, nWid, nHei, hdc2, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
         DeleteDC(hdc2);
-        pRT->ReleaseDC(hdc);
+        pRT->ReleaseDC(hdc,NULL);
     }
     else
     {
         //创建一个黑色插入符的位图
         CRect rc(0, 0, nWid, nHei);
+		pRT->BeginDraw();
         pRT->FillSolidRect(&rc, m_crCaret);
+		pRT->EndDraw();
     }
+
     return TRUE;
 }
 

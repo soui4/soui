@@ -33,7 +33,7 @@ translucent="0"
     </window>
     <window size="-2,0" weight="1" layout="hbox">
       <listview size="0,-2" weight="1" name="lv_test" margin="1,1,1,1" colorBorder="@color/red">
-        <template itemHeight="50" layout="hbox" gravity="center">
+        <template itemHeight="50" layout="hbox" gravity="center" skin="skin_item_bk">
           <text name="txt_test"/>
         </template>
       </listview>

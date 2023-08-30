@@ -35,9 +35,9 @@ void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT
         BOOL bGetDC = hdc == 0;
         if (bGetDC)
             hdc = m_pHostWnd->GetDC();
-        HDC memdc = pMemRT->GetDC(0);
+        HDC memdc = pMemRT->GetDC(1);
         ::BitBlt(hdc, rcInvalid->left, rcInvalid->top, RectWidth(rcInvalid), RectHeight(rcInvalid), memdc, rcInvalid->left, rcInvalid->top, SRCCOPY);
-        pMemRT->ReleaseDC(memdc);
+        pMemRT->ReleaseDC(memdc,NULL);
         if (bGetDC)
             m_pHostWnd->ReleaseDC(hdc);
     }
@@ -60,10 +60,10 @@ void SHostPresenter::UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlph
     CSize szDst = rc.Size();
     CPoint ptSrc;
 
-    HDC hdc = pRT->GetDC(0);
+    HDC hdc = pRT->GetDC(1);
     S_UPDATELAYEREDWINDOWINFO info = { sizeof(info), NULL, &ptDst, &szDst, hdc, &ptSrc, 0, &bf, ULW_ALPHA, &rcDirty };
     SWndSurface::SUpdateLayeredWindowIndirect(m_pHostWnd->GetHwnd(), &info);
-    pRT->ReleaseDC(hdc);
+    pRT->ReleaseDC(hdc,NULL);
 }
 
 SNSEND

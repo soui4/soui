@@ -202,7 +202,6 @@ void SObjectDefaultRegister::RegisterInterpolator(SObjectFactoryMgr *objFactory)
     objFactory->TplRegisterFactory<SBounceInterpolator>();
     objFactory->TplRegisterFactory<SCycleInterpolator>();
     objFactory->TplRegisterFactory<SOvershootInterpolator>();
-    objFactory->TplRegisterFactory<SPathInterpolator>();
 }
 
 void SObjectDefaultRegister::RegisterAnimation(SObjectFactoryMgr *objFactory) const
@@ -269,7 +268,8 @@ void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, 
     m_pSingletons[SUiDef::GetType()] = new SUiDef();
     m_pSingletons[SWindowMgr::GetType()] = new SWindowMgr();
     m_pSingletons[STimerGenerator::GetType()] = new STimerGenerator();
-    m_pSingletons[SFontPool::GetType()] = new SFontPool(m_RenderFactory);
+    if(m_RenderFactory)
+		m_pSingletons[SFontPool::GetType()] = new SFontPool(m_RenderFactory);
 
     m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
     m_pSingletons[STextServiceHelper::GetType()] = new STextServiceHelper();
@@ -294,7 +294,8 @@ void SApplication::_DestroySingletons()
     DELETE_SINGLETON(STextServiceHelper);
     DELETE_SINGLETON(SWindowFinder);
 
-    DELETE_SINGLETON(SFontPool);
+    if(m_pSingletons[SFontPool::GetType()])
+		DELETE_SINGLETON(SFontPool);
     DELETE_SINGLETON(SUiDef);
     DELETE_SINGLETON(STimerGenerator);
     DELETE_SINGLETON(SWindowMgr);
@@ -595,6 +596,16 @@ HRESULT SApplication::CreateScriptModule(IScriptModule **ppScriptModule)
 IRenderFactory *SApplication::GetRenderFactory()
 {
     return m_RenderFactory;
+}
+
+BOOL SApplication::SetRenderFactory(THIS_ IRenderFactory * renderFac)
+{
+	if(m_RenderFactory || !renderFac)
+		return FALSE;
+	m_RenderFactory = renderFac;
+	SASSERT(m_pSingletons[SFontPool::GetType()]==NULL);
+	m_pSingletons[SFontPool::GetType()] = new SFontPool(m_RenderFactory);
+	return TRUE;
 }
 
 void SApplication::SetRealWndHandler(IRealWndHandler *pRealHandler)

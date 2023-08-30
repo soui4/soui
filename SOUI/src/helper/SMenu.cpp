@@ -135,7 +135,7 @@ void SMenuODWnd::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
     HDC dc(lpDrawItemStruct->hDC);
     SAutoRefPtr<IRenderTarget> pRT;
     GETRENDERFACTORY->CreateRenderTarget(&pRT, rcItem.Width(), rcItem.Height());
-
+	pRT->BeginDraw();
     if (pdmmi)
     {
         MENUITEMINFO mii = { sizeof(MENUITEMINFO), MIIM_FTYPE, 0 };
@@ -201,9 +201,10 @@ void SMenuODWnd::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
     }
     rcItem = lpDrawItemStruct->rcItem;
 
+	pRT->EndDraw();
     HDC hmemdc = pRT->GetDC(0);
     BitBlt(dc, rcItem.left, rcItem.top, rcItem.Width(), rcItem.Height(), hmemdc, 0, 0, SRCCOPY);
-    pRT->ReleaseDC(hmemdc);
+    pRT->ReleaseDC(hmemdc,&rcItem);
 }
 
 void SMenuODWnd::MeasureItem(LPMEASUREITEMSTRUCT lpMeasureItemStruct)

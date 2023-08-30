@@ -432,6 +432,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\FpsWnd.cpp"
+				>
+			</File>
+			<File
 				RelativePath="magnet\magnetframe.cpp"
 				>
 			</File>
@@ -683,6 +687,10 @@
 			</File>
 			<File
 				RelativePath="FormatMsgDlg.h"
+				>
+			</File>
+			<File
+				RelativePath=".\FpsWnd.h"
 				>
 			</File>
 			<File

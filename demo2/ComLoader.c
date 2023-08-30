@@ -28,6 +28,7 @@ struct SComInfo s_comInfo[]={
 	{Decoder_Stb,_T("imgdecoder-stbd.dll"),NULL},
 	{Render_Gdi,_T("render-gdid.dll"),NULL},
 	{Render_Skia,_T("render-skiad.dll"),NULL},
+	{Render_D2D,_T("render-d2dd.dll"),NULL},
 	{Log4Z,_T("log4zd.dll"),NULL},
 	{Resprovider_7Zip,_T("resprovider-7zipd.dll"),NULL},
 	{Resprovider_Zip,_T("resprovider-zipd.dll"),NULL},
@@ -43,6 +44,7 @@ struct SComInfo s_comInfo[]={
 	{Decoder_Stb,_T("imgdecoder-stb.dll"),NULL},
 	{Render_Gdi,_T("render-gdi.dll"),NULL},
 	{Render_Skia,_T("render-skia.dll"),NULL},
+	{Render_D2D,_T("render-d2d.dll"),NULL},
 	{Log4Z,_T("log4z.dll"),NULL},
 	{Resprovider_7Zip,_T("resprovider-7zip.dll"),NULL},
 	{Resprovider_Zip,_T("resprovider-zip.dll"),NULL},
@@ -87,6 +89,9 @@ struct SComInfo s_comInfo[]={
 #endif
 #if(SCOM_MASK&scom_mask_render_gdi)
 #pragma comment(lib,"render-gdid")
+#endif
+#if(SCOM_MASK&scom_mask_render_d2d)
+#pragma comment(lib,"render-d2dd")
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
 #pragma comment(lib,"imgdecoder-wicd")
@@ -133,6 +138,9 @@ struct SComInfo s_comInfo[]={
 #endif
 #if(SCOM_MASK&scom_mask_render_gdi)
 #pragma comment(lib,"render-gdi")
+#endif
+#if(SCOM_MASK&scom_mask_render_d2d)
+#pragma comment(lib,"render-d2d")
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
 #pragma comment(lib,"imgdecoder-wic")
@@ -186,6 +194,7 @@ SOUI_COM_C BOOL Decoder_Wic_SCreateInstance(IObjRef **ppObj);
 SOUI_COM_C BOOL Decoder_Stb_SCreateInstance(IObjRef **ppObj);
 SOUI_COM_C BOOL Render_Gdi_SCreateInstance(IObjRef **ppObj);
 SOUI_COM_C BOOL Render_Skia_SCreateInstance(IObjRef **ppObj);
+SOUI_COM_C BOOL Render_D2D_SCreateInstance(IObjRef **ppObj);
 SOUI_COM_C BOOL Log4z_SCreateInstance(IObjRef **ppObj);
 SOUI_COM_C BOOL Resp_7zip_SCreateInstance(IObjRef ** ppObj);
 SOUI_COM_C BOOL Resp_Zip_SCreateInstance(IObjRef ** ppObj);
@@ -200,6 +209,7 @@ struct SComInfo s_comInfo[]={
 	{Decoder_Stb,Decoder_Stb_SCreateInstance},
 	{Render_Gdi,Render_Gdi_SCreateInstance},
 	{Render_Skia,Render_Skia_SCreateInstance},
+	{Render_D2D,Render_D2D_SCreateInstance},
 	{Log4Z,Log4z_SCreateInstance},
 	{Resprovider_7Zip,Resp_7zip_SCreateInstance},
 	{Resprovider_Zip,Resp_Zip_SCreateInstance},

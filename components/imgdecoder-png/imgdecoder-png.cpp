@@ -147,7 +147,7 @@ namespace SOUI
     }
     
   
-	HRESULT SImgDecoderFactory_PNG::SaveImage(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, LPVOID pFormat) SCONST
+	HRESULT SImgDecoderFactory_PNG::SaveImage(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, const void* pFormat) SCONST
     {
         if(!pBits) return E_INVALIDARG;
                 
@@ -254,7 +254,14 @@ namespace SOUI
 
         return S_OK;
     }
-    
+
+	HRESULT SImgDecoderFactory_PNG::SaveImage2(THIS_ BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, ImgFmt imgFmt) const
+	{
+		if(imgFmt!=Img_PNG)
+			return E_INVALIDARG;
+		return SaveImage(pBits,nWid,nHei,pszFileName,NULL);
+	}
+
     LPCWSTR SImgDecoderFactory_PNG::GetDescription() const
     {
         return DESC_IMGDECODER;

@@ -22,7 +22,7 @@ class SImageMaskWnd : public SWindow {
 
     void UpdateCacheFromSkin(ISkinObj *pSkin);
     void UpdateCacheFromImage(IBitmapS *pBitmap, FilterLevel fl);
-    void MakeCacheApha();
+    void MakeCacheAlpha();
 
     SOUI_ATTRS_BEGIN()
     ATTR_CUSTOM(L"mask", OnAttrMask) // image.a

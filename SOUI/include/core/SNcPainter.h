@@ -135,6 +135,7 @@ class SNcPainter
     BOOL m_bLButtonDown;
     BOOL m_bMouseHover;
     SNcPanel *m_root;
+	CRect m_rcInvalid;
 };
 
 class SNcPanel : public SOsrPanel {
@@ -143,7 +144,7 @@ class SNcPanel : public SOsrPanel {
     SNcPanel(IHostProxy *pFrameHost, IItemContainer *pItemContainer);
 
     void SetActive(BOOL bActive);
-
+	BOOL IsActive() const{return m_bActive;}
   protected:
     BOOL OnEraseBkgnd(IRenderTarget *pRT);
     SOUI_MSG_MAP_BEGIN()

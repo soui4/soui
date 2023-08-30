@@ -471,6 +471,8 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      * Describe
      */
     STDMETHOD_(HRESULT, Save)(CTHIS_ LPCWSTR pszFileName, const LPVOID pFormat) SCONST PURE;
+
+	STDMETHOD_(HRESULT, Save2)(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST PURE;
 };
 
 typedef IBitmapS *IBitmapPtr;
@@ -702,13 +704,6 @@ DECLARE_INTERFACE_(IRegionS, IRenderObj)
      */
     STDMETHOD_(void, Clear)(THIS) PURE;
 
-    /**
-     * IsEqual
-     * @brief    Test whether two region is equal
-     * @return   BOOL, true-this and testRgn are equal
-     * Describe
-     */
-    STDMETHOD_(BOOL, IsEqual)(CTHIS_ const IRegionS *testRgn) SCONST PURE;
 };
 
 typedef enum _xFormIndex
@@ -730,14 +725,6 @@ typedef struct _IxForm
     float fMat[kMCount];
 } IxForm;
 
-#undef INTERFACE
-#define INTERFACE IPathInfo
-DECLARE_INTERFACE_(IPathInfo, IObjRef)
-{
-    STDMETHOD_(int, pointNumber)(CTHIS) SCONST PURE;
-    STDMETHOD_(const float *, data)(CTHIS) SCONST PURE;
-};
-
 typedef enum _FillType
 {
     /** Specifies that "inside" is computed by a non-zero sum of signed
@@ -756,13 +743,6 @@ typedef enum _FillType
     kInverseEvenOdd_FillType
 } FillType;
 
-typedef enum _Convexity
-{
-    kUnknown_Convexity,
-    kConvex_Convexity,
-    kConcave_Convexity
-} Convexity;
-
 typedef enum _Direction
 {
     /** Direction either has not been or could not be computed */
@@ -773,19 +753,6 @@ typedef enum _Direction
     kCCW_Direction,
 } Direction;
 
-typedef enum _AddPathMode
-{
-    /** Source path contours are added as new contours.
-     */
-    kAppend_AddPathMode,
-    /** Path is added by extending the last contour of the destination path
-    with the first contour of the source path. If the last contour of
-    the destination path is closed, then it will not be extended.
-    Instead, the start of source path will be extended by a straight
-    line to the end point of the destination path.
-    */
-    kExtend_AddPathMode
-} AddPathMode;
 
 #undef INTERFACE
 #define INTERFACE IPathS
@@ -836,62 +803,12 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     */
     STDMETHOD_(void, setFillType)(THIS_ FillType ft) PURE;
 
-    /** Returns true if the filltype is one of the Inverse variants */
-    STDMETHOD_(BOOL, isInverseFillType)(CTHIS) SCONST PURE;
-
-    /**
-     *  Toggle between inverse and normal filltypes. This reverse the return
-     *  value of isInverseFillType()
-     */
-    STDMETHOD_(void, toggleInverseFillType)(THIS) PURE;
-
-    /**
-     *  Return the path's convexity, as stored in the path. If it is currently unknown,
-     *  then this function will attempt to compute the convexity (and cache the result).
-     */
-    STDMETHOD_(Convexity, getConvexity)(CTHIS) SCONST PURE;
-
-    /**
-     *  Store a convexity setting in the path. There is no automatic check to
-     *  see if this value actually agrees with the return value that would be
-     *  computed by getConvexity().
-     *
-     *  Note: even if this is set to a "known" value, if the path is later
-     *  changed (e.g. lineTo(), addRect(), etc.) then the cached value will be
-     *  reset to kUnknown_Convexity.
-     */
-    STDMETHOD_(void, setConvexity)(THIS_ Convexity c) PURE;
-
-    /**
-     *  Returns true if the path is flagged as being convex. This is not a
-     *  confirmed by any analysis, it is just the value set earlier.
-     */
-    STDMETHOD_(BOOL, isConvex)(CTHIS) SCONST PURE;
-
-    /** Returns true if the path is an oval.
-     *
-     * @param rect      returns the bounding rect of this oval. It's a circle
-     *                  if the height and width are the same.
-     *
-     * @return true if this path is an oval.
-     *              Tracking whether a path is an oval is considered an
-     *              optimization for performance and so some paths that are in
-     *              fact ovals can report false.
-     */
-    STDMETHOD_(BOOL, isOval)(CTHIS_ RECT * rect) SCONST PURE;
-
     /** Clear any lines and curves from the path, making it empty. This frees up
     internal storage associated with those segments.
     On Android, does not change fSourcePath.
     */
     STDMETHOD_(void, reset)(THIS) PURE;
 
-    /** Similar to reset(), in that all lines and curves are removed from the
-    path. However, any internal storage for those lines/curves is retained,
-    making reuse of the path potentially faster.
-    On Android, does not change fSourcePath.
-    */
-    STDMETHOD_(void, rewind)(THIS) PURE;
 
     /** Returns true if the path is empty (contains no lines or curves)
 
@@ -899,60 +816,6 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     */
     STDMETHOD_(BOOL, isEmpty)(CTHIS) SCONST PURE;
 
-    /**
-     *  Returns true if all of the points in this path are finite, meaning there
-     *  are no infinities and no NaNs.
-     */
-    STDMETHOD_(BOOL, isFinite)(CTHIS) SCONST PURE;
-
-    /**
-     *  Returns true if the path specifies a single line (i.e. it contains just
-     *  a moveTo and a lineTo). If so, and line[] is not null, it sets the 2
-     *  points in line[] to the end-points of the line. If the path is not a
-     *  line, returns false and ignores line[].
-     */
-    STDMETHOD_(BOOL, isLine)(CTHIS_ POINT line[2]) SCONST PURE;
-
-    /** Returns true if the path specifies a rectangle. If so, and if rect is
-    not null, set rect to the bounds of the path. If the path does not
-    specify a rectangle, return false and ignore rect.
-
-    @param rect If not null, returns the bounds of the path if it specifies
-    a rectangle
-    @return true if the path specifies a rectangle
-    */
-    STDMETHOD_(BOOL, isRect)(CTHIS_ RECT * rect) SCONST PURE;
-
-    /** Return the number of points in the path
-     */
-    STDMETHOD_(int, countPoints)(CTHIS) SCONST PURE;
-
-    /** Return the point at the specified index. If the index is out of range
-    (i.e. is not 0 <= index < countPoints()) then the returned coordinates
-    will be (0,0)
-    */
-    STDMETHOD_(fPoint, getPoint)(CTHIS_ int index) SCONST PURE;
-
-    /** Returns the number of points in the path. Up to max points are copied.
-
-    @param points If not null, receives up to max points
-    @param max The maximum number of points to copy into points
-    @return the actual number of points in the path
-    */
-    STDMETHOD_(int, getPoints)(CTHIS_ fPoint points[], int max) SCONST PURE;
-
-    /** Return the number of verbs in the path
-     */
-    STDMETHOD_(int, countVerbs)(CTHIS) SCONST PURE;
-
-    /** Returns the number of verbs in the path. Up to max verbs are copied. The
-    verbs are copied as one byte per verb.
-
-    @param verbs If not null, receives up to max verbs
-    @param max The maximum number of verbs to copy into verbs
-    @return the actual number of verbs in the path
-    */
-    STDMETHOD_(int, getVerbs)(CTHIS_ BYTE verbs[], int max) SCONST PURE;
 
     /** Returns the bounds of the path's points. If the path contains 0 or 1
     points, the bounds is set to (0,0,0,0), and isEmpty() will return true.
@@ -1066,42 +929,6 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     STDMETHOD_(void, rCubicTo)
     (THIS_ float x1, float y1, float x2, float y2, float x3, float y3) PURE;
 
-    /** Append the specified arc to the path as a new contour. If the start of
-    the path is different from the path's current last point, then an
-    automatic lineTo() is added to connect the current contour to the start
-    of the arc. However, if the path is empty, then we call moveTo() with
-    the first point of the arc. The sweep angle is treated mod 360.
-
-    @param oval The bounding oval defining the shape and size of the arc
-    @param startAngle Starting angle (in degrees) where the arc begins
-    @param sweepAngle Sweep angle (in degrees) measured clockwise. This is
-    treated mod 360.
-    @param forceMoveTo If true, always begin a new contour with the arc
-    */
-    STDMETHOD_(void, arcTo)
-    (THIS_ const RECT *oval, float startAngle, float sweepAngle, BOOL forceMoveTo) PURE;
-
-    /** Append a line and arc to the current path. This is the same as the
-    PostScript call "arct".
-    */
-    STDMETHOD_(void, arcTo2)(THIS_ float x1, float y1, float x2, float y2, float radius) PURE;
-
-    /** Close the current contour. If the current point is not equal to the
-    first point of the contour, a line segment is automatically added.
-    */
-    STDMETHOD_(void, close)(THIS) PURE;
-
-    /** Returns true if the path specifies a rectangle. If so, and if isClosed is
-    not null, set isClosed to true if the path is closed. Also, if returning true
-    and direction is not null, return the rect direction. If the path does not
-    specify a rectangle, return false and ignore isClosed and direction.
-
-    @param isClosed If not null, set to true if the path is closed
-    @param direction If not null, set to the rectangle's direction
-    @return true if the path specifies a rectangle
-    */
-    STDMETHOD_(BOOL, isRect2)(CTHIS_ BOOL * isClosed, Direction * direction) SCONST PURE;
-
     /**
      *  Add a closed rectangle contour to the path
      *  @param rect The rectangle to add as a closed contour to the path
@@ -1136,6 +963,8 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addOval)(THIS_ const RECT *oval, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
+	STDMETHOD_(void,addOval2)(THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction)) PURE;
+
     /**
      *  Add a closed circle contour to the path
      *
@@ -1159,6 +988,8 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     */
     STDMETHOD_(void, addArc)(THIS_ const RECT *oval, float startAngle, float sweepAngle) PURE;
 
+	STDMETHOD_(void,addArc2)(THIS_ float left, float top, float right, float bottom,float startAngle, float sweepAngle) PURE;
+
     /**
      *  Add a closed round-rectangle contour to the path
      *  @param rect The bounds of a round-rectangle to add as a closed contour
@@ -1174,7 +1005,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *  Add a closed round-rectangle contour to the path. Each corner receives
      *  two radius values [X, Y]. The corners are ordered top-left, top-right,
      *  bottom-right, bottom-left.
-     *  @param rect The bounds of a round-rectangle to add as a closed contour
+     *  @param left,top,right and bottom, The bounds of a round-rectangle to add as a closed contour
      *  @param radii Array of 8 scalars, 4 [X,Y] pairs for each corner
      *  @param dir  The direction to wind the rectangle's contour. Cannot be
      *              kUnknown_Direction.
@@ -1183,7 +1014,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *       sqaure corner and oversized radii are proportionally scaled down).
      */
     STDMETHOD_(void, addRoundRect2)
-    (THIS_ const RECT *rect, const float radii[], Direction dir DEF_VAL(kCW_Direction)) PURE;
+    (THIS_ float left, float top,float right,float bottom, float rx,float ry, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
     /**
      *  Add a new contour made of just lines. This is just a fast version of
@@ -1198,18 +1029,6 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addPoly)(THIS_ const POINT pts[], int count, BOOL close) PURE;
 
-    /** Add a copy of src to the path, offset by (dx,dy)
-    @param src  The path to add as a new contour
-    @param dx   The amount to translate the path in X as it is added
-    @param dx   The amount to translate the path in Y as it is added
-    */
-    STDMETHOD_(void, addPath)
-    (THIS_ const IPathS *src, float dx, float dy, AddPathMode mode /*= kAppend_AddPathMode*/) PURE;
-
-    /**
-     *  Same as addPath(), but reverses the src input
-     */
-    STDMETHOD_(void, reverseAddPath)(THIS_ const IPathS *src) PURE;
 
     /** Offset the path by (dx,dy), returning true on success
 
@@ -1230,88 +1049,28 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
 
     @param lastPt   The last point on the path is returned here
     */
-    STDMETHOD_(BOOL, getLastPt)(CTHIS_ POINT * lastPt) SCONST PURE;
-
-    /** Set the last point on the path. If no points have been added,
-    moveTo(x,y) is automatically called.
-
-    @param x    The new x-coordinate for the last point
-    @param y    The new y-coordinate for the last point
-    */
-    STDMETHOD_(void, setLastPt)(THIS_ float x, float y) PURE;
+    STDMETHOD_(BOOL, getLastPt)(CTHIS_ fPoint * lastPt) SCONST PURE;
 
     STDMETHOD_(void, addString)
     (THIS_ LPCTSTR pszText, int nLen, float x, float y, const IFontS *pFont) PURE;
 
-    // Returns a float[] with each point along the path represented by 3 floats
-    // * fractional length along the path that the point resides
-    // * x coordinate
-    // * y coordinate
-    // Note that more than one point may have the same length along the path in
-    // the case of a move.
-    // NULL can be returned if the Path is empty.
-    STDMETHOD_(IPathInfo *, approximate)(THIS_ float acceptableError) PURE;
-
     STDMETHOD_(IPathS *, clone)(CTHIS) SCONST PURE;
-};
+	
+	STDMETHOD_(BOOL,beginFigure)(THIS_ float x,float y,BOOL bFill DEF_VAL(TRUE)) PURE;
 
-#undef INTERFACE
-#define INTERFACE IPathMeasure
-DECLARE_INTERFACE_(IPathMeasure, IObjRef)
-{
-    //!添加引用
-    /*!
-     */
-    STDMETHOD_(long, AddRef)(THIS) PURE;
+	STDMETHOD_(BOOL,endFigure)(THIS_ BOOL bClose) PURE;
 
-    //!释放引用
-    /*!
-     */
-    STDMETHOD_(long, Release)(THIS) PURE;
+	STDMETHOD_(float,getLength)(CTHIS) SCONST PURE;
 
-    //!释放对象
-    /*!
-     */
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+	STDMETHOD_(BOOL,getPosTan)(CTHIS_ float distance, fPoint *pos, fPoint *vec) SCONST PURE;
 
-    /**
-     * Assign a new path, or null to have none.
-     */
-    STDMETHOD_(void, setPath)(THIS_ IPathS * path, BOOL forceClosed) PURE;
+	/** Close the current path to stop edit
+    */
+    STDMETHOD_(void, close)(THIS) PURE;
 
-    /**
-     * Return the total length of the current contour, or 0 if no path is
-     * associated with this measure object.
-     */
-    STDMETHOD_(float, getLength)(THIS) PURE;
+	STDMETHOD_(BOOL, hitTest)(CTHIS_ float x,float y) SCONST PURE;
 
-    /**
-     * Pins distance to 0 <= distance <= getLength(), and then computes the
-     * corresponding position and tangent. Returns false if there is no path,
-     * or a zero-length path was specified, in which case position and tangent
-     * are unchanged.
-     *
-     * @param distance The distance along the current contour to sample
-     * @param pos If not null, eturns the sampled position (x==[0], y==[1])
-     * @param tan If not null, returns the sampled tangent (x==[0], y==[1])
-     * @return false if there was no path associated with this measure object
-     */
-    STDMETHOD_(BOOL, getPosTan)(THIS_ float distance, float pos[], float tan[]) PURE;
-
-    /**
-     * Given a start and stop distance, return in dst the intervening
-     * segment(s). If the segment is zero-length, return false, else return
-     * true. startD and stopD are pinned to legal values (0..getLength()).
-     * If startD >= stopD then return false (and leave dst untouched).
-     * Begin the segment with a moveTo if startWithMoveTo is true.
-     *
-     * <p>On {@link android.os.Build.VERSION_CODES#KITKAT} and earlier
-     * releases, the resulting path may not display on a hardware-accelerated
-     * Canvas. A simple workaround is to add a single operation to this path,
-     * such as <code>dst.rLineTo(0, 0)</code>.</p>
-     */
-    STDMETHOD_(BOOL, getSegment)
-    (THIS_ float startD, float stopD, IPathS *dst, BOOL startWithMoveTo) PURE;
+	STDMETHOD_(BOOL, hitTestStroke)(CTHIS_ float x,float y,float strokeSize) SCONST PURE;
 };
 
 typedef struct _GradientItem
@@ -1359,7 +1118,10 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    STDMETHOD_(HRESULT, CreateCompatibleRenderTarget)(THIS_ SIZE szTarget, IRenderTarget * *ppRenderTarget) PURE;
+	STDMETHOD_(void, BeginDraw)(THIS) PURE;
+	STDMETHOD_(void, EndDraw)(THIS) PURE;
+
+	STDMETHOD_(BOOL,IsOffscreen)(CTHIS) SCONST PURE;
 
     STDMETHOD_(HRESULT, CreatePen)(THIS_ int iStyle, COLORREF cr, int cWidth, IPenS **ppPen) PURE;
     STDMETHOD_(HRESULT, CreateSolidColorBrush)(THIS_ COLORREF cr, IBrushS * *ppBrush) PURE;
@@ -1380,7 +1142,6 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, PopClip)(THIS) PURE;
 
     STDMETHOD_(HRESULT, ExcludeClipRect)(THIS_ LPCRECT pRc) PURE;
-    STDMETHOD_(HRESULT, IntersectClipRect)(THIS_ LPCRECT pRc) PURE;
 
     STDMETHOD_(HRESULT, SaveClip)(THIS_ int *pnState) PURE;
     STDMETHOD_(HRESULT, RestoreClip)(THIS_ int nState DEF_VAL(-1)) PURE;
@@ -1441,7 +1202,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
 
     //两个兼容GDI操作的接口
     STDMETHOD_(HDC, GetDC)(THIS_ UINT uFlag) PURE;
-    STDMETHOD_(void, ReleaseDC)(THIS_ HDC hdc) PURE;
+    STDMETHOD_(void, ReleaseDC)(THIS_ HDC hdc,LPCRECT pRc DEF_VAL(NULL)) PURE;
 
     /**
      * SetTransform
@@ -1508,21 +1269,6 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     */
     STDMETHOD_(HRESULT, FillPath)(THIS_ const IPathS *path) PURE;
 
-    /** This behaves the same as save(), but in addition it allocates an
-    offscreen bitmap. All drawing calls are directed there, and only when
-    the balancing call to restore() is made is that offscreen transfered to
-    the canvas (or the previous layer).
-    @param pRect (may be null) This rect, if non-null, is used as a hint to
-    limit the size of the offscreen, and thus drawing may be
-    clipped to it, though that clipping is not guaranteed to
-    happen. If exact clipping is desired, use clipRect().
-    @param byAlpha  This is applied to the offscreen when restore() is called.
-    @return The value to pass to restoreToCount() to balance this save()
-    */
-    STDMETHOD_(HRESULT, PushLayer)(THIS_ const RECT *pRect, BYTE byAlpha DEF_VAL(0xFF)) PURE;
-
-    STDMETHOD_(HRESULT, PopLayer)(THIS) PURE;
-
     STDMETHOD_(HRESULT, SetXfermode)(THIS_ int mode, int *pOldMode DEF_VAL(NULL)) PURE;
     STDMETHOD_(BOOL, SetAntiAlias)(THIS_ BOOL bAntiAlias) PURE;
     STDMETHOD_(BOOL, GetAntiAlias)(CTHIS) SCONST PURE;
@@ -1558,6 +1304,9 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
     STDMETHOD_(BOOL, CreateRenderTarget)
     (THIS_ IRenderTarget * *ppRenderTarget, int nWid DEF_VAL(0), int nHei DEF_VAL(0)) PURE;
 
+	STDMETHOD_(BOOL, CreateRenderTarget2)
+		(THIS_ IRenderTarget * *ppRenderTarget, HWND hWnd) PURE;
+
     /**
      * CreateFont
      * @brief    创建字体
@@ -1574,17 +1323,15 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
 
     STDMETHOD_(BOOL, CreateRegion)(THIS_ IRegionS * *ppRgn) PURE;
 
+	STDMETHOD_(BOOL, CreatePath)(THIS_ IPathS * *ppPath) PURE;
+
     STDMETHOD_(HRESULT, CreateBlurMaskFilter)
     (THIS_ float radius, BlurStyle style, BlurFlags flag, IMaskFilter **ppMaskFilter) PURE;
 
     STDMETHOD_(HRESULT, CreateEmbossMaskFilter)
     (THIS_ float direction[3], float ambient, float specular, float blurRadius, IMaskFilter **ppMaskFilter) PURE;
 
-    STDMETHOD_(BOOL, CreatePath)(THIS_ IPathS * *ppPath) PURE;
-
     STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFGUID guidEffect, IPathEffect * *ppPathEffect) PURE;
-
-    STDMETHOD_(BOOL, CreatePathMeasure)(THIS_ IPathMeasure * *ppPathMeasure) PURE;
 };
 
 #ifdef __cplusplus

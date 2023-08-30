@@ -321,7 +321,8 @@ public:
 		SButton* pBtnUninstall = pItem->FindChildByName2<SButton>(L"btn_uninstall");
 		CRect rcBtn = pBtnUninstall->GetWindowRect();
 		SMatrix mtx;
-		mtx.setRotate(45);
+		//mtx.setTranslate(0,10);
+		mtx.setRotate(10);
 		mtx.preTranslate(-rcBtn.Width() / 2, -rcBtn.Height() / 2);
 		mtx.postTranslate(rcBtn.Width() / 2, rcBtn.Height() / 2);
 		pBtnUninstall->SetMatrix(mtx);

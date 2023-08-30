@@ -15,6 +15,7 @@
 #ifdef _DEBUG
 #define COM_RENDER_GDI  _T("render-gdid.dll")
 #define COM_RENDER_SKIA _T("render-skiad.dll")
+#define COM_RENDER_D2D _T("render-d2dd.dll")
 #define COM_SCRIPT_LUA _T("scriptmodule-luad.dll")
 #define COM_TRANSLATOR _T("translatord.dll")
 #define COM_ZIPRESPROVIDER _T("resprovider-zipd.dll")
@@ -26,6 +27,7 @@
 #else
 #define COM_RENDER_GDI  _T("render-gdi.dll")
 #define COM_RENDER_SKIA _T("render-skia.dll")
+#define COM_RENDER_D2D _T("render-d2d.dll")
 #define COM_SCRIPT_LUA _T("scriptmodule-lua.dll")
 #define COM_TRANSLATOR _T("translator.dll")
 #define COM_ZIPRESPROVIDER _T("resprovider-zip.dll")
@@ -172,6 +174,11 @@ namespace SOUI
     {
         BOOL SCreateInstance(IObjRef **);
     }
+	namespace RENDER_D2D
+	{
+		BOOL SCreateInstance(IObjRef **);
+	}
+
     namespace SCRIPT_LUA
     {
         BOOL SCreateInstance(IObjRef **);
@@ -247,6 +254,13 @@ public:
     {
         return RENDER_SKIA::SCreateInstance(ppObj);
     }
+#endif
+
+#if(SCOM_MASK&scom_mask_render_d2d)
+	BOOL CreateRender_D2D(IObjRef **ppObj)
+	{
+		return RENDER_D2D::SCreateInstance(ppObj);
+	}
 #endif
 
 #if(SCOM_MASK&scom_mask_script_lua)
@@ -354,7 +368,13 @@ public:
     {
         return renderLoader.CreateInstance(m_strDllPath+COM_RENDER_SKIA,ppObj);
     }
-    BOOL CreateScrpit_Lua(IObjRef **ppObj)
+
+	BOOL CreateRender_D2D(IObjRef **ppObj)
+	{
+		return renderLoader.CreateInstance(m_strDllPath+COM_RENDER_D2D,ppObj);
+	}
+	
+	BOOL CreateScrpit_Lua(IObjRef **ppObj)
     {
         return scriptLoader.CreateInstance(m_strDllPath+COM_SCRIPT_LUA,ppObj);
     }

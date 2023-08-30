@@ -252,7 +252,7 @@ namespace SOUI
         return( CLSID_NULL );
     }
 
-	HRESULT SImgDecoderFactory_GDIP::SaveImage(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, LPVOID pFormat) SCONST
+	HRESULT SImgDecoderFactory_GDIP::SaveImage(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, const void * pFormat) SCONST
     {
         const GUID * pFmtID = (const GUID*)pFormat;
         
@@ -291,6 +291,41 @@ namespace SOUI
         Image *gdipImg = &bmp;
         return Ok == gdipImg->Save(pszFileName,&clsidEncoder,NULL)?S_OK:E_FAIL;
     }
+
+	/*
+	DEFINE_GUID(ImageFormatBMP, 0xb96b3cab,0x0728,0x11d3,0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e);
+	DEFINE_GUID(ImageFormatEMF, 0xb96b3cac,0x0728,0x11d3,0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e);
+	DEFINE_GUID(ImageFormatWMF, 0xb96b3cad,0x0728,0x11d3,0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e);
+	DEFINE_GUID(ImageFormatJPEG, 0xb96b3cae,0x0728,0x11d3,0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e);
+	DEFINE_GUID(ImageFormatPNG, 0xb96b3caf,0x0728,0x11d3,0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e);
+	DEFINE_GUID(ImageFormatGIF, 0xb96b3cb0,0x0728,0x11d3,0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e);
+	DEFINE_GUID(ImageFormatTIFF, 0xb96b3cb1,0x0728,0x11d3,0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e);
+	DEFINE_GUID(ImageFormatEXIF, 0xb96b3cb2,0x0728,0x11d3,0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e);
+	DEFINE_GUID(ImageFormatIcon, 0xb96b3cb5,0x0728,0x11d3,0x9d,0x7b,0x00,0x00,0xf8,0x1e,0xf3,0x2e);
+	*/
+	HRESULT SImgDecoderFactory_GDIP::SaveImage2(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
+	{
+		const GUID *fmt = NULL;
+		switch(imgFmt){
+			case Img_PNG:
+				fmt = &ImageFormatPNG;
+				break;
+			case Img_BMP:
+				fmt = &ImageFormatBMP;
+				break;
+			case Img_TIFF:
+				fmt = &ImageFormatTIFF;
+				break;
+			case Img_JPG:
+				fmt = &ImageFormatJPEG;
+				break;
+			default:
+				break;
+		}
+		if(!fmt)
+			return E_INVALIDARG;
+		return SaveImage(pBits,nWid,nHei,pszFileName,(const void*)fmt);
+	}
 
     LPCWSTR SImgDecoderFactory_GDIP::GetDescription() const
     {

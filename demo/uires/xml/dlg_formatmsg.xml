@@ -1,11 +1,11 @@
-﻿<SOUI trCtx="dlg_formatmsg" title="format msg" width="500" height="300" margin="5,5,5,5" resizable="0" bigIcon="LOGO:32" smallIcon="LOGO:16" translucent="1" alpha="255">
+﻿<SOUI trCtx="dlg_formatmsg" title="format msg" width="500" height="300" margin="5,5,5,5" resizable="0" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" translucent="1" alpha="255">
   <style>
     <!--局部style对象-->
     <class name="cls_edit" ncSkin="_skin.sys.border" margin-x="2" margin-y="2" />
   </style>
   <root class="cls_dlg_frame" cache="1">
     <caption pos="0,0,-0,30" show="1" font="adding:8">
-      <icon pos="10,8" src="LOGO:16"/>
+      <icon pos="10,8" src="ICON_LOGO:16"/>
       <text class="cls_txt_red">输入XML格式消息</text>
       <imgbtn id="IDCANCEL" skin="_skin.sys.btn.close"    pos="-45,0" tip="close" animate="1"/>
     </caption>

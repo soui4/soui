@@ -9,6 +9,7 @@ INCLUDEPATH += .
 SUBDIRS += imgdecoder-wic
 SUBDIRS += render-gdi
 SUBDIRS += render-skia
+SUBDIRS += render-d2d
 SUBDIRS += translator
 SUBDIRS += resprovider-zip
 SUBDIRS += imgdecoder-stb
@@ -23,6 +24,7 @@ SUBDIRS += httpclient
 
 imgdecoder-png.depends += zlib png
 render-skia.depends += skia
+render-d2d.depends += utilities4
 resprovider-zip.depends += zlib utilities4
 translator.depends += utilities4
 resprovider-7zip.depends += 7z utilities4

@@ -65,7 +65,7 @@ void SStaticGdip::OnDrawLine(IRenderTarget * pRT, LPCTSTR pszBuf, int iBegin, in
 			graphics.DrawString(str, str.GetLength(),&font,pt,&format,&brush);
 		}
 	}
-	pRT->ReleaseDC(hdc);
+	pRT->ReleaseDC(hdc,pRect);
 }
 
 
@@ -84,7 +84,7 @@ SIZE SStaticGdip::OnMeasureText(IRenderTarget *pRT,LPCTSTR pszText,int cchLen)
 		szRet.cx = (long)rcOut.GetRight();
 		szRet.cy = (long)rcOut.GetBottom();
 	}
-	pRT->ReleaseDC(hdc);
+	pRT->ReleaseDC(hdc,NULL);
 	return szRet;
 }
 

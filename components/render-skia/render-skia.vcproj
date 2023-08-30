@@ -420,10 +420,6 @@
 				>
 			</File>
 			<File
-				RelativePath="pathmeasure-skia.cpp"
-				>
-			</File>
-			<File
 				RelativePath="render-skia.cpp"
 				>
 			</File>
@@ -443,10 +439,6 @@
 			</File>
 			<File
 				RelativePath="patheffect-skia.h"
-				>
-			</File>
-			<File
-				RelativePath="pathmeasure-skia.h"
 				>
 			</File>
 			<File

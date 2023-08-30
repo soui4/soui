@@ -162,7 +162,7 @@ SHexEdit::SHexEdit()
     , m_dwZeroAddr(0)
 {
     m_bFocusable = TRUE;
-    m_tPaintDetails.nCharacterWidth = 0;
+	memset(&m_tPaintDetails,0,sizeof(m_tPaintDetails));
     m_bCaretAtLineEnd = false;
 
     m_tAdrTxtCol = RGBA(0x00, 0x00, 0xBF, 0xFF);

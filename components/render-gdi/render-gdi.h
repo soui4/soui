@@ -27,6 +27,7 @@ public:
 	STDMETHOD_(void,SetImgDecoderFactory)(THIS_ IImgDecoderFactory *pImgDecoderFac) OVERRIDE;
 	STDMETHOD_(BOOL,CreateRenderTarget)(THIS_ IRenderTarget ** ppRenderTarget,int nWid,int nHei) OVERRIDE;
 
+	STDMETHOD_(BOOL,CreateRenderTarget2)(THIS_ IRenderTarget ** ppRenderTarget,HWND hWnd) OVERRIDE;
 	STDMETHOD_(BOOL,CreateFont)(THIS_ IFontS ** ppFont, const LOGFONT *lf) OVERRIDE;
 
 	STDMETHOD_(BOOL,CreateBitmap)(THIS_ IBitmapS ** ppBitmap) OVERRIDE;
@@ -40,8 +41,6 @@ public:
 	STDMETHOD_(BOOL,CreatePath)(THIS_ IPathS ** ppPath) OVERRIDE;
 
 	STDMETHOD_(BOOL,CreatePathEffect)(THIS_ REFGUID guidEffect,IPathEffect ** ppPathEffect) OVERRIDE;
-
-	STDMETHOD_(BOOL,CreatePathMeasure)(THIS_ IPathMeasure ** ppPathMeasure) OVERRIDE;
 protected:
 	SAutoRefPtr<IImgDecoderFactory> m_imgDecoderFactory;
 };
@@ -245,6 +244,7 @@ public:
 	STDMETHOD_(HRESULT,Scale2)(THIS_ IBitmapS **pOutput,int nWid,int nHei,FilterLevel filterLevel) SCONST OVERRIDE;
 
 	STDMETHOD_(HRESULT,Save)(THIS_ LPCWSTR pszFileName,const LPVOID pFormat) SCONST OVERRIDE;
+	STDMETHOD_(HRESULT, Save2)(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST OVERRIDE;
 		virtual void SetMaskFilter(IMaskFilter *pMaskFilter){}
 		virtual IMaskFilter* GetMaskFilter(){return NULL;}
 public:
@@ -288,8 +288,6 @@ public:
 	STDMETHOD_(void,Offset)(THIS_ POINT pt) OVERRIDE;
 
 	STDMETHOD_(void,Clear)(THIS) OVERRIDE;
-
-	STDMETHOD_(BOOL,IsEqual)(THIS_ const IRegionS * testRgn) SCONST OVERRIDE;
 protected:
 	HRGN GetRegion() const;
 	void _CombineRgn(HRGN hRgn,int nCombineMode);
@@ -306,7 +304,10 @@ public:
 	SRenderTarget_GDI(IRenderFactory* pRenderFactory,int nWid,int nHei);
 	~SRenderTarget_GDI();
 
-	STDMETHOD_(HRESULT,CreateCompatibleRenderTarget)(THIS_ SIZE szTarget,IRenderTarget **ppRenderTarget) OVERRIDE;
+	STDMETHOD_(void, BeginDraw)(THIS) OVERRIDE{}
+	STDMETHOD_(void, EndDraw)(THIS) OVERRIDE{}
+	STDMETHOD_(BOOL,IsOffscreen)(CTHIS) SCONST {return TRUE;}
+
 	STDMETHOD_(HRESULT,CreatePen)(THIS_ int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateSolidColorBrush)(THIS_ COLORREF cr,IBrushS ** ppBrush) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateBitmapBrush)(THIS_ IBitmapS *pBmp,TileMode xtm,TileMode ytm, IBrushS ** ppBrush ) OVERRIDE;
@@ -324,7 +325,6 @@ public:
 	STDMETHOD_(HRESULT,PopClip)(THIS) OVERRIDE;
 
 	STDMETHOD_(HRESULT,ExcludeClipRect)(THIS_ LPCRECT pRc) OVERRIDE;
-	STDMETHOD_(HRESULT,IntersectClipRect)(THIS_ LPCRECT pRc) OVERRIDE;
 
 	STDMETHOD_(HRESULT,SaveClip)(THIS_ int *pnState) OVERRIDE;
 	STDMETHOD_(HRESULT,RestoreClip)(THIS_ int nState/*=-1*/) OVERRIDE;
@@ -372,7 +372,7 @@ public:
 	STDMETHOD_(void,SetMaskFilter)(THIS_ IMaskFilter *pMaskFilter) OVERRIDE{}
 	STDMETHOD_(IMaskFilter *,GetMaskFilter)(THIS) OVERRIDE{return NULL;}
 	STDMETHOD_(HDC,GetDC)(THIS_ UINT uFlag) OVERRIDE;
-	STDMETHOD_(void,ReleaseDC)(THIS_ HDC hdc) OVERRIDE;
+	STDMETHOD_(void,ReleaseDC)(THIS_ HDC hdc,LPCRECT pRc) OVERRIDE;
 	STDMETHOD_(HRESULT,SetTransform)(THIS_ const float matrix[9], float oldMatrix[9]/*=NULL*/) OVERRIDE;
 	STDMETHOD_(HRESULT,GetTransform)(THIS_ float matrix[9]) SCONST OVERRIDE;
 	STDMETHOD_(COLORREF,GetPixel)(THIS_ int x, int y) OVERRIDE;
@@ -380,8 +380,6 @@ public:
 	STDMETHOD_(HRESULT,PushClipPath)(THIS_ const IPathS * path, UINT mode, BOOL doAntiAlias = false) OVERRIDE;
 	STDMETHOD_(HRESULT,DrawPath)(THIS_ const IPathS * path,IPathEffect * pathEffect=NULL) OVERRIDE;
 	STDMETHOD_(HRESULT,FillPath)(THIS_ const IPathS * path) OVERRIDE;
-	STDMETHOD_(HRESULT,PushLayer)(THIS_ const RECT * pRect,BYTE byAlpha/*=0xFF*/) OVERRIDE;
-	STDMETHOD_(HRESULT,PopLayer)(THIS) OVERRIDE;
 	STDMETHOD_(HRESULT,SetXfermode)(THIS_ int mode,int *pOldMode=NULL) OVERRIDE;
 	STDMETHOD_(BOOL,SetAntiAlias)(THIS_ BOOL bAntiAlias) OVERRIDE;
 	STDMETHOD_(BOOL,GetAntiAlias)(THIS) SCONST OVERRIDE;

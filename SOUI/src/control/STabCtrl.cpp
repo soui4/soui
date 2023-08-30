@@ -38,6 +38,7 @@ class STabSlider
                 GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcPage.Width() * 2, rcPage.Height());
             }
 
+			m_memRT->BeginDraw();
             CPoint pt;
 
             if (m_bVertical)
@@ -112,6 +113,7 @@ class STabSlider
             GetContainer()->RegisterTimelineHandler(this);
             pTabCtrl->GetItem(iTo)->SetVisible(FALSE);
             SetVisible(TRUE, TRUE);
+			m_memRT->EndDraw();
         }
         else
         {
@@ -127,7 +129,7 @@ class STabSlider
             {
                 GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcPage.Width() * 2, rcPage.Height());
             }
-
+			m_memRT->BeginDraw();
             CPoint pt;
 
             if (m_bVertical)
@@ -198,7 +200,7 @@ class STabSlider
             PaintForeground(m_memRT, &rcPage, GetParent());
 
             m_memRT->SetViewportOrg(CPoint());
-
+			m_memRT->EndDraw();
             GetContainer()->RegisterTimelineHandler(this);
             pTabCtrl->GetItem(iTo)->SetVisible(FALSE);
             SetVisible(TRUE, TRUE);

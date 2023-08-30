@@ -6,6 +6,7 @@
 
 #define scom_mask_render_skia  (1 << 3)
 #define scom_mask_render_gdi  (1 << 4)
+#define scom_mask_render_d2d  (1 << 14)
 
 #define scom_mask_imgdecoder_gdip  (1 << 5)
 #define scom_mask_imgdecoder_png  (1 << 6)

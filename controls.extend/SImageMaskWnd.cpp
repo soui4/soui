@@ -61,7 +61,7 @@ HRESULT SImageMaskWnd::OnAttrMask(const SStringW &strValue, BOOL bLoading)
         if (pSkin)
         {
             UpdateCacheFromSkin(pSkin);
-            MakeCacheApha();
+            MakeCacheAlpha();
         }
     }
     return S_OK;
@@ -92,7 +92,7 @@ void SImageMaskWnd::UpdateCacheFromImage(IBitmapS *pBitmap, FilterLevel fl)
     pRTDst->SelectObject(pOldBmp, NULL);
 }
 
-void SImageMaskWnd::MakeCacheApha()
+void SImageMaskWnd::MakeCacheAlpha()
 {
     //从mask的指定channel中获得alpha通道
     LPBYTE pBitCache = (LPBYTE)m_bmpCache->LockPixelBits();
@@ -129,7 +129,7 @@ HRESULT SImageMaskWnd::OnAttrImage(const SStringW &strValue, BOOL bLoading)
         if (pSkin)
         {
             UpdateCacheFromSkin(pSkin);
-            MakeCacheApha();
+            MakeCacheAlpha();
         }
     }
     else
@@ -142,7 +142,7 @@ HRESULT SImageMaskWnd::OnAttrImage(const SStringW &strValue, BOOL bLoading)
 void SImageMaskWnd::SetImage(IBitmapS *pBitmap, FilterLevel fl /*=kHigh_FilterLevel*/)
 {
     UpdateCacheFromImage(pBitmap, fl);
-    MakeCacheApha();
+    MakeCacheAlpha();
     Invalidate();
 }
 

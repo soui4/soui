@@ -12,7 +12,6 @@ namespace SOUI
 	{
 		GetEventSet()->addEvent(EVENTID(EventPath));
 		GETRENDERFACTORY->CreatePath(&m_path);
-		GETRENDERFACTORY->CreatePathMeasure(&m_pathMeasure);
 	}
 
 	SPathView::~SPathView(void)
@@ -26,26 +25,24 @@ namespace SOUI
 		{
 			m_lstPoints.Add(pts[i]);
 		}
-		m_path->reset();
-		m_path->addPoly(m_lstPoints.GetData(),m_lstPoints.GetCount(),false);
+		updatePath();
 		OnPathChanged();
 	}
 
 	void SPathView::OnLButtonDown(UINT nFlags,CPoint pt)
 	{
-		if(!m_path || !m_pathMeasure)
+		if(!m_path)
 			return;
 		CRect rc = GetClientRect();
 		pt -= rc.TopLeft();
 		m_lstPoints.Add(pt);
-		m_path->reset();
-		m_path->addPoly(m_lstPoints.GetData(),m_lstPoints.GetCount(),false);
+		updatePath();
 		OnPathChanged();
 	}
 
 	void SPathView::OnRButtonDown(UINT nFlags, CPoint point)
 	{
-		if(!m_path || !m_pathMeasure)
+		if(!m_path)
 			return;
 
 		CRect rc=GetClientRect();
@@ -58,8 +55,7 @@ namespace SOUI
 			if(rcFrame.PtInRect(point))
 			{
 				m_lstPoints.RemoveAt(i);
-				m_path->reset();
-				m_path->addPoly(m_lstPoints.GetData(),m_lstPoints.GetCount(),false);
+				updatePath();
 				OnPathChanged();
 				break;
 			}
@@ -68,7 +64,7 @@ namespace SOUI
 
 	void SPathView::OnPaint(IRenderTarget *pRT)
 	{
-		if(!m_path || !m_pathMeasure)
+		if(!m_path)
 		{
 			__baseCls::OnPaint(pRT);
 			return;
@@ -81,7 +77,8 @@ namespace SOUI
 		{
 			SAutoRefPtr<ICornerPathEffect> pathEffect;
 			GETRENDERFACTORY->CreatePathEffect(__uuidof(ICornerPathEffect),(IPathEffect**)&pathEffect);
-			pathEffect->Init(m_fCornerRadius);
+			if(pathEffect)
+				pathEffect->Init(m_fCornerRadius);
 
 			SAutoRefPtr<IPenS> pen,oldPen;
 			pRT->CreatePen(m_nLineStyle,m_crLine,m_nLineWidth,&pen);
@@ -109,10 +106,18 @@ namespace SOUI
 	void SPathView::OnPathChanged()
 	{
 		EventPath evt(this);
-		m_pathMeasure->setPath(m_path,false);
-		evt.fLength = m_pathMeasure->getLength();
+		evt.fLength = m_path->getLength();
 		FireEvent(evt);
 		Invalidate();
+	}
+
+	void SPathView::updatePath()
+	{
+		m_path->reset();
+		m_path->beginFigure(0,0);
+		m_path->addPoly(m_lstPoints.GetData(),m_lstPoints.GetCount(),false);
+		m_path->endFigure(FALSE);
+		m_path->close();
 	}
 
 }

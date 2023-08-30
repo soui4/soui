@@ -694,42 +694,51 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
     SMatrix mtx(fMtx);
 
     SAutoRefPtr<IRenderTarget> rt;
-    if (!mtx.isIdentity())
+    if (!mtx.isIdentity() || !pRT->IsOffscreen())
     {
         GETRENDERFACTORY->CreateRenderTarget(&rt, rcClient.Width(), rcClient.Height());
+		rt->BeginDraw();
         rt->SetViewportOrg(-rcClient.TopLeft());
-        rt->AlphaBlend(&rcClient, pRT, &rcClient, 255);
+		if(!SUCCEEDED(rt->BitBlt(&rcClient,pRT,rcClient.left,rcClient.top))){
+			//从ID2D1HwndRenderTarget复制背景会失败，重新生成背景
+			rt->ClearRect(&rcClient,RGBA(255,255,255,255));
+			SSendMessage(WM_ERASEBKGND,(WPARAM)(IRenderTarget*)rt);
+		}
     }
     else
     {
         rt = pRT;
     }
     HDC hdc = rt->GetDC(0);
-    int nOldMode = ::SetGraphicsMode(hdc, GM_COMPATIBLE); // richedit需要将GraphicMode强制设置为GM_COMPATIBLE
+	if(hdc)
+	{
+		int nOldMode = ::SetGraphicsMode(hdc, GM_COMPATIBLE); // richedit需要将GraphicMode强制设置为GM_COMPATIBLE
 
-    ALPHAINFO ai;
-    CGdiAlpha::AlphaBackup(hdc, &rcClient, ai);
-
-    LONG lPos = 0;
-    m_pTxtHost->GetTextService()->TxGetVScroll(NULL, NULL, &lPos, NULL, NULL);
-    RECTL rcL = { rcClient.left, rcClient.top, rcClient.right, rcClient.bottom };
-    m_pTxtHost->GetTextService()->TxDraw(DVASPECT_CONTENT, // Draw Aspect
-                                         0,                // Lindex
-                                         NULL,             // Info for drawing optimazation
-                                         NULL,             // target device information
-                                         hdc,              // Draw device HDC
-                                         NULL,             // Target device HDC
-                                         &rcL,             // Bounding client rectangle
-                                         NULL,             // Clipping rectangle for metafiles
-                                         &rcClient,        // Update rectangle
-                                         NULL,             // Call back function
-                                         0,                // Call back parameter
-                                         TXTVIEW_ACTIVE);
-    CGdiAlpha::AlphaRestore(ai);
-    ::SetGraphicsMode(hdc, nOldMode);
-    rt->ReleaseDC(hdc);
-    if (!mtx.isIdentity())
+		ALPHAINFO ai;
+		CGdiAlpha::AlphaBackup(hdc, &rcClient, ai);
+		
+		LONG lPos = 0;
+		m_pTxtHost->GetTextService()->TxGetVScroll(NULL, NULL, &lPos, NULL, NULL);
+		RECTL rcL = { rcClient.left, rcClient.top, rcClient.right, rcClient.bottom };
+		m_pTxtHost->GetTextService()->TxDraw(DVASPECT_CONTENT, // Draw Aspect
+											 0,                // Lindex
+											 NULL,             // Info for drawing optimazation
+											 NULL,             // target device information
+											 hdc,              // Draw device HDC
+											 NULL,             // Target device HDC
+											 &rcL,             // Bounding client rectangle
+											 NULL,             // Clipping rectangle for metafiles
+											 &rcClient,        // Update rectangle
+											 NULL,             // Call back function
+											 0,                // Call back parameter
+											 TXTVIEW_ACTIVE);
+		CGdiAlpha::AlphaRestore(ai);
+		::SetGraphicsMode(hdc, nOldMode);
+	}
+    rt->ReleaseDC(hdc,&rcClient);
+    if (rt!=pRT)
     {
+		rt->EndDraw();
         pRT->AlphaBlend(&rcClient, rt, &rcClient, 255);
         rt = NULL;
     }

@@ -27,6 +27,9 @@
     <file name="menu_ico" path="image\TrayMenu\menu_ico.png" />
     <file name="png_menu_border" path="image\TrayMenu\menuborder.png" />
   </ImgTrayMenu>
+  <IMG>
+    <file name="png_item_bk" path="image\item_bk.png"/>
+  </IMG>
 
   <ICON>
     <file name="ICON_LOGO"  path="image\soui.ico"/>

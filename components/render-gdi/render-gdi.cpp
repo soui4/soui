@@ -21,6 +21,13 @@ namespace SOUI
         return TRUE;
     }
 
+	BOOL SRenderFactory_GDI::CreateRenderTarget2(THIS_ IRenderTarget ** ppRenderTarget,HWND hWnd)
+	{
+		RECT rc;
+		::GetClientRect(hWnd,&rc);
+		return CreateRenderTarget(ppRenderTarget,rc.right,rc.bottom);
+	}
+
     BOOL SRenderFactory_GDI::CreateFont( IFontS ** ppFont , const LOGFONT *lf)
     {
         *ppFont = new SFont_GDI(this,lf);
@@ -49,11 +56,6 @@ namespace SOUI
 		return FALSE;
 	}
 
-	BOOL SRenderFactory_GDI::CreatePathMeasure(IPathMeasure ** ppPathMeasure)
-	{
-		return FALSE;
-	}
-
 	void SRenderFactory_GDI::SetImgDecoderFactory(IImgDecoderFactory *pImgDecoderFac)
 	{
 		m_imgDecoderFactory=pImgDecoderFac;
@@ -63,6 +65,7 @@ namespace SOUI
 	{
 		return m_imgDecoderFactory;
 	}
+
 
 	//////////////////////////////////////////////////////////////////////////
 
@@ -438,6 +441,13 @@ namespace SOUI
 		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage(pBits,Width(),Height(),pszFileName,pFormat);
 	}
 
+	HRESULT SBitmap_GDI::Save2(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
+	{
+		LPBYTE pBits = (LPBYTE)GetPixelBits();
+		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2(pBits,Width(),Height(),pszFileName,imgFmt);
+	}
+
+
     //////////////////////////////////////////////////////////////////////////
     //	SRegion_GDI
     SRegion_GDI::SRegion_GDI( IRenderFactory *pRenderFac )
@@ -523,12 +533,6 @@ namespace SOUI
         GetRgnBox(&rcBox);
         return (rcBox.left == rcBox.right) || (rcBox.top== rcBox.bottom);
     }
-
-	BOOL SRegion_GDI::IsEqual(const IRegionS * testRgn) const
-	{
-		const SRegion_GDI *pRgnTestGdi = (const SRegion_GDI*)testRgn;
-		return ::EqualRgn(m_hRgn,pRgnTestGdi->m_hRgn);
-	}
 
     void SRegion_GDI::Offset( POINT pt )
     {
@@ -680,13 +684,6 @@ namespace SOUI
         DeleteDC(m_hdc);
     }
 
-    HRESULT SRenderTarget_GDI::CreateCompatibleRenderTarget( SIZE szTarget,IRenderTarget **ppRenderTarget )
-    {
-        SRenderTarget_GDI *pRT = new SRenderTarget_GDI(m_pRenderFactory,szTarget.cx,szTarget.cy);
-        *ppRenderTarget = pRT;
-        return S_OK;
-    }
-
     HRESULT SRenderTarget_GDI::CreatePen( int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen )
     {
 		*ppPen = new SPen_GDI(m_pRenderFactory,iStyle,cr,cWidth);
@@ -742,12 +739,6 @@ namespace SOUI
     HRESULT SRenderTarget_GDI::ExcludeClipRect( LPCRECT pRc )
     {
         ::ExcludeClipRect(m_hdc,pRc->left,pRc->top,pRc->right,pRc->bottom);
-        return S_OK;
-    }
-
-    HRESULT SRenderTarget_GDI::IntersectClipRect( LPCRECT pRc )
-    {
-        ::IntersectClipRect(m_hdc,pRc->left,pRc->top,pRc->right,pRc->bottom);
         return S_OK;
     }
 
@@ -1244,7 +1235,7 @@ namespace SOUI
         return m_hdc;
     }
 
-    void SRenderTarget_GDI::ReleaseDC( HDC hdc )
+    void SRenderTarget_GDI::ReleaseDC( HDC hdc ,LPCRECT pRc)
     {
         if(hdc == m_hdc)
         {
@@ -1506,16 +1497,6 @@ namespace SOUI
 	}
 
 	HRESULT SRenderTarget_GDI::FillPath(const IPathS * path)
-	{
-		return E_NOTIMPL;
-	}
-
-	HRESULT SRenderTarget_GDI::PushLayer(const RECT * pRect,BYTE byAlpha)
-	{
-		return E_NOTIMPL;
-	}
-
-	HRESULT SRenderTarget_GDI::PopLayer()
 	{
 		return E_NOTIMPL;
 	}
