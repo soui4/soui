@@ -72,6 +72,8 @@ HCURSOR SResProviderZip::LoadCursor( LPCTSTR pszResName )
 
 IBitmapS * SResProviderZip::LoadImage( LPCTSTR strType,LPCTSTR pszResName)
 {
+	if(!m_renderFactory)
+		return NULL;
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
@@ -85,6 +87,8 @@ IBitmapS * SResProviderZip::LoadImage( LPCTSTR strType,LPCTSTR pszResName)
 
 IImgX   * SResProviderZip::LoadImgX( LPCTSTR strType,LPCTSTR pszResName )
 {
+	if(!m_renderFactory)
+		return NULL;
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
@@ -112,23 +116,21 @@ BOOL SResProviderZip::_Init( LPCTSTR pszZipFile ,LPCSTR pszPsw)
 {
 	if(!m_zipFile.Open(pszZipFile)) return FALSE;
 	m_zipFile.SetPassword(pszPsw);
-	if (!m_renderFactory)
-		return TRUE;
-	return _LoadSkin();
+	return _InitFileMap();
 }
 
 BOOL SResProviderZip::_Init( LPBYTE pBytes, DWORD dwByteCounts, LPCSTR pszPsw ) 
 {
 	if(!m_zipFile.Open(pBytes, dwByteCounts)) return FALSE;
 	m_zipFile.SetPassword(pszPsw);
-	return _LoadSkin();
+	return _InitFileMap();
 }
 
 BOOL SResProviderZip::_Init( HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType, LPCSTR pszPsw)
 {
 	if(!m_zipFile.Open(hInst,pszResName,pszType)) return FALSE;
 	m_zipFile.SetPassword(pszPsw);
-	return _LoadSkin();
+	return _InitFileMap();
 }
 
 BOOL SResProviderZip::Init( WPARAM wParam,LPARAM lParam )
@@ -215,7 +217,7 @@ BOOL SResProviderZip::HasResource( LPCTSTR strType,LPCTSTR pszResName )
 	return !strPath.IsEmpty();
 }
 
-BOOL SResProviderZip::_LoadSkin()
+BOOL SResProviderZip::_InitFileMap()
 {
 	CZipFile zf;
 	BOOL bIdx=m_zipFile.GetFile(m_childDir+UIRES_INDEX,zf);

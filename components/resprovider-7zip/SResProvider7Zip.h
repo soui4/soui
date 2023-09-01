@@ -35,7 +35,7 @@ public:
 protected:
     BOOL _Init(LPCTSTR pszZipFile ,LPCSTR pszPsw);
     BOOL _Init(HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType ,LPCSTR pszPsw);
-	BOOL _LoadSkin();
+	BOOL _InitFileMap();
 	SStringT _GetFilePath(LPCTSTR pszResName,LPCTSTR pszType);
 	
 	SMap<SResID,SStringT> m_mapFiles;

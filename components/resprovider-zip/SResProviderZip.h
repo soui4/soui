@@ -36,7 +36,7 @@ protected:
     BOOL _Init(LPCTSTR pszZipFile ,LPCSTR pszPsw);
     BOOL _Init(LPBYTE pBytes, DWORD dwByteCounts, LPCSTR pszPsw);    
     BOOL _Init(HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType ,LPCSTR pszPsw);
-	BOOL _LoadSkin();
+	BOOL _InitFileMap();
 	SStringT _GetFilePath(LPCTSTR pszResName,LPCTSTR pszType);
 	void _EnumFile(LPCTSTR pszPath,EnumFileCallback funEnumCB, LPARAM lp);
 

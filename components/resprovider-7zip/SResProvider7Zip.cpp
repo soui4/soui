@@ -73,6 +73,8 @@ HCURSOR SResProvider7Zip::LoadCursor( LPCTSTR pszResName )
 
 IBitmapS * SResProvider7Zip::LoadImage( LPCTSTR strType,LPCTSTR pszResName)
 {
+	if(!m_renderFactory)
+		return NULL;
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
@@ -86,6 +88,9 @@ IBitmapS * SResProvider7Zip::LoadImage( LPCTSTR strType,LPCTSTR pszResName)
 
 IImgX   * SResProvider7Zip::LoadImgX( LPCTSTR strType,LPCTSTR pszResName )
 {
+	if(!m_renderFactory)
+		return NULL;
+
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
@@ -106,17 +111,13 @@ IImgX   * SResProvider7Zip::LoadImgX( LPCTSTR strType,LPCTSTR pszResName )
 BOOL SResProvider7Zip::_Init( LPCTSTR pszZipFile ,LPCSTR pszPsw)
 {
 	if (!m_zipFile.Open(pszZipFile, pszPsw)) return FALSE;
-	if (!m_renderFactory)
-		return TRUE;
-	return _LoadSkin();
+	return _InitFileMap();
 }
 
 BOOL SResProvider7Zip::_Init( HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType  ,LPCSTR pszPsw)
 {
 	if(!m_zipFile.Open(hInst,pszResName,pszPsw,pszType)) return FALSE;
-	if (!m_renderFactory)
-		return TRUE;
-	return _LoadSkin();
+	return _InitFileMap();
 }
 
 BOOL SResProvider7Zip::Init( WPARAM wParam,LPARAM lParam )
@@ -191,7 +192,7 @@ BOOL SResProvider7Zip::HasResource( LPCTSTR strType,LPCTSTR pszResName )
 	return !strPath.IsEmpty();
 }
 
-BOOL SResProvider7Zip::_LoadSkin()
+BOOL SResProvider7Zip::_InitFileMap()
 {
 	CZipFile zf;
 	BOOL bIdx=m_zipFile.GetFile(m_childDir + UIRES_INDEX,zf);
