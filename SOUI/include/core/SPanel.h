@@ -204,11 +204,11 @@ class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
     }
 
   public:
-    STDMETHOD_(SIZE, GetViewSize)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, GetViewSize)(CTHIS_ SIZE *szView) SCONST OVERRIDE;
 
     STDMETHOD_(void, SetViewSize)(THIS_ SIZE szView) OVERRIDE;
 
-    STDMETHOD_(POINT, GetViewOrigin)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, GetViewOrigin)(CTHIS_ POINT *ptOri) SCONST OVERRIDE;
 
     STDMETHOD_(void, SetViewOrigin)(THIS_ POINT pt) OVERRIDE;
 

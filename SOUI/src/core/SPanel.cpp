@@ -727,9 +727,10 @@ void SScrollView::SetViewOrigin(POINT pt)
     Invalidate();
 }
 
-POINT SScrollView::GetViewOrigin() const
+void SScrollView::GetViewOrigin(POINT *ptOri) const
 {
-    return m_ptOrigin;
+	SASSERT(ptOri);
+    *ptOri = m_ptOrigin;
 }
 
 void SScrollView::SetViewSize(SIZE szView)
@@ -743,9 +744,10 @@ void SScrollView::SetViewSize(SIZE szView)
     OnViewSizeChanged(oldViewSize, szView);
 }
 
-SIZE SScrollView::GetViewSize() const
+void SScrollView::GetViewSize(SIZE *szView) const
 {
-    return m_szView;
+	SASSERT(szView);
+	*szView = m_szView;
 }
 
 void SScrollView::UpdateScrollBar()
