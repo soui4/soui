@@ -18,15 +18,18 @@ else{
 DEPENDPATH += .
 INCLUDEPATH += . \
 			   ../../soui/include \
-			   ../../utilities/include \
-			   ./sdk7.1_d2d/include
-
-CONFIG(x64){
-    LIBPATH += ./sdk7.1_d2d/lib/x86
-}
-else{
-    LIBPATH += ./sdk7.1_d2d/lib/x64
-}
+			   ../../utilities/include
+			   
+lessThan(MSC_VER, 1600) {
+	INCLUDEPATH += ./sdk7.1_d2d/include
+	CONFIG(x64){
+		LIBPATH += ./sdk7.1_d2d/lib/x86
+	}
+	else{
+		LIBPATH += ./sdk7.1_d2d/lib/x64
+	}
+}			   
+			   
 
 dir = ../..
 include($$dir/common.pri)
