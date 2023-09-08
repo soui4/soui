@@ -111,13 +111,15 @@ IImgX   * SResProvider7Zip::LoadImgX( LPCTSTR strType,LPCTSTR pszResName )
 BOOL SResProvider7Zip::_Init( LPCTSTR pszZipFile ,LPCSTR pszPsw)
 {
 	if (!m_zipFile.Open(pszZipFile, pszPsw)) return FALSE;
-	return _InitFileMap();
+	_InitFileMap();
+	return TRUE;
 }
 
 BOOL SResProvider7Zip::_Init( HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType  ,LPCSTR pszPsw)
 {
 	if(!m_zipFile.Open(hInst,pszResName,pszPsw,pszType)) return FALSE;
-	return _InitFileMap();
+	_InitFileMap();
+	return TRUE;
 }
 
 BOOL SResProvider7Zip::Init( WPARAM wParam,LPARAM lParam )
