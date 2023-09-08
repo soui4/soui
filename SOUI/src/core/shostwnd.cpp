@@ -205,7 +205,7 @@ void SRootWindow::BeforePaint(IRenderTarget *pRT, SPainter &painter)
     if (pFont)
         pRT->SelectObject(pFont, (IRenderObj **)&painter.oldFont);
     else
-        pRT->SelectObject(SFontPool::getSingleton().GetFont(FF_DEFAULTFONT, GetScale()), NULL);
+        pRT->SelectObject(GETUIDEF->GetFont(FF_DEFAULTFONT, GetScale()), NULL);
 
     COLORREF crTxt = style.GetTextColor(iState);
     if (crTxt != CR_INVALID)
@@ -362,6 +362,18 @@ BOOL SHostWnd::onRootResize(IEvtArgs *e)
     return TRUE;
 }
 
+
+void SHostWnd::EnablePrivateUiDef(THIS_ BOOL bEnable)
+{
+	if(!m_privateUiDefInfo)
+		return;
+	if(bEnable)
+		GETUIDEF->PushUiDefInfo(m_privateUiDefInfo,TRUE);
+	else
+		GETUIDEF->PopUiDefInfo(m_privateUiDefInfo,TRUE);
+}
+
+
 BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 {
     SASSERT(pNode);
@@ -372,6 +384,16 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     }
     if (!SNativeWnd::IsWindow())
         return FALSE;
+
+	m_privateUiDefInfo = NULL;
+	IUiDefInfo *pUiDefInfo = SUiDef::CreateUiDefInfo();
+	if (pUiDefInfo->Init2(pNode, FALSE))
+	{ // init private uidef info.
+		m_privateUiDefInfo = pUiDefInfo;
+	}
+	pUiDefInfo->Release();
+	EnablePrivateUiDef(TRUE);
+
     if (m_AniState != Ani_none)
     {
         if (m_AniState & Ani_host)
@@ -396,19 +418,6 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 
     m_hostAttr.Init();
     m_hostAttr.InitFromXml(pNode);
-
-    if (m_privateUiDefInfo)
-    {
-        GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
-        m_privateUiDefInfo = NULL;
-    }
-	IUiDefInfo *pUiDefInfo = SUiDef::CreateUiDefInfo();
-    if (pUiDefInfo->Init2(pNode, FALSE))
-    { // init private uidef info.
-        m_privateUiDefInfo = pUiDefInfo;
-        GETUIDEF->PushUiDefInfo(pUiDefInfo);
-    }
-    pUiDefInfo->Release();
 
     //加载脚本数据
     SXmlNode xmlNode(pNode);
@@ -628,6 +637,9 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         }
         xmlChild = xmlChild.next_sibling();
     }
+
+	EnablePrivateUiDef(FALSE);
+
     return TRUE;
 }
 
@@ -806,11 +818,7 @@ void SHostWnd::OnDestroy()
             GetMsgLoop()->RemoveIdleHandler(pIdleHandler);
         m_pScriptModule = NULL;
     }
-	if (m_privateUiDefInfo)
-	{
-		GETUIDEF->PopUiDefInfo(m_privateUiDefInfo);
-		m_privateUiDefInfo = NULL;
-	}
+	m_privateUiDefInfo = NULL;
 
     m_memRT = NULL;
     m_rgnInvalidate = NULL;

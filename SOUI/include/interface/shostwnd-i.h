@@ -161,6 +161,15 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
      * @return
      */
     STDMETHOD_(void, ShowHostWnd)(THIS_ int uShowCmd, BOOL bWaitAniDone) PURE;
+
+
+	/**
+     * @brief 是否启用布局中定义的私有UIDef对象
+     * @param BOOL bEnable TRUE-启动，FALSE-关闭
+     * @return void
+	 * @remark 当程序中需要重新从私有UIDef中获取数据时启动，启用完后关闭
+     */
+	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) PURE;
 };
 
 #undef INTERFACE
@@ -308,6 +317,15 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      * @return
      */
     STDMETHOD_(void, ShowHostWnd)(THIS_ int uShowCmd, BOOL bWaitAniDone) PURE;
+
+	/**
+     * @brief 是否启用布局中定义的私有UIDef对象
+     * @param BOOL bEnable TRUE-启动，FALSE-关闭
+     * @return void
+	 * @remark 当程序中需要重新从私有UIDef中获取数据时启动，启用完后关闭
+     */
+	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) PURE;
+
     //////////////////////////////////////////////////////////////////////////
 
     /**

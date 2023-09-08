@@ -73,15 +73,17 @@ typedef BOOL (*FunFontCheck)(const SStringW &strFontName);
  *
  * Describe
  */
-class SOUI_EXP SFontPool : public SSingletonMap<SFontPool, IFontPtr, FontInfo> {
-    SINGLETON2_TYPE(SINGLETON_FONTPOOL)
+class SOUI_EXP SFontPool : public SCmnMap<IFontPtr, FontInfo> {
   public:
-    SFontPool(IRenderFactory *pRendFactory);
+    SFontPool(IRenderFactory *fac);
 
+  protected:
+	static void OnKeyRemoved(const IFontPtr &obj);
   public:
     static void SetFontChecker(FunFontCheck fontCheck);
     static BOOL CheckFont(const SStringW &strFontName);
-
+	static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo &defFontInfo);
+	static SStringW FontInfoToString(const FontInfo &fi);
   public:
     /**
      * GetFont
@@ -91,23 +93,16 @@ class SOUI_EXP SFontPool : public SSingletonMap<SFontPool, IFontPtr, FontInfo> {
      *
      * Describe  描述字符串格式如：face:宋体,bold:0,italic:1,underline:1,strike:1,adding:10
      */
-    IFontPtr GetFont(const SStringW &strFont, int scale);
-
-    void SetDefFontInfo(const SStringW &strFontInfo);
+    virtual IFontPtr GetFont(const SStringW &strFont, int scale);
+    virtual  void SetDefFontInfo(const SStringW &strFontInfo);
 	const FontInfo &GetDefFontInfo() const;
-  public:
-    static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo &defFontInfo);
-    static SStringW FontInfoToString(const FontInfo &fi);
+	void  SetRenderFactory(IRenderFactory *fac);
   protected:
-
-    static void OnKeyRemoved(const IFontPtr &obj);
-
     IFontPtr _CreateFont(const FontInfo &fontInfo);
     void _SetDefFontInfo(const FontInfo &fontInfo);
 
     SAutoRefPtr<IRenderFactory> m_RenderFactory;
     FontInfo m_defFontInfo;
-    SCriticalSection m_cs;
 
     static FunFontCheck s_funFontCheck;
 };

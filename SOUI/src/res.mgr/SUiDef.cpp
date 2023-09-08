@@ -120,7 +120,7 @@ UINT SUiDefInfo::Init(IResProvider *pResProvider, LPCTSTR pszUidef)
 UINT SUiDefInfo::Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResProvider)
 {
     UINT uRet = 0;
-    GETUIDEF->PushUiDefInfo(this); // make it possible for a uidef element to ref other uidef element in the same package.
+    GETUIDEF->PushUiDefInfo(this,TRUE); // make it possible for a uidef element to ref other uidef element in the same package.
 
     SXmlNode root(pNode);
     if (bGlobalDomain)
@@ -260,7 +260,7 @@ UINT SUiDefInfo::Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResPr
             uRet |= UDI_TEMPLATE;
         }
     }
-    GETUIDEF->PopUiDefInfo(this);
+    GETUIDEF->PopUiDefInfo(this,TRUE);
 
     return uRet;
 }
@@ -310,7 +310,7 @@ STemplatePool *SUiDefInfo::GetTemplatePool()
     return templatePool;
 }
 //////////////////////////////////////////////////////////////////////////
-SUiDef::SUiDef(void)
+SUiDef::SUiDef(IRenderFactory *fac):SFontPool(fac)
 {
     SAutoLock autolock(m_cs);
 	IUiDefInfo *emptyUiInfo = CreateUiDefInfo();
@@ -383,20 +383,23 @@ void SUiDef::SetUiDef(IUiDefInfo *pUiDefInfo, bool bUpdateDefFont)
     m_lstUiDefInfo.AddHead(pUiDefInfo);
     pUiDefInfo->AddRef();
 
-    if (bUpdateDefFont)
-        SFontPool::getSingletonPtr()->SetDefFontInfo(m_defUiDefInfo->GetDefFontInfo());
+    SetDefFontInfo(m_defUiDefInfo->GetDefFontInfo());
 }
 
-void SUiDef::PushUiDefInfo(IUiDefInfo *pUiDefInfo)
+void SUiDef::PushUiDefInfo(IUiDefInfo *pUiDefInfo,BOOL bPreivate)
 {
     SAutoLock autolock(m_cs);
     m_lstUiDefInfo.AddTail(pUiDefInfo);
     pUiDefInfo->AddRef();
+	if(bPreivate) 
+		m_cs.Enter();
 }
 
-BOOL SUiDef::PopUiDefInfo(IUiDefInfo *pUiDefInfo)
+BOOL SUiDef::PopUiDefInfo(IUiDefInfo *pUiDefInfo,BOOL bPreivate)
 {
     SAutoLock autolock(m_cs);
+	if(bPreivate)
+		m_cs.Leave();
 	if(!pUiDefInfo){
 		if(m_lstUiDefInfo.IsEmpty())
 			return FALSE;
@@ -607,6 +610,18 @@ SStringW SUiDef::GetFontDesc(int idx)
 IUiDefInfo * SUiDef::CreateUiDefInfo()
 {
 	return new SUiDefInfo();
+}
+
+IFontPtr SUiDef::GetFont(const SStringW &strFont, int scale)
+{
+	SAutoLock lock(m_cs);
+	return SFontPool::GetFont(strFont,scale);
+}
+
+void SUiDef::SetDefFontInfo(const SStringW &strFontInfo)
+{
+	SAutoLock lock(m_cs);
+	SFontPool::SetDefFontInfo(strFontInfo);
 }
 
 

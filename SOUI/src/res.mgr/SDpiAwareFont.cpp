@@ -32,6 +32,6 @@ void SDpiAwareFont::UpdateFont(int nScale)
 
 IFontS *SDpiAwareFont::OnGetFont(const SStringW &strDesc, int nScale)
 {
-    return SFontPool::getSingleton().GetFont(strDesc, nScale);
+    return GETUIDEF->GetFont(strDesc, nScale);
 }
 SNSEND

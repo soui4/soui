@@ -55,10 +55,10 @@ struct IUiDefInfo : IObjRef
 #define GETSTRING(x)               GETUIDEF->GetString(x)
 #define GETLAYOUTSIZE(x)           GETUIDEF->GetLayoutSize(x)
 
-class SOUI_EXP SUiDef : public SSingleton2<SUiDef> {
+class SOUI_EXP SUiDef : public SSingleton2<SUiDef>, public SFontPool {
     SINGLETON2_TYPE(SINGLETON_UIDEF)
   public:
-    SUiDef(void);
+    SUiDef(IRenderFactory *fac);
     ~SUiDef(void);
 
   public:
@@ -100,7 +100,7 @@ class SOUI_EXP SUiDef : public SSingleton2<SUiDef> {
      * @return   void
      * Describe soui的uidef对象是一个列表,每一个界面可以有自己的uidef对象
      */
-    void PushUiDefInfo(IUiDefInfo *pUiDefInfo);
+    void PushUiDefInfo(IUiDefInfo *pUiDefInfo,BOOL bPreivate=FALSE);
 
     /** PopUiDefInfo
      * @brief    Pop一个UiDef对象
@@ -108,7 +108,7 @@ class SOUI_EXP SUiDef : public SSingleton2<SUiDef> {
      * @return   BOOL, TRUE--成功
      * Describe soui的uidef对象是一个列表,每一个界面可以有自己的uidef对象
      */
-    BOOL PopUiDefInfo(IUiDefInfo *pUiDefInfo);
+    BOOL PopUiDefInfo(IUiDefInfo *pUiDefInfo,BOOL bPreivate=FALSE);
 
     /**
      * PushSkinPool
@@ -194,6 +194,11 @@ class SOUI_EXP SUiDef : public SSingleton2<SUiDef> {
     //(something是在资源包中的font表定义的命名字符串)
     SStringW GetFontDesc(const SStringW &strFont);
     SStringW GetFontDesc(int idx);
+
+  public:
+		IFontPtr GetFont(const SStringW &strFont, int scale) override;
+
+		void SetDefFontInfo(const SStringW &strFontInfo) override;
 
   protected:
     SAutoRefPtr<IUiDefInfo> m_defUiDefInfo;

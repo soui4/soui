@@ -378,6 +378,9 @@ public:
 	STDMETHOD_(void,ShowHostWnd)(THIS_ int uShowCmd,BOOL bWaitAniDone) OVERRIDE{
 		return SHostWnd::ShowHostWnd(uShowCmd,bWaitAniDone);
 	}
+	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE{
+		return SHostWnd::EnablePrivateUiDef(bEnable);
+	}
 
 };
 

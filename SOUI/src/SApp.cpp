@@ -265,12 +265,9 @@ SApplication::~SApplication(void)
 
 void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, BOOL bImeApp)
 {
-    m_pSingletons[SUiDef::GetType()] = new SUiDef();
+    m_pSingletons[SUiDef::GetType()] = new SUiDef(m_RenderFactory);
     m_pSingletons[SWindowMgr::GetType()] = new SWindowMgr();
     m_pSingletons[STimerGenerator::GetType()] = new STimerGenerator();
-    if(m_RenderFactory)
-		m_pSingletons[SFontPool::GetType()] = new SFontPool(m_RenderFactory);
-
     m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
     m_pSingletons[STextServiceHelper::GetType()] = new STextServiceHelper();
     m_pSingletons[SRicheditMenuDef::GetType()] = new SRicheditMenuDef();
@@ -293,9 +290,6 @@ void SApplication::_DestroySingletons()
     DELETE_SINGLETON(SRicheditMenuDef);
     DELETE_SINGLETON(STextServiceHelper);
     DELETE_SINGLETON(SWindowFinder);
-
-    if(m_pSingletons[SFontPool::GetType()])
-		DELETE_SINGLETON(SFontPool);
     DELETE_SINGLETON(SUiDef);
     DELETE_SINGLETON(STimerGenerator);
     DELETE_SINGLETON(SWindowMgr);
@@ -357,56 +351,10 @@ void *SApplication::GetInnerSingleton(SingletonType nType)
 
 BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc &xmlDoc, IResProvider *pResProvider /* = NULL*/)
 {
-    if (!pResProvider)
-    {
-        if (!pszType)
-        {
-            SPOSITION pos = m_lstResPackage.GetHeadPosition();
-            while (pos)
-            {
-                IResProvider *pResP = m_lstResPackage.GetNext(pos);
-                if (pResP->HasResource(NULL, pszXmlName))
-                {
-                    pResProvider = pResP;
-                    break;
-                }
-            }
-        }
-        if (!pResProvider)
-        {
-            if (IsFileType(pszType))
-            {
-                bool bLoad = xmlDoc.load_file(pszXmlName, xml_parse_default, enc_auto);
-                if (!bLoad)
-                {
-                    XmlParseResult res;
-                    xmlDoc.GetParseResult(&res);
-                    SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName, SXmlDoc::GetErrDesc(res.status), res.offset);
-                }
-                return bLoad;
-            }
-            else
-            {
-                pResProvider = GetMatchResProvider(pszType, pszXmlName);
-            }
-        }
-    }
-    if (!pResProvider)
-    {
-        SSLOGW() << "load xml failed: " << pszType << ":" << pszXmlName << " not found in respovider list";
-        return FALSE;
-    }
-    size_t dwSize = pResProvider->GetRawBufferSize(pszType, pszXmlName);
-    if (dwSize == 0)
-    {
-        SSLOGW() << "load xml failed: " << pszType << ":" << pszXmlName << " pResProvider->GetRawBufferSize return 0";
-        return FALSE;
-    }
-    SAutoBuf strXml;
-    strXml.Allocate(dwSize);
-    pResProvider->GetRawBuffer(pszType, pszXmlName, strXml, dwSize);
-
-    bool bLoad = xmlDoc.load_buffer(strXml, strXml.size(), xml_parse_default, enc_auto);
+	SAutoBuf xmlBuf;
+	if(!LoadRawBuffer(pszType,pszXmlName,pResProvider,xmlBuf))
+		return FALSE;
+    bool bLoad = xmlDoc.load_buffer(xmlBuf, xmlBuf.size(), xml_parse_default, enc_auto);
     if (!bLoad)
     {
         XmlParseResult result;
@@ -493,7 +441,7 @@ BOOL SApplication::InstallTranslator(THIS_ ITranslator *trModule)
     trModule->getFontInfo(&strFontInfo);
     if (!strFontInfo.IsEmpty())
     {
-        SFontPool::getSingletonPtr()->SetDefFontInfo(strFontInfo);
+        GETUIDEF->SetDefFontInfo(strFontInfo);
     }
     SHostMgr::getSingletonPtr()->DispatchMessage(true, UM_SETLANGUAGE);
     return TRUE;
@@ -603,8 +551,7 @@ BOOL SApplication::SetRenderFactory(THIS_ IRenderFactory * renderFac)
 	if(m_RenderFactory || !renderFac)
 		return FALSE;
 	m_RenderFactory = renderFac;
-	SASSERT(m_pSingletons[SFontPool::GetType()]==NULL);
-	m_pSingletons[SFontPool::GetType()] = new SFontPool(m_RenderFactory);
+	GETUIDEF->SetRenderFactory(renderFac);
 	return TRUE;
 }
 
@@ -825,7 +772,7 @@ BOOL SApplication::UnregisterObjFactory(THIS_ const IObjectFactory *objFac)
 
 void SApplication::SetDefaultFontInfo(THIS_ LPCWSTR pszFontInfo)
 {
-    SFontPool::getSingletonPtr()->SetDefFontInfo(pszFontInfo);
+    GETUIDEF->SetDefFontInfo(pszFontInfo);
 }
 
 void SApplication::SetCreateTaskLoopCallback(THIS_ FunCrateTaskLoop cbCreateTaskLoop)

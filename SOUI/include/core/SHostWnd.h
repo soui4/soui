@@ -266,6 +266,7 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(void, EnableDragDrop)(THIS) OVERRIDE;
 
     STDMETHOD_(void, ShowHostWnd)(THIS_ int uShowCmd, BOOL bWaitAniDone) OVERRIDE;
+	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
 
   public:
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1)

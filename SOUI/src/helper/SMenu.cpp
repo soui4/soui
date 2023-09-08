@@ -85,7 +85,7 @@ SAutoRefPtr<IFontS> SMenuAttr::GetFontPtr()
     SAutoRefPtr<IFontS> font = m_dpiFont.GetFontPtr();
     if (font)
         return font;
-    return SFontPool::getSingleton().GetFont(FF_DEFAULTFONT, m_scale);
+    return GETUIDEF->GetFont(FF_DEFAULTFONT, m_scale);
 }
 
 void SMenuAttr::SetScale(int scale)

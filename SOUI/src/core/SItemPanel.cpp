@@ -326,7 +326,7 @@ void SOsrPanel::BeforePaint(IRenderTarget *pRT, SPainter &painter)
     IFontPtr fontText = GetStyle().GetTextFont(iState);
     COLORREF crText = GetStyle().GetTextColor(iState);
     if (fontText == NULL)
-        fontText = SFontPool::getSingleton().GetFont(FF_DEFAULTFONT, GetScale());
+        fontText = GETUIDEF->GetFont(FF_DEFAULTFONT, GetScale());
     if (crText == CR_INVALID)
         crText = RGBA(0, 0, 0, 255);
     pRT->SelectObject(fontText, (IRenderObj **)&painter.oldFont);

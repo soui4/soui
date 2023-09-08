@@ -44,12 +44,17 @@ BOOL SFontPool::CheckFont(const SStringW &strFontName)
     return s_funFontCheck(strFontName);
 }
 
-SFontPool::SFontPool(IRenderFactory *pRendFactory)
-    : m_RenderFactory(pRendFactory)
+SFontPool::SFontPool(IRenderFactory *fac):m_RenderFactory(fac)
 {
     m_pFunOnKeyRemoved = OnKeyRemoved;
     FontInfo emptyInfo;
     m_defFontInfo = FontInfoFromString(L"face:宋体,size:16", emptyInfo);
+}
+
+
+void SFontPool::SetRenderFactory(IRenderFactory *fac)
+{
+	m_RenderFactory= fac;
 }
 
 void SFontPool::OnKeyRemoved(const IFontPtr &obj)
@@ -74,7 +79,6 @@ const static WCHAR KDefFontFace[] = L"宋体";
 
 IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
 {
-    SAutoLock autoLock(m_cs);
     SStringW strFontDesc = GETUIDEF->GetFontDesc(strFont);
     FontInfo info = FontInfoFromString(strFontDesc, m_defFontInfo);
     info.scale = scale;
@@ -141,7 +145,6 @@ const FontInfo &SFontPool::GetDefFontInfo() const
 
 void SFontPool::_SetDefFontInfo(const FontInfo &fontInfo)
 {
-    SAutoLock autoLock(m_cs);
     m_defFontInfo = fontInfo;
     RemoveAll();
     SHostMgr::getSingletonPtr()->DispatchMessage(true, UM_UPDATEFONT);

@@ -3,8 +3,9 @@
 
 #include <interface/sresprovidermgr-i.h>
 #include <atl.mini/scomcli.h>
-#include <helper/SCriticalSection.h>
 #include <layout/SLayoutSize.h>
+#include <helper/SCriticalSection.h>
+#include <helper/SAutoBuf.h>
 
 SNSBEGIN
 
@@ -60,6 +61,7 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
     //使用name:size形式的字符串加载图标，如果没有size,则默认系统图标SIZE
     HICON LoadIcon2(const SStringW &strIconID);
 
+	BOOL LoadRawBuffer(LPCTSTR pszType, LPCTSTR pszResName,IResProvider *pResProvider,SAutoBuf &buf);
   protected:
 #ifdef _DEBUG
     static BOOL CALLBACK CheckUsage(LPCTSTR pszName, LPCTSTR pszType, LPARAM lp);
