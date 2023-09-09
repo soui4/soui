@@ -39,7 +39,7 @@ class CElementTraits<SObjectInfo> : public CElementTraitsBase<SObjectInfo> {
 
     static bool CompareElements(INARGTYPE obj1, INARGTYPE obj2)
     {
-        return obj1.nType == obj2.nType && wcsicmp(obj1.szName, obj2.szName) == 0;
+        return obj1.nType == obj2.nType && _wcsicmp(obj1.szName, obj2.szName) == 0;
     }
 };
 

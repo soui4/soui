@@ -2,9 +2,7 @@
 #define __STASKHANDLER__H__
 
 #include <interface/STaskLoop-i.h>
-//#include <helper/SSharedPtr.hpp>
 #include <helper/obj-ref-impl.hpp>
-//#include <helper/SFunctor.hpp>
 #include <core/SNativeWnd.h>
 #include <helper/SSemaphore.h>
 #include <souicoll.h>
@@ -71,6 +69,8 @@ class SOUI_EXP STaskHandler
     STDMETHOD_(BOOL, getName)(THIS_ char *pszBuf, int nBufLen) OVERRIDE;
 
     STDMETHOD_(BOOL, getRunningTaskInfo)(THIS_ char *buf, int bufLen) OVERRIDE;
+
+    STDMETHOD_(void, setHeartBeatTask)(THIS_ IRunnable* pTask, int intervel) OVERRIDE;
 
   private:
     LRESULT OnRunTask(UINT uMsg, WPARAM wp, LPARAM lp);

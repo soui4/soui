@@ -171,6 +171,12 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
      */
 	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) PURE;
 
+	/**
+     * @brief 设置窗口的dpi倍数
+     * @param int nScale dpi倍数,以100为基数
+	 * @param LPCRECT pDestRect 缩放后的窗口坐标
+     * @return void
+     */
 	STDMETHOD_(void, SetScale)(THIS_ int nScale,LPCRECT pDestRect) PURE;
 };
 

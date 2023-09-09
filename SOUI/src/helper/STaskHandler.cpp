@@ -69,12 +69,12 @@ long STaskHandler::postTask(const IRunnable *runnable, BOOL waitUntilDone, int p
     m_items[m_nextTaskID] = pCloneRunnable;
     if (waitUntilDone)
     {
-        SendMessage(UM_RUN_TASK, ++m_nextTaskID, (LPARAM)pCloneRunnable);
+        SendMessage(UM_RUN_TASK, m_nextTaskID++, (LPARAM)pCloneRunnable);
         return -1;
     }
     else
     {
-        PostMessage(UM_RUN_TASK, ++m_nextTaskID, (LPARAM)pCloneRunnable);
+        PostMessage(UM_RUN_TASK, m_nextTaskID++, (LPARAM)pCloneRunnable);
         return m_nextTaskID;
     }
 }
@@ -149,6 +149,10 @@ int STaskHandler::getTaskCount() const
 BOOL STaskHandler::getRunningTaskInfo(char *buf, int bufLen)
 {
     return false;
+}
+
+void STaskHandler::setHeartBeatTask(IRunnable* pTask, int intervel){
+
 }
 
 SNSEND

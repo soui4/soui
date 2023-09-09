@@ -984,6 +984,8 @@ LRESULT SHostWnd::OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 LRESULT SHostWnd::OnActivateApp(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
+	if(!m_presenter) //防止host.OnDestroy中destroy子窗口可能给host发这个消息
+		return 0;
     return DoFrameEvent(uMsg, wParam, lParam);
 }
 
