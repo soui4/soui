@@ -1938,6 +1938,23 @@ void SHostWnd::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     }
 }
 
+void SHostWnd::SetScale(THIS_ int nScale,LPCRECT desRect)
+{
+	EnablePrivateUiDef(TRUE);
+	GetRoot()->SDispatchMessage(UM_SETSCALE, nScale, 0);
+	GetNcPainter()->GetRoot()->SDispatchMessage(UM_SETSCALE, nScale, 0);
+	UpdateAutoSizeCount(true);
+	SetWindowPos(
+		NULL,
+		desRect->left,
+		desRect->top,
+		desRect->right - desRect->left,
+		desRect->bottom - desRect->top,
+		SWP_NOZORDER | SWP_NOACTIVATE);
+	UpdateAutoSizeCount(false);
+	EnablePrivateUiDef(FALSE);
+}
+
 //////////////////////////////////////////////////////////////////
 //  SHostWnd::SHostAnimationHandler
 void SHostWnd::SHostAnimationHandler::OnNextFrame()

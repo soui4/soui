@@ -381,6 +381,9 @@ public:
 	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE{
 		return SHostWnd::EnablePrivateUiDef(bEnable);
 	}
+	STDMETHOD_(void, SetScale)(THIS_ int nScale,LPCRECT pDestRect){
+		return SHostWnd::SetScale(nScale,pDestRect);
+	}
 
 };
 

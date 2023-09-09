@@ -141,17 +141,7 @@ namespace SOUI{
 			T *pT = static_cast<T*>(this);
 			if (nScale != pT->GetRoot()->GetScale()) //As ShostWnd::GetScale is under protect, here, we using SWindow::GetScale.
 			{
-				pT->GetRoot()->SDispatchMessage(UM_SETSCALE, nScale, 0);
-				pT->GetNcPainter()->GetRoot()->SDispatchMessage(UM_SETSCALE, nScale, 0);
-				pT->UpdateAutoSizeCount(true);
-				pT->SetWindowPos(
-					NULL,
-					desRect->left,
-					desRect->top,
-					desRect->right - desRect->left,
-					desRect->bottom - desRect->top,
-					SWP_NOZORDER | SWP_NOACTIVATE);
-				pT->UpdateAutoSizeCount(false);
+				pT->SetScale(nScale,desRect);
 			}
 		}
 

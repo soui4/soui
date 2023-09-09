@@ -170,6 +170,8 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 	 * @remark 当程序中需要重新从私有UIDef中获取数据时启动，启用完后关闭
      */
 	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) PURE;
+
+	STDMETHOD_(void, SetScale)(THIS_ int nScale,LPCRECT pDestRect) PURE;
 };
 
 #undef INTERFACE
