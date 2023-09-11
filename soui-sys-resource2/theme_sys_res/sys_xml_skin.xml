@@ -1,4 +1,5 @@
 <skin>
+  <imglist name="_skin.sys.msgicon" src="PNG:SYS_MSGICON" states="5"/>
   <imglist name="_skin.sys.btn.close" src="PNG:SYS_BTN_CLOSE" states="3">
     <states>
       <state index="0" value="normal|disable"/>

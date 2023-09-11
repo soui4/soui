@@ -56,7 +56,7 @@ INT_PTR SMessageBoxImpl::MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption
 
 BOOL SMessageBoxImpl::OnSetIcon(UINT uType)
 {
-    SImageWnd *pIcon = (SImageWnd *)FindChildByName(NAME_MSGBOX_ICON);
+    SImageWnd *pIcon = FindChildByName2<SImageWnd>(NAME_MSGBOX_ICON);
     if (!pIcon)
         return FALSE;
     switch (uType & 0xF0)

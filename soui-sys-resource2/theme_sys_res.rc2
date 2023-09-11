@@ -2,7 +2,7 @@
 //
 // PNG
 //
-
+SYS_MSGICON             PNG                     "theme_sys_res\\msgicon.png"
 SYS_BORDER              PNG                     "theme_sys_res\\sys_border.png"
 SYS_CHECKBOX            PNG                     "theme_sys_res\\sys_checkbox.png"
 SYS_RADIO               PNG                     "theme_sys_res\\sys_radio.png"
