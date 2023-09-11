@@ -468,9 +468,10 @@ void SStringA::ReleaseBuffer(int nNewLength /*= -1*/)
 
 char* SStringA::GetBuffer(int nMinBufLength)
 {
-	SASSERT(nMinBufLength >= 0);
-
 	TStringData* pData = GetData();
+	if(nMinBufLength<0)
+		nMinBufLength = pData->nAllocLength;
+
 	if (pData->IsShared() || nMinBufLength > pData->nAllocLength)
 	{
 		// we have to grow the buffer

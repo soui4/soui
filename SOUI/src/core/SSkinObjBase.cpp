@@ -169,6 +169,11 @@ int SSkinObjBase::GetScale() const
     return m_nScale;
 }
 
+void SSkinObjBase::SetScale(int scale)
+{
+    m_nScale = scale;
+}
+
 int SSkinObjBase::GetStates() const
 {
     return 1;

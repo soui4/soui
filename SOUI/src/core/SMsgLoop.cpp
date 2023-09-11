@@ -51,7 +51,7 @@ int SMessageLoop::Run()
     m_nIdleCount = 0;
     m_tid = GetCurrentThreadId();
     m_bQuit = FALSE;
-	int nRet = 0;
+    int nRet = 0;
     do
     {
         BOOL bGetMsg = WaitMsg();
@@ -243,7 +243,7 @@ BOOL SMessageLoop::WaitMsg(THIS)
 
 int SMessageLoop::HandleMsg(THIS)
 {
-	MSG msg={0};
+    MSG msg = { 0 };
     while (PeekMsg(&msg, 0, 0, TRUE))
     {
         if (msg.message == WM_QUIT)
@@ -259,7 +259,7 @@ int SMessageLoop::HandleMsg(THIS)
             m_nIdleCount = 0;
         }
     }
-	return (int)msg.wParam;
+    return (int)msg.wParam;
 }
 
 SNSEND

@@ -472,7 +472,7 @@ DECLARE_INTERFACE_(IBitmapS, IRenderObj)
      */
     STDMETHOD_(HRESULT, Save)(CTHIS_ LPCWSTR pszFileName, const LPVOID pFormat) SCONST PURE;
 
-	STDMETHOD_(HRESULT, Save2)(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST PURE;
+    STDMETHOD_(HRESULT, Save2)(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST PURE;
 };
 
 typedef IBitmapS *IBitmapPtr;
@@ -703,7 +703,6 @@ DECLARE_INTERFACE_(IRegionS, IRenderObj)
      * Describe
      */
     STDMETHOD_(void, Clear)(THIS) PURE;
-
 };
 
 typedef enum _xFormIndex
@@ -752,7 +751,6 @@ typedef enum _Direction
     /** counter-clockwise direction for adding closed contours */
     kCCW_Direction,
 } Direction;
-
 
 #undef INTERFACE
 #define INTERFACE IPathS
@@ -809,13 +807,11 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     */
     STDMETHOD_(void, reset)(THIS) PURE;
 
-
     /** Returns true if the path is empty (contains no lines or curves)
 
     @return true if the path is empty (contains no lines or curves)
     */
     STDMETHOD_(BOOL, isEmpty)(CTHIS) SCONST PURE;
-
 
     /** Returns the bounds of the path's points. If the path contains 0 or 1
     points, the bounds is set to (0,0,0,0), and isEmpty() will return true.
@@ -963,7 +959,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addOval)(THIS_ const RECT *oval, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
-	STDMETHOD_(void,addOval2)(THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction)) PURE;
+    STDMETHOD_(void, addOval2)(THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
     /**
      *  Add a closed circle contour to the path
@@ -988,7 +984,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     */
     STDMETHOD_(void, addArc)(THIS_ const RECT *oval, float startAngle, float sweepAngle) PURE;
 
-	STDMETHOD_(void,addArc2)(THIS_ float left, float top, float right, float bottom,float startAngle, float sweepAngle) PURE;
+    STDMETHOD_(void, addArc2)(THIS_ float left, float top, float right, float bottom, float startAngle, float sweepAngle) PURE;
 
     /**
      *  Add a closed round-rectangle contour to the path
@@ -1014,7 +1010,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *       sqaure corner and oversized radii are proportionally scaled down).
      */
     STDMETHOD_(void, addRoundRect2)
-    (THIS_ float left, float top,float right,float bottom, float rx,float ry, Direction dir DEF_VAL(kCW_Direction)) PURE;
+    (THIS_ float left, float top, float right, float bottom, float rx, float ry, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
     /**
      *  Add a new contour made of just lines. This is just a fast version of
@@ -1028,7 +1024,6 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      *      }
      */
     STDMETHOD_(void, addPoly)(THIS_ const POINT pts[], int count, BOOL close) PURE;
-
 
     /** Offset the path by (dx,dy), returning true on success
 
@@ -1055,22 +1050,22 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     (THIS_ LPCTSTR pszText, int nLen, float x, float y, const IFontS *pFont) PURE;
 
     STDMETHOD_(IPathS *, clone)(CTHIS) SCONST PURE;
-	
-	STDMETHOD_(BOOL,beginFigure)(THIS_ float x,float y,BOOL bFill DEF_VAL(TRUE)) PURE;
 
-	STDMETHOD_(BOOL,endFigure)(THIS_ BOOL bClose) PURE;
+    STDMETHOD_(BOOL, beginFigure)(THIS_ float x, float y, BOOL bFill DEF_VAL(TRUE)) PURE;
 
-	STDMETHOD_(float,getLength)(CTHIS) SCONST PURE;
+    STDMETHOD_(BOOL, endFigure)(THIS_ BOOL bClose) PURE;
 
-	STDMETHOD_(BOOL,getPosTan)(CTHIS_ float distance, fPoint *pos, fPoint *vec) SCONST PURE;
+    STDMETHOD_(float, getLength)(CTHIS) SCONST PURE;
 
-	/** Close the current path to stop edit
-    */
+    STDMETHOD_(BOOL, getPosTan)(CTHIS_ float distance, fPoint *pos, fPoint *vec) SCONST PURE;
+
+    /** Close the current path to stop edit
+     */
     STDMETHOD_(void, close)(THIS) PURE;
 
-	STDMETHOD_(BOOL, hitTest)(CTHIS_ float x,float y) SCONST PURE;
+    STDMETHOD_(BOOL, hitTest)(CTHIS_ float x, float y) SCONST PURE;
 
-	STDMETHOD_(BOOL, hitTestStroke)(CTHIS_ float x,float y,float strokeSize) SCONST PURE;
+    STDMETHOD_(BOOL, hitTestStroke)(CTHIS_ float x, float y, float strokeSize) SCONST PURE;
 };
 
 typedef struct _GradientItem
@@ -1118,10 +1113,10 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-	STDMETHOD_(void, BeginDraw)(THIS) PURE;
-	STDMETHOD_(void, EndDraw)(THIS) PURE;
+    STDMETHOD_(void, BeginDraw)(THIS) PURE;
+    STDMETHOD_(void, EndDraw)(THIS) PURE;
 
-	STDMETHOD_(BOOL,IsOffscreen)(CTHIS) SCONST PURE;
+    STDMETHOD_(BOOL, IsOffscreen)(CTHIS) SCONST PURE;
 
     STDMETHOD_(HRESULT, CreatePen)(THIS_ int iStyle, COLORREF cr, int cWidth, IPenS **ppPen) PURE;
     STDMETHOD_(HRESULT, CreateSolidColorBrush)(THIS_ COLORREF cr, IBrushS * *ppBrush) PURE;
@@ -1175,8 +1170,8 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, DrawGradientRectEx)
     (THIS_ LPCRECT pRect, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF)) PURE;
     STDMETHOD_(HRESULT, DrawGradientPath)
-    (THIS_ const IPathS* path, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF)) PURE;
-    
+    (THIS_ const IPathS *path, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+
     STDMETHOD_(HRESULT, DrawIconEx)
     (THIS_ int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT diFlags) PURE;
     STDMETHOD_(HRESULT, DrawBitmap)
@@ -1202,7 +1197,7 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
 
     //两个兼容GDI操作的接口
     STDMETHOD_(HDC, GetDC)(THIS_ UINT uFlag) PURE;
-    STDMETHOD_(void, ReleaseDC)(THIS_ HDC hdc,LPCRECT pRc DEF_VAL(NULL)) PURE;
+    STDMETHOD_(void, ReleaseDC)(THIS_ HDC hdc, LPCRECT pRc DEF_VAL(NULL)) PURE;
 
     /**
      * SetTransform
@@ -1304,8 +1299,8 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
     STDMETHOD_(BOOL, CreateRenderTarget)
     (THIS_ IRenderTarget * *ppRenderTarget, int nWid DEF_VAL(0), int nHei DEF_VAL(0)) PURE;
 
-	STDMETHOD_(BOOL, CreateRenderTarget2)
-		(THIS_ IRenderTarget * *ppRenderTarget, HWND hWnd) PURE;
+    STDMETHOD_(BOOL, CreateRenderTarget2)
+    (THIS_ IRenderTarget * *ppRenderTarget, HWND hWnd) PURE;
 
     /**
      * CreateFont
@@ -1323,7 +1318,7 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
 
     STDMETHOD_(BOOL, CreateRegion)(THIS_ IRegionS * *ppRgn) PURE;
 
-	STDMETHOD_(BOOL, CreatePath)(THIS_ IPathS * *ppPath) PURE;
+    STDMETHOD_(BOOL, CreatePath)(THIS_ IPathS * *ppPath) PURE;
 
     STDMETHOD_(HRESULT, CreateBlurMaskFilter)
     (THIS_ float radius, BlurStyle style, BlurFlags flag, IMaskFilter **ppMaskFilter) PURE;

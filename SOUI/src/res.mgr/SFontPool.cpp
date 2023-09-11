@@ -44,17 +44,17 @@ BOOL SFontPool::CheckFont(const SStringW &strFontName)
     return s_funFontCheck(strFontName);
 }
 
-SFontPool::SFontPool(IRenderFactory *fac):m_RenderFactory(fac)
+SFontPool::SFontPool(IRenderFactory *fac)
+    : m_RenderFactory(fac)
 {
     m_pFunOnKeyRemoved = OnKeyRemoved;
     FontInfo emptyInfo;
     m_defFontInfo = FontInfoFromString(L"face:宋体,size:16", emptyInfo);
 }
 
-
 void SFontPool::SetRenderFactory(IRenderFactory *fac)
 {
-	m_RenderFactory= fac;
+    m_RenderFactory = fac;
 }
 
 void SFontPool::OnKeyRemoved(const IFontPtr &obj)

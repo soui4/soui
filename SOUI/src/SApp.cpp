@@ -351,9 +351,9 @@ void *SApplication::GetInnerSingleton(SingletonType nType)
 
 BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc &xmlDoc, IResProvider *pResProvider /* = NULL*/)
 {
-	SAutoBuf xmlBuf;
-	if(!LoadRawBuffer(pszType,pszXmlName,pResProvider,xmlBuf))
-		return FALSE;
+    SAutoBuf xmlBuf;
+    if (!LoadRawBuffer(pszType, pszXmlName, pResProvider, xmlBuf))
+        return FALSE;
     bool bLoad = xmlDoc.load_buffer(xmlBuf, xmlBuf.size(), xml_parse_default, enc_auto);
     if (!bLoad)
     {
@@ -464,8 +464,8 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
         SXmlDoc xmlDoc;
         if (_LoadXmlDocment(_T("SYS_XML_SKIN"), _T("XML"), xmlDoc, pResProvider))
         {
-            SSkinPool *p = GETUIDEF->GetBuiltinSkinPool();
-            p->LoadSkins(xmlDoc.root().child(L"skin"));
+            ISkinPool *p = GETUIDEF->GetBuiltinSkinPool();
+            p->LoadSkins(&xmlDoc.root().child(L"skin"));
         }
         else
         {
@@ -546,13 +546,13 @@ IRenderFactory *SApplication::GetRenderFactory()
     return m_RenderFactory;
 }
 
-BOOL SApplication::SetRenderFactory(THIS_ IRenderFactory * renderFac)
+BOOL SApplication::SetRenderFactory(THIS_ IRenderFactory *renderFac)
 {
-	if(m_RenderFactory || !renderFac)
-		return FALSE;
-	m_RenderFactory = renderFac;
-	GETUIDEF->SetRenderFactory(renderFac);
-	return TRUE;
+    if (m_RenderFactory || !renderFac)
+        return FALSE;
+    m_RenderFactory = renderFac;
+    GETUIDEF->SetRenderFactory(renderFac);
+    return TRUE;
 }
 
 void SApplication::SetRealWndHandler(IRealWndHandler *pRealHandler)

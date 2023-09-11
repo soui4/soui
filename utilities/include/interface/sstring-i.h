@@ -43,14 +43,14 @@ DECLARE_INTERFACE_(IStringA,IObjRef)
 	STDMETHOD_(int, Replace)(THIS_ const char* pszOld, const char* pszNew)PURE;
 	STDMETHOD_(int, Remove)(THIS_ char chRemove)PURE;
 
-	STDMETHOD_(int, FindChar)(CTHIS_ char ch, int nStart) SCONST PURE;
+	STDMETHOD_(int, FindChar)(CTHIS_ char ch, int nStart DEF_VAL(0)) SCONST PURE;
 	STDMETHOD_(int, ReverseFind)(CTHIS_ char ch) SCONST PURE;
 
 	// find a sub-string (like strstr)
-	STDMETHOD_(int, Find)(CTHIS_ const char* pszSub, int nStart) SCONST PURE;
+	STDMETHOD_(int, Find)(CTHIS_ const char* pszSub, int nStart DEF_VAL(0)) SCONST PURE;
 	// Access to string implementation buffer as "C" character array
-	STDMETHOD_(char*, GetBuffer)(THIS_ int nMinBufLength)PURE;
-	STDMETHOD_(void ,ReleaseBuffer)(THIS_ int nNewLength)PURE;
+	STDMETHOD_(char*, GetBuffer)(THIS_ int nMinBufLength DEF_VAL(-1))PURE;
+	STDMETHOD_(void ,ReleaseBuffer)(THIS_ int nNewLength DEF_VAL(-1))PURE;
 	STDMETHOD_(char* ,GetBufferSetLength)(THIS_ int nNewLength)PURE;
 	STDMETHOD_(void ,SetLength)(THIS_ int nLength)PURE;
 	STDMETHOD_(void ,Copy)(THIS_ const IStringA * src) PURE;
@@ -108,14 +108,14 @@ DECLARE_INTERFACE_(IStringW,IObjRef)
 	STDMETHOD_(int, Replace)(THIS_ const wchar_t* pszOld, const wchar_t* pszNew)PURE;
 	STDMETHOD_(int, Remove)(THIS_ wchar_t chRemove)PURE;
 
-	STDMETHOD_(int, FindChar)(CTHIS_ wchar_t ch, int nStart) SCONST PURE;
+	STDMETHOD_(int, FindChar)(CTHIS_ wchar_t ch, int nStart DEF_VAL(0)) SCONST PURE;
 	STDMETHOD_(int, ReverseFind)(CTHIS_ wchar_t ch) SCONST PURE;
 
 	// find a sub-string (like strstr)
-	STDMETHOD_(int, Find)(CTHIS_ const wchar_t* pszSub, int nStart) SCONST PURE;
+	STDMETHOD_(int, Find)(CTHIS_ const wchar_t* pszSub, int nStart DEF_VAL(0)) SCONST PURE;
 	// Access to string implementation buffer as "C" character array
-	STDMETHOD_(wchar_t*, GetBuffer)(THIS_ int nMinBufLength)PURE;
-	STDMETHOD_(void ,ReleaseBuffer)(THIS_ int nNewLength)PURE;
+	STDMETHOD_(wchar_t*, GetBuffer)(THIS_ int nMinBufLength DEF_VAL(-1))PURE;
+	STDMETHOD_(void ,ReleaseBuffer)(THIS_ int nNewLength DEF_VAL(-1))PURE;
 	STDMETHOD_(wchar_t* ,GetBufferSetLength)(THIS_ int nNewLength)PURE;
 	STDMETHOD_(void ,SetLength)(THIS_ int nLength) PURE;
 	STDMETHOD_(void ,Copy)(THIS_ const IStringW * src) PURE;

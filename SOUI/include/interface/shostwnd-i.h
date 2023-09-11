@@ -162,22 +162,21 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
      */
     STDMETHOD_(void, ShowHostWnd)(THIS_ int uShowCmd, BOOL bWaitAniDone) PURE;
 
-
-	/**
+    /**
      * @brief 是否启用布局中定义的私有UIDef对象
      * @param BOOL bEnable TRUE-启动，FALSE-关闭
      * @return void
-	 * @remark 当程序中需要重新从私有UIDef中获取数据时启动，启用完后关闭
+     * @remark 当程序中需要重新从私有UIDef中获取数据时启动，启用完后关闭
      */
-	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) PURE;
+    STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) PURE;
 
-	/**
+    /**
      * @brief 设置窗口的dpi倍数
      * @param int nScale dpi倍数,以100为基数
-	 * @param LPCRECT pDestRect 缩放后的窗口坐标
+     * @param LPCRECT pDestRect 缩放后的窗口坐标
      * @return void
      */
-	STDMETHOD_(void, SetScale)(THIS_ int nScale,LPCRECT pDestRect) PURE;
+    STDMETHOD_(void, SetScale)(THIS_ int nScale, LPCRECT pDestRect) PURE;
 };
 
 #undef INTERFACE
@@ -326,13 +325,13 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      */
     STDMETHOD_(void, ShowHostWnd)(THIS_ int uShowCmd, BOOL bWaitAniDone) PURE;
 
-	/**
+    /**
      * @brief 是否启用布局中定义的私有UIDef对象
      * @param BOOL bEnable TRUE-启动，FALSE-关闭
      * @return void
-	 * @remark 当程序中需要重新从私有UIDef中获取数据时启动，启用完后关闭
+     * @remark 当程序中需要重新从私有UIDef中获取数据时启动，启用完后关闭
      */
-	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) PURE;
+    STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) PURE;
 
     //////////////////////////////////////////////////////////////////////////
 

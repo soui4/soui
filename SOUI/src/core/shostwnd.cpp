@@ -362,17 +362,15 @@ BOOL SHostWnd::onRootResize(IEvtArgs *e)
     return TRUE;
 }
 
-
 void SHostWnd::EnablePrivateUiDef(THIS_ BOOL bEnable)
 {
-	if(!m_privateUiDefInfo)
-		return;
-	if(bEnable)
-		GETUIDEF->PushUiDefInfo(m_privateUiDefInfo,TRUE);
-	else
-		GETUIDEF->PopUiDefInfo(m_privateUiDefInfo,TRUE);
+    if (!m_privateUiDefInfo)
+        return;
+    if (bEnable)
+        GETUIDEF->PushUiDefInfo(m_privateUiDefInfo, TRUE);
+    else
+        GETUIDEF->PopUiDefInfo(m_privateUiDefInfo, TRUE);
 }
-
 
 BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 {
@@ -385,14 +383,14 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     if (!SNativeWnd::IsWindow())
         return FALSE;
 
-	m_privateUiDefInfo = NULL;
-	IUiDefInfo *pUiDefInfo = SUiDef::CreateUiDefInfo();
-	if (pUiDefInfo->Init2(pNode, FALSE))
-	{ // init private uidef info.
-		m_privateUiDefInfo = pUiDefInfo;
-	}
-	pUiDefInfo->Release();
-	EnablePrivateUiDef(TRUE);
+    m_privateUiDefInfo = NULL;
+    IUiDefInfo *pUiDefInfo = SUiDef::CreateUiDefInfo();
+    if (pUiDefInfo->Init2(pNode, FALSE))
+    { // init private uidef info.
+        m_privateUiDefInfo = pUiDefInfo;
+    }
+    pUiDefInfo->Release();
+    EnablePrivateUiDef(TRUE);
 
     if (m_AniState != Ani_none)
     {
@@ -555,14 +553,17 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             ModifyStyleEx(0, WS_EX_LAYERED);
         ::SetLayeredWindowAttributes(m_hWnd, 0, GetRoot()->GetAlpha(), LWA_ALPHA);
     }
-	m_memRT = NULL;
-	if(m_hostAttr.m_bTranslucent){
-		CRect rcWnd;
-		SNativeWnd::GetWindowRect(&rcWnd);
-		GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcWnd.Width(), rcWnd.Height());
-	}else{
-		GETRENDERFACTORY->CreateRenderTarget2(&m_memRT, m_hWnd);
-	}
+    m_memRT = NULL;
+    if (m_hostAttr.m_bTranslucent)
+    {
+        CRect rcWnd;
+        SNativeWnd::GetWindowRect(&rcWnd);
+        GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcWnd.Width(), rcWnd.Height());
+    }
+    else
+    {
+        GETRENDERFACTORY->CreateRenderTarget2(&m_memRT, m_hWnd);
+    }
 
     BuildWndTreeZorder();
 
@@ -638,7 +639,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         xmlChild = xmlChild.next_sibling();
     }
 
-	EnablePrivateUiDef(FALSE);
+    EnablePrivateUiDef(FALSE);
 
     return TRUE;
 }
@@ -652,7 +653,7 @@ void SHostWnd::_Redraw()
 
 void SHostWnd::_RedrawRegion(IRegionS *pRgnUpdate, CRect &rcInvalid)
 {
-	m_memRT->BeginDraw();
+    m_memRT->BeginDraw();
     CRect rcWnd = m_pRoot->GetWindowRect();
 
     SPainter painter;
@@ -679,10 +680,10 @@ void SHostWnd::_RedrawRegion(IRegionS *pRgnUpdate, CRect &rcInvalid)
     m_memRT->RestoreClip(clipState);
     _PaintVideoCanvasForeground(m_memRT); // paint foreground of video canvas.
 
-	m_memRT->PopClip();
+    m_memRT->PopClip();
 
     m_pRoot->AfterPaint(m_memRT, painter);
-	m_memRT->EndDraw();
+    m_memRT->EndDraw();
 }
 
 void SHostWnd::OnPrint(HDC dc, UINT uFlags)
@@ -722,7 +723,7 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         ::GetClipBox(dc, &rcUpdate);
         rcInvalid = rcInvalid | rcUpdate;
     }
-    UpdatePresenter(dc, m_memRT, rcInvalid,255,uFlags);
+    UpdatePresenter(dc, m_memRT, rcInvalid, 255, uFlags);
 }
 
 void SHostWnd::OnPaint(HDC dc)
@@ -779,7 +780,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     SHostMgr::getSingletonPtr()->AddHostMsgHandler(this);
     UpdateAutoSizeCount(true);
     m_memRT = NULL;
-	CRect rcWnd = GetClientRect();
+    CRect rcWnd = GetClientRect();
     GETRENDERFACTORY->CreateRenderTarget(&m_memRT, rcWnd.Width(), rcWnd.Height());
     m_rgnInvalidate = NULL;
     GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
@@ -818,7 +819,7 @@ void SHostWnd::OnDestroy()
             GetMsgLoop()->RemoveIdleHandler(pIdleHandler);
         m_pScriptModule = NULL;
     }
-	m_privateUiDefInfo = NULL;
+    m_privateUiDefInfo = NULL;
 
     m_memRT = NULL;
     m_rgnInvalidate = NULL;
@@ -839,7 +840,7 @@ void SHostWnd::OnSize(UINT nType, CSize size)
     if (size.cx == 0 || size.cy == 0)
         return;
     CRect rcWnd = GetWindowRect();
-    if(size != rcWnd.Size() && m_nAutoSizing == 0)
+    if (size != rcWnd.Size() && m_nAutoSizing == 0)
     {
         m_szAppSetted = size;
     }
@@ -984,8 +985,8 @@ LRESULT SHostWnd::OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 LRESULT SHostWnd::OnActivateApp(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-	if(!m_presenter) //防止host.OnDestroy中destroy子窗口可能给host发这个消息
-		return 0;
+    if (!m_presenter) //防止host.OnDestroy中destroy子窗口可能给host发这个消息
+        return 0;
     return DoFrameEvent(uMsg, wParam, lParam);
 }
 
@@ -1051,11 +1052,11 @@ HWND SHostWnd::GetHostHwnd()
     return m_hWnd;
 }
 
-void SHostWnd::UpdatePresenter(HDC dc, IRenderTarget *pRT, LPCRECT rcInvalid, BYTE byAlpha ,UINT uFlag)
+void SHostWnd::UpdatePresenter(HDC dc, IRenderTarget *pRT, LPCRECT rcInvalid, BYTE byAlpha, UINT uFlag)
 {
-	byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
-	if(pRT->IsOffscreen() || uFlag!=0)
-		m_presenter->OnHostPresent(dc, pRT, rcInvalid, byAlpha);
+    byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
+    if (pRT->IsOffscreen() || uFlag != 0)
+        m_presenter->OnHostPresent(dc, pRT, rcInvalid, byAlpha);
 }
 
 void SHostWnd::UpdateAlpha(BYTE byAlpha)
@@ -1116,8 +1117,8 @@ BOOL SHostWnd::UpdateWindow(BOOL bForce)
 {
     if (m_bResizing)
         return FALSE;
-	if(!m_bNeedRepaint && !bForce)
-		return FALSE;
+    if (!m_bNeedRepaint && !bForce)
+        return FALSE;
     if (m_dummyWnd)
         ::UpdateWindow(m_dummyWnd->m_hWnd);
     else
@@ -1249,7 +1250,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 {
                     *x += xStepLen;
                     *y += yStepLen;
-					pRT->BeginDraw();
+                    pRT->BeginDraw();
                     pRT->ClearRect(rcWnd, 0);
                     CPoint ptAnchor;
                     if (dwFlags & AW_VER_NEGATIVE)
@@ -1257,7 +1258,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     if (dwFlags & AW_HOR_NEGATIVE)
                         ptAnchor.x = rcWnd.right - rcShow.Width();
                     _BitBlt(pRT, m_memRT, rcShow, ptAnchor);
-					pRT->EndDraw();
+                    pRT->EndDraw();
                     UpdatePresenter(0, pRT, &rcWnd, byAlpha);
                     Sleep(10);
                 }
@@ -1271,10 +1272,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 for (int i = 0; i < nSteps; i++)
                 {
                     rcShow.DeflateRect(xStep, yStep);
-					pRT->BeginDraw();
+                    pRT->BeginDraw();
                     pRT->ClearRect(rcWnd, 0);
-					_BitBlt(pRT, m_memRT, rcShow, rcShow.TopLeft());
-					pRT->EndDraw();
+                    _BitBlt(pRT, m_memRT, rcShow, rcShow.TopLeft());
+                    pRT->EndDraw();
                     UpdatePresenter(0, pRT, rcWnd, byAlpha);
                     Sleep(10);
                 }
@@ -1337,7 +1338,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 {
                     *x += xStepLen;
                     *y += yStepLen;
-					pRT->BeginDraw();
+                    pRT->BeginDraw();
                     pRT->ClearRect(rcWnd, 0);
                     CPoint ptAnchor;
                     if (dwFlags & AW_VER_POSITIVE)
@@ -1345,7 +1346,7 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                     if (dwFlags & AW_HOR_POSITIVE)
                         ptAnchor.x = rcWnd.right - rcShow.Width();
                     _BitBlt(pRT, m_memRT, rcShow, ptAnchor);
-					pRT->EndDraw();
+                    pRT->EndDraw();
                     UpdatePresenter(0, pRT, &rcWnd, byAlpha);
                     Sleep(10);
                 }
@@ -1362,10 +1363,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
                 for (int i = 0; i < nSteps; i++)
                 {
                     rcShow.InflateRect(xStep, yStep);
-					pRT->BeginDraw();
+                    pRT->BeginDraw();
                     pRT->ClearRect(rcWnd, 0);
                     _BitBlt(pRT, m_memRT, rcShow, rcShow.TopLeft());
-					pRT->EndDraw();
+                    pRT->EndDraw();
                     UpdatePresenter(0, pRT, &rcWnd, byAlpha);
                     Sleep(10);
                 }
@@ -1940,21 +1941,15 @@ void SHostWnd::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     }
 }
 
-void SHostWnd::SetScale(THIS_ int nScale,LPCRECT desRect)
+void SHostWnd::SetScale(THIS_ int nScale, LPCRECT desRect)
 {
-	EnablePrivateUiDef(TRUE);
-	GetRoot()->SDispatchMessage(UM_SETSCALE, nScale, 0);
-	GetNcPainter()->GetRoot()->SDispatchMessage(UM_SETSCALE, nScale, 0);
-	UpdateAutoSizeCount(true);
-	SetWindowPos(
-		NULL,
-		desRect->left,
-		desRect->top,
-		desRect->right - desRect->left,
-		desRect->bottom - desRect->top,
-		SWP_NOZORDER | SWP_NOACTIVATE);
-	UpdateAutoSizeCount(false);
-	EnablePrivateUiDef(FALSE);
+    EnablePrivateUiDef(TRUE);
+    GetRoot()->SDispatchMessage(UM_SETSCALE, nScale, 0);
+    GetNcPainter()->GetRoot()->SDispatchMessage(UM_SETSCALE, nScale, 0);
+    UpdateAutoSizeCount(true);
+    SetWindowPos(NULL, desRect->left, desRect->top, desRect->right - desRect->left, desRect->bottom - desRect->top, SWP_NOZORDER | SWP_NOACTIVATE);
+    UpdateAutoSizeCount(false);
+    EnablePrivateUiDef(FALSE);
 }
 
 //////////////////////////////////////////////////////////////////

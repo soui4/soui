@@ -69,14 +69,14 @@ public:
 	STDMETHOD_(int, Replace)(THIS_ const char* pszOld, const char* pszNew);
 	STDMETHOD_(int, Remove)(THIS_ char chRemove);
 
-	STDMETHOD_(int, FindChar)(THIS_ char ch, int nStart = 0) SCONST ;
+	STDMETHOD_(int, FindChar)(THIS_ char ch, int nStart DEF_VAL(0)) SCONST ;
 	STDMETHOD_(int, ReverseFind)(THIS_ char ch) SCONST ;
 
 	// find a sub-string (like strstr)
-	STDMETHOD_(int, Find)(THIS_ const char* pszSub, int nStart=0) SCONST ;
+	STDMETHOD_(int, Find)(THIS_ const char* pszSub, int nStart  DEF_VAL(0)) SCONST ;
 	// Access to string implementation buffer as "C" character array
-	STDMETHOD_(char*, GetBuffer)(THIS_ int nMinBufLength);
-	STDMETHOD_(void ,ReleaseBuffer)(THIS_ int nNewLength=-1);
+	STDMETHOD_(char*, GetBuffer)(THIS_ int nMinBufLength DEF_VAL(-1));
+	STDMETHOD_(void ,ReleaseBuffer)(THIS_ int nNewLength DEF_VAL(-1));
 	STDMETHOD_(char* ,GetBufferSetLength)(THIS_ int nNewLength);
 	STDMETHOD_(void ,SetLength)(THIS_ int nLength);
 	STDMETHOD_(void ,Copy)(THIS_ const IStringA * src);

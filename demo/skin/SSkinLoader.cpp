@@ -8,7 +8,7 @@ SSkinLoader * SSingleton<SSkinLoader>::ms_Singleton = NULL;
 
 SSkinLoader::SSkinLoader(SApplication* theApp):m_pResProvider(NULL),m_theApp(theApp)
 {
-	m_privateSkinPool = new SSkinPool();
+	m_privateSkinPool.Attach(SUiDef::CreateSkinPool());
 	GETUIDEF->PushSkinPool(m_privateSkinPool);
 }
 
@@ -58,6 +58,6 @@ void SOUI::SSkinLoader::LoadSkin(SStringT respath,const TCHAR *strXmlSkin /*= _T
 	SXmlDoc xmlDoc;
 	if (LOADXML(xmlDoc,strXmlSkin))
 	{
-		m_privateSkinPool->LoadSkins(xmlDoc.root().child(L"skin"));
+		m_privateSkinPool->LoadSkins(&xmlDoc.root().child(L"skin"));
 	}
 }

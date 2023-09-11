@@ -266,9 +266,10 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(void, EnableDragDrop)(THIS) OVERRIDE;
 
     STDMETHOD_(void, ShowHostWnd)(THIS_ int uShowCmd, BOOL bWaitAniDone) OVERRIDE;
-	STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
+    STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
 
-	STDMETHOD_(void, SetScale)(THIS_ int nScale,LPCRECT pDestRect) OVERRIDE;
+    STDMETHOD_(void, SetScale)(THIS_ int nScale, LPCRECT pDestRect) OVERRIDE;
+
   public:
     SWindow *FindChildByName(LPCWSTR strName, int nDeep = -1)
     {
@@ -398,7 +399,7 @@ class SOUI_EXP SHostWnd
     void OnKillFocus(HWND wndFocus);
 
     void UpdateAlpha(BYTE byAlpha);
-	void UpdatePresenter(HDC dc, IRenderTarget *pRT, LPCRECT rc, BYTE byAlpha = 255,UINT uFlag=0);
+    void UpdatePresenter(HDC dc, IRenderTarget *pRT, LPCRECT rc, BYTE byAlpha = 255, UINT uFlag = 0);
 
     void OnCaptureChanged(HWND wnd);
 

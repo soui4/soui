@@ -433,35 +433,35 @@ void SResProviderMgr::SetFilePrefix(LPCTSTR pszFilePrefix)
         m_strFilePrefix.Append(_T("\\"));
 }
 
-BOOL SResProviderMgr::LoadRawBuffer(LPCTSTR pszType, LPCTSTR pszResName,IResProvider *pResProvider,SAutoBuf &buf)
+BOOL SResProviderMgr::LoadRawBuffer(LPCTSTR pszType, LPCTSTR pszResName, IResProvider *pResProvider, SAutoBuf &buf)
 {
-	SAutoLock lock(m_cs);
-	if (IsFileType(pszType))
-	{
-		size_t dwSize=SResLoadFromFile::GetRawBufferSize(pszResName);
-		if(dwSize==0)
-			return FALSE;
-		buf.Allocate(dwSize);
-		SResLoadFromFile::GetRawBuffer(pszResName,buf,dwSize);
-		return TRUE;
-	}
-	if (!pResProvider)
-	{
-		pResProvider = GetMatchResProvider(pszType, pszResName);
-	}
-	if (!pResProvider)
-	{
-		SSLOGW() << "GetMatchResProvider failed: " << pszType << ":" << pszResName << " not found in respovider list";
-		return FALSE;
-	}
-	size_t dwSize = pResProvider->GetRawBufferSize(pszType, pszResName);
-	if (dwSize == 0)
-	{
-		SSLOGW() << "GetMatchResProvider failed: " << pszType << ":" << pszResName << " pResProvider->GetRawBufferSize return 0";
-		return FALSE;
-	}
-	buf.Allocate(dwSize);
-	return pResProvider->GetRawBuffer(pszType, pszResName, buf, dwSize);
+    SAutoLock lock(m_cs);
+    if (IsFileType(pszType))
+    {
+        size_t dwSize = SResLoadFromFile::GetRawBufferSize(pszResName);
+        if (dwSize == 0)
+            return FALSE;
+        buf.Allocate(dwSize);
+        SResLoadFromFile::GetRawBuffer(pszResName, buf, dwSize);
+        return TRUE;
+    }
+    if (!pResProvider)
+    {
+        pResProvider = GetMatchResProvider(pszType, pszResName);
+    }
+    if (!pResProvider)
+    {
+        SSLOGW() << "GetMatchResProvider failed: " << pszType << ":" << pszResName << " not found in respovider list";
+        return FALSE;
+    }
+    size_t dwSize = pResProvider->GetRawBufferSize(pszType, pszResName);
+    if (dwSize == 0)
+    {
+        SSLOGW() << "GetMatchResProvider failed: " << pszType << ":" << pszResName << " pResProvider->GetRawBufferSize return 0";
+        return FALSE;
+    }
+    buf.Allocate(dwSize);
+    return pResProvider->GetRawBuffer(pszType, pszResName, buf, dwSize);
 }
 
 SNSEND

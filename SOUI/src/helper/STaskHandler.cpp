@@ -151,8 +151,8 @@ BOOL STaskHandler::getRunningTaskInfo(char *buf, int bufLen)
     return false;
 }
 
-void STaskHandler::setHeartBeatTask(IRunnable* pTask, int intervel){
-
+void STaskHandler::setHeartBeatTask(IRunnable *pTask, int intervel)
+{
 }
 
 SNSEND

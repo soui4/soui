@@ -96,9 +96,9 @@ BOOL SActiveX::InitActiveX()
 void SActiveX::OnPaint(IRenderTarget *pRT)
 {
     HDC hdc = pRT->GetDC(0);
-	CRect rcClient = GetClientRect();
+    CRect rcClient = GetClientRect();
     m_axContainer->Draw(hdc, &rcClient);
-    pRT->ReleaseDC(hdc,&rcClient);
+    pRT->ReleaseDC(hdc, &rcClient);
 }
 
 int SActiveX::OnCreate(LPVOID)

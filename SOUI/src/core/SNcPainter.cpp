@@ -179,31 +179,31 @@ LRESULT SNcPainter::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
 
             m_root->Move(rcCaption);
             m_root->UpdateLayout();
-			m_rcInvalid = rcCaption;
-			m_rcInvalid.OffsetRect(nBorderWid,nBorderWid);
+            m_rcInvalid = rcCaption;
+            m_rcInvalid.OffsetRect(nBorderWid, nBorderWid);
 
             m_memLeft->Resize(CSize(nBorderWid, rcWnd.Height()));
-			m_memLeft->BeginDraw();
+            m_memLeft->BeginDraw();
             m_skinBorder->DrawByIndex(m_memLeft, &rcWnd, 0);
-			m_memLeft->EndDraw();
+            m_memLeft->EndDraw();
 
             m_memRight->Resize(CSize(nBorderWid, rcWnd.Height()));
             m_memRight->SetViewportOrg(CPoint(-(rcWnd.right - nBorderWid), 0));
-			m_memRight->BeginDraw();
+            m_memRight->BeginDraw();
             m_skinBorder->DrawByIndex(m_memRight, &rcWnd, 0);
-			m_memRight->EndDraw();
+            m_memRight->EndDraw();
 
             m_memTop->Resize(CSize(rcWnd.Width() - 2 * nBorderWid, nBorderWid));
             m_memTop->SetViewportOrg(CPoint(-nBorderWid, 0));
-			m_memTop->BeginDraw();
+            m_memTop->BeginDraw();
             m_skinBorder->DrawByIndex(m_memTop, &rcWnd, 0);
-			m_memTop->EndDraw();
+            m_memTop->EndDraw();
 
             m_memBottom->Resize(CSize(rcWnd.Width() - 2 * nBorderWid, nBorderWid));
             m_memBottom->SetViewportOrg(CPoint(-nBorderWid, -(rcWnd.bottom - nBorderWid)));
-			m_memBottom->BeginDraw();
+            m_memBottom->BeginDraw();
             m_skinBorder->DrawByIndex(m_memBottom, &rcWnd, 0);
-			m_memBottom->EndDraw();
+            m_memBottom->EndDraw();
         }
         else
         {
@@ -225,9 +225,9 @@ BOOL SNcPainter::OnNcActivate(BOOL bActive)
             m_pHost->SetWindowLongPtr(GWL_STYLE, dwStyle);
         m_root->SetActive(bActive);
 
-		int nBorderWid = m_borderWidth.toPixelSize(GetScale());
-		m_rcInvalid = m_root->GetClientRect();
-		m_rcInvalid.OffsetRect(nBorderWid,nBorderWid);
+        int nBorderWid = m_borderWidth.toPixelSize(GetScale());
+        m_rcInvalid = m_root->GetClientRect();
+        m_rcInvalid.OffsetRect(nBorderWid, nBorderWid);
         m_pHost->SendMessage(WM_NCPAINT);
     }
     return TRUE;
@@ -394,7 +394,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
         {
             HDC memdc = m_memLeft->GetDC(0);
             BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc, rcDraw.left, rcDraw.top, SRCCOPY);
-            m_memLeft->ReleaseDC(memdc,&rcDraw);
+            m_memLeft->ReleaseDC(memdc, &rcDraw);
         }
     }
     // draw top
@@ -403,7 +403,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
         {
             HDC memdc = m_memTop->GetDC(0);
             BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc, rcDraw.left, rcDraw.top, SRCCOPY);
-            m_memTop->ReleaseDC(memdc,&rcDraw);
+            m_memTop->ReleaseDC(memdc, &rcDraw);
         }
     }
     // draw right
@@ -412,7 +412,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
         {
             HDC memdc = m_memRight->GetDC(0);
             BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc, rcDraw.left, rcDraw.top, SRCCOPY);
-            m_memRight->ReleaseDC(memdc,&rcDraw);
+            m_memRight->ReleaseDC(memdc, &rcDraw);
         }
     }
     // draw bottom
@@ -421,7 +421,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
         {
             HDC memdc = m_memBottom->GetDC(0);
             BitBlt(hdc, rcDraw.left, rcDraw.top, rcDraw.Width(), rcDraw.Height(), memdc, rcDraw.left, rcDraw.top, SRCCOPY);
-            m_memBottom->ReleaseDC(memdc,&rcDraw);
+            m_memBottom->ReleaseDC(memdc, &rcDraw);
         }
     }
 
@@ -436,8 +436,8 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
         m_memRT->EndDraw();
         HDC memdc = m_memRT->GetDC(0);
         ::BitBlt(hdc, rcTitle.left, rcTitle.top, rcTitle.Width(), rcTitle.Height(), memdc, rcTitle.left, rcTitle.top, SRCCOPY);
-        m_memRT->ReleaseDC(memdc,&rcTitle);
-        m_rcInvalid=CRect();
+        m_memRT->ReleaseDC(memdc, &rcTitle);
+        m_rcInvalid = CRect();
     }
 
     ::ReleaseDC(m_pHost->m_hWnd, hdc);
@@ -547,9 +547,9 @@ void SNcPainter::InvalidateHostRect(LPCRECT pRc, BOOL bClip)
     if (m_bInPaint)
         return;
     if (pRc)
-		m_rcInvalid |= *pRc;
+        m_rcInvalid |= *pRc;
     else
-		m_rcInvalid = GetHostRect();
+        m_rcInvalid = GetHostRect();
     m_pHost->SendMessage(WM_NCPAINT);
 }
 
@@ -579,7 +579,7 @@ void SNcPainter::OnReleaseHostRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFl
     int nBorderWid = m_borderWidth.toPixelSize(GetScale());
     HDC memdc = m_memRT->GetDC(0);
     ::BitBlt(hdc, rc->left, rc->top, RectWidth(rc), RectHeight(rc), memdc, rc->left, rc->top, SRCCOPY);
-    m_memRT->ReleaseDC(memdc,rc);
+    m_memRT->ReleaseDC(memdc, rc);
     ::ReleaseDC(m_pHost->m_hWnd, hdc);
 }
 

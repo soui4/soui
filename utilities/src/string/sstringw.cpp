@@ -392,9 +392,9 @@ void SStringW::ReleaseBuffer(int nNewLength /*= -1*/)
 
 wchar_t* SStringW::GetBuffer(int nMinBufLength)
 {
-	SASSERT(nMinBufLength >= 0);
-
 	TStringData* pData = GetData();
+	if(nMinBufLength<0)
+		nMinBufLength = pData->nAllocLength;
 	if (pData->IsShared() || nMinBufLength > pData->nAllocLength)
 	{
 		// we have to grow the buffer

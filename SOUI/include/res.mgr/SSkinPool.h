@@ -14,7 +14,7 @@
 #ifndef __SSKINPOOL__H__
 #define __SSKINPOOL__H__
 #include <core/SSingletonMap.h>
-#include <interface/Sskinobj-i.h>
+#include <interface/SSkinPool-i.h>
 #include <helper/obj-ref-impl.hpp>
 
 SNSBEGIN
@@ -104,43 +104,29 @@ class CElementTraits<SkinKey> : public CElementTraitsBase<SkinKey> {
  * Describe
  */
 class SOUI_EXP SSkinPool
-    : public SCmnMap<SSkinPtr, SkinKey>
-    , public TObjRefImpl<IObjRef> {
+    : public TObjRefImpl<ISkinPool>
+    , protected SCmnMap<SSkinPtr, SkinKey> {
   public:
     SSkinPool();
 
     virtual ~SSkinPool();
 
-    /**
-     * GetSkin
-     * @brief    获得与指定name匹配的SkinObj
-     * @param    LPCWSTR strSkinName --    Name of Skin Object
-     * @return   ISkinObj*  -- 找到的Skin Object
-     * Describe
-     */
-    ISkinObj *GetSkin(const SStringW &strSkinName, int nScale);
+  public:
+    STDMETHOD_(ISkinObj *, GetSkin)(THIS_ LPCWSTR strSkinName, int nScale) OVERRIDE;
 
-    /**
-     * LoadSkins
-     * @brief    从XML中加载Skin列表
-     * @param    SXmlNode xmlNode --  描述SkinObj的XML表
-     * @return   int -- 成功加载的SkinObj数量
-     * Describe
-     */
-    int LoadSkins(SXmlNode xmlNode);
+    STDMETHOD_(int, LoadSkins)(THIS_ IXmlNode *xmlNode) OVERRIDE;
 
-    /**
-     * AddSkin
-     * @brief    增加一个skinObj对象到SkinPool
-     * @param    ISkinObj* --  SkinObj
-     * @return   BOOL -- 加入是否成功,重名加入失败
-     * Describe
-     */
-    BOOL AddSkin(ISkinObj *skin);
+    STDMETHOD_(BOOL, AddSkin)(THIS_ ISkinObj *skin) OVERRIDE;
+
+    STDMETHOD_(BOOL, RemoveSkin)(THIS_ ISkinObj *skin) OVERRIDE;
+
+    STDMETHOD_(void, RemoveAll)(THIS) OVERRIDE;
 
   protected:
-    static void OnKeyRemoved(const SSkinPtr &obj);
+    int _LoadSkins(SXmlNode xmlNode);
+    ISkinObj *_LoadSkin(SXmlNode xmlNode, int nScale);
 
+    static void OnKeyRemoved(const SSkinPtr &obj);
 #ifdef _DEBUG
     SMap<SkinKey, int> m_mapSkinUseCount; //皮肤使用计数
 #endif

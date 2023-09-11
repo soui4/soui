@@ -729,7 +729,7 @@ void SScrollView::SetViewOrigin(POINT pt)
 
 void SScrollView::GetViewOrigin(POINT *ptOri) const
 {
-	SASSERT(ptOri);
+    SASSERT(ptOri);
     *ptOri = m_ptOrigin;
 }
 
@@ -746,8 +746,8 @@ void SScrollView::SetViewSize(SIZE szView)
 
 void SScrollView::GetViewSize(SIZE *szView) const
 {
-	SASSERT(szView);
-	*szView = m_szView;
+    SASSERT(szView);
+    *szView = m_szView;
 }
 
 void SScrollView::UpdateScrollBar()
@@ -875,8 +875,8 @@ void SScrollView::UpdateViewSize()
     if (!(m_viewSize[0].isValid() && m_viewSize[1].isValid()))
         return;
     CRect rcWnd = SWindow::GetClientRect();
-	CRect rcPadding = GetStyle().GetPadding();
-	rcWnd.DeflateRect(rcPadding);
+    CRect rcPadding = GetStyle().GetPadding();
+    rcWnd.DeflateRect(rcPadding);
 
     CSize szView;
     if (m_viewSize[0].isMatchParent())
@@ -905,25 +905,27 @@ void SScrollView::UpdateViewSize()
     if (szView.cy > rcWnd.Height() && m_viewSize[0].isMatchParent())
     {
         szView.cx -= GetSbWidth();
-		if(m_viewSize[1].isWrapContent()){
-			//recalc height
-			CSize szCalc = GetLayout()->MeasureChildren(this, szView.cx, -1);
-			szView.cy = szCalc.cy;
-		}
+        if (m_viewSize[1].isWrapContent())
+        {
+            // recalc height
+            CSize szCalc = GetLayout()->MeasureChildren(this, szView.cx, -1);
+            szView.cy = szCalc.cy;
+        }
     }
     else if (szView.cx > rcWnd.Width() && m_viewSize[1].isMatchParent())
     {
         szView.cy -= GetSbWidth();
-		if(m_viewSize[0].isWrapContent()){
-			//recalc width
-			CSize szCalc = GetLayout()->MeasureChildren(this, -1, szView.cy);
-			szView.cx = szCalc.cx;
-		}
+        if (m_viewSize[0].isWrapContent())
+        {
+            // recalc width
+            CSize szCalc = GetLayout()->MeasureChildren(this, -1, szView.cy);
+            szView.cx = szCalc.cx;
+        }
     }
-	if(!m_viewSize[0].isSpecifiedSize())
-		szView.cx += rcPadding.left + rcPadding.right;
-	if(!m_viewSize[1].isSpecifiedSize())
-		szView.cy += rcPadding.top + rcPadding.bottom;
+    if (!m_viewSize[0].isSpecifiedSize())
+        szView.cx += rcPadding.left + rcPadding.right;
+    if (!m_viewSize[1].isSpecifiedSize())
+        szView.cy += rcPadding.top + rcPadding.bottom;
 
     SetViewSize(szView);
 }

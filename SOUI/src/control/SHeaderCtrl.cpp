@@ -583,17 +583,17 @@ HBITMAP SHeaderCtrl::CreateDragImage(UINT iItem)
 
     SAutoRefPtr<IRenderTarget> pRT;
     GETRENDERFACTORY->CreateRenderTarget(&pRT, rcItem.Width(), rcItem.Height());
-	pRT->BeginDraw();
+    pRT->BeginDraw();
     BeforePaintEx(pRT);
     DrawItem(pRT, rcItem, m_arrItems.GetData() + iItem);
-	pRT->EndDraw();
+    pRT->EndDraw();
     HBITMAP hBmp = CreateBitmap(rcItem.Width(), rcItem.Height(), 1, 32, NULL);
     HDC hdc = GetDC(NULL);
     HDC hMemDC = CreateCompatibleDC(hdc);
     ::SelectObject(hMemDC, hBmp);
     HDC hdcSrc = pRT->GetDC(0);
     ::BitBlt(hMemDC, 0, 0, rcItem.Width(), rcItem.Height(), hdcSrc, 0, 0, SRCCOPY);
-    pRT->ReleaseDC(hdcSrc,NULL);
+    pRT->ReleaseDC(hdcSrc, NULL);
     DeleteDC(hMemDC);
     ReleaseDC(NULL, hdc);
     return hBmp;

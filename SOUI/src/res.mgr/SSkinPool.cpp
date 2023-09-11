@@ -32,47 +32,68 @@ SSkinPool::~SSkinPool()
 #endif
 }
 
-int SSkinPool::LoadSkins(SXmlNode xmlNode)
+ISkinObj *SSkinPool::_LoadSkin(SXmlNode xmlSkin, int nScale)
 {
-    if (!xmlNode)
-        return 0;
+    SStringW strTypeName = xmlSkin.name();
+    SStringW strSkinName = xmlSkin.attribute(L"name").value();
 
+    if (strSkinName.IsEmpty() || strTypeName.IsEmpty())
+    {
+        return NULL;
+    }
+
+    ISkinObj *pSkin = SApplication::getSingleton().CreateSkinByName(strTypeName);
+    if (pSkin)
+    {
+        pSkin->InitFromXml(&xmlSkin);
+        if (nScale != -1 && pSkin->GetScale() == 100)
+        {
+            pSkin->SetScale(nScale);
+        }
+        SkinKey key = { strSkinName, pSkin->GetScale() };
+        SASSERT(!HasKey(key));
+        AddKeyObject(key, pSkin);
+    }
+    else
+    {
+        SASSERT_FMTW(FALSE, L"load skin error,type=%s,name=%s", strTypeName.c_str(), strSkinName.c_str());
+    }
+    return pSkin;
+}
+
+int SSkinPool::_LoadSkins(SXmlNode xmlNode)
+{
     int nLoaded = 0;
     SStringW strSkinName, strTypeName;
 
-    // loadSkins前把this加入到poolmgr,便于在skin中引用其它skin
-    GETUIDEF->PushSkinPool(this);
-
+    int scale = xmlNode.attribute(L"scale").as_int(-1);
     SXmlNode xmlSkin = xmlNode.first_child();
     while (xmlSkin)
     {
-        strTypeName = xmlSkin.name();
-        strSkinName = xmlSkin.attribute(L"name").value();
-
-        if (strSkinName.IsEmpty() || strTypeName.IsEmpty())
+        SStringW strName = xmlSkin.name();
+        if (strName.CompareNoCase(L"skin") == 0)
         {
-            xmlSkin = xmlSkin.next_sibling();
-            continue;
-        }
-
-        ISkinObj *pSkin = SApplication::getSingleton().CreateSkinByName(strTypeName);
-        if (pSkin)
-        {
-            pSkin->InitFromXml(&xmlSkin);
-            SkinKey key = { strSkinName, pSkin->GetScale() };
-            SASSERT(!HasKey(key));
-            AddKeyObject(key, pSkin);
-            nLoaded++;
+            nLoaded += _LoadSkins(xmlSkin);
         }
         else
         {
-            SASSERT_FMTW(FALSE, L"load skin error,type=%s,name=%s", strTypeName.c_str(), strSkinName.c_str());
+            ISkinObj *pSkin = _LoadSkin(xmlSkin, scale);
+            if (pSkin)
+                nLoaded++;
         }
         xmlSkin = xmlSkin.next_sibling();
     }
+    return nLoaded;
+}
 
+int SSkinPool::LoadSkins(IXmlNode *xmlNode)
+{
+    if (!xmlNode)
+        return 0;
+    // loadSkins前把this加入到poolmgr,便于在skin中引用其它skin
+    GETUIDEF->PushSkinPool(this);
+    int nLoaded = _LoadSkins(SXmlNode(xmlNode));
     GETUIDEF->PopSkinPool(this);
-
     return nLoaded;
 }
 
@@ -86,7 +107,13 @@ BOOL SSkinPool::AddSkin(ISkinObj *pSkin)
     return TRUE;
 }
 
-ISkinObj *SSkinPool::GetSkin(const SStringW &strSkinName, int nScale)
+BOOL SSkinPool::RemoveSkin(THIS_ ISkinObj *pSkin)
+{
+    SkinKey key = { pSkin->GetName(), pSkin->GetScale() };
+    return !!RemoveKeyObject(key);
+}
+
+ISkinObj *SSkinPool::GetSkin(LPCWSTR strSkinName, int nScale)
 {
     SkinKey key = { strSkinName, nScale };
 
@@ -125,6 +152,11 @@ ISkinObj *SSkinPool::GetSkin(const SStringW &strSkinName, int nScale)
 void SSkinPool::OnKeyRemoved(const SSkinPtr &obj)
 {
     obj->Release();
+}
+
+void SSkinPool::RemoveAll(THIS)
+{
+    SCmnMap<SSkinPtr, SkinKey>::RemoveAll();
 }
 
 SNSEND

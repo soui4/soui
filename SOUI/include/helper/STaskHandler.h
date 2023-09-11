@@ -70,7 +70,7 @@ class SOUI_EXP STaskHandler
 
     STDMETHOD_(BOOL, getRunningTaskInfo)(THIS_ char *buf, int bufLen) OVERRIDE;
 
-    STDMETHOD_(void, setHeartBeatTask)(THIS_ IRunnable* pTask, int intervel) OVERRIDE;
+    STDMETHOD_(void, setHeartBeatTask)(THIS_ IRunnable *pTask, int intervel) OVERRIDE;
 
   private:
     LRESULT OnRunTask(UINT uMsg, WPARAM wp, LPARAM lp);

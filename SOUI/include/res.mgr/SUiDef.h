@@ -13,7 +13,7 @@
 
 SNSBEGIN
 
-enum 
+enum
 {
     UDI_GLOBAL = 1 << 0,
     UDI_SKIN = 1 << 1,
@@ -27,8 +27,8 @@ enum
 
 struct IUiDefInfo : IObjRef
 {
-    virtual UINT Init(IResProvider *pResProvide, LPCTSTR pszUidef) =0;
-    virtual UINT Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResProvider = NULL)=0;
+    virtual UINT Init(IResProvider *pResProvide, LPCTSTR pszUidef) = 0;
+    virtual UINT Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResProvider = NULL) = 0;
 
     virtual SSkinPool *GetSkinPool() = 0;
     virtual SStylePool *GetStylePool() = 0;
@@ -55,14 +55,18 @@ struct IUiDefInfo : IObjRef
 #define GETSTRING(x)               GETUIDEF->GetString(x)
 #define GETLAYOUTSIZE(x)           GETUIDEF->GetLayoutSize(x)
 
-class SOUI_EXP SUiDef : public SSingleton2<SUiDef>, public SFontPool {
+class SOUI_EXP SUiDef
+    : public SSingleton2<SUiDef>
+    , public SFontPool {
     SINGLETON2_TYPE(SINGLETON_UIDEF)
   public:
     SUiDef(IRenderFactory *fac);
     ~SUiDef(void);
 
   public:
-    static IUiDefInfo * CreateUiDefInfo();
+    static IUiDefInfo *CreateUiDefInfo();
+
+    static ISkinPool *CreateSkinPool();
 
     /**
      * InitDefUiDef
@@ -100,7 +104,7 @@ class SOUI_EXP SUiDef : public SSingleton2<SUiDef>, public SFontPool {
      * @return   void
      * Describe soui的uidef对象是一个列表,每一个界面可以有自己的uidef对象
      */
-    void PushUiDefInfo(IUiDefInfo *pUiDefInfo,BOOL bPreivate=FALSE);
+    void PushUiDefInfo(IUiDefInfo *pUiDefInfo, BOOL bPreivate = FALSE);
 
     /** PopUiDefInfo
      * @brief    Pop一个UiDef对象
@@ -108,25 +112,25 @@ class SOUI_EXP SUiDef : public SSingleton2<SUiDef>, public SFontPool {
      * @return   BOOL, TRUE--成功
      * Describe soui的uidef对象是一个列表,每一个界面可以有自己的uidef对象
      */
-    BOOL PopUiDefInfo(IUiDefInfo *pUiDefInfo,BOOL bPreivate=FALSE);
+    BOOL PopUiDefInfo(IUiDefInfo *pUiDefInfo, BOOL bPreivate = FALSE);
 
     /**
      * PushSkinPool
      * @brief    向列表中增加一个新的SSkinPool对象
-     * @param    SSkinPool * pSkinPool --    SSkinPool对象
+     * @param    ISkinPool * pSkinPool --    ISkinPool对象
      * @return   void
      * Describe
      */
-    void PushSkinPool(SSkinPool *pSkinPool);
+    void PushSkinPool(ISkinPool *pSkinPool);
 
     /**
      * PopSkinPool
      * @brief    弹出一个SSkinPool对象
-     * @param    SSkinPool * pSkinPool --   准备弹出的SSkinPool对象
+     * @param    ISkinPool * pSkinPool --   准备弹出的ISkinPool对象
      * @return   BOOL
      * Describe  内建SkinPool不用调用PopSkinPool
      */
-    BOOL PopSkinPool(SSkinPool *pSkinPool);
+    BOOL PopSkinPool(ISkinPool *pSkinPool);
 
   public:
     /**
@@ -153,7 +157,7 @@ class SOUI_EXP SUiDef : public SSingleton2<SUiDef>, public SFontPool {
      * @return   SSkinPool * -- 内建SkinPool指针
      * Describe
      */
-    SSkinPool *GetBuiltinSkinPool();
+    ISkinPool *GetBuiltinSkinPool();
 
     /**
      * GetStyle
@@ -185,26 +189,26 @@ class SOUI_EXP SUiDef : public SSingleton2<SUiDef>, public SFontPool {
     //获取资源包中的字符串表中固定索引号的字符串，只支持从默认资源包中查询
     SStringW GetString(int idx);
 
-    //从字符串名返回LayoutSize，字符串可以是：@dim/something
+    //从字符串名返回LayoutSize，字符串可以是：@dim/dimname
     //(something是在资源包中的Dim表定义的命名字符串)
     SLayoutSize GetLayoutSize(const SStringW &strSize);
     SLayoutSize GetLayoutSize(int idx);
 
-    //从字符串名返回字体描述，字符串可以是：@font/something
+    //从字符串名返回字体描述，字符串可以是：@font/fontname
     //(something是在资源包中的font表定义的命名字符串)
     SStringW GetFontDesc(const SStringW &strFont);
     SStringW GetFontDesc(int idx);
 
   public:
-		IFontPtr GetFont(const SStringW &strFont, int scale) override;
+    IFontPtr GetFont(const SStringW &strFont, int scale) override;
 
-		void SetDefFontInfo(const SStringW &strFontInfo) override;
+    void SetDefFontInfo(const SStringW &strFontInfo) override;
 
   protected:
     SAutoRefPtr<IUiDefInfo> m_defUiDefInfo;
     SList<IUiDefInfo *> m_lstUiDefInfo;
-    SList<SSkinPool *> m_lstSkinPools;
-    SAutoRefPtr<SSkinPool> m_bulitinSkinPool;
+    SList<ISkinPool *> m_lstSkinPools;
+    SAutoRefPtr<ISkinPool> m_bulitinSkinPool;
     SCriticalSection m_cs;
 };
 

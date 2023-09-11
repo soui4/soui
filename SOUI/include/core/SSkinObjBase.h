@@ -44,6 +44,7 @@ class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
     STDMETHOD_(BYTE, GetAlpha)(THIS) SCONST OVERRIDE;
     STDMETHOD_(void, SetAlpha)(THIS_ BYTE byAlpha) OVERRIDE;
     STDMETHOD_(int, GetScale)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(void, SetScale)(THIS_ int scale) OVERRIDE;
     STDMETHOD_(ISkinObj *, Scale)(THIS_ int nScale) OVERRIDE;
     STDMETHOD_(void, OnColorize)(THIS_ COLORREF cr) OVERRIDE;
 

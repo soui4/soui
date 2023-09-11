@@ -133,6 +133,13 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
     STDMETHOD_(int, GetScale)(CTHIS) SCONST PURE;
 
     /**
+     * SetScale
+     * @brief    设置放大比例
+     * @param   int scale 放大比例
+     * Describe 内部接口，不要在业务层调用
+     */
+    STDMETHOD_(void, SetScale)(THIS_ int scale) PURE;
+    /**
      * Scale
      * @brief    将当前Skin按照指定比例缩放
      * @param    int nScale -- 放大比例

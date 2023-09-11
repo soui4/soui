@@ -64,6 +64,7 @@ HEADERS += include/SApp.h \
            include/interface/SResProvider-i.h \
            include/interface/SScriptModule-i.h \
            include/interface/SSkinobj-i.h \
+           include/interface/SSkinPool-i.h \
            include/interface/STaskLoop-i.h \
            include/interface/STimelineHandler-i.h \
            include/interface/stooltip-i.h \

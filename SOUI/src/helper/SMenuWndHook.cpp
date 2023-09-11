@@ -309,12 +309,12 @@ void SMenuWndHook::OnPrint(HDC dc)
 
     SAutoRefPtr<IRenderTarget> pRT;
     GETRENDERFACTORY->CreateRenderTarget(&pRT, rcWnd.Width(), rcWnd.Height());
-	pRT->BeginDraw();
+    pRT->BeginDraw();
     pBorderSkin->DrawByIndex(pRT, rcWnd, 0);
-	pRT->EndDraw();
+    pRT->EndDraw();
     HDC hmemdc = pRT->GetDC(0);
     ::BitBlt(dc, 0, 0, rcWnd.Width(), rcWnd.Height(), hmemdc, 0, 0, SRCCOPY);
-    pRT->ReleaseDC(hmemdc,NULL);
+    pRT->ReleaseDC(hmemdc, NULL);
     ::RestoreDC(dc, nSave);
 }
 

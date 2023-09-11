@@ -873,24 +873,25 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                 if (!strXmlTemp.IsEmpty())
                 { // create children by template.
                     SXmlNode xmlData = xmlChild.child(KTempData);
-					while(xmlData){
-						SStringW strXml = strXmlTemp;
-						for (SXmlAttr param = xmlData.first_attribute(); param; param = param.next_attribute())
-						{
-							SStringW strParam = SStringW().Format(KTempParamFmt, param.name());
-							SStringW strValue = param.value();
-							strValue.Replace(L"\"", L"&#34;");  //防止数据中包含“双引号”，导致破坏XML结构
-							strXml.Replace(strParam, strValue); // replace params to value.
-						}
-						SXmlDoc xmlDoc;
-						if (xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()), strXml.GetLength() * sizeof(WCHAR), 116, enc_utf16))
-						{
-							CreateChilds(xmlDoc.root());
-							bRet = TRUE;
-						}
-						strXml.ReleaseBuffer();
-						xmlData = xmlData.next_sibling(KTempData);
-					}
+                    while (xmlData)
+                    {
+                        SStringW strXml = strXmlTemp;
+                        for (SXmlAttr param = xmlData.first_attribute(); param; param = param.next_attribute())
+                        {
+                            SStringW strParam = SStringW().Format(KTempParamFmt, param.name());
+                            SStringW strValue = param.value();
+                            strValue.Replace(L"\"", L"&#34;");  //防止数据中包含“双引号”，导致破坏XML结构
+                            strXml.Replace(strParam, strValue); // replace params to value.
+                        }
+                        SXmlDoc xmlDoc;
+                        if (xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()), strXml.GetLength() * sizeof(WCHAR), 116, enc_utf16))
+                        {
+                            CreateChilds(xmlDoc.root());
+                            bRet = TRUE;
+                        }
+                        strXml.ReleaseBuffer();
+                        xmlData = xmlData.next_sibling(KTempData);
+                    }
                 }
             }
             else
@@ -1103,7 +1104,7 @@ void SWindow::_PaintClient(IRenderTarget *pRT)
             pRTCache->SetViewportOrg(-rcWnd.TopLeft());
             if (IsCacheDirty())
             {
-				pRTCache->BeginDraw();
+                pRTCache->BeginDraw();
                 pRTCache->ClearRect(&rcWnd, 0);
 
                 SAutoRefPtr<IFontS> oldFont;
@@ -1118,7 +1119,7 @@ void SWindow::_PaintClient(IRenderTarget *pRT)
                 pRTCache->SetTextColor(crOld);
 
                 MarkCacheDirty(false);
-				pRTCache->EndDraw();
+                pRTCache->EndDraw();
             }
             pRT->AlphaBlend(rcWnd, pRTCache, rcWnd, 255);
         }
@@ -1165,7 +1166,7 @@ void SWindow::_RedrawNonClient()
     CRect rcClient = SWindow::GetClientRect();
     if (rcWnd == rcClient)
         return;
-	Update();
+    Update();
     InvalidateRect(rcWnd, TRUE, FALSE);   // invalid window rect
     InvalidateRect(rcClient, TRUE, TRUE); // but clip client rect
 }
@@ -1294,7 +1295,7 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
         pRTBackup = pRT;
         pRT = NULL;
         GETRENDERFACTORY->CreateRenderTarget(&pRT, rcWnd.Width(), rcWnd.Height());
-		pRT->BeginDraw();
+        pRT->BeginDraw();
         pRT->OffsetViewportOrg(-rcWnd.left, -rcWnd.top, NULL);
         //绘制到窗口的缓存上,需要继承原RT的绘图属性
         pRT->SelectObject(pRTBackup->GetCurrentObject(OT_FONT), NULL);
@@ -1358,7 +1359,7 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     if (IsLayeredWindow())
     { //将绘制到窗口的缓存上的图像返回到上一级RT
         SASSERT(pRTBackup);
-		pRT->EndDraw();
+        pRT->EndDraw();
         OnCommitSurface(pRTBackup, &rcWnd, pRT, &rcWnd, GetAlpha());
         pRT->Release();
         pRT = pRTBackup;
@@ -2345,7 +2346,7 @@ IRenderTarget *SWindow::GetRenderTarget(GrtFlag gdcFlags, IRegionS *pRgn)
     IRenderTarget *pRT = NULL;
     m_pGetRTData = new GETRTDATA;
     GETRENDERFACTORY->CreateRenderTarget(&pRT, rcRT.Width(), rcRT.Height());
-	pRT->BeginDraw();
+    pRT->BeginDraw();
     pRT->OffsetViewportOrg(-rcRT.left, -rcRT.top, NULL);
     BeforePaintEx(pRT);
     pRT->PushClipRegion(pRgn, RGN_COPY);
@@ -2364,7 +2365,7 @@ void SWindow::ReleaseRenderTarget(IRenderTarget *pRT)
         return;
     if (m_pGetRTData->gdcFlags != GRT_NODRAW)
     {
-		m_pGetRTData->rt->EndDraw();
+        m_pGetRTData->rt->EndDraw();
         SMatrix mtx;
         SWindow *p = this;
         while (p)

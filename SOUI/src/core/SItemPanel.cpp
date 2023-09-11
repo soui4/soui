@@ -251,10 +251,10 @@ void SOsrPanel::Draw(IRenderTarget *pRT, const CRect &rc)
         pRT->GetClipRegion(&rgn);
     }
 
-	pRT->BeginDraw();
+    pRT->BeginDraw();
 
     RedrawRegion(pRT, rgn);
-	pRT->EndDraw();
+    pRT->EndDraw();
     pRT->OffsetViewportOrg(-rc.left, -rc.top, NULL);
     AfterPaint(pRT, painter);
 }

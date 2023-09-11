@@ -1,16 +1,15 @@
 ﻿#pragma once
-#include "pugixml\pugixml.hpp"
-#include "res.mgr\SSkinPool.h"
-#include "helper\SplitString.h"
-#include "resprovider-zip\zipresprovider-param.h"
-#include "resprovider-zip\SResProviderZip.h"
+
+#include <interface/SSkinPool-i.h>
+#include <core/SSingleton.h>
+
 namespace SOUI
 {
 #define RT_SKIN _T("SkinXml")
 	class SSkinLoader :public SSingleton<SSkinLoader>
 	{
 		SAutoRefPtr<IResProvider> m_pResProvider; 
-		SAutoRefPtr<SSkinPool>  m_privateSkinPool;
+		SAutoRefPtr<ISkinPool>  m_privateSkinPool;
 		SApplication *m_theApp;
 // 		BOOL CreateResProvider_ZIP(IObjRef **ppObj)
 // 		{

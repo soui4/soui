@@ -99,7 +99,7 @@
   <imglist name="skin_soui"	src="imgx:png_soui"/>
   <imglist name="skin_btn_expand" src="imgx:btn_expand" states="6">
     <states>
-            <state index="0" value="normal"/>
+      <state index="0" value="normal"/>
       <state index="1" value="hover"/>
       <state index="2" value="pushdown"/>
       <state index="3" value="normal&checked"/>

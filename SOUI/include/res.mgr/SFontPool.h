@@ -78,12 +78,14 @@ class SOUI_EXP SFontPool : public SCmnMap<IFontPtr, FontInfo> {
     SFontPool(IRenderFactory *fac);
 
   protected:
-	static void OnKeyRemoved(const IFontPtr &obj);
+    static void OnKeyRemoved(const IFontPtr &obj);
+
   public:
     static void SetFontChecker(FunFontCheck fontCheck);
     static BOOL CheckFont(const SStringW &strFontName);
-	static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo &defFontInfo);
-	static SStringW FontInfoToString(const FontInfo &fi);
+    static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo &defFontInfo);
+    static SStringW FontInfoToString(const FontInfo &fi);
+
   public:
     /**
      * GetFont
@@ -94,9 +96,10 @@ class SOUI_EXP SFontPool : public SCmnMap<IFontPtr, FontInfo> {
      * Describe  描述字符串格式如：face:宋体,bold:0,italic:1,underline:1,strike:1,adding:10
      */
     virtual IFontPtr GetFont(const SStringW &strFont, int scale);
-    virtual  void SetDefFontInfo(const SStringW &strFontInfo);
-	const FontInfo &GetDefFontInfo() const;
-	void  SetRenderFactory(IRenderFactory *fac);
+    virtual void SetDefFontInfo(const SStringW &strFontInfo);
+    const FontInfo &GetDefFontInfo() const;
+    void SetRenderFactory(IRenderFactory *fac);
+
   protected:
     IFontPtr _CreateFont(const FontInfo &fontInfo);
     void _SetDefFontInfo(const FontInfo &fontInfo);

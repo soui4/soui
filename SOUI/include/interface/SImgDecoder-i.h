@@ -134,13 +134,14 @@ DECLARE_INTERFACE_(IImgX, IObjRef)
     STDMETHOD_(IImgFrame *, GetFrame)(THIS_ UINT iFrame) PURE;
 };
 
-typedef enum _ImgFmt{
-	Img_PNG,
-	Img_BMP,
-	Img_TIFF,
-	Img_JPG,
-	Img_Webp,
-}ImgFmt;
+typedef enum _ImgFmt
+{
+    Img_PNG,
+    Img_BMP,
+    Img_TIFF,
+    Img_JPG,
+    Img_Webp,
+} ImgFmt;
 
 /**
  * @struct     IImgDecoderFactory
@@ -185,10 +186,10 @@ DECLARE_INTERFACE_(IImgDecoderFactory, IObjRef)
      * Describe
      */
     STDMETHOD_(HRESULT, SaveImage)
-    (CTHIS_ BYTE * pBits, int nWid, int nHei, LPCWSTR pszFileName,const void* pFormat) SCONST PURE;
+    (CTHIS_ BYTE * pBits, int nWid, int nHei, LPCWSTR pszFileName, const void *pFormat) SCONST PURE;
 
-	STDMETHOD_(HRESULT, SaveImage2)
-		(CTHIS_ BYTE * pBits, int nWid, int nHei, LPCWSTR pszFileName, ImgFmt imgFmt) SCONST PURE;
+    STDMETHOD_(HRESULT, SaveImage2)
+    (CTHIS_ BYTE * pBits, int nWid, int nHei, LPCWSTR pszFileName, ImgFmt imgFmt) SCONST PURE;
 
     /**
      * GetImgDecoderDesc

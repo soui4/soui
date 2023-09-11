@@ -625,7 +625,7 @@ DECLARE_INTERFACE_IID_(IScrollView, IPanel, "49B024D6-221D-42d4-902B-AFAAC5AFFE4
      * @brief 获取视图尺寸
      * @return SIZE-视图尺寸
      */
-    STDMETHOD_(void, GetViewSize)(CTHIS_ SIZE *szView) SCONST PURE;
+    STDMETHOD_(void, GetViewSize)(CTHIS_ SIZE * szView) SCONST PURE;
 
     /**
      * @brief 设置视图尺寸
@@ -638,7 +638,7 @@ DECLARE_INTERFACE_IID_(IScrollView, IPanel, "49B024D6-221D-42d4-902B-AFAAC5AFFE4
      * @brief 获取视图原点坐标
      * @return POINT-原点坐标
      */
-    STDMETHOD_(void, GetViewOrigin)(CTHIS_ POINT *ptOri) SCONST PURE;
+    STDMETHOD_(void, GetViewOrigin)(CTHIS_ POINT * ptOri) SCONST PURE;
 
     /**
      * @brief 设置视图原点坐标
