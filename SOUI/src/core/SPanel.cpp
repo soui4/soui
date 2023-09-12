@@ -937,24 +937,12 @@ HRESULT SScrollView::OnAttrViewSize(const SStringW &strValue, BOOL bLoading)
         return E_INVALIDARG;
     m_viewSize[0] = GETLAYOUTSIZE(values[0]);
     m_viewSize[1] = GETLAYOUTSIZE(values[1]);
-	if(m_pLayoutParam){//transfer viewsize to layout size.
-		m_pLayoutParam->SetAttribute(L"size",strValue,bLoading);
-	}
+
     if (!bLoading)
     {
         UpdateViewSize();
     }
     return S_FALSE;
-}
-
-HRESULT SScrollView::OnAttrLayout(const SStringW &strValue, BOOL bLoading)
-{
-	if(!SUCCEEDED(__baseCls::OnAttrLayout(strValue,bLoading)))
-		return E_INVALIDARG;
-	SStringW strAttr = SStringW().Format(L"%s,%s",m_viewSize[0].toString().c_str(),m_viewSize[1].toString().c_str());
-	if(m_pLayoutParam)
-		m_pLayoutParam->SetAttribute(L"size",strAttr,bLoading);
-	return S_OK;
 }
 
 void SScrollView::GetChildrenLayoutRect(RECT *prc) const
@@ -973,6 +961,5 @@ void SScrollView::UpdateChildrenPosition()
     UpdateViewSize();
     __baseCls::UpdateChildrenPosition();
 }
-
 
 SNSEND

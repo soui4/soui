@@ -1887,20 +1887,9 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
                 szParent.cx -= rcMargin.left + rcPadding.left + rcMargin.right + rcPadding.right;
                 if (szParent.cx < 0)
                     szParent.cx = 0;
-            }else if(nParentWid == -1 && szRet.cx != KWnd_MaxSize)
-            {
-                szParent.cx = szRet.cx;
-                szParent.cx -= rcMargin.left + rcPadding.left + rcMargin.right + rcPadding.right;
-                if (szParent.cx < 0)
-                    szParent.cx = 0;
             }
             if (nParentHei > 0)
             {
-                szParent.cy -= rcMargin.top + rcPadding.top + rcMargin.bottom + rcPadding.bottom;
-                if (szParent.cy < 0)
-                    szParent.cy = 0;
-            }else if(nParentHei==-1 && szRet.cy != KWnd_MaxSize){
-                szParent.cy = szRet.cy;
                 szParent.cy -= rcMargin.top + rcPadding.top + rcMargin.bottom + rcPadding.bottom;
                 if (szParent.cy < 0)
                     szParent.cy = 0;

@@ -413,15 +413,15 @@ measureChilds:
             CSize szChild(SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
             if (pLinearLayoutParam->IsMatchParent(Horz))
             {
-                if (!pParentLayoutParam->IsWrapContent(Horz))
+                if (pParentLayoutParam->IsWrapContent(Horz))
                 {
                     if (nWidth == SIZE_WRAP_CONTENT && m_orientation == Vert)
                     {
                         nWaiting++;
                         break;
                     }
-                    szChild.cx = nWidth;
                 }
+				szChild.cx = nWidth;
             }
             else if (pLinearLayoutParam->IsSpecifiedSize(Horz))
             {
@@ -430,15 +430,15 @@ measureChilds:
             }
             if (pLinearLayoutParam->IsMatchParent(Vert))
             {
-                if (!pParentLayoutParam->IsWrapContent(Vert))
+                if (pParentLayoutParam->IsWrapContent(Vert))
                 {
                     if (nHeight == SIZE_WRAP_CONTENT && m_orientation == Horz)
                     {
                         nWaiting++;
                         break;
                     }
-                    szChild.cy = nHeight;
                 }
+				szChild.cy = nHeight;
             }
             else if (pLinearLayoutParam->IsSpecifiedSize(Vert))
             {
