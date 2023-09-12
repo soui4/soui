@@ -226,10 +226,12 @@ class SOUI_EXP SScrollView : public TPanelProxy<IScrollView> {
 
   protected:
     HRESULT OnAttrViewSize(const SStringW &strValue, BOOL bLoading);
+	HRESULT OnAttrLayout(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"origin-x", m_ptOrigin.x, FALSE)
         ATTR_INT(L"origin-y", m_ptOrigin.y, FALSE)
+		ATTR_CUSTOM(L"layout",OnAttrLayout)
         ATTR_CUSTOM(L"viewSize", OnAttrViewSize)
     SOUI_ATTRS_END()
 
