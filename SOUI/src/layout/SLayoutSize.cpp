@@ -43,10 +43,10 @@ bool SLayoutSize::valueEqual(float value)
 SStringW SLayoutSize::toString() const
 {
     // copy from stringstream.
-	if(isWrapContent())
-		return L"-1";
-	else if(isMatchParent())
-		return L"-2";
+    if (isWrapContent())
+        return L"-1";
+    else if (isMatchParent())
+        return L"-2";
     return SStringW().Format(L"%.*g%s", 8, fSize, kUnitMap[unit]);
 }
 

@@ -115,7 +115,7 @@ UINT SMenuBarItem::PopMenu()
         m_pHostMenu->m_iNowMenu = -1;
         return iRet;
     }
-	m_pHostMenu->m_pNowMenu->KillTimer(TIMER_POP);
+    m_pHostMenu->m_pNowMenu->KillTimer(TIMER_POP);
     m_pHostMenu->m_iNowMenu = -1;
     m_pHostMenu->m_pNowMenu = NULL;
 

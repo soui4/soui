@@ -396,6 +396,7 @@ SIZE SLinearLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHei
     memset(ppChilds, 0, sizeof(IWindow *) * nChildCount);
     const ILayoutParam *pParentLayoutParam = (const ILayoutParam *)pParent->GetLayoutParam();
 
+    bool bWaitingForLimit = true;
     float fWeight = 0;
     int nWaiting = 0;
     int nChilds = 0;
@@ -413,15 +414,15 @@ measureChilds:
             CSize szChild(SIZE_WRAP_CONTENT, SIZE_WRAP_CONTENT);
             if (pLinearLayoutParam->IsMatchParent(Horz))
             {
-                if (pParentLayoutParam->IsWrapContent(Horz))
+                if (!pParentLayoutParam->IsWrapContent(Horz))
                 {
-                    if (nWidth == SIZE_WRAP_CONTENT && m_orientation == Vert)
-                    {
-                        nWaiting++;
-                        break;
-                    }
+                    szChild.cx = nWidth;
                 }
-				szChild.cx = nWidth;
+                else if (bWaitingForLimit && nWidth == SIZE_WRAP_CONTENT && m_orientation == Vert)
+                {
+                    nWaiting++;
+                    break;
+                }
             }
             else if (pLinearLayoutParam->IsSpecifiedSize(Horz))
             {
@@ -430,15 +431,15 @@ measureChilds:
             }
             if (pLinearLayoutParam->IsMatchParent(Vert))
             {
-                if (pParentLayoutParam->IsWrapContent(Vert))
+                if (!pParentLayoutParam->IsWrapContent(Vert))
                 {
-                    if (nHeight == SIZE_WRAP_CONTENT && m_orientation == Horz)
-                    {
-                        nWaiting++;
-                        break;
-                    }
+                    szChild.cy = nHeight;
                 }
-				szChild.cy = nHeight;
+                else if (bWaitingForLimit && nHeight == SIZE_WRAP_CONTENT && m_orientation == Horz)
+                {
+                    nWaiting++;
+                    break;
+                }
             }
             else if (pLinearLayoutParam->IsSpecifiedSize(Vert))
             {
@@ -484,11 +485,9 @@ measureChilds:
             {
                 nWidth = smax(pSize[i].cx, nWidth);
             }
-            if (nWidth != SIZE_WRAP_CONTENT)
-            {
-                nChilds = 0;
-                goto measureChilds;
-            }
+            bWaitingForLimit = false;
+            nChilds = 0;
+            goto measureChilds;
         }
         else
         {
@@ -497,11 +496,9 @@ measureChilds:
             {
                 nHeight = smax(pSize[i].cy, nHeight);
             }
-            if (nHeight != SIZE_WRAP_CONTENT)
-            {
-                nChilds = 0;
-                goto measureChilds;
-            }
+            bWaitingForLimit = false;
+            nChilds = 0;
+            goto measureChilds;
         }
     }
 
