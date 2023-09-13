@@ -230,7 +230,7 @@ UINT SUiDefInfo::Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResPr
         SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeSkin);
         if (nodeData)
         {
-            pSkinPool.Attach(new SSkinPool);
+            pSkinPool.Attach(new SSkinPool(TRUE));
             pSkinPool->LoadSkins(&nodeData);
             nodeData.set_userdata(1);
             uRet |= UDI_SKIN;
@@ -318,7 +318,7 @@ SUiDef::SUiDef(IRenderFactory *fac)
     SetUiDef(emptyUiInfo, false); // set empty uiinfo
     emptyUiInfo->Release();
 
-    m_bulitinSkinPool.Attach(new SSkinPool);
+    m_bulitinSkinPool.Attach(new SSkinPool(TRUE));
     m_lstSkinPools.AddTail(m_bulitinSkinPool);
     m_bulitinSkinPool->AddRef();
 }
@@ -616,9 +616,9 @@ IUiDefInfo *SUiDef::CreateUiDefInfo()
     return new SUiDefInfo();
 }
 
-ISkinPool *SUiDef::CreateSkinPool()
+ISkinPool *SUiDef::CreateSkinPool(BOOL bAutoScale)
 {
-    return new SSkinPool();
+    return new SSkinPool(bAutoScale);
 }
 
 IFontPtr SUiDef::GetFont(const SStringW &strFont, int scale)

@@ -8,7 +8,7 @@ SSkinLoader * SSingleton<SSkinLoader>::ms_Singleton = NULL;
 
 SSkinLoader::SSkinLoader(SApplication* theApp):m_pResProvider(NULL),m_theApp(theApp)
 {
-	m_privateSkinPool.Attach(SUiDef::CreateSkinPool());
+	m_privateSkinPool.Attach(SUiDef::CreateSkinPool(TRUE));
 	GETUIDEF->PushSkinPool(m_privateSkinPool);
 }
 
