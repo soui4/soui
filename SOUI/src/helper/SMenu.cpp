@@ -421,9 +421,8 @@ void SMenu::BuildMenu(HMENU menuPopup, SXmlNode xmlNode)
             if (strText.IsEmpty())
             {
                 strText = SWindow::GetXmlText(xmlItem);
-                ;
             }
-            strText = TR(strText, GetMenuAttr(menuPopup)->m_strTrCtx);
+            strText = TR(GETSTRING(strText), GetMenuAttr(menuPopup)->m_strTrCtx);
             strText = STrText::EscapeString(strText);
             InitMenuItemData(pdmmi, strText);
 
