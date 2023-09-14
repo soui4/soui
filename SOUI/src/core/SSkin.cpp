@@ -189,8 +189,8 @@ void SSkinImgCenter::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState
 //////////////////////////////////////////////////////////////////////////
 //  SSkinImgFrame
 SSkinImgFrame::SSkinImgFrame()
-    : m_rcMargin(0, 0, 0, 0)
 {
+    m_bEnableScale = false;
 }
 
 void SSkinImgFrame::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
