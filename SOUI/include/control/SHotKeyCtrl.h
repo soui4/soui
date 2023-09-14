@@ -182,10 +182,12 @@ class SOUI_EXP SHotKeyCtrl
 
   protected:
     HRESULT OnAttrInvalidComb(const SStringW &value, BOOL bLoading);
+	HRESULT OnAttrInvalidSysKey(const SStringW &value, BOOL bLoading);
     HRESULT OnAttrInvalidModifier(const SStringW &value, BOOL bLoading);
     HRESULT OnAttrHotKey(const SStringW &value, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"invalidComb", OnAttrInvalidComb)
+		ATTR_CUSTOM(L"invalidSysKey", OnAttrInvalidSysKey)
         ATTR_CUSTOM(L"invalidModifier", OnAttrInvalidModifier)
         ATTR_CUSTOM(L"hotKey", OnAttrHotKey)
     SOUI_ATTRS_END()
