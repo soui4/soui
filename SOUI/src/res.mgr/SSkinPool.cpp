@@ -135,7 +135,7 @@ ISkinObj *SSkinPool::GetSkin(LPCWSTR strSkinName, int nScale)
                 key.scale = SDpiScale::GetBuiltinScales()[i];
 				if(HasKey(key)){
 					nScales[findScales++]=key.scale;					
-					if(nScale > key.scale){
+					if(nScale < key.scale){
 						if(nScale%key.scale == 0)
 						{
 							bestScale = key.scale;
