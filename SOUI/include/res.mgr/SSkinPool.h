@@ -130,7 +130,7 @@ class SOUI_EXP SSkinPool
 #ifdef _DEBUG
     SMap<SkinKey, int> m_mapSkinUseCount; //皮肤使用计数
 #endif
-	BOOL	m_bAutoScale;	//支持自动缩放标志，不同的pool，这个标志可以不同，基础pool为true,用户自定义的pool，可以用来支持动态加载不同scale的skin，可以禁用缩放
+    BOOL m_bAutoScale; //支持自动缩放标志，不同的pool，这个标志可以不同，基础pool为true,用户自定义的pool，可以用来支持动态加载不同scale的skin，可以禁用缩放
 };
 
 SNSEND

@@ -66,7 +66,7 @@ class SOUI_EXP SUiDef
   public:
     static IUiDefInfo *CreateUiDefInfo();
 
-    static ISkinPool *CreateSkinPool(BOOL bAutoScale=TRUE);
+    static ISkinPool *CreateSkinPool(BOOL bAutoScale = TRUE);
 
     /**
      * InitDefUiDef

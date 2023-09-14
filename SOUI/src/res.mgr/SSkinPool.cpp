@@ -9,7 +9,8 @@ SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 // SSkinPool
 
-SSkinPool::SSkinPool(BOOL bAutoScale):m_bAutoScale(bAutoScale)
+SSkinPool::SSkinPool(BOOL bAutoScale)
+    : m_bAutoScale(bAutoScale)
 {
     m_pFunOnKeyRemoved = OnKeyRemoved;
 }
@@ -119,43 +120,49 @@ ISkinObj *SSkinPool::GetSkin(LPCWSTR strSkinName, int nScale)
 
     if (!HasKey(key))
     {
-		if(!m_bAutoScale)
-			return NULL;
+        if (!m_bAutoScale)
+            return NULL;
 
         nScale = SDpiScale::NormalizeScale(nScale);
         key.scale = nScale;
         if (!HasKey(key))
         {
-			const int kMaxBuiltinScales=20;
-			int  nScales[kMaxBuiltinScales] = {0};
-			int  findScales = 0;
-			int  bestScale = 0;
-            for (int i = 0; i < SDpiScale::GetBuiltinScaleCount(); i++)
+            const int kMaxBuiltinScales = 20;
+            SASSERT(SDpiScale::GetBuiltinScaleCount() <= kMaxBuiltinScales);
+            int nScales[kMaxBuiltinScales] = { 0 };
+            int findScales = 0;
+            int bestScale = 0;
+            for (int i = SDpiScale::GetBuiltinScaleCount() - 1; i >= 0; i--)
             {
                 key.scale = SDpiScale::GetBuiltinScales()[i];
-				if(HasKey(key)){
-					nScales[findScales++]=key.scale;					
-					if(nScale > key.scale){
-						if(nScale%key.scale == 0)
-						{
-							bestScale = key.scale;
-							break;
-						}
-					}else{
-						if(key.scale%nScale == 0){
-							bestScale = key.scale;
-							break;
-						}
-					}
-				}
+                if (HasKey(key))
+                {
+                    nScales[findScales++] = key.scale;
+                    if (nScale > key.scale)
+                    {
+                        if (nScale % key.scale == 0)
+                        {
+                            bestScale = key.scale;
+                            break;
+                        }
+                    }
+                    else
+                    {
+                        if (key.scale % nScale == 0)
+                        {
+                            bestScale = key.scale;
+                            break;
+                        }
+                    }
+                }
             }
-			if(findScales==0)
-				return NULL;
-			if(bestScale==0)
-				bestScale = nScales[0];
-			key.scale = bestScale;
+            if (findScales == 0)
+                return NULL;
+            if (bestScale == 0)
+                bestScale = nScales[0];
+            key.scale = bestScale;
             ISkinObj *pSkinSrc = GetKeyObject(key);
-			SASSERT(pSkinSrc);
+            SASSERT(pSkinSrc);
             ISkinObj *pSkin = pSkinSrc->Scale(nScale);
             if (pSkin)
             {

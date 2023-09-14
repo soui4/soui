@@ -155,6 +155,7 @@ void SFontPool::SetDefFontInfo(const SStringW &strFontInfo)
     if (strFontInfo.IsEmpty())
         return;
     FontInfo emptyDefFont;
+    emptyDefFont.scale = 100;
     FontInfo fi = FontInfoFromString(strFontInfo, emptyDefFont);
     if (!CheckFont(fi.strFaceName))
     { // make sure default font face is valid.
