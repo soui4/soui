@@ -668,6 +668,7 @@ void SHostWnd::_RedrawRegion(IRegionS *pRgnUpdate, CRect &rcInvalid)
     else
     {
         rcInvalid = rcWnd;
+		pRgnUpdate->CombineRect(&rcWnd,RGN_COPY);
         m_memRT->PushClipRect(&rcInvalid, RGN_COPY);
     }
     //清除残留的alpha值
