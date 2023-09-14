@@ -219,7 +219,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param lParam LPARAM--参数2
      * @return
      */
-    STDMETHOD_(void, SDispatchMessage)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam) PURE;
+    STDMETHOD_(void, SDispatchMessage)(THIS_ UINT uMsg, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) PURE;
 
     /**
      * @brief 获取窗口是否允许设置为焦点

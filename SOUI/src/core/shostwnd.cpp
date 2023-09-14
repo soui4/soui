@@ -778,7 +778,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     }
     m_presenter->OnHostCreate();
     m_dwThreadID = GetCurrentThreadId();
-    SHostMgr::getSingletonPtr()->AddHostMsgHandler(this);
+    SHostMgr::getSingletonPtr()->AddHostMsgHandler(m_hWnd);
     UpdateAutoSizeCount(true);
     m_memRT = NULL;
     CRect rcWnd = GetClientRect();
@@ -825,7 +825,7 @@ void SHostWnd::OnDestroy()
     m_memRT = NULL;
     m_rgnInvalidate = NULL;
 
-    SHostMgr::getSingletonPtr()->RemoveHostMsgHandler(this);
+    SHostMgr::getSingletonPtr()->RemoveHostMsgHandler(m_hWnd);
     // exit app. (copy from wtl)
     if (m_hostAttr.m_byWndType == SHostWndAttr::WT_APPMAIN || (m_hostAttr.m_byWndType == SHostWndAttr::WT_UNDEFINE && (SNativeWnd::GetStyle() & (WS_CHILD | WS_POPUP)) == 0 && (SNativeWnd::GetExStyle() & WS_EX_TOOLWINDOW) == 0))
         ::PostQuitMessage(1);
@@ -1728,16 +1728,6 @@ void SHostWnd::UpdateAutoSizeCount(bool bInc)
         m_nAutoSizing--;
 }
 
-void SHostWnd::OnHostMsg(BOOL bRelayout, UINT uMsg, WPARAM wp, LPARAM lp)
-{
-    GetNcPainter()->GetRoot()->SDispatchMessage(uMsg, wp, lp);
-    GetRoot()->SDispatchMessage(uMsg, wp, lp);
-    if (bRelayout)
-    {
-        GetRoot()->RequestRelayout();
-    }
-}
-
 void SHostWnd::EnableIME(BOOL bEnable)
 {
     if (bEnable)
@@ -1951,6 +1941,15 @@ void SHostWnd::SetScale(THIS_ int nScale, LPCRECT desRect)
     SetWindowPos(NULL, desRect->left, desRect->top, desRect->right - desRect->left, desRect->bottom - desRect->top, SWP_NOZORDER | SWP_NOACTIVATE);
     UpdateAutoSizeCount(false);
     EnablePrivateUiDef(FALSE);
+}
+
+LRESULT SHostWnd::OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp)
+{
+	GetNcPainter()->GetRoot()->SDispatchMessage(uMsg);
+	GetRoot()->SDispatchMessage(uMsg);
+	GetRoot()->RequestRelayout();
+
+	return 0;
 }
 
 //////////////////////////////////////////////////////////////////

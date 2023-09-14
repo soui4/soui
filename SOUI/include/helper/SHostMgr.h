@@ -1,6 +1,5 @@
 ﻿#ifndef __SHOSTMGR__H__
 #define __SHOSTMGR__H__
-#include <interface/SHostMsgHandler-i.h>
 #include <core/SSingleton2.h>
 
 SNSBEGIN
@@ -12,15 +11,15 @@ class SOUI_EXP SHostMgr : public SSingleton2<SHostMgr> {
     SHostMgr(void);
     ~SHostMgr(void);
 
-    void DispatchMessage(BOOL bRelayout, UINT uMsg, WPARAM wp = 0, LPARAM lp = 0);
+    void DispatchMessage(UINT uMsg, WPARAM wp = 0, LPARAM lp = 0);
 
   protected:
-    bool AddHostMsgHandler(IHostMsgHandler *pHost);
+    bool AddHostMsgHandler(HWND hHost);
 
-    bool RemoveHostMsgHandler(IHostMsgHandler *pHost);
+    bool RemoveHostMsgHandler(HWND hHost);
 
   protected:
-    SMap<IHostMsgHandler *, bool> m_mapHostMsgHandler;
+    SMap<HWND, bool> m_mapHostMsgHandler;
     SCriticalSection m_cs;
 };
 SNSEND

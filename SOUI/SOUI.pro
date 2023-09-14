@@ -48,7 +48,6 @@ HEADERS += include/SApp.h \
            include/interface/SAnimation-i.h \
            include/interface/SAttrStorage-i.h \
            include/interface/scaret-i.h \
-           include/interface/SHostMsgHandler-i.h \
            include/interface/SImgDecoder-i.h \
            include/interface/sinterpolator-i.h \
            include/interface/sipcobj-i.h \

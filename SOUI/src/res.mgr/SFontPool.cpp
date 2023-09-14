@@ -147,7 +147,7 @@ void SFontPool::_SetDefFontInfo(const FontInfo &fontInfo)
 {
     m_defFontInfo = fontInfo;
     RemoveAll();
-    SHostMgr::getSingletonPtr()->DispatchMessage(true, UM_UPDATEFONT);
+    SHostMgr::getSingletonPtr()->DispatchMessage(UM_UPDATEFONT);
 }
 
 void SFontPool::SetDefFontInfo(const SStringW &strFontInfo)

@@ -11,7 +11,6 @@
 #include <core/SDropTargetDispatcher.h>
 #include <event/SEventcrack.h>
 #include <interface/stooltip-i.h>
-#include <interface/SHostMsgHandler-i.h>
 #include <interface/shostwnd-i.h>
 #include <interface/SHostPresenter-i.h>
 #include <core/SCaret.h>
@@ -156,8 +155,7 @@ class SOUI_EXP SRootWindow : public SWindow {
 class SDummyWnd;
 class SOUI_EXP SHostWnd
     : public TNativeWndProxy<IHostWnd>
-    , public SwndContainerImpl
-    , protected IHostMsgHandler {
+    , public SwndContainerImpl{
     friend class SDummyWnd;
     friend class SRootWindow;
     friend class SNcPainter;
@@ -463,9 +461,6 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(void, OnUpdateCursor)() OVERRIDE;
 
   protected:
-    STDMETHOD_(void, OnHostMsg)(THIS_ BOOL bRelayout, UINT uMsg, WPARAM wp, LPARAM lp) OVERRIDE;
-
-  protected:
     virtual IToolTip *CreateTooltip() const;
     virtual void DestroyTooltip(IToolTip *pTooltip) const;
 
@@ -478,6 +473,9 @@ class SOUI_EXP SHostWnd
 
   public: //事件处理接口
     virtual BOOL _HandleEvent(IEvtArgs *pEvt);
+
+  protected:
+	LRESULT OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp);
 
     BEGIN_MSG_MAP_EX(SHostWnd)
         MSG_WM_SIZE(OnSize)
@@ -508,6 +506,7 @@ class SOUI_EXP SHostWnd
         MESSAGE_HANDLER_EX(WM_GETOBJECT, OnGetObject)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_SYSCOMMAND(OnSysCommand)
+		MESSAGE_HANDLER_EX(UM_UPDATEFONT,OnUpdateFont)
         CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
 #if (!DISABLE_SWNDSPY)
         MESSAGE_HANDLER_EX(SPYMSG_SETSPY, OnSpyMsgSetSpy)

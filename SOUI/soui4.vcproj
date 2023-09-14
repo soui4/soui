@@ -1095,10 +1095,6 @@
 				>
 			</File>
 			<File
-				RelativePath="include\interface\SHostMsgHandler-i.h"
-				>
-			</File>
-			<File
 				RelativePath="include\interface\SHostPresenter-i.h"
 				>
 			</File>
@@ -1639,11 +1635,11 @@
 				>
 			</File>
 			<File
-				RelativePath="include\interface\SWndContainer-i.h"
+				RelativePath="include\core\SWndContainer-i.h"
 				>
 			</File>
 			<File
-				RelativePath="include\core\SWndContainer-i.h"
+				RelativePath="include\interface\SWndContainer-i.h"
 				>
 			</File>
 			<File
