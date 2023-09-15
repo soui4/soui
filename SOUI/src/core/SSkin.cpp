@@ -143,8 +143,8 @@ void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
     pRet->m_bLazyLoad = FALSE;
 
     CSize szSkin = GetSkinSize();
-    szSkin.cx = MulDiv(szSkin.cx, nScale, 100);
-    szSkin.cy = MulDiv(szSkin.cy, nScale, 100);
+    szSkin.cx = MulDiv(szSkin.cx, nScale, GetScale());
+    szSkin.cy = MulDiv(szSkin.cy, nScale, GetScale());
     if (m_bVertical)
     {
         szSkin.cy *= m_nStates;
@@ -215,10 +215,11 @@ void SSkinImgFrame::_Scale(ISkinObj *skinObj, int nScale)
 {
     SSkinImgList::_Scale(skinObj, nScale);
     SSkinImgFrame *pClone = sobj_cast<SSkinImgFrame>(skinObj);
-    pClone->m_rcMargin.left = MulDiv(m_rcMargin.left, nScale, 100);
-    pClone->m_rcMargin.top = MulDiv(m_rcMargin.top, nScale, 100);
-    pClone->m_rcMargin.right = MulDiv(m_rcMargin.right, nScale, 100);
-    pClone->m_rcMargin.bottom = MulDiv(m_rcMargin.bottom, nScale, 100);
+	int nSrcScale = GetScale();
+    pClone->m_rcMargin.left = MulDiv(m_rcMargin.left, nScale, nSrcScale);
+    pClone->m_rcMargin.top = MulDiv(m_rcMargin.top, nScale, nSrcScale);
+    pClone->m_rcMargin.right = MulDiv(m_rcMargin.right, nScale, nSrcScale);
+    pClone->m_rcMargin.bottom = MulDiv(m_rcMargin.bottom, nScale, nSrcScale);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -547,7 +548,7 @@ void SSkinScrollbar::_Scale(ISkinObj *skinObj, int nScale)
     __baseCls::_Scale(skinObj, nScale);
 
     SSkinScrollbar *pRet = sobj_cast<SSkinScrollbar>(skinObj);
-    pRet->m_nMargin = MulDiv(m_nMargin, nScale, 100);
+    pRet->m_nMargin = MulDiv(m_nMargin, nScale, GetScale());
     pRet->m_bHasInactive = m_bHasInactive;
     pRet->m_bHasGripper = m_bHasGripper;
 }
