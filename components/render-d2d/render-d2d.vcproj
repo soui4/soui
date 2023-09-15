@@ -80,7 +80,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="utilities4.lib"
+				AdditionalDependencies="utilities4.lib d2d1.lib dwrite.lib"
 				OutputFile="$(OutDir)\render-d2d.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -178,7 +178,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="utilities4.lib"
+				AdditionalDependencies="utilities4.lib d2d1.lib dwrite.lib"
 				OutputFile="$(OutDir)\render-d2d.dll"
 				LinkIncremental="1"
 				SuppressStartupBanner="true"
@@ -275,7 +275,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="utilities4d.lib"
+				AdditionalDependencies="utilities4d.lib d2d1.lib dwrite.lib"
 				OutputFile="$(OutDir)\render-d2dd.dll"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\bin;.\sdk7.1_d2d\lib\x86"
@@ -370,7 +370,7 @@
 			<Tool
 				Name="VCLinkerTool"
 				IgnoreImportLibrary="true"
-				AdditionalDependencies="utilities4d.lib"
+				AdditionalDependencies="utilities4d.lib d2d1.lib dwrite.lib"
 				OutputFile="$(OutDir)\render-d2dd.dll"
 				SuppressStartupBanner="true"
 				AdditionalLibraryDirectories="..\..\bin64;.\sdk7.1_d2d\lib\x64"

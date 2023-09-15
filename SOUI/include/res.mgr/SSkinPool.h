@@ -107,7 +107,7 @@ class SOUI_EXP SSkinPool
     : public TObjRefImpl<ISkinPool>
     , protected SCmnMap<SSkinPtr, SkinKey> {
   public:
-    SSkinPool(BOOL bAutoScale);
+    SSkinPool(BOOL bAutoScale=TRUE);
 
     virtual ~SSkinPool();
 

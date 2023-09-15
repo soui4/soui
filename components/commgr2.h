@@ -53,6 +53,9 @@
 #if(SCOM_MASK&scom_mask_render_gdi)
     #pragma comment(lib,"render-gdid")
 #endif
+#if(SCOM_MASK&scom_mask_render_d2d)
+#pragma comment(lib,"render-d2dd")
+#endif
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
     #pragma comment(lib,"imgdecoder-wicd")
 #endif
@@ -102,6 +105,9 @@
 #endif
 #if(SCOM_MASK&scom_mask_render_gdi)
     #pragma comment(lib,"render-gdi")
+#endif
+#if(SCOM_MASK&scom_mask_render_d2d)
+#pragma comment(lib,"render-d2d")
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
     #pragma comment(lib,"imgdecoder-wic")
