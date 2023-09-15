@@ -30,9 +30,9 @@ void SHostMgr::DispatchMessage(UINT uMsg, WPARAM wp, LPARAM lp)
     SAutoLock autoLock(m_cs);
     SPOSITION pos = m_mapHostMsgHandler.GetStartPosition();
     while (pos)
-    {//can't call SHostWnd.Fun for multiple ui threads.
+    { // can't call SHostWnd.Fun for multiple ui threads.
         HWND hHost = m_mapHostMsgHandler.GetNextKey(pos);
-		::PostMessage(hHost, uMsg, wp, lp);
+        ::PostMessage(hHost, uMsg, wp, lp);
     }
 }
 

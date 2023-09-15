@@ -215,7 +215,7 @@ void SSkinImgFrame::_Scale(ISkinObj *skinObj, int nScale)
 {
     SSkinImgList::_Scale(skinObj, nScale);
     SSkinImgFrame *pClone = sobj_cast<SSkinImgFrame>(skinObj);
-	int nSrcScale = GetScale();
+    int nSrcScale = GetScale();
     pClone->m_rcMargin.left = MulDiv(m_rcMargin.left, nScale, nSrcScale);
     pClone->m_rcMargin.top = MulDiv(m_rcMargin.top, nScale, nSrcScale);
     pClone->m_rcMargin.right = MulDiv(m_rcMargin.right, nScale, nSrcScale);

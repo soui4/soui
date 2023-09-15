@@ -538,9 +538,12 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             GetMonitorInfo(hMonitor, &info);
             SStringT dummyTitle = SStringT().Format(_T("%s_dummy"), m_hostAttr.m_strTitle.c_str());
             m_dummyWnd->CreateNative(dummyTitle, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE, info.rcWork.left, info.rcWork.top, 1, 1, m_hWnd, 0, NULL);
-            m_dummyWnd->SetWindowLongPtr(GWL_EXSTYLE, m_dummyWnd->GetWindowLongPtr(GWL_EXSTYLE) | WS_EX_LAYERED);
+            m_dummyWnd->SetWindowLongPtr(GWL_EXSTYLE, WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE | WS_EX_LAYERED);
             ::SetLayeredWindowAttributes(m_dummyWnd->m_hWnd, 0, 0, LWA_ALPHA);
-            m_dummyWnd->ShowWindow(SW_SHOWNOACTIVATE);
+            if (IsWindowVisible())
+            {
+                m_dummyWnd->ShowWindow(SW_SHOWNOACTIVATE);
+            }
         }
     }
     else if (dwExStyle & WS_EX_LAYERED || GetRoot()->GetAlpha() != 0xFF)
@@ -668,7 +671,7 @@ void SHostWnd::_RedrawRegion(IRegionS *pRgnUpdate, CRect &rcInvalid)
     else
     {
         rcInvalid = rcWnd;
-		pRgnUpdate->CombineRect(&rcWnd,RGN_COPY);
+        pRgnUpdate->CombineRect(&rcWnd, RGN_COPY);
         m_memRT->PushClipRect(&rcInvalid, RGN_COPY);
     }
     //清除残留的alpha值
@@ -1603,9 +1606,18 @@ void SHostWnd::OnWindowPosChanged(LPWINDOWPOS lpWndPos)
         MONITORINFO info = { sizeof(MONITORINFO) };
         if (GetMonitorInfo(hMonitor, &info))
         {
-            m_dummyWnd->SetWindowPos(NULL, info.rcWork.left, info.rcWork.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+            m_dummyWnd->SetWindowPos(NULL, info.rcWork.left, info.rcWork.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
         }
     }
+    if ((lpWndPos->flags & SWP_SHOWWINDOW) && m_dummyWnd)
+    {
+        m_dummyWnd->SetWindowPos(NULL, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
+    }
+    else if ((lpWndPos->flags & SWP_HIDEWINDOW) && m_dummyWnd)
+    {
+        m_dummyWnd->SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
+    }
+
     //下面这一行不能删除，否则显示不正常。
     SetMsgHandled(FALSE);
 }
@@ -1945,11 +1957,11 @@ void SHostWnd::SetScale(THIS_ int nScale, LPCRECT desRect)
 
 LRESULT SHostWnd::OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp)
 {
-	GetNcPainter()->GetRoot()->SDispatchMessage(uMsg);
-	GetRoot()->SDispatchMessage(uMsg);
-	GetRoot()->RequestRelayout();
+    GetNcPainter()->GetRoot()->SDispatchMessage(uMsg);
+    GetRoot()->SDispatchMessage(uMsg);
+    GetRoot()->RequestRelayout();
 
-	return 0;
+    return 0;
 }
 
 //////////////////////////////////////////////////////////////////

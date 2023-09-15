@@ -96,23 +96,23 @@ void SHotKeyCtrl::UpdateModifier()
     BOOL bShift = GetKeyState(VK_SHIFT) & 0x8000;
 
     WORD wCombKey = 0;
-	WORD wCombMask = HKCOMB_NONE;
+    WORD wCombMask = HKCOMB_NONE;
     if (!bAlt && !bCtrl && !bShift)
         wCombKey = Mod_None;
     else if (bAlt && !bCtrl && !bShift)
-        wCombKey = Mod_Alt,wCombMask=HKCOMB_A;
+        wCombKey = Mod_Alt, wCombMask = HKCOMB_A;
     else if (!bAlt && bCtrl && !bShift)
-        wCombKey = Mod_Ctrl,wCombMask=HKCOMB_C;
+        wCombKey = Mod_Ctrl, wCombMask = HKCOMB_C;
     else if (!bAlt && !bCtrl && bShift)
-        wCombKey = Mod_Shift,wCombMask=HKCOMB_S;
+        wCombKey = Mod_Shift, wCombMask = HKCOMB_S;
     else if (bAlt && bCtrl && !bShift)
-        wCombKey = Mod_CA,wCombMask=HKCOMB_CA;
+        wCombKey = Mod_CA, wCombMask = HKCOMB_CA;
     else if (bAlt && !bCtrl && bShift)
-        wCombKey = Mod_SA,wCombMask=HKCOMB_SA;
+        wCombKey = Mod_SA, wCombMask = HKCOMB_SA;
     else if (!bAlt && bCtrl && bShift)
-        wCombKey = Mod_SC,wCombMask=HKCOMB_SC;
+        wCombKey = Mod_SC, wCombMask = HKCOMB_SC;
     else
-        wCombKey = Mod_SCA,wCombMask=HKCOMB_SCA;
+        wCombKey = Mod_SCA, wCombMask = HKCOMB_SCA;
     if (wCombMask & m_wInvalidComb)
         m_wModifier = m_wInvalidModifier;
     else
@@ -221,56 +221,60 @@ SStringT SHotKeyCtrl::GetWindowText(BOOL bRawText)
 
 HRESULT SHotKeyCtrl::OnAttrInvalidComb(const SStringW &value, BOOL bLoading)
 {
-	SStringWList arrComb;
-	SplitString(value,L'|',arrComb);
-	for(UINT i=0;i<arrComb.GetCount();i++){
-		DWORD dwKey = TranslateAccelKey(S_CW2T(arrComb[i]));
-		switch(HIWORD(dwKey)){
-			case Mod_Alt:
-				m_wInvalidComb|=HKCOMB_A;
-				break;
-			case Mod_Ctrl:
-				m_wInvalidComb|=HKCOMB_C;
-				break;
-			case Mod_Shift:
-				m_wInvalidComb|=HKCOMB_S;
-				break;
-			case Mod_CA:
-				m_wInvalidComb|=HKCOMB_CA;
-				break;
-			case Mod_SA:
-				m_wInvalidComb|=HKCOMB_SA;
-				break;
-			case Mod_SC:
-				m_wInvalidComb|=HKCOMB_SC;
-				break;
-			case Mod_SCA:
-				m_wInvalidComb|=HKCOMB_SCA;
-				break;
-		}
-	}
+    SStringWList arrComb;
+    SplitString(value, L'|', arrComb);
+    for (UINT i = 0; i < arrComb.GetCount(); i++)
+    {
+        DWORD dwKey = TranslateAccelKey(S_CW2T(arrComb[i]));
+        switch (HIWORD(dwKey))
+        {
+        case Mod_Alt:
+            m_wInvalidComb |= HKCOMB_A;
+            break;
+        case Mod_Ctrl:
+            m_wInvalidComb |= HKCOMB_C;
+            break;
+        case Mod_Shift:
+            m_wInvalidComb |= HKCOMB_S;
+            break;
+        case Mod_CA:
+            m_wInvalidComb |= HKCOMB_CA;
+            break;
+        case Mod_SA:
+            m_wInvalidComb |= HKCOMB_SA;
+            break;
+        case Mod_SC:
+            m_wInvalidComb |= HKCOMB_SC;
+            break;
+        case Mod_SCA:
+            m_wInvalidComb |= HKCOMB_SCA;
+            break;
+        }
+    }
     return bLoading ? S_OK : S_FALSE;
 }
 
 HRESULT SHotKeyCtrl::OnAttrInvalidSysKey(const SStringW &value, BOOL bLoading)
 {
-	SStringWList arrComb;
-	SplitString(value,L'|',arrComb);
-	for(UINT i=0;i<arrComb.GetCount();i++){
-		DWORD dwKey = TranslateAccelKey(S_CW2T(arrComb[i]));
-		switch(HIWORD(dwKey)){
-		case Mod_Alt:
-			m_wInvalidComb=HKCOMB_A|HKCOMB_CA|HKCOMB_SA|HKCOMB_SCA;
-			break;
-		case Mod_Ctrl:
-			m_wInvalidComb=HKCOMB_C|HKCOMB_CA|HKCOMB_SC|HKCOMB_SCA;
-			break;
-		case Mod_Shift:
-			m_wInvalidComb=HKCOMB_S|HKCOMB_SA|HKCOMB_SC|HKCOMB_SCA;
-			break;
-		}
-	}
-	return bLoading ? S_OK : S_FALSE;
+    SStringWList arrComb;
+    SplitString(value, L'|', arrComb);
+    for (UINT i = 0; i < arrComb.GetCount(); i++)
+    {
+        DWORD dwKey = TranslateAccelKey(S_CW2T(arrComb[i]));
+        switch (HIWORD(dwKey))
+        {
+        case Mod_Alt:
+            m_wInvalidComb = HKCOMB_A | HKCOMB_CA | HKCOMB_SA | HKCOMB_SCA;
+            break;
+        case Mod_Ctrl:
+            m_wInvalidComb = HKCOMB_C | HKCOMB_CA | HKCOMB_SC | HKCOMB_SCA;
+            break;
+        case Mod_Shift:
+            m_wInvalidComb = HKCOMB_S | HKCOMB_SA | HKCOMB_SC | HKCOMB_SCA;
+            break;
+        }
+    }
+    return bLoading ? S_OK : S_FALSE;
 }
 
 HRESULT SHotKeyCtrl::OnAttrInvalidModifier(const SStringW &value, BOOL bLoading)

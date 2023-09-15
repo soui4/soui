@@ -155,7 +155,7 @@ class SOUI_EXP SRootWindow : public SWindow {
 class SDummyWnd;
 class SOUI_EXP SHostWnd
     : public TNativeWndProxy<IHostWnd>
-    , public SwndContainerImpl{
+    , public SwndContainerImpl {
     friend class SDummyWnd;
     friend class SRootWindow;
     friend class SNcPainter;
@@ -475,7 +475,7 @@ class SOUI_EXP SHostWnd
     virtual BOOL _HandleEvent(IEvtArgs *pEvt);
 
   protected:
-	LRESULT OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp);
+    LRESULT OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp);
 
     BEGIN_MSG_MAP_EX(SHostWnd)
         MSG_WM_SIZE(OnSize)
@@ -506,7 +506,7 @@ class SOUI_EXP SHostWnd
         MESSAGE_HANDLER_EX(WM_GETOBJECT, OnGetObject)
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_SYSCOMMAND(OnSysCommand)
-		MESSAGE_HANDLER_EX(UM_UPDATEFONT,OnUpdateFont)
+        MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
         CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
 #if (!DISABLE_SWNDSPY)
         MESSAGE_HANDLER_EX(SPYMSG_SETSPY, OnSpyMsgSetSpy)
