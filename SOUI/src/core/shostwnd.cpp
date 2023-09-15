@@ -792,7 +792,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_szAppSetted.cy = lpCreateStruct->cy;
     if (!OnLoadLayoutFromResourceID(m_strXmlLayout))
         return -1;
-
+	GetRoot()->RequestRelayout();
     m_pTipCtrl = CreateTooltip();
     if (m_pTipCtrl && m_hostAttr.m_bHasMsgLoop)
         GetMsgLoop()->AddMessageFilter(m_pTipCtrl);
