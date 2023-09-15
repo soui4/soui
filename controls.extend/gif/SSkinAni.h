@@ -82,10 +82,11 @@ namespace SOUI
 			pClone->m_iFrame = m_iFrame;
 			pClone->m_filterLevel = m_filterLevel;
 			pClone->m_bTile = m_bTile;
-			pClone->m_rcMargin.left = MulDiv(m_rcMargin.left,nScale,100);
-			pClone->m_rcMargin.top = MulDiv(m_rcMargin.top,nScale,100);
-			pClone->m_rcMargin.right = MulDiv(m_rcMargin.right,nScale,100);
-			pClone->m_rcMargin.bottom = MulDiv(m_rcMargin.bottom,nScale,100);
+			int srcScale = GetScale();
+			pClone->m_rcMargin.left = MulDiv(m_rcMargin.left,nScale,srcScale);
+			pClone->m_rcMargin.top = MulDiv(m_rcMargin.top,nScale,srcScale);
+			pClone->m_rcMargin.right = MulDiv(m_rcMargin.right,nScale,srcScale);
+			pClone->m_rcMargin.bottom = MulDiv(m_rcMargin.bottom,nScale,srcScale);
 		}
 
 		LONG GetExpandCode() const{

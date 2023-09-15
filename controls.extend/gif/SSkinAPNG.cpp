@@ -147,8 +147,8 @@ void SSkinAPNG::_Scale(ISkinObj *pObj, int nScale)
 	pClone->m_pFrames = new SAniFrame[m_nFrames];
 
 	CSize szSkin = GetSkinSize();
-	szSkin.cx = MulDiv(szSkin.cx, nScale, 100);
-	szSkin.cy = MulDiv(szSkin.cy, nScale, 100);
+	szSkin.cx = MulDiv(szSkin.cx, nScale, GetScale());
+	szSkin.cy = MulDiv(szSkin.cy, nScale, GetScale());
 	for(int i=0;i<m_nFrames;i++)
 	{
 		m_pFrames[i].pBmp->Scale2(&pClone->m_pFrames[i].pBmp, szSkin.cx, szSkin.cy, kHigh_FilterLevel);

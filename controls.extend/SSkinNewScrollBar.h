@@ -47,8 +47,8 @@ class SSkinNewScrollbar : public SSkinScrollbar {
 		__baseCls::_Scale(skinObj, nScale);
 		SSkinNewScrollbar *pRet = sobj_cast<SSkinNewScrollbar>(skinObj);
 		CSize szSkin = GetSkinSize();
-		szSkin.cx = MulDiv(szSkin.cx, nScale, 100);
-		szSkin.cy = MulDiv(szSkin.cy, nScale, 100);
+		szSkin.cx = MulDiv(szSkin.cx, nScale, GetScale());
+		szSkin.cy = MulDiv(szSkin.cy, nScale, GetScale());
 
 		if (m_pImgHorz)
 		{
