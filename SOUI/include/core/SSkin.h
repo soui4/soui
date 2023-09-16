@@ -61,7 +61,7 @@ class SOUI_EXP SSkinImgList : public SSkinObjBase {
     SAutoRefPtr<IBitmapS> m_imgBackup; //色调调整前的备分
     FilterLevel m_filterLevel;
 
-  private:
+  protected:
     mutable SAutoRefPtr<IBitmapS> m_pImg;
     mutable SStringW m_strSrc;
     BOOL m_bLazyLoad;
