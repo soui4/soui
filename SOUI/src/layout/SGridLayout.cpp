@@ -366,8 +366,6 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
 
     CRect rcParent;
     pParent->GetChildrenLayoutRect(&rcParent);
-    int xInter = m_xInterval.toPixelSize(pParent->GetScale());
-    int yInter = m_yInterval.toPixelSize(pParent->GetScale());
 
     //先计算出每个格子的大小,算法和MeasureChildren一样，后面再考虑如何优化
     int cells = nCols * nRows;
@@ -519,35 +517,64 @@ void SGridLayout::LayoutChildren(IWindow *pParent)
     delete[] pCellsSpanFlagY;
     delete[] pCellsSpanFlagX;
 
+	int xInter = m_xInterval.toPixelSize(pParent->GetScale());
+	int yInter = m_yInterval.toPixelSize(pParent->GetScale());
     //分配weight
-    int netParentWid = rcParent.Width() - (nCols - 1) * xInter;
-    if (nTotalWidth < netParentWid && totalColsWeight > 0.0f)
-    {
-        int nRemain = netParentWid - nTotalWidth;
-        for (int i = 0; i < nCols; i++)
-        { //采用逐行4舍5入的方式解决不能整除的问题.
-            if (SLayoutSize::fequal(totalColsWeight, 0.0f))
-                break;
-            int extra = int(nRemain * pColsWeight[i] / totalColsWeight + 0.5f);
-            pCellsWidth[i] += extra;
-            nRemain -= extra;
-            totalColsWeight -= pColsWeight[i];
-        }
-    }
-    int netParentHei = rcParent.Height() - (nRows - 1) * yInter;
-    if (nTotalHeight < netParentHei && totalRowsWeight > 0.0f)
-    {
-        int nRemain = netParentHei - nTotalHeight;
-        for (int i = 0; i < nRows; i++)
-        { //采用逐行4舍5入的方式解决不能整除的问题.
-            if (SLayoutSize::fequal(totalRowsWeight, 0.0f))
-                break;
-            int extra = int(nRemain * pRowsWeight[i] / totalRowsWeight + 0.5f);
-            pCellsHeight[i] += extra;
-            nRemain -= extra;
-            totalRowsWeight -= pRowsWeight[i];
-        }
-    }
+	if(totalColsWeight > 0.0f){
+		int netParentWid = rcParent.Width() - (nCols - 1) * (xInter>0?xInter:0);
+		if (nTotalWidth < netParentWid)
+		{
+			int nRemain = netParentWid - nTotalWidth;
+			for (int i = 0; i < nCols; i++)
+			{ //采用逐行4舍5入的方式解决不能整除的问题.
+				if (SLayoutSize::fequal(totalColsWeight, 0.0f))
+					break;
+				int extra = int(nRemain * pColsWeight[i] / totalColsWeight + 0.5f);
+				pCellsWidth[i] += extra;
+				nRemain -= extra;
+				totalColsWeight -= pColsWeight[i];
+			}
+		}
+	}else if(xInter<0){
+		int nRemain = rcParent.Width() - nTotalWidth;
+		if(xInter==SIZE_WRAP_CONTENT && nCols>1)
+			xInter=nRemain/(nCols-1);
+		else if(xInter==SIZE_MATCH_PARENT)
+		{
+			xInter=nRemain/(nCols+1);
+			rcParent.DeflateRect(xInter,0,xInter,0);
+		}
+		else
+			xInter=0;
+	}
+	if(totalRowsWeight > 0.0f){
+		int netParentHei = rcParent.Height() - (nRows - 1) * (yInter>0?yInter:0);
+		if (nTotalHeight < netParentHei)
+		{
+			int nRemain = netParentHei - nTotalHeight;
+			for (int i = 0; i < nRows; i++)
+			{ //采用逐行4舍5入的方式解决不能整除的问题.
+				if (SLayoutSize::fequal(totalRowsWeight, 0.0f))
+					break;
+				int extra = int(nRemain * pRowsWeight[i] / totalRowsWeight + 0.5f);
+				pCellsHeight[i] += extra;
+				nRemain -= extra;
+				totalRowsWeight -= pRowsWeight[i];
+			}
+		}
+	}else if(yInter<0){
+		int nRemain = rcParent.Height() - nTotalHeight;
+		if(yInter==SIZE_WRAP_CONTENT && nRows>1)
+			yInter=nRemain/(nRows-1);
+		else if(yInter==SIZE_MATCH_PARENT)
+		{
+			yInter=nRemain/(nRows+1);
+			rcParent.DeflateRect(0,yInter,0,yInter);
+		}
+		else
+			yInter=0;
+	}
+
     delete[] pColsWeight;
     delete[] pRowsWeight;
 

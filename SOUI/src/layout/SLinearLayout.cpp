@@ -219,7 +219,6 @@ void SLinearLayout::LayoutChildren(IWindow *pParent)
 
     int offset = 0;
     float fWeight = 0.0f;
-    int interval = m_interval.toPixelSize(pParent->GetScale());
 
     { // assign width or height
 
@@ -274,66 +273,84 @@ void SLinearLayout::LayoutChildren(IWindow *pParent)
             pSize[iChild] = szChild;
             offset += m_orientation == Vert ? szChild.cy : szChild.cx;
 
-            offset += interval; // add interval
-
             iChild++;
             pChild = pParent->GetNextLayoutIChild(pChild);
         }
 
         nChilds = iChild;
-        offset -= interval; // sub the last interval value.
     }
 
     int size = m_orientation == Vert ? rcParent.Height() : rcParent.Width();
+	int interval = m_interval.toPixelSize(pParent->GetScale());
+	if(interval>0){
+		offset += (nChilds-1)*interval;
+	}
     ORIENTATION orienOther = m_orientation == Vert ? Horz : Vert;
-    if (fWeight > 0.0f && size > offset)
-    { // assign size by weight
-        int nRemain = size - offset;
+	if(size > offset)
+	{
+		if (fWeight > 0.0f)
+		{ // assign size by weight
+			int nRemain = size - offset;
 
-        for (int iChild = 0; iChild < nChilds; iChild++)
-        {
-            if (SLayoutSize::fequal(fWeight, 0.0f))
-                break;
-            IWindow *pChild = pChilds[iChild];
-            SLinearLayoutParam *pLinearLayoutParam = (SLinearLayoutParam *)pChild->GetLayoutParam();
-            int nScale = pChild->GetScale();
-            if (pLinearLayoutParam->weight > 0.0f)
-            {
-                int extra = int(nRemain * pLinearLayoutParam->weight / fWeight + 0.5f);
-                LONG &szChild = m_orientation == Vert ? pSize[iChild].cy : pSize[iChild].cx;
-                szChild += extra;
-                nRemain -= extra;
-                fWeight -= pLinearLayoutParam->weight;
+			for (int iChild = 0; iChild < nChilds; iChild++)
+			{
+				if (SLayoutSize::fequal(fWeight, 0.0f))
+					break;
+				IWindow *pChild = pChilds[iChild];
+				SLinearLayoutParam *pLinearLayoutParam = (SLinearLayoutParam *)pChild->GetLayoutParam();
+				int nScale = pChild->GetScale();
+				if (pLinearLayoutParam->weight > 0.0f)
+				{
+					int extra = int(nRemain * pLinearLayoutParam->weight / fWeight + 0.5f);
+					LONG &szChild = m_orientation == Vert ? pSize[iChild].cy : pSize[iChild].cx;
+					szChild += extra;
+					nRemain -= extra;
+					fWeight -= pLinearLayoutParam->weight;
 
-                if (pLinearLayoutParam->IsWrapContent(orienOther))
-                {
-                    ILayoutParam *backup = pLinearLayoutParam->Clone();
-                    pLinearLayoutParam->SetSpecifiedSize(m_orientation, SLayoutSize((float)szChild, SLayoutSize::dp));
-                    int nWid = pSize[iChild].cx, nHei = pSize[iChild].cy;
+					if (pLinearLayoutParam->IsWrapContent(orienOther))
+					{
+						ILayoutParam *backup = pLinearLayoutParam->Clone();
+						pLinearLayoutParam->SetSpecifiedSize(m_orientation, SLayoutSize((float)szChild, SLayoutSize::dp));
+						int nWid = pSize[iChild].cx, nHei = pSize[iChild].cy;
 
-                    if (orienOther == Vert)
-                        nHei = SIZE_WRAP_CONTENT;
-                    else
-                        nWid = SIZE_WRAP_CONTENT;
+						if (orienOther == Vert)
+							nHei = SIZE_WRAP_CONTENT;
+						else
+							nWid = SIZE_WRAP_CONTENT;
 
-                    CSize szCalc;
-                    pChild->GetDesiredSize(&szCalc, nWid, nHei);
-                    if (orienOther == Vert)
-                    {
-                        szCalc.cy += pLinearLayoutParam->extend_top.toPixelSize(nScale) + pLinearLayoutParam->extend_bottom.toPixelSize(nScale);
-                        pSize[iChild].cy = szCalc.cy;
-                    }
-                    else
-                    {
-                        szCalc.cx += pLinearLayoutParam->extend_left.toPixelSize(nScale) + pLinearLayoutParam->extend_right.toPixelSize(nScale);
-                        pSize[iChild].cx = szCalc.cx;
-                    }
-                    pChild->SetLayoutParam(backup);
-                    backup->Release();
-                }
-            }
-        }
-    }
+						CSize szCalc;
+						pChild->GetDesiredSize(&szCalc, nWid, nHei);
+						if (orienOther == Vert)
+						{
+							szCalc.cy += pLinearLayoutParam->extend_top.toPixelSize(nScale) + pLinearLayoutParam->extend_bottom.toPixelSize(nScale);
+							pSize[iChild].cy = szCalc.cy;
+						}
+						else
+						{
+							szCalc.cx += pLinearLayoutParam->extend_left.toPixelSize(nScale) + pLinearLayoutParam->extend_right.toPixelSize(nScale);
+							pSize[iChild].cx = szCalc.cx;
+						}
+						pChild->SetLayoutParam(backup);
+						backup->Release();
+					}
+				}
+			}
+		}else if(interval<0){
+			//handle interval==-1 or interval==-2
+			if(interval==SIZE_WRAP_CONTENT && nChilds>1) 
+				interval=(size-offset)/(nChilds-1);
+			else if(interval==SIZE_MATCH_PARENT)
+			{
+				interval = (size-offset)/(nChilds+1);
+				if(m_orientation == Vert)
+					rcParent.DeflateRect(0,interval,0,interval);
+				else
+					rcParent.DeflateRect(interval,0,interval,0);
+			}
+			else
+				interval = 0;
+		}
+	}
     { // assign position
         offset = 0;
         for (int iChild = 0; iChild < nChilds; iChild++)
@@ -504,6 +521,8 @@ measureChilds:
 
     int size = m_orientation == Vert ? nHeight : nWidth;
     int nInterval = m_interval.toPixelSize(pParent->GetScale());
+	if(nInterval<0) 
+		nInterval = 0;
     if (!SLayoutSize::fequal(fWeight, 0.0f) && size != SIZE_WRAP_CONTENT)
     { // assign weight for elements. and calc size of other orientation again.
         int offset = 0;
