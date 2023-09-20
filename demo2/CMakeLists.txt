@@ -17,6 +17,15 @@ source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
+if(MSVC_VERSION LESS_EQUAL 1500 AND ENABLE_SOUI_COM_LIB)
+message("vs is less than vs2008")
+if (CMAKE_CL_64)
+	link_directories("${PROJECT_SOURCE_DIR}/components/render-d2d/sdk7.1_d2d/lib/x64")
+else ()
+	link_directories("${PROJECT_SOURCE_DIR}/components/render-d2d/sdk7.1_d2d/lib/x86")
+endif ()
+endif()
+
 if (CMAKE_CL_64)
     if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
     link_directories(${PROJECT_SOURCE_DIR}/bin64a)
@@ -28,16 +37,19 @@ else ()
 endif ()
 add_executable(demo2 WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
 
-#set_target_properties(demo2 PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+set_target_properties(demo2 PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
 else()
 	target_link_libraries(demo2 -municode)
-
 endif()
 
 add_dependencies(demo2 soui-sys-resource render-gdi imgdecoder-gdip)
 target_link_libraries(demo2 soui4 utilities4)
+if(ENABLE_SOUI_COM_LIB)
+	target_link_libraries(demo2 d2d1.lib dwrite.lib)
+endif()
+
 set_target_properties (demo2 PROPERTIES
     FOLDER demos
 )
