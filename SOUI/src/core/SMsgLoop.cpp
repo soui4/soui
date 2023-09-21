@@ -21,6 +21,9 @@ SMessageLoop::SMessageLoop(IMessageLoop *pParentLoop)
     : m_bRunning(FALSE)
     , m_tid(0)
     , m_parentLoop(pParentLoop)
+	, m_bQuit(FALSE)
+	, m_bDoIdle(FALSE)
+	, m_nIdleCount(0)
 {
 }
 
