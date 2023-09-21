@@ -61,15 +61,16 @@ INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
 
         int nRet = m_MsgLoop->Run();
 
-        if (m_nRetCode == RC_INIT)
-        { //不是自己主动使用EndDialog关闭窗口，重新把WM_QUIT放回消息队列。
-            PostQuitMessage(nRet);
-        }
         // From MFC
         // hide the window before enabling the parent, etc.
         if (IsWindow())
         {
             ShowHostWnd(SW_HIDE, TRUE);
+        }
+
+        if (m_nRetCode == RC_INIT)
+        { //不是自己主动使用EndDialog关闭窗口，重新把WM_QUIT放回消息队列。
+            PostQuitMessage(nRet);
         }
 
         if (bEnableParent)

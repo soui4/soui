@@ -231,13 +231,13 @@ BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilter
 BOOL SMessageLoop::WaitMsg(THIS)
 {
     MSG msg;
-    while (m_bDoIdle && !PeekMsg(&msg, 0, 0, FALSE))
+    while (!m_bQuit && m_bDoIdle && !PeekMsg(&msg, 0, 0, FALSE))
     {
         if (!OnIdle(m_nIdleCount++))
             m_bDoIdle = FALSE;
-        if (m_bQuit)
-            return FALSE;
     }
+    if (m_bQuit)
+        return FALSE;
     return ::WaitMessage();
 }
 
