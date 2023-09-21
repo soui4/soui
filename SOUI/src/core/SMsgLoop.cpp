@@ -244,7 +244,7 @@ BOOL SMessageLoop::WaitMsg(THIS)
 int SMessageLoop::HandleMsg(THIS)
 {
     MSG msg = { 0 };
-    while (PeekMsg(&msg, 0, 0, TRUE))
+    while (PeekMsg(&msg, 0, 0, TRUE) && !m_bQuit)
     {
         if (msg.message == WM_QUIT)
         {
