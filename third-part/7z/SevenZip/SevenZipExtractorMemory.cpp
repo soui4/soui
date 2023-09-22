@@ -91,13 +91,13 @@ namespace SevenZip
 			/* [out] */ ULARGE_INTEGER *plibNewPosition){
 				switch(dwOrigin){
 					case STREAM_SEEK_SET:
-						m_nPos = dlibMove.QuadPart;
+						m_nPos = (UINT)dlibMove.QuadPart;
 						break;
 					case STREAM_SEEK_CUR:
-						m_nPos += dlibMove.QuadPart;
+						m_nPos += (UINT)dlibMove.QuadPart;
 						break;
 					case STREAM_SEEK_END:
-						m_nPos = m_szBuf+dlibMove.QuadPart;
+						m_nPos = m_szBuf+(UINT)dlibMove.QuadPart;
 						break;
 				}
 				if(plibNewPosition){

@@ -377,7 +377,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     SASSERT(pNode);
     if (pNode->Empty())
     {
-        SASSERT_FMTA(FALSE, "Null XML node", 0);
+        SASSERT_FMTA(FALSE, "Null XML node");
         return FALSE;
     }
     if (!SNativeWnd::IsWindow())
