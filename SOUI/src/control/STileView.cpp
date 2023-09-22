@@ -703,7 +703,9 @@ void STileView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     {
         EnsureVisible(nNewSelItem);
         SetSel(nNewSelItem, TRUE);
-    }
+	}else{
+		SetMsgHandled(FALSE);
+	}
 }
 
 void STileView::EnsureVisible(int iItem)

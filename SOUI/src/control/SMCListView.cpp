@@ -1036,7 +1036,9 @@ void SMCListView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
         EnsureVisible(nNewSelItem);
         // 取消选择通知
         SetSel(nNewSelItem, TRUE);
-    }
+	}else{
+		SetMsgHandled(FALSE);
+	}
 }
 
 void SMCListView::EnsureVisible(int iItem)

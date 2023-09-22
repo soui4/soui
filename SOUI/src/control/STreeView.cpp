@@ -767,7 +767,9 @@ void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     {
         EnsureVisible(nNewSelItem);
         SetSel(nNewSelItem, TRUE);
-    }
+	}else{
+		SetMsgHandled(FALSE);
+	}
 }
 
 LRESULT STreeView::OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
