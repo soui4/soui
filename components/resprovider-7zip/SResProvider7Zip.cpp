@@ -182,7 +182,7 @@ void SResProvider7Zip::EnumResource(EnumResCallback funEnumCB,LPARAM lp)
 	SPOSITION pos = m_mapFiles.GetStartPosition();
 	while(pos)
 	{
-		SResID id = m_mapFiles.GetNextKey(pos);
+		const SResID &id = m_mapFiles.GetNextKey(pos);
 		if(!funEnumCB(id.szType,id.szName,lp))
 			break;
 	}

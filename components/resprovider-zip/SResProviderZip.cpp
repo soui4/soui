@@ -108,7 +108,12 @@ IImgX   * SResProviderZip::LoadImgX( LPCTSTR strType,LPCTSTR pszResName )
 
 void SResProviderZip::EnumResource(EnumResCallback funEnumCB,LPARAM lp)
 {
-	//todo:hjx
+	SPOSITION pos = m_mapFiles.GetStartPosition();
+	while(pos){
+		const SResID & resId = m_mapFiles.GetNextKey(pos);
+		if(!funEnumCB(resId.szType,resId.szName,lp))
+			break;
+	}
 }
 
 
