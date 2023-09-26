@@ -1505,11 +1505,11 @@ void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
         minus_bottom,
         line,
         line_join,
-        line_bottom
+        line_bottom,
+		line_root,
     }; // 9 line states
     CRect rcLine = rc;
     rcLine.right = rcLine.left + nIndent;
-    //	rcLine.DeflateRect(0, (rcLine.Height() - m_nIndent) / 2);
     SPOSITION pos = lstParent.GetHeadPosition();
     while (pos)
     {
@@ -1524,12 +1524,13 @@ void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     BOOL hasNextSibling = m_adapter->GetNextSiblingItem(hItem) != 0;
     BOOL hasPervSibling = m_adapter->GetPrevSiblingItem(hItem) != 0;
     BOOL hasChild = m_adapter->HasChildren(hItem);
+	bool hasParent = m_adapter->GetParentItem(hItem) != 0;
     int iLine = -1;
     if (hasChild)
     { // test if is collapsed
         if (!m_adapter->IsItemExpanded(hItem))
         {
-            if (lstParent.IsEmpty() && !hasPervSibling) // no parent
+            if (!hasParent && !hasPervSibling) // no parent
                 iLine = plus;
             else if (hasNextSibling)
                 iLine = plus_join;
@@ -1538,7 +1539,7 @@ void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
         }
         else
         {
-            if (lstParent.IsEmpty() && !hasPervSibling) // no parent
+            if (!hasParent && !hasPervSibling) // no parent
                 iLine = minus;
             else if (hasNextSibling)
                 iLine = minus_join;
@@ -1549,7 +1550,12 @@ void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     else
     {
         if (hasNextSibling)
-            iLine = line_join;
+		{
+			if(!hasParent && !hasPervSibling)
+				iLine = line_root;
+			else
+				iLine = line_join;
+		}
         else
             iLine = line_bottom;
     }

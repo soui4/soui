@@ -886,11 +886,11 @@ void STreeCtrl::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
         minus_bottom,
         line,
         line_join,
-        line_bottom
-    }; // 9 line states
+        line_bottom,
+		line_root,
+    }; // 10 line states
     CRect rcLine = rc;
     rcLine.right = rcLine.left + m_nIndent;
-    //	rcLine.DeflateRect(0, (rcLine.Height() - m_nIndent) / 2);
     SPOSITION pos = lstParent.GetHeadPosition();
     while (pos)
     {
@@ -905,12 +905,13 @@ void STreeCtrl::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     bool hasNextSibling = GetNextSiblingItem(hItem) != 0;
     bool hasPervSibling = GetPrevSiblingItem(hItem) != 0;
     bool hasChild = GetChildItem(hItem) != 0;
+	bool hasParent = GetParentItem(hItem) != 0;
     int iLine = -1;
     if (hasChild)
     { // test if is collapsed
         if (pItem->bCollapsed)
         {
-            if (lstParent.IsEmpty() && !hasPervSibling) // no parent
+            if (!hasParent && !hasPervSibling) // no parent
                 iLine = plus;
             else if (hasNextSibling)
                 iLine = plus_join;
@@ -919,7 +920,7 @@ void STreeCtrl::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
         }
         else
         {
-            if (lstParent.IsEmpty() && !hasPervSibling) // no parent
+            if (!hasParent && !hasPervSibling) // no parent
                 iLine = minus;
             else if (hasNextSibling)
                 iLine = minus_join;
@@ -930,7 +931,12 @@ void STreeCtrl::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     else
     {
         if (hasNextSibling)
-            iLine = line_join;
+		{
+			if(!hasParent && !hasPervSibling)
+				iLine = line_root;
+			else
+				iLine = line_join;
+		}
         else
             iLine = line_bottom;
     }
