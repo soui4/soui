@@ -1,5 +1,6 @@
 ﻿#include "utilities.h"
 #include "string/strcpcvt.h"
+#include "xml/SXml.h"
 #include <shlwapi.h>
 #pragma comment(lib,"shlwapi.lib")
 SNSBEGIN
@@ -44,6 +45,21 @@ int Str2Int(LPCWSTR src,BOOL supportHex)
 	int nRet = 0;
 	::StrToIntExW(src, supportHex?STIF_SUPPORT_HEX:STIF_DEFAULT, &nRet);
 	return nRet;
+}
+
+IStringA * CreateIStringA(LPCSTR src)
+{
+	return new SStringA(src);
+}
+
+IStringW * CreateIStringW(LPCWSTR src)
+{
+	return new SStringW(src);
+}
+
+IXmlDoc * CreateIXmlDoc()
+{
+	return new SXmlDoc();
 }
 
 

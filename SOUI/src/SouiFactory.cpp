@@ -14,40 +14,40 @@ SouiFactory::~SouiFactory(void)
 {
 }
 
-STDMETHODIMP_(IApplication *)
+IApplication *
 SouiFactory::CreateApp(THIS_ IRenderFactory *pRenderFac, HMODULE hInst, LPCTSTR pszHostClassName, BOOL bImeApp)
 {
     return new SApplication(pRenderFac, hInst, pszHostClassName, SObjectDefaultRegister(), bImeApp);
 }
 
-STDMETHODIMP_(INativeWnd *) SouiFactory::CreateNativeWnd(THIS)
+INativeWnd * SouiFactory::CreateNativeWnd(THIS)
 {
     return new SNativeWnd();
 }
 
-STDMETHODIMP_(IHostWnd *) SouiFactory::CreateHostWnd(THIS_ LPCTSTR pszResID)
+IHostWnd * SouiFactory::CreateHostWnd(THIS_ LPCTSTR pszResID)
 {
     return new SHostWnd(pszResID);
 }
 
-STDMETHODIMP_(IHostDialog *) SouiFactory::CreateHostDialog(THIS_ LPCTSTR pszResID)
+IHostDialog * SouiFactory::CreateHostDialog(THIS_ LPCTSTR pszResID)
 {
     return new SHostDialog(pszResID);
 }
 
-STDMETHODIMP_(IStringA *) SouiFactory::CreateStringA(THIS_ LPCSTR pszSrc)
+IStringA * SouiFactory::CreateStringA(THIS_ LPCSTR pszSrc)
 {
-    return new SStringA(pszSrc);
+	return CreateIStringA(pszSrc);
 }
 
-STDMETHODIMP_(IStringW *) SouiFactory::CreateStringW(THIS_ LPCWSTR pszSrc)
+IStringW * SouiFactory::CreateStringW(THIS_ LPCWSTR pszSrc)
 {
-    return new SStringW(pszSrc);
+	return CreateIStringW(pszSrc);
 }
 
 STDMETHODIMP_(IXmlDoc *) SouiFactory::CreateXmlDoc(THIS)
 {
-    return new SXmlDoc();
+    return CreateIXmlDoc();
 }
 
 IResProvider *SouiFactory::CreateResProvider(THIS_ BUILTIN_RESTYPE resType)

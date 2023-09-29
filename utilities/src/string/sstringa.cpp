@@ -1174,4 +1174,9 @@ SStringA::SStringA()
 	Init();
 }
 
+void SStringA::Release(THIS)
+{
+	delete this;
+}
+
 SNSEND

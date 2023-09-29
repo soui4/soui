@@ -7,7 +7,6 @@
 #include <utilities-def.h>
 #include <string/sstringdata.h>
 #include <interface/sstring-i.h>
-#include <helper/obj-ref-impl.hpp>
 
 SNSBEGIN
 
@@ -32,7 +31,7 @@ struct UTILITIES_API wchar_traits
 		int nBufferMax);
 };
 
-class UTILITIES_API SStringW : public TObjRefImpl<IStringW>
+class UTILITIES_API SStringW : public IStringW
 {
 public:
 	typedef const wchar_t * pctstr;
@@ -91,6 +90,7 @@ public:
 	STDMETHOD_(void,Trim)(THIS_ wchar_t chTarget DEF_VAL(VK_SPACE)) OVERRIDE;
 	STDMETHOD_(void,AppendChar)(THIS_ wchar_t ch) OVERRIDE;
 	STDMETHOD_(void,AppendStr)(THIS_ const wchar_t *pszStr, int nLen DEF_VAL(-1)) OVERRIDE;
+	STDMETHOD_(void,Release)(THIS) OVERRIDE;
 
 	// simple sub-string extraction
 	SStringW Mid(int nFirst) const;

@@ -1137,4 +1137,9 @@ SStringW::SStringW()
 	Init();
 }
 
+void SStringW::Release(THIS)
+{
+	delete this;
+}
+
 SNSEND
