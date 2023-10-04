@@ -1507,7 +1507,7 @@ void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
         line_join,
         line_bottom,
 		line_root,
-    }; // 9 line states
+    }; // 10 line states
     CRect rcLine = rc;
     rcLine.right = rcLine.left + nIndent;
     SPOSITION pos = lstParent.GetHeadPosition();
@@ -1524,7 +1524,7 @@ void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     BOOL hasNextSibling = m_adapter->GetNextSiblingItem(hItem) != 0;
     BOOL hasPervSibling = m_adapter->GetPrevSiblingItem(hItem) != 0;
     BOOL hasChild = m_adapter->HasChildren(hItem);
-	bool hasParent = m_adapter->GetParentItem(hItem) != 0;
+	bool hasParent = m_adapter->GetParentItem(hItem) != STVI_ROOT;
     int iLine = -1;
     if (hasChild)
     { // test if is collapsed
