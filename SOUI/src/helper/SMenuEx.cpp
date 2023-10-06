@@ -1394,4 +1394,14 @@ ULONG_PTR SMenuEx::GetMenuUserData(THIS_ UINT uPosition, UINT uFlags)
     return pItemRef->GetUserData();
 }
 
+BOOL SMenuEx::GetMenuString(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString)
+{
+	SWindow *pItemRef = FindItem(uPosition, uFlags);
+	if (!pItemRef)
+		return FALSE;
+	SStringT strText = pItemRef->GetWindowText();
+	lpItemString->Copy(&strText);
+	return TRUE;
+}
+
 SNSEND

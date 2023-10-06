@@ -190,6 +190,15 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
      * @return hmenu
      */
     STDMETHOD_(HMENU, GetSubMenu)(THIS_ int nPos) PURE;
+
+    /**
+     * @brief get menu text
+	 * @param uPosition pos
+	 * @param uFlags
+	 * @param lpItemString output string
+     * @return BOOL
+     */
+	STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) PURE;
 };
 
 SNSEND

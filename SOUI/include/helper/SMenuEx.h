@@ -131,6 +131,7 @@ class SOUI_EXP SMenuEx
 
     STDMETHOD_(IMenuEx *, GetSubMenu)(THIS_ int nPos) OVERRIDE;
 
+	STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) OVERRIDE;
   public:
     static void EndMenu(int nCmdId = 0);
 

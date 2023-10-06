@@ -280,6 +280,7 @@ class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
 
     STDMETHOD_(HMENU, GetSubMenu)(THIS_ int nPos) OVERRIDE;
 
+	STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) OVERRIDE;
   protected:
     void UpdateScale(int nScale);
     void BuildMenu(HMENU menuPopup, SXmlNode xmlNode);
