@@ -88,8 +88,8 @@ class SOUI_EXP SFontPool : public SCmnMap<IFontPtr, FontInfo> {
      *
      * Describe  描述字符串格式如：face:宋体,bold:0,italic:1,underline:1,strike:1,adding:10
      */
-    IFontPtr GetFont(const SStringW &strFont, int scale);
-    void SetDefFontInfo(const SStringW &strFontInfo);
+    static IFontPtr GetFont(const SStringW &strFont, int scale);
+    static void SetDefFontInfo(const SStringW &strFontInfo);
 
   protected:
     static void OnKeyRemoved(const IFontPtr &obj);
