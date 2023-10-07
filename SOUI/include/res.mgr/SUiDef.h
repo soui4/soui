@@ -200,16 +200,36 @@ class SOUI_EXP SUiDef
     SStringW GetFontDesc(int idx);
 
   public:
+    /**
+     * GetFont
+     * @brief    获得与指定的strFont对应的IFontPtr
+     * @param    const SStringW & strFont --  font描述字符串
+     * @param scale 放大倍数
+     * @return   IFontPtr -- font对象
+     *
+     * Describe  描述字符串格式如：face:宋体,bold:0,italic:1,underline:1,strike:1,adding:10
+     */
+
     IFontPtr GetFont(const SStringW &strFont, int scale);
 
+    /**
+     * @brief 设置默认字体
+     * @param strFontInfo 默认字体描述
+     */
     void SetDefFontInfo(const SStringW &strFontInfo);
+
+    /**
+     * @brief 获取默认字体信息
+     * @return FontInfo 字体信息
+     */
+    FontInfo GetDefFontInfo() const;
 
   protected:
     SAutoRefPtr<IUiDefInfo> m_defUiDefInfo;
     SList<IUiDefInfo *> m_lstUiDefInfo;
     SList<ISkinPool *> m_lstSkinPools;
     SAutoRefPtr<ISkinPool> m_bulitinSkinPool;
-    SCriticalSection m_cs;
+    mutable SCriticalSection m_cs;
 };
 
 SNSEND

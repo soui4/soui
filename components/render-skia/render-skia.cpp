@@ -2364,6 +2364,8 @@ namespace SOUI
 		SStringW str=S_CT2W(SStringT(pszText,nLen));
 		paint.getTextPath((LPCWSTR)str,str.GetLength()*2,0.0f,0.0f,&path);
 #endif
+		SkRect rcBound=path.getBounds();
+		path.offset(-rcBound.fLeft,-rcBound.fTop);
 		m_skPath.addPath(path,x,y,SkPath::kAppend_AddPathMode);
 	}
 

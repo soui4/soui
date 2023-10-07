@@ -633,4 +633,10 @@ void SUiDef::SetDefFontInfo(const SStringW &strFontInfo)
     SFontPool::_SetDefFontInfo(strFontInfo);
 }
 
+FontInfo SUiDef::GetDefFontInfo() const
+{
+    SAutoLock lock(m_cs);
+    return SFontPool::_GetDefFontInfo();
+}
+
 SNSEND

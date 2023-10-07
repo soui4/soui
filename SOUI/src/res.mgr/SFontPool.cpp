@@ -138,7 +138,7 @@ IFontPtr SFontPool::_CreateFont(const FontInfo &fontInfo)
     return ret;
 }
 
-const FontInfo &SFontPool::GetDefFontInfo() const
+const FontInfo &SFontPool::_GetDefFontInfo() const
 {
     return m_defFontInfo;
 }
@@ -279,6 +279,11 @@ IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
 void SFontPool::SetDefFontInfo(const SStringW &strFontInfo)
 {
     return GETUIDEF->SetDefFontInfo(strFontInfo);
+}
+
+FontInfo SFontPool::GetDefFontInfo()
+{
+    return GETUIDEF->GetDefFontInfo();
 }
 
 SNSEND

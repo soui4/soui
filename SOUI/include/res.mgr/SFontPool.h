@@ -75,21 +75,56 @@ typedef BOOL (*FunFontCheck)(const SStringW &strFontName);
  */
 class SOUI_EXP SFontPool : public SCmnMap<IFontPtr, FontInfo> {
   public:
+    /**
+     * @brief 设置检查字体的回调函数
+     * @param fontCheck  检查字体的回调函数
+     */
     static void SetFontChecker(FunFontCheck fontCheck);
+
+    /**
+     * @brief 检查一个字体是否有效
+     * @param strFontName 字体名
+     * @return TRUE-有效
+     */
     static BOOL CheckFont(const SStringW &strFontName);
+
+    /**
+     * @brief 将字体描述转换为FontInfo
+     * @param strFontInfo 字体描述
+     * @param defFontInfo 默认字体的FontInfo
+     * @return FontInfo
+     */
     static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo &defFontInfo);
+
+    /**
+     * @brief 将FontInfo转换为字体描述
+     * @param fi FontInfo
+     * @return 字体描述
+     */
     static SStringW FontInfoToString(const FontInfo &fi);
 
     /**
      * GetFont
      * @brief    获得与指定的strFont对应的IFontPtr
      * @param    const SStringW & strFont --  font描述字符串
+     * @param scale 放大倍数
      * @return   IFontPtr -- font对象
      *
      * Describe  描述字符串格式如：face:宋体,bold:0,italic:1,underline:1,strike:1,adding:10
      */
     static IFontPtr GetFont(const SStringW &strFont, int scale);
+
+    /**
+     * @brief 设置默认字体
+     * @param strFontInfo 默认字体描述
+     */
     static void SetDefFontInfo(const SStringW &strFontInfo);
+
+    /**
+     * @brief 获取默认字体信息
+     * @return FontInfo 字体信息
+     */
+    static FontInfo GetDefFontInfo();
 
   protected:
     static void OnKeyRemoved(const IFontPtr &obj);
@@ -98,17 +133,9 @@ class SOUI_EXP SFontPool : public SCmnMap<IFontPtr, FontInfo> {
     SFontPool(IRenderFactory *fac);
 
   protected:
-    const FontInfo &GetDefFontInfo() const;
+    const FontInfo &_GetDefFontInfo() const;
     void SetRenderFactory(IRenderFactory *fac);
 
-    /**
-     * GetFont
-     * @brief    获得与指定的strFont对应的IFontPtr
-     * @param    const SStringW & strFont --  font描述字符串
-     * @return   IFontPtr -- font对象
-     *
-     * Describe  描述字符串格式如：face:宋体,bold:0,italic:1,underline:1,strike:1,adding:10
-     */
     IFontPtr _GetFont(const SStringW &strFont, int scale);
     void _SetDefFontInfo(const SStringW &strFontInfo);
 
