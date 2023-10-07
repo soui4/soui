@@ -774,9 +774,11 @@ void SListView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     {
         EnsureVisible(nNewSelItem);
         SetSel(nNewSelItem, TRUE);
-	}else{
-		SetMsgHandled(FALSE);
-	}
+    }
+    else
+    {
+        SetMsgHandled(FALSE);
+    }
 }
 
 void SListView::EnsureVisible(int iItem)

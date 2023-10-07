@@ -164,14 +164,14 @@ DECLARE_INTERFACE_(IMenuEx, IObjRef)
      */
     STDMETHOD_(IMenuEx *, GetSubMenu)(THIS_ int nPos) PURE;
 
-	/**
+    /**
      * @brief get menu text
-	 * @param uPosition pos
-	 * @param uFlags
-	 * @param lpItemString output string
+     * @param uPosition pos
+     * @param uFlags
+     * @param lpItemString output string
      * @return BOOL
      */
-	STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) PURE;
+    STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) PURE;
 };
 
 EXTERN_C void SOUI_EXP EndMenuEx(int nCmdId);

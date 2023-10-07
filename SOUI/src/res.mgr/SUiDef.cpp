@@ -624,13 +624,13 @@ ISkinPool *SUiDef::CreateSkinPool(BOOL bAutoScale)
 IFontPtr SUiDef::GetFont(const SStringW &strFont, int scale)
 {
     SAutoLock lock(m_cs);
-    return SFontPool::GetFont(strFont, scale);
+    return SFontPool::_GetFont(strFont, scale);
 }
 
 void SUiDef::SetDefFontInfo(const SStringW &strFontInfo)
 {
     SAutoLock lock(m_cs);
-    SFontPool::SetDefFontInfo(strFontInfo);
+    SFontPool::_SetDefFontInfo(strFontInfo);
 }
 
 SNSEND

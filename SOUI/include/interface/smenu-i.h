@@ -193,12 +193,12 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
 
     /**
      * @brief get menu text
-	 * @param uPosition pos
-	 * @param uFlags
-	 * @param lpItemString output string
+     * @param uPosition pos
+     * @param uFlags
+     * @param lpItemString output string
      * @return BOOL
      */
-	STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) PURE;
+    STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) PURE;
 };
 
 SNSEND

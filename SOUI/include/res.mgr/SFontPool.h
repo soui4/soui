@@ -75,18 +75,11 @@ typedef BOOL (*FunFontCheck)(const SStringW &strFontName);
  */
 class SOUI_EXP SFontPool : public SCmnMap<IFontPtr, FontInfo> {
   public:
-    SFontPool(IRenderFactory *fac);
-
-  protected:
-    static void OnKeyRemoved(const IFontPtr &obj);
-
-  public:
     static void SetFontChecker(FunFontCheck fontCheck);
     static BOOL CheckFont(const SStringW &strFontName);
     static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo &defFontInfo);
     static SStringW FontInfoToString(const FontInfo &fi);
 
-  public:
     /**
      * GetFont
      * @brief    获得与指定的strFont对应的IFontPtr
@@ -95,12 +88,30 @@ class SOUI_EXP SFontPool : public SCmnMap<IFontPtr, FontInfo> {
      *
      * Describe  描述字符串格式如：face:宋体,bold:0,italic:1,underline:1,strike:1,adding:10
      */
-    virtual IFontPtr GetFont(const SStringW &strFont, int scale);
-    virtual void SetDefFontInfo(const SStringW &strFontInfo);
+    IFontPtr GetFont(const SStringW &strFont, int scale);
+    void SetDefFontInfo(const SStringW &strFontInfo);
+
+  protected:
+    static void OnKeyRemoved(const IFontPtr &obj);
+
+  protected:
+    SFontPool(IRenderFactory *fac);
+
+  protected:
     const FontInfo &GetDefFontInfo() const;
     void SetRenderFactory(IRenderFactory *fac);
 
-  protected:
+    /**
+     * GetFont
+     * @brief    获得与指定的strFont对应的IFontPtr
+     * @param    const SStringW & strFont --  font描述字符串
+     * @return   IFontPtr -- font对象
+     *
+     * Describe  描述字符串格式如：face:宋体,bold:0,italic:1,underline:1,strike:1,adding:10
+     */
+    IFontPtr _GetFont(const SStringW &strFont, int scale);
+    void _SetDefFontInfo(const SStringW &strFontInfo);
+
     IFontPtr _CreateFont(const FontInfo &fontInfo);
     void _SetDefFontInfo(const FontInfo &fontInfo);
 

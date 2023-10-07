@@ -887,7 +887,7 @@ void STreeCtrl::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
         line,
         line_join,
         line_bottom,
-		line_root,
+        line_root,
     }; // 10 line states
     CRect rcLine = rc;
     rcLine.right = rcLine.left + m_nIndent;
@@ -905,7 +905,7 @@ void STreeCtrl::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     bool hasNextSibling = GetNextSiblingItem(hItem) != 0;
     bool hasPervSibling = GetPrevSiblingItem(hItem) != 0;
     bool hasChild = GetChildItem(hItem) != 0;
-	bool hasParent = GetParentItem(hItem) != 0;
+    bool hasParent = GetParentItem(hItem) != 0;
     int iLine = -1;
     if (hasChild)
     { // test if is collapsed
@@ -931,12 +931,12 @@ void STreeCtrl::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     else
     {
         if (hasNextSibling)
-		{
-			if(!hasParent && !hasPervSibling)
-				iLine = line_root;
-			else
-				iLine = line_join;
-		}
+        {
+            if (!hasParent && !hasPervSibling)
+                iLine = line_root;
+            else
+                iLine = line_join;
+        }
         else
             iLine = line_bottom;
     }

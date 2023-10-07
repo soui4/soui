@@ -1925,7 +1925,7 @@ void SHostWnd::ShowHostWnd(THIS_ int nShowCmd, BOOL bWaitAniDone)
         SApplication::getSingletonPtr()->GetMsgLoopFactory()->CreateMsgLoop(&msgLoop, GetMsgLoop());
         for (; m_AniState & Ani_win;)
         {
-            if(!msgLoop->WaitMsg())
+            if (!msgLoop->WaitMsg())
                 break;
             msgLoop->HandleMsg();
         }

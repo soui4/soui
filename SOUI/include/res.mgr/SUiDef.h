@@ -200,9 +200,9 @@ class SOUI_EXP SUiDef
     SStringW GetFontDesc(int idx);
 
   public:
-    IFontPtr GetFont(const SStringW &strFont, int scale) override;
+    IFontPtr GetFont(const SStringW &strFont, int scale);
 
-    void SetDefFontInfo(const SStringW &strFontInfo) override;
+    void SetDefFontInfo(const SStringW &strFontInfo);
 
   protected:
     SAutoRefPtr<IUiDefInfo> m_defUiDefInfo;

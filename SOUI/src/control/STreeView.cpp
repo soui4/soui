@@ -767,9 +767,11 @@ void STreeView::OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags)
     {
         EnsureVisible(nNewSelItem);
         SetSel(nNewSelItem, TRUE);
-	}else{
-		SetMsgHandled(FALSE);
-	}
+    }
+    else
+    {
+        SetMsgHandled(FALSE);
+    }
 }
 
 LRESULT STreeView::OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -1506,7 +1508,7 @@ void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
         line,
         line_join,
         line_bottom,
-		line_root,
+        line_root,
     }; // 10 line states
     CRect rcLine = rc;
     rcLine.right = rcLine.left + nIndent;
@@ -1524,7 +1526,7 @@ void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     BOOL hasNextSibling = m_adapter->GetNextSiblingItem(hItem) != 0;
     BOOL hasPervSibling = m_adapter->GetPrevSiblingItem(hItem) != 0;
     BOOL hasChild = m_adapter->HasChildren(hItem);
-	bool hasParent = m_adapter->GetParentItem(hItem) != STVI_ROOT;
+    bool hasParent = m_adapter->GetParentItem(hItem) != STVI_ROOT;
     int iLine = -1;
     if (hasChild)
     { // test if is collapsed
@@ -1550,12 +1552,12 @@ void STreeView::DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     else
     {
         if (hasNextSibling)
-		{
-			if(!hasParent && !hasPervSibling)
-				iLine = line_root;
-			else
-				iLine = line_join;
-		}
+        {
+            if (!hasParent && !hasPervSibling)
+                iLine = line_root;
+            else
+                iLine = line_join;
+        }
         else
             iLine = line_bottom;
     }

@@ -77,7 +77,7 @@ static const WCHAR KFontWeight[] = L"weight";
 static const WCHAR KFontEscapement[] = L"escapement";
 const static WCHAR KDefFontFace[] = L"宋体";
 
-IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
+IFontPtr SFontPool::_GetFont(const SStringW &strFont, int scale)
 {
     SStringW strFontDesc = GETUIDEF->GetFontDesc(strFont);
     FontInfo info = FontInfoFromString(strFontDesc, m_defFontInfo);
@@ -150,7 +150,7 @@ void SFontPool::_SetDefFontInfo(const FontInfo &fontInfo)
     SHostMgr::getSingletonPtr()->DispatchMessage(UM_UPDATEFONT);
 }
 
-void SFontPool::SetDefFontInfo(const SStringW &strFontInfo)
+void SFontPool::_SetDefFontInfo(const SStringW &strFontInfo)
 {
     if (strFontInfo.IsEmpty())
         return;
@@ -269,6 +269,16 @@ SStringW SFontPool::FontInfoToString(const FontInfo &fi)
     s << KFontEscapement << KPropSeprator << fi.style.attr.fEscapement;
 
     return S_CA2W(szBuf);
+}
+
+IFontPtr SFontPool::GetFont(const SStringW &strFont, int scale)
+{
+    return GETUIDEF->GetFont(strFont, scale);
+}
+
+void SFontPool::SetDefFontInfo(const SStringW &strFontInfo)
+{
+    return GETUIDEF->SetDefFontInfo(strFontInfo);
 }
 
 SNSEND

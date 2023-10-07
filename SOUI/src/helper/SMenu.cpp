@@ -626,15 +626,15 @@ HMENU SMenu::GetSubMenu(THIS_ int nPos)
     return ::GetSubMenu(m_hMenu, nPos);
 }
 
-BOOL SMenu::GetMenuString(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString)
+BOOL SMenu::GetMenuString(THIS_ UINT uPosition, UINT uFlags, IStringT *lpItemString)
 {
-	MENUITEMINFO mi = { sizeof(mi), 0 };
-	mi.fMask = MIIM_DATA;
-	if (!::GetMenuItemInfo(m_hMenu, uPosition, uFlags & MF_BYPOSITION, &mi))
-		return FALSE;
-	SMenuItemData *pItemData = (SMenuItemData *)mi.dwItemData;
-	lpItemString->Copy(&pItemData->strText);
-	return TRUE;
+    MENUITEMINFO mi = { sizeof(mi), 0 };
+    mi.fMask = MIIM_DATA;
+    if (!::GetMenuItemInfo(m_hMenu, uPosition, uFlags & MF_BYPOSITION, &mi))
+        return FALSE;
+    SMenuItemData *pItemData = (SMenuItemData *)mi.dwItemData;
+    lpItemString->Copy(&pItemData->strText);
+    return TRUE;
 }
 
 SNSEND
