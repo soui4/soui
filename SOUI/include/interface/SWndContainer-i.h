@@ -99,12 +99,6 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
     STDMETHOD_(IScriptModule *, GetScriptModule)(THIS) PURE;
 
     /**
-     * @brief 获取光标对象
-     * @return ICaret *--光标对象
-     */
-    STDMETHOD_(ICaret *, GetCaret)(THIS) PURE;
-
-    /**
      * @brief 获取宿主窗口HWND
      * @return HWND--宿主窗口HWND
      */

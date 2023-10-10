@@ -29,6 +29,7 @@ typedef enum _SOUI_EVENTS
     EVT_INIT = 8000,
     EVT_EXIT,
     EVT_TIMER,
+    EVT_GET_CARET,
 
     //基本窗口事件
     EVT_SETFOCUS = 8100,
@@ -286,6 +287,8 @@ DEF_EVT(EventTimer, EVT_TIMER, on_timer, {
     UINT uID;
     LPARAM uData;
 })
+
+DEF_EVT(EventGetCaret, EVT_GET_CARET, on_get_caret, { IStringW *strCaret; })
 
 DEF_EVT(EventScroll, EVT_SCROLL, on_scroll, {
     int nSbCode;

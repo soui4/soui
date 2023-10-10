@@ -1285,3 +1285,9 @@ void CMainDlg::OnShellTrayNotify(IEvtArgs * e)
 		break;
 	}
 }
+
+void CMainDlg::OnGetCaret(IEvtArgs* e)
+{
+	EventGetCaret *e2=sobj_cast<EventGetCaret>(e);
+	e2->strCaret->Assign(L"<caret color=\"rgb(0,0,255)\" animate=\"true\" fadeTime=\"20\" showTime=\"10\" interpolator=\"Accelerate\"/>");
+}

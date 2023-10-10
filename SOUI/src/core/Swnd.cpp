@@ -8,6 +8,7 @@
 #include "helper/SwndFinder.h"
 #include "helper/STime.h"
 #include "animation/STransformation.h"
+#include "core/SCaret.h"
 
 SNSBEGIN
 
@@ -149,6 +150,7 @@ SWindow::SWindow()
     m_pLayoutParam.Attach(new SouiLayoutParam());
     m_pLayoutParam->SetMatchParent(Both);
 
+    m_evtSet.addEvent(EVENTID(EventGetCaret));
     m_evtSet.addEvent(EVENTID(EventSwndCreate));
     m_evtSet.addEvent(EVENTID(EventSwndInitFinish));
     m_evtSet.addEvent(EVENTID(EventSwndDestroy));
@@ -1329,9 +1331,9 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     if (m_uZorder >= iZorderBegin && m_uZorder < iZorderEnd && (!pRgn || pRgn->IsEmpty() || _WndRectInRgn(rcClient, pRgn)))
     { // paint client
         _PaintClient(pRT);
-        if (IsFocused())
+        if (IsFocused() && m_caret)
         { // draw caret
-            GetContainer()->GetCaret()->Draw(pRT);
+            m_caret->Draw(pRT);
         }
     }
 
@@ -3028,43 +3030,61 @@ BOOL SWindow::CreateCaret(HBITMAP pBmp, int nWid, int nHeight)
 {
     if (!GetContainer())
         return FALSE;
-    return GetContainer()->GetCaret()->Init(pBmp, nWid, nHeight);
+    if (!m_caret)
+    {
+        m_caret.Attach(new SCaret(GetContainer()));
+        SStringW strCaret;
+        EventGetCaret evt(this);
+        evt.strCaret = &strCaret;
+        FireEvent(&evt);
+        SXmlNode xmlCaret;
+        SXmlDoc xmlDoc;
+        if (!strCaret.IsEmpty())
+        {
+            if (xmlDoc.load_buffer_inplace(strCaret.GetBuffer(), strCaret.GetLength() * sizeof(wchar_t), xml_parse_default, enc_utf16))
+                xmlCaret = xmlDoc.root().child(L"caret");
+            strCaret.ReleaseBuffer();
+        }
+        if (!xmlCaret)
+        {
+            xmlCaret = GETUIDEF->GetUiDef()->GetCaretInfo();
+        }
+        m_caret->InitFromXml(&xmlCaret);
+    }
+    return m_caret->Init(pBmp, nWid, nHeight);
 }
 
 void SWindow::ShowCaret(BOOL bShow)
 {
-    if (!GetContainer())
+    if (!m_caret)
         return;
-
-    ICaret *pCaret = GetContainer()->GetCaret();
-    if (pCaret->SetVisible(bShow, m_swnd))
+    if (m_caret->SetVisible(bShow, m_swnd))
     {
-        CRect rcCaret = pCaret->GetRect();
+        CRect rcCaret = m_caret->GetRect();
         InvalidateRect(rcCaret);
     }
 }
 
 void SWindow::SetCaretPos(int x, int y)
 {
-    if (!GetContainer())
+    if (!m_caret)
         return;
 
-    ICaret *pCaret = GetContainer()->GetCaret();
-    if (pCaret->IsVisible())
+    if (m_caret->IsVisible())
     {
         {
-            CRect rcCaret = pCaret->GetRect();
+            CRect rcCaret = m_caret->GetRect();
             InvalidateRect(rcCaret);
         }
-        pCaret->SetPosition(x, y);
+        m_caret->SetPosition(x, y);
         {
-            CRect rcCaret = pCaret->GetRect();
+            CRect rcCaret = m_caret->GetRect();
             InvalidateRect(rcCaret);
         }
     }
     else
     {
-        pCaret->SetPosition(x, y);
+        m_caret->SetPosition(x, y);
     }
 }
 

@@ -16,7 +16,6 @@
 
 #include <core/SDropTargetDispatcher.h>
 #include <core/SFocusManager.h>
-#include <core/SCaret.h>
 #include <core/STimerlineHandlerMgr.h>
 
 SNSBEGIN
@@ -76,8 +75,6 @@ class SOUI_EXP SwndContainerImpl
 
     //重建窗口树的zorder
     STDMETHOD_(void, BuildWndTreeZorder)(THIS) OVERRIDE;
-
-    STDMETHOD_(ICaret *, GetCaret)(THIS) OVERRIDE;
 
     STDMETHOD_(BOOL, RegisterVideoCanvas)(THIS_ SWND swnd) OVERRIDE;
 

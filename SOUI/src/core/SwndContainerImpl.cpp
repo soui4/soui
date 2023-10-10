@@ -18,12 +18,6 @@ SwndContainerImpl::SwndContainerImpl()
     , m_bZorderDirty(TRUE)
     , m_pRoot(NULL)
 {
-    m_caret.Attach(new SCaret(this));
-    SXmlNode xmlCaret = GETUIDEF->GetUiDef()->GetCaretInfo();
-    if (xmlCaret)
-    {
-        m_caret->InitFromXml(&xmlCaret);
-    }
 }
 
 void SwndContainerImpl::SetRoot(SWindow *pRoot)
@@ -472,11 +466,6 @@ void SwndContainerImpl::BuildWndTreeZorder()
         _BuildWndTreeZorder(m_pRoot, uInitZorder);
         m_bZorderDirty = FALSE;
     }
-}
-
-ICaret *SwndContainerImpl::GetCaret()
-{
-    return m_caret;
 }
 
 void SwndContainerImpl::_BuildWndTreeZorder(IWindow *pWnd, UINT &iOrder)
