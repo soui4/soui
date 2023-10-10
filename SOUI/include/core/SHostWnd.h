@@ -159,7 +159,7 @@ class SOUI_EXP SHostWnd
     friend class SDummyWnd;
     friend class SRootWindow;
     friend class SNcPainter;
-
+	DEF_SOBJECT(SNativeWnd, L"SHostWnd")
   protected:
     SDummyWnd *m_dummyWnd;   /**<半透明窗口使用的一个响应WM_PAINT消息的窗口*/
     SHostWndAttr m_hostAttr; /**<host属性，对应XML中的SOUI结点 */

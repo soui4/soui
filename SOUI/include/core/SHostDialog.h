@@ -23,6 +23,7 @@
 SNSBEGIN
 
 class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
+	DEF_SOBJECT(SHostWnd, L"SHostDialog")
   public:
     SHostDialog(LPCWSTR pszXmlName = NULL);
     SHostDialog(LPCSTR pszXmlName);
