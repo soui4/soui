@@ -26,10 +26,10 @@
 
 [!if CHECKBOX_USE_LUA]
 #ifdef _DEBUG
-#pragma comment(lib,"lua-52d")
+#pragma comment(lib,"lua-54d")
 #pragma comment(lib,"scriptmodule-luad")
 #else
-#pragma comment(lib,"lua-52")
+#pragma comment(lib,"lua-54")
 #pragma comment(lib,"scriptmodule-lua")
 #endif
 [!endif]
