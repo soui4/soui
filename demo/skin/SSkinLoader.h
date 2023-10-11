@@ -11,14 +11,10 @@ namespace SOUI
 		SAutoRefPtr<IResProvider> m_pResProvider; 
 		SAutoRefPtr<ISkinPool>  m_privateSkinPool;
 		SApplication *m_theApp;
-// 		BOOL CreateResProvider_ZIP(IObjRef **ppObj)
-// 		{
-// 			return RESPROVIDER_ZIP::SCreateInstance(ppObj);
-// 		}
 	public:
 		SSkinLoader(SApplication*);
 		~SSkinLoader();
-		void LoadSkinFormZip(SStringT respath, const TCHAR *strXmlSkin=_T("LoadSkinXml"));
-		void LoadSkin(SStringT respath,const TCHAR *strXmlSkin = _T("LoadSkinXml"));
+		void LoadSkinFormZip(SStringT respath, const TCHAR *strXmlSkin=_T("SkinXml:LoadSkinXml"));
+		void LoadSkin(SStringT respath,const TCHAR *strXmlSkin = _T("SkinXml:LoadSkinXml"));
 	};
 }//END SOUI
