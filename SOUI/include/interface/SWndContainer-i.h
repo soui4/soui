@@ -266,6 +266,8 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @return BOOL
      */
     STDMETHOD_(BOOL, UnregisterVideoCanvas)(THIS_ SWND swnd) PURE;
+
+	STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) PURE;
 };
 
 SNSEND

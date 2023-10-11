@@ -363,6 +363,11 @@ void SOsrPanel::OnUpdateCursor()
     m_pHostProxy->GetHostContainer()->OnUpdateCursor();
 }
 
+void SOsrPanel::EnableHostPrivateUiDef(THIS_ BOOL bEnable)
+{
+	return m_pHostProxy->GetHostContainer()->EnableHostPrivateUiDef(bEnable);
+}
+
 BOOL SOsrPanel::IsItemInClip(const SMatrix &mtx, const CRect &rcClip, const IRegionS *clipRgn, const CRect &rcItem)
 {
     if (!mtx.isIdentity()) // don't clip any item if matrix is not identify.

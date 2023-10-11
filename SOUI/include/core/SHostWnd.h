@@ -175,7 +175,7 @@ class SOUI_EXP SHostWnd
     SAutoRefPtr<IRegionS> m_rgnInvalidate;      /**<脏区域*/
     SAutoRefPtr<IRenderTarget> m_memRT;         /**<绘制缓存*/
     SAutoRefPtr<IUiDefInfo> m_privateUiDefInfo; /** 局部uidefinfo*/
-
+	int                     m_cEnableUiDefCount;/** 局部uidefinfo enable count*/
     SAutoRefPtr<IScriptModule> m_pScriptModule; /**<脚本模块*/
     SAutoRefPtr<SNcPainter> m_pNcPainter;       /**<非客户区绘制模块*/
 
@@ -450,6 +450,7 @@ class SOUI_EXP SHostWnd
 
     STDMETHOD_(BOOL, RegisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
+	STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
 
     // STDMETHOD_(IMessageLoop *, GetMsgLoop)(); same as IHostWnd::GetMsgLoop
 
