@@ -1341,4 +1341,6 @@ typedef IPathS IPath;
 #endif //__cplusplus
 
 SNSEND
+typedef BOOL (*FontFallback)(LPCSTR u8FontName, wchar_t text, char u8FontNameFallback[100], int *charset);
+
 #endif // __SRENDER_I__H__

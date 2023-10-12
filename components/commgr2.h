@@ -324,6 +324,10 @@ public:
 	}
 #endif
 
+	HMODULE GetRenderModule(){
+		return NULL;
+	}
+
 	SStringT m_strImgDecoder;
 };
 
@@ -417,6 +421,10 @@ public:
 	BOOL CreateHttpClient(IObjRef **ppObj)
 	{
 		return httpClientLoader.CreateInstance(m_strDllPath + COM_HTTPCLIENT, ppObj);
+	}
+
+	HMODULE GetRenderModule(){
+		return renderLoader.GetModule();
 	}
 protected:
     //SComLoader实现从DLL的指定函数创建符号SOUI要求的类COM组件。

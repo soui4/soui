@@ -34,6 +34,10 @@ public:
         }
         return m_funCreateInst(ppObj);
     }
+
+	HMODULE GetModule(){
+		return m_hMod;
+	}
 protected:
     HMODULE m_hMod;
     funSCreateInstance m_funCreateInst;

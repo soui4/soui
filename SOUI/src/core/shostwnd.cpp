@@ -294,6 +294,14 @@ void SRootWindow::FireMenuCmd(int menuID)
 //////////////////////////////////////////////////////////////////////////
 // SHostWnd
 //////////////////////////////////////////////////////////////////////////
+
+BOOL SHostWnd::s_HideLocalUiDef = TRUE;
+
+void SHostWnd::SetHideLocalUiDef(BOOL bHide)
+{
+    s_HideLocalUiDef = bHide;
+}
+
 SHostWnd::SHostWnd(LPCWSTR pszResName /*= NULL*/)
 {
     if (pszResName)
@@ -320,7 +328,7 @@ void SHostWnd::_Init()
     m_hostAnimationHandler.m_pHostWnd = this;
     m_evtHandler.fun = NULL;
     m_evtHandler.ctx = NULL;
-	m_cEnableUiDefCount = 0;
+    m_cEnableUiDefCount = 0;
 }
 
 SHostWnd::~SHostWnd()
@@ -367,14 +375,16 @@ void SHostWnd::EnablePrivateUiDef(THIS_ BOOL bEnable)
 {
     if (!m_privateUiDefInfo)
         return;
-	if(bEnable)
-	{		
-		if(++m_cEnableUiDefCount == 1)
-			GETUIDEF->PushUiDefInfo(m_privateUiDefInfo, TRUE);
-	}else{
-		if(--m_cEnableUiDefCount == 0)
-			GETUIDEF->PopUiDefInfo(m_privateUiDefInfo, TRUE);
-	}
+    if (bEnable)
+    {
+        if (++m_cEnableUiDefCount == 1)
+            GETUIDEF->PushUiDefInfo(m_privateUiDefInfo, TRUE);
+    }
+    else
+    {
+        if (--m_cEnableUiDefCount == 0)
+            GETUIDEF->PopUiDefInfo(m_privateUiDefInfo, TRUE);
+    }
 }
 
 BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
@@ -389,7 +399,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         return FALSE;
 
     m_privateUiDefInfo = NULL;
-	m_cEnableUiDefCount = 0;
+    m_cEnableUiDefCount = 0;
     IUiDefInfo *pUiDefInfo = SUiDef::CreateUiDefInfo();
     if (pUiDefInfo->Init2(pNode, FALSE))
     { // init private uidef info.
@@ -648,7 +658,8 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         xmlChild = xmlChild.next_sibling();
     }
 
-    EnablePrivateUiDef(FALSE);
+    if (s_HideLocalUiDef)
+        EnablePrivateUiDef(FALSE);
 
     return TRUE;
 }
@@ -829,8 +840,12 @@ void SHostWnd::OnDestroy()
             GetMsgLoop()->RemoveIdleHandler(pIdleHandler);
         m_pScriptModule = NULL;
     }
+
+    if (!s_HideLocalUiDef)
+        EnablePrivateUiDef(FALSE);
+    SASSERT(m_cEnableUiDefCount == 0);
     m_privateUiDefInfo = NULL;
-	m_cEnableUiDefCount = 0;
+
     m_memRT = NULL;
     m_rgnInvalidate = NULL;
 
@@ -1973,7 +1988,7 @@ LRESULT SHostWnd::OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp)
 
 void SHostWnd::EnableHostPrivateUiDef(THIS_ BOOL bEnable)
 {
-	EnablePrivateUiDef(bEnable);
+    EnablePrivateUiDef(bEnable);
 }
 
 //////////////////////////////////////////////////////////////////

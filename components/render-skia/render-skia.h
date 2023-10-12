@@ -502,3 +502,4 @@ namespace RENDER_SKIA
 SNSEND
 
 EXTERN_C BOOL SOUI_COM_API Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory);
+EXTERN_C void SOUI_COM_API Render_Skia_SetFontFallback(FontFallback fontFallback);

@@ -2574,3 +2574,28 @@ EXTERN_C BOOL Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory)
 {
 	return SOUI::RENDER_SKIA::SCreateInstance(ppRenderFactory);
 }
+
+static FontFallback s_fontFallback=NULL;
+SkTypeface * SkiaFontFallback(SkTypeface * font,wchar_t text){
+	if(!s_fontFallback)
+		return NULL;
+	SkString curFontName;
+	font->getFamilyName(&curFontName);
+
+	char fontName[100]={0};
+	int nCharSet = DEFAULT_CHARSET;
+	if(!s_fontFallback(curFontName.c_str(),text,fontName,&nCharSet))
+		return NULL;
+	return SkTypeface::CreateFromName(fontName,font->style(),nCharSet);
+}
+
+
+EXTERN_C void Render_Skia_SetFontFallback(FontFallback fontFallback)
+{
+	s_fontFallback = fontFallback;
+	if(fontFallback){
+		SkTextLayoutEx::SetFontFallback(SkiaFontFallback);
+	}else{
+		SkTextLayoutEx::SetFontFallback(NULL);
+	}
+}

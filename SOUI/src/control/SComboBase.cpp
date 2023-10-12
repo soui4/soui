@@ -353,7 +353,7 @@ SWindow *SComboBase::GetDropDownOwner()
 static const wchar_t *KAttrTrCtx = L"trCtx";
 void SComboBase::OnCreateDropDown(SDropDownWnd *pDropDown)
 {
-	GetContainer()->EnableHostPrivateUiDef(TRUE);
+    GetContainer()->EnableHostPrivateUiDef(TRUE);
     SXmlNode xmlDropdownStyleNode = m_xmlDropdownStyle.root().child(KStyle_Dropdown);
     if (xmlDropdownStyleNode)
     {
@@ -367,7 +367,7 @@ void SComboBase::OnCreateDropDown(SDropDownWnd *pDropDown)
     {
         pDropDown->GetHostAttr().SetTrCtx(GetTrCtx());
     }
-	GetContainer()->EnableHostPrivateUiDef(FALSE);
+    GetContainer()->EnableHostPrivateUiDef(FALSE);
     m_dwBtnState = WndState_PushDown;
     CRect rcBtn;
     GetDropBtnRect(&rcBtn);

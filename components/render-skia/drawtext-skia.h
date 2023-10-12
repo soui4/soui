@@ -4,6 +4,8 @@
 #include <core/SkCanvas.h>
 #include <core/sktdarray.h>
 
+typedef SkTypeface * (*FunFontFallback)(SkTypeface * font,wchar_t buf);
+
 class SkTextLayoutEx {
 public:
     //not support for DT_PREFIXONLY
@@ -11,6 +13,7 @@ public:
 
     SkRect draw(SkCanvas* canvas);
 
+	static void SetFontFallback(FunFontFallback fun);
 private:
     SkScalar drawLineEndWithEllipsis(SkCanvas *canvas, SkScalar x, SkScalar y, int iBegin,int iEnd,SkScalar maxWidth);
 
@@ -32,6 +35,8 @@ private:
     UINT            m_uFormat;    //显示标志
     SkRect          m_rcBound;    //限制矩形
     SkPaint  *m_paint;
+
+	static FunFontFallback s_fontFallback;
 };
 
 

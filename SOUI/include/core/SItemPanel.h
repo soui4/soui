@@ -134,7 +134,7 @@ class SOUI_EXP SOsrPanel
 
     STDMETHOD_(void, OnUpdateCursor)() OVERRIDE;
 
-	STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
+    STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
 
   public: // SWindow
     virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);

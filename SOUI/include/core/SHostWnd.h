@@ -175,7 +175,7 @@ class SOUI_EXP SHostWnd
     SAutoRefPtr<IRegionS> m_rgnInvalidate;      /**<脏区域*/
     SAutoRefPtr<IRenderTarget> m_memRT;         /**<绘制缓存*/
     SAutoRefPtr<IUiDefInfo> m_privateUiDefInfo; /** 局部uidefinfo*/
-	int                     m_cEnableUiDefCount;/** 局部uidefinfo enable count*/
+    int m_cEnableUiDefCount;                    /** 局部uidefinfo enable count*/
     SAutoRefPtr<IScriptModule> m_pScriptModule; /**<脚本模块*/
     SAutoRefPtr<SNcPainter> m_pNcPainter;       /**<非客户区绘制模块*/
 
@@ -194,10 +194,16 @@ class SOUI_EXP SHostWnd
     EventHandlerInfo m_evtHandler;
     SAutoRefPtr<IHostPresenter> m_presenter;
 
+    static BOOL s_HideLocalUiDef; /**<隐藏局部uidef对象全局标志  */
   public:
     SHostWnd(LPCWSTR pszResName = NULL);
     SHostWnd(LPCSTR pszResName);
     virtual ~SHostWnd();
+
+    /************************************************************************/
+    /*用来设置是否隐藏窗口的局部布局属性，整个程序只应在窗口初始化前调用一次*/
+    /************************************************************************/
+    static void SetHideLocalUiDef(BOOL bHide);
 
   public:
     enum
@@ -450,7 +456,7 @@ class SOUI_EXP SHostWnd
 
     STDMETHOD_(BOOL, RegisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
-	STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
+    STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
 
     // STDMETHOD_(IMessageLoop *, GetMsgLoop)(); same as IHostWnd::GetMsgLoop
 

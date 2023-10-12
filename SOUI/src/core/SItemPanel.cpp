@@ -365,7 +365,7 @@ void SOsrPanel::OnUpdateCursor()
 
 void SOsrPanel::EnableHostPrivateUiDef(THIS_ BOOL bEnable)
 {
-	return m_pHostProxy->GetHostContainer()->EnableHostPrivateUiDef(bEnable);
+    return m_pHostProxy->GetHostContainer()->EnableHostPrivateUiDef(bEnable);
 }
 
 BOOL SOsrPanel::IsItemInClip(const SMatrix &mtx, const CRect &rcClip, const IRegionS *clipRgn, const CRect &rcItem)
