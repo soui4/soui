@@ -1398,7 +1398,7 @@ namespace SOUI
 		if(cchLen<0) cchLen = _tcslen(pszText);
 		ID2D1Factory *pFac = toD2DFac(m_pRenderFactory);
 		IDWriteFactory *pWriteFac = toD2DWriteFac(m_pRenderFactory);
-		SFont_D2D *pFont = (SFont_D2D*)(IFontS*)m_curFont;
+		SFont_D2D *pFont = m_curFont;
 		const LOGFONT * lf = pFont->LogFont();
 		IDWriteTextFormat *txtFormat = pFont->GetFont();
 		if(uFormat & DT_SINGLELINE) txtFormat->SetWordWrapping(DWRITE_WORD_WRAPPING_NO_WRAP);
