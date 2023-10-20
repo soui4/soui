@@ -27,6 +27,12 @@ CONFIG(debug,debug|release){
 else{
 	LIBS += utilities4.lib soui4.lib
 }
+!LIB_ALL:!COM_LIB{
+}
+else{
+	LIBS += d2d1.lib dwrite.lib
+}
+
 CONFIG(debug,debug|release){
 	LIBS += mhookd.lib smileyd.lib
 }

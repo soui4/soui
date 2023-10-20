@@ -23,6 +23,13 @@ else{
 	LIBS += utilities4.lib soui4.lib
 }
 
+!LIB_ALL:!COM_LIB{
+}
+else{
+	LIBS += d2d1.lib dwrite.lib
+}
+
+
 # Input
 HEADERS += ComLoader.h \
            resource.h \
