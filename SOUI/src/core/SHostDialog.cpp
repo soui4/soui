@@ -26,7 +26,8 @@ SHostDialog::~SHostDialog(void)
 INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
 {
     SASSERT(!m_MsgLoop);
-    SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop, SApplication::getSingletonPtr()->GetMsgLoop());
+	SAutoRefPtr<IMessageLoop> parentMsgLoop=SApplication::getSingletonPtr()->GetMsgLoop();
+    SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop, parentMsgLoop);
 
     if (!hParent)
     {
@@ -69,8 +70,8 @@ INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
         }
 
         if (m_nRetCode == RC_INIT)
-        { //不是自己主动使用EndDialog关闭窗口，重新把WM_QUIT放回消息队列。
-            PostQuitMessage(nRet);
+        { //可能是程序中主动退出app，而不是自己EndDialog关闭窗口，重新把WM_QUIT放回消息队列。
+            parentMsgLoop->Quit(nRet);
         }
 
         if (bEnableParent)
@@ -98,8 +99,7 @@ void SHostDialog::EndDialog(INT_PTR nResult)
     if (m_nRetCode == RC_INIT)
     {
         m_nRetCode = nResult;
-        m_MsgLoop->Quit();
-        PostMessage(WM_NULL);
+        m_MsgLoop->Quit((int)m_nRetCode);
     }
 }
 

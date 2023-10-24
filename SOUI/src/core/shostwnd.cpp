@@ -852,7 +852,7 @@ void SHostWnd::OnDestroy()
     SHostMgr::getSingletonPtr()->RemoveHostMsgHandler(m_hWnd);
     // exit app. (copy from wtl)
     if (m_hostAttr.m_byWndType == SHostWndAttr::WT_APPMAIN || (m_hostAttr.m_byWndType == SHostWndAttr::WT_UNDEFINE && (SNativeWnd::GetStyle() & (WS_CHILD | WS_POPUP)) == 0 && (SNativeWnd::GetExStyle() & WS_EX_TOOLWINDOW) == 0))
-        ::PostQuitMessage(1);
+        GetMsgLoop()->Quit(1);
 }
 
 void SHostWnd::OnSize(UINT nType, CSize size)

@@ -40,11 +40,11 @@ void SMessageLoop::OnMsg(LPMSG pMsg)
     }
 }
 
-void SMessageLoop::Quit()
+void SMessageLoop::Quit(int exitCode)
 {
     if (!m_bRunning)
         return;
-    m_bQuit = TRUE;
+	PostThreadMessage(m_tid,WM_QUIT,(WPARAM)exitCode,0);
 }
 
 int SMessageLoop::Run()

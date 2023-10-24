@@ -931,7 +931,7 @@ void SMenuEx::RunMenu(HWND hRoot)
 
         if (bMsgQuit)
         {
-            PostQuitMessage((int)msg.wParam);
+            msgLoop->Quit((int)msg.wParam);
             break;
         }
     }

@@ -499,7 +499,7 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
 int SApplication::Run(HWND hMainWnd)
 {
     m_hMainWnd = hMainWnd;
-    SAutoRefPtr<IMessageLoop> pMsgLoop = GetMsgLoop(GetCurrentThreadId());
+    SAutoRefPtr<IMessageLoop> pMsgLoop = GetMsgLoop();
     SASSERT(pMsgLoop);
     int nRet = pMsgLoop->Run();
     if (::IsWindow(m_hMainWnd))
@@ -511,7 +511,12 @@ int SApplication::Run(HWND hMainWnd)
 
 void SApplication::Quit(int nCode)
 {
-    PostQuitMessage(nCode);
+	SAutoLock autoLock(m_cs);
+	SPOSITION pos = m_msgLoopMap.GetStartPosition();
+	while(pos){
+		IMessageLoop *pMsgLoop = m_msgLoopMap.GetNextValue(pos);
+		pMsgLoop->Quit(nCode);
+	}
 }
 
 HMODULE SApplication::GetModule() const

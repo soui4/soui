@@ -182,7 +182,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @param DWORD dwThreadID--线程ID
      * @return IMessageLoop *--指定线程的msgloop
      */
-    STDMETHOD_(IMessageLoop *, GetMsgLoop)(CTHIS_ DWORD dwThreadID) SCONST PURE;
+    STDMETHOD_(IMessageLoop *, GetMsgLoop)(CTHIS_ DWORD dwThreadID DEF_VAL(GetCurrentThreadId())) SCONST PURE;
 
     /**
      * @brief 获取IResProviderMgr接口

@@ -33,7 +33,7 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
     STDMETHOD_(void, OnMsg)(THIS_ LPMSG pMsg) OVERRIDE;
 
-    STDMETHOD_(void, Quit)(THIS) OVERRIDE;
+    STDMETHOD_(void, Quit)(THIS_ int exitCode) OVERRIDE;
 
     STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable *runable) OVERRIDE;
 

@@ -61,7 +61,7 @@ DECLARE_INTERFACE_(IMessageLoop, IObjRef)
 
     STDMETHOD_(void, OnMsg)(THIS_ LPMSG pMsg) PURE;
 
-    STDMETHOD_(void, Quit)(THIS) PURE;
+    STDMETHOD_(void, Quit)(THIS_ int exitCode DEF_VAL(0)) PURE;
 
     STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable * runable) PURE;
 
