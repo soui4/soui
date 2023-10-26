@@ -595,6 +595,13 @@ HRESULT SListBox::OnLanguageChanged()
     return hr;
 }
 
+void SListBox::OnScaleChanged(int nScale)
+{
+    __baseCls::OnScaleChanged(nScale);
+    GetScaleSkin(m_pItemSkin, nScale);
+    GetScaleSkin(m_pIconSkin, nScale);
+}
+
 void SListBox::UpdateScrollBar()
 {
     CRect rcClient = SWindow::GetClientRect();

@@ -259,6 +259,8 @@ class SOUI_EXP SListBox : public TPanelProxy<IListBox> {
 
     virtual HRESULT OnLanguageChanged();
 
+    void OnScaleChanged(int nScale) override;
+
     /**
      * SListBox::CreateChildren
      * @brief    创建新项
