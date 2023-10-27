@@ -44,7 +44,7 @@ void SMessageLoop::Quit(int exitCode)
 {
     if (!m_bRunning)
         return;
-	PostThreadMessage(m_tid,WM_QUIT,(WPARAM)exitCode,0);
+    PostThreadMessage(m_tid, WM_QUIT, (WPARAM)exitCode, 0);
 }
 
 int SMessageLoop::Run()

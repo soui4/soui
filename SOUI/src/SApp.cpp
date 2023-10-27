@@ -511,12 +511,13 @@ int SApplication::Run(HWND hMainWnd)
 
 void SApplication::Quit(int nCode)
 {
-	SAutoLock autoLock(m_cs);
-	SPOSITION pos = m_msgLoopMap.GetStartPosition();
-	while(pos){
-		IMessageLoop *pMsgLoop = m_msgLoopMap.GetNextValue(pos);
-		pMsgLoop->Quit(nCode);
-	}
+    SAutoLock autoLock(m_cs);
+    SPOSITION pos = m_msgLoopMap.GetStartPosition();
+    while (pos)
+    {
+        IMessageLoop *pMsgLoop = m_msgLoopMap.GetNextValue(pos);
+        pMsgLoop->Quit(nCode);
+    }
 }
 
 HMODULE SApplication::GetModule() const

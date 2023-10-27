@@ -413,6 +413,16 @@ void SOsrPanel::RequestRelayout(SWND hSource, BOOL bSourceResizable)
     }
 }
 
+BOOL SOsrPanel::PostTask(THIS_ IRunnable *runable, BOOL bAsync)
+{
+    return m_pHostProxy->GetHostContainer()->PostTask(runable, bAsync);
+}
+
+int SOsrPanel::RemoveTasksForObject(THIS_ void *pObj)
+{
+    return m_pHostProxy->GetHostContainer()->RemoveTasksForObject(pObj);
+}
+
 //////////////////////////////////////////////////////////////////////////
 SItemPanel *SItemPanel::Create(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
 {

@@ -194,7 +194,14 @@ class SOUI_EXP SHostWnd
     EventHandlerInfo m_evtHandler;
     SAutoRefPtr<IHostPresenter> m_presenter;
 
-    static BOOL s_HideLocalUiDef; /**<隐藏局部uidef对象全局标志  */
+    //几个异步任务相关的对象，由于msgloop的异步任务依赖msgloop，在dll中使用soui可能没有soui自己的msgloop
+    SCriticalSection m_cs;
+    SList<IRunnable *> m_runnables;
+    SCriticalSection m_csRunningQueue;
+    SList<IRunnable *> m_runningQueue;
+
+    static BOOL s_HideLocalUiDef;  /**<隐藏局部uidef对象全局标志  */
+    static int s_TaskQueueBufSize; /**<异步任务等待长度,默认为5  */
   public:
     SHostWnd(LPCWSTR pszResName = NULL);
     SHostWnd(LPCSTR pszResName);
@@ -204,6 +211,7 @@ class SOUI_EXP SHostWnd
     /*用来设置是否隐藏窗口的局部布局属性，整个程序只应在窗口初始化前调用一次*/
     /************************************************************************/
     static void SetHideLocalUiDef(BOOL bHide);
+    static void SetTaskQueueBufSize(int nBufSize);
 
   public:
     enum
@@ -465,7 +473,12 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(int, GetScale)() const OVERRIDE;
 
     STDMETHOD_(void, EnableIME)(BOOL bEnable) OVERRIDE;
+
     STDMETHOD_(void, OnUpdateCursor)() OVERRIDE;
+
+    STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable *runable, BOOL bAsync DEF_VAL(TRUE)) OVERRIDE;
+
+    STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE;
 
   protected:
     virtual IToolTip *CreateTooltip() const;
@@ -483,6 +496,7 @@ class SOUI_EXP SHostWnd
 
   protected:
     LRESULT OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp);
+    LRESULT OnRunTasks(UINT uMsg, WPARAM wp, LPARAM lp);
 
     BEGIN_MSG_MAP_EX(SHostWnd)
         MSG_WM_SIZE(OnSize)
@@ -514,6 +528,7 @@ class SOUI_EXP SHostWnd
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_SYSCOMMAND(OnSysCommand)
         MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
+        MESSAGE_HANDLER_EX(UM_RUN_TASKS, OnRunTasks)
         CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
 #if (!DISABLE_SWNDSPY)
         MESSAGE_HANDLER_EX(SPYMSG_SETSPY, OnSpyMsgSetSpy)

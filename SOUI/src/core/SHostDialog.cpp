@@ -26,7 +26,7 @@ SHostDialog::~SHostDialog(void)
 INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
 {
     SASSERT(!m_MsgLoop);
-	SAutoRefPtr<IMessageLoop> parentMsgLoop=SApplication::getSingletonPtr()->GetMsgLoop();
+    SAutoRefPtr<IMessageLoop> parentMsgLoop = SApplication::getSingletonPtr()->GetMsgLoop();
     SApplication::getSingleton().GetMsgLoopFactory()->CreateMsgLoop(&m_MsgLoop, parentMsgLoop);
 
     if (!hParent)

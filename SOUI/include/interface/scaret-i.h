@@ -4,6 +4,8 @@
 
 SNSBEGIN
 
+typedef struct IRenderTarget IRenderTarget;
+
 #undef INTERFACE
 #define INTERFACE ICaret
 DECLARE_INTERFACE_(ICaret, IObject)

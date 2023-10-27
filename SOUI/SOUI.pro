@@ -162,7 +162,6 @@ HEADERS += include/SApp.h \
            include/core/SWindowMgr.h \
            include/core/SWnd.h \
            include/core/SWndAccessible.h \
-           include/core/SWndContainer-i.h \
            include/core/SWndContainerImpl.h \
            include/core/SWndStyle.h \
            include/core/SNcPainter.h \
@@ -194,7 +193,6 @@ HEADERS += include/SApp.h \
            include/helper/SResID.h \
            include/helper/STimer.h \
            include/helper/STimerGenerator.h \
-           include/helper/STaskHandler.h \
            include/helper/STileViewItemLocator.h \
            include/helper/STime.h \
            include/helper/SToolTip.h \
@@ -314,7 +312,6 @@ SOURCES += src/SApp.cpp \
            src/helper/SMenuWndHook.cpp \
            src/helper/STimer.cpp \
            src/helper/STimerGenerator.cpp \
-           src/helper/STaskHandler.cpp \
            src/helper/STileViewItemLocator.cpp \
            src/helper/stime.cpp \
            src/helper/SToolTip.cpp \

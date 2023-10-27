@@ -4,6 +4,7 @@ tools\clang-format.exe -i SOUI\include\control\*.h -style=file --verbose
 tools\clang-format.exe -i SOUI\include\core\*.h -style=file --verbose
 tools\clang-format.exe -i SOUI\include\event\*.h -style=file --verbose
 tools\clang-format.exe -i SOUI\include\helper\*.h -style=file --verbose
+tools\clang-format.exe -i SOUI\include\helper\*.hpp -style=file --verbose
 tools\clang-format.exe -i SOUI\include\interface\*.h -style=file --verbose
 tools\clang-format.exe -i SOUI\include\layout\*.h -style=file --verbose
 tools\clang-format.exe -i SOUI\include\matrix\*.h -style=file --verbose

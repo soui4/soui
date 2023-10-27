@@ -136,6 +136,9 @@ class SOUI_EXP SOsrPanel
 
     STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
 
+    STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable *runable, BOOL bAsync DEF_VAL(TRUE)) OVERRIDE;
+    STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE;
+
   public: // SWindow
     virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
     virtual void ModifyItemState(DWORD dwStateAdd, DWORD dwStateRemove);

@@ -745,10 +745,6 @@
 				>
 			</File>
 			<File
-				RelativePath="src\helper\STaskHandler.cpp"
-				>
-			</File>
-			<File
 				RelativePath="src\control\STileView.cpp"
 				>
 			</File>
@@ -1632,10 +1628,6 @@
 			</File>
 			<File
 				RelativePath="include\core\SWndAccessible.h"
-				>
-			</File>
-			<File
-				RelativePath="include\core\SWndContainer-i.h"
 				>
 			</File>
 			<File

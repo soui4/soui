@@ -44,6 +44,8 @@ typedef enum GrtFlag
  * Describe
  */
 
+typedef struct IRegionS IRegionS;
+
 #undef INTERFACE
 #define INTERFACE ISwndContainer
 DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
@@ -268,6 +270,10 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
     STDMETHOD_(BOOL, UnregisterVideoCanvas)(THIS_ SWND swnd) PURE;
 
     STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) PURE;
+
+    STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable * runable, BOOL bAsync DEF_VAL(TRUE)) PURE;
+
+    STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) PURE;
 };
 
 SNSEND

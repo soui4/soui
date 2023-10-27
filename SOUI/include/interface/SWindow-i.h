@@ -26,6 +26,7 @@ enum
     UM_UPDATEFONT,
     UM_GETDESIREDSIZE,                // wp=parent wid,lp=parent hei, return size
     UM_MENUEVENT,                     //模拟菜单控件事件，wparam:0, lparam:EventArg *
+    UM_RUN_TASKS,                     //执行异步任务
     SPYMSG_BASE = UM_SOUI_BEGIN + 50, //和老版本保持一致(10000+1000)
     SPYMSG_SETSPY = SPYMSG_BASE,      //设置SPY消息接收窗口句柄
     SPYMSG_SWNDENUM,                  //枚举窗口列表,wparam:SWND,lparam:SWindow::GetWindow

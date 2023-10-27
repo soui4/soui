@@ -296,10 +296,16 @@ void SRootWindow::FireMenuCmd(int menuID)
 //////////////////////////////////////////////////////////////////////////
 
 BOOL SHostWnd::s_HideLocalUiDef = TRUE;
+int SHostWnd::s_TaskQueueBufSize = 5;
 
 void SHostWnd::SetHideLocalUiDef(BOOL bHide)
 {
     s_HideLocalUiDef = bHide;
+}
+
+void SHostWnd::SetTaskQueueBufSize(int nBufSize)
+{
+    s_TaskQueueBufSize = nBufSize;
 }
 
 SHostWnd::SHostWnd(LPCWSTR pszResName /*= NULL*/)
@@ -1989,6 +1995,73 @@ LRESULT SHostWnd::OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp)
 void SHostWnd::EnableHostPrivateUiDef(THIS_ BOOL bEnable)
 {
     EnablePrivateUiDef(bEnable);
+}
+
+BOOL SHostWnd::PostTask(THIS_ IRunnable *runable, BOOL bAsync /*DEF_VAL(TRUE)*/)
+{
+    {
+        SAutoLock lock(m_cs);
+        m_runnables.AddTail(runable->clone());
+    }
+    if (!bAsync)
+    {
+        SendMessage(UM_RUN_TASKS);
+    }
+    else if (m_runnables.GetCount() > s_TaskQueueBufSize)
+    {
+        PostMessage(UM_RUN_TASKS);
+    }
+    return TRUE;
+}
+
+int SHostWnd::RemoveTasksForObject(THIS_ void *pObj)
+{
+    int nRet = 0;
+    SAutoLock lock(m_cs);
+    SPOSITION pos = m_runnables.GetHeadPosition();
+    while (pos)
+    {
+        SPOSITION pos2 = pos;
+        IRunnable *p = m_runnables.GetNext(pos);
+        if (p->getObject() == pObj)
+        {
+            p->Release();
+            m_runnables.RemoveAt(pos2);
+            nRet++;
+        }
+    }
+    SAutoLock lock2(m_csRunningQueue);
+    pos = m_runningQueue.GetHeadPosition();
+    while (pos)
+    {
+        SPOSITION pos2 = pos;
+        IRunnable *p = m_runningQueue.GetNext(pos);
+        if (p->getObject() == pObj)
+        {
+            p->Release();
+            m_runningQueue.RemoveAt(pos2);
+            nRet++;
+        }
+    }
+    return nRet;
+}
+
+LRESULT SHostWnd::OnRunTasks(UINT uMsg, WPARAM wp, LPARAM lp)
+{
+    m_cs.Enter();
+    m_runningQueue.Swap(m_runnables);
+    m_cs.Leave();
+    for (;;)
+    {
+        SAutoLock lock(m_csRunningQueue);
+        if (m_runningQueue.IsEmpty())
+            break;
+        IRunnable *pRunnable = m_runningQueue.GetHead();
+        m_runningQueue.RemoveHead();
+        pRunnable->run();
+        pRunnable->Release();
+    }
+    return 0;
 }
 
 //////////////////////////////////////////////////////////////////
