@@ -220,6 +220,8 @@ class SOUI_EXP SHostWnd
         kPulseInterval = 10,
         kNcCheckTimer = 4322,
         kNcCheckInterval = 50,
+        kTaskTimer = 4323,
+        kTaskInterval = 100,
     };
 
   public:

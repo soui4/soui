@@ -929,6 +929,9 @@ void SHostWnd::OnTimer(UINT_PTR idEvent)
             SwndContainerImpl::OnNextFrame();
         }
         return;
+    }else if(idEvent == kTaskTimer){
+        OnRunTasks(0,0,0);
+        return;
     }
 
     STimerID sTimerID((DWORD)idEvent);
@@ -1999,18 +2002,23 @@ void SHostWnd::EnableHostPrivateUiDef(THIS_ BOOL bEnable)
 
 BOOL SHostWnd::PostTask(THIS_ IRunnable *runable, BOOL bAsync /*DEF_VAL(TRUE)*/)
 {
-    {
-        SAutoLock lock(m_cs);
-        m_runnables.AddTail(runable->clone());
-    }
+    m_cs.Enter();
+    m_runnables.AddTail(runable->clone());
+    int tasks = (int)m_runnables.GetCount();
     if (!bAsync)
     {
+        m_cs.Leave();
         SendMessage(UM_RUN_TASKS);
+        return TRUE;
     }
-    else if (m_runnables.GetCount() > s_TaskQueueBufSize)
+    else if (tasks > s_TaskQueueBufSize)
     {
         PostMessage(UM_RUN_TASKS);
     }
+    else if(tasks == 1){
+        SetTimer(kTaskTimer,kTaskInterval);
+    }
+    m_cs.Leave();
     return TRUE;
 }
 
@@ -2049,6 +2057,7 @@ int SHostWnd::RemoveTasksForObject(THIS_ void *pObj)
 LRESULT SHostWnd::OnRunTasks(UINT uMsg, WPARAM wp, LPARAM lp)
 {
     m_cs.Enter();
+	KillTimer(kTaskTimer);
     m_runningQueue.Swap(m_runnables);
     m_cs.Leave();
     for (;;)
