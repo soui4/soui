@@ -392,6 +392,13 @@ size_t SkResourceCache::getSingleAllocationByteLimit() const {
 
 SK_DECLARE_STATIC_MUTEX(gMutex);
 static SkResourceCache* gResourceCache = NULL;
+void  cleanup_gResourceCache_Global() {
+    if (gResourceCache) {
+        SkDELETE(gResourceCache);
+        gResourceCache = NULL;
+    }
+}
+
 static void cleanup_gResourceCache() {
     // We'll clean this up in our own tests, but disable for clients.
     // Chrome seems to have funky multi-process things going on in unit tests that

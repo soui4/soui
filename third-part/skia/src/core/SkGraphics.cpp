@@ -126,10 +126,13 @@ void SkGraphics::Init() {
 
 }
 
+extern void  cleanup_gResourceCache_Global();
+
 void SkGraphics::Term() {
     PurgeFontCache();
     PurgeResourceCache();
     SkPaint::Term();
+    cleanup_gResourceCache_Global();
 }
 
 ///////////////////////////////////////////////////////////////////////////////
