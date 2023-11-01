@@ -23,7 +23,6 @@ target_compile_definitions(imgdecoder-gdip
   PUBLIC SOUI_IMAGE_DECODER_USE_GDIPLUS
 )
 target_include_directories(imgdecoder-gdip
-  PRIVATE ${PROJECT_SOURCE_DIR}/config
   PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
@@ -34,3 +33,17 @@ set_target_properties (imgdecoder-gdip PROPERTIES
     FOLDER components/imgdecoder
 )
 target_link_libraries(imgdecoder-gdip gdiplus.lib)
+
+install(TARGETS imgdecoder-gdip
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS imgdecoder-gdip
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

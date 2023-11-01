@@ -27,7 +27,6 @@ target_compile_definitions(imgdecoder-stb
 )
 target_include_directories(imgdecoder-stb
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${PROJECT_SOURCE_DIR}/config
   PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
 )
@@ -35,4 +34,18 @@ target_include_directories(imgdecoder-stb
 set(COM_LIBS ${COM_LIBS} imgdecoder-stb CACHE INTERNAL "com_lib")
 set_target_properties (imgdecoder-stb PROPERTIES
     FOLDER components/imgdecoder
+)
+
+install(TARGETS imgdecoder-stb
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS imgdecoder-stb
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
 )

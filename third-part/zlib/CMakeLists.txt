@@ -43,3 +43,17 @@ set(COM_LIBS ${COM_LIBS} zlib CACHE INTERNAL "com_lib")
 set_target_properties (zlib PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS zlib
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS zlib
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

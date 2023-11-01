@@ -7,7 +7,7 @@
 
 #define COM_IMGDECODER  _T("imgdecoder-gdip")
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 #define COM_RENDER_GDI  _T("render-gdid.dll")
 #define COM_RENDER_SKIA _T("render-skiad.dll")
 #define COM_RENDER_D2D  _T("render-d2dd.dll")
@@ -36,7 +36,7 @@
 #pragma comment(lib,"Usp10")
 #pragma comment(lib,"opengl32")
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 #pragma comment(lib,"skiad")
 #pragma comment(lib,"zlibd")
 #pragma comment(lib,"pngd")
@@ -53,7 +53,7 @@
 #pragma comment(lib,"resprovider-7zipd")
 #pragma comment(lib,"log4zd")
 #pragma comment(lib,"taskloopd")
-#else//_DEBUG
+#else//defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 
 #pragma comment(lib,"skia")
 #pragma comment(lib,"zlib")

@@ -18,6 +18,12 @@ set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 # 设置输出目录
 #
 if (OUTPATH_WITHOUT_TYPE)
+       message("---Put All generation in different ${PROJECT_BINARY_DIR}/bin")
+        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_BINARY_DIR}/bin)
+else()
+    set(CMAKE_DEBUG_POSTFIX "d")
     if (CMAKE_CL_64)
         message("---Put All generation in same Path(bin64)")
         set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/bin64)
@@ -35,18 +41,6 @@ if (OUTPATH_WITHOUT_TYPE)
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_DEBUG ${PROJECT_SOURCE_DIR}/bin)
         set(CMAKE_RUNTIME_OUTPUT_DIRECTORY_RELEASE ${PROJECT_SOURCE_DIR}/bin)
     endif ()
-else()
-    if (CMAKE_CL_64)
-        message("---Put All generation in different Path(bin64)")
-        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin64)
-        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin64)
-        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin64)
-    else ()
-        message("---Put All generation in different Path(bin)")
-        set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-        set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-        set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${PROJECT_SOURCE_DIR}/bin)
-    endif ()
 endif()
 
 #
@@ -58,8 +52,6 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MP /wd4100 /wd4189 /wd4996")
 #
 # 设置输入文件的后缀
 #
-set(CMAKE_DEBUG_POSTFIX "d")
-set(CMAKE_RELEASE_POSTFIX "")
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "possible configurations" FORCE)
 
 if (ENABLE_SOUI_CORE_LIB)

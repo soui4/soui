@@ -20,3 +20,17 @@ endif()
 if(MSVC)
     set_target_properties(soui-sys-resource PROPERTIES LINK_FLAGS "/NOENTRY")
 endif()
+
+install(TARGETS soui-sys-resource
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS soui-sys-resource
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

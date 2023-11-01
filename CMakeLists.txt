@@ -57,10 +57,22 @@ option(ENABLE_SOUI_COM_LIB "Enable compile 'components' as static lib" OFF)
 #
 option(XP_TOOLSET "" ON)
 
+option(OUTPATH_WITHOUT_TYPE "On to output debug/release to different folder(Off to same folder and add suffix 'd' for debug )" OFF)
+
 config_compiler_and_linker()
 
+if(OUTPATH_WITHOUT_TYPE)
+message("output config to ${PROJECT_BINARY_DIR}/config/config.h")
+configure_file("config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONLY)
+configure_file("config/build.cfg.in" "${PROJECT_BINARY_DIR}/config/build.cfg" @ONLY)
+include_directories(${PROJECT_BINARY_DIR}/config)
+install(FILES "${PROJECT_BINARY_DIR}/config/config.h" DESTINATION config)
+else()
+message("output config to ${PROJECT_SOURCE_DIR}/config/config.h")
 configure_file("config/config.h.in" "${PROJECT_SOURCE_DIR}/config/config.h" @ONLY)
 configure_file("config/build.cfg.in" "${PROJECT_SOURCE_DIR}/config/build.cfg" @ONLY)
+include_directories(${PROJECT_SOURCE_DIR}/config)
+endif()
 
 #
 #

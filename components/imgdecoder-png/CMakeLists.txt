@@ -34,7 +34,6 @@ target_compile_definitions(imgdecoder-png
 )
 target_include_directories(imgdecoder-png
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${PROJECT_SOURCE_DIR}/config
   PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/png
@@ -44,4 +43,18 @@ target_include_directories(imgdecoder-png
 set(COM_LIBS ${COM_LIBS} imgdecoder-png CACHE INTERNAL "com_lib")
 set_target_properties (imgdecoder-png PROPERTIES
     FOLDER components/imgdecoder
+)
+
+install(TARGETS imgdecoder-png
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS imgdecoder-png
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
 )

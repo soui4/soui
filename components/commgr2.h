@@ -12,7 +12,7 @@
 
 #define COM_IMGDECODER  _T("imgdecoder-gdip")
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 #define COM_RENDER_GDI  _T("render-gdid.dll")
 #define COM_RENDER_SKIA _T("render-skiad.dll")
 #define COM_RENDER_D2D _T("render-d2dd.dll")
@@ -40,12 +40,11 @@
 
 
 #ifdef LIB_SOUI_COM
-#pragma message("LIB_SOUI_COM")
 
 #pragma comment(lib,"Usp10")
 #pragma comment(lib,"opengl32")
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 #if(SCOM_MASK&scom_mask_render_skia)
     #pragma comment(lib,"skiad")
     #pragma comment(lib,"render-skiad")
@@ -98,7 +97,7 @@
 	#pragma comment(lib,"ScriptModule-LUAd")
 #endif
 
-#else//_DEBUG
+#else//defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 #if(SCOM_MASK&scom_mask_render_skia)
     #pragma comment(lib,"skia")
     #pragma comment(lib,"render-skia")

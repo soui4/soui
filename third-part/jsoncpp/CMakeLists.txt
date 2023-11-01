@@ -37,3 +37,17 @@ set(COM_LIBS ${COM_LIBS} jsoncpp CACHE INTERNAL "com_lib")
 set_target_properties (jsoncpp PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS jsoncpp
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS jsoncpp
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

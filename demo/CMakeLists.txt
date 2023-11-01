@@ -1,6 +1,5 @@
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-include_directories(${PROJECT_SOURCE_DIR}/config)
 include_directories(${PROJECT_SOURCE_DIR}/components)
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
@@ -119,6 +118,9 @@ else ()
 endif ()
 endif()
 
+if(OUTPATH_WITHOUT_TYPE)
+    link_directories(${PROJECT_BINARY_DIR}/bin)
+else()
 if (CMAKE_CL_64)
     if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
     link_directories(${PROJECT_SOURCE_DIR}/bin64a)
@@ -128,9 +130,14 @@ if (CMAKE_CL_64)
 else ()
     link_directories(${PROJECT_SOURCE_DIR}/bin)
 endif ()
+endif()
+
 add_executable(demo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${EXTENDCOTROLS})
 
-set_target_properties(demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+if(CMAKE_DEBUG_POSTFIX)
+    set_target_properties(demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+endif()
+
 add_dependencies(demo soui-sys-resource ${COM_LIBS})
 if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
 target_link_libraries(demo soui4 utilities4 smiley)
@@ -144,4 +151,18 @@ endif()
 
 set_target_properties (demo PROPERTIES
     FOLDER demos
+)
+
+install(TARGETS demo
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS demo
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
 )

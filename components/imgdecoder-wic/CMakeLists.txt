@@ -25,7 +25,6 @@ target_compile_definitions(imgdecoder-wic
 )
 target_include_directories(imgdecoder-wic
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${PROJECT_SOURCE_DIR}/config
   PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
 )
@@ -33,4 +32,18 @@ target_include_directories(imgdecoder-wic
 set(COM_LIBS ${COM_LIBS} imgdecoder-wic CACHE INTERNAL "com_lib")
 set_target_properties (imgdecoder-wic PROPERTIES
     FOLDER components/imgdecoder
+)
+
+install(TARGETS imgdecoder-wic
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS imgdecoder-wic
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
 )

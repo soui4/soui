@@ -20,3 +20,17 @@ set(COM_LIBS ${COM_LIBS} Scintilla CACHE INTERNAL "com_lib")
 set_target_properties (Scintilla PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS Scintilla
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS Scintilla
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

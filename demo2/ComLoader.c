@@ -1,5 +1,5 @@
 #include <Windows.h>
-#include "../config/config.h"
+#include <config.h>
 #include "ComLoader.h"
 #include <tchar.h>
 #include <commask.h>
@@ -20,7 +20,7 @@ struct SComInfo
 	HMODULE hMod;
 };
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 struct SComInfo s_comInfo[]={
 	{Decoder_Png,_T("imgdecoder-pngd.dll"),NULL},
 	{Decoder_Gdip,_T("imgdecoder-gdipd.dll"),NULL},
@@ -82,7 +82,7 @@ struct SComInfo s_comInfo[]={
 #pragma comment(lib,"Usp10")
 #pragma comment(lib,"opengl32")
 
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 #if(SCOM_MASK&scom_mask_render_skia)
 #pragma comment(lib,"skiad")
 #pragma comment(lib,"render-skiad")

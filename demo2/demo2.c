@@ -1,4 +1,5 @@
-﻿//从PE文件加载，注意从文件加载路径位置
+﻿#include <config.h>
+//从PE文件加载，注意从文件加载路径位置
 #define RES_TYPE 0
 //#define SYSRES_TYPE 0
 // #define RES_TYPE 0   //PE
@@ -13,15 +14,11 @@
 #include "resprovider-7zip\zip7resprovider-param.h"
 #endif
 #endif
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 #define SYS_NAMED_RESOURCE _T("soui-sys-resourced.dll")
 #else
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
 #endif
-
-
-#include <config.h>
-
 
 #ifndef WIN32_LEAN_AND_MEAN
 #    define WIN32_LEAN_AND_MEAN

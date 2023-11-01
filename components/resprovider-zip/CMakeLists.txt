@@ -1,7 +1,6 @@
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
 include_directories(${PROJECT_SOURCE_DIR}/third-part/zlib)
-include_directories(${PROJECT_SOURCE_DIR}/config)
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 
@@ -31,4 +30,18 @@ endif()
 set(COM_LIBS ${COM_LIBS} resprovider-zip CACHE INTERNAL "com_lib")
 set_target_properties (resprovider-zip PROPERTIES
     FOLDER components
+)
+
+install(TARGETS resprovider-zip
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS resprovider-zip
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
 )

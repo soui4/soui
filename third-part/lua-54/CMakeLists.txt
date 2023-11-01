@@ -75,3 +75,17 @@ set(COM_LIBS ${COM_LIBS} lua-54 CACHE INTERNAL "com_lib")
 set_target_properties (lua-54 PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS lua-54
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS lua-54
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

@@ -31,10 +31,25 @@ target_include_directories(soui4
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface
-  PUBLIC ${PROJECT_SOURCE_DIR}/config
   PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
 )
 target_link_libraries(soui4 utilities4)
 
 target_precompile_headers(soui4 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/souistd.h")
 set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")
+
+install(TARGETS soui4
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS soui4
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include" DESTINATION include/SOUI)

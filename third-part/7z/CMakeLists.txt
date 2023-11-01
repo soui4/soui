@@ -494,3 +494,17 @@ set(COM_LIBS ${COM_LIBS} 7z CACHE INTERNAL "com_lib")
 set_target_properties (7z PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS 7z
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS 7z
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

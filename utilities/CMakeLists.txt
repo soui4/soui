@@ -4,7 +4,6 @@
 
 add_definitions(-DUTILITIES_EXPORTS -D_CRT_SECURE_NO_WARNINGS)
 
-include_directories(${PROJECT_SOURCE_DIR}/config)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(include)
 
@@ -25,3 +24,19 @@ endif()
 
 set(CORE_LIBS ${CORE_LIBS} utilities4)
 set(CORE_LIBS ${CORE_LIBS} utilities4 CACHE INTERNAL "core_lib")
+
+install(TARGETS utilities4
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS utilities4
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)
+
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/include" DESTINATION include/utilities)

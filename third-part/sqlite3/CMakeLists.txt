@@ -26,3 +26,17 @@ set(COM_LIBS ${COM_LIBS} sqlite3 CACHE INTERNAL "com_lib")
 set_target_properties (sqlite3 PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS sqlite3
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS sqlite3
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

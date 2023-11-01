@@ -15,3 +15,17 @@ ADD_LIBRARY (smiley STATIC ${SMILEY_SRCS} ${SMILEY_HEADERS})
 set_target_properties (smiley PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS smiley
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS smiley
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

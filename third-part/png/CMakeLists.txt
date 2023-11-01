@@ -65,3 +65,17 @@ set(COM_LIBS ${COM_LIBS} png CACHE INTERNAL "com_lib")
 set_target_properties (png PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS png
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS png
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

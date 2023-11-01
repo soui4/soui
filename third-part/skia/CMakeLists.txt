@@ -947,3 +947,17 @@ set(COM_LIBS ${COM_LIBS} skia CACHE INTERNAL "com_lib")
 set_target_properties (skia PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS skia
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS skia
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

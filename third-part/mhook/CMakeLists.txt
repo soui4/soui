@@ -23,3 +23,17 @@ ADD_LIBRARY (mhook STATIC ${MHOOK_SRCS} ${MHOOK_HEADERS})
 set_target_properties (mhook PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS mhook
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS mhook
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

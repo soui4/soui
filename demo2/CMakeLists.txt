@@ -1,6 +1,5 @@
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
-include_directories(${PROJECT_SOURCE_DIR}/config)
 include_directories(${PROJECT_SOURCE_DIR}/components)
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
@@ -26,6 +25,9 @@ else ()
 endif ()
 endif()
 
+if(OUTPATH_WITHOUT_TYPE)
+    link_directories(${PROJECT_BINARY_DIR}/bin)
+else()
 if (CMAKE_CL_64)
     if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
     link_directories(${PROJECT_SOURCE_DIR}/bin64a)
@@ -35,9 +37,13 @@ if (CMAKE_CL_64)
 else ()
     link_directories(${PROJECT_SOURCE_DIR}/bin)
 endif ()
+endif()
 add_executable(demo2 WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
 
-set_target_properties(demo2 PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+if(CMAKE_DEBUG_POSTFIX)
+    set_target_properties(demo2 PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+endif()
+
 if(MSVC)
     set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SAFESEH:NO")
 else()
@@ -52,4 +58,18 @@ endif()
 
 set_target_properties (demo2 PROPERTIES
     FOLDER demos
+)
+
+install(TARGETS demo2
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS demo2
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
 )

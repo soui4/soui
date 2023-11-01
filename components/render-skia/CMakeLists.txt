@@ -1,4 +1,3 @@
-include_directories(${PROJECT_SOURCE_DIR}/config)
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 
@@ -45,4 +44,18 @@ target_include_directories(render-skia
 set(COM_LIBS ${COM_LIBS} render-skia CACHE INTERNAL "com_lib")
 set_target_properties (render-skia PROPERTIES
     FOLDER components/render
+)
+
+install(TARGETS render-skia
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS render-skia
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
 )

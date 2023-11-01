@@ -34,3 +34,17 @@ add_library(gtest STATIC src/gtest-all.cc src/gtest_main.cc)
 set_target_properties (gtest PROPERTIES
     FOLDER third-part
 )
+
+install(TARGETS gtest
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS gtest
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
+)

@@ -27,7 +27,6 @@ target_compile_definitions(render-gdi
 )
 target_include_directories(render-gdi
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${PROJECT_SOURCE_DIR}/config
   PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
 )
@@ -35,4 +34,18 @@ target_include_directories(render-gdi
 set(COM_LIBS ${COM_LIBS} render-gdi CACHE INTERNAL "com_lib")
 set_target_properties (render-gdi PROPERTIES
     FOLDER components/render
+)
+
+install(TARGETS render-gdi
+    CONFIGURATIONS Release
+    RUNTIME DESTINATION bin/Release
+    LIBRARY DESTINATION lib/Release
+    ARCHIVE DESTINATION lib/Release
+)
+
+install(TARGETS render-gdi
+    CONFIGURATIONS Debug
+    RUNTIME DESTINATION bin/Debug
+    LIBRARY DESTINATION lib/Debug
+    ARCHIVE DESTINATION lib/Debug
 )
