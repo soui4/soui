@@ -12,6 +12,8 @@
 #include <string/strcpcvt.h>
 #include <souicoll.h>
 #include <core/SkShader.h>
+#include <core/SkSurface.h>
+
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -378,10 +380,12 @@ protected:
 //////////////////////////////////////////////////////////////////////////
 //	SRenderTarget_Skia
 //////////////////////////////////////////////////////////////////////////
+class DeviceManager;
 class SRenderTarget_Skia: public TObjRefImpl<IRenderTarget>
 {
 public:
 	SRenderTarget_Skia(IRenderFactory* pRenderFactory,int nWid,int nHei);
+	SRenderTarget_Skia(IRenderFactory* pRenderFactory,HWND hWnd);
 	~SRenderTarget_Skia();
 	STDMETHOD_(void, BeginDraw)(THIS) OVERRIDE{}
 	STDMETHOD_(void, EndDraw)(THIS) OVERRIDE{}
@@ -467,7 +471,10 @@ public:
 protected:
 	bool SetPaintXferMode(SkPaint & paint,int nRopMode);
 protected:
+	DeviceManager *m_deviceMgr;
 	SkCanvas *m_SkCanvas;
+	SkSurface* m_surface;
+
 	int		  m_lastSave;
 	SColor            m_curColor;
 	SAutoRefPtr<SBitmap_Skia> m_curBmp;

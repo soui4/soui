@@ -31,7 +31,6 @@ target_compile_definitions(render-skia
 )
 target_include_directories(render-skia
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
-  PRIVATE ${PROJECT_SOURCE_DIR}/config
   PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia
@@ -39,6 +38,10 @@ target_include_directories(render-skia
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/config
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/core
   PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/src/core
+
+  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/gpu
+  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/include/utils
+  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/skia/src/gpu
 )
 
 set(COM_LIBS ${COM_LIBS} render-skia CACHE INTERNAL "com_lib")

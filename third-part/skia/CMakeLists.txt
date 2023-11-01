@@ -477,6 +477,8 @@ set(headers
 	src/images/bmpdecoderhelper.h
 	src/images/SkScaledBitmapSampler.h
 	src/images/transform_scanline.h
+	src/gpu/GrRecordReplaceDraw.h
+	src/gpu/GrLayerHoister.h
 )
 
 set(srcs
@@ -908,7 +910,10 @@ set(srcs
     "src/core/SkWriter32.cpp" 
     "src/core/SkXfermode.cpp" 
     "src/effects/SkXfermodeImageFilter.cpp" 
-
+    "src/image/SkSurface_Gpu.cpp"
+    "src/image/SkImage_Gpu.cpp"
+    "src/gpu/GrLayerHoister.cpp"
+    "src/gpu/GrRecordReplaceDraw.cpp"
 
 )
 if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")

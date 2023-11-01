@@ -5,6 +5,11 @@
 #include <effects/SkBlurMaskFilter.h>
 #include <core/SkGraphics.h>
 #include <core/SkPathMeasure.h>
+#include <gpu/gl/GrGLInterface.h>
+#include <gpu/GrContext.h>
+#include <utils/SkWGL.h>
+#include <src/gpu/gl/GrGLUtil.h>
+#include <GL/Gl.h>
 #include <src/effects/SkBlurMask.h>
 
 #include <gdialpha.h>
@@ -163,6 +168,140 @@ namespace SOUI
 	private:
 		SkPaint::Join m_Join;
 	};
+
+
+	//////////////////////////////////////////////////////////////////////////
+	struct AttachmentInfo {
+		int fSampleCount;
+		int fStencilBits;
+	};
+
+	class DeviceManager {
+	public:
+
+		DeviceManager(HWND hwnd) {
+			fHWND = hwnd;
+#if SK_SUPPORT_GPU
+			fCurContext = NULL;
+			fCurIntf = NULL;
+			fCurRenderTarget = NULL;
+			fMSAASampleCount = 0;
+#endif
+		}
+
+		virtual ~DeviceManager() {
+#if SK_SUPPORT_GPU
+			SkSafeUnref(fCurContext);
+			SkSafeUnref(fCurIntf);
+			SkSafeUnref(fCurRenderTarget);
+#endif
+		}
+
+		virtual SkSurface* createSurface()  {
+#if SK_SUPPORT_GPU
+				if (fCurContext) {
+					return SkSurface::NewRenderTargetDirect(fCurRenderTarget);
+				}
+#endif
+				return NULL;
+		}
+
+		void detachGL() {
+			wglMakeCurrent(GetDC((HWND)fHWND), 0);
+			wglDeleteContext((HGLRC)fHGLRC);
+			fHGLRC = NULL;
+		}
+
+
+		bool attachGL(int msaaSampleCount, AttachmentInfo* info) {
+			HDC dc = GetDC((HWND)fHWND);
+			if (NULL == fHGLRC) {
+				fHGLRC = SkCreateWGLContext(dc, msaaSampleCount,
+					kGLPreferCompatibilityProfile_SkWGLContextRequest);
+				if (NULL == fHGLRC) {
+					return false;
+				}
+				glClearStencil(0);
+				glClearColor(0, 0, 0, 0);
+				glStencilMask(0xffffffff);
+				glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
+			}
+			if (wglMakeCurrent(dc, (HGLRC)fHGLRC)) {
+				// use DescribePixelFormat to get the stencil bit depth.
+				int pixelFormat = GetPixelFormat(dc);
+				PIXELFORMATDESCRIPTOR pfd;
+				DescribePixelFormat(dc, pixelFormat, sizeof(pfd), &pfd);
+				info->fStencilBits = pfd.cStencilBits;
+
+				// Get sample count if the MSAA WGL extension is present
+				SkWGLExtensions extensions;
+				if (extensions.hasExtension(dc, "WGL_ARB_multisample")) {
+					static const int kSampleCountAttr = SK_WGL_SAMPLES;
+					extensions.getPixelFormatAttribiv(dc,
+						pixelFormat,
+						0,
+						1,
+						&kSampleCountAttr,
+						&info->fSampleCount);
+				} else {
+					info->fSampleCount = 0;
+				}
+
+				RECT rc;
+				GetClientRect(fHWND,&rc);
+				glViewport(0, 0,
+					SkScalarRoundToInt(rc.right),
+					SkScalarRoundToInt(rc.bottom));
+				return true;
+			}
+			return false;
+		}
+
+		void windowSizeChanged(int nWid,int nHei) {
+#if SK_SUPPORT_GPU
+			if (fCurContext) {
+				AttachmentInfo attachmentInfo;
+				attachGL(fMSAASampleCount, &attachmentInfo);
+
+				GrBackendRenderTargetDesc desc;
+				RECT rc;
+				GetClientRect(fHWND,&rc);
+				desc.fWidth = SkScalarRoundToInt(nWid);
+				desc.fHeight = SkScalarRoundToInt(nHei);
+				desc.fConfig = kSkia8888_GrPixelConfig;
+				desc.fOrigin = kBottomLeft_GrSurfaceOrigin;
+				desc.fSampleCnt = attachmentInfo.fSampleCount;
+				desc.fStencilBits = attachmentInfo.fStencilBits;
+				GrGLint buffer;
+				GR_GL_GetIntegerv(fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
+				desc.fRenderTargetHandle = buffer;
+
+				SkSafeUnref(fCurRenderTarget);
+				fCurRenderTarget = fCurContext->wrapBackendRenderTarget(desc);
+			}
+#endif
+		}
+
+		virtual GrContext* getGrContext() {
+#if SK_SUPPORT_GPU
+			return fCurContext;
+#else
+			return NULL;
+#endif
+		}
+
+	private:
+		HWND fHWND;
+    void*               fHGLRC;
+#if SK_SUPPORT_GPU
+		GrContext*              fCurContext;
+		const GrGLInterface*    fCurIntf;
+		GrRenderTarget*         fCurRenderTarget;
+		int fMSAASampleCount;
+#endif
+	};
+
+
 	//////////////////////////////////////////////////////////////////////////
 	// SRenderFactory_Skia
 
@@ -310,6 +449,8 @@ namespace SOUI
 		,m_bAntiAlias(true)
 		,m_xferMode(kSrcOver_Mode)
 		,m_lastSave(0)
+		,m_surface(NULL)
+		,m_deviceMgr(NULL)
 	{
 		m_ptOrg.fX=m_ptOrg.fY=0.0f;
 		m_pRenderFactory = pRenderFactory;
@@ -332,9 +473,51 @@ namespace SOUI
 		pRenderFactory->CreateFont(&m_defFont,&lf);
 		SelectObject(m_defFont,NULL);
 
-		pRenderFactory->CreateBitmap(&m_defBmp);
-		m_defBmp->Init(nWid,nHei,NULL);
-		SelectObject(m_defBmp,NULL);
+		SAutoRefPtr<IBitmapS> bmp;
+		pRenderFactory->CreateBitmap(&bmp);
+		bmp->Init(nWid,nHei,NULL);
+		SelectObject(bmp,NULL);
+
+
+		SAutoRefPtr<IPenS> pPen;
+		CreatePen(PS_SOLID,SColor(0,0,0).toCOLORREF(),1,&pPen);
+		SelectObject(pPen,NULL);
+	}
+
+	SRenderTarget_Skia::SRenderTarget_Skia(IRenderFactory* pRenderFactory,HWND hWnd)
+		:m_SkCanvas(NULL)
+		,m_curColor(0xFF000000)//默认黑色
+		,m_hGetDC(0)
+		,m_uGetDCFlag(0)
+		,m_bAntiAlias(true)
+		,m_xferMode(kSrcOver_Mode)
+		,m_lastSave(0)
+		,m_surface(NULL)
+		,m_deviceMgr(NULL)
+	{
+		m_ptOrg.fX=m_ptOrg.fY=0.0f;
+		m_pRenderFactory = pRenderFactory;
+		m_deviceMgr = new DeviceManager(hWnd);
+
+		m_surface = m_deviceMgr->createSurface();
+		m_SkCanvas = m_surface->getCanvas();
+		m_paint.setTextEncoding(SkPaint::kUTF16_TextEncoding);
+		m_paint.setAntiAlias(true);
+		m_paint.setLCDRenderText(true);
+		m_paint.setStyle(SkPaint::kStrokeAndFill_Style);
+
+		CreatePen(PS_SOLID,SColor(0,0,0).toCOLORREF(),1,&m_defPen);
+		SelectObject(m_defPen,NULL);
+
+		CreateSolidColorBrush(SColor(0,0,0).toCOLORREF(),&m_defBrush);
+		SelectObject(m_defBrush,NULL);
+
+		LOGFONT lf={0};
+		lf.lfHeight=20;
+		_tcscpy(lf.lfFaceName,_T("宋体"));
+		pRenderFactory->CreateFont(&m_defFont,&lf);
+		SelectObject(m_defFont,NULL);
+
 		SAutoRefPtr<IPenS> pPen;
 		CreatePen(PS_SOLID,SColor(0,0,0).toCOLORREF(),1,&pPen);
 		SelectObject(pPen,NULL);
@@ -342,7 +525,15 @@ namespace SOUI
 
 	SRenderTarget_Skia::~SRenderTarget_Skia()
 	{
-		if(m_SkCanvas) delete m_SkCanvas;
+		if(m_surface) {
+			m_surface->unref();
+		}else if(m_SkCanvas)
+		{
+			delete m_SkCanvas;
+		}
+		if(m_deviceMgr){
+			delete m_deviceMgr;
+		}
 	}
 
 	HRESULT SRenderTarget_Skia::CreatePen( int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen )
@@ -377,9 +568,13 @@ namespace SOUI
 
 	HRESULT SRenderTarget_Skia::Resize( SIZE sz )
 	{
-		m_curBmp->Init(sz.cx,sz.cy,NULL);
-		delete m_SkCanvas;
-		m_SkCanvas = new SkCanvas(m_curBmp->GetSkBitmap());
+		if(m_deviceMgr){
+			m_deviceMgr->windowSizeChanged(sz.cx,sz.cy);
+		}else{
+			m_curBmp->Init(sz.cx,sz.cy,NULL);
+			delete m_SkCanvas;
+			m_SkCanvas = new SkCanvas(m_curBmp->GetSkBitmap());
+		}
 		return S_OK;
 	}
 
@@ -988,6 +1183,8 @@ namespace SOUI
 		switch(pObj->ObjectType())
 		{
 		case OT_BITMAP: 
+			if(m_deviceMgr)
+				return E_UNEXPECTED;
 			pRet=m_curBmp;
 			m_curBmp=(SBitmap_Skia*)pObj;
 			//重新生成clip

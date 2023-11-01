@@ -334,6 +334,13 @@ SOURCES += src\image\SkImagePriv.cpp
 SOURCES += src\image\SkSurface.cpp
 HEADERS += src\image\SkSurface_Base.h
 SOURCES += src\image\SkSurface_Raster.cpp
+SOURCES += src\image\SkSurface_Gpu.cpp
+SOURCES += src\image\SkImage_Gpu.cpp
+HEADERS += src\gpu\GrLayerHoister.h
+SOURCES += src\gpu\GrLayerHoister.cpp
+HEADERS += src\gpu\GrRecordReplaceDraw.h
+SOURCES += src\gpu\GrRecordReplaceDraw.cpp
+
 SOURCES += src\lazy\SkCachingPixelRef.cpp
 HEADERS += src\lazy\SkCachingPixelRef.h
 SOURCES += src\lazy\SkDiscardableMemoryPool.cpp

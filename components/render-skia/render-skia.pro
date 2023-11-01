@@ -23,6 +23,10 @@ INCLUDEPATH += . \
 			   ../../third-part/skia/include \
 			   ../../third-part/skia/include/config \
 			   ../../third-part/skia/include/core \
+			   ../../third-part/skia/include/gpu \
+			   ../../third-part/skia/include/utils \
+			   ../../third-part/skia/src/gpu \
+
 
 dir = ../..
 include($$dir/common.pri)
