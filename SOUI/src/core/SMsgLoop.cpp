@@ -84,18 +84,18 @@ int SMessageLoop::Run()
 
 BOOL SMessageLoop::OnIdle(int nIdleCount)
 {
-    BOOL bContinue = FALSE; // default set to don't continue
+    BOOL bContinue = !m_aIdleHandler.IsEmpty();
+
     for (size_t i = 0; i < m_aIdleHandler.GetCount(); i++)
     {
         IIdleHandler *pIdleHandler = m_aIdleHandler[i];
-        if (pIdleHandler != NULL)
-            if (pIdleHandler->OnIdle())
-                bContinue = TRUE;
+        if(!pIdleHandler->OnIdle())
+            bContinue=FALSE;
     }
     if (m_parentLoop)
     {
-        if (m_parentLoop->OnIdle(nIdleCount))
-            bContinue = TRUE;
+        if(!m_parentLoop->OnIdle(nIdleCount))
+            bContinue=FALSE;
     }
     return bContinue;
 }
@@ -133,11 +133,15 @@ BOOL SMessageLoop::IsIdleMessage(MSG *pMsg)
 
 BOOL SMessageLoop::RemoveIdleHandler(IIdleHandler *pIdleHandler)
 {
+    if(!pIdleHandler)
+        return FALSE;
     return RemoveElementFromArray(m_aIdleHandler, pIdleHandler);
 }
 
 BOOL SMessageLoop::AddIdleHandler(IIdleHandler *pIdleHandler)
 {
+    if(!pIdleHandler)
+        return FALSE;
     m_aIdleHandler.Add(pIdleHandler);
     return TRUE;
 }
@@ -236,8 +240,7 @@ BOOL SMessageLoop::WaitMsg(THIS)
     MSG msg;
     while (!m_bQuit && m_bDoIdle && !PeekMsg(&msg, 0, 0, FALSE))
     {
-        if (!OnIdle(m_nIdleCount++))
-            m_bDoIdle = FALSE;
+        m_bDoIdle = OnIdle(m_nIdleCount++);
     }
     if (m_bQuit)
         return FALSE;
