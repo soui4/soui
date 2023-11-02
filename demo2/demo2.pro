@@ -39,5 +39,5 @@ HEADERS += ComLoader.h \
 SOURCES += ComLoader.c demo2.c TestLvAdapter.c
 
 RC_FILE += demo2.rc
-
+RC_INCLUDEPATH += ..\config
 RC_INCLUDEPATH += ..\soui-sys-resource

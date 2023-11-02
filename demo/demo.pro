@@ -178,5 +178,5 @@ SOURCES += demo.cpp \
           FpsWnd.cpp \
 
 RC_FILE += demo.rc
-
+RC_INCLUDEPATH += ..\config
 RC_INCLUDEPATH += ..\soui-sys-resource
