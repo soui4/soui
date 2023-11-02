@@ -237,7 +237,7 @@ namespace SOUI {
 
 		BOOL CreateImgDecoder(IObjRef ** ppObj)
 		{
-#ifdef _DEBUG
+#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 			SStringT strImgDecoder = m_strImgDecoder + _T("d.dll");
 #else
 			SStringT strImgDecoder = m_strImgDecoder + _T(".dll");
