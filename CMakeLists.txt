@@ -36,6 +36,13 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
 include(__cmake/internal_utils.cmake)
 include(__cmake/global.cmake)
 
+if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+IF (CMAKE_CL_64)
+  set (CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/output_64 CACHE PATH "default install prefix" FORCE)
+ELSE (CMAKE_CL_64)
+  set (CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/output_32 CACHE PATH "default install prefix" FORCE)
+ENDIF (CMAKE_CL_64)
+endif()
 
 
 option(USE_UNICODE "Use Unicode" ON)
