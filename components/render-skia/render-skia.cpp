@@ -179,14 +179,31 @@ namespace SOUI
 	class DeviceManager {
 	public:
 
-		DeviceManager(HWND hwnd) {
-			fHWND = hwnd;
-#if SK_SUPPORT_GPU
-			fCurContext = NULL;
-			fCurIntf = NULL;
-			fCurRenderTarget = NULL;
+		DeviceManager(HWND hwnd)
+			:fHWND(hwnd)
+			,fHGLRC(NULL)
+			,fCurContext(NULL)
+			,fCurIntf(NULL)
+			,fCurRenderTarget(NULL) 
+		{
 			fMSAASampleCount = 0;
-#endif
+			AttachmentInfo attachmentInfo;
+			bool result = attachGL(fMSAASampleCount, &attachmentInfo);
+			if (!result) {
+				SkDebugf("Failed to initialize GL");
+				return;
+			}
+
+			SkAutoTUnref<const GrGLInterface> glInterface;
+			glInterface.reset(GrGLCreateNativeInterface());
+			// Currently SampleApp does not use NVPR. TODO: Provide an NVPR device type that is skipped
+			// when the driver doesn't support NVPR.
+			fCurIntf = GrGLInterfaceRemoveNVPR(glInterface.get());
+			fCurContext = GrContext::Create(kOpenGL_GrBackend, (GrBackendContext) fCurIntf);
+			// call windowSizeChanged to create the render target
+			RECT rc;
+			GetClientRect(hwnd,&rc);
+			windowSizeChanged(rc.right,rc.bottom);
 		}
 
 		~DeviceManager() {
