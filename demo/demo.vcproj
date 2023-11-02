@@ -72,7 +72,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST"
-				AdditionalIncludeDirectories="$(ProjectDir)\..\soui-sys-resource"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)\..\soui-sys-resource&quot;;&quot;$(ProjectDir)\..\config&quot;"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -171,7 +171,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST"
-				AdditionalIncludeDirectories="$(ProjectDir)\..\soui-sys-resource"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)\..\soui-sys-resource&quot;;&quot;$(ProjectDir)\..\config&quot;"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -269,7 +269,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST,_DEBUG"
-				AdditionalIncludeDirectories="$(ProjectDir)\..\soui-sys-resource"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)\..\soui-sys-resource&quot;;&quot;$(ProjectDir)\..\config&quot;"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
@@ -365,7 +365,7 @@
 			<Tool
 				Name="VCResourceCompilerTool"
 				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,QT_NO_DYNAMIC_CAST,_DEBUG"
-				AdditionalIncludeDirectories="$(ProjectDir)\..\soui-sys-resource"
+				AdditionalIncludeDirectories="&quot;$(ProjectDir)\..\soui-sys-resource&quot;;&quot;$(ProjectDir)\..\config&quot;"
 			/>
 			<Tool
 				Name="VCPreLinkEventTool"
