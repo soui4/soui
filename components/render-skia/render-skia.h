@@ -387,9 +387,9 @@ public:
 	SRenderTarget_Skia(IRenderFactory* pRenderFactory,int nWid,int nHei);
 	SRenderTarget_Skia(IRenderFactory* pRenderFactory,HWND hWnd);
 	~SRenderTarget_Skia();
-	STDMETHOD_(void, BeginDraw)(THIS) OVERRIDE{}
-	STDMETHOD_(void, EndDraw)(THIS) OVERRIDE{}
-	STDMETHOD_(BOOL,IsOffscreen)(CTHIS) SCONST {return TRUE;}
+	STDMETHOD_(void, BeginDraw)(THIS) OVERRIDE;
+	STDMETHOD_(void, EndDraw)(THIS) OVERRIDE;
+	STDMETHOD_(BOOL,IsOffscreen)(CTHIS) SCONST;
 
 	STDMETHOD_(HRESULT,CreatePen)(THIS_ int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateSolidColorBrush)(THIS_ COLORREF cr,IBrushS ** ppBrush) OVERRIDE;

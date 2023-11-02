@@ -189,7 +189,7 @@ namespace SOUI
 #endif
 		}
 
-		virtual ~DeviceManager() {
+		~DeviceManager() {
 #if SK_SUPPORT_GPU
 			SkSafeUnref(fCurContext);
 			SkSafeUnref(fCurIntf);
@@ -197,7 +197,11 @@ namespace SOUI
 #endif
 		}
 
-		virtual SkSurface* createSurface()  {
+		HWND getHwnd() const{
+			return fHWND;
+		}
+
+		SkSurface* createSurface()  {
 #if SK_SUPPORT_GPU
 				if (fCurContext) {
 					return SkSurface::NewRenderTargetDirect(fCurRenderTarget);
@@ -332,6 +336,12 @@ namespace SOUI
 		return TRUE;
 	}
 
+	BOOL SRenderFactory_Skia::CreateRenderTarget2(THIS_ IRenderTarget ** ppRenderTarget,HWND hWnd)
+	{
+		*ppRenderTarget = new SRenderTarget_Skia(this, hWnd);
+		return TRUE;
+	}
+
 	BOOL SRenderFactory_Skia::CreateFont( IFontS ** ppFont , const LOGFONT *lf )
 	{
 		*ppFont = new SFont_Skia(this,lf);
@@ -391,13 +401,6 @@ namespace SOUI
 			return E_OUTOFMEMORY;
 		*ppMaskFilter = new SMaskFilter_Skia(pMaskFilter);
 		return S_OK;
-	}
-
-	BOOL SRenderFactory_Skia::CreateRenderTarget2(THIS_ IRenderTarget ** ppRenderTarget,HWND hWnd)
-	{
-		RECT rc;
-		::GetClientRect(hWnd,&rc);
-		return CreateRenderTarget(ppRenderTarget,rc.right,rc.bottom);
 	}
 
 	//----------------------------------------------------------------------------------------------
@@ -1787,6 +1790,26 @@ namespace SOUI
 		{
 			m_paint.setMaskFilter(NULL);
 		}
+	}
+
+	void SRenderTarget_Skia::BeginDraw(THIS)
+	{
+		
+	}
+
+	void SRenderTarget_Skia::EndDraw(THIS)
+	{
+		if(IsOffscreen())
+			return;
+		glFlush();
+		HDC dc = ::GetDC(m_deviceMgr->getHwnd());
+		SwapBuffers(dc);
+		::ReleaseDC(m_deviceMgr->getHwnd(), dc);
+	}
+
+	BOOL SRenderTarget_Skia::IsOffscreen(CTHIS) SCONST
+	{
+		return m_deviceMgr==NULL;
 	}
 
 
