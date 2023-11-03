@@ -25,13 +25,9 @@ SXmlAttr::SXmlAttr(const SXmlAttr& src):_attr(src._attr)
 
 IXmlAttr * SXmlAttr::toIXmlAttr(pugi::xml_attribute attr)
 {
-	if(attr)
-	{
-		return new SXmlAttr(attr.internal_object());
-	}else
-	{
-		return NULL;
-	}
+	if(!attr) return NULL;
+	SXmlDoc *pDoc = (SXmlDoc*)attr.get_doc_extra_data();
+	return pDoc->toIXmlAttr(attr.internal_object());
 }
 
 LPVOID SXmlAttr::GetPrivPtr(THIS) SCONST
@@ -343,13 +339,9 @@ IXmlNode *SXmlNode::PrevSibling2(THIS_ const wchar_t* name,BOOL bCaseSensitive) 
 
 IXmlNode * SXmlNode::toIXmlNode(pugi::xml_node node)
 {
-	if(node)
-	{
-		return new SXmlNode(node.internal_object());
-	}else
-	{
-		return NULL;
-	}
+	if(!node) return NULL;
+	SXmlDoc *pDoc = (SXmlDoc*)node.get_doc_extra_data();
+	return pDoc->toIXmlNode(node.internal_object());
 }
 
 
@@ -618,11 +610,17 @@ bool SXmlNode::remove_children()
 
 SXmlDoc::SXmlDoc()
 {
+	m_attrMap = new AttrMap;
+	m_nodeMap = new NodeMap;
 	_doc = new pugi::xml_document;
+	_doc->set_extra_data(this);
 }
 
 SXmlDoc::~SXmlDoc()
 {
+	clearMap();
+	delete m_attrMap;
+	delete m_nodeMap;
 	delete _doc;
 }
 
@@ -699,6 +697,7 @@ void SXmlDoc::Copy(THIS_ const IXmlDoc* proto)
 void SXmlDoc::Reset(THIS)
 {
 	_doc->reset();
+	clearMap();
 }
 
 LPVOID SXmlDoc::GetPrivPtr(THIS) SCONST
@@ -762,6 +761,46 @@ const char * SXmlDoc::GetErrDesc(XmlStatus status)
 	pugi::xml_parse_result res;
 	res.status = (pugi::xml_parse_status)status;
 	return res.description();
+}
+
+IXmlAttr * SXmlDoc::toIXmlAttr(pugi::xml_attribute_struct *pAttr)
+{
+	AttrMap::CPair *pair = m_attrMap->Lookup(pAttr);
+	if(pair)
+		return pair->m_value;
+	SXmlAttr *pRet = new SXmlAttr(pAttr);
+	m_attrMap->SetAt(pAttr,pRet);
+	return pRet;
+}
+
+IXmlNode * SXmlDoc::toIXmlNode(pugi::xml_node_struct* pNode)
+{
+	NodeMap::CPair *pair = m_nodeMap->Lookup(pNode);
+	if(pair)
+		return pair->m_value;
+	SXmlNode *pRet = new SXmlNode(pNode);
+	m_nodeMap->SetAt(pNode,pRet);
+	return pRet;
+}
+
+void SXmlDoc::clearMap()
+{
+	{
+		SPOSITION pos = m_attrMap->GetStartPosition();
+		while(pos){
+			SXmlAttr *pAttr = m_attrMap->GetNextValue(pos);
+			delete pAttr;
+		}
+		m_attrMap->RemoveAll();
+	}
+	{
+		SPOSITION pos = m_nodeMap->GetStartPosition();
+		while(pos){
+			SXmlNode *pNode = m_nodeMap->GetNextValue(pos);
+			delete pNode;
+		}
+		m_nodeMap->RemoveAll();
+	}
 }
 
 SNSEND

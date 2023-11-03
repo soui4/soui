@@ -1161,6 +1161,8 @@ PUGI__NS_BEGIN
 
 		xml_extra_buffer* extra_buffers;
 
+		void * extraData;
+
 	#ifdef PUGIXML_COMPACT
 		compact_hash_table hash;
 	#endif
@@ -5562,6 +5564,13 @@ namespace pugi
 
 		return impl::set_value_integer<unsigned long long>(_attr->value, _attr->header, impl::xml_memory_page_value_allocated_mask, rhs, false);
 	}
+
+	PUGI__FN void * xml_attribute::get_doc_extra_data() const
+	{
+		impl::xml_document_struct *doc = &impl::get_document(_attr);
+		return doc->extraData;
+	}
+
 #endif
 
 #ifdef __BORLANDC__
@@ -5694,6 +5703,11 @@ namespace pugi
 	PUGI__FN int xml_node::get_userdata() const
 	{
 		return _root ? _root->userdata : 0;
+	}
+
+	PUGI__FN void * xml_node::get_doc_extra_data() const{
+		impl::xml_document_struct *doc = &impl::get_document(_root);
+		return doc->extraData;
 	}
 
 	PUGI__FN xml_node xml_node::child(const char_t* name_,bool bCaseSensitive) const
@@ -7632,6 +7646,18 @@ namespace pugi
 				return xml_node(i);
 
 		return xml_node();
+	}
+
+	PUGI__FN void xml_document::set_extra_data(void *data)
+	{
+		impl::xml_document_struct * doc = &impl::get_document(_root);
+		doc->extraData = data;
+	}
+
+	PUGI__FN void * xml_document::get_extra_data()
+	{
+		impl::xml_document_struct * doc = &impl::get_document(_root);
+		return doc->extraData;
 	}
 
 #ifndef PUGIXML_NO_STL
