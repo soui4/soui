@@ -388,6 +388,7 @@ namespace pugi
 		bool set_userdata(int data);
 		int get_userdata() const;
 
+		void * get_doc_extra_data() const;
 	public:
 		// Default constructor. Constructs an empty attribute.
 		xml_attribute();
@@ -500,6 +501,7 @@ namespace pugi
 	public:
 		bool set_userdata(int data);
 		int get_userdata() const;
+		void * get_doc_extra_data() const;
 	public:
 		// Default constructor. Constructs an empty node.
 		xml_node();
@@ -1132,6 +1134,9 @@ namespace pugi
 
 		// Get document element
 		xml_node document_element() const;
+
+		void set_extra_data(void *data);
+		void * get_extra_data();
 	};
 	
 

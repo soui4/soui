@@ -46,17 +46,19 @@ class SSkinNewScrollbar : public SSkinScrollbar {
 	{
 		__baseCls::_Scale(skinObj, nScale);
 		SSkinNewScrollbar *pRet = sobj_cast<SSkinNewScrollbar>(skinObj);
-		CSize szSkin = GetSkinSize();
-		szSkin.cx = MulDiv(szSkin.cx, nScale, GetScale());
-		szSkin.cy = MulDiv(szSkin.cy, nScale, GetScale());
-
 		if (m_pImgHorz)
 		{
-			m_pImgHorz->Scale2(&pRet->m_pImgHorz, szSkin.cx*4, szSkin.cy, kHigh_FilterLevel);
+            SIZE szImg = m_pImgHorz->Size();
+            szImg.cx = MulDiv(szImg.cx, nScale, GetScale());
+            szImg.cy = MulDiv(szImg.cy, nScale, GetScale());
+            m_pImgHorz->Scale2(&pRet->m_pImgHorz, szImg.cx, szImg.cy, kHigh_FilterLevel);
 		}
 		if (m_pImgVert)
 		{
-			m_pImgVert->Scale2(&pRet->m_pImgVert, szSkin.cx*4, szSkin.cy, kHigh_FilterLevel);
+            SIZE szImg = m_pImgHorz->Size();
+            szImg.cx = MulDiv(szImg.cx, nScale, GetScale());
+            szImg.cy = MulDiv(szImg.cy, nScale, GetScale());
+            m_pImgVert->Scale2(&pRet->m_pImgVert, szImg.cx, szImg.cy, kHigh_FilterLevel);
 		}
 	}
 

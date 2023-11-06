@@ -9,23 +9,8 @@ SNSBEGIN
 
 #undef INTERFACE
 #define INTERFACE IXmlAttr
-DECLARE_INTERFACE_(IXmlAttr,IObjRef)
+DECLARE_INTERFACE(IXmlAttr)
 {
-	//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) PURE;
-
-	//!释放对象
-	/*!
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-
 	STDMETHOD_(LPVOID,GetPrivPtr)(CTHIS) SCONST PURE;
 
 	// Check if attribute is empty
@@ -64,23 +49,8 @@ typedef enum _XmlNodeType
 
 #undef INTERFACE
 #define INTERFACE IXmlNode
-DECLARE_INTERFACE_(IXmlNode,IObjRef)
+DECLARE_INTERFACE(IXmlNode)
 {
-	//!添加引用
-	/*!
-	*/
-	STDMETHOD_(long,AddRef) (THIS) PURE;
-
-	//!释放引用
-	/*!
-	*/
-	STDMETHOD_(long,Release) (THIS) PURE;
-
-	//!释放对象
-	/*!
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
-
 	STDMETHOD_(void,ToString)(CTHIS_ IStringW *out) SCONST PURE;
 
 	STDMETHOD_(LPVOID,GetPrivPtr)(CTHIS) SCONST PURE;
