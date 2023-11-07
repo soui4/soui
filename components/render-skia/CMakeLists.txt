@@ -1,6 +1,11 @@
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 
+add_definitions(
+    -D_CRT_SECURE_NO_WARNINGS
+    -DGR_GL_FUNCTION_TYPE=WINAPI
+)
+
 set(render-skia_header
 	stdafx.h
 	drawtext-skia.h

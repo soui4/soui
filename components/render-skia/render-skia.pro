@@ -38,6 +38,7 @@ else{
 	LIBS += utilities4.lib skia.lib shlwapi.lib
 }
 LIBS += Usp10.lib opengl32.lib
+DEFINES += GR_GL_FUNCTION_TYPE=WINAPI
 
 PRECOMPILED_HEADER = stdafx.h
 
