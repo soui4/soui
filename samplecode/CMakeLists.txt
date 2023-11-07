@@ -1,4 +1,7 @@
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+add_definitions(
+    -D_CRT_SECURE_NO_WARNINGS
+    -DGR_GL_FUNCTION_TYPE=WINAPI
+)
 
 set(samplecode_header
 SampleApp.h

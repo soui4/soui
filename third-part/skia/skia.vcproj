@@ -50,7 +50,7 @@
 				AdditionalOptions="/MP"
 				Optimization="1"
 				AdditionalIncludeDirectories=".,.,include\config,include\core,src\core,include\gpu,src\gpu,include\images,include\utils,include\utils\win,src\utils,include\ports,include/text,include\effects,src\sfnt,include\pathops,src\image,src\opts,src\lazy,..\..\config,..\..\tools\mkspecs\win32-msvc2008"
-				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,SK_IGNORE_ETC1_SUPPORT,QT_NO_DYNAMIC_CAST,NDEBUG"
+				PreprocessorDefinitions="_WINDOWS;UNICODE;WIN32;_CRT_SECURE_NO_WARNINGS;SK_IGNORE_ETC1_SUPPORT;QT_NO_DYNAMIC_CAST;NDEBUG;GR_GL_FUNCTION_TYPE=WINAPI"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
@@ -128,7 +128,7 @@
 				AdditionalOptions="/MP"
 				Optimization="1"
 				AdditionalIncludeDirectories=".,.,include\config,include\core,src\core,include\gpu,src\gpu,include\images,include\utils,include\utils\win,src\utils,include\ports,include/text,include\effects,src\sfnt,include\pathops,src\image,src\opts,src\lazy,..\..\config,..\..\tools\mkspecs\win32-msvc2008"
-				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,SK_IGNORE_ETC1_SUPPORT,QT_NO_DYNAMIC_CAST,NDEBUG"
+				PreprocessorDefinitions="_WINDOWS;UNICODE;WIN32;_CRT_SECURE_NO_WARNINGS;SK_IGNORE_ETC1_SUPPORT;QT_NO_DYNAMIC_CAST;NDEBUG;GR_GL_FUNCTION_TYPE=WINAPI"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"
 				RuntimeLibrary="0"
@@ -205,7 +205,7 @@
 				AdditionalOptions="/MP"
 				Optimization="4"
 				AdditionalIncludeDirectories=".,.,include\config,include\core,src\core,include\gpu,src\gpu,include\images,include\utils,include\utils\win,src\utils,include\ports,include/text,include\effects,src\sfnt,include\pathops,src\image,src\opts,src\lazy,..\..\config,..\..\tools\mkspecs\win32-msvc2008"
-				PreprocessorDefinitions="_WINDOWS;UNICODE;WIN32;_CRT_SECURE_NO_WARNINGS;SK_IGNORE_ETC1_SUPPORT;QT_NO_DYNAMIC_CAST"
+				PreprocessorDefinitions="_WINDOWS;UNICODE;WIN32;_CRT_SECURE_NO_WARNINGS;SK_IGNORE_ETC1_SUPPORT;QT_NO_DYNAMIC_CAST;GR_GL_FUNCTION_TYPE=WINAPI"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"
 				RuntimeLibrary="1"
@@ -283,7 +283,7 @@
 				AdditionalOptions="/MP"
 				Optimization="4"
 				AdditionalIncludeDirectories=".,.,include\config,include\core,src\core,include\gpu,src\gpu,include\images,include\utils,include\utils\win,src\utils,include\ports,include/text,include\effects,src\sfnt,include\pathops,src\image,src\opts,src\lazy,..\..\config,..\..\tools\mkspecs\win32-msvc2008"
-				PreprocessorDefinitions="_WINDOWS,UNICODE,WIN32,_CRT_SECURE_NO_WARNINGS,SK_IGNORE_ETC1_SUPPORT,QT_NO_DYNAMIC_CAST"
+				PreprocessorDefinitions="_WINDOWS;UNICODE;WIN32;_CRT_SECURE_NO_WARNINGS;SK_IGNORE_ETC1_SUPPORT;QT_NO_DYNAMIC_CAST;GR_GL_FUNCTION_TYPE=WINAPI"
 				GeneratePreprocessedFile="0"
 				ExceptionHandling="1"
 				RuntimeLibrary="1"
@@ -2488,6 +2488,10 @@
 				>
 			</File>
 			<File
+				RelativePath="src\gpu\GrLayerHoister.h"
+				>
+			</File>
+			<File
 				RelativePath="src\gpu\effects\GrMatrixConvolutionEffect.h"
 				>
 			</File>
@@ -2549,6 +2553,10 @@
 			</File>
 			<File
 				RelativePath="src\gpu\gl\debug\GrProgramObj.h"
+				>
+			</File>
+			<File
+				RelativePath=".\src\gpu\GrRecordReplaceDraw.h"
 				>
 			</File>
 			<File
@@ -3921,14 +3929,6 @@
 			</File>
 			<File
 				RelativePath="src\images\transform_scanline.h"
-				>
-			</File>
-			<File
-				RelativePath="src\gpu\GrLayerHoister.h"
-				>
-			</File>
-			<File
-				RelativePath=".\src\gpu\GrRecordReplaceDraw.h"
 				>
 			</File>
 		</Filter>

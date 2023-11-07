@@ -26,6 +26,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/core)
 add_definitions (
     -D_CRT_SECURE_NO_WARNINGS
     -DSK_IGNORE_ETC1_SUPPORT
+    -DGR_GL_FUNCTION_TYPE=WINAPI
     )
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")

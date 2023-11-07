@@ -41,8 +41,8 @@ INCLUDEPATH += . \
 dir = ../..
 include($$dir/common.pri)
 
-DEFINES += SK_IGNORE_ETC1_SUPPORT 
-
+DEFINES += SK_IGNORE_ETC1_SUPPORT
+DEFINES += GR_GL_FUNCTION_TYPE=WINAPI
 win32-msvc*{
     QMAKE_CXXFLAGS += /wd4244 /wd4800 /wd4100
 }
