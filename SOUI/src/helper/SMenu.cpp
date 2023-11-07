@@ -175,13 +175,23 @@ void SMenuODWnd::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
         // draw text
         CRect rcTxt = rcItem;
+        rcTxt.right-=5;	//todo: fix this magic offset
         rcTxt.DeflateRect(m_attr->GetTextMargin(), 0);
 
         COLORREF crOld = pRT->SetTextColor(bDisabled ? m_attr->m_crTxtGray : (bSelected ? m_attr->m_crTxtSel : m_attr->m_crTxtNormal));
 
         SAutoRefPtr<IFontS> oldFont;
         pRT->SelectObject(m_attr->GetFontPtr(), (IRenderObj **)&oldFont);
-        pRT->DrawText(pdmmi->strText, pdmmi->strText.GetLength(), &rcTxt, DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS);
+        SStringT strLeft,strRight;
+        int pos = pdmmi->strText.ReverseFind('\t');
+        if(pos!=-1){
+            strLeft = pdmmi->strText.Left(pos);
+            strRight = pdmmi->strText.Mid(pos+1);
+            pRT->DrawText(strLeft, strLeft.GetLength(), &rcTxt, DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS);
+            pRT->DrawText(strRight, strRight.GetLength(), &rcTxt, DT_SINGLELINE | DT_VCENTER | DT_RIGHT | DT_END_ELLIPSIS);
+        }else{
+            pRT->DrawText(pdmmi->strText, pdmmi->strText.GetLength(), &rcTxt, DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS);
+        }
         pRT->SelectObject(oldFont, NULL);
 
         pRT->SetTextColor(crOld);
