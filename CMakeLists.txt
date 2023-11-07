@@ -103,4 +103,4 @@ add_subdirectory(demo)
 add_subdirectory(demo2)
 
 ##
-##add_subdirectory(samplecode)
+add_subdirectory(samplecode)
