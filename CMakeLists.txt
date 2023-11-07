@@ -95,12 +95,4 @@ add_subdirectory(soui-sys-resource)
 #
 #
 # 
-add_subdirectory(components)
-
-#
-#
-add_subdirectory(demo)
-add_subdirectory(demo2)
-
-##
-##
+add_subdirectory(samplecode)
