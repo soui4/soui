@@ -729,10 +729,10 @@ static bool compareSampleTitle(const SkViewFactory* first, const SkViewFactory* 
     return strcmp(getSampleTitle(first).c_str(), getSampleTitle(second).c_str()) < 0;
 }
 
-DEFINE_string(slide, "", "Start on this sample.");
+DEFINE_string(slide, "test", "Start on this sample.");
 DEFINE_int32(msaa, 0, "Request multisampling with this count.");
 DEFINE_string(pictureDir, "", "Read pictures from here.");
-DEFINE_string(picture, "", "Path to single picture.");
+DEFINE_string(picture, "e:\\test_pic\\0c242d553d86b30c6c075.jpg", "Path to single picture.");
 DEFINE_bool(sort, false, "Sort samples by title.");
 DEFINE_bool(list, false, "List samples?");
 #ifdef SAMPLE_PDF_FILE_VIEWER
@@ -819,6 +819,7 @@ SampleWindow::SampleWindow(void* hwnd, int argc, char** argv, DeviceManager* dev
 #endif
 
     fDeviceType = kRaster_DeviceType;
+    fDeviceType = kGPU_DeviceType;
 
 #if DEFAULT_TO_GPU
     fDeviceType = kGPU_DeviceType;
@@ -944,8 +945,7 @@ SampleWindow::SampleWindow(void* hwnd, int argc, char** argv, DeviceManager* dev
     this->setVisibleP(true);
     this->setClipToBounds(false);
 
-    if(!fSamples.isEmpty())
-        this->loadView((*fSamples[fCurrIndex])());
+    this->loadView((*fSamples[fCurrIndex])());
 
     fPDFData = NULL;
 
@@ -1126,6 +1126,10 @@ void SampleWindow::draw(SkCanvas* canvas) {
                 }
             }
         }
+        SkPaint paint;
+        paint.setColor(0x60FF00FF);
+        paint.setStyle(SkPaint::kStrokeAndFill_Style);
+        canvas->drawRoundRect(SkRect::MakeXYWH(10, 10, 300,300), 10, 10, paint);
     }
     if (fShowZoomer && !fSaveToPdf) {
         showZoomer(canvas);
@@ -2075,7 +2079,6 @@ void SampleWindow::onSizeChange() {
 
     SkView::F2BIter iter(this);
     SkView* view = iter.next();
-    if (!view) return;
     view->setSize(this->width(), this->height());
 
     // rebuild our clippath
