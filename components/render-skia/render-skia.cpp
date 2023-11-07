@@ -227,6 +227,15 @@ namespace SOUI
 				return NULL;
 		}
 
+		void presentGL(){
+			if(!fCurContext)
+				return;
+			fCurContext->flush();
+			glFlush();
+			HDC dc = GetDC((HWND)fHWND);
+			SwapBuffers(dc);
+			ReleaseDC((HWND)fHWND, dc);
+		}
 		void detachGL() {
 			wglMakeCurrent(GetDC((HWND)fHWND), 0);
 			wglDeleteContext((HGLRC)fHGLRC);
@@ -1818,10 +1827,7 @@ namespace SOUI
 	{
 		if(IsOffscreen())
 			return;
-		glFlush();
-		HDC dc = ::GetDC(m_deviceMgr->getHwnd());
-		SwapBuffers(dc);
-		::ReleaseDC(m_deviceMgr->getHwnd(), dc);
+		m_deviceMgr->presentGL();
 	}
 
 	BOOL SRenderTarget_Skia::IsOffscreen(CTHIS) SCONST
