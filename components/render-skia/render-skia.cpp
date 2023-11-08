@@ -294,8 +294,6 @@ namespace SOUI
 				attachGL(fMSAASampleCount, &attachmentInfo);
 
 				GrBackendRenderTargetDesc desc;
-				RECT rc;
-				GetClientRect(fHWND,&rc);
 				desc.fWidth = SkScalarRoundToInt(nWid);
 				desc.fHeight = SkScalarRoundToInt(nHei);
 				desc.fConfig = kSkia8888_GrPixelConfig;
@@ -528,8 +526,6 @@ namespace SOUI
 		m_pRenderFactory = pRenderFactory;
 		m_deviceMgr = new DeviceManager(hWnd);
 
-		m_surface = m_deviceMgr->createSurface();
-		m_SkCanvas = m_surface->getCanvas();
 		m_paint.setTextEncoding(SkPaint::kUTF16_TextEncoding);
 		m_paint.setAntiAlias(true);
 		m_paint.setLCDRenderText(true);
@@ -554,14 +550,14 @@ namespace SOUI
 
 	SRenderTarget_Skia::~SRenderTarget_Skia()
 	{
-		if(m_surface) {
-			m_surface->unref();
-		}else if(m_SkCanvas)
-		{
-			delete m_SkCanvas;
-		}
 		if(m_deviceMgr){
+			if (m_surface) {
+				m_surface->unref();
+			}
 			delete m_deviceMgr;
+		}
+		else {
+			delete m_SkCanvas;
 		}
 	}
 
@@ -598,6 +594,12 @@ namespace SOUI
 	HRESULT SRenderTarget_Skia::Resize( SIZE sz )
 	{
 		if(m_deviceMgr){
+			if (m_surface) {
+				m_surface->unref();
+			}
+			m_surface = m_deviceMgr->createSurface();
+			m_SkCanvas = m_surface->getCanvas();
+
 			m_deviceMgr->windowSizeChanged(sz.cx,sz.cy);
 		}else{
 			m_curBmp->Init(sz.cx,sz.cy,NULL);
