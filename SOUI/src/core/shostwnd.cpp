@@ -855,6 +855,14 @@ void SHostWnd::OnDestroy()
     m_memRT = NULL;
     m_rgnInvalidate = NULL;
 
+    //clear pending tasks.
+    SPOSITION pos = m_runnables.GetHeadPosition();
+    while (pos) {
+        IRunnable* pRunnable = m_runnables.GetNext(pos);
+        pRunnable->Release();
+    }
+    m_runnables.RemoveAll();
+
     SHostMgr::getSingletonPtr()->RemoveHostMsgHandler(m_hWnd);
     // exit app. (copy from wtl)
     if (m_hostAttr.m_byWndType == SHostWndAttr::WT_APPMAIN || (m_hostAttr.m_byWndType == SHostWndAttr::WT_UNDEFINE && (SNativeWnd::GetStyle() & (WS_CHILD | WS_POPUP)) == 0 && (SNativeWnd::GetExStyle() & WS_EX_TOOLWINDOW) == 0))
