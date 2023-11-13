@@ -478,6 +478,7 @@ namespace SOUI
 		,m_lastSave(0)
 		,m_surface(NULL)
 		,m_deviceMgr(NULL)
+		,m_cDrawing(0)
 	{
 		m_ptOrg.fX=m_ptOrg.fY=0.0f;
 		m_pRenderFactory = pRenderFactory;
@@ -521,6 +522,7 @@ namespace SOUI
 		,m_lastSave(0)
 		,m_surface(NULL)
 		,m_deviceMgr(NULL)
+		,m_cDrawing(0)
 	{
 		m_ptOrg.fX=m_ptOrg.fY=0.0f;
 		m_pRenderFactory = pRenderFactory;
@@ -1822,14 +1824,21 @@ namespace SOUI
 
 	void SRenderTarget_Skia::BeginDraw(THIS)
 	{
-		
+		if(IsOffscreen())
+			return;
+		m_cDrawing++;
+
+		//RECT rc;
+		//GetClientRect(m_deviceMgr->getHwnd(),&rc);
+		//FillSolidRect(&rc,-1);
 	}
 
 	void SRenderTarget_Skia::EndDraw(THIS)
 	{
 		if(IsOffscreen())
 			return;
-		m_deviceMgr->presentGL();
+		if(--m_cDrawing==0)
+			m_deviceMgr->presentGL();
 	}
 
 	BOOL SRenderTarget_Skia::IsOffscreen(CTHIS) SCONST

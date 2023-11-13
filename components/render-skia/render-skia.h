@@ -474,7 +474,7 @@ protected:
 	DeviceManager *m_deviceMgr;
 	SkCanvas *m_SkCanvas;
 	SkSurface* m_surface;
-
+	int		   m_cDrawing;
 	int		  m_lastSave;
 	SColor            m_curColor;
 	SAutoRefPtr<SBitmap_Skia> m_curBmp;
