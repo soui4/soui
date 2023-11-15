@@ -158,7 +158,7 @@ BOOL OnBtnMenu(IEvtArgs *evt,void *Ctx){
 
 	pMenu = s_souiFac->lpVtbl->CreateMenu(s_souiFac,NULL);
 	pMenu->lpVtbl->LoadMenu(pMenu,UIRES.SMENU.menu_test);
-	nCmd = pMenu->lpVtbl->TrackPopupMenu(pMenu,TPM_RETURNCMD,rcBtn.left,rcBtn.bottom,hwnd,NULL,0);
+	nCmd = pMenu->lpVtbl->TrackPopupMenu(pMenu,TPM_RETURNCMD,rcBtn.left,rcBtn.bottom,hwnd,NULL,100);
 	pMenu->lpVtbl->Release(pMenu);
 	return TRUE;
 }

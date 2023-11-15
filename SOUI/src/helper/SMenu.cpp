@@ -175,7 +175,6 @@ void SMenuODWnd::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
         // draw text
         CRect rcTxt = rcItem;
-        rcTxt.right-=5;	//todo: fix this magic offset
         rcTxt.DeflateRect(m_attr->GetTextMargin(), 0);
 
         COLORREF crOld = pRT->SetTextColor(bDisabled ? m_attr->m_crTxtGray : (bSelected ? m_attr->m_crTxtSel : m_attr->m_crTxtNormal));
@@ -185,6 +184,8 @@ void SMenuODWnd::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
         SStringT strLeft,strRight;
         int pos = pdmmi->strText.ReverseFind('\t');
         if(pos!=-1){
+            const int kArrowSize = 14;//arrow width.
+            rcTxt.right-=kArrowSize*m_attr->GetScale()/100;
             strLeft = pdmmi->strText.Left(pos);
             strRight = pdmmi->strText.Mid(pos+1);
             pRT->DrawText(strLeft, strLeft.GetLength(), &rcTxt, DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS);
