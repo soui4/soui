@@ -55,6 +55,8 @@ class SOUI_EXP SSliderBar : public SProgress {
         SC_RAILBACK,
     };
 
+    STDMETHOD_(BOOL, SetValue)(THIS_ int nValue) OVERRIDE;
+
   protected:
     /**
      * SSliderBar::HitTest

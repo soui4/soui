@@ -89,13 +89,13 @@ BOOL SMessageLoop::OnIdle(int nIdleCount)
     for (size_t i = 0; i < m_aIdleHandler.GetCount(); i++)
     {
         IIdleHandler *pIdleHandler = m_aIdleHandler[i];
-        if(!pIdleHandler->OnIdle())
-            bContinue=FALSE;
+        if (!pIdleHandler->OnIdle())
+            bContinue = FALSE;
     }
     if (m_parentLoop)
     {
-        if(!m_parentLoop->OnIdle(nIdleCount))
-            bContinue=FALSE;
+        if (!m_parentLoop->OnIdle(nIdleCount))
+            bContinue = FALSE;
     }
     return bContinue;
 }
@@ -133,14 +133,14 @@ BOOL SMessageLoop::IsIdleMessage(MSG *pMsg)
 
 BOOL SMessageLoop::RemoveIdleHandler(IIdleHandler *pIdleHandler)
 {
-    if(!pIdleHandler)
+    if (!pIdleHandler)
         return FALSE;
     return RemoveElementFromArray(m_aIdleHandler, pIdleHandler);
 }
 
 BOOL SMessageLoop::AddIdleHandler(IIdleHandler *pIdleHandler)
 {
-    if(!pIdleHandler)
+    if (!pIdleHandler)
         return FALSE;
     m_aIdleHandler.Add(pIdleHandler);
     return TRUE;

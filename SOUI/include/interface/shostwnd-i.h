@@ -341,9 +341,9 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      */
     STDMETHOD_(void, SetScale)(THIS_ int nScale, LPCRECT pDestRect) PURE;
 
-	//////////////////////////////////////////////////////////////////////////
+    //////////////////////////////////////////////////////////////////////////
 
-	/**
+    /**
      * @brief 启动一个模式窗口
      * @param hParent 窗口的Owner
      * @return

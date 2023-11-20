@@ -181,16 +181,19 @@ void SMenuODWnd::DrawItem(LPDRAWITEMSTRUCT lpDrawItemStruct)
 
         SAutoRefPtr<IFontS> oldFont;
         pRT->SelectObject(m_attr->GetFontPtr(), (IRenderObj **)&oldFont);
-        SStringT strLeft,strRight;
+        SStringT strLeft, strRight;
         int pos = pdmmi->strText.ReverseFind('\t');
-        if(pos!=-1){
-            const int kArrowSize = 14;//arrow width.
-            rcTxt.right-=kArrowSize*m_attr->GetScale()/100;
+        if (pos != -1)
+        {
+            const int kArrowSize = 14; // arrow width.
+            rcTxt.right -= kArrowSize * m_attr->GetScale() / 100;
             strLeft = pdmmi->strText.Left(pos);
-            strRight = pdmmi->strText.Mid(pos+1);
+            strRight = pdmmi->strText.Mid(pos + 1);
             pRT->DrawText(strLeft, strLeft.GetLength(), &rcTxt, DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS);
             pRT->DrawText(strRight, strRight.GetLength(), &rcTxt, DT_SINGLELINE | DT_VCENTER | DT_RIGHT | DT_END_ELLIPSIS);
-        }else{
+        }
+        else
+        {
             pRT->DrawText(pdmmi->strText, pdmmi->strText.GetLength(), &rcTxt, DT_SINGLELINE | DT_VCENTER | DT_LEFT | DT_END_ELLIPSIS);
         }
         pRT->SelectObject(oldFont, NULL);
