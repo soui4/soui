@@ -50,7 +50,7 @@ else()
 	target_link_libraries(demo2 -municode)
 endif()
 
-add_dependencies(demo2 soui-sys-resource render-gdi imgdecoder-gdip)
+add_dependencies(demo2 soui-sys-resource ${COM_LIBS})
 target_link_libraries(demo2 soui4 utilities4)
 if(ENABLE_SOUI_COM_LIB)
 	target_link_libraries(demo2 d2d1.lib dwrite.lib)
