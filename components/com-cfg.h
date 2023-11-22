@@ -1,6 +1,6 @@
 ﻿//SOUI组件配置
-
-#pragma  once
+#ifndef _SOUI_COM_CFG_H_
+#define _SOUI_COM_CFG_H_
 
 #include <config.h>
 #include <string/tstring.h>
@@ -308,3 +308,5 @@ namespace SOUI {
 
 }//end of soui
 #endif
+
+#endif//_SOUI_COM_CFG_H_
