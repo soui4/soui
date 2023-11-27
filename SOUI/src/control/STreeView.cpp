@@ -881,6 +881,7 @@ void STreeView::UpdateVisibleItems()
 {
     if (!m_adapter)
         return;
+    SAutoEnableHostPrivUiDef enableUiDef(this);
     HSTREEITEM hItem = m_tvItemLocator->Position2Item(m_siVer.nPos);
     if (hItem == ITEM_NULL)
     {
@@ -1086,6 +1087,7 @@ void STreeView::onBranchInvalidated(HSTREEITEM hBranch, BOOL bInvalidParents, BO
     {
         return;
     }
+    SAutoEnableHostPrivUiDef enableUiDef(this);
     if (bInvalidParents)
     {
         HSTREEITEM hParent = m_adapter->GetParentItem(hBranch);

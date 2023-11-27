@@ -352,7 +352,7 @@ void SViewSwitchAnimator::start(THIS_ ITimelineHandlersMgr *pTimerlineMgr)
     m_aniStyle = m_pOwner->GetChildAnimateStyle(m_iTo);
     m_bVertAni = m_pOwner->IsVertChildAnimate(m_iTo);
 
-    if (m_aniStyle != kFadeInOut && m_aniStyle!= kAniNone)
+    if (m_aniStyle != kFadeInOut && m_aniStyle != kAniNone)
     {
         if (m_pTo)
             m_pTo->SetAlpha(255);

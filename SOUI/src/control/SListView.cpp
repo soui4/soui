@@ -344,6 +344,7 @@ void SListView::UpdateVisibleItems()
 {
     if (!m_adapter)
         return;
+    SAutoEnableHostPrivUiDef enableUiDef(this);
     int iOldFirstVisible = m_iFirstVisible;
     int iOldLastVisible = m_iFirstVisible + (int)m_lstItems.GetCount();
     int nOldTotalHeight = m_lvItemLocator->GetTotalHeight();
@@ -501,6 +502,7 @@ void SListView::UpdateVisibleItems()
 
 void SListView::UpdateVisibleItem(int iItem)
 {
+    SAutoEnableHostPrivUiDef enableUiDef(this);
     SASSERT(m_lvItemLocator->IsFixHeight());
     SItemPanel *pItem = GetItemPanel(iItem);
     SASSERT(pItem);
