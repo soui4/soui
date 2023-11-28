@@ -75,6 +75,8 @@ void SChromeTab::MoveTo(const CRect &rcEnd)
 
 void SChromeTab::OnAnimatorState(int percent)
 {
+	if(percent == ABORT)
+		return;
     CRect rcTemp;
     rcTemp.left = m_rcBegin.left + (m_rcEnd.left - m_rcBegin.left) * percent / 100;
     rcTemp.top = m_rcBegin.top + (m_rcEnd.top - m_rcBegin.top) * percent / 100;
@@ -451,10 +453,10 @@ void SChromeTabCtrl::OnNextFrame()
 {
     for (UINT i = 0; i < m_lstTabOrder.GetCount(); i++)
     {
-        m_lstTabOrder[i]->Update();
+        m_lstTabOrder[i]->UpdateAnimator();
     }
     if (m_pBtnNew)
-        m_pBtnNew->Update();
+        m_pBtnNew->UpdateAnimator();
 }
 
 int SChromeTabCtrl::OnCreate(LPVOID)
