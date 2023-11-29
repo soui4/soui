@@ -194,7 +194,7 @@ int SListBox::InsertString(int nIndex, LPCTSTR lpszItem, int nImage, LPARAM lPar
     // SASSERT(lpszItem);
 
     LPLBITEM pItem = new LBITEM(this);
-    pItem->strText.SetText(lpszItem);
+    pItem->strText.SetText(lpszItem, false);
     pItem->nImage = nImage;
     pItem->lParam = lParam;
 

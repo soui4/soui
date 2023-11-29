@@ -3232,7 +3232,7 @@ SStringT SWindow::GetToolTipText()
 
 void SWindow::SetToolTipText(LPCTSTR pszText)
 {
-    m_strToolTipText.SetText(pszText);
+    m_strToolTipText.SetText(pszText, false);
     if (!GetContainer())
         return;
     if (GetContainer()->GetHover() == m_swnd)

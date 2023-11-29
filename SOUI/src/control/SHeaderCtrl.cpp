@@ -40,7 +40,7 @@ int SHeaderCtrl::InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LP
     item.cx = szWid.toPixelSize(GetScale());
     item.bDpiAware = bDpiAware;
     item.strText.SetOwner(this);
-    item.strText.SetText(pszText);
+    item.strText.SetText(pszText, false);
     item.state = 0;
     item.iOrder = iItem;
     item.lParam = lParam;
@@ -95,7 +95,7 @@ BOOL SHeaderCtrl::SetItem(int iItem, const SHDITEM *pItem)
 
     if (pItem->mask & SHDI_TEXT && pItem->pszText)
     {
-        item.strText.SetText(pItem->pszText);
+        item.strText.SetText(pItem->pszText, false);
     }
     if (pItem->mask & SHDI_WIDTH)
         item.cx = pItem->cx;
@@ -482,7 +482,6 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
         if (strText.IsEmpty())
         {
             strText = SWindow::GetXmlText(xmlItem);
-            ;
         }
         item.strText.SetText(S_CW2T(GETSTRING(strText)));
         SLayoutSize szItem = GETLAYOUTSIZE(xmlItem.attribute(L"width").as_string(L"50"));
