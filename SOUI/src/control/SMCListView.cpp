@@ -1096,6 +1096,11 @@ void SMCListView::EnsureVisible(int iItem)
             OnScroll(TRUE, SB_THUMBPOSITION, pos);
         }
     }
+    if (!m_lvItemLocator->IsFixHeight())
+    {
+        int pos = m_lvItemLocator->Item2Position(iItem);
+        OnScroll(TRUE, SB_THUMBPOSITION, pos);
+    }
 }
 
 BOOL SMCListView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)

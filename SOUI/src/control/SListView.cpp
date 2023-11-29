@@ -795,7 +795,7 @@ void SListView::EnsureVisible(int iItem)
 
     int iFirstVisible = m_iFirstVisible;
     int iLastVisible = m_iFirstVisible + (int)m_lstItems.GetCount();
-
+    int nPageSize = m_bVertical ? m_siVer.nPage : m_siHoz.nPage;
     if (iItem >= iFirstVisible && iItem < iLastVisible)
     {
         if (iItem == iFirstVisible)
@@ -809,7 +809,7 @@ void SListView::EnsureVisible(int iItem)
                 OnScroll(m_bVertical, SB_BOTTOM, 0);
             else
             {
-                int pos = m_lvItemLocator->Item2Position(iItem + 1) - (m_bVertical ? m_siVer.nPage : m_siHoz.nPage);
+                int pos = m_lvItemLocator->Item2Position(iItem + 1) - nPageSize;
                 OnScroll(m_bVertical, SB_THUMBPOSITION, pos);
             }
         }
@@ -830,9 +830,14 @@ void SListView::EnsureVisible(int iItem)
         }
         else
         {
-            int pos = m_lvItemLocator->Item2Position(iItem + 1) - (m_bVertical ? m_siVer.nPage : m_siHoz.nPage);
+            int pos = m_lvItemLocator->Item2Position(iItem + 1) - nPageSize;
             OnScroll(m_bVertical, SB_THUMBPOSITION, pos);
         }
+    }
+    if (!m_lvItemLocator->IsFixHeight())
+    {
+        int pos = m_lvItemLocator->Item2Position(iItem);
+        OnScroll(m_bVertical, SB_THUMBPOSITION, pos);
     }
 }
 
