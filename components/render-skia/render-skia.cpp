@@ -177,6 +177,9 @@ namespace SOUI
 	};
 
 	class DeviceManager {
+		GLuint fbo; 
+		GLuint colorTexture; 
+
 	public:
 
 		DeviceManager(HWND hwnd)
@@ -185,15 +188,15 @@ namespace SOUI
 			,fCurContext(NULL)
 			,fCurIntf(NULL)
 			,fCurRenderTarget(NULL) 
+			,fMSAASampleCount(0)
+			, fbo(0),colorTexture(0)
 		{
-			fMSAASampleCount = 0;
 			AttachmentInfo attachmentInfo;
 			bool result = attachGL(fMSAASampleCount, &attachmentInfo);
 			if (!result) {
 				SkDebugf("Failed to initialize GL");
 				return;
 			}
-
 			SkAutoTUnref<const GrGLInterface> glInterface;
 			glInterface.reset(GrGLCreateNativeInterface());
 			// Currently SampleApp does not use NVPR. TODO: Provide an NVPR device type that is skipped
@@ -218,20 +221,48 @@ namespace SOUI
 			return fHWND;
 		}
 
-		SkSurface* createSurface()  {
+		SkSurface* createSurface(const SIZE *sz)  {
 #if SK_SUPPORT_GPU
-				if (fCurContext) {
-					return SkSurface::NewRenderTargetDirect(fCurRenderTarget);
+				if (!fCurContext) {
+					return NULL;
 				}
+				return SkSurface::NewRenderTargetDirect(fCurRenderTarget);
 #endif
 				return NULL;
+		}
+
+		void prepareGL(){
+			if(!fCurContext || !fbo)
+				return;
+			//render to fbo
+			fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo);
+			RECT rc;
+			GetClientRect(fHWND,&rc);
+			glViewport(0,0,rc.right,rc.bottom);
 		}
 
 		void presentGL(){
 			if(!fCurContext)
 				return;
+
+			fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
+			RECT rc;
+			GetClientRect(fHWND,&rc);
+			glViewport(0,0,rc.right,rc.bottom);
+
+			// 渲染 FBO 的纹理到屏幕
+			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+			glClear(GL_COLOR_BUFFER_BIT);
+
+			fCurIntf->fFunctions.fUseProgram(0);  // 使用默认的着色器程序
+
+			glBindTexture(GL_TEXTURE_2D, colorTexture);
+			glDrawArrays(GL_TRIANGLES, 0, 6);
+			glBindTexture(GL_TEXTURE_2D, 0);
+
 			fCurContext->flush();
 			glFlush();
+
 			HDC dc = GetDC((HWND)fHWND);
 			SwapBuffers(dc);
 			ReleaseDC((HWND)fHWND, dc);
@@ -276,12 +307,6 @@ namespace SOUI
 				} else {
 					info->fSampleCount = 0;
 				}
-
-				RECT rc;
-				GetClientRect(fHWND,&rc);
-				glViewport(0, 0,
-					SkScalarRoundToInt(rc.right),
-					SkScalarRoundToInt(rc.bottom));
 				return true;
 			}
 			return false;
@@ -290,9 +315,20 @@ namespace SOUI
 		void windowSizeChanged(int nWid,int nHei) {
 #if SK_SUPPORT_GPU
 			if (fCurContext) {
+				SkSafeUnref(fCurRenderTarget);
+				if(fbo!=0){
+					fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
+
+					fCurIntf->fFunctions.fDeleteFramebuffers(1, &fbo);
+					fCurIntf->fFunctions.fDeleteTextures(1, &colorTexture);
+					fbo = 0;
+					colorTexture = 0;
+				}
+
 				AttachmentInfo attachmentInfo;
 				attachGL(fMSAASampleCount, &attachmentInfo);
 
+				//build rendertarget.
 				GrBackendRenderTargetDesc desc;
 				desc.fWidth = SkScalarRoundToInt(nWid);
 				desc.fHeight = SkScalarRoundToInt(nHei);
@@ -304,8 +340,22 @@ namespace SOUI
 				GR_GL_GetIntegerv(fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
 				desc.fRenderTargetHandle = buffer;
 
-				SkSafeUnref(fCurRenderTarget);
 				fCurRenderTarget = fCurContext->wrapBackendRenderTarget(desc);
+
+				//build fbo and texture
+				fCurIntf->fFunctions.fGenFramebuffers(1,&fbo);
+				fCurIntf->fFunctions.fGenTextures(1, &colorTexture);
+				fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, colorTexture);
+				fCurIntf->fFunctions.fTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nWid, nHei, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+				fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				fCurIntf->fFunctions.fFramebufferTexture2D(GR_GL_FRAMEBUFFER, GR_GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0);
+
+				// 检查 FBO 完整性
+				GLenum status = fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER);
+				if(status != GR_GL_FRAMEBUFFER_COMPLETE){
+				}
+				glViewport(0, 0,nWid,nHei);
 			}
 #endif
 		}
@@ -599,7 +649,7 @@ namespace SOUI
 			if (m_surface) {
 				m_surface->unref();
 			}
-			m_surface = m_deviceMgr->createSurface();
+			m_surface = m_deviceMgr->createSurface(&sz);
 			m_SkCanvas = m_surface->getCanvas();
 
 			m_deviceMgr->windowSizeChanged(sz.cx,sz.cy);
@@ -1826,8 +1876,11 @@ namespace SOUI
 	{
 		if(IsOffscreen())
 			return;
-		m_cDrawing++;
-
+		if(0==m_cDrawing++)
+		{
+			m_deviceMgr->prepareGL();
+		}
+	
 		//RECT rc;
 		//GetClientRect(m_deviceMgr->getHwnd(),&rc);
 		//FillSolidRect(&rc,-1);
