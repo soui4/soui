@@ -30,3 +30,7 @@ add_subdirectory(httpclient)
 #	add_subdirectory(resprovider-7zip)
 #	message(STATUS "build resprovider-7zip ON")
 #endif()
+
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/com-cfg.h" DESTINATION include/components)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/commask.h" DESTINATION include/components)
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/commgr2.h" DESTINATION include/components)

@@ -84,14 +84,13 @@ SSliderBar::RANGE SSliderBar::_GetPartRange(int nLength, int nThumbSize, BOOL bT
 
 CRect SSliderBar::GetPartRect(UINT uSBCode)
 {
-    SASSERT(m_pSkinThumb);
-
     CRect rcClient;
     GetClientRect(&rcClient);
 
-    SIZE szThumb = m_pSkinThumb->GetSkinSize();
+    SIZE szThumb = { 0 };
     SIZE szRail = m_pSkinBg->GetSkinSize();
-
+    if (m_pSkinThumb)
+        szThumb = m_pSkinThumb->GetSkinSize();
     if (IsVertical())
     {
         RANGE r = _GetPartRange(rcClient.Height(), szThumb.cy, m_bThumbInRail, m_nMinValue, m_nMaxValue, m_nValue, uSBCode);
@@ -122,7 +121,7 @@ CRect SSliderBar::GetPartRect(UINT uSBCode)
 
 void SSliderBar::OnPaint(IRenderTarget *pRT)
 {
-    SASSERT(m_pSkinThumb && m_pSkinBg && m_pSkinPos);
+    SASSERT(m_pSkinBg && m_pSkinPos);
 
     SPainter painter;
 
@@ -135,14 +134,16 @@ void SSliderBar::OnPaint(IRenderTarget *pRT)
         CRect rcSel = GetPartRect(SC_SELECT);
         m_pSkinPos->DrawByIndex(pRT, rcSel, 0);
     }
-    CRect rcThumb = GetPartRect(SC_THUMB);
-    int nState = 0; // normal
-    if (m_bDrag)
-        nState = 2; // pushback
-    else if (m_uHtPrev == SC_THUMB)
-        nState = 1; // hover
-    m_pSkinThumb->DrawByIndex(pRT, rcThumb, nState);
-
+    if (m_pSkinThumb)
+    {
+        CRect rcThumb = GetPartRect(SC_THUMB);
+        int nState = 0; // normal
+        if (m_bDrag)
+            nState = 2; // pushback
+        else if (m_uHtPrev == SC_THUMB)
+            nState = 1; // hover
+        m_pSkinThumb->DrawByIndex(pRT, rcThumb, nState);
+    }
     AfterPaint(pRT, painter);
 }
 
@@ -253,10 +254,12 @@ LRESULT SSliderBar::NotifyPos(UINT uCode, int nPos)
 
 SIZE SSliderBar::GetDesiredSize(int wid, int hei)
 {
-    SASSERT(m_pSkinBg && m_pSkinThumb);
+    SASSERT(m_pSkinBg);
     CSize szRet;
     SIZE sizeBg = m_pSkinBg->GetSkinSize();
-    SIZE sizeThumb = m_pSkinThumb->GetSkinSize();
+    SIZE sizeThumb = { 0 };
+    if (m_pSkinThumb)
+        sizeThumb = m_pSkinThumb->GetSkinSize();
 
     if (IsVertical())
     {
@@ -282,6 +285,13 @@ void SSliderBar::OnScaleChanged(int scale)
 {
     __baseCls::OnScaleChanged(scale);
     GetScaleSkin(m_pSkinThumb, scale);
+}
+
+BOOL SSliderBar::SetValue(THIS_ int nValue)
+{
+    if (m_bDrag)
+        return FALSE;
+    return __baseCls::SetValue(nValue);
 }
 
 SNSEND

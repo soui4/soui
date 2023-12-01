@@ -56,7 +56,7 @@ class SOUI_EXP STabPage : public TWindowProxy<ITabPage> {
     }
     STDMETHOD_(void, SetTitle)(THIS_ LPCTSTR lpszTitle) OVERRIDE
     {
-        m_strTitle.SetText(lpszTitle);
+        m_strTitle.SetText(lpszTitle, false);
     }
 
     STDMETHOD_(int, GetIconIndex)(CTHIS) SCONST OVERRIDE

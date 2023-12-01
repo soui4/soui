@@ -855,6 +855,15 @@ void SHostWnd::OnDestroy()
     m_memRT = NULL;
     m_rgnInvalidate = NULL;
 
+    // clear pending tasks.
+    SPOSITION pos = m_runnables.GetHeadPosition();
+    while (pos)
+    {
+        IRunnable *pRunnable = m_runnables.GetNext(pos);
+        pRunnable->Release();
+    }
+    m_runnables.RemoveAll();
+
     SHostMgr::getSingletonPtr()->RemoveHostMsgHandler(m_hWnd);
     // exit app. (copy from wtl)
     if (m_hostAttr.m_byWndType == SHostWndAttr::WT_APPMAIN || (m_hostAttr.m_byWndType == SHostWndAttr::WT_UNDEFINE && (SNativeWnd::GetStyle() & (WS_CHILD | WS_POPUP)) == 0 && (SNativeWnd::GetExStyle() & WS_EX_TOOLWINDOW) == 0))
@@ -929,8 +938,10 @@ void SHostWnd::OnTimer(UINT_PTR idEvent)
             SwndContainerImpl::OnNextFrame();
         }
         return;
-    }else if(idEvent == kTaskTimer){
-        OnRunTasks(0,0,0);
+    }
+    else if (idEvent == kTaskTimer)
+    {
+        OnRunTasks(0, 0, 0);
         return;
     }
 
@@ -2015,8 +2026,9 @@ BOOL SHostWnd::PostTask(THIS_ IRunnable *runable, BOOL bAsync /*DEF_VAL(TRUE)*/)
     {
         PostMessage(UM_RUN_TASKS);
     }
-    else if(tasks == 1){
-        SetTimer(kTaskTimer,kTaskInterval);
+    else if (tasks == 1)
+    {
+        SetTimer(kTaskTimer, kTaskInterval);
     }
     m_cs.Leave();
     return TRUE;
@@ -2057,7 +2069,7 @@ int SHostWnd::RemoveTasksForObject(THIS_ void *pObj)
 LRESULT SHostWnd::OnRunTasks(UINT uMsg, WPARAM wp, LPARAM lp)
 {
     m_cs.Enter();
-	KillTimer(kTaskTimer);
+    KillTimer(kTaskTimer);
     m_runningQueue.Swap(m_runnables);
     m_cs.Leave();
     for (;;)

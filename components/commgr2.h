@@ -1,6 +1,6 @@
 ﻿//SOUI组件配置
-
-#pragma  once
+#ifndef _SOUI_COMMGR2_H_
+#define _SOUI_COMMGR2_H_
 
 #include <config.h>
 #include <string/tstring.h>
@@ -444,3 +444,5 @@ protected:
 
 }
 #endif
+
+#endif//_SOUI_COMMGR2_H_

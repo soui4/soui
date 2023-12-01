@@ -197,7 +197,7 @@ function on_run(args)
 	if tid == 0 then
 		prog_all = {0,0,0,0};
 		on_canvas_size(nil);
-		tid = runTimer:StartTimer(50,1);
+		tid = runTimer:StartTimer(50,1,0);
 		btn:SetWindowText(T"stop");
 		flag_win:SetVisible(0,1);
 	else

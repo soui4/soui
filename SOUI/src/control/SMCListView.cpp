@@ -583,6 +583,7 @@ void SMCListView::UpdateVisibleItems()
 {
     if (!m_adapter)
         return;
+    SAutoEnableHostPrivUiDef enableUiDef(this);
     int iOldFirstVisible = m_iFirstVisible;
     int iOldLastVisible = m_iFirstVisible + m_lstItems.GetCount();
     int nOldTotalHeight = m_lvItemLocator->GetTotalHeight();
@@ -749,6 +750,7 @@ void SMCListView::UpdateVisibleItems()
 
 void SMCListView::UpdateVisibleItem(int iItem)
 {
+    SAutoEnableHostPrivUiDef enableUiDef(this);
     SASSERT(m_lvItemLocator->IsFixHeight());
     SItemPanel *pItem = GetItemPanel(iItem);
     SASSERT(pItem);
@@ -1093,6 +1095,11 @@ void SMCListView::EnsureVisible(int iItem)
             int pos = m_lvItemLocator->Item2Position(iItem + 1) - m_siVer.nPage;
             OnScroll(TRUE, SB_THUMBPOSITION, pos);
         }
+    }
+    if (!m_lvItemLocator->IsFixHeight())
+    {
+        int pos = m_lvItemLocator->Item2Position(iItem);
+        OnScroll(TRUE, SB_THUMBPOSITION, pos);
     }
 }
 

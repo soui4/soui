@@ -486,7 +486,7 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
      *
      * Describe  设置进度条进度值
      */
-    BOOL WINAPI SetValue(int nValue);
+    STDMETHOD_(BOOL, SetValue)(THIS_ int nValue) OVERRIDE;
     /**
      * SProgress::GetValue
      * @brief    获取进度值
@@ -494,7 +494,7 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
      *
      * Describe  获取进度值
      */
-    int WINAPI GetValue() const
+    STDMETHOD_(int, GetValue)(CTHIS) SCONST OVERRIDE
     {
         return m_nValue;
     }
@@ -507,7 +507,7 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
      *
      * Describe  设置进度值
      */
-    void WINAPI SetRange(int nMin, int nMax);
+    STDMETHOD_(void, SetRange)(THIS_ int nMin, int nMax) OVERRIDE;
     /**
      * SProgress::GetRange
      * @param    int nMin  --  进度最小值
@@ -516,7 +516,7 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
      *
      * Describe  获取进度值
      */
-    void WINAPI GetRange(int *pMin, int *pMax) const;
+    STDMETHOD_(void, GetRange)(CTHIS_ int *pMin, int *pMax) SCONST OVERRIDE;
     /**
      * SProgress::IsVertical
      * @brief    判断进度条是否为竖直状态
@@ -524,7 +524,7 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
      *
      * Describe  获取进度值
      */
-    BOOL WINAPI IsVertical() const
+    STDMETHOD_(BOOL, IsVertical)(CTHIS) SCONST OVERRIDE
     {
         return m_bVertical;
     }

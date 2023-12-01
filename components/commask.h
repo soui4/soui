@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _SOUI_COM_MASK_H_
+#define _SOUI_COM_MASK_H_
 
 #define scom_mask_translator  (1 << 0)
 #define scom_mask_log4z  (1 << 1)
@@ -22,3 +23,4 @@
 
 #define scom_mask_scom_all  (0xffffffff)
 
+#endif //_SOUI_COM_MASK_H_

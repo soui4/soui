@@ -1273,5 +1273,21 @@ class SOUI_EXP SWindow
 #endif
 };
 
+class SOUI_EXP SAutoEnableHostPrivUiDef {
+  public:
+    SAutoEnableHostPrivUiDef(SWindow *pOwner)
+        : m_pOwner(pOwner)
+    {
+        m_pOwner->GetContainer()->EnableHostPrivateUiDef(TRUE);
+    }
+    ~SAutoEnableHostPrivUiDef()
+    {
+        m_pOwner->GetContainer()->EnableHostPrivateUiDef(FALSE);
+    }
+
+  protected:
+    SWindow *m_pOwner;
+};
+
 SNSEND
 #endif // __SWND__H__

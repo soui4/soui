@@ -823,6 +823,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
 {
     ASSERT_UI_THREAD();
     BOOL bRet = FALSE;
+    SAutoEnableHostPrivUiDef enableUiDef(this);
     for (SXmlNode xmlChild = xmlNode.first_child(); xmlChild; xmlChild = xmlChild.next_sibling())
     {
         if (xmlChild.type() != node_element)
@@ -3231,7 +3232,7 @@ SStringT SWindow::GetToolTipText()
 
 void SWindow::SetToolTipText(LPCTSTR pszText)
 {
-    m_strToolTipText.SetText(pszText);
+    m_strToolTipText.SetText(pszText, false);
     if (!GetContainer())
         return;
     if (GetContainer()->GetHover() == m_swnd)

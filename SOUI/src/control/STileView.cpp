@@ -194,6 +194,7 @@ void STileView::onDataSetInvalidated()
 
 void STileView::UpdateVisibleItem(int iItem)
 {
+    SAutoEnableHostPrivUiDef enableUiDef(this);
     SItemPanel *pItem = GetItemPanel(iItem);
     SASSERT(pItem);
     SXmlNode xmlNode = m_xmlTemplate.root().first_child();
@@ -294,6 +295,7 @@ void STileView::UpdateVisibleItems()
     {
         return;
     }
+    SAutoEnableHostPrivUiDef enableUiDef(this);
     int iOldFirstVisible = m_iFirstVisible;
     int iOldLastVisible = m_iFirstVisible + (int)m_lstItems.GetCount();
 
