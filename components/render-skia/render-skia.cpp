@@ -245,22 +245,31 @@ namespace SOUI
 			if(!fCurContext)
 				return;
 
-			fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
 			RECT rc;
-			GetClientRect(fHWND,&rc);
-			glViewport(0,0,rc.right,rc.bottom);
-
-			// 渲染 FBO 的纹理到屏幕
-			glClearColor(0.0f, 0.0f, 0.0f, 1.0f);
-			glClear(GL_COLOR_BUFFER_BIT);
-
-			fCurIntf->fFunctions.fUseProgram(0);  // 使用默认的着色器程序
-
-			glBindTexture(GL_TEXTURE_2D, colorTexture);
-			glDrawArrays(GL_TRIANGLES, 0, 6);
-			glBindTexture(GL_TEXTURE_2D, 0);
+            GetClientRect(fHWND, &rc);
+            glViewport(0, 0, rc.right, rc.bottom);
 
 			fCurContext->flush();
+
+            fCurIntf->fFunctions.fBindFramebuffer(GR_GL_READ_FRAMEBUFFER, fbo);
+            fCurIntf->fFunctions.fBindFramebuffer(GR_GL_DRAW_FRAMEBUFFER, GR_GL_NONE);
+            {
+                fCurIntf->fFunctions.fBlitFramebuffer(
+					  0
+					, 0
+					, rc.right
+					, rc.bottom
+					
+					, 0
+					, 0
+					, rc.right
+					, rc.bottom
+					
+					, GL_COLOR_BUFFER_BIT
+					, GL_NEAREST);
+			}
+			fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
+
 			glFlush();
 
 			HDC dc = GetDC((HWND)fHWND);
@@ -325,37 +334,61 @@ namespace SOUI
 					colorTexture = 0;
 				}
 
-				AttachmentInfo attachmentInfo;
-				attachGL(fMSAASampleCount, &attachmentInfo);
-
-				//build rendertarget.
-				GrBackendRenderTargetDesc desc;
-				desc.fWidth = SkScalarRoundToInt(nWid);
-				desc.fHeight = SkScalarRoundToInt(nHei);
-				desc.fConfig = kSkia8888_GrPixelConfig;
-				desc.fOrigin = kBottomLeft_GrSurfaceOrigin;
-				desc.fSampleCnt = attachmentInfo.fSampleCount;
-				desc.fStencilBits = attachmentInfo.fStencilBits;
-				GrGLint buffer;
-				GR_GL_GetIntegerv(fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
-				desc.fRenderTargetHandle = buffer;
-
-				fCurRenderTarget = fCurContext->wrapBackendRenderTarget(desc);
-
 				//build fbo and texture
 				fCurIntf->fFunctions.fGenFramebuffers(1,&fbo);
 				fCurIntf->fFunctions.fGenTextures(1, &colorTexture);
-				fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, colorTexture);
-				fCurIntf->fFunctions.fTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nWid, nHei, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-				fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-				fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-				fCurIntf->fFunctions.fFramebufferTexture2D(GR_GL_FRAMEBUFFER, GR_GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0);
 
-				// 检查 FBO 完整性
-				GLenum status = fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER);
-				if(status != GR_GL_FRAMEBUFFER_COMPLETE){
+				// 调整Texture大小
+				GLint texture_prev=0;
+                fCurIntf->fFunctions.fGetIntegerv(GR_GL_TEXTURE_BINDING_2D, &texture_prev);
+                {
+                    fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, colorTexture);
+
+                    fCurIntf->fFunctions.fTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nWid, nHei, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+                    fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                    fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GR_GL_CLAMP_TO_EDGE);
+                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GR_GL_CLAMP_TO_EDGE);
 				}
-				glViewport(0, 0,nWid,nHei);
+                fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, texture_prev);
+
+				// 绑定颜色附件
+                GLint fbo_prev=0;
+                fCurIntf->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER, &fbo_prev);
+                {
+                    fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo);
+                    fCurIntf->fFunctions.fFramebufferTexture2D(GR_GL_FRAMEBUFFER, GR_GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0);
+
+                    // 检查 FBO 完整性
+                    GLenum status = fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER);
+                    if (status != GR_GL_FRAMEBUFFER_COMPLETE)
+                    {
+                    }
+				}
+                fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo_prev);
+
+				glViewport(0, 0, nWid, nHei);
+
+				// 绑定fbo，在此fbo上生成BackendRenderTarget
+                fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo);
+				{
+                    AttachmentInfo attachmentInfo;
+                    attachGL(fMSAASampleCount, &attachmentInfo);
+
+                    // build rendertarget.
+                    GrBackendRenderTargetDesc desc;
+                    desc.fWidth = SkScalarRoundToInt(nWid);
+                    desc.fHeight = SkScalarRoundToInt(nHei);
+                    desc.fConfig = kSkia8888_GrPixelConfig;
+                    desc.fOrigin = kBottomLeft_GrSurfaceOrigin;
+                    desc.fSampleCnt = attachmentInfo.fSampleCount;
+                    desc.fStencilBits = attachmentInfo.fStencilBits;
+                    GrGLint buffer;
+                    GR_GL_GetIntegerv(fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
+                    desc.fRenderTargetHandle = buffer;
+
+                    fCurRenderTarget = fCurContext->wrapBackendRenderTarget(desc);
+				}
 			}
 #endif
 		}
@@ -743,6 +776,16 @@ namespace SOUI
 
 	HRESULT SRenderTarget_Skia::BitBlt( LPCRECT pRcDest,IRenderTarget *pRTSour,int xSrc,int ySrc,DWORD dwRop/*=SRCCOPY*/)
 	{
+        if (this->IsOffscreen())
+        {
+            int k = 0;
+        }
+
+		if (pRTSour->IsOffscreen())
+		{
+            int k = 0;
+		}
+
 		SkPaint paint=m_paint;
 		paint.setStyle(SkPaint::kFill_Style);
 		SetPaintXferMode(paint,dwRop);
