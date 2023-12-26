@@ -376,33 +376,49 @@ BOOL SMCListView::OnHeaderSizeChanging(IEvtArgs *pEvt)
 {
     UpdateScrollBar();
     UpdateHeaderCtrl();
-    SPOSITION pos = m_lstItems.GetHeadPosition();
-    while (pos)
+    if (!m_lvItemLocator->IsFixHeight())
     {
-        ItemInfo ii = m_lstItems.GetNext(pos);
-        CRect rcItem = ii.pItem->GetWindowRect();
-        rcItem.right = m_pHeader->GetTotalWidth();
-        ii.pItem->Move(rcItem);
-        CRect rcSubItem(rcItem);
-        rcSubItem.right = rcSubItem.left = 0;
+        int *nWids = new int[m_pHeader->GetItemCount()];
         for (int i = 0; i < m_pHeader->GetItemCount(); i++)
         {
             SHDITEM hi = { SHDI_ORDER, 0 };
             m_pHeader->GetItem(i, &hi);
-            rcSubItem.left = rcSubItem.right;
-            rcSubItem.right += m_pHeader->GetItemWidth(i);
-            SStringW strColName;
-            m_adapter->GetColumnName(hi.iOrder, &strColName);
-            SWindow *pCol = ii.pItem->FindChildByName(strColName);
-            if (pCol)
-            {
-                pCol->Move(rcSubItem);
-            }
+            nWids[hi.iOrder] = m_pHeader->GetItemWidth(i);
         }
-        SASSERT(rcSubItem.right == m_pHeader->GetTotalWidth());
+        m_adapter->SetColumnsWidth(nWids, m_pHeader->GetItemCount());
+        delete[] nWids;
+        UpdateVisibleItems();
     }
+    else
+    {
+        SPOSITION pos = m_lstItems.GetHeadPosition();
+        while (pos)
+        {
+            ItemInfo ii = m_lstItems.GetNext(pos);
+            CRect rcItem = ii.pItem->GetWindowRect();
+            rcItem.right = m_pHeader->GetTotalWidth();
+            ii.pItem->Move(rcItem);
+            CRect rcSubItem(rcItem);
+            rcSubItem.right = rcSubItem.left = 0;
+            for (int i = 0; i < m_pHeader->GetItemCount(); i++)
+            {
+                SHDITEM hi = { SHDI_ORDER, 0 };
+                m_pHeader->GetItem(i, &hi);
+                rcSubItem.left = rcSubItem.right;
+                rcSubItem.right += m_pHeader->GetItemWidth(i);
+                SStringW strColName;
+                m_adapter->GetColumnName(hi.iOrder, &strColName);
+                SWindow *pCol = ii.pItem->FindChildByName(strColName);
+                if (pCol)
+                {
+                    pCol->Move(rcSubItem);
+                }
+            }
+            SASSERT(rcSubItem.right == m_pHeader->GetTotalWidth());
+        }
 
-    InvalidateRect(GetListRect());
+        InvalidateRect(GetListRect());
+    }
     return TRUE;
 }
 
