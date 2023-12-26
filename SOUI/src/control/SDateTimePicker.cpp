@@ -43,7 +43,7 @@ SDateTimePicker::~SDateTimePicker()
 
 BOOL SDateTimePicker::CreateChildren(SXmlNode xmlNode)
 {
-    m_pCalendar = (SCalendar *)SApplication::getSingleton().CreateWindowByName(SCalendar::GetClassName());
+    m_pCalendar = (SCalendar *)CreateChildByName(SCalendar::GetClassName());
     if (NULL == m_pCalendar)
         return FALSE;
     m_pCalendar->SetContainer(GetContainer());

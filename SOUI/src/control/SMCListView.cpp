@@ -154,7 +154,7 @@ BOOL SMCListView::CreateChildren(SXmlNode xmlNode)
     xmlTemplate.set_userdata(1);
     SXmlNode xmlHeader = xmlNode.child(L"headerStyle");
     xmlHeader.set_userdata(1);
-    m_pHeader = sobj_cast<SHeaderCtrl>(SApplication::getSingletonPtr()->CreateWindowByName(xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
+    m_pHeader = sobj_cast<SHeaderCtrl>(CreateChildByName(xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
     SASSERT(m_pHeader);
     if (!m_pHeader)
         return FALSE;
@@ -756,6 +756,7 @@ void SMCListView::UpdateVisibleItems()
     if (!m_lvItemLocator->IsFixHeight() && m_lvItemLocator->GetTotalHeight() != nOldTotalHeight)
     { // update scroll range
         UpdateScrollBar();
+        UpdateHeaderCtrl();
         UpdateVisibleItems(); //根据新的滚动条状态重新记录显示列表项
     }
     else

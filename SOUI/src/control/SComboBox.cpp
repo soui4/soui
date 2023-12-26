@@ -25,7 +25,7 @@ BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
     //创建列表控件
     SXmlNode listStyle = xmlNode.child(L"listStyle");
     SStringW strListClass = listStyle.attribute(L"wndclass").as_string(SListBox::GetClassName());
-    m_pListBox = sobj_cast<SListBox>(SApplication::getSingleton().CreateWindowByName(strListClass));
+    m_pListBox = sobj_cast<SListBox>(CreateChildByName(strListClass));
     SASSERT(m_pListBox);
 
     m_pListBox->SetContainer(GetContainer());
