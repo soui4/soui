@@ -133,6 +133,7 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
         {
             m_itemRecycle.Add(new SList<SItemPanel *>());
         }
+        _UpdateAdapterColumnsWidth();
         onDataSetChanged();
     }
     return TRUE;
@@ -378,15 +379,7 @@ BOOL SMCListView::OnHeaderSizeChanging(IEvtArgs *pEvt)
     UpdateHeaderCtrl();
     if (!m_lvItemLocator->IsFixHeight())
     {
-        int *nWids = new int[m_pHeader->GetItemCount()];
-        for (int i = 0; i < m_pHeader->GetItemCount(); i++)
-        {
-            SHDITEM hi = { SHDI_ORDER, 0 };
-            m_pHeader->GetItem(i, &hi);
-            nWids[hi.iOrder] = m_pHeader->GetItemWidth(i);
-        }
-        m_adapter->SetColumnsWidth(nWids, m_pHeader->GetItemCount());
-        delete[] nWids;
+        _UpdateAdapterColumnsWidth();
         UpdateVisibleItems();
     }
     else
@@ -780,19 +773,7 @@ void SMCListView::OnSize(UINT nType, CSize size)
     __baseCls::OnSize(nType, size);
     UpdateScrollBar();
     UpdateHeaderCtrl();
-
-    // update item window
-    CRect rcClient = GetClientRect();
-    SPOSITION pos = m_lstItems.GetHeadPosition();
-    while (pos)
-    {
-        ItemInfo ii = m_lstItems.GetNext(pos);
-        int idx = (int)ii.pItem->GetItemIndex();
-        int nHei = m_lvItemLocator->GetItemHeight(idx);
-        CRect rcItem(0, 0, m_pHeader->GetTotalWidth(), nHei);
-        ii.pItem->Move(rcItem);
-    }
-
+    _UpdateAdapterColumnsWidth();
     UpdateVisibleItems();
 }
 
@@ -1401,6 +1382,22 @@ void SMCListView::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei
         psz->cy = m_lvItemLocator->GetTotalHeight() + rcPadding.top + rcPadding.bottom;
         if (nParentHei > 0 && psz->cy > nParentHei)
             psz->cy = nParentHei;
+    }
+}
+
+void SMCListView::_UpdateAdapterColumnsWidth() const
+{
+    if (!m_lvItemLocator->IsFixHeight() && m_adapter)
+    {
+        int *nWids = new int[m_pHeader->GetItemCount()];
+        for (int i = 0; i < m_pHeader->GetItemCount(); i++)
+        {
+            SHDITEM hi = { SHDI_ORDER, 0 };
+            m_pHeader->GetItem(i, &hi);
+            nWids[hi.iOrder] = m_pHeader->GetItemWidth(i);
+        }
+        m_adapter->SetColumnsWidth(nWids, m_pHeader->GetItemCount());
+        delete[] nWids;
     }
 }
 
