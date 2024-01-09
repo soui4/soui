@@ -150,14 +150,14 @@ void SSliderBar::OnPaint(IRenderTarget *pRT)
 void SSliderBar::OnLButtonUp(UINT nFlags, CPoint point)
 {
     ReleaseCapture();
-
+    OnMouseMove(nFlags, point);
     if (m_bDrag)
     {
         m_bDrag = FALSE;
         CRect rcThumb = GetPartRect(SC_THUMB);
         InvalidateRect(rcThumb);
+        NotifyPos(SBA_MOUSE_UP, m_nValue);
     }
-    OnMouseMove(nFlags, point);
 }
 
 void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
@@ -191,7 +191,7 @@ void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
         m_ptDrag = point;
         m_nDragValue = m_nValue;
 
-        NotifyPos(SC_THUMB, m_nValue);
+        NotifyPos(SBA_MOUSE_DOWN, m_nValue);
     }
 }
 
@@ -218,7 +218,7 @@ void SSliderBar::OnMouseMove(UINT nFlags, CPoint point)
         {
             m_nValue = nNewTrackPos;
             Invalidate();
-            NotifyPos(SC_THUMB, m_nValue);
+            NotifyPos(SBA_MOUSE_MOVING, m_nValue);
         }
     }
     else
@@ -244,11 +244,11 @@ void SSliderBar::OnMouseLeave()
     }
 }
 
-LRESULT SSliderBar::NotifyPos(UINT uCode, int nPos)
+LRESULT SSliderBar::NotifyPos(SliderBarAction action, int nPos)
 {
     EventSliderPos evt(this);
     evt.nPos = nPos;
-
+    evt.action = action;
     return FireEvent(evt);
 }
 
