@@ -32,6 +32,8 @@
 #include "SkWindow.h"
 #include "TransitionView.h"
 #include "sk_tool_utils.h"
+#include <GL/Gl.h>
+#include <assert.h>
 
 #if SK_SUPPORT_GPU
 #include "gl/GrGLInterface.h"
@@ -163,6 +165,10 @@ public:
         fCurIntf = NULL;
         fCurRenderTarget = NULL;
         fMSAASampleCount = 0;
+
+        m_fbo = 0;
+        m_colorTexture = 0;
+        fFboRenderTarget = NULL;
 #endif
         fBackend = kNone_BackEndType;
     }
@@ -172,6 +178,8 @@ public:
         SkSafeUnref(fCurContext);
         SkSafeUnref(fCurIntf);
         SkSafeUnref(fCurRenderTarget);
+
+        SkSafeUnref(fFboRenderTarget);
 #endif
     }
 
@@ -266,6 +274,15 @@ public:
 
         SkSafeUnref(fCurRenderTarget);
         fCurRenderTarget = NULL;
+
+        if (m_fbo != 0) {
+            fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
+
+            fCurIntf->fFunctions.fDeleteFramebuffers(1, &m_fbo);
+            fCurIntf->fFunctions.fDeleteTextures(1, &m_colorTexture);
+            m_fbo = 0;
+            m_colorTexture = 0;
+        }
 #endif
         win->detach();
         fBackend = kNone_BackEndType;
@@ -275,7 +292,7 @@ public:
                                      SampleWindow* win) SK_OVERRIDE {
 #if SK_SUPPORT_GPU
         if (IsGpuDeviceType(dType) && fCurContext) {
-            return SkSurface::NewRenderTargetDirect(fCurRenderTarget);
+            return SkSurface::NewRenderTargetDirect(getGrRenderTarget());
         }
 #endif
         return NULL;
@@ -288,7 +305,33 @@ public:
         if (fCurContext) {
             // in case we have queued drawing calls
             fCurContext->flush();
+            //SkAutoTUnref<SkSurface> surface2(SkSurface::NewRenderTargetDirect(fCurRenderTarget));
+ /*           SkCanvas* canvas2 = surface2->getCanvas();
+            const SkBitmap& bm = win->getBitmap();
+            int wid = bm.width();
+            int hei = bm.height();
+            SkRect rc = { 0,0,wid / 2,hei };
+            SkPaint paint;
+            paint.setStrokeWidth(2);
+            paint.setColor(0xFF0000FF);
+            canvas2->drawRoundRect(rc, 10, 10, paint);
+            fCurContext->flush();
+            */
+            //const SkBitmap& bm = win->getBitmap();
+            //int wid = bm.width();
+            //int hei = bm.height();
+            //fCurIntf->fFunctions.fBindFramebuffer(GR_GL_READ_FRAMEBUFFER, m_fbo);
+            //fCurIntf->fFunctions.fBindFramebuffer(GR_GL_DRAW_FRAMEBUFFER, GR_GL_NONE);
+            //fCurIntf->fFunctions.fBlitFramebuffer(
+            //    0, 0, wid,hei
+            //    , 0, 0, wid, hei
+            //    , GL_COLOR_BUFFER_BIT
+            //    , GL_NEAREST);
+            //fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
+            //glFlush();
 
+
+            //fCurContext->copyTexture(m_co)
             if (!IsGpuDeviceType(dType)) {
                 // need to send the raster bits to the (gpu) window
                 fCurContext->setRenderTarget(fCurRenderTarget);
@@ -310,6 +353,48 @@ public:
         if (fCurContext) {
             AttachmentInfo attachmentInfo;
             win->attach(fBackend, fMSAASampleCount, &attachmentInfo);
+            {
+                const GrGLInterface* m_fCurIntf = fCurIntf;
+
+                SkSafeUnref(fCurRenderTarget);
+                if (m_fbo != 0) {
+                    m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
+
+                    m_fCurIntf->fFunctions.fDeleteFramebuffers(1, &m_fbo);
+                    m_fCurIntf->fFunctions.fDeleteTextures(1, &m_colorTexture);
+                    m_fbo = 0;
+                    m_colorTexture = 0;
+                }
+
+                //build fbo and texture
+                m_fCurIntf->fFunctions.fGenFramebuffers(1, &m_fbo);
+                m_fCurIntf->fFunctions.fGenTextures(1, &m_colorTexture);
+
+                // 调整Texture大小
+                GLint texture_prev = 0;
+                m_fCurIntf->fFunctions.fGetIntegerv(GR_GL_TEXTURE_BINDING_2D, &texture_prev);
+                m_fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, m_colorTexture);
+
+                m_fCurIntf->fFunctions.fTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, win->width(), win->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+                m_fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+                m_fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GR_GL_CLAMP_TO_EDGE);
+                glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GR_GL_CLAMP_TO_EDGE);
+                m_fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, texture_prev);
+
+                // 绑定颜色附件
+                GLint fbo_prev = 0;
+                m_fCurIntf->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER, &fbo_prev);
+                m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, m_fbo);
+                m_fCurIntf->fFunctions.fFramebufferTexture2D(GR_GL_FRAMEBUFFER, GR_GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture, 0);
+
+                // 检查 FBO 完整性
+                GLenum status = m_fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER);
+                assert(status == GR_GL_FRAMEBUFFER_COMPLETE);
+                m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo_prev);
+            }
+            GLenum status = fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER);
+            assert(status == GR_GL_FRAMEBUFFER_COMPLETE);
 
             GrBackendRenderTargetDesc desc;
             desc.fWidth = SkScalarRoundToInt(win->width());
@@ -318,12 +403,82 @@ public:
             desc.fOrigin = kBottomLeft_GrSurfaceOrigin;
             desc.fSampleCnt = attachmentInfo.fSampleCount;
             desc.fStencilBits = attachmentInfo.fStencilBits;
+            {
+                GrGLint buffer;
+                GR_GL_GetIntegerv(fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
+                desc.fRenderTargetHandle = buffer;
+            }
+            SkSafeUnref(fCurRenderTarget);
+            //fCurRenderTarget = fCurContext->wrapBackendRenderTarget(desc);
+            status = fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER); 
+            assert(status == GR_GL_FRAMEBUFFER_COMPLETE);
+
+            if (m_fbo != 0) {
+                fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
+
+                fCurIntf->fFunctions.fDeleteFramebuffers(1, &m_fbo);
+                fCurIntf->fFunctions.fDeleteTextures(1, &m_colorTexture);
+                m_fbo = 0;
+                m_colorTexture = 0;
+            }
+            //build fbo and texture
+            fCurIntf->fFunctions.fGenFramebuffers(1, &m_fbo);
+            fCurIntf->fFunctions.fGenTextures(1, &m_colorTexture);
+            {
+                GrGLint buffer;
+                GR_GL_GetIntegerv(fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
+                desc.fRenderTargetHandle = buffer;
+            }
+            status = fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER);
+            assert(status == GR_GL_FRAMEBUFFER_COMPLETE);
+            // 调整Texture大小
+            GLint texture_prev = 0;
+            fCurIntf->fFunctions.fGetIntegerv(GR_GL_TEXTURE_BINDING_2D, &texture_prev);
+            fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, m_colorTexture);
+
+            fCurIntf->fFunctions.fTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, win->width(), win->height(), 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+            fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+            fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GR_GL_CLAMP_TO_EDGE);
+            glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GR_GL_CLAMP_TO_EDGE);
+            fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, texture_prev);
+            {
+                GrGLint buffer;
+                GR_GL_GetIntegerv(fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
+                desc.fRenderTargetHandle = buffer;
+            }
+            status = fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER);
+            assert(status == GR_GL_FRAMEBUFFER_COMPLETE);
+            // 绑定颜色附件
+            GLint fbo_prev = 0;
+            fCurIntf->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER, &fbo_prev);
+            fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, m_fbo);
+            fCurIntf->fFunctions.fFramebufferTexture2D(GR_GL_FRAMEBUFFER, GR_GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture, 0);
+
+            {
+                GrGLint buffer;
+                GR_GL_GetIntegerv(fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
+                desc.fRenderTargetHandle = buffer;
+            }
+            // 检查 FBO 完整性
+            status = fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER);
+            assert(status == GR_GL_FRAMEBUFFER_COMPLETE);
+            fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo_prev);
+
+            //glViewport(0, 0, nWid, nHei);
+
+            // 绑定fbo，在此fbo上生成BackendRenderTarget
+            fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, m_fbo);
+
+            SkSafeUnref(fFboRenderTarget);
+            //fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, m_fbo);
+
             GrGLint buffer;
             GR_GL_GetIntegerv(fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
             desc.fRenderTargetHandle = buffer;
 
-            SkSafeUnref(fCurRenderTarget);
-            fCurRenderTarget = fCurContext->wrapBackendRenderTarget(desc);
+            fFboRenderTarget = fCurContext->wrapBackendRenderTarget(desc);
+
         }
 #endif
     }
@@ -338,7 +493,7 @@ public:
 
     virtual GrRenderTarget* getGrRenderTarget() SK_OVERRIDE {
 #if SK_SUPPORT_GPU
-        return fCurRenderTarget;
+        return fFboRenderTarget;
 #else
         return NULL;
 #endif
@@ -350,6 +505,10 @@ private:
     GrContext*              fCurContext;
     const GrGLInterface*    fCurIntf;
     GrRenderTarget*         fCurRenderTarget;
+    GrRenderTarget* fFboRenderTarget;
+    GLuint m_fbo;
+    GLuint m_colorTexture;
+
     int fMSAASampleCount;
 #endif
 

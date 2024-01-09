@@ -177,22 +177,22 @@ namespace SOUI
 	};
 
 	class DeviceManager {
-		GLuint fbo; 
-		GLuint colorTexture; 
+		GLuint m_fbo; 
+		GLuint m_colorTexture; 
 
 	public:
 
 		DeviceManager(HWND hwnd)
-			:fHWND(hwnd)
-			,fHGLRC(NULL)
-			,fCurContext(NULL)
-			,fCurIntf(NULL)
-			,fCurRenderTarget(NULL) 
-			,fMSAASampleCount(0)
-			, fbo(0),colorTexture(0)
+			:m_fHWND(hwnd)
+			,m_fHGLRC(NULL)
+			,m_fCurContext(NULL)
+			,m_fCurIntf(NULL)
+			,m_fCurRenderTarget(NULL) 
+			,m_fMSAASampleCount(0)
+			, m_fbo(0),m_colorTexture(0)
 		{
 			AttachmentInfo attachmentInfo;
-			bool result = attachGL(fMSAASampleCount, &attachmentInfo);
+			bool result = attachGL(m_fMSAASampleCount, &attachmentInfo);
 			if (!result) {
 				SkDebugf("Failed to initialize GL");
 				return;
@@ -201,8 +201,8 @@ namespace SOUI
 			glInterface.reset(GrGLCreateNativeInterface());
 			// Currently SampleApp does not use NVPR. TODO: Provide an NVPR device type that is skipped
 			// when the driver doesn't support NVPR.
-			fCurIntf = GrGLInterfaceRemoveNVPR(glInterface.get());
-			fCurContext = GrContext::Create(kOpenGL_GrBackend, (GrBackendContext) fCurIntf);
+			m_fCurIntf = GrGLInterfaceRemoveNVPR(glInterface.get());
+			m_fCurContext = GrContext::Create(kOpenGL_GrBackend, (GrBackendContext) m_fCurIntf);
 			// call windowSizeChanged to create the render target
 			RECT rc;
 			GetClientRect(hwnd,&rc);
@@ -211,84 +211,69 @@ namespace SOUI
 
 		~DeviceManager() {
 #if SK_SUPPORT_GPU
-			SkSafeUnref(fCurContext);
-			SkSafeUnref(fCurIntf);
-			SkSafeUnref(fCurRenderTarget);
+			SkSafeUnref(m_fCurContext);
+			SkSafeUnref(m_fCurIntf);
+			SkSafeUnref(m_fCurRenderTarget);
 #endif
 		}
 
 		HWND getHwnd() const{
-			return fHWND;
+			return m_fHWND;
 		}
 
 		SkSurface* createSurface(const SIZE *sz)  {
 #if SK_SUPPORT_GPU
-				if (!fCurContext) {
+				if (!m_fCurContext) {
 					return NULL;
 				}
-				return SkSurface::NewRenderTargetDirect(fCurRenderTarget);
+				return SkSurface::NewRenderTargetDirect(m_fCurRenderTarget);
 #endif
 				return NULL;
 		}
 
 		void prepareGL(){
-			if(!fCurContext || !fbo)
+			if(!m_fCurContext || !m_fbo)
 				return;
 			//render to fbo
-			fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo);
+			m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, m_fbo);
 			RECT rc;
-			GetClientRect(fHWND,&rc);
+			GetClientRect(m_fHWND,&rc);
 			glViewport(0,0,rc.right,rc.bottom);
 		}
 
 		void presentGL(){
-			if(!fCurContext)
+			if(!m_fCurContext)
 				return;
-
 			RECT rc;
-            GetClientRect(fHWND, &rc);
-            glViewport(0, 0, rc.right, rc.bottom);
-
-			fCurContext->flush();
-
-            fCurIntf->fFunctions.fBindFramebuffer(GR_GL_READ_FRAMEBUFFER, fbo);
-            fCurIntf->fFunctions.fBindFramebuffer(GR_GL_DRAW_FRAMEBUFFER, GR_GL_NONE);
-            {
-                fCurIntf->fFunctions.fBlitFramebuffer(
-					  0
-					, 0
-					, rc.right
-					, rc.bottom
-					
-					, 0
-					, 0
-					, rc.right
-					, rc.bottom
-					
-					, GL_COLOR_BUFFER_BIT
-					, GL_NEAREST);
-			}
-			fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
-
+            GetClientRect(m_fHWND, &rc);
+			m_fCurContext->flush();
+			m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_READ_FRAMEBUFFER, m_fbo);
+			m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_DRAW_FRAMEBUFFER, GR_GL_NONE);
+			m_fCurIntf->fFunctions.fBlitFramebuffer(
+				0, 0, rc.right, rc.bottom
+				, 0, 0, rc.right, rc.bottom
+				, GL_COLOR_BUFFER_BIT
+				, GL_NEAREST);
+			m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
 			glFlush();
 
-			HDC dc = GetDC((HWND)fHWND);
+			HDC dc = GetDC((HWND)m_fHWND);
 			SwapBuffers(dc);
-			ReleaseDC((HWND)fHWND, dc);
+			ReleaseDC((HWND)m_fHWND, dc);
 		}
 		void detachGL() {
-			wglMakeCurrent(GetDC((HWND)fHWND), 0);
-			wglDeleteContext((HGLRC)fHGLRC);
-			fHGLRC = NULL;
+			wglMakeCurrent(GetDC((HWND)m_fHWND), 0);
+			wglDeleteContext((HGLRC)m_fHGLRC);
+			m_fHGLRC = NULL;
 		}
 
 
 		bool attachGL(int msaaSampleCount, AttachmentInfo* info) {
-			HDC dc = GetDC((HWND)fHWND);
-			if (NULL == fHGLRC) {
-				fHGLRC = SkCreateWGLContext(dc, msaaSampleCount,
+			HDC dc = GetDC((HWND)m_fHWND);
+			if (NULL == m_fHGLRC) {
+				m_fHGLRC = SkCreateWGLContext(dc, msaaSampleCount,
 					kGLPreferCompatibilityProfile_SkWGLContextRequest);
-				if (NULL == fHGLRC) {
+				if (NULL == m_fHGLRC) {
 					return false;
 				}
 				glClearStencil(0);
@@ -296,7 +281,7 @@ namespace SOUI
 				glStencilMask(0xffffffff);
 				glClear(GL_STENCIL_BUFFER_BIT | GL_COLOR_BUFFER_BIT);
 			}
-			if (wglMakeCurrent(dc, (HGLRC)fHGLRC)) {
+			if (wglMakeCurrent(dc, (HGLRC)m_fHGLRC)) {
 				// use DescribePixelFormat to get the stencil bit depth.
 				int pixelFormat = GetPixelFormat(dc);
 				PIXELFORMATDESCRIPTOR pfd;
@@ -323,57 +308,51 @@ namespace SOUI
 
 		void windowSizeChanged(int nWid,int nHei) {
 #if SK_SUPPORT_GPU
-			if (fCurContext) {
-				SkSafeUnref(fCurRenderTarget);
-				if(fbo!=0){
-					fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
+			if (m_fCurContext) {
+				SkSafeUnref(m_fCurRenderTarget);
+				if(m_fbo!=0){
+					m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
 
-					fCurIntf->fFunctions.fDeleteFramebuffers(1, &fbo);
-					fCurIntf->fFunctions.fDeleteTextures(1, &colorTexture);
-					fbo = 0;
-					colorTexture = 0;
+					m_fCurIntf->fFunctions.fDeleteFramebuffers(1, &m_fbo);
+					m_fCurIntf->fFunctions.fDeleteTextures(1, &m_colorTexture);
+					m_fbo = 0;
+					m_colorTexture = 0;
 				}
 
 				//build fbo and texture
-				fCurIntf->fFunctions.fGenFramebuffers(1,&fbo);
-				fCurIntf->fFunctions.fGenTextures(1, &colorTexture);
+				m_fCurIntf->fFunctions.fGenFramebuffers(1,&m_fbo);
+				m_fCurIntf->fFunctions.fGenTextures(1, &m_colorTexture);
 
 				// 调整Texture大小
 				GLint texture_prev=0;
-                fCurIntf->fFunctions.fGetIntegerv(GR_GL_TEXTURE_BINDING_2D, &texture_prev);
-                {
-                    fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, colorTexture);
+                m_fCurIntf->fFunctions.fGetIntegerv(GR_GL_TEXTURE_BINDING_2D, &texture_prev);
+				m_fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, m_colorTexture);
 
-                    fCurIntf->fFunctions.fTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nWid, nHei, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
-                    fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-                    fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GR_GL_CLAMP_TO_EDGE);
-                    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GR_GL_CLAMP_TO_EDGE);
-				}
-                fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, texture_prev);
+				m_fCurIntf->fFunctions.fTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, nWid, nHei, 0, GL_RGBA, GL_UNSIGNED_BYTE, NULL);
+				m_fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+				m_fCurIntf->fFunctions.fTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GR_GL_CLAMP_TO_EDGE);
+				glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GR_GL_CLAMP_TO_EDGE);
+				m_fCurIntf->fFunctions.fBindTexture(GL_TEXTURE_2D, texture_prev);
 
 				// 绑定颜色附件
                 GLint fbo_prev=0;
-                fCurIntf->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER, &fbo_prev);
-                {
-                    fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo);
-                    fCurIntf->fFunctions.fFramebufferTexture2D(GR_GL_FRAMEBUFFER, GR_GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, colorTexture, 0);
+				m_fCurIntf->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER, &fbo_prev);
+				m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, m_fbo);
+				m_fCurIntf->fFunctions.fFramebufferTexture2D(GR_GL_FRAMEBUFFER, GR_GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture, 0);
 
-                    // 检查 FBO 完整性
-                    GLenum status = fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER);
-                    if (status != GR_GL_FRAMEBUFFER_COMPLETE)
-                    {
-                    }
-				}
-                fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo_prev);
+				// 检查 FBO 完整性
+				GLenum status = m_fCurIntf->fFunctions.fCheckFramebufferStatus(GR_GL_FRAMEBUFFER);
+				SASSERT(status == GR_GL_FRAMEBUFFER_COMPLETE);
+				m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo_prev);
 
 				glViewport(0, 0, nWid, nHei);
 
 				// 绑定fbo，在此fbo上生成BackendRenderTarget
-                fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo);
+                m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, m_fbo);
 				{
                     AttachmentInfo attachmentInfo;
-                    attachGL(fMSAASampleCount, &attachmentInfo);
+                    attachGL(m_fMSAASampleCount, &attachmentInfo);
 
                     // build rendertarget.
                     GrBackendRenderTargetDesc desc;
@@ -384,10 +363,10 @@ namespace SOUI
                     desc.fSampleCnt = attachmentInfo.fSampleCount;
                     desc.fStencilBits = attachmentInfo.fStencilBits;
                     GrGLint buffer;
-                    GR_GL_GetIntegerv(fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
+                    GR_GL_GetIntegerv(m_fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
                     desc.fRenderTargetHandle = buffer;
 
-                    fCurRenderTarget = fCurContext->wrapBackendRenderTarget(desc);
+                    m_fCurRenderTarget = m_fCurContext->wrapBackendRenderTarget(desc);
 				}
 			}
 #endif
@@ -395,20 +374,20 @@ namespace SOUI
 
 		virtual GrContext* getGrContext() {
 #if SK_SUPPORT_GPU
-			return fCurContext;
+			return m_fCurContext;
 #else
 			return NULL;
 #endif
 		}
 
 	private:
-		HWND fHWND;
-    void*               fHGLRC;
+		HWND m_fHWND;
+    void*               m_fHGLRC;
 #if SK_SUPPORT_GPU
-		GrContext*              fCurContext;
-		const GrGLInterface*    fCurIntf;
-		GrRenderTarget*         fCurRenderTarget;
-		int fMSAASampleCount;
+		GrContext*              m_fCurContext;
+		const GrGLInterface*    m_fCurIntf;
+		GrRenderTarget*         m_fCurRenderTarget;
+		int m_fMSAASampleCount;
 #endif
 	};
 
@@ -776,14 +755,9 @@ namespace SOUI
 
 	HRESULT SRenderTarget_Skia::BitBlt( LPCRECT pRcDest,IRenderTarget *pRTSour,int xSrc,int ySrc,DWORD dwRop/*=SRCCOPY*/)
 	{
-        if (this->IsOffscreen())
-        {
-            int k = 0;
-        }
-
-		if (pRTSour->IsOffscreen())
+		if (!pRTSour->IsOffscreen())
 		{
-            int k = 0;
+			return E_UNEXPECTED;
 		}
 
 		SkPaint paint=m_paint;
@@ -1919,21 +1893,20 @@ namespace SOUI
 	{
 		if(IsOffscreen())
 			return;
-		if(0==m_cDrawing++)
+		if(0 == m_cDrawing++)
 		{
 			m_deviceMgr->prepareGL();
-		}
-	
-		//RECT rc;
-		//GetClientRect(m_deviceMgr->getHwnd(),&rc);
-		//FillSolidRect(&rc,-1);
+			//RECT rc;
+			//GetClientRect(m_deviceMgr->getHwnd(),&rc);
+			//FillSolidRect(&rc,-1);
+		}	
 	}
 
 	void SRenderTarget_Skia::EndDraw(THIS)
 	{
 		if(IsOffscreen())
 			return;
-		if(--m_cDrawing==0)
+		if(--m_cDrawing == 0)
 			m_deviceMgr->presentGL();
 	}
 

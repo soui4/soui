@@ -310,7 +310,7 @@ BOOL LoadUserRes(IApplication *pApp,ISouiFactory *pSourFac)
 		//选择了仅在Release版本打包资源则在DEBUG下始终使用文件加载
 		{
 			pResProvider = pSourFac->lpVtbl->CreateResProvider(pSourFac,RES_FILE );
-			bLoaded = pResProvider->lpVtbl->Init(pResProvider,(LPARAM)_T("uires"), 0);
+			bLoaded = pResProvider->lpVtbl->Init(pResProvider,(LPARAM)_T("D:\\work\\soui4lib\\demo2\\uires"), 0);
 			SASSERT(bLoaded);
 			if(!bLoaded) break;
 		}
