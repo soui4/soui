@@ -1,4 +1,4 @@
-﻿#include "souistd.h"
+#include "souistd.h"
 #include "control/SRichEdit.h"
 #include "SApp.h"
 #include "helper/SMenu.h"
@@ -23,7 +23,7 @@ SNSBEGIN
 
 STextServiceHelper::STextServiceHelper()
 {
-    m_rich20 = LoadLibrary(_T("riched20.dll"));
+    m_rich20 = LoadLibrary(_T("Msftedit.dll"));
     if (m_rich20)
         m_funCreateTextServices = (PCreateTextServices)GetProcAddress(m_rich20, "CreateTextServices");
 }
@@ -812,21 +812,55 @@ BOOL SRichEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     if (m_fScrollPending)
         return FALSE;
     LRESULT lresult = -1;
+    LONG lPos = 0;
+
     m_fScrollPending = TRUE;
     SPanel::OnScroll(bVertical, uCode, nPos);
 
-    m_pTxtHost->GetTextService()->TxSendMessage(bVertical ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM(uCode, nPos), 0, &lresult);
-    LONG lPos = 0;
-    if (bVertical)
+    if (uCode == SB_THUMBPOSITION)
     {
-        m_pTxtHost->GetTextService()->TxGetVScroll(NULL, NULL, &lPos, NULL, NULL);
+        POINT scrollPos;
+
+        m_pTxtHost->GetTextService()->TxSendMessage(EM_GETSCROLLPOS, 0, reinterpret_cast<LPARAM>(&scrollPos), NULL);
+        if (bVertical)
+        {
+            scrollPos.y = nPos;
+        }
+        else
+        {
+            scrollPos.x = nPos;
+        }
+
+        m_pTxtHost->GetTextService()->TxSendMessage(EM_SETSCROLLPOS, 0, reinterpret_cast<LPARAM>(&scrollPos), NULL);
+        m_pTxtHost->GetTextService()->TxSendMessage(EM_GETSCROLLPOS, 0, reinterpret_cast<LPARAM>(&scrollPos), NULL);
+
+        if (bVertical)
+        {
+            lPos = scrollPos.y;
+        }
+        else
+        {
+            lPos = scrollPos.x;
+        }
+
+        if (lPos != GetScrollPos(bVertical))
+            SetScrollPos(bVertical, lPos, TRUE);
     }
     else
     {
-        m_pTxtHost->GetTextService()->TxGetHScroll(NULL, NULL, &lPos, NULL, NULL);
+        m_pTxtHost->GetTextService()->TxSendMessage(bVertical ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM(uCode, nPos), 0, &lresult);
+        if (bVertical)
+        {
+            m_pTxtHost->GetTextService()->TxGetVScroll(NULL, NULL, &lPos, NULL, NULL);
+        }
+        else
+        {
+            m_pTxtHost->GetTextService()->TxGetHScroll(NULL, NULL, &lPos, NULL, NULL);
+        }
+
+        if (lPos != GetScrollPos(bVertical))
+            SetScrollPos(bVertical, lPos, TRUE);
     }
-    if (lPos != GetScrollPos(bVertical))
-        SetScrollPos(bVertical, lPos, TRUE);
 
     m_fScrollPending = FALSE;
     if (uCode == SB_THUMBTRACK)
