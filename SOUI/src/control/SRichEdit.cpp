@@ -1,4 +1,4 @@
-#include "souistd.h"
+﻿#include "souistd.h"
 #include "control/SRichEdit.h"
 #include "SApp.h"
 #include "helper/SMenu.h"
@@ -23,7 +23,11 @@ SNSBEGIN
 
 STextServiceHelper::STextServiceHelper()
 {
+#ifdef USE_MSFTEDIT
     m_rich20 = LoadLibrary(_T("Msftedit.dll"));
+#else
+	m_rich20 = LoadLibrary(_T("riched20.dll"));
+#endif
     if (m_rich20)
         m_funCreateTextServices = (PCreateTextServices)GetProcAddress(m_rich20, "CreateTextServices");
 }
@@ -812,11 +816,11 @@ BOOL SRichEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     if (m_fScrollPending)
         return FALSE;
     LRESULT lresult = -1;
-    LONG lPos = 0;
-
     m_fScrollPending = TRUE;
     SPanel::OnScroll(bVertical, uCode, nPos);
 
+#ifdef USE_MSFTEDIT
+    LONG lPos = 0;
     if (uCode == SB_THUMBPOSITION)
     {
         POINT scrollPos;
@@ -861,6 +865,20 @@ BOOL SRichEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
         if (lPos != GetScrollPos(bVertical))
             SetScrollPos(bVertical, lPos, TRUE);
     }
+#else
+    m_pTxtHost->GetTextService()->TxSendMessage(bVertical ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM(uCode, nPos), 0, &lresult);
+    LONG lPos = 0;
+    if (bVertical)
+    {
+        m_pTxtHost->GetTextService()->TxGetVScroll(NULL, NULL, &lPos, NULL, NULL);
+    }
+    else
+    {
+        m_pTxtHost->GetTextService()->TxGetHScroll(NULL, NULL, &lPos, NULL, NULL);
+    }
+    if (lPos != GetScrollPos(bVertical))
+        SetScrollPos(bVertical, lPos, TRUE);
+#endif
 
     m_fScrollPending = FALSE;
     if (uCode == SB_THUMBTRACK)
