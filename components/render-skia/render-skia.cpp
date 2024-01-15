@@ -221,7 +221,7 @@ namespace SOUI
 			return m_fHWND;
 		}
 
-		SkSurface* createSurface(const SIZE *sz)  {
+		SkSurface* createSurface()  {
 #if SK_SUPPORT_GPU
 				if (!m_fCurContext) {
 					return NULL;
@@ -246,9 +246,10 @@ namespace SOUI
 				return;
 			RECT rc;
             GetClientRect(m_fHWND, &rc);
+			glViewport(0, 0, rc.right, rc.bottom);
 			m_fCurContext->flush();
 			m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_READ_FRAMEBUFFER, m_fbo);
-			m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_DRAW_FRAMEBUFFER, GR_GL_NONE);
+			m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_DRAW_FRAMEBUFFER, 0);
 			m_fCurIntf->fFunctions.fBlitFramebuffer(
 				0, 0, rc.right, rc.bottom
 				, 0, 0, rc.right, rc.bottom
@@ -349,7 +350,6 @@ namespace SOUI
 				glViewport(0, 0, nWid, nHei);
 
 				// 绑定fbo，在此fbo上生成BackendRenderTarget
-                m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, m_fbo);
 				{
                     AttachmentInfo attachmentInfo;
                     attachGL(m_fMSAASampleCount, &attachmentInfo);
@@ -362,9 +362,8 @@ namespace SOUI
                     desc.fOrigin = kBottomLeft_GrSurfaceOrigin;
                     desc.fSampleCnt = attachmentInfo.fSampleCount;
                     desc.fStencilBits = attachmentInfo.fStencilBits;
-                    GrGLint buffer;
-                    GR_GL_GetIntegerv(m_fCurIntf, GR_GL_FRAMEBUFFER_BINDING, &buffer);
-                    desc.fRenderTargetHandle = buffer;
+
+                    desc.fRenderTargetHandle = m_fbo;
 
                     m_fCurRenderTarget = m_fCurContext->wrapBackendRenderTarget(desc);
 				}
@@ -661,7 +660,7 @@ namespace SOUI
 			if (m_surface) {
 				m_surface->unref();
 			}
-			m_surface = m_deviceMgr->createSurface(&sz);
+			m_surface = m_deviceMgr->createSurface();
 			m_SkCanvas = m_surface->getCanvas();
 
 			m_deviceMgr->windowSizeChanged(sz.cx,sz.cy);
