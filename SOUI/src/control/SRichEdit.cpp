@@ -23,7 +23,11 @@ SNSBEGIN
 
 STextServiceHelper::STextServiceHelper()
 {
-    m_rich20 = LoadLibrary(_T("riched20.dll"));
+#ifdef USE_MSFTEDIT
+    m_rich20 = LoadLibrary(_T("Msftedit.dll"));
+#else
+	m_rich20 = LoadLibrary(_T("riched20.dll"));
+#endif
     if (m_rich20)
         m_funCreateTextServices = (PCreateTextServices)GetProcAddress(m_rich20, "CreateTextServices");
 }
@@ -815,6 +819,53 @@ BOOL SRichEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     m_fScrollPending = TRUE;
     SPanel::OnScroll(bVertical, uCode, nPos);
 
+#ifdef USE_MSFTEDIT
+    LONG lPos = 0;
+    if (uCode == SB_THUMBPOSITION)
+    {
+        POINT scrollPos;
+
+        m_pTxtHost->GetTextService()->TxSendMessage(EM_GETSCROLLPOS, 0, reinterpret_cast<LPARAM>(&scrollPos), NULL);
+        if (bVertical)
+        {
+            scrollPos.y = nPos;
+        }
+        else
+        {
+            scrollPos.x = nPos;
+        }
+
+        m_pTxtHost->GetTextService()->TxSendMessage(EM_SETSCROLLPOS, 0, reinterpret_cast<LPARAM>(&scrollPos), NULL);
+        m_pTxtHost->GetTextService()->TxSendMessage(EM_GETSCROLLPOS, 0, reinterpret_cast<LPARAM>(&scrollPos), NULL);
+
+        if (bVertical)
+        {
+            lPos = scrollPos.y;
+        }
+        else
+        {
+            lPos = scrollPos.x;
+        }
+
+        if (lPos != GetScrollPos(bVertical))
+            SetScrollPos(bVertical, lPos, TRUE);
+    }
+    else
+    {
+        m_pTxtHost->GetTextService()->TxSendMessage(bVertical ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM(uCode, nPos), 0, &lresult);
+        if (bVertical)
+        {
+            m_pTxtHost->GetTextService()->TxGetVScroll(NULL, NULL, &lPos, NULL, NULL);
+        }
+        else
+        {
+            m_pTxtHost->GetTextService()->TxGetHScroll(NULL, NULL, &lPos, NULL, NULL);
+        }
+
+        if (lPos != GetScrollPos(bVertical))
+            SetScrollPos(bVertical, lPos, TRUE);
+    }
+#else
     m_pTxtHost->GetTextService()->TxSendMessage(bVertical ? WM_VSCROLL : WM_HSCROLL, MAKEWPARAM(uCode, nPos), 0, &lresult);
     LONG lPos = 0;
     if (bVertical)
@@ -827,6 +878,7 @@ BOOL SRichEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     }
     if (lPos != GetScrollPos(bVertical))
         SetScrollPos(bVertical, lPos, TRUE);
+#endif
 
     m_fScrollPending = FALSE;
     if (uCode == SB_THUMBTRACK)

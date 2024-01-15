@@ -443,7 +443,7 @@ BOOL SApplication::InstallTranslator(THIS_ ITranslator *trModule)
     {
         GETUIDEF->SetDefFontInfo(strFontInfo);
     }
-    SHostMgr::getSingletonPtr()->DispatchMessage(true, UM_SETLANGUAGE);
+    SHostMgr::getSingletonPtr()->DispatchMessage(UM_SETLANGUAGE);
     return TRUE;
 }
 

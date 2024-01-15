@@ -56,7 +56,7 @@ int SListCtrl::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, L
 BOOL SListCtrl::CreateChildren(SXmlNode xmlNode)
 {
     SXmlNode xmlHeader = xmlNode.child(L"headerStyle");
-    m_pHeader = sobj_cast<SHeaderCtrl>(SApplication::getSingletonPtr()->CreateWindowByName(xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
+    m_pHeader = sobj_cast<SHeaderCtrl>(CreateChildByName(xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
     SASSERT(m_pHeader);
     if (!m_pHeader)
         return FALSE;

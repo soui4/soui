@@ -475,7 +475,16 @@ DEF_EVT(EventRENotify, EVT_RE_NOTIFY, on_richedit_notify, {
 
 DEF_EVT(EventREMenu, EVT_RE_MENU, on_richedit_menu, { UINT uCmd; })
 
-DEF_EVT(EventSliderPos, EVT_SLIDER_POS, on_slider_pos, { int nPos; })
+typedef enum _SliderBarAction
+{
+    SBA_MOUSE_DOWN = 0,
+    SBA_MOUSE_MOVING,
+    SBA_MOUSE_UP
+} SliderBarAction;
+DEF_EVT(EventSliderPos, EVT_SLIDER_POS, on_slider_pos, {
+    int nPos;
+    SliderBarAction action;
+})
 
 //点击表头
 DEF_EVT(EventHeaderClick, EVT_HEADER_CLICK, on_header_click, { int iItem; })

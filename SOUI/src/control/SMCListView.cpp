@@ -133,6 +133,7 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
         {
             m_itemRecycle.Add(new SList<SItemPanel *>());
         }
+        _UpdateAdapterColumnsWidth();
         onDataSetChanged();
     }
     return TRUE;
@@ -154,7 +155,7 @@ BOOL SMCListView::CreateChildren(SXmlNode xmlNode)
     xmlTemplate.set_userdata(1);
     SXmlNode xmlHeader = xmlNode.child(L"headerStyle");
     xmlHeader.set_userdata(1);
-    m_pHeader = sobj_cast<SHeaderCtrl>(SApplication::getSingletonPtr()->CreateWindowByName(xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
+    m_pHeader = sobj_cast<SHeaderCtrl>(CreateChildByName(xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
     SASSERT(m_pHeader);
     if (!m_pHeader)
         return FALSE;
@@ -376,33 +377,41 @@ BOOL SMCListView::OnHeaderSizeChanging(IEvtArgs *pEvt)
 {
     UpdateScrollBar();
     UpdateHeaderCtrl();
-    SPOSITION pos = m_lstItems.GetHeadPosition();
-    while (pos)
+    if (!m_lvItemLocator->IsFixHeight())
     {
-        ItemInfo ii = m_lstItems.GetNext(pos);
-        CRect rcItem = ii.pItem->GetWindowRect();
-        rcItem.right = m_pHeader->GetTotalWidth();
-        ii.pItem->Move(rcItem);
-        CRect rcSubItem(rcItem);
-        rcSubItem.right = rcSubItem.left = 0;
-        for (int i = 0; i < m_pHeader->GetItemCount(); i++)
-        {
-            SHDITEM hi = { SHDI_ORDER, 0 };
-            m_pHeader->GetItem(i, &hi);
-            rcSubItem.left = rcSubItem.right;
-            rcSubItem.right += m_pHeader->GetItemWidth(i);
-            SStringW strColName;
-            m_adapter->GetColumnName(hi.iOrder, &strColName);
-            SWindow *pCol = ii.pItem->FindChildByName(strColName);
-            if (pCol)
-            {
-                pCol->Move(rcSubItem);
-            }
-        }
-        SASSERT(rcSubItem.right == m_pHeader->GetTotalWidth());
+        _UpdateAdapterColumnsWidth();
+        UpdateVisibleItems();
     }
+    else
+    {
+        SPOSITION pos = m_lstItems.GetHeadPosition();
+        while (pos)
+        {
+            ItemInfo ii = m_lstItems.GetNext(pos);
+            CRect rcItem = ii.pItem->GetWindowRect();
+            rcItem.right = m_pHeader->GetTotalWidth();
+            ii.pItem->Move(rcItem);
+            CRect rcSubItem(rcItem);
+            rcSubItem.right = rcSubItem.left = 0;
+            for (int i = 0; i < m_pHeader->GetItemCount(); i++)
+            {
+                SHDITEM hi = { SHDI_ORDER, 0 };
+                m_pHeader->GetItem(i, &hi);
+                rcSubItem.left = rcSubItem.right;
+                rcSubItem.right += m_pHeader->GetItemWidth(i);
+                SStringW strColName;
+                m_adapter->GetColumnName(hi.iOrder, &strColName);
+                SWindow *pCol = ii.pItem->FindChildByName(strColName);
+                if (pCol)
+                {
+                    pCol->Move(rcSubItem);
+                }
+            }
+            SASSERT(rcSubItem.right == m_pHeader->GetTotalWidth());
+        }
 
-    InvalidateRect(GetListRect());
+        InvalidateRect(GetListRect());
+    }
     return TRUE;
 }
 
@@ -740,6 +749,7 @@ void SMCListView::UpdateVisibleItems()
     if (!m_lvItemLocator->IsFixHeight() && m_lvItemLocator->GetTotalHeight() != nOldTotalHeight)
     { // update scroll range
         UpdateScrollBar();
+        UpdateHeaderCtrl();
         UpdateVisibleItems(); //根据新的滚动条状态重新记录显示列表项
     }
     else
@@ -763,19 +773,7 @@ void SMCListView::OnSize(UINT nType, CSize size)
     __baseCls::OnSize(nType, size);
     UpdateScrollBar();
     UpdateHeaderCtrl();
-
-    // update item window
-    CRect rcClient = GetClientRect();
-    SPOSITION pos = m_lstItems.GetHeadPosition();
-    while (pos)
-    {
-        ItemInfo ii = m_lstItems.GetNext(pos);
-        int idx = (int)ii.pItem->GetItemIndex();
-        int nHei = m_lvItemLocator->GetItemHeight(idx);
-        CRect rcItem(0, 0, m_pHeader->GetTotalWidth(), nHei);
-        ii.pItem->Move(rcItem);
-    }
-
+    _UpdateAdapterColumnsWidth();
     UpdateVisibleItems();
 }
 
@@ -1384,6 +1382,22 @@ void SMCListView::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei
         psz->cy = m_lvItemLocator->GetTotalHeight() + rcPadding.top + rcPadding.bottom;
         if (nParentHei > 0 && psz->cy > nParentHei)
             psz->cy = nParentHei;
+    }
+}
+
+void SMCListView::_UpdateAdapterColumnsWidth() const
+{
+    if (!m_lvItemLocator->IsFixHeight() && m_adapter)
+    {
+        int *nWids = new int[m_pHeader->GetItemCount()];
+        for (int i = 0; i < m_pHeader->GetItemCount(); i++)
+        {
+            SHDITEM hi = { SHDI_ORDER, 0 };
+            m_pHeader->GetItem(i, &hi);
+            nWids[hi.iOrder] = m_pHeader->GetItemWidth(i);
+        }
+        m_adapter->SetColumnsWidth(nWids, m_pHeader->GetItemCount());
+        delete[] nWids;
     }
 }
 

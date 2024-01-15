@@ -659,7 +659,7 @@ STabPage *STabCtrl::CreatePageFromXml(SXmlNode xmlPage)
 {
     if (wcscmp(xmlPage.name(), STabPage::GetClassName()) != 0)
         return NULL;
-    return (STabPage *)SApplication::getSingleton().CreateWindowByName(STabPage::GetClassName());
+    return (STabPage *)CreateChildByName(STabPage::GetClassName());
 }
 
 int STabCtrl::InsertItem(LPCWSTR lpContent, int iInsert /*=-1*/)

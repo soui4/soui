@@ -335,6 +335,13 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
      * @return TRUE--执行排序，FALSE--没有执行排序
      */
     STDMETHOD_(BOOL, OnSort)(THIS_ int iCol, UINT *pFmts, int nCols) PURE;
+
+    /**
+     * @brief 设置列宽接口
+     * @param int *pColWid--列宽数据
+     * @param nCols int 总列数
+     */
+    STDMETHOD_(void, SetColumnsWidth)(THIS_ int *pColWid, int nCols) PURE;
 };
 
 #undef INTERFACE

@@ -231,6 +231,7 @@ class SOUI_EXP SMCListView
 
   protected:
     CRect _OnItemGetRect(int iPosition) const;
+    void _UpdateAdapterColumnsWidth() const;
 
   protected:
     SHeaderCtrl *m_pHeader;
