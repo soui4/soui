@@ -497,6 +497,7 @@ class SOUI_EXP SHostWnd
     virtual BOOL _HandleEvent(IEvtArgs *pEvt);
 
   protected:
+    LRESULT OnSetLanguage(UINT uMsg,WPARAM wp,LPARAM lp);
     LRESULT OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp);
     LRESULT OnRunTasks(UINT uMsg, WPARAM wp, LPARAM lp);
 
@@ -530,6 +531,7 @@ class SOUI_EXP SHostWnd
         MSG_WM_COMMAND(OnCommand)
         MSG_WM_SYSCOMMAND(OnSysCommand)
         MESSAGE_HANDLER_EX(UM_UPDATEFONT, OnUpdateFont)
+		MESSAGE_HANDLER_EX(UM_SETLANGUAGE,OnSetLanguage)
         MESSAGE_HANDLER_EX(UM_RUN_TASKS, OnRunTasks)
         CHAIN_MSG_MAP_MEMBER(*m_pNcPainter)
 #if (!DISABLE_SWNDSPY)

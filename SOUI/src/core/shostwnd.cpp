@@ -2085,6 +2085,13 @@ LRESULT SHostWnd::OnRunTasks(UINT uMsg, WPARAM wp, LPARAM lp)
     return 0;
 }
 
+LRESULT SHostWnd::OnSetLanguage(UINT uMsg,WPARAM wp,LPARAM lp)
+{
+    GetNcPainter()->GetRoot()->SDispatchMessage(uMsg);
+    GetRoot()->SDispatchMessage(uMsg);
+    return 0;
+}
+
 //////////////////////////////////////////////////////////////////
 //  SHostWnd::SHostAnimationHandler
 void SHostWnd::SHostAnimationHandler::OnNextFrame()
