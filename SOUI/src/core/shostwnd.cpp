@@ -2088,7 +2088,10 @@ LRESULT SHostWnd::OnRunTasks(UINT uMsg, WPARAM wp, LPARAM lp)
 LRESULT SHostWnd::OnSetLanguage(UINT uMsg,WPARAM wp,LPARAM lp)
 {
     GetNcPainter()->GetRoot()->SDispatchMessage(uMsg);
+    GetNcPainter()->GetRoot()->RequestRelayout();
+    GetNcPainter()->GetRoot()->Invalidate();
     GetRoot()->SDispatchMessage(uMsg);
+    GetRoot()->RequestRelayout();
     return 0;
 }
 
