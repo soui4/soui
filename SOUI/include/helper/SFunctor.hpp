@@ -48,9 +48,14 @@ class StdRunnable : public SRunnable {
     {
     }
 
+    StdRunnable(void *pObj,const std::function<void(void)>& fun)
+        : SRunnable(pObj),_func(fun)
+    {
+    }
+
     STDMETHOD_(IRunnable *, clone)(THIS) SCONST
     {
-        return new StdRunnable(_func);
+        return new StdRunnable(_pObj,_func);
     }
 
     STDMETHOD_(void, run)(THIS)
