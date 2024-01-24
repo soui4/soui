@@ -886,6 +886,7 @@ void SHostWnd::OnSize(UINT nType, CSize size)
     }
     m_bResizing = TRUE;
     m_memRT->Resize(size);
+    m_memRT->Resize(size);//todo:不知道为什么，这里要resize两次，使用opengl的skia render在窗口大小变化后才正常。
     BOOL bDirty = GetRoot()->IsLayoutDirty();
     GetRoot()->OnRelayout(CRect(0, 0, size.cx, size.cy));
     _Redraw();
