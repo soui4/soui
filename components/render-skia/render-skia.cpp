@@ -338,7 +338,7 @@ namespace SOUI
 
 				// 绑定颜色附件
                 GLint fbo_prev=0;
-				m_fCurIntf->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER, &fbo_prev);
+				m_fCurIntf->fFunctions.fGetIntegerv(GR_GL_FRAMEBUFFER_BINDING, &fbo_prev);
 				m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, m_fbo);
 				m_fCurIntf->fFunctions.fFramebufferTexture2D(GR_GL_FRAMEBUFFER, GR_GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_colorTexture, 0);
 
