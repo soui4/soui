@@ -32,7 +32,7 @@ translucent="0"
       <text size="100,-2" name="txt_pos" colorText="@color/red" text="50"/>
     </window>
     <window size="-2,0" weight="1" layout="hbox">
-      <listview size="0,-2" weight="1" name="lv_test" margin="1,1,1,1" colorBorder="@color/red" show="0">
+      <listview size="0,-2" weight="1" name="lv_test" margin="1,1,1,1" show="1">
         <template itemHeight="50" layout="hbox" gravity="center" skin="skin_item_bk">
           <text name="txt_test"/>
         </template>
