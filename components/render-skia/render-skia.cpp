@@ -660,10 +660,10 @@ namespace SOUI
 			if (m_surface) {
 				m_surface->unref();
 			}
+			m_deviceMgr->windowSizeChanged(sz.cx,sz.cy);
 			m_surface = m_deviceMgr->createSurface();
 			m_SkCanvas = m_surface->getCanvas();
 
-			m_deviceMgr->windowSizeChanged(sz.cx,sz.cy);
 		}else{
 			m_curBmp->Init(sz.cx,sz.cy,NULL);
 			delete m_SkCanvas;
