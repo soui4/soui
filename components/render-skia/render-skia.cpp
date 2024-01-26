@@ -27,6 +27,10 @@
 #include <vector>
 #include <map>
 
+#ifdef ENABLE_RENDER_DOC
+#include <C:\Program Files\RenderDoc\renderdoc_app.h>
+#endif
+
 #define getTotalClip internal_private_getTotalClip
 // #include <vld.h>
 
@@ -179,6 +183,13 @@ namespace SOUI
 	class DeviceManager {
 		GLuint m_fbo; 
 		GLuint m_colorTexture; 
+#ifdef ENABLE_RENDER_DOC
+
+		RENDERDOC_API_1_6_0* rdoc = nullptr;
+		pRENDERDOC_GetAPI getApi = nullptr;
+		// 加载RenderDoc库
+		HMODULE renderdocModule = 0;
+#endif
 
 	public:
 
@@ -191,6 +202,24 @@ namespace SOUI
 			,m_fMSAASampleCount(0)
 			, m_fbo(0),m_colorTexture(0)
 		{
+#ifdef ENABLE_RENDER_DOC
+
+			// 加载RenderDoc库
+			renderdocModule = LoadLibraryA("C:\\Program Files\\RenderDoc\\x86\\renderdoc.dll"); // 替换为RenderDoc库的实际路径和名称
+
+			// 获取pRENDERDOC_GetAPI函数指针
+			//getApi = (pRENDERDOC_GetAPI)GetProcAddress(renderdocModule, "RENDERDOC_GetAPI");
+
+			// 检查是否成功加载RenderDoc库和获取函数指针
+			if (getApi != nullptr)
+			{
+				// 获取RenderDoc API接口
+				getApi(eRENDERDOC_API_Version_1_6_0, reinterpret_cast<void**>(&rdoc));
+				if (rdoc) {
+					rdoc->MaskOverlayBits(eRENDERDOC_Overlay_Enabled | eRENDERDOC_Overlay_FrameRate| eRENDERDOC_Overlay_FrameNumber, 0);
+				}
+			}
+#endif
 			AttachmentInfo attachmentInfo;
 			bool result = attachGL(m_fMSAASampleCount, &attachmentInfo);
 			if (!result) {
@@ -215,6 +244,11 @@ namespace SOUI
 			SkSafeUnref(m_fCurIntf);
 			SkSafeUnref(m_fCurRenderTarget);
 #endif
+#ifdef ENABLE_RENDER_DOC
+			if (renderdocModule) {
+				FreeLibrary(renderdocModule);
+			}
+#endif
 		}
 
 		HWND getHwnd() const{
@@ -236,9 +270,17 @@ namespace SOUI
 				return;
 			//render to fbo
 			m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, m_fbo);
+//			m_fCurIntf->fFunctions.fClearColor(0.0f, 0.0f, 0.0f, 1.0f);
+//			m_fCurIntf->fFunctions.fClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 			RECT rc;
 			GetClientRect(m_fHWND,&rc);
 			glViewport(0,0,rc.right,rc.bottom);
+#ifdef ENABLE_RENDER_DOC
+			if (rdoc != nullptr)
+			{
+				rdoc->StartFrameCapture(reinterpret_cast<void*>(m_fbo), nullptr);
+			}
+#endif
 		}
 
 		void presentGL(){
@@ -248,6 +290,11 @@ namespace SOUI
             GetClientRect(m_fHWND, &rc);
 			glViewport(0, 0, rc.right, rc.bottom);
 			m_fCurContext->flush();
+#ifdef ENABLE_RENDER_DOC
+			if (rdoc) {
+				rdoc->EndFrameCapture(reinterpret_cast<void*>(m_fbo), nullptr);
+			}
+#endif
 			m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_READ_FRAMEBUFFER, m_fbo);
 			m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_DRAW_FRAMEBUFFER, 0);
 			m_fCurIntf->fFunctions.fBlitFramebuffer(
@@ -273,7 +320,7 @@ namespace SOUI
 			HDC dc = GetDC((HWND)m_fHWND);
 			if (NULL == m_fHGLRC) {
 				m_fHGLRC = SkCreateWGLContext(dc, msaaSampleCount,
-					kGLPreferCompatibilityProfile_SkWGLContextRequest);
+					kGLPreferCoreProfile_SkWGLContextRequest);
 				if (NULL == m_fHGLRC) {
 					return false;
 				}
@@ -312,6 +359,11 @@ namespace SOUI
 			if (m_fCurContext) {
 				SkSafeUnref(m_fCurRenderTarget);
 				if(m_fbo!=0){
+#ifdef ENABLE_RENDER_DOC
+					if (rdoc) {
+						rdoc->DiscardFrameCapture(reinterpret_cast<void*>(m_fbo),nullptr);
+					}
+#endif
 					m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, 0);
 
 					m_fCurIntf->fFunctions.fDeleteFramebuffers(1, &m_fbo);
@@ -348,7 +400,6 @@ namespace SOUI
 				m_fCurIntf->fFunctions.fBindFramebuffer(GR_GL_FRAMEBUFFER, fbo_prev);
 
 				glViewport(0, 0, nWid, nHei);
-
 				// 绑定fbo，在此fbo上生成BackendRenderTarget
 				{
                     AttachmentInfo attachmentInfo;
@@ -1345,7 +1396,8 @@ namespace SOUI
 	HDC SRenderTarget_Skia::GetDC( UINT uFlag )
 	{
 		if(m_hGetDC) return m_hGetDC;
-
+		if (!m_curBmp)
+			return 0;
 		HBITMAP bmp=m_curBmp->GetGdiBitmap();//bmp可能为NULL
 		HDC hdc_desk = ::GetDC(NULL);
 		m_hGetDC = CreateCompatibleDC(hdc_desk);
@@ -1413,7 +1465,7 @@ namespace SOUI
 
 	void SRenderTarget_Skia::ReleaseDC( HDC hdc ,LPCRECT pRc)
 	{
-		if(hdc == m_hGetDC)
+		if(hdc == m_hGetDC && hdc!=0)
 		{
 			DeleteDC(hdc);
 			m_hGetDC = 0;

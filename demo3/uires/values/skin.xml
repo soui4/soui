@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<skin>
+	<gradation name="skin_active" colorFrom="rgb(15,17,20)" colorTo="rgb(153,180,209)" vertical="false"/>
+	<gradation name="skin_inactive" colorFrom="rgb(191,205,219)" colorTo="rgb(191,205,219)" vertical="false"/>
+</skin>

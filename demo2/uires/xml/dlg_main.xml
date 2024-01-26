@@ -17,7 +17,7 @@ translucent="0"
     </window>
     <imgbtn id="sysid_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
   </ncpainter>
-  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" layout="vbox" gravity="center">
+  <root skin="_skin.sys.wnd.bkgnd" cache="0"  width="600" height="400" layout="vbox" gravity="center">
     <window size="-2,30" layout="hbox" interval="10">
       <window size="0,0" weight="1"/>
       <button size="100,30" name="btn_flash" text="flash" tip="Flash Window"/>
@@ -31,8 +31,8 @@ translucent="0"
       <sliderbar size="0,-2" weight="1" name="tst_slider" min="0" max="100" value="50" font="test:12,test2:24"/>
       <text size="100,-2" name="txt_pos" colorText="@color/red" text="50"/>
     </window>
-    <window size="-2,0" weight="1" layout="hbox">
-      <listview size="0,-2" weight="1" name="lv_test" margin="1,1,1,1" show="1">
+    <window size="-2,0" weight="1" layout="hbox" padding="10">
+      <listview size="0,-2" weight="1" name="lv_test" margin1="1,1,1,1" show="0" clipClient="1">
         <template itemHeight="50" layout="hbox" gravity="center" skin="skin_item_bk">
           <text name="txt_test"/>
         </template>
