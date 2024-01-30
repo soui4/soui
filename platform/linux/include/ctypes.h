@@ -5,7 +5,6 @@
 #include <stdarg.h>
 
 
-#define HRESULT int
 typedef unsigned int UINT;
 typedef int64_t __int64;// int64_t
 #define E_INVALIDARG 1
@@ -28,12 +27,18 @@ typedef int32_t INT;
 typedef wchar_t WCHAR;
 typedef void * LPVOID;
 typedef intptr_t INT_PTR;
+typedef intptr_t LONG_PTR;
+typedef uintptr_t UINT_PTR;
 typedef uintptr_t ULONG_PTR;
-typedef ULONG_PTR DWORD_PTR;
+typedef intptr_t DWORD_PTR;
+typedef int32_t LRESULT;
+typedef int32_t HRESULT;
+typedef UINT_PTR WPARAM;
+typedef LONG_PTR LPARAM;
 
-struct GUID{
+typedef struct _GUID{
 DWORD ids[4];
-};
+}GUID;
 
 
 #define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD_PTR)(a)) & 0xff)) | ((WORD)((BYTE)(((DWORD_PTR)(b)) & 0xff))) << 8))
@@ -52,9 +57,27 @@ typedef int BOOL;
 #define FALSE 0
 #define TRUE 1
 
+#define IDOK                1
+#define IDCANCEL            2
+#define IDABORT             3
+#define IDRETRY             4
+#define IDIGNORE            5
+#define IDYES               6
+#define IDNO                7
+#define IDCLOSE         8
+#define IDHELP          9
+#define IDTRYAGAIN      10
+#define IDCONTINUE      11
+
 
 #define HINSTANCE int
 #define HMODULE int
+#define HICON int
+#define HWND  int
+#define HMENU int
+#define HGDIOBJ int
+#define HBRUSH int
+#define HPEN   int
 
 typedef char *LPSTR;
 typedef wchar_t *LPWSTR;
@@ -67,6 +90,7 @@ typedef const wchar_t * LPCWSTR;
 
 #define __cdecl //__attribute__((cdecl))
 #define __stdcall //__attribute__((stdcall))
+#define WINAPI __stdcall
 
 #define ARRAYSIZE(x) (sizeof((x))/sizeof((x)[0]))
 
@@ -138,5 +162,12 @@ typedef struct tagPOINTS
     SHORT   x;
 #endif
 } POINTS, *PPOINTS, *LPPOINTS;
+
+
+#ifdef __cplusplus
+    #define EXTERN_C    extern "C"
+#else
+    #define EXTERN_C    extern
+#endif
 
 #endif//__PLATFORM_LINUX_
