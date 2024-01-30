@@ -13,6 +13,7 @@
 
 #ifndef __SAPP__H__
 #define __SAPP__H__
+#include <platform.h>
 #include <core/SSingleton.h>
 #include <interface/sapp-i.h>
 

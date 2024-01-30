@@ -1,7 +1,7 @@
 ﻿#pragma once
 
 #include "SPropertyItem-i.h"
-#include <sobject/sobject.hpp>
+#include <sobject/Sobject.hpp>
 #include <helper/obj-ref-impl.hpp>
 
 namespace SOUI

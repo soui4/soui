@@ -26,7 +26,7 @@
 #include <helper/obj-ref-impl.hpp>
 #include <animation/SInterpolatorImpl.h>
 #include <animation/STransformation.h>
-#include <sobject/sobject.hpp>
+#include <sobject/Sobject.hpp>
 
 #define ATTR_VALUE_DESC(attribname, desc)                     \
     if (0 == strAttribName.CompareNoCase(attribname))         \
