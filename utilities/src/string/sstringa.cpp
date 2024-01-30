@@ -4,7 +4,10 @@
 #ifndef _MBCS
 #define _MBCS
 #endif
-#include <mbstring.h>
+//#include <mbstring.h>
+#ifndef _WIN32
+#include <strfun.h>
+#endif
 
 #define smin_tsr(a,b)            (((a) < (b)) ? (a) : (b))
 
@@ -12,7 +15,11 @@ SNSBEGIN
 
 int char_traits::LoadString(HINSTANCE hInst, UINT uID, char* lpBuffer, int nBufferMax)
 {
+#ifdef _WIN32
 	return ::LoadStringA(hInst, uID, lpBuffer, nBufferMax);
+#else
+	return 0;
+#endif
 }
 
 int char_traits::Format(char** ppszDst, const char* pszFormat, va_list args)
@@ -70,28 +77,28 @@ char* char_traits::StrUpper(char* psz)
 #endif
 }
 
-char* char_traits::StrStr(const char* psz, const char* psz2)
+const char* char_traits::StrStr(const char* psz, const char* psz2)
 {
 #ifdef _MBCS
-	return (char*)_mbsstr((unsigned char*)psz, (unsigned char*)psz2);
+	return (const char*)_mbsstr((unsigned char*)psz, (unsigned char*)psz2);
 #else
 	return strstr(psz, psz2);
 #endif
 }
 
-char* char_traits::StrRChr(const char* psz, char ch)
+const char* char_traits::StrRChr(const char* psz, char ch)
 {
 #ifdef _MBCS
-	return (char*)_mbsrchr((unsigned char*)psz, ch);
+	return (const char*)_mbsrchr((unsigned char*)psz, ch);
 #else
 	return strrchr(psz, ch);
 #endif
 }
 
-char* char_traits::StrChr(const char* psz, char ch)
+const char* char_traits::StrChr(const char* psz, char ch)
 {
 #ifdef _MBCS
-	return (char*)_mbschr((unsigned char*)psz, ch);
+	return (const char*)_mbschr((unsigned char*)psz, ch);
 #else
 	return strchr(psz, ch);
 #endif
@@ -551,7 +558,7 @@ int SStringA::Find(const char* pszSub, int nStart /*= 0*/) const
 		return -1;
 
 	// find first matching substring
-	char* psz = char_traits::StrStr(m_pszData + nStart, pszSub);
+	const char* psz = char_traits::StrStr(m_pszData + nStart, pszSub);
 
 	// return -1 for not found, distance from beginning otherwise
 	return (psz == NULL) ? -1 : (int)(psz - m_pszData);
@@ -564,7 +571,7 @@ int SStringA::FindChar(char ch, int nStart /*= 0*/) const
 		return -1;
 
 	// find first single character
-	char* psz = char_traits::StrChr(m_pszData + nStart, ch);
+	const char* psz = char_traits::StrChr(m_pszData + nStart, ch);
 
 	// return -1 if not found and index otherwise
 	return (psz == NULL) ? -1 : (int)(psz - m_pszData);
@@ -573,7 +580,7 @@ int SStringA::FindChar(char ch, int nStart /*= 0*/) const
 int SStringA::ReverseFind(char ch) const
 {
 	// find last single character
-	char* psz = char_traits::StrRChr(m_pszData, ch);
+	const char* psz = char_traits::StrRChr(m_pszData, ch);
 
 	// return -1 if not found, distance from beginning otherwise
 	return (psz == NULL) ? -1 : (int)(psz - m_pszData);
@@ -618,7 +625,7 @@ int SStringA::Replace(const char* pszOld, const char* pszNew)
 	char* pszTarget;
 	while (pszStart < pszEnd)
 	{
-		while ((pszTarget = char_traits::StrStr(pszStart, pszOld)) != NULL)
+		while ((pszTarget = (char *)char_traits::StrStr(pszStart, pszOld)) != NULL)
 		{
 			nCount++;
 			pszStart = pszTarget + nSourceLen;
@@ -647,7 +654,7 @@ int SStringA::Replace(const char* pszOld, const char* pszNew)
 		// loop again to actually do the work
 		while (pszStart < pszEnd)
 		{
-			while ((pszTarget = char_traits::StrStr(pszStart, pszOld)) != NULL)
+			while ((pszTarget = (char *)char_traits::StrStr(pszStart, pszOld)) != NULL)
 			{
 				int nBalance = nOldLength - ((int)(pszTarget - m_pszData) + nSourceLen);
 				memmove(pszTarget + nReplacementLen, pszTarget + nSourceLen, nBalance * sizeof(char));

@@ -1,7 +1,7 @@
 ﻿
 #include "string/sstringdata.h"
 #include "soui_mem_wrapper.h"
-#include <Windows.h>
+#include <ctypes.h>
 
 namespace SOUI
 {

@@ -3,7 +3,7 @@
 
 
 
-#include <windows.h>
+#include <ctypes.h>
 #include <utilities-def.h>
 #include <string/sstringdata.h>
 #include <interface/sstring-i.h>
@@ -15,9 +15,9 @@ struct UTILITIES_API wchar_traits
 	static size_t StrLen(const wchar_t* psz);
 	static int Compare(const wchar_t* psz1, const wchar_t* psz2);
 	static int CompareNoCase(const wchar_t* psz1, const wchar_t* psz2);
-	static wchar_t* StrChr(const wchar_t* psz, wchar_t ch);
-	static wchar_t* StrRChr(const wchar_t* psz, wchar_t ch);
-	static wchar_t* StrStr(const wchar_t* psz, const wchar_t* psz2);
+	static const wchar_t* StrChr(const wchar_t* psz, wchar_t ch);
+	static const wchar_t* StrRChr(const wchar_t* psz, wchar_t ch);
+	static const wchar_t* StrStr(const wchar_t* psz, const wchar_t* psz2);
 	static wchar_t* StrUpper(wchar_t* psz);
 	static wchar_t* StrLower(wchar_t* psz);
 	static int IsSpace(wchar_t ch);

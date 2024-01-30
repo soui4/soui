@@ -1,8 +1,10 @@
-﻿#include "trace.h"
+﻿//#include "trace.h"
 #include <stdio.h>
 
 #define MAX_TRACEBUF    502
 
+typedef const char * LPCSTR;
+typedef const wchar_t * LPCWSTR;
 namespace SOUI
 {
 void  STraceA(LPCSTR pstrFormat, ...)

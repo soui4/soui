@@ -13,8 +13,9 @@
 
 
 
-#include <windows.h>
+//#include <windows.h>
 #include <limits.h>
+#include <memory.h>
 #include "soui_mem_wrapper.h"
 #include "snew.h"
 
@@ -67,6 +68,7 @@
 #endif
 #define _SCATCHALL() __pragma(warning(push)) __pragma(warning(disable: 4571)) catch( ... ) __pragma(warning(pop))
 
+#include <ctypes.h>
 
 #pragma pack(push,_S_PACKING)
 namespace SOUI
@@ -174,7 +176,7 @@ inline HRESULT SMultiply(int _W64    *piResult, int _W64    iLeft, int _W64 iRig
 template<>
 inline HRESULT SMultiply(unsigned int    _W64 *piResult, unsigned int _W64 iLeft, unsigned int _W64 iRight)
 {
-    unsigned __int64 i64Result=static_cast<unsigned __int64>(iLeft) * static_cast<unsigned __int64>(iRight);
+    uint64_t i64Result=static_cast<uint64_t>(iLeft) * static_cast<uint64_t>(iRight);
     if(i64Result>UINT_MAX)
     {
         return E_INVALIDARG;
@@ -198,7 +200,7 @@ inline HRESULT SMultiply(long    _W64 *piResult, long _W64 iLeft, long _W64 iRig
 template<>
 inline HRESULT SMultiply(unsigned long _W64 *piResult, unsigned long _W64 iLeft, unsigned long _W64 iRight)
 {
-    unsigned __int64 i64Result=static_cast<unsigned __int64>(iLeft) * static_cast<unsigned __int64>(iRight);
+    uint64_t i64Result=static_cast<uint64_t>(iLeft) * static_cast<uint64_t>(iRight);
     if(i64Result>ULONG_MAX)
     {
         return E_INVALIDARG;
@@ -356,7 +358,7 @@ public:
 
     static bool CompareElements( INARGTYPE element1, INARGTYPE element2 )
     {
-        return( (element1 == element2) != 0 );  // != 0 to handle overloads of operator== that return BOOL instead of bool
+        return memcmp(&element1,&element2,sizeof(INARGTYPE)) == 0 ;  // != 0 to handle overloads of operator== that return BOOL instead of bool
     }
 
     static int CompareElementsOrdered( INARGTYPE element1, INARGTYPE element2 )

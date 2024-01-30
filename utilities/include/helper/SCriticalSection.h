@@ -14,7 +14,7 @@
 #ifndef __SCRITICALSECTION__H__
 #define __SCRITICALSECTION__H__
 #include <utilities-def.h>
-#include <Windows.h>
+#include <mutex>
 
 namespace SOUI
 {
@@ -27,7 +27,8 @@ namespace SOUI
 		void Enter();
 		void Leave();
     protected:
-        CRITICAL_SECTION    m_cs;
+
+        std::recursive_mutex    m_cs;
     };
 
     class UTILITIES_API SAutoLock

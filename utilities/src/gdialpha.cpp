@@ -1,6 +1,6 @@
 ﻿#include "gdialpha.h"
 #include <malloc.h>
-
+#ifdef _WIN32
 namespace SOUI
 {
 
@@ -78,3 +78,8 @@ void CGdiAlpha::AlphaRestore(ALPHAINFO &alphaInfo)
 }
 
 }//namespace SOUI
+#else
+void test(int a){
+    
+}
+#endif //_WIN32

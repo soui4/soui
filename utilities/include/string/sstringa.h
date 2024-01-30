@@ -2,8 +2,7 @@
 #define __TSTRINGA_H__
 
 
-
-#include <windows.h>
+#include <ctypes.h>
 #include <utilities-def.h>
 #include <interface/sstring-i.h>
 #include <string/sstringdata.h>
@@ -15,9 +14,9 @@ struct UTILITIES_API char_traits
 	static size_t StrLen(const char* psz);
 	static int Compare(const char* psz1, const char* psz2);
 	static int CompareNoCase(const char* psz1, const char* psz2);
-	static char* StrChr(const char* psz, char ch);
-	static char* StrRChr(const char* psz, char ch);
-	static char* StrStr(const char* psz, const char* psz2);
+	static const char* StrChr(const char* psz, char ch);
+	static const char* StrRChr(const char* psz, char ch);
+	static const char* StrStr(const char* psz, const char* psz2);
 	static char* StrUpper(char* psz);
 	static char* StrLower(char* psz);
 	static int IsSpace(char ch);

@@ -1,6 +1,7 @@
 #include "string/sstringw.h"
 #include <soui_mem_wrapper.h>
 #include <stdio.h>
+#include <strfun.h>
 
 #define smin_tsr(a,b)            (((a) < (b)) ? (a) : (b))
 
@@ -8,7 +9,11 @@ SNSBEGIN
 
 int wchar_traits::LoadString(HINSTANCE hInst, UINT uID, wchar_t* lpBuffer, int nBufferMax)
 {
+#ifdef _WIN32
 	return ::LoadStringW(hInst, uID, lpBuffer, nBufferMax);
+#else
+	return 0;
+#endif
 }
 
 int wchar_traits::Format(wchar_t** ppszDst, const wchar_t* pszFormat, va_list args)
@@ -16,7 +21,6 @@ int wchar_traits::Format(wchar_t** ppszDst, const wchar_t* pszFormat, va_list ar
 	int len = _vscwprintf(pszFormat, args); // _vscprintf doesn't count terminating '\0'
 	if (len == 0) return 0;
 	*ppszDst = (wchar_t*)soui_mem_wrapper::SouiMalloc((len + 1) * sizeof(wchar_t));
-	//vswprintf(*ppszDst, pszFormat, args);
 	vswprintf_s(*ppszDst, len + 1, pszFormat, args);
 	return len;
 }
@@ -51,19 +55,19 @@ wchar_t* wchar_traits::StrUpper(wchar_t* psz)
 	return _wcsupr(psz);
 }
 
-wchar_t* wchar_traits::StrStr(const wchar_t* psz, const wchar_t* psz2)
+const wchar_t* wchar_traits::StrStr(const wchar_t* psz, const wchar_t* psz2)
 {
-	return const_cast<wchar_t*>(wcsstr(psz, psz2));
+	return wcsstr(psz, psz2);
 }
 
-wchar_t* wchar_traits::StrRChr(const wchar_t* psz, wchar_t ch)
+const wchar_t* wchar_traits::StrRChr(const wchar_t* psz, wchar_t ch)
 {
-	return const_cast<wchar_t*>(wcsrchr(psz, ch));
+	return wcsrchr(psz, ch);
 }
 
-wchar_t* wchar_traits::StrChr(const wchar_t* psz, wchar_t ch)
+const wchar_t* wchar_traits::StrChr(const wchar_t* psz, wchar_t ch)
 {
-	return const_cast<wchar_t*>(wcschr(psz, ch));
+	return wcschr(psz, ch);
 }
 
 int wchar_traits::CompareNoCase(const wchar_t* psz1, const wchar_t* psz2)
@@ -474,7 +478,7 @@ int SStringW::Find(const wchar_t* pszSub, int nStart /*= 0*/) const
 		return -1;
 
 	// find first matching substring
-	wchar_t* psz = wchar_traits::StrStr(m_pszData + nStart, pszSub);
+	const wchar_t* psz = wchar_traits::StrStr(m_pszData + nStart, pszSub);
 
 	// return -1 for not found, distance from beginning otherwise
 	return (psz == NULL) ? -1 : (int)(psz - m_pszData);
@@ -487,7 +491,7 @@ int SStringW::FindChar(wchar_t ch, int nStart /*= 0*/) const
 		return -1;
 
 	// find first single character
-	wchar_t* psz = wchar_traits::StrChr(m_pszData + nStart, ch);
+	const wchar_t* psz = wchar_traits::StrChr(m_pszData + nStart, ch);
 
 	// return -1 if not found and index otherwise
 	return (psz == NULL) ? -1 : (int)(psz - m_pszData);
@@ -496,7 +500,7 @@ int SStringW::FindChar(wchar_t ch, int nStart /*= 0*/) const
 int SStringW::ReverseFind(wchar_t ch) const
 {
 	// find last single character
-	wchar_t* psz = wchar_traits::StrRChr(m_pszData, ch);
+	const wchar_t* psz = wchar_traits::StrRChr(m_pszData, ch);
 
 	// return -1 if not found, distance from beginning otherwise
 	return (psz == NULL) ? -1 : (int)(psz - m_pszData);
@@ -541,7 +545,7 @@ int SStringW::Replace(const wchar_t* pszOld, const wchar_t* pszNew)
 	wchar_t* pszTarget;
 	while (pszStart < pszEnd)
 	{
-		while ((pszTarget = wchar_traits::StrStr(pszStart, pszOld)) != NULL)
+		while ((pszTarget = (wchar_t*)wchar_traits::StrStr(pszStart, pszOld)) != NULL)
 		{
 			nCount++;
 			pszStart = pszTarget + nSourceLen;
@@ -570,7 +574,7 @@ int SStringW::Replace(const wchar_t* pszOld, const wchar_t* pszNew)
 		// loop again to actually do the work
 		while (pszStart < pszEnd)
 		{
-			while ((pszTarget = wchar_traits::StrStr(pszStart, pszOld)) != NULL)
+			while ((pszTarget = (wchar_t*)wchar_traits::StrStr(pszStart, pszOld)) != NULL)
 			{
 				int nBalance = nOldLength - ((int)(pszTarget - m_pszData) + nSourceLen);
 				memmove(pszTarget + nReplacementLen, pszTarget + nSourceLen, nBalance * sizeof(wchar_t));

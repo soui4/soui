@@ -1,7 +1,9 @@
-#include <Windows.h>
 #include <helper/SSemaphore.h>
 #include <cerrno>
 
+#ifdef _WIN32
+
+#include <Windows.h>
 
 namespace SOUI
 {
@@ -61,3 +63,5 @@ void SSemaphore::notify()
 }
 
 }
+
+#endif//_WIN32

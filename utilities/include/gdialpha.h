@@ -1,5 +1,6 @@
 ﻿#ifndef __GDIALPHA__H__
 #define __GDIALPHA__H__
+#ifdef _WIN32
 
 #include "utilities-def.h"
 #include <windows.h>
@@ -37,4 +38,6 @@ public:
 };
 
 }//namespace SOUI
+
+#endif //_WIN32
 #endif // __GDIALPHA__H__

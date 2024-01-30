@@ -1,6 +1,8 @@
-#include <Windows.h>
+//#include <Windows.h>
 #include <soui_mem_wrapper.h>
 #include <helper/SAutoBuf.h>
+#include <memory.h>
+#include <memory>
 
 namespace SOUI{
 

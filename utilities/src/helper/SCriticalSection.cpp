@@ -1,23 +1,21 @@
-#include <helper\SCriticalSection.h>
+#include <helper/SCriticalSection.h>
 
 namespace SOUI
 {
 	SCriticalSection::SCriticalSection()
 	{
-		InitializeCriticalSection(&m_cs);
 	}
 	SCriticalSection::~SCriticalSection()
 	{
-		DeleteCriticalSection(&m_cs);
 	}
 
 	void SCriticalSection::Enter()
 	{
-		EnterCriticalSection(&m_cs);
+		m_cs.lock();
 	}
 
 	void SCriticalSection::Leave()
 	{
-		LeaveCriticalSection(&m_cs);
+		m_cs.unlock();
 	}
 }
