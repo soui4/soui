@@ -87,14 +87,21 @@ elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
 else()
   include_directories(${PROJECT_SOURCE_DIR}/platform/linux/include)
 endif()
+
+
+# 添加调试标志
+set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+
 #
 #
-#add_subdirectory(third-part)
+add_subdirectory(third-part)
 
 #
 #
 #
 add_subdirectory(utilities)
+
+add_subdirectory(fun_test)
 #add_subdirectory(SOUI)
 #add_subdirectory(soui-sys-resource)
 

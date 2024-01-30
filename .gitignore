@@ -43,7 +43,7 @@ Ankh.NoLoad
 *.a
 
 #Visual Studio Code files
-.vscode/
+#.vscode/
 
-#Soui
-demos
+build/
+
