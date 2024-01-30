@@ -46,4 +46,4 @@ Ankh.NoLoad
 #.vscode/
 
 build/
-
+config/
