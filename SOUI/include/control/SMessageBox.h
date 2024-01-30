@@ -12,7 +12,7 @@
  */
 #ifndef __SMESSAGEBOX__H__
 #define __SMESSAGEBOX__H__
-#include <core/shostdialog.h>
+#include <core/SHostDialog.h>
 #include <helper/SDpiHelper.hpp>
 #include <interface/SMessageBox-i.h>
 

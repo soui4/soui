@@ -28,5 +28,6 @@ TEST(Charset,Cvt){
     
     SStringA src2 = S_CW2A(wstr,CP_UTF8);
     bool beq = src == src2;
+    
     EXPECT_EQ(beq,true);
 }

@@ -13,7 +13,7 @@
 
 #ifndef __SDROPTARGETDISPATCHER__H__
 #define __SDROPTARGETDISPATCHER__H__
-#include "swnd.h"
+#include "SWnd.h"
 
 SNSBEGIN
 

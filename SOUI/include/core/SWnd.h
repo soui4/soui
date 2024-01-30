@@ -14,7 +14,7 @@
 #ifndef __SWND__H__
 #define __SWND__H__
 #include <core/SWindowMgr.h>
-#include <interface/SwndContainer-i.h>
+#include <interface/SWndContainer-i.h>
 #include <interface/slayout-i.h>
 #include <interface/saccproxy-i.h>
 #include <interface/scaret-i.h>
@@ -24,11 +24,13 @@
 #include <event/SEvents.h>
 #include <event/SEventSet.h>
 #include <res.mgr/SUiDef.h>
-#include <core/SwndStyle.h>
+#include <core/SWndStyle.h>
 #include <core/SSkin.h>
 #include <animation/SAnimation.h>
 #include <interface/SWindow-i.h>
+#ifdef _WIN32
 #include <OCIdl.h>
+#endif
 
 #define SC_WANTARROWS  0x0001     /* Control wants arrow keys         */
 #define SC_WANTTAB     0x0002     /* Control wants tab keys           */

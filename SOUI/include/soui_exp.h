@@ -1,4 +1,4 @@
-#ifdef DLL_CORE
+#if defined(DLL_CORE) && defined(_WIN32)
 #ifdef SOUI_EXPORTS
 #define SOUI_EXP __declspec(dllexport)
 #else

@@ -12,7 +12,7 @@
  */
 #ifndef __SREALWND__H__
 #define __SREALWND__H__
-#include <interface/sctrl-i.h>
+#include <interface/SCtrl-i.h>
 #include <proxy/SWindowProxy.h>
 
 //////////////////////////////////////////////////////////////////////////

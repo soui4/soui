@@ -5,7 +5,7 @@
 
 #ifndef __SDATETIMEPICKER__H__
 #define __SDATETIMEPICKER__H__
-#include <core/swnd.h>
+#include <core/SWnd.h>
 
 SNSBEGIN
 

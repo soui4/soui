@@ -13,15 +13,17 @@
 
 #ifndef __SAPP__H__
 #define __SAPP__H__
-#include <core/ssingleton.h>
+#include <core/SSingleton.h>
 #include <interface/sapp-i.h>
 
 #include <res.mgr/SResProviderMgr.h>
 #include <res.mgr/SNamedValue.h>
 
-#include <core/smsgloop.h>
+#include <core/SMsgLoop.h>
 #include <core/SObjectFactory.h>
+#ifdef _WIN32
 #include <OleAcc.h>
+#endif
 #include <helper/obj-ref-impl.hpp>
 #include <interface/SSkinobj-i.h>
 

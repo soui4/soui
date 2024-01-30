@@ -25,19 +25,25 @@
 #pragma warning(disable : 4355)
 
 #include <config.h>
+#include <soui-version.h>
 
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
-#include <windows.h>
 
+#include <platform.h>
+#ifdef _WIN32
 #include <CommCtrl.h>
 #include <Shlwapi.h>
 #include <OleCtl.h>
 #include <tchar.h>
+#include <trace.h>
+#include <atl.mini/SComCli.h>
+#endif
+
 #include <stdio.h>
 
-#include <trace.h>
+
 #include <utilities.h>
 #include <soui_exp.h>
 
@@ -48,26 +54,22 @@
 #include <wtl.mini/msgcrack.h>
 #include <wtl.mini/souimisc.h>
 #include <atl.mini/atldef.h>
-#include <atl.mini/scomcli.h>
 #include <string/tstring.h>
 #include <string/strcpcvt.h>
-#include <xml/sxml.h>
+#include <xml/SXml.h>
 
 #include <interface/SRender-i.h>
 #include <interface/SImgDecoder-i.h>
-
-#include <soui-version.h>
-
-#include <helper/SLog.h>
+#include <helper/slog.h>
 #include <helper/SAssertFmt.h>
 #include <helper/SAttrCracker.h>
 #include <helper/SColor.h>
 #include <SApp.h>
 
-#include <res.mgr/sfontpool.h>
-#include <res.mgr/sresprovider.h>
+#include <res.mgr/SFontPool.h>
+#include <res.mgr/SResProvider.h>
 
-#include <control/souictrls.h>
+#include <control/SouiCtrls.h>
 #include <control/SMessageBox.h>
 
 

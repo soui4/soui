@@ -102,7 +102,7 @@ add_subdirectory(third-part)
 add_subdirectory(utilities)
 
 add_subdirectory(fun_test)
-#add_subdirectory(SOUI)
+add_subdirectory(SOUI)
 #add_subdirectory(soui-sys-resource)
 
 #

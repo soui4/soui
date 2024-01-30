@@ -8,7 +8,7 @@
 #ifndef __SITEMPANEL__H__
 #define __SITEMPANEL__H__
 
-#include "SwndContainerImpl.h"
+#include "SWndContainerImpl.h"
 
 SNSBEGIN
 

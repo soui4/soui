@@ -9,15 +9,15 @@
 #include <core/SWndContainerImpl.h>
 #include <core/SNativeWnd.h>
 #include <core/SDropTargetDispatcher.h>
-#include <event/SEventcrack.h>
+#include <event/SEventCrack.h>
 #include <interface/stooltip-i.h>
 #include <interface/shostwnd-i.h>
 #include <interface/SHostPresenter-i.h>
 #include <core/SCaret.h>
 #include <core/SNcPainter.h>
-#include <layout/SLayoutsize.h>
+#include <layout/SLayoutSize.h>
 #include <helper/SplitString.h>
-#include <helper/SWndSpy.h>
+#include <helper/swndspy.h>
 #include <helper/STimerGenerator.h>
 #include <proxy/SNativeWndProxy.h>
 SNSBEGIN

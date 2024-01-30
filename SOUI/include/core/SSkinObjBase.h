@@ -1,10 +1,10 @@
 ﻿#ifndef __SSKINOBJBASE__H__
 #define __SSKINOBJBASE__H__
 
-#include <interface/Sskinobj-i.h>
+#include <interface/SSkinobj-i.h>
 #include <helper/obj-ref-impl.hpp>
 #include <souicoll.h>
-#include <core/Swnd.h>
+#include <core/SWnd.h>
 
 SNSBEGIN
 //////////////////////////////////////////////////////////////////////////

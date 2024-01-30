@@ -16,8 +16,8 @@
 #ifndef __SHOSTDIALOG__H__
 #define __SHOSTDIALOG__H__
 
-#include <core/shostwnd.h>
-#include <core/smsgloop.h>
+#include <core/SHostWnd.h>
+#include <core/SMsgLoop.h>
 #include <proxy/SHostWndProxy.h>
 
 SNSBEGIN

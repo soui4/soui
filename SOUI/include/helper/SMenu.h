@@ -3,7 +3,7 @@
 
 #include <sobject/Sobject.hpp>
 #include <core/SNativeWnd.h>
-#include <res.mgr/Sskinpool.h>
+#include <res.mgr/SSkinPool.h>
 #include <helper/obj-ref-impl.hpp>
 #include <interface/smenu-i.h>
 
