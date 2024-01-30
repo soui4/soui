@@ -40,7 +40,7 @@
 #define SASSERT_VALID(x)
 
 #ifndef SASSUME
-#define SASSUME(expr) do { SASSERT(expr); __analysis_assume(!!(expr)); } while(0)
+#define SASSUME(expr) do { SASSERT(expr);  } while(0)
 #endif // SASSUME
 
 #ifndef SENSURE
@@ -442,7 +442,7 @@ _DECLARE_PRIMITIVE_TRAITS( char )
 _DECLARE_PRIMITIVE_TRAITS( short )
 _DECLARE_PRIMITIVE_TRAITS( int )
 _DECLARE_PRIMITIVE_TRAITS( long )
-_DECLARE_PRIMITIVE_TRAITS( __int64 )
+//_DECLARE_PRIMITIVE_TRAITS( __int64 )
 _DECLARE_PRIMITIVE_TRAITS( float )
 _DECLARE_PRIMITIVE_TRAITS( double )
 _DECLARE_PRIMITIVE_TRAITS( bool )

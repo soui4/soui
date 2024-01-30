@@ -1,8 +1,12 @@
 ﻿#include "utilities.h"
 #include "string/strcpcvt.h"
 #include "xml/SXml.h"
+#ifdef _WIN32
 #include <shlwapi.h>
 #pragma comment(lib,"shlwapi.lib")
+#else
+#include <strfun.h>
+#endif
 SNSBEGIN
 
 int RectWidth(LPCRECT rc) {return rc->right-rc->left;}
@@ -11,7 +15,7 @@ int RectHeight(LPCRECT rc) {return rc->bottom-rc->top;}
 #define HIMETRIC_PER_INCH   2540
 #define MAP_PIX_TO_LOGHIM(x,ppli)   MulDiv(HIMETRIC_PER_INCH, (x), (ppli))
 #define MAP_LOGHIM_TO_PIX(x,ppli)   MulDiv((ppli), (x), HIMETRIC_PER_INCH)
-
+#ifdef _WIN32
 void SHiMetricToPixel(const SIZEL * lpSizeInHiMetric, LPSIZEL lpSizeInPix)
 {
 	int nPixelsPerInchX;    // Pixels per logical inch along width
@@ -39,11 +43,12 @@ void SPixelToHiMetric(const SIZEL * lpSizeInPix, LPSIZEL lpSizeInHiMetric)
 	lpSizeInHiMetric->cx = MAP_PIX_TO_LOGHIM(lpSizeInPix->cx, nPixelsPerInchX);
 	lpSizeInHiMetric->cy = MAP_PIX_TO_LOGHIM(lpSizeInPix->cy, nPixelsPerInchY);
 }
+#endif
 
 int Str2Int(LPCWSTR src,BOOL supportHex)
 {
 	int nRet = 0;
-	::StrToIntExW(src, supportHex?STIF_SUPPORT_HEX:STIF_DEFAULT, &nRet);
+	StrToIntExW(src, supportHex?STIF_SUPPORT_HEX:STIF_DEFAULT, &nRet);
 	return nRet;
 }
 

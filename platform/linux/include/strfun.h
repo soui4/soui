@@ -6,6 +6,7 @@
 #include <string.h>
 #include <wchar.h>
 #include <wctype.h>
+#include <ctypes.h>
 
 #define _vscprintf vprintf
 #define vsprintf_s vsnprintf
@@ -69,4 +70,86 @@ inline wchar_t * _wcsupr(wchar_t* s) {
 
 #define _wcsicmp(s1,s2) wcscasecmp(s1,s2)
 
+#define CP_ACP 0
+#define CP_UTF8 1
+
+#define ERROR_INSUFFICIENT_BUFFER 100
+
+inline int MultiByteToWideChar(int cp,int flags, const char *src, int len,wchar_t *dst,int dstLen){
+    return 0;
+}
+
+inline int WideCharToMultiByte(int cp,int flags,const wchar_t* src,int lne,char * dst,int dstLen,BOOL *p1,BOOL *p2){
+    return 0;
+}
+
+#define STIF_DEFAULT        0x00000000L
+#define STIF_SUPPORT_HEX    0x00000001L
+
+inline BOOL StrToInt64ExW(const wchar_t *str, DWORD flags, LONGLONG *ret)
+{
+    BOOL negative = FALSE;
+    LONGLONG value = 0;
+
+    if (!str || !ret)
+        return FALSE;
+
+    /* Skip leading space, '+', '-' */
+    while (*str == ' ' || *str == '\t' || *str == '\n') str++;
+
+    if (*str == '-')
+    {
+        negative = TRUE;
+        str++;
+    }
+    else if (*str == '+')
+        str++;
+
+    if (flags & STIF_SUPPORT_HEX && *str == '0' && (str[1] == 'x' || str[1] == 'X'))
+    {
+        /* Read hex number */
+        str += 2;
+
+        if (!isxdigit(*str))
+            return FALSE;
+
+        while (isxdigit(*str))
+        {
+            value *= 16;
+            if (*str >= '0' && *str <= '9')
+                value += (*str - '0');
+            else if (*str >= 'A' && *str <= 'Z')
+                value += 10 + (*str - 'A');
+            else
+                value += 10 + (*str - 'a');
+            str++;
+        }
+
+        *ret = value;
+        return TRUE;
+    }
+
+    /* Read decimal number */
+    if (*str < '0' || *str > '9')
+        return FALSE;
+
+    while (*str >= '0' && *str <= '9')
+    {
+        value *= 10;
+        value += (*str - '0');
+        str++;
+    }
+
+    *ret = negative ? -value : value;
+    return TRUE;
+}
+
+inline BOOL StrToIntExW(const wchar_t *str, DWORD flags, INT *ret)
+{
+    LONGLONG value;
+    BOOL res;
+    res = StrToInt64ExW(str, flags, &value);
+    if (res) *ret = value;
+    return res;
+}
 #endif

@@ -81,26 +81,32 @@ configure_file("config/build.cfg.in" "${PROJECT_SOURCE_DIR}/config/build.cfg" @O
 include_directories(${PROJECT_SOURCE_DIR}/config)
 endif()
 
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+  include_directories(${PROJECT_SOURCE_DIR}/platform/windows/include)
+elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
+else()
+  include_directories(${PROJECT_SOURCE_DIR}/platform/linux/include)
+endif()
 #
 #
-add_subdirectory(third-part)
+#add_subdirectory(third-part)
 
 #
 #
 #
 add_subdirectory(utilities)
-add_subdirectory(SOUI)
-add_subdirectory(soui-sys-resource)
+#add_subdirectory(SOUI)
+#add_subdirectory(soui-sys-resource)
 
 #
 #
 # 
-add_subdirectory(components)
+#add_subdirectory(components)
 
 #
 #
-add_subdirectory(demo)
-add_subdirectory(demo2)
+#add_subdirectory(demo)
+#add_subdirectory(demo2)
 
 ##
 ##

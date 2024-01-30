@@ -1,12 +1,15 @@
 ﻿#ifndef __STRCPCVT__H__
 #define __STRCPCVT__H__
 
+#include <strfun.h>
+
 #ifndef CP_ACP
 #define CP_ACP 0
 #endif//CP_ACP
 
 #include "utilities-def.h"
 #include "tstring.h"
+
 
 namespace SOUI
 {

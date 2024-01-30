@@ -2,7 +2,7 @@
 #define __UTILITIES__H__
 
 #include <utilities-def.h>
-#include <windows.h>
+#include <ctypes.h>
 #include <interface/sstring-i.h>
 #include <interface/sxml-i.h>
 
@@ -11,8 +11,10 @@ SNSBEGIN
 UTILITIES_API int RectWidth(LPCRECT rc) ;
 UTILITIES_API int RectHeight(LPCRECT rc) ;
 
+#ifdef _WIN32
 UTILITIES_API void SHiMetricToPixel(const SIZEL * lpSizeInHiMetric, LPSIZEL lpSizeInPix);
 UTILITIES_API void SPixelToHiMetric(const SIZEL * lpSizeInPix, LPSIZEL lpSizeInHiMetric);
+#endif
 
 UTILITIES_API int Str2Int(LPCWSTR src,BOOL supportHex);
 
