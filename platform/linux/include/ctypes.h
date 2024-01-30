@@ -64,9 +64,6 @@ inline long InterlockedIncrement(long *v){
 
 #define UNREFERENCED_PARAMETER(x)
 
-inline int GetLastError(){
-    return 0;
-}
 typedef DWORD   COLORREF;
 typedef DWORD   *LPCOLORREF;
 typedef int16_t SHORT;

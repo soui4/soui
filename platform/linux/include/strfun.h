@@ -7,6 +7,7 @@
 #include <wchar.h>
 #include <wctype.h>
 #include <ctypes.h>
+#include <errno.h>
 
 #define _vscprintf vprintf
 #define vsprintf_s vsnprintf
@@ -77,7 +78,11 @@ inline wchar_t * _wcsupr(wchar_t* s) {
 
 #define ERROR_INSUFFICIENT_BUFFER 100
 inline void SetLastError(int e){
+    errno = e;
+}
 
+inline int GetLastError() {
+    return errno;
 }
 
 inline int MultiByteToWideChar(int cp,int flags, const char *src, int len,wchar_t *dst,int dstLen){
