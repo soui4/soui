@@ -19,15 +19,34 @@ typedef int64_t __int64;// int64_t
 #define FAILED(x) (x)!=S_OK
 #define ULONG uint64_t
 
+typedef uint8_t BYTE;
 typedef uint32_t DWORD;
 typedef uint16_t WORD;
 typedef int32_t LONG;
 typedef int64_t LONGLONG;
 typedef int32_t INT;
 typedef wchar_t WCHAR;
+typedef void * LPVOID;
+typedef intptr_t INT_PTR;
+typedef uintptr_t ULONG_PTR;
+typedef ULONG_PTR DWORD_PTR;
+
 struct GUID{
 DWORD ids[4];
 };
+
+
+#define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD_PTR)(a)) & 0xff)) | ((WORD)((BYTE)(((DWORD_PTR)(b)) & 0xff))) << 8))
+#define MAKELONG(a, b)      ((LONG)(((WORD)(((DWORD_PTR)(a)) & 0xffff)) | ((DWORD)((WORD)(((DWORD_PTR)(b)) & 0xffff))) << 16))
+#define LOWORD(l)           ((WORD)(((DWORD_PTR)(l)) & 0xffff))
+#define HIWORD(l)           ((WORD)((((DWORD_PTR)(l)) >> 16) & 0xffff))
+#define LOBYTE(w)           ((BYTE)(((DWORD_PTR)(w)) & 0xff))
+#define HIBYTE(w)           ((BYTE)((((DWORD_PTR)(w)) >> 8) & 0xff))
+
+#define RGB(r,g,b) ((r)|(g)<<8|(b)<<16)
+#define GetRValue(rgb)   (LOBYTE(rgb))
+#define GetGValue(rgb)  (LOBYTE(rgb<<8))
+#define GetBValue(rgb)  (LOBYTE(rgb<<16))
 
 typedef int BOOL;
 #define FALSE 0
@@ -44,9 +63,7 @@ typedef const wchar_t * LPCWSTR;
 
 #define VK_SPACE 0x20
 
-typedef void * LPVOID;
-typedef intptr_t INT_PTR;
-typedef uintptr_t ULONG_PTR;
+
 
 #define __cdecl //__attribute__((cdecl))
 #define __stdcall //__attribute__((stdcall))
