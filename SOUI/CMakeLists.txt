@@ -13,15 +13,21 @@ file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_UIRES  *.xml *.idx *.ico)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 
+file(GLOB SRC_ROOT src/*.cpp)
+file(GLOB_RECURSE SRC_VALUEANI src/valueAnimator/*.cpp)
+set(SRC_TEST 
+    src/test.cpp
+)
+source_group("src_root" FILES ${SRC_ROOT})
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("SoUI Resource" FILES ${CURRENT_UIRES})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
-set(source ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
+set(source ${CURRENT_HEADERS} ${SRC_TEST} )
 
 if (NOT ENABLE_SOUI_CORE_LIB)
-    set (source  ${source} soui.rc)
+    #set (source  ${source} soui.rc)
     add_library(soui4 SHARED ${source})
 else()
     add_library(soui4 STATIC ${source})
@@ -35,7 +41,7 @@ target_include_directories(soui4
 )
 target_link_libraries(soui4 utilities4)
 
-target_precompile_headers(soui4 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/souistd.h")
+#target_precompile_headers(soui4 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/souistd.h")
 set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")
 
 install(TARGETS soui4

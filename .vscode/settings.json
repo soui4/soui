@@ -1,6 +1,11 @@
 {
     "files.associations": {
         "*.tcc": "cpp",
-        "utility": "cpp"
+        "utility": "cpp",
+        "cstdint": "cpp",
+        "chrono": "cpp",
+        "random": "cpp",
+        "limits": "cpp",
+        "algorithm": "cpp"
     }
 }

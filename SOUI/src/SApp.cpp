@@ -3,7 +3,7 @@
 #include "core/SNativeWnd.h"
 #include "core/SWindowMgr.h"
 
-#include "res.mgr/sfontpool.h"
+#include "res.mgr/SFontPool.h"
 #include "res.mgr/SUiDef.h"
 #include "res.mgr/SObjDefAttr.h"
 
@@ -15,12 +15,12 @@
 #include "helper/SHostMgr.h"
 #include "event/SNotifyCenter.h"
 
-#include "control/Smessagebox.h"
+#include "control/SMessageBox.h"
 #include "updatelayeredwindow/SUpdateLayeredWindow.h"
-#include "helper/splitstring.h"
+#include "helper/SplitString.h"
 
 #include "core/SSkin.h"
-#include "control/souictrls.h"
+#include "control/SouiCtrls.h"
 #include "layout/SouiLayout.h"
 #include "layout/SLinearLayout.h"
 #include "layout/SGridLayout.h"

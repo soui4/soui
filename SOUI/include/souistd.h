@@ -58,18 +58,18 @@
 #include <string/strcpcvt.h>
 #include <xml/SXml.h>
 
-#include <interface/SRender-i.h>
-#include <interface/SImgDecoder-i.h>
+//#include <interface/SRender-i.h>
+//#include <interface/SImgDecoder-i.h>
 #include <helper/slog.h>
 #include <helper/SAssertFmt.h>
 #include <helper/SAttrCracker.h>
 #include <helper/SColor.h>
-#include <SApp.h>
+//#include <SApp.h>
 
-#include <res.mgr/SFontPool.h>
-#include <res.mgr/SResProvider.h>
+//#include <res.mgr/SFontPool.h>
+//#include <res.mgr/SResProvider.h>
 
-#include <control/SouiCtrls.h>
-#include <control/SMessageBox.h>
+//#include <control/SouiCtrls.h>
+//#include <control/SMessageBox.h>
 
 

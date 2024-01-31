@@ -50,7 +50,9 @@ inline uint8_t * _mbscvt(uint8_t * srcU8,BOOL bLower){
 #define _ismbcspace isspace
 #define _vscwprintf(fmt,args) vswprintf(NULL,0,fmt,args)
 #define vswprintf_s vswprintf
-
+#define _wtoi(x) wcstol(x,NULL,10)
+#define memmove_s(dst,ndst,src,len) memmove(dst,src,len)
+#define swscanf_s swscanf
 inline wchar_t * _wcslwr(wchar_t* s) {
     wchar_t *str = s;
     while (*str) {
@@ -210,5 +212,10 @@ inline BOOL StrToIntExW(const wchar_t *str, DWORD flags, INT *ret)
     res = StrToInt64ExW(str, flags, &value);
     if (res) *ret = value;
     return res;
+}
+
+inline int MulDiv(int a,int b,int c){
+    int64_t t = a*b;
+    return (int)(t/c);
 }
 #endif

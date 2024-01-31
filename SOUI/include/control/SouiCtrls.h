@@ -26,8 +26,9 @@
 #include "SMCListView.h"
 #include "STileView.h"
 #include "STreeView.h"
-#include "SMenuBar.h"
 #include "SDateTimePicker.h"
 #include "SFrame.h"
 #include "SStackView.h"
+//#include "SMenuBar.h"
+
 #endif // __SOUICTRLS__H__

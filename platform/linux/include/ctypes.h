@@ -1,8 +1,21 @@
 #ifndef __PLATFORM_LINUX_
 #define __PLATFORM_LINUX_
-
+#include <stdlib.h>
 #include <stdint.h>
 #include <stdarg.h>
+
+#ifndef _INTPTR_T
+#ifndef __intptr_t_defined
+typedef __INTPTR_TYPE__ intptr_t;
+#define __intptr_t_defined
+#define _INTPTR_T
+#endif
+#endif
+
+#ifndef _UINTPTR_T
+typedef __UINTPTR_TYPE__ uintptr_t;
+#define _UINTPTR_T
+#endif
 
 
 typedef unsigned int UINT;
@@ -10,15 +23,17 @@ typedef int64_t __int64;// int64_t
 #define E_INVALIDARG 1
 #define E_OUTOFMEMORY 2
 #define E_POINTER 3
+#define E_FAIL 4
 
 #define S_OK 0
 #define S_FALSE 1
 
 
 #define FAILED(x) (x)!=S_OK
-#define ULONG uint64_t
 
+typedef unsigned long ULONG;
 typedef uint8_t BYTE;
+typedef BYTE * LPBYTE;
 typedef uint32_t DWORD;
 typedef uint16_t WORD;
 typedef int32_t LONG;
@@ -29,17 +44,30 @@ typedef void * LPVOID;
 typedef intptr_t INT_PTR;
 typedef intptr_t LONG_PTR;
 typedef uintptr_t UINT_PTR;
+typedef intptr_t LONG_PTR;
+typedef uintptr_t UINT_PTR;
 typedef uintptr_t ULONG_PTR;
 typedef intptr_t DWORD_PTR;
 typedef int32_t LRESULT;
 typedef int32_t HRESULT;
 typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
+#define __time64_t time_t
 
 typedef struct _GUID{
 DWORD ids[4];
 }GUID;
 
+typedef struct _SYSTEMTIME{
+    WORD wYear;
+    WORD wMonth;
+    WORD wDayOfWeek;
+    WORD wDay;
+    WORD wHour;
+    WORD wMinute;
+    WORD wSecond;
+    WORD wMilliseconds;
+}SYSTEMTIME;
 
 #define MAKEWORD(a, b)      ((WORD)(((BYTE)(((DWORD_PTR)(a)) & 0xff)) | ((WORD)((BYTE)(((DWORD_PTR)(b)) & 0xff))) << 8))
 #define MAKELONG(a, b)      ((LONG)(((WORD)(((DWORD_PTR)(a)) & 0xffff)) | ((DWORD)((WORD)(((DWORD_PTR)(b)) & 0xffff))) << 16))
@@ -69,6 +97,18 @@ typedef int BOOL;
 #define IDTRYAGAIN      10
 #define IDCONTINUE      11
 
+#define IDOK                1
+#define IDCANCEL            2
+#define IDABORT             3
+#define IDRETRY             4
+#define IDIGNORE            5
+#define IDYES               6
+#define IDNO                7
+#define IDCLOSE         8
+#define IDHELP          9
+#define IDTRYAGAIN      10
+#define IDCONTINUE      11
+
 
 #define HINSTANCE int
 #define HMODULE int
@@ -78,6 +118,9 @@ typedef int BOOL;
 #define HGDIOBJ int
 #define HBRUSH int
 #define HPEN   int
+#define HBITMAP int
+#define HRSRC int
+#define HCURSOR int
 
 typedef char *LPSTR;
 typedef wchar_t *LPWSTR;
@@ -91,7 +134,7 @@ typedef const wchar_t * LPCWSTR;
 #define __cdecl //__attribute__((cdecl))
 #define __stdcall //__attribute__((stdcall))
 #define WINAPI __stdcall
-
+#define CALLBACK 
 #define ARRAYSIZE(x) (sizeof((x))/sizeof((x)[0]))
 
 
@@ -168,6 +211,16 @@ typedef struct tagPOINTS
     #define EXTERN_C    extern "C"
 #else
     #define EXTERN_C    extern
+#endif
+
+#define SUCCEEDED(x) ((x)>0)
+#define INFINITE     (UINT)-1
+
+#ifndef max
+#define max(a,b) ((a)>(b)?(a):(b))
+#endif
+#ifndef min
+#define min(a,b) ((a)<(b)?(a):(b))
 #endif
 
 #endif//__PLATFORM_LINUX_
