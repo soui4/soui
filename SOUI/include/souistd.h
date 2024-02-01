@@ -27,6 +27,7 @@
 #include <config.h>
 #include <soui-version.h>
 
+#include <SGuid.h>
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif

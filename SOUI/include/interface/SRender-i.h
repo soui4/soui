@@ -6,6 +6,7 @@
 #include <interface/SPathEffect-i.h>
 #include <interface/SImgDecoder-i.h>
 #include <interface/sxml-i.h>
+#include <SGuid.h>
 
 SNSBEGIN
 
@@ -1326,7 +1327,7 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
     STDMETHOD_(HRESULT, CreateEmbossMaskFilter)
     (THIS_ float direction[3], float ambient, float specular, float blurRadius, IMaskFilter **ppMaskFilter) PURE;
 
-    STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFGUID guidEffect, IPathEffect * *ppPathEffect) PURE;
+    STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFSGUID guidEffect, IPathEffect * *ppPathEffect) PURE;
 };
 
 #ifdef __cplusplus

@@ -217,21 +217,20 @@ namespace SOUI
 		return TRUE;
 	}
 
-	BOOL SRenderFactory_Skia::CreatePathEffect(REFGUID guidEffect,IPathEffect ** ppPathEffect)
+	BOOL SRenderFactory_Skia::CreatePathEffect(REFSGUID guidEffect,IPathEffect ** ppPathEffect)
 	{
 		* ppPathEffect = NULL;
-		#ifdef _MSC_VER
-		if(guidEffect == __uuidof(ICornerPathEffect))
+
+		if(guidEffect == __suidof(ICornerPathEffect))
 		{
 			*ppPathEffect = (IPathEffect*) new SPathEffect_Corner();
-		}else if(guidEffect == __uuidof(IDashPathEffect))
+		}else if(guidEffect == __suidof(IDashPathEffect))
 		{
 			*ppPathEffect = (IPathEffect *) new SPathEffect_Dash();
-		}else if(guidEffect == __uuidof(IDiscretePathEffect))
+		}else if(guidEffect == __suidof(IDiscretePathEffect))
 		{
 			*ppPathEffect = (IPathEffect *) new SPathEffect_Discrete();
 		}
-		#endif //_MSC_VER
 		return (*ppPathEffect) != NULL;
 	}
 

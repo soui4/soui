@@ -177,7 +177,7 @@ DECLARE_INTERFACE_(ILvAdapter, IObjRef)
      * @param [out] IObjRef ** ppObj -- the return interface
      * @return HRESULT S_OK--SUCCEED
      */
-    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppObj) PURE;
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFSGUID id, IObjRef * *ppObj) PURE;
 };
 
 #undef INTERFACE
@@ -305,7 +305,7 @@ DECLARE_INTERFACE_(IMcAdapter, ILvAdapter)
      * @param [out] IObjRef ** ppObj -- the return interface
      * @return HRESULT S_OK--SUCCEED
      */
-    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppObj) PURE;
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFSGUID id, IObjRef * *ppObj) PURE;
 
     /**
      * @brief 获取一个列在模板中对应的窗口名称
@@ -646,7 +646,7 @@ DECLARE_INTERFACE_(ITvAdapter, IObjRef)
      * @param [out] IObjRef ** ppObj -- the return interface
      * @return HRESULT S_OK--SUCCEED
      */
-    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppObj) PURE;
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFSGUID id, IObjRef * *ppObj) PURE;
 };
 
 SNSEND

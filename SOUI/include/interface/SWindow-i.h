@@ -52,7 +52,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param [out] ppRet IObjRef * *--控件接口
      * @return S_OK--成功
      */
-    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef * *ppRet) PURE;
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFSGUID id, IObjRef * *ppRet) PURE;
 
     /**
      * @brief 获取控件容器接口

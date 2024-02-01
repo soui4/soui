@@ -2,8 +2,10 @@
 #define __SPATHEFFECT_I__H__
 
 #include <interface/obj-ref-i.h>
-
+#include <SGuid.h>
 SNSBEGIN
+
+
 
 #undef INTERFACE
 #define INTERFACE IPathEffect
@@ -33,8 +35,9 @@ DECLARE_INTERFACE_(IPathEffect, IObjRef)
 
 #undef INTERFACE
 #define INTERFACE ICornerPathEffect
-DECLARE_INTERFACE_IID_(ICornerPathEffect, IPathEffect, "3C4A07C2-2617-432a-ADFC-8921D8B2E2BD")
+DECLARE_INTERFACE_(ICornerPathEffect, IPathEffect)
 {
+	DECLARE_CLASS_SIID( 0x3C4A07C2,0x2617432a,0xADFC8921,0xD8B2E2BD)
     //!添加引用
     /*!
      */
@@ -61,8 +64,9 @@ DECLARE_INTERFACE_IID_(ICornerPathEffect, IPathEffect, "3C4A07C2-2617-432a-ADFC-
 
 #undef INTERFACE
 #define INTERFACE IDashPathEffect
-DECLARE_INTERFACE_IID_(IDashPathEffect, IPathEffect, "5FA8CF4C-8C83-4eac-82C0-EE160E04D78C")
+DECLARE_INTERFACE_(IDashPathEffect, IPathEffect)
 {
+	DECLARE_CLASS_SIID( 0x5FA8CF4C,0x8C834eac,0x82C0EE16,0x0E04D78C)
     //!添加引用
     /*!
      */
@@ -89,8 +93,9 @@ DECLARE_INTERFACE_IID_(IDashPathEffect, IPathEffect, "5FA8CF4C-8C83-4eac-82C0-EE
 
 #undef INTERFACE
 #define INTERFACE IDashPathEffect
-DECLARE_INTERFACE_IID_(IDiscretePathEffect, IPathEffect, "51D32163-594E-4fbe-B2A5-8A07DEDDBEAB")
+DECLARE_INTERFACE_(IDiscretePathEffect, IPathEffect)
 {
+	DECLARE_CLASS_SIID( 0x51D32163,0x594E4fbe,0xB2A58A07,0xDEDDBEAB)
     //!添加引用
     /*!
      */
