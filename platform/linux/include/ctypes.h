@@ -121,6 +121,7 @@ typedef int BOOL;
 #define HBITMAP int
 #define HRSRC int
 #define HCURSOR int
+#define HDC int
 
 typedef char *LPSTR;
 typedef wchar_t *LPWSTR;
@@ -222,5 +223,53 @@ typedef struct tagPOINTS
 #ifndef min
 #define min(a,b) ((a)<(b)?(a):(b))
 #endif
+
+
+#define SRCCOPY             (DWORD)0x00CC0020 /* dest = source                   */
+#define SRCPAINT            (DWORD)0x00EE0086 /* dest = source OR dest           */
+#define SRCAND              (DWORD)0x008800C6 /* dest = source AND dest          */
+#define SRCINVERT           (DWORD)0x00660046 /* dest = source XOR dest          */
+#define DSTINVERT           (DWORD)0x00550009 /* dest = (NOT dest)               */
+
+#define LF_FACESIZE 32
+typedef struct tagLOGFONT
+{
+    LONG      lfHeight;
+    LONG      lfWidth;
+    LONG      lfEscapement;
+    LONG      lfOrientation;
+    LONG      lfWeight;
+    BYTE      lfItalic;
+    BYTE      lfUnderline;
+    BYTE      lfStrikeOut;
+    BYTE      lfCharSet;
+    BYTE      lfOutPrecision;
+    BYTE      lfClipPrecision;
+    BYTE      lfQuality;
+    BYTE      lfPitchAndFamily;
+    wchar_t      lfFaceName[LF_FACESIZE];
+} LOGFONT;
+
+#define RGN_AND             1
+#define RGN_OR              2
+#define RGN_XOR             3
+#define RGN_DIFF            4
+#define RGN_COPY            5
+#define RGN_MIN             RGN_AND
+#define RGN_MAX             RGN_COPY
+
+
+typedef struct tagMSG
+    {
+    HWND hwnd;
+    UINT message;
+    WPARAM wParam;
+    LPARAM lParam;
+    DWORD time;
+    POINT pt;
+    } 	MSG;
+
+typedef struct tagMSG *PMSG;
+typedef struct tagMSG *LPMSG;
 
 #endif//__PLATFORM_LINUX_

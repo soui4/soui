@@ -14,10 +14,10 @@
 #ifndef __SCRITICALSECTION__H__
 #define __SCRITICALSECTION__H__
 #include <utilities-def.h>
-#include <mutex>
 
 namespace SOUI
 {
+    class SCriticalSectionImpl;
     class UTILITIES_API SCriticalSection
     {
     public:
@@ -28,7 +28,7 @@ namespace SOUI
 		void Leave();
     protected:
 
-        std::recursive_mutex    m_cs;
+        SCriticalSectionImpl*    m_cs;
     };
 
     class UTILITIES_API SAutoLock

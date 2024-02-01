@@ -1,9 +1,7 @@
 ﻿#ifndef __SRESPROVIDERMGR__H__
 #define __SRESPROVIDERMGR__H__
 
-#include <ctypes.h>
-#include <tchar.h>
-#include <strfun.h>
+#include <platform.h>
 #include <interface/SResProviderMgr-i.h>
 //#include <atl.mini/SComCli.h>
 #include <layout/SLayoutSize.h>

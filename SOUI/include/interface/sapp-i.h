@@ -303,7 +303,7 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @param REFGUID langId--翻译包ID
      * @return BOOL, TRUE--成功
      */
-    STDMETHOD_(BOOL, UnnstallTranslator)(THIS_ REFGUID langId) PURE;
+    STDMETHOD_(BOOL, UnnstallTranslator)(THIS_ REFSGUID langId) PURE;
 
     /**
      * @brief 启用NotifyCenter

@@ -2,7 +2,7 @@
 #define __SGUID_H_
 
 typedef struct _SGUID{
-	int a,b,c,d;
+	unsigned int a,b,c,d;
 }SGUID,*PSGUID;
 
 #define SGuidEqual(id1,id2) (id1.a==id2.a && id1.b==id2.b && id1.c==id2.c && id1.d==id2.d)

@@ -8,6 +8,7 @@
 #include <wctype.h>
 #include <ctypes.h>
 #include <errno.h>
+#include <pthread.h>
 
 #define _vscprintf vprintf
 #define vsprintf_s vsnprintf
@@ -53,6 +54,8 @@ inline uint8_t * _mbscvt(uint8_t * srcU8,BOOL bLower){
 #define _wtoi(x) wcstol(x,NULL,10)
 #define memmove_s(dst,ndst,src,len) memmove(dst,src,len)
 #define swscanf_s swscanf
+#define snwprintf swprintf
+
 inline wchar_t * _wcslwr(wchar_t* s) {
     wchar_t *str = s;
     while (*str) {
@@ -217,5 +220,9 @@ inline BOOL StrToIntExW(const wchar_t *str, DWORD flags, INT *ret)
 inline int MulDiv(int a,int b,int c){
     int64_t t = a*b;
     return (int)(t/c);
+}
+
+inline uint32_t GetCurrentThreadId(){
+   return (uint32_t)pthread_self();
 }
 #endif

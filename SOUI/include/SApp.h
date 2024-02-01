@@ -173,7 +173,7 @@ class SOUI_EXP SApplication
 	}
 
 	STDMETHOD_(BOOL,InstallTranslator)(THIS_ ITranslator * trModule) OVERRIDE;
-	STDMETHOD_(BOOL,UnnstallTranslator)(THIS_  REFGUID langId) OVERRIDE;
+	STDMETHOD_(BOOL,UnnstallTranslator)(THIS_  REFSGUID langId) OVERRIDE;
 
 	STDMETHOD_(void,EnableNotifyCenter)(THIS_ BOOL bEnable,int interval DEF_VAL(20)) OVERRIDE;
 
@@ -261,9 +261,10 @@ class SOUI_EXP SApplication
     virtual IAnimation *CreateAnimationByName(LPCWSTR pszName) const;
     virtual IValueAnimator *CreateValueAnimatorByName(LPCWSTR pszName) const;
 
+#ifdef _WIN32
     virtual IAccProxy *CreateAccProxy(SWindow *pWnd) const;
     virtual IAccessible *CreateAccessible(SWindow *pWnd) const;
-
+#endif
   protected:
     void _CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, BOOL bImeApp);
     void _DestroySingletons();

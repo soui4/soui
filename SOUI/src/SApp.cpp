@@ -294,7 +294,7 @@ void SApplication::_DestroySingletons()
     DELETE_SINGLETON(STimerGenerator);
     DELETE_SINGLETON(SWindowMgr);
 }
-
+#ifdef _WIN32
 IAccProxy *SApplication::CreateAccProxy(SWindow *pWnd) const
 {
 #ifdef SOUI_ENABLE_ACC
@@ -341,6 +341,7 @@ IAccessible *SApplication::CreateAccessible(SWindow *pWnd) const
     return NULL;
 #endif // SOUI_ENABLE_ACC
 }
+#endif
 
 void *SApplication::GetInnerSingleton(SingletonType nType)
 {
