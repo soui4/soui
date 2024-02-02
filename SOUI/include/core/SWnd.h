@@ -427,7 +427,7 @@ class SOUI_EXP SWindow
 
     STDMETHOD_(BOOL, UnsubscribeEvent)(THIS_ DWORD evtId, const IEvtSlot *pSlot) OVERRIDE;
 
-    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFSGUID id, IObjRef **ppRet) OVERRIDE;
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef **ppRet) OVERRIDE;
 
     STDMETHOD_(BOOL, AddEvent)(THIS_ DWORD dwEventID, LPCWSTR pszEventHandlerName) OVERRIDE;
 

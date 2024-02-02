@@ -54,10 +54,6 @@ typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
 #define __time64_t time_t
 
-typedef struct _GUID{
-DWORD ids[4];
-}GUID;
-
 typedef struct _SYSTEMTIME{
     WORD wYear;
     WORD wMonth;

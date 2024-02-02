@@ -37,7 +37,7 @@ public:
 
 	STDMETHOD_(BOOL,CreatePath)(THIS_ IPathS ** ppPath) OVERRIDE;
 
-	STDMETHOD_(BOOL,CreatePathEffect)(THIS_ REFSGUID guidEffect,IPathEffect ** ppPathEffect) OVERRIDE;
+	STDMETHOD_(BOOL,CreatePathEffect)(THIS_ REFGUID guidEffect,IPathEffect ** ppPathEffect) OVERRIDE;
 
 	STDMETHOD_(HRESULT,CreateBlurMaskFilter)(THIS_ float radius, BlurStyle style,BlurFlags flag,IMaskFilter ** ppMaskFilter) OVERRIDE;
 

@@ -12,8 +12,7 @@
 #define __SOUICOLL_H__
 
 
-
-//#include <windows.h>
+#include <platform.h>
 #include <limits.h>
 #include <memory.h>
 #include "soui_mem_wrapper.h"

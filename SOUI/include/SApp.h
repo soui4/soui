@@ -173,7 +173,7 @@ class SOUI_EXP SApplication
 	}
 
 	STDMETHOD_(BOOL,InstallTranslator)(THIS_ ITranslator * trModule) OVERRIDE;
-	STDMETHOD_(BOOL,UnnstallTranslator)(THIS_  REFSGUID langId) OVERRIDE;
+	STDMETHOD_(BOOL,UnnstallTranslator)(THIS_  REFGUID langId) OVERRIDE;
 
 	STDMETHOD_(void,EnableNotifyCenter)(THIS_ BOOL bEnable,int interval DEF_VAL(20)) OVERRIDE;
 

@@ -184,7 +184,7 @@ class LvAdatperImpl : public BaseClass {
         getViewDesiredSize(ret, position, pItemPanel, wid, hei);
     }
 
-    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFSGUID id, IObjRef **ppObj) OVERRIDE
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef **ppObj) OVERRIDE
     {
         return E_NOINTERFACE;
     }
@@ -625,7 +625,7 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         return ITEM_NULL;
     }
 
-    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFSGUID id, IObjRef **ppObj) OVERRIDE
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID id, IObjRef **ppObj) OVERRIDE
     {
         return E_NOINTERFACE;
     }

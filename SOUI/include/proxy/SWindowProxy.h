@@ -27,7 +27,7 @@ public:
 		return this;
 	}
 
-	STDMETHOD_(HRESULT, QueryInterface)(REFSGUID id, IObjRef **ppRet) OVERRIDE
+	STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
 	{
 		if (id == __suidof(T))
 		{
