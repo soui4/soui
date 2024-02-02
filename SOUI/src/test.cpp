@@ -19,3 +19,6 @@
 
 #include <core/SWnd.h>
 #include <res.mgr/SSkinPool.h>
+#include <animation/SAnimation.h>
+#include <animation/SAnimationSet.h>
+#include <valueAnimator/SValueAnimator.h>
