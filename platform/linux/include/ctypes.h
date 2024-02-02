@@ -52,6 +52,11 @@ typedef int32_t LRESULT;
 typedef int32_t HRESULT;
 typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
+typedef uint16_t USHORT;
+typedef uint64_t ULONG64;
+typedef void VOID;
+typedef void* LPVOID;
+
 #define __time64_t time_t
 
 typedef struct _SYSTEMTIME{
@@ -119,6 +124,9 @@ typedef int BOOL;
 #define HCURSOR int
 #define HDC int
 #define HRGN int
+#define HFONT int
+#define HANDLE int
+#define ATOM int
 
 typedef char *LPSTR;
 typedef wchar_t *LPWSTR;

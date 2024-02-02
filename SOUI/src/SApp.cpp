@@ -137,7 +137,6 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<STabCtrl>();
     objFactory->TplRegisterFactory<STabPage>();
     objFactory->TplRegisterFactory<SActiveX>();
-    // objFactory->TplRegisterFactory<SFlashCtrl>();
     objFactory->TplRegisterFactory<SSplitPane>();
     objFactory->TplRegisterFactory<SSplitWnd>();
     objFactory->TplRegisterFactory<SSplitWnd_Col>();

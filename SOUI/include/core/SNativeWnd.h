@@ -2,7 +2,7 @@
 #define __SNATIVEWND__H__
 #include <interface/SNativeWnd-i.h>
 #include <sobject/Sobject.hpp>
-
+#include <helper/SCriticalSection.h>
 #include "SSingleton2.h"
 //////////////////////////////////////////////////////////////////////////
 // thunk 技术实现参考http://www.cppblog.com/proguru/archive/2008/08/24/59831.html
@@ -38,7 +38,7 @@ class SOUI_EXP SNativeWndHelper : public SSingleton2<SNativeWndHelper> {
     ~SNativeWndHelper();
 
     HANDLE m_hHeap;
-    CRITICAL_SECTION m_cs;
+    SCriticalSection m_cs;
     void *m_sharePtr;
 
     ATOM m_atom;
