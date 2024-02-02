@@ -25,8 +25,8 @@ endif ()
 endif()
 add_executable(fun_test ${CURRENT_HEADERS} ${CURRENT_SRCS})
 
-add_dependencies(fun_test utilities4 gtest)
-target_link_libraries(fun_test utilities4 gtest pthread)
+add_dependencies(fun_test utilities4 gtest platform)
+target_link_libraries(fun_test utilities4 gtest platform pthread)
 
 
 set_target_properties (fun_test PROPERTIES

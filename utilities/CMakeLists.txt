@@ -13,13 +13,15 @@ file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 
+
 if (NOT ENABLE_SOUI_CORE_LIB)
-    #set (source  ${CURRENT_SRCS} utilities.rc)
     add_library(utilities4 SHARED ${CURRENT_SRCS} ${CURRENT_HEADERS})
-    #target_link_libraries(utilities4 shlwapi)
 else()
     add_library(utilities4 STATIC ${CURRENT_SRCS} ${CURRENT_HEADERS})
 endif()
+add_dependencies(utilities4 platform)
+target_link_libraries(utilities4 platform)
+
 
 set(CORE_LIBS ${CORE_LIBS} utilities4)
 set(CORE_LIBS ${CORE_LIBS} utilities4 CACHE INTERNAL "core_lib")

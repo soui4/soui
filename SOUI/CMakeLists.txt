@@ -29,6 +29,7 @@ set(source ${CURRENT_HEADERS} ${SRC_TEST} )
 if (NOT ENABLE_SOUI_CORE_LIB)
     #set (source  ${source} soui.rc)
     add_library(soui4 SHARED ${source})
+
 else()
     add_library(soui4 STATIC ${source})
 endif()
@@ -39,7 +40,8 @@ target_include_directories(soui4
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface
   PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
 )
-target_link_libraries(soui4 utilities4)
+add_dependencies(soui4 utilities4 platform)
+target_link_libraries(soui4 utilities4 platform)
 
 #target_precompile_headers(soui4 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/souistd.h")
 set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")

@@ -99,6 +99,7 @@ add_subdirectory(third-part)
 #
 #
 #
+add_subdirectory(platform)
 add_subdirectory(utilities)
 
 add_subdirectory(fun_test)
