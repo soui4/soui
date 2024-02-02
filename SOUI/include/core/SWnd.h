@@ -450,7 +450,9 @@ class SOUI_EXP SWindow
     STDMETHOD_(void, SetCaretPos)(THIS_ int x, int y) OVERRIDE;
 
   public:
+  #ifdef _WIN32
     IAccessible *GetAccessible();
+  #endif
     IAccProxy *GetAccProxy();
     void accNotifyEvent(DWORD dwEvt);
 

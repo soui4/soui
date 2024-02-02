@@ -24,6 +24,7 @@ typedef int64_t __int64;// int64_t
 #define E_OUTOFMEMORY 2
 #define E_POINTER 3
 #define E_FAIL 4
+#define E_NOTIMPL 5
 
 #define S_OK 0
 #define S_FALSE 1
@@ -56,6 +57,8 @@ typedef uint16_t USHORT;
 typedef uint64_t ULONG64;
 typedef void VOID;
 typedef void* LPVOID;
+typedef void* PVOID;
+typedef uint8_t UCHAR;
 
 #define __time64_t time_t
 
@@ -286,10 +289,38 @@ typedef struct _BLENDFUNCTION {
 }BLENDFUNCTION, *PBLENDFUNCTION, *LPBLENDFUNCTION;
 
 
-#define WM_USER 100
-
 typedef struct _IDropTarget{
 
 }IDropTarget;
+
+
+/* Pen Styles */
+#define PS_SOLID            0
+#define PS_DASH             1       /* -------  */
+#define PS_DOT              2       /* .......  */
+#define PS_DASHDOT          3       /* _._._._  */
+#define PS_DASHDOTDOT       4       /* _.._.._  */
+#define PS_NULL             5
+#define PS_INSIDEFRAME      6
+#define PS_USERSTYLE        7
+#define PS_ALTERNATE        8
+#define PS_STYLE_MASK       0x0000000F
+
+#define PS_ENDCAP_ROUND     0x00000000
+#define PS_ENDCAP_SQUARE    0x00000100
+#define PS_ENDCAP_FLAT      0x00000200
+#define PS_ENDCAP_MASK      0x00000F00
+
+#define PS_JOIN_ROUND       0x00000000
+#define PS_JOIN_BEVEL       0x00001000
+#define PS_JOIN_MITER       0x00002000
+#define PS_JOIN_MASK        0x0000F000
+
+#define PS_COSMETIC         0x00000000
+#define PS_GEOMETRIC        0x00010000
+#define PS_TYPE_MASK        0x000F0000
+
+#define AD_COUNTERCLOCKWISE 1
+#define AD_CLOCKWISE        2
 
 #endif//__PLATFORM_LINUX_

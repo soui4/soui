@@ -13,5 +13,9 @@
 
 #include "helper/SAppDir.h"
 
+
 //#include "helper/SToolTip.h"
 //#include "core/SNativeWnd.h"
+
+#include <core/SWnd.h>
+#include <res.mgr/SSkinPool.h>

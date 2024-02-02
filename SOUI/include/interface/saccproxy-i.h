@@ -5,6 +5,8 @@
 
 SNSBEGIN
 
+#ifdef _WIN32
+
 #undef INTERFACE
 #define INTERFACE IAccProxy
 DECLARE_INTERFACE_(IAccProxy, IObjRef)
@@ -37,6 +39,8 @@ DECLARE_INTERFACE_(IAccProxy, IObjRef)
     STDMETHOD(put_accName)(THIS_ BSTR szName) PURE;
     STDMETHOD(put_accValue)(THIS_ BSTR szValue) PURE;
 };
+
+#endif//_WIN32
 
 SNSEND
 #endif // __SACCPROXY_I__H__

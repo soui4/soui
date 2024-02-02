@@ -5,4 +5,6 @@
 #include "strfun.h"
 #include "objbase.h"
 #include "guid.h"
+#include "winuser.h"
+
 #endif//__PLATFORM_H_
