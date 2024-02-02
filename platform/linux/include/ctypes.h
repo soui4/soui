@@ -122,6 +122,7 @@ typedef int BOOL;
 #define HRSRC int
 #define HCURSOR int
 #define HDC int
+#define HRGN int
 
 typedef char *LPSTR;
 typedef wchar_t *LPWSTR;
@@ -271,5 +272,20 @@ typedef struct tagMSG
 
 typedef struct tagMSG *PMSG;
 typedef struct tagMSG *LPMSG;
+
+
+typedef struct _BLENDFUNCTION {
+  BYTE     BlendOp;
+  BYTE     BlendFlags;
+  BYTE     SourceConstantAlpha;
+  BYTE     AlphaFormat;
+}BLENDFUNCTION, *PBLENDFUNCTION, *LPBLENDFUNCTION;
+
+
+#define WM_USER 100
+
+typedef struct _IDropTarget{
+
+}IDropTarget;
 
 #endif//__PLATFORM_LINUX_

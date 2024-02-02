@@ -4,5 +4,5 @@
 #include "tchar.h"
 #include "strfun.h"
 #include "objbase.h"
-
+#include "guid.h"
 #endif//__PLATFORM_H_

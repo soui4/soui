@@ -11,7 +11,6 @@
 #include <interface/SListViewItemLocator-i.h>
 #include <interface/STreeViewItemLocator-i.h>
 #include <interface/STileViewItemLocator-i.h>
-#include <SGuid.h>
 
 SNSBEGIN
 

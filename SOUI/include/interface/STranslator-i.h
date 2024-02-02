@@ -85,7 +85,7 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
      *
      * Describe
      */
-    STDMETHOD_(SGUID, guid)(CTHIS) SCONST PURE;
+    STDMETHOD_(GUID, guid)(CTHIS) SCONST PURE;
     /**
      * tr
      * @brief    执行翻译的接口
@@ -185,7 +185,7 @@ DECLARE_INTERFACE_(ITranslatorMgr, IObjRef)
      *
      * Describe
      */
-    STDMETHOD_(BOOL, UninstallTranslator)(THIS_ REFSGUID id) PURE;
+    STDMETHOD_(BOOL, UninstallTranslator)(THIS_ REFGUID id) PURE;
 
     /**
      * tr

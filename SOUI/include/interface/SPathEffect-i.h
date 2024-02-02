@@ -2,7 +2,6 @@
 #define __SPATHEFFECT_I__H__
 
 #include <interface/obj-ref-i.h>
-#include <SGuid.h>
 SNSBEGIN
 
 

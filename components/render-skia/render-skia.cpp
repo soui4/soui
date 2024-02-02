@@ -217,7 +217,7 @@ namespace SOUI
 		return TRUE;
 	}
 
-	BOOL SRenderFactory_Skia::CreatePathEffect(REFSGUID guidEffect,IPathEffect ** ppPathEffect)
+	BOOL SRenderFactory_Skia::CreatePathEffect(REFGUID guidEffect,IPathEffect ** ppPathEffect)
 	{
 		* ppPathEffect = NULL;
 
