@@ -1,4 +1,4 @@
-#ifndef __DPIHELPER_H_
+﻿#ifndef __DPIHELPER_H_
 #define __DPIHELPER_H_
 
 #include <helper/SDpiScale.h>

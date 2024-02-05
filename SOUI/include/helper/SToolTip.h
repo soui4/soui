@@ -2,7 +2,7 @@
 #define __STOOLTIP__H__
 
 #include "interface/stooltip-i.h"
-#include "core/SNativeWnd.h"
+#include <SNativeWnd.h>
 
 SNSBEGIN
 class STipCtrl

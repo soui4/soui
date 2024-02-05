@@ -60,7 +60,8 @@
 #include <res.mgr/SFontPool.h>
 #include <res.mgr/SResProvider.h>
 
-//#include <control/SouiCtrls.h>
-//#include <control/SMessageBox.h>
-
+#ifdef _WIN32
+#include <control/SouiCtrls.h>
+#include <control/SMessageBox.h>
+#endif
 

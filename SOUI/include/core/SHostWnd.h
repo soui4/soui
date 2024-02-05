@@ -7,7 +7,7 @@
 #define __SHOSTWND__H__
 
 #include <core/SWndContainerImpl.h>
-#include <core/SNativeWnd.h>
+#include <SNativeWnd.h>
 #include <core/SDropTargetDispatcher.h>
 #include <event/SEventCrack.h>
 #include <interface/stooltip-i.h>

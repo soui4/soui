@@ -8,6 +8,6 @@
 #include <OleCtl.h>
 #include <tchar.h>
 #include <atl.mini/SComCli.h>
-#define __suidof __uuidof
+#include <guid.h>
 
 #endif

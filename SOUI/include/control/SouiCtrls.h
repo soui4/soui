@@ -29,6 +29,8 @@
 #include "SDateTimePicker.h"
 #include "SFrame.h"
 #include "SStackView.h"
-//#include "SMenuBar.h"
+#ifdef _WIN32
+#include "SMenuBar.h"
+#endif
 
 #endif // __SOUICTRLS__H__

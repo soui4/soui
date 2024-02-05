@@ -1,7 +1,7 @@
 ﻿#ifndef __SDRAGWND__H__
 #define __SDRAGWND__H__
 
-#include "core/SNativeWnd.h"
+#include <SNativeWnd.h>
 
 SNSBEGIN
 

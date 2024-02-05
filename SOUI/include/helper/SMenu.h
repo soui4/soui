@@ -2,7 +2,7 @@
 #define __SMENU__H__
 
 #include <sobject/Sobject.hpp>
-#include <core/SNativeWnd.h>
+#include <SNativeWnd.h>
 #include <res.mgr/SSkinPool.h>
 #include <helper/obj-ref-impl.hpp>
 #include <interface/smenu-i.h>

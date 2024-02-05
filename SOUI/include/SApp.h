@@ -20,7 +20,7 @@
 #include <res.mgr/SResProviderMgr.h>
 #include <res.mgr/SNamedValue.h>
 
-#include <core/SMsgLoop.h>
+#include <SMsgLoop.h>
 #include <core/SObjectFactory.h>
 #ifdef _WIN32
 #include <OleAcc.h>

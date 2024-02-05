@@ -5,7 +5,7 @@
 #define WIN32_LEAN_AND_MEAN
 #endif // !WIN32_LEAN_AND_MEAN
 
-#include <ctypes.h>
+#include <platform.h>
 
 #define GetAValue(rgb)   (LOBYTE((rgb) >> 24))
 #define RGBA(r, g, b, a) (RGB(r, g, b) | (a << 24))

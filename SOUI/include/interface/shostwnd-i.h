@@ -21,7 +21,7 @@ typedef struct _EventHandlerInfo
 #define INTERFACE IHostWnd
 DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 {
-#include "SNativeWndApi.h"
+#include <interface/SNativeWndApi.h>
     //////////////////////////////////////////////////////////////////////////
 
     /**
@@ -183,7 +183,7 @@ DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 #define INTERFACE IHostDialog
 DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 {
-#include "SNativeWndApi.h"
+#include <interface/SNativeWndApi.h>
 
     //////////////////////////////////////////////////////////////////////////
 

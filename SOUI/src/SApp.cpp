@@ -1,6 +1,6 @@
 ﻿#include "souistd.h"
 #include "SApp.h"
-#include "core/SNativeWnd.h"
+#include <SNativeWnd.h>
 #include "core/SWindowMgr.h"
 
 #include "res.mgr/SFontPool.h"
@@ -270,7 +270,6 @@ void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, 
     m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
     m_pSingletons[STextServiceHelper::GetType()] = new STextServiceHelper();
     m_pSingletons[SRicheditMenuDef::GetType()] = new SRicheditMenuDef();
-    m_pSingletons[SNativeWndHelper::GetType()] = new SNativeWndHelper(hInst, pszHostClassName, bImeApp);
 
     m_pSingletons[SHostMgr::GetType()] = new SHostMgr();
 }
@@ -285,7 +284,6 @@ void SApplication::_DestroySingletons()
         DELETE_SINGLETON(SNotifyCenter);
 
     DELETE_SINGLETON(SHostMgr);
-    DELETE_SINGLETON(SNativeWndHelper);
     DELETE_SINGLETON(SRicheditMenuDef);
     DELETE_SINGLETON(STextServiceHelper);
     DELETE_SINGLETON(SWindowFinder);

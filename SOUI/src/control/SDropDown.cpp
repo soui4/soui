@@ -12,7 +12,7 @@
  */
 #include "souistd.h"
 #include "control/SDropDown.h"
-#include <core/SMsgLoop.h>
+#include <SMsgLoop.h>
 
 SNSBEGIN
 #define IDINIT -1

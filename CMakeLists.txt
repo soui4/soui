@@ -89,8 +89,10 @@ else()
 endif()
 
 
+if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 # 添加调试标志
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+endif()
 
 #
 #

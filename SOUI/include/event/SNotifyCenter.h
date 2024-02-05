@@ -4,6 +4,8 @@
 #include <core/SSingleton2.h>
 #include <helper/SCriticalSection.h>
 #include <interface/SNotifyCenter-i.h>
+#include <event/SEventSet.h>
+
 #if _MSC_VER >= 1700 // VS2012
 #define ENABLE_RUNONUI
 #endif

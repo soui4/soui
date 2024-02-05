@@ -9,6 +9,8 @@
 #define __SITEMPANEL__H__
 
 #include "SWndContainerImpl.h"
+#include <proxy/SWindowProxy.h>
+#include <interface/SCtrl-i.h>
 
 SNSBEGIN
 
