@@ -9,36 +9,6 @@
 //////////////////////////////////////////////////////////////////////////
 SNSBEGIN
 
-template <class T, class Base>
-class TObjRefProxy
-    : public T
-    , public Base {
-  public:
-    //!添加引用
-    /*!
-     */
-    STDMETHOD_(long, AddRef)(THIS) OVERRIDE
-    {
-        return Base::AddRef();
-    }
-
-    //!释放引用
-    /*!
-     */
-    STDMETHOD_(long, Release)(THIS) OVERRIDE
-    {
-        return Base::Release();
-    }
-
-    //!释放对象
-    /*!
-     */
-    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
-    {
-        return Base::OnFinalRelease();
-    }
-};
-
 struct tagThunk;
 class PLATFORM_API SNativeWnd : public TObjRefImpl<INativeWnd> {
   public:
