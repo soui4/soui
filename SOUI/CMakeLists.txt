@@ -6,30 +6,37 @@
 # 1394020320@qq.com
 #
 
-add_definitions(-DSOUI_EXPORTS -D_CRT_SECURE_NO_WARNINGS -D_M_AMD64)
+add_definitions(-DSOUI_EXPORTS -D_CRT_SECURE_NO_WARNINGS)
 
 file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_UIRES  *.xml *.idx *.ico)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 
+source_group("Header Files" FILES ${CURRENT_HEADERS})
+source_group("Source Files" FILES ${CURRENT_SRCS})
+source_group("SoUI Resource" FILES ${CURRENT_UIRES})
+source_group("Resource Files" FILES ${CURRENT_RC})
+
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+set(source ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
+else()
 file(GLOB SRC_ROOT src/*.cpp)
 file(GLOB_RECURSE SRC_VALUEANI src/valueAnimator/*.cpp)
 set(SRC_TEST 
     src/test.cpp
 )
 source_group("src_root" FILES ${SRC_ROOT})
-source_group("Header Files" FILES ${CURRENT_HEADERS})
-source_group("Source Files" FILES ${CURRENT_SRCS})
-source_group("SoUI Resource" FILES ${CURRENT_UIRES})
-source_group("Resource Files" FILES ${CURRENT_RC})
-
 set(source ${CURRENT_HEADERS} ${SRC_TEST} )
+endif()
+
 
 if (NOT ENABLE_SOUI_CORE_LIB)
-    #set (source  ${source} soui.rc)
-    add_library(soui4 SHARED ${source})
 
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+    set (source  ${source} soui.rc)
+endif()
+    add_library(soui4 SHARED ${source})
 else()
     add_library(soui4 STATIC ${source})
 endif()

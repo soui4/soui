@@ -1,9 +1,7 @@
 ﻿#ifndef __TSTRINGW_H__
 #define __TSTRINGW_H__
 
-
-
-#include <ctypes.h>
+#include <platform.h>
 #include <utilities-def.h>
 #include <string/sstringdata.h>
 #include <interface/sstring-i.h>

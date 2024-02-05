@@ -1,39 +1,195 @@
-﻿#include "souistd.h"
-#include "core/SNativeWnd.h"
+﻿#include "platform.h"
+#include "SNativeWnd.h"
+#include <helper/SCriticalSection.h>
 
 SNSBEGIN
 
-SNativeWndHelper::SNativeWndHelper(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp)
-    : m_hInst(hInst)
-    , m_sharePtr(NULL)
-    , m_atom(0)
+#if defined(_M_IX86)
+// 按一字节对齐
+#pragma pack(push, 1)
+struct tagThunk
 {
-    InitializeCriticalSection(&m_cs);
+    DWORD m_mov; // 4个字节
+    DWORD m_this;
+    BYTE m_jmp;
+    DWORD m_relproc;
+    //关键代码   //////////////////////////////////////
+    void Init(DWORD_PTR proc, void* pThis)
+    {
+        m_mov = 0x042444C7;
+        m_this = (DWORD)(ULONG_PTR)pThis; // mov [esp+4], pThis;而esp+4本来是放hWnd,现在被偷着放对象指针了.
+        m_jmp = 0xe9;
+        // 跳转到proc指定的入口函数
+        m_relproc = (DWORD)((INT_PTR)proc - ((INT_PTR)this + sizeof(tagThunk)));
+        // 告诉CPU把以上四条语句不当数据，当指令,接下来用GetCodeAddress获得的指针就会运行此指令
+        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+    }
+    void* GetCodeAddress()
+    {
+        return this; // 指向this,那么由GetCodeAddress获得的函数pProc是从DWORD m_mov;开始执行的
+    }
+};
+#pragma pack(pop)
+#elif defined(_M_AMD64)
+#pragma pack(push, 2)
+struct tagThunk
+{
+    USHORT RcxMov;  // mov rcx, pThis
+    ULONG64 RcxImm; //
+    USHORT RaxMov;  // mov rax, target
+    ULONG64 RaxImm; //
+    USHORT RaxJmp;  // jmp target
+    void Init(DWORD_PTR proc, void* pThis)
+    {
+        RcxMov = 0xb948;         // mov rcx, pThis
+        RcxImm = (ULONG64)pThis; //
+        RaxMov = 0xb848;         // mov rax, target
+        RaxImm = (ULONG64)proc;  //
+        RaxJmp = 0xe0ff;         // jmp rax
+        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+    }
+    // some thunks will dynamically allocate the memory for the code
+    void* GetCodeAddress()
+    {
+        return this;
+    }
+};
+#pragma pack(pop)
+#elif defined(_M_ARM)
+#pragma pack(push, 4)
+struct tagThunk // this should come out to 16 bytes
+{
+    DWORD m_mov_r0; // mov    r0, pThis
+    DWORD m_mov_pc; // mov    pc, pFunc
+    DWORD m_pThis;
+    DWORD m_pFunc;
+    void Init(DWORD_PTR proc, void* pThis)
+    {
+        m_mov_r0 = 0xE59F0000;
+        m_mov_pc = 0xE59FF000;
+        m_pThis = (DWORD)pThis;
+        m_pFunc = (DWORD)proc;
+        // write block from data cache and
+        //  flush from instruction cache
+        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+    }
+    void* GetCodeAddress()
+    {
+        return this;
+    }
+};
+#pragma pack(pop)
+#elif defined(_M_ARM64)
+#pragma pack(push, 4)
+struct tagThunk // this should come out to 16 bytes
+{
+    ULONG m_ldr_r16; // ldr  x16, [pc, #24]
+    ULONG m_ldr_r0;  // ldr  x0, [pc, #12]
+    ULONG m_br;      // br   x16
+    ULONG m_pad;
+    ULONG64 m_pThis;
+    ULONG64 m_pFunc;
+    void Init(DWORD_PTR proc, void* pThis)
+    {
+        m_ldr_r16 = 0x580000D0;
+        m_ldr_r0 = 0x58000060;
+        m_br = 0xd61f0200;
+        m_pThis = (ULONG64)pThis;
+        m_pFunc = (ULONG64)proc;
+        // write block from data cache and
+        //  flush from instruction cache
+        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+    }
+    void* GetCodeAddress()
+    {
+        return this;
+    }
+};
+#pragma pack(pop)
+#else
+#error Only AMD64, ARM, ARM64 and X86 supported
+#endif
+
+class SNativeWndHelper{
+public:
+    HANDLE GetHeap()
+    {
+        return m_hHeap;
+    }
+
+    void LockSharePtr(void* p);
+    void UnlockSharePtr();
+    void* GetSharePtr()
+    {
+        return m_sharePtr;
+    }
+
+    HINSTANCE GetAppInstance()
+    {
+        return m_hInst;
+    }
+    ATOM GetSimpleWndAtom()
+    {
+        return m_atom;
+    }
+
+    BOOL Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp);
+
+public:
+    static  SNativeWndHelper* instance() {
+        static SNativeWndHelper _this;
+        return &_this;
+    }
+private:
+    SNativeWndHelper();
+    ~SNativeWndHelper();
+
+    HANDLE m_hHeap;
+    SCriticalSection m_cs;
+    void* m_sharePtr;
+
+    ATOM m_atom;
+    HINSTANCE m_hInst;
+};
+
+SNativeWndHelper::SNativeWndHelper()
+    : m_hInst(0)
+    , m_sharePtr(NULL)
+    , m_atom(0) {
+
+}
+
+BOOL SNativeWndHelper::Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp)
+{
+    SAutoLock lock(m_cs);
+    if (m_hHeap)
+        return FALSE;
+    m_hInst = hInst;
     m_hHeap = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE, 0, 0);
     if (bImeApp)
         m_atom = SNativeWnd::RegisterSimpleWnd2(m_hInst, pszClassName);
     else
         m_atom = SNativeWnd::RegisterSimpleWnd(m_hInst, pszClassName);
+    return TRUE;
 }
 
 SNativeWndHelper::~SNativeWndHelper()
 {
     if (m_hHeap)
         HeapDestroy(m_hHeap);
-    DeleteCriticalSection(&m_cs);
     if (m_atom)
         UnregisterClass((LPCTSTR)m_atom, m_hInst);
 }
 
 void SNativeWndHelper::LockSharePtr(void *p)
 {
-    EnterCriticalSection(&m_cs);
+    m_cs.Enter();
     m_sharePtr = p;
 }
 
 void SNativeWndHelper::UnlockSharePtr()
 {
-    LeaveCriticalSection(&m_cs);
+    m_cs.Leave();
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -80,15 +236,15 @@ ATOM SNativeWnd::RegisterSimpleWnd2(HINSTANCE hInst, LPCTSTR pszSimpleWndName)
 
 HWND SNativeWnd::CreateNative(LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam)
 {
-    SNativeWndHelper::getSingletonPtr()->LockSharePtr(this);
+    SNativeWndHelper::instance()->LockSharePtr(this);
 
-    m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::getSingletonPtr()->GetHeap(), HEAP_ZERO_MEMORY, sizeof(tagThunk));
+    m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::instance()->GetHeap(), HEAP_ZERO_MEMORY, sizeof(tagThunk));
     // 在::CreateWindow返回之前会去调StarWindowProc函数
-    HWND hWnd = ::CreateWindowEx(dwExStyle, (LPCTSTR)SNativeWndHelper::getSingletonPtr()->GetSimpleWndAtom(), lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, (HMENU)(UINT_PTR)nID, SNativeWndHelper::getSingletonPtr()->GetAppInstance(), lpParam);
-    SNativeWndHelper::getSingletonPtr()->UnlockSharePtr();
+    HWND hWnd = ::CreateWindowEx(dwExStyle, (LPCTSTR)SNativeWndHelper::instance()->GetSimpleWndAtom(), lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, (HMENU)(UINT_PTR)nID, SNativeWndHelper::instance()->GetAppInstance(), lpParam);
+    SNativeWndHelper::instance()->UnlockSharePtr();
     if (!hWnd)
     {
-        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(), 0, m_pThunk);
+        HeapFree(SNativeWndHelper::instance()->GetHeap(), 0, m_pThunk);
         m_pThunk = NULL;
     }
     return hWnd;
@@ -103,7 +259,7 @@ void SNativeWnd::OnFinalMessage(HWND hWnd)
 {
     if (m_pThunk)
     {
-        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(), 0, m_pThunk);
+        HeapFree(SNativeWndHelper::instance()->GetHeap(), 0, m_pThunk);
         m_pThunk = NULL;
     }
     m_hWnd = NULL;
@@ -163,7 +319,7 @@ LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
 LRESULT CALLBACK SNativeWnd::StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    SNativeWnd *pThis = (SNativeWnd *)SNativeWndHelper::getSingletonPtr()->GetSharePtr();
+    SNativeWnd *pThis = (SNativeWnd *)SNativeWndHelper::instance()->GetSharePtr();
 
     pThis->m_hWnd = hWnd;
     // 初始化Thunk，做了两件事:1、mov指令替换hWnd为对象指针，2、jump指令跳转到WindowProc
@@ -181,13 +337,13 @@ BOOL SNativeWnd::SubclassWindow(HWND hWnd)
 {
     SASSERT(::IsWindow(hWnd));
     // Allocate the thunk structure here, where we can fail gracefully.
-    m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::getSingletonPtr()->GetHeap(), HEAP_ZERO_MEMORY, sizeof(tagThunk));
+    m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::instance()->GetHeap(), HEAP_ZERO_MEMORY, sizeof(tagThunk));
     m_pThunk->Init((DWORD_PTR)WindowProc, this);
     WNDPROC pProc = (WNDPROC)m_pThunk->GetCodeAddress();
     WNDPROC pfnWndProc = (WNDPROC)::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pProc);
     if (pfnWndProc == NULL)
     {
-        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(), 0, m_pThunk);
+        HeapFree(SNativeWndHelper::instance()->GetHeap(), 0, m_pThunk);
         m_pThunk = NULL;
         return FALSE;
     }

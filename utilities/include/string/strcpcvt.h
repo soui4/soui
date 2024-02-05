@@ -1,7 +1,7 @@
 ﻿#ifndef __STRCPCVT__H__
 #define __STRCPCVT__H__
 
-#include <strfun.h>
+#include <platform.h>
 
 #ifndef CP_ACP
 #define CP_ACP 0

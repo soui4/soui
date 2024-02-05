@@ -67,7 +67,7 @@
 #endif
 #define _SCATCHALL() __pragma(warning(push)) __pragma(warning(disable: 4571)) catch( ... ) __pragma(warning(pop))
 
-#include <ctypes.h>
+//#include <ctypes.h>
 
 #pragma pack(push,_S_PACKING)
 namespace SOUI

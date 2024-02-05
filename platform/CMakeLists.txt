@@ -1,4 +1,5 @@
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
+  add_subdirectory(windows)
 elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
 else()
   add_subdirectory(linux)

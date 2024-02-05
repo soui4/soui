@@ -1,7 +1,6 @@
 #include "string/sstringw.h"
 #include <soui_mem_wrapper.h>
 #include <stdio.h>
-#include <strfun.h>
 
 #define smin_tsr(a,b)            (((a) < (b)) ? (a) : (b))
 

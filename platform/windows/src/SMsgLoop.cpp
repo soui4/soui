@@ -1,5 +1,5 @@
-﻿#include "souistd.h"
-#include "core/SMsgLoop.h"
+﻿#include "platform.h"
+#include "SMsgLoop.h"
 
 #ifndef WM_SYSTIMER
 #define WM_SYSTIMER 0x0118 //(caret blink)
@@ -62,7 +62,6 @@ int SMessageLoop::Run()
             break;
         if (!bGetMsg)
         {
-            SSLOGD() << "WaitMsg returned FALSE (error)";
             continue; // error, don't process
         }
         nRet = HandleMsg();
@@ -162,7 +161,7 @@ BOOL SMessageLoop::PostTask(IRunnable *runable)
     SAutoLock lock(m_cs);
     if (m_tid == 0)
     {
-        SSLOGW() << "msg loop not running now! pending task size:" << m_runnables.GetCount();
+        //SSLOGW() << "msg loop not running now! pending task size:" << m_runnables.GetCount();
     }
     m_runnables.AddTail(runable->clone());
     if (m_runnables.GetCount() > 5)

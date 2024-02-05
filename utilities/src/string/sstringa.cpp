@@ -4,9 +4,8 @@
 #ifndef _MBCS
 #define _MBCS
 #endif
-//#include <mbstring.h>
-#ifndef _WIN32
-#include <strfun.h>
+#ifdef _WIN32
+#include <mbstring.h>
 #endif
 
 #define smin_tsr(a,b)            (((a) < (b)) ? (a) : (b))

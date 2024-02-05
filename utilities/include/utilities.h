@@ -2,7 +2,7 @@
 #define __UTILITIES__H__
 
 #include <utilities-def.h>
-#include <ctypes.h>
+#include <platform.h>
 #include <interface/sstring-i.h>
 #include <interface/sxml-i.h>
 

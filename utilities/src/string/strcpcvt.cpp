@@ -1,5 +1,4 @@
-﻿#include <strfun.h>
-#include "string/strcpcvt.h"
+﻿#include "string/strcpcvt.h"
 
 namespace SOUI
 {

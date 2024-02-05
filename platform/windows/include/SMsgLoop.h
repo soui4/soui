@@ -2,10 +2,13 @@
 #define __SMSGLOOP__H__
 #include <interface/smsgloop-i.h>
 #include <souicoll.h>
+#include <helper/obj-ref-impl.hpp>
+#include <platform_exp.h>
+#include <helper/SCriticalSection.h>
 
 SNSBEGIN
 
-class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
+class PLATFORM_API SMessageLoop : public TObjRefImpl<IMessageLoop> {
   public:
     SMessageLoop(IMessageLoop *pParentLoop);
     virtual ~SMessageLoop();
