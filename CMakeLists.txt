@@ -83,6 +83,7 @@ endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
   include_directories(${PROJECT_SOURCE_DIR}/platform/windows/include)
+  include_directories(${PROJECT_SOURCE_DIR}/third-part/stdint)
 elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
 else()
   include_directories(${PROJECT_SOURCE_DIR}/platform/linux/include)
