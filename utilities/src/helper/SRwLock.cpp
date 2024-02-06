@@ -17,6 +17,15 @@
 
 SNSBEGIN
 
+struct IRwLock {
+    virtual ~IRwLock() {}
+    virtual void LockShared(void) = 0;
+    virtual void UnlockShared(void) = 0;
+    virtual void LockExclusive(void) = 0;
+    virtual void UnlockExclusive(void) = 0;
+};
+#if defined(_WIN32)
+
 static bool native_rw_locks_supported = false;
 static bool module_load_attempted = false;
 static HMODULE library = NULL;
@@ -34,16 +43,6 @@ AcquireSRWLockExclusive acquire_srw_lock_exclusive;
 AcquireSRWLockShared    acquire_srw_lock_shared;
 ReleaseSRWLockShared    release_srw_lock_shared;
 ReleaseSRWLockExclusive release_srw_lock_exclusive;
-
-
-struct IRwLock {
-    virtual ~IRwLock() {}
-    virtual void LockShared(void) = 0;
-    virtual void UnlockShared(void) = 0;
-    virtual void LockExclusive(void) = 0;
-    virtual void UnlockExclusive(void) = 0;
-};
-#if defined(_WIN32)
 
 static bool LoadModule() {
     if (module_load_attempted) {
