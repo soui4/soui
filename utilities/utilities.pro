@@ -42,6 +42,7 @@ HEADERS += resource.h \
            include/helper/SEmptyable.hpp \
            include/helper/SNoCopyable.hpp \
            include/helper/SSemaphore.h \
+           include/helper/SRwLock.h \
            include/helper/SSharedPtr.hpp \
            include/interface/obj-ref-i.h \
            include/interface/sstring-i.h \
@@ -64,6 +65,7 @@ SOURCES += src/gdialpha.cpp \
            src/helper/SAutoBuf.cpp \
            src/helper/SCriticalSection.cpp \
            src/helper/SSemaphore.cpp \
+           src/helper/SRwLock.cpp \
            src/pugixml/pugixml.cpp \
            src/string/sstringa.cpp \
            src/string/sstringdata.cpp \

@@ -413,6 +413,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\src\helper\SRwLock.cpp"
+				>
+			</File>
+			<File
 				RelativePath="src\helper\SSemaphore.cpp"
 				>
 			</File>
@@ -471,6 +475,10 @@
 				>
 			</File>
 			<File
+				RelativePath=".\include\helper\obj-ref-impl.hpp"
+				>
+			</File>
+			<File
 				RelativePath="include\pugixml\pugiconfig.hpp"
 				>
 			</File>
@@ -524,6 +532,10 @@
 			</File>
 			<File
 				RelativePath="include\wtl.mini\souimisc.h"
+				>
+			</File>
+			<File
+				RelativePath=".\include\helper\SRwLock.h"
 				>
 			</File>
 			<File

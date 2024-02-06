@@ -3,8 +3,7 @@
 #include "soui_mem_wrapper.h"
 #include <Windows.h>
 
-namespace SOUI
-{
+SNSBEGIN
     // Globals
 
     // For an empty string, m_pszData will point here
@@ -70,4 +69,5 @@ namespace SOUI
 		SASSERT(nRefs > 0);
 		InterlockedIncrement(&nRefs);
 	}
-}
+
+SNSEND

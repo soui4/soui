@@ -1,7 +1,6 @@
 #pragma once
 #include <utilities-def.h>
-namespace SOUI
-{
+SNSBEGIN
 	/**
 	* Inheriate this class to make your class cannot be copy and assign.
 	*
@@ -16,4 +15,4 @@ namespace SOUI
 		const SNoCopyable &operator=(const SNoCopyable &);
 	};
 
-}
+SNSEND

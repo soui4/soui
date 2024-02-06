@@ -14,10 +14,10 @@
 #ifndef __SCRITICALSECTION__H__
 #define __SCRITICALSECTION__H__
 #include <utilities-def.h>
-#include <Windows.h>
 
-namespace SOUI
-{
+SNSBEGIN
+
+    class SCriticalSectionImpl;
     class UTILITIES_API SCriticalSection
     {
     public:
@@ -27,7 +27,8 @@ namespace SOUI
 		void Enter();
 		void Leave();
     protected:
-        CRITICAL_SECTION    m_cs;
+
+        SCriticalSectionImpl*    m_cs;
     };
 
     class UTILITIES_API SAutoLock
@@ -45,6 +46,6 @@ namespace SOUI
     protected:
         SCriticalSection & m_cs;
     };
-}
+SNSEND
 
 #endif // __SCRITICALSECTION__H__

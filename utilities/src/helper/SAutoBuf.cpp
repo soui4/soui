@@ -2,9 +2,7 @@
 #include <soui_mem_wrapper.h>
 #include <helper/SAutoBuf.h>
 
-namespace SOUI{
-
-
+SNSBEGIN
 	SAutoBuf::SAutoBuf(size_t nElements) : m_pBuf(0)
 	{
 		Allocate(nElements);
@@ -85,4 +83,4 @@ namespace SOUI{
 		return m_pBuf;
 	}
 
-}
+SNSEND

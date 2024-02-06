@@ -1,7 +1,6 @@
 ﻿#include "string/strcpcvt.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SStringW SStrCpCvt::CvtW2W( const SStringW &str,unsigned int)
 {
@@ -61,4 +60,4 @@ SStringA SStrCpCvt::CvtW2A( const SStringW & str,unsigned int cp/*=CP_ACP*/ )
 }
 
 
-}
+SNSEND

@@ -3,8 +3,8 @@
 #include <utilities-def.h>
 #include <helper/SNoCopyable.hpp>
 
-namespace SOUI
-{
+SNSBEGIN
+
 	enum
 	{
 		RETURN_OK = 0,
@@ -53,6 +53,6 @@ private:
     SemaphorePrivate &_private;
 };
 
-}
+SNSEND
 
 #endif // __SSEMAPHORE__H__

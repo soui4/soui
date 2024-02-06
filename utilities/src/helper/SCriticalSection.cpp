@@ -1,23 +1,27 @@
-#include <helper\SCriticalSection.h>
+#include <helper/SCriticalSection.h>
+#include <mutex>
+SNSBEGIN
 
-namespace SOUI
-{
+	class SCriticalSectionImpl: public std::mutex{
+	};
+
 	SCriticalSection::SCriticalSection()
 	{
-		InitializeCriticalSection(&m_cs);
+		m_cs = new SCriticalSectionImpl;
 	}
 	SCriticalSection::~SCriticalSection()
 	{
-		DeleteCriticalSection(&m_cs);
+		delete m_cs;
 	}
 
 	void SCriticalSection::Enter()
 	{
-		EnterCriticalSection(&m_cs);
+		m_cs->lock();
 	}
 
 	void SCriticalSection::Leave()
 	{
-		LeaveCriticalSection(&m_cs);
+		m_cs->unlock();
 	}
-}
+
+SNSEND

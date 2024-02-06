@@ -1,10 +1,11 @@
-#include <Windows.h>
 #include <helper/SSemaphore.h>
 #include <cerrno>
 
+#ifdef _WIN32
 
-namespace SOUI
-{
+#include <Windows.h>
+
+SNSBEGIN
 	class SemaphorePrivate
 	{
 	public:
@@ -60,4 +61,6 @@ void SSemaphore::notify()
     BOOL ret = ::ReleaseSemaphore(_private._hsem, 1, &previous_count);
 }
 
-}
+SNSEND
+
+#endif//_WIN32
