@@ -138,26 +138,26 @@ private:
 };
 
 class SRwLockWin7 : public IRwLock {
-    SRWLOCK lock_;
+    SRWLOCK m_rwlock;
 public:
     SRwLockWin7() {
-        initialize_srw_lock(&lock_);
+        initialize_srw_lock(&m_rwlock);
     }
 
     void LockExclusive() override{
-        acquire_srw_lock_exclusive(&lock_);
+        acquire_srw_lock_exclusive(&m_rwlock);
     }
 
     void UnlockExclusive() override {
-        release_srw_lock_exclusive(&lock_);
+        release_srw_lock_exclusive(&m_rwlock);
     }
 
     void LockShared() override {
-        acquire_srw_lock_shared(&lock_);
+        acquire_srw_lock_shared(&m_rwlock);
     }
 
     void UnlockShared() override {
-        release_srw_lock_shared(&lock_);
+        release_srw_lock_shared(&m_rwlock);
     }
 };
 #else
