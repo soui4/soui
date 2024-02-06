@@ -1,7 +1,7 @@
 #include <helper/SCriticalSection.h>
 #include <mutex>
-namespace SOUI
-{
+SNSBEGIN
+
 	class SCriticalSectionImpl: public std::mutex{
 	};
 
@@ -23,4 +23,5 @@ namespace SOUI
 	{
 		m_cs->unlock();
 	}
-}
+
+SNSEND

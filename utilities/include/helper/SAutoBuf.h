@@ -1,7 +1,9 @@
 ﻿#ifndef __SAUTOBUF__H__
 #define __SAUTOBUF__H__
 
-namespace SOUI{
+#include <utilities-def.h>
+
+SNSBEGIN
 
 	class UTILITIES_API SAutoBuf
 	{
@@ -36,6 +38,6 @@ namespace SOUI{
 		bool   m_bExternalBuf;
 	};
 
-}
+SNSEND
 
 #endif // __SAUTOBUF__H__

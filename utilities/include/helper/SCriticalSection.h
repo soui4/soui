@@ -15,8 +15,8 @@
 #define __SCRITICALSECTION__H__
 #include <utilities-def.h>
 
-namespace SOUI
-{
+SNSBEGIN
+
     class SCriticalSectionImpl;
     class UTILITIES_API SCriticalSection
     {
@@ -46,6 +46,6 @@ namespace SOUI
     protected:
         SCriticalSection & m_cs;
     };
-}
+SNSEND
 
 #endif // __SCRITICALSECTION__H__
