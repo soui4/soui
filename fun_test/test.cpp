@@ -7,11 +7,8 @@
 #include <helper/SRwLock.h>
 
 using namespace SOUI;
-TEST(MathTest, Addition) {
-  EXPECT_EQ(2 + 2, 4);
-}
 
-TEST(XmlTest,Load){
+TEST(Util,Xml_Load){
     SXmlDoc xml;
     EXPECT_EQ(xml.load_file("/home/flyhigh/work/soui4/demo2/uires/xml/dlg_main.xml"),true);
     SXmlNode node=xml.root().first_child();
@@ -22,7 +19,7 @@ TEST(XmlTest,Load){
     }
 }
 
-TEST(Charset,Cvt){
+TEST(Util,Str_Cvt){
     setlocale(LC_ALL, "");
     SStringA src = "再跌几个月得6.0了";
     SStringW wstr = S_CA2W(src,CP_UTF8);
