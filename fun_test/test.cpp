@@ -1,9 +1,10 @@
-#include <stdio.h>
+﻿#include <stdio.h>
 #include <gtest/gtest.h>
 #include <xml/SXml.h>
 #include <string/sstringa.h>
 #include <string/sstringw.h>
 #include <string/strcpcvt.h>
+#include <helper/SRwLock.h>
 
 using namespace SOUI;
 TEST(MathTest, Addition) {
@@ -30,4 +31,19 @@ TEST(Charset,Cvt){
     bool beq = src == src2;
     
     EXPECT_EQ(beq,true);
+}
+
+TEST(Util, RwLock) {
+    SRwLock lock;
+    lock.LockShared();
+    lock.UnlockShared();
+
+    lock.LockExclusive();
+    lock.UnlockExclusive();
+
+    lock.LockShared();
+    lock.LockExclusive();
+    lock.UnlockExclusive();
+    lock.UnlockShared();
+    EXPECT_EQ(1, 1);
 }

@@ -26,8 +26,10 @@ endif()
 add_executable(fun_test ${CURRENT_HEADERS} ${CURRENT_SRCS})
 
 add_dependencies(fun_test utilities4 gtest platform)
-target_link_libraries(fun_test utilities4 gtest platform pthread)
-
+target_link_libraries(fun_test utilities4 gtest platform)
+if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+target_link_libraries(fun_test pthread)
+endif()
 
 set_target_properties (fun_test PROPERTIES
     FOLDER demos
