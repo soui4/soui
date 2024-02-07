@@ -3,7 +3,7 @@
 #
 
 file(GLOB_RECURSE CURRENT_HEADERS include/*.h include/*.hpp ../interface/*.h)
-file(GLOB_RECURSE CURRENT_SRCS  src/*.cpp)
+file(GLOB_RECURSE CURRENT_SRCS  src/*.cpp src/*.h)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})

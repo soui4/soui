@@ -17,7 +17,7 @@
 SNSBEGIN
 
 struct IRwLock;
-class SRwLock : public SNoCopyable {
+class UTILITIES_API SRwLock : public SNoCopyable {
  public:
 	SRwLock();
 	~SRwLock();
@@ -30,6 +30,31 @@ class SRwLock : public SNoCopyable {
 
  private:
 	 IRwLock* impl;
+};
+
+class UTILITIES_API SAutoReadLock : public SNoCopyable{
+  public:
+  SAutoReadLock(SRwLock *plock):m_pLock(plock){
+    m_pLock->LockShared();
+  }
+  ~SAutoReadLock(){
+    m_pLock->UnlockShared();
+  }
+  private:
+  SRwLock * m_pLock;
+};
+
+
+class UTILITIES_API SAutoWriteLock : public SNoCopyable{
+  public:
+  SAutoWriteLock(SRwLock *plock):m_pLock(plock){
+    m_pLock->LockExclusive();
+  }
+  ~SAutoWriteLock(){
+    m_pLock->UnlockExclusive();
+  }
+  private:
+  SRwLock * m_pLock;
 };
 
 SNSEND

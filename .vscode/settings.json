@@ -8,6 +8,7 @@
         "limits": "cpp",
         "algorithm": "cpp",
         "mutex": "cpp",
-        "shared_mutex": "cpp"
+        "shared_mutex": "cpp",
+        "regex": "cpp"
     }
 }
