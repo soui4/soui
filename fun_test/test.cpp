@@ -42,8 +42,8 @@ TEST(Util, RwLock) {
     lock.UnlockExclusive();
 
     lock.LockShared();
-    lock.LockExclusive();
-    lock.UnlockExclusive();
+    lock.LockShared();
+    lock.UnlockShared();
     lock.UnlockShared();
     EXPECT_EQ(1, 1);
 }
