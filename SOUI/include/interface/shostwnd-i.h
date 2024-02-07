@@ -2,7 +2,7 @@
 #define __SHOSTWND_I__H__
 #include <interface/SNativeWnd-i.h>
 #include <interface/SNcPainter-i.h>
-#include <interface/smsgloop-i.h>
+#include <interface/SMsgLoop-i.h>
 
 SNSBEGIN
 

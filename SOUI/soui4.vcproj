@@ -1235,7 +1235,7 @@
 				>
 			</File>
 			<File
-				RelativePath="include\interface\smsgloop-i.h"
+				RelativePath="include\interface\SMsgLoop-i.h"
 				>
 			</File>
 			<File

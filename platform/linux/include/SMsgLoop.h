@@ -1,6 +1,6 @@
 ﻿#ifndef __SMSGLOOP__H__
 #define __SMSGLOOP__H__
-#include <interface/smsgloop-i.h>
+#include <interface/SMsgLoop-i.h>
 #include <souicoll.h>
 #include <helper/obj-ref-impl.hpp>
 #include <helper/SCriticalSection.h>

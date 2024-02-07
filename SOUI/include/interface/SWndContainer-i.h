@@ -16,7 +16,7 @@
 
 #include <core/SDefine.h>
 #include <interface/SEvtArgs-i.h>
-#include <interface/smsgloop-i.h>
+#include <interface/SMsgLoop-i.h>
 #include <interface/SScriptModule-i.h>
 #include <interface/scaret-i.h>
 #include <interface/STimelineHandler-i.h>

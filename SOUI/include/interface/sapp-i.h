@@ -6,7 +6,7 @@
 #include <interface/stooltip-i.h>
 #include <interface/slog-i.h>
 #include <interface/SAttrStorage-i.h>
-#include <interface/smsgloop-i.h>
+#include <interface/SMsgLoop-i.h>
 #include <interface/shostwnd-i.h>
 #include <interface/SResProviderMgr-i.h>
 #include <interface/SRealWndHandler-i.h>

@@ -74,7 +74,7 @@ HEADERS += include/SApp.h \
            include/interface/SEvtArgs-i.h \
            include/interface/shostwnd-i.h \
            include/interface/sapp-i.h \
-           include/interface/smsgloop-i.h \
+           include/interface/SMsgLoop-i.h \
            include/interface/SResProviderMgr-i.h \
            include/interface/SWindow-i.h \
            include/interface/SWndContainer-i.h \
