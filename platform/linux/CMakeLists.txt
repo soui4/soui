@@ -2,9 +2,6 @@
 # SOUI cmake配置文件
 #
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
-
 file(GLOB_RECURSE CURRENT_HEADERS include/*.h include/*.hpp ../interface/*.h)
 file(GLOB_RECURSE CURRENT_SRCS  src/*.cpp)
 
@@ -16,6 +13,12 @@ if (NOT ENABLE_SOUI_CORE_LIB)
 else()
     add_library(platform STATIC ${CURRENT_SRCS} ${CURRENT_HEADERS})
 endif()
+
+target_include_directories(platform
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..
+  	PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
+)
 
 set(CORE_LIBS ${CORE_LIBS} platform)
 set(CORE_LIBS ${CORE_LIBS} platform CACHE INTERNAL "core_lib")
