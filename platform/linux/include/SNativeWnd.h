@@ -4,9 +4,7 @@
 #include <interface/SNativeWnd-i.h>
 #include <helper/SCriticalSection.h>
 #include <helper/obj-ref-impl.hpp>
-//////////////////////////////////////////////////////////////////////////
-// thunk 技术实现参考http://www.cppblog.com/proguru/archive/2008/08/24/59831.html
-//////////////////////////////////////////////////////////////////////////
+
 SNSBEGIN
 
 class SNativeWnd : public TObjRefImpl<INativeWnd> {
