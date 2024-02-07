@@ -1,4 +1,4 @@
-#ifndef __SRUNNABLE_I__H__
+﻿#ifndef __SRUNNABLE_I__H__
 #define __SRUNNABLE_I__H__
 #include <interface/obj-ref-i.h>
 
