@@ -5,7 +5,7 @@
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-file(GLOB_RECURSE CURRENT_HEADERS include/*.h include/*.hpp)
+file(GLOB_RECURSE CURRENT_HEADERS include/*.h include/*.hpp ../interface/*.h)
 file(GLOB_RECURSE CURRENT_SRCS  src/*.cpp)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})

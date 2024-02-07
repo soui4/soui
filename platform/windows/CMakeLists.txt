@@ -3,7 +3,7 @@
 #
 add_definitions(-DPLATFORM_EXPORTS)
 
-file(GLOB_RECURSE CURRENT_HEADERS include/*.h include/*.hpp)
+file(GLOB_RECURSE CURRENT_HEADERS include/*.h include/*.hpp ../interface/*.h)
 file(GLOB_RECURSE CURRENT_SRCS  src/*.cpp)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
