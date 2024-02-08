@@ -5,6 +5,7 @@
 #include <helper/SCriticalSection.h>
 #include <helper/obj-ref-impl.hpp>
 #include <xcb/xcb.h>
+#include <string/tstring.h>
 
 SNSBEGIN
 
@@ -171,7 +172,7 @@ class SNativeWnd : public TObjRefImpl<INativeWnd> {
     xcb_connection_t * mConnection;
     xcb_screen_t *mScreen;
     uint32_t m_gc;
-
+    SStringT m_strTitle;
   public:
     static LRESULT CALLBACK WindowProc(SNativeWnd * pWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };

@@ -95,6 +95,21 @@ SThreadUiState *SUiState::getThreadUiState()
 }
 
 //---------------------------------------------------------------------
+xcb_atom_t SThreadUiState::internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName)
+{
+    xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, onlyIfExist, strlen(atomName), atomName);
+    xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(connection, cookie, NULL);
+    xcb_atom_t atom = XCB_ATOM_NONE;
+
+    if (reply)
+    {
+        atom = reply->atom;
+        free(reply);
+    }
+
+    return atom;
+}
+
 SThreadUiState::SThreadUiState(int screenNum)
 {
     connection = xcb_connect(nullptr, &screenNum);
@@ -121,14 +136,9 @@ SThreadUiState::SThreadUiState(int screenNum)
     }
     screen = iter.data;
 
-    xcb_intern_atom_cookie_t wm_protocols_cookie = xcb_intern_atom(connection, 1, 12, "WM_PROTOCOLS");
-    xcb_intern_atom_cookie_t wm_delete_window_cookie = xcb_intern_atom(connection, 0, 16, "WM_DELETE_WINDOW");
-    xcb_intern_atom_reply_t *wm_protocols_reply = xcb_intern_atom_reply(connection, wm_protocols_cookie, NULL);
-    xcb_intern_atom_reply_t *wm_delete_window_reply = xcb_intern_atom_reply(connection, wm_delete_window_cookie, NULL);
-    wm_protocols_atom = wm_protocols_reply->atom;
-    wm_delete_window_atom = wm_delete_window_reply->atom;
-    free(wm_protocols_reply);
-    free(wm_delete_window_reply);
+    wm_protocols_atom = internAtom(connection, 1, "WM_PROTOCOLS");
+    wm_delete_window_atom = internAtom(connection, 0, "WM_DELETE_WINDOW");
+    wm_stat_atom = internAtom(connection, 0, "_NET_WM_STATE");
 }
 
 SThreadUiState::~SThreadUiState()

@@ -13,17 +13,20 @@ SNSBEGIN
 class SNativeWnd;
 class SThreadUiState : SNoCopyable{
 public:
-    SThreadUiState(int screenNum);
-    ~SThreadUiState();
+  SThreadUiState(int screenNum);
+  ~SThreadUiState();
 public:
     xcb_connection_t* connection;
     xcb_screen_t* screen;
     xcb_atom_t wm_delete_window_atom;
     xcb_atom_t wm_protocols_atom;
+    xcb_atom_t wm_stat_atom;
 public:
     void onWndCreate(HWND hwnd, SNativeWnd* pWnd);
     void onWndDestroy(HWND hwnd);
     SNativeWnd * GetNativeWndFromHwnd(HWND hwnd);
+
+    static xcb_atom_t internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName);
 private:
     SMap<HWND,SNativeWnd*> m_mapWnd;
 };

@@ -45,12 +45,14 @@ HWND  SNativeWnd::CreateNative
 
     xcb_create_gc(mConnection, m_gc, m_hWnd, value_mask, value_list);
 
+    m_strTitle = lpWindowName;
     xcb_change_property(mConnection, XCB_PROP_MODE_REPLACE, m_hWnd,
-        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, strlen(lpWindowName), lpWindowName);
+        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, m_strTitle.GetLength(), m_strTitle.c_str());
 
     xcb_change_property(mConnection, XCB_PROP_MODE_REPLACE, m_hWnd, state->wm_protocols_atom, XCB_ATOM_ATOM, 32, 1, &state->wm_delete_window_atom);
 
-    xcb_map_window(mConnection, m_hWnd);
+    if(dwStyle & WS_VISIBLE)
+        xcb_map_window(mConnection, m_hWnd);
 
     const unsigned coords[] = {static_cast<unsigned>(x),
                                static_cast<unsigned>(y)};
@@ -237,7 +239,11 @@ int SNativeWnd::SetWindowRgn(HRGN hRgn, BOOL bRedraw /*=TRUE*/)
 BOOL SNativeWnd::ShowWindow(int nCmdShow)
 {
     SASSERT(m_hWnd!=0);
-    return ::ShowWindow(m_hWnd, nCmdShow);
+    if(nCmdShow & SW_SHOW)
+        xcb_map_window(mConnection, m_hWnd);
+    else
+        xcb_unmap_window(mConnection, m_hWnd);
+    xcb_flush(mConnection);
 }
 
 BOOL SNativeWnd::MoveWindow2(LPCRECT lpRect, BOOL bRepaint /*= TRUE*/)
@@ -248,37 +254,82 @@ BOOL SNativeWnd::MoveWindow2(LPCRECT lpRect, BOOL bRepaint /*= TRUE*/)
 BOOL SNativeWnd::MoveWindow(int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/)
 {
     SASSERT(m_hWnd!=0);
-    return ::MoveWindow(m_hWnd, x, y, nWidth, nHeight, bRepaint);
+    {
+            const unsigned coords[] = {static_cast<unsigned>(x),
+                               static_cast<unsigned>(y)};
+    xcb_configure_window(mConnection, m_hWnd,
+                         XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
+
+    }
+    {
+    const uint32_t vals[2] = {nWidth, nHeight};
+    xcb_configure_window(mConnection, m_hWnd,
+                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
+                         vals);
+    }
+    return TRUE;
 }
 
 BOOL SNativeWnd::IsWindowVisible() const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::IsWindowVisible(m_hWnd);
+    SASSERT(IsWindow());
+    xcb_get_window_attributes_cookie_t cookie = xcb_get_window_attributes(mConnection, m_hWnd);
+    xcb_get_window_attributes_reply_t *reply = xcb_get_window_attributes_reply(mConnection, cookie, NULL);
+    if (!reply)
+        return FALSE;
+    uint8_t mapState = reply->map_state;
+    free(reply);
+    return mapState == XCB_MAP_STATE_VIEWABLE;
 }
 
 BOOL SNativeWnd::IsZoomed() const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::IsZoomed(m_hWnd);
+    SASSERT(IsWindow());
+    SThreadUiState *state = SUiState::instance()->getThreadUiState();
+    xcb_get_property_cookie_t cookie = xcb_get_property(mConnection, 0, m_hWnd, XCB_ATOM_ATOM, state->wm_stat_atom, 0, 1024);
+    xcb_get_property_reply_t *reply = xcb_get_property_reply(mConnection, cookie, NULL);
+    if (!reply) return FALSE;
+    xcb_atom_t *atoms = (xcb_atom_t*)xcb_get_property_value(reply);
+    int num_atoms = xcb_get_property_value_length(reply) / sizeof(xcb_atom_t);
+
+    //todo: 遍历窗口类型属性，查找最大化和最小化状态
+free(reply);
+    return FALSE;
 }
 
 BOOL SNativeWnd::IsIconic() const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::IsIconic(m_hWnd);
+    SASSERT(IsWindow());
+    SThreadUiState *state = SUiState::instance()->getThreadUiState();
+    xcb_get_property_cookie_t cookie = xcb_get_property(mConnection, 0, m_hWnd, XCB_ATOM_ATOM, state->wm_stat_atom, 0, 1024);
+    xcb_get_property_reply_t *reply = xcb_get_property_reply(mConnection, cookie, NULL);
+    if (!reply) return FALSE;
+    xcb_atom_t *atoms = (xcb_atom_t*)xcb_get_property_value(reply);
+    int num_atoms = xcb_get_property_value_length(reply) / sizeof(xcb_atom_t);
+    free(reply);
+    return FALSE;
 }
 
 int SNativeWnd::GetWindowText(LPTSTR lpszStringBuf, int nMaxCount) const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::GetWindowText(m_hWnd, lpszStringBuf, nMaxCount);
+    SASSERT(IsWindow());
+    if(nMaxCount < m_strTitle.GetLength())
+    {
+        strncpy(lpszStringBuf,m_strTitle.c_str(),nMaxCount);
+        return nMaxCount;
+    }else{
+        strcpy(lpszStringBuf, m_strTitle.c_str());
+        return m_strTitle.GetLength();
+    }
 }
 
 BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::SetWindowText(m_hWnd, lpszString);
+    SASSERT(IsWindow());
+    m_strTitle = lpszString;
+    xcb_change_property(mConnection, XCB_PROP_MODE_REPLACE, m_hWnd, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, m_strTitle.GetLength(), m_strTitle.c_str());
+
+    return TRUE;
 }
 
 BOOL SNativeWnd::SendNotifyMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
@@ -298,136 +349,158 @@ LRESULT SNativeWnd::SendMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lPar
 
 HWND SNativeWnd::SetFocus()
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::SetFocus(m_hWnd);
+    SASSERT(IsWindow());
+    //return ::SetFocus(m_hWnd);
+    return 0;
 }
 
 HWND SNativeWnd::SetCapture()
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::SetCapture(m_hWnd);
+    SASSERT(IsWindow());
+    //return ::SetCapture(m_hWnd);
+    return 0;
 }
 
 HWND SNativeWnd::GetCapture()
 {
-    return ::GetCapture();
+    //return ::GetCapture();
+    return 0;
 }
 
 BOOL SNativeWnd::ReleaseCapture()
 {
-    return ::ReleaseCapture();
+    //return ::ReleaseCapture();
+    return 0;
 }
 
 BOOL SNativeWnd::ShowCaret()
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::ShowCaret(m_hWnd);
+    SASSERT(IsWindow());
+    //return ::ShowCaret(m_hWnd);
+    return 0;
 }
 
 BOOL SNativeWnd::HideCaret()
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::HideCaret(m_hWnd);
+    SASSERT(IsWindow());
+    //return ::HideCaret(m_hWnd);
+    return 0;
 }
 
 BOOL SNativeWnd::CreateCaret(HBITMAP hBitmap)
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::CreateCaret(m_hWnd, hBitmap, 0, 0);
+    SASSERT(IsWindow());
+    //return ::CreateCaret(m_hWnd, hBitmap, 0, 0);
+    return 0;
 }
 
 int SNativeWnd::ReleaseDC(HDC hDC)
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::ReleaseDC(m_hWnd, hDC);
+    SASSERT(IsWindow());
+    //return ::ReleaseDC(m_hWnd, hDC);
+    return 0;
 }
 
 HDC SNativeWnd::GetWindowDC()
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::GetWindowDC(m_hWnd);
+    SASSERT(IsWindow());
+    //return ::GetWindowDC(m_hWnd);
+    return 0;
 }
 
 HDC SNativeWnd::GetDC()
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::GetDC(m_hWnd);
+    SASSERT(IsWindow());
+    //return ::GetDC(m_hWnd);
+    return 0;
 }
 
 BOOL SNativeWnd::KillTimer(UINT_PTR nIDEvent)
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::KillTimer(m_hWnd, nIDEvent);
+    SASSERT(IsWindow());
+    //return ::KillTimer(m_hWnd, nIDEvent);
+    return 0;
 }
 
 UINT_PTR SNativeWnd::SetTimer(UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::SetTimer(m_hWnd, nIDEvent, nElapse, (TIMERPROC)lpfnTimer);
+    SASSERT(IsWindow());
+    //return ::SetTimer(m_hWnd, nIDEvent, nElapse, (TIMERPROC)lpfnTimer);
+    return 0;
 }
 
 int SNativeWnd::MapWindowRect(HWND hWndTo, LPRECT lpRect) const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::MapWindowPoints(m_hWnd, hWndTo, (LPPOINT)lpRect, 2);
+    SASSERT(IsWindow());
+    //return ::MapWindowPoints(m_hWnd, hWndTo, (LPPOINT)lpRect, 2);
+    return 0;
 }
 
 int SNativeWnd::MapWindowPoints(HWND hWndTo, LPPOINT lpPoint, UINT nCount) const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::MapWindowPoints(m_hWnd, hWndTo, lpPoint, nCount);
+    SASSERT(IsWindow());
+    //return ::MapWindowPoints(m_hWnd, hWndTo, lpPoint, nCount);
+    return 0;
 }
 
 BOOL SNativeWnd::ScreenToClient2(LPRECT lpRect) const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    if (!::ScreenToClient(m_hWnd, (LPPOINT)lpRect))
-        return FALSE;
-    return ::ScreenToClient(m_hWnd, ((LPPOINT)lpRect) + 1);
+    SASSERT(IsWindow());
+    // if (!::ScreenToClient(m_hWnd, (LPPOINT)lpRect))
+    //     return FALSE;
+    // return ::ScreenToClient(m_hWnd, ((LPPOINT)lpRect) + 1);
+    return 0;
 }
 
 BOOL SNativeWnd::ScreenToClient(LPPOINT lpPoint) const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::ScreenToClient(m_hWnd, lpPoint);
+    SASSERT(IsWindow());
+    //return ::ScreenToClient(m_hWnd, lpPoint);
+    return 0;
 }
 
 BOOL SNativeWnd::ClientToScreen2(LPRECT lpRect) const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    if (!::ClientToScreen(m_hWnd, (LPPOINT)lpRect))
-        return FALSE;
-    return ::ClientToScreen(m_hWnd, ((LPPOINT)lpRect) + 1);
+    SASSERT(IsWindow());
+    // if (!::ClientToScreen(m_hWnd, (LPPOINT)lpRect))
+    //     return FALSE;
+    // return ::ClientToScreen(m_hWnd, ((LPPOINT)lpRect) + 1);
+    return 0;
 }
 
 BOOL SNativeWnd::ClientToScreen(LPPOINT lpPoint) const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::ClientToScreen(m_hWnd, lpPoint);
+    SASSERT(IsWindow());
+ //   return ::ClientToScreen(m_hWnd, lpPoint);
+ return 0;
 }
 
 BOOL SNativeWnd::GetClientRect(LPRECT lpRect) const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::GetClientRect(m_hWnd, lpRect);
+    SASSERT(IsWindow());
+ //   return ::GetClientRect(m_hWnd, lpRect);
+ return 0;
 }
 
 BOOL SNativeWnd::GetWindowRect(LPRECT lpRect) const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::GetWindowRect(m_hWnd, lpRect);
+    SASSERT(IsWindow());
+ //   return ::GetWindowRect(m_hWnd, lpRect);
+ return 0;
 }
 
 BOOL SNativeWnd::InvalidateRect(LPCRECT lpRect, BOOL bErase /*= TRUE*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::InvalidateRect(m_hWnd, lpRect, bErase);
+    SASSERT(IsWindow());
+//    return ::InvalidateRect(m_hWnd, lpRect, bErase);
+return 0;
 }
 
 BOOL SNativeWnd::Invalidate(BOOL bErase /*= TRUE*/)
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::InvalidateRect(m_hWnd, NULL, bErase);
+    SASSERT(IsWindow());
+ //   return ::InvalidateRect(m_hWnd, NULL, bErase);
+ return 0;
 }
 
 BOOL SNativeWnd::IsWindow() SCONST
@@ -437,50 +510,58 @@ BOOL SNativeWnd::IsWindow() SCONST
 
 BOOL SNativeWnd::SetWindowPos(HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags)
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::SetWindowPos(m_hWnd, hWndInsertAfter, x, y, cx, cy, nFlags);
+    SASSERT(IsWindow());
+  //  return ::SetWindowPos(m_hWnd, hWndInsertAfter, x, y, cx, cy, nFlags);
+  return 0;
 }
 
 BOOL SNativeWnd::IsWindowEnabled() const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::IsWindowEnabled(m_hWnd);
+    SASSERT(IsWindow());
+ //   return ::IsWindowEnabled(m_hWnd);
+ return 0;
 }
 
 HWND SNativeWnd::SetParent(HWND hWndNewParent)
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::SetParent(m_hWnd, hWndNewParent);
+    SASSERT(IsWindow());
+ //   return ::SetParent(m_hWnd, hWndNewParent);
+ return 0;
 }
 
 HWND SNativeWnd::GetParent()
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::GetParent(m_hWnd);
+    SASSERT(IsWindow());
+ //   return ::GetParent(m_hWnd);
+ return 0;
 }
 
 LONG_PTR SNativeWnd::SetWindowLongPtr(int nIndex, LONG_PTR dwNewLong)
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::SetWindowLongPtr(m_hWnd, nIndex, dwNewLong);
+    SASSERT(IsWindow());
+    //return ::SetWindowLongPtr(m_hWnd, nIndex, dwNewLong);
+    return 0;
 }
 
 LONG_PTR SNativeWnd::GetWindowLongPtr(int nIndex) const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return ::GetWindowLongPtr(m_hWnd, nIndex);
+    SASSERT(IsWindow());
+    //return ::GetWindowLongPtr(m_hWnd, nIndex);
+    return 0;
 }
 
 DWORD SNativeWnd::GetExStyle() const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+    SASSERT(IsWindow());
+    //return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
+    return 0;
 }
 
 DWORD SNativeWnd::GetStyle() const
 {
-    SASSERT(::IsWindow(m_hWnd));
-    return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+    SASSERT(IsWindow());
+    //return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
+    return 0;
 }
 
 int SNativeWnd::GetDlgCtrlID() const
