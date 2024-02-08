@@ -225,14 +225,6 @@ typedef struct tagPOINTS
 #define SUCCEEDED(x) ((x)>0)
 #define INFINITE     (UINT)-1
 
-#ifndef max
-#define max(a,b) ((a)>(b)?(a):(b))
-#endif
-#ifndef min
-#define min(a,b) ((a)<(b)?(a):(b))
-#endif
-
-
 #define SRCCOPY             (DWORD)0x00CC0020 /* dest = source                   */
 #define SRCPAINT            (DWORD)0x00EE0086 /* dest = source OR dest           */
 #define SRCAND              (DWORD)0x008800C6 /* dest = source AND dest          */

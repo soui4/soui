@@ -18,5 +18,11 @@
 #define CTHIS const THIS
 #endif
 
+#ifndef smax
+#define smax(a,b) ((a)>(b)?(a):(b))
+#endif
+#ifndef smin
+#define smin(a,b) ((a)<(b)?(a):(b))
+#endif
 
 #endif // __SDEF__H__

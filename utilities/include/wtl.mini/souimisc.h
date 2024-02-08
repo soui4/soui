@@ -525,10 +525,10 @@ public:
             SetRectEmpty();
             return FALSE;
         }
-        left   = max( src1->left, src2->left );
-        right  = min( src1->right, src2->right );
-        top    = max( src1->top, src2->top );
-        bottom = min( src1->bottom, src2->bottom );
+        left   = smax( src1->left, src2->left );
+        right  = smin( src1->right, src2->right );
+        top    = smax( src1->top, src2->top );
+        bottom = smin( src1->bottom, src2->bottom );
         return TRUE;
     }
 
@@ -549,10 +549,10 @@ public:
             if (src2.IsRectEmpty()) *this = src1;
             else
             {
-                left   = min( src1.left, src2.left );
-                right  = max( src1.right, src2.right );
-                top    = min( src1.top, src2.top );
-                bottom = max( src1.bottom, src2.bottom );
+                left   = smin( src1.left, src2.left );
+                right  = smax( src1.right, src2.right );
+                top    = smin( src1.top, src2.top );
+                bottom = smax( src1.bottom, src2.bottom );
             }
         }
         return TRUE;
