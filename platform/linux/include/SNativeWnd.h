@@ -4,6 +4,7 @@
 #include <interface/SNativeWnd-i.h>
 #include <helper/SCriticalSection.h>
 #include <helper/obj-ref-impl.hpp>
+#include <xcb/xcb.h>
 
 SNSBEGIN
 
@@ -57,7 +58,7 @@ class SNativeWnd : public TObjRefImpl<INativeWnd> {
     STDMETHOD_(BOOL, SetWindowPos)
     (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) OVERRIDE;
 
-    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter DEF_VAL(NULL)) OVERRIDE;
+    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, DestroyWindow)(THIS) OVERRIDE;
 
@@ -167,11 +168,9 @@ class SNativeWnd : public TObjRefImpl<INativeWnd> {
   public:
     HWND m_hWnd;
     int  m_id;
-  protected:
-    static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
-    // 只执行一次
-    static LRESULT CALLBACK StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    xcb_connection_t * mConnection;
+    xcb_screen_t *mScreen;
+    uint32_t m_gc;
 };
 
 SNSEND

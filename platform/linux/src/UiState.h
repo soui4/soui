@@ -10,6 +10,7 @@ using namespace std;
 
 SNSBEGIN
 
+class SNativeWnd;
 class SThreadUiState : SNoCopyable{
 public:
     SThreadUiState(int screenNum);
@@ -19,11 +20,17 @@ public:
     xcb_screen_t* screen;
     xcb_atom_t wm_delete_window_atom;
     xcb_atom_t wm_protocols_atom;
+public:
+    void onWndCreate(HWND hwnd, SNativeWnd* pWnd);
+    void onWndDestroy(HWND hwnd);
+    SNativeWnd * GetNativeWndFromHwnd(HWND hwnd);
+private:
+    SMap<HWND,SNativeWnd*> m_mapWnd;
 };
 
 class SUiState : SNoCopyable{
     SRwLock m_rwLock;
-    SMap<pthread_t,SThreadUiState*> m_thdStates;
+    SMap<pthread_t,SThreadUiState*> m_trdStates;
 public:
     static SUiState * instance();
     static void free();

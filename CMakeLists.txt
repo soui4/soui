@@ -44,8 +44,11 @@ ELSE (CMAKE_CL_64)
 ENDIF (CMAKE_CL_64)
 endif()
 
-
-option(USE_UNICODE "Use Unicode" ON)
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+  option(USE_UNICODE "Use Unicode" ON)
+else()
+  set(USE_UNICODE OFF)
+endif()
 
 # When other libraries are using a shared version of runtime libraries,
 # Google Test also has to use one.

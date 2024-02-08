@@ -38,8 +38,8 @@ inline uint8_t * _mbscvt(uint8_t * srcU8,BOOL bLower){
     return srcU8;
 }
 
-#define _mbslwr(x) _mbscvt(x,TRUE)
-#define _mbsupr(x) _mbscvt(x,FALSE)
+#define _mbslwr(x) _mbscvt((uint8_t*)(x),TRUE)
+#define _mbsupr(x) _mbscvt((uint8_t*)(x),FALSE)
 
 
 #define _mbsstr(s1,s2) strstr((const char*)(s1),(const char *)(s2))
