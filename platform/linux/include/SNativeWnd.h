@@ -171,6 +171,9 @@ class SNativeWnd : public TObjRefImpl<INativeWnd> {
     xcb_connection_t * mConnection;
     xcb_screen_t *mScreen;
     uint32_t m_gc;
+
+  public:
+    static LRESULT CALLBACK WindowProc(SNativeWnd * pWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 SNSEND
