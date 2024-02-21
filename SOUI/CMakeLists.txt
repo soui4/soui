@@ -53,7 +53,7 @@ add_dependencies(soui4 utilities4 platform)
 target_link_libraries(soui4 utilities4 platform)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-target_precompile_headers(soui4 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/souistd.h")
+#target_precompile_headers(soui4 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/souistd.h")
 endif()
 set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")
 

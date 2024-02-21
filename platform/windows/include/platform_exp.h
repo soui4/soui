@@ -1,6 +1,8 @@
 #ifndef __PLATFORM_EXP_H_
 #define __PLATFORM_EXP_H_
 
+#include <config.h>
+
 #if defined(DLL_CORE) && defined(_WIN32)
 #ifdef PLATFORM_EXPORTS
 #define PLATFORM_API __declspec(dllexport)
