@@ -1,6 +1,6 @@
 ﻿#ifndef __DPIHELPER_H_
 #define __DPIHELPER_H_
-
+#include <platform.h>
 #include <helper/SDpiScale.h>
 #include <wtl.mini/msgcrack.h>
 #include <wtl.mini/souimisc.h>
@@ -11,7 +11,7 @@
 
 namespace SOUI
 {
-  #ifdef _WIN32
+#ifdef _WIN32
 class SDpiHelper {
   public:
     //获取一个PE文件的version
@@ -126,6 +126,13 @@ class SDpiHelper {
         return nScale;
     }
 };
+#else
+class SDpiHelper{
+public:
+    static int getScale(HWND hWnd){
+        return 100;
+    }
+};
 #endif
 
 template <class T>
@@ -160,7 +167,7 @@ class SDpiHandler {
             nScale = 100;
         nScale = SDpiScale::NormalizeScale(nScale);
         CRect rc;
-        ::GetWindowRect(hWnd, &rc);
+        ::GetWindowRect(hWnd, (RECT*)&rc);
         CSize sz = rc.Size();
         sz.cx = sz.cx * nScale / 100;
         sz.cy = sz.cy * nScale / 100;

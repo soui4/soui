@@ -19,5 +19,7 @@
 #include <animation/SAnimationSet.h>
 #include <valueAnimator/SValueAnimator.h>
 
-//#include "helper/SToolTip.h"
 #include <core/SHostWnd.h>
+#include <helper/SToolTip.h>
+#include <SApp.h>
+#include <control/SMessageBox.h>
