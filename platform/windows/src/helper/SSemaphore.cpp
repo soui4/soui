@@ -1,8 +1,6 @@
 #include <helper/SSemaphore.h>
 #include <cerrno>
 
-#ifdef _WIN32
-
 #include <Windows.h>
 
 SNSBEGIN
@@ -62,5 +60,3 @@ void SSemaphore::notify()
 }
 
 SNSEND
-
-#endif//_WIN32

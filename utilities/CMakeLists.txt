@@ -4,8 +4,6 @@
 
 add_definitions(-DUTILITIES_EXPORTS -D_CRT_SECURE_NO_WARNINGS)
 message("CMAKE_CURRENT_SOURCE_DIR = ${CMAKE_CURRENT_SOURCE_DIR}")
-include_directories(${CMAKE_CURRENT_SOURCE_DIR})
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
 file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
@@ -19,6 +17,13 @@ if (NOT ENABLE_SOUI_CORE_LIB)
 else()
     add_library(utilities4 STATIC ${CURRENT_SRCS} ${CURRENT_HEADERS})
 endif()
+
+target_include_directories(utilities4
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../platform
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../platform/include
+)
 add_dependencies(utilities4 platform)
 target_link_libraries(utilities4 platform)
 

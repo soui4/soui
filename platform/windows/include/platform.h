@@ -7,7 +7,6 @@
 #include <Shlwapi.h>
 #include <OleCtl.h>
 #include <tchar.h>
-#include <atl.mini/SComCli.h>
 #include <guid.h>
 #include <sysapi.h>
 #endif

@@ -1,39 +1,44 @@
 #include <helper/SCriticalSection.h>
+#include <Windows.h>
 SNSBEGIN
 
-	class SCriticalSectionImpl{
-		public:
-		SCriticalSectionImpl(){}
-		~SCriticalSectionImpl(){}
-
-		void Lock(){
-
-		}
-
-		void Unlock(){
-			
-		}
-		private:
-		CRITICALSECTION m_cs;
-	};
-
-	SCriticalSection::SCriticalSection()
-	{
-		m_cs = new SCriticalSectionImpl;
+class SCriticalSectionImpl{
+public:
+	SCriticalSectionImpl(){
+		InitializeCriticalSection(&m_cs);
 	}
-	SCriticalSection::~SCriticalSection()
-	{
-		delete m_cs;
+	~SCriticalSectionImpl(){
+		DeleteCriticalSection(&m_cs);
 	}
 
-	void SCriticalSection::Enter()
-	{
-		m_cs->lock();
+	void lock(){
+		EnterCriticalSection(&m_cs);
 	}
 
-	void SCriticalSection::Leave()
-	{
-		m_cs->unlock();
+	void unlock(){
+		LeaveCriticalSection(&m_cs);
 	}
+private:
+	CRITICAL_SECTION m_cs;
+};
+
+SCriticalSection::SCriticalSection()
+{
+	m_cs = new SCriticalSectionImpl;
+}
+SCriticalSection::~SCriticalSection()
+{
+	delete m_cs;
+}
+
+void SCriticalSection::Enter()
+{
+	m_cs->lock();
+}
+
+void SCriticalSection::Leave()
+{
+	m_cs->unlock();
+}
 
 SNSEND

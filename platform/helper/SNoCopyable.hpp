@@ -1,11 +1,13 @@
 #pragma once
-#include <utilities-def.h>
+#include <platform_exp.h>
+#include <sdef.h>
+
 SNSBEGIN
 	/**
 	* Inheriate this class to make your class cannot be copy and assign.
 	*
 	*/
-	class UTILITIES_API SNoCopyable
+	class PLATFORM_API SNoCopyable
 	{
 	public:
 		SNoCopyable() {}

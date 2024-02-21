@@ -3,7 +3,7 @@
 #
 add_definitions(-DPLATFORM_EXPORTS)
 
-file(GLOB_RECURSE CURRENT_HEADERS include/*.h include/*.hpp ../interface/*.h)
+file(GLOB_RECURSE CURRENT_HEADERS include/*.h include/*.hpp ../interface/*.h ../include/*.hpp ../include/*.h)
 file(GLOB_RECURSE CURRENT_SRCS  src/*.cpp)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
@@ -18,7 +18,7 @@ endif()
 target_include_directories(platform
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..
-  	PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include
 )
 
 set(CORE_LIBS ${CORE_LIBS} platform)
