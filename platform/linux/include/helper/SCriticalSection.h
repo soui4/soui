@@ -13,12 +13,13 @@
 
 #ifndef __SCRITICALSECTION__H__
 #define __SCRITICALSECTION__H__
-#include <utilities-def.h>
+#include <platform_exp.h>
+#include <sdef.h>
 
 SNSBEGIN
 
     class SCriticalSectionImpl;
-    class UTILITIES_API SCriticalSection
+    class PLATFORM_API SCriticalSection
     {
     public:
 		SCriticalSection();
@@ -31,7 +32,7 @@ SNSBEGIN
         SCriticalSectionImpl*    m_cs;
     };
 
-    class UTILITIES_API SAutoLock
+    class PLATFORM_API SAutoLock
     {
     public:
         SAutoLock(SCriticalSection & cs):m_cs(cs)

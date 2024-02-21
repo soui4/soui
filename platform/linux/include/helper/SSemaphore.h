@@ -1,6 +1,8 @@
 ﻿#ifndef __SSEMAPHORE__H__
 #define __SSEMAPHORE__H__
-#include <utilities-def.h>
+
+#include <platform_exp.h>
+#include <sdef.h>
 #include <helper/SNoCopyable.hpp>
 
 SNSBEGIN
@@ -16,7 +18,7 @@ class SemaphorePrivate;
 /**
  * Semaphore class for thread synchronization.
  */
-class UTILITIES_API SSemaphore : public SNoCopyable
+class PLATFORM_API SSemaphore : public SNoCopyable
 {
 public:
     /**

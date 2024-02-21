@@ -11,13 +11,15 @@
 #ifndef _SRW_LOCK_H_
 #define _SRW_LOCK_H_
 
-#include <utilities-def.h>
+#include <platform_exp.h>
+#include <sdef.h>
 #include <helper/SNoCopyable.hpp>
+
 
 SNSBEGIN
 
 struct IRwLock;
-class UTILITIES_API SRwLock : public SNoCopyable {
+class PLATFORM_API SRwLock : public SNoCopyable {
  public:
 	SRwLock();
 	~SRwLock();
@@ -32,7 +34,7 @@ class UTILITIES_API SRwLock : public SNoCopyable {
 	 IRwLock* impl;
 };
 
-class UTILITIES_API SAutoReadLock : public SNoCopyable{
+class PLATFORM_API SAutoReadLock : public SNoCopyable{
   public:
   SAutoReadLock(SRwLock *plock):m_pLock(plock){
     m_pLock->LockShared();
@@ -45,7 +47,7 @@ class UTILITIES_API SAutoReadLock : public SNoCopyable{
 };
 
 
-class UTILITIES_API SAutoWriteLock : public SNoCopyable{
+class PLATFORM_API SAutoWriteLock : public SNoCopyable{
   public:
   SAutoWriteLock(SRwLock *plock):m_pLock(plock){
     m_pLock->LockExclusive();
