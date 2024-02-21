@@ -2,10 +2,6 @@
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 add_definitions(-D_HAS_TR1_NAMESPACE)
 
-message("project src dir = ${PROJECT_SOURCE_DIR}")
-include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
-include_directories(${PROJECT_SOURCE_DIR}/third-part/gtest/include)
-
 file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 
@@ -24,6 +20,15 @@ else ()
 endif ()
 endif()
 add_executable(fun_test ${CURRENT_HEADERS} ${CURRENT_SRCS})
+
+target_include_directories(fun_test
+  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
+  PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
+  PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
+  PUBLIC ${PROJECT_SOURCE_DIR}/platform
+  PUBLIC ${PROJECT_SOURCE_DIR}/platform/include
+  PUBLIC ${PROJECT_SOURCE_DIR}/third-part/gtest/include
+)
 
 add_dependencies(fun_test utilities4 gtest platform)
 target_link_libraries(fun_test utilities4 gtest platform)

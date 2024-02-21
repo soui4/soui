@@ -47,6 +47,7 @@ target_include_directories(soui4
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface
   PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
   PUBLIC ${PROJECT_SOURCE_DIR}/platform
+  PUBLIC ${PROJECT_SOURCE_DIR}/platform/include
 )
 add_dependencies(soui4 utilities4 platform)
 target_link_libraries(soui4 utilities4 platform)

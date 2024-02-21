@@ -2,7 +2,7 @@
 #include <sdef.h>
 #include <helper/SNoCopyable.hpp>
 #include <helper/SRwLock.h>
-#include <souicoll.h>
+#include <map>
 #include <pthread.h>
 #include <xcb/xcb.h>
 
@@ -28,12 +28,12 @@ public:
 
     static xcb_atom_t internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName);
 private:
-    SMap<HWND,SNativeWnd*> m_mapWnd;
+    std::map<HWND,SNativeWnd*> m_mapWnd;
 };
 
 class SUiState : SNoCopyable{
     SRwLock m_rwLock;
-    SMap<pthread_t,SThreadUiState*> m_trdStates;
+    std::map<pthread_t,SThreadUiState*> m_trdStates;
 public:
     static SUiState * instance();
     static void free();

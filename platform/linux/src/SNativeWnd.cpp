@@ -47,7 +47,7 @@ HWND  SNativeWnd::CreateNative
 
     m_strTitle = lpWindowName;
     xcb_change_property(mConnection, XCB_PROP_MODE_REPLACE, m_hWnd,
-        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, m_strTitle.GetLength(), m_strTitle.c_str());
+        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, m_strTitle.length(), m_strTitle.c_str());
 
     xcb_change_property(mConnection, XCB_PROP_MODE_REPLACE, m_hWnd, state->wm_protocols_atom, XCB_ATOM_ATOM, 32, 1, &state->wm_delete_window_atom);
 
@@ -313,13 +313,13 @@ BOOL SNativeWnd::IsIconic() const
 int SNativeWnd::GetWindowText(LPTSTR lpszStringBuf, int nMaxCount) const
 {
     SASSERT(IsWindow());
-    if(nMaxCount < m_strTitle.GetLength())
+    if(nMaxCount < m_strTitle.length())
     {
         strncpy(lpszStringBuf,m_strTitle.c_str(),nMaxCount);
         return nMaxCount;
     }else{
         strcpy(lpszStringBuf, m_strTitle.c_str());
-        return m_strTitle.GetLength();
+        return m_strTitle.length();
     }
 }
 
@@ -327,7 +327,7 @@ BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
 {
     SASSERT(IsWindow());
     m_strTitle = lpszString;
-    xcb_change_property(mConnection, XCB_PROP_MODE_REPLACE, m_hWnd, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, m_strTitle.GetLength(), m_strTitle.c_str());
+    xcb_change_property(mConnection, XCB_PROP_MODE_REPLACE, m_hWnd, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, m_strTitle.length(), m_strTitle.c_str());
 
     return TRUE;
 }

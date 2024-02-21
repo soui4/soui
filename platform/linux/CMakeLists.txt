@@ -2,8 +2,8 @@
 # SOUI cmake配置文件
 #
 
-file(GLOB_RECURSE CURRENT_HEADERS include/*.h include/*.hpp ../interface/*.h)
-file(GLOB_RECURSE CURRENT_SRCS  src/*.cpp src/*.h)
+file(GLOB_RECURSE CURRENT_HEADERS include/*.h include/*.hpp ../interface/*.h ../include/*.hpp ../include/*.h)
+file(GLOB_RECURSE CURRENT_SRCS  src/*.cpp)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
@@ -17,7 +17,13 @@ endif()
 target_include_directories(platform
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/..
-  	PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
+	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../include
+)
+
+# 🔗 Link CrossWindow to your project:
+target_link_libraries(
+    platform
+    xcb xcb-util
 )
 
 set(CORE_LIBS ${CORE_LIBS} platform)

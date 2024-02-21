@@ -33,21 +33,20 @@ void SUiState::free()
 SUiState::~SUiState()
 {
     SAutoWriteLock autoLock(&m_rwLock);
-    assert(m_trdStates.IsEmpty());
-    SPOSITION pos = m_trdStates.GetStartPosition();
-    while (pos)
-    {
-        SThreadUiState *pstate = m_trdStates.GetNextValue(pos);
-        delete pstate;
+    assert(m_trdStates.empty());
+    auto it = m_trdStates.begin();
+    while(it!=m_trdStates.end()){
+        delete it->second;
+        it++;
     }
-    m_trdStates.RemoveAll();
+    m_trdStates.clear();
 }
 
 bool SUiState::init(int screenNum)
 {
     SAutoWriteLock autoLock(&m_rwLock);
     pthread_t tid = pthread_self();
-    if (m_trdStates.Lookup(tid) != NULL)
+    if (m_trdStates.find(tid) != m_trdStates.end())
     {
         return true;
     }
@@ -65,13 +64,13 @@ void SUiState::uninit()
 {
     SAutoWriteLock autoLock(&m_rwLock);
     pthread_t tid = pthread_self();
-    auto it = m_trdStates.Lookup(tid);
-    if (it == NULL)
+    auto it = m_trdStates.find(tid);
+    if (it == m_trdStates.end())
     {
         return;
     }
-    delete it->m_value;
-    m_trdStates.RemoveAtPos(it);
+    delete it->second;
+    m_trdStates.erase(it);
 }
 
 SThreadUiState *SUiState::getThreadUiState()
@@ -79,10 +78,10 @@ SThreadUiState *SUiState::getThreadUiState()
     pthread_t tid = pthread_self();
     {
         SAutoReadLock autoLock(&m_rwLock);
-        auto it = m_trdStates.Lookup(tid);
-        if (it != NULL)
+        auto it = m_trdStates.find(tid);
+        if (it != m_trdStates.end())
         {
-            return it->m_value;
+            return it->second;
         }
     }
     {
@@ -157,18 +156,18 @@ void SThreadUiState::onWndCreate(HWND hwnd, SNativeWnd *pWnd)
 
 void SThreadUiState::onWndDestroy(HWND hwnd)
 {
-    m_mapWnd.RemoveKey(hwnd);
+    m_mapWnd.erase(hwnd);
 }
 
 SNativeWnd *SThreadUiState::GetNativeWndFromHwnd(HWND hwnd)
 {
-    auto it = m_mapWnd.Lookup(hwnd);
-    if(!it)
+    auto it = m_mapWnd.find(hwnd);
+    if(it == m_mapWnd.end())
     {
         assert(false);
         return nullptr;
     }
-    return it->m_value;
+    return it->second;
 }
 
 SNSEND
