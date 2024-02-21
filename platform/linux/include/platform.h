@@ -6,5 +6,6 @@
 #include "objbase.h"
 #include "guid.h"
 #include "winuser.h"
+#include "dataobject-i.h"
 
 #endif//__PLATFORM_H_

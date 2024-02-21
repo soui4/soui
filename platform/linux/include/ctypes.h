@@ -39,6 +39,7 @@ typedef uint32_t DWORD;
 typedef uint16_t WORD;
 typedef int32_t LONG;
 typedef int64_t LONGLONG;
+typedef uint64_t ULONGLONG;
 typedef int32_t INT;
 typedef wchar_t WCHAR;
 typedef void * LPVOID;
@@ -314,5 +315,41 @@ typedef struct _IDropTarget{
 
 #define AD_COUNTERCLOCKWISE 1
 #define AD_CLOCKWISE        2
+
+
+typedef HANDLE              HGLOBAL;
+
+typedef union _ULARGE_INTEGER {
+    struct {
+        DWORD LowPart;
+        DWORD HighPart;
+    };
+    struct {
+        DWORD LowPart;
+        DWORD HighPart;
+    } u;
+    ULONGLONG QuadPart;
+} ULARGE_INTEGER;
+
+typedef union _LARGE_INTEGER {
+    struct {
+        DWORD LowPart;
+        LONG HighPart;
+    };
+    struct {
+        DWORD LowPart;
+        LONG HighPart;
+    } u;
+    LONGLONG QuadPart;
+} LARGE_INTEGER;
+
+typedef struct _FILETIME {
+    DWORD dwLowDateTime;
+    DWORD dwHighDateTime;
+} FILETIME, *PFILETIME, *LPFILETIME;
+
+typedef wchar_t OLECHAR;
+typedef OLECHAR **SNB;
+
 
 #endif//__PLATFORM_LINUX_

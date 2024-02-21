@@ -34,7 +34,9 @@ inline bool operator==(const GUID & id1,const GUID &id2){
 #else
 #define REFGUID const GUID *
 #endif
-
+#define IID GUID
+#define REFIID REFGUID
+#define REFCLSID REFGUID
 
 
 #endif//__SGUID_H_

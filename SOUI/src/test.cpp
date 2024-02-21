@@ -13,12 +13,11 @@
 
 #include "helper/SAppDir.h"
 
-
-//#include "helper/SToolTip.h"
-//#include "core/SNativeWnd.h"
-
 #include <core/SWnd.h>
 #include <res.mgr/SSkinPool.h>
 #include <animation/SAnimation.h>
 #include <animation/SAnimationSet.h>
 #include <valueAnimator/SValueAnimator.h>
+
+//#include "helper/SToolTip.h"
+#include <core/SHostWnd.h>

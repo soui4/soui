@@ -14,6 +14,7 @@
 #ifndef __SDROPTARGETDISPATCHER__H__
 #define __SDROPTARGETDISPATCHER__H__
 #include "SWnd.h"
+#include <platform.h>
 
 SNSBEGIN
 
@@ -37,7 +38,7 @@ class SDropTargetDispatcher : public IDropTarget {
     // IUnknown
     virtual HRESULT STDMETHODCALLTYPE QueryInterface(
         /* [in] */ REFIID riid,
-        /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject);
+        /* [iid_is][out] */ void **ppvObject);
 
     virtual ULONG STDMETHODCALLTYPE AddRef(void)
     {
