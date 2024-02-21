@@ -1,5 +1,6 @@
 #include <sysapi.h>
 #include <WinUser.h>
+#include <tchar.h>
 #pragma comment(lib, "version.lib")
 
 static int getScaleOld(HWND hWnd = NULL)
@@ -81,9 +82,9 @@ int GetWindowScale(HWND hWnd)
         HMODULE hModule = LoadLibrary(_T("Shcore.dll"));
         if (hModule)
         {
-            CRect winrc;
+            RECT winrc;
             GetWindowRect(hWnd, &winrc);
-            HMONITOR hMonitor = MonitorFromRect(winrc, MONITOR_DEFAULTTONEAREST);
+            HMONITOR hMonitor = MonitorFromRect(&winrc, MONITOR_DEFAULTTONEAREST);
             UINT dpiX, dpiY;
             typedef enum _MONITOR_DPI_TYPE
             {
