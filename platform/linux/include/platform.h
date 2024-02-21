@@ -7,5 +7,7 @@
 #include "guid.h"
 #include "winuser.h"
 #include "dataobject-i.h"
+#include "ctrl_types.h"
+#include "sysapi.h"
 
 #endif//__PLATFORM_H_

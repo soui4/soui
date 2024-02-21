@@ -4,6 +4,10 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+#define FAR
+#define NEAR
+#define CONST const
+
 #ifndef _INTPTR_T
 #ifndef __intptr_t_defined
 typedef __INTPTR_TYPE__ intptr_t;
@@ -60,6 +64,27 @@ typedef void VOID;
 typedef void* LPVOID;
 typedef void* PVOID;
 typedef uint8_t UCHAR;
+
+typedef int BOOL;
+typedef float               FLOAT;
+typedef FLOAT               *PFLOAT;
+typedef BOOL            *PBOOL;
+typedef BOOL             *LPBOOL;
+typedef BYTE            *PBYTE;
+typedef BYTE             *LPBYTE;
+typedef int             *PINT;
+typedef int              *LPINT;
+typedef WORD            *PWORD;
+typedef WORD             *LPWORD;
+typedef long             *LPLONG;
+typedef DWORD           *PDWORD;
+typedef DWORD            *LPDWORD;
+typedef void             *LPVOID;
+typedef CONST void       *LPCVOID;
+
+typedef int                 INT;
+typedef unsigned int        UINT;
+typedef unsigned int        *PUINT;
 
 #define __time64_t time_t
 

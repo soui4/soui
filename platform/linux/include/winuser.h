@@ -850,4 +850,5 @@ typedef struct tagCREATESTRUCT {
     DWORD       dwExStyle;
 } CREATESTRUCT, *LPCREATESTRUCT;
 
+
 #endif//__WINUSER_H_
