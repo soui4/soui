@@ -113,8 +113,9 @@ add_subdirectory(utilities)
 
 #add_subdirectory(fun_test)
 add_subdirectory(SOUI)
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
 add_subdirectory(soui-sys-resource)
-
+endif()
 #
 #
 # 

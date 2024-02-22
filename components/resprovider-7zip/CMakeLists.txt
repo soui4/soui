@@ -13,7 +13,7 @@ set(resprovider-7zip_header
 set(resprovider-7zip_src 
     cursoricon.cpp
 	SResProvider7Zip.cpp
-	zip7Archive.cpp
+	Zip7Archive.cpp
 )
 
 add_definitions(-DRESPROVIDER7ZIP_EXPORTS)
