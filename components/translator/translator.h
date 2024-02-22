@@ -9,7 +9,7 @@
 #include <helper/obj-ref-impl.hpp>
 #include <string/tstring.h>
 #include <string/strcpcvt.h>
-#include <xml/sxml.h>
+#include <xml/SXml.h>
 #include <interface/STranslator-i.h>
 
 SNSBEGIN

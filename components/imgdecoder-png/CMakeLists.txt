@@ -21,13 +21,14 @@ source_group("Source Files" FILES ${imgdecoder-png_src})
 if (NOT ENABLE_SOUI_COM_LIB)
     set (imgdecoder-png_src  ${imgdecoder-png_src} imgdecoder-png.rc)
     add_library(imgdecoder-png SHARED ${imgdecoder-png_src} ${imgdecoder-png_header})
-    target_link_libraries(imgdecoder-png png zlib)
+    target_link_libraries(imgdecoder-png png zlib platform)
 else()
     add_library(imgdecoder-png STATIC ${imgdecoder-png_src} ${imgdecoder-png_header})
     target_compile_definitions(imgdecoder-png
       PUBLIC SOUI_IMAGE_DECODER_USE_LIBPNG_STATIC
     )
 endif()
+add_dependencies(imgdecoder-png platform png zlib)
 
 target_compile_definitions(imgdecoder-png
   PUBLIC SOUI_IMAGE_DECODER_USE_LIBPNG

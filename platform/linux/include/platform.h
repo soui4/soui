@@ -3,10 +3,11 @@
 #include "ctypes.h"
 #include "tchar.h"
 #include "strfun.h"
-#include "objbase.h"
+#include "Objbase.h"
 #include "guid.h"
 #include "winuser.h"
-#include "dataobject-i.h"
+#include <unknown-i.h>
+#include <dataobject-i.h>
 #include "ctrl_types.h"
 #include "sysapi.h"
 

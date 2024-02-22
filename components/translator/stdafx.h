@@ -10,7 +10,7 @@
 #define _CRT_NON_CONFORMING_SWPRINTFS
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 // Windows Header Files:
-#include <windows.h>
+#include <platform.h>
 #include <limits.h>
 #include <malloc.h>
 

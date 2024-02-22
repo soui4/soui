@@ -1,6 +1,6 @@
 ﻿#include <stdio.h>
 #include <stdlib.h>
-#include <windows.h>
+#include <platform.h>
 
 #include <png.h>
 #include <pngstruct.h>
@@ -251,7 +251,28 @@ APNGDATA * loadPng(IPngReader *pSrc)
 
 APNGDATA * LoadAPNG_from_file( const wchar_t * pszFileName )
 {
-    FILE *f = _wfopen(pszFileName,L"rb");
+    #ifdef _WIN32
+    FILE *f = wopen(pszFileName,L"rb");
+    #else
+    char szFileName[1000];
+    WideCharToMultiByte(CP_UTF8,0,pszFileName,-1,szFileName,1000,NULL,NULL);
+    FILE *f = fopen(szFileName,"rb");
+    #endif
+    if(!f) return NULL;
+    IPngReader_File file(f);
+    APNGDATA *pRet = loadPng(&file);
+    fclose(f);
+    return pRet;
+}
+
+APNGDATA * LoadAPNG_from_fileA( const char * pszFileName )
+{
+    #ifdef _WIN32
+    wchar_t szFileName[MAX_PATH];
+    MultiByteToWideChar(CP_ACP,0,pszFileName,-1,szFileName,MAX_PATH);
+    #else
+    FILE *f = fopen(pszFileName,"rb");
+    #endif
     if(!f) return NULL;
     IPngReader_File file(f);
     APNGDATA *pRet = loadPng(&file);

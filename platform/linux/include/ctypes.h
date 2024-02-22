@@ -173,14 +173,6 @@ typedef const wchar_t * LPCWSTR;
 #define ARRAYSIZE(x) (sizeof((x))/sizeof((x)[0]))
 
 
-inline long InterlockedDecrement(long *v){
-    return __atomic_fetch_sub(v,1,__ATOMIC_SEQ_CST);
-}
-
-inline long InterlockedIncrement(long *v){
-    return __atomic_fetch_add(v,1,__ATOMIC_SEQ_CST);
-}
-
 #define UNREFERENCED_PARAMETER(x)
 
 typedef DWORD   COLORREF;

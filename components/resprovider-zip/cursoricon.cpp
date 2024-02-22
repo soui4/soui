@@ -27,7 +27,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include <windows.h>
+#include <platform.h>
 
 #define smax(a,b) (a)>(b)?(a):(b)
 

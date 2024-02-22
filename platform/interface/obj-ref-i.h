@@ -2,7 +2,7 @@
 #define __OBJ_REF_I__H__
 
 #include <sdef.h>
-#include <objbase.h>
+#include <Objbase.h>
 #include <guid.h>
 
 #ifdef __cplusplus

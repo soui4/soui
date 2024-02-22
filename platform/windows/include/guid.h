@@ -1,8 +1,6 @@
 #ifndef __SGUID_H_
 #define __SGUID_H_
 
-#define GuidEqual(id1,id2) (memcmp(&id1,&id2,sizeof(GUID))==0)
-
 #ifdef __cplusplus
 
 #define DECLARE_CLASS_SIID(l1, w1, w2, w3, w4, l2) \

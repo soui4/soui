@@ -2,7 +2,7 @@
 #ifndef __OBJ_REF_IMPL_HPP
 #define __OBJ_REF_IMPL_HPP
 #include <sdef.h>
-#include <ObjBase.h>
+#include <Objbase.h>
 
 
 SNSBEGIN

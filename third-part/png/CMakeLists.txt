@@ -66,6 +66,8 @@ set_target_properties (png PROPERTIES
     FOLDER third-part
 )
 
+target_compile_options(png PRIVATE -fPIC)
+
 install(TARGETS png
     CONFIGURATIONS Release
     RUNTIME DESTINATION bin/Release

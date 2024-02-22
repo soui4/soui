@@ -14,7 +14,6 @@ set(translator_header
 )
 
 set(translator_src 
-    dllmain.cpp
     translator.cpp)
 
 source_group("Header Files" FILES ${translator_header})

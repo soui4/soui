@@ -4,7 +4,7 @@
 #include "stdafx.h"
 #include "translator.h"
 #include <search.h>
-#include <ObjBase.h>
+#include <Objbase.h>
 #include <tchar.h>
 
 SNSBEGIN
@@ -230,7 +230,9 @@ BOOL STranslatorMgr::InstallTranslator(ITranslator *pTranslator)
 	while(pos)
 	{
 		ITranslator *p=m_lstLang->GetNext(pos);
-		if(IsEqualGUID(pTranslator->guid(),p->guid()))
+		GUID id2 = p->guid();
+		GUID id1 = pTranslator->guid();
+		if(IsEqualGUID(id1,id2))
 		{
 			return FALSE;
 		}
@@ -248,7 +250,8 @@ BOOL STranslatorMgr::UninstallTranslator(REFGUID id)
 	{
 		SPOSITION posBackup=pos;
 		ITranslator *p=m_lstLang->GetNext(pos);
-		if(IsEqualGUID(id,p->guid()))
+		GUID id2 = p->guid();
+		if(IsEqualGUID(id,id2))
 		{
 			m_lstLang->RemoveAt(posBackup);
 			p->Release();
@@ -298,7 +301,7 @@ BOOL STranslatorMgr::CreateTranslator( ITranslator ** ppTranslator )
 
 void STranslatorMgr::SetLanguage(LPCWSTR strLang)
 {
-	if (wcsicmp(m_szLangName,strLang)!=0)
+	if (_wcsicmp(m_szLangName,strLang)!=0)
 	{
 		SPOSITION pos = m_lstLang->GetHeadPosition();
 		while (pos)
