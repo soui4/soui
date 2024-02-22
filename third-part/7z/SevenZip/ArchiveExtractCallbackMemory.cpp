@@ -5,7 +5,7 @@
 #include <comdef.h>
 #include "../CPP/Common/MyCom.h"
 #include "FileStreamMemory.h"
-
+#include <tchar.h>
 namespace SevenZip
 {
 	namespace intl

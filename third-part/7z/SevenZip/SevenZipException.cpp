@@ -1,5 +1,5 @@
 #include "SevenZipException.h"
-
+#include <tchar.h>
 
 namespace SevenZip
 {

@@ -5,7 +5,6 @@
 #include "GradientFillHelper.h"
 #include <gdialpha.h>
 #include <math.h>
-#include <trace.h>
 #include <tchar.h>
 #include <algorithm>
 

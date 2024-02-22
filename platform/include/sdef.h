@@ -25,4 +25,27 @@
 #define smin(a,b) ((a)<(b)?(a):(b))
 #endif
 
+
+#ifndef SASSERT
+#include <assert.h>
+#define SASSERT(x) assert(x)
+#endif
+
+#ifdef LIB_SOUI_COM
+#define SOUI_COM_API
+#define SOUI_COM_C
+#else
+#ifdef _WIN32
+#define SOUI_COM_API __declspec(dllexport)
+#else
+#define SOUI_COM_API
+#endif
+#define SOUI_COM_C  EXTERN_C
+#endif//LIB_SOUI_COM
+
+#ifndef NULL
+#define NULL 0
+#endif
+
+
 #endif // __SDEF__H__

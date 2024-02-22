@@ -76,7 +76,7 @@ namespace SOUI
 		if(count>1)
 		{
 			SAutoRefPtr<ICornerPathEffect> pathEffect;
-			GETRENDERFACTORY->CreatePathEffect(__uuidof(ICornerPathEffect),(IPathEffect**)&pathEffect);
+			GETRENDERFACTORY->CreatePathEffect(__suidof(ICornerPathEffect),(IPathEffect**)&pathEffect);
 			if(pathEffect)
 				pathEffect->Init(m_fCornerRadius);
 

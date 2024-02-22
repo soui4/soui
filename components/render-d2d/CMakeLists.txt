@@ -29,17 +29,20 @@ target_include_directories(render-d2d
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
 )
 
-if(MSVC_VERSION LESS_EQUAL 1500)
+
+if(MSVC_VERSION LESS 1600)
 message("vs is less than vs2008")
 target_include_directories(render-d2d
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/include
 )
 if (CMAKE_CL_64)
-	target_link_directories(render-d2d PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/lib/x64")
+	link_directories(PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/lib/x64")
 else ()
-	target_link_directories(render-d2d PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/lib/x86")
+	link_directories(PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/lib/x86")
 endif ()
 endif()
+
+
 
 
     

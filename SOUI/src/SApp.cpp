@@ -235,6 +235,7 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     , m_cbCreateTaskLoop(NULL)
 {
     SWndSurface::Init();
+	SNativeWnd::InitWndClass(hInst,pszHostClassName,bImeApp);
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
     _CreateSingletons(hInst, pszHostClassName, bImeApp);
 
@@ -270,7 +271,6 @@ void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, 
     m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
     m_pSingletons[STextServiceHelper::GetType()] = new STextServiceHelper();
     m_pSingletons[SRicheditMenuDef::GetType()] = new SRicheditMenuDef();
-
     m_pSingletons[SHostMgr::GetType()] = new SHostMgr();
 }
 

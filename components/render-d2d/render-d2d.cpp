@@ -5,7 +5,6 @@
 #include <gdialpha.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include <trace.h>
 #include <tchar.h>
 #include <algorithm>
 #include <atl.mini/SComHelper.h>

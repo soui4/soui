@@ -13,10 +13,6 @@ Abstract:
 
 --*/
 
-/*
-ԭ�� winHttp.h �ļ���Wininet.h �ļ����岻���ݣ�����汾���޸İ档
-��֤�����ڰ���wininet.h�ļ��Ĵ����а���winhttp.h
-*/
 
 
 #pragma  once

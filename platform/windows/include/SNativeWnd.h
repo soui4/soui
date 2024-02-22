@@ -15,9 +15,8 @@ class PLATFORM_API SNativeWnd : public TObjRefImpl<INativeWnd> {
     SNativeWnd();
     virtual ~SNativeWnd(void);
 
-    static ATOM RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName);
-
-    static ATOM RegisterSimpleWnd2(HINSTANCE hInst, LPCTSTR pszSimpleWndName);
+    static ATOM RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName,BOOL bImeWnd);
+	static void InitWndClass(HINSTANCE hInst, LPCTSTR pszSimpleWndName,BOOL bImeWnd);
 
     STDMETHOD_(int, GetID)(THIS) SCONST
     {

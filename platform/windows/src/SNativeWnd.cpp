@@ -166,10 +166,7 @@ BOOL SNativeWndHelper::Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp)
         return FALSE;
     m_hInst = hInst;
     m_hHeap = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE, 0, 0);
-    if (bImeApp)
-        m_atom = SNativeWnd::RegisterSimpleWnd2(m_hInst, pszClassName);
-    else
-        m_atom = SNativeWnd::RegisterSimpleWnd(m_hInst, pszClassName);
+    m_atom = SNativeWnd::RegisterSimpleWnd(m_hInst, pszClassName,bImeApp);
     return TRUE;
 }
 
@@ -208,11 +205,11 @@ SNativeWnd::~SNativeWnd(void)
 {
 }
 
-ATOM SNativeWnd::RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName)
+ATOM SNativeWnd::RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName,BOOL bImeWnd)
 {
     WNDCLASSEX wcex = { sizeof(WNDCLASSEX), 0 };
     wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
+    wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | (bImeWnd?CS_IME:0);
     wcex.lpfnWndProc = StartWindowProc; // 第一个处理函数
     wcex.hInstance = hInst;
     wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
@@ -221,17 +218,8 @@ ATOM SNativeWnd::RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName)
     return ::RegisterClassEx(&wcex);
 }
 
-ATOM SNativeWnd::RegisterSimpleWnd2(HINSTANCE hInst, LPCTSTR pszSimpleWndName)
-{
-    WNDCLASSEX wcex = { sizeof(WNDCLASSEX), 0 };
-    wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_IME;
-    wcex.lpfnWndProc = StartWindowProc; // 第一个处理函数
-    wcex.hInstance = hInst;
-    wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wcex.lpszClassName = pszSimpleWndName;
-    return ::RegisterClassEx(&wcex);
+void SNativeWnd::InitWndClass(HINSTANCE hInst, LPCTSTR pszSimpleWndName,BOOL bImeWnd){
+	SNativeWndHelper::instance()->Init(hInst,pszSimpleWndName,bImeWnd);
 }
 
 HWND SNativeWnd::CreateNative(LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam)

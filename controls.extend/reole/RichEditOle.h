@@ -10,7 +10,7 @@
 
 #include "../smiley/ssmileyctrl.h"
 #include <control/srichedit.h>
-
+#include <atl.mini/SComCli.h>
 using namespace SOUI;
 
 #define ID_INVALID  -1

@@ -13,7 +13,7 @@
 #pragma once
 #include <ShellAPI.h>
 #include <core/SWnd.h>
-#include <core/SNativeWnd.h>
+#include <SNativeWnd.h>
  /**
   * @class      SShellNotifyIcon
   * @brief      ShellNotifyIcon

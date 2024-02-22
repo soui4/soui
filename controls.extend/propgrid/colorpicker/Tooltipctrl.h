@@ -1,6 +1,6 @@
 ﻿#pragma once
 
-#include <core/SNativeWnd.h>
+#include <SNativeWnd.h>
 
 namespace SOUI{
 

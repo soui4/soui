@@ -12,7 +12,6 @@
 #include "drawtext-skia.h"
 
 #include "render-skia.h"
-#include "trace.h"
 
 #include "skia2rop2.h"
 #include "PathEffect-Skia.h"

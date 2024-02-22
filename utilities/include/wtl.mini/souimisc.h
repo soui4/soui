@@ -347,14 +347,14 @@ public:
         return this;
     }
 
-    static BOOL IsRectEmpty(LPCRECT prc)
+    static BOOL IsRectEmpty2(LPCRECT prc)
     {
         return prc->left == prc->right && prc->top == prc->bottom;
     }
 
     BOOL IsRectEmpty() const
     {
-        return IsRectEmpty(this);
+        return IsRectEmpty2(this);
     }
 
     BOOL IsRectNull() const
@@ -561,7 +561,7 @@ public:
     BOOL SubtractRect(const RECT *src1, const RECT *src2 )
     {
         CRect tmp;
-        if (IsRectEmpty( src1 ))
+        if (IsRectEmpty2( src1 ))
         {
             SetRectEmpty();
             return FALSE;

@@ -109,7 +109,7 @@ source_group("Resource Files" FILES ${CURRENT_RC})
 source_group("Extend Cotrols" FILES ${EXTENDCOTROLS})
 
 
-if(MSVC_VERSION LESS_EQUAL 1500 AND ENABLE_SOUI_COM_LIB)
+if(MSVC_VERSION LESS 1600 AND ENABLE_SOUI_COM_LIB)
 message("vs is less than vs2008")
 if (CMAKE_CL_64)
 	link_directories("${PROJECT_SOURCE_DIR}/components/render-d2d/sdk7.1_d2d/lib/x64")

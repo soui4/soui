@@ -52,7 +52,7 @@
 //
 
 #include "SevenString.h"
-
+#include <tchar.h>
 namespace SevenZip
 {
 namespace intl

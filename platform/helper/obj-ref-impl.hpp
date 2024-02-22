@@ -2,11 +2,8 @@
 #ifndef __OBJ_REF_IMPL_HPP
 #define __OBJ_REF_IMPL_HPP
 #include <sdef.h>
+#include <ObjBase.h>
 
-#ifndef SASSERT
-#include <assert.h>
-#define SASSERT(x) assert(x);
-#endif
 
 SNSBEGIN
 

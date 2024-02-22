@@ -1,6 +1,6 @@
 #include "PathScanner.h"
 #include "FileSys.h"
-
+#include <tchar.h>
 
 namespace SevenZip
 {

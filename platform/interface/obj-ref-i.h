@@ -3,6 +3,7 @@
 
 #include <sdef.h>
 #include <objbase.h>
+#include <guid.h>
 
 #ifdef __cplusplus
 #define DEF_VAL(x) =x

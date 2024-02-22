@@ -84,6 +84,9 @@ configure_file("config/build.cfg.in" "${PROJECT_SOURCE_DIR}/config/build.cfg" @O
 include_directories(${PROJECT_SOURCE_DIR}/config)
 endif()
 
+add_definitions(-D_CRT_NONSTDC_NO_WARNINGS)
+include_directories(${PROJECT_SOURCE_DIR}/platform ${PROJECT_SOURCE_DIR}/platform/include)
+
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
   include_directories(${PROJECT_SOURCE_DIR}/platform/windows/include)
   include_directories(${PROJECT_SOURCE_DIR}/third-part/stdint)
@@ -108,19 +111,19 @@ add_subdirectory(third-part)
 add_subdirectory(platform)
 add_subdirectory(utilities)
 
-add_subdirectory(fun_test)
+#add_subdirectory(fun_test)
 add_subdirectory(SOUI)
-#add_subdirectory(soui-sys-resource)
+add_subdirectory(soui-sys-resource)
 
 #
 #
 # 
-#add_subdirectory(components)
+add_subdirectory(components)
 
 #
 #
-#add_subdirectory(demo)
-#add_subdirectory(demo2)
+add_subdirectory(demo)
+add_subdirectory(demo2)
 
 ##
 ##
