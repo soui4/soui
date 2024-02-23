@@ -18,6 +18,7 @@ source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("SoUI Resource" FILES ${CURRENT_UIRES})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
+set(CURRENT_SRCS src/res.mgr/SUiDef.cpp src/SouiFactory.cpp)
 # 添加 -fpermissive 选项到 C++ 编译器标志
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fpermissive")

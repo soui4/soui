@@ -45,5 +45,10 @@ BOOL WaitMessage();
 
 BOOL IsWindow(HWND hWnd);
 void DestroyWindow(HWND hwnd);
-    
+
+HDC GetDC(HWND hWnd);
+void ReleaseDC(HWND hwnd,HDC hdc);
+
+int GetSystemMetrics(int nIndex);
+
 #endif

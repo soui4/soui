@@ -55,11 +55,13 @@
 #include <helper/SAssertFmt.h>
 #include <helper/SAttrCracker.h>
 #include <helper/SColor.h>
+#include <helper/SplitString.h>
 #include <SApp.h>
 
 #include <res.mgr/SFontPool.h>
 #include <res.mgr/SResProvider.h>
-
+#include <res.mgr/SUiDef.h>
+#include <res.mgr/SDpiAwareFont.h>
 #ifdef _WIN32
 #include <control/SouiCtrls.h>
 #include <control/SMessageBox.h>

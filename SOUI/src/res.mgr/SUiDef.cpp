@@ -1,8 +1,7 @@
-﻿#include "include\souistd.h"
-#include "res.mgr\SUiDef.h"
-
-#include "helper\SplitString.h"
-#include "helper\SAutoBuf.h"
+﻿#include "include/souistd.h"
+#include "res.mgr/SUiDef.h"
+#include "helper/SplitString.h"
+#include "helper/SAutoBuf.h"
 
 SNSBEGIN
 

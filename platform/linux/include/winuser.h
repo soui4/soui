@@ -850,5 +850,78 @@ typedef struct tagCREATESTRUCT {
     DWORD       dwExStyle;
 } CREATESTRUCT, *LPCREATESTRUCT;
 
+#define OCM__BASE           (WM_USER+0x1c00)
+#define OCM_COMMAND         (OCM__BASE + WM_COMMAND)
+
+#define OCM_CTLCOLORBTN     (OCM__BASE + WM_CTLCOLORBTN)
+#define OCM_CTLCOLOREDIT    (OCM__BASE + WM_CTLCOLOREDIT)
+#define OCM_CTLCOLORDLG     (OCM__BASE + WM_CTLCOLORDLG)
+#define OCM_CTLCOLORLISTBOX (OCM__BASE + WM_CTLCOLORLISTBOX)
+#define OCM_CTLCOLORMSGBOX  (OCM__BASE + WM_CTLCOLORMSGBOX)
+#define OCM_CTLCOLORSCROLLBAR   (OCM__BASE + WM_CTLCOLORSCROLLBAR)
+#define OCM_CTLCOLORSTATIC  (OCM__BASE + WM_CTLCOLORSTATIC)
+
+#define OCM_DRAWITEM        (OCM__BASE + WM_DRAWITEM)
+#define OCM_MEASUREITEM     (OCM__BASE + WM_MEASUREITEM)
+#define OCM_DELETEITEM      (OCM__BASE + WM_DELETEITEM)
+#define OCM_VKEYTOITEM      (OCM__BASE + WM_VKEYTOITEM)
+#define OCM_CHARTOITEM      (OCM__BASE + WM_CHARTOITEM)
+#define OCM_COMPAREITEM     (OCM__BASE + WM_COMPAREITEM)
+#define OCM_HSCROLL         (OCM__BASE + WM_HSCROLL)
+#define OCM_VSCROLL         (OCM__BASE + WM_VSCROLL)
+#define OCM_PARENTNOTIFY    (OCM__BASE + WM_PARENTNOTIFY)
+#define OCM_NOTIFY          (OCM__BASE + WM_NOTIFY)
+
+#define ODT_MENU        1
+#define ODT_LISTBOX     2
+#define ODT_COMBOBOX    3
+#define ODT_BUTTON      4
+#define ODT_STATIC      5
+
+
+#define SM_CXSCREEN             0
+#define SM_CYSCREEN             1
+#define SM_CXVSCROLL            2
+#define SM_CYHSCROLL            3
+#define SM_CYCAPTION            4
+#define SM_CXBORDER             5
+#define SM_CYBORDER             6
+#define SM_CXDLGFRAME           7
+#define SM_CYDLGFRAME           8
+#define SM_CYVTHUMB             9
+#define SM_CXHTHUMB             10
+#define SM_CXICON               11
+#define SM_CYICON               12
+#define SM_CXCURSOR             13
+#define SM_CYCURSOR             14
+#define SM_CYMENU               15
+#define SM_CXFULLSCREEN         16
+#define SM_CYFULLSCREEN         17
+#define SM_CYKANJIWINDOW        18
+#define SM_MOUSEPRESENT         19
+#define SM_CYVSCROLL            20
+#define SM_CXHSCROLL            21
+#define SM_DEBUG                22
+#define SM_SWAPBUTTON           23
+#define SM_RESERVED1            24
+#define SM_RESERVED2            25
+#define SM_RESERVED3            26
+#define SM_RESERVED4            27
+#define SM_CXMIN                28
+#define SM_CYMIN                29
+#define SM_CXSIZE               30
+#define SM_CYSIZE               31
+#define SM_CXFRAME              32
+#define SM_CYFRAME              33
+#define SM_CXMINTRACK           34
+#define SM_CYMINTRACK           35
+#define SM_CXDOUBLECLK          36
+#define SM_CYDOUBLECLK          37
+#define SM_CXICONSPACING        38
+#define SM_CYICONSPACING        39
+#define SM_MENUDROPALIGNMENT    40
+#define SM_PENWINDOWS           41
+#define SM_DBCSENABLED          42
+#define SM_CMOUSEBUTTONS        43
 
 #endif//__WINUSER_H_

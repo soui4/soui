@@ -3,7 +3,8 @@
 #include <helper/SMenu.h>
 #include <helper/SMenuEx.h>
 #include <helper/STimer.h>
-
+#include <core/SHostDialog.h>
+#include <valueAnimator/SValueAnimator.h>
 SNSBEGIN
 
 SouiFactory::SouiFactory(void)
@@ -44,7 +45,7 @@ IStringW *SouiFactory::CreateStringW(THIS_ LPCWSTR pszSrc)
     return CreateIStringW(pszSrc);
 }
 
-STDMETHODIMP_(IXmlDoc *) SouiFactory::CreateXmlDoc(THIS)
+IXmlDoc * SouiFactory::CreateXmlDoc(THIS)
 {
     return CreateIXmlDoc();
 }

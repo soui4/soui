@@ -586,3 +586,14 @@ BOOL IsWindow(HWND hWnd){
 void DestroyWindow(HWND hwnd){
     
 }
+
+HDC GetDC(HWND hWnd){
+    return 0;
+}
+void ReleaseDC(HWND hwnd,HDC hdc){
+
+}
+
+int GetSystemMetrics(int nIndex){
+    return 0;
+}

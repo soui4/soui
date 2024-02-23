@@ -135,4 +135,82 @@ typedef SCROLLINFO CONST FAR *LPCSCROLLINFO;
 #define NM_CUSTOMTEXT           (NM_FIRST-24)   // uses NMCUSTOMTEXT struct
 #define NM_TVSTATEIMAGECHANGING (NM_FIRST-24)   // uses NMTVSTATEIMAGECHANGING struct, defined after HTREEITEM
 
+
+/*
+ * MEASUREITEMSTRUCT for ownerdraw
+ */
+typedef struct tagMEASUREITEMSTRUCT {
+    UINT       CtlType;
+    UINT       CtlID;
+    UINT       itemID;
+    UINT       itemWidth;
+    UINT       itemHeight;
+    ULONG_PTR  itemData;
+} MEASUREITEMSTRUCT, NEAR *PMEASUREITEMSTRUCT, FAR *LPMEASUREITEMSTRUCT;
+
+/*
+ * DRAWITEMSTRUCT for ownerdraw
+ */
+typedef struct tagDRAWITEMSTRUCT {
+    UINT        CtlType;
+    UINT        CtlID;
+    UINT        itemID;
+    UINT        itemAction;
+    UINT        itemState;
+    HWND        hwndItem;
+    HDC         hDC;
+    RECT        rcItem;
+    ULONG_PTR   itemData;
+} DRAWITEMSTRUCT, NEAR *PDRAWITEMSTRUCT, FAR *LPDRAWITEMSTRUCT;
+
+/*
+ * DELETEITEMSTRUCT for ownerdraw
+ */
+typedef struct tagDELETEITEMSTRUCT {
+    UINT       CtlType;
+    UINT       CtlID;
+    UINT       itemID;
+    HWND       hwndItem;
+    ULONG_PTR  itemData;
+} DELETEITEMSTRUCT, NEAR *PDELETEITEMSTRUCT, FAR *LPDELETEITEMSTRUCT;
+
+/*
+ * COMPAREITEMSTUCT for ownerdraw sorting
+ */
+typedef struct tagCOMPAREITEMSTRUCT {
+    UINT        CtlType;
+    UINT        CtlID;
+    HWND        hwndItem;
+    UINT        itemID1;
+    ULONG_PTR   itemData1;
+    UINT        itemID2;
+    ULONG_PTR   itemData2;
+    DWORD       dwLocaleId;
+} COMPAREITEMSTRUCT, NEAR *PCOMPAREITEMSTRUCT, FAR *LPCOMPAREITEMSTRUCT;
+
+
+typedef struct tagTEXTMETRIC
+{
+    LONG        tmHeight;
+    LONG        tmAscent;
+    LONG        tmDescent;
+    LONG        tmInternalLeading;
+    LONG        tmExternalLeading;
+    LONG        tmAveCharWidth;
+    LONG        tmMaxCharWidth;
+    LONG        tmWeight;
+    LONG        tmOverhang;
+    LONG        tmDigitizedAspectX;
+    LONG        tmDigitizedAspectY;
+    BYTE        tmFirstChar;
+    BYTE        tmLastChar;
+    BYTE        tmDefaultChar;
+    BYTE        tmBreakChar;
+    BYTE        tmItalic;
+    BYTE        tmUnderlined;
+    BYTE        tmStruckOut;
+    BYTE        tmPitchAndFamily;
+    BYTE        tmCharSet;
+} TEXTMETRIC, *PTEXTMETRIC, NEAR *NPTEXTMETRIC, FAR *LPTEXTMETRIC;
+
 #endif
