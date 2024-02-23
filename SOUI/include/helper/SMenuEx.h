@@ -1,7 +1,7 @@
 ﻿#ifndef __SMENUEX__H__
 #define __SMENUEX__H__
 
-#include <core/shostwnd.h>
+#include <core/SHostWnd.h>
 #include <interface/smenuex-i.h>
 
 SNSBEGIN

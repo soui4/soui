@@ -11,6 +11,8 @@ SNSBEGIN
 
 class SNativeWnd : public TObjRefImpl<INativeWnd> {
   public:
+  	static BOOL InitWndClass(HINSTANCE hInst,LPCTSTR pszHostClassName,BOOL bImeApp);
+  public:
     SNativeWnd();
     virtual ~SNativeWnd(void);
 

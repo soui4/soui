@@ -12,6 +12,19 @@ typedef struct tagNMHDR
 typedef NMHDR FAR * LPNMHDR;
 
 
+/*
+ * Scroll bar messages
+ */
+#define SBM_SETPOS                  0x00E0 /*not in win3.1 */
+#define SBM_GETPOS                  0x00E1 /*not in win3.1 */
+#define SBM_SETRANGE                0x00E2 /*not in win3.1 */
+#define SBM_SETRANGEREDRAW          0x00E6 /*not in win3.1 */
+#define SBM_GETRANGE                0x00E3 /*not in win3.1 */
+#define SBM_ENABLE_ARROWS           0x00E4 /*not in win3.1 */
+#define SBM_SETSCROLLINFO           0x00E9
+#define SBM_GETSCROLLINFO           0x00EA
+#define SBM_GETSCROLLBARINFO        0x00EB
+
 #define SIF_RANGE           0x0001
 #define SIF_PAGE            0x0002
 #define SIF_POS             0x0004

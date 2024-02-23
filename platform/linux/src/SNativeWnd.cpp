@@ -4,6 +4,10 @@
 
 SNSBEGIN
 
+BOOL SNativeWnd::InitWndClass(HINSTANCE hInst,LPCTSTR pszHostClassName,BOOL bImeApp){
+    return TRUE;
+}
+
 SNativeWnd::SNativeWnd():m_hWnd(0),mConnection(nullptr),mScreen(nullptr),m_gc(0){
 
 }

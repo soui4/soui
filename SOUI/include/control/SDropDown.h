@@ -16,7 +16,7 @@
  */
 #ifndef __SDROPDOWN__H__
 #define __SDROPDOWN__H__
-#include "core/shostwnd.h"
+#include <core/SHostWnd.h>
 
 SNSBEGIN
 

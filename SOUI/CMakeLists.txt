@@ -18,18 +18,11 @@ source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("SoUI Resource" FILES ${CURRENT_UIRES})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
-if (CMAKE_SYSTEM_NAME MATCHES Windows)
-set(source ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
-else()
-file(GLOB SRC_ROOT src/*.cpp)
-file(GLOB_RECURSE SRC_VALUEANI src/valueAnimator/*.cpp)
-set(SRC_TEST 
-    src/test.cpp
-)
-source_group("src_root" FILES ${SRC_ROOT})
-set(source ${CURRENT_HEADERS} ${SRC_TEST} )
-endif()
+# 添加 -fpermissive 选项到 C++ 编译器标志
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fpermissive")
 
+set(source ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
 
 if (NOT ENABLE_SOUI_CORE_LIB)
 

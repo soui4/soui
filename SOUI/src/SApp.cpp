@@ -136,7 +136,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SCaption>();
     objFactory->TplRegisterFactory<STabCtrl>();
     objFactory->TplRegisterFactory<STabPage>();
-    objFactory->TplRegisterFactory<SActiveX>();
+
     objFactory->TplRegisterFactory<SSplitPane>();
     objFactory->TplRegisterFactory<SSplitWnd>();
     objFactory->TplRegisterFactory<SSplitWnd_Col>();
@@ -147,23 +147,26 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SHeaderCtrl>();
     objFactory->TplRegisterFactory<SListCtrl>();
     objFactory->TplRegisterFactory<SListBox>();
-    objFactory->TplRegisterFactory<SRichEdit>();
-    objFactory->TplRegisterFactory<SEdit>();
     objFactory->TplRegisterFactory<SHotKeyCtrl>();
-    objFactory->TplRegisterFactory<SComboEdit>();
-    objFactory->TplRegisterFactory<SComboBox>();
     objFactory->TplRegisterFactory<SSpinButtonCtrl>();
     objFactory->TplRegisterFactory<SListView>();
-    objFactory->TplRegisterFactory<SComboView>();
     objFactory->TplRegisterFactory<SMCListView>();
     objFactory->TplRegisterFactory<STileView>();
     objFactory->TplRegisterFactory<STreeView>();
-    objFactory->TplRegisterFactory<SMenuBar>();
     objFactory->TplRegisterFactory<SCalendar>();
     objFactory->TplRegisterFactory<SDateTimePicker>();
     objFactory->TplRegisterFactory<SFrame>();
     objFactory->TplRegisterFactory<SStackView>();
     objFactory->TplRegisterFactory<SStackPage>();
+#ifdef _WIN32
+    objFactory->TplRegisterFactory<SMenuBar>();
+    objFactory->TplRegisterFactory<SRichEdit>();
+    objFactory->TplRegisterFactory<SEdit>();
+    objFactory->TplRegisterFactory<SComboEdit>();
+    objFactory->TplRegisterFactory<SComboBox>();
+    objFactory->TplRegisterFactory<SComboView>();
+    objFactory->TplRegisterFactory<SActiveX>();
+#endif//_WIN32
 }
 
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
@@ -269,10 +272,12 @@ void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, 
     m_pSingletons[SWindowMgr::GetType()] = new SWindowMgr();
     m_pSingletons[STimerGenerator::GetType()] = new STimerGenerator();
     m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
+    m_pSingletons[SHostMgr::GetType()] = new SHostMgr();
+    #ifdef _WIN32
     m_pSingletons[STextServiceHelper::GetType()] = new STextServiceHelper();
     m_pSingletons[SRicheditMenuDef::GetType()] = new SRicheditMenuDef();
-    m_pSingletons[SHostMgr::GetType()] = new SHostMgr();
-}
+    #endif//_WIN32
+ }
 
 #define DELETE_SINGLETON(x)                  \
     delete (x *)m_pSingletons[x::GetType()]; \
@@ -283,9 +288,11 @@ void SApplication::_DestroySingletons()
     if (m_pSingletons[SNotifyCenter::GetType()])
         DELETE_SINGLETON(SNotifyCenter);
 
-    DELETE_SINGLETON(SHostMgr);
+#ifdef _WIN32    
     DELETE_SINGLETON(SRicheditMenuDef);
     DELETE_SINGLETON(STextServiceHelper);
+#endif//_WIN32
+    DELETE_SINGLETON(SHostMgr);
     DELETE_SINGLETON(SWindowFinder);
     DELETE_SINGLETON(SUiDef);
     DELETE_SINGLETON(STimerGenerator);
@@ -471,6 +478,7 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
         }
     }
     // load edit context menu
+    #ifdef _WIN32
     {
         SXmlDoc xmlDoc;
         if (_LoadXmlDocment(_T("SYS_XML_EDITMENU"), _T("XML"), xmlDoc, pResProvider))
@@ -482,6 +490,7 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
             uRet |= 0x02;
         }
     }
+    #endif//_WIN32
     // load messagebox template
     {
         SXmlDoc xmlDoc;
