@@ -23,7 +23,7 @@
 #pragma once
 
 #include "SAxUtil.h"
-#include "atl.mini/scomcli.h"
+#include <atl.mini/SComCli.h>
 #include <MsHtmHst.h>
 
 SNSBEGIN

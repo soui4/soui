@@ -3,6 +3,7 @@
 
 #include <interface/sinterpolator-i.h>
 #include <helper/obj-ref-impl.hpp>
+#include <sobject/Sobject.hpp>
 
 SNSBEGIN
 

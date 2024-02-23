@@ -1,5 +1,6 @@
-﻿#include "souistd.h"
+﻿#ifdef _WIN32
 
+#include "souistd.h"
 #include "activex/SBStr.h"
 
 SNSBEGIN
@@ -83,3 +84,5 @@ size_t sbstr::ByteLength() const
 }
 
 SNSEND
+
+#endif//_WIN32

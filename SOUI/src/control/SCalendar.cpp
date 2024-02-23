@@ -217,7 +217,7 @@ SStringT SCalendarCore::FormatYear(WORD iYear)
 
 SStringT SCalendarCore::FormatMonth(WORD iMonth)
 {
-    TCHAR szText[][5] = { _T("一"), _T("二"), _T("三"), _T("四"), _T("五"), _T("六"), _T("七"), _T("八"), _T("九"), _T("十"), _T("十一"), _T("十二") };
+    TCHAR szText[][7] = { _T("一"), _T("二"), _T("三"), _T("四"), _T("五"), _T("六"), _T("七"), _T("八"), _T("九"), _T("十"), _T("十一"), _T("十二") };
     SASSERT(iMonth <= 12 && iMonth >= 1);
     return szText[iMonth - 1];
 }
@@ -286,7 +286,7 @@ void SCalendar::Init()
     m_pSkinNext = NULL;
     m_showType = SHOW_MONTH;
 
-    TCHAR sztext[][3] = { _T("日"), _T("一"), _T("二"), _T("三"), _T("四"), _T("五"), _T("六") };
+    TCHAR sztext[][4] = { _T("日"), _T("一"), _T("二"), _T("三"), _T("四"), _T("五"), _T("六") };
     for (int i = 0; i < 7; i++)
     {
         m_strWeek[i].SetText(sztext[i]);

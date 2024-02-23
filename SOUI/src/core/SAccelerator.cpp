@@ -3,7 +3,7 @@
 
 SNSBEGIN
 
-SAccelerator::SAccelerator(UINT vKey, bool bCtrl, bool bAlt, bool bShift)
+SAccelerator::SAccelerator(WORD vKey, bool bCtrl, bool bAlt, bool bShift)
     : m_wVK(vKey)
     , m_wModifier(0)
 {

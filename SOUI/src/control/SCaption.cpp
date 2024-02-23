@@ -10,6 +10,7 @@
  *
  * Describe    此类完成标题栏控件
  */
+#ifdef _WIN32
 #include "souistd.h"
 #include "control/SCaption.h"
 
@@ -102,3 +103,5 @@ BOOL SCaption::IsSuppotMaxMove()
 }
 
 SNSEND
+
+#endif//_WIN32

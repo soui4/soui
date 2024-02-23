@@ -80,6 +80,30 @@ inline void wcscpy_s(wchar_t* destination,  size_t num, const wchar_t* source)
     destination[num - 1] = L'\0'; 
 }
 
+inline float _wtof(const wchar_t *src){
+    wchar_t* endptr;
+    double value = wcstod(src, &endptr);
+    if (src == endptr) {
+        return 0.0;
+    } else {
+        return value;
+    }
+}
+
+inline const char *CharNext(const char* src){
+    return (const char*)_mbsinc((const uint8_t*)src);
+}
+
+#ifdef _UNICODE
+#define _tcsncmp wcsncmp
+#define _tcslen wcslen
+#define _ttoi  wcstol
+#else
+#define _tcsncmp strncmp
+#define _tcslen strlen
+#define _ttoi atoi
+#endif
+
 #define _wcsicmp(s1,s2) wcscasecmp(s1,s2)
 
 #define CP_ACP 0

@@ -36,6 +36,8 @@ int WideCharToMultiByte(int cp,int flags,const wchar_t* src,int len,char * dst,i
 BOOL StrToInt64ExW(const wchar_t *str, DWORD flags, LONGLONG *ret);
 BOOL StrToIntExW(const wchar_t *str, DWORD flags, INT *ret);
 
+void GetLocalTime(SYSTEMTIME *pSysTime);
+
 void DestroyIcon(HICON hIcon);
 void GetWindowRect(HWND hWnd,RECT *rc);
 int  GetWindowScale(HWND hWnd);
@@ -51,4 +53,7 @@ void ReleaseDC(HWND hwnd,HDC hdc);
 
 int GetSystemMetrics(int nIndex);
 
+void SetCursor(HCURSOR hCursor);
+BOOL ShellExecute(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters,
+    LPCSTR lpDirectory, INT nShowCmd);
 #endif

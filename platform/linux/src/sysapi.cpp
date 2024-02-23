@@ -146,6 +146,19 @@ BOOL StrToIntExW(const wchar_t *str, DWORD flags, INT *ret)
     return res;
 }
 
+
+void GetLocalTime(SYSTEMTIME *pSysTime){
+    struct tm * now = localtime(nullptr);
+    pSysTime->wYear = now->tm_year;
+    pSysTime->wMonth = now->tm_mon;
+    pSysTime->wDayOfWeek = now->tm_wday;
+    pSysTime->wDay = now->tm_mday;
+    pSysTime->wHour = now->tm_hour;
+    pSysTime->wMinute = now->tm_min;
+    pSysTime->wSecond = now->tm_sec;
+    pSysTime->wMilliseconds = 0;//todo:hjx
+}
+
 static inline BOOL is_valid_hex(WCHAR c)
 {
     if (!(((c >= '0') && (c <= '9'))  ||
@@ -596,4 +609,13 @@ void ReleaseDC(HWND hwnd,HDC hdc){
 
 int GetSystemMetrics(int nIndex){
     return 0;
+}
+
+void SetCursor(HCURSOR hCursor){
+
+}
+
+BOOL ShellExecute(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters,
+    LPCSTR lpDirectory, INT nShowCmd){
+    return FALSE;
 }
