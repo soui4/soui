@@ -671,7 +671,7 @@ class CSTree {
             node->hPrevSibling = NULL;
             node = (HSTREENODE)pChilds[nChilds - 1];
             node->hNextSibling = NULL;
-            if (hItem != STVL_ROOT)
+            if (hItem != STVI_ROOT)
             {
                 HSTREENODE parent = (HSTREENODE)hItem;
                 parent->hChildFirst = (HSTREENODE)pChilds[0];

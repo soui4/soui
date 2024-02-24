@@ -45,13 +45,19 @@ BOOL SDropTargetDispatcher::UnregisterDragDrop(SWND swnd)
     return TRUE;
 }
 
+#ifdef _WIN32
+#define __uuidofsys __uuidof
+#else
+#define __uuidofsys __suidof
+#endif
+
 HRESULT SDropTargetDispatcher::QueryInterface(/* [in] */ REFIID riid,
                                                                 /* [iid_is][out] */ void  * *ppvObject)
 {
     HRESULT hr = S_FALSE;
-    if (riid == __suidof(IUnknown))
+    if (riid == __uuidofsys(IUnknown))
         *ppvObject = (IUnknown *)this, hr = S_OK;
-    else if (riid == __suidof(IDropTarget))
+    else if (riid == __uuidofsys(IDropTarget))
         *ppvObject = (IDropTarget *)this, hr = S_OK;
     return hr;
 }
