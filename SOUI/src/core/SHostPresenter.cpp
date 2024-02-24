@@ -26,6 +26,7 @@ void SHostPresenter::OnHostResize(THIS_ SIZE szHost)
 
 void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT rcInvalid, BYTE byAlpha)
 {
+    #ifdef _WIN32
     if (m_pHostWnd->IsTranslucent())
     {
         UpdateLayerFromRenderTarget(pMemRT, byAlpha, rcInvalid);
@@ -41,21 +42,24 @@ void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT
         if (bGetDC)
             m_pHostWnd->ReleaseDC(hdc);
     }
+    #endif//_WIN32
 }
 
 void SHostPresenter::OnHostAlpha(THIS_ BYTE byAlpha)
 {
+    #ifdef _WIN32
     ::SetLayeredWindowAttributes(m_pHostWnd->GetHwnd(), 0, byAlpha, LWA_ALPHA);
+    #endif//_WIN32
 }
 
 void SHostPresenter::UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlpha, LPCRECT prcDirty)
 {
+    #ifdef _WIN32
     CRect rc;
     m_pHostWnd->GetWindowRect(&rc);
     CRect rcDirty = prcDirty ? (*prcDirty) : CRect(0, 0, rc.Width(), rc.Height());
     BLENDFUNCTION bf = { AC_SRC_OVER, 0, byAlpha, AC_SRC_ALPHA };
 
-    //注意：下面这几个参数不能直接在info参数里直接使用&rc.Size()，否则会被编译器优化掉，导致参数错误
     CPoint ptDst = rc.TopLeft();
     CSize szDst = rc.Size();
     CPoint ptSrc;
@@ -64,6 +68,7 @@ void SHostPresenter::UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlph
     S_UPDATELAYEREDWINDOWINFO info = { sizeof(info), NULL, &ptDst, &szDst, hdc, &ptSrc, 0, &bf, ULW_ALPHA, &rcDirty };
     SWndSurface::SUpdateLayeredWindowIndirect(m_pHostWnd->GetHwnd(), &info);
     pRT->ReleaseDC(hdc, NULL);
+    #endif//_WIN32
 }
 
 SNSEND

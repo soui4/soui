@@ -8,9 +8,10 @@
 #include "helper/SplitString.h"
 #include "helper/STime.h"
 #include <helper/SHostMgr.h>
+#ifdef _WIN32
 #include <Imm.h>
 #pragma comment(lib, "imm32.lib")
-
+#endif
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -398,7 +399,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     SASSERT(pNode);
     if (pNode->Empty())
     {
-        SASSERT_FMTA(FALSE, "Null XML node");
+        SASSERT_FMTA(FALSE, "Null XML node",0);
         return FALSE;
     }
     if (!SNativeWnd::IsWindow())
@@ -551,6 +552,8 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 
     if (m_hostAttr.m_bTranslucent)
     {
+        //todo:hjx
+        #ifdef _WIN32
         if (!m_dummyWnd)
         {
             SetWindowLongPtr(GWL_EXSTYLE, GetWindowLongPtr(GWL_EXSTYLE) | WS_EX_LAYERED);
@@ -567,6 +570,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
                 m_dummyWnd->ShowWindow(SW_SHOWNOACTIVATE);
             }
         }
+        #endif//_WIN32
     }
     else if (dwExStyle & WS_EX_LAYERED || GetRoot()->GetAlpha() != 0xFF)
     {
@@ -576,7 +580,10 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         }
         if (!(dwExStyle & WS_EX_LAYERED))
             ModifyStyleEx(0, WS_EX_LAYERED);
+        //todo:hjx
+        #ifdef _WIN32
         ::SetLayeredWindowAttributes(m_hWnd, 0, GetRoot()->GetAlpha(), LWA_ALPHA);
+        #endif//_WIN32
     }
     m_memRT = NULL;
     if (m_hostAttr.m_bTranslucent)
@@ -1239,6 +1246,7 @@ static BOOL _BitBlt(IRenderTarget *pRTDst, IRenderTarget *pRTSrc, CRect rcDst, C
 
 BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
 {
+    #ifdef _WIN32
     if (!IsTranslucent())
     {
         return ::AnimateWindow(m_hWnd, dwTime, dwFlags);
@@ -1433,6 +1441,10 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
         }
         return FALSE;
     }
+    #else
+    //todo:hjx
+    return FALSE;
+    #endif
 }
 
 BOOL SHostWnd::RegisterTimelineHandler(ITimelineHandler *pHandler)
@@ -1564,10 +1576,12 @@ void SHostWnd::OnCaptureChanged(HWND wnd)
         return;
     if (wnd != NULL)
     { //如果当前响应了鼠标按下消息，在lost capture时也应该响应弹起消息
+    #ifdef _WIN32
         TCHAR szClassName[30];
         ::GetClassName(wnd, szClassName, 30);
         if (_tcscmp(szClassName, _T("CLIPBRDWNDCLASS")) == 0)
             return; //在窗口内拖动时也可能产生capturechange消息。
+    #endif//_WIN32
     }
     _RestoreClickState();
 }
@@ -1783,6 +1797,7 @@ void SHostWnd::UpdateAutoSizeCount(bool bInc)
 
 void SHostWnd::EnableIME(BOOL bEnable)
 {
+    #ifdef _WIN32
     if (bEnable)
     {
         HIMC hImc = ImmGetContext(m_hWnd);
@@ -1801,6 +1816,7 @@ void SHostWnd::EnableIME(BOOL bEnable)
             ImmDestroyContext(hImc);
         }
     }
+    #endif
 }
 
 void SHostWnd::OnUpdateCursor()

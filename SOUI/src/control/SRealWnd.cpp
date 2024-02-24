@@ -1,5 +1,5 @@
 ﻿#include <souistd.h>
-#include <control/Srealwnd.h>
+#include <control/SRealWnd.h>
 #include <interface/SRealWndHandler-i.h>
 
 SNSBEGIN
@@ -91,7 +91,7 @@ BOOL SRealWnd::InitRealWnd()
             //如果不是在加载的时候创建窗口，则需要自动调整窗口位置
             CRect rcClient;
             GetClientRect(&rcClient);
-            SetWindowPos(m_hRealWnd, 0, rcClient.left, rcClient.top, rcClient.Width(), rcClient.Height(), SWP_NOZORDER);
+            ::SetWindowPos(m_hRealWnd, 0, rcClient.left, rcClient.top, rcClient.Width(), rcClient.Height(), SWP_NOZORDER);
         }
 
         if (pRealWndHandler)

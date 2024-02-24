@@ -2,9 +2,10 @@
 #define __SSKINOBJBASE__H__
 
 #include <interface/SSkinobj-i.h>
+#include <interface/sxml-i.h>
 #include <helper/obj-ref-impl.hpp>
+#include <sobject/Sobject.hpp>
 #include <souicoll.h>
-#include <core/SWnd.h>
 
 SNSBEGIN
 //////////////////////////////////////////////////////////////////////////

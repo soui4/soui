@@ -1,9 +1,13 @@
 ﻿#ifndef __SLISTVIEW__H__
 #define __SLISTVIEW__H__
 
-#include "core/SItemPanel.h"
-#include "interface/SAdapter-i.h"
-#include "interface/SListViewItemLocator-i.h"
+#include <core/SPanel.h>
+#include <core/SItemPanel.h>
+#include <interface/SAdapter-i.h>
+#include <interface/SListViewItemLocator-i.h>
+#include <proxy/SPanelProxy.h>
+
+
 SNSBEGIN
 
 class SOUI_EXP SListView

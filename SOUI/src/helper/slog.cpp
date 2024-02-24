@@ -19,6 +19,7 @@ void Log::DefCallback(const char *tag, const char *pLogStr, int level, const cha
     }
     if (!bLog || Log::s_enableEcho)
     {
+        #ifdef _WIN32
         SYSTEMTIME wtm;
         GetLocalTime(&wtm);
         const int kMaxLog = Log::MAX_LOGLEN + 100;
@@ -30,6 +31,7 @@ void Log::DefCallback(const char *tag, const char *pLogStr, int level, const cha
         logbuf2[nLen] = 0;
         OutputDebugStringA(logbuf2);
         free(logbuf2);
+        #endif//_WIN32
     }
 }
 
@@ -61,6 +63,7 @@ Log::~Log()
     }
     else if (s_enableEcho)
     {
+        #ifdef _WIN32
         SYSTEMTIME wtm;
         GetLocalTime(&wtm);
         const int kMaxLog = Log::MAX_LOGLEN + 100;
@@ -71,6 +74,7 @@ Log::~Log()
         logbuf2[nLen] = 0;
         OutputDebugStringA(logbuf2);
         free(logbuf2);
+        #endif//_WIN32
     }
 }
 

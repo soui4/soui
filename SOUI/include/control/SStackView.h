@@ -1,6 +1,9 @@
 ﻿#ifndef __SSTACKVIEW__H__
 #define __SSTACKVIEW__H__
 #include <valueAnimator/SValueAnimator.h>
+#include <interface/SCtrl-i.h>
+#include <core/SWnd.h>
+#include <proxy/SWindowProxy.h>
 
 SNSBEGIN
 

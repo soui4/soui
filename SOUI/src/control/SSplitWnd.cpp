@@ -97,8 +97,8 @@ void SSplitWnd::OnPaint(IRenderTarget *pRT)
     else
         rcSep.bottom = rcSep.top;
 
-    long &RB = (m_orintation == Vertical) ? rcSep.right : rcSep.bottom;
-    long &LT = (m_orintation == Vertical) ? rcSep.left : rcSep.top;
+    LONG &RB = (m_orintation == Vertical) ? rcSep.right : rcSep.bottom;
+    LONG &LT = (m_orintation == Vertical) ? rcSep.left : rcSep.top;
 
     for (int i = 0; i < (int)m_lstPane.GetCount() - 1; i++)
     {

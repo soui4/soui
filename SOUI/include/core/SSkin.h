@@ -5,6 +5,7 @@
 #include <layout/SLayoutSize.h>
 #include <helper/SplitString.h>
 #include <matrix/SPoint.h>
+#include <sobject/Sobject.hpp>
 
 SNSBEGIN
 
@@ -606,8 +607,8 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
 class SOUI_EXP SSKinGroup : public SSkinObjBase {
     DEF_SOBJECT(SSkinObjBase, L"group")
   public:
-    STDMETHOD_(SIZE, GetSkinSize)(THIS) SCONST OVERRIDE;
-    STDMETHOD_(int, GetStates)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(SIZE, GetSkinSize)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(int, GetStates)(CTHIS) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"normal", m_skins[0], FALSE)

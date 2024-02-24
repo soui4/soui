@@ -3,8 +3,8 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "souistd.h"
-#include "core/Swndstyle.h"
-#include "core/Swnd.h"
+#include "core/SWndStyle.h"
+#include "core/SWnd.h"
 #include "helper/SplitString.h"
 
 SNSBEGIN

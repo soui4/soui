@@ -5,7 +5,7 @@
 //     Version: 2012.12.18 - 1.0 - Create
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
-#include "control/Slistbox.h"
+#include <control/SListbox.h>
 
 #pragma warning(disable : 4018)
 #pragma warning(disable : 4267)

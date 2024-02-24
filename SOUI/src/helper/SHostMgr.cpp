@@ -1,5 +1,5 @@
-#include <include\souistd.h>
-#include <helper\SHostMgr.h>
+#include <include/souistd.h>
+#include <helper/SHostMgr.h>
 
 SNSBEGIN
 SHostMgr::SHostMgr(void)

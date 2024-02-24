@@ -1,6 +1,6 @@
 ﻿#include "souistd.h"
-#include <helper/swndfinder.h>
-#include <core/Swnd.h>
+#include <helper/SwndFinder.h>
+#include <core/SWnd.h>
 
 SNSBEGIN
 

@@ -2290,6 +2290,7 @@ DECLARE_INTERFACE_(IDateTimePicker, ICtrl)
 
 typedef int(__cdecl *FunTreeSortCallback)(void *pCtx, const void *phItem1, const void *phItem2);
 
+#ifndef STVI_ROOT
 #ifdef _WIN64
 #define STVI_ROOT  ((HSTREEITEM)0xFFFF000000000000) //=TVI_ROOT
 #define STVI_FIRST ((HSTREEITEM)0xFFFF000000000001) //=TVI_FIRST
@@ -2299,6 +2300,7 @@ typedef int(__cdecl *FunTreeSortCallback)(void *pCtx, const void *phItem1, const
 #define STVI_FIRST ((HSTREEITEM)0xFFFF0001) //=TVI_FIRST
 #define STVI_LAST  ((HSTREEITEM)0xFFFF0002) //=TVI_LAST
 #endif
+#endif//STVI_ROOT
 
 #undef INTERFACE
 #define INTERFACE ITreeCtrl

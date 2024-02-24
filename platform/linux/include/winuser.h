@@ -1183,4 +1183,360 @@ typedef struct tagCREATESTRUCT {
 #define DI_COMPAT       0x0004
 #define DI_DEFAULTSIZE  0x0008
 
+#define MONITOR_DEFAULTTONULL       0x00000000
+#define MONITOR_DEFAULTTOPRIMARY    0x00000001
+#define MONITOR_DEFAULTTONEAREST    0x00000002
+
+typedef struct tagMONITORINFO
+{
+    DWORD   cbSize;
+    RECT    rcMonitor;
+    RECT    rcWork;
+    DWORD   dwFlags;
+} MONITORINFO, *LPMONITORINFO;
+
+#define HWND_TOP        ((HWND)0)
+#define HWND_BOTTOM     ((HWND)1)
+#define HWND_TOPMOST    ((HWND)-1)
+#define HWND_NOTOPMOST  ((HWND)-2)
+#define HWND_MESSAGE    ((HWND)-3)
+
+#define SWP_NOSIZE          0x0001
+#define SWP_NOMOVE          0x0002
+#define SWP_NOZORDER        0x0004
+#define SWP_NOREDRAW        0x0008
+#define SWP_NOACTIVATE      0x0010
+#define SWP_FRAMECHANGED    0x0020  /* The frame changed: send WM_NCCALCSIZE */
+#define SWP_SHOWWINDOW      0x0040
+#define SWP_HIDEWINDOW      0x0080
+#define SWP_NOCOPYBITS      0x0100
+#define SWP_NOOWNERZORDER   0x0200  /* Don't do owner Z ordering */
+#define SWP_NOSENDCHANGING  0x0400  /* Don't send WM_WINDOWPOSCHANGING */
+
+#define SWP_DRAWFRAME       SWP_FRAMECHANGED
+#define SWP_NOREPOSITION    SWP_NOOWNERZORDER
+
+
+#define MAKEWPARAM(l, h)      ((WPARAM)(DWORD)MAKELONG(l, h))
+#define MAKELPARAM(l, h)      ((LPARAM)(DWORD)MAKELONG(l, h))
+
+#define LWA_COLORKEY            0x00000001
+#define LWA_ALPHA               0x00000002
+
+//todo:hjx
+#define MAKEINTRESOURCE(x) #x
+#define IDC_ARROW           MAKEINTRESOURCE(32512)
+#define IDC_IBEAM           MAKEINTRESOURCE(32513)
+#define IDC_WAIT            MAKEINTRESOURCE(32514)
+#define IDC_CROSS           MAKEINTRESOURCE(32515)
+#define IDC_UPARROW         MAKEINTRESOURCE(32516)
+#define IDC_SIZE            MAKEINTRESOURCE(32640)  /* OBSOLETE: use IDC_SIZEALL */
+#define IDC_ICON            MAKEINTRESOURCE(32641)  /* OBSOLETE: use IDC_ARROW */
+#define IDC_SIZENWSE        MAKEINTRESOURCE(32642)
+#define IDC_SIZENESW        MAKEINTRESOURCE(32643)
+#define IDC_SIZEWE          MAKEINTRESOURCE(32644)
+#define IDC_SIZENS          MAKEINTRESOURCE(32645)
+#define IDC_SIZEALL         MAKEINTRESOURCE(32646)
+#define IDC_NO              MAKEINTRESOURCE(32648) /*not in win3.1 */
+#define IDC_HAND            MAKEINTRESOURCE(32649)
+#define IDC_APPSTARTING     MAKEINTRESOURCE(32650) /*not in win3.1 */
+#define IDC_HELP            MAKEINTRESOURCE(32651)
+
+
+#define WH_MIN              (-1)
+#define WH_MSGFILTER        (-1)
+#define WH_JOURNALRECORD    0
+#define WH_JOURNALPLAYBACK  1
+#define WH_KEYBOARD         2
+#define WH_GETMESSAGE       3
+#define WH_CALLWNDPROC      4
+#define WH_CBT              5
+#define WH_SYSMSGFILTER     6
+#define WH_MOUSE            7
+
+
+#define TPM_LEFTBUTTON  0x0000L
+#define TPM_RIGHTBUTTON 0x0002L
+#define TPM_LEFTALIGN   0x0000L
+#define TPM_CENTERALIGN 0x0004L
+#define TPM_RIGHTALIGN  0x0008L
+#define TPM_TOPALIGN        0x0000L
+#define TPM_VCENTERALIGN    0x0010L
+#define TPM_BOTTOMALIGN     0x0020L
+
+#define TPM_HORIZONTAL      0x0000L     /* Horz alignment matters more */
+#define TPM_VERTICAL        0x0040L     /* Vert alignment matters more */
+#define TPM_NONOTIFY        0x0080L     /* Don't send any notification msgs */
+#define TPM_RETURNCMD       0x0100L
+
+#define MSGF_DIALOGBOX      0
+#define MSGF_MESSAGEBOX     1
+#define MSGF_MENU           2
+#define MSGF_SCROLLBAR      5
+#define MSGF_NEXTWINDOW     6
+#define MSGF_MAX            8                       // unused
+#define MSGF_USER           4096
+
+
+#define MB_OK                       0x00000000L
+#define MB_OKCANCEL                 0x00000001L
+#define MB_ABORTRETRYIGNORE         0x00000002L
+#define MB_YESNOCANCEL              0x00000003L
+#define MB_YESNO                    0x00000004L
+#define MB_RETRYCANCEL              0x00000005L
+#if(WINVER >= 0x0500)
+#define MB_CANCELTRYCONTINUE        0x00000006L
+#endif /* WINVER >= 0x0500 */
+
+
+#define MB_ICONHAND                 0x00000010L
+#define MB_ICONQUESTION             0x00000020L
+#define MB_ICONEXCLAMATION          0x00000030L
+#define MB_ICONASTERISK             0x00000040L
+
+#define MB_USERICON                 0x00000080L
+#define MB_ICONWARNING              MB_ICONEXCLAMATION
+#define MB_ICONERROR                MB_ICONHAND
+
+#define MB_ICONINFORMATION          MB_ICONASTERISK
+#define MB_ICONSTOP                 MB_ICONHAND
+
+#define MB_DEFBUTTON1               0x00000000L
+#define MB_DEFBUTTON2               0x00000100L
+#define MB_DEFBUTTON3               0x00000200L
+#define MB_DEFBUTTON4               0x00000300L
+
+
+#define GWL_WNDPROC         (-4)
+#define GWL_HINSTANCE       (-6)
+#define GWL_HWNDPARENT      (-8)
+#define GWL_STYLE           (-16)
+#define GWL_EXSTYLE         (-20)
+#define GWL_USERDATA        (-21)
+#define GWL_ID              (-12)
+
+
+#define	DROPEFFECT_NONE	( 0 )
+
+#define	DROPEFFECT_COPY	( 1 )
+
+#define	DROPEFFECT_MOVE	( 2 )
+
+#define	DROPEFFECT_LINK	( 4 )
+
+#define	DROPEFFECT_SCROLL	( 0x80000000 )
+
+
+
+#define EVENT_OBJECT_FOCUS                  0x8005  // hwnd + ID + idChild is focused item
+#define EVENT_OBJECT_SELECTION              0x8006  // hwnd + ID + idChild is selected item (if only one), or idChild is OBJID_WINDOW if complex
+#define EVENT_OBJECT_SELECTIONADD           0x8007  // hwnd + ID + idChild is item added
+#define EVENT_OBJECT_SELECTIONREMOVE        0x8008  // hwnd + ID + idChild is item removed
+#define EVENT_OBJECT_SELECTIONWITHIN        0x8009  // hwnd + ID + idChild is parent of changed selected items
+
+/*
+ * NOTES:
+ * There is only one "focused" child item in a parent.  This is the place
+ * keystrokes are going at a given moment.  Hence only send a notification
+ * about where the NEW focus is going.  A NEW item getting the focus already
+ * implies that the OLD item is losing it.
+ *
+ * SELECTION however can be multiple.  Hence the different SELECTION
+ * notifications.  Here's when to use each:
+ *
+ * (1) Send a SELECTION notification in the simple single selection
+ *     case (like the focus) when the item with the selection is
+ *     merely moving to a different item within a container.  hwnd + ID
+ *     is the container control, idChildItem is the new child with the
+ *     selection.
+ *
+ * (2) Send a SELECTIONADD notification when a new item has simply been added
+ *     to the selection within a container.  This is appropriate when the
+ *     number of newly selected items is very small.  hwnd + ID is the
+ *     container control, idChildItem is the new child added to the selection.
+ *
+ * (3) Send a SELECTIONREMOVE notification when a new item has simply been
+ *     removed from the selection within a container.  This is appropriate
+ *     when the number of newly selected items is very small, just like
+ *     SELECTIONADD.  hwnd + ID is the container control, idChildItem is the
+ *     new child removed from the selection.
+ *
+ * (4) Send a SELECTIONWITHIN notification when the selected items within a
+ *     control have changed substantially.  Rather than propagate a large
+ *     number of changes to reflect removal for some items, addition of
+ *     others, just tell somebody who cares that a lot happened.  It will
+ *     be faster an easier for somebody watching to just turn around and
+ *     query the container control what the new bunch of selected items
+ *     are.
+ */
+
+#define EVENT_OBJECT_STATECHANGE            0x800A  // hwnd + ID + idChild is item w/ state change
+/*
+ * Examples of when to send an EVENT_OBJECT_STATECHANGE include
+ *      * It is being enabled/disabled (USER does for windows)
+ *      * It is being pressed/released (USER does for buttons)
+ *      * It is being checked/unchecked (USER does for radio/check buttons)
+ */
+#define EVENT_OBJECT_LOCATIONCHANGE         0x800B  // hwnd + ID + idChild is moved/sized item
+
+/*
+ * Note:
+ * A LOCATIONCHANGE is not sent for every child object when the parent
+ * changes shape/moves.  Send one notification for the topmost object
+ * that is changing.  For example, if the user resizes a top level window,
+ * USER will generate a LOCATIONCHANGE for it, but not for the menu bar,
+ * title bar, scrollbars, etc.  that are also changing shape/moving.
+ *
+ * In other words, it only generates LOCATIONCHANGE notifications for
+ * real windows that are moving/sizing.  It will not generate a LOCATIONCHANGE
+ * for every non-floating child window when the parent moves (the children are
+ * logically moving also on screen, but not relative to the parent).
+ *
+ * Now, if the app itself resizes child windows as a result of being
+ * sized, USER will generate LOCATIONCHANGEs for those dudes also because
+ * it doesn't know better.
+ *
+ * Note also that USER will generate LOCATIONCHANGE notifications for two
+ * non-window sys objects:
+ *      (1) System caret
+ *      (2) Cursor
+ */
+
+#define EVENT_OBJECT_NAMECHANGE             0x800C  // hwnd + ID + idChild is item w/ name change
+#define EVENT_OBJECT_DESCRIPTIONCHANGE      0x800D  // hwnd + ID + idChild is item w/ desc change
+#define EVENT_OBJECT_VALUECHANGE            0x800E  // hwnd + ID + idChild is item w/ value change
+#define EVENT_OBJECT_PARENTCHANGE           0x800F  // hwnd + ID + idChild is item w/ new parent
+#define EVENT_OBJECT_HELPCHANGE             0x8010  // hwnd + ID + idChild is item w/ help change
+#define EVENT_OBJECT_DEFACTIONCHANGE        0x8011  // hwnd + ID + idChild is item w/ def action change
+#define EVENT_OBJECT_ACCELERATORCHANGE      0x8012  // hwnd + ID + idChild is item w/ keybd accel change
+
+#define EVENT_OBJECT_INVOKED                0x8013  // hwnd + ID + idChild is item invoked
+#define EVENT_OBJECT_TEXTSELECTIONCHANGED   0x8014  // hwnd + ID + idChild is item w? test selection change
+
+/*
+ * EVENT_OBJECT_CONTENTSCROLLED
+ * Sent when ending the scrolling of a window object.
+ *
+ * Unlike the similar event (EVENT_SYSTEM_SCROLLEND), this event will be
+ * associated with the scrolling window itself. There is no difference
+ * between horizontal or vertical scrolling.
+ *
+ * This event should be posted whenever scroll action is completed, including
+ * when it is scrolled by scroll bars, mouse wheel, or keyboard navigations.
+ *
+ *   example:
+ *          hwnd == window that is scrolling
+ *          idObject == OBJID_CLIENT
+ *          idChild == CHILDID_SELF
+ */
+#define EVENT_OBJECT_CONTENTSCROLLED        0x8015
+
+#define EVENT_OBJECT_CREATE                 0x8000  // hwnd + ID + idChild is created item
+#define EVENT_OBJECT_DESTROY                0x8001  // hwnd + ID + idChild is destroyed item
+#define EVENT_OBJECT_SHOW                   0x8002  // hwnd + ID + idChild is shown item
+#define EVENT_OBJECT_HIDE                   0x8003  // hwnd + ID + idChild is hidden item
+#define EVENT_OBJECT_REORDER                0x8004  // hwnd + ID + idChild is parent of zordering children
+
+#define CHILDID_SELF 0
+
+#define ALTERNATE                    1
+#define WINDING                      2
+#define POLYFILL_LAST                2
+
+
+#define SC_SIZE         0xF000
+#define SC_MOVE         0xF010
+#define SC_MINIMIZE     0xF020
+#define SC_MAXIMIZE     0xF030
+#define SC_NEXTWINDOW   0xF040
+#define SC_PREVWINDOW   0xF050
+#define SC_CLOSE        0xF060
+#define SC_VSCROLL      0xF070
+#define SC_HSCROLL      0xF080
+#define SC_MOUSEMENU    0xF090
+#define SC_KEYMENU      0xF100
+#define SC_ARRANGE      0xF110
+#define SC_RESTORE      0xF120
+#define SC_TASKLIST     0xF130
+#define SC_SCREENSAVE   0xF140
+#define SC_HOTKEY       0xF150
+
+#define MAX_PATH        1000
+
+#pragma pack(push,1)
+typedef struct tagRGBQUAD {
+        BYTE    rgbBlue;
+        BYTE    rgbGreen;
+        BYTE    rgbRed;
+        BYTE    rgbReserved;
+} RGBQUAD;
+#pragma pack(pop)
+
+typedef RGBQUAD FAR* LPRGBQUAD;
+
+
+
+#define MF_BYCOMMAND        0x00000000L
+#define MF_BYPOSITION       0x00000400L
+
+#define MF_SEPARATOR        0x00000800L
+
+#define MF_ENABLED          0x00000000L
+#define MF_GRAYED           0x00000001L
+#define MF_DISABLED         0x00000002L
+
+#define MF_UNCHECKED        0x00000000L
+#define MF_CHECKED          0x00000008L
+#define MF_USECHECKBITMAPS  0x00000200L
+
+#define MF_STRING           0x00000000L
+#define MF_BITMAP           0x00000004L
+#define MF_OWNERDRAW        0x00000100L
+
+#define MF_POPUP            0x00000010L
+#define MF_MENUBARBREAK     0x00000020L
+#define MF_MENUBREAK        0x00000040L
+
+#define MF_UNHILITE         0x00000000L
+#define MF_HILITE           0x00000080L
+
+#if(WINVER >= 0x0400)
+#define MF_DEFAULT          0x00001000L
+#endif /* WINVER >= 0x0400 */
+#define MF_SYSMENU          0x00002000L
+#define MF_HELP             0x00004000L
+#if(WINVER >= 0x0400)
+#define MF_RIGHTJUSTIFY     0x00004000L
+#endif /* WINVER >= 0x0400 */
+
+#define MF_MOUSESELECT      0x00008000L
+#if(WINVER >= 0x0400)
+#define MF_END              0x00000080L  /* Obsolete -- only used by old RES files */
+#endif /* WINVER >= 0x0400 */
+
+
+#define FW_DONTCARE         0
+#define FW_THIN             100
+#define FW_EXTRALIGHT       200
+#define FW_LIGHT            300
+#define FW_NORMAL           400
+#define FW_MEDIUM           500
+#define FW_SEMIBOLD         600
+#define FW_BOLD             700
+#define FW_EXTRABOLD        800
+#define FW_HEAVY            900
+
+#define DEFAULT_QUALITY         0
+#define DRAFT_QUALITY           1
+#define PROOF_QUALITY           2
+#if(WINVER >= 0x0400)
+#define NONANTIALIASED_QUALITY  3
+#define ANTIALIASED_QUALITY     4
+#endif /* WINVER >= 0x0400 */
+
+#define CLEARTYPE_QUALITY       5
+#define CLEARTYPE_NATURAL_QUALITY       6
+
+#define IS_INTRESOURCE(_r) ((((ULONG_PTR)(_r)) >> 16) == 0)
+
 #endif//__WINUSER_H_

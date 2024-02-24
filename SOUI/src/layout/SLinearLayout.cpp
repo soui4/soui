@@ -1,6 +1,7 @@
 ﻿#include "souistd.h"
-#include "layout\SLinearLayout.h"
-#include "helper\SplitString.h"
+#include "layout/SLinearLayout.h"
+#include "helper/SplitString.h"
+#include <core/SWnd.h>
 
 SNSBEGIN
 
@@ -68,7 +69,7 @@ SLayoutSize SLinearLayoutParam::GetSpecifiedSize(ORIENTATION orientation) const
     case Any:
     case Both:
     default:
-        SASSERT_FMTA(FALSE, "GetSpecifiedSize can only be applied for Horz or Vert");
+        SASSERT_FMTA(FALSE, "GetSpecifiedSize can only be applied for Horz or Vert",0);
         return SLayoutSize();
     }
 }

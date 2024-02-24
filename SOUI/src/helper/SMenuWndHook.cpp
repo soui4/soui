@@ -12,12 +12,14 @@
 
 #include "souistd.h"
 #include "helper/SMenuWndHook.h"
-#include "res.mgr/Sskinpool.h"
-#include "core/Sskin.h"
+#include "res.mgr/SSkinPool.h"
+#include "core/SSkin.h"
 
 #ifdef _WIN64
 #define GWL_WNDPROC GWLP_WNDPROC
 #endif //_WIN64
+
+#ifdef _WIN32
 
 SNSBEGIN
 
@@ -337,3 +339,5 @@ void SMenuWndHook::OnWindowPosChanged()
 }
 
 SNSEND
+
+#endif//_WIN32

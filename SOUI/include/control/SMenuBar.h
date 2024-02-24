@@ -1,6 +1,7 @@
 ﻿#ifndef __SMENUBAR__H__
 #define __SMENUBAR__H__
 
+#include <core/SWnd.h>
 #include <helper/SMenu.h>
 
 SNSBEGIN

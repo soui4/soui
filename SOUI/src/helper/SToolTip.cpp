@@ -1,7 +1,8 @@
 ﻿#include "souistd.h"
-#include "helper\SToolTip.h"
+#include "helper/SToolTip.h"
 //增加对多显示器的支持
 #define COMPILE_MULTIMON_STUBS
+#ifdef _WIN32
 #include <multimon.h>
 
 SNSBEGIN
@@ -222,3 +223,5 @@ void STipCtrl::OnFinalMessage(HWND hWnd)
     delete this;
 }
 SNSEND
+
+#endif//_WIN32

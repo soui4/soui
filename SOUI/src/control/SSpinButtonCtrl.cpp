@@ -1,5 +1,5 @@
-﻿#include "include\souistd.h"
-#include "control\SSpinButtonCtrl.h"
+﻿#include "include/souistd.h"
+#include "control/SSpinButtonCtrl.h"
 
 SNSBEGIN
 SSpinButtonCtrl::SSpinButtonCtrl(void)

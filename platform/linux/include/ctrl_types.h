@@ -213,4 +213,65 @@ typedef struct tagTEXTMETRIC
     BYTE        tmCharSet;
 } TEXTMETRIC, *PTEXTMETRIC, NEAR *NPTEXTMETRIC, FAR *LPTEXTMETRIC;
 
+
+#define HDF_LEFT                0x0000 // Same as LVCFMT_LEFT
+#define HDF_RIGHT               0x0001 // Same as LVCFMT_RIGHT
+#define HDF_CENTER              0x0002 // Same as LVCFMT_CENTER
+#define HDF_JUSTIFYMASK         0x0003 // Same as LVCFMT_JUSTIFYMASK
+#define HDF_RTLREADING          0x0004 // Same as LVCFMT_LEFT
+
+#define HDF_BITMAP              0x2000
+#define HDF_STRING              0x4000
+#define HDF_OWNERDRAW           0x8000 // Same as LVCFMT_COL_HAS_IMAGES
+#define HDF_IMAGE               0x0800 // Same as LVCFMT_IMAGE
+#define HDF_BITMAP_ON_RIGHT     0x1000 // Same as LVCFMT_BITMAP_ON_RIGHT
+#define HDF_SORTUP              0x0400
+#define HDF_SORTDOWN            0x0200
+
+#define HDF_CHECKBOX            0x0040
+#define HDF_CHECKED             0x0080
+#define HDF_FIXEDWIDTH          0x0100 // Can't resize the column; same as LVCFMT_FIXED_WIDTH
+#define HDF_SPLITBUTTON      0x1000000 // Column is a split button; same as LVCFMT_SPLITBUTTON
+
+
+#define HOTKEYF_SHIFT           0x01
+#define HOTKEYF_CONTROL         0x02
+#define HOTKEYF_ALT             0x04
+#define HOTKEYF_EXT             0x08
+
+#define HKCOMB_NONE             0x0001
+#define HKCOMB_S                0x0002
+#define HKCOMB_C                0x0004
+#define HKCOMB_A                0x0008
+#define HKCOMB_SC               0x0010
+#define HKCOMB_SA               0x0020
+#define HKCOMB_CA               0x0040
+#define HKCOMB_SCA              0x0080
+
+
+#define SB_LINEUP           0
+#define SB_LINELEFT         0
+#define SB_LINEDOWN         1
+#define SB_LINERIGHT        1
+#define SB_PAGEUP           2
+#define SB_PAGELEFT         2
+#define SB_PAGEDOWN         3
+#define SB_PAGERIGHT        3
+#define SB_THUMBPOSITION    4
+#define SB_THUMBTRACK       5
+#define SB_TOP              6
+#define SB_LEFT             6
+#define SB_BOTTOM           7
+#define SB_RIGHT            7
+#define SB_ENDSCROLL        8
+
+#define EN_SETFOCUS         0x0100
+#define EN_KILLFOCUS        0x0200
+#define EN_CHANGE           0x0300
+#define EN_UPDATE           0x0400
+#define EN_ERRSPACE         0x0500
+#define EN_MAXTEXT          0x0501
+#define EN_HSCROLL          0x0601
+#define EN_VSCROLL          0x0602
+
 #endif

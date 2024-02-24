@@ -55,6 +55,7 @@ inline uint8_t * _mbscvt(uint8_t * srcU8,BOOL bLower){
 #define memmove_s(dst,ndst,src,len) memmove(dst,src,len)
 #define swscanf_s swscanf
 #define snwprintf swprintf
+#define CharLowerBuff(str,len) _mbscvt((uint8_t*)(str),len)
 
 inline wchar_t * _wcslwr(wchar_t* s) {
     wchar_t *str = s;
@@ -94,17 +95,34 @@ inline const char *CharNext(const char* src){
     return (const char*)_mbsinc((const uint8_t*)src);
 }
 
+#define _wcsicmp(s1,s2) wcscasecmp(s1,s2)
+#define _wcsnicmp(s1,s2,num) wcsncasecmp(s1,s2,num)
+#define stricmp(s1,s2) strcasecmp(s1,s2)
+#define strnicmp(s1,s2,num) strncasecmp(s1,s2,num)
+
 #ifdef _UNICODE
 #define _tcsncmp wcsncmp
 #define _tcslen wcslen
 #define _ttoi  wcstol
+#define _tcsdup wcsdup
+#define _tcsicmp _wcsicmp
+#define _tcsnicmp _wcsnicmp
+#define _tcscpy wcscpy
+#define _tcstok wcstok
+#define _tcsncpy wcsncpy
+#define _tcsrchr wcschr
 #else
 #define _tcsncmp strncmp
 #define _tcslen strlen
 #define _ttoi atoi
+#define _tcsdup strdup
+#define _tcsicmp stricmp
+#define _tcsnicmp strnicmp
+#define _tcscpy strcpy
+#define _tcstok strtok
+#define _tcsncpy strncpy
+#define _tcsrchr strchr
 #endif
-
-#define _wcsicmp(s1,s2) wcscasecmp(s1,s2)
 
 #define CP_ACP 0
 #define CP_UTF8 1

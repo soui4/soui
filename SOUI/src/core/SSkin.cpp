@@ -2,7 +2,7 @@
 //   File Name: SSkinPool
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
-#include "core/Sskin.h"
+#include "core/SSkin.h"
 #include "helper/SDIBHelper.h"
 
 SNSBEGIN

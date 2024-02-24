@@ -36,6 +36,18 @@
 #define STVL_ROOT  ((PSTREELINK)(ULONG_PTR)0xFFFF0000)
 #endif
 
+#ifndef STVI_ROOT
+#ifdef _WIN64
+#define STVI_ROOT  ((HSTREEITEM)0xFFFF000000000000) //=TVI_ROOT
+#define STVI_FIRST ((HSTREEITEM)0xFFFF000000000001) //=TVI_FIRST
+#define STVI_LAST  ((HSTREEITEM)0xFFFF000000000002) //=TVI_LAST
+#else
+#define STVI_ROOT  ((HSTREEITEM)0xFFFF0000) //=TVI_ROOT
+#define STVI_FIRST ((HSTREEITEM)0xFFFF0001) //=TVI_FIRST
+#define STVI_LAST  ((HSTREEITEM)0xFFFF0002) //=TVI_LAST
+#endif
+#endif//STVI_ROOT
+
 /**
  * @class      CSTree 模板类
  * @brief      CSTree 模板类
@@ -659,7 +671,7 @@ class CSTree {
             node->hPrevSibling = NULL;
             node = (HSTREENODE)pChilds[nChilds - 1];
             node->hNextSibling = NULL;
-            if (hItem != STVI_ROOT)
+            if (hItem != STVL_ROOT)
             {
                 HSTREENODE parent = (HSTREENODE)hItem;
                 parent->hChildFirst = (HSTREENODE)pChilds[0];

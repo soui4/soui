@@ -1,5 +1,6 @@
-﻿#include "souistd.h"
-#include "control/SMenuBar.h"
+﻿#include <souistd.h>
+#include <control/SMenuBar.h>
+#include <control/SCmnCtrl.h>
 
 #define TIMER_POP 10
 

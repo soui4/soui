@@ -1,5 +1,5 @@
 ﻿#include "souistd.h"
-#include "control/Stabctrl.h"
+#include "control/STabCtrl.h"
 #include "animation/SInterpolatorImpl.h"
 
 SNSBEGIN

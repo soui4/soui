@@ -3,7 +3,7 @@
 // Description: Font Pool
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
-#include "res.mgr/sfontpool.h"
+#include "res.mgr/SFontPool.h"
 #include "helper/SplitString.h"
 #include "layout/SLayoutSize.h"
 #include "helper/SHostMgr.h"
@@ -23,6 +23,7 @@ int CALLBACK DefFontsEnumProc(CONST LOGFONT *lplf,    // logical-font data
 
 static BOOL DefFontCheck(const SStringW &strFontName)
 {
+    #ifdef _WIN32
     //确保字体存在
     HDC hdc = GetDC(NULL);
     SStringT strFace = S_CW2T(strFontName);
@@ -30,6 +31,9 @@ static BOOL DefFontCheck(const SStringW &strFontName)
     EnumFonts(hdc, strFace.c_str(), DefFontsEnumProc, (LPARAM)&bValidFont);
     ReleaseDC(NULL, hdc);
     return bValidFont;
+    #else
+    return TRUE;
+    #endif//_WIN32
 }
 
 FunFontCheck SFontPool::s_funFontCheck = DefFontCheck;

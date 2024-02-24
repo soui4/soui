@@ -2,6 +2,7 @@
 #include "SApp.h"
 #include "control/SMessageBox.h"
 #include "control/SCmnCtrl.h"
+#include <control/STabCtrl.h>
 
 SNSBEGIN
 

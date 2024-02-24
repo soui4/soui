@@ -1,6 +1,6 @@
 #include "souistd.h"
-#include "msaa\SAccProxyCmnCtrl.h"
-#include "control\SCmnCtrl.h"
+#include "msaa/SAccProxyCmnCtrl.h"
+#include "control/SCmnCtrl.h"
 
 SNSBEGIN
 #ifdef SOUI_ENABLE_ACC

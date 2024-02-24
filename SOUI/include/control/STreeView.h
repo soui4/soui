@@ -1,10 +1,12 @@
 ﻿#ifndef __STREEVIEW__H__
 #define __STREEVIEW__H__
 
-#include "core/SWnd.h"
-#include "core/SItemPanel.h"
-#include "interface/SAdapter-i.h"
-#include "interface/STreeViewItemLocator-i.h"
+#include <core/SWnd.h>
+#include <core/SPanel.h>
+#include <core/SItemPanel.h>
+#include <interface/SAdapter-i.h>
+#include <interface/STreeViewItemLocator-i.h>
+#include <proxy/SPanelProxy.h>
 
 SNSBEGIN
 //////////////////////////////////////////////////////////////////////////

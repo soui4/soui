@@ -114,7 +114,7 @@ LRESULT SNcPainter::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
         SNativeWnd *pNative = m_pHost->GetNative();
         if (bCalcValidRects && (pNative->GetStyle() & WS_CHILDWINDOW))
         {
-            //×Ó´°¿Ú£¬Ïà¶ÔÓÚ¸¸´°¿Ú×ø±ê
+            //ï¿½Ó´ï¿½ï¿½Ú£ï¿½ï¿½ï¿½ï¿½ï¿½Ú¸ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
             if (SWP_NOSIZE & pParam->lppos->flags)
                 return 0;
 
@@ -142,7 +142,7 @@ LRESULT SNcPainter::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
         }
         else if (bCalcValidRects)
         {
-            // top-level Ïà¶ÔÓÚÆÁÄ»×ø±ê
+            // top-level ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä»ï¿½ï¿½ï¿½ï¿½
             if (SWP_NOSIZE & pParam->lppos->flags)
                 return 0;
 
@@ -367,6 +367,7 @@ UINT SNcPainter::OnNcHitTest(CPoint point)
 
 void SNcPainter::OnNcPaint(HRGN hRgn)
 {
+    #ifdef _WIN32
     if (!IsDrawNc())
         return;
     // paint non client.
@@ -442,6 +443,7 @@ void SNcPainter::OnNcPaint(HRGN hRgn)
 
     ::ReleaseDC(m_pHost->m_hWnd, hdc);
     m_bInPaint = FALSE;
+    #endif//_WIN32
 }
 
 BOOL SNcPainter::IsDrawNc() const
@@ -573,14 +575,15 @@ IRenderTarget *SNcPainter::OnGetHostRenderTarget(LPCRECT rc, GrtFlag gdcFlags)
 
 void SNcPainter::OnReleaseHostRenderTarget(IRenderTarget *pRT, LPCRECT rc, GrtFlag gdcFlags)
 {
+    #ifdef _WIN32
     m_memRT->PopClip();
-
     HDC hdc = ::GetWindowDC(m_pHost->m_hWnd);
     int nBorderWid = m_borderWidth.toPixelSize(GetScale());
     HDC memdc = m_memRT->GetDC(0);
     ::BitBlt(hdc, rc->left, rc->top, RectWidth(rc), RectHeight(rc), memdc, rc->left, rc->top, SRCCOPY);
     m_memRT->ReleaseDC(memdc, rc);
     ::ReleaseDC(m_pHost->m_hWnd, hdc);
+    #endif
 }
 
 LRESULT SNcPainter::OnNcMouseEvent(UINT msg, WPARAM wp, LPARAM lp)

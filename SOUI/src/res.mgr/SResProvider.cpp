@@ -3,7 +3,9 @@
 // Description: Resource Provider
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
-#include "res.mgr/Sresprovider.h"
+#include "res.mgr/SResProvider.h"
+//todo:hjx
+#ifdef _WIN32
 #include <io.h>
 
 SNSBEGIN
@@ -518,3 +520,5 @@ void SResProviderFiles::_EnumFile(LPCTSTR pszPath, EnumFileCallback funEnumCB, L
 }
 
 SNSEND
+
+#endif//_WIN32

@@ -3,6 +3,7 @@
 #include <interface/scaret-i.h>
 #include <interface/sinterpolator-i.h>
 #include <interface/STimelineHandler-i.h>
+#include <sobject/Sobject.hpp>
 
 SNSBEGIN
 class SOUI_EXP SCaret

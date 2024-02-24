@@ -1,17 +1,17 @@
 ﻿#ifndef __SACCHELPER_I__H__
 #define __SACCHELPER_I__H__
-#include <utilities-def.h>
+#include <interface/SWindow-i.h>
 
 SNSBEGIN
 
-typedef struct IWindow IWindow;
-
 #undef INTERFACE
 #define INTERFACE IAccHelper
-DECLARE_INTERFACE_IID_(IAccHelper, IUnknown, "9FAF3067-6723-40DA-A56B-CDCB11B8902B")
+DECLARE_INTERFACE_(IAccHelper, IUnknown)
 {
+    DECLARE_CLASS_SIID(0x9FAF3067,0x6723,0x40DA,0xA56B,0xDCB1,0x1B8902B)
+   
     STDMETHOD_(HRESULT, QueryInterface)
-    (THIS_ REFIID riid, void __RPC_FAR *__RPC_FAR *ppvObject) PURE;
+    (THIS_ REFIID riid, void  **ppvObject) PURE;
 
     STDMETHOD_(ULONG, AddRef)(THIS) PURE;
 

@@ -5,6 +5,7 @@
 #include "gdialpha.h"
 #include <souicoll.h>
 
+#ifdef _WIN32
 SNSBEGIN
 
 SMenuItemData::SMenuItemData()
@@ -652,3 +653,5 @@ BOOL SMenu::GetMenuString(THIS_ UINT uPosition, UINT uFlags, IStringT *lpItemStr
 }
 
 SNSEND
+
+#endif//_WIN32

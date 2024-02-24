@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdarg.h>
 
+
 #define FAR
 #define NEAR
 #define CONST const
@@ -29,6 +30,7 @@ typedef int64_t __int64;// int64_t
 #define E_POINTER 3
 #define E_FAIL 4
 #define E_NOTIMPL 5
+#define E_NOINTERFACE 6
 
 #define S_OK 0
 #define S_FALSE 1
@@ -156,6 +158,8 @@ typedef int BOOL;
 #define HFONT int
 #define HANDLE int
 #define ATOM int
+#define HMONITOR int
+#define HHOOK int
 
 typedef char *LPSTR;
 typedef wchar_t *LPWSTR;
@@ -265,7 +269,7 @@ typedef struct tagLOGFONT
     BYTE      lfClipPrecision;
     BYTE      lfQuality;
     BYTE      lfPitchAndFamily;
-    wchar_t      lfFaceName[LF_FACESIZE];
+    char     lfFaceName[LF_FACESIZE];//todo:hjx
 } LOGFONT;
 
 #define RGN_AND             1
@@ -297,11 +301,6 @@ typedef struct _BLENDFUNCTION {
   BYTE     SourceConstantAlpha;
   BYTE     AlphaFormat;
 }BLENDFUNCTION, *PBLENDFUNCTION, *LPBLENDFUNCTION;
-
-
-typedef struct _IDropTarget{
-
-}IDropTarget;
 
 
 /* Pen Styles */

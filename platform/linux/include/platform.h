@@ -8,6 +8,7 @@
 #include "winuser.h"
 #include <unknown-i.h>
 #include <dataobject-i.h>
+#include <droptarget-i.h>
 #include "ctrl_types.h"
 #include "sysapi.h"
 

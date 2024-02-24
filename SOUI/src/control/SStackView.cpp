@@ -1,5 +1,5 @@
 #include <souistd.h>
-#include <Control/SStackView.h>
+#include <control/SStackView.h>
 
 SNSBEGIN
 

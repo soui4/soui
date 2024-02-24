@@ -13,8 +13,9 @@
 
 #ifndef __SDROPTARGETDISPATCHER__H__
 #define __SDROPTARGETDISPATCHER__H__
-#include "SWnd.h"
 #include <platform.h>
+#include <souicoll.h>
+#include <core/SWnd.h>
 
 SNSBEGIN
 

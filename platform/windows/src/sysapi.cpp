@@ -113,3 +113,8 @@ int GetWindowScale(HWND hWnd)
     }
     return nScale;
 }
+
+
+BOOL IsFilePathValid(LPCTSTR strPath){
+    return ::GetFileAttributes(strPath) != INVALID_FILE_ATTRIBUTES;
+}
