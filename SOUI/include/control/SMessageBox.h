@@ -26,10 +26,6 @@ SNSBEGIN
 #define NAME_MSGBOX_BTN2      L"button2nd" //第2个按钮ID
 #define NAME_MSGBOX_BTN3      L"button3rd" //第3个按钮ID
 
-BOOL SOUI_EXP SetMsgTemplate(SXmlNode xmlNode);
-
-SXmlNode SOUI_EXP GetMsgTemplate();
-
 /**
  * @class     SMessageBoxImpl
  * @brief     消息窗口模板

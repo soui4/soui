@@ -21,6 +21,50 @@ SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 //  STextServiceHelper
+/**
+ * @class      STextServiceHelper
+ * @brief
+ *
+ * Describe
+ */
+class SOUI_EXP STextServiceHelper {
+public:
+	static STextServiceHelper * instance(){
+		static STextServiceHelper _this;
+		return &_this;
+	}
+  public:
+    /**
+     * STextServiceHelper::CreateTextServices
+     * @brief
+     * @param  IUnknown *punkOuter
+     * @param  ITextHost *pITextHost
+     * @param  IUnknown **ppUnk
+     * @return 返回HRESULT
+     *
+     * Describe
+     */
+    HRESULT CreateTextServices(IUnknown *punkOuter, ITextHost *pITextHost, IUnknown **ppUnk);
+
+  protected:
+    /**
+     * STextServiceHelper::STextServiceHelper
+     * @brief    构造函数
+     *
+     * Describe  构造函数
+     */
+    STextServiceHelper();
+    /**
+     * STextServiceHelper::~STextServiceHelper
+     * @brief    析构函数
+     *
+     * Describe  析构函数
+     */
+    ~STextServiceHelper();
+
+    HINSTANCE m_rich20;                          /**< richedit module */
+    PCreateTextServices m_funCreateTextServices; /**< 回调函数 */
+};
 
 STextServiceHelper::STextServiceHelper()
 {
@@ -582,7 +626,7 @@ BOOL STextHost::Init(SRichEdit *pRichEdit)
     m_pRichEdit = pRichEdit;
 
     // Create Text Services component
-    if (FAILED(STextServiceHelper::getSingleton().CreateTextServices(NULL, this, &pUnk)))
+    if (FAILED(STextServiceHelper::instance()->CreateTextServices(NULL, this, &pUnk)))
         return FALSE;
 
     hr = pUnk->QueryInterface(IID_ITextServices, (void **)&pserv);
@@ -593,7 +637,7 @@ BOOL STextHost::Init(SRichEdit *pRichEdit)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// dui interface
+// SRichEdit
 
 SRichEdit::SRichEdit()
     : m_pTxtHost(NULL)
@@ -1113,8 +1157,8 @@ void SRichEdit::OnRButtonDown(UINT nFlags, CPoint point)
     if (FireCtxMenu(point))
         return; //用户自己响应右键
     SetFocus();
-    //弹出默认编辑窗菜单
-    SXmlNode xmlMenu = GetMenuTemplate();
+	//弹出默认编辑窗菜单
+	SXmlNode  xmlMenu = SApplication::getSingletonPtr()->GetEditCtxMenuTemplate();
     if (xmlMenu)
     {
         SMenu menu;

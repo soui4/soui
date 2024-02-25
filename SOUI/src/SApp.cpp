@@ -240,7 +240,7 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     SWndSurface::Init();
 	SNativeWnd::InitWndClass(hInst,pszHostClassName,bImeApp);
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
-    _CreateSingletons(hInst, pszHostClassName, bImeApp);
+    _CreateSingletons();
 
     m_translator.Attach(new SNullTranslator);
     m_tooltipFactory.Attach(new SDefToolTipFactory);
@@ -266,17 +266,13 @@ SApplication::~SApplication(void)
     _DestroySingletons();
 }
 
-void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, BOOL bImeApp)
+void SApplication::_CreateSingletons()
 {
     m_pSingletons[SUiDef::GetType()] = new SUiDef(m_RenderFactory);
     m_pSingletons[SWindowMgr::GetType()] = new SWindowMgr();
     m_pSingletons[STimerGenerator::GetType()] = new STimerGenerator();
     m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
     m_pSingletons[SHostMgr::GetType()] = new SHostMgr();
-    #ifdef _WIN32
-    m_pSingletons[STextServiceHelper::GetType()] = new STextServiceHelper();
-    m_pSingletons[SRicheditMenuDef::GetType()] = new SRicheditMenuDef();
-    #endif//_WIN32
  }
 
 #define DELETE_SINGLETON(x)                  \
@@ -288,10 +284,6 @@ void SApplication::_DestroySingletons()
     if (m_pSingletons[SNotifyCenter::GetType()])
         DELETE_SINGLETON(SNotifyCenter);
 
-#ifdef _WIN32    
-    DELETE_SINGLETON(SRicheditMenuDef);
-    DELETE_SINGLETON(STextServiceHelper);
-#endif//_WIN32
     DELETE_SINGLETON(SHostMgr);
     DELETE_SINGLETON(SWindowFinder);
     DELETE_SINGLETON(SUiDef);
@@ -359,6 +351,7 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc 
     SAutoBuf xmlBuf;
     if (!LoadRawBuffer(pszType, pszXmlName, pResProvider, xmlBuf))
         return FALSE;
+	xmlDoc.Reset();
     bool bLoad = xmlDoc.load_buffer(xmlBuf, xmlBuf.size(), xml_parse_default, enc_auto);
     if (!bLoad)
     {
@@ -477,24 +470,16 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
             uRet |= 0x01;
         }
     }
-    // load edit context menu
-    #ifdef _WIN32
-    {
-        SXmlDoc xmlDoc;
-        if (_LoadXmlDocment(_T("SYS_XML_EDITMENU"), _T("XML"), xmlDoc, pResProvider))
-        {
-            SRicheditMenuDef::getSingleton().SetMenuXml(xmlDoc.root().child(L"editmenu"));
-        }
-        else
-        {
-            uRet |= 0x02;
-        }
-    }
-    #endif//_WIN32
+	// load edit context menu
+	{
+		if(!SetEditCtxMenuTemplateResId(_T("XML:SYS_XML_EDITMENU"),pResProvider))
+		{
+			uRet |= 0x02;
+		}
+	}
     // load messagebox template
     {
-        SXmlDoc xmlDoc;
-        if (!_LoadXmlDocment(_T("SYS_XML_MSGBOX"), _T("XML"), xmlDoc, pResProvider) || !SetMsgTemplate(xmlDoc.root().child(L"SOUI")))
+		if(!SetMessageBoxTemplateResId(_T("XML:SYS_XML_MSGBOX"),pResProvider))
         {
             uRet |= 0x04;
         }
@@ -821,6 +806,37 @@ ITaskLoop *SApplication::GetTaskLoop(THIS_ int iTaskLoop)
     {
         return NULL;
     }
+}
+
+
+SXmlNode SApplication::GetMessageBoxTemplate() const
+{
+	return m_xmlMessageBoxTemplate.root().child(L"soui");
+}
+
+SXmlNode SApplication::GetEditCtxMenuTemplate() const
+{
+	return m_xmlEditCtxMenuTemplate.root().first_child();
+}
+
+BOOL SApplication::SetEditCtxMenuTemplateResId(THIS_ LPCTSTR resId,IResProvider *pResProvider)
+{
+	return LoadXmlDocment(m_xmlEditCtxMenuTemplate,resId,pResProvider);
+}
+
+BOOL SApplication::SetMessageBoxTemplateResId(THIS_ LPCTSTR resId,IResProvider *pResProvider)
+{
+	if(!LoadXmlDocment(m_xmlMessageBoxTemplate,resId,pResProvider))
+		return FALSE;
+	SXmlNode uiRoot = m_xmlMessageBoxTemplate.root().child(L"soui");
+	if(!uiRoot)
+		return FALSE;
+	if (!uiRoot.attribute(L"minSize").value()[0])
+	{
+		m_xmlMessageBoxTemplate.Reset();
+		return FALSE;
+	}
+	return TRUE;
 }
 
 SNSEND

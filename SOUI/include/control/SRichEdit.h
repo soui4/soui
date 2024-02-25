@@ -32,84 +32,6 @@ enum
     MENU_USER = 20,
 };
 
-class SRichEdit;
-/**
- * @class      STextServiceHelper
- * @brief
- *
- * Describe
- */
-class SOUI_EXP STextServiceHelper : public SSingleton2<STextServiceHelper> {
-    SINGLETON2_TYPE(SINGLETON_TEXTSERVICEHELPER)
-  public:
-    /**
-     * STextServiceHelper::CreateTextServices
-     * @brief
-     * @param  IUnknown *punkOuter
-     * @param  ITextHost *pITextHost
-     * @param  IUnknown **ppUnk
-     * @return 返回HRESULT
-     *
-     * Describe
-     */
-    HRESULT CreateTextServices(IUnknown *punkOuter, ITextHost *pITextHost, IUnknown **ppUnk);
-
-  protected:
-    /**
-     * STextServiceHelper::STextServiceHelper
-     * @brief    构造函数
-     *
-     * Describe  构造函数
-     */
-    STextServiceHelper();
-    /**
-     * STextServiceHelper::~STextServiceHelper
-     * @brief    析构函数
-     *
-     * Describe  析构函数
-     */
-    ~STextServiceHelper();
-
-    HINSTANCE m_rich20;                          /**< richedit module */
-    PCreateTextServices m_funCreateTextServices; /**< 回调函数 */
-};
-
-/**
- * @class      SRicheditMenuDef
- * @brief
- *
- * Describe
- */
-class SOUI_EXP SRicheditMenuDef : public SSingleton2<SRicheditMenuDef> {
-    SINGLETON2_TYPE(SINGLETON_RICHEDITMENUDEF)
-  public:
-    /**
-     * SRicheditMenuDef::SetMenuXml
-     * @brief    加载xml文件
-     *
-     * Describe  加载xml文件
-     */
-    void SetMenuXml(SXmlNode xmlMenu)
-    {
-        m_xmlMenu.Reset();
-        m_xmlMenu.root().append_copy(xmlMenu);
-    }
-
-    /**
-     * SRicheditMenuDef::GetMenuXml
-     * @brief    获取xml文件
-     *
-     * Describe  获取xml文件
-     */
-    SXmlNode GetMenuXml()
-    {
-        return m_xmlMenu.root().first_child();
-    }
-
-  protected:
-    SXmlDoc m_xmlMenu; /**< xml文件对象 */
-};
-
 /**
  * @class      STextHost
  * @brief
@@ -1075,11 +997,6 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      * Describe  是否允许拖拽
      */
     void OnEnableDragDrop(BOOL bEnable);
-
-    virtual SXmlNode GetMenuTemplate() const
-    {
-        return SRicheditMenuDef::getSingleton().GetMenuXml();
-    }
 
     LRESULT OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp);
 

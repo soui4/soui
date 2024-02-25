@@ -191,6 +191,8 @@ class SOUI_EXP SApplication
 	STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) OVERRIDE;
 	STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateScriptModule)(THIS_ IScriptModule **ppScriptModule) OVERRIDE;
+	STDMETHOD_(BOOL,SetEditCtxMenuTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) OVERRIDE;
+	STDMETHOD_(BOOL,SetMessageBoxTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) OVERRIDE;
 
   public:
     /**
@@ -254,6 +256,9 @@ class SOUI_EXP SApplication
 
     int Str2ID(const SStringW &str);
 
+	SXmlNode GetMessageBoxTemplate() const;
+	SXmlNode GetEditCtxMenuTemplate() const;
+
     SStringW tr(const SStringW &strSrc, const SStringW &strCtx) const;
     virtual IWindow *CreateWindowByName(LPCWSTR pszWndClass) const;
     virtual ISkinObj *CreateSkinByName(LPCWSTR pszSkinClass) const;
@@ -266,7 +271,7 @@ class SOUI_EXP SApplication
     virtual IAccessible *CreateAccessible(SWindow *pWnd) const;
 #endif
   protected:
-    void _CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, BOOL bImeApp);
+    void _CreateSingletons();
     void _DestroySingletons();
     BOOL _LoadXmlDocment(LPCTSTR pszXmlName,
                          LPCTSTR pszType,
@@ -297,6 +302,8 @@ class SOUI_EXP SApplication
 	SArray<SAutoRefPtr<ITaskLoop>> m_lstTaskLoop;//task loop list
     //一组单例指针
     void *m_pSingletons[SINGLETON_COUNT];
+	SXmlDoc m_xmlEditCtxMenuTemplate;
+	SXmlDoc m_xmlMessageBoxTemplate;
 };
 
 SNSEND

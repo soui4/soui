@@ -27,8 +27,6 @@ typedef enum _SingletonType
     SINGLETON_SWNDMGR,
     SINGLETON_TIMERGENERATOR,
     SINGLETON_WINDOWFINDER,
-    SINGLETON_TEXTSERVICEHELPER,
-    SINGLETON_RICHEDITMENUDEF,
     SINGLETON_HOSTMGR,
     SINGLETON_NOTIFYCENTER,
 
@@ -389,6 +387,10 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * Describe
      */
     STDMETHOD_(HRESULT, CreateScriptModule)(THIS_ IScriptModule * *ppScriptModule) PURE;
+
+	STDMETHOD_(BOOL,SetEditCtxMenuTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) PURE;
+
+	STDMETHOD_(BOOL,SetMessageBoxTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) PURE;
 };
 
 SNSEND
