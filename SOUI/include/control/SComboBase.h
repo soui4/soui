@@ -1,9 +1,9 @@
 ﻿#ifndef __SCOMBOBASE__H__
 #define __SCOMBOBASE__H__
 
-#include "core/SWnd.h"
-#include "SRichEdit.h"
-#include "SDropDown.h"
+#include <core/SWnd.h>
+#include <control/SEdit.h>
+#include <control/SDropDown.h>
 
 SNSBEGIN
 #define IDC_CB_EDIT       -100
