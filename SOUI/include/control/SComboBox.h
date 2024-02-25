@@ -12,9 +12,9 @@
  */
 #ifndef __SCOMBOBOX__H__
 #define __SCOMBOBOX__H__
-#include "SComboBase.h"
-#include "Slistbox.h"
-#include "SCmnCtrl.h"
+#include <control/SComboBase.h>
+#include <control/SListbox.h>
+#include <control/SCmnCtrl.h>
 
 SNSBEGIN
 
