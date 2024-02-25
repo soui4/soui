@@ -72,7 +72,10 @@ HRESULT SEdit::OnLanguageChanged()
 }
 
 #else
-
+//todo: impl linux edit
+void SEdit::SetSel(int begin, int end, BOOL bScroll)
+{
+}
 
 #endif
 SNSEND
