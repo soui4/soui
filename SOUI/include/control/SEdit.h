@@ -1,4 +1,4 @@
-#ifndef _SEDIT_H_
+﻿#ifndef _SEDIT_H_
 #define _SEDIT_H_
 
 #ifdef _WIN32
@@ -7,7 +7,7 @@
 SNSBEGIN
 /**
  * @class      SEdit
- * @brief      ��edit�ؼ�
+ * @brief      简单edit控件
  *
  * Describe
  */
@@ -16,9 +16,9 @@ class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
   public:
     /**
      * SEdit::SEdit
-     * @brief    ���캯��
+     * @brief    构造函数
      *
-     * Describe  ���캯��
+     * Describe  构造函数
      */
     SEdit();
 
@@ -47,25 +47,25 @@ class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
 
     /**
      * SEdit::OnPaint
-     * @brief    ������Ϣ
-     * @param    IRenderTarget * pRT -- �滭�豸������
+     * @brief    绘制消息
+     * @param    IRenderTarget * pRT -- 绘画设备上下文
      *
-     * Describe  �˺�������Ϣ��Ӧ����
+     * Describe  此函数是消息响应函数
      */
     void OnPaint(IRenderTarget *pRT);
     /**
      * SEdit::OnSetFocus
-     * @brief    ��ý���
+     * @brief    获得焦点
      *
-     * Describe  �˺�������Ϣ��Ӧ����
+     * Describe  此函数是消息响应函数
      */
     void OnSetFocus(SWND wndOld);
     UINT GetCueTextAlign();
     /**
      * SEdit::OnKillFocus
-     * @brief    ʧȥ����
+     * @brief    失去焦点
      *
-     * Describe  �˺�������Ϣ��Ӧ����
+     * Describe  此函数是消息响应函数
      */
     void OnKillFocus(SWND wndFocus);
 
