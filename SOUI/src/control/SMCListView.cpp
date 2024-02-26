@@ -766,6 +766,7 @@ void SMCListView::UpdateVisibleItem(int iItem)
     SASSERT(pItem);
     SXmlNode xmlNode = m_xmlTemplate.root().first_child();
     m_adapter->getView(iItem, pItem, &xmlNode);
+    pItem->Invalidate();
 }
 
 void SMCListView::OnSize(UINT nType, CSize size)
