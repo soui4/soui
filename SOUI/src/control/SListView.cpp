@@ -508,6 +508,7 @@ void SListView::UpdateVisibleItem(int iItem)
     SASSERT(pItem);
     SXmlNode xmlNode = m_xmlTemplate.root().first_child();
     m_adapter->getView(iItem, pItem, &xmlNode);
+    pItem->Invalidate();
 }
 
 void SListView::OnSize(UINT nType, CSize size)

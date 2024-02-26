@@ -199,6 +199,7 @@ void STileView::UpdateVisibleItem(int iItem)
     SASSERT(pItem);
     SXmlNode xmlNode = m_xmlTemplate.root().first_child();
     m_adapter->getView(iItem, pItem, &xmlNode);
+    pItem->Invalidate();
 }
 
 void STileView::onItemDataChanged(int iItem)
