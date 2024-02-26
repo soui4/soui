@@ -942,3 +942,8 @@ BOOL DestroyCursor(HCURSOR hCursor)
 BOOL IsFilePathValid(const char* path) {
     return access(path, F_OK) == 0;
 }
+
+BOOL GetTextMetrics(HDC hdc, TEXTMETRIC *txtMetric)
+{
+    return 0;
+}

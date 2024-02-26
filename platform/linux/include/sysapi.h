@@ -265,4 +265,5 @@ BOOL DestroyCursor(HCURSOR hCursor);
 
 BOOL IsFilePathValid(const char* path);
 
+BOOL GetTextMetrics(HDC hdc,TEXTMETRIC *txtMetric);
 #endif

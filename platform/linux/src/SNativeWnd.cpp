@@ -86,7 +86,7 @@ BOOL SNativeWnd::DestroyWindow(){
 void SNativeWnd::OnFinalMessage(HWND hWnd)
 { 
     //todo:hjx
-    m_hWnd = NULL;
+    m_hWnd = 0;
 }
 
 LRESULT CALLBACK SNativeWnd::WindowProc(SNativeWnd * pWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -124,7 +124,7 @@ LRESULT CALLBACK SNativeWnd::WindowProc(SNativeWnd * pWnd, UINT uMsg, WPARAM wPa
     {
         // clear out window handle
         HWND hWndThis = pThis->m_hWnd;
-        pThis->m_hWnd = NULL;
+        pThis->m_hWnd = 0;
         pThis->m_bDestoryed = FALSE;
         // clean up after window is destroyed
         pThis->m_pCurrentMsg = pOldMsg;
@@ -248,6 +248,7 @@ BOOL SNativeWnd::ShowWindow(int nCmdShow)
     else
         xcb_unmap_window(mConnection, m_hWnd);
     xcb_flush(mConnection);
+    return TRUE;
 }
 
 BOOL SNativeWnd::MoveWindow2(LPCRECT lpRect, BOOL bRepaint /*= TRUE*/)
@@ -266,7 +267,7 @@ BOOL SNativeWnd::MoveWindow(int x, int y, int nWidth, int nHeight, BOOL bRepaint
 
     }
     {
-    const uint32_t vals[2] = {nWidth, nHeight};
+    const uint32_t vals[2] = {(uint32_t)nWidth, (uint32_t)nHeight};
     xcb_configure_window(mConnection, m_hWnd,
                          XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
                          vals);

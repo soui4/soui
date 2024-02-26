@@ -1,6 +1,6 @@
 ﻿#ifndef __SMENU__H__
 #define __SMENU__H__
-
+#include <platform.h>
 #include <sobject/Sobject.hpp>
 #include <SNativeWnd.h>
 #include <res.mgr/SSkinPool.h>
