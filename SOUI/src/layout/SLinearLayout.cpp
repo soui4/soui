@@ -69,7 +69,7 @@ SLayoutSize SLinearLayoutParam::GetSpecifiedSize(ORIENTATION orientation) const
     case Any:
     case Both:
     default:
-        SASSERT_FMTA(FALSE, "GetSpecifiedSize can only be applied for Horz or Vert",0);
+        SASSERT_MSGA(FALSE, "GetSpecifiedSize can only be applied for Horz or Vert");
         return SLayoutSize();
     }
 }

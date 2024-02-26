@@ -346,7 +346,7 @@ void SWindow::TestMainThread()
 #ifdef _DEBUG
     if (IsBadWritePtr(this, sizeof(SWindow)))
     {
-        SASSERT_FMTA(FALSE, "this is null!!!", 0);
+        SASSERT_MSGA(FALSE, "this is null!!!");
     }
     else
     {
