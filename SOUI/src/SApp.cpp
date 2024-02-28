@@ -158,13 +158,13 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SFrame>();
     objFactory->TplRegisterFactory<SStackView>();
     objFactory->TplRegisterFactory<SStackPage>();
-#ifdef _WIN32
-    objFactory->TplRegisterFactory<SMenuBar>();
-    objFactory->TplRegisterFactory<SRichEdit>();
     objFactory->TplRegisterFactory<SEdit>();
     objFactory->TplRegisterFactory<SComboEdit>();
     objFactory->TplRegisterFactory<SComboBox>();
     objFactory->TplRegisterFactory<SComboView>();
+#ifdef _WIN32
+    objFactory->TplRegisterFactory<SMenuBar>();
+    objFactory->TplRegisterFactory<SRichEdit>();
     objFactory->TplRegisterFactory<SActiveX>();
 #endif//_WIN32
 }

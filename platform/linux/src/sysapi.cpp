@@ -947,3 +947,11 @@ BOOL GetTextMetrics(HDC hdc, TEXTMETRIC *txtMetric)
 {
     return 0;
 }
+
+BOOL HasFont(LPCTSTR fontName){
+    return TRUE;
+}
+
+BOOL SetNativeWndAlpha(HWND hWnd, BYTE byAlpha){
+    return FALSE;
+}

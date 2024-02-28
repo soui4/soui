@@ -92,6 +92,10 @@ class SOUI_EXP SEdit : public TWindowProxy<IEdit> {
 	DEF_SOBJECT(SWindow, L"edit")
 public:
   void SetSel(int begin, int end, BOOL bScroll);
+
+  STDMETHOD_(void, GetCueText)(CTHIS_ IStringT *pStr) SCONST;
+
+  STDMETHOD_(COLORREF, GetCueColor)(CTHIS) SCONST;
 };
 
 SNSEND

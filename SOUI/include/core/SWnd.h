@@ -28,9 +28,6 @@
 #include <core/SSkin.h>
 #include <animation/SAnimation.h>
 #include <interface/SWindow-i.h>
-#ifdef _WIN32
-#include <OCIdl.h>
-#endif
 
 #define SC_WANTARROWS  0x0001     /* Control wants arrow keys         */
 #define SC_WANTTAB     0x0002     /* Control wants tab keys           */

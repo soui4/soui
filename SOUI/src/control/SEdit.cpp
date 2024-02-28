@@ -77,5 +77,13 @@ void SEdit::SetSel(int begin, int end, BOOL bScroll)
 {
 }
 
+void SEdit::GetCueText(CTHIS_ IStringT *pStr) SCONST
+{
+}
+
+COLORREF SEdit::GetCueColor(CTHIS) SCONST
+{
+    return 0;
+}
 #endif
 SNSEND

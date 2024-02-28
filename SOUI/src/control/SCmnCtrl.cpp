@@ -4,16 +4,7 @@
 
 #include "souistd.h"
 #include "control/SCmnCtrl.h"
-#include <platform.h>
-#ifdef _WIN32
-#include <shellapi.h>
 
-#if _MSC_VER < 1500
-#include <tmschema.h> //for VS2005
-#else
-#include <vsstyle.h>
-#endif
-#endif//_WIN32
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////

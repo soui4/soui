@@ -580,10 +580,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         }
         if (!(dwExStyle & WS_EX_LAYERED))
             ModifyStyleEx(0, WS_EX_LAYERED);
-        //todo:hjx
-        #ifdef _WIN32
-        ::SetLayeredWindowAttributes(m_hWnd, 0, GetRoot()->GetAlpha(), LWA_ALPHA);
-        #endif//_WIN32
+        SetNativeWndAlpha(m_hWnd,GetRoot()->GetAlpha());
     }
     m_memRT = NULL;
     if (m_hostAttr.m_bTranslucent)

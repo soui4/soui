@@ -4,4 +4,6 @@
 #include <windows.h>
 int  PLATFORM_API GetWindowScale(HWND hWnd);
 BOOL PLATFORM_API IsFilePathValid(LPCTSTR path);
+BOOL PLATFORM_API HasFont(LPCTSTR fontName);
+BOOL PLATFORM_API SetNativeWndAlpha(HWND hWnd,BYTE byAlpha);
 #endif

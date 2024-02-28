@@ -9,4 +9,10 @@
 #include <tchar.h>
 #include <guid.h>
 #include <sysapi.h>
+#include <OleAcc.h>
+#include <OCIdl.h>
+#if _MSC_VER < 1500
+#include <tmschema.h> //for VS2005
+#else
+#include <vsstyle.h>
 #endif

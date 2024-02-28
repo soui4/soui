@@ -266,4 +266,8 @@ BOOL DestroyCursor(HCURSOR hCursor);
 BOOL IsFilePathValid(const char* path);
 
 BOOL GetTextMetrics(HDC hdc,TEXTMETRIC *txtMetric);
+
+BOOL HasFont(LPCTSTR fontName);
+
+BOOL SetNativeWndAlpha(HWND hWnd, BYTE byAlpha);
 #endif

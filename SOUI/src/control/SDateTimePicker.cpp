@@ -690,7 +690,6 @@ void SDateTimePicker::DropDown()
 {
     if (NULL != m_pDropDownWnd)
         return;
-#ifdef _WIN32
     m_pDropDownWnd = new SDropDownWnd_ComboBox(this);
     CRect rcPopup;
     SLayoutSize nWid;
@@ -701,7 +700,6 @@ void SDateTimePicker::DropDown()
     m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 
     m_pDropDownWnd->SNativeWnd::SetCapture();
-#endif//_WIN32
 }
 
 SNSEND

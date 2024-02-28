@@ -118,3 +118,29 @@ int GetWindowScale(HWND hWnd)
 BOOL IsFilePathValid(LPCTSTR strPath){
     return ::GetFileAttributes(strPath) != INVALID_FILE_ATTRIBUTES;
 }
+
+
+static int CALLBACK DefFontsEnumProc(CONST LOGFONT *lplf,    // logical-font data
+                              CONST TEXTMETRIC *lptm, // physical-font data
+                              DWORD dwType,           // font type
+                              LPARAM lpData           // application-defined data
+)
+{
+    BOOL *pbValidFont = (BOOL *)lpData;
+    *pbValidFont = TRUE;
+    return 0; // stop enum.
+}
+
+BOOL HasFont(LPCTSTR fontName){
+    HDC hdc = GetDC(NULL);
+    BOOL bValidFont = FALSE;
+    EnumFonts(hdc, fontName, DefFontsEnumProc, (LPARAM)&bValidFont);
+    ReleaseDC(NULL, hdc);
+    return bValidFont;
+}
+
+
+BOOL SetNativeWndAlpha(HWND hWnd, BYTE byAlpha)
+{
+    return ::SetLayeredWindowAttributes(hWnd, 0, byAlpha, LWA_ALPHA);
+}

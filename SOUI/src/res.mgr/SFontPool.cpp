@@ -23,17 +23,7 @@ int CALLBACK DefFontsEnumProc(CONST LOGFONT *lplf,    // logical-font data
 
 static BOOL DefFontCheck(const SStringW &strFontName)
 {
-    #ifdef _WIN32
-    //确保字体存在
-    HDC hdc = GetDC(NULL);
-    SStringT strFace = S_CW2T(strFontName);
-    BOOL bValidFont = FALSE;
-    EnumFonts(hdc, strFace.c_str(), DefFontsEnumProc, (LPARAM)&bValidFont);
-    ReleaseDC(NULL, hdc);
-    return bValidFont;
-    #else
-    return TRUE;
-    #endif//_WIN32
+    return HasFont(S_CW2T(strFontName));
 }
 
 FunFontCheck SFontPool::s_funFontCheck = DefFontCheck;

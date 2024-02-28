@@ -12,6 +12,7 @@
 #define _tcslwr _mbslwr
 #define _tcscmp strcmp
 #define _T(x) x
+#define _tcsftime strftime
 #else
 #define TCHAR wchar_t
 #define LPCTSTR LPCWSTR
@@ -20,6 +21,7 @@
 #define _tcslwr _wcslwr
 #define _tcscmp wcscmp
 #define _T(x) L##x
+#define _tcsftime wcsftime
 #endif
 
 #endif//__TCHAR_H_

@@ -22,9 +22,6 @@
 
 #include <SMsgLoop.h>
 #include <core/SObjectFactory.h>
-#ifdef _WIN32
-#include <OleAcc.h>
-#endif
 #include <helper/obj-ref-impl.hpp>
 #include <interface/SSkinobj-i.h>
 
