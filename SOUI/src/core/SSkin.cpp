@@ -410,6 +410,38 @@ HRESULT SGradientDesc::OnAttrColors(const SStringW &value, BOOL bLoading)
     return ParseGradientColors(value, m_arrGradient) ? S_FALSE : E_INVALIDARG;
 }
 
+int SGradientDesc::LoadColorTable(IXmlNode* xmlNode)
+{
+    IXmlNode* xmlColor = xmlNode->Child(L"item", FALSE);
+    if (!xmlColor)
+        return 0;
+
+    m_arrGradient.RemoveAll();
+    SXmlNode color(xmlColor);
+    float pos = -1.f;
+    while (color) {
+        GradientItem gradient;
+        gradient.cr = GETCOLOR(color.attribute(L"color").as_string());
+        gradient.pos = color.attribute(L"pos").as_float();
+        if (gradient.pos < pos || gradient.pos < 0.f || gradient.pos>1.0f)
+        {
+            SSLOGW() << "invalid gradient item pos. pos must between 0 and 1";
+        }
+        else
+        {
+            m_arrGradient.Add(gradient);
+            pos = gradient.pos;
+        }
+        color = color.next_sibling();
+    }
+    if (m_arrGradient.GetCount() < 2) {
+        m_arrGradient.RemoveAll();
+        //invalid
+        SSLOGW() << "gradient color table is empty";
+    }
+    return (int)m_arrGradient.GetCount();
+}
+
 GradientInfo SGradientDesc::GetGradientInfo(int nScale) const
 {
     GradientInfo ret;
@@ -461,6 +493,11 @@ ISkinObj *SSkinGradation2::Scale(int nScale)
 {
     return NULL;
 }
+
+void SSkinGradation2::OnInitFinished(THIS_ IXmlNode* xmlNode) {
+    LoadColorTable(xmlNode);
+}
+
 //////////////////////////////////////////////////////////////////////////
 // SScrollbarSkin
 SSkinScrollbar::SSkinScrollbar()

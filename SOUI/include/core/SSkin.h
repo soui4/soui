@@ -253,6 +253,7 @@ class SOUI_EXP SGradientDesc {
 
   protected:
     HRESULT OnAttrColors(const SStringW &value, BOOL bLoading);
+    int LoadColorTable(IXmlNode* xmlNode);
 
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"colors", OnAttrColors)
@@ -277,7 +278,7 @@ class SOUI_EXP SSkinGradation2
 
   public:
     STDMETHOD_(ISkinObj *, Scale)(THIS_ int nScale) OVERRIDE;
-
+    STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode* xmlNode) OVERRIDE;
   protected:
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
 
