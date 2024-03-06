@@ -452,6 +452,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
 
         IBrushS *CreateBrush(IRenderTarget *pRT, int nScale, BYTE byAlpha) const;
 
+		STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode) override;
       public:
         SOUI_ATTRS_BEGIN()
             ATTR_CHAIN_CLASS(SGradientDesc)

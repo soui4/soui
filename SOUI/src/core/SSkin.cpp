@@ -774,15 +774,15 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
     SAutoRefPtr<IBrushS> pBrush, oldBrush;
     if (m_solid)
     {
-        pBrush = m_solid->CreateBrush(pRT, byAlpha);
+        pBrush.Attach(m_solid->CreateBrush(pRT, byAlpha));
     }
     else if (m_gradient != NULL)
     {
-        pBrush = m_gradient->CreateBrush(pRT, GetScale(), byAlpha);
+        pBrush.Attach(m_gradient->CreateBrush(pRT, GetScale(), byAlpha));
     }
     else if (m_bitmap)
     {
-        pBrush = m_bitmap->CreateBrush(pRT, byAlpha);
+        pBrush.Attach(m_bitmap->CreateBrush(pRT, byAlpha));
     }
 
     SAutoRefPtr<IPenS> pPen, oldPen;
@@ -906,6 +906,10 @@ IBrushS *SSkinShape::SGradientBrush::CreateBrush(IRenderTarget *pRT, int nScale,
     GradientInfo info = GetGradientInfo(nScale);
     pRT->CreateGradientBrush(m_arrGradient.GetData(), (int)m_arrGradient.GetCount(), &info, byAlpha, kRepeat_TileMode, &ret);
     return ret;
+}
+
+void SSkinShape::SGradientBrush::OnInitFinished(THIS_ IXmlNode *xmlNode) {
+	LoadColorTable(xmlNode);
 }
 
 HRESULT SSkinShape::SCornerSize::OnAttrRadius(const SStringW strValue, BOOL bLoading)
