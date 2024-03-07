@@ -12,6 +12,7 @@ SSliderBar::SSliderBar()
     , m_uHtPrev(-1)
     , m_pSkinThumb(GETBUILTINSKIN(SKIN_SYS_SLIDER_THUMB))
     , m_bThumbInRail(FALSE)
+    , m_bDrawRail(TRUE)
 {
     m_evtSet.addEvent(EVENTID(EventSliderPos));
 }
@@ -121,18 +122,19 @@ CRect SSliderBar::GetPartRect(UINT uSBCode)
 
 void SSliderBar::OnPaint(IRenderTarget *pRT)
 {
-    SASSERT(m_pSkinBg && m_pSkinPos);
-
     SPainter painter;
 
     BeforePaint(pRT, painter);
 
-    CRect rcRail = GetPartRect(SC_RAILBACK);
-    m_pSkinBg->DrawByIndex(pRT, rcRail, 0);
-    if (m_nValue != m_nMinValue)
-    {
-        CRect rcSel = GetPartRect(SC_SELECT);
-        m_pSkinPos->DrawByIndex(pRT, rcSel, 0);
+    if (m_bDrawRail) {
+        CRect rcRail = GetPartRect(SC_RAILBACK);
+        if (m_pSkinBg)
+            m_pSkinBg->DrawByIndex(pRT, rcRail, 0);
+        if (m_nValue != m_nMinValue && m_pSkinPos)
+        {
+            CRect rcSel = GetPartRect(SC_SELECT);
+            m_pSkinPos->DrawByIndex(pRT, rcSel, 0);
+        }
     }
     if (m_pSkinThumb)
     {

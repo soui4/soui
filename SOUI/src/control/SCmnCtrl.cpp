@@ -915,11 +915,10 @@ void SProgress::OnPaint(IRenderTarget *pRT)
 
     BeforePaint(pRT, painter);
 
-    SASSERT(m_pSkinBg && m_pSkinPos);
-
     CRect rcClient;
     GetClientRect(&rcClient);
-    m_pSkinBg->DrawByState(pRT, rcClient, WndState_Normal);
+    if(m_pSkinBg)
+        m_pSkinBg->DrawByState(pRT, rcClient, WndState_Normal);
     CRect rcValue = rcClient;
 
     if (IsVertical())
@@ -931,7 +930,7 @@ void SProgress::OnPaint(IRenderTarget *pRT)
     {
         rcValue.right = rcValue.left + (int)(((__int64)rcValue.Width()) * (m_nValue - m_nMinValue) / (__int64)(m_nMaxValue - m_nMinValue));
     }
-    if (m_nValue > m_nMinValue)
+    if (m_nValue > m_nMinValue && m_pSkinPos)
     {
         m_pSkinPos->DrawByState(pRT, rcValue, WndState_Normal);
     }
@@ -951,8 +950,7 @@ int SProgress::OnCreate(void *)
         m_pSkinBg = GETBUILTINSKIN(IsVertical() ? SKIN_SYS_VERT_PROG_BKGND : SKIN_SYS_PROG_BKGND);
     if (!m_pSkinPos)
         m_pSkinPos = GETBUILTINSKIN(IsVertical() ? SKIN_SYS_VERT_PROG_BAR : SKIN_SYS_PROG_BAR);
-    SASSERT(m_pSkinBg && m_pSkinPos);
-    return (m_pSkinBg && m_pSkinPos) ? 0 : -1;
+    return 0;
 }
 
 BOOL SProgress::SetValue(int dwValue)
