@@ -75,7 +75,7 @@ class SOUI_EXP SSliderBar : public SProgress {
 
     SAutoRefPtr<ISkinObj> m_pSkinThumb; /**< 皮肤对象 */
     BOOL m_bThumbInRail;                /**< 滑块包含在轨道中 */
-    BOOL m_bDrawRail;/**< 绘制轨道 */
+    BOOL m_bDrawRail;                   /**< 绘制轨道 */
   protected:
     /**
      * SSliderBar::NotifyPos

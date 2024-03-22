@@ -126,7 +126,8 @@ void SSliderBar::OnPaint(IRenderTarget *pRT)
 
     BeforePaint(pRT, painter);
 
-    if (m_bDrawRail) {
+    if (m_bDrawRail)
+    {
         CRect rcRail = GetPartRect(SC_RAILBACK);
         if (m_pSkinBg)
             m_pSkinBg->DrawByIndex(pRT, rcRail, 0);

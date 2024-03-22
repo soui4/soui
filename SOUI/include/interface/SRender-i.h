@@ -3,6 +3,7 @@
 
 #include <interface/obj-ref-i.h>
 #include <interface/sobject-i.h>
+#include <interface/SGradient-i.h>
 #include <interface/SPathEffect-i.h>
 #include <interface/SImgDecoder-i.h>
 #include <interface/sxml-i.h>
@@ -1068,12 +1069,6 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
     STDMETHOD_(BOOL, hitTestStroke)(CTHIS_ float x, float y, float strokeSize) SCONST PURE;
 };
 
-typedef struct _GradientItem
-{
-    COLORREF cr;
-    float pos;
-} GradientItem;
-
 typedef struct _GradientInfo
 {
     GradientType type;
@@ -1082,9 +1077,10 @@ typedef struct _GradientInfo
         float radius; // radical
         struct
         {
-            float fX;
-            float fY;
-        } center; // sweep;
+            float centerX; // 0.0 -> 1.0, 0.5 is center of x
+            float centerY; // 0.0 -> 1.0, 0.5 is center of y
+            BOOL bFullArc; // true(default) indicator gradient is rendered for full circle.
+        } sweep;           // sweep;
     };
 } GradientInfo;
 
@@ -1162,6 +1158,8 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
 
     STDMETHOD_(HRESULT, DrawArc)
     (THIS_ LPCRECT pRect, float startAngle, float sweepAngle, BOOL useCenter) PURE;
+    STDMETHOD_(HRESULT, DrawArc2)
+    (THIS_ LPCRECT pRect, float startAngle, float sweepAngle, int width) PURE;
     STDMETHOD_(HRESULT, FillArc)(THIS_ LPCRECT pRect, float startAngle, float sweepAngle) PURE;
 
     STDMETHOD_(HRESULT, DrawLines)(THIS_ LPPOINT pPt, size_t nCount) PURE;

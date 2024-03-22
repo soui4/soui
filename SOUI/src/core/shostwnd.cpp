@@ -1175,9 +1175,9 @@ void SHostWnd::UpdateTooltip()
 {
     if (!m_pTipCtrl)
         return;
-    if (!m_hostAttr.m_bHasMsgLoop)
+    if (!m_hostAttr.m_bHasMsgLoop && GetCurrentMessage())
     {
-        m_pTipCtrl->RelayEvent((LPMSG)GetCurrentMessage());
+        m_pTipCtrl->RelayEvent(GetCurrentMessage());
     }
     SWindow *pHover = SWindowMgr::GetWindow(m_hHover);
     if (m_msgMouse.message != 0 || !pHover)
@@ -2085,7 +2085,7 @@ LRESULT SHostWnd::OnRunTasks(UINT uMsg, WPARAM wp, LPARAM lp)
     return 0;
 }
 
-LRESULT SHostWnd::OnSetLanguage(UINT uMsg,WPARAM wp,LPARAM lp)
+LRESULT SHostWnd::OnSetLanguage(UINT uMsg, WPARAM wp, LPARAM lp)
 {
     GetNcPainter()->GetRoot()->SDispatchMessage(uMsg);
     GetNcPainter()->GetRoot()->RequestRelayout();

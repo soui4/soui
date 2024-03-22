@@ -1194,8 +1194,8 @@ namespace SOUI
 			pShader = SkGradientShader::CreateRadial(skCenter,info->radius ,skColors, pos,nCount,tileMode);
 		}else if(info->type==sweep)
 		{
-			SkScalar centerX = skrc.fLeft+skrc.width()*info->center.fX;
-			SkScalar centerY = skrc.fTop+skrc.height()*info->center.fY;
+			SkScalar centerX = skrc.fLeft + skrc.width() * info->sweep.centerX;
+			SkScalar centerY = skrc.fTop+skrc.height()*info->sweep.centerY;
 			pShader = SkGradientShader::CreateSweep(centerX,centerY, skColors, pos,nCount);
 		}
 		if(nCount>3){
@@ -1369,6 +1369,39 @@ namespace SOUI
 		SkRect skrc = toSkRect(pRect);
 		skrc.offset(m_ptOrg);
 		m_SkCanvas->drawArc(skrc,startAngle,sweepAngle,!!useCenter,paint);
+		return S_OK;
+	}
+
+	HRESULT SRenderTarget_Skia::DrawArc2(LPCRECT pRect, float startAngle, float sweepAngle, int width)
+	{
+		SkPaint paint = m_paint;
+		paint.setStrokeCap(SkPaint::kButt_Cap);
+		paint.setStyle(SkPaint::kStroke_Style);
+		if (m_bAntiAlias)
+		{
+			paint.setStrokeWidth((SkScalar)width - 0.5f);
+		}
+		else
+		{
+			paint.setStrokeWidth((SkScalar)width);
+		}
+		
+		SkRect skrc = toSkRect(pRect);
+		skrc.offset(m_ptOrg);
+		m_SkCanvas->translate(skrc.centerX(), skrc.centerY());
+		m_SkCanvas->rotate(startAngle);
+		SkRect skrc2 = skrc;
+		skrc2.offset(-skrc.centerX(), -skrc.centerY());
+		m_curBrush->InitPaint(paint, skrc2);
+		
+		if (!m_curBrush->IsFullArc()) {
+			SkMatrix matrix;
+			matrix.setScale(sweepAngle / 360.0f, 1.0f);
+			paint.getShader()->setLocalMatrix(&matrix);
+		}
+		m_SkCanvas->drawArc(skrc2, 0, sweepAngle, false, paint);
+		m_SkCanvas->rotate(-startAngle);
+		m_SkCanvas->translate(-skrc.centerX(), -skrc.centerY());
 		return S_OK;
 	}
 
@@ -2154,6 +2187,13 @@ namespace SOUI
 	}
 
 
+	BOOL SBrush_Skia::IsFullArc() const
+	{
+		if (m_gradInfo.type == sweep)
+			return m_gradInfo.sweep.bFullArc;
+		else
+			return FALSE;
+	}
 	//////////////////////////////////////////////////////////////////////////
 	static int s_cPath =0;
 	SPath_Skia::SPath_Skia(IRenderFactory *pRenderFac)

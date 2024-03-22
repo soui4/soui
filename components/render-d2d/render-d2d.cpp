@@ -621,8 +621,8 @@ namespace SOUI
 							{
 								SComPtr<ID2D1RadialGradientBrush> brush;
 								D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES properties;
-								properties.center.x = m_gradInfo.center.fX;
-								properties.center.y = m_gradInfo.center.fY;
+								properties.center.x = m_gradInfo.sweep.centerX;
+								properties.center.y = m_gradInfo.sweep.centerY;
 								properties.gradientOriginOffset.x = properties.gradientOriginOffset.y = 0.0f;
 								properties.radiusX = properties.radiusY = m_gradInfo.radius;
 								if(SUCCEEDED(hr=pRT->CreateRadialGradientBrush(properties,collection,&brush)))
@@ -2010,6 +2010,10 @@ namespace SOUI
 		SPath_D2D path(m_pRenderFactory);
 		path.addArc(pRect,startAngle,sweepAngle);
 		return DrawPath(&path,NULL);
+	}
+
+	HRESULT SRenderTarget_D2D::DrawArc2(LPCRECT pRect, float startAngle, float sweepAngle, int width) {
+		return E_NOTIMPL;
 	}
 
 	HRESULT SRenderTarget_D2D::FillArc( LPCRECT pRect,float startAngle,float sweepAngle )

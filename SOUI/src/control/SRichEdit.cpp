@@ -26,7 +26,7 @@ STextServiceHelper::STextServiceHelper()
 #ifdef USE_MSFTEDIT
     m_rich20 = LoadLibrary(_T("Msftedit.dll"));
 #else
-	m_rich20 = LoadLibrary(_T("riched20.dll"));
+    m_rich20 = LoadLibrary(_T("riched20.dll"));
 #endif
     if (m_rich20)
         m_funCreateTextServices = (PCreateTextServices)GetProcAddress(m_rich20, "CreateTextServices");

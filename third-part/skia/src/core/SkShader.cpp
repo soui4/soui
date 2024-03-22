@@ -46,6 +46,15 @@ SkShader::SkShader(const SkMatrix* localMatrix) {
     }
 }
 
+void SkShader::setLocalMatrix(const SkMatrix* localMatrix) {
+    if (localMatrix) {
+        fLocalMatrix = *localMatrix;
+    }
+    else {
+        fLocalMatrix.reset();
+    }
+}
+
 #ifdef SK_SUPPORT_LEGACY_DEEPFLATTENING
 SkShader::SkShader(SkReadBuffer& buffer) : INHERITED(buffer) {
     inc_shader_counter();

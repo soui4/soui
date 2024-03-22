@@ -1377,6 +1377,10 @@ namespace SOUI
         return S_OK;
     }
 
+    HRESULT SRenderTarget_GDI::DrawArc2(LPCRECT pRect, float startAngle, float sweepAngle, int width) {
+        return E_NOTIMPL;
+    }
+
     HRESULT SRenderTarget_GDI::FillArc( LPCRECT pRect,float startAngle,float sweepAngle )
     {
         BYTE byAlpha=0xFF;

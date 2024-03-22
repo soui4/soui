@@ -4,7 +4,7 @@
 #include "souistd.h"
 #include "core/Sskin.h"
 #include "helper/SDIBHelper.h"
-
+#include <core/SGradient.h>
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -359,87 +359,8 @@ SGradientDesc::SGradientDesc()
     m_angle = 0.0f;
     m_radius = SLayoutSize(100);
     m_centerX = m_centerY = 0.5;
-}
-
-static int GradientItemCmp(const void *_p1, const void *_p2)
-{
-    const GradientItem *p1 = (const GradientItem *)_p1;
-    const GradientItem *p2 = (const GradientItem *)_p2;
-    float diff = p1->pos - p2->pos;
-    if (diff > 0.0f)
-        return 1;
-    else if (diff < 0.0f)
-        return -1;
-    else
-        return 0;
-}
-
-static BOOL ParseGradientColors(const SStringW &value, SArray<GradientItem> &output)
-{
-    SStringWList lstInfo;
-    SplitString(value, ',', lstInfo);
-
-    for (UINT i = 0; i < lstInfo.GetCount(); i++)
-    {
-        SStringWList lstColorInfo;
-        SplitString(lstInfo[i], '|', lstColorInfo);
-        GradientItem gradient;
-        if (lstColorInfo.GetCount() == 2)
-        {
-            gradient.cr = GETCOLOR(lstColorInfo[0]);
-            gradient.pos = (float)_wtof(lstColorInfo[1]);
-        }
-        else
-        {
-            gradient.cr = GETCOLOR(lstColorInfo[0]);
-            gradient.pos = 1.0f * i / (lstInfo.GetCount() - 1);
-        }
-        output.Add(gradient);
-    }
-    qsort(output.GetData(), output.GetCount(), sizeof(GradientItem), GradientItemCmp);
-    if (output.GetCount() < 2)
-        return FALSE;
-    output[0].pos = 0.0f;
-    output[output.GetCount() - 1].pos = 1.0f;
-    return TRUE;
-}
-
-HRESULT SGradientDesc::OnAttrColors(const SStringW &value, BOOL bLoading)
-{
-    m_arrGradient.RemoveAll();
-    return ParseGradientColors(value, m_arrGradient) ? S_FALSE : E_INVALIDARG;
-}
-
-int SGradientDesc::LoadColorTable(IXmlNode* xmlNode)
-{
-    IXmlNode* xmlColor = xmlNode->Child(L"item", FALSE);
-    if (!xmlColor)
-        return 0;
-
-    m_arrGradient.RemoveAll();
-    SXmlNode color(xmlColor);
-    float pos = -1.f;
-    while (color) {
-        GradientItem gradient;
-        gradient.cr = GETCOLOR(color.attribute(L"color").as_string());
-        gradient.pos = color.attribute(L"pos").as_float();
-        if (gradient.pos < pos || gradient.pos < 0.f || gradient.pos>1.0f)
-        {
-            SSLOGW() << "invalid gradient item pos. pos must between 0 and 1";
-        }
-        else
-        {
-            m_arrGradient.Add(gradient);
-            pos = gradient.pos;
-        }
-        color = color.next_sibling();
-    }
-    if (m_arrGradient.GetCount() < 2) {
-        m_arrGradient.RemoveAll();
-        //invalid
-        SSLOGW() << "gradient color table is empty";
-    }
-    return (int)m_arrGradient.GetCount();
+    m_bFullArc = TRUE;
+    m_gradient.Attach(new SGradient());
 }
 
 GradientInfo SGradientDesc::GetGradientInfo(int nScale) const
@@ -455,8 +376,9 @@ GradientInfo SGradientDesc::GetGradientInfo(int nScale) const
         ret.radius = (float)m_radius.toPixelSize(nScale);
         break;
     case sweep:
-        ret.center.fX = m_centerX;
-        ret.center.fY = m_centerY;
+        ret.sweep.centerX = m_centerX;
+        ret.sweep.centerY = m_centerY;
+        ret.sweep.bFullArc = m_bFullArc;
         break;
     }
     return ret;
@@ -469,6 +391,7 @@ SSkinGradation2::SSkinGradation2()
     m_szCorner[0].setInvalid();
     m_szCorner[1].setInvalid();
     m_bEnableScale = false;
+    m_gradient.Attach(new SGradient());
 }
 
 void SSkinGradation2::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const
@@ -486,7 +409,7 @@ void SSkinGradation2::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iSta
         ptCorner.y = (int)(rc.Height() / 2 * m_ptCorner.fY);
     }
     GradientInfo info = GetGradientInfo(GetScale());
-    pRT->DrawGradientRectEx(prcDraw, ptCorner, m_arrGradient.GetData(), (int)m_arrGradient.GetCount(), &info, GetAlpha());
+    pRT->DrawGradientRectEx(prcDraw, ptCorner, m_gradient->GetGradientData(), m_gradient->GetGradientLength(), &info, GetAlpha());
 }
 
 ISkinObj *SSkinGradation2::Scale(int nScale)
@@ -494,8 +417,9 @@ ISkinObj *SSkinGradation2::Scale(int nScale)
     return NULL;
 }
 
-void SSkinGradation2::OnInitFinished(THIS_ IXmlNode* xmlNode) {
-    LoadColorTable(xmlNode);
+void SSkinGradation2::OnInitFinished(THIS_ IXmlNode *xmlNode)
+{
+    m_gradient->OnInitFinished(xmlNode);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -900,16 +824,17 @@ IBrushS *SSkinShape::SShapeBitmap::CreateBrush(IRenderTarget *pRT, BYTE byAlpha)
 
 IBrushS *SSkinShape::SGradientBrush::CreateBrush(IRenderTarget *pRT, int nScale, BYTE byAlpha) const
 {
-    if (m_arrGradient.GetCount() < 2)
+    if (m_gradient->GetGradientLength() < 2)
         return NULL;
     IBrushS *ret = NULL;
     GradientInfo info = GetGradientInfo(nScale);
-    pRT->CreateGradientBrush(m_arrGradient.GetData(), (int)m_arrGradient.GetCount(), &info, byAlpha, kRepeat_TileMode, &ret);
+    pRT->CreateGradientBrush(m_gradient->GetGradientData(), m_gradient->GetGradientLength(), &info, byAlpha, kRepeat_TileMode, &ret);
     return ret;
 }
 
-void SSkinShape::SGradientBrush::OnInitFinished(THIS_ IXmlNode *xmlNode) {
-	LoadColorTable(xmlNode);
+void SSkinShape::SGradientBrush::OnInitFinished(THIS_ IXmlNode *xmlNode)
+{
+    m_gradient->OnInitFinished(xmlNode);
 }
 
 HRESULT SSkinShape::SCornerSize::OnAttrRadius(const SStringW strValue, BOOL bLoading)
@@ -938,7 +863,6 @@ HRESULT SSkinShape::SRatioCornerSize::OnAttrRadius(const SStringW strValue, BOOL
     {
         swscanf_s(strValue.c_str(), L"%f", &m_radius.fX);
         m_radius.fY = m_radius.fX;
-        ;
         return S_OK;
     }
     else if (nValues == 2)

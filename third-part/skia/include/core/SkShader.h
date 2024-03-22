@@ -47,6 +47,8 @@ public:
      */
     const SkMatrix& getLocalMatrix() const { return fLocalMatrix; }
 
+    void setLocalMatrix(const SkMatrix* localMatrix);
+
     /**
      *  Returns true if the local matrix is not an identity matrix.
      *

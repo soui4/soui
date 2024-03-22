@@ -524,6 +524,7 @@ public:
 	STDMETHOD_(HRESULT,FillSolidEllipse)(THIS_ LPCRECT pRect,COLORREF cr) OVERRIDE;
 
 	STDMETHOD_(HRESULT,DrawArc)(THIS_ LPCRECT pRect,float startAngle,float sweepAngle,BOOL useCenter) OVERRIDE;
+	STDMETHOD_(HRESULT,DrawArc2)(THIS_ LPCRECT pRect,float startAngle,float sweepAngle,int width) OVERRIDE;
 	STDMETHOD_(HRESULT,FillArc)(THIS_ LPCRECT pRect,float startAngle,float sweepAngle) OVERRIDE;
 
 	STDMETHOD_(HRESULT,DrawLines)(THIS_ LPPOINT pPt,size_t nCount) OVERRIDE;

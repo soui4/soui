@@ -917,7 +917,7 @@ void SProgress::OnPaint(IRenderTarget *pRT)
 
     CRect rcClient;
     GetClientRect(&rcClient);
-    if(m_pSkinBg)
+    if (m_pSkinBg)
         m_pSkinBg->DrawByState(pRT, rcClient, WndState_Normal);
     CRect rcValue = rcClient;
 

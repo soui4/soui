@@ -93,6 +93,7 @@ HEADERS += include/SApp.h \
            include/interface/SObjFactory-i.h \
            include/interface/SHostPresenter-i.h \
            include/interface/SHttpClient-i.h \
+           include/interface/SGradient-i.h \
            include/proxy/SNativeWndProxy.h \
            include/proxy/SHostWndProxy.h \
            include/proxy/SPanelProxy.h \
@@ -166,6 +167,7 @@ HEADERS += include/SApp.h \
            include/core/SWndStyle.h \
            include/core/SNcPainter.h \
            include/core/SHostPresenter.h \
+           include/core/SGradient.h \
            include/event/SEventCrack.h \
            include/event/SEvents.h \
            include/event/SEventSet.h \
@@ -225,6 +227,7 @@ HEADERS += include/SApp.h \
            include/res.mgr/SSkinPool.h \
            include/res.mgr/SStylePool.h \
            include/res.mgr/SUiDef.h \
+           include/res.mgr/SGradientPool.h \
            include/sobject/Sobject.hpp \
            include/unknown/obj-ref-i.h \
            include/unknown/obj-ref-impl.hpp \
@@ -297,6 +300,7 @@ SOURCES += src/SApp.cpp \
            src/core/SwndStyle.cpp \
            src/core/SNcPainter.cpp \
            src/core/SHostPresenter.cpp \
+           src/core/SGradient.cpp \
            src/event/SEventSet.cpp \
            src/event/SNotifyCenter.cpp \
            src/helper/SAppDir.cpp \
@@ -335,5 +339,6 @@ SOURCES += src/SApp.cpp \
            src/res.mgr/SSkinPool.cpp \
            src/res.mgr/SStylePool.cpp \
            src/res.mgr/SUiDef.cpp \
+           src/res.mgr/SGradientPool.cpp \
            src/updatelayeredwindow/SUpdateLayeredWindow.cpp \
            src/valueAnimator/SValueAnimator.cpp

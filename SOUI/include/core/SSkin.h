@@ -243,20 +243,23 @@ class SOUI_EXP SGradientDesc {
     SGradientDesc();
 
   protected:
-    SArray<GradientItem> m_arrGradient;
+    SAutoRefPtr<IGradient> m_gradient;
     SLayoutSize m_radius;
     GradientType m_type;
     float m_angle;
     float m_centerX;
     float m_centerY;
+    BOOL m_bFullArc;
+
+  public:
     GradientInfo GetGradientInfo(int nScale) const;
+    IGradient *GetGradient()
+    {
+        return m_gradient;
+    }
 
   protected:
-    HRESULT OnAttrColors(const SStringW &value, BOOL bLoading);
-    int LoadColorTable(IXmlNode* xmlNode);
-
     SOUI_ATTRS_BEGIN()
-        ATTR_CUSTOM(L"colors", OnAttrColors)
         ATTR_ENUM_BEGIN(L"type", GradientType, TRUE)
             ATTR_ENUM_VALUE(L"linear", linear)
             ATTR_ENUM_VALUE(L"radial", radial)
@@ -266,6 +269,9 @@ class SOUI_EXP SGradientDesc {
         ATTR_FLOAT(L"angle", m_angle, TRUE)
         ATTR_FLOAT(L"centerX", m_centerX, TRUE)
         ATTR_FLOAT(L"centerY", m_centerY, TRUE)
+        ATTR_BOOL(L"fullArc", m_bFullArc, TRUE)
+        ATTR_GRADIENT(L"gradient", m_gradient, TRUE)
+        ATTR_CHAIN_PTR(m_gradient, 0)
     SOUI_ATTRS_BREAK()
 };
 
@@ -278,14 +284,15 @@ class SOUI_EXP SSkinGradation2
 
   public:
     STDMETHOD_(ISkinObj *, Scale)(THIS_ int nScale) OVERRIDE;
-    STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode* xmlNode) OVERRIDE;
+    STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode) OVERRIDE;
+
   protected:
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iState, BYTE byAlpha) const override;
 
     SPoint m_ptCorner;
     SLayoutSize m_szCorner[2];
 
-  protected:
+  public:
     SOUI_ATTRS_BEGIN()
         ATTR_SPOINT(L"ratio_corners", m_ptCorner, TRUE)
         ATTR_LAYOUTSIZE2(L"corners", m_szCorner, TRUE)
@@ -452,7 +459,8 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
 
         IBrushS *CreateBrush(IRenderTarget *pRT, int nScale, BYTE byAlpha) const;
 
-		STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode) override;
+        STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode) override;
+
       public:
         SOUI_ATTRS_BEGIN()
             ATTR_CHAIN_CLASS(SGradientDesc)
