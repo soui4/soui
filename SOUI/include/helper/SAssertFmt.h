@@ -14,7 +14,7 @@
 
 #define SASSERT_MSGA(expr, msg) \
         (void) ((!!(expr)) || \
-                (1 != _CrtDbgReport(_CRT_ASSERT, _CRT_WIDE(__FILE__), __LINE__, NULL, msg)) || \
+                (1 != _CrtDbgReport(_CRT_ASSERT, __FILE__, __LINE__, NULL, msg)) || \
                 (_CrtDbgBreak(), 0))
 #else
 #define SASSERT_FMTW(expr, format, ...) \

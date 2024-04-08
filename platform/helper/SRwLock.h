@@ -12,7 +12,7 @@
 #define _SRW_LOCK_H_
 
 #include <platform_exp.h>
-#include <sdef.h>
+#include <platform.h>
 #include <helper/SNoCopyable.hpp>
 
 

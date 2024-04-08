@@ -1,5 +1,4 @@
 #include <sysapi.h>
-#include <WinUser.h>
 #include <tchar.h>
 #pragma comment(lib, "version.lib")
 

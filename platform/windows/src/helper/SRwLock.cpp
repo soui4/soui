@@ -9,11 +9,6 @@
  */
 
 #include <helper/SRwLock.h>
-#if defined( _WIN32 )
-#include <windows.h>
-#else
-#include <pthread.h>
-#endif
 
 SNSBEGIN
 
@@ -24,7 +19,6 @@ struct IRwLock {
     virtual void LockExclusive(void) = 0;
     virtual void UnlockExclusive(void) = 0;
 };
-#if defined(_WIN32)
 
 static bool native_rw_locks_supported = false;
 static bool module_load_attempted = false;
@@ -160,49 +154,9 @@ public:
         release_srw_lock_shared(&m_rwlock);
     }
 };
-#else
-class SRwLockPosix : public IRwLock
-{
-public:
-
-    SRwLockPosix()
-    {
-        ::pthread_rwlock_init(&m_rwlock, NULL);
-    }
-
-    ~SRwLockPosix()
-    {
-        ::pthread_rwlock_destroy(&m_rwlock);
-    }
-
-    void LockShared() override
-    {
-        ::pthread_rwlock_rdlock(&m_rwlock);
-    }
-
-    void UnlockShared(void) override
-    {
-        ::pthread_rwlock_unlock(&m_rwlock);
-    }
-
-    void LockExclusive(void) override
-    {
-        ::pthread_rwlock_wrlock(&m_rwlock);
-    }
-
-    void UnlockExclusive(void) override
-    {
-        ::pthread_rwlock_unlock(&m_rwlock);
-    }
-
-private:
-    pthread_rwlock_t m_rwlock;
-};
-#endif
 
 SRwLock::SRwLock()
 {
-#ifdef _WIN32
     if (LoadModule()) {
         impl = new SRwLockWin7();
     }
@@ -210,9 +164,6 @@ SRwLock::SRwLock()
     {
         impl = new SRwLockWinXP();
     }
-#else
-    impl = new SRwLockPosix();
-#endif
 }
 
 SRwLock::~SRwLock() {

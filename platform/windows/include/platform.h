@@ -11,8 +11,11 @@
 #include <sysapi.h>
 #include <OleAcc.h>
 #include <OCIdl.h>
+#include <shellapi.h>
 #if _MSC_VER < 1500
 #include <tmschema.h> //for VS2005
 #else
 #include <vsstyle.h>
 #endif
+#include <sdef.h>
+#endif//__PLATFORM_H_

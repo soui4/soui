@@ -1,8 +1,6 @@
 #include <helper/SSemaphore.h>
 #include <cerrno>
 
-#include <Windows.h>
-
 SNSBEGIN
 	class SemaphorePrivate
 	{

@@ -1,5 +1,4 @@
 #include <helper/SCriticalSection.h>
-#include <Windows.h>
 SNSBEGIN
 
 class SCriticalSectionImpl{

@@ -2,7 +2,7 @@
 #define __SSEMAPHORE__H__
 
 #include <platform_exp.h>
-#include <sdef.h>
+#include <platform.h>
 #include <helper/SNoCopyable.hpp>
 
 SNSBEGIN

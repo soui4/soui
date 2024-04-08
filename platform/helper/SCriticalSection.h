@@ -14,7 +14,7 @@
 #ifndef __SCRITICALSECTION__H__
 #define __SCRITICALSECTION__H__
 #include <platform_exp.h>
-#include <sdef.h>
+#include <platform.h>
 
 SNSBEGIN
 
