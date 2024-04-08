@@ -7,7 +7,7 @@
 #include <res.mgr/SFontPool.h>
 #include <res.mgr/SSkinPool.h>
 #include <res.mgr/SStylePool.h>
-
+#include <res.mgr/SGradientPool.h>
 #include <res.mgr/SObjDefAttr.h>
 #include <res.mgr/SNamedValue.h>
 
@@ -23,6 +23,7 @@ enum
     UDI_STRING = 1 << 5,
     UDI_DIMENSION = 1 << 6,
     UDI_FONT = 1 << 7,
+    UDI_GRADIENT = 1 << 8,
 };
 
 struct IUiDefInfo : IObjRef
@@ -33,12 +34,12 @@ struct IUiDefInfo : IObjRef
     virtual SSkinPool *GetSkinPool() = 0;
     virtual SStylePool *GetStylePool() = 0;
     virtual STemplatePool *GetTemplatePool() = 0;
+    virtual SGradientPool *GetGradientPool() = 0;
 
     virtual SNamedColor &GetNamedColor() = 0;
     virtual SNamedString &GetNamedString() = 0;
     virtual SNamedDimension &GetNamedDimension() = 0;
     virtual SNamedFont &GetNamedFont() = 0;
-
     // global settings.
     virtual SStringW GetDefFontInfo() = 0;
     virtual SXmlNode GetCaretInfo() = 0;
@@ -176,6 +177,15 @@ class SOUI_EXP SUiDef
      * Describe
      */
     SStringW GetTemplateString(const SStringW &strName);
+
+    /**
+     * GetGradient
+     * @brief    Get gradient object from pool by name
+     * @param    const SStringW & strName --  name of gradient
+     * @return   IGradient* -- gradient object
+     * Describe
+     */
+    IGradient *GetGradient(const SStringW &strName);
 
     //从字符串返回颜色值，字符串可以是：@color/red
     //(red是在资源包中的颜色表定义的颜色名)，也可以是rgba(r,g,b,a)，也可以是rgb(r,g,b)，还可以是#ff0000(ff)这样的格式

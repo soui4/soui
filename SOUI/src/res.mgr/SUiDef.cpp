@@ -17,6 +17,7 @@ const static WCHAR KNodeString[] = L"string";
 const static WCHAR KNodeStyle[] = L"style";
 const static WCHAR KNodeTemplate[] = L"template";
 const static WCHAR KNodeObjAttr[] = L"objattr";
+const static WCHAR KNodeGradient[] = L"gradient";
 
 static SXmlNode GetSourceXmlNode(SXmlNode nodeRoot, SXmlDoc &docInit, IResProvider *pResProvider, const wchar_t *pszName)
 {
@@ -49,6 +50,7 @@ class SUiDefInfo : public TObjRefImpl<IUiDefInfo> {
     SSkinPool *GetSkinPool() override;
     SStylePool *GetStylePool() override;
     STemplatePool *GetTemplatePool() override;
+    SGradientPool *GetGradientPool() override;
     SObjDefAttr *GetObjDefAttr() override;
     SNamedColor &GetNamedColor() override;
     SNamedString &GetNamedString() override;
@@ -62,7 +64,7 @@ class SUiDefInfo : public TObjRefImpl<IUiDefInfo> {
     SAutoRefPtr<SStylePool> pStylePool;
     SAutoRefPtr<SObjDefAttr> objDefAttr;
     SAutoRefPtr<STemplatePool> templatePool;
-
+    SAutoRefPtr<SGradientPool> gradientPool;
     SNamedColor namedColor;
     SNamedString namedString;
     SNamedDimension namedDim;
@@ -201,6 +203,18 @@ UINT SUiDefInfo::Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResPr
         }
     }
 
+    // load named color
+    {
+        SXmlDoc docData;
+        SXmlNode nodeData = GetSourceXmlNode(root, docData, pResProvider, KNodeGradient);
+        if (nodeData)
+        {
+            gradientPool.Attach(new SGradientPool);
+            gradientPool->Init(nodeData);
+            nodeData.set_userdata(1);
+            uRet |= UDI_GRADIENT;
+        }
+    }
     // load named dimension
     {
         SXmlDoc docData;
@@ -307,6 +321,11 @@ SXmlNode SUiDefInfo::GetCaretInfo()
 STemplatePool *SUiDefInfo::GetTemplatePool()
 {
     return templatePool;
+}
+
+SGradientPool *SUiDefInfo::GetGradientPool()
+{
+    return gradientPool;
 }
 //////////////////////////////////////////////////////////////////////////
 SUiDef::SUiDef(IRenderFactory *fac)
@@ -526,6 +545,23 @@ SStringW SUiDef::GetTemplateString(const SStringW &strName)
             return strRet;
     }
     return SStringW();
+}
+
+IGradient *SUiDef::GetGradient(const SStringW &strName)
+{
+    SAutoLock autolock(m_cs);
+    SPOSITION pos = m_lstUiDefInfo.GetTailPosition();
+    while (pos)
+    {
+        IUiDefInfo *pUiInfo = m_lstUiDefInfo.GetPrev(pos);
+        SGradientPool *pPool = pUiInfo->GetGradientPool();
+        if (!pPool)
+            continue;
+        IGradient *pRet = pPool->GetGradient(strName);
+        if (pRet)
+            return pRet;
+    }
+    return NULL;
 }
 
 COLORREF SUiDef::GetColor(const SStringW &strColor)

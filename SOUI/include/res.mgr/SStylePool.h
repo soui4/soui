@@ -13,13 +13,9 @@
 
 #ifndef __SSTYLEPOOL__H__
 #define __SSTYLEPOOL__H__
-#include <core/SSingletonMap.h>
+#include <core/SCmnMap.h>
 #include <interface/obj-ref-i.h>
 #include <helper/obj-ref-impl.hpp>
-
-//通过NAME获得对应的Style
-// p1: name of style
-// p2: output of style
 
 SNSBEGIN
 /**
@@ -36,8 +32,7 @@ class SOUI_EXP SStylePool
      * GetStyle
      * @brief    Get style object from pool by class name
      * @param    LPCWSTR lpszName --  name of style
-     * @param [out]  SwndStyle & style --  style
-     * @return   BOOL -- TRUE: success; FALSE: not exist
+     * @return   SXmlNode -- xml style
      * Describe
      */
     SXmlNode GetStyle(const SStringW &strName);

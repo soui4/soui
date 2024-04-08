@@ -727,12 +727,7 @@ bool CFileStream::GetFile(const char *fileName, BlobBuffer &blob)
 	//改为不区分大小写吧，soui ui库大小写比较乱．．.	  
 	std::string file_name(fileName);
 	file_name = tolowerstring(file_name);
-
-#ifdef _DEBUG
-	return getBlob(file_name.c_str(), blob, true);
-#else
 	return getBlob(file_name.c_str(), blob, false);
-#endif
 }
 
 int CFileStream::GetFileCount()

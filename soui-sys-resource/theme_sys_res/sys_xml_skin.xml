@@ -4,7 +4,7 @@
   <imglist name="_skin.sys.radio" src="PNG:SYS_RADIO" states="8" checkAsPushdown="0"/>
   <imglist name="_skin.sys.focuscheckbox" src="PNG:SYS_FOCUS_CHECKBOX"/>
   <imglist name="_skin.sys.focusradio" src="PNG:SYS_FOCUS_RADIO"/>
-  <button name="_skin.sys.btn.normal" colorUp="#ffffff" colorDown="#ffffff" colorUpHover="#ecf5ff" colorDownHover="#ecf5ff" colorUpPush="#ecf5ff" colorDownPush="#ecf5ff" colorUpDisable="#DDDDDDFF" colorDownDisable="#DDDDDDFF" cornerRadius="2" colorBorder="#1890FF66" colorBorderHover="#1890FF66" colorBorderPush="#1890FF66" colorBorderDisable="#1890FF66"/>
+  <button name="_skin.sys.btn.normal" colorUp="#ffffff" colorDown="#ffffff" colorUpHover="#ecf5ff" colorDownHover="#ecf5ff" colorUpPush="#B9DDFF" colorDownPush="#B9DDFF" colorUpDisable="#DDDDDDFF" colorDownDisable="#DDDDDDFF" cornerRadius="2" colorBorder="#1890FF66" colorBorderHover="#1890FF66" colorBorderPush="#1890FF66" colorBorderDisable="#1890FF66"/>
   <scrollbar name="_skin.sys.scrollbar" src="PNG:SYS_SCROLLBAR" margin="3" hasgripper="0"/>
   <imgframe name="_skin.sys.border" src="PNG:SYS_BORDER" states="2" margin-x="3" margin-y="3"/>
   <imgcenter name="_skin.sys.dropbtn" src="PNG:SYS_DROPBTN" states="3"/>

@@ -41,14 +41,21 @@
 #include "MainDlg.h"
 
 
+enum{
+	RESTYPE_FILE = 0,//从文件中加载资源，加载失败再从PE加载
+	RESTYPE_PE,//从PE资源中加载UI资源
+	RESTYPE_ZIP,//从zip包中加载资源
+	RESTYPE_7Z,//从7zip包中加载资源
+};
 #ifdef _DEBUG
-#define RES_TYPE 0      //从文件中加载资源，加载失败再从PE加载
+#define RES_TYPE RESTYPE_FILE      //从文件中加载资源，加载失败再从PE加载
 #else
-#define RES_TYPE 1		//从PE资源中加载UI资源
+#define RES_TYPE RESTYPE_PE		//从PE资源中加载UI资源
 #endif
-// #define RES_TYPE 1   //从PE资源中加载UI资源
-//#define RES_TYPE 2   //从zip包中加载资源
+//#define RES_TYPE RESTYPE_ZIP   //从zip包中加载资源
+#define RES_TYPE RESTYPE_7Z   //从7zip包中加载资源
 
+#include "../components/resprovider-7zip/zip7resprovider-param.h"
 #include "../components/resprovider-zip/zipresprovider-param.h"
 
 #if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
@@ -220,7 +227,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		//为渲染模块设置它需要引用的图片解码模块
 		pRenderFactory->SetImgDecoderFactory(pImgDecoderFactory);
 		theApp->SetRenderFactory(pRenderFactory);
-		pRenderFactory = NULL;
 
 		theApp->SetLogManager(pLogMgr);
 		SLOGFMTE(L"log output using unicode format,str=%s, tick=%u", L"中文", GetTickCount());
@@ -313,7 +319,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
 		//定义一人个资源提供对象,SOUI系统中实现了3种资源加载方式，分别是从文件加载，从EXE的资源加载及从ZIP压缩包加载
 		SAutoRefPtr<IResProvider>   pResProvider;
-#if (RES_TYPE == 0)//从文件加载
+#if (RES_TYPE == RESTYPE_FILE)//从文件加载
 		pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
 		if (!pResProvider->Init((LPARAM)_T("uires"), 0))
 		{
@@ -326,10 +332,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 				goto exit;
 			}
 		}
-#elif (RES_TYPE==1)//从EXE资源加载
+#elif (RES_TYPE==RESTYPE_PE)//从EXE资源加载
 		pResProvider.Attach(souiFac.CreateResProvider(RES_PE));
 		pResProvider->Init((WPARAM)hInstance, 0);
-#elif (RES_TYPE==2)//从ZIP包加载
+#elif (RES_TYPE==RESTYPE_ZIP)//从ZIP包加载
 		bLoaded = pComMgr->CreateResProvider_ZIP((IObjRef**)&pResProvider);
 		SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), _T("resprovider_zip"));
 
@@ -337,7 +343,16 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		ZipFile(&param,pRenderFactory, _T("uires.zip"), "souizip");
 		bLoaded = pResProvider->Init((WPARAM)&param, 0);
 		SASSERT(bLoaded);
+#elif (RES_TYPE==RESTYPE_7Z)//从ZIP包加载
+		bLoaded = pComMgr->CreateResProvider_7ZIP((IObjRef**)&pResProvider);
+		SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), _T("resprovider_zip"));
+
+		ZIP7RES_PARAM param;
+		Zip7File(&param,pRenderFactory, _T("uires.zip"), "souizip");
+		bLoaded = pResProvider->Init((WPARAM)&param, 0);
+		SASSERT(bLoaded);
 #endif
+		pRenderFactory = NULL;
 		//将创建的IResProvider交给SApplication对象
 		theApp->AddResProvider(pResProvider);
 

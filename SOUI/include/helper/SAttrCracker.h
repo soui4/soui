@@ -405,4 +405,18 @@
     }                                                                                 \
     else
 
+#define ATTR_GRADIENT(attribname, varname, allredraw)                 \
+    if (0 == strAttribName.CompareNoCase(attribname))                 \
+    {                                                                 \
+        SOUI::IGradient *pGradient = GETUIDEF->GetGradient(strValue); \
+        if (!pGradient)                                               \
+            hRet = E_FAIL;                                            \
+        else                                                          \
+        {                                                             \
+            varname = pGradient;                                      \
+            hRet = allredraw ? S_OK : S_FALSE;                        \
+        }                                                             \
+    }                                                                 \
+    else
+
 #endif //_SATTRCRACK_H
