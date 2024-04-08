@@ -1,19 +1,4 @@
-﻿//!添加引用
-/*!
- */
-STDMETHOD_(long, AddRef)(THIS) PURE;
-
-//!释放引用
-/*!
- */
-STDMETHOD_(long, Release)(THIS) PURE;
-
-//!释放对象
-/*!
- */
-STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-//////////////////////////////////////////////////////////////////////////
-
+﻿
 /**
  * @brief 创建一个Native窗口
  * @param lpWindowName 窗口名

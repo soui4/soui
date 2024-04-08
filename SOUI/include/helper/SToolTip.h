@@ -3,6 +3,7 @@
 
 #include "interface/stooltip-i.h"
 #include <SNativeWnd.h>
+#include <helper/obj-ref-impl.hpp>
 
 SNSBEGIN
 class STipCtrl

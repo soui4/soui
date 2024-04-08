@@ -10,7 +10,7 @@
 SNSBEGIN
 
 struct tagThunk;
-class PLATFORM_API SNativeWnd : public TObjRefImpl<INativeWnd> {
+class PLATFORM_API SNativeWnd : public INativeWnd {
   public:
     SNativeWnd();
     virtual ~SNativeWnd(void);

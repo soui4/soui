@@ -35,12 +35,12 @@ void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT
     {
         BOOL bGetDC = hdc == 0;
         if (bGetDC)
-            hdc = m_pHostWnd->GetDC();
+            hdc = m_pHostWnd->GetINativeWnd()->GetDC();
         HDC memdc = pMemRT->GetDC(1);
         ::BitBlt(hdc, rcInvalid->left, rcInvalid->top, RectWidth(rcInvalid), RectHeight(rcInvalid), memdc, rcInvalid->left, rcInvalid->top, SRCCOPY);
         pMemRT->ReleaseDC(memdc, NULL);
         if (bGetDC)
-            m_pHostWnd->ReleaseDC(hdc);
+            m_pHostWnd->GetINativeWnd()->ReleaseDC(hdc);
     }
     #endif//_WIN32
 }
@@ -48,7 +48,7 @@ void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT
 void SHostPresenter::OnHostAlpha(THIS_ BYTE byAlpha)
 {
     #ifdef _WIN32
-    ::SetLayeredWindowAttributes(m_pHostWnd->GetHwnd(), 0, byAlpha, LWA_ALPHA);
+    ::SetLayeredWindowAttributes(m_pHostWnd->GetINativeWnd()->GetHwnd(), 0, byAlpha, LWA_ALPHA);
     #endif//_WIN32
 }
 
@@ -56,7 +56,7 @@ void SHostPresenter::UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlph
 {
     #ifdef _WIN32
     CRect rc;
-    m_pHostWnd->GetWindowRect(&rc);
+    m_pHostWnd->GetINativeWnd()->GetWindowRect(&rc);
     CRect rcDirty = prcDirty ? (*prcDirty) : CRect(0, 0, rc.Width(), rc.Height());
     BLENDFUNCTION bf = { AC_SRC_OVER, 0, byAlpha, AC_SRC_ALPHA };
 
@@ -66,7 +66,7 @@ void SHostPresenter::UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlph
 
     HDC hdc = pRT->GetDC(1);
     S_UPDATELAYEREDWINDOWINFO info = { sizeof(info), NULL, &ptDst, &szDst, hdc, &ptSrc, 0, &bf, ULW_ALPHA, &rcDirty };
-    SWndSurface::SUpdateLayeredWindowIndirect(m_pHostWnd->GetHwnd(), &info);
+    SWndSurface::SUpdateLayeredWindowIndirect(m_pHostWnd->GetINativeWnd()->GetHwnd(), &info);
     pRT->ReleaseDC(hdc, NULL);
     #endif//_WIN32
 }
