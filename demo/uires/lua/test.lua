@@ -12,10 +12,10 @@ bet_rate = 4;		--赔率
 prog_max	 = 200;	--最大步数
 prog_all = {0,0,0,0} --马匹进度
 
-function on_host_msg(nativeWnd,msg, wp,lp,pRes)
-    --slog("test on host msg:" .. msg);
+function on_host_msg(hostWnd,msg, wp,lp,pRes)
+	--slog("test on host msg:" .. msg);
 	if msg == 0x82 then -- 0x82 == WM_NCDESTROY
-		NativeWnd_SetMsgHandler(nativeWnd,"",nativeWnd);
+		HostWnd_SetMsgHandler(hostWnd,"",nil);
 	end
 	return 0;
 end
@@ -69,7 +69,7 @@ end
 function on_exit(args)
 	slog("execute script function: on_exit");
 	win = getHostFromInitEvent(args);
-	NativeWnd_SetMsgHandler(win,"",0);--remove msg handler
+	HostWnd_SetMsgHandler(win,"",nil);--remove msg handler
 	runTimer:Release();
 end
 
