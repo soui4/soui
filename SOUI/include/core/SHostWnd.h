@@ -153,8 +153,8 @@ class SOUI_EXP SRootWindow : public SWindow {
 
 class SDummyWnd;
 class SOUI_EXP SHostWnd
-    : public SNativeWnd
-    , public TObjRefImpl<IHostWnd>
+    : public TObjRefImpl<IHostWnd>
+    , public SNativeWnd
     , public SwndContainerImpl {
     friend class SDummyWnd;
     friend class SRootWindow;
@@ -225,7 +225,7 @@ class SOUI_EXP SHostWnd
     };
 
   public:
-      STDMETHOD_(INativeWnd*, GetINativeWnd)(THIS) OVERRIDE {
+      STDMETHOD_(INativeWnd*, GetNativeWnd)(THIS) OVERRIDE {
           return (INativeWnd *)this;
       }
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;

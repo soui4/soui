@@ -294,7 +294,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		//将程序的运行路径修改到demo所在的目录
 #ifdef _DEBUG
 		SStringT strResDir = theApp->GetAppDir();
-		strResDir += _T("\\..\\demo");
+		strResDir += _T("D:\\work\\soui4lib\\demo");
 		SetCurrentDirectory(strResDir);
 		//SOUI系统总是从appdir去查找资源
 		theApp->SetAppDir(strResDir);

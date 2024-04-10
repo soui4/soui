@@ -41,23 +41,23 @@ BOOL LuaMsgHandler(const LPMSG pMsg, LRESULT *pRes, void *ctx){
 	return nRet!=0;
 }
 
-void NativeWnd_SetMsgHandler(INativeWnd *pNativeWnd, LPCSTR pszLuaFun, void *ctx){
+void HostWnd_SetMsgHandler(IHostWnd *pHostWnd, LPCSTR pszLuaFun, void *ctx){
 	SStringA strFun(pszLuaFun);
 	if(strFun.IsEmpty())
 	{
-		MsgHandlerInfo *pInfo = pNativeWnd->GetMsgHandler();
+		MsgHandlerInfo *pInfo = pHostWnd->GetNativeWnd()->GetMsgHandler();
 		if(pInfo->fun){
 			delete (LuaMsgHandlerCtx*)pInfo->ctx;
-			pNativeWnd->SetMsgHandler(NULL,NULL);
+			pHostWnd->GetNativeWnd()->SetMsgHandler(NULL,NULL);
 		}
 	}else
 	{
 		LuaMsgHandlerCtx *pCtx2 = new LuaMsgHandlerCtx;
 		pCtx2->luaState = lua_tinker::get_state();
-		pCtx2->pNativeWnd = pNativeWnd;
+		pCtx2->pNativeWnd = pHostWnd->GetNativeWnd();
 		pCtx2->pCtx = ctx;
 		pCtx2->strLuaFun = strFun;
-		pNativeWnd->SetMsgHandler(LuaMsgHandler,pCtx2);
+		pHostWnd->GetNativeWnd()->SetMsgHandler(LuaMsgHandler,pCtx2);
 	}
 }
 
@@ -212,7 +212,7 @@ BOOL ExpLua_Global(lua_State *L)
 
 		lua_tinker::def(L,"getHostFromInitEvent",getHostFromInitEvent);
 
-		lua_tinker::def(L,"NativeWnd_SetMsgHandler",NativeWnd_SetMsgHandler);
+		lua_tinker::def(L,"HostWnd_SetMsgHandler", HostWnd_SetMsgHandler);
 
 		lua_tinker::def(L,"HostWnd_SetEventHandler",HostWnd_SetEventHandler);
 		

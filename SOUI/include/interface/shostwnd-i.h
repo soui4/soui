@@ -10,7 +10,6 @@ typedef struct IWindow IWindow;
 typedef struct IApplication IApplication;
 typedef struct IHostPresenter IHostPresenter;
 typedef struct IHostWnd IHostWnd;
-
 typedef struct _EventHandlerInfo
 {
     FunCallback fun;
@@ -40,7 +39,7 @@ DECLARE_INTERFACE_(IHostWnd, IObjRef)
      * @brief 获取NativeWnd接口
      * @return INativeWnd*
      */
-    STDMETHOD_(INativeWnd*, GetINativeWnd)(THIS) PURE;
+    STDMETHOD_(INativeWnd*, GetNativeWnd)(THIS) PURE;
 
     /**
      * @brief 创建窗口
@@ -220,7 +219,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      * @brief 获取NativeWnd接口
      * @return INativeWnd*
      */
-    STDMETHOD_(INativeWnd*, GetINativeWnd)(THIS) PURE;
+    STDMETHOD_(INativeWnd*, GetNativeWnd)(THIS) PURE;
 
     //////////////////////////////////////////////////////////////////////////
 

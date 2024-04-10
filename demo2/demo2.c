@@ -132,7 +132,7 @@ void SetDefaultDir()
 
 	lpInsertPos = _tcsrchr(szCurrentDir, _T('\\'));
 #ifdef _DEBUG
-	_tcscpy(lpInsertPos + 1, _T("..\\demo2"));
+	_tcscpy(szCurrentDir, _T("d:\\work\\soui4lib\\demo2"));
 #else
 	_tcscpy(lpInsertPos + 1, _T("\0"));
 #endif
@@ -141,7 +141,8 @@ void SetDefaultDir()
 BOOL OnBtnFlash(IEvtArgs *evt,void *Ctx)
 {
 	IHostWnd *pHostWnd = (IHostWnd*)Ctx;
-	HWND hwnd = pHostWnd->lpVtbl->GetHwnd(pHostWnd);
+	INativeWnd* pNativeWnd = pHostWnd->lpVtbl->GetNativeWnd(pHostWnd);
+	HWND hwnd = pNativeWnd->lpVtbl->GetHwnd(pNativeWnd);
 	FlashWindow(hwnd,TRUE);
 	return TRUE;
 }
@@ -150,11 +151,12 @@ BOOL OnBtnMenu(IEvtArgs *evt,void *Ctx){
 	IMenu *pMenu = NULL;
 	IWindow *pSender = (IWindow*)evt->lpVtbl->Sender(evt);
 	IHostWnd *pHostWnd = (IHostWnd*)Ctx;
-	HWND hwnd = pHostWnd->lpVtbl->GetHwnd(pHostWnd);
+	INativeWnd* pNativeWnd = pHostWnd->lpVtbl->GetNativeWnd(pHostWnd);
+	HWND hwnd = pNativeWnd->lpVtbl->GetHwnd(pNativeWnd);
 	RECT rcBtn;
 	int nCmd = 0;
 	pSender->lpVtbl->GetWindowRect(pSender,&rcBtn);
-	pHostWnd->lpVtbl->ClientToScreen2(pHostWnd,&rcBtn);
+	pNativeWnd->lpVtbl->ClientToScreen2(pNativeWnd,&rcBtn);
 
 	pMenu = s_souiFac->lpVtbl->CreateMenu(s_souiFac,NULL);
 	pMenu->lpVtbl->LoadMenu(pMenu,UIRES.SMENU.menu_test);
@@ -167,11 +169,12 @@ BOOL OnBtnMenuEx(IEvtArgs *evt,void *Ctx){
 	IMenuEx *pMenu = NULL;
 	IWindow *pSender = (IWindow*)evt->lpVtbl->Sender(evt);
 	IHostWnd *pHostWnd = (IHostWnd*)Ctx;
-	HWND hwnd = pHostWnd->lpVtbl->GetHwnd(pHostWnd);
+	INativeWnd* pNativeWnd = pHostWnd->lpVtbl->GetNativeWnd(pHostWnd);
+	HWND hwnd = pNativeWnd->lpVtbl->GetHwnd(pNativeWnd);
 	RECT rcBtn;
 	int nCmd = 0;
 	pSender->lpVtbl->GetWindowRect(pSender,&rcBtn);
-	pHostWnd->lpVtbl->ClientToScreen2(pHostWnd,&rcBtn);
+	pNativeWnd->lpVtbl->ClientToScreen2(pNativeWnd,&rcBtn);
 
 	pMenu = s_souiFac->lpVtbl->CreateMenuEx(s_souiFac);
 	pMenu->lpVtbl->LoadMenu(pMenu,UIRES.SMENU.menuex_test);
@@ -210,8 +213,9 @@ BOOL OnHostMsg(const LPMSG pMsg,LRESULT *pRes,void *Ctx)
 BOOL OnBtnDialog(IEvtArgs *evt,void *Ctx)
 {
 	IHostDialog* hostDialog = s_souiFac->lpVtbl->CreateHostDialog(s_souiFac,UIRES.LAYOUT.DLG_TEST);
+	INativeWnd* pNativeWnd = hostDialog->lpVtbl->GetNativeWnd(hostDialog);
 
-	hostDialog->lpVtbl->SetMsgHandler(hostDialog,OnHostMsg,hostDialog);
+	pNativeWnd->lpVtbl->SetMsgHandler(pNativeWnd,OnHostMsg,hostDialog);
 	hostDialog->lpVtbl->DoModal(hostDialog,NULL);
 
 	hostDialog->lpVtbl->Release(hostDialog);
@@ -375,7 +379,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrC
 		{
 			//使用接口方式创建HostWnd。
 			IHostWnd * hostWnd = souiFac->lpVtbl->CreateHostWnd(souiFac,UIRES.LAYOUT.XML_MAINWND);
-
+			INativeWnd* nativeWnd = hostWnd->lpVtbl->GetNativeWnd(hostWnd);
 			hostWnd->lpVtbl->Create(hostWnd,NULL,0,0,0,0);
 			{
 				IListView *pLv =NULL;
@@ -391,7 +395,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrC
 					pLv->lpVtbl->Release(pLv);
 				}
 			}
-			hostWnd->lpVtbl->ShowWindow(hostWnd,SW_SHOWNORMAL);
+			nativeWnd->lpVtbl->ShowWindow(nativeWnd,SW_SHOWNORMAL);
 
 			//使用事件订阅方式响应界面控件事件。
 			{
@@ -404,7 +408,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrC
 				SConnect(souiFac,hostWnd,R.id.tst_slider,OnSliderPos,EVT_SLIDER_POS);
 			}
 
-			nRet = theApp->lpVtbl->Run(theApp,hostWnd->lpVtbl->GetHwnd(hostWnd));
+			nRet = theApp->lpVtbl->Run(theApp, nativeWnd->lpVtbl->GetHwnd(nativeWnd));
 
 			hostWnd->lpVtbl->Release(hostWnd);
 		}

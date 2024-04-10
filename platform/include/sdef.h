@@ -9,6 +9,7 @@
 #define OVERRIDE override
 #define CTHIS_  THIS_
 #define CTHIS  THIS
+#define DEF_VAL(x) =x
 #else
 #define SCONST
 #define SNSBEGIN
@@ -16,6 +17,7 @@
 #define OVERRIDE
 #define CTHIS_ const THIS_
 #define CTHIS const THIS
+#define DEF_VAL(x)
 #endif
 
 #ifndef smax
@@ -46,6 +48,5 @@
 #ifndef NULL
 #define NULL 0
 #endif
-
 
 #endif // __SDEF__H__

@@ -35,7 +35,7 @@ function on_init(args)
 	--初始化全局对象
 	slog("on_init");
 	win = getHostFromInitEvent(args);
-	NativeWnd_SetMsgHandler(win,"on_host_msg",win);
+	HostWnd_SetMsgHandler(win,"on_host_msg",win);
 
 	if win == nil then
 		return 0;

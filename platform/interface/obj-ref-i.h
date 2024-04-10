@@ -5,12 +5,6 @@
 #include <Objbase.h>
 #include <guid.h>
 
-#ifdef __cplusplus
-#define DEF_VAL(x) =x
-#else
-#define DEF_VAL(x)
-#endif//__cplusplus
-
 #undef INTERFACE
 #define INTERFACE IObjRef
 DECLARE_INTERFACE(IObjRef)

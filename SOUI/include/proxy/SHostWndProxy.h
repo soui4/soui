@@ -32,8 +32,8 @@ public:
 		SHostWnd::OnFinalRelease();
 	}
 
-	STDMETHOD_(INativeWnd*, GetINativeWnd)(THIS) OVERRIDE {
-		return SHostWnd::GetINativeWnd();
+	STDMETHOD_(INativeWnd*, GetNativeWnd)(THIS) OVERRIDE {
+		return SHostWnd::GetNativeWnd();
 	}
 
 	STDMETHOD_(HWND, CreateEx)
