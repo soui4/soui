@@ -16,7 +16,6 @@
 #include "event/SNotifyCenter.h"
 
 #include "control/SMessageBox.h"
-#include "updatelayeredwindow/SUpdateLayeredWindow.h"
 #include "helper/SplitString.h"
 
 #include "core/SSkin.h"
@@ -37,7 +36,6 @@
 #include "animation/SAlphaAnimation.h"
 #include "animation/STranslateAnimation.h"
 #include "valueAnimator/SValueAnimator.h"
-#include "core/SHostPresenter.h"
 
 SNSBEGIN
 
@@ -237,7 +235,6 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     , m_cbCreateObj(NULL)
     , m_cbCreateTaskLoop(NULL)
 {
-    SWndSurface::Init();
 	SNativeWnd::InitWndClass(hInst,pszHostClassName,bImeApp);
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
     _CreateSingletons();

@@ -1,6 +1,7 @@
 ﻿#include "platform.h"
 #include "SNativeWnd.h"
 #include <helper/SCriticalSection.h>
+#include "SUpdateLayeredWindow.h"
 
 SNSBEGIN
 
@@ -219,6 +220,7 @@ ATOM SNativeWnd::RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName,BOO
 }
 
 void SNativeWnd::InitWndClass(HINSTANCE hInst, LPCTSTR pszSimpleWndName,BOOL bImeWnd){
+    SWndSurface::Init();
 	SNativeWndHelper::instance()->Init(hInst,pszSimpleWndName,bImeWnd);
 }
 
@@ -655,6 +657,11 @@ BOOL SNativeWnd::SetLayeredWindowAttributes(COLORREF crKey, BYTE bAlpha, DWORD d
 {
     SASSERT(::IsWindow(m_hWnd));
     return ::SetLayeredWindowAttributes(m_hWnd, crKey, bAlpha, dwFlags);
+}
+
+BOOL SNativeWnd::SetLayeredWindowAlpha(BYTE byAlpha) {
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetLayeredWindowAttributes(m_hWnd, 0, byAlpha, LWA_ALPHA);
 }
 
 int SNativeWnd::SetWindowRgn(HRGN hRgn, BOOL bRedraw /*=TRUE*/)

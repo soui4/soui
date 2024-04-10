@@ -146,6 +146,8 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     STDMETHOD_(BOOL, SetLayeredWindowAttributes)
     (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) OVERRIDE;
 
+    STDMETHOD_(BOOL, SetLayeredWindowAlpha)(THIS_ BYTE byAlpha) OVERRIDE;
+
     STDMETHOD_(BOOL, UpdateLayeredWindow)
     (THIS_ HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags) OVERRIDE;
 

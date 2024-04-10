@@ -1,7 +1,5 @@
-﻿#include "souistd.h"
-#include "SUpdateLayeredWindow.h"
+﻿#include "SUpdateLayeredWindow.h"
 
-#ifdef _WIN32
 SNSBEGIN
 
 typedef BOOL(WINAPI *FunUpdateLayeredWindow)(HWND hwnd, HDC hdcDst, const POINT *pptDst, const SIZE *psize, HDC hdcSrc, const POINT *pptSrc, COLORREF crKey, const BLENDFUNCTION *pblend, DWORD dwflags);
@@ -41,12 +39,10 @@ BOOL SWndSurface::Init()
     return TRUE;
 }
 
-BOOL WINAPI SWndSurface::SUpdateLayeredWindowIndirect(HWND hWnd, const S_UPDATELAYEREDWINDOWINFO *pULWInfo)
+BOOL SWndSurface::SUpdateLayeredWindowIndirect(HWND hWnd, const S_UPDATELAYEREDWINDOWINFO *pULWInfo)
 {
     BOOL bRet = s_funUpdateLayeredWindowIndirect(hWnd, pULWInfo);
     return bRet;
 }
 
 SNSEND
-
-#endif//_WIN32

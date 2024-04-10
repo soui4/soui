@@ -2,12 +2,12 @@
 
 #include "SApp.h"
 #include "core/SHostWnd.h"
-#include "core/SHostPresenter.h"
 #include "helper/SAutoBuf.h"
 #include "helper/SColor.h"
 #include "helper/SplitString.h"
 #include "helper/STime.h"
 #include <helper/SHostMgr.h>
+#include <SHostPresenter.h>
 #ifdef _WIN32
 #include <Imm.h>
 #pragma comment(lib, "imm32.lib")
@@ -580,7 +580,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         }
         if (!(dwExStyle & WS_EX_LAYERED))
             ModifyStyleEx(0, WS_EX_LAYERED);
-        SetNativeWndAlpha(m_hWnd,GetRoot()->GetAlpha());
+        SetLayeredWindowAlpha(GetRoot()->GetAlpha());
     }
     m_memRT = NULL;
     if (m_hostAttr.m_bTranslucent)
@@ -593,6 +593,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     {
         GETRENDERFACTORY->CreateRenderTarget2(&m_memRT, m_hWnd);
     }
+    m_presenter->SetHostTranlucent(m_hostAttr.m_bTranslucent);
 
     BuildWndTreeZorder();
 
@@ -804,7 +805,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (!m_presenter)
     {
-        m_presenter.Attach(new SHostPresenter(this));
+        m_presenter.Attach(new SHostPresenter(GetNativeWnd()));
     }
     m_presenter->OnHostCreate();
     m_dwThreadID = GetCurrentThreadId();

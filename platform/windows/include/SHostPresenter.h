@@ -2,17 +2,21 @@
 #define __SHOSTPRESENTER__H__
 #include <interface/SHostPresenter-i.h>
 #include <helper/obj-ref-impl.hpp>
+#include <platform_exp.h>
+#include <interface/SNativeWnd-i.h>
+
 SNSBEGIN
 
-class SOUI_EXP SHostPresenter : public TObjRefImpl<IHostPresenter> {
+class PLATFORM_API SHostPresenter : public TObjRefImpl<IHostPresenter> {
   protected:
-    IHostWnd *m_pHostWnd;
-
+    INativeWnd *m_pNativeWnd;
+    BOOL m_bTranslucent;
   public:
-    SHostPresenter(IHostWnd *pHostWnd);
+    SHostPresenter(INativeWnd*pHostWnd);
     ~SHostPresenter(void);
 
   public:
+      STDMETHOD_(void, SetHostTranlucent)(THIS_ BOOL bTranslucent) OVERRIDE;
     STDMETHOD_(void, OnHostCreate)(THIS) OVERRIDE;
     STDMETHOD_(void, OnHostDestroy)(THIS) OVERRIDE;
     STDMETHOD_(void, OnHostResize)(THIS_ SIZE szHost) OVERRIDE;

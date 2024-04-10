@@ -416,6 +416,12 @@ DECLARE_INTERFACE(INativeWnd){
         (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
 
     /**
+     * @brief 设置窗口透明度
+     * @param byAlpha 透明度,0->255
+     * @return TRUE-SUCCEED
+    */
+    STDMETHOD_(BOOL, SetLayeredWindowAlpha)(THIS_ BYTE byAlpha) PURE;
+    /**
      * @brief 更新分层窗口
      * @param hdcDst
      * @param pptDst

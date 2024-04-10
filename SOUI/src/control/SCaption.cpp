@@ -70,38 +70,6 @@ void SCaption::OnLButtonDblClk(UINT nFlags, CPoint point)
     }
 }
 
-BOOL SCaption::IsSuppotMaxMove()
-{
-    OSVERSIONINFOEX OSVerInfo;
-    BOOL bOsVersionInfoEx;
-
-    ::ZeroMemory(&OSVerInfo, sizeof(OSVERSIONINFOEX));
-
-    // Get the OS Version Information
-    OSVerInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFOEX);
-    bOsVersionInfoEx = ::GetVersionEx((OSVERSIONINFO *)&OSVerInfo);
-    if (!(bOsVersionInfoEx))
-    {
-        OSVerInfo.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-        if (!::GetVersionEx((OSVERSIONINFO *)&OSVerInfo))
-        {
-            return FALSE;
-        }
-    }
-
-    /**
-     * Does it support Windows 8.1,Windows 8,Windows 7,Windows Vista ?
-     * I just ignore the Windows Server System
-     * if you wanna get more information, you can click the following link:
-     *			http://msdn.microsoft.com/en-us/library/ms724833.aspx
-     */
-    if (OSVerInfo.wProductType == VER_NT_WORKSTATION && OSVerInfo.dwMajorVersion == 6)
-    {
-        return TRUE;
-    }
-    return FALSE;
-}
-
 SNSEND
 
 #endif//_WIN32
