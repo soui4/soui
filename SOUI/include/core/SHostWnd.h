@@ -225,7 +225,7 @@ class SOUI_EXP SHostWnd
     };
 
   public:
-      STDMETHOD_(INativeWnd*, GetNativeWnd)(THIS) OVERRIDE {
+      STDMETHOD_(INativeWnd*, GetNative)(THIS) OVERRIDE {
           return (INativeWnd *)this;
       }
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
@@ -330,11 +330,6 @@ class SOUI_EXP SHostWnd
     SWindow *GetRoot() const
     {
         return m_pRoot;
-    }
-
-    SNativeWnd *GetNative()
-    {
-        return this;
     }
 
     CRect GetWindowRect() const;

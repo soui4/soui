@@ -141,7 +141,7 @@ void SetDefaultDir()
 BOOL OnBtnFlash(IEvtArgs *evt,void *Ctx)
 {
 	IHostWnd *pHostWnd = (IHostWnd*)Ctx;
-	INativeWnd* pNativeWnd = pHostWnd->lpVtbl->GetNativeWnd(pHostWnd);
+	INativeWnd* pNativeWnd = pHostWnd->lpVtbl->GetNative(pHostWnd);
 	HWND hwnd = pNativeWnd->lpVtbl->GetHwnd(pNativeWnd);
 	FlashWindow(hwnd,TRUE);
 	return TRUE;
@@ -151,7 +151,7 @@ BOOL OnBtnMenu(IEvtArgs *evt,void *Ctx){
 	IMenu *pMenu = NULL;
 	IWindow *pSender = (IWindow*)evt->lpVtbl->Sender(evt);
 	IHostWnd *pHostWnd = (IHostWnd*)Ctx;
-	INativeWnd* pNativeWnd = pHostWnd->lpVtbl->GetNativeWnd(pHostWnd);
+	INativeWnd* pNativeWnd = pHostWnd->lpVtbl->GetNative(pHostWnd);
 	HWND hwnd = pNativeWnd->lpVtbl->GetHwnd(pNativeWnd);
 	RECT rcBtn;
 	int nCmd = 0;
@@ -169,7 +169,7 @@ BOOL OnBtnMenuEx(IEvtArgs *evt,void *Ctx){
 	IMenuEx *pMenu = NULL;
 	IWindow *pSender = (IWindow*)evt->lpVtbl->Sender(evt);
 	IHostWnd *pHostWnd = (IHostWnd*)Ctx;
-	INativeWnd* pNativeWnd = pHostWnd->lpVtbl->GetNativeWnd(pHostWnd);
+	INativeWnd* pNativeWnd = pHostWnd->lpVtbl->GetNative(pHostWnd);
 	HWND hwnd = pNativeWnd->lpVtbl->GetHwnd(pNativeWnd);
 	RECT rcBtn;
 	int nCmd = 0;
@@ -213,7 +213,7 @@ BOOL OnHostMsg(const LPMSG pMsg,LRESULT *pRes,void *Ctx)
 BOOL OnBtnDialog(IEvtArgs *evt,void *Ctx)
 {
 	IHostDialog* hostDialog = s_souiFac->lpVtbl->CreateHostDialog(s_souiFac,UIRES.LAYOUT.DLG_TEST);
-	INativeWnd* pNativeWnd = hostDialog->lpVtbl->GetNativeWnd(hostDialog);
+	INativeWnd* pNativeWnd = hostDialog->lpVtbl->GetNative(hostDialog);
 
 	pNativeWnd->lpVtbl->SetMsgHandler(pNativeWnd,OnHostMsg,hostDialog);
 	hostDialog->lpVtbl->DoModal(hostDialog,NULL);
@@ -379,7 +379,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrC
 		{
 			//使用接口方式创建HostWnd。
 			IHostWnd * hostWnd = souiFac->lpVtbl->CreateHostWnd(souiFac,UIRES.LAYOUT.XML_MAINWND);
-			INativeWnd* nativeWnd = hostWnd->lpVtbl->GetNativeWnd(hostWnd);
+			INativeWnd* nativeWnd = hostWnd->lpVtbl->GetNative(hostWnd);
 			hostWnd->lpVtbl->Create(hostWnd,NULL,0,0,0,0);
 			{
 				IListView *pLv =NULL;

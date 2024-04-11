@@ -36,10 +36,10 @@ DECLARE_INTERFACE_(IHostWnd, IObjRef)
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
     //////////////////////////////////////////////////////////////////////////
     /**
-     * @brief 获取NativeWnd接口
+     * @brief 获取INativeWnd接口
      * @return INativeWnd*
      */
-    STDMETHOD_(INativeWnd*, GetNativeWnd)(THIS) PURE;
+    STDMETHOD_(INativeWnd*, GetNative)(THIS) PURE;
 
     /**
      * @brief 创建窗口
@@ -219,7 +219,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      * @brief 获取NativeWnd接口
      * @return INativeWnd*
      */
-    STDMETHOD_(INativeWnd*, GetNativeWnd)(THIS) PURE;
+    STDMETHOD_(INativeWnd*, GetNative)(THIS) PURE;
 
     //////////////////////////////////////////////////////////////////////////
 

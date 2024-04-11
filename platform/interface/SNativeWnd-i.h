@@ -54,7 +54,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @param bForce 为真是，如果当前窗口的wndproc不是SNativeWnd对象的窗口过程也执行反子类化
      * @return 执行反子类化的窗口HWND
      */
-    STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) PURE;
+    STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce DEF_VAL(FALSE)) PURE;
 
     /**
      * @brief 获取当前的窗口消息对象
@@ -118,7 +118,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @param nFlags Window positioning flags
      * @return TRUE-SUCCEED
      */
-    STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
+    STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) PURE;
 
     /**
      * @brief 修改窗口exStyle
@@ -127,7 +127,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @param nFlags Window positioning flags
      * @return TRUE-SUCCEED
      */
-    STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
+    STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) PURE;
 
     /**
      * @brief 设置窗口的Pos
@@ -147,7 +147,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @param hWndCenter 相对居中窗口
      * @return TRUE-SUCCEED
      */
-    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter /*= NULL*/) PURE;
+    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter DEF_VAL(NULL)) PURE;
 
     /**
      * @brief 销毁窗口
@@ -166,7 +166,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @param bErase 清除窗口内容
      * @return TRUE-SUCCEED
      */
-    STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase /*= TRUE*/) PURE;
+    STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase DEF_VAL(TRUE)) PURE;
 
     /**
      * @brief 刷新窗口指定区域
@@ -174,7 +174,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @param bErase 清除窗口内容
      * @return TRUE-SUCCEED
      */
-    STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /* = TRUE*/) PURE;
+    STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase DEF_VAL(TRUE)) PURE;
 
     /**
      * @brief 获取窗口位置
@@ -322,7 +322,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return 消息处理返回值
      */
     STDMETHOD_(LRESULT, SendMessage)
-        (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+        (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) PURE;
 
     /**
      * @brief 异步执行一个消息到窗口处理过程
@@ -332,10 +332,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return 消息处理返回值
      */
     STDMETHOD_(BOOL, PostMessage)
-        (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
-
-    STDMETHOD_(BOOL, SendNotifyMessage)
-        (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+        (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) PURE;
 
     /**
      * @brief 设置窗口标题
@@ -380,7 +377,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return
      */
     STDMETHOD_(BOOL, MoveWindow)
-        (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/) PURE;
+        (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint DEF_VAL(TRUE)) PURE;
 
     /**
      * @brief 移动窗口位置
@@ -388,7 +385,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @param bRepaint 刷新标志
      * @return
      */
-    STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint /*= TRUE*/) PURE;
+    STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint DEF_VAL(TRUE)) PURE;
 
     /**
      * @brief 显示窗口
@@ -403,7 +400,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @param bRedraw 刷新标志
      * @return
      */
-    STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw /*=TRUE*/) PURE;
+    STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw DEF_VAL(TRUE)) PURE;
 
     /**
      * @brief 设置窗口的分层属性

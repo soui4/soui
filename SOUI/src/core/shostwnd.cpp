@@ -805,7 +805,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (!m_presenter)
     {
-        m_presenter.Attach(new SHostPresenter(GetNativeWnd()));
+        m_presenter.Attach(new SHostPresenter(GetNative()));
     }
     m_presenter->OnHostCreate();
     m_dwThreadID = GetCurrentThreadId();

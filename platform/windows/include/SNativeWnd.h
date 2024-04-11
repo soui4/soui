@@ -121,9 +121,6 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     STDMETHOD_(BOOL, PostMessage)
     (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
 
-    STDMETHOD_(BOOL, SendNotifyMessage)
-    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
-
     STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) OVERRIDE;
 
     STDMETHOD_(int, GetWindowText)(THIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST OVERRIDE;

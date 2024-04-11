@@ -718,12 +718,6 @@ BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
     return ::SetWindowText(m_hWnd, lpszString);
 }
 
-BOOL SNativeWnd::SendNotifyMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
-{
-    SASSERT(::IsWindow(m_hWnd));
-    return ::SendNotifyMessage(m_hWnd, message, wParam, lParam);
-}
-
 BOOL SNativeWnd::PostMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
 {
     SASSERT(::IsWindow(m_hWnd));

@@ -45,10 +45,10 @@ void HostWnd_SetMsgHandler(IHostWnd *pHostWnd, LPCSTR pszLuaFun, void *ctx){
 	SStringA strFun(pszLuaFun);
 	if(strFun.IsEmpty())
 	{
-		MsgHandlerInfo *pInfo = pHostWnd->GetNativeWnd()->GetMsgHandler();
+		MsgHandlerInfo *pInfo = pHostWnd->GetNative()->GetMsgHandler();
 		if(pInfo->fun){
 			delete (LuaMsgHandlerCtx*)pInfo->ctx;
-			pHostWnd->GetNativeWnd()->SetMsgHandler(NULL,NULL);
+			pHostWnd->GetNative()->SetMsgHandler(NULL,NULL);
 		}
 	}else
 	{
@@ -57,7 +57,7 @@ void HostWnd_SetMsgHandler(IHostWnd *pHostWnd, LPCSTR pszLuaFun, void *ctx){
 		pCtx2->pHostWnd = pHostWnd;
 		pCtx2->pCtx = ctx;
 		pCtx2->strLuaFun = strFun;
-		pHostWnd->GetNativeWnd()->SetMsgHandler(LuaMsgHandler,pCtx2);
+		pHostWnd->GetNative()->SetMsgHandler(LuaMsgHandler,pCtx2);
 	}
 }
 

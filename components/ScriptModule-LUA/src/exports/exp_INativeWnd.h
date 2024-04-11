@@ -53,7 +53,6 @@ BOOL ExpLua_INativeWnd(lua_State *L)
 		lua_tinker::class_def<INativeWnd>(L,"SetFocus",&INativeWnd::SetFocus);
 		lua_tinker::class_def<INativeWnd>(L,"SendMessage",&INativeWnd::SendMessage);
 		lua_tinker::class_def<INativeWnd>(L,"PostMessage",&INativeWnd::PostMessage);
-		lua_tinker::class_def<INativeWnd>(L,"SendNotifyMessage",&INativeWnd::SendNotifyMessage);
 		lua_tinker::class_def<INativeWnd>(L,"SetWindowText",&INativeWnd::SetWindowText);
 		lua_tinker::class_def<INativeWnd>(L,"GetWindowText",&INativeWnd::GetWindowText);
 		lua_tinker::class_def<INativeWnd>(L,"IsIconic",&INativeWnd::IsIconic);
