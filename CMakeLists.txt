@@ -67,7 +67,7 @@ option(ENABLE_SOUI_COM_LIB "Enable compile 'components' as static lib" OFF)
 #
 option(XP_TOOLSET "" ON)
 
-option(OUTPATH_WITHOUT_TYPE "On to output debug/release to different folder(Off to same folder and add suffix 'd' for debug )" OFF)
+option(OUTPATH_WITHOUT_TYPE "On to output debug/release to different folder(Off to same folder and add suffix 'd' for debug )" ON)
 
 config_compiler_and_linker()
 

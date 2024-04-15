@@ -418,6 +418,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return TRUE-SUCCEED
     */
     STDMETHOD_(BOOL, SetLayeredWindowAlpha)(THIS_ BYTE byAlpha) PURE;
+    
     /**
      * @brief 更新分层窗口
      * @param hdcDst

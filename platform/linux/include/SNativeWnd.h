@@ -9,7 +9,7 @@
 
 SNSBEGIN
 
-class SNativeWnd : public TObjRefImpl<INativeWnd> {
+class SNativeWnd : public INativeWnd {
   public:
   	static BOOL InitWndClass(HINSTANCE hInst,LPCTSTR pszHostClassName,BOOL bImeApp);
   public:
@@ -119,9 +119,6 @@ class SNativeWnd : public TObjRefImpl<INativeWnd> {
     STDMETHOD_(BOOL, PostMessage)
     (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
 
-    STDMETHOD_(BOOL, SendNotifyMessage)
-    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
-
     STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) OVERRIDE;
 
     STDMETHOD_(int, GetWindowText)(THIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST OVERRIDE;
@@ -143,6 +140,8 @@ class SNativeWnd : public TObjRefImpl<INativeWnd> {
 
     STDMETHOD_(BOOL, SetLayeredWindowAttributes)
     (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) OVERRIDE;
+
+    STDMETHOD_(BOOL, SetLayeredWindowAlpha)(THIS_ BYTE byAlpha) OVERRIDE;
 
     STDMETHOD_(BOOL, UpdateLayeredWindow)
     (THIS_ HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags) OVERRIDE;

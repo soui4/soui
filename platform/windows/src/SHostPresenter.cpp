@@ -50,7 +50,7 @@ void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT
 
 void SHostPresenter::OnHostAlpha(THIS_ BYTE byAlpha)
 {
-    ::SetLayeredWindowAttributes(m_pNativeWnd->GetHwnd(), 0, byAlpha, LWA_ALPHA);
+    m_pNativeWnd->SetLayeredWindowAlpha(byAlpha);
 }
 
 void SHostPresenter::UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlpha, LPCRECT prcDirty)

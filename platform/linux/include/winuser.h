@@ -1315,6 +1315,7 @@ typedef struct tagMONITORINFO
 #define GWL_USERDATA        (-21)
 #define GWL_ID              (-12)
 
+#define GWLP_HWNDPARENT GWL_HWNDPARENT
 
 #define	DROPEFFECT_NONE	( 0 )
 

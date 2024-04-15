@@ -1,6 +1,8 @@
 #ifndef __SGUID_H_
 #define __SGUID_H_
 
+#include <memory.h>
+
 typedef struct _GUID {
     uint32_t Data1;
     uint16_t Data2;

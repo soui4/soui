@@ -231,6 +231,10 @@ BOOL SNativeWnd::UpdateLayeredWindow(HDC hdcDst, POINT *pptDst, SIZE *psize, HDC
     return FALSE;
 }
 
+ BOOL SNativeWnd::SetLayeredWindowAlpha(THIS_ BYTE byAlpha) {
+    return FALSE;
+ }
+
 BOOL SNativeWnd::SetLayeredWindowAttributes(COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
 {
     return FALSE;}
@@ -335,11 +339,6 @@ BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
     xcb_change_property(mConnection, XCB_PROP_MODE_REPLACE, m_hWnd, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, m_strTitle.length(), m_strTitle.c_str());
 
     return TRUE;
-}
-
-BOOL SNativeWnd::SendNotifyMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
-{
-    return FALSE;
 }
 
 BOOL SNativeWnd::PostMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
