@@ -34,16 +34,16 @@ private:
 class SUiState : SNoCopyable{
     SRwLock m_rwLock;
     std::map<pthread_t,SThreadUiState*> m_trdStates;
+    friend class SThreadUiState;
 public:
     static SUiState * instance();
     static void free();
 
 public:
-    bool init(int screenNum=0);
-    void uninit();
-    SThreadUiState * getThreadUiState();
-
+    SThreadUiState * getThreadUiState(int screenNum=0);
 private:
+    void clearThreadUiState(SThreadUiState *pObj);
+
     SUiState(){}
     ~SUiState();
 };

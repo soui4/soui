@@ -1,6 +1,7 @@
 ﻿#ifndef __SNATIVEWND__H__
 #define __SNATIVEWND__H__
 #include <platform.h>
+#include <platform_exp.h>
 #include <interface/SNativeWnd-i.h>
 #include <helper/SCriticalSection.h>
 #include <helper/obj-ref-impl.hpp>
@@ -9,7 +10,7 @@
 
 SNSBEGIN
 
-class SNativeWnd : public INativeWnd {
+class PLATFORM_API SNativeWnd : public INativeWnd {
   public:
   	static BOOL InitWndClass(HINSTANCE hInst,LPCTSTR pszHostClassName,BOOL bImeApp);
   public:

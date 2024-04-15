@@ -42,25 +42,7 @@ SUiState::~SUiState()
     m_trdStates.clear();
 }
 
-bool SUiState::init(int screenNum)
-{
-    SAutoWriteLock autoLock(&m_rwLock);
-    pthread_t tid = pthread_self();
-    if (m_trdStates.find(tid) != m_trdStates.end())
-    {
-        return true;
-    }
-    SThreadUiState *state = new SThreadUiState(screenNum);
-    if (!state->connection)
-    {
-        delete state;
-        return false;
-    }
-    m_trdStates[tid] = state;
-    return true;
-}
-
-void SUiState::uninit()
+void SUiState::clearThreadUiState(SThreadUiState *pObj)
 {
     SAutoWriteLock autoLock(&m_rwLock);
     pthread_t tid = pthread_self();
@@ -69,11 +51,12 @@ void SUiState::uninit()
     {
         return;
     }
+    assert(it->second == pObj);
     delete it->second;
     m_trdStates.erase(it);
 }
 
-SThreadUiState *SUiState::getThreadUiState()
+SThreadUiState *SUiState::getThreadUiState(int screenNum)
 {
     pthread_t tid = pthread_self();
     {
@@ -87,11 +70,12 @@ SThreadUiState *SUiState::getThreadUiState()
     {
         //not found
         SAutoWriteLock autoLock(&m_rwLock);
-        SThreadUiState * state = new SThreadUiState(0);        
+        SThreadUiState * state = new SThreadUiState(screenNum);        
         m_trdStates[tid]=state;
         return state;
     }
 }
+
 
 //---------------------------------------------------------------------
 xcb_atom_t SThreadUiState::internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName)
@@ -157,6 +141,9 @@ void SThreadUiState::onWndCreate(HWND hwnd, SNativeWnd *pWnd)
 void SThreadUiState::onWndDestroy(HWND hwnd)
 {
     m_mapWnd.erase(hwnd);
+    if(m_mapWnd.empty()){
+        SUiState::instance()->clearThreadUiState(this);
+    }
 }
 
 SNativeWnd *SThreadUiState::GetNativeWndFromHwnd(HWND hwnd)

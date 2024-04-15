@@ -20,7 +20,7 @@ HWND  SNativeWnd::CreateNative
 (LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam ){
     m_id = nID;
 
-    SThreadUiState *state = SUiState::instance()->getThreadUiState();
+    SThreadUiState *state = SUiState::instance()->getThreadUiState(0);
     mConnection = state->connection;
     mScreen = state->screen;
 
