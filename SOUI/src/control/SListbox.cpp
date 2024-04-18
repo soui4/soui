@@ -489,7 +489,8 @@ void SListBox::OnLButtonUp(UINT nFlags, CPoint pt)
 {
     if (m_bHotTrack)
     {
-        m_iHoverItem = HitTest(pt);
+        CPoint pt2(pt);
+        m_iHoverItem = HitTest(pt2);
         if (m_iHoverItem != m_iSelItem)
             NotifySelChange(m_iSelItem, m_iHoverItem);
     }
