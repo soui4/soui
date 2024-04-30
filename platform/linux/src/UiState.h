@@ -1,8 +1,12 @@
+#ifndef _UISTATE_H_
+#define _UISTATE_H_
+
 #include <platform.h>
 #include <sdef.h>
 #include <helper/SNoCopyable.hpp>
 #include <helper/SRwLock.h>
 #include <map>
+#include <list>
 #include <pthread.h>
 #include <xcb/xcb.h>
 
@@ -10,7 +14,7 @@
 #define WM_ID_ATOM(id) SOUI::SUiState::instance()->atom(#id)
 
 SNSBEGIN
-
+struct UiMsg;
 class SNativeWnd;
 class SThreadUiState : SNoCopyable{
 public:
@@ -26,9 +30,13 @@ public:
     void onWndCreate(HWND hwnd, SNativeWnd* pWnd);
     void onWndDestroy(HWND hwnd);
     SNativeWnd * GetNativeWndFromHwnd(HWND hwnd);
-
+    bool update();
+private:
+    void pushEvent(xcb_generic_event_t *e);
 private:
     std::map<HWND,SNativeWnd*> m_mapWnd;
+    std::list<UiMsg *> m_msgQueue;
+    
 };
 
 
@@ -53,3 +61,5 @@ private:
 };
 
 SNSEND
+
+#endif//_UISTATE_H_

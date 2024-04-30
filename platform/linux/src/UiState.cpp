@@ -1,6 +1,9 @@
 #include "UiState.h"
 #include <helper/SCriticalSection.h>
 #include <assert.h>
+#include "uimsg.h"
+#include "SNativeWnd.h"
+
 SNSBEGIN
 
 static SUiState *s_uiState = NULL;
@@ -141,6 +144,17 @@ SThreadUiState::~SThreadUiState()
     {
         return;
     }
+
+    for(auto it:m_mapWnd){
+        if(it.second->GetStyle()&WS_POPUP)
+            it.second->DestroyWindow();
+    }
+    m_mapWnd.clear();
+    for(auto it:m_msgQueue){
+        free(it);
+    }
+    m_msgQueue.clear();
+
     xcb_disconnect(connection);
 }
 
@@ -167,5 +181,47 @@ SNativeWnd *SThreadUiState::GetNativeWndFromHwnd(HWND hwnd)
     }
     return it->second;
 }
+
+bool SThreadUiState::update(){
+    int evtCnt=0;
+    xcb_generic_event_t* e;
+    while (xcb_generic_event_t* e = xcb_poll_for_event(connection))
+    {        
+        pushEvent(e);
+        free(e);
+        evtCnt++;
+    }
+    return evtCnt>0;
+}
+
+void SThreadUiState::pushEvent(xcb_generic_event_t *event){
+    uint8_t event_code = event->response_type & 0x7f;
+    UiMsg *pMsg = nullptr;
+    switch (event_code)
+    {
+    case XCB_CLIENT_MESSAGE:
+    {
+        xcb_client_message_event_t *client_message_event = (xcb_client_message_event_t *) event;
+        if(client_message_event->type == WM_ID_ATOM(WM_QUIT))
+        {
+            pMsg = new UiMsg;
+            pMsg->hwnd=0;
+            pMsg->message = WM_QUIT;
+            pMsg->wParam = MAKEWPARAM(client_message_event->data.data32[0],client_message_event->data.data32[1]);
+            pMsg->lParam = MAKELPARAM(client_message_event->data.data32[2],client_message_event->data.data32[3]);
+        }
+        break;
+    }
+    case XCB_CONFIGURE_NOTIFY:
+    {}
+    break;
+    default:
+        break;
+    }
+    if(pMsg){
+        m_msgQueue.push_back(pMsg);
+    }
+}
+
 
 SNSEND

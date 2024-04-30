@@ -658,8 +658,8 @@ int GetWindowScale(HWND hWnd)
 
 void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
 {
-    SOUI::SThreadUiState *thdUiState = SOUI::SUiState::instance()->getThreadUiState2(tid);
-    if(!thdUiState)
+    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState2(tid);
+    if(!trdUiState)
         return;
     xcb_client_message_event_t ev;  
     ev.response_type = XCB_CLIENT_MESSAGE;  
@@ -671,10 +671,10 @@ void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
     ev.data.data32[2] = lp&0xffffffff; 
     ev.data.data32[3] = (lp&0xffffffff00000000)>>32; 
 
-    xcb_void_cookie_t cookie = xcb_send_event(thdUiState->connection, 0 /* 不广播 */, 0, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
+    xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 /* 不广播 */, 0, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
   
     // 检查发送是否成功（尽管这通常不是必需的，因为发送失败的情况很少）  
-    xcb_generic_error_t *error = xcb_request_check(thdUiState->connection, cookie);  
+    xcb_generic_error_t *error = xcb_request_check(trdUiState->connection, cookie);  
     if (error) {  
         // 处理错误
         fprintf(stderr, "Error sending event: %d\n", error->error_code);  
@@ -684,7 +684,10 @@ void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
 
 BOOL WaitMessage()
 {
-    return FALSE;
+    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState();
+    if(!trdUiState)
+        return FALSE;
+    return trdUiState->update();
 }
 
 BOOL IsWindow(HWND hWnd)
