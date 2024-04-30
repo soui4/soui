@@ -1,6 +1,7 @@
 #include "platform.h"
 #include <sysapi.h>
 #include <pthread.h>
+#include "UiState.h"
 
 void SetLastError(int e)
 {
@@ -657,6 +658,28 @@ int GetWindowScale(HWND hWnd)
 
 void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
 {
+    SOUI::SThreadUiState *thdUiState = SOUI::SUiState::instance()->getThreadUiState2(tid);
+    if(!thdUiState)
+        return;
+    xcb_client_message_event_t ev;  
+    ev.response_type = XCB_CLIENT_MESSAGE;  
+    ev.format = 32; // 数据格式为32位  
+    ev.window = 0; // 目标窗口  
+    ev.type = WM_ID_ATOM(WM_QUIT); 
+    ev.data.data32[0] = wp&0xffffffff; 
+    ev.data.data32[1] = (wp&0xffffffff00000000)>>32; 
+    ev.data.data32[2] = lp&0xffffffff; 
+    ev.data.data32[3] = (lp&0xffffffff00000000)>>32; 
+
+    xcb_void_cookie_t cookie = xcb_send_event(thdUiState->connection, 0 /* 不广播 */, 0, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
+  
+    // 检查发送是否成功（尽管这通常不是必需的，因为发送失败的情况很少）  
+    xcb_generic_error_t *error = xcb_request_check(thdUiState->connection, cookie);  
+    if (error) {  
+        // 处理错误
+        fprintf(stderr, "Error sending event: %d\n", error->error_code);  
+        free(error);  
+    }
 }
 
 BOOL WaitMessage()

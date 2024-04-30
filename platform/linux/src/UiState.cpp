@@ -56,9 +56,8 @@ void SUiState::clearThreadUiState(SThreadUiState *pObj)
     m_trdStates.erase(it);
 }
 
-SThreadUiState *SUiState::getThreadUiState(int screenNum)
-{
-    pthread_t tid = pthread_self();
+SThreadUiState * SUiState::getThreadUiState2(int tid_,int screenNum){
+   pthread_t tid = pthread_t(tid_);
     {
         SAutoReadLock autoLock(&m_rwLock);
         auto it = m_trdStates.find(tid);
@@ -76,9 +75,21 @@ SThreadUiState *SUiState::getThreadUiState(int screenNum)
     }
 }
 
+SThreadUiState *SUiState::getThreadUiState(int screenNum)
+{
+    pthread_t tid = pthread_self();
+    return getThreadUiState2(tid,screenNum);
+}
+
+xcb_atom_t SUiState::atom(const char *name,bool onlyIfExist){
+    SThreadUiState *trdUiState = getThreadUiState();
+    if(!trdUiState)
+        return 0;
+    return internAtom(trdUiState->connection,onlyIfExist?1:0,name);
+}
 
 //---------------------------------------------------------------------
-xcb_atom_t SThreadUiState::internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName)
+xcb_atom_t SUiState::internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName)
 {
     xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, onlyIfExist, strlen(atomName), atomName);
     xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(connection, cookie, NULL);
@@ -87,7 +98,7 @@ xcb_atom_t SThreadUiState::internAtom(xcb_connection_t *connection, uint8_t only
     if (reply)
     {
         atom = reply->atom;
-        free(reply);
+        ::free(reply);
     }
 
     return atom;
@@ -119,9 +130,9 @@ SThreadUiState::SThreadUiState(int screenNum)
     }
     screen = iter.data;
 
-    wm_protocols_atom = internAtom(connection, 1, "WM_PROTOCOLS");
-    wm_delete_window_atom = internAtom(connection, 0, "WM_DELETE_WINDOW");
-    wm_stat_atom = internAtom(connection, 0, "_NET_WM_STATE");
+    wm_protocols_atom = SUiState::internAtom(connection, 1, "WM_PROTOCOLS");
+    wm_delete_window_atom = SUiState::internAtom(connection, 0, "WM_DELETE_WINDOW");
+    wm_stat_atom = SUiState::internAtom(connection, 0, "_NET_WM_STATE");
 }
 
 SThreadUiState::~SThreadUiState()

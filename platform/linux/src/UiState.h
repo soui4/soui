@@ -7,6 +7,8 @@
 #include <xcb/xcb.h>
 
 
+#define WM_ID_ATOM(id) SOUI::SUiState::instance()->atom(#id)
+
 SNSBEGIN
 
 class SNativeWnd;
@@ -25,10 +27,10 @@ public:
     void onWndDestroy(HWND hwnd);
     SNativeWnd * GetNativeWndFromHwnd(HWND hwnd);
 
-    static xcb_atom_t internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName);
 private:
     std::map<HWND,SNativeWnd*> m_mapWnd;
 };
+
 
 class SUiState : SNoCopyable{
     SRwLock m_rwLock;
@@ -38,8 +40,11 @@ public:
     static SUiState * instance();
     static void free();
 
+    static xcb_atom_t internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName);
 public:
+    xcb_atom_t atom(const char *name,bool onlyIfExist=false);
     SThreadUiState * getThreadUiState(int screenNum=0);
+    SThreadUiState * getThreadUiState2(int tid,int screenNum=0);
 private:
     void clearThreadUiState(SThreadUiState *pObj);
 
