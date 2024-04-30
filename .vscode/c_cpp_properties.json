@@ -5,6 +5,7 @@
             "name": "linux",
             "includePath": [
                 "${workspaceFolder}/**",
+                "${workspaceFolder}/platform",
                 "${workspaceFolder}/platform/linux/include",
                 "${workspaceFolder}/utilities/include",
                 "${workspaceFolder}/third-part/gtest/include"

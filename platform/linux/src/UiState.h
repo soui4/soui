@@ -6,7 +6,6 @@
 #include <pthread.h>
 #include <xcb/xcb.h>
 
-using namespace std;
 
 SNSBEGIN
 
