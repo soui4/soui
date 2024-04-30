@@ -1,10 +1,7 @@
 ﻿#ifndef __SNATIVEWND_I__H__
 #define __SNATIVEWND_I__H__
 
-#include <sdef.h>
-#include <Objbase.h>
-#include <guid.h>
-
+#include <platform.h>
 SNSBEGIN
 
 typedef BOOL (*FunMsgHandler)(const LPMSG pMsg, LRESULT *pRes, void *ctx);
