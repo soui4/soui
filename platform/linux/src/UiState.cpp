@@ -78,6 +78,16 @@ SThreadUiState * SUiState::getThreadUiState2(int tid_,int screenNum){
     }
 }
 
+SThreadUiState * SUiState::getThreadUiStateFromHwnd(HWND hwnd){
+    SAutoReadLock autoLock(&m_rwLock);
+    for(auto & it:m_trdStates){
+        if(it.second->hasHwnd(hwnd)){
+            return it.second;
+        }
+    }
+    return nullptr;
+}
+
 SThreadUiState *SUiState::getThreadUiState(int screenNum)
 {
     pthread_t tid = pthread_self();
@@ -136,6 +146,7 @@ SThreadUiState::SThreadUiState(int screenNum)
     wm_protocols_atom = SUiState::internAtom(connection, 1, "WM_PROTOCOLS");
     wm_delete_window_atom = SUiState::internAtom(connection, 0, "WM_DELETE_WINDOW");
     wm_stat_atom = SUiState::internAtom(connection, 0, "_NET_WM_STATE");
+    wm_window = SUiState::internAtom(connection,0,"WM_WINDOWS");
 }
 
 SThreadUiState::~SThreadUiState()
@@ -182,6 +193,10 @@ SNativeWnd *SThreadUiState::GetNativeWndFromHwnd(HWND hwnd)
     return it->second;
 }
 
+bool SThreadUiState::hasHwnd(HWND hwnd){
+    return GetNativeWndFromHwnd(hwnd)!=nullptr;
+}
+
 bool SThreadUiState::update(){
     int evtCnt=0;
     xcb_generic_event_t* e;
@@ -202,13 +217,19 @@ void SThreadUiState::pushEvent(xcb_generic_event_t *event){
     case XCB_CLIENT_MESSAGE:
     {
         xcb_client_message_event_t *client_message_event = (xcb_client_message_event_t *) event;
-        if(client_message_event->type == WM_ID_ATOM(WM_QUIT))
+        if(client_message_event->type == wm_window)
         {
             pMsg = new UiMsg;
-            pMsg->hwnd=0;
-            pMsg->message = WM_QUIT;
-            pMsg->wParam = MAKEWPARAM(client_message_event->data.data32[0],client_message_event->data.data32[1]);
-            pMsg->lParam = MAKELPARAM(client_message_event->data.data32[2],client_message_event->data.data32[3]);
+            pMsg->hwnd=client_message_event->window;
+            pMsg->message = client_message_event->data.data32[0];
+            pMsg->wParam = MAKEWPARAM(client_message_event->data.data32[1],client_message_event->data.data32[2]);
+            pMsg->lParam = MAKELPARAM(client_message_event->data.data32[3],client_message_event->data.data32[4]);
+        }
+        else if(client_message_event->data.data32[0] == wm_delete_window_atom){
+            pMsg = new UiMsg;
+            pMsg->message = WM_CLOSE;
+            pMsg->hwnd = client_message_event->window;
+            pMsg->wParam = pMsg->lParam = 0;
         }
         break;
     }

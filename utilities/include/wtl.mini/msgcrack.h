@@ -109,7 +109,7 @@ public: \
 { \
     bHandled = TRUE; \
     lResult = ReflectNotifications(uMsg, wParam, lParam, bHandled); \
-    if((lResult == 0) && (uMsg >= WM_CTLCOLORMSGBOX) && (uMsg <= WM_CTLCOLORSTATIC)) \
+    if((lResult == 0)) \
     bHandled = FALSE; \
     if(bHandled) \
     return TRUE; \

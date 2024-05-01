@@ -2,6 +2,8 @@
 #include <sysapi.h>
 #include <pthread.h>
 #include "UiState.h"
+#include "SNativeWnd.h"
+using namespace SOUI;
 
 void SetLastError(int e)
 {
@@ -665,11 +667,12 @@ void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
     ev.response_type = XCB_CLIENT_MESSAGE;  
     ev.format = 32; // 数据格式为32位  
     ev.window = 0; // 目标窗口  
-    ev.type = WM_ID_ATOM(WM_QUIT); 
-    ev.data.data32[0] = wp&0xffffffff; 
-    ev.data.data32[1] = (wp&0xffffffff00000000)>>32; 
-    ev.data.data32[2] = lp&0xffffffff; 
-    ev.data.data32[3] = (lp&0xffffffff00000000)>>32; 
+    ev.type = trdUiState->wm_window;
+    ev.data.data32[0] = msg;
+    ev.data.data32[1] = wp&0xffffffff; 
+    ev.data.data32[2] = (wp&0xffffffff00000000)>>32; 
+    ev.data.data32[3] = lp&0xffffffff; 
+    ev.data.data32[4] = (lp&0xffffffff00000000)>>32; 
 
     xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 /* 不广播 */, 0, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
   
@@ -770,14 +773,50 @@ CallNextHookEx(HHOOK hhk, int nCode, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-BOOL PostMessage(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-    return FALSE;
+    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiStateFromHwnd(hWnd);
+    if(!trdUiState)
+        return FALSE;
+    xcb_client_message_event_t ev;  
+    ev.response_type = XCB_CLIENT_MESSAGE;  
+    ev.format = 32; // 数据格式为32位  
+    ev.window = hWnd; // 目标窗口  
+    ev.type = trdUiState->wm_window;
+    ev.data.data32[0] = msg;
+    ev.data.data32[1] = wp&0xffffffff; 
+    ev.data.data32[2] = (wp&0xffffffff00000000)>>32; 
+    ev.data.data32[3] = lp&0xffffffff; 
+    ev.data.data32[4] = (lp&0xffffffff00000000)>>32; 
+
+    xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 /* 不广播 */, 0, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
+  
+    // 检查发送是否成功（尽管这通常不是必需的，因为发送失败的情况很少）  
+    xcb_generic_error_t *error = xcb_request_check(trdUiState->connection, cookie);  
+    if (error) {  
+        // 处理错误
+        fprintf(stderr, "Error sending event: %d\n", error->error_code);  
+        free(error); 
+        return FALSE;
+    }
+    return TRUE;
 }
 
-LRESULT SendMessage(HWND hWnd, UINT Msg, WPARAM wParam, LPARAM lParam)
+LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-    return 0;
+    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiStateFromHwnd(hWnd);
+    if(!trdUiState)
+        return -1;
+    SOUI::SThreadUiState *trdUiStateCur = SOUI::SUiState::instance()->getThreadUiState();
+    if(trdUiState == trdUiStateCur){
+        //same thread,call wndproc directly.
+        FunWndProc wndProc = (FunWndProc)GetWindowLongPtr(hWnd,GWL_WNDPROC);
+        assert(wndProc);
+        return wndProc(hWnd,msg,wp,lp);
+    }else{
+        return PostMessage(hWnd,msg,wp,lp);
+        //todo, hjx dont care about the result right now.
+    }
 }
 
 int MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
@@ -810,6 +849,14 @@ LONG SetWindowLong(HWND hWnd, int nIndex,LONG data){
 }
 LONG GetWindowLong(HWND hWnd, int nIndex)
 {
+    return 0;
+}
+
+LONG_PTR GetWindowLongPtr(HWND hWnd,int nIndex){
+    return 0;
+}
+
+LONG_PTR SetWindowLongPtr(HWND hWnd, int nIndex,LONG_PTR data){
     return 0;
 }
 

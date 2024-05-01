@@ -163,13 +163,6 @@ LRESULT SNativeWnd::ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     case WM_CHARTOITEM:
     case WM_HSCROLL:
     case WM_VSCROLL:
-    case WM_CTLCOLORBTN:
-    case WM_CTLCOLORDLG:
-    case WM_CTLCOLOREDIT:
-    case WM_CTLCOLORLISTBOX:
-    case WM_CTLCOLORMSGBOX:
-    case WM_CTLCOLORSCROLLBAR:
-    case WM_CTLCOLORSTATIC:
         bHandled = TRUE;
         //lResult = ::SendMessage(GetParent(), uMsg, wParam, lParam);
         break;

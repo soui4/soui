@@ -11,7 +11,8 @@
 #include <xcb/xcb.h>
 
 
-#define WM_ID_ATOM(id) SOUI::SUiState::instance()->atom(#id)
+#define STR_ATOM(atom_name,onlyExist) SOUI::SUiState::instance()->atom(atom_name,onlyExist)
+#define ID_ATOM(id,onlyExist) STR_ATOM(#id,onlyExist)
 
 SNSBEGIN
 struct UiMsg;
@@ -26,11 +27,13 @@ public:
     xcb_atom_t wm_delete_window_atom;
     xcb_atom_t wm_protocols_atom;
     xcb_atom_t wm_stat_atom;
+    xcb_atom_t wm_window;
 public:
     void onWndCreate(HWND hwnd, SNativeWnd* pWnd);
     void onWndDestroy(HWND hwnd);
     SNativeWnd * GetNativeWndFromHwnd(HWND hwnd);
     bool update();
+    bool hasHwnd(HWND hwnd);
 private:
     void pushEvent(xcb_generic_event_t *e);
 private:
@@ -53,6 +56,7 @@ public:
     xcb_atom_t atom(const char *name,bool onlyIfExist=false);
     SThreadUiState * getThreadUiState(int screenNum=0);
     SThreadUiState * getThreadUiState2(int tid,int screenNum=0);
+    SThreadUiState * getThreadUiStateFromHwnd(HWND hwnd);
 private:
     void clearThreadUiState(SThreadUiState *pObj);
 

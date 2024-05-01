@@ -151,12 +151,13 @@ SetWindowPos(
      int cy,
      UINT uFlags);
 
-LONG
-GetWindowLong(
-     HWND hWnd,
-     int nIndex);
+LONG GetWindowLong(HWND hWnd,int nIndex);
 
 LONG SetWindowLong(HWND hWnd, int nIndex,LONG data);
+
+LONG_PTR GetWindowLongPtr(HWND hWnd,int nIndex);
+
+LONG_PTR SetWindowLongPtr(HWND hWnd, int nIndex,LONG_PTR data);
 
 UINT
 MapVirtualKey(
