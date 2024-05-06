@@ -142,8 +142,8 @@ typedef int BOOL;
 #define IDCONTINUE      11
 
 
-#define HINSTANCE int
-#define HMODULE int
+#define HINSTANCE UINT_PTR
+#define HMODULE UINT_PTR
 #define HICON int
 #define HWND  int
 #define HMENU int

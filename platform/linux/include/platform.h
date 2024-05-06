@@ -11,6 +11,9 @@
 #include "Objbase.h"
 #include "guid.h"
 #include "winuser.h"
+#include "error.h"
+#include "debug.h"
+#include "class.h"
 
 #include "ctrl_types.h"
 #include "sysapi.h"

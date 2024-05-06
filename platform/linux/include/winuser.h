@@ -5,6 +5,7 @@
 #define WINVER 0x0600
 #endif
 
+typedef LRESULT (CALLBACK *WNDPROC)(HWND,UINT,WPARAM,LPARAM);
 
 /*
  * ShowWindow() Commands

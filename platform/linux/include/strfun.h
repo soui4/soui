@@ -129,6 +129,5 @@ inline const char *CharNext(const char* src){
 #define CP_UTF7 2
 #define CP_SYMBOL 3
 
-#define ERROR_INSUFFICIENT_BUFFER 100
 
 #endif
