@@ -14,15 +14,74 @@ struct _Window{
     xcb_screen_t *mScreen;
     uint32_t gc;
 
-    HWND hParent;
-    WNDPROC wndProc;
     std::string title; 
 
-    DWORD extra[1];
+    HWND               parent;        /* Window parent */
+    HWND               owner;         /* Window owner */
+    WNDPROC            winproc;       /* Window procedure */
+    HINSTANCE          hInstance;     /* Window hInstance (from CreateWindow) */
+    UINT               dwStyle;       /* Window style (from CreateWindow) */
+    UINT               dwExStyle;     /* Extended style (from CreateWindowEx) */
+    UINT_PTR           wIDmenu;       /* ID or hmenu (from CreateWindow) */
+    UINT               helpContext;   /* Help context ID */
+    UINT               flags;         /* Misc. flags (see below) */
+    DWORD_PTR          userdata;      /* User private data */
+    int                cbWndExtra;    /* class cbWndExtra at window creation */
+    DWORD              extra[1];
 };
 
 static std::map<HWND,_Window*> map_wnd;
 static std::recursive_mutex mutex_wnd;
+
+static _Window * get_win_ptr(HWND hWnd){
+    std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
+    auto it = map_wnd.find(hWnd);
+    if(it == map_wnd.end())
+        return nullptr;
+    return it->second;
+}
+
+static LONG_PTR get_win_data( const void *ptr, UINT size )
+{
+    if (size == sizeof(WORD))
+    {
+        WORD ret;
+        memcpy( &ret, ptr, sizeof(ret) );
+        return ret;
+    }
+    else if (size == sizeof(DWORD))
+    {
+        DWORD ret;
+        memcpy( &ret, ptr, sizeof(ret) );
+        return ret;
+    }
+    else
+    {
+        LONG_PTR ret;
+        memcpy( &ret, ptr, sizeof(ret) );
+        return ret;
+    }
+}
+
+/* helper for set_window_long */
+static inline void set_win_data( void *ptr, LONG_PTR val, UINT size )
+{
+    if (size == sizeof(WORD))
+    {
+        WORD newval = val;
+        memcpy( ptr, &newval, sizeof(newval) );
+    }
+    else if (size == sizeof(DWORD))
+    {
+        DWORD newval = val;
+        memcpy( ptr, &newval, sizeof(newval) );
+    }
+    else
+    {
+        memcpy( ptr, &val, sizeof(val) );
+    }
+}
+
 /***********************************************************************
  *		CreateWindowExW (USER32.@)
  */
@@ -108,7 +167,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     xcb_flush(pWnd->mConnection);
 
     pWnd->gc = m_gc;
-    pWnd->hParent = cs->hwndParent;
+    pWnd->parent = cs->hwndParent;
 
     {
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
@@ -254,21 +313,89 @@ BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy,
     return 0;
 }
 
-LONG SetWindowLong(HWND hWnd, int nIndex,LONG data){
-    return 0;
-}
-LONG GetWindowLong(HWND hWnd, int nIndex)
-{
-    return 0;
-}
+static LONG_PTR SetWindowLongSize(HWND hWnd,int nIndex,LONG_PTR data,uint32_t size);
+static LONG_PTR GetWindowLongSize(HWND hWnd,int nIndex,uint32_t size);
 
-LONG_PTR GetWindowLongPtr(HWND hWnd,int nIndex){
-    return 0;
+LONG SetWindowLong(HWND hWnd, int nIndex,LONG data){
+    return SetWindowLongSize(hWnd,nIndex,data,sizeof(LONG));
 }
 
 LONG_PTR SetWindowLongPtr(HWND hWnd, int nIndex,LONG_PTR data){
+    return SetWindowLongSize(hWnd,nIndex,data,sizeof(LONG_PTR));
+}
+
+static LONG_PTR SetWindowLongSize(HWND hWnd,int nIndex,LONG_PTR data,uint32_t size){
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return 0;
+    LONG_PTR retval = GetWindowLongSize(hWnd,nIndex,size);
+    switch(nIndex){
+        case GWL_STYLE:
+        wndObj->dwStyle = data;
+        break;
+        case GWL_EXSTYLE:
+        wndObj->dwExStyle = data;
+        break;
+        case GWL_HINSTANCE:
+        wndObj->hInstance=data;
+        break;
+        case GWL_HWNDPARENT:
+        wndObj->parent=data;
+        break;
+        case GWL_ID:
+        wndObj->wIDmenu=data;
+        break;
+        case GWL_USERDATA:
+        wndObj->userdata=data;
+        break;
+        case GWL_WNDPROC:
+        wndObj->winproc = (WNDPROC)data;
+        break;
+        default:
+        if(nIndex>=0 && nIndex<wndObj->cbWndExtra-size){
+            set_win_data( (char *)wndObj->extra + nIndex, data, size );
+        }   
+    }
+    return retval;
+}
+
+
+LONG GetWindowLong(HWND hWnd, int nIndex)
+{
+    return (LONG)GetWindowLongSize(hWnd,nIndex,sizeof(LONG));
+}
+
+LONG_PTR GetWindowLongPtr(HWND hWnd,int nIndex){
+    return GetWindowLongSize(hWnd,nIndex,sizeof(LONG_PTR));
+}
+
+static LONG_PTR GetWindowLongSize(HWND hWnd,int nIndex,uint32_t size){
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return 0;
+    switch(nIndex){
+        case GWL_STYLE:
+        return wndObj->dwStyle;
+        case GWL_EXSTYLE:
+        return wndObj->dwExStyle;
+        case GWL_HINSTANCE:
+        return wndObj->hInstance;
+        case GWL_HWNDPARENT:
+        return wndObj->parent;
+        case GWL_ID:
+        return wndObj->wIDmenu;
+        case GWL_USERDATA:
+        return wndObj->userdata;
+        case GWL_WNDPROC:
+        return (LONG_PTR)wndObj->winproc;
+        default:
+        if(nIndex>=0 && nIndex<wndObj->cbWndExtra-size){
+            return get_win_data( (char *)wndObj->extra + nIndex, size );
+        }   
+    }
     return 0;
 }
+
 
 
 BOOL CreateCaret(HWND hWnd, HBITMAP hBitmap, int nWidth, int nHeight)
