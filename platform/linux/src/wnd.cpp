@@ -22,7 +22,7 @@ struct _Window{
 };
 
 static std::map<HWND,_Window*> map_wnd;
-static std::mutex mutex_wnd;
+static std::recursive_mutex mutex_wnd;
 /***********************************************************************
  *		CreateWindowExW (USER32.@)
  */
@@ -58,7 +58,9 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 {
     WNDCLASSEX info;
     if (!GetClassInfoEx( module, className, &info )) return FALSE;
-    _Window *pWnd = (_Window*)alloca(sizeof(_Window)+info.cbWndExtra-sizeof(DWORD));
+    void * p = malloc(sizeof(_Window)+info.cbWndExtra-sizeof(DWORD));
+    _Window *pWnd = new(p)_Window();
+    
     pWnd->tid = pthread_self();
     SThreadUiState *state = SUiState::instance()->getThreadUiState2(pWnd->tid);
     pWnd->mConnection = state->connection;
@@ -109,7 +111,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     pWnd->hParent = cs->hwndParent;
 
     {
-        std::unique_lock<std::mutex> lock(mutex_wnd);
+        std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         map_wnd.insert(std::make_pair(hWnd,pWnd));
     }
 
@@ -117,12 +119,23 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 }
 
 BOOL WINAPI DestroyWindow(HWND hWnd){
-    return FALSE;
+    if(!IsWindow(hWnd))
+        return FALSE;
+    SendMessage(hWnd,WM_DESTROY,0,0);
+    std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
+    auto it = map_wnd.find(hWnd);
+    if(it==map_wnd.end())
+        return FALSE;
+    delete it->second;
+    map_wnd.erase(it);
+    return TRUE;
 }
 
 BOOL WINAPI IsWindow(HWND hWnd)
 {
-    return FALSE;
+    std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
+    auto it = map_wnd.find(hWnd);
+    return it != map_wnd.end();
 }
 
 HDC WINAPI GetDC(HWND hWnd)
@@ -162,9 +175,13 @@ BOOL GetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpmi)
 
 BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiStateFromHwnd(hWnd);
-    if(!trdUiState)
+    std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
+    auto it = map_wnd.find(hWnd);
+    if(it == map_wnd.end())
         return FALSE;
+    _Window *pWnd = it->second;
+ 
+    auto trdUiState = SUiState::instance()->getThreadUiState2(pWnd->tid);
     xcb_client_message_event_t ev;  
     ev.response_type = XCB_CLIENT_MESSAGE;  
     ev.format = 32; // 数据格式为32位  
@@ -191,7 +208,13 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiStateFromHwnd(hWnd);
+    std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
+    auto it = map_wnd.find(hWnd);
+    if(it == map_wnd.end())
+        return -1;
+    _Window *pWnd = it->second;
+
+    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState2(pWnd->tid);
     if(!trdUiState)
         return -1;
     SOUI::SThreadUiState *trdUiStateCur = SOUI::SUiState::instance()->getThreadUiState();
@@ -301,13 +324,13 @@ HWND SetActiveWindow(HWND hWnd)
     return 0;
 }
 
-HWND GetParent(HWND hwnd)
+HWND GetParent(HWND hWnd)
 {
-    return 0;
+    return (HWND)GetWindowLongPtr(hWnd,GWLP_HWNDPARENT);
 }
 
 HWND SetParent(HWND hWnd, HWND hParent){
-    return 0;
+    return (HWND)SetWindowLongPtr(hWnd,GWLP_HWNDPARENT,hParent);
 }
 
 BOOL GetCursorPos(LPPOINT ppt)
