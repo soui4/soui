@@ -1,7 +1,28 @@
 #include <wnd.h>
+#include <xcb/xcb.h>
+#include <map>
+#include <mutex>
+#include <string>
+#include "UiState.h"
+using namespace SOUI;
 
 HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module);
 
+struct _Window{
+    pthread_t tid;
+    xcb_connection_t *mConnection;
+    xcb_screen_t *mScreen;
+    uint32_t gc;
+
+    HWND hParent;
+    WNDPROC wndProc;
+    std::string title; 
+
+    DWORD extra[1];
+};
+
+static std::map<HWND,_Window*> map_wnd;
+static std::mutex mutex_wnd;
 /***********************************************************************
  *		CreateWindowExW (USER32.@)
  */
@@ -35,120 +56,301 @@ HWND WINAPI  CreateWindowEx( DWORD exStyle, LPCSTR className,
  */
 HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 {
-    UNICODE_STRING _class, window_name = {0};
-    HWND hwnd, top_child = 0;
     WNDCLASSEX info;
-    WCHAR name_buf[8];
-    HMENU menu;
+    if (!GetClassInfoEx( module, className, &info )) return FALSE;
+    _Window *pWnd = (_Window*)alloca(sizeof(_Window)+info.cbWndExtra-sizeof(DWORD));
+    pWnd->tid = pthread_self();
+    SThreadUiState *state = SUiState::instance()->getThreadUiState2(pWnd->tid);
+    pWnd->mConnection = state->connection;
+    pWnd->mScreen = state->screen;
 
-    if (!get_class_info( module, className, &info, &_class, FALSE )) return FALSE;
+    HWND hWnd = xcb_generate_id(pWnd->mConnection);
 
-    /* Fix the styles for MDI children */
-    if (cs->dwExStyle & WS_EX_MDICHILD)
+    uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+    uint32_t value_list[2] = {
+        pWnd->mScreen->black_pixel,
+        XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_BUTTON_PRESS |
+            XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION |
+            XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW |
+            XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | 
+            XCB_EVENT_MASK_RESIZE_REDIRECT|XCB_EVENT_MASK_FOCUS_CHANGE|
+            XCB_EVENT_MASK_VISIBILITY_CHANGE|XCB_EVENT_MASK_STRUCTURE_NOTIFY};
+
+    xcb_create_window(pWnd->mConnection, XCB_COPY_FROM_PARENT, hWnd,
+                      pWnd->mScreen->root, cs->x, cs->y, cs->cx, cs->cy, 0,
+                      XCB_WINDOW_CLASS_INPUT_OUTPUT, pWnd->mScreen->root_visual, mask,
+                      value_list);
+
+    uint32_t m_gc = xcb_generate_id(pWnd->mConnection);
+// 设置绘图上下文属性
+    uint32_t value_mask = XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES;
+    value_list[0] = pWnd->mScreen->black_pixel;
+    value_list[1] = 0;
+
+    xcb_create_gc(pWnd->mConnection, m_gc, hWnd, value_mask, value_list);
+    pWnd->title = cs->lpszName;
+    xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd,
+        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, pWnd->title.length(), pWnd->title.c_str());
+
+    xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd, state->wm_protocols_atom, XCB_ATOM_ATOM, 32, 1, &state->wm_delete_window_atom);
+
+    if(cs->style & WS_VISIBLE)
+        xcb_map_window(pWnd->mConnection, hWnd);
+
+    const unsigned coords[] = {static_cast<unsigned>(cs->x),
+                               static_cast<unsigned>(cs->y)};
+    xcb_configure_window(pWnd->mConnection, hWnd,
+                         XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
+
+    //state->onWndCreate(m_hWnd,this);
+    xcb_flush(pWnd->mConnection);
+
+    pWnd->gc = m_gc;
+    pWnd->hParent = cs->hwndParent;
+
     {
-        POINT pos[2];
-        UINT id = 0;
-
-        if (!NtUserGetMDIClientInfo( cs->hwndParent ))
-        {
-            WARN("WS_EX_MDICHILD, but parent %p is not MDIClient\n", cs->hwndParent);
-            return 0;
-        }
-
-        /* cs->lpCreateParams of WM_[NC]CREATE is different for MDI children.
-         * MDICREATESTRUCT members have the originally passed values.
-         *
-         * Note: we rely on the fact that MDICREATESTRUCTA and MDICREATESTRUCTW
-         * have the same layout.
-         */
-        mdi_cs.szClass = cs->lpszClass;
-        mdi_cs.szTitle = cs->lpszName;
-        mdi_cs.hOwner = cs->hInstance;
-        mdi_cs.x = cs->x;
-        mdi_cs.y = cs->y;
-        mdi_cs.cx = cs->cx;
-        mdi_cs.cy = cs->cy;
-        mdi_cs.style = cs->style;
-        mdi_cs.lParam = (LPARAM)cs->lpCreateParams;
-
-        cs->lpCreateParams = &mdi_cs;
-
-        if (GetWindowLongW(cs->hwndParent, GWL_STYLE) & MDIS_ALLCHILDSTYLES)
-        {
-            if (cs->style & WS_POPUP)
-            {
-                TRACE("WS_POPUP with MDIS_ALLCHILDSTYLES is not allowed\n");
-                return 0;
-            }
-            cs->style |= WS_CHILD | WS_CLIPSIBLINGS;
-        }
-        else
-        {
-            cs->style &= ~WS_POPUP;
-            cs->style |= WS_CHILD | WS_VISIBLE | WS_CLIPSIBLINGS | WS_CAPTION |
-                WS_SYSMENU | WS_THICKFRAME | WS_MINIMIZEBOX | WS_MAXIMIZEBOX;
-        }
-
-        top_child = GetWindow(cs->hwndParent, GW_CHILD);
-
-        if (top_child)
-        {
-            /* Restore current maximized child */
-            if((cs->style & WS_VISIBLE) && IsZoomed(top_child))
-            {
-                TRACE("Restoring current maximized child %p\n", top_child);
-                if (cs->style & WS_MAXIMIZE)
-                {
-                    /* if the new window is maximized don't bother repainting */
-                    SendMessageW( top_child, WM_SETREDRAW, FALSE, 0 );
-                    NtUserShowWindow( top_child, SW_SHOWNORMAL );
-                    SendMessageW( top_child, WM_SETREDRAW, TRUE, 0 );
-                }
-                else NtUserShowWindow( top_child, SW_SHOWNORMAL );
-            }
-        }
-
-        MDI_CalcDefaultChildPos( cs->hwndParent, -1, pos, 0, &id );
-        if (!(cs->style & WS_POPUP)) cs->hMenu = ULongToHandle(id);
-
-        TRACE( "MDI child id %04x\n", id );
-
-        if (cs->style & (WS_CHILD | WS_POPUP))
-        {
-            if (is_default_coord( cs->x ))
-            {
-                cs->x = pos[0].x;
-                cs->y = pos[0].y;
-            }
-            if (is_default_coord( cs->cx ) || !cs->cx) cs->cx = pos[1].x;
-            if (is_default_coord( cs->cy ) || !cs->cy) cs->cy = pos[1].y;
-        }
+        std::unique_lock<std::mutex> lock(mutex_wnd);
+        map_wnd.insert(std::make_pair(hWnd,pWnd));
     }
 
-    if (!unicode && cs->lpszName)
-    {
-        const char *nameA = (const char *)cs->lpszName;
-        /* resource ID string is a special case */
-        if (nameA[0] == '\xff')
-        {
-            name_buf[0] = 0xffff;
-            name_buf[1] = MAKEWORD( nameA[1], nameA[2] );
-            name_buf[2] = 0;
-            RtlInitUnicodeString( &window_name, name_buf );
-        }
-        else if (!RtlCreateUnicodeStringFromAsciiz( &window_name, (const char *)cs->lpszName ))
-            return 0;
+    return hWnd;
+}
+
+BOOL WINAPI DestroyWindow(HWND hWnd){
+    return FALSE;
+}
+
+BOOL WINAPI IsWindow(HWND hWnd)
+{
+    return FALSE;
+}
+
+HDC WINAPI GetDC(HWND hWnd)
+{
+    return 0;
+}
+void WINAPI ReleaseDC(HWND hwnd, HDC hdc)
+{
+}
+
+
+BOOL ClientToScreen(HWND hWnd, LPPOINT ppt)
+{
+    return 0;
+}
+BOOL ScreenToClient(HWND hWnd, LPPOINT ppt)
+{
+    return 0;
+}
+
+BOOL GetClipBox(HDC hdc, RECT *pRc)
+{
+    return 0;
+}
+
+HMONITOR
+MonitorFromWindow(HWND hwnd, DWORD dwFlags)
+{
+    return 0;
+}
+
+BOOL GetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpmi)
+{
+    return FALSE;
+}
+
+
+BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiStateFromHwnd(hWnd);
+    if(!trdUiState)
+        return FALSE;
+    xcb_client_message_event_t ev;  
+    ev.response_type = XCB_CLIENT_MESSAGE;  
+    ev.format = 32; // 数据格式为32位  
+    ev.window = hWnd; // 目标窗口  
+    ev.type = trdUiState->wm_window;
+    ev.data.data32[0] = msg;
+    ev.data.data32[1] = wp&0xffffffff; 
+    ev.data.data32[2] = (wp&0xffffffff00000000)>>32; 
+    ev.data.data32[3] = lp&0xffffffff; 
+    ev.data.data32[4] = (lp&0xffffffff00000000)>>32; 
+
+    xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 /* 不广播 */, 0, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
+  
+    // 检查发送是否成功（尽管这通常不是必需的，因为发送失败的情况很少）  
+    xcb_generic_error_t *error = xcb_request_check(trdUiState->connection, cookie);  
+    if (error) {  
+        // 处理错误
+        fprintf(stderr, "Error sending event: %d\n", error->error_code);  
+        free(error); 
+        return FALSE;
     }
-    else RtlInitUnicodeString( &window_name, cs->lpszName );
+    return TRUE;
+}
 
-    menu = cs->hMenu;
-    if (!menu && info.lpszMenuName && (cs->style & (WS_CHILD | WS_POPUP)) != WS_CHILD)
-        menu = LoadMenuW( cs->hInstance, info.lpszMenuName );
+LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
+{
+    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiStateFromHwnd(hWnd);
+    if(!trdUiState)
+        return -1;
+    SOUI::SThreadUiState *trdUiStateCur = SOUI::SUiState::instance()->getThreadUiState();
+    if(trdUiState == trdUiStateCur){
+        //same thread,call wndproc directly.
+        WNDPROC wndProc = (WNDPROC)GetWindowLongPtr(hWnd,GWL_WNDPROC);
+        assert(wndProc);
+        return wndProc(hWnd,msg,wp,lp);
+    }else{
+        return PostMessage(hWnd,msg,wp,lp);
+        //todo, hjx dont care about the result right now.
+    }
+}
 
-    hwnd = NtUserCreateWindowEx( cs->dwExStyle, &class, NULL, &window_name, cs->style,
-                                 cs->x, cs->y, cs->cx, cs->cy, cs->hwndParent, menu, module,
-                                 cs->lpCreateParams, 0, cs->hInstance, 0, !unicode );
-    if (!hwnd && menu && menu != cs->hMenu) NtUserDestroyMenu( menu );
-    if (!unicode && window_name.Buffer != name_buf) RtlFreeUnicodeString( &window_name );
-    return hwnd;
+int MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
+{
+    return 0;
+}
+
+BOOL SetForegroundWindow(HWND hWnd)
+{
+    return 0;
+}
+
+HWND GetForegroundWindow()
+{
+    return 0;
+}
+
+BOOL ShowWindow(HWND hWnd, int nCmdShow)
+{
+    return 0;
+}
+
+BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags)
+{
+    return 0;
+}
+
+LONG SetWindowLong(HWND hWnd, int nIndex,LONG data){
+    return 0;
+}
+LONG GetWindowLong(HWND hWnd, int nIndex)
+{
+    return 0;
+}
+
+LONG_PTR GetWindowLongPtr(HWND hWnd,int nIndex){
+    return 0;
+}
+
+LONG_PTR SetWindowLongPtr(HWND hWnd, int nIndex,LONG_PTR data){
+    return 0;
+}
+
+
+BOOL CreateCaret(HWND hWnd, HBITMAP hBitmap, int nWidth, int nHeight)
+{
+    return 0;
+}
+
+BOOL DestroyCaret(VOID)
+{
+    return FALSE;
+}
+BOOL HideCaret(HWND hWnd)
+{
+    return 0;
+}
+
+BOOL ShowCaret(HWND hWnd)
+{
+    return 0;
+}
+
+BOOL SetCaretPos(int X, int Y)
+{
+    return 0;
+}
+
+BOOL GetCaretPos(LPPOINT lpPoint)
+{
+    return 0;
+}
+
+HWND GetActiveWindow()
+{
+    return 0;
+}
+
+HWND GetDesktopWindow()
+{
+    return 0;
+}
+
+BOOL IsWindowEnabled(HWND hWnd)
+{
+    return 0;
+}
+
+void EnableWindow(HWND hWnd, BOOL bEnable)
+{
+}
+
+HWND SetActiveWindow(HWND hWnd)
+{
+    return 0;
+}
+
+HWND GetParent(HWND hwnd)
+{
+    return 0;
+}
+
+HWND SetParent(HWND hWnd, HWND hParent){
+    return 0;
+}
+
+BOOL GetCursorPos(LPPOINT ppt)
+{
+    return 0;
+}
+
+HWND WindowFromPoint(POINT pt)
+{
+    return 0;
+}
+
+UINT_PTR SetTimer(HWND hWnd, UINT_PTR nIDEvent, UINT uElapse, TIMERPROC lpTimerFunc)
+{
+    return 0;
+}
+
+BOOL KillTimer(HWND hWnd, UINT_PTR uIDEvent)
+{
+    return 0;
+}
+
+HWND GetFocus()
+{
+    return 0;
+}
+
+HWND SetFocus(HWND hWnd)
+{
+    return 0;
+}
+
+HDC BeginPaint(HWND hWnd, PAINTSTRUCT *ps){
+    return 0;
+}
+void EndPaint(HWND hWnd, PAINTSTRUCT *ps){}
+
+BOOL UpdateWindow(HWND hWnd)
+{
+    return 0;
+}
+
+BOOL GetClientRect(HWND hWnd, RECT *pRc)
+{
+    return 0;
 }

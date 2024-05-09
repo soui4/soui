@@ -56,32 +56,11 @@ int  GetWindowScale(HWND hWnd);
 void PostThreadMessage(int tid, UINT msg,WPARAM wp,LPARAM lp);
 BOOL WaitMessage();
 
-BOOL IsWindow(HWND hWnd);
-void DestroyWindow(HWND hwnd);
-
-HDC GetDC(HWND hWnd);
-void ReleaseDC(HWND hwnd,HDC hdc);
-
 int GetSystemMetrics(int nIndex);
 
 void SetCursor(HCURSOR hCursor);
 BOOL ShellExecute(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters,
     LPCSTR lpDirectory, INT nShowCmd);
-
-BOOL ClientToScreen(HWND hWnd,LPPOINT ppt);
-BOOL ScreenToClient(HWND hWnd,LPPOINT ppt);
-
-BOOL GetClipBox(HDC hdc, RECT *pRc);
-
-HMONITOR
-MonitorFromWindow(
-    HWND hwnd,
-    DWORD dwFlags);
-
-BOOL
-GetMonitorInfo(
- HMONITOR hMonitor,
- LPMONITORINFO lpmi);
 
 void DeleteObject(HGDIOBJ hObj);
 
@@ -110,55 +89,6 @@ CallNextHookEx(
      WPARAM wParam,
      LPARAM lParam);
 
-BOOL
-PostMessage(
-     HWND hWnd,
-     UINT Msg,
-     WPARAM wParam,
-     LPARAM lParam);
-
-LRESULT SendMessage(
-     HWND hWnd,
-     UINT Msg,
-     WPARAM wParam,
-     LPARAM lParam);
-
-int
-MessageBox(
-     HWND hWnd,
-     LPCTSTR lpText,
-     LPCTSTR lpCaption,
-     UINT uType);
-
-BOOL
-SetForegroundWindow(
- HWND hWnd);
-
-HWND GetForegroundWindow();
-
- BOOL
-ShowWindow(
-     HWND hWnd,
-     int nCmdShow);
-
-BOOL
-SetWindowPos(
-     HWND hWnd,
-     HWND hWndInsertAfter,
-     int X,
-     int Y,
-     int cx,
-     int cy,
-     UINT uFlags);
-
-LONG GetWindowLong(HWND hWnd,int nIndex);
-
-LONG SetWindowLong(HWND hWnd, int nIndex,LONG data);
-
-LONG_PTR GetWindowLongPtr(HWND hWnd,int nIndex);
-
-LONG_PTR SetWindowLongPtr(HWND hWnd, int nIndex,LONG_PTR data);
-
 UINT
 MapVirtualKey(
      UINT uCode,
@@ -177,71 +107,6 @@ DestroyCaret(
     VOID);
 
 
-BOOL
-HideCaret(
-     HWND hWnd);
-
-BOOL
-ShowCaret(
-     HWND hWnd);
-
-BOOL
-SetCaretPos(
-     int X,
-     int Y);
-
-BOOL
-GetCaretPos(
-    LPPOINT lpPoint);
-
-
-HWND GetActiveWindow();
-
-HWND GetDesktopWindow();
-
-BOOL IsWindowEnabled(HWND hWnd);
-
-void EnableWindow(HWND hWnd,BOOL bEnable);
-
-HWND SetActiveWindow(HWND hWnd);
-
-HWND GetParent(HWND hwnd);
-HWND SetParent(HWND hWnd, HWND hParent);
-
-BOOL GetCursorPos(LPPOINT ppt);
-
-HWND WindowFromPoint(POINT pt);
-
-DWORD GetTickCount();
-
-typedef VOID (CALLBACK* TIMERPROC)(HWND, UINT, UINT_PTR, DWORD);
-
-UINT_PTR
-SetTimer(
-     HWND hWnd,
-     UINT_PTR nIDEvent,
-     UINT uElapse,
-     TIMERPROC lpTimerFunc);
-
-BOOL
-KillTimer(
-     HWND hWnd,
-     UINT_PTR uIDEvent);
-
-HWND GetFocus();
-
-HWND SetFocus(HWND hWnd);
-
-typedef struct _PAINTSTRUCT{
-
-}PAINTSTRUCT;
-
-HDC BeginPaint(HWND hWnd, PAINTSTRUCT *ps);
-void EndPaint(HWND hWnd, PAINTSTRUCT *ps);
-
-BOOL UpdateWindow(HWND hWnd);
-
-BOOL GetClientRect(HWND hWnd,RECT *pRc);
 
 BOOL RegisterDragDrop(HWND, IDropTarget *pDrapTarget);
 
@@ -270,5 +135,4 @@ BOOL GetTextMetrics(HDC hdc,TEXTMETRIC *txtMetric);
 
 BOOL HasFont(LPCTSTR fontName);
 
-BOOL SetNativeWndAlpha(HWND hWnd, BYTE byAlpha);
 #endif

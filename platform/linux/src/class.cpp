@@ -224,3 +224,18 @@ BOOL WINAPI GetClassInfoEx( HINSTANCE hInstance, LPCSTR name, WNDCLASSEX *wc )
     /* We must return the atom of the class here instead of just TRUE. */
     return atom;
 }
+
+void WINAPI RtlInitUnicodeString(
+    UNICODE_STRING * target, /* [I/O] Buffered unicode string to be initialized */
+    char* source)          /* [I]   '\0' terminated unicode string used to initialize target */
+{
+    if ((target->Buffer = source))
+    {
+        unsigned int length = strlen(source) ;
+        if (length > 0xfffc)
+            length = 0xfffc;
+        target->Length = length;
+        target->MaximumLength = target->Length + sizeof(char);
+    }
+    else target->Length = target->MaximumLength = 0;
+}

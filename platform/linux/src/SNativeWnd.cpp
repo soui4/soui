@@ -522,13 +522,13 @@ HWND SNativeWnd::GetParent()
 LONG_PTR SNativeWnd::SetWindowLongPtr(int nIndex, LONG_PTR dwNewLong)
 {
     SASSERT(IsWindow());
-    return ::SetWindowLong(m_hWnd, nIndex, dwNewLong);
+    return ::SetWindowLongPtr(m_hWnd, nIndex, dwNewLong);
 }
 
 LONG_PTR SNativeWnd::GetWindowLongPtr(int nIndex) const
 {
     SASSERT(IsWindow());
-    return ::GetWindowLong(m_hWnd, nIndex);
+    return ::GetWindowLongPtr(m_hWnd, nIndex);
 }
 
 DWORD SNativeWnd::GetExStyle() const

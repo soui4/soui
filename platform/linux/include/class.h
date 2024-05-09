@@ -45,7 +45,12 @@ struct UNICODE_STRING
 {
     int MaximumLength;
     char * Buffer;
+    unsigned int Length;
 };
+
+void WINAPI RtlInitUnicodeString(
+    UNICODE_STRING * target, /* [I/O] Buffered unicode string to be initialized */
+    char* source);          /* [I]   '\0' terminated unicode string used to initialize target */
 
 ATOM WINAPI RegisterClassEx( const WNDCLASSEX* wc );
 BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance );

@@ -693,21 +693,6 @@ BOOL WaitMessage()
     return trdUiState->update();
 }
 
-BOOL IsWindow(HWND hWnd)
-{
-    return FALSE;
-}
-void DestroyWindow(HWND hwnd)
-{
-}
-
-HDC GetDC(HWND hWnd)
-{
-    return 0;
-}
-void ReleaseDC(HWND hwnd, HDC hdc)
-{
-}
 
 int GetSystemMetrics(int nIndex)
 {
@@ -723,30 +708,6 @@ BOOL ShellExecute(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParamet
     return FALSE;
 }
 
-BOOL ClientToScreen(HWND hWnd, LPPOINT ppt)
-{
-    return 0;
-}
-BOOL ScreenToClient(HWND hWnd, LPPOINT ppt)
-{
-    return 0;
-}
-
-BOOL GetClipBox(HDC hdc, RECT *pRc)
-{
-    return 0;
-}
-
-HMONITOR
-MonitorFromWindow(HWND hwnd, DWORD dwFlags)
-{
-    return 0;
-}
-
-BOOL GetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpmi)
-{
-    return FALSE;
-}
 
 void DeleteObject(HGDIOBJ hObj)
 {
@@ -773,166 +734,7 @@ CallNextHookEx(HHOOK hhk, int nCode, WPARAM wParam, LPARAM lParam)
     return 0;
 }
 
-BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
-{
-    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiStateFromHwnd(hWnd);
-    if(!trdUiState)
-        return FALSE;
-    xcb_client_message_event_t ev;  
-    ev.response_type = XCB_CLIENT_MESSAGE;  
-    ev.format = 32; // 数据格式为32位  
-    ev.window = hWnd; // 目标窗口  
-    ev.type = trdUiState->wm_window;
-    ev.data.data32[0] = msg;
-    ev.data.data32[1] = wp&0xffffffff; 
-    ev.data.data32[2] = (wp&0xffffffff00000000)>>32; 
-    ev.data.data32[3] = lp&0xffffffff; 
-    ev.data.data32[4] = (lp&0xffffffff00000000)>>32; 
-
-    xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 /* 不广播 */, 0, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
-  
-    // 检查发送是否成功（尽管这通常不是必需的，因为发送失败的情况很少）  
-    xcb_generic_error_t *error = xcb_request_check(trdUiState->connection, cookie);  
-    if (error) {  
-        // 处理错误
-        fprintf(stderr, "Error sending event: %d\n", error->error_code);  
-        free(error); 
-        return FALSE;
-    }
-    return TRUE;
-}
-
-LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
-{
-    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiStateFromHwnd(hWnd);
-    if(!trdUiState)
-        return -1;
-    SOUI::SThreadUiState *trdUiStateCur = SOUI::SUiState::instance()->getThreadUiState();
-    if(trdUiState == trdUiStateCur){
-        //same thread,call wndproc directly.
-        FunWndProc wndProc = (FunWndProc)GetWindowLongPtr(hWnd,GWL_WNDPROC);
-        assert(wndProc);
-        return wndProc(hWnd,msg,wp,lp);
-    }else{
-        return PostMessage(hWnd,msg,wp,lp);
-        //todo, hjx dont care about the result right now.
-    }
-}
-
-int MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
-{
-    return 0;
-}
-
-BOOL SetForegroundWindow(HWND hWnd)
-{
-    return 0;
-}
-
-HWND GetForegroundWindow()
-{
-    return 0;
-}
-
-BOOL ShowWindow(HWND hWnd, int nCmdShow)
-{
-    return 0;
-}
-
-BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags)
-{
-    return 0;
-}
-
-LONG SetWindowLong(HWND hWnd, int nIndex,LONG data){
-    return 0;
-}
-LONG GetWindowLong(HWND hWnd, int nIndex)
-{
-    return 0;
-}
-
-LONG_PTR GetWindowLongPtr(HWND hWnd,int nIndex){
-    return 0;
-}
-
-LONG_PTR SetWindowLongPtr(HWND hWnd, int nIndex,LONG_PTR data){
-    return 0;
-}
-
 UINT MapVirtualKey(UINT uCode, UINT uMapType)
-{
-    return 0;
-}
-
-BOOL CreateCaret(HWND hWnd, HBITMAP hBitmap, int nWidth, int nHeight)
-{
-    return 0;
-}
-
-BOOL DestroyCaret(VOID)
-{
-    return FALSE;
-}
-BOOL HideCaret(HWND hWnd)
-{
-    return 0;
-}
-
-BOOL ShowCaret(HWND hWnd)
-{
-    return 0;
-}
-
-BOOL SetCaretPos(int X, int Y)
-{
-    return 0;
-}
-
-BOOL GetCaretPos(LPPOINT lpPoint)
-{
-    return 0;
-}
-
-HWND GetActiveWindow()
-{
-    return 0;
-}
-
-HWND GetDesktopWindow()
-{
-    return 0;
-}
-
-BOOL IsWindowEnabled(HWND hWnd)
-{
-    return 0;
-}
-
-void EnableWindow(HWND hWnd, BOOL bEnable)
-{
-}
-
-HWND SetActiveWindow(HWND hWnd)
-{
-    return 0;
-}
-
-HWND GetParent(HWND hwnd)
-{
-    return 0;
-}
-
-HWND SetParent(HWND hWnd, HWND hParent){
-    return 0;
-}
-
-BOOL GetCursorPos(LPPOINT ppt)
-{
-    return 0;
-}
-
-HWND WindowFromPoint(POINT pt)
 {
     return 0;
 }
@@ -942,40 +744,6 @@ DWORD GetTickCount()
     return 0;
 }
 
-UINT_PTR SetTimer(HWND hWnd, UINT_PTR nIDEvent, UINT uElapse, TIMERPROC lpTimerFunc)
-{
-    return 0;
-}
-
-BOOL KillTimer(HWND hWnd, UINT_PTR uIDEvent)
-{
-    return 0;
-}
-
-HWND GetFocus()
-{
-    return 0;
-}
-
-HWND SetFocus(HWND hWnd)
-{
-    return 0;
-}
-
-HDC BeginPaint(HWND hWnd, PAINTSTRUCT *ps){
-    return 0;
-}
-void EndPaint(HWND hWnd, PAINTSTRUCT *ps){}
-
-BOOL UpdateWindow(HWND hWnd)
-{
-    return 0;
-}
-
-BOOL GetClientRect(HWND hWnd, RECT *pRc)
-{
-    return 0;
-}
 
 BOOL RegisterDragDrop(HWND, IDropTarget *pDrapTarget){
     return 0;
