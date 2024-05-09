@@ -2,7 +2,6 @@
 #include <helper/SCriticalSection.h>
 #include <assert.h>
 #include "uimsg.h"
-#include "SNativeWnd.h"
 
 SNSBEGIN
 
@@ -78,16 +77,6 @@ SThreadUiState * SUiState::getThreadUiState2(int tid_,int screenNum){
     }
 }
 
-SThreadUiState * SUiState::getThreadUiStateFromHwnd(HWND hwnd){
-    SAutoReadLock autoLock(&m_rwLock);
-    for(auto & it:m_trdStates){
-        if(it.second->hasHwnd(hwnd)){
-            return it.second;
-        }
-    }
-    return nullptr;
-}
-
 SThreadUiState *SUiState::getThreadUiState(int screenNum)
 {
     pthread_t tid = pthread_self();
@@ -156,11 +145,6 @@ SThreadUiState::~SThreadUiState()
         return;
     }
 
-    for(auto it:m_mapWnd){
-        if(it.second->GetStyle()&WS_POPUP)
-            it.second->DestroyWindow();
-    }
-    m_mapWnd.clear();
     for(auto it:m_msgQueue){
         free(it);
     }
@@ -169,33 +153,6 @@ SThreadUiState::~SThreadUiState()
     xcb_disconnect(connection);
 }
 
-void SThreadUiState::onWndCreate(HWND hwnd, SNativeWnd *pWnd)
-{
-    m_mapWnd[hwnd] = pWnd;
-}
-
-void SThreadUiState::onWndDestroy(HWND hwnd)
-{
-    m_mapWnd.erase(hwnd);
-    if(m_mapWnd.empty()){
-        SUiState::instance()->clearThreadUiState(this);
-    }
-}
-
-SNativeWnd *SThreadUiState::GetNativeWndFromHwnd(HWND hwnd)
-{
-    auto it = m_mapWnd.find(hwnd);
-    if(it == m_mapWnd.end())
-    {
-        assert(false);
-        return nullptr;
-    }
-    return it->second;
-}
-
-bool SThreadUiState::hasHwnd(HWND hwnd){
-    return GetNativeWndFromHwnd(hwnd)!=nullptr;
-}
 
 bool SThreadUiState::update(){
     int evtCnt=0;

@@ -8,8 +8,6 @@
 #include <xcb/xcb.h>
 #include <string>
 
-typedef LRESULT (CALLBACK *FunWndProc)(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
-
 SNSBEGIN
 
 class PLATFORM_API SNativeWnd : public INativeWnd {
