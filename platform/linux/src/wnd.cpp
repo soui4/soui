@@ -18,6 +18,7 @@ struct _Window{
 
     std::string title; 
 
+    UINT_PTR           objOpaque;
     HWND               parent;        /* Window parent */
     HWND               owner;         /* Window owner */
     WNDPROC            winproc;       /* Window procedure */
@@ -186,7 +187,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         map_wnd.insert(std::make_pair(hWnd,pWnd));
     }
-
+    SendMessage(hWnd,WM_CREATE,0,(LPARAM)cs);
     return hWnd;
 }
 
@@ -364,6 +365,9 @@ static LONG_PTR SetWindowLongSize(HWND hWnd,int nIndex,LONG_PTR data,uint32_t si
         case GWL_WNDPROC:
         wndObj->winproc = (WNDPROC)data;
         break;
+        case GWLP_OPAQUE:
+        wndObj->objOpaque = data;
+        break;
         default:
         if(nIndex>=0 && nIndex<wndObj->cbWndExtra-size){
             set_win_data( (char *)wndObj->extra + nIndex, data, size );
@@ -401,6 +405,8 @@ static LONG_PTR GetWindowLongSize(HWND hWnd,int nIndex,uint32_t size){
         return wndObj->userdata;
         case GWL_WNDPROC:
         return (LONG_PTR)wndObj->winproc;
+        case GWLP_OPAQUE:
+        return wndObj->objOpaque;
         default:
         if(nIndex>=0 && nIndex<wndObj->cbWndExtra-size){
             return get_win_data( (char *)wndObj->extra + nIndex, size );

@@ -160,7 +160,7 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     virtual BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0);
 
   protected:
-    LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+    static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT DefWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     virtual void OnFinalMessage(HWND hWnd);

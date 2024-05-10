@@ -6,7 +6,7 @@ SNSBEGIN
 
 class SNativeHelper{
 public:
-    SNativeHelper* instance(){
+    static SNativeHelper* instance(){
         SNativeHelper _this;
         return &_this;
     }
@@ -15,14 +15,28 @@ public:
         WNDCLASSEX wndCls={sizeof(WNDCLASSEX),0};
         wndCls.lpszClassName = pszClassName;
         wndCls.lpfnWndProc = SNativeWnd::StartWindowProc;
+        m_atom = RegisterClassEx(&wndCls);
+    }
+
+    void * GetSharePtr(){
+        return m_ptr;
+    }
+
+    void SetSharePtr(void *ptr){
+        m_ptr = ptr;
+    }
+
+    ATOM getAtom(){
+        return m_atom;
     }
 private:
-SNativeHelper(){
+SNativeHelper():m_atom(0),m_ptr(nullptr){
 
 }
 ~SNativeHelper(){}
 
 ATOM m_atom;
+void * m_ptr;
 };
 
 BOOL SNativeWnd::InitWndClass(HINSTANCE hInst,LPCTSTR pszHostClassName,BOOL bImeApp){
@@ -39,7 +53,9 @@ SNativeWnd::~SNativeWnd(void)
 
 HWND  SNativeWnd::CreateNative
 (LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam ){
-    HWND hWnd =::CreateWindowEx(dwExStyle,"window",lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,nID,0,lpParam);
+    SNativeHelper::instance()->SetSharePtr(this);
+    HWND hWnd =::CreateWindowEx(dwExStyle,(LPCSTR)SNativeHelper::instance()->getAtom(),lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,nID,0,lpParam);
+    SNativeHelper::instance()->SetSharePtr(nullptr);
     SThreadUiState *state = SUiState::instance()->getThreadUiState();
     mConnection = state->connection;
     mScreen = state->screen;
@@ -66,29 +82,15 @@ void SNativeWnd::OnFinalMessage(HWND hWnd)
 
 LRESULT CALLBACK SNativeWnd::StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    /*
-    SNativeWnd *pThis = (SNativeWnd *)SNativeWndHelper::instance()->GetSharePtr();
-
-    pThis->m_hWnd = hWnd;
-    // 初始化Thunk，做了两件事:1、mov指令替换hWnd为对象指针，2、jump指令跳转到WindowProc
-    pThis->m_pThunk->Init((DWORD_PTR)WindowProc, pThis);
-
-    // 得到Thunk指针
-    WNDPROC pProc = (WNDPROC)pThis->m_pThunk->GetCodeAddress();
-    ::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pProc);
-    */
-    // 调用下面的语句后，以后消息来了，都由pProc处理
-    //todo:hjx
-    WNDPROC pProc=nullptr;
-    ::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pProc);
-
-    return pProc(hWnd, uMsg, wParam, lParam);
+    SNativeWnd *pThis = (SNativeWnd *)SNativeHelper::instance()->GetSharePtr();
+    ::SetWindowLongPtr(hWnd,GWLP_OPAQUE,(LONG_PTR)pThis);
+    ::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)WindowProc);
+    return WindowProc(hWnd, uMsg, wParam, lParam);
 }
 
 LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    //todo:hjx
-    SNativeWnd *pThis = (SNativeWnd *)hWnd; 
+    SNativeWnd *pThis = (SNativeWnd *)::GetWindowLongPtr(hWnd,GWLP_OPAQUE); 
     MSG msg = { pThis->m_hWnd, uMsg, wParam, lParam };
     const MSG *pOldMsg = pThis->m_pCurrentMsg;
     pThis->m_pCurrentMsg = &msg;

@@ -1041,10 +1041,11 @@ typedef struct tagMONITORINFO
 #define GWL_STYLE           (-16)
 #define GWL_EXSTYLE         (-20)
 #define GWL_USERDATA        (-21)
-
+#define GWL_OPAQUE          (-25)
 
 #define GWLP_HWNDPARENT GWL_HWNDPARENT
 #define GWLP_WNDPROC    GWL_WNDPROC
+#define GWLP_OPAQUE     GWL_OPAQUE
 
 #define	DROPEFFECT_NONE	( 0 )
 

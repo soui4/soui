@@ -6,6 +6,7 @@
 
 typedef struct tagCLASS
 {
+    UINT_PTR    objOpaque;
     UINT         style;         /* Class style */
 //    BOOL         local;         /* Local class? */
     WNDPROC      winproc;       /* Window procedure */

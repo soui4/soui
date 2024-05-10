@@ -158,6 +158,20 @@ BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance )
 
 static CLASS *find_class( HINSTANCE module, UNICODE_STRING *name ){
     std::unique_lock<std::mutex> lock(cls_mutex);
+    if(IS_INTRESOURCE(name->Buffer)){
+        ATOM atom = (ATOM)reinterpret_cast<LONG_PTR>(name->Buffer);
+        bool bValid = false;
+        for(auto it : atom_map){
+            if(it.second  == atom){
+                name->Buffer = (char*)it.first.c_str();
+                name->Length = it.first.length();
+                bValid = true;
+                break;
+            }
+        }
+        if(!bValid)
+            return nullptr;
+    }
     for(auto & it : class_list){
         if(strcmp(it->name,name->Buffer)==0)
             return it;
@@ -173,7 +187,6 @@ ATOM WINAPI NtUserGetClassInfoEx( HINSTANCE instance, UNICODE_STRING *name, WNDC
     static const char messageW[] = {'M','e','s','s','a','g','e'};
     CLASS *_class;
     ATOM atom;
-
     if (!(_class = find_class( instance, name ))) return 0;
 
     if (wc)
