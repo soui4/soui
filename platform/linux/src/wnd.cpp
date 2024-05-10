@@ -527,3 +527,7 @@ BOOL GetClientRect(HWND hWnd, RECT *pRc)
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
     return 0;
 }
+
+BOOL SetNativeWndAlpha(HWND hWnd, BYTE byAlpha){
+    return FALSE;
+}
