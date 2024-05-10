@@ -166,6 +166,38 @@ bool SThreadUiState::update(){
     return evtCnt>0;
 }
 
+BOOL SThreadUiState::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
+    for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
+        BOOL bMatch=TRUE;
+        UiMsg *msg = (*it);
+        do{
+            if(msg->message==WM_QUIT)
+                break;
+            if(msg->hwnd != hWnd && hWnd != 0)
+            {
+                bMatch=FALSE;
+                break;
+            }
+            if(wMsgFilterMin==0 && wMsgFilterMax==0)
+                break;
+            if(wMsgFilterMin<= msg->message && wMsgFilterMax>=msg->message)
+                break;
+            bMatch=FALSE;
+        }while(false);
+        if(bMatch){
+            pMsg->hwnd = msg->hwnd;
+            pMsg->message = msg->message;
+            pMsg->wParam = msg->wParam;
+            pMsg->lParam = msg->lParam;
+            delete msg;
+            m_msgQueue.erase(it);
+            return TRUE;
+        }
+       
+    }
+    return FALSE;
+}
+
 void SThreadUiState::pushEvent(xcb_generic_event_t *event){
     uint8_t event_code = event->response_type & 0x7f;
     UiMsg *pMsg = nullptr;

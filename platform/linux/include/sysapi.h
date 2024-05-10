@@ -56,6 +56,8 @@ int  GetWindowScale(HWND hWnd);
 void PostThreadMessage(int tid, UINT msg,WPARAM wp,LPARAM lp);
 BOOL WaitMessage();
 
+BOOL PeekMessage(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
+
 int GetSystemMetrics(int nIndex);
 
 void SetCursor(HCURSOR hCursor);

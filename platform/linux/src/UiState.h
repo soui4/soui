@@ -29,6 +29,8 @@ public:
     xcb_atom_t wm_window;
 public:
     bool update();
+    BOOL peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
+
 private:
     void pushEvent(xcb_generic_event_t *e);
 private:

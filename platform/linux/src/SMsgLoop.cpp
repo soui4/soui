@@ -307,9 +307,7 @@ void SMessageLoopPriv::ExecutePendingTask()
 
 BOOL SMessageLoopPriv::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilterMax, BOOL bRemove)
 {
-    //todo:hjx
-    return FALSE;
-    //return ::PeekMessage(pMsg, 0, wMsgFilterMin, wMsgFilterMax, bRemove ? PM_REMOVE : PM_NOREMOVE);
+    return ::PeekMessage(pMsg, 0, wMsgFilterMin, wMsgFilterMax, bRemove ? PM_REMOVE : PM_NOREMOVE);
 }
 
 BOOL SMessageLoopPriv::WaitMsg(THIS)

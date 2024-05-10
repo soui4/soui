@@ -1270,4 +1270,9 @@ typedef RGBQUAD FAR* LPRGBQUAD;
 
 #define IS_INTRESOURCE(_r) ((((ULONG_PTR)(_r)) >> 16) == 0)
 
+#define PM_NOREMOVE 0x0000  //Messages are not removed from the queue after processing by PeekMessage.
+#define PM_REMOVE   0x0001  //Messages are removed from the queue after processing by PeekMessage.
+#define PM_NOYIELD  0x0002  //Prevents the system from releasing any thread that is waiting for the caller to go idle
+
+
 #endif//__WINUSER_H_

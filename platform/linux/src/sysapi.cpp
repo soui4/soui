@@ -693,6 +693,12 @@ BOOL WaitMessage()
     return trdUiState->update();
 }
 
+BOOL PeekMessage(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
+    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState();
+    if(!trdUiState)
+        return FALSE;
+    return trdUiState->peekMsg(pMsg,hWnd,wMsgFilterMin,wMsgFilterMax,wRemoveMsg);
+}
 
 int GetSystemMetrics(int nIndex)
 {
