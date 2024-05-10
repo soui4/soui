@@ -154,4 +154,5 @@ GetMonitorInfo(
  HMONITOR hMonitor,
  LPMONITORINFO lpmi);
 
+HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp);
 #endif//_WND_H__

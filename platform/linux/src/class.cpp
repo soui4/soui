@@ -5,7 +5,7 @@
 #include <atomic>
 #include <mutex>
 
-static std::mutex atom_mutex;
+static std::mutex cls_mutex;
 static std::list<CLASS*> class_list;
 static std::map<std::string,ATOM> atom_map;
 static std::atomic_uint32_t atom_start(10);
@@ -33,7 +33,7 @@ ATOM get_int_atom_value( const char *name )
 
 bool NtUserGetAtomName( ATOM atomName, UNICODE_STRING *str )
 {
-    std::unique_lock<std::mutex> lock(atom_mutex);
+    std::unique_lock<std::mutex> lock(cls_mutex);
     for(auto & it:atom_map){
         if(it.second == atomName)
         {
@@ -109,7 +109,7 @@ ATOM WINAPI RegisterClassEx( const WNDCLASSEX *wc)
     _class->winproc       = wc->lpfnWndProc;
     if(!_class->atomName){
         //todo:hjx 
-        std::unique_lock<std::mutex> lock(atom_mutex);
+        std::unique_lock<std::mutex> lock(cls_mutex);
         auto it = atom_map.find(_class->name);
         if(it!=atom_map.end())
         {
@@ -121,11 +121,14 @@ ATOM WINAPI RegisterClassEx( const WNDCLASSEX *wc)
             atom_map.insert(std::make_pair(_class->name,_class->atomName));
         }    
     }else{
-        std::unique_lock<std::mutex> lock(atom_mutex);
+        std::unique_lock<std::mutex> lock(cls_mutex);
         atom_map.insert(std::make_pair(_class->name,_class->atomName));
     }
     atom = _class->atomName;
-    class_list.push_front(_class);
+    {
+        std::unique_lock<std::mutex> lock(cls_mutex);
+        class_list.push_front(_class);
+    }
 
     return atom;
 }
@@ -136,7 +139,7 @@ ATOM WINAPI RegisterClassEx( const WNDCLASSEX *wc)
  */
 BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance )
 {
-    std::unique_lock<std::mutex> lock(atom_mutex);
+    std::unique_lock<std::mutex> lock(cls_mutex);
     for(auto it = class_list.begin();it!=class_list.end();it++){
         CLASS * _class = *it;
         if(strcmp(_class->name,className)==0)
@@ -154,7 +157,7 @@ BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance )
 }
 
 static CLASS *find_class( HINSTANCE module, UNICODE_STRING *name ){
-    std::unique_lock<std::mutex> lock(atom_mutex);
+    std::unique_lock<std::mutex> lock(cls_mutex);
     for(auto & it : class_list){
         if(strcmp(it->name,name->Buffer)==0)
             return it;
@@ -198,7 +201,7 @@ ATOM get_class_info( HINSTANCE instance, const char *class_name, WNDCLASSEX *inf
     HMODULE module;
     ATOM atom;
 
-    std::unique_lock<std::mutex> lock(atom_mutex);
+    std::unique_lock<std::mutex> lock(cls_mutex);
     atom = NtUserGetClassInfoEx( instance, &name, info);
 
     if (name_str) *name_str = name;

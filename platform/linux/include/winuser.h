@@ -1044,6 +1044,7 @@ typedef struct tagMONITORINFO
 
 
 #define GWLP_HWNDPARENT GWL_HWNDPARENT
+#define GWLP_WNDPROC    GWL_WNDPROC
 
 #define	DROPEFFECT_NONE	( 0 )
 

@@ -16,7 +16,7 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     virtual ~SNativeWnd(void);
 
     static ATOM RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName,BOOL bImeWnd);
-	static void InitWndClass(HINSTANCE hInst, LPCTSTR pszSimpleWndName,BOOL bImeWnd);
+	  static void InitWndClass(HINSTANCE hInst, LPCTSTR pszSimpleWndName,BOOL bImeWnd);
 
     STDMETHOD_(int, GetID)(THIS) SCONST
     {

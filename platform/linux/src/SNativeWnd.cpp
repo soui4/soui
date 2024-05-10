@@ -4,6 +4,27 @@
 
 SNSBEGIN
 
+class SNativeHelper{
+public:
+    SNativeHelper* instance(){
+        SNativeHelper _this;
+        return &_this;
+    }
+
+    BOOL Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp){
+        WNDCLASSEX wndCls={sizeof(WNDCLASSEX),0};
+        wndCls.lpszClassName = pszClassName;
+        wndCls.lpfnWndProc = SNativeWnd::StartWindowProc;
+    }
+private:
+SNativeHelper(){
+
+}
+~SNativeHelper(){}
+
+ATOM m_atom;
+};
+
 BOOL SNativeWnd::InitWndClass(HINSTANCE hInst,LPCTSTR pszHostClassName,BOOL bImeApp){
     return TRUE;
 }
@@ -43,9 +64,31 @@ void SNativeWnd::OnFinalMessage(HWND hWnd)
     m_hWnd = 0;
 }
 
-LRESULT CALLBACK SNativeWnd::WindowProc(SNativeWnd * pWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+LRESULT CALLBACK SNativeWnd::StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    SNativeWnd *pThis = (SNativeWnd *)pWnd; 
+    /*
+    SNativeWnd *pThis = (SNativeWnd *)SNativeWndHelper::instance()->GetSharePtr();
+
+    pThis->m_hWnd = hWnd;
+    // 初始化Thunk，做了两件事:1、mov指令替换hWnd为对象指针，2、jump指令跳转到WindowProc
+    pThis->m_pThunk->Init((DWORD_PTR)WindowProc, pThis);
+
+    // 得到Thunk指针
+    WNDPROC pProc = (WNDPROC)pThis->m_pThunk->GetCodeAddress();
+    ::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pProc);
+    */
+    // 调用下面的语句后，以后消息来了，都由pProc处理
+    //todo:hjx
+    WNDPROC pProc=nullptr;
+    ::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pProc);
+
+    return pProc(hWnd, uMsg, wParam, lParam);
+}
+
+LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
+{
+    //todo:hjx
+    SNativeWnd *pThis = (SNativeWnd *)hWnd; 
     MSG msg = { pThis->m_hWnd, uMsg, wParam, lParam };
     const MSG *pOldMsg = pThis->m_pCurrentMsg;
     pThis->m_pCurrentMsg = &msg;

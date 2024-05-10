@@ -11,6 +11,7 @@
 SNSBEGIN
 
 class PLATFORM_API SNativeWnd : public INativeWnd {
+    friend class SNativeHelper;
   public:
   	static BOOL InitWndClass(HINSTANCE hInst,LPCTSTR pszHostClassName,BOOL bImeApp);
   public:
@@ -159,6 +160,7 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     virtual BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0);
 
   protected:
+    LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
     LRESULT DefWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     virtual void OnFinalMessage(HWND hWnd);
@@ -175,8 +177,8 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     xcb_screen_t *mScreen;
     uint32_t m_gc;
     std::string m_strTitle;
-  public:
-    static LRESULT CALLBACK WindowProc(SNativeWnd * pWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+  private:
+    static LRESULT CALLBACK StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };
 
 SNSEND

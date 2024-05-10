@@ -6,6 +6,8 @@
 #include "UiState.h"
 using namespace SOUI;
 
+#define CLS_WINDOW "window"
+
 HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module);
 
 struct _Window{
@@ -115,8 +117,19 @@ HWND WINAPI  CreateWindowEx( DWORD exStyle, LPCSTR className,
  */
 HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 {
-    WNDCLASSEX info;
-    if (!GetClassInfoEx( module, className, &info )) return FALSE;
+    WNDCLASSEX info={0};
+    if (!GetClassInfoEx( module, className, &info )){
+        if(strcmp(className,CLS_WINDOW)==0){
+            //built in class
+            info.cbSize = sizeof(info);
+            info.cbClsExtra = 0;
+            info.lpfnWndProc = DefWindowProc;
+            info.lpszClassName = CLS_WINDOW;
+            RegisterClassEx(&info);
+        }else{
+            return FALSE;
+        }    
+    }
     void * p = malloc(sizeof(_Window)+info.cbWndExtra-sizeof(DWORD));
     _Window *pWnd = new(p)_Window();
     
@@ -168,7 +181,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 
     pWnd->gc = m_gc;
     pWnd->parent = cs->hwndParent;
-
+    pWnd->winproc = info.lpfnWndProc;
     {
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         map_wnd.insert(std::make_pair(hWnd,pWnd));
@@ -502,5 +515,9 @@ BOOL UpdateWindow(HWND hWnd)
 
 BOOL GetClientRect(HWND hWnd, RECT *pRc)
 {
+    return 0;
+}
+
+HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
     return 0;
 }
