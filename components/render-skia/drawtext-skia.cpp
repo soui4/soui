@@ -268,46 +268,9 @@ SkRect SkTextLayoutEx::draw( SkCanvas* canvas )
     return rcDraw;
 }
 
-FunFontFallback SkTextLayoutEx::s_fontFallback = NULL;
-
-void SkTextLayoutEx::SetFontFallback(FunFontFallback fun)
-{
-	s_fontFallback = fun;
-}
-
-static const int  kLocalSize = 100;
 void SkTextLayoutEx::drawText(SkCanvas *canvas,const wchar_t* text, size_t length, SkScalar x, SkScalar y,  SkPaint& paint)
 {
-	SkTypeface *pfont = paint.getTypeface();
-	pfont->ref();
-	uint16_t  glyphs_[kLocalSize];
-	uint16_t* glyphs = length<=kLocalSize ? glyphs_: (new uint16_t[length]);
-	int nValids=pfont->charsToGlyphs(text,SkTypeface::kUTF16_Encoding,glyphs,length);
-	if(nValids==length || !s_fontFallback)
-	{
-		canvas->drawText(text,length*sizeof(wchar_t),x,y,paint);
-	}else
-	{
-		for(int i=0;i<length;i++){
-			SkTypeface * font2=NULL;
-			if(glyphs[i]==0)
-			{
-				font2 = s_fontFallback(pfont,text[i]);
-				if(font2)
-					paint.setTypeface(font2);
-			}
-			canvas->drawText(text+i,sizeof(wchar_t),x,y,paint);
-			x+=paint.measureText(text+i,sizeof(wchar_t));
-			if(font2)
-			{
-				paint.setTypeface(pfont);
-				font2->unref();
-			}
-		}
-	}
-	pfont->unref();
-	if(length>kLocalSize)
-		delete []glyphs;
+	canvas->drawText(text,length*sizeof(wchar_t),x,y,paint);
 }
 
 SkScalar SkTextLayoutEx::measureText( SkPaint *paint,const wchar_t* text, size_t length)

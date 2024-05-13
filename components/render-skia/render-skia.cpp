@@ -2634,8 +2634,8 @@ EXTERN_C void Render_Skia_SetFontFallback(FontFallback fontFallback)
 {
 	s_fontFallback = fontFallback;
 	if(fontFallback){
-		SkTextLayoutEx::SetFontFallback(SkiaFontFallback);
+		SkCanvas::SetFontFallback(SkiaFontFallback);
 	}else{
-		SkTextLayoutEx::SetFontFallback(NULL);
+		SkCanvas::SetFontFallback(NULL);
 	}
 }

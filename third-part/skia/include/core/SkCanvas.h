@@ -38,7 +38,7 @@ class SkSurface_Base;
 class SkTextBlob;
 class GrContext;
 class GrRenderTarget;
-
+class SkTypeface;
 class SkCanvasState;
 
 namespace SkCanvasStateUtils {
@@ -60,9 +60,14 @@ namespace SkCanvasStateUtils {
     color, typeface, textSize, strokeWidth, shader (e.g. gradients, patterns),
     etc.
 */
+typedef SkTypeface * (*FunFontFallback)(SkTypeface * font,wchar_t buf);
+
 class SK_API SkCanvas : public SkRefCnt {
+	static FunFontFallback s_fontFallback;
 public:
     SK_DECLARE_INST_COUNT(SkCanvas)
+
+	static void SetFontFallback(FunFontFallback fun);
 
     /**
      *  Attempt to allocate an offscreen raster canvas, matching the ImageInfo.

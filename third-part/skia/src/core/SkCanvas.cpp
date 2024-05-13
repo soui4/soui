@@ -26,6 +26,7 @@
 #include "SkTextFormatParams.h"
 #include "SkTLazy.h"
 #include "SkUtils.h"
+#include "SkTypeface.h"
 
 #if SK_SUPPORT_GPU
 #include "GrRenderTarget.h"
@@ -2211,11 +2212,51 @@ void SkCanvas::onDrawTextBlob(const SkTextBlob* blob, SkScalar x, SkScalar y,
     LOOPER_END
 }
 
-// These will become non-virtual, so they always call the (virtual) onDraw... method
-void SkCanvas::drawText(const void* text, size_t byteLength, SkScalar x, SkScalar y,
-                        const SkPaint& paint) {
-    this->onDrawText(text, byteLength, x, y, paint);
+static const int  kLocalSize = 100;
+FunFontFallback SkCanvas::s_fontFallback = NULL;
+
+void SkCanvas::SetFontFallback(FunFontFallback fun)
+{
+	s_fontFallback = fun;
 }
+
+// These will become non-virtual, so they always call the (virtual) onDraw... method
+void SkCanvas::drawText(const void* text, size_t byteLength, SkScalar x, SkScalar y,const SkPaint& paint) {
+	SkTypeface *pfont = paint.getTypeface();
+	pfont->ref();
+	uint16_t  glyphs_[kLocalSize];
+	size_t length = byteLength/sizeof(wchar_t);
+	const wchar_t *wText = (const wchar_t*)text;
+	uint16_t* glyphs = length<=kLocalSize ? glyphs_: (new uint16_t[length]);
+	int nValids=pfont->charsToGlyphs(wText,SkTypeface::kUTF16_Encoding,glyphs,length);
+	if(nValids==length || !s_fontFallback)
+	{
+		onDrawText(text,byteLength,x,y,paint);
+	}else
+	{
+		SkPaint *pPaint = (SkPaint*)&paint;
+		for(int i=0;i<length;i++){
+			SkTypeface * font2=NULL;
+			if(glyphs[i]==0)
+			{
+				font2 = s_fontFallback(pfont,wText[i]);
+				if(font2)
+					pPaint->setTypeface(font2);
+			}
+			onDrawText(wText+i,sizeof(wchar_t),x,y,paint);
+			x+=paint.measureText(wText+i,sizeof(wchar_t));
+			if(font2)
+			{
+				pPaint->setTypeface(pfont);
+				font2->unref();
+			}
+		}
+	}
+	pfont->unref();
+	if(length>kLocalSize)
+		delete []glyphs;
+}
+
 void SkCanvas::drawPosText(const void* text, size_t byteLength, const SkPoint pos[],
                            const SkPaint& paint) {
     this->onDrawPosText(text, byteLength, pos, paint);
