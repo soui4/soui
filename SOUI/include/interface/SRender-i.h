@@ -1339,6 +1339,16 @@ typedef IPathS IPath;
 #endif //__cplusplus
 
 SNSEND
-typedef BOOL (*FontFallback)(LPCSTR u8FontName, const wchar_t *text, size_t len, char u8FontNameFallback[100], int *charset);
+
+/**
+ * @brief 字体回退回调接口，skia渲染专用
+ * @param u8FontName，当前字体名，utf8编码
+ * @param pWord, 不能渲染的字符
+ * @param wordLen, 字长，为1或者2
+ * @param[out] u8FontNameFallback,可用字体名，utf8编码
+ * @param[out] charset, 字体的charset属性
+ * @return TRUE-找到字体
+*/
+typedef BOOL (*FontFallback)(LPCSTR u8FontName, const wchar_t *pWord, size_t wordLen, char u8FontNameFallback[100], int *charset);
 
 #endif // __SRENDER_I__H__

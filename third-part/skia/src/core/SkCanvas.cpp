@@ -2225,36 +2225,37 @@ void SkCanvas::drawText(const void* text, size_t byteLength, SkScalar x, SkScala
 	SkTypeface *pfont = paint.getTypeface();
 	pfont->ref();
 	uint16_t  glyphs_[kLocalSize];
-	size_t length = byteLength/sizeof(wchar_t);
-	const wchar_t *wText = (const wchar_t*)text;
+	size_t length = byteLength/sizeof(uint16_t);
+	const uint16_t *wText = (const uint16_t*)text;
 	uint16_t* glyphs = length<=kLocalSize ? glyphs_: (new uint16_t[length]);
-	int nValids=pfont->charsToGlyphs(wText,SkTypeface::kUTF16_Encoding,glyphs,length);
+	int nValids=pfont->charsToGlyphs(wText,SkTypeface::kUTF16_Encoding,glyphs,(int)length);
 	if(nValids==length || !s_fontFallback)
 	{
 		onDrawText(text,byteLength,x,y,paint);
 	}else
 	{
 		SkPaint *pPaint = (SkPaint*)&paint;
-		for(int i=0;i<length;){
+		const uint16_t *pEnd = wText+length;
+		int iWord = 0;
+		while(wText<pEnd){
 			SkTypeface * font2=NULL;
-            
-            const uint16_t *text = (const uint16_t *)(wText + i);
-            SkUTF16_NextUnichar(&text);
-            size_t sizeofutf16char = (char *)text - (char *)(wText + i);
-			if(glyphs[i]==0)
+            const uint16_t *pWord = wText;
+            SkUTF16_NextUnichar(&wText);
+            size_t sizeofutf16char = (wText-pWord)*sizeof(uint16_t);
+			if(glyphs[iWord]==0)
 			{
-				font2 = s_fontFallback(pfont,wText+i,sizeofutf16char/sizeof(wchar_t));
+				font2 = s_fontFallback(pfont,(const wchar_t*)pWord,(wText-pWord));
 				if(font2)
 					pPaint->setTypeface(font2);
 			}
-            onDrawText(wText + i, sizeofutf16char, x, y, paint);
-            x += paint.measureText(wText + i, sizeofutf16char);
+            onDrawText(pWord, sizeofutf16char, x, y, paint);
+            x += paint.measureText(pWord, sizeofutf16char);
 			if(font2)
 			{
 				pPaint->setTypeface(pfont);
 				font2->unref();
             }
-            i += sizeofutf16char;
+			iWord++;
 		}
 	}
 	pfont->unref();
