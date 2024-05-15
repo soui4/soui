@@ -2235,21 +2235,26 @@ void SkCanvas::drawText(const void* text, size_t byteLength, SkScalar x, SkScala
 	}else
 	{
 		SkPaint *pPaint = (SkPaint*)&paint;
-		for(int i=0;i<length;i++){
+		for(int i=0;i<length;){
 			SkTypeface * font2=NULL;
+            
+            const uint16_t *text = (const uint16_t *)(wText + i);
+            SkUTF16_NextUnichar(&text);
+            size_t sizeofutf16char = (char *)text - (char *)(wText + i);
 			if(glyphs[i]==0)
 			{
-				font2 = s_fontFallback(pfont,wText[i]);
+				font2 = s_fontFallback(pfont,wText+i,sizeofutf16char/sizeof(wchar_t));
 				if(font2)
 					pPaint->setTypeface(font2);
 			}
-			onDrawText(wText+i,sizeof(wchar_t),x,y,paint);
-			x+=paint.measureText(wText+i,sizeof(wchar_t));
+            onDrawText(wText + i, sizeofutf16char, x, y, paint);
+            x += paint.measureText(wText + i, sizeofutf16char);
 			if(font2)
 			{
 				pPaint->setTypeface(pfont);
 				font2->unref();
-			}
+            }
+            i += sizeofutf16char;
 		}
 	}
 	pfont->unref();

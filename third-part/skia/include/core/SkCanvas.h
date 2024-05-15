@@ -60,7 +60,7 @@ namespace SkCanvasStateUtils {
     color, typeface, textSize, strokeWidth, shader (e.g. gradients, patterns),
     etc.
 */
-typedef SkTypeface * (*FunFontFallback)(SkTypeface * font,wchar_t buf);
+typedef SkTypeface *(*FunFontFallback)(SkTypeface *font, const wchar_t *buf, size_t len);
 
 class SK_API SkCanvas : public SkRefCnt {
 	static FunFontFallback s_fontFallback;
