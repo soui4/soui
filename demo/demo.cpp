@@ -53,7 +53,7 @@ enum{
 #define RES_TYPE RESTYPE_PE		//从PE资源中加载UI资源
 #endif
 //#define RES_TYPE RESTYPE_ZIP   //从zip包中加载资源
-#define RES_TYPE RESTYPE_7Z   //从7zip包中加载资源
+//#define RES_TYPE RESTYPE_7Z   //从7zip包中加载资源
 
 #include "../components/resprovider-7zip/zip7resprovider-param.h"
 #include "../components/resprovider-zip/zipresprovider-param.h"

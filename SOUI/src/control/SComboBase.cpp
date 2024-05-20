@@ -445,14 +445,14 @@ void SComboBase::DropDown()
     EventCBDropdown evt(this);
     evt.pDropDown = m_pDropDownWnd;
     FireEvent(&evt);
-    CRect rcPopup;
-    m_pDropDownWnd->Create(rcPopup, 0);
+    m_pDropDownWnd->Create(CRect(0,0,100,100), 0);
 
     CRect rcPadding = m_pDropDownWnd->GetRoot()->GetStyle().GetPadding();
     CRect rcMargin = m_pDropDownWnd->GetRoot()->GetStyle().GetMargin();
-    int nItemHeight = GetListBoxHeight() + rcPadding.top + rcPadding.bottom + rcMargin.top + rcMargin.bottom;
+    int nDropHeight = GetListBoxHeight() + rcPadding.top + rcPadding.bottom + rcMargin.top + rcMargin.bottom;
 
-    BOOL bDown = CalcPopupRect(nItemHeight, rcPopup);   
+	CRect rcPopup;
+    BOOL bDown = CalcPopupRect(nDropHeight, rcPopup);   
     m_pDropDownWnd->MoveWindow(rcPopup.left, rcPopup.top, rcPopup.Width(), rcPopup.Height());    
     m_pDropDownWnd->GetRoot()->UpdateChildrenPosition();
 
