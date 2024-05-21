@@ -5,6 +5,8 @@
 #include <string/sstringw.h>
 #include <string/strcpcvt.h>
 #include <helper/SRwLock.h>
+#include <SNativeWnd.h>
+#include <SMsgLoop.h>
 
 using namespace SOUI;
 
@@ -43,4 +45,14 @@ TEST(Util, RwLock) {
     lock.UnlockShared();
     lock.UnlockShared();
     EXPECT_EQ(1, 1);
+}
+
+TEST(Window,loop){
+    SNativeWnd wnd;
+    HWND hWnd = wnd.CreateNative("test window",WS_POPUP,0,0,0,100,100,0);
+    if(hWnd){
+        SMessageLoop loop(nullptr);
+        int ret = loop.Run();
+        EXPECT_EQ(ret,1);
+    }
 }
