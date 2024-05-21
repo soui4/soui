@@ -3,6 +3,7 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include "class.h"
 #include "UiState.h"
 using namespace SOUI;
 
@@ -85,6 +86,7 @@ static inline void set_win_data( void *ptr, LONG_PTR val, UINT size )
     }
 }
 
+extern bool NtUserGetAtomName( ATOM atomName, UNICODE_STRING *str );
 /***********************************************************************
  *		CreateWindowExW (USER32.@)
  */
@@ -94,6 +96,13 @@ HWND WINAPI  CreateWindowEx( DWORD exStyle, LPCSTR className,
                                  HWND parent, HMENU menu,
                                  HINSTANCE instance, LPVOID data )
 {
+    char szClassName[100];
+    if(IS_INTRESOURCE(className)){
+        UNICODE_STRING str={100,szClassName,0};
+        if(!NtUserGetAtomName((ATOM)LOWORD(className),&str))
+            return NULL;
+        className = szClassName;
+    }
     CREATESTRUCT cs;
     cs.lpCreateParams = data;
     cs.hInstance      = instance;

@@ -16,6 +16,7 @@ public:
         wndCls.lpszClassName = pszClassName;
         wndCls.lpfnWndProc = SNativeWnd::StartWindowProc;
         m_atom = RegisterClassEx(&wndCls);
+        return TRUE;
     }
 
     void * GetSharePtr(){
@@ -40,11 +41,14 @@ void * m_ptr;
 };
 
 BOOL SNativeWnd::InitWndClass(HINSTANCE hInst,LPCTSTR pszHostClassName,BOOL bImeApp){
+    SNativeHelper::instance()->Init(hInst,pszHostClassName,bImeApp);
     return TRUE;
 }
 
+//--------------------------------------------------------------
 SNativeWnd::SNativeWnd():m_hWnd(0),mConnection(nullptr),mScreen(nullptr),m_gc(0){
-
+    m_msgHandlerInfo.fun = NULL;
+    m_msgHandlerInfo.ctx = NULL;
 }
 
 SNativeWnd::~SNativeWnd(void)
@@ -54,8 +58,10 @@ SNativeWnd::~SNativeWnd(void)
 HWND  SNativeWnd::CreateNative
 (LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam ){
     SNativeHelper::instance()->SetSharePtr(this);
-    HWND hWnd =::CreateWindowEx(dwExStyle,(LPCSTR)SNativeHelper::instance()->getAtom(),lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,nID,0,lpParam);
+    m_hWnd =::CreateWindowEx(dwExStyle,(LPCSTR)SNativeHelper::instance()->getAtom(),lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,nID,0,lpParam);
     SNativeHelper::instance()->SetSharePtr(nullptr);
+    if(!m_hWnd)
+        return 0;
     SThreadUiState *state = SUiState::instance()->getThreadUiState();
     mConnection = state->connection;
     mScreen = state->screen;

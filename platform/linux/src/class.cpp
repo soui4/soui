@@ -5,7 +5,7 @@
 #include <atomic>
 #include <mutex>
 
-static std::mutex cls_mutex;
+static std::recursive_mutex cls_mutex;
 static std::list<CLASS*> class_list;
 static std::map<std::string,ATOM> atom_map;
 static std::atomic_uint32_t atom_start(10);
@@ -33,7 +33,7 @@ ATOM get_int_atom_value( const char *name )
 
 bool NtUserGetAtomName( ATOM atomName, UNICODE_STRING *str )
 {
-    std::unique_lock<std::mutex> lock(cls_mutex);
+    std::unique_lock<std::recursive_mutex> lock(cls_mutex);
     for(auto & it:atom_map){
         if(it.second == atomName)
         {
@@ -64,7 +64,8 @@ ATOM WINAPI RegisterClassEx( const WNDCLASSEX *wc)
     if (!(instance = wc->hInstance))
     {
          SetLastError( ERROR_INVALID_PARAMETER );
-         return 0;
+         //todo:hjx
+         //return 0;
     }
 
     /* Fix the extra bytes value */
@@ -109,7 +110,7 @@ ATOM WINAPI RegisterClassEx( const WNDCLASSEX *wc)
     _class->winproc       = wc->lpfnWndProc;
     if(!_class->atomName){
         //todo:hjx 
-        std::unique_lock<std::mutex> lock(cls_mutex);
+        std::unique_lock<std::recursive_mutex> lock(cls_mutex);
         auto it = atom_map.find(_class->name);
         if(it!=atom_map.end())
         {
@@ -121,12 +122,12 @@ ATOM WINAPI RegisterClassEx( const WNDCLASSEX *wc)
             atom_map.insert(std::make_pair(_class->name,_class->atomName));
         }    
     }else{
-        std::unique_lock<std::mutex> lock(cls_mutex);
+        std::unique_lock<std::recursive_mutex> lock(cls_mutex);
         atom_map.insert(std::make_pair(_class->name,_class->atomName));
     }
     atom = _class->atomName;
     {
-        std::unique_lock<std::mutex> lock(cls_mutex);
+        std::unique_lock<std::recursive_mutex> lock(cls_mutex);
         class_list.push_front(_class);
     }
 
@@ -139,7 +140,7 @@ ATOM WINAPI RegisterClassEx( const WNDCLASSEX *wc)
  */
 BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance )
 {
-    std::unique_lock<std::mutex> lock(cls_mutex);
+    std::unique_lock<std::recursive_mutex> lock(cls_mutex);
     for(auto it = class_list.begin();it!=class_list.end();it++){
         CLASS * _class = *it;
         if(strcmp(_class->name,className)==0)
@@ -157,7 +158,7 @@ BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance )
 }
 
 static CLASS *find_class( HINSTANCE module, UNICODE_STRING *name ){
-    std::unique_lock<std::mutex> lock(cls_mutex);
+    std::unique_lock<std::recursive_mutex> lock(cls_mutex);
     if(IS_INTRESOURCE(name->Buffer)){
         ATOM atom = (ATOM)reinterpret_cast<LONG_PTR>(name->Buffer);
         bool bValid = false;
@@ -210,14 +211,20 @@ ATOM WINAPI NtUserGetClassInfoEx( HINSTANCE instance, UNICODE_STRING *name, WNDC
 ATOM get_class_info( HINSTANCE instance, const char *class_name, WNDCLASSEX *info,
                      UNICODE_STRING *name_str)
 {
-    UNICODE_STRING name;
-    HMODULE module;
     ATOM atom;
 
-    std::unique_lock<std::mutex> lock(cls_mutex);
+    std::unique_lock<std::recursive_mutex> lock(cls_mutex);
+    UNICODE_STRING name={0,(char*)class_name,strlen(class_name)};
     atom = NtUserGetClassInfoEx( instance, &name, info);
 
-    if (name_str) *name_str = name;
+    if (atom && name_str){
+        if(name.Length > name_str->MaximumLength)
+        {
+            assert(false);
+            return 0;
+        }    
+        strcpy(name_str->Buffer,class_name);
+    }
     return atom;
 }
 
