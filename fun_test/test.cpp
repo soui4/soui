@@ -50,7 +50,7 @@ TEST(Util, RwLock) {
 TEST(Window,loop){
     SNativeWnd::InitWndClass(0,"soui_host",FALSE);
     SNativeWnd wnd;
-    HWND hWnd = wnd.CreateNative("test window",WS_POPUP,0,0,0,100,100,0);
+    HWND hWnd = wnd.CreateNative("test window",WS_POPUP|WS_VISIBLE,0,0,0,100,100,0);
     if(hWnd){
         SMessageLoop loop(nullptr);
         int ret = loop.Run();
