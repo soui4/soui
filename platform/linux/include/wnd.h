@@ -135,6 +135,7 @@ void EndPaint(HWND hWnd, PAINTSTRUCT *ps);
 BOOL UpdateWindow(HWND hWnd);
 
 BOOL GetClientRect(HWND hWnd,RECT *pRc);
+void GetWindowRect(HWND hWnd,RECT *rc);
 
 BOOL SetNativeWndAlpha(HWND hWnd, BYTE byAlpha);
 

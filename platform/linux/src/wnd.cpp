@@ -524,6 +524,11 @@ BOOL GetClientRect(HWND hWnd, RECT *pRc)
     return 0;
 }
 
+
+void GetWindowRect(HWND hWnd, RECT *rc)
+{
+}
+
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
     return 0;
 }

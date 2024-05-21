@@ -110,8 +110,8 @@ void SMessageLoopPriv::OnMsg(LPMSG pMsg)
     if (!PreTranslateMessage(pMsg))
     {
         //todo:hjx
-        //::TranslateMessage(pMsg);
-        //::DispatchMessage(pMsg);
+        ::TranslateMessage(pMsg);
+        ::DispatchMessage(pMsg);
     }
 }
 

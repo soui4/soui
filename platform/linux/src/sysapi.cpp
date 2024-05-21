@@ -2,7 +2,7 @@
 #include <sysapi.h>
 #include <pthread.h>
 #include "UiState.h"
-#include "SNativeWnd.h"
+#include "wnd.h"
 using namespace SOUI;
 
 void SetLastError(int e)
@@ -649,9 +649,6 @@ void DestroyIcon(HICON hIcon)
 {
 }
 
-void GetWindowRect(HWND hWnd, RECT *rc)
-{
-}
 
 int GetWindowScale(HWND hWnd)
 {
@@ -693,11 +690,25 @@ BOOL WaitMessage()
     return trdUiState->update();
 }
 
-BOOL PeekMessage(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
+BOOL PeekMessage(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
     SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState();
     if(!trdUiState)
         return FALSE;
     return trdUiState->peekMsg(pMsg,hWnd,wMsgFilterMin,wMsgFilterMax,wRemoveMsg);
+}
+
+BOOL TranslateMessage(LPMSG pMsg){
+    return TRUE;
+}
+
+BOOL DispatchMessage(LPMSG pMsg){
+    if(!pMsg->hwnd)
+        return FALSE;
+    WNDPROC wndProc = (WNDPROC)GetWindowLongPtr(pMsg->hwnd,GWLP_WNDPROC);
+    if(!wndProc)
+        return FALSE;
+    wndProc(pMsg->hwnd,pMsg->message,pMsg->wParam,pMsg->lParam);
+    return TRUE;
 }
 
 int GetSystemMetrics(int nIndex)

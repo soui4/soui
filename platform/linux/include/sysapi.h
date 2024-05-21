@@ -50,13 +50,15 @@ int  _localtime64_s (
         );
 
 void DestroyIcon(HICON hIcon);
-void GetWindowRect(HWND hWnd,RECT *rc);
 int  GetWindowScale(HWND hWnd);
 
 void PostThreadMessage(int tid, UINT msg,WPARAM wp,LPARAM lp);
 BOOL WaitMessage();
 
-BOOL PeekMessage(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
+BOOL PeekMessage(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
+
+BOOL TranslateMessage(LPMSG pMsg);
+BOOL DispatchMessage(LPMSG pMsg);
 
 int GetSystemMetrics(int nIndex);
 
