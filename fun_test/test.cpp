@@ -48,11 +48,11 @@ TEST(Util, RwLock) {
 }
 
 TEST(Window,loop){
-    // SNativeWnd wnd;
-    // HWND hWnd = wnd.CreateNative("test window",WS_POPUP,0,0,0,100,100,0);
-    // if(hWnd){
-    //     SMessageLoop loop(nullptr);
-    //     int ret = loop.Run();
-    //     EXPECT_EQ(ret,1);
-    // }
+    SNativeWnd wnd;
+    HWND hWnd = wnd.CreateNative("test window",WS_POPUP,0,0,0,100,100,0);
+    if(hWnd){
+        SMessageLoop loop(nullptr);
+        int ret = loop.Run();
+        EXPECT_EQ(ret,1);
+    }
 }

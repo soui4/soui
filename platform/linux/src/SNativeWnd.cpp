@@ -7,7 +7,7 @@ SNSBEGIN
 class SNativeHelper{
 public:
     static SNativeHelper* instance(){
-        SNativeHelper _this;
+        static SNativeHelper _this;
         return &_this;
     }
 
