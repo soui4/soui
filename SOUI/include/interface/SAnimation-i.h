@@ -55,6 +55,14 @@ DECLARE_INTERFACE(IAnimationListener)
      * @param animation The animation which was repeated.
      */
     STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation * animation) PURE;
+
+    /**
+     * <p>Notifies the pause state of the animation.</p>
+     *
+     * @param animation The animation which pause state changed.
+     * @param paused true for paused
+     */
+    STDMETHOD_(void, OnAnimationPauseChange)(THIS_ IAnimation * animation, BOOL bPaused) PURE;
 };
 
 /**
@@ -360,7 +368,7 @@ DECLARE_INTERFACE_(IAnimation, IObject)
      * @return True if the animation is still running
      */
     STDMETHOD_(BOOL, getTransformation)
-    (THIS_ int64_t currentTime, ITransformation * outTransformation) PURE;
+    (THIS_ uint64_t currentTime, ITransformation * outTransformation) PURE;
 
     /**
      * <p>Indicates whether this animation has started or not.</p>
@@ -402,6 +410,10 @@ DECLARE_INTERFACE_(IAnimation, IObject)
     STDMETHOD_(void, setUserData)(THIS_ ULONG_PTR data) PURE;
 
     STDMETHOD_(ULONG_PTR, getUserData)(CTHIS) SCONST PURE;
+
+    STDMETHOD_(void, pause)(THIS) PURE;
+
+    STDMETHOD_(void, resume)(THIS) PURE;
 };
 
 SNSEND

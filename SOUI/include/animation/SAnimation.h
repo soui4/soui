@@ -94,7 +94,7 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
     /**
      * The time in milliseconds at which the animation must start;
      */
-    int64_t mStartTime;
+    uint64_t mStartTime;
 
     /**
      * The delay in milliseconds after which the animation must start. When the
@@ -171,6 +171,9 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
 
     ULONG_PTR mUserData;
 
+    bool mPaused;
+    uint64_t mPauseTime;
+
   public:
     SAnimation();
 
@@ -238,7 +241,7 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
     (THIS_ uint64_t currentTime, ITransformation *outTransformation, float scale) OVERRIDE;
 
     STDMETHOD_(BOOL, getTransformation)
-    (THIS_ int64_t currentTime, ITransformation *outTransformation) OVERRIDE;
+    (THIS_ uint64_t currentTime, ITransformation *outTransformation) OVERRIDE;
 
     STDMETHOD_(BOOL, hasStarted)(THIS) SCONST OVERRIDE;
 
@@ -255,6 +258,10 @@ class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
     STDMETHOD_(void, setUserData)(THIS_ ULONG_PTR data) OVERRIDE;
 
     STDMETHOD_(ULONG_PTR, getUserData)(THIS) SCONST OVERRIDE;
+
+    STDMETHOD_(void, pause)(THIS) OVERRIDE;
+
+    STDMETHOD_(void, resume)(THIS) OVERRIDE;
 
   protected:
     bool isCanceled();

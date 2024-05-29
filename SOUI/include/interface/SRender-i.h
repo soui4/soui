@@ -1348,7 +1348,7 @@ SNSEND
  * @param[out] u8FontNameFallback,可用字体名，utf8编码
  * @param[out] charset, 字体的charset属性
  * @return TRUE-找到字体
-*/
+ */
 typedef BOOL (*FontFallback)(LPCSTR u8FontName, const wchar_t *pWord, size_t wordLen, char u8FontNameFallback[100], int *charset);
 
 #endif // __SRENDER_I__H__

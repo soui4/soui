@@ -689,6 +689,7 @@ class SOUI_EXP SWindow
     STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation *animation);
     STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation *animation);
     STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation *animation);
+    STDMETHOD_(void, OnAnimationPauseChange)(THIS_ IAnimation *animation, BOOL bPaused);
 
   protected:
     virtual void OnAnimationInvalidate(IAnimation *pAni, bool bErase);
