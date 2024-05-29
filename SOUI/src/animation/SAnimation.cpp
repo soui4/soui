@@ -357,7 +357,7 @@ void SAnimation::reset()
 
     mPaused = false;
 
-    mStartTime = -1;
+    mStartTime = START_ON_FIRST_FRAME;
 
     mStartOffset = 0;
     mDuration = 0;
@@ -428,7 +428,7 @@ ULONG_PTR SAnimation::getUserData() const
 
 void SAnimation::pause()
 {
-    if (mStarted && !mEnded && !mPaused)
+    if (!mEnded && !mPaused)
     {
         mPaused = true;
         mPauseTime = STime::GetCurrentTimeMs();
@@ -439,11 +439,14 @@ void SAnimation::pause()
 
 void SAnimation::resume()
 {
-    if (mStarted && !mEnded && mPaused)
+    if (!mEnded && mPaused)
     {
         mPaused = false;
-        uint64_t now = STime::GetCurrentTimeMs();
-        mStartTime += now - mPauseTime;
+        if (mStartTime != START_ON_FIRST_FRAME)
+        {
+            uint64_t now = STime::GetCurrentTimeMs();
+            mStartTime += now - mPauseTime;
+        }
         if (mListener)
             mListener->OnAnimationPauseChange(this, FALSE);
     }
