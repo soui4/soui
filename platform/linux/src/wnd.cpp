@@ -292,6 +292,7 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
         free(error); 
         return FALSE;
     }
+    xcb_flush(trdUiState->connection);
     return TRUE;
 }
 
