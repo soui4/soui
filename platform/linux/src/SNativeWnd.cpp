@@ -190,8 +190,7 @@ BOOL SNativeWnd::DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, L
 
 LRESULT SNativeWnd::DefWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    return 0;
-    //return ::CallWindowProc(m_pfnSuperWindowProc, m_hWnd, uMsg, wParam, lParam);
+    return ::DefWindowProc(m_hWnd,uMsg,wParam,lParam);
 }
 
 LRESULT SNativeWnd::DefWindowProc()
@@ -341,12 +340,12 @@ BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
 
 BOOL SNativeWnd::PostMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
 {
-    return FALSE;
+    return ::PostMessage(m_hWnd,message,wParam,lParam);
 }
 
 LRESULT SNativeWnd::SendMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
 {
-    return FALSE;
+    return ::SendMessage(m_hWnd,message,wParam,lParam);;
 }
 
 HWND SNativeWnd::SetFocus()

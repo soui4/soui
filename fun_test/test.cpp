@@ -7,6 +7,7 @@
 #include <helper/SRwLock.h>
 #include <SNativeWnd.h>
 #include <SMsgLoop.h>
+#include <wtl.mini/msgcrack.h>
 
 using namespace SOUI;
 
@@ -47,10 +48,26 @@ TEST(Util, RwLock) {
     EXPECT_EQ(1, 1);
 }
 
+class SNativeWnd2: public SNativeWnd{
+public:
+SNativeWnd2(){};
+
+protected:
+void OnDestroy();
+
+BEGIN_MSG_MAP_EX(SNativeWnd2)
+ MSG_WM_DESTROY(OnDestroy)
+END_MSG_MAP()
+};
+
+void SNativeWnd2::OnDestroy(){
+    PostMessage(WM_QUIT,1);
+}
+
 TEST(Window,loop){
     SNativeWnd::InitWndClass(0,"soui_host",FALSE);
-    SNativeWnd wnd;
-    HWND hWnd = wnd.CreateNative("test window",WS_POPUP|WS_VISIBLE,0,0,0,100,100,0);
+    SNativeWnd2 wnd;
+    HWND hWnd = wnd.CreateNative("test window",WS_POPUP|WS_VISIBLE,0,0,0,400,400,0);
     if(hWnd){
         SMessageLoop loop(nullptr);
         int ret = loop.Run();

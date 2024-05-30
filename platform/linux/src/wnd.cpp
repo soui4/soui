@@ -100,7 +100,7 @@ HWND WINAPI  CreateWindowEx( DWORD exStyle, LPCSTR className,
     if(IS_INTRESOURCE(className)){
         UNICODE_STRING str={100,szClassName,0};
         if(!NtUserGetAtomName((ATOM)LOWORD(className),&str))
-            return NULL;
+            return 0;
         className = szClassName;
     }
     CREATESTRUCT cs;
@@ -204,11 +204,17 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
     if(!IsWindow(hWnd))
         return FALSE;
     SendMessage(hWnd,WM_DESTROY,0,0);
+    SendMessage(hWnd,WM_NCDESTROY,0,0);
     std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
     auto it = map_wnd.find(hWnd);
     if(it==map_wnd.end())
         return FALSE;
-    delete it->second;
+    _Window *wndObj = it->second;
+    //delete wndObj and release resource of the window object
+    xcb_free_gc(wndObj->mConnection,wndObj->gc);
+    xcb_destroy_window(wndObj->mConnection, hWnd); 
+    xcb_flush(wndObj->mConnection);
+    delete wndObj;
     map_wnd.erase(it);
     return TRUE;
 }
@@ -539,6 +545,11 @@ void GetWindowRect(HWND hWnd, RECT *rc)
 }
 
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
+    switch(msg){
+        case WM_CLOSE:
+        DestroyWindow(hwnd);
+        break;
+    }
     return 0;
 }
 
