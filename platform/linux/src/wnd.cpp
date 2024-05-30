@@ -271,6 +271,7 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
  
     auto trdUiState = SUiState::instance()->getThreadUiState2(pWnd->tid);
     xcb_client_message_event_t ev;  
+    memset(&ev,0,sizeof(ev));
     ev.response_type = XCB_CLIENT_MESSAGE;  
     ev.format = 32; // 数据格式为32位  
     ev.window = hWnd; // 目标窗口  
@@ -281,7 +282,7 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
     ev.data.data32[3] = lp&0xffffffff; 
     ev.data.data32[4] = (lp&0xffffffff00000000)>>32; 
 
-    xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 /* 不广播 */, 0, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
+    xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 /* 不广播 */, hWnd, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
   
     // 检查发送是否成功（尽管这通常不是必需的，因为发送失败的情况很少）  
     xcb_generic_error_t *error = xcb_request_check(trdUiState->connection, cookie);  
