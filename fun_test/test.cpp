@@ -53,15 +53,17 @@ public:
 SNativeWnd2(){};
 
 protected:
-void OnDestroy();
+void OnClose();
 
 BEGIN_MSG_MAP_EX(SNativeWnd2)
- MSG_WM_DESTROY(OnDestroy)
+ MSG_WM_CLOSE(OnClose)
 END_MSG_MAP()
 };
 
-void SNativeWnd2::OnDestroy(){
+void SNativeWnd2::OnClose(){
     PostMessage(WM_QUIT,1);
+    //todo: PostThreadMessage not work now
+    //PostThreadMessage(GetCurrentThreadId(),WM_QUIT,0,0);  
 }
 
 TEST(Window,loop){
@@ -71,6 +73,8 @@ TEST(Window,loop){
     if(hWnd){
         SMessageLoop loop(nullptr);
         int ret = loop.Run();
+        wnd.DestroyWindow();
+
         EXPECT_EQ(ret,1);
     }
 }

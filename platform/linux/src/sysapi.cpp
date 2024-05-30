@@ -660,10 +660,13 @@ void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
     SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState2(tid);
     if(!trdUiState)
         return;
-    xcb_client_message_event_t ev;  
+    xcb_window_t root = trdUiState->screen->root; // 获取根窗口ID
+
+    xcb_client_message_event_t ev; 
+    memset(&ev,0,sizeof(ev)); 
     ev.response_type = XCB_CLIENT_MESSAGE;  
     ev.format = 32; // 数据格式为32位  
-    ev.window = 0; // 目标窗口  
+    ev.window = root; // 目标窗口  
     ev.type = trdUiState->wm_window;
     ev.data.data32[0] = msg;
     ev.data.data32[1] = wp&0xffffffff; 
@@ -671,7 +674,7 @@ void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
     ev.data.data32[3] = lp&0xffffffff; 
     ev.data.data32[4] = (lp&0xffffffff00000000)>>32; 
 
-    xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 /* 不广播 */, 0, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
+    xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 , root, XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char *)&ev);  
   
     // 检查发送是否成功（尽管这通常不是必需的，因为发送失败的情况很少）  
     xcb_generic_error_t *error = xcb_request_check(trdUiState->connection, cookie);  
