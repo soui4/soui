@@ -660,7 +660,7 @@ void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
     SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState2(tid);
     if(!trdUiState)
         return;
-    xcb_window_t root = trdUiState->screen->root; // 获取根窗口ID
+    xcb_window_t root = xcb_setup_roots_iterator(xcb_get_setup(trdUiState->connection)).data->root; // 获取根窗口ID
 
     xcb_client_message_event_t ev; 
     memset(&ev,0,sizeof(ev)); 
@@ -668,21 +668,15 @@ void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
     ev.format = 32; // 数据格式为32位  
     ev.window = root; // 目标窗口  
     ev.type = trdUiState->wm_window;
+    ev.sequence=10000;
     ev.data.data32[0] = msg;
     ev.data.data32[1] = wp&0xffffffff; 
     ev.data.data32[2] = (wp&0xffffffff00000000)>>32; 
     ev.data.data32[3] = lp&0xffffffff; 
     ev.data.data32[4] = (lp&0xffffffff00000000)>>32; 
 
-    xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 , root, XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char *)&ev);  
-  
-    // 检查发送是否成功（尽管这通常不是必需的，因为发送失败的情况很少）  
-    xcb_generic_error_t *error = xcb_request_check(trdUiState->connection, cookie);  
-    if (error) {  
-        // 处理错误
-        fprintf(stderr, "Error sending event: %d\n", error->error_code);  
-        free(error);  
-    }
+    xcb_send_event(trdUiState->connection, 0 , root, XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY | XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char *)&ev);  
+    xcb_flush(trdUiState->connection);
 }
 
 BOOL WaitMessage()

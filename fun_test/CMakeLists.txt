@@ -33,7 +33,9 @@ target_include_directories(fun_test
 add_dependencies(fun_test utilities4 gtest platform)
 target_link_libraries(fun_test utilities4 gtest platform)
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
-target_link_libraries(fun_test pthread xcb xcb-util)
+find_package(X11 REQUIRED)
+include_directories(${X11_INCLUDE_DIR})
+target_link_libraries(fun_test pthread xcb xcb-util ${X11_LIBRARIES})
 endif()
 
 set_target_properties (fun_test PROPERTIES
