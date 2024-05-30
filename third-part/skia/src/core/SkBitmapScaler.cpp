@@ -259,14 +259,6 @@ bool SkBitmapScaler::Resize(SkBitmap* resultPtr,
         ((RESIZE_FIRST_ALGORITHM_METHOD <= method) &&
         (method <= RESIZE_LAST_ALGORITHM_METHOD)));
 
-    SkRect dest = { 0, 0, destWidth, destHeight };
-    if (!dest.contains(destSubset)) {
-        SkErrorInternals::SetError( kInvalidArgument_SkError,
-                                    "Sorry, the destination bitmap scale subset "
-                                    "falls outside the full destination bitmap." );
-        return false;
-    }
-
     // If the size of source or destination is 0, i.e. 0x0, 0xN or Nx0, just
     // return empty.
     if (source.width() < 1 || source.height() < 1 ||
@@ -275,6 +267,15 @@ bool SkBitmapScaler::Resize(SkBitmap* resultPtr,
         // is just a negative scale (flip)
         return false;
     }
+
+    SkRect dest = { 0, 0, destWidth, destHeight };
+    if (!dest.contains(destSubset)) {
+        SkErrorInternals::SetError( kInvalidArgument_SkError,
+                                    "Sorry, the destination bitmap scale subset "
+                                    "falls outside the full destination bitmap." );
+        return false;
+    }
+
 
     method = ResizeMethodToAlgorithmMethod(method);
 

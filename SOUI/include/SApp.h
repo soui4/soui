@@ -31,7 +31,7 @@
 #define GETTOOLTIPFACTORY SOUI::SApplication::getSingleton().GetToolTipFactory()
 
 #define LOADXML(p1, p2)   SOUI::SApplication::getSingleton().LoadXmlDocment(p1, p2)
-#define LOADIMAGE(p1, p2) SOUI::SApplication::getSingleton().LoadImage(p1, p2)
+#define LOADIMAGE(p1,p2)  ((IResProviderMgr*)SOUI::SApplication::getSingletonPtr())->LoadImage(p1,p2)
 #define LOADIMAGE2(p1)    SOUI::SApplication::getSingleton().LoadImage2(p1)
 #define LOADICON(p1, p2)  SOUI::SApplication::getSingleton().LoadIcon(p1, p2, p2)
 #define LOADICON2(p1)     SOUI::SApplication::getSingleton().LoadIcon2(p1)

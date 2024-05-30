@@ -18,7 +18,7 @@ class SOUI_EXP SGradient : public TObjRefImpl<SObjectImpl<IGradient>> {
     STDMETHOD_(int, GetGradientLength)(CTHIS) SCONST OVERRIDE;
 
   protected:
-    STDMETHOD_(void,OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
+    STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *pNode) OVERRIDE;
 
   public:
     SOUI_ATTRS_BEGIN()

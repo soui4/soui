@@ -122,7 +122,7 @@ void SAnimationSet::scaleCurrentDuration(float scale)
     }
 }
 
-BOOL SAnimationSet::getTransformation(int64_t currentTime, ITransformation *t)
+BOOL SAnimationSet::getTransformation(uint64_t currentTime, ITransformation *t)
 {
     if (mStartTime == -1)
     {
@@ -304,6 +304,24 @@ SAnimationSet::SAnimationSet(bool shareInterpolator /*=true*/)
 {
     setFlag(PROPERTY_SHARE_INTERPOLATOR_MASK, shareInterpolator);
     init();
+}
+
+void SAnimationSet::pause()
+{
+    __baseCls::pause();
+    for (UINT i = 0; i < mAnimations.GetCount(); i++)
+    {
+        mAnimations[i]->pause();
+    }
+}
+
+void SAnimationSet::resume()
+{
+    for (UINT i = 0; i < mAnimations.GetCount(); i++)
+    {
+        mAnimations[i]->resume();
+    }
+    __baseCls::resume();
 }
 
 SNSEND

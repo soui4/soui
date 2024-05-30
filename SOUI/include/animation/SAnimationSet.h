@@ -116,7 +116,7 @@ class SOUI_EXP SAnimationSet : public SAnimation {
      * @see android.view.animation.Animation#getTransformation
      */
     STDMETHOD_(BOOL, getTransformation)
-    (THIS_ int64_t currentTime, ITransformation *outTransformation) OVERRIDE;
+    (THIS_ uint64_t currentTime, ITransformation *outTransformation) OVERRIDE;
 
     /**
      * @see android.view.animation.Animation#scaleCurrentDuration(float)
@@ -130,6 +130,10 @@ class SOUI_EXP SAnimationSet : public SAnimation {
     (THIS_ int width, int height, int parentWidth, int parentHeight, int nScale) OVERRIDE;
 
     STDMETHOD_(void, copy)(THIS_ const IAnimation *src) OVERRIDE;
+
+    STDMETHOD_(void, pause)(THIS) OVERRIDE;
+
+    STDMETHOD_(void, resume)(THIS) OVERRIDE;
 
   protected:
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;

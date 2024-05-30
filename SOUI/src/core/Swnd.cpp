@@ -3660,6 +3660,14 @@ BOOL SWindow::UnregisterDragDrop(THIS)
     return GetContainer()->UnregisterDragDrop(m_swnd);
 }
 
+void SWindow::OnAnimationPauseChange(THIS_ IAnimation *animation, BOOL bPaused)
+{
+    if (bPaused)
+        GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
+    else
+        GetContainer()->RegisterTimelineHandler(&m_animationHandler);
+}
+
 //////////////////////////////////////////////////////////////////////////
 static SWindow *ICWND_NONE = (SWindow *)-2;
 SWindow::SAnimationHandler::SAnimationHandler(SWindow *pOwner)

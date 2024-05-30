@@ -100,7 +100,7 @@ bool SAnimation::isCanceled()
     return mStartTime == -2;
 }
 
-BOOL SAnimation::getTransformation(int64_t currentTime, ITransformation *outTransformation)
+BOOL SAnimation::getTransformation(uint64_t currentTime, ITransformation *outTransformation)
 {
     if (mStartTime == -1)
     {
@@ -355,7 +355,9 @@ void SAnimation::reset()
 
     mStarted = false;
 
-    mStartTime = -1;
+    mPaused = false;
+
+    mStartTime = START_ON_FIRST_FRAME;
 
     mStartOffset = 0;
     mDuration = 0;
@@ -422,6 +424,32 @@ void SAnimation::setUserData(ULONG_PTR data)
 ULONG_PTR SAnimation::getUserData() const
 {
     return mUserData;
+}
+
+void SAnimation::pause()
+{
+    if (!mEnded && !mPaused)
+    {
+        mPaused = true;
+        mPauseTime = STime::GetCurrentTimeMs();
+        if (mListener)
+            mListener->OnAnimationPauseChange(this, TRUE);
+    }
+}
+
+void SAnimation::resume()
+{
+    if (!mEnded && mPaused)
+    {
+        mPaused = false;
+        if (mStartTime != START_ON_FIRST_FRAME)
+        {
+            uint64_t now = STime::GetCurrentTimeMs();
+            mStartTime += now - mPauseTime;
+        }
+        if (mListener)
+            mListener->OnAnimationPauseChange(this, FALSE);
+    }
 }
 
 SAnimation::~SAnimation()
