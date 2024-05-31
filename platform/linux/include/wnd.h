@@ -17,8 +17,6 @@ BOOL WINAPI DestroyWindow(HWND hWnd);
 
 BOOL WINAPI IsWindow(HWND hwnd);
 
-HDC WINAPI GetDC(HWND hWnd);
-void WINAPI ReleaseDC(HWND hwnd, HDC hdc);
 
 BOOL
 PostMessage(
@@ -45,11 +43,6 @@ SetForegroundWindow(
  HWND hWnd);
 
 HWND GetForegroundWindow();
-
- BOOL
-ShowWindow(
-     HWND hWnd,
-     int nCmdShow);
 
 BOOL
 SetWindowPos(
@@ -134,9 +127,13 @@ void EndPaint(HWND hWnd, PAINTSTRUCT *ps);
 
 BOOL UpdateWindow(HWND hWnd);
 
-BOOL GetClientRect(HWND hWnd,RECT *pRc);
-void GetWindowRect(HWND hWnd,RECT *rc);
-
+BOOL GetClientRect(HWND hWnd,RECT *lpRect);
+BOOL GetWindowRect(HWND hWnd,RECT *lpRect);
+BOOL InvalidateRect(
+  HWND       hWnd,
+  const RECT *lpRect,
+  BOOL       bErase
+);
 BOOL SetNativeWndAlpha(HWND hWnd, BYTE byAlpha);
 
 
@@ -156,4 +153,21 @@ GetMonitorInfo(
  LPMONITORINFO lpmi);
 
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp);
+
+BOOL ShowWindow(HWND hWnd, int nCmdShow);
+
+BOOL MoveWindow(HWND hWnd,int x, int y, int nWidth, int nHeight, BOOL bRepaint);
+
+BOOL IsWindowVisible(HWND hWnd);
+
+BOOL IsZoomed(HWND hWnd);
+BOOL IsIconic(HWND hWnd);
+int GetWindowText(HWND hWnd, LPTSTR lpszStringBuf, int nMaxCount);
+
+int GetWindowTextLength(HWND hWnd);
+BOOL SetWindowText(HWND hWnd , LPCTSTR lpszString);
+HDC GetDC(HWND hWnd);
+int ReleaseDC(HWND hWnd,HDC hdc);
+
+int MapWindowPoints(HWND hWndFrom,HWND hWndTo, LPPOINT lpPoint, UINT nCount);
 #endif//_WND_H__

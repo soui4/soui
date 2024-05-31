@@ -20,11 +20,11 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
 
     STDMETHOD_(int, GetID)(THIS) SCONST
     {
-        return m_id;
+        return (int)::GetWindowLong(m_hWnd,GWL_ID);
     }
     STDMETHOD_(void, SetID)(THIS_ int nID)
     {
-      m_id = nID;
+      ::SetWindowLong(m_hWnd,GWL_ID,nID);
     }
 
     STDMETHOD_(HWND, CreateNative)
@@ -172,11 +172,8 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
 
   public:
     HWND m_hWnd;
-    int  m_id;
     xcb_connection_t * mConnection;
     xcb_screen_t *mScreen;
-    uint32_t m_gc;
-    std::string m_strTitle;
   private:
     static LRESULT CALLBACK StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
 };

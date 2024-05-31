@@ -1,5 +1,6 @@
 #include <wnd.h>
 #include <xcb/xcb.h>
+#include <xcb/xproto.h>
 #include <map>
 #include <mutex>
 #include <string>
@@ -12,13 +13,13 @@ using namespace SOUI;
 HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module);
 
 struct _Window{
+    std::recursive_mutex mutex;
     pthread_t tid;
     xcb_connection_t *mConnection;
     xcb_screen_t *mScreen;
     uint32_t gc;
 
     std::string title; 
-
     UINT_PTR           objOpaque;
     HWND               parent;        /* Window parent */
     HWND               owner;         /* Window owner */
@@ -210,12 +211,14 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
     if(it==map_wnd.end())
         return FALSE;
     _Window *wndObj = it->second;
+    map_wnd.erase(it);
+
     //delete wndObj and release resource of the window object
     xcb_free_gc(wndObj->mConnection,wndObj->gc);
     xcb_destroy_window(wndObj->mConnection, hWnd); 
     xcb_flush(wndObj->mConnection);
     delete wndObj;
-    map_wnd.erase(it);
+
     return TRUE;
 }
 
@@ -224,14 +227,6 @@ BOOL WINAPI IsWindow(HWND hWnd)
     std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
     auto it = map_wnd.find(hWnd);
     return it != map_wnd.end();
-}
-
-HDC WINAPI GetDC(HWND hWnd)
-{
-    return 0;
-}
-void WINAPI ReleaseDC(HWND hwnd, HDC hdc)
-{
 }
 
 
@@ -263,11 +258,10 @@ BOOL GetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpmi)
 
 BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-    std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
-    auto it = map_wnd.find(hWnd);
-    if(it == map_wnd.end())
-        return FALSE;
-    _Window *pWnd = it->second;
+    _Window *pWnd = get_win_ptr(hWnd);
+    if(!pWnd)
+        return -1;
+    std::unique_lock<std::recursive_mutex> lock(pWnd->mutex);
  
     auto trdUiState = SUiState::instance()->getThreadUiState2(pWnd->tid);
     xcb_client_message_event_t ev;  
@@ -298,11 +292,10 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-    std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
-    auto it = map_wnd.find(hWnd);
-    if(it == map_wnd.end())
+    _Window *pWnd = get_win_ptr(hWnd);
+    if(!pWnd)
         return -1;
-    _Window *pWnd = it->second;
+    std::unique_lock<std::recursive_mutex> lock(pWnd->mutex);
 
     SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState2(pWnd->tid);
     if(!trdUiState)
@@ -334,11 +327,6 @@ HWND GetForegroundWindow()
     return 0;
 }
 
-BOOL ShowWindow(HWND hWnd, int nCmdShow)
-{
-    return 0;
-}
-
 BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags)
 {
     return 0;
@@ -360,6 +348,7 @@ static LONG_PTR SetWindowLongSize(HWND hWnd,int nIndex,LONG_PTR data,uint32_t si
     if(!wndObj)
         return 0;
     LONG_PTR retval = GetWindowLongSize(hWnd,nIndex,size);
+    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     switch(nIndex){
         case GWL_STYLE:
         wndObj->dwStyle = data;
@@ -407,6 +396,7 @@ static LONG_PTR GetWindowLongSize(HWND hWnd,int nIndex,uint32_t size){
     _Window *wndObj = get_win_ptr(hWnd);
     if(!wndObj)
         return 0;
+    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     switch(nIndex){
         case GWL_STYLE:
         return wndObj->dwStyle;
@@ -542,8 +532,9 @@ BOOL GetClientRect(HWND hWnd, RECT *pRc)
 }
 
 
-void GetWindowRect(HWND hWnd, RECT *rc)
+BOOL GetWindowRect(HWND hWnd, RECT *rc)
 {
+    return false;
 }
 
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
@@ -557,4 +548,190 @@ HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
 
 BOOL SetNativeWndAlpha(HWND hWnd, BYTE byAlpha){
     return FALSE;
+}
+
+BOOL ShowWindow(HWND hWnd, int nCmdShow)
+{
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return FALSE;
+    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
+    if(nCmdShow & SW_SHOW)
+        xcb_map_window(wndObj->mConnection, hWnd);
+    else
+        xcb_unmap_window(wndObj->mConnection, hWnd);
+    xcb_flush(wndObj->mConnection);
+    return TRUE;
+}
+
+BOOL InvalidateRect(
+  HWND       hWnd,
+  const RECT *lpRect,
+  BOOL       bErase
+){
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return FALSE;
+    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
+    xcb_connection_t *connection=wndObj->mConnection;
+    RECT rcWnd;
+    if(!lpRect){
+        GetWindowRect(hWnd,&rcWnd);
+        lpRect=&rcWnd;
+    }
+ // 发送曝光事件
+    xcb_expose_event_t expose_event;
+    expose_event.response_type = XCB_EXPOSE;
+    expose_event.window = hWnd;
+    expose_event.x = lpRect->left;
+    expose_event.y = lpRect->top;
+    expose_event.width = lpRect->right - lpRect->left;
+    expose_event.height = lpRect->bottom - lpRect->top;
+    xcb_send_event(connection, false, hWnd, XCB_EVENT_MASK_EXPOSURE, (const char *)&expose_event);
+    xcb_flush(connection);
+    return TRUE;
+}
+
+BOOL MoveWindow(HWND hWnd,int x, int y, int nWidth, int nHeight, BOOL bRepaint)
+{
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return FALSE;
+    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
+    xcb_connection_t *connection=wndObj->mConnection;
+    {
+            const unsigned coords[] = {static_cast<unsigned>(x),
+                               static_cast<unsigned>(y)};
+    xcb_configure_window(connection, hWnd,
+                         XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
+
+    }
+    {
+    const uint32_t vals[2] = {(uint32_t)nWidth, (uint32_t)nHeight};
+    xcb_configure_window(connection, hWnd,
+                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
+                         vals);
+    }
+
+    //todo: repaint
+    xcb_flush(connection);
+    if(bRepaint){
+        RECT rc={0,0,nWidth,nHeight};
+        InvalidateRect(hWnd,&rc,TRUE);
+    }
+    return TRUE;
+}
+
+BOOL IsWindowVisible(HWND hWnd)
+{
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return FALSE;
+    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
+    xcb_connection_t *connection=wndObj->mConnection;
+
+    xcb_get_window_attributes_cookie_t cookie = xcb_get_window_attributes(connection, hWnd);
+    xcb_get_window_attributes_reply_t *reply = xcb_get_window_attributes_reply(connection, cookie, NULL);
+    if (!reply)
+        return FALSE;
+    uint8_t mapState = reply->map_state;
+    free(reply);
+    return mapState == XCB_MAP_STATE_VIEWABLE;
+}
+
+static BOOL CheckWindowState(HWND hWnd, xcb_atom_t st){
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return FALSE;
+    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
+    SThreadUiState *state = SUiState::instance()->getThreadUiState2(wndObj->tid);
+    assert(state);
+    xcb_connection_t *connection=wndObj->mConnection;
+
+    xcb_get_property_cookie_t cookie = xcb_get_property(connection, 0, hWnd, XCB_ATOM_ATOM, state->wm_stat_atom, 0, 1024);
+    xcb_get_property_reply_t *reply = xcb_get_property_reply(connection, cookie, NULL);
+    if (!reply) return FALSE;
+    xcb_atom_t *atoms = (xcb_atom_t*)xcb_get_property_value(reply);
+    int num_atoms = xcb_get_property_value_length(reply) / sizeof(xcb_atom_t);
+    BOOL bRet = FALSE;
+    for(int i=0;i<num_atoms;i++){
+        if(atoms[i] == st)
+        {
+            bRet = TRUE;
+            break;
+        }
+    }
+    free(reply);
+    return bRet;
+} 
+
+//todo:hjx 
+enum WmState : uint32_t {
+  WM_STATE_WITHDRAWN = 0,
+  WM_STATE_NORMAL = 1,
+  WM_STATE_ICONIC = 3,
+};
+
+BOOL IsZoomed(HWND hWnd){
+    return CheckWindowState(hWnd,WM_STATE_ICONIC);
+}
+
+BOOL IsIconic(HWND hWnd){
+    return CheckWindowState(hWnd,WM_STATE_ICONIC);
+}
+
+int GetWindowText(HWND hWnd, LPTSTR lpszStringBuf, int nMaxCount)
+{
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return FALSE;
+    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
+    int nRet = 0;
+    if(nMaxCount>wndObj->title.length())
+        strcpy(lpszStringBuf,wndObj->title.c_str()),nRet = wndObj->title.length();
+    else
+        strncpy(lpszStringBuf,wndObj->title.c_str(),nMaxCount),nRet=nMaxCount;
+    return nRet;
+}
+
+int GetWindowTextLength(HWND hWnd){
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return 0;
+    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
+    return wndObj->title.length();
+}
+
+BOOL SetWindowText(HWND hWnd , LPCTSTR lpszString){
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return FALSE;
+    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
+    wndObj->title = lpszString;
+    xcb_change_property(wndObj->mConnection, XCB_PROP_MODE_REPLACE, hWnd,
+        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, wndObj->title.length(), wndObj->title.c_str());
+    xcb_flush(wndObj->mConnection);
+    return TRUE;
+}
+
+HDC GetDC(HWND hWnd){
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return 0;
+    return wndObj->gc;
+}
+
+int ReleaseDC(HWND hWnd,HDC hdc){
+    _Window *wndObj = get_win_ptr(hWnd);
+    if(!wndObj)
+        return 0;
+    if(wndObj->gc!=hdc)
+        return 0;
+    //todo:hjx
+    return 1;
+}
+
+int MapWindowPoints(HWND hWndFrom,HWND hWndTo, LPPOINT lpPoint, UINT nCount){
+    //todo:hjx
+    return 0;
 }

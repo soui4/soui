@@ -46,7 +46,7 @@ BOOL SNativeWnd::InitWndClass(HINSTANCE hInst,LPCTSTR pszHostClassName,BOOL bIme
 }
 
 //--------------------------------------------------------------
-SNativeWnd::SNativeWnd():m_hWnd(0),mConnection(nullptr),mScreen(nullptr),m_gc(0){
+SNativeWnd::SNativeWnd():m_hWnd(0),mConnection(nullptr),mScreen(nullptr){
     m_msgHandlerInfo.fun = NULL;
     m_msgHandlerInfo.ctx = NULL;
 }
@@ -75,14 +75,11 @@ HWND  SNativeWnd::GetHwnd(){
 }
 
 BOOL SNativeWnd::DestroyWindow(){
-    BOOL bRet = ::DestroyWindow(m_hWnd);
-    m_hWnd = 0;
-    return bRet;
+    return ::DestroyWindow(m_hWnd);
 }
 
 void SNativeWnd::OnFinalMessage(HWND hWnd)
 { 
-    //todo:hjx
     m_hWnd = 0;
 }
 
@@ -169,7 +166,7 @@ LRESULT SNativeWnd::ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     case WM_HSCROLL:
     case WM_VSCROLL:
         bHandled = TRUE;
-        //lResult = ::SendMessage(GetParent(), uMsg, wParam, lParam);
+        lResult = ::SendMessage(GetParent(), uMsg, wParam, lParam);
         break;
     default:
         bHandled = FALSE;
@@ -210,12 +207,20 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
 
 BOOL SNativeWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
 {
-    return FALSE;
+    DWORD dwStyle = GetWindowLong(m_hWnd,GWL_STYLE);
+    dwStyle&=~dwRemove;
+    dwStyle|=dwAdd;
+    SetWindowLong(m_hWnd,GWL_STYLE,dwStyle);
+    return TRUE;
 }
 
 BOOL SNativeWnd::ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
 {
-    return FALSE;
+    DWORD dwStyle = GetWindowLong(m_hWnd,GWL_EXSTYLE);
+    dwStyle&=~dwRemove;
+    dwStyle|=dwAdd;
+    SetWindowLong(m_hWnd,GWL_EXSTYLE,dwStyle);
+    return TRUE;
 }
 
 BOOL SNativeWnd::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID /*= 0*/)
@@ -229,12 +234,13 @@ BOOL SNativeWnd::UpdateLayeredWindow(HDC hdcDst, POINT *pptDst, SIZE *psize, HDC
 }
 
  BOOL SNativeWnd::SetLayeredWindowAlpha(THIS_ BYTE byAlpha) {
-    return FALSE;
+    return SetNativeWndAlpha(m_hWnd,byAlpha);
  }
 
 BOOL SNativeWnd::SetLayeredWindowAttributes(COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
 {
-    return FALSE;}
+    return FALSE;
+}
 
 int SNativeWnd::SetWindowRgn(HRGN hRgn, BOOL bRedraw /*=TRUE*/)
 {
@@ -243,13 +249,7 @@ int SNativeWnd::SetWindowRgn(HRGN hRgn, BOOL bRedraw /*=TRUE*/)
 
 BOOL SNativeWnd::ShowWindow(int nCmdShow)
 {
-    SASSERT(m_hWnd!=0);
-    if(nCmdShow & SW_SHOW)
-        xcb_map_window(mConnection, m_hWnd);
-    else
-        xcb_unmap_window(mConnection, m_hWnd);
-    xcb_flush(mConnection);
-    return TRUE;
+    return ::ShowWindow(m_hWnd,nCmdShow);
 }
 
 BOOL SNativeWnd::MoveWindow2(LPCRECT lpRect, BOOL bRepaint /*= TRUE*/)
@@ -259,83 +259,37 @@ BOOL SNativeWnd::MoveWindow2(LPCRECT lpRect, BOOL bRepaint /*= TRUE*/)
 
 BOOL SNativeWnd::MoveWindow(int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/)
 {
-    SASSERT(m_hWnd!=0);
-    {
-            const unsigned coords[] = {static_cast<unsigned>(x),
-                               static_cast<unsigned>(y)};
-    xcb_configure_window(mConnection, m_hWnd,
-                         XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
-
-    }
-    {
-    const uint32_t vals[2] = {(uint32_t)nWidth, (uint32_t)nHeight};
-    xcb_configure_window(mConnection, m_hWnd,
-                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
-                         vals);
-    }
-    return TRUE;
+    return ::MoveWindow(m_hWnd,x,y,nWidth,nHeight,bRepaint);
 }
 
 BOOL SNativeWnd::IsWindowVisible() const
 {
     SASSERT(IsWindow());
-    xcb_get_window_attributes_cookie_t cookie = xcb_get_window_attributes(mConnection, m_hWnd);
-    xcb_get_window_attributes_reply_t *reply = xcb_get_window_attributes_reply(mConnection, cookie, NULL);
-    if (!reply)
-        return FALSE;
-    uint8_t mapState = reply->map_state;
-    free(reply);
-    return mapState == XCB_MAP_STATE_VIEWABLE;
+    return ::IsWindowVisible(m_hWnd);
 }
 
 BOOL SNativeWnd::IsZoomed() const
 {
     SASSERT(IsWindow());
-    SThreadUiState *state = SUiState::instance()->getThreadUiState();
-    xcb_get_property_cookie_t cookie = xcb_get_property(mConnection, 0, m_hWnd, XCB_ATOM_ATOM, state->wm_stat_atom, 0, 1024);
-    xcb_get_property_reply_t *reply = xcb_get_property_reply(mConnection, cookie, NULL);
-    if (!reply) return FALSE;
-    xcb_atom_t *atoms = (xcb_atom_t*)xcb_get_property_value(reply);
-    int num_atoms = xcb_get_property_value_length(reply) / sizeof(xcb_atom_t);
-
-    //todo: 遍历窗口类型属性，查找最大化和最小化状态
-free(reply);
-    return FALSE;
+    return ::IsZoomed(m_hWnd);
 }
 
 BOOL SNativeWnd::IsIconic() const
 {
     SASSERT(IsWindow());
-    SThreadUiState *state = SUiState::instance()->getThreadUiState();
-    xcb_get_property_cookie_t cookie = xcb_get_property(mConnection, 0, m_hWnd, XCB_ATOM_ATOM, state->wm_stat_atom, 0, 1024);
-    xcb_get_property_reply_t *reply = xcb_get_property_reply(mConnection, cookie, NULL);
-    if (!reply) return FALSE;
-    xcb_atom_t *atoms = (xcb_atom_t*)xcb_get_property_value(reply);
-    int num_atoms = xcb_get_property_value_length(reply) / sizeof(xcb_atom_t);
-    free(reply);
-    return FALSE;
+    return ::IsIconic(m_hWnd);
 }
 
 int SNativeWnd::GetWindowText(LPTSTR lpszStringBuf, int nMaxCount) const
 {
     SASSERT(IsWindow());
-    if(nMaxCount < m_strTitle.length())
-    {
-        strncpy(lpszStringBuf,m_strTitle.c_str(),nMaxCount);
-        return nMaxCount;
-    }else{
-        strcpy(lpszStringBuf, m_strTitle.c_str());
-        return m_strTitle.length();
-    }
+    return ::GetWindowText(m_hWnd,lpszStringBuf,nMaxCount);
 }
 
 BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
 {
     SASSERT(IsWindow());
-    m_strTitle = lpszString;
-    xcb_change_property(mConnection, XCB_PROP_MODE_REPLACE, m_hWnd, XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, m_strTitle.length(), m_strTitle.c_str());
-
-    return TRUE;
+    return ::SetWindowText(m_hWnd,lpszString);
 }
 
 BOOL SNativeWnd::PostMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
@@ -394,8 +348,7 @@ BOOL SNativeWnd::CreateCaret(HBITMAP hBitmap)
 int SNativeWnd::ReleaseDC(HDC hDC)
 {
     SASSERT(IsWindow());
-    //return ::ReleaseDC(m_hWnd, hDC);
-    return 0;
+    return ::ReleaseDC(m_hWnd, hDC);
 }
 
 HDC SNativeWnd::GetWindowDC()
@@ -408,8 +361,7 @@ HDC SNativeWnd::GetWindowDC()
 HDC SNativeWnd::GetDC()
 {
     SASSERT(IsWindow());
-    //return ::GetDC(m_hWnd);
-    return 0;
+    return ::GetDC(m_hWnd);
 }
 
 BOOL SNativeWnd::KillTimer(UINT_PTR nIDEvent)
@@ -427,15 +379,13 @@ UINT_PTR SNativeWnd::SetTimer(UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lp
 int SNativeWnd::MapWindowRect(HWND hWndTo, LPRECT lpRect) const
 {
     SASSERT(IsWindow());
-    //return ::MapWindowPoints(m_hWnd, hWndTo, (LPPOINT)lpRect, 2);
-    return 0;
+    return ::MapWindowPoints(m_hWnd, hWndTo, (LPPOINT)lpRect, 2);
 }
 
 int SNativeWnd::MapWindowPoints(HWND hWndTo, LPPOINT lpPoint, UINT nCount) const
 {
     SASSERT(IsWindow());
-    //return ::MapWindowPoints(m_hWnd, hWndTo, lpPoint, nCount);
-    return 0;
+    return ::MapWindowPoints(m_hWnd, hWndTo, lpPoint, nCount);
 }
 
 BOOL SNativeWnd::ScreenToClient2(LPRECT lpRect) const
@@ -469,29 +419,25 @@ BOOL SNativeWnd::ClientToScreen(LPPOINT lpPoint) const
 BOOL SNativeWnd::GetClientRect(LPRECT lpRect) const
 {
     SASSERT(IsWindow());
- //   return ::GetClientRect(m_hWnd, lpRect);
- return 0;
-}
+    return ::GetClientRect(m_hWnd, lpRect);
+ }
 
 BOOL SNativeWnd::GetWindowRect(LPRECT lpRect) const
 {
     SASSERT(IsWindow());
- //   return ::GetWindowRect(m_hWnd, lpRect);
- return 0;
-}
+    return ::GetWindowRect(m_hWnd, lpRect);
+ }
 
 BOOL SNativeWnd::InvalidateRect(LPCRECT lpRect, BOOL bErase /*= TRUE*/)
 {
     SASSERT(IsWindow());
-//    return ::InvalidateRect(m_hWnd, lpRect, bErase);
-return 0;
+    return ::InvalidateRect(m_hWnd, lpRect, bErase);
 }
 
 BOOL SNativeWnd::Invalidate(BOOL bErase /*= TRUE*/)
 {
     SASSERT(IsWindow());
- //   return ::InvalidateRect(m_hWnd, NULL, bErase);
- return 0;
+    return ::InvalidateRect(m_hWnd, NULL, bErase);
 }
 
 BOOL SNativeWnd::IsWindow() SCONST
@@ -538,15 +484,13 @@ LONG_PTR SNativeWnd::GetWindowLongPtr(int nIndex) const
 DWORD SNativeWnd::GetExStyle() const
 {
     SASSERT(IsWindow());
-    //return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
-    return 0;
+    return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_EXSTYLE);
 }
 
 DWORD SNativeWnd::GetStyle() const
 {
     SASSERT(IsWindow());
-    //return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
-    return 0;
+    return (DWORD)::GetWindowLongPtr(m_hWnd, GWL_STYLE);
 }
 
 int SNativeWnd::GetDlgCtrlID() const
