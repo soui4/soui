@@ -86,6 +86,7 @@ SComboBase::SComboBase(void)
     , m_strCue(this)
     , m_LastPressTime(0)
     , m_bAutoMatch(FALSE)
+    , m_bAutoDropdown(FALSE)
     , m_nTextLength(0)
 {
     m_bFocusable = TRUE;
@@ -444,6 +445,8 @@ void SComboBase::DropDown()
 
     EventCBDropdown evt(this);
     evt.pDropDown = m_pDropDownWnd;
+    SStringT strInput = GetWindowText(TRUE);
+    evt.strInput = NULL;
     FireEvent(&evt);
     m_pDropDownWnd->Create(CRect(0, 0, 100, 100), 0);
 
@@ -464,10 +467,43 @@ void SComboBase::DropDown()
     m_pDropDownWnd->SNativeWnd::SetCapture();
 }
 
+void SComboBase::UpdateDropdown(const SStringT &strInput)
+{
+    if (!m_pDropDownWnd)
+    {
+        m_pDropDownWnd = new SDropDownWnd_ComboBox(this);
+        m_pDropDownWnd->GetRoot()->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
+    }
+
+    EventCBDropdown evt(this);
+    evt.pDropDown = m_pDropDownWnd;
+    evt.strInput = &strInput;
+    FireEvent(&evt);
+    BOOL bNewPopup = !m_pDropDownWnd->IsWindow();
+    if (bNewPopup)
+        m_pDropDownWnd->Create(CRect(0, 0, 100, 100), 0);
+
+    CRect rcPadding = m_pDropDownWnd->GetRoot()->GetStyle().GetPadding();
+    CRect rcMargin = m_pDropDownWnd->GetRoot()->GetStyle().GetMargin();
+    int nDropHeight = GetListBoxHeight() + rcPadding.top + rcPadding.bottom + rcMargin.top + rcMargin.bottom;
+
+    CRect rcPopup;
+    BOOL bDown = CalcPopupRect(nDropHeight, rcPopup);
+    m_pDropDownWnd->MoveWindow(rcPopup.left, rcPopup.top, rcPopup.Width(), rcPopup.Height());
+    m_pDropDownWnd->GetRoot()->UpdateChildrenPosition();
+
+    if (m_nAnimTime > 0 && bNewPopup)
+        m_pDropDownWnd->AnimateHostWindow(m_nAnimTime, AW_SLIDE | (bDown ? AW_VER_POSITIVE : AW_VER_NEGATIVE));
+    else
+        m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+
+    m_pDropDownWnd->SNativeWnd::SetCapture();
+}
+
 void SComboBase::CloseUp()
 {
     EventCBBeforeCloseUp evt(this);
-    evt.bCloseBlock = false;
+    evt.bCloseBlock = FALSE;
     FireEvent(&evt);
 
     if (!evt.bCloseBlock && m_pDropDownWnd)
@@ -497,9 +533,9 @@ BOOL SComboBase::FireEvent(IEvtArgs *evt)
         if (evtRe->iNotify == EN_CHANGE && !m_pEdit->GetEventSet()->isMuted())
         {
             m_pEdit->GetEventSet()->setMutedState(true);
+            SStringT strTxt = m_pEdit->GetWindowText();
             if (m_bAutoMatch)
             {
-                SStringT strTxt = m_pEdit->GetWindowText();
                 if (strTxt.GetLength() > m_nTextLength)
                 {
                     int iItem = FindString(strTxt, -1, TRUE);
@@ -511,6 +547,10 @@ BOOL SComboBase::FireEvent(IEvtArgs *evt)
                     }
                 }
                 m_nTextLength = strTxt.GetLength();
+            }
+            if (m_bAutoDropdown)
+            {
+                UpdateDropdown(strTxt);
             }
 
             GetEventSet()->setMutedState(true);
