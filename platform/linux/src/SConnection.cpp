@@ -161,6 +161,7 @@ bool SConnection::update(){
 }
 
 BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
+    std::unique_lock<std::recursive_mutex> lock(m_mutex);
     for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
         BOOL bMatch=TRUE;
         UiMsg *msg = (*it);
@@ -190,6 +191,17 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
        
     }
     return FALSE;
+}
+
+void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
+{
+    std::unique_lock<std::recursive_mutex> lock(m_mutex);
+    UiMsg *pMsg = new UiMsg;
+    pMsg->hwnd = hWnd;
+    pMsg->message = message;
+    pMsg->wParam = wp;
+    pMsg->lParam = lp;
+    m_msgQueue.push_back(pMsg);
 }
 
 void SConnection::pushEvent(xcb_generic_event_t *event){
@@ -223,6 +235,7 @@ void SConnection::pushEvent(xcb_generic_event_t *event){
         break;
     }
     if(pMsg){
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
         m_msgQueue.push_back(pMsg);
     }
 }

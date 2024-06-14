@@ -260,33 +260,11 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
     _Window *pWnd = get_win_ptr(hWnd);
     if(!pWnd)
-        return -1;
+        return FALSE;
     std::unique_lock<std::recursive_mutex> lock(pWnd->mutex);
  
-    auto trdUiState = SConnMgr::instance()->getConnection(pWnd->tid);
-    xcb_client_message_event_t ev;  
-    memset(&ev,0,sizeof(ev));
-    ev.response_type = XCB_CLIENT_MESSAGE;  
-    ev.format = 32; // 数据格式为32位  
-    ev.window = hWnd; // 目标窗口  
-    ev.type = trdUiState->wm_window;
-    ev.data.data32[0] = msg;
-    ev.data.data32[1] = wp&0xffffffff; 
-    ev.data.data32[2] = (wp&0xffffffff00000000)>>32; 
-    ev.data.data32[3] = lp&0xffffffff; 
-    ev.data.data32[4] = (lp&0xffffffff00000000)>>32; 
-
-    xcb_void_cookie_t cookie = xcb_send_event(trdUiState->connection, 0 /* 不广播 */, hWnd, XCB_EVENT_MASK_NO_EVENT, (const char *)&ev);  
-  
-    // 检查发送是否成功（尽管这通常不是必需的，因为发送失败的情况很少）  
-    xcb_generic_error_t *error = xcb_request_check(trdUiState->connection, cookie);  
-    if (error) {  
-        // 处理错误
-        fprintf(stderr, "Error sending event: %d\n", error->error_code);  
-        free(error); 
-        return FALSE;
-    }
-    xcb_flush(trdUiState->connection);
+    auto conn = SConnMgr::instance()->getConnection(pWnd->tid);
+    conn->postMsg(hWnd,msg,wp,lp);
     return TRUE;
 }
 

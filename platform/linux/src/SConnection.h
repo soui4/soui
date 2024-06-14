@@ -9,7 +9,7 @@
 #include <list>
 #include <pthread.h>
 #include <xcb/xcb.h>
-
+#include <mutex>
 
 #define STR_ATOM(atom_name,onlyExist) SOUI::SConnMgr::instance()->atom(atom_name,onlyExist)
 #define ID_ATOM(id,onlyExist) STR_ATOM(#id,onlyExist)
@@ -29,11 +29,12 @@ public:
     xcb_atom_t wm_window;
 public:
     bool update();
-    BOOL peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
-
+    BOOL peekMsg(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
+    void postMsg(HWND hWnd,UINT message,WPARAM wp,LPARAM lp);
 private:
     void pushEvent(xcb_generic_event_t *e);
 private:
+    std::recursive_mutex m_mutex;
     std::list<UiMsg *> m_msgQueue;
 };
 
