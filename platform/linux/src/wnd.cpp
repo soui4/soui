@@ -46,6 +46,46 @@ static _Window * get_win_ptr(HWND hWnd){
     return it->second;
 }
 
+class WndObj{
+    public:
+    WndObj(const WndObj &src){
+        wnd=src.wnd;
+        if(wnd){
+            wnd->mutex.lock();
+        }
+    }
+
+    ~WndObj(){
+        if(wnd){
+            wnd->mutex.unlock();
+        }
+    }
+
+    static WndObj fromHwnd(HWND hWnd){
+        std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
+        _Window *wnd = get_win_ptr(hWnd);
+        return WndObj(wnd);
+    }
+
+    _Window * operator ->(){
+        return wnd;
+    }
+
+    bool operator !() const{
+        return wnd==nullptr;
+    }
+
+    private:
+
+    WndObj(_Window *pWnd):wnd(pWnd){
+        if(wnd){
+            wnd->mutex.lock();
+        }
+    }
+
+
+    _Window * wnd;
+};
 static LONG_PTR get_win_data( const void *ptr, UINT size )
 {
     if (size == sizeof(WORD))
@@ -258,11 +298,9 @@ BOOL GetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpmi)
 
 BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-    _Window *pWnd = get_win_ptr(hWnd);
+    WndObj pWnd = WndObj::fromHwnd(hWnd);
     if(!pWnd)
         return FALSE;
-    std::unique_lock<std::recursive_mutex> lock(pWnd->mutex);
- 
     auto conn = SConnMgr::instance()->getConnection(pWnd->tid);
     conn->postMsg(hWnd,msg,wp,lp);
     return TRUE;
@@ -270,11 +308,9 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 
 LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
-    _Window *pWnd = get_win_ptr(hWnd);
+    WndObj pWnd = WndObj::fromHwnd(hWnd);
     if(!pWnd)
         return -1;
-    std::unique_lock<std::recursive_mutex> lock(pWnd->mutex);
-
     SOUI::SConnection *trdUiState = SOUI::SConnMgr::instance()->getConnection(pWnd->tid);
     if(!trdUiState)
         return -1;
@@ -322,11 +358,10 @@ LONG_PTR SetWindowLongPtr(HWND hWnd, int nIndex,LONG_PTR data){
 }
 
 static LONG_PTR SetWindowLongSize(HWND hWnd,int nIndex,LONG_PTR data,uint32_t size){
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return 0;
     LONG_PTR retval = GetWindowLongSize(hWnd,nIndex,size);
-    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     switch(nIndex){
         case GWL_STYLE:
         wndObj->dwStyle = data;
@@ -371,10 +406,9 @@ LONG_PTR GetWindowLongPtr(HWND hWnd,int nIndex){
 }
 
 static LONG_PTR GetWindowLongSize(HWND hWnd,int nIndex,uint32_t size){
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return 0;
-    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     switch(nIndex){
         case GWL_STYLE:
         return wndObj->dwStyle;
@@ -530,10 +564,9 @@ BOOL SetNativeWndAlpha(HWND hWnd, BYTE byAlpha){
 
 BOOL ShowWindow(HWND hWnd, int nCmdShow)
 {
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     if(nCmdShow & SW_SHOW)
         xcb_map_window(wndObj->mConnection, hWnd);
     else
@@ -547,10 +580,9 @@ BOOL InvalidateRect(
   const RECT *lpRect,
   BOOL       bErase
 ){
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     xcb_connection_t *connection=wndObj->mConnection;
     RECT rcWnd;
     if(!lpRect){
@@ -572,10 +604,9 @@ BOOL InvalidateRect(
 
 BOOL MoveWindow(HWND hWnd,int x, int y, int nWidth, int nHeight, BOOL bRepaint)
 {
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     xcb_connection_t *connection=wndObj->mConnection;
     {
             const unsigned coords[] = {static_cast<unsigned>(x),
@@ -602,10 +633,9 @@ BOOL MoveWindow(HWND hWnd,int x, int y, int nWidth, int nHeight, BOOL bRepaint)
 
 BOOL IsWindowVisible(HWND hWnd)
 {
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     xcb_connection_t *connection=wndObj->mConnection;
 
     xcb_get_window_attributes_cookie_t cookie = xcb_get_window_attributes(connection, hWnd);
@@ -618,10 +648,9 @@ BOOL IsWindowVisible(HWND hWnd)
 }
 
 static BOOL CheckWindowState(HWND hWnd, xcb_atom_t st){
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     SConnection *state = SConnMgr::instance()->getConnection(wndObj->tid);
     assert(state);
     xcb_connection_t *connection=wndObj->mConnection;
@@ -660,10 +689,9 @@ BOOL IsIconic(HWND hWnd){
 
 int GetWindowText(HWND hWnd, LPTSTR lpszStringBuf, int nMaxCount)
 {
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     int nRet = 0;
     if(nMaxCount>wndObj->title.length())
         strcpy(lpszStringBuf,wndObj->title.c_str()),nRet = wndObj->title.length();
@@ -673,18 +701,16 @@ int GetWindowText(HWND hWnd, LPTSTR lpszStringBuf, int nMaxCount)
 }
 
 int GetWindowTextLength(HWND hWnd){
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return 0;
-    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     return wndObj->title.length();
 }
 
 BOOL SetWindowText(HWND hWnd , LPCTSTR lpszString){
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
     wndObj->title = lpszString;
     xcb_change_property(wndObj->mConnection, XCB_PROP_MODE_REPLACE, hWnd,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, wndObj->title.length(), wndObj->title.c_str());
@@ -693,14 +719,14 @@ BOOL SetWindowText(HWND hWnd , LPCTSTR lpszString){
 }
 
 HDC GetDC(HWND hWnd){
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return 0;
     return wndObj->gc;
 }
 
 int ReleaseDC(HWND hWnd,HDC hdc){
-    _Window *wndObj = get_win_ptr(hWnd);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return 0;
     if(wndObj->gc!=hdc)

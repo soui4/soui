@@ -11,7 +11,7 @@
                 "${workspaceFolder}/third-part/gtest/include"
             ],
             "defines": [],
-            "compilerPath": "/usr/bin/clang-9",
+            "compilerPath": "/usr/bin/g++",
             "cStandard": "c17",
             "cppStandard": "c++14",
             "intelliSenseMode": "linux-clang-x64"
