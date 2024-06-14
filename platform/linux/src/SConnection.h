@@ -50,7 +50,7 @@ public:
     static xcb_atom_t internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName);
 public:
     xcb_atom_t atom(const char *name,bool onlyIfExist=false);
-    SConnection * getConnection(int tid=0,int screenNum=0);
+    SConnection * getConnection(pthread_t tid=0,int screenNum=0);
 private:
     void clearThreadUiState(SConnection *pObj);
 

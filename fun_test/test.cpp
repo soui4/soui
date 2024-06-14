@@ -61,9 +61,9 @@ END_MSG_MAP()
 };
 
 void SNativeWnd2::OnClose(){
-    PostMessage(WM_QUIT,1);
+    //PostMessage(WM_QUIT,1);
     //todo: PostThreadMessage not work now
-    //PostThreadMessage(GetCurrentThreadId(),WM_QUIT,0,0);  
+    PostThreadMessage(GetCurrentThreadId(),WM_QUIT,0,0);  
 }
 
 TEST(Window,loop){

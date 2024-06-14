@@ -87,7 +87,7 @@ protected:
 	SCriticalSection m_csRunningQueue;
 	RunnableList m_runningQueue;
 	SAutoRefPtr<IMessageLoop> m_parentLoop;
-	DWORD m_tid;
+	uint64_t m_tid;
 };
 
 

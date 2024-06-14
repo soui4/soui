@@ -295,7 +295,6 @@ BOOL GetMonitorInfo(HMONITOR hMonitor, LPMONITORINFO lpmi)
     return FALSE;
 }
 
-
 BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
     WndObj pWnd = WndObj::fromHwnd(hWnd);

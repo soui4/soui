@@ -58,8 +58,8 @@ void SConnMgr::clearThreadUiState(SConnection *pObj)
     m_trdStates.erase(it);
 }
 
-SConnection * SConnMgr::getConnection(int tid_,int screenNum){
-   pthread_t tid = tid_!=0? pthread_t(tid_):pthread_self();   
+SConnection * SConnMgr::getConnection(pthread_t tid_,int screenNum){
+   pthread_t tid = tid_!=0? tid_:pthread_self();   
     {
         SAutoReadLock autoLock(&m_rwLock);
         auto it = m_trdStates.find(tid);

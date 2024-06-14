@@ -29,7 +29,7 @@ int GetLastError() ;
 
 int MulDiv(int a,int b,int c);
 
-uint32_t GetCurrentThreadId();
+uint64_t GetCurrentThreadId();
 
 int MultiByteToWideChar(int cp,int flags, const char *src, int len,wchar_t *dst,int dstLen);
 
@@ -52,7 +52,7 @@ int  _localtime64_s (
 void DestroyIcon(HICON hIcon);
 int  GetWindowScale(HWND hWnd);
 
-void PostThreadMessage(int tid, UINT msg,WPARAM wp,LPARAM lp);
+void PostThreadMessage(uint64_t tid, UINT msg,WPARAM wp,LPARAM lp);
 BOOL WaitMessage();
 
 BOOL PeekMessage(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
