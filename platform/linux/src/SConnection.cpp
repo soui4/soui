@@ -1,38 +1,38 @@
-#include "UiState.h"
+#include "SConnection.h"
 #include <helper/SCriticalSection.h>
 #include <assert.h>
 #include "uimsg.h"
 
 SNSBEGIN
 
-static SUiState *s_uiState = NULL;
+static SConnMgr *s_connMgr = NULL;
 static SCriticalSection s_cs;
 
-SUiState *SUiState::instance()
+SConnMgr *SConnMgr::instance()
 {
-    if (!s_uiState)
+    if (!s_connMgr)
     {
         SAutoLock lock(s_cs);
-        if (!s_uiState)
+        if (!s_connMgr)
         {
-            s_uiState = new SUiState();
+            s_connMgr = new SConnMgr();
         }
     }
-    return s_uiState;
+    return s_connMgr;
 }
 
-void SUiState::free()
+void SConnMgr::free()
 {
     SAutoLock lock(s_cs);
-    if (s_uiState)
+    if (s_connMgr)
     {
-        delete s_uiState;
-        s_uiState = NULL;
+        delete s_connMgr;
+        s_connMgr = NULL;
     }
 }
 
 //----------------------------------------------------------
-SUiState::~SUiState()
+SConnMgr::~SConnMgr()
 {
     SAutoWriteLock autoLock(&m_rwLock);
     assert(m_trdStates.empty());
@@ -44,7 +44,7 @@ SUiState::~SUiState()
     m_trdStates.clear();
 }
 
-void SUiState::clearThreadUiState(SThreadUiState *pObj)
+void SConnMgr::clearThreadUiState(SConnection *pObj)
 {
     SAutoWriteLock autoLock(&m_rwLock);
     pthread_t tid = pthread_self();
@@ -58,8 +58,8 @@ void SUiState::clearThreadUiState(SThreadUiState *pObj)
     m_trdStates.erase(it);
 }
 
-SThreadUiState * SUiState::getThreadUiState2(int tid_,int screenNum){
-   pthread_t tid = pthread_t(tid_);
+SConnection * SConnMgr::getConnection(int tid_,int screenNum){
+   pthread_t tid = tid_!=0? pthread_t(tid_):pthread_self();   
     {
         SAutoReadLock autoLock(&m_rwLock);
         auto it = m_trdStates.find(tid);
@@ -71,27 +71,21 @@ SThreadUiState * SUiState::getThreadUiState2(int tid_,int screenNum){
     {
         //not found
         SAutoWriteLock autoLock(&m_rwLock);
-        SThreadUiState * state = new SThreadUiState(screenNum);        
+        SConnection * state = new SConnection(screenNum);        
         m_trdStates[tid]=state;
         return state;
     }
 }
 
-SThreadUiState *SUiState::getThreadUiState(int screenNum)
-{
-    pthread_t tid = pthread_self();
-    return getThreadUiState2(tid,screenNum);
-}
-
-xcb_atom_t SUiState::atom(const char *name,bool onlyIfExist){
-    SThreadUiState *trdUiState = getThreadUiState();
+xcb_atom_t SConnMgr::atom(const char *name,bool onlyIfExist){
+    SConnection *trdUiState = getConnection();
     if(!trdUiState)
         return 0;
     return internAtom(trdUiState->connection,onlyIfExist?1:0,name);
 }
 
 //---------------------------------------------------------------------
-xcb_atom_t SUiState::internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName)
+xcb_atom_t SConnMgr::internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName)
 {
     xcb_intern_atom_cookie_t cookie = xcb_intern_atom(connection, onlyIfExist, strlen(atomName), atomName);
     xcb_intern_atom_reply_t *reply = xcb_intern_atom_reply(connection, cookie, NULL);
@@ -106,7 +100,7 @@ xcb_atom_t SUiState::internAtom(xcb_connection_t *connection, uint8_t onlyIfExis
     return atom;
 }
 
-SThreadUiState::SThreadUiState(int screenNum)
+SConnection::SConnection(int screenNum)
 {
     connection = xcb_connect(nullptr, &screenNum);
     if (xcb_connection_has_error(connection) > 0)
@@ -132,13 +126,13 @@ SThreadUiState::SThreadUiState(int screenNum)
     }
     screen = iter.data;
 
-    wm_protocols_atom = SUiState::internAtom(connection, 1, "WM_PROTOCOLS");
-    wm_delete_window_atom = SUiState::internAtom(connection, 0, "WM_DELETE_WINDOW");
-    wm_stat_atom = SUiState::internAtom(connection, 0, "_NET_WM_STATE");
-    wm_window = SUiState::internAtom(connection,0,"WM_WINDOWS");
+    wm_protocols_atom = SConnMgr::internAtom(connection, 1, "WM_PROTOCOLS");
+    wm_delete_window_atom = SConnMgr::internAtom(connection, 0, "WM_DELETE_WINDOW");
+    wm_stat_atom = SConnMgr::internAtom(connection, 0, "_NET_WM_STATE");
+    wm_window = SConnMgr::internAtom(connection,0,"WM_WINDOWS");
 }
 
-SThreadUiState::~SThreadUiState()
+SConnection::~SConnection()
 {
     if (!connection)
     {
@@ -154,7 +148,7 @@ SThreadUiState::~SThreadUiState()
 }
 
 
-bool SThreadUiState::update(){
+bool SConnection::update(){
     int evtCnt=0;
     xcb_generic_event_t* e;
     while (xcb_generic_event_t* e = xcb_poll_for_event(connection))
@@ -166,7 +160,7 @@ bool SThreadUiState::update(){
     return evtCnt>0;
 }
 
-BOOL SThreadUiState::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
+BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
     for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
         BOOL bMatch=TRUE;
         UiMsg *msg = (*it);
@@ -198,7 +192,7 @@ BOOL SThreadUiState::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, U
     return FALSE;
 }
 
-void SThreadUiState::pushEvent(xcb_generic_event_t *event){
+void SConnection::pushEvent(xcb_generic_event_t *event){
     uint8_t event_code = event->response_type & 0x7f;
     UiMsg *pMsg = nullptr;
     switch (event_code)

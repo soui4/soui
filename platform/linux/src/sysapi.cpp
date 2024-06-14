@@ -1,7 +1,7 @@
 #include "platform.h"
 #include <sysapi.h>
 #include <pthread.h>
-#include "UiState.h"
+#include "SConnection.h"
 #include "wnd.h"
 using namespace SOUI;
 
@@ -657,7 +657,7 @@ int GetWindowScale(HWND hWnd)
 
 void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
 {
-    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState2(tid);
+    SOUI::SConnection *trdUiState = SOUI::SConnMgr::instance()->getConnection(tid);
     if(!trdUiState)
         return;
     xcb_window_t root = trdUiState->screen->root; // 获取根窗口ID
@@ -687,14 +687,14 @@ void PostThreadMessage(int tid, UINT msg, WPARAM wp, LPARAM lp)
 
 BOOL WaitMessage()
 {
-    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState();
+    SOUI::SConnection *trdUiState = SOUI::SConnMgr::instance()->getConnection();
     if(!trdUiState)
         return FALSE;
     return trdUiState->update();
 }
 
 BOOL PeekMessage(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
-    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState();
+    SOUI::SConnection *trdUiState = SOUI::SConnMgr::instance()->getConnection();
     if(!trdUiState)
         return FALSE;
     return trdUiState->peekMsg(pMsg,hWnd,wMsgFilterMin,wMsgFilterMax,wRemoveMsg);

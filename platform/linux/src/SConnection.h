@@ -11,15 +11,15 @@
 #include <xcb/xcb.h>
 
 
-#define STR_ATOM(atom_name,onlyExist) SOUI::SUiState::instance()->atom(atom_name,onlyExist)
+#define STR_ATOM(atom_name,onlyExist) SOUI::SConnMgr::instance()->atom(atom_name,onlyExist)
 #define ID_ATOM(id,onlyExist) STR_ATOM(#id,onlyExist)
 
 SNSBEGIN
 struct UiMsg;
-class SThreadUiState : SNoCopyable{
+class SConnection : SNoCopyable{
 public:
-  SThreadUiState(int screenNum);
-  ~SThreadUiState();
+  SConnection(int screenNum);
+  ~SConnection();
 public:
     xcb_connection_t* connection;
     xcb_screen_t* screen;
@@ -38,24 +38,23 @@ private:
 };
 
 
-class SUiState : SNoCopyable{
+class SConnMgr : SNoCopyable{
     SRwLock m_rwLock;
-    std::map<pthread_t,SThreadUiState*> m_trdStates;
-    friend class SThreadUiState;
+    std::map<pthread_t,SConnection*> m_trdStates;
+    friend class SConnection;
 public:
-    static SUiState * instance();
+    static SConnMgr * instance();
     static void free();
 
     static xcb_atom_t internAtom(xcb_connection_t *connection, uint8_t onlyIfExist, const char *atomName);
 public:
     xcb_atom_t atom(const char *name,bool onlyIfExist=false);
-    SThreadUiState * getThreadUiState(int screenNum=0);
-    SThreadUiState * getThreadUiState2(int tid,int screenNum=0);
+    SConnection * getConnection(int tid=0,int screenNum=0);
 private:
-    void clearThreadUiState(SThreadUiState *pObj);
+    void clearThreadUiState(SConnection *pObj);
 
-    SUiState(){}
-    ~SUiState();
+    SConnMgr(){}
+    ~SConnMgr();
 };
 
 SNSEND

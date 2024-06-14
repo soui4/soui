@@ -1,6 +1,6 @@
 #include <SNativeWnd.h>
-#include "UiState.h"
 #include <string.h>
+#include "SConnection.h"
 
 SNSBEGIN
 
@@ -62,7 +62,7 @@ HWND  SNativeWnd::CreateNative
     SNativeHelper::instance()->SetSharePtr(nullptr);
     if(!m_hWnd)
         return 0;
-    SThreadUiState *state = SUiState::instance()->getThreadUiState();
+    SConnection *state = SConnMgr::instance()->getConnection();
     mConnection = state->connection;
     mScreen = state->screen;
 

@@ -5,7 +5,7 @@
 #include <mutex>
 #include <string>
 #include "class.h"
-#include "UiState.h"
+#include "SConnection.h"
 using namespace SOUI;
 
 #define CLS_WINDOW "window"
@@ -145,7 +145,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     _Window *pWnd = new(p)_Window();
     
     pWnd->tid = pthread_self();
-    SThreadUiState *state = SUiState::instance()->getThreadUiState2(pWnd->tid);
+    SConnection *state = SConnMgr::instance()->getConnection(pWnd->tid);
     pWnd->mConnection = state->connection;
     pWnd->mScreen = state->screen;
 
@@ -263,7 +263,7 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
         return -1;
     std::unique_lock<std::recursive_mutex> lock(pWnd->mutex);
  
-    auto trdUiState = SUiState::instance()->getThreadUiState2(pWnd->tid);
+    auto trdUiState = SConnMgr::instance()->getConnection(pWnd->tid);
     xcb_client_message_event_t ev;  
     memset(&ev,0,sizeof(ev));
     ev.response_type = XCB_CLIENT_MESSAGE;  
@@ -297,10 +297,10 @@ LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
         return -1;
     std::unique_lock<std::recursive_mutex> lock(pWnd->mutex);
 
-    SOUI::SThreadUiState *trdUiState = SOUI::SUiState::instance()->getThreadUiState2(pWnd->tid);
+    SOUI::SConnection *trdUiState = SOUI::SConnMgr::instance()->getConnection(pWnd->tid);
     if(!trdUiState)
         return -1;
-    SOUI::SThreadUiState *trdUiStateCur = SOUI::SUiState::instance()->getThreadUiState();
+    SOUI::SConnection *trdUiStateCur = SOUI::SConnMgr::instance()->getConnection();
     if(trdUiState == trdUiStateCur){
         //same thread,call wndproc directly.
         WNDPROC wndProc = (WNDPROC)GetWindowLongPtr(hWnd,GWL_WNDPROC);
@@ -644,7 +644,7 @@ static BOOL CheckWindowState(HWND hWnd, xcb_atom_t st){
     if(!wndObj)
         return FALSE;
     std::unique_lock<std::recursive_mutex> lock(wndObj->mutex);
-    SThreadUiState *state = SUiState::instance()->getThreadUiState2(wndObj->tid);
+    SConnection *state = SConnMgr::instance()->getConnection(wndObj->tid);
     assert(state);
     xcb_connection_t *connection=wndObj->mConnection;
 
