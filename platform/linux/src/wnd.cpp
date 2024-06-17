@@ -20,7 +20,6 @@ struct _Window{
     pthread_t tid;
     xcb_connection_t *mConnection;
     xcb_screen_t *mScreen;
-    uint32_t gc;
     cairo_surface_t * surface;
     std::string title; 
     UINT_PTR           objOpaque;
@@ -191,6 +190,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     _Window *pWnd = new(p)_Window();
     
     pWnd->tid = pthread_self();
+    pWnd->surface = nullptr;
     SConnection *state = SConnMgr::instance()->getConnection(pWnd->tid);
     pWnd->mConnection = state->connection;
     pWnd->mScreen = state->screen;
@@ -214,13 +214,11 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
                       XCB_WINDOW_CLASS_INPUT_OUTPUT, pWnd->mScreen->root_visual, mask,
                       value_list);
 
-    uint32_t m_gc = xcb_generate_id(pWnd->mConnection);
 // 设置绘图上下文属性
     uint32_t value_mask = XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES;
     value_list[0] = pWnd->mScreen->black_pixel;
     value_list[1] = 0;
 
-    xcb_create_gc(pWnd->mConnection, m_gc, hWnd, value_mask, value_list);
     pWnd->title = cs->lpszName;
     xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, pWnd->title.length(), pWnd->title.c_str());
@@ -237,7 +235,6 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 
     xcb_flush(pWnd->mConnection);
 
-    pWnd->gc = m_gc;
     pWnd->parent = cs->hwndParent;
     pWnd->winproc = info.lpfnWndProc;
     {
@@ -251,10 +248,11 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 
         _Window *wndObj = it->second;
         map_wnd.erase(it);
-
+        if(wndObj->surface){
+            cairo_surface_destroy(wndObj->surface);
+        }
         //delete wndObj and release resource of the window object
         xcb_unmap_window(wndObj->mConnection,hWnd);
-        xcb_free_gc(wndObj->mConnection,wndObj->gc);
         xcb_destroy_window(wndObj->mConnection, hWnd); 
         xcb_flush(wndObj->mConnection);
         free(wndObj);
