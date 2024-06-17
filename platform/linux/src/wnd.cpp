@@ -276,7 +276,6 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
 
     //delete wndObj and release resource of the window object
     xcb_unmap_window(wndObj->mConnection,hWnd);
-    xcb_free_gc(wndObj->mConnection,wndObj->gc);
     xcb_destroy_window(wndObj->mConnection, hWnd); 
     xcb_flush(wndObj->mConnection);
     free(wndObj);
@@ -611,7 +610,10 @@ BOOL UpdateWindow(HWND hWnd)
 
 BOOL GetClientRect(HWND hWnd, RECT *pRc)
 {
-    return GetWindowRect(hWnd,pRc);
+    if(!GetWindowRect(hWnd,pRc))
+        return FALSE;
+    OffsetRect(pRc,-pRc->left,-pRc->top);
+    return TRUE;
 }
 
 
@@ -844,6 +846,7 @@ int ReleaseDC(HWND hWnd,HDC hdc){
         return 0;
     cairo_t* cairo_dc = (cairo_t*)hdc;
     cairo_destroy(cairo_dc);
+    xcb_flush(wndObj->mConnection);
     return 1;
 }
 

@@ -8,6 +8,8 @@
 #include <SNativeWnd.h>
 #include <SMsgLoop.h>
 #include <wtl.mini/msgcrack.h>
+#include <cairo/cairo-xcb.h>
+#include <xcb/xcb_aux.h>
 
 using namespace SOUI;
 
@@ -54,9 +56,21 @@ SNativeWnd2(){};
 
 protected:
 void OnClose();
+void OnPaint(HDC hdc){
+    PAINTSTRUCT ps;
+    hdc = BeginPaint(m_hWnd,&ps);
+    RECT rcWnd;
+    GetClientRect(&rcWnd);
+    cairo_t *cr =(cairo_t*)hdc;
+    cairo_set_source_rgb(cr, 1.0, 0.5, 0.0); // 设置绘图上下文的颜色
+    cairo_rectangle(cr, rcWnd.left, rcWnd.top, rcWnd.right-rcWnd.left, rcWnd.bottom-rcWnd.top); // 绘制矩形
+    cairo_fill(cr); // 填充矩形
+    EndPaint(m_hWnd,&ps);
+}
 
 BEGIN_MSG_MAP_EX(SNativeWnd2)
  MSG_WM_CLOSE(OnClose)
+ MSG_WM_PAINT(OnPaint)
 END_MSG_MAP()
 };
 
