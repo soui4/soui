@@ -238,7 +238,22 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         map_wnd.insert(std::make_pair(hWnd,pWnd));
     }
-    SendMessage(hWnd,WM_CREATE,0,(LPARAM)cs);
+    if(0!=SendMessage(hWnd,WM_CREATE,0,(LPARAM)cs)){
+        std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
+        auto it = map_wnd.find(hWnd);
+        assert(it!=map_wnd.end());
+
+        _Window *wndObj = it->second;
+        map_wnd.erase(it);
+
+        //delete wndObj and release resource of the window object
+        xcb_unmap_window(wndObj->mConnection,hWnd);
+        xcb_free_gc(wndObj->mConnection,wndObj->gc);
+        xcb_destroy_window(wndObj->mConnection, hWnd); 
+        xcb_flush(wndObj->mConnection);
+        free(wndObj);
+        hWnd = 0;
+    }
     return hWnd;
 }
 
@@ -251,14 +266,16 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
     auto it = map_wnd.find(hWnd);
     if(it==map_wnd.end())
         return FALSE;
+
     _Window *wndObj = it->second;
     map_wnd.erase(it);
 
     //delete wndObj and release resource of the window object
+    xcb_unmap_window(wndObj->mConnection,hWnd);
     xcb_free_gc(wndObj->mConnection,wndObj->gc);
     xcb_destroy_window(wndObj->mConnection, hWnd); 
     xcb_flush(wndObj->mConnection);
-    delete wndObj;
+    free(wndObj);
 
     return TRUE;
 }
