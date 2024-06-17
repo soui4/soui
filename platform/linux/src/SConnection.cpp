@@ -131,7 +131,6 @@ SConnection::SConnection(int screenNum)
     wm_stat_atom = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE");
     wm_stat_hidden_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_HIDDEN");
     wm_stat_enable_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_DEMANDS_ATTENTION");
-    wm_window = SConnMgr::internAtom(connection,0,"WM_WINDOWS");
 }
 
 SConnection::~SConnection()
@@ -228,15 +227,7 @@ void SConnection::pushEvent(xcb_generic_event_t *event){
     case XCB_CLIENT_MESSAGE:
     {
         xcb_client_message_event_t *client_message_event = (xcb_client_message_event_t *) event;
-        if(client_message_event->type == wm_window)
-        {
-            pMsg = new Msg;
-            pMsg->hwnd=client_message_event->window;
-            pMsg->message = client_message_event->data.data32[0];
-            pMsg->wParam = MAKEWPARAM(client_message_event->data.data32[1],client_message_event->data.data32[2]);
-            pMsg->lParam = MAKELPARAM(client_message_event->data.data32[3],client_message_event->data.data32[4]);
-        }
-        else if(client_message_event->data.data32[0] == wm_delete_window_atom){
+        if(client_message_event->data.data32[0] == wm_delete_window_atom){
             pMsg = new Msg;
             pMsg->message = WM_CLOSE;
             pMsg->hwnd = client_message_event->window;

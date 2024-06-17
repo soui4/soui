@@ -28,7 +28,6 @@ public:
     xcb_atom_t wm_stat_atom;
     xcb_atom_t wm_stat_hidden_atom;
     xcb_atom_t wm_stat_enable_atom;
-    xcb_atom_t wm_window;
 public:
     bool update();
     BOOL peekMsg(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
