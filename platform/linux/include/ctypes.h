@@ -145,7 +145,8 @@ typedef int BOOL;
 #define HINSTANCE UINT_PTR
 #define HMODULE UINT_PTR
 #define HICON int
-#define HWND  UINT_PTR
+typedef uint32_t HWND;
+//#define HWND  uint32_t
 #define HMENU int
 #define HGDIOBJ int
 #define HBRUSH int

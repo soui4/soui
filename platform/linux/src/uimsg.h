@@ -4,8 +4,16 @@
 #include <sdef.h>
 
 SNSBEGIN
-struct UiMsg : MSG{
-    virtual ~UiMsg(){}
+struct Msg : MSG{
+    virtual ~Msg(){}
+};
+
+struct MsgCreate: Msg,CREATESTRUCT
+{
+    MsgCreate(){
+        wParam = 0;
+        lParam = (LPARAM)(CREATESTRUCT*)this;
+    }
 };
 
 SNSEND

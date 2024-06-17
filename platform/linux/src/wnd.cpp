@@ -188,7 +188,9 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     SConnection *state = SConnMgr::instance()->getConnection(pWnd->tid);
     pWnd->mConnection = state->connection;
     pWnd->mScreen = state->screen;
-
+    pWnd->dwStyle = cs->style;
+    pWnd->dwExStyle = cs->dwExStyle;
+    pWnd->hInstance = module;
     HWND hWnd = xcb_generate_id(pWnd->mConnection);
 
     uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
@@ -227,7 +229,6 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     xcb_configure_window(pWnd->mConnection, hWnd,
                          XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
 
-    //state->onWndCreate(m_hWnd,this);
     xcb_flush(pWnd->mConnection);
 
     pWnd->gc = m_gc;
@@ -342,7 +343,19 @@ HWND GetForegroundWindow()
 
 BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags)
 {
-    return 0;
+    WndObj wndOj = WndObj::fromHwnd(hWnd);
+    if(!wndOj)
+        return FALSE;
+    RECT rcWnd;
+    GetWindowRect(hWnd,&rcWnd);
+    if(!(uFlags & SWP_NOSIZE)){
+        rcWnd.right = rcWnd.left+cx;
+        rcWnd.bottom = rcWnd.top+cy;
+    }
+    if(!(uFlags & SWP_NOMOVE)){
+        OffsetRect(&rcWnd,X-rcWnd.left,Y-rcWnd.top);
+    }
+    return MoveWindow(hWnd,rcWnd.left,rcWnd.top,rcWnd.right-rcWnd.left,rcWnd.bottom-rcWnd.top,!(uFlags&SWP_NOREDRAW));
 }
 
 static LONG_PTR SetWindowLongSize(HWND hWnd,int nIndex,LONG_PTR data,uint32_t size);
@@ -479,8 +492,30 @@ BOOL IsWindowEnabled(HWND hWnd)
     return 0;
 }
 
-void EnableWindow(HWND hWnd, BOOL bEnable)
+BOOL EnableWindow(HWND hWnd, BOOL bEnable)
 {
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj) 
+        return FALSE;
+    SConnection *conn = SConnMgr::instance()->getConnection(wndObj->tid);
+    xcb_client_message_event_t event = {
+        .response_type = XCB_CLIENT_MESSAGE,
+        .format = 32,
+        .sequence = 0,
+        .window = hWnd,
+        .type = conn->wm_stat_atom
+    };
+    event.data.data32[0] = bEnable?0:1;
+    event.data.data32[1] = conn->wm_stat_enable_atom;
+    xcb_send_event(
+        conn->connection,
+        0,
+        hWnd,
+        XCB_EVENT_MASK_STRUCTURE_NOTIFY,
+        (const char *)&event
+    );
+    xcb_flush(conn->connection);
+    return TRUE;
 }
 
 HWND SetActiveWindow(HWND hWnd)
@@ -534,18 +569,37 @@ void EndPaint(HWND hWnd, PAINTSTRUCT *ps){}
 
 BOOL UpdateWindow(HWND hWnd)
 {
-    return 0;
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj)
+        return FALSE;
+    //todo:hjx
+    xcb_flush(wndObj->mConnection);
+    return TRUE;
 }
 
 BOOL GetClientRect(HWND hWnd, RECT *pRc)
 {
-    return 0;
+    return GetWindowRect(hWnd,pRc);
 }
 
 
 BOOL GetWindowRect(HWND hWnd, RECT *rc)
 {
-    return false;
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj)
+        return FALSE;
+    
+    xcb_get_geometry_cookie_t geometry_cookie = xcb_get_geometry(wndObj->mConnection, hWnd);
+    xcb_get_geometry_reply_t *geometry_reply = xcb_get_geometry_reply(wndObj->mConnection, geometry_cookie, NULL);
+
+    if (!geometry_reply)
+        return FALSE;
+    rc->left = geometry_reply->x;
+    rc->top = geometry_reply->y;
+    rc->right = rc->left + geometry_reply->width;
+    rc->bottom = rc->top + geometry_reply->height;
+    free(geometry_reply);
+    return TRUE;
 }
 
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
@@ -597,7 +651,7 @@ BOOL InvalidateRect(
     expose_event.width = lpRect->right - lpRect->left;
     expose_event.height = lpRect->bottom - lpRect->top;
     xcb_send_event(connection, false, hWnd, XCB_EVENT_MASK_EXPOSURE, (const char *)&expose_event);
-    xcb_flush(connection);
+//    xcb_flush(connection);
     return TRUE;
 }
 
@@ -735,6 +789,17 @@ int ReleaseDC(HWND hWnd,HDC hdc){
 }
 
 int MapWindowPoints(HWND hWndFrom,HWND hWndTo, LPPOINT lpPoint, UINT nCount){
-    //todo:hjx
-    return 0;
+    RECT rcFrom,rcTo;
+    if(!GetWindowRect(hWndFrom,&rcFrom))
+        return 0;
+    if(!GetWindowRect(hWndTo,&rcTo))
+        return 0;
+    int xDiff = rcTo.left-rcFrom.left;
+    int yDiff = rcTo.top-rcFrom.top;
+
+    for(UINT i=0;i<nCount;i++){
+        lpPoint[i].x -= xDiff;
+        lpPoint[i].y -= yDiff;
+    }
+    return MAKELONG(-xDiff,-yDiff);
 }

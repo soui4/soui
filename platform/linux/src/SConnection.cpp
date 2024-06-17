@@ -127,8 +127,10 @@ SConnection::SConnection(int screenNum)
     screen = iter.data;
 
     wm_protocols_atom = SConnMgr::internAtom(connection, 1, "WM_PROTOCOLS");
-    wm_delete_window_atom = SConnMgr::internAtom(connection, 0, "WM_DELETE_WINDOW");
-    wm_stat_atom = SConnMgr::internAtom(connection, 0, "_NET_WM_STATE");
+    wm_delete_window_atom = SConnMgr::internAtom(connection, 1, "WM_DELETE_WINDOW");
+    wm_stat_atom = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE");
+    wm_stat_hidden_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_HIDDEN");
+    wm_stat_enable_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_DEMANDS_ATTENTION");
     wm_window = SConnMgr::internAtom(connection,0,"WM_WINDOWS");
 }
 
@@ -164,7 +166,7 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
     std::unique_lock<std::recursive_mutex> lock(m_mutex);
     for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
         BOOL bMatch=TRUE;
-        UiMsg *msg = (*it);
+        Msg *msg = (*it);
         do{
             if(msg->message==WM_QUIT)
                 break;
@@ -196,7 +198,7 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
 void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
 {
     std::unique_lock<std::recursive_mutex> lock(m_mutex);
-    UiMsg *pMsg = new UiMsg;
+    Msg *pMsg = new Msg;
     pMsg->hwnd = hWnd;
     pMsg->message = message;
     pMsg->wParam = wp;
@@ -206,30 +208,55 @@ void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
 
 void SConnection::pushEvent(xcb_generic_event_t *event){
     uint8_t event_code = event->response_type & 0x7f;
-    UiMsg *pMsg = nullptr;
+    Msg *pMsg = nullptr;
     switch (event_code)
     {
+    case XCB_CONFIGURE_NOTIFY:
+    {
+        xcb_configure_notify_event_t *e2 = (xcb_configure_notify_event_t*)event;
+        // MsgCreate * msg = new MsgCreate;
+        // msg->hwnd = e2->window;
+        // msg->message = WM_CREATE;
+        // msg->x = e2->x;
+        // msg->y = e2->y;
+        // msg->cx = e2->width;
+        // msg->cy = e2->height;
+        // //todo:hjx
+        // pMsg = msg;
+        break;
+    }
     case XCB_CLIENT_MESSAGE:
     {
         xcb_client_message_event_t *client_message_event = (xcb_client_message_event_t *) event;
         if(client_message_event->type == wm_window)
         {
-            pMsg = new UiMsg;
+            pMsg = new Msg;
             pMsg->hwnd=client_message_event->window;
             pMsg->message = client_message_event->data.data32[0];
             pMsg->wParam = MAKEWPARAM(client_message_event->data.data32[1],client_message_event->data.data32[2]);
             pMsg->lParam = MAKELPARAM(client_message_event->data.data32[3],client_message_event->data.data32[4]);
         }
         else if(client_message_event->data.data32[0] == wm_delete_window_atom){
-            pMsg = new UiMsg;
+            pMsg = new Msg;
             pMsg->message = WM_CLOSE;
             pMsg->hwnd = client_message_event->window;
             pMsg->wParam = pMsg->lParam = 0;
+        }else if(client_message_event->type == wm_stat_hidden_atom){
+            pMsg = new Msg;
+            pMsg->message = WM_SHOWWINDOW;
+            pMsg->hwnd =client_message_event->window;
+            pMsg->wParam = client_message_event->data.data32[0];
+            pMsg->lParam = 0;
+        }
+        else if(client_message_event->type == wm_stat_enable_atom){
+            pMsg = new Msg;
+            pMsg->message = WM_ENABLE;
+            pMsg->hwnd =client_message_event->window;
+            pMsg->wParam = client_message_event->data.data32[0];
+            pMsg->lParam = 0;
         }
         break;
     }
-    case XCB_CONFIGURE_NOTIFY:
-    {}
     break;
     default:
         break;

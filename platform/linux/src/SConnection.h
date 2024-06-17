@@ -15,7 +15,7 @@
 #define ID_ATOM(id,onlyExist) STR_ATOM(#id,onlyExist)
 
 SNSBEGIN
-struct UiMsg;
+struct Msg;
 class SConnection : SNoCopyable{
 public:
   SConnection(int screenNum);
@@ -26,6 +26,8 @@ public:
     xcb_atom_t wm_delete_window_atom;
     xcb_atom_t wm_protocols_atom;
     xcb_atom_t wm_stat_atom;
+    xcb_atom_t wm_stat_hidden_atom;
+    xcb_atom_t wm_stat_enable_atom;
     xcb_atom_t wm_window;
 public:
     bool update();
@@ -35,7 +37,7 @@ private:
     void pushEvent(xcb_generic_event_t *e);
 private:
     std::recursive_mutex m_mutex;
-    std::list<UiMsg *> m_msgQueue;
+    std::list<Msg *> m_msgQueue;
 };
 
 

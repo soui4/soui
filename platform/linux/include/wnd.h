@@ -87,7 +87,7 @@ HWND GetDesktopWindow();
 
 BOOL IsWindowEnabled(HWND hWnd);
 
-void EnableWindow(HWND hWnd,BOOL bEnable);
+BOOL EnableWindow(HWND hWnd,BOOL bEnable);
 
 HWND SetActiveWindow(HWND hWnd);
 
