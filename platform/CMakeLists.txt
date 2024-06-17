@@ -1,5 +1,5 @@
 # 
-# SOUI cmakeÅäÖÃÎÄ¼þ
+# SOUI cmakeï¿½ï¿½ï¿½ï¿½ï¿½Ä¼ï¿½
 #
 add_definitions(-DPLATFORM_EXPORTS)
 
@@ -22,6 +22,13 @@ source_group("Source Files" FILES ${CURRENT_SRCS})
 
 if (NOT ENABLE_SOUI_CORE_LIB)
     add_library(platform SHARED ${CURRENT_SRCS} ${HEADERS_COM} ${HEADERS_PLATFORM})
+    if(CMAKE_SYSTEM_NAME MATCHES Linux)
+    target_link_libraries(
+        platform
+        cairo xcb-util
+    )
+    endif()
+
 else()
     add_library(platform STATIC ${CURRENT_SRCS} ${HEADERS_COM} ${HEADERS_PLATFORM})
 endif()

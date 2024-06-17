@@ -8,14 +8,6 @@ struct Msg : MSG{
     virtual ~Msg(){}
 };
 
-struct MsgCreate: Msg,CREATESTRUCT
-{
-    MsgCreate(){
-        wParam = 0;
-        lParam = (LPARAM)(CREATESTRUCT*)this;
-    }
-};
-
 SNSEND
 
 #endif//_UIMSG_H_

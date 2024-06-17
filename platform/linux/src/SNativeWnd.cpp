@@ -94,6 +94,7 @@ LRESULT CALLBACK SNativeWnd::StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam
 LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     SNativeWnd *pThis = (SNativeWnd *)::GetWindowLongPtr(hWnd,GWLP_OPAQUE); 
+    pThis->m_hWnd = hWnd;
     MSG msg = { pThis->m_hWnd, uMsg, wParam, lParam };
     const MSG *pOldMsg = pThis->m_pCurrentMsg;
     pThis->m_pCurrentMsg = &msg;

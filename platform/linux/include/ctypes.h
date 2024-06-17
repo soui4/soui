@@ -154,7 +154,7 @@ typedef uint32_t HWND;
 #define HBITMAP int
 #define HRSRC int
 #define HCURSOR int
-#define HDC int
+typedef UINT_PTR HDC;
 #define HRGN int
 #define HFONT int
 #define HANDLE int

@@ -210,18 +210,34 @@ void SConnection::pushEvent(xcb_generic_event_t *event){
     Msg *pMsg = nullptr;
     switch (event_code)
     {
+    case XCB_EXPOSE:
+    {
+        xcb_expose_event_t* expose = (xcb_expose_event_t*)event;
+        pMsg = new Msg;
+        pMsg->hwnd = expose->window;
+        pMsg->message = WM_PAINT;
+        pMsg->wParam = 0;
+        pMsg->lParam = 0;
+        break;
+    }
+    case XCB_RESIZE_REQUEST:
+    {
+        xcb_resize_request_event_t* resize = (xcb_resize_request_event_t*)event;
+        pMsg = new Msg;
+        pMsg->hwnd = resize->window;
+        pMsg->message = WM_SIZE;
+        pMsg->wParam=SIZE_RESTORED;
+        pMsg->lParam = MAKELPARAM(resize->width,resize->height);
+        break;
+    } 
     case XCB_CONFIGURE_NOTIFY:
     {
-        xcb_configure_notify_event_t *e2 = (xcb_configure_notify_event_t*)event;
-        // MsgCreate * msg = new MsgCreate;
-        // msg->hwnd = e2->window;
-        // msg->message = WM_CREATE;
-        // msg->x = e2->x;
-        // msg->y = e2->y;
-        // msg->cx = e2->width;
-        // msg->cy = e2->height;
-        // //todo:hjx
-        // pMsg = msg;
+        // xcb_configure_notify_event_t *e2 = (xcb_configure_notify_event_t*)event;
+        // pMsg = new Msg;
+        // pMsg->hwnd = e2->window;
+        // pMsg->message = WM_SIZE;
+        // pMsg->wParam=SIZE_RESTORED;
+        // pMsg->lParam = MAKELPARAM(e2->width,e2->height);
         break;
     }
     case XCB_CLIENT_MESSAGE:

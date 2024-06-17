@@ -119,11 +119,11 @@ HWND GetFocus();
 HWND SetFocus(HWND hWnd);
 
 typedef struct _PAINTSTRUCT{
-
+     HDC hdc;
 }PAINTSTRUCT;
 
 HDC BeginPaint(HWND hWnd, PAINTSTRUCT *ps);
-void EndPaint(HWND hWnd, PAINTSTRUCT *ps);
+BOOL EndPaint(HWND hWnd, const PAINTSTRUCT *ps);
 
 BOOL UpdateWindow(HWND hWnd);
 

@@ -1,11 +1,14 @@
 #include <wnd.h>
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
+#include <cairo/cairo-xcb.h>
+#include <xcb/xcb_aux.h>
 #include <map>
 #include <mutex>
 #include <string>
 #include "class.h"
 #include "SConnection.h"
+
 using namespace SOUI;
 
 #define CLS_WINDOW "window"
@@ -18,7 +21,7 @@ struct _Window{
     xcb_connection_t *mConnection;
     xcb_screen_t *mScreen;
     uint32_t gc;
-
+    cairo_surface_t * surface;
     std::string title; 
     UINT_PTR           objOpaque;
     HWND               parent;        /* Window parent */
@@ -75,6 +78,9 @@ class WndObj{
         return wnd==nullptr;
     }
 
+    operator bool() const{
+        return wnd!=nullptr;
+    }
     private:
 
     WndObj(_Window *pWnd):wnd(pWnd){
@@ -580,9 +586,20 @@ HWND SetFocus(HWND hWnd)
 }
 
 HDC BeginPaint(HWND hWnd, PAINTSTRUCT *ps){
-    return 0;
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj)
+        return 0;
+    wndObj->mutex.lock();
+    return ps->hdc = GetDC(hWnd);
 }
-void EndPaint(HWND hWnd, PAINTSTRUCT *ps){}
+
+BOOL EndPaint(HWND hWnd, const PAINTSTRUCT *ps){
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj)
+        return FALSE;
+    wndObj->mutex.unlock();
+    return ReleaseDC(hWnd,ps->hdc);
+}
 
 BOOL UpdateWindow(HWND hWnd)
 {
@@ -621,6 +638,33 @@ BOOL GetWindowRect(HWND hWnd, RECT *rc)
 
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
     switch(msg){
+        case WM_CREATE:
+        {
+            WndObj wndObj=WndObj::fromHwnd(hwnd);
+            if(wndObj){
+                CREATESTRUCT * cs = (CREATESTRUCT*)lp;
+                wndObj->surface = cairo_xcb_surface_create(wndObj->mConnection, hwnd, xcb_aux_find_visual_by_id(wndObj->mScreen,wndObj->mScreen->root_visual), cs->cx,cs->cy);
+            }
+        }
+        break;
+        case WM_SIZE:
+        {
+            WndObj wndObj=WndObj::fromHwnd(hwnd);
+            SIZE sz ={lp&0xffff,(lp&0xffff0000)>>16};
+            if(wndObj && wndObj->surface){
+                cairo_xcb_surface_set_size(wndObj->surface,sz.cx,sz.cy);
+            }
+        }
+        break;
+        case WM_DESTROY:
+        {
+            WndObj wndObj=WndObj::fromHwnd(hwnd);
+            if(wndObj && wndObj->surface){
+                cairo_surface_destroy(wndObj->surface);
+                wndObj->surface = nullptr;
+            }
+        }
+        break;
         case WM_CLOSE:
         DestroyWindow(hwnd);
         break;
@@ -790,18 +834,18 @@ BOOL SetWindowText(HWND hWnd , LPCTSTR lpszString){
 
 HDC GetDC(HWND hWnd){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
-    if(!wndObj)
+    if(!wndObj || !wndObj->surface)
         return 0;
-    return wndObj->gc;
+    cairo_t* ret = cairo_create(wndObj->surface);
+    return (HDC)ret;
 }
 
 int ReleaseDC(HWND hWnd,HDC hdc){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return 0;
-    if(wndObj->gc!=hdc)
-        return 0;
-    //todo:hjx
+    cairo_t* cairo_dc = (cairo_t*)hdc;
+    cairo_destroy(cairo_dc);
     return 1;
 }
 
