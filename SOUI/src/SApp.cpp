@@ -465,7 +465,8 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
         if (_LoadXmlDocment(_T("SYS_XML_SKIN"), _T("XML"), xmlDoc, pResProvider))
         {
             ISkinPool *p = GETUIDEF->GetBuiltinSkinPool();
-            p->LoadSkins(&xmlDoc.root().child(L"skin"));
+            SXmlNode xmlSkin = xmlDoc.root().child(L"skin");
+            p->LoadSkins(&xmlSkin);
         }
         else
         {
