@@ -145,6 +145,12 @@ class SOUI_EXP SComboBase
 
     STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs *evt) OVERRIDE;
 
+    STDMETHOD_(UINT, OnGetDlgCode)(CTHIS) SCONST OVERRIDE;
+
+    STDMETHOD_(BOOL, IsFocusable)(CTHIS) SCONST OVERRIDE;
+
+    STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
+
     SStringT GetWindowText(BOOL bRawText = FALSE) OVERRIDE;
 
     SStringT GetLBText(int iItem, BOOL bRawText = FALSE);
@@ -187,6 +193,8 @@ class SOUI_EXP SComboBase
     virtual void OnSelChanged();
 
   protected:
+    void UpdateDropdown(const SStringT &strInput);
+
     /**
      * SComboBoxBase::CalcPopupRect
      * @brief    计算弹出窗口位置
@@ -317,30 +325,12 @@ class SOUI_EXP SComboBase
      * Describe  此函数是用于销毁下拉窗口
      */
     void OnDestroy();
-    /**
-     * SComboBoxBase::OnGetDlgCode
-     * @brief    获取消息码
-     *
-     * Describe  获取消息码
-     */
-    virtual UINT WINAPI OnGetDlgCode() const;
-
-    /**
-     * SComboBoxBase::IsFocusable
-     * @brief    是否禁止TAB键
-     *
-     * Describe  是否禁止TAB键
-     */
-    BOOL WINAPI IsFocusable() const;
-
-    STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
 
     void OnKillFocus(SWND wndFocus);
 
-    HRESULT OnAttrDropDown(const SStringW &strValue, BOOL bLoading);
-
     SStringT GetCueText(BOOL bRawText = FALSE) const;
 
+    HRESULT OnAttrDropDown(const SStringW &strValue, BOOL bLoading);
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"dropDown", OnAttrDropDown)
         ATTR_LAYOUTSIZE(L"dropHeight", m_nDropHeight, TRUE)
@@ -351,6 +341,7 @@ class SOUI_EXP SComboBase
         ATTR_COLOR(L"cueColor", m_crCue, TRUE)
         ATTR_I18NSTRT(L"cueText", m_strCue, TRUE)
         ATTR_BOOL(L"autoMatch", m_bAutoMatch, FALSE)
+        ATTR_BOOL(L"autoDropdown", m_bAutoDropdown, FALSE)
     SOUI_ATTRS_END()
 
     SOUI_MSG_MAP_BEGIN()
@@ -394,12 +385,13 @@ class SOUI_EXP SComboBase
     SDropDownWnd *m_pDropDownWnd; /**< DropDown指针 */
     SXmlDoc m_xmlDropdownStyle;   /**< DropDown的style */
     BOOL m_bAutoFitDropBtn;       /**< 自适应下拉按钮大小*/
-    COLORREF m_crCue;
-    STrText m_strCue;
+    COLORREF m_crCue;             /**< 提示文本*/
+    STrText m_strCue;             /**< 提示文本显示颜色*/
 
-    SStringT m_strMatch;   /*快速输入用来定位下拉列表中的项*/
-    DWORD m_LastPressTime; /*最后按键的时间,*/
-    BOOL m_bAutoMatch;
+    SStringT m_strMatch;   /**<快速输入用来定位下拉列表中的项*/
+    DWORD m_LastPressTime; /**<最后按键的时间*/
+    BOOL m_bAutoMatch;     /**<edit中输入时自动从下拉列表匹配*/
+    BOOL m_bAutoDropdown;  /**<edit中输入时自动更新下拉列表*/
     int m_nTextLength;
 };
 

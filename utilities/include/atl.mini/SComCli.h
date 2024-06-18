@@ -245,7 +245,7 @@ public:
     template <typename Q>
     T* operator=( const SComPtr<Q>& lp) throw()
     {
-        if( !IsEqualObject(lp) )
+        if( !SComPtrBase<T>::IsEqualObject(lp) )
         {
             return static_cast<T*>(SComQIPtrAssign((IUnknown**)&this->p, lp, __uuidof(T)));
         }

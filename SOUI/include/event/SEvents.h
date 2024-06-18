@@ -511,9 +511,13 @@ DEF_EVT(EventHeaderRelayout, EVT_HEADER_RELAYOUT, on_header_relayout, { int fake
 
 DEF_EVT(EventCBSelChange, EVT_CB_SELCHANGE, on_combobox_sel_change, { int nCurSel; })
 
-DEF_EVT(EventCBDropdown, EVT_CB_DROPDOWN, on_combobox_dropdown, { void *pDropDown; })
+DEF_EVT(EventCBDropdown, EVT_CB_DROPDOWN, on_combobox_dropdown, {
+    void *pDropDown;
+    const IStringT *strInput;
+})
 
 DEF_EVT(EventCBBeforeCloseUp, EVT_CB_BEFORE_CLOSEUP, on_combobox_before_closeup, { BOOL bCloseBlock; })
+
 
 DEF_EVT(EventLCSelChanging, EVT_LC_SELCHANGING, on_listctrl_sel_changing, {
     int nNewSel;

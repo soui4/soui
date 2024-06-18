@@ -56,6 +56,7 @@ void SOUI::SSkinLoader::LoadSkin(SStringT respath,const TCHAR *strXmlSkin /*= _T
 	SXmlDoc xmlDoc;
 	if (LOADXML(xmlDoc,strXmlSkin))
 	{
-		m_privateSkinPool->LoadSkins(&xmlDoc.root().child(L"skin"));
+		SXmlNode xmlSkin = xmlDoc.root().child(L"skin");
+		m_privateSkinPool->LoadSkins(&xmlSkin);
 	}
 }

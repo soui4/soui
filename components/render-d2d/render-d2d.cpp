@@ -805,25 +805,21 @@ namespace SOUI
 			return Clone(pOutput);
 		}
 		HRESULT hr = E_UNEXPECTED;
-		BOOL bOK = GetRenderFactory()->CreateBitmap(pOutput);
-		if(bOK)
+		IRenderTarget *pRT=NULL;
+		if(GetRenderFactory()->CreateRenderTarget(&pRT,nWid,nHei))
 		{
-			IRenderTarget *pRT=NULL;
-			if(GetRenderFactory()->CreateRenderTarget(&pRT,nWid,nHei))
+			RECT rcSrc = {0,0,(long)Width(),(long)Height()};
+			RECT rcDst ={0,0,nWid,nHei};
+			hr = pRT->DrawBitmapEx(&rcDst,this,&rcSrc,MAKELONG(EM_STRETCH,filterLevel),255);
+			if(hr == S_OK)
 			{
-				RECT rcSrc = {0,0,(long)Width(),(long)Height()};
-				RECT rcDst ={0,0,nWid,nHei};
-				hr = pRT->DrawBitmapEx(&rcDst,this,&rcSrc,MAKELONG(EM_STRETCH,filterLevel),255);
-				if(hr == S_OK)
-				{
-					*pOutput = (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
-					(*pOutput)->AddRef();
-				}
-				pRT->Release();
-			}else
-			{
-				hr = E_OUTOFMEMORY;
+				*pOutput = (IBitmapS*)pRT->GetCurrentObject(OT_BITMAP);
+				(*pOutput)->AddRef();
 			}
+			pRT->Release();
+		}else
+		{
+			hr = E_OUTOFMEMORY;
 		}
 		return hr;
 	}
@@ -1966,7 +1962,7 @@ namespace SOUI
 
 	HRESULT SRenderTarget_D2D::InvertRect(LPCRECT pRect)
 	{
-		SComQIPtr<ID2D1GdiInteropRenderTarget> gdiRt=m_rt;
+		SComQIPtr<ID2D1GdiInteropRenderTarget> gdiRt(m_rt);
 		if(!gdiRt)
 			return E_FAIL;
 		HDC hdc=0;
@@ -2058,7 +2054,7 @@ namespace SOUI
 
 	COLORREF SRenderTarget_D2D::GetPixel( int x, int y )
 	{
-		SComQIPtr<ID2D1GdiInteropRenderTarget> gdiRt=m_rt;
+		SComQIPtr<ID2D1GdiInteropRenderTarget> gdiRt(m_rt);
 		if(gdiRt){
 			HDC hdc=0;
 			gdiRt->GetDC(D2D1_DC_INITIALIZE_MODE_COPY,&hdc);
@@ -2072,7 +2068,7 @@ namespace SOUI
 
 	COLORREF SRenderTarget_D2D::SetPixel( int x, int y, COLORREF cr )
 	{
-		SComQIPtr<ID2D1GdiInteropRenderTarget> gdiRt=m_rt;
+		SComQIPtr<ID2D1GdiInteropRenderTarget> gdiRt(m_rt);
 		if(gdiRt){
 			HDC hdc=0;
 			gdiRt->GetDC(D2D1_DC_INITIALIZE_MODE_COPY,&hdc);
@@ -2655,7 +2651,7 @@ namespace SOUI
 	BOOL SPath_D2D::getPosTan(CTHIS_ float distance, fPoint *pos, fPoint *vec) const
 	{
 		D2D1_POINT_DESCRIPTION pointDescription;
-		SComQIPtr<ID2D1PathGeometry1> path2=m_path;
+		SComQIPtr<ID2D1PathGeometry1> path2(m_path);
 		if(!path2)
 			return FALSE;
 		HRESULT hr = path2->ComputePointAndSegmentAtLength(distance,0,NULL,&pointDescription);

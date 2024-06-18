@@ -1887,9 +1887,9 @@ DECLARE_INTERFACE_(IComboBase, ICtrl)
      * Describe
      */
     STDMETHOD_(int, FindString)
-    (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+    (THIS_ LPCTSTR pszFind, int nAfter DEF_VAL(-1), BOOL bPartMatch DEF_VAL(TRUE)) PURE;
     STDMETHOD_(int, FindStringA)
-    (THIS_ LPCSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+    (THIS_ LPCSTR pszFind, int nAfter DEF_VAL(-1), BOOL bPartMatch DEF_VAL(TRUE)) PURE;
 
     //////////////////////////////////////////////////////////////////////////
     /**
@@ -2003,9 +2003,9 @@ DECLARE_INTERFACE_(IComboBox, IComboBase)
      * Describe
      */
     STDMETHOD_(int, FindString)
-    (THIS_ LPCTSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+    (THIS_ LPCTSTR pszFind, int nAfter DEF_VAL(-1), BOOL bPartMatch DEF_VAL(TRUE)) PURE;
     STDMETHOD_(int, FindStringA)
-    (THIS_ LPCSTR pszFind, int nAfter /* = -1*/, BOOL bPartMatch /* = TRUE*/) PURE;
+    (THIS_ LPCSTR pszFind, int nAfter DEF_VAL(-1), BOOL bPartMatch DEF_VAL(TRUE)) PURE;
 
     /**
      * SComboBoxBase::DropDown
@@ -3077,7 +3077,7 @@ DECLARE_INTERFACE_(ITabCtrl, ICtrl)
      *
      * Describe  插入tab页面
      */
-    STDMETHOD_(int, InsertItem)(THIS_ LPCWSTR lpContent, int iInsert /* = -1*/) PURE;
+    STDMETHOD_(int, InsertItem)(THIS_ LPCWSTR lpContent, int iInsert DEF_VAL(-1)) PURE;
 
     /**
      * ITabCtrl::GetItemCount
@@ -3107,7 +3107,7 @@ DECLARE_INTERFACE_(ITabCtrl, ICtrl)
      *
      * Describe  获取当前选中
      */
-    STDMETHOD_(BOOL, RemoveItem)(THIS_ int nIndex, int iSelPage /*= 0*/) PURE;
+    STDMETHOD_(BOOL, RemoveItem)(THIS_ int nIndex, int iSelPage DEF_VAL(0)) PURE;
 
     /**
      * ITabCtrl::RemoveAllItems
