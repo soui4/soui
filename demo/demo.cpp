@@ -205,7 +205,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		BOOL bLoaded = FALSE;
 		//从各组件中显式创建上述组件对象
 		if (nType == IDYES)
-			bLoaded = pComMgr->CreateRender_D2D((IObjRef**)&pRenderFactory);
+			bLoaded = pComMgr->CreateRender_Skia((IObjRef**)&pRenderFactory);
 		else
 			bLoaded = pComMgr->CreateRender_GDI((IObjRef**)&pRenderFactory);
 		SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), nType == IDYES ? _T("render_skia") : _T("render_gdi"));
