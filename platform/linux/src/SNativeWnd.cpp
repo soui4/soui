@@ -34,7 +34,9 @@ private:
 SNativeHelper():m_atom(0),m_ptr(nullptr){
 
 }
-~SNativeHelper(){}
+~SNativeHelper(){
+    SConnMgr::free();
+}
 
 ATOM m_atom;
 void * m_ptr;

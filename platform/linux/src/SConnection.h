@@ -1,5 +1,5 @@
-#ifndef _UISTATE_H_
-#define _UISTATE_H_
+#ifndef _SCONN_H_
+#define _SCONN_H_
 
 #include <platform.h>
 #include <sdef.h>
@@ -10,6 +10,9 @@
 #include <pthread.h>
 #include <xcb/xcb.h>
 #include <mutex>
+#include <thread>
+#include <atomic>
+
 
 #define STR_ATOM(atom_name,onlyExist) SOUI::SConnMgr::instance()->atom(atom_name,onlyExist)
 #define ID_ATOM(id,onlyExist) STR_ATOM(#id,onlyExist)
@@ -33,16 +36,20 @@ public:
     BOOL peekMsg(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
     void postMsg(HWND hWnd,UINT message,WPARAM wp,LPARAM lp);
 private:
-    void pushEvent(xcb_generic_event_t *e);
+    bool pushEvent(xcb_generic_event_t *e);
+
+    static void* onRun(void *p);
 private:
     std::recursive_mutex m_mutex;
     std::list<Msg *> m_msgQueue;
+    std::thread      m_trdEvtReader;
+    std::atomic<bool> m_bQuit;
 };
 
 
 class SConnMgr : SNoCopyable{
     SRwLock m_rwLock;
-    std::map<pthread_t,SConnection*> m_trdStates;
+    std::map<pthread_t,SConnection*> m_conns;
     friend class SConnection;
 public:
     static SConnMgr * instance();
@@ -53,7 +60,7 @@ public:
     xcb_atom_t atom(const char *name,bool onlyIfExist=false);
     SConnection * getConnection(pthread_t tid=0,int screenNum=0);
 private:
-    void clearThreadUiState(SConnection *pObj);
+    void removeConn(SConnection *pObj);
 
     SConnMgr(){}
     ~SConnMgr();
@@ -61,4 +68,4 @@ private:
 
 SNSEND
 
-#endif//_UISTATE_H_
+#endif//_SCONN_H_

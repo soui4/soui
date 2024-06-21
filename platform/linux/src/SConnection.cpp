@@ -1,6 +1,7 @@
 #include "SConnection.h"
 #include <helper/SCriticalSection.h>
 #include <assert.h>
+#include <functional>
 #include "uimsg.h"
 
 SNSBEGIN
@@ -35,35 +36,34 @@ void SConnMgr::free()
 SConnMgr::~SConnMgr()
 {
     SAutoWriteLock autoLock(&m_rwLock);
-    assert(m_trdStates.empty());
-    auto it = m_trdStates.begin();
-    while(it!=m_trdStates.end()){
+    auto it = m_conns.begin();
+    while(it!=m_conns.end()){
         delete it->second;
         it++;
     }
-    m_trdStates.clear();
+    m_conns.clear();
 }
 
-void SConnMgr::clearThreadUiState(SConnection *pObj)
+void SConnMgr::removeConn(SConnection *pObj)
 {
     SAutoWriteLock autoLock(&m_rwLock);
     pthread_t tid = pthread_self();
-    auto it = m_trdStates.find(tid);
-    if (it == m_trdStates.end())
+    auto it = m_conns.find(tid);
+    if (it == m_conns.end())
     {
         return;
     }
     assert(it->second == pObj);
     delete it->second;
-    m_trdStates.erase(it);
+    m_conns.erase(it);
 }
 
 SConnection * SConnMgr::getConnection(pthread_t tid_,int screenNum){
    pthread_t tid = tid_!=0? tid_:pthread_self();   
     {
         SAutoReadLock autoLock(&m_rwLock);
-        auto it = m_trdStates.find(tid);
-        if (it != m_trdStates.end())
+        auto it = m_conns.find(tid);
+        if (it != m_conns.end())
         {
             return it->second;
         }
@@ -72,7 +72,7 @@ SConnection * SConnMgr::getConnection(pthread_t tid_,int screenNum){
         //not found
         SAutoWriteLock autoLock(&m_rwLock);
         SConnection * state = new SConnection(screenNum);        
-        m_trdStates[tid]=state;
+        m_conns[tid]=state;
         return state;
     }
 }
@@ -131,6 +131,9 @@ SConnection::SConnection(int screenNum)
     wm_stat_atom = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE");
     wm_stat_hidden_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_HIDDEN");
     wm_stat_enable_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_DEMANDS_ATTENTION");
+
+    m_bQuit=false;
+    m_trdEvtReader = std::move(std::thread(std::bind(&onRun, this)));
 }
 
 SConnection::~SConnection()
@@ -139,6 +142,8 @@ SConnection::~SConnection()
     {
         return;
     }
+    m_bQuit = true;
+    m_trdEvtReader.join();
 
     for(auto it:m_msgQueue){
         free(it);
@@ -152,12 +157,16 @@ SConnection::~SConnection()
 bool SConnection::update(){
     int evtCnt=0;
     xcb_generic_event_t* e;
+    int nflush = 0;
     while (xcb_generic_event_t* e = xcb_poll_for_event(connection))
     {        
-        pushEvent(e);
+        if(pushEvent(e))
+            nflush++;
         free(e);
         evtCnt++;
     }
+    if(evtCnt)
+    printf("SConnection::update,%d\n",evtCnt);
     return evtCnt>0;
 }
 
@@ -194,6 +203,20 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
     return FALSE;
 }
 
+void triggerRedraw(xcb_connection_t* connection, xcb_window_t window) {
+    xcb_expose_event_t exposeEvent;
+    exposeEvent.response_type = XCB_EXPOSE;
+    exposeEvent.window = window;
+    exposeEvent.x = 0;
+    exposeEvent.y = 0;
+    exposeEvent.width = 0;  // 设置为0表示重绘整个窗口
+    exposeEvent.height = 0; // 设置为0表示重绘整个窗口
+    exposeEvent.count = 0;
+
+    xcb_send_event(connection, false, window, XCB_EVENT_MASK_EXPOSURE, (const char*)&exposeEvent);
+    //xcb_flush(connection);
+}
+
 void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
 {
     std::unique_lock<std::recursive_mutex> lock(m_mutex);
@@ -205,9 +228,11 @@ void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
     m_msgQueue.push_back(pMsg);
 }
 
-void SConnection::pushEvent(xcb_generic_event_t *event){
+bool SConnection::pushEvent(xcb_generic_event_t *event){
     uint8_t event_code = event->response_type & 0x7f;
     Msg *pMsg = nullptr;
+    printf("pushEvent code=%u\n",event_code);
+    bool ret = false;
     switch (event_code)
     {
     case XCB_EXPOSE:
@@ -218,6 +243,13 @@ void SConnection::pushEvent(xcb_generic_event_t *event){
         pMsg->message = WM_PAINT;
         pMsg->wParam = 0;
         pMsg->lParam = 0;
+        printf("XCB+EXPOSE\n");
+        break;
+    }
+    case XCB_CONFIGURE_NOTIFY:
+    {
+        xcb_configure_notify_event_t *e2 = (xcb_configure_notify_event_t*)event;
+        printf("XCB_CONFIGURE_NOTIFY\n");
         break;
     }
     case XCB_RESIZE_REQUEST:
@@ -228,18 +260,17 @@ void SConnection::pushEvent(xcb_generic_event_t *event){
         pMsg->message = WM_SIZE;
         pMsg->wParam=SIZE_RESTORED;
         pMsg->lParam = MAKELPARAM(resize->width,resize->height);
+
+        const uint32_t vals[2] = {resize->width,resize->height};
+        xcb_configure_window(connection, resize->window,
+                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
+                         vals);
+                         ret = true;
+        //xcb_flush(connection);
+//        triggerRedraw(connection,resize->window);
+        printf("XCB_RESIZE_REQUEST,wid=%d,hei=%d\n",resize->width,resize->height);
         break;
     } 
-    case XCB_CONFIGURE_NOTIFY:
-    {
-        // xcb_configure_notify_event_t *e2 = (xcb_configure_notify_event_t*)event;
-        // pMsg = new Msg;
-        // pMsg->hwnd = e2->window;
-        // pMsg->message = WM_SIZE;
-        // pMsg->wParam=SIZE_RESTORED;
-        // pMsg->lParam = MAKELPARAM(e2->width,e2->height);
-        break;
-    }
     case XCB_CLIENT_MESSAGE:
     {
         xcb_client_message_event_t *client_message_event = (xcb_client_message_event_t *) event;
@@ -272,7 +303,17 @@ void SConnection::pushEvent(xcb_generic_event_t *event){
         std::unique_lock<std::recursive_mutex> lock(m_mutex);
         m_msgQueue.push_back(pMsg);
     }
+    return ret;
 }
 
+void* SConnection::onRun(void *p)
+{
+    SConnection * _this = static_cast<SConnection*>(p);
+    while(!_this->m_bQuit){
+        sleep(1);
+        printf("thread read event\n");
+    }
+    return p;
+}
 
 SNSEND

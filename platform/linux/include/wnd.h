@@ -2,6 +2,12 @@
 #define _WND_H__
 #include <platform.h>
 
+#ifndef GET_X_LPARAM
+#define GET_X_LPARAM(lParam) ((int)(short)LOWORD(lParam))
+#endif
+#ifndef GET_Y_LPARAM
+#define GET_Y_LPARAM(lParam) ((int)(short)HIWORD(lParam))
+#endif
 
 /***********************************************************************
  *		CreateWindowExW (USER32.@)

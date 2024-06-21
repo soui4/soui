@@ -650,7 +650,7 @@ HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
         case WM_SIZE:
         {
             WndObj wndObj=WndObj::fromHwnd(hwnd);
-            SIZE sz ={lp&0xffff,(lp&0xffff0000)>>16};
+            SIZE sz ={GET_X_LPARAM(lp),GET_Y_LPARAM(lp)};
             if(wndObj && wndObj->surface){
                 cairo_xcb_surface_set_size(wndObj->surface,sz.cx,sz.cy);
             }

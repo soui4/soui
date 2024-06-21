@@ -22,6 +22,14 @@
              "ignoreFailures": true
             }
             ]
-            }
+        },
+        {
+            "name": "(gdb) Attach",            
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/build/bin/fun_test",
+            "processId": "${command:pickProcess}",
+            "MIMode": "gdb"
+          }
     ]
 }

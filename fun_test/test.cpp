@@ -7,6 +7,9 @@
 #include <helper/SRwLock.h>
 #include <SNativeWnd.h>
 #include <SMsgLoop.h>
+#include <wtl.mini/souimisc.h>
+#define _WTYPES_NS SOUI
+
 #include <wtl.mini/msgcrack.h>
 #include <cairo/cairo-xcb.h>
 #include <xcb/xcb_aux.h>
@@ -56,7 +59,20 @@ SNativeWnd2(){};
 
 protected:
 void OnClose();
-void OnPaint(HDC hdc){
+void OnPaint(HDC hdc);
+void OnSize(UINT state,SIZE sz);
+BEGIN_MSG_MAP_EX(SNativeWnd2)
+ MSG_WM_CLOSE(OnClose)
+ MSG_WM_PAINT(OnPaint)
+ MSG_WM_SIZE(OnSize)
+END_MSG_MAP()
+};
+
+void SNativeWnd2::OnSize(UINT state,SIZE sz){
+    SetMsgHandled(FALSE);
+}
+
+void SNativeWnd2::OnPaint(HDC hdc){
     PAINTSTRUCT ps;
     hdc = BeginPaint(m_hWnd,&ps);
     RECT rcWnd;
@@ -67,13 +83,6 @@ void OnPaint(HDC hdc){
     cairo_fill(cr); // 填充矩形
     EndPaint(m_hWnd,&ps);
 }
-
-BEGIN_MSG_MAP_EX(SNativeWnd2)
- MSG_WM_CLOSE(OnClose)
- MSG_WM_PAINT(OnPaint)
-END_MSG_MAP()
-};
-
 void SNativeWnd2::OnClose(){
     //PostMessage(WM_QUIT,1);
     PostThreadMessage(GetCurrentThreadId(),WM_QUIT,1,0);  
