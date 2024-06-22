@@ -176,4 +176,6 @@ HDC GetDC(HWND hWnd);
 int ReleaseDC(HWND hWnd,HDC hdc);
 
 int MapWindowPoints(HWND hWndFrom,HWND hWndTo, LPPOINT lpPoint, UINT nCount);
+
+void Conn_Flush();
 #endif//_WND_H__

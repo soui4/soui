@@ -38,9 +38,12 @@ public:
 private:
     bool pushEvent(xcb_generic_event_t *e);
 
-    static void* onRun(void *p);
+    static void* readProc(void *p);
+    void _readProc();
+
 private:
     std::recursive_mutex m_mutex;
+    std::list<xcb_generic_event_t*> m_evtQueue;
     std::list<Msg *> m_msgQueue;
     std::thread      m_trdEvtReader;
     std::atomic<bool> m_bQuit;

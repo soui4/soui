@@ -665,17 +665,17 @@ void PostThreadMessage(uint64_t tid, UINT msg, WPARAM wp, LPARAM lp)
 
 BOOL WaitMessage()
 {
-    SOUI::SConnection *trdUiState = SOUI::SConnMgr::instance()->getConnection();
-    if(!trdUiState)
+    SOUI::SConnection *conn = SOUI::SConnMgr::instance()->getConnection();
+    if(!conn)
         return FALSE;
-    return trdUiState->update();
+    return conn->update();
 }
 
 BOOL PeekMessage(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
-    SOUI::SConnection *trdUiState = SOUI::SConnMgr::instance()->getConnection();
-    if(!trdUiState)
+    SOUI::SConnection *conn = SOUI::SConnMgr::instance()->getConnection();
+    if(!conn)
         return FALSE;
-    return trdUiState->peekMsg(pMsg,hWnd,wMsgFilterMin,wMsgFilterMax,wRemoveMsg);
+    return conn->peekMsg(pMsg,hWnd,wMsgFilterMin,wMsgFilterMax,wRemoveMsg);
 }
 
 BOOL TranslateMessage(LPMSG pMsg){

@@ -133,7 +133,7 @@ SConnection::SConnection(int screenNum)
     wm_stat_enable_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_DEMANDS_ATTENTION");
 
     m_bQuit=false;
-    m_trdEvtReader = std::move(std::thread(std::bind(&onRun, this)));
+    m_trdEvtReader = std::move(std::thread(std::bind(&readProc, this)));
 }
 
 SConnection::~SConnection()
@@ -155,19 +155,14 @@ SConnection::~SConnection()
 
 
 bool SConnection::update(){
-    int evtCnt=0;
-    xcb_generic_event_t* e;
-    int nflush = 0;
-    while (xcb_generic_event_t* e = xcb_poll_for_event(connection))
-    {        
-        if(pushEvent(e))
-            nflush++;
-        free(e);
-        evtCnt++;
+    std::unique_lock<std::recursive_mutex> lock(m_mutex);
+    for(auto it:m_evtQueue){
+        pushEvent(it);
+        free(it);
     }
-    if(evtCnt)
-    printf("SConnection::update,%d\n",evtCnt);
-    return evtCnt>0;
+    bool bRet = !m_evtQueue.empty();
+    m_evtQueue.clear();
+    return bRet;
 }
 
 BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
@@ -260,14 +255,15 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
         pMsg->message = WM_SIZE;
         pMsg->wParam=SIZE_RESTORED;
         pMsg->lParam = MAKELPARAM(resize->width,resize->height);
-
+/*
         const uint32_t vals[2] = {resize->width,resize->height};
         xcb_configure_window(connection, resize->window,
                          XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
                          vals);
-                         ret = true;
-        //xcb_flush(connection);
-//        triggerRedraw(connection,resize->window);
+                         */
+        ret = true;
+                         
+        xcb_flush(connection);
         printf("XCB_RESIZE_REQUEST,wid=%d,hei=%d\n",resize->width,resize->height);
         break;
     } 
@@ -306,14 +302,33 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
     return ret;
 }
 
-void* SConnection::onRun(void *p)
+void* SConnection::readProc(void *p)
 {
     SConnection * _this = static_cast<SConnection*>(p);
-    while(!_this->m_bQuit){
-        sleep(1);
-        printf("thread read event\n");
-    }
+    _this->_readProc();
     return p;
+}
+
+void SConnection::_readProc()
+{
+    while (!m_bQuit){
+        xcb_generic_event_t * event = xcb_wait_for_event(connection);
+        if(!event){
+            m_bQuit = true;
+            break;
+        }
+        m_mutex.lock();
+        m_evtQueue.push_back(event);
+        m_mutex.unlock();
+    }
+
+    m_mutex.lock();
+    for (auto it : m_evtQueue)
+    {
+        free(it);
+    }
+    m_evtQueue.clear();
+    m_mutex.unlock();
 }
 
 SNSEND
