@@ -226,25 +226,44 @@ void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
 bool SConnection::pushEvent(xcb_generic_event_t *event){
     uint8_t event_code = event->response_type & 0x7f;
     Msg *pMsg = nullptr;
-    printf("pushEvent code=%u\n",event_code);
+    //printf("pushEvent code=%u\n",event_code);
     bool ret = false;
     switch (event_code)
     {
     case XCB_EXPOSE:
     {
         xcb_expose_event_t* expose = (xcb_expose_event_t*)event;
-        pMsg = new Msg;
-        pMsg->hwnd = expose->window;
-        pMsg->message = WM_PAINT;
-        pMsg->wParam = 0;
-        pMsg->lParam = 0;
-        printf("XCB+EXPOSE\n");
+        cairo_rectangle_int_t rc = {expose->x,expose->y,expose->width,expose->height};
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
+        for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
+                if((*it)->message == WM_PAINT && (*it)->hwnd == expose->window)
+                {
+                    MsgPaint *oldMsg = (MsgPaint*)(*it);
+                    cairo_region_union_rectangle(oldMsg->rgn,&rc);
+                    return true;
+                }
+        }
+
+        MsgPaint *pMsgPaint = new MsgPaint(cairo_region_create_rectangle(&rc));
+        pMsgPaint->hwnd = expose->window;
+        pMsgPaint->message = WM_PAINT;
+        pMsgPaint->wParam = 0;
+        pMsgPaint->lParam = 0;
+        pMsg = pMsgPaint;
         break;
     }
     case XCB_CONFIGURE_NOTIFY:
     {
         xcb_configure_notify_event_t *e2 = (xcb_configure_notify_event_t*)event;
-        printf("XCB_CONFIGURE_NOTIFY\n");
+        std::unique_lock<std::recursive_mutex> lock(m_mutex);
+        for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
+                if((*it)->message == WM_SIZE && (*it)->hwnd == e2->window)
+                {
+                    m_msgQueue.erase(it);
+                    break;
+                }
+        }
+
         pMsg = new Msg;
         pMsg->hwnd = e2->window;
         pMsg->message = WM_SIZE;
