@@ -634,14 +634,6 @@ BOOL GetWindowRect(HWND hWnd, RECT *rc)
 
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
     switch(msg){
-        case WM_PAINT:
-        {
-            WndObj wndObj=WndObj::fromHwnd(hwnd);
-            if(wndObj){
-                
-            }
-            break;
-        }
         case WM_CREATE:
         {
             WndObj wndObj=WndObj::fromHwnd(hwnd);
@@ -725,7 +717,7 @@ BOOL InvalidateRect(
     expose_event.width = lpRect->right - lpRect->left;
     expose_event.height = lpRect->bottom - lpRect->top;
     xcb_send_event(connection, false, hWnd, XCB_EVENT_MASK_EXPOSURE, (const char *)&expose_event);
-//    xcb_flush(connection);
+    xcb_flush(connection);
     return TRUE;
 }
 

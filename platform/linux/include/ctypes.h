@@ -155,7 +155,8 @@ typedef uint32_t HWND;
 #define HRSRC int
 #define HCURSOR int
 typedef UINT_PTR HDC;
-#define HRGN int
+typedef UINT_PTR HRGN;
+
 #define HFONT int
 #define HANDLE int
 #define ATOM int

@@ -1,6 +1,7 @@
 #ifndef _WND_H__
 #define _WND_H__
 #include <platform.h>
+#include "region.h"
 
 #ifndef GET_X_LPARAM
 #define GET_X_LPARAM(lParam) ((int)(short)LOWORD(lParam))

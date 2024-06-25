@@ -1,9 +1,7 @@
 ﻿// render-gdi.cpp : Defines the exported functions for the DLL application.
 //
 
-#include "render-gdi.h"
-#include "GradientFillHelper.h"
-#include <gdialpha.h>
+#include "render-cairo.h"
 #include <math.h>
 #include <tchar.h>
 #include <algorithm>
@@ -16,7 +14,7 @@ namespace SOUI
     // SRenderFactory_GDI
     BOOL SRenderFactory_Cairo::CreateRenderTarget( IRenderTarget ** ppRenderTarget ,int nWid,int nHei)
     {
-        *ppRenderTarget = new SRenderTarget_GDI(this, nWid, nHei);
+        *ppRenderTarget = new SRenderFactory_Cairo(this, nWid, nHei);
         return TRUE;
     }
 
@@ -1546,7 +1544,7 @@ namespace SOUI
     {
         BOOL SCreateInstance(IObjRef ** ppRenderFactory)
         {
-            *ppRenderFactory = new SRenderFactory_GDI;
+            *ppRenderFactory = new SRenderFactory_Cairo;
             return TRUE;
         }
     }
