@@ -95,13 +95,14 @@ BOOL FrameRgn(
 DWORD GetRegionData(
 					HRGN hRgn,            // handle to region
 					DWORD dwCount,        // size of region data buffer
-					LPRGNDATA lpRgnData   // region data buffer
+					PRGNDATA lpRgnData   // region data buffer
 					);
 
 enum {
 	NULLREGION=1, // Region is empty. 
 SIMPLEREGION,// Region is a single rectangle. 
 COMPLEXREGION,// Region is more than a single rectangle. 
+ERROR
 };
 
 int GetRgnBox(
