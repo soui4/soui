@@ -78,10 +78,16 @@ void SNativeWnd2::OnPaint(HDC hdc){
     RECT rcWnd;
     GetClientRect(&rcWnd);
     cairo_t *cr =(cairo_t*)hdc;
+
+    cairo_rectangle(cr,10,10,100,100);
+    cairo_rectangle(cr,100,100,200,200);
+    cairo_clip(cr);
     cairo_set_source_rgb(cr, 1.0, 0.5, 0.0); // 设置绘图上下文的颜色
     cairo_rectangle(cr, rcWnd.left, rcWnd.top, rcWnd.right-rcWnd.left, rcWnd.bottom-rcWnd.top); // 绘制矩形
     cairo_fill(cr); // 填充矩形
-
+    
+    cairo_reset_clip(cr);
+    
     cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); 
     cairo_select_font_face(cr, "Ani", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
     cairo_set_font_size(cr, 100.0);
