@@ -23,7 +23,7 @@ add_subdirectory(ScriptModule-LUA)
 add_subdirectory(SIpcObject)
 add_subdirectory(httpclient)
 else()
-add_subdirectory(render-cairo)
+#add_subdirectory(render-cairo)
 endif()
 
 install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/com-cfg.h" DESTINATION include/components)
