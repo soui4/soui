@@ -22,12 +22,10 @@ SDropDownWnd::SDropDownWnd(ISDropDownOwner *pOwner)
     , m_bClick(FALSE)
     , m_uExitCode((UINT)IDINIT)
 {
-    GetMsgLoop()->AddMessageFilter(this);
 }
 
 SDropDownWnd::~SDropDownWnd()
 {
-    GetMsgLoop()->RemoveMessageFilter(this);
 }
 
 void SDropDownWnd::OnFinalMessage(HWND hWnd)
@@ -56,6 +54,7 @@ BOOL SDropDownWnd::Create(LPCRECT lpRect, LPVOID lParam, DWORD dwStyle, DWORD dw
     HWND hWnd = SNativeWnd::CreateNative(NULL, dwStyle, dwExStyle, lpRect->left, lpRect->top, lpRect->right - lpRect->left, lpRect->bottom - lpRect->top, hParent, 0, NULL);
     if (!hWnd)
         return FALSE;
+    GetMsgLoop()->AddMessageFilter(this);
     m_pOwner->OnCreateDropDown(this);
     return TRUE;
 }
@@ -110,6 +109,7 @@ void SDropDownWnd::EndDropDown(UINT uCode)
 void SDropDownWnd::OnDestroy()
 {
     m_pOwner->OnDestroyDropDown(this);
+    GetMsgLoop()->RemoveMessageFilter(this);
     SetMsgHandled(FALSE);
 }
 
