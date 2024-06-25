@@ -143,14 +143,14 @@ SConnection::~SConnection()
         return;
     }
     m_bQuit = true;
+    xcb_disconnect(connection);
+
     m_trdEvtReader.join();
 
     for(auto it:m_msgQueue){
         free(it);
     }
     m_msgQueue.clear();
-
-    xcb_disconnect(connection);
 }
 
 
