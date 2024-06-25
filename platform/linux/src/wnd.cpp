@@ -202,22 +202,13 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
     uint32_t value_list[2] = {
         pWnd->mScreen->black_pixel,
-        XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_BUTTON_PRESS |XCB_EVENT_MASK_PROPERTY_CHANGE|
-            XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION |
-            XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW |
-            XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE | 
-            XCB_EVENT_MASK_RESIZE_REDIRECT|XCB_EVENT_MASK_FOCUS_CHANGE|
-            XCB_EVENT_MASK_VISIBILITY_CHANGE|XCB_EVENT_MASK_STRUCTURE_NOTIFY};
+        XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY |XCB_EVENT_MASK_PROPERTY_CHANGE
+        };
 
     xcb_create_window(pWnd->mConnection, XCB_COPY_FROM_PARENT, hWnd,
-                      pWnd->mScreen->root, cs->x, cs->y, cs->cx, cs->cy, 0,
+                      pWnd->mScreen->root, cs->x, cs->y, cs->cx, cs->cy, 10,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT, pWnd->mScreen->root_visual, mask,
                       value_list);
-
-// 设置绘图上下文属性
-    uint32_t value_mask = XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES;
-    value_list[0] = pWnd->mScreen->black_pixel;
-    value_list[1] = 0;
 
     pWnd->title = cs->lpszName;
     xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd,
@@ -227,11 +218,6 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 
     if(cs->style & WS_VISIBLE)
         xcb_map_window(pWnd->mConnection, hWnd);
-
-    const unsigned coords[] = {static_cast<unsigned>(cs->x),
-                               static_cast<unsigned>(cs->y)};
-    xcb_configure_window(pWnd->mConnection, hWnd,
-                         XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
 
     xcb_flush(pWnd->mConnection);
 

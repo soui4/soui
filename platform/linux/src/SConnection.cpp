@@ -245,28 +245,13 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
     {
         xcb_configure_notify_event_t *e2 = (xcb_configure_notify_event_t*)event;
         printf("XCB_CONFIGURE_NOTIFY\n");
-        break;
-    }
-    case XCB_RESIZE_REQUEST:
-    {
-        xcb_resize_request_event_t* resize = (xcb_resize_request_event_t*)event;
         pMsg = new Msg;
-        pMsg->hwnd = resize->window;
+        pMsg->hwnd = e2->window;
         pMsg->message = WM_SIZE;
         pMsg->wParam=SIZE_RESTORED;
-        pMsg->lParam = MAKELPARAM(resize->width,resize->height);
-/*
-        const uint32_t vals[2] = {resize->width,resize->height};
-        xcb_configure_window(connection, resize->window,
-                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
-                         vals);
-                         */
-        ret = true;
-                         
-        xcb_flush(connection);
-        printf("XCB_RESIZE_REQUEST,wid=%d,hei=%d\n",resize->width,resize->height);
+        pMsg->lParam = MAKELPARAM(e2->width,e2->height);
         break;
-    } 
+    }
     case XCB_CLIENT_MESSAGE:
     {
         xcb_client_message_event_t *client_message_event = (xcb_client_message_event_t *) event;

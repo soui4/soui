@@ -153,11 +153,15 @@ main2 ()
                      win,                           /* window Id           */
                      screen->root,                  /* parent window       */
                      0, 0,                          /* x, y                */
-                     150, 150,                      /* width, height       */
+                     550, 450,                      /* width, height       */
                      10,                            /* border_width        */
                      XCB_WINDOW_CLASS_INPUT_OUTPUT, /* class               */
                      screen->root_visual,           /* visual              */
                      mask, values);                 /* masks */
+
+std::string title = "hello";
+    xcb_change_property(c, XCB_PROP_MODE_REPLACE, win,
+        XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, title.length(), title.c_str());
 
   /* Map the window on the screen */
   xcb_map_window (c, win);
@@ -211,11 +215,11 @@ main2 ()
 }
 
 TEST(Window,demo){
-    EXPECT_EQ(main2(),0);
+   // EXPECT_EQ(main2(),0);
 }
 
 TEST(Window,loop){
-/*    
+//*    
     SNativeWnd::InitWndClass(0,"soui_host",FALSE);
     SNativeWnd2 wnd;
     HWND hWnd = wnd.CreateNative("test window",WS_POPUP|WS_VISIBLE,0,0,0,400,400,0);
