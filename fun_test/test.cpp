@@ -81,6 +81,17 @@ void SNativeWnd2::OnPaint(HDC hdc){
     cairo_set_source_rgb(cr, 1.0, 0.5, 0.0); // 设置绘图上下文的颜色
     cairo_rectangle(cr, rcWnd.left, rcWnd.top, rcWnd.right-rcWnd.left, rcWnd.bottom-rcWnd.top); // 绘制矩形
     cairo_fill(cr); // 填充矩形
+
+    cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); 
+    cairo_select_font_face(cr, "Ani", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
+    cairo_set_font_size(cr, 100.0);
+    cairo_text_extents_t ext;
+    cairo_text_extents(cr,"hello",&ext);
+    printf("hello extents=%d,%d\n",(int)ext.width,(int)ext.height);
+    cairo_move_to(cr,100,ext.height);
+    cairo_show_text(cr,"hello, Soui");
+
+
     EndPaint(m_hWnd,&ps);
 }
 void SNativeWnd2::OnClose(){
