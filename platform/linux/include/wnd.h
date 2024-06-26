@@ -1,7 +1,5 @@
 #ifndef _WND_H__
 #define _WND_H__
-#include <platform.h>
-#include "region.h"
 
 #ifndef GET_X_LPARAM
 #define GET_X_LPARAM(lParam) ((int)(short)LOWORD(lParam))
@@ -147,8 +145,6 @@ BOOL SetNativeWndAlpha(HWND hWnd, BYTE byAlpha);
 BOOL ClientToScreen(HWND hWnd,LPPOINT ppt);
 BOOL ScreenToClient(HWND hWnd,LPPOINT ppt);
 
-BOOL GetClipBox(HDC hdc, RECT *pRc);
-
 HMONITOR
 MonitorFromWindow(
     HWND hwnd,
@@ -178,5 +174,7 @@ int ReleaseDC(HWND hWnd,HDC hdc);
 
 int MapWindowPoints(HWND hWndFrom,HWND hWndTo, LPPOINT lpPoint, UINT nCount);
 
+//todo:hjx
 void Conn_Flush();
+
 #endif//_WND_H__

@@ -11,10 +11,6 @@ inline long InterlockedIncrement(long *v){
     return __atomic_fetch_add(v,1,__ATOMIC_SEQ_CST);
 }
 
-void OffsetRect(RECT *prc,int xOffset,int yOffset);
-
-BOOL IsRectEmpty(const RECT * prc);
-
 void qsort_s(void * _Base, 
          size_t _NumOfElements,  size_t _SizeOfElements,
          int (__cdecl * _PtFuncCompare)(void *, const void *, const void *), void *_Context);
@@ -65,8 +61,6 @@ int GetSystemMetrics(int nIndex);
 void SetCursor(HCURSOR hCursor);
 BOOL ShellExecute(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters,
     LPCSTR lpDirectory, INT nShowCmd);
-
-void DeleteObject(HGDIOBJ hObj);
 
 SHORT
 GetKeyState(

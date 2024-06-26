@@ -33,6 +33,6 @@ else{
 PRECOMPILED_HEADER = stdafx.h
 
 # Input
-HEADERS += GradientFillHelper.h render-gdi.h
-SOURCES += GradientFillHelper.cpp render-gdi.cpp
+HEADERS += win/GradientFillHelper.h win/render-gdi.h
+SOURCES += win/GradientFillHelper.cpp win/render-gdi.cpp
 

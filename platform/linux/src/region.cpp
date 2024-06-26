@@ -1,3 +1,4 @@
+#include <platform.h>
 #include "region.h"
 #include <cairo/cairo.h>
 

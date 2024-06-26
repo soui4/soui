@@ -318,19 +318,6 @@ static void shortsort_s(char *lo, char *hi, size_t width, int(__cdecl *comp)(voi
 
 static void swap(char *p, char *q, size_t width);
 
-void OffsetRect(RECT *prc, int xOffset, int yOffset)
-{
-    prc->left += xOffset;
-    prc->right+= xOffset;
-    prc->top += yOffset;
-    prc->bottom += yOffset;
-}
-
-BOOL IsRectEmpty(const RECT *prc)
-{
-    return prc->left == prc->right && prc->top == prc->bottom;
-}
-
 void qsort_s(void *base, size_t num, size_t width, int(__cdecl *comp)(void *, const void *, const void *), void *context)
 {
     char *lo, *hi;       /* ends of sub-array currently sorting */
@@ -704,11 +691,6 @@ void SetCursor(HCURSOR hCursor)
 BOOL ShellExecute(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters, LPCSTR lpDirectory, INT nShowCmd)
 {
     return FALSE;
-}
-
-
-void DeleteObject(HGDIOBJ hObj)
-{
 }
 
 SHORT GetKeyState(int nVirtKey)

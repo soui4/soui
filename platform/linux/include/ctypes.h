@@ -31,6 +31,7 @@ typedef int64_t __int64;// int64_t
 #define E_FAIL 4
 #define E_NOTIMPL 5
 #define E_NOINTERFACE 6
+#define E_UNEXPECTED 7
 
 #define S_OK 0
 #define S_FALSE 1
@@ -296,7 +297,13 @@ typedef struct tagMSG
 typedef struct tagMSG *PMSG;
 typedef struct tagMSG *LPMSG;
 
+#define AC_SRC_OVER                 0x00
 
+//
+// alpha format flags
+//
+
+#define AC_SRC_ALPHA                0x01
 typedef struct _BLENDFUNCTION {
   BYTE     BlendOp;
   BYTE     BlendFlags;
@@ -368,6 +375,10 @@ typedef struct _FILETIME {
 
 typedef wchar_t OLECHAR;
 typedef OLECHAR **SNB;
+
+typedef LONG LRESULT;
+#define S_OK 0
+#define S_FALSE 1
 
 
 #endif//__PLATFORM_LINUX_

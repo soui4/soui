@@ -1,9 +1,12 @@
+#include <platform.h>
 #include <class.h>
 #include <list>
 #include <map>
 #include <string>
 #include <atomic>
 #include <mutex>
+
+#include <gdi.h>
 
 static std::recursive_mutex cls_mutex;
 static std::list<CLASS*> class_list;

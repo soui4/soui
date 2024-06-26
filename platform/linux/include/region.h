@@ -1,8 +1,6 @@
 #ifndef _REGION_H_
 #define _REGION_H_
-
-#include <platform.h>
-
+#include <gdi.h>
 #ifndef CONST 
 #define CONST const
 #endif
@@ -62,15 +60,6 @@ typedef struct _RGNDATA {
 	RGNDATAHEADER rdh; 
 	char          Buffer[1]; 
 } RGNDATA, *PRGNDATA; 
-
-typedef struct  _XFORM { 
-	FLOAT eM11; 
-	FLOAT eM12; 
-	FLOAT eM21; 
-	FLOAT eM22; 
-	FLOAT eDx; 
-	FLOAT eDy; 
-} XFORM, *PXFORM; 
 
 HRGN ExtCreateRegion(
 					 CONST XFORM *lpXform,     // transformation data

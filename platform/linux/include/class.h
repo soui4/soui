@@ -1,6 +1,5 @@
 #ifndef _CLASS_H_
 #define _CLASS_H_
-#include <platform.h>
 
 #define MAX_ATOM_LEN 255
 

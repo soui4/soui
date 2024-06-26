@@ -1200,11 +1200,8 @@ typedef struct tagRGBQUAD {
         BYTE    rgbGreen;
         BYTE    rgbRed;
         BYTE    rgbReserved;
-} RGBQUAD;
+} RGBQUAD, * LPRGBQUAD;
 #pragma pack(pop)
-
-typedef RGBQUAD FAR* LPRGBQUAD;
-
 
 
 #define MF_BYCOMMAND        0x00000000L
@@ -1274,5 +1271,86 @@ typedef RGBQUAD FAR* LPRGBQUAD;
 #define PM_REMOVE   0x0001  //Messages are removed from the queue after processing by PeekMessage.
 #define PM_NOYIELD  0x0002  //Prevents the system from releasing any thread that is waiting for the caller to go idle
 
+BOOL
+WINAPI
+SetRect(
+     LPRECT lprc,
+     int xLeft,
+     int yTop,
+     int xRight,
+     int yBottom);
+
+
+BOOL
+WINAPI
+SetRectEmpty(
+     LPRECT lprc);
+
+
+BOOL
+WINAPI
+CopyRect(
+     LPRECT lprcDst,
+     CONST RECT *lprcSrc);
+
+
+BOOL
+WINAPI
+InflateRect(
+    LPRECT lprc,
+     int dx,
+     int dy);
+
+
+BOOL
+WINAPI
+IntersectRect(
+     LPRECT lprcDst,
+     CONST RECT *lprcSrc1,
+     CONST RECT *lprcSrc2);
+
+
+BOOL
+WINAPI
+UnionRect(
+     LPRECT lprcDst,
+     CONST RECT *lprcSrc1,
+     CONST RECT *lprcSrc2);
+
+
+BOOL
+WINAPI
+SubtractRect(
+     LPRECT lprcDst,
+     CONST RECT *lprcSrc1,
+     CONST RECT *lprcSrc2);
+
+
+BOOL
+WINAPI
+OffsetRect(
+     LPRECT lprc,
+     int dx,
+     int dy);
+
+
+BOOL
+WINAPI
+IsRectEmpty(
+     CONST RECT *lprc);
+
+
+BOOL
+WINAPI
+EqualRect(
+     CONST RECT *lprc1,
+     CONST RECT *lprc2);
+
+
+BOOL
+WINAPI
+PtInRect(
+     CONST RECT *lprc,
+     POINT pt);
 
 #endif//__WINUSER_H_

@@ -75,6 +75,11 @@ inline wchar_t * _wcsupr(wchar_t* s) {
     return s;
 }
 
+inline void strcpy_s(char* destination,size_t num,const char *source){
+    strncpy(destination, source, num);
+    destination[num - 1] = L'\0'; 
+}
+
 inline void wcscpy_s(wchar_t* destination,  size_t num, const wchar_t* source)
 {
     wcsncpy(destination, source, num);

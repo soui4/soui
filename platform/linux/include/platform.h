@@ -18,5 +18,7 @@
 #include "ctrl_types.h"
 #include "sysapi.h"
 #include "wnd.h"
+#include "region.h"
+#include "gdi.h"
 
 #endif//__PLATFORM_H_

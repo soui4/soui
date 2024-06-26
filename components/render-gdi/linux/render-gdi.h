@@ -1,4 +1,7 @@
-﻿#pragma once
+﻿#ifndef _RENDER_CAIRO_H_
+#define _RENDER_CAIRO_H_
+
+#include <platform.h>
 #include <interface/SRender-i.h>
 
 #include <helper/SColor.h>
@@ -410,3 +413,5 @@ namespace RENDER_GDI
 SNSEND
 
 EXTERN_C BOOL SOUI_COM_API Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory);
+
+#endif//_RENDER_CAIRO_H_

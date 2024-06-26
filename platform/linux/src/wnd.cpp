@@ -1,3 +1,4 @@
+#include <platform.h>
 #include <wnd.h>
 #include <xcb/xcb.h>
 #include <xcb/xproto.h>
