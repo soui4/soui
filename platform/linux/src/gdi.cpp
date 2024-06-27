@@ -1,6 +1,6 @@
 #include <platform.h>
 #include <gdi.h>
-
+#include <cairo/cairo.h>
 
 HPEN ExtCreatePen(DWORD iPenStyle, DWORD cWidth, const LOGBRUSH *plbrush, DWORD cStyle, const DWORD *pstyle)
 {
@@ -72,7 +72,15 @@ HBRUSH CreateSolidBrush(COLORREF color)
 
 HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *lpbmi, UINT usage, VOID **ppvBits, HANDLE hSection, DWORD offset)
 {
-    return HBITMAP(0);
+    if(lpbmi->bmiHeader.biBitCount!=32)
+        return 0;
+    cairo_surface_t *ret = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,lpbmi->bmiHeader.biWidth,lpbmi->bmiHeader.biHeight);
+    if(!ret)
+        return 0;
+    if(ppvBits){
+        *ppvBits = cairo_image_surface_get_data(ret);
+    }
+    return (HBITMAP)ret;
 }
 
 HDC CreateCompatibleDC(HDC hdc)

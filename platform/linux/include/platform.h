@@ -4,6 +4,7 @@
 #include <dataobject-i.h>
 #include <droptarget-i.h>
 #include <sdef.h>
+#include <dlfcn.h>
 
 #include "ctypes.h"
 #include "tchar.h"

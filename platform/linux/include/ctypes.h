@@ -142,9 +142,9 @@ typedef int BOOL;
 #define IDTRYAGAIN      10
 #define IDCONTINUE      11
 
+typedef UINT_PTR HINSTANCE;
+typedef void * HMODULE;
 
-#define HINSTANCE UINT_PTR
-#define HMODULE UINT_PTR
 #define HICON int
 typedef uint32_t HWND;
 //#define HWND  uint32_t
@@ -152,7 +152,7 @@ typedef uint32_t HWND;
 #define HGDIOBJ int
 #define HBRUSH int
 #define HPEN   int
-#define HBITMAP int
+typedef UINT_PTR HBITMAP;
 #define HRSRC int
 #define HCURSOR int
 typedef UINT_PTR HDC;

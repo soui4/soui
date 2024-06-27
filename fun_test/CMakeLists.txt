@@ -28,7 +28,8 @@ target_include_directories(fun_test
   PUBLIC ${PROJECT_SOURCE_DIR}/platform
   PUBLIC ${PROJECT_SOURCE_DIR}/platform/include
   PUBLIC ${PROJECT_SOURCE_DIR}/third-part/gtest/include
-)
+  PUBLIC ${PROJECT_SOURCE_DIR}/components
+  )
 
 add_dependencies(fun_test utilities4 gtest platform)
 target_link_libraries(fun_test utilities4 gtest platform)

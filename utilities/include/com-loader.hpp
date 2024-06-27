@@ -1,4 +1,16 @@
-﻿#pragma once
+﻿#ifndef _COM_LOADER_H_
+#define _COM_LOADER_H_
+
+#include <platform.h>
+#include <interface/obj-ref-i.h>
+#include <string/tstring.h>
+
+#ifdef __linux__
+
+#define LoadLibrary(x) dlopen(x,RTLD_NOW)
+#define FreeLibrary dlclose
+#define GetProcAddress dlsym
+#endif//__linux___
 
 namespace SOUI {
 //加载组件辅助类
@@ -20,9 +32,15 @@ public:
 
     BOOL CreateInstance(LPCTSTR pszDllPath,IObjRef **ppObj,LPCSTR pszFnName = "SCreateInstance")
     {
+        SStringT strPath(pszDllPath);
         if(!m_funCreateInst)
         {
-            m_hMod=LoadLibrary(pszDllPath);
+            #ifdef _WIN32
+            strPath+=_T(".dll");
+            #else
+            strPath+=_T(".so");
+            #endif
+            m_hMod=LoadLibrary(strPath);
             if(!m_hMod) return FALSE;
             m_funCreateInst=(funSCreateInstance)GetProcAddress(m_hMod,pszFnName);
             if(!m_funCreateInst)
@@ -30,7 +48,7 @@ public:
                 FreeLibrary(m_hMod);
                 return FALSE;
             }
-            _tcscpy(m_szDllPath,pszDllPath);
+            _tcscpy(m_szDllPath,strPath);
         }
         return m_funCreateInst(ppObj);
     }
@@ -45,3 +63,5 @@ protected:
 };
 
 }//end of soui
+
+#endif//_COM_LOADER_H_

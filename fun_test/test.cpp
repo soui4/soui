@@ -14,7 +14,19 @@
 #include <cairo/cairo-xcb.h>
 #include <xcb/xcb_aux.h>
 
+#include <commgr2.h>
+#include <interface/SRender-i.h>
+
 using namespace SOUI;
+
+TEST(Util,com_load){
+    SComMgr2 comMgr("libimgdecoder-png");
+    SAutoRefPtr<IImgDecoderFactory> decoder;
+    EXPECT_EQ(comMgr.CreateImgDecoder((IObjRef**)&decoder),TRUE);
+    if(decoder){
+        printf("load image decoder succeed!\n");
+    }
+}
 
 TEST(Util,Xml_Load){
     SXmlDoc xml;
@@ -87,7 +99,7 @@ void SNativeWnd2::OnPaint(HDC hdc){
     cairo_fill(cr); // 填充矩形
     
     cairo_reset_clip(cr);
-    
+
     cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); 
     cairo_select_font_face(cr, "Ani", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
     cairo_set_font_size(cr, 100.0);
