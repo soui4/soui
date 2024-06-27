@@ -7,7 +7,7 @@ HPEN ExtCreatePen(DWORD iPenStyle, DWORD cWidth, const LOGBRUSH *plbrush, DWORD 
     return 0;
 }
 
-int GetObject(HANDLE h, int c, LPVOID pv)
+int GetObject(HGDIOBJ h, int c, LPVOID pv)
 {
     return 0;
 }
@@ -80,7 +80,7 @@ HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *lpbmi, UINT usage, VOID **pp
     if(ppvBits){
         *ppvBits = cairo_image_surface_get_data(ret);
     }
-    return (HBITMAP)ret;
+    return new _GdiObj(_GdiObj::go_dib,ret);
 }
 
 HDC CreateCompatibleDC(HDC hdc)
@@ -115,7 +115,21 @@ HGDIOBJ SelectObject(HDC hdc, HGDIOBJ h)
 
 BOOL DeleteObject(HGDIOBJ hObj)
 {
-    return FALSE;
+    if(!hObj)
+        return FALSE;
+    switch (hObj->type)
+    {
+    case _GdiObj::go_dib:
+        {
+            cairo_surface_t* pixmap = (cairo_surface_t*)hObj->ptr;
+            cairo_surface_destroy(pixmap);
+        }
+        break;
+    default:
+        break;
+    }
+    delete hObj;
+    return TRUE;
 }
 
 int SaveDC(HDC hdc)

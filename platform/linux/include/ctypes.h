@@ -147,19 +147,19 @@ typedef void * HMODULE;
 
 #define HICON int
 typedef uint32_t HWND;
-//#define HWND  uint32_t
-#define HMENU int
-#define HGDIOBJ int
-#define HBRUSH int
-#define HPEN   int
-typedef UINT_PTR HBITMAP;
+typedef struct _GdiObj * HGDIOBJ;
+
+typedef HGDIOBJ HPEN;
+typedef HGDIOBJ HFONT;
+typedef HGDIOBJ HBRUSH;
+typedef HGDIOBJ HBITMAP;
+typedef HGDIOBJ HRGN;
 #define HRSRC int
 #define HCURSOR int
 typedef UINT_PTR HDC;
-typedef UINT_PTR HRGN;
 
-#define HFONT int
-#define HANDLE int
+#define HMENU int
+#define HANDLE UINT_PTR
 #define ATOM int
 #define HMONITOR int
 #define HHOOK int

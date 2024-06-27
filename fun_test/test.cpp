@@ -20,11 +20,30 @@
 using namespace SOUI;
 
 TEST(Util,com_load){
-    SComMgr2 comMgr("libimgdecoder-png");
+    SComMgr2 comMgr("libimgdecoder-stb");
     SAutoRefPtr<IImgDecoderFactory> decoder;
     EXPECT_EQ(comMgr.CreateImgDecoder((IObjRef**)&decoder),TRUE);
-    if(decoder){
-        printf("load image decoder succeed!\n");
+    if(!decoder){
+        printf("load image decoder failed!\n");
+        return;
+    }
+    SAutoRefPtr<IImgX> img;
+    decoder->CreateImgX(&img);
+    EXPECT_EQ(img->LoadFromFileA("/home/flyhigh/work/soui4/demo/uires/image/soui.png"),true);
+    
+    IImgFrame * pFrame = img->GetFrame(0);
+    UINT wid,hei;
+    pFrame->GetSize(&wid,&hei);
+    printf("frame size=%u*%u\n",wid,hei);
+    BITMAPINFO bmi;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biWidth = wid;
+    bmi.bmiHeader.biHeight = hei;
+    BYTE *bits=nullptr;
+    HBITMAP bmp = CreateDIBSection(0,&bmi,0,(void**)&bits,0,0);
+    if(bmp){
+        pFrame->CopyPixels(nullptr,0,wid*hei*4,bits);
+        DeleteObject(bmp);
     }
 }
 

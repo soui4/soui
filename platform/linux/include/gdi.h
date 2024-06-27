@@ -1,6 +1,21 @@
 #ifndef _LINUX_GDI_H_
 #define _LINUX_GDI_H_
 
+typedef struct _GdiObj{
+    enum{
+        go_pen=0,
+        go_brush,
+        go_dib,
+        go_ddb,
+        go_font,
+        go_rgn,
+    };
+    int type;
+    void *ptr;
+    _GdiObj(int _type,void * _ptr):type(_type),ptr(_ptr){
+
+    }
+}* HGDIOBJ;
 
 typedef struct  _XFORM { 
 	FLOAT eM11; 
@@ -37,7 +52,7 @@ HPEN WINAPI ExtCreatePen(  DWORD iPenStyle,
                                      DWORD cStyle,
                                     CONST DWORD *pstyle);
 
-int   WINAPI GetObject( HANDLE h,  int c, LPVOID pv);
+int   WINAPI GetObject( HGDIOBJ h,  int c, LPVOID pv);
 
 /* Logical Pen */
 typedef struct tagLOGPEN
