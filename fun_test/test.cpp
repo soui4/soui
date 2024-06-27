@@ -19,22 +19,21 @@
 
 using namespace SOUI;
 
-TEST(Util,com_load){
+HBITMAP LoadPng(const char * path){
     SComMgr2 comMgr("libimgdecoder-stb");
     SAutoRefPtr<IImgDecoderFactory> decoder;
     EXPECT_EQ(comMgr.CreateImgDecoder((IObjRef**)&decoder),TRUE);
     if(!decoder){
         printf("load image decoder failed!\n");
-        return;
+        return 0;
     }
     SAutoRefPtr<IImgX> img;
     decoder->CreateImgX(&img);
-    EXPECT_EQ(img->LoadFromFileA("/home/flyhigh/work/soui4/demo/uires/image/soui.png"),true);
+    EXPECT_EQ(img->LoadFromFileA(path),true);
     
     IImgFrame * pFrame = img->GetFrame(0);
     UINT wid,hei;
     pFrame->GetSize(&wid,&hei);
-    printf("frame size=%u*%u\n",wid,hei);
     BITMAPINFO bmi;
     bmi.bmiHeader.biBitCount = 32;
     bmi.bmiHeader.biWidth = wid;
@@ -43,6 +42,14 @@ TEST(Util,com_load){
     HBITMAP bmp = CreateDIBSection(0,&bmi,0,(void**)&bits,0,0);
     if(bmp){
         pFrame->CopyPixels(nullptr,0,wid*hei*4,bits);
+    }
+    return bmp;
+}
+
+TEST(Util,com_load){
+    HBITMAP bmp = LoadPng("/home/flyhigh/work/soui4/demo/uires/image/soui.png");
+    EXPECT_EQ(bmp!=0,TRUE);
+    if(bmp){
         DeleteObject(bmp);
     }
 }
@@ -85,19 +92,40 @@ TEST(Util, RwLock) {
 }
 
 class SNativeWnd2: public SNativeWnd{
+    HBITMAP m_bmp;
 public:
-SNativeWnd2(){};
+SNativeWnd2():m_bmp(0){};
 
 protected:
 void OnClose();
 void OnPaint(HDC hdc);
 void OnSize(UINT state,SIZE sz);
+void OnDestroy();
+int  OnCreate(LPCREATESTRUCT lpCs);
+
 BEGIN_MSG_MAP_EX(SNativeWnd2)
  MSG_WM_CLOSE(OnClose)
  MSG_WM_PAINT(OnPaint)
  MSG_WM_SIZE(OnSize)
+ MSG_WM_CREATE(OnCreate)
+ MSG_WM_DESTROY(OnDestroy)
 END_MSG_MAP()
 };
+
+void SNativeWnd2::OnDestroy(){
+    if(m_bmp){
+        DeleteObject(m_bmp);
+        m_bmp=0;
+    }
+    SetMsgHandled(FALSE);
+}
+
+int  SNativeWnd2::OnCreate(LPCREATESTRUCT lpCs){
+    m_bmp = LoadPng("/home/flyhigh/work/soui4/demo/uires/image/soui.png");
+    if(!m_bmp) return 1;
+    SetMsgHandled(FALSE);
+    return 0;
+}
 
 void SNativeWnd2::OnSize(UINT state,SIZE sz){
     SetMsgHandled(FALSE);
@@ -125,10 +153,18 @@ void SNativeWnd2::OnPaint(HDC hdc){
     cairo_text_extents_t ext;
     cairo_text_extents(cr,"hello",&ext);
     printf("hello extents=%d,%d\n",(int)ext.width,(int)ext.height);
-    cairo_move_to(cr,100,ext.height);
+    cairo_move_to(cr,30,ext.height);
     cairo_show_text(cr,"hello, Soui");
 
-
+    if(m_bmp){
+        cairo_save(cr);
+        BITMAP bm;
+        GetObject(m_bmp,sizeof(bm),&bm);
+        cairo_translate(cr,0,0);
+        cairo_set_source_surface(cr,(cairo_surface_t*)m_bmp->ptr,0,0);
+        cairo_paint(cr);
+        cairo_restore(cr);
+    }
     EndPaint(m_hWnd,&ps);
 }
 void SNativeWnd2::OnClose(){

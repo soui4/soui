@@ -63,7 +63,9 @@ int MultiByteToWideChar(int cp, int flags, const char *src, int len, wchar_t *ds
             break; // 遇到空字符，结束转换
         }
     }
-
+    if(i<dstLen){
+        dst[i]=0;
+    }
     return i;
 }
 

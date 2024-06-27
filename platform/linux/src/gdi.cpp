@@ -9,6 +9,24 @@ HPEN ExtCreatePen(DWORD iPenStyle, DWORD cWidth, const LOGBRUSH *plbrush, DWORD 
 
 int GetObject(HGDIOBJ h, int c, LPVOID pv)
 {
+    if(!h->ptr)
+        return 0;
+    switch(h->type){
+        case _GdiObj::go_dib:
+        if(c>=sizeof(BITMAP)){
+            BITMAP * bm = (BITMAP*)pv;
+            cairo_surface_t * pixmap = (cairo_surface_t*)h->ptr;
+            bm->bmWidth = cairo_image_surface_get_width(pixmap);
+            bm->bmHeight = cairo_image_surface_get_height(pixmap);
+            bm->bmPlanes = 1;
+            bm->bmBitsPixel=32;
+            bm->bmWidthBytes = bm->bmWidth*4;
+            bm->bmType = BI_RGB;
+            bm->bmBits = cairo_image_surface_get_data(pixmap);
+            return sizeof(BITMAP);
+        }
+        break;
+    }
     return 0;
 }
 
