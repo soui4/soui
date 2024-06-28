@@ -16,6 +16,7 @@
 
 #include <commgr2.h>
 #include <interface/SRender-i.h>
+#include <string>
 
 using namespace SOUI;
 
@@ -135,6 +136,24 @@ void SNativeWnd2::OnPaint(HDC hdc){
     hdc = BeginPaint(m_hWnd,&ps);
     RECT rcWnd;
     GetClientRect(&rcWnd);
+    HBRUSH hbr = CreateSolidBrush(RGBA(255,255,255,255));
+    FillRect(hdc,&rcWnd,hbr);
+    DeleteObject(hbr);
+
+    SetTextColor(hdc,RGBA(255,0,0,255));
+
+    LOGFONT lf={0};
+    lf.lfHeight = 50;
+    strcpy(lf.lfFaceName,"Ani");
+    HFONT hFont = CreateFontIndirect(&lf);
+    HFONT oldFont = SelectObject(hdc,hFont);
+
+    std::string str = "hello soui";
+    SIZE sz={0};
+    GetTextExtentPoint32(hdc,str.c_str(),str.length(),&sz);
+    TextOut(hdc,10,10,str.c_str(),-1);
+    
+    SelectObject(hdc,oldFont);
     /*
     cairo_t *cr =(cairo_t*)hdc;
 

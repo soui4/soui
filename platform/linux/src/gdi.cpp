@@ -14,6 +14,17 @@ typedef struct _GdiObj{
     }
 }* HGDIOBJ;
 
+struct CairoColor{
+    double r,g,b,a;
+};
+
+void RGBA2CairoColor(COLORREF crSrc,CairoColor *dst){
+    dst->r = GetRValue(crSrc)/255.0;
+    dst->g = GetGValue(crSrc)/255.0;
+    dst->b = GetBValue(crSrc)/255.0;
+    dst->a = GetAValue(crSrc)/255.0;
+}
+
 HGDIOBJ InitGdiObj(int type,void *ptr){
     return new _GdiObj(type,ptr);
 }
@@ -68,7 +79,9 @@ HPEN CreatePenIndirect(const LOGPEN *plpen)
 
 HFONT CreateFontIndirect(const LOGFONT *lplf)
 {
-    return 0;
+    LOGFONT *plog = new LOGFONT;
+    memcpy(plog,&lplf,sizeof(LOGFONT));
+    return InitGdiObj(OBJ_FONT,plog);
 }
 
 HFONT CreateFont(int cHeight, int cWidth, int cEscapement, int cOrientation, int cWeight, 
@@ -110,7 +123,10 @@ HBRUSH CreateDIBPatternBrushPt(const VOID *lpPackedDIB, UINT iUsage)
 
 HBRUSH CreateSolidBrush(COLORREF color)
 {
-    return 0;
+    LOGBRUSH *plog = new LOGBRUSH;
+    plog->lbStyle = BS_SOLID;
+    plog->lbColor = color;
+    return InitGdiObj(OBJ_BITMAP,plog);
 }
 
 HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *lpbmi, UINT usage, VOID **ppvBits, HANDLE hSection, DWORD offset)
@@ -173,7 +189,9 @@ BOOL DeleteDC(HDC hdc)
 
 int SetBkMode(HDC hdc, int mode)
 {
-    return 0;
+    int ret = hdc->bkMode;
+    hdc->bkMode = mode;
+    return ret;
 }
 
 int SetGraphicsMode(HDC hdc, int iMode)
@@ -188,11 +206,29 @@ HBITMAP CreateCompatibleBitmap(HDC hdc, int cx, int cy)
 
 HGDIOBJ SelectObject(HDC hdc, HGDIOBJ h)
 {
-    cairo_t * cr = (cairo_t*)(hdc);
+    HGDIOBJ ret = 0;
+    assert(h);
     switch(h->type){
-
+        case OBJ_PEN:
+        {
+            ret = hdc->pen;
+            hdc->pen = h;
+            break;
+        }
+        case OBJ_BRUSH:
+        {
+            ret = hdc->brush;
+            hdc->brush=h;
+            break;
+        }
+        case OBJ_FONT:
+        {
+            ret = hdc->hfont;
+            hdc->hfont = h;
+            break;
+        }
     }
-    return HGDIOBJ(0);
+    return ret;
 }
 
 BOOL DeleteObject(HGDIOBJ hObj)
@@ -213,6 +249,12 @@ BOOL DeleteObject(HGDIOBJ hObj)
         break;
     case OBJ_PEN:
         delete (LOGPEN*)hObj->ptr;
+        break;
+    case OBJ_BRUSH:
+        delete (LOGBRUSH*)hObj->ptr;
+        break;
+    case OBJ_FONT:
+        delete (LOGFONT*)hObj->ptr;
         break;
     default:
         break;
@@ -275,18 +317,61 @@ int  GetDIBits(HDC hdc, HBITMAP hbm, UINT start, UINT cLines, LPVOID lpvBits, LP
     return 0;
 }
 
+static void ApplyFont(HDC hdc){
+    if(hdc->hfont){
+        LOGFONT *lf = (LOGFONT*)GetGdiObjPtr(hdc->hfont);
+        cairo_select_font_face(hdc->cairo, lf->lfFaceName, 
+            lf->lfItalic?CAIRO_FONT_SLANT_ITALIC:CAIRO_FONT_SLANT_NORMAL, 
+            lf->lfWeight>400?CAIRO_FONT_WEIGHT_BOLD:CAIRO_FONT_WEIGHT_NORMAL);
+
+        cairo_set_font_size(hdc->cairo, lf->lfHeight);
+    }
+}
+
 int DrawText(HDC hdc, LPCSTR lpchText, int cchText, LPRECT lprc, UINT format)
 {
+    //todo:hjx
     return 0;
 }
 
 BOOL GetTextExtentPoint32(HDC hdc, LPCSTR lpString, int c, LPSIZE psizl)
 {
-    return 0;
+    ApplyFont(hdc);
+    cairo_text_extents_t ext;
+    if(c<0){
+        cairo_text_extents(hdc->cairo,lpString,&ext);
+    }else{
+        char *buf = (char*)malloc(c+1);
+        memcpy(buf,lpString,c);
+        buf[c]=0;
+        cairo_text_extents(hdc->cairo,buf,&ext);
+        free(buf);
+    }
+    return TRUE;
 }
 
 HGDIOBJ  GetStockObject(int i)
 {
+    switch(i){
+        case BLACK_BRUSH:
+        return CreateSolidBrush(RGBA(0,0,0,255));
+        case WHITE_BRUSH:
+        return CreateSolidBrush(RGBA(255,255,255,255));
+        case NULL_PEN:
+        return CreatePen(PS_SOLID,0,0);
+        case BLACK_PEN:
+        return CreatePen(PS_SOLID,1,RGBA(0,0,0,255));
+        case WHITE_PEN:
+        return CreatePen(PS_SOLID,1,RGBA(255,255,255,255));
+        case SYSTEM_FONT:
+        {
+            LOGFONT lf={0};
+            strcpy(lf.lfFaceName,"Arial");
+            lf.lfHeight=20;
+            lf.lfWeight=400;
+            return CreateFontIndirect(&lf);
+        }
+    }
     return HGDIOBJ(0);
 }
 
@@ -312,7 +397,20 @@ BOOL  AlphaBlend(HDC hdcDest, int xoriginDest, int yoriginDest, int wDest, int h
 
 BOOL  TextOut(HDC hdc, int x, int y, LPCSTR lpString, int c)
 {
-    return 0;
+    CairoColor cr;
+    RGBA2CairoColor(hdc->crText,&cr);
+    cairo_set_source_rgba(hdc->cairo, cr.r,cr.g,cr.b,cr.a); 
+    cairo_move_to(hdc->cairo,x,y);
+    if(c>0){
+        char *buf = (char*)malloc(c+1);
+        memcpy(buf,lpString,c);
+        buf[c]=0;
+        cairo_show_text(hdc->cairo,buf);
+        free(buf);
+    }else{
+        cairo_show_text(hdc->cairo,lpString);
+    }
+    return TRUE;
 }
 
 BOOL  SetViewportOrgEx(HDC hdc, int x, int y, LPPOINT lppt)
@@ -325,9 +423,15 @@ BOOL  OffsetViewportOrgEx(HDC hdc, int x, int y, LPPOINT lppt)
     return 0;
 }
 
-int  FillRect(HDC hDC, const RECT *lprc, HBRUSH hbr)
+int  FillRect(HDC hdc, const RECT *lprc, HBRUSH hbr)
 {
-    return 0;
+    LOGBRUSH *plog =(LOGBRUSH*)GetGdiObjPtr(hbr);
+    CairoColor cr;
+    RGBA2CairoColor(plog->lbColor,&cr);
+    cairo_set_source_rgba(hdc->cairo,cr.r,cr.g,cr.b,cr.a);
+    cairo_rectangle(hdc->cairo,lprc->left,lprc->top,lprc->right-lprc->left,lprc->bottom-lprc->top);
+    cairo_fill(hdc->cairo);
+    return 1;
 }
 
 int  FrameRect(HDC hDC, const RECT *lprc, HBRUSH hbr)

@@ -110,9 +110,11 @@ typedef struct _SYSTEMTIME{
 #define HIBYTE(w)           ((BYTE)((((DWORD_PTR)(w)) >> 8) & 0xff))
 
 #define RGB(r,g,b) ((r)|(g)<<8|(b)<<16)
+#define RGBA(r,g,b,a) ((r)|(g)<<8|(b)<<16|(a)<<24)
 #define GetRValue(rgb)   (LOBYTE(rgb))
-#define GetGValue(rgb)  (LOBYTE(rgb<<8))
-#define GetBValue(rgb)  (LOBYTE(rgb<<16))
+#define GetGValue(rgb)  (LOBYTE(rgb>>8))
+#define GetBValue(rgb)  (LOBYTE(rgb>>16))
+#define GetAValue(rgb)  (LOBYTE(rgb>>24))
 
 typedef int BOOL;
 #define FALSE 0

@@ -7,8 +7,6 @@
 
 #include <platform.h>
 
-#define GetAValue(rgb)   (LOBYTE((rgb) >> 24))
-#define RGBA(r, g, b, a) (RGB(r, g, b) | (a << 24))
 #define CR_INVALID       0x00FFFFFF
 
 //以ARGB格式存储颜色值

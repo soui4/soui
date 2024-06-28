@@ -10,8 +10,14 @@ typedef struct _SDC{
     COLORREF  crText;
     HGDIOBJ   pen;
     HGDIOBJ   brush;
+    HGDIOBJ   hfont;
+    int       bkMode;
     int       nSave;
-    _SDC():cairo(nullptr),bmp(nullptr),nSave(0),crText(RGB(0,0,0)|0xff000000),pen(nullptr),brush(nullptr){}
+    _SDC():cairo(nullptr),bmp(nullptr),nSave(0),crText(RGBA(0,0,0,0xff))
+        ,pen(GetStockObject(BLACK_PEN))
+        ,brush(GetStockObject(WHITE_BRUSH))
+        ,hfont(GetStockObject(SYSTEM_FONT))
+        ,bkMode(0){}
 
     ~_SDC(){
         if(cairo){
@@ -20,6 +26,7 @@ typedef struct _SDC{
         DeleteObject(pen);
         DeleteObject(brush);
         DeleteObject(bmp);
+        DeleteObject(hfont);
     }
 
     int SaveState(){
