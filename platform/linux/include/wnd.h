@@ -174,7 +174,4 @@ int ReleaseDC(HWND hWnd,HDC hdc);
 
 int MapWindowPoints(HWND hWndFrom,HWND hWndTo, LPPOINT lpPoint, UINT nCount);
 
-//todo:hjx
-void Conn_Flush();
-
 #endif//_WND_H__

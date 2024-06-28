@@ -80,7 +80,6 @@ protected:
 	BOOL m_bQuit;
 	BOOL m_bDoIdle;
 	int m_nIdleCount;
-    int m_nHandleMsg;
 	SCriticalSection m_cs;
 	typedef std::list<IRunnable *> RunnableList;
 	RunnableList m_runnables;
@@ -138,11 +137,7 @@ int SMessageLoopPriv::Run()
         {
             continue; // error, don't process
         }
-        m_nHandleMsg = 0;
         nRet = HandleMsg();
-        if(m_nHandleMsg>0){
-            Conn_Flush();
-        }
     } while (!m_bQuit);
 
     {
@@ -337,7 +332,6 @@ int SMessageLoopPriv::HandleMsg(THIS)
         }
         ExecutePendingTask();
         OnMsg(&msg);
-        m_nHandleMsg++;
         m_bDoIdle = IsIdleMessage(&msg);
         if (m_bDoIdle)
         {

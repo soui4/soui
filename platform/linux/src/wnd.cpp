@@ -839,6 +839,13 @@ BOOL SetWindowText(HWND hWnd , LPCTSTR lpszString){
 }
 
 HDC GetDC(HWND hWnd){
+    if(!hWnd){
+        //todo: get root window dc
+        SConnection *conn = SConnMgr::instance()->getConnection();
+        cairo_surface_t * surface = cairo_xcb_surface_create(conn->connection, conn->screen->root, xcb_aux_find_visual_by_id(conn->screen,conn->screen->root_visual), 10,10);
+        cairo_t * ret = cairo_create(surface);
+        return (HDC)ret;
+    }
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj || !wndObj->canvas.surface)
         return 0;
@@ -856,10 +863,17 @@ HDC GetDC(HWND hWnd){
 }
 
 int ReleaseDC(HWND hWnd,HDC hdc){
+    cairo_t* cairo_dc = (cairo_t*)hdc;
+    if(!hWnd){
+        SConnection *conn = SConnMgr::instance()->getConnection();
+        cairo_surface_t *surface = cairo_get_target(cairo_dc);
+        cairo_surface_destroy(surface);
+        cairo_destroy(cairo_dc);
+        return 1;
+    }
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return 0;
-    cairo_t* cairo_dc = (cairo_t*)hdc;
     cairo_destroy(cairo_dc);
     xcb_flush(wndObj->mConnection);
     return 1;
@@ -879,9 +893,4 @@ int MapWindowPoints(HWND hWndFrom,HWND hWndTo, LPPOINT lpPoint, UINT nCount){
         lpPoint[i].y -= yDiff;
     }
     return MAKELONG(-xDiff,-yDiff);
-}
-
-void Conn_Flush(){
-    SConnection *conn = SConnMgr::instance()->getConnection();
-    xcb_flush(conn->connection);
 }
