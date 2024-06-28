@@ -902,7 +902,6 @@ void STreeView::UpdateVisibleItems()
             {
                 ii.pItem->ModifyItemState(0, WndState_Check);
                 ii.pItem->GetFocusManager()->ClearFocus();
-                m_hSelected = 0;
             }
             ii.pItem->SetVisible(FALSE); //防止执行SItemPanel::OnTimeFrame()
             ii.pItem->GetEventSet()->setMutedState(false);
