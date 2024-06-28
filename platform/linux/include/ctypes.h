@@ -154,9 +154,11 @@ typedef HGDIOBJ HFONT;
 typedef HGDIOBJ HBRUSH;
 typedef HGDIOBJ HBITMAP;
 typedef HGDIOBJ HRGN;
+
+typedef struct _SDC * HDC;
 #define HRSRC int
 #define HCURSOR int
-typedef UINT_PTR HDC;
+
 
 #define HMENU int
 #define HANDLE UINT_PTR

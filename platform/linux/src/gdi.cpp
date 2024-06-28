@@ -1,12 +1,16 @@
 #include <platform.h>
 #include <gdi.h>
 #include <cairo/cairo.h>
+#include <cairo/cairo-xcb.h>
+#include <xcb/xcb_aux.h>
+#include "sdc.h"
+#include "SConnection.h"
+using namespace SOUI;
 
 typedef struct _GdiObj{
     int type;
     void *ptr;
     _GdiObj(int _type,void * _ptr):type(_type),ptr(_ptr){
-
     }
 }* HGDIOBJ;
 
@@ -31,7 +35,7 @@ int GetObject(HGDIOBJ h, int c, LPVOID pv)
     if(!h->ptr)
         return 0;
     switch(h->type){
-        case go_dib:
+        case OBJ_BITMAP:
         if(c>=sizeof(BITMAP)){
             BITMAP * bm = (BITMAP*)pv;
             cairo_surface_t * pixmap = (cairo_surface_t*)h->ptr;
@@ -51,13 +55,15 @@ int GetObject(HGDIOBJ h, int c, LPVOID pv)
 
 HPEN CreatePen(int iStyle, int cWidth, COLORREF color)
 {
-    LOGPEN logPen = {iStyle,cWidth,color};
+    LOGPEN logPen = {(UINT)iStyle,(LONG)cWidth,color};
     return CreatePenIndirect(&logPen);
 }
 
 HPEN CreatePenIndirect(const LOGPEN *plpen)
 {
-    return 0;
+    LOGPEN *pData = new LOGPEN;
+    memcpy(pData,plpen,sizeof(LOGPEN));
+    return InitGdiObj(OBJ_PEN,pData);
 }
 
 HFONT CreateFontIndirect(const LOGFONT *lplf)
@@ -117,7 +123,7 @@ HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *lpbmi, UINT usage, VOID **pp
     if(ppvBits){
         *ppvBits = cairo_image_surface_get_data(ret);
     }
-    return InitGdiObj(go_dib,ret);
+    return InitGdiObj(OBJ_BITMAP,ret);
 }
 
 BOOL   UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONST VOID*pjBits){
@@ -136,19 +142,33 @@ BOOL   UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONS
 }
 
 void   MarkPixmapDirty(HBITMAP bmp){
-    if(bmp && bmp->type == go_dib){
+    if(bmp && bmp->type == OBJ_BITMAP){
         cairo_surface_mark_dirty((cairo_surface_t*)bmp->ptr);
     }
 }
 
 HDC CreateCompatibleDC(HDC hdc)
 {
-    return HDC(0);
+    if(hdc==0){
+        //todo: get root window dc
+        SConnection *conn = SConnMgr::instance()->getConnection();
+        cairo_surface_t * surface = cairo_xcb_surface_create(conn->connection, conn->screen->root, xcb_aux_find_visual_by_id(conn->screen,conn->screen->root_visual), 10,10);
+        hdc = new _SDC;
+        hdc->hwnd = conn->screen->root;
+        hdc->bmp = InitGdiObj(OBJ_BITMAP,surface);
+        hdc->cairo = cairo_create(surface);
+        return hdc;
+    }else{
+        RECT rcWnd;
+        GetClientRect(hdc->hwnd,&rcWnd);
+        return CreateDC(hdc->hwnd,rcWnd.right,rcWnd.bottom);
+    }
 }
 
 BOOL DeleteDC(HDC hdc)
 {
-    return 0;
+    delete hdc;
+    return TRUE;
 }
 
 int SetBkMode(HDC hdc, int mode)
@@ -168,6 +188,10 @@ HBITMAP CreateCompatibleBitmap(HDC hdc, int cx, int cy)
 
 HGDIOBJ SelectObject(HDC hdc, HGDIOBJ h)
 {
+    cairo_t * cr = (cairo_t*)(hdc);
+    switch(h->type){
+
+    }
     return HGDIOBJ(0);
 }
 
@@ -177,15 +201,18 @@ BOOL DeleteObject(HGDIOBJ hObj)
         return FALSE;
     switch (hObj->type)
     {
-    case go_dib:
+    case OBJ_BITMAP:
         {
             cairo_surface_destroy((cairo_surface_t*)hObj->ptr);
         }
         break;
-    case go_rgn:
+    case OBJ_REGION:
     {
         cairo_region_destroy((cairo_region_t*)hObj->ptr);
     }
+        break;
+    case OBJ_PEN:
+        delete (LOGPEN*)hObj->ptr;
         break;
     default:
         break;
@@ -196,7 +223,12 @@ BOOL DeleteObject(HGDIOBJ hObj)
 
 int SaveDC(HDC hdc)
 {
-    return 0;
+    return hdc->SaveState();
+}
+
+BOOL RestoreDC(HDC hdc, int nSavedDC)
+{
+    return hdc->RestoreState(nSavedDC);
 }
 
 int SelectClipRgn(HDC hdc, HRGN hrgn)
@@ -219,11 +251,6 @@ int IntersectClipRect(HDC hdc, int left, int top, int right, int bottom)
     return 0;
 }
 
-BOOL RestoreDC(HDC hdc, int nSavedDC)
-{
-    return 0;
-}
-
 int  GetClipRgn(HDC hdc, HRGN hrgn)
 {
     return 0;
@@ -231,6 +258,15 @@ int  GetClipRgn(HDC hdc, HRGN hrgn)
 
 HGDIOBJ  GetCurrentObject(HDC hdc, UINT type)
 {
+    switch(type){
+        case OBJ_PEN:
+        return hdc->pen;
+        case OBJ_BRUSH:
+        return hdc->brush;
+        case OBJ_BITMAP:
+        return hdc->bmp;
+        break;
+    }
     return HGDIOBJ(0);
 }
 
@@ -336,5 +372,7 @@ int  SetROP2(HDC hdc, int rop2)
 
 COLORREF  SetTextColor(HDC hdc, COLORREF color)
 {
-    return COLORREF(0);
+    COLORREF ret = hdc->crText;
+    hdc->crText = color;
+    return ret;
 }

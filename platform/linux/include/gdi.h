@@ -1,14 +1,12 @@
 #ifndef _LINUX_GDI_H_
 #define _LINUX_GDI_H_
 
-typedef enum{
-        go_pen=0,
-        go_brush,
-        go_dib,
-        go_ddb,
-        go_font,
-        go_rgn,
-}GdiObjType;
+#define OBJ_PEN             1
+#define OBJ_BRUSH           2
+#define OBJ_DC              3
+#define OBJ_FONT            6
+#define OBJ_BITMAP          7
+#define OBJ_REGION          8
 
 HGDIOBJ InitGdiObj(int type,void *ptr);
 int GetGdiObjType(HGDIOBJ hgdiobj);
@@ -121,6 +119,7 @@ HBITMAP WINAPI CreateDIBSection( HDC hdc,  CONST BITMAPINFO *lpbmi,  UINT usage,
 BOOL    WINAPI UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONST VOID*pjBits);
 void    WINAPI MarkPixmapDirty(HBITMAP bmp);
 
+HDC  WINAPI CreateDC(HWND hwnd,int cx,int cy);
 HDC     WINAPI CreateCompatibleDC(  HDC hdc);
 BOOL    WINAPI DeleteDC( HDC hdc);
 

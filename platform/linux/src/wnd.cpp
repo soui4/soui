@@ -9,6 +9,7 @@
 #include <string>
 #include "class.h"
 #include "SConnection.h"
+#include "sdc.h"
 
 using namespace SOUI;
 
@@ -16,17 +17,12 @@ using namespace SOUI;
 
 HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module);
 
-struct _WndCanvas{
-    cairo_surface_t * surface;
-    cairo_region_t  * rgnClip;
-};
-
 struct _Window{
     std::recursive_mutex mutex;
     pthread_t tid;
     xcb_connection_t *mConnection;
     xcb_screen_t *mScreen;
-    _WndCanvas    canvas;
+    HDC           canvas;
     std::string title; 
     UINT_PTR           objOpaque;
     HWND               parent;        /* Window parent */
@@ -196,8 +192,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     _Window *pWnd = new(p)_Window();
     
     pWnd->tid = pthread_self();
-    pWnd->canvas.surface = nullptr;
-    pWnd->canvas.rgnClip = nullptr;
+    pWnd->canvas = nullptr;
 
     SConnection *state = SConnMgr::instance()->getConnection(pWnd->tid);
     pWnd->mConnection = state->connection;
@@ -242,11 +237,8 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 
         _Window *wndObj = it->second;
         map_wnd.erase(it);
-        if(wndObj->canvas.surface){
-            cairo_surface_destroy(wndObj->canvas.surface);
-        }
-        if(wndObj->canvas.rgnClip){
-            cairo_region_destroy(wndObj->canvas.rgnClip);
+        if(wndObj->canvas){
+            DeleteDC(wndObj->canvas);
         }
         //delete wndObj and release resource of the window object
         xcb_unmap_window(wndObj->mConnection,hWnd);
@@ -633,6 +625,19 @@ BOOL GetWindowRect(HWND hWnd, RECT *rc)
     return TRUE;
 }
 
+HDC CreateDC(HWND hwnd,int cx,int cy){
+    assert(hwnd);
+    WndObj wndObj = WndObj::fromHwnd(hwnd);
+    if(!wndObj)
+        return 0;
+    cairo_surface_t * surface = cairo_xcb_surface_create(wndObj->mConnection, hwnd, xcb_aux_find_visual_by_id(wndObj->mScreen,wndObj->mScreen->root_visual), cx,cy);
+    HDC hdc = new _SDC;
+    hdc->hwnd = hwnd;
+    hdc->bmp = InitGdiObj(OBJ_BITMAP,surface);
+    hdc->cairo = cairo_create(surface);
+    return hdc;
+}
+
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
     switch(msg){
         case WM_CREATE:
@@ -640,7 +645,7 @@ HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
             WndObj wndObj=WndObj::fromHwnd(hwnd);
             if(wndObj){
                 CREATESTRUCT * cs = (CREATESTRUCT*)lp;
-                wndObj->canvas.surface = cairo_xcb_surface_create(wndObj->mConnection, hwnd, xcb_aux_find_visual_by_id(wndObj->mScreen,wndObj->mScreen->root_visual), cs->cx,cs->cy);
+                wndObj->canvas = CreateDC(hwnd,cs->cx,cs->cy);
             }
         }
         break;
@@ -648,26 +653,20 @@ HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
         {
             WndObj wndObj=WndObj::fromHwnd(hwnd);
             SIZE sz ={GET_X_LPARAM(lp),GET_Y_LPARAM(lp)};
-            if(wndObj && wndObj->canvas.surface){
-                cairo_xcb_surface_set_size(wndObj->canvas.surface,sz.cx,sz.cy);
-                if(wndObj->canvas.rgnClip){
-                    cairo_region_destroy(wndObj->canvas.rgnClip);
-                }
-                cairo_rectangle_int_t rc={0,0,sz.cx,sz.cy};
-                wndObj->canvas.rgnClip = cairo_region_create_rectangle(&rc);
+            if(wndObj && wndObj->canvas)
+            {
+                cairo_xcb_surface_set_size((cairo_surface_t*)GetGdiObjPtr(GetCurrentObject(wndObj->canvas,OBJ_BITMAP)),sz.cx,sz.cy);
+                RestoreDC(wndObj->canvas,0);
             }
         }
         break;
         case WM_DESTROY:
         {
             WndObj wndObj=WndObj::fromHwnd(hwnd);
-            if(wndObj && wndObj->canvas.surface){
-                cairo_surface_destroy(wndObj->canvas.surface);
-                wndObj->canvas.surface = nullptr;
-                if(wndObj->canvas.rgnClip){
-                    cairo_region_destroy(wndObj->canvas.rgnClip);
-                    wndObj->canvas.rgnClip=nullptr;
-                }
+            if(wndObj && wndObj->canvas)
+            {
+                DeleteDC(wndObj->canvas);
+                wndObj->canvas = nullptr;
             }
         }
         break;
@@ -840,41 +839,23 @@ BOOL SetWindowText(HWND hWnd , LPCTSTR lpszString){
 
 HDC GetDC(HWND hWnd){
     if(!hWnd){
-        //todo: get root window dc
-        SConnection *conn = SConnMgr::instance()->getConnection();
-        cairo_surface_t * surface = cairo_xcb_surface_create(conn->connection, conn->screen->root, xcb_aux_find_visual_by_id(conn->screen,conn->screen->root_visual), 10,10);
-        cairo_t * ret = cairo_create(surface);
-        return (HDC)ret;
+        return CreateCompatibleDC(nullptr);
     }
     WndObj wndObj = WndObj::fromHwnd(hWnd);
-    if(!wndObj || !wndObj->canvas.surface)
+    if(!wndObj || !wndObj->canvas)
         return 0;
-    cairo_t* ret = cairo_create(wndObj->canvas.surface);
-    if(wndObj->canvas.rgnClip){
-        int num_rectangles = cairo_region_num_rectangles(wndObj->canvas.rgnClip);
-        for (int i = 0; i < num_rectangles; i++) {
-            cairo_rectangle_int_t rect;
-            cairo_region_get_rectangle(wndObj->canvas.rgnClip, i, &rect);
-            cairo_rectangle(ret,rect.x,rect.y,rect.width,rect.height);
-        }
-        cairo_clip(ret);
-    }
-    return (HDC)ret;
+    return wndObj->canvas;
 }
 
 int ReleaseDC(HWND hWnd,HDC hdc){
     cairo_t* cairo_dc = (cairo_t*)hdc;
     if(!hWnd){
-        SConnection *conn = SConnMgr::instance()->getConnection();
-        cairo_surface_t *surface = cairo_get_target(cairo_dc);
-        cairo_surface_destroy(surface);
-        cairo_destroy(cairo_dc);
+        DeleteDC(hdc);
         return 1;
     }
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return 0;
-    cairo_destroy(cairo_dc);
     xcb_flush(wndObj->mConnection);
     return 1;
 }

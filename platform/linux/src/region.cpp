@@ -88,7 +88,7 @@ HRGN CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect)
 {
     cairo_rectangle_int_t rc={nLeftRect,nTopRect,nRightRect-nLeftRect,nBottomRect-nTopRect};
     cairo_region_t *ret = cairo_region_create_rectangle(&rc);
-    return InitGdiObj(go_rgn,ret);
+    return InitGdiObj(OBJ_REGION,ret);
 }
 
 HRGN CreateRectRgnIndirect(const RECT *lprc)
@@ -121,7 +121,7 @@ HRGN ExtCreateRegion(const XFORM *lpXform, DWORD nCount, const RGNDATA *lpRgnDat
         //todo: only translate is availble.
         cairo_region_translate(rgn,lpXform->eDx,lpXform->eDy);
     }
-    return InitGdiObj(go_rgn,rgn);
+    return InitGdiObj(OBJ_REGION,rgn);
 }
 
 
@@ -137,7 +137,7 @@ static void ClipRegion(cairo_t * ctx, cairo_region_t* rgn){
 
 BOOL FillRgn(HDC hdc, HRGN hrgn, HBRUSH hbr)
 {
-    if(!hrgn || GetGdiObjType(hrgn)!=go_rgn)
+    if(!hrgn || GetGdiObjType(hrgn)!=OBJ_REGION)
         return FALSE;
     cairo_t * ctx = (cairo_t*)hdc;
     cairo_save(ctx);
@@ -153,7 +153,7 @@ BOOL FillRgn(HDC hdc, HRGN hrgn, HBRUSH hbr)
 
 BOOL FrameRgn(HDC hdc, HRGN hrgn, HBRUSH hbr, int nWidth, int nHeight)
 {
-    if(!hrgn || GetGdiObjType(hrgn)!=go_rgn)
+    if(!hrgn || GetGdiObjType(hrgn)!=OBJ_REGION)
         return FALSE;
     cairo_t * ctx = (cairo_t*)hdc;
     cairo_save(ctx);
