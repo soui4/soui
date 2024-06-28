@@ -179,9 +179,13 @@ BOOL DeleteObject(HGDIOBJ hObj)
     {
     case go_dib:
         {
-            cairo_surface_t* pixmap = (cairo_surface_t*)hObj->ptr;
-            cairo_surface_destroy(pixmap);
+            cairo_surface_destroy((cairo_surface_t*)hObj->ptr);
         }
+        break;
+    case go_rgn:
+    {
+        cairo_region_destroy((cairo_region_t*)hObj->ptr);
+    }
         break;
     default:
         break;

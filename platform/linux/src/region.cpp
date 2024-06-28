@@ -1,13 +1,14 @@
 #include <platform.h>
-#include "region.h"
 #include <cairo/cairo.h>
+#include "region.h"
+#include "gdi.h"
 
 int GetRegionComplexity(HRGN hRgn){
     if(!hRgn)
         return ERROR;
-    if(cairo_region_is_empty((cairo_region_t*)hRgn))
+    if(cairo_region_is_empty((cairo_region_t*)GetGdiObjPtr(hRgn)))
         return NULLREGION;
-    if(cairo_region_num_rectangles((cairo_region_t*)hRgn)==1)
+    if(cairo_region_num_rectangles((cairo_region_t*)GetGdiObjPtr(hRgn))==1)
         return SIMPLEREGION;
     return COMPLEXREGION;
 }
@@ -19,9 +20,9 @@ int CombineRgn(HRGN hrgnDst, HRGN hrgnSrc1, HRGN hrgnSrc2, int iMode)
         {
             cairo_region_t *empty = cairo_region_create();
             //clear dest region
-            cairo_region_intersect((cairo_region_t*)hrgnDst,empty);
-            cairo_region_union((cairo_region_t*)hrgnDst,(cairo_region_t*)hrgnSrc1);
-            cairo_region_intersect((cairo_region_t*)hrgnDst,(cairo_region_t*)hrgnSrc2);
+            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),empty);
+            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
+            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
             cairo_region_destroy(empty);
         }
         break;
@@ -29,8 +30,8 @@ int CombineRgn(HRGN hrgnDst, HRGN hrgnSrc1, HRGN hrgnSrc2, int iMode)
         {
             cairo_region_t *empty = cairo_region_create();
             //clear dest region
-            cairo_region_intersect((cairo_region_t*)hrgnDst,empty);
-            cairo_region_union((cairo_region_t*)hrgnDst,(cairo_region_t*)hrgnSrc1);
+            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),empty);
+            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
             cairo_region_destroy(empty);
         }
         break;
@@ -38,9 +39,9 @@ int CombineRgn(HRGN hrgnDst, HRGN hrgnSrc1, HRGN hrgnSrc2, int iMode)
         {
             cairo_region_t *empty = cairo_region_create();
             //clear dest region
-            cairo_region_intersect((cairo_region_t*)hrgnDst,empty);
-            cairo_region_union((cairo_region_t*)hrgnDst,(cairo_region_t*)hrgnSrc1);
-            cairo_region_subtract((cairo_region_t*)hrgnDst,(cairo_region_t*)hrgnSrc2);
+            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),empty);
+            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
+            cairo_region_subtract((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
             cairo_region_destroy(empty);
         }
         break;
@@ -48,9 +49,9 @@ int CombineRgn(HRGN hrgnDst, HRGN hrgnSrc1, HRGN hrgnSrc2, int iMode)
         {
             cairo_region_t *empty = cairo_region_create();
             //clear dest region
-            cairo_region_intersect((cairo_region_t*)hrgnDst,empty);
-            cairo_region_union((cairo_region_t*)hrgnDst,(cairo_region_t*)hrgnSrc1);
-            cairo_region_union((cairo_region_t*)hrgnDst,(cairo_region_t*)hrgnSrc2);
+            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),empty);
+            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
+            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
             cairo_region_destroy(empty);
         }
         break;
@@ -58,9 +59,9 @@ int CombineRgn(HRGN hrgnDst, HRGN hrgnSrc1, HRGN hrgnSrc2, int iMode)
         {
             cairo_region_t *empty = cairo_region_create();
             //clear dest region
-            cairo_region_intersect((cairo_region_t*)hrgnDst,empty);
-            cairo_region_union((cairo_region_t*)hrgnDst,(cairo_region_t*)hrgnSrc1);
-            cairo_region_xor((cairo_region_t*)hrgnDst,(cairo_region_t*)hrgnSrc2);
+            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),empty);
+            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
+            cairo_region_xor((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
             cairo_region_destroy(empty);
         }
         break;
@@ -87,7 +88,7 @@ HRGN CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect)
 {
     cairo_rectangle_int_t rc={nLeftRect,nTopRect,nRightRect-nLeftRect,nBottomRect-nTopRect};
     cairo_region_t *ret = cairo_region_create_rectangle(&rc);
-    return (HRGN)ret;
+    return InitGdiObj(go_rgn,ret);
 }
 
 HRGN CreateRectRgnIndirect(const RECT *lprc)
@@ -102,7 +103,7 @@ HRGN CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottom
 
 BOOL EqualRgn(HRGN hSrcRgn1, HRGN hSrcRgn2)
 {
-    return cairo_region_equal((cairo_region_t*)hSrcRgn1,(cairo_region_t*)hSrcRgn2);
+    return cairo_region_equal((cairo_region_t*)GetGdiObjPtr(hSrcRgn1),(cairo_region_t*)GetGdiObjPtr(hSrcRgn2));
 }
 
 HRGN ExtCreateRegion(const XFORM *lpXform, DWORD nCount, const RGNDATA *lpRgnData)
@@ -120,7 +121,7 @@ HRGN ExtCreateRegion(const XFORM *lpXform, DWORD nCount, const RGNDATA *lpRgnDat
         //todo: only translate is availble.
         cairo_region_translate(rgn,lpXform->eDx,lpXform->eDy);
     }
-    return (HRGN)rgn;
+    return InitGdiObj(go_rgn,rgn);
 }
 
 
@@ -136,12 +137,12 @@ static void ClipRegion(cairo_t * ctx, cairo_region_t* rgn){
 
 BOOL FillRgn(HDC hdc, HRGN hrgn, HBRUSH hbr)
 {
-    if(!hrgn)
+    if(!hrgn || GetGdiObjType(hrgn)!=go_rgn)
         return FALSE;
     cairo_t * ctx = (cairo_t*)hdc;
     cairo_save(ctx);
 
-    ClipRegion(ctx,(cairo_region_t *)hrgn);
+    ClipRegion(ctx,(cairo_region_t *)GetGdiObjPtr(hrgn));
     //todo:use hbrush color
     cairo_fill(ctx);
 
@@ -152,11 +153,11 @@ BOOL FillRgn(HDC hdc, HRGN hrgn, HBRUSH hbr)
 
 BOOL FrameRgn(HDC hdc, HRGN hrgn, HBRUSH hbr, int nWidth, int nHeight)
 {
-    if(!hrgn)
+    if(!hrgn || GetGdiObjType(hrgn)!=go_rgn)
         return FALSE;
     cairo_t * ctx = (cairo_t*)hdc;
     cairo_save(ctx);
-    ClipRegion(ctx,(cairo_region_t *)hrgn);
+    ClipRegion(ctx,(cairo_region_t *)GetGdiObjPtr(hrgn));
     //todo:use hbrush color
     cairo_stroke(ctx);
 
@@ -166,7 +167,7 @@ BOOL FrameRgn(HDC hdc, HRGN hrgn, HBRUSH hbr, int nWidth, int nHeight)
 
 DWORD GetRegionData(HRGN hrgn, DWORD dwCount, PRGNDATA lpRgnData)
 {
-    int nrc = cairo_region_num_rectangles((cairo_region_t*)hrgn);
+    int nrc = cairo_region_num_rectangles((cairo_region_t*)GetGdiObjPtr(hrgn));
     int nRet = sizeof(RECT)*nrc + sizeof(RGNDATAHEADER);
     if(!lpRgnData)
         return nRet;
@@ -175,7 +176,7 @@ DWORD GetRegionData(HRGN hrgn, DWORD dwCount, PRGNDATA lpRgnData)
     LPRECT prc = (LPRECT)lpRgnData->Buffer;
     for(int i=0;i<nrc;i++){
         cairo_rectangle_int_t rc ;
-        cairo_region_get_rectangle((cairo_region_t*)hrgn,i,&rc);
+        cairo_region_get_rectangle((cairo_region_t*)GetGdiObjPtr(hrgn),i,&rc);
         prc->left = rc.x;
         prc->top = rc.y;
         prc->right = rc.x + rc.width;
@@ -188,7 +189,7 @@ DWORD GetRegionData(HRGN hrgn, DWORD dwCount, PRGNDATA lpRgnData)
 int GetRgnBox(HRGN hrgn, LPRECT lprc)
 {
     cairo_rectangle_int_t rc ;
-    cairo_region_get_extents((cairo_region_t*)hrgn,&rc);
+    cairo_region_get_extents((cairo_region_t*)GetGdiObjPtr(hrgn),&rc);
     lprc->left = rc.x;
     lprc->top = rc.y;
     lprc->right = rc.x + rc.width;
@@ -203,7 +204,7 @@ BOOL InvertRgn(HDC hdc, HRGN hrgn)
     cairo_t * ctx = (cairo_t*)hdc;
     cairo_save(ctx);
 
-    ClipRegion(ctx,(cairo_region_t *)hrgn);
+    ClipRegion(ctx,(cairo_region_t *)GetGdiObjPtr(hrgn));
     //todo:
     //cairo_invert(ctx);
 
@@ -213,7 +214,7 @@ BOOL InvertRgn(HDC hdc, HRGN hrgn)
 
 int OffsetRgn(HRGN hrgn, int nXOffset, int nYOffset)
 {
-    cairo_region_translate((cairo_region_t*)hrgn,nXOffset,nYOffset);
+    cairo_region_translate((cairo_region_t*)GetGdiObjPtr(hrgn),nXOffset,nYOffset);
     return 1;
 }
 
@@ -224,7 +225,7 @@ BOOL PaintRgn(HDC hdc, HRGN hrgn)
     cairo_t * ctx = (cairo_t*)hdc;
     cairo_save(ctx);
 
-    ClipRegion(ctx,(cairo_region_t *)hrgn);
+    ClipRegion(ctx,(cairo_region_t *)GetGdiObjPtr(hrgn));
     cairo_fill(ctx);
 
     cairo_restore(ctx);
@@ -233,13 +234,13 @@ BOOL PaintRgn(HDC hdc, HRGN hrgn)
 
 BOOL PtInRegion(HRGN hrgn, int X, int Y)
 {
-    return cairo_region_contains_point((cairo_region_t*)hrgn,X,Y);
+    return cairo_region_contains_point((cairo_region_t*)GetGdiObjPtr(hrgn),X,Y);
 }
 
 BOOL RectInRegion(HRGN hrgn, const RECT *lprc)
 {
     cairo_rectangle_int_t rc={lprc->left,lprc->top,lprc->right-lprc->left,lprc->bottom-lprc->top};
-    return cairo_region_contains_rectangle((cairo_region_t*)hrgn,&rc);
+    return cairo_region_contains_rectangle((cairo_region_t*)GetGdiObjPtr(hrgn),&rc);
 }
 
 int SetPolyFillMode(HDC hdc, int iPolyFillMode)
@@ -250,11 +251,11 @@ int SetPolyFillMode(HDC hdc, int iPolyFillMode)
 BOOL SetRectRgn(HRGN hrgn, int left, int top, int right, int bottom)
 {
     cairo_region_t *tmp = cairo_region_create();
-    cairo_region_intersect((cairo_region_t*)hrgn,tmp);
+    cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgn),tmp);
     cairo_region_destroy(tmp);
     cairo_rectangle_int_t rc={left,top,right-left,bottom-top};
     tmp = cairo_region_create_rectangle(&rc);
-    cairo_region_union((cairo_region_t*)hrgn,tmp);
+    cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgn),tmp);
     cairo_region_destroy(tmp);
     return 0;
 }

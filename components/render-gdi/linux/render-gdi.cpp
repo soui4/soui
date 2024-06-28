@@ -358,7 +358,7 @@ namespace SOUI
 
     void SBitmap_GDI::UnlockPixelBits( LPVOID pBuf)
     {
-
+        MarkPixmapDirty(m_hBmp);
     }
 
     const LPVOID SBitmap_GDI::GetPixelBits() const

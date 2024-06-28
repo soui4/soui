@@ -1763,7 +1763,7 @@ namespace SOUI
 		BITMAP bm;
 		GetObject(m_hBmp,sizeof(bm),&bm);
 		memcpy(bm.bmBits,pBuf,Width()*Height()*4);
-		m_bitmap.setPixels(pBuf);
+		MarkPixmapDirty(m_hBmp);
 	}
 
 	const LPVOID SBitmap_Skia::GetPixelBits() const
