@@ -156,7 +156,7 @@ void SNativeWnd2::OnPaint(HDC hdc){
     cairo_show_text(cr,"hello, Soui");
 
     if(m_bmp){
-        cairo_set_source_surface(cr,(cairo_surface_t*)m_bmp->ptr,50,50);
+        cairo_set_source_surface(cr,(cairo_surface_t*)GetGdiObjPtr(m_bmp),50,50);
         cairo_paint(cr);
     }
     EndPaint(m_hWnd,&ps);

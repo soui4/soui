@@ -2,6 +2,25 @@
 #include <gdi.h>
 #include <cairo/cairo.h>
 
+typedef struct _GdiObj{
+    int type;
+    void *ptr;
+    _GdiObj(int _type,void * _ptr):type(_type),ptr(_ptr){
+
+    }
+}* HGDIOBJ;
+
+HGDIOBJ InitGdiObj(int type,void *ptr){
+    return new _GdiObj(type,ptr);
+}
+
+int GetGdiObjType(HGDIOBJ hgdiobj){
+    return hgdiobj->type;
+}
+void* GetGdiObjPtr(HGDIOBJ hgdiobj){
+    return hgdiobj->ptr;
+}
+
 HPEN ExtCreatePen(DWORD iPenStyle, DWORD cWidth, const LOGBRUSH *plbrush, DWORD cStyle, const DWORD *pstyle)
 {
     return 0;
@@ -12,7 +31,7 @@ int GetObject(HGDIOBJ h, int c, LPVOID pv)
     if(!h->ptr)
         return 0;
     switch(h->type){
-        case _GdiObj::go_dib:
+        case go_dib:
         if(c>=sizeof(BITMAP)){
             BITMAP * bm = (BITMAP*)pv;
             cairo_surface_t * pixmap = (cairo_surface_t*)h->ptr;
@@ -98,7 +117,7 @@ HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *lpbmi, UINT usage, VOID **pp
     if(ppvBits){
         *ppvBits = cairo_image_surface_get_data(ret);
     }
-    return new _GdiObj(_GdiObj::go_dib,ret);
+    return InitGdiObj(go_dib,ret);
 }
 
 BOOL   UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONST VOID*pjBits){
@@ -112,8 +131,14 @@ BOOL   UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONS
         memcpy(bm.bmBits,pjBits,hei*stride);
     else
         memset(bm.bmBits,0,hei*stride);
-    cairo_surface_mark_dirty((cairo_surface_t*)bmp->ptr);
+    MarkPixmapDirty(bmp);
     return TRUE;
+}
+
+void   MarkPixmapDirty(HBITMAP bmp){
+    if(bmp && bmp->type == go_dib){
+        cairo_surface_mark_dirty((cairo_surface_t*)bmp->ptr);
+    }
 }
 
 HDC CreateCompatibleDC(HDC hdc)
@@ -152,7 +177,7 @@ BOOL DeleteObject(HGDIOBJ hObj)
         return FALSE;
     switch (hObj->type)
     {
-    case _GdiObj::go_dib:
+    case go_dib:
         {
             cairo_surface_t* pixmap = (cairo_surface_t*)hObj->ptr;
             cairo_surface_destroy(pixmap);

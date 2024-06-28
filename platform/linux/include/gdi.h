@@ -1,21 +1,18 @@
 #ifndef _LINUX_GDI_H_
 #define _LINUX_GDI_H_
 
-typedef struct _GdiObj{
-    enum{
+typedef enum{
         go_pen=0,
         go_brush,
         go_dib,
         go_ddb,
         go_font,
         go_rgn,
-    };
-    int type;
-    void *ptr;
-    _GdiObj(int _type,void * _ptr):type(_type),ptr(_ptr){
+}GdiObjType;
 
-    }
-}* HGDIOBJ;
+HGDIOBJ InitGdiObj(int type,void *ptr);
+int GetGdiObjType(HGDIOBJ hgdiobj);
+void* GetGdiObjPtr(HGDIOBJ hgdiobj);
 
 typedef struct  _XFORM { 
 	FLOAT eM11; 
@@ -122,6 +119,8 @@ HBRUSH  WINAPI CreateDIBPatternBrushPt(  CONST VOID *lpPackedDIB,  UINT iUsage);
 HBRUSH  WINAPI CreateSolidBrush(  COLORREF color);
 HBITMAP WINAPI CreateDIBSection( HDC hdc,  CONST BITMAPINFO *lpbmi,  UINT usage,  VOID **ppvBits,  HANDLE hSection,  DWORD offset);
 BOOL    WINAPI UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONST VOID*pjBits);
+void    WINAPI MarkPixmapDirty(HBITMAP bmp);
+
 HDC     WINAPI CreateCompatibleDC(  HDC hdc);
 BOOL    WINAPI DeleteDC( HDC hdc);
 
