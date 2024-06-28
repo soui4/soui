@@ -684,7 +684,7 @@ namespace SOUI
 			UINT bufSize=0;
 			BYTE *pBuf=NULL;
 			lock->GetDataPointer(&bufSize,&pBuf);
-			hr = pFrame->CopyPixels(&rc2,stride,bufSize,pBuf);
+			memcpy(pBuf,pFrame->GetPixels(),nHei*stride);
 			lock->Release();
 			m_sz.cx = nWid;
 			m_sz.cy = nHei;

@@ -16,19 +16,18 @@ SNSBEGIN
     {
     public:
         SImgFrame_WIC(IWICBitmapSource *pFrame=NULL);
+        ~SImgFrame_WIC();
+        
         void SetWICBitmapSource(IWICBitmapSource *pFrame);
         void SetFrameDelay(int nDelay);
 
 		STDMETHOD_(BOOL,GetSize)(THIS_ UINT *pWid,UINT *pHei) OVERRIDE;
-		STDMETHOD_(BOOL,CopyPixels)(THIS_ 
-			/* [unique][in] */ const RECT *prc,
-			/* [in] */ UINT cbStride,
-			/* [in] */ UINT cbBufferSize,
-			/* [size_is][out] */ BYTE *pbBuffer) OVERRIDE;
 		STDMETHOD_(int,GetDelay)(THIS) OVERRIDE {return m_nFrameDelay;}
+    	STDMETHOD_(const VOID *,GetPixels)(CTHIS) SCONST OVERRIDE;
     protected:
-        SAutoRefPtr<IWICBitmapSource>  m_pFrame;
+        void    * m_pdata;      
         int     m_nFrameDelay;
+        SIZE    m_size;
     };
     
     class SImgX_WIC : public TObjRefImpl<IImgX>

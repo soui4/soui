@@ -1693,8 +1693,7 @@ namespace SOUI
 		m_bitmap.setPixels(pBits);
 
 		const int stride = m_bitmap.rowBytes();
-		pFrame->CopyPixels(NULL, stride, stride * uHei,
-			reinterpret_cast<BYTE*>(m_bitmap.getPixels()));
+		memcpy(m_bitmap.getPixels(),pFrame->GetPixels(),stride * uHei);
 		return S_OK;
 	}
 
@@ -1734,8 +1733,7 @@ namespace SOUI
 		m_bitmap.setPixels(pBits);
 
 		const int stride = m_bitmap.rowBytes();
-		pFrame->CopyPixels(NULL, stride, stride * uHei,
-			reinterpret_cast<BYTE*>(m_bitmap.getPixels()));
+		memcpy(m_bitmap.getPixels(),pFrame->GetPixels(),stride*uHei);
 		return S_OK;
 	}
 

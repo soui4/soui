@@ -12,53 +12,53 @@ namespace SOUI
 
     //////////////////////////////////////////////////////////////////////////
     // SRenderFactory_GDI
-    BOOL SRenderFactory_Cairo::CreateRenderTarget( IRenderTarget ** ppRenderTarget ,int nWid,int nHei)
+    BOOL SRenderFactory_Gdi::CreateRenderTarget( IRenderTarget ** ppRenderTarget ,int nWid,int nHei)
     {
         *ppRenderTarget = new SRenderTarget_GDI(this, nWid, nHei);
         return TRUE;
     }
 
-	BOOL SRenderFactory_Cairo::CreateRenderTarget2(THIS_ IRenderTarget ** ppRenderTarget,HWND hWnd)
+	BOOL SRenderFactory_Gdi::CreateRenderTarget2(THIS_ IRenderTarget ** ppRenderTarget,HWND hWnd)
 	{
 		RECT rc;
 		::GetClientRect(hWnd,&rc);
 		return CreateRenderTarget(ppRenderTarget,rc.right,rc.bottom);
 	}
 
-    BOOL SRenderFactory_Cairo::CreateFont( IFontS ** ppFont , const LOGFONT *lf)
+    BOOL SRenderFactory_Gdi::CreateFont( IFontS ** ppFont , const LOGFONT *lf)
     {
         *ppFont = new SFont_GDI(this,lf);
         return TRUE;
     }
 
-    BOOL SRenderFactory_Cairo::CreateBitmap( IBitmapS ** ppBitmap )
+    BOOL SRenderFactory_Gdi::CreateBitmap( IBitmapS ** ppBitmap )
     {
         *ppBitmap = new SBitmap_GDI(this);
         return TRUE;
     }
 
-    BOOL SRenderFactory_Cairo::CreateRegion( IRegionS **ppRgn )
+    BOOL SRenderFactory_Gdi::CreateRegion( IRegionS **ppRgn )
     {
         *ppRgn = new SRegion_GDI(this);
         return TRUE;
     }
 
-	BOOL SRenderFactory_Cairo::CreatePath(IPathS ** ppPath)
+	BOOL SRenderFactory_Gdi::CreatePath(IPathS ** ppPath)
 	{
 		return FALSE;
 	}
 
-	BOOL SRenderFactory_Cairo::CreatePathEffect(REFGUID guidEffect,IPathEffect ** ppPathEffect)
+	BOOL SRenderFactory_Gdi::CreatePathEffect(REFGUID guidEffect,IPathEffect ** ppPathEffect)
 	{
 		return FALSE;
 	}
 
-	void SRenderFactory_Cairo::SetImgDecoderFactory(IImgDecoderFactory *pImgDecoderFac)
+	void SRenderFactory_Gdi::SetImgDecoderFactory(IImgDecoderFactory *pImgDecoderFac)
 	{
 		m_imgDecoderFactory=pImgDecoderFac;
 	}
 
-	IImgDecoderFactory * SRenderFactory_Cairo::GetImgDecoderFactory()
+	IImgDecoderFactory * SRenderFactory_Gdi::GetImgDecoderFactory()
 	{
 		return m_imgDecoderFactory;
 	}
@@ -276,15 +276,8 @@ namespace SOUI
         m_hBmp = CreateGDIBitmap(nWid,nHei,&pBmpBits);
         if(m_hBmp)
         {
-            m_sz.cx=nWid,m_sz.cy=nHei;
-            const int stride = m_sz.cx*4;
-            if(pBits)
-            {
-                memcpy(pBmpBits,pBits,stride*m_sz.cy);
-            }else
-            {
-                memset(pBmpBits,0,stride*m_sz.cy);
-            }
+            if(UpdateDIBPixmap(m_hBmp,nWid,nHei,32,nWid*4,pBits))
+                m_sz.cx=nWid,m_sz.cy=nHei;
         }
         return m_hBmp?S_OK:E_OUTOFMEMORY;
     }
@@ -298,11 +291,8 @@ namespace SOUI
         void * pBits=NULL;
         m_hBmp = CreateGDIBitmap(nWid,nHei,&pBits);
         if(!m_hBmp) return E_OUTOFMEMORY;
-
-        m_sz.cx=nWid,m_sz.cy=nHei;
-        const int stride = m_sz.cx*4;
-        pFrame->CopyPixels(NULL, stride, stride * m_sz.cy,
-            reinterpret_cast<BYTE*>(pBits));
+        if(!UpdateDIBPixmap(m_hBmp,nWid,nHei,32,nWid*4,pFrame->GetPixels()))
+            m_sz.cx=nWid,m_sz.cy=nHei;
         return S_OK;
     }
 
@@ -339,8 +329,7 @@ namespace SOUI
 
         if(!m_hBmp) return E_OUTOFMEMORY;
         const int stride = m_sz.cx*4;
-        pFrame->CopyPixels(NULL, stride, stride * m_sz.cy,
-            reinterpret_cast<BYTE*>(pBits));
+        memcpy(pBits,pFrame->GetPixels(),stride * m_sz.cy);
 
         return S_OK;
     }
@@ -1417,7 +1406,7 @@ namespace SOUI
     {
         BOOL SCreateInstance(IObjRef ** ppRenderFactory)
         {
-            *ppRenderFactory = new SRenderFactory_Cairo;
+            *ppRenderFactory = new SRenderFactory_Gdi;
             return TRUE;
         }
     }

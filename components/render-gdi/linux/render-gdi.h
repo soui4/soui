@@ -15,14 +15,14 @@ SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 // SRenderFactory_GDI
-class SRenderFactory_Cairo : public TObjRefImpl<IRenderFactory>
+class SRenderFactory_Gdi : public TObjRefImpl<IRenderFactory>
 {
 public:
-	SRenderFactory_Cairo()
+	SRenderFactory_Gdi()
 	{
 	}
 
-	~SRenderFactory_Cairo()
+	~SRenderFactory_Gdi()
 	{
 	}
 

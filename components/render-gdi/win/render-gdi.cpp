@@ -303,8 +303,7 @@ namespace SOUI
 
         m_sz.cx=nWid,m_sz.cy=nHei;
         const int stride = m_sz.cx*4;
-        pFrame->CopyPixels(NULL, stride, stride * m_sz.cy,
-            reinterpret_cast<BYTE*>(pBits));
+        memcpy(pBits,pFrame->GetPixels(),stride * m_sz.cy);
         return S_OK;
     }
 
@@ -341,8 +340,7 @@ namespace SOUI
 
         if(!m_hBmp) return E_OUTOFMEMORY;
         const int stride = m_sz.cx*4;
-        pFrame->CopyPixels(NULL, stride, stride * m_sz.cy,
-            reinterpret_cast<BYTE*>(pBits));
+        memcpy(pBits,pFrame->GetPixels(),stride * m_sz.cy);
 
         return S_OK;
     }

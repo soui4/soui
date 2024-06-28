@@ -27,14 +27,9 @@ namespace SOUI
         return TRUE;
     }
 
-    BOOL SImgFrame_STB::CopyPixels( /* [unique][in] */ const RECT *prc, /* [in] */ UINT cbStride, /* [in] */ UINT cbBufferSize, /* [size_is][out] */ BYTE *pbBuffer )
-    {
-        if(cbBufferSize != m_nHei * m_nWid *4) return FALSE;
-        memcpy(pbBuffer,m_data,cbBufferSize);
-        return TRUE;
+    const VOID * SImgFrame_STB::GetPixels(CTHIS) SCONST{
+        return m_data;
     }
-
-    
     //////////////////////////////////////////////////////////////////////////
     // SImgX_STB
     int SImgX_STB::LoadFromMemory( void *pBuf,size_t bufLen )

@@ -121,7 +121,7 @@ HBRUSH  WINAPI CreateDIBPatternBrush(  HGLOBAL h,  UINT iUsage);
 HBRUSH  WINAPI CreateDIBPatternBrushPt(  CONST VOID *lpPackedDIB,  UINT iUsage);
 HBRUSH  WINAPI CreateSolidBrush(  COLORREF color);
 HBITMAP WINAPI CreateDIBSection( HDC hdc,  CONST BITMAPINFO *lpbmi,  UINT usage,  VOID **ppvBits,  HANDLE hSection,  DWORD offset);
-
+BOOL    WINAPI UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONST VOID*pjBits);
 HDC     WINAPI CreateCompatibleDC(  HDC hdc);
 BOOL    WINAPI DeleteDC( HDC hdc);
 

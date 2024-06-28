@@ -169,3 +169,17 @@ BOOL IsSuppotMaxMove()
     }
     return FALSE;
 }
+
+BOOL UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONST VOID*pjBits){
+    BITMAP bm={0};
+    GetObject(bmp,sizeof(bm),&bm);
+    if(!bm.bmBits)
+        return FALSE;
+    if(bm.bmWidth != wid || bm.bmHeight!=hei || bm.bmBitsPixel != bitsPixel)
+        return FALSE;
+    if(pjBits)
+        memcpy(bm.bmBits,pjBits,hei*stride);
+    else
+        memset(bm.bmBits,0,hei*stride);
+    return TRUE;
+}

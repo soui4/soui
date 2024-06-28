@@ -38,10 +38,9 @@ HBITMAP LoadPng(const char * path){
     bmi.bmiHeader.biBitCount = 32;
     bmi.bmiHeader.biWidth = wid;
     bmi.bmiHeader.biHeight = hei;
-    BYTE *bits=nullptr;
-    HBITMAP bmp = CreateDIBSection(0,&bmi,0,(void**)&bits,0,0);
+    HBITMAP bmp = CreateDIBSection(0,&bmi,0,NULL,0,0);
     if(bmp){
-        pFrame->CopyPixels(nullptr,0,wid*hei*4,bits);
+        UpdateDIBPixmap(bmp,wid,hei,32,wid*4,pFrame->GetPixels());
     }
     return bmp;
 }
@@ -157,13 +156,8 @@ void SNativeWnd2::OnPaint(HDC hdc){
     cairo_show_text(cr,"hello, Soui");
 
     if(m_bmp){
-        cairo_save(cr);
-        BITMAP bm;
-        GetObject(m_bmp,sizeof(bm),&bm);
-        cairo_translate(cr,0,0);
-        cairo_set_source_surface(cr,(cairo_surface_t*)m_bmp->ptr,0,0);
+        cairo_set_source_surface(cr,(cairo_surface_t*)m_bmp->ptr,50,50);
         cairo_paint(cr);
-        cairo_restore(cr);
     }
     EndPaint(m_hWnd,&ps);
 }

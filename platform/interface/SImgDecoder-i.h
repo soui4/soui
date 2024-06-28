@@ -38,23 +38,13 @@ DECLARE_INTERFACE(IImgFrame)
     STDMETHOD_(BOOL, GetSize)(THIS_ UINT * pWid, UINT * pHei) PURE;
 
     /**
-     * CopyPixels
-     * @brief    copy pixel data to the output buffer
-     * @param [in] const RECT * prc --  The rectangle to copy. A NULL value specifies the entire
-     * bitmap.
-     * @param [in] UINT cbStride --  The stride of the bitmap
-     * @param [in] UINT cbBufferSize --  The size of the buffer.
-     * @param [out] BYTE * pbBuffer --  A pointer to the buffer
-     * @return   BOOL  TRUE if successful, or FALSE otherwise.
+     * GetPixels
+     * @brief    get pixels buffer
+     * @return   const VOID *  pixels buffer ptr
      * Describe
      */
-    STDMETHOD_(BOOL, CopyPixels)
-    (THIS_
-     /* [unique][in] */ const RECT *prc,
-     /* [in] */ UINT cbStride,
-     /* [in] */ UINT cbBufferSize,
-     /* [size_is][out] */ BYTE *pbBuffer) PURE;
-
+    STDMETHOD_(const VOID *,GetPixels)(CTHIS) SCONST PURE;
+    
     /**
      * GetDelay
      * @brief    get delay for a frame of a gif image
