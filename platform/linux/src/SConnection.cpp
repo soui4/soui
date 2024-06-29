@@ -155,7 +155,9 @@ SConnection::~SConnection()
 
 
 bool SConnection::update(){
-    std::unique_lock<std::recursive_mutex> lock(m_mutex);
+    std::unique_lock<std::mutex> lock(m_mutex4Evt);
+    m_varCondition.wait(lock);
+
     for(auto it:m_evtQueue){
         pushEvent(it);
         free(it);
@@ -166,7 +168,7 @@ bool SConnection::update(){
 }
 
 BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
-    std::unique_lock<std::recursive_mutex> lock(m_mutex);
+    std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
     for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
         BOOL bMatch=TRUE;
         Msg *msg = (*it);
@@ -214,7 +216,7 @@ void triggerRedraw(xcb_connection_t* connection, xcb_window_t window) {
 
 void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
 {
-    std::unique_lock<std::recursive_mutex> lock(m_mutex);
+    std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
     Msg *pMsg = new Msg;
     pMsg->hwnd = hWnd;
     pMsg->message = message;
@@ -234,7 +236,7 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
     {
         xcb_expose_event_t* expose = (xcb_expose_event_t*)event;
         cairo_rectangle_int_t rc = {expose->x,expose->y,expose->width,expose->height};
-        std::unique_lock<std::recursive_mutex> lock(m_mutex);
+        std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
         for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
                 if((*it)->message == WM_PAINT && (*it)->hwnd == expose->window)
                 {
@@ -255,7 +257,7 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
     case XCB_CONFIGURE_NOTIFY:
     {
         xcb_configure_notify_event_t *e2 = (xcb_configure_notify_event_t*)event;
-        std::unique_lock<std::recursive_mutex> lock(m_mutex);
+        std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
         for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
                 if((*it)->message == WM_SIZE && (*it)->hwnd == e2->window)
                 {
@@ -300,7 +302,7 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
         break;
     }
     if(pMsg){
-        std::unique_lock<std::recursive_mutex> lock(m_mutex);
+        std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
         m_msgQueue.push_back(pMsg);
     }
     return ret;
@@ -321,18 +323,20 @@ void SConnection::_readProc()
             m_bQuit = true;
             break;
         }
-        m_mutex.lock();
-        m_evtQueue.push_back(event);
-        m_mutex.unlock();
+        {
+            std::unique_lock<std::mutex> lock(m_mutex4Evt);
+            m_evtQueue.push_back(event);
+            m_varCondition.notify_one();
+        }
     }
 
-    m_mutex.lock();
+    m_mutex4Evt.lock();
     for (auto it : m_evtQueue)
     {
         free(it);
     }
     m_evtQueue.clear();
-    m_mutex.unlock();
+    m_mutex4Evt.unlock();
 }
 
 SNSEND

@@ -12,7 +12,7 @@
 #include <mutex>
 #include <thread>
 #include <atomic>
-
+#include <condition_variable>
 
 #define STR_ATOM(atom_name,onlyExist) SOUI::SConnMgr::instance()->atom(atom_name,onlyExist)
 #define ID_ATOM(id,onlyExist) STR_ATOM(#id,onlyExist)
@@ -42,8 +42,11 @@ private:
     void _readProc();
 
 private:
-    std::recursive_mutex m_mutex;
+    std::condition_variable m_varCondition;
+    std::mutex m_mutex4Evt;
     std::list<xcb_generic_event_t*> m_evtQueue;
+
+    std::recursive_mutex m_mutex4Msg;
     std::list<Msg *> m_msgQueue;
     std::thread      m_trdEvtReader;
     std::atomic<bool> m_bQuit;
