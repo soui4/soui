@@ -80,7 +80,7 @@ HPEN CreatePenIndirect(const LOGPEN *plpen)
 HFONT CreateFontIndirect(const LOGFONT *lplf)
 {
     LOGFONT *plog = new LOGFONT;
-    memcpy(plog,&lplf,sizeof(LOGFONT));
+    memcpy(plog,lplf,sizeof(LOGFONT));
     return InitGdiObj(OBJ_FONT,plog);
 }
 
@@ -126,7 +126,7 @@ HBRUSH CreateSolidBrush(COLORREF color)
     LOGBRUSH *plog = new LOGBRUSH;
     plog->lbStyle = BS_SOLID;
     plog->lbColor = color;
-    return InitGdiObj(OBJ_BITMAP,plog);
+    return InitGdiObj(OBJ_BRUSH,plog);
 }
 
 HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *lpbmi, UINT usage, VOID **ppvBits, HANDLE hSection, DWORD offset)
@@ -334,6 +334,31 @@ int DrawText(HDC hdc, LPCSTR lpchText, int cchText, LPRECT lprc, UINT format)
     return 0;
 }
 
+
+BOOL  TextOut(HDC hdc, int x, int y, LPCSTR lpString, int c)
+{
+    ApplyFont(hdc);
+    CairoColor cr;
+    RGBA2CairoColor(hdc->crText,&cr);
+    cairo_set_source_rgba(hdc->cairo, cr.r,cr.g,cr.b,cr.a); 
+
+    cairo_text_extents_t ext2;
+    cairo_text_extents(hdc->cairo,"A",&ext2);
+    cairo_move_to(hdc->cairo,x,y-ext2.y_bearing);
+
+    if(c>0){
+        char *buf = (char*)malloc(c+1);
+        memcpy(buf,lpString,c);
+        buf[c]=0;
+        cairo_show_text(hdc->cairo,buf);
+        free(buf);
+    }else{
+        cairo_show_text(hdc->cairo,lpString);
+    }
+    return TRUE;
+}
+
+
 BOOL GetTextExtentPoint32(HDC hdc, LPCSTR lpString, int c, LPSIZE psizl)
 {
     ApplyFont(hdc);
@@ -347,12 +372,22 @@ BOOL GetTextExtentPoint32(HDC hdc, LPCSTR lpString, int c, LPSIZE psizl)
         cairo_text_extents(hdc->cairo,buf,&ext);
         free(buf);
     }
+    psizl->cx = ext.width;
+    psizl->cy = ext.height;
     return TRUE;
 }
 
 HGDIOBJ  GetStockObject(int i)
 {
     switch(i){
+        case NULL_BRUSH:
+        {
+            static LOGBRUSH log;
+            log.lbStyle=BS_NULL;
+            log.lbColor = RGBA(0,0,0,0);
+            static _GdiObj br(OBJ_BRUSH,&log);
+            return &br;
+        }
         case BLACK_BRUSH:{
             static LOGBRUSH log;
             log.lbStyle=BS_SOLID;
@@ -370,7 +405,7 @@ HGDIOBJ  GetStockObject(int i)
         case NULL_PEN:
         {
             static LOGPEN log;
-            log.lopnStyle=PS_SOLID;
+            log.lopnStyle=PS_NULL;
             log.lopnWidth = 0;
             static _GdiObj pen(OBJ_PEN,&log);
             return &pen;
@@ -408,7 +443,27 @@ HGDIOBJ  GetStockObject(int i)
 
 BOOL  Rectangle(HDC hdc, int left, int top, int right, int bottom)
 {
-    return 0;
+    cairo_save(hdc->cairo);
+    LOGBRUSH *br = (LOGBRUSH*)GetGdiObjPtr(hdc->brush);
+    if(br->lbStyle == BS_SOLID){
+        CairoColor cr;
+        RGBA2CairoColor(br->lbColor,&cr);
+        cairo_set_source_rgba(hdc->cairo,cr.r,cr.g,cr.b,cr.a);
+        cairo_rectangle(hdc->cairo,left,top,right-left,bottom-top);
+        cairo_fill(hdc->cairo);
+    }
+
+    LOGPEN * pen= (LOGPEN *)GetGdiObjPtr(hdc->pen);
+    if(pen->lopnStyle==PS_SOLID){
+        CairoColor cr;
+        RGBA2CairoColor(pen->lopnColor,&cr);
+        cairo_set_source_rgba(hdc->cairo,cr.r,cr.g,cr.b,cr.a);
+        cairo_set_line_width(hdc->cairo,pen->lopnWidth);
+        cairo_rectangle(hdc->cairo,left,top,right-left,bottom-top);
+        cairo_stroke(hdc->cairo);
+    }
+    cairo_restore(hdc->cairo);
+    return TRUE;
 }
 
 BOOL  RoundRect(HDC hdc, int left, int top, int right, int bottom, int width, int height)
@@ -424,24 +479,6 @@ BOOL  Polyline(HDC hdc, const POINT *apt, int cpt)
 BOOL  AlphaBlend(HDC hdcDest, int xoriginDest, int yoriginDest, int wDest, int hDest, HDC hdcSrc, int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, BLENDFUNCTION ftn)
 {
     return 0;
-}
-
-BOOL  TextOut(HDC hdc, int x, int y, LPCSTR lpString, int c)
-{
-    CairoColor cr;
-    RGBA2CairoColor(hdc->crText,&cr);
-    cairo_set_source_rgba(hdc->cairo, cr.r,cr.g,cr.b,cr.a); 
-    cairo_move_to(hdc->cairo,x,y);
-    if(c>0){
-        char *buf = (char*)malloc(c+1);
-        memcpy(buf,lpString,c);
-        buf[c]=0;
-        cairo_show_text(hdc->cairo,buf);
-        free(buf);
-    }else{
-        cairo_show_text(hdc->cairo,lpString);
-    }
-    return TRUE;
 }
 
 BOOL  SetViewportOrgEx(HDC hdc, int x, int y, LPPOINT lppt)

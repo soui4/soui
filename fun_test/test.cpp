@@ -151,9 +151,24 @@ void SNativeWnd2::OnPaint(HDC hdc){
     std::string str = "hello soui";
     SIZE sz={0};
     GetTextExtentPoint32(hdc,str.c_str(),str.length(),&sz);
+    HPEN pen = CreatePen(PS_SOLID,1,RGBA(0,0,255,255));
+    HPEN oldPen = SelectObject(hdc,pen);
+    HBRUSH br = CreateSolidBrush(RGBA(128,128,128,255));
+    HBRUSH oldBr = SelectObject(hdc,br);
+    Rectangle(hdc,10,10,10+sz.cx,10+sz.cy);
+
     TextOut(hdc,10,10,str.c_str(),-1);
-    
+
+    SelectObject(hdc,oldBr);
+    DeleteObject(br);
+
+    SelectObject(hdc,oldPen);
+    DeleteObject(pen);
+
     SelectObject(hdc,oldFont);
+    DeleteObject(hFont);
+
+    
     /*
     cairo_t *cr =(cairo_t*)hdc;
 
