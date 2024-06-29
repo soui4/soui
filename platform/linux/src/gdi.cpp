@@ -169,15 +169,11 @@ HDC CreateCompatibleDC(HDC hdc)
         //todo: get root window dc
         SConnection *conn = SConnMgr::instance()->getConnection();
         cairo_surface_t * surface = cairo_xcb_surface_create(conn->connection, conn->screen->root, xcb_aux_find_visual_by_id(conn->screen,conn->screen->root_visual), 10,10);
-        hdc = new _SDC;
-        hdc->hwnd = conn->screen->root;
-        hdc->bmp = InitGdiObj(OBJ_BITMAP,surface);
-        hdc->cairo = cairo_create(surface);
+        HBITMAP bmp = InitGdiObj(OBJ_BITMAP,surface);
+        hdc = new _SDC(conn->screen->root,bmp);
         return hdc;
     }else{
-        RECT rcWnd;
-        GetClientRect(hdc->hwnd,&rcWnd);
-        return CreateDC(hdc->hwnd,rcWnd.right,rcWnd.bottom);
+        return CreateDC(hdc->hwnd,0,0);
     }
 }
 
@@ -225,6 +221,16 @@ HGDIOBJ SelectObject(HDC hdc, HGDIOBJ h)
         {
             ret = hdc->hfont;
             hdc->hfont = h;
+            break;
+        }
+        case OBJ_BITMAP:
+        {
+            //recreate cairo_t object
+            assert(h != hdc->bmp);
+            ret = hdc->bmp;
+            cairo_destroy(hdc->cairo);
+            hdc->bmp = h;
+            hdc->cairo = cairo_create((cairo_surface_t*)GetGdiObjPtr(h));
             break;
         }
     }
@@ -326,6 +332,87 @@ static void ApplyFont(HDC hdc){
 
         cairo_set_font_size(hdc->cairo, lf->lfHeight);
     }
+}
+
+/*
+void draw_scaled_surface(cairo_t *cr, cairo_surface_t *surface, double x, double y, double width, double height) {
+    // 获取源表面的宽度和高度
+    double src_width = cairo_image_surface_get_width(surface);
+    double src_height = cairo_image_surface_get_height(surface);
+
+    // 计算缩放比例
+    double scale_x = width / src_width;
+    double scale_y = height / src_height;
+
+    // 保存当前的变换矩阵
+    cairo_save(cr);
+
+    // 移动到目标矩形的位置
+    cairo_translate(cr, x, y);
+
+    // 缩放变换矩阵
+    cairo_scale(cr, scale_x, scale_y);
+
+    // 设置源表面
+    cairo_set_source_surface(cr, surface, 0, 0);
+
+    // 绘制源表面
+    cairo_paint(cr);
+
+    // 恢复之前的变换矩阵
+    cairo_restore(cr);
+}
+*/
+
+// 检查矩阵是否是单位矩阵
+static int matrix_is_identity(const cairo_matrix_t *matrix) {
+    static cairo_matrix_t identity_matrix={
+        1.0,0.0,
+        0.0,1.0,
+        0.0,0.0
+    };
+    return matrix->xx == identity_matrix.xx &&
+            matrix->xy == identity_matrix.xy &&
+            matrix->yy == identity_matrix.yy &&
+            matrix->yx == identity_matrix.yx &&
+            matrix->x0 == identity_matrix.x0 &&
+            matrix->y0 == identity_matrix.y0;
+}
+
+BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop)
+{
+    assert(hdc && hdcSrc);
+    cairo_surface_t *src = (cairo_surface_t *)GetGdiObjPtr(hdcSrc->bmp);
+
+    double src_width = cairo_image_surface_get_width(src);
+    double src_height = cairo_image_surface_get_height(src);
+    cairo_matrix_t mtx;
+    cairo_get_matrix(hdc->cairo,&mtx);
+    if(!matrix_is_identity(&mtx))
+    {
+        if(mtx.xy!=0.0 || mtx.yx!=0.0)
+            return false;
+        double xSrc=x1,ySrc=y1;
+        cairo_matrix_transform_point(&mtx,&xSrc,&ySrc);
+        double x2 = x1+cx;
+        double y2 = y1+cy;
+        cairo_matrix_transform_point(&mtx,&x2,&y2);
+
+        x1= xSrc,y1=ySrc;
+        cx = x2-x1,cy=y2-y1;
+    }
+    RECT rcSrc={x1,y1,x1+cx,y1+cy};
+    RECT rcSurface={0,0,src_width,src_height};
+    IntersectRect(&rcSrc,&rcSrc,&rcSurface);
+
+    cairo_save(hdc->cairo);
+    cairo_translate(hdc->cairo,x,y);
+    cairo_set_source_surface(hdc->cairo,src,rcSrc.left,rcSrc.top);
+    //todo: apply rop
+
+    cairo_paint(hdc->cairo);
+    cairo_restore(hdc->cairo);
+    return TRUE;
 }
 
 int DrawText(HDC hdc, LPCSTR lpchText, int cchText, LPRECT lprc, UINT format)

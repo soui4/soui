@@ -168,33 +168,13 @@ void SNativeWnd2::OnPaint(HDC hdc){
     SelectObject(hdc,oldFont);
     DeleteObject(hFont);
 
-    
-    /*
-    cairo_t *cr =(cairo_t*)hdc;
+    //draw hbitmap
+    HDC memdc = CreateCompatibleDC(hdc);
+    HBITMAP oldBmp = SelectObject(memdc,m_bmp);
+    BitBlt(hdc,0,100,128,128,memdc,50,50,SRCCOPY);
+    SelectObject(memdc,oldBmp);
+    DeleteDC(memdc);
 
-    cairo_rectangle(cr,10,10,100,100);
-    cairo_rectangle(cr,100,100,200,200);
-    cairo_clip(cr);
-    cairo_set_source_rgb(cr, 1.0, 0.5, 0.0); // 设置绘图上下文的颜色
-    cairo_rectangle(cr, rcWnd.left, rcWnd.top, rcWnd.right-rcWnd.left, rcWnd.bottom-rcWnd.top); // 绘制矩形
-    cairo_fill(cr); // 填充矩形
-    
-    cairo_reset_clip(cr);
-
-    cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); 
-    cairo_select_font_face(cr, "Ani", CAIRO_FONT_SLANT_ITALIC, CAIRO_FONT_WEIGHT_NORMAL);
-    cairo_set_font_size(cr, 100.0);
-    cairo_text_extents_t ext;
-    cairo_text_extents(cr,"hello",&ext);
-    printf("hello extents=%d,%d\n",(int)ext.width,(int)ext.height);
-    cairo_move_to(cr,30,ext.height);
-    cairo_show_text(cr,"hello, Soui");
-
-    if(m_bmp){
-        cairo_set_source_surface(cr,(cairo_surface_t*)GetGdiObjPtr(m_bmp),50,50);
-        cairo_paint(cr);
-    }
-    */
     EndPaint(m_hWnd,&ps);
 }
 void SNativeWnd2::OnClose(){

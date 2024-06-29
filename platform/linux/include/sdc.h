@@ -13,15 +13,24 @@ typedef struct _SDC{
     HGDIOBJ   hfont;
     int       bkMode;
     int       nSave;
-    _SDC():cairo(nullptr),bmp(nullptr),nSave(0),crText(RGBA(0,0,0,0xff))
+    _SDC(HWND _hwnd,HBITMAP _bmp):hwnd(_hwnd),bmp(_bmp),nSave(0),crText(RGBA(0,0,0,0xff))
         ,pen(GetStockObject(BLACK_PEN))
         ,brush(GetStockObject(WHITE_BRUSH))
         ,hfont(GetStockObject(SYSTEM_FONT))
-        ,bkMode(0){}
+        ,bkMode(0){
+            if(bmp){
+                cairo = cairo_create((cairo_surface_t*)GetGdiObjPtr(bmp));
+            }else{
+                cairo = nullptr;
+            }
+        }
 
     ~_SDC(){
         if(cairo){
             cairo_destroy(cairo);
+        }
+        if(bmp){
+            DeleteObject(bmp);
         }
     }
 
