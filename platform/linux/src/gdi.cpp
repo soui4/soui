@@ -334,36 +334,6 @@ static void ApplyFont(HDC hdc){
     }
 }
 
-/*
-void draw_scaled_surface(cairo_t *cr, cairo_surface_t *surface, double x, double y, double width, double height) {
-    // 获取源表面的宽度和高度
-    double src_width = cairo_image_surface_get_width(surface);
-    double src_height = cairo_image_surface_get_height(surface);
-
-    // 计算缩放比例
-    double scale_x = width / src_width;
-    double scale_y = height / src_height;
-
-    // 保存当前的变换矩阵
-    cairo_save(cr);
-
-    // 移动到目标矩形的位置
-    cairo_translate(cr, x, y);
-
-    // 缩放变换矩阵
-    cairo_scale(cr, scale_x, scale_y);
-
-    // 设置源表面
-    cairo_set_source_surface(cr, surface, 0, 0);
-
-    // 绘制源表面
-    cairo_paint(cr);
-
-    // 恢复之前的变换矩阵
-    cairo_restore(cr);
-}
-*/
-
 // 检查矩阵是否是单位矩阵
 static int matrix_is_identity(const cairo_matrix_t *matrix) {
     static cairo_matrix_t identity_matrix={
@@ -377,6 +347,37 @@ static int matrix_is_identity(const cairo_matrix_t *matrix) {
             matrix->yx == identity_matrix.yx &&
             matrix->x0 == identity_matrix.x0 &&
             matrix->y0 == identity_matrix.y0;
+}
+
+
+BOOL  AlphaBlend(HDC hdc, int x, int y, int wDst, int hDst, HDC hdcSrc, int x2, int y2, int wSrc, int hSrc, BLENDFUNCTION ftn)
+{
+    assert(hdc && hdcSrc);
+    cairo_surface_t *src = (cairo_surface_t *)GetGdiObjPtr(hdcSrc->bmp);
+    
+    cairo_save(hdc->cairo);
+    cairo_rectangle(hdc->cairo,x,y,wDst,hDst);
+    cairo_clip(hdc->cairo);
+    
+    cairo_translate(hdc->cairo,x,y);
+    double scale_x = wDst*1.0/wSrc;
+    double scale_y = hDst*1.0/hSrc;
+    cairo_scale(hdc->cairo,scale_x,scale_y);
+
+    cairo_set_source_surface(hdc->cairo,src,-x2,-y2);
+
+    // cairo_pattern_t *pattern = cairo_pattern_create_for_surface(src);
+    // cairo_set_source(hdc->cairo,pattern);
+    // cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
+    // cairo_set_source_rgba(hdc->cairo,1.0,1.0,1.0,0.5);
+
+    cairo_rectangle(hdc->cairo,0,0,wDst/scale_x,hDst/scale_y);
+    cairo_fill(hdc->cairo);
+
+    // cairo_pattern_destroy(pattern);
+
+    cairo_restore(hdc->cairo);
+    return 0;
 }
 
 BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, DWORD rop)
@@ -411,7 +412,6 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
         break;
     }
     cairo_fill(hdc->cairo);
-    //todo: apply rop
     cairo_restore(hdc->cairo);
     return TRUE;
 }
@@ -562,11 +562,6 @@ BOOL  RoundRect(HDC hdc, int left, int top, int right, int bottom, int width, in
 }
 
 BOOL  Polyline(HDC hdc, const POINT *apt, int cpt)
-{
-    return 0;
-}
-
-BOOL  AlphaBlend(HDC hdcDest, int xoriginDest, int yoriginDest, int wDest, int hDest, HDC hdcSrc, int xoriginSrc, int yoriginSrc, int wSrc, int hSrc, BLENDFUNCTION ftn)
 {
     return 0;
 }

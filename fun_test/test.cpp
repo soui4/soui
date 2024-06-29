@@ -136,7 +136,7 @@ void SNativeWnd2::OnPaint(HDC hdc){
     hdc = BeginPaint(m_hWnd,&ps);
     RECT rcWnd;
     GetClientRect(&rcWnd);
-    HBRUSH hbr = CreateSolidBrush(RGBA(255,255,255,255));
+    HBRUSH hbr = CreateSolidBrush(RGBA(88,88,88,255));
     FillRect(hdc,&rcWnd,hbr);
     DeleteObject(hbr);
 
@@ -156,6 +156,7 @@ void SNativeWnd2::OnPaint(HDC hdc){
     HBRUSH br = CreateSolidBrush(RGBA(128,128,128,255));
     HBRUSH oldBr = SelectObject(hdc,br);
     Rectangle(hdc,10,10,10+sz.cx,10+sz.cy);
+    Rectangle(hdc,0,100,64,164);
 
     TextOut(hdc,10,10,str.c_str(),-1);
 
@@ -172,8 +173,10 @@ void SNativeWnd2::OnPaint(HDC hdc){
     HDC memdc = CreateCompatibleDC(hdc);
     HBITMAP oldBmp = SelectObject(memdc,m_bmp);
 
-    RECT rc2={100,100,100+64,100+64};
-    BitBlt(hdc,rc2.left,rc2.top,rc2.right-rc2.left,rc2.bottom-rc2.top,memdc,64,64,SRCCOPY);
+    RECT rc2={0,100,64,100+64};
+    //BitBlt(hdc,rc2.left,rc2.top,rc2.right-rc2.left,rc2.bottom-rc2.top,memdc,64,64,SRCCOPY);
+    BLENDFUNCTION bf;
+    AlphaBlend(hdc,100,100,128,128,memdc,0,0,64,64,bf);
     SelectObject(memdc,oldBmp);
     DeleteDC(memdc);
 
