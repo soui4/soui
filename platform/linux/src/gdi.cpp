@@ -353,23 +353,54 @@ BOOL GetTextExtentPoint32(HDC hdc, LPCSTR lpString, int c, LPSIZE psizl)
 HGDIOBJ  GetStockObject(int i)
 {
     switch(i){
-        case BLACK_BRUSH:
-        return CreateSolidBrush(RGBA(0,0,0,255));
-        case WHITE_BRUSH:
-        return CreateSolidBrush(RGBA(255,255,255,255));
+        case BLACK_BRUSH:{
+            static LOGBRUSH log;
+            log.lbStyle=BS_SOLID;
+            log.lbColor = RGBA(0,0,0,255);
+            static _GdiObj br(OBJ_BRUSH,&log);
+            return &br;
+        }
+        case WHITE_BRUSH:{
+            static LOGBRUSH log;
+            log.lbStyle=BS_SOLID;
+            log.lbColor = RGBA(255,255,255,255);
+            static _GdiObj br(OBJ_BRUSH,&log);
+            return &br;
+        }
         case NULL_PEN:
-        return CreatePen(PS_SOLID,0,0);
+        {
+            static LOGPEN log;
+            log.lopnStyle=PS_SOLID;
+            log.lopnWidth = 0;
+            static _GdiObj pen(OBJ_PEN,&log);
+            return &pen;
+        }
         case BLACK_PEN:
-        return CreatePen(PS_SOLID,1,RGBA(0,0,0,255));
+        {
+            static LOGPEN log;
+            log.lopnStyle=PS_SOLID;
+            log.lopnWidth = 1;
+            log.lopnColor = RGBA(0,0,0,255);
+            static _GdiObj pen(OBJ_PEN,&log);
+            return &pen;
+        }
         case WHITE_PEN:
-        return CreatePen(PS_SOLID,1,RGBA(255,255,255,255));
+        {
+            static LOGPEN log;
+            log.lopnStyle=PS_SOLID;
+            log.lopnWidth = 1;
+            log.lopnColor = RGBA(255,255,255,255);
+            static _GdiObj pen(OBJ_PEN,&log);
+            return &pen;
+        }
         case SYSTEM_FONT:
         {
-            LOGFONT lf={0};
+            static LOGFONT lf={0};
             strcpy(lf.lfFaceName,"Arial");
             lf.lfHeight=20;
             lf.lfWeight=400;
-            return CreateFontIndirect(&lf);
+            static _GdiObj font(OBJ_FONT,&lf);
+            return &font;
         }
     }
     return HGDIOBJ(0);

@@ -23,10 +23,6 @@ typedef struct _SDC{
         if(cairo){
             cairo_destroy(cairo);
         }
-        DeleteObject(pen);
-        DeleteObject(brush);
-        DeleteObject(bmp);
-        DeleteObject(hfont);
     }
 
     int SaveState(){
