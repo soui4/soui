@@ -384,33 +384,34 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
     assert(hdc && hdcSrc);
     cairo_surface_t *src = (cairo_surface_t *)GetGdiObjPtr(hdcSrc->bmp);
 
-    double src_width = cairo_image_surface_get_width(src);
-    double src_height = cairo_image_surface_get_height(src);
-    cairo_matrix_t mtx;
-    cairo_get_matrix(hdc->cairo,&mtx);
-    if(!matrix_is_identity(&mtx))
-    {
-        if(mtx.xy!=0.0 || mtx.yx!=0.0)
-            return false;
-        double xSrc=x1,ySrc=y1;
-        cairo_matrix_transform_point(&mtx,&xSrc,&ySrc);
-        double x2 = x1+cx;
-        double y2 = y1+cy;
-        cairo_matrix_transform_point(&mtx,&x2,&y2);
-
-        x1= xSrc,y1=ySrc;
-        cx = x2-x1,cy=y2-y1;
-    }
-    RECT rcSrc={x1,y1,x1+cx,y1+cy};
-    RECT rcSurface={0,0,src_width,src_height};
-    IntersectRect(&rcSrc,&rcSrc,&rcSurface);
-
     cairo_save(hdc->cairo);
-    cairo_translate(hdc->cairo,x,y);
-    cairo_set_source_surface(hdc->cairo,src,rcSrc.left,rcSrc.top);
+    cairo_rectangle(hdc->cairo,x,y,cx,cy);
+    cairo_clip(hdc->cairo);
+    cairo_rectangle(hdc->cairo,x,y,cx,cy);
+    switch(rop){
+        case SRCCOPY:
+        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
+        break;
+        case SRCINVERT:
+        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
+        break;
+        case SRCPAINT:
+        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
+        break;
+        case SRCAND:
+        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_DEST_IN);
+        break;
+        case DSTINVERT:
+        cairo_set_source_rgb(hdc->cairo,1.0,1.0,1.0);
+        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
+        break;
+    }
+    cairo_fill(hdc->cairo);
     //todo: apply rop
-
-    cairo_paint(hdc->cairo);
     cairo_restore(hdc->cairo);
     return TRUE;
 }
@@ -424,6 +425,7 @@ int DrawText(HDC hdc, LPCSTR lpchText, int cchText, LPRECT lprc, UINT format)
 
 BOOL  TextOut(HDC hdc, int x, int y, LPCSTR lpString, int c)
 {
+    cairo_save(hdc->cairo);
     ApplyFont(hdc);
     CairoColor cr;
     RGBA2CairoColor(hdc->crText,&cr);
@@ -442,6 +444,7 @@ BOOL  TextOut(HDC hdc, int x, int y, LPCSTR lpString, int c)
     }else{
         cairo_show_text(hdc->cairo,lpString);
     }
+    cairo_restore(hdc->cairo);
     return TRUE;
 }
 

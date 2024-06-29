@@ -171,7 +171,9 @@ void SNativeWnd2::OnPaint(HDC hdc){
     //draw hbitmap
     HDC memdc = CreateCompatibleDC(hdc);
     HBITMAP oldBmp = SelectObject(memdc,m_bmp);
-    BitBlt(hdc,0,100,128,128,memdc,50,50,SRCCOPY);
+
+    RECT rc2={100,100,100+64,100+64};
+    BitBlt(hdc,rc2.left,rc2.top,rc2.right-rc2.left,rc2.bottom-rc2.top,memdc,64,64,SRCCOPY);
     SelectObject(memdc,oldBmp);
     DeleteDC(memdc);
 
