@@ -3,6 +3,8 @@
 #include <cairo/cairo.h>
 #include <cairo/cairo-xcb.h>
 #include <xcb/xcb_aux.h>
+#include <math.h>
+
 #include "sdc.h"
 #include "SConnection.h"
 using namespace SOUI;
@@ -34,6 +36,107 @@ int GetGdiObjType(HGDIOBJ hgdiobj){
 }
 void* GetGdiObjPtr(HGDIOBJ hgdiobj){
     return hgdiobj->ptr;
+}
+
+
+static bool ApplyPen(cairo_t * ctx,HPEN hpen){
+    LOGPEN *pen = (LOGPEN*)GetGdiObjPtr(hpen);
+    if(pen->lopnStyle == PS_NULL)
+        return false;
+    cairo_set_line_width(ctx,pen->lopnWidth);
+    CairoColor cr;
+    RGBA2CairoColor(pen->lopnColor,&cr);
+    cairo_set_source_rgba(ctx,cr.r,cr.g,cr.b,cr.a);
+    switch(pen->lopnStyle & PS_STYLE_MASK){
+        case PS_DASH:
+        {
+            static double dashes_dash[] = {5.0, 5.0};
+            cairo_set_dash(ctx,dashes_dash,ARRAYSIZE(dashes_dash),0.0);
+        }
+        break;
+        case PS_DASHDOT:
+        {
+            static double dashes_dash[] = {5.0, 5.0, 1.0, 5.0};
+            cairo_set_dash(ctx,dashes_dash,ARRAYSIZE(dashes_dash),0.0);
+        }
+        case PS_DASHDOTDOT:
+        {
+            static double dashes_dash[] = {5.0, 5.0, 1.0, 5.0, 1.0, 5.0};
+            cairo_set_dash(ctx,dashes_dash,ARRAYSIZE(dashes_dash),0.0);
+        }
+        case PS_SOLID:
+        break;
+    }
+    switch(pen->lopnStyle & PS_ENDCAP_MASK){
+        case PS_ENDCAP_ROUND:
+        cairo_set_line_cap(ctx,CAIRO_LINE_CAP_ROUND);
+        break;
+        case PS_ENDCAP_SQUARE:
+        cairo_set_line_cap(ctx,CAIRO_LINE_CAP_SQUARE);
+        break;
+        case PS_ENDCAP_FLAT:
+        default:
+        cairo_set_line_cap(ctx,CAIRO_LINE_CAP_BUTT);
+        break;
+    }
+    switch(pen->lopnStyle & PS_JOIN_MASK){
+        case PS_JOIN_ROUND:
+        cairo_set_line_join(ctx,CAIRO_LINE_JOIN_ROUND);
+        break;
+        case PS_JOIN_BEVEL:
+        cairo_set_line_join(ctx,CAIRO_LINE_JOIN_BEVEL);
+        break;
+        case PS_JOIN_MITER:
+        default:
+        cairo_set_line_join(ctx,CAIRO_LINE_JOIN_MITER);
+        break;
+    }
+    return true;
+}
+
+static bool ApplyBrush(cairo_t * ctx,HBRUSH hbr){
+    LOGBRUSH *br = (LOGBRUSH*)GetGdiObjPtr(hbr);
+    if(br->lbStyle == BS_NULL)
+        return false;
+    switch(br->lbStyle){
+        case BS_SOLID:
+        {
+            CairoColor cr;
+            RGBA2CairoColor(br->lbColor,&cr);
+            cairo_set_source_rgba(ctx,cr.r,cr.g,cr.b,cr.a);
+        }
+        break;
+        case BS_PATTERN:
+        {
+            cairo_pattern_t *pattern = (cairo_pattern_t*)br->lbHatch;
+            cairo_set_source(ctx,pattern);
+            break;
+        }
+    }
+    return true;
+}
+
+static void ApplyFont(HDC hdc){
+    if(hdc->hfont){
+        LOGFONT *lf = (LOGFONT*)GetGdiObjPtr(hdc->hfont);
+        cairo_select_font_face(hdc->cairo, lf->lfFaceName, 
+            lf->lfItalic?CAIRO_FONT_SLANT_ITALIC:CAIRO_FONT_SLANT_NORMAL, 
+            lf->lfWeight>400?CAIRO_FONT_WEIGHT_BOLD:CAIRO_FONT_WEIGHT_NORMAL);
+
+        cairo_set_font_size(hdc->cairo, lf->lfHeight);
+    }
+}
+
+
+static void ApplyRegion(cairo_t * ctx, HRGN hRgn){
+    cairo_region_t* rgn = (cairo_region_t* )GetGdiObjPtr(hRgn);
+    int nrc = cairo_region_num_rectangles(rgn);
+    for(int i=0;i<nrc;i++){
+        cairo_rectangle_int_t rc ;
+        cairo_region_get_rectangle(rgn,i,&rc);
+        cairo_rectangle(ctx,rc.x,rc.y,rc.width,rc.height);
+    }
+    cairo_clip(ctx);
 }
 
 HPEN ExtCreatePen(DWORD iPenStyle, DWORD cWidth, const LOGBRUSH *plbrush, DWORD cStyle, const DWORD *pstyle)
@@ -250,7 +353,8 @@ BOOL DeleteObject(HGDIOBJ hObj)
         break;
     case OBJ_REGION:
     {
-        cairo_region_destroy((cairo_region_t*)hObj->ptr);
+        if(hObj->ptr) 
+            cairo_region_destroy((cairo_region_t*)hObj->ptr);
     }
         break;
     case OBJ_PEN:
@@ -281,27 +385,37 @@ BOOL RestoreDC(HDC hdc, int nSavedDC)
 
 int SelectClipRgn(HDC hdc, HRGN hrgn)
 {
-    return 0;
+    HRGN old = hdc->rgn;
+    hdc->rgn = hrgn;
+    DeleteObject(old);
+    return RgnComplexity(hrgn);
 }
 
 int ExtSelectClipRgn(HDC hdc, HRGN hrgn, int mode)
 {
-    return 0;
+    return CombineRgn(hdc->rgn,hdc->rgn,hrgn,mode);
 }
 
 int ExcludeClipRect(HDC hdc, int left, int top, int right, int bottom)
 {
-    return 0;
+    HRGN hrgn = CreateRectRgn(left,top,right,bottom);
+    int ret = CombineRgn(hdc->rgn,hdc->rgn,hrgn,RGN_DIFF);
+    DeleteObject(hrgn);
+    return ret;
 }
 
 int IntersectClipRect(HDC hdc, int left, int top, int right, int bottom)
 {
-    return 0;
+    HRGN hrgn = CreateRectRgn(left,top,right,bottom);
+    int ret = CombineRgn(hdc->rgn,hdc->rgn,hrgn,RGN_AND);
+    DeleteObject(hrgn);
+    return ret;
 }
 
 int  GetClipRgn(HDC hdc, HRGN hrgn)
 {
-    return 0;
+    CombineRgn(hrgn,hdc->rgn,nullptr,RGN_COPY);
+    return RgnComplexity(hrgn) == NULLREGION?0:1;
 }
 
 HGDIOBJ  GetCurrentObject(HDC hdc, UINT type)
@@ -313,7 +427,8 @@ HGDIOBJ  GetCurrentObject(HDC hdc, UINT type)
         return hdc->brush;
         case OBJ_BITMAP:
         return hdc->bmp;
-        break;
+        case OBJ_FONT:
+        return hdc->hfont;
     }
     return HGDIOBJ(0);
 }
@@ -321,17 +436,6 @@ HGDIOBJ  GetCurrentObject(HDC hdc, UINT type)
 int  GetDIBits(HDC hdc, HBITMAP hbm, UINT start, UINT cLines, LPVOID lpvBits, LPBITMAPINFO lpbmi, UINT usage)
 {
     return 0;
-}
-
-static void ApplyFont(HDC hdc){
-    if(hdc->hfont){
-        LOGFONT *lf = (LOGFONT*)GetGdiObjPtr(hdc->hfont);
-        cairo_select_font_face(hdc->cairo, lf->lfFaceName, 
-            lf->lfItalic?CAIRO_FONT_SLANT_ITALIC:CAIRO_FONT_SLANT_NORMAL, 
-            lf->lfWeight>400?CAIRO_FONT_WEIGHT_BOLD:CAIRO_FONT_WEIGHT_NORMAL);
-
-        cairo_set_font_size(hdc->cairo, lf->lfHeight);
-    }
 }
 
 // 检查矩阵是否是单位矩阵
@@ -350,6 +454,74 @@ static int matrix_is_identity(const cairo_matrix_t *matrix) {
 }
 
 
+BOOL InvertRgn(HDC hdc, HRGN hrgn)
+{
+    if(!hrgn)
+        return FALSE;
+    cairo_t * ctx = hdc->cairo;
+    cairo_save(ctx);
+    ApplyRegion(ctx,hrgn);
+    RECT rc;
+    GetRgnBox(hrgn,&rc);
+    cairo_set_source_rgb(ctx,1.0,1.0,1.0);
+    cairo_set_operator(ctx,CAIRO_OPERATOR_XOR);
+    cairo_rectangle(ctx,rc.left,rc.top,rc.right-rc.left,rc.bottom-rc.top);
+    cairo_fill(ctx);
+
+    cairo_restore(ctx);
+    return TRUE;
+}
+
+int GetClipBox(HDC hdc, LPRECT lprect)
+{
+    return GetRgnBox(hdc->rgn,lprect);
+}
+
+
+BOOL FillRgn(HDC hdc, HRGN hrgn, HBRUSH hbr)
+{
+    if(!hrgn || GetGdiObjType(hrgn)!=OBJ_REGION)
+        return FALSE;
+    cairo_t * ctx = (cairo_t*)hdc;
+    cairo_save(ctx);
+    ApplyRegion(ctx,hrgn);
+    RECT rc;
+    GetRgnBox(hrgn,&rc);
+    cairo_rectangle(ctx,rc.left,rc.top,rc.right-rc.left,rc.bottom-rc.top);
+    ApplyBrush(ctx,hbr);
+    cairo_fill(ctx);
+    cairo_restore(ctx);
+    return TRUE;
+}
+
+
+BOOL FrameRgn(HDC hdc, HRGN hrgn, HBRUSH hbr, int nWidth, int nHeight)
+{
+    if(!hrgn || GetGdiObjType(hrgn)!=OBJ_REGION)
+        return FALSE;
+    cairo_t * ctx = (cairo_t*)hdc;
+    cairo_save(ctx);
+    ApplyRegion(ctx,hrgn);
+    ApplyPen(ctx,hdc->pen);
+    cairo_stroke(ctx);
+    cairo_restore(ctx);
+    return TRUE;
+}
+
+
+BOOL PaintRgn(HDC hdc, HRGN hrgn)
+{
+    if(!hrgn)
+        return FALSE;
+    cairo_t * ctx = (cairo_t*)hdc;
+    cairo_save(ctx);
+    ApplyBrush(ctx,hdc->brush);
+    ApplyRegion(ctx,hrgn);
+    cairo_paint(ctx);
+    cairo_restore(ctx);
+    return TRUE;
+}
+
 BOOL  AlphaBlend(HDC hdc, int x, int y, int wDst, int hDst, HDC hdcSrc, int x2, int y2, int wSrc, int hSrc, BLENDFUNCTION ftn)
 {
     assert(hdc && hdcSrc);
@@ -365,6 +537,8 @@ BOOL  AlphaBlend(HDC hdc, int x, int y, int wDst, int hDst, HDC hdcSrc, int x2, 
     cairo_scale(hdc->cairo,scale_x,scale_y);
 
     cairo_set_source_surface(hdc->cairo,src,-x2,-y2);
+
+    //todo: draw alpha
 
     // cairo_pattern_t *pattern = cairo_pattern_create_for_surface(src);
     // cairo_set_source(hdc->cairo,pattern);
@@ -556,24 +730,77 @@ BOOL  Rectangle(HDC hdc, int left, int top, int right, int bottom)
     return TRUE;
 }
 
+void drawRoundRect(cairo_t* cr, double x, double y, double width, double height, double rx, double ry) {
+    double degrees = M_PI / 180.0;
+
+    double kappa = 0.5522848;
+    double ox = (width / 2) * kappa;
+    double oy = (height / 2) * kappa;
+    double xe = x + width;
+    double ye = y + height;
+    double xm = x + width / 2;
+    double ym = y + height / 2;
+
+    cairo_new_sub_path(cr);
+    cairo_move_to(cr, x, ym);
+    cairo_curve_to(cr, x, ym - ry * oy, xm - rx * ox, y, xm, y);
+    cairo_curve_to(cr, xm + rx * ox, y, xe, ym - ry * oy, xe, ym);
+    cairo_curve_to(cr, xe, ym + ry * oy, xm + rx * ox, ye, xm, ye);
+    cairo_curve_to(cr, xm - rx * ox, ye, x, ym + ry * oy, x, ym);
+    cairo_close_path(cr);
+}
+
 BOOL  RoundRect(HDC hdc, int left, int top, int right, int bottom, int width, int height)
 {
-    return 0;
+    cairo_t *ctx = hdc->cairo;
+    cairo_save(ctx);
+    drawRoundRect(ctx, left, top, right-left, bottom-top, width,height);
+    if(ApplyBrush(ctx,hdc->brush)){
+        cairo_fill(ctx);
+    }
+    if(ApplyPen(ctx,hdc->pen))
+    {
+        cairo_stroke(ctx);
+    }
+    cairo_restore(ctx);
+    return TRUE;
 }
 
 BOOL  Polyline(HDC hdc, const POINT *apt, int cpt)
 {
+    cairo_t *ctx = hdc->cairo;
+    cairo_save(ctx);
+    ApplyPen(ctx,hdc->pen);
+
+    for(int i=0;i<cpt-1;i++){
+        cairo_move_to(ctx,apt[i].x,apt[i].y);
+        cairo_line_to(ctx,apt[i+1].x,apt[i+1].y);
+    }
+    cairo_restore(ctx);
     return 0;
 }
 
 BOOL  SetViewportOrgEx(HDC hdc, int x, int y, LPPOINT lppt)
 {
-    return 0;
+    cairo_matrix_t mtx;
+    cairo_get_matrix(hdc->cairo,&mtx);
+    lppt->x = (int)floor(mtx.x0);
+    lppt->y = (int)floor(mtx.y0);
+    mtx.x0=x;
+    mtx.y0=y;
+    cairo_set_matrix(hdc->cairo,&mtx);
+    return TRUE;
 }
 
 BOOL  OffsetViewportOrgEx(HDC hdc, int x, int y, LPPOINT lppt)
 {
-    return 0;
+    cairo_matrix_t mtx;
+    cairo_get_matrix(hdc->cairo,&mtx);
+    lppt->x = (int)floor(mtx.x0);
+    lppt->y = (int)floor(mtx.y0);
+
+    cairo_translate(hdc->cairo,x,y);
+    return TRUE;
 }
 
 int  FillRect(HDC hdc, const RECT *lprc, HBRUSH hbr)
@@ -614,12 +841,28 @@ BOOL  Arc(HDC hdc, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y
 
 BOOL  GetWorldTransform(HDC hdc, LPXFORM lpxf)
 {
-    return 0;
+    cairo_matrix_t mtx;
+    cairo_get_matrix(hdc->cairo,&mtx);
+    lpxf->eM11 = mtx.xx;
+    lpxf->eM12 = mtx.xy;
+    lpxf->eM21 = mtx.yy;
+    lpxf->eM22 = mtx.yx;
+    lpxf->eDx = mtx.x0;
+    lpxf->eDy = mtx.y0;
+    return TRUE;
 }
 
 BOOL  SetWorldTransform(HDC hdc, const XFORM *lpxf)
 {
-    return 0;
+    cairo_matrix_t mtx;
+    mtx.xx =lpxf->eM11; 
+    mtx.xy =lpxf->eM12;
+    mtx.yy =lpxf->eM21;
+    mtx.yx =lpxf->eM22;
+    mtx.x0 =lpxf->eDx ;
+    mtx.y0 =lpxf->eDy ;
+    cairo_set_matrix(hdc->cairo,&mtx);
+    return TRUE;
 }
 
 int  SetROP2(HDC hdc, int rop2)

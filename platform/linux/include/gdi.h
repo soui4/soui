@@ -148,8 +148,31 @@ int   WINAPI SetGraphicsMode( HDC hdc,  int iMode);
  int  WINAPI IntersectClipRect(  HDC hdc,  int left,  int top,  int right,  int bottom);
  BOOL WINAPI RestoreDC( HDC hdc,  int nSavedDC);
 
+ BOOL WINAPI InvertRgn(
+			   HDC hdc,    // handle to device context
+			   HRGN hrgn   // handle to region to be inverted
+			   );
  int   WINAPI GetClipBox(  HDC hdc,   LPRECT lprect);
  int   WINAPI GetClipRgn(  HDC hdc,  HRGN hrgn);
+
+ BOOL WINAPI FillRgn(
+			 HDC hdc,    // handle to device context
+			 HRGN hrgn,  // handle to region to be filled
+			 HBRUSH hbr  // handle to brush used to fill the region
+			 );
+
+BOOL WINAPI PaintRgn(  HDC hdc,    // handle to device context
+			  HRGN hrgn   // handle to region to be painted
+			  );
+              
+BOOL WINAPI FrameRgn(
+			  HDC hdc,     // handle to device context
+			  HRGN hrgn,   // handle to region to be framed
+			  HBRUSH hbr,  // handle to brush used to draw border
+			  int nWidth,  // width of region frame
+			  int nHeight  // height of region frame
+			  );
+
  HGDIOBJ WINAPI GetCurrentObject(  HDC hdc,  UINT type);
  int   WINAPI GetDIBits(  HDC hdc,  HBITMAP hbm,  UINT start,  UINT cLines,   LPVOID lpvBits, LPBITMAPINFO lpbmi,  UINT usage);  // SAL actual size of lpbmi is computed from structure elements
 

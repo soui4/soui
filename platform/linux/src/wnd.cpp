@@ -289,11 +289,6 @@ BOOL ScreenToClient(HWND hWnd, LPPOINT ppt)
     return 0;
 }
 
-BOOL GetClipBox(HDC hdc, RECT *pRc)
-{
-    return 0;
-}
-
 HMONITOR
 MonitorFromWindow(HWND hwnd, DWORD dwFlags)
 {

@@ -5,6 +5,8 @@
 #define CONST const
 #endif
 
+int RgnComplexity(HRGN hRgn);
+
 int CombineRgn(
    HRGN hrgnDst,
    HRGN hrgnSrc1,
@@ -67,19 +69,6 @@ HRGN ExtCreateRegion(
 					 CONST RGNDATA *lpRgnData  // region data buffer
 					 );
 
-BOOL FillRgn(
-			 HDC hdc,    // handle to device context
-			 HRGN hrgn,  // handle to region to be filled
-			 HBRUSH hbr  // handle to brush used to fill the region
-			 );
-
-BOOL FrameRgn(
-			  HDC hdc,     // handle to device context
-			  HRGN hrgn,   // handle to region to be framed
-			  HBRUSH hbr,  // handle to brush used to draw border
-			  int nWidth,  // width of region frame
-			  int nHeight  // height of region frame
-			  );
 
 DWORD GetRegionData(
 					HRGN hRgn,            // handle to region
@@ -99,18 +88,10 @@ int GetRgnBox(
 			  LPRECT lprc  // bounding rectangle
 			  );
 
-BOOL InvertRgn(
-			   HDC hdc,    // handle to device context
-			   HRGN hrgn   // handle to region to be inverted
-			   );
 
 int OffsetRgn(  HRGN hrgn,     // handle to region
 			  int nXOffset,  // offset along x-axis  
 			  int nYOffset   // offset along y-axis
-			  );
-
-BOOL PaintRgn(  HDC hdc,    // handle to device context
-			  HRGN hrgn   // handle to region to be painted
 			  );
 
 BOOL PtInRegion(  HRGN hrgn,  // handle to region

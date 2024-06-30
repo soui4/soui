@@ -3,7 +3,7 @@
 #include "region.h"
 #include "gdi.h"
 
-int GetRegionComplexity(HRGN hRgn){
+int RgnComplexity(HRGN hRgn){
     if(!hRgn)
         return ERROR;
     if(cairo_region_is_empty((cairo_region_t*)GetGdiObjPtr(hRgn)))
@@ -66,7 +66,7 @@ int CombineRgn(HRGN hrgnDst, HRGN hrgnSrc1, HRGN hrgnSrc2, int iMode)
         }
         break;
     }
-    return GetRegionComplexity(hrgnDst);
+    return RgnComplexity(hrgnDst);
 }
 
 HRGN CreateEllipticRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect)
@@ -124,47 +124,6 @@ HRGN ExtCreateRegion(const XFORM *lpXform, DWORD nCount, const RGNDATA *lpRgnDat
     return InitGdiObj(OBJ_REGION,rgn);
 }
 
-
-static void ClipRegion(cairo_t * ctx, cairo_region_t* rgn){
-    int nrc = cairo_region_num_rectangles(rgn);
-    for(int i=0;i<nrc;i++){
-        cairo_rectangle_int_t rc ;
-        cairo_region_get_rectangle(rgn,i,&rc);
-        cairo_rectangle(ctx,rc.x,rc.y,rc.width,rc.height);
-    }
-    cairo_clip(ctx);
-}
-
-BOOL FillRgn(HDC hdc, HRGN hrgn, HBRUSH hbr)
-{
-    if(!hrgn || GetGdiObjType(hrgn)!=OBJ_REGION)
-        return FALSE;
-    cairo_t * ctx = (cairo_t*)hdc;
-    cairo_save(ctx);
-
-    ClipRegion(ctx,(cairo_region_t *)GetGdiObjPtr(hrgn));
-    //todo:use hbrush color
-    cairo_fill(ctx);
-
-    cairo_restore(ctx);
-    return TRUE;
-}
-
-
-BOOL FrameRgn(HDC hdc, HRGN hrgn, HBRUSH hbr, int nWidth, int nHeight)
-{
-    if(!hrgn || GetGdiObjType(hrgn)!=OBJ_REGION)
-        return FALSE;
-    cairo_t * ctx = (cairo_t*)hdc;
-    cairo_save(ctx);
-    ClipRegion(ctx,(cairo_region_t *)GetGdiObjPtr(hrgn));
-    //todo:use hbrush color
-    cairo_stroke(ctx);
-
-    cairo_restore(ctx);
-    return TRUE;
-}
-
 DWORD GetRegionData(HRGN hrgn, DWORD dwCount, PRGNDATA lpRgnData)
 {
     int nrc = cairo_region_num_rectangles((cairo_region_t*)GetGdiObjPtr(hrgn));
@@ -194,42 +153,13 @@ int GetRgnBox(HRGN hrgn, LPRECT lprc)
     lprc->top = rc.y;
     lprc->right = rc.x + rc.width;
     lprc->bottom = rc.y + rc.height;
-    return GetRegionComplexity(hrgn);
-}
-
-BOOL InvertRgn(HDC hdc, HRGN hrgn)
-{
-    if(!hrgn)
-        return FALSE;
-    cairo_t * ctx = (cairo_t*)hdc;
-    cairo_save(ctx);
-
-    ClipRegion(ctx,(cairo_region_t *)GetGdiObjPtr(hrgn));
-    //todo:
-    //cairo_invert(ctx);
-
-    cairo_restore(ctx);
-    return TRUE;
+    return RgnComplexity(hrgn);
 }
 
 int OffsetRgn(HRGN hrgn, int nXOffset, int nYOffset)
 {
     cairo_region_translate((cairo_region_t*)GetGdiObjPtr(hrgn),nXOffset,nYOffset);
     return 1;
-}
-
-BOOL PaintRgn(HDC hdc, HRGN hrgn)
-{
-    if(!hrgn)
-        return FALSE;
-    cairo_t * ctx = (cairo_t*)hdc;
-    cairo_save(ctx);
-
-    ClipRegion(ctx,(cairo_region_t *)GetGdiObjPtr(hrgn));
-    cairo_fill(ctx);
-
-    cairo_restore(ctx);
-    return TRUE;
 }
 
 BOOL PtInRegion(HRGN hrgn, int X, int Y)

@@ -2,6 +2,7 @@
 #define _SDC_H_
 #include <platform.h>
 #include <cairo/cairo.h>
+#include <region.h>
 
 typedef struct _SDC{
     HWND      hwnd;
@@ -11,6 +12,8 @@ typedef struct _SDC{
     HGDIOBJ   pen;
     HGDIOBJ   brush;
     HGDIOBJ   hfont;
+    HGDIOBJ   rgn;
+
     int       bkMode;
     int       nSave;
     _SDC(HWND _hwnd,HBITMAP _bmp):hwnd(_hwnd),bmp(_bmp),nSave(0),crText(RGBA(0,0,0,0xff))
@@ -23,6 +26,9 @@ typedef struct _SDC{
             }else{
                 cairo = nullptr;
             }
+            RECT rcWnd={0};
+            GetClientRect(hwnd,&rcWnd);
+            rgn = InitGdiObj(OBJ_REGION,CreateRectRgnIndirect(&rcWnd));
         }
 
     ~_SDC(){
@@ -32,6 +38,7 @@ typedef struct _SDC{
         if(bmp){
             DeleteObject(bmp);
         }
+        DeleteObject(rgn);
     }
 
     int SaveState(){
