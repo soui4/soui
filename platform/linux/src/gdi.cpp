@@ -482,7 +482,7 @@ BOOL FillRgn(HDC hdc, HRGN hrgn, HBRUSH hbr)
 {
     if(!hrgn || GetGdiObjType(hrgn)!=OBJ_REGION)
         return FALSE;
-    cairo_t * ctx = (cairo_t*)hdc;
+    cairo_t * ctx = hdc->cairo;
     cairo_save(ctx);
     ApplyRegion(ctx,hrgn);
     RECT rc;
@@ -499,7 +499,7 @@ BOOL FrameRgn(HDC hdc, HRGN hrgn, HBRUSH hbr, int nWidth, int nHeight)
 {
     if(!hrgn || GetGdiObjType(hrgn)!=OBJ_REGION)
         return FALSE;
-    cairo_t * ctx = (cairo_t*)hdc;
+    cairo_t * ctx = hdc->cairo;
     cairo_save(ctx);
     ApplyRegion(ctx,hrgn);
     ApplyPen(ctx,hdc->pen);
@@ -513,7 +513,7 @@ BOOL PaintRgn(HDC hdc, HRGN hrgn)
 {
     if(!hrgn)
         return FALSE;
-    cairo_t * ctx = (cairo_t*)hdc;
+    cairo_t * ctx = hdc->cairo;
     cairo_save(ctx);
     ApplyBrush(ctx,hdc->brush);
     ApplyRegion(ctx,hrgn);
@@ -590,10 +590,282 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
     return TRUE;
 }
 
-int DrawText(HDC hdc, LPCSTR lpchText, int cchText, LPRECT lprc, UINT format)
+
+static bool IsAlpha(TCHAR c)
 {
-    //todo:hjx
-    return 0;
+    return (c >= 'a' && c <= 'z') || (c >= 'A' && c <= 'Z') || c == '_';
+}
+
+static bool IsNumber(TCHAR c)
+{
+    return c >= '0' && c <= '9';
+}
+
+static bool IsHex(TCHAR c)
+{
+    return IsNumber(c) || (c >= 'a' && c <= 'f') || (c >= 'A' && c <= 'F');
+}
+
+static bool IsDigit(TCHAR c)
+{
+    return IsNumber(c) || c == '.' || c == ',';
+}
+
+static LPCTSTR SkipWord(LPCTSTR p)
+{
+    if (IsAlpha(*p))
+    {
+        while (*p)
+        {
+            p = CharNext(p);
+            if (!IsAlpha(*p))
+                break;
+        }
+    }
+    return p;
+}
+
+static LPCTSTR SkipNumber(LPCTSTR p)
+{
+    if (*p && *(p + 1) && (_tcsncmp(p, _T("0x"), 2) == 0 || _tcsncmp(p, _T("0X"), 2) == 0))
+    { // test for hex number
+        p = p + 2;
+        while (*p)
+        {
+            if (!IsHex(*p))
+                break;
+            p++;
+        }
+        return p;
+    }
+    else
+    {
+        while (*p)
+        {
+            if (!IsDigit(*p))
+                break;
+            p++;
+        }
+        return p;
+    }
+}
+
+static LPCTSTR WordNext(LPCTSTR pszBuf, bool bWordbreak)
+{
+    SASSERT(pszBuf);
+    LPCTSTR p = CharNext(pszBuf);
+    if (!bWordbreak)
+        return p;
+    LPCTSTR pWord = SkipWord(pszBuf);
+    if (pWord > pszBuf)
+        return pWord;
+    LPCTSTR pNum = SkipNumber(pszBuf);
+    if (pNum > pszBuf)
+        return pNum;
+    return p;
+}
+
+static LPCSTR nextChar(LPCSTR p){
+    int len = mbtowc(nullptr,p,MB_CUR_MAX);
+    assert(len>0);
+    return p + len;
+}
+
+static SIZE OnMeasureText(HDC hdc,LPCSTR pszBuf,int cchText){
+    cairo_text_extents_t ext;
+    int i=0;
+    char word[6];
+    LPCSTR p = pszBuf;
+    LPCSTR pEnd = p+cchText;
+
+    SIZE ret = {0,0};
+    while(p<pEnd){
+        LPCSTR next = nextChar(p);
+        assert(next-p<=5);
+        memcpy(word,p,(next-p));
+        word[next-p]=0;
+        cairo_text_extents(hdc->cairo,word,&ext);
+        ret.cx += ext.width;
+        ret.cy = std::max(ret.cy,(LONG)ext.height);
+    }
+    return ret;
+}
+
+static void DrawSingleLine(HDC hdc, LPCTSTR pszBuf, int iBegin, int cchText, LPRECT pRect, UINT uFormat)
+{
+    char *buf=(char*)malloc(cchText+1);
+    memcpy(buf,pszBuf,cchText);
+    buf[cchText]=0;
+    cairo_text_extents_t ext;
+    cairo_text_extents(hdc->cairo,buf,&ext);
+    if(uFormat & DT_CALCRECT){
+        pRect->right = pRect->left + ext.width;
+        pRect->bottom = pRect->top + ext.height;
+    }else{
+        switch(uFormat&(DT_LEFT|DT_CENTER|DT_RIGHT)){
+            case DT_LEFT:
+            cairo_move_to(hdc->cairo,pRect->left,pRect->top+ext.height);
+            break;
+            case DT_CENTER:
+            cairo_move_to(hdc->cairo,pRect->left + (pRect->right-pRect->left - ext.width)/2,pRect->top + ext.height);
+            case DT_RIGHT:
+            cairo_move_to(hdc->cairo,pRect->right - ext.width,pRect->top + ext.height);
+            break;
+        }
+        cairo_show_text(hdc->cairo,buf);
+    }
+    free(buf);
+}
+
+
+#define kDrawText_LineInterval 0
+
+void DrawMultiLine(HDC hdc, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat)
+{
+    int i = 0, nLine = 1;
+    if (cchText == -1)
+        cchText = (int)_tcslen(pszBuf);
+    LPCTSTR p1 = pszBuf;
+    POINT pt = { pRect->left, pRect->top };
+    SIZE szWord = OnMeasureText(hdc, _T("A"), 1);
+    int nLineHei = szWord.cy;
+    int nRight = pRect->right;
+    int nLineWid = pRect->right - pRect->left;
+    pRect->right = pRect->left;
+
+    LPCTSTR pLineHead = p1, pLineTail = p1;
+
+    LPCTSTR pPrev = NULL;
+    while (i < cchText)
+    {
+        LPCTSTR p2 = WordNext(p1, uFormat&DT_WORDBREAK);
+        SASSERT(p2 > p1);
+        if ((*p1 == _T('\n') && p2))
+        {
+            if (pLineTail > pLineHead && !(uFormat & DT_CALCRECT))
+            {
+                RECT rcText={pRect->left, pt.y, nRight, pt.y + nLineHei};
+                DrawSingleLine(hdc, pszBuf, (int)(pLineHead - pszBuf), (int)(pLineTail - pLineHead), &rcText, uFormat);
+            }
+            pt.y += nLineHei + kDrawText_LineInterval;
+            pt.x = pRect->left;
+            nLine++;
+            i += (int)(p2 - p1);
+            p1 = p2;
+            pLineHead = p2;
+            continue;
+        }
+        if (uFormat & DT_WORDBREAK && *p1 == 0x20 && pt.x == pRect->left && (!pPrev || *pPrev != 0x20))
+        { // skip the first space for a new line.
+            i += (int)(p2 - p1);
+            pPrev = p1;
+            p1 = p2;
+            pLineTail = pLineHead = p2;
+            continue;
+        }
+        szWord = OnMeasureText(hdc, p1, (int)(p2 - p1));
+        if (pt.x + szWord.cx > nRight)
+        { //检测到一行超过边界时还要保证当前行不为空
+
+            if (pLineTail > pLineHead)
+            {
+                if (!(uFormat & DT_CALCRECT))
+                {
+                    RECT rcText = {pRect->left, pt.y, nRight, pt.y + nLineHei};
+                    DrawSingleLine(hdc, pszBuf, (int)(pLineHead - pszBuf), (int)(pLineTail - pLineHead), &rcText, uFormat);
+                }
+                // 显示多行文本时，如果下一行文字的高度超过了文本框，则不再输出下一行文字内容。
+                if (pt.y + nLineHei + kDrawText_LineInterval > pRect->bottom)
+                { //将绘制限制在有效区。
+                    pLineHead = pLineTail;
+                    break;
+                }
+
+                pLineHead = p1;
+
+                pt.y += nLineHei + kDrawText_LineInterval;
+                pt.x = pRect->left;
+                nLine++;
+
+                continue;
+            }
+            else
+            { // word is too long to draw in a single line
+                LPCTSTR p3 = p1;
+                SIZE szChar;
+                szWord.cx = 0;
+                while (p3 < p2)
+                {
+                    LPCTSTR p4 = CharNext(p3);
+                    szChar = OnMeasureText(hdc, p3, (int)(p4 - p3));
+                    if (szWord.cx + szChar.cx > nLineWid)
+                    {
+                        if (p3 == p1)
+                        { // a line will contain at least one char.
+                            p2 = p4;
+                            szWord.cx = szChar.cx;
+                        }
+                        else
+                        {
+                            p2 = p3;
+                        }
+                        break;
+                    }
+                    szWord.cx += szChar.cx;
+                    p3 = p4;
+                }
+            }
+        }
+        pt.x += szWord.cx;
+        if (pt.x > pRect->right && uFormat & DT_CALCRECT)
+            pRect->right = pt.x;
+        i += (int)(p2 - p1);
+        pPrev = p1;
+        pLineTail = p1 = p2;
+    }
+
+    if (uFormat & DT_CALCRECT)
+    {
+        if (pRect->bottom > pt.y + nLineHei)
+            pRect->bottom = pt.y + nLineHei;
+    }
+    else if (pLineTail > pLineHead)
+    {
+        RECT rcText={pRect->left, pt.y, nRight, pt.y + nLineHei};
+        DrawSingleLine(hdc, pszBuf, (int)(pLineHead - pszBuf), (int)(pLineTail - pLineHead), &rcText, uFormat);
+    }
+}
+
+int DrawText(HDC hdc, LPCSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat)
+{
+    if (uFormat & DT_SINGLELINE)
+    {
+        DrawSingleLine(hdc, pszBuf, 0, cchText, pRect, uFormat);
+    }
+    else
+    {
+        if (uFormat & (DT_VCENTER | DT_BOTTOM) && !(uFormat & DT_CALCRECT))
+        {
+            DrawMultiLine(hdc, pszBuf, cchText, pRect, uFormat | DT_CALCRECT);
+            SIZE szTxt = {pRect->right-pRect->left,pRect->bottom-pRect->top};
+            RECT rcText = *pRect;
+            switch (uFormat & (DT_VCENTER | DT_BOTTOM))
+            {
+            case DT_VCENTER:
+                InflateRect(&rcText,0, -(rcText.bottom-rcText.top - szTxt.cy) / 2);
+                break;
+            case DT_BOTTOM:
+                InflateRect(&rcText,0, -(rcText.bottom-rcText.top - szTxt.cy));
+                break;
+            }
+            DrawMultiLine(hdc, pszBuf, cchText, &rcText, uFormat);
+        }
+        else
+        {
+            DrawMultiLine(hdc, pszBuf, cchText, pRect, uFormat);
+        }
+    }
+    return TRUE;
 }
 
 
@@ -814,19 +1086,50 @@ int  FillRect(HDC hdc, const RECT *lprc, HBRUSH hbr)
     return 1;
 }
 
-int  FrameRect(HDC hDC, const RECT *lprc, HBRUSH hbr)
+int  FrameRect(HDC hdc, const RECT *lprc, HBRUSH hbr)
 {
-    return 0;
+    cairo_t * ctx = hdc->cairo;
+    cairo_save(ctx);
+    ApplyPen(ctx,hdc->pen);
+    cairo_rectangle(hdc->cairo,lprc->left,lprc->top,lprc->right-lprc->left,lprc->bottom-lprc->top);
+    cairo_stroke(ctx);
+    cairo_restore(ctx);
+    return TRUE;
 }
 
-BOOL  InvertRect(HDC hDC, const RECT *lprc)
+BOOL  InvertRect(HDC hdc, const RECT *lprc)
 {
-    return 0;
+    cairo_t * ctx = hdc->cairo;
+    cairo_save(ctx);
+    cairo_set_source_rgb(ctx,1.0,1.0,1.0);
+    cairo_set_operator(ctx,CAIRO_OPERATOR_XOR);
+    cairo_rectangle(ctx,lprc->left,lprc->top,lprc->right-lprc->left,lprc->bottom-lprc->top);
+    cairo_fill(ctx);
+
+    cairo_restore(ctx);
+    return TRUE;
 }
 
 BOOL  Ellipse(HDC hdc, int left, int top, int right, int bottom)
 {
-    return 0;
+    cairo_t *ctx = hdc->cairo;
+    cairo_save(ctx);
+    double x = (left+right)/2;
+    double y = (top+bottom)/2;
+    double scale_x = right-left;
+    double scale_y = bottom-top;
+    cairo_translate(ctx,x, y);
+    cairo_scale(ctx,scale_x, scale_y);
+    cairo_arc(ctx,0,0,1,0,2*M_PI);
+
+    if(ApplyBrush(ctx,hdc->brush)){
+        cairo_fill(ctx);
+    }
+    if(ApplyPen(ctx,hdc->pen)){
+        cairo_stroke(ctx);
+    }
+    cairo_restore(ctx);
+    return TRUE;
 }
 
 BOOL  Pie(HDC hdc, int left, int top, int right, int bottom, int xr1, int yr1, int xr2, int yr2)
