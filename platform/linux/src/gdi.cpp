@@ -897,6 +897,7 @@ BOOL  TextOut(HDC hdc, int x, int y, LPCSTR lpString, int c)
 
 BOOL GetTextExtentPoint32(HDC hdc, LPCSTR lpString, int c, LPSIZE psizl)
 {
+    cairo_save(hdc->cairo);
     ApplyFont(hdc);
     cairo_text_extents_t ext;
     if(c<0){
@@ -910,6 +911,8 @@ BOOL GetTextExtentPoint32(HDC hdc, LPCSTR lpString, int c, LPSIZE psizl)
     }
     psizl->cx = ext.width;
     psizl->cy = ext.height;
+    cairo_restore(hdc->cairo);
+    
     return TRUE;
 }
 
