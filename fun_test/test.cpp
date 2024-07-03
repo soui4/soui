@@ -20,6 +20,9 @@
 
 using namespace SOUI;
 
+static const char * kPath_TestPng ="/home/flyhigh/work/soui4/demo/uires/image/soui.png";
+static const char * kPath_TestXml ="/home/flyhigh/work/soui4/demo2/uires/xml/dlg_main.xml";
+
 HBITMAP LoadPng(const char * path){
     SComMgr2 comMgr("libimgdecoder-stb");
     SAutoRefPtr<IImgDecoderFactory> decoder;
@@ -47,7 +50,7 @@ HBITMAP LoadPng(const char * path){
 }
 
 TEST(Util,com_load){
-    HBITMAP bmp = LoadPng("/home/flyhigh/work/soui4/demo/uires/image/soui.png");
+    HBITMAP bmp = LoadPng(kPath_TestXml);
     EXPECT_EQ(bmp!=0,TRUE);
     if(bmp){
         DeleteObject(bmp);
@@ -56,7 +59,7 @@ TEST(Util,com_load){
 
 TEST(Util,Xml_Load){
     SXmlDoc xml;
-    EXPECT_EQ(xml.load_file("/home/flyhigh/work/soui4/demo2/uires/xml/dlg_main.xml"),true);
+    EXPECT_EQ(xml.load_file(kPath_TestPng),true);
     SXmlNode node=xml.root().first_child();
     while(node){
         const wchar_t * name = node.name();
@@ -121,7 +124,7 @@ void SNativeWnd2::OnDestroy(){
 }
 
 int  SNativeWnd2::OnCreate(LPCREATESTRUCT lpCs){
-    m_bmp = LoadPng("/home/flyhigh/work/soui4/demo/uires/image/soui.png");
+    m_bmp = LoadPng(kPath_TestPng);
     if(!m_bmp) return 1;
     SetMsgHandled(FALSE);
     return 0;
