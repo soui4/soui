@@ -50,7 +50,7 @@ HBITMAP LoadPng(const char * path){
 }
 
 TEST(Util,com_load){
-    HBITMAP bmp = LoadPng(kPath_TestXml);
+    HBITMAP bmp = LoadPng(kPath_TestPng);
     EXPECT_EQ(bmp!=0,TRUE);
     if(bmp){
         DeleteObject(bmp);
@@ -59,7 +59,7 @@ TEST(Util,com_load){
 
 TEST(Util,Xml_Load){
     SXmlDoc xml;
-    EXPECT_EQ(xml.load_file(kPath_TestPng),true);
+    EXPECT_EQ(xml.load_file(kPath_TestXml),true);
     SXmlNode node=xml.root().first_child();
     while(node){
         const wchar_t * name = node.name();
