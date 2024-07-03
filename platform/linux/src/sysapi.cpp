@@ -1,6 +1,7 @@
 #include "platform.h"
 #include <sysapi.h>
 #include <pthread.h>
+#include <sys/mman.h>
 #include "SConnection.h"
 #include "wnd.h"
 using namespace SOUI;
@@ -773,4 +774,39 @@ BOOL GetTextMetrics(HDC hdc, TEXTMETRIC *txtMetric)
 
 BOOL HasFont(LPCTSTR fontName){
     return TRUE;
+}
+
+
+int IsBadReadPtr(const void* ptr, size_t size) {
+    if (ptr == NULL || size == 0) {
+        return 1; // Invalid pointer or size
+    }
+
+    void* page = (void*)((uintptr_t)ptr & ~(sysconf(_SC_PAGESIZE) - 1));
+    if (mprotect(page, size, PROT_READ) == 0) {
+        // Accessing the pointer is successful, restore the original permissions
+        mprotect(page, size, PROT_READ | PROT_WRITE | PROT_EXEC);
+        return 0; // Valid pointer
+    }
+
+    return 1; // Invalid pointer
+}
+
+int IsBadWritePtr(const void* ptr, size_t size) {
+    if (ptr == NULL || size == 0) {
+        return 1; // Invalid pointer or size
+    }
+
+    void* page = (void*)((uintptr_t)ptr & ~(sysconf(_SC_PAGESIZE) - 1));
+    if (mprotect(page, size, PROT_WRITE) == 0) {
+        // Accessing the pointer is successful, restore the original permissions
+        mprotect(page, size, PROT_READ | PROT_WRITE | PROT_EXEC);
+        return 0; // Valid pointer
+    }
+
+    return 1; // Invalid pointer
+}
+
+void ZeroMemory(void *p,size_t size){
+    memset(p,0,size);
 }

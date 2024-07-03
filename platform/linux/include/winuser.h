@@ -1353,4 +1353,5 @@ PtInRect(
      CONST RECT *lprc,
      POINT pt);
 
+
 #endif//__WINUSER_H_

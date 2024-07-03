@@ -133,4 +133,8 @@ BOOL GetTextMetrics(HDC hdc,TEXTMETRIC *txtMetric);
 
 BOOL HasFont(LPCTSTR fontName);
 
+int IsBadReadPtr(const void* ptr, size_t size);
+int IsBadWritePtr(const void* ptr, size_t size);
+
+void ZeroMemory(void *p,size_t size);
 #endif

@@ -1,5 +1,6 @@
 #include <sysapi.h>
 #include <tchar.h>
+
 #pragma comment(lib, "version.lib")
 
 static int getScaleOld(HWND hWnd = NULL)

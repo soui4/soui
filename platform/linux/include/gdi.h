@@ -95,6 +95,14 @@ typedef struct tagBITMAPINFOHEADER{
         DWORD      biClrImportant;
 } BITMAPINFOHEADER, FAR *LPBITMAPINFOHEADER, *PBITMAPINFOHEADER;
 
+typedef struct tagBITMAPFILEHEADER{
+    WORD bfType;
+    DWORD bfSize;
+    WORD  bfReserved1;
+    WORD  bfReserved2;
+    DWORD bfOffBits;
+}BITMAPFILEHEADER,*PBITMAPFILEHEADER;
+
 /* constants for the biCompression field */
 #define BI_RGB        0L
 #define BI_RLE8       1L
@@ -110,6 +118,10 @@ typedef struct tagBITMAPINFO {
 
 #define DIB_RGB_COLORS      0 /* color table in RGBs */
 #define DIB_PAL_COLORS      1 /* color table in palette indices */
+
+#define CBM_INIT        0x04L   /* initialize bitmap */
+#define LR_DEFAULTSIZE 0
+#define LR_DEFAULTCOLOR 1
 
 HBITMAP WINAPI CreateDIBitmap(  HDC hdc,  CONST BITMAPINFOHEADER *pbmih,  DWORD flInit,  CONST VOID *pjBits,  CONST BITMAPINFO *pbmi,  UINT iUsage);
 HBRUSH  WINAPI CreateDIBPatternBrush(  HGLOBAL h,  UINT iUsage);

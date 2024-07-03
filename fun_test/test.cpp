@@ -191,7 +191,7 @@ void SNativeWnd2::OnClose(){
 }
 
 TEST(Window,loop){
-//*    
+/*    
     SNativeWnd::InitWndClass(0,"soui_host",FALSE);
     SNativeWnd2 wnd;
     HWND hWnd = wnd.CreateNative("test window",WS_POPUP|WS_VISIBLE,0,0,0,400,400,0);
@@ -204,4 +204,13 @@ TEST(Window,loop){
     }
 
     //*/
+}
+
+int run_demo(){
+    
+    return 0;
+}
+
+TEST(soui,demo){
+    EXPECT_EQ(run_demo(),0);
 }

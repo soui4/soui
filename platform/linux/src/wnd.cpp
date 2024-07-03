@@ -386,7 +386,7 @@ static LONG_PTR SetWindowLongSize(HWND hWnd,int nIndex,LONG_PTR data,uint32_t si
         wndObj->dwExStyle = data;
         break;
         case GWL_HINSTANCE:
-        wndObj->hInstance=data;
+        wndObj->hInstance=(HINSTANCE)data;
         break;
         case GWL_HWNDPARENT:
         wndObj->parent=data;
@@ -431,7 +431,7 @@ static LONG_PTR GetWindowLongSize(HWND hWnd,int nIndex,uint32_t size){
         case GWL_EXSTYLE:
         return wndObj->dwExStyle;
         case GWL_HINSTANCE:
-        return wndObj->hInstance;
+        return (LONG_PTR)wndObj->hInstance;
         case GWL_HWNDPARENT:
         return wndObj->parent;
         case GWL_ID:

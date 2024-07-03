@@ -29,7 +29,9 @@
 
 #include <platform.h>
 
+#ifndef smax
 #define smax(a,b) (a)>(b)?(a):(b)
+#endif
 
 namespace CursorIcon_Zip{
 
