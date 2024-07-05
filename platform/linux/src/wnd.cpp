@@ -194,9 +194,9 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     pWnd->tid = pthread_self();
     pWnd->hdc = nullptr;
 
-    SConnection *conn = SConnMgr::instance()->getConnection(pWnd->tid);
-    pWnd->mConnection = conn->connection;
-    pWnd->mScreen = conn->screen;
+    SConnection *state = SConnMgr::instance()->getConnection(pWnd->tid);
+    pWnd->mConnection = state->connection;
+    pWnd->mScreen = state->screen;
     pWnd->dwStyle = cs->style;
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
@@ -217,7 +217,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, pWnd->title.length(), pWnd->title.c_str());
 
-    xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd, conn->wm_protocols_atom, XCB_ATOM_ATOM, 32, 1, &conn->wm_delete_window_atom);
+    xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd, state->wm_protocols_atom, XCB_ATOM_ATOM, 32, 1, &state->wm_delete_window_atom);
 
     if(cs->style & WS_VISIBLE)
         xcb_map_window(pWnd->mConnection, hWnd);
