@@ -467,6 +467,9 @@ TrackMouseEvent(
 #define WS_SIZEBOX          WS_THICKFRAME
 #define WS_TILEDWINDOW      WS_OVERLAPPEDWINDOW
 
+#define TTS_NOPREFIX  0x00200000L
+#define TTS_ALWAYSTIP 0x00400000L
+
 /*
  * Common Window Styles
  */
@@ -556,10 +559,6 @@ TrackMouseEvent(
 #if(_WIN32_WINNT >= 0x0501)
 #define CS_DROPSHADOW       0x00020000
 #endif /* _WIN32_WINNT >= 0x0501 */
-
-
-
-
 
 //-----------------------------------------------------------------
 typedef struct tagCREATESTRUCT {
@@ -1352,6 +1351,5 @@ WINAPI
 PtInRect(
      CONST RECT *lprc,
      POINT pt);
-
 
 #endif//__WINUSER_H_

@@ -82,3 +82,8 @@ BOOL PtInRect(const RECT *lprc, POINT pt)
     return pt.x>=lprc->left && pt.x<lprc->right
            && pt.y>=lprc->top && pt.y<lprc->bottom;
 }
+
+BOOL TrackMouseEvent(LPTRACKMOUSEEVENT lpEventTrack)
+{
+    return FALSE;
+}

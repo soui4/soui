@@ -912,8 +912,16 @@ BOOL GetTextExtentPoint32(HDC hdc, LPCSTR lpString, int c, LPSIZE psizl)
     psizl->cx = ext.width;
     psizl->cy = ext.height;
     cairo_restore(hdc->cairo);
-    
+
     return TRUE;
+}
+
+COLORREF GetSysColor(int i){
+    switch(i){
+        case COLOR_INFOBK:
+        return RGBA(128,128,128,255);
+    }
+    return RGBA(255,255,255,255);
 }
 
 HGDIOBJ  GetStockObject(int i)
@@ -968,6 +976,7 @@ HGDIOBJ  GetStockObject(int i)
             return &pen;
         }
         case SYSTEM_FONT:
+        case DEFAULT_GUI_FONT:
         {
             static LOGFONT lf={0};
             strcpy(lf.lfFaceName,"Arial");
@@ -1181,4 +1190,9 @@ COLORREF  SetTextColor(HDC hdc, COLORREF color)
     COLORREF ret = hdc->crText;
     hdc->crText = color;
     return ret;
+}
+
+HANDLE LoadImage(HINSTANCE hInst, LPCSTR name, UINT type, int cx, int cy, UINT fuLoad)
+{
+    return HANDLE();
 }

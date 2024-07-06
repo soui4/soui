@@ -4,7 +4,7 @@
 #define COMPILE_MULTIMON_STUBS
 #ifdef _WIN32
 #include <multimon.h>
-
+#endif//_WIN32
 SNSBEGIN
 
 #define TIMERID_DELAY 1
@@ -151,6 +151,10 @@ void STipCtrl::ShowTip(BOOL bShow)
         CRect rcWnd;
         GetWindowRect(&rcWnd);
 
+        rcWnd.right = rcWnd.left + rcText.right + 2 * MARGIN_TIP;
+        rcWnd.bottom = rcWnd.top + rcText.bottom + 2 * MARGIN_TIP;
+
+#ifdef _WIN32
         //增加对多显示器的支持
         HMONITOR hMonitor;
         MONITORINFO mi;
@@ -160,14 +164,12 @@ void STipCtrl::ShowTip(BOOL bShow)
         int cx = mi.rcMonitor.right;
         int cy = mi.rcMonitor.bottom;
         /*增加部分结束*/
-
-        rcWnd.right = rcWnd.left + rcText.right + 2 * MARGIN_TIP;
-        rcWnd.bottom = rcWnd.top + rcText.bottom + 2 * MARGIN_TIP;
         //去掉下面这两行
         if (rcWnd.right > cx)
             rcWnd.OffsetRect(cx - rcWnd.right, 0);
         if (rcWnd.bottom > cy)
             rcWnd.OffsetRect(0, cy - rcWnd.bottom);
+#endif//_WIN32
         SetWindowPos(HWND_TOPMOST, rcWnd.left, rcWnd.top, rcWnd.Width(), rcWnd.Height(), SWP_SHOWWINDOW | SWP_NOACTIVATE | SWP_NOOWNERZORDER);
     }
 }
@@ -223,5 +225,3 @@ void STipCtrl::OnFinalMessage(HWND hWnd)
     delete this;
 }
 SNSEND
-
-#endif//_WIN32

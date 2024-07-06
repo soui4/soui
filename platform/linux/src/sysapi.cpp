@@ -2,9 +2,24 @@
 #include <sysapi.h>
 #include <pthread.h>
 #include <sys/mman.h>
+#include <sys/stat.h>
 #include "SConnection.h"
 #include "wnd.h"
 using namespace SOUI;
+
+
+FILE * _wfopen(const wchar_t *path,const wchar_t *mode){
+    int len = WideCharToMultiByte(CP_UTF8,0,path,-1,nullptr,0,nullptr,nullptr);
+    char *u8path = (char*)malloc(len+1);
+    WideCharToMultiByte(CP_UTF8,0,path,-1,u8path,len+1,nullptr,nullptr);
+    u8path[len]=0;
+    char u8mode[20]={0};
+    WideCharToMultiByte(CP_UTF8,0,mode,-1,u8mode,20,nullptr,nullptr);
+    FILE *ret = fopen(u8path,u8mode);
+    free(u8path);
+    return ret;
+}
+
 
 void SetLastError(int e)
 {
@@ -809,4 +824,25 @@ int IsBadWritePtr(const void* ptr, size_t size) {
 
 void ZeroMemory(void *p,size_t size){
     memset(p,0,size);
+}
+
+uint32_t GetFileAttributes(const char *path)
+{
+    struct stat st;
+    if(0!=stat(path,&st))
+        return INVALID_FILE_ATTRIBUTES;
+    uint32_t ret = 0;
+    if(S_ISDIR(st.st_mode))
+        ret |= FILE_ATTRIBUTE_DIRECTORY;
+    else
+    {
+        ret |= FILE_ATTRIBUTE_NORMAL;
+    }    
+    if(S_IWUSR & st.st_mode){
+        ret |= FILE_ATTRIBUTE_READONLY;
+    }
+    if(strrchr(path,'.')!=nullptr){
+        ret |= FILE_ATTRIBUTE_HIDDEN;
+    }
+    return ret;
 }

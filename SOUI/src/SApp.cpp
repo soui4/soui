@@ -131,7 +131,6 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SScrollView>();
     objFactory->TplRegisterFactory<SRealWnd>();
     objFactory->TplRegisterFactory<SToggle>();
-    objFactory->TplRegisterFactory<SCaption>();
     objFactory->TplRegisterFactory<STabCtrl>();
     objFactory->TplRegisterFactory<STabPage>();
 
@@ -161,6 +160,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SComboBox>();
     objFactory->TplRegisterFactory<SComboView>();
 #ifdef _WIN32
+    objFactory->TplRegisterFactory<SCaption>();
     objFactory->TplRegisterFactory<SMenuBar>();
     objFactory->TplRegisterFactory<SRichEdit>();
     objFactory->TplRegisterFactory<SActiveX>();

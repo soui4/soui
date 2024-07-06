@@ -9,6 +9,8 @@
 
 SNSBEGIN
 
+#ifdef _WIN32
+
 #define CX_ICON 16 //支持的图标的宽度
 #define CY_ICON 16 //支持的图标的高度
 
@@ -295,5 +297,6 @@ class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
     SAutoRefPtr<ISkinObj> m_icons;
 };
 
+#endif//_WIN32
 SNSEND
 #endif // __SMENU__H__

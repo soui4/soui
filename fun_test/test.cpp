@@ -18,10 +18,15 @@
 #include <interface/SRender-i.h>
 #include <string>
 
+#include <souistd.h>
+#include <SouiFactory.h>
+
 using namespace SOUI;
 
 static const char * kPath_TestPng ="/home/flyhigh/work/soui4/demo/uires/image/soui.png";
 static const char * kPath_TestXml ="/home/flyhigh/work/soui4/demo2/uires/xml/dlg_main.xml";
+static const char * kPath_SysRes = "/home/flyhigh/work/soui4/soui-sys-resource";
+static const char * kPath_TestRes = "/home/flyhigh/work/soui4/fun_test/uires";
 
 HBITMAP LoadPng(const char * path){
     SComMgr2 comMgr("libimgdecoder-stb");
@@ -206,11 +211,24 @@ TEST(Window,loop){
     //*/
 }
 
-int run_demo(){
-    
+
+int run_demo(HINSTANCE hInst){
+    SComMgr2 comMgr("libimgdecoder-stb");
+    SAutoRefPtr<IRenderFactory> renderFac;
+    comMgr.CreateRender_GDI((IObjRef**)&renderFac);
+    SApplication app(renderFac,hInst);
+    SouiFactory sfac;
+    SAutoRefPtr<IResProvider> sysResouce(sfac.CreateResProvider(RES_FILE));
+    sysResouce->Init((LPARAM)kPath_SysRes, 0);
+    app.LoadSystemNamedResource(sysResouce);
+    SAutoRefPtr<IResProvider> testResouce(sfac.CreateResProvider(RES_FILE));
+    testResouce->Init((LPARAM)kPath_TestRes, 0);
+    app.AddResProvider(testResouce);
+
     return 0;
 }
 
 TEST(soui,demo){
-    EXPECT_EQ(run_demo(),0);
+    HINSTANCE hInst = 0;
+    EXPECT_EQ(run_demo(hInst),0);
 }

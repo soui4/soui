@@ -129,10 +129,9 @@ inline const char *CharNext(const char* src){
 #define _tcsrchr strchr
 #endif
 
-#define CP_ACP 0
+#define CP_ACP 1
 #define CP_UTF8 1
 #define CP_UTF7 2
 #define CP_SYMBOL 3
-
 
 #endif

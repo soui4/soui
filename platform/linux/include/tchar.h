@@ -13,6 +13,7 @@
 #define _tcscmp strcmp
 #define _T(x) x
 #define _tcsftime strftime
+#define _tfopen fopen
 #else
 #define TCHAR wchar_t
 #define LPCTSTR LPCWSTR
@@ -22,6 +23,7 @@
 #define _tcscmp wcscmp
 #define _T(x) L##x
 #define _tcsftime wcsftime
+#define _tfopen _wfopen
 #endif
 
 #endif//__TCHAR_H_

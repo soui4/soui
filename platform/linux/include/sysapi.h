@@ -137,4 +137,8 @@ int IsBadReadPtr(const void* ptr, size_t size);
 int IsBadWritePtr(const void* ptr, size_t size);
 
 void ZeroMemory(void *p,size_t size);
+
+uint32_t GetFileAttributes(const char *path);
+
+FILE * _wfopen(const wchar_t *path,const wchar_t *mode);
 #endif

@@ -120,8 +120,7 @@ typedef struct tagBITMAPINFO {
 #define DIB_PAL_COLORS      1 /* color table in palette indices */
 
 #define CBM_INIT        0x04L   /* initialize bitmap */
-#define LR_DEFAULTSIZE 0
-#define LR_DEFAULTCOLOR 1
+
 
 HBITMAP WINAPI CreateDIBitmap(  HDC hdc,  CONST BITMAPINFOHEADER *pbmih,  DWORD flInit,  CONST VOID *pjBits,  CONST BITMAPINFO *pbmi,  UINT iUsage);
 HBRUSH  WINAPI CreateDIBPatternBrush(  HGLOBAL h,  UINT iUsage);
@@ -224,8 +223,12 @@ GetTextExtentPoint32(
 #define DEVICE_DEFAULT_FONT 14
 #define DEFAULT_PALETTE     15
 #define SYSTEM_FIXED_FONT   16
+#define DEFAULT_GUI_FONT    17
 
  HGDIOBJ WINAPI GetStockObject(  int i);
+
+ #define COLOR_INFOBK 1
+ COLORREF GetSysColor(int i);
 
  BOOL WINAPI Rectangle( HDC hdc,  int left,  int top,  int right,  int bottom);
 
@@ -275,5 +278,35 @@ InvertRect(
 
  int   WINAPI SetROP2( HDC hdc,  int rop2);
  COLORREF WINAPI SetTextColor( HDC hdc,  COLORREF color);
+
+
+#define IMAGE_BITMAP 	0
+#define IMAGE_CURSOR 	1
+#define IMAGE_ICON      2
+
+
+
+#define LR_CREATEDIBSECTION  0x00002000 \
+	//When the uType parameter specifies IMAGE_BITMAP, causes the function to return a DIB section bitmap rather than a compatible bitmap. This flag is useful for loading a bitmap without mapping it to the colors of the display device.
+
+#define LR_DEFAULTCOLOR \
+0x00000000 \
+	//The default flag; it does nothing. All it means is "not LR_MONOCHROME".
+
+#define LR_DEFAULTSIZE \
+0x00000040 \
+	//Uses the width or height specified by the system metric values for cursors or icons, if the cxDesired or cyDesired values are set to zero. If this flag is not specified and cxDesired and cyDesired are set to zero, the function uses the actual resource size. If the resource contains multiple images, the function uses the size of the first image.
+
+#define LR_LOADFROMFILE \
+0x00000010 
+
+HANDLE LoadImage(
+  HINSTANCE hInst,
+             LPCSTR    name,
+            UINT      type,
+             int       cx,
+             int       cy,
+             UINT      fuLoad
+);
 
 #endif//_LINUX_GDI_H_

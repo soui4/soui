@@ -1,5 +1,13 @@
 #ifndef __PLATFORM_H_
 #define __PLATFORM_H_
+
+#ifndef WINVER
+#define WINVER       0x0500
+#endif // WINVER
+#ifndef _WIN32_WINNT
+#define _WIN32_WINNT 0x0502
+#endif//_WIN32_WINNT
+
 #include <unknown-i.h>
 #include <dataobject-i.h>
 #include <droptarget-i.h>
