@@ -54,6 +54,15 @@ HBITMAP LoadPng(const char * path){
     return bmp;
 }
 
+
+TEST(Util,sstring){
+    SStringT str="test";
+    SStringT str2 ="soui";
+    SStringT str3 = str+_T("/")+"soui";
+    EXPECT_EQ(str3=="test/soui",0);
+}
+
+
 TEST(Util,com_load){
     HBITMAP bmp = LoadPng(kPath_TestPng);
     EXPECT_EQ(bmp!=0,TRUE);
@@ -216,6 +225,10 @@ int run_demo(HINSTANCE hInst){
     SComMgr2 comMgr;
     SAutoRefPtr<IRenderFactory> renderFac;
     comMgr.CreateRender_GDI((IObjRef**)&renderFac);
+    SAutoRefPtr<IImgDecoderFactory> imgDecoder;
+    comMgr.CreateImgDecoder((IObjRef**)&imgDecoder);
+    renderFac->SetImgDecoderFactory(imgDecoder);
+    
     SApplication app(renderFac,hInst);
     SouiFactory sfac;
     SAutoRefPtr<IResProvider> sysResouce(sfac.CreateResProvider(RES_FILE));

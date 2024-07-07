@@ -18,4 +18,7 @@
 #include <vsstyle.h>
 #endif
 #include <sdef.h>
+
+typedef DWORD tid_t;
+
 #endif//__PLATFORM_H_

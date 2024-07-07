@@ -48,7 +48,7 @@ target_include_directories(soui4
 )
 add_dependencies(soui4 utilities4 platform)
 target_link_libraries(soui4 utilities4 platform)
-
+ 
 set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")
 
 install(TARGETS soui4

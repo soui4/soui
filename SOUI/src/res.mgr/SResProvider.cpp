@@ -320,20 +320,7 @@ IImgX *SResLoadFromFile::LoadImgX(LPCTSTR strPath)
 
 size_t SResLoadFromFile::GetRawBufferSize(LPCTSTR strPath)
 {
-    #ifdef _WIN32
-    WIN32_FIND_DATA wfd;
-    HANDLE hf = FindFirstFile(strPath, &wfd);
-    if (INVALID_HANDLE_VALUE == hf)
-        return 0;
-    FindClose(hf);
-    return wfd.nFileSizeLow;
-    #else
-    struct stat st;
-    int ret = stat(strPath,&st);
-    if(ret!=0)
-        return 0;
-    return st.st_size;
-    #endif
+    return file_length(strPath);
 }
 
 BOOL SResLoadFromFile::GetRawBuffer(LPCTSTR strPath, LPVOID pBuf, size_t size)
@@ -362,6 +349,11 @@ BOOL SResLoadFromFile::GetRawBuffer(LPCTSTR strPath, LPVOID pBuf, size_t size)
 
 //////////////////////////////////////////////////////////////////////////
 // SResProviderFiles
+#ifdef _WIN32
+#define kPath_Slash _T("\\")
+#else
+#define kPath_Slash _T("/")
+#endif//_WIN32
 
 SResProviderFiles::SResProviderFiles()
 {
@@ -372,7 +364,7 @@ SStringT SResProviderFiles::GetRes(LPCTSTR strType, LPCTSTR pszResName)
     if (!strType)
     {
         // pszResName is relative path
-        SStringT strRet = m_strPath + _T("\\") + pszResName;
+        SStringT strRet = m_strPath + kPath_Slash + pszResName;
         DWORD dwAttr = GetFileAttributes(strRet);
         if (dwAttr == INVALID_FILE_ATTRIBUTES || (dwAttr & FILE_ATTRIBUTE_ARCHIVE) == 0)
             strRet = _T("");
@@ -382,7 +374,8 @@ SStringT SResProviderFiles::GetRes(LPCTSTR strType, LPCTSTR pszResName)
     SMap<SResID, SStringT>::CPair *p = m_mapFiles.Lookup(resID);
     if (!p)
         return _T("");
-    SStringT strRet = m_strPath + _T("\\") + p->m_value;
+
+    SStringT strRet = m_strPath + kPath_Slash + p->m_value;
     return strRet;
 }
 
@@ -447,7 +440,7 @@ BOOL SResProviderFiles::Init(WPARAM wParam, LPARAM lParam)
     LPCTSTR pszPath = (LPCTSTR)wParam;
 
     SStringT strPathIndex = pszPath;
-    strPathIndex += _T("\\");
+    strPathIndex += kPath_Slash;
     strPathIndex += UIRES_INDEX;
 
     SXmlDoc xmlDoc;
@@ -467,6 +460,9 @@ BOOL SResProviderFiles::Init(WPARAM wParam, LPARAM lParam)
         {
             SResID id(strType, S_CW2T(xmlFile.attribute(L"name").value()));
             SStringT strFile = S_CW2T(xmlFile.attribute(L"path").value());
+            #if !defined(_WIN32)
+            strFile.ReplaceChar(_T('\\'),_T('/'));
+            #endif
             //再次Init时会因为此行代码导致资源无法加载
             // if(!m_strPath.IsEmpty())
             // strFile.Format(_T("%s\\%s"),(LPCTSTR)m_strPath,(LPCTSTR)strFile);

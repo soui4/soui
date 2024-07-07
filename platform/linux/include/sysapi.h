@@ -25,7 +25,7 @@ int GetLastError() ;
 
 int MulDiv(int a,int b,int c);
 
-uint64_t GetCurrentThreadId();
+tid_t GetCurrentThreadId();
 
 int MultiByteToWideChar(int cp,int flags, const char *src, int len,wchar_t *dst,int dstLen);
 
@@ -141,4 +141,7 @@ void ZeroMemory(void *p,size_t size);
 uint32_t GetFileAttributes(const char *path);
 
 FILE * _wfopen(const wchar_t *path,const wchar_t *mode);
+
+long file_length(const char * path);
+
 #endif

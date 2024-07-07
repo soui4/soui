@@ -184,3 +184,21 @@ BOOL UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONST 
         memset(bm.bmBits,0,hei*stride);
     return TRUE;
 }
+
+long file_length_A(const char *path){
+    WIN32_FIND_DATA wfd;
+    HANDLE hf = FindFirstFileA(path, &wfd);
+    if (INVALID_HANDLE_VALUE == hf)
+        return 0;
+    FindClose(hf);
+    return wfd.nFileSizeLow;
+}
+
+long file_length_W(const wchar_t *path){
+    WIN32_FIND_DATA wfd;
+    HANDLE hf = FindFirstFileW(path, &wfd);
+    if (INVALID_HANDLE_VALUE == hf)
+        return 0;
+    FindClose(hf);
+    return wfd.nFileSizeLow;
+}

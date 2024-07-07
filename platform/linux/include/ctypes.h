@@ -157,6 +157,7 @@ typedef HGDIOBJ HBRUSH;
 typedef HGDIOBJ HBITMAP;
 typedef HGDIOBJ HRGN;
 
+typedef UINT_PTR tid_t;
 typedef struct _SDC * HDC;
 #define HRSRC int
 #define HCURSOR int

@@ -3,6 +3,7 @@
 #include <pthread.h>
 #include <sys/mman.h>
 #include <sys/stat.h>
+#include <fcntl.h>
 #include "SConnection.h"
 #include "wnd.h"
 using namespace SOUI;
@@ -20,6 +21,16 @@ FILE * _wfopen(const wchar_t *path,const wchar_t *mode){
     return ret;
 }
 
+long file_length(const char *path)
+{
+    struct stat buf;
+    int fd = open(path, O_RDONLY);
+    fstat(fd, &buf);
+    close(fd);
+    if(S_ISDIR(buf.st_mode))
+        return 0;
+    return buf.st_size;
+}
 
 void SetLastError(int e)
 {
@@ -37,9 +48,9 @@ int MulDiv(int a, int b, int c)
     return (int)(t / c);
 }
 
-uint64_t GetCurrentThreadId()
+tid_t GetCurrentThreadId()
 {
-    return (uint64_t)pthread_self();
+    return (tid_t)pthread_self();
 }
 
 int MultiByteToWideChar(int cp, int flags, const char *src, int len, wchar_t *dst, int dstLen)

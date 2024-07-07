@@ -188,7 +188,7 @@ class SOUI_EXP SHostWnd
     SAutoRefPtr<IAnimation> m_hostAnimation;
     DWORD m_AniState;
     BOOL m_bFirstShow;
-    DWORD m_dwThreadID;
+    tid_t m_dwThreadID;
     SRootWindow *m_pRoot;
 
     EventHandlerInfo m_evtHandler;
