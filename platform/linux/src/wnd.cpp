@@ -623,11 +623,18 @@ BOOL GetWindowRect(HWND hWnd, RECT *rc)
 HDC CreateDC(HWND hwnd,int cx,int cy){
     assert(hwnd);
     WndObj wndObj = WndObj::fromHwnd(hwnd);
-    if(!wndObj)
-        return 0;
-    cairo_surface_t * surface = cairo_xcb_surface_create(wndObj->mConnection, hwnd, xcb_aux_find_visual_by_id(wndObj->mScreen,wndObj->mScreen->root_visual), cx,cy);
-    HDC hdc = new _SDC(hwnd,InitGdiObj(OBJ_BITMAP,surface));
-    return hdc;
+    if(wndObj){
+        cairo_surface_t * surface = cairo_xcb_surface_create(wndObj->mConnection, hwnd, xcb_aux_find_visual_by_id(wndObj->mScreen,wndObj->mScreen->root_visual), cx,cy);
+        HDC hdc = new _SDC(hwnd,InitGdiObj(OBJ_BITMAP,surface));
+        return hdc;
+    }else{
+        SConnection *conn = SConnMgr::instance()->getConnection();
+        hwnd = conn->screen->root;
+        cairo_surface_t * surface = cairo_xcb_surface_create(conn->connection, hwnd, xcb_aux_find_visual_by_id(conn->screen,conn->screen->root_visual), cx,cy);
+        HDC hdc = new _SDC(hwnd,InitGdiObj(OBJ_BITMAP,surface));
+        return hdc;
+    }
+
 }
 
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){

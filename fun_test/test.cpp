@@ -227,6 +227,7 @@ int run_demo(HINSTANCE hInst){
 
     SHostWnd hostWnd("layout:XML_MAINWND");
     hostWnd.Create(0);
+    hostWnd.ShowWindow(SW_SHOW);
     app.Run(hostWnd.m_hWnd);
     
     return 0;
