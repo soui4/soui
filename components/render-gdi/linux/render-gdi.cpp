@@ -316,9 +316,7 @@ namespace SOUI
         m_hBmp = CreateGDIBitmap(m_sz.cx,m_sz.cy,&pBits);
 
         if(!m_hBmp) return E_OUTOFMEMORY;
-        const int stride = m_sz.cx*4;
-        memcpy(pBits,pFrame->GetPixels(),stride * m_sz.cy);
-
+        UpdateDIBPixmap(m_hBmp,nWid,nHei,32,nWid*4,pFrame->GetPixels());
         return S_OK;
     }
 
