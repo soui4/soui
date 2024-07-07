@@ -211,7 +211,11 @@ DWORD iOutPrecision, DWORD iClipPrecision, DWORD iQuality, DWORD iPitchAndFamily
 
 HBITMAP CreateDIBitmap(HDC hdc, const BITMAPINFOHEADER *pbmih, DWORD flInit, const VOID *pjBits, const BITMAPINFO *pbmi, UINT iUsage)
 {
-    return 0;
+    HBITMAP bmp = CreateDIBSection(hdc,pbmi,0,nullptr,0,0);
+    if(bmp){
+        UpdateDIBPixmap(bmp,pbmi->bmiHeader.biWidth,pbmi->bmiHeader.biHeight,pbmi->bmiHeader.biBitCount,pbmi->bmiHeader.biWidth*4,pjBits);
+    }
+    return bmp;
 }
 
 HBRUSH  CreateDIBPatternBrush(HGLOBAL h, UINT iUsage)
@@ -300,7 +304,12 @@ int SetGraphicsMode(HDC hdc, int iMode)
 
 HBITMAP CreateCompatibleBitmap(HDC hdc, int cx, int cy)
 {
-    return HBITMAP(0);
+    BITMAPINFO bmi;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biWidth = cx;
+    bmi.bmiHeader.biHeight = -cy;
+    return CreateDIBSection(hdc,&bmi,0,nullptr,0,0);
 }
 
 HGDIOBJ SelectObject(HDC hdc, HGDIOBJ h)
@@ -1068,8 +1077,10 @@ BOOL  SetViewportOrgEx(HDC hdc, int x, int y, LPPOINT lppt)
 {
     cairo_matrix_t mtx;
     cairo_get_matrix(hdc->cairo,&mtx);
-    lppt->x = (int)floor(mtx.x0);
-    lppt->y = (int)floor(mtx.y0);
+    if(lppt){
+        lppt->x = (int)floor(mtx.x0);
+        lppt->y = (int)floor(mtx.y0);
+    }
     mtx.x0=x;
     mtx.y0=y;
     cairo_set_matrix(hdc->cairo,&mtx);
@@ -1080,8 +1091,10 @@ BOOL  OffsetViewportOrgEx(HDC hdc, int x, int y, LPPOINT lppt)
 {
     cairo_matrix_t mtx;
     cairo_get_matrix(hdc->cairo,&mtx);
-    lppt->x = (int)floor(mtx.x0);
-    lppt->y = (int)floor(mtx.y0);
+    if(lppt){
+        lppt->x = (int)floor(mtx.x0);
+        lppt->y = (int)floor(mtx.y0);
+    }
 
     cairo_translate(hdc->cairo,x,y);
     return TRUE;

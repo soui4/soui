@@ -226,6 +226,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 
     pWnd->parent = cs->hwndParent;
     pWnd->winproc = info.lpfnWndProc;
+    pWnd->hdc = CreateDC(hWnd,cs->cx,cs->cy);
     {
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         map_wnd.insert(std::make_pair(hWnd,pWnd));
@@ -261,6 +262,12 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
         return FALSE;
 
     _Window *wndObj = it->second;
+    if(wndObj->hdc)
+    {
+        DeleteDC(wndObj->hdc);
+        wndObj->hdc = nullptr;
+    }
+
     map_wnd.erase(it);
 
     //delete wndObj and release resource of the window object
@@ -639,15 +646,6 @@ HDC CreateDC(HWND hwnd,int cx,int cy){
 
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
     switch(msg){
-        case WM_CREATE:
-        {
-            WndObj wndObj=WndObj::fromHwnd(hwnd);
-            if(wndObj){
-                CREATESTRUCT * cs = (CREATESTRUCT*)lp;
-                wndObj->hdc = CreateDC(hwnd,cs->cx,cs->cy);
-            }
-        }
-        break;
         case WM_SIZE:
         {
             WndObj wndObj=WndObj::fromHwnd(hwnd);
@@ -655,16 +653,6 @@ HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
             if(wndObj && wndObj->hdc)
             {
                 cairo_xcb_surface_set_size((cairo_surface_t*)GetGdiObjPtr(GetCurrentObject(wndObj->hdc,OBJ_BITMAP)),sz.cx,sz.cy);
-            }
-        }
-        break;
-        case WM_DESTROY:
-        {
-            WndObj wndObj=WndObj::fromHwnd(hwnd);
-            if(wndObj && wndObj->hdc)
-            {
-                DeleteDC(wndObj->hdc);
-                wndObj->hdc = nullptr;
             }
         }
         break;
