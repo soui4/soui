@@ -225,6 +225,10 @@ int run_demo(HINSTANCE hInst){
     testResouce->Init((LPARAM)kPath_TestRes, 0);
     app.AddResProvider(testResouce);
 
+    SHostWnd hostWnd("layout:XML_MAINWND");
+    hostWnd.Create(0);
+    app.Run(hostWnd.m_hWnd);
+    
     return 0;
 }
 
