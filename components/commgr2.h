@@ -10,6 +10,7 @@
 #define SCOM_MASK scom_mask_scom_all
 #endif 
 
+#ifdef _WIN32
 #define COM_IMGDECODER  _T("imgdecoder-gdip")
 
 #if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
@@ -37,7 +38,21 @@
 #define COM_IPCOBJ _T("sipcobject")
 #define COM_HTTPCLIENT _T("httpclient")
 #endif	// _DEBUG
+#else
+#define COM_IMGDECODER  _T("libimgdecoder-stb")
+#define COM_RENDER_GDI  _T("librender-gdi")
+#define COM_RENDER_SKIA _T("librender-skia")
+#define COM_SCRIPT_LUA _T("libscriptmodule-lua")
+#define COM_TRANSLATOR _T("libtranslator")
+#define COM_ZIPRESPROVIDER _T("libresprovider-zip")
+#define COM_LOG4Z   _T("liblog4z")
+#define COM_7ZIPRESPROVIDER _T("libresprovider-7zip")
+#define COM_TASKLOOP _T("libtaskloop")
 
+#define COM_RENDER_D2D _T("render-d2d")
+#define COM_IPCOBJ _T("sipcobject")
+#define COM_HTTPCLIENT _T("httpclient")
+#endif//_WIN32
 
 #ifdef LIB_SOUI_COM
 

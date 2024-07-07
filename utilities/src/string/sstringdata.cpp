@@ -60,14 +60,14 @@ SNSBEGIN
 	void TStringData::Release()
 	{
 		SASSERT(nRefs != 0);
-		if (InterlockedDecrement(&nRefs) <= 0)
+		if (--nRefs <= 0)
 			soui_mem_wrapper::SouiFree(this);
 	}
 
 	void TStringData::AddRef()
 	{
 		SASSERT(nRefs > 0);
-		InterlockedIncrement(&nRefs);
+		nRefs++;
 	}
 
 SNSEND

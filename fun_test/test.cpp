@@ -213,7 +213,7 @@ TEST(Window,loop){
 
 
 int run_demo(HINSTANCE hInst){
-    SComMgr2 comMgr("libimgdecoder-stb");
+    SComMgr2 comMgr;
     SAutoRefPtr<IRenderFactory> renderFac;
     comMgr.CreateRender_GDI((IObjRef**)&renderFac);
     SApplication app(renderFac,hInst);

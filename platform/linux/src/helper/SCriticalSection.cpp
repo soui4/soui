@@ -2,7 +2,7 @@
 #include <mutex>
 SNSBEGIN
 
-	class SCriticalSectionImpl: public std::mutex{
+	class SCriticalSectionImpl: public std::recursive_mutex{
 	};
 
 	SCriticalSection::SCriticalSection()
