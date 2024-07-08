@@ -1,0 +1,18 @@
+{
+  "version": "0.2.1",
+  "defaults": {},
+  "configurations": [
+    {
+      "type": "cppgdb",
+      "name": "fun_test (bin\\fun_test)",
+      "project": "CMakeLists.txt",
+      "projectTarget": "fun_test (bin\\fun_test)",
+      "comment": "了解如何配置远程调试。有关详细信息，请参阅 http://aka.ms/vslinuxdebug",
+      "debuggerConfiguration": "gdb",
+      "args": [],
+      "env": {
+        "DISPLAY": "172.29.76.139:0.0"
+      }
+    }
+  ]
+}
