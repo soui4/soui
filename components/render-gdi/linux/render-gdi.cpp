@@ -251,9 +251,9 @@ namespace SOUI
         bmi.bmiHeader.biCompression = BI_RGB;
         bmi.bmiHeader.biSizeImage   = 0;
 
-        HDC hdc=GetDC(NULL);
+        HDC hdc=GetDC(0);
         HBITMAP hBmp=CreateDIBSection(hdc,&bmi,DIB_RGB_COLORS,ppBits,0,0);
-        ReleaseDC(NULL,hdc);
+        ReleaseDC(0,hdc);
         return hBmp;
     }
 
@@ -387,7 +387,7 @@ namespace SOUI
 		IRenderTarget *pRT=NULL;
 		if(GetRenderFactory()->CreateRenderTarget(&pRT,nWid,nHei))
 		{
-			RECT rcSrc = {0,0,(long)Width(),(long)Height()};
+			RECT rcSrc = {0,0,(LONG)Width(),(LONG)Height()};
 			RECT rcDst ={0,0,nWid,nHei};
 			hr = pRT->DrawBitmapEx(&rcDst,this,&rcSrc,MAKELONG(EM_STRETCH,filterLevel),255);
 			if(hr == S_OK)
@@ -544,9 +544,9 @@ namespace SOUI
 
         m_ptOrg.x=m_ptOrg.y=0;
                 
-        HDC hdc=::GetDC(NULL);
+        HDC hdc=::GetDC(0);
         m_hdc = CreateCompatibleDC(hdc);
-        ::ReleaseDC(NULL,hdc);
+        ::ReleaseDC(0,hdc);
         ::SetBkMode(m_hdc,TRANSPARENT);
         ::SetGraphicsMode(m_hdc,GM_ADVANCED);
         CreatePen(PS_SOLID,SColor(0,0,0).toCOLORREF(),1,&m_defPen);
@@ -819,7 +819,7 @@ namespace SOUI
 				RECT rc2 = {x-sz.cy, y, x, y+sz.cx};
 				rc = rc2;
 			}else{
-				RECT rc2 = {0,0, (long)m_curBmp->Width(),(long)m_curBmp->Height()};
+				RECT rc2 = {0,0, (LONG)m_curBmp->Width(),(LONG)m_curBmp->Height()};
 				rc = rc2;
 			}
 			::TextOut(m_hdc,x,y,lpszString,nCount);
@@ -1133,25 +1133,9 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::ClearRect( LPCRECT pRect,COLORREF cr )
     {
-        int nWid=pRect->right-pRect->left;
-        int nHei=pRect->bottom-pRect->top;
-		if(nWid == 0 || nHei == 0)
-			return S_OK;
-
-        LPDWORD pBits;
-        HBITMAP hBmp=SBitmap_GDI::CreateGDIBitmap(nWid,nHei,(void**)&pBits);
-        HDC hMemDC=CreateCompatibleDC(m_hdc);
-        ::SelectObject(hMemDC,hBmp);
-
-        SColor color(cr);
-        DWORD dwColor=color.toARGB();
-
-		for(int i=0;i<nHei;i++)for(int j=0;j<nWid;j++) 
-			*pBits++ = dwColor;
-
-        ::BitBlt(m_hdc,pRect->left,pRect->top,nWid,nHei,hMemDC,0,0,SRCCOPY);
-        ::DeleteDC(hMemDC);
-        ::DeleteObject(hBmp);
+        HBRUSH br = CreateSolidBrush(cr);
+        FillRect(m_hdc, pRect,br);
+        DeleteObject(br);
         return S_OK;    
     }
 

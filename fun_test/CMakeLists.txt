@@ -32,7 +32,7 @@ target_include_directories(fun_test
   )
 
 add_dependencies(fun_test utilities4 gtest platform soui4)
-target_link_libraries(fun_test utilities4 gtest platform soui4)
+target_link_libraries(fun_test utilities4 gtest platform soui4 render-gdi)
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 target_link_libraries(fun_test pthread xcb xcb-util dl)
 endif()
