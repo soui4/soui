@@ -60,7 +60,7 @@ SNativeWnd::~SNativeWnd(void)
 HWND  SNativeWnd::CreateNative
 (LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam ){
     SNativeHelper::instance()->SetSharePtr(this);
-    m_hWnd =::CreateWindowEx(dwExStyle,(LPCSTR)SNativeHelper::instance()->getAtom(),lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,nID,0,lpParam);
+    m_hWnd =::CreateWindowEx(dwExStyle,(LPCSTR)(INT_PTR)SNativeHelper::instance()->getAtom(),lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,nID,0,lpParam);
     SNativeHelper::instance()->SetSharePtr(nullptr);
     if(!m_hWnd)
         return 0;

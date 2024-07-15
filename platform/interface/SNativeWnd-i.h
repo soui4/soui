@@ -144,7 +144,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @param hWndCenter 相对居中窗口
      * @return TRUE-SUCCEED
      */
-    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter DEF_VAL(NULL)) PURE;
+    STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter DEF_VAL(0)) PURE;
 
     /**
      * @brief 销毁窗口
