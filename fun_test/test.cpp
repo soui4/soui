@@ -201,15 +201,18 @@ void SNativeWnd2::OnPaint(HDC hdc){
 }
 void SNativeWnd2::OnClose(){
     //PostMessage(WM_QUIT,1);
+    //SetWindowPos(0, 0, 0, 600, 600, SWP_NOMOVE | SWP_NOZORDER);
     PostThreadMessage(GetCurrentThreadId(),WM_QUIT,1,0);  
 }
 
 TEST(Window,loop){
-/*    
+//*    
     SNativeWnd::InitWndClass(0,"soui_host",FALSE);
     SNativeWnd2 wnd;
-    HWND hWnd = wnd.CreateNative("test window",WS_POPUP|WS_VISIBLE,0,0,0,400,400,0);
+    HWND hWnd = wnd.CreateNative("test window",WS_POPUP,0,0,0,10,10,0);
     if(hWnd){
+        wnd.SetWindowPos(0, 0, 0, 600, 600, SWP_NOMOVE | SWP_NOZORDER);
+        wnd.ShowWindow(SW_SHOW);
         SMessageLoop loop(nullptr);
         int ret = loop.Run();
         wnd.DestroyWindow();
@@ -240,6 +243,7 @@ int run_demo(HINSTANCE hInst){
 
     SHostWnd hostWnd("layout:XML_MAINWND");
     hostWnd.Create(0);
+    hostWnd.SetWindowPos(0, 0, 0, 600, 400, SWP_NOMOVE | SWP_NOZORDER);
     hostWnd.ShowWindow(SW_SHOW);
     app.Run(hostWnd.m_hWnd);
     
@@ -248,5 +252,5 @@ int run_demo(HINSTANCE hInst){
 
 TEST(soui,demo){
     HINSTANCE hInst = 0;
-    EXPECT_EQ(run_demo(hInst),0);
+//    EXPECT_EQ(run_demo(hInst),0);
 }

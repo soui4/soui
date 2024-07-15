@@ -678,8 +678,11 @@ BOOL ShowWindow(HWND hWnd, int nCmdShow)
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    if(nCmdShow & SW_SHOW)
+    if (nCmdShow & SW_SHOW)
+    {
         xcb_map_window(wndObj->mConnection, hWnd);
+        InvalidateRect(hWnd, nullptr, TRUE);
+    }
     else
         xcb_unmap_window(wndObj->mConnection, hWnd);
     xcb_flush(wndObj->mConnection);
