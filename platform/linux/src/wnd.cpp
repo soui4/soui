@@ -226,11 +226,11 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 
     pWnd->parent = cs->hwndParent;
     pWnd->winproc = info.lpfnWndProc;
-    pWnd->hdc = CreateDC(hWnd,cs->cx,cs->cy);
     {
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         map_wnd.insert(std::make_pair(hWnd,pWnd));
     }
+    pWnd->hdc = CreateDC(hWnd, cs->cx, cs->cy);
     if(0!=SendMessage(hWnd,WM_CREATE,0,(LPARAM)cs)){
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         auto it = map_wnd.find(hWnd);
@@ -317,6 +317,22 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
     return TRUE;
 }
 
+LRESULT CallWndProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if (!wndObj)
+        return -1;
+    switch (msg) {
+    case WM_SIZE:
+        SIZE sz = { GET_X_LPARAM(lp),GET_Y_LPARAM(lp) };
+        if (wndObj->hdc)
+        {
+            cairo_xcb_surface_set_size((cairo_surface_t*)GetGdiObjPtr(GetCurrentObject(wndObj->hdc, OBJ_BITMAP)), sz.cx, sz.cy);
+        }
+        break;
+    }
+    return proc(hWnd, msg, wp, lp);
+}
+
 LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
 {
     WndObj pWnd = WndObj::fromHwnd(hWnd);
@@ -330,7 +346,7 @@ LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
         //same thread,call wndproc directly.
         WNDPROC wndProc = (WNDPROC)GetWindowLongPtr(hWnd,GWL_WNDPROC);
         assert(wndProc);
-        return wndProc(hWnd,msg,wp,lp);
+        return CallWndProc(wndProc,hWnd,msg,wp,lp);
     }else{
         return PostMessage(hWnd,msg,wp,lp);
         //todo, hjx dont care about the result right now.
@@ -646,16 +662,6 @@ HDC CreateDC(HWND hwnd,int cx,int cy){
 
 HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
     switch(msg){
-        case WM_SIZE:
-        {
-            WndObj wndObj=WndObj::fromHwnd(hwnd);
-            SIZE sz ={GET_X_LPARAM(lp),GET_Y_LPARAM(lp)};
-            if(wndObj && wndObj->hdc)
-            {
-                cairo_xcb_surface_set_size((cairo_surface_t*)GetGdiObjPtr(GetCurrentObject(wndObj->hdc,OBJ_BITMAP)),sz.cx,sz.cy);
-            }
-        }
-        break;
         case WM_CLOSE:
         DestroyWindow(hwnd);
         break;

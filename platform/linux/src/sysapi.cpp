@@ -704,7 +704,7 @@ BOOL DispatchMessage(LPMSG pMsg){
     WNDPROC wndProc = (WNDPROC)GetWindowLongPtr(pMsg->hwnd,GWLP_WNDPROC);
     if(!wndProc)
         return FALSE;
-    wndProc(pMsg->hwnd,pMsg->message,pMsg->wParam,pMsg->lParam);
+    CallWndProc(wndProc,pMsg->hwnd,pMsg->message,pMsg->wParam,pMsg->lParam);
     return TRUE;
 }
 

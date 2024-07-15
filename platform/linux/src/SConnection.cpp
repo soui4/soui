@@ -156,7 +156,7 @@ SConnection::~SConnection()
 
 bool SConnection::update(){
     std::unique_lock<std::mutex> lock(m_mutex4Evt);
-    m_varCondition.wait(lock);
+    m_varCondition.wait(lock, [&]{return !m_evtQueue.empty(); });
 
     for(auto it:m_evtQueue){
         pushEvent(it);
@@ -228,7 +228,6 @@ void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
 bool SConnection::pushEvent(xcb_generic_event_t *event){
     uint8_t event_code = event->response_type & 0x7f;
     Msg *pMsg = nullptr;
-    //printf("pushEvent code=%u\n",event_code);
     bool ret = false;
     switch (event_code)
     {

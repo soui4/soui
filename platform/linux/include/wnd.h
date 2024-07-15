@@ -22,35 +22,36 @@ BOOL WINAPI DestroyWindow(HWND hWnd);
 
 BOOL WINAPI IsWindow(HWND hwnd);
 
-
 BOOL
-PostMessage(
+WINAPI PostMessage(
      HWND hWnd,
      UINT Msg,
      WPARAM wParam,
      LPARAM lParam);
 
-LRESULT SendMessage(
+LRESULT WINAPI CallWndProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+
+LRESULT WINAPI SendMessage(
      HWND hWnd,
      UINT Msg,
      WPARAM wParam,
      LPARAM lParam);
 
 int
-MessageBox(
+WINAPI MessageBox(
      HWND hWnd,
      LPCTSTR lpText,
      LPCTSTR lpCaption,
      UINT uType);
 
 BOOL
-SetForegroundWindow(
+WINAPI SetForegroundWindow(
  HWND hWnd);
 
-HWND GetForegroundWindow();
+HWND WINAPI GetForegroundWindow();
 
 BOOL
-SetWindowPos(
+WINAPI SetWindowPos(
      HWND hWnd,
      HWND hWndInsertAfter,
      int X,
