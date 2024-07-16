@@ -144,4 +144,58 @@ FILE * _wfopen(const wchar_t *path,const wchar_t *mode);
 
 long file_length(const char * path);
 
+#define HEAP_NO_SERIALIZE               0x00000001      
+#define HEAP_GROWABLE                   0x00000002      
+#define HEAP_GENERATE_EXCEPTIONS        0x00000004      
+#define HEAP_ZERO_MEMORY                0x00000008      
+#define HEAP_REALLOC_IN_PLACE_ONLY      0x00000010      
+#define HEAP_TAIL_CHECKING_ENABLED      0x00000020      
+#define HEAP_FREE_CHECKING_ENABLED      0x00000040      
+#define HEAP_DISABLE_COALESCE_ON_FREE   0x00000080      
+#define HEAP_CREATE_ALIGN_16            0x00010000      
+#define HEAP_CREATE_ENABLE_TRACING      0x00020000      
+#define HEAP_CREATE_ENABLE_EXECUTE      0x00040000      
+#define HEAP_MAXIMUM_TAG                0x0FFF              
+#define HEAP_PSEUDO_TAG_FLAG            0x8000              
+#define HEAP_TAG_SHIFT                  18                  
+#define HEAP_CREATE_SEGMENT_HEAP        0x00000100      
+#define HEAP_CREATE_HARDENED            0x00000200      
+
+HANDLE WINAPI
+HeapCreate(
+    DWORD flOptions,
+    size_t dwInitialSize,
+    size_t dwMaximumSize
+);
+
+BOOL
+WINAPI
+HeapDestroy(
+    HANDLE hHeap
+);
+
+LPVOID
+WINAPI
+HeapAlloc(
+    HANDLE hHeap,
+    DWORD dwFlags,
+    size_t dwBytes
+);
+
+BOOL
+WINAPI
+HeapFree(
+    HANDLE hHeap,
+    DWORD dwFlags,
+    LPVOID lpMem
+);
+
+BOOL
+WINAPI
+FlushInstructionCache(
+    HANDLE hProcess,
+    LPCVOID lpBaseAddress,
+    size_t dwSize
+);
+
 #endif

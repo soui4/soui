@@ -857,3 +857,85 @@ uint32_t GetFileAttributes(const char *path)
     }
     return ret;
 }
+
+struct MemBlock {
+    size_t len;
+    void* ptr;
+};
+
+struct HeapInfo {
+    DWORD option;
+    std::list<MemBlock> lstMem;
+};
+
+HANDLE
+HeapCreate(
+    DWORD flOptions,
+    size_t dwInitialSize,
+    size_t dwMaximumSize
+) {
+    return (HANDLE)(new HeapInfo);
+}
+
+BOOL
+WINAPI
+HeapDestroy(
+    HANDLE hHeap
+) {
+    if (!hHeap)
+        return FALSE;
+    HeapInfo* info = (HeapInfo*)hHeap;
+
+    for (auto it : info->lstMem) {
+        free(it.ptr);
+    }
+    delete info;
+    return TRUE;
+}
+
+LPVOID
+HeapAlloc(
+    HANDLE hHeap,
+    DWORD dwFlags,
+    size_t dwBytes
+) {
+    HeapInfo* info = (HeapInfo*)hHeap;
+    if (!info)
+        return nullptr;
+    int prot = PROT_READ | PROT_WRITE;
+    if (info->option & HEAP_CREATE_ENABLE_EXECUTE)
+        prot |= PROT_EXEC;
+    MemBlock block;
+    block.len = dwBytes;
+    block.ptr = mmap(nullptr, dwBytes, prot, MAP_ANONYMOUS | MAP_LOCKED, 0, 0);
+    info->lstMem.push_back(block);
+    return block.ptr;
+}
+
+BOOL
+HeapFree(
+    HANDLE hHeap,
+    DWORD dwFlags,
+    LPVOID lpMem
+) {
+    HeapInfo* info = (HeapInfo*)hHeap;
+    if (!info)
+        return FALSE;
+    for (auto it = info->lstMem.begin(); it != info->lstMem.end(); it++) {
+        if (it->ptr == lpMem) {
+            munmap(it->ptr, it->len);
+            info->lstMem.erase(it);
+            return TRUE;
+        }
+    }
+    return FALSE;
+}
+
+BOOL
+FlushInstructionCache(
+    HANDLE hProcess,
+    LPCVOID lpBaseAddress,
+    size_t dwSize
+) {
+    return TRUE;
+}
