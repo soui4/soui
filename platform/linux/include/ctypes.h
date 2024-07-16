@@ -25,19 +25,131 @@ typedef __UINTPTR_TYPE__ uintptr_t;
 
 typedef unsigned int UINT;
 typedef int64_t __int64;// int64_t
-#define E_INVALIDARG 1
-#define E_OUTOFMEMORY 2
-#define E_POINTER 3
-#define E_FAIL 4
-#define E_NOTIMPL 5
-#define E_NOINTERFACE 6
-#define E_UNEXPECTED 7
+
+// ---------------------- HRESULT value definitions -----------------
+//
+// HRESULT definitions
+//
+
+#ifdef RC_INVOKED
+#define _HRESULT_TYPEDEF_(_sc) _sc
+#else // RC_INVOKED
+#define _HRESULT_TYPEDEF_(_sc) ((HRESULT)_sc)
+#endif // RC_INVOKED
+
+#define NOERROR             0
+
+//
+// Error definitions follow
+//
+
+//
+// Codes 0x4000-0x40ff are reserved for OLE
+//
+//
+// Error codes
+//
+//
+// MessageId: E_UNEXPECTED
+//
+// MessageText:
+//
+// Catastrophic failure
+//
+#define E_UNEXPECTED                     _HRESULT_TYPEDEF_(0x8000FFFFL)
+
+//
+// MessageId: E_NOTIMPL
+//
+// MessageText:
+//
+// Not implemented
+//
+#define E_NOTIMPL                        _HRESULT_TYPEDEF_(0x80004001L)
+
+//
+// MessageId: E_OUTOFMEMORY
+//
+// MessageText:
+//
+// Ran out of memory
+//
+#define E_OUTOFMEMORY                    _HRESULT_TYPEDEF_(0x8007000EL)
+
+//
+// MessageId: E_INVALIDARG
+//
+// MessageText:
+//
+// One or more arguments are invalid
+//
+#define E_INVALIDARG                     _HRESULT_TYPEDEF_(0x80070057L)
+
+//
+// MessageId: E_NOINTERFACE
+//
+// MessageText:
+//
+// No such interface supported
+//
+#define E_NOINTERFACE                    _HRESULT_TYPEDEF_(0x80004002L)
+
+//
+// MessageId: E_POINTER
+//
+// MessageText:
+//
+// Invalid pointer
+//
+#define E_POINTER                        _HRESULT_TYPEDEF_(0x80004003L)
+
+//
+// MessageId: E_HANDLE
+//
+// MessageText:
+//
+// Invalid handle
+//
+#define E_HANDLE                         _HRESULT_TYPEDEF_(0x80070006L)
+
+//
+// MessageId: E_ABORT
+//
+// MessageText:
+//
+// Operation aborted
+//
+#define E_ABORT                          _HRESULT_TYPEDEF_(0x80004004L)
+
+//
+// MessageId: E_FAIL
+//
+// MessageText:
+//
+// Unspecified error
+//
+#define E_FAIL                           _HRESULT_TYPEDEF_(0x80004005L)
+
+//
+// MessageId: E_ACCESSDENIED
+//
+// MessageText:
+//
+// General access denied error
+//
+#define E_ACCESSDENIED                   _HRESULT_TYPEDEF_(0x80070005L)
+
 
 #define S_OK 0
 #define S_FALSE 1
 
+#ifndef SUCCEEDED
+#define SUCCEEDED(hr)   (((HRESULT)(hr)) >= 0)
+#endif
 
-#define FAILED(x) (x)!=S_OK
+#ifndef FAILED
+#define FAILED(hr) (((HRESULT)(hr)) < 0)
+#endif
 
 typedef unsigned long ULONG;
 typedef uint8_t BYTE;
@@ -252,7 +364,6 @@ typedef struct tagPOINTS
     #define EXTERN_C    extern
 #endif
 
-#define SUCCEEDED(x) ((x)>0)
 #define INFINITE     (UINT)-1
 
 #define SRCCOPY             (DWORD)0x00CC0020 /* dest = source                   */

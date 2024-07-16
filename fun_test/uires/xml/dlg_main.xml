@@ -2,7 +2,7 @@
 appWnd="1"
 translucent="0"
 >
-  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" >
+  <root  width="600" height="400" >
     <text pos="10,10" text="hello soui"/>
   </root>
 </SOUI>
