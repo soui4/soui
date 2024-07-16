@@ -194,9 +194,12 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
     pWnd->tid = pthread_self();
     pWnd->hdc = nullptr;
 
-    SConnection *state = SConnMgr::instance()->getConnection(pWnd->tid);
-    pWnd->mConnection = state->connection;
-    pWnd->mScreen = state->screen;
+    SConnection *conn = SConnMgr::instance()->getConnection(pWnd->tid);
+    HWND hParent = cs->hwndParent;
+    if (!hParent) hParent = conn->screen->root;
+
+    pWnd->mConnection = conn->connection;
+    pWnd->mScreen = conn->screen;
     pWnd->dwStyle = cs->style;
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
@@ -208,23 +211,30 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
         XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY |XCB_EVENT_MASK_PROPERTY_CHANGE
         };
 
-    xcb_create_window(pWnd->mConnection, XCB_COPY_FROM_PARENT, hWnd,
-                      pWnd->mScreen->root, cs->x, cs->y, cs->cx, cs->cy, 10,
+    auto cookie = xcb_create_window_checked(pWnd->mConnection, XCB_COPY_FROM_PARENT, hWnd,
+                      hParent, cs->x, cs->y, std::max(cs->cx,1u), std::max(cs->cy,1u), 10,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT, pWnd->mScreen->root_visual, mask,
                       value_list);
-
+    xcb_generic_error_t * err = xcb_request_check(pWnd->mConnection, cookie);
+    if (err) {
+        printf("窗口创建请求出错：%d\n", err->error_code);
+        free(err);
+        return 0;
+    }
+    const uint32_t vals[2] = { cs->cx, cs->cy};
+    xcb_configure_window(pWnd->mConnection, hWnd, XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, vals);
     pWnd->title = cs->lpszName;
     xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, pWnd->title.length(), pWnd->title.c_str());
 
-    xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd, state->wm_protocols_atom, XCB_ATOM_ATOM, 32, 1, &state->wm_delete_window_atom);
+    xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd, conn->wm_protocols_atom, XCB_ATOM_ATOM, 32, 1, &conn->wm_delete_window_atom);
 
     if(cs->style & WS_VISIBLE)
         xcb_map_window(pWnd->mConnection, hWnd);
 
     xcb_flush(pWnd->mConnection);
 
-    pWnd->parent = cs->hwndParent;
+    pWnd->parent = hParent;
     pWnd->winproc = info.lpfnWndProc;
     {
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
@@ -645,6 +655,8 @@ BOOL GetWindowRect(HWND hWnd, RECT *rc)
 
 HDC CreateDC(HWND hwnd,int cx,int cy){
     assert(hwnd);
+    cx = std::max(cx, 1);
+    cy = std::max(cy, 1);
     WndObj wndObj = WndObj::fromHwnd(hwnd);
     if(wndObj){
         cairo_surface_t * surface = cairo_xcb_surface_create(wndObj->mConnection, hwnd, xcb_aux_find_visual_by_id(wndObj->mScreen,wndObj->mScreen->root_visual), cx,cy);
@@ -678,14 +690,21 @@ BOOL ShowWindow(HWND hWnd, int nCmdShow)
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
+    BOOL bVisible = IsWindowVisible(hWnd);
+    BOOL bNew = nCmdShow & SW_SHOW;
+    if (bVisible == bNew)
+        return TRUE;
     if (nCmdShow & SW_SHOW)
     {
         xcb_map_window(wndObj->mConnection, hWnd);
         InvalidateRect(hWnd, nullptr, TRUE);
     }
     else
+    {
         xcb_unmap_window(wndObj->mConnection, hWnd);
+    }    
     xcb_flush(wndObj->mConnection);
+    SendMessage(hWnd, WM_SHOWWINDOW, bNew, 0);
     return TRUE;
 }
 

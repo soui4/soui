@@ -566,8 +566,8 @@ typedef struct tagCREATESTRUCT {
     HINSTANCE   hInstance;
     HMENU       hMenu;
     HWND        hwndParent;
-    int         cy;
-    int         cx;
+    uint32_t    cy;
+    uint32_t    cx;
     int         y;
     int         x;
     LONG        style;
