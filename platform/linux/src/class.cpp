@@ -146,7 +146,12 @@ BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance )
     std::unique_lock<std::recursive_mutex> lock(cls_mutex);
     for(auto it = class_list.begin();it!=class_list.end();it++){
         CLASS * _class = *it;
-        if(strcmp(_class->name,className)==0)
+        BOOL bMatch = FALSE;
+        if (IS_INTRESOURCE(className))
+            bMatch = _class->atomName == (ATOM)(UINT_PTR)className;
+        else
+            bMatch = strcmp(_class->name, className) == 0;
+        if(bMatch)
         {
             atom_map.erase(std::string(_class->name));
             //if (_class->hbrBackground > (HBRUSH)(COLOR_GRADIENTINACTIVECAPTION + 1))

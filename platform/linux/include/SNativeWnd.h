@@ -1,34 +1,34 @@
 ﻿#ifndef __SNATIVEWND__H__
 #define __SNATIVEWND__H__
-#include <platform.h>
-#include <platform_exp.h>
 #include <interface/SNativeWnd-i.h>
 #include <helper/SCriticalSection.h>
 #include <helper/obj-ref-impl.hpp>
-#include <xcb/xcb.h>
-#include <string>
-
+#include <platform_exp.h>
+//////////////////////////////////////////////////////////////////////////
+// thunk 技术实现参考http://www.cppblog.com/proguru/archive/2008/08/24/59831.html
+//////////////////////////////////////////////////////////////////////////
 SNSBEGIN
 
+struct tagThunk;
 class PLATFORM_API SNativeWnd : public INativeWnd {
-    friend class SNativeHelper;
-  public:
-  	static BOOL InitWndClass(HINSTANCE hInst,LPCTSTR pszHostClassName,BOOL bImeApp);
-  public:
+public:
     SNativeWnd();
     virtual ~SNativeWnd(void);
 
+    static ATOM RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName, BOOL bImeWnd);
+    static void InitWndClass(HINSTANCE hInst, LPCTSTR pszSimpleWndName, BOOL bImeWnd);
+
     STDMETHOD_(int, GetID)(THIS) SCONST
     {
-        return (int)::GetWindowLong(m_hWnd,GWL_ID);
+        return GetDlgCtrlID();
     }
     STDMETHOD_(void, SetID)(THIS_ int nID)
     {
-      ::SetWindowLong(m_hWnd,GWL_ID,nID);
+        SetWindowLongPtr(GWL_ID, nID);
     }
 
     STDMETHOD_(HWND, CreateNative)
-    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID DEF_VAL(0), LPVOID lpParam DEF_VAL(0)) OVERRIDE;
+        (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID DEF_VAL(0), LPVOID lpParam DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(HWND, GetHwnd)(THIS) OVERRIDE;
 
@@ -36,7 +36,7 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
 
     STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce DEF_VAL(FALSE)) OVERRIDE;
 
-    STDMETHOD_(const MSG *, GetCurrentMessage)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(const MSG*, GetCurrentMessage)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(int, GetDlgCtrlID)(THIS) SCONST OVERRIDE;
 
@@ -55,13 +55,13 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     STDMETHOD_(BOOL, IsWindowEnabled)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, ModifyStyle)
-    (THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) OVERRIDE;
+        (THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, ModifyStyleEx)
-    (THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) OVERRIDE;
+        (THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, SetWindowPos)
-    (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) OVERRIDE;
+        (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) OVERRIDE;
 
     STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter DEF_VAL(0)) OVERRIDE;
 
@@ -86,12 +86,12 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     STDMETHOD_(BOOL, ScreenToClient2)(THIS_ LPRECT lpRect) SCONST OVERRIDE;
 
     STDMETHOD_(int, MapWindowPoints)
-    (THIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST OVERRIDE;
+        (THIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST OVERRIDE;
 
     STDMETHOD_(int, MapWindowRect)(THIS_ HWND hWndTo, LPRECT lpRect) SCONST OVERRIDE;
 
     STDMETHOD_(UINT_PTR, SetTimer)
-    (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) DEF_VAL(NULL)) OVERRIDE;
+        (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK* lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) DEF_VAL(NULL)) OVERRIDE;
 
     STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) OVERRIDE;
 
@@ -116,10 +116,10 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     STDMETHOD_(HWND, SetFocus)(THIS) OVERRIDE;
 
     STDMETHOD_(LRESULT, SendMessage)
-    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
+        (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, PostMessage)
-    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
+        (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) OVERRIDE;
 
@@ -132,7 +132,7 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     STDMETHOD_(BOOL, IsWindowVisible)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, MoveWindow)
-    (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint DEF_VAL(TRUE)) OVERRIDE;
+        (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint DEF_VAL(TRUE)) OVERRIDE;
 
     STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint DEF_VAL(TRUE)) OVERRIDE;
 
@@ -141,41 +141,45 @@ class PLATFORM_API SNativeWnd : public INativeWnd {
     STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw DEF_VAL(TRUE)) OVERRIDE;
 
     STDMETHOD_(BOOL, SetLayeredWindowAttributes)
-    (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) OVERRIDE;
+        (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) OVERRIDE;
 
     STDMETHOD_(BOOL, SetLayeredWindowAlpha)(THIS_ BYTE byAlpha) OVERRIDE;
 
     STDMETHOD_(BOOL, UpdateLayeredWindow)
-    (THIS_ HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags) OVERRIDE;
+        (THIS_ HDC hdcDst, POINT* pptDst, SIZE* psize, HDC hdcSrc, POINT* pptSrc, COLORREF crKey, BLENDFUNCTION* pblend, DWORD dwFlags) OVERRIDE;
 
-    STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) OVERRIDE;
-    STDMETHOD_(MsgHandlerInfo *, GetMsgHandler)(THIS) OVERRIDE;
+    STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void* ctx) OVERRIDE;
+    STDMETHOD_(MsgHandlerInfo*, GetMsgHandler)(THIS) OVERRIDE;
 
     LRESULT DefWindowProc();
-    LRESULT ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
-    LRESULT ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled);
-    static BOOL DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult);
+    LRESULT ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    LRESULT ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled);
+    static BOOL DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult);
 
-  public: // EXTRACT FROM BEGIN_MSG_MAP_EX and END_MSG_MAP
-    virtual BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID = 0);
+public: // EXTRACT FROM BEGIN_MSG_MAP_EX and END_MSG_MAP
+    virtual BOOL ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID = 0);
 
-  protected:
-    static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+protected:
     LRESULT DefWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     virtual void OnFinalMessage(HWND hWnd);
 
-    const MSG *m_pCurrentMsg;
+    const MSG* m_pCurrentMsg;
     BOOL m_bDestoryed;
 
     MsgHandlerInfo m_msgHandlerInfo;
 
-  public:
+public:
     HWND m_hWnd;
-    xcb_connection_t * mConnection;
-    xcb_screen_t *mScreen;
-  private:
+
+protected:
+    static LRESULT CALLBACK WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    // 只执行一次
     static LRESULT CALLBACK StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam);
+
+    tagThunk* m_pThunk;
+    WNDPROC m_pfnSuperWindowProc;
 };
 
 SNSEND
