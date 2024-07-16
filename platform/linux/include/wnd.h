@@ -29,7 +29,7 @@ WINAPI PostMessage(
      WPARAM wParam,
      LPARAM lParam);
 
-LRESULT WINAPI CallWndProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
+LRESULT WINAPI CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp);
 
 LRESULT WINAPI SendMessage(
      HWND hWnd,

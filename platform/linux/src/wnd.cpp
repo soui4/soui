@@ -327,7 +327,7 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
     return TRUE;
 }
 
-LRESULT CallWndProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
+LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if (!wndObj)
         return -1;
@@ -356,7 +356,7 @@ LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
         //same thread,call wndproc directly.
         WNDPROC wndProc = (WNDPROC)GetWindowLongPtr(hWnd,GWL_WNDPROC);
         assert(wndProc);
-        return CallWndProc(wndProc,hWnd,msg,wp,lp);
+        return CallWindowProc(wndProc,hWnd,msg,wp,lp);
     }else{
         return PostMessage(hWnd,msg,wp,lp);
         //todo, hjx dont care about the result right now.

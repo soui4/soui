@@ -260,7 +260,7 @@ typedef void * HINSTANCE;
 typedef void * HMODULE;
 
 #define HICON int
-typedef uint32_t HWND;
+typedef UINT_PTR HWND;
 typedef struct _GdiObj * HGDIOBJ;
 
 typedef HGDIOBJ HPEN;

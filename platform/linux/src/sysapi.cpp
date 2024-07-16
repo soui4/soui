@@ -704,7 +704,7 @@ BOOL DispatchMessage(LPMSG pMsg){
     WNDPROC wndProc = (WNDPROC)GetWindowLongPtr(pMsg->hwnd,GWLP_WNDPROC);
     if(!wndProc)
         return FALSE;
-    CallWndProc(wndProc,pMsg->hwnd,pMsg->message,pMsg->wParam,pMsg->lParam);
+    CallWindowProc(wndProc,pMsg->hwnd,pMsg->message,pMsg->wParam,pMsg->lParam);
     return TRUE;
 }
 
@@ -907,7 +907,13 @@ HeapAlloc(
         prot |= PROT_EXEC;
     MemBlock block;
     block.len = dwBytes;
-    block.ptr = mmap(nullptr, dwBytes, prot, MAP_ANONYMOUS | MAP_LOCKED, 0, 0);
+    block.ptr = mmap(nullptr, dwBytes, prot, MAP_ANONYMOUS | MAP_PRIVATE, -1, 0);
+    if (block.ptr == MAP_FAILED) {
+        return nullptr;
+    }
+    if (dwFlags & HEAP_ZERO_MEMORY) {
+        memset(block.ptr, 0, dwBytes);
+    }
     info->lstMem.push_back(block);
     return block.ptr;
 }
@@ -938,4 +944,12 @@ FlushInstructionCache(
     size_t dwSize
 ) {
     return TRUE;
+}
+
+HANDLE
+WINAPI
+GetCurrentProcess(
+    VOID
+) {
+    return 0;
 }

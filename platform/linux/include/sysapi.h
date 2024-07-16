@@ -198,4 +198,9 @@ FlushInstructionCache(
     size_t dwSize
 );
 
+HANDLE
+WINAPI
+GetCurrentProcess(
+    VOID
+);
 #endif
