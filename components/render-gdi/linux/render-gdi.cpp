@@ -229,7 +229,7 @@ namespace SOUI
 
 	SBrush_GDI::SBrush_GDI(IRenderFactory * pRenderFac,COLORREF cr) :TGdiRenderObjImpl<IBrushS,OT_BRUSH>(pRenderFac),m_cr(cr),m_brushType(Brush_Color)
 	{
-		m_hBrush = ::CreateSolidBrush(m_cr&0x00ffffff);
+		m_hBrush = ::CreateSolidBrush(m_cr);
 	}
 
 	SBrush_GDI::~SBrush_GDI()
@@ -769,7 +769,7 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::FillSolidRoundRect(LPCRECT pRect,POINT pt,COLORREF cr)
     {
-        HBRUSH br=::CreateSolidBrush(cr&0x00ffffff);
+        HBRUSH br=::CreateSolidBrush(cr);
 		HGDIOBJ oldObj=::SelectObject(m_hdc,br);
 		HGDIOBJ oldPen = ::SelectObject(m_hdc, GetStockObject(NULL_PEN));
 		::RoundRect(m_hdc,pRect->left,pRect->top,pRect->right,pRect->bottom,pt.x*2,pt.y*2);
@@ -1125,7 +1125,7 @@ namespace SOUI
     //通过一个内存位图来填充位置的alpha值
     HRESULT SRenderTarget_GDI::FillSolidRect( LPCRECT pRect,COLORREF cr )
     {
-        HBRUSH br=::CreateSolidBrush(cr&0x00ffffff);
+        HBRUSH br=::CreateSolidBrush(cr);
         ::FillRect(m_hdc,pRect,br);
         ::DeleteObject(br);
         return S_OK;    
@@ -1166,7 +1166,7 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::FillSolidEllipse(LPCRECT pRect,COLORREF cr)
     {
-		HBRUSH br=::CreateSolidBrush(cr&0x00ffffff);
+		HBRUSH br=::CreateSolidBrush(cr);
 		HGDIOBJ oldObj=::SelectObject(m_hdc,br);
 		HGDIOBJ oldPen = ::SelectObject(m_hdc, GetStockObject(NULL_PEN));
 		::Ellipse(m_hdc,pRect->left,pRect->top,pRect->right,pRect->bottom);
@@ -1366,7 +1366,7 @@ namespace SOUI
 	{
 		COLORREF crOld=m_curColor.toCOLORREF();
 		m_curColor.setRGB(color);
-		::SetTextColor(m_hdc,color&0x00ffffff);
+		::SetTextColor(m_hdc,color);
 		return crOld;
 	}
 

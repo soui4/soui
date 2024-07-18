@@ -5,6 +5,8 @@
 #define CONST const
 #endif
 
+#define RDH_RECTANGLES  1
+
 int RgnComplexity(HRGN hRgn);
 
 int CombineRgn(

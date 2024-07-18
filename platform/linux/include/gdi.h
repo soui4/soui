@@ -11,6 +11,7 @@
 HGDIOBJ InitGdiObj(int type,void *ptr);
 int GetGdiObjType(HGDIOBJ hgdiobj);
 void* GetGdiObjPtr(HGDIOBJ hgdiobj);
+void SetGdiObjPtr(HGDIOBJ hgdiObj, void* ptr);
 
 typedef struct  _XFORM { 
 	FLOAT eM11; 

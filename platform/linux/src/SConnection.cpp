@@ -191,6 +191,10 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
             pMsg->message = msg->message;
             pMsg->wParam = msg->wParam;
             pMsg->lParam = msg->lParam;
+            if (msg->message == WM_PAINT) {
+                MsgPaint* msg2 = (MsgPaint*)msg;
+                SelectClipRgn(GetDC(pMsg->hwnd), msg2->rgn);
+            }
             delete msg;
             m_msgQueue.erase(it);
             return TRUE;
@@ -198,20 +202,6 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
        
     }
     return FALSE;
-}
-
-void triggerRedraw(xcb_connection_t* connection, xcb_window_t window) {
-    xcb_expose_event_t exposeEvent;
-    exposeEvent.response_type = XCB_EXPOSE;
-    exposeEvent.window = window;
-    exposeEvent.x = 0;
-    exposeEvent.y = 0;
-    exposeEvent.width = 0;  // 设置为0表示重绘整个窗口
-    exposeEvent.height = 0; // 设置为0表示重绘整个窗口
-    exposeEvent.count = 0;
-
-    xcb_send_event(connection, false, window, XCB_EVENT_MASK_EXPOSURE, (const char*)&exposeEvent);
-    //xcb_flush(connection);
 }
 
 void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
@@ -234,18 +224,21 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
     case XCB_EXPOSE:
     {
         xcb_expose_event_t* expose = (xcb_expose_event_t*)event;
-        cairo_rectangle_int_t rc = {expose->x,expose->y,expose->width,expose->height};
+        RECT rc = {expose->x,expose->y,expose->x+expose->width,expose->y+expose->height};
+        HRGN hrgn = CreateRectRgnIndirect(&rc);
+        memset(&rc, 0, sizeof(rc));
+        GetRgnBox(hrgn, &rc);
         std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
         for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
                 if((*it)->message == WM_PAINT && (*it)->hwnd == expose->window)
                 {
                     MsgPaint *oldMsg = (MsgPaint*)(*it);
-                    cairo_region_union_rectangle(oldMsg->rgn,&rc);
+                    CombineRgn(oldMsg->rgn, oldMsg->rgn, hrgn, RGN_OR);
+                    DeleteObject(hrgn);
                     return true;
                 }
         }
-
-        MsgPaint *pMsgPaint = new MsgPaint(cairo_region_create_rectangle(&rc));
+        MsgPaint *pMsgPaint = new MsgPaint(hrgn);
         pMsgPaint->hwnd = expose->window;
         pMsgPaint->message = WM_PAINT;
         pMsgPaint->wParam = 0;

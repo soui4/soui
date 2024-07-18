@@ -6,6 +6,7 @@
 #include <fcntl.h>
 #include "SConnection.h"
 #include "wnd.h"
+#include "uimsg.h"
 using namespace SOUI;
 
 

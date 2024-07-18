@@ -28,11 +28,9 @@ int CombineRgn(HRGN hrgnDst, HRGN hrgnSrc1, HRGN hrgnSrc2, int iMode)
         break;
         case RGN_COPY:
         {
-            cairo_region_t *empty = cairo_region_create();
-            //clear dest region
-            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),empty);
-            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
-            cairo_region_destroy(empty);
+            cairo_region_t *rgnCpy = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
+            cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
+            SetGdiObjPtr(hrgnDst, rgnCpy);
         }
         break;
         case RGN_DIFF:
@@ -88,6 +86,8 @@ HRGN CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect)
 {
     cairo_rectangle_int_t rc={nLeftRect,nTopRect,nRightRect-nLeftRect,nBottomRect-nTopRect};
     cairo_region_t *ret = cairo_region_create_rectangle(&rc);
+    cairo_rectangle_int_t ext;
+    cairo_region_get_extents(ret, &ext);
     return InitGdiObj(OBJ_REGION,ret);
 }
 
@@ -126,7 +126,8 @@ HRGN ExtCreateRegion(const XFORM *lpXform, DWORD nCount, const RGNDATA *lpRgnDat
 
 DWORD GetRegionData(HRGN hrgn, DWORD dwCount, PRGNDATA lpRgnData)
 {
-    int nrc = cairo_region_num_rectangles((cairo_region_t*)GetGdiObjPtr(hrgn));
+    cairo_region_t* rgn = (cairo_region_t*)GetGdiObjPtr(hrgn);
+    int nrc = cairo_region_num_rectangles(rgn);
     int nRet = sizeof(RECT)*nrc + sizeof(RGNDATAHEADER);
     if(!lpRgnData)
         return nRet;
@@ -135,19 +136,26 @@ DWORD GetRegionData(HRGN hrgn, DWORD dwCount, PRGNDATA lpRgnData)
     LPRECT prc = (LPRECT)lpRgnData->Buffer;
     for(int i=0;i<nrc;i++){
         cairo_rectangle_int_t rc ;
-        cairo_region_get_rectangle((cairo_region_t*)GetGdiObjPtr(hrgn),i,&rc);
+        cairo_region_get_rectangle(rgn,i,&rc);
         prc->left = rc.x;
         prc->top = rc.y;
         prc->right = rc.x + rc.width;
         prc->bottom = rc.y + rc.height;
         prc++;
     }
+    cairo_rectangle_int_t ext;
+    cairo_region_get_extents(rgn, &ext);
+    lpRgnData->rdh.rcBound = RECT{ext.x,ext.y,ext.x+ext.width,ext.y+ext.height};
+    lpRgnData->rdh.nCount = nrc;
+    lpRgnData->rdh.nRgnSize = nRet;
+    lpRgnData->rdh.iType = RDH_RECTANGLES;
     return nRet;
 }
 
 int GetRgnBox(HRGN hrgn, LPRECT lprc)
 {
     cairo_rectangle_int_t rc ;
+    int nrc = cairo_region_num_rectangles((cairo_region_t*)GetGdiObjPtr(hrgn));
     cairo_region_get_extents((cairo_region_t*)GetGdiObjPtr(hrgn),&rc);
     lprc->left = rc.x;
     lprc->top = rc.y;

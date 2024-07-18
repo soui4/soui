@@ -30,7 +30,6 @@ void SHostPresenter::OnHostResize(THIS_ SIZE szHost)
 
 void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT rcInvalid, BYTE byAlpha)
 {
-    FillRect(hdc, rcInvalid, GetStockObject(WHITE_BRUSH));
     BOOL bGetDC = hdc == 0;
     if (bGetDC)
         hdc = m_pNativeWnd->GetDC();

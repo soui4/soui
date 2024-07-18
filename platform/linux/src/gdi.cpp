@@ -38,6 +38,10 @@ void* GetGdiObjPtr(HGDIOBJ hgdiobj){
     return hgdiobj->ptr;
 }
 
+void SetGdiObjPtr(HGDIOBJ hgdiObj, void* ptr) {
+    hgdiObj->ptr = ptr;
+}
+
 
 static bool ApplyPen(cairo_t * ctx,HPEN hpen){
     LOGPEN *pen = (LOGPEN*)GetGdiObjPtr(hpen);
@@ -129,6 +133,7 @@ static void ApplyFont(HDC hdc){
 
 
 static void ApplyRegion(cairo_t * ctx, HRGN hRgn){
+    cairo_reset_clip(ctx);
     cairo_region_t* rgn = (cairo_region_t* )GetGdiObjPtr(hRgn);
     int nrc = cairo_region_num_rectangles(rgn);
     for(int i=0;i<nrc;i++){
@@ -394,21 +399,23 @@ BOOL RestoreDC(HDC hdc, int nSavedDC)
 
 int SelectClipRgn(HDC hdc, HRGN hrgn)
 {
-    HRGN old = hdc->rgn;
-    hdc->rgn = hrgn;
-    DeleteObject(old);
-    return RgnComplexity(hrgn);
+    CombineRgn(hdc->rgn,hrgn,nullptr,RGN_COPY);
+    ApplyRegion(hdc->cairo, hdc->rgn);
+    return RgnComplexity(hdc->rgn);
 }
 
 int ExtSelectClipRgn(HDC hdc, HRGN hrgn, int mode)
 {
-    return CombineRgn(hdc->rgn,hdc->rgn,hrgn,mode);
+    int ret= CombineRgn(hdc->rgn,hdc->rgn,hrgn,mode);
+    ApplyRegion(hdc->cairo, hdc->rgn);
+    return ret;
 }
 
 int ExcludeClipRect(HDC hdc, int left, int top, int right, int bottom)
 {
     HRGN hrgn = CreateRectRgn(left,top,right,bottom);
     int ret = CombineRgn(hdc->rgn,hdc->rgn,hrgn,RGN_DIFF);
+    ApplyRegion(hdc->cairo, hdc->rgn);
     DeleteObject(hrgn);
     return ret;
 }
@@ -417,6 +424,7 @@ int IntersectClipRect(HDC hdc, int left, int top, int right, int bottom)
 {
     HRGN hrgn = CreateRectRgn(left,top,right,bottom);
     int ret = CombineRgn(hdc->rgn,hdc->rgn,hrgn,RGN_AND);
+    ApplyRegion(hdc->cairo, hdc->rgn);
     DeleteObject(hrgn);
     return ret;
 }
