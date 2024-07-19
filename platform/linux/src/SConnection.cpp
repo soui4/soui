@@ -193,7 +193,13 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
             pMsg->lParam = msg->lParam;
             if (msg->message == WM_PAINT) {
                 MsgPaint* msg2 = (MsgPaint*)msg;
-                SelectClipRgn(GetDC(pMsg->hwnd), msg2->rgn);
+                RECT rcWnd;
+                GetClientRect(msg->hwnd, &rcWnd);
+                HRGN rgn = CreateRectRgnIndirect(&rcWnd);
+                //todo:hjx
+                //SelectClipRgn(GetDC(pMsg->hwnd), msg2->rgn);
+                SelectClipRgn(GetDC(pMsg->hwnd), rgn);
+                DeleteObject(rgn);
             }
             delete msg;
             m_msgQueue.erase(it);

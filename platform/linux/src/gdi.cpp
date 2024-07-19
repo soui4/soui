@@ -399,6 +399,7 @@ BOOL RestoreDC(HDC hdc, int nSavedDC)
 
 int SelectClipRgn(HDC hdc, HRGN hrgn)
 {
+
     CombineRgn(hdc->rgn,hrgn,nullptr,RGN_COPY);
     ApplyRegion(hdc->cairo, hdc->rgn);
     return RgnComplexity(hdc->rgn);
@@ -491,7 +492,13 @@ BOOL InvertRgn(HDC hdc, HRGN hrgn)
 
 int GetClipBox(HDC hdc, LPRECT lprect)
 {
-    return GetRgnBox(hdc->rgn,lprect);
+    double x1, y1, x2, y2;
+    cairo_clip_extents(hdc->cairo, &x1, &y1, &x2, &y2);
+    lprect->left = x1;
+    lprect->top = y1;
+    lprect->right = x2;
+    lprect->bottom = y2;
+    return 0;
 }
 
 

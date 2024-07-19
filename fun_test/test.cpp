@@ -197,11 +197,15 @@ void SNativeWnd2::OnSize(UINT state,SIZE sz){
 void SNativeWnd2::OnPaint(HDC hdc){
     PAINTSTRUCT ps;
     hdc = BeginPaint(m_hWnd,&ps);
+    IntersectClipRect(hdc, 0, 0, 400, 400);
+
     RECT rcWnd;
     GetClientRect(&rcWnd);
     HBRUSH hbr = CreateSolidBrush(RGBA(88,88,88,255));
     FillRect(hdc,&rcWnd,hbr);
     DeleteObject(hbr);
+
+    IntersectClipRect(hdc, 0, 0, 200, 200);
 
     SetTextColor(hdc,RGBA(255,0,0,255));
 
@@ -251,26 +255,25 @@ void SNativeWnd2::OnClose(){
     PostThreadMessage(GetCurrentThreadId(),WM_QUIT,1,0);  
 }
 
-TEST(Window,loop){
-/*    
-    SNativeWnd::InitWndClass(0,"soui_host",FALSE);
+int run_window() {
+    int ret = 0;
+    SNativeWnd::InitWndClass(0, "soui_host", FALSE);
     SNativeWnd2 wnd;
-    HWND hWnd = wnd.CreateNative("test window",WS_POPUP,0,0,0,0,0,0);
-    if(hWnd){
+    HWND hWnd = wnd.CreateNative("test window", WS_POPUP, 0, 0, 0, 0, 0, 0);
+    if (hWnd) {
         wnd.SetWindowPos(0, 0, 0, 600, 600, SWP_NOMOVE | SWP_NOZORDER);
         wnd.ShowWindow(SW_SHOW);
         SMessageLoop loop(nullptr);
-        int ret = loop.Run();
+        ret = loop.Run();
         wnd.DestroyWindow();
-
-        EXPECT_EQ(ret,1);
     }
-
-    //*/
+    return ret;
+}
+TEST(demo,window){
+    //EXPECT_EQ(run_window(), 1);
 }
 
-
-int run_demo(HINSTANCE hInst){
+int run_app(HINSTANCE hInst){
     SComMgr2 comMgr;
     SAutoRefPtr<IRenderFactory> renderFac;
     comMgr.CreateRender_GDI((IObjRef**)&renderFac);
@@ -295,7 +298,7 @@ int run_demo(HINSTANCE hInst){
     return 0;
 }
 
-TEST(soui,demo){
+TEST(demo,app){
     HINSTANCE hInst = 0;
-    EXPECT_EQ(run_demo(hInst),0);
+    EXPECT_EQ(run_app(hInst),0);
 }

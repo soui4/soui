@@ -725,6 +725,11 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
     //刷新前重新布局，会自动检查布局脏标志
     GetRoot()->UpdateLayout();
 
+    CRect rcWnd = GetClientRect();
+    m_memRT->PushClipRect(&rcWnd, RGN_COPY);
+    CRect rcClip;
+    m_memRT->GetClipBox(&rcClip);
+
     if (m_bNeedAllRepaint)
     {
         m_rgnInvalidate->Clear();
@@ -755,6 +760,14 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         ::GetClipBox(dc, &rcUpdate);
         rcInvalid = rcInvalid | rcUpdate;
     }
+    {
+        CRect rcClip;
+        m_memRT->GetClipBox(&rcClip);
+        CRect rcWnd = GetClientRect();
+        m_memRT->FillSolidRect(&rcWnd, RGBA(255,0,0,255));
+    }
+    m_memRT->PopClip();
+
     UpdatePresenter(dc, m_memRT, rcInvalid, 255, uFlags);
 }
 
