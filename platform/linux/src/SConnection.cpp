@@ -226,14 +226,15 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
         xcb_expose_event_t* expose = (xcb_expose_event_t*)event;
         RECT rc = {expose->x,expose->y,expose->x+expose->width,expose->y+expose->height};
         HRGN hrgn = CreateRectRgnIndirect(&rc);
-        memset(&rc, 0, sizeof(rc));
-        GetRgnBox(hrgn, &rc);
         std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
         for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
                 if((*it)->message == WM_PAINT && (*it)->hwnd == expose->window)
                 {
                     MsgPaint *oldMsg = (MsgPaint*)(*it);
+                    RECT rcOld,rcNew;
+                    GetRgnBox(oldMsg->rgn, &rcOld);
                     CombineRgn(oldMsg->rgn, oldMsg->rgn, hrgn, RGN_OR);
+                    GetRgnBox(oldMsg->rgn, &rcNew);
                     DeleteObject(hrgn);
                     return true;
                 }

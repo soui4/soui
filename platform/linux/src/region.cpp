@@ -18,49 +18,42 @@ int CombineRgn(HRGN hrgnDst, HRGN hrgnSrc1, HRGN hrgnSrc2, int iMode)
     switch(iMode){
         case RGN_AND:
         {
-            cairo_region_t *empty = cairo_region_create();
-            //clear dest region
-            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),empty);
-            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
-            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
-            cairo_region_destroy(empty);
+            cairo_region_t*  r = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
+            cairo_region_intersect(r, (cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
+            cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
+            SetGdiObjPtr(hrgnDst, r);
         }
         break;
         case RGN_COPY:
         {
             cairo_region_t *rgnCpy = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
+            //delete old region
             cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
             SetGdiObjPtr(hrgnDst, rgnCpy);
         }
         break;
         case RGN_DIFF:
         {
-            cairo_region_t *empty = cairo_region_create();
-            //clear dest region
-            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),empty);
-            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
-            cairo_region_subtract((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
-            cairo_region_destroy(empty);
+            cairo_region_t* r = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
+            cairo_region_subtract(r, (cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
+            cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
+            SetGdiObjPtr(hrgnDst, r);
         }
         break;
         case RGN_OR:
         {
-            cairo_region_t *empty = cairo_region_create();
-            //clear dest region
-            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),empty);
-            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
-            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
-            cairo_region_destroy(empty);
+            cairo_region_t* r = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
+            cairo_region_union(r, (cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
+            cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
+            SetGdiObjPtr(hrgnDst, r);
         }
         break;
         case RGN_XOR:
         {
-            cairo_region_t *empty = cairo_region_create();
-            //clear dest region
-            cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgnDst),empty);
-            cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
-            cairo_region_xor((cairo_region_t*)GetGdiObjPtr(hrgnDst),(cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
-            cairo_region_destroy(empty);
+            cairo_region_t* r = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
+            cairo_region_xor(r, (cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
+            cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
+            SetGdiObjPtr(hrgnDst, r);
         }
         break;
     }
@@ -155,7 +148,6 @@ DWORD GetRegionData(HRGN hrgn, DWORD dwCount, PRGNDATA lpRgnData)
 int GetRgnBox(HRGN hrgn, LPRECT lprc)
 {
     cairo_rectangle_int_t rc ;
-    int nrc = cairo_region_num_rectangles((cairo_region_t*)GetGdiObjPtr(hrgn));
     cairo_region_get_extents((cairo_region_t*)GetGdiObjPtr(hrgn),&rc);
     lprc->left = rc.x;
     lprc->top = rc.y;

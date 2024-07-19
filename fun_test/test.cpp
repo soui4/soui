@@ -28,6 +28,48 @@ static const char * kPath_TestXml ="/home/flyhigh/work/soui4/demo2/uires/xml/dlg
 static const char * kPath_SysRes = "/home/flyhigh/work/soui4/soui-sys-resource";
 static const char * kPath_TestRes = "/home/flyhigh/work/soui4/fun_test/uires";
 
+TEST(soui, region_and) {
+    RECT rc1 = { 0,0,600,400 };
+    RECT rc2 = { 10,10,56,18 };
+    RECT rcCom = { 0,0,600,400 };
+    HRGN rgn1 = CreateRectRgnIndirect(&rc1);
+    HRGN rgn2 = CreateRectRgnIndirect(&rc2);
+    CombineRgn(rgn1, rgn1, rgn2, RGN_OR);
+    DeleteObject(rgn2);
+    RECT rc3;
+    GetRgnBox(rgn1, &rc3);
+    DeleteObject(rgn1);
+    EXPECT_EQ(memcmp(&rc3, &rcCom, sizeof(RECT)), 0);
+}
+
+TEST(soui, region_diff) {
+    RECT rc1 = { 0,0,600,400 };
+    RECT rc2 = { 0,0,100,400 };
+    RECT rcCom = { 100,0,600,400 };
+    HRGN rgn1 = CreateRectRgnIndirect(&rc1);
+    HRGN rgn2 = CreateRectRgnIndirect(&rc2);
+    CombineRgn(rgn1, rgn1, rgn2, RGN_DIFF);
+    DeleteObject(rgn2);
+    RECT rc3;
+    GetRgnBox(rgn1, &rc3);
+    DeleteObject(rgn1);
+    EXPECT_EQ(memcmp(&rc3, &rcCom, sizeof(RECT)), 0);
+}
+
+TEST(soui, region_or) {
+    RECT rc1 = { 0,0,600,400 };
+    RECT rc2 = { 600,0,700,400 };
+    RECT rcCom = { 0,0,700,400 };
+    HRGN rgn1 = CreateRectRgnIndirect(&rc1);
+    HRGN rgn2 = CreateRectRgnIndirect(&rc2);
+    CombineRgn(rgn1, rgn1, rgn2, RGN_OR);
+    DeleteObject(rgn2);
+    RECT rc3;
+    GetRgnBox(rgn1, &rc3);
+    DeleteObject(rgn1);
+    EXPECT_EQ(memcmp(&rc3, &rcCom, sizeof(RECT)), 0);
+}
+
 HBITMAP LoadPng(const char * path){
     SComMgr2 comMgr("libimgdecoder-stb");
     SAutoRefPtr<IImgDecoderFactory> decoder;
@@ -41,6 +83,10 @@ HBITMAP LoadPng(const char * path){
     EXPECT_EQ(img->LoadFromFileA(path),true);
     
     IImgFrame * pFrame = img->GetFrame(0);
+    if (!pFrame) {
+        printf("get frame failed!\n");
+        return 0;
+    }
     UINT wid,hei;
     pFrame->GetSize(&wid,&hei);
     BITMAPINFO bmi;
@@ -59,7 +105,7 @@ TEST(Util,sstring){
     SStringT str="test";
     SStringT str2 ="soui";
     SStringT str3 = str+_T("/")+"soui";
-    EXPECT_EQ(str3=="test/soui",0);
+    EXPECT_EQ(str3=="test/soui",true);
 }
 
 
