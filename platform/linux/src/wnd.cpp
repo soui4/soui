@@ -378,21 +378,32 @@ HWND GetForegroundWindow()
     return 0;
 }
 
-BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int X, int Y, int cx, int cy, UINT uFlags)
+BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT uFlags)
 {
-    WndObj wndOj = WndObj::fromHwnd(hWnd);
-    if(!wndOj)
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj)
         return FALSE;
-    RECT rcWnd;
-    GetWindowRect(hWnd,&rcWnd);
-    if(!(uFlags & SWP_NOSIZE)){
-        rcWnd.right = rcWnd.left+cx;
-        rcWnd.bottom = rcWnd.top+cy;
-    }
+    xcb_connection_t *connection=wndObj->mConnection;
+    
     if(!(uFlags & SWP_NOMOVE)){
-        OffsetRect(&rcWnd,X-rcWnd.left,Y-rcWnd.top);
+        const int32_t coords[] = {static_cast<int32_t>(x),
+                               static_cast<int32_t>(y)};
+        xcb_configure_window(connection, hWnd,
+                         XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
+        printf("SetWindowPos, pos={%d,%d}\n",x,y);
     }
-    return MoveWindow(hWnd,rcWnd.left,rcWnd.top,rcWnd.right-rcWnd.left,rcWnd.bottom-rcWnd.top,!(uFlags&SWP_NOREDRAW));
+    if(!(uFlags & SWP_NOSIZE)){
+        const uint32_t coords[] = {static_cast<uint32_t>(cx),
+                               static_cast<uint32_t>(cy)};
+        xcb_configure_window(connection, hWnd,
+                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, coords);
+        printf("SetWindowPos, size={%d,%d}\n",cx,cy);
+    }
+    xcb_flush(connection);
+    if((!uFlags & SWP_NOREDRAW)){
+        InvalidateRect(hWnd,nullptr,TRUE);
+    }
+    return TRUE;
 }
 
 static LONG_PTR SetWindowLongSize(HWND hWnd,int nIndex,LONG_PTR data,uint32_t size);
@@ -539,7 +550,7 @@ BOOL EnableWindow(HWND hWnd, BOOL bEnable)
         .response_type = XCB_CLIENT_MESSAGE,
         .format = 32,
         .sequence = 0,
-        .window = hWnd,
+        .window = (xcb_window_t)hWnd,
         .type = conn->wm_stat_atom
     };
     event.data.data32[0] = bEnable?0:1;
@@ -719,7 +730,7 @@ BOOL InvalidateRect(
     xcb_connection_t *connection=wndObj->mConnection;
     RECT rcWnd;
     if(!lpRect){
-        GetWindowRect(hWnd,&rcWnd);
+        GetClientRect(hWnd,&rcWnd);
         lpRect=&rcWnd;
     }
  // 发送曝光事件
@@ -737,31 +748,7 @@ BOOL InvalidateRect(
 
 BOOL MoveWindow(HWND hWnd,int x, int y, int nWidth, int nHeight, BOOL bRepaint)
 {
-    WndObj wndObj = WndObj::fromHwnd(hWnd);
-    if(!wndObj)
-        return FALSE;
-    xcb_connection_t *connection=wndObj->mConnection;
-    {
-            const unsigned coords[] = {static_cast<unsigned>(x),
-                               static_cast<unsigned>(y)};
-    xcb_configure_window(connection, hWnd,
-                         XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
-
-    }
-    {
-    const uint32_t vals[2] = {(uint32_t)nWidth, (uint32_t)nHeight};
-    xcb_configure_window(connection, hWnd,
-                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
-                         vals);
-    }
-
-    //todo: repaint
-    xcb_flush(connection);
-    if(bRepaint){
-        RECT rc={0,0,nWidth,nHeight};
-        InvalidateRect(hWnd,&rc,TRUE);
-    }
-    return TRUE;
+    return SetWindowPos(hWnd,0,x,y,nWidth,nHeight,SWP_NOZORDER|(bRepaint?0:SWP_NOREDRAW));
 }
 
 BOOL IsWindowVisible(HWND hWnd)
