@@ -195,17 +195,31 @@ void SNativeWnd2::OnSize(UINT state,SIZE sz){
 }
 
 void SNativeWnd2::OnPaint(HDC hdc){
-    PAINTSTRUCT ps;
-    hdc = BeginPaint(m_hWnd,&ps);
-    IntersectClipRect(hdc, 0, 0, 400, 400);
-
     RECT rcWnd;
     GetClientRect(&rcWnd);
-    HBRUSH hbr = CreateSolidBrush(RGBA(88,88,88,255));
-    FillRect(hdc,&rcWnd,hbr);
-    DeleteObject(hbr);
+    PAINTSTRUCT ps;
+    hdc = BeginPaint(m_hWnd,&ps);
+    if(1){
+        HDC memdc = CreateCompatibleDC(hdc);
+        HBITMAP bmp=CreateCompatibleBitmap(hdc,rcWnd.right,rcWnd.bottom);
+        HGDIOBJ oldBmp = SelectObject(memdc,bmp);
+        HBRUSH hbr = CreateSolidBrush(RGBA(255,0,0,255));
+        HRGN hrgn = CreateRectRgn(0,0,100,100);
+        HRGN hrgn2 = CreateRectRgn(100,100,200,200);
+        CombineRgn(hrgn,hrgn,hrgn2,RGN_OR);
+        SelectClipRgn(memdc,hrgn);
+        DeleteObject(hrgn);
+        DeleteObject(hrgn2);
 
-    IntersectClipRect(hdc, 0, 0, 200, 200);
+        FillRect(memdc,&rcWnd,hbr);
+        BitBlt(hdc,0,0,rcWnd.right,rcWnd.bottom,memdc,0,0,SRCCOPY);
+        BLENDFUNCTION fn;
+        //AlphaBlend(hdc,0,0,rcWnd.right,rcWnd.bottom,memdc,0,0,rcWnd.right,rcWnd.bottom,fn);
+        SelectObject(memdc,oldBmp);
+        DeleteObject(bmp);
+        DeleteDC(memdc);
+    }
+
 
     SetTextColor(hdc,RGBA(255,0,0,255));
 

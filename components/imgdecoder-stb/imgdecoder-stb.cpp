@@ -57,7 +57,7 @@ namespace SOUI
 #ifdef _WIN32
         FILE *f=_wfopen(pszFileName,L"rb");
 #else
-        char szFileName[1000];
+        char szFileName[1000]={0};
         WideCharToMultiByte(CP_UTF8,0,pszFileName,-1,szFileName,1000,NULL,NULL);
         FILE *f = fopen(szFileName,"rb");
 #endif
