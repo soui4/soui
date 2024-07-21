@@ -49,7 +49,7 @@ private:
     std::recursive_mutex m_mutex4Msg;
     std::list<Msg *> m_msgQueue;
     Msg * m_msgPeek;
-    
+    bool  m_bMsgNeedFree;
     std::thread      m_trdEvtReader;
     std::atomic<bool> m_bQuit;
 };

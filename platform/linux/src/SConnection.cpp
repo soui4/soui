@@ -134,6 +134,7 @@ SConnection::SConnection(int screenNum)
 
     m_bQuit=false;
     m_msgPeek = nullptr;
+    m_bMsgNeedFree = false;
     m_trdEvtReader = std::move(std::thread(std::bind(&readProc, this)));
 }
 
@@ -152,9 +153,10 @@ SConnection::~SConnection()
         delete it;
     }
     m_msgQueue.clear();
-    if(m_msgPeek){
+    if(m_msgPeek && m_bMsgNeedFree){
         delete m_msgPeek;
         m_msgPeek = nullptr;
+        m_bMsgNeedFree = false;
     }
 }
 
@@ -192,16 +194,16 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
             bMatch=FALSE;
         }while(false);
         if(bMatch){
-            if(m_msgPeek){
+            if(m_msgPeek && m_bMsgNeedFree){
                 delete m_msgPeek;
-                m_msgPeek = nullptr;
             }
+            m_msgPeek = msg;
             if(wRemoveMsg & PM_NOREMOVE)
-                m_msgPeek = msg->clone();
+                m_bMsgNeedFree = false;
             else
             {
                 m_msgQueue.erase(it);
-                m_msgPeek = msg;
+                m_bMsgNeedFree=true;
             }
             memcpy(pMsg,(MSG*)m_msgPeek,sizeof(MSG));
             
