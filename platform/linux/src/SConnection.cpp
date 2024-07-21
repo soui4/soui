@@ -133,6 +133,7 @@ SConnection::SConnection(int screenNum)
     wm_stat_enable_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_DEMANDS_ATTENTION");
 
     m_bQuit=false;
+    m_msgPeek = nullptr;
     m_trdEvtReader = std::move(std::thread(std::bind(&readProc, this)));
 }
 
@@ -148,9 +149,13 @@ SConnection::~SConnection()
     m_trdEvtReader.join();
 
     for(auto it:m_msgQueue){
-        free(it);
+        delete it;
     }
     m_msgQueue.clear();
+    if(m_msgPeek){
+        delete m_msgPeek;
+        m_msgPeek = nullptr;
+    }
 }
 
 
@@ -187,22 +192,19 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
             bMatch=FALSE;
         }while(false);
         if(bMatch){
-            pMsg->hwnd = msg->hwnd;
-            pMsg->message = msg->message;
-            pMsg->wParam = msg->wParam;
-            pMsg->lParam = msg->lParam;
-            if (msg->message == WM_PAINT) {
-                MsgPaint* msg2 = (MsgPaint*)msg;
-                RECT rcWnd;
-                GetClientRect(msg->hwnd, &rcWnd);
-                HRGN rgn = CreateRectRgnIndirect(&rcWnd);
-                //todo:hjx
-                //SelectClipRgn(GetDC(pMsg->hwnd), msg2->rgn);
-                SelectClipRgn(GetDC(pMsg->hwnd), rgn);
-                DeleteObject(rgn);
+            if(m_msgPeek){
+                delete m_msgPeek;
+                m_msgPeek = nullptr;
             }
-            delete msg;
-            m_msgQueue.erase(it);
+            if(wRemoveMsg & PM_NOREMOVE)
+                m_msgPeek = msg->clone();
+            else
+            {
+                m_msgQueue.erase(it);
+                m_msgPeek = msg;
+            }
+            memcpy(pMsg,m_msgPeek,sizeof(MSG));
+            
             return TRUE;
         }
        
@@ -249,7 +251,7 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
         pMsgPaint->hwnd = expose->window;
         pMsgPaint->message = WM_PAINT;
         pMsgPaint->wParam = 0;
-        pMsgPaint->lParam = 0;
+        pMsgPaint->lParam = (LPARAM)pMsgPaint->rgn;
         pMsg = pMsgPaint;
         break;
     }
@@ -265,11 +267,19 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
                 }
         }
 
-        pMsg = new Msg;
-        pMsg->hwnd = e2->window;
-        pMsg->message = WM_SIZE;
-        pMsg->wParam=SIZE_RESTORED;
-        pMsg->lParam = MAKELPARAM(e2->width,e2->height);
+        MsgWndPosChanged *pMsgPosChanged = new MsgWndPosChanged;
+        pMsgPosChanged->hwnd = e2->window;
+        pMsgPosChanged->message = WM_WINDOWPOSCHANGED;
+        pMsgPosChanged->wParam=0;
+        pMsgPosChanged->pos.hwnd = e2->window;
+        pMsgPosChanged->pos.hwndInsertAfter = e2->above_sibling;
+        pMsgPosChanged->pos.x = e2->x;
+        pMsgPosChanged->pos.y = e2->y;
+        pMsgPosChanged->pos.cx = e2->width;
+        pMsgPosChanged->pos.cy = e2->height;
+        pMsgPosChanged->lParam = (LPARAM)&pMsgPosChanged->pos;
+
+        pMsg = pMsgPosChanged;
         break;
     }
     case XCB_CLIENT_MESSAGE:

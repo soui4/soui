@@ -31,7 +31,7 @@ HGDIOBJ InitGdiObj(int type,void *ptr){
     return new _GdiObj(type,ptr);
 }
 
-int GetGdiObjType(HGDIOBJ hgdiobj){
+int GetObjectType(HGDIOBJ hgdiobj){
     return hgdiobj->type;
 }
 void* GetGdiObjPtr(HGDIOBJ hgdiobj){
@@ -504,7 +504,7 @@ int GetClipBox(HDC hdc, LPRECT lprect)
 
 BOOL FillRgn(HDC hdc, HRGN hrgn, HBRUSH hbr)
 {
-    if(!hrgn || GetGdiObjType(hrgn)!=OBJ_REGION)
+    if(!hrgn || GetObjectType(hrgn)!=OBJ_REGION)
         return FALSE;
     cairo_t * ctx = hdc->cairo;
     cairo_save(ctx);
@@ -521,7 +521,7 @@ BOOL FillRgn(HDC hdc, HRGN hrgn, HBRUSH hbr)
 
 BOOL FrameRgn(HDC hdc, HRGN hrgn, HBRUSH hbr, int nWidth, int nHeight)
 {
-    if(!hrgn || GetGdiObjType(hrgn)!=OBJ_REGION)
+    if(!hrgn || GetObjectType(hrgn)!=OBJ_REGION)
         return FALSE;
     cairo_t * ctx = hdc->cairo;
     cairo_save(ctx);

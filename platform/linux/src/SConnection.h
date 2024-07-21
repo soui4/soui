@@ -48,6 +48,8 @@ private:
 
     std::recursive_mutex m_mutex4Msg;
     std::list<Msg *> m_msgQueue;
+    Msg * m_msgPeek;
+    
     std::thread      m_trdEvtReader;
     std::atomic<bool> m_bQuit;
 };

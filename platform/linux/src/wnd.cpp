@@ -24,6 +24,7 @@ struct _Window{
     xcb_screen_t *mScreen;
     HDC           hdc;
     std::string title; 
+    RECT          rc;
     UINT_PTR           objOpaque;
     HWND               parent;        /* Window parent */
     HWND               owner;         /* Window owner */
@@ -221,6 +222,11 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
         free(err);
         return 0;
     }
+    pWnd->rc.left = cs->x;
+    pWnd->rc.top = cs->y;
+    pWnd->rc.right = cs->x + cs->cx;
+    pWnd->rc.bottom = cs->y + cs->cy;
+
     const uint32_t vals[2] = { cs->cx, cs->cy};
     xcb_configure_window(pWnd->mConnection, hWnd, XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, vals);
     pWnd->title = cs->lpszName;
@@ -332,6 +338,53 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
     if (!wndObj)
         return -1;
     switch (msg) {
+    case WM_PAINT:
+        if (lp) {
+                HGDIOBJ hrgn = (HGDIOBJ)lp;
+                if(GetObjectType(hrgn) == OBJ_REGION){
+                    HDC hdc = GetDC(hWnd);
+                    SelectClipRgn(hdc, hrgn);
+                    ReleaseDC(hWnd,hdc);
+                }
+            }
+        break;
+    case WM_WINDOWPOSCHANGED:
+        {
+            WINDOWPOS & wndPos = *(WINDOWPOS*)lp;
+            if(!(wndPos.flags  & SWP_NOMOVE)){
+                const int32_t coords[] = {static_cast<int32_t>(wndPos.x),
+                                    static_cast<int32_t>(wndPos.y)};
+                xcb_configure_window(wndObj->mConnection, hWnd,
+                                XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
+                OffsetRect(&wndObj->rc,wndPos.x-wndObj->rc.left,wndPos.y-wndObj->rc.top);
+                printf("WM_WINDOWPOSCHANGED, pos={%d,%d}\n",wndPos.x,wndPos.y);
+            }
+            if(!(wndPos.flags & SWP_NOSIZE)){
+                const uint32_t coords[] = {static_cast<uint32_t>(wndPos.cx),
+                                    static_cast<uint32_t>(wndPos.cy)};
+                xcb_configure_window(wndObj->mConnection, hWnd,
+                                XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, coords);
+                wndObj->rc.right = wndObj->rc.left + wndPos.cx;
+                wndObj->rc.bottom = wndObj->rc.top + wndPos.cy;
+                printf("WM_WINDOWPOSCHANGED, size={%d,%d}\n",wndPos.cx,wndPos.cy);
+                SendMessage(hWnd,WM_SIZE,0,MAKELPARAM(wndPos.cx,wndPos.cy));
+            }
+            int showCmd = SW_HIDE;
+            if(wndPos.flags & SWP_SHOWWINDOW)
+            {
+                if(wndPos.flags & SWP_NOACTIVATE)
+                    showCmd = SW_SHOW;
+                else
+                    showCmd = SW_SHOWNOACTIVATE;
+            }
+            
+            ShowWindow(wndPos.hwnd,showCmd);
+            xcb_flush(wndObj->mConnection);
+            if((!wndPos.flags & SWP_NOREDRAW)){
+                InvalidateRect(hWnd,nullptr,TRUE);
+            }
+        }
+        break;
     case WM_SIZE:
         SIZE sz = { GET_X_LPARAM(lp),GET_Y_LPARAM(lp) };
         if (wndObj->hdc)
@@ -383,26 +436,20 @@ BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy,
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    xcb_connection_t *connection=wndObj->mConnection;
-    
-    if(!(uFlags & SWP_NOMOVE)){
-        const int32_t coords[] = {static_cast<int32_t>(x),
-                               static_cast<int32_t>(y)};
-        xcb_configure_window(connection, hWnd,
-                         XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
-        printf("SetWindowPos, pos={%d,%d}\n",x,y);
-    }
-    if(!(uFlags & SWP_NOSIZE)){
-        const uint32_t coords[] = {static_cast<uint32_t>(cx),
-                               static_cast<uint32_t>(cy)};
-        xcb_configure_window(connection, hWnd,
-                         XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, coords);
-        printf("SetWindowPos, size={%d,%d}\n",cx,cy);
-    }
-    xcb_flush(connection);
-    if((!uFlags & SWP_NOREDRAW)){
-        InvalidateRect(hWnd,nullptr,TRUE);
-    }
+    WINDOWPOS wndPos;
+    wndPos.hwnd = hWnd;
+    wndPos.hwndInsertAfter = hWndInsertAfter;
+    wndPos.x=x;
+    wndPos.y=y;
+    wndPos.cx=cx;
+    wndPos.cy = cy;
+    wndPos.flags = uFlags;
+    SendMessage(hWnd,WM_WINDOWPOSCHANGING,0,(LPARAM)&wndPos);
+    if(wndPos.cx < 1)
+        wndPos.cx = 1;
+    if(wndPos.cy < 1)
+        wndPos.cy=1;
+    SendMessage(hWnd,WM_WINDOWPOSCHANGED,0,(LPARAM)&wndPos);
     return TRUE;
 }
 
@@ -650,17 +697,7 @@ BOOL GetWindowRect(HWND hWnd, RECT *rc)
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    
-    xcb_get_geometry_cookie_t geometry_cookie = xcb_get_geometry(wndObj->mConnection, hWnd);
-    xcb_get_geometry_reply_t *geometry_reply = xcb_get_geometry_reply(wndObj->mConnection, geometry_cookie, NULL);
-
-    if (!geometry_reply)
-        return FALSE;
-    rc->left = geometry_reply->x;
-    rc->top = geometry_reply->y;
-    rc->right = rc->left + geometry_reply->width;
-    rc->bottom = rc->top + geometry_reply->height;
-    free(geometry_reply);
+    *rc = wndObj->rc;
     return TRUE;
 }
 

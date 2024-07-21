@@ -9,7 +9,6 @@
 #define OBJ_REGION          8
 
 HGDIOBJ InitGdiObj(int type,void *ptr);
-int GetGdiObjType(HGDIOBJ hgdiobj);
 void* GetGdiObjPtr(HGDIOBJ hgdiobj);
 void SetGdiObjPtr(HGDIOBJ hgdiObj, void* ptr);
 
@@ -49,7 +48,7 @@ HPEN WINAPI ExtCreatePen(  DWORD iPenStyle,
                                     CONST DWORD *pstyle);
 
 int   WINAPI GetObject( HGDIOBJ h,  int c, LPVOID pv);
-
+int   WINAPI GetObjectType(HGDIOBJ hgdiobj);
 /* Logical Pen */
 typedef struct tagLOGPEN
   {
