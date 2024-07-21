@@ -218,7 +218,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
                       value_list);
     xcb_generic_error_t * err = xcb_request_check(pWnd->mConnection, cookie);
     if (err) {
-        printf("窗口创建请求出错：%d\n", err->error_code);
+        printf("xcb_create_window failed, errcode=%d\n", err->error_code);
         free(err);
         return 0;
     }
@@ -338,6 +338,10 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
     if (!wndObj)
         return -1;
     switch (msg) {
+    case WM_MOVE:
+        OffsetRect(&wndObj->rc,GET_X_LPARAM(lp)-wndObj->rc.left,GET_Y_LPARAM(lp)-wndObj->rc.top);
+        break;
+    
     case WM_PAINT:
         if (lp) {
                 HGDIOBJ hrgn = (HGDIOBJ)lp;
@@ -348,47 +352,12 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
                 }
             }
         break;
-    case WM_WINDOWPOSCHANGED:
-        {
-            WINDOWPOS & wndPos = *(WINDOWPOS*)lp;
-            if(!(wndPos.flags  & SWP_NOMOVE)){
-                const int32_t coords[] = {static_cast<int32_t>(wndPos.x),
-                                    static_cast<int32_t>(wndPos.y)};
-                xcb_configure_window(wndObj->mConnection, hWnd,
-                                XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
-                OffsetRect(&wndObj->rc,wndPos.x-wndObj->rc.left,wndPos.y-wndObj->rc.top);
-                printf("WM_WINDOWPOSCHANGED, pos={%d,%d}\n",wndPos.x,wndPos.y);
-            }
-            if(!(wndPos.flags & SWP_NOSIZE)){
-                const uint32_t coords[] = {static_cast<uint32_t>(wndPos.cx),
-                                    static_cast<uint32_t>(wndPos.cy)};
-                xcb_configure_window(wndObj->mConnection, hWnd,
-                                XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, coords);
-                wndObj->rc.right = wndObj->rc.left + wndPos.cx;
-                wndObj->rc.bottom = wndObj->rc.top + wndPos.cy;
-                printf("WM_WINDOWPOSCHANGED, size={%d,%d}\n",wndPos.cx,wndPos.cy);
-                SendMessage(hWnd,WM_SIZE,0,MAKELPARAM(wndPos.cx,wndPos.cy));
-            }
-            int showCmd = SW_HIDE;
-            if(wndPos.flags & SWP_SHOWWINDOW)
-            {
-                if(wndPos.flags & SWP_NOACTIVATE)
-                    showCmd = SW_SHOW;
-                else
-                    showCmd = SW_SHOWNOACTIVATE;
-            }
-            
-            ShowWindow(wndPos.hwnd,showCmd);
-            xcb_flush(wndObj->mConnection);
-            if((!wndPos.flags & SWP_NOREDRAW)){
-                InvalidateRect(hWnd,nullptr,TRUE);
-            }
-        }
-        break;
     case WM_SIZE:
         SIZE sz = { GET_X_LPARAM(lp),GET_Y_LPARAM(lp) };
-        if (wndObj->hdc)
+        if (wndObj->hdc && (sz.cx != wndObj->rc.right-wndObj->rc.left || sz.cy != wndObj->rc.bottom-wndObj->rc.top))
         {
+            wndObj->rc.right=wndObj->rc.left + sz.cx;
+            wndObj->rc.bottom = wndObj->rc.top+sz.cy;
             cairo_xcb_surface_set_size((cairo_surface_t*)GetGdiObjPtr(GetCurrentObject(wndObj->hdc, OBJ_BITMAP)), sz.cx, sz.cy);
         }
         break;
@@ -720,10 +689,46 @@ HDC CreateDC(HWND hwnd,int cx,int cy){
 
 }
 
-HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp){
+HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj)
+        return -1;
     switch(msg){
-        case WM_CLOSE:
-        DestroyWindow(hwnd);
+    case WM_CLOSE:
+        DestroyWindow(hWnd);
+        break;
+    case WM_WINDOWPOSCHANGED:
+        {
+            WINDOWPOS & wndPos = *(WINDOWPOS*)lp;
+            if(!(wndPos.flags  & SWP_NOMOVE)){
+                const int32_t coords[] = {static_cast<int32_t>(wndPos.x),
+                                    static_cast<int32_t>(wndPos.y)};
+                xcb_configure_window(wndObj->mConnection, hWnd,
+                                XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
+                SendMessage(hWnd,WM_MOVE,0,MAKELPARAM(wndPos.x,wndPos.y));
+            }
+            if(!(wndPos.flags & SWP_NOSIZE)){
+                const uint32_t coords[] = {static_cast<uint32_t>(wndPos.cx),
+                                    static_cast<uint32_t>(wndPos.cy)};
+                xcb_configure_window(wndObj->mConnection, hWnd,
+                                XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, coords);
+                SendMessage(hWnd,WM_SIZE,0,MAKELPARAM(wndPos.cx,wndPos.cy));
+            }
+            int showCmd = SW_HIDE;
+            if(wndPos.flags & SWP_SHOWWINDOW)
+            {
+                if(wndPos.flags & SWP_NOACTIVATE)
+                    showCmd = SW_SHOW;
+                else
+                    showCmd = SW_SHOWNOACTIVATE;
+            }
+            
+            ShowWindow(wndPos.hwnd,showCmd);
+            xcb_flush(wndObj->mConnection);
+            if((!wndPos.flags & SWP_NOREDRAW)){
+                InvalidateRect(hWnd,nullptr,TRUE);
+            }
+        }
         break;
     }
     return 0;

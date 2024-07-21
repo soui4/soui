@@ -203,7 +203,7 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
                 m_msgQueue.erase(it);
                 m_msgPeek = msg;
             }
-            memcpy(pMsg,m_msgPeek,sizeof(MSG));
+            memcpy(pMsg,(MSG*)m_msgPeek,sizeof(MSG));
             
             return TRUE;
         }
@@ -260,26 +260,32 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
         xcb_configure_notify_event_t *e2 = (xcb_configure_notify_event_t*)event;
         std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
         for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
+                if((*it)->message == WM_MOVE && (*it)->hwnd == e2->window)
+                {
+                    m_msgQueue.erase(it);
+                    break;
+                }
+        }
+        for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
                 if((*it)->message == WM_SIZE && (*it)->hwnd == e2->window)
                 {
                     m_msgQueue.erase(it);
                     break;
                 }
         }
-
-        MsgWndPosChanged *pMsgPosChanged = new MsgWndPosChanged;
-        pMsgPosChanged->hwnd = e2->window;
-        pMsgPosChanged->message = WM_WINDOWPOSCHANGED;
-        pMsgPosChanged->wParam=0;
-        pMsgPosChanged->pos.hwnd = e2->window;
-        pMsgPosChanged->pos.hwndInsertAfter = e2->above_sibling;
-        pMsgPosChanged->pos.x = e2->x;
-        pMsgPosChanged->pos.y = e2->y;
-        pMsgPosChanged->pos.cx = e2->width;
-        pMsgPosChanged->pos.cy = e2->height;
-        pMsgPosChanged->lParam = (LPARAM)&pMsgPosChanged->pos;
-
-        pMsg = pMsgPosChanged;
+        pMsg = new Msg;
+        pMsg->hwnd = e2->window;
+        pMsg->message = WM_MOVE;
+        pMsg->wParam = 0;
+        pMsg->lParam = MAKELPARAM(e2->x,e2->y);
+        m_msgQueue.push_back(pMsg);
+        pMsg = new Msg;
+        pMsg->hwnd = e2->window;
+        pMsg->message = WM_SIZE;
+        pMsg->wParam = 0;
+        pMsg->lParam = MAKELPARAM(e2->width,e2->height);
+        m_msgQueue.push_back(pMsg);
+        pMsg = nullptr;
         break;
     }
     case XCB_CLIENT_MESSAGE:
