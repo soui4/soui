@@ -127,7 +127,7 @@ static void ApplyFont(HDC hdc){
             lf->lfItalic?CAIRO_FONT_SLANT_ITALIC:CAIRO_FONT_SLANT_NORMAL, 
             lf->lfWeight>400?CAIRO_FONT_WEIGHT_BOLD:CAIRO_FONT_WEIGHT_NORMAL);
 
-        cairo_set_font_size(hdc->cairo, lf->lfHeight);
+        cairo_set_font_size(hdc->cairo, abs(lf->lfHeight));
     }
 }
 
@@ -736,6 +736,7 @@ static void DrawSingleLine(HDC hdc, LPCTSTR pszBuf, int iBegin, int cchText, LPR
             break;
             case DT_CENTER:
             cairo_move_to(hdc->cairo,pRect->left + (pRect->right-pRect->left - ext.width)/2,pRect->top + ext.height);
+            break;
             case DT_RIGHT:
             cairo_move_to(hdc->cairo,pRect->right - ext.width,pRect->top + ext.height);
             break;
@@ -875,7 +876,8 @@ int DrawText(HDC hdc, LPCSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat)
     CairoColor cr;
     RGBA2CairoColor(hdc->crText, &cr);
     cairo_set_source_rgba(hdc->cairo, cr.r, cr.g, cr.b, cr.a);
-
+    cairo_matrix_t mtx = { 0 };
+    cairo_get_matrix(hdc->cairo,&mtx);
     if (uFormat & DT_SINGLELINE)
     {
         DrawSingleLine(hdc, pszBuf, 0, cchText, pRect, uFormat);
