@@ -407,7 +407,7 @@ int SelectClipRgn(HDC hdc, HRGN hrgn)
 
 int ExtSelectClipRgn(HDC hdc, HRGN hrgn, int mode)
 {
-    int ret= CombineRgn(hdc->rgn,hdc->rgn,hrgn,mode);
+    int ret= CombineRgn(hdc->rgn,hrgn,hdc->rgn,mode);
     ApplyRegion(hdc->cairo, hdc->rgn);
     return ret;
 }

@@ -39,7 +39,7 @@ typedef struct _SDC {
 		if (!cairo)
 			return 0;
 		cairo_save(cairo);
-		return ++nSave;
+		return nSave++;
 	}
 
 	BOOL RestoreState(int nState) {
