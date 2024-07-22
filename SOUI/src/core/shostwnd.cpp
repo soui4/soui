@@ -746,7 +746,6 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         SAutoRefPtr<IRegionS> pRgnUpdate = m_rgnInvalidate;
         m_rgnInvalidate = NULL;
         GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
-
         _RedrawRegion(pRgnUpdate, rcInvalid);
     }
     else

@@ -142,6 +142,9 @@ static void ApplyRegion(cairo_t * ctx, HRGN hRgn){
         cairo_rectangle(ctx,rc.x,rc.y,rc.width,rc.height);
     }
     cairo_clip(ctx);
+    double x1, x2, y1, y2;
+    cairo_clip_extents(ctx, &x1, &y1, &x2, &y2);
+    printf("clip box=%d,%d,%d,%d\n", (int)x1, (int)y1, (int)x2, (int)y2);
 }
 
 HPEN ExtCreatePen(DWORD iPenStyle, DWORD cWidth, const LOGBRUSH *plbrush, DWORD cStyle, const DWORD *pstyle)
@@ -720,6 +723,7 @@ static void DrawSingleLine(HDC hdc, LPCTSTR pszBuf, int iBegin, int cchText, LPR
     char *buf=(char*)malloc(cchText+1);
     memcpy(buf,pszBuf,cchText);
     buf[cchText]=0;
+
     cairo_text_extents_t ext;
     cairo_text_extents(hdc->cairo,buf,&ext);
     if(uFormat & DT_CALCRECT){
@@ -737,6 +741,7 @@ static void DrawSingleLine(HDC hdc, LPCTSTR pszBuf, int iBegin, int cchText, LPR
             break;
         }
         cairo_show_text(hdc->cairo,buf);
+        printf("DrawSingleLine:%s\n", buf);
     }
     free(buf);
 }
@@ -862,6 +867,12 @@ void DrawMultiLine(HDC hdc, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFor
 
 int DrawText(HDC hdc, LPCSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat)
 {
+    cairo_save(hdc->cairo);
+    ApplyFont(hdc);
+    CairoColor cr;
+    RGBA2CairoColor(hdc->crText, &cr);
+    cairo_set_source_rgba(hdc->cairo, cr.r, cr.g, cr.b, cr.a);
+
     if (uFormat & DT_SINGLELINE)
     {
         DrawSingleLine(hdc, pszBuf, 0, cchText, pRect, uFormat);
@@ -889,6 +900,8 @@ int DrawText(HDC hdc, LPCSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat)
             DrawMultiLine(hdc, pszBuf, cchText, pRect, uFormat);
         }
     }
+    cairo_restore(hdc->cairo);
+
     return TRUE;
 }
 
