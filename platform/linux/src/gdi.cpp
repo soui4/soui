@@ -867,6 +867,9 @@ void DrawMultiLine(HDC hdc, LPCTSTR pszBuf, int cchText, LPRECT pRect, UINT uFor
 
 int DrawText(HDC hdc, LPCSTR pszBuf, int cchText, LPRECT pRect, UINT uFormat)
 {
+    if (cchText < 0)
+        cchText = strlen(pszBuf);
+
     cairo_save(hdc->cairo);
     ApplyFont(hdc);
     CairoColor cr;

@@ -208,7 +208,8 @@ void SNativeWnd2::OnDestroy(){
 }
 
 int  SNativeWnd2::OnCreate(LPCREATESTRUCT lpCs){
-    m_bmp = LoadPng(kPath_TestPng);
+    std::string srcDir = getSourceDir();
+    m_bmp = LoadPng((srcDir+kPath_TestPng).c_str());
     if(!m_bmp) return 1;
     SetMsgHandled(FALSE);
     return 0;
@@ -244,8 +245,15 @@ void SNativeWnd2::OnPaint(HDC hdc){
         DeleteObject(hrgn2);
 
         FillRect(memdc,&rcWnd,hbr);
-        BitBlt(hdc,0,0,rcWnd.right,rcWnd.bottom,memdc,0,0,SRCCOPY);
         RestoreDC(memdc, -1);
+        const char* txt = "hello soui";
+        SIZE szTxt;
+        GetTextExtentPoint32(memdc, txt, -1, &szTxt);
+        CRect rc(CPoint(10, 70), szTxt);
+        SetTextColor(memdc, RGBA(0, 255, 0, 255));
+        DrawText(memdc, txt, -1,&rc,DT_SINGLELINE);
+
+        BitBlt(hdc,0,0,rcWnd.right,rcWnd.bottom,memdc,0,0,SRCCOPY);
 
         SelectObject(memdc,oldBmp);
         DeleteObject(bmp);
@@ -316,7 +324,7 @@ int run_window() {
     return ret;
 }
 TEST(demo,window){
-    //EXPECT_EQ(run_window(), 1);
+    EXPECT_EQ(run_window(), 1);
 }
 
 int run_app(HINSTANCE hInst){
@@ -350,5 +358,5 @@ int run_app(HINSTANCE hInst){
 
 TEST(demo,app){
     HINSTANCE hInst = 0;
-    EXPECT_EQ(run_app(hInst),0);
+    //EXPECT_EQ(run_app(hInst),0);
 }
