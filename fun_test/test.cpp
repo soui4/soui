@@ -23,10 +23,32 @@
 
 using namespace SOUI;
 
-static const char * kPath_TestPng ="/home/flyhigh/work/soui4/demo/uires/image/soui.png";
-static const char * kPath_TestXml ="/home/flyhigh/work/soui4/demo2/uires/xml/dlg_main.xml";
-static const char * kPath_SysRes = "/home/flyhigh/work/soui4/soui-sys-resource";
-static const char * kPath_TestRes = "/home/flyhigh/work/soui4/fun_test/uires";
+//获得源文件根路径,区分在VS中远程调试及在vscode中本机运行两种模式
+std::string getSourceDir() {
+    char szPath[MAX_PATH];
+    GetModuleFileName(nullptr, szPath, MAX_PATH);
+    //if run on remote linux machine, path should like /home/user/.vs/pathname/xxx/out/build/Linux-GCC-Debug/bin
+    //convert this path to /home/user/.vs/pathname/xxx/src
+    char* pdotvs = strstr(szPath, ".vs");
+    if (pdotvs) {
+        //run on remote linux machine
+        char* out = strstr(szPath, "out");
+        SASSERT(out);
+        strcpy(out, "src");
+        return szPath;
+    }
+    else {
+        char* build = strstr(szPath, "/build/bin");
+        SASSERT(build);
+        build[0] = 0;
+        return szPath;
+    }
+}
+
+static const char * kPath_TestPng ="/demo/uires/image/soui.png";
+static const char * kPath_TestXml ="/demo2/uires/xml/dlg_main.xml";
+static const char * kPath_SysRes = "/soui-sys-resource";
+static const char * kPath_TestRes = "/fun_test/uires";
 
 TEST(soui, region_and) {
     RECT rc1 = { 0,0,600,400 };
@@ -110,7 +132,8 @@ TEST(Util,sstring){
 
 
 TEST(Util,com_load){
-    HBITMAP bmp = LoadPng(kPath_TestPng);
+    std::string srcDir = getSourceDir();
+    HBITMAP bmp = LoadPng((srcDir+kPath_TestPng).c_str());
     EXPECT_EQ(bmp!=0,TRUE);
     if(bmp){
         DeleteObject(bmp);
@@ -118,8 +141,9 @@ TEST(Util,com_load){
 }
 
 TEST(Util,Xml_Load){
+    std::string srcDir = getSourceDir();
     SXmlDoc xml;
-    EXPECT_EQ(xml.load_file(kPath_TestXml),true);
+    EXPECT_EQ(xml.load_file((srcDir+kPath_TestXml).c_str()),true);
     SXmlNode node=xml.root().first_child();
     while(node){
         const wchar_t * name = node.name();
@@ -296,6 +320,8 @@ TEST(demo,window){
 }
 
 int run_app(HINSTANCE hInst){
+    std::string srcDir = getSourceDir();
+
     SComMgr2 comMgr;
     SAutoRefPtr<IRenderFactory> renderFac;
     comMgr.CreateRender_GDI((IObjRef**)&renderFac);
@@ -306,10 +332,12 @@ int run_app(HINSTANCE hInst){
     SApplication app(renderFac,hInst);
     SouiFactory sfac;
     SAutoRefPtr<IResProvider> sysResouce(sfac.CreateResProvider(RES_FILE));
-    sysResouce->Init((LPARAM)kPath_SysRes, 0);
+    std::string sysRes = srcDir + kPath_SysRes;
+    sysResouce->Init((LPARAM)sysRes.c_str(), 0);
     app.LoadSystemNamedResource(sysResouce);
     SAutoRefPtr<IResProvider> testResouce(sfac.CreateResProvider(RES_FILE));
-    testResouce->Init((LPARAM)kPath_TestRes, 0);
+    std::string appRes = srcDir + kPath_TestRes;
+    testResouce->Init((LPARAM)appRes.c_str(), 0);
     app.AddResProvider(testResouce);
 
     SHostWnd hostWnd("layout:XML_MAINWND");

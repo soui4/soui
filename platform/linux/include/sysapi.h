@@ -108,8 +108,6 @@ DestroyCaret(
 
 BOOL RegisterDragDrop(HWND, IDropTarget *pDrapTarget);
 
-BOOL GetModuleFileName(HMODULE hModule,LPTSTR pszPath,int length);
-
 BOOL CallMsgFilter(
      LPMSG lpMsg,
      int nCode);
@@ -202,5 +200,11 @@ HANDLE
 WINAPI
 GetCurrentProcess(
     VOID
+);
+
+DWORD WINAPI GetModuleFileName(
+    HMODULE hModule,
+    LPSTR lpFilename,
+    DWORD nSize
 );
 #endif

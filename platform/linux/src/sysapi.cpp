@@ -124,7 +124,9 @@ int WideCharToMultiByte(int cp, int flags, const wchar_t *src, int len, char *ds
         ptr++;
         i += result;
     }
-
+    if (i < dstLen) {
+        dst[i] = 0;
+    }
     return i;
 }
 
@@ -759,11 +761,6 @@ BOOL RegisterDragDrop(HWND, IDropTarget *pDrapTarget){
     return 0;
 }
 
-BOOL GetModuleFileName(HMODULE hModule, LPTSTR pszPath, int length)
-{
-    return 0;
-}
-
 BOOL CallMsgFilter(LPMSG lpMsg, int nCode)
 {
     return 0;
@@ -953,4 +950,44 @@ GetCurrentProcess(
     VOID
 ) {
     return 0;
+}
+
+DWORD GetModuleFileName(
+    HMODULE hModule,
+    LPSTR lpFilename,
+    DWORD nSize
+) {
+    if (hModule) {
+        Dl_info info;
+        int result = dladdr(hModule, &info);
+        if (!result)
+            return 0;
+        ssize_t len = strlen(info.dli_fname);
+        if (!lpFilename)
+            return len;
+        if (nSize < len)
+            return 0;
+        strncpy(lpFilename, info.dli_fname, len);
+        if (len < nSize)
+            lpFilename[len] = 0;
+        return len;
+
+    }
+    else {
+        char path[MAX_PATH];
+        ssize_t len;
+        len = readlink("/proc/self/exe", path, sizeof(path) - 1);
+        if (len == -1) {
+            perror("readlink");
+            return 0;
+        }
+        if (lpFilename == 0)
+            return len;
+        if (nSize < len)
+            return 0;
+        strncpy(lpFilename, path, len);
+        if (len < nSize)
+            lpFilename[len] = 0;
+        return len;
+    }
 }
