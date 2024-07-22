@@ -142,9 +142,6 @@ static void ApplyRegion(cairo_t * ctx, HRGN hRgn){
         cairo_rectangle(ctx,rc.x,rc.y,rc.width,rc.height);
     }
     cairo_clip(ctx);
-    double x1, x2, y1, y2;
-    cairo_clip_extents(ctx, &x1, &y1, &x2, &y2);
-    printf("clip box=%d,%d,%d,%d\n", (int)x1, (int)y1, (int)x2, (int)y2);
 }
 
 HPEN ExtCreatePen(DWORD iPenStyle, DWORD cWidth, const LOGBRUSH *plbrush, DWORD cStyle, const DWORD *pstyle)
@@ -742,7 +739,6 @@ static void DrawSingleLine(HDC hdc, LPCTSTR pszBuf, int iBegin, int cchText, LPR
             break;
         }
         cairo_show_text(hdc->cairo,buf);
-        printf("DrawSingleLine:%s\n", buf);
     }
     free(buf);
 }
