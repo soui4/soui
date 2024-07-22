@@ -39,6 +39,7 @@ typedef struct _SDC {
 		if (!cairo)
 			return 0;
 		cairo_save(cairo);
+		printf("SaveState(), current nSave=%d,this=%p\n", nSave, this);
 		return nSave++;
 	}
 
@@ -57,6 +58,7 @@ typedef struct _SDC {
 				--nSave;
 			}
 		}
+		printf("RestoreState(%d), nSave=%d,this=%p\n", nState, nSave, this);
 		return TRUE;
 	}
 } *HDC;

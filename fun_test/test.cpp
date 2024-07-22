@@ -204,17 +204,25 @@ void SNativeWnd2::OnPaint(HDC hdc){
         HBITMAP bmp=CreateCompatibleBitmap(hdc,rcWnd.right,rcWnd.bottom);
         HGDIOBJ oldBmp = SelectObject(memdc,bmp);
         HBRUSH hbr = CreateSolidBrush(RGBA(255,0,0,255));
+        int save = SaveDC(memdc);
+        RestoreDC(memdc, save);
+
+        save = SaveDC(memdc);     
         HRGN hrgn = CreateRectRgn(0,0,100,100);
-        HRGN hrgn2 = CreateRectRgn(100,100,200,200);
+        HRGN hrgn2 = CreateRectRgn(100,100,500,500);
         CombineRgn(hrgn,hrgn,hrgn2,RGN_OR);
-        SelectClipRgn(memdc,hrgn);
+        //SelectClipRgn(memdc, hrgn);
+        ExtSelectClipRgn(memdc,hrgn,RGN_COPY);
+        RECT rcClip;
+        GetClipBox(memdc, &rcClip);
+
         DeleteObject(hrgn);
         DeleteObject(hrgn2);
 
         FillRect(memdc,&rcWnd,hbr);
         BitBlt(hdc,0,0,rcWnd.right,rcWnd.bottom,memdc,0,0,SRCCOPY);
-        BLENDFUNCTION fn;
-        //AlphaBlend(hdc,0,0,rcWnd.right,rcWnd.bottom,memdc,0,0,rcWnd.right,rcWnd.bottom,fn);
+        RestoreDC(memdc, -1);
+
         SelectObject(memdc,oldBmp);
         DeleteObject(bmp);
         DeleteDC(memdc);
@@ -284,7 +292,7 @@ int run_window() {
     return ret;
 }
 TEST(demo,window){
-    EXPECT_EQ(run_window(), 1);
+    //EXPECT_EQ(run_window(), 1);
 }
 
 int run_app(HINSTANCE hInst){
@@ -314,5 +322,5 @@ int run_app(HINSTANCE hInst){
 
 TEST(demo,app){
     HINSTANCE hInst = 0;
-    //EXPECT_EQ(run_app(hInst),0);
+    EXPECT_EQ(run_app(hInst),0);
 }

@@ -760,15 +760,10 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
         ::GetClipBox(dc, &rcUpdate);
         rcInvalid = rcInvalid | rcUpdate;
     }
-    {
-        CRect rcClip;
-        m_memRT->GetClipBox(&rcClip);
-        CRect rcWnd = GetClientRect();
-        m_memRT->FillSolidRect(&rcWnd, RGBA(255,0,0,255));
-    }
-    m_memRT->PopClip();
 
+    m_memRT->PopClip();
     UpdatePresenter(dc, m_memRT, rcInvalid, 255, uFlags);
+    printf("SHostWnd::OnPrint end,dc=%p\n", m_memRT->GetDC(0));
 }
 
 void SHostWnd::OnPaint(HDC dc)
