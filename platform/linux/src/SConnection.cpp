@@ -155,6 +155,7 @@ SConnection::SConnection(int screenNum)
     wm_protocols_atom = SConnMgr::internAtom(connection, 1, "WM_PROTOCOLS");
     wm_delete_window_atom = SConnMgr::internAtom(connection, 1, "WM_DELETE_WINDOW");
     wm_stat_atom = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE");
+    //todo:_NET_WM_STATE_RESTORED£¬_NET_WM_STATE_MINIMIZED²»´æÔÚ
     wm_state_minimize = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE_MINIMIZED");
     wm_state_maximize = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE_MAXIMIZED_HORZ");
     wm_state_restore = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE_RESTORED");
@@ -191,8 +192,16 @@ SConnection::~SConnection()
 
 
 bool SConnection::update(){
+    UINT timeOut = -1;
+    {
+        std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
+        for (auto& it : m_lstTimer) {
+            timeOut = std::min(timeOut, it.fireRemain);
+        }
+    }
     std::unique_lock<std::mutex> lock(m_mutex4Evt);
-    m_varCondition.wait(lock, [&]{return !m_evtQueue.empty(); });
+    uint32_t ts1 = _time64(nullptr);
+    m_varCondition.wait_for(lock, std::chrono::milliseconds(timeOut), [&]{return !m_evtQueue.empty(); });
 
     for(auto it:m_evtQueue){
         pushEvent(it);
@@ -200,6 +209,24 @@ bool SConnection::update(){
     }
     bool bRet = !m_evtQueue.empty();
     m_evtQueue.clear();
+
+    uint64_t ts2 = _time64(nullptr);
+    {
+        UINT elapse = ts2 - ts1;
+        std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
+        for (auto& it : m_lstTimer) {
+            if (it.fireRemain > elapse) {
+                Msg* pMsg = new Msg;
+                pMsg->hwnd = it.hWnd;
+                pMsg->message = WM_TIMER;
+                pMsg->wParam = it.id;
+                pMsg->lParam = 0;
+                pMsg->time = ts2;
+                m_msgQueue.push_back(pMsg);
+                it.fireRemain = it.elapse;
+            }
+        }
+    }
     return bRet;
 }
 
@@ -237,8 +264,7 @@ BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT
             memcpy(pMsg,(MSG*)m_msgPeek,sizeof(MSG));
             
             return TRUE;
-        }
-       
+        }       
     }
     return FALSE;
 }
@@ -252,6 +278,59 @@ void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
     pMsg->wParam = wp;
     pMsg->lParam = lp;
     m_msgQueue.push_back(pMsg);
+}
+
+UINT_PTR SConnection::SetTimer(HWND hWnd, UINT_PTR id, UINT uElapse,
+    TIMERPROC proc)
+{
+    std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
+    if (hWnd) {
+        //find exist timer.
+        for (auto& it : m_lstTimer) {
+            if (it.hWnd != hWnd)
+                continue;
+            if (it.id == id) {
+                it.fireRemain = uElapse;
+                it.proc = proc;
+                return id;
+            }
+        }
+        TimerInfo timer;
+        timer.id = id;
+        timer.fireRemain = uElapse;
+        timer.hWnd = hWnd;
+        timer.proc = proc;
+        m_lstTimer.push_back(timer);
+        return id;
+    }
+    else {
+        UINT_PTR newId = 0;
+        for (auto& it : m_lstTimer) {
+            if (it.hWnd)
+                continue;
+            newId = std::max(it.id, newId);
+        }
+        TimerInfo timer;
+        timer.id = newId+1;
+        timer.fireRemain = uElapse;
+        timer.hWnd = hWnd;
+        timer.proc = proc;
+        m_lstTimer.push_back(timer);
+        return newId;
+    }
+}
+
+BOOL SConnection::KillTimer(HWND hWnd,
+    UINT_PTR id)
+{
+    std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
+    for (auto it = m_lstTimer.begin(); it != m_lstTimer.end(); it++) {
+        if (it->hWnd == hWnd && it->id == id) {
+            m_lstTimer.erase(it);
+            return TRUE;
+        }
+    }
+    return FALSE;
 }
 
 static uint32_t TsSpan(uint32_t t1, uint32_t t2) {
@@ -471,6 +550,21 @@ void SConnection::_readProc()
     }
     m_evtQueue.clear();
     m_mutex4Evt.unlock();
+}
+
+UINT_PTR SConnection::generateTimerId(HWND hWnd,UINT_PTR id)
+{
+    std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
+    if (hWnd) {
+
+    }
+    else {
+
+    }
+    UINT_PTR newId = hWnd ? 0 : id;
+    for (auto& it : m_lstTimer) {
+
+    }
 }
 
 SNSEND

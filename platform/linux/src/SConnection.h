@@ -19,6 +19,15 @@
 
 SNSBEGIN
 struct Msg;
+
+struct TimerInfo {
+    UINT_PTR id;
+    HWND hWnd;
+    UINT elapse;
+    UINT fireRemain;
+    TIMERPROC proc;
+};
+
 class SConnection : SNoCopyable{
 public:
   SConnection(int screenNum);
@@ -38,12 +47,17 @@ public:
     bool update();
     BOOL peekMsg(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
     void postMsg(HWND hWnd,UINT message,WPARAM wp,LPARAM lp);
+    UINT_PTR SetTimer(HWND hWnd, UINT_PTR id, UINT uElapse,
+        TIMERPROC proc);
+    BOOL KillTimer(HWND hWnd,
+        UINT_PTR id);
 private:
     bool pushEvent(xcb_generic_event_t *e);
 
     static void* readProc(void *p);
     void _readProc();
 
+    UINT_PTR generateTimerId(HWND hWnd, UINT_PTR id);
 private:
     std::condition_variable m_varCondition;
     std::mutex m_mutex4Evt;
@@ -58,6 +72,8 @@ private:
     bool  m_bMsgNeedFree;
     std::thread      m_trdEvtReader;
     std::atomic<bool> m_bQuit;
+
+    std::list<TimerInfo> m_lstTimer;
 };
 
 class SConnMgr : SNoCopyable{
