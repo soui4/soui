@@ -327,6 +327,20 @@ TEST(demo,window){
     //EXPECT_EQ(run_window(), 1);
 }
 
+class CMainDlg : public SHostWnd {
+public:
+    CMainDlg(LPCSTR pszLayout) :SHostWnd(pszLayout) {}
+
+    void OnClose();
+    EVENT_MAP_BEGIN()
+        EVENT_ID_COMMAND(1,OnClose)
+    EVENT_MAP_END2(SHostWnd)
+};
+
+void CMainDlg::OnClose() {
+    PostMessage(WM_QUIT);
+}
+
 int run_app(HINSTANCE hInst){
     std::string srcDir = getSourceDir();
 
@@ -348,7 +362,7 @@ int run_app(HINSTANCE hInst){
     testResouce->Init((LPARAM)appRes.c_str(), 0);
     app.AddResProvider(testResouce);
 
-    SHostWnd hostWnd("layout:XML_MAINWND");
+    CMainDlg hostWnd("layout:XML_MAINWND");
     hostWnd.Create(0);
     hostWnd.ShowWindow(SW_SHOW);
     app.Run(hostWnd.m_hWnd);
