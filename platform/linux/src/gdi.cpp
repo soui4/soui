@@ -277,16 +277,14 @@ void   MarkPixmapDirty(HBITMAP bmp){
 
 HDC CreateCompatibleDC(HDC hdc)
 {
+    HWND hwnd = 0;
     if(hdc==0){
-        //todo: get root window dc
         SConnection *conn = SConnMgr::instance()->getConnection();
-        cairo_surface_t * surface = cairo_xcb_surface_create(conn->connection, conn->screen->root, xcb_aux_find_visual_by_id(conn->screen,conn->screen->root_visual), 10,10);
-        HBITMAP bmp = InitGdiObj(OBJ_BITMAP,surface);
-        hdc = new _SDC(conn->screen->root,bmp);
-        return hdc;
+        hwnd = conn->screen->root;
     }else{
-        return CreateDC(hdc->hwnd,0,0);
+        hwnd = hdc->hwnd;
     }
+    return new _SDC(hwnd);
 }
 
 BOOL DeleteDC(HDC hdc)
@@ -345,9 +343,14 @@ HGDIOBJ SelectObject(HDC hdc, HGDIOBJ h)
             //recreate cairo_t object
             assert(h != hdc->bmp);
             ret = hdc->bmp;
-            cairo_destroy(hdc->cairo);
+            if (hdc->cairo)
+            {
+                cairo_destroy(hdc->cairo);
+                hdc->cairo = nullptr;
+            }
             hdc->bmp = h;
-            hdc->cairo = cairo_create((cairo_surface_t*)GetGdiObjPtr(h));
+            if(GetGdiObjPtr(h))
+                hdc->cairo = cairo_create((cairo_surface_t*)GetGdiObjPtr(h));
             break;
         }
     }
@@ -361,7 +364,7 @@ BOOL DeleteObject(HGDIOBJ hObj)
     switch (hObj->type)
     {
     case OBJ_BITMAP:
-        {
+        if(hObj->ptr){
             cairo_surface_destroy((cairo_surface_t*)hObj->ptr);
         }
         break;
@@ -965,6 +968,11 @@ COLORREF GetSysColor(int i){
 HGDIOBJ  GetStockObject(int i)
 {
     switch(i){
+    case NULL_BITMAP:
+    {
+        static _GdiObj bmp(OBJ_BITMAP, nullptr);
+        return &bmp;
+    }
         case NULL_BRUSH:
         {
             static LOGBRUSH log;

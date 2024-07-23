@@ -15,7 +15,7 @@ using namespace SOUI;
 
 #define CLS_WINDOW "window"
 
-HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module);
+static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module);
 
 struct _Window{
     std::recursive_mutex mutex;
@@ -23,6 +23,7 @@ struct _Window{
     xcb_connection_t *mConnection;
     xcb_screen_t *mScreen;
     HDC           hdc;
+    HBITMAP       bmp;
     std::string title; 
     RECT          rc;
     UINT_PTR           objOpaque;
@@ -169,12 +170,26 @@ HWND WINAPI  CreateWindowEx( DWORD exStyle, LPCSTR className,
     return WIN_CreateWindowEx( &cs, className, instance);
 }
 
+
+static BOOL InitWndDC(HWND hwnd, int cx, int cy) {
+    assert(hwnd);
+    WndObj wndObj = WndObj::fromHwnd(hwnd);
+    assert(wndObj);
+    cx = std::max(cx, 1);
+    cy = std::max(cy, 1);
+    cairo_surface_t* surface = cairo_xcb_surface_create(wndObj->mConnection, hwnd, xcb_aux_find_visual_by_id(wndObj->mScreen, wndObj->mScreen->root_visual), cx, cy);
+    wndObj->bmp = InitGdiObj(OBJ_BITMAP, surface);
+    wndObj->hdc = new _SDC(hwnd);
+    SelectObject(wndObj->hdc, wndObj->bmp);
+    return TRUE;
+}
+
 /***********************************************************************
  *           WIN_CreateWindowEx
  *
  * Implementation of CreateWindowEx().
  */
-HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
+static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 {
     WNDCLASSEX info={0};
     if (!GetClassInfoEx( module, className, &info )){
@@ -246,7 +261,7 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         map_wnd.insert(std::make_pair(hWnd,pWnd));
     }
-    pWnd->hdc = CreateDC(hWnd, cs->cx, cs->cy);
+    InitWndDC(hWnd, cs->cx, cs->cy);
     if(0!=SendMessage(hWnd,WM_CREATE,0,(LPARAM)cs)){
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         auto it = map_wnd.find(hWnd);
@@ -256,6 +271,9 @@ HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
         map_wnd.erase(it);
         if(wndObj->hdc){
             DeleteDC(wndObj->hdc);
+        }
+        if (wndObj->bmp) {
+            DeleteObject(wndObj->bmp);
         }
         //delete wndObj and release resource of the window object
         xcb_unmap_window(wndObj->mConnection,hWnd);
@@ -283,7 +301,10 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
         DeleteDC(wndObj->hdc);
         wndObj->hdc = nullptr;
     }
-
+    if (wndObj->bmp) {
+        DeleteObject(wndObj->bmp);
+        wndObj->bmp = nullptr;
+    }
     map_wnd.erase(it);
 
     //delete wndObj and release resource of the window object
@@ -354,11 +375,11 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
         break;
     case WM_SIZE:
         SIZE sz = { GET_X_LPARAM(lp),GET_Y_LPARAM(lp) };
-        if (wndObj->hdc && (sz.cx != wndObj->rc.right-wndObj->rc.left || sz.cy != wndObj->rc.bottom-wndObj->rc.top))
+        if (wndObj->bmp && (sz.cx != wndObj->rc.right-wndObj->rc.left || sz.cy != wndObj->rc.bottom-wndObj->rc.top))
         {
             wndObj->rc.right=wndObj->rc.left + sz.cx;
             wndObj->rc.bottom = wndObj->rc.top+sz.cy;
-            cairo_xcb_surface_set_size((cairo_surface_t*)GetGdiObjPtr(GetCurrentObject(wndObj->hdc, OBJ_BITMAP)), sz.cx, sz.cy);
+            cairo_xcb_surface_set_size((cairo_surface_t*)GetGdiObjPtr(wndObj->bmp), sz.cx, sz.cy);
         }
         break;
     }
@@ -668,25 +689,6 @@ BOOL GetWindowRect(HWND hWnd, RECT *rc)
         return FALSE;
     *rc = wndObj->rc;
     return TRUE;
-}
-
-HDC CreateDC(HWND hwnd,int cx,int cy){
-    assert(hwnd);
-    cx = std::max(cx, 1);
-    cy = std::max(cy, 1);
-    WndObj wndObj = WndObj::fromHwnd(hwnd);
-    if(wndObj){
-        cairo_surface_t * surface = cairo_xcb_surface_create(wndObj->mConnection, hwnd, xcb_aux_find_visual_by_id(wndObj->mScreen,wndObj->mScreen->root_visual), cx,cy);
-        HDC hdc = new _SDC(hwnd,InitGdiObj(OBJ_BITMAP,surface));
-        return hdc;
-    }else{
-        SConnection *conn = SConnMgr::instance()->getConnection();
-        hwnd = conn->screen->root;
-        cairo_surface_t * surface = cairo_xcb_surface_create(conn->connection, hwnd, xcb_aux_find_visual_by_id(conn->screen,conn->screen->root_visual), cx,cy);
-        HDC hdc = new _SDC(hwnd,InitGdiObj(OBJ_BITMAP,surface));
-        return hdc;
-    }
-
 }
 
 HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){

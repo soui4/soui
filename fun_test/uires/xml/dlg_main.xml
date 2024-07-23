@@ -2,7 +2,7 @@
 appWnd="1"
 translucent="0"
 >
-  <root  width="600" height="400" colorBkgnd="@color/white">
+  <root  width="600" height="400" skin="_skin.sys.wnd.bkgnd" colorBkgnd="@color/white">
     <text pos="10,10" text="hello soui" colorText="@color/red" colorBkgnd="@color/gray"/>
   </root>
 </SOUI>

@@ -762,7 +762,6 @@ void SHostWnd::OnPrint(HDC dc, UINT uFlags)
 
     m_memRT->PopClip();
     UpdatePresenter(dc, m_memRT, rcInvalid, 255, uFlags);
-    printf("SHostWnd::OnPrint end,dc=%p\n", m_memRT->GetDC(0));
 }
 
 void SHostWnd::OnPaint(HDC dc)

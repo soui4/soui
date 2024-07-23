@@ -130,7 +130,6 @@ HBITMAP WINAPI CreateDIBSection( HDC hdc,  CONST BITMAPINFO *lpbmi,  UINT usage,
 BOOL    WINAPI UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONST VOID*pjBits);
 void    WINAPI MarkPixmapDirty(HBITMAP bmp);
 
-HDC  WINAPI CreateDC(HWND hwnd,int cx,int cy);
 HDC     WINAPI CreateCompatibleDC(  HDC hdc);
 BOOL    WINAPI DeleteDC( HDC hdc);
 
@@ -224,6 +223,7 @@ GetTextExtentPoint32(
 #define DEFAULT_PALETTE     15
 #define SYSTEM_FIXED_FONT   16
 #define DEFAULT_GUI_FONT    17
+#define NULL_BITMAP         20
 
  HGDIOBJ WINAPI GetStockObject(  int i);
 
