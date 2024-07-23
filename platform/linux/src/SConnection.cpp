@@ -100,6 +100,30 @@ xcb_atom_t SConnMgr::internAtom(xcb_connection_t *connection, uint8_t onlyIfExis
     return atom;
 }
 
+//todo: 获取鼠标双击时间间隔，目前获取不到有效值
+static uint32_t GetDoubleClickSpan(xcb_connection_t* connection,xcb_screen_t * screen) {
+    uint32_t ret = 200;
+    xcb_window_t root_window = screen->root;
+
+    // 获取DoubleClickTime资源的原子ID
+    xcb_atom_t atom = SConnMgr::internAtom(connection, 0, "_NET_DOUBLE_CLICK_TIME");
+    // 发送获取属性的请求
+    xcb_get_property_cookie_t cookie = xcb_get_property(connection, 0, root_window, atom, XCB_ATOM_CARDINAL, 0, 1024);
+    xcb_get_property_reply_t *reply = xcb_get_property_reply(connection, cookie, NULL);
+    if (reply == NULL) {
+        fprintf(stderr, "Failed to get property value\n");
+        return ret;
+    }
+    
+    // 检查获取的值是否有效
+    if (reply->value_len == 1) {
+        ret = *((uint32_t*)xcb_get_property_value(reply));
+    }
+    // 释放资源
+    free(reply);
+    return ret;
+}
+
 SConnection::SConnection(int screenNum)
 {
     connection = xcb_connect(nullptr, &screenNum);
@@ -108,7 +132,7 @@ SConnection::SConnection(int screenNum)
         connection = NULL;
         return;
     }
-
+    
     /* Get the screen whose number is screenNum */
 
     const xcb_setup_t *setup = xcb_get_setup(connection);
@@ -125,6 +149,8 @@ SConnection::SConnection(int screenNum)
         iter = xcb_setup_roots_iterator(setup);
     }
     screen = iter.data;
+
+    m_tsDoubleSpan = GetDoubleClickSpan(connection, screen);
 
     wm_protocols_atom = SConnMgr::internAtom(connection, 1, "WM_PROTOCOLS");
     wm_delete_window_atom = SConnMgr::internAtom(connection, 1, "WM_DELETE_WINDOW");
@@ -225,6 +251,30 @@ void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
     m_msgQueue.push_back(pMsg);
 }
 
+static uint32_t TsSpan(uint32_t t1, uint32_t t2) {
+    if (t1 > t2) {
+        return t1 - t2;
+    }
+    else {
+        return t1 + (0xffffffff - t2);
+    }
+}
+
+static WPARAM ButtonState2Mask(uint16_t state) {
+    WPARAM wp = 0;
+    if (state & XCB_KEY_BUT_MASK_SHIFT)
+        wp |= MK_SHIFT;
+    if (state & XCB_KEY_BUT_MASK_CONTROL)
+        wp |= MK_CONTROL;
+    if (state & XCB_BUTTON_MASK_1)
+        wp |= MK_LBUTTON;
+    if (state & XCB_BUTTON_MASK_2)
+        wp |= MK_RBUTTON;
+    if (state & XCB_BUTTON_MASK_3)
+        wp |= MK_RBUTTON;
+    return wp;
+}
+
 bool SConnection::pushEvent(xcb_generic_event_t *event){
     uint8_t event_code = event->response_type & 0x7f;
     Msg *pMsg = nullptr;
@@ -315,6 +365,70 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
         break;
     }
     break;
+    case XCB_BUTTON_PRESS:
+    {
+        xcb_button_press_event_t* e2 = (xcb_button_press_event_t*)event;
+        if (e2->detail >= XCB_BUTTON_INDEX_1 && e2->detail <= XCB_BUTTON_INDEX_3) {
+            pMsg = new Msg;
+            pMsg->hwnd = e2->event;
+            pMsg->pt.x = e2->event_x;
+            pMsg->pt.y = e2->event_y;
+            pMsg->lParam = MAKELPARAM(pMsg->pt.x, pMsg->pt.y);
+            switch (e2->detail) {
+            case XCB_BUTTON_INDEX_1://left button
+                pMsg->message = TsSpan(e2->time, m_tsPrevPress) > m_tsDoubleSpan ? WM_LBUTTONDOWN : WM_LBUTTONDBLCLK;
+                break;
+            case XCB_BUTTON_INDEX_2:
+                pMsg->message = TsSpan(e2->time, m_tsPrevPress) < m_tsDoubleSpan ? WM_RBUTTONDOWN : WM_RBUTTONDBLCLK;
+                break;
+            case XCB_BUTTON_INDEX_3:
+                pMsg->message = TsSpan(e2->time, m_tsPrevPress) < m_tsDoubleSpan ? WM_MBUTTONDOWN : WM_MBUTTONDBLCLK;
+                break;
+            }
+            pMsg->wParam = ButtonState2Mask(e2->state);
+            m_tsPrevPress = e2->time;
+            printf("on button down, msg=%d,pt=(%d,%d)\n", pMsg->message, pMsg->pt.x, pMsg->pt.y);
+        }
+        break;
+    }
+    case XCB_BUTTON_RELEASE:
+    {
+        xcb_button_release_event_t* e2 = (xcb_button_release_event_t*)event;
+        if (e2->detail >= XCB_BUTTON_INDEX_1 && e2->detail <= XCB_BUTTON_INDEX_3) {
+            pMsg = new Msg;
+            pMsg->hwnd = e2->event;
+            pMsg->pt.x = e2->event_x;
+            pMsg->pt.y = e2->event_y;
+            pMsg->lParam = MAKELPARAM(pMsg->pt.x, pMsg->pt.y);
+            switch (e2->detail) {
+            case XCB_BUTTON_INDEX_1://left button
+                pMsg->message = WM_LBUTTONUP;
+                break;
+            case XCB_BUTTON_INDEX_2:
+                pMsg->message = WM_RBUTTONUP;
+                break;
+            case XCB_BUTTON_INDEX_3:
+                pMsg->message = WM_MBUTTONUP;
+                break;
+            }
+            pMsg->wParam = ButtonState2Mask(e2->state);
+            printf("on button up!!, msg=%d,pt=(%d,%d)\n", pMsg->message, pMsg->pt.x, pMsg->pt.y);
+        }
+        break;
+    }
+    case XCB_MOTION_NOTIFY:
+    {
+        xcb_motion_notify_event_t* e2 = (xcb_motion_notify_event_t*)event;
+        pMsg = new Msg;
+        pMsg->hwnd = e2->event;
+        pMsg->message = WM_MOUSEMOVE;
+        pMsg->pt.x = e2->event_x;
+        pMsg->pt.y = e2->event_y;
+        pMsg->lParam = MAKELPARAM(pMsg->pt.x, pMsg->pt.y);
+        pMsg->wParam = ButtonState2Mask(e2->state);
+        pMsg->time = e2->time;
+        break;
+    }
     default:
         break;
     }

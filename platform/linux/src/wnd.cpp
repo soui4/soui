@@ -15,8 +15,6 @@ using namespace SOUI;
 
 #define CLS_WINDOW "window"
 
-static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module);
-
 struct _Window{
     std::recursive_mutex mutex;
     pthread_t tid;
@@ -137,38 +135,6 @@ static inline void set_win_data( void *ptr, LONG_PTR val, UINT size )
 }
 
 extern bool NtUserGetAtomName( ATOM atomName, UNICODE_STRING *str );
-/***********************************************************************
- *		CreateWindowExW (USER32.@)
- */
-HWND WINAPI  CreateWindowEx( DWORD exStyle, LPCSTR className,
-                                 LPCSTR windowName, DWORD style, INT x,
-                                 INT y, INT width, INT height,
-                                 HWND parent, HMENU menu,
-                                 HINSTANCE instance, LPVOID data )
-{
-    char szClassName[100];
-    if(IS_INTRESOURCE(className)){
-        UNICODE_STRING str={100,szClassName,0};
-        if(!NtUserGetAtomName((ATOM)LOWORD(className),&str))
-            return 0;
-        className = szClassName;
-    }
-    CREATESTRUCT cs;
-    cs.lpCreateParams = data;
-    cs.hInstance      = instance;
-    cs.hMenu          = menu;
-    cs.hwndParent     = parent;
-    cs.x              = x;
-    cs.y              = y;
-    cs.cx             = width;
-    cs.cy             = height;
-    cs.style          = style;
-    cs.lpszName       = windowName;
-    cs.lpszClass      = className;
-    cs.dwExStyle      = exStyle;
-
-    return WIN_CreateWindowEx( &cs, className, instance);
-}
 
 
 static BOOL InitWndDC(HWND hwnd, int cx, int cy) {
@@ -220,11 +186,14 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
     HWND hWnd = xcb_generate_id(pWnd->mConnection);
-
     uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
     uint32_t value_list[2] = {
         pWnd->mScreen->black_pixel,
-        XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY |XCB_EVENT_MASK_PROPERTY_CHANGE
+        XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY 
+        | XCB_EVENT_MASK_PROPERTY_CHANGE
+        | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE
+        | XCB_EVENT_MASK_ENTER_WINDOW| XCB_EVENT_MASK_LEAVE_WINDOW
+        | XCB_EVENT_MASK_KEY_PRESS| XCB_EVENT_MASK_KEY_RELEASE
         };
 
     auto cookie = xcb_create_window_checked(pWnd->mConnection, XCB_COPY_FROM_PARENT, hWnd,
@@ -283,6 +252,39 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
         hWnd = 0;
     }
     return hWnd;
+}
+
+/***********************************************************************
+ *		CreateWindowExW (USER32.@)
+ */
+HWND WINAPI  CreateWindowEx(DWORD exStyle, LPCSTR className,
+    LPCSTR windowName, DWORD style, INT x,
+    INT y, INT width, INT height,
+    HWND parent, HMENU menu,
+    HINSTANCE instance, LPVOID data)
+{
+    char szClassName[100];
+    if (IS_INTRESOURCE(className)) {
+        UNICODE_STRING str = { 100,szClassName,0 };
+        if (!NtUserGetAtomName((ATOM)LOWORD(className), &str))
+            return 0;
+        className = szClassName;
+    }
+    CREATESTRUCT cs;
+    cs.lpCreateParams = data;
+    cs.hInstance = instance;
+    cs.hMenu = menu;
+    cs.hwndParent = parent;
+    cs.x = x;
+    cs.y = y;
+    cs.cx = width;
+    cs.cy = height;
+    cs.style = style;
+    cs.lpszName = windowName;
+    cs.lpszClass = className;
+    cs.dwExStyle = exStyle;
+
+    return WIN_CreateWindowEx(&cs, className, instance);
 }
 
 BOOL WINAPI DestroyWindow(HWND hWnd){

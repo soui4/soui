@@ -48,6 +48,9 @@ private:
 
     std::recursive_mutex m_mutex4Msg;
     std::list<Msg *> m_msgQueue;
+    xcb_timestamp_t  m_tsPrevPress;
+    xcb_timestamp_t  m_tsDoubleSpan;
+
     Msg * m_msgPeek;
     bool  m_bMsgNeedFree;
     std::thread      m_trdEvtReader;
