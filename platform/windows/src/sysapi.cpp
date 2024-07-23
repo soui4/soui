@@ -139,7 +139,7 @@ BOOL HasFont(LPCTSTR fontName){
     return bValidFont;
 }
 
-BOOL IsSuppotMaxMove()
+BOOL IsSupportMaxMove()
 {
     OSVERSIONINFOEX OSVerInfo;
     BOOL bOsVersionInfoEx;

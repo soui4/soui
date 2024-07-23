@@ -18,8 +18,7 @@ using namespace SOUI;
 struct _Window{
     std::recursive_mutex mutex;
     pthread_t tid;
-    xcb_connection_t *mConnection;
-    xcb_screen_t *mScreen;
+    SConnection *mConnection;
     HDC           hdc;
     HBITMAP       bmp;
     std::string title; 
@@ -143,7 +142,7 @@ static BOOL InitWndDC(HWND hwnd, int cx, int cy) {
     assert(wndObj);
     cx = std::max(cx, 1);
     cy = std::max(cy, 1);
-    cairo_surface_t* surface = cairo_xcb_surface_create(wndObj->mConnection, hwnd, xcb_aux_find_visual_by_id(wndObj->mScreen, wndObj->mScreen->root_visual), cx, cy);
+    cairo_surface_t* surface = cairo_xcb_surface_create(wndObj->mConnection->connection, hwnd, xcb_aux_find_visual_by_id(wndObj->mConnection->screen, wndObj->mConnection->screen->root_visual), cx, cy);
     wndObj->bmp = InitGdiObj(OBJ_BITMAP, surface);
     wndObj->hdc = new _SDC(hwnd);
     SelectObject(wndObj->hdc, wndObj->bmp);
@@ -180,15 +179,14 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     HWND hParent = cs->hwndParent;
     if (!hParent) hParent = conn->screen->root;
 
-    pWnd->mConnection = conn->connection;
-    pWnd->mScreen = conn->screen;
+    pWnd->mConnection = conn;
     pWnd->dwStyle = cs->style;
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
-    HWND hWnd = xcb_generate_id(pWnd->mConnection);
+    HWND hWnd = xcb_generate_id(pWnd->mConnection->connection);
     uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK | XCB_CW_OVERRIDE_REDIRECT;
     uint32_t value_list[] = {
-        pWnd->mScreen->black_pixel,
+        pWnd->mConnection->screen->black_pixel,
         1,
         XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY 
         | XCB_EVENT_MASK_PROPERTY_CHANGE
@@ -197,11 +195,11 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
         | XCB_EVENT_MASK_KEY_PRESS| XCB_EVENT_MASK_KEY_RELEASE
         };
 
-    auto cookie = xcb_create_window_checked(pWnd->mConnection, XCB_COPY_FROM_PARENT, hWnd,
+    auto cookie = xcb_create_window_checked(pWnd->mConnection->connection, XCB_COPY_FROM_PARENT, hWnd,
                       hParent, cs->x, cs->y, std::max(cs->cx,1u), std::max(cs->cy,1u), 10,
-                      XCB_WINDOW_CLASS_INPUT_OUTPUT, pWnd->mScreen->root_visual, mask,
+                      XCB_WINDOW_CLASS_INPUT_OUTPUT, pWnd->mConnection->screen->root_visual, mask,
                       value_list);
-    xcb_generic_error_t * err = xcb_request_check(pWnd->mConnection, cookie);
+    xcb_generic_error_t * err = xcb_request_check(pWnd->mConnection->connection, cookie);
     if (err) {
         printf("xcb_create_window failed, errcode=%d\n", err->error_code);
         free(err);
@@ -213,17 +211,17 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     pWnd->rc.bottom = cs->y + cs->cy;
 
     const uint32_t vals[2] = { cs->cx, cs->cy};
-    xcb_configure_window(pWnd->mConnection, hWnd, XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, vals);
+    xcb_configure_window(pWnd->mConnection->connection, hWnd, XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, vals);
     pWnd->title = cs->lpszName;
-    xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd,
+    xcb_change_property(pWnd->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, pWnd->title.length(), pWnd->title.c_str());
 
-    xcb_change_property(pWnd->mConnection, XCB_PROP_MODE_REPLACE, hWnd, conn->wm_protocols_atom, XCB_ATOM_ATOM, 32, 1, &conn->wm_delete_window_atom);
+    xcb_change_property(pWnd->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd, conn->wm_protocols_atom, XCB_ATOM_ATOM, 32, 1, &conn->wm_delete_window_atom);
 
     if(cs->style & WS_VISIBLE)
-        xcb_map_window(pWnd->mConnection, hWnd);
+        xcb_map_window(pWnd->mConnection->connection, hWnd);
 
-    xcb_flush(pWnd->mConnection);
+    xcb_flush(pWnd->mConnection->connection);
 
     pWnd->parent = hParent;
     pWnd->winproc = info.lpfnWndProc;
@@ -246,9 +244,9 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
             DeleteObject(wndObj->bmp);
         }
         //delete wndObj and release resource of the window object
-        xcb_unmap_window(wndObj->mConnection,hWnd);
-        xcb_destroy_window(wndObj->mConnection, hWnd); 
-        xcb_flush(wndObj->mConnection);
+        xcb_unmap_window(wndObj->mConnection->connection,hWnd);
+        xcb_destroy_window(wndObj->mConnection->connection, hWnd);
+        xcb_flush(wndObj->mConnection->connection);
         free(wndObj);
         hWnd = 0;
     }
@@ -311,9 +309,9 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
     map_wnd.erase(it);
 
     //delete wndObj and release resource of the window object
-    xcb_unmap_window(wndObj->mConnection,hWnd);
-    xcb_destroy_window(wndObj->mConnection, hWnd); 
-    xcb_flush(wndObj->mConnection);
+    xcb_unmap_window(wndObj->mConnection->connection,hWnd);
+    xcb_destroy_window(wndObj->mConnection->connection, hWnd);
+    xcb_flush(wndObj->mConnection->connection);
     free(wndObj);
 
     return TRUE;
@@ -394,11 +392,11 @@ LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
     WndObj pWnd = WndObj::fromHwnd(hWnd);
     if(!pWnd)
         return -1;
-    SOUI::SConnection *trdUiState = SOUI::SConnMgr::instance()->getConnection(pWnd->tid);
-    if(!trdUiState)
+    SConnection *connWnd = SConnMgr::instance()->getConnection(pWnd->tid);
+    if(!connWnd)
         return -1;
-    SOUI::SConnection *trdUiStateCur = SOUI::SConnMgr::instance()->getConnection();
-    if(trdUiState == trdUiStateCur){
+    SConnection *connCur = SConnMgr::instance()->getConnection();
+    if(connWnd == connCur){
         //same thread,call wndproc directly.
         WNDPROC wndProc = (WNDPROC)GetWindowLongPtr(hWnd,GWL_WNDPROC);
         assert(wndProc);
@@ -672,7 +670,7 @@ BOOL UpdateWindow(HWND hWnd)
     if(!wndObj)
         return FALSE;
     //todo:hjx
-    xcb_flush(wndObj->mConnection);
+    xcb_flush(wndObj->mConnection->connection);
     return TRUE;
 }
 
@@ -694,11 +692,43 @@ BOOL GetWindowRect(HWND hWnd, RECT *rc)
     return TRUE;
 }
 
+static void SendSysCommand(SConnection *conn, xcb_window_t wnd, xcb_atom_t cmdAtom) {
+    xcb_client_message_event_t event;
+    event.response_type = XCB_CLIENT_MESSAGE;
+    event.window = wnd;
+    event.format = 32;
+    event.type = conn->wm_stat_atom;
+    event.data.data32[0] = cmdAtom;
+    xcb_send_event(conn->connection, false, wnd, XCB_EVENT_MASK_STRUCTURE_NOTIFY, (const char*)&event);
+    xcb_flush(conn->connection);
+}
+
 HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return -1;
     switch(msg){
+    case WM_SYSCOMMAND:
+    {
+        WORD action = wp & 0xfff0;
+        switch (action) {
+        case SC_MOVE:
+            break;
+        case SC_MINIMIZE:
+            SendSysCommand(wndObj->mConnection, hWnd, wndObj->mConnection->wm_state_minimize);
+            break;
+        case SC_MAXIMIZE:
+            SendSysCommand(wndObj->mConnection, hWnd, wndObj->mConnection->wm_state_maximize);
+            break;
+        case SC_RESTORE:
+            SendSysCommand(wndObj->mConnection, hWnd, wndObj->mConnection->wm_state_restore);
+            break;
+        case SC_CLOSE:
+            SendMessage(hWnd, WM_CLOSE, 0, 0);
+            break;
+        }
+    }
+        break;
     case WM_CLOSE:
         DestroyWindow(hWnd);
         break;
@@ -708,14 +738,14 @@ HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
             if(!(wndPos.flags  & SWP_NOMOVE)){
                 const int32_t coords[] = {static_cast<int32_t>(wndPos.x),
                                     static_cast<int32_t>(wndPos.y)};
-                xcb_configure_window(wndObj->mConnection, hWnd,
+                xcb_configure_window(wndObj->mConnection->connection, hWnd,
                                 XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y, coords);
                 SendMessage(hWnd,WM_MOVE,0,MAKELPARAM(wndPos.x,wndPos.y));
             }
             if(!(wndPos.flags & SWP_NOSIZE)){
                 const uint32_t coords[] = {static_cast<uint32_t>(wndPos.cx),
                                     static_cast<uint32_t>(wndPos.cy)};
-                xcb_configure_window(wndObj->mConnection, hWnd,
+                xcb_configure_window(wndObj->mConnection->connection, hWnd,
                                 XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, coords);
                 SendMessage(hWnd,WM_SIZE,0,MAKELPARAM(wndPos.cx,wndPos.cy));
             }
@@ -729,7 +759,7 @@ HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
             }
             
             ShowWindow(wndPos.hwnd,showCmd);
-            xcb_flush(wndObj->mConnection);
+            xcb_flush(wndObj->mConnection->connection);
             if((!wndPos.flags & SWP_NOREDRAW)){
                 InvalidateRect(hWnd,nullptr,TRUE);
             }
@@ -754,14 +784,14 @@ BOOL ShowWindow(HWND hWnd, int nCmdShow)
         return TRUE;
     if (nCmdShow & SW_SHOW)
     {
-        xcb_map_window(wndObj->mConnection, hWnd);
+        xcb_map_window(wndObj->mConnection->connection, hWnd);
         InvalidateRect(hWnd, nullptr, TRUE);
     }
     else
     {
-        xcb_unmap_window(wndObj->mConnection, hWnd);
+        xcb_unmap_window(wndObj->mConnection->connection, hWnd);
     }    
-    xcb_flush(wndObj->mConnection);
+    xcb_flush(wndObj->mConnection->connection);
     SendMessage(hWnd, WM_SHOWWINDOW, bNew, 0);
     return TRUE;
 }
@@ -774,7 +804,7 @@ BOOL InvalidateRect(
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    xcb_connection_t *connection=wndObj->mConnection;
+    xcb_connection_t *connection=wndObj->mConnection->connection;
     RECT rcWnd;
     if(!lpRect){
         GetClientRect(hWnd,&rcWnd);
@@ -803,7 +833,7 @@ BOOL IsWindowVisible(HWND hWnd)
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    xcb_connection_t *connection=wndObj->mConnection;
+    xcb_connection_t *connection=wndObj->mConnection->connection;
 
     xcb_get_window_attributes_cookie_t cookie = xcb_get_window_attributes(connection, hWnd);
     xcb_get_window_attributes_reply_t *reply = xcb_get_window_attributes_reply(connection, cookie, NULL);
@@ -820,7 +850,7 @@ static BOOL CheckWindowState(HWND hWnd, xcb_atom_t st){
         return FALSE;
     SConnection *state = SConnMgr::instance()->getConnection(wndObj->tid);
     assert(state);
-    xcb_connection_t *connection=wndObj->mConnection;
+    xcb_connection_t *connection=wndObj->mConnection->connection;
 
     xcb_get_property_cookie_t cookie = xcb_get_property(connection, 0, hWnd, XCB_ATOM_ATOM, state->wm_stat_atom, 0, 1024);
     xcb_get_property_reply_t *reply = xcb_get_property_reply(connection, cookie, NULL);
@@ -879,9 +909,9 @@ BOOL SetWindowText(HWND hWnd , LPCTSTR lpszString){
     if(!wndObj)
         return FALSE;
     wndObj->title = lpszString;
-    xcb_change_property(wndObj->mConnection, XCB_PROP_MODE_REPLACE, hWnd,
+    xcb_change_property(wndObj->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, wndObj->title.length(), wndObj->title.c_str());
-    xcb_flush(wndObj->mConnection);
+    xcb_flush(wndObj->mConnection->connection);
     return TRUE;
 }
 
@@ -904,7 +934,7 @@ int ReleaseDC(HWND hWnd,HDC hdc){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return 0;
-    xcb_flush(wndObj->mConnection);
+    xcb_flush(wndObj->mConnection->connection);
     return 1;
 }
 

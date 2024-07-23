@@ -991,3 +991,7 @@ DWORD GetModuleFileName(
         return len;
     }
 }
+
+BOOL IsSupportMaxMove() {
+    return FALSE;
+}

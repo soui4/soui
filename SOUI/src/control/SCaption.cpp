@@ -10,7 +10,6 @@
  *
  * Describe    此类完成标题栏控件
  */
-#ifdef _WIN32
 #include "souistd.h"
 #include "control/SCaption.h"
 
@@ -34,7 +33,7 @@ void SCaption::OnLButtonUp(UINT nFlags, CPoint point)
 void SCaption::OnMouseMove(UINT nFlags, CPoint point)
 {
     HWND hHost = GetContainer()->GetHostHwnd();
-    if (WS_MAXIMIZE == (GetWindowLong(hHost, GWL_STYLE) & WS_MAXIMIZE) && m_bIsMaxDown && IsSuppotMaxMove())
+    if (WS_MAXIMIZE == (GetWindowLong(hHost, GWL_STYLE) & WS_MAXIMIZE) && m_bIsMaxDown && IsSupportMaxMove())
     {
         ::SendMessage(hHost, WM_SYSCOMMAND, SC_MOVE | HTCAPTION, 0);
 
@@ -71,5 +70,3 @@ void SCaption::OnLButtonDblClk(UINT nFlags, CPoint point)
 }
 
 SNSEND
-
-#endif//_WIN32

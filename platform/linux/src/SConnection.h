@@ -31,6 +31,9 @@ public:
     xcb_atom_t wm_stat_atom;
     xcb_atom_t wm_stat_hidden_atom;
     xcb_atom_t wm_stat_enable_atom;
+    xcb_atom_t wm_state_minimize;
+    xcb_atom_t wm_state_maximize;
+    xcb_atom_t wm_state_restore;
 public:
     bool update();
     BOOL peekMsg(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
@@ -56,7 +59,6 @@ private:
     std::thread      m_trdEvtReader;
     std::atomic<bool> m_bQuit;
 };
-
 
 class SConnMgr : SNoCopyable{
     SRwLock m_rwLock;

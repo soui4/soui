@@ -155,6 +155,9 @@ SConnection::SConnection(int screenNum)
     wm_protocols_atom = SConnMgr::internAtom(connection, 1, "WM_PROTOCOLS");
     wm_delete_window_atom = SConnMgr::internAtom(connection, 1, "WM_DELETE_WINDOW");
     wm_stat_atom = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE");
+    wm_state_minimize = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE_MINIMIZED");
+    wm_state_maximize = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE_MAXIMIZED_HORZ");
+    wm_state_restore = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE_RESTORED");
     wm_stat_hidden_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_HIDDEN");
     wm_stat_enable_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_DEMANDS_ATTENTION");
 

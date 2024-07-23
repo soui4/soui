@@ -207,4 +207,6 @@ DWORD WINAPI GetModuleFileName(
     LPSTR lpFilename,
     DWORD nSize
 );
+
+BOOL WINAPI IsSupportMaxMove();
 #endif
