@@ -186,9 +186,10 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
     HWND hWnd = xcb_generate_id(pWnd->mConnection);
-    uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-    uint32_t value_list[2] = {
+    uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK | XCB_CW_OVERRIDE_REDIRECT;
+    uint32_t value_list[] = {
         pWnd->mScreen->black_pixel,
+        1,
         XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY 
         | XCB_EVENT_MASK_PROPERTY_CHANGE
         | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE

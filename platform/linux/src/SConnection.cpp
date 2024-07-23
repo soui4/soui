@@ -387,7 +387,7 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
             }
             pMsg->wParam = ButtonState2Mask(e2->state);
             m_tsPrevPress = e2->time;
-            printf("on button down, msg=%d,pt=(%d,%d)\n", pMsg->message, pMsg->pt.x, pMsg->pt.y);
+//            printf("on button down, msg=%d,pt=(%d,%d)\n", pMsg->message, pMsg->pt.x, pMsg->pt.y);
         }
         break;
     }
@@ -412,7 +412,7 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
                 break;
             }
             pMsg->wParam = ButtonState2Mask(e2->state);
-            printf("on button up!!, msg=%d,pt=(%d,%d)\n", pMsg->message, pMsg->pt.x, pMsg->pt.y);
+//            printf("on button up!!, msg=%d,pt=(%d,%d)\n", pMsg->message, pMsg->pt.x, pMsg->pt.y);
         }
         break;
     }
