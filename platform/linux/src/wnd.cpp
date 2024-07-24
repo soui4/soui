@@ -938,7 +938,8 @@ BOOL SetWindowText(HWND hWnd , LPCTSTR lpszString){
 
 HDC GetDC(HWND hWnd){
     if(!hWnd){
-        return CreateCompatibleDC(nullptr);
+        SConnection* conn = SConnMgr::instance()->getConnection();
+        return conn->GetDC();
     }
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj || !wndObj->hdc)
@@ -947,10 +948,9 @@ HDC GetDC(HWND hWnd){
 }
 
 int ReleaseDC(HWND hWnd,HDC hdc){
-    cairo_t* cairo_dc = (cairo_t*)hdc;
     if(!hWnd){
-        DeleteDC(hdc);
-        return 1;
+        SConnection* conn = SConnMgr::instance()->getConnection();
+        return conn->ReleaseDC(hdc);;
     }
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)

@@ -13,7 +13,7 @@
 #include <thread>
 #include <atomic>
 #include <condition_variable>
-
+#include "sdc.h"
 #define STR_ATOM(atom_name,onlyExist) SOUI::SConnMgr::instance()->atom(atom_name,onlyExist)
 #define ID_ATOM(id,onlyExist) STR_ATOM(#id,onlyExist)
 
@@ -43,6 +43,7 @@ public:
     xcb_atom_t wm_state_minimize;
     xcb_atom_t wm_state_maximize;
     xcb_atom_t wm_state_restore;
+
 public:
     bool update();
     BOOL peekMsg(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
@@ -51,6 +52,8 @@ public:
         TIMERPROC proc);
     BOOL KillTimer(HWND hWnd,
         UINT_PTR id);
+    HDC GetDC();
+    BOOL ReleaseDC(HDC hdc);
 private:
     bool pushEvent(xcb_generic_event_t *e);
 
@@ -72,6 +75,8 @@ private:
     std::atomic<bool> m_bQuit;
 
     std::list<TimerInfo> m_lstTimer;
+    HDC m_deskDC;
+    HBITMAP m_deskBmp;
 };
 
 class SConnMgr : SNoCopyable{

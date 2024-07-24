@@ -714,6 +714,7 @@ static SIZE OnMeasureText(HDC hdc,LPCSTR pszBuf,int cchText){
         cairo_text_extents(hdc->cairo,word,&ext);
         ret.cx += ext.width;
         ret.cy = std::max(ret.cy,(LONG)ext.height);
+        p = next;
     }
     return ret;
 }

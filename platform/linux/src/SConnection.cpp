@@ -166,6 +166,10 @@ SConnection::SConnection(int screenNum)
     m_msgPeek = nullptr;
     m_bMsgNeedFree = false;
     m_trdEvtReader = std::move(std::thread(std::bind(&readProc, this)));
+
+    m_deskDC = new _SDC(screen->root);
+    m_deskBmp = CreateCompatibleBitmap(m_deskDC, 10, 10);
+    SelectObject(m_deskDC, m_deskBmp);
 }
 
 SConnection::~SConnection()
@@ -188,6 +192,8 @@ SConnection::~SConnection()
         m_msgPeek = nullptr;
         m_bMsgNeedFree = false;
     }
+    delete m_deskDC;
+    DeleteObject(m_deskBmp);
 }
 
 
@@ -348,6 +354,17 @@ BOOL SConnection::KillTimer(HWND hWnd,
         }
     }
     return FALSE;
+}
+
+HDC SConnection::GetDC()
+{
+    return m_deskDC;
+}
+
+BOOL SConnection::ReleaseDC(HDC hdc)
+{
+    //todo:hjx
+    return TRUE;
 }
 
 static uint32_t TsSpan(uint32_t t1, uint32_t t2) {
