@@ -49,10 +49,38 @@ BOOL  UnionRect(LPRECT lprcDst, const RECT *lprcSrc1, const RECT *lprcSrc2)
     return TRUE;
 }
 
-BOOL  SubtractRect(LPRECT lprcDst, const RECT *lprcSrc1, const RECT *lprcSrc2)
-{
-    //todo:hjx
-    return FALSE;
+BOOL SubtractRect(LPRECT dest, const RECT* src1, const RECT* src2) {
+    // 确保源矩形是有效的
+    if (!src1 || !src2) {
+        return FALSE;
+    }
+
+    // 检查src1是否完全在src2内部
+    if (src1->left >= src2->left &&
+        src1->right <= src2->right &&
+        src1->top >= src2->top &&
+        src1->bottom <= src2->bottom) {
+        return FALSE; // src1完全在src2内部，没有剩余部分
+    }
+
+    // 计算src1和src2的交点
+    int left = std::max(src1->left, src2->left);
+    int top = std::max(src1->top, src2->top);
+    int right = std::min(src1->right, src2->right);
+    int bottom = std::min(src1->bottom, src2->bottom);
+
+    // 如果没有交点，src1完全在src2外部
+    if (left >= right || top >= bottom) {
+        *dest = *src1; // 直接复制src1到dest
+        return TRUE;
+    }
+
+    // 计算减法结果
+    dest[0] = { src1->left, src1->top, left, top };
+    dest[1] = { left, top, right, bottom };
+    dest[2] = { right, src1->top, src1->right, bottom };
+
+    return TRUE;
 }
 
 BOOL OffsetRect(LPRECT prc, int dx, int dy)
