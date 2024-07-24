@@ -1,5 +1,4 @@
 #include <platform.h>
-#include <cairo/cairo.h>
 #include "region.h"
 #include "gdi.h"
 
@@ -453,16 +452,6 @@ static inline void move_rects(WINEREGION* dst, WINEREGION* src)
     init_region(src, 0);
 }
 
-/***********************************************************************
- *           REGION_DeleteObject
- */
-static BOOL REGION_DeleteObject(HGDIOBJ handle)
-{
-    WINEREGION* rgn = (WINEREGION*)GetGdiObjPtr(handle);
-    free(handle);
-    free_region(rgn);
-    return TRUE;
-}
 
 #define NTGDI_OBJ_REGION OBJ_REGION
 static void* GDI_GetObjPtr(HGDIOBJ handle, int type)
@@ -476,8 +465,17 @@ static void GDI_ReleaseObj(HGDIOBJ handle) {
 
 }
 
+/***********************************************************************
+ *           REGION_DeleteObject
+ */
+static void REGION_Free(void *ptr)
+{
+    WINEREGION* rgn = (WINEREGION*)ptr;
+    free_region(rgn);
+}
+
 static HGDIOBJ alloc_gdi_handle(void* ptr, int type) {
-    return InitGdiObj(type, ptr);
+    return InitGdiObj2(type, ptr, REGION_Free);
 }
 
 /***********************************************************************
@@ -512,7 +510,7 @@ static BOOL REGION_OffsetRegion(WINEREGION* rgn, WINEREGION* srcrgn, INT x, INT 
 }
 
 /***********************************************************************
- *           NtGdiOffsetRgn   (win32u.@)
+ *           OffsetRgn   (win32u.@)
  *
  * Moves a region by the specified X- and Y-axis offsets.
  *
@@ -529,7 +527,7 @@ static BOOL REGION_OffsetRegion(WINEREGION* rgn, WINEREGION* srcrgn, INT x, INT 
  *                     one rectangle.
  *   Failure: ERROR
  */
-INT WINAPI NtGdiOffsetRgn(HRGN hrgn, INT x, INT y)
+INT WINAPI OffsetRgn(HRGN hrgn, INT x, INT y)
 {
     WINEREGION* obj = (WINEREGION * )GDI_GetObjPtr(hrgn, NTGDI_OBJ_REGION);
     INT ret;
@@ -548,7 +546,7 @@ INT WINAPI NtGdiOffsetRgn(HRGN hrgn, INT x, INT y)
 
 
 /***********************************************************************
- *           NtGdiGetRgnBox    (win32u.@)
+ *           GetRgnBox    (win32u.@)
  *
  * Retrieves the bounding rectangle of the region. The bounding rectangle
  * is the smallest rectangle that contains the entire region.
@@ -564,7 +562,7 @@ INT WINAPI NtGdiOffsetRgn(HRGN hrgn, INT x, INT y)
  *     COMPLEXREGION - The new region can only be represented by more than
  *                     one rectangle.
  */
-INT WINAPI NtGdiGetRgnBox(HRGN hrgn, RECT* rect)
+INT WINAPI GetRgnBox(HRGN hrgn, RECT* rect)
 {
     WINEREGION* obj = (WINEREGION * )GDI_GetObjPtr(hrgn, NTGDI_OBJ_REGION);
     if (obj)
@@ -582,10 +580,10 @@ INT WINAPI NtGdiGetRgnBox(HRGN hrgn, RECT* rect)
     return ERROR;
 }
 
-BOOL WINAPI NtGdiSetRectRgn(HRGN hrgn, INT left, INT top, INT right, INT bottom);
+BOOL WINAPI SetRectRgn(HRGN hrgn, INT left, INT top, INT right, INT bottom);
 
 /***********************************************************************
- *           NtGdiCreateRectRgn   (win32u.@)
+ *           CreateRectRgn   (win32u.@)
  *
  * Creates a simple rectangular region.
  *
@@ -599,7 +597,7 @@ BOOL WINAPI NtGdiSetRectRgn(HRGN hrgn, INT left, INT top, INT right, INT bottom)
  *   Success: Handle to region.
  *   Failure: NULL.
  */
-HRGN WINAPI NtGdiCreateRectRgn(INT left, INT top, INT right, INT bottom)
+HRGN WINAPI CreateRectRgn(INT left, INT top, INT right, INT bottom)
 {
     HRGN hrgn;
     WINEREGION* obj;
@@ -612,13 +610,16 @@ HRGN WINAPI NtGdiCreateRectRgn(INT left, INT top, INT right, INT bottom)
         return 0;
     }
     TRACE("%d,%d-%d,%d returning %p\n", left, top, right, bottom, hrgn);
-    NtGdiSetRectRgn(hrgn, left, top, right, bottom);
+    SetRectRgn(hrgn, left, top, right, bottom);
     return hrgn;
 }
 
+HRGN WINAPI CreateRectRgnIndirect(CONST RECT* rc) {
+    return CreateRectRgn(rc->left, rc->top, rc->right, rc->bottom);
+}
 
 /***********************************************************************
- *           NtGdiSetRectRgn    (win32u.@)
+ *           SetRectRgn    (win32u.@)
  *
  * Sets a region to a simple rectangular region.
  *
@@ -636,7 +637,7 @@ HRGN WINAPI NtGdiCreateRectRgn(INT left, INT top, INT right, INT bottom)
  * NOTES
  *   Allows either or both left and top to be greater than right or bottom.
  */
-BOOL WINAPI NtGdiSetRectRgn(HRGN hrgn, INT left, INT top, INT right, INT bottom)
+BOOL WINAPI SetRectRgn(HRGN hrgn, INT left, INT top, INT right, INT bottom)
 {
     WINEREGION* obj;
 
@@ -665,7 +666,7 @@ BOOL WINAPI NtGdiSetRectRgn(HRGN hrgn, INT left, INT top, INT right, INT bottom)
 typedef int64_t INT64;
 
 /***********************************************************************
- *           NtGdiCreateRoundRectRgn    (win32u.@)
+ *           CreateRoundRectRgn    (win32u.@)
  *
  * Creates a rectangular region with rounded corners.
  *
@@ -685,7 +686,7 @@ typedef int64_t INT64;
  *   If ellipse_width or ellipse_height is less than 2 logical units then
  *   it is treated as though CreateRectRgn() was called instead.
  */
-HRGN WINAPI NtGdiCreateRoundRectRgn(INT left, INT top, INT right, INT bottom,
+HRGN WINAPI CreateRoundRectRgn(INT left, INT top, INT right, INT bottom,
     INT ellipse_width, INT ellipse_height)
 {
     WINEREGION* obj;
@@ -708,7 +709,7 @@ HRGN WINAPI NtGdiCreateRoundRectRgn(INT left, INT top, INT right, INT bottom,
     /* Check if we can do a normal rectangle instead */
 
     if ((ellipse_width < 2) || (ellipse_height < 2))
-        return NtGdiCreateRectRgn(left, top, right, bottom);
+        return CreateRectRgn(left, top, right, bottom);
 
     if (!(obj = alloc_region(ellipse_height))) return 0;
     obj->numRects = ellipse_height;
@@ -774,7 +775,7 @@ HRGN WINAPI NtGdiCreateRoundRectRgn(INT left, INT top, INT right, INT bottom,
 
 
 /***********************************************************************
- *           NtGdiCreateEllipticRgn    (win32u.@)
+ *           CreateEllipticRgn    (win32u.@)
  *
  * Creates an elliptical region.
  *
@@ -793,15 +794,15 @@ HRGN WINAPI NtGdiCreateRoundRectRgn(INT left, INT top, INT right, INT bottom,
  *   ellipse at each corner is equal to the width the rectangle and
  *   the same for the height.
  */
-HRGN WINAPI NtGdiCreateEllipticRgn(INT left, INT top, INT right, INT bottom)
+HRGN WINAPI CreateEllipticRgn(INT left, INT top, INT right, INT bottom)
 {
-    return NtGdiCreateRoundRectRgn(left, top, right, bottom,
+    return CreateRoundRectRgn(left, top, right, bottom,
         right - left, bottom - top);
 }
 
 
 /***********************************************************************
- *           NtGdiGetRegionData   (win32u.@)
+ *           GetRegionData   (win32u.@)
  *
  * Retrieves the data that specifies the region.
  *
@@ -822,7 +823,7 @@ HRGN WINAPI NtGdiCreateEllipticRgn(INT left, INT top, INT right, INT bottom)
  *   is the array of RECT's that specify the region. The length of the array
  *   is specified by the nCount member of the region data header.
  */
-DWORD WINAPI NtGdiGetRegionData(HRGN hrgn, DWORD count, RGNDATA* rgndata)
+DWORD WINAPI GetRegionData(HRGN hrgn, DWORD count, RGNDATA* rgndata)
 {
     DWORD size;
     WINEREGION* obj = (WINEREGION * )GDI_GetObjPtr(hrgn, NTGDI_OBJ_REGION);
@@ -868,12 +869,12 @@ static void translate(POINT* pt, UINT count, const XFORM* xform)
     }
 }
 
-INT WINAPI NtGdiCombineRgn(HRGN hDest, HRGN hSrc1, HRGN hSrc2, INT mode);
+INT WINAPI CombineRgn(HRGN hDest, HRGN hSrc1, HRGN hSrc2, INT mode);
 
 HRGN create_polypolygon_region(const POINT* Pts, const INT* Count, INT nbpolygons, INT mode,
     const RECT* clip_rect);
 /***********************************************************************
- *           NtGdiExtCreateRegion   (win32u.@)
+ *           ExtCreateRegion   (win32u.@)
  *
  * Creates a region as specified by the transformation data and region data.
  *
@@ -889,7 +890,7 @@ HRGN create_polypolygon_region(const POINT* Pts, const INT* Count, INT nbpolygon
  * NOTES
  *   See GetRegionData().
  */
-HRGN WINAPI NtGdiExtCreateRegion(const XFORM* xform, DWORD count, const RGNDATA* rgndata)
+HRGN WINAPI ExtCreateRegion(const XFORM* xform, DWORD count, const RGNDATA* rgndata)
 {
     HRGN hrgn = 0;
     WINEREGION* obj;
@@ -906,7 +907,7 @@ HRGN WINAPI NtGdiExtCreateRegion(const XFORM* xform, DWORD count, const RGNDATA*
     {
         const RECT* pCurRect, * pEndRect;
 
-        hrgn = NtGdiCreateRectRgn(0, 0, 0, 0);
+        hrgn = CreateRectRgn(0, 0, 0, 0);
 
         pEndRect = (const RECT*)rgndata->Buffer + rgndata->rdh.nCount;
         for (pCurRect = (const RECT*)rgndata->Buffer; pCurRect < pEndRect; pCurRect++)
@@ -926,7 +927,7 @@ HRGN WINAPI NtGdiExtCreateRegion(const XFORM* xform, DWORD count, const RGNDATA*
 
             translate(pt, 4, xform);
             poly_hrgn = create_polypolygon_region(pt, &count, 1, WINDING, NULL);
-            NtGdiCombineRgn(hrgn, hrgn, poly_hrgn, RGN_OR);
+            CombineRgn(hrgn, hrgn, poly_hrgn, RGN_OR);
             DeleteObject(poly_hrgn);
         }
         return hrgn;
@@ -953,7 +954,7 @@ done:
 
 
 /***********************************************************************
- *           NtGdiPtInRegion    (win32u.@)
+ *           PtInRegion    (win32u.@)
  *
  * Tests whether the specified point is inside a region.
  *
@@ -965,7 +966,7 @@ done:
  * RETURNS
  *   Non-zero if the point is inside the region or zero otherwise.
  */
-BOOL WINAPI NtGdiPtInRegion(HRGN hrgn, INT x, INT y)
+BOOL WINAPI PtInRegion(HRGN hrgn, INT x, INT y)
 {
     WINEREGION* obj;
     BOOL ret = FALSE;
@@ -981,7 +982,7 @@ BOOL WINAPI NtGdiPtInRegion(HRGN hrgn, INT x, INT y)
 
 
 /***********************************************************************
- *           NtGdiRectInRegion    (win32u.@)
+ *           RectInRegion    (win32u.@)
  *
  * Tests if a rectangle is at least partly inside the specified region.
  *
@@ -993,7 +994,7 @@ BOOL WINAPI NtGdiPtInRegion(HRGN hrgn, INT x, INT y)
  *   Non-zero if the rectangle is partially inside the region or
  *   zero otherwise.
  */
-BOOL WINAPI NtGdiRectInRegion(HRGN hrgn, const RECT* rect)
+BOOL WINAPI RectInRegion(HRGN hrgn, const RECT* rect)
 {
     WINEREGION* obj;
     BOOL ret = FALSE;
@@ -1032,7 +1033,7 @@ BOOL WINAPI NtGdiRectInRegion(HRGN hrgn, const RECT* rect)
 }
 
 /***********************************************************************
- *           NtGdiEqualRgn    (win32u.@)
+ *           EqualRgn    (win32u.@)
  *
  * Tests whether one region is identical to another.
  *
@@ -1043,7 +1044,7 @@ BOOL WINAPI NtGdiRectInRegion(HRGN hrgn, const RECT* rect)
  * RETURNS
  *   Non-zero if both regions are identical or zero otherwise.
  */
-BOOL WINAPI NtGdiEqualRgn(HRGN hrgn1, HRGN hrgn2)
+BOOL WINAPI EqualRgn(HRGN hrgn1, HRGN hrgn2)
 {
     WINEREGION* obj1, * obj2;
     BOOL ret = FALSE;
@@ -1148,7 +1149,7 @@ done:
 
 
 /***********************************************************************
- *           NtGdiCombineRgn   (win32u.@)
+ *           CombineRgn   (win32u.@)
  *
  * Combines two regions with the specified operation and stores the result
  * in the specified destination region.
@@ -1175,7 +1176,7 @@ done:
  *|  RGN_XOR - Unions of the regions minus any intersection.
  *|  RGN_DIFF - Difference (subtraction) of the regions.
  */
-INT WINAPI NtGdiCombineRgn(HRGN hDest, HRGN hSrc1, HRGN hSrc2, INT mode)
+INT WINAPI CombineRgn(HRGN hDest, HRGN hSrc1, HRGN hSrc2, INT mode)
 {
     WINEREGION* destObj = (WINEREGION*)GDI_GetObjPtr(hDest, NTGDI_OBJ_REGION);
     INT result = ERROR;
@@ -2660,7 +2661,7 @@ HRGN create_polypolygon_region(const POINT* Pts, const INT* Count, INT nbpolygon
                 (Pts[1].y == Pts[2].y) &&
                 (Pts[2].x == Pts[3].x) &&
                 (Pts[3].y == Pts[0].y))))
-        return NtGdiCreateRectRgn(min(Pts[0].x, Pts[2].x), min(Pts[0].y, Pts[2].y),
+        return CreateRectRgn(min(Pts[0].x, Pts[2].x), min(Pts[0].y, Pts[2].y),
             max(Pts[0].x, Pts[2].x), max(Pts[0].y, Pts[2].y));
 
     for (poly = total = 0; poly < nbpolygons; poly++)
@@ -2682,190 +2683,7 @@ HRGN create_polypolygon_region(const POINT* Pts, const INT* Count, INT nbpolygon
     return hrgn;
 }
 
-
-int RgnComplexity(HRGN hRgn) {
-    if (!hRgn)
-        return ERROR;
-    if (cairo_region_is_empty((cairo_region_t*)GetGdiObjPtr(hRgn)))
-        return NULLREGION;
-    if (cairo_region_num_rectangles((cairo_region_t*)GetGdiObjPtr(hRgn)) == 1)
-        return SIMPLEREGION;
-    return COMPLEXREGION;
-}
-
-int CombineRgn(HRGN hrgnDst, HRGN hrgnSrc1, HRGN hrgnSrc2, int iMode)
-{
-    switch (iMode) {
-    case RGN_AND:
-    {
-        cairo_region_t* r = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
-        cairo_region_intersect(r, (cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
-        cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
-        SetGdiObjPtr(hrgnDst, r);
-    }
-    break;
-    case RGN_COPY:
-    {
-        cairo_region_t* rgnCpy = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
-        //delete old region
-        cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
-        SetGdiObjPtr(hrgnDst, rgnCpy);
-    }
-    break;
-    case RGN_DIFF:
-    {
-        cairo_region_t* r = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
-        cairo_region_subtract(r, (cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
-        cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
-        SetGdiObjPtr(hrgnDst, r);
-    }
-    break;
-    case RGN_OR:
-    {
-        cairo_region_t* r = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
-        cairo_region_union(r, (cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
-        cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
-        SetGdiObjPtr(hrgnDst, r);
-    }
-    break;
-    case RGN_XOR:
-    {
-        cairo_region_t* r = cairo_region_copy((cairo_region_t*)GetGdiObjPtr(hrgnSrc1));
-        cairo_region_xor(r, (cairo_region_t*)GetGdiObjPtr(hrgnSrc2));
-        cairo_region_destroy((cairo_region_t*)GetGdiObjPtr(hrgnDst));
-        SetGdiObjPtr(hrgnDst, r);
-    }
-    break;
-    }
-    return RgnComplexity(hrgnDst);
-}
-
-HRGN CreateEllipticRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect)
-{
-    return 0;
-}
-
-HRGN CreateEllipticRgnIndirect(const RECT* lprc)
-{
-    return CreateEllipticRgn(lprc->left, lprc->top, lprc->right, lprc->bottom);
-}
-
-HRGN CreatePolygonRgn(const POINT* lppt, int cPoints, int fnPolyFillMode)
-{
-    return 0;
-}
-
-HRGN CreateRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect)
-{
-    cairo_rectangle_int_t rc = { nLeftRect,nTopRect,nRightRect - nLeftRect,nBottomRect - nTopRect };
-    cairo_region_t* ret = cairo_region_create_rectangle(&rc);
-    cairo_rectangle_int_t ext;
-    cairo_region_get_extents(ret, &ext);
-    return InitGdiObj(OBJ_REGION, ret);
-}
-
-HRGN CreateRectRgnIndirect(const RECT* lprc)
-{
-    return CreateRectRgn(lprc->left, lprc->top, lprc->right, lprc->bottom);
-}
-
-HRGN CreateRoundRectRgn(int nLeftRect, int nTopRect, int nRightRect, int nBottomRect, int nWidthEllipse, int nHeightEllipse)
-{
-    return 0;
-}
-
-BOOL EqualRgn(HRGN hSrcRgn1, HRGN hSrcRgn2)
-{
-    return cairo_region_equal((cairo_region_t*)GetGdiObjPtr(hSrcRgn1), (cairo_region_t*)GetGdiObjPtr(hSrcRgn2));
-}
-
-HRGN ExtCreateRegion(const XFORM* lpXform, DWORD nCount, const RGNDATA* lpRgnData)
-{
-    int rcCnt = (nCount - sizeof(RGNDATAHEADER)) / sizeof(RECT);
-    if (rcCnt == 0)
-        return 0;
-    cairo_region_t* rgn = cairo_region_create();
-    const RECT* prc = (const RECT*)lpRgnData->Buffer;
-    for (int i = 0; i < rcCnt; i++) {
-        cairo_rectangle_int_t rc = { prc->left,prc->top,prc->right - prc->left,prc->bottom - prc->top };
-        cairo_region_union_rectangle(rgn, &rc);
-    }
-    if (lpXform) {
-        //todo: only translate is availble.
-        cairo_region_translate(rgn, lpXform->eDx, lpXform->eDy);
-    }
-    return InitGdiObj(OBJ_REGION, rgn);
-}
-
-DWORD GetRegionData(HRGN hrgn, DWORD dwCount, PRGNDATA lpRgnData)
-{
-    cairo_region_t* rgn = (cairo_region_t*)GetGdiObjPtr(hrgn);
-    int nrc = cairo_region_num_rectangles(rgn);
-    int nRet = sizeof(RECT) * nrc + sizeof(RGNDATAHEADER);
-    if (!lpRgnData)
-        return nRet;
-    if (dwCount < nRet)
-        return 0;
-    LPRECT prc = (LPRECT)lpRgnData->Buffer;
-    for (int i = 0; i < nrc; i++) {
-        cairo_rectangle_int_t rc;
-        cairo_region_get_rectangle(rgn, i, &rc);
-        prc->left = rc.x;
-        prc->top = rc.y;
-        prc->right = rc.x + rc.width;
-        prc->bottom = rc.y + rc.height;
-        prc++;
-    }
-    cairo_rectangle_int_t ext;
-    cairo_region_get_extents(rgn, &ext);
-    lpRgnData->rdh.rcBound = RECT{ ext.x,ext.y,ext.x + ext.width,ext.y + ext.height };
-    lpRgnData->rdh.nCount = nrc;
-    lpRgnData->rdh.nRgnSize = nRet;
-    lpRgnData->rdh.iType = RDH_RECTANGLES;
-    return nRet;
-}
-
-int GetRgnBox(HRGN hrgn, LPRECT lprc)
-{
-    cairo_rectangle_int_t rc;
-    cairo_region_get_extents((cairo_region_t*)GetGdiObjPtr(hrgn), &rc);
-    lprc->left = rc.x;
-    lprc->top = rc.y;
-    lprc->right = rc.x + rc.width;
-    lprc->bottom = rc.y + rc.height;
-    return RgnComplexity(hrgn);
-}
-
-int OffsetRgn(HRGN hrgn, int nXOffset, int nYOffset)
-{
-    cairo_region_translate((cairo_region_t*)GetGdiObjPtr(hrgn), nXOffset, nYOffset);
-    return 1;
-}
-
-BOOL PtInRegion(HRGN hrgn, int X, int Y)
-{
-    return cairo_region_contains_point((cairo_region_t*)GetGdiObjPtr(hrgn), X, Y);
-}
-
-BOOL RectInRegion(HRGN hrgn, const RECT* lprc)
-{
-    cairo_rectangle_int_t rc = { lprc->left,lprc->top,lprc->right - lprc->left,lprc->bottom - lprc->top };
-    return cairo_region_contains_rectangle((cairo_region_t*)GetGdiObjPtr(hrgn), &rc);
-}
-
-int SetPolyFillMode(HDC hdc, int iPolyFillMode)
-{
-    return 0;
-}
-
-BOOL SetRectRgn(HRGN hrgn, int left, int top, int right, int bottom)
-{
-    cairo_region_t* tmp = cairo_region_create();
-    cairo_region_intersect((cairo_region_t*)GetGdiObjPtr(hrgn), tmp);
-    cairo_region_destroy(tmp);
-    cairo_rectangle_int_t rc = { left,top,right - left,bottom - top };
-    tmp = cairo_region_create_rectangle(&rc);
-    cairo_region_union((cairo_region_t*)GetGdiObjPtr(hrgn), tmp);
-    cairo_region_destroy(tmp);
-    return 0;
+int WINAPI RgnComplexity(HRGN hRgn) {
+    WINEREGION* obj = (WINEREGION * )GetGdiObjPtr(hRgn);
+    return get_region_type(obj);
 }

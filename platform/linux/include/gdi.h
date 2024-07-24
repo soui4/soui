@@ -8,7 +8,9 @@
 #define OBJ_BITMAP          7
 #define OBJ_REGION          8
 
-HGDIOBJ InitGdiObj(int type,void *ptr);
+typedef void (*fun_gdi_free)(void*);
+HGDIOBJ InitGdiObj(int type, void* ptr);
+HGDIOBJ InitGdiObj2(int type,void *ptr, fun_gdi_free cbFree);
 void* GetGdiObjPtr(HGDIOBJ hgdiobj);
 void SetGdiObjPtr(HGDIOBJ hgdiObj, void* ptr);
 

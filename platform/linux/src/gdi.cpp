@@ -12,7 +12,8 @@ using namespace SOUI;
 typedef struct _GdiObj{
     int type;
     void *ptr;
-    _GdiObj(int _type,void * _ptr):type(_type),ptr(_ptr){
+    fun_gdi_free cbFree;
+    _GdiObj(int _type,void * _ptr, fun_gdi_free _cbFree):type(_type),ptr(_ptr),cbFree(_cbFree){
     }
 }* HGDIOBJ;
 
@@ -27,8 +28,35 @@ void RGBA2CairoColor(COLORREF crSrc,CairoColor *dst){
     dst->a = GetAValue(crSrc)/255.0;
 }
 
+static void gdi_bmp_free(void* ptr) {
+    cairo_surface_destroy((cairo_surface_t*)ptr);
+}
+
+static void gdi_pen_free(void* ptr) {
+    delete (LOGPEN*)ptr;
+}
+
+static void gdi_brush_free(void* ptr) {
+    delete (LOGBRUSH*)ptr;
+}
+
+static void gdi_font_free(void* ptr) {
+    delete (LOGFONT*)ptr;
+}
+
 HGDIOBJ InitGdiObj(int type,void *ptr){
-    return new _GdiObj(type,ptr);
+    fun_gdi_free cbFree=nullptr;
+    switch (type) {
+    case OBJ_BITMAP:cbFree = gdi_bmp_free; break;
+    case OBJ_PEN: cbFree = gdi_pen_free; break;
+    case OBJ_BRUSH:cbFree = gdi_brush_free; break;
+    case OBJ_FONT:cbFree = gdi_font_free; break;
+    }
+    return new _GdiObj(type,ptr, cbFree);
+}
+
+HGDIOBJ InitGdiObj2(int type, void* ptr, fun_gdi_free cbFree) {
+    return new _GdiObj(type, ptr, cbFree);
 }
 
 int GetObjectType(HGDIOBJ hgdiobj){
@@ -361,30 +389,8 @@ BOOL DeleteObject(HGDIOBJ hObj)
 {
     if(!hObj)
         return FALSE;
-    switch (hObj->type)
-    {
-    case OBJ_BITMAP:
-        if(hObj->ptr){
-            cairo_surface_destroy((cairo_surface_t*)hObj->ptr);
-        }
-        break;
-    case OBJ_REGION:
-    {
-        if(hObj->ptr) 
-            cairo_region_destroy((cairo_region_t*)hObj->ptr);
-    }
-        break;
-    case OBJ_PEN:
-        delete (LOGPEN*)hObj->ptr;
-        break;
-    case OBJ_BRUSH:
-        delete (LOGBRUSH*)hObj->ptr;
-        break;
-    case OBJ_FONT:
-        delete (LOGFONT*)hObj->ptr;
-        break;
-    default:
-        break;
+    if (hObj->ptr && hObj->cbFree) {
+        hObj->cbFree(hObj->ptr);
     }
     delete hObj;
     return TRUE;
@@ -971,7 +977,7 @@ HGDIOBJ  GetStockObject(int i)
     switch(i){
     case NULL_BITMAP:
     {
-        static _GdiObj bmp(OBJ_BITMAP, nullptr);
+        static _GdiObj bmp(OBJ_BITMAP, nullptr,nullptr);
         return &bmp;
     }
         case NULL_BRUSH:
@@ -979,21 +985,21 @@ HGDIOBJ  GetStockObject(int i)
             static LOGBRUSH log;
             log.lbStyle=BS_NULL;
             log.lbColor = RGBA(0,0,0,0);
-            static _GdiObj br(OBJ_BRUSH,&log);
+            static _GdiObj br(OBJ_BRUSH,&log, nullptr);
             return &br;
         }
         case BLACK_BRUSH:{
             static LOGBRUSH log;
             log.lbStyle=BS_SOLID;
             log.lbColor = RGBA(0,0,0,255);
-            static _GdiObj br(OBJ_BRUSH,&log);
+            static _GdiObj br(OBJ_BRUSH,&log, nullptr);
             return &br;
         }
         case WHITE_BRUSH:{
             static LOGBRUSH log;
             log.lbStyle=BS_SOLID;
             log.lbColor = RGBA(255,255,255,255);
-            static _GdiObj br(OBJ_BRUSH,&log);
+            static _GdiObj br(OBJ_BRUSH,&log, nullptr);
             return &br;
         }
         case NULL_PEN:
@@ -1001,7 +1007,7 @@ HGDIOBJ  GetStockObject(int i)
             static LOGPEN log;
             log.lopnStyle=PS_NULL;
             log.lopnWidth = 0;
-            static _GdiObj pen(OBJ_PEN,&log);
+            static _GdiObj pen(OBJ_PEN,&log, nullptr);
             return &pen;
         }
         case BLACK_PEN:
@@ -1010,7 +1016,7 @@ HGDIOBJ  GetStockObject(int i)
             log.lopnStyle=PS_SOLID;
             log.lopnWidth = 1;
             log.lopnColor = RGBA(0,0,0,255);
-            static _GdiObj pen(OBJ_PEN,&log);
+            static _GdiObj pen(OBJ_PEN,&log, nullptr);
             return &pen;
         }
         case WHITE_PEN:
@@ -1019,7 +1025,7 @@ HGDIOBJ  GetStockObject(int i)
             log.lopnStyle=PS_SOLID;
             log.lopnWidth = 1;
             log.lopnColor = RGBA(255,255,255,255);
-            static _GdiObj pen(OBJ_PEN,&log);
+            static _GdiObj pen(OBJ_PEN,&log, nullptr);
             return &pen;
         }
         case SYSTEM_FONT:
@@ -1029,7 +1035,7 @@ HGDIOBJ  GetStockObject(int i)
             strcpy(lf.lfFaceName,"Arial");
             lf.lfHeight=20;
             lf.lfWeight=400;
-            static _GdiObj font(OBJ_FONT,&lf);
+            static _GdiObj font(OBJ_FONT,&lf, nullptr);
             return &font;
         }
     }
