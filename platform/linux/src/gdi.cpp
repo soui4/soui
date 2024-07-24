@@ -162,13 +162,13 @@ static void ApplyFont(HDC hdc){
 
 static void ApplyRegion(cairo_t * ctx, HRGN hRgn){
     cairo_reset_clip(ctx);
-    cairo_region_t* rgn = (cairo_region_t* )GetGdiObjPtr(hRgn);
-    int nrc = cairo_region_num_rectangles(rgn);
-    for(int i=0;i<nrc;i++){
-        cairo_rectangle_int_t rc ;
-        cairo_region_get_rectangle(rgn,i,&rc);
-        cairo_rectangle(ctx,rc.x,rc.y,rc.width,rc.height);
+    DWORD dwCount = GetRegionData(hRgn, 0, nullptr);
+    RGNDATA *pData = (RGNDATA*)malloc(dwCount);
+    RECT* pRc = (RECT*)pData->Buffer;
+    for (int i = 0; i < pData->rdh.nCount; i++) {
+        cairo_rectangle(ctx, pRc->left,pRc->top,pRc->right-pRc->left,pRc->bottom-pRc->top);
     }
+    free(pData);
     cairo_clip(ctx);
 }
 
