@@ -835,7 +835,7 @@ DWORD WINAPI GetRegionData(HRGN hrgn, DWORD count, RGNDATA* rgndata)
     TRACE(" %p count = %d, rgndata = %p\n", hrgn, count, rgndata);
 
     if (!obj) return 0;
-
+    size = obj->numRects * sizeof(RECT);
     if (!rgndata || count < FIELD_OFFSET(RGNDATA, Buffer) +size)
     {
         GDI_ReleaseObj(hrgn);
