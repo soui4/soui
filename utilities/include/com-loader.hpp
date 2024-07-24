@@ -41,7 +41,13 @@ public:
             strPath+=_T(".so");
             #endif
             m_hMod=LoadLibrary(strPath);
-            if(!m_hMod) return FALSE;
+            if (!m_hMod) {
+#ifndef _WIN32
+                const char * err = dlerror();
+                printf("load so failed, err=%s\n", err);
+#endif
+                return FALSE;
+            }
             m_funCreateInst=(funSCreateInstance)GetProcAddress(m_hMod,pszFnName);
             if(!m_funCreateInst)
             {

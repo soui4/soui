@@ -25,10 +25,10 @@ HRGN WINAPI CreateEllipticRgn(
 
 HRGN WINAPI CreateEllipticRgnIndirect(  CONST RECT *lprc   /*bounding rectangle*/);
 
-HRGN WINAPI CreatePolygonRgn(  CONST POINT *lppt,  // array of points
-  int cPoints,        // number of points in array
-  int fnPolyFillMode  // polygon-filling mode
-  );
+HRGN WINAPI CreatePolygonRgn(CONST POINT* lppt,  // array of points
+	int cPoints,        // number of points in array
+	int fnPolyFillMode  // polygon-filling mode
+);
 
 HRGN WINAPI CreateRectRgn(
 	 int nLeftRect,   // x-coordinate of upper-left corner
@@ -104,10 +104,6 @@ BOOL WINAPI RectInRegion(
 				  HRGN hrgn,         // handle to region
 				  CONST RECT *lprc   // pointer to rectangle
 				  );
-
-int WINAPI SetPolyFillMode(  HDC hdc,            // handle to device context
-					int iPolyFillMode   // polygon fill mode
-					);
 
 BOOL WINAPI SetRectRgn(  HRGN hrgn,       // handle to region
 				int nLeftRect,   // x-coordinate of upper-left corner of rectangle

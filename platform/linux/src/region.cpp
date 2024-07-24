@@ -3,7 +3,11 @@
 #include "gdi.h"
 
 #include <math.h>
+#ifdef TRACE_REGION
 #define TRACE printf
+#else
+#define TRACE(fmt,...) 
+#endif
 #define max(a,b) (a)>(b)?(a):(b)
 #define min(a,b) (a)<(b)?(a):(b)
 #define INT_MAX  0x7fffffff
@@ -2686,4 +2690,16 @@ HRGN create_polypolygon_region(const POINT* Pts, const INT* Count, INT nbpolygon
 int WINAPI RgnComplexity(HRGN hRgn) {
     WINEREGION* obj = (WINEREGION * )GetGdiObjPtr(hRgn);
     return get_region_type(obj);
+}
+
+
+HRGN WINAPI CreatePolygonRgn(CONST POINT* lppt,  // array of points
+    int cPoints,        // number of points in array
+    int fnPolyFillMode  // polygon-filling mode
+) {
+    return create_polypolygon_region(lppt, &cPoints, 1, fnPolyFillMode,nullptr);
+}
+
+HRGN WINAPI CreateEllipticRgnIndirect(CONST RECT* lprc   /*bounding rectangle*/) {
+    return CreateEllipticRgn(lprc->left, lprc->top, lprc->right, lprc->bottom);
 }
