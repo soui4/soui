@@ -543,7 +543,7 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
         pMsg->lParam = MAKELPARAM(pMsg->pt.x, pMsg->pt.y);
         pMsg->wParam = ButtonState2Mask(e2->state);
         pMsg->time = e2->time;
-        printf("XCB_MOTION_NOTIFY!!, msg=%d,pt=(%d,%d)\n", pMsg->message, pMsg->pt.x, pMsg->pt.y);
+//        printf("XCB_MOTION_NOTIFY!!, msg=%d,pt=(%d,%d)\n", pMsg->message, pMsg->pt.x, pMsg->pt.y);
         break;
     }
     default:
