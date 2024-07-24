@@ -200,7 +200,7 @@ bool SConnection::update(){
         }
     }
     std::unique_lock<std::mutex> lock(m_mutex4Evt);
-    uint32_t ts1 = _time64(nullptr);
+    uint64_t ts1 = GetTickCount64();
     m_varCondition.wait_for(lock, std::chrono::milliseconds(timeOut), [&]{return !m_evtQueue.empty(); });
 
     for(auto it:m_evtQueue){
@@ -209,8 +209,7 @@ bool SConnection::update(){
     }
     bool bRet = !m_evtQueue.empty();
     m_evtQueue.clear();
-
-    uint64_t ts2 = _time64(nullptr);
+    uint64_t ts2 = GetTickCount64();
     {
         UINT elapse = ts2 - ts1;
         std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
@@ -220,9 +219,13 @@ bool SConnection::update(){
                 pMsg->hwnd = it.hWnd;
                 pMsg->message = WM_TIMER;
                 pMsg->wParam = it.id;
-                pMsg->lParam = 0;
+                pMsg->lParam = (LPARAM)it.proc;
                 pMsg->time = ts2;
                 m_msgQueue.push_back(pMsg);
+                it.fireRemain = it.elapse;
+                bRet = true;
+            }
+            else {
                 it.fireRemain = it.elapse;
             }
         }
@@ -230,43 +233,57 @@ bool SConnection::update(){
     return bRet;
 }
 
-BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
-    std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
-    for(auto it = m_msgQueue.begin();it!=m_msgQueue.end();it++){
-        BOOL bMatch=TRUE;
-        Msg *msg = (*it);
-        do{
-            if(msg->message==WM_QUIT)
-                break;
-            if(msg->hwnd != hWnd && hWnd != 0)
-            {
-                bMatch=FALSE;
-                break;
-            }
-            if(wMsgFilterMin==0 && wMsgFilterMax==0)
-                break;
-            if(wMsgFilterMin<= msg->message && wMsgFilterMax>=msg->message)
-                break;
-            bMatch=FALSE;
-        }while(false);
-        if(bMatch){
-            if(m_msgPeek && m_bMsgNeedFree){
-                delete m_msgPeek;
-            }
-            m_msgPeek = msg;
-            if(wRemoveMsg & PM_NOREMOVE)
-                m_bMsgNeedFree = false;
-            else
-            {
-                m_msgQueue.erase(it);
-                m_bMsgNeedFree=true;
-            }
-            memcpy(pMsg,(MSG*)m_msgPeek,sizeof(MSG));
-            
-            return TRUE;
-        }       
-    }
-    return FALSE;
+BOOL SConnection::peekMsg(THIS_ LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg) {
+	std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
+	auto it = m_msgQueue.begin();
+	for (; it != m_msgQueue.end(); it++) {
+		BOOL bMatch = TRUE;
+		Msg* msg = (*it);
+		do {
+			if (msg->message == WM_QUIT)
+				break;
+			if (msg->message == WM_TIMER && msg->lParam == 0)
+				break;
+			if (msg->hwnd != hWnd && hWnd != 0)
+			{
+				bMatch = FALSE;
+				break;
+			}
+			if (wMsgFilterMin == 0 && wMsgFilterMax == 0)
+				break;
+			if (wMsgFilterMin <= msg->message && wMsgFilterMax >= msg->message)
+				break;
+			bMatch = FALSE;
+		} while (false);
+        if (bMatch) break;
+	}
+	if (it != m_msgQueue.end()) {
+		Msg* msg = (*it);
+		if (m_msgPeek && m_bMsgNeedFree) {
+			delete m_msgPeek;
+			m_msgPeek = nullptr;
+			m_bMsgNeedFree=false;
+		}
+		if (msg->message == WM_TIMER && msg->lParam) {
+			TIMERPROC proc = (TIMERPROC)msg->lParam;
+			proc(msg->hwnd, WM_TIMER, msg->wParam, msg->time);
+			m_msgQueue.erase(it);
+			return PeekMessage(pMsg, hWnd, wMsgFilterMin, wMsgFilterMax, wRemoveMsg);
+		}
+		m_msgPeek = msg;
+		if (wRemoveMsg & PM_NOREMOVE)
+			m_bMsgNeedFree = false;
+		else
+		{
+			m_msgQueue.erase(it);
+			m_bMsgNeedFree = true;
+		}
+		memcpy(pMsg, (MSG*)m_msgPeek, sizeof(MSG));
+
+		return TRUE;
+	}
+
+	return FALSE;
 }
 
 void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
@@ -509,6 +526,7 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
         pMsg->lParam = MAKELPARAM(pMsg->pt.x, pMsg->pt.y);
         pMsg->wParam = ButtonState2Mask(e2->state);
         pMsg->time = e2->time;
+        printf("XCB_MOTION_NOTIFY!!, msg=%d,pt=(%d,%d)\n", pMsg->message, pMsg->pt.x, pMsg->pt.y);
         break;
     }
     default:
@@ -550,21 +568,6 @@ void SConnection::_readProc()
     }
     m_evtQueue.clear();
     m_mutex4Evt.unlock();
-}
-
-UINT_PTR SConnection::generateTimerId(HWND hWnd,UINT_PTR id)
-{
-    std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
-    if (hWnd) {
-
-    }
-    else {
-
-    }
-    UINT_PTR newId = hWnd ? 0 : id;
-    for (auto& it : m_lstTimer) {
-
-    }
 }
 
 SNSEND

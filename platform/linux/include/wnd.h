@@ -106,6 +106,8 @@ HWND WindowFromPoint(POINT pt);
 
 DWORD GetTickCount();
 
+uint64_t GetTickCount64();
+
 typedef VOID (CALLBACK* TIMERPROC)(HWND, UINT, UINT_PTR, DWORD);
 
 UINT_PTR

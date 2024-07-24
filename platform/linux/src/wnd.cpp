@@ -190,7 +190,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
         1,
         XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY 
         | XCB_EVENT_MASK_PROPERTY_CHANGE
-        | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE
+        | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION
         | XCB_EVENT_MASK_ENTER_WINDOW| XCB_EVENT_MASK_LEAVE_WINDOW
         | XCB_EVENT_MASK_KEY_PRESS| XCB_EVENT_MASK_KEY_RELEASE
         };
@@ -630,11 +630,32 @@ HWND WindowFromPoint(POINT pt)
 
 UINT_PTR SetTimer(HWND hWnd, UINT_PTR nIDEvent, UINT uElapse, TIMERPROC lpTimerFunc)
 {
-    return 0;
+    if (hWnd) {
+        WndObj wndObj = WndObj::fromHwnd(hWnd);
+        if (!wndObj)
+            return 0;
+        return wndObj->mConnection->SetTimer(hWnd, nIDEvent, uElapse, lpTimerFunc);
+    }
+    else {
+        if (!lpTimerFunc)
+            return 0;
+        SConnection* conn = SConnMgr::instance()->getConnection();
+        return conn->SetTimer(hWnd, nIDEvent, uElapse, lpTimerFunc);
+    }
 }
 
 BOOL KillTimer(HWND hWnd, UINT_PTR uIDEvent)
 {
+    if (hWnd) {
+        WndObj wndObj = WndObj::fromHwnd(hWnd);
+        if (!wndObj)
+            return FALSE;
+        return wndObj->mConnection->KillTimer(hWnd, uIDEvent);
+    }
+    else {
+        SConnection* conn = SConnMgr::instance()->getConnection();
+        return conn->KillTimer(hWnd, uIDEvent);
+    }
     return 0;
 }
 

@@ -56,8 +56,6 @@ private:
 
     static void* readProc(void *p);
     void _readProc();
-
-    UINT_PTR generateTimerId(HWND hWnd, UINT_PTR id);
 private:
     std::condition_variable m_varCondition;
     std::mutex m_mutex4Evt;

@@ -753,9 +753,14 @@ UINT MapVirtualKey(UINT uCode, UINT uMapType)
 
 DWORD GetTickCount()
 {
-    return 0;
+    return (DWORD)GetTickCount64();
 }
 
+uint64_t GetTickCount64() {
+    struct timespec ts;
+    clock_gettime(CLOCK_MONOTONIC, &ts);
+    return (ts.tv_sec * 1000) + (ts.tv_nsec / 1000000);
+}
 
 BOOL RegisterDragDrop(HWND, IDropTarget *pDrapTarget){
     return 0;
