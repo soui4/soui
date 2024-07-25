@@ -400,7 +400,8 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
             wndObj->state = Normal;
             break;
         }
-        break;
+        printf("wm_state, wp=%d\n",wp);
+        return 1;
     case WM_SIZE:
         wp = wndObj->state;
 		SIZE sz = { GET_X_LPARAM(lp),GET_Y_LPARAM(lp) };

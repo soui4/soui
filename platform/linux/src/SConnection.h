@@ -30,6 +30,17 @@ struct TimerInfo {
 
 class SConnection : SNoCopyable{
 public:
+   enum NetWmState {
+        NetWmStateAbove = 0x1,
+        NetWmStateBelow = 0x2,
+        NetWmStateFullScreen = 0x4,
+        NetWmStateMaximizedHorz = 0x8,
+        NetWmStateMaximizedVert = 0x10,
+        NetWmStateModal = 0x20,
+        NetWmStateStaysOnTop = 0x40,
+        NetWmStateDemandsAttention = 0x80
+    };
+    
   SConnection(int screenNum);
   ~SConnection();
 public:
@@ -39,10 +50,15 @@ public:
     xcb_atom_t WM_PROTOCOLS_ATOM;
     xcb_atom_t _NET_WM_STATE_ATOM;
     xcb_atom_t _NET_WM_STATE_HIDDEN_ATOM;
-    xcb_atom_t _NET_WM_STATE_DEMANDS_ATTENTION_ATOM;
     xcb_atom_t _NET_WM_STATE_MAXIMIZED_HORZ_ATOM;
     xcb_atom_t _NET_WM_STATE_MAXIMIZED_VERT_ATOM;
     
+    xcb_atom_t _NET_WM_STATE_ABOVE_ATOM;
+    xcb_atom_t _NET_WM_STATE_BELOW_ATOM;
+    xcb_atom_t _NET_WM_STATE_FULLSCREEN_ATOM;
+    xcb_atom_t _NET_WM_STATE_STAYS_ON_TOP_ATOM;
+    xcb_atom_t _NET_WM_STATE_DEMANDS_ATTENTION_ATOM;
+
     //ICCCM window state
     xcb_atom_t WM_STATE_ATOM;
     xcb_atom_t WM_CLASS_ATOM;
@@ -59,10 +75,11 @@ public:
     HDC GetDC();
     BOOL ReleaseDC(HDC hdc);
 private:
-    bool pushEvent(xcb_generic_event_t *e);
+  uint32_t netWmStates(HWND hWnd);
+  bool pushEvent(xcb_generic_event_t *e);
 
-    static void* readProc(void *p);
-    void _readProc();
+  static void *readProc(void *p);
+  void _readProc();
 private:
     std::condition_variable m_varCondition;
     std::mutex m_mutex4Evt;

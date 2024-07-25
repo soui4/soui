@@ -4,6 +4,7 @@
 #include <functional>
 #include <xcb/xcb_icccm.h>
 #include "uimsg.h"
+#include <algorithm>
 
 SNSBEGIN
 
@@ -162,6 +163,11 @@ SConnection::SConnection(int screenNum)
     _NET_WM_STATE_ATOM = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE");
     _NET_WM_STATE_HIDDEN_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_HIDDEN");
     _NET_WM_STATE_DEMANDS_ATTENTION_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_DEMANDS_ATTENTION");
+
+    _NET_WM_STATE_ABOVE_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_ABOVE");
+    _NET_WM_STATE_BELOW_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_BELOW");
+    _NET_WM_STATE_FULLSCREEN_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_FULLSCREEN");
+    _NET_WM_STATE_STAYS_ON_TOP_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_STAYS_ON_TOP");
 
     _NET_WM_STATE_MAXIMIZED_HORZ_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_MAXIMIZED_HORZ");
     _NET_WM_STATE_MAXIMIZED_VERT_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_MAXIMIZED_VERT");
@@ -395,6 +401,44 @@ static WPARAM ButtonState2Mask(uint16_t state) {
     return wp;
 }
 
+uint32_t SConnection::netWmStates(HWND hWnd)
+{
+    uint32_t result(0);
+
+    xcb_get_property_cookie_t get_cookie =
+        xcb_get_property_unchecked(connection, 0, hWnd, _NET_WM_STATE_ATOM,
+                         XCB_ATOM_ATOM, 0, 1024);
+
+    xcb_get_property_reply_t *reply =
+        xcb_get_property_reply(connection, get_cookie, NULL);
+
+    if (reply && reply->format == 32 && reply->type == XCB_ATOM_ATOM) {
+        const xcb_atom_t *states = static_cast<const xcb_atom_t *>(xcb_get_property_value(reply));
+        const xcb_atom_t *statesEnd = states + reply->length;
+        if (statesEnd != std::find(states, statesEnd, _NET_WM_STATE_ABOVE_ATOM))
+            result |= NetWmStateAbove;
+        if (statesEnd != std::find(states, statesEnd, _NET_WM_STATE_BELOW_ATOM))
+            result |= NetWmStateBelow;
+        if (statesEnd != std::find(states, statesEnd, _NET_WM_STATE_FULLSCREEN_ATOM))
+            result |= NetWmStateFullScreen;
+        if (statesEnd != std::find(states, statesEnd, _NET_WM_STATE_MAXIMIZED_HORZ_ATOM))
+            result |= NetWmStateMaximizedHorz;
+        if (statesEnd != std::find(states, statesEnd, _NET_WM_STATE_MAXIMIZED_VERT_ATOM))
+            result |= NetWmStateMaximizedVert;
+        if (statesEnd != std::find(states, statesEnd, _NET_WM_STATE_STAYS_ON_TOP_ATOM))
+            result |= NetWmStateStaysOnTop;
+        if (statesEnd != std::find(states, statesEnd, _NET_WM_STATE_DEMANDS_ATTENTION_ATOM))
+            result |= NetWmStateDemandsAttention;
+        free(reply);
+    } else {
+#ifdef NET_WM_STATE_DEBUG
+        printf("getting net wm state (%x), empty\n", m_window);
+#endif
+    }
+
+    return result;
+}
+
 bool SConnection::pushEvent(xcb_generic_event_t *event){
     uint8_t event_code = event->response_type & 0x7f;
     Msg *pMsg = nullptr;
@@ -444,8 +488,15 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
                 free(reply);
             }
             if (newState != SIZE_MINIMIZED) {
-
+                uint32_t state = netWmStates(e2->window);
+                if(state & (NetWmStateMaximizedHorz |NetWmStateMaximizedVert)){
+                    newState = SIZE_MAXIMIZED;
+                }
             }
+            pMsg = new Msg;
+            pMsg->hwnd = e2->window;
+            pMsg->message = WM_STATE;
+            pMsg->wParam = newState;
         }
         break;
     }
