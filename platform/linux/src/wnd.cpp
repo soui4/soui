@@ -4,6 +4,7 @@
 #include <xcb/xproto.h>
 #include <cairo/cairo-xcb.h>
 #include <xcb/xcb_aux.h>
+#include <xcb/xcb_icccm.h>
 #include <map>
 #include <mutex>
 #include <string>
@@ -220,7 +221,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     xcb_change_property(pWnd->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, pWnd->title.length(), pWnd->title.c_str());
 
-    xcb_change_property(pWnd->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd, conn->wm_protocols_atom, XCB_ATOM_ATOM, 32, 1, &conn->wm_delete_window_atom);
+    xcb_change_property(pWnd->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd, conn->WM_PROTOCOLS_ATOM, XCB_ATOM_ATOM, 32, 1, &conn->WM_DELETE_WINDOW_ATOM);
 
     if(cs->style & WS_VISIBLE)
         xcb_map_window(pWnd->mConnection->connection, hWnd);
@@ -593,10 +594,10 @@ BOOL EnableWindow(HWND hWnd, BOOL bEnable)
         .format = 32,
         .sequence = 0,
         .window = (xcb_window_t)hWnd,
-        .type = conn->wm_stat_atom
+        .type = conn->_NET_WM_STATE_ATOM
     };
     event.data.data32[0] = bEnable?0:1;
-    event.data.data32[1] = conn->wm_stat_enable_atom;
+    event.data.data32[1] = conn->_NET_WM_STATE_DEMANDS_ATTENTION_ATOM;
     xcb_send_event(
         conn->connection,
         0,
@@ -717,14 +718,30 @@ BOOL GetWindowRect(HWND hWnd, RECT *rc)
     return TRUE;
 }
 
-static void SendSysCommand(SConnection *conn, xcb_window_t wnd, xcb_atom_t cmdAtom) {
+static void ChangeNetWmState(SConnection *conn, xcb_window_t wnd, bool bSet,xcb_atom_t one,xcb_atom_t two) {
     xcb_client_message_event_t event;
     event.response_type = XCB_CLIENT_MESSAGE;
     event.window = wnd;
     event.format = 32;
-    event.type = conn->wm_stat_atom;
-    event.data.data32[0] = cmdAtom;
-    xcb_send_event(conn->connection, false, wnd, XCB_EVENT_MASK_STRUCTURE_NOTIFY, (const char*)&event);
+    event.sequence=0;
+    event.type = conn->_NET_WM_STATE_ATOM;
+    event.data.data32[0] = bSet?1:0;
+    event.data.data32[1] = one;
+    event.data.data32[2] = two;
+    event.data.data32[3]=event.data.data32[4]=0;
+    xcb_send_event(conn->connection, false, conn->screen->root, XCB_EVENT_MASK_STRUCTURE_NOTIFY|XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char*)&event);
+    xcb_flush(conn->connection);
+}
+
+static void SendSysCommand(SConnection *conn, xcb_window_t wnd, uint32_t cmd) {
+    xcb_client_message_event_t event;
+    event.response_type = XCB_CLIENT_MESSAGE;
+    event.window = wnd;
+    event.format = 32;
+    event.sequence=0;
+    event.type = conn->WM_CHANGE_STATE_ATOM;
+    event.data.data32[0] = cmd;
+    xcb_send_event(conn->connection, false, conn->screen->root, XCB_EVENT_MASK_STRUCTURE_NOTIFY|XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char*)&event);
     xcb_flush(conn->connection);
 }
 
@@ -740,13 +757,13 @@ HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
         case SC_MOVE:
             break;
         case SC_MINIMIZE:
-            SendSysCommand(wndObj->mConnection, hWnd, wndObj->mConnection->wm_state_minimize);
+            SendSysCommand(wndObj->mConnection, hWnd, XCB_ICCCM_WM_STATE_ICONIC);
             break;
         case SC_MAXIMIZE:
-            SendSysCommand(wndObj->mConnection, hWnd, wndObj->mConnection->wm_state_maximize);
+            ChangeNetWmState(wndObj->mConnection,hWnd,true,wndObj->mConnection->_NET_WM_STATE_MAXIMIZED_HORZ_ATOM,wndObj->mConnection->_NET_WM_STATE_MAXIMIZED_VERT_ATOM);
             break;
         case SC_RESTORE:
-            SendSysCommand(wndObj->mConnection, hWnd, wndObj->mConnection->wm_state_restore);
+            //SendSysCommand(wndObj->mConnection, hWnd, wndObj->mConnection->wm_state_restore);
             break;
         case SC_CLOSE:
             SendMessage(hWnd, WM_CLOSE, 0, 0);
@@ -877,7 +894,7 @@ static BOOL CheckWindowState(HWND hWnd, xcb_atom_t st){
     assert(state);
     xcb_connection_t *connection=wndObj->mConnection->connection;
 
-    xcb_get_property_cookie_t cookie = xcb_get_property(connection, 0, hWnd, XCB_ATOM_ATOM, state->wm_stat_atom, 0, 1024);
+    xcb_get_property_cookie_t cookie = xcb_get_property(connection, 0, hWnd, XCB_ATOM_ATOM, state->_NET_WM_STATE_ATOM, 0, 1024);
     xcb_get_property_reply_t *reply = xcb_get_property_reply(connection, cookie, NULL);
     if (!reply) return FALSE;
     xcb_atom_t *atoms = (xcb_atom_t*)xcb_get_property_value(reply);

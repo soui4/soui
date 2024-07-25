@@ -100,14 +100,14 @@ xcb_atom_t SConnMgr::internAtom(xcb_connection_t *connection, uint8_t onlyIfExis
     return atom;
 }
 
-//todo: »ñÈ¡Êó±êË«»÷Ê±¼ä¼ä¸ô£¬Ä¿Ç°»ñÈ¡²»µ½ÓÐÐ§Öµ
+//todo: ï¿½ï¿½È¡ï¿½ï¿½ï¿½Ë«ï¿½ï¿½Ê±ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ä¿Ç°ï¿½ï¿½È¡ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½Ð§Öµ
 static uint32_t GetDoubleClickSpan(xcb_connection_t* connection,xcb_screen_t * screen) {
     uint32_t ret = 200;
     xcb_window_t root_window = screen->root;
 
-    // »ñÈ¡DoubleClickTime×ÊÔ´µÄÔ­×ÓID
+    // ï¿½ï¿½È¡DoubleClickTimeï¿½ï¿½Ô´ï¿½ï¿½Ô­ï¿½ï¿½ID
     xcb_atom_t atom = SConnMgr::internAtom(connection, 0, "_NET_DOUBLE_CLICK_TIME");
-    // ·¢ËÍ»ñÈ¡ÊôÐÔµÄÇëÇó
+    // ï¿½ï¿½ï¿½Í»ï¿½È¡ï¿½ï¿½ï¿½Ôµï¿½ï¿½ï¿½ï¿½ï¿½
     xcb_get_property_cookie_t cookie = xcb_get_property(connection, 0, root_window, atom, XCB_ATOM_CARDINAL, 0, 1024);
     xcb_get_property_reply_t *reply = xcb_get_property_reply(connection, cookie, NULL);
     if (reply == NULL) {
@@ -115,11 +115,11 @@ static uint32_t GetDoubleClickSpan(xcb_connection_t* connection,xcb_screen_t * s
         return ret;
     }
     
-    // ¼ì²é»ñÈ¡µÄÖµÊÇ·ñÓÐÐ§
+    // ï¿½ï¿½ï¿½ï¿½È¡ï¿½ï¿½Öµï¿½Ç·ï¿½ï¿½ï¿½Ð§
     if (reply->value_len == 1) {
         ret = *((uint32_t*)xcb_get_property_value(reply));
     }
-    // ÊÍ·Å×ÊÔ´
+    // ï¿½Í·ï¿½ï¿½ï¿½Ô´
     free(reply);
     return ret;
 }
@@ -152,15 +152,15 @@ SConnection::SConnection(int screenNum)
 
     m_tsDoubleSpan = GetDoubleClickSpan(connection, screen);
 
-    wm_protocols_atom = SConnMgr::internAtom(connection, 1, "WM_PROTOCOLS");
-    wm_delete_window_atom = SConnMgr::internAtom(connection, 1, "WM_DELETE_WINDOW");
-    wm_stat_atom = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE");
-    //todo:_NET_WM_STATE_RESTORED£¬_NET_WM_STATE_MINIMIZED²»´æÔÚ
-    wm_state_minimize = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE_MINIMIZED");
-    wm_state_maximize = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE_MAXIMIZED_HORZ");
-    wm_state_restore = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE_RESTORED");
-    wm_stat_hidden_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_HIDDEN");
-    wm_stat_enable_atom = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_DEMANDS_ATTENTION");
+    WM_PROTOCOLS_ATOM = SConnMgr::internAtom(connection, 1, "WM_PROTOCOLS");
+    WM_DELETE_WINDOW_ATOM = SConnMgr::internAtom(connection, 1, "WM_DELETE_WINDOW");
+    WM_CHANGE_STATE_ATOM = SConnMgr::internAtom(connection, 1, "WM_CHANGE_STATE");
+    _NET_WM_STATE_ATOM = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE");
+    _NET_WM_STATE_HIDDEN_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_HIDDEN");
+    _NET_WM_STATE_DEMANDS_ATTENTION_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_DEMANDS_ATTENTION");
+
+    _NET_WM_STATE_MAXIMIZED_HORZ_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_MAXIMIZED_HORZ");
+    _NET_WM_STATE_MAXIMIZED_VERT_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_MAXIMIZED_VERT");
 
     m_bQuit=false;
     m_msgPeek = nullptr;
@@ -459,19 +459,19 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
     case XCB_CLIENT_MESSAGE:
     {
         xcb_client_message_event_t *client_message_event = (xcb_client_message_event_t *) event;
-        if(client_message_event->data.data32[0] == wm_delete_window_atom){
+        if(client_message_event->data.data32[0] == WM_DELETE_WINDOW_ATOM){
             pMsg = new Msg;
             pMsg->message = WM_CLOSE;
             pMsg->hwnd = client_message_event->window;
             pMsg->wParam = pMsg->lParam = 0;
-        }else if(client_message_event->type == wm_stat_hidden_atom){
+        }else if(client_message_event->type == _NET_WM_STATE_HIDDEN_ATOM){
             pMsg = new Msg;
             pMsg->message = WM_SHOWWINDOW;
             pMsg->hwnd =client_message_event->window;
             pMsg->wParam = client_message_event->data.data32[0];
             pMsg->lParam = 0;
         }
-        else if(client_message_event->type == wm_stat_enable_atom){
+        else if(client_message_event->type == _NET_WM_STATE_DEMANDS_ATTENTION_ATOM){
             pMsg = new Msg;
             pMsg->message = WM_ENABLE;
             pMsg->hwnd =client_message_event->window;

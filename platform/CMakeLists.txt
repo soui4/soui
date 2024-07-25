@@ -36,6 +36,7 @@ endif()
 target_include_directories(platform
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_DIR}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_DIR}/include
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../utilities/include
 )

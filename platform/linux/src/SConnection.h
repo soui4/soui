@@ -35,15 +35,14 @@ public:
 public:
     xcb_connection_t* connection;
     xcb_screen_t* screen;
-    xcb_atom_t wm_delete_window_atom;
-    xcb_atom_t wm_protocols_atom;
-    xcb_atom_t wm_stat_atom;
-    xcb_atom_t wm_stat_hidden_atom;
-    xcb_atom_t wm_stat_enable_atom;
-    xcb_atom_t wm_state_minimize;
-    xcb_atom_t wm_state_maximize;
-    xcb_atom_t wm_state_restore;
-
+    xcb_atom_t WM_DELETE_WINDOW_ATOM;
+    xcb_atom_t WM_PROTOCOLS_ATOM;
+    xcb_atom_t _NET_WM_STATE_ATOM;
+    xcb_atom_t WM_CHANGE_STATE_ATOM;
+    xcb_atom_t _NET_WM_STATE_HIDDEN_ATOM;
+    xcb_atom_t _NET_WM_STATE_DEMANDS_ATTENTION_ATOM;
+    xcb_atom_t _NET_WM_STATE_MAXIMIZED_HORZ_ATOM;
+    xcb_atom_t _NET_WM_STATE_MAXIMIZED_VERT_ATOM;
 public:
     bool update();
     BOOL peekMsg(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
