@@ -398,6 +398,8 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
             break;
         case SIZE_RESTORED:
             wndObj->state = Normal;
+            lp = MAKELPARAM(wndObj->rc.right-wndObj->rc.left,wndObj->rc.bottom-wndObj->rc.top);
+            CallWindowProc(proc,hWnd,WM_SIZE,0,lp);//call size again
             break;
         }
         printf("wm_state, wp=%d\n",wp);
@@ -788,7 +790,7 @@ HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
             ChangeNetWmState(wndObj->mConnection,hWnd,true,wndObj->mConnection->_NET_WM_STATE_MAXIMIZED_HORZ_ATOM,wndObj->mConnection->_NET_WM_STATE_MAXIMIZED_VERT_ATOM);
             break;
         case SC_RESTORE:
-            //SendSysCommand(wndObj->mConnection, hWnd, wndObj->mConnection->wm_state_restore);
+            SendSysCommand(wndObj->mConnection, hWnd, XCB_ICCCM_WM_STATE_NORMAL);
             break;
         case SC_CLOSE:
             SendMessage(hWnd, WM_CLOSE, 0, 0);
