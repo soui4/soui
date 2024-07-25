@@ -70,12 +70,11 @@ void SetGdiObjPtr(HGDIOBJ hgdiObj, void* ptr) {
     hgdiObj->ptr = ptr;
 }
 
-
-static bool ApplyPen(cairo_t * ctx,HPEN hpen){
+static bool ApplyPen(cairo_t * ctx,HPEN hpen, double lineScale=1.0){
     LOGPEN *pen = (LOGPEN*)GetGdiObjPtr(hpen);
     if(pen->lopnStyle == PS_NULL)
         return false;
-    cairo_set_line_width(ctx,pen->lopnWidth);
+    cairo_set_line_width(ctx,pen->lopnWidth* lineScale);
     CairoColor cr;
     RGBA2CairoColor(pen->lopnColor,&cr);
     cairo_set_source_rgba(ctx,cr.r,cr.g,cr.b,cr.a);
@@ -1193,11 +1192,39 @@ BOOL  Ellipse(HDC hdc, int left, int top, int right, int bottom)
 
 BOOL  Pie(HDC hdc, int left, int top, int right, int bottom, int xr1, int yr1, int xr2, int yr2)
 {
+
     return 0;
 }
 
 BOOL  Arc(HDC hdc, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 {
+    double wid = x2 - x1;
+    double hei = y2 - y1;
+    if (wid == 0 || hei == 0)
+        return FALSE;
+
+    cairo_save(hdc->cairo);
+    double cx = (x1 + x2) / 2;
+    double cy = (y1 + y2) / 2;
+    cairo_translate(hdc->cairo,cx, cy);
+    cairo_scale(hdc->cairo, wid, hei);
+    
+    double dx3 = double(x3 - cx) / wid;
+    double dx4 = double(x4 - cx) / wid;
+
+    double dy3 = double(y3 - cy) / hei;
+    double dy4 = double(y4 - cy) / hei;
+
+    double arc1 = atan2(dy3, dx3);
+    double arc2 = atan2(dy4, dx4);
+    cairo_move_to(hdc->cairo, dx3, dx4);
+    cairo_arc(hdc->cairo, 0, 0, 0.5, arc1,arc2);
+
+    if (ApplyPen(hdc->cairo, hdc->pen, 2.0 / (wid + hei))){
+        cairo_stroke(hdc->cairo);
+    }
+
+    cairo_restore(hdc->cairo);
     return 0;
 }
 

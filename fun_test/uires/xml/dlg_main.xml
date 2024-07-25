@@ -1,10 +1,10 @@
 ﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="appMain"
-appWnd="1"
-translucent="0"
+	appWnd="1"
+	translucent="0" 
+	toolwnd="1"
 >
   <root  width="600" height="400" skin="_skin.sys.wnd.bkgnd" colorBkgnd="@color/white" layout="vbox">
 	  <caption size="-2,30" font="adding:2" layout="hbox" gravity="center" padding_left="10">
-		  <!--show where a frame widget can be used-->
 		  <text text="@string/title"/>
 		  <text text="QQ群:" extend_left="5"/>
 		  <text text="229313785" colorText="@color/red"/>

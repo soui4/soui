@@ -281,6 +281,12 @@ void SNativeWnd2::OnPaint(HDC hdc){
 
     TextOut(hdc,10,10,str.c_str(),-1);
 
+    //Test Arc
+
+    RECT rcArc = { 10,50,60,200 };
+    OffsetRect(&rcArc, 10, 10);
+    Arc(hdc, rcArc.left, rcArc.top, rcArc.right, rcArc.bottom,  rcArc.left, (rcArc.top + rcArc.bottom) / 2, (rcArc.left + rcArc.right) / 2, rcArc.top);
+
     SelectObject(hdc,oldBr);
     DeleteObject(br);
 
@@ -325,7 +331,7 @@ int run_window() {
     return ret;
 }
 TEST(demo,window){
-    //EXPECT_EQ(run_window(), 1);
+    EXPECT_EQ(run_window(), 1);
 }
 
 class CMainDlg : public SHostWnd {
@@ -373,5 +379,5 @@ int run_app(HINSTANCE hInst){
 
 TEST(demo,app){
     HINSTANCE hInst = 0;
-    EXPECT_EQ(run_app(hInst),0);
+    //EXPECT_EQ(run_app(hInst),0);
 }

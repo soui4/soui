@@ -184,18 +184,22 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
     HWND hWnd = xcb_generate_id(pWnd->mConnection->connection);
-    uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK | XCB_CW_OVERRIDE_REDIRECT;
-    uint32_t value_list[] = {
-        pWnd->mConnection->screen->black_pixel,
-        1,
-        XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY 
+    static const uint32_t evt_mask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY
         | XCB_EVENT_MASK_PROPERTY_CHANGE
         | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION
-        | XCB_EVENT_MASK_ENTER_WINDOW| XCB_EVENT_MASK_LEAVE_WINDOW
-        | XCB_EVENT_MASK_KEY_PRESS| XCB_EVENT_MASK_KEY_RELEASE
-        };
-
-    auto cookie = xcb_create_window_checked(pWnd->mConnection->connection, XCB_COPY_FROM_PARENT, hWnd,
+        | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW
+        | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE;
+    uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
+    uint32_t value_list[3] = { conn->screen->black_pixel };
+    if (cs->dwExStyle & WS_EX_TOOLWINDOW) {
+        mask |= XCB_CW_OVERRIDE_REDIRECT;
+        value_list[1] = 1;
+        value_list[2] = evt_mask;
+    }
+    else {
+        value_list[1] = evt_mask;
+    }
+    xcb_void_cookie_t cookie = xcb_create_window_checked(pWnd->mConnection->connection, XCB_COPY_FROM_PARENT, hWnd,
                       hParent, cs->x, cs->y, std::max(cs->cx,1u), std::max(cs->cy,1u), 10,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT, pWnd->mConnection->screen->root_visual, mask,
                       value_list);
