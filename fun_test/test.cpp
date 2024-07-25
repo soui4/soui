@@ -298,7 +298,7 @@ void SNativeWnd2::OnPaint(HDC hdc){
     //BitBlt(hdc,rc2.left,rc2.top,rc2.right-rc2.left,rc2.bottom-rc2.top,memdc,64,64,SRCCOPY);
     BLENDFUNCTION bf;
     bf.SourceConstantAlpha = 128;//set alpha to 0.5
-    AlphaBlend(hdc,100,100,128,128,memdc,0,0,64,64,bf);
+    AlphaBlend(hdc,100,100,256,256,memdc,0,0,128,128,bf);
     SelectObject(memdc,oldBmp);
     DeleteDC(memdc);
 

@@ -571,7 +571,6 @@ BOOL  AlphaBlend(HDC hdc, int x, int y, int wDst, int hDst, HDC hdcSrc, int x1, 
     cairo_scale(hdc->cairo,scale_x,scale_y);
 
     cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
-    cairo_rectangle(hdc->cairo,0,0,wDst/scale_x,hDst/scale_y);
     cairo_paint_with_alpha(hdc->cairo, ftn.SourceConstantAlpha*1.0/255.0);
 
     cairo_restore(hdc->cairo);
