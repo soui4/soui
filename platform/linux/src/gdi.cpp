@@ -561,7 +561,6 @@ BOOL  AlphaBlend(HDC hdc, int x, int y, int wDst, int hDst, HDC hdcSrc, int x1, 
 {
     assert(hdc && hdcSrc);
     cairo_surface_t *src = (cairo_surface_t *)GetGdiObjPtr(hdcSrc->bmp);
-    
     cairo_save(hdc->cairo);
     cairo_rectangle(hdc->cairo,x,y,wDst,hDst);
     cairo_clip(hdc->cairo);
@@ -572,18 +571,8 @@ BOOL  AlphaBlend(HDC hdc, int x, int y, int wDst, int hDst, HDC hdcSrc, int x1, 
     cairo_scale(hdc->cairo,scale_x,scale_y);
 
     cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
-    
-    //todo: draw alpha
-
-    // cairo_pattern_t *pattern = cairo_pattern_create_for_surface(src);
-    // cairo_set_source(hdc->cairo,pattern);
-    // cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
-    // cairo_set_source_rgba(hdc->cairo,1.0,1.0,1.0,0.5);
-
     cairo_rectangle(hdc->cairo,0,0,wDst/scale_x,hDst/scale_y);
-    cairo_fill(hdc->cairo);
-
-    // cairo_pattern_destroy(pattern);
+    cairo_paint_with_alpha(hdc->cairo, ftn.SourceConstantAlpha*1.0/255.0);
 
     cairo_restore(hdc->cairo);
     return 0;
