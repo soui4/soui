@@ -50,6 +50,48 @@ static const char * kPath_TestXml ="/demo2/uires/xml/dlg_main.xml";
 static const char * kPath_SysRes = "/soui-sys-resource";
 static const char * kPath_TestRes = "/fun_test/uires";
 
+/*
+void DrawEllipse(cairo_t* cr, int x1, int y1, int x2, int y2, int lineWid) {
+    double cx = (x1 + x2) / 2;
+    double cy = (y1 + y2) / 2;
+    double radius_x = (x2-x1)/2;
+    double radius_y = (y2-y1)/2;
+
+    cairo_set_line_width(cr, 2);
+
+    // 绘制椭圆边框
+    cairo_save(cr);
+    cairo_translate(cr, cx, cy);
+    cairo_scale(cr, radius_x, radius_y);
+    cairo_arc(cr, 0, 0, 1, 0, 2 * M_PI);
+
+    cairo_restore(cr);
+    // 设置绘制样式
+    cairo_set_source_rgb(cr, 0, 0, 1); // 设置颜色为蓝色
+    cairo_stroke(cr); // 描边椭圆
+
+}
+
+int test_arc() {
+    // 创建 Cairo 绘图表面
+    cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 400, 400);
+    cairo_t* cr = cairo_create(surface);
+    DrawEllipse(cr, 0, 50, 400, 350, 2);
+
+    // 保存绘图结果到文件
+    cairo_surface_write_to_png(surface, "/home/flyhigh/work/test2.png");
+
+    // 释放资源
+    cairo_surface_destroy(surface);
+    cairo_destroy(cr);
+
+    return 0;
+}
+
+TEST(soui, arc) {
+    test_arc();
+}
+*/
 TEST(soui, region_and) {
     RECT rc1 = { 0,0,600,400 };
     RECT rc2 = { 10,10,56,18 };
@@ -274,21 +316,34 @@ void SNativeWnd2::OnPaint(HDC hdc){
     GetTextExtentPoint32(hdc,str.c_str(),str.length(),&sz);
     HPEN pen = CreatePen(PS_SOLID,1,RGBA(0,0,255,255));
     HPEN oldPen = SelectObject(hdc,pen);
+
     HBRUSH br = CreateSolidBrush(RGBA(128,128,128,255));
     HBRUSH oldBr = SelectObject(hdc,br);
     Rectangle(hdc,10,10,10+sz.cx,10+sz.cy);
     Rectangle(hdc,0,100,64,164);
 
-    TextOut(hdc,10,10,str.c_str(),-1);
-
-    //Test Arc
-
-    RECT rcArc = { 10,50,60,200 };
-    OffsetRect(&rcArc, 10, 10);
-    Arc(hdc, rcArc.left, rcArc.top, rcArc.right, rcArc.bottom,  rcArc.left, (rcArc.top + rcArc.bottom) / 2, (rcArc.left + rcArc.right) / 2, rcArc.top);
+    TextOut(hdc,10,20,str.c_str(),-1);
 
     SelectObject(hdc,oldBr);
     DeleteObject(br);
+
+    {//test arc api
+        RECT rcArc = { 10,50,60,200 };
+        int wid = rcArc.right - rcArc.left;
+        int hei = rcArc.bottom - rcArc.top;
+        OffsetRect(&rcArc, 10, 10);
+        auto oldbr = SelectObject(hdc, GetStockObject(NULL_BRUSH));
+        Ellipse(hdc, rcArc.left, rcArc.top, rcArc.right, rcArc.bottom);
+        OffsetRect(&rcArc, wid, 0);
+        Arc(hdc, rcArc.left, rcArc.top, rcArc.right, rcArc.bottom, rcArc.left, (rcArc.top + rcArc.bottom) / 2, (rcArc.left + rcArc.right) / 2, rcArc.top);
+        OffsetRect(&rcArc, wid, 0);
+        SelectObject(hdc, oldbr);
+        HPEN pen = CreatePen(PS_DASH, 2, RGBA(0, 128, 0, 255));
+        HPEN oldPen = SelectObject(hdc, pen);
+        Pie(hdc, rcArc.left, rcArc.top, rcArc.right, rcArc.bottom, rcArc.left, (rcArc.top + rcArc.bottom) / 2, (rcArc.left + rcArc.right) / 2, rcArc.top);
+        SelectObject(hdc, oldPen);
+        DeleteObject(pen);
+    }
 
     SelectObject(hdc,oldPen);
     DeleteObject(pen);

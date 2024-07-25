@@ -70,11 +70,16 @@ void SetGdiObjPtr(HGDIOBJ hgdiObj, void* ptr) {
     hgdiObj->ptr = ptr;
 }
 
-static bool ApplyPen(cairo_t * ctx,HPEN hpen, double lineScale=1.0){
+static bool IsNullPen(HPEN hpen) {
+    LOGPEN* pen = (LOGPEN*)GetGdiObjPtr(hpen);
+    return pen->lopnStyle == PS_NULL;
+}
+
+static bool ApplyPen(cairo_t * ctx,HPEN hpen){
     LOGPEN *pen = (LOGPEN*)GetGdiObjPtr(hpen);
     if(pen->lopnStyle == PS_NULL)
         return false;
-    cairo_set_line_width(ctx,pen->lopnWidth* lineScale);
+    cairo_set_line_width(ctx,pen->lopnWidth);
     CairoColor cr;
     RGBA2CairoColor(pen->lopnColor,&cr);
     cairo_set_source_rgba(ctx,cr.r,cr.g,cr.b,cr.a);
@@ -123,6 +128,11 @@ static bool ApplyPen(cairo_t * ctx,HPEN hpen, double lineScale=1.0){
         break;
     }
     return true;
+}
+
+static bool IsNullBrush(HPEN hbr) {
+    LOGBRUSH* br = (LOGBRUSH*)GetGdiObjPtr(hbr);
+    return br->lbStyle == BS_NULL;
 }
 
 static bool ApplyBrush(cairo_t * ctx,HBRUSH hbr){
@@ -1033,26 +1043,21 @@ HGDIOBJ  GetStockObject(int i)
 
 BOOL  Rectangle(HDC hdc, int left, int top, int right, int bottom)
 {
-    cairo_save(hdc->cairo);
-    LOGBRUSH *br = (LOGBRUSH*)GetGdiObjPtr(hdc->brush);
-    if(br->lbStyle == BS_SOLID){
-        CairoColor cr;
-        RGBA2CairoColor(br->lbColor,&cr);
-        cairo_set_source_rgba(hdc->cairo,cr.r,cr.g,cr.b,cr.a);
+
+    if(!IsNullBrush(hdc->brush)){
+        cairo_save(hdc->cairo);
+        ApplyBrush(hdc->cairo, hdc->brush);
         cairo_rectangle(hdc->cairo,left,top,right-left,bottom-top);
         cairo_fill(hdc->cairo);
+        cairo_restore(hdc->cairo);
     }
-
-    LOGPEN * pen= (LOGPEN *)GetGdiObjPtr(hdc->pen);
-    if(pen->lopnStyle==PS_SOLID){
-        CairoColor cr;
-        RGBA2CairoColor(pen->lopnColor,&cr);
-        cairo_set_source_rgba(hdc->cairo,cr.r,cr.g,cr.b,cr.a);
-        cairo_set_line_width(hdc->cairo,pen->lopnWidth);
-        cairo_rectangle(hdc->cairo,left,top,right-left,bottom-top);
+    if (!IsNullPen(hdc->pen)) {
+        cairo_save(hdc->cairo);
+        ApplyPen(hdc->cairo, hdc->pen);
+        cairo_rectangle(hdc->cairo, left, top, right - left, bottom - top);
         cairo_stroke(hdc->cairo);
+        cairo_restore(hdc->cairo);
     }
-    cairo_restore(hdc->cairo);
     return TRUE;
 }
 
@@ -1171,29 +1176,82 @@ BOOL  InvertRect(HDC hdc, const RECT *lprc)
 BOOL  Ellipse(HDC hdc, int left, int top, int right, int bottom)
 {
     cairo_t *ctx = hdc->cairo;
-    cairo_save(ctx);
-    double x = (left+right)/2;
-    double y = (top+bottom)/2;
-    double scale_x = right-left;
-    double scale_y = bottom-top;
-    cairo_translate(ctx,x, y);
-    cairo_scale(ctx,scale_x, scale_y);
-    cairo_arc(ctx,0,0,1,0,2*M_PI);
-
-    if(ApplyBrush(ctx,hdc->brush)){
+    double x = (left + right) / 2;
+    double y = (top + bottom) / 2;
+    double scale_x = (right - left) / 2;
+    double scale_y = (bottom - top) / 2;
+    if(!IsNullBrush(hdc->brush)){
+        cairo_save(ctx);
+        cairo_translate(ctx, x, y);
+        cairo_scale(ctx, scale_x, scale_y);
+        cairo_move_to(ctx, 1, 0);
+        cairo_arc(ctx, 0, 0, 1, 0, 2 * M_PI);
+        cairo_restore(ctx);
+        cairo_save(ctx);
+        ApplyBrush(ctx, hdc->brush);
         cairo_fill(ctx);
+        cairo_restore(ctx);
     }
-    if(ApplyPen(ctx,hdc->pen)){
-        cairo_stroke(ctx);
+    if(!IsNullPen(hdc->pen)){
+        cairo_save(ctx);
+        cairo_translate(ctx, x, y);
+        cairo_scale(ctx, scale_x, scale_y);
+        cairo_move_to(ctx, 1, 0);
+        cairo_arc(ctx, 0, 0, 1, 0, 2 * M_PI);
+        cairo_restore(ctx);
+        cairo_save(ctx);
+        ApplyPen(ctx, hdc->pen);
+        cairo_stroke(ctx);        
+        cairo_restore(ctx);
     }
-    cairo_restore(ctx);
+
     return TRUE;
 }
 
-BOOL  Pie(HDC hdc, int left, int top, int right, int bottom, int xr1, int yr1, int xr2, int yr2)
+BOOL  Pie(HDC hdc, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
 {
+    double wid = x2 - x1;
+    double hei = y2 - y1;
+    if (wid == 0 || hei == 0)
+        return FALSE;
+    double cx = (x1 + x2) / 2;
+    double cy = (y1 + y2) / 2;
+    double dx3 = double(x3 - cx) / wid;
+    double dx4 = double(x4 - cx) / wid;
+    double dy3 = double(y3 - cy) / hei;
+    double dy4 = double(y4 - cy) / hei;
+    double arc1 = atan2(dy3, dx3);
+    double arc2 = atan2(dy4, dx4);
 
-    return 0;
+    if (!IsNullBrush(hdc->brush)) {
+        cairo_save(hdc->cairo);
+        cairo_translate(hdc->cairo, cx, cy);
+        cairo_scale(hdc->cairo, wid, hei);
+        cairo_move_to(hdc->cairo, 0, 0);
+        cairo_line_to(hdc->cairo, dx3, dx4);
+        cairo_arc(hdc->cairo, 0, 0, 0.5, arc1, arc2);
+        cairo_close_path(hdc->cairo);
+        cairo_restore(hdc->cairo);
+        cairo_save(hdc->cairo);
+        ApplyBrush(hdc->cairo, hdc->brush);
+        cairo_fill(hdc->cairo);
+        cairo_restore(hdc->cairo);
+    }
+    if (!IsNullPen(hdc->pen)) {
+        cairo_save(hdc->cairo);
+        cairo_translate(hdc->cairo, cx, cy);
+        cairo_scale(hdc->cairo, wid, hei);
+        cairo_move_to(hdc->cairo, 0, 0);
+        cairo_line_to(hdc->cairo, dx3, dx4);
+        cairo_arc(hdc->cairo, 0, 0, 0.5, arc1, arc2);
+        cairo_close_path(hdc->cairo);
+        cairo_restore(hdc->cairo);
+        cairo_save(hdc->cairo);
+        ApplyPen(hdc->cairo, hdc->pen);
+        cairo_stroke(hdc->cairo);
+        cairo_restore(hdc->cairo);
+    }
+    return TRUE;
 }
 
 BOOL  Arc(HDC hdc, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y4)
@@ -1219,13 +1277,13 @@ BOOL  Arc(HDC hdc, int x1, int y1, int x2, int y2, int x3, int y3, int x4, int y
     double arc2 = atan2(dy4, dx4);
     cairo_move_to(hdc->cairo, dx3, dx4);
     cairo_arc(hdc->cairo, 0, 0, 0.5, arc1,arc2);
-
-    if (ApplyPen(hdc->cairo, hdc->pen, 2.0 / (wid + hei))){
+    cairo_restore(hdc->cairo);
+    cairo_save(hdc->cairo);
+    if (ApplyPen(hdc->cairo, hdc->pen)){
         cairo_stroke(hdc->cairo);
     }
-
     cairo_restore(hdc->cairo);
-    return 0;
+    return TRUE;
 }
 
 BOOL  GetWorldTransform(HDC hdc, LPXFORM lpxf)
