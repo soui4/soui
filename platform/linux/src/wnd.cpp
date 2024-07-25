@@ -772,6 +772,19 @@ static void SendSysCommand(SConnection *conn, xcb_window_t wnd, uint32_t cmd) {
     xcb_flush(conn->connection);
 }
 
+
+static void SendSysRestore(SConnection *conn, xcb_window_t wnd) {
+    xcb_client_message_event_t event;
+    event.response_type = XCB_CLIENT_MESSAGE;
+    event.window = wnd;
+    event.format = 32;
+    event.sequence=0;
+    event.type = conn->WM_CHANGE_STATE_ATOM;
+    event.data.data32[0] = XCB_ICCCM_WM_STATE_NORMAL;
+    xcb_send_event(conn->connection, false, conn->screen->root, XCB_EVENT_MASK_STRUCTURE_NOTIFY|XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char*)&event);
+    xcb_flush(conn->connection);
+}
+
 HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
@@ -790,7 +803,7 @@ HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
             ChangeNetWmState(wndObj->mConnection,hWnd,true,wndObj->mConnection->_NET_WM_STATE_MAXIMIZED_HORZ_ATOM,wndObj->mConnection->_NET_WM_STATE_MAXIMIZED_VERT_ATOM);
             break;
         case SC_RESTORE:
-            SendSysCommand(wndObj->mConnection, hWnd, XCB_ICCCM_WM_STATE_NORMAL);
+            SendSysRestore(wndObj->mConnection, hWnd);
             break;
         case SC_CLOSE:
             SendMessage(hWnd, WM_CLOSE, 0, 0);
