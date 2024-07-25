@@ -411,6 +411,7 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
 			wndObj->rc.bottom = wndObj->rc.top + sz.cy;
 			cairo_xcb_surface_set_size((cairo_surface_t*)GetGdiObjPtr(wndObj->bmp), sz.cx, sz.cy);
 		}
+        printf("wm_size, wp=%d, size=(%d,%d)\n", wp,sz.cx,sz.cy);
 		break;
     }
     return proc(hWnd, msg, wp, lp);

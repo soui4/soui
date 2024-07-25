@@ -475,7 +475,7 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
     {
         xcb_property_notify_event_t* e2 = (xcb_property_notify_event_t*)event;
         if (e2->atom == _NET_WM_STATE_ATOM || e2->atom == WM_STATE_ATOM) {
-            uint32_t newState = SIZE_RESTORED;
+            uint32_t newState = -1;
             if (e2->atom == WM_STATE_ATOM) {
                 const xcb_get_property_cookie_t get_cookie = xcb_get_property(connection, 0, e2->window, WM_STATE_ATOM, XCB_ATOM_ANY, 0, 1024);
                 xcb_get_property_reply_t * reply = xcb_get_property_reply(connection, get_cookie, nullptr);
@@ -483,6 +483,9 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
                     const uint32_t* data = (const uint32_t*)xcb_get_property_value(reply);
                     if (data[0] == XCB_ICCCM_WM_STATE_ICONIC/* || data[0]==XCB_ICCCM_WM_STATE_WITHDRAWN*/) {
                         newState = SIZE_MINIMIZED;                       
+                    }
+                    else if (data[0] == XCB_ICCCM_WM_STATE_NORMAL) {
+                        newState = SIZE_RESTORED;
                     }
                 }
                 free(reply);
@@ -493,10 +496,12 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
                     newState = SIZE_MAXIMIZED;
                 }
             }
-            pMsg = new Msg;
-            pMsg->hwnd = e2->window;
-            pMsg->message = WM_STATE;
-            pMsg->wParam = newState;
+            if (newState != -1) {
+                pMsg = new Msg;
+                pMsg->hwnd = e2->window;
+                pMsg->message = WM_STATE;
+                pMsg->wParam = newState;
+            }
         }
         break;
     }
