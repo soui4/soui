@@ -725,7 +725,7 @@ static void DrawSingleLine(HDC hdc, LPCTSTR pszBuf, int iBegin, int cchText, LPR
     cairo_text_extents(hdc->cairo,buf,&ext);
     if(uFormat & DT_CALCRECT){
         pRect->right = pRect->left + ext.width;
-        pRect->bottom = pRect->top + ext.height;
+        pRect->bottom = pRect->top + ext.height-ext.y_bearing;
     }else{
         switch(uFormat&(DT_LEFT|DT_CENTER|DT_RIGHT)){
             case DT_LEFT:
@@ -948,7 +948,7 @@ BOOL GetTextExtentPoint32(HDC hdc, LPCSTR lpString, int c, LPSIZE psizl)
         free(buf);
     }
     psizl->cx = ext.width;
-    psizl->cy = ext.height;
+    psizl->cy = ext.height - ext.y_bearing;
     cairo_restore(hdc->cairo);
 
     return TRUE;
