@@ -164,6 +164,7 @@ static void ApplyRegion(cairo_t * ctx, HRGN hRgn){
     cairo_reset_clip(ctx);
     DWORD dwCount = GetRegionData(hRgn, 0, nullptr);
     RGNDATA *pData = (RGNDATA*)malloc(dwCount);
+    GetRegionData(hRgn, dwCount, pData);
     RECT* pRc = (RECT*)pData->Buffer;
     for (int i = 0; i < pData->rdh.nCount; i++) {
         cairo_rectangle(ctx, pRc->left,pRc->top,pRc->right-pRc->left,pRc->bottom-pRc->top);
