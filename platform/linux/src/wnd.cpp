@@ -388,7 +388,7 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
                 }
             }
         break;
-    case WM_STATE:
+    case UM_STATE:
         switch (wp) {
         case SIZE_MINIMIZED:
             wndObj->state = Minimized;
@@ -774,13 +774,19 @@ static void SendSysCommand(SConnection *conn, xcb_window_t wnd, uint32_t cmd) {
 
 
 static void SendSysRestore(SConnection *conn, xcb_window_t wnd) {
+
     xcb_client_message_event_t event;
     event.response_type = XCB_CLIENT_MESSAGE;
     event.window = wnd;
     event.format = 32;
     event.sequence=0;
-    event.type = conn->WM_CHANGE_STATE_ATOM;
-    event.data.data32[0] = XCB_ICCCM_WM_STATE_NORMAL;
+    event.type = conn->_NET_WM_STATE_ATOM;
+    event.data.data32[0] = 0;
+    event.data.data32[1] = conn->_NET_WM_STATE_MAXIMIZED_VERT_ATOM;
+    event.data.data32[2] = conn->_NET_WM_STATE_MAXIMIZED_HORZ_ATOM;
+    event.data.data32[3] = 0;
+    event.data.data32[4] = 0;
+
     xcb_send_event(conn->connection, false, conn->screen->root, XCB_EVENT_MASK_STRUCTURE_NOTIFY|XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char*)&event);
     xcb_flush(conn->connection);
 }

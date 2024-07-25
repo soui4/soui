@@ -23,7 +23,7 @@ struct MsgWndPosChanged: Msg{
     WINDOWPOS pos;
 };
 
-#define WM_STATE (WM_INTERNAL+1)
+#define UM_STATE (WM_INTERNAL+1)
 
 SNSEND
 

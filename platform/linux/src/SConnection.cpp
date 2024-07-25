@@ -502,7 +502,7 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
             if (newState != -1) {
                 pMsg = new Msg;
                 pMsg->hwnd = e2->window;
-                pMsg->message = WM_STATE;
+                pMsg->message = UM_STATE;
                 pMsg->wParam = newState;
             }
         }
