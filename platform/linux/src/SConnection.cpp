@@ -2,6 +2,7 @@
 #include <helper/SCriticalSection.h>
 #include <assert.h>
 #include <functional>
+#include <xcb/xcb_icccm.h>
 #include "uimsg.h"
 
 SNSBEGIN
@@ -154,6 +155,9 @@ SConnection::SConnection(int screenNum)
 
     WM_PROTOCOLS_ATOM = SConnMgr::internAtom(connection, 1, "WM_PROTOCOLS");
     WM_DELETE_WINDOW_ATOM = SConnMgr::internAtom(connection, 1, "WM_DELETE_WINDOW");
+    WM_STATE_ATOM = SConnMgr::internAtom(connection, 1, "WM_STATE");
+    WM_CLASS_ATOM = SConnMgr::internAtom(connection, 1, "WM_CLASS");
+    WM_NAME_ATOM = SConnMgr::internAtom(connection, 1, "WM_NAME");
     WM_CHANGE_STATE_ATOM = SConnMgr::internAtom(connection, 1, "WM_CHANGE_STATE");
     _NET_WM_STATE_ATOM = SConnMgr::internAtom(connection, 1, "_NET_WM_STATE");
     _NET_WM_STATE_HIDDEN_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_HIDDEN");
@@ -421,6 +425,28 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
         pMsgPaint->wParam = 0;
         pMsgPaint->lParam = (LPARAM)pMsgPaint->rgn;
         pMsg = pMsgPaint;
+        break;
+    }
+    case XCB_PROPERTY_NOTIFY:
+    {
+        xcb_property_notify_event_t* e2 = (xcb_property_notify_event_t*)event;
+        if (e2->atom == _NET_WM_STATE_ATOM || e2->atom == WM_STATE_ATOM) {
+            uint32_t newState = SIZE_RESTORED;
+            if (e2->atom == WM_STATE_ATOM) {
+                const xcb_get_property_cookie_t get_cookie = xcb_get_property(connection, 0, e2->window, WM_STATE_ATOM, XCB_ATOM_ANY, 0, 1024);
+                xcb_get_property_reply_t * reply = xcb_get_property_reply(connection, get_cookie, nullptr);
+                if (reply && reply->format == 32 && reply->type == WM_STATE_ATOM && reply->length!=0) {
+                    const uint32_t* data = (const uint32_t*)xcb_get_property_value(reply);
+                    if (data[0] == XCB_ICCCM_WM_STATE_ICONIC/* || data[0]==XCB_ICCCM_WM_STATE_WITHDRAWN*/) {
+                        newState = SIZE_MINIMIZED;                       
+                    }
+                }
+                free(reply);
+            }
+            if (newState != SIZE_MINIMIZED) {
+
+            }
+        }
         break;
     }
     case XCB_CONFIGURE_NOTIFY:

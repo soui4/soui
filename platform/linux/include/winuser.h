@@ -257,6 +257,8 @@ typedef struct tagCOPYDATASTRUCT {
 #define WM_PRINT                        0x0317
 #define WM_PRINTCLIENT                  0x0318
 
+#define WM_INTERNAL                     0x0350  //internal message
+
 #define WM_APP                          0x8000
 
 

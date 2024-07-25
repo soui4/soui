@@ -11,10 +11,17 @@
 #include "class.h"
 #include "SConnection.h"
 #include "sdc.h"
+#include "uimsg.h"
 
 using namespace SOUI;
 
 #define CLS_WINDOW "window"
+
+enum WndState {
+    Normal = 0,
+    Minimized = 1,
+    Maximized = 2,
+};
 
 struct _Window{
     std::recursive_mutex mutex;
@@ -24,6 +31,7 @@ struct _Window{
     HBITMAP       bmp;
     std::string title; 
     RECT          rc;
+    WndState      state;
     UINT_PTR           objOpaque;
     HWND               parent;        /* Window parent */
     HWND               owner;         /* Window owner */
@@ -181,6 +189,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     if (!hParent) hParent = conn->screen->root;
 
     pWnd->mConnection = conn;
+    pWnd->state = Normal;
     pWnd->dwStyle = cs->style;
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
@@ -379,15 +388,29 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
                 }
             }
         break;
-    case WM_SIZE:
-        SIZE sz = { GET_X_LPARAM(lp),GET_Y_LPARAM(lp) };
-        if (wndObj->bmp && (sz.cx != wndObj->rc.right-wndObj->rc.left || sz.cy != wndObj->rc.bottom-wndObj->rc.top))
-        {
-            wndObj->rc.right=wndObj->rc.left + sz.cx;
-            wndObj->rc.bottom = wndObj->rc.top+sz.cy;
-            cairo_xcb_surface_set_size((cairo_surface_t*)GetGdiObjPtr(wndObj->bmp), sz.cx, sz.cy);
+    case WM_STATE:
+        switch (wp) {
+        case SIZE_MINIMIZED:
+            wndObj->state = Minimized;
+            break;
+        case SIZE_MAXIMIZED:
+            wndObj->state = Maximized;
+            break;
+        case SIZE_RESTORED:
+            wndObj->state = Normal;
+            break;
         }
         break;
+    case WM_SIZE:
+        wp = wndObj->state;
+		SIZE sz = { GET_X_LPARAM(lp),GET_Y_LPARAM(lp) };
+		if (wndObj->bmp && (sz.cx != wndObj->rc.right - wndObj->rc.left || sz.cy != wndObj->rc.bottom - wndObj->rc.top))
+		{
+			wndObj->rc.right = wndObj->rc.left + sz.cx;
+			wndObj->rc.bottom = wndObj->rc.top + sz.cy;
+			cairo_xcb_surface_set_size((cairo_surface_t*)GetGdiObjPtr(wndObj->bmp), sz.cx, sz.cy);
+		}
+		break;
     }
     return proc(hWnd, msg, wp, lp);
 }

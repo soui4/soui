@@ -38,11 +38,16 @@ public:
     xcb_atom_t WM_DELETE_WINDOW_ATOM;
     xcb_atom_t WM_PROTOCOLS_ATOM;
     xcb_atom_t _NET_WM_STATE_ATOM;
-    xcb_atom_t WM_CHANGE_STATE_ATOM;
     xcb_atom_t _NET_WM_STATE_HIDDEN_ATOM;
     xcb_atom_t _NET_WM_STATE_DEMANDS_ATTENTION_ATOM;
     xcb_atom_t _NET_WM_STATE_MAXIMIZED_HORZ_ATOM;
     xcb_atom_t _NET_WM_STATE_MAXIMIZED_VERT_ATOM;
+    
+    //ICCCM window state
+    xcb_atom_t WM_STATE_ATOM;
+    xcb_atom_t WM_CLASS_ATOM;
+    xcb_atom_t WM_NAME_ATOM;
+    xcb_atom_t WM_CHANGE_STATE_ATOM;
 public:
     bool update();
     BOOL peekMsg(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
