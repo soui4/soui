@@ -12,8 +12,12 @@ using namespace SOUI;
 typedef struct _GdiObj{
     int type;
     void *ptr;
+    int nRef;
     fun_gdi_free cbFree;
-    _GdiObj(int _type,void * _ptr, fun_gdi_free _cbFree):type(_type),ptr(_ptr),cbFree(_cbFree){
+    _GdiObj(int _type,void * _ptr, fun_gdi_free _cbFree):type(_type),ptr(_ptr),cbFree(_cbFree), nRef(1){
+    }
+
+    ~_GdiObj() {
     }
 }* HGDIOBJ;
 
@@ -36,8 +40,20 @@ static void gdi_pen_free(void* ptr) {
     delete (LOGPEN*)ptr;
 }
 
+struct PatternInfo {
+    cairo_pattern_t* pattern;
+    HBITMAP  bmp;
+};
+
 static void gdi_brush_free(void* ptr) {
-    delete (LOGBRUSH*)ptr;
+    LOGBRUSH* plogbr = (LOGBRUSH*)ptr;
+    if (plogbr->lbStyle == BS_PATTERN) {
+        PatternInfo* info = (PatternInfo*)plogbr->lbHatch;
+        cairo_pattern_destroy(info->pattern);
+        DeleteObject(info->bmp);
+        delete info;
+    }
+    delete plogbr;
 }
 
 static void gdi_font_free(void* ptr) {
@@ -62,12 +78,17 @@ HGDIOBJ InitGdiObj2(int type, void* ptr, fun_gdi_free cbFree) {
 int GetObjectType(HGDIOBJ hgdiobj){
     return hgdiobj->type;
 }
+
 void* GetGdiObjPtr(HGDIOBJ hgdiobj){
     return hgdiobj->ptr;
 }
 
 void SetGdiObjPtr(HGDIOBJ hgdiObj, void* ptr) {
     hgdiObj->ptr = ptr;
+}
+
+int  RefGdiObj(HGDIOBJ hgdiObj) {
+    return ++hgdiObj->nRef;
 }
 
 static bool IsNullPen(HPEN hpen) {
@@ -149,8 +170,8 @@ static bool ApplyBrush(cairo_t * ctx,HBRUSH hbr){
         break;
         case BS_PATTERN:
         {
-            cairo_pattern_t *pattern = (cairo_pattern_t*)br->lbHatch;
-            cairo_set_source(ctx,pattern);
+            PatternInfo* info = (PatternInfo*)br->lbHatch;
+            cairo_set_source(ctx,info->pattern);
             break;
         }
     }
@@ -255,6 +276,8 @@ DWORD iOutPrecision, DWORD iClipPrecision, DWORD iQuality, DWORD iPitchAndFamily
 
 HBITMAP CreateDIBitmap(HDC hdc, const BITMAPINFOHEADER *pbmih, DWORD flInit, const VOID *pjBits, const BITMAPINFO *pbmi, UINT iUsage)
 {
+    if (iUsage != DIB_RGB_COLORS)
+        return nullptr;
     HBITMAP bmp = CreateDIBSection(hdc,pbmi,0,nullptr,0,0);
     if(bmp){
         UpdateDIBPixmap(bmp,pbmi->bmiHeader.biWidth,pbmi->bmiHeader.biHeight,pbmi->bmiHeader.biBitCount,pbmi->bmiHeader.biWidth*4,pjBits);
@@ -264,12 +287,33 @@ HBITMAP CreateDIBitmap(HDC hdc, const BITMAPINFOHEADER *pbmih, DWORD flInit, con
 
 HBRUSH  CreateDIBPatternBrush(HGLOBAL h, UINT iUsage)
 {
-    return 0;
+    //todo:hjx
+    return nullptr;
 }
 
 HBRUSH CreateDIBPatternBrushPt(const VOID *lpPackedDIB, UINT iUsage)
 {
-    return 0;
+    BITMAPINFO* pInfo = (BITMAPINFO*)lpPackedDIB;
+    HBITMAP bmp = CreateDIBitmap(nullptr, &pInfo->bmiHeader, 1,pInfo+1, pInfo,iUsage);
+    if (!bmp) {
+        return nullptr;
+    }
+    HBRUSH ret =  CreatePatternBrush(bmp);
+    DeleteObject(bmp);
+    return ret;
+}
+
+HBRUSH CreatePatternBrush(HBITMAP bmp)
+{
+    LOGBRUSH* plog = new LOGBRUSH;
+    plog->lbStyle = BS_PATTERN;
+    PatternInfo* info = new PatternInfo;
+    info->bmp = bmp;
+    info->pattern = cairo_pattern_create_for_surface((cairo_surface_t*)GetGdiObjPtr(bmp));
+    RefGdiObj(bmp);
+    plog->lbHatch = (UINT_PTR)info;
+    return InitGdiObj(OBJ_BRUSH, plog);
+
 }
 
 HBRUSH CreateSolidBrush(COLORREF color)
@@ -400,6 +444,8 @@ BOOL DeleteObject(HGDIOBJ hObj)
 {
     if(!hObj)
         return FALSE;
+    if (--hObj->nRef > 0)
+        return TRUE;
     if (hObj->ptr && hObj->cbFree) {
         hObj->cbFree(hObj->ptr);
     }
@@ -1327,4 +1373,50 @@ COLORREF  SetTextColor(HDC hdc, COLORREF color)
 HANDLE LoadImage(HINSTANCE hInst, LPCSTR name, UINT type, int cx, int cy, UINT fuLoad)
 {
     return HANDLE();
+}
+
+static double color16_to_double(USHORT v) {
+    return v * 1.0 / 0xffff;
+}
+
+static void NormalizeRect(RECT* prc) {
+    if (prc->left > prc->right) {
+        std::swap(prc->left, prc->right);
+    }
+    if (prc->top > prc->bottom) {
+        std::swap(prc->top, prc->bottom);
+    }
+}
+
+BOOL GradientFill(HDC hdc, TRIVERTEX* pVertices, ULONG nVertices, void* pMesh, ULONG nMeshElements, DWORD dwMode)
+{
+    if (dwMode == GRADIENT_FILL_TRIANGLE)
+        return FALSE;
+    PGRADIENT_RECT pGradientRect = (PGRADIENT_RECT)pMesh;
+    //fill rect horz
+    for (ULONG i = 0; i < nMeshElements; i++) {
+        if (pGradientRect[i].UpperLeft >= nVertices || pGradientRect[i].LowerRight >= nVertices)
+            return FALSE;
+        TRIVERTEX* vertix0 = pVertices + pGradientRect[i].UpperLeft;
+        TRIVERTEX* vertix1 = pVertices + pGradientRect[i].LowerRight;
+        cairo_pattern_t* gradient = dwMode == GRADIENT_FILL_RECT_H ?
+            cairo_pattern_create_linear(vertix0->x, vertix0->y, vertix1->x, vertix0->y) ://horz gradient
+            cairo_pattern_create_linear(vertix0->x, vertix0->y, vertix0->x, vertix1->y); //vert gradient
+
+        cairo_pattern_add_color_stop_rgba(gradient, 0, color16_to_double(vertix0->Red),
+            color16_to_double(vertix0->Green),
+            color16_to_double(vertix0->Blue),
+            color16_to_double(vertix0->Alpha));
+        cairo_pattern_add_color_stop_rgba(gradient, 1, color16_to_double(vertix1->Red),
+            color16_to_double(vertix1->Green),
+            color16_to_double(vertix1->Blue),
+            color16_to_double(vertix1->Alpha));
+        cairo_set_source(hdc->cairo, gradient);
+        RECT rc = { vertix0->x, vertix0->y, vertix1->x, vertix1->y };
+        NormalizeRect(&rc);
+        cairo_rectangle(hdc->cairo, rc.left,rc.top,rc.right-rc.left,rc.bottom-rc.top);
+        cairo_fill(hdc->cairo);
+        cairo_pattern_destroy(gradient);
+    }
+    return TRUE;
 }

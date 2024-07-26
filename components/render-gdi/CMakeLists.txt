@@ -3,21 +3,23 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 set(render-gdi_header
 	stdafx.h
-	win/GradientFillHelper.h
+	GradientFillHelper.h
 	win/render-gdi.h
 )
 
 set(render-gdi_src
-    win/GradientFillHelper.cpp
+    GradientFillHelper.cpp
     win/render-gdi.cpp
 )
 else()
 set(render-gdi_header
 	stdafx.h
+	GradientFillHelper.h
 	linux/render-gdi.h
 )
 
 set(render-gdi_src
+    GradientFillHelper.cpp
     linux/render-gdi.cpp
 )
 endif()

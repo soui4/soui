@@ -363,6 +363,36 @@ void SNativeWnd2::OnPaint(HDC hdc){
     SelectObject(memdc,oldBmp);
     DeleteDC(memdc);
 
+    {//test gradient
+        TRIVERTEX        vert[3];
+        GRADIENT_RECT    gRect[2];
+        vert[0].x = 10;
+        vert[0].y = 300;
+        vert[0].Red = 0x0000;
+        vert[0].Green = 0x0000;
+        vert[0].Blue = 0x0000;
+        vert[0].Alpha = 0xffff;
+
+        vert[1].x = 200;
+        vert[1].y = 350;
+        vert[1].Red = 0x0000;
+        vert[1].Green = 0x0000;
+        vert[1].Blue = 0xff00;
+        vert[1].Alpha = 0xffff;
+
+        vert[2].x = 300;
+        vert[2].y = 300;
+        vert[2].Red = 0x0000;
+        vert[2].Green = 0xff00;
+        vert[2].Blue = 0x0000;
+        vert[2].Alpha = 0xffff;
+
+        gRect[0].UpperLeft = 0;
+        gRect[0].LowerRight = 1;
+        gRect[1].UpperLeft = 1;
+        gRect[1].LowerRight = 2;
+        GradientFill(hdc, vert, 3, &gRect, 2, GRADIENT_FILL_RECT_H);
+    }
     EndPaint(m_hWnd,&ps);
 }
 void SNativeWnd2::OnClose(){
@@ -386,7 +416,7 @@ int run_window() {
     return ret;
 }
 TEST(demo,window){
-    //EXPECT_EQ(run_window(), 1);
+    EXPECT_EQ(run_window(), 1);
 }
 
 class CMainDlg : public SHostWnd {
@@ -434,5 +464,5 @@ int run_app(HINSTANCE hInst){
 
 TEST(demo,app){
     HINSTANCE hInst = 0;
-    EXPECT_EQ(run_app(hInst),0);
+    //EXPECT_EQ(run_app(hInst),0);
 }

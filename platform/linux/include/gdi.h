@@ -13,6 +13,7 @@ HGDIOBJ InitGdiObj(int type, void* ptr);
 HGDIOBJ InitGdiObj2(int type,void *ptr, fun_gdi_free cbFree);
 void* GetGdiObjPtr(HGDIOBJ hgdiobj);
 void SetGdiObjPtr(HGDIOBJ hgdiObj, void* ptr);
+int  RefGdiObj(HGDIOBJ hgdiObj);
 
 typedef struct  _XFORM { 
 	FLOAT eM11; 
@@ -28,7 +29,7 @@ typedef struct tagLOGBRUSH
   {
     UINT        lbStyle;
     COLORREF    lbColor;
-    ULONG_PTR    lbHatch;    // Sundown: lbHatch could hold a HANDLE
+    UINT_PTR    lbHatch;    // Sundown: lbHatch could hold a HANDLE
   } LOGBRUSH, *PLOGBRUSH, NEAR *NPLOGBRUSH, FAR *LPLOGBRUSH;
 
 #define BS_SOLID            0
@@ -128,6 +129,7 @@ HBITMAP WINAPI CreateDIBitmap(  HDC hdc,  CONST BITMAPINFOHEADER *pbmih,  DWORD 
 HBRUSH  WINAPI CreateDIBPatternBrush(  HGLOBAL h,  UINT iUsage);
 HBRUSH  WINAPI CreateDIBPatternBrushPt(  CONST VOID *lpPackedDIB,  UINT iUsage);
 HBRUSH  WINAPI CreateSolidBrush(  COLORREF color);
+HBRUSH  WINAPI CreatePatternBrush(HBITMAP bmp);
 HBITMAP WINAPI CreateDIBSection( HDC hdc,  CONST BITMAPINFO *lpbmi,  UINT usage,  VOID **ppvBits,  HANDLE hSection,  DWORD offset);
 BOOL    WINAPI UpdateDIBPixmap(HBITMAP bmp,int wid,int hei,int bitsPixel,int stride,CONST VOID*pjBits);
 void    WINAPI MarkPixmapDirty(HBITMAP bmp);
@@ -309,6 +311,37 @@ HANDLE LoadImage(
              int       cx,
              int       cy,
              UINT      fuLoad
+);
+
+typedef USHORT COLOR16;
+
+typedef struct _TRIVERTEX
+{
+    LONG    x;
+    LONG    y;
+    COLOR16 Red;
+    COLOR16 Green;
+    COLOR16 Blue;
+    COLOR16 Alpha;
+}TRIVERTEX, * PTRIVERTEX, * LPTRIVERTEX;
+
+typedef struct _GRADIENT_RECT {
+    ULONG    UpperLeft;
+    ULONG    LowerRight;
+}GRADIENT_RECT, * PGRADIENT_RECT;
+
+#define GRADIENT_FILL_RECT_H    0x00000000
+#define GRADIENT_FILL_RECT_V    0x00000001
+#define GRADIENT_FILL_TRIANGLE  0x00000002
+#define GRADIENT_FILL_OP_FLAG   0x000000ff
+
+BOOL WINAPI GradientFill(
+    HDC hdc,
+    TRIVERTEX* pVertices,
+    ULONG nVertices,
+    void* pMesh,
+    ULONG nMeshElements,
+    DWORD dwMode
 );
 
 #endif//_LINUX_GDI_H_

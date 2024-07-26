@@ -5,6 +5,7 @@
 #include <math.h>
 #include <tchar.h>
 #include <algorithm>
+#include "GradientFillHelper.h"
 
 namespace SOUI
 {
@@ -1093,32 +1094,31 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::DrawGradientRect(THIS_ LPCRECT pRect,  BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha)
     {
-		// DCBuffer dcBuf(m_hdc,pRect,byAlpha,FALSE);
-		// if (ptRoundCorner.x == 0 && ptRoundCorner.y == 0)
-		// {
-		// 	GradientFillRect(dcBuf,pRect,pGradients,nCount,bVert,0xFF);
-		// }
-		// else{
-		// 	int wid = pRect->right-pRect->left;
-		// 	int hei = pRect->bottom-pRect->top;
-		// 	HBITMAP hBmp = SBitmap_GDI::CreateGDIBitmap(wid,hei,NULL);
-		// 	HDC hMemDC = ::CreateCompatibleDC(m_hdc);
-		// 	::SetBkMode(hMemDC,TRANSPARENT);
-		// 	HGDIOBJ hOldBmp = ::SelectObject(hMemDC,hBmp);	
-		// 	::SetViewportOrgEx(hMemDC,-pRect->left,-pRect->top,NULL);
-		// 	GradientFillRect(hMemDC,pRect,pGradients,nCount,bVert,0xFF);
-		// 	::SelectObject(hMemDC,hOldBmp);
-		// 	DeleteDC(hMemDC);
+		 if (ptRoundCorner.x == 0 && ptRoundCorner.y == 0)
+		 {
+		 	GradientFillRect(m_hdc,pRect,pGradients,nCount,bVert,0xFF);
+		 }
+		 else{
+		 	int wid = pRect->right-pRect->left;
+		 	int hei = pRect->bottom-pRect->top;
+		 	HBITMAP hBmp = SBitmap_GDI::CreateGDIBitmap(wid,hei,NULL);
+		 	HDC hMemDC = ::CreateCompatibleDC(m_hdc);
+		 	::SetBkMode(hMemDC,TRANSPARENT);
+		 	HGDIOBJ hOldBmp = ::SelectObject(hMemDC,hBmp);	
+		 	::SetViewportOrgEx(hMemDC,-pRect->left,-pRect->top,NULL);
+		 	GradientFillRect(hMemDC,pRect,pGradients,nCount,bVert,0xFF);
+		 	::SelectObject(hMemDC,hOldBmp);
+		 	DeleteDC(hMemDC);
 
-		// 	HBRUSH hbr = ::CreatePatternBrush(hBmp);
+		 	HBRUSH hbr = ::CreatePatternBrush(hBmp);
 
-		// 	HGDIOBJ oldBr = ::SelectObject(dcBuf,hbr);
-		// 	::SelectObject(dcBuf,GetStockObject(NULL_PEN));
-		// 	::RoundRect(dcBuf,pRect->left,pRect->top,pRect->right,pRect->bottom,ptRoundCorner.x*2,ptRoundCorner.y*2);
-		// 	::SelectObject(dcBuf,oldBr);
-		// 	::DeleteObject(hbr);
-		// 	::DeleteObject(hBmp);
-		// }
+		 	HGDIOBJ oldBr = ::SelectObject(m_hdc,hbr);
+		 	::SelectObject(m_hdc,GetStockObject(NULL_PEN));
+		 	::RoundRect(m_hdc,pRect->left,pRect->top,pRect->right,pRect->bottom,ptRoundCorner.x*2,ptRoundCorner.y*2);
+		 	::SelectObject(m_hdc,oldBr);
+		 	::DeleteObject(hbr);
+		 	::DeleteObject(hBmp);
+		 }
         return S_OK;
     }
 
