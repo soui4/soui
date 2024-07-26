@@ -537,6 +537,39 @@ static int matrix_is_identity(const cairo_matrix_t *matrix) {
             matrix->y0 == identity_matrix.y0;
 }
 
+static bool matrix_inverse(double A[3][3], double A_inv[3][3]) {
+    double det = A[0][0] * (A[1][1] * A[2][2] - A[1][2] * A[2][1]) - A[0][1] * (A[1][0] * A[2][2] - A[1][2] * A[2][0]) + A[0][2] * (A[1][0] * A[2][1] - A[1][1] * A[2][0]);
+
+    if (det == 0) {
+        //printf("矩阵不可逆，因为行列式为零。\n");
+        return false;
+    }
+
+    A_inv[0][0] = (A[1][1] * A[2][2] - A[1][2] * A[2][1]) / det;
+    A_inv[0][1] = (A[0][2] * A[2][1] - A[0][1] * A[2][2]) / det;
+    A_inv[0][2] = (A[0][1] * A[1][2] - A[0][2] * A[1][1]) / det;
+    A_inv[1][0] = (A[1][2] * A[2][0] - A[1][0] * A[2][2]) / det;
+    A_inv[1][1] = (A[0][0] * A[2][2] - A[0][2] * A[2][0]) / det;
+    A_inv[1][2] = (A[0][2] * A[1][0] - A[0][0] * A[1][2]) / det;
+    A_inv[2][0] = (A[1][0] * A[2][1] - A[1][1] * A[2][0]) / det;
+    A_inv[2][1] = (A[0][1] * A[2][0] - A[0][0] * A[2][1]) / det;
+    A_inv[2][2] = (A[0][0] * A[1][1] - A[0][1] * A[1][0]) / det;
+    return true;
+}
+
+static bool cairo_matrix_inverse(const cairo_matrix_t* src, cairo_matrix_t* inv) {
+    double A[3][3];
+    A[0][0] = src->xx;   A[0][1] = src->yx;   A[0][2] = 0;
+    A[1][0] = src->xy;   A[1][1] = src->yy;   A[1][2] = 0;
+    A[2][0] = src->x0;   A[2][1] = src->y0;   A[2][2] = 1;
+    double A_inv[3][3];
+    if (!matrix_inverse(A, A_inv))
+        return false;
+    inv->xx = A_inv[0][0]; inv->yx = A_inv[0][1];
+    inv->xy = A_inv[1][0]; inv->yy = A_inv[1][1];
+    inv->x0 = A_inv[2][0]; inv->y0 = A_inv[2][1];
+    return true;
+}
 
 BOOL InvertRgn(HDC hdc, HRGN hrgn)
 {
@@ -612,11 +645,26 @@ BOOL PaintRgn(HDC hdc, HRGN hrgn)
     return TRUE;
 }
 
+static void ApplySrcMatrix(cairo_t* dst, cairo_t* src_ctx) {
+    //todo: if src dc has a transform matrix, apply it's inverse matrix to dst cairo context. result has not been verified right now.
+    cairo_matrix_t mtx;
+    cairo_get_matrix(src_ctx, &mtx);
+    if (!matrix_is_identity(&mtx)) {
+        cairo_matrix_t inv;
+        if (cairo_matrix_inverse(&mtx, &inv)) {
+            cairo_transform(dst, &inv);
+        }
+    }
+}
+
 BOOL  AlphaBlend(HDC hdc, int x, int y, int wDst, int hDst, HDC hdcSrc, int x1, int y1, int wSrc, int hSrc, BLENDFUNCTION ftn)
 {
     assert(hdc && hdcSrc);
     cairo_surface_t *src = (cairo_surface_t *)GetGdiObjPtr(hdcSrc->bmp);
     cairo_save(hdc->cairo);
+
+    ApplySrcMatrix(hdc->cairo, hdcSrc->cairo);
+
     cairo_rectangle(hdc->cairo,x,y,wDst,hDst);
     cairo_clip(hdc->cairo);
     
@@ -638,6 +686,8 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
     cairo_surface_t *src = (cairo_surface_t *)GetGdiObjPtr(hdcSrc->bmp);
 
     cairo_save(hdc->cairo);
+    ApplySrcMatrix(hdc->cairo, hdcSrc->cairo);
+
     cairo_rectangle(hdc->cairo,x,y,cx,cy);
     cairo_clip(hdc->cairo);
     cairo_rectangle(hdc->cairo,x,y,cx,cy);
