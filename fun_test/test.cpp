@@ -416,7 +416,7 @@ int run_window() {
     return ret;
 }
 TEST(demo,window){
-    EXPECT_EQ(run_window(), 1);
+    //EXPECT_EQ(run_window(), 1);
 }
 
 class CMainDlg : public SHostWnd {
@@ -464,5 +464,5 @@ int run_app(HINSTANCE hInst){
 
 TEST(demo,app){
     HINSTANCE hInst = 0;
-    //EXPECT_EQ(run_app(hInst),0);
+    EXPECT_EQ(run_app(hInst),0);
 }
