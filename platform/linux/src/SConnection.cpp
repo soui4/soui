@@ -492,14 +492,17 @@ bool SConnection::pushEvent(xcb_generic_event_t *event){
             }
             if (newState != SIZE_MINIMIZED) {
                 uint32_t state = netWmStates(e2->window);
-                if(state & (NetWmStateMaximizedHorz |NetWmStateMaximizedVert)){
+                printf("state changed, state=0x%08x\n",state);
+                if((state & (NetWmStateMaximizedHorz |NetWmStateMaximizedVert) )== (NetWmStateMaximizedHorz |NetWmStateMaximizedVert)){
                     newState = SIZE_MAXIMIZED;
+                }else if((state & (NetWmStateMaximizedHorz |NetWmStateMaximizedVert) )== 0){
+                    newState = SIZE_RESTORED;
                 }
             }
             if (newState != -1) {
                 pMsg = new Msg;
                 pMsg->hwnd = e2->window;
-                pMsg->message = WM_STATE;
+                pMsg->message = UM_STATE;
                 pMsg->wParam = newState;
             }
         }

@@ -388,7 +388,7 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
                 }
             }
         break;
-    case WM_STATE:
+    case UM_STATE:
         switch (wp) {
         case SIZE_MINIMIZED:
             wndObj->state = Minimized;
@@ -398,6 +398,8 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
             break;
         case SIZE_RESTORED:
             wndObj->state = Normal;
+            lp = MAKELPARAM(wndObj->rc.right-wndObj->rc.left,wndObj->rc.bottom-wndObj->rc.top);
+            CallWindowProc(proc,hWnd,WM_SIZE,0,lp);//call size again
             break;
         }
         printf("wm_state, wp=%d\n",wp);
@@ -770,6 +772,25 @@ static void SendSysCommand(SConnection *conn, xcb_window_t wnd, uint32_t cmd) {
     xcb_flush(conn->connection);
 }
 
+
+static void SendSysRestore(SConnection *conn, xcb_window_t wnd) {
+
+    xcb_client_message_event_t event;
+    event.response_type = XCB_CLIENT_MESSAGE;
+    event.window = wnd;
+    event.format = 32;
+    event.sequence=0;
+    event.type = conn->_NET_WM_STATE_ATOM;
+    event.data.data32[0] = 0;
+    event.data.data32[1] = conn->_NET_WM_STATE_MAXIMIZED_VERT_ATOM;
+    event.data.data32[2] = conn->_NET_WM_STATE_MAXIMIZED_HORZ_ATOM;
+    event.data.data32[3] = 0;
+    event.data.data32[4] = 0;
+
+    xcb_send_event(conn->connection, false, conn->screen->root, XCB_EVENT_MASK_STRUCTURE_NOTIFY|XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT, (const char*)&event);
+    xcb_flush(conn->connection);
+}
+
 HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
@@ -788,7 +809,7 @@ HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
             ChangeNetWmState(wndObj->mConnection,hWnd,true,wndObj->mConnection->_NET_WM_STATE_MAXIMIZED_HORZ_ATOM,wndObj->mConnection->_NET_WM_STATE_MAXIMIZED_VERT_ATOM);
             break;
         case SC_RESTORE:
-            //SendSysCommand(wndObj->mConnection, hWnd, wndObj->mConnection->wm_state_restore);
+            SendSysRestore(wndObj->mConnection, hWnd);
             break;
         case SC_CLOSE:
             SendMessage(hWnd, WM_CLOSE, 0, 0);
