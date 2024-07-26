@@ -842,7 +842,6 @@ static HRESULT HandleScMove(HWND hWnd, UINT flag) {
             }
             else if (msg.message == WM_LBUTTONUP) {
                 bQuit = TRUE;
-                printf("move window quit!!\n");
                 break;
             }
             else if (msg.message == WM_MOUSEMOVE) {
@@ -854,7 +853,6 @@ static HRESULT HandleScMove(HWND hWnd, UINT flag) {
                     int32_t x = rcWnd.left + ptNow.x - ptClick.x;
                     int32_t y = rcWnd.top + ptNow.y - ptClick.y;
                     SetWindowPos(hWnd, 0, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-                    printf("move window to (%d,%d)\n", x, y);
                 }
                     break;
                 case HTTOP:
@@ -978,7 +976,7 @@ HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
                                 XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, coords);
                 SendMessage(hWnd,WM_SIZE,0,MAKELPARAM(wndPos.cx,wndPos.cy));
             }
-            int showCmd = SW_HIDE;
+            int showCmd = -1;
             if(wndPos.flags & SWP_SHOWWINDOW)
             {
                 if(wndPos.flags & SWP_NOACTIVATE)
@@ -986,8 +984,12 @@ HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
                 else
                     showCmd = SW_SHOWNOACTIVATE;
             }
-            
-            ShowWindow(wndPos.hwnd,showCmd);
+            else if (wndPos.flags & SWP_HIDEWINDOW)
+            {
+                showCmd = SW_HIDE;
+            }            
+            if(showCmd!=-1) 
+                ShowWindow(wndPos.hwnd,showCmd);
             xcb_flush(wndObj->mConnection->connection);
             if((!wndPos.flags & SWP_NOREDRAW)){
                 InvalidateRect(hWnd,nullptr,TRUE);
