@@ -177,4 +177,12 @@ int ReleaseDC(HWND hWnd,HDC hdc);
 
 int MapWindowPoints(HWND hWndFrom,HWND hWndTo, LPPOINT lpPoint, UINT nCount);
 
+HWND WINAPI SetCapture(
+   HWND hWnd
+);
+
+BOOL WINAPI ReleaseCapture();
+
+HWND WINAPI GetCapture();
+
 #endif//_WND_H__

@@ -40,7 +40,7 @@ public:
         NetWmStateStaysOnTop = 0x40,
         NetWmStateDemandsAttention = 0x80
     };
-    
+
   SConnection(int screenNum);
   ~SConnection();
 public:
@@ -74,6 +74,10 @@ public:
         UINT_PTR id);
     HDC GetDC();
     BOOL ReleaseDC(HDC hdc);
+
+    HWND SetCapture(HWND hCapture);
+    BOOL ReleaseCapture();
+    HWND GetCapture() const;
 private:
   uint32_t netWmStates(HWND hWnd);
   bool pushEvent(xcb_generic_event_t *e);
@@ -98,6 +102,7 @@ private:
     std::list<TimerInfo> m_lstTimer;
     HDC m_deskDC;
     HBITMAP m_deskBmp;
+    HWND m_hWndCapture;
 };
 
 class SConnMgr : SNoCopyable{

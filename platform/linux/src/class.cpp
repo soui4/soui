@@ -193,7 +193,6 @@ static CLASS *find_class( HINSTANCE module, UNICODE_STRING *name ){
  */
 ATOM WINAPI NtUserGetClassInfoEx( HINSTANCE instance, UNICODE_STRING *name, WNDCLASSEX *wc)
 {
-    static const char messageW[] = {'M','e','s','s','a','g','e'};
     CLASS *_class;
     ATOM atom;
     if (!(_class = find_class( instance, name ))) return 0;
@@ -209,7 +208,7 @@ ATOM WINAPI NtUserGetClassInfoEx( HINSTANCE instance, UNICODE_STRING *name, WNDC
         wc->hIconSm       = _class->hIconSm ? _class->hIconSm : _class->hIconSmIntern;
         wc->hCursor       = _class->hCursor;
         wc->hbrBackground = _class->hbrBackground;
-        wc->lpszClassName = name->Buffer;
+        wc->lpszClassName = _class->basename;
     }
     atom = _class->atomName;
     return atom;
@@ -222,7 +221,7 @@ ATOM get_class_info( HINSTANCE instance, const char *class_name, WNDCLASSEX *inf
     ATOM atom;
 
     std::unique_lock<std::recursive_mutex> lock(cls_mutex);
-    UNICODE_STRING name={0,(char*)class_name,strlen(class_name)};
+    UNICODE_STRING name={0,(char*)class_name,IS_INTRESOURCE(class_name)?0:strlen(class_name)};
     atom = NtUserGetClassInfoEx( instance, &name, info);
 
     if (atom && name_str){
@@ -231,7 +230,7 @@ ATOM get_class_info( HINSTANCE instance, const char *class_name, WNDCLASSEX *inf
             assert(false);
             return 0;
         }    
-        strcpy(name_str->Buffer,class_name);
+        strcpy(name_str->Buffer,info->lpszClassName);
     }
     return atom;
 }

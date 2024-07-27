@@ -175,6 +175,8 @@ SConnection::SConnection(int screenNum)
     m_bQuit=false;
     m_msgPeek = nullptr;
     m_bMsgNeedFree = false;
+    m_hWndCapture = 0;
+
     m_trdEvtReader = std::move(std::thread(std::bind(&readProc, this)));
 
     m_deskDC = new _SDC(screen->root);
@@ -375,6 +377,38 @@ BOOL SConnection::ReleaseDC(HDC hdc)
 {
     //todo:hjx
     return TRUE;
+}
+
+HWND SConnection::SetCapture(HWND hCapture)
+{
+    xcb_grab_pointer(
+        connection,
+        1, // 这个标志位表示不使用对子窗口的事件
+        hCapture,
+        XCB_EVENT_MASK_BUTTON_PRESS|XCB_EVENT_MASK_BUTTON_RELEASE|XCB_EVENT_MASK_POINTER_MOTION, 
+        XCB_GRAB_MODE_ASYNC, // 异步捕获
+        XCB_GRAB_MODE_ASYNC,
+        XCB_NONE, // 捕获事件的窗口
+        XCB_NONE, // 使用默认光标
+        XCB_CURRENT_TIME // 立即开始捕获
+    );
+
+    HWND ret = m_hWndCapture;
+    m_hWndCapture = hCapture;
+    return ret;
+}
+
+BOOL SConnection::ReleaseCapture()
+{
+    if(!m_hWndCapture)
+        return FALSE;
+    m_hWndCapture = 0;
+    xcb_ungrab_pointer(connection,XCB_CURRENT_TIME);
+    return TRUE;
+}
+
+HWND SConnection::GetCapture() const{
+    return m_hWndCapture;
 }
 
 static uint32_t TsSpan(uint32_t t1, uint32_t t2) {

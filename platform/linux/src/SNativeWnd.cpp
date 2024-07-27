@@ -728,20 +728,17 @@ HWND SNativeWnd::SetFocus()
 HWND SNativeWnd::SetCapture()
 {
     SASSERT(::IsWindow(m_hWnd));
-    return 0;
-    //return ::SetCapture(m_hWnd);
+    return ::SetCapture(m_hWnd);
 }
 
 HWND SNativeWnd::GetCapture()
 {
-    return 0;
-//    return ::GetCapture();
+    return ::GetCapture();
 }
 
 BOOL SNativeWnd::ReleaseCapture()
 {
-    return FALSE;
-//    return ::ReleaseCapture();
+    return ::ReleaseCapture();
 }
 
 BOOL SNativeWnd::ShowCaret()

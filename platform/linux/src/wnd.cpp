@@ -23,21 +23,16 @@ enum WndState {
     Maximized = 2,
 };
 
-struct DragingInfo {
-    UINT flag;
-    POINT ptClick;
-};
-
 struct _Window{
     std::recursive_mutex mutex;
     pthread_t tid;
     SConnection *mConnection;
-    DragingInfo* pDragingInfo;
     HDC           hdc;
     HBITMAP       bmp;
     std::string title; 
     RECT          rc;
     WndState      state;
+    ATOM          clsAtom;
     UINT_PTR           objOpaque;
     HWND               parent;        /* Window parent */
     HWND               owner;         /* Window owner */
@@ -151,6 +146,22 @@ static inline void set_win_data( void *ptr, LONG_PTR val, UINT size )
 extern bool NtUserGetAtomName( ATOM atomName, UNICODE_STRING *str );
 
 
+
+static BOOL _GetCursorPos(SConnection* conn,LPPOINT ppt) {
+    // 获取当前鼠标位置的请求
+    xcb_query_pointer_cookie_t pointer_cookie = xcb_query_pointer(conn->connection, conn->screen->root);
+    xcb_query_pointer_reply_t* pointer_reply = xcb_query_pointer_reply(conn->connection, pointer_cookie, NULL);
+    if (!pointer_reply) {
+        fprintf(stderr,"Failed to get mouse position\n");
+        return FALSE;
+    }
+    ppt->x = pointer_reply->root_x;
+    ppt->y = pointer_reply->root_y;
+    // 释放资源
+    free(pointer_reply);
+    return TRUE;
+}
+
 static BOOL InitWndDC(HWND hwnd, int cx, int cy) {
     assert(hwnd);
     WndObj wndObj = WndObj::fromHwnd(hwnd);
@@ -172,14 +183,15 @@ static BOOL InitWndDC(HWND hwnd, int cx, int cy) {
 static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 {
     WNDCLASSEX info={0};
-    if (!GetClassInfoEx( module, className, &info )){
+    ATOM clsAtom = GetClassInfoEx( module, className, &info );
+    if (!clsAtom){
         if(strcmp(className,CLS_WINDOW)==0){
             //built in class
             info.cbSize = sizeof(info);
             info.cbClsExtra = 0;
             info.lpfnWndProc = DefWindowProc;
             info.lpszClassName = CLS_WINDOW;
-            RegisterClassEx(&info);
+            clsAtom = RegisterClassEx(&info);
         }else{
             return FALSE;
         }    
@@ -199,7 +211,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     pWnd->dwStyle = cs->style;
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
-    pWnd->pDragingInfo = nullptr;
+    pWnd->clsAtom = clsAtom;
 
     HWND hWnd = xcb_generate_id(pWnd->mConnection->connection);
     static const uint32_t evt_mask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY
@@ -208,8 +220,8 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
         | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW
         | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE;
     uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-    uint32_t value_list[3] = { conn->screen->black_pixel };
-    if (cs->dwExStyle & WS_EX_TOOLWINDOW) {
+    uint32_t value_list[3] = { conn->screen->white_pixel };
+    if (!(cs->style & (WS_THICKFRAME|WS_BORDER))) {
         mask |= XCB_CW_OVERRIDE_REDIRECT;
         value_list[1] = 1;
         value_list[2] = evt_mask;
@@ -328,11 +340,6 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
         DeleteObject(wndObj->bmp);
         wndObj->bmp = nullptr;
     }
-    if (wndObj->pDragingInfo)
-    {
-        delete wndObj->pDragingInfo;
-        wndObj->pDragingInfo = nullptr;
-    }
     map_wnd.erase(it);
 
     //delete wndObj and release resource of the window object
@@ -346,19 +353,28 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
 
 BOOL WINAPI IsWindow(HWND hWnd)
 {
-    std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
-    auto it = map_wnd.find(hWnd);
-    return it != map_wnd.end();
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    return !!wndObj;
 }
 
 
 BOOL ClientToScreen(HWND hWnd, LPPOINT ppt)
 {
-    return 0;
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj)
+        return FALSE;
+    ppt->x += wndObj->rc.left;
+    ppt->y += wndObj->rc.top;
+    return TRUE;
 }
 BOOL ScreenToClient(HWND hWnd, LPPOINT ppt)
 {
-    return 0;
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj)
+        return FALSE;
+    ppt->x -= wndObj->rc.left;
+    ppt->y -= wndObj->rc.top;
+    return TRUE;
 }
 
 HMONITOR
@@ -382,11 +398,185 @@ BOOL PostMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
     return TRUE;
 }
 
+HWND SetCapture(
+   HWND hWnd
+){
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj)
+        return 0;
+    HWND oldCapture = wndObj->mConnection->SetCapture(hWnd);
+    //todo:hjx
+    SendMessage(hWnd,WM_CAPTURECHANGED,0,hWnd);
+    return oldCapture;
+}
+
+BOOL ReleaseCapture(){
+    SConnection *conn = SConnMgr::instance()->getConnection();
+    return conn->ReleaseCapture();
+}
+
+HWND GetCapture(){
+    SConnection *conn = SConnMgr::instance()->getConnection();
+    return conn->GetCapture();
+}
+
+static HRESULT HandleNcTestCode(HWND hWnd, UINT htCode) {
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if (!wndObj)
+        return -1;
+
+    POINT ptClick;
+    if (!_GetCursorPos(wndObj->mConnection, &ptClick))
+        return -1;
+    if(!(htCode>=HTCAPTION && htCode <=HTBOTTOMRIGHT))
+        return -2;
+     
+    RECT rcWnd = wndObj->rc;
+    BOOL bQuit = FALSE;
+    SetCapture(hWnd);
+    for (; !bQuit;) {
+        MSG msg;
+        if (!WaitMessage())
+            break;
+        while (PeekMessage(&msg, hWnd, 0, 0, TRUE)) {
+            if (msg.message == WM_QUIT) {
+                bQuit = TRUE;
+                wndObj->mConnection->postMsg(msg.hwnd, msg.message, msg.wParam, msg.lParam);
+                break;
+            }
+            else if (msg.message == WM_LBUTTONUP) {
+                bQuit = TRUE;
+                break;
+            }
+            else if (msg.message == WM_MOUSEMOVE) {
+                POINT ptNow;
+                _GetCursorPos(wndObj->mConnection, &ptNow);
+                switch (htCode) {
+                case HTCAPTION:
+                {//move window
+                    int32_t x = rcWnd.left + ptNow.x - ptClick.x;
+                    int32_t y = rcWnd.top + ptNow.y - ptClick.y;
+                    SetWindowPos(hWnd, 0, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
+                }
+                    break;
+                case HTTOP:
+                {//
+                    RECT rcNow = rcWnd;
+                    rcNow.top += ptNow.y - ptClick.y;
+                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right-rcNow.left, rcNow.bottom-rcNow.top, SWP_NOZORDER);
+                }
+                break;
+                case HTBOTTOM:
+                {//
+                    RECT rcNow = rcWnd;
+                    rcNow.bottom += ptNow.y - ptClick.y;
+                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER|SWP_NOMOVE);
+                }
+                break;
+                case HTLEFT:
+                {
+                    RECT rcNow = rcWnd;
+                    rcNow.left += ptNow.x - ptClick.x;
+                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER);
+                }
+                break;
+                case HTRIGHT:
+                {
+                    RECT rcNow = rcWnd;
+                    rcNow.right += ptNow.x - ptClick.x;
+                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER|SWP_NOMOVE);
+                }
+                break;
+                case HTTOPLEFT:
+                {
+                    RECT rcNow = rcWnd;
+                    rcNow.left += ptNow.x - ptClick.x;
+                    rcNow.top += ptNow.y - ptClick.y;
+                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER);
+                }
+                break;
+                case HTTOPRIGHT: 
+                {
+                    RECT rcNow = rcWnd;
+                    rcNow.right += ptNow.x - ptClick.x;
+                    rcNow.top += ptNow.y - ptClick.y;
+                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER);
+                }
+                break;
+                case HTBOTTOMLEFT:
+                {
+                    RECT rcNow = rcWnd;
+                    rcNow.left += ptNow.x - ptClick.x;
+                    rcNow.bottom += ptNow.y - ptClick.y;
+                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER);
+                }
+                break;
+                case HTSIZE:
+                case HTBOTTOMRIGHT:
+                {
+                    RECT rcNow = rcWnd;
+                    rcNow.right += ptNow.x - ptClick.x;
+                    rcNow.bottom += ptNow.y - ptClick.y;
+                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER|SWP_NOMOVE);
+                }
+                break;
+                }
+            }
+            else {
+                TranslateMessage(&msg);
+                DispatchMessage(&msg);
+            }
+        }
+    }
+    ReleaseCapture();
+
+    return 0;
+}
+
 LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) {
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if (!wndObj)
         return -1;
     switch (msg) {
+        case WM_LBUTTONDOWN:
+        case WM_LBUTTONUP:
+        case WM_MOUSEMOVE:
+        {
+            POINT pt;
+            _GetCursorPos(wndObj->mConnection,&pt);
+            int htCode = proc(hWnd,WM_NCHITTEST,0,MAKELPARAM(pt.x,pt.y));
+            if(htCode>HTCAPTION && htCode <HTBORDER){
+                if(msg == WM_MOUSEMOVE){
+                    //todo: set cursor according to htCode
+                    LPCSTR cursorId = nullptr;
+                    switch(htCode){
+                        case HTLEFT:
+                        case HTRIGHT:
+                        cursorId = IDC_SIZENS;
+                        break;
+                        case HTTOP:
+                        case HTBOTTOM:
+                        cursorId = IDC_SIZEWE;
+                        break;
+                        case HTTOPLEFT:
+                        case HTBOTTOMRIGHT:
+                        cursorId = IDC_SIZENWSE;
+                        break;
+                        case HTTOPRIGHT:
+                        case HTBOTTOMLEFT:
+                        cursorId = IDC_SIZENESW;
+                        break;
+                        case HTSIZE:
+                        cursorId = IDC_SIZENESW;
+                        break;              
+                    }
+                    SetCursor(LoadCursor(wndObj->hInstance,cursorId));
+                }else if(msg == WM_LBUTTONDOWN){
+                    HandleNcTestCode(hWnd,htCode);
+                }
+            }
+        }
+        break;
     case WM_MOVE:
         OffsetRect(&wndObj->rc,GET_X_LPARAM(lp)-wndObj->rc.left,GET_Y_LPARAM(lp)-wndObj->rc.top);
         break;
@@ -400,6 +590,7 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
                     ReleaseDC(hWnd,hdc);
                 }
             }
+        proc(hWnd,WM_ERASEBKGND,0,(LPARAM)wndObj->hdc);
         break;
     case UM_STATE:
         switch (wp) {
@@ -485,6 +676,7 @@ BOOL SetWindowPos(HWND hWnd, HWND hWndInsertAfter, int x, int y, int cx, int cy,
         wndPos.cx = 1;
     if(wndPos.cy < 1)
         wndPos.cy=1;
+    
     SendMessage(hWnd,WM_WINDOWPOSCHANGED,0,(LPARAM)&wndPos);
     return TRUE;
 }
@@ -663,21 +855,6 @@ HWND SetParent(HWND hWnd, HWND hParent){
     return (HWND)SetWindowLongPtr(hWnd,GWLP_HWNDPARENT,hParent);
 }
 
-static BOOL _GetCursorPos(SConnection* conn,LPPOINT ppt) {
-    // 获取当前鼠标位置的请求
-    xcb_query_pointer_cookie_t pointer_cookie = xcb_query_pointer(conn->connection, conn->screen->root);
-    xcb_query_pointer_reply_t* pointer_reply = xcb_query_pointer_reply(conn->connection, pointer_cookie, NULL);
-    if (!pointer_reply) {
-        fprintf(stderr,"Failed to get mouse position\n");
-        return FALSE;
-    }
-    ppt->x = pointer_reply->root_x;
-    ppt->y = pointer_reply->root_y;
-    // 释放资源
-    free(pointer_reply);
-    return TRUE;
-}
-
 BOOL GetCursorPos(LPPOINT ppt)
 {
     SConnection* conn = SConnMgr::instance()->getConnection();
@@ -820,126 +997,56 @@ static void SendSysRestore(SConnection *conn, xcb_window_t wnd) {
     xcb_flush(conn->connection);
 }
 
-static HRESULT HandleScMove(HWND hWnd, UINT flag) {
-    WndObj wndObj = WndObj::fromHwnd(hWnd);
-    if (!wndObj)
-        return -1;
-
-    POINT ptClick;
-    if (!_GetCursorPos(wndObj->mConnection, &ptClick))
-        return -1;
-    RECT rcWnd = wndObj->rc;
-    BOOL bQuit = FALSE;
-    for (; !bQuit;) {
-        MSG msg;
-        if (!WaitMessage())
-            break;
-        while (PeekMessage(&msg, hWnd, 0, 0, TRUE)) {
-            if (msg.message == WM_QUIT) {
-                bQuit = TRUE;
-                wndObj->mConnection->postMsg(msg.hwnd, msg.message, msg.wParam, msg.lParam);
-                break;
-            }
-            else if (msg.message == WM_LBUTTONUP) {
-                bQuit = TRUE;
-                break;
-            }
-            else if (msg.message == WM_MOUSEMOVE) {
-                POINT ptNow;
-                _GetCursorPos(wndObj->mConnection, &ptNow);
-                switch (flag) {
-                case HTCAPTION:
-                {//move window
-                    int32_t x = rcWnd.left + ptNow.x - ptClick.x;
-                    int32_t y = rcWnd.top + ptNow.y - ptClick.y;
-                    SetWindowPos(hWnd, 0, x, y, 0, 0, SWP_NOZORDER | SWP_NOSIZE);
-                }
-                    break;
-                case HTTOP:
-                {//
-                    RECT rcNow = rcWnd;
-                    rcNow.top += ptNow.y - ptClick.y;
-                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right-rcNow.left, rcNow.bottom-rcNow.top, SWP_NOZORDER);
-                }
-                break;
-                case HTBOTTOM:
-                {//
-                    RECT rcNow = rcWnd;
-                    rcNow.bottom += ptNow.y - ptClick.y;
-                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER|SWP_NOMOVE);
-                }
-                break;
-                case HTLEFT:
-                {
-                    RECT rcNow = rcWnd;
-                    rcNow.left += ptNow.x - ptClick.x;
-                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER);
-                }
-                break;
-                case HTRIGHT:
-                {
-                    RECT rcNow = rcWnd;
-                    rcNow.right += ptNow.x - ptClick.x;
-                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER|SWP_NOMOVE);
-                }
-                break;
-                case HTTOPLEFT:
-                {
-                    RECT rcNow = rcWnd;
-                    rcNow.left += ptNow.x - ptClick.x;
-                    rcNow.top += ptNow.y - ptClick.y;
-                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER);
-                }
-                break;
-                case HTTOPRIGHT: 
-                {
-                    RECT rcNow = rcWnd;
-                    rcNow.right += ptNow.x - ptClick.x;
-                    rcNow.top += ptNow.y - ptClick.y;
-                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER);
-                }
-                break;
-                case HTBOTTOMLEFT:
-                {
-                    RECT rcNow = rcWnd;
-                    rcNow.left += ptNow.x - ptClick.x;
-                    rcNow.bottom += ptNow.y - ptClick.y;
-                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER);
-                }
-                break;
-                case HTBOTTOMRIGHT:
-                {
-                    RECT rcNow = rcWnd;
-                    rcNow.right += ptNow.x - ptClick.x;
-                    rcNow.bottom += ptNow.y - ptClick.y;
-                    SetWindowPos(hWnd, 0, rcNow.left, rcNow.top, rcNow.right - rcNow.left, rcNow.bottom - rcNow.top, SWP_NOZORDER|SWP_NOMOVE);
-                }
-                break;
-                }
-            }
-            else {
-                TranslateMessage(&msg);
-                DispatchMessage(&msg);
-            }
-        }
-    }
-    return 0;
-}
 
 HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return -1;
     switch(msg){
+        case WM_ERASEBKGND:
+        {
+            WNDCLASSEX info={0};
+            //GetClassInfoEx return the atom value instead an bool
+            ATOM clsAtom = GetClassInfoEx( wndObj->hInstance, MAKEINTRESOURCE(wndObj->clsAtom), &info );
+            if(clsAtom && info.hbrBackground){
+                FillRect((HDC)lp,&wndObj->rc,info.hbrBackground);
+            }
+        }
+        break;
+        case WM_GETMINMAXINFO:
+            return -1;//not handle
+        case WM_WINDOWPOSCHANGING:
+        {
+            WINDOWPOS *lpWndPos = (WINDOWPOS*)lp;
+            if(!(lpWndPos->flags & (SWP_NOSIZE|SWP_NOMOVE))){
+                MINMAXINFO info={0};
+                if(0==SendMessage(hWnd,WM_GETMINMAXINFO,0,(LPARAM)&info)){
+                    if(lpWndPos->cx > info.ptMaxTrackSize.x)
+                        lpWndPos->cx = info.ptMaxTrackSize.x;
+                    if(lpWndPos->cx < info.ptMinTrackSize.x)
+                        lpWndPos->cx = info.ptMinTrackSize.x;
+
+                    if(lpWndPos->cy > info.ptMaxTrackSize.y)
+                        lpWndPos->cy = info.ptMaxTrackSize.y;
+                    if(lpWndPos->cy < info.ptMinTrackSize.y)
+                        lpWndPos->cy = info.ptMinTrackSize.y;
+
+                    if(lpWndPos->x > info.ptMaxPosition.x)
+                        lpWndPos->x = info.ptMaxPosition.x;
+                    if(lpWndPos->y > info.ptMaxPosition.y)
+                        lpWndPos->y = info.ptMaxPosition.y;
+                }
+            }
+            
+        }
+        break;
     case WM_SYSCOMMAND:
     {
         WORD action = wp & 0xfff0;
         switch (action) {
-        case SC_SIZE:
-            HandleScMove(hWnd, lp);
-            break;
         case SC_MOVE:
-            HandleScMove(hWnd, HTCAPTION);
+            if((wp&0x0f) == HTCAPTION) 
+                HandleNcTestCode(hWnd, HTCAPTION);
             break;
         case SC_MINIMIZE:
             SendSysCommand(wndObj->mConnection, hWnd, XCB_ICCCM_WM_STATE_ICONIC);
@@ -1075,44 +1182,19 @@ BOOL IsWindowVisible(HWND hWnd)
     return mapState == XCB_MAP_STATE_VIEWABLE;
 }
 
-static BOOL CheckWindowState(HWND hWnd, xcb_atom_t st){
+
+BOOL IsZoomed(HWND hWnd){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    SConnection *state = SConnMgr::instance()->getConnection(wndObj->tid);
-    assert(state);
-    xcb_connection_t *connection=wndObj->mConnection->connection;
-
-    xcb_get_property_cookie_t cookie = xcb_get_property(connection, 0, hWnd, XCB_ATOM_ATOM, state->_NET_WM_STATE_ATOM, 0, 1024);
-    xcb_get_property_reply_t *reply = xcb_get_property_reply(connection, cookie, NULL);
-    if (!reply) return FALSE;
-    xcb_atom_t *atoms = (xcb_atom_t*)xcb_get_property_value(reply);
-    int num_atoms = xcb_get_property_value_length(reply) / sizeof(xcb_atom_t);
-    BOOL bRet = FALSE;
-    for(int i=0;i<num_atoms;i++){
-        if(atoms[i] == st)
-        {
-            bRet = TRUE;
-            break;
-        }
-    }
-    free(reply);
-    return bRet;
-} 
-
-//todo:hjx 
-enum WmState : uint32_t {
-  WM_STATE_WITHDRAWN = 0,
-  WM_STATE_NORMAL = 1,
-  WM_STATE_ICONIC = 3,
-};
-
-BOOL IsZoomed(HWND hWnd){
-    return CheckWindowState(hWnd,WM_STATE_ICONIC);
+    return wndObj->state == Maximized;
 }
 
 BOOL IsIconic(HWND hWnd){
-    return CheckWindowState(hWnd,WM_STATE_ICONIC);
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if(!wndObj)
+        return FALSE;
+    return wndObj->state == Minimized;
 }
 
 int GetWindowText(HWND hWnd, LPTSTR lpszStringBuf, int nMaxCount)

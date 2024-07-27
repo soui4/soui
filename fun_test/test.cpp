@@ -405,7 +405,7 @@ int run_window() {
     int ret = 0;
     SNativeWnd::InitWndClass(0, "soui_host", FALSE);
     SNativeWnd2 wnd;
-    HWND hWnd = wnd.CreateNative("test window", WS_POPUP, 0, 0, 0, 0, 0, 0);
+    HWND hWnd = wnd.CreateNative("test window", WS_POPUP|WS_BORDER, 0, 0, 0, 0, 0, 0);
     if (hWnd) {
         wnd.SetWindowPos(0, 0, 0, 600, 600, SWP_NOMOVE | SWP_NOZORDER);
         wnd.ShowWindow(SW_SHOW);
@@ -416,7 +416,7 @@ int run_window() {
     return ret;
 }
 TEST(demo,window){
-    //EXPECT_EQ(run_window(), 1);
+    EXPECT_EQ(run_window(), 1);
 }
 
 class CMainDlg : public SHostWnd {

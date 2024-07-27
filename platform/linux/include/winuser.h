@@ -951,8 +951,9 @@ typedef struct tagMONITORINFO
 #define LWA_COLORKEY            0x00000001
 #define LWA_ALPHA               0x00000002
 
-//todo:hjx
-#define MAKEINTRESOURCE(x) #x
+#define IS_INTRESOURCE(_r) ((((ULONG_PTR)(_r)) >> 16) == 0)
+#define MAKEINTRESOURCE(x) ((LPSTR)(ULONG_PTR)(WORD((x))))
+
 #define IDC_ARROW           MAKEINTRESOURCE(32512)
 #define IDC_IBEAM           MAKEINTRESOURCE(32513)
 #define IDC_WAIT            MAKEINTRESOURCE(32514)
@@ -1265,8 +1266,6 @@ typedef struct tagRGBQUAD {
 
 #define CLEARTYPE_QUALITY       5
 #define CLEARTYPE_NATURAL_QUALITY       6
-
-#define IS_INTRESOURCE(_r) ((((ULONG_PTR)(_r)) >> 16) == 0)
 
 #define PM_NOREMOVE 0x0000  //Messages are not removed from the queue after processing by PeekMessage.
 #define PM_REMOVE   0x0001  //Messages are removed from the queue after processing by PeekMessage.
