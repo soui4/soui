@@ -431,6 +431,7 @@ static HRESULT HandleNcTestCode(HWND hWnd, UINT htCode) {
     if(!(htCode>=HTCAPTION && htCode <=HTBOTTOMRIGHT))
         return -2;
      
+    wndObj->mConnection->SetTimerBlock(true);
     RECT rcWnd = wndObj->rc;
     BOOL bQuit = FALSE;
     SetCapture(hWnd);
@@ -529,7 +530,7 @@ static HRESULT HandleNcTestCode(HWND hWnd, UINT htCode) {
         }
     }
     ReleaseCapture();
-
+    wndObj->mConnection->SetTimerBlock(false);
     return 0;
 }
 
@@ -574,6 +575,10 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
                 }else if(msg == WM_LBUTTONDOWN){
                     HandleNcTestCode(hWnd,htCode);
                 }
+            }else{
+                WNDCLASSEX wc;
+                GetClassInfoEx(wndObj->hInstance,MAKEINTRESOURCE(wndObj->clsAtom),&wc);
+                SetCursor(wc.hCursor);
             }
         }
         break;

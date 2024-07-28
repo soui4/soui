@@ -78,6 +78,14 @@ public:
     HWND SetCapture(HWND hCapture);
     BOOL ReleaseCapture();
     HWND GetCapture() const;
+
+    HCURSOR SetCursor(HCURSOR cursor);
+    HCURSOR LoadCursor(LPCSTR pszName);
+    BOOL DestroyCursor(HCURSOR cursor);
+
+    void SetTimerBlock(bool bBlock){
+        m_bBlockTimer = bBlock;
+    }
 private:
   uint32_t netWmStates(HWND hWnd);
   bool pushEvent(xcb_generic_event_t *e);
@@ -100,9 +108,14 @@ private:
     std::atomic<bool> m_bQuit;
 
     std::list<TimerInfo> m_lstTimer;
+    bool m_bBlockTimer;
+
     HDC m_deskDC;
     HBITMAP m_deskBmp;
     HWND m_hWndCapture;
+    HCURSOR m_hCursor;
+
+    std::map<WORD,HCURSOR> m_sysCursor;
 };
 
 class SConnMgr : SNoCopyable{

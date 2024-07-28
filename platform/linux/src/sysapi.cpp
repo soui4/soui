@@ -716,10 +716,6 @@ int GetSystemMetrics(int nIndex)
     return 0;
 }
 
-void SetCursor(HCURSOR hCursor)
-{
-}
-
 BOOL ShellExecute(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters, LPCSTR lpDirectory, INT nShowCmd)
 {
     return FALSE;
@@ -783,14 +779,20 @@ __time64_t _time64(__time64_t *_Time)
 
 HCURSOR LoadCursor(HINSTANCE hInstance, LPCSTR lpCursorName)
 {
-    return 0;
+    SConnection *conn = SConnMgr::instance()->getConnection();
+    return conn->LoadCursor(lpCursorName);
 }
 
 BOOL DestroyCursor(HCURSOR hCursor)
 {
-    return 0;
+    SConnection *conn = SConnMgr::instance()->getConnection();
+    return conn->DestroyCursor(hCursor);
 }
 
+HCURSOR SetCursor(HCURSOR hCursor){
+    SConnection *conn = SConnMgr::instance()->getConnection();
+    return conn->SetCursor(hCursor);
+}
 
 BOOL IsFilePathValid(const char* path) {
     return access(path, F_OK) == 0;

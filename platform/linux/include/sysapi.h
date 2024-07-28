@@ -58,7 +58,7 @@ BOOL DispatchMessage(LPMSG pMsg);
 
 int GetSystemMetrics(int nIndex);
 
-void SetCursor(HCURSOR hCursor);
+HCURSOR SetCursor(HCURSOR hCursor);
 BOOL ShellExecute(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParameters,
     LPCSTR lpDirectory, INT nShowCmd);
 

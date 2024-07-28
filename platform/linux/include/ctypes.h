@@ -272,7 +272,7 @@ typedef HGDIOBJ HRGN;
 typedef UINT_PTR tid_t;
 typedef struct _SDC * HDC;
 #define HRSRC int
-#define HCURSOR int
+typedef uint32_t HCURSOR;
 
 
 #define HMENU int

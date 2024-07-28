@@ -8,6 +8,89 @@
 
 SNSBEGIN
 
+
+//Appendix B: X Font Cursors
+//The following are the available cursors that can be used with XCreateFontCursor().
+
+	#define XC_X_cursor 0 		
+    #define XC_ll_angle 76
+	#define XC_arrow 2 		
+    #define XC_lr_angle 78
+	#define XC_based_arrow_down 4 		
+    #define XC_man 80
+	#define XC_based_arrow_up 6 		
+    #define XC_middlebutton 82
+	#define XC_boat 8 		
+    #define XC_mouse 84
+	#define XC_bogosity 10 		
+    #define XC_pencil 86
+	#define XC_bottom_left_corner 12 		
+    #define XC_pirate 88
+	#define XC_bottom_right_corner 14 		
+    #define XC_plus 90
+	#define XC_bottom_side 16 		
+    #define XC_question_arrow 92
+	#define XC_bottom_tee 18 		
+    #define XC_right_ptr 94
+	#define XC_box_spiral 20 		
+    #define XC_right_side 96
+	#define XC_center_ptr 22 		
+    #define XC_right_tee 98
+	#define XC_circle 24 		
+    #define XC_rightbutton 100
+	#define XC_clock 26 		
+    #define XC_rtl_logo 102
+	#define XC_coffee_mug 28 		
+    #define XC_sailboat 104
+	#define XC_cross 30 		
+    #define XC_sb_down_arrow 106
+	#define XC_cross_reverse 32 		
+    #define XC_sb_h_double_arrow 108
+	#define XC_crosshair 34 		
+    #define XC_sb_left_arrow 110
+	#define XC_diamond_cross 36 		
+    #define XC_sb_right_arrow 112
+	#define XC_dot 38 		
+    #define XC_sb_up_arrow 114
+	#define XC_dot_box_mask 40 		
+    #define XC_sb_v_double_arrow 116
+	#define XC_double_arrow 42 		
+    #define XC_shuttle 118
+	#define XC_draft_large 44 		
+    #define XC_sizing 120
+	#define XC_draft_small 46 		
+    #define XC_spider 122
+	#define XC_draped_box 48 		
+    #define XC_spraycan 124
+	#define XC_exchange 50 		
+    #define XC_star 126
+	#define XC_fleur 52 		
+    #define XC_target 128
+	#define XC_gobbler 54 		
+    #define XC_tcross 130
+	#define XC_gumby 56 		
+    #define XC_top_left_arrow 132
+	#define XC_hand1 58 		
+    #define XC_top_left_corner 134
+	#define XC_hand2 60 		
+    #define XC_top_right_corner 136
+	#define XC_heart 62 		
+    #define XC_top_side 138
+	#define XC_icon 64 		
+    #define XC_top_tee 140
+	#define XC_iron_cross 66 		
+    #define XC_trek 142
+	#define XC_left_ptr 68 		
+    #define XC_ul_angle 144
+	#define XC_left_side 70 		
+    #define XC_umbrella 146
+	#define XC_left_tee 72 		
+    #define XC_ur_angle 148
+	#define XC_leftbutton 74 		
+    #define XC_watch 150
+	#define XC_xterm 152
+
+
 static SConnMgr *s_connMgr = NULL;
 static SCriticalSection s_cs;
 
@@ -176,6 +259,8 @@ SConnection::SConnection(int screenNum)
     m_msgPeek = nullptr;
     m_bMsgNeedFree = false;
     m_hWndCapture = 0;
+    m_hCursor = 0;
+    m_bBlockTimer = false;
 
     m_trdEvtReader = std::move(std::thread(std::bind(&readProc, this)));
 
@@ -190,6 +275,12 @@ SConnection::~SConnection()
     {
         return;
     }
+
+    for(auto it = m_sysCursor.begin();it!=m_sysCursor.end();it++){
+        xcb_free_cursor(connection,it->second);
+    }
+    m_sysCursor.clear();
+
     m_bQuit = true;
     xcb_disconnect(connection);
 
@@ -211,7 +302,7 @@ SConnection::~SConnection()
 
 bool SConnection::update(){
     UINT timeOut = -1;
-    {
+    if(!m_bBlockTimer){
         std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
         for (auto& it : m_lstTimer) {
             timeOut = std::min(timeOut, it.fireRemain);
@@ -228,7 +319,7 @@ bool SConnection::update(){
     bool bRet = !m_evtQueue.empty();
     m_evtQueue.clear();
     uint64_t ts2 = GetTickCount64();
-    {
+    if(!m_bBlockTimer){
         UINT elapse = ts2 - ts1;
         std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
         for (auto& it : m_lstTimer) {
@@ -409,6 +500,124 @@ BOOL SConnection::ReleaseCapture()
 
 HWND SConnection::GetCapture() const{
     return m_hWndCapture;
+}
+
+HCURSOR SConnection::SetCursor(HCURSOR cursor)
+{
+    if(!cursor)
+        cursor = LoadCursor(IDC_ARROW);
+    HCURSOR ret = m_hCursor;
+    if(cursor != m_hCursor){
+        uint32_t val[]={cursor};
+        xcb_change_window_attributes(connection, screen->root, XCB_CW_CURSOR,val);
+        m_hCursor= cursor;
+    }
+    return ret;
+}
+
+
+
+static HCURSOR
+load_font_cursor(xcb_connection_t *c,
+            xcb_screen_t     *screen,
+            int               cursor_id)
+{
+  xcb_font_t font = xcb_generate_id (c);
+  xcb_open_font (c, font,
+                                       strlen ("cursor"),
+                                       "cursor");
+
+  xcb_cursor_t cursor = xcb_generate_id (c);
+  xcb_create_glyph_cursor (c, cursor, font, font,
+                           cursor_id, cursor_id + 1,
+                           0, 0, 0,
+                           0, 0, 0);
+
+  xcb_close_font(c, font);
+  return cursor;
+}
+
+
+#define CIDC_ARROW           (32512)
+#define CIDC_IBEAM           (32513)
+#define CIDC_WAIT            (32514)
+#define CIDC_CROSS           (32515)
+#define CIDC_UPARROW         (32516)
+#define CIDC_SIZE            (32640)  
+#define CIDC_ICON            (32641)  
+#define CIDC_SIZENWSE        (32642)
+#define CIDC_SIZENESW        (32643)
+#define CIDC_SIZEWE          (32644)
+#define CIDC_SIZENS          (32645)
+#define CIDC_SIZEALL         (32646)
+#define CIDC_NO              (32648) 
+#define CIDC_HAND            (32649)
+#define CIDC_APPSTARTING     (32650) 
+#define CIDC_HELP            (32651)
+
+
+HCURSOR SConnection::LoadCursor(LPCSTR lpCursorName)
+{
+    HCURSOR ret = 0;
+    if(IS_INTRESOURCE(lpCursorName)){
+        WORD wId = (WORD)(ULONG_PTR)lpCursorName;
+        if(m_sysCursor.find(wId) != m_sysCursor.end())
+            return m_sysCursor[wId];
+        int cursorId = 0;
+        switch(wId){
+            case CIDC_ARROW:
+            cursorId = XC_left_ptr;
+            break;
+            case CIDC_IBEAM:
+            cursorId = XC_xterm;
+            break;
+            case CIDC_CROSS:
+            cursorId = XC_cross;
+            break;
+            case CIDC_UPARROW:
+            cursorId = XC_sb_up_arrow;
+            break;
+            case CIDC_SIZE:
+            cursorId = XC_sizing;
+            break;
+            case CIDC_SIZENWSE:
+            cursorId = XC_top_right_corner;
+            break;
+            case CIDC_SIZENESW:
+            cursorId = XC_top_left_corner;
+            break;
+            case CIDC_SIZEWE:
+            cursorId = XC_sb_v_double_arrow;
+            break;
+            case CIDC_SIZENS:
+            cursorId = XC_sb_h_double_arrow;
+            break;
+            case CIDC_SIZEALL:
+            cursorId = XC_cross_reverse;
+            break;
+            case CIDC_HAND:
+            cursorId = XC_hand1;
+            break;
+        }
+        
+        ret = load_font_cursor(connection,screen,cursorId);
+        if(ret){
+            m_sysCursor.insert(std::make_pair(wId,ret));
+        }
+    }
+    return ret;
+}
+
+BOOL SConnection::DestroyCursor(HCURSOR cursor)
+{
+    //look for sys cursor
+    for(auto it = m_sysCursor.begin();it!=m_sysCursor.end();it++){
+        if(it->second == cursor){
+            return TRUE;
+        }
+    }
+    xcb_free_cursor(connection,cursor);
+    return TRUE;
 }
 
 static uint32_t TsSpan(uint32_t t1, uint32_t t2) {

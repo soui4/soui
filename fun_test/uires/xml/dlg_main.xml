@@ -4,7 +4,7 @@
 	toolwnd="1"
 >
   <root  width="600" height="400" skin="_skin.sys.wnd.bkgnd" colorBkgnd="@color/white" layout="vbox">
-	  <caption size="-2,30" font="adding:2" layout="hbox" gravity="center" padding_left="10">
+	  <caption size="-2,30" font="adding:2" layout="hbox" gravity="center" padding_left="10" colorBkgnd="@color/blue">
 		  <text text="@string/title"/>
 		  <text text="QQ群:" extend_left="5"/>
 		  <text text="229313785" colorText="@color/red"/>
