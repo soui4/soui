@@ -193,7 +193,7 @@ void SNativeWndHelper::UnlockSharePtr()
 SNativeWnd::SNativeWnd()
     : m_bDestoryed(FALSE)
     , m_pCurrentMsg(NULL)
-    , m_hWnd(NULL)
+    , m_hWnd(0)
     , m_pfnSuperWindowProc(::DefWindowProc)
     , m_pThunk(NULL)
 {
@@ -250,7 +250,7 @@ void SNativeWnd::OnFinalMessage(HWND hWnd)
         HeapFree(SNativeWndHelper::instance()->GetHeap(), 0, m_pThunk);
         m_pThunk = NULL;
     }
-    m_hWnd = NULL;
+    m_hWnd = 0;
 }
 
 LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)

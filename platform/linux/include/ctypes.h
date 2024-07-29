@@ -169,8 +169,8 @@ typedef intptr_t LONG_PTR;
 typedef uintptr_t UINT_PTR;
 typedef uintptr_t ULONG_PTR;
 typedef intptr_t DWORD_PTR;
-typedef int32_t LRESULT;
-typedef int32_t HRESULT;
+typedef ULONG_PTR LRESULT;
+typedef ULONG_PTR HRESULT;
 typedef UINT_PTR WPARAM;
 typedef LONG_PTR LPARAM;
 typedef uint16_t USHORT;
@@ -259,7 +259,6 @@ typedef int BOOL;
 typedef void * HINSTANCE;
 typedef void * HMODULE;
 
-#define HICON int
 typedef UINT_PTR HWND;
 typedef struct _GdiObj * HGDIOBJ;
 
@@ -268,6 +267,7 @@ typedef HGDIOBJ HFONT;
 typedef HGDIOBJ HBRUSH;
 typedef HGDIOBJ HBITMAP;
 typedef HGDIOBJ HRGN;
+typedef HBITMAP HICON;
 
 typedef UINT_PTR tid_t;
 typedef struct _SDC * HDC;
@@ -492,7 +492,6 @@ typedef struct _FILETIME {
 typedef wchar_t OLECHAR;
 typedef OLECHAR **SNB;
 
-typedef LONG LRESULT;
 #define S_OK 0
 #define S_FALSE 1
 

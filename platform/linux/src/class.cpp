@@ -54,7 +54,6 @@ BOOL GetAtomName( ATOM atomName, LPSTR name, int cchLen)
 ATOM WINAPI RegisterClassEx( const WNDCLASSEX *wc)
 {
     HINSTANCE instance;
-    HICON sm_icon = 0;
     CLASS *_class;
     ATOM atom;
     BOOL ret;
@@ -106,7 +105,6 @@ ATOM WINAPI RegisterClassEx( const WNDCLASSEX *wc)
 
     _class->hIcon         = wc->hIcon;
     _class->hIconSm       = wc->hIconSm;
-    _class->hIconSmIntern = sm_icon;
     _class->hCursor       = wc->hCursor;
     _class->hbrBackground = wc->hbrBackground;
     _class->winproc       = wc->lpfnWndProc;
@@ -155,7 +153,6 @@ BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance )
             atom_map.erase(std::string(_class->name));
             //if (_class->hbrBackground > (HBRUSH)(COLOR_GRADIENTINACTIVECAPTION + 1))
             DeleteObject( _class->hbrBackground );
-            DestroyCursor( _class->hIconSmIntern);
             free(_class);
             class_list.erase(it);
             return TRUE;
@@ -201,7 +198,7 @@ static ATOM get_class_info( HINSTANCE instance, const char *class_name, WNDCLASS
         wc->cbWndExtra = _class->cbWndExtra;
         wc->hInstance = instance;
         wc->hIcon = _class->hIcon;
-        wc->hIconSm = _class->hIconSm ? _class->hIconSm : _class->hIconSmIntern;
+        wc->hIconSm = _class->hIconSm;
         wc->hCursor = _class->hCursor;
         wc->hbrBackground = _class->hbrBackground;
         wc->lpszClassName = _class->basename;

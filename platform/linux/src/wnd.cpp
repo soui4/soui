@@ -33,6 +33,8 @@ struct _Window{
     RECT          rc;
     WndState      state;
     ATOM          clsAtom;
+    HICON         iconBig;
+    HICON         iconSmall;
     UINT_PTR           objOpaque;
     HWND               parent;        /* Window parent */
     HWND               owner;         /* Window owner */
@@ -172,6 +174,24 @@ static BOOL InitWndDC(HWND hwnd, int cx, int cy) {
     return TRUE;
 }
 
+static void WIN_SetIcon(HWND hWnd, HICON hIcon) {
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if (wndObj) {
+        if (hIcon) {
+            BITMAP bm;
+            GetObject(hIcon, sizeof(bm), &bm);
+            if (bm.bmBitsPixel == 32) {
+                xcb_change_property(wndObj->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd,
+                    wndObj->mConnection->_NET_WM_ICON, XCB_ATOM_CARDINAL, 32, bm.bmWidth * bm.bmHeight, bm.bmBits);
+            }
+        }
+        else {
+            xcb_delete_property(wndObj->mConnection->connection, hWnd, wndObj->mConnection->_NET_WM_ICON);
+        }
+        xcb_flush(wndObj->mConnection->connection);
+    }
+}
+
 /***********************************************************************
  *           WIN_CreateWindowEx
  *
@@ -179,21 +199,21 @@ static BOOL InitWndDC(HWND hwnd, int cx, int cy) {
  */
 static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE module)
 {
-    WNDCLASSEX info={0};
-    ATOM clsAtom = GetClassInfoEx( module, className, &info );
+    WNDCLASSEX clsInfo={0};
+    ATOM clsAtom = GetClassInfoEx( module, className, &clsInfo );
     if (!clsAtom){
         if(strcmp(className,CLS_WINDOW)==0){
             //built in class
-            info.cbSize = sizeof(info);
-            info.cbClsExtra = 0;
-            info.lpfnWndProc = DefWindowProc;
-            info.lpszClassName = CLS_WINDOW;
-            clsAtom = RegisterClassEx(&info);
+            clsInfo.cbSize = sizeof(clsInfo);
+            clsInfo.cbClsExtra = 0;
+            clsInfo.lpfnWndProc = DefWindowProc;
+            clsInfo.lpszClassName = CLS_WINDOW;
+            clsAtom = RegisterClassEx(&clsInfo);
         }else{
             return FALSE;
         }    
     }
-    void * p = malloc(sizeof(_Window)+info.cbWndExtra-sizeof(DWORD));
+    void * p = malloc(sizeof(_Window)+clsInfo.cbWndExtra-sizeof(DWORD));
     _Window *pWnd = new(p)_Window();
     
     pWnd->tid = pthread_self();
@@ -209,6 +229,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
     pWnd->clsAtom = clsAtom;
+    pWnd->iconSmall = pWnd->iconBig = nullptr;
 
     HWND hWnd = xcb_generate_id(pWnd->mConnection->connection);
     static const uint32_t evt_mask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY
@@ -255,7 +276,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     xcb_flush(pWnd->mConnection->connection);
 
     pWnd->parent = hParent;
-    pWnd->winproc = info.lpfnWndProc;
+    pWnd->winproc = clsInfo.lpfnWndProc;
     {
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         map_wnd.insert(std::make_pair(hWnd,pWnd));
@@ -280,6 +301,12 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
         xcb_flush(wndObj->mConnection->connection);
         free(wndObj);
         hWnd = 0;
+    }
+    if (clsInfo.hIconSm) {
+        SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)clsInfo.hIconSm);
+    }
+    if (clsInfo.hIcon) {
+        SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)clsInfo.hIconSm);
     }
     return hWnd;
 }
@@ -335,6 +362,15 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
     if (wndObj->bmp) {
         DeleteObject(wndObj->bmp);
         wndObj->bmp = nullptr;
+    }
+
+    if (wndObj->iconBig) {
+        DeleteObject(wndObj->iconBig);
+        wndObj->iconBig = nullptr;
+    }
+    if (wndObj->iconSmall) {
+        DeleteObject(wndObj->iconSmall);
+        wndObj->iconSmall = nullptr;
     }
     map_wnd.erase(it);
 
@@ -999,11 +1035,29 @@ static void SendSysRestore(SConnection *conn, xcb_window_t wnd) {
 }
 
 
-HRESULT DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
+LRESULT  DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return -1;
     switch(msg){
+    case WM_SETICON:
+    {
+        if (wp == ICON_SMALL) {
+            HICON ret = wndObj->iconSmall;
+            wndObj->iconSmall = (HICON)lp;
+            if (!wndObj->iconBig) {
+                WIN_SetIcon(hWnd, wndObj->iconSmall);
+            }
+            return (LRESULT)ret;
+        }
+        else if (wp == ICON_BIG) {
+            HICON ret = wndObj->iconBig;
+            wndObj->iconBig = (HICON)lp;
+            WIN_SetIcon(hWnd, wndObj->iconBig);
+            return (LRESULT)ret;
+        }
+        break;
+    }
         case WM_ERASEBKGND:
         {
             WNDCLASSEX info={0};

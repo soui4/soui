@@ -12,7 +12,6 @@ typedef struct tagCLASS
     UINT_PTR     instance;      /* Module that created the task */
     HICON        hIcon;         /* Default icon */
     HICON        hIconSm;       /* Default small icon */
-    HICON        hIconSmIntern; /* Internal small icon, derived from hIcon */
     HCURSOR      hCursor;       /* Default cursor */
     HBRUSH       hbrBackground; /* Default background */
     ATOM         atomName;      /* Name of the class */

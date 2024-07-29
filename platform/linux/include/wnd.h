@@ -158,7 +158,7 @@ GetMonitorInfo(
  HMONITOR hMonitor,
  LPMONITORINFO lpmi);
 
-HRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp);
+LRESULT DefWindowProc(HWND hwnd,UINT msg,WPARAM wp,LPARAM lp);
 
 BOOL ShowWindow(HWND hWnd, int nCmdShow);
 

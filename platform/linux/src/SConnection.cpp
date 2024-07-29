@@ -254,6 +254,7 @@ SConnection::SConnection(int screenNum)
 
     _NET_WM_STATE_MAXIMIZED_HORZ_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_MAXIMIZED_HORZ");
     _NET_WM_STATE_MAXIMIZED_VERT_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_MAXIMIZED_VERT");
+    _NET_WM_ICON = SConnMgr::internAtom(connection, 1, "_NET_WM_ICON");
 
     m_bQuit=false;
     m_msgPeek = nullptr;
