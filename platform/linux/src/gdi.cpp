@@ -1444,7 +1444,7 @@ HANDLE LoadImage(HINSTANCE hInst, LPCSTR name, UINT type, int cx, int cy, UINT f
 {
     if(!(fuLoad & LR_LOADFROMFILE))
         return HANDLE(0);
-    if (type == IMAGE_ICON || type == IMAGE_BITMAP) {
+    if (type == IMAGE_ICON ) {
         //load png as icon
         cairo_surface_t* image = cairo_image_surface_create_from_png(name);
         if (!image)
@@ -1461,6 +1461,17 @@ HANDLE LoadImage(HINSTANCE hInst, LPCSTR name, UINT type, int cx, int cy, UINT f
             cairo_surface_destroy(image);
             image = scaled_surface;
         }
+        ICONINFO info;
+        info.fIcon = TRUE;
+        info.hbmColor = InitGdiObj(OBJ_BITMAP, image);
+        info.hbmMask = nullptr;        
+        return (HANDLE)CreateIconIndirect(&info);
+    }
+    else if (type == IMAGE_BITMAP)
+    {
+        cairo_surface_t* image = cairo_image_surface_create_from_png(name);
+        if (!image)
+            return 0;
         return (HANDLE)InitGdiObj(OBJ_BITMAP, image);
     }
     else {
@@ -1512,5 +1523,71 @@ BOOL GradientFill(HDC hdc, TRIVERTEX* pVertices, ULONG nVertices, void* pMesh, U
         cairo_fill(hdc->cairo);
         cairo_pattern_destroy(gradient);
     }
+    return TRUE;
+}
+
+struct _IconObj {
+    BOOL fIcon;
+    DWORD xHotspot;
+    DWORD yHotspot;
+    HBITMAP hbmMask;
+    HBITMAP hbmColor;
+};
+
+BOOL GetIconInfo(HICON hIcon,
+    PICONINFO piconinfo
+) {
+    if (!hIcon)
+        return FALSE;
+    piconinfo->fIcon = hIcon->fIcon;
+    piconinfo->xHotspot = hIcon->xHotspot;
+    piconinfo->yHotspot = hIcon->xHotspot;
+    piconinfo->hbmColor = hIcon->hbmColor;
+    piconinfo->hbmMask = hIcon->hbmMask;
+    return TRUE;
+}
+
+HICON CreateIconIndirect(PICONINFO piconinfo)
+{
+    _IconObj* icon = new _IconObj;
+    icon->fIcon = piconinfo->fIcon;
+    icon->xHotspot = piconinfo->xHotspot;
+    icon->yHotspot = piconinfo->xHotspot;
+    icon->hbmColor = piconinfo->hbmColor;
+    icon->hbmMask = piconinfo->hbmMask;
+    return icon;
+}
+
+BOOL DrawIcon(HDC hDC, int X, int Y, HICON hIcon)
+{
+    ICONINFO info;
+    if (!GetIconInfo(hIcon, &info))
+        return FALSE;
+    if (!info.hbmColor)
+        return FALSE;
+    BITMAP bm;
+    GetObject(info.hbmColor, sizeof(bm), &bm);
+    if (bm.bmBitsPixel != 32)
+        return FALSE;
+    HDC memdc = CreateCompatibleDC(hDC);
+    HGDIOBJ oldBmp = SelectObject(hDC, info.hbmColor);    
+    BLENDFUNCTION bf;
+    bf.BlendOp = AC_SRC_ALPHA;
+    bf.SourceConstantAlpha = 255;
+    AlphaBlend(hDC, X, Y, bm.bmWidth, bm.bmHeight, memdc, 0, 0, bm.bmWidth, bm.bmHeight, bf);
+    SelectObject(memdc, oldBmp);
+    DeleteDC(memdc);
+    return TRUE;
+}
+
+BOOL DestroyIcon(HICON hIcon)
+{
+    if (!hIcon)
+        return FALSE;
+    if (hIcon->hbmColor)
+        DeleteObject(hIcon->hbmColor);
+    if (hIcon->hbmMask)
+        DeleteObject(hIcon->hbmMask);
+    delete hIcon;
     return TRUE;
 }

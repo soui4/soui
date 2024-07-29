@@ -45,7 +45,6 @@ int  _localtime64_s (
         const __time64_t *ptime
         );
 
-void DestroyIcon(HICON hIcon);
 int  GetWindowScale(HWND hWnd);
 
 void PostThreadMessage(uint64_t tid, UINT msg,WPARAM wp,LPARAM lp);

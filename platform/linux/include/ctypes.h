@@ -267,7 +267,7 @@ typedef HGDIOBJ HFONT;
 typedef HGDIOBJ HBRUSH;
 typedef HGDIOBJ HBITMAP;
 typedef HGDIOBJ HRGN;
-typedef HBITMAP HICON;
+typedef struct _IconObj* HICON;
 
 typedef UINT_PTR tid_t;
 typedef struct _SDC * HDC;

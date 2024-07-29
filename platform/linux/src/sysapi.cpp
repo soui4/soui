@@ -664,11 +664,6 @@ static void swap(char *a, char *b, size_t width)
 #undef __SHORTSORT
 #undef swap
 
-void DestroyIcon(HICON hIcon)
-{
-}
-
-
 int GetWindowScale(HWND hWnd)
 {
     return 100;

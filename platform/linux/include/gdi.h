@@ -351,4 +351,26 @@ BOOL WINAPI GradientFill(
     DWORD dwMode
 );
 
+typedef struct _ICONINFO {
+    BOOL fIcon;
+    DWORD xHotspot;
+    DWORD yHotspot;
+    HBITMAP hbmMask;
+    HBITMAP hbmColor;
+} ICONINFO,*PICONINFO;
+
+HICON WINAPI CreateIconIndirect(PICONINFO piconinfo);
+
+BOOL WINAPI GetIconInfo(HICON hIcon,
+    PICONINFO piconinfo
+);
+
+BOOL WINAPI DrawIcon(HDC hDC,
+    int X,
+    int Y,
+    HICON hIcon
+);
+
+BOOL WINAPI DestroyIcon(HICON hIcon);
+
 #endif//_LINUX_GDI_H_

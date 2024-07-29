@@ -177,9 +177,10 @@ static BOOL InitWndDC(HWND hwnd, int cx, int cy) {
 static void WIN_SetIcon(HWND hWnd, HICON hIcon) {
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if (wndObj) {
-        if (hIcon) {
+        ICONINFO info;
+        if (GetIconInfo(hIcon,&info)) {
             BITMAP bm;
-            GetObject(hIcon, sizeof(bm), &bm);
+            GetObject(info.hbmColor, sizeof(bm), &bm);
             if (bm.bmBitsPixel == 32) {
                 xcb_change_property(wndObj->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd,
                     wndObj->mConnection->_NET_WM_ICON, XCB_ATOM_CARDINAL, 32, bm.bmWidth * bm.bmHeight, bm.bmBits);
@@ -365,11 +366,11 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
     }
 
     if (wndObj->iconBig) {
-        DeleteObject(wndObj->iconBig);
+        DestroyIcon(wndObj->iconBig);
         wndObj->iconBig = nullptr;
     }
     if (wndObj->iconSmall) {
-        DeleteObject(wndObj->iconSmall);
+        DestroyIcon(wndObj->iconSmall);
         wndObj->iconSmall = nullptr;
     }
     map_wnd.erase(it);
