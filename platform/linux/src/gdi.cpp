@@ -1464,7 +1464,9 @@ HANDLE LoadImage(HINSTANCE hInst, LPCSTR name, UINT type, int cx, int cy, UINT f
         ICONINFO info;
         info.fIcon = TRUE;
         info.hbmColor = InitGdiObj(OBJ_BITMAP, image);
-        info.hbmMask = nullptr;        
+        info.hbmMask = nullptr;     
+        info.xHotspot = cx / 2;
+        info.yHotspot = cy / 2;
         return (HANDLE)CreateIconIndirect(&info);
     }
     else if (type == IMAGE_BITMAP)
@@ -1578,7 +1580,7 @@ BOOL DrawIconEx(HDC hDC, int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWi
     if (cxWidth < 0) cxWidth = bm.bmWidth;
     if (cyWidth < 0) cyWidth = bm.bmHeight;
     HDC memdc = CreateCompatibleDC(hDC);
-    HGDIOBJ oldBmp = SelectObject(hDC, hIcon->hbmColor);
+    HGDIOBJ oldBmp = SelectObject(memdc, hIcon->hbmColor);
     BLENDFUNCTION bf;
     bf.BlendOp = AC_SRC_ALPHA;
     bf.SourceConstantAlpha = 255;
