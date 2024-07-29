@@ -151,7 +151,6 @@ BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance )
         if(bMatch)
         {
             atom_map.erase(std::string(_class->name));
-            //if (_class->hbrBackground > (HBRUSH)(COLOR_GRADIENTINACTIVECAPTION + 1))
             DeleteObject( _class->hbrBackground );
             free(_class);
             class_list.erase(it);

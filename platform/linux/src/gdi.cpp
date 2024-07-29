@@ -4,6 +4,7 @@
 #include <cairo/cairo-xcb.h>
 #include <xcb/xcb_aux.h>
 #include <math.h>
+#include <png.h>
 
 #include "sdc.h"
 #include "SConnection.h"
@@ -1420,9 +1421,52 @@ COLORREF  SetTextColor(HDC hdc, COLORREF color)
     return ret;
 }
 
+HBITMAP CreateBitmap(
+    int nWidth,         // bitmap width, in pixels
+    int nHeight,        // bitmap height, in pixels
+    UINT cPlanes,       // number of color planes
+    UINT cBitsPerPel,   // number of bits to identify color
+    CONST VOID* lpvBits // color data array
+) {
+    if (cBitsPerPel != 32 || cPlanes!=1)
+        return nullptr;
+    cairo_surface_t* ret = cairo_image_surface_create_for_data((unsigned char*)lpvBits,CAIRO_FORMAT_ARGB32, nWidth, nHeight, nWidth*4);
+    if (ret) {
+        return InitGdiObj(OBJ_BITMAP, ret);
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
 HANDLE LoadImage(HINSTANCE hInst, LPCSTR name, UINT type, int cx, int cy, UINT fuLoad)
 {
-    return HANDLE();
+    if(!(fuLoad & LR_LOADFROMFILE))
+        return HANDLE(0);
+    if (type == IMAGE_ICON || type == IMAGE_BITMAP) {
+        //load png as icon
+        cairo_surface_t* image = cairo_image_surface_create_from_png(name);
+        if (!image)
+            return 0;
+        int wid = cairo_image_surface_get_width(image);
+        int hei = cairo_image_surface_get_height(image);
+        if (wid != cx || hei != cy) {
+            cairo_surface_t* scaled_surface = cairo_surface_create_similar_image(image, CAIRO_FORMAT_ARGB32, cx, cy); 
+            cairo_t* scaled_cr = cairo_create(scaled_surface);
+            cairo_scale(scaled_cr, static_cast<double>(cx) / wid, static_cast<double>(cy) / hei);
+            cairo_set_source_surface(scaled_cr, image, 0, 0);
+            cairo_paint(scaled_cr);
+            cairo_destroy(scaled_cr);
+            cairo_surface_destroy(image);
+            image = scaled_surface;
+        }
+        return (HANDLE)InitGdiObj(OBJ_BITMAP, image);
+    }
+    else {
+        printf("LoadImage error, unknown params\n");
+        return 0;
+    }
 }
 
 static double color16_to_double(USHORT v) {

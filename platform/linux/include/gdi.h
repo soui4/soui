@@ -125,6 +125,13 @@ typedef struct tagBITMAPINFO {
 #define CBM_INIT        0x04L   /* initialize bitmap */
 
 
+HBITMAP WINAPI CreateBitmap(
+    int nWidth,         // bitmap width, in pixels
+    int nHeight,        // bitmap height, in pixels
+    UINT cPlanes,       // number of color planes
+    UINT cBitsPerPel,   // number of bits to identify color
+    CONST VOID* lpvBits // color data array
+);
 HBITMAP WINAPI CreateDIBitmap(  HDC hdc,  CONST BITMAPINFOHEADER *pbmih,  DWORD flInit,  CONST VOID *pjBits,  CONST BITMAPINFO *pbmi,  UINT iUsage);
 HBRUSH  WINAPI CreateDIBPatternBrush(  HGLOBAL h,  UINT iUsage);
 HBRUSH  WINAPI CreateDIBPatternBrushPt(  CONST VOID *lpPackedDIB,  UINT iUsage);
