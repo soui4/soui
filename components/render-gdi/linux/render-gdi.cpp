@@ -833,8 +833,8 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::DrawIconEx( int xLeft, int yTop, HICON hIcon, int cxWidth,int cyWidth,UINT diFlags )
     {
-        
-        return E_INVALIDARG;
+        ::DrawIconEx(m_hdc, xLeft, yTop, hIcon, cxWidth, cyWidth, 0, NULL, diFlags);
+        return S_OK;
     }
 
     HRESULT SRenderTarget_GDI::DrawBitmap(LPCRECT pRcDest,const IBitmapS *pBitmap,int xSrc,int ySrc,BYTE byAlpha/*=0xFF*/ )

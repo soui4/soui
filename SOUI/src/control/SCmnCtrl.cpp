@@ -1159,7 +1159,6 @@ SIZE SIconWnd::MeasureContent(int wid, int hei)
 {
     if (!m_theIcon)
         return CSize();
-#ifdef _WIN32
     ICONINFO iconInfo = { 0 };
     GetIconInfo(m_theIcon, &iconInfo);
     if (iconInfo.hbmColor)
@@ -1168,10 +1167,6 @@ SIZE SIconWnd::MeasureContent(int wid, int hei)
         DeleteObject(iconInfo.hbmMask);
 
     return CSize(iconInfo.xHotspot * 2, iconInfo.yHotspot * 2);
-#else
-    //todo:hjx
-    return CSize(32,32);
-#endif
 }
 
 void SIconWnd::SetIcon(HICON hIcon)

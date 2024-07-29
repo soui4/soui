@@ -23,6 +23,7 @@
 		  </page>
 		  <page title="page2" layout="vbox" gravity="center">
 			  <text text="hello soui in page2" colorText="@color/green" colorBkgnd="@color/gray"/>
+			  <icon src="ICON_LOGO:32"/>
 		  </page>
 	  </tabctrl>
   </root>

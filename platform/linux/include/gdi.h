@@ -371,6 +371,17 @@ BOOL WINAPI DrawIcon(HDC hDC,
     HICON hIcon
 );
 
+BOOL WINAPI DrawIconEx(HDC hdc,
+    int xLeft,
+    int yTop,
+    HICON hIcon,
+    int cxWidth,
+    int cyWidth,
+    UINT istepIfAniCur,
+    HBRUSH hbrFlickerFreeDraw,
+    UINT diFlags
+);
+
 BOOL WINAPI DestroyIcon(HICON hIcon);
 
 #endif//_LINUX_GDI_H_

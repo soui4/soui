@@ -1543,7 +1543,11 @@ BOOL GetIconInfo(HICON hIcon,
     piconinfo->xHotspot = hIcon->xHotspot;
     piconinfo->yHotspot = hIcon->xHotspot;
     piconinfo->hbmColor = hIcon->hbmColor;
+    if (piconinfo->hbmColor)
+        RefGdiObj(piconinfo->hbmColor);
     piconinfo->hbmMask = hIcon->hbmMask;
+    if(piconinfo->hbmMask)
+        RefGdiObj(piconinfo->hbmMask);
     return TRUE;
 }
 
@@ -1560,23 +1564,28 @@ HICON CreateIconIndirect(PICONINFO piconinfo)
 
 BOOL DrawIcon(HDC hDC, int X, int Y, HICON hIcon)
 {
-    ICONINFO info;
-    if (!GetIconInfo(hIcon, &info))
-        return FALSE;
-    if (!info.hbmColor)
+    return DrawIconEx(hDC, X, Y, hIcon, -1, -1, 0, NULL, DI_NORMAL);
+}
+
+BOOL DrawIconEx(HDC hDC, int xLeft, int yTop, HICON hIcon, int cxWidth, int cyWidth, UINT istepIfAniCur, HBRUSH hbrFlickerFreeDraw, UINT diFlags)
+{
+    if (!hIcon || !hIcon->hbmColor)
         return FALSE;
     BITMAP bm;
-    GetObject(info.hbmColor, sizeof(bm), &bm);
+    GetObject(hIcon->hbmColor, sizeof(bm), &bm);
     if (bm.bmBitsPixel != 32)
         return FALSE;
+    if (cxWidth < 0) cxWidth = bm.bmWidth;
+    if (cyWidth < 0) cyWidth = bm.bmHeight;
     HDC memdc = CreateCompatibleDC(hDC);
-    HGDIOBJ oldBmp = SelectObject(hDC, info.hbmColor);    
+    HGDIOBJ oldBmp = SelectObject(hDC, hIcon->hbmColor);
     BLENDFUNCTION bf;
     bf.BlendOp = AC_SRC_ALPHA;
     bf.SourceConstantAlpha = 255;
-    AlphaBlend(hDC, X, Y, bm.bmWidth, bm.bmHeight, memdc, 0, 0, bm.bmWidth, bm.bmHeight, bf);
+    AlphaBlend(hDC, xLeft, yTop, cxWidth, cyWidth, memdc, 0, 0, bm.bmWidth, bm.bmHeight, bf);
     SelectObject(memdc, oldBmp);
     DeleteDC(memdc);
+
     return TRUE;
 }
 
