@@ -5,13 +5,10 @@
 
 typedef struct tagCLASS
 {
-    UINT_PTR    objOpaque;
     UINT         style;         /* Class style */
-//    BOOL         local;         /* Local class? */
     WNDPROC      winproc;       /* Window procedure */
     INT          cbClsExtra;    /* Class extra bytes */
     INT          cbWndExtra;    /* Window extra bytes */
-//    struct dce  *dce;           /* Opaque pointer to class DCE */
     UINT_PTR     instance;      /* Module that created the task */
     HICON        hIcon;         /* Default icon */
     HICON        hIconSm;       /* Default small icon */
@@ -19,9 +16,8 @@ typedef struct tagCLASS
     HCURSOR      hCursor;       /* Default cursor */
     HBRUSH       hbrBackground; /* Default background */
     ATOM         atomName;      /* Name of the class */
-    char        name[MAX_ATOM_LEN + 1];
-    char       *basename;      /* Base name for redirected classes, pointer within 'name'. */
-//    struct client_menu_name menu_name; /* Default menu name */
+    char         name[MAX_ATOM_LEN + 1];
+    char       * basename;      /* Base name for redirected classes, pointer within 'name'. */
 } CLASS;
 
 typedef struct tagWNDCLASSEX
@@ -41,20 +37,11 @@ typedef struct tagWNDCLASSEX
 } WNDCLASSEX, *PWNDCLASSEX, *LPWNDCLASSEX;
 
 
-struct UNICODE_STRING
-{
-    int MaximumLength;
-    char * Buffer;
-    unsigned int Length;
-};
-
-void WINAPI RtlInitUnicodeString(
-    UNICODE_STRING * target, /* [I/O] Buffered unicode string to be initialized */
-    char* source);          /* [I]   '\0' terminated unicode string used to initialize target */
-
 ATOM WINAPI RegisterClassEx( const WNDCLASSEX* wc );
 BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance );
 
 BOOL WINAPI GetClassInfoEx( HINSTANCE hInstance, LPCSTR name, WNDCLASSEX *wc );
+
+BOOL WINAPI GetAtomName(ATOM atomName, LPSTR name, int cchLen);
 
 #endif//_CLASS_H_

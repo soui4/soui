@@ -228,8 +228,7 @@ HWND SNativeWnd::CreateNative(LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExSty
     SNativeWndHelper::instance()->LockSharePtr(this);
 
     m_pThunk = (tagThunk*)HeapAlloc(SNativeWndHelper::instance()->GetHeap(), HEAP_ZERO_MEMORY, sizeof(tagThunk));
-    // ��::CreateWindow����֮ǰ��ȥ��StarWindowProc����
-    HWND hWnd = ::CreateWindowEx(dwExStyle, (LPCTSTR)SNativeWndHelper::instance()->GetSimpleWndAtom(), lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, (HMENU)(UINT_PTR)nID, SNativeWndHelper::instance()->GetAppInstance(), lpParam);
+    HWND hWnd = ::CreateWindowEx(dwExStyle, (LPCTSTR)(UINT_PTR)SNativeWndHelper::instance()->GetSimpleWndAtom(), lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, (HMENU)(UINT_PTR)nID, SNativeWndHelper::instance()->GetAppInstance(), lpParam);
     SNativeWndHelper::instance()->UnlockSharePtr();
     if (!hWnd)
     {
@@ -294,7 +293,7 @@ LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     {
         // clear out window handle
         HWND hWndThis = pThis->m_hWnd;
-        pThis->m_hWnd = NULL;
+        pThis->m_hWnd = 0;
         pThis->m_bDestoryed = FALSE;
         // clean up after window is destroyed
         pThis->m_pCurrentMsg = pOldMsg;
@@ -501,18 +500,18 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
 
     // determine owner window to center against
     DWORD dwStyle = GetStyle();
-    if (hWndCenter == NULL)
+    if (hWndCenter == 0)
     {
         if (dwStyle & WS_CHILD)
             hWndCenter = ::GetParent(m_hWnd);
         //else
         //    hWndCenter = ::GetWindow(m_hWnd, GW_OWNER);
 
-        if (hWndCenter == NULL)
+        if (hWndCenter == 0)
         {
             hWndCenter = ::GetActiveWindow();
             if (hWndCenter == m_hWnd)
-                hWndCenter = NULL;
+                hWndCenter = 0;
         }
     }
 
@@ -525,19 +524,19 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
     if (!(dwStyle & WS_CHILD))
     {
         // don't center against invisible or minimized windows
-        if (hWndCenter != NULL)
+        if (hWndCenter != 0)
         {
             DWORD dwStyleCenter = (DWORD)::GetWindowLongPtr(hWndCenter, GWL_STYLE);
             if (!(dwStyleCenter & WS_VISIBLE) || (dwStyleCenter & WS_MINIMIZE))
-                hWndCenter = NULL;
+                hWndCenter = 0;
         }
 
         // center within screen coordinates
 #if WINVER < 0x0500
         ::SystemParametersInfo(SPI_GETWORKAREA, NULL, &rcArea, NULL);
 #else
-        HMONITOR hMonitor = NULL;
-        if (hWndCenter != NULL)
+        HMONITOR hMonitor = 0;
+        if (hWndCenter != 0)
         {
             hMonitor = ::MonitorFromWindow(hWndCenter, MONITOR_DEFAULTTONEAREST);
         }
@@ -552,7 +551,7 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
 
         rcArea = minfo.rcWork;
 #endif
-        if (hWndCenter == NULL)
+        if (hWndCenter == 0)
             rcCenter = rcArea;
         else
             ::GetWindowRect(hWndCenter, &rcCenter);
@@ -588,7 +587,7 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
         yTop = rcArea.top;
 
     // map screen coordinates to child coordinates
-    return ::SetWindowPos(m_hWnd, NULL, xLeft, yTop, -1, -1, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+    return ::SetWindowPos(m_hWnd, 0, xLeft, yTop, -1, -1, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 BOOL SNativeWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)

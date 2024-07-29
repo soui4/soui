@@ -34,18 +34,18 @@ ATOM get_int_atom_value( const char *name )
     return ret;
 }
 
-bool NtUserGetAtomName( ATOM atomName, UNICODE_STRING *str )
+BOOL GetAtomName( ATOM atomName, LPSTR name, int cchLen)
 {
     std::unique_lock<std::recursive_mutex> lock(cls_mutex);
     for(auto & it:atom_map){
         if(it.second == atomName)
         {
-            if(str->MaximumLength>it.first.length())
-                strcpy(str->Buffer,it.first.c_str());
-            return true;
+            if(cchLen >it.first.length())
+                strcpy(name,it.first.c_str());
+            return TRUE;
         }
     }
-    return false;
+    return FALSE;
 }
 
 /***********************************************************************
@@ -88,8 +88,7 @@ ATOM WINAPI RegisterClassEx( const WNDCLASSEX *wc)
     }
     else
     {
-        UNICODE_STRING str = { .MaximumLength = sizeof(_class->name), .Buffer = _class->name };
-        NtUserGetAtomName( _class->atomName, &str );
+        GetAtomName( _class->atomName, _class->name,sizeof(_class->name));
     }
 
     _class->style      = wc->style;
@@ -165,15 +164,14 @@ BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance )
     return FALSE;
 }
 
-static CLASS *find_class( HINSTANCE module, UNICODE_STRING *name ){
+static CLASS *find_class( HINSTANCE module, LPCSTR clsName ){
     std::unique_lock<std::recursive_mutex> lock(cls_mutex);
-    if(IS_INTRESOURCE(name->Buffer)){
-        ATOM atom = (ATOM)reinterpret_cast<LONG_PTR>(name->Buffer);
+    if(IS_INTRESOURCE(clsName)){
+        ATOM atom = (ATOM)reinterpret_cast<LONG_PTR>(clsName);
         bool bValid = false;
-        for(auto it : atom_map){
+        for(auto & it : atom_map){
             if(it.second  == atom){
-                name->Buffer = (char*)it.first.c_str();
-                name->Length = it.first.length();
+                clsName = it.first.c_str();
                 bValid = true;
                 break;
             }
@@ -182,56 +180,33 @@ static CLASS *find_class( HINSTANCE module, UNICODE_STRING *name ){
             return nullptr;
     }
     for(auto & it : class_list){
-        if(strcmp(it->name,name->Buffer)==0)
+        if(strcmp(it->name, clsName)==0)
             return it;
     }
     return NULL;
 }
 
-/***********************************************************************
- *	     NtUserGetClassInfo   (win32u.@)
- */
-ATOM WINAPI NtUserGetClassInfoEx( HINSTANCE instance, UNICODE_STRING *name, WNDCLASSEX *wc)
+static ATOM get_class_info( HINSTANCE instance, const char *class_name, WNDCLASSEX * wc)
 {
-    CLASS *_class;
+    std::unique_lock<std::recursive_mutex> lock(cls_mutex);
+    CLASS* _class;
     ATOM atom;
-    if (!(_class = find_class( instance, name ))) return 0;
+    if (!(_class = find_class(instance, class_name))) return 0;
 
     if (wc)
     {
-        wc->style         = _class->style;
-        wc->lpfnWndProc   = _class->winproc;
-        wc->cbClsExtra    = _class->cbClsExtra;
-        wc->cbWndExtra    = _class->cbWndExtra;
-        wc->hInstance     =  instance;
-        wc->hIcon         = _class->hIcon;
-        wc->hIconSm       = _class->hIconSm ? _class->hIconSm : _class->hIconSmIntern;
-        wc->hCursor       = _class->hCursor;
+        wc->style = _class->style;
+        wc->lpfnWndProc = _class->winproc;
+        wc->cbClsExtra = _class->cbClsExtra;
+        wc->cbWndExtra = _class->cbWndExtra;
+        wc->hInstance = instance;
+        wc->hIcon = _class->hIcon;
+        wc->hIconSm = _class->hIconSm ? _class->hIconSm : _class->hIconSmIntern;
+        wc->hCursor = _class->hCursor;
         wc->hbrBackground = _class->hbrBackground;
         wc->lpszClassName = _class->basename;
     }
     atom = _class->atomName;
-    return atom;
-}
-
-
-ATOM get_class_info( HINSTANCE instance, const char *class_name, WNDCLASSEX *info,
-                     UNICODE_STRING *name_str)
-{
-    ATOM atom;
-
-    std::unique_lock<std::recursive_mutex> lock(cls_mutex);
-    UNICODE_STRING name={0,(char*)class_name,IS_INTRESOURCE(class_name)?0:strlen(class_name)};
-    atom = NtUserGetClassInfoEx( instance, &name, info);
-
-    if (atom && name_str){
-        if(name.Length > name_str->MaximumLength)
-        {
-            assert(false);
-            return 0;
-        }    
-        strcpy(name_str->Buffer,info->lpszClassName);
-    }
     return atom;
 }
 
@@ -248,24 +223,9 @@ BOOL WINAPI GetClassInfoEx( HINSTANCE hInstance, LPCSTR name, WNDCLASSEX *wc )
         return FALSE;
     }
 
-    atom = get_class_info( hInstance, name, wc, NULL );
+    atom = get_class_info( hInstance, name, wc );
     if (atom) wc->lpszClassName = name;
 
     /* We must return the atom of the class here instead of just TRUE. */
     return atom;
-}
-
-void WINAPI RtlInitUnicodeString(
-    UNICODE_STRING * target, /* [I/O] Buffered unicode string to be initialized */
-    char* source)          /* [I]   '\0' terminated unicode string used to initialize target */
-{
-    if ((target->Buffer = source))
-    {
-        unsigned int length = strlen(source) ;
-        if (length > 0xfffc)
-            length = 0xfffc;
-        target->Length = length;
-        target->MaximumLength = target->Length + sizeof(char);
-    }
-    else target->Length = target->MaximumLength = 0;
 }
