@@ -10,7 +10,7 @@
 #include <errno.h>
 #include <pthread.h>
 
-#define _vscprintf vprintf
+#define _vscprintf(fmt,...) snprintf(nullptr,0,fmt,__VA_ARGS__)
 #define vsprintf_s vsnprintf
 
 inline const uint8_t *_mbsinc(const uint8_t * srcU8){
