@@ -248,7 +248,10 @@ class STabSlider
     {
         CRect rcWnd = GetWindowRect();
         CRect rcSrc(m_ptOffset.x, m_ptOffset.y, m_ptOffset.x + rcWnd.Width(), m_ptOffset.y + rcWnd.Height());
-        pRT->AlphaBlend(rcWnd, m_memRT, rcSrc, 255);
+        //pRT->AlphaBlend(rcWnd, m_memRT, rcSrc, 255);
+        SStringT str;
+        str.Format(_T("ani step=%d\n"),m_iStep);
+        pRT->DrawText("test4",5,&rcWnd,DT_SINGLELINE);
     }
 
     void OnSize(UINT fType, CSize sz)
