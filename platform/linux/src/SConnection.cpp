@@ -325,7 +325,8 @@ bool SConnection::update(){
         UINT elapse = ts2 - ts1;
         std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
         for (auto& it : m_lstTimer) {
-            if (it.fireRemain > elapse) {
+            if (it.fireRemain <= elapse) {
+                //fire timer event
                 Msg* pMsg = new Msg;
                 pMsg->hwnd = it.hWnd;
                 pMsg->message = WM_TIMER;
@@ -337,7 +338,7 @@ bool SConnection::update(){
                 bRet = true;
             }
             else {
-                it.fireRemain = it.elapse;
+                it.fireRemain -= elapse;
             }
         }
     }
@@ -411,6 +412,7 @@ void SConnection::postMsg(HWND hWnd, UINT message, WPARAM wp, LPARAM lp)
 UINT_PTR SConnection::SetTimer(HWND hWnd, UINT_PTR id, UINT uElapse,
     TIMERPROC proc)
 {
+//    printf("setTimer, hwnd=%08x,id=%u,uElaple=%u\n", (uint32_t)hWnd, (uint32_t)id, uElapse);
     std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
     if (hWnd) {
         //find exist timer.
@@ -428,6 +430,7 @@ UINT_PTR SConnection::SetTimer(HWND hWnd, UINT_PTR id, UINT uElapse,
         timer.fireRemain = uElapse;
         timer.hWnd = hWnd;
         timer.proc = proc;
+        timer.elapse = 0;
         m_lstTimer.push_back(timer);
         return id;
     }
@@ -443,6 +446,7 @@ UINT_PTR SConnection::SetTimer(HWND hWnd, UINT_PTR id, UINT uElapse,
         timer.fireRemain = uElapse;
         timer.hWnd = hWnd;
         timer.proc = proc;
+        timer.elapse = 0;
         m_lstTimer.push_back(timer);
         return newId;
     }
@@ -451,6 +455,8 @@ UINT_PTR SConnection::SetTimer(HWND hWnd, UINT_PTR id, UINT uElapse,
 BOOL SConnection::KillTimer(HWND hWnd,
     UINT_PTR id)
 {
+//    printf("KillTimer, hwnd=%08x,id=%u\n", (uint32_t)hWnd, (uint32_t)id);
+
     std::unique_lock<std::recursive_mutex> lock(m_mutex4Msg);
     for (auto it = m_lstTimer.begin(); it != m_lstTimer.end(); it++) {
         if (it->hWnd == hWnd && it->id == id) {

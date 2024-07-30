@@ -1191,7 +1191,7 @@ BOOL ShowWindow(HWND hWnd, int nCmdShow)
     }
     xcb_flush(wndObj->mConnection->connection);
     SendMessage(hWnd, WM_SHOWWINDOW, bNew, 0);
-    printf("show window,id=%u, show=%d\n", (uint32_t)hWnd, bNew);
+    printf("show window,id=%08x, show=%d, time=%u\n", (uint32_t)hWnd, bNew,GetTickCount());
     return TRUE;
 }
 
