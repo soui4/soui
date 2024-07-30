@@ -177,6 +177,10 @@ static void WIN_SetIcon(HWND hWnd, HICON hIcon) {
                 xcb_change_property(wndObj->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd,
                     wndObj->mConnection->_NET_WM_ICON, XCB_ATOM_CARDINAL, 32, bm.bmWidth * bm.bmHeight, bm.bmBits);
             }
+            if(info.hbmColor)
+                DeleteObject(info.hbmColor);
+            if(info.hbmMask)
+                DeleteObject(info.hbmMask);
         }
         else {
             xcb_delete_property(wndObj->mConnection->connection, hWnd, wndObj->mConnection->_NET_WM_ICON);
@@ -358,15 +362,6 @@ BOOL WINAPI DestroyWindow(HWND hWnd){
     if (wndObj->bmp) {
         DeleteObject(wndObj->bmp);
         wndObj->bmp = nullptr;
-    }
-
-    if (wndObj->iconBig) {
-        DestroyIcon(wndObj->iconBig);
-        wndObj->iconBig = nullptr;
-    }
-    if (wndObj->iconSmall) {
-        DestroyIcon(wndObj->iconSmall);
-        wndObj->iconSmall = nullptr;
     }
     map_wnd.erase(it);
 

@@ -1,4 +1,4 @@
-﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="appMain"
+﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:128" smallIcon="ICON_LOGO:64" margin="5,5,5,5"  resizable="1" wndType="appMain"
 	appWnd="1"
 	translucent="0" 
 	toolwnd="1"
@@ -17,13 +17,13 @@
 		  <imgbtn id="sysid_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
 	  </caption>
 
-	  <tabctrl size="-2,0" weight="1" tabHeight="30" animateSteps2="30">
+	  <tabctrl size="-2,0" weight="1" tabHeight="30" animateSteps="30">
 		  <page title="page1" layout="vbox" gravity="center">
 			  <text text="hello soui in page1" colorText="@color/red" colorBkgnd="@color/gray"/>
 		  </page>
 		  <page title="page2" layout="vbox" gravity="center">
 			  <text text="hello soui in page2" colorText="@color/green" colorBkgnd="@color/gray"/>
-			  <icon src="ICON_LOGO:32"/>
+			  <icon1 src="ICON_LOGO:128"/>
 		  </page>
 	  </tabctrl>
   </root>
