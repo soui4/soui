@@ -1088,7 +1088,17 @@ LRESULT  DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
                         lpWndPos->y = info.ptMaxPosition.y;
                 }
             }
-            
+            if (!(lpWndPos->flags & SWP_NOZORDER)) {
+                if (lpWndPos->hwndInsertAfter == HWND_TOPMOST || lpWndPos->hwndInsertAfter == HWND_TOP) {
+                    uint32_t val[] = { XCB_STACK_MODE_ABOVE };
+                    xcb_configure_window(wndObj->mConnection->connection, lpWndPos->hwnd, XCB_CONFIG_WINDOW_STACK_MODE, &val);
+                }
+                else {
+                    uint32_t val[] = { (uint32_t)lpWndPos->hwndInsertAfter, XCB_STACK_MODE_ABOVE };
+                    xcb_configure_window(wndObj->mConnection->connection, lpWndPos->hwnd, XCB_CONFIG_WINDOW_SIBLING | XCB_CONFIG_WINDOW_STACK_MODE, &val);
+                }
+                xcb_flush(wndObj->mConnection->connection);
+            }            
         }
         break;
     case WM_SYSCOMMAND:
