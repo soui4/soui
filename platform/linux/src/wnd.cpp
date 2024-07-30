@@ -19,9 +19,9 @@ using namespace SOUI;
 #define CLS_WINDOW "window"
 
 enum WndState {
-    Normal = 0,
-    Minimized = 1,
-    Maximized = 2,
+    WS_Normal = 0,
+    WS_Minimized = 1,
+    WS_Maximized = 2,
 };
 
 struct _Window{
@@ -147,21 +147,6 @@ static inline void set_win_data( void *ptr, LONG_PTR val, UINT size )
 }
 
 
-static BOOL _GetCursorPos(SConnection* conn,LPPOINT ppt) {
-    // 获取当前鼠标位置的请求
-    xcb_query_pointer_cookie_t pointer_cookie = xcb_query_pointer(conn->connection, conn->screen->root);
-    xcb_query_pointer_reply_t* pointer_reply = xcb_query_pointer_reply(conn->connection, pointer_cookie, NULL);
-    if (!pointer_reply) {
-        fprintf(stderr,"Failed to get mouse position\n");
-        return FALSE;
-    }
-    ppt->x = pointer_reply->root_x;
-    ppt->y = pointer_reply->root_y;
-    // 释放资源
-    free(pointer_reply);
-    return TRUE;
-}
-
 static BOOL InitWndDC(HWND hwnd, int cx, int cy) {
     assert(hwnd);
     WndObj wndObj = WndObj::fromHwnd(hwnd);
@@ -232,12 +217,18 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     if (!hParent) hParent = conn->screen->root;
 
     pWnd->mConnection = conn;
-    pWnd->state = Normal;
+    pWnd->state = WS_Normal;
     pWnd->dwStyle = cs->style;
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
     pWnd->clsAtom = clsAtom;
     pWnd->iconSmall = pWnd->iconBig = nullptr;
+    pWnd->parent = hParent;
+    pWnd->winproc = clsInfo.lpfnWndProc;
+    pWnd->rc.left = cs->x;
+    pWnd->rc.top = cs->y;
+    pWnd->rc.right = cs->x + cs->cx;
+    pWnd->rc.bottom = cs->y + cs->cy;
 
     HWND hWnd = xcb_generate_id(pWnd->mConnection->connection);
     static const uint32_t evt_mask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY
@@ -255,43 +246,37 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     else {
         value_list[1] = evt_mask;
     }
-    xcb_void_cookie_t cookie = xcb_create_window_checked(pWnd->mConnection->connection, XCB_COPY_FROM_PARENT, hWnd,
+    xcb_void_cookie_t cookie = xcb_create_window_checked(conn->connection, XCB_COPY_FROM_PARENT, hWnd,
                       hParent, cs->x, cs->y, std::max(cs->cx,1u), std::max(cs->cy,1u), 10,
-                      XCB_WINDOW_CLASS_INPUT_OUTPUT, pWnd->mConnection->screen->root_visual, mask,
+                      XCB_WINDOW_CLASS_INPUT_OUTPUT, conn->screen->root_visual, mask,
                       value_list);
-    xcb_generic_error_t * err = xcb_request_check(pWnd->mConnection->connection, cookie);
+    xcb_generic_error_t * err = xcb_request_check(conn->connection, cookie);
     if (err) {
         printf("xcb_create_window failed, errcode=%d\n", err->error_code);
         free(err);
         return 0;
     }
 
-    pWnd->rc.left = cs->x;
-    pWnd->rc.top = cs->y;
-    pWnd->rc.right = cs->x + cs->cx;
-    pWnd->rc.bottom = cs->y + cs->cy;
-
     const uint32_t vals[2] = { cs->cx, cs->cy};
-    xcb_configure_window(pWnd->mConnection->connection, hWnd, XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, vals);
+    xcb_configure_window(conn->connection, hWnd, XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT, vals);
     pWnd->title = cs->lpszName;
-    xcb_change_property(pWnd->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd,
+    xcb_change_property(conn->connection, XCB_PROP_MODE_REPLACE, hWnd,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, pWnd->title.length(), pWnd->title.c_str());
-
-    xcb_change_property(pWnd->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd, conn->WM_PROTOCOLS_ATOM, XCB_ATOM_ATOM, 32, 1, &conn->WM_DELETE_WINDOW_ATOM);
-
-    if(cs->style & WS_VISIBLE)
-        xcb_map_window(pWnd->mConnection->connection, hWnd);
-
-    xcb_flush(pWnd->mConnection->connection);
-
-    pWnd->parent = hParent;
-    pWnd->winproc = clsInfo.lpfnWndProc;
+    xcb_change_property(conn->connection, XCB_PROP_MODE_REPLACE, hWnd, conn->WM_PROTOCOLS_ATOM, XCB_ATOM_ATOM, 32, 1, &conn->WM_DELETE_WINDOW_ATOM);
+    if (cs->style & WS_VISIBLE)
+    {
+        xcb_map_window(conn->connection, hWnd);
+    }
+    xcb_flush(conn->connection);
     {
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         map_wnd.insert(std::make_pair(hWnd,pWnd));
     }
     SetWindowLongPtr(hWnd, GWLP_HWNDPARENT, cs->hwndParent);
     InitWndDC(hWnd, cs->cx, cs->cy);
+    if (cs->style & WS_VISIBLE && cs->style & WS_POPUP && !(cs->style & WS_DISABLED) && !(cs->dwExStyle & WS_EX_TOOLWINDOW)) {
+        conn->SetActiveWindow(hWnd);
+    }
     if(0!=SendMessage(hWnd,WM_CREATE,0,(LPARAM)cs)){
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         auto it = map_wnd.find(hWnd);
@@ -318,8 +303,6 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     if (clsInfo.hIcon) {
         SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)clsInfo.hIconSm);
     }
-    HWND hTest = pWnd->mConnection->GetWindow(hWnd,GW_PARENT);
-
     return hWnd;
 }
 
@@ -470,7 +453,7 @@ static HRESULT HandleNcTestCode(HWND hWnd, UINT htCode) {
         return -1;
 
     POINT ptClick;
-    if (!_GetCursorPos(wndObj->mConnection, &ptClick))
+    if (!wndObj->mConnection->GetCursorPos(&ptClick))
         return -1;
     if(!(htCode>=HTCAPTION && htCode <=HTBOTTOMRIGHT))
         return -2;
@@ -495,7 +478,7 @@ static HRESULT HandleNcTestCode(HWND hWnd, UINT htCode) {
             }
             else if (msg.message == WM_MOUSEMOVE) {
                 POINT ptNow;
-                _GetCursorPos(wndObj->mConnection, &ptNow);
+                wndObj->mConnection->GetCursorPos(&ptNow);
                 switch (htCode) {
                 case HTCAPTION:
                 {//move window
@@ -588,7 +571,7 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
         case WM_MOUSEMOVE:
         {
             POINT pt;
-            _GetCursorPos(wndObj->mConnection,&pt);
+            wndObj->mConnection->GetCursorPos(&pt);
             int htCode = proc(hWnd,WM_NCHITTEST,0,MAKELPARAM(pt.x,pt.y));
             if(htCode>HTCAPTION && htCode <HTBORDER){
                 if(msg == WM_MOUSEMOVE){
@@ -644,13 +627,13 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
     case UM_STATE:
         switch (wp) {
         case SIZE_MINIMIZED:
-            wndObj->state = Minimized;
+            wndObj->state = WS_Minimized;
             break;
         case SIZE_MAXIMIZED:
-            wndObj->state = Maximized;
+            wndObj->state = WS_Maximized;
             break;
         case SIZE_RESTORED:
-            wndObj->state = Normal;
+            wndObj->state = WS_Normal;
             lp = MAKELPARAM(wndObj->rc.right-wndObj->rc.left,wndObj->rc.bottom-wndObj->rc.top);
             CallWindowProc(proc,hWnd,WM_SIZE,0,lp);//call size again
             break;
@@ -863,7 +846,10 @@ HWND GetDesktopWindow()
 
 BOOL IsWindowEnabled(HWND hWnd)
 {
-    return 0;
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if (!wndObj)
+        return FALSE;
+    return !(wndObj->dwStyle & WS_DISABLED);
 }
 
 BOOL EnableWindow(HWND hWnd, BOOL bEnable)
@@ -871,29 +857,29 @@ BOOL EnableWindow(HWND hWnd, BOOL bEnable)
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj) 
         return FALSE;
-    SConnection *conn = SConnMgr::instance()->getConnection(wndObj->tid);
-    xcb_client_message_event_t event = {
-        .response_type = XCB_CLIENT_MESSAGE,
-        .format = 32,
-        .sequence = 0,
-        .window = (xcb_window_t)hWnd,
-        .type = conn->_NET_WM_STATE_ATOM
-    };
-    event.data.data32[0] = bEnable?0:1;
-    event.data.data32[1] = conn->_NET_WM_STATE_DEMANDS_ATTENTION_ATOM;
-    xcb_send_event(
-        conn->connection,
-        0,
-        hWnd,
-        XCB_EVENT_MASK_STRUCTURE_NOTIFY,
-        (const char *)&event
-    );
-    xcb_flush(conn->connection);
+    
+    if (bEnable)
+        wndObj->dwStyle &= ~WS_DISABLED;
+    else
+        wndObj->dwStyle |= WS_DISABLED;
     return TRUE;
 }
 
 HWND SetActiveWindow(HWND hWnd)
 {
+    WndObj wndObj = WndObj::fromHwnd(hWnd);
+    if (!wndObj)
+        return 0;
+    if (wndObj->dwStyle & (WS_POPUP | WS_OVERLAPPED) && !(wndObj->dwExStyle & (WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE)))
+    {
+        HWND hRet = wndObj->mConnection->SetActiveWindow(hWnd);
+        PostMessage(hWnd, WM_ACTIVATE, WA_ACTIVE, hRet);
+        if(hRet) PostMessage(hRet, WM_ACTIVATE, WA_INACTIVE, hWnd);
+        return hRet;
+    }
+    else {
+        printf("window can't be activiated, hwnd=%u", (uint32_t)hWnd);
+    }
     return 0;
 }
 
@@ -909,7 +895,7 @@ HWND SetParent(HWND hWnd, HWND hParent){
 BOOL GetCursorPos(LPPOINT ppt)
 {
     SConnection* conn = SConnMgr::instance()->getConnection();
-    return _GetCursorPos(conn, ppt);
+    return conn->GetCursorPos(ppt);
 }
 
 HWND WindowFromPoint(POINT pt)
@@ -1186,18 +1172,22 @@ BOOL ShowWindow(HWND hWnd, int nCmdShow)
     if(!wndObj)
         return FALSE;
     BOOL bVisible = IsWindowVisible(hWnd);
-    BOOL bNew = nCmdShow & SW_SHOW;
+    BOOL bNew = nCmdShow == SW_SHOW || nCmdShow == SW_SHOWNOACTIVATE || nCmdShow==SW_SHOWNORMAL;
     if (bVisible == bNew)
         return TRUE;
-    if (nCmdShow & SW_SHOW)
+    if (bNew)
     {
         xcb_map_window(wndObj->mConnection->connection, hWnd);
+        wndObj->dwStyle |= WS_VISIBLE;
+        if (nCmdShow != SW_SHOWNOACTIVATE)
+            SetActiveWindow(hWnd);
         InvalidateRect(hWnd, nullptr, TRUE);
     }
     else
     {
         xcb_unmap_window(wndObj->mConnection->connection, hWnd);
-    }    
+        wndObj->dwStyle &= ~WS_VISIBLE;
+    }
     xcb_flush(wndObj->mConnection->connection);
     SendMessage(hWnd, WM_SHOWWINDOW, bNew, 0);
     return TRUE;
@@ -1256,14 +1246,14 @@ BOOL IsZoomed(HWND hWnd){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    return wndObj->state == Maximized;
+    return wndObj->state == WS_Maximized;
 }
 
 BOOL IsIconic(HWND hWnd){
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    return wndObj->state == Minimized;
+    return wndObj->state == WS_Minimized;
 }
 
 int GetWindowText(HWND hWnd, LPTSTR lpszStringBuf, int nMaxCount)

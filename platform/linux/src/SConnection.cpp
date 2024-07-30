@@ -646,11 +646,12 @@ static WPARAM ButtonState2Mask(uint16_t state) {
     return wp;
 }
 
-BOOL SConnection::ActiviateWnd(HWND hWnd)
+HWND SConnection::SetActiveWindow(HWND hWnd)
 {
+    HWND ret = m_hWndActive;
     xcb_set_input_focus(connection, XCB_INPUT_FOCUS_POINTER_ROOT, hWnd, XCB_CURRENT_TIME);
     m_hWndActive = hWnd;
-    return TRUE;
+    return ret;
 }
 
 HWND SConnection::GetParentWnd(HWND hWnd) const
@@ -695,6 +696,54 @@ HWND SConnection::GetWindow(HWND hWnd, int code) const
     }
     free(tree_reply);
     return ret;
+}
+
+HWND SConnection::WindowFromPoint(POINT pt,HWND hWnd) const
+{
+    if (!hWnd)
+        hWnd = screen->root;
+    xcb_query_tree_reply_t* reply = xcb_query_tree_reply(
+        connection,
+        xcb_query_tree(connection, hWnd),
+        0
+    );
+
+    xcb_window_t* children = xcb_query_tree_children(reply);
+    int num_children = xcb_query_tree_children_length(reply);
+    xcb_window_t result = XCB_WINDOW_NONE;
+
+    for (int i = 0; i < num_children; i++) {
+        xcb_get_geometry_reply_t* geometry = xcb_get_geometry_reply(connection, xcb_get_geometry(connection, children[i]), NULL);
+        if (!geometry) continue;
+
+        if (pt.x >= geometry->x && pt.x < (geometry->x + geometry->width) &&
+            pt.y >= geometry->y && pt.y < (geometry->y + geometry->height)) {
+            result = children[i];
+        }
+        free(geometry);
+        if(result != XCB_WINDOW_NONE)
+            break;
+    }
+    free(reply);
+    if (!result)
+        return hWnd;
+    else
+        return WindowFromPoint(pt, result);
+}
+
+BOOL SConnection::GetCursorPos(LPPOINT ppt) const {
+    // 获取当前鼠标位置的请求
+    xcb_query_pointer_cookie_t pointer_cookie = xcb_query_pointer(connection, screen->root);
+    xcb_query_pointer_reply_t* pointer_reply = xcb_query_pointer_reply(connection, pointer_cookie, NULL);
+    if (!pointer_reply) {
+        fprintf(stderr, "Failed to get mouse position\n");
+        return FALSE;
+    }
+    ppt->x = pointer_reply->root_x;
+    ppt->y = pointer_reply->root_y;
+    // 释放资源
+    free(pointer_reply);
+    return TRUE;
 }
 
 uint32_t SConnection::netWmStates(HWND hWnd)

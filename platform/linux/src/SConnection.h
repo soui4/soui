@@ -94,11 +94,17 @@ public:
         return m_hWndActive;
     }
 
-    BOOL ActiviateWnd(HWND hWnd);
+    HWND SetActiveWindow(HWND hWnd);
 
     HWND GetParentWnd(HWND hWnd) const;
 
     HWND GetWindow(HWND hWnd, int code) const;
+
+    HWND WindowFromPoint(POINT pt, HWND hWnd) const;
+
+
+    BOOL GetCursorPos(LPPOINT ppt) const;
+
 private:
   uint32_t netWmStates(HWND hWnd);
   bool pushEvent(xcb_generic_event_t *e);
