@@ -218,7 +218,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
 
     pWnd->mConnection = conn;
     pWnd->state = WS_Normal;
-    pWnd->dwStyle = cs->style;
+    pWnd->dwStyle = cs->style & ~WS_VISIBLE;//remove visible
     pWnd->dwExStyle = cs->dwExStyle;
     pWnd->hInstance = module;
     pWnd->clsAtom = clsAtom;
@@ -274,9 +274,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     }
     SetWindowLongPtr(hWnd, GWLP_HWNDPARENT, cs->hwndParent);
     InitWndDC(hWnd, cs->cx, cs->cy);
-    if (cs->style & WS_VISIBLE && cs->style & WS_POPUP && !(cs->style & WS_DISABLED) && !(cs->dwExStyle & WS_EX_TOOLWINDOW)) {
-        conn->SetActiveWindow(hWnd);
-    }
+
     if(0!=SendMessage(hWnd,WM_CREATE,0,(LPARAM)cs)){
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         auto it = map_wnd.find(hWnd);
@@ -296,6 +294,9 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
         xcb_flush(wndObj->mConnection->connection);
         free(wndObj);
         hWnd = 0;
+    }
+    if (cs->style & WS_VISIBLE) {
+        ShowWindow(hWnd, SW_SHOW);
     }
     if (clsInfo.hIconSm) {
         SendMessage(hWnd, WM_SETICON, ICON_SMALL, (LPARAM)clsInfo.hIconSm);
@@ -870,7 +871,7 @@ HWND SetActiveWindow(HWND hWnd)
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if (!wndObj)
         return 0;
-    if (wndObj->dwStyle & (WS_POPUP | WS_OVERLAPPED) && !(wndObj->dwExStyle & (WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE)))
+    if (!(wndObj->dwStyle & WS_CHILD) && !(wndObj->dwExStyle & (WS_EX_TOOLWINDOW | WS_EX_NOACTIVATE)))
     {
         HWND hRet = wndObj->mConnection->SetActiveWindow(hWnd);
         PostMessage(hWnd, WM_ACTIVATE, WA_ACTIVE, hRet);
@@ -878,7 +879,7 @@ HWND SetActiveWindow(HWND hWnd)
         return hRet;
     }
     else {
-        printf("window can't be activiated, hwnd=%u", (uint32_t)hWnd);
+        printf("window can't be activiated, hwnd=%u\n", (uint32_t)hWnd);
     }
     return 0;
 }
@@ -1172,14 +1173,14 @@ BOOL ShowWindow(HWND hWnd, int nCmdShow)
     if(!wndObj)
         return FALSE;
     BOOL bVisible = IsWindowVisible(hWnd);
-    BOOL bNew = nCmdShow == SW_SHOW || nCmdShow == SW_SHOWNOACTIVATE || nCmdShow==SW_SHOWNORMAL;
+    BOOL bNew = nCmdShow == SW_SHOW || nCmdShow == SW_SHOWNOACTIVATE || nCmdShow==SW_SHOWNORMAL || nCmdShow == SW_SHOWNA;
     if (bVisible == bNew)
         return TRUE;
     if (bNew)
     {
         xcb_map_window(wndObj->mConnection->connection, hWnd);
         wndObj->dwStyle |= WS_VISIBLE;
-        if (nCmdShow != SW_SHOWNOACTIVATE)
+        if (nCmdShow != SW_SHOWNOACTIVATE && nCmdShow != SW_SHOWNA)
             SetActiveWindow(hWnd);
         InvalidateRect(hWnd, nullptr, TRUE);
     }
@@ -1190,6 +1191,7 @@ BOOL ShowWindow(HWND hWnd, int nCmdShow)
     }
     xcb_flush(wndObj->mConnection->connection);
     SendMessage(hWnd, WM_SHOWWINDOW, bNew, 0);
+    printf("show window,id=%u, show=%d\n", (uint32_t)hWnd, bNew);
     return TRUE;
 }
 
