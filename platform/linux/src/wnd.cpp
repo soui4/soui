@@ -25,6 +25,7 @@ enum WndState {
 };
 
 struct _Window{
+    UINT_PTR           objOpaque;
     std::recursive_mutex mutex;
     pthread_t tid;
     SConnection *mConnection;
@@ -36,7 +37,7 @@ struct _Window{
     ATOM          clsAtom;
     HICON         iconBig;
     HICON         iconSmall;
-    UINT_PTR           objOpaque;
+    int           isPainting;
     HWND               parent;        /* Window parent */
     HWND               owner;         /* Window owner */
     WNDPROC            winproc;       /* Window procedure */
@@ -233,7 +234,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     pWnd->rc.top = cs->y;
     pWnd->rc.right = cs->x + cs->cx;
     pWnd->rc.bottom = cs->y + cs->cy;
-
+    pWnd->isPainting = 0;
     HWND hWnd = xcb_generate_id(pWnd->mConnection->connection);
     static const uint32_t evt_mask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY
         | XCB_EVENT_MASK_PROPERTY_CHANGE
@@ -618,6 +619,7 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
                     ReleaseDC(hWnd,hdc);
                 }
             }
+        wndObj->isPainting++;
         proc(hWnd,WM_ERASEBKGND,0,(LPARAM)wndObj->hdc);
         break;
     case UM_STATE:
@@ -648,7 +650,10 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
         //printf("wm_size, wp=%u, size=(%u,%u)\n", wp,sz.cx,sz.cy);
 		break;
     }
-    return proc(hWnd, msg, wp, lp);
+    LRESULT ret = proc(hWnd, msg, wp, lp);
+    if (msg == WM_PAINT) {
+        wndObj->isPainting--;
+    }
 }
 
 LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)
@@ -961,8 +966,28 @@ BOOL UpdateWindow(HWND hWnd)
     WndObj wndObj = WndObj::fromHwnd(hWnd);
     if(!wndObj)
         return FALSE;
-    //todo:hjx
-    xcb_flush(wndObj->mConnection->connection);
+    if (wndObj->isPainting)
+        return FALSE;
+
+    MSG msg;
+    BOOL bQuit = FALSE;
+    while (!bQuit) {
+        if (!WaitMessage())
+            break;
+        PeekMessage(&msg, 0, 0, 0, PM_REMOVE);
+        if (msg.message == WM_QUIT) {
+            bQuit = TRUE;
+            break;
+        }
+        TranslateMessage(&msg);
+        DispatchMessage(&msg);
+        if (msg.message == WM_PAINT && msg.hwnd == hWnd) //make sure paint message had been handled
+            break;
+    }
+    if (bQuit) {
+        //restore wm_quit
+        PostThreadMessage(wndObj->tid, WM_QUIT, msg.wParam, msg.lParam);
+    }
     return TRUE;
 }
 
