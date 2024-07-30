@@ -89,6 +89,16 @@ public:
     void SetTimerBlock(bool bBlock){
         m_bBlockTimer = bBlock;
     }
+
+    HWND GetActiveWnd() const {
+        return m_hWndActive;
+    }
+
+    BOOL ActiviateWnd(HWND hWnd);
+
+    HWND GetParentWnd(HWND hWnd) const;
+
+    HWND GetWindow(HWND hWnd, int code) const;
 private:
   uint32_t netWmStates(HWND hWnd);
   bool pushEvent(xcb_generic_event_t *e);
@@ -118,6 +128,7 @@ private:
     HWND m_hWndCapture;
     HCURSOR m_hCursor;
 
+    HWND m_hWndActive;
     std::map<WORD,HCURSOR> m_sysCursor;
 };
 

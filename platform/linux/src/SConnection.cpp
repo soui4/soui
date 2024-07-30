@@ -260,6 +260,7 @@ SConnection::SConnection(int screenNum)
     m_msgPeek = nullptr;
     m_bMsgNeedFree = false;
     m_hWndCapture = 0;
+    m_hWndActive = 0;
     m_hCursor = 0;
     m_bBlockTimer = false;
 
@@ -643,6 +644,57 @@ static WPARAM ButtonState2Mask(uint16_t state) {
     if (state & XCB_BUTTON_MASK_3)
         wp |= MK_RBUTTON;
     return wp;
+}
+
+BOOL SConnection::ActiviateWnd(HWND hWnd)
+{
+    xcb_set_input_focus(connection, XCB_INPUT_FOCUS_POINTER_ROOT, hWnd, XCB_CURRENT_TIME);
+    m_hWndActive = hWnd;
+    return TRUE;
+}
+
+HWND SConnection::GetParentWnd(HWND hWnd) const
+{
+    return GetWindow(hWnd, GW_PARENT);
+
+}
+
+HWND SConnection::GetWindow(HWND hWnd, int code) const
+{
+    xcb_query_tree_cookie_t tree_cookie = xcb_query_tree(connection, hWnd);
+    xcb_query_tree_reply_t* tree_reply = xcb_query_tree_reply(connection, tree_cookie, NULL);
+    if (!tree_reply)
+        return 0;
+    HWND ret = 0;
+    switch(code){
+    case GW_CHILDFIRST:
+    if(tree_reply->children_len>0){
+        xcb_window_t* children = xcb_query_tree_children(tree_reply);
+        ret = children[0];
+    }
+        break;
+    case GW_CHILDLAST:
+        if (tree_reply->children_len > 0) {
+            xcb_window_t* children = xcb_query_tree_children(tree_reply);
+            ret = children[tree_reply->children_len-1];
+        }
+        break;
+    case GW_HWNDFIRST: 
+        if(tree_reply->parent){
+            ret = GetWindow(tree_reply->parent, GW_CHILDFIRST);
+        }
+        break;
+    case GW_HWNDLAST:
+        if (tree_reply->parent) {
+            ret = GetWindow(tree_reply->parent, GW_CHILDLAST);
+        }
+        break;
+    case GW_PARENT:
+        ret = tree_reply->parent;
+        break;
+    }
+    free(tree_reply);
+    return ret;
 }
 
 uint32_t SConnection::netWmStates(HWND hWnd)

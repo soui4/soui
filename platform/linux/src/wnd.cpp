@@ -8,6 +8,7 @@
 #include <map>
 #include <mutex>
 #include <string>
+#include <vector>
 #include "class.h"
 #include "SConnection.h"
 #include "sdc.h"
@@ -182,6 +183,12 @@ static void WIN_SetIcon(HWND hWnd, HICON hIcon) {
             BITMAP bm;
             GetObject(info.hbmColor, sizeof(bm), &bm);
             if (bm.bmBitsPixel == 32) {
+                std::vector<uint32_t> buf;
+                buf.resize(bm.bmWidth * bm.bmHeight + 2);
+                uint32_t* data = buf.data();
+                data[0] = bm.bmWidth;
+                data[1] = bm.bmHeight;
+                memcpy(data + 2, bm.bmBits, bm.bmWidth * bm.bmHeight * 4);
                 xcb_change_property(wndObj->mConnection->connection, XCB_PROP_MODE_REPLACE, hWnd,
                     wndObj->mConnection->_NET_WM_ICON, XCB_ATOM_CARDINAL, 32, bm.bmWidth * bm.bmHeight, bm.bmBits);
             }
@@ -258,6 +265,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
         free(err);
         return 0;
     }
+
     pWnd->rc.left = cs->x;
     pWnd->rc.top = cs->y;
     pWnd->rc.right = cs->x + cs->cx;
@@ -282,6 +290,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
         map_wnd.insert(std::make_pair(hWnd,pWnd));
     }
+    SetWindowLongPtr(hWnd, GWLP_HWNDPARENT, cs->hwndParent);
     InitWndDC(hWnd, cs->cx, cs->cy);
     if(0!=SendMessage(hWnd,WM_CREATE,0,(LPARAM)cs)){
         std::unique_lock<std::recursive_mutex> lock(mutex_wnd);
@@ -309,6 +318,8 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     if (clsInfo.hIcon) {
         SendMessage(hWnd, WM_SETICON, ICON_BIG, (LPARAM)clsInfo.hIconSm);
     }
+    HWND hTest = pWnd->mConnection->GetWindow(hWnd,GW_PARENT);
+
     return hWnd;
 }
 
@@ -840,12 +851,14 @@ BOOL GetCaretPos(LPPOINT lpPoint)
 
 HWND GetActiveWindow()
 {
-    return 0;
+    SConnection* conn = SConnMgr::instance()->getConnection();
+    return conn->GetActiveWnd();
 }
 
 HWND GetDesktopWindow()
 {
-    return 0;
+    SConnection* conn = SConnMgr::instance()->getConnection();
+    return conn->screen->root;
 }
 
 BOOL IsWindowEnabled(HWND hWnd)

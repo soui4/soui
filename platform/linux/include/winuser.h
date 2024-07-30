@@ -1353,4 +1353,17 @@ PtInRect(
      CONST RECT *lprc,
      POINT pt);
 
+
+/*
+ * GetWindow() Constants
+ */
+#define GW_HWNDFIRST        0
+#define GW_HWNDLAST         1
+#define GW_HWNDNEXT         2
+#define GW_HWNDPREV         3
+#define GW_OWNER            4
+#define GW_CHILD            5
+#define GW_CHILDFIRST       GW_CHILD
+#define GW_CHILDLAST        6
+#define GW_PARENT           7
 #endif//__WINUSER_H_
