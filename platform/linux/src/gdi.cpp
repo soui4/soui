@@ -433,8 +433,16 @@ HGDIOBJ SelectObject(HDC hdc, HGDIOBJ h)
                 hdc->cairo = nullptr;
             }
             hdc->bmp = h;
-            if(GetGdiObjPtr(h))
+            if (GetGdiObjPtr(h))
+            {
                 hdc->cairo = cairo_create((cairo_surface_t*)GetGdiObjPtr(h));
+                BITMAP bm;
+                GetObject(h, sizeof(bm), &bm);
+                RECT rcCanvas = { 0,0,bm.bmWidth,bm.bmHeight };
+                HRGN rgn = CreateRectRgnIndirect(&rcCanvas);
+                CombineRgn(hdc->rgn, rgn, nullptr, RGN_COPY);
+                DeleteObject(rgn);
+            }
             break;
         }
     }
@@ -1216,9 +1224,25 @@ BOOL  SetViewportOrgEx(HDC hdc, int x, int y, LPPOINT lppt)
         lppt->x = (int)floor(mtx.x0);
         lppt->y = (int)floor(mtx.y0);
     }
+    int dx = x - mtx.x0;
+    int dy = y - mtx.y0;
+    OffsetRgn(hdc->rgn, -dx, -dy);
+
     mtx.x0=x;
     mtx.y0=y;
+
     cairo_set_matrix(hdc->cairo,&mtx);
+    return TRUE;
+}
+
+BOOL GetViewportOrgEx(HDC hdc, LPPOINT lpPoint) 
+{
+    if (!lpPoint)
+        return FALSE;
+    cairo_matrix_t mtx;
+    cairo_get_matrix(hdc->cairo, &mtx);
+    lpPoint->x = (int)floor(mtx.x0);
+    lpPoint->y = (int)floor(mtx.y0);
     return TRUE;
 }
 
@@ -1230,9 +1254,7 @@ BOOL  OffsetViewportOrgEx(HDC hdc, int x, int y, LPPOINT lppt)
         lppt->x = (int)floor(mtx.x0);
         lppt->y = (int)floor(mtx.y0);
     }
-
-    cairo_translate(hdc->cairo,x,y);
-    return TRUE;
+    return SetViewportOrgEx(hdc, x + mtx.x0, y + mtx.y0, lppt);
 }
 
 int  FillRect(HDC hdc, const RECT *lprc, HBRUSH hbr)

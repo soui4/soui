@@ -394,7 +394,6 @@ protected:
 	SAutoRefPtr<SPen_GDI> m_curPen;
 	SAutoRefPtr<SBrush_GDI> m_curBrush;
 	SAutoRefPtr<SFont_GDI> m_curFont;
-	POINT               m_ptOrg;
 
 	//注意保存4个默认的GDI对象
 	SAutoRefPtr<IBitmapS> m_defBmp;

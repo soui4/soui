@@ -542,8 +542,6 @@ namespace SOUI
         ,m_uGetDCFlag(0)
     {
 		m_pRenderFactory = pRenderFactory;
-
-        m_ptOrg.x=m_ptOrg.y=0;
                 
         HDC hdc=::GetDC(0);
         m_hdc = CreateCompatibleDC(hdc);
@@ -610,7 +608,6 @@ namespace SOUI
     HRESULT SRenderTarget_GDI::PushClipRect( LPCRECT pRect ,UINT mode/*=RGN_AND*/)
     {
         RECT rc=*pRect;
-        ::OffsetRect(&rc,m_ptOrg.x,m_ptOrg.y);
         HRGN hRgn=::CreateRectRgnIndirect(&rc);
         ::SaveDC(m_hdc);
         ::ExtSelectClipRgn(m_hdc,hRgn,mode);
@@ -648,7 +645,6 @@ namespace SOUI
         SRegion_GDI *pRgnGDI=(SRegion_GDI*)pRegion;
         HRGN hRgn=::CreateRectRgn(0,0,0,0);
         ::CombineRgn(hRgn,pRgnGDI->GetRegion(),NULL,RGN_COPY);
-        ::OffsetRgn(hRgn,m_ptOrg.x,m_ptOrg.y);
         ::SaveDC(m_hdc);
         ::ExtSelectClipRgn(m_hdc,hRgn,mode);
         ::DeleteObject(hRgn);
@@ -659,8 +655,6 @@ namespace SOUI
     {
         SRegion_GDI *pRgn=new SRegion_GDI(m_pRenderFactory);
         ::GetClipRgn(m_hdc,pRgn->GetRegion());
-        POINT pt={-m_ptOrg.x,-m_ptOrg.y};
-        pRgn->Offset(pt);
         *ppRegion = pRgn;
         return S_OK;
     }
@@ -1052,29 +1046,19 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::OffsetViewportOrg( int xOff, int yOff, LPPOINT lpPoint )
     {
-        if(lpPoint)
-        {
-            *lpPoint=m_ptOrg;
-        }
-        m_ptOrg.x+=xOff;
-        m_ptOrg.y+=yOff;
-        ::SetViewportOrgEx(m_hdc,m_ptOrg.x,m_ptOrg.y,NULL);
+        ::OffsetViewportOrgEx(m_hdc, xOff, yOff, lpPoint);
         return S_OK;
     }
 
     HRESULT SRenderTarget_GDI::GetViewportOrg( LPPOINT lpPoint )
     {
-        if(lpPoint)
-        {
-            *lpPoint=m_ptOrg;
-        }
+        ::GetViewportOrgEx(m_hdc, lpPoint);
         return S_OK;
     }
 
     HRESULT SRenderTarget_GDI::SetViewportOrg( POINT pt )
     {
-        m_ptOrg = pt;
-        ::SetViewportOrgEx(m_hdc,m_ptOrg.x,m_ptOrg.y,NULL);
+        ::SetViewportOrgEx(m_hdc, pt.x, pt.y,NULL);
         return S_OK;
     }
 

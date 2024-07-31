@@ -253,6 +253,7 @@ GetTextExtentPoint32(
  BOOL  WINAPI TextOut(  HDC hdc,  int x,  int y, LPCSTR lpString,  int c);
 
  BOOL  WINAPI SetViewportOrgEx(  HDC hdc,  int x,  int y,  LPPOINT lppt);
+ BOOL  WINAPI GetViewportOrgEx(HDC hdc, LPPOINT lpPoint);
  BOOL  WINAPI OffsetViewportOrgEx(  HDC hdc,  int x,  int y,  LPPOINT lppt);
 
 
