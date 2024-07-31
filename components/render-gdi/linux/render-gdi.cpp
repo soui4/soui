@@ -607,8 +607,7 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::PushClipRect( LPCRECT pRect ,UINT mode/*=RGN_AND*/)
     {
-        RECT rc=*pRect;
-        HRGN hRgn=::CreateRectRgnIndirect(&rc);
+        HRGN hRgn=::CreateRectRgnIndirect(pRect);
         ::SaveDC(m_hdc);
         ::ExtSelectClipRgn(m_hdc,hRgn,mode);
         ::DeleteObject(hRgn);

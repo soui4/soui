@@ -12,7 +12,6 @@ typedef struct _SDC {
 	HGDIOBJ   pen;
 	HGDIOBJ   brush;
 	HGDIOBJ   hfont;
-	HGDIOBJ   rgn;
 
 	int       bkMode;
 	int       nSave;
@@ -22,16 +21,13 @@ typedef struct _SDC {
 		, hfont(GetStockObject(SYSTEM_FONT))
 		, bmp(GetStockObject(NULL_BITMAP))
 		, bkMode(0)
-		, rgn(0)
 		, cairo(nullptr)
 	{
-		rgn = CreateRectRgn(0, 0, 0, 0);
 	}
 
 	~_SDC() {
 		if(cairo)
 			cairo_destroy(cairo);
-		DeleteObject(rgn);
 	}
 
 	int SaveState() {

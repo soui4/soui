@@ -1,6 +1,8 @@
 #ifndef _LINUX_GDI_H_
 #define _LINUX_GDI_H_
 
+#define FIELD_OFFSET(type,field) ((LONG)offsetof(type,field))
+
 #define OBJ_PEN             1
 #define OBJ_BRUSH           2
 #define OBJ_DC              3

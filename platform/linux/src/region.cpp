@@ -13,8 +13,6 @@
 #define INT_MAX  0x7fffffff
 #define INT_MIN  (-0x7fffffff-1)
 
-#define FIELD_OFFSET(type,field) ((LONG)offsetof(type,field))
-
 
 static inline void order_rect(RECT* rect)
 {

@@ -436,12 +436,8 @@ HGDIOBJ SelectObject(HDC hdc, HGDIOBJ h)
             if (GetGdiObjPtr(h))
             {
                 hdc->cairo = cairo_create((cairo_surface_t*)GetGdiObjPtr(h));
-                BITMAP bm;
-                GetObject(h, sizeof(bm), &bm);
-                RECT rcCanvas = { 0,0,bm.bmWidth,bm.bmHeight };
-                HRGN rgn = CreateRectRgnIndirect(&rcCanvas);
-                CombineRgn(hdc->rgn, rgn, nullptr, RGN_COPY);
-                DeleteObject(rgn);
+                //todo:
+                cairo_set_antialias(hdc->cairo, CAIRO_ANTIALIAS_GOOD);
             }
             break;
         }
@@ -472,43 +468,73 @@ BOOL RestoreDC(HDC hdc, int nSavedDC)
     return hdc->RestoreState(nSavedDC);
 }
 
+int  GetClipRgn(HDC hdc, HRGN hrgn)
+{
+    cairo_rectangle_list_t* rcList = cairo_copy_clip_rectangle_list(hdc->cairo);
+
+    int size = FIELD_OFFSET(RGNDATA, Buffer)+ rcList->num_rectangles * sizeof(RECT);
+	RGNDATA* pRgnData = (RGNDATA*)malloc(size);
+    pRgnData->rdh.dwSize = size;
+    pRgnData->rdh.iType = RDH_RECTANGLES;
+    pRgnData->rdh.nCount = rcList->num_rectangles;
+
+	RECT* pRc = (RECT*)pRgnData->Buffer;
+	cairo_rectangle_t* pRcSrc = rcList->rectangles;
+	for (int i = 0; i < rcList->num_rectangles; i++) {
+		pRc->left = pRcSrc->x;
+		pRc->top = pRcSrc->y;
+		pRc->right = pRc->left + pRcSrc->width;
+		pRc->bottom = pRc->top + pRcSrc->height;
+        pRc++;
+        pRcSrc++;
+	}
+	HRGN rgnSrc = ExtCreateRegion(NULL, pRgnData->rdh.nCount, pRgnData);
+	free(pRgnData);    
+    cairo_rectangle_list_destroy(rcList);
+    CombineRgn(hrgn, rgnSrc, nullptr, RGN_COPY);
+    DeleteObject(rgnSrc);
+    return RgnComplexity(hrgn) == NULLREGION ? 0 : 1;
+}
+
 int SelectClipRgn(HDC hdc, HRGN hrgn)
 {
-
-    CombineRgn(hdc->rgn,hrgn,nullptr,RGN_COPY);
-    ApplyRegion(hdc->cairo, hdc->rgn);
-    return RgnComplexity(hdc->rgn);
+    ApplyRegion(hdc->cairo, hrgn);
+    return RgnComplexity(hrgn);
 }
 
 int ExtSelectClipRgn(HDC hdc, HRGN hrgn, int mode)
 {
-    int ret= CombineRgn(hdc->rgn,hrgn,hdc->rgn,mode);
-    ApplyRegion(hdc->cairo, hdc->rgn);
+    POINT pt;
+    GetViewportOrgEx(hdc, &pt);
+    RECT rcClip;
+    GetClipBox(hdc, &rcClip);
+
+    HRGN rgnNow = CreateRectRgn(0, 0, 0, 0);
+    GetClipRgn(hdc, rgnNow);
+    int ret = CombineRgn(rgnNow, rgnNow, hrgn, mode);
+
+    RECT rc3;
+    GetRgnBox(rgnNow, &rc3);
+
+    ApplyRegion(hdc->cairo, rgnNow);
+    DeleteObject(rgnNow);
     return ret;
 }
 
 int ExcludeClipRect(HDC hdc, int left, int top, int right, int bottom)
 {
     HRGN hrgn = CreateRectRgn(left,top,right,bottom);
-    int ret = CombineRgn(hdc->rgn,hdc->rgn,hrgn,RGN_DIFF);
-    ApplyRegion(hdc->cairo, hdc->rgn);
+    int ret = ExtSelectClipRgn(hdc, hrgn, RGN_DIFF);
     DeleteObject(hrgn);
     return ret;
 }
 
 int IntersectClipRect(HDC hdc, int left, int top, int right, int bottom)
 {
-    HRGN hrgn = CreateRectRgn(left,top,right,bottom);
-    int ret = CombineRgn(hdc->rgn,hdc->rgn,hrgn,RGN_AND);
-    ApplyRegion(hdc->cairo, hdc->rgn);
+    HRGN hrgn = CreateRectRgn(left, top, right, bottom);
+    int ret = ExtSelectClipRgn(hdc, hrgn, RGN_AND);
     DeleteObject(hrgn);
     return ret;
-}
-
-int  GetClipRgn(HDC hdc, HRGN hrgn)
-{
-    CombineRgn(hrgn,hdc->rgn,nullptr,RGN_COPY);
-    return RgnComplexity(hrgn) == NULLREGION?0:1;
 }
 
 HGDIOBJ  GetCurrentObject(HDC hdc, UINT type)
@@ -1224,9 +1250,6 @@ BOOL  SetViewportOrgEx(HDC hdc, int x, int y, LPPOINT lppt)
         lppt->x = (int)floor(mtx.x0);
         lppt->y = (int)floor(mtx.y0);
     }
-    int dx = x - mtx.x0;
-    int dy = y - mtx.y0;
-    OffsetRgn(hdc->rgn, -dx, -dy);
 
     mtx.x0=x;
     mtx.y0=y;
