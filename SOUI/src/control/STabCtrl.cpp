@@ -23,10 +23,10 @@ class STabSlider
 
         CRect rcPage;
         pTabCtrl->GetChildrenLayoutRect(&rcPage);
+        pTabCtrl->InsertChild(this);
+        Move(rcPage);
         if (nType == 0)
         {
-            pTabCtrl->InsertChild(this);
-            Move(rcPage);
 
             m_bVertical = pTabCtrl->m_nTabAlign == STabCtrl::AlignLeft || pTabCtrl->m_nTabAlign == STabCtrl::AlignRight;
             if (m_bVertical)
@@ -117,9 +117,6 @@ class STabSlider
         }
         else
         {
-            pTabCtrl->InsertChild(this, ICWND_FIRST);
-            Move(rcPage);
-
             m_bVertical = pTabCtrl->m_nTabAlign == STabCtrl::AlignLeft || pTabCtrl->m_nTabAlign == STabCtrl::AlignRight;
             if (m_bVertical)
             {
@@ -167,7 +164,6 @@ class STabSlider
             pt -= rcPage.TopLeft();
             m_memRT->SetViewportOrg(pt);
             PaintForeground(m_memRT, &rcPage, GetParent());
-
             pTabCtrl->GetItem(iFrom)->SetVisible(FALSE);
 
             if (m_bVertical)
@@ -248,10 +244,8 @@ class STabSlider
     {
         CRect rcWnd = GetWindowRect();
         CRect rcSrc(m_ptOffset.x, m_ptOffset.y, m_ptOffset.x + rcWnd.Width(), m_ptOffset.y + rcWnd.Height());
-        //pRT->AlphaBlend(rcWnd, m_memRT, rcSrc, 255);
-        SStringT str;
-        str.Format(_T("ani step=%d\n"),m_iStep);
-        pRT->DrawText("test4",5,&rcWnd,DT_SINGLELINE);
+        pRT->AlphaBlend(rcWnd, m_memRT, rcSrc, 255);
+
     }
 
     void OnSize(UINT fType, CSize sz)
