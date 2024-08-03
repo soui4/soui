@@ -35,7 +35,6 @@ typedef struct tagWNDCLASSEX
     HICON     hIconSm;
 } WNDCLASSEX, *PWNDCLASSEX, *LPWNDCLASSEX;
 
-
 ATOM WINAPI RegisterClassEx( const WNDCLASSEX* wc );
 BOOL WINAPI UnregisterClass( LPCSTR className, HINSTANCE instance );
 

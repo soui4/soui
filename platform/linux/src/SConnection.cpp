@@ -173,6 +173,9 @@ SConnection::SConnection(int screenNum)
     _NET_WM_STATE_MAXIMIZED_VERT_ATOM = SConnMgr::internAtom(connection,1,"_NET_WM_STATE_MAXIMIZED_VERT");
     _NET_WM_ICON = SConnMgr::internAtom(connection, 1, "_NET_WM_ICON");
 
+    _NET_WM_ICON_NAME = SConnMgr::internAtom(connection,1,"_NET_WM_ICON_NAME");
+    _NET_WM_ICON = SConnMgr::internAtom(connection,1,"_NET_WM_ICON");
+
     m_bQuit=false;
     m_msgPeek = nullptr;
     m_bMsgNeedFree = false;

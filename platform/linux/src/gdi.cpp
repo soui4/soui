@@ -753,6 +753,49 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
     return TRUE;
 }
 
+BOOL DrawIcon( HDC hdc, INT x, INT y, HICON hIcon )
+{
+    return DrawIconEx( hdc, x, y, hIcon, 0, 0, 0, 0, DI_NORMAL | DI_COMPAT | DI_DEFAULTSIZE );
+}
+
+BOOL WINAPI DrawIconEx( HDC hdc, INT x0, INT y0, HICON icon, INT width,
+                              INT height, UINT step, HBRUSH brush, UINT flags )
+{
+    //todo:hjx
+    return FALSE;
+}
+
+BOOL  StretchBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, int cx2, int cy2, DWORD rop)
+{
+    //todo:hjx
+    return 0;
+}
+
+INT StretchDIBits(HDC hdc, INT x_dst, INT y_dst, INT width_dst, INT height_dst, INT x_src, INT y_src, INT width_src, INT height_src, const void *bits, const BITMAPINFO *bmi, UINT coloruse, DWORD rop)
+{
+    //todo:hjx
+    return 0;
+}
+
+void SetStretchBltMode(HDC hdc, int mode)
+{
+    //todo:hjx
+}
+
+HBITMAP CreateBitmap(INT width, INT height, UINT planes, UINT bpp, const void *bits)
+{
+    BITMAPINFO bmi;
+    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biPlanes = 1;
+    bmi.bmiHeader.biWidth = width;
+    bmi.bmiHeader.biHeight = height;
+    void* pBits=nullptr;
+    HBITMAP ret =  CreateDIBSection(NULL,&bmi,DIB_RGB_COLORS,&pBits,0,0);
+    if(ret){
+        UpdateDIBPixmap(ret,width,height,32,width*4,pBits);
+    }
+    return ret;
+}
 
 static bool IsAlpha(TCHAR c)
 {
@@ -1094,11 +1137,74 @@ BOOL GetTextExtentPoint32(HDC hdc, LPCSTR lpString, int c, LPSIZE psizl)
     return TRUE;
 }
 
+
+/* the various registry keys that are used to store parameters */
+enum parameter_key
+{
+    COLORS_KEY,
+    DESKTOP_KEY,
+    KEYBOARD_KEY,
+    MOUSE_KEY,
+    METRICS_KEY,
+    SOUND_KEY,
+    VERSION_KEY,
+    SHOWSOUNDS_KEY,
+    KEYBOARDPREF_KEY,
+    SCREENREADER_KEY,
+    AUDIODESC_KEY,
+    NB_PARAM_KEYS
+};
+struct sysparam_entry
+{
+};
+
+struct sysparam_rgb_entry
+{
+    enum parameter_key base_key;
+    const char        *regval;
+    COLORREF              val;
+};
+
+static struct sysparam_rgb_entry system_colors[] =
+{
+#define RGB_ENTRY(name,val,reg) { COLORS_KEY, reg , (val) }
+    RGB_ENTRY( COLOR_SCROLLBAR, RGB(212, 208, 200), "Scrollbar" ),
+    RGB_ENTRY( COLOR_BACKGROUND, RGB(58, 110, 165), "Background" ),
+    RGB_ENTRY( COLOR_ACTIVECAPTION, RGB(10, 36, 106), "ActiveTitle" ),
+    RGB_ENTRY( COLOR_INACTIVECAPTION, RGB(128, 128, 128), "InactiveTitle" ),
+    RGB_ENTRY( COLOR_MENU, RGB(212, 208, 200), "Menu" ),
+    RGB_ENTRY( COLOR_WINDOW, RGB(255, 255, 255), "Window" ),
+    RGB_ENTRY( COLOR_WINDOWFRAME, RGB(0, 0, 0), "WindowFrame" ),
+    RGB_ENTRY( COLOR_MENUTEXT, RGB(0, 0, 0), "MenuText" ),
+    RGB_ENTRY( COLOR_WINDOWTEXT, RGB(0, 0, 0), "WindowText" ),
+    RGB_ENTRY( COLOR_CAPTIONTEXT, RGB(255, 255, 255), "TitleText" ),
+    RGB_ENTRY( COLOR_ACTIVEBORDER, RGB(212, 208, 200), "ActiveBorder" ),
+    RGB_ENTRY( COLOR_INACTIVEBORDER, RGB(212, 208, 200), "InactiveBorder" ),
+    RGB_ENTRY( COLOR_APPWORKSPACE, RGB(128, 128, 128), "AppWorkSpace" ),
+    RGB_ENTRY( COLOR_HIGHLIGHT, RGB(10, 36, 106), "Hilight" ),
+    RGB_ENTRY( COLOR_HIGHLIGHTTEXT, RGB(255, 255, 255), "HilightText" ),
+    RGB_ENTRY( COLOR_BTNFACE, RGB(212, 208, 200), "ButtonFace" ),
+    RGB_ENTRY( COLOR_BTNSHADOW, RGB(128, 128, 128), "ButtonShadow" ),
+    RGB_ENTRY( COLOR_GRAYTEXT, RGB(128, 128, 128), "GrayText" ),
+    RGB_ENTRY( COLOR_BTNTEXT, RGB(0, 0, 0), "ButtonText" ),
+    RGB_ENTRY( COLOR_INACTIVECAPTIONTEXT, RGB(212, 208, 200), "InactiveTitleText" ),
+    RGB_ENTRY( COLOR_BTNHIGHLIGHT, RGB(255, 255, 255), "ButtonHilight" ),
+    RGB_ENTRY( COLOR_3DDKSHADOW, RGB(64, 64, 64), "ButtonDkShadow" ),
+    RGB_ENTRY( COLOR_3DLIGHT, RGB(212, 208, 200), "ButtonLight" ),
+    RGB_ENTRY( COLOR_INFOTEXT, RGB(0, 0, 0), "InfoText" ),
+    RGB_ENTRY( COLOR_INFOBK, RGB(255, 255, 225), "InfoWindow" ),
+    RGB_ENTRY( COLOR_ALTERNATEBTNFACE, RGB(181, 181, 181), "ButtonAlternateFace" ),
+    RGB_ENTRY( COLOR_HOTLIGHT, RGB(0, 0, 200), "HotTrackingColor" ),
+    RGB_ENTRY( COLOR_GRADIENTACTIVECAPTION, RGB(166, 202, 240), "GradientActiveTitle" ),
+    RGB_ENTRY( COLOR_GRADIENTINACTIVECAPTION, RGB(192, 192, 192), "GradientInactiveTitle" ),
+    RGB_ENTRY( COLOR_MENUHILIGHT, RGB(10, 36, 106), "MenuHilight" ),
+    RGB_ENTRY( COLOR_MENUBAR, RGB(212, 208, 200), "MenuBar" )
+#undef RGB_ENTRY
+};
+
 COLORREF GetSysColor(int i){
-    switch(i){
-        case COLOR_INFOBK:
-        return RGBA(128,128,128,255);
-    }
+    if(i>=0 && i<ARRAYSIZE(system_colors))
+        return system_colors[i].val;
     return RGBA(255,255,255,255);
 }
 
@@ -1573,6 +1679,16 @@ BOOL GradientFill(HDC hdc, TRIVERTEX* pVertices, ULONG nVertices, void* pMesh, U
         cairo_pattern_destroy(gradient);
     }
     return TRUE;
+}
+
+
+int GetDeviceCaps(HDC hdc, int cap)
+{
+    if(cap == BITSPIXEL) //todo:hjx
+        return 32;
+    if(cap == PLANES)
+        return 1;
+    return 0;
 }
 
 struct _IconObj {

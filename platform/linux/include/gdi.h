@@ -100,6 +100,76 @@ typedef struct tagBITMAPINFOHEADER{
         DWORD      biClrImportant;
 } BITMAPINFOHEADER, FAR *LPBITMAPINFOHEADER, *PBITMAPINFOHEADER;
 
+typedef LONG FXPT16DOT16, *LPFXPT16DOT16;
+typedef LONG FXPT2DOT30, *LPFXPT2DOT30;
+typedef LONG LCSCSTYPE;
+typedef LONG LCSGAMUTMATCH;
+
+typedef struct tagCIEXYZ
+{
+  FXPT2DOT30 ciexyzX;
+  FXPT2DOT30 ciexyzY;
+  FXPT2DOT30 ciexyzZ;
+} CIEXYZ, *LPCIEXYZ;
+
+typedef struct tagCIEXYZTRIPLE
+{
+  CIEXYZ ciexyzRed;
+  CIEXYZ ciexyzGreen;
+  CIEXYZ ciexyzBlue;
+} CIEXYZTRIPLE, *LPCIEXYZTRIPLE;
+
+typedef struct
+{
+    DWORD        bV4Size;
+    LONG         bV4Width;
+    LONG         bV4Height;
+    WORD         bV4Planes;
+    WORD         bV4BitCount;
+    DWORD        bV4V4Compression;
+    DWORD        bV4SizeImage;
+    LONG         bV4XPelsPerMeter;
+    LONG         bV4YPelsPerMeter;
+    DWORD        bV4ClrUsed;
+    DWORD        bV4ClrImportant;
+    DWORD        bV4RedMask;
+    DWORD        bV4GreenMask;
+    DWORD        bV4BlueMask;
+    DWORD        bV4AlphaMask;
+    DWORD        bV4CSType;
+    CIEXYZTRIPLE bV4Endpoints;
+    DWORD        bV4GammaRed;
+    DWORD        bV4GammaGreen;
+    DWORD        bV4GammaBlue;
+} BITMAPV4HEADER, *PBITMAPV4HEADER;
+
+typedef struct {
+    DWORD        bV5Size;
+    LONG         bV5Width;
+    LONG         bV5Height;
+    WORD         bV5Planes;
+    WORD         bV5BitCount;
+    DWORD        bV5Compression;
+    DWORD        bV5SizeImage;
+    LONG         bV5XPelsPerMeter;
+    LONG         bV5YPelsPerMeter;
+    DWORD        bV5ClrUsed;
+    DWORD        bV5ClrImportant;
+    DWORD        bV5RedMask;
+    DWORD        bV5GreenMask;
+    DWORD        bV5BlueMask;
+    DWORD        bV5AlphaMask;
+    DWORD        bV5CSType;
+    CIEXYZTRIPLE bV5Endpoints;
+    DWORD        bV5GammaRed;
+    DWORD        bV5GammaGreen;
+    DWORD        bV5GammaBlue;
+    DWORD        bV5Intent;
+    DWORD        bV5ProfileData;
+    DWORD        bV5ProfileSize;
+    DWORD        bV5Reserved;
+} BITMAPV5HEADER, *LPBITMAPV5HEADER, *PBITMAPV5HEADER;
+
 typedef struct tagBITMAPFILEHEADER{
     WORD bfType;
     DWORD bfSize;
@@ -107,6 +177,29 @@ typedef struct tagBITMAPFILEHEADER{
     WORD  bfReserved2;
     DWORD bfOffBits;
 }BITMAPFILEHEADER,*PBITMAPFILEHEADER;
+
+
+typedef struct
+{
+    DWORD   bcSize;
+    WORD    bcWidth;
+    WORD    bcHeight;
+    WORD    bcPlanes;
+    WORD    bcBitCount;
+} BITMAPCOREHEADER, *PBITMAPCOREHEADER, *LPBITMAPCOREHEADER;
+
+
+typedef struct tagRGBTRIPLE {
+  BYTE rgbtBlue;
+  BYTE rgbtGreen;
+  BYTE rgbtRed;
+} RGBTRIPLE;
+
+typedef struct
+{
+    BITMAPCOREHEADER bmciHeader;
+    RGBTRIPLE        bmciColors[1];
+} BITMAPCOREINFO, *PBITMAPCOREINFO, *LPBITMAPCOREINFO;
 
 /* constants for the biCompression field */
 #define BI_RGB        0L
@@ -120,6 +213,15 @@ typedef struct tagBITMAPINFO {
     BITMAPINFOHEADER    bmiHeader;
     RGBQUAD             bmiColors[1];
 } BITMAPINFO, FAR *LPBITMAPINFO, *PBITMAPINFO;
+
+typedef struct
+{
+	BITMAP		dsBm;
+	BITMAPINFOHEADER	dsBmih;
+	DWORD			dsBitfields[3];
+	HANDLE		dshSection;
+	DWORD			dsOffset;
+} DIBSECTION, *PDIBSECTION, *LPDIBSECTION;
 
 #define DIB_RGB_COLORS      0 /* color table in RGBs */
 #define DIB_PAL_COLORS      1 /* color table in palette indices */
@@ -199,7 +301,22 @@ BOOL WINAPI FrameRgn(
  HGDIOBJ WINAPI GetCurrentObject(  HDC hdc,  UINT type);
  int   WINAPI GetDIBits(  HDC hdc,  HBITMAP hbm,  UINT start,  UINT cLines,   LPVOID lpvBits, LPBITMAPINFO lpbmi,  UINT usage);  // SAL actual size of lpbmi is computed from structure elements
 
- BOOL  WINAPI BitBlt(  HDC hdc,  int x,  int y,  int cx,  int cy,  HDC hdcSrc,  int x1,  int y1,  DWORD rop);
+HICON WINAPI CreateIconIndirect(PICONINFO iconinfo);
+
+BOOL  WINAPI BitBlt(  HDC hdc,  int x,  int y,  int cx,  int cy,  HDC hdcSrc,  int x1,  int y1,  DWORD rop);
+
+BOOL  WINAPI StretchBlt(  HDC hdc,  int x,  int y,  int cx,  int cy,  HDC hdcSrc,  int x1,  int y1, int cx2,  int cy2,  DWORD rop);
+
+BOOL WINAPI DrawIcon( HDC hdc, INT x, INT y, HICON hIcon );
+
+BOOL WINAPI DrawIconEx( HDC hdc, INT x0, INT y0, HICON icon, INT width,
+                              INT height, UINT step, HBRUSH brush, UINT flags );
+
+INT WINAPI  StretchDIBits( HDC hdc, INT x_dst, INT y_dst, INT width_dst,
+                                            INT height_dst, INT x_src, INT y_src, INT width_src,
+                                            INT height_src, const void *bits, const BITMAPINFO *bmi,
+                                            UINT coloruse, DWORD rop );
+
 int
 WINAPI
 DrawText(
@@ -240,7 +357,6 @@ GetTextExtentPoint32(
 
  HGDIOBJ WINAPI GetStockObject(  int i);
 
- #define COLOR_INFOBK 1
  COLORREF GetSysColor(int i);
 
  BOOL WINAPI Rectangle( HDC hdc,  int left,  int top,  int right,  int bottom);
@@ -293,26 +409,6 @@ InvertRect(
  int   WINAPI SetROP2( HDC hdc,  int rop2);
  COLORREF WINAPI SetTextColor( HDC hdc,  COLORREF color);
 
-
-#define IMAGE_BITMAP 	0
-#define IMAGE_CURSOR 	1
-#define IMAGE_ICON      2
-
-
-
-#define LR_CREATEDIBSECTION  0x00002000 \
-	//When the uType parameter specifies IMAGE_BITMAP, causes the function to return a DIB section bitmap rather than a compatible bitmap. This flag is useful for loading a bitmap without mapping it to the colors of the display device.
-
-#define LR_DEFAULTCOLOR \
-0x00000000 \
-	//The default flag; it does nothing. All it means is "not LR_MONOCHROME".
-
-#define LR_DEFAULTSIZE \
-0x00000040 \
-	//Uses the width or height specified by the system metric values for cursors or icons, if the cxDesired or cyDesired values are set to zero. If this flag is not specified and cxDesired and cyDesired are set to zero, the function uses the actual resource size. If the resource contains multiple images, the function uses the size of the first image.
-
-#define LR_LOADFROMFILE \
-0x00000010 
 
 HANDLE LoadImage(
   HINSTANCE hInst,

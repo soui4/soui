@@ -868,6 +868,12 @@ struct HeapInfo {
     std::list<MemBlock> lstMem;
 };
 
+HANDLE GetProcessHeap()
+{
+    static HeapInfo global_heap;
+    return HANDLE(&global_heap);
+}
+
 HANDLE
 HeapCreate(
     DWORD flOptions,
@@ -954,11 +960,8 @@ GetCurrentProcess(
     return 0;
 }
 
-DWORD GetModuleFileName(
-    HMODULE hModule,
-    LPSTR lpFilename,
-    DWORD nSize
-) {
+DWORD GetModuleFileName(HMODULE hModule, LPSTR lpFilename, DWORD nSize)
+{
     if (hModule) {
         Dl_info info;
         int result = dladdr(hModule, &info);

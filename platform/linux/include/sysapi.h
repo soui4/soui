@@ -158,6 +158,8 @@ long file_length(const char * path);
 #define HEAP_CREATE_SEGMENT_HEAP        0x00000100      
 #define HEAP_CREATE_HARDENED            0x00000200      
 
+HANDLE WINAPI GetProcessHeap();
+
 HANDLE WINAPI
 HeapCreate(
     DWORD flOptions,

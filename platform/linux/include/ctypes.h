@@ -221,7 +221,7 @@ typedef struct _SYSTEMTIME{
 #define LOBYTE(w)           ((BYTE)(((DWORD_PTR)(w)) & 0xff))
 #define HIBYTE(w)           ((BYTE)((((DWORD_PTR)(w)) >> 8) & 0xff))
 
-#define RGB(r,g,b) ((r)|(g)<<8|(b)<<16)
+#define RGB(r,g,b) ((r)|(g)<<8|(b)<<16)|(0xffu<<24)
 #define RGBA(r,g,b,a) ((r)|(g)<<8|(b)<<16|(a)<<24)
 #define GetRValue(rgb)   (LOBYTE(rgb))
 #define GetGValue(rgb)  (LOBYTE(rgb>>8))

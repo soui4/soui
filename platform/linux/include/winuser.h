@@ -905,12 +905,6 @@ typedef struct tagCREATESTRUCT {
 #define VK_OEM_CLEAR      0xFE
 
 
-#define DI_MASK         0x0001
-#define DI_IMAGE        0x0002
-#define DI_NORMAL       0x0003
-#define DI_COMPAT       0x0004
-#define DI_DEFAULTSIZE  0x0008
-
 #define MONITOR_DEFAULTTONULL       0x00000000
 #define MONITOR_DEFAULTTOPRIMARY    0x00000001
 #define MONITOR_DEFAULTTONEAREST    0x00000002
@@ -1354,16 +1348,170 @@ PtInRect(
      POINT pt);
 
 
-/*
- * GetWindow() Constants
- */
-#define GW_HWNDFIRST        0
-#define GW_HWNDLAST         1
-#define GW_HWNDNEXT         2
-#define GW_HWNDPREV         3
-#define GW_OWNER            4
-#define GW_CHILD            5
-#define GW_CHILDFIRST       GW_CHILD
-#define GW_CHILDLAST        6
-#define GW_PARENT           7
+/* NtUserSetCursorIconData parameter, not compatible with Windows */
+struct cursoricon_frame
+{
+    UINT     width;    /* frame-specific width */
+    UINT     height;   /* frame-specific height */
+    HBITMAP  color;    /* color bitmap */
+    HBITMAP  alpha;    /* pre-multiplied alpha bitmap for 32-bpp icons */
+    HBITMAP  mask;     /* mask bitmap (followed by color for 1-bpp icons) */
+    POINT    hotspot;
+};
+
+struct cursoricon_desc
+{
+    UINT flags;
+    UINT num_steps;
+    UINT num_frames;
+    UINT delay;
+    struct cursoricon_frame *frames;
+    DWORD *frame_seq;
+    DWORD *frame_rates;
+    HRSRC rsrc;
+};
+
+#pragma pack(push,1)
+typedef struct
+{
+    BYTE   bWidth;
+    BYTE   bHeight;
+    BYTE   bColorCount;
+    BYTE   bReserved;
+} ICONRESDIR;
+
+typedef struct
+{
+    WORD   wWidth;
+    WORD   wHeight;
+} CURSORDIR;
+
+typedef struct
+{   union
+    { ICONRESDIR icon;
+      CURSORDIR  cursor;
+    } ResInfo;
+    WORD   wPlanes;
+    WORD   wBitCount;
+    DWORD  dwBytesInRes;
+    WORD   wResId;
+} CURSORICONDIRENTRY;
+
+typedef struct
+{
+    WORD                idReserved;
+    WORD                idType;
+    WORD                idCount;
+    CURSORICONDIRENTRY  idEntries[1];
+} CURSORICONDIR;
+
+typedef struct {
+    BYTE bWidth;
+    BYTE bHeight;
+    BYTE bColorCount;
+    BYTE bReserved;
+    WORD xHotspot;
+    WORD yHotspot;
+    DWORD dwDIBSize;
+    DWORD dwDIBOffset;
+} CURSORICONFILEDIRENTRY;
+
+typedef struct
+{
+    WORD                idReserved;
+    WORD                idType;
+    WORD                idCount;
+    CURSORICONFILEDIRENTRY  idEntries[1];
+} CURSORICONFILEDIR;
+#pragma pack(pop)
+
+#define FIELD_OFFSET(type, field) ((LONG)offsetof(type, field))
+#define RTL_FIELD_SIZE(type, field) (sizeof(((type *)0)->field))
+#define RTL_SIZEOF_THROUGH_FIELD(type, field) (FIELD_OFFSET(type, field) + RTL_FIELD_SIZE(type, field))
+
+typedef struct _ICONINFO {
+	BOOL		fIcon;
+	DWORD		xHotspot;
+	DWORD		yHotspot;
+	HBITMAP	hbmMask;
+	HBITMAP	hbmColor;
+} ICONINFO, *PICONINFO;
+
+typedef struct _ICONINFOEXA
+{
+    DWORD     cbSize;
+    BOOL      fIcon;
+    DWORD     xHotspot;
+    DWORD     yHotspot;
+    HBITMAP   hbmMask;
+    HBITMAP   hbmColor;
+    WORD      wResID;
+    char      szModName[MAX_PATH];
+    char      szResName[MAX_PATH];
+} ICONINFOEXA, *PICONINFOEXA;
+
+typedef struct _ICONINFOEXW
+{
+    DWORD     cbSize;
+    BOOL      fIcon;
+    DWORD     xHotspot;
+    DWORD     yHotspot;
+    HBITMAP   hbmMask;
+    HBITMAP   hbmColor;
+    WORD      wResID;
+    wchar_t      szModName[MAX_PATH];
+    wchar_t      szResName[MAX_PATH];
+} ICONINFOEXW, *PICONINFOEXW;
+
+
+#define COLOR_SCROLLBAR		    0
+#define COLOR_BACKGROUND	    1
+#define COLOR_ACTIVECAPTION	    2
+#define COLOR_INACTIVECAPTION	    3
+#define COLOR_MENU		    4
+#define COLOR_WINDOW		    5
+#define COLOR_WINDOWFRAME	    6
+#define COLOR_MENUTEXT		    7
+#define COLOR_WINDOWTEXT	    8
+#define COLOR_CAPTIONTEXT  	    9
+#define COLOR_ACTIVEBORDER	   10
+#define COLOR_INACTIVEBORDER	   11
+#define COLOR_APPWORKSPACE	   12
+#define COLOR_HIGHLIGHT		   13
+#define COLOR_HIGHLIGHTTEXT	   14
+#define COLOR_BTNFACE              15
+#define COLOR_BTNSHADOW            16
+#define COLOR_GRAYTEXT             17
+#define COLOR_BTNTEXT		   18
+#define COLOR_INACTIVECAPTIONTEXT  19
+#define COLOR_BTNHIGHLIGHT         20
+/* win95 colors */
+#define COLOR_3DDKSHADOW           21
+#define COLOR_3DLIGHT              22
+#define COLOR_INFOTEXT             23
+#define COLOR_INFOBK               24
+#define COLOR_DESKTOP              COLOR_BACKGROUND
+#define COLOR_3DFACE               COLOR_BTNFACE
+#define COLOR_3DSHADOW             COLOR_BTNSHADOW
+#define COLOR_3DHIGHLIGHT          COLOR_BTNHIGHLIGHT
+#define COLOR_3DHILIGHT            COLOR_BTNHIGHLIGHT
+#define COLOR_BTNHILIGHT           COLOR_BTNHIGHLIGHT
+/* win98 colors */
+#define COLOR_ALTERNATEBTNFACE         25  /* undocumented, constant name unknown */
+#define COLOR_HOTLIGHT                 26
+#define COLOR_GRADIENTACTIVECAPTION    27
+#define COLOR_GRADIENTINACTIVECAPTION  28
+/* win2k/xp colors */
+#define COLOR_MENUHILIGHT              29
+#define COLOR_MENUBAR                  30
+
+  /* WM_CTLCOLOR values */
+#define CTLCOLOR_MSGBOX             0
+#define CTLCOLOR_EDIT               1
+#define CTLCOLOR_LISTBOX            2
+#define CTLCOLOR_BTN                3
+#define CTLCOLOR_DLG                4
+#define CTLCOLOR_SCROLLBAR          5
+#define CTLCOLOR_STATIC             6
+
 #endif//__WINUSER_H_
