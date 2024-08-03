@@ -905,6 +905,12 @@ typedef struct tagCREATESTRUCT {
 #define VK_OEM_CLEAR      0xFE
 
 
+#define DI_MASK         0x0001
+#define DI_IMAGE        0x0002
+#define DI_NORMAL       0x0003
+#define DI_COMPAT       0x0004
+#define DI_DEFAULTSIZE  0x0008
+
 #define MONITOR_DEFAULTTONULL       0x00000000
 #define MONITOR_DEFAULTTOPRIMARY    0x00000001
 #define MONITOR_DEFAULTTONEAREST    0x00000002
@@ -1347,6 +1353,18 @@ PtInRect(
      CONST RECT *lprc,
      POINT pt);
 
+/*
+ * GetWindow() Constants
+ */
+#define GW_HWNDFIRST        0
+#define GW_HWNDLAST         1
+#define GW_HWNDNEXT         2
+#define GW_HWNDPREV         3
+#define GW_OWNER            4
+#define GW_CHILD            5
+#define GW_CHILDFIRST       GW_CHILD
+#define GW_CHILDLAST        6
+#define GW_PARENT           7
 
 /* NtUserSetCursorIconData parameter, not compatible with Windows */
 struct cursoricon_frame
