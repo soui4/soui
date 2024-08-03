@@ -3,93 +3,14 @@
 #include <assert.h>
 #include <functional>
 #include <xcb/xcb_icccm.h>
+#include <xcb/render.h>
+#include <xcb/xcb_renderutil.h>
+#include <xcb/xcb_image.h>
+
 #include "uimsg.h"
 #include <algorithm>
 
 SNSBEGIN
-
-
-//Appendix B: X Font Cursors
-//The following are the available cursors that can be used with XCreateFontCursor().
-
-	#define XC_X_cursor 0 		
-    #define XC_ll_angle 76
-	#define XC_arrow 2 		
-    #define XC_lr_angle 78
-	#define XC_based_arrow_down 4 		
-    #define XC_man 80
-	#define XC_based_arrow_up 6 		
-    #define XC_middlebutton 82
-	#define XC_boat 8 		
-    #define XC_mouse 84
-	#define XC_bogosity 10 		
-    #define XC_pencil 86
-	#define XC_bottom_left_corner 12 		
-    #define XC_pirate 88
-	#define XC_bottom_right_corner 14 		
-    #define XC_plus 90
-	#define XC_bottom_side 16 		
-    #define XC_question_arrow 92
-	#define XC_bottom_tee 18 		
-    #define XC_right_ptr 94
-	#define XC_box_spiral 20 		
-    #define XC_right_side 96
-	#define XC_center_ptr 22 		
-    #define XC_right_tee 98
-	#define XC_circle 24 		
-    #define XC_rightbutton 100
-	#define XC_clock 26 		
-    #define XC_rtl_logo 102
-	#define XC_coffee_mug 28 		
-    #define XC_sailboat 104
-	#define XC_cross 30 		
-    #define XC_sb_down_arrow 106
-	#define XC_cross_reverse 32 		
-    #define XC_sb_h_double_arrow 108
-	#define XC_crosshair 34 		
-    #define XC_sb_left_arrow 110
-	#define XC_diamond_cross 36 		
-    #define XC_sb_right_arrow 112
-	#define XC_dot 38 		
-    #define XC_sb_up_arrow 114
-	#define XC_dot_box_mask 40 		
-    #define XC_sb_v_double_arrow 116
-	#define XC_double_arrow 42 		
-    #define XC_shuttle 118
-	#define XC_draft_large 44 		
-    #define XC_sizing 120
-	#define XC_draft_small 46 		
-    #define XC_spider 122
-	#define XC_draped_box 48 		
-    #define XC_spraycan 124
-	#define XC_exchange 50 		
-    #define XC_star 126
-	#define XC_fleur 52 		
-    #define XC_target 128
-	#define XC_gobbler 54 		
-    #define XC_tcross 130
-	#define XC_gumby 56 		
-    #define XC_top_left_arrow 132
-	#define XC_hand1 58 		
-    #define XC_top_left_corner 134
-	#define XC_hand2 60 		
-    #define XC_top_right_corner 136
-	#define XC_heart 62 		
-    #define XC_top_side 138
-	#define XC_icon 64 		
-    #define XC_top_tee 140
-	#define XC_iron_cross 66 		
-    #define XC_trek 142
-	#define XC_left_ptr 68 		
-    #define XC_ul_angle 144
-	#define XC_left_side 70 		
-    #define XC_umbrella 146
-	#define XC_left_tee 72 		
-    #define XC_ur_angle 148
-	#define XC_leftbutton 74 		
-    #define XC_watch 150
-	#define XC_xterm 152
-
 
 static SConnMgr *s_connMgr = NULL;
 static SCriticalSection s_cs;
@@ -185,14 +106,12 @@ xcb_atom_t SConnMgr::internAtom(xcb_connection_t *connection, uint8_t onlyIfExis
     return atom;
 }
 
-//todo: ��ȡ���˫��ʱ������Ŀǰ��ȡ������Чֵ
+//todo: 
 static uint32_t GetDoubleClickSpan(xcb_connection_t* connection,xcb_screen_t * screen) {
     uint32_t ret = 200;
     xcb_window_t root_window = screen->root;
 
-    // ��ȡDoubleClickTime��Դ��ԭ��ID
     xcb_atom_t atom = SConnMgr::internAtom(connection, 0, "_NET_DOUBLE_CLICK_TIME");
-    // ���ͻ�ȡ���Ե�����
     xcb_get_property_cookie_t cookie = xcb_get_property(connection, 0, root_window, atom, XCB_ATOM_CARDINAL, 0, 1024);
     xcb_get_property_reply_t *reply = xcb_get_property_reply(connection, cookie, NULL);
     if (reply == NULL) {
@@ -200,11 +119,9 @@ static uint32_t GetDoubleClickSpan(xcb_connection_t* connection,xcb_screen_t * s
         return ret;
     }
     
-    // ����ȡ��ֵ�Ƿ���Ч
     if (reply->value_len == 1) {
         ret = *((uint32_t*)xcb_get_property_value(reply));
     }
-    // �ͷ���Դ
     free(reply);
     return ret;
 }
@@ -278,10 +195,14 @@ SConnection::~SConnection()
         return;
     }
 
-    for(auto it = m_sysCursor.begin();it!=m_sysCursor.end();it++){
-        xcb_free_cursor(connection,it->second);
+    for(auto it : m_sysCursor){
+        xcb_free_cursor(connection,it.second);
     }
     m_sysCursor.clear();
+    for(auto it:m_stdCursor){
+        DestroyIcon(it.second);
+    }
+    m_stdCursor.clear();
 
     m_bQuit = true;
     xcb_disconnect(connection);
@@ -508,39 +429,110 @@ HWND SConnection::GetCapture() const{
     return m_hWndCapture;
 }
 
+xcb_cursor_t SConnection::createXcbCursor(HCURSOR cursor)
+{
+        xcb_generic_error_t *error = 0;
+        xcb_render_query_pict_formats_cookie_t formatsCookie = xcb_render_query_pict_formats(connection);
+        xcb_render_query_pict_formats_reply_t *formatsReply = xcb_render_query_pict_formats_reply(connection,
+                                                                                                formatsCookie,
+                                                                                                &error);
+        if (!formatsReply || error) {
+            //qWarning("qt_xcb_createCursorXRender: query_pict_formats failed");
+            free(formatsReply);
+            free(error);
+            return XCB_NONE;
+        }
+        xcb_render_pictforminfo_t *fmt = xcb_render_util_find_standard_format(formatsReply,
+                                                                            XCB_PICT_STANDARD_ARGB_32);
+        if (!fmt) {
+            //qWarning("qt_xcb_createCursorXRender: Failed to find format PICT_STANDARD_ARGB_32");
+            free(formatsReply);
+            return XCB_NONE;
+        }
+    xcb_cursor_t xcb_cursor = XCB_NONE;
+        ICONINFO info={0};
+        GetIconInfo(cursor,&info);
+        assert(info.fIcon == 0);
+        assert(info.hbmColor);
+        BITMAP bm;
+        GetObject(info.hbmColor,sizeof(bm),&bm);
+        if(bm.bmBitsPixel!=32){
+            goto end;
+        }
+
+    do{
+        xcb_pixmap_t pix = xcb_generate_id(connection);
+        xcb_create_pixmap(connection, 32, pix, screen->root, bm.bmWidth, bm.bmHeight);
+
+        xcb_render_picture_t pic = xcb_generate_id(connection);
+        xcb_render_create_picture(connection, pic, pix, fmt->id, 0, 0);
+
+        xcb_gcontext_t gc = xcb_generate_id(connection);
+
+        xcb_image_t *xi = xcb_image_create(bm.bmWidth, bm.bmHeight, XCB_IMAGE_FORMAT_Z_PIXMAP,
+                                       32, 32, 32, 32,
+                                       XCB_IMAGE_ORDER_LSB_FIRST,//todo:hjx
+                                       XCB_IMAGE_ORDER_MSB_FIRST,
+                                       0, 0, 0);
+        if (!xi) {
+            //qWarning("qt_xcb_createCursorXRender: xcb_image_create failed");
+            break;
+        }
+        xi->data = (uint8_t *) malloc(xi->stride * bm.bmHeight);
+        if (!xi->data) {
+            //qWarning("qt_xcb_createCursorXRender: Failed to malloc() image data");
+            xcb_image_destroy(xi);
+            break;
+        }
+        memcpy(xi->data, bm.bmBits,bm.bmWidth*4*bm.bmHeight);
+
+        xcb_create_gc(connection, gc, pix, 0, 0);
+        xcb_image_put(connection, pix, gc, xi, 0, 0, 0);
+        xcb_free_gc(connection, gc);
+
+        xcb_cursor = xcb_generate_id(connection);
+        xcb_render_create_cursor(connection, xcb_cursor, pic, info.xHotspot, info.yHotspot);
+
+        free(xi->data);
+        xcb_image_destroy(xi);
+        xcb_render_free_picture(connection, pic);
+        xcb_free_pixmap(connection, pix);
+
+    }while(false);
+ 
+    free(formatsReply);
+end:
+    if(info.hbmColor)
+        DeleteObject(info.hbmColor);
+    if(info.hbmMask)
+        DeleteObject(info.hbmMask);
+
+    return xcb_cursor;
+}
+
 HCURSOR SConnection::SetCursor(HCURSOR cursor)
 {
     if(!cursor)
         cursor = LoadCursor(IDC_ARROW);
-    HCURSOR ret = m_hCursor;
-    if(cursor != m_hCursor){
-        uint32_t val[]={cursor};
-        xcb_change_window_attributes(connection, screen->root, XCB_CW_CURSOR,val);
-        m_hCursor= cursor;
+    assert(cursor);
+    if(cursor == m_hCursor)
+        return cursor;
+    xcb_cursor_t xcbCursor = 0;
+    if(m_sysCursor.find(cursor)!=m_sysCursor.end()){
+        xcbCursor = m_sysCursor[cursor];
+    }else{
+        xcbCursor = createXcbCursor(cursor);
+        if(!xcbCursor)
+        {
+            //todo: print error
+            return 0;
+        }
     }
+    HCURSOR ret = m_hCursor;
+    uint32_t val[]={xcbCursor};
+    xcb_change_window_attributes(connection, screen->root, XCB_CW_CURSOR,val);
+    m_hCursor= cursor;
     return ret;
-}
-
-
-
-static HCURSOR
-load_font_cursor(xcb_connection_t *c,
-            xcb_screen_t     *screen,
-            int               cursor_id)
-{
-  xcb_font_t font = xcb_generate_id (c);
-  xcb_open_font (c, font,
-                                       strlen ("cursor"),
-                                       "cursor");
-
-  xcb_cursor_t cursor = xcb_generate_id (c);
-  xcb_create_glyph_cursor (c, cursor, font, font,
-                           cursor_id, cursor_id + 1,
-                           0, 0, 0,
-                           0, 0, 0);
-
-  xcb_close_font(c, font);
-  return cursor;
 }
 
 
@@ -561,55 +553,43 @@ load_font_cursor(xcb_connection_t *c,
 #define CIDC_APPSTARTING     (32650) 
 #define CIDC_HELP            (32651)
 
+LPCSTR SConnection::getStdCursorName(WORD wId)
+{
+    switch(wId){
+        case CIDC_ARROW: return "arrow.cur";
+        case CIDC_IBEAM: return "ibeam.cur";
+        case CIDC_WAIT: return "wait.cur";
+        case CIDC_CROSS: return "cross.cur";
+        case CIDC_UPARROW: return "uparrow.cur";
+        case CIDC_SIZE: return "size.cur";
+        case CIDC_ICON: return "icon.cur";
+        case CIDC_SIZENWSE: return "sizenwse.cur";
+        case CIDC_SIZENESW: return "sizenesw.cur";
+        case CIDC_SIZEWE:return "sizewe.cur";
+        case CIDC_SIZENS: return "sizens.cur";
+        case CIDC_SIZEALL: return "sizeall.cur";
+        case CIDC_HAND: return "hand.cur";
+        case CIDC_HELP: return "help.cur";
+    }
+    return NULL;
+}
+
 
 HCURSOR SConnection::LoadCursor(LPCSTR lpCursorName)
 {
     HCURSOR ret = 0;
     if(IS_INTRESOURCE(lpCursorName)){
         WORD wId = (WORD)(ULONG_PTR)lpCursorName;
-        if(m_sysCursor.find(wId) != m_sysCursor.end())
-            return m_sysCursor[wId];
-        int cursorId = 0;
-        switch(wId){
-            case CIDC_ARROW:
-            cursorId = XC_left_ptr;
-            break;
-            case CIDC_IBEAM:
-            cursorId = XC_xterm;
-            break;
-            case CIDC_CROSS:
-            cursorId = XC_cross;
-            break;
-            case CIDC_UPARROW:
-            cursorId = XC_sb_up_arrow;
-            break;
-            case CIDC_SIZE:
-            cursorId = XC_sizing;
-            break;
-            case CIDC_SIZENWSE:
-            cursorId = XC_top_right_corner;
-            break;
-            case CIDC_SIZENESW:
-            cursorId = XC_top_left_corner;
-            break;
-            case CIDC_SIZEWE:
-            cursorId = XC_sb_v_double_arrow;
-            break;
-            case CIDC_SIZENS:
-            cursorId = XC_sb_h_double_arrow;
-            break;
-            case CIDC_SIZEALL:
-            cursorId = XC_cross_reverse;
-            break;
-            case CIDC_HAND:
-            cursorId = XC_hand1;
-            break;
-        }
-        
-        ret = load_font_cursor(connection,screen,cursorId);
-        if(ret){
-            m_sysCursor.insert(std::make_pair(wId,ret));
-        }
+        if(m_stdCursor.find(wId)!=m_stdCursor.end())
+            return m_stdCursor[wId];
+        //todo: hjx load std cursor
+        std::string strCursor = "/home/flyhigh/work/soui4/cursor/";
+        strCursor += getStdCursorName(wId);
+        ret = (HCURSOR)LoadImage(0,strCursor.c_str(),IMAGE_CURSOR,0,0,LR_LOADFROMFILE|LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
+        assert(ret);
+        m_stdCursor.insert(std::make_pair(wId,ret));
+    }else{
+        ret = (HCURSOR)LoadImage(0,lpCursorName,IMAGE_CURSOR,0,0,LR_LOADFROMFILE|LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
     }
     return ret;
 }
@@ -617,12 +597,15 @@ HCURSOR SConnection::LoadCursor(LPCSTR lpCursorName)
 BOOL SConnection::DestroyCursor(HCURSOR cursor)
 {
     //look for sys cursor
-    for(auto it = m_sysCursor.begin();it!=m_sysCursor.end();it++){
-        if(it->second == cursor){
+    auto it = m_sysCursor.find(cursor);
+    if(it==m_sysCursor.end())
+        return FALSE;
+    for(auto it : m_stdCursor){
+        if(cursor == it.second)
             return TRUE;
-        }
     }
-    xcb_free_cursor(connection,cursor);
+    m_sysCursor.erase(cursor);
+    DestroyIcon((HICON)cursor);
     return TRUE;
 }
 
@@ -749,6 +732,7 @@ BOOL SConnection::GetCursorPos(LPPOINT ppt) const {
     free(pointer_reply);
     return TRUE;
 }
+
 
 uint32_t SConnection::netWmStates(HWND hWnd)
 {

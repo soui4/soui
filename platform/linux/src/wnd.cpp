@@ -654,6 +654,7 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
     if (msg == WM_PAINT) {
         wndObj->isPainting--;
     }
+    return ret;
 }
 
 LRESULT SendMessage(HWND hWnd, UINT msg, WPARAM wp, LPARAM lp)

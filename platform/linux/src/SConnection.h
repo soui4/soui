@@ -106,6 +106,8 @@ public:
     BOOL GetCursorPos(LPPOINT ppt) const;
 
 private:
+  static LPCSTR getStdCursorName(WORD wId);
+  xcb_cursor_t createXcbCursor(HCURSOR cursor);
   uint32_t netWmStates(HWND hWnd);
   bool pushEvent(xcb_generic_event_t *e);
 
@@ -135,7 +137,8 @@ private:
     HCURSOR m_hCursor;
 
     HWND m_hWndActive;
-    std::map<WORD,HCURSOR> m_sysCursor;
+    std::map<HCURSOR,xcb_cursor_t> m_sysCursor;
+    std::map<WORD,HCURSOR> m_stdCursor;
 };
 
 class SConnMgr : SNoCopyable{

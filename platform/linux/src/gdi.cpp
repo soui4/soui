@@ -1512,7 +1512,9 @@ HANDLE LoadImage(HINSTANCE hInst, LPCSTR name, UINT type, int cx, int cy, UINT f
         info.hbmMask = nullptr;     
         info.xHotspot = cx / 2;
         info.yHotspot = cy / 2;
-        return (HANDLE)CreateIconIndirect(&info);
+        HANDLE ret = (HANDLE)CreateIconIndirect(&info);
+        DeleteObject(info.hbmColor);
+        return ret;
     }
     else if (type == IMAGE_BITMAP)
     {
@@ -1605,7 +1607,11 @@ HICON CreateIconIndirect(PICONINFO piconinfo)
     icon->xHotspot = piconinfo->xHotspot;
     icon->yHotspot = piconinfo->xHotspot;
     icon->hbmColor = piconinfo->hbmColor;
+    if(icon->hbmColor)
+        RefGdiObj(icon->hbmColor);
     icon->hbmMask = piconinfo->hbmMask;
+    if(icon->hbmMask)
+        RefGdiObj(icon->hbmMask);
     return icon;
 }
 

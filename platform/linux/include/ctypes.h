@@ -272,7 +272,7 @@ typedef struct _IconObj* HICON;
 typedef UINT_PTR tid_t;
 typedef struct _SDC * HDC;
 #define HRSRC int
-typedef uint32_t HCURSOR;
+typedef struct _IconObj* HCURSOR;
 
 
 #define HMENU int
