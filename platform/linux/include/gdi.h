@@ -502,9 +502,6 @@ HANDLE WINAPI LoadImageA( HINSTANCE hinst, LPCSTR name, UINT type,
 HBITMAP WINAPI CreateBitmap( INT width, INT height, UINT planes,
                                   UINT bpp, const void *bits );
 
-BOOL WINAPI GetIconInfoExA( HICON icon, ICONINFOEXA *info );
-BOOL WINAPI GetIconInfoExW( HICON icon, ICONINFOEXW *info );
-
 void WINAPI SetStretchBltMode(HDC hdc,int mode);
 
 HICON WINAPI CreateIconIndirect(PICONINFO piconinfo);

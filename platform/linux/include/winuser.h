@@ -905,12 +905,6 @@ typedef struct tagCREATESTRUCT {
 #define VK_OEM_CLEAR      0xFE
 
 
-#define DI_MASK         0x0001
-#define DI_IMAGE        0x0002
-#define DI_NORMAL       0x0003
-#define DI_COMPAT       0x0004
-#define DI_DEFAULTSIZE  0x0008
-
 #define MONITOR_DEFAULTTONULL       0x00000000
 #define MONITOR_DEFAULTTOPRIMARY    0x00000001
 #define MONITOR_DEFAULTTONEAREST    0x00000002
@@ -1454,32 +1448,6 @@ typedef struct _ICONINFO {
 	HBITMAP	hbmMask;
 	HBITMAP	hbmColor;
 } ICONINFO, *PICONINFO;
-
-typedef struct _ICONINFOEXA
-{
-    DWORD     cbSize;
-    BOOL      fIcon;
-    DWORD     xHotspot;
-    DWORD     yHotspot;
-    HBITMAP   hbmMask;
-    HBITMAP   hbmColor;
-    WORD      wResID;
-    char      szModName[MAX_PATH];
-    char      szResName[MAX_PATH];
-} ICONINFOEXA, *PICONINFOEXA;
-
-typedef struct _ICONINFOEXW
-{
-    DWORD     cbSize;
-    BOOL      fIcon;
-    DWORD     xHotspot;
-    DWORD     yHotspot;
-    HBITMAP   hbmMask;
-    HBITMAP   hbmColor;
-    WORD      wResID;
-    wchar_t      szModName[MAX_PATH];
-    wchar_t      szResName[MAX_PATH];
-} ICONINFOEXW, *PICONINFOEXW;
 
 
 #define COLOR_SCROLLBAR		    0

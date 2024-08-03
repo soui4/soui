@@ -60,7 +60,7 @@ public:
     xcb_atom_t _NET_WM_STATE_DEMANDS_ATTENTION_ATOM;
 
     xcb_atom_t _NET_WM_ICON;
-
+    xcb_atom_t _NET_WM_ICON_NAME;
     //ICCCM window state
     xcb_atom_t WM_STATE_ATOM;
     xcb_atom_t WM_CLASS_ATOM;

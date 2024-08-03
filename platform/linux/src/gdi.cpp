@@ -753,18 +753,6 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
     return TRUE;
 }
 
-BOOL DrawIcon( HDC hdc, INT x, INT y, HICON hIcon )
-{
-    return DrawIconEx( hdc, x, y, hIcon, 0, 0, 0, 0, DI_NORMAL | DI_COMPAT | DI_DEFAULTSIZE );
-}
-
-BOOL WINAPI DrawIconEx( HDC hdc, INT x0, INT y0, HICON icon, INT width,
-                              INT height, UINT step, HBRUSH brush, UINT flags )
-{
-    //todo:hjx
-    return FALSE;
-}
-
 BOOL  StretchBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, int cx2, int cy2, DWORD rop)
 {
     //todo:hjx
@@ -780,21 +768,6 @@ INT StretchDIBits(HDC hdc, INT x_dst, INT y_dst, INT width_dst, INT height_dst, 
 void SetStretchBltMode(HDC hdc, int mode)
 {
     //todo:hjx
-}
-
-HBITMAP CreateBitmap(INT width, INT height, UINT planes, UINT bpp, const void *bits)
-{
-    BITMAPINFO bmi;
-    bmi.bmiHeader.biBitCount = 32;
-    bmi.bmiHeader.biPlanes = 1;
-    bmi.bmiHeader.biWidth = width;
-    bmi.bmiHeader.biHeight = height;
-    void* pBits=nullptr;
-    HBITMAP ret =  CreateDIBSection(NULL,&bmi,DIB_RGB_COLORS,&pBits,0,0);
-    if(ret){
-        UpdateDIBPixmap(ret,width,height,32,width*4,pBits);
-    }
-    return ret;
 }
 
 static bool IsAlpha(TCHAR c)
