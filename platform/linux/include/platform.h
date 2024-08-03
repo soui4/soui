@@ -22,7 +22,6 @@
 #include "winuser.h"
 #include "error.h"
 #include "debug.h"
-#include "unicode_str.h"
 #include "class.h"
 
 #include "ctrl_types.h"

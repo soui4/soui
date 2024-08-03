@@ -1,8 +1,6 @@
 #ifndef _LINUX_GDI_H_
 #define _LINUX_GDI_H_
 
-#define FIELD_OFFSET(type,field) ((LONG)offsetof(type,field))
-
 #define OBJ_PEN             1
 #define OBJ_BRUSH           2
 #define OBJ_DC              3
@@ -449,14 +447,6 @@ BOOL WINAPI GradientFill(
     ULONG nMeshElements,
     DWORD dwMode
 );
-
-typedef struct _ICONINFO {
-    BOOL fIcon;
-    DWORD xHotspot;
-    DWORD yHotspot;
-    HBITMAP hbmMask;
-    HBITMAP hbmColor;
-} ICONINFO,*PICONINFO;
 
 HICON WINAPI CreateIconIndirect(PICONINFO piconinfo);
 
