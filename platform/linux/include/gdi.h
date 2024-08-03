@@ -226,6 +226,17 @@ typedef struct
 
 #define CBM_INIT        0x04L   /* initialize bitmap */
 
+  /* StretchBlt() modes */
+#define BLACKONWHITE         1
+#define WHITEONBLACK         2
+#define COLORONCOLOR	     3
+#define HALFTONE             4
+#define MAXSTRETCHBLTMODE    4
+
+#define STRETCH_ANDSCANS     BLACKONWHITE
+#define STRETCH_ORSCANS      WHITEONBLACK
+#define STRETCH_DELETESCANS  COLORONCOLOR
+#define STRETCH_HALFTONE     HALFTONE
 
 HBITMAP WINAPI CreateBitmap(
     int nWidth,         // bitmap width, in pixels
@@ -447,6 +458,54 @@ BOOL WINAPI GradientFill(
     ULONG nMeshElements,
     DWORD dwMode
 );
+
+
+/* types of LoadImage */
+#define IMAGE_BITMAP	0
+#define IMAGE_ICON	1
+#define IMAGE_CURSOR	2
+#define IMAGE_ENHMETAFILE	3
+
+/* loadflags to LoadImage */
+#define LR_DEFAULTCOLOR		0x0000
+#define LR_MONOCHROME		0x0001
+#define LR_COLOR		0x0002
+#define LR_COPYRETURNORG	0x0004
+#define LR_COPYDELETEORG	0x0008
+#define LR_LOADFROMFILE		0x0010
+#define LR_LOADTRANSPARENT	0x0020
+#define LR_DEFAULTSIZE		0x0040
+#define LR_VGACOLOR		0x0080
+#define LR_LOADMAP3DCOLORS	0x1000
+#define	LR_CREATEDIBSECTION	0x2000
+#define LR_COPYFROMRESOURCE	0x4000
+#define LR_SHARED		0x8000
+
+/* Flags for DrawIconEx.  */
+#define DI_MASK                 0x0001
+#define DI_IMAGE                0x0002
+#define DI_NORMAL               (DI_MASK | DI_IMAGE)
+#define DI_COMPAT               0x0004
+#define DI_DEFAULTSIZE          0x0008
+#define DI_NOMIRROR             0x0010
+
+
+#define BITSPIXEL 1
+#define PLANES 2
+int WINAPI GetDeviceCaps(HDC hdc,int cap);
+
+HANDLE WINAPI LoadImageW( HINSTANCE hinst, LPCWSTR name, UINT type,
+                INT desiredx, INT desiredy, UINT loadflags );
+HANDLE WINAPI LoadImageA( HINSTANCE hinst, LPCSTR name, UINT type,
+                INT desiredx, INT desiredy, UINT loadflags );
+
+HBITMAP WINAPI CreateBitmap( INT width, INT height, UINT planes,
+                                  UINT bpp, const void *bits );
+
+BOOL WINAPI GetIconInfoExA( HICON icon, ICONINFOEXA *info );
+BOOL WINAPI GetIconInfoExW( HICON icon, ICONINFOEXW *info );
+
+void WINAPI SetStretchBltMode(HDC hdc,int mode);
 
 HICON WINAPI CreateIconIndirect(PICONINFO piconinfo);
 
