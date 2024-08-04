@@ -293,7 +293,7 @@ HBITMAP CreateDIBitmap(HDC hdc, const BITMAPINFOHEADER *pbmih, DWORD flInit, con
         return nullptr;
     HBITMAP bmp = CreateDIBSection(hdc,pbmi,0,nullptr,0,0);
     if(bmp){
-        UpdateDIBPixmap(bmp,pbmi->bmiHeader.biWidth,pbmi->bmiHeader.biHeight,pbmi->bmiHeader.biBitCount,pbmi->bmiHeader.biWidth*4,pjBits);
+        UpdateDIBPixmap(bmp,pbmi->bmiHeader.biWidth,pbmi->bmiHeader.biHeight,pbmi->bmiHeader.biBitCount,pbmi->bmiHeader.biWidth*pbmi->bmiHeader.biBitCount/8,pjBits);
     }
     return bmp;
 }
@@ -339,9 +339,14 @@ HBRUSH CreateSolidBrush(COLORREF color)
 
 HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *lpbmi, UINT usage, VOID **ppvBits, HANDLE hSection, DWORD offset)
 {
-    if(lpbmi->bmiHeader.biBitCount!=32)
+    cairo_format_t fmt = CAIRO_FORMAT_INVALID;
+    switch(lpbmi->bmiHeader.biBitCount){
+        case 1: fmt = CAIRO_FORMAT_A1;break;
+        case 32: fmt = CAIRO_FORMAT_ARGB32;break;
+    }
+    if(fmt == CAIRO_FORMAT_INVALID)
         return 0;
-    cairo_surface_t *ret = cairo_image_surface_create(CAIRO_FORMAT_ARGB32,lpbmi->bmiHeader.biWidth,abs(lpbmi->bmiHeader.biHeight));
+    cairo_surface_t *ret = cairo_image_surface_create(fmt,lpbmi->bmiHeader.biWidth,abs(lpbmi->bmiHeader.biHeight));
     if(!ret)
         return 0;
     if(ppvBits){
@@ -739,19 +744,19 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
     cairo_clip(hdc->cairo);
     switch(rop){
         case SRCCOPY:
-        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
         break;
         case SRCINVERT:
-        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
         break;
         case SRCPAINT:
-        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
         break;
         case SRCAND:
-        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_DEST_IN);
         break;
         case DSTINVERT:

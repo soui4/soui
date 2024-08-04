@@ -533,7 +533,7 @@ HCURSOR SConnection::SetCursor(HCURSOR cursor)
     }
     HCURSOR ret = m_hCursor;
     uint32_t val[]={xcbCursor};
-    xcb_change_window_attributes(connection, screen->root, XCB_CW_CURSOR,val);
+    xcb_change_window_attributes(connection, m_hWndActive?m_hWndActive: screen->root, XCB_CW_CURSOR,val);
     m_hCursor= cursor;
     return ret;
 }
@@ -558,6 +558,7 @@ HCURSOR SConnection::SetCursor(HCURSOR cursor)
 
 LPCSTR SConnection::getStdCursorName(WORD wId)
 {
+    return "ocr_normal.cur";
     switch(wId){
         case CIDC_ARROW: return "ocr_normal.cur";
         case CIDC_IBEAM: return "ocr_ibeam.cur";
