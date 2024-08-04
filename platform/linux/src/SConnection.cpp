@@ -573,6 +573,7 @@ LPCSTR SConnection::getStdCursorName(WORD wId)
         case CIDC_SIZENS: return "ocr_sizens.cur";
         case CIDC_HAND: return "ocr_hand.cur";
         case CIDC_HELP: return "ocr_help.cur";
+        case CIDC_APPSTARTING:return "ocr_appstarting.cur";
     }
     return NULL;
 }
@@ -587,7 +588,10 @@ HCURSOR SConnection::LoadCursor(LPCSTR lpCursorName)
             return m_stdCursor[wId];
         //todo: hjx load std cursor
         std::string strCursor = "/home/flyhigh/work/soui4/platform/linux/resource/";
-        strCursor += getStdCursorName(wId);
+        LPCSTR pszStdName = getStdCursorName(wId);
+        if(!pszStdName)
+            pszStdName = getStdCursorName(CIDC_ARROW);
+        strCursor += pszStdName;
         ret = (HCURSOR)LoadImage(0,strCursor.c_str(),IMAGE_CURSOR,0,0,LR_LOADFROMFILE|LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
         assert(ret);
         m_stdCursor.insert(std::make_pair(wId,ret));

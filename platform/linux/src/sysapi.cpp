@@ -708,6 +708,13 @@ BOOL DispatchMessage(LPMSG pMsg){
 
 int GetSystemMetrics(int nIndex)
 {
+    switch(nIndex){
+        case SM_CXICON: return 32;
+        case SM_CYICON: return 32;
+        case SM_CXCURSOR: return 32;
+        case SM_CYCURSOR: return 32;
+    }
+    printf("unknown index for GetSystemMetrics, index=%d\n",nIndex);
     return 0;
 }
 

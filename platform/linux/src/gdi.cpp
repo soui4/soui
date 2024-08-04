@@ -219,11 +219,23 @@ int GetObject(HGDIOBJ h, int c, LPVOID pv)
         if(c>=sizeof(BITMAP)){
             BITMAP * bm = (BITMAP*)pv;
             cairo_surface_t * pixmap = (cairo_surface_t*)h->ptr;
+            cairo_format_t fmt = cairo_image_surface_get_format(pixmap);
             bm->bmWidth = cairo_image_surface_get_width(pixmap);
             bm->bmHeight = cairo_image_surface_get_height(pixmap);
             bm->bmPlanes = 1;
-            bm->bmBitsPixel=32;
-            bm->bmWidthBytes = bm->bmWidth*4;
+            switch(fmt){
+                case CAIRO_FORMAT_A1:
+                bm->bmBitsPixel=1;
+                break;
+                case CAIRO_FORMAT_ARGB32:
+                bm->bmBitsPixel=32;
+                break;
+                default:
+                assert(0);
+                break;
+            }
+            
+            bm->bmWidthBytes = bm->bmWidth*bm->bmBitsPixel/8;
             bm->bmType = BI_RGB;
             bm->bmBits = cairo_image_surface_get_data(pixmap);
             return sizeof(BITMAP);
@@ -1601,9 +1613,23 @@ HBITMAP CreateBitmap(
     UINT cBitsPerPel,   // number of bits to identify color
     CONST VOID* lpvBits // color data array
 ) {
-    if (cBitsPerPel != 32 || cPlanes!=1)
+    if(cPlanes != 1)
         return nullptr;
-    cairo_surface_t* ret = cairo_image_surface_create_for_data((unsigned char*)lpvBits,CAIRO_FORMAT_ARGB32, nWidth, nHeight, nWidth*4);
+    cairo_surface_t* ret = nullptr;
+    switch(cBitsPerPel){
+        case 1://mono color
+            if(lpvBits)
+                ret = cairo_image_surface_create_for_data((unsigned char*)lpvBits,CAIRO_FORMAT_A1, nWidth, nHeight, nWidth/8);
+            else
+                ret = cairo_image_surface_create(CAIRO_FORMAT_A1, nWidth, nHeight);
+        break;
+        case 32:
+            if(lpvBits)
+                ret = cairo_image_surface_create_for_data((unsigned char*)lpvBits,CAIRO_FORMAT_ARGB32, nWidth, nHeight, nWidth*4);
+            else
+                ret = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, nWidth, nHeight);
+        break;
+    }
     if (ret) {
         return InitGdiObj(OBJ_BITMAP, ret);
     }

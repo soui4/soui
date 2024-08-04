@@ -983,7 +983,15 @@ done:
 static HICON create_cursoricon_object( struct cursoricon_desc *desc, BOOL is_icon, HINSTANCE module,
                                        const WCHAR *resname, HRSRC rsrc )
 {
-    return 0;//todo:hjx
+    if(desc->num_frames==0)
+        return nullptr;
+    ICONINFO info;
+    info.fIcon = is_icon;
+    info.hbmColor = desc->frames[0].color;
+    info.hbmMask = desc->frames[0].mask;
+    info.xHotspot = desc->frames[0].hotspot.x;
+    info.yHotspot = desc->frames[0].hotspot.y;
+    return CreateIconIndirect(&info);
 }
 
 /***********************************************************************
@@ -999,14 +1007,14 @@ static HICON create_icon_from_bmi( const BITMAPINFO *bmi, DWORD maxsize, HMODULE
     struct cursoricon_desc desc =
     {
         .flags = flags,
+        .num_frames = 1,
         .frames = &frame,
     };
-    HICON ret;
-
+    
     if (!create_icon_frame( bmi, maxsize, hotspot, bIcon, width, height, flags, &frame )) return 0;
 
-    ret = create_cursoricon_object( &desc, bIcon, module, resname, rsrc );
-    if (!ret) free_icon_frame( &frame );
+    HICON ret = create_cursoricon_object( &desc, bIcon, module, resname, rsrc );
+    free_icon_frame( &frame );
     return ret;
 }
 
