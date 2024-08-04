@@ -558,7 +558,7 @@ HCURSOR SConnection::SetCursor(HCURSOR cursor)
 
 LPCSTR SConnection::getStdCursorName(WORD wId)
 {
-    return "ocr_normal.cur";
+//    return "ocr_normal.cur";
     switch(wId){
         case CIDC_ARROW: return "ocr_normal.cur";
         case CIDC_IBEAM: return "ocr_ibeam.cur";
@@ -592,6 +592,7 @@ HCURSOR SConnection::LoadCursor(LPCSTR lpCursorName)
         LPCSTR pszStdName = getStdCursorName(wId);
         if(!pszStdName)
             pszStdName = getStdCursorName(CIDC_ARROW);
+        printf("load cursor: %s\n",pszStdName);
         strCursor += pszStdName;
         ret = (HCURSOR)LoadImage(0,strCursor.c_str(),IMAGE_CURSOR,0,0,LR_LOADFROMFILE|LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
         assert(ret);

@@ -459,6 +459,7 @@ static HRESULT HandleNcTestCode(HWND hWnd, UINT htCode) {
     RECT rcWnd = wndObj->rc;
     BOOL bQuit = FALSE;
     SetCapture(hWnd);
+    HCURSOR oldCursor = SetCursor(LoadCursor(wndObj->hInstance,IDC_SIZE));
     for (; !bQuit;) {
         MSG msg;
         if (!WaitMessage())
@@ -554,6 +555,8 @@ static HRESULT HandleNcTestCode(HWND hWnd, UINT htCode) {
         }
     }
     ReleaseCapture();
+    SetCursor(oldCursor);
+
     wndObj->mConnection->SetTimerBlock(false);
     return 0;
 }
@@ -592,9 +595,10 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
                         cursorId = IDC_SIZENESW;
                         break;
                         case HTSIZE:
-                        cursorId = IDC_SIZENESW;
+                        cursorId = IDC_SIZE;
                         break;              
                     }
+                    printf("httest, setcursor id=%d\n",(int)(UINT_PTR)cursorId);
                     SetCursor(LoadCursor(wndObj->hInstance,cursorId));
                 }else if(msg == WM_LBUTTONDOWN){
                     HandleNcTestCode(hWnd,htCode);
@@ -602,7 +606,10 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
             }else{
                 WNDCLASSEX wc;
                 GetClassInfoEx(wndObj->hInstance,MAKEINTRESOURCE(wndObj->clsAtom),&wc);
-                SetCursor(wc.hCursor);
+                if(!wc.hCursor)
+                    SetCursor(LoadCursor(wndObj->hInstance,IDC_ARROW));
+                else
+                    SetCursor(wc.hCursor);
             }
         }
         break;
