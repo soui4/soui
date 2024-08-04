@@ -122,29 +122,7 @@ static int map_fileW( LPCWSTR name, MapFileInfo * ret )
 {
     char szNameU8[MAX_PATH];
     WideCharToMultiByte(CP_UTF8,0,name,-1,szNameU8,MAX_PATH,NULL,NULL);
-    int fd = open(szNameU8, O_RDONLY); // 以只读方式打开文件
-    if (fd == -1) {
-        perror("open");
-        return 0;
-    }
-
-    struct stat sb;
-    if (fstat(fd, &sb) == -1) { // 获取文件状态，这里用以获取文件大小
-        perror("fstat");
-        close(fd);
-        return 0;
-    }
-
-    void *mapped_file = mmap(NULL, sb.st_size, PROT_READ, MAP_PRIVATE, fd, 0);
-    if (mapped_file == MAP_FAILED) {
-        perror("mmap");
-        close(fd);
-        return 0;
-    }
-    ret->fd = fd;
-    ret->fileSize = sb.st_size;
-    ret->ptr = mapped_file;
-    return 1;
+    return map_file(szNameU8,ret);
 }
 
 /***********************************************************************
@@ -1335,7 +1313,7 @@ HICON WINAPI CreateIconFromResource( LPBYTE bits, UINT cbSize,
 }
 
 
-static HICON CURSORICON_LoadFromFile( LPCWSTR filename,
+static HICON CURSORICON_LoadFromFile( LPCSTR filename,
                              INT width, INT height, INT depth,
                              BOOL fCursor, UINT loadflags)
 {
@@ -1349,7 +1327,7 @@ static HICON CURSORICON_LoadFromFile( LPCWSTR filename,
 
     //TRACE("loading %s\n", debugstr_w( filename ));
 
-    if(!map_fileW( filename, &info ))
+    if(!map_file( filename, &info ))
         return hIcon;
     bits = (const BYTE*) info.ptr;
     filesize = info.fileSize;
@@ -1687,7 +1665,7 @@ static void DIB_FixColorsToLoadflags(BITMAPINFO * bmi, UINT loadflags, BYTE pix)
 /**********************************************************************
  *       BITMAP_Load
  */
-static HBITMAP BITMAP_Load( HINSTANCE instance, LPCWSTR name,
+static HBITMAP BITMAP_Load( HINSTANCE instance, LPCSTR name,
                             INT desiredx, INT desiredy, UINT loadflags )
 {
     HBITMAP hbitmap = 0, orig_bm;
@@ -1723,7 +1701,7 @@ static HBITMAP BITMAP_Load( HINSTANCE instance, LPCWSTR name,
     {
         BITMAPFILEHEADER * bmfh;
 
-        if (!(map_fileW( name, &minfo ))) return 0;
+        if (!(map_file( name, &minfo ))) return 0;
         ptr = (const char*)minfo.ptr;
         info = (BITMAPINFO *)(ptr + sizeof(BITMAPFILEHEADER));
         bmfh = (BITMAPFILEHEADER *)ptr;
@@ -1825,19 +1803,18 @@ end:
  *
  * See LoadImageW.
  */
-HANDLE WINAPI LoadImageA( HINSTANCE hinst, LPCSTR name, UINT type,
+HANDLE WINAPI LoadImageW( HINSTANCE hinst, LPCWSTR name, UINT type,
                               INT desiredx, INT desiredy, UINT loadflags)
 {
     HANDLE res;
-    LPWSTR u_name;
+    LPSTR u_name;
 
     if (IS_INTRESOURCE(name))
-        return LoadImageW(hinst, (LPCWSTR)name, type, desiredx, desiredy, loadflags);
-
-    DWORD len = MultiByteToWideChar( CP_ACP, 0, name, -1, NULL, 0 );
-    u_name = (LPWSTR)HeapAlloc( GetProcessHeap(), 0, len * sizeof(WCHAR) );
-    MultiByteToWideChar( CP_ACP, 0, name, -1, u_name, len );
-    res = LoadImageW(hinst, u_name, type, desiredx, desiredy, loadflags);
+        return LoadImageA(hinst, (LPCSTR)name, type, desiredx, desiredy, loadflags);
+    DWORD len =WideCharToMultiByte(CP_UTF8,0,name,-1,NULL,0,NULL,NULL);
+    u_name = (LPSTR)HeapAlloc( GetProcessHeap(), 0, len);
+    WideCharToMultiByte(CP_UTF8,0,name,-1,u_name,len,NULL,NULL);
+    res = LoadImageA(hinst, u_name, type, desiredx, desiredy, loadflags);
     HeapFree(GetProcessHeap(), 0, u_name);
     return res;
 }
@@ -1859,7 +1836,7 @@ HANDLE WINAPI LoadImageA( HINSTANCE hinst, LPCSTR name, UINT type,
  *
  * FIXME: Implementation lacks some features, see LR_ defines in winuser.h
  */
-HANDLE WINAPI LoadImageW( HINSTANCE hinst, LPCWSTR name, UINT type,
+HANDLE WINAPI LoadImageA( HINSTANCE hinst, LPCSTR name, UINT type,
                 INT desiredx, INT desiredy, UINT loadflags )
 {
     int depth;

@@ -725,22 +725,21 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
 
     cairo_rectangle(hdc->cairo,x,y,cx,cy);
     cairo_clip(hdc->cairo);
-    cairo_rectangle(hdc->cairo,x,y,cx,cy);
     switch(rop){
         case SRCCOPY:
-        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_source_surface(hdc->cairo,src,x1,y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
         break;
         case SRCINVERT:
-        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_source_surface(hdc->cairo,src,x1,y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
         break;
         case SRCPAINT:
-        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_source_surface(hdc->cairo,src,x1,y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
         break;
         case SRCAND:
-        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_source_surface(hdc->cairo,src,x1,y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_DEST_IN);
         break;
         case DSTINVERT:
@@ -748,21 +747,71 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
         break;
     }
+    cairo_rectangle(hdc->cairo,0,0,cx,cy);
     cairo_fill(hdc->cairo);
     cairo_restore(hdc->cairo);
     return TRUE;
 }
 
+//todo: to test
 BOOL  StretchBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, int cx2, int cy2, DWORD rop)
 {
-    //todo:hjx
-    return 0;
+    assert(hdc && hdcSrc);
+    cairo_surface_t *src = (cairo_surface_t *)GetGdiObjPtr(hdcSrc->bmp);
+
+    cairo_save(hdc->cairo);
+    ApplySrcMatrix(hdc->cairo, hdcSrc->cairo);
+
+    cairo_rectangle(hdc->cairo,x,y,cx,cy);
+    cairo_clip(hdc->cairo);
+
+    cairo_translate(hdc->cairo,x,y);
+    double scale_x = cx*1.0/cx2;
+    double scale_y = cy*1.0/cy2;
+    cairo_scale(hdc->cairo,scale_x,scale_y);
+
+    switch(rop){
+        case SRCCOPY:
+        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
+        break;
+        case SRCINVERT:
+        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
+        break;
+        case SRCPAINT:
+        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
+        break;
+        case SRCAND:
+        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_DEST_IN);
+        break;
+        case DSTINVERT:
+        cairo_set_source_rgb(hdc->cairo,1.0,1.0,1.0);
+        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
+        break;
+    }
+    cairo_rectangle(hdc->cairo,0,0,cx,cy);
+    cairo_fill(hdc->cairo);
+    cairo_restore(hdc->cairo);
+    return TRUE;
 }
 
+//todo: to test
 INT StretchDIBits(HDC hdc, INT x_dst, INT y_dst, INT width_dst, INT height_dst, INT x_src, INT y_src, INT width_src, INT height_src, const void *bits, const BITMAPINFO *bmi, UINT coloruse, DWORD rop)
 {
-    //todo:hjx
-    return 0;
+    HBITMAP bmp = CreateDIBitmap(hdc,&bmi->bmiHeader,1,bits,bmi,coloruse);
+    if(!bmp)
+    {
+        return 0;
+    }
+    HDC memdc = CreateCompatibleDC(hdc);
+    SelectObject(memdc,bmp);
+    BOOL ret = StretchBlt(hdc,x_dst,y_dst,width_dst,height_dst,memdc,x_src,y_src,width_src,height_src,rop);
+    DeleteDC(memdc);
+    DeleteObject(bmp);
+    return ret;
 }
 
 void SetStretchBltMode(HDC hdc, int mode)
@@ -1561,50 +1610,6 @@ HBITMAP CreateBitmap(
     else
     {
         return nullptr;
-    }
-}
-
-HANDLE LoadImage(HINSTANCE hInst, LPCSTR name, UINT type, int cx, int cy, UINT fuLoad)
-{
-    if(!(fuLoad & LR_LOADFROMFILE))
-        return HANDLE(0);
-    if (type == IMAGE_ICON ) {
-        //load png as icon
-        cairo_surface_t* image = cairo_image_surface_create_from_png(name);
-        if (!image)
-            return 0;
-        int wid = cairo_image_surface_get_width(image);
-        int hei = cairo_image_surface_get_height(image);
-        if (wid != cx || hei != cy) {
-            cairo_surface_t* scaled_surface = cairo_surface_create_similar_image(image, CAIRO_FORMAT_ARGB32, cx, cy); 
-            cairo_t* scaled_cr = cairo_create(scaled_surface);
-            cairo_scale(scaled_cr, static_cast<double>(cx) / wid, static_cast<double>(cy) / hei);
-            cairo_set_source_surface(scaled_cr, image, 0, 0);
-            cairo_paint(scaled_cr);
-            cairo_destroy(scaled_cr);
-            cairo_surface_destroy(image);
-            image = scaled_surface;
-        }
-        ICONINFO info;
-        info.fIcon = TRUE;
-        info.hbmColor = InitGdiObj(OBJ_BITMAP, image);
-        info.hbmMask = nullptr;     
-        info.xHotspot = cx / 2;
-        info.yHotspot = cy / 2;
-        HANDLE ret = (HANDLE)CreateIconIndirect(&info);
-        DeleteObject(info.hbmColor);
-        return ret;
-    }
-    else if (type == IMAGE_BITMAP)
-    {
-        cairo_surface_t* image = cairo_image_surface_create_from_png(name);
-        if (!image)
-            return 0;
-        return (HANDLE)InitGdiObj(OBJ_BITMAP, image);
-    }
-    else {
-        printf("LoadImage error, unknown params\n");
-        return 0;
     }
 }
 

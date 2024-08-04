@@ -418,16 +418,6 @@ InvertRect(
  int   WINAPI SetROP2( HDC hdc,  int rop2);
  COLORREF WINAPI SetTextColor( HDC hdc,  COLORREF color);
 
-
-HANDLE LoadImage(
-  HINSTANCE hInst,
-             LPCSTR    name,
-            UINT      type,
-             int       cx,
-             int       cy,
-             UINT      fuLoad
-);
-
 typedef USHORT COLOR16;
 
 typedef struct _TRIVERTEX
@@ -498,6 +488,12 @@ HANDLE WINAPI LoadImageW( HINSTANCE hinst, LPCWSTR name, UINT type,
                 INT desiredx, INT desiredy, UINT loadflags );
 HANDLE WINAPI LoadImageA( HINSTANCE hinst, LPCSTR name, UINT type,
                 INT desiredx, INT desiredy, UINT loadflags );
+
+#ifdef _UNICODE
+#define LoadImage LoadImageW
+#else
+#define LoadImage LoadImageA
+#endif
 
 HBITMAP WINAPI CreateBitmap( INT width, INT height, UINT planes,
                                   UINT bpp, const void *bits );
