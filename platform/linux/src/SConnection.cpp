@@ -559,20 +559,20 @@ HCURSOR SConnection::SetCursor(HCURSOR cursor)
 LPCSTR SConnection::getStdCursorName(WORD wId)
 {
     switch(wId){
-        case CIDC_ARROW: return "arrow.cur";
-        case CIDC_IBEAM: return "ibeam.cur";
-        case CIDC_WAIT: return "wait.cur";
-        case CIDC_CROSS: return "cross.cur";
-        case CIDC_UPARROW: return "uparrow.cur";
-        case CIDC_SIZE: return "size.cur";
-        case CIDC_ICON: return "icon.cur";
-        case CIDC_SIZENWSE: return "sizenwse.cur";
-        case CIDC_SIZENESW: return "sizenesw.cur";
-        case CIDC_SIZEWE:return "sizewe.cur";
-        case CIDC_SIZENS: return "sizens.cur";
-        case CIDC_SIZEALL: return "sizeall.cur";
-        case CIDC_HAND: return "hand.cur";
-        case CIDC_HELP: return "help.cur";
+        case CIDC_ARROW: return "ocr_normal.cur";
+        case CIDC_IBEAM: return "ocr_ibeam.cur";
+        case CIDC_WAIT: return "ocr_wait.cur";
+        case CIDC_CROSS: return "ocr_cross.cur";
+        case CIDC_UPARROW: return "ocr_up.cur";
+        case CIDC_SIZE: return "ocr_size.cur";
+        case CIDC_SIZEALL: return "ocr_sizeall.cur";
+        case CIDC_ICON: return "ocr_icon.cur";
+        case CIDC_SIZENWSE: return "ocr_sizenwse.cur";
+        case CIDC_SIZENESW: return "ocr_sizenesw.cur";
+        case CIDC_SIZEWE:return "ocr_sizewe.cur";
+        case CIDC_SIZENS: return "ocr_sizens.cur";
+        case CIDC_HAND: return "ocr_hand.cur";
+        case CIDC_HELP: return "ocr_help.cur";
     }
     return NULL;
 }
@@ -586,7 +586,7 @@ HCURSOR SConnection::LoadCursor(LPCSTR lpCursorName)
         if(m_stdCursor.find(wId)!=m_stdCursor.end())
             return m_stdCursor[wId];
         //todo: hjx load std cursor
-        std::string strCursor = "/home/flyhigh/work/soui4/cursor/";
+        std::string strCursor = "/home/flyhigh/work/soui4/platform/linux/resource/";
         strCursor += getStdCursorName(wId);
         ret = (HCURSOR)LoadImage(0,strCursor.c_str(),IMAGE_CURSOR,0,0,LR_LOADFROMFILE|LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
         assert(ret);
