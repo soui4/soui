@@ -742,21 +742,22 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
 
     cairo_rectangle(hdc->cairo,x,y,cx,cy);
     cairo_clip(hdc->cairo);
+    cairo_translate(hdc->cairo,x,y);
     switch(rop){
         case SRCCOPY:
-        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
         break;
         case SRCINVERT:
-        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
         break;
         case SRCPAINT:
-        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
         break;
         case SRCAND:
-        cairo_set_source_surface(hdc->cairo,src,x-x1,y-y1);
+        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_DEST_IN);
         break;
         case DSTINVERT:
@@ -789,19 +790,19 @@ BOOL  StretchBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int 
 
     switch(rop){
         case SRCCOPY:
-        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
         break;
         case SRCINVERT:
-        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
         break;
         case SRCPAINT:
-        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
         break;
         case SRCAND:
-        cairo_set_source_surface(hdc->cairo,src,x1,y1);
+        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
         cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_DEST_IN);
         break;
         case DSTINVERT:
