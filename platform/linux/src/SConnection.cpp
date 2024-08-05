@@ -623,7 +623,7 @@ HCURSOR SConnection::LoadCursor(LPCSTR lpCursorName)
         if (!getStdCursorName2(wId, data)) {
             getStdCursorName2(CIDC_ARROW, data);
         }
-        ret = (HCURSOR)LoadImageBuf((PBYTE)data.buf,data.length,FALSE,0,0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR);
+        ret = (HCURSOR)LoadImageBuf((PBYTE)data.buf,data.length, IMAGE_CURSOR,0,0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR);
 //        ret = (HCURSOR)LoadImage(0,strCursor.c_str(),IMAGE_CURSOR,0,0,LR_LOADFROMFILE|LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
         assert(ret);
         m_stdCursor.insert(std::make_pair(wId,ret));
