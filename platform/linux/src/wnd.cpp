@@ -459,7 +459,6 @@ static HRESULT HandleNcTestCode(HWND hWnd, UINT htCode) {
     RECT rcWnd = wndObj->rc;
     BOOL bQuit = FALSE;
     SetCapture(hWnd);
-    HCURSOR oldCursor = SetCursor(LoadCursor(wndObj->hInstance,IDC_SIZE));
     for (; !bQuit;) {
         MSG msg;
         if (!WaitMessage())
@@ -555,7 +554,6 @@ static HRESULT HandleNcTestCode(HWND hWnd, UINT htCode) {
         }
     }
     ReleaseCapture();
-    SetCursor(oldCursor);
 
     wndObj->mConnection->SetTimerBlock(false);
     return 0;
@@ -575,16 +573,15 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
             int htCode = proc(hWnd,WM_NCHITTEST,0,MAKELPARAM(pt.x,pt.y));
             if(htCode>HTCAPTION && htCode <HTBORDER){
                 if(msg == WM_MOUSEMOVE){
-                    //todo: set cursor according to htCode
                     LPCSTR cursorId = nullptr;
                     switch(htCode){
                         case HTLEFT:
                         case HTRIGHT:
-                        cursorId = IDC_SIZENS;
+                        cursorId = IDC_SIZEWE;
                         break;
                         case HTTOP:
                         case HTBOTTOM:
-                        cursorId = IDC_SIZEWE;
+                        cursorId = IDC_SIZENS;
                         break;
                         case HTTOPLEFT:
                         case HTBOTTOMRIGHT:
@@ -598,7 +595,6 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
                         cursorId = IDC_SIZE;
                         break;              
                     }
-                    printf("httest, setcursor id=%d\n",(int)(UINT_PTR)cursorId);
                     SetCursor(LoadCursor(wndObj->hInstance,cursorId));
                 }else if(msg == WM_LBUTTONDOWN){
                     HandleNcTestCode(hWnd,htCode);
@@ -1139,8 +1135,12 @@ LRESULT  DefWindowProc(HWND hWnd,UINT msg,WPARAM wp,LPARAM lp){
         WORD action = wp & 0xfff0;
         switch (action) {
         case SC_MOVE:
-            if((wp&0x0f) == HTCAPTION) 
+            if ((wp & 0x0f) == HTCAPTION)
+            {
+                HCURSOR oldCursor = SetCursor(LoadCursor(wndObj->hInstance, IDC_SIZE));
                 HandleNcTestCode(hWnd, HTCAPTION);
+                SetCursor(oldCursor);
+            }
             break;
         case SC_MINIMIZE:
             SendSysCommand(wndObj->mConnection, hWnd, XCB_ICCCM_WM_STATE_ICONIC);
