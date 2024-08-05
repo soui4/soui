@@ -295,7 +295,8 @@ void SNativeWnd2::OnPaint(HDC hdc){
         SetTextColor(memdc, RGBA(0, 255, 0, 255));
         DrawText(memdc, txt, -1,&rc,DT_SINGLELINE);
 
-        BitBlt(hdc,0,0,rcWnd.right,rcWnd.bottom,memdc,0,0,SRCCOPY);
+        //BitBlt(hdc, 0, 0, rcWnd.right, rcWnd.bottom, memdc, 0, 0, SRCCOPY);
+        StretchBlt(hdc,0,0,rcWnd.right,rcWnd.bottom,memdc,0,0, rcWnd.right, -rcWnd.bottom,SRCCOPY);
 
         SelectObject(memdc,oldBmp);
         DeleteObject(bmp);

@@ -755,7 +755,7 @@ static HBITMAP create_alpha_bitmap( HBITMAP color, const BITMAPINFO *src_info, c
     if (!(info = (BITMAPINFO *)malloc( FIELD_OFFSET( BITMAPINFO, bmiColors[256] )))) goto done;
     info->bmiHeader.biSize = sizeof(BITMAPINFOHEADER);
     info->bmiHeader.biWidth = bm.bmWidth;
-    info->bmiHeader.biHeight = -bm.bmHeight;
+    info->bmiHeader.biHeight = -bm.bmHeight;//todo:hjx
     info->bmiHeader.biPlanes = 1;
     info->bmiHeader.biBitCount = 32;
     info->bmiHeader.biCompression = BI_RGB;
@@ -770,7 +770,7 @@ static HBITMAP create_alpha_bitmap( HBITMAP color, const BITMAPINFO *src_info, c
     {
         SelectObject( hdc, alpha );
         StretchDIBits( hdc, 0, 0, bm.bmWidth, bm.bmHeight,
-                       0, 0, src_info->bmiHeader.biWidth, src_info->bmiHeader.biHeight,
+                       0, 0, src_info->bmiHeader.biWidth, - src_info->bmiHeader.biHeight,
                        color_bits, src_info, DIB_RGB_COLORS, SRCCOPY );
 
     }
@@ -903,7 +903,7 @@ static BOOL create_icon_frame( const BITMAPINFO *bmi, DWORD maxsize, POINT hotsp
         /* copy color data into second half of mask bitmap */
         SelectObject( hdc, frame->mask );
         StretchDIBits( hdc, 0, height, width, height,
-                       0, 0, bmi_width, bmi_height,
+                       0, 0, bmi_width, -bmi_height,
                        color_bits, bmi_copy, DIB_RGB_COLORS, SRCCOPY );
     }
     else
@@ -912,7 +912,7 @@ static BOOL create_icon_frame( const BITMAPINFO *bmi, DWORD maxsize, POINT hotsp
         if (!(frame->color = create_color_bitmap( width, height ))) goto done;
         SelectObject( hdc, frame->color );
         StretchDIBits( hdc, 0, 0, width, height,
-                       0, 0, bmi_width, bmi_height,
+                       0, 0, bmi_width, -bmi_height,
                        color_bits, bmi_copy, DIB_RGB_COLORS, SRCCOPY );
 
         if (bmi_has_alpha( bmi_copy, color_bits ))
@@ -1848,9 +1848,6 @@ HANDLE WINAPI LoadImageA( HINSTANCE hinst, LPCSTR name, UINT type,
                 INT desiredx, INT desiredy, UINT loadflags )
 {
     int depth;
-    WCHAR path[MAX_PATH];
-
-
     if (loadflags & LR_LOADFROMFILE)
     {
         loadflags &= ~LR_SHARED;

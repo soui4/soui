@@ -346,9 +346,17 @@ HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *lpbmi, UINT usage, VOID **pp
     }
     if(fmt == CAIRO_FORMAT_INVALID)
         return 0;
+    if (lpbmi->bmiHeader.biHeight < 0) {
+        printf("CreateDIBSection,height=%d\n", lpbmi->bmiHeader.biHeight);
+    }
     cairo_surface_t *ret = cairo_image_surface_create(fmt,lpbmi->bmiHeader.biWidth,abs(lpbmi->bmiHeader.biHeight));
     if(!ret)
         return 0;
+    cairo_status_t status = cairo_surface_status(ret);
+    if (status != CAIRO_STATUS_SUCCESS) {
+        cairo_surface_destroy(ret);
+        return 0;
+    }
     if(ppvBits){
         *ppvBits = cairo_image_surface_get_data(ret);
     }
@@ -409,10 +417,10 @@ int SetGraphicsMode(HDC hdc, int iMode)
 HBITMAP CreateCompatibleBitmap(HDC hdc, int cx, int cy)
 {
     BITMAPINFO bmi;
-    bmi.bmiHeader.biBitCount = 32;
+    bmi.bmiHeader.biBitCount = 32;//todo:hjx
     bmi.bmiHeader.biPlanes = 1;
     bmi.bmiHeader.biWidth = cx;
-    bmi.bmiHeader.biHeight = -cy;
+    bmi.bmiHeader.biHeight = cy;
     return CreateDIBSection(hdc,&bmi,0,nullptr,0,0);
 }
 
@@ -771,7 +779,6 @@ BOOL BitBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, D
     return TRUE;
 }
 
-//todo: to test
 BOOL  StretchBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int y1, int cx2, int cy2, DWORD rop)
 {
     assert(hdc && hdcSrc);
@@ -783,40 +790,40 @@ BOOL  StretchBlt(HDC hdc, int x, int y, int cx, int cy, HDC hdcSrc, int x1, int 
     cairo_rectangle(hdc->cairo,x,y,cx,cy);
     cairo_clip(hdc->cairo);
 
-    cairo_translate(hdc->cairo,x,y);
+    cairo_translate(hdc->cairo,x + cx/2.0,y + cy/2.0);
     double scale_x = cx*1.0/cx2;
     double scale_y = cy*1.0/cy2;
     cairo_scale(hdc->cairo,scale_x,scale_y);
-
+    cx2 = abs(cx2);
+    cy2 = abs(cy2);
     switch(rop){
         case SRCCOPY:
-        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
-        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
+            cairo_set_source_surface(hdc->cairo, src, -x1 - cx2 / 2.0, -y1 - cy2 / 2.0);
+            cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
         break;
         case SRCINVERT:
-        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
-        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
+            cairo_set_source_surface(hdc->cairo, src, -x1 - cx2 / 2.0, -y1 - cy2 / 2.0);
+            cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
         break;
         case SRCPAINT:
-        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
-        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
+            cairo_set_source_surface(hdc->cairo, src, -x1 - cx2 / 2.0, -y1 - cy2 / 2.0);
+            cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_OVER);
         break;
         case SRCAND:
-        cairo_set_source_surface(hdc->cairo,src,-x1,-y1);
-        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_DEST_IN);
+            cairo_set_source_surface(hdc->cairo, src, -x1 - cx2 / 2.0, -y1 - cy2 / 2.0);
+            cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_DEST_IN);
         break;
         case DSTINVERT:
-        cairo_set_source_rgb(hdc->cairo,1.0,1.0,1.0);
-        cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
+            cairo_set_source_rgb(hdc->cairo,1.0,1.0,1.0);
+            cairo_set_operator(hdc->cairo,CAIRO_OPERATOR_XOR);
         break;
     }
-    cairo_rectangle(hdc->cairo,0,0,cx,cy);
+    cairo_rectangle(hdc->cairo, -cx/2.0, -cy/2.0, cx, cy);
     cairo_fill(hdc->cairo);
     cairo_restore(hdc->cairo);
     return TRUE;
 }
 
-//todo: to test
 INT StretchDIBits(HDC hdc, INT x_dst, INT y_dst, INT width_dst, INT height_dst, INT x_src, INT y_src, INT width_src, INT height_src, const void *bits, const BITMAPINFO *bmi, UINT coloruse, DWORD rop)
 {
     HBITMAP bmp = CreateDIBitmap(hdc,&bmi->bmiHeader,1,bits,bmi,coloruse);
@@ -829,7 +836,7 @@ INT StretchDIBits(HDC hdc, INT x_dst, INT y_dst, INT width_dst, INT height_dst, 
     BOOL ret = StretchBlt(hdc,x_dst,y_dst,width_dst,height_dst,memdc,x_src,y_src,width_src,height_src,rop);
     DeleteDC(memdc);
     DeleteObject(bmp);
-    return ret;
+    return height_src;
 }
 
 void SetStretchBltMode(HDC hdc, int mode)

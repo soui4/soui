@@ -13,6 +13,6 @@
   </values>
 
   <ICON>
-    <file name="ICON_LOGO"  path="image\soui.png"/>
+    <file name="ICON_LOGO"  path="image\soui.ico"/>
   </ICON>
 </resource>
