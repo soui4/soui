@@ -47,3 +47,5 @@ Ankh.NoLoad
 
 build/
 config/
+/.vs
+/CMakeSettings.json
