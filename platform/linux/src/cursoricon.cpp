@@ -1011,7 +1011,8 @@ static HICON create_icon_from_bmi( const BITMAPINFO *bmi, DWORD maxsize, HMODULE
         .frames = &frame,
     };
     
-    if (!create_icon_frame( bmi, maxsize, hotspot, bIcon, width, height, flags, &frame )) return 0;
+    if (!create_icon_frame( bmi, maxsize, hotspot, bIcon, width, height, flags, &frame ))
+        return 0;
 
     HICON ret = create_cursoricon_object( &desc, bIcon, module, resname, rsrc );
     free_icon_frame( &frame );
@@ -1320,59 +1321,60 @@ HICON WINAPI CreateIconFromResource( LPBYTE bits, UINT cbSize,
     return CreateIconFromResourceEx( bits, cbSize, bIcon, dwVersion, 0, 0, LR_DEFAULTSIZE | LR_SHARED );
 }
 
-
-static HICON CURSORICON_LoadFromFile( LPCSTR filename,
-                             INT width, INT height, INT depth,
-                             BOOL fCursor, UINT loadflags)
+static HICON CURSORICON_LoadFromBuf(const char* bits,
+    DWORD filesize,
+    INT width, INT height, INT depth,
+    BOOL fCursor, UINT loadflags)
 {
-    const CURSORICONFILEDIRENTRY *entry;
-    CURSORICONFILEDIR *dir;
+    const CURSORICONFILEDIRENTRY* entry;
+    CURSORICONFILEDIR* dir;
     HICON hIcon = 0;
-    const BYTE *bits;
-    DWORD filesize;
     POINT hotspot;
     MapFileInfo info;
 
     //TRACE("loading %s\n", debugstr_w( filename ));
 
-    if(!map_file( filename, &info ))
-        return hIcon;
-    bits = (const BYTE*) info.ptr;
-    filesize = info.fileSize;
     /* Check for .ani. */
-    if (memcmp( bits, "RIFF", 4 ) == 0)
+    if (memcmp(bits, "RIFF", 4) == 0)
     {
-        hIcon = CURSORICON_CreateIconFromANI( bits, filesize, width, height, depth, !fCursor, loadflags );
-        goto end;
+        return CURSORICON_CreateIconFromANI((const PBYTE)bits, filesize, width, height, depth, !fCursor, loadflags);        
     }
 
-    dir = (CURSORICONFILEDIR*) bits;
-    if ( filesize < FIELD_OFFSET( CURSORICONFILEDIR, idEntries) + sizeof(CURSORICONFILEDIRENTRY)*dir->idCount)
-        goto end;
+    dir = (CURSORICONFILEDIR*)bits;
+    if (filesize < FIELD_OFFSET(CURSORICONFILEDIR, idEntries) + sizeof(CURSORICONFILEDIRENTRY) * dir->idCount)
+        return 0;
 
-    if ( fCursor )
-        entry = CURSORICON_FindBestCursorFile( dir, filesize, width, height, depth, loadflags );
+    if (fCursor)
+        entry = CURSORICON_FindBestCursorFile(dir, filesize, width, height, depth, loadflags);
     else
-        entry = CURSORICON_FindBestIconFile( dir, filesize, width, height, depth, loadflags );
+        entry = CURSORICON_FindBestIconFile(dir, filesize, width, height, depth, loadflags);
 
-    if ( !entry )
-        goto end;
+    if (!entry)
+        return 0;
 
     /* check that we don't run off the end of the file */
-    if ( entry->dwDIBOffset > filesize )
-        goto end;
-    if ( entry->dwDIBOffset + entry->dwDIBSize > filesize )
-        goto end;
+    if (entry->dwDIBOffset > filesize)
+        return 0;
+    if (entry->dwDIBOffset + entry->dwDIBSize > filesize)
+        return 0;
 
     hotspot.x = entry->xHotspot;
     hotspot.y = entry->yHotspot;
-    hIcon = create_icon_from_bmi( (const BITMAPINFO *)&bits[entry->dwDIBOffset], filesize - entry->dwDIBOffset,
-                                  NULL, NULL, 0, hotspot, !fCursor, width, height, loadflags );
-end:
-    //UnmapViewOfFile( bits );
+    return  create_icon_from_bmi((const BITMAPINFO*)&bits[entry->dwDIBOffset], filesize - entry->dwDIBOffset,
+        NULL, NULL, 0, hotspot, !fCursor, width, height, loadflags);
+}
+
+static HICON CURSORICON_LoadFromFile( LPCSTR filename,
+                             INT width, INT height, INT depth,
+                             BOOL fCursor, UINT loadflags)
+{
+    HICON hIcon = 0;
+    MapFileInfo info;
+    if(!map_file( filename, &info ))
+        return hIcon;
+    hIcon = CURSORICON_LoadFromBuf((const char *)info.ptr, info.fileSize, width, height, depth, fCursor, loadflags);
     munmap(info.ptr,info.fileSize);
     close(info.fd);
-
     return hIcon;
 }
 
@@ -1673,56 +1675,35 @@ static void DIB_FixColorsToLoadflags(BITMAPINFO * bmi, UINT loadflags, BYTE pix)
 /**********************************************************************
  *       BITMAP_Load
  */
-static HBITMAP BITMAP_Load( HINSTANCE instance, LPCSTR name,
-                            INT desiredx, INT desiredy, UINT loadflags )
+static HBITMAP BITMAP_LoadBuf(const char* ptr,UINT length,
+    INT desiredx, INT desiredy, UINT loadflags)
 {
     HBITMAP hbitmap = 0, orig_bm;
     HRSRC hRsrc;
     HGLOBAL handle;
-    const char *ptr = NULL;
-    BITMAPINFO *info, *fix_info = NULL, *scaled_info = NULL;
+    BITMAPINFO* info, * fix_info = NULL, * scaled_info = NULL;
     int size;
     BYTE pix;
-    char *bits;
+    char* bits;
     LONG width, height, new_width, new_height;
     WORD bpp_dummy;
     DWORD compr_dummy, offbits = 0;
     INT bm_type;
     HDC screen_mem_dc = NULL;
-    MapFileInfo minfo;
+    
+    BITMAPFILEHEADER* bmfh;
 
-    if (!(loadflags & LR_LOADFROMFILE))
+    info = (BITMAPINFO*)(ptr + sizeof(BITMAPFILEHEADER));
+    bmfh = (BITMAPFILEHEADER*)ptr;
+    if (bmfh->bfType != 0x4d42 /* 'BM' */)
     {
-        // if (!instance)
-        // {
-        //     /* OEM bitmap: try to load the resource from user32.dll */
-        //     instance = user32_module;
-        // }
-
-        // if (!(hRsrc = FindResourceW( instance, name, (LPWSTR)RT_BITMAP ))) return 0;
-        // if (!(handle = LoadResource( instance, hRsrc ))) return 0;
-
-        // if ((info = LockResource( handle )) == NULL) 
-        return 0;
+        WARN_(cursor)("Invalid/unsupported bitmap format!\n");
+        goto end;
     }
-    else
-    {
-        BITMAPFILEHEADER * bmfh;
+    if (bmfh->bfOffBits) offbits = bmfh->bfOffBits - sizeof(BITMAPFILEHEADER);
 
-        if (!(map_file( name, &minfo ))) return 0;
-        ptr = (const char*)minfo.ptr;
-        info = (BITMAPINFO *)(ptr + sizeof(BITMAPFILEHEADER));
-        bmfh = (BITMAPFILEHEADER *)ptr;
-        if (bmfh->bfType != 0x4d42 /* 'BM' */)
-        {
-            WARN_(cursor)("Invalid/unsupported bitmap format!\n");
-            goto end;
-        }
-        if (bmfh->bfOffBits) offbits = bmfh->bfOffBits - sizeof(BITMAPFILEHEADER);
-    }
-
-    bm_type = DIB_GetBitmapInfo( &info->bmiHeader, &width, &height,
-                                 &bpp_dummy, &compr_dummy);
+    bm_type = DIB_GetBitmapInfo(&info->bmiHeader, &width, &height,
+        &bpp_dummy, &compr_dummy);
     if (bm_type == -1)
     {
         WARN_(cursor)("Invalid bitmap format!\n");
@@ -1741,19 +1722,19 @@ static HBITMAP BITMAP_Load( HINSTANCE instance, LPCSTR name,
 
     memcpy(scaled_info, fix_info, size);
 
-    if(desiredx != 0)
+    if (desiredx != 0)
         new_width = desiredx;
     else
         new_width = width;
 
-    if(desiredy != 0)
+    if (desiredy != 0)
         new_height = height > 0 ? desiredy : -desiredy;
     else
         new_height = height;
 
-    if(bm_type == 0)
+    if (bm_type == 0)
     {
-        BITMAPCOREHEADER *core = (BITMAPCOREHEADER *)&scaled_info->bmiHeader;
+        BITMAPCOREHEADER* core = (BITMAPCOREHEADER*)&scaled_info->bmiHeader;
         core->bcWidth = new_width;
         core->bcHeight = new_height;
     }
@@ -1771,9 +1752,9 @@ static HBITMAP BITMAP_Load( HINSTANCE instance, LPCSTR name,
 
     if (new_height < 0) new_height = -new_height;
 
-    if (!(screen_mem_dc = CreateCompatibleDC( 0 ))) goto end;
+    if (!(screen_mem_dc = CreateCompatibleDC(0))) goto end;
 
-    bits = (char *)info + (offbits ? offbits : size);
+    bits = (char*)info + (offbits ? offbits : size);
 
     if (loadflags & LR_CREATEDIBSECTION)
     {
@@ -1798,12 +1779,37 @@ end:
     if (screen_mem_dc) DeleteDC(screen_mem_dc);
     HeapFree(GetProcessHeap(), 0, scaled_info);
     HeapFree(GetProcessHeap(), 0, fix_info);
-    if (loadflags & LR_LOADFROMFILE) 
-    {
-        munmap(minfo.ptr,minfo.fileSize);
-        close(minfo.fd);
-    }
     return hbitmap;
+}
+
+
+static HBITMAP BITMAP_Load( HINSTANCE instance, LPCSTR name,
+                            INT desiredx, INT desiredy, UINT loadflags )
+{
+    
+    if (!(loadflags & LR_LOADFROMFILE))
+    {
+        // if (!instance)
+        // {
+        //     /* OEM bitmap: try to load the resource from user32.dll */
+        //     instance = user32_module;
+        // }
+
+        // if (!(hRsrc = FindResourceW( instance, name, (LPWSTR)RT_BITMAP ))) return 0;
+        // if (!(handle = LoadResource( instance, hRsrc ))) return 0;
+
+        // if ((info = LockResource( handle )) == NULL) 
+        return 0;
+    }
+    else
+    {
+        MapFileInfo minfo;
+        if (!(map_file( name, &minfo ))) return 0;
+        HBITMAP ret = BITMAP_LoadBuf((const char * )minfo.ptr, minfo.fileSize, desiredx, desiredy, loadflags);
+        munmap(minfo.ptr, minfo.fileSize);
+        close(minfo.fd);
+        return ret;
+    }
 }
 
 /**********************************************************************
@@ -1844,6 +1850,23 @@ HANDLE WINAPI LoadImageW( HINSTANCE hinst, LPCWSTR name, UINT type,
  *
  * FIXME: Implementation lacks some features, see LR_ defines in winuser.h
  */
+
+HANDLE WINAPI LoadImageBuf(const void* buf, UINT length, UINT type,
+    INT desiredx, INT desiredy, UINT loadflags) {
+    int depth;
+    switch (type) {
+    case IMAGE_BITMAP:
+        return (HANDLE)BITMAP_LoadBuf((const char *)buf,length, desiredx, desiredy, loadflags);
+
+    case IMAGE_ICON:
+    case IMAGE_CURSOR:
+        depth = 1;
+        if (!(loadflags & LR_MONOCHROME)) depth = get_display_bpp();
+        return (HANDLE)CURSORICON_LoadFromBuf((const char*)buf, length, desiredx, desiredy, depth, (type == IMAGE_CURSOR), loadflags);
+    }
+    return 0;
+}
+
 HANDLE WINAPI LoadImageA( HINSTANCE hinst, LPCSTR name, UINT type,
                 INT desiredx, INT desiredy, UINT loadflags )
 {

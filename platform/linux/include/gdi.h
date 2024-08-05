@@ -495,6 +495,9 @@ HANDLE WINAPI LoadImageA( HINSTANCE hinst, LPCSTR name, UINT type,
 #define LoadImage LoadImageA
 #endif
 
+HANDLE WINAPI LoadImageBuf(const void* buf, UINT length, UINT type,
+    INT desiredx, INT desiredy, UINT loadflags);
+
 HBITMAP WINAPI CreateBitmap( INT width, INT height, UINT planes,
                                   UINT bpp, const void *bits );
 
@@ -524,5 +527,10 @@ BOOL WINAPI DrawIconEx(HDC hdc,
 );
 
 BOOL WINAPI DestroyIcon(HICON hIcon);
+
+HICON WINAPI CreateIconFromResourceEx(LPBYTE bits, UINT cbSize,
+    BOOL bIcon, DWORD dwVersion,
+    INT width, INT height,
+    UINT cFlag);
 
 #endif//_LINUX_GDI_H_

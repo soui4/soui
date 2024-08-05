@@ -580,6 +580,36 @@ LPCSTR SConnection::getStdCursorName(WORD wId)
     return NULL;
 }
 
+struct CData {
+    const unsigned char* buf;
+    UINT   length;
+};
+
+static bool getStdCursorName2(WORD wId, CData & data)
+{
+    bool ret = true;
+    switch (wId) {
+    case CIDC_ARROW: data.buf = ocr_normal_cur; data.length = sizeof(ocr_normal_cur); break;;
+    case CIDC_IBEAM: data.buf = ocr_ibeam_cur; data.length = sizeof(ocr_ibeam_cur); break;;
+    case CIDC_WAIT:  data.buf = ocr_wait_cur; data.length = sizeof(ocr_wait_cur); break;
+    case CIDC_CROSS:  data.buf = ocr_cross_cur; data.length = sizeof(ocr_cross_cur); break;
+    case CIDC_UPARROW:  data.buf = ocr_up_cur; data.length = sizeof(ocr_up_cur); break;
+    case CIDC_SIZE:  data.buf = ocr_size_cur; data.length = sizeof(ocr_size_cur); break;
+    case CIDC_SIZEALL:  data.buf = ocr_sizeall_cur; data.length = sizeof(ocr_sizeall_cur); break;
+    case CIDC_ICON:  data.buf = ocr_icon_cur; data.length = sizeof(ocr_icon_cur); break;
+    case CIDC_SIZENWSE:  data.buf = ocr_sizenwse_cur; data.length = sizeof(ocr_sizenwse_cur); break;
+    case CIDC_SIZENESW:  data.buf = ocr_sizenesw_cur; data.length = sizeof(ocr_sizenesw_cur); break;
+    case CIDC_SIZEWE: data.buf = ocr_sizewe_cur; data.length = sizeof(ocr_sizewe_cur); break;
+    case CIDC_SIZENS:  data.buf = ocr_sizens_cur; data.length = sizeof(ocr_sizens_cur); break;
+    case CIDC_HAND:  data.buf = ocr_hand_cur; data.length = sizeof(ocr_hand_cur); break;
+    case CIDC_HELP:  data.buf = ocr_help_cur; data.length = sizeof(ocr_help_cur); break;
+    case CIDC_APPSTARTING: data.buf = ocr_appstarting_cur; data.length = sizeof(ocr_appstarting_cur); break;
+    default:
+        ret = false;
+        break;
+    }
+    return ret;
+}
 
 HCURSOR SConnection::LoadCursor(LPCSTR lpCursorName)
 {
@@ -589,13 +619,12 @@ HCURSOR SConnection::LoadCursor(LPCSTR lpCursorName)
         if(m_stdCursor.find(wId)!=m_stdCursor.end())
             return m_stdCursor[wId];
         //todo: hjx load std cursor
-        std::string strCursor = "/home/flyhigh/work/soui4/platform/linux/resource/";
-        LPCSTR pszStdName = getStdCursorName(wId);
-        if(!pszStdName)
-            pszStdName = getStdCursorName(CIDC_ARROW);
-        printf("load cursor: %s\n",pszStdName);
-        strCursor += pszStdName;
-        ret = (HCURSOR)LoadImage(0,strCursor.c_str(),IMAGE_CURSOR,0,0,LR_LOADFROMFILE|LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
+        CData data;
+        if (!getStdCursorName2(wId, data)) {
+            getStdCursorName2(CIDC_ARROW, data);
+        }
+        ret = (HCURSOR)LoadImageBuf((PBYTE)data.buf,data.length,FALSE,0,0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR);
+//        ret = (HCURSOR)LoadImage(0,strCursor.c_str(),IMAGE_CURSOR,0,0,LR_LOADFROMFILE|LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
         assert(ret);
         m_stdCursor.insert(std::make_pair(wId,ret));
     }else{
