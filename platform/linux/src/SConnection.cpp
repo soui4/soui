@@ -9,6 +9,7 @@
 
 #include "uimsg.h"
 #include <algorithm>
+#include "cursors.hpp"
 
 SNSBEGIN
 
