@@ -106,7 +106,6 @@ public:
     BOOL GetCursorPos(LPPOINT ppt) const;
 
 private:
-  static LPCSTR getStdCursorName(WORD wId);
   xcb_cursor_t createXcbCursor(HCURSOR cursor);
   uint32_t netWmStates(HWND hWnd);
   bool pushEvent(xcb_generic_event_t *e);

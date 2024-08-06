@@ -557,35 +557,12 @@ HCURSOR SConnection::SetCursor(HCURSOR cursor)
 #define CIDC_APPSTARTING     (32650) 
 #define CIDC_HELP            (32651)
 
-LPCSTR SConnection::getStdCursorName(WORD wId)
-{
-//    return "ocr_normal.cur";
-    switch(wId){
-        case CIDC_ARROW: return "ocr_normal.cur";
-        case CIDC_IBEAM: return "ocr_ibeam.cur";
-        case CIDC_WAIT: return "ocr_wait.cur";
-        case CIDC_CROSS: return "ocr_cross.cur";
-        case CIDC_UPARROW: return "ocr_up.cur";
-        case CIDC_SIZE: return "ocr_size.cur";
-        case CIDC_SIZEALL: return "ocr_sizeall.cur";
-        case CIDC_ICON: return "ocr_icon.cur";
-        case CIDC_SIZENWSE: return "ocr_sizenwse.cur";
-        case CIDC_SIZENESW: return "ocr_sizenesw.cur";
-        case CIDC_SIZEWE:return "ocr_sizewe.cur";
-        case CIDC_SIZENS: return "ocr_sizens.cur";
-        case CIDC_HAND: return "ocr_hand.cur";
-        case CIDC_HELP: return "ocr_help.cur";
-        case CIDC_APPSTARTING:return "ocr_appstarting.cur";
-    }
-    return NULL;
-}
-
 struct CData {
     const unsigned char* buf;
     UINT   length;
 };
 
-static bool getStdCursorName2(WORD wId, CData & data)
+static bool getStdCursorCData(WORD wId, CData & data)
 {
     bool ret = true;
     switch (wId) {
@@ -618,13 +595,11 @@ HCURSOR SConnection::LoadCursor(LPCSTR lpCursorName)
         WORD wId = (WORD)(ULONG_PTR)lpCursorName;
         if(m_stdCursor.find(wId)!=m_stdCursor.end())
             return m_stdCursor[wId];
-        //todo: hjx load std cursor
         CData data;
-        if (!getStdCursorName2(wId, data)) {
-            getStdCursorName2(CIDC_ARROW, data);
+        if (!getStdCursorCData(wId, data)) {
+            getStdCursorCData(CIDC_ARROW, data);
         }
         ret = (HCURSOR)LoadImageBuf((PBYTE)data.buf,data.length, IMAGE_CURSOR,0,0, LR_DEFAULTSIZE | LR_DEFAULTCOLOR);
-//        ret = (HCURSOR)LoadImage(0,strCursor.c_str(),IMAGE_CURSOR,0,0,LR_LOADFROMFILE|LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
         assert(ret);
         m_stdCursor.insert(std::make_pair(wId,ret));
     }else{

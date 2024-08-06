@@ -346,9 +346,6 @@ HBITMAP CreateDIBSection(HDC hdc, const BITMAPINFO *lpbmi, UINT usage, VOID **pp
     }
     if(fmt == CAIRO_FORMAT_INVALID)
         return 0;
-    if (lpbmi->bmiHeader.biHeight < 0) {
-        printf("CreateDIBSection,height=%d\n", lpbmi->bmiHeader.biHeight);
-    }
     cairo_surface_t *ret = cairo_image_surface_create(fmt,lpbmi->bmiHeader.biWidth,abs(lpbmi->bmiHeader.biHeight));
     if(!ret)
         return 0;
