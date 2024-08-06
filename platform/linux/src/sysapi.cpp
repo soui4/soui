@@ -54,6 +54,64 @@ tid_t GetCurrentThreadId()
     return (tid_t)pthread_self();
 }
 
+#ifdef USING_MYUTF8
+int my_mbtowc (wchar_t * utf16,
+		   const char * utf8, size_t __n) {
+    int i = 0, j = 0;
+
+        unsigned char byte1 = utf8[i];
+
+        if ((byte1 & 0x80) == 0) {
+            // Single byte character
+            utf16[j++] = byte1;
+        } else if ((byte1 & 0xE0) == 0xC0) {
+            // Two byte character
+            unsigned char byte2 = utf8[i + 1];
+            utf16[j++] = ((byte1 & 0x1F) << 6) | (byte2 & 0x3F);
+            i++;
+        } else if ((byte1 & 0xF0) == 0xE0) {
+            // Three byte character
+            unsigned char byte2 = utf8[i + 1];
+            unsigned char byte3 = utf8[i + 2];
+            utf16[j++] = ((byte1 & 0x0F) << 12) | ((byte2 & 0x3F) << 6) | (byte3 & 0x3F);
+            i += 2;
+        } else {
+            // More complex cases not handled in this example
+            return -1;
+        }
+
+        return ++i;
+}
+
+int my_wctomb (char *utf8, wchar_t codepoint){
+    int  j = 0;
+
+        if (codepoint <= 0x7F) {
+            // Single byte character
+            utf8[j++] = codepoint & 0x7F;
+        } else if (codepoint <= 0x7FF) {
+            // Two byte character
+            utf8[j++] = 0xC0 | ((codepoint >> 6) & 0x1F);
+            utf8[j++] = 0x80 | (codepoint & 0x3F);
+        } else if (codepoint <= 0xFFFF) {
+            // Three byte character
+            utf8[j++] = 0xE0 | ((codepoint >> 12) & 0x0F);
+            utf8[j++] = 0x80 | ((codepoint >> 6) & 0x3F);
+            utf8[j++] = 0x80 | (codepoint & 0x3F);
+        } else {
+            // More complex cases not handled in this example
+            return -1;
+        }
+    return j;
+}
+
+#define MB2WC my_mbtowc
+#define WC2MB my_wctomb
+#else
+#define MB2WC mbtowc
+#define WC2MB wctomb
+#endif//USING_MYUTF8
+
 int MultiByteToWideChar(int cp, int flags, const char *src, int len, wchar_t *dst, int dstLen)
 {
     if (cp != CP_ACP && cp != CP_UTF8)
@@ -74,12 +132,12 @@ int MultiByteToWideChar(int cp, int flags, const char *src, int len, wchar_t *ds
                 SetLastError(ERROR_INSUFFICIENT_BUFFER);
                 break;
             }
-            result = mbtowc(&dst[i], ptr, MB_CUR_MAX);
+            result = MB2WC(&dst[i], ptr, MB_CUR_MAX);
         }
         else
         {
             wchar_t tmp;
-            result = mbtowc(&tmp, ptr, MB_CUR_MAX);
+            result = MB2WC(&tmp, ptr, MB_CUR_MAX);
         }
         if (result > 0)
         {
@@ -97,6 +155,7 @@ int MultiByteToWideChar(int cp, int flags, const char *src, int len, wchar_t *ds
     return i;
 }
 
+
 int WideCharToMultiByte(int cp, int flags, const wchar_t *src, int len, char *dst, int dstLen, BOOL *p1, BOOL *p2)
 {
     const wchar_t *ptr = src;
@@ -109,7 +168,7 @@ int WideCharToMultiByte(int cp, int flags, const wchar_t *src, int len, char *ds
     while (ptr < stop)
     {
         char tmp[4];
-        int result = wctomb(tmp, *ptr);
+        int result = WC2MB(tmp, *ptr);
         if (result <= 0)
             break;
         if (dst)

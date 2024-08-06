@@ -2,7 +2,7 @@
 # SOUI cmake�����ļ�
 #
 add_definitions(-DPLATFORM_EXPORTS)
-
+add_definitions(-DUSING_MYUTF8)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 set(SRC_DIR "windows")

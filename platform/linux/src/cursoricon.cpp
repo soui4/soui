@@ -517,7 +517,7 @@ static int CURSORICON_FindBestIcon( LPCVOID dir, DWORD size, fnGetCIEntry get_en
     /* Find Best Colors for Best Fit */
     for ( i = 0; get_entry( dir, size, i, &cx, &cy, &bits ); i++ )
     {
-        TRACE_(cursor)("entry %d: %d x %d, %d bpp\n", i, cx, cy, bits);
+        //TRACE_(cursor)("entry %d: %d x %d, %d bpp\n", i, cx, cy, bits);
 
         if(abs(width - cx) == iXDiff && abs(height - cy) == iYDiff)
         {
