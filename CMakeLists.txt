@@ -102,6 +102,10 @@ if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
 endif()
 
+# 设置库文件的输出路径
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
 #
 #
 add_subdirectory(third-part)
