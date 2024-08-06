@@ -25,7 +25,7 @@ if (NOT ENABLE_SOUI_CORE_LIB)
     if(CMAKE_SYSTEM_NAME MATCHES Linux)
     target_link_libraries(
         platform
-        cairo xcb-util
+        xkbcommon cairo xcb-util
     )
     endif()
 
