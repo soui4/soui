@@ -101,3 +101,23 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 ##  **LICENSE** 
 
 请查看[`license.txt`](./license.txt)文档
+
+
+##  **Linux编译** 
+安装git, cmake
+sudo apt-get install git cmake
+
+安装build-essential,gdb,xcb,xcb-util,cairo.
+sudo apt install build-essential gdb libcairo2-dev libxcb1-dev libxcb-util0-dev
+安装完成后，即可编译。
+要调试代码可以在linux系统上安装vscode，使用gdb进行调试
+
+使用vs远程调试
+linux机器上安装
+sudo apt install -y openssh-server build-essential gdb rsync make zip ninja-build
+本机安装
+CMake, Vcxsvr(https://sourceforge.net/projects/vcxsrv/files/vcxsrv/21.1.10/vcxsrv-64.21.1.10.0.installer.exe/download)
+在VS菜单：
+工具\选项\跨平台 页面的列表中添加linux主机IP，注意配置好登陆启用名，密码
+然后就可以在VS里运行远程调试了。
+具体参考：https://learn.microsoft.com/zh-cn/cpp/build/get-started-linux-cmake?view=msvc-170
