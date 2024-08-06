@@ -28,6 +28,8 @@
 #include <sys/stat.h>
 #include <errno.h>
 #include <unistd.h>
+#include <stdio.h>
+#include <stdlib.h>
 
 #include "xkbcommon/xkbcommon.h"
 #include "utils.h"
@@ -73,6 +75,25 @@ err:
     return 0;
 }
 
+static int myasprintf(char **strp,const char *fmt,...){
+    va_list args;
+    int len;
+    va_start(args,fmt);
+    len = vsnprintf(NULL,0,fmt,args);
+    if(len<0){
+        va_end(args);
+        return -1;
+    }
+    *strp = (char*)malloc(len+1);
+    if(! (*strp)){
+        va_end(args);
+        return -1;
+    }
+    vsnprintf(*strp,len+1,fmt,args);
+    va_end(args);
+    return len;
+}
+
 /**
  * Append the default include directories to the context.
  */
@@ -83,7 +104,6 @@ xkb_context_include_path_append_default(struct xkb_context *ctx)
     char *user_path;
     int err;
     int ret = 0;
-
     root = secure_getenv("XKB_CONFIG_ROOT");
     if (root != NULL)
        ret |= xkb_context_include_path_append(ctx, root);
@@ -93,7 +113,7 @@ xkb_context_include_path_append_default(struct xkb_context *ctx)
     home = secure_getenv("HOME");
     if (!home)
         return ret;
-    err = asprintf(&user_path, "%s/.xkb", home);
+    err = myasprintf(&user_path, "%s/.xkb", home);
     if (err <= 0)
         return ret;
     ret |= xkb_context_include_path_append(ctx, user_path);
