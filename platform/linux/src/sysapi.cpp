@@ -730,7 +730,7 @@ int GetWindowScale(HWND hWnd)
 
 void PostThreadMessage(uint64_t tid, UINT msg, WPARAM wp, LPARAM lp)
 {
-    SOUI::SConnection *conn = SOUI::SConnMgr::instance()->getConnection(tid);
+    SConnection *conn = SConnMgr::instance()->getConnection(tid);
     if(!conn)
         return;
     conn->postMsg(0,msg,wp,lp);
@@ -738,21 +738,21 @@ void PostThreadMessage(uint64_t tid, UINT msg, WPARAM wp, LPARAM lp)
 
 BOOL WaitMessage()
 {
-    SOUI::SConnection *conn = SOUI::SConnMgr::instance()->getConnection();
+    SConnection *conn = SConnMgr::instance()->getConnection();
     if(!conn)
         return FALSE;
     return conn->update();
 }
 
 BOOL PeekMessage(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg){
-    SOUI::SConnection *conn = SOUI::SConnMgr::instance()->getConnection();
+    SConnection *conn = SConnMgr::instance()->getConnection();
     if(!conn)
         return FALSE;
     return conn->peekMsg(pMsg,hWnd,wMsgFilterMin,wMsgFilterMax,wRemoveMsg);
 }
 
 BOOL TranslateMessage(LPMSG pMsg){
-    SOUI::SConnection* conn = SOUI::SConnMgr::instance()->getConnection();
+    SConnection* conn = SConnMgr::instance()->getConnection();
     if (!conn)
         return FALSE;
     conn->TranslateMessage(pMsg);
@@ -788,7 +788,8 @@ BOOL ShellExecute(HWND hwnd, LPCSTR lpOperation, LPCSTR lpFile, LPCSTR lpParamet
 
 SHORT GetKeyState(int nVirtKey)
 {
-    return 0;
+    SConnection* conn = SConnMgr::instance()->getConnection();
+    return conn->GetKeyState(nVirtKey);
 }
 
 HHOOK SetWindowsHookEx(int idHook, HOOKPROC lpfn, HINSTANCE hmod, DWORD dwThreadId)

@@ -17,7 +17,6 @@
 #define STR_ATOM(atom_name,onlyExist) SOUI::SConnMgr::instance()->atom(atom_name,onlyExist)
 #define ID_ATOM(id,onlyExist) STR_ATOM(#id,onlyExist)
 
-SNSBEGIN
 struct Msg;
 
 struct TimerInfo {
@@ -29,7 +28,7 @@ struct TimerInfo {
 };
 
 class SXcbKeyboard;
-class SConnection : SNoCopyable{
+class SConnection {
 public:
    enum NetWmState {
         NetWmStateAbove = 0x1,
@@ -72,6 +71,7 @@ public:
     xcb_atom_t _XKB_RULES_NAMES;
 public:
     bool update();
+    SHORT GetKeyState(int vk);
     BOOL TranslateMessage(const MSG* pMsg);
     BOOL peekMsg(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
     void postMsg(HWND hWnd,UINT message,WPARAM wp,LPARAM lp);
@@ -146,8 +146,8 @@ private:
     SXcbKeyboard* m_keyboard;
 };
 
-class SConnMgr : SNoCopyable{
-    SRwLock m_rwLock;
+class SConnMgr{
+    std::recursive_mutex m_rwLock;
     std::map<pthread_t,SConnection*> m_conns;
     friend class SConnection;
 public:
@@ -164,7 +164,5 @@ private:
     SConnMgr(){}
     ~SConnMgr();
 };
-
-SNSEND
 
 #endif//_SCONN_H_

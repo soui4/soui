@@ -4,7 +4,6 @@
 #include <sdef.h>
 #include "gdi.h"
 
-SNSBEGIN
 struct Msg : MSG{
     virtual ~Msg(){}
 };
@@ -24,7 +23,5 @@ struct MsgWndPosChanged: Msg{
 };
 
 #define UM_STATE (WM_INTERNAL+1)
-
-SNSEND
 
 #endif//_UIMSG_H_
