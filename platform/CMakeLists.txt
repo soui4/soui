@@ -1,4 +1,5 @@
 add_subdirectory(linux/thirdparty/xkbcommon)
+add_subdirectory(linux/thirdparty/libxcb)
 
 add_definitions(-DPLATFORM_EXPORTS)
 add_definitions(-DUSING_MYUTF8)
@@ -28,7 +29,7 @@ if (NOT ENABLE_SOUI_CORE_LIB)
     if(CMAKE_SYSTEM_NAME MATCHES Linux)
     target_link_libraries(
         platform
-        xkbcommon cairo xcb-util
+        libxcb xkbcommon cairo xcb-util
     )
     endif()
 
