@@ -233,6 +233,7 @@ public:
         memset(&xkb_names, 0, sizeof(xkb_names));
         m_key_symbols = xcb_key_symbols_alloc(m_conn->connection);
         updateModifiers();
+        updateKeymap();
     }
 
     ~SXcbKeyboard() {
