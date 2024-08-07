@@ -752,6 +752,10 @@ BOOL PeekMessage(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax,
 }
 
 BOOL TranslateMessage(LPMSG pMsg){
+    SOUI::SConnection* conn = SOUI::SConnMgr::instance()->getConnection();
+    if (!conn)
+        return FALSE;
+    conn->TranslateMessage(pMsg);
     return TRUE;
 }
 

@@ -1,6 +1,5 @@
-# 
-# SOUI cmake�����ļ�
-#
+add_subdirectory(linux/thirdparty/xkbcommon)
+
 add_definitions(-DPLATFORM_EXPORTS)
 add_definitions(-DUSING_MYUTF8)
 
@@ -14,7 +13,11 @@ endif()
 
 file(GLOB_RECURSE HEADERS_COM include/*.h include/*.hpp interface/*.h)
 file(GLOB_RECURSE HEADERS_PLATFORM  ${SRC_DIR}/include/*.hpp ${SRC_DIR}/include/*.h)
-file(GLOB_RECURSE CURRENT_SRCS ${SRC_DIR}/xcb-util-image/*.c ${SRC_DIR}/xcb-util-renderutil/*.c  ${SRC_DIR}/src/*.cpp )
+file(GLOB_RECURSE CURRENT_SRCS 
+    ${SRC_DIR}/thirdparty/xcb-util-image/*.c 
+    ${SRC_DIR}/thirdparty/xcb-util-renderutil/*.c  
+    ${SRC_DIR}/thirdparty/xcb-util-keysyms/*.c  
+    ${SRC_DIR}/src/*.cpp )
 
 source_group("Header Files(Com)" FILES ${HEADERS_COM})
 source_group("Header Files(Platform)" FILES ${HEADERS_PLATFORM})
@@ -38,8 +41,8 @@ target_include_directories(platform
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/include
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_DIR}
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_DIR}/include
-    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/${SRC_DIR}/xcb
-#    PRIVATE /usr/include/xcb
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/linux/thirdparty
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/linux/thirdparty/xkbcommon
 	PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/../utilities/include
 )
 

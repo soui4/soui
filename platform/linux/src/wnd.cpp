@@ -243,7 +243,7 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
         | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE;
     uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
     uint32_t value_list[3] = { conn->screen->white_pixel };
-    if (!(cs->style & (WS_THICKFRAME|WS_BORDER))) {
+    if (0 && !(cs->style & (WS_THICKFRAME|WS_BORDER))) {
         mask |= XCB_CW_OVERRIDE_REDIRECT;
         value_list[1] = 1;
         value_list[2] = evt_mask;

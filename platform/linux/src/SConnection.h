@@ -28,6 +28,7 @@ struct TimerInfo {
     TIMERPROC proc;
 };
 
+class SXcbKeyboard;
 class SConnection : SNoCopyable{
 public:
    enum NetWmState {
@@ -46,6 +47,8 @@ public:
 public:
     xcb_connection_t* connection;
     xcb_screen_t* screen;
+    const xcb_setup_t* m_setup;
+
     xcb_atom_t WM_DELETE_WINDOW_ATOM;
     xcb_atom_t WM_PROTOCOLS_ATOM;
     xcb_atom_t _NET_WM_STATE_ATOM;
@@ -66,9 +69,10 @@ public:
     xcb_atom_t WM_CLASS_ATOM;
     xcb_atom_t WM_NAME_ATOM;
     xcb_atom_t WM_CHANGE_STATE_ATOM;
-
+    xcb_atom_t _XKB_RULES_NAMES;
 public:
     bool update();
+    BOOL TranslateMessage(const MSG* pMsg);
     BOOL peekMsg(LPMSG pMsg, HWND  hWnd, UINT wMsgFilterMin, UINT wMsgFilterMax, UINT  wRemoveMsg);
     void postMsg(HWND hWnd,UINT message,WPARAM wp,LPARAM lp);
     UINT_PTR SetTimer(HWND hWnd, UINT_PTR id, UINT uElapse,
@@ -117,7 +121,7 @@ private:
     std::mutex m_mutex4Evt;
     std::list<xcb_generic_event_t*> m_evtQueue;
 
-    std::recursive_mutex m_mutex4Msg;
+    mutable std::recursive_mutex m_mutex4Msg;
     std::list<Msg *> m_msgQueue;
     xcb_timestamp_t  m_tsPrevPress;
     xcb_timestamp_t  m_tsDoubleSpan;
@@ -138,6 +142,8 @@ private:
     HWND m_hWndActive;
     std::map<HCURSOR,xcb_cursor_t> m_sysCursor;
     std::map<WORD,HCURSOR> m_stdCursor;
+
+    SXcbKeyboard* m_keyboard;
 };
 
 class SConnMgr : SNoCopyable{
