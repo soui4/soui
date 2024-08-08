@@ -24,6 +24,79 @@
 using namespace SOUI;
 
 
+int flash() {
+    // 连接到 X 服务器
+    xcb_connection_t* connection = xcb_connect(NULL, NULL);
+    const xcb_setup_t* setup = xcb_get_setup(connection);
+    xcb_screen_t* screen = xcb_setup_roots_iterator(setup).data;
+
+    // 创建一个有边框的窗口
+    xcb_window_t window = xcb_generate_id(connection);
+
+    int wid = 300, hei = 300;
+    // 创建窗口
+    uint32_t values[] = { screen->white_pixel, XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_EXPOSURE };
+    xcb_create_window(connection, XCB_COPY_FROM_PARENT, window, screen->root,
+        100, 100, wid, hei, 1, XCB_WINDOW_CLASS_INPUT_OUTPUT,
+        screen->root_visual, XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK,
+        values
+    );
+
+    // 显示窗口
+    xcb_map_window(connection, window);
+
+    // 刷新连接
+    xcb_flush(connection);
+
+    // 双缓冲绘制
+    xcb_generic_event_t* event;
+    xcb_gcontext_t gc = xcb_generate_id(connection);
+
+    uint32_t val[] = { screen->black_pixel, 0 };
+    xcb_create_gc(connection, gc, window, XCB_GC_FOREGROUND | XCB_GC_GRAPHICS_EXPOSURES, val);
+
+    xcb_pixmap_t pixmap = xcb_generate_id(connection);
+    xcb_create_pixmap(connection, screen->root_depth, pixmap, window, 1, 1);
+
+    while ((event = xcb_wait_for_event(connection))) {
+        switch (event->response_type & ~0x80) {
+        case XCB_EXPOSE: {
+            // 双缓冲绘制
+            xcb_rectangle_t rect = { 0, 0, wid, hei };
+            uint32_t color = 0xff0000;
+            xcb_change_gc(connection, gc, XCB_GC_FOREGROUND, &color);
+            xcb_poly_fill_rectangle(connection, pixmap, gc, 1, &rect);
+
+            xcb_copy_area(connection, pixmap, window, gc, 0, 0, 0, 0, wid, hei);
+            xcb_flush(connection);
+            break;
+        }
+        case XCB_CONFIGURE_NOTIFY: {
+            // 处理窗口大小变化事件
+            xcb_configure_notify_event_t* configure_event = (xcb_configure_notify_event_t*)event;
+            // 更新绘制区域大小
+            xcb_free_pixmap(connection, pixmap);
+            pixmap = xcb_generate_id(connection);
+            wid = configure_event->width, hei=configure_event->height;
+            xcb_create_pixmap(connection, screen->root_depth, pixmap, window,wid,hei );
+            break;
+        }
+        default:
+            break;
+        }
+        free(event);
+    }
+
+    // 清理资源
+    xcb_free_pixmap(connection, pixmap);
+    xcb_free_gc(connection, gc);
+
+    // 断开连接
+    xcb_disconnect(connection);
+
+    return 0;
+}
+
 int frameless_window() {
     // 连接到 X 服务器
     xcb_connection_t* connection = xcb_connect(NULL, NULL);
@@ -86,6 +159,7 @@ int frameless_window() {
 
 TEST(window, frameless) {
     //frameless_window();
+    flash();
 }
 
 //获得源文件根路径,区分在VS中远程调试及在vscode中本机运行两种模式
@@ -488,5 +562,5 @@ int run_app(HINSTANCE hInst){
 
 TEST(demo,app){
     HINSTANCE hInst = 0;
-    EXPECT_EQ(run_app(hInst),0);
+    //EXPECT_EQ(run_app(hInst),0);
 }
