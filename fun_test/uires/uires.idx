@@ -11,7 +11,9 @@
   	<file name="color" path="values\color.xml"/>
   	<file name="skin" path="values\skin.xml"/>
   </values>
-
+  <img>
+    <file name="girl" path="image\girl.png"/>
+  </img>
   <ICON>
     <file name="ICON_LOGO"  path="image\soui.ico"/>
   </ICON>
