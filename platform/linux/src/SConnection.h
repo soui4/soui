@@ -69,6 +69,11 @@ public:
     xcb_atom_t WM_NAME_ATOM;
     xcb_atom_t WM_CHANGE_STATE_ATOM;
     xcb_atom_t _XKB_RULES_NAMES;
+
+    xcb_atom_t _NET_WM_WINDOW_TYPE_DOCK;
+    xcb_atom_t _NET_WM_WINDOW_TYPE_TOOLBAR;
+    xcb_atom_t _NET_WM_WINDOW_TYPE_SPLASH;
+    xcb_atom_t _NET_WM_WINDOW_TYPE;
 public:
     bool update();
     SHORT GetKeyState(int vk);

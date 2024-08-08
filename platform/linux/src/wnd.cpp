@@ -235,24 +235,18 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     pWnd->rc.right = cs->x + cs->cx;
     pWnd->rc.bottom = cs->y + cs->cy;
     pWnd->isPainting = 0;
-    HWND hWnd = xcb_generate_id(pWnd->mConnection->connection);
+    HWND hWnd = xcb_generate_id(conn->connection);
+
     static const uint32_t evt_mask = XCB_EVENT_MASK_EXPOSURE | XCB_EVENT_MASK_STRUCTURE_NOTIFY
         | XCB_EVENT_MASK_PROPERTY_CHANGE
         | XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE | XCB_EVENT_MASK_POINTER_MOTION
         | XCB_EVENT_MASK_ENTER_WINDOW | XCB_EVENT_MASK_LEAVE_WINDOW
         | XCB_EVENT_MASK_KEY_PRESS | XCB_EVENT_MASK_KEY_RELEASE;
     uint32_t mask = XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK;
-    uint32_t value_list[3] = { conn->screen->white_pixel };
-    if (0 && !(cs->style & (WS_THICKFRAME|WS_BORDER))) {
-        mask |= XCB_CW_OVERRIDE_REDIRECT;
-        value_list[1] = 1;
-        value_list[2] = evt_mask;
-    }
-    else {
-        value_list[1] = evt_mask;
-    }
+    uint32_t value_list[] = { conn->screen->white_pixel,evt_mask };
+
     xcb_void_cookie_t cookie = xcb_create_window_checked(conn->connection, XCB_COPY_FROM_PARENT, hWnd,
-                      hParent, cs->x, cs->y, std::max(cs->cx,1u), std::max(cs->cy,1u), 10,
+                      hParent, cs->x, cs->y, std::max(cs->cx,1u), std::max(cs->cy,1u), 0,
                       XCB_WINDOW_CLASS_INPUT_OUTPUT, conn->screen->root_visual, mask,
                       value_list);
     xcb_generic_error_t * err = xcb_request_check(conn->connection, cookie);
@@ -268,6 +262,11 @@ static HWND WIN_CreateWindowEx( CREATESTRUCT *cs, LPCSTR className, HINSTANCE mo
     xcb_change_property(conn->connection, XCB_PROP_MODE_REPLACE, hWnd,
         XCB_ATOM_WM_NAME, XCB_ATOM_STRING, 8, pWnd->title.length(), pWnd->title.c_str());
     xcb_change_property(conn->connection, XCB_PROP_MODE_REPLACE, hWnd, conn->WM_PROTOCOLS_ATOM, XCB_ATOM_ATOM, 32, 1, &conn->WM_DELETE_WINDOW_ATOM);
+
+    if (!(cs->style & (WS_THICKFRAME | WS_BORDER))) {
+        xcb_change_property(conn->connection, XCB_PROP_MODE_REPLACE, hWnd, conn->_NET_WM_WINDOW_TYPE, XCB_ATOM_ATOM, 32, 1, &conn->_NET_WM_WINDOW_TYPE_SPLASH);
+    }
+
     if (cs->style & WS_VISIBLE)
     {
         xcb_map_window(conn->connection, hWnd);

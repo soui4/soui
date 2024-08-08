@@ -183,6 +183,12 @@ SConnection::SConnection(int screenNum):m_keyboard(nullptr)
     _NET_WM_ICON_NAME = SConnMgr::internAtom(connection,1,"_NET_WM_ICON_NAME");
     _NET_WM_ICON = SConnMgr::internAtom(connection,1,"_NET_WM_ICON");
     _XKB_RULES_NAMES = SConnMgr::internAtom(connection, 1, "_XKB_RULES_NAMES");
+
+    _NET_WM_WINDOW_TYPE_DOCK = SConnMgr::internAtom(connection, 1, "_NET_WM_WINDOW_TYPE_DOCK");
+    _NET_WM_WINDOW_TYPE_TOOLBAR = SConnMgr::internAtom(connection, 1, "_NET_WM_WINDOW_TYPE_TOOLBAR");
+    _NET_WM_WINDOW_TYPE_SPLASH = SConnMgr::internAtom(connection, 1, "_NET_WM_WINDOW_TYPE_SPLASH");
+    _NET_WM_WINDOW_TYPE = SConnMgr::internAtom(connection, 1, "_NET_WM_WINDOW_TYPE");
+
     m_bQuit=false;
     m_msgPeek = nullptr;
     m_bMsgNeedFree = false;

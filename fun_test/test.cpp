@@ -23,6 +23,71 @@
 
 using namespace SOUI;
 
+
+int frameless_window() {
+    // 连接到 X 服务器
+    xcb_connection_t* connection = xcb_connect(NULL, NULL);
+    const xcb_setup_t* setup = xcb_get_setup(connection);
+    xcb_screen_t* screen = xcb_setup_roots_iterator(setup).data;
+
+    // 创建一个没有窗口外框的窗口
+    xcb_window_t window = xcb_generate_id(connection);
+
+    // 创建窗口
+    xcb_create_window(connection, XCB_COPY_FROM_PARENT, window, screen->root,
+        0, 0, 800, 600, 0, XCB_WINDOW_CLASS_INPUT_OUTPUT,
+        screen->root_visual, 0, NULL);
+
+    // 设置窗口类型为 _NET_WM_WINDOW_TYPE_DOCK
+    const char* type_name = "_NET_WM_WINDOW_TYPE";
+    xcb_intern_atom_cookie_t atom_cookie = xcb_intern_atom(connection, 0, strlen(type_name), type_name);
+    xcb_intern_atom_reply_t* atom_reply = xcb_intern_atom_reply(connection, atom_cookie, NULL);
+    xcb_atom_t window_type = atom_reply->atom;
+
+    const char* type_dock_name = "_NET_WM_WINDOW_TYPE_SPLASH";
+    xcb_intern_atom_cookie_t type_dock_cookie = xcb_intern_atom(connection, 0, strlen(type_dock_name), type_dock_name);
+    xcb_intern_atom_reply_t* type_dock_reply = xcb_intern_atom_reply(connection, type_dock_cookie, NULL);
+    xcb_atom_t window_type_dock = type_dock_reply->atom;
+
+    xcb_change_property(connection, XCB_PROP_MODE_REPLACE, window, window_type, XCB_ATOM_ATOM, 32, 1, &window_type_dock);
+
+
+    // 显示窗口
+    xcb_map_window(connection, window);
+
+    // 刷新连接
+    xcb_flush(connection);
+
+    // 进入事件循环
+    xcb_generic_event_t* event;
+    while ((event = xcb_wait_for_event(connection))) {
+        switch (event->response_type & ~0x80) {
+        case XCB_KEY_PRESS: {
+            // 处理键盘按键事件
+            break;
+        }
+        case XCB_EXPOSE: {
+            // 处理重绘事件
+            break;
+        }
+        default: {
+            // 其他事件处理
+            break;
+        }
+        }
+        free(event);
+    }
+
+    // 断开连接
+    xcb_disconnect(connection);
+
+    return 0;
+}
+
+TEST(window, frameless) {
+    //frameless_window();
+}
+
 //获得源文件根路径,区分在VS中远程调试及在vscode中本机运行两种模式
 std::string getSourceDir() {
     char szPath[MAX_PATH];
@@ -50,48 +115,6 @@ static const char * kPath_TestXml ="/demo2/uires/xml/dlg_main.xml";
 static const char * kPath_SysRes = "/soui-sys-resource";
 static const char * kPath_TestRes = "/fun_test/uires";
 
-/*
-void DrawEllipse(cairo_t* cr, int x1, int y1, int x2, int y2, int lineWid) {
-    double cx = (x1 + x2) / 2;
-    double cy = (y1 + y2) / 2;
-    double radius_x = (x2-x1)/2;
-    double radius_y = (y2-y1)/2;
-
-    cairo_set_line_width(cr, 2);
-
-    // 绘制椭圆边框
-    cairo_save(cr);
-    cairo_translate(cr, cx, cy);
-    cairo_scale(cr, radius_x, radius_y);
-    cairo_arc(cr, 0, 0, 1, 0, 2 * M_PI);
-
-    cairo_restore(cr);
-    // 设置绘制样式
-    cairo_set_source_rgb(cr, 0, 0, 1); // 设置颜色为蓝色
-    cairo_stroke(cr); // 描边椭圆
-
-}
-
-int test_arc() {
-    // 创建 Cairo 绘图表面
-    cairo_surface_t* surface = cairo_image_surface_create(CAIRO_FORMAT_ARGB32, 400, 400);
-    cairo_t* cr = cairo_create(surface);
-    DrawEllipse(cr, 0, 50, 400, 350, 2);
-
-    // 保存绘图结果到文件
-    cairo_surface_write_to_png(surface, "/home/flyhigh/work/test2.png");
-
-    // 释放资源
-    cairo_surface_destroy(surface);
-    cairo_destroy(cr);
-
-    return 0;
-}
-
-TEST(soui, arc) {
-    test_arc();
-}
-*/
 TEST(soui, region_and) {
     RECT rc1 = { 0,0,600,400 };
     RECT rc2 = { 10,10,56,18 };
