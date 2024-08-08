@@ -596,7 +596,8 @@ LRESULT CallWindowProc(WNDPROC proc, HWND hWnd, UINT msg, WPARAM wp, LPARAM lp) 
                     }
                     SetCursor(LoadCursor(wndObj->hInstance,cursorId));
                 }else if(msg == WM_LBUTTONDOWN){
-                    HandleNcTestCode(hWnd,htCode);
+                    if (0 == HandleNcTestCode(hWnd, htCode))
+                        return 0;
                 }
             }else{
                 WNDCLASSEX wc;
