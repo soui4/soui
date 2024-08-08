@@ -23,6 +23,78 @@
 
 using namespace SOUI;
 
+int flash2() {
+    // 连接到 X 服务器
+    xcb_connection_t* connection = xcb_connect(NULL, NULL);
+    const xcb_setup_t* setup = xcb_get_setup(connection);
+    xcb_screen_t* screen = xcb_setup_roots_iterator(setup).data;
+
+    // 创建一个有边框的窗口
+    xcb_window_t window = xcb_generate_id(connection);
+
+    int wid = 300, hei = 300;
+
+    // 创建窗口
+    uint32_t vals[] = { screen->white_pixel, XCB_EVENT_MASK_STRUCTURE_NOTIFY | XCB_EVENT_MASK_EXPOSURE };
+    xcb_create_window(connection, XCB_COPY_FROM_PARENT, window, screen->root,
+        100, 100, wid, hei, 1, XCB_WINDOW_CLASS_INPUT_OUTPUT,
+        screen->root_visual, XCB_CW_BACK_PIXEL | XCB_CW_EVENT_MASK,
+        vals);
+
+    // 设置窗口边框
+    uint32_t border_color = 0x00ff00; // Green color for the border
+    xcb_change_window_attributes(connection, window, XCB_CW_BORDER_PIXEL, &border_color);
+
+    // 显示窗口
+    xcb_map_window(connection, window);
+
+    // 刷新连接
+    xcb_flush(connection);
+
+    // Cairo绘制
+    xcb_generic_event_t* event;
+    cairo_surface_t* surface = cairo_xcb_surface_create(connection, window, xcb_aux_find_visual_by_id(screen, screen->root_visual), wid, hei);
+    cairo_t* cr = cairo_create(surface);
+
+    while ((event = xcb_wait_for_event(connection))) {
+        switch (event->response_type & ~0x80) {
+        case XCB_EXPOSE: {
+            // 绘制红色矩形
+            cairo_set_source_rgb(cr, 1.0, 0.0, 0.0); // 设置颜色为红色
+            cairo_rectangle(cr, 0, 0, wid, hei); // 矩形大小
+            cairo_fill(cr); // 填充矩形
+
+            //cairo_surface_flush(surface);
+            xcb_flush(connection);
+            break;
+        }
+        case XCB_CONFIGURE_NOTIFY: {
+            // 处理窗口大小变化事件
+            xcb_configure_notify_event_t* configure_event = (xcb_configure_notify_event_t*)event;
+            // 更新绘制区域大小
+            wid = configure_event->width, hei = configure_event->height;
+            cairo_surface_destroy(surface);
+            cairo_destroy(cr);
+
+            surface = cairo_xcb_surface_create(connection, window, xcb_aux_find_visual_by_id(screen, screen->root_visual), wid, hei);
+            cr = cairo_create(surface);
+            break;
+        }
+        default:
+            break;
+        }
+        free(event);
+    }
+
+    // 清理资源
+    cairo_surface_destroy(surface);
+    cairo_destroy(cr);
+
+    // 断开连接
+    xcb_disconnect(connection);
+
+    return 0;
+}
 
 int flash() {
     // 连接到 X 服务器
@@ -62,7 +134,7 @@ int flash() {
         switch (event->response_type & ~0x80) {
         case XCB_EXPOSE: {
             // 双缓冲绘制
-            xcb_rectangle_t rect = { 0, 0, wid, hei };
+            xcb_rectangle_t rect = { 0, 0, (uint16_t)wid, (uint16_t)hei };
             uint32_t color = 0xff0000;
             xcb_change_gc(connection, gc, XCB_GC_FOREGROUND, &color);
             xcb_poly_fill_rectangle(connection, pixmap, gc, 1, &rect);
@@ -159,7 +231,7 @@ int frameless_window() {
 
 TEST(window, frameless) {
     //frameless_window();
-    flash();
+    flash2();
 }
 
 //获得源文件根路径,区分在VS中远程调试及在vscode中本机运行两种模式
