@@ -1236,7 +1236,7 @@ BOOL LogerManager::pushLog(int level, const char * filter, const char * log, con
     {
         HMODULE hMod = 0;
         GetModuleHandleExA(GET_MODULE_HANDLE_EX_FLAG_FROM_ADDRESS| GET_MODULE_HANDLE_EX_FLAG_UNCHANGED_REFCOUNT,(LPCSTR)pRetAddr,&hMod);
-        GetModuleFileNameA(hMod,szPath,100);
+        GetModuleFileNameA(hMod,szPath,MAX_PATH);
         pModuleName = strrchr(szPath,'\\')+1;
     }
 	pLog->_moduleName = pModuleName;
