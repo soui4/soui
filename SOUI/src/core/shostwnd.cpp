@@ -879,8 +879,7 @@ void SHostWnd::OnSize(UINT nType, CSize size)
 
     if (size.cx == 0 || size.cy == 0)
         return;
-    CRect rcWnd = GetWindowRect();
-    if (size != rcWnd.Size() && m_nAutoSizing == 0)
+    if (m_nAutoSizing == 0)
     {
         m_szAppSetted = size;
     }
