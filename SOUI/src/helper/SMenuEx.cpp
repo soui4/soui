@@ -979,7 +979,7 @@ BOOL SMenuEx::_HandleEvent(IEvtArgs *pEvt)
     }
     else if (s_MenuData && ::IsWindow(s_MenuData->GetOwner()))
     {
-        return (BOOL)::SendMessage(s_MenuData->GetOwner(), UM_MENUEVENT, 0, (LPARAM)pEvt);
+        return (BOOL)::SendMessage(s_MenuData->GetOwner(), UM_MENUEVENT, (WPARAM)GetHostWnd(), (LPARAM)pEvt);
     }
     else
     {
@@ -1343,7 +1343,7 @@ void SMenuEx::SendInitPopupMenu2Owner(int idx)
 
     if (::IsWindow(s_MenuData->GetOwner()))
     {
-        ::SendMessage(s_MenuData->GetOwner(), WM_INITMENUPOPUP, (WPARAM)this, (LPARAM)idx);
+        ::SendMessage(s_MenuData->GetOwner(), WM_INITMENUPOPUP, (WPARAM)(IMenuEx*)this, (LPARAM)idx);
     }
     m_bMenuInitialized = TRUE;
 }

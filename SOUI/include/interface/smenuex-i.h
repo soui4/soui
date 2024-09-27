@@ -172,6 +172,12 @@ DECLARE_INTERFACE_(IMenuEx, IObjRef)
      * @return BOOL
      */
     STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) PURE;
+
+    /**
+     * @brief get hostwnd ptr
+     * @return IHostWnd*
+    */
+    STDMETHOD_(IHostWnd*, GetHostWnd)(THIS) PURE;
 };
 
 EXTERN_C void SOUI_EXP EndMenuEx(int nCmdId);
