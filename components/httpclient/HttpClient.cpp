@@ -263,10 +263,15 @@ int CWinHttp::QueryStatusCode()
 	}
 	return http_code;
 }
-
 BOOL CWinHttp::Request(IStringA *out, LPCSTR lpUrl, RequestType type, LPCSTR lpPostData /*= NULL*/, LPCSTR lpHeader/*=NULL*/ )
 {
-	if ( !InitConnect(lpUrl, type, lpPostData, lpHeader) )
+	DWORD dwDataLen = lpPostData==NULL?0:strlen(lpPostData);
+	return Request2(out,lpUrl,type,(LPVOID)lpPostData,dwDataLen,lpHeader);
+}
+
+BOOL CWinHttp::Request2(IStringA *out, LPCSTR lpUrl, RequestType type, LPVOID lpPostData, DWORD dwDataLen, LPCSTR lpHeader/*=NULL*/ )
+{
+	if ( !InitConnect(lpUrl, type, lpHeader,lpPostData,dwDataLen) )
 		return FALSE;
 	m_httpCode = QueryStatusCode();
 	if (m_httpCode == HTTP_STATUS_NOT_FOUND) {
@@ -370,7 +375,7 @@ static void ParseUrl( LPCSTR lpUrl, string& strHostName, string& strPage, WORD& 
 	strPage=strTemp.substr(nPos, strTemp.size()-nPos);
 }
 
-BOOL CWinHttp::InitConnect( LPCSTR lpUrl, RequestType type, LPCSTR lpPostData/*=NULL*/, LPCSTR lpHeader/*=NULL*/ )
+BOOL CWinHttp::InitConnect( LPCSTR lpUrl, RequestType type, LPCSTR lpHeader, LPVOID lpPostData,DWORD dwDataLen )
 {
 	Close();
 	if ( !Init() )
@@ -401,7 +406,7 @@ BOOL CWinHttp::InitConnect( LPCSTR lpUrl, RequestType type, LPCSTR lpPostData/*=
 			SECURITY_FLAG_IGNORE_CERT_DATE_INVALID;
 		WinHttpSetOption(m_hRequest, WINHTTP_OPTION_SECURITY_FLAGS, &dwFlags, sizeof(dwFlags));
 	}
-	if ( !SendHttpRequest(lpPostData, lpHeader) )
+	if ( !SendHttpRequest(lpHeader,lpPostData, dwDataLen) )
 	{
 		m_error = Hir_SendErr;
 		return false;
@@ -414,17 +419,18 @@ BOOL CWinHttp::InitConnect( LPCSTR lpUrl, RequestType type, LPCSTR lpPostData/*=
 	return true;
 }
 
-BOOL CWinHttp::SendHttpRequest( LPCSTR lpPostData/*=NULL*/, LPCSTR lpHeader/*=NULL*/ )
+BOOL CWinHttp::SendHttpRequest( LPCSTR lpHeader, LPVOID lpPostData, DWORD dataLen)
 {
 	//Ìí¼ÓHTTPÍ·
 	SStringW header = S_CA2W(m_header.toHttpHeaders().c_str(),CP_UTF8);
 	::WinHttpAddRequestHeaders(m_hRequest, header.c_str(), header.GetLength(), WINHTTP_ADDREQ_FLAG_ADD | WINHTTP_ADDREQ_FLAG_REPLACE);
 
-	DWORD dwSize = (NULL==lpPostData)?0:strlen(lpPostData);
-	if ( lpHeader == NULL )
-		return ::WinHttpSendRequest(m_hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0, (LPVOID)lpPostData, dwSize, dwSize, NULL) == TRUE;
-	SStringW strHeader=S_CA2W(lpHeader,CP_UTF8);
-	return ::WinHttpSendRequest(m_hRequest, strHeader.c_str(), strHeader.GetLength(), (LPVOID)lpPostData, dwSize, dwSize, NULL) == TRUE;
+	if ( !lpHeader){
+		return ::WinHttpSendRequest(m_hRequest, WINHTTP_NO_ADDITIONAL_HEADERS, 0, lpPostData, dataLen, dataLen, NULL) == TRUE;
+	}else{
+		SStringW strHeader=S_CA2W(lpHeader,CP_UTF8);
+		return ::WinHttpSendRequest(m_hRequest, strHeader.c_str(), strHeader.GetLength(), lpPostData, dataLen, dataLen, NULL) == TRUE;
+	}
 }
 
 void CWinHttp::SetHeader(LPCSTR pszKey,LPCSTR pszValue)

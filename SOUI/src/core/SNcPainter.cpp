@@ -228,7 +228,7 @@ BOOL SNcPainter::OnNcActivate(BOOL bActive)
         int nBorderWid = m_borderWidth.toPixelSize(GetScale());
         m_rcInvalid = m_root->GetClientRect();
         m_rcInvalid.OffsetRect(nBorderWid, nBorderWid);
-        m_pHost->SendMessage(WM_NCPAINT);
+        m_pHost->SendMessage(WM_NCPAINT,1);
     }
     return TRUE;
 }
@@ -550,7 +550,9 @@ void SNcPainter::InvalidateHostRect(LPCRECT pRc, BOOL bClip)
         m_rcInvalid |= *pRc;
     else
         m_rcInvalid = GetHostRect();
-    m_pHost->SendMessage(WM_NCPAINT);
+	HRGN hRgn = CreateRectRgnIndirect(&m_rcInvalid);
+    m_pHost->SendMessage(WM_NCPAINT,(WPARAM)hRgn);
+	DeleteObject(hRgn);
 }
 
 void SNcPainter::OnLayoutDirty()

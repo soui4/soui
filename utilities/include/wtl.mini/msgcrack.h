@@ -981,12 +981,12 @@ public: \
             return TRUE; \
     }
 
-// void OnInitMenuPopup(IMenuEx* menuPopup, UINT nIndex)
+// void OnInitMenuPopup(SMenuEx* menuPopup, UINT nIndex)
 #define MSG_WM_INITMENUPOPUP_EX(func) \
     if (uMsg == WM_INITMENUPOPUP) \
     { \
         SetMsgHandled(TRUE); \
-        func((IMenuEx*)wParam, (int)(lParam)); \
+        func((SMenuEx*)wParam, (int)(lParam)); \
         lResult = 0; \
         if(IsMsgHandled()) \
             return TRUE; \
