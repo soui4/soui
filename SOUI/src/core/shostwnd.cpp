@@ -325,12 +325,20 @@ SHostWnd::SHostWnd(LPCSTR pszResName)
 void SHostWnd::_Init()
 {
     SApplication::getSingletonPtr()->AddRef();
-    m_bTrackFlag = (FALSE), m_bNeedRepaint = (FALSE), m_bNeedAllRepaint = (TRUE), m_pTipCtrl = (NULL), m_dummyWnd = (NULL), m_szAppSetted = CSize(0, 0), m_nAutoSizing = (0), m_bResizing = (false), m_dwThreadID = (0), m_AniState = (0), m_pRoot = (new SRootWindow(this)), m_pNcPainter.Attach(new SNcPainter(this));
-
-    SwndContainerImpl::SetRoot(m_pRoot);
+    m_bTrackFlag = (FALSE),
+        m_bNeedRepaint = (FALSE),
+        m_bNeedAllRepaint = (TRUE),
+        m_pTipCtrl = (NULL),
+        m_dummyWnd = (NULL),
+        m_szAppSetted = CSize(0, 0),
+        m_nAutoSizing = (0),
+        m_bResizing = (false),
+        m_dwThreadID = (0),
+        m_AniState = (0);
+    m_pRoot = NULL;
+    m_pNcPainter.Attach(new SNcPainter(this));
     m_msgMouse.message = 0;
 
-    m_pRoot->SetContainer(this);
     m_hostAnimationHandler.m_pHostWnd = this;
     m_evtHandler.fun = NULL;
     m_evtHandler.ctx = NULL;
@@ -339,7 +347,10 @@ void SHostWnd::_Init()
 
 SHostWnd::~SHostWnd()
 {
-    delete m_pRoot;
+    if (m_pRoot) {
+        m_pRoot->Release();
+        m_pRoot = NULL;
+    }
     SApplication::getSingletonPtr()->Release();
 }
 
@@ -796,6 +807,10 @@ BOOL SHostWnd::OnLoadLayoutFromResourceID(const SStringT &resId)
     }
 }
 
+SRootWindow* SHostWnd::CreateRoot() {
+    return new SRootWindow(this);
+}
+
 int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (!m_presenter)
@@ -813,6 +828,15 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     GETRENDERFACTORY->CreateRegion(&m_rgnInvalidate);
     m_szAppSetted.cx = lpCreateStruct->cx;
     m_szAppSetted.cy = lpCreateStruct->cy;
+
+    if (m_pRoot) {
+        m_pRoot->Release();
+        m_pRoot = NULL;
+    }
+    m_pRoot = CreateRoot();
+    m_pRoot->SetContainer(this);
+    SwndContainerImpl::SetRoot(m_pRoot);
+
     if (!OnLoadLayoutFromResourceID(m_strXmlLayout))
         return -1;
     GetRoot()->RequestRelayout();
@@ -1203,7 +1227,7 @@ void SHostWnd::OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
 {
     HMONITOR hMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONULL);
 
-    if (hMonitor)
+    if (hMonitor && GetRoot())
     {
         MONITORINFO mi = { sizeof(MONITORINFO) };
         ::GetMonitorInfo(hMonitor, &mi);
@@ -1218,6 +1242,9 @@ void SHostWnd::OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
         lpMMI->ptMaxTrackSize.y = abs(rcWork.Height()) + rcMaxInset.bottom + rcMaxInset.top;
         CSize szMin = m_hostAttr.GetMinSize(GetScale());
         lpMMI->ptMinTrackSize = CPoint(szMin.cx, szMin.cy);
+    }
+    else {
+        SetMsgHandled(FALSE);
     }
 }
 

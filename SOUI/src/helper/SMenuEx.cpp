@@ -14,7 +14,7 @@ SNSBEGIN
 #define Y_IMIDFLAG (-1000)
 
 //////////////////////////////////////////////////////////////////////////
-class SMenuExRoot : public SWindow {
+class SMenuExRoot : public SRootWindow {
     DEF_SOBJECT(SWindow, L"menuRoot")
     friend class SMenuEx;
     friend class SMenuExItem;
@@ -81,6 +81,7 @@ class SMenuExRoot : public SWindow {
         , m_pIconSkin(NULL)
         , m_pMenuEx(pMenuEx)
         , m_dwContextHelpId(0)
+        , SRootWindow(pMenuEx)
     {
         m_nItemHei.setSize(26.f, SLayoutSize::dp);
         m_nIconBarWidth.setSize(24.f, SLayoutSize::dp);
@@ -114,18 +115,12 @@ class SMenuExRoot : public SWindow {
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE
     {
         SXmlNode xmlNode(pNode);
-        //找到根节点，获取在根节点上配置的全局菜单对象属性
-        SXmlNode xmlRoot = xmlNode.root().first_child();
-        if (xmlNode != xmlRoot)
-        {
-            __baseCls::__baseCls::InitFromXml(&xmlRoot); // IObject::InitFromXml
-        }
-        BOOL bRet = __baseCls::InitFromXml(&xmlNode);
+        __baseCls::InitFromXml(&xmlNode);
         SetWindowText(_T("")); //防止子菜单显示父级菜单项的文本。
         return TRUE;
     }
 
-    virtual BOOL CreateChildren(SXmlNode xmlNode)
+    BOOL CreateChildren(SXmlNode xmlNode) OVERRIDE
     {
         SXmlNode xmlItem = xmlNode.first_child();
         while (xmlItem)
@@ -140,11 +135,6 @@ class SMenuExRoot : public SWindow {
             xmlItem = xmlItem.next_sibling();
         }
         return TRUE;
-    }
-
-    STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT *prc) SCONST OVERRIDE
-    {
-        GetClientRect(prc);
     }
 
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE
@@ -235,7 +225,7 @@ void SMenuExItem::OnPaint(IRenderTarget *pRT)
     __baseCls::OnPaint(pRT);
 
     CRect rc = GetClientRect();
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     rc.right = rc.left + pMenuRoot->m_nIconBarWidth.toPixelSize(GetScale());
     rc.left += pMenuRoot->m_iconX.toPixelSize(GetScale());
@@ -303,7 +293,7 @@ BOOL SMenuExItem::OnEraseBkgnd(IRenderTarget *pRT)
 void SMenuExItem::GetTextRect(LPRECT pRect)
 {
     GetClientRect(pRect);
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     int nScale = GetScale();
     pRect->left += pMenuRoot->m_nIconBarWidth.toPixelSize(nScale) + pMenuRoot->m_nTextOffset.toPixelSize(nScale);
@@ -315,7 +305,7 @@ void SMenuExItem::GetDesiredSize(SIZE *psz, int wid, int hei)
 {
     CSize szRet;
     __baseCls::GetDesiredSize(&szRet, wid, hei);
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     if (GetChildrenCount() == 0)
     {
@@ -402,7 +392,7 @@ class SMenuExSep : public SMenuExItem {
 
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int wid, int hei) OVERRIDE
     {
-        SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+        SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
         (void)pMenuRoot;
         SASSERT(pMenuRoot);
         CSize szRet;
@@ -585,6 +575,10 @@ SMenuEx::~SMenuEx(void)
     DestroyMenu();
 }
 
+SRootWindow* SMenuEx::CreateRoot() {
+    return new SMenuExRoot(this);
+}
+
 BOOL SMenuEx::LoadMenu(LPCTSTR strMenu)
 {
     SXmlDoc xmlMenu;
@@ -610,6 +604,8 @@ BOOL SMenuEx::LoadMenu2(IXmlNode *xmlMenu)
         return FALSE;
 
     HWND hWnd = CreateEx(NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0, 0, 0, 0);
+    if (!hWnd)
+        return FALSE;
     SXmlDoc souiXml;
     SXmlNode root = souiXml.root().append_child(L"SOUI");
     root.append_attribute(L"translucent").set_value(1);
@@ -618,17 +614,8 @@ BOOL SMenuEx::LoadMenu2(IXmlNode *xmlMenu)
         root.append_attribute(L"trCtx").set_value(xmlNode.attribute(L"trCtx").value());
     }
     InitFromXml(&root);
+    GetRoot()->InitFromXml(&xmlNode);
     m_hostAttr.SetSendWheel2Hover(true);
-    if (!hWnd)
-        return FALSE;
-
-    SMenuExRoot *pMenuRoot = new SMenuExRoot(this);
-    GetRoot()->InsertChild(pMenuRoot);
-
-    pMenuRoot->InitFromXml(&xmlNode);
-
-    pMenuRoot->GetLayoutParam()->SetWrapContent(Both);
-
     return TRUE;
 }
 
@@ -640,7 +627,7 @@ SMenuExItem *SMenuEx::GetMenuItem(int nID, BOOL byCmdId)
     }
     else
     {
-        SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+        SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
         SWindow *pItem = pMenuRoot->GetWindow(GSW_FIRSTCHILD);
         for (int i = 0; i < nID && pItem; i++)
         {
@@ -713,7 +700,7 @@ UINT SMenuEx::TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale)
 
 void SMenuEx::ShowMenu(UINT uFlag, int x, int y)
 {
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
 
     SendInitPopupMenu2Owner(0);
     SASSERT(pMenuRoot);
@@ -1038,7 +1025,7 @@ void SMenuEx::PopupSubMenu(SMenuExItem *pItem, BOOL bCheckFirstItem)
     pSubMenu->ShowMenu(0, rcItem.right, rcItem.top);
     if (bCheckFirstItem)
     {
-        SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(pSubMenu->GetRoot()->GetWindow(GSW_FIRSTCHILD));
+        SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(pSubMenu->GetRoot());
         SASSERT(pMenuRoot);
         SMenuExItem *pFirstItem = pMenuRoot->GetNextMenuItem(NULL, TRUE);
         if (pFirstItem)
@@ -1051,7 +1038,7 @@ void SMenuEx::PopupSubMenu(SMenuExItem *pItem, BOOL bCheckFirstItem)
 
 void SMenuEx::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
 {
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     switch (nChar)
     {
@@ -1145,7 +1132,7 @@ EXTERN_C void EndMenuEx(int nCmdId)
 
 SWindow *SMenuEx::FindItem(UINT uPos, UINT uFlag)
 {
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     SWindow *pItemRef = NULL;
 
@@ -1172,7 +1159,7 @@ SWindow *SMenuEx::FindItem(UINT uPos, UINT uFlag)
 
 BOOL SMenuEx::InsertMenu(UINT uPos, UINT uFlag, int nId, LPCTSTR lpNewItem, int iIcon)
 {
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     SWindow *pItemRef = FindItem(uPos, uFlag);
 
@@ -1245,7 +1232,7 @@ BOOL SMenuEx::IniNullMenu(SMenuExRoot *ParentRoot)
 
 BOOL SMenuEx::DeleteMenu(UINT uPos, UINT uFlag)
 {
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     SWindow *pItemRef = FindItem(uPos, uFlag);
     if (!pItemRef)
@@ -1256,7 +1243,7 @@ BOOL SMenuEx::DeleteMenu(UINT uPos, UINT uFlag)
 
 BOOL SMenuEx::CheckMenuItem(UINT uPos, UINT uFlag)
 {
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     SWindow *pItemRef = FindItem(uPos, uFlag);
     if (!pItemRef)
@@ -1275,7 +1262,7 @@ BOOL SMenuEx::CheckMenuItem(UINT uPos, UINT uFlag)
 
 BOOL SMenuEx::CheckMenuRadioItem(UINT idFirst, UINT idLast, UINT idCheck, UINT uFlags)
 {
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     SWindow *pItemRefFirst = FindItem(idFirst, uFlags);
     SWindow *pItemRefLast = FindItem(idLast, uFlags);
@@ -1350,14 +1337,14 @@ void SMenuEx::SendInitPopupMenu2Owner(int idx)
 
 DWORD SMenuEx::GetContextHelpId() const
 {
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     return pMenuRoot->m_dwContextHelpId;
 }
 
 void SMenuEx::SetContextHelpId(DWORD dwId)
 {
-    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot()->GetWindow(GSW_FIRSTCHILD));
+    SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
     SASSERT(pMenuRoot);
     pMenuRoot->m_dwContextHelpId = dwId;
 }

@@ -158,6 +158,8 @@ class SOUI_EXP SMenuEx
     END_MSG_MAP()
   protected:
     virtual BOOL _HandleEvent(IEvtArgs *pEvt);
+    SRootWindow* CreateRoot() override;
+
     STDMETHOD_(LPCWSTR, GetTranslatorContext)(THIS) SCONST OVERRIDE;
     STDMETHOD_(int, GetScale)() SCONST OVERRIDE;
 
