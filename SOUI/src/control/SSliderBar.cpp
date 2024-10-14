@@ -141,7 +141,9 @@ void SSliderBar::OnPaint(IRenderTarget *pRT)
     {
         CRect rcThumb = GetPartRect(SC_THUMB);
         int nState = 0; // normal
-        if (m_bDrag)
+        if (IsDisabled(TRUE) && m_pSkinThumb->GetStates()>3)
+            nState = 3;
+        else if (m_bDrag)
             nState = 2; // pushback
         else if (m_uHtPrev == SC_THUMB)
             nState = 1; // hover
@@ -153,7 +155,6 @@ void SSliderBar::OnPaint(IRenderTarget *pRT)
 void SSliderBar::OnLButtonUp(UINT nFlags, CPoint point)
 {
     ReleaseCapture();
-    OnMouseMove(nFlags, point);
     if (m_bDrag)
     {
         m_bDrag = FALSE;
@@ -161,6 +162,7 @@ void SSliderBar::OnLButtonUp(UINT nFlags, CPoint point)
         InvalidateRect(rcThumb);
         NotifyPos(SBA_MOUSE_UP, m_nValue);
     }
+    OnMouseMove(nFlags, point);
 }
 
 void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
