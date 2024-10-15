@@ -463,6 +463,7 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(BOOL, UpdateWindow)(BOOL bForce DEF_VAL(TRUE)) OVERRIDE;
 
     STDMETHOD_(void, UpdateTooltip)() OVERRIDE;
+	STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign,LPCTSTR pszTip) OVERRIDE;
 
     STDMETHOD_(BOOL, RegisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;

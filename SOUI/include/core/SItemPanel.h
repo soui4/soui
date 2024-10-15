@@ -123,6 +123,7 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(BOOL, UpdateWindow)(BOOL bForce) OVERRIDE;
 
     STDMETHOD_(void, UpdateTooltip)() OVERRIDE;
+    STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign, LPCTSTR pszTip) OVERRIDE;
 
     STDMETHOD_(IMessageLoop *, GetMsgLoop)() OVERRIDE;
 

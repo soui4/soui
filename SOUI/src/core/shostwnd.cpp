@@ -1223,6 +1223,19 @@ void SHostWnd::UpdateTooltip()
     }
 }
 
+void SHostWnd::SetToolTip(LPCRECT rc, UINT tipAlign,LPCTSTR pszTip)
+{
+	if(!m_pTipCtrl)
+		return;
+	CRect rc2;
+	if(rc){
+		rc2=*rc;
+		ClientToScreen2(&rc2);
+	}
+    
+	m_pTipCtrl->SetToolTip(rc2,tipAlign,pszTip,GetScale());
+}
+
 void SHostWnd::OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
 {
     HMONITOR hMonitor = ::MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONULL);

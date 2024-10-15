@@ -76,7 +76,9 @@ class SOUI_EXP SSliderBar : public SProgress {
     SAutoRefPtr<ISkinObj> m_pSkinThumb; /**< 皮肤对象 */
     BOOL m_bThumbInRail;                /**< 滑块包含在轨道中 */
     BOOL m_bDrawRail;                   /**< 绘制轨道 */
+	BOOL m_bDragTip;                    /**< 拖动滑块时在tip中显示数值 */
   protected:
+	  void ShowValueInTip(int nValue);
     /**
      * SSliderBar::NotifyPos
      * @brief    通知
@@ -172,6 +174,7 @@ class SOUI_EXP SSliderBar : public SProgress {
         ATTR_SKIN(L"thumbSkin", m_pSkinThumb, TRUE)
         ATTR_BOOL(L"thumbInRail", m_bThumbInRail, TRUE)
         ATTR_BOOL(L"drawRail", m_bDrawRail, TRUE)
+		ATTR_BOOL(L"dragTip", m_bDragTip, TRUE)
     SOUI_ATTRS_END()
 };
 

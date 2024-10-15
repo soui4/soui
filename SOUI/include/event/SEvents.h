@@ -109,6 +109,7 @@ typedef enum _SOUI_EVENTS
     EVT_RE_MENU,
 
     EVT_SLIDER_POS = 17000,
+	EVT_SLIDER_VALUETIP,
 
     EVT_HEADER_CLICK = 18000,
     EVT_HEADER_ITEMCHANGING,
@@ -485,6 +486,12 @@ DEF_EVT(EventSliderPos, EVT_SLIDER_POS, on_slider_pos, {
     int nPos;
     SliderBarAction action;
 })
+
+DEF_EVT(EventSliderValueTip, EVT_SLIDER_VALUETIP, on_slider_valuetip, {
+	int nPos;
+	IStringT *buf;
+})
+
 
 //点击表头
 DEF_EVT(EventHeaderClick, EVT_HEADER_CLICK, on_header_click, { int iItem; })

@@ -359,7 +359,7 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc 
     {
         XmlParseResult result;
         xmlDoc.GetParseResult(&result);
-        SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName, S_CA2W(SXmlDoc::GetErrDesc(result.status)).c_str(), result.offset);
+        SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName, S_CA2W(SXmlDoc::GetErrDesc(result.status)).c_str(), (int)result.offset);
     }
     return bLoad;
 }

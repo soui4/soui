@@ -24,9 +24,11 @@ class STipCtrl
 
     STDMETHOD_(void, RelayEvent)(THIS_ const MSG *pMsg) OVERRIDE;
 
+    STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign,LPCTSTR pszTip,int nScale) OVERRIDE;
   protected:
     virtual void OnFinalMessage(HWND hWnd);
 
+	void UpdateFont(int nScale);
     void OnTimer(UINT_PTR idEvent);
     void OnPaint(HDC dc);
     void ShowTip(BOOL bShow);
@@ -46,6 +48,8 @@ class STipCtrl
     HFONT m_font;
 
     TIPID m_id;
+
+	UINT  m_tipAlign;
 };
 SNSEND
 
