@@ -30,8 +30,9 @@ void SwndContainerImpl::SetRoot(SWindow *pRoot)
 LRESULT SwndContainerImpl::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     LRESULT lRet = 0;
-    m_pRoot->AddRef();
-    m_pRoot->SetMsgHandled(TRUE);
+	SWindow *pRoot = m_pRoot;//use a local value to avoid m_pRoot changed while handle message
+    pRoot->AddRef();
+    pRoot->SetMsgHandled(TRUE);
 
     switch (uMsg)
     {
@@ -84,11 +85,11 @@ LRESULT SwndContainerImpl::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         else if (uMsg >= WM_MOUSEFIRST && uMsg <= WM_MOUSELAST)
             OnFrameMouseEvent(uMsg, wParam, lParam);
         else
-            m_pRoot->SetMsgHandled(FALSE);
+            pRoot->SetMsgHandled(FALSE);
         break;
     }
 
-    m_pRoot->Release();
+    pRoot->Release();
     return lRet;
 }
 
