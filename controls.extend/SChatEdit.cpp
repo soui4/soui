@@ -242,6 +242,8 @@ void SChatEdit::OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)
     if (nChar == VK_RETURN)
     {
         EventChatEditKeyReturn evt(this);
+		evt.bCancel=FALSE;
+		FireEvent(&evt);
         if (evt.bCancel)
             return;
     }
