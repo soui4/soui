@@ -440,7 +440,6 @@ void SComboBase::DropDown()
     if (!m_pDropDownWnd)
     {
         m_pDropDownWnd = new SDropDownWnd_ComboBox(this);
-        m_pDropDownWnd->GetRoot()->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
     }
 
     EventCBDropdown evt(this);
@@ -449,6 +448,7 @@ void SComboBase::DropDown()
     evt.strInput = NULL;
     FireEvent(&evt);
     m_pDropDownWnd->Create(CRect(0, 0, 100, 100), 0);
+    m_pDropDownWnd->GetRoot()->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
 
     CRect rcPadding = m_pDropDownWnd->GetRoot()->GetStyle().GetPadding();
     CRect rcMargin = m_pDropDownWnd->GetRoot()->GetStyle().GetMargin();

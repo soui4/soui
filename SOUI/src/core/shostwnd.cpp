@@ -325,16 +325,16 @@ SHostWnd::SHostWnd(LPCSTR pszResName)
 void SHostWnd::_Init()
 {
     SApplication::getSingletonPtr()->AddRef();
-    m_bTrackFlag = (FALSE),
-        m_bNeedRepaint = (FALSE),
-        m_bNeedAllRepaint = (TRUE),
-        m_pTipCtrl = (NULL),
-        m_dummyWnd = (NULL),
-        m_szAppSetted = CSize(0, 0),
-        m_nAutoSizing = (0),
-        m_bResizing = (false),
-        m_dwThreadID = (0),
-        m_AniState = (0);
+    m_bTrackFlag = FALSE;
+    m_bNeedRepaint = FALSE;
+    m_bNeedAllRepaint = TRUE;
+    m_pTipCtrl = NULL;
+    m_dummyWnd = NULL;
+    m_szAppSetted = CSize(0, 0);
+    m_nAutoSizing = 0;
+    m_bResizing = false;
+    m_dwThreadID = 0;
+    m_AniState = 0;
     m_pRoot = NULL;
     m_pNcPainter.Attach(new SNcPainter(this));
     m_msgMouse.message = 0;
