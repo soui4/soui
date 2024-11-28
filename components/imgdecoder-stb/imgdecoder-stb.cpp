@@ -27,14 +27,9 @@ namespace SOUI
         return TRUE;
     }
 
-    BOOL SImgFrame_STB::CopyPixels( /* [unique][in] */ const RECT *prc, /* [in] */ UINT cbStride, /* [in] */ UINT cbBufferSize, /* [size_is][out] */ BYTE *pbBuffer )
-    {
-        if(cbBufferSize != m_nHei * m_nWid *4) return FALSE;
-        memcpy(pbBuffer,m_data,cbBufferSize);
-        return TRUE;
+    const VOID * SImgFrame_STB::GetPixels(CTHIS) SCONST{
+        return m_data;
     }
-
-    
     //////////////////////////////////////////////////////////////////////////
     // SImgX_STB
     int SImgX_STB::LoadFromMemory( void *pBuf,size_t bufLen )
@@ -59,8 +54,13 @@ namespace SOUI
     {
         if(m_pImg) delete m_pImg;
         m_pImg = NULL;
-
+#ifdef _WIN32
         FILE *f=_wfopen(pszFileName,L"rb");
+#else
+        char szFileName[1000]={0};
+        WideCharToMultiByte(CP_UTF8,0,pszFileName,-1,szFileName,1000,NULL,NULL);
+        FILE *f = fopen(szFileName,"rb");
+#endif
         if(!f) return 0;
         int w=0,h=0;
         unsigned char *data = stbi_load_from_file(f,&w,&h,NULL,4);
@@ -74,10 +74,17 @@ namespace SOUI
         return 1;
     }
 
+    #ifndef MAX_PATH
+    #define MAX_PATH 1000
+    #endif
     int SImgX_STB::LoadFromFileA( LPCSTR pszFileName )
     {
         wchar_t wszFileName[MAX_PATH+1];
-        MultiByteToWideChar(CP_ACP,0,pszFileName,-1,wszFileName,MAX_PATH);
+        int cp = CP_ACP;
+    #ifndef _WIN32
+        cp = CP_UTF8;
+    #endif
+        MultiByteToWideChar(cp,0,pszFileName,-1,wszFileName,MAX_PATH);
         if(GetLastError()==ERROR_INSUFFICIENT_BUFFER) return 0;
         return LoadFromFileW(wszFileName);
     }

@@ -12,7 +12,7 @@
  */
 #ifndef __SMESSAGEBOX__H__
 #define __SMESSAGEBOX__H__
-#include <core/shostdialog.h>
+#include <core/SHostDialog.h>
 #include <helper/SDpiHelper.hpp>
 #include <interface/SMessageBox-i.h>
 
@@ -25,10 +25,6 @@ SNSBEGIN
 #define NAME_MSGBOX_BTN1      L"button1st" //第1个按钮ID，按钮ID在显示时会自动修改为如IDOK,IDCANCEL这样的ID。
 #define NAME_MSGBOX_BTN2      L"button2nd" //第2个按钮ID
 #define NAME_MSGBOX_BTN3      L"button3rd" //第3个按钮ID
-
-BOOL SOUI_EXP SetMsgTemplate(SXmlNode xmlNode);
-
-SXmlNode SOUI_EXP GetMsgTemplate();
 
 /**
  * @class     SMessageBoxImpl

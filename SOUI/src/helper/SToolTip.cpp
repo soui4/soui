@@ -1,5 +1,5 @@
 ﻿#include "souistd.h"
-#include "helper\SToolTip.h"
+#include "helper/SToolTip.h"
 //增加对多显示器的支持
 #define COMPILE_MULTIMON_STUBS
 #include <multimon.h>

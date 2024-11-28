@@ -43,7 +43,7 @@ set(COM_LIBS ${COM_LIBS} zlib CACHE INTERNAL "com_lib")
 set_target_properties (zlib PROPERTIES
     FOLDER third-part
 )
-
+target_compile_options(zlib PRIVATE -fPIC)
 install(TARGETS zlib
     CONFIGURATIONS Release
     RUNTIME DESTINATION bin/Release

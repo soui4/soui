@@ -346,7 +346,7 @@ void SWindow::TestMainThread()
 #ifdef _DEBUG
     if (IsBadWritePtr(this, sizeof(SWindow)))
     {
-        SASSERT_FMTA(FALSE, "this is null!!!", 0);
+        SASSERT_MSGA(FALSE, "this is null!!!");
     }
     else
     {
@@ -836,7 +836,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
             if (LOADXML(xmlDoc, strSrc))
             {
                 SXmlNode xmlInclude = xmlDoc.root().first_child();
-                if (wcsicmp(xmlInclude.name(), KLabelInclude) == 0)
+                if (_wcsicmp(xmlInclude.name(), KLabelInclude) == 0)
                 { // compatible with 2.9.0.1
                     CreateChildren(xmlInclude);
                     bRet = TRUE;
@@ -846,7 +846,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                     // merger include attribute to xml node.
                     for (SXmlAttr attr = xmlChild.first_attribute(); attr; attr = attr.next_attribute())
                     {
-                        if (wcsicmp(attr.name(), L"src") == 0)
+                        if (_wcsicmp(attr.name(), L"src") == 0)
                             continue;
                         if (xmlInclude.attribute(attr.name()))
                         {
@@ -1172,6 +1172,7 @@ void SWindow::_RedrawNonClient()
     Update();
     InvalidateRect(rcWnd, TRUE, FALSE);   // invalid window rect
     InvalidateRect(rcClient, TRUE, TRUE); // but clip client rect
+    Update();
 }
 
 static SAutoRefPtr<IRegionS> ConvertRect2RenderRegion(const CRect &rc, const SMatrix &mtx)
@@ -2792,7 +2793,7 @@ HRESULT SWindow::OnAttrClass(const SStringW &strValue, BOOL bLoading)
         }
         for (SXmlAttr attr = xmlStyle.first_attribute(); attr; attr = attr.next_attribute())
         { //解析style中的属性
-            if (wcsicmp(attr.name(), L"class") == 0 || IsAttributeHandled(attr))
+            if (_wcsicmp(attr.name(), L"class") == 0 || IsAttributeHandled(attr))
                 continue; //防止class中包含有其它class属性,避免发生死循环
             SetAttribute(attr.name(), attr.value(), bLoading);
         }
@@ -3297,6 +3298,7 @@ void SWindow::OnRebuildFont()
     m_style.UpdateFont();
 }
 
+#ifdef _WIN32
 IAccessible *SWindow::GetAccessible()
 {
 #ifdef SOUI_ENABLE_ACC
@@ -3307,6 +3309,7 @@ IAccessible *SWindow::GetAccessible()
     return NULL;
 #endif
 }
+#endif
 
 IAccProxy *SWindow::GetAccProxy()
 {

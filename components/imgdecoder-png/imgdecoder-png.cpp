@@ -35,14 +35,9 @@ namespace SOUI
         return TRUE;
     }
 
-    BOOL SImgFrame_PNG::CopyPixels( /* [unique][in] */ const RECT *prc, /* [in] */ UINT cbStride, /* [in] */ UINT cbBufferSize, /* [size_is][out] */ BYTE *pbBuffer )
-    {
-        if(!m_pdata || cbBufferSize != m_nHei * m_nWid *4) return FALSE;
-        memcpy(pbBuffer,m_pdata,cbBufferSize);
-        return TRUE;
+    const VOID * SImgFrame_PNG::GetPixels(CTHIS) SCONST{
+        return m_pdata;
     }
-
-    
     //////////////////////////////////////////////////////////////////////////
     // SImgX_PNG
     int SImgX_PNG::LoadFromMemory( void *pBuf,size_t bufLen )
@@ -59,10 +54,8 @@ namespace SOUI
 
     int SImgX_PNG::LoadFromFileA( LPCSTR pszFileName )
     {
-        wchar_t wszFileName[MAX_PATH+1];
-        MultiByteToWideChar(CP_ACP,0,pszFileName,-1,wszFileName,MAX_PATH);
-        if(GetLastError()==ERROR_INSUFFICIENT_BUFFER) return 0;
-        return LoadFromFileW(wszFileName);
+        APNGDATA * pdata =LoadAPNG_from_fileA(pszFileName);
+        return _DoDecode(pdata);
     }
 
     SImgX_PNG::SImgX_PNG( BOOL bPremultiplied )
@@ -156,7 +149,13 @@ namespace SOUI
         png_infop info_ptr;  
 
         /* 打开需要写入的文件 */  
+        #ifdef _WIN32
         fp = _wfopen(pszFileName, L"wb");  
+        #else
+        char szFileName[1000];
+        WideCharToMultiByte(CP_UTF8,0,pszFileName,-1,szFileName,1000,NULL,NULL);
+        fp = fopen(szFileName,"wb");
+        #endif
         if (fp == NULL)  
             return (E_FAIL);  
 

@@ -37,6 +37,9 @@
 #	include <string>
 #endif
 
+#ifndef _WIN32
+#include <strapi.h>
+#endif
 // For placement new
 #include <snew.h>
 #include <string/strcpcvt.h>
@@ -234,7 +237,7 @@ PUGI__NS_BEGIN
 		if(bCaseSensitive)
 			return wcscmp(src, dst) == 0;
 		else
-			return wcsicmp(src,dst) == 0;
+			return _wcsicmp(src,dst) == 0;
 	#else
 		if(bCaseSensitive)
 			return strcmp(src, dst) == 0;

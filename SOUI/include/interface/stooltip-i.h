@@ -2,7 +2,7 @@
 #define __STOOLTIP_I__H__
 
 #include <interface/obj-ref-i.h>
-#include <interface/smsgloop-i.h>
+#include <interface/SMsgLoop-i.h>
 
 SNSBEGIN
 

@@ -111,17 +111,16 @@ LRESULT SNcPainter::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
     if (m_titleHeight.isZero() && m_borderWidth.isZero())
     {
         LPNCCALCSIZE_PARAMS pParam = (LPNCCALCSIZE_PARAMS)lParam;
-        SNativeWnd *pNative = m_pHost->GetNative();
+        INativeWnd *pNative = m_pHost->GetNative();
         if (bCalcValidRects && (pNative->GetStyle() & WS_CHILDWINDOW))
         {
-            //子窗口，相对于父窗口坐标
             if (SWP_NOSIZE & pParam->lppos->flags)
                 return 0;
 
             CRect rcWindow;
             pNative->GetWindowRect(rcWindow);
             POINT point = { rcWindow.left, rcWindow.top };
-            ::ScreenToClient(::GetParent(pNative->m_hWnd), &point);
+            ::ScreenToClient(::GetParent(pNative->GetHwnd()), &point);
             int w = rcWindow.Width();
             int h = rcWindow.Height();
 
@@ -142,7 +141,6 @@ LRESULT SNcPainter::OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam)
         }
         else if (bCalcValidRects)
         {
-            // top-level 相对于屏幕坐标
             if (SWP_NOSIZE & pParam->lppos->flags)
                 return 0;
 

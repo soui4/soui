@@ -459,11 +459,14 @@ void SComboBase::DropDown()
     m_pDropDownWnd->MoveWindow(rcPopup.left, rcPopup.top, rcPopup.Width(), rcPopup.Height());
     m_pDropDownWnd->GetRoot()->UpdateChildrenPosition();
 
+#ifdef _WIN32
     if (m_nAnimTime > 0)
         m_pDropDownWnd->AnimateHostWindow(m_nAnimTime, AW_SLIDE | (bDown ? AW_VER_POSITIVE : AW_VER_NEGATIVE));
     else
         m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
-
+#else
+        m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+#endif
     m_pDropDownWnd->SNativeWnd::SetCapture();
 }
 
@@ -492,11 +495,14 @@ void SComboBase::UpdateDropdown(const SStringT &strInput)
     m_pDropDownWnd->MoveWindow(rcPopup.left, rcPopup.top, rcPopup.Width(), rcPopup.Height());
     m_pDropDownWnd->GetRoot()->UpdateChildrenPosition();
 
+#ifdef _WIN32
     if (m_nAnimTime > 0 && bNewPopup)
         m_pDropDownWnd->AnimateHostWindow(m_nAnimTime, AW_SLIDE | (bDown ? AW_VER_POSITIVE : AW_VER_NEGATIVE));
     else
         m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
-
+#else
+    m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+#endif
     m_pDropDownWnd->SNativeWnd::SetCapture();
 }
 

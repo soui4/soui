@@ -3,7 +3,7 @@
 #include <control/SActiveX.h>
 #include <ExDisp.h>
 #include <ExDispid.h>
-
+#include <atl.mini/SComCli.h>
 namespace SOUI
 {
 struct IWebEvent

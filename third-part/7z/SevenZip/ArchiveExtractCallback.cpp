@@ -4,7 +4,7 @@
 #include "OutStreamWrapper.h"
 #include <comdef.h>
 #include "../CPP/Common/MyCom.h"
-
+#include <tchar.h>
 namespace SevenZip
 {
     namespace intl

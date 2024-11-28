@@ -16,7 +16,7 @@
 #include <utilities-def.h>
 #include <interface/obj-ref-i.h>
 #include <interface/SEvtArgs-i.h>
-#include <interface/smsgloop-i.h>
+#include <interface/SMsgLoop-i.h>
 #include <stdint.h>
 
 SNSBEGIN

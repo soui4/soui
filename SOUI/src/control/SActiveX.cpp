@@ -1,4 +1,5 @@
-﻿#include "souistd.h"
+﻿#ifdef _WIN32
+#include "souistd.h"
 #include "activex/SBStr.h"
 #include "../activex/SAxContainer.h"
 #include "control/SActiveX.h"
@@ -215,3 +216,5 @@ void SActiveX::SetExternalUIHandler(IDocHostUIHandler *pUiHandler)
 }
 
 SNSEND
+
+#endif//_WIN32

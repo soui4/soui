@@ -131,6 +131,6 @@ bool SkThread::setProcessorAffinity(unsigned int processor) {
         return false;
     }
 
-    DWORD_PTR threadAffinityMask = 1 << nth_set_bit(processor, processAffinityMask);
+    DWORD_PTR threadAffinityMask = static_cast<DWORD_PTR>(1) << nth_set_bit(processor, processAffinityMask);
     return 0 != SetThreadAffinityMask(winData->fHandle, threadAffinityMask);
 }

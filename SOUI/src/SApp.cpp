@@ -1,9 +1,9 @@
 ﻿#include "souistd.h"
 #include "SApp.h"
-#include "core/SNativeWnd.h"
+#include <core/SNativeWnd.h>
 #include "core/SWindowMgr.h"
 
-#include "res.mgr/sfontpool.h"
+#include "res.mgr/SFontPool.h"
 #include "res.mgr/SUiDef.h"
 #include "res.mgr/SObjDefAttr.h"
 
@@ -15,12 +15,11 @@
 #include "helper/SHostMgr.h"
 #include "event/SNotifyCenter.h"
 
-#include "control/Smessagebox.h"
-#include "updatelayeredwindow/SUpdateLayeredWindow.h"
-#include "helper/splitstring.h"
+#include "control/SMessageBox.h"
+#include "helper/SplitString.h"
 
 #include "core/SSkin.h"
-#include "control/souictrls.h"
+#include "control/SouiCtrls.h"
 #include "layout/SouiLayout.h"
 #include "layout/SLinearLayout.h"
 #include "layout/SGridLayout.h"
@@ -133,11 +132,9 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SScrollView>();
     objFactory->TplRegisterFactory<SRealWnd>();
     objFactory->TplRegisterFactory<SToggle>();
-    objFactory->TplRegisterFactory<SCaption>();
     objFactory->TplRegisterFactory<STabCtrl>();
     objFactory->TplRegisterFactory<STabPage>();
-    objFactory->TplRegisterFactory<SActiveX>();
-    // objFactory->TplRegisterFactory<SFlashCtrl>();
+
     objFactory->TplRegisterFactory<SSplitPane>();
     objFactory->TplRegisterFactory<SSplitWnd>();
     objFactory->TplRegisterFactory<SSplitWnd_Col>();
@@ -148,23 +145,27 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SHeaderCtrl>();
     objFactory->TplRegisterFactory<SListCtrl>();
     objFactory->TplRegisterFactory<SListBox>();
-    objFactory->TplRegisterFactory<SRichEdit>();
-    objFactory->TplRegisterFactory<SEdit>();
     objFactory->TplRegisterFactory<SHotKeyCtrl>();
-    objFactory->TplRegisterFactory<SComboEdit>();
-    objFactory->TplRegisterFactory<SComboBox>();
     objFactory->TplRegisterFactory<SSpinButtonCtrl>();
     objFactory->TplRegisterFactory<SListView>();
-    objFactory->TplRegisterFactory<SComboView>();
     objFactory->TplRegisterFactory<SMCListView>();
     objFactory->TplRegisterFactory<STileView>();
     objFactory->TplRegisterFactory<STreeView>();
-    objFactory->TplRegisterFactory<SMenuBar>();
     objFactory->TplRegisterFactory<SCalendar>();
     objFactory->TplRegisterFactory<SDateTimePicker>();
     objFactory->TplRegisterFactory<SFrame>();
     objFactory->TplRegisterFactory<SStackView>();
     objFactory->TplRegisterFactory<SStackPage>();
+    objFactory->TplRegisterFactory<SRichEdit>();
+    objFactory->TplRegisterFactory<SEdit>();
+    objFactory->TplRegisterFactory<SComboEdit>();
+    objFactory->TplRegisterFactory<SComboBox>();
+    objFactory->TplRegisterFactory<SComboView>();
+    objFactory->TplRegisterFactory<SCaption>();
+#ifdef _WIN32
+    objFactory->TplRegisterFactory<SMenuBar>();
+    objFactory->TplRegisterFactory<SActiveX>();
+#endif//_WIN32
 }
 
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
@@ -235,9 +236,13 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     , m_cbCreateObj(NULL)
     , m_cbCreateTaskLoop(NULL)
 {
-    SWndSurface::Init();
+#ifdef _WIN32
+	SWndSurface::Init();
+#endif//_WIN32
+
+	SNativeWnd::InitWndClass(hInst,pszHostClassName,bImeApp);
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
-    _CreateSingletons(hInst, pszHostClassName, bImeApp);
+    _CreateSingletons();
 
     m_translator.Attach(new SNullTranslator);
     m_tooltipFactory.Attach(new SDefToolTipFactory);
@@ -263,18 +268,14 @@ SApplication::~SApplication(void)
     _DestroySingletons();
 }
 
-void SApplication::_CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, BOOL bImeApp)
+void SApplication::_CreateSingletons()
 {
     m_pSingletons[SUiDef::GetType()] = new SUiDef(m_RenderFactory);
     m_pSingletons[SWindowMgr::GetType()] = new SWindowMgr();
     m_pSingletons[STimerGenerator::GetType()] = new STimerGenerator();
     m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
-    m_pSingletons[STextServiceHelper::GetType()] = new STextServiceHelper();
-    m_pSingletons[SRicheditMenuDef::GetType()] = new SRicheditMenuDef();
-    m_pSingletons[SNativeWndHelper::GetType()] = new SNativeWndHelper(hInst, pszHostClassName, bImeApp);
-
     m_pSingletons[SHostMgr::GetType()] = new SHostMgr();
-}
+ }
 
 #define DELETE_SINGLETON(x)                  \
     delete (x *)m_pSingletons[x::GetType()]; \
@@ -286,15 +287,12 @@ void SApplication::_DestroySingletons()
         DELETE_SINGLETON(SNotifyCenter);
 
     DELETE_SINGLETON(SHostMgr);
-    DELETE_SINGLETON(SNativeWndHelper);
-    DELETE_SINGLETON(SRicheditMenuDef);
-    DELETE_SINGLETON(STextServiceHelper);
     DELETE_SINGLETON(SWindowFinder);
     DELETE_SINGLETON(SUiDef);
     DELETE_SINGLETON(STimerGenerator);
     DELETE_SINGLETON(SWindowMgr);
 }
-
+#ifdef _WIN32
 IAccProxy *SApplication::CreateAccProxy(SWindow *pWnd) const
 {
 #ifdef SOUI_ENABLE_ACC
@@ -341,6 +339,7 @@ IAccessible *SApplication::CreateAccessible(SWindow *pWnd) const
     return NULL;
 #endif // SOUI_ENABLE_ACC
 }
+#endif
 
 void *SApplication::GetInnerSingleton(SingletonType nType)
 {
@@ -354,6 +353,7 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc 
     SAutoBuf xmlBuf;
     if (!LoadRawBuffer(pszType, pszXmlName, pResProvider, xmlBuf))
         return FALSE;
+	xmlDoc.Reset();
     bool bLoad = xmlDoc.load_buffer(xmlBuf, xmlBuf.size(), xml_parse_default, enc_auto);
     if (!bLoad)
     {
@@ -473,22 +473,16 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
             uRet |= 0x01;
         }
     }
-    // load edit context menu
-    {
-        SXmlDoc xmlDoc;
-        if (_LoadXmlDocment(_T("SYS_XML_EDITMENU"), _T("XML"), xmlDoc, pResProvider))
-        {
-            SRicheditMenuDef::getSingleton().SetMenuXml(xmlDoc.root().child(L"editmenu"));
-        }
-        else
-        {
-            uRet |= 0x02;
-        }
-    }
+	// load edit context menu
+	{
+		if(!SetEditCtxMenuTemplateResId(_T("XML:SYS_XML_EDITMENU"),pResProvider))
+		{
+			uRet |= 0x02;
+		}
+	}
     // load messagebox template
     {
-        SXmlDoc xmlDoc;
-        if (!_LoadXmlDocment(_T("SYS_XML_MSGBOX"), _T("XML"), xmlDoc, pResProvider) || !SetMsgTemplate(xmlDoc.root().child(L"SOUI")))
+		if(!SetMessageBoxTemplateResId(_T("XML:SYS_XML_MSGBOX"),pResProvider))
         {
             uRet |= 0x04;
         }
@@ -815,6 +809,37 @@ ITaskLoop *SApplication::GetTaskLoop(THIS_ int iTaskLoop)
     {
         return NULL;
     }
+}
+
+
+SXmlNode SApplication::GetMessageBoxTemplate() const
+{
+	return m_xmlMessageBoxTemplate.root().child(L"soui");
+}
+
+SXmlNode SApplication::GetEditCtxMenuTemplate() const
+{
+	return m_xmlEditCtxMenuTemplate.root().first_child();
+}
+
+BOOL SApplication::SetEditCtxMenuTemplateResId(THIS_ LPCTSTR resId,IResProvider *pResProvider)
+{
+	return LoadXmlDocment(m_xmlEditCtxMenuTemplate,resId,pResProvider);
+}
+
+BOOL SApplication::SetMessageBoxTemplateResId(THIS_ LPCTSTR resId,IResProvider *pResProvider)
+{
+	if(!LoadXmlDocment(m_xmlMessageBoxTemplate,resId,pResProvider))
+		return FALSE;
+	SXmlNode uiRoot = m_xmlMessageBoxTemplate.root().child(L"soui");
+	if(!uiRoot)
+		return FALSE;
+	if (!uiRoot.attribute(L"minSize").value()[0])
+	{
+		m_xmlMessageBoxTemplate.Reset();
+		return FALSE;
+	}
+	return TRUE;
 }
 
 SNSEND

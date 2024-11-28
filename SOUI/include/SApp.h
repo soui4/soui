@@ -13,15 +13,15 @@
 
 #ifndef __SAPP__H__
 #define __SAPP__H__
-#include <core/ssingleton.h>
+#include <windows.h>
+#include <core/SSingleton.h>
 #include <interface/sapp-i.h>
 
 #include <res.mgr/SResProviderMgr.h>
 #include <res.mgr/SNamedValue.h>
 
-#include <core/smsgloop.h>
+#include <core/SMsgLoop.h>
 #include <core/SObjectFactory.h>
-#include <OleAcc.h>
 #include <helper/obj-ref-impl.hpp>
 #include <interface/SSkinobj-i.h>
 
@@ -188,6 +188,8 @@ class SOUI_EXP SApplication
 	STDMETHOD_(ITaskLoop *, GetTaskLoop)(THIS_ int iTaskLoop DEF_VAL(0)) OVERRIDE;
 	STDMETHOD_(void, SetCreateTaskLoopCallback)(THIS_ FunCrateTaskLoop cbCreateTaskLoop) OVERRIDE;
 	STDMETHOD_(HRESULT,CreateScriptModule)(THIS_ IScriptModule **ppScriptModule) OVERRIDE;
+	STDMETHOD_(BOOL,SetEditCtxMenuTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) OVERRIDE;
+	STDMETHOD_(BOOL,SetMessageBoxTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) OVERRIDE;
 
   public:
     /**
@@ -251,6 +253,9 @@ class SOUI_EXP SApplication
 
     int Str2ID(const SStringW &str);
 
+	SXmlNode GetMessageBoxTemplate() const;
+	SXmlNode GetEditCtxMenuTemplate() const;
+
     SStringW tr(const SStringW &strSrc, const SStringW &strCtx) const;
     virtual IWindow *CreateWindowByName(LPCWSTR pszWndClass) const;
     virtual ISkinObj *CreateSkinByName(LPCWSTR pszSkinClass) const;
@@ -258,11 +263,12 @@ class SOUI_EXP SApplication
     virtual IAnimation *CreateAnimationByName(LPCWSTR pszName) const;
     virtual IValueAnimator *CreateValueAnimatorByName(LPCWSTR pszName) const;
 
+#ifdef _WIN32
     virtual IAccProxy *CreateAccProxy(SWindow *pWnd) const;
     virtual IAccessible *CreateAccessible(SWindow *pWnd) const;
-
+#endif
   protected:
-    void _CreateSingletons(HINSTANCE hInst, LPCTSTR pszHostClassName, BOOL bImeApp);
+    void _CreateSingletons();
     void _DestroySingletons();
     BOOL _LoadXmlDocment(LPCTSTR pszXmlName,
                          LPCTSTR pszType,
@@ -293,6 +299,8 @@ class SOUI_EXP SApplication
 	SArray<SAutoRefPtr<ITaskLoop>> m_lstTaskLoop;//task loop list
     //一组单例指针
     void *m_pSingletons[SINGLETON_COUNT];
+	SXmlDoc m_xmlEditCtxMenuTemplate;
+	SXmlDoc m_xmlMessageBoxTemplate;
 };
 
 SNSEND

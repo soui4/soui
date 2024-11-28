@@ -1,9 +1,14 @@
 #
 # 1394020320@qq.com
 #
+if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4355 /wd4225 /wd4244")
+else()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+endif()
+
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/config)
-
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/core)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/gpu)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/images)
@@ -22,13 +27,13 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/sfnt)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gpu)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/core)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../freetype/include)
 
 add_definitions (
     -D_CRT_SECURE_NO_WARNINGS
     -DSK_IGNORE_ETC1_SUPPORT
     )
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
 #
 # TODO
 # 由于源文件太多，且有很多没有使用到，使用其他过滤手段没有方法过滤
@@ -516,7 +521,7 @@ set(srcs
     "src/gpu/gl/GrGLCaps.cpp" 
     "src/gpu/gl/GrGLContext.cpp" 
     "src/gpu/gl/debug/GrGLCreateDebugInterface.cpp" 
-    "src/gpu/gl/win/GrGLCreateNativeInterface_win.cpp" 
+    #"src/gpu/gl/win/GrGLCreateNativeInterface_win.cpp" 
     "src/gpu/gl/GrGLCreateNullInterface.cpp" 
     "src/gpu/gl/GrGLDefaultInterface_native.cpp" 
     "src/gpu/gl/GrGLExtensions.cpp" 
@@ -608,7 +613,7 @@ set(srcs
     "src/effects/SkAlphaThresholdFilter.cpp" 
     "src/core/SkAnnotation.cpp" 
     "src/effects/SkArithmeticMode.cpp" 
-    "src/utils/win/SkAutoCoInitialize.cpp" 
+    #"src/utils/win/SkAutoCoInitialize.cpp" 
     "src/effects/SkAvoidXfermode.cpp" 
     "src/core/SkBBHFactory.cpp" 
     "src/core/SkBBoxHierarchyRecord.cpp" 
@@ -711,8 +716,6 @@ set(srcs
     "src/core/SkFont.cpp" 
     "src/core/SkFontDescriptor.cpp" 
     "src/core/SkFontHost.cpp" 
-    "src/ports/SkFontHost_win.cpp" 
-    "src/ports/SkFontMgr_default_gdi.cpp" 
     "src/fonts/SkFontMgr_indirect.cpp" 
     "src/core/SkFontStream.cpp" 
     "src/utils/SkFrontBufferedStream.cpp" 
@@ -731,7 +734,7 @@ set(srcs
     "src/effects/gradients/SkGradientShader.cpp" 
     "src/core/SkGraphics.cpp" 
     "src/utils/win/SkHRESULT.cpp" 
-    "src/utils/win/SkIStream.cpp" 
+    #"src/utils/win/SkIStream.cpp" 
     "src/image/SkImage.cpp" 
     "src/images/SkImageDecoder.cpp" 
     "src/images/SkImageEncoder.cpp" 
@@ -773,13 +776,11 @@ set(srcs
     "src/effects/SkMorphologyImageFilter.cpp" 
     "src/core/SkMultiPictureDraw.cpp" 
     "src/utils/SkNWayCanvas.cpp" 
-    "src/gpu/gl/win/SkNativeGLContext_win.cpp" 
     "src/utils/SkNinePatch.cpp" 
     "src/utils/SkNullCanvas.cpp" 
     "src/gpu/gl/SkNullGLContext.cpp" 
     "src/utils/SkOSFile.cpp" 
     "src/ports/SkOSFile_stdio.cpp" 
-    "src/ports/SkOSFile_win.cpp" 
     "src/sfnt/SkOTTable_name.cpp" 
     "src/sfnt/SkOTUtils.cpp" 
     "src/effects/SkOffsetImageFilter.cpp" 
@@ -838,7 +839,7 @@ set(srcs
     "src/core/SkQuadClipper.cpp" 
     "src/pathops/SkQuarticRoot.cpp" 
     "src/core/SkRRect.cpp" 
-    "src/utils/SkRTConf.cpp" 
+    "src/utils/SkRTConf.cpp"   
     "src/core/SkRTree.cpp" 
     "src/effects/gradients/SkRadialGradient.cpp" 
     "src/core/SkRasterClip.cpp" 
@@ -872,12 +873,11 @@ set(srcs
     "src/core/SkStringUtils.cpp" 
     "src/core/SkStroke.cpp" 
     "src/core/SkStrokeRec.cpp" 
-    "src/core/SkStrokerPriv.cpp" 
+    "src/core/SkStrokerPriv.cpp"   
     "src/image/SkSurface.cpp" 
     "src/image/SkSurface_Raster.cpp" 
     "src/effects/gradients/SkSweepGradient.cpp" 
     "src/core/SkTLS.cpp" 
-    "src/ports/SkTLS_win.cpp" 
     "src/core/SkTSearch.cpp" 
     "src/effects/SkTableColorFilter.cpp" 
     "src/effects/SkTableMaskFilter.cpp" 
@@ -888,11 +888,9 @@ set(srcs
     "src/utils/SkTextureCompressor.cpp" 
     "src/utils/SkTextureCompressor_ASTC.cpp" 
     "src/utils/SkTextureCompressor_LATC.cpp" 
-    "src/utils/SkTextureCompressor_R11EAC.cpp" 
-    "src/utils/SkThreadUtils_win.cpp" 
+    "src/utils/SkTextureCompressor_R11EAC.cpp"        
     "src/core/SkTileGrid.cpp" 
     "src/effects/SkTileImageFilter.cpp" 
-    "src/ports/SkTime_win.cpp" 
     "src/effects/SkTransparentShader.cpp" 
     "src/effects/gradients/SkTwoPointConicalGradient.cpp" 
     "src/effects/gradients/SkTwoPointConicalGradient_gpu.cpp" 
@@ -903,14 +901,41 @@ set(srcs
     "src/core/SkUtils.cpp" 
     "src/core/SkValidatingReadBuffer.cpp" 
     "src/core/SkVertState.cpp" 
-    "src/utils/win/SkWGL_win.cpp" 
     "src/core/SkWriteBuffer.cpp" 
     "src/core/SkWriter32.cpp" 
     "src/core/SkXfermode.cpp" 
     "src/effects/SkXfermodeImageFilter.cpp" 
+    )
 
+    
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+    set(srcs
+        ${srcs}
+        "src/ports/SkFontMgr_default_gdi.cpp" 
+        "src/ports/SkFontHost_win.cpp" 
+        "src/gpu/gl/win/SkNativeGLContext_win.cpp" 
+        "src/ports/SkOSFile_win.cpp" 
+        "src/ports/SkTLS_win.cpp" 
+        "src/utils/SkThreadUtils_win.cpp" 
+        "src/ports/SkTime_win.cpp" 
+        "src/utils/win/SkWGL_win.cpp" 
+        "src/gpu/gl/win/GrGLCreateNativeInterface_win.cpp" 
+    )
+else()
+    set(srcs
+        ${srcs}
+        "src/ports/SkFontHost_linux.cpp" 
+        "src/ports/SkOSFile_posix.cpp" 
+        "src/ports/SkTLS_pthread.cpp" 
+        "src/utils/SkThreadUtils_pthread.cpp" 
+        "src/utils/SkThreadUtils_pthread_linux.cpp" 
+        "src/ports/SkTime_Unix.cpp" 
+        "src/ports/SkFontHost_FreeType_common.cpp"
+        "src/ports/SkFontHost_FreeType.cpp"
+        "src/gpu/gl/unix/GrGLCreateNativeInterface_unix.cpp"
+    )
+endif()
 
-)
 if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
 set(srcs
     ${srcs}
@@ -943,6 +968,14 @@ source_group("Header Files" FILES ${headers})
 source_group("Source Files" FILES ${srcs})
 
 add_library(skia STATIC ${srcs} ${headers})
+
+if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+    target_compile_options(skia PRIVATE -fPIC)
+    find_package(Freetype REQUIRED)
+    target_include_directories(skia PRIVATE ${FREETYPE_INCLUDE_DIRS})
+    target_link_libraries(skia ${FREETYPE_LIBRARIES})
+endif()
+
 set(COM_LIBS ${COM_LIBS} skia CACHE INTERNAL "com_lib")
 set_target_properties (skia PROPERTIES
     FOLDER third-part

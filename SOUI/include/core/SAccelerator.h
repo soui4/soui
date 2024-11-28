@@ -43,7 +43,7 @@ class SOUI_EXP SAccelerator : public IAccelerator {
      * @param    bool bShift --  与Shilft组合
      * Describe
      */
-    SAccelerator(UINT vKey = 0, bool bCtrl = false, bool bAlt = false, bool bShift = false);
+    SAccelerator(WORD vKey = 0, bool bCtrl = false, bool bAlt = false, bool bShift = false);
 
     /**
      * ~CAccelerator

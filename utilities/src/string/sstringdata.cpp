@@ -1,10 +1,9 @@
 ﻿
 #include "string/sstringdata.h"
 #include "soui_mem_wrapper.h"
-#include <Windows.h>
+#include <windows.h>
 
-namespace SOUI
-{
+SNSBEGIN
     // Globals
 
     // For an empty string, m_pszData will point here
@@ -61,13 +60,14 @@ namespace SOUI
 	void TStringData::Release()
 	{
 		SASSERT(nRefs != 0);
-		if (InterlockedDecrement(&nRefs) <= 0)
+		if (--nRefs <= 0)
 			soui_mem_wrapper::SouiFree(this);
 	}
 
 	void TStringData::AddRef()
 	{
 		SASSERT(nRefs > 0);
-		InterlockedIncrement(&nRefs);
+		nRefs++;
 	}
-}
+
+SNSEND

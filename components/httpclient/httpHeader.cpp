@@ -150,7 +150,7 @@ bool CHttpHeader::Revolse(const std::string& strHeader)
 	std::string strLine, strKey, strValue;
 	do
 	{
-		nFindPos = strHeader.find("\r\n", nStartPos);
+		nFindPos = (int)strHeader.find("\r\n", nStartPos);
 		if (-1 == nFindPos)
 			strLine = strHeader.substr(nStartPos, strHeader.size() - nStartPos);
 		else
@@ -161,14 +161,14 @@ bool CHttpHeader::Revolse(const std::string& strHeader)
 		if (0 == nLineIndex)//µÚÒ»ÐÐ
 		{
 			http_version_ = strLine.substr(0, 8);
-			int nSpace1 = strLine.find(" ");
-			int nSpace2 = strLine.find(" ", nSpace1 + 1);
+			size_t nSpace1 = strLine.find(" ");
+			size_t nSpace2 = strLine.find(" ", nSpace1 + 1);
 			http_code_ = atoi(strLine.substr(nSpace1 + 1, nSpace2 - nSpace1 - 1).c_str());
 			http_response_ = strLine.substr(nSpace2 + 1, strLine.size() - nSpace2 - 1);
 			nLineIndex++;
 			continue;
 		}
-		int nSplit = strLine.find(": ");
+		size_t nSplit = strLine.find(": ");
 		strKey = strLine.substr(0, nSplit);
 		strValue = strLine.substr(nSplit + 2, strLine.size() - nSplit - 2);
 		std::pair<std::string, std::string> data;

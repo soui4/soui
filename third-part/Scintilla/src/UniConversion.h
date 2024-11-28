@@ -7,6 +7,7 @@
 
 #ifndef UNICONVERSION_H
 #define UNICONVERSION_H
+#include <assert.h>
 
 #ifdef SCI_NAMESPACE
 namespace Scintilla {
@@ -16,13 +17,57 @@ const int UTF8MaxBytes = 4;
 
 const int unicodeReplacementChar = 0xFFFD;
 
-unsigned int UTF8Length(const wchar_t *uptr, unsigned int tlen);
-void UTF8FromUTF16(const wchar_t *uptr, unsigned int tlen, char *putf, unsigned int len);
+void UTF8FromUTF16(const unsigned short*uptr, unsigned int tlen, char *putf, unsigned int len);
 unsigned int UTF8CharLength(unsigned char ch);
+
+size_t UTF16ToUTF8Length(const unsigned short* uptr, size_t len);
 size_t UTF16Length(const char *s, size_t len);
-size_t UTF16FromUTF8(const char *s, size_t len, wchar_t *tbuf, size_t tlen);
+size_t UTF16FromUTF8(const char *s, size_t len, unsigned short* tbuf, size_t tlen);
+size_t UTF32ToUTF8Length(const unsigned int* uptr, size_t len);
+size_t UTF32Length(const char* s, size_t len);
+void UTF8FromUTF32(const unsigned int* uptr, unsigned int tlen, char* putf, unsigned int len);
 unsigned int UTF32FromUTF8(const char *s, unsigned int len, unsigned int *tbuf, unsigned int tlen);
 unsigned int UTF16FromUTF32Character(unsigned int val, wchar_t *tbuf);
+
+inline unsigned int UTF8Length(const wchar_t* uptr, unsigned int tlen) {
+#if (WCHAR_SIZE==2)
+	assert(sizeof(wchar_t) == 2);
+	return (unsigned int)UTF16ToUTF8Length((const unsigned short*)uptr, tlen);
+#else
+	assert(sizeof(wchar_t) == 4);
+	return (unsigned int)UTF32ToUTF8Length((const unsigned int*)uptr, tlen);
+#endif
+}
+
+inline void UTF8FromWideChar(const wchar_t* uptr, unsigned int tlen, char* putf, unsigned int len) {
+#if (WCHAR_SIZE==2)
+	assert(sizeof(wchar_t) == 2);
+	UTF8FromUTF16((const unsigned short*)uptr, tlen, putf, len);
+#else
+	assert(sizeof(wchar_t) == 4);
+	UTF8FromUTF32((const unsigned int*)uptr, tlen, putf, len);
+#endif
+}
+
+inline size_t WideCharLength(const char* s, size_t len) {
+#if (WCHAR_SIZE==2)
+	assert(sizeof(wchar_t) == 2);
+	return UTF16Length(s, len);
+#else 
+	assert(sizeof(wchar_t) == 4);
+	return UTF32Length(s, len);
+#endif
+}
+
+inline size_t WideCharFromUTF8(const char* s, size_t len, wchar_t* tbuf, size_t tlen) {
+#if (WCHAR_SIZE==2)
+	assert(sizeof(wchar_t) == 2);
+	return UTF16FromUTF8(s, len, (unsigned short*)tbuf, tlen);
+#else
+	assert(sizeof(wchar_t) == 4);
+	return UTF32FromUTF8(s, len, (unsigned int*)tbuf, tlen);
+#endif
+}
 
 extern int UTF8BytesOfLead[256];
 void UTF8BytesOfLeadInitialise();

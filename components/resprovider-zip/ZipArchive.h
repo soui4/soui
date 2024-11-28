@@ -155,7 +155,7 @@ protected:
 	ZipDirHeader	m_Header;
 	ZipDirFileHeader** m_Files;
 	BYTE*			m_DirData;
-	CHAR			m_szPassword[64];
+	char			m_szPassword[64];
 
 public:
 	CZipArchive();

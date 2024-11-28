@@ -18,10 +18,21 @@ source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("SoUI Resource" FILES ${CURRENT_UIRES})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
+
+if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+# 添加 -fpermissive 选项到 C++ 编译器标志
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive" )
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fpermissive")
+add_compile_options(-Wno-conversion-null -Wno-pointer-arith -Wno-format)
+endif()
+
 set(source ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
 
 if (NOT ENABLE_SOUI_CORE_LIB)
+
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
     set (source  ${source} soui.rc)
+endif()
     add_library(soui4 SHARED ${source})
 else()
     add_library(soui4 STATIC ${source})
@@ -33,9 +44,16 @@ target_include_directories(soui4
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface
   PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
 )
-target_link_libraries(soui4 utilities4)
 
-target_precompile_headers(soui4 PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/include/souistd.h")
+add_dependencies(soui4 utilities4)
+target_link_libraries(soui4 utilities4)
+ 
+if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+add_dependencies(soui4  swinx)
+target_link_libraries(soui4  swinx)
+endif()
+
+
 set(CORE_LIBS ${CORE_LIBS} soui4 CACHE INTERNAL "core_lib")
 
 install(TARGETS soui4

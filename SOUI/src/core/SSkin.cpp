@@ -2,7 +2,7 @@
 //   File Name: SSkinPool
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
-#include "core/Sskin.h"
+#include "core/SSkin.h"
 #include "helper/SDIBHelper.h"
 #include <core/SGradient.h>
 SNSBEGIN
@@ -357,13 +357,14 @@ SGradientDesc::SGradientDesc()
     // set default to linear gradient
     m_type = linear;
     m_angle = 0.0f;
-    m_radius = SLayoutSize(100);
-    m_centerX = m_centerY = 0.5;
+    m_centerX = m_centerY = 0.5f;
+    m_radius.setInvalid();
+    m_ratio_radius = 0.5f;
     m_bFullArc = TRUE;
     m_gradient.Attach(new SGradient());
 }
 
-GradientInfo SGradientDesc::GetGradientInfo(int nScale) const
+GradientInfo SGradientDesc::GetGradientInfo(int nScale, int wid,int hei ) const
 {
     GradientInfo ret;
     ret.type = m_type;
@@ -373,7 +374,12 @@ GradientInfo SGradientDesc::GetGradientInfo(int nScale) const
         ret.angle = m_angle;
         break;
     case radial:
-        ret.radius = (float)m_radius.toPixelSize(nScale);
+        if(m_radius.isValid())
+            ret.radial.radius = (float)m_radius.toPixelSize(nScale);
+        else
+            ret.radial.radius  = m_ratio_radius * smax(wid,hei);
+        ret.sweep.centerX = m_centerX;
+        ret.sweep.centerY = m_centerY;
         break;
     case sweep:
         ret.sweep.centerX = m_centerX;
@@ -408,7 +414,7 @@ void SSkinGradation2::_DrawByIndex(IRenderTarget *pRT, LPCRECT prcDraw, int iSta
         ptCorner.x = (int)(rc.Width() / 2 * m_ptCorner.fX);
         ptCorner.y = (int)(rc.Height() / 2 * m_ptCorner.fY);
     }
-    GradientInfo info = GetGradientInfo(GetScale());
+    GradientInfo info = GetGradientInfo(GetScale(),prcDraw->right-prcDraw->left,prcDraw->bottom-prcDraw->top);
     pRT->DrawGradientRectEx(prcDraw, ptCorner, m_gradient->GetGradientData(), m_gradient->GetGradientLength(), &info, GetAlpha());
 }
 
@@ -702,7 +708,7 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
     }
     else if (m_gradient != NULL)
     {
-        pBrush.Attach(m_gradient->CreateBrush(pRT, GetScale(), byAlpha));
+        pBrush.Attach(m_gradient->CreateBrush(pRT, GetScale(), byAlpha,rcDraw->right-rcDraw->left,rcDraw->bottom-rcDraw->top));
     }
     else if (m_bitmap)
     {
@@ -822,12 +828,12 @@ IBrushS *SSkinShape::SShapeBitmap::CreateBrush(IRenderTarget *pRT, BYTE byAlpha)
     return ret;
 }
 
-IBrushS *SSkinShape::SGradientBrush::CreateBrush(IRenderTarget *pRT, int nScale, BYTE byAlpha) const
+IBrushS *SSkinShape::SGradientBrush::CreateBrush(IRenderTarget *pRT, int nScale, BYTE byAlpha,int wid,int hei) const
 {
     if (m_gradient->GetGradientLength() < 2)
         return NULL;
     IBrushS *ret = NULL;
-    GradientInfo info = GetGradientInfo(nScale);
+    GradientInfo info = GetGradientInfo(nScale,wid,hei);
     pRT->CreateGradientBrush(m_gradient->GetGradientData(), m_gradient->GetGradientLength(), &info, byAlpha, kRepeat_TileMode, &ret);
     return ret;
 }

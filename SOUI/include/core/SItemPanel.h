@@ -8,7 +8,9 @@
 #ifndef __SITEMPANEL__H__
 #define __SITEMPANEL__H__
 
-#include "SwndContainerImpl.h"
+#include "SWndContainerImpl.h"
+#include <proxy/SWindowProxy.h>
+#include <interface/SCtrl-i.h>
 
 SNSBEGIN
 
@@ -201,7 +203,7 @@ class TOsrPanelProxy
 
     STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
     {
-        if (id == __uuidof(T))
+        if (id == __suidof(T))
         {
             *ppRet = (T *)this;
             AddRef();

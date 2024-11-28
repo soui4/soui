@@ -1,4 +1,4 @@
-﻿#include <interface/Sxml-i.h>
+﻿#include <interface/sxml-i.h>
 using namespace pugi;
 
 BOOL ExpLua_IXml(lua_State *L)

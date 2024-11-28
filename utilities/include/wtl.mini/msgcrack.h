@@ -109,7 +109,7 @@ public: \
 { \
     bHandled = TRUE; \
     lResult = ReflectNotifications(uMsg, wParam, lParam, bHandled); \
-    if((lResult == 0) && (uMsg >= WM_CTLCOLORMSGBOX) && (uMsg <= WM_CTLCOLORSTATIC)) \
+    if((lResult == 0)) \
     bHandled = FALSE; \
     if(bHandled) \
     return TRUE; \
@@ -1730,7 +1730,6 @@ public: \
 ///////////////////////////////////////////////////////////////////////////////
 // New NT4 & NT5 messages
 
-#if(_WIN32_WINNT >= 0x0400)
 
 // void OnMouseHover(WPARAM wParam, CPoint ptPos)
 #define MSG_WM_MOUSEHOVER(func) \
@@ -1754,9 +1753,6 @@ public: \
             return TRUE; \
     }
 
-#endif /* _WIN32_WINNT >= 0x0400 */
-
-#if(WINVER >= 0x0500)
 
 // void OnMenuRButtonUp(WPARAM wParam, HMENU menu)
 #define MSG_WM_MENURBUTTONUP(func) \
@@ -1811,9 +1807,6 @@ public: \
             return TRUE; \
     }
 
-#endif /* WINVER >= 0x0500 */
-
-#if(_WIN32_WINNT >= 0x0500)
 
 // BOOL OnAppCommand(HWND wndFocus, short cmd, WORD uDevice, int dwKeys)
 #define MSG_WM_APPCOMMAND(func) \
@@ -1923,10 +1916,6 @@ public: \
             return TRUE; \
     }
 
-#endif // (_WIN32_WINNT >= 0x0500)
-
-#if(_WIN32_WINNT >= 0x0501)
-
 // void OnInput(WPARAM RawInputCode, HRAWINPUT hRawInput)
 #define MSG_WM_INPUT(func) \
     if (uMsg == WM_INPUT) \
@@ -1973,7 +1962,6 @@ public: \
             return TRUE; \
     }
 
-#endif /* _WIN32_WINNT >= 0x0501 */
 
 ///////////////////////////////////////////////////////////////////////////////
 // ATL defined messages

@@ -9,17 +9,16 @@
 #include <core/SWndContainerImpl.h>
 #include <core/SNativeWnd.h>
 #include <core/SDropTargetDispatcher.h>
-#include <event/SEventcrack.h>
+#include <event/SEventCrack.h>
 #include <interface/stooltip-i.h>
 #include <interface/shostwnd-i.h>
 #include <interface/SHostPresenter-i.h>
 #include <core/SCaret.h>
 #include <core/SNcPainter.h>
-#include <layout/SLayoutsize.h>
+#include <layout/SLayoutSize.h>
 #include <helper/SplitString.h>
-#include <helper/SWndSpy.h>
+#include <helper/swndspy.h>
 #include <helper/STimerGenerator.h>
-#include <proxy/SNativeWndProxy.h>
 SNSBEGIN
 
 // disable swnd spy for release by default.
@@ -73,7 +72,9 @@ class SOUI_EXP SHostWndAttr : public TObjRefImpl<SObject> {
         ATTR_DWORD(L"wndStyle", m_dwStyle, FALSE)
         ATTR_DWORD(L"wndStyleEx", m_dwExStyle, FALSE)
         ATTR_BOOL(L"resizable", m_bResizable, FALSE)
+        #ifdef _WIN32
         ATTR_BOOL(L"translucent", m_bTranslucent, FALSE)
+        #endif//_WIN32
         ATTR_BOOL(L"sendWheel2Hover", m_bSendWheel2Hover, FALSE)
         ATTR_BOOL(L"appWnd", m_bAppWnd, FALSE)
         ATTR_BOOL(L"toolWindow", m_bToolWnd, FALSE)
@@ -154,7 +155,8 @@ class SOUI_EXP SRootWindow : public SWindow {
 
 class SDummyWnd;
 class SOUI_EXP SHostWnd
-    : public TNativeWndProxy<IHostWnd>
+    : public TObjRefImpl<IHostWnd>
+    , public SNativeWnd
     , public SwndContainerImpl {
     friend class SDummyWnd;
     friend class SRootWindow;
@@ -188,7 +190,7 @@ class SOUI_EXP SHostWnd
     SAutoRefPtr<IAnimation> m_hostAnimation;
     DWORD m_AniState;
     BOOL m_bFirstShow;
-    DWORD m_dwThreadID;
+    tid_t m_dwThreadID;
     SRootWindow *m_pRoot;
 
     EventHandlerInfo m_evtHandler;
@@ -225,6 +227,9 @@ class SOUI_EXP SHostWnd
     };
 
   public:
+      STDMETHOD_(INativeWnd*, GetNative)(THIS) OVERRIDE {
+          return (INativeWnd *)this;
+      }
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
 
     STDMETHOD_(BOOL, DestroyWindow)(THIS) OVERRIDE;
@@ -327,11 +332,6 @@ class SOUI_EXP SHostWnd
     SWindow *GetRoot() const
     {
         return m_pRoot;
-    }
-
-    SNativeWnd *GetNative()
-    {
-        return this;
     }
 
     CRect GetWindowRect() const;

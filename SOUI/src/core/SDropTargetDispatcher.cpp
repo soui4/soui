@@ -1,6 +1,6 @@
 ﻿#include "souistd.h"
 #include "core/SDropTargetDispatcher.h"
-#include "core/SwndContainerImpl.h"
+#include <core/SWndContainerImpl.h>
 
 SNSBEGIN
 SDropTargetDispatcher::SDropTargetDispatcher()
@@ -45,18 +45,24 @@ BOOL SDropTargetDispatcher::UnregisterDragDrop(SWND swnd)
     return TRUE;
 }
 
-HRESULT STDMETHODCALLTYPE SDropTargetDispatcher::QueryInterface(/* [in] */ REFIID riid,
-                                                                /* [iid_is][out] */ void __RPC_FAR *__RPC_FAR *ppvObject)
+#ifdef _WIN32
+#define __uuidofsys __uuidof
+#else
+#define __uuidofsys __suidof
+#endif
+
+HRESULT SDropTargetDispatcher::QueryInterface(/* [in] */ REFIID riid,
+                                                                /* [iid_is][out] */ void  * *ppvObject)
 {
     HRESULT hr = S_FALSE;
-    if (riid == __uuidof(IUnknown))
+    if (riid == __uuidofsys(IUnknown))
         *ppvObject = (IUnknown *)this, hr = S_OK;
-    else if (riid == __uuidof(IDropTarget))
+    else if (riid == __uuidofsys(IDropTarget))
         *ppvObject = (IDropTarget *)this, hr = S_OK;
     return hr;
 }
 
-HRESULT STDMETHODCALLTYPE SDropTargetDispatcher::DragEnter(/* [unique][in] */ IDataObject *pDataObj,
+HRESULT  SDropTargetDispatcher::DragEnter(/* [unique][in] */ IDataObject *pDataObj,
                                                            /* [in] */ DWORD grfKeyState,
                                                            /* [in] */ POINTL pt,
                                                            /* [out][in] */ DWORD *pdwEffect)
@@ -66,7 +72,7 @@ HRESULT STDMETHODCALLTYPE SDropTargetDispatcher::DragEnter(/* [unique][in] */ ID
     return DragOver(grfKeyState, pt, pdwEffect);
 }
 
-HRESULT STDMETHODCALLTYPE SDropTargetDispatcher::DragOver(/* [in] */ DWORD grfKeyState,
+HRESULT SDropTargetDispatcher::DragOver(/* [in] */ DWORD grfKeyState,
                                                           /* [in] */ POINTL pt,
                                                           /* [out][in] */ DWORD *pdwEffect)
 {

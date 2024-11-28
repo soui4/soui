@@ -67,7 +67,7 @@ BOOL STileView::SetAdapter(ILvAdapter *adapter)
 {
     if (!m_tvItemLocator)
     {
-        SASSERT_FMTA(FALSE, "error: A item locator is in need before setting adapter!!!");
+        SASSERT_MSGA(FALSE, "error: A item locator is in need before setting adapter!!!");
         return FALSE;
     }
     if (m_adapter == adapter)

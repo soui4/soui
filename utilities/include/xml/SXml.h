@@ -3,9 +3,9 @@
 #include <utilities.h>
 #include <utilities-def.h>
 #include <interface/sxml-i.h>
-#include <helper/obj-ref-impl.hpp>
 #include <pugixml/pugixml.hpp>
 #include <souicoll.h>
+#include <helper/obj-ref-impl.hpp>
 
 SNSBEGIN
 

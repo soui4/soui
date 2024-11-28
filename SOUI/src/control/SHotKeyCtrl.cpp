@@ -1,6 +1,5 @@
 ﻿#include "souistd.h"
 #include "control/SHotKeyCtrl.h"
-#include <CommCtrl.h>
 
 SNSBEGIN
 

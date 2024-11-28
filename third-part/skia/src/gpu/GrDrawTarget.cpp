@@ -99,9 +99,9 @@ GrDrawTarget::GrDrawTarget(GrContext* context)
     GeometrySrcState& geoSrc = fGeoSrcStateStack.push_back();
 #ifdef SK_DEBUG
     geoSrc.fVertexCount = DEBUG_INVAL_START_IDX;
-    geoSrc.fVertexBuffer = (GrVertexBuffer*)DEBUG_INVAL_BUFFER;
+    geoSrc.fVertexBuffer = (GrVertexBuffer*)(intptr_t)DEBUG_INVAL_BUFFER;
     geoSrc.fIndexCount = DEBUG_INVAL_START_IDX;
-    geoSrc.fIndexBuffer = (GrIndexBuffer*)DEBUG_INVAL_BUFFER;
+    geoSrc.fIndexBuffer = (GrIndexBuffer*)(intptr_t)DEBUG_INVAL_BUFFER;
 #endif
     geoSrc.fVertexSrc = kNone_GeometrySrcType;
     geoSrc.fIndexSrc  = kNone_GeometrySrcType;
@@ -241,7 +241,7 @@ void GrDrawTarget::releasePreviousVertexSource() {
         case kBuffer_GeometrySrcType:
             geoSrc.fVertexBuffer->unref();
 #ifdef SK_DEBUG
-            geoSrc.fVertexBuffer = (GrVertexBuffer*)DEBUG_INVAL_BUFFER;
+            geoSrc.fVertexBuffer = (GrVertexBuffer*)(intptr_t)DEBUG_INVAL_BUFFER;
 #endif
             break;
         default:
@@ -264,7 +264,7 @@ void GrDrawTarget::releasePreviousIndexSource() {
         case kBuffer_GeometrySrcType:
             geoSrc.fIndexBuffer->unref();
 #ifdef SK_DEBUG
-            geoSrc.fIndexBuffer = (GrIndexBuffer*)DEBUG_INVAL_BUFFER;
+            geoSrc.fIndexBuffer = (GrIndexBuffer*)(intptr_t)DEBUG_INVAL_BUFFER;
 #endif
             break;
         default:

@@ -1,5 +1,6 @@
 #include <souistd.h>
 #include <core/SScrollBarHandler.h>
+#include <core/SSkin.h>
 
 SNSBEGIN
 SScrollBarHandler::SScrollBarHandler(IScrollBarHost *pCB, bool bVert)

@@ -44,7 +44,6 @@
 #include <process.h>
 #pragma comment(lib, "shlwapi")
 #pragma warning(disable:4996)
-
 #else
 #include <unistd.h>
 #include <netinet/in.h>
@@ -82,7 +81,7 @@
 #include <list>
 #include <queue>
 #include <deque>
-
+#include <stdint.h>
 using namespace SOUI;
 
 //////////////////////////////////////////////////////////////////////////
@@ -320,9 +319,9 @@ void * threadProc(void * pParam)
 struct LogData
 {
     int    _level;    //log level
-    unsigned __int64 _time;        //create time
+    uint64_t _time;        //create time
 	DWORD _pid;
-	DWORD _tid;
+	tid_t _tid;
 	std::string _content; //content
 	std::string _filter;
 	std::string _moduleName;
@@ -1422,7 +1421,7 @@ bool LogerManager::popLog(LogData *& log)
 void LogerManager::run()
 {
     _runing = true;
-    pushLog(LOG_LEVEL_ALARM, "logger", "-----------------  log4z thread started!   ----------------------------", __FILE__, __LINE__ , __FUNCTION__,_ReturnAddress());
+    pushLog(LOG_LEVEL_ALARM, "logger", "-----------------  log4z thread started!   ----------------------------", __FILE__, __LINE__ , __FUNCTION__,RetAddr());
 	if (_loggerInfo._enable)
 	{
 		std::stringstream ss;
@@ -1430,7 +1429,7 @@ void LogerManager::run()
 			<<" path=" <<_loggerInfo._path
 			<<" level=" << _loggerInfo._level
 			<<" display=" << _loggerInfo._display;
-		pushLog(LOG_LEVEL_ALARM, "logger", ss.str().c_str(), __FILE__, __LINE__ , __FUNCTION__,_ReturnAddress());
+		pushLog(LOG_LEVEL_ALARM, "logger", ss.str().c_str(), __FILE__, __LINE__ , __FUNCTION__,RetAddr());
 	}
 
 

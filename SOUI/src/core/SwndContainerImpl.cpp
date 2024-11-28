@@ -2,8 +2,8 @@
 //  Class Name: SwndContainerImpl
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
-#include "core/SwndContainerImpl.h"
-#include "res.mgr/SUiDef.h"
+#include <core/SWndContainerImpl.h>
+
 
 SNSBEGIN
 
@@ -121,7 +121,7 @@ SWND SwndContainerImpl::OnSetSwndCapture(SWND swnd)
 
 void SwndContainerImpl::OnSetSwndFocus(SWND swnd)
 {
-    if (swnd && ::GetFocus() != GetHostHwnd() && !(::GetWindowLongPtr(GetHostHwnd(), GWL_EXSTYLE) & WS_EX_TOOLWINDOW))
+    if (swnd && ::GetFocus() != GetHostHwnd() && !(::GetWindowLong(GetHostHwnd(), GWL_EXSTYLE) & WS_EX_TOOLWINDOW))
     {
         ::SetFocus(GetHostHwnd());
     }

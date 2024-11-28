@@ -1,10 +1,10 @@
 ﻿#ifndef __SSEMAPHORE__H__
 #define __SSEMAPHORE__H__
+
 #include <utilities-def.h>
 #include <helper/SNoCopyable.hpp>
+SNSBEGIN
 
-namespace SOUI
-{
 	enum
 	{
 		RETURN_OK = 0,
@@ -53,6 +53,6 @@ private:
     SemaphorePrivate &_private;
 };
 
-}
+SNSEND
 
 #endif // __SSEMAPHORE__H__

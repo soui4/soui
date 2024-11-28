@@ -1,6 +1,6 @@
 ﻿#include "souistd.h"
-#include "layout\SGridLayout.h"
-
+#include "layout/SGridLayout.h"
+#include <core/SWnd.h>
 SNSBEGIN
 GridGravity SGridLayoutParam::parseGridGravity(const SStringW &strValue)
 {
@@ -180,7 +180,7 @@ SLayoutSize SGridLayoutParam::GetSpecifiedSize(ORIENTATION orientation) const
     case Any:
     case Both:
     default:
-        SASSERT_FMTA(FALSE, "GetSpecifiedSize can only be applied for Horz or Vert");
+        SASSERT_MSGA(FALSE, "GetSpecifiedSize can only be applied for Horz or Vert");
         return SLayoutSize();
     }
 }

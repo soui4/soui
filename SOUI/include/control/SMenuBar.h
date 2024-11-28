@@ -1,9 +1,13 @@
 ﻿#ifndef __SMENUBAR__H__
 #define __SMENUBAR__H__
 
+#include <core/SWnd.h>
 #include <helper/SMenu.h>
 
 SNSBEGIN
+
+#ifdef _WIN32
+
 class SMenuBarItem;
 
 class SOUI_EXP SMenuBar : public SWindow {
@@ -39,5 +43,6 @@ class SOUI_EXP SMenuBar : public SWindow {
     static SMenuBar *m_pMenuBar;
 };
 
+#endif//_WIN32
 SNSEND
 #endif // __SMENUBAR__H__

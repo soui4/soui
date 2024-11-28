@@ -185,7 +185,7 @@ SkData* CompressBitmapToFormat(const SkBitmap &bitmap, Format format) {
     SkData* dst = SkData::NewUninitialized(compressedDataSize);
 
     if (!CompressBufferToFormat((uint8_t*)dst->writable_data(), src, bitmap.colorType(),
-                                bitmap.width(), bitmap.height(), bitmap.rowBytes(), format)) {
+                                bitmap.width(), bitmap.height(), (int)bitmap.rowBytes(), format)) {
         dst->unref();
         dst = NULL;
     }

@@ -1,46 +1,229 @@
-﻿#include "souistd.h"
-#include "core/SNativeWnd.h"
+﻿#include <souistd.h>
+#include <helper/SCriticalSection.h>
+#include <core/SNativeWnd.h>
 
 SNSBEGIN
 
-SNativeWndHelper::SNativeWndHelper(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp)
-    : m_hInst(hInst)
-    , m_sharePtr(NULL)
-    , m_atom(0)
+//////////////////////////////////////////////////////////////////////////
+// thunk 技术实现参考http://www.cppblog.com/proguru/archive/2008/08/24/59831.html
+//////////////////////////////////////////////////////////////////////////
+
+#if defined(__i386__) ||defined(__X86__) || defined(_M_IX86)
+#pragma pack(push, 1)
+struct tagThunk
 {
-    InitializeCriticalSection(&m_cs);
+    DWORD m_mov;
+    DWORD m_this;
+    BYTE m_jmp;
+    DWORD m_relproc;
+    void Init(DWORD_PTR proc, void* pThis)
+    {
+        m_mov = 0x042444C7;
+        m_this = (DWORD)(ULONG_PTR)pThis;
+        m_jmp = 0xe9;
+        m_relproc = (DWORD)((INT_PTR)proc - ((INT_PTR)this + sizeof(tagThunk)));
+        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+    }
+    void* GetCodeAddress()
+    {
+        return this;
+    }
+};
+#pragma pack(pop)
+#elif defined(_M_AMD64) || defined(__amd64__)||defined(__x86_64__)
+#if defined(__linux__)
+#pragma pack(push, 2)
+struct tagThunk
+{
+    USHORT RdiMov;  // mov rdi, pThis
+    ULONG64 RdiImm; //
+    USHORT RaxMov;  // mov rax, target
+    ULONG64 RaxImm; //
+    USHORT RaxJmp;  // jmp target
+    void Init(DWORD_PTR proc, void* pThis)
+    {
+        RdiMov = 0xbf48;         // mov rdi, pThis
+        RdiImm = (ULONG64)pThis; //
+        RaxMov = 0xb848;         // mov rax, target
+        RaxImm = (ULONG64)proc;  //
+        RaxJmp = 0xe0ff;         // jmp rax
+        BOOL b = FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+    }
+    // some thunks will dynamically allocate the memory for the code
+    void* GetCodeAddress()
+    {
+        return this;
+    }
+};
+#else//__linux__
+#pragma pack(push, 2)
+struct tagThunk
+{
+    USHORT RcxMov;  // mov rcx, pThis
+    ULONG64 RcxImm; //
+    USHORT RaxMov;  // mov rax, target
+    ULONG64 RaxImm; //
+    USHORT RaxJmp;  // jmp target
+    void Init(DWORD_PTR proc, void* pThis)
+    {
+        RcxMov = 0xb948;         // mov rcx, pThis
+        RcxImm = (ULONG64)pThis; //
+        RaxMov = 0xb848;         // mov rax, target
+        RaxImm = (ULONG64)proc;  //
+        RaxJmp = 0xe0ff;         // jmp rax
+        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+    }
+    // some thunks will dynamically allocate the memory for the code
+    void* GetCodeAddress()
+    {
+        return this;
+    }
+};
+#pragma pack(pop)
+#endif//__linux__
+
+#elif defined(__arm__) || defined(_M_ARM)
+#pragma pack(push, 4)
+struct tagThunk // this should come out to 16 bytes
+{
+    DWORD m_mov_r0; // mov    r0, pThis
+    DWORD m_mov_pc; // mov    pc, pFunc
+    DWORD m_pThis;
+    DWORD m_pFunc;
+    void Init(DWORD_PTR proc, void* pThis)
+    {
+        m_mov_r0 = 0xE59F0000;
+        m_mov_pc = 0xE59FF000;
+        m_pThis = (DWORD)pThis;
+        m_pFunc = (DWORD)proc;
+        // write block from data cache and
+        //  flush from instruction cache
+        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+    }
+    void* GetCodeAddress()
+    {
+        return this;
+    }
+};
+#pragma pack(pop)
+#elif defined(__arm64__) || defined(_M_ARM64)
+#pragma pack(push, 1)
+struct tagThunk // this should come out to 16 bytes
+{
+    DWORD m_ldr_r16; // ldr  x16, [pc, #24]
+    DWORD m_ldr_r0;  // ldr  x0, [pc, #12]
+    DWORD m_br;      // br   x16
+    DWORD m_pad;
+    ULONG64 m_pThis;
+    ULONG64 m_pFunc;
+
+    void Init(DWORD_PTR proc, void* pThis)
+    {
+        m_ldr_r16 = 0x580000D0;
+        m_ldr_r0 = 0x58000060;
+        m_br = 0xd61f0200;
+        m_pThis = (ULONG64)pThis;
+        m_pFunc = (ULONG64)proc;
+        // write block from data cache and
+        //  flush from instruction cache          
+        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+
+    }
+    void* GetCodeAddress()
+    {
+        return this;
+    }
+};
+#pragma pack(pop)
+#else
+#error Only AMD64, ARM, ARM64 and X86 supported
+#endif
+
+
+class SNativeWndHelper {
+public:
+    HANDLE GetHeap()
+    {
+        return m_hHeap;
+    }
+
+    void LockSharePtr(void* p);
+    void UnlockSharePtr();
+    void* GetSharePtr()
+    {
+        return m_sharePtr;
+    }
+
+    HINSTANCE GetAppInstance()
+    {
+        return m_hInst;
+    }
+    ATOM GetSimpleWndAtom()
+    {
+        return m_atom;
+    }
+
+    BOOL Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp);
+
+public:
+    static  SNativeWndHelper* instance() {
+        static SNativeWndHelper _this;
+        return &_this;
+    }
+private:
+    SNativeWndHelper();
+    ~SNativeWndHelper();
+
+    HANDLE m_hHeap;
+    SCriticalSection m_cs;
+    void* m_sharePtr;
+
+    ATOM m_atom;
+    HINSTANCE m_hInst;
+};
+
+SNativeWndHelper::SNativeWndHelper()
+    : m_hInst(0)
+    , m_sharePtr(NULL)
+    , m_atom(0) {
+
+}
+
+BOOL SNativeWndHelper::Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp)
+{
+    SAutoLock lock(m_cs);
+    if (m_hHeap)
+        return FALSE;
+    m_hInst = hInst;
     m_hHeap = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE, 0, 0);
-    if (bImeApp)
-        m_atom = SNativeWnd::RegisterSimpleWnd2(m_hInst, pszClassName);
-    else
-        m_atom = SNativeWnd::RegisterSimpleWnd(m_hInst, pszClassName);
+    m_atom = SNativeWnd::RegisterSimpleWnd(m_hInst, pszClassName, bImeApp);
+    return TRUE;
 }
 
 SNativeWndHelper::~SNativeWndHelper()
 {
     if (m_hHeap)
         HeapDestroy(m_hHeap);
-    DeleteCriticalSection(&m_cs);
     if (m_atom)
-        UnregisterClass((LPCTSTR)m_atom, m_hInst);
+        UnregisterClass((LPCTSTR)(UINT_PTR)m_atom, m_hInst);
 }
 
-void SNativeWndHelper::LockSharePtr(void *p)
+void SNativeWndHelper::LockSharePtr(void* p)
 {
-    EnterCriticalSection(&m_cs);
+    m_cs.Enter();
     m_sharePtr = p;
 }
 
 void SNativeWndHelper::UnlockSharePtr()
 {
-    LeaveCriticalSection(&m_cs);
+    m_cs.Leave();
 }
 
 //////////////////////////////////////////////////////////////////////////
 SNativeWnd::SNativeWnd()
     : m_bDestoryed(FALSE)
     , m_pCurrentMsg(NULL)
-    , m_hWnd(NULL)
+    , m_hWnd(0)
     , m_pfnSuperWindowProc(::DefWindowProc)
     , m_pThunk(NULL)
 {
@@ -52,43 +235,34 @@ SNativeWnd::~SNativeWnd(void)
 {
 }
 
-ATOM SNativeWnd::RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName)
+ATOM SNativeWnd::RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName, BOOL bImeWnd)
 {
     WNDCLASSEX wcex = { sizeof(WNDCLASSEX), 0 };
     wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS;
-    wcex.lpfnWndProc = StartWindowProc; // 第一个处理函数
+    wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | (bImeWnd ? CS_IME : 0);
+    wcex.lpfnWndProc = StartWindowProc; // ��һ����������
     wcex.hInstance = hInst;
     wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
+    //wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
     wcex.lpszClassName = pszSimpleWndName;
     return ::RegisterClassEx(&wcex);
 }
 
-ATOM SNativeWnd::RegisterSimpleWnd2(HINSTANCE hInst, LPCTSTR pszSimpleWndName)
-{
-    WNDCLASSEX wcex = { sizeof(WNDCLASSEX), 0 };
-    wcex.cbSize = sizeof(WNDCLASSEX);
-    wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | CS_IME;
-    wcex.lpfnWndProc = StartWindowProc; // 第一个处理函数
-    wcex.hInstance = hInst;
-    wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
-    wcex.hbrBackground = (HBRUSH)(COLOR_WINDOW + 1);
-    wcex.lpszClassName = pszSimpleWndName;
-    return ::RegisterClassEx(&wcex);
+void SNativeWnd::InitWndClass(HINSTANCE hInst, LPCTSTR pszSimpleWndName, BOOL bImeWnd) {
+    //SWndSurface::Init();
+    SNativeWndHelper::instance()->Init(hInst, pszSimpleWndName, bImeWnd);
 }
 
 HWND SNativeWnd::CreateNative(LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam)
 {
-    SNativeWndHelper::getSingletonPtr()->LockSharePtr(this);
+    SNativeWndHelper::instance()->LockSharePtr(this);
 
-    m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::getSingletonPtr()->GetHeap(), HEAP_ZERO_MEMORY, sizeof(tagThunk));
-    // 在::CreateWindow返回之前会去调StarWindowProc函数
-    HWND hWnd = ::CreateWindowEx(dwExStyle, (LPCTSTR)SNativeWndHelper::getSingletonPtr()->GetSimpleWndAtom(), lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, (HMENU)(UINT_PTR)nID, SNativeWndHelper::getSingletonPtr()->GetAppInstance(), lpParam);
-    SNativeWndHelper::getSingletonPtr()->UnlockSharePtr();
+    m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::instance()->GetHeap(), HEAP_ZERO_MEMORY|HEAP_CREATE_ENABLE_EXECUTE, sizeof(tagThunk));
+    HWND hWnd = ::CreateWindowEx(dwExStyle, (LPCTSTR)(UINT_PTR)SNativeWndHelper::instance()->GetSimpleWndAtom(), lpWindowName, dwStyle, x, y, nWidth, nHeight, hWndParent, (HMENU)(UINT_PTR)nID, SNativeWndHelper::instance()->GetAppInstance(), lpParam);
+    SNativeWndHelper::instance()->UnlockSharePtr();
     if (!hWnd)
     {
-        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(), 0, m_pThunk);
+        HeapFree(SNativeWndHelper::instance()->GetHeap(), 0, m_pThunk);
         m_pThunk = NULL;
     }
     return hWnd;
@@ -103,17 +277,17 @@ void SNativeWnd::OnFinalMessage(HWND hWnd)
 {
     if (m_pThunk)
     {
-        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(), 0, m_pThunk);
+        HeapFree(SNativeWndHelper::instance()->GetHeap(), 0, m_pThunk);
         m_pThunk = NULL;
     }
-    m_hWnd = NULL;
+    m_hWnd = 0;
 }
 
 LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    SNativeWnd *pThis = (SNativeWnd *)hWnd; // 强转为对象指针
+    SNativeWnd *pThis = (SNativeWnd *)hWnd;
     MSG msg = { pThis->m_hWnd, uMsg, wParam, lParam };
-    const MSG *pOldMsg = pThis->m_pCurrentMsg;
+    const MSG* pOldMsg = pThis->m_pCurrentMsg;
     pThis->m_pCurrentMsg = &msg;
     LRESULT lRes = 0;
     if (pThis->m_msgHandlerInfo.fun)
@@ -148,7 +322,7 @@ LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
     {
         // clear out window handle
         HWND hWndThis = pThis->m_hWnd;
-        pThis->m_hWnd = NULL;
+        pThis->m_hWnd = 0;
         pThis->m_bDestoryed = FALSE;
         // clean up after window is destroyed
         pThis->m_pCurrentMsg = pOldMsg;
@@ -163,17 +337,15 @@ LRESULT CALLBACK SNativeWnd::WindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 
 LRESULT CALLBACK SNativeWnd::StartWindowProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
-    SNativeWnd *pThis = (SNativeWnd *)SNativeWndHelper::getSingletonPtr()->GetSharePtr();
-
+    SNativeWnd *pThis = (SNativeWnd *)SNativeWndHelper::instance()->GetSharePtr();
+    SNativeWndHelper::instance()->UnlockSharePtr();
     pThis->m_hWnd = hWnd;
     // 初始化Thunk，做了两件事:1、mov指令替换hWnd为对象指针，2、jump指令跳转到WindowProc
     pThis->m_pThunk->Init((DWORD_PTR)WindowProc, pThis);
-
     // 得到Thunk指针
     WNDPROC pProc = (WNDPROC)pThis->m_pThunk->GetCodeAddress();
     // 调用下面的语句后，以后消息来了，都由pProc处理
-    ::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pProc);
-
+    ::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pProc); 
     return pProc(hWnd, uMsg, wParam, lParam);
 }
 
@@ -181,13 +353,13 @@ BOOL SNativeWnd::SubclassWindow(HWND hWnd)
 {
     SASSERT(::IsWindow(hWnd));
     // Allocate the thunk structure here, where we can fail gracefully.
-    m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::getSingletonPtr()->GetHeap(), HEAP_ZERO_MEMORY, sizeof(tagThunk));
+    m_pThunk = (tagThunk *)HeapAlloc(SNativeWndHelper::instance()->GetHeap(), HEAP_ZERO_MEMORY | HEAP_CREATE_ENABLE_EXECUTE, sizeof(tagThunk));
     m_pThunk->Init((DWORD_PTR)WindowProc, this);
     WNDPROC pProc = (WNDPROC)m_pThunk->GetCodeAddress();
     WNDPROC pfnWndProc = (WNDPROC)::SetWindowLongPtr(hWnd, GWLP_WNDPROC, (LONG_PTR)pProc);
     if (pfnWndProc == NULL)
     {
-        HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(), 0, m_pThunk);
+        HeapFree(SNativeWndHelper::instance()->GetHeap(), 0, m_pThunk);
         m_pThunk = NULL;
         return FALSE;
     }
@@ -198,25 +370,25 @@ BOOL SNativeWnd::SubclassWindow(HWND hWnd)
 
 HWND SNativeWnd::UnsubclassWindow(BOOL bForce /*= FALSE*/)
 {
-    SASSERT(m_hWnd != NULL);
+    SASSERT(m_hWnd != 0);
 
     WNDPROC pOurProc = (WNDPROC)m_pThunk->GetCodeAddress();
     WNDPROC pActiveProc = (WNDPROC)::GetWindowLongPtr(m_hWnd, GWLP_WNDPROC);
 
-    HWND hWnd = NULL;
+    HWND hWnd = 0;
     if (bForce || pOurProc == pActiveProc)
     {
         if (!::SetWindowLongPtr(m_hWnd, GWLP_WNDPROC, (LONG_PTR)m_pfnSuperWindowProc))
-            return NULL;
+            return 0;
 
         m_pfnSuperWindowProc = ::DefWindowProc;
         hWnd = m_hWnd;
-        m_hWnd = NULL;
+        m_hWnd = 0;
     }
     return hWnd;
 }
 
-LRESULT SNativeWnd::ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
+LRESULT SNativeWnd::ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
     LRESULT lResult = 0;
     switch (uMsg)
@@ -232,13 +404,6 @@ LRESULT SNativeWnd::ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     case WM_CHARTOITEM:
     case WM_HSCROLL:
     case WM_VSCROLL:
-    case WM_CTLCOLORBTN:
-    case WM_CTLCOLORDLG:
-    case WM_CTLCOLOREDIT:
-    case WM_CTLCOLORLISTBOX:
-    case WM_CTLCOLORMSGBOX:
-    case WM_CTLCOLORSCROLLBAR:
-    case WM_CTLCOLORSTATIC:
         bHandled = TRUE;
         lResult = ::SendMessage(GetParent(), uMsg, wParam, lParam);
         break;
@@ -249,9 +414,9 @@ LRESULT SNativeWnd::ForwardNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     return lResult;
 }
 
-LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL &bHandled)
+LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL& bHandled)
 {
-    HWND hWndChild = NULL;
+    HWND hWndChild = 0;
 
     switch (uMsg)
     {
@@ -270,7 +435,7 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
             hWndChild = (HWND)lParam;
             break;
         default:
-            hWndChild = GetDlgItem(m_hWnd, HIWORD(wParam));
+//            hWndChild = GetDlgItem(m_hWnd, HIWORD(wParam));
             break;
         }
         break;
@@ -279,8 +444,8 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
             hWndChild = ((LPDRAWITEMSTRUCT)lParam)->hwndItem;
         break;
     case WM_MEASUREITEM:
-        if (wParam) // not from a menu
-            hWndChild = GetDlgItem(m_hWnd, ((LPMEASUREITEMSTRUCT)lParam)->CtlID);
+        //if (wParam) // not from a menu
+        //    hWndChild = GetDlgItem(m_hWnd, ((LPMEASUREITEMSTRUCT)lParam)->CtlID);
         break;
     case WM_COMPAREITEM:
         if (wParam) // not from a menu
@@ -297,20 +462,20 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     case WM_VSCROLL:
         hWndChild = (HWND)lParam;
         break;
-    case WM_CTLCOLORBTN:
-    case WM_CTLCOLORDLG:
-    case WM_CTLCOLOREDIT:
-    case WM_CTLCOLORLISTBOX:
-    case WM_CTLCOLORMSGBOX:
-    case WM_CTLCOLORSCROLLBAR:
-    case WM_CTLCOLORSTATIC:
-        hWndChild = (HWND)lParam;
+    //case WM_CTLCOLORBTN:
+    //case WM_CTLCOLORDLG:
+    //case WM_CTLCOLOREDIT:
+    //case WM_CTLCOLORLISTBOX:
+    //case WM_CTLCOLORMSGBOX:
+    //case WM_CTLCOLORSCROLLBAR:
+    //case WM_CTLCOLORSTATIC:
+    //    hWndChild = (HWND)lParam;
         break;
     default:
         break;
     }
 
-    if (hWndChild == NULL)
+    if (hWndChild == 0)
     {
         bHandled = FALSE;
         return 1;
@@ -320,7 +485,7 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     return ::SendMessage(hWndChild, OCM__BASE + uMsg, wParam, lParam);
 }
 
-BOOL SNativeWnd::DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult)
+BOOL SNativeWnd::DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult)
 {
     switch (uMsg)
     {
@@ -335,13 +500,13 @@ BOOL SNativeWnd::DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, L
     case OCM_CHARTOITEM:
     case OCM_HSCROLL:
     case OCM_VSCROLL:
-    case OCM_CTLCOLORBTN:
-    case OCM_CTLCOLORDLG:
-    case OCM_CTLCOLOREDIT:
-    case OCM_CTLCOLORLISTBOX:
-    case OCM_CTLCOLORMSGBOX:
-    case OCM_CTLCOLORSCROLLBAR:
-    case OCM_CTLCOLORSTATIC:
+    //case OCM_CTLCOLORBTN:
+    //case OCM_CTLCOLORDLG:
+    //case OCM_CTLCOLOREDIT:
+    //case OCM_CTLCOLORLISTBOX:
+    //case OCM_CTLCOLORMSGBOX:
+    //case OCM_CTLCOLORSCROLLBAR:
+    //case OCM_CTLCOLORSTATIC:
         lResult = ::DefWindowProc(hWnd, uMsg - OCM__BASE, wParam, lParam);
         return TRUE;
     default:
@@ -357,7 +522,7 @@ LRESULT SNativeWnd::DefWindowProc(UINT uMsg, WPARAM wParam, LPARAM lParam)
 
 LRESULT SNativeWnd::DefWindowProc()
 {
-    const MSG *pMsg = m_pCurrentMsg;
+    const MSG* pMsg = m_pCurrentMsg;
     LRESULT lRes = 0;
     if (pMsg != NULL)
         lRes = DefWindowProc(pMsg->message, pMsg->wParam, pMsg->lParam);
@@ -370,18 +535,18 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
 
     // determine owner window to center against
     DWORD dwStyle = GetStyle();
-    if (hWndCenter == NULL)
+    if (hWndCenter == 0)
     {
         if (dwStyle & WS_CHILD)
             hWndCenter = ::GetParent(m_hWnd);
         else
             hWndCenter = ::GetWindow(m_hWnd, GW_OWNER);
 
-        if (hWndCenter == NULL)
+        if (hWndCenter == 0)
         {
             hWndCenter = ::GetActiveWindow();
             if (hWndCenter == m_hWnd)
-                hWndCenter = NULL;
+                hWndCenter = 0;
         }
     }
 
@@ -394,19 +559,19 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
     if (!(dwStyle & WS_CHILD))
     {
         // don't center against invisible or minimized windows
-        if (hWndCenter != NULL)
+        if (hWndCenter != 0)
         {
             DWORD dwStyleCenter = (DWORD)::GetWindowLongPtr(hWndCenter, GWL_STYLE);
             if (!(dwStyleCenter & WS_VISIBLE) || (dwStyleCenter & WS_MINIMIZE))
-                hWndCenter = NULL;
+                hWndCenter = 0;
         }
 
         // center within screen coordinates
 #if WINVER < 0x0500
         ::SystemParametersInfo(SPI_GETWORKAREA, NULL, &rcArea, NULL);
 #else
-        HMONITOR hMonitor = NULL;
-        if (hWndCenter != NULL)
+        HMONITOR hMonitor = 0;
+        if (hWndCenter != 0)
         {
             hMonitor = ::MonitorFromWindow(hWndCenter, MONITOR_DEFAULTTONEAREST);
         }
@@ -421,7 +586,7 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
 
         rcArea = minfo.rcWork;
 #endif
-        if (hWndCenter == NULL)
+        if (hWndCenter == 0)
             rcCenter = rcArea;
         else
             ::GetWindowRect(hWndCenter, &rcCenter);
@@ -435,7 +600,7 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
         ::GetClientRect(hWndParent, &rcArea);
         SASSERT(::IsWindow(hWndCenter));
         ::GetClientRect(hWndCenter, &rcCenter);
-        ::MapWindowPoints(hWndCenter, hWndParent, (POINT *)&rcCenter, 2);
+        ::MapWindowPoints(hWndCenter, hWndParent, (POINT*)&rcCenter, 2);
     }
 
     int DlgWidth = rcDlg.right - rcDlg.left;
@@ -457,7 +622,7 @@ BOOL SNativeWnd::CenterWindow(HWND hWndCenter /*= NULL*/)
         yTop = rcArea.top;
 
     // map screen coordinates to child coordinates
-    return ::SetWindowPos(m_hWnd, NULL, xLeft, yTop, -1, -1, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+    return ::SetWindowPos(m_hWnd, 0, xLeft, yTop, -1, -1, SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
 }
 
 BOOL SNativeWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
@@ -472,7 +637,7 @@ BOOL SNativeWnd::ModifyStyle(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
     ::SetWindowLongPtr(m_hWnd, GWL_STYLE, dwNewStyle);
     if (nFlags != 0)
     {
-        ::SetWindowPos(m_hWnd, NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | nFlags);
+        ::SetWindowPos(m_hWnd, 0, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | nFlags);
     }
 
     return TRUE;
@@ -490,27 +655,33 @@ BOOL SNativeWnd::ModifyStyleEx(DWORD dwRemove, DWORD dwAdd, UINT nFlags /*= 0*/)
     ::SetWindowLongPtr(m_hWnd, GWL_EXSTYLE, dwNewStyle);
     if (nFlags != 0)
     {
-        ::SetWindowPos(m_hWnd, NULL, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | nFlags);
+        ::SetWindowPos(m_hWnd, 0, 0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE | SWP_NOZORDER | SWP_NOACTIVATE | nFlags);
     }
 
     return TRUE;
 }
 
-BOOL SNativeWnd::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT &lResult, DWORD dwMsgMapID /*= 0*/)
+BOOL SNativeWnd::ProcessWindowMessage(HWND hWnd, UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT& lResult, DWORD dwMsgMapID /*= 0*/)
 {
     return FALSE;
 }
 
-BOOL SNativeWnd::UpdateLayeredWindow(HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags)
+BOOL SNativeWnd::UpdateLayeredWindow(HDC hdcDst, POINT* pptDst, SIZE* psize, HDC hdcSrc, POINT* pptSrc, COLORREF crKey, BLENDFUNCTION* pblend, DWORD dwFlags)
 {
     SASSERT(::IsWindow(m_hWnd));
-    return ::UpdateLayeredWindow(m_hWnd, hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend, dwFlags);
+    return FALSE;
+    //return ::UpdateLayeredWindow(m_hWnd, hdcDst, pptDst, psize, hdcSrc, pptSrc, crKey, pblend, dwFlags);
 }
 
 BOOL SNativeWnd::SetLayeredWindowAttributes(COLORREF crKey, BYTE bAlpha, DWORD dwFlags)
 {
     SASSERT(::IsWindow(m_hWnd));
     return ::SetLayeredWindowAttributes(m_hWnd, crKey, bAlpha, dwFlags);
+}
+
+BOOL SNativeWnd::SetLayeredWindowAlpha(BYTE byAlpha) {
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SetLayeredWindowAttributes(m_hWnd, 0, byAlpha, LWA_ALPHA);
 }
 
 int SNativeWnd::SetWindowRgn(HRGN hRgn, BOOL bRedraw /*=TRUE*/)
@@ -567,12 +738,6 @@ BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
     return ::SetWindowText(m_hWnd, lpszString);
 }
 
-BOOL SNativeWnd::SendNotifyMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
-{
-    SASSERT(::IsWindow(m_hWnd));
-    return ::SendNotifyMessage(m_hWnd, message, wParam, lParam);
-}
-
 BOOL SNativeWnd::PostMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
 {
     SASSERT(::IsWindow(m_hWnd));
@@ -619,10 +784,10 @@ BOOL SNativeWnd::HideCaret()
     return ::HideCaret(m_hWnd);
 }
 
-BOOL SNativeWnd::CreateCaret(HBITMAP hBitmap)
+BOOL SNativeWnd::CreateCaret(HBITMAP hBitmap,int nWidth,int nHeight)
 {
     SASSERT(::IsWindow(m_hWnd));
-    return ::CreateCaret(m_hWnd, hBitmap, 0, 0);
+    return ::CreateCaret(m_hWnd, hBitmap, nWidth, nHeight);
 }
 
 int SNativeWnd::ReleaseDC(HDC hDC)
@@ -634,7 +799,8 @@ int SNativeWnd::ReleaseDC(HDC hDC)
 HDC SNativeWnd::GetWindowDC()
 {
     SASSERT(::IsWindow(m_hWnd));
-    return ::GetWindowDC(m_hWnd);
+    return 0;
+    //return ::GetWindowDC(m_hWnd);
 }
 
 HDC SNativeWnd::GetDC()
@@ -649,7 +815,7 @@ BOOL SNativeWnd::KillTimer(UINT_PTR nIDEvent)
     return ::KillTimer(m_hWnd, nIDEvent);
 }
 
-UINT_PTR SNativeWnd::SetTimer(UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/)
+UINT_PTR SNativeWnd::SetTimer(UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK* lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/)
 {
     SASSERT(::IsWindow(m_hWnd));
     return ::SetTimer(m_hWnd, nIDEvent, nElapse, (TIMERPROC)lpfnTimer);
@@ -784,18 +950,18 @@ int SNativeWnd::GetDlgCtrlID() const
     return ::GetDlgCtrlID(m_hWnd);
 }
 
-const MSG *SNativeWnd::GetCurrentMessage() const
+const MSG* SNativeWnd::GetCurrentMessage() const
 {
     return m_pCurrentMsg;
 }
 
-void SNativeWnd::SetMsgHandler(THIS_ FunMsgHandler fun, void *ctx)
+void SNativeWnd::SetMsgHandler(THIS_ FunMsgHandler fun, void* ctx)
 {
     m_msgHandlerInfo.fun = fun;
     m_msgHandlerInfo.ctx = ctx;
 }
 
-MsgHandlerInfo *SNativeWnd::GetMsgHandler()
+MsgHandlerInfo* SNativeWnd::GetMsgHandler()
 {
     return &m_msgHandlerInfo;
 }

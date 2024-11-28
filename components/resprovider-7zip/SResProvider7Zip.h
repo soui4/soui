@@ -5,8 +5,7 @@
 #include <string/tstring.h>
 #include <string/strcpcvt.h>
 #include <souicoll.h>
-#define _COLL_NS SOUI
-#define SOUI_EXP
+//#define _COLL_NS SOUI
 #include <helper/SResID.h>
 #include <interface/SRender-i.h>
 

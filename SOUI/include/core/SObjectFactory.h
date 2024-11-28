@@ -15,6 +15,8 @@
 #define __SOBJECTFACTORY__H__
 #include <core/SCmnMap.h>
 #include <helper/obj-ref-impl.hpp>
+#include <interface/SObjFactory-i.h>
+
 SNSBEGIN
 
 SOUI_EXP SObjectInfo ObjInfo_New(LPCWSTR name, int type);

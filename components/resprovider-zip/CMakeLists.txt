@@ -1,4 +1,4 @@
-add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+add_definitions(-D_CRT_SECURE_NO_WARNINGS -DZIP_DISABLE_WILDCARD)
 
 include_directories(${PROJECT_SOURCE_DIR}/third-part/zlib)
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
@@ -11,7 +11,6 @@ set(resprovider-zip_header
 )
 
 set(resprovider-zip_src 
-    cursoricon.cpp
     SResProviderZip.cpp
     zipArchive.cpp
 )
@@ -26,6 +25,8 @@ if (NOT ENABLE_SOUI_COM_LIB)
 else()
     add_library(resprovider-zip STATIC ${resprovider-zip_src} ${resprovider-zip_header})
 endif()
+
+add_dependencies(resprovider-zip zlib utilities4)
 
 set(COM_LIBS ${COM_LIBS} resprovider-zip CACHE INTERNAL "com_lib")
 set_target_properties (resprovider-zip PROPERTIES

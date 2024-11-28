@@ -1,14 +1,58 @@
 ﻿#include <souistd.h>
-#include <control/Srealwnd.h>
+#include <control/SRealWnd.h>
 #include <interface/SRealWndHandler-i.h>
+#include <helper/obj-ref-impl.hpp>
 
 SNSBEGIN
+
+class DefRealWndHandler : public  TObjRefImpl2<IRealWndHandler, DefRealWndHandler> {
+public:
+    DefRealWndHandler(SRealWnd* pRealWnd):m_owner(pRealWnd) {
+
+    }
+
+    HWND WINAPI OnRealWndCreate(IWindow* pRealWnd) OVERRIDE {
+        EventRealWndCreate evt(m_owner);
+        evt.hRet = 0;
+        m_owner->FireEvent(&evt);
+        return evt.hRet;
+    }
+    void WINAPI OnRealWndDestroy(IWindow* pRealWnd) OVERRIDE {
+        EventRealWndDestroy evt(m_owner);
+        m_owner->FireEvent(&evt);
+    }
+    BOOL WINAPI OnRealWndInit(IWindow* pRealWnd) OVERRIDE {
+        EventRealWndInit evt(m_owner);
+        evt.bRet = FALSE;
+        m_owner->FireEvent(&evt);
+        return evt.bRet;
+    }
+
+    BOOL WINAPI OnRealWndPosition(IWindow* pRealWnd, const RECT* rcWnd) OVERRIDE {
+        EventRealWndPosition evt(m_owner);
+        evt.rc = *rcWnd;
+        evt.bRet = FALSE;
+        m_owner->FireEvent(&evt);
+        return evt.bRet;
+    }
+protected:
+    SRealWnd* m_owner;
+};
 
 SRealWnd::SRealWnd()
     : m_bInit(FALSE)
     , m_lpData(0)
     , m_hRealWnd(0)
 {
+    GetEventSet()->addEvent(EVENTID(EventRealWndCreate));
+    GetEventSet()->addEvent(EVENTID(EventRealWndDestroy));
+    GetEventSet()->addEvent(EVENTID(EventRealWndInit));
+    GetEventSet()->addEvent(EVENTID(EventRealWndPosition));
+
+    m_pRealWndHandler = GETREALWNDHANDLER;
+    if (!m_pRealWndHandler) {
+        m_pRealWndHandler.Attach(new DefRealWndHandler(this));
+    }
 }
 
 SRealWnd::~SRealWnd()
@@ -42,9 +86,7 @@ void SRealWnd::OnDestroy()
 {
     if (IsWindow(m_hRealWnd))
     {
-        IRealWndHandler *pRealWndHandler = GETREALWNDHANDLER;
-        if (pRealWndHandler)
-            pRealWndHandler->OnRealWndDestroy(this);
+        m_pRealWndHandler->OnRealWndDestroy(this);
     }
     __baseCls::OnDestroy();
 }
@@ -78,25 +120,14 @@ HWND SRealWnd::GetRealHwnd(BOOL bAutoCreate /*=TRUE*/)
 BOOL SRealWnd::InitRealWnd()
 {
     m_dwStyle |= WS_CHILD;
-
-    IRealWndHandler *pRealWndHandler = GETREALWNDHANDLER;
-
-    if (pRealWndHandler)
-        m_hRealWnd = pRealWndHandler->OnRealWndCreate(this);
+    m_hRealWnd = m_pRealWndHandler->OnRealWndCreate(this);
 
     if (::IsWindow(m_hRealWnd))
     {
-        if (!m_bInit && !pRealWndHandler->OnRealWndSize(this))
-        {
-            //如果不是在加载的时候创建窗口，则需要自动调整窗口位置
-            CRect rcClient;
-            GetClientRect(&rcClient);
-            SetWindowPos(m_hRealWnd, 0, rcClient.left, rcClient.top, rcClient.Width(), rcClient.Height(), SWP_NOZORDER);
-        }
-
-        if (pRealWndHandler)
-            pRealWndHandler->OnRealWndInit(this);
-
+        CRect rcClient;
+        GetClientRect(&rcClient);
+        SetRealWndPos(m_hRealWnd, &rcClient);
+        m_pRealWndHandler->OnRealWndInit(this);
         return TRUE;
     }
     return FALSE;
@@ -107,20 +138,25 @@ BOOL SRealWnd::OnRelayout(const CRect &rcWnd)
     if (!__baseCls::OnRelayout(rcWnd))
         return FALSE;
 
-    IRealWndHandler *pRealWndHandler = GETREALWNDHANDLER;
     HWND hRealWnd = GetRealHwnd(FALSE);
-    if (pRealWndHandler && ::IsWindow(hRealWnd))
+    if (::IsWindow(hRealWnd))
     {
-        if (!pRealWndHandler->OnRealWndPosition(this, rcWnd))
-        {
-            CPoint pt = rcWnd.TopLeft();
-            if (GetWindowLong(hRealWnd, GWL_STYLE) & WS_POPUP)
-            {
-                ::ClientToScreen(GetContainer()->GetHostHwnd(), &pt);
-            }
-            ::SetWindowPos(hRealWnd, 0, pt.x, pt.y, rcWnd.Width(), rcWnd.Height(), SWP_NOZORDER);
-        }
+        SetRealWndPos(hRealWnd, &rcWnd);
     }
     return TRUE;
 }
+
+void SRealWnd::SetRealWndPos(HWND hRealWnd,const CRect* prc)
+{
+    if (!m_pRealWndHandler->OnRealWndPosition(this, prc))
+    {
+        CPoint pt = prc->TopLeft();
+        if (GetWindowLong(hRealWnd, GWL_STYLE) & WS_POPUP)
+        {
+            ::ClientToScreen(GetContainer()->GetHostHwnd(), &pt);
+        }
+        ::SetWindowPos(hRealWnd, 0, pt.x, pt.y, prc->Width(), prc->Height(), SWP_NOZORDER);
+    }
+}
+
 SNSEND

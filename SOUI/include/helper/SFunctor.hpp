@@ -1,6 +1,6 @@
 #pragma once
 #include <interface/STaskLoop-i.h>
-#include <interface/smsgloop-i.h>
+#include <interface/SMsgLoop-i.h>
 #include <interface/SWndContainer-i.h>
 #include <helper/obj-ref-impl.hpp>
 #if _MSC_VER >= 1700

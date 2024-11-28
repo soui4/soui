@@ -159,7 +159,7 @@ void SkPicturePlayback::draw(SkCanvas* canvas, SkDrawPictureCallback* callback) 
         DrawType op = ReadOpAndSize(&reader, &size);
         if (NOOP == op) {
             // NOOPs are to be ignored - do not propagate them any further
-            SkipIterTo(&it, &reader, fCurOffset + size);
+            SkipIterTo(&it, &reader, (uint32_t)fCurOffset + size);
             continue;
         }
 

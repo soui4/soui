@@ -21,12 +21,8 @@ public:
 	void Attach(const BYTE * pdata,int nWid,int nHei,int nDelay);
 
 	STDMETHOD_(BOOL,GetSize)(THIS_ UINT *pWid,UINT *pHei) OVERRIDE;
-	STDMETHOD_(BOOL,CopyPixels)(THIS_ 
-		/* [unique][in] */ const RECT *prc,
-		/* [in] */ UINT cbStride,
-		/* [in] */ UINT cbBufferSize,
-		/* [size_is][out] */ BYTE *pbBuffer) OVERRIDE;
 	STDMETHOD_(int,GetDelay)(THIS) OVERRIDE {return m_nFrameDelay;}
+	STDMETHOD_(const VOID *,GetPixels)(CTHIS) SCONST OVERRIDE;
 protected:
 	int     m_nFrameDelay;
 	int     m_nWid, m_nHei;

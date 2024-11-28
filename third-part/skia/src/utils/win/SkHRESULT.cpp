@@ -6,7 +6,7 @@
  */
 
 #include "SkTypes.h"
-
+#include <windows.h>
 #include "SkHRESULT.h"
 
 void SkTraceHR(const char* file, unsigned long line, HRESULT hr, const char* msg) {
@@ -14,7 +14,7 @@ void SkTraceHR(const char* file, unsigned long line, HRESULT hr, const char* msg
         SkDebugf("%s\n", msg);
     }
     SkDebugf("%s(%lu) : error 0x%x: ", file, line, hr);
-
+/*
     LPSTR errorText = NULL;
     FormatMessageA(FORMAT_MESSAGE_ALLOCATE_BUFFER |
                    FORMAT_MESSAGE_FROM_SYSTEM |
@@ -34,4 +34,5 @@ void SkTraceHR(const char* file, unsigned long line, HRESULT hr, const char* msg
         LocalFree(errorText);
         errorText = NULL;
     }
+    */
 }

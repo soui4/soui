@@ -1,10 +1,10 @@
 #pragma once
-#include <interface/SIpcObj-i.h>
+#include <interface/sipcobj-i.h>
 #include <helper/obj-ref-impl.hpp>
 #include <map>
 #include "ShareMemBuffer.h"
 
-#ifdef _LIB
+#if defined(_LIB) || !defined(_WIN32)
 #define SIPC_API
 #define SIPC_COM_C 
 #else

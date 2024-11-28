@@ -144,10 +144,10 @@ bool SkWStream::writePackedUInt(size_t value) {
     uint8_t data[5];
     size_t len = 1;
     if (value <= SK_MAX_BYTE_FOR_U8) {
-        data[0] = value;
+        data[0] = (uint8_t)value;
         len = 1;
     } else if (value <= 0xFFFF) {
-        uint16_t value16 = value;
+        uint16_t value16 = (uint16_t)value;
         data[0] = SK_BYTE_SENTINEL_FOR_U16;
         memcpy(&data[1], &value16, 2);
         len = 3;

@@ -12,6 +12,9 @@
 
 #include "SkAdvancedTypefaceMetrics.h"
 #include "SkWeakRefCnt.h"
+#ifndef DEFAULT_CHARSET
+#define DEFAULT_CHARSET 1
+#endif//DEFAULT_CHARSET
 
 class SkDescriptor;
 class SkFontDescriptor;

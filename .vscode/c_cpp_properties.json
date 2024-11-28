@@ -1,0 +1,20 @@
+{
+    "version": 4,
+    "configurations": [        
+        {
+            "name": "linux",
+            "includePath": [
+                "${workspaceFolder}/**",
+                "${workspaceFolder}/platform",
+                "${workspaceFolder}/platform/linux/include",
+                "${workspaceFolder}/utilities/include",
+                "${workspaceFolder}/third-part/gtest/include"
+            ],
+            "defines": [],
+            "compilerPath": "/usr/bin/g++",
+            "cStandard": "c17",
+            "cppStandard": "c++14",
+            "intelliSenseMode": "linux-clang-x64"
+        }
+    ]
+}

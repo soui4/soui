@@ -16,7 +16,7 @@
 #include <stdio.h>
 #include <typeinfo>
 #include <lua.h>
-#include <Windows.h>
+#include <windows.h>
 
 #ifndef UAPI
 #define UAPI __stdcall
@@ -550,7 +550,7 @@ namespace lua_tinker
       lua_pushcclosure ( L, functor<RVal, T1, T2, T3, T4, T5>::invoke, 1 );
    }
 
-#ifndef _WIN64
+#if defined(_WIN32) && !defined(_WIN64)
    template<typename RVal>
    void push_functor ( lua_State *L, RVal (UAPI *func )( ) )
    {
@@ -1296,7 +1296,7 @@ namespace lua_tinker
       ( void ) func;
       lua_pushcclosure ( L, mem_functor<RVal, T, T1, T2, T3, T4, T5,T6,T7,T8,T9,T10>::invoke, 1 );
    }
-#ifndef _WIN64
+#if defined(_WIN32) && !defined(_WIN64)
    // push_functor
    template<typename RVal, typename T>
    void push_functor ( lua_State *L, RVal (UAPI T::*func )( ) )

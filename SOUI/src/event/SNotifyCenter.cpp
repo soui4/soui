@@ -1,6 +1,8 @@
 ﻿#include "souistd.h"
 #include <event/SNotifyCenter.h>
 #include <helper/SFunctor.hpp>
+#include <core/SNativeWnd.h>
+
 SNSBEGIN
 
 template <>

@@ -95,7 +95,7 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
      * @brief 创建Menu对象
      * @return IMenu * -- Menu对象
      */
-    STDMETHOD_(IMenu *, CreateMenu)(THIS_ HMENU hMenu DEF_VAL(NULL)) PURE;
+    STDMETHOD_(IMenu *, CreateMenu)(THIS_ HMENU hMenu DEF_VAL(0)) PURE;
 
     /** CreateMenuEx
      * @brief 创建MenuEx对象

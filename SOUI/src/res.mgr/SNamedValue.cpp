@@ -4,7 +4,7 @@
 
 #include "souistd.h"
 #include "res.mgr/SNamedValue.h"
-#include "core/swndstyle.h"
+#include "core/SWndStyle.h"
 
 SNSBEGIN
 

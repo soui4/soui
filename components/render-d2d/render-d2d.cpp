@@ -5,7 +5,6 @@
 #include <gdialpha.h>
 #define _USE_MATH_DEFINES
 #include <math.h>
-#include <trace.h>
 #include <tchar.h>
 #include <algorithm>
 #include <atl.mini/SComHelper.h>
@@ -172,7 +171,7 @@ namespace SOUI
 
 	static D2D1_RECT_F toRectF(LPCRECT pRc,BOOL bDec5=FALSE)
 	{
-		D2D1_RECT_F ret={pRc->left,pRc->top,pRc->right,pRc->bottom};
+		D2D1_RECT_F ret={(float)pRc->left,(float)pRc->top,(float)pRc->right,(float)pRc->bottom};
 		if(bDec5){
 			ret.left+=0.5f;
 			ret.top +=0.5f;
@@ -183,7 +182,7 @@ namespace SOUI
 	}
 
 	static D2D1_POINT_2F toPointF(POINT pt){
-		D2D1_POINT_2F ret = {pt.x,pt.y};
+		D2D1_POINT_2F ret = { (float)pt.x,(float)pt.y};
 		return ret;
 	}
 
@@ -546,7 +545,7 @@ namespace SOUI
 			case Brush_Shader:
 				{
 					SComPtr<ID2D1GradientStopCollection> collection;
-					int nCount = m_arrGradItem.GetCount();
+					int nCount = (int)m_arrGradItem.GetCount();
 					D2D1_GRADIENT_STOP* gradientStops = new D2D1_GRADIENT_STOP [nCount];
 					for (int i=0;i<nCount;i++)
 					{
@@ -621,10 +620,10 @@ namespace SOUI
 							{
 								SComPtr<ID2D1RadialGradientBrush> brush;
 								D2D1_RADIAL_GRADIENT_BRUSH_PROPERTIES properties;
-								properties.center.x = m_gradInfo.sweep.centerX;
-								properties.center.y = m_gradInfo.sweep.centerY;
+								properties.center.x = m_gradInfo.radial.centerX*(pRect->right-pRect->left);
+								properties.center.y = m_gradInfo.radial.centerY*(pRect->bottom-pRect->top);
 								properties.gradientOriginOffset.x = properties.gradientOriginOffset.y = 0.0f;
-								properties.radiusX = properties.radiusY = m_gradInfo.radius;
+								properties.radiusX = properties.radiusY = m_gradInfo.radial.radius;
 								if(SUCCEEDED(hr=pRT->CreateRadialGradientBrush(properties,collection,&brush)))
 									return (ID2D1Brush*)brush;
 							}
@@ -675,17 +674,17 @@ namespace SOUI
 		do{
 			HRESULT hr = Init(nWid,nHei,NULL);
 			if(hr!=S_OK) break;
-			WICRect rc={0,0,nWid,nHei};
+			WICRect rc={0,0,(int)nWid,(int)nHei};
 			IWICBitmapLock *lock=NULL;
 			hr=m_bmp2->Lock(&rc,WICBitmapLockWrite,&lock);
 			if(hr!=S_OK) break;
-			RECT rc2={0,0,nWid,nHei};
+			RECT rc2={0,0,(LONG)nWid,(LONG)nHei};
 			UINT stride=0;
 			lock->GetStride(&stride);
 			UINT bufSize=0;
 			BYTE *pBuf=NULL;
 			lock->GetDataPointer(&bufSize,&pBuf);
-			hr = pFrame->CopyPixels(&rc2,stride,bufSize,pBuf);
+			memcpy(pBuf,pFrame->GetPixels(),nHei*stride);
 			lock->Release();
 			m_sz.cx = nWid;
 			m_sz.cy = nHei;
@@ -1066,7 +1065,7 @@ namespace SOUI
 		else{
 			ID2D1Factory *pFac = toD2DFac(GetRenderFactory());
 			SComPtr<ID2D1RoundedRectangleGeometry> hrgn;
-			D2D1_ROUNDED_RECT rc={toRectF(lprect),ptRadius.x,ptRadius.y};
+			D2D1_ROUNDED_RECT rc={toRectF(lprect),(float)ptRadius.x,(float)ptRadius.y};
 			pFac->CreateRoundedRectangleGeometry(rc,&hrgn);
 			CombineGeometry(hrgn,nCombineMode);
 			m_bRect = FALSE;
@@ -1391,7 +1390,7 @@ namespace SOUI
 
 	HRESULT SRenderTarget_D2D::DrawText( LPCTSTR pszText,int cchLen,LPRECT pRc,UINT uFormat)
 	{
-		if(cchLen<0) cchLen = _tcslen(pszText);
+		if(cchLen<0) cchLen = (int)_tcslen(pszText);
 		ID2D1Factory *pFac = toD2DFac(m_pRenderFactory);
 		IDWriteFactory *pWriteFac = toD2DWriteFac(m_pRenderFactory);
 		SFont_D2D *pFont = m_curFont;
@@ -1438,7 +1437,7 @@ namespace SOUI
 			layout->SetStrikethrough(lf->lfStrikeOut,range);
 			layout->SetUnderline(lf->lfUnderline,range);
 			SBrush_D2D *pBr = SBrush_D2D::CreateSolidBrush(m_pRenderFactory,m_curColor.toCOLORREF());
-			D2D1_POINT_2F pt={pRc->left,pRc->top};
+			D2D1_POINT_2F pt={ (float)pRc->left,(float)pRc->top};
 			m_rt->PushAxisAlignedClip(toRectF(pRc),D2D1_ANTIALIAS_MODE_ALIASED);
 			m_rt->DrawTextLayout(pt,layout,pBr->toBrush(m_rt,NULL));
 			m_rt->PopAxisAlignedClip();
@@ -1487,7 +1486,7 @@ namespace SOUI
 	{
 		SPen_D2D *pen=(SPen_D2D*)(IPenS*)m_curPen;
 		SComPtr<ID2D1Brush> br = pen->GetColorBrush(m_rt);			
-		D2D1_ROUNDED_RECT rcRound={toRectF(pRect,TRUE),pt.x,pt.y};
+		D2D1_ROUNDED_RECT rcRound={toRectF(pRect,TRUE),(float)pt.x,(float)pt.y};
 		m_rt->DrawRoundedRectangle(rcRound,br,m_curPen->GetWidth(),pen->GetStrokeStyle());
 		return S_OK;
 	}
@@ -1495,7 +1494,7 @@ namespace SOUI
 	HRESULT SRenderTarget_D2D::FillRoundRect( LPCRECT pRect,POINT pt )
 	{
 		SComPtr<ID2D1Brush> br = m_curBrush->toBrush(m_rt,pRect);
-		D2D1_ROUNDED_RECT rcRound={toRectF(pRect,TRUE),pt.x,pt.y};
+		D2D1_ROUNDED_RECT rcRound={toRectF(pRect,TRUE),(float)pt.x,(float)pt.y};
 		m_rt->FillRoundedRectangle(rcRound,br);
 		return S_OK;
 	}
@@ -1505,7 +1504,7 @@ namespace SOUI
 		SComPtr<ID2D1SolidColorBrush> br;
 		D2DColor color(cr);
 		m_rt->CreateSolidColorBrush(color.toD2DColor(),&br);
-		D2D1_ROUNDED_RECT rcRound={toRectF(pRect,TRUE),pt.x,pt.y};
+		D2D1_ROUNDED_RECT rcRound={toRectF(pRect,TRUE),(float)pt.x,(float)pt.y};
 		m_rt->FillRoundedRectangle(rcRound,br);
 		return S_OK;    
 	}
@@ -1532,7 +1531,7 @@ namespace SOUI
 
 	HRESULT SRenderTarget_D2D::TextOut( int x, int y, LPCTSTR lpszString, int nCount)
 	{
-		if(nCount<0) nCount = _tcslen(lpszString);
+		if(nCount<0) nCount = (int)_tcslen(lpszString);
 		SIZE sz;
 		MeasureText(lpszString,nCount,&sz);
 		RECT rc={x,y,x+sz.cx,y+sz.cy};
@@ -1978,7 +1977,7 @@ namespace SOUI
 	HRESULT SRenderTarget_D2D::DrawEllipse( LPCRECT pRect )
 	{
 		if(!m_curPen) return E_INVALIDARG;
-		D2D1_ELLIPSE shape={{(pRect->left+pRect->right)/2,(pRect->top+pRect->bottom)/2},RectWidth(pRect)/2,RectHeight(pRect)/2};
+		D2D1_ELLIPSE shape={{(float)(pRect->left+pRect->right)/2,(float)(pRect->top+pRect->bottom)/2},(float)RectWidth(pRect)/2,(float)RectHeight(pRect)/2};
 		m_rt->FillEllipse(shape,m_curBrush->toBrush(m_rt,pRect));
 		m_rt->DrawEllipse(shape,m_curPen->GetColorBrush(m_rt),m_curPen->GetWidth(),m_curPen->GetStrokeStyle());
 		return S_OK;
@@ -1986,14 +1985,14 @@ namespace SOUI
 
 	HRESULT SRenderTarget_D2D::FillEllipse( LPCRECT pRect )
 	{
-		D2D1_ELLIPSE shape={{(pRect->left+pRect->right)/2,(pRect->top+pRect->bottom)/2},RectWidth(pRect)/2,RectHeight(pRect)/2};
+		D2D1_ELLIPSE shape={{(float)(pRect->left+pRect->right)/2,(float)(pRect->top+pRect->bottom)/2},(float)RectWidth(pRect)/2,(float)RectHeight(pRect)/2};
 		m_rt->FillEllipse(shape,m_curBrush->toBrush(m_rt,pRect));
 		return S_OK;
 	}
 
 	HRESULT SRenderTarget_D2D::FillSolidEllipse(LPCRECT pRect,COLORREF cr)
 	{
-		D2D1_ELLIPSE shape={{(pRect->left+pRect->right)/2,(pRect->top+pRect->bottom)/2},RectWidth(pRect)/2,RectHeight(pRect)/2};
+		D2D1_ELLIPSE shape={{(float)(pRect->left+pRect->right)/2,(float)(pRect->top+pRect->bottom)/2},(float)RectWidth(pRect)/2,(float)RectHeight(pRect)/2};
 		SBrush_D2D *pBr = SBrush_D2D::CreateSolidBrush(m_pRenderFactory,cr);
 		m_rt->FillEllipse(shape,pBr->toBrush(m_rt,pRect));
 		pBr->Release();
@@ -2239,7 +2238,7 @@ namespace SOUI
 
 	int SClipStack::GetLayerCount() const
 	{
-		return m_stack.GetCount();
+		return (int)m_stack.GetCount();
 	}
 
 

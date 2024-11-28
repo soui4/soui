@@ -210,14 +210,7 @@ namespace SevenZip
         HRESULT hr = archive->Open(inFile, 0, openCallback);
         if (hr != S_OK)
         {
-            LPVOID msgBuf;
-            if (::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL, hr, 0, (LPTSTR)&msgBuf, 0, NULL) == 0)
-            {
-                m_message = (LPCTSTR)msgBuf;
-                ::LocalFree(msgBuf);
-            }
+			m_message = _T("open error");
             return hr;	//Open archive error
         }
 
@@ -286,14 +279,7 @@ namespace SevenZip
         hr = archive->Extract(NULL, UInt32(-1), false, extractCallback);
         if (hr != S_OK)
         {
-            LPVOID msgBuf;
-            if (::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-                FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-                NULL, hr, 0, (LPTSTR)&msgBuf, 0, NULL) == 0)
-            {
-                m_message = (LPCTSTR)msgBuf;
-                ::LocalFree(msgBuf);
-            }
+			m_message = _T("extract error");
         }
         if (callback)
         {

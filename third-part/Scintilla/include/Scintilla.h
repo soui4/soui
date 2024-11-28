@@ -17,11 +17,11 @@
 extern "C" {
 #endif
 
-#if defined(_WIN32)
+//#if defined(_WIN32)
 /* Return false on failure: */
 int Scintilla_RegisterClasses(void *hInstance);
 int Scintilla_ReleaseResources(void);
-#endif
+//#endif
 int Scintilla_LinkLexers(void);
 
 #ifdef __cplusplus
@@ -1109,7 +1109,7 @@ struct Sci_Rectangle {
 };
 
 /* This structure is used in printing and requires some of the graphics types
- * from Platform.h.  Not needed by most client code. */
+ * from windows.h.  Not needed by most client code. */
 
 struct Sci_RangeToFormat {
 	Sci_SurfaceID hdc;

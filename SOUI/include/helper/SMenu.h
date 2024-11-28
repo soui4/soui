@@ -1,13 +1,15 @@
 ﻿#ifndef __SMENU__H__
 #define __SMENU__H__
-
+#include <windows.h>
 #include <sobject/Sobject.hpp>
 #include <core/SNativeWnd.h>
-#include <res.mgr/Sskinpool.h>
+#include <res.mgr/SSkinPool.h>
 #include <helper/obj-ref-impl.hpp>
 #include <interface/smenu-i.h>
 
 SNSBEGIN
+
+#if defined(_WIN32) || defined(__linux__)
 
 #define CX_ICON 16 //支持的图标的宽度
 #define CY_ICON 16 //支持的图标的高度
@@ -224,7 +226,7 @@ class SMenuODWnd
 class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
   public:
     SMenu(const SMenu &src);
-    SMenu(HMENU hMenu = NULL);
+    SMenu(HMENU hMenu = 0);
     ~SMenu(void);
 
   public:
@@ -295,5 +297,6 @@ class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
     SAutoRefPtr<ISkinObj> m_icons;
 };
 
+#endif//_WIN32
 SNSEND
 #endif // __SMENU__H__

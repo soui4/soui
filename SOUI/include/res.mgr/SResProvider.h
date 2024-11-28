@@ -24,6 +24,7 @@ class SOUI_EXP SResLoadFromMemory {
     static IImgX *LoadImgX(LPVOID pBuf, size_t size);
 };
 
+#ifdef _WIN32
 class SResProviderPE : public TObjRefImpl<IResProvider> {
   public:
     SResProviderPE();
@@ -51,6 +52,9 @@ class SResProviderPE : public TObjRefImpl<IResProvider> {
     HINSTANCE m_hResInst;
     BOOL m_bOwner;
 };
+
+#endif//_WIN32
+
 
 class SOUI_EXP SResLoadFromFile {
   public:

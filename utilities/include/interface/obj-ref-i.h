@@ -1,13 +1,13 @@
 ﻿#ifndef __OBJ_REF_I__H__
 #define __OBJ_REF_I__H__
 
-#include <utilities-def.h>
-
-#ifdef __cplusplus
-#define DEF_VAL(x) =x
+#include <sdef.h>
+#include <objbase.h>
+#ifdef _WIN32
+#include <sguid.h>
 #else
-#define DEF_VAL(x)
-#endif//__cplusplus
+#include <guiddef.h>
+#endif//_WIN32
 
 #undef INTERFACE
 #define INTERFACE IObjRef

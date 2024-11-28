@@ -1,6 +1,6 @@
-﻿#include "souistd.h"
-#include "core/SHostDialog.h"
-#include "core/SMsgLoop.h"
+﻿#include <souistd.h>
+#include <core/SHostDialog.h>
+#include <core/SMsgLoop.h>
 
 SNSBEGIN
 

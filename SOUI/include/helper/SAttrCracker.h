@@ -30,7 +30,7 @@
 
 //不交给SObject处理的属性表结尾
 #define SOUI_ATTRS_BREAK() \
-    return E_NOTIMPL;      \
+        hRet = E_NOTIMPL;  \
     return hRet;           \
     }
 

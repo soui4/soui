@@ -1,10 +1,12 @@
 ﻿#include "souistd.h"
-#include "layout\SouiLayout.h"
+#include "layout/SouiLayout.h"
 #include "helper/SplitString.h"
+#include <core/SWnd.h>
 #pragma warning(push)
 #pragma warning(disable : 4985) // disable the warning message during the include
 #include <math.h>               // this is where I would normally get the warning message
 #pragma warning(pop)
+
 
 SNSBEGIN
 enum

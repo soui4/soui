@@ -1,8 +1,7 @@
 ﻿#include "gdialpha.h"
 #include <malloc.h>
-
-namespace SOUI
-{
+#ifdef _WIN32
+SNSBEGIN
 
 #define  MAX_ALPHABUF    1<<16
 
@@ -77,4 +76,6 @@ void CGdiAlpha::AlphaRestore(ALPHAINFO &alphaInfo)
     ALPHARESTORE(&alphaInfo.bm,alphaInfo.rc.left,alphaInfo.rc.top,alphaInfo.rc.right - alphaInfo.rc.left, alphaInfo.rc.bottom - alphaInfo.rc.top,alphaInfo.lpBuf);
 }
 
-}//namespace SOUI
+SNSEND
+
+#endif //_WIN32

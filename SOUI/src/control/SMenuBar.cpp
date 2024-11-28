@@ -1,9 +1,13 @@
-﻿#include "souistd.h"
-#include "control/SMenuBar.h"
+﻿#include <souistd.h>
+#include <control/SMenuBar.h>
+#include <control/SCmnCtrl.h>
 
 #define TIMER_POP 10
 
 SNSBEGIN
+
+#ifdef _WIN32
+
 HHOOK SMenuBar::m_hMsgHook = NULL;
 SMenuBar *SMenuBar::m_pMenuBar = NULL;
 
@@ -378,4 +382,6 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
     }
     return CallNextHookEx(m_hMsgHook, code, wParam, lParam);
 }
+
+#endif//_WIN32
 SNSEND

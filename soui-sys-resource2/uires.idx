@@ -1,0 +1,44 @@
+<resource>
+    <PNG>
+        <file name="SYS_MSGICON" path="theme_sys_res\msgicon.png"/>
+        <file name="SYS_BORDER" path="theme_sys_res\sys_border.png"/>
+        <file name="SYS_CHECKBOX" path="theme_sys_res\sys_checkbox.png"/>
+        <file name="SYS_RADIO" path="theme_sys_res\sys_radio.png"/>
+        <file name="SYS_FOCUS_CHECKBOX" path="theme_sys_res\sys_focus_checkbox.png"/>
+        <file name="SYS_FOCUS_RADIO" path="theme_sys_res\sys_focus_radio.png"/>
+        <file name="SYS_DROPBTN" path="theme_sys_res\sys_dropbtn.png"/>
+        <file name="SYS_SCROLLBAR" path="theme_sys_res\sys_scrollbar.png"/>
+        <file name="SYS_TREE_CHECKBOX" path="theme_sys_res\sys_tree_checkbox.png"/>
+        <file name="SYS_TREE_TOGGLE" path="theme_sys_res\sys_tree_toggle.png"/>
+        <file name="SYS_TREE_LINES" path="theme_sys_res\sys_tree_lines.png"/>
+        <file name="SYS_HEADER" path="theme_sys_res\sys_header.png"/>
+        <file name="SYS_SPLIT_VERT" path="theme_sys_res\sys_split_vert.png"/>
+        <file name="SYS_SPLIT_HORZ" path="theme_sys_res\sys_split_horz.png"/>
+        <file name="SYS_PROG_BKGND" path="theme_sys_res\sys_prog_bkgnd.png"/>
+        <file name="SYS_PROG_BAR" path="theme_sys_res\sys_prog_bar.png"/>
+        <file name="SYS_VERT_PROG_BKGND" path="theme_sys_res\sys_vert_prog_bkgnd.png"/>
+        <file name="SYS_VERT_PROG_BAR" path="theme_sys_res\sys_vert_prog_bar.png"/>
+        <file name="SYS_SLIDER_THUMB" path="theme_sys_res\sys_slider_thumb.png"/>
+        <file name="SYS_TAB_PAGE" path="theme_sys_res\sys_tab_page.png"/>
+        <file name="SYS_BTN_MINIMIZE" path="theme_sys_res\sys_btn_minimize.png"/>
+        <file name="SYS_BTN_RESTORE" path="theme_sys_res\sys_btn_restore.png"/>
+        <file name="SYS_BTN_CLOSE" path="theme_sys_res\sys_btn_close.png"/>
+        <file name="SYS_BTN_MAXIMIZE" path="theme_sys_res\sys_btn_maximize.png"/>
+        <file name="SYS_MENU_CHECK" path="theme_sys_res\sys_menu_check.png"/>
+        <file name="SYS_MENU_ARROW" path="theme_sys_res\sys_menu_arrow.png"/>
+        <file name="SYS_MENU_SEP" path="theme_sys_res\sys_menu_sep.png"/>
+        <file name="SYS_MENU_BORDER" path="theme_sys_res\sys_menu_border.png"/>
+        <file name="SYS_MENU_SKIN" path="theme_sys_res\sys_menu_skin.png"/>
+        <file name="SYS_ICONS" path="theme_sys_res\sys_icons.png"/>
+        <file name="SYS_WND_BKGND" path="theme_sys_res\sys_wnd_bkgnd.png"/>
+        <file name="SYS_BTN_PREV" path="theme_sys_res\sys_btn_prev.png"/>
+        <file name="SYS_BTN_NEXT" path="theme_sys_res\sys_btn_next.png"/>
+        <file name="SYS_SPIN_DOWN" path="theme_sys_res\sys_spin_down.png"/>
+        <file name="SYS_SPIN_UP" path="theme_sys_res\sys_spin_up.png"/>
+    </PNG>
+    <XML>
+        <file name="SYS_XML_SKIN" path="theme_sys_res\sys_xml_skin.xml"/>
+        <file name="SYS_XML_EDITMENU" path="theme_sys_res\sys_xml_editmenu.xml"/>
+        <file name="SYS_XML_MSGBOX" path="theme_sys_res\sys_xml_msgbox.xml"/>
+    </XML>
+</resource>

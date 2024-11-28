@@ -2,8 +2,6 @@
 #define __TSTRINGA_H__
 
 
-
-#include <windows.h>
 #include <utilities-def.h>
 #include <interface/sstring-i.h>
 #include <string/sstringdata.h>
@@ -15,16 +13,16 @@ struct UTILITIES_API char_traits
 	static size_t StrLen(const char* psz);
 	static int Compare(const char* psz1, const char* psz2);
 	static int CompareNoCase(const char* psz1, const char* psz2);
-	static char* StrChr(const char* psz, char ch);
-	static char* StrRChr(const char* psz, char ch);
-	static char* StrStr(const char* psz, const char* psz2);
+	static const char* StrChr(const char* psz, char ch);
+	static const char* StrRChr(const char* psz, char ch);
+	static const char* StrStr(const char* psz, const char* psz2);
 	static char* StrUpper(char* psz);
 	static char* StrLower(char* psz);
 	static int IsSpace(char ch);
 	static char CharLower(char ch);
 	static char CharUpper(char ch);
 	static char* CharNext(char* psz);
-	static int Format(char** ppszDst, const char* pszFormat, va_list args);
+	static int Format(char** ppszDst, const char* pszFormat, va_list & args);
 
 	static int LoadString(HINSTANCE hInst,
 		UINT uID,
@@ -261,9 +259,9 @@ protected:
 	void Init();
 	void InitFromIString(const IStringA *stringSrc);
 
-	BOOL _Format(const char* pszFormat, va_list args);
+	BOOL _Format(const char* pszFormat, va_list & args);
 
-	void _AppendFormat(const char* pszFormat, va_list args);
+	void _AppendFormat(const char* pszFormat, va_list & args);
 
 	// Assignment operators
 	//  All assign a new value to the string

@@ -5,7 +5,11 @@
 
 #ifndef __SDATETIMEPICKER__H__
 #define __SDATETIMEPICKER__H__
-#include <core/swnd.h>
+#include <core/SWnd.h>
+#include <proxy/SWindowProxy.h>
+#include <interface/SCtrl-i.h>
+#include <control/SDropDown.h>
+#include <control/SCalendar.h>
 
 SNSBEGIN
 

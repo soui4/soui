@@ -170,7 +170,7 @@ function AddConfig(proj, strProjectName) {
         CLTool.SuppressStartupBanner = true;
         CLTool.TreatWChar_tAsBuiltInType = (wcharSet == 1);
         CLTool.WarningLevel = warningLevelOption.warningLevel_3;
-        CLTool.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\config";"$(SOUI4PATH)\\components";"$(SOUI4PATH)\\SOUI\\include";"$(SOUI4PATH)\\utilities\\include"';
+	  CLTool.AdditionalIncludeDirectories = '"$(ENV_INSTALL_32)\\include\\config";"$(ENV_INSTALL_32)\\include\\components";"$(ENV_INSTALL_32)\\include\\SOUI";"$(ENV_INSTALL_32)\\include\\SOUI\\include";"$(ENV_INSTALL_32)\\include\\utilities\\include"';
         CLTool.PreprocessorDefinitions = 'WIN32;_WINDOWS;_USRDLL;STRICT;_DEBUG';
         CLTool.RuntimeLibrary = (mtSet == 1) ? 1 : 3; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
         CLTool.BrowseInformation = browseInfoOption.brAllInfo;// FR
@@ -183,8 +183,8 @@ function AddConfig(proj, strProjectName) {
         LinkTool.LinkIncremental = linkIncrementalYes;
         LinkTool.SuppressStartupBanner = true;  // nologo
         LinkTool.GenerateDebugInformation = true;
-        LinkTool.AdditionalLibraryDirectories = '"$(SOUI4PATH)\\bin"';
-        LinkTool.AdditionalDependencies = 'utilities4d.lib soui4d.lib'
+	 LinkTool.AdditionalLibraryDirectories = '"$(ENV_INSTALL_32)\\lib\\debug"';
+        LinkTool.AdditionalDependencies = 'utilities4.lib soui4.lib'
         LinkTool.SubSystem = subSystemOption.subSystemWindows;
 
         var resCplTool = config.Tools('VCResourceCompilerTool');
@@ -213,7 +213,7 @@ function AddConfig(proj, strProjectName) {
         CLTool.SuppressStartupBanner = true;
         CLTool.TreatWChar_tAsBuiltInType = (wcharSet == 1);
         CLTool.WarningLevel = warningLevelOption.warningLevel_3;
-        CLTool.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\config";"$(SOUI4PATH)\\components";"$(SOUI4PATH)\\SOUI\\include";"$(SOUI4PATH)\\utilities\\include"';
+	CLTool.AdditionalIncludeDirectories = '"$(ENV_INSTALL_32)\\include\\config";"$(ENV_INSTALL_32)\\include\\components";"$(ENV_INSTALL_32)\\include\\SOUI";"$(ENV_INSTALL_32)\\include\\SOUI\\include";"$(ENV_INSTALL_32)\\include\\utilities\\include"';
         CLTool.PreprocessorDefinitions = 'WIN32;_WINDOWS;_USRDLL;NDEBUG';
         CLTool.RuntimeLibrary = (mtSet == 1) ? 0 : 2;; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
         CLTool.WholeProgramOptimization = true;	//全程序优化：启动链接时代码生成
@@ -223,7 +223,7 @@ function AddConfig(proj, strProjectName) {
         LinkTool.GenerateDebugInformation = true;
         LinkTool.LinkIncremental = linkIncrementalYes;
         LinkTool.SuppressStartupBanner = true;  // nologoif(UserDll)
-        LinkTool.AdditionalLibraryDirectories = '"$(SOUI4PATH)\\bin"';
+		LinkTool.AdditionalLibraryDirectories = '"$(ENV_INSTALL_32)\\lib\\release"';
         LinkTool.AdditionalDependencies = 'utilities4.lib soui4.lib'
         LinkTool.LinkIncremental = 1;
         LinkTool.SubSystem = subSystemOption.subSystemWindows;
@@ -251,7 +251,7 @@ function AddConfig(proj, strProjectName) {
             CLTool_x64.SuppressStartupBanner = true;
             CLTool_x64.TreatWChar_tAsBuiltInType = (wcharSet == 1);
             CLTool_x64.WarningLevel = warningLevelOption.warningLevel_3;
-            CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\config";"$(SOUI4PATH)\\components";"$(SOUI4PATH)\\SOUI\\include";"$(SOUI4PATH)\\utilities\\include"';
+	     CLTool_x64.AdditionalIncludeDirectories = '"$(ENV_INSTALL_64)\\include\\config";"$(ENV_INSTALL_64)\\include\\components";"$(ENV_INSTALL_64)\\include\\SOUI";"$(ENV_INSTALL_64)\\include\\SOUI\\include";"$(ENV_INSTALL_64)\\include\\utilities\\include"';
             CLTool_x64.PreprocessorDefinitions = 'WIN64;_WINDOWS;_USRDLL;STRICT;_DEBUG';
             CLTool_x64.RuntimeLibrary = (mtSet == 1) ? 1 : 3; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
             CLTool_x64.BrowseInformation = browseInfoOption.brAllInfo;// FR
@@ -264,8 +264,8 @@ function AddConfig(proj, strProjectName) {
             LinkTool_64.LinkIncremental = linkIncrementalYes;
             LinkTool_64.SuppressStartupBanner = true;  // nologo
             LinkTool_64.GenerateDebugInformation = true;
-            LinkTool_64.AdditionalLibraryDirectories = '"$(SOUI4PATH)\\bin64"';
-            LinkTool_64.AdditionalDependencies = 'utilities4d.lib soui4d.lib'
+		LinkTool_64.AdditionalLibraryDirectories = '"$(ENV_INSTALL_64)\\lib\\debug"';
+            LinkTool_64.AdditionalDependencies = 'utilities4.lib soui4.lib'
             LinkTool_64.SubSystem = subSystemOption.subSystemWindows;
             var resCplTool_64 = config_x64.Tools('VCResourceCompilerTool');
             resCplTool_64.Culture = 0x804;
@@ -289,7 +289,7 @@ function AddConfig(proj, strProjectName) {
             CLTool_x64.SuppressStartupBanner = true;
             CLTool_x64.TreatWChar_tAsBuiltInType = (wcharSet == 1);
             CLTool_x64.WarningLevel = warningLevelOption.warningLevel_3;
-            CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\config";"$(SOUI4PATH)\\components";"$(SOUI4PATH)\\SOUI\\include";"$(SOUI4PATH)\\utilities\\include"';
+	     CLTool_x64.AdditionalIncludeDirectories = '"$(ENV_INSTALL_64)\\include\\config";"$(ENV_INSTALL_64)\\include\\components";"$(ENV_INSTALL_64)\\include\\SOUI";"$(ENV_INSTALL_64)\\include\\SOUI\\include";"$(ENV_INSTALL_64)\\include\\utilities\\include"';
             CLTool_x64.PreprocessorDefinitions = 'WIN64;_WINDOWS;_USRDLL;NDEBUG';
             CLTool_x64.RuntimeLibrary = (mtSet == 1) ? 0 : 2;; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
             CLTool_x64.WholeProgramOptimization = true;	//全程序优化：启动链接时代码生成
@@ -298,7 +298,7 @@ function AddConfig(proj, strProjectName) {
             LinkTool_x64.GenerateDebugInformation = true;
             LinkTool_x64.LinkIncremental = linkIncrementalYes;
             LinkTool_x64.SuppressStartupBanner = true;  // nologoif(UserDll)
-            LinkTool_x64.AdditionalLibraryDirectories = '"$(SOUI4PATH)\\bin64"';
+		LinkTool_64.AdditionalLibraryDirectories = '"$(ENV_INSTALL_64)\\lib\\release"';
             LinkTool_x64.AdditionalDependencies = 'utilities4.lib soui4.lib'
             LinkTool_x64.LinkIncremental = 1;
             LinkTool_x64.SubSystem = subSystemOption.subSystemWindows;

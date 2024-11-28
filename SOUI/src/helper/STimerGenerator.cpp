@@ -1,6 +1,6 @@
 ﻿#include "souistd.h"
 #include "helper/STimerGenerator.h"
-
+#include <event/SEvents.h>
 SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 //  SScriptTimer

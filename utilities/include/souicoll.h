@@ -12,9 +12,10 @@
 #define __SOUICOLL_H__
 
 
-
 #include <windows.h>
 #include <limits.h>
+#include <memory.h>
+#include <stdint.h>
 #include "soui_mem_wrapper.h"
 #include "snew.h"
 
@@ -39,7 +40,7 @@
 #define SASSERT_VALID(x)
 
 #ifndef SASSUME
-#define SASSUME(expr) do { SASSERT(expr); __analysis_assume(!!(expr)); } while(0)
+#define SASSUME(expr) do { SASSERT(expr);  } while(0)
 #endif // SASSUME
 
 #ifndef SENSURE
@@ -53,20 +54,12 @@
 #define SUNUSED(x) (void)x;
 #endif //SUNUSED
 
-#if !defined(_W64)
-#if !defined(__midl) &&    (defined(_X86_)    || defined(_M_IX86))
-#define    _W64 __w64
-#else
-#define    _W64
-#endif
-#endif
-
-
 #ifndef _STRY
 #define _STRY try
 #endif
 #define _SCATCHALL() __pragma(warning(push)) __pragma(warning(disable: 4571)) catch( ... ) __pragma(warning(pop))
 
+//#include <ctypes.h>
 
 #pragma pack(push,_S_PACKING)
 namespace SOUI
@@ -81,7 +74,7 @@ template<typename T>
 class SLimits;
 
 template<>
-class SLimits<int _W64>
+class SLimits<int >
 {
 public:
     static const int _Min=INT_MIN;
@@ -89,7 +82,7 @@ public:
 };
 
 template<>
-class SLimits<unsigned int _W64>
+class SLimits<unsigned int >
 {
 public:
     static const unsigned int _Min=0;
@@ -97,7 +90,7 @@ public:
 };
 
 template<>
-class SLimits<long _W64>
+class SLimits<long >
 {
 public:
     static const long _Min=LONG_MIN;
@@ -105,7 +98,7 @@ public:
 };
 
 template<>
-class SLimits<unsigned long _W64>
+class SLimits<unsigned long >
 {
 public:
     static const unsigned long _Min=0;
@@ -160,50 +153,50 @@ inline HRESULT SMultiply(T* ptResult,    T tLeft, T tRight)
 
 /* fast    version    for    32 bit integers    */
 template<>
-inline HRESULT SMultiply(int _W64    *piResult, int _W64    iLeft, int _W64 iRight)
+inline HRESULT SMultiply(int     *piResult, int     iLeft, int  iRight)
 {
-    __int64 i64Result=static_cast<__int64>(iLeft) * static_cast<__int64>(iRight);
+    int64_t i64Result=static_cast<int64_t>(iLeft) * static_cast<int64_t>(iRight);
     if(i64Result>INT_MAX || i64Result < INT_MIN)
     {
         return E_INVALIDARG;
     }
-    *piResult=static_cast<int _W64>(i64Result);
+    *piResult=static_cast<int >(i64Result);
     return S_OK;
 }
 
 template<>
-inline HRESULT SMultiply(unsigned int    _W64 *piResult, unsigned int _W64 iLeft, unsigned int _W64 iRight)
+inline HRESULT SMultiply(unsigned int     *piResult, unsigned int  iLeft, unsigned int  iRight)
 {
-    unsigned __int64 i64Result=static_cast<unsigned __int64>(iLeft) * static_cast<unsigned __int64>(iRight);
+    uint64_t i64Result=static_cast<uint64_t>(iLeft) * static_cast<uint64_t>(iRight);
     if(i64Result>UINT_MAX)
     {
         return E_INVALIDARG;
     }
-    *piResult=static_cast<unsigned int _W64>(i64Result);
+    *piResult=static_cast<unsigned int >(i64Result);
     return S_OK;
 }
 
 template<>
-inline HRESULT SMultiply(long    _W64 *piResult, long _W64 iLeft, long _W64 iRight)
+inline HRESULT SMultiply(long     *piResult, long  iLeft, long  iRight)
 {
-    __int64 i64Result=static_cast<__int64>(iLeft) * static_cast<__int64>(iRight);
+    int64_t i64Result=static_cast<int64_t>(iLeft) * static_cast<int64_t>(iRight);
     if(i64Result>LONG_MAX || i64Result < LONG_MIN)
     {
         return E_INVALIDARG;
     }
-    *piResult=static_cast<long _W64>(i64Result);
+    *piResult=static_cast<long>(i64Result);
     return S_OK;
 }
 
 template<>
-inline HRESULT SMultiply(unsigned long _W64 *piResult, unsigned long _W64 iLeft, unsigned long _W64 iRight)
+inline HRESULT SMultiply(unsigned long  *piResult, unsigned long  iLeft, unsigned long  iRight)
 {
-    unsigned __int64 i64Result=static_cast<unsigned __int64>(iLeft) * static_cast<unsigned __int64>(iRight);
+    uint64_t i64Result=static_cast<uint64_t>(iLeft) * static_cast<uint64_t>(iRight);
     if(i64Result>ULONG_MAX)
     {
         return E_INVALIDARG;
     }
-    *piResult=static_cast<unsigned long _W64>(i64Result);
+    *piResult=static_cast<unsigned long >(i64Result);
     return S_OK;
 }
 
@@ -356,7 +349,7 @@ public:
 
     static bool CompareElements( INARGTYPE element1, INARGTYPE element2 )
     {
-        return( (element1 == element2) != 0 );  // != 0 to handle overloads of operator== that return BOOL instead of bool
+        return memcmp(&element1,&element2,sizeof(INARGTYPE)) == 0 ;  // != 0 to handle overloads of operator== that return BOOL instead of bool
     }
 
     static int CompareElementsOrdered( INARGTYPE element1, INARGTYPE element2 )
@@ -434,13 +427,13 @@ _DECLARE_PRIMITIVE_TRAITS( unsigned char )
 _DECLARE_PRIMITIVE_TRAITS( unsigned short )
 _DECLARE_PRIMITIVE_TRAITS( unsigned int )
 _DECLARE_PRIMITIVE_TRAITS( unsigned long )
-_DECLARE_PRIMITIVE_TRAITS( unsigned __int64 )
+//_DECLARE_PRIMITIVE_TRAITS( unsigned __int64 )
 _DECLARE_PRIMITIVE_TRAITS( signed char )
 _DECLARE_PRIMITIVE_TRAITS( char )
 _DECLARE_PRIMITIVE_TRAITS( short )
 _DECLARE_PRIMITIVE_TRAITS( int )
 _DECLARE_PRIMITIVE_TRAITS( long )
-_DECLARE_PRIMITIVE_TRAITS( __int64 )
+//_DECLARE_PRIMITIVE_TRAITS( __int64 )
 _DECLARE_PRIMITIVE_TRAITS( float )
 _DECLARE_PRIMITIVE_TRAITS( double )
 _DECLARE_PRIMITIVE_TRAITS( bool )

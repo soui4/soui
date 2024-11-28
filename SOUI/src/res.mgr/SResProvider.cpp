@@ -3,9 +3,13 @@
 // Description: Resource Provider
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
-#include "res.mgr/Sresprovider.h"
+#include "res.mgr/SResProvider.h"
+#ifdef _WIN32
 #include <io.h>
-
+#else
+#include <sys/stat.h>
+#include <dirent.h>
+#endif
 SNSBEGIN
 
 //定义3种系统资源类型
@@ -46,6 +50,7 @@ IImgX *SResLoadFromMemory::LoadImgX(LPVOID pBuf, size_t size)
     return pImgX;
 }
 
+#ifdef _WIN32
 //////////////////////////////////////////////////////////////////////////
 SResProviderPE::SResProviderPE()
     : m_hResInst(0)
@@ -261,6 +266,8 @@ void SResProviderPE::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
     EnumFileParam param = { funEnumCB, lp };
     EnumResourceTypes(m_hResInst, EnumResTypeProc2, (LONG_PTR)&param);
 }
+
+#endif//_WIN32
 //////////////////////////////////////////////////////////////////////////
 //
 
@@ -313,12 +320,7 @@ IImgX *SResLoadFromFile::LoadImgX(LPCTSTR strPath)
 
 size_t SResLoadFromFile::GetRawBufferSize(LPCTSTR strPath)
 {
-    WIN32_FIND_DATA wfd;
-    HANDLE hf = FindFirstFile(strPath, &wfd);
-    if (INVALID_HANDLE_VALUE == hf)
-        return 0;
-    FindClose(hf);
-    return wfd.nFileSizeLow;
+    return file_length(strPath);
 }
 
 BOOL SResLoadFromFile::GetRawBuffer(LPCTSTR strPath, LPVOID pBuf, size_t size)
@@ -326,7 +328,13 @@ BOOL SResLoadFromFile::GetRawBuffer(LPCTSTR strPath, LPVOID pBuf, size_t size)
     FILE *f = _tfopen(strPath, _T("rb"));
     if (!f)
         return FALSE;
+#ifdef _WIN32
     size_t len = _filelength(_fileno(f));
+#else
+    fseek(f,0,SEEK_END);
+    size_t len = ftell(f);
+    fseek(f,0,SEEK_SET);
+#endif
     if (len > size)
     {
         SetLastError(ERROR_INSUFFICIENT_BUFFER);
@@ -341,6 +349,11 @@ BOOL SResLoadFromFile::GetRawBuffer(LPCTSTR strPath, LPVOID pBuf, size_t size)
 
 //////////////////////////////////////////////////////////////////////////
 // SResProviderFiles
+#ifdef _WIN32
+#define kPath_Slash _T("\\")
+#else
+#define kPath_Slash _T("/")
+#endif//_WIN32
 
 SResProviderFiles::SResProviderFiles()
 {
@@ -351,7 +364,7 @@ SStringT SResProviderFiles::GetRes(LPCTSTR strType, LPCTSTR pszResName)
     if (!strType)
     {
         // pszResName is relative path
-        SStringT strRet = m_strPath + _T("\\") + pszResName;
+        SStringT strRet = m_strPath + kPath_Slash + pszResName;
         DWORD dwAttr = GetFileAttributes(strRet);
         if (dwAttr == INVALID_FILE_ATTRIBUTES || (dwAttr & FILE_ATTRIBUTE_ARCHIVE) == 0)
             strRet = _T("");
@@ -361,7 +374,8 @@ SStringT SResProviderFiles::GetRes(LPCTSTR strType, LPCTSTR pszResName)
     SMap<SResID, SStringT>::CPair *p = m_mapFiles.Lookup(resID);
     if (!p)
         return _T("");
-    SStringT strRet = m_strPath + _T("\\") + p->m_value;
+
+    SStringT strRet = m_strPath + kPath_Slash + p->m_value;
     return strRet;
 }
 
@@ -426,7 +440,7 @@ BOOL SResProviderFiles::Init(WPARAM wParam, LPARAM lParam)
     LPCTSTR pszPath = (LPCTSTR)wParam;
 
     SStringT strPathIndex = pszPath;
-    strPathIndex += _T("\\");
+    strPathIndex += kPath_Slash;
     strPathIndex += UIRES_INDEX;
 
     SXmlDoc xmlDoc;
@@ -446,6 +460,9 @@ BOOL SResProviderFiles::Init(WPARAM wParam, LPARAM lParam)
         {
             SResID id(strType, S_CW2T(xmlFile.attribute(L"name").value()));
             SStringT strFile = S_CW2T(xmlFile.attribute(L"path").value());
+            #if !defined(_WIN32)
+            strFile.ReplaceChar(_T('\\'),_T('/'));
+            #endif
             //再次Init时会因为此行代码导致资源无法加载
             // if(!m_strPath.IsEmpty())
             // strFile.Format(_T("%s\\%s"),(LPCTSTR)m_strPath,(LPCTSTR)strFile);
@@ -454,10 +471,13 @@ BOOL SResProviderFiles::Init(WPARAM wParam, LPARAM lParam)
         }
         xmlType = xmlType.next_sibling();
     }
-
+#ifdef _WIN32
     TCHAR szFullPath[1025];
     GetFullPathName(pszPath, 1024, szFullPath, NULL);
     m_strPath = szFullPath;
+#else
+    m_strPath = pszPath;
+#endif//_WIN32
     return TRUE;
 }
 
@@ -485,6 +505,7 @@ void SResProviderFiles::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
 
 void SResProviderFiles::_EnumFile(LPCTSTR pszPath, EnumFileCallback funEnumCB, LPARAM lp)
 {
+#ifdef _WIN32
     WIN32_FIND_DATA wfd;
     SStringT strFilter;
     if (pszPath)
@@ -515,6 +536,43 @@ void SResProviderFiles::_EnumFile(LPCTSTR pszPath, EnumFileCallback funEnumCB, L
         } while (FindNextFile(hFind, &wfd));
         FindClose(hFind);
     }
+#else
+    DIR *dir;
+    struct dirent *entry;
+
+    SStringT strFilter;
+    if (pszPath)
+        strFilter = m_strPath + _T("/") + pszPath;
+    else
+        strFilter = m_strPath;
+
+    dir = opendir(pszPath); // 替换为需要枚举的文件夹路径
+    if (dir == NULL) {
+        return ;
+    }
+
+    while ((entry = readdir(dir)) != NULL) {
+        SStringT strPath;
+            if (pszPath == NULL)
+                strPath = entry->d_name;
+            else
+                strPath = SStringT().Format(_T("%s\\%s"), pszPath, entry->d_name);
+            if (entry->d_type & DT_DIR)
+            {
+                if (_tcscmp(entry->d_name, _T(".")) == 0 || _tcscmp(entry->d_name, _T("..")) == 0)
+                    continue;
+                _EnumFile(strPath.c_str(), funEnumCB, lp);
+            }
+            else if (entry->d_type & DT_REG)
+            {
+                if (!funEnumCB(strPath.c_str(), lp))
+                    break;
+            }
+    }
+
+    closedir(dir);
+#endif//_WIN32
 }
 
 SNSEND
+

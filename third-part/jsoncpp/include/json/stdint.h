@@ -10,8 +10,7 @@
 
 #ifndef RC_INVOKED
 
-
-
+#ifdef _WIN32
 typedef signed char        int8_t;
 typedef short              int16_t;
 typedef int                int32_t;
@@ -36,12 +35,13 @@ typedef int                int_fast32_t;
 typedef long long          int_fast64_t;
 typedef unsigned char      uint_fast8_t;
 //typedef unsigned int       uint_fast16_t;
+
 typedef unsigned int       uint_fast32_t;
 typedef unsigned long long uint_fast64_t;
 
 typedef long long          intmax_t;
 typedef unsigned long long uintmax_t;
-
+#endif
 
 
 #endif // RC_INVOKED

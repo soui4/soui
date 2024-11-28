@@ -6,7 +6,7 @@ SNSBEGIN
 
 struct TStringData
 {
-	long nRefs;            // Reference count: negative == locked
+	int nRefs;            // Reference count: negative == locked
 	int nDataLength;    // Length of currently used data in XCHARs (not including terminating null)
 	int nAllocLength;    // Length of allocated data in XCHARs (not including terminating null)
 

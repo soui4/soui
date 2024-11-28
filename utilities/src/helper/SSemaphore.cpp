@@ -1,15 +1,14 @@
-#include <Windows.h>
 #include <helper/SSemaphore.h>
+#include <windows.h>
 #include <cerrno>
 
+SNSBEGIN
 
-namespace SOUI
+class SemaphorePrivate
 {
-	class SemaphorePrivate
-	{
-	public:
-		HANDLE  _hsem;
-	};
+public:
+	HANDLE  _hsem;
+};
 
 SSemaphore::SSemaphore() :
     _private(*(new SemaphorePrivate()))
@@ -55,9 +54,6 @@ int SSemaphore::wait(unsigned int msec)
 
 void SSemaphore::notify()
 {
-    LONG previous_count;
-    // let's just unblock one waiting thread.
-    BOOL ret = ::ReleaseSemaphore(_private._hsem, 1, &previous_count);
+    ::ReleaseSemaphore(_private._hsem, 1, NULL);
 }
-
-}
+SNSEND

@@ -15,7 +15,7 @@
 
 #include <core/SWnd.h>
 #include <interface/SCtrl-i.h>
-
+#include <proxy/SWindowProxy.h>
 SNSBEGIN
 
 #define SORT_MASK  (HDF_SORTDOWN | HDF_SORTUP)

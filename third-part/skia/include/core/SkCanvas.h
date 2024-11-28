@@ -381,7 +381,7 @@ public:
         @param flags  LayerFlags
         @return The value to pass to restoreToCount() to balance this save()
     */
-    SK_ATTR_EXTERNALLY_DEPRECATED("SaveFlags use is deprecated")
+    //SK_ATTR_EXTERNALLY_DEPRECATED("SaveFlags use is deprecated")
     int saveLayer(const SkRect* bounds, const SkPaint* paint, SaveFlags flags);
 
     /** This behaves the same as save(), but in addition it allocates an
@@ -411,7 +411,7 @@ public:
         @param flags  LayerFlags
         @return The value to pass to restoreToCount() to balance this save()
     */
-    SK_ATTR_EXTERNALLY_DEPRECATED("SaveFlags use is deprecated")
+    //SK_ATTR_EXTERNALLY_DEPRECATED("SaveFlags use is deprecated")
     int saveLayerAlpha(const SkRect* bounds, U8CPU alpha, SaveFlags flags);
 
     /** This call balances a previous call to save(), and is used to remove all

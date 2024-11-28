@@ -50,7 +50,7 @@ public:
         }
 
         fCount += 1;
-        fLength += sizeof(Entry) + length;
+        fLength += sizeof(Entry) + (uint32_t)length;
         return (entry + 1); // return its data
     }
 

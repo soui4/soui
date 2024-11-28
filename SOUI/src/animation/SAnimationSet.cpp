@@ -2,7 +2,7 @@
 #include <souistd.h>
 #include <animation/SAnimationSet.h>
 #include <SApp.h>
-#include <helper/stime.h>
+#include <helper/STime.h>
 
 SNSBEGIN
 

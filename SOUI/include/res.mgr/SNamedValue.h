@@ -6,6 +6,7 @@
 #define __SNAMEDVALUE__H__
 #include "helper/SColor.h"
 #include "layout/SLayoutSize.h"
+#include <stdlib.h>
 
 SNSBEGIN
 #define MAX_NAME 50

@@ -2,8 +2,8 @@
 
 #include <core/SkPaint.h>
 #include <core/SkCanvas.h>
-#include <core/sktdarray.h>
-
+#include <core/SkTDArray.h>
+#include <windows.h>
 
 class SkTextLayoutEx {
 public:

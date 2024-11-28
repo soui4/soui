@@ -34,7 +34,7 @@ static inline float sk_float_copysign(float x, float y) {
 // clang-cl reports __cplusplus for clang, not the __cplusplus vc++ version _MSC_VER would report.
 #define SK_BUILD_WITH_CLANG_CL (defined(_MSC_VER) && defined(__clang__))
 #if (!SK_BUILD_WITH_CLANG_CL && __cplusplus >= 201103L) || (defined(_MSC_VER) && _MSC_VER >= 1800)
-    return copysign(x, y);
+    return (float)copysign(x, y);
 
 // Posix has demanded 'float copysignf(float, float)' (from C99) since Issue 6.
 #elif defined(_POSIX_VERSION) && _POSIX_VERSION >= 200112L

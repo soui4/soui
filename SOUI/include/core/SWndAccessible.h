@@ -1,13 +1,13 @@
 ﻿#ifndef __SWNDACCESSIBLE__H__
 #define __SWNDACCESSIBLE__H__
+
+#ifdef SOUI_ENABLE_ACC
 #include <oleacc.h>
 #include <helper/SUnknown.h>
 #include "Swnd.h"
 #include "interface/sacchelper-i.h"
 
 SNSBEGIN
-
-#ifdef SOUI_ENABLE_ACC
 
 class SOUI_EXP SAccessible
     : public IAccessible
@@ -69,7 +69,8 @@ class SOUI_EXP SAccessible
     IUNKNOWN_ADD_IID(IDispatch)
     IUNKNOWN_END()
 };
-#endif // SOUI_ENABLE_ACC
 SNSEND
+
+#endif // SOUI_ENABLE_ACC
 
 #endif // __SWNDACCESSIBLE__H__

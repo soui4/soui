@@ -4,15 +4,6 @@
 #include "SResProviderZip.h"
 #include <xml/SXml.h>
 
-namespace CursorIcon_Zip{
-extern HICON CURSORICON_LoadFromBuf(const BYTE * bits,DWORD filesize,INT width, INT height,BOOL fCursor, UINT loadflags);
-extern HICON CURSORICON_LoadFromFile( LPCWSTR filename,
-									 INT width, INT height,
-									 BOOL fCursor, UINT loadflags);
-}
-
-using namespace CursorIcon_Zip;
-
 SNSBEGIN
 
 SResProviderZip::SResProviderZip():m_renderFactory(NULL)
@@ -30,7 +21,7 @@ HBITMAP SResProviderZip::LoadBitmap(LPCTSTR pszResName )
 	CZipFile zf;
 	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
 
-	HDC hDC = GetDC(NULL);
+	HDC hDC = GetDC(0);
 	//读取位图头
 	BITMAPFILEHEADER *pBmpFileHeader=(BITMAPFILEHEADER *)zf.GetData(); 
 	//检测位图头
@@ -46,7 +37,7 @@ HBITMAP SResProviderZip::LoadBitmap(LPCTSTR pszResName )
 	LPBITMAPINFO lpBitmap=(LPBITMAPINFO)(pBmpFileHeader+1); 
 	LPVOID lpBits=(LPBYTE)zf.GetData()+pBmpFileHeader->bfOffBits;
 	HBITMAP hBitmap= CreateDIBitmap(hDC,&lpBitmap->bmiHeader,CBM_INIT,lpBits,lpBitmap,DIB_RGB_COLORS);
-	ReleaseDC(NULL,hDC);
+	ReleaseDC(0,hDC);
 
 	return hBitmap;
 }
@@ -58,7 +49,7 @@ HICON SResProviderZip::LoadIcon(LPCTSTR pszResName ,int cx/*=0*/,int cy/*=0*/)
 	CZipFile zf;
 	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
 
-	return CURSORICON_LoadFromBuf(zf.GetData(),zf.GetSize(),cx,cy,FALSE,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
+	return (HICON)LoadIconFromMemory(zf.GetData(),zf.GetSize(),TRUE,cx,cy,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
 }
 
 HCURSOR SResProviderZip::LoadCursor( LPCTSTR pszResName )
@@ -67,7 +58,7 @@ HCURSOR SResProviderZip::LoadCursor( LPCTSTR pszResName )
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
 	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
-	return (HCURSOR)CURSORICON_LoadFromBuf(zf.GetData(),zf.GetSize(),0,0,TRUE,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
+	return (HCURSOR)LoadIconFromMemory(zf.GetData(),zf.GetSize(),FALSE,0,0,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
 }
 
 IBitmapS * SResProviderZip::LoadImage( LPCTSTR strType,LPCTSTR pszResName)

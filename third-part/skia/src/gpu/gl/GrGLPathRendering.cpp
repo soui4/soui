@@ -125,13 +125,13 @@ GrPathRange* GrGLPathRendering::createGlyphs(const SkTypeface* typeface,
     const void* fontData = fontStream->getMemoryBase();
     if (NULL == fontData) {
         // TODO: Find a more efficient way to pass the font data (e.g. open file descriptor).
-        fontTempBuffer.reset(fontDataLength);
+        fontTempBuffer.reset((int)fontDataLength);
         fontStream->read(&fontTempBuffer.front(), fontDataLength);
         fontData = &fontTempBuffer.front();
     }
 
     const size_t numPaths = typeface->countGlyphs();
-    const GrGLuint basePathID = this->genPaths(numPaths);
+    const GrGLuint basePathID = this->genPaths((GrGLsizei)numPaths);
     SkAutoTUnref<GrGLPath> templatePath(SkNEW_ARGS(GrGLPath, (fGpu, SkPath(), stroke)));
 
     GrGLenum status;

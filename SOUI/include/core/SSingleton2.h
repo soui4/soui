@@ -15,7 +15,7 @@
 #define __SSINGLETON2__H__
 
 #include <assert.h>
-#include <SApp.h>
+
 SNSBEGIN
 
 #define SINGLETON2_TYPE(x)         \

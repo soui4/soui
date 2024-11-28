@@ -2,7 +2,7 @@
 //   File Name: SPanel.h
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
-#include "core/Spanel.h"
+#include "core/SPanel.h"
 
 #define DEF_UPDATEINTERVAL 0
 

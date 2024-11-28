@@ -2,6 +2,7 @@
 
 #include "UIAnimation.h"
 #include <atl.mini/SComHelper.h>
+#include <atl.mini/SComCli.h>
 #include <ShlObj.h>
 
 namespace SOUI

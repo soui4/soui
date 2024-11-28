@@ -1,8 +1,9 @@
 ﻿#ifndef __STOOLTIP__H__
 #define __STOOLTIP__H__
 
-#include "interface/stooltip-i.h"
-#include "core/SNativeWnd.h"
+#include <interface/stooltip-i.h>
+#include <core/SNativeWnd.h>
+#include <helper/obj-ref-impl.hpp>
 
 SNSBEGIN
 class STipCtrl

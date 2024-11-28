@@ -16,7 +16,7 @@ static size_t breakTextEx(const SkPaint *pPaint, const wchar_t* textD, size_t le
 	endLen = 0;
 
 	const wchar_t * p = textD;
-	int nRet = nLineLen;
+    size_t nRet = nLineLen;
 	for (size_t i = 0; i<nLineLen; i++, p++)
 	{
 		if (*p == L'\r' || *p == L'\n')
@@ -37,7 +37,7 @@ static size_t breakTextEx(const SkPaint *pPaint, const wchar_t* textD, size_t le
 
 SkRect DrawText_Skia(SkCanvas* canvas,const wchar_t *text,int len,SkRect box, SkPaint& paint,UINT uFormat)
 {
-	if(len<0)	len = wcslen(text);
+	if(len<0)	len = (int)wcslen(text);
     SkTextLayoutEx layout;
     layout.init(text,len,box,paint,uFormat);
     
@@ -49,13 +49,13 @@ void SkTextLayoutEx::init( const wchar_t text[], size_t length,SkRect rc,  SkPai
 {
     if(uFormat & DT_NOPREFIX)
     {
-        m_text.setCount(length);
+        m_text.setCount((int)length);
         memcpy(m_text.begin(),text,length*sizeof(wchar_t));
     }else
     {
         m_prefix.reset();
         SkTDArray<wchar_t> tmp;
-        tmp.setCount(length);
+        tmp.setCount((int)length);
         memcpy(tmp.begin(),text,length*sizeof(wchar_t));
         for(int i=0;i<tmp.count();i++)
         {
@@ -99,10 +99,10 @@ void SkTextLayoutEx::buildLines()
         while(lineHead<m_text.count())
         {
 			int endLen = 0;
-            size_t line_len = breakTextEx(m_paint,text, stop - text, maxWid,endLen);
+            int line_len = (int)breakTextEx(m_paint,text, stop - text, maxWid,endLen);
 			if (line_len + endLen == 0)
 				break;
-			LineInfo info = { lineHead,(int)line_len };
+			LineInfo info = { lineHead,line_len };
 			m_lines.push(info);
 			text += line_len+endLen;
             lineHead += line_len+endLen;
