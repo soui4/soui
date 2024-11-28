@@ -17,12 +17,8 @@ SNSBEGIN
         ~SImgFrame_STB();
 
 		STDMETHOD_(BOOL,GetSize)(THIS_ UINT *pWid,UINT *pHei) OVERRIDE;
-		STDMETHOD_(BOOL,CopyPixels)(THIS_ 
-			/* [unique][in] */ const RECT *prc,
-			/* [in] */ UINT cbStride,
-			/* [in] */ UINT cbBufferSize,
-			/* [size_is][out] */ BYTE *pbBuffer) OVERRIDE;
 		STDMETHOD_(int,GetDelay)(THIS) OVERRIDE {return 0;}
+        STDMETHOD_(const VOID *,GetPixels)(CTHIS) SCONST OVERRIDE;
 
     protected:
         unsigned char * m_data;

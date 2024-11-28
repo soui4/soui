@@ -5,7 +5,7 @@
 #include "OutStreamWrapper.h"
 #include "PropVariant2.h"
 #include "UsefulFunctions.h"
-
+#include <tchar.h>
 
 namespace SevenZip
 {

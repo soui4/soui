@@ -3,7 +3,7 @@
 
 SNSBEGIN
 
-SAccelerator::SAccelerator(UINT vKey, bool bCtrl, bool bAlt, bool bShift)
+SAccelerator::SAccelerator(WORD vKey, bool bCtrl, bool bAlt, bool bShift)
     : m_wVK(vKey)
     , m_wModifier(0)
 {
@@ -63,7 +63,7 @@ WORD SAccelerator::VkFromString(LPCTSTR pszKey)
     {
         if (pszKey[0] == _T('f'))
         { // F1-F12
-            wKey = VK_F1 + _tstoi(pszKey + 1) - 1;
+            wKey = VK_F1 + _ttoi(pszKey + 1) - 1;
         }
         else if (_tcsnicmp(pszKey, _T("num "), 4) == 0)
         { // Num 0 - Num 9 || Num Del
@@ -74,7 +74,7 @@ WORD SAccelerator::VkFromString(LPCTSTR pszKey)
             else if (_tcscmp(pszKey + 4, _T("+")) == 0)
                 wKey = VK_ADD;
             else
-                wKey = VK_NUMPAD0 + _tstoi(pszKey + 4);
+                wKey = VK_NUMPAD0 + _ttoi(pszKey + 4);
         }
     }
     else // if( _tcslen(pszKey)==1)
@@ -173,7 +173,7 @@ SStringT SAccelerator::GetKeyName(WORD vk)
             str.Format(_T("F%d"), vk - VK_F1 + 1);
         else
         {
-            char c = MapVirtualKeyA(vk, 2);
+            TCHAR c = MapVirtualKey(vk, 2);
             switch (c)
             {
             case '-':

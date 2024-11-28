@@ -11,9 +11,8 @@ set(resprovider-7zip_header
 )
 
 set(resprovider-7zip_src 
-    cursoricon.cpp
 	SResProvider7Zip.cpp
-	zip7Archive.cpp
+	Zip7Archive.cpp
 )
 
 add_definitions(-DRESPROVIDER7ZIP_EXPORTS)
@@ -29,7 +28,7 @@ else()
     add_library(resprovider-7zip STATIC ${resprovider-7zip_src} ${resprovider-7zip_header})
 endif()
 
-add_dependencies(resprovider-7zip 7z)
+add_dependencies(resprovider-7zip 7z utilities4)
 if(MSVC)
 set_target_properties(resprovider-7zip PROPERTIES LINK_FLAGS "/SAFESEH:NO") 
 endif()

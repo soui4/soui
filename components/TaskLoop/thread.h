@@ -26,12 +26,6 @@ public:
     };
 
     /**
-     * Get current thread ID.
-     * @return current thread ID.
-     */
-    static long getCurrentThreadID();
-
-    /**
      * Set stopping flag to thread. The thread may not be stopped immediately.
      */
     void stop();
@@ -56,11 +50,7 @@ public:
      * Get thread ID.
      * @return thread ID.
      */
-    long getThreadID()
-    {
-        SAutoLock autoLock(_lock);
-        return _threadID;
-    }
+    long getThreadID() const;
 
     /**
      * Get thread name.
@@ -88,26 +78,14 @@ public:
      */
     virtual ~Thread();
 
-    /**
-     * Invalid thread ID.
-     */
-    static const long INVALID_THREAD_ID;
-
 	bool start(IRunnable *runnable, const std::string &name, ThreadPriority priority = Normal);
 
 private:
-    /**
-     * For implementation on Windows,
-     * we have to use this  Win32 thunk to call the c-style entry point : threadProc
-     */
-#ifdef WIN32
-	static unsigned int WINAPI threadProcWin32thunk(void * lpParameter);
-#endif
-    static void *threadProc(void *args);
+   static unsigned int CALLBACK threadProc(void *args);
 
     void clear();
     void setThreadName(const std::string &name);
-    void setPriority(ThreadPriority priority);
+    bool setPriority(ThreadPriority priority);
 
     // Thread object itself must be thread-safe
     SCriticalSection _lock;
@@ -115,7 +93,6 @@ private:
     bool _stopping;
     SAutoRefPtr<IRunnable> _runnable;
     std::string _name;
-    long _threadID;
     SSemaphore _startSem;
     ThreadPrivate &_private;
     ThreadPriority _priorityLevel;

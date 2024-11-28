@@ -41,12 +41,11 @@
 #include "MainDlg.h"
 
 
-enum{
-	RESTYPE_FILE = 0,//从文件中加载资源，加载失败再从PE加载
-	RESTYPE_PE,//从PE资源中加载UI资源
-	RESTYPE_ZIP,//从zip包中加载资源
-	RESTYPE_7Z,//从7zip包中加载资源
-};
+#define	RESTYPE_FILE  0 //从文件中加载资源，加载失败再从PE加载
+#define	RESTYPE_PE 1 //从PE资源中加载UI资源
+#define	RESTYPE_ZIP 2 //从zip包中加载资源
+#define RESTYPE_7Z 3//从7zip包中加载资源
+
 #ifdef _DEBUG
 #define RES_TYPE RESTYPE_FILE      //从文件中加载资源，加载失败再从PE加载
 #else
@@ -294,7 +293,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		//将程序的运行路径修改到demo所在的目录
 #ifdef _DEBUG
 		SStringT strResDir = theApp->GetAppDir();
-		strResDir += _T("\\..\\demo");
+		strResDir += _T("D:\\work\\soui4lib\\demo");
 		SetCurrentDirectory(strResDir);
 		//SOUI系统总是从appdir去查找资源
 		theApp->SetAppDir(strResDir);

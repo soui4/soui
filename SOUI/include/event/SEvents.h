@@ -139,6 +139,11 @@ typedef enum _SOUI_EVENTS
     EVT_SELECTMENU = 22150,
     EVT_POPMENU,
 
+    EVT_REALWND_CREATE=22160,
+    EVT_REALWND_DESTROY,
+    EVT_REALWND_INIT,
+    EVT_REALWND_POSITION,
+
     EVT_EXTERNAL_BEGIN = 10000000,
 } SOUI_EVENTS;
 
@@ -609,6 +614,22 @@ DEF_EVT(EventSetHotKey, EVT_HOT_KEY_SET, on_hot_key_set_event, {
     WORD wModifiers;
 })
 
+DEF_EVT(EventRealWndCreate, EVT_REALWND_CREATE, on_real_wnd_create, {
+    HWND       hRet;
+    })
+
+DEF_EVT(EventRealWndDestroy, EVT_REALWND_DESTROY, on_real_wnd_destroy, {
+        int fake;
+    })
+
+DEF_EVT(EventRealWndInit, EVT_REALWND_INIT, on_real_wnd_init, {
+        BOOL bRet;
+    })
+
+DEF_EVT(EventRealWndPosition, EVT_REALWND_POSITION, on_real_wnd_position, {
+        RECT rc;
+        BOOL bRet;
+    })
 SNSEND
 
 #endif // __SEVENTS__H__

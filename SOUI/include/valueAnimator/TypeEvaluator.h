@@ -27,6 +27,7 @@
 #define __TYPEEVALUATOR__H__
 #include <math.h>
 #include <helper/obj-ref-impl.hpp>
+#include <helper/SColor.h>
 
 SNSBEGIN
 

@@ -12,14 +12,19 @@
 #define IDC_SOUIDIR                     1004
 #define IDC_BROWSE2                     1005
 #define IDC_VS2005                      1006
+#define IDC_INSTALL_DIR32               1006
 #define IDC_VS2008                      1007
+#define IDC_BROWSE_DIR32                1007
 #define IDC_VS2010                      1008
 #define IDC_VS2012                      1009
+#define IDC_INSTALL_DIR64               1010
 #define IDC_LIST1                       1011
 #define IDC_LOG                         1011
 #define IDC_BUTTON1                     1012
 #define IDC_SETOUTSOFT                  1012
 #define IDC_HOMESITE                    1012
+#define IDC_BROWSE4                     1013
+#define IDC_BROWSE_DIR64                1013
 #define IDC_VSENV                       1014
 #define IDC_VSLIST                      1014
 

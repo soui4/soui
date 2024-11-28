@@ -14,7 +14,13 @@ source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
+add_definitions(-DSTATIC_BUILD -D_CRT_SECURE_NO_WARNINGS)
+
 add_library(Scintilla STATIC ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_RC})
+
+if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+   add_dependencies(Scintilla swinx)
+endif()
 
 set(COM_LIBS ${COM_LIBS} Scintilla CACHE INTERNAL "com_lib")
 set_target_properties (Scintilla PROPERTIES

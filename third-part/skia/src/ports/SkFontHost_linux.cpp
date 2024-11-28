@@ -289,7 +289,7 @@ protected:
     }
 
     virtual SkTypeface* onLegacyCreateTypeface(const char familyName[],
-                                               unsigned styleBits) const SK_OVERRIDE
+                                               unsigned styleBits, unsigned charset) const SK_OVERRIDE
     {
         SkTypeface::Style oldStyle = (SkTypeface::Style)styleBits;
         SkFontStyle style = SkFontStyle(oldStyle & SkTypeface::kBold
@@ -329,7 +329,15 @@ private:
         SkOSFile::Iter iter(directory.c_str(), ".ttf");
         SkString name;
 
+        static const char * kBlackList[]={
+            "NotoSerifEthiopic-SemiCondensedExtraLight.ttf",
+            "NotoSerifDevanagari-SemiCondensedBold.ttf"
+        };
         while (iter.next(&name, false)) {
+            for(int i=0,c=sizeof(kBlackList)/sizeof(const char*);i<c;i++){
+                if(name.contains(kBlackList[i]))
+                    continue;
+            }
             SkString filename(
                 SkOSPath::Join(directory.c_str(), name.c_str()));
 
@@ -381,6 +389,7 @@ private:
         static const char* gDefaultNames[] = {
             "Arial", "Verdana", "Times New Roman", "Droid Sans", NULL
         };
+        gDefaultNormal = NULL;
         for (size_t i = 0; i < SK_ARRAY_COUNT(gDefaultNames); ++i) {
             SkFontStyleSet_Custom* set = this->onMatchFamily(gDefaultNames[i]);
             if (NULL == set) {

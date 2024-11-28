@@ -40,7 +40,7 @@ public:
 
     virtual void clear() SK_OVERRIDE;
 
-    virtual int getCount() const SK_OVERRIDE { return fCount; }
+    virtual int getCount() const SK_OVERRIDE { return (int)fCount; }
 
     virtual int getDepth() const SK_OVERRIDE { return -1; }
 

@@ -158,14 +158,16 @@
 #    undef NOMINMAX
 #  endif
 #
+#
+#endif
+
+//force to using ARGB format, hjx 2024.8.28
 #  ifndef SK_A32_SHIFT
 #    define SK_A32_SHIFT 24
 #    define SK_R32_SHIFT 16
 #    define SK_G32_SHIFT 8
 #    define SK_B32_SHIFT 0
 #  endif
-#
-#endif
 
 #ifndef SK_ALWAYSBREAK
 #  ifdef SK_DEBUG

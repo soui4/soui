@@ -42,9 +42,9 @@ GrGpu::GrGpu(GrContext* context)
     fGeomPoolStateStack.push_back();
 #ifdef SK_DEBUG
     GeometryPoolState& poolState = fGeomPoolStateStack.back();
-    poolState.fPoolVertexBuffer = (GrVertexBuffer*)DEBUG_INVAL_BUFFER;
+    poolState.fPoolVertexBuffer = (GrVertexBuffer*)(intptr_t)DEBUG_INVAL_BUFFER;
     poolState.fPoolStartVertex = DEBUG_INVAL_START_IDX;
-    poolState.fPoolIndexBuffer = (GrIndexBuffer*)DEBUG_INVAL_BUFFER;
+    poolState.fPoolIndexBuffer = (GrIndexBuffer*)(intptr_t)DEBUG_INVAL_BUFFER;
     poolState.fPoolStartIndex = DEBUG_INVAL_START_IDX;
 #endif
 }

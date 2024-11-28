@@ -13,7 +13,7 @@ using namespace SOUI;
 
 #include "exp_Basic.h"
 #include "exp_string.h"
-#include "exp_ixml.h"
+#include "exp_IXml.h"
 #include "exp_ctrls.h"
 #include "exp_Window.h"
 #include "exp_IObjRef.h"
@@ -38,7 +38,7 @@ using namespace SOUI;
 #include "exp_IAnimation.h"
 #include "exp_IValueAnimator.h"
 #include "exp_IInterpolator.h"
-#include "exp_Global.h"
+#include "exp_global.h"
 #include "exp_SysApi.h"
 
 BOOL SOUI_Export_Lua(lua_State *L)

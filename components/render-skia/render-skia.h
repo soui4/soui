@@ -212,6 +212,11 @@ public:
 public:
 	const SkBitmap & GetSkBitmap() const{return m_bitmap;}
 	HBITMAP  GetGdiBitmap(){return m_hBmp;}
+	#ifndef _WIN32
+	void MarkDirty(){
+		MarkPixmapDirty(m_hBmp);
+	}
+	#endif//_WIN32
 protected:
 	HBITMAP CreateGDIBitmap(int nWid,int nHei,void ** ppBits);
 
@@ -385,7 +390,7 @@ public:
 	SRenderTarget_Skia(IRenderFactory* pRenderFactory,int nWid,int nHei);
 	~SRenderTarget_Skia();
 	STDMETHOD_(void, BeginDraw)(THIS) OVERRIDE{}
-	STDMETHOD_(void, EndDraw)(THIS) OVERRIDE{}
+	STDMETHOD_(void, EndDraw)(THIS) OVERRIDE;
 	STDMETHOD_(BOOL,IsOffscreen)(CTHIS) SCONST {return TRUE;}
 
 	STDMETHOD_(HRESULT,CreatePen)(THIS_ int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen) OVERRIDE;
@@ -490,7 +495,7 @@ protected:
 	SAutoRefPtr<IRenderFactory> m_pRenderFactory;
 
 	HDC m_hGetDC;
-	UINT m_uGetDCFlag;
+	int m_nGetDC;
 
 	bool			m_bAntiAlias;
 	SList<int>		m_lstLayerId;	//list to save layer ids

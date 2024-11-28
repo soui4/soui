@@ -2,11 +2,8 @@
 #ifndef __OBJ_REF_IMPL_HPP
 #define __OBJ_REF_IMPL_HPP
 #include <sdef.h>
-
-#ifndef SASSERT
-#include <assert.h>
-#define SASSERT(x) assert(x);
-#endif
+#include <objbase.h>
+#include <interface/obj-ref-i.h>
 
 SNSBEGIN
 
@@ -21,12 +18,14 @@ public:
 	virtual ~TObjRefImpl(){
 	}
 
-	virtual long WINAPI AddRef () override{
+	STDMETHOD_(long,AddRef) (THIS) override{
 		return InterlockedIncrement(&m_cRef);
 	}
 
-	virtual long WINAPI Release () override
-	{
+	//!释放引用
+	/*!
+	*/
+	STDMETHOD_(long,Release) (THIS) override{
 		long lRet = InterlockedDecrement(&m_cRef);
 		if(lRet==0)
 		{
@@ -35,12 +34,15 @@ public:
 		return lRet;
 	}
 
-	virtual void WINAPI OnFinalRelease () override
-    {
-        delete this;
-    }
+	//!释放对象
+	/*!
+	*/
+	STDMETHOD_(void,OnFinalRelease) (THIS) override{
+		delete this;
+	}
+
 protected:
-	volatile LONG m_cRef;
+	LONG m_cRef;
 };
 
 
@@ -49,8 +51,7 @@ template<class T,class T2>
 class TObjRefImpl2 :  public TObjRefImpl<T>
 {
 public:
-	virtual void WINAPI OnFinalRelease () override
-	{
+	STDMETHOD_(void,OnFinalRelease) (THIS) override{
 		delete static_cast<T2*>(this);
 	}
 };
@@ -65,10 +66,10 @@ public:
 		p = NULL;
 	}
 
-	SAutoRefPtr(T* lp) 
+	SAutoRefPtr(T* lp,BOOL bAddRef=TRUE) 
 	{
 		p = lp;
-		if (p != NULL)
+		if (p != NULL && bAddRef)
 		{
 			p->AddRef();
 		}

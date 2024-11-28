@@ -2,6 +2,7 @@
 #define __SLOG_I__H__
 
 #include <interface/obj-ref-i.h>
+#include <windows.h>
 #include <time.h>
 
 SNSBEGIN

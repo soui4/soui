@@ -1,7 +1,8 @@
 ﻿#ifndef __SOUILAYOUT__H__
 #define __SOUILAYOUT__H__
-#include "interface/slayout-i.h"
-#include "SouiLayoutParamStruct.h"
+#include <interface/slayout-i.h>
+#include <layout/SouiLayoutParamStruct.h>
+#include <sobject/Sobject.hpp>
 
 SNSBEGIN
 

@@ -1,11 +1,13 @@
-﻿#include "TaskLoop.h"
+﻿#include <windows.h>
+#include "TaskLoop.h"
 #include <helper/obj-ref-impl.hpp>
 #include <algorithm>
 #include <cassert>
 #include <deque>
 #include <limits>
+#ifdef _WIN32
 #pragma comment(lib,"Winmm.lib")
-
+#endif//_WIN32
 namespace SOUI
 {
 
@@ -26,7 +28,9 @@ namespace SOUI
 	{
 		stop();
 		if(m_nHeartBeatInterval!=INFINITE){
+			#ifdef _WIN32
 			timeEndPeriod(1);
+			#endif//_WIN32
 		}
 	}
 
@@ -61,7 +65,7 @@ namespace SOUI
 		}
 		SAutoRefPtr<IRunnable> pCloneRunnable;
 		pCloneRunnable.Attach(runnable->clone());
-		if (Thread::getCurrentThreadID() == m_thread.getThreadID() && waitUntilDone)
+		if (GetCurrentThreadId() == m_thread.getThreadID() && waitUntilDone)
 		{
 			pCloneRunnable->run();
 			return -1;
@@ -160,7 +164,11 @@ namespace SOUI
 			{
 				SAutoLock autoLock(m_csHeartBeatTask);
 				if(m_heartBeatTask){
+					#ifdef _WIN32
 					unsigned int tsNow = timeGetTime();
+					#else
+					unsigned int tsNow = GetTickCount();
+					#endif
 					unsigned int elapse = 0;
 					if(m_tsTick == -1)
 					{
@@ -250,7 +258,9 @@ namespace SOUI
 			if(m_heartBeatTask && m_heartBeatTask->getObject() == object){
 				m_heartBeatTask=NULL;
 				m_nHeartBeatInterval = INFINITE;
+				#ifdef _WIN32
 				timeEndPeriod(1);
+				#endif//_WIN32
 			}
 		}
 	}
@@ -297,13 +307,17 @@ namespace SOUI
 		if(pTask){
 			m_nHeartBeatInterval = intervel;
 			m_heartBeatTask.Attach(pTask->clone());
+			#ifdef _WIN32
 			timeBeginPeriod(1);
+			#endif//_WIN32
 			m_tsTick = -1;
 			m_itemsSem.notify();//stop previous wait.
 		}else{
 			m_heartBeatTask = NULL;
 			m_nHeartBeatInterval=INFINITE;
+			#ifdef _WIN32
 			timeEndPeriod(1);
+			#endif//_WIN32
 		}
 	}
 

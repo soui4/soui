@@ -13,10 +13,11 @@
 
 #ifndef __SCMNCTRL__H__
 #define __SCMNCTRL__H__
-#include "core/SWnd.h"
-#include "core/SAccelerator.h"
-#include "core/SFocusManager.h"
+#include <core/SWnd.h>
+#include <core/SAccelerator.h>
+#include <core/SFocusManager.h>
 #include <interface/SCtrl-i.h>
+#include <proxy/SWindowProxy.h>
 
 SNSBEGIN
 

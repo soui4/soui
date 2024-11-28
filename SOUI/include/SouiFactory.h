@@ -20,7 +20,7 @@ class SOUI_EXP SouiFactory : public TObjRefImpl<ISouiFactory> {
     STDMETHOD_(IXmlDoc *, CreateXmlDoc)(THIS) OVERRIDE;
     STDMETHOD_(IResProvider*, CreateResProvider)(THIS_ BUILTIN_RESTYPE resType) OVERRIDE;
     STDMETHOD_(IEvtSlot *, CreateFuncSlot)(THIS_ FunCallback fun, void *ctx) OVERRIDE;
-	STDMETHOD_(IMenu*, CreateMenu)(THIS_  HMENU hMenu DEF_VAL(NULL)) OVERRIDE;
+	STDMETHOD_(IMenu*, CreateMenu)(THIS_  HMENU hMenu DEF_VAL(0)) OVERRIDE;
 	STDMETHOD_(IMenuEx*,CreateMenuEx)(THIS) OVERRIDE;
 	STDMETHOD_(ITimer*,CreateTimer)(THIS_ IEvtSlot *pEvtSlot) OVERRIDE;
 	STDMETHOD_(IAnimatorGroup*,CreateAnimatorGroup)(THIS) OVERRIDE;

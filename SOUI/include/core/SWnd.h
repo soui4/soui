@@ -14,7 +14,7 @@
 #ifndef __SWND__H__
 #define __SWND__H__
 #include <core/SWindowMgr.h>
-#include <interface/SwndContainer-i.h>
+#include <interface/SWndContainer-i.h>
 #include <interface/slayout-i.h>
 #include <interface/saccproxy-i.h>
 #include <interface/scaret-i.h>
@@ -24,11 +24,10 @@
 #include <event/SEvents.h>
 #include <event/SEventSet.h>
 #include <res.mgr/SUiDef.h>
-#include <core/SwndStyle.h>
+#include <core/SWndStyle.h>
 #include <core/SSkin.h>
 #include <animation/SAnimation.h>
 #include <interface/SWindow-i.h>
-#include <OCIdl.h>
 
 #define SC_WANTARROWS  0x0001     /* Control wants arrow keys         */
 #define SC_WANTTAB     0x0002     /* Control wants tab keys           */
@@ -448,7 +447,9 @@ class SOUI_EXP SWindow
     STDMETHOD_(void, SetCaretPos)(THIS_ int x, int y) OVERRIDE;
 
   public:
+  #ifdef _WIN32
     IAccessible *GetAccessible();
+  #endif
     IAccProxy *GetAccProxy();
     void accNotifyEvent(DWORD dwEvt);
 

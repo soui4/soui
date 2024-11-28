@@ -1,8 +1,9 @@
 ﻿#ifndef __SGRIDLAYOUT__H__
 #define __SGRIDLAYOUT__H__
 
-#include "interface/slayout-i.h"
-#include "SGridLayoutParamStruct.h"
+#include <interface/slayout-i.h>
+#include <layout/SGridLayoutParamStruct.h>
+#include <sobject/Sobject.hpp>
 
 SNSBEGIN
 

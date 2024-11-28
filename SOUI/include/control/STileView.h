@@ -1,11 +1,12 @@
 ﻿#ifndef __STILEVIEW__H__
 #define __STILEVIEW__H__
 
-#include "core/SWnd.h"
-#include "core/SItemPanel.h"
-#include "interface/SAdapter-i.h"
-
-#include "helper/STileViewItemLocator.h"
+#include <core/SWnd.h>
+#include <core/SPanel.h>
+#include <core/SItemPanel.h>
+#include <interface/SAdapter-i.h>
+#include <helper/STileViewItemLocator.h>
+#include <proxy/SPanelProxy.h>
 
 SNSBEGIN
 

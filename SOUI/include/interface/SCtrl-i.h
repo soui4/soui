@@ -11,7 +11,7 @@
 #include <interface/SListViewItemLocator-i.h>
 #include <interface/STreeViewItemLocator-i.h>
 #include <interface/STileViewItemLocator-i.h>
-
+#include <SGuidDef.h>
 SNSBEGIN
 
 #undef INTERFACE
@@ -45,10 +45,14 @@ DECLARE_INTERFACE_(ICtrl, IObjRef)
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
 };
 
+// {36D49C0A-CCBA-4238-98E2-B6ACB18824B5}
+DEFINE_SGUID(IID_IOsrPanel, 
+			0x36d49c0a, 0xccba, 0x4238, 0x98, 0xe2, 0xb6, 0xac, 0xb1, 0x88, 0x24, 0xb5);
 #undef INTERFACE
 #define INTERFACE IOsrPanel
-DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
+DECLARE_INTERFACE_(IOsrPanel, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IOsrPanel)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -110,10 +114,16 @@ DECLARE_INTERFACE_IID_(IOsrPanel, ICtrl, "85A3CD3C-D665-454b-AABC-EE8389BBD914")
     STDMETHOD_(void, PtToHost)(THIS_ POINT * pt) SCONST PURE;
 };
 
+
+// {F78CA81B-729B-4fe5-B3FE-6C70AD363017}
+DEFINE_SGUID(IID_IItemPanel, 
+			0xf78ca81b, 0x729b, 0x4fe5, 0xb3, 0xfe, 0x6c, 0x70, 0xad, 0x36, 0x30, 0x17);
+
 #undef INTERFACE
 #define INTERFACE IItemPanel
-DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F909A4")
+DECLARE_INTERFACE_(IItemPanel, IOsrPanel)
 {
+	DECLARE_CLASS_SIID(IID_IItemPanel)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -191,10 +201,16 @@ DECLARE_INTERFACE_IID_(IItemPanel, IOsrPanel, "176CDF98-260E-4070-91B5-E6E163F90
     STDMETHOD_(void, SetColor)(THIS_ COLORREF crBk, COLORREF crSelBk) PURE;
 };
 
+
+// {310A0C73-1DCA-4ac2-B6C9-569B0EA40496}
+DEFINE_SGUID(IID_IImageWnd, 
+			0x310a0c73, 0x1dca, 0x4ac2, 0xb6, 0xc9, 0x56, 0x9b, 0xe, 0xa4, 0x4, 0x96);
+
 #undef INTERFACE
 #define INTERFACE IImageWnd
-DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
+DECLARE_INTERFACE_(IImageWnd, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IImageWnd)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -267,10 +283,16 @@ DECLARE_INTERFACE_IID_(IImageWnd, ICtrl, "42148B05-6223-46f6-B903-D42D84038546")
     STDMETHOD_(BOOL, SetIcon)(THIS_ int nSubID) PURE;
 };
 
+
+// {C2378093-CB34-4811-98D1-A721637B3B87}
+DEFINE_SGUID(IID_IAnimateImgWnd, 
+			0xc2378093, 0xcb34, 0x4811, 0x98, 0xd1, 0xa7, 0x21, 0x63, 0x7b, 0x3b, 0x87);
+
 #undef INTERFACE
 #define INTERFACE IAnimateImgWnd
-DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E2595A")
+DECLARE_INTERFACE_(IAnimateImgWnd, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IAnimateImgWnd)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -323,10 +345,16 @@ DECLARE_INTERFACE_IID_(IAnimateImgWnd, ICtrl, "374A5086-AD38-4f15-83E0-002822E25
     STDMETHOD_(BOOL, IsPlaying)(CTHIS) SCONST PURE;
 };
 
+
+// {0A572106-14E0-48d7-85C3-3E08B9DA85A8}
+DEFINE_SGUID(IID_IProgress, 
+			0xa572106, 0x14e0, 0x48d7, 0x85, 0xc3, 0x3e, 0x8, 0xb9, 0xda, 0x85, 0xa8);
+
 #undef INTERFACE
 #define INTERFACE IProgress
-DECLARE_INTERFACE_IID_(IProgress, ICtrl, "77407E2D-582B-4ef2-A33A-427C933BAA8C")
+DECLARE_INTERFACE_(IProgress, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IProgress)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -407,10 +435,15 @@ typedef enum _ScrollBarID
     SSB_BOTH = (SSB_HORZ | SSB_VERT),
 } ScrollBarID;
 
+// {8DE0A6C5-9CBC-465f-B784-EBA4CB8AE6D9}
+DEFINE_SGUID(IID_IPanel, 
+			0x8de0a6c5, 0x9cbc, 0x465f, 0xb7, 0x84, 0xeb, 0xa4, 0xcb, 0x8a, 0xe6, 0xd9);
+
 #undef INTERFACE
 #define INTERFACE IPanel
-DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
+DECLARE_INTERFACE_(IPanel, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IPanel)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -514,10 +547,16 @@ DECLARE_INTERFACE_IID_(IPanel, ICtrl, "B1A97BB7-64BE-408f-AC7C-2197CC2F4DD0")
     STDMETHOD_(BOOL, HasScrollBar)(CTHIS_ BOOL bVertical) SCONST PURE;
 };
 
+
+
+// {F7A4A172-31B2-4597-9DE5-F62160723733}
+DEFINE_SGUID(IID_IScrollView, 
+			0xf7a4a172, 0x31b2, 0x4597, 0x9d, 0xe5, 0xf6, 0x21, 0x60, 0x72, 0x37, 0x33);
 #undef INTERFACE
 #define INTERFACE IScrollView
-DECLARE_INTERFACE_IID_(IScrollView, IPanel, "49B024D6-221D-42d4-902B-AFAAC5AFFE41")
+DECLARE_INTERFACE_(IScrollView, IPanel)
 {
+	DECLARE_CLASS_SIID(IID_IScrollView)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -681,10 +720,15 @@ typedef struct SHDITEM
     float fWeight;
 } SHDITEM, *LPSHDITEM;
 
+
+// {EE19AA27-7C36-4426-8700-8FBCB0C738F5}
+DEFINE_SGUID(IID_IHeaderCtrl, 
+			0xee19aa27, 0x7c36, 0x4426, 0x87, 0x0, 0x8f, 0xbc, 0xb0, 0xc7, 0x38, 0xf5);
 #undef INTERFACE
 #define INTERFACE IHeaderCtrl
-DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45")
+DECLARE_INTERFACE_(IHeaderCtrl, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IHeaderCtrl)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -843,10 +887,16 @@ DECLARE_INTERFACE_IID_(IHeaderCtrl, ICtrl, "60A8788F-C775-424f-AA82-DCA9CECE3D45
     STDMETHOD_(void, GetItemRect)(CTHIS_ int iItem, LPRECT prc) SCONST PURE;
 };
 
+
+
+// {107ED2EA-6C95-4cec-A300-2CE5AB0A7DDB}
+DEFINE_SGUID(IID_IListView, 
+			0x107ed2ea, 0x6c95, 0x4cec, 0xa3, 0x0, 0x2c, 0xe5, 0xab, 0xa, 0x7d, 0xdb);
 #undef INTERFACE
 #define INTERFACE IListView
-DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2")
+DECLARE_INTERFACE_(IListView, IPanel)
 {
+	DECLARE_CLASS_SIID(IID_IListView)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -1007,10 +1057,15 @@ DECLARE_INTERFACE_IID_(IListView, IPanel, "E584B16A-6BDB-4afb-8BCC-3A1ABACD2FE2"
     STDMETHOD_(IItemPanel *, HitTest)(CTHIS_ const POINT *pt) SCONST PURE;
 };
 
+
+// {A45F148C-F628-4df7-A60E-B51DA0017B00}
+DEFINE_SGUID(IID_IMcListView, 
+			0xa45f148c, 0xf628, 0x4df7, 0xa6, 0xe, 0xb5, 0x1d, 0xa0, 0x1, 0x7b, 0x0);
 #undef INTERFACE
 #define INTERFACE IMcListView
-DECLARE_INTERFACE_IID_(IMcListView, IPanel, "485AB4B5-6018-4710-BF8E-751FDE53E335")
+DECLARE_INTERFACE_(IMcListView, IPanel)
 {
+	DECLARE_CLASS_SIID(IID_IMcListView)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -1202,10 +1257,15 @@ DECLARE_INTERFACE_IID_(IMcListView, IPanel, "485AB4B5-6018-4710-BF8E-751FDE53E33
     STDMETHOD_(int, GetColumnCount)(CTHIS) SCONST PURE;
 };
 
+
+// {572CA529-AFFF-412c-8A51-2014A9801739}
+DEFINE_SGUID(IID_ITreeView, 
+			0x572ca529, 0xafff, 0x412c, 0x8a, 0x51, 0x20, 0x14, 0xa9, 0x80, 0x17, 0x39);
 #undef INTERFACE
 #define INTERFACE ITreeView
-DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B")
+DECLARE_INTERFACE_(ITreeView, IPanel)
 {
+	DECLARE_CLASS_SIID(IID_ITreeView)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -1364,10 +1424,16 @@ DECLARE_INTERFACE_IID_(ITreeView, IPanel, "4FB8BF5D-950C-4f05-861C-FBEB119E4C2B"
     STDMETHOD_(IItemPanel *, HitTest)(CTHIS_ const POINT *pt) SCONST PURE;
 };
 
+
+
+// {5586EA88-3D4B-4d5f-8F71-436D43420D00}
+DEFINE_SGUID(IID_ITileView, 
+			0x5586ea88, 0x3d4b, 0x4d5f, 0x8f, 0x71, 0x43, 0x6d, 0x43, 0x42, 0xd, 0x0);
 #undef INTERFACE
 #define INTERFACE ITileView
-DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3")
+DECLARE_INTERFACE_(ITileView, IPanel)
 {
+	DECLARE_CLASS_SIID(IID_ITileView)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -1526,10 +1592,16 @@ DECLARE_INTERFACE_IID_(ITileView, IPanel, "3718C98E-9177-4afb-986F-94B03A78F2C3"
     STDMETHOD_(IItemPanel *, HitTest)(CTHIS_ const POINT *pt) SCONST PURE;
 };
 
+
+
+// {B0B45363-3D10-4889-9459-A2A84E37575F}
+DEFINE_SGUID(IID_IListBox, 
+			0xb0b45363, 0x3d10, 0x4889, 0x94, 0x59, 0xa2, 0xa8, 0x4e, 0x37, 0x57, 0x5f);
 #undef INTERFACE
 #define INTERFACE IListBox
-DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
+DECLARE_INTERFACE_(IListBox, IPanel)
 {
+	DECLARE_CLASS_SIID(IID_IListBox)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -1796,10 +1868,15 @@ DECLARE_INTERFACE_IID_(IListBox, IPanel, "4A36DC8A-7378-4a2d-A3AF-D04B0712ACCD")
     STDMETHOD_(int, GetItemImage)(THIS_ int nIndex) PURE;
 };
 
+
+// {5FB30471-54CB-4db8-9160-31B545E28BC5}
+DEFINE_SGUID(IID_IComboBase, 
+			0x5fb30471, 0x54cb, 0x4db8, 0x91, 0x60, 0x31, 0xb5, 0x45, 0xe2, 0x8b, 0xc5);
 #undef INTERFACE
 #define INTERFACE IComboBase
-DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC")
+DECLARE_INTERFACE_(IComboBase, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IComboBase)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -1910,10 +1987,16 @@ DECLARE_INTERFACE_IID_(IComboBase, ICtrl, "2BF10693-BEBD-4497-B6B5-5380BA8401EC"
     STDMETHOD_(void, SetDropdown)(THIS_ BOOL bDropdown) PURE;
 };
 
+
+
+// {E7F9C5A6-EA49-41c8-9D8F-7075CB9674EA}
+DEFINE_SGUID(IID_IComboBox, 
+			0xe7f9c5a6, 0xea49, 0x41c8, 0x9d, 0x8f, 0x70, 0x75, 0xcb, 0x96, 0x74, 0xea);
 #undef INTERFACE
 #define INTERFACE IComboBox
-DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC9CF")
+DECLARE_INTERFACE_(IComboBox, IComboBase)
 {
+	DECLARE_CLASS_SIID(IID_IComboBox)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -2078,10 +2161,16 @@ DECLARE_INTERFACE_IID_(IComboBox, IComboBase, "AC6C72BB-51BE-4216-ADA5-B394283DC
     STDMETHOD_(IListBox *, GetIListBox)(THIS) PURE;
 };
 
+
+
+// {36DD3BAD-523B-421a-9311-3DD0F0BF06D1}
+DEFINE_SGUID(IID_IComboView, 
+                                      0x36dd3bad, 0x523b, 0x421a, 0x93, 0x11, 0x3d, 0xd0, 0xf0, 0xbf, 0x6, 0xd1);
 #undef INTERFACE
 #define INTERFACE IComboView
-DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC253D")
+DECLARE_INTERFACE_(IComboView, IComboBase)
 {
+	DECLARE_CLASS_SIID(IID_IComboView)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -2195,10 +2284,16 @@ DECLARE_INTERFACE_IID_(IComboView, IComboBase, "EADE040E-0D6A-47a3-882F-F70A94FC
     STDMETHOD_(IListView *, GetIListView)(THIS) PURE;
 };
 
+
+
+// {846F25CD-E0DB-49b0-8F20-0BD70538F631}
+DEFINE_SGUID(IID_IDateTimePicker, 
+0x846f25cd, 0xe0db, 0x49b0, 0x8f, 0x20, 0xb, 0xd7, 0x5, 0x38, 0xf6, 0x31);
 #undef INTERFACE
 #define INTERFACE IDateTimePicker
-DECLARE_INTERFACE_IID_(IDateTimePicker, ICtrl, "6DB1EF42-AED7-4a36-8011-BE2AD7B45953")
+DECLARE_INTERFACE_(IDateTimePicker, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IDateTimePicker)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -2273,6 +2368,7 @@ DECLARE_INTERFACE_IID_(IDateTimePicker, ICtrl, "6DB1EF42-AED7-4a36-8011-BE2AD7B4
 
 typedef int(__cdecl *FunTreeSortCallback)(void *pCtx, const void *phItem1, const void *phItem2);
 
+#ifndef STVI_ROOT
 #ifdef _WIN64
 #define STVI_ROOT  ((HSTREEITEM)0xFFFF000000000000) //=TVI_ROOT
 #define STVI_FIRST ((HSTREEITEM)0xFFFF000000000001) //=TVI_FIRST
@@ -2282,11 +2378,16 @@ typedef int(__cdecl *FunTreeSortCallback)(void *pCtx, const void *phItem1, const
 #define STVI_FIRST ((HSTREEITEM)0xFFFF0001) //=TVI_FIRST
 #define STVI_LAST  ((HSTREEITEM)0xFFFF0002) //=TVI_LAST
 #endif
+#endif//STVI_ROOT
 
+// {A877B61C-7E5E-4716-8423-8DC61EAF61E9}
+DEFINE_SGUID(IID_ITreeCtrl, 
+0xa877b61c, 0x7e5e, 0x4716, 0x84, 0x23, 0x8d, 0xc6, 0x1e, 0xaf, 0x61, 0xe9);
 #undef INTERFACE
 #define INTERFACE ITreeCtrl
-DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A")
+DECLARE_INTERFACE_(ITreeCtrl, IPanel)
 {
+	DECLARE_CLASS_SIID(IID_ITreeCtrl)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -2578,10 +2679,16 @@ DECLARE_INTERFACE_IID_(ITreeCtrl, IPanel, "8FACB4B5-DD66-4755-AFD0-7DA8BB15611A"
     STDMETHOD_(BOOL, EnsureVisible)(THIS_ HSTREEITEM hItem) PURE;
 };
 
+
+
+// {E21767AC-6A40-45a2-9E5C-EA5CDF516C60}
+DEFINE_SGUID(IID_IHotKeyCtrl, 
+0xe21767ac, 0x6a40, 0x45a2, 0x9e, 0x5c, 0xea, 0x5c, 0xdf, 0x51, 0x6c, 0x60);
 #undef INTERFACE
 #define INTERFACE IHotKeyCtrl
-DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55")
+DECLARE_INTERFACE_(IHotKeyCtrl, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IHotKeyCtrl)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -2640,10 +2747,15 @@ DECLARE_INTERFACE_IID_(IHotKeyCtrl, ICtrl, "8839DDF0-84CE-4bca-8BE4-FF55928E3A55
     STDMETHOD_(void, GetHotKey)(CTHIS_ WORD * wKey, WORD * wModifers) SCONST PURE;
 };
 
+
+// {7B9C2C3E-3101-4cda-9436-F88D9993BA5F}
+DEFINE_SGUID(IID_IRichEdit, 
+			0x7b9c2c3e, 0x3101, 0x4cda, 0x94, 0x36, 0xf8, 0x8d, 0x99, 0x93, 0xba, 0x5f);
 #undef INTERFACE
 #define INTERFACE IRichEdit
-DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A")
+DECLARE_INTERFACE_(IRichEdit, IPanel)
 {
+	DECLARE_CLASS_SIID(IID_IRichEdit)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -2917,10 +3029,15 @@ DECLARE_INTERFACE_IID_(IRichEdit, IPanel, "6B72BCCE-9D42-4fb8-9CF4-F8F9605ACA9A"
     STDMETHOD_(COLORREF, SetDefaultTextColor)(THIS_ COLORREF cr) PURE;
 };
 
+
+// {A32ED365-E6B8-4ada-BE49-BCF127F94427}
+DEFINE_SGUID(IID_ITabPage, 
+			0xa32ed365, 0xe6b8, 0x4ada, 0xbe, 0x49, 0xbc, 0xf1, 0x27, 0xf9, 0x44, 0x27);
 #undef INTERFACE
 #define INTERFACE ITabPage
-DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
+DECLARE_INTERFACE_(ITabPage, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_ITabPage)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -2983,10 +3100,16 @@ DECLARE_INTERFACE_IID_(ITabPage, ICtrl, "7E1C8BBF-1F87-4174-A30C-6CE3E4A47A13")
     STDMETHOD_(void, SetIconIndex)(THIS_ int iIcon) PURE;
 };
 
+
+
+// {17714866-88B9-480b-83D1-F044486D78D1}
+DEFINE_SGUID(IID_ITabCtrl, 
+0x17714866, 0x88b9, 0x480b, 0x83, 0xd1, 0xf0, 0x44, 0x48, 0x6d, 0x78, 0xd1);
 #undef INTERFACE
 #define INTERFACE ITabCtrl
-DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
+DECLARE_INTERFACE_(ITabCtrl, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_ITabCtrl)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -3106,10 +3229,16 @@ DECLARE_INTERFACE_IID_(ITabCtrl, ICtrl, "CAD40CB4-A0E5-4bea-9CE6-8DFC45DEFFD4")
     STDMETHOD_(int, GetPageIndex)(THIS_ LPCTSTR pszName, BOOL bTitle) PURE;
 };
 
+
+
+// {71CCB156-39DD-4eee-842C-C8363368AF30}
+DEFINE_SGUID(IID_IEdit, 
+0x71ccb156, 0x39dd, 0x4eee, 0x84, 0x2c, 0xc8, 0x36, 0x33, 0x68, 0xaf, 0x30);
 #undef INTERFACE
 #define INTERFACE IEdit
-DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560")
+DECLARE_INTERFACE_(IEdit, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IEdit)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -3153,10 +3282,16 @@ DECLARE_INTERFACE_IID_(IEdit, ICtrl, "E682E0FF-1B1C-4a15-AB43-552E705B2560")
     STDMETHOD_(COLORREF, GetCueColor)(CTHIS) SCONST PURE;
 };
 
+
+
+// {7F8DF81C-6C6E-4572-BDE6-0757A4D07C5F}
+DEFINE_SGUID(IID_ISpinButtonCtrl, 
+			0x7f8df81c, 0x6c6e, 0x4572, 0xbd, 0xe6, 0x7, 0x57, 0xa4, 0xd0, 0x7c, 0x5f);
 #undef INTERFACE
 #define INTERFACE ISpinButtonCtrl
-DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A03561F8C")
+DECLARE_INTERFACE_(ISpinButtonCtrl, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_ISpinButtonCtrl)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -3219,10 +3354,16 @@ DECLARE_INTERFACE_IID_(ISpinButtonCtrl, ICtrl, "C04997B9-E2AA-48bf-AEA5-FF1A0356
     STDMETHOD_(IWindow *, GetIBuddy)(CTHIS) SCONST PURE;
 };
 
+
+
+// {80E930E7-BFC2-4e5e-8FFC-A2F0B4EC24E9}
+DEFINE_SGUID(IID_IIconWnd, 
+0x80e930e7, 0xbfc2, 0x4e5e, 0x8f, 0xfc, 0xa2, 0xf0, 0xb4, 0xec, 0x24, 0xe9);
 #undef INTERFACE
 #define INTERFACE IIconWnd
-DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
+DECLARE_INTERFACE_(IIconWnd, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IIconWnd)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -3261,10 +3402,16 @@ DECLARE_INTERFACE_IID_(IIconWnd, ICtrl, "8BBD8033-9955-41FD-8C3D-19FE702A9DB0")
     STDMETHOD_(void, SetIcon)(THIS_ HICON hIcon) PURE;
 };
 
+
+
+// {EDFF5B4F-8BF0-46fb-9399-C91859D5A1BC}
+DEFINE_SGUID(IID_IRealWnd, 
+0xedff5b4f, 0x8bf0, 0x46fb, 0x93, 0x99, 0xc9, 0x18, 0x59, 0xd5, 0xa1, 0xbc);
 #undef INTERFACE
 #define INTERFACE IRealWnd
-DECLARE_INTERFACE_IID_(IRealWnd, ICtrl, "3E9F9B19-68D1-47f1-9011-2F8B98C0A628")
+DECLARE_INTERFACE_(IRealWnd, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IRealWnd)
     /**
      * @brief 增加引用计数
      * @return 新引用计数
@@ -3340,10 +3487,14 @@ typedef enum _StackViewAniStyle
     kPushInOut
 } StackViewAniStyle;
 
+// {59D1145E-C906-404e-8128-29C7CC80E3DC}
+DEFINE_SGUID(IID_IStackView, 
+			0x59d1145e, 0xc906, 0x404e, 0x81, 0x28, 0x29, 0xc7, 0xcc, 0x80, 0xe3, 0xdc);
 #undef INTERFACE
 #define INTERFACE IStackView
-DECLARE_INTERFACE_IID_(IStackView, ICtrl, "1A7172D8-F45B-45fe-A73E-2B7F07E7EB70")
+DECLARE_INTERFACE_(IStackView, ICtrl)
 {
+	DECLARE_CLASS_SIID(IID_IStackView)
     /**
      * @brief 增加引用计数
      * @return 新引用计数

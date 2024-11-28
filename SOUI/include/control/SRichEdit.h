@@ -13,12 +13,13 @@
 #ifndef __SRICHEDIT__H__
 #define __SRICHEDIT__H__
 
-#include <Richedit.h>
-#include <TextServ.h>
+#include <richedit.h>
 #include <core/SPanel.h>
-#include <core/SSingleton2.h>
 #include <proxy/SCtrlProxy.h>
 #include <interface/STimer-i.h>
+
+#include <imm.h>
+#include <textserv.h>
 
 SNSBEGIN
 enum
@@ -33,83 +34,6 @@ enum
 };
 
 class SRichEdit;
-/**
- * @class      STextServiceHelper
- * @brief
- *
- * Describe
- */
-class SOUI_EXP STextServiceHelper : public SSingleton2<STextServiceHelper> {
-    SINGLETON2_TYPE(SINGLETON_TEXTSERVICEHELPER)
-  public:
-    /**
-     * STextServiceHelper::CreateTextServices
-     * @brief
-     * @param  IUnknown *punkOuter
-     * @param  ITextHost *pITextHost
-     * @param  IUnknown **ppUnk
-     * @return 返回HRESULT
-     *
-     * Describe
-     */
-    HRESULT CreateTextServices(IUnknown *punkOuter, ITextHost *pITextHost, IUnknown **ppUnk);
-
-  protected:
-    /**
-     * STextServiceHelper::STextServiceHelper
-     * @brief    构造函数
-     *
-     * Describe  构造函数
-     */
-    STextServiceHelper();
-    /**
-     * STextServiceHelper::~STextServiceHelper
-     * @brief    析构函数
-     *
-     * Describe  析构函数
-     */
-    ~STextServiceHelper();
-
-    HINSTANCE m_rich20;                          /**< richedit module */
-    PCreateTextServices m_funCreateTextServices; /**< 回调函数 */
-};
-
-/**
- * @class      SRicheditMenuDef
- * @brief
- *
- * Describe
- */
-class SOUI_EXP SRicheditMenuDef : public SSingleton2<SRicheditMenuDef> {
-    SINGLETON2_TYPE(SINGLETON_RICHEDITMENUDEF)
-  public:
-    /**
-     * SRicheditMenuDef::SetMenuXml
-     * @brief    加载xml文件
-     *
-     * Describe  加载xml文件
-     */
-    void SetMenuXml(SXmlNode xmlMenu)
-    {
-        m_xmlMenu.Reset();
-        m_xmlMenu.root().append_copy(xmlMenu);
-    }
-
-    /**
-     * SRicheditMenuDef::GetMenuXml
-     * @brief    获取xml文件
-     *
-     * Describe  获取xml文件
-     */
-    SXmlNode GetMenuXml()
-    {
-        return m_xmlMenu.root().first_child();
-    }
-
-  protected:
-    SXmlDoc m_xmlMenu; /**< xml文件对象 */
-};
-
 /**
  * @class      STextHost
  * @brief
@@ -154,32 +78,9 @@ class SOUI_EXP STextHost : public ITextHost {
     }
 
   protected:
-    /**
-     * STextHost::QueryInterface
-     * @brief
-     * @param     REFIID riid
-     * @param     void **ppvObject
-     *
-     * Describe
-     */
-    virtual HRESULT _stdcall QueryInterface(REFIID riid, void **ppvObject);
-    /**
-     * STextHost::AddRef
-     * @brief
-     * @brief
-     * @return    返回UNLONG
-     *
-     * Describe
-     */
-    virtual ULONG _stdcall AddRef(void);
-    /**
-     * STextHost::Release
-     * @brief
-     * @return    返回UNLONG
-     *
-     * Describe
-     */
-    virtual ULONG _stdcall Release(void);
+      STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID riid, void** ppvObject) OVERRIDE;
+      STDMETHOD_(ULONG, AddRef)(THIS) OVERRIDE;
+      STDMETHOD_(ULONG, Release)(THIS) OVERRIDE;
 
     /**
      * STextHost::TxGetDC
@@ -1076,11 +977,6 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      */
     void OnEnableDragDrop(BOOL bEnable);
 
-    virtual SXmlNode GetMenuTemplate() const
-    {
-        return SRicheditMenuDef::getSingleton().GetMenuXml();
-    }
-
     LRESULT OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp);
 
     BOOL OnTxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw);
@@ -1206,79 +1102,6 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     SMap<UINT, SAutoRefPtr<ITimer>> m_mapTimer; /**< map of timer to id*/
 };
 
-/**
- * @class      SEdit
- * @brief      简单edit控件
- *
- * Describe
- */
-class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
-    DEF_SOBJECT(SRichEdit, L"edit")
-  public:
-    /**
-     * SEdit::SEdit
-     * @brief    构造函数
-     *
-     * Describe  构造函数
-     */
-    SEdit();
-
-  public:
-    STDMETHOD_(void, GetCueText)(CTHIS_ IStringT *pStr) SCONST
-    {
-        SStringT str = GetCueText(FALSE);
-        pStr->Copy(&str);
-    }
-
-    STDMETHOD_(COLORREF, GetCueColor)(CTHIS) SCONST
-    {
-        return m_crCue;
-    }
-
-  public:
-    SStringT GetCueText(BOOL bRawText = FALSE) const;
-
-    SOUI_ATTRS_BEGIN()
-        ATTR_COLOR(L"cueColor", m_crCue, TRUE)
-        ATTR_I18NSTRT(L"cueText", m_strCue, TRUE)
-    SOUI_ATTRS_END()
-
-  protected:
-    virtual HRESULT OnLanguageChanged();
-
-    /**
-     * SEdit::OnPaint
-     * @brief    绘制消息
-     * @param    IRenderTarget * pRT -- 绘画设备上下文
-     *
-     * Describe  此函数是消息响应函数
-     */
-    void OnPaint(IRenderTarget *pRT);
-    /**
-     * SEdit::OnSetFocus
-     * @brief    获得焦点
-     *
-     * Describe  此函数是消息响应函数
-     */
-    void OnSetFocus(SWND wndOld);
-    UINT GetCueTextAlign();
-    /**
-     * SEdit::OnKillFocus
-     * @brief    失去焦点
-     *
-     * Describe  此函数是消息响应函数
-     */
-    void OnKillFocus(SWND wndFocus);
-
-    SOUI_MSG_MAP_BEGIN()
-        MSG_WM_PAINT_EX(OnPaint)
-        MSG_WM_SETFOCUS_EX(OnSetFocus)
-        MSG_WM_KILLFOCUS_EX(OnKillFocus)
-    SOUI_MSG_MAP_END()
-
-    COLORREF m_crCue;
-    STrText m_strCue;
-};
 SNSEND
 
 #endif // __SRICHEDIT__H__

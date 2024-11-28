@@ -76,7 +76,7 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
 {
     if (!m_lvItemLocator)
     {
-        SASSERT_FMTA(FALSE, "error: A item locator is in need before setting adapter!!!");
+        SASSERT_MSGA(FALSE, "error: A item locator is in need before setting adapter!!!");
         return FALSE;
     }
     if (m_adapter == adapter)

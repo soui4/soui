@@ -273,12 +273,12 @@ public:
 
     CRect(const RECT& srcRect)
     {
-        ::CopyRect(this, &srcRect);
+        CopyRect(&srcRect);
     }
 
     CRect(LPCRECT lpSrcRect)
     {
-        ::CopyRect(this, lpSrcRect);
+        CopyRect(lpSrcRect);
     }
 
     CRect(POINT point, SIZE size)
@@ -347,9 +347,10 @@ public:
         return this;
     }
 
+
     BOOL IsRectEmpty() const
     {
-        return ::IsRectEmpty(this);
+		return ::IsRectEmpty(this);
     }
 
     BOOL IsRectNull() const
@@ -359,43 +360,51 @@ public:
 
     BOOL PtInRect(POINT point) const
     {
-        return ::PtInRect(this, point);
+        return point.x>=left && point.x<right
+                && point.y>=top && point.y<bottom;
     }
 
 // Operations
     void SetRect(int x1, int y1, int x2, int y2)
     {
-        ::SetRect(this, x1, y1, x2, y2);
+        left = x1, right=x2;
+        top = y1, bottom = y2;
     }
 
     void SetRect(POINT topLeft, POINT bottomRight)
     {
-        ::SetRect(this, topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
+        SetRect(topLeft.x, topLeft.y, bottomRight.x, bottomRight.y);
     }
 
     void SetRectEmpty()
     {
-        ::SetRectEmpty(this);
+        right = left;
+        bottom = top;
     }
 
     void CopyRect(LPCRECT lpSrcRect)
     {
-        ::CopyRect(this, lpSrcRect);
+        left = lpSrcRect->left;
+        top = lpSrcRect->top;
+        right = lpSrcRect->right;
+        bottom = lpSrcRect->bottom;
     }
 
     BOOL EqualRect(LPCRECT lpRect) const
     {
-        return ::EqualRect(this, lpRect);
+        return left == lpRect->left && right == lpRect->right
+               && top == lpRect->top && bottom == lpRect->bottom;
     }
 
     void InflateRect(int x, int y)
     {
-        ::InflateRect(this, x, y);
+        left -= x, right+=x;
+        top -=y ,bottom += y;
     }
 
     void InflateRect(SIZE size)
     {
-        ::InflateRect(this, size.cx, size.cy);
+        InflateRect(size.cx, size.cy);
     }
 
     void InflateRect(LPCRECT lpRect)
@@ -416,12 +425,12 @@ public:
 
     void DeflateRect(int x, int y)
     {
-        ::InflateRect(this, -x, -y);
+        InflateRect(-x, -y);
     }
 
     void DeflateRect(SIZE size)
     {
-        ::InflateRect(this, -size.cx, -size.cy);
+        InflateRect(-size.cx, -size.cy);
     }
 
     void DeflateRect(LPCRECT lpRect)
@@ -442,16 +451,19 @@ public:
 
     void OffsetRect(int x, int y)
     {
-        ::OffsetRect(this, x, y);
+        left +=x;
+        right +=x;
+        top += y;
+        bottom += y;
     }
     void OffsetRect(SIZE size)
     {
-        ::OffsetRect(this, size.cx, size.cy);
+        OffsetRect(size.cx, size.cy);
     }
 
     void OffsetRect(POINT point)
     {
-        ::OffsetRect(this, point.x, point.y);
+        OffsetRect(point.x, point.y);
     }
 
     void NormalizeRect()
@@ -496,46 +508,110 @@ public:
         MoveToY(pt.y);
     }
 
+    
     // operations that fill '*this' with result
-    BOOL IntersectRect(LPCRECT lpRect1, LPCRECT lpRect2)
+    BOOL IntersectRect(LPCRECT src1, LPCRECT src2)
     {
-        return ::IntersectRect(this, lpRect1, lpRect2);
+        if (!src1 || !src2) return FALSE;
+        CRect rc1(src1),rc2(src2);
+        if (rc1.IsRectEmpty() || rc2.IsRectEmpty() ||
+            (src1->left >= src2->right) || (src2->left >= src1->right) ||
+            (src1->top >= src2->bottom) || (src2->top >= src1->bottom))
+        {
+            SetRectEmpty();
+            return FALSE;
+        }
+        left   = smax( src1->left, src2->left );
+        right  = smin( src1->right, src2->right );
+        top    = smax( src1->top, src2->top );
+        bottom = smin( src1->bottom, src2->bottom );
+        return TRUE;
     }
 
     BOOL UnionRect(LPCRECT lpRect1, LPCRECT lpRect2)
     {
-        return ::UnionRect(this, lpRect1, lpRect2);
+        CRect src1(lpRect1),src2(lpRect2);
+        if (src1.IsRectEmpty())
+        {
+            if (src2.IsRectEmpty())
+            {
+                SetRectEmpty();
+                return FALSE;
+            }
+            else *this = src2;
+        }
+        else
+        {
+            if (src2.IsRectEmpty()) *this = src1;
+            else
+            {
+                left   = smin( src1.left, src2.left );
+                right  = smax( src1.right, src2.right );
+                top    = smin( src1.top, src2.top );
+                bottom = smax( src1.bottom, src2.bottom );
+            }
+        }
+        return TRUE;
     }
 
-    BOOL SubtractRect(LPCRECT lpRectSrc1, LPCRECT lpRectSrc2)
+    BOOL SubtractRect(const RECT *src1, const RECT *src2 )
     {
-        return ::SubtractRect(this, lpRectSrc1, lpRectSrc2);
+        CRect tmp;
+		if (::IsRectEmpty( src1 ))
+        {
+            SetRectEmpty();
+            return FALSE;
+        }
+        if (tmp.IntersectRect(src1, src2 ))
+        {
+            if (tmp.EqualRect(src1 ))
+            {
+                SetRectEmpty( );
+                return FALSE;
+            }
+            *this = *src1;
+            if ((tmp.top == top) && (tmp.bottom == bottom))
+            {
+                if (tmp.left == left) left = tmp.right;
+                else if (tmp.right == right) right = tmp.left;
+            }
+            else if ((tmp.left == left) && (tmp.right == right))
+            {
+                if (tmp.top == top) top = tmp.bottom;
+                else if (tmp.bottom == bottom) bottom = tmp.top;
+            }
+        }
+        else
+        {
+            *this = *src1;
+        }
+        return TRUE;
     }
 
 // Additional Operations
     void operator =(const RECT& srcRect)
     {
-        ::CopyRect(this, &srcRect);
+        CopyRect(&srcRect);
     }
 
     BOOL operator ==(const RECT& rect) const
     {
-        return ::EqualRect(this, &rect);
+        return EqualRect(&rect);
     }
 
     BOOL operator !=(const RECT& rect) const
     {
-        return ::EqualRect(this, &rect)==0;
+        return EqualRect(&rect)==0;
     }
 
     void operator +=(POINT point)
     {
-        ::OffsetRect(this, point.x, point.y);
+        OffsetRect(point.x, point.y);
     }
 
     void operator +=(SIZE size)
     {
-        ::OffsetRect(this, size.cx, size.cy);
+        OffsetRect(size.cx, size.cy);
     }
 
     void operator +=(LPCRECT lpRect)
@@ -545,12 +621,12 @@ public:
 
     void operator -=(POINT point)
     {
-        ::OffsetRect(this, -point.x, -point.y);
+        OffsetRect(-point.x, -point.y);
     }
 
     void operator -=(SIZE size)
     {
-        ::OffsetRect(this, -size.cx, -size.cy);
+        OffsetRect(-size.cx, -size.cy);
     }
 
     void operator -=(LPCRECT lpRect)
@@ -560,26 +636,26 @@ public:
 
     void operator &=(const RECT& rect)
     {
-        ::IntersectRect(this, this, &rect);
+        IntersectRect(this, &rect);
     }
 
     void operator |=(const RECT& rect)
     {
-        ::UnionRect(this, this, &rect);
+        UnionRect(this, &rect);
     }
 
 // Operators returning CRect values
     CRect operator +(POINT pt) const
     {
         CRect rect(*this);
-        ::OffsetRect(&rect, pt.x, pt.y);
+        rect.OffsetRect(pt.x, pt.y);
         return rect;
     }
 
     CRect operator -(POINT pt) const
     {
         CRect rect(*this);
-        ::OffsetRect(&rect, -pt.x, -pt.y);
+        rect.OffsetRect(-pt.x, -pt.y);
         return rect;
     }
 
@@ -593,14 +669,14 @@ public:
     CRect operator +(SIZE size) const
     {
         CRect rect(*this);
-        ::OffsetRect(&rect, size.cx, size.cy);
+        rect.OffsetRect(size.cx, size.cy);
         return rect;
     }
 
     CRect operator -(SIZE size) const
     {
         CRect rect(*this);
-        ::OffsetRect(&rect, -size.cx, -size.cy);
+        rect.OffsetRect(-size.cx, -size.cy);
         return rect;
     }
 
@@ -614,14 +690,14 @@ public:
     CRect operator &(const RECT& rect2) const
     {
         CRect rect;
-        ::IntersectRect(&rect, this, &rect2);
+        rect.IntersectRect(this, &rect2);
         return rect;
     }
 
     CRect operator |(const RECT& rect2) const
     {
         CRect rect;
-        ::UnionRect(&rect, this, &rect2);
+        rect.UnionRect(this, &rect2);
         return rect;
     }
 
@@ -696,209 +772,6 @@ inline void operator /=(SIZE & s, Num n)
     s = s / n;
 };
 
-
-///////////////////////////////////////////////////////////////////////////////
-// CRgn
-
-template <bool t_bManaged>
-class CRgnT
-{
-public:
-    // Data members
-    HRGN m_hRgn;
-
-    // Constructor/destructor/operators
-    CRgnT(HRGN hRgn = NULL) : m_hRgn(hRgn)
-    { }
-
-    ~CRgnT()
-    {
-        if(t_bManaged && m_hRgn != NULL)
-            DeleteObject();
-    }
-
-    CRgnT<t_bManaged>& operator =(HRGN hRgn)
-    {
-        Attach(hRgn);
-        return *this;
-    }
-
-    void Attach(HRGN hRgn)
-    {
-        if(t_bManaged && m_hRgn != NULL && m_hRgn != hRgn)
-            ::DeleteObject(m_hRgn);
-        m_hRgn = hRgn;
-    }
-
-    HRGN Detach()
-    {
-        HRGN hRgn = m_hRgn;
-        m_hRgn = NULL;
-        return hRgn;
-    }
-
-    operator HRGN() const { return m_hRgn; }
-
-    bool IsNull() const { return (m_hRgn == NULL); }
-
-    // Create methods
-    HRGN CreateRectRgn(int x1, int y1, int x2, int y2)
-    {
-        SASSERT(m_hRgn == NULL);
-        m_hRgn = ::CreateRectRgn(x1, y1, x2, y2);
-        return m_hRgn;
-    }
-
-    HRGN CreateRectRgnIndirect(LPCRECT lpRect)
-    {
-        SASSERT(m_hRgn == NULL);
-        m_hRgn = ::CreateRectRgnIndirect(lpRect);
-        return m_hRgn;
-    }
-
-#ifndef _WIN32_WCE
-    HRGN CreateEllipticRgn(int x1, int y1, int x2, int y2)
-    {
-        SASSERT(m_hRgn == NULL);
-        m_hRgn = ::CreateEllipticRgn(x1, y1, x2, y2);
-        return m_hRgn;
-    }
-
-    HRGN CreateEllipticRgnIndirect(LPCRECT lpRect)
-    {
-        SASSERT(m_hRgn == NULL);
-        m_hRgn = ::CreateEllipticRgnIndirect(lpRect);
-        return m_hRgn;
-    }
-
-    HRGN CreatePolygonRgn(LPPOINT lpPoints, int nCount, int nMode)
-    {
-        SASSERT(m_hRgn == NULL);
-        m_hRgn = ::CreatePolygonRgn(lpPoints, nCount, nMode);
-        return m_hRgn;
-    }
-
-    HRGN CreatePolyPolygonRgn(LPPOINT lpPoints, LPINT lpPolyCounts, int nCount, int nPolyFillMode)
-    {
-        SASSERT(m_hRgn == NULL);
-        m_hRgn = ::CreatePolyPolygonRgn(lpPoints, lpPolyCounts, nCount, nPolyFillMode);
-        return m_hRgn;
-    }
-
-    HRGN CreateRoundRectRgn(int x1, int y1, int x2, int y2, int x3, int y3)
-    {
-        SASSERT(m_hRgn == NULL);
-        m_hRgn = ::CreateRoundRectRgn(x1, y1, x2, y2, x3, y3);
-        return m_hRgn;
-    }
-
-    HRGN CreateFromPath(HDC hDC)
-    {
-        SASSERT(m_hRgn == NULL);
-        SASSERT(hDC != NULL);
-        m_hRgn = ::PathToRegion(hDC);
-        return m_hRgn;
-    }
-
-    HRGN CreateFromData(const XFORM* lpXForm, int nCount, const RGNDATA* pRgnData)
-    {
-        SASSERT(m_hRgn == NULL);
-        m_hRgn = ::ExtCreateRegion(lpXForm, nCount, pRgnData);
-        return m_hRgn;
-    }
-#endif // !_WIN32_WCE
-
-    BOOL DeleteObject()
-    {
-        SASSERT(m_hRgn != NULL);
-        BOOL bRet = ::DeleteObject(m_hRgn);
-        if(bRet)
-            m_hRgn = NULL;
-        return bRet;
-    }
-
-    // Operations
-    void SetRectRgn(int x1, int y1, int x2, int y2)
-    {
-        SASSERT(m_hRgn != NULL);
-        ::SetRectRgn(m_hRgn, x1, y1, x2, y2);
-    }
-
-    void SetRectRgn(LPCRECT lpRect)
-    {
-        SASSERT(m_hRgn != NULL);
-        ::SetRectRgn(m_hRgn, lpRect->left, lpRect->top, lpRect->right, lpRect->bottom);
-    }
-
-    int CombineRgn(HRGN hRgnSrc1, HRGN hRgnSrc2, int nCombineMode)
-    {
-        SASSERT(m_hRgn != NULL);
-        return ::CombineRgn(m_hRgn, hRgnSrc1, hRgnSrc2, nCombineMode);
-    }
-
-    int CombineRgn(HRGN hRgnSrc, int nCombineMode)
-    {
-        SASSERT(m_hRgn != NULL);
-        return ::CombineRgn(m_hRgn, m_hRgn, hRgnSrc, nCombineMode);
-    }
-
-    int CopyRgn(HRGN hRgnSrc)
-    {
-        SASSERT(m_hRgn != NULL);
-        return ::CombineRgn(m_hRgn, hRgnSrc, NULL, RGN_COPY);
-    }
-
-    BOOL EqualRgn(HRGN hRgn) const
-    {
-        SASSERT(m_hRgn != NULL);
-        return ::EqualRgn(m_hRgn, hRgn);
-    }
-
-    int OffsetRgn(int x, int y)
-    {
-        SASSERT(m_hRgn != NULL);
-        return ::OffsetRgn(m_hRgn, x, y);
-    }
-
-    int OffsetRgn(POINT point)
-    {
-        SASSERT(m_hRgn != NULL);
-        return ::OffsetRgn(m_hRgn, point.x, point.y);
-    }
-
-    int GetRgnBox(LPRECT lpRect) const
-    {
-        SASSERT(m_hRgn != NULL);
-        return ::GetRgnBox(m_hRgn, lpRect);
-    }
-
-    BOOL PtInRegion(int x, int y) const
-    {
-        SASSERT(m_hRgn != NULL);
-        return ::PtInRegion(m_hRgn, x, y);
-    }
-
-    BOOL PtInRegion(POINT point) const
-    {
-        SASSERT(m_hRgn != NULL);
-        return ::PtInRegion(m_hRgn, point.x, point.y);
-    }
-
-    BOOL RectInRegion(LPCRECT lpRect) const
-    {
-        SASSERT(m_hRgn != NULL);
-        return ::RectInRegion(m_hRgn, lpRect);
-    }
-
-    int GetRegionData(LPRGNDATA lpRgnData, int nDataSize) const
-    {
-        SASSERT(m_hRgn != NULL);
-        return (int)::GetRegionData(m_hRgn, nDataSize, lpRgnData);
-    }
-};
-
-typedef CRgnT<false>   CRgnHandle;
-typedef CRgnT<true>    CRgn;
 
 }; // namespace SOUI
 

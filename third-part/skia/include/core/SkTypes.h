@@ -8,10 +8,11 @@
 #ifndef SkTypes_DEFINED
 #define SkTypes_DEFINED
 
+#include <stdint.h>
 #include "SkPreConfig.h"
 #include "SkUserConfig.h"
 #include "SkPostConfig.h"
-#include <stdint.h>
+
 
 /** \file SkTypes.h
 */

@@ -1,9 +1,9 @@
 ﻿#ifndef __SCOMBOBASE__H__
 #define __SCOMBOBASE__H__
 
-#include "core/SWnd.h"
-#include "SRichEdit.h"
-#include "SDropDown.h"
+#include <core/SWnd.h>
+#include <control/SEdit.h>
+#include <control/SDropDown.h>
 
 SNSBEGIN
 #define IDC_CB_EDIT       -100
@@ -374,7 +374,7 @@ class SOUI_EXP SComboBase
             return SStringT();
         }
     }
-    SRichEdit *m_pEdit;               /**< SRichEdit指针 */
+    SEdit *m_pEdit;               /**< SRichEdit指针 */
     DWORD m_dwBtnState;               /**< 按钮状态      */
     SAutoRefPtr<ISkinObj> m_pSkinBtn; /**< 按钮资源      */
 
@@ -419,7 +419,7 @@ class TComboBaseProxy
     }
     STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
     {
-        if (id == __uuidof(T))
+        if (id == __suidof(T))
         {
             *ppRet = (T *)this;
             AddRef();

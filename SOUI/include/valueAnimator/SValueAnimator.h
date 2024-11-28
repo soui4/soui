@@ -53,7 +53,7 @@
 
 #include <interface/SValueAnimator-i.h>
 #include <valueAnimator/TypeEvaluator.h>
-
+#include <sobject/Sobject.hpp>
 SNSBEGIN
 
 class SOUI_EXP SValueAnimator

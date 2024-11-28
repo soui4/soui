@@ -14,7 +14,7 @@
 #ifndef __SFONTPOOL__H__
 #define __SFONTPOOL__H__
 
-#include <core/ssingletonmap.h>
+#include <core/SSingletonMap.h>
 #include <interface/SRender-i.h>
 #include <res.mgr/SFontInfo.h>
 #include <helper/obj-ref-impl.hpp>

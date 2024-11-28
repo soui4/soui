@@ -265,7 +265,7 @@ int CWinHttp::QueryStatusCode()
 }
 BOOL CWinHttp::Request(IStringA *out, LPCSTR lpUrl, RequestType type, LPCSTR lpPostData /*= NULL*/, LPCSTR lpHeader/*=NULL*/ )
 {
-	DWORD dwDataLen = lpPostData==NULL?0:strlen(lpPostData);
+	DWORD dwDataLen = lpPostData==NULL?0:(DWORD)strlen(lpPostData);
 	return Request2(out,lpUrl,type,(LPVOID)lpPostData,dwDataLen,lpHeader);
 }
 
@@ -303,7 +303,7 @@ BOOL CWinHttp::Request2(IStringA *out, LPCSTR lpUrl, RequestType type, LPVOID lp
 	free(lpBuff);
 	if ( !bFinish )
 		strRet.clear();
-	out->Assign2(strRet.c_str(),strRet.length());
+	out->Assign2(strRet.c_str(),(int)strRet.length());
 	return !strRet.empty();
 }
 
@@ -345,7 +345,7 @@ static void ParseUrl( LPCSTR lpUrl, string& strHostName, string& strPage, WORD& 
 	sPort = 80;
 	string strTemp(lpUrl);
 	int headerLen = 7;
-	int nPos=strTemp.find("http://");
+	size_t nPos=strTemp.find("http://");
 
 	if(string::npos == nPos)
 	{
@@ -363,7 +363,7 @@ static void ParseUrl( LPCSTR lpUrl, string& strHostName, string& strPage, WORD& 
 		strHostName=strTemp;
 	else
 		strHostName = strTemp.substr(0, nPos);
-	int nPos1 = strHostName.find(':');
+	size_t nPos1 = strHostName.find(':');
 	if ( nPos1 != string::npos )
 	{
 		string strPort = strTemp.substr(nPos1+1, strHostName.size()-nPos1-1);

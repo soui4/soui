@@ -12,7 +12,8 @@
  */
 #ifndef __SREALWND__H__
 #define __SREALWND__H__
-#include <interface/sctrl-i.h>
+#include <core/SWnd.h>
+#include <interface/SCtrl-i.h>
 #include <proxy/SWindowProxy.h>
 
 //////////////////////////////////////////////////////////////////////////
@@ -181,6 +182,8 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
      */
     BOOL InitRealWnd();
 
+    void SetRealWndPos(HWND hRealWnd, const CRect* prc);
+
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)
         MSG_WM_DESTROY(OnDestroy)
@@ -197,6 +200,8 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
 
     HWND m_hRealWnd; /**< 窗口句柄 */
     LPVOID m_lpData; /**< 附加参数 */
+
+    SAutoRefPtr<IRealWndHandler> m_pRealWndHandler;
 };
 
 SNSEND

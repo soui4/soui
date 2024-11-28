@@ -10,14 +10,33 @@ SNSBEGIN
 
     //////////////////////////////////////////////////////////////////////////
     // SImgFrame_WIC
-    SImgFrame_WIC::SImgFrame_WIC( IWICBitmapSource *pFrame ):m_pFrame(pFrame),m_nFrameDelay(0)
+    SImgFrame_WIC::SImgFrame_WIC( IWICBitmapSource *pFrame ):m_nFrameDelay(0),m_pdata(NULL)
     {
-
+        SetWICBitmapSource(pFrame);
     }
     
+    SImgFrame_WIC::~SImgFrame_WIC(){
+        if(m_pdata){
+            free(m_pdata);
+        }
+    }
+
     void SImgFrame_WIC::SetWICBitmapSource( IWICBitmapSource *pFrame )
     {
-        m_pFrame=pFrame;
+        if(m_pdata)
+        {
+            free(m_pdata);
+            m_pdata=NULL;
+        }    
+        m_size.cx = m_size.cy= 0;
+        if(pFrame){
+            UINT wid,hei;
+            pFrame->GetSize(&wid,&hei);
+            m_size.cx = wid;
+            m_size.cy = hei;
+            m_pdata = malloc(wid*hei*4);
+            pFrame->CopyPixels(NULL,wid*4,wid*hei*4,(BYTE*)m_pdata);
+        }
     }
 
     void SImgFrame_WIC::SetFrameDelay( int nDelay )
@@ -27,25 +46,14 @@ SNSBEGIN
 
     BOOL SImgFrame_WIC::GetSize( UINT *pWid,UINT *pHei )
     {
-        SASSERT(m_pFrame);
-        return S_OK == m_pFrame->GetSize(pWid,pHei);
+        *pWid = m_size.cx;
+        *pHei = m_size.cy;
+        return TRUE;
     }
 
-    BOOL SImgFrame_WIC::CopyPixels(const RECT *prc, UINT cbStride, UINT cbBufferSize, BYTE *pbBuffer )
-    {
-        SASSERT(m_pFrame);
-        if(!prc)
-        {
-            return S_OK==m_pFrame->CopyPixels(NULL,cbStride,cbBufferSize,pbBuffer);
-        }
-        else
-        {
-            WICRect rc={prc->left,prc->top,prc->right-prc->left,prc->bottom-prc->top};
-            return S_OK==m_pFrame->CopyPixels(&rc,cbStride,cbBufferSize,pbBuffer);
-        }
+    const VOID * SImgFrame_WIC::GetPixels(CTHIS) SCONST{
+        return m_pdata;
     }
-
-
 
     //////////////////////////////////////////////////////////////////////////
 

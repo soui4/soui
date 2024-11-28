@@ -12,8 +12,8 @@
  */
 #ifndef __SSPLITWND__H__
 #define __SSPLITWND__H__
-#include <core/swnd.h>
-#include <layout/slayoutsize.h>
+#include <core/SWnd.h>
+#include <layout/SLayoutSize.h>
 
 SNSBEGIN
 

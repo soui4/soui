@@ -1,6 +1,6 @@
-﻿#include "include\souistd.h"
-#include "helper\SMenuEx.h"
-#include "helper\SplitString.h"
+﻿#include "include/souistd.h"
+#include "helper/SMenuEx.h"
+#include "helper/SplitString.h"
 #include <layout/SLinearLayout.h>
 SNSBEGIN
 #define TIMERID_POPSUBMENU 100
@@ -222,6 +222,7 @@ SMenuExItem::SMenuExItem(SMenuEx *pOwnerMenu, ISkinObj *pItemSkin)
 
 void SMenuExItem::OnPaint(IRenderTarget *pRT)
 {
+    SSLOGI()<<"SMenuExItem,"<<m_nID<<" state="<<GetState();
     __baseCls::OnPaint(pRT);
 
     CRect rc = GetClientRect();
@@ -339,7 +340,7 @@ SWindow *SMenuExItem::CreateChildByName(LPCWSTR pszName)
 {
     if (pszName == NULL)
         return NULL;
-    if (wcsicmp(pszName, SMenuExItem::GetClassName()) == 0)
+    if (_wcsicmp(pszName, SMenuExItem::GetClassName()) == 0)
         return NULL;
     return __baseCls::CreateChildByName(pszName);
 }
@@ -664,7 +665,7 @@ UINT SMenuEx::TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale)
         hActive = ::GetActiveWindow();
 
     HWND hRoot = hActive;
-    while ((::GetWindowLongPtr(hRoot, GWL_STYLE) & WS_CHILD) && ::GetParent(hRoot))
+    while ((::GetWindowLong(hRoot, GWL_STYLE) & WS_CHILD) && ::GetParent(hRoot))
     {
         hRoot = ::GetParent(hRoot);
     }
@@ -851,7 +852,7 @@ void SMenuEx::RunMenu(HWND hRoot)
             {
                 if (!CallMsgFilter(&msg, MSGF_MENU))
                     break;
-                PeekMessage(&msg, NULL, msg.message, msg.message, PM_REMOVE);
+                msgLoop->PeekMsg(&msg, msg.message, msg.message, TRUE);
             }
             else
             {

@@ -29,9 +29,10 @@
 # 1394020320@qq.com
 #
 
-cmake_minimum_required(VERSION 3.4.3)
+cmake_minimum_required(VERSION 3.1)
 project(SOUI4)
 
+set(CMAKE_BUILD_TYPE Debug)
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
 include(__cmake/internal_utils.cmake)
 include(__cmake/global.cmake)
@@ -44,8 +45,11 @@ ELSE (CMAKE_CL_64)
 ENDIF (CMAKE_CL_64)
 endif()
 
-
-option(USE_UNICODE "Use Unicode" ON)
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+  option(USE_UNICODE "Use Unicode" ON)
+else()
+  set(USE_UNICODE OFF)
+endif()
 
 # When other libraries are using a shared version of runtime libraries,
 # Google Test also has to use one.
@@ -64,34 +68,40 @@ option(ENABLE_SOUI_COM_LIB "Enable compile 'components' as static lib" OFF)
 #
 option(XP_TOOLSET "" ON)
 
-option(OUTPATH_WITHOUT_TYPE "On to output debug/release to different folder(Off to same folder and add suffix 'd' for debug )" OFF)
-
 config_compiler_and_linker()
 
-if(OUTPATH_WITHOUT_TYPE)
-message("output config to ${PROJECT_BINARY_DIR}/config/config.h")
 configure_file("config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONLY)
 configure_file("config/build.cfg.in" "${PROJECT_BINARY_DIR}/config/build.cfg" @ONLY)
 include_directories(${PROJECT_BINARY_DIR}/config)
 install(FILES "${PROJECT_BINARY_DIR}/config/config.h" DESTINATION include/config)
+
+
+
+# 设置库文件的输出路径
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+add_definitions(-D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
+
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+  include_directories(${PROJECT_SOURCE_DIR}/third-part/stdint)
+  add_definitions(-DWCHAR_SIZE=2)
+elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
 else()
-message("output config to ${PROJECT_SOURCE_DIR}/config/config.h")
-configure_file("config/config.h.in" "${PROJECT_SOURCE_DIR}/config/config.h" @ONLY)
-configure_file("config/build.cfg.in" "${PROJECT_SOURCE_DIR}/config/build.cfg" @ONLY)
-include_directories(${PROJECT_SOURCE_DIR}/config)
+  # 添加调试标志
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+  add_definitions(-DWCHAR_SIZE=4)
+  include_directories(${PROJECT_SOURCE_DIR}/swinx/include)
+  add_subdirectory(swinx)
 endif()
 
-#
-#
 add_subdirectory(third-part)
-
-#
-#
-#
 add_subdirectory(utilities)
-add_subdirectory(SOUI)
-add_subdirectory(soui-sys-resource)
 
+add_subdirectory(SOUI)
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+add_subdirectory(soui-sys-resource)
+endif()
 #
 #
 # 
@@ -99,8 +109,9 @@ add_subdirectory(components)
 
 #
 #
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
 add_subdirectory(demo)
 add_subdirectory(demo2)
+endif()
 
-##
-##
+add_subdirectory(fun_test)

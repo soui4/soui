@@ -1,6 +1,6 @@
 ﻿
 #include "skia2rop2.h"
-#include <core/skcolorpriv.h>
+#include <core/SkColorPriv.h>
 #include <src/core/SkReadBuffer.h>
 #include <include/core/SkPreConfig.h>
 

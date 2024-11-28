@@ -28,6 +28,7 @@ else()
       PUBLIC SOUI_IMAGE_DECODER_USE_LIBPNG_STATIC
     )
 endif()
+add_dependencies(imgdecoder-png png zlib)
 
 target_compile_definitions(imgdecoder-png
   PUBLIC SOUI_IMAGE_DECODER_USE_LIBPNG

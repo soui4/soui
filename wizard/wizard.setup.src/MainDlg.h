@@ -4,6 +4,10 @@
 
 #pragma once
 
+#define ENV_SOUI4  _T("SOUI4PATH")
+#define ENV_INSTALL_32 _T("SOUI4_INSTALL_32")
+#define ENV_INSTALL_64 _T("SOUI4_INSTALL_64")
+
 
 class CMainDlg : public CDialogImpl<CMainDlg>
 {
@@ -27,12 +31,15 @@ public:
 		MESSAGE_HANDLER(WM_DESTROY, OnDestroy)
 		COMMAND_ID_HANDLER(IDCANCEL, OnCancel)
 		COMMAND_ID_HANDLER(IDC_BROWSE2, OnBrowseSouiDir)
+		COMMAND_ID_HANDLER(IDC_BROWSE_DIR32, OnBrowseInstallDir32)
+		COMMAND_ID_HANDLER(IDC_BROWSE_DIR64, OnBrowseInstallDir64)
 		COMMAND_ID_HANDLER(IDC_INSTALL, OnInstall)
 		COMMAND_ID_HANDLER(IDC_UNINSTALL, OnUninstall)
 		COMMAND_ID_HANDLER(IDC_HOMESITE, OnHomeSite)
 		END_MSG_MAP()
 
 	CString m_strWizardDir;//数据目录
+	CString m_strInstall32, m_strInstall64;
 
 	typedef BOOL(WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
 	LPFN_ISWOW64PROCESS fnIsWow64Process;
@@ -294,7 +301,7 @@ public:
 		}
 
 		TCHAR szPath[MAX_PATH];
-		if (GetEnvironmentVariable(_T("SOUI4PATH"), szPath, MAX_PATH))
+		if (GetEnvironmentVariable(ENV_SOUI4, szPath, MAX_PATH))
 		{
 			SetDlgItemText(IDC_SOUIDIR, szPath);
 		}
@@ -312,13 +319,20 @@ public:
 				}
 			}
 		}
-
+		if (GetEnvironmentVariable(ENV_INSTALL_32, szPath, MAX_PATH))
+		{
+			SetDlgItemText(IDC_INSTALL_DIR32, szPath);
+		}
+		if (GetEnvironmentVariable(ENV_INSTALL_64, szPath, MAX_PATH))
+		{
+			SetDlgItemText(IDC_INSTALL_DIR64, szPath);
+		}
 		return TRUE;
 	}
 
 	LRESULT OnHomeSite(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 	{
-		ShellExecute(0, _T("open"), _T("https://ui520.cn"), NULL, NULL, SW_SHOWNORMAL);
+		ShellExecute(0, _T("open"), _T("https://github.com/soui4/soui"), NULL, NULL, SW_SHOWNORMAL);
 		return 0;
 	}
 
@@ -328,6 +342,26 @@ public:
 		if (folderDlg.DoModal() == IDOK)
 		{
 			SetDlgItemText(IDC_SOUIDIR, folderDlg.GetFolderPath());
+		}
+		return 0;
+	}
+
+	LRESULT OnBrowseInstallDir32(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+	{
+		CFolderDialog folderDlg;
+		if (folderDlg.DoModal() == IDOK)
+		{
+			SetDlgItemText(IDC_INSTALL_DIR32, folderDlg.GetFolderPath());
+		}
+		return 0;
+	}
+
+	LRESULT OnBrowseInstallDir64(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
+	{
+		CFolderDialog folderDlg;
+		if (folderDlg.DoModal() == IDOK)
+		{
+			SetDlgItemText(IDC_INSTALL_DIR64, folderDlg.GetFolderPath());
 		}
 		return 0;
 	}
@@ -356,31 +390,37 @@ public:
 			MessageBox(_T("当前目录下没有找到SOUI的源代码"), _T("错误"), MB_OK | MB_ICONSTOP);
 			return 0;
 		}
+
+		CString strDir32,strDir64;
+		{
+			TCHAR szDir[MAX_PATH]={0};
+			GetDlgItemText(IDC_INSTALL_DIR32, szDir, MAX_PATH);
+			if(GetFileAttributes(szDir)==INVALID_FILE_ATTRIBUTES)
+			{
+				MessageBox(_T("没有找到32位soui安装目录"), _T("错误"), MB_OK | MB_ICONSTOP);
+				return 0;
+			}
+			strDir32 = szDir;
+		}
+		{
+			TCHAR szDir[MAX_PATH]={0};
+			GetDlgItemText(IDC_INSTALL_DIR64, szDir, MAX_PATH);
+			if(GetFileAttributes(szDir)==INVALID_FILE_ATTRIBUTES)
+			{
+				MessageBox(_T("没有找到64位soui安装目录"), _T("错误"), MB_OK | MB_ICONSTOP);
+				return 0;
+			}
+			strDir64=szDir;
+		}
 		//设置环境变量
 
 		CRegKey reg;
 		if (ERROR_SUCCESS == reg.Open(HKEY_LOCAL_MACHINE, _T("System\\CurrentControlSet\\Control\\Session Manager\\Environment"), KEY_SET_VALUE | KEY_QUERY_VALUE))
 		{
-			reg.SetStringValue(_T("SOUI4PATH"), szSouiDir);
-			DWORD dwSize = 0;
-			LONG lRet = reg.QueryStringValue(_T("Path"), NULL, &dwSize);
-			if (ERROR_SUCCESS == lRet)
-			{//修改path环境变量
-				CString str;
-				TCHAR * pBuf = str.GetBufferSetLength(dwSize);
-				lRet = reg.QueryStringValue(_T("Path"), pBuf, &dwSize);
-				str.ReleaseBuffer();
-
-				CString strSouiBin(_T("%SOUI4PATH%\\bin"));
-				if (StrStrI(str, strSouiBin) == NULL)
-				{//已经设置后不再设置
-					if (str.IsEmpty())
-						str = strSouiBin;
-					else
-					{	str += _T(";");str += strSouiBin;}
-					reg.SetStringValue(_T("Path"), str,REG_EXPAND_SZ);
-				}
-			}
+			//set 3 Environmental values
+			reg.SetStringValue(ENV_SOUI4, szSouiDir);
+			reg.SetStringValue(ENV_INSTALL_32, strDir32);
+			reg.SetStringValue(ENV_INSTALL_64, strDir64);			
 			reg.Close();
 			DWORD_PTR msgResult = 0;
 			//广播环境变量修改消息
@@ -557,8 +597,5 @@ public:
 		EndDialog(wID);
 		return 0;
 	}
-	// 	BEGIN_MSG_MAP(CMainDlg)
-	// 		COMMAND_ID_HANDLER(IDC_INSTALL, BN_CLICKED, OnBnClickedInstall)
-	// 	END_MSG_MAP()
-	LRESULT OnBnClickedInstall(WORD /*wNotifyCode*/, WORD /*wID*/, HWND /*hWndCtl*/, BOOL& /*bHandled*/);
+
 };

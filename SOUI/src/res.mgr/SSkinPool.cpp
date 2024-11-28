@@ -1,6 +1,6 @@
 ﻿#include "souistd.h"
 #include "res.mgr/SSkinPool.h"
-#include "core/Sskin.h"
+#include "core/SSkin.h"
 #include "SApp.h"
 #include "helper/SDpiScale.h"
 

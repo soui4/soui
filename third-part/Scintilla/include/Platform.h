@@ -1,5 +1,5 @@
 // Scintilla source code edit control
-/** @file Platform.h
+/** @file windows.h
  ** Interface to platform facilities. Also includes some basic utilities.
  ** Implemented in PlatGTK.cxx for GTK+/Linux, PlatWin.cxx for Windows, and PlatWX.cxx for wxWindows.
  **/
@@ -218,7 +218,11 @@ public:
 	}
 
 	long AsLong() const {
+#ifdef _WIN32
 		return co;
+#else
+		return co|0xff000000;
+#endif
 	}
 
 	unsigned int GetRed() const {

@@ -279,7 +279,7 @@ static void SetLogFont(LOGFONTW &lf, const char *faceName, int characterSet, flo
 	lf.lfItalic = static_cast<BYTE>(italic ? 1 : 0);
 	lf.lfCharSet = static_cast<BYTE>(characterSet);
 	lf.lfQuality = Win32MapFontQuality(extraFontFlag);
-	UTF16FromUTF8(faceName, strlen(faceName)+1, lf.lfFaceName, LF_FACESIZE);
+	WideCharFromUTF8(faceName, strlen(faceName)+1, lf.lfFaceName, LF_FACESIZE);
 }
 
 /**
@@ -332,7 +332,7 @@ FontCached::FontCached(const FontParameters &fp) :
 		IDWriteTextFormat *pTextFormat;
 		const int faceSize = 200;
 		WCHAR wszFace[faceSize];
-		UTF16FromUTF8(fp.faceName, strlen(fp.faceName)+1, wszFace, faceSize);
+		WideCharFromUTF8(fp.faceName, strlen(fp.faceName)+1, wszFace, faceSize);
 		FLOAT fHeight = fp.size;
 		DWRITE_FONT_STYLE style = fp.italic ? DWRITE_FONT_STYLE_ITALIC : DWRITE_FONT_STYLE_NORMAL;
 		HRESULT hr = pIDWriteFactory->CreateTextFormat(wszFace, NULL,
@@ -382,7 +382,7 @@ bool FontCached::SameAs(const FontParameters &fp) {
 		(lf.lfQuality == Win32MapFontQuality(fp.extraFontFlag)) &&
 		(technology == fp.technology)) {
 			wchar_t wszFace[LF_FACESIZE];
-			UTF16FromUTF8(fp.faceName, strlen(fp.faceName)+1, wszFace, LF_FACESIZE);
+			WideCharFromUTF8(fp.faceName, strlen(fp.faceName)+1, wszFace, LF_FACESIZE);
 			return 0 == wcscmp(lf.lfFaceName,wszFace);
 	}
 	return false;
@@ -487,7 +487,7 @@ public:
 	TextWide(const char *s, int len, bool unicodeMode, int codePage=0) :
 		VarBuffer<wchar_t, stackBufferLength>(len) {
 		if (unicodeMode) {
-			tlen = static_cast<int>(UTF16FromUTF8(s, len, buffer, len));
+			tlen = static_cast<int>(WideCharFromUTF8(s, len, buffer, len));
 		} else {
 			// Support Asian string display in 9x English
 			tlen = ::MultiByteToWideChar(codePage, 0, s, len, buffer, len);
@@ -1706,17 +1706,17 @@ XYPOSITION SurfaceD2D::WidthChar(Font &font_, char ch) {
 
 XYPOSITION SurfaceD2D::Ascent(Font &font_) {
 	SetFont(font_);
-	return ceil(yAscent);
+	return ceilf(yAscent);
 }
 
 XYPOSITION SurfaceD2D::Descent(Font &font_) {
 	SetFont(font_);
-	return ceil(yDescent);
+	return ceilf(yDescent);
 }
 
 XYPOSITION SurfaceD2D::InternalLeading(Font &font_) {
 	SetFont(font_);
-	return floor(yInternalLeading);
+	return floorf(yInternalLeading);
 }
 
 XYPOSITION SurfaceD2D::ExternalLeading(Font &) {
@@ -1785,22 +1785,22 @@ Window::~Window() {
 
 void Window::Destroy() {
 	if (wid)
-		::DestroyWindow(static_cast<HWND>(wid));
+		::DestroyWindow((HWND)wid);
 	wid = 0;
 }
 
 bool Window::HasFocus() {
-	return ::GetFocus() == wid;
+	return ::GetFocus() == (HWND)wid;
 }
 
 PRectangle Window::GetPosition() {
 	RECT rc;
-	::GetWindowRect(static_cast<HWND>(wid), &rc);
+	::GetWindowRect((HWND)wid, &rc);
 	return PRectangle::FromInts(rc.left, rc.top, rc.right, rc.bottom);
 }
 
 void Window::SetPosition(PRectangle rc) {
-	::SetWindowPos(static_cast<HWND>(wid),
+	::SetWindowPos((HWND)(wid),
 		0, static_cast<int>(rc.left), static_cast<int>(rc.top),
 		static_cast<int>(rc.Width()), static_cast<int>(rc.Height()), SWP_NOZORDER | SWP_NOACTIVATE);
 }
@@ -1824,10 +1824,10 @@ static RECT RectFromMonitor(HMONITOR hMonitor) {
 }
 
 void Window::SetPositionRelative(PRectangle rc, Window w) {
-	LONG style = ::GetWindowLong(static_cast<HWND>(wid), GWL_STYLE);
+	LONG style = ::GetWindowLong((HWND)wid, GWL_STYLE);
 	if (style & WS_POPUP) {
 		POINT ptOther = {0, 0};
-		::ClientToScreen(static_cast<HWND>(w.GetID()), &ptOther);
+		::ClientToScreen((HWND)(w.GetID()), &ptOther);
 		rc.Move(static_cast<XYPOSITION>(ptOther.x), static_cast<XYPOSITION>(ptOther.y));
 
 		RECT rcMonitor = RectFromPRectangle(rc);
@@ -1860,28 +1860,28 @@ void Window::SetPositionRelative(PRectangle rc, Window w) {
 PRectangle Window::GetClientPosition() {
 	RECT rc={0,0,0,0};
 	if (wid)
-		::GetClientRect(static_cast<HWND>(wid), &rc);
+		::GetClientRect((HWND)wid, &rc);
 	return PRectangle::FromInts(rc.left, rc.top, rc.right, rc.bottom);
 }
 
 void Window::Show(bool show) {
 	if (show)
-		::ShowWindow(static_cast<HWND>(wid), SW_SHOWNOACTIVATE);
+		::ShowWindow((HWND)wid, SW_SHOWNOACTIVATE);
 	else
-		::ShowWindow(static_cast<HWND>(wid), SW_HIDE);
+		::ShowWindow((HWND)wid, SW_HIDE);
 }
 
 void Window::InvalidateAll() {
-	::InvalidateRect(static_cast<HWND>(wid), NULL, FALSE);
+	::InvalidateRect((HWND)wid, NULL, FALSE);
 }
 
 void Window::InvalidateRectangle(PRectangle rc) {
 	RECT rcw = RectFromPRectangle(rc);
-	::InvalidateRect(static_cast<HWND>(wid), &rcw, FALSE);
+	::InvalidateRect((HWND)wid, &rcw, FALSE);
 }
 
 static LRESULT Window_SendMessage(Window *w, UINT msg, WPARAM wParam=0, LPARAM lParam=0) {
-	return ::SendMessage(static_cast<HWND>(w->GetID()), msg, wParam, lParam);
+	return ::SendMessage((HWND)(w->GetID()), msg, wParam, lParam);
 }
 
 void Window::SetFont(Font &font) {
@@ -1961,7 +1961,7 @@ void Window::SetCursor(Cursor curs) {
 }
 
 void Window::SetTitle(const char *s) {
-	::SetWindowTextA(static_cast<HWND>(wid), s);
+	::SetWindowTextA((HWND)wid, s);
 }
 
 /* Returns rectangle of monitor pt is on, both rect and pt are in Window's
@@ -2093,7 +2093,7 @@ public:
 	}
 	virtual ~ListBoxX() {
 		if (fontCopy) {
-			::DeleteObject(fontCopy);
+			::DeleteObject((HGDIOBJ)fontCopy);
 			fontCopy = 0;
 		}
 	}
@@ -2140,26 +2140,26 @@ void ListBoxX::Create(Window &parent_, int ctrlID_, Point location_, int lineHei
 	lineHeight = lineHeight_;
 	unicodeMode = unicodeMode_;
 	technology = technology_;
-	HWND hwndParent = static_cast<HWND>(parent->GetID());
+	HWND hwndParent = (HWND)(parent->GetID());
 	HINSTANCE hinstanceParent = GetWindowInstance(hwndParent);
 	// Window created as popup so not clipped within parent client area
-	wid = ::CreateWindowEx(
+	wid = (WindowID)::CreateWindowEx(
 		WS_EX_WINDOWEDGE, ListBoxX_ClassName, TEXT(""),
 		WS_POPUP | WS_THICKFRAME,
 		100,100, 150,80, hwndParent,
-		NULL,
+		0,
 		hinstanceParent,
 		this);
 
 	POINT locationw = {static_cast<LONG>(location.x), static_cast<LONG>(location.y)};
-	::MapWindowPoints(hwndParent, NULL, &locationw, 1);
+	::MapWindowPoints(hwndParent, 0, &locationw, 1);
 	location = Point::FromInts(locationw.x, locationw.y);
 }
 
 void ListBoxX::SetFont(Font &font) {
 	if (font.GetID()) {
 		if (fontCopy) {
-			::DeleteObject(fontCopy);
+			::DeleteObject((HGDIOBJ)fontCopy);
 			fontCopy = 0;
 		}
 		FormatAndMetrics *pfm = static_cast<FormatAndMetrics *>(font.GetID());
@@ -2181,7 +2181,7 @@ int ListBoxX::GetVisibleRows() const {
 }
 
 HWND ListBoxX::GetHWND() const {
-	return static_cast<HWND>(GetID());
+	return (HWND)(GetID());
 }
 
 PRectangle ListBoxX::GetDesiredRect() {
@@ -2331,7 +2331,7 @@ void ListBoxX::Draw(DRAWITEMSTRUCT *pDrawItem) {
 			Surface *surfaceItem = Surface::Allocate(technology);
 			if (surfaceItem) {
 				if (technology == SCWIN_TECH_GDI) {
-					surfaceItem->Init(pDrawItem->hDC, pDrawItem->hwndItem);
+					surfaceItem->Init(pDrawItem->hDC, (WindowID)pDrawItem->hwndItem);
 					long left = pDrawItem->rcItem.left + static_cast<int>(ItemInset.x + ImageInset.x);
 					PRectangle rcImage = PRectangle::FromInts(left, pDrawItem->rcItem.top,
 						left + images.GetWidth(), pDrawItem->rcItem.bottom);
@@ -2671,7 +2671,7 @@ void ListBoxX::Paint(HDC hDC) {
 	::SendMessage(lb, WM_PRINT, reinterpret_cast<WPARAM>(bitmapDC), PRF_CLIENT|PRF_NONCLIENT);
 	::BitBlt(hDC, 0, 0, extent.x, extent.y, bitmapDC, 0, 0, SRCCOPY);
 	// Select a stock brush to prevent warnings from BoundsChecker
-	::SelectObject(bitmapDC, GetStockFont(WHITE_BRUSH));
+	::SelectObject(bitmapDC, GetStockBrush(WHITE_BRUSH));
 	SelectBitmap(bitmapDC, hBitmapOld);
 	::DeleteDC(bitmapDC);
 	::DeleteObject(hBitmap);
@@ -2738,7 +2738,7 @@ LRESULT PASCAL ListBoxX::ControlWndProc(HWND hWnd, UINT uMsg, WPARAM wParam, LPA
 LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam) {
 	switch (iMessage) {
 	case WM_CREATE: {
-			HINSTANCE hinstanceParent = GetWindowInstance(static_cast<HWND>(parent->GetID()));
+			HINSTANCE hinstanceParent = GetWindowInstance(reinterpret_cast<HWND>(parent->GetID()));
 			// Note that LBS_NOINTEGRALHEIGHT is specified to fix cosmetic issue when resizing the list
 			// but has useful side effect of speeding up list population significantly
 			lb = ::CreateWindowEx(
@@ -2746,7 +2746,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 				WS_CHILD | WS_VSCROLL | WS_VISIBLE |
 				LBS_OWNERDRAWFIXED | LBS_NODATA | LBS_NOINTEGRALHEIGHT,
 				0, 0, 150,80, hWnd,
-				reinterpret_cast<HMENU>(static_cast<ptrdiff_t>(ctrlID)),
+				(HMENU)(ctrlID),
 				hinstanceParent,
 				0);
 			WNDPROC prevWndProc = reinterpret_cast<WNDPROC>(::SetWindowLongPtr(lb, GWLP_WNDPROC, reinterpret_cast<LONG_PTR>(ControlWndProc)));
@@ -2774,7 +2774,7 @@ LRESULT ListBoxX::WndProc(HWND hWnd, UINT iMessage, WPARAM wParam, LPARAM lParam
 	case WM_COMMAND:
 		// This is not actually needed now - the registered double click action is used
 		// directly to action a choice from the list.
-		::SendMessage(static_cast<HWND>(parent->GetID()), iMessage, wParam, lParam);
+		::SendMessage(reinterpret_cast<HWND>(parent->GetID()), iMessage, wParam, lParam);
 		break;
 
 	case WM_MEASUREITEM: {
@@ -2910,19 +2910,19 @@ Menu::Menu() : mid(0) {
 
 void Menu::CreatePopUp() {
 	Destroy();
-	mid = ::CreatePopupMenu();
+	mid = (MenuID)::CreatePopupMenu();
 }
 
 void Menu::Destroy() {
 	if (mid)
-		::DestroyMenu(static_cast<HMENU>(mid));
+		::DestroyMenu(reinterpret_cast<HMENU>(mid));
 	mid = 0;
 }
 
 void Menu::Show(Point pt, Window &w) {
-	::TrackPopupMenu(static_cast<HMENU>(mid),
+	::TrackPopupMenu(reinterpret_cast<HMENU>(mid),
 		TPM_RIGHTBUTTON, static_cast<int>(pt.x - 4), static_cast<int>(pt.y), 0,
-		static_cast<HWND>(w.GetID()), NULL);
+		reinterpret_cast<HWND>(w.GetID()), NULL);
 	Destroy();
 }
 
@@ -3045,12 +3045,12 @@ bool Platform::IsKeyDown(int key) {
 
 long Platform::SendScintilla(WindowID w, unsigned int msg, unsigned long wParam, long lParam) {
 	// This should never be called - its here to satisfy an old interface
-	return static_cast<long>(::SendMessage(static_cast<HWND>(w), msg, wParam, lParam));
+	return static_cast<long>(::SendMessage(reinterpret_cast<HWND>(w), msg, wParam, lParam));
 }
 
 long Platform::SendScintillaPointer(WindowID w, unsigned int msg, unsigned long wParam, void *lParam) {
 	// This should never be called - its here to satisfy an old interface
-	return static_cast<long>(::SendMessage(static_cast<HWND>(w), msg, wParam,
+	return static_cast<long>(::SendMessage(reinterpret_cast<HWND>(w), msg, wParam,
 		reinterpret_cast<LPARAM>(lParam)));
 }
 
@@ -3167,6 +3167,7 @@ void Platform_Initialise(void *hInstance) {
 	hinstPlatformRes = static_cast<HINSTANCE>(hInstance);
 	// This may be called from DllMain, in which case the call to LoadLibrary
 	// is bad because it can upset the DLL load order.
+#ifdef _WIN32
 	if (!hDLLImage) {
 		hDLLImage = ::LoadLibrary(TEXT("Msimg32"));
 	}
@@ -3181,7 +3182,12 @@ void Platform_Initialise(void *hInstance) {
 		MonitorFromRectFn = (MonitorFromRectSig)::GetProcAddress(hDLLUser32, "MonitorFromRect");
 		GetMonitorInfoFn = (GetMonitorInfoSig)::GetProcAddress(hDLLUser32, "GetMonitorInfoA");
 	}
-
+#else
+	AlphaBlendFn = AlphaBlend;
+	MonitorFromPointFn = MonitorFromPoint;
+	MonitorFromRectFn = MonitorFromRect;
+	GetMonitorInfoFn = GetMonitorInfoA;
+#endif
 	ListBoxX_Register();
 }
 

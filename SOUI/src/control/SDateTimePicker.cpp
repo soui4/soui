@@ -690,7 +690,6 @@ void SDateTimePicker::DropDown()
 {
     if (NULL != m_pDropDownWnd)
         return;
-
     m_pDropDownWnd = new SDropDownWnd_ComboBox(this);
     CRect rcPopup;
     SLayoutSize nWid;

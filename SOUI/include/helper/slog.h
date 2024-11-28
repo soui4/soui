@@ -110,7 +110,13 @@ class SOUI_EXP Log {
 
 SNSEND
 
-#define SLOG(tag, level) SOUI::Log(tag, level, __FILE__, __FUNCTION__, __LINE__, RetAddr()).stream()
+#ifdef _WIN32
+#define FUNCNAME __FUNCTION__
+#else
+#define FUNCNAME __PRETTY_FUNCTION__
+#endif//_WIN32
+
+#define SLOG(tag, level) SOUI::Log(tag, level, __FILE__, FUNCNAME, __LINE__, RetAddr()).stream()
 #ifdef _MSC_VER
 #define SLOG_FMT(tag, level, logformat, ...)                                                    \
     do                                                                                          \

@@ -7,6 +7,7 @@
 // The License.txt file describes the conditions under which this software may be distributed.
 
 #include <windows.h>
+#include <initguid.h>
 
 #include "UniConversion.h"
 #include "HanjaDic.h"
@@ -53,8 +54,7 @@ interface IHanjaDic : IUnknown {
 	STDMETHOD(MaxHanjaType)(HANJA_TYPE pHanjaType);
 };
 
-extern "C" const GUID __declspec(selectany) IID_IHanjaDic =
-{ 0xad75f3ac, 0x18cd, 0x48c6, { 0xa2, 0x7d, 0xf1, 0xe9, 0xa7, 0xdc, 0xe4, 0x32 } };
+DEFINE_GUID(IID_IHanjaDic,0xad75f3ac, 0x18cd, 0x48c6, 0xa2, 0x7d, 0xf1, 0xe9, 0xa7, 0xdc, 0xe4, 0x32 );
 
 class HanjaDic {
 private:
@@ -66,14 +66,15 @@ public:
 
 	HanjaDic() : HJinterface(NULL) {
 		hr = CLSIDFromProgID(OLESTR("mshjdic.hanjadic"), &CLSID_HanjaDic);
-		if (SUCCEEDED(hr)) {
-			hr = CoCreateInstance(CLSID_HanjaDic, NULL,
-					CLSCTX_INPROC_SERVER, IID_IHanjaDic,
-					(LPVOID *)& HJinterface);
-			if (SUCCEEDED(hr)) {
-				hr = HJinterface->OpenMainDic();
-			}
-		}
+		//todo:hjx
+		// if (SUCCEEDED(hr)) {
+		// 	hr = CoCreateInstance(CLSID_HanjaDic, NULL,
+		// 			CLSCTX_INPROC_SERVER, IID_IHanjaDic,
+		// 			(LPVOID *)& HJinterface);
+		// 	if (SUCCEEDED(hr)) {
+		// 		hr = HJinterface->OpenMainDic();
+		// 	}
+		// }
 	}
 
 	~HanjaDic() {

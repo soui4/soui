@@ -1,9 +1,16 @@
 /* stdint.h standard header */
-#pragma once
 #ifndef _STDINT
 #define _STDINT
+
 #ifndef RC_INVOKED
-#include <yvals.h>
+#if defined(__unix__) || (defined(__APPLE__) && defined(__MACH__))
+#  include <stdlib.h>
+#define __intptr_t_defined
+#ifndef DEFINED_INT64
+#define DEFINED_INT64
+typedef long long __int64;
+#endif//DEFINED_INT64
+#endif
 
 /* NB: assumes
 	byte has 8 bits
@@ -12,7 +19,7 @@
 	long long is longest type
  */
 
-#if (_MSC_VER>=1910)
+#if defined(__linux__) || (_MSC_VER>=1910)
 #define _C_STD_BEGIN
 #define _C_STD_END
 #define _CSTD	::
@@ -25,7 +32,7 @@ typedef _ULONGLONG _ULonglong;
 #endif
 
 
-_C_STD_BEGIN
+//_C_STD_BEGIN
 		/* TYPE DEFINITIONS */
 typedef signed char int8_t;
 typedef short int16_t;
@@ -51,9 +58,17 @@ typedef unsigned char uint_fast8_t;
 typedef unsigned int uint_fast16_t;
 typedef unsigned int uint_fast32_t;
 
+#if !defined(_W64)
+#if !defined(__midl) && (defined(_X86_) || defined(_M_IX86)) && _MSC_VER >= 1300
+#define _W64 __w64
+#else
+#define _W64
+#endif
+#endif
+
 #ifndef _INTPTR_T_DEFINED
  #define _INTPTR_T_DEFINED
- #ifdef _WIN64
+#if defined(_WIN64) || defined(__x86_64__) 
 typedef __int64 intptr_t;
  #else /* _WIN64 */
 typedef _W64 int intptr_t;
@@ -62,14 +77,18 @@ typedef _W64 int intptr_t;
 
 #ifndef _UINTPTR_T_DEFINED
  #define _UINTPTR_T_DEFINED
- #ifdef _WIN64
-typedef unsigned __int64 uintptr_t;
+ #if defined(_WIN64) || defined(__x86_64__) 
+typedef unsigned long long uintptr_t;
  #else /* _WIN64 */
 typedef _W64 unsigned int uintptr_t;
  #endif /* _WIN64 */
 #endif /* _UINTPTR_T_DEFINED */
 
+#ifdef __linux__
+#include <bits/stdint-intn.h>
+#else
 typedef _Longlong int64_t;
+#endif
 typedef _ULonglong uint64_t;
 
 typedef _Longlong int_least64_t;
@@ -179,7 +198,7 @@ typedef _ULonglong uintmax_t;
 #define UINT64_C(x)		((x) + (UINT64_MAX - UINT64_MAX))
 #define INTMAX_C(x)		INT64_C(x)
 #define UINTMAX_C(x)	UINT64_C(x)
-_C_STD_END
+//_C_STD_END
 #endif /* RC_INVOKED */
 #endif /* _STDINT */
 

@@ -16,8 +16,8 @@
 #ifndef __SHOSTDIALOG__H__
 #define __SHOSTDIALOG__H__
 
-#include <core/shostwnd.h>
-#include <core/smsgloop.h>
+#include <core/SHostWnd.h>
+#include <core/SMsgLoop.h>
 #include <proxy/SHostWndProxy.h>
 
 SNSBEGIN
@@ -30,7 +30,7 @@ class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
 
   public:
     STDMETHOD_(IMessageLoop *, GetMsgLoop)(THIS) OVERRIDE;
-    STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent = NULL) OVERRIDE;
+    STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent DEF_VAL(0)) OVERRIDE;
     STDMETHOD_(void, EndDialog)(THIS_ INT_PTR nResult) OVERRIDE;
 
     SHostWnd *toSHostWnd()

@@ -1,3 +1,6 @@
+#ifndef _SCTRL_PROXY_H_
+#define _SCTRL_PROXY_H_
+
 SNSBEGIN
 
 template <class T, class Base>
@@ -26,7 +29,7 @@ public:
 
 	STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
 	{
-		if (id == __uuidof(T))
+		if (id == __suidof(T))
 		{
 			*ppRet = (T *)this;
 			AddRef();
@@ -40,3 +43,5 @@ public:
 };
 
 SNSEND
+
+#endif//_SCTRL_PROXY_H_

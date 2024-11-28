@@ -2,6 +2,7 @@
 #define __SSPINBUTTONCTRL__H__
 #include <core/SWnd.h>
 #include <interface/SCtrl-i.h>
+#include <proxy/SWindowProxy.h>
 
 SNSBEGIN
 class SOUI_EXP SSpinButtonCtrl : public TWindowProxy<ISpinButtonCtrl> {

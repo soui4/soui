@@ -5,7 +5,7 @@
 #include <ctime>
 #include "../CPP/Common/MyCom.h"
 #include "../CPP/Common/MyWindows.h"
-
+#include <tchar.h>
 
 namespace SevenZip
 {

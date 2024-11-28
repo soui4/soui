@@ -1,7 +1,7 @@
 
 #include <souistd.h>
 #include <animation/SAnimation.h>
-#include <helper/stime.h>
+#include <helper/STime.h>
 
 SNSBEGIN
 

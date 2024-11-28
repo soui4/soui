@@ -4,16 +4,8 @@
 #include "SResProvider7Zip.h"
 #include <xml/SXml.h>
 
-namespace CursorIcon_7z{
-extern HICON CURSORICON_LoadFromBuf(const BYTE * bits,DWORD filesize,INT width, INT height,BOOL fCursor, UINT loadflags);
-extern HICON CURSORICON_LoadFromFile( LPCWSTR filename,
-									 INT width, INT height,
-									 BOOL fCursor, UINT loadflags);
-}
 
 using namespace SevenZip;
-using namespace CursorIcon_7z;
-
 SNSBEGIN
 
 SResProvider7Zip::SResProvider7Zip():m_renderFactory(NULL)
@@ -59,7 +51,7 @@ HICON SResProvider7Zip::LoadIcon(LPCTSTR pszResName ,int cx/*=0*/,int cy/*=0*/)
 	CZipFile zf;
 	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
 
-	return CURSORICON_LoadFromBuf(zf.GetData(),zf.GetSize(),cx,cy,FALSE,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
+	return (HICON)LoadIconFromMemory(zf.GetData(),zf.GetSize(),TRUE,cx,cy,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
 }
 
 HCURSOR SResProvider7Zip::LoadCursor( LPCTSTR pszResName )
@@ -68,7 +60,7 @@ HCURSOR SResProvider7Zip::LoadCursor( LPCTSTR pszResName )
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
 	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
-	return (HCURSOR)CURSORICON_LoadFromBuf(zf.GetData(),zf.GetSize(),0,0,TRUE,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
+	return (HCURSOR)LoadIconFromMemory(zf.GetData(),zf.GetSize(),FALSE,0,0,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
 }
 
 IBitmapS * SResProvider7Zip::LoadImage( LPCTSTR strType,LPCTSTR pszResName)

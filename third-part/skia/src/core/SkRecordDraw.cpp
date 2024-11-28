@@ -377,7 +377,7 @@ private:
     }
     Bounds bounds(const DrawPoints& op) const {
         SkRect dst;
-        dst.set(op.pts, op.count);
+        dst.set(op.pts, (int)op.count);
 
         // Pad the bounding box a little to make sure hairline points' bounds aren't empty.
         SkScalar stroke = SkMaxScalar(op.paint.getStrokeWidth(), 0.01f);

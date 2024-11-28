@@ -93,7 +93,7 @@ static void tchar_to_skstring(const TCHAR t[], SkString* s) {
 #ifdef UNICODE
     size_t sSize = WideCharToMultiByte(CP_UTF8, 0, t, -1, NULL, 0, NULL, NULL);
     s->resize(sSize);
-    WideCharToMultiByte(CP_UTF8, 0, t, -1, s->writable_str(), sSize, NULL, NULL);
+    WideCharToMultiByte(CP_UTF8, 0, t, -1, s->writable_str(), (int)sSize, NULL, NULL);
 #else
     s->set(t);
 #endif
@@ -1752,7 +1752,7 @@ static void logfont_for_name(const char* familyName, LOGFONT* lf) {
     wchar_t *wideFamilyName = new wchar_t[str_len];
     // Now actually convert the string.
     ::MultiByteToWideChar(CP_UTF8, 0, familyName, -1,
-                            wideFamilyName, str_len);
+                            wideFamilyName, (int)str_len);
     ::wcsncpy(lf->lfFaceName, wideFamilyName, LF_FACESIZE - 1);
     delete [] wideFamilyName;
     lf->lfFaceName[LF_FACESIZE-1] = L'\0';

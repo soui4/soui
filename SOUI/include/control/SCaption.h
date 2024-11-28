@@ -74,16 +74,6 @@ class SOUI_EXP SCaption : public SWindow {
      */
     void OnLButtonUp(UINT nFlags, CPoint point);
 
-    /**
-     * Describe  检测当前系统是否支持窗口最大化时可移动还原窗口
-     *
-     * CSCpation::IsSuppotMaxMove
-     *
-     * @return	返回true时,窗口在最大化时,拖动即还原,
-     *			false时不可以实现该功能
-     */
-    BOOL IsSuppotMaxMove();
-
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONDBLCLK(OnLButtonDblClk)

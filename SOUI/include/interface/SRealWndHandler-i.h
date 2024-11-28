@@ -71,16 +71,6 @@ DECLARE_INTERFACE_(IRealWndHandler, IObjRef)
     STDMETHOD_(BOOL, OnRealWndInit)(THIS_ IWindow * pRealWnd) PURE;
 
     /**
-     * SRealWnd::OnRealWndSize
-     * @brief    调整窗口大小
-     * @param    SRealWnd *pRealWnd -- 窗口指针
-     * @return   BOOL -- FALSE：交由SOUI处理; TRUE:用户管理窗口的移动
-     *
-     * Describe  调整窗口大小,该方法由OnRealWndPosition代替
-     */
-    STDMETHOD_(BOOL, OnRealWndSize)(THIS_ IWindow * pRealWnd) PURE;
-
-    /**
      * SRealWnd::OnRealWndPosition
      * @brief    调整窗口位置
      * @param    SRealWnd *pRealWnd -- 窗口指针

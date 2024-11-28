@@ -1,8 +1,13 @@
 #include <windows.h>
 #include <cassert>
 #include "thread.h"
-#include <interface\STaskLoop-i.h>
+#include <interface/STaskLoop-i.h>
+#ifndef _WIN32
+#include <thread>
+#include <functional>
+#else
 #include <process.h>
+#endif
 
 
 #ifdef _MSC_VER
@@ -48,18 +53,97 @@ static void SetThreadName(const char *threadName)
 
 SNSBEGIN
 
+#ifdef _WIN32
 class ThreadPrivate
 {
 public:
-	ThreadPrivate():_hthread(NULL), _threadID(0)
+	ThreadPrivate():_hthread(0), _threadID(-1)
 	{
 
 	}
+
+	~ThreadPrivate(){
+		if(_hthread){
+			CloseHandle(_hthread);
+		}
+	}
+	void join(){
+		WaitForSingleObject(_hthread,INFINITE);
+	}
+
+	void clear(){
+		if ( _hthread !=0 )
+		{
+				::CloseHandle( _hthread); // resource must be released
+				_hthread = 0;
+				_threadID = -1;
+		}
+	}
+
+	bool begin(unsigned int (CALLBACK *proc)(void*), void *param){
+		_hthread = (HANDLE)_beginthreadex(NULL, 0, proc, param, 0, &_threadID);
+		return _hthread!=0;
+	}
+	tid_t get_id() const{
+		return _threadID;
+	}
+
+	bool set_thread_priority(int priority){
+		if(_hthread==0)
+			return false;
+		return SetThreadPriority(_hthread, priority);
+	}
+
 	HANDLE _hthread;
 	unsigned int _threadID;
 };
 
-const long Thread::INVALID_THREAD_ID = -1;
+#else
+enum{
+	THREAD_PRIORITY_TIME_CRITICAL=0,
+	THREAD_PRIORITY_NORMAL=3,
+	THREAD_PRIORITY_IDLE =5,
+};
+class ThreadPrivate{
+public:
+ThreadPrivate():tid(-1){}
+
+tid_t tid;
+std::thread m_thread;
+
+tid_t get_id() const{
+	return tid;
+}
+void join(){
+	m_thread.join();
+	clear();
+}
+void clear(){
+	tid=-1;
+}
+
+bool set_thread_priority(int priority) {
+	if(tid==-1)
+		return false;
+    struct sched_param param;
+    int policy = 0;
+    pthread_getschedparam(tid, &policy, &param);
+    param.sched_priority = priority;
+    return pthread_setschedparam(tid, policy, &param) != 0;
+}
+
+unsigned int threadProc(unsigned int (CALLBACK *proc)(void*), void *param){
+	tid = pthread_self();
+	return proc(param);
+}
+
+bool begin(unsigned int (CALLBACK *proc)(void*), void *param){
+		m_thread = std::thread(std::bind(&ThreadPrivate::threadProc,this,proc,param));
+		return true;
+	}
+
+};
+#endif
 
 Thread::Thread() :
 _stopping(false),
@@ -76,11 +160,6 @@ Thread::~Thread()
 	delete &_private;
 }
 
-long Thread::getCurrentThreadID()
-{
-	DWORD id = ::GetCurrentThreadId();
-	return (long) id;
-}
 
 bool Thread::start(IRunnable *runnable, const std::string &name, ThreadPriority priority)
 {
@@ -100,9 +179,7 @@ bool Thread::start(IRunnable *runnable, const std::string &name, ThreadPriority 
 		_start = true;
 		_priorityLevel = priority;
 
-		_private._hthread = (HANDLE)_beginthreadex(NULL, 0, Thread::threadProcWin32thunk, this, 0, &_private._threadID);
-
-		if (_private._hthread == NULL)
+	   if(!_private.begin(&Thread::threadProc, this))
 		{
 			clear();
 			return false;
@@ -131,36 +208,15 @@ void Thread::waitForStop()
 	// we must release lock before the wait function, to avoid deadlock
 	{
 		SAutoLock autolock (_lock);
-
 		if (!_start)
 		{
-			if ( _private._hthread )
-			{
-				::CloseHandle( _private._hthread); // resource must be released
-				_private._hthread = NULL;
-				_private._threadID = 0;
-			}
-
 			return;
 		}
 	}
-
-	DWORD ret = ::WaitForSingleObject(_private._hthread, INFINITE);
-
+	_private.join();
 	{
 		SAutoLock autolock (_lock);
-
-		if ( WAIT_OBJECT_0 == ret )
-		{
-			::CloseHandle( _private._hthread);
-		}
-
-		_private._hthread = NULL;
-		_private._threadID = 0;
-	}
-
-	if (WAIT_OBJECT_0  != 0)
-	{
+		clear();
 	}
 }
 
@@ -187,7 +243,7 @@ void Thread::setThreadName(const std::string &name)
 	SetThreadName(name.c_str());
 }
 
-void Thread::setPriority(ThreadPriority priorityLevel)
+bool Thread::setPriority(ThreadPriority priorityLevel)
 {
 	int priority = 0;
 
@@ -205,12 +261,7 @@ void Thread::setPriority(ThreadPriority priorityLevel)
 		priority = THREAD_PRIORITY_NORMAL;
 		break;
 	}
-
-	BOOL ret = SetThreadPriority(_private._hthread, priority);
-
-	if (!ret)
-	{
-	}
+	return _private.set_thread_priority(priority);
 }
 
 void Thread::clear()
@@ -220,23 +271,18 @@ void Thread::clear()
 	_runnable = NULL;
 	_name = "";
 	_start = false;
-	_threadID = INVALID_THREAD_ID;
 }
 
-//  `stdcall' to 'cdecl' thunk
-unsigned WINAPI Thread::threadProcWin32thunk(LPVOID lpParameter )
-{
-	Thread::threadProc(lpParameter);
-	return 0;
-}
+long Thread::getThreadID() const
+    {
+        return _private.get_id();
+    }
 
-void *Thread::threadProc(void *args)
+unsigned int Thread::threadProc(void *args)
 {
 	Thread *thread = static_cast<Thread *> (args);
-
 	{
 		SAutoLock autoLock(thread->_lock);
-		thread->_threadID = getCurrentThreadID();
 		thread->setThreadName(thread->_name);
 		thread->setPriority(thread->_priorityLevel);
 	}
@@ -244,12 +290,7 @@ void *Thread::threadProc(void *args)
 	thread->_startSem.notify();
 	thread->_runnable->run();
 
-	{
-		SAutoLock autoLock(thread->_lock);
-		thread->clear();
-	}
-
-	return NULL;
+	return 0;
 }
 
 SNSEND

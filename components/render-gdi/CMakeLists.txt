@@ -1,15 +1,28 @@
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
 
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
 set(render-gdi_header
 	stdafx.h
 	GradientFillHelper.h
-	render-gdi.h
+	win/render-gdi.h
 )
 
 set(render-gdi_src
     GradientFillHelper.cpp
-    render-gdi.cpp
+    win/render-gdi.cpp
 )
+else()
+set(render-gdi_header
+	stdafx.h
+	GradientFillHelper.h
+	linux/render-gdi.h
+)
+
+set(render-gdi_src
+    GradientFillHelper.cpp
+    linux/render-gdi.cpp
+)
+endif()
 
 source_group("Header Files" FILES ${render-gdi_header})
 source_group("Source Files" FILES ${render-gdi_src})
@@ -17,7 +30,12 @@ source_group("Source Files" FILES ${render-gdi_src})
 if (NOT ENABLE_SOUI_COM_LIB)
     set (render-gdi_src  ${render-gdi_src} render-gdi.rc)
     add_library(render-gdi SHARED ${render-gdi_src} ${render-gdi_header})
-    target_link_libraries(render-gdi utilities4 msimg32)
+    if (CMAKE_SYSTEM_NAME MATCHES Windows)
+    	target_link_libraries(render-gdi utilities4 msimg32)
+    else()
+        target_link_libraries(render-gdi utilities4 swinx)
+    endif()
+
 else()
     add_library(render-gdi STATIC ${render-gdi_src} ${render-gdi_header})
 endif()

@@ -1,11 +1,11 @@
 ﻿#ifndef __GDIALPHA__H__
 #define __GDIALPHA__H__
+#ifdef _WIN32
 
 #include "utilities-def.h"
 #include <windows.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 #define  MAX_ALPHABUF    1<<16
 
@@ -36,5 +36,7 @@ public:
     static void AlphaRestore(ALPHAINFO &alphaInfo);
 };
 
-}//namespace SOUI
+SNSEND
+
+#endif //_WIN32
 #endif // __GDIALPHA__H__

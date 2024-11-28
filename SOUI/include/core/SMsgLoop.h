@@ -1,16 +1,19 @@
 ﻿#ifndef __SMSGLOOP__H__
 #define __SMSGLOOP__H__
-#include <interface/smsgloop-i.h>
-#include <souicoll.h>
+#include <soui_exp.h>
+#include <helper/obj-ref-impl.hpp>
+#include <interface/SMsgLoop-i.h>
 
 SNSBEGIN
 
+class SMessageLoopPriv;
 class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
   public:
     SMessageLoop(IMessageLoop *pParentLoop);
     virtual ~SMessageLoop();
 
   public:
+
     // Message filter operations
     STDMETHOD_(BOOL, AddMessageFilter)(THIS_ IMsgFilter *pMessageFilter) OVERRIDE;
 
@@ -25,7 +28,7 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
     STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG *pMsg) OVERRIDE;
 
     // override to change idle processing
-    STDMETHOD_(BOOL, OnIdle)(THIS_ int /*nIdleCount*/) OVERRIDE;
+    STDMETHOD_(BOOL, OnIdle)(THIS_ int nIdleCount) OVERRIDE;
 
     STDMETHOD_(int, Run)(THIS) OVERRIDE;
 
@@ -51,20 +54,7 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
     static BOOL IsIdleMessage(MSG *pMsg);
 
   protected:
-    SArray<IMsgFilter *> m_aMsgFilter;
-    SArray<IIdleHandler *> m_aIdleHandler;
-
-    BOOL m_bRunning;
-    BOOL m_bQuit;
-    BOOL m_bDoIdle;
-    int m_nIdleCount;
-
-    SCriticalSection m_cs;
-    SList<IRunnable *> m_runnables;
-    SCriticalSection m_csRunningQueue;
-    SList<IRunnable *> m_runningQueue;
-    SAutoRefPtr<IMessageLoop> m_parentLoop;
-    DWORD m_tid;
+	SMessageLoopPriv * m_priv;
 };
 
 SNSEND

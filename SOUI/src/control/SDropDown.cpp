@@ -10,8 +10,8 @@
  *
  * Describe  此文件主要用于SDropDownWnd类相关实现
  */
-#include "souistd.h"
-#include "control/SDropDown.h"
+#include <souistd.h>
+#include <control/SDropDown.h>
 #include <core/SMsgLoop.h>
 
 SNSBEGIN

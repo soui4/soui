@@ -2,34 +2,9 @@
 #include "SApp.h"
 #include "control/SMessageBox.h"
 #include "control/SCmnCtrl.h"
+#include <control/STabCtrl.h>
 
 SNSBEGIN
-
-static SXmlDoc s_xmlMsgTemplate;
-
-BOOL SetMsgTemplate(SXmlNode uiRoot)
-{
-    if (wcscmp(uiRoot.name(), L"SOUI") != 0)
-        return FALSE;
-    if (!uiRoot.attribute(L"minSize").value()[0])
-        return FALSE;
-
-    s_xmlMsgTemplate.Reset();
-    s_xmlMsgTemplate.root().append_copy(uiRoot);
-    return TRUE;
-}
-
-BOOL SetIMsgTemplate(IXmlNode *uiRoot)
-{
-    SXmlNode xmlRoot(uiRoot);
-    return SetMsgTemplate(xmlRoot);
-}
-
-SXmlNode GetMsgTemplate()
-{
-    return s_xmlMsgTemplate.root().child(L"SOUI");
-}
-
 //////////////////////////////////////////////////////////////////////////
 
 SMessageBoxImpl::SMessageBoxImpl()
@@ -46,7 +21,8 @@ static struct MsgBoxInfo
 
 INT_PTR SMessageBoxImpl::MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 {
-    if (!GetMsgTemplate())
+	SXmlNode xmlTemplate = SApplication::getSingletonPtr()->GetMessageBoxTemplate();
+    if (!xmlTemplate)
         return ::MessageBox(hWnd, lpText, lpCaption, uType);
     s_MsgBoxInfo.pszText = lpText;
     s_MsgBoxInfo.pszCaption = lpCaption;
@@ -115,8 +91,8 @@ SStringT SMessageBoxImpl::OnGetButtonText(int nBtnID) const
 
 BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
 {
-    SXmlNode uiRoot = GetMsgTemplate();
-
+	SXmlNode uiRoot = SApplication::getSingletonPtr()->GetMessageBoxTemplate();
+	SASSERT(uiRoot);
     InitFromXml(&uiRoot);
 
     UINT uType = s_MsgBoxInfo.uType & 0x0F;
@@ -127,7 +103,7 @@ BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
     SWindow *pBtnPanel = pBtnSwitch->GetItem(g_msgBtnText[uType].nBtns - 1);
     SASSERT(pBtnPanel);
 
-    SXmlNode nodeBtnTxt = GetMsgTemplate().child(L"buttonText");
+    SXmlNode nodeBtnTxt = uiRoot.child(L"buttonText");
     for (int i = 0; i < g_msgBtnText[uType].nBtns; i++)
     {
         SWindow *pBtn = pBtnPanel->FindChildByName(g_wcsNameOfBtns[i]);

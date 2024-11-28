@@ -1,7 +1,8 @@
-#pragma once
+#ifndef _NO_COPYABLE_H_
+#define _NO_COPYABLE_H_
+
 #include <utilities-def.h>
-namespace SOUI
-{
+SNSBEGIN
 	/**
 	* Inheriate this class to make your class cannot be copy and assign.
 	*
@@ -16,4 +17,6 @@ namespace SOUI
 		const SNoCopyable &operator=(const SNoCopyable &);
 	};
 
-}
+SNSEND
+
+#endif//_NO_COPYABLE_H_

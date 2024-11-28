@@ -1,4 +1,4 @@
-﻿#include <core/swnd.h>
+﻿#include <core/SWnd.h>
 #include "toobj.h"
 
 BOOL ExpLua_Window(lua_State *L)

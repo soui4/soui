@@ -1,14 +1,14 @@
 ﻿#ifndef __SSTRING_I__H__
 #define __SSTRING_I__H__
+#include <windows.h>
 #include <utilities-def.h>
-#include <interface/obj-ref-i.h>
 SNSBEGIN
 
 #undef INTERFACE
 #define INTERFACE IStringA
 DECLARE_INTERFACE(IStringA)
 {
-	STDMETHOD_(int, GetLength)(CTHIS) SCONST PURE;
+	STDMETHOD_(int, GetLength)() SCONST PURE;
 	STDMETHOD_(BOOL, IsEmpty)(CTHIS) SCONST PURE;
 	STDMETHOD_(void, Empty)(THIS) PURE;
 

@@ -22,25 +22,25 @@ source_group("Source Files" FILES ${TaskLoop_src})
 
 if (NOT ENABLE_SOUI_COM_LIB)
     set (TaskLoop_src  ${TaskLoop_src} TaskLoop.rc)
-    add_library(TaskLoop SHARED ${TaskLoop_src} ${TaskLoop_header})
-    target_link_libraries(TaskLoop utilities4 Winmm)
+    add_library(taskloop SHARED ${TaskLoop_src} ${TaskLoop_header})
+    target_link_libraries(taskloop utilities4)
 else()
-    add_library(TaskLoop STATIC ${TaskLoop_src} ${TaskLoop_header})
+    add_library(taskloop STATIC ${TaskLoop_src} ${TaskLoop_header})
 endif()
 
-set(COM_LIBS ${COM_LIBS} TaskLoop CACHE INTERNAL "com_lib")
-set_target_properties (TaskLoop PROPERTIES
+set(COM_LIBS ${COM_LIBS} taskloop CACHE INTERNAL "com_lib")
+set_target_properties (taskloop PROPERTIES
     FOLDER components
 )
 
-install(TARGETS TaskLoop
+install(TARGETS taskloop
     CONFIGURATIONS Release
     RUNTIME DESTINATION bin/Release
     LIBRARY DESTINATION lib/Release
     ARCHIVE DESTINATION lib/Release
 )
 
-install(TARGETS TaskLoop
+install(TARGETS taskloop
     CONFIGURATIONS Debug
     RUNTIME DESTINATION bin/Debug
     LIBRARY DESTINATION lib/Debug

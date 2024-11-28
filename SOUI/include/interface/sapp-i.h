@@ -6,7 +6,7 @@
 #include <interface/stooltip-i.h>
 #include <interface/slog-i.h>
 #include <interface/SAttrStorage-i.h>
-#include <interface/smsgloop-i.h>
+#include <interface/SMsgLoop-i.h>
 #include <interface/shostwnd-i.h>
 #include <interface/SResProviderMgr-i.h>
 #include <interface/SRealWndHandler-i.h>
@@ -27,9 +27,7 @@ typedef enum _SingletonType
     SINGLETON_SWNDMGR,
     SINGLETON_TIMERGENERATOR,
     SINGLETON_WINDOWFINDER,
-    SINGLETON_TEXTSERVICEHELPER,
     SINGLETON_RICHEDITMENUDEF,
-    SINGLETON_SIMPLEWNDHELPER,
     SINGLETON_HOSTMGR,
     SINGLETON_NOTIFYCENTER,
 
@@ -390,6 +388,10 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * Describe
      */
     STDMETHOD_(HRESULT, CreateScriptModule)(THIS_ IScriptModule * *ppScriptModule) PURE;
+
+	STDMETHOD_(BOOL,SetEditCtxMenuTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) PURE;
+
+	STDMETHOD_(BOOL,SetMessageBoxTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) PURE;
 };
 
 SNSEND

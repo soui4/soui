@@ -15,8 +15,8 @@ namespace SOUI
 
 	BOOL SIpcHandle::InitShareBuf(ULONG_PTR idLocal, ULONG_PTR idRemote, UINT uBufSize, void* pSa)
 	{
-		assert(m_hRemoteId == NULL);
-		assert(m_hLocalId == NULL);
+		assert(m_hRemoteId == 0);
+		assert(m_hLocalId == 0);
 
 
 		TCHAR szName[MAX_PATH];
@@ -93,14 +93,14 @@ namespace SOUI
 
 	HRESULT SIpcHandle::Disconnect(ULONG_PTR idSvr)
 	{
-		if (m_hLocalId == NULL)
+		if (m_hLocalId == 0)
 			return E_UNEXPECTED;
-		if (m_hRemoteId == NULL)
+		if (m_hRemoteId == 0)
 			return E_UNEXPECTED;
 		::PostMessage((HWND)idSvr, UM_CALL_FUN, FUN_ID_DISCONNECT, (LPARAM)m_hLocalId);
-		m_hRemoteId = NULL;
+		m_hRemoteId = 0;
 		m_recvBuf.Close();
-		m_hLocalId = NULL;
+		m_hLocalId = 0;
 		m_sendBuf.Close();
 		return S_OK;
 	}
@@ -118,7 +118,7 @@ namespace SOUI
 
 	bool SIpcHandle::CallFun(IFunParams * pParam) const
 	{
-		if (m_hRemoteId == NULL)
+		if (m_hRemoteId == 0)
 			return false;
 
 		//make sure msg queue is empty.
@@ -265,7 +265,7 @@ namespace SOUI
 	///////////////////////////////////////////////////////////////////////
 	SIpcServer::SIpcServer() 
 		:m_pCallback(NULL) 
-		, m_hSvr(NULL)
+		, m_hSvr(0)
 	{}
 
 	LRESULT SIpcServer::OnMessage(ULONG_PTR idLocal, UINT uMsg, WPARAM wp, LPARAM lp,BOOL &bHandled)
@@ -349,7 +349,7 @@ namespace SOUI
 		HWND hSvr = (HWND)idSvr;
 		if (!IsWindow(hSvr))
 			return E_INVALIDARG;
-		if (m_hSvr != NULL)
+		if (m_hSvr != 0)
 			return E_UNEXPECTED;
 
 		m_hSvr = hSvr;

@@ -12,7 +12,6 @@
 #include "drawtext-skia.h"
 
 #include "render-skia.h"
-#include "trace.h"
 
 #include "skia2rop2.h"
 #include "PathEffect-Skia.h"
@@ -21,6 +20,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
+#include <windows.h>
 
 #define getTotalClip internal_private_getTotalClip
 // #include <vld.h>
@@ -59,13 +59,13 @@ namespace SOUI
 
 	SkIRect toSkIRect(LPCRECT pRc)
 	{
-		SkIRect rc={pRc->left,pRc->top,pRc->right,pRc->bottom};
+		SkIRect rc={(int)pRc->left,(int)pRc->top,(int)pRc->right,(int)pRc->bottom};
 		return rc;
 	}
 
 	SkRect toSkRect(LPCRECT pRc)
 	{
-		SkIRect rc={pRc->left,pRc->top,pRc->right,pRc->bottom};
+		SkIRect rc = { (int)pRc->left,(int)pRc->top,(int)pRc->right,(int)pRc->bottom };
 		return SkRect::Make(rc);
 	}
 
@@ -220,18 +220,17 @@ namespace SOUI
 	BOOL SRenderFactory_Skia::CreatePathEffect(REFGUID guidEffect,IPathEffect ** ppPathEffect)
 	{
 		* ppPathEffect = NULL;
-		#ifdef _MSC_VER
-		if(guidEffect == __uuidof(ICornerPathEffect))
+
+		if(guidEffect == __suidof(ICornerPathEffect))
 		{
 			*ppPathEffect = (IPathEffect*) new SPathEffect_Corner();
-		}else if(guidEffect == __uuidof(IDashPathEffect))
+		}else if(guidEffect == __suidof(IDashPathEffect))
 		{
 			*ppPathEffect = (IPathEffect *) new SPathEffect_Dash();
-		}else if(guidEffect == __uuidof(IDiscretePathEffect))
+		}else if(guidEffect == __suidof(IDiscretePathEffect))
 		{
 			*ppPathEffect = (IPathEffect *) new SPathEffect_Discrete();
 		}
-		#endif //_MSC_VER
 		return (*ppPathEffect) != NULL;
 	}
 
@@ -306,7 +305,7 @@ namespace SOUI
 		:m_SkCanvas(NULL)
 		,m_curColor(0xFF000000)//默认黑色
 		,m_hGetDC(0)
-		,m_uGetDCFlag(0)
+		,m_nGetDC(0)
 		,m_bAntiAlias(true)
 		,m_xferMode(kSrcOver_Mode)
 		,m_lastSave(0)
@@ -328,7 +327,11 @@ namespace SOUI
 
 		LOGFONT lf={0};
 		lf.lfHeight=20;
+#ifdef _WIN32
 		_tcscpy(lf.lfFaceName,_T("宋体"));
+#else
+		_tcscpy(lf.lfFaceName, _T("Arial"));
+#endif
 		pRenderFactory->CreateFont(&m_defFont,&lf);
 		SelectObject(m_defFont,NULL);
 
@@ -343,6 +346,12 @@ namespace SOUI
 	SRenderTarget_Skia::~SRenderTarget_Skia()
 	{
 		if(m_SkCanvas) delete m_SkCanvas;
+	}
+
+	void SRenderTarget_Skia::EndDraw(THIS) {
+		#ifndef _WIN32
+		m_curBmp->MarkDirty();
+		#endif//_WIN32
 	}
 
 	HRESULT SRenderTarget_Skia::CreatePen( int iStyle,COLORREF cr,int cWidth,IPenS ** ppPen )
@@ -477,7 +486,7 @@ namespace SOUI
 		ySrc += ptSourViewport.y;
 
 
-		SkIRect isrc={xSrc,ySrc,xSrc + pRcDest->right-pRcDest->left,ySrc+pRcDest->bottom-pRcDest->top};
+		SkIRect isrc={xSrc,ySrc,xSrc + RectWid(pRcDest),ySrc+RectHei(pRcDest)};
 		SkRect skrc=toSkRect(pRcDest);
 		skrc.offset(m_ptOrg);
 		m_SkCanvas->drawBitmapRect(bmpSrc,&isrc,skrc,&paint);
@@ -486,7 +495,7 @@ namespace SOUI
 
 	HRESULT SRenderTarget_Skia::DrawText( LPCTSTR pszText,int cchLen,LPRECT pRc,UINT uFormat)
 	{
-		if(cchLen<0) cchLen= _tcslen(pszText);
+		if(cchLen<0) cchLen= (int)_tcslen(pszText);
 		if(cchLen==0)
 		{
 			if(uFormat & DT_CALCRECT)
@@ -682,7 +691,7 @@ namespace SOUI
 			pts[i].fX = (SkScalar)pPt[i].x;
 			pts[i].fY = (SkScalar)pPt[i].y;
 		}
-		SkPoint::Offset(pts,nCount,m_ptOrg);
+		SkPoint::Offset(pts, (int)nCount,m_ptOrg);
 
 		SkPaint paint=m_paint;
 		if(m_bAntiAlias)
@@ -711,7 +720,7 @@ namespace SOUI
 
 	HRESULT SRenderTarget_Skia::TextOut( int x, int y, LPCTSTR lpszString, int nCount)
 	{
-		if(nCount<0) nCount= _tcslen(lpszString);
+		if(nCount<0) nCount= (int)_tcslen(lpszString);
 		SStringW strW=S_CT2W(SStringT(lpszString,nCount));
 		SkPaint     txtPaint =m_paint;
 		txtPaint.setStyle(SkPaint::kStrokeAndFill_Style);
@@ -748,7 +757,7 @@ namespace SOUI
 	HRESULT SRenderTarget_Skia::DrawIconEx( int xLeft, int yTop, HICON hIcon, int cxWidth,int cyWidth,UINT diFlags )
 	{
 		HDC hdc=GetDC(0);
-
+#ifdef _WIN32
 		ICONINFO ii={0};
 		::GetIconInfo(hIcon,&ii);
 		SASSERT(ii.hbmColor);
@@ -762,14 +771,15 @@ namespace SOUI
 			CGdiAlpha::AlphaBackup(hdc,&rc,ai);
 		}
 		BOOL bRet=::DrawIconEx(hdc,xLeft,yTop,hIcon,cxWidth,cyWidth,0,NULL,diFlags);
-
 		if(bm.bmBitsPixel!=32)
 		{
 			CGdiAlpha::AlphaRestore(ai);
 		}
 		if(ii.hbmColor) DeleteObject(ii.hbmColor);
 		if(ii.hbmMask) DeleteObject(ii.hbmMask);
-
+#else
+		BOOL bRet=::DrawIconEx(hdc,xLeft,yTop,hIcon,cxWidth,cyWidth,0,NULL,diFlags);
+#endif//_WIN32
 		ReleaseDC(hdc,NULL);
 		return bRet?S_OK:S_FALSE;
 	}
@@ -873,10 +883,10 @@ namespace SOUI
 
 	HRESULT SRenderTarget_Skia::DrawBitmap9Patch( LPCRECT pRcDest,const IBitmapS *pBitmap,LPCRECT pRcSrc,LPCRECT pRcSourMargin,UINT expendMode,BYTE byAlpha/*=0xFF*/ )
 	{
-		int xDest[4] = {pRcDest->left,pRcDest->left+pRcSourMargin->left,pRcDest->right-pRcSourMargin->right,pRcDest->right};
-		int xSrc[4] = {pRcSrc->left,pRcSrc->left+pRcSourMargin->left,pRcSrc->right-pRcSourMargin->right,pRcSrc->right};
-		int yDest[4] = {pRcDest->top,pRcDest->top+pRcSourMargin->top,pRcDest->bottom-pRcSourMargin->bottom,pRcDest->bottom};
-		int ySrc[4] = {pRcSrc->top,pRcSrc->top+pRcSourMargin->top,pRcSrc->bottom-pRcSourMargin->bottom,pRcSrc->bottom};
+		LONG xDest[4] = {pRcDest->left,pRcDest->left+pRcSourMargin->left,pRcDest->right-pRcSourMargin->right,pRcDest->right};
+		LONG xSrc[4] = {pRcSrc->left,pRcSrc->left+pRcSourMargin->left,pRcSrc->right-pRcSourMargin->right,pRcSrc->right};
+		LONG yDest[4] = {pRcDest->top,pRcDest->top+pRcSourMargin->top,pRcDest->bottom-pRcSourMargin->bottom,pRcDest->bottom};
+		LONG ySrc[4] = {pRcSrc->top,pRcSrc->top+pRcSourMargin->top,pRcSrc->bottom-pRcSourMargin->bottom,pRcSrc->bottom};
 
 		//首先保证九宫分割正常
 		if(!(xSrc[0] <= xSrc[1] && xSrc[1] <= xSrc[2] && xSrc[2] <= xSrc[3])) return S_FALSE;
@@ -1048,15 +1058,18 @@ namespace SOUI
 
 	HDC SRenderTarget_Skia::GetDC( UINT uFlag )
 	{
-		if(m_hGetDC) return m_hGetDC;
+		if(m_hGetDC) 
+		{
+			m_nGetDC++;
+			return m_hGetDC;
+		}
 
 		HBITMAP bmp=m_curBmp->GetGdiBitmap();//bmp可能为NULL
-		HDC hdc_desk = ::GetDC(NULL);
+		HDC hdc_desk = ::GetDC(0);
 		m_hGetDC = CreateCompatibleDC(hdc_desk);
-		::ReleaseDC(NULL,hdc_desk);
+		::ReleaseDC(0,hdc_desk);
 
-		::SelectObject(m_hGetDC,bmp);
-
+		::SelectObject(m_hGetDC,bmp);	
 		if(m_SkCanvas->isClipEmpty())
 		{
 			::IntersectClipRect(m_hGetDC,0,0,0,0);
@@ -1111,7 +1124,7 @@ namespace SOUI
 			mtx.get(kMTransX),mtx.get(kMTransY) };
 		::SetWorldTransform(m_hGetDC,&xForm);
 
-		m_uGetDCFlag = uFlag;
+		m_nGetDC = 1;
 		return m_hGetDC;
 	}
 
@@ -1119,9 +1132,10 @@ namespace SOUI
 	{
 		if(hdc == m_hGetDC)
 		{
-			DeleteDC(hdc);
-			m_hGetDC = 0;
-			m_uGetDCFlag =0;
+			if(--m_nGetDC == 0){
+				DeleteDC(hdc);
+				m_hGetDC = 0;
+			}
 		}
 	}
 
@@ -1183,15 +1197,17 @@ namespace SOUI
 					skPts[0]=pt1b;
 					skPts[1]=pt2b;
 				}
+				skPts[0].offset(halfWid,halfHei);
+                skPts[1].offset(halfWid,halfHei);
 			}
 			SkPoint::Offset(skPts,2,skrc.fLeft,skrc.fTop);
 			pShader = SkGradientShader::CreateLinear(skPts, skColors, pos,nCount,tileMode);
 		}else if(info->type == radial)
 		{
 			SkPoint skCenter;
-			skCenter.set(halfWid,halfHei);
+			skCenter.set(wid*info->radial.centerX,hei*info->radial.centerY);
 			SkPoint::Offset(&skCenter,1,skrc.fLeft,skrc.fTop);
-			pShader = SkGradientShader::CreateRadial(skCenter,info->radius ,skColors, pos,nCount,tileMode);
+			pShader = SkGradientShader::CreateRadial(skCenter,info->radial.radius ,skColors, pos,nCount,tileMode);
 		}else if(info->type==sweep)
 		{
 			SkScalar centerX = skrc.fLeft + skrc.width() * info->sweep.centerX;
@@ -1653,10 +1669,9 @@ namespace SOUI
 		bmi.bmiHeader.biCompression = BI_RGB;
 		bmi.bmiHeader.biSizeImage   = 0;
 
-		HDC hdc=GetDC(NULL);
-		//LPVOID pBits=NULL;
+		HDC hdc=GetDC(0);
 		HBITMAP hBmp=CreateDIBSection(hdc,&bmi,DIB_RGB_COLORS,ppBits,0,0);
-		ReleaseDC(NULL,hdc);
+		ReleaseDC(0,hdc);
 		return hBmp;
 	}
 
@@ -1694,9 +1709,7 @@ namespace SOUI
 		if(!m_hBmp) return E_OUTOFMEMORY;
 		m_bitmap.setPixels(pBits);
 
-		const int stride = m_bitmap.rowBytes();
-		pFrame->CopyPixels(NULL, stride, stride * uHei,
-			reinterpret_cast<BYTE*>(m_bitmap.getPixels()));
+		memcpy(m_bitmap.getPixels(),pFrame->GetPixels(), m_bitmap.rowBytes() * uHei);
 		return S_OK;
 	}
 
@@ -1735,9 +1748,7 @@ namespace SOUI
 		if(!m_hBmp) return E_OUTOFMEMORY;
 		m_bitmap.setPixels(pBits);
 
-		const int stride = m_bitmap.rowBytes();
-		pFrame->CopyPixels(NULL, stride, stride * uHei,
-			reinterpret_cast<BYTE*>(m_bitmap.getPixels()));
+		memcpy(m_bitmap.getPixels(),pFrame->GetPixels(), m_bitmap.rowBytes() *uHei);
 		return S_OK;
 	}
 
@@ -1767,7 +1778,9 @@ namespace SOUI
 		BITMAP bm;
 		GetObject(m_hBmp,sizeof(bm),&bm);
 		memcpy(bm.bmBits,pBuf,Width()*Height()*4);
-		m_bitmap.setPixels(pBuf);
+#ifndef _WIN32
+		MarkDirty();
+#endif
 	}
 
 	const LPVOID SBitmap_Skia::GetPixelBits() const
@@ -1808,7 +1821,7 @@ namespace SOUI
 		IRenderTarget *pRT=NULL;
 		if(GetRenderFactory()->CreateRenderTarget(&pRT,nWid,nHei))
 		{
-			RECT rcSrc = {0,0,(long)Width(),(long)Height()};
+			RECT rcSrc = {0,0,(LONG)Width(),(LONG)Height()};
 			RECT rcDst ={0,0,nWid,nHei};
 			hr = pRT->DrawBitmapEx(&rcDst,this,&rcSrc,MAKELONG(EM_STRETCH,filterLevel),255);
 			if(hr == S_OK)
@@ -2384,7 +2397,7 @@ namespace SOUI
 	void SPath_Skia::addString(LPCTSTR pszText,int nLen, float x,float y, const IFontS *pFont)
 	{
 		const SFont_Skia *pFontSkia = (const SFont_Skia *)pFont;
-		if(nLen < 0) nLen = _tcslen(pszText);
+		if(nLen < 0) nLen = (int)_tcslen(pszText);
 		SkPaint paint;
 		paint.setTextEncoding(SkPaint::kUTF16_TextEncoding);
 		paint.setTypeface(pFontSkia->GetFont());

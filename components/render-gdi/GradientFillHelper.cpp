@@ -1,11 +1,16 @@
 ﻿#include "GradientFillHelper.h"
+
+#ifdef _WIN32
 #include <Wingdi.h>
 #pragma comment(lib,"msimg32.lib")
+#endif
 
 namespace SOUI
 {
 
+#ifndef GetAValue
 #define GetAValue(rgb)   (LOBYTE((rgb) >> 24))
+#endif//GetAValue
 
 void GradientFillRect(HDC hdc, const RECT *rcFill,const GradientItem * items, int nCount,BOOL bVert,BYTE byAlpha)
 {

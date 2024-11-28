@@ -13,8 +13,10 @@
 
 #ifndef __SWINDOWMGR__H__
 #define __SWINDOWMGR__H__
-#include "core/SSingletonMap.h"
-#include "core/SDefine.h"
+#include <core/SSingletonMap.h>
+#include <core/SDefine.h>
+#include <helper/SCriticalSection.h>
+
 SNSBEGIN
 
 class SWindow;
@@ -43,7 +45,7 @@ class SOUI_EXP SWindowMgr : public SSingletonMap<SWindowMgr, SWindow *, SWND> {
     static BOOL DestroyWindow(SWND swnd);
 
   protected:
-    CRITICAL_SECTION m_lockWndMap;
+    SCriticalSection m_lockWndMap;
 
     SWND m_hNextWnd;
 };

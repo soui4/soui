@@ -368,7 +368,7 @@ BOOL SResProviderMgr::HasResource(LPCTSTR pszType, LPCTSTR pszResName)
     if (IsFileType(pszType))
     {
         SStringT strPath = m_strFilePrefix + pszResName;
-        return ::GetFileAttributes(strPath) != INVALID_FILE_ATTRIBUTES;
+        return IsFilePathValid(strPath);
     }
     else
     {

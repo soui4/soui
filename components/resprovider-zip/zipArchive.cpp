@@ -16,10 +16,11 @@
 #include <zconf.h>
 #include <zlib.h>
 
-#include <crtdbg.h>
+//#include <crtdbg.h>
 #include <tchar.h>
 #include <malloc.h>
 
+#define _ASSERTE assert
 
 CZipFile::CZipFile(DWORD dwSize/*=0*/)
 		: m_pData(NULL),
@@ -41,7 +42,7 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 	}
 	BOOL CZipFile::Read(void* pBuffer, DWORD dwSize, LPDWORD pdwRead/* = NULL*/)
 	{
-		_ASSERTE(IsOpen());
+		assert(IsOpen());
 
 		if (pdwRead != NULL)
 			*pdwRead = 0;
@@ -131,7 +132,7 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 
 	BOOL CZipFile::_InitKeys(LPCSTR pstrPassword)
 	{
-		m_pCrcTable = get_crc_table();
+		m_pCrcTable = (const DWORD*)get_crc_table();
 		m_dwKey[0] = 305419896;
 		m_dwKey[1] = 591751049;
 		m_dwKey[2] = 878082192;
@@ -339,10 +340,10 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 	{
         if(!pstrPassword) return FALSE;
 
-		if (::lstrlenA(pstrPassword) >= sizeof(m_szPassword)-1)
+		if (::strlen(pstrPassword) >= sizeof(m_szPassword)-1)
 			return FALSE;
 
-		::lstrcpyA(m_szPassword, pstrPassword);
+		::strcpy(m_szPassword, pstrPassword);
 		return TRUE;
 	}
 
@@ -563,7 +564,7 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 		if (pFF == NULL)
 			return INVALID_HANDLE_VALUE;
 
-		::lstrcpy(pFF->szSearch, pszFileName);
+		::_tcscpy(pFF->szSearch, pszFileName);
 		pFF->nPos = 0;
 
 		BOOL bRet = FindNextFile((HANDLE)pFF, lpFindFileData);
@@ -675,6 +676,7 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 
 	BOOL CZipArchive::Open( HMODULE hModule,LPCTSTR pszName,LPCTSTR pszType )
 	{
+#ifdef _WIN32
 		HRSRC hResInfo = ::FindResource(hModule, pszName, pszType);
 		if (hResInfo == NULL)
 			return FALSE;
@@ -704,6 +706,9 @@ CZipFile::CZipFile(DWORD dwSize/*=0*/)
 			m_hFile=INVALID_HANDLE_VALUE;
 		}
 		return bOK;
+#else
+		return FALSE;
+#endif
 	}
 
 	void CZipArchive::CloseFile()

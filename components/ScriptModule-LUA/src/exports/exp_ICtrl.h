@@ -5,7 +5,7 @@ T1 * QueryICtrl(IWindow *pWnd){
 	if(pWnd->IsClass(T2::GetClassName()))
 	{
 		IObjRef *pCtrl=NULL;
-		pWnd->QueryInterface(__uuidof(T1),&pCtrl);
+		pWnd->QueryInterface(__suidof(T1),&pCtrl);
 		if(!pCtrl) return NULL;
 		return (T1*)pCtrl;
 	}

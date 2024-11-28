@@ -1,8 +1,9 @@
 ﻿#ifndef __SLINEARLAYOUT__H__
 #define __SLINEARLAYOUT__H__
 
-#include "interface/slayout-i.h"
-#include "SLinearLayoutParamStruct.h"
+#include <interface/slayout-i.h>
+#include <layout/SLinearLayoutParamStruct.h>
+#include <sobject/Sobject.hpp>
 
 SNSBEGIN
 

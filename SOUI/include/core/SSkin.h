@@ -5,6 +5,7 @@
 #include <layout/SLayoutSize.h>
 #include <helper/SplitString.h>
 #include <matrix/SPoint.h>
+#include <sobject/Sobject.hpp>
 
 SNSBEGIN
 
@@ -245,6 +246,7 @@ class SOUI_EXP SGradientDesc {
   protected:
     SAutoRefPtr<IGradient> m_gradient;
     SLayoutSize m_radius;
+    float m_ratio_radius;
     GradientType m_type;
     float m_angle;
     float m_centerX;
@@ -252,7 +254,7 @@ class SOUI_EXP SGradientDesc {
     BOOL m_bFullArc;
 
   public:
-    GradientInfo GetGradientInfo(int nScale) const;
+    GradientInfo GetGradientInfo(int nScale, int wid,int hei) const;
     IGradient *GetGradient()
     {
         return m_gradient;
@@ -266,6 +268,7 @@ class SOUI_EXP SGradientDesc {
             ATTR_ENUM_VALUE(L"sweep", sweep)
         ATTR_ENUM_END(m_type)
         ATTR_LAYOUTSIZE(L"radius", m_radius, TRUE)
+        ATTR_FLOAT(L"ratio_radius", m_ratio_radius, TRUE)
         ATTR_FLOAT(L"angle", m_angle, TRUE)
         ATTR_FLOAT(L"centerX", m_centerX, TRUE)
         ATTR_FLOAT(L"centerY", m_centerY, TRUE)
@@ -457,7 +460,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         {
         }
 
-        IBrushS *CreateBrush(IRenderTarget *pRT, int nScale, BYTE byAlpha) const;
+        IBrushS *CreateBrush(IRenderTarget *pRT, int nScale, BYTE byAlpha,int wid,int hei) const;
 
         STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode) override;
 
@@ -616,8 +619,8 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
 class SOUI_EXP SSKinGroup : public SSkinObjBase {
     DEF_SOBJECT(SSkinObjBase, L"group")
   public:
-    STDMETHOD_(SIZE, GetSkinSize)(THIS) SCONST OVERRIDE;
-    STDMETHOD_(int, GetStates)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(SIZE, GetSkinSize)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(int, GetStates)(CTHIS) SCONST OVERRIDE;
 
     SOUI_ATTRS_BEGIN()
         ATTR_SKIN(L"normal", m_skins[0], FALSE)

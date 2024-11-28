@@ -1,0 +1,30 @@
+<SOUI name="mainWindow" title="@string/ipc_svr" bigIcon="ICON_LOGO:128" smallIcon="ICON_LOGO:64" margin="5,5,5,5"  resizable="1" wndType="appMain"
+	appWnd="1"
+	translucent="0" 
+	toolwnd="0"
+>
+  <root  width="600" height="400" skin="_skin.sys.wnd.bkgnd" colorBkgnd="@color/white" layout="vbox">
+	  <caption size="-2,30" font="adding:2" layout="hbox" gravity="center" padding_left="10" colorBkgnd="@color/blue">
+		  <text text="@string/ipc_svr"/>
+		  <text text="QQ群:" extend_left="5"/>
+		  <text text="229313785" colorText="@color/red"/>
+		  <window size="0,0" weight="1" visible="0"/>
+		  <imgbtn id="sysid_min" skin="_skin.sys.btn.minimize" animate="1" />
+		  <window>
+			  <imgbtn id="sysid_max" skin="_skin.sys.btn.maximize"  pos="0,0" animate="1" />
+			  <imgbtn id="sysid_restore" skin="_skin.sys.btn.restore"  pos="0,0" show="0" animate="1" />
+		  </window>
+		  <imgbtn id="sysid_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
+	  </caption>
+        <window size="-2,0" weight="1" layout="vbox">
+            <window size="-2,-1" layout="hbox">
+                <text text="svr id="/>
+                <text name="txt_svr_id" colorText="@color/red"/>
+            </window>
+            <window size="-2,-1" layout="hbox">
+                <text text="recv:"/>
+                <text name="txt_recv" colorText="@color/red"/>
+            </window>
+        </window>
+  </root>
+</SOUI>

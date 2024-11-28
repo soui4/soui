@@ -3,7 +3,7 @@
 // Description: Font Pool
 //////////////////////////////////////////////////////////////////////////
 #include "souistd.h"
-#include "res.mgr/sfontpool.h"
+#include "res.mgr/SFontPool.h"
 #include "helper/SplitString.h"
 #include "layout/SLayoutSize.h"
 #include "helper/SHostMgr.h"
@@ -23,13 +23,7 @@ int CALLBACK DefFontsEnumProc(CONST LOGFONT *lplf,    // logical-font data
 
 static BOOL DefFontCheck(const SStringW &strFontName)
 {
-    //确保字体存在
-    HDC hdc = GetDC(NULL);
-    SStringT strFace = S_CW2T(strFontName);
-    BOOL bValidFont = FALSE;
-    EnumFonts(hdc, strFace.c_str(), DefFontsEnumProc, (LPARAM)&bValidFont);
-    ReleaseDC(NULL, hdc);
-    return bValidFont;
+    return HasFont(S_CW2T(strFontName));
 }
 
 FunFontCheck SFontPool::s_funFontCheck = DefFontCheck;
@@ -177,7 +171,6 @@ FontInfo SFontPool::FontInfoFromString(const SStringW &strFontDesc, const FontIn
         nodeExp = xmlExProp.root().child(kExPropKey);
     }
     SStringW fontDesc2 = strFontDesc;
-    fontDesc2.MakeLower();
     SArray<SStringW> strLst;
     size_t nSeg = SplitString(fontDesc2, KFontPropSeprator, strLst);
     for (size_t i = 0; i < nSeg; i++)
@@ -186,6 +179,7 @@ FontInfo SFontPool::FontInfoFromString(const SStringW &strFontDesc, const FontIn
         size_t n = SplitString(strLst[i], KPropSeprator, kv);
         if (n != 2)
             continue;
+        kv[0].MakeLower();
         if (kv[0] == KFontFace)
         {
             if (kv[1][0] == L'\'' || kv[1][0] == L'\"')

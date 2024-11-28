@@ -22,22 +22,31 @@ set(EXTENDCOTROLS ${EXTENDCOTROLS}
 	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinAPNG.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SSkinImgFrame3.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SVscrollbar.h
-	${PROJECT_SOURCE_DIR}/controls.extend/SSkinNewScrollbar.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SSkinNewScrollBar.h
 	${PROJECT_SOURCE_DIR}/controls.extend/FileHelper.h
-	${PROJECT_SOURCE_DIR}/controls.extend/sipaddressctrl.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SIPAddressCtrl.h
 	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/SPropertyGrid.h
-	${PROJECT_SOURCE_DIR}/controls.extend/sfadeframe.h
-	${PROJECT_SOURCE_DIR}/controls.extend/sradiobox2.h
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/SPropertyItemBase.h
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Text.h
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Option.h
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Color.h
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Size.h
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Group.h
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Rect.h
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/colorpicker/ColourPopup.h
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/colorpicker/SColorPicker.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SFadeFrame.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SRadioBox2.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SChromeTabCtrl.h
-	${PROJECT_SOURCE_DIR}/controls.extend/siectrl.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SIECtrl.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SDocHostUIHandler.h
-	${PROJECT_SOURCE_DIR}/controls.extend/schatedit.h
-	${PROJECT_SOURCE_DIR}/controls.extend/reole/richeditole.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SChatEdit.h
+	${PROJECT_SOURCE_DIR}/controls.extend/reole/RichEditOle.h
 	${PROJECT_SOURCE_DIR}/controls.extend/reole/dataobject.h
-	${PROJECT_SOURCE_DIR}/controls.extend/sscrolltext.h
-	${PROJECT_SOURCE_DIR}/controls.extend/scalendar2.h
-	${PROJECT_SOURCE_DIR}/controls.extend/slistctrlex.h
-	${PROJECT_SOURCE_DIR}/controls.extend/simagemaskwnd.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SScrollText.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SCalendar2.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SListCtrlEx.h
+	${PROJECT_SOURCE_DIR}/controls.extend/SImageMaskWnd.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SRatingBar.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SFreeMoveWindow.h
 	${PROJECT_SOURCE_DIR}/controls.extend/smiley/SSmileyCtrl.h
@@ -62,29 +71,29 @@ set(EXTENDCOTROLS ${EXTENDCOTROLS}
 	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinGif.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinAPNG.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SSkinImgFrame3.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/sipaddressctrl.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/spropertygrid.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/spropertyitembase.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/spropertyitem-text.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/spropertyitem-option.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/spropertyitem-color.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/spropertyitem-size.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/spropertyitem-group.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/spropertyitem-rect.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SIPAddressCtrl.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/SPropertyGrid.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/SPropertyItemBase.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Text.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Option.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Color.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Size.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Group.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/propitem/SPropertyItem-Rect.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/colorpicker/ColourPopup.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/colorpicker/SColorPicker.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/sfadeframe.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/sradiobox2.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SFadeFrame.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SRadioBox2.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SChromeTabCtrl.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/siectrl.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SIECtrl.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SDocHostUIHandler.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/schatedit.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/reole/richeditole.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SChatEdit.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/reole/RichEditOle.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/reole/dataobject.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/sscrolltext.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/scalendar2.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/slistctrlex.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/simagemaskwnd.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SScrollText.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SCalendar2.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SListCtrlEx.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/SImageMaskWnd.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SRatingBar.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SFreeMoveWindow.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/TipWnd.cpp
@@ -109,7 +118,7 @@ source_group("Resource Files" FILES ${CURRENT_RC})
 source_group("Extend Cotrols" FILES ${EXTENDCOTROLS})
 
 
-if(MSVC_VERSION LESS_EQUAL 1500 AND ENABLE_SOUI_COM_LIB)
+if(MSVC_VERSION LESS 1600 AND ENABLE_SOUI_COM_LIB)
 message("vs is less than vs2008")
 if (CMAKE_CL_64)
 	link_directories("${PROJECT_SOURCE_DIR}/components/render-d2d/sdk7.1_d2d/lib/x64")
@@ -138,7 +147,9 @@ if(CMAKE_DEBUG_POSTFIX)
     set_target_properties(demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
 endif()
 
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
 add_dependencies(demo soui-sys-resource ${COM_LIBS})
+endif()
 if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
 target_link_libraries(demo soui4 utilities4 smiley)
 else()

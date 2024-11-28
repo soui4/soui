@@ -12,7 +12,9 @@
  */
 #ifndef __SLISTBOX__H__
 #define __SLISTBOX__H__
-#include "core/SPanel.h"
+#include <core/SPanel.h>
+#include <proxy/SPanelProxy.h>
+#include <interface/SCtrl-i.h>
 
 SNSBEGIN
 /**
