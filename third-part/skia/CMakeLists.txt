@@ -2,11 +2,12 @@
 # 1394020320@qq.com
 #
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4355 /wd4225 /wd4244")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4355 /wd4225 /wd4244 /wd4996")
 else()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+add_definitions(-DSK_USE_POSIX_THREADS)
 endif()
-
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/config)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/core)
