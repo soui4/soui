@@ -45,9 +45,10 @@ Ankh.NoLoad
 #Visual Studio Code files
 #.vscode/
 
-build/
+build*/
 config/
 /.vs
 /CMakeSettings.json
 build
 /out
+output*/
