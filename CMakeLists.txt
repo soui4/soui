@@ -32,7 +32,11 @@
 cmake_minimum_required(VERSION 3.1)
 project(SOUI4)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CONFIGURATION_TYPES Debug Release)
+if(NOT CMAKE_BUILD_TYPE)
+set(CMAKE_BUILD_TYPE "Debug")
+endif()
+
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
 include(__cmake/internal_utils.cmake)
 include(__cmake/global.cmake)
