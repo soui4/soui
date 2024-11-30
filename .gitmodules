@@ -1,4 +1,4 @@
 [submodule "swinx"]
 	path = swinx
-	url = https://github.com/soui4/swinx.git
+	url = https://gitee.com/setoutsoft/swinx.git
 	branch = ver_0.1
