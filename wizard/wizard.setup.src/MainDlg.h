@@ -404,23 +404,24 @@ public:
 		{
 			TCHAR szDir[MAX_PATH]={0};
 			GetDlgItemText(IDC_INSTALL_DIR32, szDir, MAX_PATH);
-			if(GetFileAttributes(szDir)==INVALID_FILE_ATTRIBUTES)
-			{
-				MessageBox(_T("没有找到32位soui安装目录"), _T("错误"), MB_OK | MB_ICONSTOP);
-				return 0;
-			}
 			strDir32 = szDir;
 		}
 		{
 			TCHAR szDir[MAX_PATH]={0};
 			GetDlgItemText(IDC_INSTALL_DIR64, szDir, MAX_PATH);
-			if(GetFileAttributes(szDir)==INVALID_FILE_ATTRIBUTES)
-			{
-				MessageBox(_T("没有找到64位soui安装目录"), _T("错误"), MB_OK | MB_ICONSTOP);
-				return 0;
-			}
 			strDir64=szDir;
 		}
+		if(!strDir32.IsEmpty() && GetFileAttributes(strDir32)==INVALID_FILE_ATTRIBUTES){
+			strDir32.Empty();
+		}
+		if(!strDir64.IsEmpty() && GetFileAttributes(strDir64)==INVALID_FILE_ATTRIBUTES){
+			strDir64.Empty();
+		}
+		if(strDir32.IsEmpty() && strDir64.IsEmpty()){
+			MessageBox(_T("没有找到32位或者64位soui安装目录"), _T("错误"), MB_OK | MB_ICONSTOP);
+			return 0;
+		}
+
 		//设置环境变量
 
 		CRegKey reg;

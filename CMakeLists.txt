@@ -78,6 +78,7 @@ configure_file("config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONL
 configure_file("config/build.cfg.in" "${PROJECT_BINARY_DIR}/config/build.cfg" @ONLY)
 include_directories(${PROJECT_BINARY_DIR}/config)
 install(FILES "${PROJECT_BINARY_DIR}/config/config.h" DESTINATION include/config)
+install(FILES "${PROJECT_BINARY_DIR}/config/build.cfg" DESTINATION include/config)
 
 
 
