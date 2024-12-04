@@ -535,7 +535,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     {
         dwExStyle |= WS_EX_TOOLWINDOW;
     }
-    if (m_hostAttr.m_bTranslucent)
+    if (IsTranslucent())
     {
         dwExStyle |= WS_EX_LAYERED;
     }
@@ -602,7 +602,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
         SetLayeredWindowAlpha(GetRoot()->GetAlpha());
     }
     m_memRT = NULL;
-    if (m_hostAttr.m_bTranslucent)
+    if (IsTranslucent())
     {
         CRect rcWnd;
         SNativeWnd::GetWindowRect(&rcWnd);
@@ -779,7 +779,11 @@ void SHostWnd::OnPaint(HDC dc)
 {
     PAINTSTRUCT ps;
     dc = ::BeginPaint(m_hWnd, &ps);
+#ifdef _WIN32
     OnPrint(m_hostAttr.m_bTranslucent ? NULL : dc);
+#else
+    OnPrint(dc);
+#endif//_WIN32
     ::EndPaint(m_hWnd, &ps);
 }
 
