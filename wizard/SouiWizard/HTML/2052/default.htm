@@ -34,11 +34,18 @@
     <!-- 主窗口半透明。-->
     <symbol name='CHECKBOX_TRANSLUCENT' type=checkbox value=true></symbol>
     <!--编译选项-->
-    <SYMBOL NAME="UNICODE" TYPE=select-one VALUE=1></SYMBOL>
-    <SYMBOL NAME="WCHAR" TYPE=select-one VALUE=1></SYMBOL>
-    <SYMBOL NAME="MT" TYPE=select-one VALUE=1></SYMBOL>
-    <SYMBOL NAME="SUPPORT_XP" TYPE="select-one" VALUE="0"></SYMBOL>
-    <SYMBOL NAME="DYNAMIC_SOUI" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="UNICODE_32" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="WCHAR_32" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="MT_32" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="SUPPORT_XP_32" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="DYNAMIC_SOUI_32" TYPE="select-one" VALUE="0"></SYMBOL>
+
+    <SYMBOL NAME="UNICODE_64" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="WCHAR_64" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="MT_64" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="SUPPORT_XP_64" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="DYNAMIC_SOUI_64" TYPE="select-one" VALUE="0"></SYMBOL>
+
     <symbol name="APP_TITLE" type="string" value=""></symbol>
 
     <style type="text/css">
@@ -465,7 +472,7 @@
         }       
     }
 
-    function LoadConfig(configFile)
+    function LoadConfig(configFile,bX64)
     {
         try {
             var fso = new ActiveXObject("Scripting.FileSystemObject");
@@ -487,12 +494,21 @@
                     });
                     }
                 f.Close();
-                }
-            window.external.AddSymbol('UNICODE', keyValue["UNICODE"]);
-            window.external.AddSymbol('WCHAR', keyValue["WCHAR"]);
-            window.external.AddSymbol('MT', keyValue["MT"]);
-            window.external.AddSymbol('SUPPORT_XP', keyValue["SUPPORT_XP"]);
-            window.external.AddSymbol('DYNAMIC_SOUI', keyValue["DYNAMIC_SOUI"]);
+            }
+            if (bX64) {
+                window.external.AddSymbol('UNICODE_64', keyValue["UNICODE"]);
+                window.external.AddSymbol('WCHAR_64', keyValue["WCHAR"]);
+                window.external.AddSymbol('MT_64', keyValue["MT"]);
+                window.external.AddSymbol('SUPPORT_XP_64', keyValue["SUPPORT_XP"]);
+                window.external.AddSymbol('DYNAMIC_SOUI_64', keyValue["DYNAMIC_SOUI"]);
+            }
+            else {
+                window.external.AddSymbol('UNICODE_32', keyValue["UNICODE"]);
+                window.external.AddSymbol('WCHAR_32', keyValue["WCHAR"]);
+                window.external.AddSymbol('MT_32', keyValue["MT"]);
+                window.external.AddSymbol('SUPPORT_XP_32', keyValue["SUPPORT_XP"]);
+                window.external.AddSymbol('DYNAMIC_SOUI_32', keyValue["DYNAMIC_SOUI"]);
+            }
         }
         catch (e) {
             throw e;
@@ -512,9 +528,12 @@
             //从文件加载编译选项
 
             var wsh = new ActiveXObject("WScript.Shell");
-            var strConfigPath = wsh.Environment("system").Item("SOUI4PATH");
-            var strConfigFile = strConfigPath + '\\config\\build.cfg';
-            LoadConfig(strConfigFile);
+            var strConfigPath32 = wsh.Environment("system").Item("SOUI4_INSTALL_32");
+            var strConfigFile32 = strConfigPath32 + '\\include\\config\\build.cfg';
+            LoadConfig(strConfigFile32,false);
+            var strConfigPath64 = wsh.Environment("system").Item("SOUI4_INSTALL_64");
+            var strConfigFile64 = strConfigPath64 + '\\include\\config\\build.cfg';
+            LoadConfig(strConfigFile64,true);
         }
 
         // 加载文档并用合适的

@@ -89,23 +89,3 @@ endif()
 set_target_properties (ipc_client PROPERTIES
     FOLDER demos
 )
-
-
-if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
-#add gtk demo
-find_package(PkgConfig REQUIRED)
-pkg_check_modules(GTK3 REQUIRED gtk+-3.0)
-include_directories(${GTK3_INCLUDE_DIRS})
-link_directories(${GTK3_LIBRARY_DIRS})
-
-pkg_check_modules(CAIRO REQUIRED cairo)
-include_directories(${CAIRO_INCLUDE_DIRS})
-link_directories(${CAIRO_LIBRARY_DIRS})
-
-set(gtkdemo_src
-gtktest.c
-)
-add_executable(gtkdemo ${gtkdemo_src})
-target_link_libraries(gtkdemo xcb xcb-util dl ${CAIRO_LIBRARIES} ${GTK3_LIBRARIES})
-
-endif()

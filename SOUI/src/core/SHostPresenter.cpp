@@ -1,6 +1,6 @@
 #include <souistd.h>
 #include <core/SHostPresenter.h>
-
+#include <core/SHostWnd.h>
 SNSBEGIN
 
 #ifdef _WIN32
@@ -50,18 +50,13 @@ BOOL SWndSurface::SUpdateLayeredWindowIndirect(HWND hWnd, const S_UPDATELAYEREDW
 }
 
 //===========================================================
-SHostPresenter::SHostPresenter(INativeWnd* pHostWnd)
-    : m_pNativeWnd(pHostWnd)
-    , m_bTranslucent(FALSE)
+SHostPresenter::SHostPresenter(SHostWnd* pHostWnd)
+    : m_pHostWnd(pHostWnd)
 {
 }
 
 SHostPresenter::~SHostPresenter(void)
 {
-}
-
-void SHostPresenter::SetHostTranlucent(BOOL bTranslucent) {
-    m_bTranslucent = bTranslucent;
 }
 
 void SHostPresenter::OnHostCreate(THIS)
@@ -78,7 +73,7 @@ void SHostPresenter::OnHostResize(THIS_ SIZE szHost)
 
 void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT rcInvalid, BYTE byAlpha)
 {
-    if (m_bTranslucent)
+    if (m_pHostWnd->IsTranslucent())
     {
         UpdateLayerFromRenderTarget(pMemRT, byAlpha, rcInvalid);
     }
@@ -86,24 +81,19 @@ void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT
     {
         BOOL bGetDC = hdc == 0;
         if (bGetDC)
-            hdc = m_pNativeWnd->GetDC();
+            hdc = m_pHostWnd->GetDC();
         HDC memdc = pMemRT->GetDC(1);
         ::BitBlt(hdc, rcInvalid->left, rcInvalid->top, rcInvalid->right- rcInvalid->left, rcInvalid->bottom- rcInvalid->top, memdc, rcInvalid->left, rcInvalid->top, SRCCOPY);
         pMemRT->ReleaseDC(memdc, NULL);
         if (bGetDC)
-            m_pNativeWnd->ReleaseDC(hdc);
+            m_pHostWnd->ReleaseDC(hdc);
     }
-}
-
-void SHostPresenter::OnHostAlpha(THIS_ BYTE byAlpha)
-{
-    m_pNativeWnd->SetLayeredWindowAlpha(byAlpha);
 }
 
 void SHostPresenter::UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlpha, LPCRECT prcDirty)
 {
     RECT rc;
-    m_pNativeWnd->GetWindowRect(&rc);
+    ((SNativeWnd*)m_pHostWnd)->GetWindowRect(&rc);
     RECT rcDirty = { 0 };
     if (prcDirty) {
         rcDirty = *prcDirty;
@@ -120,23 +110,18 @@ void SHostPresenter::UpdateLayerFromRenderTarget(IRenderTarget *pRT, BYTE byAlph
 
     HDC hdc = pRT->GetDC(1);
     S_UPDATELAYEREDWINDOWINFO info = { sizeof(info), NULL, &ptDst, &szDst, hdc, &ptSrc, 0, &bf, ULW_ALPHA, &rcDirty };
-    SWndSurface::SUpdateLayeredWindowIndirect(m_pNativeWnd->GetHwnd(), &info);
+    SWndSurface::SUpdateLayeredWindowIndirect(m_pHostWnd->GetNative()->GetHwnd(), &info);
     pRT->ReleaseDC(hdc, NULL);
 }
 
 #else
-SHostPresenter::SHostPresenter(INativeWnd* pHostWnd)
-    : m_pNativeWnd(pHostWnd)
-    , m_bTranslucent(FALSE)
+SHostPresenter::SHostPresenter(SHostWnd * pHostWnd)
+    : m_pHostWnd(pHostWnd)
 {
 }
 
 SHostPresenter::~SHostPresenter(void)
 {
-}
-
-void SHostPresenter::SetHostTranlucent(BOOL bTranslucent) {
-    m_bTranslucent = bTranslucent;
 }
 
 void SHostPresenter::OnHostCreate(THIS)
@@ -155,17 +140,12 @@ void SHostPresenter::OnHostPresent(THIS_ HDC hdc, IRenderTarget *pMemRT, LPCRECT
 {
     BOOL bGetDC = hdc == 0;
     if (bGetDC)
-        hdc = m_pNativeWnd->GetDC();
+        hdc = m_pHostWnd->GetDC();
     HDC memdc = pMemRT->GetDC(1);
     ::BitBlt(hdc, rcInvalid->left, rcInvalid->top, rcInvalid->right-rcInvalid->left, rcInvalid->bottom-rcInvalid->top, memdc, rcInvalid->left, rcInvalid->top, SRCCOPY);
     pMemRT->ReleaseDC(memdc, NULL);
     if (bGetDC)
-        m_pNativeWnd->ReleaseDC(hdc);
-}
-
-void SHostPresenter::OnHostAlpha(THIS_ BYTE byAlpha)
-{
-    m_pNativeWnd->SetLayeredWindowAlpha(byAlpha);
+        m_pHostWnd->ReleaseDC(hdc);
 }
 
 #endif//_WIN32
