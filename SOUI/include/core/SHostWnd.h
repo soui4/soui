@@ -72,9 +72,7 @@ class SOUI_EXP SHostWndAttr : public TObjRefImpl<SObject> {
         ATTR_DWORD(L"wndStyle", m_dwStyle, FALSE)
         ATTR_DWORD(L"wndStyleEx", m_dwExStyle, FALSE)
         ATTR_BOOL(L"resizable", m_bResizable, FALSE)
-        #ifdef _WIN32
         ATTR_BOOL(L"translucent", m_bTranslucent, FALSE)
-        #endif//_WIN32
         ATTR_BOOL(L"sendWheel2Hover", m_bSendWheel2Hover, FALSE)
         ATTR_BOOL(L"appWnd", m_bAppWnd, FALSE)
         ATTR_BOOL(L"toolWindow", m_bToolWnd, FALSE)

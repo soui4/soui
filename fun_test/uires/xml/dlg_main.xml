@@ -20,7 +20,10 @@
 		<tabctrl size="-2,0" weight="1" tabHeight="30" animateSteps="30" curSel="0">
 			<page title="page1" layout="vbox" gravity="center" colorBkgnd="@color/white" interval="5">
 				<text text="hello soui in page1" colorText="@color/red" colorBkgnd="@color/gray"/>
-				<icon src="ICON_LOGO:128"/>
+				<window size="-2,-1" layout="hbox" gravity="center">
+					<icon src="ICON_LOGO:128"/>
+					<button size="100,30" name="btn_soui" text="transluent"/>
+				</window>
 				<window size="-1,-1" layout="hbox" interval="10" gravity="center">
 					<button name="btn_resize" size="100,30" text="resizing"/>
 					<window size="100,50" margin="2" ncskin="_skin.sys.border" text="draw border" colorTextHover="@color/red"/>

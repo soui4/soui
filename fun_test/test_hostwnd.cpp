@@ -57,6 +57,16 @@ void RunMenu(POINT pt) {
     }
 }
 
+class CSouiWnd : public SHostWnd{
+public:
+    CSouiWnd(): SHostWnd("layout:xml_soui"){}
+
+    void OnFinalMessage(HWND hWnd) override{
+        SHostWnd::OnFinalMessage(hWnd);
+        delete this;
+    }
+};
+
 class CMainDlg : public SHostWnd {
     CScintillaWnd* m_pSciter;
 public:
@@ -144,6 +154,12 @@ public:
         MessageBox(m_hWnd, _T("TEST MSGBOX!!!"), _T("test msgbox"),MB_OK);
     }
 
+    void OnBtnSoui(){
+        CSouiWnd * pwnd = new CSouiWnd;
+        CRect rc = GetWindowRect();
+        pwnd->CreateEx(m_hWnd,WS_POPUP|WS_VISIBLE,WS_EX_LAYERED,rc.right+5,rc.top,0,0);
+    }
+
     EVENT_MAP_BEGIN()
         EVENT_ID_COMMAND(1, OnClose)
         EVENT_NAME_COMMAND(L"btn_resize", OnBtnResize)
@@ -151,6 +167,7 @@ public:
         EVENT_NAME_COMMAND(L"btn_smenu", OnBtnSMenu)
         EVENT_NAME_COMMAND(L"btn_msgbox", OnShowMsgbox)
         EVENT_NAME_COMMAND(L"btn_smenuex", OnBtnSMenuEx)
+        EVENT_NAME_COMMAND(L"btn_soui", OnBtnSoui)
         EVENT_HANDLER(EventRealWndCreate::EventID, OnRealWndCreate)
         EVENT_HANDLER(EventRealWndDestroy::EventID, OnRealWndDestroy)
         EVENT_HANDLER(EventInit::EventID,OnInit)
