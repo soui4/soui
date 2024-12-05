@@ -474,16 +474,15 @@
 
     function LoadConfig(configFile,bX64)
     {
-        try {
-            var fso = new ActiveXObject("Scripting.FileSystemObject");
             var keyValue = {};
 			keyValue["UNICODE"] = 1;//unicode
 			keyValue["WCHAR"] = 1;//wchar
 			keyValue["MT"] = 1;//static linked to CRT
             keyValue["SUPPORT_XP"] = 0;//dont support XP
             keyValue["DYNAMIC_SOUI"] = 1;
+        try {
+            var fso = new ActiveXObject("Scripting.FileSystemObject");
             var reg2 = /(\w+)=(\d+)/;
-
             if (fso.FileExists(configFile)) {
                 var f = fso.OpenTextFile(configFile, 1);
                 var s = "";
@@ -495,7 +494,11 @@
                     }
                 f.Close();
             }
-            if (bX64) {
+        }
+        catch (e) {
+            //throw e;
+        }
+       if (bX64) {
                 window.external.AddSymbol('UNICODE_64', keyValue["UNICODE"]);
                 window.external.AddSymbol('WCHAR_64', keyValue["WCHAR"]);
                 window.external.AddSymbol('MT_64', keyValue["MT"]);
@@ -509,10 +512,6 @@
                 window.external.AddSymbol('SUPPORT_XP_32', keyValue["SUPPORT_XP"]);
                 window.external.AddSymbol('DYNAMIC_SOUI_32', keyValue["DYNAMIC_SOUI"]);
             }
-        }
-        catch (e) {
-            throw e;
-        }
     }
 
     // 这是一个初始化页面的函数的示例
