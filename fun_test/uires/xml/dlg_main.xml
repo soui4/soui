@@ -22,6 +22,8 @@
 				<text text="hello soui in page1" colorText="@color/red" colorBkgnd="@color/gray"/>
 				<window size="-2,-1" layout="hbox" gravity="center">
 					<icon src="ICON_LOGO:128"/>
+					<icon src="ICON_LOGO:64"/>
+					<icon src="ICON_LOGO:32"/>
 					<button size="100,30" name="btn_soui" text="transluent"/>
 				</window>
 				<window size="-1,-1" layout="hbox" interval="10" gravity="center">
