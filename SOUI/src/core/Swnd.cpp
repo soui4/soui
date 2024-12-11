@@ -887,7 +887,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                             strXml.Replace(strParam, strValue); // replace params to value.
                         }
                         SXmlDoc xmlDoc;
-                        if (xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()), strXml.GetLength() * sizeof(WCHAR), 116, enc_utf16))
+                        if (xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()), strXml.GetLength() * sizeof(WCHAR), 116, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
                         {
                             CreateChilds(xmlDoc.root());
                             bRet = TRUE;
@@ -1022,7 +1022,7 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
 BOOL SWindow::CreateChildrenFromXml(LPCWSTR pszXml)
 {
     SXmlDoc xmlDoc;
-    if (!xmlDoc.load_buffer(pszXml, wcslen(pszXml) * sizeof(wchar_t), xml_parse_default, enc_utf16))
+    if (!xmlDoc.load_buffer(pszXml, wcslen(pszXml) * sizeof(wchar_t), xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
         return FALSE;
     return CreateChildren(xmlDoc.root());
 }
@@ -3043,7 +3043,7 @@ BOOL SWindow::CreateCaret(HBITMAP pBmp, int nWid, int nHeight)
         SXmlDoc xmlDoc;
         if (!strCaret.IsEmpty())
         {
-            if (xmlDoc.load_buffer_inplace(strCaret.GetBuffer(), strCaret.GetLength() * sizeof(wchar_t), xml_parse_default, enc_utf16))
+            if (xmlDoc.load_buffer_inplace(strCaret.GetBuffer(), strCaret.GetLength() * sizeof(wchar_t), xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
                 xmlCaret = xmlDoc.root().child(L"caret");
             strCaret.ReleaseBuffer();
         }
