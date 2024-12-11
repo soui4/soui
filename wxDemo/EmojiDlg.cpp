@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "EmojiDlg.h"
 
 CEmojiDlg::CEmojiDlg(IListener* pListner)

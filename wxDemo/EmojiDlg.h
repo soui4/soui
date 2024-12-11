@@ -26,8 +26,6 @@ protected:
 	void OnSysCommand(UINT nID, SOUI::CPoint pt);
 
 protected:
-	EVENT_MAP_BEGIN()
-	EVENT_MAP_END()
 
 	BEGIN_MSG_MAP_EX(CEmojiDlg)
 		MSG_WM_INITDIALOG(OnInitDialog)
