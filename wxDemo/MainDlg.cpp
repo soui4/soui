@@ -82,8 +82,9 @@ void CMainDlg::OnLanguage(int nID)
 	{
 		CAutoRefPtr<ITranslator> lang;
 		pTransMgr->CreateTranslator(&lang);
-		lang->Load(&xmlLang.root().child(L"language"), 1);//1=LD_XML
-		TCHAR lngName[TR_MAX_NAME_LEN] = {0};
+		SXmlNode xmlLang = xmlLang.root().child(L"language");
+		lang->Load(&xmlLang, 1);//1=LD_XML
+		wchar_t lngName[TR_MAX_NAME_LEN] = {0};
 		lang->GetName(lngName);
         pTransMgr->SetLanguage(lngName);
 		pTransMgr->InstallTranslator(lang);
@@ -149,6 +150,7 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 
 void CMainDlg::OnShellTrayNotify(IEvtArgs * e)
 {
+	#ifdef _WIN32
 	EventTrayNotify *e2 = sobj_cast<EventTrayNotify>(e);
 	SShellTray *pTray = sobj_cast<SShellTray>(e->Sender());
 	switch(e2->lp)
@@ -179,6 +181,7 @@ void CMainDlg::OnShellTrayNotify(IEvtArgs * e)
 		}
 		break;
 	}
+	#endif//_WIN32
 }
 
 
@@ -266,6 +269,6 @@ void CMainDlg::OnMessageItemClick(int& nIndex)
 	CLvMessageAdapter::ItemData* pData = m_pMessageAdapter->GetItemData(nIndex);
 	if (pData)
 	{
-		pTitle->SetWindowTextW(pData->m_sstrName);
+		pTitle->SetWindowText(S_CW2T(pData->m_sstrName));
 	}
 }

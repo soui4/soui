@@ -149,12 +149,13 @@ public:
 		if (trans)
 		{//加载语言翻译包
 			m_theApp->SetTranslator(trans);
-			SXmlDoc xmlLang;
-			if (m_theApp->LoadXmlDocment(xmlLang,  _T("translator:lang_cn")))
+			SXmlDoc xmlDoc;
+			if (m_theApp->LoadXmlDocment(xmlDoc,  _T("translator:lang_cn")))
 			{
 				SAutoRefPtr<ITranslator> langCN;
 				trans->CreateTranslator(&langCN);
-				langCN->Load(&xmlLang.root().child(L"language"), 1);//1=LD_XML
+				SXmlNode xmlLang = xmlDoc.root().child(L"language");
+				langCN->Load(&xmlLang, 1);//1=LD_XML
 				trans->InstallTranslator(langCN);
 			}
 		}
@@ -163,7 +164,9 @@ public:
 	//注册用户自定义皮肤和控件
 	void Regitercustom()
 	{
+		#ifdef _WIN32
 		m_theApp->RegisterWindowClass<SShellTray>();
+		#endif//_WIN32
 	}
 
 	~SOUIEngine()
@@ -205,9 +208,15 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 		}
 		else
 		{
-			MessageBox(NULL, _T("无法正常初使化SOUI"), _T("错误"), MB_OK | MB_ICONERROR);
+			MessageBox(0, _T("无法正常初使化SOUI"), _T("错误"), MB_OK | MB_ICONERROR);
 		}
 	}
 	OleUninitialize();
 	return nRet;
 }
+
+#ifndef _WIN32
+int main(int argc, char ** argv){
+	return _tWinMain(0,0,NULL,SW_SHOWNORMAL);
+}
+#endif//_WIN32

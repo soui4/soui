@@ -135,6 +135,7 @@ SNSEND
         }                                                                                       \
     } while (false);
 #else
+#ifdef _WIN32
 // todo: mingw32 目前识别宏可变参数还有问题
 #define SLOG_FMT(tag, level, logformat, ...)                                  \
     do                                                                        \
@@ -153,6 +154,9 @@ SNSEND
         }                                                                     \
     } while (false);
 
+#else
+#define SLOG_FMT(tag, level, logformat, ...)
+#endif//_WIN32
 #endif
 
 //流式输出日志，当kLogTag有效时使用，否则编译失败，kLogTag可以是当前定义的宏，也可以是当前对象的成员变量。

@@ -46,8 +46,6 @@ protected:
 		EVENT_NAME_COMMAND(L"btn_restore", OnRestore)
 		EVENT_NAME_COMMAND(L"zh_cn", OnLanguageBtnCN)
 		EVENT_NAME_COMMAND(L"jp", OnLanguageBtnJP)
-		//EVENT_ID_HANDLER(R.id.tray_008,EventTrayNotify::EventID,OnShellTrayNotify)
-
 		EVENT_NAME_COMMAND(L"btn_message", OnBnClickMessage)
 		EVENT_NAME_COMMAND(L"btn_contact", OnBnClickContact)
 		EVENT_NAME_COMMAND(L"btn_favorites", OnBnClickCollect)
@@ -55,7 +53,7 @@ protected:
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventSetFocus::EventID, OnEditMessageSearchSetFocus)
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventKillFocus::EventID, OnEditMessageSearchKillFocus)
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventRENotify::EventID, OnEditMessageSearchChanged)
-	EVENT_MAP_END()
+	EVENT_MAP_END2(SHostWnd)
 		
 	//HostWnd真实窗口消息处理
 	BEGIN_MSG_MAP_EX(CMainDlg)

@@ -6,10 +6,16 @@ include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
-file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
+file(GLOB CURRENT_HEADERS *.h *.hpp)
+file(GLOB DEMO_SRCS  *.cpp)
+file(GLOB TRAYICON trayicon/*.*)
+
 file(GLOB_RECURSE CURRENT_SOUIS  *.xml *.idx *.ico)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
+
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+set(CURRENT_SRCS ${DEMO_SRCS} ${TRAYICON})
+endif()
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
