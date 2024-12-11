@@ -17,6 +17,3 @@
     #define DLL_CORE		//SOUI ÄÚºË±àÒëÎªdll
 #endif
 
-#if defined(OUTPATH_WITHOUT_TYPE)
-#define NO_DEBUG_SUFFIX
-#endif

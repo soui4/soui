@@ -57,11 +57,7 @@
 #include "../components/resprovider-7zip/zip7resprovider-param.h"
 #include "../components/resprovider-zip/zipresprovider-param.h"
 
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-#define SYS_NAMED_RESOURCE _T("soui-sys-resourced.dll")
-#else
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
-#endif
 
 #include "../controls.extend/smiley/ssmileyctrl.h"
 #include "skin/SDemoSkin.h"
