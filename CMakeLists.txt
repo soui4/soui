@@ -72,6 +72,14 @@ option(ENABLE_SOUI_COM_LIB "Enable compile 'components' as static lib" OFF)
 #
 option(XP_TOOLSET "" ON)
 
+set(BUILD_RICHEDIT_DEF ON)
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+option(BUILD_RICHEDIT "using richedit from source code" ${BUILD_RICHEDIT_DEF})
+else()
+set(BUILD_RICHEDIT ON)
+endif()
+
+
 config_compiler_and_linker()
 
 configure_file("config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONLY)
