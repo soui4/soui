@@ -13,4 +13,9 @@
 #include "res/resource.h"
 using namespace SOUI;
 
+#ifdef _WIN32
+#include "trayicon/SShellTray.h"
+#pragma comment(lib, "shlwapi.lib")
+#endif//_WIN32
+
 #endif//_STDAFX_H_

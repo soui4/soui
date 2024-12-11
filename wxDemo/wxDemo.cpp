@@ -3,27 +3,8 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"
-#pragma comment(lib, "shlwapi.lib")
-//从PE文件加载，注意从文件加载路径位置
-#define RES_TYPE 0
-//#define SYSRES_TYPE 0
-// #define RES_TYPE 0   //PE
-// #define RES_TYPE 1   //ZIP
-// #define RES_TYPE 2   //7z
-// #define RES_TYPE 2   //文件
-//去掉多项支持，以免代码显得混乱
-#if (RES_TYPE==1)
-#include "resprovider-zip\zipresprovider-param.h"
-#else 
-#if (RES_TYPE==2)
-#include "resprovider-7zip\zip7resprovider-param.h"
-#endif
-#endif
-#ifdef _DEBUG
+
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
-#else
-#define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
-#endif
 
 #define INIT_R_DATA
 #include "res/resource.h"
@@ -35,7 +16,6 @@
 #else
 #define tstring string
 #endif
-
 static std::tstring getSourceDir() {
 	TCHAR szPath[MAX_PATH];
 	GetModuleFileName(NULL, szPath, MAX_PATH);
