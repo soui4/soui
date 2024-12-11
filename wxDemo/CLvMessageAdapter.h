@@ -96,18 +96,18 @@ public:
 		//name
 		SStatic* pName = pItem->FindChildByName2<SStatic>(L"item_name");
 		SASSERT(pName);
-		pName->SetWindowTextW(pItemData->m_sstrName);
+		pName->SetWindowText(S_CW2T(pItemData->m_sstrName));
 
 		//content
 		SStatic* pContent = pItem->FindChildByName2<SStatic>(L"item_content");
 		SASSERT(pContent);
-		pContent->SetWindowTextW(pItemData->m_sstrContent);
+		pContent->SetWindowText(S_CW2T(pItemData->m_sstrContent));
 
 		//time
 		//根据定义的时间类型处理展示，如果是时间戳则需要处理，如果是文本则直接展示
 		SStatic* pTime = pItem->FindChildByName2<SStatic>(L"item_time");
 		SASSERT(pTime);
-		pTime->SetWindowTextW(pItemData->m_sstrTime);
+		pTime->SetWindowText(S_CW2T(pItemData->m_sstrTime));
 
 		//reminder
 		SImageWnd* pReminder = pItem->FindChildByName2<SImageWnd>(L"item_reminder");
