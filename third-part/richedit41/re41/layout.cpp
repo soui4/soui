@@ -25,6 +25,12 @@
 #include "_measure.h"
 #include "_render.h"
 
+CLayout::CLayout() {
+	int offset = FIELD_OFFSET(CLayout, _dvp);
+	memset((char*)this + offset, 0, sizeof(CLayout) - offset);
+	_iCFCells = -1; _iPFCells = -1; 
+}
+
 void CLayout::DeleteSubLayouts(
 	LONG ili,
 	LONG cLine)
