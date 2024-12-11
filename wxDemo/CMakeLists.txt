@@ -15,6 +15,8 @@ file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 set(CURRENT_SRCS ${DEMO_SRCS} ${TRAYICON})
+else()
+set(CURRENT_SRCS ${DEMO_SRCS})
 endif()
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
