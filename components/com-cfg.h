@@ -5,17 +5,31 @@
 #include <config.h>
 #include <string/tstring.h>
 
+#ifdef _WIN32
 #define COM_IMGDECODER  _T("imgdecoder-gdip")
-
 #define COM_RENDER_GDI  _T("render-gdi")
 #define COM_RENDER_SKIA _T("render-skia")
-#define COM_RENDER_D2D  _T("render-d2d")
+#define COM_RENDER_D2D _T("render-d2d")
 #define COM_SCRIPT_LUA _T("scriptmodule-lua")
 #define COM_TRANSLATOR _T("translator")
 #define COM_ZIPRESPROVIDER _T("resprovider-zip")
 #define COM_LOG4Z   _T("log4z")
 #define COM_7ZIPRESPROVIDER _T("resprovider-7zip")
 #define COM_TASKLOOP _T("taskloop")
+#define COM_IPCOBJ _T("sipcobject")
+#define COM_HTTPCLIENT _T("httpclient")
+#else
+#define COM_IMGDECODER  _T("libimgdecoder-stb")
+#define COM_RENDER_GDI  _T("librender-gdi")
+#define COM_RENDER_SKIA _T("librender-skia")
+#define COM_SCRIPT_LUA _T("libscriptmodule-lua")
+#define COM_TRANSLATOR _T("libtranslator")
+#define COM_ZIPRESPROVIDER _T("libresprovider-zip")
+#define COM_LOG4Z   _T("liblog4z")
+#define COM_7ZIPRESPROVIDER _T("libresprovider-7zip")
+#define COM_TASKLOOP _T("libtaskloop")
+#define COM_IPCOBJ _T("libsipcobject")
+#endif//_WIN32
 
 
 #ifdef LIB_SOUI_COM
@@ -217,11 +231,12 @@ namespace SOUI {
 		{
 			return renderLoader.CreateInstance(m_strDllPath + COM_RENDER_SKIA, ppObj);
 		}
+#ifdef _WIN32
 		BOOL CreateRender_D2D(IObjRef **ppObj)
 		{
 			return renderLoader.CreateInstance(m_strDllPath + COM_RENDER_D2D, ppObj);
 		}
-
+#endif//_WIN32
 		BOOL CreateScrpit_Lua(IObjRef **ppObj)
 		{
 			return scriptLoader.CreateInstance(m_strDllPath + COM_SCRIPT_LUA, ppObj);

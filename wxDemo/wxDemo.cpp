@@ -102,8 +102,8 @@ public:
 	{
 		BOOL bLoaded = FALSE;
 		do{
-			SAutoRefPtr<IResProvider> sysResProvider;
 #ifdef _WIN32
+			SAutoRefPtr<IResProvider> sysResProvider;
 			HMODULE hModSysResource = LoadLibrary(SYS_NAMED_RESOURCE);
 			if (!hModSysResource)
 				break;
@@ -123,13 +123,15 @@ public:
 			if (!bLoaded) break;
 			m_theApp->AddResProvider(pResProvider);
 #else
-			std::tstring sysRes = getSourceDir() + kPath_SysRes;
+			SAutoRefPtr<IResProvider> sysResProvider;
+			sysResProvider.Attach(m_souiFac.CreateResProvider(RES_FILE));
+			std::string sysRes = getSourceDir() + kPath_SysRes;
 			if (!sysResProvider->Init((LPARAM)sysRes.c_str(), 0))
 				break;
 			m_theApp->LoadSystemNamedResource(sysResProvider);
 			//load use resource
 			SAutoRefPtr<IResProvider> pResProvider(m_souiFac.CreateResProvider(RES_FILE), FALSE);
-			std::tstring appRes = getSourceDir() + kPath_WxDemoRes;
+			std::string appRes = getSourceDir() + kPath_WxDemoRes;
 			bLoaded = pResProvider->Init((LPARAM)appRes.c_str(), 0);
 			if (!bLoaded) break;
 			m_theApp->AddResProvider(pResProvider);
