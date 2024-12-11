@@ -1,4 +1,4 @@
-﻿//stamp:146c3aa67518a141
+//stamp:164786b7a3535054
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -16,6 +16,7 @@
 			const TCHAR * XML_PAGE_FILEHELPER;
 			const TCHAR * XML_PAGE_GROUPCOMM;
 			const TCHAR * XML_PAGE_PERSONALCOMM;
+			const TCHAR * XML_DLG_EMOJI;
 			}LAYOUT;
 		struct _values{
 			const TCHAR * string;
@@ -52,6 +53,11 @@
 			const TCHAR * IDB_PNG_SEARCH;
 			const TCHAR * IDB_PNG_SEARCHCANCEL;
 			const TCHAR * IDB_PNG_DEFAULTPERSONAL32;
+			const TCHAR * IDB_PNG_DEFAULTGROUP32;
+			const TCHAR * IDB_PNG_DEFAULTFILEHELPER32;
+			const TCHAR * IDB_PNG_DEFAULTGZH32;
+			const TCHAR * IDB_PNG_DEFAULTDYH32;
+			const TCHAR * IDB_PNG_DEFAULTNEWS32;
 			const TCHAR * IDB_PNG_EMOTION;
 			const TCHAR * IDB_PNG_IMAGE;
 			const TCHAR * IDB_PNG_FILE;
@@ -59,6 +65,15 @@
 			const TCHAR * IDB_PNG_SNAPSHOT_ARROW;
 			const TCHAR * IDB_PNG_HISTORY;
 			const TCHAR * IDB_PNG_SEND;
+			const TCHAR * IDB_PNG_NORMALAUDIO;
+			const TCHAR * IDB_PNG_DOWNAUDIO;
+			const TCHAR * IDB_PNG_NORMALVIDEO;
+			const TCHAR * IDB_PNG_DOWNVIDEO;
+			const TCHAR * IDB_PNG_NORMALAUDIOVIDEO;
+			const TCHAR * IDB_PNG_DOWNAUDIOVIDEO;
+			const TCHAR * IDB_PNG_NORMALLIVE;
+			const TCHAR * IDB_PNG_DOWNLIVE;
+			const TCHAR * IDB_PNG_REMINDER;
 			}PNG;
 		struct _ICON{
 			const TCHAR * ICON_LOGO;
@@ -85,6 +100,7 @@ struct _UIRES UIRES={
 			_T("LAYOUT:XML_PAGE_FILEHELPER"),
 			_T("LAYOUT:XML_PAGE_GROUPCOMM"),
 			_T("LAYOUT:XML_PAGE_PERSONALCOMM"),
+			_T("LAYOUT:XML_DLG_EMOJI"),
 		},
 		{
 			_T("values:string"),
@@ -121,6 +137,11 @@ struct _UIRES UIRES={
 			_T("PNG:IDB_PNG_SEARCH"),
 			_T("PNG:IDB_PNG_SEARCHCANCEL"),
 			_T("PNG:IDB_PNG_DEFAULTPERSONAL32"),
+			_T("PNG:IDB_PNG_DEFAULTGROUP32"),
+			_T("PNG:IDB_PNG_DEFAULTFILEHELPER32"),
+			_T("PNG:IDB_PNG_DEFAULTGZH32"),
+			_T("PNG:IDB_PNG_DEFAULTDYH32"),
+			_T("PNG:IDB_PNG_DEFAULTNEWS32"),
 			_T("PNG:IDB_PNG_EMOTION"),
 			_T("PNG:IDB_PNG_IMAGE"),
 			_T("PNG:IDB_PNG_FILE"),
@@ -128,6 +149,15 @@ struct _UIRES UIRES={
 			_T("PNG:IDB_PNG_SNAPSHOT_ARROW"),
 			_T("PNG:IDB_PNG_HISTORY"),
 			_T("PNG:IDB_PNG_SEND"),
+			_T("PNG:IDB_PNG_NORMALAUDIO"),
+			_T("PNG:IDB_PNG_DOWNAUDIO"),
+			_T("PNG:IDB_PNG_NORMALVIDEO"),
+			_T("PNG:IDB_PNG_DOWNVIDEO"),
+			_T("PNG:IDB_PNG_NORMALAUDIOVIDEO"),
+			_T("PNG:IDB_PNG_DOWNAUDIOVIDEO"),
+			_T("PNG:IDB_PNG_NORMALLIVE"),
+			_T("PNG:IDB_PNG_DOWNLIVE"),
+			_T("PNG:IDB_PNG_REMINDER"),
 		},
 		{
 			_T("ICON:ICON_LOGO"),
@@ -148,6 +178,8 @@ extern struct _UIRES UIRES;
 #define _R_H_
 struct _R{
 	struct _name{
+		 const wchar_t * btn_audio;
+		 const wchar_t * btn_audio_video;
 		 const wchar_t * btn_close;
 		 const wchar_t * btn_contact;
 		 const wchar_t * btn_emotion;
@@ -155,6 +187,7 @@ struct _R{
 		 const wchar_t * btn_file;
 		 const wchar_t * btn_history;
 		 const wchar_t * btn_image;
+		 const wchar_t * btn_live;
 		 const wchar_t * btn_max;
 		 const wchar_t * btn_menu;
 		 const wchar_t * btn_message;
@@ -165,9 +198,12 @@ struct _R{
 		 const wchar_t * btn_skin;
 		 const wchar_t * btn_snapshot;
 		 const wchar_t * btn_snapshot_arrow;
+		 const wchar_t * btn_video;
 		 const wchar_t * edit_msg_search;
 		 const wchar_t * edit_recv;
 		 const wchar_t * edit_send;
+		 const wchar_t * emoji_titleview;
+		 const wchar_t * emotion;
 		 const wchar_t * item_avatar;
 		 const wchar_t * item_content;
 		 const wchar_t * item_name;
@@ -180,6 +216,8 @@ struct _R{
 		 const wchar_t * text_talk_title;
 	}name;
 	struct _id{
+		int btn_audio;
+		int btn_audio_video;
 		int btn_close;
 		int btn_contact;
 		int btn_emotion;
@@ -187,6 +225,7 @@ struct _R{
 		int btn_file;
 		int btn_history;
 		int btn_image;
+		int btn_live;
 		int btn_max;
 		int btn_menu;
 		int btn_message;
@@ -197,9 +236,12 @@ struct _R{
 		int btn_skin;
 		int btn_snapshot;
 		int btn_snapshot_arrow;
+		int btn_video;
 		int edit_msg_search;
 		int edit_recv;
 		int edit_send;
+		int emoji_titleview;
+		int emotion;
 		int item_avatar;
 		int item_content;
 		int item_name;
@@ -228,6 +270,8 @@ struct _R{
 #ifdef INIT_R_DATA
 struct _R R={
 	{
+		L"btn_audio",
+		L"btn_audio_video",
 		L"btn_close",
 		L"btn_contact",
 		L"btn_emotion",
@@ -235,6 +279,7 @@ struct _R R={
 		L"btn_file",
 		L"btn_history",
 		L"btn_image",
+		L"btn_live",
 		L"btn_max",
 		L"btn_menu",
 		L"btn_message",
@@ -245,9 +290,12 @@ struct _R R={
 		L"btn_skin",
 		L"btn_snapshot",
 		L"btn_snapshot_arrow",
+		L"btn_video",
 		L"edit_msg_search",
 		L"edit_recv",
 		L"edit_send",
+		L"emoji_titleview",
+		L"emotion",
 		L"item_avatar",
 		L"item_content",
 		L"item_name",
@@ -261,6 +309,8 @@ struct _R R={
 	}
 	,
 	{
+		65568,
+		65567,
 		65541,
 		65538,
 		65558,
@@ -268,6 +318,7 @@ struct _R R={
 		65560,
 		65563,
 		65559,
+		65566,
 		65542,
 		65545,
 		65537,
@@ -278,9 +329,12 @@ struct _R R={
 		65546,
 		65561,
 		65562,
+		65569,
 		65547,
 		65557,
 		65564,
+		65570,
+		65571,
 		65550,
 		65552,
 		65551,

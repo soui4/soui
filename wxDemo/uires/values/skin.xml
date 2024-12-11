@@ -24,6 +24,11 @@
 	<imglist name="skin_search_cancel" src="PNG:IDB_PNG_SEARCHCANCEL" states="3" />
 
 	<imgframe name="skin_default_personal32" src="PNG:IDB_PNG_DEFAULTPERSONAL32" />
+	<imgframe name="skin_default_group32" src="PNG:IDB_PNG_DEFAULTGROUP32" />
+	<imgframe name="skin_default_filehelper32" src="PNG:IDB_PNG_DEFAULTFILEHELPER32" />
+	<imgframe name="skin_default_gzh32" src="PNG:IDB_PNG_DEFAULTGZH32" />
+	<imgframe name="skin_default_dyh32" src="PNG:IDB_PNG_DEFAULTDYH32" />
+	<imgframe name="skin_default_news32" src="PNG:IDB_PNG_DEFAULTNEWS32" />
 
 	<imglist name="skin_emotion" src="PNG:IDB_PNG_EMOTION" states="3" />
 	<imglist name="skin_image" src="PNG:IDB_PNG_IMAGE" states="3" />
@@ -32,4 +37,22 @@
 	<imglist name="skin_snapshot_arrow" src="PNG:IDB_PNG_SNAPSHOT_ARROW" states="3" />
 	<imglist name="skin_history" src="PNG:IDB_PNG_HISTORY" states="3" />
 	<imglist name="skin_send" src="PNG:IDB_PNG_SEND" states="4" />
+
+	<imgframe name="skin_audio_normal" src="PNG:IDB_PNG_NORMALAUDIO" />
+	<imgframe name="skin_audio_down" src="PNG:IDB_PNG_DOWNAUDIO" />
+	<group name="skin_audio" normal="skin_audio_normal" hover="skin_audio_down" pushDown="skin_audio_down" />
+
+	<imgframe name="skin_video_normal" src="PNG:IDB_PNG_NORMALVIDEO" />
+	<imgframe name="skin_video_down" src="PNG:IDB_PNG_DOWNVIDEO" />
+	<group name="skin_video" normal="skin_video_normal" hover="skin_video_down" pushDown="skin_video_down" />
+
+	<imgframe name="skin_audio_video_normal" src="PNG:IDB_PNG_NORMALAUDIOVIDEO" />
+	<imgframe name="skin_audio_video_down" src="PNG:IDB_PNG_DOWNAUDIOVIDEO" />
+	<group name="skin_audio_video" normal="skin_audio_video_normal" hover="skin_audio_video_down" pushDown="skin_audio_video_down" />
+
+	<imgframe name="skin_live_normal" src="PNG:IDB_PNG_NORMALLIVE" />
+	<imgframe name="skin_live_down" src="PNG:IDB_PNG_DOWNLIVE" />
+	<group name="skin_live" normal="skin_live_normal" hover="skin_live_down" pushDown="skin_live_down" />
+
+	<imgframe name="skin_reminder" src="PNG:IDB_PNG_REMINDER" />
 </skin>

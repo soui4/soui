@@ -25,6 +25,9 @@
 			<imgbtn name="btn_snapshot" pos="[10,{0" skin="skin_snapshot" cursor="hand"/>
 			<imgbtn name="btn_snapshot_arrow" pos="[0,{5" skin="skin_snapshot_arrow" cursor="hand"/>
 			<imgbtn name="btn_history" pos="[10,{-5" skin="skin_history" cursor="hand"/>
+
+			<imgbtn name="btn_audio" pos="-55,{0,@20,@20" skin="skin_audio" cursor="hand" />
+			<imgbtn name="btn_video" pos="-30,{0,@20,@20" skin="skin_video" cursor="hand" />
 		</caption>
 		<caption pos="0,[0,-0,-30" colorBkgnd="#F5F5F5">
 			<!--send re-->

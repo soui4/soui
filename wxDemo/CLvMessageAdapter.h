@@ -84,13 +84,62 @@ public:
 		//avatar
 		SImageWnd* pAvatar = pItem->FindChildByName2<SImageWnd>(L"item_avatar");
 		SASSERT(pAvatar);
-		if (pItemData->m_sstrAvatar == L"")
+		switch (pItemData->m_nType)
 		{
-			//use default avatar
+		case -1:
+		{
+			//gzh
+			pAvatar->SetAttribute(L"skin", L"skin_default_gzh32");
 		}
-		else
+		break;
+		case -2:
 		{
-			//use default avatar
+			//dyh
+			pAvatar->SetAttribute(L"skin", L"skin_default_dyh32");
+		}
+		break;
+		case -3:
+		{
+			//news
+			pAvatar->SetAttribute(L"skin", L"skin_default_news32");
+		}
+		break;
+		case 0:
+		{
+			//file helper
+			pAvatar->SetAttribute(L"skin", L"skin_default_filehelper32");
+		}
+		break;
+		case 1:
+		{
+			//personal 
+			if (pItemData->m_sstrAvatar == L"")
+			{
+				//use default avatar
+				pAvatar->SetAttribute(L"skin", L"skin_default_personal32");
+			}
+			else
+			{
+				//use default avatar
+			}
+		}
+		break;
+		case 2:
+		{
+			//group
+			if (pItemData->m_sstrAvatar == L"")
+			{
+				//use default avatar
+				pAvatar->SetAttribute(L"skin", L"skin_default_group32");
+			}
+			else
+			{
+				//use default avatar
+			}
+		}
+		break;
+		default:
+			break;
 		}
 
 		//name

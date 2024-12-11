@@ -1,5 +1,51 @@
 ﻿<?xml version="1.0"?>
 <include>
-	<caption pos="0,0,-0,-0">
+	<caption pos="0,0,-0,-0" colorBkgnd="#CAC8C7">
+		<caption pos="0,0,-0,-180" margin="0,1,0,1" colorBkgnd="#F5F5F5">
+			<!--recv re-->
+			<edit name="edit_recv"
+				  multiLines="1"
+				  inset="10,10,10,10"
+				  pos="0,0,-0,-0"
+				  password="0"
+				  wordWrap="1"
+				  autoWordSel="1"
+				  sbskin="skin_scrollbar"
+				  vscrollBar="1"
+				  autoVscroll="1"
+				  hscrollBar="0"
+				  sbWid="8"
+				  font="face:微软雅黑,size:14"/>
+		</caption>
+		<caption pos="0,[0,-0, @25" colorBkgnd="#F5F5F5">
+			<!--opt-->
+			<imgbtn name="btn_emotion" pos="10,5" skin="skin_emotion" cursor="hand"/>
+			<imgbtn name="btn_image" pos="[10,{0" skin="skin_image" cursor="hand"/>
+			<imgbtn name="btn_file" pos="[10,{0" skin="skin_file" cursor="hand"/>
+			<imgbtn name="btn_snapshot" pos="[10,{0" skin="skin_snapshot" cursor="hand"/>
+			<imgbtn name="btn_snapshot_arrow" pos="[0,{5" skin="skin_snapshot_arrow" cursor="hand"/>
+			<imgbtn name="btn_history" pos="[10,{-5" skin="skin_history" cursor="hand"/>
+
+		</caption>
+		<caption pos="0,[0,-0,-30" colorBkgnd="#F5F5F5">
+			<!--send re-->
+			<edit name="edit_send"
+				  multiLines="1"
+				  inset="10,10,10,10"
+				  pos="0,0,-0,-0"
+				  password="0"
+				  wordWrap="1"
+				  autoWordSel="1"
+				  sbskin="skin_scrollbar"
+				  vscrollBar="1"
+				  autoVscroll="1"
+				  hscrollBar="0"
+				  sbWid="8"
+				  font="face:微软雅黑,size:14"/>
+		</caption>
+		<caption pos="0,[0,-0,-0" colorBkgnd="#F5F5F5">
+			<!--send btn-->
+			<imgbtn name="btn_send" pos="-65,0,@60,@25" skin="skin_send" font="face:微软雅黑,size:12" text="发送" align="center" valign="center" cursor="hand"/>
+		</caption>
 	</caption>
 </include>

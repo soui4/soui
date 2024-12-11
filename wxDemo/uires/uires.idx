@@ -12,6 +12,8 @@
 	  <file name="XML_PAGE_FILEHELPER" path="xml\page_comm_filehelper.xml" />
 	  <file name="XML_PAGE_GROUPCOMM" path="xml\page_comm_group.xml" />
 	  <file name="XML_PAGE_PERSONALCOMM" path="xml\page_comm_personal.xml" />
+
+	  <file name="XML_DLG_EMOJI" path="xml\dlg_emoji.xml" />
   </LAYOUT>
   
   <values>
@@ -57,6 +59,11 @@
 		<file name="IDB_PNG_SEARCHCANCEL" path="image\common\btn_cancel.png" />
 
 		<file name="IDB_PNG_DEFAULTPERSONAL32" path="image\personal.png" />
+		<file name="IDB_PNG_DEFAULTGROUP32" path="image\group.png" />
+		<file name="IDB_PNG_DEFAULTFILEHELPER32" path="image\filehelper.png" />
+		<file name="IDB_PNG_DEFAULTGZH32" path="image\gzh.png" />
+		<file name="IDB_PNG_DEFAULTDYH32" path="image\dyh.png" />
+		<file name="IDB_PNG_DEFAULTNEWS32" path="image\news.png" />
 
 		<file name="IDB_PNG_EMOTION" path="image\emotion.png" />
 		<file name="IDB_PNG_IMAGE" path="image\image.png" />
@@ -65,6 +72,18 @@
 		<file name="IDB_PNG_SNAPSHOT_ARROW" path="image\snapshot_arrow.png" />
 		<file name="IDB_PNG_HISTORY" path="image\history.png" />
 		<file name="IDB_PNG_SEND" path="image\send.png" />
+
+		<file name="IDB_PNG_NORMALAUDIO" path="image\audio_normal.png" />
+		<file name="IDB_PNG_DOWNAUDIO" path="image\audio_down.png" />
+		<file name="IDB_PNG_NORMALVIDEO" path="image\video_normal.png" />
+		<file name="IDB_PNG_DOWNVIDEO" path="image\video_down.png" />
+
+		<file name="IDB_PNG_NORMALAUDIOVIDEO" path="image\video_audio_normal.png" />
+		<file name="IDB_PNG_DOWNAUDIOVIDEO" path="image\video_audio_down.png" />
+		<file name="IDB_PNG_NORMALLIVE" path="image\live_normal.png" />
+		<file name="IDB_PNG_DOWNLIVE" path="image\live_down.png" />
+
+		<file name="IDB_PNG_REMINDER" path="image\reminder.png" />
 	</PNG>
 	
   <ICON>

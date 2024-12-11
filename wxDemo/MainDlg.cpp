@@ -8,6 +8,8 @@
 
 CMainDlg::CMainDlg() : SHostWnd(_T("LAYOUT:XML_MAINWND"))
 {
+	m_pEmojiDlg = NULL;
+	m_bEmotionShow = false;
 }
 
 CMainDlg::~CMainDlg()
@@ -40,24 +42,78 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
 	STabCtrl* pTabMessageComm = (STabCtrl*)pPageMessage->FindIChildByName(L"tab_msg_comm");
 	SASSERT(pTabMessageComm);
-	for (int i = 0; i < 10; i++)
+
+	//测试添加文件助手
+	{
+		SStringW sstrID;
+		sstrID.Format(L"%d", 99999);
+
+		SStringW sstrPage;
+		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_FILEHELPER'/></page>", sstrID);
+		pTabMessageComm->InsertItem(sstrPage);
+
+		SStringW sstrAvatar = L"";
+		SStringW sstrName = L"文件传输助手";
+		SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
+		SStringW sstrTime = L"昨天";
+		bool bReminder = false;
+
+		int nType = 0;
+		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
+	}
+
+	//测试添加个人
+	{
+		for (int i = 0; i < 5; i++)
+		{
+			SStringW sstrID;
+			sstrID.Format(L"%d", i);
+
+			SStringW sstrPage;
+			sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_PERSONALCOMM'/></page>", sstrID);
+			pTabMessageComm->InsertItem(sstrPage);
+
+			SStringW sstrAvatar = L"";
+			SStringW sstrName;
+			sstrName.Format(L"个人测试%d", i);
+			SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
+			SStringW sstrTime = L"12:09";
+			bool bReminder = false;
+			if (i < 2) bReminder = true;
+
+			int nType = 1;
+			m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
+		}
+	}
+
+	//测试添加群
+	for (int i = 0; i < 5; i++)
 	{
 		SStringW sstrID;
 		sstrID.Format(L"%d", i);
 
 		SStringW sstrPage;
-		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_PERSONALCOMM'/></page>", sstrID);
+		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_GROUPCOMM'/></page>", sstrID);
 		pTabMessageComm->InsertItem(sstrPage);
 
 		SStringW sstrAvatar = L"";
 		SStringW sstrName;
-		sstrName.Format(L"个人测试%d", i);
+		sstrName.Format(L"群测试%d", i);
 		SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
-		SStringW sstrTime = L"2024-12-22";
+		SStringW sstrTime = L"12:09";
 		bool bReminder = false;
+		if (i % 2 == 0) bReminder = true;
 
-		int nType = 1;
+		int nType = 2;
 		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
+	}
+
+
+	if (!m_pEmojiDlg)
+	{
+		m_pEmojiDlg = new CEmojiDlg(this);
+		m_pEmojiDlg->Create(this->m_hWnd, 0, 0, 0, 0);
+		m_pEmojiDlg->SendMessage(WM_INITDIALOG);
 	}
 
 	return 0;
@@ -253,6 +309,88 @@ bool CMainDlg::OnEditMessageSearchKillFocus(EventArgs* pEvt)
 bool CMainDlg::OnEditMessageSearchChanged(EventArgs* e)
 {
 	return true;
+}
+
+void CMainDlg::EmotionTileViewItemClick(const std::string& strID)
+{
+	if (m_bEmotionShow)
+	{
+		m_pEmojiDlg->ShowWindow(SW_HIDE);
+		m_bEmotionShow = false;
+	}
+	else
+	{
+		m_pEmojiDlg->ShowWindow(SW_SHOW);
+		m_pEmojiDlg->SetNoSel();
+		m_bEmotionShow = true;
+	}
+
+	//根据ID找到对应的图片然后将图片添加到re中
+	auto iter = CGlobalUnits::instance()->m_mapEmojisIndex.find(strID);
+	if (iter != CGlobalUnits::instance()->m_mapEmojisIndex.end())
+	{
+		//TODO:
+	}
+}
+
+void CMainDlg::OnBnClickEmotion()
+{
+	if (m_bEmotionShow)
+	{
+		m_pEmojiDlg->ShowWindow(SW_HIDE);
+		m_bEmotionShow = false;
+	}
+	else
+	{
+		m_pEmojiDlg->ShowWindow(SW_SHOW);
+		m_pEmojiDlg->SetNoSel();
+		m_bEmotionShow = true;
+	}
+}
+
+void CMainDlg::OnBnClickImage()
+{
+	//
+}
+
+void CMainDlg::OnBnClickFile()
+{
+	//
+}
+
+void CMainDlg::OnBnClickCapture()
+{
+	//
+}
+
+void CMainDlg::OnBnClickCaptureSetting()
+{
+	//
+}
+
+void CMainDlg::OnBnClickHistory()
+{
+	//
+}
+
+void CMainDlg::OnBnClickAudio()
+{
+	//
+}
+
+void CMainDlg::OnBnClickVideo()
+{
+	//
+}
+
+void CMainDlg::OnBnClickLive()
+{
+	//
+}
+
+void CMainDlg::OnBnClickAudioVideo()
+{
+	//
 }
 
 void CMainDlg::OnMessageItemClick(int& nIndex)

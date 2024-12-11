@@ -71,7 +71,7 @@
 					</caption>
 					<caption pos="-40,[0,-0,-0">
 						<!--reminder-->
-						<img name="item_reminder" pos="|-16,|-16"/>
+						<img name="item_reminder" pos="|-8,|-8" skin="skin_reminder"/>
 					</caption>
 				</template>
 			</listview>
