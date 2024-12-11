@@ -89,7 +89,6 @@ install(FILES "${PROJECT_BINARY_DIR}/config/config.h" DESTINATION include/config
 install(FILES "${PROJECT_BINARY_DIR}/config/build.cfg" DESTINATION include/config)
 
 
-
 # 设置库文件的输出路径
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -130,3 +129,4 @@ add_subdirectory(demo2)
 endif()
 
 add_subdirectory(fun_test)
+add_subdirectory(wxDemo)

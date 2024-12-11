@@ -38,9 +38,9 @@
 				</window>
 				<window size="-2,-1" layout="hbox" interval="10">
 					<text text="edit1"/>
-					<edit size="200,30" name="edit_test" text="hello" margin="2"/>
+					<edit size="200,30" name="edit_test" text="hello" margin="2" enableDragdrop="1"/>
 					<text text="edit2"/>
-					<edit size="200,30" name="edit_test2" text="soui5" margin="2"/>
+					<edit size="200,30" name="edit_test2" text="soui5" margin="2" enableDragdrop="1"/>
 				</window>
 				<window size="-2,0" weight="1" layout="hbox" interval="10">
 					<window size="100,-2" skin="skin_grad_0"/>

@@ -1,0 +1,80 @@
+﻿<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef\init.xml"/>
+  </UIDEF>
+  <LAYOUT>
+    <file name="XML_MAINWND" path="xml\dlg_main.xml"/>
+
+	  <file name="XML_PAGE_MSG" path="xml\page_msg.xml" />
+	  <file name="XML_PAGE_CONTACT" path="xml\page_contact.xml" />
+	  <file name="XML_PAGE_COLLECT" path="xml\page_collect.xml" />
+
+	  <file name="XML_PAGE_FILEHELPER" path="xml\page_comm_filehelper.xml" />
+	  <file name="XML_PAGE_GROUPCOMM" path="xml\page_comm_group.xml" />
+	  <file name="XML_PAGE_PERSONALCOMM" path="xml\page_comm_personal.xml" />
+  </LAYOUT>
+  
+  <values>
+  	<file name="string" path="values\string.xml"/>
+  	<file name="color" path="values\color.xml"/>
+  	<file name="skin" path="values\skin.xml"/>
+  </values>
+
+	<CURSOR>
+		<file name="normal" path="cur\cur202.cur"/>
+		<file name="opt1" path="cur\cur104.cur"/>
+		<file name="opt2" path="cur\Handwriting.cur"/>
+		<file name="opt3_1" path="cur\cur110.cur"/>
+		<file name="opt3_2" path="cur\cur111.cur"/>
+		<file name="opt3_3" path="cur\cur112.cur"/>
+	</CURSOR>
+
+  <IMG>
+    <file name="traymenu_icons" path="image\traymenu_icons.png"/>
+  </IMG>
+
+	<PNG>
+		<file name="IDB_PNG_DEFAULTLOGO_48P" path="image\default_logo48.png" />
+		<file name="IDB_PNG_DEFAULTLOGO_32P" path="image\default_logo32.png" />
+		<file name="IDB_PNG_SB" path="image\sb.png" />
+		<file name="IDB_PNG_VSCROLL" path="image\vscrollbar.png" />
+		<file name="IDB_PNG_SHADOW" path="image\common\shadow.png" />
+		<file name="IDB_PNG_GREENSHADOW" path="image\common\green_shadow.png" />
+	
+		<file name="IDB_PNG_COMMON_CLOSE" path="image\common\comm_close.png" />
+		<file name="IDB_PNG_COMMON_MIN" path="image\common\comm_min.png" />
+		<file name="IDB_PNG_COMMON_MAX" path="image\common\comm_max.png" />
+		<file name="IDB_PNG_COMMON_RESTORE" path="image\common\comm_restore.png" />
+
+		<file name="IDB_PNG_SKIN" path="image\btn_skin.png" />
+		<file name="IDB_PNG_MENU" path="image\btn_menu.png" />
+
+		<file name="IDB_PNG_MESSAGE" path="image\message.png" />
+		<file name="IDB_PNG_CONTACT" path="image\contact.png" />
+		<file name="IDB_PNG_FAVORITES" path="image\favorites.png" />
+
+		<file name="IDB_PNG_SEARCH" path="image\search.png" />
+		<file name="IDB_PNG_SEARCHCANCEL" path="image\common\btn_cancel.png" />
+
+		<file name="IDB_PNG_DEFAULTPERSONAL32" path="image\personal.png" />
+
+		<file name="IDB_PNG_EMOTION" path="image\emotion.png" />
+		<file name="IDB_PNG_IMAGE" path="image\image.png" />
+		<file name="IDB_PNG_FILE" path="image\file.png" />
+		<file name="IDB_PNG_SNAPSHOT" path="image\snapshot.png" />
+		<file name="IDB_PNG_SNAPSHOT_ARROW" path="image\snapshot_arrow.png" />
+		<file name="IDB_PNG_HISTORY" path="image\history.png" />
+		<file name="IDB_PNG_SEND" path="image\send.png" />
+	</PNG>
+	
+  <ICON>
+    <file name="ICON_LOGO"  path="image\soui.ico"/>
+  </ICON>
+  <translator>
+    <file name="lang_cn"  path="translator\lang_cn.xml"/>
+    <file name="lang_jp"  path="translator\lang_jp.xml"/>
+  </translator>
+  <SMENU>
+    <file name="menu_tray" path="xml\menu_tray.xml"/>
+  </SMENU>
+</resource>

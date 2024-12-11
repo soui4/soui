@@ -289,7 +289,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		//将程序的运行路径修改到demo所在的目录
 #ifdef _DEBUG
 		SStringT strResDir = theApp->GetAppDir();
-		strResDir += _T("D:\\work\\soui4lib\\demo");
 		SetCurrentDirectory(strResDir);
 		//SOUI系统总是从appdir去查找资源
 		theApp->SetAppDir(strResDir);
@@ -311,7 +310,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 			FreeLibrary(hSysResource);
 #endif
 		}
-
 		//定义一人个资源提供对象,SOUI系统中实现了3种资源加载方式，分别是从文件加载，从EXE的资源加载及从ZIP压缩包加载
 		SAutoRefPtr<IResProvider>   pResProvider;
 #if (RES_TYPE == RESTYPE_FILE)//从文件加载
