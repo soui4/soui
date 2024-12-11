@@ -2072,7 +2072,7 @@ int CTextMsgFilter::OnGetIMECompText(
 			hr = CIme::CheckInsertResultString(0, *this, NULL, &cbSize, (WCHAR *)lparam);
 
 			if (hr == S_OK)
-				return cbSize/2;
+				return CchOfCb(cbSize);
 		}
 	}
 	return 0;

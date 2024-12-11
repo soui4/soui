@@ -2035,7 +2035,8 @@ LONG CLightDTEngine::ReadPlainText(
 		cbRead += j;
 		j = 0;										
 		
-		cchConv = cbRead/2;							// Default Unicode cch
+		//todo:hjx
+		cchConv = CchOfCb(cbRead);							// Default Unicode cch
 		if(uCpg == CP_UBE)							// Big Endian Unicode
 		{
 			WORD *pch = (WORD*)&wszBuf[2];
