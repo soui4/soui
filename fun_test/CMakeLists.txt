@@ -11,21 +11,6 @@ include_directories(  PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}
   PUBLIC ${PROJECT_SOURCE_DIR}/components
   )
 
-
-if(OUTPATH_WITHOUT_TYPE)
-    link_directories(${PROJECT_BINARY_DIR}/bin)
-else()
-if (CMAKE_CL_64)
-    if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
-    link_directories(${PROJECT_SOURCE_DIR}/bin64a)
-    else()
-    link_directories(${PROJECT_SOURCE_DIR}/bin64)
-    endif()
-else ()
-    link_directories(${PROJECT_SOURCE_DIR}/bin)
-endif ()
-endif()
-
 set(FUN_TEST_SRC
 test.cpp
 ScintillaWnd.cpp
