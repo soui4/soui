@@ -40,6 +40,19 @@
       "env": {
         "DISPLAY": "172.29.76.139:0.0"
       }
+    },
+{
+      "type": "cppgdb",
+      "name": "wxDemo (bin\\wxDemo)",
+      "project": "CMakeLists.txt",
+      "projectTarget": "wxDemo (bin\\wxDemo)",
+      "comment": "了解如何配置远程调试。有关详细信息，请参阅 http://aka.ms/vslinuxdebug",
+      "debuggerConfiguration": "gdb",
+      "MIMode": "gdb",
+      "args": [],
+      "env": {
+        "DISPLAY": "172.29.76.139:0.0"
+      }
     }
   ]
 }
