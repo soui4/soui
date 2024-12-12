@@ -20,23 +20,6 @@ struct SComInfo
 	HMODULE hMod;
 };
 
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-struct SComInfo s_comInfo[]={
-	{Decoder_Png,_T("imgdecoder-pngd.dll"),NULL},
-	{Decoder_Gdip,_T("imgdecoder-gdipd.dll"),NULL},
-	{Decoder_Wic,_T("imgdecoder-wicd.dll"),NULL},
-	{Decoder_Stb,_T("imgdecoder-stbd.dll"),NULL},
-	{Render_Gdi,_T("render-gdid.dll"),NULL},
-	{Render_Skia,_T("render-skiad.dll"),NULL},
-	{Render_D2D,_T("render-d2dd.dll"),NULL},
-	{Log4Z,_T("log4zd.dll"),NULL},
-	{Resprovider_7Zip,_T("resprovider-7zipd.dll"),NULL},
-	{Resprovider_Zip,_T("resprovider-zipd.dll"),NULL},
-	{Script_Lua,_T("scriptmodule-luad.dll"),NULL},
-	{TaskLoop,_T("TaskLoopd.dll"),NULL},
-	{Translator,_T("translatord.dll"),NULL},
-};
-#else
 struct SComInfo s_comInfo[]={
 	{Decoder_Png,_T("imgdecoder-png.dll"),NULL},
 	{Decoder_Gdip,_T("imgdecoder-gdip.dll"),NULL},
@@ -52,7 +35,7 @@ struct SComInfo s_comInfo[]={
 	{TaskLoop,_T("TaskLoop.dll"),NULL},
 	{Translator,_T("translator.dll"),NULL},
 };
-#endif
+
 	BOOL LoadComObj(SComID id,IObjRef ** ppObj)
 	{
 		FunCreateInstance fun=NULL;
@@ -82,56 +65,7 @@ struct SComInfo s_comInfo[]={
 #pragma comment(lib,"Usp10")
 #pragma comment(lib,"opengl32")
 
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-#if(SCOM_MASK&scom_mask_render_skia)
-#pragma comment(lib,"skiad")
-#pragma comment(lib,"render-skiad")
-#endif
-#if(SCOM_MASK&scom_mask_render_gdi)
-#pragma comment(lib,"render-gdid")
-#endif
-#if(SCOM_MASK&scom_mask_render_d2d)
-#pragma comment(lib,"render-d2dd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_wic)
-#pragma comment(lib,"imgdecoder-wicd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_png)
-#pragma comment(lib,"pngd")
-#pragma comment(lib,"zlibd")
-#pragma comment(lib,"imgdecoder-pngd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_stb)
-#pragma comment(lib,"imgdecoder-stbd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_gdip)
-#pragma comment(lib,"imgdecoder-gdipd")
-#endif
-#if(SCOM_MASK&scom_mask_resprovider_zip)
-#pragma comment(lib,"zlibd")
-#pragma comment(lib,"resprovider-zipd")
-#endif
-#if(SCOM_MASK&scom_mask_resprovider_7z)
-#pragma comment(lib,"7zd")
-#pragma comment(lib,"resprovider-7zipd")
-#endif
-#if(SCOM_MASK&scom_mask_translator)
-#pragma comment(lib,"translatord")
-#endif
-#if(SCOM_MASK&scom_mask_log4z)
-#pragma comment(lib,"log4zd")
-#endif
-#if(SCOM_MASK&scom_mask_taskloop)
-#pragma comment(lib,"taskloopd")
-#endif
-#if(SCOM_MASK&scom_mask_ipcobject)
-#pragma comment(lib,"sipcobjectd")
-#endif
-#if(SCOM_MASK&scom_mask_script_lua)
-#pragma comment(lib,"lua-54d")
-#pragma comment(lib,"scriptmodule-luad")
-#endif
-#else//_DEBUG
+
 #if(SCOM_MASK&scom_mask_render_skia)
 #pragma comment(lib,"skia")
 #pragma comment(lib,"render-skia")
@@ -180,7 +114,7 @@ struct SComInfo s_comInfo[]={
 #pragma comment(lib,"lua-54")
 #pragma comment(lib,"scriptmodule-lua")
 #endif
-#endif//_DEBUG
+
 
 struct SComInfo
 {
