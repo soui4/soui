@@ -175,7 +175,13 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 		SOUIEngine souiEngine;
 		if (souiEngine.Init(hInstance))
 		{
+#ifdef _WIN32
 			SetCurrentDirectory(_T("D:\\work\\soui4.git\\wxDemo"));
+#else
+			std::string strDir = getSourceDir();
+			strDir += "/wxDemo";
+			SetCurrentDirectoryA(strDir.c_str());
+#endif//_WIN32
 			CGlobalUnits::instance()->OperateEmojis();
 
 			//加载系统资源
@@ -202,6 +208,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 
 #ifndef _WIN32
 int main(int argc, char ** argv){
-	return _tWinMain(0,0,NULL,SW_SHOWNORMAL);
+	HINSTANCE hInst = GetModuleHandle(NULL);
+	return _tWinMain(hInst,0,NULL,SW_SHOWNORMAL);
 }
 #endif//_WIN32

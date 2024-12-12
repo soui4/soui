@@ -41,7 +41,12 @@ void CGlobalUnits::OperateEmojis()
 	/*	2024-12-11	yangjinpeng
 	*	处理本地目录下的emoji图片
 	*/
-	std::string strPath = "emojis\\*.png";
+#ifdef _WIN32
+	std::string strPathPrefix = "emojis\\";
+#else
+	std::string strPathPrefix = "emojis/";
+#endif//_WIN32
+	std::string strPath = strPathPrefix  + "*.png";
 	SStringT sstrPath = S_CA2T(strPath.c_str());
 
 	WIN32_FIND_DATA findFileData;
@@ -60,7 +65,7 @@ void CGlobalUnits::OperateEmojis()
 			m_mapEmojisIndex.insert(std::make_pair(strUUID, strName));
 
 			std::string strTempPath;
-			strTempPath.append("emojis\\");
+			strTempPath.append(strPathPrefix);
 			strTempPath.append(strName);
 			SStringT sstrPath = S_CA2T(strTempPath.c_str());
 			IBitmap* pRes = SResLoadFromFile::LoadImage(sstrPath);
