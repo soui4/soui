@@ -554,6 +554,12 @@ __int64 ParseUIDefFile(map<string,string> &mapFiles, const wchar_t * pszFileName
     return tmStamp;
 }
 
+void wtoutf8(const std::wstring & src, std::string &out){
+	int len = WideCharToMultiByte(CP_UTF8,0,src.c_str(),src.length(),NULL,0,NULL,NULL);
+	out.resize(len);
+	WideCharToMultiByte(CP_UTF8,0,src.c_str(),src.length(),(char*)out.c_str(),len,NULL,NULL);
+}
+
 //uiresbuilder -p uires -i uires\uires.idx -r .\uires\winres.rc2 -h .\uires\resource.h idtable
 int _tmain(int argc, _TCHAR* argv[])
 {
@@ -695,7 +701,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			it2++;
 		}
         __int64 tmIdx=GetLastWriteTime(strIndexFile.c_str());
-		WriteFile(tmIdx, strRes, strOut);
+		WriteFile(tmIdx, strRes, strOut,FALSE);
 	}
 
     //输入name,id定义,只解析资源中layout资源的XML资源
@@ -888,7 +894,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			strOut += L"extern struct _R R;\r\n";
 			strOut += L"#endif//INIT_R_DATA\r\n";
 
-			WriteFile(tmResource, strHeadFile, strOut);
+			WriteFile(tmResource, strHeadFile, strOut,TRUE);
 		}
 		if(!strJsFile.empty()){
 			wstring strOut = RB_HEADER_ID;
