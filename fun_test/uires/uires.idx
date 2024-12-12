@@ -21,8 +21,11 @@
 		<file name="girl" path="image\girl.png"/>
 		<file name="yy_logo" path="image\yy.png"/>
 		<file name="soui" path="image\soui.png"/>
-    <file name="png_menu_border" path="image\menuborder.png" />
+		<file name="png_menu_border" path="image\menuborder.png" />
 	</img>
+	<rtf>
+		<file name="test" path="rtf\test.rtf"/>
+	</rtf>
 	<ICON>
 		<file name="ICON_LOGO"  path="image\soui.ico"/>
 	</ICON>
