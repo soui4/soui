@@ -128,6 +128,7 @@ endif ()
 endif()
 
 add_executable(demo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${EXTENDCOTROLS})
+target_link_directories(demo PRIVATE ${CMAKE_BINARY_DIR}/bin)
 
 if(CMAKE_DEBUG_POSTFIX)
     set_target_properties(demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})

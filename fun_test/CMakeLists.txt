@@ -19,6 +19,7 @@ test_native.cpp
 )
 
 add_executable(fun_test ${CURRENT_HEADERS} ${FUN_TEST_SRC})
+target_link_directories(fun_test PRIVATE ${CMAKE_BINARY_DIR}/bin)
 
 add_dependencies(fun_test utilities4 gtest soui4 resprovider-zip log4z  render-gdi  render-skia taskloop Scintilla)
 target_include_directories(fun_test 
@@ -41,6 +42,7 @@ set(IPC_SVR_SRC
 ipc_svr.cpp
 )
 add_executable(ipc_svr ${CURRENT_HEADERS} ${IPC_SVR_SRC})
+target_link_directories(ipc_svr PRIVATE ${CMAKE_BINARY_DIR}/bin)
 
 add_dependencies(ipc_svr utilities4 soui4 resprovider-zip log4z  render-gdi  render-skia taskloop)
 target_link_libraries(ipc_svr utilities4 soui4)
@@ -61,6 +63,7 @@ set(IPC_SVR_CLIENT
 ipc_client.cpp
 )
 add_executable(ipc_client ${CURRENT_HEADERS} ${IPC_SVR_CLIENT})
+target_link_directories(ipc_client PRIVATE ${CMAKE_BINARY_DIR}/bin)
 
 add_dependencies(ipc_client utilities4 soui4 resprovider-zip log4z  render-gdi  render-skia taskloop)
 target_link_libraries(ipc_client utilities4 soui4)

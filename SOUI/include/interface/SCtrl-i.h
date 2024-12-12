@@ -347,14 +347,14 @@ DECLARE_INTERFACE_(IAnimateImgWnd, ICtrl)
 
 
 // {0A572106-14E0-48d7-85C3-3E08B9DA85A8}
-DEFINE_SGUID(IID_IProgress, 
+DEFINE_SGUID(IID_IProg, 
 			0xa572106, 0x14e0, 0x48d7, 0x85, 0xc3, 0x3e, 0x8, 0xb9, 0xda, 0x85, 0xa8);
 
 #undef INTERFACE
 #define INTERFACE IProgress
 DECLARE_INTERFACE_(IProgress, ICtrl)
 {
-	DECLARE_CLASS_SIID(IID_IProgress)
+	DECLARE_CLASS_SIID(IID_IProg)
     /**
      * @brief 增加引用计数
      * @return 新引用计数

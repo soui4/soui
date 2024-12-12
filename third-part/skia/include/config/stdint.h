@@ -87,18 +87,18 @@ typedef _W64 unsigned int uintptr_t;
 #ifdef __linux__
 #include <bits/stdint-intn.h>
 #else
-typedef _Longlong int64_t;
+typedef long long int64_t;
 #endif
-typedef _ULonglong uint64_t;
+typedef unsigned long long uint64_t;
 
-typedef _Longlong int_least64_t;
-typedef _ULonglong uint_least64_t;
+typedef long long int_least64_t;
+typedef unsigned long long uint_least64_t;
 
-typedef _Longlong int_fast64_t;
-typedef _ULonglong uint_fast64_t;
+typedef long long int_fast64_t;
+typedef unsigned long long uint_fast64_t;
 
-typedef _Longlong intmax_t;
-typedef _ULonglong uintmax_t;
+typedef long long intmax_t;
+typedef unsigned long long uintmax_t;
 
 		/* LIMIT MACROS */
 #define INT8_MIN	(-0x7f - _C2)
