@@ -193,8 +193,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 			GetModuleFileName(NULL, szFilePath, MAX_PATH);
 			(_tcsrchr(szFilePath, _T(PATH_SLASH)))[1] = 0;
 			SStringT sstrExePath = szFilePath;
-			sstrExePath += _T("emojis");
-			sstrExePath += _T(PATH_SLASH);
+			sstrExePath += SStringT(_T("emojis"))+ _T(PATH_SLASH);
 			if (GetFileAttributes(sstrExePath) != INVALID_FILE_ATTRIBUTES)
 			{
 				CGlobalUnits::instance()->SetEmojiPath(sstrExePath);
