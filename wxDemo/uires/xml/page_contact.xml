@@ -143,19 +143,19 @@
 						<caption pos="0,0,-0,-0">
 							<!--一个tileView-->
 							<tileview pos="0,0,-0,-0" name="tileview_gzh" wantTab="1" marginSize="2" colorBkgnd="#FFFFFF" sbskin="skin_scrollbar" sbWid="8">
-								<template itemHeight="80" itemWidth="60" colorHover="rgba(100,100,100,50)" colorSelected="#FFFFFF" trackMouseEvent="1">
-									<caption pos="50,0,-50,-0" cursor="hand">
+								<template itemHeight="120" itemWidth="100" colorHover="rgba(100,100,100,50)" colorSelected="#FFFFFF" trackMouseEvent="1">
+									<caption pos="0,0,-0,-0" cursor="hand">
 										<!--文本头像各占一半-->
-										<caption pos="0,0,@60,@40">
+										<caption pos="0,0,@100,@60">
 											<img name="item_avatar" pos="|-16,|-16" skin="skin_default_personal32"/>
 										</caption>
-										<text pos="0,[0,@60,@40" 
+										<text pos="0,[0,@100,@60" 
 											  align="center" 
 											  valign="center" 
 											  dotted="1" 
 											  name="item_name" 
 											  colorText="#282828" 
-											  font="face:微软雅黑,size:15" />
+											  font="face:微软雅黑,size:12" />
 									</caption>
 								</template>
 							</tileview>
