@@ -102,7 +102,7 @@ protected:
 		EVENT_NAME_HANDLER(L"edit_contact_search", EventSetFocus::EventID, OnEditContactSearchSetFocus)
 		EVENT_NAME_HANDLER(L"edit_contact_search", EventKillFocus::EventID, OnEditContactSearchKillFocus)
 		EVENT_NAME_HANDLER(L"edit_contact_search", EventRENotify::EventID, OnEditMessageSearchChanged)
-	EVENT_MAP_END()
+	EVENT_MAP_END2(SHostWnd)
 		
 	LRESULT OnMenuEvent(UINT msg, WPARAM wp, LPARAM lp);
 	void OnInitEmojiMenu(IMenuEx* menuPopup, UINT nIndex);

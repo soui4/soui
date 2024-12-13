@@ -6,7 +6,7 @@ struct TreeItemData
 {
 	TreeItemData() :bGroup(false) {}
 	std::string strID;
-	INT32 gid;			//用户的组ID
+	int32_t gid;			//用户的组ID
 	SStringT strImg;	//用户图像
 	SStringT strName;	//用户名
 	bool bGroup;
@@ -30,35 +30,35 @@ public:
 
 		{
 			TreeItemData data;
-			data.strName = L"新的朋友";
+			data.strName = _T("新的朋友");
 			data.gid = 1;
 			data.bGroup = true;
 			HSTREEITEM hRoot = InsertItem(data);
 			SetItemExpanded(hRoot, TRUE);
 			data.bGroup = FALSE;
 			data.strID = "new_friends";
-			data.strName = L"新的朋友";
-			data.strImg = L"skin_default_personal32";
+			data.strName = _T("新的朋友");
+			data.strImg = _T("skin_default_personal32");
 			InsertItem(data, hRoot);
 		}
 
 		{
 			TreeItemData data1;
-			data1.strName = L"公众号";
+			data1.strName = _T("公众号");
 			data1.gid = 2;
 			data1.bGroup = true;
 			HSTREEITEM hRoot1 = InsertItem(data1);
 			SetItemExpanded(hRoot1, TRUE);
 			data1.bGroup = false;
 			data1.strID = "page_gzh";
-			data1.strName = L"公众号测试";
-			data1.strImg = L"skin_default_gzh32";
+			data1.strName = _T("公众号测试");
+			data1.strImg = _T("skin_default_gzh32");
 			InsertItem(data1, hRoot1);
 		}
 
 		{
 			TreeItemData data2;
-			data2.strName = L"订阅号";
+			data2.strName = _T("订阅号");
 			data2.gid = 3;
 			data2.bGroup = TRUE;
 			HSTREEITEM hRoot2 = InsertItem(data2);
@@ -66,14 +66,14 @@ public:
 
 			data2.bGroup = false;
 			data2.strID = "page_dyh";
-			data2.strName = L"订阅号测试";
-			data2.strImg = L"skin_default_dyh32";
+			data2.strName = _T("订阅号测试");
+			data2.strImg = _T("skin_default_dyh32");
 			InsertItem(data2, hRoot2);
 		}
 
 		{
 			TreeItemData data3;
-			data3.strName = L"群聊";
+			data3.strName = _T("群聊");
 			data3.gid = 4;
 			data3.bGroup = TRUE;
 			HSTREEITEM hRoot3 = InsertItem(data3);
@@ -84,16 +84,16 @@ public:
 			{
 				data3.bGroup = false;
 				data3.strID = iter->second.m_strGroupID;
-				SStringW sstrGroupName = S_CA2W(iter->second.m_strGroupName.c_str());
+				SStringT sstrGroupName = S_CA2T(iter->second.m_strGroupName.c_str());
 				data3.strName = sstrGroupName;
-				data3.strImg = L"skin_default_group32";
+				data3.strImg = _T("skin_default_group32");
 				InsertItem(data3, hRoot3);
 			}
 		}
 
 		{//此处可根据用户名首字符做分类处理
 			TreeItemData data4;
-			data4.strName = L"好友";
+			data4.strName = _T("好友");
 			data4.gid = 5;
 			data4.bGroup = TRUE;
 			HSTREEITEM hRoot4 = InsertItem(data4);
@@ -103,9 +103,9 @@ public:
 			{
 				data4.bGroup = false;
 				data4.strID = iter->second.m_strID;
-				SStringW sstrName = S_CA2W(iter->second.m_strName.c_str());
+				SStringT sstrName = S_CA2T(iter->second.m_strName.c_str());
 				data4.strName = sstrName;
-				data4.strImg = L"skin_default_personal32";
+				data4.strImg = _T("skin_default_personal32");
 				InsertItem(data4, hRoot4);
 			}
 		}
@@ -153,7 +153,7 @@ public:
 
 			SImageWnd* pFace = pItem->FindChildByName2<SImageWnd>(L"face");
 			SASSERT(pFace);
-			pItem->FindChildByName(L"face")->SetAttribute(L"skin", ii.data.strImg);
+			pItem->FindChildByName(L"face")->SetAttribute(L"skin", S_CT2W(ii.data.strImg));
 		}
 		else
 		{

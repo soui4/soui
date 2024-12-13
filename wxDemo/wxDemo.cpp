@@ -66,7 +66,11 @@ public:
 		BOOL bLoaded = TRUE;
 		do{
 			//使用SKIA渲染界面
+#ifdef _WIN32
 			bLoaded = m_ComMgr.CreateRender_Skia((IObjRef * *)& pRenderFactory);
+#else
+			bLoaded = m_ComMgr.CreateRender_GDI((IObjRef**)&pRenderFactory);
+#endif//_WIN32
 			SASSERT_FMT(bLoaded, _T("load interface [render] failed!"));
 			if(!bLoaded) break;
 			//设置图像解码引擎。默认为GDIP。基本主流图片都能解码。系统自带，无需其它库
