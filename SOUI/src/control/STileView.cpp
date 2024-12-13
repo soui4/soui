@@ -784,7 +784,7 @@ BOOL STileView::CreateChildren(SXmlNode xmlNode)
         m_xmlTemplate.root().append_copy(xmlTemplate);
         {
             //创建一个定位器
-            STileViewItemLocator *pItemLocator = new STileViewItemLocator(xmlTemplate.attribute(L"itemHeight").as_string(L"10dp"), xmlTemplate.attribute(L"itemWidth").as_string(L"10dp"), m_nMarginSize);
+            STileViewItemLocator *pItemLocator = new STileViewItemLocator(this,xmlTemplate.attribute(L"itemHeight").as_string(L"10dp"), xmlTemplate.attribute(L"itemWidth").as_string(L"10dp"), m_nMarginSize);
             SetItemLocator(pItemLocator);
             pItemLocator->Release();
         }

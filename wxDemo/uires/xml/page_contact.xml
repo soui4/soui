@@ -142,7 +142,7 @@
 					<page title="page_gzh">
 						<caption pos="0,0,-0,-0">
 							<!--一个tileView-->
-							<tileview pos="0,0,-0,-0" name="tileview_gzh" wantTab="1" marginSize="2" colorBkgnd="#FFFFFF" sbskin="skin_scrollbar" sbWid="8">
+							<tileview pos="0,0,-0,-0" name="tileview_gzh" wantTab="1" marginSize="2" colorBkgnd="#FFFFFF" sbskin="skin_scrollbar" sbWid="8" align="center">
 								<template itemHeight="120" itemWidth="100" colorHover="rgba(100,100,100,50)" colorSelected="#FFFFFF" trackMouseEvent="1">
 									<caption pos="0,0,-0,-0" cursor="hand">
 										<!--文本头像各占一半-->

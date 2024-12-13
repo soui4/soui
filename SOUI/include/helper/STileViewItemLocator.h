@@ -5,8 +5,8 @@
 SNSBEGIN
 class SOUI_EXP STileViewItemLocator : public TObjRefImpl<ITileViewItemLocator> {
   public:
-    STileViewItemLocator(int nItemHei, int nItemWid, int nMarginSize = 0);
-    STileViewItemLocator(LPCWSTR szItemHei, LPCWSTR szItemWid, SLayoutSize marginSize = SLayoutSize());
+    STileViewItemLocator(SWindow *owner,int nItemHei, int nItemWid, int nMarginSize = 0);
+    STileViewItemLocator(SWindow* owner, LPCWSTR szItemHei, LPCWSTR szItemWid, SLayoutSize marginSize = SLayoutSize());
 
   public:
     STDMETHOD_(void, SetAdapter)(THIS_ ILvAdapter *pAdapter) OVERRIDE;
@@ -65,6 +65,7 @@ class SOUI_EXP STileViewItemLocator : public TObjRefImpl<ITileViewItemLocator> {
     int m_nCountInRow;            //每行的item个数
 
     SAutoRefPtr<ILvAdapter> m_adapter;
+    SWindow* m_pOwner;
 };
 
 SNSEND

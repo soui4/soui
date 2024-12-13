@@ -21,13 +21,14 @@ class SOUI_EXP SwndStyle {
   public:
     enum
     {
-        Align_Left = 0x000UL,   // valign = top
-        Align_Center = 0x100UL, // valign = middle
-        Align_Right = 0x200UL,  // valign = bottom
-
-        VAlign_Top = 0x0000UL,    // valign = top
-        VAlign_Middle = 0x1000UL, // valign = middle
-        VAlign_Bottom = 0x2000UL, // valign = bottom
+        Align_Left = 0x000U,   // valign = top
+        Align_Center = 0x100U, // valign = middle
+        Align_Right = 0x200U,  // valign = bottom
+        Align_MaskX = 0x300L,
+        VAlign_Top = 0x0000U,    // valign = top
+        VAlign_Middle = 0x1000U, // valign = middle
+        VAlign_Bottom = 0x2000U, // valign = bottom
+        Align_MaskY = 0x3000U,
     };
 
   public:
@@ -43,6 +44,7 @@ class SOUI_EXP SwndStyle {
     DWORD m_bVideoCanvas : 1;     /**<视频渲染画布 */
 
     UINT GetTextAlign() const;
+    UINT GetAlign() const;
     int GetStates();
     COLORREF GetTextColor(int iState);
     IFontPtr GetTextFont(int iState);

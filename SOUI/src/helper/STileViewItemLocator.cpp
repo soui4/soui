@@ -4,22 +4,24 @@
 SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 // STileViewItemLocatorFix
-STileViewItemLocator::STileViewItemLocator(int nItemHei, int nItemWid, int nMarginSize /*= 0*/)
+STileViewItemLocator::STileViewItemLocator(SWindow* owner, int nItemHei, int nItemWid, int nMarginSize /*= 0*/)
     : m_nItemHeight((float)nItemHei, SLayoutSize::px)
     , m_nItemWidth((float)nItemWid, SLayoutSize::px)
     , m_nItemMargin((float)nMarginSize, SLayoutSize::px)
     , m_nTileViewWidth(0.f, SLayoutSize::px)
     , m_nCountInRow(1)
+    , m_pOwner(owner)
 {
 }
 
-STileViewItemLocator::STileViewItemLocator(LPCWSTR szItemHei, LPCWSTR szItemWid, SLayoutSize marginSize)
+STileViewItemLocator::STileViewItemLocator(SWindow* owner, LPCWSTR szItemHei, LPCWSTR szItemWid, SLayoutSize marginSize)
     : m_nItemHeight(GETLAYOUTSIZE(szItemHei))
     , m_nItemWidth(GETLAYOUTSIZE(szItemWid))
     , m_nItemMargin(marginSize)
     , m_nTileViewWidth(0, SLayoutSize::px)
     , m_nCountInRow(1)
     , m_scale(100)
+    , m_pOwner(owner)
 {
 }
 
@@ -108,11 +110,26 @@ RECT STileViewItemLocator::GetItemRect(int iItem)
     int nRowIdx, nColIdx;
     GetItemRowAndColIndex(iItem, &nRowIdx, &nColIdx);
 
+    int margin = m_nItemMargin.toPixelSize(m_scale);
     CRect rect;
-    rect.left = m_nItemMargin.toPixelSize(m_scale) + nColIdx * (m_nItemWidth.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
-    rect.top = m_nItemMargin.toPixelSize(m_scale) + nRowIdx * (m_nItemHeight.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
+    rect.left = margin + nColIdx * (m_nItemWidth.toPixelSize(m_scale) + margin);
+    rect.top = margin + nRowIdx * (m_nItemHeight.toPixelSize(m_scale) + margin);
     rect.right = rect.left + m_nItemWidth.toPixelSize(m_scale);
     rect.bottom = rect.top + m_nItemHeight.toPixelSize(m_scale);
+
+    if ((m_pOwner->GetStyle().GetAlign() & SwndStyle::Align_MaskX) != SwndStyle::Align_Left) {
+        CRect rcClient = m_pOwner->GetClientRect();
+        int totalWid = m_nItemWidth.toPixelSize(m_scale) * m_nCountInRow + (margin+1)* m_nCountInRow;
+        switch (m_pOwner->GetStyle().GetAlign() & SwndStyle::Align_MaskX) {
+        case SwndStyle::Align_Center:
+            rect.OffsetRect((rcClient.Width() - totalWid) / 2, 0);
+            break;
+        case SwndStyle::Align_Right:
+            rect.OffsetRect((rcClient.Width() - totalWid), 0);
+            break;
+        }
+    }
+
     return rect;
 }
 
