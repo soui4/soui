@@ -11,6 +11,7 @@
 #include "CTvContactAdapter.h"
 
 #include "CLvNewFriendAdapter.h"
+#include "CGZHTileViewAdapter.h"
 
 #ifdef _WIN32
 #include "snapshot/CWindowEnumer.h"
@@ -22,6 +23,7 @@ class CMainDlg : public SHostWnd
 	, public CLvMessageAdapter::IListen
 	, public CTvContactAdapter::IListen
     , public CLvNewFriendAdapter::IListen
+    , public CGZHTileViewAdapter::IListen
 	, public CEmotionTileViewAdapter::IListener
 {
 public:
@@ -129,6 +131,7 @@ private:
 	CTvContactAdapter* m_pContactAdapter;
 
 	CLvNewFriendAdapter* m_pNewFriendAdapter;
+    CGZHTileViewAdapter *m_pGZHTileViewAdapter;
 
 	SMenuEx* m_pEmojiMenu;
 };

@@ -211,6 +211,23 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
         m_pNewFriendAdapter->AddItem(sstrID, sstrAvatar, sstrName, sstrMessage, nState);
 	}
 
+	//通讯录-公众号适配器设置
+    STileView *pTileViewGZH = (STileView *)pTabContactInfo->GetPage(pTabContactInfo->GetPageIndex(_T("page_gzh"), TRUE))->FindIChildByName(L"tileview_gzh");
+    pTileViewGZH->EnableScrollBar(SSB_HORZ, FALSE);
+    m_pGZHTileViewAdapter = new CGZHTileViewAdapter(this);
+    pTileViewGZH->SetAdapter(m_pGZHTileViewAdapter);
+    m_pGZHTileViewAdapter->Release();
+	for (int i = 0; i < 20; i++)
+	{
+		SStringW sstrID;
+        sstrID.Format(L"%d", i);
+		SStringW sstrName;
+        sstrName.Format(L"%d公众号名", i);
+        std::string strAvatar = "";
+        std::string strID = S_CW2A(sstrID);
+        std::string strName = S_CW2A(sstrName);
+		m_pGZHTileViewAdapter->AddItem(strID, strName, strAvatar);
+	}
 
 	return 0;
 }

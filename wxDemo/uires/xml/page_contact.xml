@@ -140,23 +140,46 @@
 						</caption>
 					</page>
 					<page title="page_gzh">
-						<caption pos="0,0,-0,-0" colorBkgnd="#ffff00">
-
+						<caption pos="0,0,-0,-0">
+							<!--一个tileView-->
+							<tileview pos="0,0,-0,-0" name="tileview_gzh" wantTab="1" marginSize="2" colorBkgnd="#FFFFFF" sbskin="skin_scrollbar" sbWid="8">
+								<template itemHeight="80" itemWidth="60" colorHover="rgba(100,100,100,50)" colorSelected="#FFFFFF" trackMouseEvent="1">
+									<caption pos="50,0,-50,-0" cursor="hand">
+										<!--文本头像各占一半-->
+										<caption pos="0,0,@60,@40">
+											<img name="item_avatar" pos="|-16,|-16" skin="skin_default_personal32"/>
+										</caption>
+										<text pos="0,[0,@60,@40" 
+											  align="center" 
+											  valign="center" 
+											  dotted="1" 
+											  name="item_name" 
+											  colorText="#282828" 
+											  font="face:微软雅黑,size:15" />
+									</caption>
+								</template>
+							</tileview>
 						</caption>
 					</page>
 					<page title="page_dyh">
 						<caption pos="0,0,-0,-0" colorBkgnd="#ff00ff">
-
+							<!--一个tileView-->
+							<tileview pos="5,5,-5,-5" name="tileview_dyh" wantTab="1" marginSize="2" colorBkgnd="#FFFFFF" sbskin="skin_scrollbar" sbWid="8">
+								<template itemHeight="80" itemWidth="40" colorHover="#cccccc" colorSelected="#FFFFFF" trackMouseEvent="1">
+									<img name="item_face" pos="|0,0" offset="-0.5,0" cursor="hand"/>
+									<text name="item_name" ></text>
+								</template>
+							</tileview>
 						</caption>
 					</page>
 					<page title="page_group">
 						<caption pos="0,0,-0,-0" colorBkgnd="#0000ff">
-
+							<!--一个tileView + 按钮-->
 						</caption>
 					</page>
 					<page title="page_personal">
 						<caption pos="0,0,-0,-0" colorBkgnd="#ffffff">
-
+							<!--稍微有点麻烦的布局-->
 						</caption>
 					</page>
 				</tabctrl>
