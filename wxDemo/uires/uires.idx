@@ -12,6 +12,12 @@
 	  <file name="XML_PAGE_FILEHELPER" path="xml\page_comm_filehelper.xml" />
 	  <file name="XML_PAGE_GROUPCOMM" path="xml\page_comm_group.xml" />
 	  <file name="XML_PAGE_PERSONALCOMM" path="xml\page_comm_personal.xml" />
+	  <file name="XML_PAGE_GZH" path="xml\page_comm_gzh.xml" />
+	  <file name="XML_PAGE_DYH" path="xml\page_comm_dyh.xml" />
+	  <file name="XML_PAGE_NEWS" path="xml\page_comm_news.xml" />
+
+
+	  <file name="XML_DLG_SNAPSHOT" path="xml\dlg_snapshot.xml" />
   </LAYOUT>
   
   <values>
@@ -94,7 +100,7 @@
   <SMENU>
     <file name="menu_tray" path="xml\menu_tray.xml"/>
   </SMENU>
-	<menuex>
+	<smenuex>
 		<file name="emoji" path="menuex\emoji.xml"/>
-	</menuex>
+	</smenuex>
 </resource>

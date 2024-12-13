@@ -106,6 +106,75 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
 	}
 
+	//测试添加公众号
+	{
+		for (int i = 0; i < 3; i++)
+		{
+			SStringW sstrID;
+			sstrID.Format(L"%d", i);
+
+			SStringW sstrPage;
+			sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_GZH'/></page>", sstrID);
+			pTabMessageComm->InsertItem(sstrPage);
+
+			SStringW sstrAvatar = L"";
+			SStringW sstrName;
+			sstrName.Format(L"公众号测试%d", i);
+			SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
+			SStringW sstrTime = L"2024-12-12";
+			bool bReminder = false;
+			int nType = -1;
+			m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
+		}
+	}
+
+	//测试添加订阅号
+	{
+		SStringW sstrID;
+		sstrID.Format(L"%d", 9999);
+
+		SStringW sstrPage;
+		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_DYH'/></page>", sstrID);
+		pTabMessageComm->InsertItem(sstrPage);
+
+		SStringW sstrAvatar = L"";
+		SStringW sstrName = L"订阅号测试";
+		SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
+		SStringW sstrTime = L"2024-12-12";
+		bool bReminder = false;
+		int nType = -2;
+		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
+	}
+
+	//测试添加新闻
+	{
+		SStringW sstrID;
+		sstrID.Format(L"%d", 9999);
+
+		SStringW sstrPage;
+		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_NEWS'/></page>", sstrID);
+		pTabMessageComm->InsertItem(sstrPage);
+
+		SStringW sstrAvatar = L"";
+		SStringW sstrName = L"新闻测试";
+		SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
+		SStringW sstrTime = L"2024-12-12";
+		bool bReminder = false;
+		int nType = -3;
+		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
+	}
+	int nLvMessageSel = 0;
+	pLvMessage->SetSel(nLvMessageSel, TRUE);
+	OnMessageItemClick(nLvMessageSel);
+
+	//通讯录相关初始化
+	STreeView* pTreeView = FindChildByName2<STreeView>("tv_contact");
+	pLvMessage->EnableScrollBar(SSB_HORZ, FALSE);
+
+	m_pContactAdapter = new CTvContactAdapter(this);
+	pTreeView->SetAdapter(m_pContactAdapter);
+	m_pContactAdapter->Release();
+
 	return 0;
 }
 
@@ -301,6 +370,31 @@ bool CMainDlg::OnEditMessageSearchChanged(EventArgs* e)
 	return true;
 }
 
+bool CMainDlg::OnEditContactSearchSetFocus(EventArgs* pEvt)
+{
+	//展示搜索框中的取消搜索按钮
+	SImageButton* pSearchCancel = FindChildByName2<SImageButton>(L"btn_contact_search_cancel");
+	pSearchCancel->SetAttribute(L"show", L"1");
+
+	//需要展示搜索页面
+	//TODO:
+	return true;
+}
+
+bool CMainDlg::OnEditContactSearchKillFocus(EventArgs* pEvt)
+{
+	SImageButton* pSearchCancel = FindChildByName2<SImageButton>(L"btn_contact_search_cancel");
+	pSearchCancel->SetAttribute(L"show", L"0");
+
+	//重新展示消息列表
+	return true;
+}
+
+bool CMainDlg::OnEditContactSearchChanged(EventArgs* e)
+{
+	return true;
+}
+
 void CMainDlg::OnEmotionItemClick(const std::string& strID)
 {
 	SLOGI() << "OnEmotionItemClick,id=" << strID.c_str();
@@ -319,7 +413,7 @@ void CMainDlg::OnBnClickEmotion(IEvtArgs *e)
 	ClientToScreen2(&rc);
 
 	SMenuEx menuEmoji;
-	menuEmoji.LoadMenuU8("menuex:emoji");
+	menuEmoji.LoadMenuU8("smenuex:emoji");
 	m_pEmojiMenu = &menuEmoji;
 	menuEmoji.TrackPopupMenu(TPM_BOTTOMALIGN, rc.left, rc.top, m_hWnd, GetScale());
 	m_pEmojiMenu = nullptr;
@@ -337,7 +431,11 @@ void CMainDlg::OnBnClickFile()
 
 void CMainDlg::OnBnClickCapture()
 {
-	//
+#ifdef _WIN32
+	CSnapshotDlg dlg;
+	CWindowEnumer::EnumAllTopWindow();
+	dlg.DoModal(NULL);
+#endif//_WIN32
 }
 
 void CMainDlg::OnBnClickCaptureSetting()
@@ -386,6 +484,21 @@ void CMainDlg::OnMessageItemClick(int& nIndex)
 	{
 		pTitle->SetWindowText(S_CW2T(pData->m_sstrName));
 	}
+}
+
+void CMainDlg::ContactTVItemClick(int nGID, const std::string& strID)
+{
+	//根据GID、ID做处理
+}
+
+void CMainDlg::ContactTVItemDBClick(int nGID, const std::string& strID)
+{
+	//根据GID、ID做处理
+}
+
+void CMainDlg::ContactTVItemRClick(int nGID, const std::string& strID)
+{
+	//根据GID、ID做处理
 }
 
 LRESULT CMainDlg::OnMenuEvent(UINT msg, WPARAM wp, LPARAM lp) {

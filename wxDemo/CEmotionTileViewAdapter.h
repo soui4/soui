@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <vector>
 
 #include <helper/SAdapterBase.h>
@@ -94,5 +94,5 @@ public:
 private:
 	IListener* m_pListener;
 
-	std::vector<ItemData*>	m_vecItems;				// Êı¾İ
+	std::vector<ItemData*>	m_vecItems;				// æ•°æ®
 };

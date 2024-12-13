@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOUI title="截屏" 
+      width="1400" 
+      height="800" 
+      appWnd="0" 
+      wndType="normal" 
+      toolWindow="1" 
+      translucent="0">
+
+<root >
+	<SnapshotCtrl pos="0,0,-0,-0" name="snapshot" cursor="normal"/>
+</root>
+
+</SOUI>

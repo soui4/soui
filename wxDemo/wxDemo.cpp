@@ -8,7 +8,9 @@
 
 #define INIT_R_DATA
 #include "res/resource.h"
-
+#ifdef _WIN32
+#include "snapshot/SSnapshotCtrl.h"
+#endif//_WIN32
 #include <string>
 
 #ifdef _UNICODE
@@ -64,7 +66,11 @@ public:
 		BOOL bLoaded = TRUE;
 		do{
 			//使用SKIA渲染界面
-			bLoaded = m_ComMgr.CreateRender_GDI((IObjRef * *)& pRenderFactory);
+#ifdef _WIN32
+			bLoaded = m_ComMgr.CreateRender_Skia((IObjRef * *)& pRenderFactory);
+#else
+			bLoaded = m_ComMgr.CreateRender_GDI((IObjRef**)&pRenderFactory);
+#endif//_WIN32
 			SASSERT_FMT(bLoaded, _T("load interface [render] failed!"));
 			if(!bLoaded) break;
 			//设置图像解码引擎。默认为GDIP。基本主流图片都能解码。系统自带，无需其它库
@@ -148,6 +154,8 @@ public:
 	{
 		#ifdef _WIN32
 		m_theApp->RegisterWindowClass<SShellTray>();
+
+		m_theApp->RegisterWindowClass<SSnapshotCtrl>();//
 		#endif//_WIN32
 	}
 
@@ -166,6 +174,11 @@ public:
 	}
 };
 
+#ifdef _WIN32
+#define PATH_SLASH '\\'
+#else
+#define PATH_SLASH '/'
+#endif//_WIN32
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int /*nCmdShow*/)
 {
 	HRESULT hRes = OleInitialize(NULL);
@@ -175,13 +188,27 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 		SOUIEngine souiEngine;
 		if (souiEngine.Init(hInstance))
 		{
+			//获取AppPath
+			TCHAR szFilePath[MAX_PATH + 1];
+			GetModuleFileName(NULL, szFilePath, MAX_PATH);
+			(_tcsrchr(szFilePath, _T(PATH_SLASH)))[1] = 0;
+			SStringT sstrExePath = szFilePath;
+			sstrExePath += _T("emojis");
+			sstrExePath += _T(PATH_SLASH);
+			if (GetFileAttributes(sstrExePath) != INVALID_FILE_ATTRIBUTES)
+			{
+				CGlobalUnits::instance()->SetEmojiPath(sstrExePath);
+			}
+			else
+			{
 #ifdef _WIN32
-			SetCurrentDirectory(_T("D:\\work\\soui4.git\\wxDemo"));
+				CGlobalUnits::instance()->SetEmojiPath(_T("D:\\work\\soui4.git\\wxDemo\\emojis\\"));
 #else
-			std::string strDir = getSourceDir();
-			strDir += "/wxDemo";
-			SetCurrentDirectoryA(strDir.c_str());
+				std::string strDir = getSourceDir();
+				strDir += "/wxDemo/emojis/";
+				CGlobalUnits::instance()->SetEmojiPath(strDir.c_str());
 #endif//_WIN32
+			}
 			CGlobalUnits::instance()->OperateEmojis();
 
 			//加载系统资源

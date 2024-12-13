@@ -1,4 +1,4 @@
-﻿//stamp:146c490839cf5432
+﻿//stamp:1bd97bc37ad94cf6
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -16,6 +16,10 @@
 			const TCHAR * XML_PAGE_FILEHELPER;
 			const TCHAR * XML_PAGE_GROUPCOMM;
 			const TCHAR * XML_PAGE_PERSONALCOMM;
+			const TCHAR * XML_PAGE_GZH;
+			const TCHAR * XML_PAGE_DYH;
+			const TCHAR * XML_PAGE_NEWS;
+			const TCHAR * XML_DLG_SNAPSHOT;
 			}LAYOUT;
 		struct _values{
 			const TCHAR * string;
@@ -84,9 +88,9 @@
 		struct _SMENU{
 			const TCHAR * menu_tray;
 			}SMENU;
-		struct _smenuex{
+		struct _menuex{
 			const TCHAR * emoji;
-			}smenuex;
+			}menuex;
 	};
 #endif//_UIRES_H_
 #ifdef INIT_R_DATA
@@ -102,6 +106,10 @@ struct _UIRES UIRES={
 			_T("LAYOUT:XML_PAGE_FILEHELPER"),
 			_T("LAYOUT:XML_PAGE_GROUPCOMM"),
 			_T("LAYOUT:XML_PAGE_PERSONALCOMM"),
+			_T("LAYOUT:XML_PAGE_GZH"),
+			_T("LAYOUT:XML_PAGE_DYH"),
+			_T("LAYOUT:XML_PAGE_NEWS"),
+			_T("LAYOUT:XML_DLG_SNAPSHOT"),
 		},
 		{
 			_T("values:string"),
@@ -171,7 +179,7 @@ struct _UIRES UIRES={
 			_T("SMENU:menu_tray"),
 		},
 		{
-			_T("smenuex:emoji"),
+			_T("menuex:emoji"),
 		},
 	};
 #else
@@ -186,6 +194,8 @@ struct _R{
 		 const wchar_t * btn_audio_video;
 		 const wchar_t * btn_close;
 		 const wchar_t * btn_contact;
+		 const wchar_t * btn_contact_mgr;
+		 const wchar_t * btn_contact_search_cancel;
 		 const wchar_t * btn_emotion;
 		 const wchar_t * btn_favorites;
 		 const wchar_t * btn_file;
@@ -203,9 +213,12 @@ struct _R{
 		 const wchar_t * btn_snapshot;
 		 const wchar_t * btn_snapshot_arrow;
 		 const wchar_t * btn_video;
+		 const wchar_t * edit_contact_search;
 		 const wchar_t * edit_msg_search;
 		 const wchar_t * edit_recv;
 		 const wchar_t * edit_send;
+		 const wchar_t * face;
+		 const wchar_t * hr;
 		 const wchar_t * item_avatar;
 		 const wchar_t * item_content;
 		 const wchar_t * item_name;
@@ -213,15 +226,21 @@ struct _R{
 		 const wchar_t * item_time;
 		 const wchar_t * lv_message;
 		 const wchar_t * main_logo;
+		 const wchar_t * name;
+		 const wchar_t * snapshot;
+		 const wchar_t * tab_contact_search;
 		 const wchar_t * tab_main_opt;
 		 const wchar_t * tab_msg_comm;
 		 const wchar_t * text_talk_title;
+		 const wchar_t * tv_contact;
 	}name;
 	struct _id{
 		int btn_audio;
 		int btn_audio_video;
 		int btn_close;
 		int btn_contact;
+		int btn_contact_mgr;
+		int btn_contact_search_cancel;
 		int btn_emotion;
 		int btn_favorites;
 		int btn_file;
@@ -239,9 +258,12 @@ struct _R{
 		int btn_snapshot;
 		int btn_snapshot_arrow;
 		int btn_video;
+		int edit_contact_search;
 		int edit_msg_search;
 		int edit_recv;
 		int edit_send;
+		int face;
+		int hr;
 		int item_avatar;
 		int item_content;
 		int item_name;
@@ -249,9 +271,13 @@ struct _R{
 		int item_time;
 		int lv_message;
 		int main_logo;
+		int name;
+		int snapshot;
+		int tab_contact_search;
 		int tab_main_opt;
 		int tab_msg_comm;
 		int text_talk_title;
+		int tv_contact;
 	}id;
 	struct _color{
 		int blue;
@@ -274,6 +300,8 @@ struct _R R={
 		L"btn_audio_video",
 		L"btn_close",
 		L"btn_contact",
+		L"btn_contact_mgr",
+		L"btn_contact_search_cancel",
 		L"btn_emotion",
 		L"btn_favorites",
 		L"btn_file",
@@ -291,9 +319,12 @@ struct _R R={
 		L"btn_snapshot",
 		L"btn_snapshot_arrow",
 		L"btn_video",
+		L"edit_contact_search",
 		L"edit_msg_search",
 		L"edit_recv",
 		L"edit_send",
+		L"face",
+		L"hr",
 		L"item_avatar",
 		L"item_content",
 		L"item_name",
@@ -301,36 +332,45 @@ struct _R R={
 		L"item_time",
 		L"lv_message",
 		L"main_logo",
+		L"name",
+		L"snapshot",
+		L"tab_contact_search",
 		L"tab_main_opt",
 		L"tab_msg_comm",
-		L"text_talk_title"
+		L"text_talk_title",
+		L"tv_contact"
 	}
 	,
 	{
-		65568,
-		65567,
+		65576,
+		65575,
 		65541,
 		65538,
-		65558,
-		65539,
 		65560,
-		65563,
-		65559,
+		65558,
 		65566,
+		65539,
+		65568,
+		65571,
+		65567,
+		65574,
 		65542,
 		65545,
 		65537,
 		65544,
 		65548,
 		65543,
-		65565,
+		65573,
 		65546,
-		65561,
-		65562,
 		65569,
-		65547,
+		65570,
+		65577,
 		65557,
+		65547,
+		65565,
+		65572,
 		65564,
+		65562,
 		65550,
 		65552,
 		65551,
@@ -338,9 +378,13 @@ struct _R R={
 		65553,
 		65549,
 		65536,
+		65563,
+		65578,
+		65559,
 		65540,
 		65556,
-		65555
+		65555,
+		65561
 	}
 	,
 	{

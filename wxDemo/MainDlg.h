@@ -1,21 +1,33 @@
-// MainDlg.h : interface of the CMainDlg class
+﻿// MainDlg.h : interface of the CMainDlg class
 //
 /////////////////////////////////////////////////////////////////////////////
-#pragma once
+#ifndef _MAINDLG_H_
+#define _MAINDLG_H_
 
 #include <helper/SMenuEx.h>
-#include "CLvMessageAdapter.h"
 #include "CGlobalUnits.h"
 #include "CEmotionTileViewAdapter.h"
+#include "CLvMessageAdapter.h"
+#include "CTvContactAdapter.h"
+
+#ifdef _WIN32
+#include "snapshot/CWindowEnumer.h"
+#include "snapshot/CSnapshotDlg.h"
+#endif//_WIN32
+
 
 class CMainDlg : public SHostWnd
-	, public CLvMessageAdapter::IListener
+	, public CLvMessageAdapter::IListen
+	, public CTvContactAdapter::IListen
 	, public CEmotionTileViewAdapter::IListener
 {
 public:
 	virtual void OnMessageItemClick(int& nIndex);
 	virtual void OnEmotionItemClick(const std::string& strID);
 
+	virtual void ContactTVItemClick(int nGID, const std::string& strID);
+	virtual void ContactTVItemDBClick(int nGID, const std::string& strID);
+	virtual void ContactTVItemRClick(int nGID, const std::string& strID);
 public:
 	CMainDlg();
 	~CMainDlg();
@@ -39,6 +51,10 @@ public:
 	bool OnEditMessageSearchSetFocus(EventArgs* pEvt);
 	bool OnEditMessageSearchKillFocus(EventArgs* pEvt);
 	bool OnEditMessageSearchChanged(EventArgs* e);
+
+	bool OnEditContactSearchSetFocus(EventArgs* pEvt);
+	bool OnEditContactSearchKillFocus(EventArgs* pEvt);
+	bool OnEditContactSearchChanged(EventArgs* e);
 
 	void OnBnClickEmotion(IEvtArgs *e);
 	void OnBnClickImage();
@@ -70,7 +86,7 @@ protected:
 
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventSetFocus::EventID, OnEditMessageSearchSetFocus)
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventKillFocus::EventID, OnEditMessageSearchKillFocus)
-		EVENT_NAME_HANDLER(L"edit_msg_search", EventRENotify::EventID, OnEditMessageSearchChanged)
+		EVENT_NAME_HANDLER(L"edit_msg_search", EventRENotify::EventID, OnEditContactSearchChanged)
 
 		EVENT_NAME_HANDLER(L"btn_emotion",EventCmd::EventID, OnBnClickEmotion)
 		EVENT_NAME_COMMAND(L"btn_image", OnBnClickImage)
@@ -82,6 +98,10 @@ protected:
 		EVENT_NAME_COMMAND(L"btn_video", OnBnClickVideo)
 		EVENT_NAME_COMMAND(L"btn_live", OnBnClickLive)
 		EVENT_NAME_COMMAND(L"btn_audio_video", OnBnClickAudioVideo)
+
+		EVENT_NAME_HANDLER(L"edit_contact_search", EventSetFocus::EventID, OnEditContactSearchSetFocus)
+		EVENT_NAME_HANDLER(L"edit_contact_search", EventKillFocus::EventID, OnEditContactSearchKillFocus)
+		EVENT_NAME_HANDLER(L"edit_contact_search", EventRENotify::EventID, OnEditMessageSearchChanged)
 	EVENT_MAP_END2(SHostWnd)
 		
 	LRESULT OnMenuEvent(UINT msg, WPARAM wp, LPARAM lp);
@@ -103,5 +123,9 @@ protected:
 
 private:
 	CLvMessageAdapter* m_pMessageAdapter;
+	CTvContactAdapter* m_pContactAdapter;
 	SMenuEx* m_pEmojiMenu;
 };
+
+
+#endif//_MAINDLG_H_
