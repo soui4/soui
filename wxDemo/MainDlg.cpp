@@ -224,8 +224,8 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		SStringW sstrName;
         sstrName.Format(L"%d公众号名", i);
         std::string strAvatar = "";
-        std::string strID = S_CW2A(sstrID);
-        std::string strName = S_CW2A(sstrName);
+        std::string strID = S_CW2A(sstrID).c_str();
+        std::string strName = S_CW2A(sstrName).c_str();
 		m_pGZHTileViewAdapter->AddItem(strID, strName, strAvatar);
 	}
 

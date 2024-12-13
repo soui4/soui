@@ -50,7 +50,7 @@ protected:
         SASSERT(pImg);
         if (pItemData->m_strAvatar == "")
 		{
-            pImg->SetAttribute(_T("skin"), _T("skin_default_gzh32"));
+            pImg->SetAttribute(L"skin", L"skin_default_gzh32");
 		}
 
 		SStatic *pName = pItem->FindChildByName2<SStatic>(L"item_name");
