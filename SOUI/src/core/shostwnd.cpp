@@ -361,12 +361,14 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
         return m_hWnd;
     UpdateAutoSizeCount(true);
     SXmlDoc xmlDoc;
+    SXmlNode xmlRoot;
     if (!xmlInit)
     {
         if (!OnLoadLayoutFromResourceID(xmlDoc)) {
             SSLOGW() << "OnLoadLayoutFromResourceID return FALSE";
         }
-        xmlInit = &xmlDoc.root().first_child();
+        xmlRoot = xmlDoc.root().first_child();
+        xmlInit = &xmlRoot;
     }
     m_hostAttr.Init();
     m_hostAttr.InitFromXml(xmlInit);

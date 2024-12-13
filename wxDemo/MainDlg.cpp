@@ -4,6 +4,9 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"	
+#include "DropTargetImpl.h"
+#include <atl.mini/SComCli.h>
+
 #define kLogTag "wxdemo"
 
 CMainDlg::CMainDlg() : SHostWnd(_T("LAYOUT:XML_MAINWND")), m_pEmojiMenu(NULL)
@@ -48,8 +51,14 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
 		SStringW sstrPage;
 		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_FILEHELPER'/></page>", sstrID);
-		pTabMessageComm->InsertItem(sstrPage);
-
+		int iPage = pTabMessageComm->InsertItem(sstrPage);
+		SWindow* pPage = static_cast<SWindow*>(pTabMessageComm->GetPage(iPage));
+		SEdit* pInputEdit = pPage->FindChildByName2<SEdit>("edit_send");
+		if (pInputEdit) {
+			HRESULT hr = ::RegisterDragDrop(m_hWnd, GetDropTarget());
+			SComPtr<IDropTarget> dropTarget(new CEditDropTarget(pInputEdit),FALSE);
+			RegisterDragDrop(pInputEdit->GetSwnd(), dropTarget);
+		}
 		SStringW sstrAvatar = L"";
 		SStringW sstrName = L"文件传输助手";
 		SStringW sstrContent = L"测试1231241231231231123124123123123123122312";

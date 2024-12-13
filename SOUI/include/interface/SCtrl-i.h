@@ -14,10 +14,15 @@
 #include <SGuidDef.h>
 SNSBEGIN
 
+// {BCB520F9-3C81-4AD7-AD E2-FE72BD761032}
+DEFINE_SGUID(IID_ICtrl,
+    0xBCB520F9, 0x3C81, 0x4AD7, 0xAD, 0xe2, 0xFE, 0x72, 0xBD, 0x76, 0x10, 0x32);
 #undef INTERFACE
 #define INTERFACE ICtrl
 DECLARE_INTERFACE_(ICtrl, IObjRef)
 {
+    DECLARE_CLASS_SIID(IID_ICtrl)
+
     /**
      * @brief 增加引用计数
      * @return 新引用计数
