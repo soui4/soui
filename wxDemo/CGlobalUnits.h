@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "apppublic.h"
 #include <map>
 
@@ -30,7 +30,7 @@ public:
 	std::string GenerateUUID();
 	void OperateEmojis();
 
-	void GenerateShamDate();		//´¦Àí¼ÙÊı¾İ
+	void GenerateShamDate();		//å¤„ç†å‡æ•°æ®
 };
 
 #define GlobalUnits  CGlobalUnits::instance();

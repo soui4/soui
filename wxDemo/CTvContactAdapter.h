@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "CGlobalUnits.h"
 #include <helper/SAdapterBase.h>
 
@@ -6,9 +6,9 @@ struct TreeItemData
 {
 	TreeItemData() :bGroup(false) {}
 	std::string strID;
-	INT32 gid;			//ÓÃ»§µÄ×éID
-	SStringT strImg;	//ÓÃ»§Í¼Ïñ
-	SStringT strName;	//ÓÃ»§Ãû
+	INT32 gid;			//ç”¨æˆ·çš„ç»„ID
+	SStringT strImg;	//ç”¨æˆ·å›¾åƒ
+	SStringT strName;	//ç”¨æˆ·å
 	bool bGroup;
 
 };
@@ -30,35 +30,35 @@ public:
 
 		{
 			TreeItemData data;
-			data.strName = L"ÐÂµÄÅóÓÑ";
+			data.strName = L"æ–°çš„æœ‹å‹";
 			data.gid = 1;
 			data.bGroup = true;
 			HSTREEITEM hRoot = InsertItem(data);
 			SetItemExpanded(hRoot, TRUE);
 			data.bGroup = FALSE;
 			data.strID = "new_friends";
-			data.strName = L"ÐÂµÄÅóÓÑ";
+			data.strName = L"æ–°çš„æœ‹å‹";
 			data.strImg = L"skin_default_personal32";
 			InsertItem(data, hRoot);
 		}
 
 		{
 			TreeItemData data1;
-			data1.strName = L"¹«ÖÚºÅ";
+			data1.strName = L"å…¬ä¼—å·";
 			data1.gid = 2;
 			data1.bGroup = true;
 			HSTREEITEM hRoot1 = InsertItem(data1);
 			SetItemExpanded(hRoot1, TRUE);
 			data1.bGroup = false;
 			data1.strID = "page_gzh";
-			data1.strName = L"¹«ÖÚºÅ²âÊÔ";
+			data1.strName = L"å…¬ä¼—å·æµ‹è¯•";
 			data1.strImg = L"skin_default_gzh32";
 			InsertItem(data1, hRoot1);
 		}
 
 		{
 			TreeItemData data2;
-			data2.strName = L"¶©ÔÄºÅ";
+			data2.strName = L"è®¢é˜…å·";
 			data2.gid = 3;
 			data2.bGroup = TRUE;
 			HSTREEITEM hRoot2 = InsertItem(data2);
@@ -66,14 +66,14 @@ public:
 
 			data2.bGroup = false;
 			data2.strID = "page_dyh";
-			data2.strName = L"¶©ÔÄºÅ²âÊÔ";
+			data2.strName = L"è®¢é˜…å·æµ‹è¯•";
 			data2.strImg = L"skin_default_dyh32";
 			InsertItem(data2, hRoot2);
 		}
 
 		{
 			TreeItemData data3;
-			data3.strName = L"ÈºÁÄ";
+			data3.strName = L"ç¾¤èŠ";
 			data3.gid = 4;
 			data3.bGroup = TRUE;
 			HSTREEITEM hRoot3 = InsertItem(data3);
@@ -91,9 +91,9 @@ public:
 			}
 		}
 
-		{//´Ë´¦¿É¸ù¾ÝÓÃ»§ÃûÊ××Ö·û×ö·ÖÀà´¦Àí
+		{//æ­¤å¤„å¯æ ¹æ®ç”¨æˆ·åé¦–å­—ç¬¦åšåˆ†ç±»å¤„ç†
 			TreeItemData data4;
-			data4.strName = L"ºÃÓÑ";
+			data4.strName = L"å¥½å‹";
 			data4.gid = 5;
 			data4.bGroup = TRUE;
 			HSTREEITEM hRoot4 = InsertItem(data4);
@@ -131,14 +131,14 @@ public:
 			}
 			pItem->InitFromXml(&xmlTemplate);
 			if (itemType == 0)
-			{//²»ÈÃµã	
+			{//ä¸è®©ç‚¹	
 				pItem->GetEventSet()->setMutedState(true);
 			}
 		}
 
 		if (itemType == 1)
 		{
-			//¹ØÁªÊÂ¼þ
+			//å…³è”äº‹ä»¶
 			pItem->GetEventSet()->subscribeEvent(EVT_ITEMPANEL_CLICK,
 				Subscriber(&CTvContactAdapter::OnItemPanelClick, this));
 			pItem->GetEventSet()->subscribeEvent(EVT_ITEMPANEL_DBCLICK,
@@ -146,7 +146,7 @@ public:
 			pItem->GetEventSet()->subscribeEvent(EVT_ITEMPANEL_RCLICK,
 				Subscriber(&CTvContactAdapter::OnItemPanelRClick, this));
 
-			//ÉèÖÃÖµ
+			//è®¾ç½®å€¼
 			SStatic* pName = pItem->FindChildByName2<SStatic>(L"name");
 			SASSERT(pName);
 			pName->SetWindowText(ii.data.strName);

@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 #include <helper/SAdapterBase.h>
 #include <vector>
 
@@ -29,7 +29,7 @@ protected:
 			return true;
 
 		pEvt->bubbleUp = false;
-		if (-1 == pEvt->iNewSel)				// ≤ªƒ‹…Ë÷√ -1 
+		if (-1 == pEvt->iNewSel)				// ‰∏çËÉΩËÆæÁΩÆ -1 
 			pEvt->bCancel = TRUE;
 
 		return TRUE;
@@ -153,7 +153,7 @@ public:
 		pContent->SetWindowTextW(pItemData->m_sstrContent);
 
 		//time
-		//∏˘æ›∂®“Âµƒ ±º‰¿‡–Õ¥¶¿Ì’π æ£¨»Áπ˚ « ±º‰¥¡‘Ú–Ë“™¥¶¿Ì£¨»Áπ˚ «Œƒ±æ‘Ú÷±Ω”’π æ
+		//Ê†πÊçÆÂÆö‰πâÁöÑÊó∂Èó¥Á±ªÂûãÂ§ÑÁêÜÂ±ïÁ§∫ÔºåÂ¶ÇÊûúÊòØÊó∂Èó¥Êà≥ÂàôÈúÄË¶ÅÂ§ÑÁêÜÔºåÂ¶ÇÊûúÊòØÊñáÊú¨ÂàôÁõ¥Êé•Â±ïÁ§∫
 		SStatic* pTime = pItem->FindChildByName2<SStatic>(L"item_time");
 		SASSERT(pTime);
 		pTime->SetWindowTextW(pItemData->m_sstrTime);
@@ -163,12 +163,12 @@ public:
 		SASSERT(pReminder);
 		if (pItemData->m_bReminder) 
 		{
-			//’π æ
+			//Â±ïÁ§∫
 			pReminder->SetAttribute(L"show", L"1");
 		}
 		else
 		{
-			//≤ª’π æ
+			//‰∏çÂ±ïÁ§∫
 			pReminder->SetAttribute(L"show", L"0");
 		}
 	}
@@ -206,7 +206,7 @@ public:
 	}
 
 private:
-	std::vector<ItemData*>				m_vecItemDatas;				//  ˝æ› 
+	std::vector<ItemData*>				m_vecItemDatas;				// Êï∞ÊçÆ 
 
 	SListView* m_pOwner;
 	IListen* m_pListen;
