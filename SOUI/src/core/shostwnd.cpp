@@ -355,24 +355,27 @@ SHostWnd::~SHostWnd()
     SApplication::getSingletonPtr()->Release();
 }
 
-HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)
+HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight,IXmlNode *xmlInit)
 {
     if (NULL != m_hWnd)
         return m_hWnd;
     UpdateAutoSizeCount(true);
     SXmlDoc xmlDoc;
-    if (!OnLoadLayoutFromResourceID(xmlDoc)) {
-        SSLOGW() << "OnLoadLayoutFromResourceID return FALSE";
+    if (!xmlInit)
+    {
+        if (!OnLoadLayoutFromResourceID(xmlDoc)) {
+            SSLOGW() << "OnLoadLayoutFromResourceID return FALSE";
+        }
+        xmlInit = &xmlDoc.root().first_child();
     }
-    SXmlNode xmlRoot = xmlDoc.root().first_child();
     m_hostAttr.Init();
-    m_hostAttr.InitFromXml(&xmlRoot);
+    m_hostAttr.InitFromXml(xmlInit);
 #ifndef _WIN32
     if (m_hostAttr.m_bTranslucent) {
         dwExStyle |= WS_EX_COMPOSITED;
     }
 #endif//_WIN32
-    HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0, (IXmlNode*)&xmlRoot);
+    HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0, xmlInit);
     UpdateAutoSizeCount(false);
     if (!hWnd)
         return NULL;

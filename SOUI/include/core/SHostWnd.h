@@ -271,7 +271,7 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) OVERRIDE;
 
     STDMETHOD_(HWND, CreateEx)
-    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) OVERRIDE;
+    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, IXmlNode* xmlInit DEF_VAL(NULL)) OVERRIDE;
     STDMETHOD_(HWND, Create)
     (THIS_ HWND hWndParent, int x = 0, int y = 0, int nWidth = 0, int nHeight = 0) OVERRIDE;
 

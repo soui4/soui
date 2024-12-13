@@ -50,10 +50,11 @@ DECLARE_INTERFACE_(IHostWnd, IObjRef)
      * @param y
      * @param nWidth
      * @param nHeight
+     * @param xmlInit init xml node
      * @return HWND
      */
     STDMETHOD_(HWND, CreateEx)
-    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) PURE;
+    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, IXmlNode * xmlInit DEF_VAL(NULL)) PURE;
 
     /**
      * @brief 创建窗口
@@ -232,10 +233,11 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      * @param y
      * @param nWidth
      * @param nHeight
+     * @param xmlInit init xml node
      * @return HWND
      */
     STDMETHOD_(HWND, CreateEx)
-    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) PURE;
+    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, IXmlNode * xmlInit DEF_VAL(NULL)) PURE;
 
     /**
      * @brief 创建窗口

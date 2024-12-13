@@ -37,9 +37,9 @@ public:
 	}
 
 	STDMETHOD_(HWND, CreateEx)
-		(THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)
+		(THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight,IXmlNode *initXml)
 	{
-		return SHostWnd::CreateEx(hWndParent, dwStyle, dwExStyle, x, y, nWidth, nHeight);
+		return SHostWnd::CreateEx(hWndParent, dwStyle, dwExStyle, x, y, nWidth, nHeight, initXml);
 	}
 	STDMETHOD_(HWND, Create)
 		(THIS_ HWND hWndParent, int x = 0, int y = 0, int nWidth = 0, int nHeight = 0)

@@ -597,12 +597,6 @@ BOOL SMenuEx::LoadMenuU8(THIS_ LPCSTR resId)
 
 BOOL SMenuEx::OnLoadLayoutFromResourceID(SXmlDoc& souiXml)
 {
-    SXmlNode root = souiXml.root().append_child(L"SOUI");
-    root.append_attribute(L"translucent").set_value(1);
-    if (m_pParent == NULL)
-    {
-        //root.append_attribute(L"trCtx").set_value(xmlNode.attribute(L"trCtx").value());
-    }
     return TRUE;
 }
 
@@ -613,8 +607,15 @@ BOOL SMenuEx::LoadMenu2(IXmlNode *xmlMenu)
     SXmlNode xmlNode(xmlMenu);
     if (xmlNode.name() != SStringW(SMenuExRoot::GetClassName()) && xmlNode.name() != SStringW(SMenuExItem::GetClassName()))
         return FALSE;
+    SXmlDoc souiXml;
+    SXmlNode root = souiXml.root().append_child(L"SOUI");
+    root.append_attribute(L"translucent").set_value(1);
+    if (m_pParent == NULL)
+    {
+        root.append_attribute(L"trCtx").set_value(xmlNode.attribute(L"trCtx").value());
+    }
 
-    HWND hWnd = CreateEx(NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0, 0, 0, 0);
+    HWND hWnd = CreateEx(NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0, 0, 0, 0,&root);
     if (!hWnd)
         return FALSE;
 
