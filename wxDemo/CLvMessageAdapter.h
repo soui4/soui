@@ -1,4 +1,4 @@
-Ôªø#pragma once
+#pragma once
 #include <helper/SAdapterBase.h>
 #include <vector>
 
@@ -17,7 +17,7 @@ public:
 		bool	 m_bReminder;
 	};
 
-	struct IListener
+	struct IListen
 	{
 		virtual void OnMessageItemClick(int& nIndex) = 0;
 	};
@@ -29,7 +29,7 @@ protected:
 			return true;
 
 		pEvt->bubbleUp = false;
-		if (-1 == pEvt->iNewSel)				// ‰∏çËÉΩËÆæÁΩÆ -1 
+		if (-1 == pEvt->iNewSel)				// ≤ªƒ‹…Ë÷√ -1 
 			pEvt->bCancel = TRUE;
 
 		return TRUE;
@@ -51,7 +51,7 @@ protected:
 	}
 
 public:
-	CLvMessageAdapter(SListView* pOwner, IListener* pListen)
+	CLvMessageAdapter(SListView* pOwner, IListen* pListen)
 	{
 		m_pOwner = pOwner;
 		SASSERT(m_pOwner);
@@ -145,30 +145,30 @@ public:
 		//name
 		SStatic* pName = pItem->FindChildByName2<SStatic>(L"item_name");
 		SASSERT(pName);
-		pName->SetWindowText(S_CW2T(pItemData->m_sstrName));
+		pName->SetWindowTextW(pItemData->m_sstrName);
 
 		//content
 		SStatic* pContent = pItem->FindChildByName2<SStatic>(L"item_content");
 		SASSERT(pContent);
-		pContent->SetWindowText(S_CW2T(pItemData->m_sstrContent));
+		pContent->SetWindowTextW(pItemData->m_sstrContent);
 
 		//time
-		//Ê†πÊçÆÂÆö‰πâÁöÑÊó∂Èó¥Á±ªÂûãÂ§ÑÁêÜÂ±ïÁ§∫ÔºåÂ¶ÇÊûúÊòØÊó∂Èó¥Êà≥ÂàôÈúÄË¶ÅÂ§ÑÁêÜÔºåÂ¶ÇÊûúÊòØÊñáÊú¨ÂàôÁõ¥Êé•Â±ïÁ§∫
+		//∏˘æ›∂®“Âµƒ ±º‰¿‡–Õ¥¶¿Ì’π æ£¨»Áπ˚ « ±º‰¥¡‘Ú–Ë“™¥¶¿Ì£¨»Áπ˚ «Œƒ±æ‘Ú÷±Ω”’π æ
 		SStatic* pTime = pItem->FindChildByName2<SStatic>(L"item_time");
 		SASSERT(pTime);
-		pTime->SetWindowText(S_CW2T(pItemData->m_sstrTime));
+		pTime->SetWindowTextW(pItemData->m_sstrTime);
 
 		//reminder
 		SImageWnd* pReminder = pItem->FindChildByName2<SImageWnd>(L"item_reminder");
 		SASSERT(pReminder);
 		if (pItemData->m_bReminder) 
 		{
-			//Â±ïÁ§∫
+			//’π æ
 			pReminder->SetAttribute(L"show", L"1");
 		}
 		else
 		{
-			//‰∏çÂ±ïÁ§∫
+			//≤ª’π æ
 			pReminder->SetAttribute(L"show", L"0");
 		}
 	}
@@ -206,9 +206,9 @@ public:
 	}
 
 private:
-	std::vector<ItemData*>				m_vecItemDatas;				// Êï∞ÊçÆ 
+	std::vector<ItemData*>				m_vecItemDatas;				//  ˝æ› 
 
 	SListView* m_pOwner;
-	IListener* m_pListen;
+	IListen* m_pListen;
 };
 

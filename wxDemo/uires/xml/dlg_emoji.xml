@@ -1,0 +1,21 @@
+﻿<?xml version="1.0"?>
+<SOUI name="emoji"
+      width="300"
+      height="250"
+      toolWindow="1"
+      wndType="normal"
+      translucent="1"
+      sendWheel2Hover="1"
+      alpha="255">
+  <root cache="1">
+    <window pos="0,0,-0,-0" skin="skin_shadow">
+      <window pos="5,5,-5,-5" colorBkgnd="#ffffff">
+        <tileview pos="5,5,-5,-5" name="emoji_titleview" wantTab="1" marginSize="2" colorBkgnd="#FFFFFF" sbskin="skin_scrollbar" sbWid="8">
+          <template itemHeight="20" itemWidth="20" colorHover="#cccccc" colorSelected="#FFFFFF" trackMouseEvent="1">
+            <img name="emotion" pos="|0,0" offset="-0.5,0" cursor="hand"/>
+          </template>
+        </tileview>
+      </window>
+    </window>
+  </root>
+</SOUI>

@@ -3,15 +3,71 @@
 	<caption pos="0,0,-0,-0">
 		<imgbtn name="btn_close" skin="skin_common_close"    pos="-30,0" tip="关闭" animate="1" cursor="hand"/>
 		<imgbtn name="btn_max" skin="skin_common_max"  pos="-60,0" tip="最大化" animate="1" cursor="hand"/>
-		<imgbtn name="btn_restore" skin="skin_common_restore"  pos="-60,0" show="0" tip="还原" animate="1" cursor="hand"/>
+		<imgbtn name="btn_restore" skin="skin_common_restore"  pos="-60,0" show="0" tip="向下还原" animate="1" cursor="hand"/>
 		<imgbtn name="btn_min" skin="skin_common_min" pos="-90,0" animate="1" tip="最小化" cursor="hand"/>
 		<imgbtn name="btn_menu" skin="skin_btn_menu" pos="-120,0" animate="1" tip="更改语言" cursor="hand"/>
 		<imgbtn name="btn_skin" skin="skin_btn_skin" pos="-150,0" animate="1" tip="更改皮肤" cursor="hand"/>
 
-		<caption pos="0,0,@160,-0" colorBkgnd="rgb(0,238,0)">
+		<caption pos="0,0,@250,-0" colorBkgnd="#F7F7F7">
+			<edit name="edit_contact_search"
+				  pos="10,10,-10,@28"
+				  colorBkgnd="rgb(220,224,228)"
+				  align="left"
+				  valign="center"
+				  inset="20,0,25,0"
+				  notifyChange="1"
+				  font="face:微软雅黑,size:12"
+				  autoWordSel="0"
+				  colorText="#000000"
+				  cueColor="rgb(100,100,100)"
+				  cueText="搜索" />
+			<imgbtn pos="[-20,{8" name="btn_contact_search_cancel" show="0" skin="skin_search_cancel" />
+			<img pos="12,16" skin="skin_search"></img>
+			<caption pos="0,48,-0,-0" colorBkgnd="##E5E5E7">
+				<!--两页 通讯录&搜索-->
+				<tabctrl pos="0,0,-0,-0" name="tab_contact_search" tabHeight="0">
+					<page title="page_contact_contact">
+						<!--
+						<scrollview pos="0,0,-0,-0" viewSize="-2,-1" sbSkin="skin_scrollbar" sbwid="8" >
+							<imgbtn name="btn_contact_mgr" pos="10,10,-10,@40" skin="skin_send" font="face:微软雅黑,size:12" text="通讯录管理" align="center" valign="center" cursor="hand"/>
 
+							<treeview pos="0,[0" size="-2,-1" name="tv_contact" indent="0">
+								<template >
+									<item_group focusable="0" layout="vbox" colorSelected="#00000000" size="250,30" margin="0,0,0,1" colorBorder="@color/color_line">
+										<hr name="hr" height="1" width="-2" colorLine="#c9c7c6"/>
+										<text extend_left="12" weight="1" size="-2,0" align="bottom" name="name" text="新朋友" font="face:微软雅黑,size:12" colorText="#E5A8A8"/>
+									</item_group>
+									<item_data size="250,60" layout="hbox" gravity="center" colorHover="#dddbda" colorSelected="#c9c7c6">
+										<img extend_left="12" name="face" skin="skin_default_personal32"/>
+										<text extend_left="12" name="name" text="新朋友" font="face:微软雅黑,size:18"/>
+									</item_data>
+								</template>
+							</treeview>
+						</scrollview>
+						-->
+						
+						<imgbtn name="btn_contact_mgr" pos="10,10,-10,@40" skin="skin_send" font="face:微软雅黑,size:12" text="通讯录管理" align="center" valign="center" cursor="hand"/>
+						
+						<treeview pos="0,[10,-0,-0" name="tv_contact" indent="0" sbSkin="skin_scrollbar" sbwid="8">
+							<template >
+								<item_group focusable="0" layout="vbox" colorSelected="#00000000" size="240,30" margin="0,0,0,1" colorBorder="@color/color_line">
+									<hr name="hr" height="1" width="-2" colorLine="#c9c7c6"/>
+									<text extend_left="12" weight="1" size="-2,0" align="bottom" name="name" text="新朋友" font="face:微软雅黑,size:12" colorText="#E5A8A8"/>
+								</item_group>
+								<item_data size="240,60" layout="hbox" gravity="center" colorHover="#dddbda" colorSelected="#c9c7c6">
+									<img extend_left="12" name="face" skin="skin_default_personal32"/>
+									<text extend_left="12" name="name" text="新朋友" font="face:微软雅黑,size:16" dotted="1"/>
+								</item_data>
+							</template>
+						</treeview>
+					</page>
+					<page title="page_contact_search">
+
+					</page>
+				</tabctrl>
+			</caption>
 		</caption>
-		<caption pos="[0,50,-0,-0" colorBkgnd="rgb(230,0,238)">
+		<caption pos="[0,50,-0,-0" >
 
 		</caption>
 	</caption>

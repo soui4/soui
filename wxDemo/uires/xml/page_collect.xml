@@ -3,7 +3,7 @@
 	<caption pos="0,0,-0,-0">
 		<imgbtn name="btn_close" skin="skin_common_close"    pos="-30,0" tip="关闭" animate="1" cursor="hand"/>
 		<imgbtn name="btn_max" skin="skin_common_max"  pos="-60,0" tip="最大化" animate="1" cursor="hand"/>
-		<imgbtn name="btn_restore" skin="skin_common_restore"  pos="-60,0" show="0" tip="还原" animate="1" cursor="hand"/>
+		<imgbtn name="btn_restore" skin="skin_common_restore"  pos="-60,0" show="0" tip="向下还原" animate="1" cursor="hand"/>
 		<imgbtn name="btn_min" skin="skin_common_min" pos="-90,0" animate="1" tip="最小化" cursor="hand"/>
 		<imgbtn name="btn_menu" skin="skin_btn_menu" pos="-120,0" animate="1" tip="更改语言" cursor="hand"/>
 		<imgbtn name="btn_skin" skin="skin_btn_skin" pos="-150,0" animate="1" tip="更改皮肤" cursor="hand"/>
