@@ -184,6 +184,34 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 	pTreeView->SetAdapter(m_pContactAdapter);
 	m_pContactAdapter->Release();
 
+	//通讯录-新朋友适配器设置
+    STabCtrl *pTabContactInfo = (STabCtrl *)pPageContact->FindIChildByName(L"tab_contact_info");
+    SASSERT(pTabContactInfo);
+    SListView * pLvNewFriend = (SListView*)pTabContactInfo->GetPage(pTabContactInfo->GetPageIndex(_T("page_newfriend"), TRUE))->FindIChildByName(L"lv_newfrined");
+    pLvNewFriend->EnableScrollBar(SSB_HORZ, FALSE);
+	m_pNewFriendAdapter = new CLvNewFriendAdapter(pLvNewFriend, this);
+    pLvNewFriend->SetAdapter(m_pNewFriendAdapter);
+    m_pNewFriendAdapter->Release();
+
+	for (int i = 0; i < 20; i++)
+	{
+        SStringW sstrID;
+        sstrID.Format(L"%d", i);
+        SStringW sstrAvatar = L"";
+        SStringW sstrName;
+        sstrName.Format(L"新朋友测试%d", i);
+        SStringW sstrMessage;
+        sstrMessage.Format(L"新朋友%d 验证消息测试", i);
+		int nState = 0;
+        if (i == 0)
+            nState = 2;
+        else
+            nState = i % 2;
+
+        m_pNewFriendAdapter->AddItem(sstrID, sstrAvatar, sstrName, sstrMessage, nState);
+	}
+
+
 	return 0;
 }
 
@@ -498,6 +526,64 @@ void CMainDlg::OnMessageItemClick(int& nIndex)
 void CMainDlg::ContactTVItemClick(int nGID, const std::string& strID)
 {
 	//根据GID、ID做处理
+    STabCtrl *pMainOptTab = FindChildByName2<STabCtrl>(L"tab_main_opt");
+    IWindow *pPageContact = pMainOptTab->GetPage(1);
+    STabCtrl *pContactInfoTab = (STabCtrl *)pPageContact->FindIChildByName(L"tab_contact_info");
+
+    SStatic *pTitle = (SStatic *)pPageContact->FindIChildByName(L"text_contact_title");
+    SASSERT(pTitle);
+    switch (nGID)
+    {
+    case 1:
+    {
+        //新的朋友
+        pTitle->SetWindowText(_T("新的朋友"));
+        pContactInfoTab->SetCurSel(pContactInfoTab->GetPageIndex(_T("page_newfriend"), TRUE));
+    }
+    break;
+    case 2:
+    {
+        //公众号
+        pTitle->SetWindowText(_T("公众号"));
+        pContactInfoTab->SetCurSel(pContactInfoTab->GetPageIndex(_T("page_gzh"), TRUE));
+    }
+    break;
+    case 3:
+    {
+        //订阅号
+        pTitle->SetWindowText(_T("订阅号"));
+        pContactInfoTab->SetCurSel(pContactInfoTab->GetPageIndex(_T("page_dyh"), TRUE));
+    }
+    break;
+    case 4:
+    {
+        //群聊
+        GroupsMap::iterator iter = CGlobalUnits::instance()->m_mapGroups.find(strID);
+        if (iter != CGlobalUnits::instance()->m_mapGroups.end())
+        {
+            std::string strName = iter->second.m_strGroupName;
+            pTitle->SetWindowText(S_CA2T(strName.c_str()));
+
+            pContactInfoTab->SetCurSel(pContactInfoTab->GetPageIndex(_T("page_group"), TRUE));
+        }
+    }
+    break;
+    case 5:
+    {
+        //好友
+		PersonalsMap::iterator iter = CGlobalUnits::instance()->m_mapPersonals.find(strID);
+        if (iter != CGlobalUnits::instance()->m_mapPersonals.end())
+        {
+            std::string strName = iter->second.m_strName;
+            pTitle->SetWindowText(S_CA2T(strName.c_str()));
+
+            pContactInfoTab->SetCurSel(pContactInfoTab->GetPageIndex(_T("page_personal"), TRUE));
+        }
+    }
+    break;
+    default:
+        break;
+    }
 }
 
 void CMainDlg::ContactTVItemDBClick(int nGID, const std::string& strID)
