@@ -10,6 +10,8 @@
 #include "CLvMessageAdapter.h"
 #include "CTvContactAdapter.h"
 
+#include "CLvNewFriendAdapter.h"
+
 #ifdef _WIN32
 #include "snapshot/CWindowEnumer.h"
 #include "snapshot/CSnapshotDlg.h"
@@ -19,6 +21,7 @@
 class CMainDlg : public SHostWnd
 	, public CLvMessageAdapter::IListen
 	, public CTvContactAdapter::IListen
+    , public CLvNewFriendAdapter::IListen
 	, public CEmotionTileViewAdapter::IListener
 {
 public:
@@ -124,6 +127,9 @@ protected:
 private:
 	CLvMessageAdapter* m_pMessageAdapter;
 	CTvContactAdapter* m_pContactAdapter;
+
+	CLvNewFriendAdapter* m_pNewFriendAdapter;
+
 	SMenuEx* m_pEmojiMenu;
 };
 
