@@ -3,18 +3,18 @@
 /////////////////////////////////////////////////////////////////////////////
 #pragma once
 
+#include <helper/SMenuEx.h>
 #include "CLvMessageAdapter.h"
 #include "CGlobalUnits.h"
-
-#include "EmojiDlg.h"
+#include "CEmotionTileViewAdapter.h"
 
 class CMainDlg : public SHostWnd
-	, public CLvMessageAdapter::IListen
-	, public CEmojiDlg::IListener
+	, public CLvMessageAdapter::IListener
+	, public CEmotionTileViewAdapter::IListener
 {
 public:
 	virtual void OnMessageItemClick(int& nIndex);
-	virtual void EmotionTileViewItemClick(const std::string& strID);
+	virtual void OnEmotionItemClick(const std::string& strID);
 
 public:
 	CMainDlg();
@@ -40,7 +40,7 @@ public:
 	bool OnEditMessageSearchKillFocus(EventArgs* pEvt);
 	bool OnEditMessageSearchChanged(EventArgs* e);
 
-	void OnBnClickEmotion();
+	void OnBnClickEmotion(IEvtArgs *e);
 	void OnBnClickImage();
 	void OnBnClickFile();
 	void OnBnClickCapture();
@@ -72,7 +72,7 @@ protected:
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventKillFocus::EventID, OnEditMessageSearchKillFocus)
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventRENotify::EventID, OnEditMessageSearchChanged)
 
-		EVENT_NAME_COMMAND(L"btn_emotion", OnBnClickEmotion)
+		EVENT_NAME_HANDLER(L"btn_emotion",EventCmd::EventID, OnBnClickEmotion)
 		EVENT_NAME_COMMAND(L"btn_image", OnBnClickImage)
 		EVENT_NAME_COMMAND(L"btn_file", OnBnClickFile)
 		EVENT_NAME_COMMAND(L"btn_snapshot", OnBnClickCapture)
@@ -84,6 +84,9 @@ protected:
 		EVENT_NAME_COMMAND(L"btn_audio_video", OnBnClickAudioVideo)
 	EVENT_MAP_END2(SHostWnd)
 		
+	LRESULT OnMenuEvent(UINT msg, WPARAM wp, LPARAM lp);
+	void OnInitEmojiMenu(IMenuEx* menuPopup, UINT nIndex);
+
 	//HostWnd真实窗口消息处理
 	BEGIN_MSG_MAP_EX(CMainDlg)
 		MSG_WM_INITDIALOG(OnInitDialog)
@@ -92,13 +95,13 @@ protected:
 	//托盘消息处理
 		//MESSAGE_HANDLER(WM_ICONNOTIFY, OnIconNotify)
 		MSG_WM_COMMAND(OnCommand)
+		MESSAGE_HANDLER_EX(UM_MENUEVENT, OnMenuEvent)
+		MSG_WM_INITMENUPOPUP_EX(OnInitEmojiMenu)
 		CHAIN_MSG_MAP(SHostWnd)
 		REFLECT_NOTIFICATIONS_EX()
 	END_MSG_MAP()
 
 private:
 	CLvMessageAdapter* m_pMessageAdapter;
-
-	CEmojiDlg* m_pEmojiDlg;
-	bool	   m_bEmotionShow;
+	SMenuEx* m_pEmojiMenu;
 };

@@ -12,8 +12,6 @@
 	  <file name="XML_PAGE_FILEHELPER" path="xml\page_comm_filehelper.xml" />
 	  <file name="XML_PAGE_GROUPCOMM" path="xml\page_comm_group.xml" />
 	  <file name="XML_PAGE_PERSONALCOMM" path="xml\page_comm_personal.xml" />
-
-	  <file name="XML_DLG_EMOJI" path="xml\dlg_emoji.xml" />
   </LAYOUT>
   
   <values>
@@ -96,4 +94,7 @@
   <SMENU>
     <file name="menu_tray" path="xml\menu_tray.xml"/>
   </SMENU>
+	<menuex>
+		<file name="emoji" path="menuex\emoji.xml"/>
+	</menuex>
 </resource>

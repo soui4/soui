@@ -1,4 +1,4 @@
-﻿//stamp:1647957d5654f6fd
+﻿//stamp:146c490839cf5432
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -16,7 +16,6 @@
 			const TCHAR * XML_PAGE_FILEHELPER;
 			const TCHAR * XML_PAGE_GROUPCOMM;
 			const TCHAR * XML_PAGE_PERSONALCOMM;
-			const TCHAR * XML_DLG_EMOJI;
 			}LAYOUT;
 		struct _values{
 			const TCHAR * string;
@@ -85,6 +84,9 @@
 		struct _SMENU{
 			const TCHAR * menu_tray;
 			}SMENU;
+		struct _smenuex{
+			const TCHAR * emoji;
+			}smenuex;
 	};
 #endif//_UIRES_H_
 #ifdef INIT_R_DATA
@@ -100,7 +102,6 @@ struct _UIRES UIRES={
 			_T("LAYOUT:XML_PAGE_FILEHELPER"),
 			_T("LAYOUT:XML_PAGE_GROUPCOMM"),
 			_T("LAYOUT:XML_PAGE_PERSONALCOMM"),
-			_T("LAYOUT:XML_DLG_EMOJI"),
 		},
 		{
 			_T("values:string"),
@@ -169,6 +170,9 @@ struct _UIRES UIRES={
 		{
 			_T("SMENU:menu_tray"),
 		},
+		{
+			_T("smenuex:emoji"),
+		},
 	};
 #else
 extern struct _UIRES UIRES;
@@ -202,8 +206,6 @@ struct _R{
 		 const wchar_t * edit_msg_search;
 		 const wchar_t * edit_recv;
 		 const wchar_t * edit_send;
-		 const wchar_t * emoji_titleview;
-		 const wchar_t * emotion;
 		 const wchar_t * item_avatar;
 		 const wchar_t * item_content;
 		 const wchar_t * item_name;
@@ -240,8 +242,6 @@ struct _R{
 		int edit_msg_search;
 		int edit_recv;
 		int edit_send;
-		int emoji_titleview;
-		int emotion;
 		int item_avatar;
 		int item_content;
 		int item_name;
@@ -294,8 +294,6 @@ struct _R R={
 		L"edit_msg_search",
 		L"edit_recv",
 		L"edit_send",
-		L"emoji_titleview",
-		L"emotion",
 		L"item_avatar",
 		L"item_content",
 		L"item_name",
@@ -333,8 +331,6 @@ struct _R R={
 		65547,
 		65557,
 		65564,
-		65570,
-		65571,
 		65550,
 		65552,
 		65551,

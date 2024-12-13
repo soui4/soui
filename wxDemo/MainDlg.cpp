@@ -4,12 +4,10 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"	
-#include <helper/SMenuEx.h>
+#define kLogTag "wxdemo"
 
-CMainDlg::CMainDlg() : SHostWnd(_T("LAYOUT:XML_MAINWND"))
+CMainDlg::CMainDlg() : SHostWnd(_T("LAYOUT:XML_MAINWND")), m_pEmojiMenu(NULL)
 {
-	m_pEmojiDlg = NULL;
-	m_bEmotionShow = false;
 }
 
 CMainDlg::~CMainDlg()
@@ -106,14 +104,6 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
 		int nType = 2;
 		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
-	}
-
-
-	if (!m_pEmojiDlg)
-	{
-		m_pEmojiDlg = new CEmojiDlg(this);
-		m_pEmojiDlg->Create(this->m_hWnd, 0, 0, 0, 0);
-		m_pEmojiDlg->SendMessage(WM_INITDIALOG);
 	}
 
 	return 0;
@@ -311,20 +301,9 @@ bool CMainDlg::OnEditMessageSearchChanged(EventArgs* e)
 	return true;
 }
 
-void CMainDlg::EmotionTileViewItemClick(const std::string& strID)
+void CMainDlg::OnEmotionItemClick(const std::string& strID)
 {
-	if (m_bEmotionShow)
-	{
-		m_pEmojiDlg->ShowWindow(SW_HIDE);
-		m_bEmotionShow = false;
-	}
-	else
-	{
-		m_pEmojiDlg->ShowWindow(SW_SHOW);
-		m_pEmojiDlg->SetNoSel();
-		m_bEmotionShow = true;
-	}
-
+	SLOGI() << "OnEmotionItemClick,id=" << strID.c_str();
 	//根据ID找到对应的图片然后将图片添加到re中
 	auto iter = CGlobalUnits::instance()->m_mapEmojisIndex.find(strID);
 	if (iter != CGlobalUnits::instance()->m_mapEmojisIndex.end())
@@ -333,19 +312,17 @@ void CMainDlg::EmotionTileViewItemClick(const std::string& strID)
 	}
 }
 
-void CMainDlg::OnBnClickEmotion()
+void CMainDlg::OnBnClickEmotion(IEvtArgs *e)
 {
-	if (m_bEmotionShow)
-	{
-		m_pEmojiDlg->ShowWindow(SW_HIDE);
-		m_bEmotionShow = false;
-	}
-	else
-	{
-		m_pEmojiDlg->ShowWindow(SW_SHOW);
-		m_pEmojiDlg->SetNoSel();
-		m_bEmotionShow = true;
-	}
+	SWindow* btn = sobj_cast<SWindow>(e->Sender());
+	CRect rc = btn->GetWindowRect();
+	ClientToScreen2(&rc);
+
+	SMenuEx menuEmoji;
+	menuEmoji.LoadMenuU8("menuex:emoji");
+	m_pEmojiMenu = &menuEmoji;
+	menuEmoji.TrackPopupMenu(TPM_BOTTOMALIGN, rc.left, rc.top, m_hWnd, GetScale());
+	m_pEmojiMenu = nullptr;
 }
 
 void CMainDlg::OnBnClickImage()
@@ -409,4 +386,26 @@ void CMainDlg::OnMessageItemClick(int& nIndex)
 	{
 		pTitle->SetWindowText(S_CW2T(pData->m_sstrName));
 	}
+}
+
+LRESULT CMainDlg::OnMenuEvent(UINT msg, WPARAM wp, LPARAM lp) {
+	IEvtArgs* e = (IEvtArgs*)lp;
+	_HandleEvent(e);
+	return 0;
+}
+
+void CMainDlg::OnInitEmojiMenu(IMenuEx* menuPopup, UINT nIndex) {
+	SHostWnd* pMenuHost = static_cast<SHostWnd*>(menuPopup->GetHostWnd());
+	STileView* pTileView = pMenuHost->FindChildByName2<STileView>(L"emoji_titleview");
+	SASSERT(pTileView);
+	CEmotionTileViewAdapter* pAdapter = new CEmotionTileViewAdapter(this);
+	pTileView->SetAdapter(pAdapter);
+	std::map<std::string, std::string>::iterator iter = CGlobalUnits::instance()->m_mapEmojisIndex.begin();
+	for (; iter != CGlobalUnits::instance()->m_mapEmojisIndex.end(); iter++)
+	{
+		pAdapter->AddItem(iter->first.c_str());
+	}
+	pAdapter->Release();
+	pTileView->SetSel(-1);
+
 }

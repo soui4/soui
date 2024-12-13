@@ -17,7 +17,7 @@ public:
 		bool	 m_bReminder;
 	};
 
-	struct IListen
+	struct IListener
 	{
 		virtual void OnMessageItemClick(int& nIndex) = 0;
 	};
@@ -51,7 +51,7 @@ protected:
 	}
 
 public:
-	CLvMessageAdapter(SListView* pOwner, IListen* pListen)
+	CLvMessageAdapter(SListView* pOwner, IListener* pListen)
 	{
 		m_pOwner = pOwner;
 		SASSERT(m_pOwner);
@@ -209,6 +209,6 @@ private:
 	std::vector<ItemData*>				m_vecItemDatas;				// 数据 
 
 	SListView* m_pOwner;
-	IListen* m_pListen;
+	IListener* m_pListen;
 };
 
