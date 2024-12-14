@@ -218,9 +218,108 @@
 						</caption>
 					</page>
 					<page title="page_personal">
-						<caption pos="0,0,-0,-0" colorBkgnd="#ffffff">
+						<window pos="0,0,-0,-0" colorBkgnd="#ffffff">
 							<!--稍微有点麻烦的布局-->
-						</caption>
+							<window pos="|-200,50" size="400,400" colorBkgnd="#c9c7c6">
+								<window pos="0,0,-0,@100" colorBkgnd="#ffffff">
+									<window pos="0,10,@80,@80">
+										<img name="item_avatar" pos="|-16,|-16" skin="skin_default_personal32"/>
+									</window>
+									<window pos="[0,10,-40,-10">
+										<window pos="0,0,-0,@30">
+											<text pos="0,0,-0,-0"
+												  align="left"
+												  valign="center"
+												  cursor="hand"
+												  dotted="1"
+												  name="contact_userinfo_name"
+												  colorText="#282828"
+												  font="face:微软雅黑,size:14,bold:1">个人信息页测试名</text>
+										</window>
+										<window pos="0,[0,-0,@25">
+											<text pos="0,0,-0,-0"
+												  align="left"
+												  valign="center"
+												  cursor="hand"
+												  dotted="1"
+												  name="contact_userinfo_wxnumber"
+												  colorText="#c9c7c6"
+												  font="face:微软雅黑,size:12">微信号：abcdefg</text>
+										</window>
+										<window pos="0,[0,-0,@25">
+											<text pos="0,0,-0,-0"
+												  align="left"
+												  valign="center"
+												  cursor="hand"
+												  dotted="1"
+												  name="contact_userinfo_area"
+												  colorText="#c9c7c6"
+												  font="face:微软雅黑,size:12">地区：浙江 杭州</text>
+										</window>
+									</window>
+								</window>
+								<window pos="0,[1,-0,@59" colorBkgnd="#ffffff">
+									<window pos="0,0,@80,-0">
+										<text pos="0,0,-0,-0"
+											  align="left"
+											  valign="center"
+											  cursor="hand"
+											  dotted="1"
+											  colorText="#c9c7c6"
+											  font="face:微软雅黑,size:12">备注</text>
+									</window>
+									<window pos="[0,{0,-0,-0">
+										<text pos="0,0,-0,-0"
+											  align="left"
+											  valign="center"
+											  cursor="hand"
+											  dotted="1"
+											  name="contact_userinfo_mark"
+											  colorText="#c9c7c6"
+											  font="face:微软雅黑,size:12">点击添加备注</text>
+									</window>
+								</window>
+								<window pos="0,[1,-0,@100" colorBkgnd="#ffffff">
+									<window pos="0,0,@80,-0">
+										<text pos="0,0,-0,@60"
+											  align="left"
+											  valign="center"
+											  cursor="hand"
+											  dotted="1"
+											  colorText="#c9c7c6"
+											  font="face:微软雅黑,size:12">个性签名</text>
+										<text pos="0,[0,-0,-0"
+											  align="left"
+											  valign="center"
+											  cursor="hand"
+											  dotted="1"
+											  colorText="#c9c7c6"
+											  font="face:微软雅黑,size:12">来源</text>
+									</window>
+									<window pos="[0,{0,-0,-0">
+										<text pos="0,0,-0,@60"
+											  align="left"
+											  valign="center"
+											  cursor="hand"
+											  dotted="1"
+											  colorText="#282828"
+											  name="contact_userinfo_sign"
+											  font="face:微软雅黑,size:12">鸟随鸾凤腾飞远，人随贤良品自高。</text>
+										<text pos="0,[0,-0,-0"
+											  align="left"
+											  valign="center"
+											  cursor="hand"
+											  dotted="1"
+											  colorText="#282828"
+											  name="contact_userinfo_addsrc"
+											  font="face:微软雅黑,size:12">通过手机号搜索添加</text>
+									</window>
+								</window>
+								<window pos="0,[1,-0,-0" colorBkgnd="#ffffff">
+
+								</window>
+							</window>
+						</window>
 					</page>
 				</tabctrl>
 			</caption>

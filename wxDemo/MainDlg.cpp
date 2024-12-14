@@ -618,6 +618,9 @@ void CMainDlg::ContactTVItemClick(int nGID, const std::string& strID)
             pTitle->SetWindowText(S_CA2T(strName.c_str()));
 
             pContactInfoTab->SetCurSel(pContactInfoTab->GetPageIndex(_T("page_group"), TRUE));
+
+			//需要设置群详情页的信息
+			//TODO:
         }
     }
     break;
@@ -631,6 +634,9 @@ void CMainDlg::ContactTVItemClick(int nGID, const std::string& strID)
             pTitle->SetWindowText(S_CA2T(strName.c_str()));
 
             pContactInfoTab->SetCurSel(pContactInfoTab->GetPageIndex(_T("page_personal"), TRUE));
+
+			//需要设置用户详情页的信息
+			//TODO:
         }
     }
     break;
