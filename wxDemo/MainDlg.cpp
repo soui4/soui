@@ -199,9 +199,9 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
         sstrID.Format(L"%d", i);
         SStringW sstrAvatar = L"";
         SStringW sstrName;
-        sstrName.Format(L"新朋友测试%d", i);
+        sstrName.Format(L"新朋友%d", i);
         SStringW sstrMessage;
-        sstrMessage.Format(L"新朋友%d 验证消息测试", i);
+        sstrMessage.Format(L"你好 我是新朋友%d 这是一条验证消息", i);
 		int nState = 0;
         if (i == 0)
             nState = 2;
@@ -217,17 +217,53 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     m_pGZHTileViewAdapter = new CGZHTileViewAdapter(this);
     pTileViewGZH->SetAdapter(m_pGZHTileViewAdapter);
     m_pGZHTileViewAdapter->Release();
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		SStringW sstrID;
         sstrID.Format(L"%d", i);
 		SStringW sstrName;
-        sstrName.Format(L"%d公众号名", i);
+        sstrName.Format(L"公众号%d", i);
         std::string strAvatar = "";
         std::string strID = S_CW2A(sstrID).c_str();
         std::string strName = S_CW2A(sstrName).c_str();
 		m_pGZHTileViewAdapter->AddItem(strID, strName, strAvatar);
 	}
+
+	//通讯录-订阅号适配器设置
+    STileView *pTileViewDYH = (STileView *)pTabContactInfo->GetPage(pTabContactInfo->GetPageIndex(_T("page_dyh"), TRUE))->FindIChildByName(L"tileview_dyh");
+    pTileViewDYH->EnableScrollBar(SSB_HORZ, FALSE);
+    m_pDYHTileViewAdapter = new CDYHTileViewAdapter(this);
+    pTileViewDYH->SetAdapter(m_pDYHTileViewAdapter);
+    m_pDYHTileViewAdapter->Release();
+    for (int i = 0; i < 10; i++)
+    {
+        SStringW sstrID;
+        sstrID.Format(L"%d", i);
+        SStringW sstrName;
+        sstrName.Format(L"订阅号%d", i);
+        std::string strAvatar = "";
+        std::string strID = S_CW2A(sstrID).c_str();
+        std::string strName = S_CW2A(sstrName).c_str();
+        m_pDYHTileViewAdapter->AddItem(strID, strName, strAvatar);
+    }
+
+	//通讯录-群成员适配器设置
+    STileView *pTileViewGrpmbr = (STileView *)pTabContactInfo->GetPage(pTabContactInfo->GetPageIndex(_T("page_group"), TRUE))->FindIChildByName(L"tileview_grpmbr");
+    pTileViewGrpmbr->EnableScrollBar(SSB_HORZ, FALSE);
+    m_pGrpmbrTileViewAdapter = new CGrpMbrTileViewAdapter(this);
+    pTileViewGrpmbr->SetAdapter(m_pGrpmbrTileViewAdapter);
+    m_pGrpmbrTileViewAdapter->Release();
+	for (int i = 0; i < 40; i++)
+    {
+        SStringW sstrID;
+        sstrID.Format(L"%d", i);
+        SStringW sstrName;
+        sstrName.Format(L"群成员%d", i);
+        std::string strAvatar = "";
+        std::string strID = S_CW2A(sstrID).c_str();
+        std::string strName = S_CW2A(sstrName).c_str();
+        m_pGrpmbrTileViewAdapter->AddItem(strID, strName, strAvatar);
+    }
 
 	return 0;
 }
