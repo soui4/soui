@@ -485,6 +485,16 @@ bool CMainDlg::OnEditContactSearchChanged(EventArgs* e)
 	return true;
 }
 
+void __cdecl SFmt(char *buf,const char* pszFormat, ...)
+{
+	va_list argList;
+	va_start(argList, pszFormat);
+	//int len3 = vsnprintf(nullptr,0,pszFormat,argList);
+	int len = _vscprintf(pszFormat, argList);
+	int len2 = vsprintf_s(buf,100,pszFormat, argList);
+	va_end(argList);
+}
+
 void CMainDlg::OnEmotionItemClick(const std::string& strID)
 {
 	SLOGI() << "OnEmotionItemClick,id=" << strID.c_str();
@@ -492,7 +502,22 @@ void CMainDlg::OnEmotionItemClick(const std::string& strID)
 	auto iter = CGlobalUnits::instance()->m_mapEmojisIndex.find(strID);
 	if (iter != CGlobalUnits::instance()->m_mapEmojisIndex.end())
 	{
-		//TODO:
+		EndMenuEx(-1);
+
+			STabCtrl* pMainOptTab = FindChildByName2<STabCtrl>(L"tab_main_opt");
+			IWindow* pPageMessage = pMainOptTab->GetPage(0);
+			STabCtrl* pTabMessageComm = (STabCtrl*)pPageMessage->FindIChildByName(L"tab_msg_comm");
+			SASSERT(pTabMessageComm);
+
+			SWindow * pPage = static_cast<SWindow*>(pTabMessageComm->GetPage(pTabMessageComm->GetCurSel()));
+			SRichEdit * edit = pPage->FindChildByName2<SRichEdit>("edit_send");
+			if(edit){
+				edit->SetSel(-1);
+				char szBuf [100];
+				SStringA str = SStringA().Format(_T("emoji id=%s"),strID.c_str());
+				edit->ReplaceSel(S_CA2T(str));
+			}
+
 	}
 }
 
