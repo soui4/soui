@@ -6,19 +6,21 @@
 
 class CDYHTileViewAdapter : public SAdapterBase {
 public:
-	struct ItemData
-	{
-		std::string m_strID;
-	};
+    struct ItemData
+    {
+        std::string m_strID;
+        std::string m_strName;
+        std::string m_strAvatar;
+    };
 
-	struct IListener
+	struct IListen
 	{
 		//virtual void OnEmotionItemClick(const std::string& strID) = 0;
 	};
 
 public:
-    CDYHTileViewAdapter(IListener *pListener)
-		:m_pListener(pListener)
+    CDYHTileViewAdapter(IListen *pListen)
+		:m_pListen(pListen)
 	{
 
 	}
@@ -36,7 +38,7 @@ protected:
 		if (0 == pItem->GetChildrenCount())
 		{
 			pItem->InitFromXml(&xmlTemplate);
-			pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&CDYHTileViewAdapter::OnEvtItemPanelClick, this));
+			//pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&CDYHTileViewAdapter::OnEvtItemPanelClick, this));
         }
 
 		size_t sPos = static_cast<size_t>(position);
@@ -45,18 +47,16 @@ protected:
 		ItemData* pItemData = m_vecItems[sPos];
 		if (NULL == pItemData) return;
 
-		SImageWnd* pImg = pItem->FindChildByName2<SImageWnd>(L"emotion");
-		if (NULL != pImg)
-		{
+		SImageWnd *pImg = pItem->FindChildByName2<SImageWnd>(L"item_avatar");
+        SASSERT(pImg);
+        if (pItemData->m_strAvatar == "")
+        {
+            pImg->SetAttribute(L"skin", L"skin_default_dyh32");
+        }
 
-
-			std::map<std::string, IBitmap*>::iterator iter =
-				CGlobalUnits::instance()->m_mapFace.find(pItemData->m_strID);
-			if (iter != CGlobalUnits::instance()->m_mapFace.end())
-			{
-				pImg->SetImage(iter->second);
-			}
-		}
+        SStatic *pName = pItem->FindChildByName2<SStatic>(L"item_name");
+        SASSERT(pName);
+        pName->SetWindowText(S_CA2T(pItemData->m_strName.c_str()));
 	}
 
 	BOOL OnEvtItemPanelClick(EventArgs* e)
@@ -81,17 +81,19 @@ protected:
 	}
 
 public:
-	void AddItem(const std::string& strID)
-	{
-		ItemData* pItemFaceData = new ItemData;
-		pItemFaceData->m_strID = strID;
+    void AddItem(std::string &strID, std::string &strName, std::string &strAvatar)
+    {
+        ItemData *pItemData = new ItemData;
+        pItemData->m_strID = strID;
+        pItemData->m_strName = strName;
+        pItemData->m_strAvatar = strAvatar;
 
-		m_vecItems.push_back(pItemFaceData);
-		notifyDataSetChanged();
-	}
+        m_vecItems.push_back(pItemData);
+        notifyDataSetChanged();
+    }
 
 private:
-	IListener* m_pListener;
+	IListen* m_pListen;
 
 	std::vector<ItemData*>	m_vecItems;				// 数据
 };

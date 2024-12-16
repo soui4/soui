@@ -247,16 +247,8 @@ void CRenderer::Init()
 	CTxtEdit *ped	= GetPed();
 	_cpAccelerator = ped->GetCpAccelerator();
 
-	static const RECTUV zrect = { 0, 0, 0, 0 };
-	_rcView		= zrect;
-	_rcRender	= zrect;	  
-	_rc			= zrect;
-	_dupLine	= 0;
-	_dwFlags	= 0;
-	_hdcBitmap	= NULL;
-	_ptCur.u	= 0;
-	_ptCur.v	= 0;
-	_plogpalette   = NULL;
+	int offset = FIELD_OFFSET(CRenderer,_rcView);
+	memset((char*)this+offset,0,sizeof(CRenderer)-offset);
 
 	CDocInfo *pDocInfo = ped->GetDocInfoNC();
 	if(pDocInfo)

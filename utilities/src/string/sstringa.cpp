@@ -23,7 +23,10 @@ int char_traits::LoadString(HINSTANCE hInst, UINT uID, char* lpBuffer, int nBuff
 
 int char_traits::Format(char** ppszDst, const char* pszFormat, va_list & args)
 {
-	int len = _vscprintf(pszFormat, args); // _vscprintf doesn't count terminating '\0'
+	va_list va2;
+	va_copy(va2,args);
+	int len = _vscprintf(pszFormat, va2); // _vscprintf doesn't count terminating '\0'
+	va_end(va2);
 	if (len <= 0) return 0;
 	*ppszDst = (char*)soui_mem_wrapper::SouiMalloc(len + 1);
 	vsprintf_s(*ppszDst, len + 1, pszFormat, args);

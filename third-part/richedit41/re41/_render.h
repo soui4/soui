@@ -41,6 +41,8 @@ class CRenderer : public CMeasurer
 #endif
 
 private:
+	COffscreenDC _osdc;				// Manager for offscreen DC
+
     RECTUV		_rcView;			// View rect (_hdc logical coords)
     RECTUV		_rcRender;			// Rendered rect (_hdc logical coords)
     RECTUV		_rc;				// Running clip/erase rect (_hdc logical coords)
@@ -56,7 +58,6 @@ private:
 	COLORREF	_crCurBackground;	// Current background color
 	COLORREF	_crCurTextColor;	// Current text color
 
-	COffscreenDC _osdc;				// Manager for offscreen DC
 	HDC			_hdc;				// Current hdc
 	HDC			_hdcBitmap;			// Memory hdc for background BitBlts
 	HBITMAP		_hbitmapSave;		// Saved hbitmap when _hdcMem being used

@@ -1608,6 +1608,8 @@ CTxtPara::CTxtPara(CTxtRange *prg) : CTxtFormat(prg)
 {
 	Assert(!_dwMask && !_PF._dwBorderColor); // We assume that object is zeroed (new'd)
 	_PF._iTabs = -1;
+	_dwMask = 0;
+	memset(_rgxTabs,0,sizeof(_rgxTabs));
 }
 
 /*

@@ -793,6 +793,8 @@ CTxtWinHost::CTxtWinHost()
 #ifndef NOACCESSIBILITY
     _pTypeInfo = NULL;
 #endif
+	int offset=FIELD_OFFSET(CTxtWinHost,_hwnd);
+	memset((char*)this+offset,0,sizeof(CTxtWinHost)-offset);
 
 	_fRegisteredForDrop = FALSE;
 	_crefs = 1;	

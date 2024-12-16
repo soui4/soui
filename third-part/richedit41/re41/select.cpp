@@ -85,6 +85,8 @@ CTxtSelection::CTxtSelection(CDisplay * const pdp) :
 
 	Assert(pdp);
 	Assert(GetPed());
+	int offset = FIELD_OFFSET(CTxtSelection,_pdp);
+	memset((char*)this+offset,0,sizeof(CTxtSelection)-offset);
 
 	_fSel	   = TRUE;					// This range is a selection
 	_pdp	   = pdp;

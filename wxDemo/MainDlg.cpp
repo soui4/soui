@@ -199,9 +199,9 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
         sstrID.Format(L"%d", i);
         SStringW sstrAvatar = L"";
         SStringW sstrName;
-        sstrName.Format(L"新朋友测试%d", i);
+        sstrName.Format(L"新朋友%d", i);
         SStringW sstrMessage;
-        sstrMessage.Format(L"新朋友%d 验证消息测试", i);
+        sstrMessage.Format(L"你好 我是新朋友%d 这是一条验证消息", i);
 		int nState = 0;
         if (i == 0)
             nState = 2;
@@ -217,17 +217,53 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     m_pGZHTileViewAdapter = new CGZHTileViewAdapter(this);
     pTileViewGZH->SetAdapter(m_pGZHTileViewAdapter);
     m_pGZHTileViewAdapter->Release();
-	for (int i = 0; i < 20; i++)
+	for (int i = 0; i < 10; i++)
 	{
 		SStringW sstrID;
         sstrID.Format(L"%d", i);
 		SStringW sstrName;
-        sstrName.Format(L"%d公众号名", i);
+        sstrName.Format(L"公众号%d", i);
         std::string strAvatar = "";
         std::string strID = S_CW2A(sstrID).c_str();
         std::string strName = S_CW2A(sstrName).c_str();
 		m_pGZHTileViewAdapter->AddItem(strID, strName, strAvatar);
 	}
+
+	//通讯录-订阅号适配器设置
+    STileView *pTileViewDYH = (STileView *)pTabContactInfo->GetPage(pTabContactInfo->GetPageIndex(_T("page_dyh"), TRUE))->FindIChildByName(L"tileview_dyh");
+    pTileViewDYH->EnableScrollBar(SSB_HORZ, FALSE);
+    m_pDYHTileViewAdapter = new CDYHTileViewAdapter(this);
+    pTileViewDYH->SetAdapter(m_pDYHTileViewAdapter);
+    m_pDYHTileViewAdapter->Release();
+    for (int i = 0; i < 10; i++)
+    {
+        SStringW sstrID;
+        sstrID.Format(L"%d", i);
+        SStringW sstrName;
+        sstrName.Format(L"订阅号%d", i);
+        std::string strAvatar = "";
+        std::string strID = S_CW2A(sstrID).c_str();
+        std::string strName = S_CW2A(sstrName).c_str();
+        m_pDYHTileViewAdapter->AddItem(strID, strName, strAvatar);
+    }
+
+	//通讯录-群成员适配器设置
+    STileView *pTileViewGrpmbr = (STileView *)pTabContactInfo->GetPage(pTabContactInfo->GetPageIndex(_T("page_group"), TRUE))->FindIChildByName(L"tileview_grpmbr");
+    pTileViewGrpmbr->EnableScrollBar(SSB_HORZ, FALSE);
+    m_pGrpmbrTileViewAdapter = new CGrpMbrTileViewAdapter(this);
+    pTileViewGrpmbr->SetAdapter(m_pGrpmbrTileViewAdapter);
+    m_pGrpmbrTileViewAdapter->Release();
+	for (int i = 0; i < 40; i++)
+    {
+        SStringW sstrID;
+        sstrID.Format(L"%d", i);
+        SStringW sstrName;
+        sstrName.Format(L"群成员%d", i);
+        std::string strAvatar = "";
+        std::string strID = S_CW2A(sstrID).c_str();
+        std::string strName = S_CW2A(sstrName).c_str();
+        m_pGrpmbrTileViewAdapter->AddItem(strID, strName, strAvatar);
+    }
 
 	return 0;
 }
@@ -449,6 +485,16 @@ bool CMainDlg::OnEditContactSearchChanged(EventArgs* e)
 	return true;
 }
 
+void __cdecl SFmt(char *buf,const char* pszFormat, ...)
+{
+	va_list argList;
+	va_start(argList, pszFormat);
+	//int len3 = vsnprintf(nullptr,0,pszFormat,argList);
+	int len = _vscprintf(pszFormat, argList);
+	int len2 = vsprintf_s(buf,100,pszFormat, argList);
+	va_end(argList);
+}
+
 void CMainDlg::OnEmotionItemClick(const std::string& strID)
 {
 	SLOGI() << "OnEmotionItemClick,id=" << strID.c_str();
@@ -456,12 +502,36 @@ void CMainDlg::OnEmotionItemClick(const std::string& strID)
 	auto iter = CGlobalUnits::instance()->m_mapEmojisIndex.find(strID);
 	if (iter != CGlobalUnits::instance()->m_mapEmojisIndex.end())
 	{
-		//TODO:
+		EndMenuEx(-1);
+
+		STabCtrl *pMainOptTab = FindChildByName2<STabCtrl>(L"tab_main_opt");
+        IWindow *pPageMessage = pMainOptTab->GetPage(0);
+        STabCtrl *pTabMessageComm = (STabCtrl *)pPageMessage->FindIChildByName(L"tab_msg_comm");
+        SASSERT(pTabMessageComm);
+
+		SWindow *pPage = static_cast<SWindow *>(pTabMessageComm->GetPage(pTabMessageComm->GetCurSel()));
+        SRichEdit *edit = pPage->FindChildByName2<SRichEdit>("edit_send");
+        if (edit)
+        {
+            edit->SetSel(-1);
+            SStringA str = SStringA().Format("emoji id=%s", strID.c_str());
+            edit->ReplaceSel(S_CA2T(str));
+        }
 	}
 }
 
 void CMainDlg::OnBnClickEmotion(IEvtArgs *e)
 {
+	HDC hdc = GetDC();
+	IFontPtr font = SFontPool::GetFont(L"宋体",100);
+	const LOGFONT * lf = font->LogFont();
+	HFONT hf = CreateFontIndirect(lf);
+	HGDIOBJ oldFont = SelectObject(hdc,hf);
+	CRect rc2(0,0,200,200);
+	DrawText(hdc,_T("test"),12,&rc2,DT_CENTER);
+	SelectObject(hdc,oldFont);
+	ReleaseDC(hdc);
+
 	SWindow* btn = sobj_cast<SWindow>(e->Sender());
 	CRect rc = btn->GetWindowRect();
 	ClientToScreen2(&rc);
@@ -475,12 +545,58 @@ void CMainDlg::OnBnClickEmotion(IEvtArgs *e)
 
 void CMainDlg::OnBnClickImage()
 {
-	//
+#ifdef _WIN32
+    CFileDialogEx openDlg(TRUE, _T("图片"), 0, 6, _T("图片文件\0*.gif;*.bmp;*.jpg;*.png\0\0"));
+    if (openDlg.DoModal() == IDOK)
+    {
+        SStringW strFile = openDlg.m_szFileName;
+        int nFileSize;
+        FILE *fp = _wfopen(strFile, L"rb");
+        if (fp)
+        {
+            fseek(fp, 0L, SEEK_END);
+            nFileSize = ftell(fp);
+            rewind(fp);
+            fclose(fp);
+        }
+        else
+            return;
+
+		//此处可先处理图片大小限制
+		//TODO:
+
+		//将图片插入到对应的send_richedit中
+		//TODO:
+    }
+#endif //_WIN32
 }
 
 void CMainDlg::OnBnClickFile()
 {
-	//
+#ifdef _WIN32
+    CFileDialogEx openDlg(TRUE, _T("文件"), 0, 6, _T("文件\0*.*\0\0"));
+    if (openDlg.DoModal() == IDOK)
+    {
+        SStringW strFile = openDlg.m_szFileName;
+        int nFileSize;
+        FILE *fp = _wfopen(strFile, L"rb");
+        if (fp)
+        {
+            fseek(fp, 0L, SEEK_END);
+            nFileSize = ftell(fp);
+            rewind(fp);
+            fclose(fp);
+        }
+        else
+            return;
+
+        //此处可先处理文件大小限制
+        // TODO:
+
+        //将文件插入到对应的send_richedit中
+        // TODO:
+    }
+#endif //_WIN32
 }
 
 void CMainDlg::OnBnClickCapture()
@@ -499,27 +615,32 @@ void CMainDlg::OnBnClickCaptureSetting()
 
 void CMainDlg::OnBnClickHistory()
 {
-	//
+	//打开历史记录窗口
+	//TODO:
 }
 
 void CMainDlg::OnBnClickAudio()
 {
-	//
+	//发送语音聊天请求
+	//TODO:
 }
 
 void CMainDlg::OnBnClickVideo()
 {
-	//
+    //发送视频聊天请求
+    // TODO:
 }
 
 void CMainDlg::OnBnClickLive()
 {
-	//
+    //发送群直播请求
+    // TODO:
 }
 
 void CMainDlg::OnBnClickAudioVideo()
 {
-	//
+    //发送群语音视频聊天请求
+    // TODO:
 }
 
 void CMainDlg::OnMessageItemClick(int& nIndex)
@@ -582,6 +703,9 @@ void CMainDlg::ContactTVItemClick(int nGID, const std::string& strID)
             pTitle->SetWindowText(S_CA2T(strName.c_str()));
 
             pContactInfoTab->SetCurSel(pContactInfoTab->GetPageIndex(_T("page_group"), TRUE));
+
+			//需要设置群详情页的信息
+			//TODO:
         }
     }
     break;
@@ -595,6 +719,9 @@ void CMainDlg::ContactTVItemClick(int nGID, const std::string& strID)
             pTitle->SetWindowText(S_CA2T(strName.c_str()));
 
             pContactInfoTab->SetCurSel(pContactInfoTab->GetPageIndex(_T("page_personal"), TRUE));
+
+			//需要设置用户详情页的信息
+			//TODO:
         }
     }
     break;
