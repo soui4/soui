@@ -504,19 +504,19 @@ void CMainDlg::OnEmotionItemClick(const std::string& strID)
 	{
 		EndMenuEx(-1);
 
-			STabCtrl* pMainOptTab = FindChildByName2<STabCtrl>(L"tab_main_opt");
-			IWindow* pPageMessage = pMainOptTab->GetPage(0);
-			STabCtrl* pTabMessageComm = (STabCtrl*)pPageMessage->FindIChildByName(L"tab_msg_comm");
-			SASSERT(pTabMessageComm);
+		STabCtrl *pMainOptTab = FindChildByName2<STabCtrl>(L"tab_main_opt");
+        IWindow *pPageMessage = pMainOptTab->GetPage(0);
+        STabCtrl *pTabMessageComm = (STabCtrl *)pPageMessage->FindIChildByName(L"tab_msg_comm");
+        SASSERT(pTabMessageComm);
 
-			SWindow * pPage = static_cast<SWindow*>(pTabMessageComm->GetPage(pTabMessageComm->GetCurSel()));
-			SRichEdit * edit = pPage->FindChildByName2<SRichEdit>("edit_send");
-			if(edit){
-				edit->SetSel(-1);
-				SStringA str = SStringA().Format("emoji id=%s",strID.c_str());
-				edit->ReplaceSel(S_CA2T(str));
-			}
-
+		SWindow *pPage = static_cast<SWindow *>(pTabMessageComm->GetPage(pTabMessageComm->GetCurSel()));
+        SRichEdit *edit = pPage->FindChildByName2<SRichEdit>("edit_send");
+        if (edit)
+        {
+            edit->SetSel(-1);
+            SStringA str = SStringA().Format("emoji id=%s", strID.c_str());
+            edit->ReplaceSel(S_CA2T(str));
+        }
 	}
 }
 
@@ -545,12 +545,58 @@ void CMainDlg::OnBnClickEmotion(IEvtArgs *e)
 
 void CMainDlg::OnBnClickImage()
 {
-	//
+#ifdef _WIN32
+    CFileDialogEx openDlg(TRUE, _T("图片"), 0, 6, _T("图片文件\0*.gif;*.bmp;*.jpg;*.png\0\0"));
+    if (openDlg.DoModal() == IDOK)
+    {
+        SStringW strFile = openDlg.m_szFileName;
+        int nFileSize;
+        FILE *fp = _wfopen(strFile, L"rb");
+        if (fp)
+        {
+            fseek(fp, 0L, SEEK_END);
+            nFileSize = ftell(fp);
+            rewind(fp);
+            fclose(fp);
+        }
+        else
+            return;
+
+		//此处可先处理图片大小限制
+		//TODO:
+
+		//将图片插入到对应的send_richedit中
+		//TODO:
+    }
+#endif //_WIN32
 }
 
 void CMainDlg::OnBnClickFile()
 {
-	//
+#ifdef _WIN32
+    CFileDialogEx openDlg(TRUE, _T("文件"), 0, 6, _T("文件\0*.*\0\0"));
+    if (openDlg.DoModal() == IDOK)
+    {
+        SStringW strFile = openDlg.m_szFileName;
+        int nFileSize;
+        FILE *fp = _wfopen(strFile, L"rb");
+        if (fp)
+        {
+            fseek(fp, 0L, SEEK_END);
+            nFileSize = ftell(fp);
+            rewind(fp);
+            fclose(fp);
+        }
+        else
+            return;
+
+        //此处可先处理文件大小限制
+        // TODO:
+
+        //将文件插入到对应的send_richedit中
+        // TODO:
+    }
+#endif //_WIN32
 }
 
 void CMainDlg::OnBnClickCapture()
@@ -569,27 +615,32 @@ void CMainDlg::OnBnClickCaptureSetting()
 
 void CMainDlg::OnBnClickHistory()
 {
-	//
+	//打开历史记录窗口
+	//TODO:
 }
 
 void CMainDlg::OnBnClickAudio()
 {
-	//
+	//发送语音聊天请求
+	//TODO:
 }
 
 void CMainDlg::OnBnClickVideo()
 {
-	//
+    //发送视频聊天请求
+    // TODO:
 }
 
 void CMainDlg::OnBnClickLive()
 {
-	//
+    //发送群直播请求
+    // TODO:
 }
 
 void CMainDlg::OnBnClickAudioVideo()
 {
-	//
+    //发送群语音视频聊天请求
+    // TODO:
 }
 
 void CMainDlg::OnMessageItemClick(int& nIndex)
