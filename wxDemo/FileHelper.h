@@ -32,7 +32,7 @@ inline BOOL BuildFilePath(LPCTSTR pszCurPath,LPCTSTR pszNewPath,BOOL bPath=TRUE)
     _tcscpy_s(szNewPath,_countof(szNewPath),pszNewPath);
     if(bPath)
     {
-        int nLen=_tcslen(szNewPath);
+        int nLen=(int)_tcslen(szNewPath);
         if(szNewPath[nLen-1]!=_T('\\'))
             _tcscat(szNewPath,_T("\\"));
     }
