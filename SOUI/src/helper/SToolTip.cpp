@@ -16,6 +16,7 @@ STipCtrl::STipCtrl(void)
     , m_nShowSpan(5000)
     , m_font(0)
 	, m_tipAlign(TA_AUTO)
+    , m_nScale(100)
 {
     m_id.dwHi = m_id.dwLow = 0;
 }

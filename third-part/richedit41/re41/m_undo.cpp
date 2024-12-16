@@ -42,6 +42,8 @@ CUndoStack::CUndoStack(
 	_index = 0;
 	_cUndoLim = 0;
 
+	_fGroupTyping = _fMerge = _fRedo= _fSingleLevelMode= 0;
+
 	// We should be creating an undo stack if there's nothing to put in it!
 	Assert(cUndoLim);
 	SetUndoLimit(cUndoLim);
@@ -1114,6 +1116,8 @@ CUndoStackGuard::CUndoStackGuard(
 	_ped = ped;
 	_fReEntered = FALSE;
 	_hr = NOERROR;
+	_paeNext = NULL;
+	_publdr = NULL;
 	ped->GetCallMgr()->RegisterComponent(this, COMP_UNDOGUARD);
 }
 

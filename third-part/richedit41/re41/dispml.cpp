@@ -212,9 +212,10 @@ CDisplayML::CDisplayML (CTxtEdit* ped)
 {
 	TRACEBEGIN(TRCSUBSYSDISP, TRCSCOPEINTERN, "CDisplayML::CDisplayML");
 
-	Assert(!_dulTarget && !_dvlTarget);
-
+	int offset = FIELD_OFFSET(CDisplayML,_cpCalcMax);
+	memset((char*)this+offset,0,sizeof(CDisplayML)-offset);
 	_fMultiLine = TRUE;
+	
 }
 
 CDisplayML::~CDisplayML()

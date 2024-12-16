@@ -60,7 +60,7 @@ namespace SOUI
 		m_nid.uCallbackMessage = WM_ICONNOTIFY;
 		m_nid.uFlags = flags|NIF_MESSAGE;
 		m_nid.hIcon = hIcon;
-		_tcscpy_s(m_nid.szTip, szTip);
+		_tcscpy_s(m_nid.szTip, 128, szTip);
 	}
 
 	void SShellTray::StartAni()
@@ -154,7 +154,7 @@ namespace SOUI
 		{
 			m_nid.uFlags |= NIF_TIP;
 			m_nid.uFlags &= ~NIF_INFO;
-			_tcscpy_s(m_nid.szTip, m_strTip);
+			_tcscpy_s(m_nid.szTip, 128, m_strTip);
 			Shell_NotifyIcon(NIM_MODIFY, &m_nid);
 		}
 		return S_FALSE;
@@ -183,7 +183,7 @@ namespace SOUI
 			m_ArrIcon.RemoveAll();
 			m_MsgOnlyWnd->DestroyWindow();
 		}
-		__super::OnFinalRelease();
+		SWindow::OnFinalRelease();
 	}
 
 

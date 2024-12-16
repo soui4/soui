@@ -224,7 +224,7 @@ public:
 
 	SHORT		_sTmpDisplayAttrIdx; // Index to the temp. display attrib array
 
-	CCharFormat() { _sTmpDisplayAttrIdx = -1; }
+	CCharFormat() { ZeroMemory(this,sizeof(CCharFormat)); _sTmpDisplayAttrIdx = -1; }
 													//@cmember Apply *<p pCF>
 	HRESULT	Apply (const CCharFormat *pCF,			//  to this CCharFormat
 				   DWORD dwMask, DWORD dwMask2);

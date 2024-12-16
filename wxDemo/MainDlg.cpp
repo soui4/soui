@@ -513,8 +513,7 @@ void CMainDlg::OnEmotionItemClick(const std::string& strID)
 			SRichEdit * edit = pPage->FindChildByName2<SRichEdit>("edit_send");
 			if(edit){
 				edit->SetSel(-1);
-				char szBuf [100];
-				SStringA str = SStringA().Format(_T("emoji id=%s"),strID.c_str());
+				SStringA str = SStringA().Format("emoji id=%s",strID.c_str());
 				edit->ReplaceSel(S_CA2T(str));
 			}
 
@@ -523,6 +522,16 @@ void CMainDlg::OnEmotionItemClick(const std::string& strID)
 
 void CMainDlg::OnBnClickEmotion(IEvtArgs *e)
 {
+	HDC hdc = GetDC();
+	IFontPtr font = SFontPool::GetFont(L"宋体",100);
+	const LOGFONT * lf = font->LogFont();
+	HFONT hf = CreateFontIndirect(lf);
+	HGDIOBJ oldFont = SelectObject(hdc,hf);
+	CRect rc2(0,0,200,200);
+	DrawText(hdc,_T("test"),12,&rc2,DT_CENTER);
+	SelectObject(hdc,oldFont);
+	ReleaseDC(hdc);
+
 	SWindow* btn = sobj_cast<SWindow>(e->Sender());
 	CRect rc = btn->GetWindowRect();
 	ClientToScreen2(&rc);

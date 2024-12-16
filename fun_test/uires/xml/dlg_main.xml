@@ -54,7 +54,7 @@
 				<img skin="skin_girl"/>
 			</page>
 			<page title="richedit" padding="10,10,10,10">
-				<richedit size="-2,-2" name="re_test" enableDragdrop="1" multiLines="1" vscrollBar="1"  wordWrap="1" autoVscroll="1" hscrollBar="0" wantReturn="1" wantTab="1" rtf="rtf:test"/>
+				<richedit size="-2,-2" name="re_test" enableDragdrop="1" multiLines="1" vscrollBar="1"  wordWrap="1" autoVscroll="1" hscrollBar="0" wantReturn="1" wantTab="1" rtf1="rtf:test"/>
 			</page>
 			<page title="scintilla">
 				<realwnd size="-2,-2" name="wnd_sci" wndclass="Scintilla" wndname="hello sci" init="1"/>
