@@ -12,6 +12,7 @@
 *_i.c
 *_p.c
 *.ncb
+*.pdb
 *.suo
 *.tlb
 *.tlh
@@ -23,6 +24,8 @@
 *.sdf
 *.opensdf
 *.unsuccessfulbuild
+RC*
+
 ipch/
 obj/
 [Ll]ib
