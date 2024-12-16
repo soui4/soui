@@ -32,13 +32,16 @@ protected:
 public:
 	void SetBmpResource(CBitmap* pBmp);
 
-private:
+	void CalcPos();
+
+  private:
 	CBitmap* m_pBitmap;
 
 	SOUI::CPoint	m_ptDown;				//鼠标按下的位置
 	SOUI::CRect		m_rcCaptureArea;		//截图区域
-
 	EcPosType		m_emPosType;
 	bool	m_bCapture;
+
+	SOUI::CRect m_rcPos[8];
 };
 

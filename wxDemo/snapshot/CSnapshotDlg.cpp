@@ -20,11 +20,11 @@ BOOL CSnapshotDlg::OnInitDialog(HWND wnd, LPARAM lInitParam)
 
 	int nxScreen, nyScreen;
 #ifndef DEBUG
-// 	nxScreen = 400;
-// 	nyScreen = 400;
+	nxScreen = 600;
+	nyScreen = 600;
 
-	nxScreen = dm.dmPelsWidth;
-	nyScreen = dm.dmPelsHeight;
+// 	nxScreen = dm.dmPelsWidth;
+// 	nyScreen = dm.dmPelsHeight;
 #else
 	nxScreen = dm.dmPelsWidth;
 	nyScreen = dm.dmPelsHeight;
