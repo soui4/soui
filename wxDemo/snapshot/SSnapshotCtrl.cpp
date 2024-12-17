@@ -40,6 +40,19 @@ void SSnapshotCtrl::OnPaint(IRenderTarget* pRT)
 		pRT->FillPath(path);
 		pRT->SelectObject(oldbrush, NULL);
 	}
+
+
+	{//绘制8个操作点
+        CAutoRefPtr<IBrush> brush, oldbrush;
+        pRT->CreateSolidColorBrush(RGBA(255, 0, 0, 255), &brush);
+        pRT->SelectObject(brush, (IRenderObj **)&oldbrush);
+        for (int i = 0; i < 8; ++i)
+        {
+            CRect rcDot(m_rcPos[i]);
+            pRT->FillRectangle(rcDot);
+        }
+        pRT->SelectObject(oldbrush, NULL);
+    }
 }
 
 void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
@@ -92,25 +105,6 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
 			else if (ptLT.y > rcWnd.bottom - m_rcCaptureArea.Height())
 				ptLT.y = rcWnd.bottom - m_rcCaptureArea.Height();
 			m_rcCaptureArea.MoveToXY(ptLT);
-
-// 			int nCaptureWid = m_rcCaptureArea.Width();
-// 			int nCaptureHei = m_rcCaptureArea.Height();
-// 			CPoint ptPos(m_rcCaptureArea.TopLeft());
-// 
-// 			if (m_ptDown.x > point.x)
-// 				ptPos.x -= (m_ptDown.x - point.x);
-// 			else
-// 				ptPos.x += (point.x - m_ptDown.x);
-// 			if (m_ptDown.y > point.y)
-// 				ptPos.y -= (m_ptDown.y - point.y);
-// 			else
-// 				ptPos.y += (point.y - m_ptDown.y);
-// 
-// 			if (ptPos.x < 0) ptPos.x = 0;
-// 			if (ptPos.y < 0) ptPos.y = 0;
-// 
-// 			//m_rcCaptureArea.TopLeft() = ptPos;
-// 			m_rcCaptureArea.SetRect(ptPos.x, ptPos.y, ptPos.x + nCaptureWid, ptPos.y + nCaptureHei);
 		}
 		break;
 		default:
@@ -118,6 +112,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
 		}
 	}
 
+	CalcPos();
 	Invalidate();
 }
 
@@ -133,7 +128,7 @@ void SSnapshotCtrl::OnLButtonDown(UINT nFlags, SOUI::CPoint point)
 	else if (PtInRect(m_rcCaptureArea, point))
 	{
 		m_emPosType = SelectRect;
-		m_ptDown = point;
+        m_ptDown = point - m_rcCaptureArea.TopLeft();
 	}
 }
 
@@ -166,16 +161,16 @@ void SSnapshotCtrl::OnLButtonUp(UINT nFlags, SOUI::CPoint point)
 		break;
 	case SelectRect:
 	{
-		SOUI::CPoint ptLT = point - m_ptDown;			// 相对 鼠标点击 时  的 偏移量  也就是 移动 的 值 
-		if (ptLT.x < rcWnd.left)
-			ptLT.x = rcWnd.left;
-		else if (ptLT.x > rcWnd.right - m_rcCaptureArea.Width())
-			ptLT.x = rcWnd.right - m_rcCaptureArea.Width();
-		if (ptLT.y < rcWnd.top)
-			ptLT.y = rcWnd.top;
-		else if (ptLT.y > rcWnd.bottom - m_rcCaptureArea.Height())
-			ptLT.y = rcWnd.bottom - m_rcCaptureArea.Height();
-		m_rcCaptureArea.MoveToXY(ptLT);
+		SOUI::CPoint ptPos = point - m_ptDown;			// 相对 鼠标点击 时  的 偏移量  也就是 移动 的 值 
+		if (ptPos.x < rcWnd.left)
+			ptPos.x = rcWnd.left;
+		else if (ptPos.x > rcWnd.right - m_rcCaptureArea.Width())
+			ptPos.x = rcWnd.right - m_rcCaptureArea.Width();
+		if (ptPos.y < rcWnd.top)
+			ptPos.y = rcWnd.top;
+		else if (ptPos.y > rcWnd.bottom - m_rcCaptureArea.Height())
+			ptPos.y = rcWnd.bottom - m_rcCaptureArea.Height();
+		m_rcCaptureArea.MoveToXY(ptPos);
 	}
 	break;
 	default:
@@ -202,4 +197,29 @@ void SSnapshotCtrl::SetBmpResource(CBitmap* pBmp)
 
 	//m_vecBitmap.push_back(pBmp);
 	Invalidate();
+}
+
+void SSnapshotCtrl::CalcPos()
+{
+    SOUI::CRect rcLine(m_rcCaptureArea);
+    rcLine.InflateRect(1, 1);
+    CAutoRefPtr<IPen> curPen, oldPen;
+
+    SOUI::CPoint center = rcLine.CenterPoint();
+    // 上左 方块
+    m_rcPos[(int)EcPosType::TopLeft].SetRect(rcLine.left, rcLine.top, rcLine.left + 14, rcLine.top + 14);
+    // 上中 方块
+    m_rcPos[(int)EcPosType::TopCenter].SetRect(center.x - 2, rcLine.top, center.x + 2, rcLine.top + 4);
+    // 上右 方块
+    m_rcPos[(int)EcPosType::TopRight].SetRect(rcLine.right - 4, rcLine.top, rcLine.right, rcLine.top + 4);
+    // 右中 方块
+    m_rcPos[(int)EcPosType::RightCenter].SetRect(rcLine.right - 4, center.y - 2, rcLine.right, center.y + 2);
+    // 下右 方块
+    m_rcPos[(int)EcPosType::BottomRight].SetRect(rcLine.right - 4, rcLine.bottom - 4, rcLine.right, rcLine.bottom);
+    // 下中 方块
+    m_rcPos[(int)EcPosType::BottomCenter].SetRect(center.x - 2, rcLine.bottom - 4, center.x + 2, rcLine.bottom);
+    // 下左 方块
+    m_rcPos[(int)EcPosType::BottomLeft].SetRect(rcLine.left, rcLine.bottom - 4, rcLine.left + 4, rcLine.bottom);
+    // 左中 方块
+    m_rcPos[(int)EcPosType::LeftCenter].SetRect(rcLine.left, center.y - 2, rcLine.left + 4, center.y + 2);
 }
