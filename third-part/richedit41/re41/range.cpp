@@ -105,7 +105,7 @@ CTxtRange::CTxtRange(CTxtEdit *ped, LONG cp, LONG cch) :
 	CRchTxtPtr(ped, cp)
 {
 	TRACEBEGIN(TRCSUBSYSRANG, TRCSCOPEINTERN, "CTxtRange::CTxtRange");
-
+	_cRefs = 0;
 	RangeValidateCp(cp, cch);
 	Update_iFormat(-1);					// Choose _iFormat
 
@@ -119,7 +119,7 @@ CTxtRange::CTxtRange(CRchTxtPtr& rtp, LONG cch) :
 	CRchTxtPtr(rtp)
 {
 	TRACEBEGIN(TRCSUBSYSRANG, TRCSCOPEINTERN, "CTxtRange::CTxtRange");
-
+	_cRefs = 0;
 	RangeValidateCp(GetCp(), cch);
 	Update_iFormat(-1);					// Choose _iFormat
 
@@ -133,7 +133,7 @@ CTxtRange::CTxtRange(const CTxtRange &rg) :
 	CRchTxtPtr((CRchTxtPtr)rg)
 {
 	TRACEBEGIN(TRCSUBSYSRANG, TRCSCOPEINTERN, "CTxtRange::CTxtRange");
-
+	_cRefs = 0;
 	_cch = rg._cch;
 	_wFlags = FALSE;				// This range isn't a selection
 	_iFormat = -1;					// Set up the default format, which

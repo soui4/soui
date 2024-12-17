@@ -1455,10 +1455,10 @@ BOOL CRenderer::RenderChunk(
 
 	LONG		cchValid = cchChunk;
 	LONG		i;
-	const WCHAR *pchT;
+	const WCHAR *pchT=pchRender;
 
 	// Search for object in chunk
-	for(pchT = pchRender, i = 0; i < cchValid && *pchT != WCH_EMBEDDING; i++)
+	for(i = 0; i < cchValid && *pchT != WCH_EMBEDDING; i++)
 		pchT++;
 
 	if(i == 0)
