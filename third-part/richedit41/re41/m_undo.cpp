@@ -68,7 +68,7 @@ CUndoStack::~CUndoStack()
 	// Clear out any remaining antievents
 	ClearAll();
 
-	delete _prgActions;
+	delete []_prgActions;
 }
 
 /*
@@ -761,7 +761,7 @@ SetState:
 	_cUndoLim = cUndoLim;
 	
 	if(_prgActions)
-		delete _prgActions;
+		delete []_prgActions;
 
 	_prgActions = prgnew;
 }	
