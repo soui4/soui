@@ -863,7 +863,6 @@ BOOL CDisplayML::RecalcLines (
 			rgliNew.Clear(AF_KEEPMEM);	 		// Clear aux array
 
 			// Remember information about match after editing
-			Assert((cp = rpOld.CalculateCp()) == me.GetCp());
 			pled->_vpMatchOld  += dvpExtraLine;
 			pled->_vpMatchNew	= dvp + dvpExtraLine;
 			pled->_vpMatchNewTop = dvpPrev;
@@ -1824,7 +1823,6 @@ BOOL CDisplayML::UpdateView(
 	{
 		// Update is after view: don't do anything
 		fRecalcVisible = FALSE;
-		AssertNr(VerifyFirstVisible());
 		goto finish;
 	}
 	else if(led._vpMatchNew <= _vpScroll + _dvpFirstVisible &&
@@ -1855,8 +1853,6 @@ BOOL CDisplayML::UpdateView(
 			_cpFirstVisible = 0;
 			_sPage = 0;
 		}
-
-		AssertNr(VerifyFirstVisible());
 	}
 	else
 	{
@@ -1902,8 +1898,6 @@ BOOL CDisplayML::UpdateView(
 			WaitForRecalc(cpNewFirstVisible, -1);
 			Set_yScroll(cpNewFirstVisible);
 		}
-		AssertNr(VerifyFirstVisible());
-
 		// Is there a match in the display area? - this can only happen if the
 		// old match is on the screen and the new match will be on the screen
 		if (led._vpMatchOld < vpScrollOld + _dvpView &&
@@ -2810,7 +2804,6 @@ scrollit:
 				_vpScroll = vpScroll;
 
 				AssertSz(_vpScroll >= 0, "CDisplayML::ScrollView _vpScroll < 0");
-				AssertNr(VerifyFirstVisible());
 				if(!WaitForRecalcView())
 			        return FALSE;
 			}

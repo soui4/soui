@@ -747,7 +747,7 @@ PassMsg:
 
 	START_PROFILING
 
-	IUndoBuilder *	publdr;
+	IUndoBuilder *	publdr=NULL;
 	CGenUndoBuilder undobldr(this, UB_AUTOCOMMIT, &publdr);
 
 	switch(msg)
@@ -2010,8 +2010,7 @@ update_kbd:
 			// Freeze the display before loading
 			CFreezeDisplay fd(_pdp);
 
-			lres = _ldte.LoadFromEs(prg, wparam, (EDITSTREAM *)lparam,
-									FALSE, publdr);
+			lres = _ldte.LoadFromEs(prg, wparam, (EDITSTREAM *)lparam,FALSE, publdr);
 
 			if (_fOutlineView)
 			{

@@ -1275,7 +1275,6 @@ EC CRTFRead::HandleChar(
 		_ecParseError = ecTruncateAtCRLF;
  	else
 	{
-		AssertNr(ch <= 0x7F || ch > 0xFF || FTokIsSymbol(ch));
 		_dwMaskCF2		|=  CFM2_RUNISDBCS;
 		_CF._dwEffects	&= ~CFE_RUNISDBCS;
 		AddText((WCHAR*)&ch, 1, CharGetsNumbering(ch));

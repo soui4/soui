@@ -338,7 +338,7 @@ void _cdecl operator delete (void* pv)
 
 #endif //DEBUG
 
-HANDLE g_hHeap;
+HANDLE g_hHeap=NULL;
 
 /*
  *	PvAlloc (cbBuf, uiMemFlags)

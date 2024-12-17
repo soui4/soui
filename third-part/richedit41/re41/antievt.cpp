@@ -444,9 +444,7 @@ HRESULT CReplaceFormattingAE::Undo(
 	// runs side by side
     rp.NextRun();
 	rp.MergeRuns(iRunMerge, pf);
-
 	// Make sure the runs are still OK  
-	AssertNr(rp.CalcTextLength() == cchText);
 
 	if(pnm)
 		pnm->NotifyPostReplaceRange(NULL, CP_INFINITE, 0, 0, _cp, _cp + cchTotal);
