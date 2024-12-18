@@ -11,6 +11,7 @@
 
 CMainDlg::CMainDlg() : SHostWnd(_T("LAYOUT:XML_MAINWND")), m_pEmojiMenu(NULL)
 {
+    m_bMessageSearchResultEmpty = false;
 }
 
 CMainDlg::~CMainDlg()
@@ -36,10 +37,17 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
 	SListView* pLvMessage = FindChildByName2<SListView>(L"lv_message");
 	pLvMessage->EnableScrollBar(SSB_HORZ, FALSE);
-
 	m_pMessageAdapter = new CLvMessageAdapter(pLvMessage, this);
 	pLvMessage->SetAdapter(m_pMessageAdapter);
 	m_pMessageAdapter->Release();
+
+	SListView *pLvMessageSearch = FindChildByName2<SListView>(L"lv_message_search");
+    pLvMessageSearch->EnableScrollBar(SSB_HORZ, FALSE);
+    m_pMessageSearchAdapter = new CLvMessageSearchAdapter(pLvMessageSearch, this);
+    pLvMessageSearch->SetAdapter(m_pMessageSearchAdapter);
+    m_pMessageSearchAdapter->Release();
+	//设置search的适配器 TODO：
+    pLvMessageSearch->SetAttribute(_T("show"), _T("0"));
 
 	STabCtrl* pTabMessageComm = (STabCtrl*)pPageMessage->FindIChildByName(L"tab_msg_comm");
 	SASSERT(pTabMessageComm);
@@ -64,6 +72,14 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
 		SStringW sstrTime = L"昨天";
 		bool bReminder = false;
+
+		//测试生成搜索简拼、全拼
+		SStringT sstrEncode = CGlobalUnits::instance()->EncodeChinese(sstrName);
+        SStringT sstrSimple, sstrFull;
+        CGlobalUnits::instance()->GetSimpleAndFull(sstrEncode, sstrSimple, sstrFull);
+
+		//将源字符串-ID、全拼-ID、简拼-ID保存在全局搜索结果中以备后续使用
+		//TODO:
 
 		int nType = 0;
 		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
@@ -441,8 +457,11 @@ bool CMainDlg::OnEditMessageSearchSetFocus(EventArgs* pEvt)
 	SImageButton* pSearchCancel = FindChildByName2<SImageButton>(L"btn_msg_search_cancel");
 	pSearchCancel->SetAttribute(L"show", L"1");
 
-	//需要展示搜索页面
-	//TODO:
+    //需要展示搜索页面
+    SListView *pLvMessage = FindChildByName2<SListView>(L"lv_message");
+    SListView *pLvMessageSearch = FindChildByName2<SListView>(L"lv_message_search");
+    pLvMessage->SetAttribute(_T("show"), _T("0"));
+    pLvMessageSearch->SetAttribute(_T("show"), _T("1"));
 	return true;
 }
 
@@ -452,12 +471,70 @@ bool CMainDlg::OnEditMessageSearchKillFocus(EventArgs* pEvt)
 	pSearchCancel->SetAttribute(L"show", L"0");
 
 	//重新展示消息列表
+    if (m_bMessageSearchResultEmpty)
+	{
+        SListView *pLvMessage = FindChildByName2<SListView>(L"lv_message");
+        SListView *pLvMessageSearch = FindChildByName2<SListView>(L"lv_message_search");
+        pLvMessage->SetAttribute(_T("show"), _T("1"));
+        pLvMessageSearch->SetAttribute(_T("show"), _T("0"));
+	}
+
 	return true;
 }
 
 bool CMainDlg::OnEditMessageSearchChanged(EventArgs* e)
 {
+    /*
+     * 大致处理逻辑
+     * 1、获取edit内容
+     * 2、判断是拼音搜索还是中文搜索
+     * 3、根据上述匹配拿到搜索结果然后重新构建搜索列表信息
+     */
+    EventRENotify *e2 = sobj_cast<EventRENotify>(e);
+    if (e2->iNotify != EN_CHANGE)
+        return false;
+    SEdit *pEdit = sobj_cast<SEdit>(e2->sender);
+    SStringT sstrInput = pEdit->GetWindowText();
+
+    if (!sstrInput.IsEmpty())
+    {
+        m_bMessageSearchResultEmpty = false;
+        if (!CGlobalUnits::instance()->IsIncludeChinese(sstrInput)) //拼音搜索
+        {
+            //遍历构建的搜索表，然后查找字符串，如果找到了结果则将结果记录一下
+
+            //有可能查到多个将结果去重处理
+        }
+        else
+        {
+            //汉字搜索
+        }
+
+        //重新构建列表
+    }
+    else
+    {
+        // todo:
+        m_bMessageSearchResultEmpty = true;
+    }
 	return true;
+}
+
+void CMainDlg::OnMessageSearchItemClick(int &nIndex)
+{
+    //消息页搜索列表项点击事件
+	//隐藏搜索列表展示消息列表
+	//将聊天页切换到对应的页面、将对应的列表项选中、将滚动条滚动到相应位置
+}
+
+void CMainDlg::OnBnClickMsgSearchCancel()
+{
+    m_bMessageSearchResultEmpty = true;
+
+	SListView *pLvMessage = FindChildByName2<SListView>(L"lv_message");
+    SListView *pLvMessageSearch = FindChildByName2<SListView>(L"lv_message_search");
+    pLvMessage->SetAttribute(_T("show"), _T("1"));
+    pLvMessageSearch->SetAttribute(_T("show"), _T("0"));
 }
 
 bool CMainDlg::OnEditContactSearchSetFocus(EventArgs* pEvt)
@@ -466,8 +543,6 @@ bool CMainDlg::OnEditContactSearchSetFocus(EventArgs* pEvt)
 	SImageButton* pSearchCancel = FindChildByName2<SImageButton>(L"btn_contact_search_cancel");
 	pSearchCancel->SetAttribute(L"show", L"1");
 
-	//需要展示搜索页面
-	//TODO:
 	return true;
 }
 
@@ -477,6 +552,8 @@ bool CMainDlg::OnEditContactSearchKillFocus(EventArgs* pEvt)
 	pSearchCancel->SetAttribute(L"show", L"0");
 
 	//重新展示消息列表
+
+
 	return true;
 }
 

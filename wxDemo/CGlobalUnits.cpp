@@ -72,6 +72,99 @@ void CGlobalUnits::OperateEmojis()
 	}
 }
 
+void CGlobalUnits::OperatePinyinMap()
+{
+	//构建汉字关联表
+    m_PinyinMap.clear();
+    SStringT sstrPath = m_sstrAppPath + _T("default_res\\pymap.txt");
+
+#ifdef _WIN32
+    std::string strPath = S_CT2A(sstrPath);
+    std::ifstream fin(strPath.c_str(), std::ios::in);
+    char line[1024] = { 0 };
+	while (fin.getline(line, sizeof(line)))
+	{
+        std::string strLine = line;
+        std::string strKey, strValue;
+        std::string::size_type pos;
+        pos = strLine.find_first_of(' ');
+        if (std::string::npos != pos)
+        {
+            strKey = strLine.substr(0, pos);
+            strValue = strLine.substr(pos + 1);
+            m_PinyinMap.insert(std::make_pair(S_CA2T(strKey.c_str()), S_CA2T(strValue.c_str())));
+        }
+	}
+#endif
+}
+
+SStringT CGlobalUnits::EncodeChinese(SStringT &sstrSrc)
+{
+    SStringT sstrTemp, sstrRet;
+    int cur;
+	for (int i = 0; i < sstrSrc.GetLength(); i++)
+	{
+        cur = sstrSrc.GetAt(i);
+        sstrTemp.Format(L"%04X", cur);
+        sstrRet = sstrRet + sstrTemp;
+	}
+
+    return sstrRet;
+}
+
+SStringT CGlobalUnits::DecodeChinese(SStringT &sstrSrc)
+{
+    SStringT sstrTemp, sstrRet;
+    for (int i = 0; i < sstrSrc.GetLength(); i += 4)
+    {
+        SStringT sstr = sstrSrc.Mid(i, 4);
+        wchar_t *str1 = sstr.GetBuffer(sstr.GetLength() + 2);
+        int x = (int)_tcstol(sstr, &str1, 16); //十六进制
+
+        sstrTemp.Format(L"%c", x);
+        sstrRet = sstrRet + sstrTemp;
+    }
+    return sstrRet;
+}
+
+bool CGlobalUnits::GetSimpleAndFull(SStringT &sstrSrc, SStringT &sstrSimple, SStringT &sstrFull)
+{
+	//获取简拼跟全拼
+    if (sstrSrc.IsEmpty())
+        return false;
+	
+	SStringT sstrTemp;
+	for (int i = 0; i < sstrSrc.GetLength(); i += 4)
+    {
+        SStringT sstr = sstrSrc.Mid(i, 4);
+        auto iter = m_PinyinMap.find((const wchar_t *)sstr);
+        if (iter != m_PinyinMap.end())
+            sstrTemp = iter->second.c_str();
+
+        sstrFull = sstrFull + sstrTemp;
+        sstrSimple = sstrSimple + sstrTemp.Left(1);
+    }
+ 
+	return true;
+}
+
+bool CGlobalUnits::IsIncludeChinese(SStringT &sstrSrc)
+{
+    std::string strSrc = S_CW2A(sstrSrc.c_str());
+    char *str = (char *)strSrc.c_str();
+    char c;
+    while (1)
+    {
+        c = *str++;
+        if (c == 0)
+            break;    //如果到字符串尾则说明该字符串没有中文字符
+        if (c & 0x80) //如果字符高位为1且下一字符高位也是1则有中文字符
+            if (*str & 0x80)
+                return true;
+    }
+    return false;
+}
+
 void CGlobalUnits::GenerateShamDate()
 {
 	const char* shamAreas[] = {
