@@ -8,6 +8,7 @@
 #include "CGlobalUnits.h"
 #include "CEmotionTileViewAdapter.h"
 #include "CLvMessageAdapter.h"
+#include "CLvMessageSearchAdapter.h"
 #include "CTvContactAdapter.h"
 
 #include "CLvNewFriendAdapter.h"
@@ -23,6 +24,7 @@
 
 class CMainDlg : public SHostWnd
 	, public CLvMessageAdapter::IListen
+    , public CLvMessageSearchAdapter::IListen
 	, public CTvContactAdapter::IListen
     , public CLvNewFriendAdapter::IListen
     , public CGZHTileViewAdapter::IListen
@@ -32,6 +34,7 @@ class CMainDlg : public SHostWnd
 {
 public:
 	virtual void OnMessageItemClick(int& nIndex);
+	virtual void OnMessageSearchItemClick(int &nIndex);
 	virtual void OnEmotionItemClick(const std::string& strID);
 
 	virtual void ContactTVItemClick(int nGID, const std::string& strID);
@@ -60,6 +63,7 @@ public:
 	bool OnEditMessageSearchSetFocus(EventArgs* pEvt);
 	bool OnEditMessageSearchKillFocus(EventArgs* pEvt);
 	bool OnEditMessageSearchChanged(EventArgs* e);
+    void OnBnClickMsgSearchCancel();
 
 	bool OnEditContactSearchSetFocus(EventArgs* pEvt);
 	bool OnEditContactSearchKillFocus(EventArgs* pEvt);
@@ -93,6 +97,7 @@ protected:
 		EVENT_NAME_COMMAND(L"btn_contact", OnBnClickContact)
 		EVENT_NAME_COMMAND(L"btn_favorites", OnBnClickCollect)
 
+        EVENT_NAME_COMMAND(L"btn_msg_search_cancel", OnBnClickMsgSearchCancel)
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventSetFocus::EventID, OnEditMessageSearchSetFocus)
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventKillFocus::EventID, OnEditMessageSearchKillFocus)
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventRENotify::EventID, OnEditContactSearchChanged)
@@ -134,12 +139,16 @@ private:
 	CLvMessageAdapter* m_pMessageAdapter;
 	CTvContactAdapter* m_pContactAdapter;
 
+	CLvMessageSearchAdapter *m_pMessageSearchAdapter;
+
 	CLvNewFriendAdapter* m_pNewFriendAdapter;
     CGZHTileViewAdapter *m_pGZHTileViewAdapter;
     CDYHTileViewAdapter *m_pDYHTileViewAdapter;
     CGrpMbrTileViewAdapter *m_pGrpmbrTileViewAdapter;
 
 	SMenuEx* m_pEmojiMenu;
+
+	bool m_bMessageSearchResultEmpty;
 };
 
 

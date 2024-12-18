@@ -21,7 +21,7 @@
 				  colorText="#000000"
 				  cueColor="rgb(100,100,100)"
 				  cueText="搜索" />
-			<imgbtn pos="[-20,{8" name="btn_msg_search_cancel" show="0" skin="skin_search_cancel" />
+			<imgbtn pos="[-20,{8" name="btn_msg_search_cancel" show="0" skin="skin_search_cancel" cursor="hand" />
 			<img pos="12,16" skin="skin_search"></img>
 			
 			<!--聊天列表-->
@@ -72,6 +72,33 @@
 					<caption pos="-40,[0,-0,-0">
 						<!--reminder-->
 						<img name="item_reminder" pos="|-8,|-8" skin="skin_reminder"/>
+					</caption>
+				</template>
+			</listview>
+			<listview pos="0,48,-0,-0"
+					  name="lv_message_search"
+					  headHeight="0"
+					  focuable="0"
+					  sbWid="8"
+					  sbSkin="skin_scrollbar"
+					  colorBkgnd="#D8D8D8">
+				<template itemHeight="64"
+						  colorHover="#DAD8D8"
+						  colorSelected="#CAC8C7"
+						  trackMouseEvent="1">
+					<caption pos="5,12,@40,@40">
+						<!--avatar-->
+						<img name="item_avatar" pos="|-16,|-16" skin="skin_default_personal32"/>
+					</caption>
+					<caption pos="[5,0,-0,-0">
+						<!--name-->
+						<text name="item_name"
+							  pos="0,0,-20,-0"
+							  align="left"
+							  valign="center"
+							  dotted="1"
+							  colorText="#282828"
+							  font="face:微软雅黑,size:15" />
 					</caption>
 				</template>
 			</listview>
