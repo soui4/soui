@@ -19,6 +19,7 @@ STipCtrl::STipCtrl(void)
     , m_nScale(100)
 {
     m_id.dwHi = m_id.dwLow = 0;
+    m_id.bNcTip = FALSE;
 }
 
 STipCtrl::~STipCtrl(void)

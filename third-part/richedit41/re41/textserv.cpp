@@ -2527,8 +2527,7 @@ HRESULT CTxtEdit::TxDraw(
 		hicTargetDev = hicLocal;			
 	}
 
-	AssertSz(GetMapMode(hdcDraw) == MM_TEXT || GetDeviceCaps(hdcDraw, TECHNOLOGY) == DT_METAFILE,
-	 "RichEdit requires MM_TEXT.");	// REVIEW (keithcu) Clients do (and should) use MM_TEXT
+	//AssertSz(GetMapMode(hdcDraw) == MM_TEXT || GetDeviceCaps(hdcDraw, TECHNOLOGY) == DT_METAFILE, "RichEdit requires MM_TEXT.");	// REVIEW (keithcu) Clients do (and should) use MM_TEXT
 
 	// Preallocate the memory so the set cannnot fail and we don't
 	// have to use the heap. Note that all clean up is handled
@@ -3446,8 +3445,7 @@ HRESULT CTxtEdit::TxGetNaturalSize(
 	pt.x = *pwidth;
 	pt.y = *pheight;
 
-	AssertSz(GetMapMode(hdcDraw) == MM_TEXT || GetDeviceCaps(hdcDraw, TECHNOLOGY) == DT_METAFILE,
-	 "RichEdit requires MM_TEXT.");	// REVIEW (keithcu) Clients do (and should) use MM_TEXT
+	//AssertSz(GetMapMode(hdcDraw) == MM_TEXT || GetDeviceCaps(hdcDraw, TECHNOLOGY) == DT_METAFILE, "RichEdit requires MM_TEXT.");	// REVIEW (keithcu) Clients do (and should) use MM_TEXT
 
 	// Set the extent information needed for zooming
 	_pdp->SetTempZoomDenominator(psizelExtent->cy);

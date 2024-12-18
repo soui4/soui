@@ -1648,17 +1648,13 @@ void CDisplayML::Render(
 		if (fLastLine)
 			break;
 
-#ifdef DEBUG
 		cp  += pli->_cch;
 		vpLi += pli->GetHeight();
-
 		// Rich controls with password characters stop at EOPs, 
 		// so re.GetCp() may be less than cp.
 		AssertSz(_ped->IsRich() && _ped->fUsePassword() || re.GetCp() == cp, "cp out of sync with line table");
-#endif
 		pt = re.GetCurPoint();
 		AssertSz(pt.v == vpLi, "CDisplayML::RenderView() - y out of sync with line table");
-
 	}
 
 	re.EndRender(pliFirst, pli, cpFirst, ptFirst);

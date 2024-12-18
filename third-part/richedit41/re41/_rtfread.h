@@ -125,7 +125,7 @@ struct STATE
 
 	DEFFONT		rgDefFont[6];			//@cmember Default fonts for \dbch, etc.
 
-	STATE() {};
+	STATE() { memset(this, 0, sizeof(STATE)); }
 										//@cmember Adds or applies PF to state's PF
 	BOOL AddPF(const CParaFormat &PF,
 				LONG lDocType, DWORD dwMask, DWORD dwMask2);
