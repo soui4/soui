@@ -65,6 +65,14 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		SStringW sstrTime = L"昨天";
 		bool bReminder = false;
 
+		//测试生成搜索简拼、全拼
+		SStringT sstrEncode = CGlobalUnits::instance()->EncodeChinese(sstrName);
+        SStringT sstrSimple, sstrFull;
+        CGlobalUnits::instance()->GetSimpleAndFull(sstrEncode, sstrSimple, sstrFull);
+
+		//将源字符串-ID、全拼-ID、简拼-ID保存在全局搜索结果中以备后续使用
+		//TODO:
+
 		int nType = 0;
 		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
 	}
@@ -482,6 +490,38 @@ bool CMainDlg::OnEditContactSearchKillFocus(EventArgs* pEvt)
 
 bool CMainDlg::OnEditContactSearchChanged(EventArgs* e)
 {
+    /*
+	* 大致处理逻辑
+	* 1、获取edit内容
+	* 2、判断是拼音搜索还是中文搜索
+	* 3、根据上述匹配拿到搜索结果然后重新构建搜索列表信息
+	*/
+    EventRENotify *e2 = sobj_cast<EventRENotify>(e);
+    if (e2->iNotify != EN_CHANGE)
+        return false;
+    SEdit *pEdit = sobj_cast<SEdit>(e2->sender);
+    SStringT sstrInput = pEdit->GetWindowText();
+
+	if (sstrInput.IsEmpty())
+	{
+		if (CGlobalUnits::instance()->IsIncludeChinese(sstrInput))  //拼音搜索
+		{
+			//遍历构建的搜索表，然后查找字符串，如果找到了结果则将结果记录一下
+
+			//有可能查到多个将结果去重处理
+		}
+		else
+		{
+			//汉字搜索
+		}
+
+		//重新构建列表
+	}
+	else
+	{
+		//todo:
+	}
+
 	return true;
 }
 

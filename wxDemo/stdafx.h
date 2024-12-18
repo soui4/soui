@@ -19,6 +19,8 @@ using namespace SOUI;
 
 #include "FileHelper.h"
 
+#include <fstream>
+
 #include <Imm.h>
 #pragma comment(lib, "imm32.lib")
 

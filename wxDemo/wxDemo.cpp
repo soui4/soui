@@ -193,6 +193,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 			GetModuleFileName(NULL, szFilePath, MAX_PATH);
 			(_tcsrchr(szFilePath, _T(PATH_SLASH)))[1] = 0;
 			SStringT sstrExePath = szFilePath;
+
+			CGlobalUnits::instance()->m_sstrAppPath = sstrExePath;
+
 			sstrExePath += SStringT(_T("emojis"))+ _T(PATH_SLASH);
 			if (GetFileAttributes(sstrExePath) != INVALID_FILE_ATTRIBUTES)
 			{
@@ -209,6 +212,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 #endif//_WIN32
 			}
 			CGlobalUnits::instance()->OperateEmojis();
+
+			//处理拼音搜索
+            CGlobalUnits::instance()->OperatePinyinMap();
 
 			//加载系统资源
 			souiEngine.LoadRes();
