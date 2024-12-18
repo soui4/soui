@@ -35,8 +35,8 @@ public:
 	void OperateEmojis();
 
     void OperatePinyinMap();
-    SStringT EncodeChinese(SStringT& sstrSrc);
-    SStringT DecodeChinese(SStringT& sstrSrc);
+    SStringT EncodeChinese(const SStringT& sstrSrc);
+    SStringT DecodeChinese(const SStringT& sstrSrc);
     bool GetSimpleAndFull(SStringT& sstrSrc, SStringT& sstrSimple, SStringT& sstrFull);
     bool IsIncludeChinese(SStringT &sstrSrc);
 

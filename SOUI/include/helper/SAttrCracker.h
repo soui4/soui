@@ -73,7 +73,7 @@
 #define ATTR_INT(attribname, varname, allredraw)      \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        int nRet = Str2Int(strValue, TRUE);           \
+        int nRet = Str2IntW(strValue, TRUE);           \
         varname = nRet;                               \
         hRet = allredraw ? S_OK : S_FALSE;            \
     }                                                 \
@@ -176,7 +176,7 @@
 #define ATTR_UINT(attribname, varname, allredraw)     \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        int nRet = Str2Int(strValue, TRUE);           \
+        int nRet = Str2IntW(strValue, TRUE);           \
         varname = (UINT)nRet;                         \
         hRet = allredraw ? S_OK : S_FALSE;            \
     }                                                 \
@@ -186,7 +186,7 @@
 #define ATTR_DWORD(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        int nRet = Str2Int(strValue, TRUE);           \
+        int nRet = Str2IntW(strValue, TRUE);           \
         varname = (DWORD)nRet;                        \
         hRet = allredraw ? S_OK : S_FALSE;            \
     }                                                 \
@@ -196,7 +196,7 @@
 #define ATTR_WORD(attribname, varname, allredraw)     \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        int nRet = Str2Int(strValue, TRUE);           \
+        int nRet = Str2IntW(strValue, TRUE);           \
         varname = (WORD)nRet;                         \
         hRet = allredraw ? S_OK : S_FALSE;            \
     }                                                 \
@@ -267,7 +267,7 @@
 #define ATTR_HEX(attribname, varname, allredraw)      \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        int nRet = Str2Int(strValue, TRUE);           \
+        int nRet = Str2IntW(strValue, TRUE);           \
         varname = nRet;                               \
         hRet = allredraw ? S_OK : S_FALSE;            \
     }                                                 \

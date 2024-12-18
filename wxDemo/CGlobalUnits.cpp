@@ -98,30 +98,29 @@ void CGlobalUnits::OperatePinyinMap()
 #endif
 }
 
-SStringT CGlobalUnits::EncodeChinese(SStringT &sstrSrc)
+SStringT CGlobalUnits::EncodeChinese(const SStringT &sstrSrc)
 {
     SStringT sstrTemp, sstrRet;
     int cur;
 	for (int i = 0; i < sstrSrc.GetLength(); i++)
 	{
         cur = sstrSrc.GetAt(i);
-        sstrTemp.Format(L"%04X", cur);
+        sstrTemp.Format(_T("%04X"), cur);
         sstrRet = sstrRet + sstrTemp;
 	}
 
     return sstrRet;
 }
 
-SStringT CGlobalUnits::DecodeChinese(SStringT &sstrSrc)
+SStringT CGlobalUnits::DecodeChinese(const SStringT &sstrSrc)
 {
     SStringT sstrTemp, sstrRet;
     for (int i = 0; i < sstrSrc.GetLength(); i += 4)
     {
         SStringT sstr = sstrSrc.Mid(i, 4);
-        wchar_t *str1 = sstr.GetBuffer(sstr.GetLength() + 2);
+        TCHAR *str1 = sstr.GetBuffer(sstr.GetLength() + 2);
         int x = (int)_tcstol(sstr, &str1, 16); //十六进制
-
-        sstrTemp.Format(L"%c", x);
+        sstrTemp.Format(_T("%c"), x);
         sstrRet = sstrRet + sstrTemp;
     }
     return sstrRet;
@@ -137,7 +136,7 @@ bool CGlobalUnits::GetSimpleAndFull(SStringT &sstrSrc, SStringT &sstrSimple, SSt
 	for (int i = 0; i < sstrSrc.GetLength(); i += 4)
     {
         SStringT sstr = sstrSrc.Mid(i, 4);
-        auto iter = m_PinyinMap.find((const wchar_t *)sstr);
+        auto iter = m_PinyinMap.find(sstr);
         if (iter != m_PinyinMap.end())
             sstrTemp = iter->second.c_str();
 
@@ -150,7 +149,7 @@ bool CGlobalUnits::GetSimpleAndFull(SStringT &sstrSrc, SStringT &sstrSimple, SSt
 
 bool CGlobalUnits::IsIncludeChinese(SStringT &sstrSrc)
 {
-    std::string strSrc = S_CW2A(sstrSrc.c_str());
+    std::string strSrc = S_CT2A(sstrSrc).c_str();
     char *str = (char *)strSrc.c_str();
     char c;
     while (1)

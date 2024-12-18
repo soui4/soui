@@ -67,11 +67,18 @@ BOOL UpdateDIBPixmap(HBITMAP bmp, int wid, int hei, int bitsPixel, int stride, C
 }
 #endif
 
-int Str2Int(LPCWSTR src,BOOL supportHex)
+int Str2IntW(LPCWSTR src,BOOL supportHex)
 {
 	int nRet = 0;
 	StrToIntExW(src, supportHex?STIF_SUPPORT_HEX:STIF_DEFAULT, &nRet);
 	return nRet;
+}
+
+int Str2IntA(LPCSTR src, BOOL supportHex)
+{
+    int nRet = 0;
+    StrToIntExA(src, supportHex ? STIF_SUPPORT_HEX : STIF_DEFAULT, &nRet);
+    return nRet;
 }
 
 SNS::IStringA * CreateIStringA(LPCSTR src)

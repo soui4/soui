@@ -47,7 +47,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     pLvMessageSearch->SetAdapter(m_pMessageSearchAdapter);
     m_pMessageSearchAdapter->Release();
 	//设置search的适配器 TODO：
-    pLvMessageSearch->SetAttribute(_T("show"), _T("0"));
+	pLvMessageSearch->SetVisible(FALSE, TRUE);
 
 	STabCtrl* pTabMessageComm = (STabCtrl*)pPageMessage->FindIChildByName(L"tab_msg_comm");
 	SASSERT(pTabMessageComm);
@@ -74,7 +74,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		bool bReminder = false;
 
 		//测试生成搜索简拼、全拼
-		SStringT sstrEncode = CGlobalUnits::instance()->EncodeChinese(sstrName);
+		SStringT sstrEncode = CGlobalUnits::instance()->EncodeChinese(S_CW2T(sstrName));
         SStringT sstrSimple, sstrFull;
         CGlobalUnits::instance()->GetSimpleAndFull(sstrEncode, sstrSimple, sstrFull);
 
@@ -455,28 +455,28 @@ bool CMainDlg::OnEditMessageSearchSetFocus(EventArgs* pEvt)
 {
 	//展示搜索框中的取消搜索按钮
 	SImageButton* pSearchCancel = FindChildByName2<SImageButton>(L"btn_msg_search_cancel");
-	pSearchCancel->SetAttribute(L"show", L"1");
+	pSearchCancel->SetVisible(TRUE, TRUE);
 
     //需要展示搜索页面
     SListView *pLvMessage = FindChildByName2<SListView>(L"lv_message");
     SListView *pLvMessageSearch = FindChildByName2<SListView>(L"lv_message_search");
-    pLvMessage->SetAttribute(_T("show"), _T("0"));
-    pLvMessageSearch->SetAttribute(_T("show"), _T("1"));
+	pLvMessage->SetVisible(FALSE, TRUE);
+	pLvMessageSearch->SetVisible(TRUE, TRUE);
 	return true;
 }
 
 bool CMainDlg::OnEditMessageSearchKillFocus(EventArgs* pEvt)
 {
 	SImageButton* pSearchCancel = FindChildByName2<SImageButton>(L"btn_msg_search_cancel");
-	pSearchCancel->SetAttribute(L"show", L"0");
+	pSearchCancel->SetVisible(FALSE, TRUE);
 
 	//重新展示消息列表
     if (m_bMessageSearchResultEmpty)
 	{
         SListView *pLvMessage = FindChildByName2<SListView>(L"lv_message");
         SListView *pLvMessageSearch = FindChildByName2<SListView>(L"lv_message_search");
-        pLvMessage->SetAttribute(_T("show"), _T("1"));
-        pLvMessageSearch->SetAttribute(_T("show"), _T("0"));
+		pLvMessage->SetVisible(TRUE, TRUE);
+		pLvMessageSearch->SetVisible(FALSE, TRUE);
 	}
 
 	return true;
@@ -533,8 +533,8 @@ void CMainDlg::OnBnClickMsgSearchCancel()
 
 	SListView *pLvMessage = FindChildByName2<SListView>(L"lv_message");
     SListView *pLvMessageSearch = FindChildByName2<SListView>(L"lv_message_search");
-    pLvMessage->SetAttribute(_T("show"), _T("1"));
-    pLvMessageSearch->SetAttribute(_T("show"), _T("0"));
+	pLvMessage->SetVisible(TRUE, TRUE);
+	pLvMessageSearch->SetVisible(FALSE, TRUE);
 }
 
 bool CMainDlg::OnEditContactSearchSetFocus(EventArgs* pEvt)
