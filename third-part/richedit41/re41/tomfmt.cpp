@@ -83,9 +83,9 @@ HRESULT QueryInterface (
  *	@mfunc
  *		Constructor
  */
-CTxtFont::CTxtFont(CTxtRange *prg) : CTxtFormat(prg)
+CTxtFont::CTxtFont(CTxtRange *prg) : CTxtFormat(prg),_dwMask(0)
 {
-	Assert(!_dwMask);		// We assume that object is zeroed (new'd)
+	memset(&_tmpDisplayAttr,0,sizeof(_tmpDisplayAttr));
 }
 
 
@@ -1606,10 +1606,10 @@ STDMETHODIMP CTxtFont::SetWeight (
  */
 CTxtPara::CTxtPara(CTxtRange *prg) : CTxtFormat(prg)
 {
-	Assert(!_dwMask && !_PF._dwBorderColor); // We assume that object is zeroed (new'd)
-	_PF._iTabs = -1;
 	_dwMask = 0;
+	_dwFlags = 0;
 	memset(_rgxTabs,0,sizeof(_rgxTabs));
+	_PF._iTabs = -1;
 }
 
 /*

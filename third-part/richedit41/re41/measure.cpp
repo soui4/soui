@@ -31,6 +31,8 @@ ASSERTDATA
 void CMeasurer::Init(const CDisplay *pdp)
 {
 	CTxtEdit *	ped = GetPed();
+	int offset = FIELD_OFFSET(CMeasurer,_pdp);
+	memset((char*)this+offset,0,sizeof(CMeasurer)-offset);
 
 	_pdp = pdp;
 	_pddReference = pdp;

@@ -504,7 +504,7 @@ BOOL CDisplayML::RecalcLines (
 	//Create 1 line for empty controls
 	if(!Count())
 		CreateEmptyLine();
-
+	printf("count lines=%d\n", Count());
     Paginate(0);
 
 	_vpCalcMax = dvp;

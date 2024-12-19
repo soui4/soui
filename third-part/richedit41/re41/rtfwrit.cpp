@@ -509,7 +509,7 @@ CRTFConverter::CRTFConverter(
 	_dwFlags		= dwFlags;
 	_ecParseError	= ecNoError;
 	_bTableLevel	= 0;
-
+	_iCharRep       = 0;
 	if(!_ctfi)
 		ReadFontSubInfo();
 

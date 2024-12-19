@@ -302,7 +302,7 @@ public:
 	DWORD	_dwBorderColor;			// Colors/attribs
 	char	_bTableLevel;			// Table nesting level
 
-	CParaFormat() {}
+	CParaFormat() { memset(this, 0, sizeof(CParaFormat)); }
 													//@cmember Add tab at
 	HRESULT	AddTab (LONG tabPos, LONG tabType,		// position <p tabPos>
 					LONG tabStyle, LONG *prgxTabs);

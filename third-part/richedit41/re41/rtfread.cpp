@@ -222,6 +222,8 @@ CRTFRead::CRTFRead (
 	TRACEBEGIN(TRCSUBSYSRTFR, TRCSCOPEINTERN, "CRTFRead::CRTFRead");
 
 	Assert(prg->GetCch() == 0);
+	int offset = FIELD_OFFSET(CRTFRead,_iParam);
+	memset((char*)this+offset,0,sizeof(CRTFRead)-offset);
 
 	//TODO(BradO):  We should examine the member data in the constructor
 	//	and determine which data we want initialized on construction and
