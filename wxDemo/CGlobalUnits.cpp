@@ -136,7 +136,7 @@ bool CGlobalUnits::GetSimpleAndFull(SStringT &sstrSrc, SStringT &sstrSimple, SSt
 	for (int i = 0; i < sstrSrc.GetLength(); i += 4)
     {
         SStringT sstr = sstrSrc.Mid(i, 4);
-        auto iter = m_PinyinMap.find(sstr);
+		std::multimap<SStringT, SStringT>::iterator iter = m_PinyinMap.find(sstr);
         if (iter != m_PinyinMap.end())
             sstrTemp = iter->second.c_str();
 

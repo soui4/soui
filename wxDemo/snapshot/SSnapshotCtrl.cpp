@@ -207,19 +207,19 @@ void SSnapshotCtrl::CalcPos()
 
     SOUI::CPoint center = rcLine.CenterPoint();
     // 上左 方块
-    m_rcPos[(int)EcPosType::TopLeft].SetRect(rcLine.left, rcLine.top, rcLine.left + 14, rcLine.top + 14);
+    m_rcPos[TopLeft].SetRect(rcLine.left, rcLine.top, rcLine.left + 14, rcLine.top + 14);
     // 上中 方块
-    m_rcPos[(int)EcPosType::TopCenter].SetRect(center.x - 2, rcLine.top, center.x + 2, rcLine.top + 4);
+    m_rcPos[TopCenter].SetRect(center.x - 2, rcLine.top, center.x + 2, rcLine.top + 4);
     // 上右 方块
-    m_rcPos[(int)EcPosType::TopRight].SetRect(rcLine.right - 4, rcLine.top, rcLine.right, rcLine.top + 4);
+    m_rcPos[TopRight].SetRect(rcLine.right - 4, rcLine.top, rcLine.right, rcLine.top + 4);
     // 右中 方块
-    m_rcPos[(int)EcPosType::RightCenter].SetRect(rcLine.right - 4, center.y - 2, rcLine.right, center.y + 2);
+    m_rcPos[RightCenter].SetRect(rcLine.right - 4, center.y - 2, rcLine.right, center.y + 2);
     // 下右 方块
-    m_rcPos[(int)EcPosType::BottomRight].SetRect(rcLine.right - 4, rcLine.bottom - 4, rcLine.right, rcLine.bottom);
+    m_rcPos[BottomRight].SetRect(rcLine.right - 4, rcLine.bottom - 4, rcLine.right, rcLine.bottom);
     // 下中 方块
-    m_rcPos[(int)EcPosType::BottomCenter].SetRect(center.x - 2, rcLine.bottom - 4, center.x + 2, rcLine.bottom);
+    m_rcPos[BottomCenter].SetRect(center.x - 2, rcLine.bottom - 4, center.x + 2, rcLine.bottom);
     // 下左 方块
-    m_rcPos[(int)EcPosType::BottomLeft].SetRect(rcLine.left, rcLine.bottom - 4, rcLine.left + 4, rcLine.bottom);
+    m_rcPos[BottomLeft].SetRect(rcLine.left, rcLine.bottom - 4, rcLine.left + 4, rcLine.bottom);
     // 左中 方块
-    m_rcPos[(int)EcPosType::LeftCenter].SetRect(rcLine.left, center.y - 2, rcLine.left + 4, center.y + 2);
+    m_rcPos[LeftCenter].SetRect(rcLine.left, center.y - 2, rcLine.left + 4, center.y + 2);
 }

@@ -79,7 +79,7 @@ public:
 			HSTREEITEM hRoot3 = InsertItem(data3);
 			SetItemExpanded(hRoot3, TRUE);
 
-			auto iter = CGlobalUnits::instance()->m_mapGroups.begin();
+			GroupsMap::iterator iter = CGlobalUnits::instance()->m_mapGroups.begin();
 			for (; iter != CGlobalUnits::instance()->m_mapGroups.end(); iter++)
 			{
 				data3.bGroup = false;
@@ -98,7 +98,7 @@ public:
 			data4.bGroup = TRUE;
 			HSTREEITEM hRoot4 = InsertItem(data4);
 			SetItemExpanded(hRoot4, TRUE);
-			auto iter = CGlobalUnits::instance()->m_mapPersonals.begin();
+			PersonalsMap::iterator iter = CGlobalUnits::instance()->m_mapPersonals.begin();
 			for (; iter != CGlobalUnits::instance()->m_mapPersonals.end(); iter++)
 			{
 				data4.bGroup = false;
@@ -113,7 +113,7 @@ public:
 
 	~CTvContactAdapter() {}
 
-	virtual void getView(HSTREEITEM loc, SItemPanel* pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(HSTREEITEM loc, SItemPanel* pItem, SXmlNode xmlTemplate)
 	{
 		ItemInfo& ii = m_tree.GetItemRef((HSTREEITEM)loc);
 		int itemType = getViewType(loc);
@@ -165,14 +165,14 @@ public:
 		}
 	}
 
-	virtual int getViewType(HSTREEITEM hItem) const
+	virtual int WINAPI getViewType(HSTREEITEM hItem) const
 	{
 		ItemInfo& ii = m_tree.GetItemRef((HSTREEITEM)hItem);
 		if (ii.data.bGroup) return 0;
 		else return 1;
 	}
 
-	virtual int getViewTypeCount() const
+	virtual int WINAPI getViewTypeCount() const
 	{
 		return 2;
 	}

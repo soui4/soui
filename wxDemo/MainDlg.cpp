@@ -576,7 +576,7 @@ void CMainDlg::OnEmotionItemClick(const std::string& strID)
 {
 	SLOGI() << "OnEmotionItemClick,id=" << strID.c_str();
 	//根据ID找到对应的图片然后将图片添加到re中
-	auto iter = CGlobalUnits::instance()->m_mapEmojisIndex.find(strID);
+	std::map<std::string, std::string>::iterator iter = CGlobalUnits::instance()->m_mapEmojisIndex.find(strID);
 	if (iter != CGlobalUnits::instance()->m_mapEmojisIndex.end())
 	{
 		EndMenuEx(-1);
@@ -617,7 +617,7 @@ void CMainDlg::OnBnClickEmotion(IEvtArgs *e)
 	menuEmoji.LoadMenuU8("smenuex:emoji");
 	m_pEmojiMenu = &menuEmoji;
 	menuEmoji.TrackPopupMenu(TPM_BOTTOMALIGN, rc.left, rc.top, m_hWnd, GetScale());
-	m_pEmojiMenu = nullptr;
+	m_pEmojiMenu = NULL;
 }
 
 void CMainDlg::OnBnClickImage()

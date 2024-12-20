@@ -26,11 +26,11 @@ public:
 	~CEmotionTileViewAdapter() {}
 
 protected:
-	virtual int getCount() {
+	virtual int WINAPI getCount() {
 		return static_cast<int>(m_vecItems.size());
 	}
 
-	virtual void getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
+	virtual void WINAPI getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
 	{
 		if (0 == pItem->GetChildrenCount())
 		{
