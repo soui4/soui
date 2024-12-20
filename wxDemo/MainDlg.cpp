@@ -54,11 +54,11 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
 	//测试添加文件助手
 	{
-		SStringW sstrID;
-		sstrID.Format(L"%d", 99999);
+		SStringT sstrID;
+		sstrID.Format(_T("%d"), 99999);
 
-		SStringW sstrPage;
-		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_FILEHELPER'/></page>", sstrID);
+		SStringT sstrPage;
+        sstrPage.Format(_T("<page title='%s'><include src='layout:XML_PAGE_FILEHELPER'/></page>"), sstrID);
 		int iPage = pTabMessageComm->InsertItem(sstrPage);
 		SWindow* pPage = static_cast<SWindow*>(pTabMessageComm->GetPage(iPage));
 		SEdit* pInputEdit = pPage->FindChildByName2<SEdit>("edit_send");
@@ -67,105 +67,141 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 			SComPtr<IDropTarget> dropTarget(new CEditDropTarget(pInputEdit),FALSE);
 			RegisterDragDrop(pInputEdit->GetSwnd(), dropTarget);
 		}
-		SStringW sstrAvatar = L"";
-		SStringW sstrName = L"文件传输助手";
-		SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
-		SStringW sstrTime = L"昨天";
+        SStringT sstrAvatar = _T("");
+        SStringT sstrName = _T("文件传输助手");
+        SStringT sstrContent = _T("测试1231241231231231123124123123123123122312");
+        SStringT sstrTime = _T("昨天");
 		bool bReminder = false;
-
-		//测试生成搜索简拼、全拼
-		SStringT sstrEncode = CGlobalUnits::instance()->EncodeChinese(sstrName);
-        SStringT sstrSimple, sstrFull;
-        CGlobalUnits::instance()->GetSimpleAndFull(sstrEncode, sstrSimple, sstrFull);
-
-		//将源字符串-ID、全拼-ID、简拼-ID保存在全局搜索结果中以备后续使用
-		//TODO:
 
 		int nType = 0;
 		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
+
+		//测试生成搜索简拼、全拼
+        SStringT sstrEncode = CGlobalUnits::instance()->EncodeChinese(sstrName);
+        SStringT sstrSimple, sstrFull;
+        CGlobalUnits::instance()->GetSimpleAndFull(sstrEncode, sstrSimple, sstrFull);
+        std::string strID = S_CT2A(sstrID);
+        //将源字符串-ID、全拼-ID、简拼-ID保存在全局搜索结果中以备后续使用
+        CGlobalUnits::instance()->m_mapMessageChineseSearch.insert(std::make_pair(sstrName, SEARCH_INFO(nType, strID)));
+
+        CGlobalUnits::instance()->m_mapMessagePinyinSearch.insert(std::make_pair(sstrSimple, SEARCH_INFO(nType, strID)));
+        CGlobalUnits::instance()->m_mapMessagePinyinSearch.insert(std::make_pair(sstrFull, SEARCH_INFO(nType, strID)));
 	}
 
 	//测试添加个人
 	{
 		for (int i = 0; i < 5; i++)
 		{
-			SStringW sstrID;
+            SStringT sstrID;
 			sstrID.Format(L"%d", i);
 
-			SStringW sstrPage;
+			SStringT sstrPage;
 			sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_PERSONALCOMM'/></page>", sstrID);
 			pTabMessageComm->InsertItem(sstrPage);
 
-			SStringW sstrAvatar = L"";
-			SStringW sstrName;
+			SStringT sstrAvatar = L"";
+            SStringT sstrName;
 			sstrName.Format(L"个人测试%d", i);
-			SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
-			SStringW sstrTime = L"12:09";
+            SStringT sstrContent = L"测试1231241231231231123124123123123123122312";
+            SStringT sstrTime = L"12:09";
 			bool bReminder = false;
 			if (i < 2) bReminder = true;
 
 			int nType = 1;
 			m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
+
+			//测试生成搜索简拼、全拼
+            SStringT sstrEncode = CGlobalUnits::instance()->EncodeChinese(sstrName);
+            SStringT sstrSimple, sstrFull;
+            CGlobalUnits::instance()->GetSimpleAndFull(sstrEncode, sstrSimple, sstrFull);
+            std::string strID = S_CT2A(sstrID);
+            //将源字符串-ID、全拼-ID、简拼-ID保存在全局搜索结果中以备后续使用
+            CGlobalUnits::instance()->m_mapMessageChineseSearch.insert(std::make_pair(sstrName, SEARCH_INFO(nType, strID)));
+
+            CGlobalUnits::instance()->m_mapMessagePinyinSearch.insert(std::make_pair(sstrSimple, SEARCH_INFO(nType, strID)));
+            CGlobalUnits::instance()->m_mapMessagePinyinSearch.insert(std::make_pair(sstrFull, SEARCH_INFO(nType, strID)));
 		}
 	}
 
 	//测试添加群
 	for (int i = 0; i < 5; i++)
 	{
-		SStringW sstrID;
+        SStringT sstrID;
 		sstrID.Format(L"%d", i);
 
-		SStringW sstrPage;
+		SStringT sstrPage;
 		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_GROUPCOMM'/></page>", sstrID);
 		pTabMessageComm->InsertItem(sstrPage);
 
-		SStringW sstrAvatar = L"";
-		SStringW sstrName;
+		SStringT sstrAvatar = L"";
+        SStringT sstrName;
 		sstrName.Format(L"群测试%d", i);
-		SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
-		SStringW sstrTime = L"12:09";
+        SStringT sstrContent = L"测试1231241231231231123124123123123123122312";
+        SStringT sstrTime = L"12:09";
 		bool bReminder = false;
 		if (i % 2 == 0) bReminder = true;
 
 		int nType = 2;
 		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
+
+		//测试生成搜索简拼、全拼
+        SStringT sstrEncode = CGlobalUnits::instance()->EncodeChinese(sstrName);
+        SStringT sstrSimple, sstrFull;
+        CGlobalUnits::instance()->GetSimpleAndFull(sstrEncode, sstrSimple, sstrFull);
+        std::string strID = S_CT2A(sstrID);
+        //将源字符串-ID、全拼-ID、简拼-ID保存在全局搜索结果中以备后续使用
+        CGlobalUnits::instance()->m_mapMessageChineseSearch.insert(std::make_pair(sstrName, SEARCH_INFO(nType, strID)));
+
+        CGlobalUnits::instance()->m_mapMessagePinyinSearch.insert(std::make_pair(sstrSimple, SEARCH_INFO(nType, strID)));
+        CGlobalUnits::instance()->m_mapMessagePinyinSearch.insert(std::make_pair(sstrFull, SEARCH_INFO(nType, strID)));
 	}
 
 	//测试添加公众号
 	{
-		for (int i = 0; i < 3; i++)
+		for (int i = 0; i < 5; i++)
 		{
-			SStringW sstrID;
+            SStringT sstrID;
 			sstrID.Format(L"%d", i);
 
-			SStringW sstrPage;
+			SStringT sstrPage;
 			sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_GZH'/></page>", sstrID);
 			pTabMessageComm->InsertItem(sstrPage);
 
-			SStringW sstrAvatar = L"";
-			SStringW sstrName;
+			SStringT sstrAvatar = L"";
+            SStringT sstrName;
 			sstrName.Format(L"公众号测试%d", i);
-			SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
-			SStringW sstrTime = L"2024-12-12";
+            SStringT sstrContent = L"测试1231241231231231123124123123123123122312";
+            SStringT sstrTime = L"2024-12-12";
 			bool bReminder = false;
 			int nType = -1;
 			m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
+
+			//测试生成搜索简拼、全拼
+            SStringT sstrEncode = CGlobalUnits::instance()->EncodeChinese(sstrName);
+            SStringT sstrSimple, sstrFull;
+            CGlobalUnits::instance()->GetSimpleAndFull(sstrEncode, sstrSimple, sstrFull);
+            std::string strID = S_CT2A(sstrID);
+            //将源字符串-ID、全拼-ID、简拼-ID保存在全局搜索结果中以备后续使用
+            CGlobalUnits::instance()->m_mapMessageChineseSearch.insert(std::make_pair(sstrName, SEARCH_INFO(nType, strID)));
+
+            CGlobalUnits::instance()->m_mapMessagePinyinSearch.insert(std::make_pair(sstrSimple, SEARCH_INFO(nType, strID)));
+            CGlobalUnits::instance()->m_mapMessagePinyinSearch.insert(std::make_pair(sstrFull, SEARCH_INFO(nType, strID)));
 		}
 	}
 
 	//测试添加订阅号
 	{
-		SStringW sstrID;
+        SStringT sstrID;
 		sstrID.Format(L"%d", 9999);
 
-		SStringW sstrPage;
+		SStringT sstrPage;
 		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_DYH'/></page>", sstrID);
 		pTabMessageComm->InsertItem(sstrPage);
 
-		SStringW sstrAvatar = L"";
-		SStringW sstrName = L"订阅号测试";
-		SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
-		SStringW sstrTime = L"2024-12-12";
+		SStringT sstrAvatar = L"";
+        SStringT sstrName = L"订阅号测试";
+        SStringT sstrContent = L"测试1231241231231231123124123123123123122312";
+        SStringT sstrTime = L"2024-12-12";
 		bool bReminder = false;
 		int nType = -2;
 		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
@@ -173,17 +209,17 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 
 	//测试添加新闻
 	{
-		SStringW sstrID;
+        SStringT sstrID;
 		sstrID.Format(L"%d", 9999);
 
-		SStringW sstrPage;
+		SStringT sstrPage;
 		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_NEWS'/></page>", sstrID);
 		pTabMessageComm->InsertItem(sstrPage);
 
-		SStringW sstrAvatar = L"";
-		SStringW sstrName = L"新闻测试";
-		SStringW sstrContent = L"测试1231241231231231123124123123123123122312";
-		SStringW sstrTime = L"2024-12-12";
+		SStringT sstrAvatar = L"";
+        SStringT sstrName = L"新闻测试";
+        SStringT sstrContent = L"测试1231241231231231123124123123123123122312";
+        SStringT sstrTime = L"2024-12-12";
 		bool bReminder = false;
 		int nType = -3;
 		m_pMessageAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName, sstrContent, sstrTime, bReminder);
@@ -481,7 +517,7 @@ bool CMainDlg::OnEditMessageSearchKillFocus(EventArgs* pEvt)
 
 	return true;
 }
-
+#include <algorithm>
 bool CMainDlg::OnEditMessageSearchChanged(EventArgs* e)
 {
     /*
@@ -495,27 +531,114 @@ bool CMainDlg::OnEditMessageSearchChanged(EventArgs* e)
         return false;
     SEdit *pEdit = sobj_cast<SEdit>(e2->sender);
     SStringT sstrInput = pEdit->GetWindowText();
+    std::wstring wstrInput = S_CT2W(sstrInput);
 
+	std::vector<SEARCH_INFO> vecSearchResult;
     if (!sstrInput.IsEmpty())
     {
         m_bMessageSearchResultEmpty = false;
         if (!CGlobalUnits::instance()->IsIncludeChinese(sstrInput)) //拼音搜索
         {
             //遍历构建的搜索表，然后查找字符串，如果找到了结果则将结果记录一下
+            auto iter = CGlobalUnits::instance()->m_mapMessagePinyinSearch.begin();
+            for (; iter != CGlobalUnits::instance()->m_mapMessagePinyinSearch.end(); iter++)
+			{
+                SStringT sstrPinyin = iter->first;
+                std::wstring wstrName = S_CT2W(sstrPinyin);
+				if (wstrName.find(wstrInput) != std::string::npos)
+                    vecSearchResult.push_back(iter->second);
+			}
 
             //有可能查到多个将结果去重处理
+            sort(vecSearchResult.begin(), vecSearchResult.end());
+            vecSearchResult.erase(unique(vecSearchResult.begin(), vecSearchResult.end()), vecSearchResult.end());
         }
         else
         {
             //汉字搜索
+            auto iter = CGlobalUnits::instance()->m_mapMessageChineseSearch.begin();
+            for (; iter != CGlobalUnits::instance()->m_mapMessageChineseSearch.end(); iter++)
+            {
+                SStringT sstrPinyin = iter->first;
+                std::wstring wstrName = S_CT2W(sstrPinyin);
+                if (wstrName.find(wstrInput) != std::string::npos)
+                    vecSearchResult.push_back(iter->second);
+            }
+            //有可能查到多个将结果去重处理
+            sort(vecSearchResult.begin(), vecSearchResult.end());
+            vecSearchResult.erase(unique(vecSearchResult.begin(), vecSearchResult.end()), vecSearchResult.end());
         }
 
         //重新构建列表
+        m_pMessageSearchAdapter->DeleteAllItem();
+		for (int i = 0; i < vecSearchResult.size(); i++)
+		{
+            int nType = vecSearchResult[i].m_nType;
+            std::string strID = vecSearchResult[i].m_strID;
+			//根据type、id去全局或者别的地方去查找到对应的头像、name等数据然后将数据添加到列表中
+            switch (nType)
+            {
+            case 0:
+            {
+				//file helper
+                SStringT sstrID = S_CA2T(strID.c_str());
+                SStringT sstrAvatar = _T("");
+                SStringT sstrName = _T("文件传输助手");
+                m_pMessageSearchAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName);
+            }
+			break;
+            case -1:
+			{
+				//gzh
+                SStringT sstrID = S_CA2T(strID.c_str());
+                SStringT sstrAvatar = _T("");
+                SStringT sstrName = _T("公众号测试") + sstrID;
+                m_pMessageSearchAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName);
+			}
+			break;
+            case -2:
+            {
+				//dyh
+                SStringT sstrID = S_CA2T(strID.c_str());
+                SStringT sstrAvatar = _T("");
+                SStringT sstrName = _T("订阅号测试") + sstrID;
+                m_pMessageSearchAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName);
+			}
+			break;
+            case -3:
+            {
+                //news
+            }
+            break;
+            case 1:
+            {
+                //personal 
+				SStringT sstrID = S_CA2T(strID.c_str());
+                SStringT sstrAvatar = _T("");
+                SStringT sstrName = _T("个人测试") + sstrID;
+                m_pMessageSearchAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName);
+            }
+            break;
+            case 2:
+            {
+                //group
+                SStringT sstrID = S_CA2T(strID.c_str());
+                SStringT sstrAvatar = _T("");
+                SStringT sstrName = _T("群测试") + sstrID;
+                m_pMessageSearchAdapter->AddItem(sstrID, nType, sstrAvatar, sstrName);
+            }
+            break;
+            default:
+                break;
+            }
+		}
+
     }
     else
     {
         // todo:
         m_bMessageSearchResultEmpty = true;
+        m_pMessageSearchAdapter->DeleteAllItem();
     }
 	return true;
 }
