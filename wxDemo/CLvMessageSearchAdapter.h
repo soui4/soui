@@ -114,7 +114,7 @@ public:
 			}
 			else
 			{
-				//use default avatar
+				//use custom avatar
 			}
 		}
 		break;
@@ -128,7 +128,7 @@ public:
 			}
 			else
 			{
-				//use default avatar
+				//use custom avatar
 			}
 		}
 		break;

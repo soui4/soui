@@ -100,7 +100,7 @@ protected:
         EVENT_NAME_COMMAND(L"btn_msg_search_cancel", OnBnClickMsgSearchCancel)
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventSetFocus::EventID, OnEditMessageSearchSetFocus)
 		EVENT_NAME_HANDLER(L"edit_msg_search", EventKillFocus::EventID, OnEditMessageSearchKillFocus)
-		EVENT_NAME_HANDLER(L"edit_msg_search", EventRENotify::EventID, OnEditContactSearchChanged)
+        EVENT_NAME_HANDLER(L"edit_msg_search", EventRENotify::EventID, OnEditMessageSearchChanged)
 
 		EVENT_NAME_HANDLER(L"btn_emotion",EventCmd::EventID, OnBnClickEmotion)
 		EVENT_NAME_COMMAND(L"btn_image", OnBnClickImage)
@@ -115,7 +115,8 @@ protected:
 
 		EVENT_NAME_HANDLER(L"edit_contact_search", EventSetFocus::EventID, OnEditContactSearchSetFocus)
 		EVENT_NAME_HANDLER(L"edit_contact_search", EventKillFocus::EventID, OnEditContactSearchKillFocus)
-		EVENT_NAME_HANDLER(L"edit_contact_search", EventRENotify::EventID, OnEditMessageSearchChanged)
+        EVENT_NAME_HANDLER(L"edit_contact_search", EventRENotify::EventID, OnEditContactSearchChanged)
+
 	EVENT_MAP_END2(SHostWnd)
 		
 	LRESULT OnMenuEvent(UINT msg, WPARAM wp, LPARAM lp);

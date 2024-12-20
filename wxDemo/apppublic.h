@@ -114,3 +114,34 @@ typedef struct _tagGHInfo
 	}
 }GH_INFO;
 typedef std::map<std::string, GH_INFO>			GHsMap;
+
+typedef struct _tagSearchInfo
+{
+    int m_nType;  //类型
+    std::string m_strID; //ID
+
+    _tagSearchInfo()
+    {
+        m_nType = -1000;
+        m_strID = "";
+    }
+    _tagSearchInfo(int nType, const std::string &strID)
+    {
+        m_nType = nType;
+        m_strID = strID;
+    }
+
+  public:
+    BOOL operator<(const _tagSearchInfo &info) const
+    {
+        return this->m_strID < info.m_strID;
+    }
+    BOOL operator==(const _tagSearchInfo &info) const
+    {
+        if (this->m_strID == info.m_strID && this->m_nType == info.m_nType)
+            return TRUE;
+        else
+            return FALSE;
+    }
+} SEARCH_INFO;
+//typedef std::multimap<std::wstring, SEARCH_INFO> SearchInfosMap;

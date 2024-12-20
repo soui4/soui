@@ -28,6 +28,13 @@ public:
 
 	std::multimap<SStringT, SStringT> m_PinyinMap;
 
+	//实际项目中只需根据通讯录构建一个就可以了，在demo中添加数据时随意添加的就分开定义了
+	std::multimap<SStringT, SEARCH_INFO> m_mapMessagePinyinSearch;
+    std::multimap<SStringT, SEARCH_INFO> m_mapMessageChineseSearch;
+
+    std::multimap<SStringT, SEARCH_INFO> m_mapContactPinyinSearch;
+    std::multimap<SStringT, SEARCH_INFO> m_mapContactChineseSearch;
+
   public:
 	void SetEmojiPath(const SStringT& emojiPath);
 
