@@ -978,7 +978,7 @@ STDMETHODIMP CTxtFont::SetBackColor (
 	}
 
 	_CF._dwEffects |= CFE_AUTOBACKCOLOR;		// Default AutoBackColor
-	if(Value != tomAutoColor)
+	if(Value != (COLORREF)tomAutoColor)
 	{
 		if(Value < 0)
 			return E_INVALIDARG;
@@ -1168,7 +1168,7 @@ STDMETHODIMP CTxtFont::SetForeColor (
 	}
 
 	_CF._dwEffects |= CFE_AUTOCOLOR;			// Default AutoColor
-	if(Value != tomAutoColor)
+	if(Value != (COLORREF)tomAutoColor)
 	{
 		_CF._dwEffects &= ~CFE_AUTOCOLOR;		// Turn off AutoColor
 		_CF._crTextColor = (COLORREF)Value;		// Use new TextColor
@@ -1544,7 +1544,7 @@ STDMETHODIMP CTxtFont::SetUnderline (
 
 	if (_fApplyToTmp)
 	{
-		if (Value == tomAutoColor)
+		if (Value == (COLORREF)tomAutoColor)
 			_tmpDisplayAttr.crUnderlineColor = (DWORD)tomAutoColor;
 		else if ((((DWORD)Value) & 0x0FF000000) == 0x0FF000000)
 			_tmpDisplayAttr.crUnderlineColor = ((DWORD)Value) & 0x000FFFFFF;	// Set UL color

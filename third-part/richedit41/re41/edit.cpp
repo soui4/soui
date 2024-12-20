@@ -7140,7 +7140,7 @@ HRESULT	CTxtEdit::GetCaretWidth()
 LONG CCellColor::GetColorIndex(
 	COLORREF cr)
 {
-	if(cr == tomAutoColor)
+	if(cr == (COLORREF)tomAutoColor)
 		return 0;
 
 	for(LONG i = 0; i < 16; i++)

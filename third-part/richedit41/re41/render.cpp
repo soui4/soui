@@ -2121,7 +2121,7 @@ void CRenderer::SetFontAndColor(
 void CRenderer::SetDefaultBackColor(
 	COLORREF cr)		//@parm Background color to use
 {
-	if(cr == tomAutoColor)
+	if(cr == (COLORREF)tomAutoColor)
 		cr = GetPed()->TxGetBackColor();		// Printer needs work...
 
 	if(_crBackground != cr)
@@ -2141,7 +2141,7 @@ void CRenderer::SetDefaultBackColor(
 void CRenderer::SetDefaultTextColor(
 	COLORREF cr)		//@parm Background color to use
 {
-	if(cr == tomAutoColor)
+	if(cr == (COLORREF)tomAutoColor)
 		cr = GetPed()->TxGetForeColor();		// Printer needs work...
 
 	if(_crTextColor != cr)
@@ -2656,7 +2656,7 @@ void CRenderer::RenderUnderline(
 	vpStart = rcIntersection.top;
 	dvp = rcIntersection.bottom - rcIntersection.top;
 
-	if (crUnderline == tomAutoColor || crUnderline == tomUndefined)
+	if (crUnderline == (COLORREF)tomAutoColor || crUnderline == (COLORREF)tomUndefined)
 	{
 		crUnderline = _crCurTextColor;
 	}

@@ -1065,7 +1065,7 @@ COLORREF CRTFRead::GetColor(
 		_dwMaskCF	  |= dwMask;				// Turn on appropriate mask bit
 		_CF._dwEffects &= ~dwMask;				// auto(back)color off: color is to be used
 
-		if(Color == tomAutoColor)
+		if(Color == (COLORREF)tomAutoColor)
 		{
 			_CF._dwEffects |= dwMask;			// auto(back)color on				
 			Color = RGB(0,0,0);
