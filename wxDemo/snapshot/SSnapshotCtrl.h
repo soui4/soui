@@ -31,17 +31,23 @@ protected:
 
 public:
 	void SetBmpResource(CBitmap* pBmp);
-
 	void CalcPos();
+    EcPosType HitPos(const CPoint &pt);	
 
+	virtual BOOL OnSetCursor(const CPoint &pt);
   private:
 	CBitmap* m_pBitmap;
 
 	SOUI::CPoint	m_ptDown;				//鼠标按下的位置
-	SOUI::CRect		m_rcCaptureArea;		//截图区域
+	SOUI::CRect		m_rcCapture;		//截图区域
 	EcPosType		m_emPosType;
 	bool	m_bCapture;
 
+	HCURSOR m_hCurSelect;
+    HCURSOR m_hCurLeft, m_hCurRight, m_hCurTop, m_hCurBottom, m_hCurTopLeft, m_hCurTopRight, m_hCurBottomLeft, m_hCurBottomRight, m_hCurHand, m_hCurArrow;
+
 	SOUI::CRect m_rcPos[8];
+
+	bool	m_bSelectFinished;
 };
 
