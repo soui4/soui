@@ -34,7 +34,7 @@ project(SOUI4)
 
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 if(NOT CMAKE_BUILD_TYPE)
-set(CMAKE_BUILD_TYPE "Debug")
+set(CMAKE_BUILD_TYPE "Release")
 endif()
 
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
@@ -87,7 +87,8 @@ include_directories(${PROJECT_BINARY_DIR}/config)
 install(FILES "${PROJECT_BINARY_DIR}/config/config.h" DESTINATION include/config)
 install(FILES "${PROJECT_BINARY_DIR}/config/build.cfg" DESTINATION include/config)
 
-
+set(CMAKE_C_FLAGS_RELEASE "-s")
+set(CMAKE_CPP_FLAGS_RELEASE "-s")
 # 设置库文件的输出路径
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
