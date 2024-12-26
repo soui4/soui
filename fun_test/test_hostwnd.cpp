@@ -148,6 +148,10 @@ public:
             SApplication::getSingletonPtr()->LoadRawBuffer(_T("layout"), _T("XML_MAINWND"), NULL, buf);
             m_pSciter->SendMessage(SCI_SETTEXT, buf.size(), (LPARAM)(char*)buf);
         }
+        SWindow* edit = FindChildByName("edit_test");
+        if (edit) {
+            ::RegisterDragDrop(m_hWnd, GetDropTarget());
+        }
     }
 
     void OnShowMsgbox(){ 
