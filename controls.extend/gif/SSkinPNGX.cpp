@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "SSkinPNGX.h"
 #include <helper/SplitString.h>
 #include <interface/simgdecoder-i.h>
@@ -14,7 +14,7 @@ SNSBEGIN
 
 HRESULT SSkinPNGX::OnAttrDelay(const SStringW &strValue,BOOL bLoading)
 {
-	//½âÎöÃ¿Ò»Ö¡µÄÑÓÊ±£¬¸ñÊ½Îª£º10,10,20[5],10, ÆäÖĞ[5]´ú±íÁ¬Ğø5Ö¡µÄÊ±ÑÓ¶¼ÊÇ20ms¡£
+	//è§£ææ¯ä¸€å¸§çš„å»¶æ—¶ï¼Œæ ¼å¼ä¸ºï¼š10,10,20[5],10, å…¶ä¸­[5]ä»£è¡¨è¿ç»­5å¸§çš„æ—¶å»¶éƒ½æ˜¯20msã€‚
 	SStringWList strDelays;
 	int nSegs = (int)SplitString(strValue,L',',strDelays);
 	m_nDelays.RemoveAll();

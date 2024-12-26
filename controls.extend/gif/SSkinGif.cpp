@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "SSkinGif.h"
 #include <helper/SplitString.h>
 #include <interface/SImgDecoder-i.h>
@@ -26,7 +26,7 @@ namespace SOUI
                 GETRESPROVIDER->GetRawBuffer(strLst[0],strLst[1],pBuf,szBuf);
             }
         }else
-        {//×Ô¶¯´ÓGIF×ÊÔ´ÀàĞÍÀï²éÕÒ×ÊÔ´
+        {//è‡ªåŠ¨ä»GIFèµ„æºç±»å‹é‡ŒæŸ¥æ‰¾èµ„æº
             szBuf=GETRESPROVIDER->GetRawBufferSize(_T("gif"),strLst[0]);
             if(szBuf)
             {
@@ -157,9 +157,9 @@ static ULONG_PTR s_gdipToken=0;
 
 /**
 * GetFrameDelay
-* @brief    »ñµÃÖ¸¶¨Ö¡µÄÏÔÊ¾Ê±¼ä
-* @param    int iFrame --  Ö¡ºÅ,Îª-1Ê±´ú±í»ñµÃµ±Ç°Ö¡µÄÑÓÊ±
-* @return   long -- ÑÓÊ±Ê±¼ä(*10ms)
+* @brief    è·å¾—æŒ‡å®šå¸§çš„æ˜¾ç¤ºæ—¶é—´
+* @param    int iFrame --  å¸§å·,ä¸º-1æ—¶ä»£è¡¨è·å¾—å½“å‰å¸§çš„å»¶æ—¶
+* @return   long -- å»¶æ—¶æ—¶é—´(*10ms)
 * Describe
 */
 

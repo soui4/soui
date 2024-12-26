@@ -1,4 +1,4 @@
-#include <string/strcpcvt.h>
+ï»¿#include <string/strcpcvt.h>
 #include <interface/SWindow-i.h>
 #include <interface/smenu-i.h>
 #include <interface/smenuex-i.h>
@@ -7,7 +7,7 @@
 #include "luaAdapter.h"
 #include "luaAnimationListener.h"
 
-//µ¼³ö»ù±¾½á¹¹ÌåÀàÐÍ
+//å¯¼å‡ºåŸºæœ¬ç»“æž„ä½“ç±»åž‹
 UINT rgb(int r,int g,int b)
 {
 	return RGBA(r,g,b,255);

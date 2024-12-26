@@ -1,4 +1,4 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "CSnapshotDlg.h"
 
 CSnapshotDlg::CSnapshotDlg()
@@ -13,7 +13,7 @@ CSnapshotDlg::~CSnapshotDlg(void)
 
 BOOL CSnapshotDlg::OnInitDialog(HWND wnd, LPARAM lInitParam)
 {
-	//ªÒ»°∆¡ƒª¥Û–°
+	//Ëé∑ÂèñÂ±èÂπïÂ§ßÂ∞è
 	DEVMODE dm;
 	ZeroMemory(&dm, sizeof(dm));
 	EnumDisplaySettings(NULL, ENUM_CURRENT_SETTINGS, &dm);

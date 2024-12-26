@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 namespace SOUI
 {
@@ -19,9 +19,9 @@ class SChatEdit : public SRichEdit {
     // Returns:   BOOL -- success:TRUE
     // Qualifier:
     // Parameter: const SStringW & strMsg
-    // remark: strMsg :Ò»¸öXML¸ñÊ½µÄÕýÎÄ£¬Ö§³Ö±êÇ©£º<color value="#ff0000">abc<link
+    // remark: strMsg :ä¸€ä¸ªXMLæ ¼å¼çš„æ­£æ–‡ï¼Œæ”¯æŒæ ‡ç­¾ï¼š<color value="#ff0000">abc<link
     // color="#0000ff">home</link><underline>efg<italic>abc<bold>abc<strike>afc<font
-    // value="ËÎÌå">abc<smiley id="1"
+    // value="å®‹ä½“">abc<smiley id="1"
     // path="c:\a.gif"/></font></strike></bold></italic></underline></color>
     //************************************
     BOOL AppendFormatText(const SStringW &strMsg, BOOL bNewLine = TRUE, BOOL bCanUndo = TRUE);

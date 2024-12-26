@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "CompressionFormat.h"
 #include <vector>
 namespace SevenZip
@@ -11,52 +11,52 @@ namespace SevenZip
 
         virtual bool OnFileItems(std::vector<std::wstring>&/*itemNames*/, std::vector<unsigned __int64>&/*itemSizes*/){ return true; };
         /*
-        ¿ªÊ¼: Ñ¹Ëõ/½âÑ¹
-        totalSize : ´ıÑ¹ËõÎÄ¼ş×Ü´óĞ¡  /   Ñ¹Ëõ°ü´óĞ¡? or ´ı½âÑ¹ÎÄ¼ş×Ü´óĞ¡?
+        å¼€å§‹: å‹ç¼©/è§£å‹
+        totalSize : å¾…å‹ç¼©æ–‡ä»¶æ€»å¤§å°  /   å‹ç¼©åŒ…å¤§å°? or å¾…è§£å‹æ–‡ä»¶æ€»å¤§å°?
         */
         virtual void OnStart(const std::wstring& /*filePath*/, unsigned __int64 /*totalSize*/) {}
 
         /*
-        ÊıÖµ½ø¶È : Ñ¹Ëõ/½âÑ¹
-        inSize   : ÒÑ´¦ÀíÎÄ¼ş×Ü´óĞ¡  / ÒÑ´¦ÀíÑ¹Ëõ°ü´óĞ¡
-        outSize  : Éú³ÉÑ¹Ëõ°ü´óĞ¡    / ½âÑ¹³öÀ´ÎÄ¼ş×Ü´óĞ¡
+        æ•°å€¼è¿›åº¦ : å‹ç¼©/è§£å‹
+        inSize   : å·²å¤„ç†æ–‡ä»¶æ€»å¤§å°  / å·²å¤„ç†å‹ç¼©åŒ…å¤§å°
+        outSize  : ç”Ÿæˆå‹ç¼©åŒ…å¤§å°    / è§£å‹å‡ºæ¥æ–‡ä»¶æ€»å¤§å°
         */
         virtual void OnRadio(unsigned __int64  /*inSize*/, unsigned __int64 /*outSize*/) {}
 
         /*
-        ÎÄ¼ş½ø¶È : Ñ¹Ëõ/½âÑ¹
-        filePath       : ÎÄ¼ş
-        bytesCompleted : ÒÑ´¦Àí´óĞ¡
+        æ–‡ä»¶è¿›åº¦ : å‹ç¼©/è§£å‹
+        filePath       : æ–‡ä»¶
+        bytesCompleted : å·²å¤„ç†å¤§å°
         */
         virtual void OnProgress(const std::wstring& /*filePath*/, unsigned __int64 /*bytesCompleted*/) {}
         
         /*
-        Ñ¹Ëõ/½âÑ¹Íê³É
-        ArchiveFilePath : Ñ¹Ëõ°üÂ·¾¶
+        å‹ç¼©/è§£å‹å®Œæˆ
+        ArchiveFilePath : å‹ç¼©åŒ…è·¯å¾„
         */
         virtual void OnEnd(const std::wstring& /*ArchiveFilePath*/) {}
 
 
         /*
-        ½âÑ¹ÎÄ¼ş¿ªÊ¼
-        destFolder : Ä¿±êÎÄ¼ş¼Ğ
-        ItemPath   : Ïà¶ÔÂ·¾¶
-        return     : ÊÇ·ñ¼ÌĞø½âÑ¹
+        è§£å‹æ–‡ä»¶å¼€å§‹
+        destFolder : ç›®æ ‡æ–‡ä»¶å¤¹
+        ItemPath   : ç›¸å¯¹è·¯å¾„
+        return     : æ˜¯å¦ç»§ç»­è§£å‹
         */
         virtual bool OnFileBegin(const std::wstring& /*destFolder*/, std::wstring&  /*ItemPath*/) { return true; };
 
         /*
-        ½âÑ¹ÎÄ¼ş½áÊø
-        filePath       : ÎÄ¼şÂ·¾¶
-        bytesCompleted : ÎÄ¼ş³ß´ç
-        return         : ÊÇ·ñ¼ÌĞø½âÑ¹
+        è§£å‹æ–‡ä»¶ç»“æŸ
+        filePath       : æ–‡ä»¶è·¯å¾„
+        bytesCompleted : æ–‡ä»¶å°ºå¯¸
+        return         : æ˜¯å¦ç»§ç»­è§£å‹
         */
         virtual bool OnFileDone(const std::wstring& /*filePath*/, unsigned __int64 /*bytesCompleted*/) { return true; }
         
         /*
-        »Ø¹öÎÄ¼ş½ø¶È
-        filePath       : ÎÄ¼şÂ·¾¶
-        return         : ÊÇ·ñ¼ÌĞø»Ø¹ö
+        å›æ»šæ–‡ä»¶è¿›åº¦
+        filePath       : æ–‡ä»¶è·¯å¾„
+        return         : æ˜¯å¦ç»§ç»­å›æ»š
         */
         virtual void OnRollBack(const std::wstring& /*filePath*/){}
 

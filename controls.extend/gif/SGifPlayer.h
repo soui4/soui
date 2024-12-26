@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <core/swnd.h>
 
 #include "sskingif.h"
@@ -11,45 +11,45 @@ namespace SOUI
 	
     /**
     * @class     SGifPlayer
-    * @brief     GIFÍ¼Æ¬ÏÔÊ¾¿Ø¼ş
+    * @brief     GIFå›¾ç‰‡æ˜¾ç¤ºæ§ä»¶
     * 
     * Describe
     */
     class SGifPlayer : public SWindow , public ITimelineHandler
     {
-        DEF_SOBJECT(SWindow, L"gifplayer")   //¶¨ÒåGIF¿Ø¼şÔÚXM¼ÓµÄ±êÇ©
+        DEF_SOBJECT(SWindow, L"gifplayer")   //å®šä¹‰GIFæ§ä»¶åœ¨XMåŠ çš„æ ‡ç­¾
     public:
         SGifPlayer();
         ~SGifPlayer();
 
         /**
          * PlayGifFile
-         * @brief    ÔÚ¿Ø¼şÖĞ²¥·ÅÒ»¸öGIFÍ¼Æ¬ÎÄ¼ş
-         * @param    LPCTSTR pszFileName --  ÎÄ¼şÃû
-         * @return   BOOL -- true:³É¹¦
+         * @brief    åœ¨æ§ä»¶ä¸­æ’­æ”¾ä¸€ä¸ªGIFå›¾ç‰‡æ–‡ä»¶
+         * @param    LPCTSTR pszFileName --  æ–‡ä»¶å
+         * @return   BOOL -- true:æˆåŠŸ
          * Describe  
          */    
         BOOL PlayGifFile(LPCTSTR pszFileName);
 
         /**
         * PlayAPNGFile
-        * @brief    ÔÚ¿Ø¼şÖĞ²¥·ÅÒ»¸öAPNGÍ¼Æ¬ÎÄ¼ş
-        * @param    LPCTSTR pszFileName --  ÎÄ¼şÃû
-        * @return   BOOL -- true:³É¹¦
+        * @brief    åœ¨æ§ä»¶ä¸­æ’­æ”¾ä¸€ä¸ªAPNGå›¾ç‰‡æ–‡ä»¶
+        * @param    LPCTSTR pszFileName --  æ–‡ä»¶å
+        * @return   BOOL -- true:æˆåŠŸ
         * Describe  
         */    
         BOOL PlayAPNGFile(LPCTSTR pszFileName);
 
-    protected://SWindowµÄĞéº¯Êı
+    protected://SWindowçš„è™šå‡½æ•°
 		virtual SIZE MeasureContent(int nParentWid, int nParentHei) override;
     protected://ITimerLineHander
 		STDMETHOD_(void,OnNextFrame)(THIS_) OVERRIDE;
 
 		virtual void OnContainerChanged(ISwndContainer *pOldContainer,ISwndContainer *pNewContainer);
 
-    public://ÊôĞÔ´¦Àí
+    public://å±æ€§å¤„ç†
         SOUI_ATTRS_BEGIN()		
-            ATTR_CUSTOM(L"skin", OnAttrSkin) //Îª¿Ø¼şÌá¹©Ò»¸öskinÊôĞÔ£¬ÓÃÀ´½ÓÊÕSSkinObj¶ÔÏóµÄname
+            ATTR_CUSTOM(L"skin", OnAttrSkin) //ä¸ºæ§ä»¶æä¾›ä¸€ä¸ªskinå±æ€§ï¼Œç”¨æ¥æ¥æ”¶SSkinObjå¯¹è±¡çš„name
 			ATTR_INT(L"scale", m_nScale, FALSE)
 			ATTR_BOOL(L"enableScale", m_bEnableScale, TRUE)
 			ATTR_BOOL(L"tile", m_bTile, TRUE)
@@ -60,33 +60,33 @@ namespace SOUI
         
     protected:
         BOOL _PlayFile(LPCTSTR pszFileName, BOOL bGif);
-    protected://ÏûÏ¢´¦Àí£¬SOUI¿Ø¼şµÄÏûÏ¢´¦ÀíºÍWTL£¬MFCºÜÏàËÆ£¬²ÉÓÃÏàËÆµÄÓ³Éä±í£¬ÏàÍ¬»òÕßÏàËÆµÄÏûÏ¢Ó³Éäºê
+    protected://æ¶ˆæ¯å¤„ç†ï¼ŒSOUIæ§ä»¶çš„æ¶ˆæ¯å¤„ç†å’ŒWTLï¼ŒMFCå¾ˆç›¸ä¼¼ï¼Œé‡‡ç”¨ç›¸ä¼¼çš„æ˜ å°„è¡¨ï¼Œç›¸åŒæˆ–è€…ç›¸ä¼¼çš„æ¶ˆæ¯æ˜ å°„å®
         
         /**
          * OnPaint
-         * @brief    ´°¿Ú»æÖÆÏûÏ¢ÏìÓ¦º¯Êı
-         * @param    IRenderTarget * pRT --  »æÖÆÄ¿±ê
+         * @brief    çª—å£ç»˜åˆ¶æ¶ˆæ¯å“åº”å‡½æ•°
+         * @param    IRenderTarget * pRT --  ç»˜åˆ¶ç›®æ ‡
          * @return   void
-         * Describe  ×¢ÒâÕâÀïµÄ²ÎÊıÊÇIRenderTarget *,¶ø²»ÊÇWTLÖĞÊ¹ÓÃµÄHDC£¬Í¬Ê±ÏûÏ¢Ó³ÉäºêÒ²±äÎªMSG_WM_PAINT_EX
+         * Describe  æ³¨æ„è¿™é‡Œçš„å‚æ•°æ˜¯IRenderTarget *,è€Œä¸æ˜¯WTLä¸­ä½¿ç”¨çš„HDCï¼ŒåŒæ—¶æ¶ˆæ¯æ˜ å°„å®ä¹Ÿå˜ä¸ºMSG_WM_PAINT_EX
          */    
         void OnPaint(IRenderTarget *pRT);
 
         /**
          * OnShowWindow
-         * @brief    ´¦Àí´°¿ÚÏÔÊ¾ÏûÏ¢
-         * @param    BOOL bShow --  true:ÏÔÊ¾
-         * @param    UINT nStatus --  ÏÔÊ¾Ô­Òò
+         * @brief    å¤„ç†çª—å£æ˜¾ç¤ºæ¶ˆæ¯
+         * @param    BOOL bShow --  true:æ˜¾ç¤º
+         * @param    UINT nStatus --  æ˜¾ç¤ºåŸå› 
          * @return   void 
-         * Describe  ²Î¿¼MSDNµÄWM_SHOWWINDOWÏûÏ¢
+         * Describe  å‚è€ƒMSDNçš„WM_SHOWWINDOWæ¶ˆæ¯
          */    
         void OnShowWindow(BOOL bShow, UINT nStatus);
     
         void OnDestroy();
 
-        //SOUI¿Ø¼şÏûÏ¢Ó³Éä±í
+        //SOUIæ§ä»¶æ¶ˆæ¯æ˜ å°„è¡¨
         SOUI_MSG_MAP_BEGIN()	
-            MSG_WM_PAINT_EX(OnPaint)    //´°¿Ú»æÖÆÏûÏ¢
-            MSG_WM_SHOWWINDOW(OnShowWindow)//´°¿ÚÏÔÊ¾×´Ì¬ÏûÏ¢
+            MSG_WM_PAINT_EX(OnPaint)    //çª—å£ç»˜åˆ¶æ¶ˆæ¯
+            MSG_WM_SHOWWINDOW(OnShowWindow)//çª—å£æ˜¾ç¤ºçŠ¶æ€æ¶ˆæ¯
             MSG_WM_DESTROY(OnDestroy)
         SOUI_MSG_MAP_END()	
 

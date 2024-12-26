@@ -1,4 +1,4 @@
-#include <souistd.h>
+ï»¿#include <souistd.h>
 #include <core/SHostPresenter.h>
 #include <core/SHostWnd.h>
 SNSBEGIN
@@ -32,7 +32,7 @@ BOOL SWndSurface::Init()
 		SASSERT(FALSE);
 		return FALSE;
 	}
-#ifdef _WIN64 // X64ÖĞÊ¹ÓÃUpdateLayeredWindowIndirectÔÚWin7²âÊÔÏÔÊ¾²»³öÄÚÈİ£¬Ö»ÄÜÊ¹ÓÃUpdateLayeredWindow,fuck
+#ifdef _WIN64 // X64ä¸­ä½¿ç”¨UpdateLayeredWindowIndirectåœ¨Win7æµ‹è¯•æ˜¾ç¤ºä¸å‡ºå†…å®¹ï¼Œåªèƒ½ä½¿ç”¨UpdateLayeredWindow,fuck
 	// MS.
 	s_funUpdateLayeredWindowIndirect = _SUpdateLayeredWindowIndirect;
 #else

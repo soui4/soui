@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "3dtransform.h"
 #include "PerspectiveTransform.h"
 #include "3dlib.h"
@@ -21,17 +21,17 @@ void  C3DTransform::Initialize()
 
     if (false == g_bInitSinCosTable)
     {
-        _control87(_MCW_RC, _RC_DOWN); //ÉèÖÃFPUµÄÉáÈëÄ£Ê½£¬ÔÚBilinearº¯ÊıÖĞĞèÒªÊ¹ÓÃ»ã±à¼Ó¿ìfloat->int
+        _control87(_MCW_RC, _RC_DOWN); //è®¾ç½®FPUçš„èˆå…¥æ¨¡å¼ï¼Œåœ¨Bilinearå‡½æ•°ä¸­éœ€è¦ä½¿ç”¨æ±‡ç¼–åŠ å¿«float->int
 
         Build_Sin_Cos_Tables();
         g_bInitSinCosTable = true;
     }
 }
 
-// Ê¹ÓÃ3DÍ¼ĞÎËã·¨À´»ñÈ¡Í¼Æ¬Ğı×ªºóµÄËÄ¸ö¶¥µãÎ»ÖÃ
+// ä½¿ç”¨3Då›¾å½¢ç®—æ³•æ¥è·å–å›¾ç‰‡æ—‹è½¬åçš„å››ä¸ªé¡¶ç‚¹ä½ç½®
 void C3DTransform::GetQuadByAnimateValue(int nDegreeX, int nDegreeY, int nDegreeZ, int nZOffset, Quad* pOutQuad)
 {
-	// .¾Ö²¿×ø±ê(ÒÔ¾ØĞÎµÄÖĞĞÄ×÷Îª¾Ö²¿×ø±êµÄÔ­µã)
+	// .å±€éƒ¨åæ ‡(ä»¥çŸ©å½¢çš„ä¸­å¿ƒä½œä¸ºå±€éƒ¨åæ ‡çš„åŸç‚¹)
 	float x = (float)m_nSrcWndWidth/2;
 	float y = (float)m_nSrcWndHeight/2;
 
@@ -41,9 +41,9 @@ void C3DTransform::GetQuadByAnimateValue(int nDegreeX, int nDegreeY, int nDegree
 	POINT3D pt3DWorld[4] = {0};
 	POINT3D pt3DCamera[4] = {0};
 
-#pragma region // .¾Ö²¿×ø±ê->ÊÀ½ç×ø±ê
+#pragma region // .å±€éƒ¨åæ ‡->ä¸–ç•Œåæ ‡
 	{
-		// .ÒÔµ±Ç°Öµ×÷Îª½Ç¶È½øĞĞĞı×ª
+		// .ä»¥å½“å‰å€¼ä½œä¸ºè§’åº¦è¿›è¡Œæ—‹è½¬
 		float fDegreeX = (float)nDegreeX;
 		float fDegreeY = (float)nDegreeY;
 		float fDegreeZ = (float)nDegreeZ;
@@ -117,7 +117,7 @@ void C3DTransform::GetQuadByAnimateValue(int nDegreeX, int nDegreeY, int nDegree
 			}
 		}
 
-		// .ÓÉÓÚÈÔÈ»ÊÇÆ½ÒÆµ½ÊÀ½ç×ø±êµÄ £¨0£¬0£¬0£©Î»ÖÃ£¬Òò´Ë²»ÓÃ¼ÆËãÆ½ÒÆ
+		// .ç”±äºä»ç„¶æ˜¯å¹³ç§»åˆ°ä¸–ç•Œåæ ‡çš„ ï¼ˆ0ï¼Œ0ï¼Œ0ï¼‰ä½ç½®ï¼Œå› æ­¤ä¸ç”¨è®¡ç®—å¹³ç§»
 		for (int i = 0; i < 4; i++)
 		{
 			pt3DWorld[i].z += nZOffset;
@@ -125,25 +125,25 @@ void C3DTransform::GetQuadByAnimateValue(int nDegreeX, int nDegreeY, int nDegree
 	}
 #pragma endregion
 
-	// Ïà»úÎ»ÖÃ(ÕâÀïÄ¬ÈÏ½«ÊÓÆ½Ãæ·ÅÔÚÓë¾ØĞÎËùÔÚÃæµÄÍ¬Ò»Î»ÖÃ£¬ÕâÑùÍ¸ÊÓ³öÀ´µÄ×ø±êÖ±½Ó¾Í¿ÉÒÔ
-	// µ±³ÉÆÁÄ»×ø±êÀ´ÓÃÁË£¬Ê¡ÁËÒ»²½²Ù×÷¡£
-	// µ«ÊÇĞèÒª×¢ÒâµÄÊÇ£¬Èç¹ûnCameraPos¹ıĞ¡µÄ»°¿´µ½µÄÍ¼Ïñ¾Í»áËõĞ¡£¬
+	// ç›¸æœºä½ç½®(è¿™é‡Œé»˜è®¤å°†è§†å¹³é¢æ”¾åœ¨ä¸çŸ©å½¢æ‰€åœ¨é¢çš„åŒä¸€ä½ç½®ï¼Œè¿™æ ·é€è§†å‡ºæ¥çš„åæ ‡ç›´æ¥å°±å¯ä»¥
+	// å½“æˆå±å¹•åæ ‡æ¥ç”¨äº†ï¼Œçœäº†ä¸€æ­¥æ“ä½œã€‚
+	// ä½†æ˜¯éœ€è¦æ³¨æ„çš„æ˜¯ï¼Œå¦‚æœnCameraPosè¿‡å°çš„è¯çœ‹åˆ°çš„å›¾åƒå°±ä¼šç¼©å°ï¼Œ
 	CAMERA camerpos = {0};
-	float  fCameraPos = 2000.0f;  // Ïà»úÎ»ÖÃ
-	float  d = fCameraPos;      // Ïà»úÓëÊÓÆ½ÃæµÄ¾àÀë¡£½«Á½ÖµÉè³ÉÒ»Ñù£¬±ÜÃâÁËÒ»´Îµ½ÆÁÄ»×ø±êµÄ×ª»»
+	float  fCameraPos = 2000.0f;  // ç›¸æœºä½ç½®
+	float  d = fCameraPos;      // ç›¸æœºä¸è§†å¹³é¢çš„è·ç¦»ã€‚å°†ä¸¤å€¼è®¾æˆä¸€æ ·ï¼Œé¿å…äº†ä¸€æ¬¡åˆ°å±å¹•åæ ‡çš„è½¬æ¢
 
 	VECTOR4D_INITXYZ(&camerpos.WorldPos, 0,0, -fCameraPos);
 
-#pragma region // ÊÀ½ç×ø±ê×ª»»ÎªÏà»ú×ø±ê
+#pragma region // ä¸–ç•Œåæ ‡è½¬æ¢ä¸ºç›¸æœºåæ ‡
 	{
-		// Æ½ÒÆ¾ØÕó
+		// å¹³ç§»çŸ©é˜µ
 		MATRIX_4_4  matCameraTrans = {0};
 		MAT_IDENTITY_4_4(&matCameraTrans);
 		matCameraTrans.M30 = -camerpos.WorldPos.x;
 		matCameraTrans.M31 = -camerpos.WorldPos.y;
 		matCameraTrans.M32 = -camerpos.WorldPos.z;
 		
-		// Ïà»ú½Ç¶ÈÎª0£¬²»Ğı×ª
+		// ç›¸æœºè§’åº¦ä¸º0ï¼Œä¸æ—‹è½¬
 
 		for (int i = 0; i < 4; i++)
 		{
@@ -152,21 +152,21 @@ void C3DTransform::GetQuadByAnimateValue(int nDegreeX, int nDegreeY, int nDegree
 	}
 #pragma endregion
 
-#pragma region // Ïà»ú×ø±ê×ª»»ÎªÍ¸ÊÓ×ø±ê
+#pragma region // ç›¸æœºåæ ‡è½¬æ¢ä¸ºé€è§†åæ ‡
 	POINT3D pt3DPerspectivePos[4];
 	for (int i = 0; i < 4; i++)
 	{
-		float z = pt3DCamera[i].z;  // ÕâÀïµÄzÊÇÓÃÓÚºÍdÏà±ÈµÄ¾àÀë£¬²»ÊÇ×ø±ê. µ±dÖµÈ¡µÄ±È½ÏĞ¡Ê±£¬»áµ¼ÖÂzÎª¸º
+		float z = pt3DCamera[i].z;  // è¿™é‡Œçš„zæ˜¯ç”¨äºå’Œdç›¸æ¯”çš„è·ç¦»ï¼Œä¸æ˜¯åæ ‡. å½“då€¼å–çš„æ¯”è¾ƒå°æ—¶ï¼Œä¼šå¯¼è‡´zä¸ºè´Ÿ
 		float i_z = 1/z;
 		if (pt3DCamera[i].z != 0)
 		{
-			pt3DPerspectivePos[i].x = d * pt3DCamera[i].x * i_z;  // nCameraPosÏàµ±ÓÚd
+			pt3DPerspectivePos[i].x = d * pt3DCamera[i].x * i_z;  // nCameraPosç›¸å½“äºd
 			pt3DPerspectivePos[i].y = d * pt3DCamera[i].y * i_z;  // 
 		}
 	}
 #pragma endregion
 
-	// ×ª»»µ½ÆÁÄ»×ø±êÉÏ
+	// è½¬æ¢åˆ°å±å¹•åæ ‡ä¸Š
 	for (int i = 0; i < 4; ++i)
 	{
 		pt3DPerspectivePos[i].x += (m_nSrcWndWidth>>1);
@@ -174,7 +174,7 @@ void C3DTransform::GetQuadByAnimateValue(int nDegreeX, int nDegreeY, int nDegree
 		pt3DPerspectivePos[i].y += (m_nSrcWndHeight>>1);
 	}
 
-	// ¸³Öµ¸ø·µ»ØÖµ
+	// èµ‹å€¼ç»™è¿”å›å€¼
 	for (int i = 0; i < 4; i++)
 	{
 		pOutQuad->pos[2*i]   = (int)pt3DPerspectivePos[i].x;
@@ -183,7 +183,7 @@ void C3DTransform::GetQuadByAnimateValue(int nDegreeX, int nDegreeY, int nDegree
 }
 
 
-// ½«º¯Êıµ÷ÓÃ¸Ä³Éºê¶¨Òå£¬ÒòÎªÕâ¸öº¯Êıµ÷ÓÃÌ«Æµ·±ÁË
+// å°†å‡½æ•°è°ƒç”¨æ”¹æˆå®å®šä¹‰ï¼Œå› ä¸ºè¿™ä¸ªå‡½æ•°è°ƒç”¨å¤ªé¢‘ç¹äº†
 #define GetLine(pBits, nPitch,y) \
 	(pBits + nPitch*(y))
 
@@ -192,31 +192,31 @@ void C3DTransform::Render(const PARAM3DTRANSFORM & param3d)
 {
 	RECT rc = {0, 0, m_nSrcWndWidth, m_nSrcWndHeight};
 
-	// ¼ÆËãµ±Ç°µÄ¶¯»­´°¿ÚÆÁÄ»×ø±ê
+	// è®¡ç®—å½“å‰çš„åŠ¨ç”»çª—å£å±å¹•åæ ‡
 	Quad quad;
 	GetQuadByAnimateValue(param3d.nRotateX,param3d.nRotateY, param3d.nRotateZ, param3d.nOffsetZ, &quad);
 
-	// ÓÃÓÚ¼ÆËã¾ØĞÎ->ÈÎÒâËÄ±ßĞÎµÄ¶ÔÓ¦¹ØÏµ
+	// ç”¨äºè®¡ç®—çŸ©å½¢->ä»»æ„å››è¾¹å½¢çš„å¯¹åº”å…³ç³»
 	PerspectiveTransform perspective;
 	perspective.SetQuad(&quad, &rc);
 	perspective.ChangeToFixedPoint();
 
-	int   nWidthDst  = m_nSrcWndWidth-1;   // (300->299)£¬Êı¾İ·¶Î§ÊÇËüµÄ´óĞ¡¼õÒ»
+	int   nWidthDst  = m_nSrcWndWidth-1;   // (300->299)ï¼Œæ•°æ®èŒƒå›´æ˜¯å®ƒçš„å¤§å°å‡ä¸€
 	int   nHeightDst = m_nSrcWndHeight-1; //
 
 	int nDstPitch = nWidthDst*4;
 
 	float fxSrc = 0;
 	float fySrc = 0;
-	float *pfxSrc = &fxSrc;  // ÎªÁËÔÚperspective_transformÖĞÊ¹ÓÃÖ¸Õë
+	float *pfxSrc = &fxSrc;  // ä¸ºäº†åœ¨perspective_transformä¸­ä½¿ç”¨æŒ‡é’ˆ
 	float *pfySrc = &fySrc;
 
 	LPBYTE pDstBits=m_pDstBits;
 	
 	int nPixByte=m_nBitsPixel/8;
 
-#if 1  // ÔÚ´óÑ­»·Ö®Ç°ÌŞ³ıµôÒ»Ğ©¿Õ°×ÇøÓò
-	//½«Ä¿±êÍ¼Æ¬Çå¿Õ
+#if 1  // åœ¨å¤§å¾ªç¯ä¹‹å‰å‰”é™¤æ‰ä¸€äº›ç©ºç™½åŒºåŸŸ
+	//å°†ç›®æ ‡å›¾ç‰‡æ¸…ç©º
 	memset(pDstBits, 0, nDstPitch * nHeightDst);
 
 	int nMinX = max(0, min(min(min(quad.Ax,quad.Bx),quad.Cx),quad.Dx));
@@ -239,10 +239,10 @@ void C3DTransform::Render(const PARAM3DTRANSFORM & param3d)
 #endif
 			perspective_transform_fp(perspective, X, Y, pfxSrc, pfySrc);
 
-			int nx = 0; //fx;   // ×¢: Ö±½Ó¸³Öµ int i = floatvalue; »á²úÉúÒ»¸ö _ftol()µ÷ÓÃ
-			int ny = 0; //fy;   //     µ¼ÖÂĞ§ÂÊ½µµÍ¡£ÕâÀïÊ¹ÓÃÄÚÇ¶»ã±àÖ¸Áî¡£(3DÓÎÏ·±à³Ì´óÊ¦¼¼ÇÉ P918)
+			int nx = 0; //fx;   // æ³¨: ç›´æ¥èµ‹å€¼ int i = floatvalue; ä¼šäº§ç”Ÿä¸€ä¸ª _ftol()è°ƒç”¨
+			int ny = 0; //fy;   //     å¯¼è‡´æ•ˆç‡é™ä½ã€‚è¿™é‡Œä½¿ç”¨å†…åµŒæ±‡ç¼–æŒ‡ä»¤ã€‚(3Dæ¸¸æˆç¼–ç¨‹å¤§å¸ˆæŠ€å·§ P918)
 
-			// ¸¡µãÊı×ªÕûÊı¡£ ×¢Òâ£ºÄ¬ÈÏµÄfistpÊÇËÄÉáÎåÈëÄ£Ê½¡£ĞèÒªÍ¨¹ıµ÷ÓÃ_control87(_MCW_RC, _RC_DOWN);½øĞĞµ÷Õû
+			// æµ®ç‚¹æ•°è½¬æ•´æ•°ã€‚ æ³¨æ„ï¼šé»˜è®¤çš„fistpæ˜¯å››èˆäº”å…¥æ¨¡å¼ã€‚éœ€è¦é€šè¿‡è°ƒç”¨_control87(_MCW_RC, _RC_DOWN);è¿›è¡Œè°ƒæ•´
 #ifndef _WIN64
 			__asm	fld    fxSrc;
 			__asm	fistp  nx;
@@ -254,34 +254,34 @@ void C3DTransform::Render(const PARAM3DTRANSFORM & param3d)
             ny = int(fySrc);
 #endif//WIN32
 
-			// 1. ceilµÄĞ§ÂÊ·Ç³£·Ç³£µÍ!Ç§Íò±ğÔÚÕâÓÃ
-			// µ«ÊÇÓĞÒ»¸öÎÊÌâÈç¹ûheightÎª300£¬ySrc=299.99999999Ê±£¬×ª³É(int)µÃµ½µÄ½á¹ûÊÇ300£¬
-			// µ«ÔÚÕâÀïÅĞ¶ÏµÄ»°ÊÇ³É¹¦µÄ£¬µ¼ÖÂ×îºó±ÀÀ££¬Òò´Ëµ±ySrc>299Ê±¼´ÍË³ö
+			// 1. ceilçš„æ•ˆç‡éå¸¸éå¸¸ä½!åƒä¸‡åˆ«åœ¨è¿™ç”¨
+			// ä½†æ˜¯æœ‰ä¸€ä¸ªé—®é¢˜å¦‚æœheightä¸º300ï¼ŒySrc=299.99999999æ—¶ï¼Œè½¬æˆ(int)å¾—åˆ°çš„ç»“æœæ˜¯300ï¼Œ
+			// ä½†åœ¨è¿™é‡Œåˆ¤æ–­çš„è¯æ˜¯æˆåŠŸçš„ï¼Œå¯¼è‡´æœ€åå´©æºƒï¼Œå› æ­¤å½“ySrc>299æ—¶å³é€€å‡º
 			if (nx < 0 || nx >= nWidthDst || ny < 0 || ny >= nHeightDst)
 			{        
 				continue;
 			}
 
-			// Ä¿±êÓëÔ´Í¼ÏñËØ¶ÔÓ¦
+			// ç›®æ ‡ä¸æºå›¾åƒç´ å¯¹åº”
 #if 0
 			//////////////////////////////////////////////////////////////////////////
-			// ÁÚ½üÈ¡Ñù, ËÙ¶È¿ì£¬µ«ÓĞ¾â³İ
+			// é‚»è¿‘å–æ ·, é€Ÿåº¦å¿«ï¼Œä½†æœ‰é”¯é½¿
 			((DWORD*)pDstBits)[X] = ((DWORD*)(m_pSrcBits + m_nSrcPitch*(int)ySrc))[(int)xSrc];
 #else
 			//////////////////////////////////////////////////////////////////////////
-			// ¶ş´ÎÏßĞÔ²åÖµ£¬ÄÜÓĞĞ§È¥µô¾â³İ£¬µ«ËÙ¶È·Ç³£Âı
+			// äºŒæ¬¡çº¿æ€§æ’å€¼ï¼Œèƒ½æœ‰æ•ˆå»æ‰é”¯é½¿ï¼Œä½†é€Ÿåº¦éå¸¸æ…¢
 			//((DWORD*)pDstBits)[X] = Bilinear(m_pSrcBits, m_nSrcPitch, nx, ny, (float)fxSrc, (float)fySrc);
 
 			//
-			// ¶ş´ÎÏßĞÔ²åÖµ¹«Ê½ÍÆµ¼
-			// http://blog.csdn.net/dakistudio/article/details/1767100 ¶ş´ÎÏßĞÔ²åÖµ¹«Ê½ÍÆµ¼
+			// äºŒæ¬¡çº¿æ€§æ’å€¼å…¬å¼æ¨å¯¼
+			// http://blog.csdn.net/dakistudio/article/details/1767100 äºŒæ¬¡çº¿æ€§æ’å€¼å…¬å¼æ¨å¯¼
 			//
-			// xÎªfxµÄÏòÏÂÈ¡Õû£¬yÎªfyµÄÏòÏÂÈ¡Õû
+			// xä¸ºfxçš„å‘ä¸‹å–æ•´ï¼Œyä¸ºfyçš„å‘ä¸‹å–æ•´
 			//
 			//inline DWORD& Bilinear(BYTE* pBits, const int& nPitch, const int& x, const int& y, const float& fx, const float& fy)
 			{
-				// ÒÑ½«Ô­Ê¼Í¼Æ¬µÄright/bottomÀ©´ó1px£¬ÕâÑùÔÚ»ñÈ¡ x+1, y+1Ê±´ïµ½Êı×é±ßÔµÒ²²»»á±ÀÀ£
-				// È¡¸½½üµÄËÄ¸öÏñËØµÄÑÕÉ«Öµ(x,y) (x+1, y) (x, y+1) (x+1, y+1)
+				// å·²å°†åŸå§‹å›¾ç‰‡çš„right/bottomæ‰©å¤§1pxï¼Œè¿™æ ·åœ¨è·å– x+1, y+1æ—¶è¾¾åˆ°æ•°ç»„è¾¹ç¼˜ä¹Ÿä¸ä¼šå´©æºƒ
+				// å–é™„è¿‘çš„å››ä¸ªåƒç´ çš„é¢œè‰²å€¼(x,y) (x+1, y) (x, y+1) (x+1, y+1)
 
 				LPBYTE pValue=GetLine(m_pSrcBits, m_nSrcPitch, ny);
 				pValue += nx*nPixByte;
@@ -292,7 +292,7 @@ void C3DTransform::Render(const PARAM3DTRANSFORM & param3d)
 				LPBYTE p1=pValue;//(x,y+1)
 				LPBYTE p3=pValue+nPixByte;//(x+1,y+1)
 
-				// ½«¸¡µãÊı³Ë·¨×ªÎª¶¨µãÊı³Ë·¨¡£Í¬Ê±ÓÅ»¯¸¡µãÊı×ª³ÉÕûÊı¡£
+				// å°†æµ®ç‚¹æ•°ä¹˜æ³•è½¬ä¸ºå®šç‚¹æ•°ä¹˜æ³•ã€‚åŒæ—¶ä¼˜åŒ–æµ®ç‚¹æ•°è½¬æˆæ•´æ•°ã€‚
 				float u = (float)fxSrc - nx;
 				float v = (float)fySrc - ny;
 			
@@ -338,7 +338,7 @@ void C3DTransform::Render(const PARAM3DTRANSFORM & param3d)
 
 BOOL C3DTransform::SetImage( LPBYTE pSour,LPBYTE pDest,int nWid,int nHei,int nBitsPixel )
 {
-	if(nBitsPixel!=24 && nBitsPixel!=32) //Ö»Ö§³Ö24ºÍ32Î»
+	if(nBitsPixel!=24 && nBitsPixel!=32) //åªæ”¯æŒ24å’Œ32ä½
 		return FALSE;
 
 	m_nSrcWndWidth=nWid+1,m_nSrcWndHeight=nHei+1;
@@ -347,7 +347,7 @@ BOOL C3DTransform::SetImage( LPBYTE pSour,LPBYTE pDest,int nWid,int nHei,int nBi
 	m_nBitsPixel=nBitsPixel;
 	m_pDstBits=pDest;
 
-	LPBYTE p1=m_pSrcBits+m_nSrcPitch;//bottom-up£¬Ìø¹ı×îÏÂÃæÒ»ĞĞ
+	LPBYTE p1=m_pSrcBits+m_nSrcPitch;//bottom-upï¼Œè·³è¿‡æœ€ä¸‹é¢ä¸€è¡Œ
 	LPBYTE p2=pSour;
 	int nLen=STRIDELEN(nWid,nBitsPixel);
 	for(int i=0;i<nHei;i++)

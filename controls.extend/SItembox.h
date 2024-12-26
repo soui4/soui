@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2014-2050 SOUIÍÅ¶Ó
+ï»¿/**
+ * Copyright (C) 2014-2050 SOUIå›¢é˜Ÿ
  * All rights reserved.
  *
  * @file       SItembox.h
@@ -25,17 +25,17 @@ class SItemBox : public SScrollView {
   public:
     /**
      * SItemBox::SItemBox
-     * @brief    ¹¹Ôìº¯Êı
+     * @brief    æ„é€ å‡½æ•°
      *
-     * Describe  ¹¹Ôìº¯Êı
+     * Describe  æ„é€ å‡½æ•°
      */
     SItemBox();
 
     /**
      * SItemBox::~SItemBox
-     * @brief    Îö¹¹º¯Êı
+     * @brief    ææ„å‡½æ•°
      *
-     * Describe  Îö¹¹º¯Êı
+     * Describe  ææ„å‡½æ•°
      */
     virtual ~SItemBox()
     {
@@ -43,161 +43,161 @@ class SItemBox : public SScrollView {
 
     /**
      * SItemBox::InsertItem
-     * @brief    ²åÈëĞÂÏî
-     * @param    LPCWSTR pszXml -- xmlÅäÖÃÎÄ¼ş
-     * @param    int iItem -- Ë÷Òı
-     * @param    BOOL bEnsureVisible -- ÊÇ·ñÏÔÊ¾
-     * @return   ·µ»ØSWindow
+     * @brief    æ’å…¥æ–°é¡¹
+     * @param    LPCWSTR pszXml -- xmlé…ç½®æ–‡ä»¶
+     * @param    int iItem -- ç´¢å¼•
+     * @param    BOOL bEnsureVisible -- æ˜¯å¦æ˜¾ç¤º
+     * @return   è¿”å›SWindow
      *
-     * Describe  ²åÈëĞÂÏî
+     * Describe  æ’å…¥æ–°é¡¹
      */
     SWindow *InsertItem(LPCWSTR pszXml, int iItem = -1, BOOL bEnsureVisible = FALSE);
 
     /**
      * SItemBox::InsertItem
-     * @brief    ²åÈëĞÂÏî
-     * @param    LPCWSTR pszXml -- xmlÅäÖÃÎÄ¼ş
-     * @param    int iItem -- Ë÷Òı
-     * @param    BOOL bEnsureVisible -- ÊÇ·ñÏÔÊ¾
-     * @return   ·µ»ØSWindow
+     * @brief    æ’å…¥æ–°é¡¹
+     * @param    LPCWSTR pszXml -- xmlé…ç½®æ–‡ä»¶
+     * @param    int iItem -- ç´¢å¼•
+     * @param    BOOL bEnsureVisible -- æ˜¯å¦æ˜¾ç¤º
+     * @return   è¿”å›SWindow
      *
-     * Describe  ²åÈëĞÂÏî
+     * Describe  æ’å…¥æ–°é¡¹
      */
     SWindow *InsertItem(pugi::xml_node xmlNode, int iItem = -1, BOOL bEnsureVisible = FALSE);
 
     /**
      * SItemBox::RemoveItem
-     * @brief    É¾³ıÏî
-     * @param    UINT iItem -- Ë÷Òı
-     * @return   ·µ»ØBOOL
+     * @brief    åˆ é™¤é¡¹
+     * @param    UINT iItem -- ç´¢å¼•
+     * @return   è¿”å›BOOL
      *
-     * Describe  É¾³ıÏî
+     * Describe  åˆ é™¤é¡¹
      */
     BOOL RemoveItem(UINT iItem);
 
     /**
      * SItemBox::RemoveItem
-     * @brief    É¾³ıÏî
-     * @param    SWindow * pChild -- ´°¿Ú½Úµã
-     * @return   ·µ»ØBOOL
+     * @brief    åˆ é™¤é¡¹
+     * @param    SWindow * pChild -- çª—å£èŠ‚ç‚¹
+     * @return   è¿”å›BOOL
      *
-     * Describe  É¾³ıÏî
+     * Describe  åˆ é™¤é¡¹
      */
     BOOL RemoveItem(SWindow *pChild);
 
     /**
      * SItemBox::SetNewPosition
-     * @brief    Îö¹¹º¯Êı
-     * @param    SWindow * pChild -- ½Úµã
-     * @param    DWORD nPos -- Î»ÖÃ
-     * @param    BOOL bEnsureVisible -- ÊÇ·ñÏÔÊ¾
-     * @return   ·µ»ØBOOL
+     * @brief    ææ„å‡½æ•°
+     * @param    SWindow * pChild -- èŠ‚ç‚¹
+     * @param    DWORD nPos -- ä½ç½®
+     * @param    BOOL bEnsureVisible -- æ˜¯å¦æ˜¾ç¤º
+     * @return   è¿”å›BOOL
      *
-     * Describe  Îö¹¹º¯Êı
+     * Describe  ææ„å‡½æ•°
      */
     BOOL SetNewPosition(SWindow *pChild, DWORD nPos, BOOL bEnsureVisible = TRUE);
 
     /**
      * SItemBox::RemoveAllItems
-     * @brief    É¾³ıËùÓĞ
+     * @brief    åˆ é™¤æ‰€æœ‰
      *
-     * Describe  É¾³ıËùÓĞ
+     * Describe  åˆ é™¤æ‰€æœ‰
      */
     void RemoveAllItems();
 
     /**
      * SItemBox::GetItemCount
-     * @brief    »ñÈ¡Ïî¸öÊı
+     * @brief    è·å–é¡¹ä¸ªæ•°
      * @return   UINT
      *
-     * Describe  »ñÈ¡Ïî¸öÊı
+     * Describe  è·å–é¡¹ä¸ªæ•°
      */
     UINT GetItemCount();
 
     /**
      * SItemBox::PageUp
-     * @brief    ÉÏÒ»Ò³
+     * @brief    ä¸Šä¸€é¡µ
      *
-     * Describe  ÉÏÒ»Ò³
+     * Describe  ä¸Šä¸€é¡µ
      */
     void PageUp();
 
     /**
      * SItemBox::PageDown
-     * @brief    ÏÂÒ»Ò³
+     * @brief    ä¸‹ä¸€é¡µ
      *
-     * Describe  ÏÂÒ»Ò³
+     * Describe  ä¸‹ä¸€é¡µ
      */
     void PageDown();
 
     /**
      * SItemBox::EnsureVisible
-     * @brief    ÉèÖÃÏÔÊ¾
-     * @param    SWindow *pItem  -- Ä³ÏîÖ¸Õë
+     * @brief    è®¾ç½®æ˜¾ç¤º
+     * @param    SWindow *pItem  -- æŸé¡¹æŒ‡é’ˆ
      *
-     * Describe  ÉèÖÃÏÔÊ¾
+     * Describe  è®¾ç½®æ˜¾ç¤º
      */
     void EnsureVisible(SWindow *pItem);
 
     /**
      * SItemBox::GetItemPos
-     * @brief    »ñÈ¡Ä³ÏîµÃË÷Òı
-     * @return   ·µ»Øint
+     * @brief    è·å–æŸé¡¹å¾—ç´¢å¼•
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡Ä³ÏîµÃË÷Òı
+     * Describe  è·å–æŸé¡¹å¾—ç´¢å¼•
      */
     int GetItemPos(SWindow *lpCurItem);
 
   protected:
-    int m_nItemWid; /**< Item¿í¶È */
-    int m_nItemHei; /**< Item¸ß¶È*/
+    int m_nItemWid; /**< Itemå®½åº¦ */
+    int m_nItemHei; /**< Itemé«˜åº¦*/
     int m_nSepWid;  /**< */
     int m_nSepHei;  /**< */
 
     /**
      * SItemBox::UpdateScroll
-     * @brief    ¸üĞÂ¹ö¶¯Ìõ
+     * @brief    æ›´æ–°æ»šåŠ¨æ¡
      *
-     * Describe  ¸üĞÂ¹ö¶¯Ìõ
+     * Describe  æ›´æ–°æ»šåŠ¨æ¡
      */
     void UpdateScroll();
 
     /**
      * SItemBox::GetItemRect
-     * @brief    »ñÈ¡Ä³ÏîÎ»ÖÃ
-     * @param    int iItem -- Ä³ÏîË÷Òı
-     * @return   ·µ»Øint
+     * @brief    è·å–æŸé¡¹ä½ç½®
+     * @param    int iItem -- æŸé¡¹ç´¢å¼•
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡Ä³ÏîµÃË÷Òı
+     * Describe  è·å–æŸé¡¹å¾—ç´¢å¼•
      */
 
     CRect GetItemRect(int iItem);
 
     /**
      * SItemBox::BringWindowAfter
-     * @brief    ²åÈëĞÂ½Úµã
-     * @param    SWindow * pChild -- ĞÂ½Úµã
-     * @param    SWindow * pInsertAfter -- Î»ÖÃ½Úµã
+     * @brief    æ’å…¥æ–°èŠ‚ç‚¹
+     * @param    SWindow * pChild -- æ–°èŠ‚ç‚¹
+     * @param    SWindow * pInsertAfter -- ä½ç½®èŠ‚ç‚¹
      *
-     * Describe  ÔÚÄ³¸ö½Úµãºó²åÈëĞÂ½Úµã
+     * Describe  åœ¨æŸä¸ªèŠ‚ç‚¹åæ’å…¥æ–°èŠ‚ç‚¹
      */
     void BringWindowAfter(SWindow *pChild, SWindow *pInsertAfter);
 
     /**
      * SItemBox::OnSize
-     * @brief    ÏûÏ¢ÏìÓ¦º¯Êı
+     * @brief    æ¶ˆæ¯å“åº”å‡½æ•°
      * @param    UINT nType --
      * @param    CSize size --
      *
-     * Describe  »ñÈ¡Ä³ÏîµÃË÷Òı
+     * Describe  è·å–æŸé¡¹å¾—ç´¢å¼•
      */
     void OnSize(UINT nType, CSize size);
 
     /**
      * SItemBox::UpdateChildrenPosition
-     * @brief    ¸üĞÂ×Ó½ÚµãÎ»ÖÃ
+     * @brief    æ›´æ–°å­èŠ‚ç‚¹ä½ç½®
      *
-     * Describe  ¸üĞÂ×Ó½ÚµãÎ»ÖÃ
+     * Describe  æ›´æ–°å­èŠ‚ç‚¹ä½ç½®
      */
     virtual void WINAPI UpdateChildrenPosition()
     {
@@ -205,41 +205,41 @@ class SItemBox : public SScrollView {
 
     /**
      * SItemBox::ReLayout
-     * @brief    ÖØĞÂ²¼¾Ö
+     * @brief    é‡æ–°å¸ƒå±€
      *
-     * Describe  ÖØĞÂ²¼¾Ö
+     * Describe  é‡æ–°å¸ƒå±€
      */
     void ReLayout();
 
     /**
      * SItemBox::OnScroll
-     * @brief    ¹ö¶¯ÊÂ¼ş
-     * @param    BOOL bVertical -- ÊÇ·ñÊÇÊúÖ±
-     * @param    UINT uCode -- ÏûÏ¢Âë
-     * @param    int nPos -- Î»ÖÃ
-     * @retur    ·µ»Øint
+     * @brief    æ»šåŠ¨äº‹ä»¶
+     * @param    BOOL bVertical -- æ˜¯å¦æ˜¯ç«–ç›´
+     * @param    UINT uCode -- æ¶ˆæ¯ç 
+     * @param    int nPos -- ä½ç½®
+     * @retur    è¿”å›int
      *
-     * Describe  »ñÈ¡Ä³ÏîµÃË÷Òı
+     * Describe  è·å–æŸé¡¹å¾—ç´¢å¼•
      */
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
 
     /**
      * SItemBox::GetScrollLineSize
-     * @brief    »ñÈ¡¹ö¶¯Ìõ´óĞ¡
-     * @param    BOOL bVertical -- ÊÇ·ñÊÇÊúÖ±·½Ïò
-     * @retur    ·µ»Øint
+     * @brief    è·å–æ»šåŠ¨æ¡å¤§å°
+     * @param    BOOL bVertical -- æ˜¯å¦æ˜¯ç«–ç›´æ–¹å‘
+     * @retur    è¿”å›int
      *
-     * Describe  »ñÈ¡¹ö¶¯Ìõ´óĞ¡
+     * Describe  è·å–æ»šåŠ¨æ¡å¤§å°
      */
     virtual int GetScrollLineSize(BOOL bVertical);
 
     /**
      * SItemBox::CreateChildren
-     * @brief    ´´½¨ĞÂÏî
+     * @brief    åˆ›å»ºæ–°é¡¹
      * @param    pugi::xml_node xmlNode
-     * @return   ·µ»ØBOOL
+     * @return   è¿”å›BOOL
      *
-     * Describe  »ñÈ¡Ä³ÏîµÃË÷Òı
+     * Describe  è·å–æŸé¡¹å¾—ç´¢å¼•
      */
     virtual BOOL CreateChildren(SXmlNode xmlNode) override;
 

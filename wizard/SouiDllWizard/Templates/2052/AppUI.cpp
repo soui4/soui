@@ -1,16 +1,16 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "AppUI.h"
 #include "MainDlg.h"
 #pragma comment(lib, "shlwapi.lib")
 
-//´ÓPEÎÄ¼ş¼ÓÔØ£¬×¢Òâ´ÓÎÄ¼ş¼ÓÔØÂ·¾¶Î»ÖÃ
+//ä»PEæ–‡ä»¶åŠ è½½ï¼Œæ³¨æ„ä»æ–‡ä»¶åŠ è½½è·¯å¾„ä½ç½®
 #define RES_TYPE 0
 //#define SYSRES_TYPE 0
 // #define RES_TYPE 0   //PE
 // #define RES_TYPE 1   //ZIP
 // #define RES_TYPE 2   //7z
-// #define RES_TYPE 2   //ÎÄ¼ş
-//È¥µô¶àÏîÖ§³Ö£¬ÒÔÃâ´úÂëÏÔµÃ»ìÂÒ
+// #define RES_TYPE 2   //æ–‡ä»¶
+//å»æ‰å¤šé¡¹æ”¯æŒï¼Œä»¥å…ä»£ç æ˜¾å¾—æ··ä¹±
 #if (RES_TYPE==1)
 #include "resprovider-zip\zipresprovider-param.h"
 #else 
@@ -89,7 +89,7 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 		SApplication *theApp = new SApplication(pRenderFactory, m_hInstance);
 
 #if (RES_TYPE != 0)
-		//Ñ¡ÔñÁË½öÔÚRelease°æ±¾´ò°ü×ÊÔ´ÔòÏµÍ³×ÊÔ´ÔÚDEBUGÏÂÊ¼ÖÕÊ¹ÓÃDLL¼ÓÔØ
+		//é€‰æ‹©äº†ä»…åœ¨Releaseç‰ˆæœ¬æ‰“åŒ…èµ„æºåˆ™ç³»ç»Ÿèµ„æºåœ¨DEBUGä¸‹å§‹ç»ˆä½¿ç”¨DLLåŠ è½½
 		{
 			HMODULE hModSysResource = LoadLibrary(SYS_NAMED_RESOURCE);
 			if (hModSysResource)
@@ -106,7 +106,7 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 	}
 }
 #else
-		//¹³Ñ¡ÁË¸´ÖÆÏµÍ³×ÊÔ´Ñ¡Ïî
+		//é’©é€‰äº†å¤åˆ¶ç³»ç»Ÿèµ„æºé€‰é¡¹
 		{
 			CAutoRefPtr<IResProvider> pSysResProvider;
 			pSysResProvider.Attach(souiFac.CreateResProvider(RES_PE));
@@ -119,7 +119,7 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 		CAutoRefPtr<IResProvider>   pResProvider;
 
 #if (RES_TYPE != 0)		
-		//Ñ¡ÔñÁË½öÔÚRelease°æ±¾´ò°ü×ÊÔ´ÔòÔÚDEBUGÏÂÊ¼ÖÕÊ¹ÓÃÎÄ¼ş¼ÓÔØ
+		//é€‰æ‹©äº†ä»…åœ¨Releaseç‰ˆæœ¬æ‰“åŒ…èµ„æºåˆ™åœ¨DEBUGä¸‹å§‹ç»ˆä½¿ç”¨æ–‡ä»¶åŠ è½½
 		{
 			pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
 			bLoaded = pResProvider->Init((LPARAM)_T("uires"), 0);
@@ -156,14 +156,14 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 		}
 #endif
 
-			//Èç¹ûĞèÒªÔÚ´úÂëÖĞÊ¹ÓÃR::id::namedidÕâÖÖ·½Ê½À´Ê¹ÓÃ¿Ø¼ş±ØĞëÒªÕâÒ»ĞĞ´úÂë£º2016Äê2ÔÂ2ÈÕ£¬R::id,R.nameÊÇÓÉuiresbuilder Ôö¼Ó-h .\res\resource.h Õâ2¸ö²ÎÊıºóÉú³ÉµÄ¡£
+			//å¦‚æœéœ€è¦åœ¨ä»£ç ä¸­ä½¿ç”¨R::id::namedidè¿™ç§æ–¹å¼æ¥ä½¿ç”¨æ§ä»¶å¿…é¡»è¦è¿™ä¸€è¡Œä»£ç ï¼š2016å¹´2æœˆ2æ—¥ï¼ŒR::id,R.nameæ˜¯ç”±uiresbuilder å¢åŠ -h .\res\resource.h è¿™2ä¸ªå‚æ•°åç”Ÿæˆçš„ã€‚
 			theApp->InitXmlNamedID((const LPCWSTR*)&R.name,(const int*)&R.id,sizeof(R.id)/sizeof(int));
 			theApp->AddResProvider(pResProvider);
 		
 [!if CHECKBOX_USE_LUA]
-		//¼ÓÔØLUA½Å±¾Ä£¿é¡£
+		//åŠ è½½LUAè„šæœ¬æ¨¡å—ã€‚
 #if (defined(DLL_CORE) || defined(LIB_ALL)) && !defined(_WIN64)
-		//¼ÓÔØLUA½Å±¾Ä£¿é£¬×¢Òâ£¬½Å±¾Ä£¿éÖ»ÓĞÔÚSOUIÄÚºËÊÇÒÔDLL·½Ê½±àÒëÊ±²ÅÄÜÊ¹ÓÃ¡£
+		//åŠ è½½LUAè„šæœ¬æ¨¡å—ï¼Œæ³¨æ„ï¼Œè„šæœ¬æ¨¡å—åªæœ‰åœ¨SOUIå†…æ ¸æ˜¯ä»¥DLLæ–¹å¼ç¼–è¯‘æ—¶æ‰èƒ½ä½¿ç”¨ã€‚
 		CAutoRefPtr<SOUI::IScriptFactory> pScriptLuaFactory;
 		bLoaded = pComMgr->CreateScrpit_Lua((IObjRef**)&pScriptLuaFactory);
 		SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), _T("scirpt_lua"));
@@ -172,12 +172,12 @@ DWORD WINAPI UI_Engine::RunUI(LPVOID lpParam)
 [!endif]
 
 [!if CHECKBOX_TRANSLATOR_SUPPORT]
-		//¼ÓÔØ¶àÓïÑÔ·­ÒëÄ£¿é¡£
+		//åŠ è½½å¤šè¯­è¨€ç¿»è¯‘æ¨¡å—ã€‚
 		CAutoRefPtr<ITranslatorMgr> trans;
 		bLoaded = pComMgr->CreateTranslator((IObjRef**)&trans);
 		SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), _T("translator"));
 		if (trans)
-		{//¼ÓÔØÓïÑÔ·­Òë°ü
+		{//åŠ è½½è¯­è¨€ç¿»è¯‘åŒ…
 			theApp->SetTranslator(trans);
 			SXmlDoc xmlLang;
 			if (theApp->LoadXmlDocment(xmlLang, _T("lang_cn"), _T("translator")))

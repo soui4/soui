@@ -1,4 +1,4 @@
-#pragma once
+Ôªø#pragma once
 
 #include "core/SSkinObjBase.h"
 
@@ -46,7 +46,7 @@ class SColorMask : public SSkinObjBase {
     ATTR_INT(L"width", m_size.cx, 0)
     ATTR_INT(L"height", m_size.cy, 0)
     ATTR_CUSTOM(L"mask", OnAttrMask)
-    ATTR_RECT(L"margin", m_rcMargin, FALSE) //æ≈π¨∏Ò4÷‹
+    ATTR_RECT(L"margin", m_rcMargin, FALSE) //‰πùÂÆ´Ê†º4Âë®
     SOUI_ATTRS_END()
 
     // CAutoRefPtr<IBitmap> *  m_pBmpCaches;

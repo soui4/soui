@@ -1,16 +1,16 @@
-#include <Windows.h>
+ï»¿#include <Windows.h>
 
 #include "httpHeader.h"
 #include "define.h"
 
 SNSBEGIN
 
-//»Øµ÷²ÎÊıĞÅÏ¢
+//å›è°ƒå‚æ•°ä¿¡æ¯
 struct HttpParamsData
 {
-	void *lpparam;//×Ô¶¨ÒåÊı¾İ
-	IHttpCallback *callback;//»Øµ÷º¯Êı
-	HttpError errcode;//´íÎóÂë
+	void *lpparam;//è‡ªå®šä¹‰æ•°æ®
+	IHttpCallback *callback;//å›è°ƒå‡½æ•°
+	HttpError errcode;//é”™è¯¯ç 
 };
 
 CHttpHeader::CHttpHeader()
@@ -82,7 +82,7 @@ void CHttpHeader::setRange(__int64 range)
 
 std::string CHttpHeader::toString(RequestType type)
 {
-	//Ìî³äÄ¬ÈÏÖµ
+	//å¡«å……é»˜è®¤å€¼
 	if (http_version_.empty()) {
 		http_version_.assign(default_http_version);
 	}
@@ -158,7 +158,7 @@ bool CHttpHeader::Revolse(const std::string& strHeader)
 			strLine = strHeader.substr(nStartPos, nFindPos - nStartPos);
 			nStartPos = nFindPos + 2;
 		}
-		if (0 == nLineIndex)//µÚÒ»ĞĞ
+		if (0 == nLineIndex)//ç¬¬ä¸€è¡Œ
 		{
 			http_version_ = strLine.substr(0, 8);
 			size_t nSpace1 = strLine.find(" ");

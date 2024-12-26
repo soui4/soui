@@ -1,4 +1,4 @@
-/********************************************************************
+ï»¿/********************************************************************
 created:	2014/10/01
 created:	01:10:2014   16:32
 filename: 	SSkinPNGX.h
@@ -16,7 +16,7 @@ SNSBEGIN
 
     /**
     * @class     SSkinAPNG
-    * @brief     APNGÍ¼Æ¬¼ÓÔØ¼°ÏÔÊ¾¶ÔÏó
+    * @brief     APNGå›¾ç‰‡åŠ è½½åŠæ˜¾ç¤ºå¯¹è±¡
     * 
     * Describe
     */
@@ -27,7 +27,7 @@ SNSBEGIN
 		SSkinPNGX();
 
         SOUI_ATTRS_BEGIN()
-            ATTR_IMAGEAUTOREF(L"src",m_pngx,FALSE)   //XMLÎÄ¼şÖĞÖ¸¶¨µÄÍ¼Æ¬×ÊÔ´Ãû,(type:name)
+            ATTR_IMAGEAUTOREF(L"src",m_pngx,FALSE)   //XMLæ–‡ä»¶ä¸­æŒ‡å®šçš„å›¾ç‰‡èµ„æºå,(type:name)
 			ATTR_CUSTOM(L"delay",OnAttrDelay) //delay, format:10[5],20,30 '[5]' is optional repeat count. 
 			ATTR_BOOL(L"vert",m_bVert,FALSE)
         SOUI_ATTRS_END()
@@ -38,20 +38,20 @@ SNSBEGIN
 
         /**
         * GetFrameDelay
-        * @brief    »ñµÃÖ¸¶¨Ö¡µÄÏÔÊ¾Ê±¼ä
-        * @param    int iFrame --  Ö¡ºÅ,Îª-1Ê±´ú±í»ñµÃµ±Ç°Ö¡µÄÑÓÊ±
-        * @return   long -- ÑÓÊ±Ê±¼ä(*10ms)
+        * @brief    è·å¾—æŒ‡å®šå¸§çš„æ˜¾ç¤ºæ—¶é—´
+        * @param    int iFrame --  å¸§å·,ä¸º-1æ—¶ä»£è¡¨è·å¾—å½“å‰å¸§çš„å»¶æ—¶
+        * @return   long -- å»¶æ—¶æ—¶é—´(*10ms)
         * Describe  
         */    
         virtual long GetFrameDelay(int iFrame=-1) const override;
         
         /**
         * Draw
-        * @brief    »æÖÆÖ¸¶¨Ö¡µÄGIFÍ¼
-        * @param    IRenderTarget * pRT --  »æÖÆÄ¿±ê
-        * @param    LPCRECT rcDraw --  »æÖÆ·¶Î§
-        * @param    DWORD dwState --  »æÖÆ×´Ì¬£¬ÕâÀï±»½âÊÍÎªÖ¡ºÅ
-        * @param    BYTE byAlpha --  Í¸Ã÷¶È
+        * @brief    ç»˜åˆ¶æŒ‡å®šå¸§çš„GIFå›¾
+        * @param    IRenderTarget * pRT --  ç»˜åˆ¶ç›®æ ‡
+        * @param    LPCRECT rcDraw --  ç»˜åˆ¶èŒƒå›´
+        * @param    DWORD dwState --  ç»˜åˆ¶çŠ¶æ€ï¼Œè¿™é‡Œè¢«è§£é‡Šä¸ºå¸§å·
+        * @param    BYTE byAlpha --  é€æ˜åº¦
         * @return   void
         * Describe  
         */    

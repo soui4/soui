@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "apppublic.h"
 
@@ -38,8 +38,8 @@ public:
   private:
 	CBitmap* m_pBitmap;
 
-	SOUI::CPoint	m_ptDown;				//Êó±ê°´ÏÂµÄÎ»ÖÃ
-	SOUI::CRect		m_rcCapture;		//½ØÍ¼ÇøÓò
+	SOUI::CPoint	m_ptDown;				//é¼ æ ‡æŒ‰ä¸‹çš„ä½ç½®
+	SOUI::CRect		m_rcCapture;		//æˆªå›¾åŒºåŸŸ
 	EcPosType		m_emPosType;
 	bool	m_bCapture;
 
