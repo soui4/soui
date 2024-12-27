@@ -55,7 +55,7 @@ class SSkinNewScrollbar : public SSkinScrollbar {
 		}
 		if (m_pImgVert)
 		{
-            SIZE szImg = m_pImgHorz->Size();
+            SIZE szImg = m_pImgVert->Size();
             szImg.cx = MulDiv(szImg.cx, nScale, GetScale());
             szImg.cy = MulDiv(szImg.cy, nScale, GetScale());
             m_pImgVert->Scale2(&pRet->m_pImgVert, szImg.cx, szImg.cy, kHigh_FilterLevel);
