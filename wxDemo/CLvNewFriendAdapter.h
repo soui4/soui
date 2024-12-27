@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <helper/SAdapterBase.h>
 #include <vector>
@@ -84,25 +84,25 @@ public:
          {
          case 0:
          {
-             //½ÓÊÕµ½ºÃÓÑÇëÇó
+             //æ¥æ”¶åˆ°å¥½å‹è¯·æ±‚
              pTextState->SetAttribute(L"show", L"0");
              pBtnAccept->SetAttribute(L"show", L"1");
          }
          break;
          case 1:
          {
-             //ÒÑÌí¼Ó
+             //å·²æ·»åŠ 
              pTextState->SetAttribute(L"show", L"1");
              pBtnAccept->SetAttribute(L"show", L"0");
-             pTextState->SetWindowText(_T("ÒÑÌí¼Ó"));
+             pTextState->SetWindowText(_T("å·²æ·»åŠ "));
          }
          break;
          case 2:
          {
-             //¼º·½·¢ËÍµÄºÃÓÑÇëÇó£¬µÈ´ıÑéÖ¤
+             //å·±æ–¹å‘é€çš„å¥½å‹è¯·æ±‚ï¼Œç­‰å¾…éªŒè¯
              pTextState->SetAttribute(L"show", L"1");
              pBtnAccept->SetAttribute(L"show", L"0");
-             pTextState->SetWindowText(_T("µÈ´ıÑéÖ¤"));
+             pTextState->SetWindowText(_T("ç­‰å¾…éªŒè¯"));
          }
          break;
          default:
@@ -141,7 +141,7 @@ public:
     }
 
   private:
-    std::vector<ItemData *> m_vecItemDatas; // Êı¾İ
+    std::vector<ItemData *> m_vecItemDatas; // æ•°æ®
 
     SListView *m_pOwner;
     IListen *m_pListen;

@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+ï»¿#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <iostream>
 #include <tchar.h>
@@ -53,7 +53,7 @@ bool convertResFile2CData(const tstring & filename,FILE *output){
 int _tmain(int argc, _TCHAR* argv[]){
 
 	int c;
-	tstring strInput;	//Æ¤·ôÂ·¾¶,Ïà¶ÔÓÚ³ÌĞòµÄ.rcÎÄ¼ş
+	tstring strInput;	//çš®è‚¤è·¯å¾„,ç›¸å¯¹äºç¨‹åºçš„.rcæ–‡ä»¶
 	tstring strOutput;
 	tstring strFilter = _T("*.*");
 	while ((c = getopt(argc, argv, _T("i:o:f:"))) != EOF)

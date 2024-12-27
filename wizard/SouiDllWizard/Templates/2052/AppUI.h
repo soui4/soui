@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 
 #include <souistd.h>
@@ -9,7 +9,7 @@
 #include <com-cfg.h>
 #include <event/SNotifyCenter.h>
 #include "resource.h"
-#define R_IN_CPP	//¶¨ÒåÕâ¸ö¿ª¹ØÀ´
+#define R_IN_CPP	//å®šä¹‰è¿™ä¸ªå¼€å…³æ¥
 #include "res\resource.h"
 using namespace SOUI;
 

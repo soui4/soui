@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SSnapshotCtrl.h"
 
 SSnapshotCtrl::SSnapshotCtrl(void)
@@ -37,7 +37,7 @@ void SSnapshotCtrl::OnPaint(IRenderTarget* pRT)
 
 	BitBlt(hDC, 0, 0, szBMP.cx, szBMP.cy, dcCompatible, 0, 0, SRCCOPY);
 
-	//»æÖÆ»ÒÉ«ÕÚÕÖ
+	//ç»˜åˆ¶ç°è‰²é®ç½©
 	{
 		CAutoRefPtr<IPath> path;
 		GETRENDERFACTORY->CreatePath(&path);
@@ -59,7 +59,7 @@ void SSnapshotCtrl::OnPaint(IRenderTarget* pRT)
 	}
 
 
-	{//»æÖÆ8¸ö²Ù×÷µã
+	{//ç»˜åˆ¶8ä¸ªæ“ä½œç‚¹
         CAutoRefPtr<IBrush> brush, oldbrush;
         pRT->CreateSolidColorBrush(RGBA(255, 0, 0, 255), &brush);
         pRT->SelectObject(brush, (IRenderObj **)&oldbrush);
@@ -77,7 +77,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
 	SetMsgHandled(FALSE);
 	SOUI::CRect rcWnd = GetWindowRect();
 
-    //¿ÉÒÆ¶¯¡¢À­Éì½ØÍ¼ÇøÓò
+    //å¯ç§»åŠ¨ã€æ‹‰ä¼¸æˆªå›¾åŒºåŸŸ
     if (!m_bSelectFinished)
     {
         if ((nFlags & MK_LBUTTON))
@@ -89,7 +89,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             {
             case Null:
             {
-                //Ñ¡È¡½ØÍ¼µÄÇøÓò
+                //é€‰å–æˆªå›¾çš„åŒºåŸŸ
                 if (m_bCapture)
                     return;
 
@@ -177,7 +177,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             case RightCenter:
             {
                 if (point.x < m_rcCapture.left)
-                { // Èç¹û ¹ıÏßÁË ¾Í »»³É ·´µÄ
+                { // å¦‚æœ è¿‡çº¿äº† å°± æ¢æˆ åçš„
                     m_emPosType = EcPosType::LeftCenter;
                     m_rcCapture.right = m_rcCapture.left;
                     m_rcCapture.left = point.x;
@@ -282,8 +282,8 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             break;
             case SelectRect:
             {
-                //ÕûÌåÒÆ¶¯½ØÍ¼µÄÇøÓò
-                SOUI::CPoint ptLT = point - m_ptDown; // Ïà¶Ô Êó±êµã»÷ Ê±  µÄ Æ«ÒÆÁ¿  Ò²¾ÍÊÇ ÒÆ¶¯ µÄ Öµ
+                //æ•´ä½“ç§»åŠ¨æˆªå›¾çš„åŒºåŸŸ
+                SOUI::CPoint ptLT = point - m_ptDown; // ç›¸å¯¹ é¼ æ ‡ç‚¹å‡» æ—¶  çš„ åç§»é‡  ä¹Ÿå°±æ˜¯ ç§»åŠ¨ çš„ å€¼
                 if (ptLT.x < rcWnd.left)
                     ptLT.x = rcWnd.left;
                 else if (ptLT.x > rcWnd.right - m_rcCapture.Width())
@@ -302,12 +302,12 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
     }
     else
     {
-        //²»ÔÊĞíÔÙÒÆ¶¯¡¢À­Éì½ØÍ¼ÇøÓò
+        //ä¸å…è®¸å†ç§»åŠ¨ã€æ‹‰ä¼¸æˆªå›¾åŒºåŸŸ
     }
 
-    //¼ÆËã8¸ö²Ù×÷µã
+    //è®¡ç®—8ä¸ªæ“ä½œç‚¹
 	CalcPos();
-    //ÉèÖÃÊó±ê¹â±ê
+    //è®¾ç½®é¼ æ ‡å…‰æ ‡
 	OnSetCursor(point);
 
 	Invalidate();
@@ -332,7 +332,7 @@ void SSnapshotCtrl::OnLButtonDown(UINT nFlags, SOUI::CPoint point)
     }
     else
     {
-        //·Ç²Ù×÷½ØÍ¼ÇøÓò²Ù×÷
+        //éæ“ä½œæˆªå›¾åŒºåŸŸæ“ä½œ
     }
 }
 
@@ -367,7 +367,7 @@ void SSnapshotCtrl::OnLButtonUp(UINT nFlags, SOUI::CPoint point)
             break;
         case SelectRect:
         {
-            SOUI::CPoint ptPos = point - m_ptDown; // Ïà¶Ô Êó±êµã»÷ Ê±  µÄ Æ«ÒÆÁ¿  Ò²¾ÍÊÇ ÒÆ¶¯ µÄ Öµ
+            SOUI::CPoint ptPos = point - m_ptDown; // ç›¸å¯¹ é¼ æ ‡ç‚¹å‡» æ—¶  çš„ åç§»é‡  ä¹Ÿå°±æ˜¯ ç§»åŠ¨ çš„ å€¼
             if (ptPos.x < rcWnd.left)
                 ptPos.x = rcWnd.left;
             else if (ptPos.x > rcWnd.right - m_rcCapture.Width())
@@ -388,7 +388,7 @@ void SSnapshotCtrl::OnLButtonUp(UINT nFlags, SOUI::CPoint point)
     }
     else
     {
-        //·Ç²Ù×÷½ØÍ¼ÇøÓò²Ù×÷
+        //éæ“ä½œæˆªå›¾åŒºåŸŸæ“ä½œ
     }
 }
 
@@ -420,21 +420,21 @@ void SSnapshotCtrl::CalcPos()
     CAutoRefPtr<IPen> curPen, oldPen;
 
     SOUI::CPoint center = rcArea.CenterPoint();
-    // ÉÏ×ó ·½¿é
+    // ä¸Šå·¦ æ–¹å—
     m_rcPos[(int)EcPosType::TopLeft].SetRect(rcArea.left, rcArea.top, rcArea.left + 6, rcArea.top + 6);
-    // ÉÏÖĞ ·½¿é
+    // ä¸Šä¸­ æ–¹å—
     m_rcPos[(int)EcPosType::TopCenter].SetRect(center.x - 3, rcArea.top, center.x + 3, rcArea.top + 6);
-    // ÉÏÓÒ ·½¿é
+    // ä¸Šå³ æ–¹å—
     m_rcPos[(int)EcPosType::TopRight].SetRect(rcArea.right - 6, rcArea.top, rcArea.right, rcArea.top + 6);
-    // ÓÒÖĞ ·½¿é
+    // å³ä¸­ æ–¹å—
     m_rcPos[(int)EcPosType::RightCenter].SetRect(rcArea.right - 6, center.y - 3, rcArea.right, center.y + 3);
-    // ÏÂÓÒ ·½¿é
+    // ä¸‹å³ æ–¹å—
     m_rcPos[(int)EcPosType::BottomRight].SetRect(rcArea.right - 6, rcArea.bottom - 6, rcArea.right, rcArea.bottom);
-    // ÏÂÖĞ ·½¿é
+    // ä¸‹ä¸­ æ–¹å—
     m_rcPos[(int)EcPosType::BottomCenter].SetRect(center.x - 3, rcArea.bottom - 6, center.x + 3, rcArea.bottom);
-    // ÏÂ×ó ·½¿é
+    // ä¸‹å·¦ æ–¹å—
     m_rcPos[(int)EcPosType::BottomLeft].SetRect(rcArea.left, rcArea.bottom - 6, rcArea.left + 6, rcArea.bottom);
-    // ×óÖĞ ·½¿é
+    // å·¦ä¸­ æ–¹å—
     m_rcPos[(int)EcPosType::LeftCenter].SetRect(rcArea.left, center.y - 3, rcArea.left + 6, center.y + 3);
 }
 

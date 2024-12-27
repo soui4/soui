@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "SWkeWebkit.h"
 #include <Imm.h>
 #pragma comment(lib, "imm32.lib")
@@ -101,7 +101,7 @@ int SWkeWebkit::OnCreate(void *)
     m_pWebView->loadURL(m_strUrl);
     SetTimer(
         TM_TICKER,
-        50); //ÓÉÓÚtimer²»¹»¼°Ê±£¬idleÓÖÏŞÖÆÁËÖ»ÔÚµ±Ç°µÄÏûÏ¢Ñ­»·ÖĞÓĞĞ§£¬Ê¹ÓÃtimerºÍonidleÒ»Æğ¸üĞÂä¯ÀÀÆ÷
+        50); //ç”±äºtimerä¸å¤ŸåŠæ—¶ï¼Œidleåˆé™åˆ¶äº†åªåœ¨å½“å‰çš„æ¶ˆæ¯å¾ªç¯ä¸­æœ‰æ•ˆï¼Œä½¿ç”¨timerå’Œonidleä¸€èµ·æ›´æ–°æµè§ˆå™¨
     return 0;
 }
 

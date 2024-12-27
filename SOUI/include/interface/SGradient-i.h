@@ -1,4 +1,4 @@
-#ifndef _GRADIENT_I_H_
+ï»¿#ifndef _GRADIENT_I_H_
 #define _GRADIENT_I_H_
 
 #include <interface/sobject-i.h>
@@ -15,17 +15,17 @@ typedef struct _GradientItem
 #define INTERFACE IGradient
 DECLARE_INTERFACE_(IGradient, IObject)
 {
-    //!Ìí¼ÓÒýÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒýÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;

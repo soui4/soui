@@ -1,4 +1,4 @@
-/********************************************************************
+ï»¿/********************************************************************
 created:	2014/10/01
 created:	01:10:2014   16:32
 filename: 	SSkinAPNG.h
@@ -6,8 +6,8 @@ file base:	SSkinAPNG
 file ext:	h
 author:		huangjianxiong
 
-purpose:	¶¯»­PNG£¨APNG£©À©Õ¹Ö§³Ö£¬ÒÀÀµÓÚµ±Ç°Ê¹ÓÃµÄÍ¼Æ¬½âÂëÆ÷¡£
-            Ä¿Ç°Ö»ÓĞimgdecoder-pngÖ§³ÖAPNG½âÂë
+purpose:	åŠ¨ç”»PNGï¼ˆAPNGï¼‰æ‰©å±•æ”¯æŒï¼Œä¾èµ–äºå½“å‰ä½¿ç”¨çš„å›¾ç‰‡è§£ç å™¨ã€‚
+            ç›®å‰åªæœ‰imgdecoder-pngæ”¯æŒAPNGè§£ç 
 *********************************************************************/
 #pragma once
 #include <interface/SSkinobj-i.h>
@@ -20,7 +20,7 @@ namespace SOUI
 
     /**
     * @class     SSkinAPNG
-    * @brief     APNGÍ¼Æ¬¼ÓÔØ¼°ÏÔÊ¾¶ÔÏó
+    * @brief     APNGå›¾ç‰‡åŠ è½½åŠæ˜¾ç¤ºå¯¹è±¡
     * 
     * Describe
     */
@@ -33,25 +33,25 @@ namespace SOUI
         
         /**
          * LoadFromFile
-         * @brief    ´ÓÎÄ¼ş¼ÓÔØAPNG
-         * @param    LPCTSTR pszFileName --  ÎÄ¼şÃû
-         * @return   int -- APNGÖ¡Êı£¬0-Ê§°Ü
+         * @brief    ä»æ–‡ä»¶åŠ è½½APNG
+         * @param    LPCTSTR pszFileName --  æ–‡ä»¶å
+         * @return   int -- APNGå¸§æ•°ï¼Œ0-å¤±è´¥
          * Describe  
          */    
         int LoadFromFile(LPCTSTR pszFileName);
 
         /**
          * LoadFromMemory
-         * @brief    ´ÓÄÚ´æ¼ÓÔØAPNG
-         * @param    LPVOID pBits --  ÄÚ´æµØÖ·
-         * @param    size_t szData --  ÄÚ´æÊı¾İ³¤¶È
-         * @return   int -- APNGÖ¡Êı£¬0-Ê§°Ü
+         * @brief    ä»å†…å­˜åŠ è½½APNG
+         * @param    LPVOID pBits --  å†…å­˜åœ°å€
+         * @param    size_t szData --  å†…å­˜æ•°æ®é•¿åº¦
+         * @return   int -- APNGå¸§æ•°ï¼Œ0-å¤±è´¥
          * Describe  
          */    
         int LoadFromMemory(LPVOID pBits,size_t szData);
 
         SOUI_ATTRS_BEGIN()
-            ATTR_CUSTOM(L"src",OnAttrSrc)   //XMLÎÄ¼şÖĞÖ¸¶¨µÄÍ¼Æ¬×ÊÔ´Ãû,(type:name)
+            ATTR_CUSTOM(L"src",OnAttrSrc)   //XMLæ–‡ä»¶ä¸­æŒ‡å®šçš„å›¾ç‰‡èµ„æºå,(type:name)
         SOUI_ATTRS_END()
 
 	public:
@@ -60,20 +60,20 @@ namespace SOUI
 	protected:
         /**
         * GetFrameDelay
-        * @brief    »ñµÃÖ¸¶¨Ö¡µÄÏÔÊ¾Ê±¼ä
-        * @param    int iFrame --  Ö¡ºÅ,Îª-1Ê±´ú±í»ñµÃµ±Ç°Ö¡µÄÑÓÊ±
-        * @return   long -- ÑÓÊ±Ê±¼ä(*10ms)
+        * @brief    è·å¾—æŒ‡å®šå¸§çš„æ˜¾ç¤ºæ—¶é—´
+        * @param    int iFrame --  å¸§å·,ä¸º-1æ—¶ä»£è¡¨è·å¾—å½“å‰å¸§çš„å»¶æ—¶
+        * @return   long -- å»¶æ—¶æ—¶é—´(*10ms)
         * Describe  
         */    
         virtual long GetFrameDelay(int iFrame=-1) const override;
         
         /**
         * Draw
-        * @brief    »æÖÆÖ¸¶¨Ö¡µÄGIFÍ¼
-        * @param    IRenderTarget * pRT --  »æÖÆÄ¿±ê
-        * @param    LPCRECT rcDraw --  »æÖÆ·¶Î§
-        * @param    DWORD dwState --  »æÖÆ×´Ì¬£¬ÕâÀï±»½âÊÍÎªÖ¡ºÅ
-        * @param    BYTE byAlpha --  Í¸Ã÷¶È
+        * @brief    ç»˜åˆ¶æŒ‡å®šå¸§çš„GIFå›¾
+        * @param    IRenderTarget * pRT --  ç»˜åˆ¶ç›®æ ‡
+        * @param    LPCRECT rcDraw --  ç»˜åˆ¶èŒƒå›´
+        * @param    DWORD dwState --  ç»˜åˆ¶çŠ¶æ€ï¼Œè¿™é‡Œè¢«è§£é‡Šä¸ºå¸§å·
+        * @param    BYTE byAlpha --  é€æ˜åº¦
         * @return   void
         * Describe  
         */    

@@ -1,4 +1,4 @@
-#include <Windows.h>
+ï»¿#include <Windows.h>
 #include "HttpClient.h"
 #include "Winhttp.h"
 #include <assert.h>
@@ -10,7 +10,7 @@ using namespace std;
 
 #pragma comment(lib, "Winhttp")
 
-#define HTTP_READBUF_LEN	1024*1024		//1MµÄ½ÓÊÕ»º³åÇø
+#define HTTP_READBUF_LEN	1024*1024		//1Mçš„æŽ¥æ”¶ç¼“å†²åŒº
 
 SNSBEGIN
 
@@ -182,7 +182,7 @@ BOOL CWinHttp::DownloadFile( LPCSTR lpUrl, LPCSTR lpFilePath )
 	free(lpBuff);
 	CloseHandle(hFile);
 	if ( !bRet )
-	{//ÏÂÔØÊ§°Ü£¬É¾³ýÎÄ¼þ
+	{//ä¸‹è½½å¤±è´¥ï¼Œåˆ é™¤æ–‡ä»¶
 		DeleteFile(strPath.c_str());
 	}
 	if(m_pCallback){
@@ -359,7 +359,7 @@ static void ParseUrl( LPCSTR lpUrl, string& strHostName, string& strPage, WORD& 
 	if (string::npos != nPos )
 		strTemp=strTemp.substr(nPos+headerLen, strTemp.size()-nPos-headerLen);
 	nPos=strTemp.find('/');
-	if ( string::npos == nPos )//Ã»ÓÐÕÒµ½ /
+	if ( string::npos == nPos )//æ²¡æœ‰æ‰¾åˆ° /
 		strHostName=strTemp;
 	else
 		strHostName = strTemp.substr(0, nPos);
@@ -421,7 +421,7 @@ BOOL CWinHttp::InitConnect( LPCSTR lpUrl, RequestType type, LPCSTR lpHeader, LPV
 
 BOOL CWinHttp::SendHttpRequest( LPCSTR lpHeader, LPVOID lpPostData, DWORD dataLen)
 {
-	//Ìí¼ÓHTTPÍ·
+	//æ·»åŠ HTTPå¤´
 	SStringW header = S_CA2W(m_header.toHttpHeaders().c_str(),CP_UTF8);
 	::WinHttpAddRequestHeaders(m_hRequest, header.c_str(), header.GetLength(), WINHTTP_ADDREQ_FLAG_ADD | WINHTTP_ADDREQ_FLAG_REPLACE);
 

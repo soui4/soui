@@ -1,4 +1,4 @@
-//////////////////////////////////////////////////////////////////////////
+ï»¿//////////////////////////////////////////////////////////////////////////
 //   File Name: Dui3DView.h
 // Description: SImg3DView
 //     Creator: ZhangZhiBin QQ->276883782
@@ -36,17 +36,17 @@ class STurn3dView : public SWindow {
     MSG_WM_TIMER_EX(OnTimer)
     SOUI_MSG_MAP_END()
   protected:
-    int m_nZStep;       // zÖáµÄÃ¿Ò»²½¾àÀë
-    int m_nYStep;       //Ã¿´Î¶¯»­ÈÆYÖáĞı×ªm_nYStep½Ç¶È
-    BOOL m_bTurn2Front; //·­×ª·½Ïò
+    int m_nZStep;       // zè½´çš„æ¯ä¸€æ­¥è·ç¦»
+    int m_nYStep;       //æ¯æ¬¡åŠ¨ç”»ç»•Yè½´æ—‹è½¬m_nYStepè§’åº¦
+    BOOL m_bTurn2Front; //ç¿»è½¬æ–¹å‘
 
     IMAGE3D::PARAM3DTRANSFORM m_3dparam;
     SAutoRefPtr<IBitmapS> m_bmpBefore;
     SAutoRefPtr<IBitmapS> m_bmpAfter;
     SAutoRefPtr<IBitmapS> m_bmpTrans;
 
-    int m_nFrameIndex; //·­×ªµ½µÚ¼¸Ö¡
-    BOOL m_bTurning;   //ÕıÔÚ·­×ª
+    int m_nFrameIndex; //ç¿»è½¬åˆ°ç¬¬å‡ å¸§
+    BOOL m_bTurning;   //æ­£åœ¨ç¿»è½¬
 };
 
 } // namespace SOUI

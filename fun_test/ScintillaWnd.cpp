@@ -1,4 +1,4 @@
-// ScintillaWnd.cpp : ÊµÏÖÎÄ¼ş
+ï»¿// ScintillaWnd.cpp : å®ç°æ–‡ä»¶
 //
 
 #include "souistd.h"
@@ -58,7 +58,7 @@ BOOL CScintillaWnd::Create(LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& re
 	return TRUE;
 }
 
-// ÏÔÊ¾ĞĞºÅ
+// æ˜¾ç¤ºè¡Œå·
 void CScintillaWnd::UpdateLineNumberWidth(void)
 {
 	char tchLines[32];    
@@ -121,10 +121,10 @@ BOOL CScintillaWnd::OpenFile(LPCTSTR lpFileName)
 		SStringW strBuf((LPCWSTR)(pbuf+2),dwSize/2-1);
 		str=S_CW2A(strBuf,CP_UTF8);
 	}else if(dwSize>3 && pbuf[0]==0xEF && pbuf[1]==0xBB && pbuf[2]==0xBF)
-	{//utf8ÓĞÇ©Ãû
+	{//utf8æœ‰ç­¾å
 		str=SStringA((LPCSTR)(pbuf+3),dwSize-3);
 	}else
-	{//utf8ÎŞÇ©Ãû
+	{//utf8æ— ç­¾å
         str=SStringA((LPCSTR)pbuf,dwSize);
 	}
 	UnmapViewOfFile( pbuf );
@@ -178,14 +178,14 @@ BOOL CScintillaWnd::SaveFile( LPCTSTR lpFileName )
 void CScintillaWnd::InitScintillaWnd(void)
 {
 	SendMessage(SCI_SETCODEPAGE,SC_CP_UTF8);//UTF8
-	//SendMessage(SCI_USEPOPUP,0,0); //¹Ø±ÕÓÒ¼ü²Ëµ¥£¬¸ÄÓÉ¸¸´°¿ÚviewÀàÏìÓ¦
+	//SendMessage(SCI_USEPOPUP,0,0); //å…³é—­å³é”®èœå•ï¼Œæ”¹ç”±çˆ¶çª—å£viewç±»å“åº”
 
 
-	//ÉèÖÃÈ«¾ÖÄ¬ÈÏstyle£¬Ä¬ÈÏstyleÖ»ÔÚÃ»ÓĞÃ÷È·µÄÑ¡ÔñÊ±»á±»Ó¦ÓÃ
-	SetAStyle(STYLE_DEFAULT, black, white, 11, "ËÎÌå");
-	SendMessage(SCI_STYLECLEARALL);	// ½«È«¾ÖÄ¬ÈÏstyleÓ¦ÓÃµ½ËùÓĞ
+	//è®¾ç½®å…¨å±€é»˜è®¤styleï¼Œé»˜è®¤styleåªåœ¨æ²¡æœ‰æ˜ç¡®çš„é€‰æ‹©æ—¶ä¼šè¢«åº”ç”¨
+	SetAStyle(STYLE_DEFAULT, black, white, 11, "å®‹ä½“");
+	SendMessage(SCI_STYLECLEARALL);	// å°†å…¨å±€é»˜è®¤styleåº”ç”¨åˆ°æ‰€æœ‰
 	
-	//Çå¿ÕËùÓĞÄ¬ÈÏµÄCtrl¿ì½İ¼üÏûÏ¢,±ÜÃâ²úÉúÂÒÂë
+	//æ¸…ç©ºæ‰€æœ‰é»˜è®¤çš„Ctrlå¿«æ·é”®æ¶ˆæ¯,é¿å…äº§ç”Ÿä¹±ç 
 	//char key = 'A';
 	//while (key <= 'Z')
 	//{
@@ -197,9 +197,9 @@ void CScintillaWnd::InitScintillaWnd(void)
 	//	SendMessage(SCI_CLEARCMDKEY,(WPARAM)keyDefinition,(LPARAM)0);
 	//	key += 1;
 	//}
-	//×Ô¶¯Íê³É
+	//è‡ªåŠ¨å®Œæˆ
 	SendMessage(SCI_AUTOCSETSEPARATOR, static_cast<WPARAM>(10), 0);
-	//ÏÔÊ¾µ±Ç°ĞĞµÄµ­»ÒÉ«±³¾°
+	//æ˜¾ç¤ºå½“å‰è¡Œçš„æ·¡ç°è‰²èƒŒæ™¯
 	SendMessage(SCI_SETCARETLINEVISIBLE,TRUE,0);
 	SendMessage(SCI_SETCARETLINEBACK, RGB(210,210,210),0);
 	SendMessage(SCI_SETCARETLINEBACKALPHA,100,0);
@@ -223,7 +223,7 @@ void CScintillaWnd::SetXmlLexer()
 	SendMessage(SCI_SETLEXER, SCLEX_XML);
 	SendMessage(SCI_SETSTYLEBITS, 7);
 
-	// ÉèÖÃÈ«¾Östyle. ÕâĞ©ÊôĞÔ»áÔÚÎŞÆäËüÑ¡ÔñÊ±±»Ó¦ÓÃ.
+	// è®¾ç½®å…¨å±€style. è¿™äº›å±æ€§ä¼šåœ¨æ— å…¶å®ƒé€‰æ‹©æ—¶è¢«åº”ç”¨.
 	SetAStyle(STYLE_DEFAULT, black, white, 11, "Verdana");
 	SendMessage(SCI_STYLECLEARALL);
 
@@ -234,7 +234,7 @@ void CScintillaWnd::SetXmlLexer()
 
 	SendMessage(SCI_STYLESETBOLD, STYLE_CONTROLCHAR, 1); 
 	// Hypertext default is used for all the document's text
-	SetAStyle(SCE_H_DEFAULT, black, white, 11, "ËÎÌå");
+	SetAStyle(SCE_H_DEFAULT, black, white, 11, "å®‹ä½“");
 
 	SetAStyle(SCE_H_TAG, 128);
 	SetAStyle(SCE_H_TAGEND, 128);
@@ -261,10 +261,10 @@ void CScintillaWnd::SetXmlLexer()
 
 	SendMessage(SCI_STYLESETBACK, SCE_HB_STRINGEOL, RGB(0x7F,0x7F,0xFF));
 	SendMessage(SCI_STYLESETFONT, SCE_HB_COMMENTLINE, 
-		reinterpret_cast<LPARAM>("ËÎÌå"));
+		reinterpret_cast<LPARAM>("å®‹ä½“"));
 
 
-	// ÉèÖÃ´úÂëÕÛµş¹æÔò
+	// è®¾ç½®ä»£ç æŠ˜å è§„åˆ™
 	SendMessage(SCI_SETPROPERTY, (WPARAM)"fold", (LPARAM)"1");
 	SendMessage(SCI_SETPROPERTY, (WPARAM)"fold.compact", (LPARAM)"0");
 	SendMessage(SCI_SETPROPERTY, (WPARAM)"fold.html", (LPARAM)"1");
@@ -273,18 +273,18 @@ void CScintillaWnd::SetXmlLexer()
 	SendMessage(SCI_SETMARGINTYPEN,  MARGIN_SCRIPT_FOLD_INDEX, SC_MARGIN_SYMBOL);
 	SendMessage(SCI_SETMARGINMASKN, MARGIN_SCRIPT_FOLD_INDEX, SC_MASK_FOLDERS);
 	SendMessage(SCI_SETMARGINWIDTHN, MARGIN_SCRIPT_FOLD_INDEX, 20);
-	SendMessage(SCI_MARKERDEFINE, SC_MARKNUM_FOLDER, SC_MARK_PLUS); //ÕÛµşÊ±ÏÔÊ¾ +
-	SendMessage(SCI_MARKERDEFINE, SC_MARKNUM_FOLDEROPEN, SC_MARK_MINUS); //´ò¿ªÊ±ÏÔÊ¾ -
+	SendMessage(SCI_MARKERDEFINE, SC_MARKNUM_FOLDER, SC_MARK_PLUS); //æŠ˜å æ—¶æ˜¾ç¤º +
+	SendMessage(SCI_MARKERDEFINE, SC_MARKNUM_FOLDEROPEN, SC_MARK_MINUS); //æ‰“å¼€æ—¶æ˜¾ç¤º -
 	SendMessage(SCI_MARKERDEFINE, SC_MARKNUM_FOLDEREND, SC_MARK_EMPTY);
 	SendMessage(SCI_MARKERDEFINE, SC_MARKNUM_FOLDERMIDTAIL, SC_MARK_EMPTY);
 	SendMessage(SCI_MARKERDEFINE, SC_MARKNUM_FOLDEROPENMID, SC_MARK_EMPTY);
 	SendMessage(SCI_MARKERDEFINE, SC_MARKNUM_FOLDERSUB, SC_MARK_EMPTY);
 	SendMessage(SCI_MARKERDEFINE, SC_MARKNUM_FOLDERTAIL, SC_MARK_EMPTY);
 
-	SendMessage(SCI_SETFOLDFLAGS, 16, 0); // 16  ÕÛµşÍêºó»­Ò»ÌõÏß
+	SendMessage(SCI_SETFOLDFLAGS, 16, 0); // 16  æŠ˜å å®Œåç”»ä¸€æ¡çº¿
 
 	SendMessage(SCI_SETMARGINSENSITIVEN, MARGIN_SCRIPT_FOLD_INDEX, 1);
-	//---------´úÂëÕÛµşÉèÖÃÍê±Ï-----------
+	//---------ä»£ç æŠ˜å è®¾ç½®å®Œæ¯•-----------
 }
 
 LRESULT CScintillaWnd::OnNotify( int idCtrl, LPNMHDR pnmh )

@@ -1,4 +1,4 @@
-#ifndef _SSKINPOOL_I_H__
+ï»¿#ifndef _SSKINPOOL_I_H__
 #define _SSKINPOOL_I_H__
 
 #include <interface/SSkinobj-i.h>
@@ -10,17 +10,17 @@ SNSBEGIN
 #define INTERFACE ISkinPool
 DECLARE_INTERFACE_(ISkinPool, IObjRef)
 {
-    //!Ìí¼ÓÒıÓÃ
+    //!æ·»åŠ å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!ÊÍ·ÅÒıÓÃ
+    //!é‡Šæ”¾å¼•ç”¨
     /*!
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!ÊÍ·Å¶ÔÏó
+    //!é‡Šæ”¾å¯¹è±¡
     /*!
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
@@ -28,43 +28,43 @@ DECLARE_INTERFACE_(ISkinPool, IObjRef)
 
     /**
      * GetSkin
-     * @brief    »ñµÃÓëÖ¸¶¨nameÆ¥ÅäµÄSkinObj
+     * @brief    è·å¾—ä¸æŒ‡å®šnameåŒ¹é…çš„SkinObj
      * @param    LPCWSTR strSkinName --    Name of Skin Object
-     * @return   ISkinObj*  -- ÕÒµ½µÄSkin Object
+     * @return   ISkinObj*  -- æ‰¾åˆ°çš„Skin Object
      * Describe
      */
     STDMETHOD_(ISkinObj *, GetSkin)(THIS_ LPCWSTR strSkinName, int nScale) PURE;
 
     /**
      * LoadSkins
-     * @brief    ´ÓXMLÖĞ¼ÓÔØSkinÁĞ±í
-     * @param    SXmlNode xmlNode --  ÃèÊöSkinObjµÄXML±í
-     * @return   int -- ³É¹¦¼ÓÔØµÄSkinObjÊıÁ¿
+     * @brief    ä»XMLä¸­åŠ è½½Skinåˆ—è¡¨
+     * @param    SXmlNode xmlNode --  æè¿°SkinObjçš„XMLè¡¨
+     * @return   int -- æˆåŠŸåŠ è½½çš„SkinObjæ•°é‡
      * Describe
      */
     STDMETHOD_(int, LoadSkins)(THIS_ IXmlNode * xmlNode) PURE;
 
     /**
      * AddSkin
-     * @brief    Ôö¼ÓÒ»¸öskinObj¶ÔÏóµ½SkinPool
+     * @brief    å¢åŠ ä¸€ä¸ªskinObjå¯¹è±¡åˆ°SkinPool
      * @param    ISkinObj* --  SkinObj
-     * @return   BOOL -- ¼ÓÈëÊÇ·ñ³É¹¦,ÖØÃû¼ÓÈëÊ§°Ü
+     * @return   BOOL -- åŠ å…¥æ˜¯å¦æˆåŠŸ,é‡ååŠ å…¥å¤±è´¥
      * Describe
      */
     STDMETHOD_(BOOL, AddSkin)(THIS_ ISkinObj * skin) PURE;
 
     /**
      * RemoveSkin
-     * @brief    É¾³ıÒ»¸öskinObj¶ÔÏó
+     * @brief    åˆ é™¤ä¸€ä¸ªskinObjå¯¹è±¡
      * @param    ISkinObj* --  SkinObj
-     * @return   BOOL -- TRUE-³É¹¦
+     * @return   BOOL -- TRUE-æˆåŠŸ
      * Describe
      */
     STDMETHOD_(BOOL, RemoveSkin)(THIS_ ISkinObj * skin) PURE;
 
     /**
      * RemoveAll
-     * @brief    É¾³ıÈ«²¿skin
+     * @brief    åˆ é™¤å…¨éƒ¨skin
      * @return   void
      * Describe
      */

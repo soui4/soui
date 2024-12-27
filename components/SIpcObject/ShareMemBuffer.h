@@ -1,4 +1,4 @@
-// MemMapFile.h: interface for the CShareMemBuffer class.
+ï»¿// MemMapFile.h: interface for the CShareMemBuffer class.
 //
 //////////////////////////////////////////////////////////////////////
 
@@ -38,7 +38,7 @@ protected:
 
 
 public:
-	// Í¨¹ý IShareBuffer ¼Ì³Ð
+	// é€šè¿‡ IShareBuffer ç»§æ‰¿
 	virtual int Write(const void * pBuf, UINT nLen) override;
 	virtual int Read(void *pBuf, UINT nLen) override;
 	virtual UINT Tell() const override;

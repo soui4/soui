@@ -1,4 +1,4 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "SChatEdit.h"
 #include "reole/RichEditOle.h"
 
@@ -49,7 +49,7 @@ BOOL SChatEdit::AppendFormatText(const SXmlNode xmlMsg, BOOL bNewLine, BOOL bCan
     TCHAR szRet[] = { 0x0a, 0 };
     int nLen = (int)SSendMessage(WM_GETTEXTLENGTH);
     if (bNewLine)
-    { //≤Â»Î“ª∏ˆªª––∑˚
+    { //ÊèíÂÖ•‰∏Ä‰∏™Êç¢Ë°åÁ¨¶
         SSendMessage(EM_SETSEL, nLen, nLen);
         SSendMessage(EM_REPLACESEL, bCanUndo, (LPARAM)L"\r\n");
         nLen = (int)SSendMessage(WM_GETTEXTLENGTH);
@@ -270,7 +270,7 @@ SStringW SChatEdit::GetFormatText()
     for (int i = 0; i < strTxt.GetLength(); i++)
     {
         if (strTxt[i] == 0xfffc)
-        { //’“µΩ“ª∏ˆOLE∂‘œÛ
+        { //ÊâæÂà∞‰∏Ä‰∏™OLEÂØπË±°
             strMsg += strTxt.Mid(iPlainTxtBegin, i - iPlainTxtBegin);
             iPlainTxtBegin = i + 1;
 

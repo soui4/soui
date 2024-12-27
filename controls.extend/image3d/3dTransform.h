@@ -1,4 +1,4 @@
-#ifndef IMAGE3D_H_CBBEE65C_14A5_4811_9AED_65F25D658C01
+ï»¿#ifndef IMAGE3D_H_CBBEE65C_14A5_4811_9AED_65F25D658C01
 #define IMAGE3D_H_CBBEE65C_14A5_4811_9AED_65F25D658C01
 
 #ifdef IMAGE3D_EXPORTS
@@ -41,7 +41,7 @@ namespace IMAGE3D
 		// Access:    public 
 		// Returns:   void
 		// Qualifier:
-		// Parameter: const PARAM3DTRANSFORM & param3d:3D±ä»»²ÎÊı
+		// Parameter: const PARAM3DTRANSFORM & param3d:3Då˜æ¢å‚æ•°
 		//************************************
 		void  Render(const PARAM3DTRANSFORM & param3d);
 
@@ -51,11 +51,11 @@ namespace IMAGE3D
 		// Access:    public 
 		// Returns:   BOOL
 		// Qualifier:
-		// Parameter: LPBYTE pSour : Ô´Í¼»º³åÇø
-		// Parameter: LPBYTE pDest : Êä³ö»º³åÇø
-		// Parameter: int nWid		:Ô´Í¼¿í¶È
-		// Parameter: int nHei		:Ô´Í¼¸ß¶È
-		// Parameter: int nBitsPixel:ÏñËØÉî¶È£¬Ö»Ö§³Ö24¼°32Î»Á½ÖÖ¸ñÊ½
+		// Parameter: LPBYTE pSour : æºå›¾ç¼“å†²åŒº
+		// Parameter: LPBYTE pDest : è¾“å‡ºç¼“å†²åŒº
+		// Parameter: int nWid		:æºå›¾å®½åº¦
+		// Parameter: int nHei		:æºå›¾é«˜åº¦
+		// Parameter: int nBitsPixel:åƒç´ æ·±åº¦ï¼Œåªæ”¯æŒ24åŠ32ä½ä¸¤ç§æ ¼å¼
 		//************************************
 		BOOL SetImage(LPBYTE pSour,LPBYTE pDest,int nWid,int nHei,int nBitsPixel);
 	protected:

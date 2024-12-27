@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SImagePlayer.h"
 
 namespace SOUI
@@ -148,7 +148,7 @@ BOOL SImagePlayer::_PlayFile(LPCTSTR pszFileName, BOOL bGif)
         SkinKey skey;
         skey.scale = GetScale();
         skey.strName = key;
-        pBuiltinSkinPool->AddKeyObject(skey, pGifSkin); //½«´´½¨µÄskin½»¸øskinpool¹ÜÀí
+        pBuiltinSkinPool->AddKeyObject(skey, pGifSkin); //å°†åˆ›å»ºçš„skinäº¤ç»™skinpoolç®¡ç†
         m_aniSkin = pGifSkin;
     }
     if (GetLayoutParam()->IsWrapContent(Any))

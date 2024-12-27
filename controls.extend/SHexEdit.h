@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "SByteArray.h"
 #include "core/SPanel.h"
 
@@ -63,9 +63,9 @@ class SHexEdit : public SPanel {
   protected:
     /**
      * SHexEdit::OnGetDlgCode
-     * @brief    »ñÈ¡´°¿ÚÏûÏ¢Âë
+     * @brief    è·å–çª—å£æ¶ˆæ¯ç 
      *
-     * Describe  ÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ¶ˆæ¯å“åº”å‡½æ•°
      */
     virtual UINT WINAPI OnGetDlgCode() const override
     {
@@ -74,10 +74,10 @@ class SHexEdit : public SPanel {
 
     /**
      * SHexEdit::OnPaint
-     * @brief    »æÖÆ
-     * @param    IRenderTarget *pRT -- »æÖÆÉè±¸
+     * @brief    ç»˜åˆ¶
+     * @param    IRenderTarget *pRT -- ç»˜åˆ¶è®¾å¤‡
      *
-     * Describe  ÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ¶ˆæ¯å“åº”å‡½æ•°
      */
     void OnPaint(IRenderTarget *pRT);
     void SetSelectedFocusCol(COLORREF tSelectedFousTxtCol,
@@ -85,17 +85,17 @@ class SHexEdit : public SPanel {
                              bool bUpdate);
     /**
      * SHexEdit::OnSetFocus
-     * @brief    ÉèÖÃ½¹µã
+     * @brief    è®¾ç½®ç„¦ç‚¹
      *
-     * Describe  ´Ëº¯ÊıÊÇÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ­¤å‡½æ•°æ˜¯æ¶ˆæ¯å“åº”å‡½æ•°
      */
     void OnSetFocus(SWND wndOld);
 
     /**
      * SHexEdit::OnKillFocus
-     * @brief    Ê§È¥½¹µã
+     * @brief    å¤±å»ç„¦ç‚¹
      *
-     * Describe  ´Ëº¯ÊıÊÇÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ­¤å‡½æ•°æ˜¯æ¶ˆæ¯å“åº”å‡½æ•°
      */
     void OnKillFocus(SWND wndFocus);
 
@@ -201,7 +201,7 @@ class SHexEdit : public SPanel {
     bool m_bRecalc;
     bool m_bHighBits;       // caret on high nibble
     bool m_bCaretAscii;     // true: caret in ASCII area; false: caret in hex area
-    bool m_bCaretAtLineEnd; // ¹â±êÔÚĞĞÎ²
+    bool m_bCaretAtLineEnd; // å…‰æ ‡åœ¨è¡Œå°¾
 
     CPoint m_cMouseRepPoint;
     int m_iMouseRepDelta;
