@@ -99,10 +99,16 @@ HRESULT SDropTargetDispatcher::DragOver(/* [in] */ DWORD grfKeyState,
             }
         }
         if (m_hHover && pPairOld)
+        {
             pPairOld->m_value->DragLeave();
+//          SSLOGI() << "drag leave, swnd=" << m_hHover;
+        }
         m_hHover = hHover;
         if (pPairNew && m_hHover)
+        {
             pPairNew->m_value->DragEnter(m_pDataObj, grfKeyState, pt, pdwEffect);
+//          SSLOGI() << "drag enter, swnd=" << m_hHover;
+        }
     }
     else
     {
@@ -131,7 +137,10 @@ HRESULT STDMETHODCALLTYPE SDropTargetDispatcher::Drop(/* [unique][in] */ IDataOb
 {
     DTMAP::CPair *pPair = m_mapDropTarget.Lookup(m_hHover);
     if (m_hHover && pPair)
+    {
+//      SSLOGI() << "drop swnd=" << m_hHover;
         pPair->m_value->Drop(pDataObj, grfKeyState, pt, pdwEffect);
+    }
     m_hHover = 0;
     m_pDataObj->Release();
     m_pDataObj = NULL;
