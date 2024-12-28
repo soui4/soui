@@ -18,34 +18,19 @@
 #else
 #define tstring string
 #endif
-static std::tstring getSourceDir() {
-	TCHAR szPath[MAX_PATH];
-	GetModuleFileName(NULL, szPath, MAX_PATH);
-	//if run on remote linux machine, path should like /home/user/.vs/pathname/xxx/out/build/Linux-GCC-Debug/bin
-	//convert this path to /home/user/.vs/pathname/xxx/src
-	TCHAR* pdotvs = _tcsstr(szPath, _T(".vs"));
-	if (pdotvs) {
-		//run on remote linux machine
-		TCHAR* out = _tcsstr(szPath, _T("out"));
-		SASSERT(out);
-		_tcscpy(out, _T("src"));
-		return szPath;
-	}
-	else {
 #ifdef _WIN32
-		TCHAR* build = _tcsstr(szPath, _T("\\out"));
-		if (!build)
-		{
-			GetCurrentDirectory(MAX_PATH, szPath);
-			return szPath;
-		}
+#define slash '\\'
 #else
-		TCHAR* build = _tcsstr(szPath, _T("/build/bin"));
-		SASSERT(build);
+#define slash '/'
 #endif
-		build[0] = 0;
-		return szPath;
-	}
+
+static std::tstring getSourceDir() {
+	SStringA file(__FILE__);
+	file = file.Left(file.ReverseFind(slash));
+	file = file.Left(file.ReverseFind(slash));
+	SStringT fileT = S_CA2T(file);
+	
+	return fileT.c_str();
 }
 
 
