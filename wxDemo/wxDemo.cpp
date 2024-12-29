@@ -189,11 +189,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 			else
 			{
                 std::tstring strDir = getSourceDir();
-				#ifdef _WIN32
                 strDir += _T("/wxDemo/emojis/");
-				#else
-                strDir += _T("\\wxDemo\\emojis\\");
-				#endif//_WIN32
                 CGlobalUnits::instance()->SetEmojiPath(strDir.c_str());
             }
 			CGlobalUnits::instance()->OperateEmojis();
