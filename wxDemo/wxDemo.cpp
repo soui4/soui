@@ -188,14 +188,14 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 			}
 			else
 			{
-#ifdef _WIN32
-				CGlobalUnits::instance()->SetEmojiPath(_T("D:\\work\\soui4.git\\wxDemo\\emojis\\"));
-#else
-				std::string strDir = getSourceDir();
-				strDir += "/wxDemo/emojis/";
-				CGlobalUnits::instance()->SetEmojiPath(strDir.c_str());
-#endif//_WIN32
-			}
+                std::tstring strDir = getSourceDir();
+				#ifdef _WIN32
+                strDir += _T("/wxDemo/emojis/");
+				#else
+                strDir += _T("\\wxDemo\\emojis\\");
+				#endif//_WIN32
+                CGlobalUnits::instance()->SetEmojiPath(strDir.c_str());
+            }
 			CGlobalUnits::instance()->OperateEmojis();
 
 			//处理拼音搜索
