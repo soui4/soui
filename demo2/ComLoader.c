@@ -1,4 +1,4 @@
-#include <Windows.h>
+#include <windows.h>
 #include <config.h>
 #include "ComLoader.h"
 #include <tchar.h>
@@ -20,6 +20,7 @@ struct SComInfo
 	HMODULE hMod;
 };
 
+#ifdef _WIN32
 struct SComInfo s_comInfo[]={
 	{Decoder_Png,_T("imgdecoder-png.dll"),NULL},
 	{Decoder_Gdip,_T("imgdecoder-gdip.dll"),NULL},
@@ -32,10 +33,26 @@ struct SComInfo s_comInfo[]={
 	{Resprovider_7Zip,_T("resprovider-7zip.dll"),NULL},
 	{Resprovider_Zip,_T("resprovider-zip.dll"),NULL},
 	{Script_Lua,_T("scriptmodule-lua.dll"),NULL},
-	{TaskLoop,_T("TaskLoop.dll"),NULL},
+	{TaskLoop,_T("taskloop.dll"),NULL},
 	{Translator,_T("translator.dll"),NULL},
 };
-
+#else
+struct SComInfo s_comInfo[] = {
+	{Decoder_Png,_T("libimgdecoder-png.so"),NULL},
+	{Decoder_Gdip,_T("libimgdecoder-gdip.so"),NULL},
+	{Decoder_Wic,_T("libimgdecoder-wic.so"),NULL},
+	{Decoder_Stb,_T("libimgdecoder-stb.so"),NULL},
+	{Render_Gdi,_T("librender-gdi.so"),NULL},
+	{Render_Skia,_T("librender-skia.so"),NULL},
+	{Render_D2D,_T("librender-d2d.so"),NULL},
+	{Log4Z,_T("liblog4z.so"),NULL},
+	{Resprovider_7Zip,_T("libresprovider-7zip.so"),NULL},
+	{Resprovider_Zip,_T("libresprovider-zip.so"),NULL},
+	{Script_Lua,_T("libscriptmodule-lua.so"),NULL},
+	{TaskLoop,_T("libtaskloop.so"),NULL},
+	{Translator,_T("libtranslator.so"),NULL},
+};
+#endif//_WIN32
 	BOOL LoadComObj(SComID id,IObjRef ** ppObj)
 	{
 		FunCreateInstance fun=NULL;
@@ -44,8 +61,13 @@ struct SComInfo s_comInfo[]={
 		if(!hDll)
 		{
 			hDll = LoadLibrary(pszDll);
-			if(!hDll)
+			if (!hDll) {
+#ifndef _WIN32
+				const char* err = dlerror();
+				printf("load so failed, err=%s\n", err);
+#endif
 				return FALSE;
+			}
 		}
 		fun = (FunCreateInstance)GetProcAddress(hDll,"SCreateInstance");
 		if(!fun)

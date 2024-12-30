@@ -1,4 +1,4 @@
-﻿//stamp:0ceb13a58cafe327
+﻿//stamp:0cf08e96e7708445
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -32,6 +32,9 @@
 			const TCHAR * menu_ico;
 			const TCHAR * png_menu_border;
 			}ImgTrayMenu;
+		struct _IMG{
+			const TCHAR * png_item_bk;
+			}IMG;
 		struct _ICON{
 			const TCHAR * ICON_LOGO;
 			}ICON;
@@ -65,6 +68,9 @@ struct _UIRES UIRES={
 			_T("ImgTrayMenu:volume"),
 			_T("ImgTrayMenu:menu_ico"),
 			_T("ImgTrayMenu:png_menu_border"),
+		},
+		{
+			_T("IMG:png_item_bk"),
 		},
 		{
 			_T("ICON:ICON_LOGO"),

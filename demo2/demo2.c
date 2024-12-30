@@ -25,15 +25,14 @@
 #  endif
 #include <windows.h>
 
-#include <CommCtrl.h>
-#include <Shlwapi.h>
-#include <OleCtl.h>
+#include <commctrl.h>
+#include <shellapi.h>
 #include <tchar.h>
 #include <stdio.h>
 #include <helper/SAssertFmt.h>
 #include <utilities-def.h>
 #include <utilities.h>
-
+#include <objidl.h>
 
 #include <core/SDefine.h>
 
@@ -53,6 +52,8 @@
 ISouiFactory * s_souiFac =NULL;
 
 
+static const TCHAR* kPath_SysRes = _T("../soui-sys-resource");
+static const TCHAR* kPath_AppRes = _T("uires");
 
 typedef struct _TestCtrl{
 	IWindow * base;
@@ -119,21 +120,27 @@ IWindow * TestCtrl_New(const IApplication *pApp){
 	return pCtrl->base;
 }
 
+#ifdef _WIN32
+#define slash '\\'
+#else
+#define slash '/'
+#endif//_WIN32
+
 //debug时方便调试设置当前目录以便从文件加载资源
 void SetDefaultDir()
 {
-	TCHAR szCurrentDir[MAX_PATH] = { 0 };
-	LPTSTR lpInsertPos;
-	GetModuleFileName(NULL, szCurrentDir, sizeof(szCurrentDir));
-
-	lpInsertPos = _tcsrchr(szCurrentDir, _T('\\'));
-#ifdef _DEBUG
-	_tcscpy(szCurrentDir, _T("d:\\work\\soui4lib\\demo2"));
-#else
-	_tcscpy(lpInsertPos + 1, _T("\0"));
-#endif
-	SetCurrentDirectory(szCurrentDir);
+	char szPath[MAX_PATH];
+	strcpy(szPath, __FILE__);
+#ifdef _WIN32
+	GetFullPathNameA(szPath, MAX_PATH, szPath, NULL);
+#endif//_WIN32
+	{
+		char* p = strrchr(szPath, slash);
+		*p = 0;
+		SetCurrentDirectoryA(szPath);
+	}
 }
+
 BOOL OnBtnFlash(IEvtArgs *evt,void *Ctx)
 {
 	IHostWnd *pHostWnd = (IHostWnd*)Ctx;
@@ -265,7 +272,7 @@ BOOL LoadRenderFac(IRenderFactory ** ppRenderFac){
 		SASSERT(bLoaded);
 		if(!bLoaded) break;
 		//设置图像解码引擎。默认为GDIP。基本主流图片都能解码。系统自带，无需其它库
-		bLoaded = LoadComObj(Decoder_Gdip,(IObjRef * *)&pImgDecoderFactory);
+		bLoaded = LoadComObj(Decoder_Stb,(IObjRef * *)&pImgDecoderFactory);
 		SASSERT(bLoaded);
 		if(!bLoaded) break;
 
@@ -278,6 +285,7 @@ BOOL LoadRenderFac(IRenderFactory ** ppRenderFac){
 //加载系统资源
 BOOL LoadSystemRes(IApplication *pApp,HINSTANCE hInstance, ISouiFactory *pSourFac)
 {
+#ifdef _WIN32
 #if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
 	HMODULE hModSysResource = hInstance;
 #else
@@ -297,6 +305,13 @@ BOOL LoadSystemRes(IApplication *pApp,HINSTANCE hInstance, ISouiFactory *pSourFa
 		SASSERT(FALSE);
 		return FALSE;
 	}
+#else
+	IResProvider* sysResProvider = pSourFac->lpVtbl->CreateResProvider(pSourFac, RES_FILE);
+	BOOL bLoaded = sysResProvider->lpVtbl->Init(sysResProvider, (WPARAM)kPath_SysRes, 0);
+	pApp->lpVtbl->LoadSystemNamedResource(pApp, sysResProvider);
+	sysResProvider->lpVtbl->Release(sysResProvider);
+	return bLoaded;
+#endif//_WIN32
 }
 
 
@@ -306,11 +321,11 @@ BOOL LoadUserRes(IApplication *pApp,ISouiFactory *pSourFac)
 	IResProvider*   pResProvider=NULL;
 	BOOL bLoaded = FALSE;
 	do{
-#ifdef _DEBUG		
+#if !defined(_WIN32)
 		//选择了仅在Release版本打包资源则在DEBUG下始终使用文件加载
 		{
 			pResProvider = pSourFac->lpVtbl->CreateResProvider(pSourFac,RES_FILE );
-			bLoaded = pResProvider->lpVtbl->Init(pResProvider,(LPARAM)_T("uires"), 0);
+			bLoaded = pResProvider->lpVtbl->Init(pResProvider,(LPARAM)kPath_AppRes, 0);
 			SASSERT(bLoaded);
 			if(!bLoaded) break;
 		}
@@ -416,3 +431,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrC
 	OleUninitialize();
 	return nRet;
 }
+
+#ifndef _WIN32
+int main(int argc, char** argv) {
+	HINSTANCE hInst = GetModuleHandle(NULL);
+	return _tWinMain(hInst, 0, NULL, SW_SHOWNORMAL);
+}
+#endif//_WIN32

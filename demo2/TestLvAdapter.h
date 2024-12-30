@@ -1,5 +1,5 @@
 #pragma once
-#include <Windows.h>
+#include <windows.h>
 #include <interface/SAdapter-i.h>
 
 typedef struct TestLvAdapter
