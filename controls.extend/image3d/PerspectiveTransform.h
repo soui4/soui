@@ -1,10 +1,10 @@
-#ifndef PERSPECTIVETRANSFORM_H_6D536C9D_C5B0_4f25_8CE9_B6EC29ECC0EF
+ï»¿#ifndef PERSPECTIVETRANSFORM_H_6D536C9D_C5B0_4f25_8CE9_B6EC29ECC0EF
 #define PERSPECTIVETRANSFORM_H_6D536C9D_C5B0_4f25_8CE9_B6EC29ECC0EF
 
 #include "3dlib.h"
 #include <math.h>
 
-// Í¨¹ıÒÆÖ²agg¿ªÔ´´úÂë£¬¼ÆËãÈÎÒâËÄ±ßĞÎµÄÀ­ÉìËã·¨ 
+// é€šè¿‡ç§»æ¤aggå¼€æºä»£ç ï¼Œè®¡ç®—ä»»æ„å››è¾¹å½¢çš„æ‹‰ä¼¸ç®—æ³• 
 
 
 // http://www.docin.com/p-114884109.html
@@ -14,18 +14,18 @@
 // http://bbs.csdn.net/topics/340208048
 
 // http://blog.csdn.net/liujb861213/article/details/7520658
-// Í¼Æ¬ÈÎÒâ½Ç¶ÈĞı×ª ÌİĞÎ±ä»» ÈÎÒâËÄ±ßĞÎ±ä»» .
+// å›¾ç‰‡ä»»æ„è§’åº¦æ—‹è½¬ æ¢¯å½¢å˜æ¢ ä»»æ„å››è¾¹å½¢å˜æ¢ .
 // http://blog.csdn.net/hitwengqi/article/details/6888783
-// µÚÁùÕÂ - Í¼Ïñ±ä»» - Í¼ÏñÀ­Éì¡¢ÊÕËõ¡¢Å¤Çú¡¢Ğı×ª[1] - ·ÂÉä±ä»»(cvWarpAffine) .
+// ç¬¬å…­ç«  - å›¾åƒå˜æ¢ - å›¾åƒæ‹‰ä¼¸ã€æ”¶ç¼©ã€æ‰­æ›²ã€æ—‹è½¬[1] - ä»¿å°„å˜æ¢(cvWarpAffine) .
 // http://msdn.microsoft.com/zh-cn/library/dd470131(VS.95).aspx
 
-//Í¸ÊÓ±ä»» Í¸ÊÓ×ª»»
+//é€è§†å˜æ¢ é€è§†è½¬æ¢
 
 // ftp://ftp.gimp.org/pub/gimp/v2.8/
 // http://www.gimp.org/downloads/
 // 'gimp_drawable_transform_tiles_affine' 
 
-// ÓĞÔ´ÂëµÄÄÜÔËĞĞµÄ·ÂPS http://www.antigrain.com/download/index.html 
+// æœ‰æºç çš„èƒ½è¿è¡Œçš„ä»¿PS http://www.antigrain.com/download/index.html 
 
 namespace IMAGE3D
 {
@@ -48,7 +48,7 @@ namespace IMAGE3D
 typedef float _pttype;
 
 
-	// ¼ì²âÊÇ·ñ½Ó½üÓÚ0.0
+	// æ£€æµ‹æ˜¯å¦æ¥è¿‘äº0.0
 	template<class T>
 	inline bool is_equal_eps(T v1, T v2, double epsilon)
 	{
@@ -62,9 +62,9 @@ typedef float _pttype;
 		*(py) = m * ((x)*p.D + (y)*p.E + p.F); \
 	}
 
-	// ²ÉÓÃ¶¨µãÊıµÄ·½·¨ÓÅ»¯
-	// PS: ÓÅ»¯µÄ½á¹û²»ÊÇºÜÃ÷ÏÔ£¬¹Ø¼üÊÇÕâ¸ö³ı·¨Ã»ÓĞÓÅ»¯,
-	//     ÒÔ¼°ÈçºÎÈÔÈ»·µ»ØÒ»¸ö¸¡µãÊı
+	// é‡‡ç”¨å®šç‚¹æ•°çš„æ–¹æ³•ä¼˜åŒ–
+	// PS: ä¼˜åŒ–çš„ç»“æœä¸æ˜¯å¾ˆæ˜æ˜¾ï¼Œå…³é”®æ˜¯è¿™ä¸ªé™¤æ³•æ²¡æœ‰ä¼˜åŒ–,
+	//     ä»¥åŠå¦‚ä½•ä»ç„¶è¿”å›ä¸€ä¸ªæµ®ç‚¹æ•°
 #define perspective_transform_fp(p, x, y, px, py) \
 	{ \
 		_pttype m = (_pttype)1.0f / (x*p.G_16 + y*p.H_16 + p.I_16); \
@@ -73,11 +73,11 @@ typedef float _pttype;
 	}
 	
 	//
-	//   A ©°---------------©´ B
+	//   A â”Œ---------------â” B
 	//     |               |
 	//     |               |
 	//     |               |
-	//   D ©¸---------------©¼ C
+	//   D â””---------------â”˜ C
 	//
 	struct Quad
 	{
@@ -134,8 +134,8 @@ typedef float _pttype;
 			return true;
 		}
 
-		// ½«¸¡µãÊıÀàĞÍ×ª»¯Îª¶¨µãÊı£¬¼Ó¿ìÔËĞĞËÙ¶È
-		// ¸ÄÎª¶¨µãÊıÖ®ºó£¬Ó¦¸ÄÎªµ÷ÓÃperspective_transform_fp
+		// å°†æµ®ç‚¹æ•°ç±»å‹è½¬åŒ–ä¸ºå®šç‚¹æ•°ï¼ŒåŠ å¿«è¿è¡Œé€Ÿåº¦
+		// æ”¹ä¸ºå®šç‚¹æ•°ä¹‹åï¼Œåº”æ”¹ä¸ºè°ƒç”¨perspective_transform_fp
 		void ChangeToFixedPoint()
 		{
 			A_16 = (int)FLOAT_TO_FIXP16(A);
@@ -286,7 +286,7 @@ typedef float _pttype;
 					is_equal_eps(I, m.I, epsilon);
 		}
 
-		// ×¢£º¸Ãº¯Êı¿ÉÄÜ»á±»ÃÜ¼¯µ÷ÓÃÊ±£¬ÇëÊ¹ÓÃºêperspective_transform
+		// æ³¨ï¼šè¯¥å‡½æ•°å¯èƒ½ä¼šè¢«å¯†é›†è°ƒç”¨æ—¶ï¼Œè¯·ä½¿ç”¨å®perspective_transform
 		inline void transform(int x, int y, _pttype* px, _pttype* py) const
 		{
 			_pttype m = (_pttype)1.0f / (x*G + y*H + I);
@@ -305,7 +305,7 @@ typedef float _pttype;
 		_pttype   D, E, F;
 		_pttype   G, H, I;
 
-		// ¶¨µãÊıĞÎÊ½
+		// å®šç‚¹æ•°å½¢å¼
 		int A_16, B_16, C_16, D_16, E_16, F_16, G_16, H_16, I_16;
 	};
 }

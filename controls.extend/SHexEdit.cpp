@@ -1,5 +1,5 @@
-/*
- * 2022.1.29  by Ð¡ÐÂ
+ï»¿/*
+ * 2022.1.29  by å°æ–°
  */
 
 #include "stdafx.h"
@@ -902,7 +902,7 @@ void SHexEdit::PaintAsciiData(IRenderTarget *pRT)
             }
 
             *pBufPtr = isprint(*pDataPtr) ? (char)*pDataPtr : '.';
-            // Ö§³Öºº×ÖµÄÏÔÊ¾, »áµ¼ÖÂAsciiÇø¶ÔÆë¼ÆËã²»ÕýÈ·
+            // æ”¯æŒæ±‰å­—çš„æ˜¾ç¤º, ä¼šå¯¼è‡´AsciiåŒºå¯¹é½è®¡ç®—ä¸æ­£ç¡®
             //*pBufPtr = (*pDataPtr >= 0x20) ? (char)*pDataPtr : '.';
         }
         *pBufPtr = '\0';

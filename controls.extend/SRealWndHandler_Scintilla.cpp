@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+ï»¿#include "StdAfx.h"
 #include "SRealWndHandler_Scintilla.h"
 #include "ScintillaWnd.h"
 
@@ -49,13 +49,13 @@ namespace SOUI
 		}
 	}
 
-	//²»´¦Àí£¬·µ»ØFALSE
+	//ä¸å¤„ç†ï¼Œè¿”å›FALSE
 	BOOL SRealWndHandler_Scintilla::OnRealWndSize( IWindow *pRealWnd )
 	{
 		return FALSE;
 	}
 
-	//²»´¦Àí£¬·µ»ØFALSE
+	//ä¸å¤„ç†ï¼Œè¿”å›FALSE
 	BOOL SRealWndHandler_Scintilla::OnRealWndInit( IWindow *pRealWnd )
 	{
 		return FALSE;

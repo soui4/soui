@@ -1,4 +1,4 @@
-#include <souistd.h>
+ï»¿#include <souistd.h>
 #include "common.h"
 #include "ScintillaWnd.h"
 
@@ -226,7 +226,7 @@ void SNativeWnd2::OnPaint(HDC hdc) {
     hdc = BeginPaint(m_hWnd, &ps);
     FillRect(hdc, &rcWnd, (HBRUSH)GetStockObject(WHITE_BRUSH));
     if (1) {
-        const char* test = "teº¯Êýst";
+        const char* test = "teå‡½æ•°st";
         const wchar_t* test2 = L"test";
         int fit;
         int dx[20];

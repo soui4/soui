@@ -1,14 +1,14 @@
-#pragma once
+ï»¿#pragma once
 
 
-//¶¨ÒåÃ¿´Î¶ÁÈ¡Êı¾İµÄ»º³åÇø´óĞ¡ 4KB
+//å®šä¹‰æ¯æ¬¡è¯»å–æ•°æ®çš„ç¼“å†²åŒºå¤§å° 4KB
 #define READ_BUFFER_SIZE		4096
 
-//ÄÚ´æÖĞÉèÖÃµÄ»º³åÇø´óĞ¡ 8M
+//å†…å­˜ä¸­è®¾ç½®çš„ç¼“å†²åŒºå¤§å° 8M
 #define DOWNLOAD_BUFFER_SIZE	(8*1024*1024)
 
 
-//¶¨Òå³£ÓÃhttpÍ·Ãû³Æ
+//å®šä¹‰å¸¸ç”¨httpå¤´åç§°
 #define HEADER_USER_AGENT			"User-Agent"
 #define HEADER_CONNECTION			"Connection"
 #define HEADER_ACCEPT				"Accept"
@@ -21,20 +21,20 @@
 #define HEADER_CONTENT_LENGTH		"Content-Length"
 
 
-//Ä¬ÈÏHTTP°æ±¾
+//é»˜è®¤HTTPç‰ˆæœ¬
 static const char default_http_version[] = "HTTP/1.1";
 
-//¶¨ÒåÄ¬ÈÏµÄuserAgent
+//å®šä¹‰é»˜è®¤çš„userAgent
 static const char default_user_agent[] = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.4044.92 Safari/537.36";
 
-//Ä¬ÈÏ½ÓÊÕÀàĞÍ
+//é»˜è®¤æ¥æ”¶ç±»å‹
 static const char default_accept[] = "*/*";
 
-//Ä¬ÈÏ±£³ÖÁ¬½Ó
+//é»˜è®¤ä¿æŒè¿æ¥
 static const char default_connection[] = "Keep-Alive";
 
-//Ä¬ÈÏÓïÑÔ
+//é»˜è®¤è¯­è¨€
 static const char default_language[] = "zh-CN,zh;q=0.9";
  
-//HTTPĞ­Òé»»ĞĞ·û
+//HTTPåè®®æ¢è¡Œç¬¦
 static const char http_newline[] = "\r\n";

@@ -71,6 +71,9 @@ option(ENABLE_SOUI_COM_LIB "Enable compile 'components' as static lib" OFF)
 #
 #
 option(XP_TOOLSET "" ON)
+#
+#
+option(ENABLE_SPECTRE "Enable Spectre Mitigation" OFF)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 option(BUILD_RICHEDIT "using richedit from source code" ON)

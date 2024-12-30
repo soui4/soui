@@ -1,64 +1,64 @@
-// define IObject APIs, included by its derieved interfaces.
+ï»¿// define IObject APIs, included by its derieved interfaces.
 
-//!Ìí¼ÓÒıÓÃ
+//!æ·»åŠ å¼•ç”¨
 /*!
  */
 STDMETHOD_(long, AddRef)(THIS) PURE;
 
-//!ÊÍ·ÅÒıÓÃ
+//!é‡Šæ”¾å¼•ç”¨
 /*!
  */
 STDMETHOD_(long, Release)(THIS) PURE;
 
-//!ÊÍ·Å¶ÔÏó
+//!é‡Šæ”¾å¯¹è±¡
 /*!
  */
 STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
 /**
  * IsClass
- * @brief    ÅĞ¶ÏthisÊÇ²»ÊÇÊôÓÚÖ¸¶¨µÄÀàĞÍ
- * @param    LPCWSTR lpszName --  ²âÊÔÀàĞÍÃû
- * @return   BOOL -- trueÊÇ²âÊÔÀàĞÍ
+ * @brief    åˆ¤æ–­thisæ˜¯ä¸æ˜¯å±äºæŒ‡å®šçš„ç±»å‹
+ * @param    LPCWSTR lpszName --  æµ‹è¯•ç±»å‹å
+ * @return   BOOL -- trueæ˜¯æµ‹è¯•ç±»å‹
  * Describe
  */
 STDMETHOD_(BOOL, IsClass)(CTHIS_ LPCWSTR lpszName) SCONST PURE;
 
 /**
  * GetObjectClass
- * @brief    »ñµÃÀàĞÍÃû
- * @return   LPCWSTR -- ÀàĞÍÃû
- * Describe  ÕâÊÇÒ»¸öĞéº¯Êı£¬×¢ÒâÓëGetClassNameµÄÇø±ğ¡£
+ * @brief    è·å¾—ç±»å‹å
+ * @return   LPCWSTR -- ç±»å‹å
+ * Describe  è¿™æ˜¯ä¸€ä¸ªè™šå‡½æ•°ï¼Œæ³¨æ„ä¸GetClassNameçš„åŒºåˆ«ã€‚
  */
 STDMETHOD_(LPCWSTR, GetObjectClass)(CTHIS) SCONST PURE;
 
 /**
  * GetObjectType
- * @brief    »ñµÃ¶ÔÏóÀàĞÍ
- * @return   int -- ¶ÔÏóÀàĞÍ
- * Describe  ÕâÊÇÒ»¸öĞéº¯Êı£¬×¢ÒâÓëGetClassTypeµÄÇø±ğ¡£
+ * @brief    è·å¾—å¯¹è±¡ç±»å‹
+ * @return   int -- å¯¹è±¡ç±»å‹
+ * Describe  è¿™æ˜¯ä¸€ä¸ªè™šå‡½æ•°ï¼Œæ³¨æ„ä¸GetClassTypeçš„åŒºåˆ«ã€‚
  */
 STDMETHOD_(int, GetObjectType)(CTHIS) SCONST PURE;
 
 /**
  * GetID
- * @brief    »ñÈ¡¶ÔÏóID
- * @return   int -- ¶ÔÏóID
+ * @brief    è·å–å¯¹è±¡ID
+ * @return   int -- å¯¹è±¡ID
  * Describe
  */
 STDMETHOD_(int, GetID)(CTHIS) SCONST PURE;
 
 /**
- * @brief ÉèÖÃ¶ÔÏóID
- * @param nID int--¶ÔÏóID
+ * @brief è®¾ç½®å¯¹è±¡ID
+ * @param nID int--å¯¹è±¡ID
  * @return
  */
 STDMETHOD_(void, SetID)(THIS_ int nID) PURE;
 
 /**
  * GetName
- * @brief    »ñÈ¡¶ÔÏóName
- * @return   LPCWSTR -- ¶ÔÏóName
+ * @brief    è·å–å¯¹è±¡Name
+ * @return   LPCWSTR -- å¯¹è±¡Name
  * Describe
  */
 STDMETHOD_(LPCWSTR, GetName)(CTHIS) SCONST PURE;
@@ -66,25 +66,25 @@ STDMETHOD_(LPCWSTR, GetName)(CTHIS) SCONST PURE;
 STDMETHOD_(LPCSTR, GetNameA)(CTHIS) SCONST PURE;
 
 /**
- * @brief ÉèÖÃ¶ÔÏóName
- * @param pszName LPCWSTR -- ¶ÔÏóName
+ * @brief è®¾ç½®å¯¹è±¡Name
+ * @param pszName LPCWSTR -- å¯¹è±¡Name
  * @return
  */
 STDMETHOD_(void, SetName)(THIS_ LPCWSTR pszName) PURE;
 
 /**
  * InitFromXml
- * @brief    ´ÓXML½á½Ú³õÊ¼»¯SObject¶ÔÏó
- * @param    SXmlNode --  XML½á½Ú
- * @return   BOOL -- ³É¹¦·µ»ØTRUE
+ * @brief    ä»XMLç»“èŠ‚åˆå§‹åŒ–SObjectå¯¹è±¡
+ * @param    SXmlNode --  XMLç»“èŠ‚
+ * @return   BOOL -- æˆåŠŸè¿”å›TRUE
  * Describe
  */
 STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *xmlNode) PURE;
 
 /**
  * OnInitFinished
- * @brief    ÊôĞÔ³õÊ¼»¯Íê³É´¦Àí½Ó¿Ú
- * @param    SXmlNode xmlNode --  ÊôĞÔ½Úµã
+ * @brief    å±æ€§åˆå§‹åŒ–å®Œæˆå¤„ç†æ¥å£
+ * @param    SXmlNode xmlNode --  å±æ€§èŠ‚ç‚¹
  * @return   void
  * Describe
  */
@@ -92,11 +92,11 @@ STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode) PURE;
 
 /**
  * ISetAttribute
- * @brief    ÉèÖÃÒ»¸ö¶ÔÏóÊôĞÔ
- * @param    const IStringW *strAttribName --  ÊôĞÔÃû
- * @param    const IStringW *strValue --  ÊôĞÔÖµ
- * @param    BOOL bLoading --  ¶ÔÏó´´½¨Ê±ÓÉÏµÍ³µ÷ÓÃ±êÖ¾
- * @return   HRESULT -- ´¦Àí´¦Àí½á¹û
+ * @brief    è®¾ç½®ä¸€ä¸ªå¯¹è±¡å±æ€§
+ * @param    const IStringW *strAttribName --  å±æ€§å
+ * @param    const IStringW *strValue --  å±æ€§å€¼
+ * @param    BOOL bLoading --  å¯¹è±¡åˆ›å»ºæ—¶ç”±ç³»ç»Ÿè°ƒç”¨æ ‡å¿—
+ * @return   HRESULT -- å¤„ç†å¤„ç†ç»“æœ
  * Describe
  */
 STDMETHOD_(HRESULT, ISetAttribute)
@@ -104,52 +104,52 @@ STDMETHOD_(HRESULT, ISetAttribute)
 
 /**
  * SetAttribute
- * @brief    ÉèÖÃÒ»¸ö¶ÔÏóÊôĞÔ
- * @param    LPCSTR pszAttr --  ÊôĞÔÃû
- * @param    LPCSTR pszValue --  ÊôĞÔÖµ
- * @param    BOOL bLoading --  ¶ÔÏó´´½¨Ê±ÓÉÏµÍ³µ÷ÓÃ±êÖ¾
- * @return   HRESULT -- ´¦Àí´¦Àí½á¹û
+ * @brief    è®¾ç½®ä¸€ä¸ªå¯¹è±¡å±æ€§
+ * @param    LPCSTR pszAttr --  å±æ€§å
+ * @param    LPCSTR pszValue --  å±æ€§å€¼
+ * @param    BOOL bLoading --  å¯¹è±¡åˆ›å»ºæ—¶ç”±ç³»ç»Ÿè°ƒç”¨æ ‡å¿—
+ * @return   HRESULT -- å¤„ç†å¤„ç†ç»“æœ
  * Describe
  */
 STDMETHOD_(HRESULT, SetAttributeA)(THIS_ LPCSTR pszAttr, LPCSTR pszValue, BOOL bLoading DEF_VAL(FALSE)) PURE;
 
 /**
  * SetAttribute
- * @brief    ÉèÖÃÒ»¸ö¶ÔÏóÊôĞÔ
- * @param    LPCWSTR pszAttr --  ÊôĞÔÃû
- * @param    LPCWSTR pszValue --  ÊôĞÔÖµ
- * @param    BOOL bLoading --  ¶ÔÏó´´½¨Ê±ÓÉÏµÍ³µ÷ÓÃ±êÖ¾
- * @return   HRESULT -- ´¦Àí´¦Àí½á¹û
+ * @brief    è®¾ç½®ä¸€ä¸ªå¯¹è±¡å±æ€§
+ * @param    LPCWSTR pszAttr --  å±æ€§å
+ * @param    LPCWSTR pszValue --  å±æ€§å€¼
+ * @param    BOOL bLoading --  å¯¹è±¡åˆ›å»ºæ—¶ç”±ç³»ç»Ÿè°ƒç”¨æ ‡å¿—
+ * @return   HRESULT -- å¤„ç†å¤„ç†ç»“æœ
  * Describe
  */
 STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading DEF_VAL(FALSE)) PURE;
 
 /**
  * GetAttribute
- * @brief    Í¨¹ıÊôĞÔÃû²éÑ¯ÊôĞÔÖµ
- * @param    LPCWSTR strAttr --  ÊôĞÔÃû
- * @param    IStringW * pValue -- ÊôĞÔÖµ
- * @return   BOOL, TRUE:»ñÈ¡³É¹¦£¬FALSE:»ñÈ¡Ê§°Ü£¬ÊôĞÔ²»´æÔÚ
- * Describe  Ä¬ÈÏ·µ»Ø¿Õ
+ * @brief    é€šè¿‡å±æ€§åæŸ¥è¯¢å±æ€§å€¼
+ * @param    LPCWSTR strAttr --  å±æ€§å
+ * @param    IStringW * pValue -- å±æ€§å€¼
+ * @return   BOOL, TRUE:è·å–æˆåŠŸï¼ŒFALSE:è·å–å¤±è´¥ï¼Œå±æ€§ä¸å­˜åœ¨
+ * Describe  é»˜è®¤è¿”å›ç©º
  */
 STDMETHOD_(BOOL, GetAttribute)(CTHIS_ LPCWSTR strAttr, IStringW *pValue) SCONST PURE;
 
 /**
  * OnAttribute
- * @brief    ÊôĞÔ´¦Àíºóµ÷ÓÃµÄ·½·¨
- * @param    LPCWSTR pszAttr--  ÊôĞÔÃû
- * @param    LPCWSTR pszValue --  ÊôĞÔÖµ
- * @param    BOOL bLoading --  ¶ÔÏó´´½¨Ê±ÓÉÏµÍ³µ÷ÓÃ±êÖ¾
- * @param    HRESULT hr --  ÊôĞÔ´¦Àí½á¹û
- * Describe  ²»×ö´¦Àí£¬Ö±½Ó·µ»Ø
+ * @brief    å±æ€§å¤„ç†åè°ƒç”¨çš„æ–¹æ³•
+ * @param    LPCWSTR pszAttr--  å±æ€§å
+ * @param    LPCWSTR pszValue --  å±æ€§å€¼
+ * @param    BOOL bLoading --  å¯¹è±¡åˆ›å»ºæ—¶ç”±ç³»ç»Ÿè°ƒç”¨æ ‡å¿—
+ * @param    HRESULT hr --  å±æ€§å¤„ç†ç»“æœ
+ * Describe  ä¸åšå¤„ç†ï¼Œç›´æ¥è¿”å›
  */
 STDMETHOD_(HRESULT, AfterAttribute)
 (THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading, HRESULT hr) PURE;
 
 /**
  * SetAttrHandler
- * @brief    ÉèÖÃÊôĞÔ´¦Àí»Øµ÷·½·¨
- * @param    FunAttrHandler attrHandler--  ÊôĞÔ´¦Àí»Øµ÷·½·¨
+ * @brief    è®¾ç½®å±æ€§å¤„ç†å›è°ƒæ–¹æ³•
+ * @param    FunAttrHandler attrHandler--  å±æ€§å¤„ç†å›è°ƒæ–¹æ³•
  * @return   void
  * Describe
  */

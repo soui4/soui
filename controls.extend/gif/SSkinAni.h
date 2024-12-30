@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <interface/SRender-i.h>
 namespace SOUI
@@ -29,17 +29,17 @@ namespace SOUI
 
         /**
          * LoadFromMemory
-         * @brief    ´ÓÄÚ´æ¼ÓÔØAPNG
-         * @param    LPVOID pBits --  ÄÚ´æµØÖ·
-         * @param    size_t szData --  ÄÚ´æÊı¾İ³¤¶È
-         * @return   int -- APNGÖ¡Êı£¬0-Ê§°Ü
+         * @brief    ä»å†…å­˜åŠ è½½APNG
+         * @param    LPVOID pBits --  å†…å­˜åœ°å€
+         * @param    size_t szData --  å†…å­˜æ•°æ®é•¿åº¦
+         * @return   int -- APNGå¸§æ•°ï¼Œ0-å¤±è´¥
          * Describe  
          */    
         virtual int LoadFromMemory(LPVOID pBits,size_t szData) { return 0; }
 
 		/**
         * ActiveNextFrame
-        * @brief    ¼¤»îÏÂÒ»Ö¡
+        * @brief    æ¿€æ´»ä¸‹ä¸€å¸§
         * @return   void 
         * Describe  
         */    
@@ -55,8 +55,8 @@ namespace SOUI
 
         /**
         * SelectActiveFrame
-        * @brief    ¼¤»îÖ¸¶¨Ö¡
-        * @param    int iFrame --  Ö¡ºÅ
+        * @brief    æ¿€æ´»æŒ‡å®šå¸§
+        * @param    int iFrame --  å¸§å·
         * @return   void
         * Describe  
         */    

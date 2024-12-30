@@ -1,4 +1,4 @@
-/********************************************************************
+ï»¿/********************************************************************
 created:	2012/12/27
 created:	27:12:2012   14:55
 filename: 	SSkinGif.h
@@ -6,7 +6,7 @@ file base:	SSkinGif
 file ext:	h
 author:		huangjianxiong
 
-purpose:	×Ô¶¨ÒåÆ¤·ô¶ÔÏó
+purpose:	è‡ªå®šä¹‰çš®è‚¤å¯¹è±¡
 *********************************************************************/
 #pragma once
 #include <interface/SSkinobj-i.h>
@@ -20,7 +20,7 @@ namespace SOUI
 
     /**
     * @class     SSkinGif
-    * @brief     GIFÍ¼Æ¬¼ÓÔØ¼°ÏÔÊ¾¶ÔÏó
+    * @brief     GIFå›¾ç‰‡åŠ è½½åŠæ˜¾ç¤ºå¯¹è±¡
     * 
     * Describe
     */
@@ -40,33 +40,33 @@ namespace SOUI
 
 		/**
 		* GetFrameDelay
-		* @brief    »ñµÃÖ¸¶¨Ö¡µÄÏÔÊ¾Ê±¼ä
-		* @param    int iFrame --  Ö¡ºÅ,Îª-1Ê±´ú±í»ñµÃµ±Ç°Ö¡µÄÑÓÊ±
-		* @return   long -- ÑÓÊ±Ê±¼ä(*10ms)
+		* @brief    è·å¾—æŒ‡å®šå¸§çš„æ˜¾ç¤ºæ—¶é—´
+		* @param    int iFrame --  å¸§å·,ä¸º-1æ—¶ä»£è¡¨è·å¾—å½“å‰å¸§çš„å»¶æ—¶
+		* @return   long -- å»¶æ—¶æ—¶é—´(*10ms)
 		* Describe
 		*/
 		long GetFrameDelay(int iFrame = -1) const;
 
-        //³õÊ¼»¯GDI+»·¾³£¬ÓÉÓÚÕâÀïĞèÒªÊ¹ÓÃGDI+À´½âÂëGIFÎÄ¼ş¸ñÊ½
+        //åˆå§‹åŒ–GDI+ç¯å¢ƒï¼Œç”±äºè¿™é‡Œéœ€è¦ä½¿ç”¨GDI+æ¥è§£ç GIFæ–‡ä»¶æ ¼å¼
         static BOOL Gdiplus_Startup();
-        //ÍË³öGDI+»·¾³
+        //é€€å‡ºGDI+ç¯å¢ƒ
         static void Gdiplus_Shutdown();
 
         /**
          * LoadFromFile
-         * @brief    ´ÓÎÄ¼ş¼ÓÔØGIF
-         * @param    LPCTSTR pszFileName --  ÎÄ¼şÃû
-         * @return   int -- GIFÖ¡Êı£¬0-Ê§°Ü
+         * @brief    ä»æ–‡ä»¶åŠ è½½GIF
+         * @param    LPCTSTR pszFileName --  æ–‡ä»¶å
+         * @return   int -- GIFå¸§æ•°ï¼Œ0-å¤±è´¥
          * Describe  
          */    
         int LoadFromFile(LPCTSTR pszFileName);
 
         /**
          * LoadFromMemory
-         * @brief    ´ÓÄÚ´æ¼ÓÔØGIF
-         * @param    LPVOID pBits --  ÄÚ´æµØÖ·
-         * @param    size_t szData --  ÄÚ´æÊı¾İ³¤¶È
-         * @return   int -- GIFÖ¡Êı£¬0-Ê§°Ü
+         * @brief    ä»å†…å­˜åŠ è½½GIF
+         * @param    LPVOID pBits --  å†…å­˜åœ°å€
+         * @param    size_t szData --  å†…å­˜æ•°æ®é•¿åº¦
+         * @return   int -- GIFå¸§æ•°ï¼Œ0-å¤±è´¥
          * Describe  
          */    
         int LoadFromMemory(LPVOID pBits,size_t szData);
@@ -77,7 +77,7 @@ namespace SOUI
 
 	public:
         SOUI_ATTRS_BEGIN()
-            ATTR_CUSTOM(L"src",OnAttrSrc)   //XMLÎÄ¼şÖĞÖ¸¶¨µÄÍ¼Æ¬×ÊÔ´Ãû,(type:name)
+            ATTR_CUSTOM(L"src",OnAttrSrc)   //XMLæ–‡ä»¶ä¸­æŒ‡å®šçš„å›¾ç‰‡èµ„æºå,(type:name)
         SOUI_ATTRS_END()
     protected:
 		virtual void _DrawByIndex2(IRenderTarget *pRT, LPCRECT rcDraw, int dwState, BYTE byAlpha = 0xFF) const  override;

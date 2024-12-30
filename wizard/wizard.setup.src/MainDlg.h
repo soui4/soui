@@ -1,4 +1,4 @@
-// MainDlg.h : interface of the CMainDlg class
+ï»¿// MainDlg.h : interface of the CMainDlg class
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -47,7 +47,7 @@ public:
 		COMMAND_ID_HANDLER(IDC_HOMESITE, OnHomeSite)
 		END_MSG_MAP()
 
-	CString m_strWizardDir;//Êı¾İÄ¿Â¼
+	CString m_strWizardDir;//æ•°æ®ç›®å½•
 	CString m_strInstall32, m_strInstall64;
 
 	typedef BOOL(WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
@@ -107,7 +107,7 @@ public:
 
 	CString ExeCmd(CString pszCmd)
 	{
-		// ´´½¨ÄäÃû¹ÜµÀ
+		// åˆ›å»ºåŒ¿åç®¡é“
 		SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE };
 		HANDLE hRead, hWrite;
 		if (!CreatePipe(&hRead, &hWrite, &sa, 0))
@@ -115,7 +115,7 @@ public:
 			return TEXT(" ");
 		}
 
-		// ÉèÖÃÃüÁîĞĞ½ø³ÌÆô¶¯ĞÅÏ¢(ÒÔÒş²Ø·½Ê½Æô¶¯ÃüÁî²¢¶¨Î»ÆäÊä³öµ½hWrite
+		// è®¾ç½®å‘½ä»¤è¡Œè¿›ç¨‹å¯åŠ¨ä¿¡æ¯(ä»¥éšè—æ–¹å¼å¯åŠ¨å‘½ä»¤å¹¶å®šä½å…¶è¾“å‡ºåˆ°hWrite
 		STARTUPINFO si = { sizeof(STARTUPINFO) };
 		GetStartupInfo(&si);
 		si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
@@ -123,17 +123,17 @@ public:
 		si.hStdError = hWrite;
 		si.hStdOutput = hWrite;
 
-		// Æô¶¯ÃüÁîĞĞ
+		// å¯åŠ¨å‘½ä»¤è¡Œ
 		PROCESS_INFORMATION pi;
 		if (!CreateProcess(NULL, pszCmd.GetBuffer(), NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi))
 		{
 			return TEXT("Cannot create process");
 		}
 
-		// Á¢¼´¹Ø±ÕhWrite
+		// ç«‹å³å…³é—­hWrite
 		CloseHandle(hWrite);
 
-		// ¶ÁÈ¡ÃüÁîĞĞ·µ»ØÖµ
+		// è¯»å–å‘½ä»¤è¡Œè¿”å›å€¼
 		CStringA strRetTmp;
 		char buff[1024] = { 0 };
 		DWORD dwRead = 0;
@@ -297,7 +297,7 @@ public:
 			if(FolderExists(dataTarget))
 			if(CreateDirectory(dataTarget, 0))
 			{
-				MessageBox(_T("ÎŞ·¨´´½¨Êı¾İÄ¿±êÎÄ¼ş¼Ğ£¡"), _T("´íÎó"), MB_OK | MB_ICONSTOP);
+				MessageBox(_T("æ— æ³•åˆ›å»ºæ•°æ®ç›®æ ‡æ–‡ä»¶å¤¹ï¼"), _T("é”™è¯¯"), MB_OK | MB_ICONSTOP);
 				delete pEnvCfg;
 				continue;
 			}
@@ -385,7 +385,7 @@ public:
 		if (GetFileAttributes(_T("SouiWizard")) == INVALID_FILE_ATTRIBUTES
 			|| GetFileAttributes(_T("SouiDllWizard")) == INVALID_FILE_ATTRIBUTES)
 		{
-			MessageBox(_T("µ±Ç°Ä¿Â¼ÏÂÃ»ÓĞÕÒµ½SOUIµÄÏòµ¼Êı¾İ"), _T("´íÎó"), MB_OK | MB_ICONSTOP);
+			MessageBox(_T("å½“å‰ç›®å½•ä¸‹æ²¡æœ‰æ‰¾åˆ°SOUIçš„å‘å¯¼æ•°æ®"), _T("é”™è¯¯"), MB_OK | MB_ICONSTOP);
 			return 0;
 		}
 		TCHAR szSouiDir[MAX_PATH] = { 0 }, szSourCore[MAX_PATH];
@@ -396,7 +396,7 @@ public:
 		_tcscat(szSourCore, _T("\\SOUI"));
 		if (GetFileAttributes(szSourCore) == INVALID_FILE_ATTRIBUTES)
 		{
-			MessageBox(_T("µ±Ç°Ä¿Â¼ÏÂÃ»ÓĞÕÒµ½SOUIµÄÔ´´úÂë"), _T("´íÎó"), MB_OK | MB_ICONSTOP);
+			MessageBox(_T("å½“å‰ç›®å½•ä¸‹æ²¡æœ‰æ‰¾åˆ°SOUIçš„æºä»£ç "), _T("é”™è¯¯"), MB_OK | MB_ICONSTOP);
 			return 0;
 		}
 
@@ -418,11 +418,11 @@ public:
 			strDir64.Empty();
 		}
 		if(strDir32.IsEmpty() && strDir64.IsEmpty()){
-			MessageBox(_T("Ã»ÓĞÕÒµ½32Î»»òÕß64Î»soui°²×°Ä¿Â¼"), _T("´íÎó"), MB_OK | MB_ICONSTOP);
+			MessageBox(_T("æ²¡æœ‰æ‰¾åˆ°32ä½æˆ–è€…64ä½souiå®‰è£…ç›®å½•"), _T("é”™è¯¯"), MB_OK | MB_ICONSTOP);
 			return 0;
 		}
 
-		//ÉèÖÃ»·¾³±äÁ¿
+		//è®¾ç½®ç¯å¢ƒå˜é‡
 
 		CRegKey reg;
 		if (ERROR_SUCCESS == reg.Open(HKEY_LOCAL_MACHINE, _T("System\\CurrentControlSet\\Control\\Session Manager\\Environment"), KEY_SET_VALUE | KEY_QUERY_VALUE))
@@ -433,16 +433,16 @@ public:
 			reg.SetStringValue(ENV_INSTALL_64, strDir64);			
 			reg.Close();
 			DWORD_PTR msgResult = 0;
-			//¹ã²¥»·¾³±äÁ¿ĞŞ¸ÄÏûÏ¢
+			//å¹¿æ’­ç¯å¢ƒå˜é‡ä¿®æ”¹æ¶ˆæ¯
 			SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, LPARAM(_T("Environment")), SMTO_ABORTIFHUNG, 5000, &msgResult);
 		}
 		else
 		{
-			MessageBox(_T("Ìí¼Ó»·¾³±äÁ¿Ê§°Ü"), _T("´íÎó"), MB_OK | MB_ICONSTOP);
+			MessageBox(_T("æ·»åŠ ç¯å¢ƒå˜é‡å¤±è´¥"), _T("é”™è¯¯"), MB_OK | MB_ICONSTOP);
 			return 0;
 		}
 
-		//×¼±¸¸´ÖÆÎÄ¼ş
+		//å‡†å¤‡å¤åˆ¶æ–‡ä»¶
 		TCHAR szFrom[1024] = { 0 };
 		TCHAR szTo[1024] = { 0 };
 		SHFILEOPSTRUCT shfo;
@@ -454,7 +454,7 @@ public:
 			if (!vslist.GetCheckState(i)) continue;
 
 			VSENVCFG *pCfg = (VSENVCFG*)vslist.GetItemData(i);
-			//¸´ÖÆÈë¿ÚÊı¾İ
+			//å¤åˆ¶å…¥å£æ•°æ®
 			BOOL bOK = TRUE;
 			if (bOK)
 			{
@@ -466,7 +466,7 @@ public:
 				_stprintf(szTo,_T("%s%s\\%s"),pCfg->strVsDir,pCfg->strDataTarget,DIR_DST);
 				bOK = 0 == SHFileOperation(&shfo);
 			}
-			//¸ÄĞ´SouiWizard.vsz
+			//æ”¹å†™SouiWizard.vsz
 			if (bOK)
 			{
 				_stprintf(szFrom,_T("%s\\%s"),pCfg->strEntrySrc,WIZARD_EXE);
@@ -483,7 +483,7 @@ public:
 
 					f = _tfopen(szTo, _T("w"));
 					if (f)
-					{//Çå¿ÕÔ­Êı¾İÔÙÖØĞÂĞ´ÈëĞÂÊı¾İ
+					{//æ¸…ç©ºåŸæ•°æ®å†é‡æ–°å†™å…¥æ–°æ•°æ®
 						CStringA str = szBuf;
 						str.Replace("%SOUI4PATH%", CT2A(szSouiDir));
 						fwrite((LPCSTR)str, 1, str.GetLength(), f);
@@ -492,7 +492,7 @@ public:
 				}
 			}
 
-			//¸ÄĞ´SouiDllWizard.vsz
+			//æ”¹å†™SouiDllWizard.vsz
 			{
 				_stprintf(szFrom,_T("%s\\%s"),pCfg->strEntrySrc,WIZARD_DLL);
 				_stprintf(szTo,_T("%s%s\\%s\\%s"),pCfg->strVsDir, pCfg->strEntryTarget,DIR_DST, WIZARD_DLL);
@@ -508,7 +508,7 @@ public:
 
 					f = _tfopen(szTo, _T("w"));
 					if (f)
-					{//Çå¿ÕÔ­Êı¾İÔÙÖØĞÂĞ´ÈëĞÂÊı¾İ
+					{//æ¸…ç©ºåŸæ•°æ®å†é‡æ–°å†™å…¥æ–°æ•°æ®
 						CStringA str = szBuf;
 						str.Replace("%SOUI4PATH%", CT2A(szSouiDir));
 						fwrite((LPCSTR)str, 1, str.GetLength(), f);
@@ -518,7 +518,7 @@ public:
 			}
 
 			CString strMsg;
-			strMsg.Format(_T("Îª%s°²×°SOUI5Ïòµ¼:%s"), pCfg->strName, bOK ? _T("³É¹¦") : _T("Ê§°Ü"));
+			strMsg.Format(_T("ä¸º%så®‰è£…SOUI5å‘å¯¼:%s"), pCfg->strName, bOK ? _T("æˆåŠŸ") : _T("å¤±è´¥"));
 			::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strMsg);
 		}
 
@@ -549,7 +549,7 @@ public:
 				bOK = DeleteFile(strSource);
 			}
 
-			// É¾³ıSouiÄ¿Â¼
+			// åˆ é™¤Souiç›®å½•
 			if (bOK)
 			{
 				CString strSource;
@@ -559,7 +559,7 @@ public:
 			}
 
 			CString strMsg;
-			strMsg.Format(_T("´Ó%sÖĞĞ¶ÔØSOUI5Ïòµ¼%s"), pCfg->strName, bOK ? _T("³É¹¦") : _T("Ê§°Ü"));
+			strMsg.Format(_T("ä»%sä¸­å¸è½½SOUI5å‘å¯¼%s"), pCfg->strName, bOK ? _T("æˆåŠŸ") : _T("å¤±è´¥"));
 			::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strMsg);
 
 		}

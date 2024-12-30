@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include "core\Swnd.h"
 
 SNSBEGIN
@@ -18,7 +18,7 @@ DEF_EVT_EXT(EventBtnSelChanged,EVT_BTNSEL_CHANGED,{
 	BOOL bCancel;
 });
 
-//Ò»¸ö
+//ä¸€ä¸ª
 class SLoopButton : public SImageButton {
     DEF_SOBJECT(SImageButton, L"loopbtn")
   public:
@@ -58,11 +58,11 @@ class SLoopButton : public SImageButton {
     MSG_WM_LBUTTONUP(OnLButtonUp)
     SOUI_MSG_MAP_END()
   private:
-    //µ±Ç°ÏÔÊ¾µÄ×´Ì¬,×¢Òâ×´Ì¬´Ó0¿ªÊ¼ËãµÄ
+    //å½“å‰æ˜¾ç¤ºçš„çŠ¶æ€,æ³¨æ„çŠ¶æ€ä»0å¼€å§‹ç®—çš„
     int m_iCurState;
-    //×Ü¹²ÓĞ¼¸¸ö×´Ì¬
+    //æ€»å…±æœ‰å‡ ä¸ªçŠ¶æ€
     int m_iState;
-    //×ÓÍ¼µÄ×´Ì¬Êı£¬²»ÊÇ×Ü¹²ÓĞ¶àÉÙ¸ö×ÓÍ¼£¬¶øÊÇÃ¿ÖÖ×´Ì¬ÏÂµÄ×ÓÍ¼Êı
+    //å­å›¾çš„çŠ¶æ€æ•°ï¼Œä¸æ˜¯æ€»å…±æœ‰å¤šå°‘ä¸ªå­å›¾ï¼Œè€Œæ˜¯æ¯ç§çŠ¶æ€ä¸‹çš„å­å›¾æ•°
     int m_iSkinStates;
 };
 

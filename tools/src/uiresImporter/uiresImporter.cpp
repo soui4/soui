@@ -1,4 +1,4 @@
-// uiresIndexMake.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// uiresIndexMake.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -12,13 +12,13 @@ typedef std::string  tstring;
 void printUsage();
 void ImportResource(xml_node xmlNode, const tstring & strUiresDir,const tstring & strNamePrefix,xml_node xmlSkin);
 
-bool g_bEnableColorize = true;//Ä¬ÈÏÆ¤·ôÔÊĞí×ÅÉ«
+bool g_bEnableColorize = true;//é»˜è®¤çš®è‚¤å…è®¸ç€è‰²
 
 int _tmain(int argc, _TCHAR* argv[])
 {
-    tstring strUiresDir;    //uiresÂ·¾¶£¬Ïà¶ÔÓÚµ±Ç°Â·¾¶
-    tstring strSubDirs;     //ËÑË÷µÄ×ÓÄ¿Â¼ÁĞ±í£¬×ÓÄ¿Â¼Ö®¼äÊ¹ÓÃ¡°|¡±·Ö¿ª.
-    tstring strImgDir;      //Í¼Æ¬Ä¿Â¼£¬²»ÒªºÍ×ÓÄ¿Â¼ÁĞ±íÖØ¸´¡£imglist: file[3].png imgframe: file[3{2,2,2,2}].png
+    tstring strUiresDir;    //uiresè·¯å¾„ï¼Œç›¸å¯¹äºå½“å‰è·¯å¾„
+    tstring strSubDirs;     //æœç´¢çš„å­ç›®å½•åˆ—è¡¨ï¼Œå­ç›®å½•ä¹‹é—´ä½¿ç”¨â€œ|â€åˆ†å¼€.
+    tstring strImgDir;      //å›¾ç‰‡ç›®å½•ï¼Œä¸è¦å’Œå­ç›®å½•åˆ—è¡¨é‡å¤ã€‚imglist: file[3].png imgframe: file[3{2,2,2,2}].png
     bool    bBackup=true;
     int c;
 
@@ -86,7 +86,7 @@ int _tmain(int argc, _TCHAR* argv[])
     ImportResource(xmlImage,strImgDir,_T(""),xmlSkin);
     
     if(bBackup)
-    {//±¸·İÊı¾İ
+    {//å¤‡ä»½æ•°æ®
         ::CopyFile(_T("uires.idx"),_T("uires.bak.idx"),FALSE);
         ::CopyFile(_T("values\\skin.xml"),_T("values\\skin.bak.xml"),FALSE);
     }
@@ -145,7 +145,7 @@ void ImportResource(xml_node xmlNode, const tstring & strUiresDir,const tstring 
 					tstring strFileName = fd.cFileName;
 					tstring strExtX = strFileName.substr(strFileName.length()-strDot9Png.length());
 					if(_tcsicmp(strExtX.c_str(),strDot9Png.c_str())==0)
-					{//Ê¶±ğandroid .9.png
+					{//è¯†åˆ«android .9.png
 						tstring src = xmlNode.name();
 						src += _T(":");
 						src += strName;
@@ -164,16 +164,16 @@ void ImportResource(xml_node xmlNode, const tstring & strUiresDir,const tstring 
 							src += strName;
 
 							xml_node node = xmlSkin.find_child_by_attribute(_T("name"),strName.c_str());
-							if(node) xmlSkin.remove_child(node);//×Ô¶¯Ê¹ÓÃĞÂµÄÆ¤·ôÌæ»»Ô­ÓĞÆ¤·ô¡£
+							if(node) xmlSkin.remove_child(node);//è‡ªåŠ¨ä½¿ç”¨æ–°çš„çš®è‚¤æ›¿æ¢åŸæœ‰çš®è‚¤ã€‚
 
 							int nStates=1, left=-1,top=-1,right=-1,bottom=-1;
 							int nValues = 0;
 
-							int nColorize = g_bEnableColorize?1:0, //×ÅÉ«±êÖ¾ {ec=0/1}
-								nAutoFit = 1,  //×ÔÊÊÓ¦±êÖ¾{fit=0/1}
-								nTile = 0,     //Æ½ÆÌ±êÖ¾{tile=0/1}
-								nVertical = 0, //×ÓÍ¼´¹Ö±ÅÅÁĞ±êÖ¾{vert=0/1}
-								nFilter=0;     //»æÖÆÂË¾µ:{filter=0/1/2/3} 0=null,1=low,2=midium,3=high
+							int nColorize = g_bEnableColorize?1:0, //ç€è‰²æ ‡å¿— {ec=0/1}
+								nAutoFit = 1,  //è‡ªé€‚åº”æ ‡å¿—{fit=0/1}
+								nTile = 0,     //å¹³é“ºæ ‡å¿—{tile=0/1}
+								nVertical = 0, //å­å›¾å‚ç›´æ’åˆ—æ ‡å¿—{vert=0/1}
+								nFilter=0;     //ç»˜åˆ¶æ»¤é•œ:{filter=0/1/2/3} 0=null,1=low,2=midium,3=high
 
 							if(p)
 							{
@@ -207,7 +207,7 @@ void ImportResource(xml_node xmlNode, const tstring & strUiresDir,const tstring 
 								il.append_attribute(_T("margin")).set_value(szMargin);
 							}
 
-							//ÉèÖÃ¸÷ÖÖ¿ÉÏÈÊôĞÔ
+							//è®¾ç½®å„ç§å¯å…ˆå±æ€§
 							if(nColorize == 0) il.append_attribute(_T("enableColorize")).set_value(0);
 							if(nAutoFit == 0) il.append_attribute(_T("autoFit")).set_value(0);
 							if(nTile !=0 ) il.append_attribute(_T("tile")).set_value(1);

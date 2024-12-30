@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SComboBoxEx.h"
 
 SNSBEGIN
@@ -23,7 +23,7 @@ SComboBoxEx::~SComboBoxEx()
 BOOL SComboBoxEx::CreateListBox(SXmlNode xmlNode)
 {
     SASSERT(xmlNode);
-    //´´½¨ÁĞ±í¿Ø¼ş
+    //åˆ›å»ºåˆ—è¡¨æ§ä»¶
     m_pListBox
         = (SListBoxEx *)SApplication::getSingleton().CreateWindowByName(SListBoxEx::GetClassName());
     m_pListBox->SetContainer(GetContainer());
@@ -34,7 +34,7 @@ BOOL SComboBoxEx::CreateListBox(SXmlNode xmlNode)
     m_pListBox->SetOwner(this); // chain notify message to combobox
     m_pListBox->SetID(IDC_DROPDOWN_LIST);
 
-    //³õÊ¼»¯ÁĞ±íÊı¾İ
+    //åˆå§‹åŒ–åˆ—è¡¨æ•°æ®
     SXmlNode xmlNode_Items = xmlNode.child(L"items");
     if (xmlNode_Items)
     {
@@ -134,7 +134,7 @@ BOOL SComboBoxEx::FireEvent(IEvtArgs *evt)
     if (evt->IdFrom() == IDC_DROPDOWN_LIST && m_pDropDownWnd)
     {
         if (evt->GetID() == EventLBSelChanged::EventID)
-        { //ÁĞ±íÑ¡ÖĞÏî¸Ä±äÊÂ¼ş
+        { //åˆ—è¡¨é€‰ä¸­é¡¹æ”¹å˜äº‹ä»¶
             OnSelChanged();
             return TRUE;
         }
@@ -149,7 +149,7 @@ BOOL SComboBoxEx::FireEvent(IEvtArgs *evt)
 			evt2.pOrgEvt = (EventCmd *)pEvtOfPanel->pOrgEvt;
             __baseCls::FireEvent(&evt2);
             if (!evt2.bCancel)
-            { //¿ÉÒÔ¹Ø±ÕÏÂÀ­ÁĞ±í
+            { //å¯ä»¥å…³é—­ä¸‹æ‹‰åˆ—è¡¨
                 CloseUp();
             }
             return TRUE;

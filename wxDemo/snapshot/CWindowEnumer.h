@@ -1,4 +1,4 @@
-#pragma once
+О╩©#pragma once
 
 #include <vector>
 
@@ -8,16 +8,16 @@ class CWindowEnumer
 	~CWindowEnumer();
 	static std::vector<CRect> rcList;
 public:
-	//╩Ях║кЫспоН╡Ц╢╟©з╡╒╩Ях║╬ьпн
+	//Х▌╥Е▐√Ф┴─Ф°┴И║╧Е╠┌Г╙≈Е▐ёЕ╧╤Х▌╥Е▐√Г÷╘Е╫╒
 	static void EnumAllTopWindow()
 	{
-		//╩Ях║фад╩иокЫсп╣д╤╔╡Ц╢╟©з,ц©╥╒ожр╩╦Ж╢╟©з╬м╣Всц╩ь╣В╨╞йЩр╩╢н
-		HWND hWnd = GetDesktopWindow();        //╣ц╣╫вюцФ╢╟©з
-		hWnd = GetWindow(hWnd, GW_CHILD);        //╣ц╣╫фад╩ио╣зр╩╦Жвс╢╟©з
+		//Х▌╥Е▐√Е╠▐Е╧∙Д╦┼Ф┴─Ф°┴Г └И║╤Е╠┌Г╙≈Е▐ё,Ф╞▐Е▐▒Г▌╟Д╦─Д╦╙Г╙≈Е▐ёЕ╟╠Х╟┐Г■╗Е⌡·Х╟┐Е┤╫Ф∙╟Д╦─Ф╛║
+		HWND hWnd = GetDesktopWindow();        //Е╬≈Е┬╟Ф║▄И²╒Г╙≈Е▐ё
+		hWnd = GetWindow(hWnd, GW_CHILD);        //Е╬≈Е┬╟Е╠▐Е╧∙Д╦┼Г╛╛Д╦─Д╦╙Е╜░Г╙≈Е▐ё
 		rcList.clear();
-		while (hWnd != NULL)                    //я╜╩╥╣ц╣╫кЫсп╣двс╢╟©з
+		while (hWnd != NULL)                    //Е╬╙Г▌╞Е╬≈Е┬╟Ф┴─Ф°┴Г └Е╜░Г╙≈Е▐ё
 		{
-			if (IsWindowVisible(hWnd))  //еп╤ойг╥Я╤╔╡Ц╢╟©з╡╒гр©и╪Ш
+			if (IsWindowVisible(hWnd))  //Е┬╓Ф√╜Ф≤╞Е░╕И║╤Е╠┌Г╙≈Е▐ёЕ╧╤Д╦■Е▐╞Х╖│
 			{
 				CRect WindowRc;
 				GetWindowRect(hWnd, &WindowRc);

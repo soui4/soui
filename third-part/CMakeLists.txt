@@ -19,7 +19,7 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
         add_subdirectory(7z)
 endif()
 if(BUILD_RICHEDIT)
-        message("build richedit41")
+        message("---Building with richedit41")
         add_subdirectory(richedit41)
 endif()
 
