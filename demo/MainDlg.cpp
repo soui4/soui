@@ -7,14 +7,14 @@
 #include "helper/SMenu.h"
 #include "../controls.extend/FileHelper.h"
 #include "../controls.extend/SChatEdit.h"
-#include "../controls.extend/reole/richeditole.h"
+#include "../controls.extend/reole/RichEditOle.h"
 #include "../controls.extend/SHexEdit.h"
 #include "SMatrixWindow.h"
 #include "FormatMsgDlg.h"
 #include <math.h>
 #include <valueAnimator/SValueAnimator.h>
 #include <helper/SMenuEx.h>
-#include <helper/SDibHelper.h>
+#include <helper/SDIBHelper.h>
 
 #pragma warning(disable:4192)
 

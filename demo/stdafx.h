@@ -15,8 +15,8 @@
 #include <souistd.h>
 #include <core/SHostDialog.h>
 #include <control/SMessageBox.h>
-#include <control/souictrls.h>
-#include <res.mgr/sobjdefattr.h>
+#include <control/SouiCtrls.h>
+#include <res.mgr/SObjDefAttr.h>
 
 #define SCOM_MASK 0xfffffff		//使用SOUI静态库时，可以使用这个mask来指定加载哪些库。
 #include <commgr2.h>
@@ -35,7 +35,7 @@
 #include "../controls.extend/smiley/SSmileyCtrl.h"
 #include "../controls.extend/SChatEdit.h"
 #include "../controls.extend/SFreeMoveWindow.h"
-#include "../controls.extend/tipwnd.h"
+#include "../controls.extend/TipWnd.h"
 #include "../controls.extend/SProgressRing.h"
 #include "../controls.extend/SGroupList.h"
 #include "../controls.extend/SAniWindow.h"

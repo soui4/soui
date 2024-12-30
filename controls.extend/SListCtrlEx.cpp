@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "SlistCtrlex.h"
+#include "SListCtrlEx.h"
 #include "SListboxex.h"
 
 #pragma warning(disable : 4018)

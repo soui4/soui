@@ -1,8 +1,8 @@
 ﻿// SSmileyCtrl.cpp : Implementation of SSmileyCtrl
-#include <Windows.h>
+#include <windows.h>
 #include "../controls.extend/smiley/SSmileyCtrl.h"
 
-#include <TOM.h>
+#include <tom.h>
 #include <richedit.h>
 
 #include <atlbase.h>

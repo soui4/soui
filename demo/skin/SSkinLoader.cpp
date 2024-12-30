@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "SSkinLoader.h"
-#include "res.mgr\SResProvider.h"
+#include "res.mgr/SResProvider.h"
 #include <SouiFactory.h>
 
 template<>

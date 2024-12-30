@@ -12,8 +12,8 @@
 #include <souistd.h>
 #include <core/SHostDialog.h>
 #include <control/SMessageBox.h>
-#include <control/souictrls.h>
-#include <res.mgr/sobjdefattr.h>
+#include <control/SouiCtrls.h>
+#include <res.mgr/SObjDefAttr.h>
 #include <com-cfg.h>
 #include <SouiFactory.h>
 [!if CHECKBOX_SHELLNOTIFYICON]

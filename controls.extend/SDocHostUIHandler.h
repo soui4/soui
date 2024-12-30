@@ -2,8 +2,8 @@
 
 #include <atl.mini/SComHelper.h>
 #include <atl.mini/SComCli.h>
-#include <ExDisp.h>
-#include <ExDispid.h>
+#include <exdisp.h>
+#include <exdispid.h>
 #include <vector>
 #include <string>
 

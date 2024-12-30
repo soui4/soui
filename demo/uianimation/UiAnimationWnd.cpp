@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "UiAnimationWnd.h"
 #include <math.h>
-#include <helper/splitstring.h>
+#include <helper/SplitString.h>
 
 #ifndef IID_PPV_ARGS
 extern "C++"

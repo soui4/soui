@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "sdemoskin.h"
+#include "SDemoSkin.h"
 #include "helper/SDIBHelper.h"
 
 namespace SOUI

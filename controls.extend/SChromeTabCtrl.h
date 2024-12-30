@@ -1,6 +1,6 @@
 #pragma once
 
-#include <core/Swnd.h>
+#include <core/SWnd.h>
 #include "SAnimator.h"
 
 namespace SOUI

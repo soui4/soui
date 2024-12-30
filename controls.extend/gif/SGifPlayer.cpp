@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "SGifPlayer.h"
-#include "sskingif.h"
+#include "SSkinGif.h"
 #include "SSkinAPNG.h"
 
 namespace SOUI

@@ -13,7 +13,7 @@
 #pragma once
 
 #include <core/SPanel.h>
-#include <core/Sitempanel.h>
+#include <core/SItemPanel.h>
 #include <control/SHeaderCtrl.h>
 
 namespace SOUI

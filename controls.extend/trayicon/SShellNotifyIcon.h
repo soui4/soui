@@ -11,7 +11,7 @@
  * Describe     
  */
 #pragma once
-#include <ShellAPI.h>
+#include <shellapi.h>
 #define WM_ICONNOTIFY (WM_USER + 1101) 
 
 #define ID_TASKBARICON	100

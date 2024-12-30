@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+﻿#include "stdafx.h"
 #include "SSkinPNGX.h"
 #include <helper/SplitString.h>
 #include <interface/simgdecoder-i.h>

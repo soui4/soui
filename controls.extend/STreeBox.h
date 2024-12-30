@@ -12,7 +12,7 @@
  */
 #pragma once
 #include "core/SPanel.h"
-#include "core/SItempanel.h"
+#include "core/SItemPanel.h"
 
 SNSBEGIN
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "SStaticGdip.h"
-#include <GdiPlus.h>
+#include <gdiplus.h>
 
 SNSBEGIN
 

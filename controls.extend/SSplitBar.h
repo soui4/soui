@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <core/swnd.h>
+#include <core/SWnd.h>
 
 namespace SOUI
 {

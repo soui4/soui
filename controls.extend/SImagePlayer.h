@@ -1,6 +1,6 @@
 ﻿#pragma once
-#include <core/swnd.h>
-#include <gif\SSkinAni.h>
+#include <core/SWnd.h>
+#include <gif/SSkinAni.h>
 
 namespace SOUI
 {

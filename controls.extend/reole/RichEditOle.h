@@ -8,8 +8,8 @@
 
 #include <richole.h>
 
-#include "../smiley/ssmileyctrl.h"
-#include <control/srichedit.h>
+#include "../smiley/SSmileyCtrl.h"
+#include <control/SRichEdit.h>
 #include <atl.mini/SComCli.h>
 using namespace SOUI;
 

@@ -6,12 +6,12 @@
 #include <helper/SMenuWndHook.h>
 #include <helper/SAutoBuf.h>
 #include "../controls.extend/SFadeFrame.h"
-#include "../controls.extend/sradiobox2.h"
+#include "../controls.extend/SRadioBox2.h"
 #include "../controls.extend/SVscrollbar.h"
 #include "../controls.extend/SSkinNewScrollBar.h"
 #include "../controls.extend/SChromeTabCtrl.h"
-#include "../controls.extend/siectrl.h"
-#include "../controls.extend/schatedit.h"
+#include "../controls.extend/SIECtrl.h"
+#include "../controls.extend/SChatEdit.h"
 #include "../controls.extend/SScrollText.h"
 #include "../controls.extend/SCalendar2.h"
 #include "../controls.extend/SHexEdit.h"
@@ -59,7 +59,7 @@
 
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
 
-#include "../controls.extend/smiley/ssmileyctrl.h"
+#include "../controls.extend/smiley/SSmileyCtrl.h"
 #include "skin/SDemoSkin.h"
 #include "skin/SSkinLoader.h"
 #include "trayicon/SShellTray.h"

@@ -4,7 +4,7 @@
 #include "RichEditOle.h"
 #include <atl.mini/SComHelper.h>
 #include <gdialpha.h>
-#include <GdiPlus.h>
+#include <gdiplus.h>
 #pragma comment(lib,"gdiplus")
 
 #include "dataobject.h"

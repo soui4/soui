@@ -20,7 +20,7 @@
 // The author accepts no liability if it causes any damage whatsoever.
 // It's free - so you get what you pay for.
 
-#include "tooltipctrl.h"
+#include "Tooltipctrl.h"
 
 namespace SOUI
 {

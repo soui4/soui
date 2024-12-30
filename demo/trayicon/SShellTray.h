@@ -11,7 +11,7 @@
  * Describe
  */
 #pragma once
-#include <ShellAPI.h>
+#include <shellapi.h>
 #include <core/SWnd.h>
 #include <core/SNativeWnd.h>
  /**

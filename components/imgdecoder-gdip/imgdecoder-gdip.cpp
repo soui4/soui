@@ -3,7 +3,7 @@
 
 #include <Windows.h>
 
-#include <GdiPlus.h>
+#include <gdiplus.h>
 #pragma comment(lib,"gdiplus")
 
 #include "imgdecoder-gdip.h"
