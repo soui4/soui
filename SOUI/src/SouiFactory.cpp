@@ -76,11 +76,7 @@ IEvtSlot *SouiFactory::CreateFuncSlot(THIS_ FunCallback fun, void *ctx)
 
 IMenu *SouiFactory::CreateMenu(THIS_ HMENU hMenu)
 {
-    #ifdef _WIN32
     return new SMenu(hMenu);
-    #else
-    return NULL;
-    #endif//_WIN32
 }
 
 IMenuEx *SouiFactory::CreateMenuEx(THIS)

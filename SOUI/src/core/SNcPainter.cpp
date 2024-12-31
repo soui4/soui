@@ -76,10 +76,9 @@ void SNcPainter::Reset()
 BOOL SNcPainter::InitFromXml(THIS_ IXmlNode *pXmlNode)
 {
     SXmlNode xmlNode(pXmlNode);
-    if (!xmlNode)
+    if (!xmlNode || m_pHost->IsTranslucent())
     {
         Reset();
-        return TRUE;
     }
     else
     {
@@ -92,8 +91,8 @@ BOOL SNcPainter::InitFromXml(THIS_ IXmlNode *pXmlNode)
         GETRENDERFACTORY->CreateRenderTarget(&m_memRight, 0, 0);
         GETRENDERFACTORY->CreateRenderTarget(&m_memTop, 0, 0);
         GETRENDERFACTORY->CreateRenderTarget(&m_memBottom, 0, 0);
-        return TRUE;
     }
+    return TRUE;
 }
 
 IWindow *SNcPainter::GetRoot(THIS)

@@ -14,11 +14,7 @@
 #include "resprovider-7zip\zip7resprovider-param.h"
 #endif
 #endif
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-#define SYS_NAMED_RESOURCE _T("soui-sys-resourced.dll")
-#else
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
-#endif
 
 #ifndef WIN32_LEAN_AND_MEAN
 #    define WIN32_LEAN_AND_MEAN

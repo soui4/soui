@@ -225,9 +225,19 @@ void CMainDlg::OnClose() {
     PostMessage(WM_QUIT);
 }
 
+static VOID CALLBACK OnTimeout(HWND hwnd, UINT msg, UINT_PTR id, DWORD ts)
+{
+    static int count = 0;
+    SLOGI() << "OnTimeout: id=" << id << " count=" << ++count;
+    if (count > 5)
+        KillTimer(0, id);
+}
+
 int run_app(HINSTANCE hInst) {
 
     std::tstring srcDir = getSourceDir();
+    UINT_PTR uid = SetTimer(0, 0, 500, OnTimeout);
+    SLOGI() << "settimer: id=" << uid;
 
     CScintillaWnd::InitScintilla(hInst);
     SComMgr2 comMgr;
