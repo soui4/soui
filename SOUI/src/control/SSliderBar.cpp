@@ -228,7 +228,6 @@ void SSliderBar::OnMouseMove(UINT nFlags, CPoint point)
         }
         if (nNewTrackPos != m_nValue)
         {
-			SSLOGI()<<"set slider pos="<<nNewTrackPos;
             m_nValue = nNewTrackPos;
             Invalidate();
             NotifyPos(SBA_MOUSE_MOVING, m_nValue);
