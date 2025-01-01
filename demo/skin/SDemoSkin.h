@@ -23,7 +23,7 @@ namespace SOUI
 	};
 	interface ISetOrLoadSkinHandler
 	{
-		virtual bool SaveSkin(SkinType, SkinSaveInf&) = NULL;		
+		virtual bool SaveSkin(SkinType, SkinSaveInf&) = 0;
 	};
 
 	class  SDemoSkin :
