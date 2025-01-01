@@ -22,7 +22,7 @@
 #include <limits>
 
 #ifndef SK_FONT_FILE_PREFIX
-#    define SK_FONT_FILE_PREFIX "/usr/share/fonts/truetype/"
+#    define SK_FONT_FILE_PREFIX "/usr/share/fonts"
 #endif
 
 ///////////////////////////////////////////////////////////////////////////////
