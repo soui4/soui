@@ -11,10 +11,14 @@
 #define WKE_H
 
 
+#ifdef _WIN32
 #ifdef BUILDING_wke
 #   define WKE_API __declspec(dllexport)
 #else
 #   define WKE_API __declspec(dllimport)
+#endif
+#else
+#    define WKE_API
 #endif
 
 typedef char utf8;
@@ -317,7 +321,11 @@ WKE_API const utf8* wkeToString(const wkeString string);
 WKE_API const wchar_t* wkeToStringW(const wkeString string);
 
 /***JavaScript Bind***/
+#ifdef __x86_64__
+#define JS_CALL
+#else
 #define JS_CALL __fastcall
+#endif
 typedef jsValue (JS_CALL *jsNativeFunction) (jsExecState es);
 
 typedef enum

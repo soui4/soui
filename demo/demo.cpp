@@ -10,7 +10,9 @@
 #include "../controls.extend/SVscrollbar.h"
 #include "../controls.extend/SSkinNewScrollBar.h"
 #include "../controls.extend/SChromeTabCtrl.h"
+#ifdef _WIN32
 #include "../controls.extend/SIECtrl.h"
+#endif
 #include "../controls.extend/SChatEdit.h"
 #include "../controls.extend/SScrollText.h"
 #include "../controls.extend/SCalendar2.h"
@@ -19,13 +21,17 @@
 #include "../controls.extend/SStaticGdip.h"
 #include "../controls.extend/SRoundWnd.h"
 
-#include "../controls.extend/SMcListViewEx\SHeaderCtrlEx.h"
-#include "../controls.extend/SMcListViewEx\SMcListViewEx.h"
+#include "../controls.extend/SMcListViewEx/SHeaderCtrlEx.h"
+#include "../controls.extend/SMcListViewEx/SMCListViewEx.h"
 
+#ifdef _WIN32
 #include "uianimation/UiAnimationWnd.h"
+#endif
 #include "appledock/SDesktopDock.h"
 #include "SMatrixWindow.h"
+#ifdef _WIN32
 #include "SmileyCreateHook.h"
+#endif
 #include "clock/sclock.h"
 #include "FpsWnd.h"
 
@@ -67,11 +73,29 @@
 
 #include <interface/STaskLoop-i.h>
 #include <helper/SFunctor.hpp>
+
 #include <string>
+#ifdef _UNICODE
+#define tstring wstring
+#else
+#define tstring string
+#endif
 
 #define INIT_R_DATA
 #include "res/resource.h"
 
+static std::tstring getSourceDir() {
+	SStringA file(__FILE__);
+	file = file.Left(file.ReverseFind('/'));
+	file = file.Left(file.ReverseFind('/'));
+	SStringT fileT = S_CA2T(file);
+
+	return fileT.c_str();
+}
+
+
+static const TCHAR* kPath_SysRes = _T("/soui-sys-resource");
+static const TCHAR* kPath_WxDemoRes = _T("/demo/uires");
 //演示异步任务。
 class CAsyncTaskObj
 {
@@ -158,7 +182,12 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
 	SouiFactory souiFac;
 	//使用imgdecoder-png图片解码模块演示apng动画
+#ifdef _WIN32
 	SComMgr2* pComMgr = new SComMgr2(_T("imgdecoder-png"));
+#else
+	SComMgr oComMgr;
+	SComMgr* pComMgr = &oComMgr;
+#endif
 
 	{//test for task loop
 		SCriticalSection  cs;
@@ -240,9 +269,11 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<S3dWindow>();//
 		theApp->RegisterWindowClass<SFreeMoveWindow>();//
 		theApp->RegisterWindowClass<SClock>();//
+#ifdef _WIN32
 		theApp->RegisterWindowClass<SGifPlayer>();//theApp中增加方法：RegisterWindowClass,替换RegisterWndFactory(TplSWindowFactory<SGifPlayer>())
 		theApp->RegisterSkinClass<SSkinGif>();//注册SkinGif
 		theApp->RegisterSkinClass<SSkinAPNG>();//注册SSkinAPNG
+#endif
 		theApp->RegisterSkinClass<SSkinVScrollbar>();//注册纵向滚动条皮肤
 		theApp->RegisterSkinClass<SSkinNewScrollbar>();//注册纵向滚动条皮肤
 		theApp->RegisterSkinClass<SDemoSkin>();
@@ -253,7 +284,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<SIPAddressCtrl>();//注册IP控件
 		theApp->RegisterWindowClass<SPropertyGrid>();//注册属性表控件
 		theApp->RegisterWindowClass<SChromeTabCtrl>();//注册ChromeTabCtrl
+#ifdef _WIN32
 		theApp->RegisterWindowClass<SIECtrl>();//注册IECtrl
+#endif
 		theApp->RegisterWindowClass<SChatEdit>();//注册ChatEdit
 		theApp->RegisterWindowClass<SScrollText>();//注册SScrollText
 		theApp->RegisterWindowClass<SDesktopDock>();//注册SDesktopDock
@@ -269,11 +302,13 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<SRoundImage>();
 		theApp->RegisterWindowClass<SRoundWnd>();
 		theApp->RegisterWindowClass<SHexEdit>();
+#ifdef _WIN32
 		theApp->RegisterWindowClass<SStaticGdip>();
 		if (SUCCEEDED(CUiAnimation::Init()))
 		{
 			theApp->RegisterWindowClass<SUiAnimationWnd>();//注册动画控件
 		}
+#endif
 		theApp->RegisterWindowClass<SFadeFrame>();//注册渐显隐动画控件
 		theApp->RegisterWindowClass<SRadioBox2>();//注册RadioBox2
 		theApp->RegisterWindowClass<SCalendar2>();//注册SCalendar2
@@ -281,7 +316,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<SShellTray>();
 		theApp->RegisterWindowClass<FpsWnd>();
 
+#ifdef _WIN32
 		SSkinGif::Gdiplus_Startup();
+#endif
 
 		//如果需要在代码中使用R::id::namedid这种方式来使用控件必须要这一行代码：2016年2月2日，R::id,R.name是由uiresbuilder 增加-h .\res\resource.h 这2个参数后生成的。
 		theApp->InitXmlNamedID((const LPCWSTR*)&R.name, (const int*)&R.id, sizeof(R.id) / sizeof(int));
@@ -293,6 +330,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		//SOUI系统总是从appdir去查找资源
 		theApp->SetAppDir(strResDir);
 #endif
+#ifdef _WIN32
 		//加载系统资源
 #if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
 		HMODULE hSysResource = hInstance;
@@ -345,6 +383,17 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		bLoaded = pResProvider->Init((WPARAM)&param, 0);
 		SASSERT(bLoaded);
 #endif
+#else
+		SAutoRefPtr<IResProvider> sysResProvider;
+		sysResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
+		std::string sysRes = getSourceDir() + kPath_SysRes;
+		sysResProvider->Init((WPARAM)sysRes.c_str(), 0);
+		theApp->LoadSystemNamedResource(sysResProvider);
+		SAutoRefPtr<IResProvider> pResProvider(souiFac.CreateResProvider(RES_FILE));
+		std::string appRes = getSourceDir() + kPath_WxDemoRes;
+		bLoaded = pResProvider->Init((LPARAM)appRes.c_str(), 0);
+		SASSERT(bLoaded);
+#endif
 		pRenderFactory = NULL;
 		//将创建的IResProvider交给SApplication对象
 		theApp->AddResProvider(pResProvider);
@@ -379,8 +428,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #endif//DLL_CORE
 
 
+#ifdef _WIN32
 		//采用hook绘制菜单的边框
 		SMenuWndHook::InstallHook(hInstance, L"_skin.sys.menu.border");
+#endif
 
 		//演示R.color.xxx,R.string.xxx在代码中的使用。
 		COLORREF crRed = GETCOLOR(R.color.red);
@@ -388,7 +439,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
 		theApp->EnableNotifyCenter(TRUE);
 		{
+#ifdef _WIN32
 			SmileyCreateHook  smileyHook;
+#endif
 			//设置提示窗口布局
 			STipWnd::SetLayout(_T("layout:dlg_tip"));
 
@@ -403,7 +456,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 			nRet = theApp->Run(dlgMain.m_hWnd);
 		}
 
+#ifdef _WIN32
 		theApp->UnregisterWindowClass<SGifPlayer>();
+#endif
 		//应用程序退出
 		delete SkinLoader;
 		delete theApp;
@@ -412,11 +467,13 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 			pLogMgr->stop();
 		}
 
+#ifdef _WIN32
 		//卸载菜单边框绘制hook
 		SMenuWndHook::UnInstallHook();
 		CUiAnimation::Free();
 
 		SSkinGif::Gdiplus_Shutdown();
+#endif
 	}
 exit:
 	delete pComMgr;
@@ -427,4 +484,10 @@ exit:
 	return nRet;
 }
 
+#ifndef _WIN32
+int main(int argc, char ** argv){
+       HINSTANCE hInst = GetModuleHandle(NULL);
+       return _tWinMain(hInst,0,NULL,SW_SHOWNORMAL);
+}
+#endif//_WIN32
 

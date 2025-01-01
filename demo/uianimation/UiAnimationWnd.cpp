@@ -1,4 +1,5 @@
-﻿#include "stdafx.h"
+﻿#ifdef _WIN32
+#include "stdafx.h"
 #include "UiAnimationWnd.h"
 #include <math.h>
 #include <helper/SplitString.h>
@@ -576,3 +577,4 @@ namespace SOUI{
     }
 
 }
+#endif

@@ -1,0 +1,1 @@
+#define __RPCNDR_H_VERSION__
