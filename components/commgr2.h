@@ -33,10 +33,9 @@
 #define COM_LOG4Z   _T("liblog4z")
 #define COM_7ZIPRESPROVIDER _T("libresprovider-7zip")
 #define COM_TASKLOOP _T("libtaskloop")
-
-#define COM_RENDER_D2D _T("render-d2d")
-#define COM_IPCOBJ _T("sipcobject")
-#define COM_HTTPCLIENT _T("httpclient")
+#define COM_RENDER_D2D _T("librender-d2d")
+#define COM_IPCOBJ _T("libsipcobject")
+#define COM_HTTPCLIENT _T("libhttpclient")
 #endif//_WIN32
 
 #ifdef LIB_SOUI_COM

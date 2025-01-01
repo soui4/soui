@@ -73,6 +73,7 @@
 
 #include <interface/STaskLoop-i.h>
 #include <helper/SFunctor.hpp>
+#include <commgr2.h>
 
 #include <string>
 #ifdef _UNICODE
@@ -93,23 +94,8 @@ static std::tstring getSourceDir() {
 	return fileT.c_str();
 }
 
-
 static const TCHAR* kPath_SysRes = _T("/soui-sys-resource");
 static const TCHAR* kPath_WxDemoRes = _T("/demo/uires");
-//演示异步任务。
-class CAsyncTaskObj
-{
-public:
-	void task1(int a)
-	{
-		SLOGI()<<"task1,a:" << a;
-	}
-
-	void task2(int a, const std::string& b)
-	{
-		SLOGI()<<"task2,a:" << a << " b:" << b.c_str();
-	}
-};
 
 class SApplication2 : public SApplication
 {
@@ -185,27 +171,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #ifdef _WIN32
 	SComMgr2* pComMgr = new SComMgr2(_T("imgdecoder-png"));
 #else
-	SComMgr oComMgr;
-	SComMgr* pComMgr = &oComMgr;
-#endif
-
-	{//test for task loop
-		SCriticalSection  cs;
-		SAutoLock lock(cs);
-
-		SAutoRefPtr<ITaskLoop> pTaskLoop;
-		pComMgr->CreateTaskLoop((IObjRef**)&pTaskLoop);
-		pTaskLoop->start("test", High);
-
-		CAsyncTaskObj obj;
-		STaskHelper::post(pTaskLoop, &obj, &CAsyncTaskObj::task1, 100, false);
-		STaskHelper::post(pTaskLoop, &obj, &CAsyncTaskObj::task2, 200, "abc", false);
-
-		while (pTaskLoop->getTaskCount() != 0)
-		{
-			Sleep(10);
-		}
-	}
+    SComMgr2 *pComMgr = new SComMgr2(_T("libimgdecoder-stb"));
+#endif //_WIN32
 	{
 		int nType = MessageBox(GetActiveWindow(), _T("选择渲染类型：\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
 		if (nType == IDCANCEL)

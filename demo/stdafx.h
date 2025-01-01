@@ -17,13 +17,6 @@
 #include <control/SMessageBox.h>
 #include <control/SouiCtrls.h>
 #include <res.mgr/SObjDefAttr.h>
-
-#define SCOM_MASK 0xfffffff		//使用SOUI静态库时，可以使用这个mask来指定加载哪些库。
-#ifdef _WIN32
-#include <commgr2.h>
-#else
-#include <com-cfg.h>
-#endif
 #include <event/SNotifyCenter.h>
 
 #include "resource.h"	//APP资源
