@@ -214,64 +214,43 @@ __time64_t STime::GetTime() const
 
 int STime::GetYear() const
 {
-    struct tm ttm;
-    struct tm *ptm;
-
-    ptm = GetLocalTm(&ttm);
-    return ptm ? (ptm->tm_year) + 1900 : 0;
+    struct tm *ptm = localtime(&m_time);
+    return ptm? (ptm->tm_year + 1900):0;
 }
 
 int STime::GetMonth() const
 {
-    struct tm ttm;
-    struct tm *ptm;
-
-    ptm = GetLocalTm(&ttm);
-    return ptm ? ptm->tm_mon + 1 : 0;
+    struct tm *ptm = localtime(&m_time);
+    return ptm ? (ptm->tm_mon + 1) : 0;
 }
 
 int STime::GetDay() const
 {
-    struct tm ttm;
-    struct tm *ptm;
-
-    ptm = GetLocalTm(&ttm);
+    struct tm *ptm = localtime(&m_time);
     return ptm ? ptm->tm_mday : 0;
 }
 
 int STime::GetHour() const
 {
-    struct tm ttm;
-    struct tm *ptm;
-
-    ptm = GetLocalTm(&ttm);
+    struct tm *ptm = localtime(&m_time);
     return ptm ? ptm->tm_hour : -1;
 }
 
 int STime::GetMinute() const
 {
-    struct tm ttm;
-    struct tm *ptm;
-
-    ptm = GetLocalTm(&ttm);
+    struct tm *ptm = localtime(&m_time);
     return ptm ? ptm->tm_min : -1;
 }
 
 int STime::GetSecond() const
 {
-    struct tm ttm;
-    struct tm *ptm;
-
-    ptm = GetLocalTm(&ttm);
+    struct tm *ptm = localtime(&m_time);
     return ptm ? ptm->tm_sec : -1;
 }
 
 int STime::GetDayOfWeek() const
 {
-    struct tm ttm;
-    struct tm *ptm;
-
-    ptm = GetLocalTm(&ttm);
+    struct tm *ptm = localtime(&m_time);
     return ptm ? ptm->tm_wday + 1 : 0;
 }
 
@@ -345,7 +324,7 @@ SStringT STime::Format(LPCTSTR pszFormat) const
 {
     if (pszFormat == NULL)
     {
-        return pszFormat;
+        return _T("");
     }
 
     TCHAR szBuffer[kMaxTimeBufferSize];
