@@ -14,6 +14,21 @@
 #pragma once
 
 #include <commdlg.h>
+
+#ifndef _MAX_FNAME
+#define _MAX_FNAME  MAX_PATH
+#endif
+#ifndef _MAX_PATH
+#define _MAX_PATH  MAX_PATH
+#endif
+
+#ifdef _WIN32
+#define PATH_SEPARATOR '\\'
+#else
+#define PATH_SEPARATOR '/'
+#endif
+
+#define C2S(c) #c
 /**
  * BuildFilePath
  * @brief    递归创建子目录
@@ -34,17 +49,17 @@ inline BOOL BuildFilePath(LPCTSTR pszCurPath, LPCTSTR pszNewPath, BOOL bPath = T
     if (bPath)
     {
         int nLen = _tcslen(szNewPath);
-        if (szNewPath[nLen - 1] != _T('\\'))
-            _tcscat(szNewPath, _T("\\"));
+        if (szNewPath[nLen - 1] != _T(PATH_SEPARATOR))
+            _tcscat(szNewPath, _T(C2S(PATH_SEPARATOR)));
     }
-    LPTSTR pszPath = _tcschr(szNewPath, _T('\\'));
+    LPTSTR pszPath = _tcschr(szNewPath, _T(PATH_SEPARATOR));
     while (pszPath)
     {
         *pszPath = 0;
         if (!CreateDirectory(szNewPath, NULL))
             return FALSE;
-        *pszPath = _T('\\');
-        pszPath = _tcschr(pszPath + 1, _T('\\'));
+        *pszPath = _T(PATH_SEPARATOR);
+        pszPath = _tcschr(pszPath + 1, _T(PATH_SEPARATOR));
     }
     SetCurrentDirectory(szCurDir);
     return TRUE;
