@@ -8,54 +8,6 @@ const wchar_t KXmlTabStyle[] = L"tabStyle";
 const wchar_t KXmlCloseBtnStyle[] = L"closeBtnStyle";
 const wchar_t KXmlNewBtnStyle[] = L"newBtnStyle";
 
-//////////////////////////////////////////////////////////////////////////
-// SChromeTab
-class SChromeTab
-    : public SWindow
-    , public SAnimator {
-    DEF_SOBJECT(SWindow, L"chromeTab")
-    friend class SChromeTabCtrl;
-
-  public:
-    SChromeTab(SChromeTabCtrl *pHost);
-
-    void MoveTo(const CRect &rcEnd);
-    BOOL IsDragable()
-    {
-        return m_iOrder != -1 && m_pHost->m_bEnableDrag;
-    }
-
-    SOUI_ATTRS_BEGIN()
-    ATTR_INT(L"allowClose", m_bAllowClose, FALSE)
-    SOUI_ATTRS_END()
-
-    SOUI_MSG_MAP_BEGIN()
-    MSG_WM_MOUSEMOVE(OnMouseMove)
-    MSG_WM_LBUTTONDOWN(OnLButtonDown)
-    MSG_WM_LBUTTONUP(OnLButtonUp)
-    MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
-    SOUI_MSG_MAP_END()
-
-  protected:
-    virtual void OnAnimatorState(int percent);
-    virtual void WINAPI OnFinalRelease()
-    {
-        delete this;
-    }
-    void OnMouseMove(UINT nFlags, CPoint pt);
-    void OnLButtonUp(UINT nFlags, CPoint pt);
-    void OnLButtonDown(UINT nFlags, CPoint pt);
-    void OnLButtonDbClick(UINT nFlags, CPoint pt);
-
-    CRect m_rcBegin, m_rcEnd;
-    BOOL m_bAllowClose;
-    CPoint m_ptDrag;
-    int m_iOrder;
-    int m_iTabIndex;
-    bool m_bDrag;
-    SChromeTabCtrl *m_pHost;
-};
-
 SChromeTab::SChromeTab(SChromeTabCtrl *pHost)
     : m_bAllowClose(TRUE)
     , m_pHost(pHost)
@@ -71,6 +23,11 @@ void SChromeTab::MoveTo(const CRect &rcEnd)
     m_rcEnd = rcEnd;
     Stop();
     Start(200);
+}
+
+BOOL SChromeTab::IsDragable()
+{
+    return m_iOrder != -1 && m_pHost->m_bEnableDrag;
 }
 
 void SChromeTab::OnAnimatorState(int percent)

@@ -11,6 +11,51 @@ namespace SOUI
 #define EVT_CHROMETAB_CLOSE      (EVT_CHROMETAB_BEGIN + 1)
 #define EVT_CHROMETAB_SELCHANGED (EVT_CHROMETAB_BEGIN + 2)
 #define EVT_CHROMETAB_DBCLICK    (EVT_CHROMETAB_BEGIN + 3)
+class SChromeTabCtrl;
+//////////////////////////////////////////////////////////////////////////
+// SChromeTab
+class SChromeTab
+    : public SWindow
+    , public SAnimator {
+    DEF_SOBJECT(SWindow, L"chromeTab")
+    friend class SChromeTabCtrl;
+
+public:
+    SChromeTab(SChromeTabCtrl *pHost);
+
+    void MoveTo(const CRect &rcEnd);
+    BOOL IsDragable();
+
+    SOUI_ATTRS_BEGIN()
+    ATTR_INT(L"allowClose", m_bAllowClose, FALSE)
+    SOUI_ATTRS_END()
+
+    SOUI_MSG_MAP_BEGIN()
+    MSG_WM_MOUSEMOVE(OnMouseMove)
+    MSG_WM_LBUTTONDOWN(OnLButtonDown)
+    MSG_WM_LBUTTONUP(OnLButtonUp)
+    MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
+    SOUI_MSG_MAP_END()
+
+  protected:
+    virtual void OnAnimatorState(int percent);
+    virtual void WINAPI OnFinalRelease()
+    {
+        delete this;
+    }
+    void OnMouseMove(UINT nFlags, CPoint pt);
+    void OnLButtonUp(UINT nFlags, CPoint pt);
+    void OnLButtonDown(UINT nFlags, CPoint pt);
+    void OnLButtonDbClick(UINT nFlags, CPoint pt);
+
+    CRect m_rcBegin, m_rcEnd;
+    BOOL m_bAllowClose;
+    CPoint m_ptDrag;
+    int m_iOrder;
+    int m_iTabIndex;
+    bool m_bDrag;
+    SChromeTabCtrl *m_pHost;
+};
 
 DEF_EVT_EXT(EventChromeTabNew, EVT_CHROMETAB_NEW, {
     SWindow *pNewTab;
