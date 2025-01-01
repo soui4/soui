@@ -774,16 +774,16 @@ LRESULT SListCtrlEx::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
         {
             CRect rcClient = GetListRect();
             CPoint ptTmp = pt; //保证落在Client之内
-            ptTmp.x = max(ptTmp.x, rcClient.left);
-            ptTmp.y = max(ptTmp.y, rcClient.top);
-            ptTmp.x = min(ptTmp.x, rcClient.right);
-            ptTmp.y = min(ptTmp.y, rcClient.bottom);
+            ptTmp.x = smax(ptTmp.x, rcClient.left);
+            ptTmp.y = smax(ptTmp.y, rcClient.top);
+            ptTmp.x = smin(ptTmp.x, rcClient.right);
+            ptTmp.y = smin(ptTmp.y, rcClient.bottom);
 
             CPoint pt1, pt2; //分配左上和右下的点
-            pt1.x = min(m_ptTmp.x, ptTmp.x);
-            pt1.y = min(m_ptTmp.y, ptTmp.y);
-            pt2.x = max(m_ptTmp.x, ptTmp.x);
-            pt2.y = max(m_ptTmp.y, ptTmp.y);
+            pt1.x = smin(m_ptTmp.x, ptTmp.x);
+            pt1.y = smin(m_ptTmp.y, ptTmp.y);
+            pt2.x = smax(m_ptTmp.x, ptTmp.x);
+            pt2.y = smax(m_ptTmp.y, ptTmp.y);
 
             m_rcWnd.left = pt1.x;
             m_rcWnd.top = pt1.y;
@@ -1085,7 +1085,7 @@ int SListCtrlEx::GetCountPerPage(BOOL bPartial)
     div_t divHeight = div(rcClient.Height(), m_nItemHeight);
 
     // round up to nearest item count
-    return max(bPartial && divHeight.rem > 0 ? divHeight.quot + 1 : divHeight.quot, 1);
+    return smax(bPartial && divHeight.rem > 0 ? divHeight.quot + 1 : divHeight.quot, 1);
 }
 
 BOOL SListCtrlEx::OnHeaderClick(IEvtArgs *pEvt)

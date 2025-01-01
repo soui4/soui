@@ -648,7 +648,7 @@ BOOL CQR_Encode::EncodeData(int nLevel, int nVersion, BOOL bAutoExtent, int nMas
 	// Taminetakodo“0000” 补充说：
 	int ncDataCodeWord = QR_VersonInfo[m_nVersion].ncDataCodeWord[nLevel];
 
-	int ncTerminater = min(4, (ncDataCodeWord * 8) - m_ncDataCodeWordBit);
+	int ncTerminater = smin(4, (ncDataCodeWord * 8) - m_ncDataCodeWordBit);
 
 	if (ncTerminater > 0)
 		m_ncDataCodeWordBit = SetBitStream(m_ncDataCodeWordBit, 0, ncTerminater);
