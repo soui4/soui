@@ -314,7 +314,11 @@ namespace SOUI
 		m_pRenderFactory = pRenderFactory;
 
 		m_SkCanvas = new SkCanvas();
+#if WCHAR_SIZE == 4
+		m_paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
+#else
 		m_paint.setTextEncoding(SkPaint::kUTF16_TextEncoding);
+#endif
 		m_paint.setAntiAlias(true);
 		m_paint.setLCDRenderText(true);
 		m_paint.setStyle(SkPaint::kStrokeAndFill_Style);
@@ -2399,7 +2403,11 @@ namespace SOUI
 		const SFont_Skia *pFontSkia = (const SFont_Skia *)pFont;
 		if(nLen < 0) nLen = (int)_tcslen(pszText);
 		SkPaint paint;
+#if WCHAR_SIZE == 4
+		paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
+#else
 		paint.setTextEncoding(SkPaint::kUTF16_TextEncoding);
+#endif
 		paint.setTypeface(pFontSkia->GetFont());
 		const LOGFONT *plf = pFont->LogFont();
 		paint.setTextSize(SkIntToScalar(abs(plf->lfHeight)));
