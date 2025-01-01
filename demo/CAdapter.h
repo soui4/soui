@@ -55,7 +55,7 @@ public:
 	{
 		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetRoot()->GetUserData();
-		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
+		SMessageBox(0, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
 	}
 };
@@ -99,7 +99,7 @@ public:
 		SWindow* pBtn = sobj_cast<SWindow>(pEvt->sender);
 		SItemPanel* pItem = (SItemPanel*)pBtn->GetRoot();
 		int iItem = pItem->GetItemIndex();
-		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
+		SMessageBox(0, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
 	}
 };
@@ -186,7 +186,7 @@ public:
 	{
 		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetUserData();
-		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
+		SMessageBox(0, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
 	}
 
@@ -335,7 +335,7 @@ public:
 		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetUserData();
 
-		if (SMessageBox(NULL, SStringT().Format(_T("Are you sure to uninstall the selected [%d] software?"), iItem), _T("uninstall"), MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
+		if (SMessageBox(0, SStringT().Format(_T("Are you sure to uninstall the selected [%d] software?"), iItem), _T("uninstall"), MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
 		{//删除一条记录
 			DeleteItem(iItem);
 		}
@@ -462,7 +462,7 @@ public:
 	{
 		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetRoot()->GetUserData();
-		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
+		SMessageBox(0, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
 	}
 

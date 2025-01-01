@@ -138,9 +138,9 @@ void SDesktopDock::OnLButtonUp(UINT nFlags, CPoint point)
 	{
 		if (m_RTRect[i].PtInRect(point))
 		{
-			SMessageBox(NULL,SStringT().Format(_T("索引===%d号"),i),_T("多点WIFI"),MB_OK);
+			SMessageBox(0,SStringT().Format(_T("索引===%d号"),i),_T("多点WIFI"),MB_OK);
 
-			ShellExecute(NULL, _T("open"),adUrls[i], NULL, NULL, SW_SHOWNORMAL);
+			ShellExecute(0, _T("open"),adUrls[i], NULL, NULL, SW_SHOWNORMAL);
 			return ;
 		}
 	}

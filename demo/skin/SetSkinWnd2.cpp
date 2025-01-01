@@ -96,7 +96,7 @@ void CSetSkinWnd::OnSetSkin(IEvtArgs * e)
 	SSkinLoader::getSingleton().LoadSkin(strLoadSkin);
 
 	if (_taccess(strSkinFile, 0) != 0){
-		SMessageBox(NULL, _T("无法设置当前主题,找不到系统主题文件。复制demo\\themes\\文件夹到soui根目录!"), _T("警告"), NULL);
+		SMessageBox(0, _T("无法设置当前主题,找不到系统主题文件。复制demo\\themes\\文件夹到soui根目录!"), _T("警告"), MB_OK);
 		return;
 	}
 	if (skin)

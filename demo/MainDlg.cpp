@@ -71,7 +71,7 @@ void CMainDlg::InitListCtrl()
         //向表头控件订阅表明点击事件，并把它和OnListHeaderClick函数相连。
         pHeader->GetEventSet()->subscribeEvent(EVT_HEADER_CLICK,Subscriber(&CMainDlg::OnListHeaderClick,this));
 
-        TCHAR szSex[][5]={_T("男"),_T("女"),_T("人妖")};
+        TCHAR szSex[][8]={_T("男"),_T("女"),_T("人妖")};
         for(int i=0;i<100;i++)
         {
             student *pst=new student;
@@ -654,11 +654,11 @@ void CMainDlg::OnBtnAppendMsg()
 
 void CMainDlg::OnBtnMsgBox()
 {
-    SMessageBox(NULL,_T("this is a message box"),_T("haha"),MB_OK|MB_ICONEXCLAMATION);
-    SMessageBox(NULL,_T("this message box includes two buttons"),_T("haha"),MB_YESNO|MB_ICONQUESTION);
+    SMessageBox(0,_T("this is a message box"),_T("haha"),MB_OK|MB_ICONEXCLAMATION);
+    SMessageBox(0,_T("this message box includes two buttons"),_T("haha"),MB_YESNO|MB_ICONQUESTION);
 
 	SNativeWnd::SetTimer(TIMER_QUIT,3000,NULL);//3S后退出APP
-    SMessageBox(NULL,_T("this message box includes three buttons. \nthe app will quit after 3 seconds if you keep the msgbox open!"),_T("Alarm"),MB_ABORTRETRYIGNORE|MB_ICONSTOP);
+    SMessageBox(0,_T("this message box includes three buttons. \nthe app will quit after 3 seconds if you keep the msgbox open!"),_T("Alarm"),MB_ABORTRETRYIGNORE|MB_ICONSTOP);
 	SNativeWnd::KillTimer(TIMER_QUIT);
 }
 
@@ -918,7 +918,7 @@ void CMainDlg::OnBtnSkin()
 	if (!::IsWindow(m_hSetSkinWnd))
 	{
 		CSetSkinWnd *pSetSkinWnd = new CSetSkinWnd();
-		pSetSkinWnd->Create(NULL);
+		pSetSkinWnd->Create(0);
 		pSetSkinWnd->CenterWindow(GetDesktopWindow());
 		pSetSkinWnd->ShowWindow(SW_SHOWDEFAULT);
 		m_hSetSkinWnd = pSetSkinWnd->m_hWnd;

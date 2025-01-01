@@ -50,7 +50,7 @@ void SOUI::SSkinLoader::LoadSkin(SStringT respath,const TCHAR *strXmlSkin /*= _T
 		m_theApp->AddResProvider(m_pResProvider, NULL);
 	}
 	SASSERT(m_pResProvider);
-	if (!m_pResProvider->Init((WPARAM)respath.GetBuffer(0), NULL))
+	if (!m_pResProvider->Init((WPARAM)respath.GetBuffer(0), 0))
 		return;
 	m_privateSkinPool->RemoveAll();
 	SXmlDoc xmlDoc;

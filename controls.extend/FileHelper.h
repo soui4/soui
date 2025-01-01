@@ -77,7 +77,7 @@ class CFileDialogEx {
                   LPCTSTR lpszFileName = NULL,
                   DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
                   LPCTSTR lpszFilter = NULL,
-                  HWND hWndParent = NULL)
+                  HWND hWndParent = 0)
     {
         memset(&m_ofn, 0, sizeof(m_ofn)); // initialize structure to 0/NULL
         m_szFileName[0] = _T('\0');
@@ -101,7 +101,7 @@ class CFileDialogEx {
 
     INT_PTR DoModal(HWND hWndParent = ::GetActiveWindow())
     {
-        if (m_ofn.hwndOwner == NULL) // set only if not specified before
+        if (m_ofn.hwndOwner == 0) // set only if not specified before
             m_ofn.hwndOwner = hWndParent;
 
         if (m_bOpenFileDialog)
