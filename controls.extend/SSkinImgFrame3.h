@@ -1,5 +1,5 @@
 ﻿#pragma once
-#include <core/sskin.h>
+#include <core/SSkin.h>
 
 namespace SOUI
 {

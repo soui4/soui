@@ -11,7 +11,7 @@
 * Describe  时间控件相关函数实现
 */
 #include "stdafx.h"
-#include <control/scalendar.h>
+#include <control/SCalendar.h>
 #include <helper/STime.h>
 #include "SCalendar2.h"
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FpsWnd.h"
-#include <Mmsystem.h>
+#include <mmsystem.h>
 #pragma comment(lib,"Winmm.lib")
 
 SNSBEGIN

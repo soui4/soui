@@ -1,6 +1,6 @@
-﻿#include "StdAfx.h"
+﻿#include "stdafx.h"
 #include "SWkeWebkit.h"
-#include <Imm.h>
+#include <imm.h>
 #pragma comment(lib, "imm32.lib")
 #pragma comment(lib, "msimg32.lib")
 namespace SOUI

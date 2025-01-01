@@ -1,7 +1,7 @@
 ﻿#ifndef __SCOMHELPER__H__
 #define __SCOMHELPER__H__
 
-#include <Unknwn.h>
+#include <unknwn.h>
 
 namespace SOUI
 {

@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "SHeaderCtrlEx.h"
-#include <CommCtrl.h>
+#include <commctrl.h>
 
 namespace SOUI
 {

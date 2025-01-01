@@ -41,7 +41,7 @@
 #include <commctrl.h>
 #include <Oleacc.h>	//IAccessible
 #include <olectl.h>
-#include <ShellAPI.h>
+#include <shellapi.h>
 #pragma comment(lib,"shell32.lib")
 #endif//_WIN32
 

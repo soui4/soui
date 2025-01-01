@@ -1,7 +1,7 @@
-﻿#include "StdAfx.h"
+﻿#include "stdafx.h"
 #include "SDesktopDock.h"
 #include <math.h>
-#include <ShellAPI.h>
+#include <shellapi.h>
 #pragma warning(disable : 4244)
 
 /*

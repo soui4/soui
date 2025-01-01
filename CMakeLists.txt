@@ -127,8 +127,8 @@ add_subdirectory(components)
 #
 #
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-add_subdirectory(demo)
-endif()
 add_subdirectory(demo2)
+endif()
+add_subdirectory(demo)
 add_subdirectory(fun_test)
 add_subdirectory(wxDemo)

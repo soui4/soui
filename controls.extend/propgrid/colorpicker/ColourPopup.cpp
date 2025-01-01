@@ -34,8 +34,8 @@
 #include "stdafx.h"
 #include <math.h>
 #include "ColourPopup.h"
-#include <ShellAPI.h>
-#include <Commdlg.h>
+#include <shellapi.h>
+#include <commdlg.h>
 
 #ifdef _DEBUG
 #define new DEBUG_NEW

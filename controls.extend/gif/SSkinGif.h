@@ -13,7 +13,7 @@ purpose:	自定义皮肤对象
 #include <helper/obj-ref-impl.hpp>
 
 #include "SSkinAni.h"
-#include <GdiPlus.h>
+#include <gdiplus.h>
 
 namespace SOUI
 {

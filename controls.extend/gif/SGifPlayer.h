@@ -1,7 +1,7 @@
 ﻿#pragma once
-#include <core/swnd.h>
+#include <core/SWnd.h>
 
-#include "sskingif.h"
+#include "SSkinGif.h"
 #include "SSkinAPNG.h"
 
 namespace SOUI

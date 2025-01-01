@@ -1,43 +1,36 @@
 ﻿#include "stdafx.h"
 #include "SmileyCreateHook.h"
-#ifdef _M_ARM64
+#if defined(_M_ARM64) || !defined(_WIN32)
 #define Mhook_SetHook(a, b) (0)
 #define Mhook_Unhook(a) (0);
 #else
 #include "mhook.h"
 #endif
 
-typedef HRESULT (STDAPICALLTYPE *_CoCreateInstance)(
-    __in     REFCLSID rclsid,
-    __in_opt LPUNKNOWN pUnkOuter,
-    __in     DWORD dwClsContext, 
-    __in     REFIID riid, 
-    __deref_out LPVOID FAR* ppv);
+
+typedef HRESULT (STDAPICALLTYPE *_CoCreateInstance)(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFIID riid, LPVOID FAR* ppv);
 
 
 _CoCreateInstance TrueCoCreateInstance = (_CoCreateInstance)GetProcAddress(GetModuleHandle(_T("ole32")),"CoCreateInstance");
 
 
 
-HRESULT STDAPICALLTYPE HookCoCreateInstance(
-    __in     REFCLSID rclsid,
-    __in_opt LPUNKNOWN pUnkOuter,
-    __in     DWORD dwClsContext, 
-    __in     REFIID riid, 
-    __deref_out LPVOID FAR* ppv)
+HRESULT STDAPICALLTYPE HookCoCreateInstance(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFIID riid, LPVOID FAR* ppv)
 {
     if(rclsid == CLSID_SSmileyCtrl)
     {
+#ifdef _WIN32
         return CreateSmiley(riid,ppv);
+#endif
     }
     return TrueCoCreateInstance(rclsid,pUnkOuter,dwClsContext,riid,ppv);
 }
 
-typedef HRESULT (STDAPICALLTYPE * _ProgIDFromCLSID) (__in REFCLSID clsid, __deref_out LPOLESTR FAR* lplpszProgID);
+typedef HRESULT (STDAPICALLTYPE * _ProgIDFromCLSID) (REFCLSID clsid, LPOLESTR FAR* lplpszProgID);
 
 _ProgIDFromCLSID TrueProgIDFromCLSID = (_ProgIDFromCLSID)GetProcAddress(GetModuleHandle(_T("ole32")),"ProgIDFromCLSID");
 
-HRESULT STDAPICALLTYPE HookProgIDFromCLSID (__in REFCLSID clsid, __deref_out LPOLESTR FAR* lplpszProgID)
+HRESULT STDAPICALLTYPE HookProgIDFromCLSID (REFCLSID clsid, LPOLESTR FAR* lplpszProgID)
 {
     if(clsid == CLSID_SSmileyCtrl)
     {

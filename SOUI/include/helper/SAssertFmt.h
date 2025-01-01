@@ -19,11 +19,11 @@
 #else
 #define SASSERT_FMTW(expr, format, ...) \
     if (!(expr))                        \
-        SSLOGFMTW(format, __VA_ARGS__);
+        SSLOGFMTW(format, ##__VA_ARGS__);
 
 #define SASSERT_FMTA(expr, format, ...) \
     if (!(expr))                        \
-        SSLOGFMTW(format, __VA_ARGS__);
+        SSLOGFMTW(format, ##__VA_ARGS__);
 
 #define SASSERT_MSGA(expr,msg) \
     if(!(expr))                         \

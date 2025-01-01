@@ -7,14 +7,14 @@
 #include "helper/SMenu.h"
 #include "../controls.extend/FileHelper.h"
 #include "../controls.extend/SChatEdit.h"
-#include "../controls.extend/reole/richeditole.h"
+#include "../controls.extend/reole/RichEditOle.h"
 #include "../controls.extend/SHexEdit.h"
 #include "SMatrixWindow.h"
 #include "FormatMsgDlg.h"
 #include <math.h>
 #include <valueAnimator/SValueAnimator.h>
 #include <helper/SMenuEx.h>
-#include <helper/SDibHelper.h>
+#include <helper/SDIBHelper.h>
 
 #pragma warning(disable:4192)
 
@@ -242,6 +242,7 @@ void CMainDlg::OnDestory()
 }
 
 
+#ifdef _WIN32
 class CSmileySource2 : public CSmileySource
 {
 public:
@@ -260,6 +261,7 @@ ISmileySource * CreateSource2()
 {
     return  new CSmileySource2;
 }
+#endif
 
 HRESULT CMainDlg::OnSkinChangeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL bHandled)
 {
@@ -330,7 +332,9 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
     SRichEdit *pEdit = FindChildByName2<SRichEdit>(L"re_gifhost");
     if(pEdit)
     {
+#ifdef _WIN32
         SetSRicheditOleCallback(pEdit,CreateSource2);
+#endif
         pEdit->SetAttribute(L"rtf",L"rtf:rtf_test");
     }
 
@@ -439,8 +443,10 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
 		pPathView->AddPoint(pts,ARRAYSIZE(pts));
 	}
 
+#ifdef _WIN32
 	//init soui 3.0 animation.
 	InitSoui3Animation();
+#endif
 
 	BYTE hexData[128] = {0};
 	for (int i=0; i<sizeof(hexData); ++i)
@@ -493,6 +499,7 @@ void CMainDlg::OnBtnWebkitRefresh()
 
 void CMainDlg::OnBtnSelectGIF()
 {
+#ifdef _WIN32
     SGifPlayer *pGifPlayer = FindChildByName2<SGifPlayer>(L"giftest");
     if(pGifPlayer)
     {
@@ -500,6 +507,7 @@ void CMainDlg::OnBtnSelectGIF()
         if(openDlg.DoModal()==IDOK)
             pGifPlayer->PlayGifFile(openDlg.m_szFileName);
     }
+#endif
 }
 
 void CMainDlg::OnBtnMenu()
@@ -579,6 +587,7 @@ void CMainDlg::OnBtnInsertGif2RE()
         CFileDialogEx openDlg(TRUE,_T("gif"),0,6,_T("gif files(*.gif)\0*.gif\0All files (*.*)\0*.*\0\0"));
         if(openDlg.DoModal()==IDOK)
         {
+#ifdef _WIN32
             ISmileySource* pSource = new CSmileySource2;
             HRESULT hr=pSource->LoadFromFile(S_CT2W(openDlg.m_szFileName));
             if(SUCCEEDED(hr))
@@ -624,6 +633,7 @@ void CMainDlg::OnBtnInsertGif2RE()
                 SMessageBox(m_hWnd,_T("加载表情失败"),_T("错误"),MB_OK|MB_ICONSTOP);
             }
             pSource->Release();
+#endif
         }
     }
 }

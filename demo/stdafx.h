@@ -15,11 +15,15 @@
 #include <souistd.h>
 #include <core/SHostDialog.h>
 #include <control/SMessageBox.h>
-#include <control/souictrls.h>
-#include <res.mgr/sobjdefattr.h>
+#include <control/SouiCtrls.h>
+#include <res.mgr/SObjDefAttr.h>
 
 #define SCOM_MASK 0xfffffff		//使用SOUI静态库时，可以使用这个mask来指定加载哪些库。
+#ifdef _WIN32
 #include <commgr2.h>
+#else
+#include <com-cfg.h>
+#endif
 #include <event/SNotifyCenter.h>
 
 #include "resource.h"	//APP资源
@@ -27,7 +31,9 @@
 #include "res/resource.h"
 
 #include "../controls.extend/SWkeWebkit.h"
+#ifdef _WIN32
 #include "../controls.extend/gif/SGifPlayer.h"
+#endif
 #include "../controls.extend/SIPAddressCtrl.h"
 #include "../controls.extend/SImageMaskWnd.h"
 #include "../controls.extend/SRatingBar.h"
@@ -35,7 +41,7 @@
 #include "../controls.extend/smiley/SSmileyCtrl.h"
 #include "../controls.extend/SChatEdit.h"
 #include "../controls.extend/SFreeMoveWindow.h"
-#include "../controls.extend/tipwnd.h"
+#include "../controls.extend/TipWnd.h"
 #include "../controls.extend/SProgressRing.h"
 #include "../controls.extend/SGroupList.h"
 #include "../controls.extend/SAniWindow.h"
@@ -45,5 +51,8 @@
 #include "SInterpolatorView.h"
 #include "SPathView.h"
 
+#ifndef _WIN32
+#include <stub/stub.h>
+#endif
 using namespace SOUI;
 

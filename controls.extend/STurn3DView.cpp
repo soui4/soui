@@ -6,7 +6,7 @@
 //              2012.08.18 - 2.0 huangjianxiong
 //////////////////////////////////////////////////////////////////////////
 
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "STurn3DView.h"
 
 namespace SOUI
