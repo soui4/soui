@@ -387,7 +387,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE hPrevInstance, LPTSTR lpstrC
 			//使用接口方式创建HostWnd。
 			IHostWnd * hostWnd = souiFac->lpVtbl->CreateHostWnd(souiFac,UIRES.LAYOUT.XML_MAINWND);
 			INativeWnd* nativeWnd = hostWnd->lpVtbl->GetNative(hostWnd);
-			hostWnd->lpVtbl->Create(hostWnd,NULL,0,0,0,0);
+			hostWnd->lpVtbl->CreateEx(hostWnd,NULL,WS_POPUP|WS_CAPTION,0,0,0,0,0,NULL);
 			{
 				IListView *pLv =NULL;
 				IWindow* root = hostWnd->lpVtbl->GetIRoot(hostWnd);

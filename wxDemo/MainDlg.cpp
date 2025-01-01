@@ -165,7 +165,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 			sstrID.Format(L"%d", i);
 
 			SStringW sstrPage;
-			sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_GZH'/></page>", sstrID);
+			sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_GZH'/></page>", sstrID.c_str());
 			pTabMessageComm->InsertItem(sstrPage);
 
 			SStringW sstrAvatar = L"";
@@ -214,7 +214,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 		sstrID.Format(L"%d", 9999);
 
 		SStringW sstrPage;
-		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_NEWS'/></page>", sstrID);
+		sstrPage.Format(L"<page title='%s'><include src='layout:XML_PAGE_NEWS'/></page>", sstrID.c_str());
 		pTabMessageComm->InsertItem(sstrPage);
 
 		SStringW sstrAvatar = L"";
@@ -686,15 +686,6 @@ bool CMainDlg::OnEditContactSearchChanged(EventArgs* e)
 	return true;
 }
 
-void __cdecl SFmt(char *buf,const char* pszFormat, ...)
-{
-	va_list argList;
-	va_start(argList, pszFormat);
-	//int len3 = vsnprintf(nullptr,0,pszFormat,argList);
-	int len = _vscprintf(pszFormat, argList);
-	int len2 = vsprintf_s(buf,100,pszFormat, argList);
-	va_end(argList);
-}
 
 void CMainDlg::OnEmotionItemClick(const std::string& strID)
 {
