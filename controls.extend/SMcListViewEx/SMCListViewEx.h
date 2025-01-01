@@ -50,9 +50,13 @@ namespace SOUI
 
 #undef INTERFACE
 #define INTERFACE IMcListViewEx
-
-	DECLARE_INTERFACE_IID_(IMcListViewEx, IMcListView, "15398C65-1A58-4074-A583-F826F821A82F")
-	{
+DEFINE_SGUID(IID_IMcListViewEx,
+    0x15398C65, 0x1A58, 0x4074, 0xA5, 0x83, 0xF8, 0x26, 0xF8, 0x21, 0xA8, 0x2F);
+DECLARE_INTERFACE_(IMcListViewEx, IObjRef)
+{
+    DECLARE_CLASS_SIID(IID_IMcListViewEx)
+	//DECLARE_INTERFACE_IID_(IMcListViewEx, IMcListView, "15398C65-1A58-4074-A583-F826F821A82F")
+	//{
 	private:
 
 		STDMETHOD_(BOOL, SetAdapter)(THIS_ IMcAdapter * adapter) { return FALSE; }
@@ -295,18 +299,18 @@ namespace SOUI
 
 		STDMETHOD_(IMcAdapterEx*, GetAdapterEx)(THIS) SCONST OVERRIDE;
 
-		STDMETHOD_(IListViewItemLocator*, GetItemLocator)(THIS) SCONST OVERRIDE;
+		STDMETHOD_(IListViewItemLocator*, GetItemLocator)(THIS) SCONST ;
 
-		STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator* pItemLocator) OVERRIDE;
+		STDMETHOD_(void, SetItemLocator)(THIS_ IListViewItemLocator* pItemLocator) ;
 
-		STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) OVERRIDE;
+		STDMETHOD_(void, EnsureVisible)(THIS_ int iItem) ;
 
-		STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify = FALSE) OVERRIDE;
+		STDMETHOD_(void, SetSel)(THIS_ int iItem, BOOL bNotify = FALSE) ;
 
 
-		STDMETHOD_(IItemPanel*, HitTest)(THIS_ const POINT* pt) SCONST OVERRIDE;
+		STDMETHOD_(IItemPanel*, HitTest)(THIS_ const POINT* pt) SCONST ;
 
-		STDMETHOD_(IHeaderCtrl*, GetIHeaderCtrl)(THIS) SCONST OVERRIDE;
+		STDMETHOD_(IHeaderCtrl*, GetIHeaderCtrl)(THIS) SCONST ;
 
 		STDMETHOD_(int, InsertColumn)
 			(THIS_ int nIndex,
@@ -315,15 +319,15 @@ namespace SOUI
 				UINT fmt,
 				LPARAM lParam = 0,
 				BOOL bDpiAware = TRUE,
-				float fWeight = 0.0f) OVERRIDE;
+				float fWeight = 0.0f) ;
 
-		STDMETHOD_(void, DeleteColumn)(THIS_ int iCol) OVERRIDE;
+		STDMETHOD_(void, DeleteColumn)(THIS_ int iCol) ;
 
-		STDMETHOD_(int, GetColumnCount)(THIS) SCONST OVERRIDE;
+		STDMETHOD_(int, GetColumnCount)(THIS) SCONST ;
 
 	protected:
 		//禁止调用
-		STDMETHOD_(int, GetSel)(THIS) SCONST OVERRIDE { return -1; }
+		STDMETHOD_(int, GetSel)(THIS) SCONST  { return -1; }
 
 	public:
 
