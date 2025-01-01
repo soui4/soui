@@ -40,7 +40,7 @@ void STipWnd::ShowTip(int x, int y, AnchorType at, const SStringT &strTip)
     pTipWnd->m_ptAnchor.x = x;
     pTipWnd->m_ptAnchor.y = y;
     pTipWnd->m_anchorType = at;
-    pTipWnd->Create(NULL);
+    pTipWnd->Create(0);
     pTipWnd->SetTip(strTip);
     pTipWnd->SetWindowPos(HWND_TOPMOST, 0, 0, 0, 0,
                           SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);

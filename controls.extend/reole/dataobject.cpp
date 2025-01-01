@@ -93,16 +93,14 @@ HGLOBAL DupMem(HGLOBAL hMem)
     // lock the source memory object
     DWORD   len    = (DWORD)GlobalSize(hMem);
     PVOID   source = GlobalLock(hMem);
-     
     // create a fixed "global" block - i.e. just
     // a regular lump of our process heap
-    PVOID   dest   = GlobalAlloc(GMEM_FIXED, len);
- 
+    HGLOBAL ret = GlobalAlloc(GMEM_FIXED, len);
+    PVOID dest = GlobalLock(ret);
     memcpy(dest, source, len);
- 
+    GlobalUnlock(ret);
     GlobalUnlock(hMem);
- 
-    return dest;
+    return ret;
 }
  
 int CDataObject::LookupFormatEtc(FORMATETC *pFormatEtc)

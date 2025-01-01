@@ -193,9 +193,9 @@ int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, B
     {
         cfNew.dwMask |= CFM_SIZE;
 
-        HDC hdc = GetDC(NULL);
+        HDC hdc = GetDC(0);
         LONG yPixPerInch = GetDeviceCaps(hdc, LOGPIXELSY);
-        ReleaseDC(NULL, hdc);
+        ReleaseDC(0, hdc);
         cfNew.yHeight
             = abs(MulDiv(xmlText.attribute(L"value").as_uint(12), LY_PER_INCH, yPixPerInch));
     }

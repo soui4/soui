@@ -1371,9 +1371,9 @@ BOOL SHexEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     if (m_dragSb != SSB_NULL)
     {
         if (bVertical)
-            OnVScroll(uCode, nPos, NULL);
+            OnVScroll(uCode, nPos, 0);
         else
-            OnHScroll(uCode, nPos, NULL);
+            OnHScroll(uCode, nPos, 0);
     }
     else
         __baseCls::OnScroll(bVertical, uCode, nPos);
@@ -1553,7 +1553,7 @@ std::string SHexEdit::GetClipboardText()
     LPSTR lpszData;      // Pointer to clipboard data
     unsigned long nSize; // Size of clipboard data
 
-    OpenClipboard(NULL);
+    OpenClipboard(0);
 
     if (IsClipboardFormatAvailable(CF_TEXT))
         hGlobal = GetClipboardData(CF_TEXT);
@@ -1591,7 +1591,7 @@ int SHexEdit::SetClipboard(LPCSTR lpszBuffer)
     // be it's owner. If NULL is passed, the current process
     // is assumed. After opening, empty the clipboard so we
     // can put our text on it.
-    OpenClipboard(NULL);
+    OpenClipboard(0);
     EmptyClipboard();
 
     // Get the size of the string in the buffer that was

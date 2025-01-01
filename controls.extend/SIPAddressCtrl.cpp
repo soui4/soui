@@ -45,7 +45,7 @@ class SEditIP : public SEdit {
 };
 
 SEditIP::SEditIP()
-    : m_hImcCopy(NULL)
+    : m_hImcCopy(0)
 {
 }
 
@@ -76,7 +76,7 @@ void SEditIP::OnSetFocus(SWND wndOld)
     __baseCls::OnSetFocus(wndOld);
     HWND hHost = GetContainer()->GetHostHwnd();
     m_hImcCopy = ImmGetContext(hHost);
-    ImmAssociateContext(hHost, NULL);
+    ImmAssociateContext(hHost, 0);
 }
 
 void SEditIP::OnKillFocus(SWND wndFocus)
