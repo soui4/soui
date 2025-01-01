@@ -63,6 +63,18 @@
       "env": {
         "DISPLAY": "hjx:0.0"
       }
+    },
+    {
+      "type": "cppgdb",
+      "name": "demo (bin\\demo)",
+      "project": "CMakeLists.txt",
+      "projectTarget": "demo (bin\\demo)",
+      "debuggerConfiguration": "gdb",
+      "MIMode": "gdb",
+      "args": [],
+      "env": {
+        "DISPLAY": "hjx:0.0"
+      }
     }
   ]
 }
