@@ -33,6 +33,7 @@ void SOsrPanel::OnFinalRelease()
 {
     AddRef(); //防止重复进入该函数
     SSendMessage(WM_DESTROY);
+    m_pHostProxy->GetHostContainer()->UnregisterTimelineHandler(this);
     __baseCls::OnFinalRelease();
 }
 

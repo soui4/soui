@@ -975,6 +975,8 @@ BOOL SHostWnd::OnSetCursor(HWND hwnd, UINT nHitTest, UINT message)
 
 void SHostWnd::OnTimer(UINT_PTR idEvent)
 {
+    if (m_memRT == NULL) // host was destroyed
+        return;
     if (idEvent == kPulseTimer)
     {
         if (!IsIconic())
