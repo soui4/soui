@@ -853,7 +853,7 @@ protected:
     }
 
     virtual SkTypeface* onLegacyCreateTypeface(const char familyName[],
-                                               unsigned styleBits) const SK_OVERRIDE {
+                                               unsigned styleBits,unsigned charSet) const SK_OVERRIDE {
         bool bold = styleBits & SkTypeface::kBold;
         bool italic = styleBits & SkTypeface::kItalic;
         SkFontStyle style = SkFontStyle(bold ? SkFontStyle::kBold_Weight

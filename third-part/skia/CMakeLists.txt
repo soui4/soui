@@ -925,7 +925,8 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
 else()
     set(srcs
         ${srcs}
-        "src/ports/SkFontHost_linux.cpp" 
+        "src/ports/SkFontMgr_fontconfig.cpp"
+        "src/ports/SkFontHost_fontconfig.cpp"
         "src/ports/SkOSFile_posix.cpp" 
         "src/ports/SkTLS_pthread.cpp" 
         "src/utils/SkThreadUtils_pthread.cpp" 
