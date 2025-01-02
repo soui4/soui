@@ -3,7 +3,7 @@
 	translucent="0"
 	toolwnd="0"
 >
-	<root  width="600" height="400" skin="_skin.sys.wnd.bkgnd" colorBkgnd="@color/white" layout="vbox" alpha="200">
+	<root  width="600" height="400" skin="_skin.sys.wnd.bkgnd" colorBkgnd="@color/white" layout="vbox" alpha1="200">
 		<caption size="-2,30" font="adding:2" layout="hbox" gravity="center" padding_left="10" colorBkgnd="@color/blue">
 			<text text="@string/title"/>
 			<text text="QQ群:" extend_left="5"/>
@@ -18,6 +18,12 @@
 		</caption>
 
 		<tabctrl size="-2,0" weight="1" tabHeight="30" animateSteps="30" curSel="0">
+			<page title="test" layout="vbox">
+				<dateTimePicker size="240,30" name="timepicker" padding="4,0,4,0" dropWidth="300" timeEnable="1">
+					<calstyle ncSkin="_skin.sys.border" daySkin="_skin.sys.btn.normal" margin="1" />
+				</dateTimePicker>
+				
+			</page>
 			<page title="page1" layout="vbox" gravity="center" colorBkgnd="@color/white" interval="5">
 				<text text="hello soui in page1" colorText="@color/red" colorBkgnd="@color/gray"/>
 				<window size="-2,-1" layout="hbox" gravity="center">

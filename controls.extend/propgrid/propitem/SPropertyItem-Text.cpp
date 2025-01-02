@@ -119,4 +119,13 @@ namespace SOUI
 		OnValueChanged();
 	}
 
+    void SPropertyItemText::OnValueChanged()
+    {
+        if(m_pEdit){
+            m_pEdit->GetEventSet()->setMutedState(TRUE);
+            m_pEdit->SetWindowText(GetValue());
+            m_pEdit->GetEventSet()->setMutedState(FALSE);
+        }
+        __baseCls::OnValueChanged();
+    }
 }

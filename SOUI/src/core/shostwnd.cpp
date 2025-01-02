@@ -1919,6 +1919,8 @@ void SHostWnd::OnSysCommand(UINT nID, CPoint lParam)
 
 void SHostWnd::_SetToolTipInfo(const SwndToolTipInfo *info, BOOL bNcTip)
 {
+    if(!m_pTipCtrl)
+        return;
     if (info)
     {
         TIPID id = { info->swnd, info->dwCookie, bNcTip };
