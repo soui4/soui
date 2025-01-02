@@ -364,10 +364,11 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
     SXmlNode xmlRoot;
     if (!xmlInit)
     {
-        if (!OnLoadLayoutFromResourceID(xmlDoc)) {
-            SSLOGW() << "OnLoadLayoutFromResourceID return FALSE";
+        xmlRoot = OnGetInitXmlNode(xmlDoc);
+        if (!xmlRoot)
+        {
+            SSLOGW() << "OnGetInitXmlNode return empty xml";
         }
-        xmlRoot = xmlDoc.root().first_child();
         xmlInit = &xmlRoot;
     }
     m_hostAttr.Init();
@@ -808,6 +809,12 @@ IToolTip *SHostWnd::CreateTooltip() const
 void SHostWnd::DestroyTooltip(IToolTip *pTooltip) const
 {
     GETTOOLTIPFACTORY->DestroyToolTip(pTooltip);
+}
+
+SXmlNode SHostWnd::OnGetInitXmlNode(SXmlDoc &xmlDoc)
+{ 
+    OnLoadLayoutFromResourceID(xmlDoc);
+    return xmlDoc.root().first_child();
 }
 
 BOOL SHostWnd::OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc)
@@ -1290,7 +1297,6 @@ static BOOL _BitBlt(IRenderTarget *pRTDst, IRenderTarget *pRTSrc, CRect rcDst, C
 
 BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
 {
-    #ifdef _WIN32
     if (!IsTranslucent())
     {
         return ::AnimateWindow(m_hWnd, dwTime, dwFlags);
@@ -1485,10 +1491,6 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
         }
         return FALSE;
     }
-    #else
-    //todo:hjx
-    return FALSE;
-    #endif
 }
 
 BOOL SHostWnd::RegisterTimelineHandler(ITimelineHandler *pHandler)

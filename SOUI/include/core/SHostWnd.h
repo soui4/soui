@@ -486,6 +486,7 @@ class SOUI_EXP SHostWnd
 
   protected:
     virtual BOOL OnLoadLayoutFromResourceID(SXmlDoc &xmlDoc);
+    virtual SXmlNode OnGetInitXmlNode(SXmlDoc &xmlDoc);
     virtual void OnUserXmlNode(SXmlNode xmlUser);
     virtual SRootWindow* CreateRoot();
   public:

@@ -89,12 +89,14 @@ SStringT SMessageBoxImpl::OnGetButtonText(int nBtnID) const
     return SStringT();
 }
 
+SXmlNode SMessageBoxImpl::OnGetInitXmlNode(SXmlDoc &xmlDoc)
+{
+    return SApplication::getSingletonPtr()->GetMessageBoxTemplate();
+}
+
 BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
 {
 	SXmlNode uiRoot = SApplication::getSingletonPtr()->GetMessageBoxTemplate();
-	SASSERT(uiRoot);
-    InitFromXml(&uiRoot);
-
     UINT uType = s_MsgBoxInfo.uType & 0x0F;
 
     STabCtrl *pBtnSwitch = FindChildByName2<STabCtrl>(NAME_MSGBOX_BTNSWITCH);
