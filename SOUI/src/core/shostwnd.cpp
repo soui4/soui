@@ -1645,6 +1645,9 @@ BOOL SHostWnd::DestroyWindow()
 {
     if (m_AniState != Ani_none)
     {
+        if (m_AniState | Ani_win_exit)
+            return TRUE;
+
         if (m_AniState & Ani_host)
             StopHostAnimation();
         if (m_AniState & Ani_win)
