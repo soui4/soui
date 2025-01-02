@@ -175,11 +175,11 @@ void CColourPopup::Initialise()
     if (m_nBoxSize - 2*m_nMargin - 2 < 5) m_nBoxSize = 5 + 2*m_nMargin + 2;
 
     // Create the font
-    NONCLIENTMETRICS ncm;
-    ncm.cbSize = sizeof(NONCLIENTMETRICS);
-    SystemParametersInfo(SPI_GETNONCLIENTMETRICS, sizeof(NONCLIENTMETRICS), &ncm, 0);
-    m_Font=CreateFontIndirect(&(ncm.lfMessageFont));
-
+    LOGFONT lf;
+    GetObject(GetStockObject(DEFAULT_GUI_FONT), sizeof(lf), &lf);
+    lf.lfHeight = -12;
+    _tcscpy(lf.lfFaceName, _T("宋体"));
+    m_Font = CreateFontIndirect(&lf);
 }
 
 CColourPopup::~CColourPopup()
@@ -387,6 +387,8 @@ void CColourPopup::OnPaint(HDC )
 {
     PAINTSTRUCT ps;
     HDC hdc=::BeginPaint(m_hWnd,&ps);
+    CRect rect;
+    GetClientRect(rect);
 
     // Draw the Default Area text
     if (m_strDefaultText.GetLength())
@@ -402,8 +404,6 @@ void CColourPopup::OnPaint(HDC )
 
     // Draw raised window edge (ex-window style WS_EX_WINDOWEDGE is sposed to do this,
     // but for some reason isn't
-    CRect rect;
-    GetClientRect(rect);
     ::DrawEdge(hdc,rect, EDGE_RAISED, BF_RECT);
 
     ::EndPaint(m_hWnd,&ps);

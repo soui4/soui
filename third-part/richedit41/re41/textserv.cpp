@@ -1112,7 +1112,7 @@ update_kbd:
 		{
 			GETTEXTEX gt;
 
-			gt.cb = wparam * 2;
+			gt.cb = CbOfCch(wparam);
 			gt.flags = GT_USECRLF;
 			gt.codepage = 1200;
 			gt.lpDefaultChar = NULL;
