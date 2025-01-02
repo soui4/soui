@@ -1,7 +1,8 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <UIDEF>
-  <deffont value="face:Noto,size:15"/>
-
+  <deffont2 value="face:,size:15"/>
+  <deffont value="face:微软雅黑,size:16"/>
+  
   <string src="values:string" />
   <skin src="values:skin"/>
   <color src="values:color"/>
