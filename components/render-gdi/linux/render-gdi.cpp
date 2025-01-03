@@ -760,21 +760,6 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::DrawLines(LPPOINT pPt,size_t nCount)
     {
-        RECT rc={100000,100000,0,0};
-        for(size_t i=0;i<nCount;i++)
-        {
-            if(pPt[i].x<rc.left) rc.left=pPt[i].x;
-            if(pPt[i].x>rc.right) rc.right=pPt[i].x;
-            if(pPt[i].y<rc.top) rc.top=pPt[i].y;
-            if(pPt[i].y>rc.bottom) rc.bottom=pPt[i].y;
-        }
-        rc.left -= 1;
-        rc.top -=1;
-        int nPenWidth = 1;
-        if(m_curPen) nPenWidth = m_curPen->GetWidth();
-        rc.bottom+=nPenWidth;
-        rc.right+=nPenWidth;
-
         ::Polyline(m_hdc,pPt,(int)nCount);
         return S_OK;
     }
