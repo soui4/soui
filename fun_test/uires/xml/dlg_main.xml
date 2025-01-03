@@ -22,7 +22,7 @@
 				<dateTimePicker size="240,30" name="timepicker" padding="4,0,4,0" dropWidth="300" timeEnable="1">
 					<calstyle ncSkin="_skin.sys.border" daySkin="_skin.sys.btn.normal" margin="1" />
 				</dateTimePicker>
-				
+				<edit extend_left="10" size="200,30" name="edit_test2" text="under" margin="2" enableDragdrop="0"/>
 			</page>
 			<page title="page1" layout="vbox" gravity="center" colorBkgnd="@color/white" interval="5">
 				<text text="hello soui in page1" colorText="@color/red" colorBkgnd="@color/gray"/>

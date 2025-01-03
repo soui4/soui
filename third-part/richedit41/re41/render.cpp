@@ -244,11 +244,12 @@ void CRenderer::Init()
 {
 	TRACEBEGIN(TRCSUBSYSDISP, TRCSCOPEINTERN, "CRenderer::Init");
 	_fRenderer = TRUE;
-	CTxtEdit *ped	= GetPed();
-	_cpAccelerator = ped->GetCpAccelerator();
 
 	int offset = FIELD_OFFSET(CRenderer,_rcView);
 	memset((char*)this+offset,0,sizeof(CRenderer)-offset);
+
+	CTxtEdit *ped	= GetPed();
+	_cpAccelerator = ped->GetCpAccelerator();
 
 	CDocInfo *pDocInfo = ped->GetDocInfoNC();
 	if(pDocInfo)
