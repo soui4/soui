@@ -1445,8 +1445,11 @@ namespace SOUI
 			matrix[kMSkewY],matrix[kMScaleY],matrix[kMTransY],
 			matrix[kMPersp0], matrix[kMPersp1], matrix[kMPersp2]
 		);
-		m.preTranslate(-m_ptOrg.fX, -m_ptOrg.fY);
-		m.postTranslate(m_ptOrg.fX, m_ptOrg.fY);
+        if (m_ptOrg.fX != 0.0f || m_ptOrg.fY != 0.0f)
+        {
+			m.preTranslate(-m_ptOrg.fX, -m_ptOrg.fY);
+			m.postTranslate(m_ptOrg.fX, m_ptOrg.fY);
+        }
 		m_SkCanvas->setMatrix(m);
 		if(m.isIdentity()){
 			m_paint.setFilterLevel(SkPaint::kNone_FilterLevel);
@@ -1462,10 +1465,10 @@ namespace SOUI
 		const SkMatrix & m = m_SkCanvas->getTotalMatrix();
 		matrix[kMScaleX] = m.getScaleX();
 		matrix[kMSkewX] = m.getSkewX();
-		matrix[kMTransX] = m.getTranslateX();
+		matrix[kMTransX] = m.getTranslateX() - m_ptOrg.fX;
 		matrix[kMSkewY] = m.getSkewY();
 		matrix[kMScaleY] = m.getScaleY();
-		matrix[kMTransY] = m.getTranslateY();
+		matrix[kMTransY] = m.getTranslateY() - m_ptOrg.fY;
 		matrix[kMPersp0] = m.getPerspX();
 		matrix[kMPersp1] = m.getPerspY();
 		matrix[kMPersp2] = m.get(SkMatrix::kMPersp2);
