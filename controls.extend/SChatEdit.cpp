@@ -35,7 +35,7 @@ BOOL SChatEdit::AppendFormatText(const SStringW &strMsg, BOOL bNewLine, BOOL bCa
     LPWSTR pszBuf = strBuf.GetBuffer(strBuf.GetLength());
     {
         SXmlDoc doc;
-        if (doc.load_buffer_inplace(pszBuf, strBuf.GetLength() * 2, xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
+        if (doc.load_buffer_inplace(pszBuf, strBuf.GetLength() * sizeof(wchar_t), xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
         {
             bRet = AppendFormatText(doc.root().child(L"msg"), bNewLine, bCanUndo);
         }
