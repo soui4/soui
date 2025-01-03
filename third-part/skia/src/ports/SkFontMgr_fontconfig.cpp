@@ -762,7 +762,7 @@ protected:
 
         FcResult result;
         SkAutoFcPattern font(FcFontMatch(fFC, pattern, &result));
-        if (NULL == font || !FontAccessible(font) || !FontFamilyNameMatches(font, matchPattern)) {
+        if (NULL == font || !FontAccessible(font) /*|| !FontFamilyNameMatches(font, matchPattern)*/) {
             return NULL;
         }
 
