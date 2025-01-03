@@ -443,10 +443,8 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
 		pPathView->AddPoint(pts,ARRAYSIZE(pts));
 	}
 
-#ifdef _WIN32
 	//init soui 3.0 animation.
 	InitSoui3Animation();
-#endif
 
 	BYTE hexData[128] = {0};
 	for (int i=0; i<sizeof(hexData); ++i)
