@@ -106,7 +106,7 @@ STreeItem* STreeBox::InsertItem(LPCWSTR pszXml,DWORD dwData,HSTREEITEM hParent/*
     pugi::xml_node xmlItem;
     if(pszXml)
     {
-        if(!xmlDoc.load_buffer(pszXml,wcslen(pszXml)*sizeof(wchar_t),pugi::parse_default,pugi::encoding_utf16))
+        if (!xmlDoc.load_buffer(pszXml, wcslen(pszXml) * sizeof(wchar_t), pugi::parse_default, sizeof(wchar_t) == 2 ? pugi::encoding_utf16 : pugi::encoding_utf32))
             return NULL;
         xmlItem=xmlDoc.first_child();
     }else
