@@ -984,9 +984,7 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::ClearRect( LPCRECT pRect,COLORREF cr )
     {
-        HBRUSH br = CreateSolidBrush(cr);
-        FillRect(m_hdc, pRect,br);
-        DeleteObject(br);
+        ::ClearRect(m_hdc,pRect,cr);
         return S_OK;    
     }
 
