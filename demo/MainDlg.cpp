@@ -667,13 +667,13 @@ public:
 
 
 protected:
-	void OnLButtonDown(UINT nFlags,CPoint pt)
+	void OnLButtonUp(UINT nFlags,CPoint pt)
 	{
 		SMessageBox(m_hWnd,_T("test"),_T("msgbox"),MB_OK);
 		SetMsgHandled(FALSE);
 	}
 BEGIN_MSG_MAP_EX(SSkiaTestWnd)
-	MSG_WM_LBUTTONDOWN(OnLButtonDown)
+	MSG_WM_LBUTTONUP(OnLButtonUp)
 	CHAIN_MSG_MAP(SHostWnd)
 END_MSG_MAP()
 
