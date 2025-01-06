@@ -658,7 +658,7 @@ void SHexEdit::PaintAddresses(IRenderTarget *pRT)
     UINT nEndAdr;
     SStringT cAdrFormatString;
     CRect cAdrRect(m_tPaintDetails.cPaintingRect);
-    _TCHAR pBuf[32];
+    TCHAR pBuf[32];
 
     // create the format string
     cAdrFormatString.Format(_T("%%0%uX"), m_nAdrSize);
@@ -778,7 +778,7 @@ void SHexEdit::PaintHexData(IRenderTarget *pRT)
             *pBufPtr++ = tabHexCharacters[*pDataPtr & 0xf];
             *pBufPtr++ = ' ';
         }
-        *--pBufPtr = '\0';
+        *(-- pBufPtr) = '\0';
         // set end-pointers
 
         if (pSelectionBufPtrEnd == NULL)

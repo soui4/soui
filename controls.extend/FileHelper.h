@@ -13,7 +13,6 @@
 
 #ifndef __FILE_HELPER_H__
 #define __FILE_HELPER_H__
-
 #include <commdlg.h>
 
 #ifndef _MAX_FNAME

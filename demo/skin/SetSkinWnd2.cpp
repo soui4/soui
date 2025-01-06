@@ -3,6 +3,7 @@
 #include "SDemoSkin.h"
 #include <winuser.h>
 #include "SSkinLoader.h"
+#include <helper/SHostMgr.h>
 
 #define SKIN_CHANGE_MSG _T("{D17D208B-25FD-412C-8071-68816D4B1F9B}")
 //注册皮肤改变消息
@@ -16,10 +17,7 @@ HRESULT CSetSkinWnd::OnSkinChangeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam
 
 long CSetSkinWnd::NotifUpdataWindow()
 {
-	WPARAM   wParam = MagicNumber;
-	LPARAM   lParam = MagicNumber;
-	DWORD   dwRecipients = BSM_APPLICATIONS;
-	return ::BroadcastSystemMessage(BSF_POSTMESSAGE, &dwRecipients, g_dwSkinChangeMessage, wParam, lParam);
+    SHostMgr::getSingletonPtr()->DispatchMessage(g_dwSkinChangeMessage, MagicNumber, MagicNumber);
 }
 
 void CSetSkinWnd::LoadSkinConfigFormXml()
@@ -94,7 +92,8 @@ void CSetSkinWnd::OnSetSkin(IEvtArgs * e)
 	strLoadSkin.Format(_T("themes\\skin%d"), ((nIndex - 9)%3)+1);
 	SSkinLoader::getSingleton().LoadSkin(strLoadSkin);
 
-	if (_taccess(strSkinFile, 0) != 0){
+	if (GetFileAttributes(strSkinFile) != FILE_ATTRIBUTE_NORMAL)
+    {
 		SMessageBox(0, _T("无法设置当前主题,找不到系统主题文件。复制demo\\themes\\文件夹到soui根目录!"), _T("警告"), MB_OK);
 		return;
 	}
