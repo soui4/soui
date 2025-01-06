@@ -106,9 +106,9 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
 elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
 else()
   # 添加调试标志
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_RELEASE} -O3")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O2")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+
   add_definitions(-DWCHAR_SIZE=4)
   include_directories(${PROJECT_SOURCE_DIR}/swinx/include)
   add_subdirectory(swinx)
