@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "FormatMsgDlg.h"
+#include <tchar.h>
 
 namespace SOUI
 {

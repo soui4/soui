@@ -13,7 +13,7 @@ public:
 	// IUnknown
 	virtual HRESULT STDMETHODCALLTYPE QueryInterface(
 		/* [in] */ REFIID riid,
-		/* [iid_is][out] */  void __RPC_FAR *__RPC_FAR *ppvObject)
+		/* [iid_is][out] */  void  * *ppvObject)
 	{
 		HRESULT hr = S_FALSE;
 		if (riid == __uuidof(IUnknown))

@@ -11,7 +11,6 @@
 #define _WIN32_WINNT 0x0501
 #endif
 #define OUTLOG_LEVEL	2	//large than 1 to disable OutputDebugString from soui system log when not use log4z module.
-#include <winsock2.h>
 #include <souistd.h>
 #include <core/SHostDialog.h>
 #include <control/SMessageBox.h>
@@ -44,8 +43,5 @@
 #include "SInterpolatorView.h"
 #include "SPathView.h"
 
-#ifndef _WIN32
-#include <stub/stub.h>
-#endif
 using namespace SOUI;
 

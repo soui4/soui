@@ -3,7 +3,6 @@
 #include "SDemoSkin.h"
 #include <winuser.h>
 #include "SSkinLoader.h"
-#include <io.h>
 
 #define SKIN_CHANGE_MSG _T("{D17D208B-25FD-412C-8071-68816D4B1F9B}")
 //注册皮肤改变消息

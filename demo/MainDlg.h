@@ -16,7 +16,6 @@
 using namespace SOUI;
 
 #include "magnet/MagnetFrame.h"
-#include "ThreadObject.h"
 #include "skin/SDemoSkin.h"
 #include "../../controls.extend/SMcListViewEx/STabCtrlHeaderBinder.h"
 #include <helper/SDpiHelper.hpp>
@@ -44,7 +43,6 @@ DEF_EVT_EXT(EventThreadStop,EVT_EXTERNAL_BEGIN + 30002,{});
 */
 class CMainDlg : public SHostWnd
 			   , public CMagnetFrame	//磁力吸附
-			   , public CThreadObject	//线程对象
 			   , public TAutoEventMapReg<CMainDlg>//通知中心自动注册
 			   , public ISetOrLoadSkinHandler
                , public IAnimatorListener 
@@ -172,14 +170,6 @@ protected:
 
 	void OnBtnTip();
 
-	virtual UINT Run();
-
-	void OnBtnStartNotifyThread();
-	void OnBtnStopNotifyThread();
-
-	BOOL OnEventThreadStart(IEvtArgs *e);
-	BOOL OnEventThreadStop(IEvtArgs *e);
-	BOOL OnEventThread(IEvtArgs *e);
 	void OnBtnOpenWrapContent();
 	
 	void OnCbxInterpolotorChange(IEvtArgs *e);
@@ -233,15 +223,8 @@ protected:
         EVENT_ID_COMMAND(R.id.btn_createchildren,OnBtnCreateChildren)
 		EVENT_ID_COMMAND(R.id.btn_init_listbox,OnInitListBox)
 		EVENT_ID_COMMAND(R.id.btn_skin,OnBtnSkin)
-		EVENT_ID_COMMAND(R.id.btn_start_notify_thread,OnBtnStartNotifyThread)
-		EVENT_ID_COMMAND(R.id.btn_stop_notify_thread,OnBtnStopNotifyThread)
 		EVENT_ID_COMMAND(R.id.btn_open_wrap_content,OnBtnOpenWrapContent)
         //-->
-		//<--通知中心事件
-		EVENT_HANDLER(EventThreadStart::EventID,OnEventThreadStart)
-		EVENT_HANDLER(EventThreadStop::EventID,OnEventThreadStop)
-		EVENT_HANDLER(EventThread::EventID,OnEventThread)
-		//-->
 		EVENT_NAME_COMMAND(L"btn_create_by_temp",OnBtnCreateByTemp)
         EVENT_NAME_COMMAND(L"btn_webkit_back",OnBtnWebkitBackward)
         EVENT_NAME_COMMAND(L"btn_webkit_fore",OnBtnWebkitForeward)

@@ -11,7 +11,8 @@
  * Describe    实现两个文件相关的helper
  */
 
-#pragma once
+#ifndef __FILE_HELPER_H__
+#define __FILE_HELPER_H__
 
 #include <commdlg.h>
 
@@ -110,3 +111,5 @@ class CFileDialogEx {
             return ::GetSaveFileName(&m_ofn);
     }
 };
+
+#endif //__FILE_HELPER_H__

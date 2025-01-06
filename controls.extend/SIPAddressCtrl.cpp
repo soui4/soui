@@ -1,6 +1,5 @@
 ﻿#include "stdafx.h"
 #include "SIPAddressCtrl.h"
-#include <winsock2.h>
 #define SEP_EDIT 2
 
 namespace SOUI
@@ -191,10 +190,8 @@ int SIPAddressCtrl::GetAddress(DWORD &dwAddress) const
 
 void SIPAddressCtrl::SetAddress(DWORD dwAddress)
 {
-    in_addr inaddr;
-    inaddr.s_addr = dwAddress;
-    SetAddress(inaddr.S_un.S_un_b.s_b1, inaddr.S_un.S_un_b.s_b2, inaddr.S_un.S_un_b.s_b3,
-               inaddr.S_un.S_un_b.s_b4);
+    const BYTE *pbyAddr = (const BYTE *)&dwAddress;
+    SetAddress(pbyAddr[0], pbyAddr[1], pbyAddr[2], pbyAddr[3]);
 }
 
 void SIPAddressCtrl::SetAddress(BYTE nField0, BYTE nField1, BYTE nField2, BYTE nField3)
