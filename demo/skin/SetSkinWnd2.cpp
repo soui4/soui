@@ -49,21 +49,13 @@ void CSetSkinWnd::LoadSkinConfigFormXml()
     }
 }
 
-CSetSkinWnd::CSetSkinWnd() :SHostWnd(_T("LAYOUT:dlg_set_skin"))
+CSetSkinWnd::CSetSkinWnd() :SHostDialog(_T("LAYOUT:dlg_set_skin"))
 {	
 	LoadSkinConfigFormXml();
 }
 
 CSetSkinWnd::~CSetSkinWnd()
 {
-}
-
-void CSetSkinWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
-{
-	if (nState == WA_INACTIVE)
-		DestroyWindow();
-	else
-		SHostWnd::OnActivate(nState, bMinimized, wndOther);
 }
 
 CRect CSetSkinWnd::GetMargin(int id)

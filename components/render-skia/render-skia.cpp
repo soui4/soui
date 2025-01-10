@@ -1798,6 +1798,8 @@ namespace SOUI
 	HRESULT SBitmap_Skia::Clone(IBitmapS **ppClone) const 
 	{
 		HRESULT hr = E_UNEXPECTED;
+        if (!m_hBmp)
+            return hr;
 		BOOL bOK = GetRenderFactory()->CreateBitmap(ppClone);
 		if(bOK)
 		{

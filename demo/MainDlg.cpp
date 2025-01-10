@@ -913,19 +913,8 @@ void CMainDlg::OnInitListBox()
 
 void CMainDlg::OnBtnSkin()
 {
-	if (!::IsWindow(m_hSetSkinWnd))
-	{
-		CSetSkinWnd *pSetSkinWnd = new CSetSkinWnd();
-		pSetSkinWnd->Create(0);
-		pSetSkinWnd->CenterWindow(GetDesktopWindow());
-		pSetSkinWnd->ShowWindow(SW_SHOWDEFAULT);
-		m_hSetSkinWnd = pSetSkinWnd->m_hWnd;
-	}
-	else
-	{
-		SetForegroundWindow(m_hSetSkinWnd);
-		FlashWindow(m_hSetSkinWnd, TRUE);
-	}
+	CSetSkinWnd pSetSkinWnd;
+	pSetSkinWnd.DoModal(m_hWnd);
 }
 
 void CMainDlg::OnBtnTip()
