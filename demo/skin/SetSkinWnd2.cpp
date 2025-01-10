@@ -18,32 +18,36 @@ HRESULT CSetSkinWnd::OnSkinChangeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam
 long CSetSkinWnd::NotifUpdataWindow()
 {
     SHostMgr::getSingletonPtr()->DispatchMessage(g_dwSkinChangeMessage, MagicNumber, MagicNumber);
+    return 0;
 }
 
 void CSetSkinWnd::LoadSkinConfigFormXml()
-	{
-		SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + _T("\\themes\\themes_config.xml");
-
-		SXmlDoc docLoad;
-		bool bLoad = docLoad.load_file(strSkinConfigPath);
-		if (bLoad)
-		{
-			SXmlNode skinInf = docLoad.root().child(L"DEMO_SKIN_CONFIG").child(L"skinInf");
-			while (skinInf)
-			{
-				SKIN_CONFIG_INF inf;
-				inf.id = (SkinType)skinInf.attribute(L"id").as_int();
-				int v1 = 0, v2 = 0, v3 = 0, v4 = 0;
-				swscanf(skinInf.attribute(L"skin_margin").as_string(), L"%d,%d,%d,%d", &v1, &v2, &v3, &v4);
-				inf.margin.left = v1;
-				inf.margin.top = v2;
-				inf.margin.right = v3;
-				inf.margin.bottom = v4;
-				m_skinConfigInf.AddTail(inf);
-				skinInf=skinInf.next_sibling();
-			}
-		}		
-	}
+{
+#ifdef _WIN32
+    SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + _T("\\themes\\themes_config.xml");
+#else
+    SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + _T("/themes/themes_config.xml");
+#endif //_WIN32
+    SXmlDoc docLoad;
+    bool bLoad = docLoad.load_file(strSkinConfigPath);
+    if (bLoad)
+    {
+        SXmlNode skinInf = docLoad.root().child(L"DEMO_SKIN_CONFIG").child(L"skinInf");
+        while (skinInf)
+        {
+            SKIN_CONFIG_INF inf;
+            inf.id = (SkinType)skinInf.attribute(L"id").as_int();
+            int v1 = 0, v2 = 0, v3 = 0, v4 = 0;
+            swscanf(skinInf.attribute(L"skin_margin").as_string(), L"%d,%d,%d,%d", &v1, &v2, &v3, &v4);
+            inf.margin.left = v1;
+            inf.margin.top = v2;
+            inf.margin.right = v3;
+            inf.margin.bottom = v4;
+            m_skinConfigInf.AddTail(inf);
+            skinInf = skinInf.next_sibling();
+        }
+    }
+}
 CSetSkinWnd::CSetSkinWnd() :SHostWnd(_T("LAYOUT:dlg_set_skin"))
 {	
 	LoadSkinConfigFormXml();

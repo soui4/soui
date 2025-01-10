@@ -587,8 +587,6 @@ HBITMAP SHeaderCtrl::CreateDragImage(UINT iItem)
     DrawItem(pRT, rcItem, m_arrItems.GetData() + iItem);
     pRT->EndDraw();
 
-    //todo:hjx
-    #ifdef _WIN32
     HBITMAP hBmp = CreateBitmap(rcItem.Width(), rcItem.Height(), 1, 32, NULL);
     HDC hdc = GetDC(NULL);
     HDC hMemDC = CreateCompatibleDC(hdc);
@@ -599,9 +597,6 @@ HBITMAP SHeaderCtrl::CreateDragImage(UINT iItem)
     DeleteDC(hMemDC);
     ReleaseDC(NULL, hdc);
     return hBmp;
-    #else
-    return 0;
-    #endif//_WIN32
 }
 
 void SHeaderCtrl::DrawDraggingState(DWORD dwDragTo)
