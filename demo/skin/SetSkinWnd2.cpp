@@ -97,7 +97,8 @@ void CSetSkinWnd::OnSetSkin(IEvtArgs * e)
 
 	SSkinLoader::getSingleton().LoadSkin(strLoadSkin);
 
-	if (GetFileAttributes(strSkinFile) != FILE_ATTRIBUTE_NORMAL)
+	DWORD dwAttr = GetFileAttributes(strSkinFile);
+    if (dwAttr == INVALID_FILE_ATTRIBUTES)
     {
 		SMessageBox(0, _T("无法设置当前主题,找不到系统主题文件。复制demo\\themes\\文件夹到soui根目录!"), _T("警告"), MB_OK);
 		return;

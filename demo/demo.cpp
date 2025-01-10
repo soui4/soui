@@ -85,10 +85,16 @@
 #define INIT_R_DATA
 #include "res/resource.h"
 
+#ifdef _WIN32
+#define SLASH '\\'
+#else
+#define SLASH '/'
+#endif//_WIN32
+
 static std::tstring getSourceDir() {
 	SStringA file(__FILE__);
-	file = file.Left(file.ReverseFind('/'));
-	file = file.Left(file.ReverseFind('/'));
+    file = file.Left(file.ReverseFind(SLASH));
+    file = file.Left(file.ReverseFind(SLASH));
 	SStringT fileT = S_CA2T(file);
 
 	return fileT.c_str();
@@ -289,12 +295,14 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->InitXmlNamedID((const LPCWSTR*)&R.name, (const int*)&R.id, sizeof(R.id) / sizeof(int));
 
 		//将程序的运行路径修改到demo所在的目录
-#ifdef _DEBUG
-		SStringT strResDir = theApp->GetAppDir();
-		SetCurrentDirectory(strResDir);
-		//SOUI系统总是从appdir去查找资源
-		theApp->SetAppDir(strResDir);
+#ifdef _WIN32
+        std::tstring appDir = getSourceDir() + _T("\\demo");
+#else
+        std::tstring appDir = getSourceDir() + _T("/demo");
 #endif
+        theApp->SetAppDir(appDir.c_str());
+        SetCurrentDirectory(appDir.c_str());
+
 #ifdef _WIN32
 		//加载系统资源
 #if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
@@ -347,11 +355,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		Zip7File(&param,pRenderFactory, _T("uires.zip"), "souizip");
 		bLoaded = pResProvider->Init((WPARAM)&param, 0);
 		SASSERT(bLoaded);
-#endif
-#else
-		std::tstring srcDir = getSourceDir();
-		theApp->SetAppDir((srcDir + _T("/demo")).c_str());
-		SAutoRefPtr<IResProvider> sysResProvider;
+#endif//RES_TYPE
+#else//_WIN32
+        std::tstring srcDir = getSourceDir();
+        SAutoRefPtr<IResProvider> sysResProvider;
 		sysResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
 		std::tstring sysRes = srcDir + kPath_SysRes;
 		sysResProvider->Init((WPARAM)sysRes.c_str(), 0);
@@ -360,7 +367,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		std::tstring appRes = srcDir + kPath_WxDemoRes;
 		bLoaded = pResProvider->Init((LPARAM)appRes.c_str(), 0);
 		SASSERT(bLoaded);
-#endif
+#endif//_WIN32
 		pRenderFactory = NULL;
 		//将创建的IResProvider交给SApplication对象
 		theApp->AddResProvider(pResProvider);
