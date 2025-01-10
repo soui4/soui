@@ -39,6 +39,7 @@ BOOL SDragWnd::BeginDrag(HBITMAP hBmp, POINT ptHot, COLORREF crKey, BYTE byAlpha
     BITMAP bm;
     GetObject(hBmp, sizeof(bm), &bm);
 
+    #ifdef _WIN32
     if (!s_pCurDragWnd->CreateNative(NULL, WS_POPUP, WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST, 0, 0, bm.bmWidth, bm.bmHeight, 0, 0, NULL))
     {
         delete s_pCurDragWnd;
@@ -65,6 +66,21 @@ BOOL SDragWnd::BeginDrag(HBITMAP hBmp, POINT ptHot, COLORREF crKey, BYTE byAlpha
         s_pCurDragWnd->m_bmp = hBmp;
         s_pCurDragWnd->Invalidate();
     }
+    #else//_WIN32
+
+    DWORD dwExStyle = WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_LAYERED;
+    if (bm.bmBitsPixel == 32)
+        dwExStyle |= WS_EX_COMPOSITED;
+    if (!s_pCurDragWnd->CreateNative(NULL, WS_POPUP, dwExStyle, 0, 0, bm.bmWidth, bm.bmHeight, 0, 0, NULL))
+    {
+        delete s_pCurDragWnd;
+        s_pCurDragWnd = NULL;
+        return FALSE;
+    }
+    s_pCurDragWnd->m_bmp = hBmp;
+    s_pCurDragWnd->SetLayeredWindowAttributes(crKey, byAlpha, dwFlags);
+    s_pCurDragWnd->Invalidate();
+    #endif//_WIN32
     s_pCurDragWnd->m_ptHot = ptHot;
     return TRUE;
 }
