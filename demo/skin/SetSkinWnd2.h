@@ -18,7 +18,6 @@ class CSetSkinWnd :
 	HRESULT OnSkinChangeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL bHandled);
 	
 	void OnColor(IEvtArgs * e);
-	BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 protected:
 	virtual void OnFinalMessage(HWND hWnd) {
 		SHostWnd::OnFinalMessage(hWnd);
@@ -42,9 +41,7 @@ public:
 	EVENT_MAP_END2(SHostWnd)
 
 		BEGIN_MSG_MAP_EX(CSetSkinWnd)
-		MSG_WM_INITDIALOG(OnInitDialog)
 		MESSAGE_HANDLER(g_dwSkinChangeMessage, OnSkinChangeMessage)
-		//MSG_WM_ACTIVATE(OnActivate)
 		CHAIN_MSG_MAP(SHostWnd)
 		REFLECT_NOTIFICATIONS_EX()
 		END_MSG_MAP()

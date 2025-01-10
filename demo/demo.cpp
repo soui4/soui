@@ -349,13 +349,15 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		SASSERT(bLoaded);
 #endif
 #else
+		std::tstring srcDir = getSourceDir();
+		theApp->SetAppDir((srcDir + _T("/demo")).c_str());
 		SAutoRefPtr<IResProvider> sysResProvider;
 		sysResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
-		std::string sysRes = getSourceDir() + kPath_SysRes;
+		std::tstring sysRes = srcDir + kPath_SysRes;
 		sysResProvider->Init((WPARAM)sysRes.c_str(), 0);
 		theApp->LoadSystemNamedResource(sysResProvider);
 		SAutoRefPtr<IResProvider> pResProvider(souiFac.CreateResProvider(RES_FILE));
-		std::string appRes = getSourceDir() + kPath_WxDemoRes;
+		std::tstring appRes = srcDir + kPath_WxDemoRes;
 		bLoaded = pResProvider->Init((LPARAM)appRes.c_str(), 0);
 		SASSERT(bLoaded);
 #endif

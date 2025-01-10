@@ -48,6 +48,7 @@ void CSetSkinWnd::LoadSkinConfigFormXml()
         }
     }
 }
+
 CSetSkinWnd::CSetSkinWnd() :SHostWnd(_T("LAYOUT:dlg_set_skin"))
 {	
 	LoadSkinConfigFormXml();
@@ -63,11 +64,6 @@ void CSetSkinWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
 		DestroyWindow();
 	else
 		SHostWnd::OnActivate(nState, bMinimized, wndOther);
-}
-
-BOOL CSetSkinWnd::OnInitDialog(HWND hWnd, LPARAM lParam)
-{
-	return 0;
 }
 
 CRect CSetSkinWnd::GetMargin(int id)
@@ -90,10 +86,15 @@ void CSetSkinWnd::OnSetSkin(IEvtArgs * e)
 	int nIndex = sender->GetID();
 	SDemoSkin *skin = (SDemoSkin *) GETSKIN(L"demoskinbk",GetScale());
 	SStringT strSkinFile;
-	SStringT strSkinPath = SApplication::getSingleton().GetAppDir() + _T("\\themes\\");
-	strSkinFile.Format(_T("%s%d.png"), strSkinPath, nIndex - 9);
 	SStringT strLoadSkin;
+	#ifdef _WIN32
+	strSkinFile.Format(_T("%s\\themes\\%d.png"), SApplication::getSingleton().GetAppDir().c_str(),nIndex - 9);
 	strLoadSkin.Format(_T("themes\\skin%d"), ((nIndex - 9)%3)+1);
+	#else
+	strSkinFile.Format(_T("%s/themes/%d.png"), SApplication::getSingleton().GetAppDir().c_str(),nIndex - 9);
+	strLoadSkin.Format(_T("themes/skin%d"), ((nIndex - 9)%3)+1);
+	#endif//_WIN32
+
 	SSkinLoader::getSingleton().LoadSkin(strLoadSkin);
 
 	if (GetFileAttributes(strSkinFile) != FILE_ATTRIBUTE_NORMAL)
