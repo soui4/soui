@@ -331,11 +331,7 @@ namespace SOUI
 
 		LOGFONT lf={0};
 		lf.lfHeight=20;
-#ifdef _WIN32
 		_tcscpy(lf.lfFaceName,_T("宋体"));
-#else
-		_tcscpy(lf.lfFaceName, _T("Arial"));
-#endif
 		pRenderFactory->CreateFont(&m_defFont,&lf);
 		SelectObject(m_defFont,NULL);
 
