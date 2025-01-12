@@ -410,27 +410,21 @@ void SDateTimePicker::OnLButtonDown(UINT nFlags, CPoint pt)
         return;
 
     m_wCharNum = 0;
+    Invalidate();
 
     CRect rcBtn;
     GetDropBtnRect(&rcBtn);
     if (!rcBtn.PtInRect(pt)) // 没有点击 按钮
     {
-        __baseCls::OnLButtonDown(nFlags, pt);
-
         EnDateType eSelType = HitTest(pt);
         if (m_eSelDateType != eSelType)
         {
             m_eSelDateType = eSelType;
-            Invalidate();
         }
-
-        return;
+    }else{
+        m_eSelDateType = eDT_NULL;
+        DropDown();
     }
-
-    m_eSelDateType = eDT_NULL;
-    Invalidate();
-
-    DropDown();
 }
 
 void SDateTimePicker::OnMouseMove(UINT nFlags, CPoint pt)
@@ -669,6 +663,9 @@ void SDateTimePicker::CloseUp()
     if (NULL != m_pDropDownWnd)
     {
         m_pDropDownWnd->EndDropDown(IDCANCEL);
+        if(m_eSelDateType == eDT_NULL){
+            ReleaseCapture();
+        }
     }
 }
 
