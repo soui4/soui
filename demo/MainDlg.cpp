@@ -900,17 +900,6 @@ void CMainDlg::OnInitListBox()
 	}
 }
 
-// 
-// void CMainDlg::OnSetSkin(int iSkin)
-// {
-//     SStringW strSkin = SStringW().Format(L"skin_bkimg_%d",iSkin);
-//     SSkinImgList * pSkin = sobj_cast<SSkinImgList>(GETSKIN(strSkin));
-//     SASSERT(pSkin);
-//     COLORREF crAvg = SDIBHelper::CalcAvarageColor(pSkin->GetImage());
-//     FindChildByID(R.id.img_skin_layer)->SetAttribute(L"skin",strSkin);
-//     DoColorize(crAvg);
-// }
-
 void CMainDlg::OnBtnSkin()
 {
 	CSetSkinWnd pSetSkinWnd;
