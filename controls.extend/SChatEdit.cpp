@@ -148,7 +148,12 @@ int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, B
         cfNew.crTextColor = GETCOLOR(xmlText.attribute(L"value").value());
         if (cfNew.crTextColor != CR_INVALID)
         {
+#ifdef _WIN32
             cfNew.crTextColor &= 0x00ffffff;
+#else
+            if ((cfNew.crTextColor&0xff000000)==0)
+                cfNew.crTextColor |= 0xffffff00;
+#endif
             cfNew.dwMask |= CFM_COLOR;
         }
     }
@@ -186,7 +191,13 @@ int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, B
         if (cr != CR_INVALID)
         {
             cfNew.dwMask |= CFM_COLOR;
-            cfNew.crTextColor = cr & 0x00ffffff;
+            #ifdef _WIN32
+            cr &= 0x00ffffff;
+            #else
+            if ((cr & 0xff000000) == 0)
+                cr |= 0xff000000;
+            #endif
+            cfNew.crTextColor = cr ;
         }
     }
     else if (xmlText.name() == KLabelSize)
