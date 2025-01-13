@@ -115,8 +115,14 @@ class SMenuExRoot : public SRootWindow {
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE
     {
         SXmlNode xmlNode(pNode);
-        __baseCls::InitFromXml(&xmlNode);
-        SetWindowText(_T("")); //防止子菜单显示父级菜单项的文本。
+        // 找到根节点，获取在根节点上配置的全局菜单对象属性
+        SXmlNode xmlRoot = xmlNode.root().first_child();
+        if (xmlNode != xmlRoot)
+        {
+            __baseCls::__baseCls::InitFromXml(&xmlRoot); // IObject::InitFromXml
+        }
+        BOOL bRet = __baseCls::InitFromXml(&xmlNode);
+        SetWindowText(_T("")); // 防止子菜单显示父级菜单项的文本。
         return TRUE;
     }
 
