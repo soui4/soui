@@ -12,6 +12,7 @@
 // #define DETOUR_DEBUG 1
 #define DETOURS_INTERNAL
 #include <detours.h>
+#include <assert.h>
 
 #if DETOURS_VERSION != 0x4c0c1   // 0xMAJORcMINORcPATCH
 #error detours.h version mismatch
@@ -849,10 +850,10 @@ BOOL WINAPI DetourFreePayload(_In_ PVOID pvData)
 
     // If you have any doubts about the following code, please refer to the comments in DetourCopyPayloadToProcess.
     HMODULE hModule = DetourGetContainingModule(pvData);
-    DETOUR_ASSERT(hModule != NULL);
+    assert(hModule != NULL);
     if (hModule != NULL) {
         fSucceeded = VirtualFree(hModule, 0, MEM_RELEASE);
-        DETOUR_ASSERT(fSucceeded);
+        assert(fSucceeded);
         if (fSucceeded) {
             hModule = NULL;
         }

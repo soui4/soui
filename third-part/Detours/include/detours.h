@@ -48,7 +48,7 @@
 #include <intsafe.h>
 #pragma warning(pop)
 #endif
-#include <crtdbg.h>
+
 
 // Allow Detours to cleanly compile with the MingW toolchain.
 //
