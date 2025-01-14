@@ -1,18 +1,11 @@
 ﻿#include "stdafx.h"
 #include "SmileyCreateHook.h"
-#if defined(_M_ARM64) || !defined(_WIN32)
-#define Mhook_SetHook(a, b) (0)
-#define Mhook_Unhook(a) (0);
-#else
-#include "mhook.h"
-#endif
-
+#include <detours.h>
 
 typedef HRESULT (STDAPICALLTYPE *_CoCreateInstance)(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFIID riid, LPVOID FAR* ppv);
 
 
-_CoCreateInstance TrueCoCreateInstance = (_CoCreateInstance)GetProcAddress(GetModuleHandle(_T("ole32")),"CoCreateInstance");
-
+static _CoCreateInstance TrueCoCreateInstance = (_CoCreateInstance)GetProcAddress(GetModuleHandle(_T("ole32")),"CoCreateInstance");
 
 
 HRESULT STDAPICALLTYPE HookCoCreateInstance(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFIID riid, LPVOID FAR* ppv)
@@ -45,20 +38,24 @@ HRESULT STDAPICALLTYPE HookProgIDFromCLSID (REFCLSID clsid, LPOLESTR FAR* lplpsz
 
 SmileyCreateHook::SmileyCreateHook(void)
 {
-    if (!Mhook_SetHook((PVOID*)&TrueCoCreateInstance, HookCoCreateInstance))
-    {
-        SASSERT(FALSE);
-    }
-
-    if (!Mhook_SetHook((PVOID*)&TrueProgIDFromCLSID, HookProgIDFromCLSID))
-    {
-        SASSERT(FALSE);
-    }
+#ifdef _WIN32
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourAttach(&(PVOID &)TrueCoCreateInstance, HookCoCreateInstance);
+    DetourAttach(&(PVOID &)TrueProgIDFromCLSID, HookProgIDFromCLSID);
+    LONG error = DetourTransactionCommit();
+    SASSERT(error == 0);
+#endif//_WIN32
 }
 
 SmileyCreateHook::~SmileyCreateHook(void)
 {
-    Mhook_Unhook((PVOID*)&TrueProgIDFromCLSID);
-    Mhook_Unhook((PVOID*)&TrueCoCreateInstance);
-
+#ifdef _WIN32
+    DetourTransactionBegin();
+    DetourUpdateThread(GetCurrentThread());
+    DetourDetach(&(PVOID &)TrueCoCreateInstance, HookCoCreateInstance);
+    DetourDetach(&(PVOID &)TrueProgIDFromCLSID, HookProgIDFromCLSID);
+    LONG error = DetourTransactionCommit();
+    SASSERT(error == 0);
+#endif //_WIN32
 }

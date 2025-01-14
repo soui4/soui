@@ -4,11 +4,8 @@ add_subdirectory(lua-54)
 add_subdirectory(sqlite3)
 
 add_subdirectory(gtest)
-
+add_subdirectory(detours)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-        if(NOT "${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
-                add_subdirectory(mhook)
-        endif()
         message(STATUS "cmake compiler id: ${CMAKE_C_COMPILER_ID}")
         if(CMAKE_C_COMPILER_ID MATCHES "GNU" AND CMAKE_CXX_COMPILER_ID MATCHES "GNU")
                 message(STATUS "Detected MinGW")
