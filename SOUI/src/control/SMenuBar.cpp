@@ -323,7 +323,7 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
             if (SMenuBar::m_pMenuBar->m_ptMouse != pt && SMenuBar::m_pMenuBar->m_iNowMenu != -1)
             {
                 SMenuBar::m_pMenuBar->m_ptMouse = pt;
-                ::ScreenToClient(SMenuBar::m_pMenuBar->m_hWnd, &pt);
+                ::MapWindowPoints(msg.hwnd, SMenuBar::m_pMenuBar->m_hWnd, &pt, 1);
                 int nIndex = SMenuBar::m_pMenuBar->HitTest(pt);
                 if (nIndex != -1)
                 {
@@ -356,6 +356,7 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
                     SMenuBar::m_pMenuBar->m_pNowMenu = menuItem;
                     SMenuBar::m_pMenuBar->m_iNowMenu = nRevIndex;
                     ::PostMessage(SMenuBar::m_pMenuBar->m_hWnd, WM_KEYDOWN, VK_ESCAPE, 0);
+                    ::PostMessage(msg.hwnd, WM_CANCELMODE, 0, 0);
                     menuItem->SetTimer(TIMER_POP, 10);
                     return TRUE;
                 }
