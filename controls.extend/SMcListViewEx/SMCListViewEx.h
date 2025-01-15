@@ -50,13 +50,11 @@ namespace SOUI
 
 #undef INTERFACE
 #define INTERFACE IMcListViewEx
-DEFINE_SGUID(IID_IMcListViewEx,
+DEFINE_GUID(IID_IMcListViewEx,
     0x15398C65, 0x1A58, 0x4074, 0xA5, 0x83, 0xF8, 0x26, 0xF8, 0x21, 0xA8, 0x2F);
 DECLARE_INTERFACE_(IMcListViewEx, IObjRef)
 {
     DECLARE_CLASS_SIID(IID_IMcListViewEx)
-	//DECLARE_INTERFACE_IID_(IMcListViewEx, IMcListView, "15398C65-1A58-4074-A583-F826F821A82F")
-	//{
 	private:
 
 		STDMETHOD_(BOOL, SetAdapter)(THIS_ IMcAdapter * adapter) { return FALSE; }

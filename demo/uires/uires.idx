@@ -26,8 +26,12 @@
 		<file name="CUR_TST" path="image\camera_capture.cur" />
 	</CURSOR>
 	<SMENU>
-		<file name="menu_test" path="xml\menu_test.xml" />
-		<file name="menu_lv" path="xml\menu_lv.xml" />
+		<file name="menu_test" path="smenu\menu_test.xml" />
+		<file name="menu_lv" path="smenu\menu_lv.xml" />
+
+		<file name="menu_file" path="smenu\menu_file.xml" />
+		<file name="menu_edit" path="smenu\menu_edit.xml" />
+		<file name="menu_help" path="smenu\menu_help.xml" />
 	</SMENU>
 	<SMENUEX>
 		<file name="menu_tray" path="xml\menuex_test.xml" />

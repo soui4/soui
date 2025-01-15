@@ -1,4 +1,4 @@
-﻿//stamp:2e2eee14d40f5b95
+﻿//stamp:33fe199815a3e0ae
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -33,6 +33,9 @@
 		struct _SMENU{
 			const TCHAR * menu_test;
 			const TCHAR * menu_lv;
+			const TCHAR * menu_file;
+			const TCHAR * menu_edit;
+			const TCHAR * menu_help;
 			}SMENU;
 		struct _SMENUEX{
 			const TCHAR * menu_tray;
@@ -235,6 +238,9 @@ struct _UIRES UIRES={
 		{
 			_T("SMENU:menu_test"),
 			_T("SMENU:menu_lv"),
+			_T("SMENU:menu_file"),
+			_T("SMENU:menu_edit"),
+			_T("SMENU:menu_help"),
 		},
 		{
 			_T("SMENUEX:menu_tray"),
@@ -539,12 +545,24 @@ struct _R{
 		 const wchar_t * matrix_test;
 		 const wchar_t * mclv_test;
 		 const wchar_t * mclv_test_header;
+		 const wchar_t * menu_about;
+		 const wchar_t * menu_add_group;
 		 const wchar_t * menu_btn_cir;
 		 const wchar_t * menu_btn_ilike;
 		 const wchar_t * menu_btn_next;
 		 const wchar_t * menu_btn_play;
 		 const wchar_t * menu_btn_pre;
 		 const wchar_t * menu_btn_vol;
+		 const wchar_t * menu_clear_group;
+		 const wchar_t * menu_del_group;
+		 const wchar_t * menu_exit;
+		 const wchar_t * menu_export_from_group;
+		 const wchar_t * menu_help;
+		 const wchar_t * menu_import_to_group;
+		 const wchar_t * menu_load_rate_db;
+		 const wchar_t * menu_modify_group;
+		 const wchar_t * menu_open_lib;
+		 const wchar_t * menu_save_lib;
 		 const wchar_t * menu_slider_vol;
 		 const wchar_t * mp_test;
 		 const wchar_t * musiclist;
@@ -784,12 +802,24 @@ struct _R{
 		int matrix_test;
 		int mclv_test;
 		int mclv_test_header;
+		int menu_about;
+		int menu_add_group;
 		int menu_btn_cir;
 		int menu_btn_ilike;
 		int menu_btn_next;
 		int menu_btn_play;
 		int menu_btn_pre;
 		int menu_btn_vol;
+		int menu_clear_group;
+		int menu_del_group;
+		int menu_exit;
+		int menu_export_from_group;
+		int menu_help;
+		int menu_import_to_group;
+		int menu_load_rate_db;
+		int menu_modify_group;
+		int menu_open_lib;
+		int menu_save_lib;
 		int menu_slider_vol;
 		int mp_test;
 		int musiclist;
@@ -1053,12 +1083,24 @@ struct _R R={
 		L"matrix_test",
 		L"mclv_test",
 		L"mclv_test_header",
+		L"menu_about",
+		L"menu_add_group",
 		L"menu_btn_cir",
 		L"menu_btn_ilike",
 		L"menu_btn_next",
 		L"menu_btn_play",
 		L"menu_btn_pre",
 		L"menu_btn_vol",
+		L"menu_clear_group",
+		L"menu_del_group",
+		L"menu_exit",
+		L"menu_export_from_group",
+		L"menu_help",
+		L"menu_import_to_group",
+		L"menu_load_rate_db",
+		L"menu_modify_group",
+		L"menu_open_lib",
+		L"menu_save_lib",
 		L"menu_slider_vol",
 		L"mp_test",
 		L"musiclist",
@@ -1299,12 +1341,24 @@ struct _R R={
 		65674,
 		65550,
 		65551,
+		102,
+		21,
 		65540,
 		65539,
 		65538,
 		65537,
 		65536,
 		65541,
+		24,
+		23,
+		12,
+		34,
+		101,
+		33,
+		11,
+		22,
+		13,
+		14,
 		65542,
 		65626,
 		65580,

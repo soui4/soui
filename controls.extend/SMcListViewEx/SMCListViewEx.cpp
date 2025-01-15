@@ -5,6 +5,9 @@
 
 #pragma warning(disable : 4267 4018 4244)
 
+#include <SInitGuid.h>
+DEFINE_GUID(IID_IMcListViewEx, 0x15398C65, 0x1A58, 0x4074, 0xA5, 0x83, 0xF8, 0x26, 0xF8, 0x21, 0xA8, 0x2F);
+
 
 #ifndef min
 #define  min(a,b) a<b?a:b

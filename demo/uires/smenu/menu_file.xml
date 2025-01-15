@@ -1,0 +1,8 @@
+﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="180">
+	<item name="menu_load_rate_db" id="11">加载词频数据词库</item>
+  <sep/>
+  <item name="menu_open_lib" id="13">打开词库</item>
+  <item name="menu_save_lib" id="14">保存词库</item>
+	<sep/>
+	<item name="menu_exit" id="12">退出(&X)</item>
+</menu>

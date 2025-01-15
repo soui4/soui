@@ -223,27 +223,37 @@
 			</window>
 			<chatedit name="re_gifhost" pos="5,[5,-5,-5" bkgndBlend="1" class="cls_edit" sbFadeFrames="30" enableDragdrop="1" multiLines="1" vscrollBar="1"  wordWrap="1" autoVscroll="1" hscrollBar="0" wantReturn="1" wantTab="1" maxBuf="6400000" rtf="rtf:rtf_test" />
 		</page>
-		<page title="buttons">
-			<imgbtn name="btn_msgbox" pos="10,40" width="200" height="40" accel="ctrl+alt+f9" font="bold:1" skin="win10btn" animate="1">show msg box</imgbtn>
-			<text pos="10,[5">press "ctrl+alt+f9" to activate the msgbox button</text>
-			<link pos="10,130" maxWidth="100" class="cls_btn_weblink" dotted="1" href="www.ui520.cn">www.ui520.cn</link>
-			<img pos="10,[10,@100,@100" skin="skin_page_icons" iconIndex="2" tip="img tip" msgTransparent="0" />
-			<text pos="10,[5" multiLines="1">the image show how to handle message in SImageWnd,\n you can do it by simply setting msgTransparent to 0</text>
-			<window pos="10,[5,@100,@30" class="cls_edit" trackMouseEvent="1">
-				<edit pos="0,0,-16,-0" name="edit_spin" notifyChange="1" margin-x="0" margin-y="0" />
-				<spinButton pos="[0,0,-0,-0" max="100" min="1" value="31" buddy="edit_spin" />
+		<page title="buttons" layout="vbox">
+			<menubar size="-2,30">
+				<btnStyle2 skin="SKIN_MENU_BTN" />
+				<menus>
+					<menuItem src="SMENU:MENU_FILE">文件(&F)</menuItem>
+					<menuItem src="SMENU:MENU_EDIT">编辑(&E)</menuItem>
+					<menuItem src="SMENU:MENU_HELP">帮助(&H)</menuItem>
+				</menus>
+			</menubar>
+			<window size="-2,0" weight="1">
+				<imgbtn name="btn_msgbox" pos="10,40" width="200" height="40" accel="ctrl+alt+f9" font="bold:1" skin="win10btn" animate="1">show msg box</imgbtn>
+				<text pos="10,[5">press "ctrl+alt+f9" to activate the msgbox button</text>
+				<link pos="10,130" maxWidth="100" class="cls_btn_weblink" dotted="1" href="www.ui520.cn">www.ui520.cn</link>
+				<img pos="10,[10,@100,@100" skin="skin_page_icons" iconIndex="2" tip="img tip" msgTransparent="0" />
+				<text pos="10,[5" multiLines="1">the image show how to handle message in SImageWnd,\n you can do it by simply setting msgTransparent to 0</text>
+				<window pos="10,[5,@100,@30" class="cls_edit" trackMouseEvent="1">
+					<edit pos="0,0,-16,-0" name="edit_spin" notifyChange="1" margin-x="0" margin-y="0" />
+					<spinButton pos="[0,0,-0,-0" max="100" min="1" value="31" buddy="edit_spin" />
+				</window>
+				<button pos="[0,{0,@100,@30" name="btn_lrc">LRC</button>
+				<roundImg pos="[10,{0,@50,@50" name="img_round" cornerSize="0" skin="skin_avatar_high" />
+				<roundImg pos="[10,{0,@50,@50" name="img_round2" cornerSize="10" skin="skin_avatar_high" />
+				<roundWnd pos="[10,{0,@50,@50" name="img_round3" cornerSize="20">
+					<img pos="0,0,-0,-0" skin="skin_avatar_high"/>
+					<button pos="0,-20,-0,-0" text="hello"/>
+				</roundWnd>
+				<button.link pos="[10,{0,@-1,@30" name="btn_tip">提示窗口演示</button.link>
+				<hr pos="10,[20,-10,@2" lineStyle="dashdotdot" mode="horizontal" lineColor="#ff0000" />
+				<hr pos="10,{0,-10,-10" lineStyle="dash" mode="tilt" lineColor="#00ff00" />
+				<hr pos="10,{0,@2,-10" lineStyle="solid" mode="vertical" lineColor="#0000ff" lineSize="2" />
 			</window>
-			<button pos="[0,{0,@100,@30" name="btn_lrc">LRC</button>
-			<roundImg pos="[10,{0,@50,@50" name="img_round" cornerSize="0" skin="skin_avatar_high" />
-      		<roundImg pos="[10,{0,@50,@50" name="img_round2" cornerSize="10" skin="skin_avatar_high" />
-      		<roundWnd pos="[10,{0,@50,@50" name="img_round3" cornerSize="20">
-        		<img pos="0,0,-0,-0" skin="skin_avatar_high"/>
-        		<button pos="0,-20,-0,-0" text="hello"/>
-      		</roundWnd>
-			<button.link pos="[10,{0,@-1,@30" name="btn_tip">提示窗口演示</button.link>
-			<hr pos="10,[20,-10,@2" lineStyle="dashdotdot" mode="horizontal" lineColor="#ff0000" />
-			<hr pos="10,{0,-10,-10" lineStyle="dash" mode="tilt" lineColor="#00ff00" />
-			<hr pos="10,{0,@2,-10" lineStyle="solid" mode="vertical" lineColor="#0000ff" lineSize="2" />
 		</page>
 		<page title="radiobox">
 			<group pos="10,10,@200,@90">
