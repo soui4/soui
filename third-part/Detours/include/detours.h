@@ -7,11 +7,12 @@
 //  Copyright (c) Microsoft Corporation.  All rights reserved.
 //
 
-#pragma once
 #ifndef _DETOURS_H_
 #define _DETOURS_H_
 
 #define DETOURS_VERSION     0x4c0c1   // 0xMAJORcMINORcPATCH
+
+#ifdef _WIN32 //only for windows
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -1228,6 +1229,7 @@ BOOL WINAPI DetourAreSameGuid(_In_ REFGUID left, _In_ REFGUID right);
 #endif // DETOURS_INTERNAL
 #endif // __cplusplus
 
+#endif //_WIN32
 #endif // _DETOURS_H_
 //
 ////////////////////////////////////////////////////////////////  End of File.

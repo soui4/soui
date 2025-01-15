@@ -162,8 +162,8 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SComboBox>();
     objFactory->TplRegisterFactory<SComboView>();
     objFactory->TplRegisterFactory<SCaption>();
-#ifdef _WIN32
     objFactory->TplRegisterFactory<SMenuBar>();
+#ifdef _WIN32
     objFactory->TplRegisterFactory<SActiveX>();
 #endif//_WIN32
 }
