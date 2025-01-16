@@ -309,7 +309,7 @@ class SOUI_EXP SWindow
     STDMETHOD_(IPathS *, GetWindowPath)(THIS) SCONST OVERRIDE;
 
     STDMETHOD_(BOOL, SetTimer)(THIS_ char id, UINT uElapse) OVERRIDE;
-    STDMETHOD_(void, KillTimer)(THIS_ char id) OVERRIDE;
+    STDMETHOD_(BOOL, KillTimer)(THIS_ char id) OVERRIDE;
 
     STDMETHOD_(SWND, GetCapture)(THIS) SCONST OVERRIDE;
     STDMETHOD_(SWND, SetCapture)(THIS) OVERRIDE;

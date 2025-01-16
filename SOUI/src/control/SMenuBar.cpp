@@ -118,6 +118,7 @@ UINT SMenuBarItem::PopMenu()
         m_pHostMenu->m_iNowMenu = -1;
         return iRet;
     }
+    SSLOGI()<<"###quit menu and kill timer for "<<m_pHostMenu->m_iNowMenu;
     m_pHostMenu->m_pNowMenu->KillTimer(TIMER_POP);
     m_pHostMenu->m_iNowMenu = -1;
     m_pHostMenu->m_pNowMenu = NULL;
@@ -163,9 +164,11 @@ void SMenuBarItem::OnTimer(char timerID)
     {
         if (!m_pHostMenu->m_bIsShow)
         {
-            PopMenu();
             KillTimer(timerID);
+            PopMenu();
         }
+    }else{
+        SetMsgHandled(FALSE);
     }
 }
 
@@ -332,8 +335,13 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
                     {
                         SMenuBar::m_pMenuBar->m_pNowMenu = menuItem;
                         SMenuBar::m_pMenuBar->m_iNowMenu = nIndex;
-                        ::PostMessage(msg.hwnd, WM_CANCELMODE, 0, 0);
-                        menuItem->SetTimer(TIMER_POP, 10);
+                        ::PostMessage(msg.hwnd, WM_CANCELMODE, 0, 0);//quit current popup menu.
+                        //kill all timer now.
+                        for(size_t i=0;i<SMenuBar::m_pMenuBar->m_lstMenuItem.GetCount();i++){
+                            SMenuBar::m_pMenuBar->m_lstMenuItem[i]->KillTimer(TIMER_POP);
+                        }
+                        menuItem->SetTimer(TIMER_POP, 10);//delay popup new menu.
+                        SSLOGI()<<"###set timer for "<< nIndex;
                         return TRUE;
                     }
                 }
@@ -344,7 +352,35 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
         {
             TCHAR vKey = (TCHAR)msg.wParam;
             if (SMenuBar::m_pMenuBar->m_iNowMenu == -1)
-                return TRUE;
+                break;
+            if(vKey != VK_LEFT && vKey != VK_RIGHT)
+                break;
+            SMenuBarItem *pNowMenu = SMenuBar::m_pMenuBar->m_pNowMenu;
+            SASSERT(pNowMenu);
+            int selItem = -1;
+            HMENU hSubMenu = 0;
+            for(int i=0;i<GetMenuItemCount(pNowMenu->m_hMenu);i++){
+                MENUITEMINFO mii = {0};
+                mii.cbSize = sizeof(MENUITEMINFO);
+                mii.fMask = MIIM_STATE|MIIM_SUBMENU;
+                GetMenuItemInfo(pNowMenu->m_hMenu, i, TRUE, &mii);
+                if (mii.fState & MF_HILITE)
+                {
+                    selItem = i;
+                    hSubMenu = mii.hSubMenu;
+                    break;
+                }
+            }
+            if(selItem!=-1 && hSubMenu){
+                BOOL isMenuExpended = IsWindowVisible((HWND)hSubMenu);
+                if(isMenuExpended && vKey == VK_LEFT){
+                    return FALSE;
+                }
+                if(!isMenuExpended && vKey==VK_RIGHT)
+                {
+                    return FALSE;
+                }
+            }
             if (vKey == VK_LEFT)
             {
                 int nRevIndex = SMenuBar::m_pMenuBar->m_iNowMenu - 1;

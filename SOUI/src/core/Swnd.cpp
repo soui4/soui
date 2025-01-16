@@ -479,10 +479,10 @@ BOOL SWindow::SetTimer(char id, UINT uElapse)
     return (BOOL)::SetTimer(GetContainer()->GetHostHwnd(), DWORD(timerID), uElapse, NULL);
 }
 
-void SWindow::KillTimer(char id)
+BOOL SWindow::KillTimer(char id)
 {
     STimerID timerID(m_swnd, id);
-    ::KillTimer(GetContainer()->GetHostHwnd(), DWORD(timerID));
+    return ::KillTimer(GetContainer()->GetHostHwnd(), DWORD(timerID));
 }
 
 SWND SWindow::GetSwnd() const
