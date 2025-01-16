@@ -499,6 +499,7 @@ void SListBox::OnLButtonUp(UINT nFlags, CPoint pt)
 
 void SListBox::OnLButtonDbClick(UINT nFlags, CPoint pt)
 {
+    __baseCls::OnLButtonDbClick(nFlags,pt);
     m_iHoverItem = HitTest(pt);
     if (m_iHoverItem != m_iSelItem)
         NotifySelChange(m_iSelItem, m_iHoverItem);

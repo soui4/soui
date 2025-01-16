@@ -2095,6 +2095,11 @@ void SWindow::OnLButtonDown(UINT nFlags, CPoint pt)
     ModifyState(WndState_PushDown, 0, TRUE);
 }
 
+void SWindow::OnLButtonDbClick(UINT nFlags, CPoint point)
+{
+    OnLButtonDown(nFlags,point);
+}
+
 void SWindow::OnLButtonUp(UINT nFlags, CPoint pt)
 {
     ReleaseCapture();

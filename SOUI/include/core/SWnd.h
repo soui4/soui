@@ -1061,6 +1061,8 @@ class SOUI_EXP SWindow
 
     void OnLButtonDown(UINT nFlags, CPoint pt);
 
+    void OnLButtonDbClick(UINT nFlags, CPoint point);
+    
     void OnLButtonUp(UINT nFlags, CPoint pt);
 
     void OnRButtonDown(UINT nFlags, CPoint point);
@@ -1097,6 +1099,7 @@ class SOUI_EXP SWindow
         MESSAGE_RANGE_HANDLER_EX(WM_LBUTTONDOWN, WM_MBUTTONDBLCLK, OnMouseClick)
         MSG_WM_LBUTTONDOWN(OnLButtonDown)
         MSG_WM_LBUTTONUP(OnLButtonUp)
+        MSG_WM_LBUTTONDBLCLK(OnLButtonDbClick)
         MSG_WM_RBUTTONDOWN(OnRButtonDown)
         MSG_WM_RBUTTONUP(OnRButtonUp)
         MSG_WM_MOUSEMOVE(OnMouseMove)
