@@ -57,7 +57,7 @@ ISkinObj *SSkinPool::_LoadSkin(SXmlNode xmlSkin, int nScale)
     }
     else
     {
-        SASSERT_FMTW(FALSE, L"load skin error,type=%s,name=%s", strTypeName.c_str(), strSkinName.c_str());
+        SSLOGFMTW(L"load skin error,type=%s,name=%s", strTypeName.c_str(), strSkinName.c_str());
     }
     return pSkin;
 }

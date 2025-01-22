@@ -1,8 +1,7 @@
 add_subdirectory(zlib)
-add_subdirectory(png)
 add_subdirectory(lua-54)
 add_subdirectory(sqlite3)
-
+add_subdirectory(pbl_aupng)
 add_subdirectory(gtest)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
         message(STATUS "cmake compiler id: ${CMAKE_C_COMPILER_ID}")

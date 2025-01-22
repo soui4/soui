@@ -408,7 +408,6 @@ void CMainDlg::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 
 void CMainDlg::OnShellTrayNotify(IEvtArgs * e)
 {
-	#ifdef _WIN32
 	EventTrayNotify *e2 = sobj_cast<EventTrayNotify>(e);
 	SShellTray *pTray = sobj_cast<SShellTray>(e->Sender());
 	switch(e2->lp)
@@ -439,7 +438,6 @@ void CMainDlg::OnShellTrayNotify(IEvtArgs * e)
 		}
 		break;
 	}
-	#endif//_WIN32
 }
 
 

@@ -3,10 +3,8 @@
 #include <helper/SplitString.h>
 #include <interface/SImgDecoder-i.h>
 #include <interface/SRender-i.h>
-
-using namespace Gdiplus;
-#pragma comment(lib,"gdiplus.lib")
-
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 namespace SOUI
 {
 
@@ -44,116 +42,68 @@ namespace SOUI
 
 int SSkinGif::LoadFromFile( LPCTSTR pszFileName )
 {
-    if (m_pImg)
-    {
-		delete m_pImg;
-    }
-    m_pImg = Bitmap::FromFile(S_CT2W(pszFileName));
-    if(!m_pImg) return 0;
-    if(m_pImg->GetLastStatus() != Gdiplus::Ok)
-    {
-        delete m_pImg;
-		m_pImg = NULL;
+    FILE *f = _tfopen(pszFileName, _T("rb"));
+    if (!f)
         return 0;
-    }
+    fseek(f, 0, SEEK_END);
+    LONG len = ftell(f); 
+    fseek(f, 0, SEEK_SET);
+    char *buf = (char*)malloc(len);
+    fread(buf, 1, len, f);
+    int ret = LoadFromMemory(buf, len);
+    fclose(f);
+    return ret;
+}
 
-    LoadFromGdipImage(m_pImg);
-    return m_nFrames;
+static void swap_rb_and_premultiply_alpha(unsigned char *pdata, int nWid, int nHei)
+{
+    // swap rgba to bgra and do premultiply
+    BYTE *p = pdata;
+    int pixel_count = nWid * nHei;
+    for (int i = 0; i < pixel_count; ++i)
+    {
+        stbi_uc a = p[3];
+        stbi_uc t = p[0];
+        if (a)
+        {
+            p[0] = (p[2] * a) / 255;
+            p[1] = (p[1] * a) / 255;
+            p[2] = (t * a) / 255;
+        }
+        else
+        {
+            memset(p, 0, 4);
+        }
+        p += 4;
+    }
 }
 
 int SSkinGif::LoadFromMemory( LPVOID pBuf,size_t dwSize )
 {
-    HGLOBAL hMem = ::GlobalAlloc(GMEM_FIXED, dwSize);
-    BYTE* pMem = (BYTE*)::GlobalLock(hMem);
+    int width, height, frames=0, comp;
+    int *delays = NULL;
+    unsigned char *data = stbi_load_gif_from_memory((const stbi_uc *)pBuf, dwSize, &delays, &width, &height, &frames, & comp, STBI_rgb_alpha);
 
-    memcpy(pMem, pBuf, dwSize);
-
-    IStream* pStm = NULL;
-    ::CreateStreamOnHGlobal(hMem, TRUE, &pStm);
-	if (m_pImg)
-	{
-		delete m_pImg;
-	}
-	m_pImg = Gdiplus::Bitmap::FromStream(pStm);
-	if (!m_pImg) return 0;
-	if (m_pImg->GetLastStatus() != Gdiplus::Ok)
+    if (data == NULL || frames==0)
     {
-        pStm->Release();
-        ::GlobalUnlock(hMem);
-		delete m_pImg;
-		m_pImg = NULL;
-        return 0;
+        printf("Failed to load image\n");
+        return 1;
     }
-
-    LoadFromGdipImage(m_pImg);
-
+    m_pFrames = new SAniFrame[frames];
+    unsigned char *p = data;
+    for (int i = 0; i < frames; i++)
+    {
+        m_pFrames[i].nDelay = delays[i]/10;
+        GETRENDERFACTORY->CreateBitmap((IBitmapS **)&m_pFrames[i].pBmp);
+        swap_rb_and_premultiply_alpha(p, width, height);
+        m_pFrames[i].pBmp->Init(width, height, p);
+        p += (width * height * 4);
+    }
+    free(delays);
+    stbi_image_free(data);
+    m_nFrames = frames;
     return m_nFrames;
 }
-
-int SSkinGif::LoadFrame(int i, Gdiplus::Bitmap * pImage) const
-{
-    if (m_pFrames && i < m_nFrames)
-    {		
-		pImage->SelectActiveFrame(&FrameDimensionTime, i);
-		Bitmap bmp(pImage->GetWidth(), pImage->GetHeight(), PixelFormat32bppPARGB);
-		Graphics g(&bmp);
-		g.DrawImage(pImage, 0, 0);
-		Gdiplus::Rect rc;
-		rc.Width = pImage->GetWidth();
-		rc.Height = pImage->GetHeight();
-		BitmapData data;
-		bmp.LockBits(&rc, 0, PixelFormat32bppPARGB, &data);
-		m_pCurFrameBmp->Init(data.Width, data.Height, data.Scan0);
-		bmp.UnlockBits(&data);
-
-		return 0;
-    }
-	return 1;
-}
-	
-int SSkinGif::LoadFromGdipImage( Gdiplus::Bitmap * pImage )
-{
-	if (m_nFrames)
-	{
-		SASSERT(m_pFrames);
-		delete[]m_pFrames;
-		m_pFrames = NULL;
-		m_nFrames = 0;
-	}
-
-    UINT nCount = pImage->GetFrameDimensionsCount();
-
-    GUID* pDimensionIDs = new GUID[nCount];
-    if (pDimensionIDs != NULL)
-    {
-        pImage->GetFrameDimensionsList(pDimensionIDs, nCount);
-        m_nFrames = pImage->GetFrameCount(&pDimensionIDs[0]);
-        delete pDimensionIDs;
-    }
-    m_pFrames = new SAniFrame[m_nFrames];
-    UINT nSize = pImage->GetPropertyItemSize(PropertyTagFrameDelay);
-    SASSERT (nSize);
-
-    Gdiplus::PropertyItem * pPropertyItem = (Gdiplus::PropertyItem *)malloc(nSize);
-    if (pPropertyItem != NULL)
-    {
-        pImage->GetPropertyItem(PropertyTagFrameDelay, nSize, pPropertyItem);
-        for(int i=0;i<m_nFrames;i++)
-        {
-            m_pFrames[i].nDelay = ((long*)pPropertyItem->value)[i];
-        }
-        free(pPropertyItem);
-    }
-
-	GETRENDERFACTORY->CreateBitmap((IBitmapS**)&m_pCurFrameBmp);
-	LoadFrame(0, pImage);
-
-    return m_nFrames;
-}
-
-static ULONG_PTR s_gdipToken=0;
-
-
 
 /**
 * GetFrameDelay
@@ -174,29 +124,16 @@ long SSkinGif::GetFrameDelay(int iFrame) const
 	return nRet;
 }
 
-BOOL SSkinGif::Gdiplus_Startup()
-{
-    GdiplusStartupInput gdiplusStartupInput;
-    Status st=GdiplusStartup(&s_gdipToken, &gdiplusStartupInput, NULL);
-    return st==0;
-
-}
-
-void SSkinGif::Gdiplus_Shutdown()
-{
-    GdiplusShutdown(s_gdipToken);
-}
-
 void SSkinGif::_DrawByIndex2(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
 	if (iState < m_nFrames)
 	{
-		LoadFrame(iState, m_pImg);
+		//LoadFrame(iState, m_pImg);
 		CRect rcSrc(CPoint(0, 0), GetSkinSize());
 		if (m_bEnableScale)
-			pRT->DrawBitmapEx(rcDraw, m_pCurFrameBmp, rcSrc, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
+            pRT->DrawBitmapEx(rcDraw, m_pFrames[m_iFrame].pBmp, rcSrc, m_bTile ? EM_TILE : EM_STRETCH, byAlpha);
 		else
-			pRT->DrawBitmapEx(rcDraw, m_pCurFrameBmp, rcSrc, EM_NULL, byAlpha);
+            pRT->DrawBitmapEx(rcDraw, m_pFrames[m_iFrame].pBmp, rcSrc, EM_NULL, byAlpha);
 	}
 }
 
@@ -205,8 +142,8 @@ SIZE SSkinGif::GetSkinSize() const
 	CSize szRet;
 	if (m_pFrames && m_nFrames>0)
 	{
-		szRet.cx = m_pCurFrameBmp->Width();
-		szRet.cy = m_pCurFrameBmp->Height();
+        szRet.cx = m_pFrames[m_iFrame].pBmp->Width();
+        szRet.cy = m_pFrames[m_iFrame].pBmp->Height();
 	}
 	return szRet;
 }

@@ -171,13 +171,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 	int nRet = 0;
 
 	SouiFactory souiFac;
-	//使用imgdecoder-png图片解码模块演示apng动画
-#ifdef _WIN32
-	SComMgr2* pComMgr = new SComMgr2(_T("imgdecoder-png"));
-#else
-    SComMgr2 *pComMgr = new SComMgr2(_T("libimgdecoder-stb"));
-#endif //_WIN32
-	{
+    SComMgr2 *pComMgr = new SComMgr2();
+    {
 		int nType = MessageBox(GetActiveWindow(), _T("选择渲染类型：\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
 		if (nType == IDCANCEL)
 		{
@@ -240,12 +235,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<S3dWindow>();//
 		theApp->RegisterWindowClass<SFreeMoveWindow>();//
 		theApp->RegisterWindowClass<SClock>();//
-#ifdef _WIN32
-		theApp->RegisterWindowClass<SGifPlayer>();//theApp中增加方法：RegisterWindowClass,替换RegisterWndFactory(TplSWindowFactory<SGifPlayer>())
-		theApp->RegisterSkinClass<SSkinGif>();//注册SkinGif
-		theApp->RegisterSkinClass<SSkinAPNG>();//注册SSkinAPNG
-#endif
-		theApp->RegisterSkinClass<SSkinVScrollbar>();//注册纵向滚动条皮肤
+        theApp->RegisterWindowClass<SGifPlayer>();     // theApp中增加方法：RegisterWindowClass,替换RegisterWndFactory(TplSWindowFactory<SGifPlayer>())
+        theApp->RegisterSkinClass<SSkinAni>();         // 注册SkinGif
+        theApp->RegisterSkinClass<SSkinVScrollbar>();  // 注册纵向滚动条皮肤
 		theApp->RegisterSkinClass<SSkinNewScrollbar>();//注册纵向滚动条皮肤
 		theApp->RegisterSkinClass<SDemoSkin>();
 
@@ -287,9 +279,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<SShellTray>();
 		theApp->RegisterWindowClass<FpsWnd>();
 
-#ifdef _WIN32
-		SSkinGif::Gdiplus_Startup();
-#endif
 
 		//如果需要在代码中使用R::id::namedid这种方式来使用控件必须要这一行代码：2016年2月2日，R::id,R.name是由uiresbuilder 增加-h .\res\resource.h 这2个参数后生成的。
 		theApp->InitXmlNamedID((const LPCWSTR*)&R.name, (const int*)&R.id, sizeof(R.id) / sizeof(int));
@@ -445,14 +434,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		//卸载菜单边框绘制hook
 		SMenuWndHook::UnInstallHook();
 		CUiAnimation::Free();
-
-		SSkinGif::Gdiplus_Shutdown();
 #endif
 	}
 exit:
 	delete pComMgr;
-
-
 	OleUninitialize();
 
 	return nRet;

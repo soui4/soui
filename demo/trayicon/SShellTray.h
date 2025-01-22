@@ -101,7 +101,7 @@ namespace SOUI
 		void OnNotify(UINT uMsg, WPARAM wParam, LPARAM lParam) override;
 		void OnTaskbarRecreate() override;
 
-		void IniNotifyIconData(HWND hOwner, HICON hIcon, UINT flags, LPCTSTR szTip);
+		void InitNotifyIconData(HWND hOwner, HICON hIcon, UINT flags, LPCTSTR szTip);
 	protected:
 		HRESULT OnAttrIcons(SStringW strValue, BOOL bLoading);
 		HRESULT OnAttrTip(SStringW szTip,BOOL bLoading=FALSE);

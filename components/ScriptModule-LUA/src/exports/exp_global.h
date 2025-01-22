@@ -156,11 +156,11 @@ void LuaConnect(IWindow *pWnd, int idEvt,LPCSTR pszFun){
 }
 
 int TrackPopupIMenu(IMenu *pMenu,UINT flag,int x,int y, int scale){
-	return pMenu->TrackPopupMenu(flag,x,y,NULL,NULL,scale);
+	return pMenu->TrackPopupMenu(flag,x,y,0,0,scale);
 }
 
 int TrackPopupIMenuEx(IMenuEx *pMenu,UINT flag,int x,int y, int scale){
-	return pMenu->TrackPopupMenu(flag,x,y,NULL,scale);
+	return pMenu->TrackPopupMenu(flag,x,y,0,scale);
 }
 
 

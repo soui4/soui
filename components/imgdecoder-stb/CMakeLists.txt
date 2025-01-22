@@ -1,8 +1,8 @@
-#add_definitions(-D_CRT_SECURE_NO_WARNINGS) // stb_image.h:4577 don't define _CRT_SECURE_NO_WARNINGS (affects user code)
 
 set(imgdecoder-stb_header
 	imgdecoder-stb.h
-	stb_image.h
+	${PROJECT_SOURCE_DIR}/third-part/stb/stb_image.h
+    ${PROJECT_SOURCE_DIR}/third-part/pbl_aupng/include/upng.h
 )
 
 set(imgdecoder-stb_src
@@ -15,6 +15,7 @@ source_group("Source Files" FILES ${imgdecoder-stb_src})
 if (NOT ENABLE_SOUI_COM_LIB)
     set (imgdecoder-stb_src  ${imgdecoder-stb_src} imgdecoder-stb.rc)
     add_library(imgdecoder-stb SHARED ${imgdecoder-stb_src} ${imgdecoder-stb_header})
+    target_link_libraries(imgdecoder-stb utilities4 aupng)
 else()
     add_library(imgdecoder-stb STATIC ${imgdecoder-stb_src} ${imgdecoder-stb_header})
     target_compile_definitions(imgdecoder-stb
@@ -29,6 +30,8 @@ target_include_directories(imgdecoder-stb
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}
   PRIVATE ${PROJECT_SOURCE_DIR}/utilities/include
   PRIVATE ${PROJECT_SOURCE_DIR}/SOUI/include
+  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/stb
+  PRIVATE ${PROJECT_SOURCE_DIR}/third-part/pbl_aupng/include
 )
 
 set(COM_LIBS ${COM_LIBS} imgdecoder-stb CACHE INTERNAL "com_lib")

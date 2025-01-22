@@ -11,7 +11,7 @@
 #endif 
 
 #ifdef _WIN32
-#define COM_IMGDECODER  _T("imgdecoder-gdip")
+#define COM_IMGDECODER  _T("imgdecoder-stb")
 #define COM_RENDER_GDI  _T("render-gdi")
 #define COM_RENDER_SKIA _T("render-skia")
 #define COM_RENDER_D2D _T("render-d2d")
@@ -56,12 +56,8 @@
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
     #pragma comment(lib,"imgdecoder-wic")
 #endif
-#if(SCOM_MASK&scom_mask_imgdecoder_png)
-    #pragma comment(lib,"png")
-	#pragma comment(lib,"zlib")
-    #pragma comment(lib,"imgdecoder-png")
-#endif
 #if(SCOM_MASK&scom_mask_imgdecoder_stb)
+    #pragma comment(lib, "aupng")
     #pragma comment(lib,"imgdecoder-stb")
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_gdip)
@@ -103,10 +99,6 @@ namespace SOUI
         BOOL SCreateInstance(IObjRef **);
     }
     namespace IMGDECODOR_STB
-    {
-        BOOL SCreateInstance(IObjRef **);
-    }
-    namespace IMGDECODOR_PNG
     {
         BOOL SCreateInstance(IObjRef **);
     }
@@ -178,10 +170,6 @@ public:
 #if(SCOM_MASK&scom_mask_imgdecoder_stb)
         if(m_strImgDecoder == _T("imgdecoder-stb"))
             return IMGDECODOR_STB::SCreateInstance(ppObj);
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_png)
-        if(m_strImgDecoder == _T("imgdecoder-png"))
-            return IMGDECODOR_PNG::SCreateInstance(ppObj);
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_gdip)
         if(m_strImgDecoder == _T("imgdecoder-gdip"))

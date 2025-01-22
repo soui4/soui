@@ -5,8 +5,7 @@ namespace SOUI
 {
     class SSkinAni : public SSkinObjBase
     {
-        DEF_SOBJECT(SSkinObjBase,L"skinani")
-
+    DEF_SOBJECT_EX(SSkinObjBase, L"ani", L"gif|apng")
 		class SAniFrame
 		{
 		public:
@@ -14,18 +13,13 @@ namespace SOUI
 			int                  nDelay;
 		};
     public:
-        SSkinAni():m_nFrames(0),m_iFrame(0),m_bTile(FALSE),m_filterLevel(kLow_FilterLevel)
-        {
+        SSkinAni();
 
-        }
+        virtual ~SSkinAni();
 
-        virtual ~SSkinAni()
-        {
-        }
+		virtual long GetFrameDelay(int iFrame = -1) const;
 
-		virtual long GetFrameDelay(int iFrame=-1) const = 0;
-
-		virtual int LoadFromFile(LPCTSTR pszFileName) { return 0; }
+		virtual int LoadFromFile(LPCTSTR pszFileName);
 
         /**
          * LoadFromMemory
@@ -35,7 +29,11 @@ namespace SOUI
          * @return   int -- APNG帧数，0-失败
          * Describe  
          */    
-        virtual int LoadFromMemory(LPVOID pBits,size_t szData) { return 0; }
+        virtual int LoadFromMemory(LPVOID pBits, size_t szData);
+
+		SIZE GetSkinSize() const;
+
+        int GetStates() const;
 
 		/**
         * ActiveNextFrame
@@ -74,20 +72,7 @@ namespace SOUI
 			_DrawByIndex2(pRT, rcDraw, m_iFrame, byAlpha);
 		}
 
-		virtual void _Scale(ISkinObj *pObj, int nScale)
-		{
-			SSkinObjBase::_Scale(pObj,nScale);
-			SSkinAni *pClone = sobj_cast<SSkinAni>(pObj);
-			pClone->m_nFrames = m_nFrames;
-			pClone->m_iFrame = m_iFrame;
-			pClone->m_filterLevel = m_filterLevel;
-			pClone->m_bTile = m_bTile;
-			int srcScale = GetScale();
-			pClone->m_rcMargin.left = MulDiv(m_rcMargin.left,nScale,srcScale);
-			pClone->m_rcMargin.top = MulDiv(m_rcMargin.top,nScale,srcScale);
-			pClone->m_rcMargin.right = MulDiv(m_rcMargin.right,nScale,srcScale);
-			pClone->m_rcMargin.bottom = MulDiv(m_rcMargin.bottom,nScale,srcScale);
-		}
+		virtual void _Scale(ISkinObj *pObj, int nScale) override;
 
 		LONG GetExpandCode() const{
 			return MAKELONG(m_bTile?EM_TILE:EM_STRETCH,m_filterLevel);
@@ -103,9 +88,12 @@ namespace SOUI
 				ATTR_ENUM_VALUE(L"medium",kMedium_FilterLevel)
 				ATTR_ENUM_VALUE(L"high",kHigh_FilterLevel)
 			ATTR_ENUM_END(m_filterLevel)
+            ATTR_CUSTOM(L"src", OnAttrSrc) // XML文件中指定的图片资源名,(type:name)
 		SOUI_ATTRS_END()
 	protected:
-		virtual void _DrawByIndex2(IRenderTarget *pRT, LPCRECT rcDraw, int iFrame, BYTE byAlpha/*=0xFF*/) const = 0;
+        HRESULT OnAttrSrc(const SStringW &strValue, BOOL bLoading);
+        int _InitImgFrame(IImgX *pImgX);
+		virtual void _DrawByIndex2(IRenderTarget *pRT, LPCRECT rcDraw, int iFrame, BYTE byAlpha/*=0xFF*/) const;
 
 	protected:
 		int m_nFrames;
@@ -113,6 +101,7 @@ namespace SOUI
 		CRect		m_rcMargin;
 		FilterLevel	m_filterLevel;
 		BOOL		m_bTile;
-    };
 
-}
+        SAniFrame *m_pFrames;
+    };
+    }

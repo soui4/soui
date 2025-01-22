@@ -492,7 +492,7 @@ ISkinObj *SUiDef::GetSkin(const SStringW &strSkinName, int nScale)
 
     if (wcscmp(strSkinName, L"") != 0)
     {
-        SASSERT_FMTW(FALSE, L"GetSkin[%s] Failed!", strSkinName.c_str());
+        SSLOGFMTW(L"GetSkin[%s] Failed!", strSkinName.c_str());
     }
     return NULL;
 }

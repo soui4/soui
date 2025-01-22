@@ -260,12 +260,10 @@ namespace SOUI
     {
         UINT nWid,nHei;
         pFrame->GetSize(&nWid,&nHei);
-
         if(m_hBmp) DeleteObject(m_hBmp);
-        void * pBits=NULL;
-        m_hBmp = CreateGDIBitmap(nWid,nHei,&pBits);
+        m_hBmp = CreateGDIBitmap(nWid,nHei,NULL);
         if(!m_hBmp) return E_OUTOFMEMORY;
-        if(!UpdateDIBPixmap(m_hBmp,nWid,nHei,32,nWid*4,pFrame->GetPixels()))
+        if(UpdateDIBPixmap(m_hBmp,nWid,nHei,32,nWid*4,pFrame->GetPixels()))
             m_sz.cx=nWid,m_sz.cy=nHei;
         return S_OK;
     }
@@ -1172,18 +1170,53 @@ namespace SOUI
 
 	HRESULT SRenderTarget_GDI::SetXfermode(int mode,int *pOldMode)
 	{
-		switch (mode)
-		{
-		case kSrcCopy:
-		case kDstInvert:
-		case kSrcInvert:
-		case kSrcAnd:
-			break;
-		default:
-			return E_INVALIDARG;
-		}
+        switch (mode)
+        {
+        case kClear_Mode:
+            mode = R2_EXT_CLEAR;
+            break;
+        case kSrc_Mode:
+            mode = R2_EXT_SOURCE;
+            break;
+        case kDst_Mode:
+            mode = R2_EXT_DEST;
+            break;
+        case kSrcIn_Mode:
+            mode = R2_EXT_IN;
+            break;
+        case kDstIn_Mode:
+            mode = R2_EXT_DEST_IN;
+            break;
+        case kSrcOut_Mode:
+            mode = R2_EXT_OUT;
+            break;
+        case kDstOut_Mode:
+            mode = R2_EXT_DEST_OUT;
+            break;
+        case kSrcOver_Mode:
+            mode = R2_EXT_OVER;
+            break;
+        case kDstOver_Mode:
+            mode = R2_EXT_DEST_OVER;
+            break;
+        case kSrcATop_Mode:
+            mode = R2_EXT_ATOP;
+            break;
+        case kDstATop_Mode:
+            mode = R2_EXT_DEST_ATOP;
+            break;
+        case kXor_Mode:
+            mode = R2_EXT_XOR;
+            break;
+        case kPlus_Mode:
+            mode = R2_EXT_ADD;
+            break;
+        }
 		int nOldMode = ::SetROP2(m_hdc,mode);
-		if(pOldMode) *pOldMode = nOldMode;
+        if (pOldMode)
+        {//todo:hjx oldMode was not been converted.
+            *pOldMode = nOldMode;
+        }
 		return S_OK;
 	}
 

@@ -330,6 +330,7 @@ unsigned long lua_tinker::read ( lua_State *L, int index )
    return ( unsigned long ) lua_tonumber ( L, index );
 }
 
+#ifdef WIN32
 template<>
 HANDLE lua_tinker::read ( lua_State *L, int index )
 {
@@ -365,12 +366,21 @@ HBITMAP lua_tinker::read(lua_State *L, int index)
 {
 	return (HBITMAP)(UINT_PTR)(UINT)lua_tonumber(L, index);
 }
+#else
+template<>
+HGDIOBJ lua_tinker::read(lua_State *L, int index)
+{
+	return (HGDIOBJ)(UINT_PTR)(UINT)lua_tonumber(L, index);
+}
+#endif
 
 template<>
 HINSTANCE lua_tinker::read(lua_State *L, int index)
 {
 	if(lua_isnumber(L,index))
 		return (HINSTANCE)(UINT_PTR)(UINT)lua_tonumber(L, index);
+   else if(lua_isnil(L, index))
+      return nullptr;
 	else
 		return *(HINSTANCE*)lua_touserdata(L, index);
 }
@@ -561,6 +571,8 @@ void lua_tinker::push ( lua_State *L, unsigned long ret )
 {
    lua_pushnumber ( L, ret );
 }
+
+#ifdef WIN32
 template<>
 void lua_tinker::push ( lua_State *L, HANDLE ret )
 {
@@ -596,6 +608,13 @@ void lua_tinker::push(lua_State *L, HBITMAP ret)
 {
 	lua_pushnumber ( L, ( UINT )(UINT_PTR)ret );
 }
+#else
+template<>
+void lua_tinker::push(lua_State *L, HGDIOBJ ret)
+{
+	lua_pushnumber ( L, ( UINT )(UINT_PTR)ret );
+}
+#endif
 
 template<>
 void lua_tinker::push(lua_State *L, HINSTANCE ret)

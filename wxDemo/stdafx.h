@@ -13,8 +13,8 @@
 #include "res/resource.h"
 using namespace SOUI;
 
-#ifdef _WIN32
 #include "trayicon/SShellTray.h"
+#ifdef _WIN32
 #pragma comment(lib, "shlwapi.lib")
 
 #include "FileHelper.h"

@@ -25,7 +25,7 @@ SNSBEGIN
  */
 #undef INTERFACE
 #define INTERFACE IImgFrame
-DECLARE_INTERFACE(IImgFrame)
+DECLARE_INTERFACE_(IImgFrame, IObjRef)
 {
     /**
      * GetSize

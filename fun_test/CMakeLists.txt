@@ -59,10 +59,10 @@ set_target_properties (ipc_svr PROPERTIES
 
 
 
-set(IPC_SVR_CLIENT
+set(IPC_CLIENT
 ipc_client.cpp
 )
-add_executable(ipc_client ${CURRENT_HEADERS} ${IPC_SVR_CLIENT})
+add_executable(ipc_client ${CURRENT_HEADERS} ${IPC_CLIENT})
 target_link_directories(ipc_client PRIVATE ${CMAKE_BINARY_DIR}/bin)
 
 add_dependencies(ipc_client utilities4 soui4 resprovider-zip log4z  render-gdi  render-skia taskloop)

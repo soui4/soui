@@ -35,13 +35,18 @@ SNSBEGIN
     static LPCWSTR GetClassName()      \
     {                                  \
         return WIDESTR(clsName);       \
+    }\
+    static LPCWSTR GetClassAlias()     \
+    {                                  \
+        return NULL;                   \
     }
+
 #else
 #define DEF_OBJ_BASE(clsName, clsType)
 #endif
 
 // SObject Class Name Declaration
-#define DEF_SOBJECT(baseCls, clsName)                   \
+#define DEF_SOBJECT_EX(baseCls, clsName, clsAlise)      \
   public:                                               \
     typedef baseCls __baseCls;                          \
     static LPCWSTR GetClassName()                       \
@@ -51,6 +56,10 @@ SNSBEGIN
     static int GetClassType()                           \
     {                                                   \
         return __baseCls::GetClassType();               \
+    }                                                   \
+    static LPCWSTR GetClassAlise()                      \
+    {                                                   \
+        return clsAlise;                                \
     }                                                   \
                                                         \
     static LPCWSTR BaseClassName()                      \
@@ -68,7 +77,9 @@ SNSBEGIN
         if (wcscmp(GetClassName(), lpszName) == 0)      \
             return TRUE;                                \
         return __baseCls::IsClass(lpszName);            \
-    }
+    }                                                   
+                                                        
+#define DEF_SOBJECT(baseCls, clsName) DEF_SOBJECT_EX(baseCls,clsName,NULL)
 
 typedef struct IObject IObject;
 

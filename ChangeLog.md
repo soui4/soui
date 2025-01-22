@@ -1,4 +1,5 @@
 # ChangeLog file for SOUI
+## 5.0 链接swinx库，实现对跨平台的支持，同时完善了部分控件。
 
 ## 4.0 使用类COM技术导致SOUI核心对象，方便C语言调用。
 ### 3.0升级4.0注意事项
@@ -13,6 +14,7 @@
 9. XxxView的适配器接口有调整，所有方法都统一使用WINAPI调用，原SWindow*的参数替换为SItemPanel*, 原pugi::xml_node替换为SXmlNode。
 10. SHostWnd不直接继承自SWindow，而是只继承SNativeWnd, 需要使用GetRoot()来获取顶层SWindow*
 11. SXmlDoc对象和pugi::xml_document一个区别在于SXmlDoc不继承SXmlNode, 要获取root节点，可以使用SXmlDoc.root()方法。
+12. SStringX.Format在使用%s来将一个SStringX对象做格式化时，不能像3.0一样直接使用SStringX放在参数表里，而是必须要使用SStringX.c_str()
 
 ## 3.0 增加矩阵变换及仿Android动画
 ## 2.0 完善SOUI模板结构框架

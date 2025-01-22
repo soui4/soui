@@ -689,6 +689,7 @@ void SWindow::SetContainer(ISwndContainer *pContainer)
 {
     ASSERT_UI_THREAD();
     OnContainerChanged(m_pContainer, pContainer);
+    m_pContainer = pContainer;
     SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
     while (pChild)
     {

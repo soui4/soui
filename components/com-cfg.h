@@ -40,10 +40,9 @@
 
 #pragma comment(lib,"skia")
 #pragma comment(lib,"zlib")
-#pragma comment(lib,"png")
+#pragma comment(lib, "aupng")
 #pragma comment(lib,"imgdecoder-wic")
 #pragma comment(lib,"imgdecoder-stb")
-#pragma comment(lib,"imgdecoder-png")
 #pragma comment(lib,"imgdecoder-gdip")
 #pragma comment(lib,"render-gdi")
 #pragma comment(lib,"render-skia")
@@ -62,10 +61,6 @@ namespace SOUI
 		BOOL SCreateInstance(IObjRef **);
 	}
 	namespace IMGDECODOR_STB
-	{
-		BOOL SCreateInstance(IObjRef **);
-	}
-	namespace IMGDECODOR_PNG
 	{
 		BOOL SCreateInstance(IObjRef **);
 	}
@@ -127,8 +122,6 @@ namespace SOUI
 				return IMGDECODOR_WIC::SCreateInstance(ppObj);
 			else if (m_strImgDecoder == _T("imgdecoder-stb"))
 				return IMGDECODOR_STB::SCreateInstance(ppObj);
-			else if (m_strImgDecoder == _T("imgdecoder-png"))
-				return IMGDECODOR_PNG::SCreateInstance(ppObj);
 			else if (m_strImgDecoder == _T("imgdecoder-gdip"))
 				return IMGDECODOR_GDIP::SCreateInstance(ppObj);
 			else

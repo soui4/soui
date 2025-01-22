@@ -23,9 +23,8 @@
 #include "res/resource.h"
 
 #include "../controls.extend/SWkeWebkit.h"
-#ifdef _WIN32
+#include "../controls.extend/gif/SSkinAni.h"
 #include "../controls.extend/gif/SGifPlayer.h"
-#endif
 #include "../controls.extend/SIPAddressCtrl.h"
 #include "../controls.extend/SImageMaskWnd.h"
 #include "../controls.extend/SRatingBar.h"

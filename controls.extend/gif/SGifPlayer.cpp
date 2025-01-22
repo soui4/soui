@@ -1,7 +1,6 @@
 #include "stdafx.h"
 #include "SGifPlayer.h"
-#include "SSkinGif.h"
-#include "SSkinAPNG.h"
+#include "SSkinAni.h"
 
 namespace SOUI
 {
@@ -43,12 +42,14 @@ void SGifPlayer::OnShowWindow( BOOL bShow, UINT nStatus )
         if(m_aniSkin->GetFrameDelay()==0)
             m_nNextInterval = 90;
         else
-            m_nNextInterval = m_aniSkin->GetFrameDelay()*10;
+            m_nNextInterval = m_aniSkin->GetFrameDelay();
 	}
 }
 
 void SGifPlayer::OnNextFrame()
 {
+    if (!IsVisible(TRUE))
+        return;
     m_nNextInterval -= 10;
     if(m_nNextInterval <= 0 && m_aniSkin)
     {
@@ -63,11 +64,10 @@ void SGifPlayer::OnNextFrame()
     	}
         m_iCurFrame%=nStates;
         Invalidate();
-
         if(m_aniSkin->GetFrameDelay()==0)
             m_nNextInterval = 90;
         else
-            m_nNextInterval =m_aniSkin->GetFrameDelay()*10;	
+            m_nNextInterval =m_aniSkin->GetFrameDelay();	
     }
 }
 
@@ -107,24 +107,27 @@ BOOL SGifPlayer::PlayAPNGFile( LPCTSTR pszFileName )
 
 BOOL SGifPlayer::_PlayFile( LPCTSTR pszFileName, BOOL bGif )
 {
-	SSkinAni *pGifSkin = (SSkinAni*)SApplication::getSingleton().CreateSkinByName(bGif?SSkinGif::GetClassName():SSkinAPNG::GetClassName());
-	if(!pGifSkin) return FALSE;
-	if(0==pGifSkin->LoadFromFile(pszFileName))
+    SSkinAni *pAniSkin = (SSkinAni *)SApplication::getSingleton().CreateSkinByName(SSkinAni::GetClassName());
+	if(!pAniSkin) return FALSE;
+	if(0==pAniSkin->LoadFromFile(pszFileName))
 	{
-		pGifSkin->Release();
+		pAniSkin->Release();
 		return FALSE;
 	}
 
 	GetContainer()->UnregisterTimelineHandler(this);
 
-	m_aniSkin = pGifSkin;
-	pGifSkin->Release();
+	m_aniSkin = pAniSkin;
+	pAniSkin->Release();
 
 	m_iCurFrame = 0;
-	WCHAR buff[16] = {0};
-	m_aniSkin->SetAttribute(L"enableScale", _itow(m_bEnableScale, buff, 10));
-	m_aniSkin->SetAttribute(L"scale", _itow(m_nScale, buff, 10));
-	m_aniSkin->SetAttribute(L"tile", _itow(m_bTile, buff, 10));
+    SStringW str;
+    str.Format(L"%d", m_bEnableScale);
+    m_aniSkin->SetAttribute(L"enableScale", str);
+    str.Format(L"%d", m_nScale);
+    m_aniSkin->SetAttribute(L"scale", str);
+    str.Format(L"%d", m_bTile);
+    m_aniSkin->SetAttribute(L"tile", str);
 	
 	if(GetLayoutParam()->IsWrapContent(Any))
 	{

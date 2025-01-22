@@ -8,6 +8,7 @@ SNSBEGIN
 typedef struct _SObjectInfo
 {
     wchar_t szName[MAX_OBJNAME];
+    LPCWSTR szAlise;
     int nType;
 } SObjectInfo;
 

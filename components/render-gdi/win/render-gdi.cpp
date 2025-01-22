@@ -298,13 +298,12 @@ namespace SOUI
         pFrame->GetSize(&nWid,&nHei);
 
         if(m_hBmp) DeleteObject(m_hBmp);
-        void * pBits=NULL;
-        m_hBmp = CreateGDIBitmap(nWid,nHei,&pBits);
+        m_hBmp = CreateGDIBitmap(nWid,nHei,NULL);
         if(!m_hBmp) return E_OUTOFMEMORY;
 
         m_sz.cx=nWid,m_sz.cy=nHei;
         const int stride = m_sz.cx*4;
-		UpdateDIBPixmap(m_hBmp,m_sz.cx,m_sz.cy,32,stride,pBits);
+        UpdateDIBPixmap(m_hBmp, m_sz.cx, m_sz.cy, 32, stride, pFrame->GetPixels());
         return S_OK;
     }
 

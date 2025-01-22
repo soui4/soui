@@ -38,6 +38,11 @@
 #include "CAdapter.h"
 #include "CDropTarget.h"
 
+#ifdef _WIN32
+#define SKIN_CFG _T("\\themes\\skin_config.xml")
+#else
+#define SKIN_CFG _T("/themes/skin_config.xml")
+#endif//_WIN32
 #define kLogTag "maindlg"
 
 int CMainDlg::OnCreate( LPCREATESTRUCT lpCreateStruct )
@@ -105,7 +110,7 @@ void SaveSkinInf2File(SkinType skinType, SkinSaveInf &skinSaveInf)
 	SXmlNode rootNode = docSave.root().append_child(L"DEMO_SKIN_CONFIG");
 	SXmlNode childSkinType = rootNode.append_child(L"skinInf");
 	childSkinType.append_attribute(L"type").set_value(skinType);
-	SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + _T("\\themes\\skin_config.xml");
+	SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + SKIN_CFG;
 	switch (skinType)
 	{
 	case color://纯色只有SkinSaveInf的color有效
@@ -135,7 +140,7 @@ bool CMainDlg::SaveSkin(SkinType skinType, SkinSaveInf &skinSaveInf)
 
 void LoadSkinFormXml(SDemoSkin *skin, SkinType *skinType, SkinLoadInf *skininf)
 {
-	SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + _T("\\themes\\skin_config.xml");
+	SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + SKIN_CFG;
 
 	SXmlDoc docLoad;
 	bool bLoad = docLoad.load_file(strSkinConfigPath);

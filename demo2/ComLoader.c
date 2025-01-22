@@ -101,13 +101,9 @@ struct SComInfo s_comInfo[] = {
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
 #pragma comment(lib,"imgdecoder-wic")
 #endif
-#if(SCOM_MASK&scom_mask_imgdecoder_png)
-#pragma comment(lib,"png")
-#pragma comment(lib,"zlib")
-#pragma comment(lib,"imgdecoder-png")
-#endif
 #if(SCOM_MASK&scom_mask_imgdecoder_stb)
-#pragma comment(lib,"imgdecoder-stb")
+#pragma comment(lib, "aupng")
+#pragma comment(lib, "imgdecoder-stb")
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_gdip)
 #pragma comment(lib,"imgdecoder-gdip")

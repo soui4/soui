@@ -6,6 +6,8 @@ include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 include_directories(${PROJECT_SOURCE_DIR}/third-part/wke/include)
 include_directories(${PROJECT_SOURCE_DIR}/third-part/Detours/include)
 include_directories(${PROJECT_SOURCE_DIR}/third-part/nanosvg/src)
+include_directories(${PROJECT_SOURCE_DIR}/third-part/stb)
+
 include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 include_directories(${PROJECT_SOURCE_DIR}/swinx/include)
@@ -28,8 +30,6 @@ set(EXTENDCOTROLS ${EXTENDCOTROLS}
 	${PROJECT_SOURCE_DIR}/controls.extend/SWkeWebkit.h
 	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinAni.h
 	${PROJECT_SOURCE_DIR}/controls.extend/gif/SGifPlayer.h
-	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinGif.h
-	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinAPNG.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SSkinImgFrame3.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SVscrollbar.h
 	${PROJECT_SOURCE_DIR}/controls.extend/SSkinNewScrollBar.h
@@ -77,9 +77,8 @@ set(EXTENDCOTROLS ${EXTENDCOTROLS}
 
 set(EXTENDCOTROLS ${EXTENDCOTROLS}
 	${PROJECT_SOURCE_DIR}/controls.extend/SWkeWebkit.cpp
-#	${PROJECT_SOURCE_DIR}/controls.extend/gif/SGifPlayer.cpp
-#	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinGif.cpp
-#	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinAPNG.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinAni.cpp
+	${PROJECT_SOURCE_DIR}/controls.extend/gif/SGifPlayer.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SSkinImgFrame3.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SIPAddressCtrl.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/propgrid/SPropertyGrid.cpp
@@ -95,10 +94,7 @@ set(EXTENDCOTROLS ${EXTENDCOTROLS}
 	${PROJECT_SOURCE_DIR}/controls.extend/SFadeFrame.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SRadioBox2.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SChromeTabCtrl.cpp
-#	${PROJECT_SOURCE_DIR}/controls.extend/SIECtrl.cpp
-#	${PROJECT_SOURCE_DIR}/controls.extend/SDocHostUIHandler.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SChatEdit.cpp
-#	${PROJECT_SOURCE_DIR}/controls.extend/reole/RichEditOle.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/reole/dataobject.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SScrollText.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SCalendar2.cpp
@@ -118,14 +114,10 @@ set(EXTENDCOTROLS ${EXTENDCOTROLS}
 	${PROJECT_SOURCE_DIR}/controls.extend/SCheckBox2.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SRoundImage.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SRoundWnd.cpp
-#	${PROJECT_SOURCE_DIR}/controls.extend/SStaticGdip.cpp
 )
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 set(EXTENDCOTROLS ${EXTENDCOTROLS}
-	${PROJECT_SOURCE_DIR}/controls.extend/gif/SGifPlayer.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinGif.cpp
-	${PROJECT_SOURCE_DIR}/controls.extend/gif/SSkinAPNG.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SIECtrl.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/SDocHostUIHandler.cpp
 	${PROJECT_SOURCE_DIR}/controls.extend/reole/RichEditOle.cpp
