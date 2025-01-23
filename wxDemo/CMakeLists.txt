@@ -29,6 +29,8 @@ target_link_directories(wxDemo PRIVATE ${CMAKE_BINARY_DIR}/bin)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 add_dependencies(demo soui-sys-resource ${COM_LIBS})
+else()
+target_link_libraries(wxDemo dl)
 endif()
 
 target_link_libraries(wxDemo soui4 utilities4)

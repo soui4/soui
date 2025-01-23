@@ -160,7 +160,7 @@ target_link_libraries(demo soui4 utilities4 detours smiley)
 endif()
 
 else()
-target_link_libraries(demo soui4 utilities4)
+target_link_libraries(demo soui4 utilities4 dl)
 endif()
 if(ENABLE_SOUI_COM_LIB)
 	target_link_libraries(demo d2d1.lib dwrite.lib)
