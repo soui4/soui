@@ -23,8 +23,12 @@ namespace SOUI
         size_t n = 0;
         char* str = (char*)luaL_checklstring(L, -1, &n);
         if(!str)   return 0;
+#ifdef WIN32
         SStringW strW=S_CA2W(str,CP_UTF8);
-        lua_pushlstring(L, (const char*)(LPCWSTR)strW, 2*strW.GetLength()+2);
+        lua_pushlstring(L, (const char*)(LPCWSTR)strW, sizeof(wchar_t)*(strW.GetLength()+1));
+#else
+        lua_pushlstring(L, (const char*)str, n);
+#endif
         return 1;
     }
 
@@ -54,11 +58,19 @@ namespace SOUI
             SOUI_Export_Lua(d_state);
             lua_register(d_state, "A2W", Utf8ToW);
             lua_tinker::def(d_state, "cast_a2w", cast_a2w);
+#ifdef WIN32
             luaL_dostring(d_state,"function L (str)\n return cast_a2w(A2W(str));\nend");//注册一个全局的"L"函数，用来将utf8编码的字符串转换为WCHAR
+#else
+            luaL_dostring(d_state,"function L (str)\n return str;\nend");//注册一个全局的"L"函数，用来将utf8编码的字符串转换为WCHAR
+#endif
 
             lua_register(d_state, "A2T", Utf8ToT);
             lua_tinker::def(d_state, "cast_a2t", cast_a2t);
+#ifdef WIN32
             luaL_dostring(d_state,"function T (str)\n return cast_a2t(A2T(str));\nend");//注册一个全局的"T"函数，用来将utf8编码的字符串转换为TCHAR
+#else
+            luaL_dostring(d_state,"function T (str)\n return str;\nend");//注册一个全局的"T"函数，用来将utf8编码的字符串转换为TCHAR
+#endif
         }
     }
 

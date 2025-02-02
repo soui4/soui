@@ -72,9 +72,10 @@ void SHostWndAttr::Init()
 {
     m_bResizable = FALSE;
     m_bTranslucent = FALSE;
+    m_bAutoShape = FALSE;
     m_bAppWnd = FALSE;
     m_bToolWnd = FALSE;
-    m_byWndType = WT_UNDEFINE;
+    m_wndType = WT_UNDEFINE;
     m_bAllowSpy = TRUE;
     m_bSendWheel2Hover = FALSE;
     m_bHasMsgLoop = TRUE;
@@ -348,31 +349,55 @@ void SHostWnd::_Init()
 
 SHostWnd::~SHostWnd()
 {
-    if (m_pRoot) {
+    if (m_pRoot)
+    {
         m_pRoot->Release();
         m_pRoot = NULL;
     }
     SApplication::getSingletonPtr()->Release();
 }
 
-HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight)
+HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, IXmlNode *xmlInit)
 {
     if (NULL != m_hWnd)
         return m_hWnd;
     UpdateAutoSizeCount(true);
-    HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0, NULL);
+    SXmlDoc xmlDoc;
+    SXmlNode xmlRoot;
+    if (!xmlInit)
+    {
+        xmlRoot = OnGetInitXmlNode(xmlDoc);
+        if (!xmlRoot)
+        {
+            SSLOGW() << "OnGetInitXmlNode return empty xml";
+        }
+        xmlInit = &xmlRoot;
+    }
+    m_hostAttr.Init();
+    m_hostAttr.InitFromXml(xmlInit);
+    if (m_hostAttr.m_bTranslucent)
+    {
+        dwExStyle |= WS_EX_LAYERED;
+#ifndef _WIN32
+        dwExStyle |= WS_EX_COMPOSITED;
+#endif //_WIN32
+    }
+    HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0, xmlInit);
     UpdateAutoSizeCount(false);
     if (!hWnd)
         return NULL;
 
-    if ((nWidth == 0 || nHeight == 0) && (x==0 && y==0))
+    if ((nWidth == 0 || nHeight == 0) && (x == 0 && y == 0))
         CenterWindow(hWndParent);
     return hWnd;
 }
 
 HWND SHostWnd::Create(HWND hWndParent, int x, int y, int nWidth, int nHeight)
 {
-    return CreateEx(hWndParent, WS_CLIPCHILDREN | WS_TABSTOP | WS_OVERLAPPED, 0, x, y, nWidth, nHeight);
+    DWORD dwStyle = WS_CLIPCHILDREN;
+    if (hWndParent)
+        dwStyle |= WS_TABSTOP;
+    return CreateEx(hWndParent, dwStyle, 0, x, y, nWidth, nHeight);
 }
 
 BOOL SHostWnd::onRootResize(IEvtArgs *e)
@@ -447,9 +472,6 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     //为了能够重入，先销毁原有的SOUI窗口
     GetRoot()->SSendMessage(WM_DESTROY);
     m_bFirstShow = TRUE;
-
-    m_hostAttr.Init();
-    m_hostAttr.InitFromXml(pNode);
 
     //加载脚本数据
     SXmlNode xmlNode(pNode);
@@ -526,10 +548,6 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     {
         dwExStyle |= WS_EX_TOOLWINDOW;
     }
-    if (m_hostAttr.m_bTranslucent)
-    {
-        dwExStyle |= WS_EX_LAYERED;
-    }
 
     if (m_hostAttr.m_dwStyle != 0)
         dwStyle = m_hostAttr.m_dwStyle & (~WS_VISIBLE);
@@ -561,10 +579,9 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
 
     GetRoot()->InitFromXml(&xmlRoot);
 
-    if (m_hostAttr.m_bTranslucent)
+    if (IsTranslucent())
     {
-        //todo:hjx
-        #ifdef _WIN32
+#ifdef _WIN32
         if (!m_dummyWnd)
         {
             SetWindowLongPtr(GWL_EXSTYLE, GetWindowLongPtr(GWL_EXSTYLE) | WS_EX_LAYERED);
@@ -581,7 +598,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
                 m_dummyWnd->ShowWindow(SW_SHOWNOACTIVATE);
             }
         }
-        #endif//_WIN32
+#endif //_WIN32
     }
     else if (dwExStyle & WS_EX_LAYERED || GetRoot()->GetAlpha() != 0xFF)
     {
@@ -590,11 +607,17 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             m_dummyWnd->DestroyWindow(); // m_dummyWnd will be set to null in SDummyWnd::OnDestroy
         }
         if (!(dwExStyle & WS_EX_LAYERED))
+        {
+#ifdef _WIN32
             ModifyStyleEx(0, WS_EX_LAYERED);
+#else
+            ModifyStyleEx(0, WS_EX_LAYERED | WS_EX_COMPOSITED);
+#endif //_WIN32
+        }
         SetLayeredWindowAlpha(GetRoot()->GetAlpha());
     }
     m_memRT = NULL;
-    if (m_hostAttr.m_bTranslucent)
+    if (IsTranslucent())
     {
         CRect rcWnd;
         SNativeWnd::GetWindowRect(&rcWnd);
@@ -604,7 +627,6 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     {
         GETRENDERFACTORY->CreateRenderTarget2(&m_memRT, m_hWnd);
     }
-    m_presenter->SetHostTranlucent(m_hostAttr.m_bTranslucent);
 
     BuildWndTreeZorder();
 
@@ -772,7 +794,11 @@ void SHostWnd::OnPaint(HDC dc)
 {
     PAINTSTRUCT ps;
     dc = ::BeginPaint(m_hWnd, &ps);
+#ifdef _WIN32
     OnPrint(m_hostAttr.m_bTranslucent ? NULL : dc);
+#else
+    OnPrint(dc);
+#endif //_WIN32
     ::EndPaint(m_hWnd, &ps);
 }
 
@@ -791,27 +817,24 @@ void SHostWnd::DestroyTooltip(IToolTip *pTooltip) const
     GETTOOLTIPFACTORY->DestroyToolTip(pTooltip);
 }
 
-BOOL SHostWnd::OnLoadLayoutFromResourceID(const SStringT &resId)
+SXmlNode SHostWnd::OnGetInitXmlNode(SXmlDoc &xmlDoc)
 {
-    if (resId.IsEmpty())
-    {
-        SSLOGW() << "resId is empty, return TRUE";
-        return TRUE;
-    }
-    SXmlDoc xmlDoc;
-    if (LOADXML(xmlDoc, resId))
-    {
-        SXmlNode xmlNode = xmlDoc.root().child(L"SOUI");
-        return InitFromXml(&xmlNode);
-    }
-    else
-    {
-        SASSERT_FMT(FALSE, _T("Load layout [%s] Failed"), m_strXmlLayout.c_str());
-        return FALSE;
-    }
+    OnLoadLayoutFromResourceID(xmlDoc);
+    return xmlDoc.root().first_child();
 }
 
-SRootWindow* SHostWnd::CreateRoot() {
+BOOL SHostWnd::OnLoadLayoutFromResourceID(SXmlDoc &xmlDoc)
+{
+    if (m_strXmlLayout.IsEmpty())
+    {
+        SSLOGW() << "resId is empty";
+        return FALSE;
+    }
+    return LOADXML(xmlDoc, m_strXmlLayout);
+}
+
+SRootWindow *SHostWnd::CreateRoot()
+{
     return new SRootWindow(this);
 }
 
@@ -819,7 +842,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
     if (!m_presenter)
     {
-        m_presenter.Attach(new SHostPresenter(GetNative()));
+        m_presenter.Attach(new SHostPresenter(this));
     }
     m_presenter->OnHostCreate();
     m_dwThreadID = GetCurrentThreadId();
@@ -833,7 +856,8 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_szAppSetted.cx = lpCreateStruct->cx;
     m_szAppSetted.cy = lpCreateStruct->cy;
 
-    if (m_pRoot) {
+    if (m_pRoot)
+    {
         m_pRoot->Release();
         m_pRoot = NULL;
     }
@@ -841,7 +865,8 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_pRoot->SetContainer(this);
     SwndContainerImpl::SetRoot(m_pRoot);
 
-    if (!OnLoadLayoutFromResourceID(m_strXmlLayout))
+    IXmlNode *pXmlRoot = (IXmlNode *)lpCreateStruct->lpCreateParams;
+    if (pXmlRoot && !InitFromXml(pXmlRoot))
         return -1;
     GetRoot()->RequestRelayout();
     m_pTipCtrl = CreateTooltip();
@@ -894,7 +919,7 @@ void SHostWnd::OnDestroy()
 
     SHostMgr::getSingletonPtr()->RemoveHostMsgHandler(m_hWnd);
     // exit app. (copy from wtl)
-    if (m_hostAttr.m_byWndType == SHostWndAttr::WT_APPMAIN || (m_hostAttr.m_byWndType == SHostWndAttr::WT_UNDEFINE && (SNativeWnd::GetStyle() & (WS_CHILD | WS_POPUP)) == 0 && (SNativeWnd::GetExStyle() & WS_EX_TOOLWINDOW) == 0))
+    if (m_hostAttr.m_wndType == SHostWndAttr::WT_APPMAIN || (m_hostAttr.m_wndType == SHostWndAttr::WT_UNDEFINE && (SNativeWnd::GetStyle() & (WS_CHILD | WS_POPUP)) == 0 && (SNativeWnd::GetExStyle() & WS_EX_TOOLWINDOW) == 0))
         GetMsgLoop()->Quit(1);
 }
 
@@ -904,22 +929,28 @@ void SHostWnd::OnSize(UINT nType, CSize size)
     SNcPainter::updateSystemButton(GetRoot(), nType);
     if (IsIconic())
         return;
-
     if (size.cx == 0 || size.cy == 0)
         return;
-    if (m_nAutoSizing == 0)
+
+    BOOL bSizeChange = size != m_szPrev;
+    SSLOGI() << "on host size,szPrev=" << m_szPrev.cx << "," << m_szPrev.cy << " size=" << size.cx << "," << size.cy << " sizeChange=" << bSizeChange;
+    if (bSizeChange)
     {
-        m_szAppSetted = size;
+        if (m_nAutoSizing == 0)
+        {
+            m_szAppSetted = size;
+        }
+        m_bResizing = TRUE;
+        m_memRT->Resize(size);
+        BOOL bDirty = GetRoot()->IsLayoutDirty();
+        GetRoot()->OnRelayout(CRect(0, 0, size.cx, size.cy));
+        if (m_nAutoSizing && bDirty)
+            GetRoot()->m_layoutDirty = SWindow::dirty_self;
+        m_presenter->OnHostResize(size);
+        m_bResizing = FALSE;
+        m_szPrev = size;
     }
-    m_bResizing = TRUE;
-    m_memRT->Resize(size);
-    BOOL bDirty = GetRoot()->IsLayoutDirty();
-    GetRoot()->OnRelayout(CRect(0, 0, size.cx, size.cy));
     _Redraw();
-    if (m_nAutoSizing && bDirty)
-        GetRoot()->m_layoutDirty = SWindow::dirty_self;
-    m_presenter->OnHostResize(size);
-    m_bResizing = FALSE;
 }
 
 void SHostWnd::OnMouseMove(UINT nFlags, CPoint point)
@@ -958,6 +989,8 @@ BOOL SHostWnd::OnSetCursor(HWND hwnd, UINT nHitTest, UINT message)
 
 void SHostWnd::OnTimer(UINT_PTR idEvent)
 {
+    if (m_memRT == NULL) // host was destroyed
+        return;
     if (idEvent == kPulseTimer)
     {
         if (!IsIconic())
@@ -1131,12 +1164,6 @@ void SHostWnd::UpdatePresenter(HDC dc, IRenderTarget *pRT, LPCRECT rcInvalid, BY
         m_presenter->OnHostPresent(dc, pRT, rcInvalid, byAlpha);
 }
 
-void SHostWnd::UpdateAlpha(BYTE byAlpha)
-{
-    byAlpha = (BYTE)((int)byAlpha * GetRoot()->GetAlpha() / 255);
-    m_presenter->OnHostAlpha(byAlpha);
-}
-
 void SHostWnd::OnRedraw(LPCRECT rc, BOOL bClip)
 {
     if (!IsWindow())
@@ -1227,17 +1254,18 @@ void SHostWnd::UpdateTooltip()
     }
 }
 
-void SHostWnd::SetToolTip(LPCRECT rc, UINT tipAlign,LPCTSTR pszTip)
+void SHostWnd::SetToolTip(LPCRECT rc, UINT tipAlign, LPCTSTR pszTip)
 {
-	if(!m_pTipCtrl)
-		return;
-	CRect rc2;
-	if(rc){
-		rc2=*rc;
-		ClientToScreen2(&rc2);
-	}
-    
-	m_pTipCtrl->SetToolTip(rc2,tipAlign,pszTip,GetScale());
+    if (!m_pTipCtrl)
+        return;
+    CRect rc2;
+    if (rc)
+    {
+        rc2 = *rc;
+        ClientToScreen2(&rc2);
+    }
+
+    m_pTipCtrl->SetToolTip(rc2, tipAlign, pszTip, GetScale());
 }
 
 void SHostWnd::OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
@@ -1260,7 +1288,8 @@ void SHostWnd::OnGetMinMaxInfo(LPMINMAXINFO lpMMI)
         CSize szMin = m_hostAttr.GetMinSize(GetScale());
         lpMMI->ptMinTrackSize = CPoint(szMin.cx, szMin.cy);
     }
-    else {
+    else
+    {
         SetMsgHandled(FALSE);
     }
 }
@@ -1282,7 +1311,6 @@ static BOOL _BitBlt(IRenderTarget *pRTDst, IRenderTarget *pRTSrc, CRect rcDst, C
 
 BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
 {
-    #ifdef _WIN32
     if (!IsTranslucent())
     {
         return ::AnimateWindow(m_hWnd, dwTime, dwFlags);
@@ -1477,10 +1505,6 @@ BOOL SHostWnd::AnimateHostWindow(DWORD dwTime, DWORD dwFlags)
         }
         return FALSE;
     }
-    #else
-    //todo:hjx
-    return FALSE;
-    #endif
 }
 
 BOOL SHostWnd::RegisterTimelineHandler(ITimelineHandler *pHandler)
@@ -1612,12 +1636,12 @@ void SHostWnd::OnCaptureChanged(HWND wnd)
         return;
     if (wnd != NULL)
     { //如果当前响应了鼠标按下消息，在lost capture时也应该响应弹起消息
-    #ifdef _WIN32
+#ifdef _WIN32
         TCHAR szClassName[30];
         ::GetClassName(wnd, szClassName, 30);
         if (_tcscmp(szClassName, _T("CLIPBRDWNDCLASS")) == 0)
             return; //在窗口内拖动时也可能产生capturechange消息。
-    #endif//_WIN32
+#endif              //_WIN32
     }
     _RestoreClickState();
 }
@@ -1637,6 +1661,9 @@ BOOL SHostWnd::DestroyWindow()
 {
     if (m_AniState != Ani_none)
     {
+        if (m_AniState | Ani_win_exit)
+            return TRUE;
+
         if (m_AniState & Ani_host)
             StopHostAnimation();
         if (m_AniState & Ani_win)
@@ -1691,7 +1718,12 @@ void SHostWnd::OnWindowPosChanging(LPWINDOWPOS lpWndPos)
 
 void SHostWnd::OnWindowPosChanged(LPWINDOWPOS lpWndPos)
 {
-    if (!(lpWndPos->flags & SWP_NOMOVE) && m_dummyWnd)
+    //下面这一行不能删除，否则显示不正常。
+    SetMsgHandled(FALSE);
+    if (!m_dummyWnd)
+        return;
+
+    if (!(lpWndPos->flags & SWP_NOMOVE))
     {
         HMONITOR hMonitor = MonitorFromWindow(m_hWnd, MONITOR_DEFAULTTONEAREST);
         MONITORINFO info = { sizeof(MONITORINFO) };
@@ -1700,17 +1732,14 @@ void SHostWnd::OnWindowPosChanged(LPWINDOWPOS lpWndPos)
             m_dummyWnd->SetWindowPos(NULL, info.rcWork.left, info.rcWork.top, 0, 0, SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
         }
     }
-    if ((lpWndPos->flags & SWP_SHOWWINDOW) && m_dummyWnd)
+    if ((lpWndPos->flags & SWP_SHOWWINDOW))
     {
         m_dummyWnd->SetWindowPos(NULL, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
     }
-    else if ((lpWndPos->flags & SWP_HIDEWINDOW) && m_dummyWnd)
+    else if ((lpWndPos->flags & SWP_HIDEWINDOW))
     {
         m_dummyWnd->SetWindowPos(NULL, 0, 0, 0, 0, SWP_HIDEWINDOW | SWP_NOZORDER | SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_NOSENDCHANGING);
     }
-
-    //下面这一行不能删除，否则显示不正常。
-    SetMsgHandled(FALSE);
 }
 
 LRESULT SHostWnd::OnGetObject(UINT uMsg, WPARAM wParam, LPARAM lParam)
@@ -1764,6 +1793,7 @@ void SHostWnd::_RestoreClickState()
 
 void SHostWnd::_Invalidate(LPCRECT prc)
 {
+#ifdef _WIN32
     if (!m_hostAttr.m_bTranslucent)
     {
         if (prc)
@@ -1775,6 +1805,12 @@ void SHostWnd::_Invalidate(LPCRECT prc)
     {
         m_dummyWnd->Invalidate(FALSE);
     }
+#else
+    if (prc)
+        SNativeWnd::InvalidateRect(prc, FALSE);
+    else
+        SNativeWnd::Invalidate(FALSE);
+#endif //_WIN32
 }
 
 bool SHostWnd::StartHostAnimation(IAnimation *pAni)
@@ -1833,7 +1869,7 @@ void SHostWnd::UpdateAutoSizeCount(bool bInc)
 
 void SHostWnd::EnableIME(BOOL bEnable)
 {
-    #ifdef _WIN32
+#ifdef _WIN32
     if (bEnable)
     {
         HIMC hImc = ImmGetContext(m_hWnd);
@@ -1852,7 +1888,7 @@ void SHostWnd::EnableIME(BOOL bEnable)
             ImmDestroyContext(hImc);
         }
     }
-    #endif
+#endif
 }
 
 void SHostWnd::OnUpdateCursor()
@@ -1892,11 +1928,13 @@ void SHostWnd::OnSysCommand(UINT nID, CPoint lParam)
     {
         DefWindowProc();
     }
-    SetMsgHandled(TRUE);//todo: hjx, drag window may result in msgHandled flag been set to 0, fix it later.
+    SetMsgHandled(TRUE); // todo: hjx, drag window may result in msgHandled flag been set to 0, fix it later.
 }
 
 void SHostWnd::_SetToolTipInfo(const SwndToolTipInfo *info, BOOL bNcTip)
 {
+    if (!m_pTipCtrl)
+        return;
     if (info)
     {
         TIPID id = { info->swnd, info->dwCookie, bNcTip };
@@ -2182,7 +2220,7 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
         }
         else if (m_pHostWnd->GetExStyle() & WS_EX_LAYERED)
         {
-            m_pHostWnd->UpdateAlpha(xform.GetAlpha());
+            m_pHostWnd->GetNative()->SetLayeredWindowAlpha(xform.GetAlpha());
         }
     }
     if (!bMore)

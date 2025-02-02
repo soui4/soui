@@ -747,7 +747,7 @@ PassMsg:
 
 	START_PROFILING
 
-	IUndoBuilder *	publdr;
+	IUndoBuilder *	publdr=NULL;
 	CGenUndoBuilder undobldr(this, UB_AUTOCOMMIT, &publdr);
 
 	switch(msg)
@@ -1112,7 +1112,7 @@ update_kbd:
 		{
 			GETTEXTEX gt;
 
-			gt.cb = wparam * 2;
+			gt.cb = CbOfCch(wparam);
 			gt.flags = GT_USECRLF;
 			gt.codepage = 1200;
 			gt.lpDefaultChar = NULL;
@@ -2010,8 +2010,7 @@ update_kbd:
 			// Freeze the display before loading
 			CFreezeDisplay fd(_pdp);
 
-			lres = _ldte.LoadFromEs(prg, wparam, (EDITSTREAM *)lparam,
-									FALSE, publdr);
+			lres = _ldte.LoadFromEs(prg, wparam, (EDITSTREAM *)lparam,FALSE, publdr);
 
 			if (_fOutlineView)
 			{
@@ -2528,8 +2527,7 @@ HRESULT CTxtEdit::TxDraw(
 		hicTargetDev = hicLocal;			
 	}
 
-	AssertSz(GetMapMode(hdcDraw) == MM_TEXT || GetDeviceCaps(hdcDraw, TECHNOLOGY) == DT_METAFILE,
-	 "RichEdit requires MM_TEXT.");	// REVIEW (keithcu) Clients do (and should) use MM_TEXT
+	//AssertSz(GetMapMode(hdcDraw) == MM_TEXT || GetDeviceCaps(hdcDraw, TECHNOLOGY) == DT_METAFILE, "RichEdit requires MM_TEXT.");	// REVIEW (keithcu) Clients do (and should) use MM_TEXT
 
 	// Preallocate the memory so the set cannnot fail and we don't
 	// have to use the heap. Note that all clean up is handled
@@ -3447,8 +3445,7 @@ HRESULT CTxtEdit::TxGetNaturalSize(
 	pt.x = *pwidth;
 	pt.y = *pheight;
 
-	AssertSz(GetMapMode(hdcDraw) == MM_TEXT || GetDeviceCaps(hdcDraw, TECHNOLOGY) == DT_METAFILE,
-	 "RichEdit requires MM_TEXT.");	// REVIEW (keithcu) Clients do (and should) use MM_TEXT
+	//AssertSz(GetMapMode(hdcDraw) == MM_TEXT || GetDeviceCaps(hdcDraw, TECHNOLOGY) == DT_METAFILE, "RichEdit requires MM_TEXT.");	// REVIEW (keithcu) Clients do (and should) use MM_TEXT
 
 	// Set the extent information needed for zooming
 	_pdp->SetTempZoomDenominator(psizelExtent->cy);

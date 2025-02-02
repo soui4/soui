@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include <core/SNativeWnd.h>
 
@@ -26,10 +26,10 @@ public:
 	void UpdateLineNumberWidth(void);
 
 protected:
-	// ÏÔÊ¾ĞĞºÅ
+	// æ˜¾ç¤ºè¡Œå·
 	void InitScintillaWnd(void);
 	void SetAStyle(int style, COLORREF fore, COLORREF back = RGB(0xff,0xff,0xff), int size = 0, const char* face = NULL);
-	// ÉèÖÃXMLµÄÓï·¨¹æÔò
+	// è®¾ç½®XMLçš„è¯­æ³•è§„åˆ™
 	void SetXmlLexer();
 	void GetRange(int start, int end, char* text);
 

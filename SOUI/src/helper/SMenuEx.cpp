@@ -115,8 +115,14 @@ class SMenuExRoot : public SRootWindow {
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE
     {
         SXmlNode xmlNode(pNode);
-        __baseCls::InitFromXml(&xmlNode);
-        SetWindowText(_T("")); //防止子菜单显示父级菜单项的文本。
+        // 找到根节点，获取在根节点上配置的全局菜单对象属性
+        SXmlNode xmlRoot = xmlNode.root().first_child();
+        if (xmlNode != xmlRoot)
+        {
+            __baseCls::__baseCls::InitFromXml(&xmlRoot); // IObject::InitFromXml
+        }
+        BOOL bRet = __baseCls::InitFromXml(&xmlNode);
+        SetWindowText(_T("")); // 防止子菜单显示父级菜单项的文本。
         return TRUE;
     }
 
@@ -222,7 +228,6 @@ SMenuExItem::SMenuExItem(SMenuEx *pOwnerMenu, ISkinObj *pItemSkin)
 
 void SMenuExItem::OnPaint(IRenderTarget *pRT)
 {
-    SSLOGI()<<"SMenuExItem,"<<m_nID<<" state="<<GetState();
     __baseCls::OnPaint(pRT);
 
     CRect rc = GetClientRect();
@@ -576,7 +581,8 @@ SMenuEx::~SMenuEx(void)
     DestroyMenu();
 }
 
-SRootWindow* SMenuEx::CreateRoot() {
+SRootWindow *SMenuEx::CreateRoot()
+{
     return new SMenuExRoot(this);
 }
 
@@ -596,16 +602,17 @@ BOOL SMenuEx::LoadMenuU8(THIS_ LPCSTR resId)
     return LoadMenu(strResId);
 }
 
+BOOL SMenuEx::OnLoadLayoutFromResourceID(SXmlDoc &souiXml)
+{
+    return TRUE;
+}
+
 BOOL SMenuEx::LoadMenu2(IXmlNode *xmlMenu)
 {
     if (IsWindow())
         return FALSE;
     SXmlNode xmlNode(xmlMenu);
     if (xmlNode.name() != SStringW(SMenuExRoot::GetClassName()) && xmlNode.name() != SStringW(SMenuExItem::GetClassName()))
-        return FALSE;
-
-    HWND hWnd = CreateEx(NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0, 0, 0, 0);
-    if (!hWnd)
         return FALSE;
     SXmlDoc souiXml;
     SXmlNode root = souiXml.root().append_child(L"SOUI");
@@ -614,7 +621,11 @@ BOOL SMenuEx::LoadMenu2(IXmlNode *xmlMenu)
     {
         root.append_attribute(L"trCtx").set_value(xmlNode.attribute(L"trCtx").value());
     }
-    InitFromXml(&root);
+
+    HWND hWnd = CreateEx(NULL, WS_POPUP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0, 0, 0, 0, &root);
+    if (!hWnd)
+        return FALSE;
+
     GetRoot()->InitFromXml(&xmlNode);
     m_hostAttr.SetSendWheel2Hover(true);
     return TRUE;

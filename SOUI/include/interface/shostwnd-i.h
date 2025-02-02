@@ -39,7 +39,7 @@ DECLARE_INTERFACE_(IHostWnd, IObjRef)
      * @brief 获取INativeWnd接口
      * @return INativeWnd*
      */
-    STDMETHOD_(INativeWnd*, GetNative)(THIS) PURE;
+    STDMETHOD_(INativeWnd *, GetNative)(THIS) PURE;
 
     /**
      * @brief 创建窗口
@@ -50,10 +50,11 @@ DECLARE_INTERFACE_(IHostWnd, IObjRef)
      * @param y
      * @param nWidth
      * @param nHeight
+     * @param xmlInit init xml node
      * @return HWND
      */
     STDMETHOD_(HWND, CreateEx)
-    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) PURE;
+    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, IXmlNode *xmlInit DEF_VAL(NULL)) PURE;
 
     /**
      * @brief 创建窗口
@@ -201,8 +202,8 @@ DECLARE_INTERFACE_(IHostWnd, IObjRef)
 DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 {
     //!添加引用
-     /*!
-      */
+    /*!
+     */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     //!释放引用
@@ -219,7 +220,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      * @brief 获取NativeWnd接口
      * @return INativeWnd*
      */
-    STDMETHOD_(INativeWnd*, GetNative)(THIS) PURE;
+    STDMETHOD_(INativeWnd *, GetNative)(THIS) PURE;
 
     //////////////////////////////////////////////////////////////////////////
 
@@ -232,10 +233,11 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      * @param y
      * @param nWidth
      * @param nHeight
+     * @param xmlInit init xml node
      * @return HWND
      */
     STDMETHOD_(HWND, CreateEx)
-    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight) PURE;
+    (THIS_ HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, IXmlNode *xmlInit DEF_VAL(NULL)) PURE;
 
     /**
      * @brief 创建窗口

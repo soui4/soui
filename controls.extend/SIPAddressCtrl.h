@@ -1,10 +1,10 @@
-/********************************************************************
+ï»¿/********************************************************************
     created:	2014/11/03
     created:	3:11:2014   16:13
     filename: 	SIPAddressCtrl.h
-    author:		±ù
+    author:		å†°
 
-    purpose:	SOUI°æµÄIP¿Ø¼þ
+    purpose:	SOUIç‰ˆçš„IPæŽ§ä»¶
 *********************************************************************/
 #pragma once
 
@@ -28,8 +28,6 @@ class SIPAddressCtrl : public SWindow {
     void SetAddress(BYTE nField0, BYTE nField1, BYTE nField2, BYTE nField3);
 
     void SetFieldFocus(WORD nField);
-    void SetFieldRange(int nField, BYTE nLower, BYTE nUpper);
-
   protected:
     void OnPaint(IRenderTarget *pRT);
     LRESULT OnCreate(LPVOID);
@@ -40,7 +38,25 @@ class SIPAddressCtrl : public SWindow {
     MSG_WM_SIZE(OnSize)
     MSG_WM_PAINT_EX(OnPaint)
     SOUI_MSG_MAP_END()
+
+    HRESULT OnAttrField(int iField,const SStringW &strValue, BOOL bLoading);
+
+    HRESULT OnAttrField0(const SStringW &strValue, BOOL bLoading);
+    HRESULT OnAttrField1(const SStringW &strValue, BOOL bLoading);
+    HRESULT OnAttrField2(const SStringW &strValue, BOOL bLoading);
+    HRESULT OnAttrField3(const SStringW &strValue, BOOL bLoading);
+
+    HRESULT OnAttrIP(const SStringW &strValue, BOOL bLoading);
+
+    SOUI_ATTRS_BEGIN()
+        ATTR_CUSTOM(L"field0", OnAttrField0)
+        ATTR_CUSTOM(L"field1", OnAttrField1)
+        ATTR_CUSTOM(L"field2", OnAttrField2)
+        ATTR_CUSTOM(L"field3", OnAttrField3)
+        ATTR_CUSTOM(L"ip", OnAttrIP)
+    SOUI_ATTRS_END()
   private:
     SEditIP *m_editFields[4];
+    BYTE m_ipFields[4];
 };
 } // namespace SOUI

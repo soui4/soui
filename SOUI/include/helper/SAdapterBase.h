@@ -388,19 +388,37 @@ class TvAdatperImpl : public BaseClass {
 template <typename T>
 class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
   public:
-    STreeAdapterBase()
-    {
-        memset(m_rootUserData, 0, sizeof(m_rootUserData));
-    }
-    ~STreeAdapterBase()
-    {
-    }
-
+    typedef void (*FunTvItemDataFreer)(T cb);
     struct ItemInfo
     {
         ULONG_PTR userData[DATA_INDEX_NUMBER];
         T data;
     };
+
+    class TreeDataFreer : public CSTree<ItemInfo>::IDataFreer {
+      public:
+        TreeDataFreer()
+            : m_dataFreer(NULL)
+        {
+        }
+        FunTvItemDataFreer m_dataFreer;
+        void OnDataFree(ItemInfo &data) override
+        {
+            if (m_dataFreer)
+                m_dataFreer(data.data);
+        }
+    };
+
+  public:
+    STreeAdapterBase()
+    {
+        memset(m_rootUserData, 0, sizeof(m_rootUserData));
+        m_tree.SetDataFreer(&m_treeFreer);
+    }
+    ~STreeAdapterBase()
+    {
+        m_tree.DeleteAllItems();
+    }
 
     //获取hItem中的指定索引的数据
     STDMETHOD_(ULONG_PTR, GetItemDataByIndex)(HSTREEITEM hItem, DATA_INDEX idx) const OVERRIDE
@@ -673,8 +691,15 @@ class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
         ii.data = data;
     }
 
+    void SetDataFreer(FunTvItemDataFreer freer)
+    {
+        m_treeFreer.m_dataFreer = freer;
+    }
+
   protected:
     CSTree<ItemInfo> m_tree;
+    TreeDataFreer m_treeFreer;
+
     ULONG_PTR m_rootUserData[DATA_INDEX_NUMBER];
 };
 SNSEND

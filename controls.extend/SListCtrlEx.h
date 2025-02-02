@@ -1,5 +1,5 @@
-/**
- * Copyright (C) 2014-2050 SOUIÍÅ¶Ó(Ë®Ä¾Ö®£©
+ï»¿/**
+ * Copyright (C) 2014-2050 SOUIå›¢é˜Ÿ(æ°´æœ¨ä¹‹ï¼‰
  * All rights reserved.
  *
  * @file       SListCtrlex.h
@@ -8,21 +8,21 @@
  * @author     soui
  * @date       2015-02-05
  *
- * Describe    À©Õ¹ÁĞ±í¿ò
+ * Describe    æ‰©å±•åˆ—è¡¨æ¡†
  */
 #pragma once
 
 #include <core/SPanel.h>
-#include <core/Sitempanel.h>
+#include <core/SItemPanel.h>
 #include <control/SHeaderCtrl.h>
 
 namespace SOUI
 {
 /**
  * @class     SListBox
- * @brief     À©Õ¹ÁĞ±í¿ò
+ * @brief     æ‰©å±•åˆ—è¡¨æ¡†
  *
- * Describe   À©Õ¹ÁĞ±í¿ò
+ * Describe   æ‰©å±•åˆ—è¡¨æ¡†
  */
 #define IDC_LSTCEX_SELECT -300
 class SListCtrlEx
@@ -34,145 +34,145 @@ class SListCtrlEx
 
     /**
      * SListCtrlEx::SListBox
-     * @brief    ¹¹Ôìº¯Êı
+     * @brief    æ„é€ å‡½æ•°
      *
-     * Describe  ¹¹Ôìº¯Êı
+     * Describe  æ„é€ å‡½æ•°
      */
     SListCtrlEx();
 
     /**
      * SListBox::~SListBox
-     * @brief    Îö¹¹º¯Êı
+     * @brief    ææ„å‡½æ•°
      *
-     * Describe  Îö¹¹º¯Êı
+     * Describe  ææ„å‡½æ•°
      */
     virtual ~SListCtrlEx();
 
     /**
      * SListCtrlEx::DeleteAllItems
-     * @brief    É¾³ıËùÓĞ
-     * @param    BOOL bUpdate -- ÊÇ·ñ¸üĞÂ
+     * @brief    åˆ é™¤æ‰€æœ‰
+     * @param    BOOL bUpdate -- æ˜¯å¦æ›´æ–°
      *
-     * Describe  É¾³ıËùÓĞ
+     * Describe  åˆ é™¤æ‰€æœ‰
      */
     void DeleteAllItems(BOOL bUpdate = TRUE);
 
     /**
      * SListCtrlEx::DeleteItem
-     * @brief    É¾³ıÖ¸¶¨Ïî
-     * @param    int iItem -- Ë÷Òı
+     * @brief    åˆ é™¤æŒ‡å®šé¡¹
+     * @param    int iItem -- ç´¢å¼•
      *
-     * Describe  É¾³ıÖ¸¶¨Ïî
+     * Describe  åˆ é™¤æŒ‡å®šé¡¹
      */
     void DeleteItem(int iItem);
 
     /**
      * SListCtrlEx::InsertItem
-     * @brief    ²åÈëĞÂÏî
-     * @param    int iItem -- Ë÷Òı
-     * @param    SXmlNode xmlNode -- xmlÎÄ¼ş
-     * @param    DWORD dwData  --  ¸½¼ÓÊı¾İ
+     * @brief    æ’å…¥æ–°é¡¹
+     * @param    int iItem -- ç´¢å¼•
+     * @param    SXmlNode xmlNode -- xmlæ–‡ä»¶
+     * @param    DWORD dwData  --  é™„åŠ æ•°æ®
      *
-     * Describe  ÔÚÄ³ÏîÖ®ºó²åÈë
+     * Describe  åœ¨æŸé¡¹ä¹‹åæ’å…¥
      */
     int InsertItem(int iItem, SXmlNode xmlNode, LPARAM dwData = 0);
 
     /**
      * SListCtrlEx::InsertItem
-     * @brief    ²åÈëĞÂÏî
-     * @param    int iItem -- Ë÷Òı
-     * @param    LPCWSTR pszXml -- xmlÎÄ¼ş
-     * @param    DWORD dwData  --  ¸½¼ÓÊı¾İ
+     * @brief    æ’å…¥æ–°é¡¹
+     * @param    int iItem -- ç´¢å¼•
+     * @param    LPCWSTR pszXml -- xmlæ–‡ä»¶
+     * @param    DWORD dwData  --  é™„åŠ æ•°æ®
      *
-     * Describe  ÔÚÄ³ÏîÖ®ºó²åÈë
+     * Describe  åœ¨æŸé¡¹ä¹‹åæ’å…¥
      */
     int InsertItem(int iItem, LPCWSTR pszXml, LPARAM dwData = 0);
 
     /**
      * SListCtrlEx::SetCurSel
-     * @brief    ÉèÖÃÑ¡ÖĞÏî
-     * @param    int nIndex -- ´ıÑ¡ÖĞË÷Òı
+     * @brief    è®¾ç½®é€‰ä¸­é¡¹
+     * @param    int nIndex -- å¾…é€‰ä¸­ç´¢å¼•
      *
-     * Describe  ÉèÖÃÑ¡ÖĞÏî
+     * Describe  è®¾ç½®é€‰ä¸­é¡¹
      */
     BOOL SetCurSel(int iItem);
 
     /**
      * SListCtrlEx::EnsureVisible
-     * @brief    ÉèÖÃÄ³ÏîÏÔÊ¾
-     * @param    int nIndex  -- Ë÷Òı
+     * @brief    è®¾ç½®æŸé¡¹æ˜¾ç¤º
+     * @param    int nIndex  -- ç´¢å¼•
      *
-     * Describe  ÉèÖÃÄ³ÏîÏÔÊ¾
+     * Describe  è®¾ç½®æŸé¡¹æ˜¾ç¤º
      */
     void EnsureVisible(int iItem);
 
     /**
      * SListCtrlEx::GetCurSel
-     * @brief    »ñÈ¡µ±Ç°Ñ¡ÖĞÏîË÷Òı
-     * @return   ·µ»Øint
+     * @brief    è·å–å½“å‰é€‰ä¸­é¡¹ç´¢å¼•
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡µ±Ç°Ñ¡ÖĞÏîË÷Òı
+     * Describe  è·å–å½“å‰é€‰ä¸­é¡¹ç´¢å¼•
      */
     int GetCurSel();
 
     /**
      * SListCtrlEx::GetItemPanel
-     * @brief    »ñÈ¡Ö¸¶¨Ïî½á¹¹
-     * @param    int iItem -- Ë÷Òı
-     * @return   ·µ»ØSWindow
+     * @brief    è·å–æŒ‡å®šé¡¹ç»“æ„
+     * @param    int iItem -- ç´¢å¼•
+     * @return   è¿”å›SWindow
      *
-     * Describe  »ñÈ¡Ö¸¶¨ÏîË÷Òı
+     * Describe  è·å–æŒ‡å®šé¡¹ç´¢å¼•
      */
     SWindow *GetItemPanel(int iItem);
 
     /**
      * SListCtrlEx::GetItemData
-     * @brief    »ñÈ¡¸½¼ÓÊı¾İ
-     * @param    int nIndex -- Ñ¡ÏîË÷Òı
-     * @return   ·µ»ØLPARAM
+     * @brief    è·å–é™„åŠ æ•°æ®
+     * @param    int nIndex -- é€‰é¡¹ç´¢å¼•
+     * @return   è¿”å›LPARAM
      *
-     * Describe  »ñÈ¡¸½¼ÓÊı¾İ
+     * Describe  è·å–é™„åŠ æ•°æ®
      */
     LPARAM GetItemData(int iItem);
 
     /**
      * SListCtrlEx::SetItemData
-     * @brief    ÉèÖÃÑ¡Ïî¸½¼ÓÊı¾İ
-     * @param    int nIndex -- Ñ¡ÏîË÷Òı
-     * @param    LPARAM lParam  -- ¸½¼ÓÊı¾İ
-     * @return   ·µ»ØBOOL
+     * @brief    è®¾ç½®é€‰é¡¹é™„åŠ æ•°æ®
+     * @param    int nIndex -- é€‰é¡¹ç´¢å¼•
+     * @param    LPARAM lParam  -- é™„åŠ æ•°æ®
+     * @return   è¿”å›BOOL
      *
-     * Describe  ÉèÖÃÑ¡Ïî¸½¼ÓÊı¾İ
+     * Describe  è®¾ç½®é€‰é¡¹é™„åŠ æ•°æ®
      */
     void SetItemData(int iItem, LPARAM lParam);
 
     /**
      * SListCtrlEx::SetItemCount
-     * @brief    ÉèÖÃÌõÄ¿ÊıÁ¿
-     * @param    int nItems ÌõÄ¿ÊıÁ¿
-     * @param    LPCTSTR pszXmlTemplate ÏÔÊ¾Ê±Ê¹ÓÃµÄXMLÄ£°å£¬
-     *           Îª¿ÕÊ±Ê¹ÓÃXML½Å±¾ÖĞÖ¸¶¨µÄtemplate×Ó½ÚµãÊı¾İ
-     * @return   ÉèÖÃÌõÄ¿ÊıÁ¿
+     * @brief    è®¾ç½®æ¡ç›®æ•°é‡
+     * @param    int nItems æ¡ç›®æ•°é‡
+     * @param    LPCTSTR pszXmlTemplate æ˜¾ç¤ºæ—¶ä½¿ç”¨çš„XMLæ¨¡æ¿ï¼Œ
+     *           ä¸ºç©ºæ—¶ä½¿ç”¨XMLè„šæœ¬ä¸­æŒ‡å®šçš„templateå­èŠ‚ç‚¹æ•°æ®
+     * @return   è®¾ç½®æ¡ç›®æ•°é‡
      *
-     * Describe  ÉèÖÃÑ¡Ïî¸½¼ÓÊı¾İ
+     * Describe  è®¾ç½®é€‰é¡¹é™„åŠ æ•°æ®
      */
     BOOL SetItemCount(int nItems, LPCTSTR pszXmlTemplate = NULL);
 
     /**
      * SListCtrlEx::GetItemCount
-     * @brief    »ñÈ¡ÌõÄ¿ÊıÁ¿
-     * @return   ·µ»Ø int
+     * @brief    è·å–æ¡ç›®æ•°é‡
+     * @return   è¿”å› int
      *
-     * Describe  »ñÈ¡ÌõÄ¿ÊıÁ¿
+     * Describe  è·å–æ¡ç›®æ•°é‡
      */
     int GetItemCount();
 
     /**
      * SListCtrlEx::GetItemHeight
-     * @brief    »ñÈ¡¸ß¶È
-     * @return   ·µ»Øint
+     * @brief    è·å–é«˜åº¦
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡¸ß¶È
+     * Describe  è·å–é«˜åº¦
      */
     int GetItemHeight()
     {
@@ -181,19 +181,19 @@ class SListCtrlEx
 
     /**
      * SListCtrlEx::RedrawItem
-     * @brief    ÖØ»æÑ¡Ïî
-     * @param    int iItem  -- Ë÷Òı
+     * @brief    é‡ç»˜é€‰é¡¹
+     * @param    int iItem  -- ç´¢å¼•
      *
-     * Describe  ÖØ»æÑ¡Ïî
+     * Describe  é‡ç»˜é€‰é¡¹
      */
     void RedrawItem(int iItem);
 
     /**
      * SListCtrlEx::HitTest
-     * @brief    »ñÈ¡Êó±êÏà¹ØĞÅÏ¢
-     * @param    CPoint &pt -- ×ø±ê
+     * @brief    è·å–é¼ æ ‡ç›¸å…³ä¿¡æ¯
+     * @param    CPoint &pt -- åæ ‡
      *
-     * Describe  ×Ô¶¯ĞŞ¸ÄptµÄÎ»ÖÃÎªÏà¶Ôµ±Ç°ÏîµÄÆ«ÒÆÁ¿
+     * Describe  è‡ªåŠ¨ä¿®æ”¹ptçš„ä½ç½®ä¸ºç›¸å¯¹å½“å‰é¡¹çš„åç§»é‡
      */
     int HitTest(CPoint &pt);
 
@@ -233,68 +233,68 @@ class SListCtrlEx
   protected:
     /**
      * SListCtrlEx::UpdatePanelsIndex
-     * @brief    ¸üĞÂË÷Òı
+     * @brief    æ›´æ–°ç´¢å¼•
      * @param    UINT nFirst
      * @param    UINT nLast
      *
-     * Describe  ¸üĞÂË÷Òı
+     * Describe  æ›´æ–°ç´¢å¼•
      */
     void UpdatePanelsIndex(UINT nFirst = 0, UINT nLast = -1);
 
     /**
      * SListCtrlEx::GetItemRect
-     * @brief    »ñÈ¡Ö¸¶¨Î»ÖÃ
-     * @param    int iItem -- Ë÷Òı
-     * @return   ·µ»ØCRect
+     * @brief    è·å–æŒ‡å®šä½ç½®
+     * @param    int iItem -- ç´¢å¼•
+     * @return   è¿”å›CRect
      *
-     * Describe  ¸üĞÂË÷Òı
+     * Describe  æ›´æ–°ç´¢å¼•
      */
     CRect GetItemRect(int iItem) const;
 
     /**
      * SListCtrlEx::OnPaint
-     * @brief    »æÖÆ
-     * @param    IRenderTarget *pRT -- »æÖÆÉè±¸
+     * @brief    ç»˜åˆ¶
+     * @param    IRenderTarget *pRT -- ç»˜åˆ¶è®¾å¤‡
      *
-     * Describe  ÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ¶ˆæ¯å“åº”å‡½æ•°
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
      * SListCtrlEx::OnSize
-     * @brief    ÏûÏ¢ÏìÓ¦º¯Êı
+     * @brief    æ¶ˆæ¯å“åº”å‡½æ•°
      * @param    UINT nType --
      * @param    CSize size --
      *
-     * Describe  »ñÈ¡Ä³ÏîµÃË÷Òı
+     * Describe  è·å–æŸé¡¹å¾—ç´¢å¼•
      */
     void OnSize(UINT nType, CSize size);
 
     /**
      * SListCtrlEx::DrawItem
-     * @brief    »æÖÆ
-     * @param    IRenderTarget *pRT  -- »æÖÆÉè±¸
-     * @param    CRect & rc -- Î»ÖÃ
-     * @param    int iItem -- Ë÷Òı
+     * @brief    ç»˜åˆ¶
+     * @param    IRenderTarget *pRT  -- ç»˜åˆ¶è®¾å¤‡
+     * @param    CRect & rc -- ä½ç½®
+     * @param    int iItem -- ç´¢å¼•
      *
-     * Describe  »æÖÆ
+     * Describe  ç»˜åˆ¶
      */
     virtual void DrawItem(IRenderTarget *pRT, CRect &rcItem, int iItem);
 
     /**
      * SListCtrlEx::CreateChildren
-     * @brief    ´´½¨ĞÂÏî
-     * @param    SXmlNode xmlNode -- xmlÎÄ¼ş
+     * @brief    åˆ›å»ºæ–°é¡¹
+     * @param    SXmlNode xmlNode -- xmlæ–‡ä»¶
      *
-     * Describe  Í¨¹ı½âÎöxmlÎÄ¼ş´´½¨
+     * Describe  é€šè¿‡è§£æxmlæ–‡ä»¶åˆ›å»º
      */
     virtual BOOL CreateChildren(SXmlNode xmlNode);
 
     /**
      * SListCtrlEx::OnUpdateToolTip
-     * @brief    ¸üĞÂÌáÊ¾
-     * @param    CPoint pt --  ¸ĞÓ¦Î»ÖÃ
-     * @param    SwndToolTipInfo & tipInfo --  ÌáÊ¾ĞÅÏ¢
+     * @brief    æ›´æ–°æç¤º
+     * @param    CPoint pt --  æ„Ÿåº”ä½ç½®
+     * @param    SwndToolTipInfo & tipInfo --  æç¤ºä¿¡æ¯
      * @return   BOOL
      *
      * Describe
@@ -303,95 +303,95 @@ class SListCtrlEx
 
     /**
      * SListCtrlEx::NotifySelChange
-     * @brief    ĞŞ¸ÄÑ¡ÖĞÏî
-     * @param    int nOldSel -- ¾ÉÑ¡ÖĞÏî
-     * @param    int nNewSel -- ĞÂÑ¡ÖĞÏî
+     * @brief    ä¿®æ”¹é€‰ä¸­é¡¹
+     * @param    int nOldSel -- æ—§é€‰ä¸­é¡¹
+     * @param    int nNewSel -- æ–°é€‰ä¸­é¡¹
      *
-     * Describe  ĞŞ¸ÄÑ¡ÖĞÏî
+     * Describe  ä¿®æ”¹é€‰ä¸­é¡¹
      */
     void NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox = FALSE);
 
     /**
      * SListCtrlEx::OnMouseEvent
-     * @brief    ×Ô¶¨ÒåÏûÏ¢ÏìÓ¦º¯Êı
-     * @param    UINT uMsg -- Êó±êÏûÏ¢ÀàĞÍ
+     * @brief    è‡ªå®šä¹‰æ¶ˆæ¯å“åº”å‡½æ•°
+     * @param    UINT uMsg -- é¼ æ ‡æ¶ˆæ¯ç±»å‹
      * @param    WPARAM wParam -- wParam
      * @param    LPARAM lParam -- lParam
-     * @return   ·µ»ØLRESULT
+     * @return   è¿”å›LRESULT
      *
-     * Describe  ×Ô¶¨ÒåÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  è‡ªå®šä¹‰æ¶ˆæ¯å“åº”å‡½æ•°
      */
     LRESULT OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     /**
      * SListCtrlEx::OnKeyEvent
-     * @brief    ×Ô¶¨ÒåÏûÏ¢ÏìÓ¦º¯Êı
-     * @param    UINT uMsg -- ¼üÅÌÏûÏ¢ÀàĞÍ
+     * @brief    è‡ªå®šä¹‰æ¶ˆæ¯å“åº”å‡½æ•°
+     * @param    UINT uMsg -- é”®ç›˜æ¶ˆæ¯ç±»å‹
      * @param    WPARAM wParam -- wParam
      * @param    LPARAM lParam -- lParam
-     * @return   ·µ»ØLRESULT
+     * @return   è¿”å›LRESULT
      *
-     * Describe  ×Ô¶¨ÒåÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  è‡ªå®šä¹‰æ¶ˆæ¯å“åº”å‡½æ•°
      */
     LRESULT OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     /**
      * SListCtrlEx::OnMouseLeave
-     * @brief    ×Ô¶¨ÒåÏûÏ¢ÏìÓ¦º¯Êı
+     * @brief    è‡ªå®šä¹‰æ¶ˆæ¯å“åº”å‡½æ•°
      *
-     * Describe  ×Ô¶¨ÒåÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  è‡ªå®šä¹‰æ¶ˆæ¯å“åº”å‡½æ•°
      */
     void OnMouseLeave();
 
     /**
      * SListCtrlEx::OnMouseWheel
-     * @brief    Êó±ê¹öÂÖÊÂ¼ş
-     * @param    UINT nFlags -- ±êÖ¾
-     * @param    short zDelta -- ¹öÂÖ¹ö¶¯µÄ¾àÀë
-     * @param    CPoint pt -- ×ø±ê
-     * @return   ·µ»ØBOOL
+     * @brief    é¼ æ ‡æ»šè½®äº‹ä»¶
+     * @param    UINT nFlags -- æ ‡å¿—
+     * @param    short zDelta -- æ»šè½®æ»šåŠ¨çš„è·ç¦»
+     * @param    CPoint pt -- åæ ‡
+     * @return   è¿”å›BOOL
      *
-     * Describe  Êó±ê¹öÂÖÊÂ¼ş
+     * Describe  é¼ æ ‡æ»šè½®äº‹ä»¶
      */
     BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
     /**
      * SListCtrlEx::OnKeyDown
-     * @brief    °´¼ü°´ÏÂ
-     * @param    TCHAR nChar -- ¼üÂëÖµ
-     * @param    UINT nRepCnt -- ÖØ¸´´ÎÊı
-     * @param    UINT nFlags -- ±êÖ¾
+     * @brief    æŒ‰é”®æŒ‰ä¸‹
+     * @param    TCHAR nChar -- é”®ç å€¼
+     * @param    UINT nRepCnt -- é‡å¤æ¬¡æ•°
+     * @param    UINT nFlags -- æ ‡å¿—
      *
-     * Describe  ÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ¶ˆæ¯å“åº”å‡½æ•°
      */
     void OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags);
 
     /**
      * SListCtrlEx::OnChar
-     * @brief    °´¼ü°´ÏÂ
-     * @param    TCHAR nChar -- ¼üÂëÖµ
-     * @param    UINT nRepCnt -- ÖØ¸´´ÎÊı
-     * @param    UINT nFlags -- ±êÖ¾
+     * @brief    æŒ‰é”®æŒ‰ä¸‹
+     * @param    TCHAR nChar -- é”®ç å€¼
+     * @param    UINT nRepCnt -- é‡å¤æ¬¡æ•°
+     * @param    UINT nFlags -- æ ‡å¿—
      *
-     * Describe  ÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ¶ˆæ¯å“åº”å‡½æ•°
      */
     void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
      * SListCtrlEx::OnGetDlgCode
-     * @brief    »ñÈ¡´°¿ÚÏûÏ¢Âë
-     * @param    ·µ»ØUINT
+     * @brief    è·å–çª—å£æ¶ˆæ¯ç 
+     * @param    è¿”å›UINT
      *
-     * Describe  »ñÈ¡´°¿ÚÏûÏ¢Âë
+     * Describe  è·å–çª—å£æ¶ˆæ¯ç 
      */
     UINT OnGetDlgCode();
 
     /**
      * SListCtrlEx::OnSetCursor
-     * @brief    ÉèÖÃÊó±êÎ»ÖÃ
-     * @param    ·µ»ØBOOL
+     * @brief    è®¾ç½®é¼ æ ‡ä½ç½®
+     * @param    è¿”å›BOOL
      *
-     * Describe  ÉèÖÃÊó±êÎ»ÖÃ
+     * Describe  è®¾ç½®é¼ æ ‡ä½ç½®
      */
     virtual BOOL OnSetCursor(const CPoint &pt);
 
@@ -407,63 +407,63 @@ class SListCtrlEx
 
     /**
      * SListCtrlEx::OnDestroy
-     * @brief    Ïú»Ù
+     * @brief    é”€æ¯
      *
-     * Describe  Ïú»Ù
+     * Describe  é”€æ¯
      */
     void OnDestroy();
 
     /**
      * SListCtrlEx::OnSetFocus
-     * @brief    »ñµÃ½¹µã
+     * @brief    è·å¾—ç„¦ç‚¹
      *
-     * Describe  »ñµÃ½¹µã
+     * Describe  è·å¾—ç„¦ç‚¹
      */
     void OnSetFocus(SWND wndOld);
 
     /**
      * SListCtrlEx::OnKillFocus
-     * @brief    Ê§È¥½¹µã
+     * @brief    å¤±å»ç„¦ç‚¹
      *
-     * Describe  Ê§È¥½¹µã
+     * Describe  å¤±å»ç„¦ç‚¹
      */
     void OnKillFocus(SWND wndFocus);
 
     /**
      * SListCtrlEx::OnNcCalcSize
-     * @brief    ¼ÆËã·Ç¿Í»§Çø´óĞ¡
-     * @param    BOOL bCalcValidRects -- ´óĞ¡
-     * @param    LPARAM lParam -- ¸½¼Ó²ÎÊı
-     * Describe  ¼ÆËã·Ç¿Í»§Çø´óĞ¡
+     * @brief    è®¡ç®—éå®¢æˆ·åŒºå¤§å°
+     * @param    BOOL bCalcValidRects -- å¤§å°
+     * @param    LPARAM lParam -- é™„åŠ å‚æ•°
+     * Describe  è®¡ç®—éå®¢æˆ·åŒºå¤§å°
      */
     LRESULT OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam);
 
     /**
      * SListCtrlEx::Relayout
-     * @brief    ÖØĞÂ²¼¾Ö
+     * @brief    é‡æ–°å¸ƒå±€
      *
-     * Describe  ÖØĞÂ²¼¾Ö
+     * Describe  é‡æ–°å¸ƒå±€
      */
     void Relayout();
 
   protected:
-    SArray<SItemPanel *> m_arrItems; /**< ±£´æÌõÄ¿µÄÊı×é */
-    int m_nItemHeight;               /**< ¸ß¶È          */
-    int m_iSelItem;                  /**< Ñ¡ÖĞÌõÄ¿      */
-    int m_iHoverItem;                /**< Hover×´Ì¬ÌõÄ¿ */
-    int m_iScrollSpeed;              /**< ¹ö¶¯ËÙ¶È      */
+    SArray<SItemPanel *> m_arrItems; /**< ä¿å­˜æ¡ç›®çš„æ•°ç»„ */
+    int m_nItemHeight;               /**< é«˜åº¦          */
+    int m_iSelItem;                  /**< é€‰ä¸­æ¡ç›®      */
+    int m_iHoverItem;                /**< HoverçŠ¶æ€æ¡ç›® */
+    int m_iScrollSpeed;              /**< æ»šåŠ¨é€Ÿåº¦      */
     BOOL m_bHotTrack;                /**<  */
 
-    SXmlDoc m_xmlTempl;            /**< ÁĞ±íÄ£°åXML */
-    SOsrPanel *m_pCapturedFrame;   /**< µ±Ç°µ÷ÓÃÁËsetcaptureµÄÁĞ±íÏî */
-    ISkinObj *m_pItemSkin;         /**< ÁĞ±íÏîµÄ±³¾°skin */
-    SStringW m_strSelectRangeSkin; /**< Ñ¡Ôñ¿òskin */
-    COLORREF m_crItemBg;           /**< ±³¾°É« */
-    COLORREF m_crItemSelBg;        /**< Ñ¡ÖĞ±³¾°É« */
-    COLORREF m_crItemHotBg;        /**< Hot±³¾°É« */
-    BOOL m_bItemRedrawDelay;       /**< ±íÏîÖØ»æÊ±»º³å */
-    SWindow *m_pWndRectangle;      /**< ¾ØĞÎÑ¡Ôñ¿ò */
-    CRect m_rcWnd;                 /**< Ñ¡Ôñ¿òÎ»ÖÃ */
+    SXmlDoc m_xmlTempl;            /**< åˆ—è¡¨æ¨¡æ¿XML */
+    SOsrPanel *m_pCapturedFrame;   /**< å½“å‰è°ƒç”¨äº†setcaptureçš„åˆ—è¡¨é¡¹ */
+    ISkinObj *m_pItemSkin;         /**< åˆ—è¡¨é¡¹çš„èƒŒæ™¯skin */
+    SStringW m_strSelectRangeSkin; /**< é€‰æ‹©æ¡†skin */
+    COLORREF m_crItemBg;           /**< èƒŒæ™¯è‰² */
+    COLORREF m_crItemSelBg;        /**< é€‰ä¸­èƒŒæ™¯è‰² */
+    COLORREF m_crItemHotBg;        /**< HotèƒŒæ™¯è‰² */
+    BOOL m_bItemRedrawDelay;       /**< è¡¨é¡¹é‡ç»˜æ—¶ç¼“å†² */
+    SWindow *m_pWndRectangle;      /**< çŸ©å½¢é€‰æ‹©æ¡† */
+    CRect m_rcWnd;                 /**< é€‰æ‹©æ¡†ä½ç½® */
     CPoint m_ptTmp;
     BOOL m_bMouseDown;
     BOOL m_bStartSelect;
@@ -474,8 +474,8 @@ class SListCtrlEx
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
     void UpdateHeaderCtrl();
     CRect GetListRect() const;
-    int m_nHeaderHeight;    /**< ÁĞ±íÍ·¸ß¶È */
-    SHeaderCtrl *m_pHeader; /**< ÁĞ±íÍ·¿Ø¼ş */
+    int m_nHeaderHeight;    /**< åˆ—è¡¨å¤´é«˜åº¦ */
+    SHeaderCtrl *m_pHeader; /**< åˆ—è¡¨å¤´æ§ä»¶ */
     int InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam = 0);
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
     virtual void UpdateScrollBar();

@@ -965,7 +965,7 @@ LONG CTxtEdit::GetTextEx(
 			*((char *)pch) = '\0';		// In case something fails
 	}
 	else						// Be sure to leave room for NULL terminator
-		cchGet = min(UINT(pgt->cb/2 - 1), (UINT)cchGet);
+		cchGet = min(UINT(CchOfCb(pgt->cb) - 1), (UINT)cchGet);
 
 	// Now grab the text 
 	if(pgt->flags & GT_NOHIDDENTEXT)
@@ -7140,7 +7140,7 @@ HRESULT	CTxtEdit::GetCaretWidth()
 LONG CCellColor::GetColorIndex(
 	COLORREF cr)
 {
-	if(cr == tomAutoColor)
+	if(cr == (COLORREF)tomAutoColor)
 		return 0;
 
 	for(LONG i = 0; i < 16; i++)

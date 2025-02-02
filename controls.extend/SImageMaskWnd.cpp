@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SImageMaskWnd.h"
 
 namespace SOUI
@@ -94,7 +94,7 @@ void SImageMaskWnd::UpdateCacheFromImage(IBitmapS *pBitmap, FilterLevel fl)
 
 void SImageMaskWnd::MakeCacheAlpha()
 {
-    //´ÓmaskµÄÖ¸¶¨channelÖĞ»ñµÃalphaÍ¨µÀ
+    //ä»maskçš„æŒ‡å®šchannelä¸­è·å¾—alphaé€šé“
     LPBYTE pBitCache = (LPBYTE)m_bmpCache->LockPixelBits();
     LPBYTE pBitMask = (LPBYTE)m_bmpMask->LockPixelBits();
     LPBYTE pDst = pBitCache;
@@ -104,12 +104,12 @@ void SImageMaskWnd::MakeCacheAlpha()
     {
         BYTE byAlpha = *pSrc;
         pSrc += 4;
-        //Ô´°ëÍ¸Ã÷£¬mask²»Í¸Ã÷Ê±Ê¹ÓÃÔ´µÄ°ëÍ¸Ã÷ÊôĞÔ
+        //æºåŠé€æ˜ï¼Œmaskä¸é€æ˜æ—¶ä½¿ç”¨æºçš„åŠé€æ˜å±æ€§
         if (pDst[3] == 0xff || (pDst[3] != 0xFF && byAlpha == 0))
-        {                                       //Ô´²»Í¸Ã÷,»òÕßmaskÈ«Í¸Ã÷
-            *pDst++ = ((*pDst) * byAlpha) >> 8; //×öpremultiply
-            *pDst++ = ((*pDst) * byAlpha) >> 8; //×öpremultiply
-            *pDst++ = ((*pDst) * byAlpha) >> 8; //×öpremultiply
+        {                                       //æºä¸é€æ˜,æˆ–è€…maskå…¨é€æ˜
+            *pDst++ = ((*pDst) * byAlpha) >> 8; //åšpremultiply
+            *pDst++ = ((*pDst) * byAlpha) >> 8; //åšpremultiply
+            *pDst++ = ((*pDst) * byAlpha) >> 8; //åšpremultiply
             *pDst++ = byAlpha;
         }
         else

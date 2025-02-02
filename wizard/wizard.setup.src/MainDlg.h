@@ -1,4 +1,4 @@
-// MainDlg.h : interface of the CMainDlg class
+Ôªø// MainDlg.h : interface of the CMainDlg class
 //
 /////////////////////////////////////////////////////////////////////////////
 
@@ -7,7 +7,16 @@
 #define ENV_SOUI4  _T("SOUI4PATH")
 #define ENV_INSTALL_32 _T("SOUI4_INSTALL_32")
 #define ENV_INSTALL_64 _T("SOUI4_INSTALL_64")
+#define DIR_DST _T("soui5")
+#define WIZARD_EXE _T("Soui5Wizard.vsz")
+#define WIZARD_DLL _T("Soui5DllWizard.vsz")
 
+const LPCTSTR kEntryFiles[]={
+	_T("Soui5DllWizard.ico"),
+	_T("Soui5DllWizard.vsdir"),
+	_T("Soui5Wizard.ico"),
+	_T("Soui5Wizard.vsdir"),
+};
 
 class CMainDlg : public CDialogImpl<CMainDlg>
 {
@@ -38,7 +47,7 @@ public:
 		COMMAND_ID_HANDLER(IDC_HOMESITE, OnHomeSite)
 		END_MSG_MAP()
 
-	CString m_strWizardDir;// ˝æ›ƒø¬º
+	CString m_strWizardDir;//Êï∞ÊçÆÁõÆÂΩï
 	CString m_strInstall32, m_strInstall64;
 
 	typedef BOOL(WINAPI *LPFN_ISWOW64PROCESS) (HANDLE, PBOOL);
@@ -98,7 +107,7 @@ public:
 
 	CString ExeCmd(CString pszCmd)
 	{
-		// ¥¥Ω®ƒ‰√˚π‹µ¿
+		// ÂàõÂª∫ÂåøÂêçÁÆ°ÈÅì
 		SECURITY_ATTRIBUTES sa = { sizeof(SECURITY_ATTRIBUTES), NULL, TRUE };
 		HANDLE hRead, hWrite;
 		if (!CreatePipe(&hRead, &hWrite, &sa, 0))
@@ -106,7 +115,7 @@ public:
 			return TEXT(" ");
 		}
 
-		// …Ë÷√√¸¡Ó––Ω¯≥Ã∆Ù∂Ø–≈œ¢(“‘“˛≤ÿ∑Ω Ω∆Ù∂Ø√¸¡Ó≤¢∂®Œª∆‰ ‰≥ˆµΩhWrite
+		// ËÆæÁΩÆÂëΩ‰ª§Ë°åËøõÁ®ãÂêØÂä®‰ø°ÊÅØ(‰ª•ÈöêËóèÊñπÂºèÂêØÂä®ÂëΩ‰ª§Âπ∂ÂÆö‰ΩçÂÖ∂ËæìÂá∫Âà∞hWrite
 		STARTUPINFO si = { sizeof(STARTUPINFO) };
 		GetStartupInfo(&si);
 		si.dwFlags = STARTF_USESHOWWINDOW | STARTF_USESTDHANDLES;
@@ -114,17 +123,17 @@ public:
 		si.hStdError = hWrite;
 		si.hStdOutput = hWrite;
 
-		// ∆Ù∂Ø√¸¡Ó––
+		// ÂêØÂä®ÂëΩ‰ª§Ë°å
 		PROCESS_INFORMATION pi;
 		if (!CreateProcess(NULL, pszCmd.GetBuffer(), NULL, NULL, TRUE, NULL, NULL, NULL, &si, &pi))
 		{
 			return TEXT("Cannot create process");
 		}
 
-		// ¡¢º¥πÿ±’hWrite
+		// Á´ãÂç≥ÂÖ≥Èó≠hWrite
 		CloseHandle(hWrite);
 
-		// ∂¡»°√¸¡Ó––∑µªÿ÷µ
+		// ËØªÂèñÂëΩ‰ª§Ë°åËøîÂõûÂÄº
 		CStringA strRetTmp;
 		char buff[1024] = { 0 };
 		DWORD dwRead = 0;
@@ -288,7 +297,7 @@ public:
 			if(FolderExists(dataTarget))
 			if(CreateDirectory(dataTarget, 0))
 			{
-				MessageBox(_T("Œﬁ∑®¥¥Ω® ˝æ›ƒø±ÍŒƒº˛º–£°"), _T("¥ÌŒÛ"), MB_OK | MB_ICONSTOP);
+				MessageBox(_T("Êó†Ê≥ïÂàõÂª∫Êï∞ÊçÆÁõÆÊ†áÊñá‰ª∂Â§πÔºÅ"), _T("ÈîôËØØ"), MB_OK | MB_ICONSTOP);
 				delete pEnvCfg;
 				continue;
 			}
@@ -376,7 +385,7 @@ public:
 		if (GetFileAttributes(_T("SouiWizard")) == INVALID_FILE_ATTRIBUTES
 			|| GetFileAttributes(_T("SouiDllWizard")) == INVALID_FILE_ATTRIBUTES)
 		{
-			MessageBox(_T("µ±«∞ƒø¬ºœ¬√ª”–’“µΩSOUIµƒœÚµº ˝æ›"), _T("¥ÌŒÛ"), MB_OK | MB_ICONSTOP);
+			MessageBox(_T("ÂΩìÂâçÁõÆÂΩï‰∏ãÊ≤°ÊúâÊâæÂà∞SOUIÁöÑÂêëÂØºÊï∞ÊçÆ"), _T("ÈîôËØØ"), MB_OK | MB_ICONSTOP);
 			return 0;
 		}
 		TCHAR szSouiDir[MAX_PATH] = { 0 }, szSourCore[MAX_PATH];
@@ -387,7 +396,7 @@ public:
 		_tcscat(szSourCore, _T("\\SOUI"));
 		if (GetFileAttributes(szSourCore) == INVALID_FILE_ATTRIBUTES)
 		{
-			MessageBox(_T("µ±«∞ƒø¬ºœ¬√ª”–’“µΩSOUIµƒ‘¥¥˙¬Î"), _T("¥ÌŒÛ"), MB_OK | MB_ICONSTOP);
+			MessageBox(_T("ÂΩìÂâçÁõÆÂΩï‰∏ãÊ≤°ÊúâÊâæÂà∞SOUIÁöÑÊ∫ê‰ª£Á†Å"), _T("ÈîôËØØ"), MB_OK | MB_ICONSTOP);
 			return 0;
 		}
 
@@ -395,24 +404,25 @@ public:
 		{
 			TCHAR szDir[MAX_PATH]={0};
 			GetDlgItemText(IDC_INSTALL_DIR32, szDir, MAX_PATH);
-			if(GetFileAttributes(szDir)==INVALID_FILE_ATTRIBUTES)
-			{
-				MessageBox(_T("√ª”–’“µΩ32Œªsoui∞≤◊∞ƒø¬º"), _T("¥ÌŒÛ"), MB_OK | MB_ICONSTOP);
-				return 0;
-			}
 			strDir32 = szDir;
 		}
 		{
 			TCHAR szDir[MAX_PATH]={0};
 			GetDlgItemText(IDC_INSTALL_DIR64, szDir, MAX_PATH);
-			if(GetFileAttributes(szDir)==INVALID_FILE_ATTRIBUTES)
-			{
-				MessageBox(_T("√ª”–’“µΩ64Œªsoui∞≤◊∞ƒø¬º"), _T("¥ÌŒÛ"), MB_OK | MB_ICONSTOP);
-				return 0;
-			}
 			strDir64=szDir;
 		}
-		//…Ë÷√ª∑æ≥±‰¡ø
+		if(!strDir32.IsEmpty() && GetFileAttributes(strDir32)==INVALID_FILE_ATTRIBUTES){
+			strDir32.Empty();
+		}
+		if(!strDir64.IsEmpty() && GetFileAttributes(strDir64)==INVALID_FILE_ATTRIBUTES){
+			strDir64.Empty();
+		}
+		if(strDir32.IsEmpty() && strDir64.IsEmpty()){
+			MessageBox(_T("Ê≤°ÊúâÊâæÂà∞32‰ΩçÊàñËÄÖ64‰ΩçsouiÂÆâË£ÖÁõÆÂΩï"), _T("ÈîôËØØ"), MB_OK | MB_ICONSTOP);
+			return 0;
+		}
+
+		//ËÆæÁΩÆÁéØÂ¢ÉÂèòÈáè
 
 		CRegKey reg;
 		if (ERROR_SUCCESS == reg.Open(HKEY_LOCAL_MACHINE, _T("System\\CurrentControlSet\\Control\\Session Manager\\Environment"), KEY_SET_VALUE | KEY_QUERY_VALUE))
@@ -423,16 +433,16 @@ public:
 			reg.SetStringValue(ENV_INSTALL_64, strDir64);			
 			reg.Close();
 			DWORD_PTR msgResult = 0;
-			//π„≤•ª∑æ≥±‰¡ø–ﬁ∏ƒœ˚œ¢
+			//ÂπøÊí≠ÁéØÂ¢ÉÂèòÈáè‰øÆÊîπÊ∂àÊÅØ
 			SendMessageTimeout(HWND_BROADCAST, WM_SETTINGCHANGE, 0, LPARAM(_T("Environment")), SMTO_ABORTIFHUNG, 5000, &msgResult);
 		}
 		else
 		{
-			MessageBox(_T("ÃÌº”ª∑æ≥±‰¡ø ß∞‹"), _T("¥ÌŒÛ"), MB_OK | MB_ICONSTOP);
+			MessageBox(_T("Ê∑ªÂä†ÁéØÂ¢ÉÂèòÈáèÂ§±Ë¥•"), _T("ÈîôËØØ"), MB_OK | MB_ICONSTOP);
 			return 0;
 		}
 
-		//◊º±∏∏¥÷∆Œƒº˛
+		//ÂáÜÂ§áÂ§çÂà∂Êñá‰ª∂
 		TCHAR szFrom[1024] = { 0 };
 		TCHAR szTo[1024] = { 0 };
 		SHFILEOPSTRUCT shfo;
@@ -444,7 +454,7 @@ public:
 			if (!vslist.GetCheckState(i)) continue;
 
 			VSENVCFG *pCfg = (VSENVCFG*)vslist.GetItemData(i);
-			//∏¥÷∆»Îø⁄ ˝æ›
+			//Â§çÂà∂ÂÖ•Âè£Êï∞ÊçÆ
 			BOOL bOK = TRUE;
 			if (bOK)
 			{
@@ -453,20 +463,14 @@ public:
 				memset(szFrom, 0, sizeof(szFrom));
 				memset(szTo, 0, sizeof(szTo));
 				_tcscpy(szFrom, _T("entry\\*.*"));
-				_tcscpy(szTo, pCfg->strVsDir);
-				_tcscat(szTo, pCfg->strDataTarget);
-				_tcscat(szTo, _T("\\Soui4"));
+				_stprintf(szTo,_T("%s%s\\%s"),pCfg->strVsDir,pCfg->strDataTarget,DIR_DST);
 				bOK = 0 == SHFileOperation(&shfo);
 			}
-			//∏ƒ–¥SouiWizard.vsz
+			//ÊîπÂÜôSouiWizard.vsz
 			if (bOK)
 			{
-				_tcscpy(szFrom, pCfg->strEntrySrc);
-				_tcscat(szFrom, _T("\\Soui4Wizard.vsz"));
-				_tcscpy(szTo, pCfg->strVsDir);
-				_tcscat(szTo, pCfg->strEntryTarget);
-				_tcscat(szTo, _T("\\Soui4\\Soui4Wizard.vsz"));
-
+				_stprintf(szFrom,_T("%s\\%s"),pCfg->strEntrySrc,WIZARD_EXE);
+				_stprintf(szTo,_T("%s%s\\%s\\%s"),pCfg->strVsDir, pCfg->strEntryTarget,DIR_DST, WIZARD_EXE);
 				CopyFile(szFrom, szTo, FALSE);
 
 				FILE *f = _tfopen(szTo, _T("r"));
@@ -479,7 +483,7 @@ public:
 
 					f = _tfopen(szTo, _T("w"));
 					if (f)
-					{//«Âø’‘≠ ˝æ›‘Ÿ÷ÿ–¬–¥»Î–¬ ˝æ›
+					{//Ê∏ÖÁ©∫ÂéüÊï∞ÊçÆÂÜçÈáçÊñ∞ÂÜôÂÖ•Êñ∞Êï∞ÊçÆ
 						CStringA str = szBuf;
 						str.Replace("%SOUI4PATH%", CT2A(szSouiDir));
 						fwrite((LPCSTR)str, 1, str.GetLength(), f);
@@ -488,14 +492,10 @@ public:
 				}
 			}
 
-			//∏ƒ–¥SouiDllWizard.vsz
+			//ÊîπÂÜôSouiDllWizard.vsz
 			{
-				_tcscpy(szFrom, pCfg->strEntrySrc);
-				_tcscat(szFrom, _T("\\Soui4DllWizard.vsz"));
-				_tcscpy(szTo, pCfg->strVsDir);
-				_tcscat(szTo, pCfg->strEntryTarget);
-				_tcscat(szTo, _T("\\Soui4\\Soui4DllWizard.vsz"));
-
+				_stprintf(szFrom,_T("%s\\%s"),pCfg->strEntrySrc,WIZARD_DLL);
+				_stprintf(szTo,_T("%s%s\\%s\\%s"),pCfg->strVsDir, pCfg->strEntryTarget,DIR_DST, WIZARD_DLL);
 				CopyFile(szFrom, szTo, FALSE);
 
 				FILE *f = _tfopen(szTo, _T("r"));
@@ -508,7 +508,7 @@ public:
 
 					f = _tfopen(szTo, _T("w"));
 					if (f)
-					{//«Âø’‘≠ ˝æ›‘Ÿ÷ÿ–¬–¥»Î–¬ ˝æ›
+					{//Ê∏ÖÁ©∫ÂéüÊï∞ÊçÆÂÜçÈáçÊñ∞ÂÜôÂÖ•Êñ∞Êï∞ÊçÆ
 						CStringA str = szBuf;
 						str.Replace("%SOUI4PATH%", CT2A(szSouiDir));
 						fwrite((LPCSTR)str, 1, str.GetLength(), f);
@@ -518,7 +518,7 @@ public:
 			}
 
 			CString strMsg;
-			strMsg.Format(_T("Œ™%s∞≤◊∞SOUI4œÚµº:%s"), pCfg->strName, bOK ? _T("≥…π¶") : _T(" ß∞‹"));
+			strMsg.Format(_T("‰∏∫%sÂÆâË£ÖSOUI5ÂêëÂØº:%s"), pCfg->strName, bOK ? _T("ÊàêÂäü") : _T("Â§±Ë¥•"));
 			::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strMsg);
 		}
 
@@ -541,51 +541,25 @@ public:
 
 			VSENVCFG *pCfg = (VSENVCFG*)vslist.GetItemData(i);
 			//remove entry files
-			CString strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4Wizard.ico");
-            ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
-			BOOL bOK = DeleteFile(strSource);
-			if (bOK)
-			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4Wizard.vsdir");
-                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
-				bOK = DeleteFile(strSource);
-			}
-			if (bOK)
-			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4Wizard.vsz");
-                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
-				bOK = DeleteFile(strSource);
-			}
-			// …æ≥˝DllœÚµºŒƒº˛
-			if (bOK)
-			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4DllWizard.ico");
-                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
-				bOK = DeleteFile(strSource);
-			}
-			if (bOK)
-			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4DllWizard.vsdir");
-                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
-				bOK = DeleteFile(strSource);
-			}
-			if (bOK)
-			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4\\Soui4DllWizard.vsz");
-                ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
+			BOOL bOK = TRUE;
+			for(int j=0;j<ARRAYSIZE(kEntryFiles) && bOK;j++){
+				CString strSource;
+				strSource.Format(_T("%s%s\\%s\\%s"),pCfg->strVsDir, pCfg->strEntryTarget, DIR_DST,kEntryFiles[j]);
+				::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
 				bOK = DeleteFile(strSource);
 			}
 
-			// …æ≥˝Souiƒø¬º
+			// Âà†Èô§SouiÁõÆÂΩï
 			if (bOK)
 			{
-				strSource = pCfg->strVsDir + pCfg->strEntryTarget + _T("\\Soui4");
+				CString strSource;
+				strSource.Format(_T("%s%s\\%s"),pCfg->strVsDir, pCfg->strEntryTarget, DIR_DST);
                 ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strSource);
 				bOK = RemoveDirectory(strSource);
 			}
 
 			CString strMsg;
-			strMsg.Format(_T("¥”%s÷––∂‘ÿSOUI4œÚµº%s"), pCfg->strName, bOK ? _T("≥…π¶") : _T(" ß∞‹"));
+			strMsg.Format(_T("‰ªé%s‰∏≠Âç∏ËΩΩSOUI5ÂêëÂØº%s"), pCfg->strName, bOK ? _T("ÊàêÂäü") : _T("Â§±Ë¥•"));
 			::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strMsg);
 
 		}

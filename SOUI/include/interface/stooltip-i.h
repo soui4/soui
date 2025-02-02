@@ -26,17 +26,18 @@ typedef struct TIPID
  * Describe
  */
 
-typedef enum TipAlign{
-	TA_AUTO = 0,
-	TA_X_LEFT=1,
-	TA_X_CENTER=2,
-	TA_X_RIGHT=3,
-	TA_X_MASK=0x0f,
-	TA_Y_TOP=0x10,
-	TA_Y_CENTER=0x20,
-	TA_Y_BOTTOM=0x30,
-	TA_Y_MASK=0xF0,
-}TipAlign;
+typedef enum TipAlign
+{
+    TA_AUTO = 0,
+    TA_X_LEFT = 1,
+    TA_X_CENTER = 2,
+    TA_X_RIGHT = 3,
+    TA_X_MASK = 0x0f,
+    TA_Y_TOP = 0x10,
+    TA_Y_CENTER = 0x20,
+    TA_Y_BOTTOM = 0x30,
+    TA_Y_MASK = 0xF0,
+} TipAlign;
 
 #undef INTERFACE
 #define INTERFACE IToolTip
@@ -57,15 +58,15 @@ DECLARE_INTERFACE_(IToolTip, IMsgFilter)
      */
     STDMETHOD_(void, UpdateTip)(THIS_ const TIPID *id, RECT rc, LPCTSTR pszTip, int nScale) PURE;
 
-	 /**
+    /**
      * @brief 在指定位置显示tooltip
-	 * @param LPCRECT rc tip显示位置，相对于container
-	 * @param UINT tipAlign tip对齐方式
-	 * @param pszTip LPCTSTR tip内容，为null时退出固定tip
-	 * @param int nScale -- 当前的缩放比例
+     * @param LPCRECT rc tip显示位置，相对于container
+     * @param UINT tipAlign tip对齐方式
+     * @param pszTip LPCTSTR tip内容，为null时退出固定tip
+     * @param int nScale -- 当前的缩放比例
      * @return
      */
-    STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign, LPCTSTR pszTip,int nScale) PURE;
+    STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign, LPCTSTR pszTip, int nScale) PURE;
 
     /**
      * ClearTip

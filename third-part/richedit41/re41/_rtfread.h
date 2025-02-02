@@ -125,7 +125,7 @@ struct STATE
 
 	DEFFONT		rgDefFont[6];			//@cmember Default fonts for \dbch, etc.
 
-	STATE() {};
+	STATE() { memset(this, 0, sizeof(STATE)); }
 										//@cmember Adds or applies PF to state's PF
 	BOOL AddPF(const CParaFormat &PF,
 				LONG lDocType, DWORD dwMask, DWORD dwMask2);
@@ -169,6 +169,8 @@ class CRTFRead : public CRTFConverter
 
 //@access Private Methods and Data
 	// Lexical analyzer outputs
+	RTFREADOLESTREAM RTFReadOLEStream;	//@cmember RTFREADOLESTREAM to use
+	CParaFormat	_PF;					//@cmember Paragraph format changes
 	LONG		_iParam;				//@cmember Control-word parameter
 	TOKEN		_token;					//@cmember Current control-word token
 	TOKEN		_tokenLast;				//@cmember Previous token
@@ -190,7 +192,6 @@ class CRTFRead : public CRTFConverter
 
 	DWORD		_dwMaskCF;				//@cmember Character format mask
 	DWORD		_dwMaskCF2;				//@cmember Character format mask 2
-	CParaFormat	_PF;					//@cmember Paragraph format changes
 	DWORD		_dwMaskPF;				//@cmember Paragraph format mask
 	DWORD		_dwMaskPF2;				//@cmember Paragraph format mask
 
@@ -260,7 +261,6 @@ class CRTFRead : public CRTFConverter
 	int			_cchUsedNumText;		//@cmember space used in szNumText
 
 	RTFOBJECT *	_prtfObject;			//@cmember Ptr to RTF Object
-	RTFREADOLESTREAM RTFReadOLEStream;	//@cmember RTFREADOLESTREAM to use
 	DWORD		_dwFlagsShape;			//@cmember Shape flags
 
 	WCHAR *		_szUnicode;				//@cmember String to hold Unicoded chars

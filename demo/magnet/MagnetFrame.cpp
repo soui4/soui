@@ -6,7 +6,7 @@ using namespace SOUI;
 const int KDistMin = 10;    //小于该值代表两个窗口自动吸附
 
 
-CMagnetFrame::CMagnetFrame(void):m_hMainWnd(NULL)
+CMagnetFrame::CMagnetFrame(void):m_hMainWnd(0)
 {
 }
 

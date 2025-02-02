@@ -1,29 +1,29 @@
-#pragma once
-#include <core/swnd.h>
-#include <gif\SSkinAni.h>
+ï»¿#pragma once
+#include <core/SWnd.h>
+#include <gif/SSkinAni.h>
 
 namespace SOUI
 {
 
 /**
  * @class     SImagePlayer
- * @brief     GIFÍ¼Æ¬ÏÔÊ¾¿Ø¼ş
+ * @brief     GIFå›¾ç‰‡æ˜¾ç¤ºæ§ä»¶
  *
  * Describe
  */
 class SImagePlayer
     : public SWindow
     , public ITimelineHandler {
-    DEF_SOBJECT(SWindow, L"imgplayer") //¶¨ÒåGIF¿Ø¼şÔÚXM¼ÓµÄ±êÇ©
+    DEF_SOBJECT(SWindow, L"imgplayer") //å®šä¹‰GIFæ§ä»¶åœ¨XMåŠ çš„æ ‡ç­¾
   public:
     SImagePlayer();
     ~SImagePlayer();
 
     /**
      * ShowImageFile
-     * @brief    ÔÚ¿Ø¼şÖĞÏÔÊ¾/²¥·ÅÒ»¸öÍ¼Æ¬ÎÄ¼ş
-     * @param    LPCTSTR pszFileName --  ÎÄ¼şÃû
-     * @return   BOOL -- true:³É¹¦
+     * @brief    åœ¨æ§ä»¶ä¸­æ˜¾ç¤º/æ’­æ”¾ä¸€ä¸ªå›¾ç‰‡æ–‡ä»¶
+     * @param    LPCTSTR pszFileName --  æ–‡ä»¶å
+     * @return   BOOL -- true:æˆåŠŸ
      * Describe
      */
     BOOL ShowImageFile(LPCTSTR pszFileName);
@@ -32,15 +32,15 @@ class SImagePlayer
     void Pause();
     void Resume();
 
-  protected: // SWindowµÄĞéº¯Êı
+  protected: // SWindowçš„è™šå‡½æ•°
     virtual CSize GetDesiredSize(LPCRECT pRcContainer);
 
   protected: // ITimerLineHander
     virtual void OnNextFrame();
 
-  public: //ÊôĞÔ´¦Àí
+  public: //å±æ€§å¤„ç†
     SOUI_ATTRS_BEGIN()
-    ATTR_CUSTOM(L"skin", OnAttrSkin) //Îª¿Ø¼şÌá¹©Ò»¸öskinÊôĞÔ£¬ÓÃÀ´½ÓÊÕSSkinObj¶ÔÏóµÄname
+    ATTR_CUSTOM(L"skin", OnAttrSkin) //ä¸ºæ§ä»¶æä¾›ä¸€ä¸ªskinå±æ€§ï¼Œç”¨æ¥æ¥æ”¶SSkinObjå¯¹è±¡çš„name
     SOUI_ATTRS_END()
   protected:
     HRESULT OnAttrSkin(const SStringW &strValue, BOOL bLoading);
@@ -49,33 +49,33 @@ class SImagePlayer
     BOOL _PlayFile(LPCTSTR pszFileName, BOOL bGif);
 
   protected
-      : //ÏûÏ¢´¦Àí£¬SOUI¿Ø¼şµÄÏûÏ¢´¦ÀíºÍWTL£¬MFCºÜÏàËÆ£¬²ÉÓÃÏàËÆµÄÓ³Éä±í£¬ÏàÍ¬»òÕßÏàËÆµÄÏûÏ¢Ó³Éäºê
+      : //æ¶ˆæ¯å¤„ç†ï¼ŒSOUIæ§ä»¶çš„æ¶ˆæ¯å¤„ç†å’ŒWTLï¼ŒMFCå¾ˆç›¸ä¼¼ï¼Œé‡‡ç”¨ç›¸ä¼¼çš„æ˜ å°„è¡¨ï¼Œç›¸åŒæˆ–è€…ç›¸ä¼¼çš„æ¶ˆæ¯æ˜ å°„å®
     /**
      * OnPaint
-     * @brief    ´°¿Ú»æÖÆÏûÏ¢ÏìÓ¦º¯Êı
-     * @param    IRenderTarget * pRT --  »æÖÆÄ¿±ê
+     * @brief    çª—å£ç»˜åˆ¶æ¶ˆæ¯å“åº”å‡½æ•°
+     * @param    IRenderTarget * pRT --  ç»˜åˆ¶ç›®æ ‡
      * @return   void
-     * Describe  ×¢ÒâÕâÀïµÄ²ÎÊıÊÇIRenderTarget
-     * *,¶ø²»ÊÇWTLÖĞÊ¹ÓÃµÄHDC£¬Í¬Ê±ÏûÏ¢Ó³ÉäºêÒ²±äÎªMSG_WM_PAINT_EX
+     * Describe  æ³¨æ„è¿™é‡Œçš„å‚æ•°æ˜¯IRenderTarget
+     * *,è€Œä¸æ˜¯WTLä¸­ä½¿ç”¨çš„HDCï¼ŒåŒæ—¶æ¶ˆæ¯æ˜ å°„å®ä¹Ÿå˜ä¸ºMSG_WM_PAINT_EX
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
      * OnShowWindow
-     * @brief    ´¦Àí´°¿ÚÏÔÊ¾ÏûÏ¢
-     * @param    BOOL bShow --  true:ÏÔÊ¾
-     * @param    UINT nStatus --  ÏÔÊ¾Ô­Òò
+     * @brief    å¤„ç†çª—å£æ˜¾ç¤ºæ¶ˆæ¯
+     * @param    BOOL bShow --  true:æ˜¾ç¤º
+     * @param    UINT nStatus --  æ˜¾ç¤ºåŸå› 
      * @return   void
-     * Describe  ²Î¿¼MSDNµÄWM_SHOWWINDOWÏûÏ¢
+     * Describe  å‚è€ƒMSDNçš„WM_SHOWWINDOWæ¶ˆæ¯
      */
     void OnShowWindow(BOOL bShow, UINT nStatus);
 
     void OnDestroy();
 
-    // SOUI¿Ø¼şÏûÏ¢Ó³Éä±í
+    // SOUIæ§ä»¶æ¶ˆæ¯æ˜ å°„è¡¨
     SOUI_MSG_MAP_BEGIN()
-    MSG_WM_PAINT_EX(OnPaint)        //´°¿Ú»æÖÆÏûÏ¢
-    MSG_WM_SHOWWINDOW(OnShowWindow) //´°¿ÚÏÔÊ¾×´Ì¬ÏûÏ¢
+    MSG_WM_PAINT_EX(OnPaint)        //çª—å£ç»˜åˆ¶æ¶ˆæ¯
+    MSG_WM_SHOWWINDOW(OnShowWindow) //çª—å£æ˜¾ç¤ºçŠ¶æ€æ¶ˆæ¯
     MSG_WM_DESTROY(OnDestroy)
     SOUI_MSG_MAP_END()
 

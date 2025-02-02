@@ -7,22 +7,25 @@
 
 #include <helper/obj-ref-impl.hpp>
 #include <interface/SImgDecoder-i.h>
+#include <souicoll.h>
 
 SNSBEGIN
 
-    class SImgFrame_STB : public IImgFrame
+    class SImgFrame_STB : public TObjRefImpl<IImgFrame>
     {
     public:
-        SImgFrame_STB(BYTE *data,int w,int h);
+        SImgFrame_STB(const BYTE *data,int w,int h,int nDelay);
+        SImgFrame_STB(BYTE *data, int w, int h, int nDelay);
         ~SImgFrame_STB();
 
 		STDMETHOD_(BOOL,GetSize)(THIS_ UINT *pWid,UINT *pHei) OVERRIDE;
-		STDMETHOD_(int,GetDelay)(THIS) OVERRIDE {return 0;}
+        STDMETHOD_(int, GetDelay)(THIS) OVERRIDE;
         STDMETHOD_(const VOID *,GetPixels)(CTHIS) SCONST OVERRIDE;
 
     protected:
         unsigned char * m_data;
         int      m_nWid,m_nHei;
+        int m_nDelay;
     };
     
     class SImgX_STB : public TObjRefImpl<IImgX>
@@ -41,7 +44,7 @@ SNSBEGIN
         void _DoPromultiply(BYTE *pdata,int nWid,int nHei);
 
         BOOL m_bPremultiple;
-        SImgFrame_STB *     m_pImg;
+        SArray<SAutoRefPtr<IImgFrame>> m_arrFrames;
     };
 
     #define DESC_IMGDECODER L"stb"

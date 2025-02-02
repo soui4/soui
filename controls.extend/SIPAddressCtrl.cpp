@@ -1,6 +1,5 @@
-﻿#include "StdAfx.h"
+﻿#include "stdafx.h"
 #include "SIPAddressCtrl.h"
-#include <WinSock2.h>
 #define SEP_EDIT 2
 
 namespace SOUI
@@ -45,7 +44,7 @@ class SEditIP : public SEdit {
 };
 
 SEditIP::SEditIP()
-    : m_hImcCopy(NULL)
+    : m_hImcCopy(0)
 {
 }
 
@@ -76,7 +75,7 @@ void SEditIP::OnSetFocus(SWND wndOld)
     __baseCls::OnSetFocus(wndOld);
     HWND hHost = GetContainer()->GetHostHwnd();
     m_hImcCopy = ImmGetContext(hHost);
-    ImmAssociateContext(hHost, NULL);
+    ImmAssociateContext(hHost, 0);
 }
 
 void SEditIP::OnKillFocus(SWND wndFocus)
@@ -99,6 +98,7 @@ void SEditIP::OnKillFocus(SWND wndFocus)
 SIPAddressCtrl::SIPAddressCtrl(void)
 {
     memset(m_editFields, 0, sizeof(m_editFields));
+    memset(m_ipFields, 0, sizeof(m_ipFields));
 }
 
 SIPAddressCtrl::~SIPAddressCtrl(void)
@@ -125,6 +125,49 @@ void SIPAddressCtrl::OnSize(UINT nType, CSize size)
     }
 }
 
+HRESULT SIPAddressCtrl::OnAttrField(int iField, const SStringW &strValue, BOOL bLoading)
+{
+    BYTE nField = (BYTE)_wtoi(strValue);
+    if (nField > 255)
+        nField = 255;
+    if (m_editFields[iField])
+        m_editFields[iField]->SetField(nField);
+    else
+        m_ipFields[iField] = nField;
+    return bLoading ? S_FALSE : S_OK;
+}
+
+HRESULT SIPAddressCtrl::OnAttrField0(const SStringW &strValue, BOOL bLoading)
+{
+    return OnAttrField(0, strValue, bLoading);
+}
+
+HRESULT SIPAddressCtrl::OnAttrField1(const SStringW &strValue, BOOL bLoading)
+{
+    return OnAttrField(1, strValue, bLoading);
+}
+HRESULT SIPAddressCtrl::OnAttrField2(const SStringW &strValue, BOOL bLoading)
+{
+    return OnAttrField(2, strValue, bLoading);
+}
+HRESULT SIPAddressCtrl::OnAttrField3(const SStringW &strValue, BOOL bLoading)
+{
+    return OnAttrField(3, strValue, bLoading);
+}
+
+HRESULT SIPAddressCtrl::OnAttrIP(const SStringW &strValue, BOOL bLoading)
+{
+    SStringWList strList;
+    SplitString(strValue, L'.', strList);
+    if (strList.GetCount() != 4)
+        return E_INVALIDARG;
+    for (int i = 0; i < 4; i++)
+    {
+        OnAttrField(i, strList.GetAt(i), bLoading);
+    }
+    return bLoading ? S_FALSE : S_OK;
+}
+
 LRESULT SIPAddressCtrl::OnCreate(LPVOID)
 {
     wchar_t szEditAttr[]
@@ -137,6 +180,7 @@ LRESULT SIPAddressCtrl::OnCreate(LPVOID)
         InsertChild(m_editFields[i]);
         SXmlNode xmlNode = xmlDoc.root().first_child();
         m_editFields[i]->InitFromXml(&xmlNode);
+        m_editFields[i]->SetField(m_ipFields[i]);
     }
     return 0;
 }
@@ -162,6 +206,9 @@ void SIPAddressCtrl::OnPaint(IRenderTarget *pRT)
 
 BOOL SIPAddressCtrl::IsBlank() const
 {
+    DWORD empty = 0;
+    if (!m_editFields[0])
+        return memcmp(m_ipFields,&empty,4)==0;
     if (m_editFields[0]->GetWindowText().GetLength() == 0
         && m_editFields[1]->GetWindowText().GetLength() == 0
         && m_editFields[2]->GetWindowText().GetLength() == 0
@@ -174,42 +221,87 @@ BOOL SIPAddressCtrl::IsBlank() const
 
 int SIPAddressCtrl::GetAddress(BYTE &nField0, BYTE &nField1, BYTE &nField2, BYTE &nField3) const
 {
-    nField0 = m_editFields[0]->GetFiled();
-    nField1 = m_editFields[1]->GetFiled();
-    nField2 = m_editFields[2]->GetFiled();
-    nField3 = m_editFields[3]->GetFiled();
+    if (m_editFields[0])
+    {
+        nField0 = m_editFields[0]->GetFiled();
+        nField1 = m_editFields[1]->GetFiled();
+        nField2 = m_editFields[2]->GetFiled();
+        nField3 = m_editFields[3]->GetFiled();
+    }
+    else
+    {
+        nField0 = m_ipFields[0];
+        nField1 = m_ipFields[1];
+        nField2 = m_ipFields[2];
+        nField3 = m_ipFields[3];
+    }
     return 0;
 }
 
 int SIPAddressCtrl::GetAddress(DWORD &dwAddress) const
 {
-    SASSERT(m_editFields[0]);
-    dwAddress = MAKELONG(MAKEWORD(m_editFields[0]->GetFiled(), m_editFields[1]->GetFiled()),
-                         MAKEWORD(m_editFields[2]->GetFiled(), m_editFields[3]->GetFiled()));
+    if (m_editFields[0])
+    {
+        BYTE nField0 = m_editFields[0]->GetFiled();
+        BYTE nField1 = m_editFields[1]->GetFiled();
+        BYTE nField2 = m_editFields[2]->GetFiled();
+        BYTE nField3 = m_editFields[3]->GetFiled();
+        dwAddress = MAKELONG(MAKEWORD(nField0, nField1), MAKEWORD(nField2, nField3));
+    }
+    else
+    {
+        dwAddress = MAKELONG(MAKEWORD(m_ipFields[0], m_ipFields[1]), MAKEWORD(m_ipFields[2], m_ipFields[3]));
+    }
     return 0;
 }
 
 void SIPAddressCtrl::SetAddress(DWORD dwAddress)
 {
-    in_addr inaddr;
-    inaddr.s_addr = dwAddress;
-    SetAddress(inaddr.S_un.S_un_b.s_b1, inaddr.S_un.S_un_b.s_b2, inaddr.S_un.S_un_b.s_b3,
-               inaddr.S_un.S_un_b.s_b4);
+    const BYTE *pbyAddr = (const BYTE *)&dwAddress;
+    SetAddress(pbyAddr[0], pbyAddr[1], pbyAddr[2], pbyAddr[3]);
 }
 
 void SIPAddressCtrl::SetAddress(BYTE nField0, BYTE nField1, BYTE nField2, BYTE nField3)
 {
-    m_editFields[0]->SetField(nField0);
-    m_editFields[1]->SetField(nField1);
-    m_editFields[2]->SetField(nField2);
-    m_editFields[3]->SetField(nField3);
+    if (m_editFields[0])
+    {
+        m_editFields[0]->SetField(nField0);
+        m_editFields[1]->SetField(nField1);
+        m_editFields[2]->SetField(nField2);
+        m_editFields[3]->SetField(nField3);
+    }
+    else
+    {
+        m_ipFields[0] = nField0;
+        m_ipFields[1] = nField1;
+        m_ipFields[2] = nField2;
+        m_ipFields[3] = nField3;
+    }
+}
+
+void SIPAddressCtrl::SetFieldFocus(WORD nField)
+{
+    if (nField < 4 && m_editFields[0])
+    {
+        m_editFields[nField]->SetFocus();
+    }
 }
 
 void SIPAddressCtrl::ClearAddress()
 {
-    m_editFields[0]->ClearEdit();
-    m_editFields[1]->ClearEdit();
-    m_editFields[2]->ClearEdit();
-    m_editFields[3]->ClearEdit();
+    if (m_editFields[0])
+    {
+        m_editFields[0]->ClearEdit();
+        m_editFields[1]->ClearEdit();
+        m_editFields[2]->ClearEdit();
+        m_editFields[3]->ClearEdit();
+    }
+    else
+    {
+        m_ipFields[0] = 0;
+        m_ipFields[1] = 0;
+        m_ipFields[2] = 0;
+        m_ipFields[3] = 0;
+    }
 }
 } // namespace SOUI

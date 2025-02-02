@@ -14,7 +14,8 @@ typedef struct _MsgHandlerInfo
 
 #undef INTERFACE
 #define INTERFACE INativeWnd
-DECLARE_INTERFACE(INativeWnd){
+DECLARE_INTERFACE(INativeWnd)
+{
 
     /**
      * @brief 创建一个Native窗口
@@ -31,7 +32,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return 窗口HWND
      */
     STDMETHOD_(HWND, CreateNative)
-        (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
+    (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
 
     /**
      * @brief 获取窗口HWND
@@ -57,7 +58,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @brief 获取当前的窗口消息对象
      * @return 窗口消息对象指针
      */
-    STDMETHOD_(const MSG*, GetCurrentMessage)(CTHIS) SCONST PURE;
+    STDMETHOD_(const MSG *, GetCurrentMessage)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取窗口ID
@@ -137,7 +138,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return TRUE-SUCCEED
      */
     STDMETHOD_(BOOL, SetWindowPos)
-        (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) PURE;
+    (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) PURE;
 
     /**
      * @brief 窗口居中
@@ -240,7 +241,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return 定时器ID
      */
     STDMETHOD_(UINT_PTR, SetTimer)
-        (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
+    (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK * lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
 
     /**
      * @brief 删除一个定时器
@@ -274,7 +275,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @param nWidth,nHeight width and height of caret
      * @return TRUE-SUCCEED
      */
-    STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP hBitmap,int nWidth,int nHeight) PURE;
+    STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP hBitmap, int nWidth, int nHeight) PURE;
 
     /**
      * @brief 隐藏光标
@@ -320,7 +321,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return 消息处理返回值
      */
     STDMETHOD_(LRESULT, SendMessage)
-        (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) PURE;
+    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) PURE;
 
     /**
      * @brief 异步执行一个消息到窗口处理过程
@@ -330,7 +331,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return 消息处理返回值
      */
     STDMETHOD_(BOOL, PostMessage)
-        (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) PURE;
+    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) PURE;
 
     /**
      * @brief 设置窗口标题
@@ -375,7 +376,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return
      */
     STDMETHOD_(BOOL, MoveWindow)
-        (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint DEF_VAL(TRUE)) PURE;
+    (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint DEF_VAL(TRUE)) PURE;
 
     /**
      * @brief 移动窗口位置
@@ -408,15 +409,15 @@ DECLARE_INTERFACE(INativeWnd){
      * @return
      */
     STDMETHOD_(BOOL, SetLayeredWindowAttributes)
-        (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
+    (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
 
     /**
      * @brief 设置窗口透明度
      * @param byAlpha 透明度,0->255
      * @return TRUE-SUCCEED
-    */
+     */
     STDMETHOD_(BOOL, SetLayeredWindowAlpha)(THIS_ BYTE byAlpha) PURE;
-    
+
     /**
      * @brief 更新分层窗口
      * @param hdcDst
@@ -430,7 +431,7 @@ DECLARE_INTERFACE(INativeWnd){
      * @return
      */
     STDMETHOD_(BOOL, UpdateLayeredWindow)
-        (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey, BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
+    (THIS_ HDC hdcDst, POINT * pptDst, SIZE * psize, HDC hdcSrc, POINT * pptSrc, COLORREF crKey, BLENDFUNCTION * pblend, DWORD dwFlags) PURE;
 
     /**
      * @brief 设置窗口消息处理函数
@@ -438,13 +439,13 @@ DECLARE_INTERFACE(INativeWnd){
      * @param ctx 消息处理函数Context
      * @return
      */
-    STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void* ctx) PURE;
+    STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
 
     /**
      * @brief 获取窗口消息处理对象
      * @return 消息处理对象
      */
-    STDMETHOD_(MsgHandlerInfo*, GetMsgHandler)(THIS) PURE;
+    STDMETHOD_(MsgHandlerInfo *, GetMsgHandler)(THIS) PURE;
 };
 
 SNSEND

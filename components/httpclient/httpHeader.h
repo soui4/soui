@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <string>
 #include <map>
 #include <interface/SHttpClient-i.h>
@@ -29,13 +29,13 @@ public:
 	void setHost(const std::string& host);
 	void setRange(__int64 range);
 
-	//×ª³ÉhttpÇëÇóÍ·
+	//è½¬æˆhttpè¯·æ±‚å¤´
 	std::string toString(RequestType type);
-	//×ª³ÉhttpÇëÇóÍ·ÁĞ±í
+	//è½¬æˆhttpè¯·æ±‚å¤´åˆ—è¡¨
 	std::string toHttpHeaders();
 
 protected:
-	//½âÎöHTTPÍ·½á¹¹
+	//è§£æHTTPå¤´ç»“æ„
 	bool Revolse(const std::string& strHeader);
 
 private:

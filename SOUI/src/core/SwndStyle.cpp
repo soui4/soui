@@ -28,6 +28,11 @@ SwndStyle::SwndStyle()
     }
 }
 
+UINT SwndStyle::GetAlign() const
+{
+    return m_uAlign | m_uVAlign;
+}
+
 UINT SwndStyle::GetTextAlign() const
 {
     if (m_nTextAlign)

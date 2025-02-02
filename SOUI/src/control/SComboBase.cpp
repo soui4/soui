@@ -114,18 +114,20 @@ BOOL SComboBase::CreateChildren(SXmlNode xmlNode)
     SASSERT(m_pEdit);
     m_pEdit->SetOwner(this);
     InsertChild(m_pEdit);
-    m_pEdit->GetEventSet()->setMutedState(true);
+    m_pEdit->GetEventSet()->setMutedState(TRUE);
     if (xmlEditStyle)
         m_pEdit->InitFromXml(&xmlEditStyle);
     else
         m_pEdit->SSendMessage(WM_CREATE);
-    m_pEdit->GetEventSet()->setMutedState(false);
+    m_pEdit->GetEventSet()->setMutedState(FALSE);
 
     m_pEdit->SetID(IDC_CB_EDIT);
     m_pEdit->SSendMessage(EM_SETEVENTMASK, 0, ENM_CHANGE);
     m_pEdit->SetVisible(!m_bDropdown);
-
-    return CreateListBox(xmlNode);
+    GetEventSet()->setMutedState(TRUE);
+    BOOL ret = CreateListBox(xmlNode);
+    GetEventSet()->setMutedState(FALSE);
+    return ret;
 }
 
 void SComboBase::GetDropBtnRect(LPRECT prc)
@@ -465,7 +467,7 @@ void SComboBase::DropDown()
     else
         m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 #else
-        m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
+    m_pDropDownWnd->SetWindowPos(HWND_TOP, 0, 0, 0, 0, SWP_SHOWWINDOW | SWP_NOMOVE | SWP_NOZORDER | SWP_NOSIZE | SWP_NOACTIVATE);
 #endif
     m_pDropDownWnd->SNativeWnd::SetCapture();
 }

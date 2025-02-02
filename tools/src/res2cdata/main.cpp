@@ -1,4 +1,4 @@
-#define _CRT_SECURE_NO_WARNINGS
+ï»¿#define _CRT_SECURE_NO_WARNINGS
 #include <stdio.h>
 #include <iostream>
 #include <tchar.h>
@@ -53,10 +53,10 @@ bool convertResFile2CData(const tstring & filename,FILE *output){
 int _tmain(int argc, _TCHAR* argv[]){
 
 	int c;
-	tstring strInput;	//Æ¤·ôÂ·¾¶,Ïà¶ÔÓÚ³ÌĞòµÄ.rcÎÄ¼ş
+	tstring strInput;	//çš®è‚¤è·¯å¾„,ç›¸å¯¹äºç¨‹åºçš„.rcæ–‡ä»¶
 	tstring strOutput;
 	tstring strFilter = _T("*.*");
-	while ((c = getopt(argc, argv, _T("i:o:f:"))) != EOF || optarg!=NULL)
+	while ((c = getopt(argc, argv, _T("i:o:f:"))) != EOF)
 	{
 		switch (c)
 		{
@@ -67,7 +67,7 @@ int _tmain(int argc, _TCHAR* argv[]){
 	}
 	
 	if(strInput.empty() || strOutput.empty()){
-		printf("usage: res2cdata.exe -i input -o output.c\n");
+		printf("usage: res2cdata.exe -i input_path [-f *.*] -o output.c\n");
 		return 1;
 	}
 	if(*strInput.rbegin() !=_T('\\'))
@@ -78,7 +78,6 @@ int _tmain(int argc, _TCHAR* argv[]){
 		_tprintf(_T("open output file failed! output = %s\n"),strOutput.c_str());
 		return 2;
 	}
-//	fprintf(fout,"#include <stdio.h>\n");
 
 	WIN32_FIND_DATA wfd;
 	tstring filename = strInput+strFilter;

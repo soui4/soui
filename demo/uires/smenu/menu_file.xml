@@ -1,0 +1,6 @@
+﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="180">
+  <item name="menu_open_lib" id="13">open</item>
+  <item name="menu_save_lib" id="14">save</item>
+	<sep/>
+	<item name="menu_exit" id="12">exit(&X)</item>
+</menu>

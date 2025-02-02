@@ -28,7 +28,7 @@ class CTextNotify : public ITxNotify
 {
 //@access Public Methods
 public:
-	CTextNotify(CTxtEdit * ped) { _ped = ped; }
+	CTextNotify(CTxtEdit * ped) { _ped = ped; _pMsgFilterNotify=NULL;}
 	~CTextNotify();
 	//
 	// ITxNotify Interface

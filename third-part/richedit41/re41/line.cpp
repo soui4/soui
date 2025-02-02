@@ -371,6 +371,10 @@ BOOL CLine::IsEqual(CLine& li)
 			_cch == li._cch;
 }
 
+void CLine::Init ()
+{
+	ZeroMemory(this, sizeof(CLine));
+}
 
 // =====================  CLinePtr: Line Run Pointer  ==========================
 

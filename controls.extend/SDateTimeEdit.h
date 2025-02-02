@@ -1,14 +1,14 @@
-/**
- * Copyright (C) 2014-2050 SOUIÍÅ¶Ó
+ï»¿/**
+ * Copyright (C) 2014-2050 SOUIå›¢é˜Ÿ
  * All rights reserved.
  *
  * @file       SDateTimeEdit.h
- * @brief      Í¨ÓÃ¿Ø¼ş
+ * @brief      é€šç”¨æ§ä»¶
  * @version    v1.0
  * @author     soui
  * @date       2014-06-27
  *
- * Describe    Ê±¼ä¿Ø¼ş
+ * Describe    æ—¶é—´æ§ä»¶
  */
 
 #pragma once
@@ -26,9 +26,9 @@ namespace SOUI
 //===========================================================================
 /**
  * @class      SMaskEdit
- * @brief      ÒşÂëÊäÈë¿ò
+ * @brief      éšç è¾“å…¥æ¡†
  *
- * Describe    ÒşÂëÊäÈë¿ò  Ö÷ÒªÓÃÓÚ¹Ì¶¨ÊäÈë¸ñÊ½
+ * Describe    éšç è¾“å…¥æ¡†  ä¸»è¦ç”¨äºå›ºå®šè¾“å…¥æ ¼å¼
  */
 class SMaskEdit : public SEdit {
     DEF_SOBJECT(SEdit, L"maskedit")
@@ -36,76 +36,76 @@ class SMaskEdit : public SEdit {
   public:
     /**
      * SMaskEdit::SMaskEdit
-     * @brief    ¹¹Ôìº¯Êı
+     * @brief    æ„é€ å‡½æ•°
      *
-     * Describe  ¹¹Ôìº¯Êı
+     * Describe  æ„é€ å‡½æ•°
      */
     SMaskEdit();
     /**
      * SMaskEdit::CanUseMask
-     * @brief    ÊÇ·ñÆôÓÃmask¹¦ÄÜ
-     * @return   ·µ»ØBOOL
+     * @brief    æ˜¯å¦å¯ç”¨maskåŠŸèƒ½
+     * @return   è¿”å›BOOL
      *
-     * Describe  ÊÇ·ñÆôÓÃmask¹¦ÄÜ
+     * Describe  æ˜¯å¦å¯ç”¨maskåŠŸèƒ½
      */
     BOOL CanUseMask() const;
     /**
      * SMaskEdit::SetUseMask
-     * @brief    ÉèÖÃmask¹¦ÄÜ
+     * @brief    è®¾ç½®maskåŠŸèƒ½
      * @param    BOOL bUseMask  -- TRUE FALSE
      *
-     * Describe  ÉèÖÃmask¹¦ÄÜ
+     * Describe  è®¾ç½®maskåŠŸèƒ½
      */
     void SetUseMask(BOOL bUseMask);
     /**
      * SMaskEdit::CanOverType
-     * @brief    ÊÇ·ñÆôÓÃ¸ÄĞ´¹¦ÄÜ
-     * @param    ·µ»ØBOOL
+     * @brief    æ˜¯å¦å¯ç”¨æ”¹å†™åŠŸèƒ½
+     * @param    è¿”å›BOOL
      *
-     * Describe  ÊÇ·ñÆôÓÃ¸ÄĞ´¹¦ÄÜ
+     * Describe  æ˜¯å¦å¯ç”¨æ”¹å†™åŠŸèƒ½
      */
     BOOL CanOverType() const;
 
     /**
      * SMaskEdit::SetOverType
-     * @brief    ÉèÖÃ¸ÄĞ´¹¦ÄÜ
+     * @brief    è®¾ç½®æ”¹å†™åŠŸèƒ½
      * @param    BOOL bOverType  -- TRUE FALSE
      *
-     * Describe  ÉèÖÃ¸ÄĞ´¹¦ÄÜ
+     * Describe  è®¾ç½®æ”¹å†™åŠŸèƒ½
      */
     void SetOverType(BOOL bOverType);
 
     /**
      * SMaskEdit::PosInRange
-     * @brief    ÊÇ·ñÆôÓÃmask¹¦ÄÜ
-     * @param    ·µ»ØBOOL
+     * @brief    æ˜¯å¦å¯ç”¨maskåŠŸèƒ½
+     * @param    è¿”å›BOOL
      *
-     * Describe  ÊÇ·ñÆôÓÃmask¹¦ÄÜ
+     * Describe  æ˜¯å¦å¯ç”¨maskåŠŸèƒ½
      */
     BOOL PosInRange(int nPos) const;
 
     /**
      * SMaskEdit::CanUseMask
-     * @brief    ÊÇ·ñÆôÓÃmask¹¦ÄÜ
-     * @param    ·µ»ØBOOL
+     * @brief    æ˜¯å¦å¯ç”¨maskåŠŸèƒ½
+     * @param    è¿”å›BOOL
      *
-     * Describe  ÊÇ·ñÆôÓÃmask¹¦ÄÜ
+     * Describe  æ˜¯å¦å¯ç”¨maskåŠŸèƒ½
      */
     TCHAR GetPromptChar() const;
     /**
      * SMaskEdit::CanUseMask
-     * @brief    ÊÇ·ñÆôÓÃmask¹¦ÄÜ
-     * @param    ·µ»ØBOOL
+     * @brief    æ˜¯å¦å¯ç”¨maskåŠŸèƒ½
+     * @param    è¿”å›BOOL
      *
-     * Describe  ÊÇ·ñÆôÓÃmask¹¦ÄÜ
+     * Describe  æ˜¯å¦å¯ç”¨maskåŠŸèƒ½
      */
     SStringT GetPromptString(int nLength) const;
     /**
      * SMaskEdit::CanUseMask
-     * @brief    ÊÇ·ñÆôÓÃmask¹¦ÄÜ
-     * @param    ·µ»ØBOOL
+     * @brief    æ˜¯å¦å¯ç”¨maskåŠŸèƒ½
+     * @param    è¿”å›BOOL
      *
-     * Describe  ÊÇ·ñÆôÓÃmask¹¦ÄÜ
+     * Describe  æ˜¯å¦å¯ç”¨maskåŠŸèƒ½
      */
     void SetPromptChar(TCHAR ch, BOOL bAutoReplace = TRUE);
 
@@ -151,41 +151,41 @@ class SMaskEdit : public SEdit {
   protected:
     /**
      * SMaskEdit::OnCreate
-     * @brief    ´´½¨ÏûÏ¢ÏìÓ¦º¯Êı
+     * @brief    åˆ›å»ºæ¶ˆæ¯å“åº”å‡½æ•°
      * @param    LPVOID
-     * @return   ·µ»ØÖµint
+     * @return   è¿”å›å€¼int
      *
-     * Describe  ´Ëº¯ÊıÊÇÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ­¤å‡½æ•°æ˜¯æ¶ˆæ¯å“åº”å‡½æ•°
      */
     int OnCreate(LPVOID);
 
     /**
      * SMaskEdit::OnChar
-     * @brief    ×Ö·ûÏûÏ¢
-     * @param    UINT nChar -- °´¼ü¶ÔÓ¦µÄÂëÖµ
-     * @param    UINT nRepCnt -- ÖØ¸´´ÎÊı
-     * @param    UINT nFlags -- ±êÖ¾
+     * @brief    å­—ç¬¦æ¶ˆæ¯
+     * @param    UINT nChar -- æŒ‰é”®å¯¹åº”çš„ç å€¼
+     * @param    UINT nRepCnt -- é‡å¤æ¬¡æ•°
+     * @param    UINT nFlags -- æ ‡å¿—
      *
-     * Describe  ´Ëº¯ÊıÊÇÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ­¤å‡½æ•°æ˜¯æ¶ˆæ¯å“åº”å‡½æ•°
      */
     void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
      * SMaskEdit::OnKeyDown
-     * @brief    ¼üÅÌ°´ÏÂÊÂ¼ş
-     * @param    UINT nChar -- °´¼ü¶ÔÓ¦µÄÂëÖµ
-     * @param    UINT nRepCnt -- ÖØ¸´´ÎÊı
-     * @param    UINT nFlags -- ±êÖ¾
+     * @brief    é”®ç›˜æŒ‰ä¸‹äº‹ä»¶
+     * @param    UINT nChar -- æŒ‰é”®å¯¹åº”çš„ç å€¼
+     * @param    UINT nRepCnt -- é‡å¤æ¬¡æ•°
+     * @param    UINT nFlags -- æ ‡å¿—
      *
-     * Describe  ´Ëº¯ÊıÊÇÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ­¤å‡½æ•°æ˜¯æ¶ˆæ¯å“åº”å‡½æ•°
      */
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
      * SMaskEdit::OnSetFocus
-     * @brief    ÉèÖÃ½¹µã
+     * @brief    è®¾ç½®ç„¦ç‚¹
      *
-     * Describe  ´Ëº¯ÊıÊÇÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ­¤å‡½æ•°æ˜¯æ¶ˆæ¯å“åº”å‡½æ•°
      */
     void OnSetFocus(SWND wndOld);
 
@@ -213,9 +213,9 @@ class SMaskEdit : public SEdit {
 
 /**
  * @class      SDateEdit
- * @brief      ÈÕÆÚ±à¼­¿ò
+ * @brief      æ—¥æœŸç¼–è¾‘æ¡†
  *
- * Describe    ÈÕÆÚ±à¼­¿ò
+ * Describe    æ—¥æœŸç¼–è¾‘æ¡†
  */
 class SDateEdit : public SMaskEdit {
     DEF_SOBJECT(SMaskEdit, L"dateedit")
@@ -223,34 +223,34 @@ class SDateEdit : public SMaskEdit {
   public:
     /**
      * SDateEdit::SDateEdit
-     * @brief    ¹¹Ôìº¯Êı
+     * @brief    æ„é€ å‡½æ•°
      *
-     * Describe  ¹¹Ôìº¯Êı
+     * Describe  æ„é€ å‡½æ•°
      */
     SDateEdit();
     /**
      * SDateEdit::SetDateTime
-     * @brief    ÉèÖÃÈÕÆÚ
-     * @param    LPCTSTR strDate -- ÈÕÆÚ×Ö·û´®
+     * @brief    è®¾ç½®æ—¥æœŸ
+     * @param    LPCTSTR strDate -- æ—¥æœŸå­—ç¬¦ä¸²
      *
-     * Describe  ÉèÖÃÈÕÆÚ
+     * Describe  è®¾ç½®æ—¥æœŸ
      */
     virtual void SetDateTime(LPCTSTR strDate);
     /**
      * SDateEdit::SetDateTime
-     * @brief    ÉèÖÃÈÕÆÚ
-     * @param    CTime tm -- ÈÕÆÚÀà¶ÔÏó
+     * @brief    è®¾ç½®æ—¥æœŸ
+     * @param    CTime tm -- æ—¥æœŸç±»å¯¹è±¡
      *
-     * Describe  ÉèÖÃÈÕÆÚ
+     * Describe  è®¾ç½®æ—¥æœŸ
      */
     virtual void SetDateTime(STime tm);
 
     /**
      * SDateEdit::GetWindowDateTime
-     * @brief    »ñÈ¡ÏµÍ³Ê±¼ä
-     * @return   SStringT ·µ»Ø×Ö·û´®
+     * @brief    è·å–ç³»ç»Ÿæ—¶é—´
+     * @return   SStringT è¿”å›å­—ç¬¦ä¸²
      *
-     * Describe  »ñÈ¡ÏµÍ³Ê±¼ä
+     * Describe  è·å–ç³»ç»Ÿæ—¶é—´
      */
     virtual SStringT GetWindowDateTime();
 
@@ -259,10 +259,10 @@ class SDateEdit : public SMaskEdit {
   protected:
     /**
      * SDateEdit::OnCreate
-     * @brief    ÏûÏ¢ÏìÓ¦º¯Êı
+     * @brief    æ¶ˆæ¯å“åº”å‡½æ•°
      * @return   int
      *
-     * Describe  ÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ¶ˆæ¯å“åº”å‡½æ•°
      */
     int OnCreate(LPVOID);
 
@@ -276,9 +276,9 @@ class SDateEdit : public SMaskEdit {
 //  CDxTimeEdit
 /**
  * @class      STimeEdit
- * @brief      Ê±¼ä±à¼­¿ò
+ * @brief      æ—¶é—´ç¼–è¾‘æ¡†
  *
- * Describe    Ê±¼ä±à¼­¿ò
+ * Describe    æ—¶é—´ç¼–è¾‘æ¡†
  */
 class STimeEdit : public SDateEdit {
     DEF_SOBJECT(SDateEdit, L"timeedit")
@@ -286,51 +286,51 @@ class STimeEdit : public SDateEdit {
   public:
     /**
      * STimeEdit::STimeEdit
-     * @brief    ¹¹Ôìº¯Êı
+     * @brief    æ„é€ å‡½æ•°
      *
-     * Describe  ¹¹Ôìº¯Êı
+     * Describe  æ„é€ å‡½æ•°
      */
     STimeEdit();
 
   public:
     /**
      * SDateEdit::SetHours
-     * @brief    ÉèÖÃĞ¡Ê±
+     * @brief    è®¾ç½®å°æ—¶
      *
-     * Describe  ÉèÖÃĞ¡Ê±
+     * Describe  è®¾ç½®å°æ—¶
      */
     virtual void SetHours(int nHours);
     /**
      * SDateEdit::SetMins
-     * @brief    ÉèÖÃ·ÖÖÓ
+     * @brief    è®¾ç½®åˆ†é’Ÿ
      *
-     * Describe  ÉèÖÃ·ÖÖÓ
+     * Describe  è®¾ç½®åˆ†é’Ÿ
      */
     virtual void SetMins(int nMins);
     /**
      * SDateEdit::SetTime
-     * @brief    ÉèÖÃÊ±¼ä
-     * @param    int nHours -- Ğ¡Ê±
-     * @param    int nMins  -- ·ÖÖÓ
+     * @brief    è®¾ç½®æ—¶é—´
+     * @param    int nHours -- å°æ—¶
+     * @param    int nMins  -- åˆ†é’Ÿ
      *
-     * Describe  ÉèÖÃÊ±¼ä
+     * Describe  è®¾ç½®æ—¶é—´
      */
     virtual void SetTime(int nHours, int nMins);
     /**
      * SDateEdit::GetHours
-     * @brief    »ñÈ¡Ğ¡Ê±
-     * @return   ·µ»Øint
+     * @brief    è·å–å°æ—¶
+     * @return   è¿”å›int
      *
-     * Describe  »ñÈ¡Ğ¡Ê±
+     * Describe  è·å–å°æ—¶
      */
 
     int GetHours() const;
     /**
      * SDateEdit::GetMins
-     * @brief    »ñÈ¡·ÖÖÓ
-     * @return   ·µ»Øint
+     * @brief    è·å–åˆ†é’Ÿ
+     * @return   è¿”å›int
      *
-     * Describe  ÉèÖÃ·ÖÖÓ
+     * Describe  è®¾ç½®åˆ†é’Ÿ
      */
 
     int GetMins() const;
@@ -339,17 +339,17 @@ class STimeEdit : public SDateEdit {
     void SetMilitary(BOOL bMilitary = TRUE);
 
   protected:
-    int m_nHours;     /**< Ğ¡Ê± */
-    int m_nMins;      /**< ·ÖÖÓ */
+    int m_nHours;     /**< å°æ—¶ */
+    int m_nMins;      /**< åˆ†é’Ÿ */
     BOOL m_bMilitary; /**<  */
 
   protected:
     /**
      * STimeEdit::OnCreate
-     * @brief    ÏûÏ¢ÏìÓ¦º¯Êı
+     * @brief    æ¶ˆæ¯å“åº”å‡½æ•°
      * @return   int
      *
-     * Describe  ÏûÏ¢ÏìÓ¦º¯Êı
+     * Describe  æ¶ˆæ¯å“åº”å‡½æ•°
      */
     int OnCreate(LPVOID);
 

@@ -1,6 +1,6 @@
 #include "stdafx.h"
 #include "FpsWnd.h"
-#include <Mmsystem.h>
+#include <mmsystem.h>
 #pragma comment(lib,"Winmm.lib")
 
 SNSBEGIN
@@ -51,5 +51,10 @@ void FpsWnd::OnPaint(IRenderTarget *pRT)
 	AfterPaint(pRT,painter);
 }
 
+void FpsWnd::OnDestroy()
+{
+    GetContainer()->UnregisterTimelineHandler(this);
+    __baseCls::OnDestroy();
+}
 
 SNSEND

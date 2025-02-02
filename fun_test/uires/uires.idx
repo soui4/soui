@@ -6,8 +6,7 @@
 		<file name="XML_MAINWND" path="xml\dlg_main.xml"/>
 		<file name="XML_MENUTEST" path="xml\menu_test.xml"/>
 		<file name="XML_MENUEXTEST" path="xml\menuex_test.xml"/>
-		<file name="xml_ipc_svr" path="xml\ipc_svr.xml"/>
-		<file name="xml_ipc_client" path="xml\ipc_client.xml"/>
+		<file name="xml_soui" path="xml\wnd_soui.xml"/>
 	</LAYOUT>
 
 	<values>
@@ -19,8 +18,12 @@
 	<img>
 		<file name="girl" path="image\girl.png"/>
 		<file name="yy_logo" path="image\yy.png"/>
-    <file name="png_menu_border" path="image\menuborder.png" />
+		<file name="soui" path="image\soui.png"/>
+		<file name="png_menu_border" path="image\menuborder.png" />
 	</img>
+	<rtf>
+		<file name="test" path="rtf\test.rtf"/>
+	</rtf>
 	<ICON>
 		<file name="ICON_LOGO"  path="image\soui.ico"/>
 	</ICON>

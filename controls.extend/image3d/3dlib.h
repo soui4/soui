@@ -1,11 +1,11 @@
-#pragma once
+ï»¿#pragma once
 namespace IMAGE3D
 {
 
 //////////////////////////////////////////////////////////////////////////
-// 3D Ä£Äâ²¿·Ö
+// 3D æ¨¡æ‹Ÿéƒ¨åˆ†
 
-// ²»°üº¬w·ÖÁ¿2DÏòÁ¿ºÍµã
+// ä¸åŒ…å«wåˆ†é‡2Då‘é‡å’Œç‚¹
 typedef struct tagVECTOR2D
 {
 	union
@@ -19,7 +19,7 @@ typedef struct tagVECTOR2D
 	};
 }VECTOR2D, POINT2D, *VECTOR2D_PTR, *POINT2D_PTR;
 
-// ²»°üº¬w·ÖÁ¿µÄ3DÏòÁ¿ºÍµã
+// ä¸åŒ…å«wåˆ†é‡çš„3Då‘é‡å’Œç‚¹
 typedef struct tagVECTOR3D
 {
 	union
@@ -33,7 +33,7 @@ typedef struct tagVECTOR3D
 	};
 } VECTOR3D, POINT3D, *VECTOR3D_PTR, *POINT3D_PTR;
 
-// °üº¬w·ÖÁ¿µÄ4DÆë´ÎÏòÁ¿ºÍµã
+// åŒ…å«wåˆ†é‡çš„4Dé½æ¬¡å‘é‡å’Œç‚¹
 typedef struct tagVECTOR4D
 {
 	union
@@ -47,7 +47,7 @@ typedef struct tagVECTOR4D
 	};
 } VECTOR4D, POINT4D, *VECTOR4D_PTR, *POINT4D_PTR;
 
-// 2D ¶¥µã
+// 2D é¡¶ç‚¹
 typedef struct tagVERTEX2DI
 {
 	int x, y;
@@ -58,30 +58,30 @@ typedef struct tagVERTEX2DF
 	float x, y;
 }VERTEX2DF, *VERTEX2DF_PTR;
 
-// 2D²ÎÊı»¯Ö±Ïß
+// 2Då‚æ•°åŒ–ç›´çº¿
 typedef struct tagPARAMLINE2D
 {
-	POINT2D  p0;  // ²ÎÊı»¯Ö±ÏßµÄÆğµã
-	POINT2D  p1;  // ²ÎÊı»¯Ö±ÏßµÄÖÕµã
-	VECTOR2D v;   // Ïß¶ÎµÄ·½ÏòÏòÁ¿  |v| = |p0 -> p1|
+	POINT2D  p0;  // å‚æ•°åŒ–ç›´çº¿çš„èµ·ç‚¹
+	POINT2D  p1;  // å‚æ•°åŒ–ç›´çº¿çš„ç»ˆç‚¹
+	VECTOR2D v;   // çº¿æ®µçš„æ–¹å‘å‘é‡  |v| = |p0 -> p1|
 } PARAMLINE2D, *PARAMLINE2D_PTR;
 
-// 3D²ÎÊı»¯Ö±Ïß
+// 3Då‚æ•°åŒ–ç›´çº¿
 typedef struct tagPARAMLINE3D
 {
-	POINT3D  p0;  // ²ÎÊı»¯Ö±ÏßµÄÆğµã
-	POINT3D  p1;  // ²ÎÊı»¯Ö±ÏßµÄÖÕµã
-	VECTOR3D v;   // Ïß¶ÎµÄ·½ÏòÏòÁ¿  |v| = |p0 -> p1|
+	POINT3D  p0;  // å‚æ•°åŒ–ç›´çº¿çš„èµ·ç‚¹
+	POINT3D  p1;  // å‚æ•°åŒ–ç›´çº¿çš„ç»ˆç‚¹
+	VECTOR3D v;   // çº¿æ®µçš„æ–¹å‘å‘é‡  |v| = |p0 -> p1|
 } PARAMLINE3D, *PARAMLINE3D_PTR;
 
-// 3D Æ½Ãæ
+// 3D å¹³é¢
 typedef struct tagPLANE3D
 {
-	POINT3D  p0;  // Æ½ÃæÉÏµÄµã
-	VECTOR3D n;   // Æ½ÃæÉÏµÄ·¨Ïß£¨²»±ØÊÇµ¥Î»ÏòÁ¿£©
+	POINT3D  p0;  // å¹³é¢ä¸Šçš„ç‚¹
+	VECTOR3D n;   // å¹³é¢ä¸Šçš„æ³•çº¿ï¼ˆä¸å¿…æ˜¯å•ä½å‘é‡ï¼‰
 }PLANE3D, *PLANE3D_PTR;
 
-// 4x4¾ØÕó
+// 4x4çŸ©é˜µ
 typedef struct tagMATRIX_4_4
 {
 	union
@@ -98,7 +98,7 @@ typedef struct tagMATRIX_4_4
 	};
 }MATRIX_4_4, *MATRIX_4_4_PTR;
 
-// 4x3¾ØÕó
+// 4x3çŸ©é˜µ
 typedef struct tagMATRIX_4_3
 {
 	union
@@ -115,7 +115,7 @@ typedef struct tagMATRIX_4_3
 	};
 }MATRIX_4_3, *MATRIX_4_3_PTR;
 
-// 1x4¾ØÕó
+// 1x4çŸ©é˜µ
 typedef struct tagMATRIX_1_4
 {
 	union
@@ -129,7 +129,7 @@ typedef struct tagMATRIX_1_4
 	};
 }MATRIX_1_4, *MATRIX_1_4_PTR;
 
-// 3x3¾ØÕó
+// 3x3çŸ©é˜µ
 typedef struct tagMATRIX_3_3
 {
 	union
@@ -145,7 +145,7 @@ typedef struct tagMATRIX_3_3
 	};
 }MATRIX_3_3, *MATRIX_3_3_PTR;
 
-// 1x3¾ØÕó
+// 1x3çŸ©é˜µ
 typedef struct tagMATRIX_1_3
 {
 	union
@@ -159,7 +159,7 @@ typedef struct tagMATRIX_1_3
 	};
 }MATRIX_1_3, *MATRIX_1_3_PTR;
 
-// 3x2¾ØÕó
+// 3x2çŸ©é˜µ
 typedef struct tagMATRIX_3_2
 {
 	union
@@ -175,7 +175,7 @@ typedef struct tagMATRIX_3_2
 	};
 }MATRIX_3_2, *MATRIX_3_2_PTR;
 
-// 2x2¾ØÕó
+// 2x2çŸ©é˜µ
 typedef struct tagMATRIX_2_2
 {
 	union
@@ -191,7 +191,7 @@ typedef struct tagMATRIX_2_2
 }MATRIX_2_2, *MATRIX_2_2_PTR;
 
 
-// 1x2¾ØÕó
+// 1x2çŸ©é˜µ
 typedef struct tagMATRIX_1_2
 {
 	union
@@ -205,9 +205,9 @@ typedef struct tagMATRIX_1_2
 	};
 }MATRIX_1_2, *MATRIX_1_2_PTR;
 
-// 4D ËÄÔªÊı
-// q = q0 + q1*i + q2*j + q3*k  »ò
-// q = q0 + <q1, q2, q3>  »ò
+// 4D å››å…ƒæ•°
+// q = q0 + q1*i + q2*j + q3*k  æˆ–
+// q = q0 + <q1, q2, q3>  æˆ–
 // q = q0 + qv
 typedef struct tagQUAT
 {
@@ -217,8 +217,8 @@ typedef struct tagQUAT
 
 		struct 
 		{
-			float    q0; // Êµ²¿
-			VECTOR3D qv; // Ğé²¿
+			float    q0; // å®éƒ¨
+			VECTOR3D qv; // è™šéƒ¨
 		};
 
 		struct
@@ -228,36 +228,36 @@ typedef struct tagQUAT
 	};
 }QUAT, *QUAT_PTR;
 
-// 2D¼«×ø±ê
+// 2Dæåæ ‡
 typedef struct tagPOLAR2D
 {
-	float    r;  // °ë¾¶
-	float    theta; // ½Ç¶È
+	float    r;  // åŠå¾„
+	float    theta; // è§’åº¦
 } POLAR2D, *POLAR2D_PTR;
 
-// 3DÖùÃæ×ø±ê
+// 3DæŸ±é¢åæ ‡
 typedef struct tagCYLINDRICAL3D
 {
-	float    r;  // °ë¾¶
-	float    theta; // ÓëZÖáµÄ¼Ğ½Ç
-	float    z;  // z×ø±ê
+	float    r;  // åŠå¾„
+	float    theta; // ä¸Zè½´çš„å¤¹è§’
+	float    z;  // zåæ ‡
 }CYLINDRICAL3D, *CYLINDRICAL3D_PTR;
 
-// 3DÇòÃæ×ø±ê
+// 3Dçƒé¢åæ ‡
 typedef struct tagSPHERICAL3D
 {
-	float    p;  // µ½Ô­µãµÄ¾àÀë
-	float    theta;  // Ïß¶Îo->pºÍÕızÖáÖ®¼äµÄ¼Ğ½Ç
-	float    phi; // Ïß¶Îo->pÔÚx-yÆ½ÃæÉÏµÄÍ¶Ó°ÓëÕıxÖáÖ®¼äµÄ¼Ğ½Ç
+	float    p;  // åˆ°åŸç‚¹çš„è·ç¦»
+	float    theta;  // çº¿æ®µo->på’Œæ­£zè½´ä¹‹é—´çš„å¤¹è§’
+	float    phi; // çº¿æ®µo->påœ¨x-yå¹³é¢ä¸Šçš„æŠ•å½±ä¸æ­£xè½´ä¹‹é—´çš„å¤¹è§’
 }SPHERICAL3D, *SPHERICAL3D_PTR;
 
 
-// ·Ç³£Ğ¡µÄÊı
+// éå¸¸å°çš„æ•°
 #define EPSILON_E4  (float)(1E-4)
 #define EPSILON_E5  (float)(1E-5)
 #define EPSILON_E6  (float)(1E-6)
 
-// 4x4µ¥Î»¾ØÕó
+// 4x4å•ä½çŸ©é˜µ
 const MATRIX_4_4 IMAT_4_4 = 
 {
 	1, 0, 0, 0,
@@ -266,7 +266,7 @@ const MATRIX_4_4 IMAT_4_4 =
 	0, 0, 0, 1
 };
 
-// 4x3µ¥Î»¾ØÕó(´ÓÊıÑ§ÉÏ4x3Ã»ÓĞµ¥Î»¾ØÕó)
+// 4x3å•ä½çŸ©é˜µ(ä»æ•°å­¦ä¸Š4x3æ²¡æœ‰å•ä½çŸ©é˜µ)
 const MATRIX_4_3 IMAT_4_3 = 
 {
 	1, 0, 0,
@@ -275,7 +275,7 @@ const MATRIX_4_3 IMAT_4_3 =
 	0, 0, 0,
 };
 
-// 3x3µ¥Î»¾ØÕó
+// 3x3å•ä½çŸ©é˜µ
 const MATRIX_3_3 IMAT_3_3 = 
 {
 	1, 0, 0,
@@ -283,14 +283,14 @@ const MATRIX_3_3 IMAT_3_3 =
 	0, 0, 1,
 };
 
-// 2x2µ¥Î»¾ØÕó
+// 2x2å•ä½çŸ©é˜µ
 const MATRIX_2_2 IMAT_2_2 = 
 {
 	1, 0,
 	0, 1,
 };
 
-// Í¨ÓÃºê
+// é€šç”¨å®
 
 #define MIN(a, b) (((a) < (b)) ? (a) : (b))
 #define MAX(a, b) (((a) > (b)) ? (b) : (a))
@@ -302,7 +302,7 @@ const MATRIX_2_2 IMAT_2_2 =
 
 #define RAND_RANGE(x, y) ((x) + (rand()%((y)-(x)+1)))
 
-// ÏòÁ¿¹éÁãºê
+// å‘é‡å½’é›¶å®
 inline  void VECTOR2D_ZERO(VECTOR2D_PTR v)
 {
 	(v)->x = (v)->y = 0.0;
@@ -317,7 +317,7 @@ inline  void VECTOR4D_ZERO(VECTOR4D_PTR v)
 	(v)->w = 1.0;
 }
 
-// Ê¹ÓÃ·ÖÁ¿³õÊ¼»¯ÏòÁ¿µÄºê
+// ä½¿ç”¨åˆ†é‡åˆå§‹åŒ–å‘é‡çš„å®
 inline  void VECTOR3D_INITXY(VECTOR2D_PTR v, float x, float y)
 {
 	(v)->x = x; 
@@ -337,7 +337,7 @@ inline  void VECTOR3D_INITXY(VECTOR4D_PTR v, float x, float y, float z)
 	(v)->w = 1.0;
 }
 
-// Ê¹ÓÃÁíÒ»¸öÏòÁ¿À´³õÊ¼»¯ÏòÁ¿µÄºê
+// ä½¿ç”¨å¦ä¸€ä¸ªå‘é‡æ¥åˆå§‹åŒ–å‘é‡çš„å®
 inline  void VECTOR2D_INIT(VECTOR2D_PTR vDst, VECTOR2D_PTR vSrc)
 {
 	(vDst)->x = (vSrc)->x;
@@ -357,7 +357,7 @@ inline  void VECTOR4D_INIT(VECTOR4D_PTR vDst, VECTOR4D_PTR vSrc)
 	(vDst)->w = (vSrc)->w;
 }
 
-// ¸´ÖÆÏòÁ¿µÄºê
+// å¤åˆ¶å‘é‡çš„å®
 inline  void VECTOR2D_COPY(VECTOR2D_PTR vDst, VECTOR2D_PTR vSrc)
 {
 	(vDst)->x = (vSrc)->x;
@@ -377,7 +377,7 @@ inline  void VECTOR4D_COPY(VECTOR4D_PTR vDst, VECTOR4D_PTR vSrc)
 	(vDst)->w = (vSrc)->w;
 }
 
-// ³õÊ¼»¯µãµÄºê
+// åˆå§‹åŒ–ç‚¹çš„å®
 inline  void POINT2D_INIT(POINT2D_PTR vDst, POINT2D_PTR vSrc)
 {
 	(vDst)->x = (vSrc)->x;
@@ -397,7 +397,7 @@ inline  void POINT4D_INIT(POINT4D_PTR vDst, POINT4D_PTR vSrc)
 	(vDst)->w = (vSrc)->w;
 }
 
-// ¸´ÖÆµãµÄºê
+// å¤åˆ¶ç‚¹çš„å®
 inline  void POINT2D_COPY(POINT2D_PTR vDst, POINT2D_PTR vSrc)
 {
 	(vDst)->x = (vSrc)->x;
@@ -454,27 +454,27 @@ inline void VECTOR4D_DIV_BY_W_VECTOR3D(VECTOR4D_PTR v4, VECTOR3D_PTR v3)
 	(v3)->z = (v4)->z/(v4)->w;  
 }
 
-// ¾ØÕóºê
+// çŸ©é˜µå®
 
-// Çå¿Õ¾ØÕó
+// æ¸…ç©ºçŸ©é˜µ
 #define MAT_ZERO_2_2(m)  {memset((void*)(m}, 0, sizeof(MATRIX_2_2))
 #define MAT_ZERO_3_3(m)  {memset((void*)(m}, 0, sizeof(MATRIX_3_3))
 #define MAT_ZERO_4_4(m)  {memset((void*)(m}, 0, sizeof(MATRIX_4_4))
 #define MAT_ZERO_4_3(m)  {memset((void*)(m}, 0, sizeof(MATRIX_4_3))
 
-// ÉèÖÃµ¥Î»¾ØÕóµÄºê
+// è®¾ç½®å•ä½çŸ©é˜µçš„å®
 #define MAT_IDENTITY_2_2(m) {memcpy((void*)(m), (void*)&IMAT_2_2, sizeof(MATRIX_2_2));}
 #define MAT_IDENTITY_3_3(m) {memcpy((void*)(m), (void*)&IMAT_3_3, sizeof(MATRIX_3_3));}
 #define MAT_IDENTITY_4_4(m) {memcpy((void*)(m), (void*)&IMAT_4_4, sizeof(MATRIX_4_4));}
 #define MAT_IDENTITY_4_3(m) {memcpy((void*)(m), (void*)&IMAT_4_3, sizeof(MATRIX_4_3));}
 
-// ¸´ÖÆ¾ØÕóµÄºê
+// å¤åˆ¶çŸ©é˜µçš„å®
 #define MAT_COPY_2_2(src_mat, dest_mat) {memcpy((void*)(dest_mat), (void*)(src_mat), sizeof(MATRIX_2_2));}
 #define MAT_COPY_3_3(src_mat, dest_mat) {memcpy((void*)(dest_mat), (void*)(src_mat), sizeof(MATRIX_3_3));}
 #define MAT_COPY_4_4(src_mat, dest_mat) {memcpy((void*)(dest_mat), (void*)(src_mat), sizeof(MATRIX_4_4));}
 #define MAT_COPY_4_3(src_mat, dest_mat) {memcpy((void*)(dest_mat), (void*)(src_mat), sizeof(MATRIX_4_3));}
 
-// ¶Ô¾ØÕó½øĞĞ×ªÖÃµÄºê
+// å¯¹çŸ©é˜µè¿›è¡Œè½¬ç½®çš„å®
 inline  void MAT_TRANSPOSE_3_3(MATRIX_3_3_PTR m)
 {
 	MATRIX_3_3 mt;
@@ -507,7 +507,7 @@ inline  void MAT_TRANSPOSE_4_4(MATRIX_4_4_PTR m, MATRIX_4_4_PTR mt)
 	mt->M30 = m->M03;  mt->M31 = m->M13;  mt->M32 = m->M23;  mt->M33 = m->M33;
 }
 
-// ¾ØÕóºÍÏòÁ¿ÁĞ»¥»»ºê
+// çŸ©é˜µå’Œå‘é‡åˆ—äº’æ¢å®
 inline  void  MAT_COLUMN_SWAP_2_2(MATRIX_2_2_PTR m, int c, MATRIX_1_2_PTR v)
 {
 	m->M[0][c] = v->M[0];
@@ -534,7 +534,7 @@ inline  void  MAT_COLUMN_SWAP_4_3(MATRIX_4_3_PTR m, int c, MATRIX_1_4_PTR v)
 	m->M[3][c] = v->M[3];
 }
 
-// ËÄÔªÊıºê
+// å››å…ƒæ•°å®
 inline void QUAT_ZERO(QUAT_PTR q) 
 {
 	(q)->x = (q)->y = (q)->z = (q)->w = 0.0;
@@ -562,15 +562,15 @@ inline void QUAT_COPY(QUAT_PTR qdst, QUAT_PTR qsrc)
 	(qdst)->z = (qsrc)->z; (qdst)->w = (qsrc)->w;  
 }
 
- // Ïà»ú
+ // ç›¸æœº
 typedef struct tagCAMERA
 {
-	POINT4D WorldPos;    // Ïà»úÔÚÊÀ½çµÄ×ø±ê
-	double  AngelX, AngelY, AngleZ; // Ïà»úµÄ³¯Ïò£¬Ê¹ÓÃÈÆX,Y,ZÖá·Ö±ğ×ª¶àÉÙ¶ÈÀ´±íÊ¾
+	POINT4D WorldPos;    // ç›¸æœºåœ¨ä¸–ç•Œçš„åæ ‡
+	double  AngelX, AngelY, AngleZ; // ç›¸æœºçš„æœå‘ï¼Œä½¿ç”¨ç»•X,Y,Zè½´åˆ†åˆ«è½¬å¤šå°‘åº¦æ¥è¡¨ç¤º
 } CAMERA, *CAMERA_PTR;
 
 
-// ¶¨µãÊıºê
+// å®šç‚¹æ•°å®
 // pi defines
 #define PI         ((float)3.141592654f)
 #define PI2        ((float)6.283185307f)
@@ -585,15 +585,15 @@ typedef struct tagCAMERA
 #define FIXP16_WP_MASK   0xffff0000
 #define FIXP16_ROUND_UP  0x00008000
 
-// ´Ó16.16¸ñÊ½µÄ¶¨µãÊıÖĞÌáÈ¡ÕûÊı²¿·ÖºÍĞ¡Êı²¿·Ö
+// ä»16.16æ ¼å¼çš„å®šç‚¹æ•°ä¸­æå–æ•´æ•°éƒ¨åˆ†å’Œå°æ•°éƒ¨åˆ†
 #define FIXP16_WP(fp) ((fp) >> FIXP16_SHIFT)
 #define FIXP16_DP(fp) ((fp) && FIXP16_DP_MASK)
 
-// ½«ÕûÊıºÍ¸¡µãÊı×ª»»Îª16.16¸ñÊ½µÄÊı
+// å°†æ•´æ•°å’Œæµ®ç‚¹æ•°è½¬æ¢ä¸º16.16æ ¼å¼çš„æ•°
 #define INT_TO_FIXP16(i) ((i) <<  FIXP16_SHIFT)
 #define FLOAT_TO_FIXP16(fv) (((float)(fv) * (float)FIXP16_MAG+0.5f))
 
-// ½«¶¨µãÊı×ª»»Îª¸¡µãÊı
+// å°†å®šç‚¹æ•°è½¬æ¢ä¸ºæµ®ç‚¹æ•°
 #define FIXP16_TO_FLOAT(fp) ( ((float)fp)/FIXP16_MAG)
 
 

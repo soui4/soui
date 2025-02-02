@@ -8,6 +8,20 @@
 
 add_definitions(-DSOUI_EXPORTS -D_CRT_SECURE_NO_WARNINGS)
 
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+set(ENABLE_THUNK ON)
+else()
+option(ENABLE_THUNK "Enable Thunk" OFF)
+endif()
+#set(ENABLE_THUNK 0) #open this line for centos or fedora
+if(${ENABLE_THUNK}) 
+message("---enable thunk in soui")
+add_definitions(-DENABLE_THUNK=1)
+else()
+message("---disable thunk in soui")
+add_definitions(-DENABLE_THUNK=0)
+endif()
+
 file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_UIRES  *.xml *.idx *.ico)

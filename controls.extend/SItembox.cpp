@@ -21,7 +21,7 @@ SItemBox::SItemBox()
 SWindow *SItemBox::InsertItem(LPCWSTR pszXml, int iItem /*=-1*/, BOOL bEnsureVisible /*=FALSE*/)
 {
     pugi::xml_document xmlDoc;
-    if (!xmlDoc.load_buffer(pszXml, wcslen(pszXml), pugi::parse_default, pugi::encoding_utf16))
+    if (!xmlDoc.load_buffer(pszXml, wcslen(pszXml), pugi::parse_default, sizeof(wchar_t) == 2 ? pugi::encoding_utf16 : pugi::encoding_utf32))
         return NULL;
 
     SWindow *pChild = m_pFirstChild, *pPrevChild = ICWND_FIRST;

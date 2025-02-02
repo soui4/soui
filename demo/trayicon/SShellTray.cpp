@@ -52,7 +52,7 @@ namespace SOUI
 
 	SShellTray::~SShellTray() {}
 
-	void SShellTray::IniNotifyIconData(HWND hOwner, HICON hIcon, UINT flags, LPCTSTR szTip)
+	void SShellTray::InitNotifyIconData(HWND hOwner, HICON hIcon, UINT flags, LPCTSTR szTip)
 	{	
 		m_nid.cbSize = sizeof(NOTIFYICONDATA);
 		m_nid.hWnd = hOwner;
@@ -60,7 +60,7 @@ namespace SOUI
 		m_nid.uCallbackMessage = WM_ICONNOTIFY;
 		m_nid.uFlags = flags|NIF_MESSAGE;
 		m_nid.hIcon = hIcon;
-		_tcscpy_s(m_nid.szTip, szTip);
+		_tcscpy_s(m_nid.szTip,128, szTip);
 	}
 
 	void SShellTray::StartAni()
@@ -154,7 +154,7 @@ namespace SOUI
 		{
 			m_nid.uFlags |= NIF_TIP;
 			m_nid.uFlags &= ~NIF_INFO;
-			_tcscpy_s(m_nid.szTip, m_strTip);
+			_tcscpy_s(m_nid.szTip,128, m_strTip);
 			Shell_NotifyIcon(NIM_MODIFY, &m_nid);
 		}
 		return S_FALSE;
@@ -167,7 +167,7 @@ namespace SOUI
 		SASSERT(m_iDefIcon < m_ArrIcon.GetCount());
 		if (m_iDefIcon >= m_ArrIcon.GetCount())
 			m_iDefIcon = 0;
-		IniNotifyIconData(m_MsgOnlyWnd->m_hWnd, m_ArrIcon.GetCount() == 0 ? GETRESPROVIDER->LoadIcon(_T("ICON_LOGO"), 16) : m_ArrIcon[m_iDefIcon],NIF_ICON|NIF_TIP,m_strTip);
+		InitNotifyIconData(m_MsgOnlyWnd->m_hWnd, m_ArrIcon.GetCount() == 0 ? GETRESPROVIDER->LoadIcon(_T("ICON_LOGO"), 16) : m_ArrIcon[m_iDefIcon],NIF_ICON|NIF_TIP,m_strTip);
 		Show();
 	}
 

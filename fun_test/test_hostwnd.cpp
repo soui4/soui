@@ -57,6 +57,16 @@ void RunMenu(POINT pt) {
     }
 }
 
+class CSouiWnd : public SHostWnd{
+public:
+    CSouiWnd(): SHostWnd("layout:xml_soui"){}
+
+    void OnFinalMessage(HWND hWnd) override{
+        SHostWnd::OnFinalMessage(hWnd);
+        delete this;
+    }
+};
+
 class CMainDlg : public SHostWnd {
     CScintillaWnd* m_pSciter;
 public:
@@ -138,10 +148,20 @@ public:
             SApplication::getSingletonPtr()->LoadRawBuffer(_T("layout"), _T("XML_MAINWND"), NULL, buf);
             m_pSciter->SendMessage(SCI_SETTEXT, buf.size(), (LPARAM)(char*)buf);
         }
+        SWindow* edit = FindChildByName("edit_test");
+        if (edit) {
+            ::RegisterDragDrop(m_hWnd, GetDropTarget());
+        }
     }
 
     void OnShowMsgbox(){ 
         MessageBox(m_hWnd, _T("TEST MSGBOX!!!"), _T("test msgbox"),MB_OK);
+    }
+
+    void OnBtnSoui(){
+        CSouiWnd * pwnd = new CSouiWnd;
+        CRect rc = GetWindowRect();
+        pwnd->CreateEx(m_hWnd,WS_POPUP|WS_VISIBLE,WS_EX_LAYERED,rc.right+5,rc.top,0,0);
     }
 
     EVENT_MAP_BEGIN()
@@ -151,6 +171,7 @@ public:
         EVENT_NAME_COMMAND(L"btn_smenu", OnBtnSMenu)
         EVENT_NAME_COMMAND(L"btn_msgbox", OnShowMsgbox)
         EVENT_NAME_COMMAND(L"btn_smenuex", OnBtnSMenuEx)
+        EVENT_NAME_COMMAND(L"btn_soui", OnBtnSoui)
         EVENT_HANDLER(EventRealWndCreate::EventID, OnRealWndCreate)
         EVENT_HANDLER(EventRealWndDestroy::EventID, OnRealWndDestroy)
         EVENT_HANDLER(EventInit::EventID,OnInit)
@@ -204,9 +225,19 @@ void CMainDlg::OnClose() {
     PostMessage(WM_QUIT);
 }
 
+static VOID CALLBACK OnTimeout(HWND hwnd, UINT msg, UINT_PTR id, DWORD ts)
+{
+    static int count = 0;
+    SLOGI() << "OnTimeout: id=" << id << " count=" << ++count;
+    if (count>2)
+        KillTimer(0, id);
+}
+
 int run_app(HINSTANCE hInst) {
 
     std::tstring srcDir = getSourceDir();
+    UINT_PTR uid = SetTimer(0, 0, 5, OnTimeout);
+    SLOGI() << "settimer: id=" << uid;
 
     CScintillaWnd::InitScintilla(hInst);
     SComMgr2 comMgr;

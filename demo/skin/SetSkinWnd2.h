@@ -8,22 +8,17 @@ struct SKIN_CONFIG_INF
 	CRect margin;
 };
 class CSetSkinWnd :
-	public SHostWnd
+	public SHostDialog
 {
 	//TODO:消息映射
 	void OnClose()
 	{
-		DestroyWindow();
+		EndDialog(IDCANCEL);
 	}
 	HRESULT OnSkinChangeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL bHandled);
 	
 	void OnColor(IEvtArgs * e);
-	BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 protected:
-	virtual void OnFinalMessage(HWND hWnd) {
-		SHostWnd::OnFinalMessage(hWnd);
-		delete this;
-	}
 	long NotifUpdataWindow();
 	void LoadSkinConfigFormXml();
 	CRect GetMargin(int id);	
@@ -31,7 +26,6 @@ public:
 	CSetSkinWnd();
 	~CSetSkinWnd();
 	void OnSetSkin(IEvtArgs *e);
-	void OnActivate(UINT nState, BOOL bMinimized, HWND wndOther);
 	void OnBuiltinSkin();
 
 	EVENT_MAP_BEGIN()
@@ -39,15 +33,13 @@ public:
 		EVENT_ID_RANGE_HANDLER(10, 27, EVT_CMD, OnSetSkin)
 		EVENT_ID_RANGE_HANDLER(30,48,EVT_CMD, OnColor)		
 		EVENT_ID_COMMAND(51,OnBuiltinSkin)
-	EVENT_MAP_END2(SHostWnd)
+	EVENT_MAP_END2(SHostDialog)
 
-		BEGIN_MSG_MAP_EX(CSetSkinWnd)
-		MSG_WM_INITDIALOG(OnInitDialog)
+	BEGIN_MSG_MAP_EX(CSetSkinWnd)
 		MESSAGE_HANDLER(g_dwSkinChangeMessage, OnSkinChangeMessage)
-		//MSG_WM_ACTIVATE(OnActivate)
-		CHAIN_MSG_MAP(SHostWnd)
+		CHAIN_MSG_MAP(SHostDialog)
 		REFLECT_NOTIFICATIONS_EX()
-		END_MSG_MAP()
+	END_MSG_MAP()
 private:
 	SList<SKIN_CONFIG_INF> m_skinConfigInf;
 };

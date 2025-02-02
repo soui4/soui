@@ -5,29 +5,31 @@
 #include <config.h>
 #include <string/tstring.h>
 
+#ifdef _WIN32
 #define COM_IMGDECODER  _T("imgdecoder-gdip")
-
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-#define COM_RENDER_GDI  _T("render-gdid.dll")
-#define COM_RENDER_SKIA _T("render-skiad.dll")
-#define COM_RENDER_D2D  _T("render-d2dd.dll")
-#define COM_SCRIPT_LUA _T("scriptmodule-luad.dll")
-#define COM_TRANSLATOR _T("translatord.dll")
-#define COM_ZIPRESPROVIDER _T("resprovider-zipd.dll")
-#define COM_LOG4Z   _T("log4zd.dll")
-#define COM_7ZIPRESPROVIDER _T("resprovider-7zipd.dll")
-#define COM_TASKLOOP _T("taskloopd.dll")
+#define COM_RENDER_GDI  _T("render-gdi")
+#define COM_RENDER_SKIA _T("render-skia")
+#define COM_RENDER_D2D _T("render-d2d")
+#define COM_SCRIPT_LUA _T("scriptmodule-lua")
+#define COM_TRANSLATOR _T("translator")
+#define COM_ZIPRESPROVIDER _T("resprovider-zip")
+#define COM_LOG4Z   _T("log4z")
+#define COM_7ZIPRESPROVIDER _T("resprovider-7zip")
+#define COM_TASKLOOP _T("taskloop")
+#define COM_IPCOBJ _T("sipcobject")
+#define COM_HTTPCLIENT _T("httpclient")
 #else
-#define COM_RENDER_GDI  _T("render-gdi.dll")
-#define COM_RENDER_SKIA _T("render-skia.dll")
-#define COM_RENDER_D2D  _T("render-d2d.dll")
-#define COM_SCRIPT_LUA _T("scriptmodule-lua.dll")
-#define COM_TRANSLATOR _T("translator.dll")
-#define COM_ZIPRESPROVIDER _T("resprovider-zip.dll")
-#define COM_LOG4Z   _T("log4z.dll")
-#define COM_7ZIPRESPROVIDER _T("resprovider-7zip.dll")
-#define COM_TASKLOOP _T("taskloop.dll")
-#endif	// _DEBUG
+#define COM_IMGDECODER  _T("libimgdecoder-stb")
+#define COM_RENDER_GDI  _T("librender-gdi")
+#define COM_RENDER_SKIA _T("librender-skia")
+#define COM_SCRIPT_LUA _T("libscriptmodule-lua")
+#define COM_TRANSLATOR _T("libtranslator")
+#define COM_ZIPRESPROVIDER _T("libresprovider-zip")
+#define COM_LOG4Z   _T("liblog4z")
+#define COM_7ZIPRESPROVIDER _T("libresprovider-7zip")
+#define COM_TASKLOOP _T("libtaskloop")
+#define COM_IPCOBJ _T("libsipcobject")
+#endif//_WIN32
 
 
 #ifdef LIB_SOUI_COM
@@ -36,31 +38,11 @@
 #pragma comment(lib,"Usp10")
 #pragma comment(lib,"opengl32")
 
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-#pragma comment(lib,"skiad")
-#pragma comment(lib,"zlibd")
-#pragma comment(lib,"pngd")
-#pragma comment(lib,"render-gdid")
-#pragma comment(lib,"render-skiad")
-#pragma comment(lib,"render-d2dd")
-#pragma comment(lib,"imgdecoder-wicd")
-#pragma comment(lib,"imgdecoder-stbd")
-#pragma comment(lib,"imgdecoder-pngd")
-#pragma comment(lib,"imgdecoder-gdipd")
-#pragma comment(lib,"translatord")
-#pragma comment(lib,"resprovider-zipd")
-#pragma comment(lib,"7zd")
-#pragma comment(lib,"resprovider-7zipd")
-#pragma comment(lib,"log4zd")
-#pragma comment(lib,"taskloopd")
-#else//defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-
 #pragma comment(lib,"skia")
 #pragma comment(lib,"zlib")
-#pragma comment(lib,"png")
+#pragma comment(lib, "aupng")
 #pragma comment(lib,"imgdecoder-wic")
 #pragma comment(lib,"imgdecoder-stb")
-#pragma comment(lib,"imgdecoder-png")
 #pragma comment(lib,"imgdecoder-gdip")
 #pragma comment(lib,"render-gdi")
 #pragma comment(lib,"render-skia")
@@ -71,7 +53,6 @@
 #pragma comment(lib,"resprovider-7zip")
 #pragma comment(lib,"log4z")
 #pragma comment(lib,"taskloop")
-#endif//_DEBUG
 
 namespace SOUI
 {
@@ -80,10 +61,6 @@ namespace SOUI
 		BOOL SCreateInstance(IObjRef **);
 	}
 	namespace IMGDECODOR_STB
-	{
-		BOOL SCreateInstance(IObjRef **);
-	}
-	namespace IMGDECODOR_PNG
 	{
 		BOOL SCreateInstance(IObjRef **);
 	}
@@ -145,8 +122,6 @@ namespace SOUI
 				return IMGDECODOR_WIC::SCreateInstance(ppObj);
 			else if (m_strImgDecoder == _T("imgdecoder-stb"))
 				return IMGDECODOR_STB::SCreateInstance(ppObj);
-			else if (m_strImgDecoder == _T("imgdecoder-png"))
-				return IMGDECODOR_PNG::SCreateInstance(ppObj);
 			else if (m_strImgDecoder == _T("imgdecoder-gdip"))
 				return IMGDECODOR_GDIP::SCreateInstance(ppObj);
 			else
@@ -237,12 +212,7 @@ namespace SOUI {
 
 		BOOL CreateImgDecoder(IObjRef ** ppObj)
 		{
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-			SStringT strImgDecoder = m_strImgDecoder + _T("d.dll");
-#else
-			SStringT strImgDecoder = m_strImgDecoder + _T(".dll");
-#endif
-			return imgDecLoader.CreateInstance(m_strDllPath + strImgDecoder, ppObj);
+			return imgDecLoader.CreateInstance(m_strDllPath + m_strImgDecoder, ppObj);
 		}
 
 		BOOL CreateRender_GDI(IObjRef **ppObj)
@@ -254,11 +224,12 @@ namespace SOUI {
 		{
 			return renderLoader.CreateInstance(m_strDllPath + COM_RENDER_SKIA, ppObj);
 		}
+#ifdef _WIN32
 		BOOL CreateRender_D2D(IObjRef **ppObj)
 		{
 			return renderLoader.CreateInstance(m_strDllPath + COM_RENDER_D2D, ppObj);
 		}
-
+#endif//_WIN32
 		BOOL CreateScrpit_Lua(IObjRef **ppObj)
 		{
 			return scriptLoader.CreateInstance(m_strDllPath + COM_SCRIPT_LUA, ppObj);

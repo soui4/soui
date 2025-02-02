@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <helper/SAdapterBase.h>
 
 SNSBEGIN
@@ -33,7 +33,7 @@ public:
 	STDMETHOD_(void, getView)(int position, IWindow *pItem, IXmlNode * xmlTemplate) OVERRIDE{
 		if(m_luaGetView.IsEmpty())
 			return;
-		//todo: ²»ÖªµÀÎªÊ²Ã´,ÕâÀï´«Ò»¸öSItemPanelµ½luaºó,lua²»ÄÜÕıÈ·Ê¶±ğ.¾¡¹ÜÒÑ¾­µ¼³öÁËSItemPanel¶ÔÏóµ½lua
+		//todo: ä¸çŸ¥é“ä¸ºä»€ä¹ˆ,è¿™é‡Œä¼ ä¸€ä¸ªSItemPanelåˆ°luaå,luaä¸èƒ½æ­£ç¡®è¯†åˆ«.å°½ç®¡å·²ç»å¯¼å‡ºäº†SItemPanelå¯¹è±¡åˆ°lua
 		lua_tinker::call<void>(m_luaState,m_luaGetView,m_ctx,position,pItem,xmlTemplate);
 	}
 
@@ -113,7 +113,7 @@ public:
 	STDMETHOD_(void, getView)(int position, IWindow *pItem, IXmlNode * xmlTemplate) OVERRIDE{
 		if(m_luaGetView.IsEmpty())
 			return;
-		//todo: ²»ÖªµÀÎªÊ²Ã´,ÕâÀï´«Ò»¸öSItemPanelµ½luaºó,lua²»ÄÜÕıÈ·Ê¶±ğ.¾¡¹ÜÒÑ¾­µ¼³öÁËSItemPanel¶ÔÏóµ½lua
+		//todo: ä¸çŸ¥é“ä¸ºä»€ä¹ˆ,è¿™é‡Œä¼ ä¸€ä¸ªSItemPanelåˆ°luaå,luaä¸èƒ½æ­£ç¡®è¯†åˆ«.å°½ç®¡å·²ç»å¯¼å‡ºäº†SItemPanelå¯¹è±¡åˆ°lua
 		lua_tinker::call<void>(m_luaState,m_luaGetView,m_ctx,position,pItem,xmlTemplate);
 	}
 

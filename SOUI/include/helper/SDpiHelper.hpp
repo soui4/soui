@@ -40,7 +40,7 @@ class SDpiHandler {
             nScale = 100;
         nScale = SDpiScale::NormalizeScale(nScale);
         CRect rc;
-        ::GetWindowRect(hWnd, (RECT*)&rc);
+        ::GetWindowRect(hWnd, (RECT *)&rc);
         CSize sz = rc.Size();
         sz.cx = sz.cx * nScale / 100;
         sz.cy = sz.cy * nScale / 100;
@@ -74,4 +74,4 @@ class SDpiHandler {
 
 SNSEND
 
-#endif//__DPIHELPER_H_
+#endif //__DPIHELPER_H_

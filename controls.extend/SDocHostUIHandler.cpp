@@ -1,4 +1,4 @@
-#include "StdAfx.h"
+#include "stdafx.h"
 #include "SDocHostUIHandler.h"
 #include <mshtml.h>
 #include <activex/SBStr.h>

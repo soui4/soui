@@ -187,60 +187,49 @@
                 <table class="ONE" border="0" cellpadding="0" cellspacing="0">
                     <col width="100%">
                     <tr valign="TOP">
-                        <td height="100%">
+                        <td height="80%">
                             <!--OPEN OF CONTENT//-->
-                            <table class="CONTENT" border="0" cellpadding="0" cellspacing="0"  disabled="true">
-                                <col width="12">
-                                <col>
-                                <col width="12">
-                                <col>
-                                <col width="12">
-                                <tr>
-                                    <td valign="TOP" height="12" colspan="5">
-                                        &nbsp;
-
-                                    </td>
-                                </tr>
+                            <table class="CONTENT" border="0" cellpadding="0" cellspacing="0" disabled="true">
+                                <col width="10" height="10">
+                                <td width="100%" height="10">
                                 <tr>
                                     <td valign="TOP" width="12">
                                         &nbsp;
                                     </td>
                                     <td valign="TOP">
                                         <span class="ItemTextTop" title="指定应用程序编译选项">
-                                            编译选项(为了防止您不希望的情况发生，我们暂时关闭了此功能):
+                                            32位编译选项:
                                         </span>
-                                         <span class="ItemText">
+                                        <span class="ItemText">
                                             <p class="Spacer">
                                                 &nbsp;
                                             </p>
                                             <br>
-                                             <br>
-                                             <span class="itemTextTop" id="code_title">
-                                                 <label id="NUMFILES_TEXT" for="UNICODE">
-                                                     编码(<u>L</u>):
-                                                 </label>
-                                                 <br>
-                                                 <select class="sidebtnNoWidth" id="UNICODE" accesskey="n" title="" size="1">
-                                                     <option value="1">UNICODE</option>
-                                                     <option value="0">MBCS</option>
-                                                 </select>
-                                             </span>
-                                             <p class="Spacer">
-                                                 &nbsp;
-                                             </p>
-                                             <br>
-                                             <span class="itemTextTop" id="wchar_t_title">
-                                                 <label id="NUMFILES_TEXT" for="WCHAR">
-                                                     是否把wchar_t视为内置(<u>W</u>):
-                                                 </label>
-                                                 <br>
-                                                 <select class="sidebtnNoWidth" id="WCHAR" accesskey="n" title="" size="1">
-                                                     <option value="0">否</option>
-                                                     <option value="1">是</option>
-                                                 </select>
-                                             </span>
                                             <br>
+                                            <span class="itemTextTop" id="code_title">
+                                                <label id="NUMFILES_TEXT" for="UNICODE_32">
+                                                    编码(<u>L</u>):
+                                                </label>
+                                                <br>
+                                                <select class="sidebtnNoWidth" id="UNICODE_32" accesskey="n" title="" size="1">
+                                                    <option value="1">UNICODE</option>
+                                                    <option value="0">MBCS</option>
+                                                </select>
+                                            </span>
+                                            <p class="Spacer">
+                                                &nbsp;
+                                            </p>
                                             <br>
+                                            <span class="itemTextTop" id="wchar_t_title">
+                                                <label id="NUMFILES_TEXT" for="WCHAR_32">
+                                                    是否把wchar_t视为内置(<u>W</u>):
+                                                </label>
+                                                <br>
+                                                <select class="sidebtnNoWidth" id="WCHAR_32" accesskey="n" title="" size="1">
+                                                    <option value="0">否</option>
+                                                    <option value="1">是</option>
+                                                </select>
+                                            </span>
                                             <br>
                                             <br>
                                         </span>
@@ -251,13 +240,8 @@
                                             <p class="Spacer">
                                                 &nbsp;
                                             </p>
-                                            <br>
-                                            <br>
                                         </span>
-                                    </td>
-                                    <td valign="TOP" width="12">
-                                        &nbsp;
-                                    </td>
+                                    </td>                                    
                                     <td valign="TOP">
                                         <span class="ItemTextTop">
                                             &nbsp;
@@ -275,28 +259,123 @@
                                                 <br>
                                                 <br>
                                                 <span class="itemTextTop" id="crt_title">
-                                                    <label id="NUMFILES_TEXT" for="MT">
+                                                    <label id="NUMFILES_TEXT" for="MT_32">
                                                         CRT链接方式(<u>C</u>):
                                                     </label>
                                                     <br>
-                                                    <select class="sidebtnNoWidth" id="MT" accesskey="n" title="" size="1">
+                                                    <select class="sidebtnNoWidth" id="MT_32" accesskey="n" title="" size="1">
                                                         <option value="0">动态链接(MD)</option>
                                                         <option value="1">静态链接(MT)</option>
                                                     </select>
                                                 </span>
-                                                 <br> <br>
+                                                <br> <br>
                                                 <span class="itemTextTop" id="crt_title">
-                                                    <label id="NUMFILES_TEXT" for="SUPPORT_XP">
+                                                    <label id="NUMFILES_TEXT" for="SUPPORT_XP_32">
                                                         是否支持XP（vs2012以上使用）(<u>X</u>):
                                                     </label>
                                                     <br>
-                                                    <select class="sidebtnNoWidth" id="SUPPORT_XP" accesskey="n" title="" size="1">
+                                                    <select class="sidebtnNoWidth" id="SUPPORT_XP_32" accesskey="n" title="" size="1">
                                                         <option value="0">不支持</option>
                                                         <option value="1">支持</option>
                                                     </select>
                                                 </span>
                                             </span>
+                                        </span>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td valign="TOP" width="12">
+                                        &nbsp;
+                                    </td>
+                                    <td valign="top">
+                                        <span class="ItemTextTop" title="指定应用程序编译选项">
+                                            64位编译选项:
+                                        </span>
+                                        <span class="ItemText">
+                                            <p class="Spacer">
+                                                &nbsp;
+                                            </p>
+                                            <br>
+                                            <br>
+                                            <span class="itemTextTop" id="code_title">
+                                                <label id="NUMFILES_TEXT" for="UNICODE_64">
+                                                    编码(<u>L</u>):
+                                                </label>
+                                                <br>
+                                                <select class="sidebtnNoWidth" id="UNICODE_64" accesskey="n" title="" size="1">
+                                                    <option value="1">UNICODE</option>
+                                                    <option value="0">MBCS</option>
+                                                </select>
                                             </span>
+                                            <p class="Spacer">
+                                                &nbsp;
+                                            </p>
+                                            <br>
+                                            <span class="itemTextTop" id="wchar_t_title">
+                                                <label id="NUMFILES_TEXT" for="WCHAR_64">
+                                                    是否把wchar_t视为内置(<u>W</u>):
+                                                </label>
+                                                <br>
+                                                <select class="sidebtnNoWidth" id="WCHAR_64" accesskey="n" title="" size="1">
+                                                    <option value="0">否</option>
+                                                    <option value="1">是</option>
+                                                </select>
+                                            </span>
+                                            <br>
+                                            <br>
+                                            <br>
+                                            <br>
+                                        </span>
+                                        <p class="ElementSpacer">
+                                            &nbsp;
+                                        </p>
+                                        <span class="ItemText">
+                                            <p class="Spacer">
+                                                &nbsp;
+                                            </p>
+                                            <br>
+                                            <br>
+                                        </span>
+                                    </td>                                   
+                                    <td valign="TOP">
+                                        <span class="ItemTextTop">
+                                            &nbsp;
+                                        </span>
+                                        <span class="ItemText">
+                                            <p class="Spacer">
+                                                &nbsp;
+                                            </p>
+                                            <br>
+                                            <br>
+                                            <span class="itemText" title="指定应用程序运行时选项。">
+                                                <label>
+                                                    运行时选项:
+                                                </label>
+                                                <br>
+                                                <br>
+                                                <span class="itemTextTop" id="crt_title">
+                                                    <label id="NUMFILES_TEXT" for="MT_64">
+                                                        CRT链接方式(<u>C</u>):
+                                                    </label>
+                                                    <br>
+                                                    <select class="sidebtnNoWidth" id="MT_64" accesskey="n" title="" size="1">
+                                                        <option value="0">动态链接(MD)</option>
+                                                        <option value="1">静态链接(MT)</option>
+                                                    </select>
+                                                </span>
+                                                <br> <br>
+                                                <span class="itemTextTop" id="crt_title">
+                                                    <label id="NUMFILES_TEXT" for="SUPPORT_XP_64">
+                                                        是否支持XP（vs2012以上使用）(<u>X</u>):
+                                                    </label>
+                                                    <br>
+                                                    <select class="sidebtnNoWidth" id="SUPPORT_XP_64" accesskey="n" title="" size="1">
+                                                        <option value="0">不支持</option>
+                                                        <option value="1">支持</option>
+                                                    </select>
+                                                </span>
+                                            </span>
+                                        </span>
                                     </td>
                                 </tr>
                             </table>

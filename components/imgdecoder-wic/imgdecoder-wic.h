@@ -12,7 +12,7 @@
 
 SNSBEGIN
 
-    class SImgFrame_WIC : public IImgFrame
+    class SImgFrame_WIC : public TObjRefImpl<IImgFrame>
     {
     public:
         SImgFrame_WIC(IWICBitmapSource *pFrame=NULL);

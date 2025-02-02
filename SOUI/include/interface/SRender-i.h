@@ -1073,12 +1073,13 @@ typedef struct _GradientInfo
 {
     GradientType type;
     union {
-        float angle;  // for linear
-        struct {
-            float radius; // radical
+        float angle; // for linear
+        struct
+        {
+            float radius;  // radical
             float centerX; // 0.0 -> 1.0, 0.5 is center of x
             float centerY; // 0.0 -> 1.0, 0.5 is center of y
-        }radial;
+        } radial;
         struct
         {
             BOOL bFullArc; // true(default) indicator gradient is rendered for full circle.

@@ -212,9 +212,10 @@ CDisplayML::CDisplayML (CTxtEdit* ped)
 {
 	TRACEBEGIN(TRCSUBSYSDISP, TRCSCOPEINTERN, "CDisplayML::CDisplayML");
 
-	Assert(!_dulTarget && !_dvlTarget);
-
+	int offset = FIELD_OFFSET(CDisplayML,_cpCalcMax);
+	memset((char*)this+offset,0,sizeof(CDisplayML)-offset);
 	_fMultiLine = TRUE;
+	
 }
 
 CDisplayML::~CDisplayML()
@@ -503,7 +504,6 @@ BOOL CDisplayML::RecalcLines (
 	//Create 1 line for empty controls
 	if(!Count())
 		CreateEmptyLine();
-
     Paginate(0);
 
 	_vpCalcMax = dvp;
@@ -862,7 +862,6 @@ BOOL CDisplayML::RecalcLines (
 			rgliNew.Clear(AF_KEEPMEM);	 		// Clear aux array
 
 			// Remember information about match after editing
-			Assert((cp = rpOld.CalculateCp()) == me.GetCp());
 			pled->_vpMatchOld  += dvpExtraLine;
 			pled->_vpMatchNew	= dvp + dvpExtraLine;
 			pled->_vpMatchNewTop = dvpPrev;
@@ -1648,17 +1647,13 @@ void CDisplayML::Render(
 		if (fLastLine)
 			break;
 
-#ifdef DEBUG
 		cp  += pli->_cch;
 		vpLi += pli->GetHeight();
-
 		// Rich controls with password characters stop at EOPs, 
 		// so re.GetCp() may be less than cp.
 		AssertSz(_ped->IsRich() && _ped->fUsePassword() || re.GetCp() == cp, "cp out of sync with line table");
-#endif
 		pt = re.GetCurPoint();
 		AssertSz(pt.v == vpLi, "CDisplayML::RenderView() - y out of sync with line table");
-
 	}
 
 	re.EndRender(pliFirst, pli, cpFirst, ptFirst);
@@ -1823,7 +1818,6 @@ BOOL CDisplayML::UpdateView(
 	{
 		// Update is after view: don't do anything
 		fRecalcVisible = FALSE;
-		AssertNr(VerifyFirstVisible());
 		goto finish;
 	}
 	else if(led._vpMatchNew <= _vpScroll + _dvpFirstVisible &&
@@ -1854,8 +1848,6 @@ BOOL CDisplayML::UpdateView(
 			_cpFirstVisible = 0;
 			_sPage = 0;
 		}
-
-		AssertNr(VerifyFirstVisible());
 	}
 	else
 	{
@@ -1901,8 +1893,6 @@ BOOL CDisplayML::UpdateView(
 			WaitForRecalc(cpNewFirstVisible, -1);
 			Set_yScroll(cpNewFirstVisible);
 		}
-		AssertNr(VerifyFirstVisible());
-
 		// Is there a match in the display area? - this can only happen if the
 		// old match is on the screen and the new match will be on the screen
 		if (led._vpMatchOld < vpScrollOld + _dvpView &&
@@ -2809,7 +2799,6 @@ scrollit:
 				_vpScroll = vpScroll;
 
 				AssertSz(_vpScroll >= 0, "CDisplayML::ScrollView _vpScroll < 0");
-				AssertNr(VerifyFirstVisible());
 				if(!WaitForRecalcView())
 			        return FALSE;
 			}

@@ -1,0 +1,5 @@
+{
+    suppressions.supp
+    Memcheck:Leak
+    fun:cairo_show_text2
+}

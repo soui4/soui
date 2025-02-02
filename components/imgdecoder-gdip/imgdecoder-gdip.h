@@ -12,8 +12,7 @@ namespace Gdiplus
 
 SNSBEGIN
 
-class SImgFrame_GDIP : public IImgFrame
-{
+class SImgFrame_GDIP : public TObjRefImpl<IImgFrame> {
 public:
 	SImgFrame_GDIP();
 	~SImgFrame_GDIP();

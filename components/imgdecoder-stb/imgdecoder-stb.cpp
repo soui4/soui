@@ -4,15 +4,28 @@
 #include "imgdecoder-stb.h"
 
 #define STB_IMAGE_IMPLEMENTATION
-#include "stb_image.h"
+#include <stb_image.h>
+#include <upng.h>
 
 namespace SOUI
 {
     //////////////////////////////////////////////////////////////////////////
     //  SImgFrame_STB
-    SImgFrame_STB::SImgFrame_STB(BYTE *data,int w,int h):m_data(data),m_nWid(w),m_nHei(h)
+SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
+        :m_nWid(w),m_nHei(h)
+        ,m_nDelay(nDelay)
     {
+        m_data = (unsigned char *)malloc(w * h * 4);
+        assert(m_data);
+        memcpy(m_data, data, w * h * 4);
+    }
 
+    SImgFrame_STB::SImgFrame_STB(BYTE *data, int w, int h, int nDelay)
+        : m_nWid(w)
+        , m_nHei(h)
+        , m_nDelay(nDelay)
+        , m_data(data)
+    {
     }
 
     SImgFrame_STB::~SImgFrame_STB()
@@ -27,33 +40,108 @@ namespace SOUI
         return TRUE;
     }
 
+    int SImgFrame_STB:: GetDelay()
+    {
+        return m_nDelay;
+    }
+
     const VOID * SImgFrame_STB::GetPixels(CTHIS) SCONST{
         return m_data;
+    }
+
+    static int upng_inflate(char *out, int outsize, const char *in, int insize)
+    {
+        return stbi_zlib_decode_buffer(out, outsize, in, insize) == outsize?0:-1;
     }
     //////////////////////////////////////////////////////////////////////////
     // SImgX_STB
     int SImgX_STB::LoadFromMemory( void *pBuf,size_t bufLen )
     {
-        if(m_pImg) delete m_pImg;
-        m_pImg = NULL;
-
         if(!pBuf) return 0;
 
-        int w=0,h=0;
-        unsigned char *data = stbi_load_from_memory((stbi_uc const *)pBuf,bufLen,&w,&h,NULL,4);
-        if(!data)
-        {
-            return 0;
+        int width, height, frames = 0, comp;
+        //test for apng
+        upng_t *upng = upng_new_from_bytes((const unsigned char *)pBuf, (unsigned long)bufLen);
+        if (upng_header(upng) == UPNG_EOK && upng_get_components(upng) == 4)
+        { // apng
+            upng_set_inflate(upng_inflate);
+            width = upng_get_width(upng);
+            height = upng_get_height(upng);
+            frames = upng_get_frame_count(upng);
+            if (UPNG_EOK != upng_decode_default(upng))
+            {
+                upng_free(upng);
+                return 0;
+            }
+            if (frames == 0)
+            {
+                m_arrFrames.SetCount(1);
+                BYTE *buf = upng_move_frame_buffer(upng);
+                _DoPromultiply(buf, width, height);
+                SImgFrame_STB *pFrame = new SImgFrame_STB(buf, width, height, 0);
+                m_arrFrames.SetAt(0, pFrame);
+                pFrame->Release();
+            }
+            else
+            {
+                m_arrFrames.SetCount(frames);
+                for (int i = 0; i < frames; i++)
+                {
+                    if(UPNG_EOK==upng_decode_next_frame(upng))
+                    {
+                        int nDelay = upng_get_frame_delay(upng);
+                        BYTE *buf = (BYTE*)upng_get_frame_buffer(upng);
+                        _DoPromultiply(buf, width, height);
+                        // don't move frame buffer from upng. the frame buffer will be reused by upng.
+                        SImgFrame_STB *pFrame = new SImgFrame_STB((const BYTE*)buf, width, height, nDelay);
+                        m_arrFrames.SetAt(i, pFrame);
+                        pFrame->Release();
+                    }
+                    else {
+                        m_arrFrames.RemoveAll();
+                        break;
+                    }
+                }
+            }
+            upng_free(upng);
+            return m_arrFrames.GetCount();
         }
-        _DoPromultiply(data,w,h);
-        m_pImg = new SImgFrame_STB(data,w,h);
-        return 1;
+        else
+        {
+            upng_free(upng);
+        }
+        int *delays = NULL;
+        //test for gif
+        unsigned char *data = stbi_load_gif_from_memory((const stbi_uc *)pBuf, (int)bufLen, &delays, &width, &height, &frames, &comp, STBI_rgb_alpha);
+        if (!data)
+        { // test for other image format
+            data = stbi_load_from_memory((stbi_uc const *)pBuf, (int)bufLen, &width, &height, NULL, 4);
+            if (!data)
+            {
+                return 0;
+            }
+            delays = (int *)malloc(sizeof(int));
+            *delays = 0;
+            frames = 1;
+        }
+        SASSERT(data);
+        m_arrFrames.SetCount(frames);
+        unsigned char *p = data;
+        for (int i = 0; i < frames; i++)
+        {
+            _DoPromultiply(p, width, height);
+            SImgFrame_STB *pFrame = new SImgFrame_STB((const BYTE*)p, width, height, delays[i]);
+            m_arrFrames.SetAt(i, pFrame);
+            p += (width * height * 4);
+            pFrame->Release();
+        }
+        free(delays);
+        stbi_image_free(data);
+        return frames;
     }
 
     int SImgX_STB::LoadFromFileW( LPCWSTR pszFileName )
     {
-        if(m_pImg) delete m_pImg;
-        m_pImg = NULL;
 #ifdef _WIN32
         FILE *f=_wfopen(pszFileName,L"rb");
 #else
@@ -62,16 +150,14 @@ namespace SOUI
         FILE *f = fopen(szFileName,"rb");
 #endif
         if(!f) return 0;
-        int w=0,h=0;
-        unsigned char *data = stbi_load_from_file(f,&w,&h,NULL,4);
+        fseek(f, 0, SEEK_END);
+        LONG len = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        char *buf = (char *)malloc(len);
+        fread(buf, 1, len, f);
+        int ret = LoadFromMemory(buf, len);
         fclose(f);
-        if(!data)
-        {
-            return 0;
-        }
-        _DoPromultiply(data,w,h);
-        m_pImg = new SImgFrame_STB(data,w,h);
-        return 1;
+        return ret;
     }
 
     #ifndef MAX_PATH
@@ -81,24 +167,19 @@ namespace SOUI
     {
         wchar_t wszFileName[MAX_PATH+1];
         int cp = CP_ACP;
-    #ifndef _WIN32
-        cp = CP_UTF8;
-    #endif
         MultiByteToWideChar(cp,0,pszFileName,-1,wszFileName,MAX_PATH);
         if(GetLastError()==ERROR_INSUFFICIENT_BUFFER) return 0;
         return LoadFromFileW(wszFileName);
     }
 
     SImgX_STB::SImgX_STB(BOOL bPremultiple)
-        :m_pImg(NULL)
-        ,m_bPremultiple(bPremultiple)
+        :m_bPremultiple(bPremultiple)
     {
 
     }
 
     SImgX_STB::~SImgX_STB( void )
     {
-        if(m_pImg) delete m_pImg;
     }
 
     void SImgX_STB::_DoPromultiply( BYTE *pdata,int nWid,int nHei )
@@ -111,9 +192,17 @@ namespace SOUI
             stbi_uc t = p[0];
             if (a) 
             {
-                p[0] = (p[2] *a)/255;
-                p[1] = (p[1] * a)/255;
-                p[2] =  (t   * a)/255;
+                if (m_bPremultiple)
+                {
+                    p[0] = (p[2] * a) / 255;
+                    p[1] = (p[1] * a) / 255;
+                    p[2] = (t * a) / 255;
+                }
+                else
+                {// swap r and b
+                    p[0] = p[2]; 
+                    p[2] = t; 
+                }
             }else
             {
                 memset(p,0,4);
@@ -125,12 +214,12 @@ namespace SOUI
 	IImgFrame * SImgX_STB::GetFrame(UINT iFrame)
 	{
 		if(iFrame >= GetFrameCount()) return NULL;
-		return m_pImg;
+		return m_arrFrames[iFrame];
 	}
 
 	UINT SImgX_STB::GetFrameCount()
 	{
-		return m_pImg?1:0;
+        return (UINT)m_arrFrames.GetCount();
 	}
 
     //////////////////////////////////////////////////////////////////////////

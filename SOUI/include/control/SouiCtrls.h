@@ -25,10 +25,10 @@
 #include <control/SDateTimePicker.h>
 #include <control/SFrame.h>
 #include <control/SStackView.h>
-#ifdef _WIN32
-#include <control/SActiveX.h>
 #include <control/SRichEdit.h>
 #include <control/SMenuBar.h>
+#ifdef _WIN32
+#include <control/SActiveX.h>
 #endif
 
 #endif // __SOUICTRLS__H__

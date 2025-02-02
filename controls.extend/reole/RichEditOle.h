@@ -1,4 +1,4 @@
-#if !defined(AFX_OLERICHEDITCTRL_H__3DFF15EE_7336_4297_9620_7F00B611DAA1__INCLUDED_)
+ï»¿#if !defined(AFX_OLERICHEDITCTRL_H__3DFF15EE_7336_4297_9620_7F00B611DAA1__INCLUDED_)
 #define AFX_OLERICHEDITCTRL_H__3DFF15EE_7336_4297_9620_7F00B611DAA1__INCLUDED_
 
 #if _MSC_VER > 1000
@@ -8,8 +8,8 @@
 
 #include <richole.h>
 
-#include "../smiley/ssmileyctrl.h"
-#include <control/srichedit.h>
+#include "../smiley/SSmileyCtrl.h"
+#include <control/SRichEdit.h>
 #include <atl.mini/SComCli.h>
 using namespace SOUI;
 
@@ -114,13 +114,13 @@ public:
     static void GdiplusShutdown(void);
     
 protected:
-    //»ñ¶ÔID¶ÔÓ¦µÄÍ¼Æ¬Â·¾¶
+    //èŽ·å¯¹IDå¯¹åº”çš„å›¾ç‰‡è·¯å¾„
     virtual SStringW ImageID2Path(UINT nID);
     
 public:
     virtual HRESULT STDMETHODCALLTYPE QueryInterface( 
         /* [in] */ REFIID riid,
-        /* [iid_is][out] */  void __RPC_FAR *__RPC_FAR *ppvObject)
+        /* [iid_is][out] */  void  * *ppvObject)
     {
         return E_NOINTERFACE;
     }

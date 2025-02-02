@@ -7,7 +7,6 @@
 #include <interface/SListViewItemLocator-i.h>
 #include <proxy/SPanelProxy.h>
 
-
 SNSBEGIN
 
 class SOUI_EXP SListView

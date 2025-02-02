@@ -38,8 +38,13 @@ public:
 	static LPCWSTR GetClassName()                       
 	{                                                   
 		return T::GetClassName();                               
-	}                                              
-public:
+	}
+    static LPCWSTR GetClassAlias()
+    {
+        return T::GetClassAlias();
+    }
+
+  public:
 	static void MarkAttributeHandled(SXmlAttr xmlAttr, bool bHandled)
 	{
 		xmlAttr.set_userdata(bHandled?1:0);

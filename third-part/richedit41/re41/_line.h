@@ -90,7 +90,7 @@ public:
 	BOOL IsNestedLayout(void) const {return _fIsNestedLayout;}
 	LONG GetHeight () const;
 	LONG GetDescent() const;
-	void Init ()				{ZeroMemory(this, sizeof(CLine));}
+	void Init ();
 	BOOL IsEqual (CLine& li);
 };
 

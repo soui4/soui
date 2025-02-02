@@ -23,7 +23,7 @@ namespace SOUI
 	};
 	interface ISetOrLoadSkinHandler
 	{
-		virtual bool SaveSkin(SkinType, SkinSaveInf&) = NULL;		
+		virtual bool SaveSkin(SkinType, SkinSaveInf&) = 0;
 	};
 
 	class  SDemoSkin :
@@ -43,7 +43,7 @@ namespace SOUI
 		COLORREF GetThemeColor() const;
 
 		void SetHander(ISetOrLoadSkinHandler*skinhander);
-		virtual SIZE WINAPI GetSkinSize();
+		virtual SIZE WINAPI GetSkinSize() const;
 		virtual BOOL IgnoreState();
 		bool SaveSkin();
 		bool LoadSkin(SkinType, SkinLoadInf& saveInf);
@@ -52,7 +52,7 @@ namespace SOUI
 		virtual void WINAPI OnColorize(COLORREF cr)
 		{}
 	protected:
-		virtual void _Draw(IRenderTarget *pRT, LPCRECT rcDraw, DWORD dwState, BYTE byAlpha);
+        void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int idx, BYTE byAlpha) const override;
 		
 		ISetOrLoadSkinHandler *m_ISetOrLoadSkinHandler;		
 		CSize m_csSize;		

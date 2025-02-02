@@ -106,7 +106,7 @@ DECLARE_INTERFACE_(IHttpClient, IObjRef)
     STDMETHOD_(BOOL, DownloadToMem)(THIS_ LPCSTR lpUrl, OUT void **ppBuffer, OUT int *nSize) PURE;
     STDMETHOD_(HttpError, GetErrorCode)(CTHIS) SCONST PURE;
     STDMETHOD_(BOOL, Request)(THIS_ IStringA * result, LPCSTR lpUrl, RequestType type, LPCSTR lpPostData DEF_VAL(NULL), LPCSTR lpHeader DEF_VAL(NULL)) PURE;
-	STDMETHOD_(BOOL,Request2)(THIS_ IStringA *out,LPCSTR lpUrl, RequestType type, LPVOID lpPostData, DWORD dwDataLen, LPCSTR lpHeader DEF_VAL(NULL)) PURE;
+    STDMETHOD_(BOOL, Request2)(THIS_ IStringA * out, LPCSTR lpUrl, RequestType type, LPVOID lpPostData, DWORD dwDataLen, LPCSTR lpHeader DEF_VAL(NULL)) PURE;
     STDMETHOD_(void, SetTimeOut)(THIS_ int dwConnectTime, int dwSendTime, int dwRecvTime) PURE;
     STDMETHOD_(int, GetHttpCode)(CTHIS) SCONST PURE;
 };

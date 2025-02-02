@@ -7455,7 +7455,7 @@ namespace pugi
 
 	class SaveAsBin{
 	public:
-		typedef SOUI::SMap<SOUI::SStringA,int> STRMAP;	//utf8_name ->index
+		typedef SNS::SMap<SNS::SStringA,int> STRMAP;	//utf8_name ->index
 
 		static void _AddStr2Map(STRMAP & strMap, const char_t * str) ;
 		static void _build_str_map(xml_node xmlNode,STRMAP &strMap) ;
@@ -7472,9 +7472,9 @@ namespace pugi
 		if(str!=NULL)
 		{
 #ifdef PUGIXML_WCHAR_MODE
-			SOUI::SStringA str2 = SOUI::S_CW2A(str,CP_UTF8);
+			SNS::SStringA str2 = SNS::S_CW2A(str,CP_UTF8);
 #else
-			SOUI::SStringA str2(str);
+			SNS::SStringA str2(str);
 #endif
 			if(!str2.IsEmpty() && strMap.Lookup(str2)==NULL)
 			{
@@ -7490,9 +7490,9 @@ namespace pugi
 		int nIdx = 0;
 
 #ifdef PUGIXML_WCHAR_MODE
-		SOUI::SStringA str2 = SOUI::S_CW2A(str, CP_UTF8);
+		SNS::SStringA str2 = SNS::S_CW2A(str, CP_UTF8);
 #else
-		SOUI::SStringA str2(str);// = SOUI::S_CA2A(str, CP_ACP, CP_UTF8);
+		SNS::SStringA str2(str);// = SNS::S_CA2A(str, CP_ACP, CP_UTF8);
 #endif
 		if(!str2.IsEmpty())
 		{
@@ -7528,7 +7528,7 @@ namespace pugi
 	{
 		int nRet = 0;
 		int idx = 1;//note: start from 1 but not 0. zero is remained for empty string.
-		SOUI::SPOSITION pos = strMap.GetStartPosition();
+		SNS::SPOSITION pos = strMap.GetStartPosition();
 		while(pos)
 		{
 		STRMAP::CPair *p = strMap.GetNext(pos);
@@ -7540,7 +7540,7 @@ namespace pugi
 
 	void SaveAsBin::_write_str_map(FILE *f,STRMAP & strMap) 
 	{
-		SOUI::SPOSITION pos = strMap.GetStartPosition();
+		SNS::SPOSITION pos = strMap.GetStartPosition();
 		while(pos)
 		{
 			STRMAP::CPair *p = strMap.GetNext(pos);

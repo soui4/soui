@@ -37,8 +37,8 @@ BOOL SCaret::Init(HBITMAP hBmp, int nWid, int nHei)
     m_bmpCaret = (IBitmapS *)pRT->GetCurrentObject(OT_BITMAP);
     if (hBmp)
     {
-        //todo:hjx
-        #ifdef _WIN32
+// todo:hjx
+#ifdef _WIN32
         //以拉伸方式创建一个插入符位图
         HDC hdc = pRT->GetDC(0);
         HDC hdc2 = CreateCompatibleDC(hdc);
@@ -49,7 +49,7 @@ BOOL SCaret::Init(HBITMAP hBmp, int nWid, int nHei)
         StretchBlt(hdc, 0, 0, nWid, nHei, hdc2, 0, 0, bm.bmWidth, bm.bmHeight, SRCCOPY);
         DeleteDC(hdc2);
         pRT->ReleaseDC(hdc, NULL);
-        #endif
+#endif
     }
     else
     {

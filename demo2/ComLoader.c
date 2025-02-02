@@ -1,4 +1,4 @@
-#include <Windows.h>
+#include <windows.h>
 #include <config.h>
 #include "ComLoader.h"
 #include <tchar.h>
@@ -20,23 +20,7 @@ struct SComInfo
 	HMODULE hMod;
 };
 
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-struct SComInfo s_comInfo[]={
-	{Decoder_Png,_T("imgdecoder-pngd.dll"),NULL},
-	{Decoder_Gdip,_T("imgdecoder-gdipd.dll"),NULL},
-	{Decoder_Wic,_T("imgdecoder-wicd.dll"),NULL},
-	{Decoder_Stb,_T("imgdecoder-stbd.dll"),NULL},
-	{Render_Gdi,_T("render-gdid.dll"),NULL},
-	{Render_Skia,_T("render-skiad.dll"),NULL},
-	{Render_D2D,_T("render-d2dd.dll"),NULL},
-	{Log4Z,_T("log4zd.dll"),NULL},
-	{Resprovider_7Zip,_T("resprovider-7zipd.dll"),NULL},
-	{Resprovider_Zip,_T("resprovider-zipd.dll"),NULL},
-	{Script_Lua,_T("scriptmodule-luad.dll"),NULL},
-	{TaskLoop,_T("TaskLoopd.dll"),NULL},
-	{Translator,_T("translatord.dll"),NULL},
-};
-#else
+#ifdef _WIN32
 struct SComInfo s_comInfo[]={
 	{Decoder_Png,_T("imgdecoder-png.dll"),NULL},
 	{Decoder_Gdip,_T("imgdecoder-gdip.dll"),NULL},
@@ -49,10 +33,26 @@ struct SComInfo s_comInfo[]={
 	{Resprovider_7Zip,_T("resprovider-7zip.dll"),NULL},
 	{Resprovider_Zip,_T("resprovider-zip.dll"),NULL},
 	{Script_Lua,_T("scriptmodule-lua.dll"),NULL},
-	{TaskLoop,_T("TaskLoop.dll"),NULL},
+	{TaskLoop,_T("taskloop.dll"),NULL},
 	{Translator,_T("translator.dll"),NULL},
 };
-#endif
+#else
+struct SComInfo s_comInfo[] = {
+	{Decoder_Png,_T("libimgdecoder-png.so"),NULL},
+	{Decoder_Gdip,_T("libimgdecoder-gdip.so"),NULL},
+	{Decoder_Wic,_T("libimgdecoder-wic.so"),NULL},
+	{Decoder_Stb,_T("libimgdecoder-stb.so"),NULL},
+	{Render_Gdi,_T("librender-gdi.so"),NULL},
+	{Render_Skia,_T("librender-skia.so"),NULL},
+	{Render_D2D,_T("librender-d2d.so"),NULL},
+	{Log4Z,_T("liblog4z.so"),NULL},
+	{Resprovider_7Zip,_T("libresprovider-7zip.so"),NULL},
+	{Resprovider_Zip,_T("libresprovider-zip.so"),NULL},
+	{Script_Lua,_T("libscriptmodule-lua.so"),NULL},
+	{TaskLoop,_T("libtaskloop.so"),NULL},
+	{Translator,_T("libtranslator.so"),NULL},
+};
+#endif//_WIN32
 	BOOL LoadComObj(SComID id,IObjRef ** ppObj)
 	{
 		FunCreateInstance fun=NULL;
@@ -61,8 +61,13 @@ struct SComInfo s_comInfo[]={
 		if(!hDll)
 		{
 			hDll = LoadLibrary(pszDll);
-			if(!hDll)
+			if (!hDll) {
+#ifndef _WIN32
+				const char* err = dlerror();
+				printf("load so failed, err=%s\n", err);
+#endif
 				return FALSE;
+			}
 		}
 		fun = (FunCreateInstance)GetProcAddress(hDll,"SCreateInstance");
 		if(!fun)
@@ -82,56 +87,7 @@ struct SComInfo s_comInfo[]={
 #pragma comment(lib,"Usp10")
 #pragma comment(lib,"opengl32")
 
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-#if(SCOM_MASK&scom_mask_render_skia)
-#pragma comment(lib,"skiad")
-#pragma comment(lib,"render-skiad")
-#endif
-#if(SCOM_MASK&scom_mask_render_gdi)
-#pragma comment(lib,"render-gdid")
-#endif
-#if(SCOM_MASK&scom_mask_render_d2d)
-#pragma comment(lib,"render-d2dd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_wic)
-#pragma comment(lib,"imgdecoder-wicd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_png)
-#pragma comment(lib,"pngd")
-#pragma comment(lib,"zlibd")
-#pragma comment(lib,"imgdecoder-pngd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_stb)
-#pragma comment(lib,"imgdecoder-stbd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_gdip)
-#pragma comment(lib,"imgdecoder-gdipd")
-#endif
-#if(SCOM_MASK&scom_mask_resprovider_zip)
-#pragma comment(lib,"zlibd")
-#pragma comment(lib,"resprovider-zipd")
-#endif
-#if(SCOM_MASK&scom_mask_resprovider_7z)
-#pragma comment(lib,"7zd")
-#pragma comment(lib,"resprovider-7zipd")
-#endif
-#if(SCOM_MASK&scom_mask_translator)
-#pragma comment(lib,"translatord")
-#endif
-#if(SCOM_MASK&scom_mask_log4z)
-#pragma comment(lib,"log4zd")
-#endif
-#if(SCOM_MASK&scom_mask_taskloop)
-#pragma comment(lib,"taskloopd")
-#endif
-#if(SCOM_MASK&scom_mask_ipcobject)
-#pragma comment(lib,"sipcobjectd")
-#endif
-#if(SCOM_MASK&scom_mask_script_lua)
-#pragma comment(lib,"lua-54d")
-#pragma comment(lib,"scriptmodule-luad")
-#endif
-#else//_DEBUG
+
 #if(SCOM_MASK&scom_mask_render_skia)
 #pragma comment(lib,"skia")
 #pragma comment(lib,"render-skia")
@@ -145,13 +101,9 @@ struct SComInfo s_comInfo[]={
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
 #pragma comment(lib,"imgdecoder-wic")
 #endif
-#if(SCOM_MASK&scom_mask_imgdecoder_png)
-#pragma comment(lib,"png")
-#pragma comment(lib,"zlib")
-#pragma comment(lib,"imgdecoder-png")
-#endif
 #if(SCOM_MASK&scom_mask_imgdecoder_stb)
-#pragma comment(lib,"imgdecoder-stb")
+#pragma comment(lib, "aupng")
+#pragma comment(lib, "imgdecoder-stb")
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_gdip)
 #pragma comment(lib,"imgdecoder-gdip")
@@ -180,7 +132,7 @@ struct SComInfo s_comInfo[]={
 #pragma comment(lib,"lua-54")
 #pragma comment(lib,"scriptmodule-lua")
 #endif
-#endif//_DEBUG
+
 
 struct SComInfo
 {

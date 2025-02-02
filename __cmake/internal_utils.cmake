@@ -77,4 +77,13 @@ macro(config_compiler_and_linker)
     else(XP_TOOLSET)
         set(BUILD_CONF_XP_TOOLSET "0")
     endif()
+
+    #
+    # 启用Spectre缓解
+    #
+    if (ENABLE_SPECTRE)
+        message("---Building with Spectre Mitigation")
+        SET(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} /Qspectre")
+        SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /Qspectre")
+    endif()
 endmacro()

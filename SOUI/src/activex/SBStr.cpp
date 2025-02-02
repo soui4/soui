@@ -85,4 +85,4 @@ size_t sbstr::ByteLength() const
 
 SNSEND
 
-#endif//_WIN32
+#endif //_WIN32

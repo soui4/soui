@@ -1,8 +1,8 @@
-#pragma once
+ï»¿#pragma once
 namespace SOUI
 {
 
-//ÊµÏÖÒ»¸öÖ»ÓĞ×İÏò¹ö¶¯ÌõÆ¤·ô
+//å®ç°ä¸€ä¸ªåªæœ‰çºµå‘æ»šåŠ¨æ¡çš®è‚¤
 /*img format: 1-normal, 2-hover, 3-pushdown, 4-disable
 1 2 3 4 //for thumb
 1 2 3 4 //for rail
@@ -16,7 +16,7 @@ class SSkinVScrollbar : public SSkinScrollbar {
         m_nStates = 4;
     }
 
-    //²»Ö§³ÖÏÔÊ¾ÉÏÏÂ¼ıÍ·
+    //ä¸æ”¯æŒæ˜¾ç¤ºä¸Šä¸‹ç®­å¤´
     virtual BOOL HasArrow() const override
     {
         return FALSE;
@@ -29,7 +29,7 @@ class SSkinVScrollbar : public SSkinScrollbar {
     }
 
   protected:
-    //·µ»ØÔ´Ö¸¶¨²¿·ÖÔÚÔ­Î»Í¼ÉÏµÄÎ»ÖÃ¡£
+    //è¿”å›æºæŒ‡å®šéƒ¨åˆ†åœ¨åŸä½å›¾ä¸Šçš„ä½ç½®ã€‚
     virtual CRect GetPartRect(int nSbCode, int nState, BOOL bVertical) const override
     {
         CRect rc;

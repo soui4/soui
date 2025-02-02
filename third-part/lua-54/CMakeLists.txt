@@ -71,6 +71,9 @@ source_group("Header Files" FILES ${headers})
 source_group("Source Files" FILES ${sources})
 
 add_library(lua-54 STATIC ${sources} ${headers})
+if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+target_compile_options(lua-54 PRIVATE -fPIC)
+endif()
 set(COM_LIBS ${COM_LIBS} lua-54 CACHE INTERNAL "com_lib")
 set_target_properties (lua-54 PROPERTIES
     FOLDER third-part

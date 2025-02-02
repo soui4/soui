@@ -20,8 +20,6 @@ void SDragWnd::OnPaint(HDC dc)
     dc = ::BeginPaint(m_hWnd, &ps);
     if (m_bmp)
     {
-        //todo:hjx
-        #ifdef _WIN32
         CRect rc;
         GetClientRect(rc);
         HDC hMemDC = CreateCompatibleDC(dc);
@@ -29,20 +27,19 @@ void SDragWnd::OnPaint(HDC dc)
         BitBlt(dc, 0, 0, rc.Width(), rc.Height(), hMemDC, 0, 0, SRCCOPY);
         ::SelectObject(hMemDC, hOldBmp);
         ::DeleteDC(hMemDC);
-        #endif//_WIN32
     }
     ::EndPaint(m_hWnd, &ps);
 }
 
 BOOL SDragWnd::BeginDrag(HBITMAP hBmp, POINT ptHot, COLORREF crKey, BYTE byAlpha, DWORD dwFlags)
 {
-    #ifdef _WIN32
     if (s_pCurDragWnd)
         return FALSE;
     s_pCurDragWnd = new SDragWnd;
     BITMAP bm;
     GetObject(hBmp, sizeof(bm), &bm);
 
+#ifdef _WIN32
     if (!s_pCurDragWnd->CreateNative(NULL, WS_POPUP, WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST, 0, 0, bm.bmWidth, bm.bmHeight, 0, 0, NULL))
     {
         delete s_pCurDragWnd;
@@ -69,11 +66,23 @@ BOOL SDragWnd::BeginDrag(HBITMAP hBmp, POINT ptHot, COLORREF crKey, BYTE byAlpha
         s_pCurDragWnd->m_bmp = hBmp;
         s_pCurDragWnd->Invalidate();
     }
+#else  //_WIN32
+
+    DWORD dwExStyle = WS_EX_TRANSPARENT | WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_LAYERED;
+    if (bm.bmBitsPixel == 32)
+        dwExStyle |= WS_EX_COMPOSITED;
+    if (!s_pCurDragWnd->CreateNative(NULL, WS_POPUP, dwExStyle, 0, 0, bm.bmWidth, bm.bmHeight, 0, 0, NULL))
+    {
+        delete s_pCurDragWnd;
+        s_pCurDragWnd = NULL;
+        return FALSE;
+    }
+    s_pCurDragWnd->m_bmp = hBmp;
+    s_pCurDragWnd->SetLayeredWindowAttributes(crKey, byAlpha, dwFlags);
+    s_pCurDragWnd->Invalidate();
+#endif //_WIN32
     s_pCurDragWnd->m_ptHot = ptHot;
     return TRUE;
-    #else
-    return FALSE;
-    #endif//_WIN32
 }
 
 void SDragWnd::DragMove(POINT pt)

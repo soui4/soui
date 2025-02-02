@@ -1,4 +1,4 @@
-//
+ï»¿//
 // cmake config.h.in
 //
 /* #undef ENABLE_SOUI_COM_LIB */
@@ -6,15 +6,15 @@
 /* #undef OUTPATH_WITHOUT_TYPE */
 
 #ifdef ENABLE_SOUI_COM_LIB
-    #define LIB_SOUI_COM		//SOUI×é¼þ±àÒëÎªlib
+    #define LIB_SOUI_COM		//SOUIç»„ä»¶ç¼–è¯‘ä¸ºlib
 #else
-    #define DLL_SOUI_COM	//SOUI×é¼þ±àÒëÎªdll
+    #define DLL_SOUI_COM	//SOUIç»„ä»¶ç¼–è¯‘ä¸ºdll
 #endif
 
 #ifdef ENABLE_SOUI_CORE_LIB
-    #define LIB_CORE		//SOUI ÄÚºË±àÒëÎªlib
+    #define LIB_CORE		//SOUI å†…æ ¸ç¼–è¯‘ä¸ºlib
 #else
-    #define DLL_CORE		//SOUI ÄÚºË±àÒëÎªdll
+    #define DLL_CORE		//SOUI å†…æ ¸ç¼–è¯‘ä¸ºdll
 #endif
 
 #if defined(OUTPATH_WITHOUT_TYPE)

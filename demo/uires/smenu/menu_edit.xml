@@ -1,0 +1,10 @@
+﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="120">
+  <item name="menu_add_group" id="21">copy</item>
+  <item name="menu_modify_group" id="22">paste</item>
+  <item name="menu_del_group" text="submenu">
+    <item name="menu_230" id="230">hello</item>
+    <item name="menu_231" id="231">soui5</item>
+  </item>
+  <sep/>
+  <item name="menu_clear_group" id="24">clear</item>
+</menu>

@@ -55,7 +55,7 @@ public:
 	{
 		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetRoot()->GetUserData();
-		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
+		SMessageBox(0, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
 	}
 };
@@ -99,7 +99,7 @@ public:
 		SWindow* pBtn = sobj_cast<SWindow>(pEvt->sender);
 		SItemPanel* pItem = (SItemPanel*)pBtn->GetRoot();
 		int iItem = pItem->GetItemIndex();
-		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
+		SMessageBox(0, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
 	}
 };
@@ -186,7 +186,7 @@ public:
 	{
 		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetUserData();
-		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
+		SMessageBox(0, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
 	}
 
@@ -335,7 +335,7 @@ public:
 		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetUserData();
 
-		if (SMessageBox(NULL, SStringT().Format(_T("Are you sure to uninstall the selected [%d] software?"), iItem), _T("uninstall"), MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
+		if (SMessageBox(0, SStringT().Format(_T("Are you sure to uninstall the selected [%d] software?"), iItem), _T("uninstall"), MB_OKCANCEL | MB_ICONQUESTION) == IDOK)
 		{//删除一条记录
 			DeleteItem(iItem);
 		}
@@ -462,72 +462,177 @@ public:
 	{
 		SButton* pBtn = sobj_cast<SButton>(pEvt->Sender());
 		int iItem = pBtn->GetRoot()->GetUserData();
-		SMessageBox(NULL, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
+		SMessageBox(0, SStringT().Format(_T("button of %d item was clicked"), iItem), _T("haha"), MB_OK);
 		return true;
 	}
 
 };
 
 
-struct TreeItemData
+struct TviBase
 {
-	SStringW strName;
-	int      nAge;
-	SStringT strTstLong;
+    SStringT strName;
+    BOOL bHot;
+    virtual ~TviBase()
+    {
+    }
 };
 
-class CTreeViewAdapter :public STreeAdapterBase<TreeItemData>
+struct TreeItemData1 : TviBase
 {
+    SStringT strUrl;
+    SStringT strPlatform;
+};
+
+struct TreeItemData2 : TviBase
+{
+};
+
+struct TreeItemData3 : TviBase
+{
+    int id;
+};
+
+enum NodeLevel
+{
+	Level1=0,
+	Level2,
+	Level3,
+};
+
+struct TreeItemData
+{
+    NodeLevel nLevel;
+    TviBase *data;
+    ~TreeItemData()
+    {
+        delete data;
+    }
+};
+
+static void OnTvItemDataFree(TreeItemData *data)
+{
+    delete data;
+}
+
+class CTreeViewAdapter : public STreeAdapterBase<TreeItemData *> {
 public:
 
 	CTreeViewAdapter() {
-		TreeItemData data;
-		data.strName = L"name root";
-		data.nAge = 100;
-		data.strTstLong = _T("name root");
-		HSTREEITEM hRoot = InsertItem(data);
-		SetItemExpanded(hRoot, FALSE);
-		for (int i = 0; i < 100; i++)
-		{
-			data.strName.Format(L"branch_%d", i);
-			data.nAge++;
-			data.strTstLong = _T("red text");
-			if (i == 50) data.strTstLong = _T("Long Text Test. When this item is shown, the treeview size should be extended automatically.");
-			InsertItem(data, hRoot);
-		}
-		//ExpandItem(hRoot,ITvAdapter::TV_TOGGLE);
+        SetDataFreer(OnTvItemDataFree);
 	}
 
 	~CTreeViewAdapter() {}
+
+	STDMETHOD_(void, InitByTemplate)(SXmlNode xmlTemplate)
+    {
+        SStringW strSrc = xmlTemplate.attribute(L"data").as_string();
+        SXmlDoc xmlDoc;
+        if (LOADXML(xmlDoc, S_CW2T(strSrc)))
+        {
+            SXmlNode root = xmlDoc.root().child(L"roomlist");
+            SXmlNode nodePlatform = root.child(L"platform");
+            HSTREEITEM hParent = STVI_ROOT;
+            while (nodePlatform)
+            {
+                TreeItemData *pData = new TreeItemData;
+                pData->nLevel = Level1;
+                TreeItemData1 *pNode = new TreeItemData1;
+                pNode->strPlatform = S_CW2T(nodePlatform.attribute(L"platform").as_string());
+                pNode->strName = S_CW2T(nodePlatform.attribute(L"name").as_string());
+                pNode->strUrl = S_CW2T(nodePlatform.attribute(L"url").as_string());
+                pNode->bHot = nodePlatform.attribute(L"hot").as_bool();
+                pData->data = pNode;
+                HSTREEITEM h1=InsertItem(pData, hParent);
+                BOOL bExpand = nodePlatform.attribute(L"expand").as_bool();
+                SetItemExpanded(h1, bExpand);
+                SXmlNode nodeType = nodePlatform.child(L"type");
+                while (nodeType)
+                {
+                    TreeItemData *pData = new TreeItemData;
+                    pData->nLevel = Level2;
+                    TreeItemData2 *pNode = new TreeItemData2;
+                    pData->data = pNode;
+                    pNode->bHot = nodeType.attribute(L"hot").as_bool();
+                    pNode->strName = S_CW2T(nodeType.attribute(L"name").as_string());
+                    HSTREEITEM h2 = InsertItem(pData, h1);
+                    BOOL bExpand = nodeType.attribute(L"expand").as_bool();
+                    SetItemExpanded(h2, bExpand);
+                    SXmlNode nodeRoom = nodeType.child(L"room");
+                    while (nodeRoom)
+                    {
+                        TreeItemData *pData = new TreeItemData;
+                        pData->nLevel = Level3;
+                        TreeItemData3 *pNode = new TreeItemData3;
+                        pData->data = pNode;
+                        pNode->bHot = nodeRoom.attribute(L"hot").as_bool();
+                        pNode->id = nodeRoom.attribute(L"id").as_int();
+                        pNode->strName = S_CW2T(nodeRoom.attribute(L"desc").as_string());
+                        InsertItem(pData, h2);
+                        nodeRoom = nodeRoom.next_sibling();
+                    }
+                    nodeType = nodeType.next_sibling();
+                }
+                nodePlatform = nodePlatform.next_sibling(L"platform");
+            }
+        }
+    }
 
 	virtual void WINAPI getView(HSTREEITEM loc, SItemPanel* pItem, SXmlNode xmlTemplate) {
 		if (pItem->GetChildrenCount() == 0)
 		{
 			pItem->InitFromXml(&xmlTemplate);
 		}
-		ItemInfo& ii = m_tree.GetItemRef(loc);
-		SWindow* pWnd = pItem->FindChildByID(R.id.btn_test);
-		SASSERT(pWnd);
-		pWnd->SetWindowText(S_CW2T(ii.data.strName));
-		SWindow* pTxtRed = pItem->FindChildByID(R.id.txt_red);
-		SASSERT(pTxtRed);
-		pTxtRed->SetWindowText(ii.data.strTstLong);
+        TreeItemData *pData = GetItemData(loc);
+        SWindow * txt = pItem->FindChildByName("txt_label");
+        SWindow *btnUrl = pItem->FindChildByName("btn_go_offcial_url");
+        btnUrl->SetVisible(false, false);
+        txt->SetWindowText(pData->data->strName);
 
-		SToggle* pSwitch = pItem->FindChildByID2<SToggle>(R.id.tgl_switch);
-		SASSERT(pSwitch);
-		pSwitch->SetVisible(HasChildren(loc));
-		pSwitch->SetToggle(IsItemExpanded(loc));
-		pSwitch->GetEventSet()->subscribeEvent(EVT_CMD, Subscriber(&CTreeViewAdapter::OnSwitchClick, this));
+        if (pData->nLevel == Level1)
+        {
+            TreeItemData1 *pNode = (TreeItemData1 *)pData->data;
+			if (!pNode->strUrl.IsEmpty())
+            {
+                btnUrl->SetVisible(true, false);
+                btnUrl->SetAttribute(L"url", S_CT2W(pNode->strUrl), 0);
+                btnUrl->GetEventSet()->subscribeEvent(EventCmd::EventID, Subscriber(&CTreeViewAdapter::OnBtnUrl, this));
+            }
+        }
+        else if (pData->nLevel == Level2)
+        {
+            TreeItemData2 *pNode = (TreeItemData2 *)pData->data;
+        }
+        else if (pData->nLevel == Level3)
+        {
+            TreeItemData3 *pNode = (TreeItemData3 *)pData->data;
+        }
+
+        SImageWnd *img = pItem->FindChildByName2<SImageWnd>("img_state");
+
+        if (pData->nLevel!= Level3)
+        {
+            BOOL expland = IsItemExpanded(loc);
+            img->SetIcon(expland ? 1 : 0);
+        }
+        else
+        {
+            img->SetIcon(2);
+        }
+
+        SWindow * aniHot = pItem->FindChildByName("ani_hot");
+        aniHot->SetVisible(pData->data->bHot, true);
 	}
 
-	BOOL OnSwitchClick(IEvtArgs* pEvt)
-	{
-		SToggle* pToggle = sobj_cast<SToggle>(pEvt->Sender());
-		SASSERT(pToggle);
-		SItemPanel* pItem = sobj_cast<SItemPanel>(pToggle->GetRoot());
-		SASSERT(pItem);
-		HSTREEITEM loc = (HSTREEITEM)pItem->GetItemIndex();
-		ExpandItem(loc, TVC_TOGGLE);
-		return true;
-	}
+	BOOL OnBtnUrl(IEvtArgs *e)
+    {
+        SWindow *pSender = sobj_cast<SWindow>(e->Sender());
+        SItemPanel *pItem = sobj_cast<SItemPanel>(pSender->GetRoot());
+        HSTREEITEM hItem = (HSTREEITEM)pItem->GetItemIndex();
+        const TreeItemData *data = GetItemData(hItem);
+        SASSERT(data->nLevel == Level1);
+        TreeItemData1 *pdata1 = (TreeItemData1 *)data->data;
+        ShellExecute(0, _T("open"), pdata1->strUrl, NULL, NULL, SW_SHOWDEFAULT);
+        return TRUE;
+    }
 };

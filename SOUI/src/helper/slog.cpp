@@ -59,16 +59,14 @@ Log::~Log()
     }
     else if (s_enableEcho)
     {
-        #ifdef _WIN32
         SYSTEMTIME wtm;
         GetLocalTime(&wtm);
         const int kMaxLog = Log::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);
-        int nLen = _snprintf_s(logbuf2, kMaxLog, _TRUNCATE, "%s, %04d-%02d-%02d %02d:%02d:%02d %03dms %s %s %s:%d\n", m_tag, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_logBuf, m_func, m_file, m_line);
+        int nLen = _snprintf(logbuf2, kMaxLog, "%s, %04d-%02d-%02d %02d:%02d:%02d %03dms %s %s %s:%d\n", m_tag, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_logBuf, m_func, m_file, m_line);
         logbuf2[nLen] = 0;
         OutputDebugStringA(logbuf2);
         free(logbuf2);
-        #endif//_WIN32
     }
 }
 

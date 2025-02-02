@@ -28,3 +28,8 @@ tools\clang-format.exe -i SOUI\src\res.mgr\*.cpp -style=file --verbose
 tools\clang-format.exe -i SOUI\src\updatelayeredwindow\*.cpp -style=file --verbose
 tools\clang-format.exe -i SOUI\src\valueAnimator\*.cpp -style=file --verbose
 tools\clang-format.exe -i SOUI\src\*.cpp -style=file --verbose
+
+
+tools\clang-format.exe -i swinx\src\*.cpp -style=file --verbose
+tools\clang-format.exe -i swinx\src\cmnctl32\*.* -style=file --verbose
+tools\clang-format.exe -i swinx\include\*.h -style=file --verbose

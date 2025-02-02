@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "TipWnd.h"
 
 #define TIMER_END_TIP 100
@@ -40,7 +40,7 @@ void STipWnd::ShowTip(int x, int y, AnchorType at, const SStringT &strTip)
     pTipWnd->m_ptAnchor.x = x;
     pTipWnd->m_ptAnchor.y = y;
     pTipWnd->m_anchorType = at;
-    pTipWnd->Create(NULL);
+    pTipWnd->Create(0);
     pTipWnd->SetTip(strTip);
     pTipWnd->SetWindowPos(HWND_TOPMOST, 0, 0, 0, 0,
                           SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);
@@ -50,7 +50,7 @@ void STipWnd::ShowTip(int x, int y, AnchorType at, const SStringT &strTip)
 void STipWnd::OnWindowPosChanging(LPWINDOWPOS lpWndPos)
 {
     if (!(lpWndPos->flags & SWP_NOSIZE))
-    { //���ڴ�С�ı䣬�������õ�anchor�ƶ�λ��
+    { //窗口大小改变，根据设置的anchor移动位置
         switch (m_anchorType)
         {
         case AT_LEFT_TOP:

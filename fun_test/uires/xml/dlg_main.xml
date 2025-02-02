@@ -3,7 +3,7 @@
 	translucent="0"
 	toolwnd="0"
 >
-	<root  width="600" height="400" skin="_skin.sys.wnd.bkgnd" colorBkgnd="@color/white" layout="vbox">
+	<root  width="600" height="400" skin="_skin.sys.wnd.bkgnd" colorBkgnd="@color/white" layout="vbox" alpha1="200">
 		<caption size="-2,30" font="adding:2" layout="hbox" gravity="center" padding_left="10" colorBkgnd="@color/blue">
 			<text text="@string/title"/>
 			<text text="QQ群:" extend_left="5"/>
@@ -18,9 +18,20 @@
 		</caption>
 
 		<tabctrl size="-2,0" weight="1" tabHeight="30" animateSteps="30" curSel="0">
+			<page title="test" layout="vbox">
+				<dateTimePicker size="240,30" name="timepicker" padding="4,0,4,0" dropWidth="300" timeEnable="1">
+					<calstyle ncSkin="_skin.sys.border" daySkin="_skin.sys.btn.normal" margin="1" />
+				</dateTimePicker>
+				<edit extend_left="10" size="200,30" name="edit_test2" text="under" margin="2" enableDragdrop="0"/>
+			</page>
 			<page title="page1" layout="vbox" gravity="center" colorBkgnd="@color/white" interval="5">
 				<text text="hello soui in page1" colorText="@color/red" colorBkgnd="@color/gray"/>
-				<icon src="ICON_LOGO:128"/>
+				<window size="-2,-1" layout="hbox" gravity="center">
+					<icon src="ICON_LOGO:128"/>
+					<icon src="ICON_LOGO:64"/>
+					<icon src="ICON_LOGO:32"/>
+					<button size="100,30" name="btn_soui" text="transluent"/>
+				</window>
 				<window size="-1,-1" layout="hbox" interval="10" gravity="center">
 					<button name="btn_resize" size="100,30" text="resizing"/>
 					<window size="100,50" margin="2" ncskin="_skin.sys.border" text="draw border" colorTextHover="@color/red"/>
@@ -33,9 +44,9 @@
 				</window>
 				<window size="-2,-1" layout="hbox" interval="10">
 					<text text="edit1"/>
-					<edit size="200,30" name="edit_test" text="hello" margin="2"/>
+					<edit size="200,30" name="edit_test" text="hello" margin="2" enableDragdrop="1"/>
 					<text text="edit2"/>
-					<edit size="200,30" name="edit_test2" text="soui5" margin="2"/>
+					<edit size="200,30" name="edit_test2" text="soui5" margin="2" enableDragdrop="1"/>
 				</window>
 				<window size="-2,0" weight="1" layout="hbox" interval="10">
 					<window size="100,-2" skin="skin_grad_0"/>
@@ -47,6 +58,10 @@
 			<page title="page2" layout="vbox" gravity="center" colorBkgnd="@color/white">
 				<text text="hello soui in page2" colorText="@color/green" colorBkgnd="@color/gray" font="underline:1,strike:1"/>
 				<img skin="skin_girl"/>
+			</page>
+			<page title="richedit" padding="10,10,10,10" layout="hbox" interval="5">
+				<richedit size="0,-2" weight="1" name="re_test" enableDragdrop="1" multiLines="1" vscrollBar="1"  wordWrap="1" autoVscroll="1" hscrollBar="0" wantReturn="1" wantTab="1" rtf="rtf:test"/>
+				<richedit size="0,-2" weight="1" name="re_test2" enableDragdrop="1" multiLines="1" vscrollBar="1"  wordWrap="1" autoVscroll="1" hscrollBar="0" wantReturn="1" wantTab="1" rtf="rtf:test"/>
 			</page>
 			<page title="scintilla">
 				<realwnd size="-2,-2" name="wnd_sci" wndclass="Scintilla" wndname="hello sci" init="1"/>

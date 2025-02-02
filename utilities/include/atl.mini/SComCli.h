@@ -26,8 +26,7 @@
 
 
 #pragma pack(push,8)
-namespace SOUI
-{
+SNSBEGIN
 
 /////////////////////////////////////////////////////////////////////////////
 // Smart Pointer helpers
@@ -88,10 +87,10 @@ protected:
         (void)nNull;
         p = NULL;
     }
-    SComPtrBase( T* lp) throw()
+    SComPtrBase( T* lp, BOOL bAddRef) throw()
     {
         p = lp;
-        if (p != NULL)
+        if (p != NULL && bAddRef)
             p->AddRef();
     }
 public:
@@ -225,13 +224,13 @@ public:
         SComPtrBase<T>(nNull)
     {
     }
-    SComPtr(T* lp) throw() :
-        SComPtrBase<T>(lp)
+    SComPtr(T* lp, BOOL bAddRef = TRUE) throw() :
+        SComPtrBase<T>(lp,bAddRef)
 
     {
     }
     SComPtr( const SComPtr<T>& lp) throw() :
-        SComPtrBase<T>(lp.p)
+        SComPtrBase<T>(lp.p,TRUE)
     {
     }
     T* operator=( T* lp) throw()
@@ -261,6 +260,7 @@ public:
     }
 };
 
+#ifdef _WIN32
 //specialization for IDispatch
 template <>
 class SComPtr<IDispatch> : public SComPtrBase<IDispatch>
@@ -269,12 +269,12 @@ public:
     SComPtr() throw()
     {
     }
-    SComPtr(IDispatch* lp) throw() :
-        SComPtrBase<IDispatch>(lp)
+    SComPtr(IDispatch* lp, BOOL bAddRef = TRUE) throw() :
+        SComPtrBase<IDispatch>(lp,bAddRef)
     {
     }
     SComPtr(const SComPtr<IDispatch>& lp) throw() :
-        SComPtrBase<IDispatch>(lp.p)
+        SComPtrBase<IDispatch>(lp.p,TRUE)
     {
     }
     IDispatch* operator=(IDispatch* lp) throw()
@@ -439,8 +439,8 @@ public:
     SComQIPtr() throw()
     {
     }
-    SComQIPtr( T* lp) throw() :
-        SComPtr<T>(lp)
+    SComQIPtr( T* lp, BOOL bAddRef = TRUE) throw() :
+        SComPtr<T>(lp,bAddRef)
     {
     }
     SComQIPtr( const SComQIPtr<T,piid>& lp) throw() :
@@ -517,8 +517,9 @@ public:
 };
 
 typedef SComQIPtr<IDispatch, &__uuidof(IDispatch)> CComDispatchDriver;
+#endif//_WIN32
 
-}    // namespace SOUI
+SNSEND
 #pragma pack(pop)
 
 #pragma warning (pop)    

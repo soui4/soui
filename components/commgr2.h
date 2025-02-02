@@ -11,21 +11,7 @@
 #endif 
 
 #ifdef _WIN32
-#define COM_IMGDECODER  _T("imgdecoder-gdip")
-
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-#define COM_RENDER_GDI  _T("render-gdid")
-#define COM_RENDER_SKIA _T("render-skiad")
-#define COM_RENDER_D2D _T("render-d2dd")
-#define COM_SCRIPT_LUA _T("scriptmodule-luad")
-#define COM_TRANSLATOR _T("translatord")
-#define COM_ZIPRESPROVIDER _T("resprovider-zipd")
-#define COM_LOG4Z   _T("log4zd")
-#define COM_7ZIPRESPROVIDER _T("resprovider-7zipd")
-#define COM_TASKLOOP _T("taskloopd")
-#define COM_IPCOBJ _T("sipcobjectd")
-#define COM_HTTPCLIENT _T("httpclientd")
-#else
+#define COM_IMGDECODER  _T("imgdecoder-stb")
 #define COM_RENDER_GDI  _T("render-gdi")
 #define COM_RENDER_SKIA _T("render-skia")
 #define COM_RENDER_D2D _T("render-d2d")
@@ -37,7 +23,6 @@
 #define COM_TASKLOOP _T("taskloop")
 #define COM_IPCOBJ _T("sipcobject")
 #define COM_HTTPCLIENT _T("httpclient")
-#endif	// _DEBUG
 #else
 #define COM_IMGDECODER  _T("libimgdecoder-stb")
 #define COM_RENDER_GDI  _T("librender-gdi")
@@ -48,10 +33,9 @@
 #define COM_LOG4Z   _T("liblog4z")
 #define COM_7ZIPRESPROVIDER _T("libresprovider-7zip")
 #define COM_TASKLOOP _T("libtaskloop")
-
-#define COM_RENDER_D2D _T("render-d2d")
-#define COM_IPCOBJ _T("sipcobject")
-#define COM_HTTPCLIENT _T("httpclient")
+#define COM_RENDER_D2D _T("librender-d2d")
+#define COM_IPCOBJ _T("libsipcobject")
+#define COM_HTTPCLIENT _T("libhttpclient")
 #endif//_WIN32
 
 #ifdef LIB_SOUI_COM
@@ -59,60 +43,6 @@
 #pragma comment(lib,"Usp10")
 #pragma comment(lib,"opengl32")
 
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-#if(SCOM_MASK&scom_mask_render_skia)
-    #pragma comment(lib,"skiad")
-    #pragma comment(lib,"render-skiad")
-#endif
-#if(SCOM_MASK&scom_mask_render_gdi)
-    #pragma comment(lib,"render-gdid")
-#endif
-#if(SCOM_MASK&scom_mask_render_d2d)
-#pragma comment(lib,"render-d2dd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_wic)
-    #pragma comment(lib,"imgdecoder-wicd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_png)
-    #pragma comment(lib,"pngd")
-	#pragma comment(lib,"zlibd")
-    #pragma comment(lib,"imgdecoder-pngd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_stb)
-    #pragma comment(lib,"imgdecoder-stbd")
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_gdip)
-    #pragma comment(lib,"imgdecoder-gdipd")
-#endif
-#if(SCOM_MASK&scom_mask_resprovider_zip)
-    #pragma comment(lib,"zlibd")
-    #pragma comment(lib,"resprovider-zipd")
-#endif
-#if(SCOM_MASK&scom_mask_resprovider_7z)
-    #pragma comment(lib,"7zd")
-    #pragma comment(lib,"resprovider-7zipd")
-#endif
-#if(SCOM_MASK&scom_mask_translator)
-    #pragma comment(lib,"translatord")
-#endif
-#if(SCOM_MASK&scom_mask_log4z)
-    #pragma comment(lib,"log4zd")
-#endif
-#if(SCOM_MASK&scom_mask_taskloop)
-	#pragma comment(lib,"taskloopd")
-#endif
-#if(SCOM_MASK&scom_mask_ipcobject)
-	#pragma comment(lib,"sipcobjectd")
-#endif
-#if(SCOM_MASK&scom_mask_ipcobject)
-	#pragma comment(lib,"httpclientd")
-#endif
-#if(SCOM_MASK&scom_mask_script_lua)
-	#pragma comment(lib,"lua-54d")
-	#pragma comment(lib,"ScriptModule-LUAd")
-#endif
-
-#else//defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
 #if(SCOM_MASK&scom_mask_render_skia)
     #pragma comment(lib,"skia")
     #pragma comment(lib,"render-skia")
@@ -126,12 +56,8 @@
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
     #pragma comment(lib,"imgdecoder-wic")
 #endif
-#if(SCOM_MASK&scom_mask_imgdecoder_png)
-    #pragma comment(lib,"png")
-	#pragma comment(lib,"zlib")
-    #pragma comment(lib,"imgdecoder-png")
-#endif
 #if(SCOM_MASK&scom_mask_imgdecoder_stb)
+    #pragma comment(lib, "aupng")
     #pragma comment(lib,"imgdecoder-stb")
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_gdip)
@@ -165,7 +91,6 @@
 	#pragma comment(lib,"ScriptModule-LUA")
 #endif
 
-#endif//_DEBUG
 
 namespace SOUI
 {
@@ -174,10 +99,6 @@ namespace SOUI
         BOOL SCreateInstance(IObjRef **);
     }
     namespace IMGDECODOR_STB
-    {
-        BOOL SCreateInstance(IObjRef **);
-    }
-    namespace IMGDECODOR_PNG
     {
         BOOL SCreateInstance(IObjRef **);
     }
@@ -249,10 +170,6 @@ public:
 #if(SCOM_MASK&scom_mask_imgdecoder_stb)
         if(m_strImgDecoder == _T("imgdecoder-stb"))
             return IMGDECODOR_STB::SCreateInstance(ppObj);
-#endif
-#if(SCOM_MASK&scom_mask_imgdecoder_png)
-        if(m_strImgDecoder == _T("imgdecoder-png"))
-            return IMGDECODOR_PNG::SCreateInstance(ppObj);
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_gdip)
         if(m_strImgDecoder == _T("imgdecoder-gdip"))
@@ -380,12 +297,7 @@ public:
 
     BOOL CreateImgDecoder(IObjRef ** ppObj)
     {
-#if defined(_DEBUG) && !defined(NO_DEBUG_SUFFIX)
-        SStringT strImgDecoder = m_strImgDecoder+_T("d");
-#else
-        SStringT strImgDecoder = m_strImgDecoder+_T("");
-#endif
-        return imgDecLoader.CreateInstance(m_strDllPath+strImgDecoder,ppObj);
+        return imgDecLoader.CreateInstance(m_strDllPath+m_strImgDecoder,ppObj);
     }
     
     BOOL CreateRender_GDI(IObjRef **ppObj)

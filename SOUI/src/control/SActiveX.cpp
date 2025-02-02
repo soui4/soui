@@ -217,4 +217,4 @@ void SActiveX::SetExternalUIHandler(IDocHostUIHandler *pUiHandler)
 
 SNSEND
 
-#endif//_WIN32
+#endif //_WIN32

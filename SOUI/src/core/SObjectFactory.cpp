@@ -5,7 +5,7 @@
 
 SNSBEGIN
 
-SObjectInfo ObjInfo_New(LPCWSTR name, int type)
+SObjectInfo ObjInfo_New(LPCWSTR name, int type, LPCWSTR alise)
 {
     SObjectInfo ret;
     SStringW strName(name);
@@ -13,6 +13,7 @@ SObjectInfo ObjInfo_New(LPCWSTR name, int type)
     SASSERT(strName.GetLength() < MAX_OBJNAME);
     wcscpy(ret.szName, strName.c_str());
     ret.nType = type;
+    ret.szAlise = alise;
     return ret;
 }
 
@@ -42,7 +43,18 @@ BOOL SObjectFactoryMgr::RegisterFactory(const IObjectFactory *objFactory, BOOL b
             return FALSE;
         RemoveKeyObject(objFactory->GetObjectInfo());
     }
-    AddKeyObject(objFactory->GetObjectInfo(), objFactory->Clone());
+    SObjectInfo objInfo = objFactory->GetObjectInfo();
+    AddKeyObject(objInfo, objFactory->Clone());
+    if (objInfo.szAlise)
+    {
+        SStringWList aliseList;
+        SplitString(SStringW(objInfo.szAlise), L'|', aliseList);
+        for (size_t i = 0; i < aliseList.GetCount(); i++)
+        {
+            SObjectInfo objInfoAlise = ObjInfo_New(aliseList[i], objInfo.nType);
+            AddKeyObject(objInfoAlise, objFactory->Clone());
+        }
+    }
     return TRUE;
 }
 

@@ -182,7 +182,7 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
      */
     BOOL InitRealWnd();
 
-    void SetRealWndPos(HWND hRealWnd, const CRect* prc);
+    void SetRealWndPos(HWND hRealWnd, const CRect *prc);
 
     SOUI_MSG_MAP_BEGIN()
         MSG_WM_PAINT_EX(OnPaint)

@@ -7,14 +7,14 @@
 #include "helper/SMenu.h"
 #include "../controls.extend/FileHelper.h"
 #include "../controls.extend/SChatEdit.h"
-#include "../controls.extend/reole/richeditole.h"
+#include "../controls.extend/reole/RichEditOle.h"
 #include "../controls.extend/SHexEdit.h"
 #include "SMatrixWindow.h"
 #include "FormatMsgDlg.h"
 #include <math.h>
 #include <valueAnimator/SValueAnimator.h>
 #include <helper/SMenuEx.h>
-#include <helper/SDibHelper.h>
+#include <helper/SDIBHelper.h>
 
 #pragma warning(disable:4192)
 
@@ -30,7 +30,6 @@
 #endif
 
 #include <shellapi.h>
-#include "skin/SDemoSkin.h"
 #include "skin/SetSkinWnd2.h"
 #include "../controls.extend/SMcListViewEx/SMCListViewEx.h"
 #include "adapter.h"
@@ -38,6 +37,11 @@
 #include "CAdapter.h"
 #include "CDropTarget.h"
 
+#ifdef _WIN32
+#define SKIN_CFG _T("\\themes\\skin_config.xml")
+#else
+#define SKIN_CFG _T("/themes/skin_config.xml")
+#endif//_WIN32
 #define kLogTag "maindlg"
 
 int CMainDlg::OnCreate( LPCREATESTRUCT lpCreateStruct )
@@ -71,7 +75,7 @@ void CMainDlg::InitListCtrl()
         //向表头控件订阅表明点击事件，并把它和OnListHeaderClick函数相连。
         pHeader->GetEventSet()->subscribeEvent(EVT_HEADER_CLICK,Subscriber(&CMainDlg::OnListHeaderClick,this));
 
-        TCHAR szSex[][5]={_T("男"),_T("女"),_T("人妖")};
+        TCHAR szSex[][8]={_T("男"),_T("女"),_T("人妖")};
         for(int i=0;i<100;i++)
         {
             student *pst=new student;
@@ -105,7 +109,7 @@ void SaveSkinInf2File(SkinType skinType, SkinSaveInf &skinSaveInf)
 	SXmlNode rootNode = docSave.root().append_child(L"DEMO_SKIN_CONFIG");
 	SXmlNode childSkinType = rootNode.append_child(L"skinInf");
 	childSkinType.append_attribute(L"type").set_value(skinType);
-	SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + _T("\\themes\\skin_config.xml");
+	SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + SKIN_CFG;
 	switch (skinType)
 	{
 	case color://纯色只有SkinSaveInf的color有效
@@ -135,7 +139,7 @@ bool CMainDlg::SaveSkin(SkinType skinType, SkinSaveInf &skinSaveInf)
 
 void LoadSkinFormXml(SDemoSkin *skin, SkinType *skinType, SkinLoadInf *skininf)
 {
-	SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + _T("\\themes\\skin_config.xml");
+	SStringT strSkinConfigPath = SApplication::getSingleton().GetAppDir() + SKIN_CFG;
 
 	SXmlDoc docLoad;
 	bool bLoad = docLoad.load_file(strSkinConfigPath);
@@ -242,6 +246,7 @@ void CMainDlg::OnDestory()
 }
 
 
+#ifdef _WIN32
 class CSmileySource2 : public CSmileySource
 {
 public:
@@ -260,6 +265,7 @@ ISmileySource * CreateSource2()
 {
     return  new CSmileySource2;
 }
+#endif
 
 HRESULT CMainDlg::OnSkinChangeMessage(UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL bHandled)
 {
@@ -320,17 +326,27 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
     FindChildByID(R.id.txt_title)->SetWindowText(S_CW2T(GetRoot()->tr(strTitle)));
     
     //演示在SOUI中的拖放
-	SEdit *pEdit1 = FindChildByName2<SEdit>(L"edit_drop_top");
-    if(pEdit1)
-    {
-        HRESULT hr=::RegisterDragDrop(m_hWnd,GetDropTarget());
-        RegisterDragDrop(pEdit1->GetSwnd(),new CTestDropTarget1(pEdit1));
-    }
-    
+    HRESULT hr=::RegisterDragDrop(m_hWnd,GetDropTarget());
+	{
+		SEdit *pEdit1 = FindChildByName2<SEdit>(L"edit_drop_top1");
+		if(pEdit1)
+		{
+			RegisterDragDrop(pEdit1->GetSwnd(),new CTestDropTarget1(pEdit1));
+		}
+	}
+	{
+		SEdit *pEdit1 = FindChildByName2<SEdit>(L"edit_drop_top2");
+		if(pEdit1)
+		{
+			RegisterDragDrop(pEdit1->GetSwnd(),new CTestDropTarget1(pEdit1));
+		}
+	}
     SRichEdit *pEdit = FindChildByName2<SRichEdit>(L"re_gifhost");
     if(pEdit)
     {
+#ifdef _WIN32
         SetSRicheditOleCallback(pEdit,CreateSource2);
+#endif
         pEdit->SetAttribute(L"rtf",L"rtf:rtf_test");
     }
 
@@ -416,7 +432,7 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
     }
 
 	//treeview
-	STreeView * pTreeView = FindChildByName2<STreeView>("tree_view_00");
+	STreeView * pTreeView = FindChildByName2<STreeView>("room_tv");
 	if (pTreeView)
 	{
 		CTreeViewAdapter * pTreeViewAdapter = new CTreeViewAdapter;
@@ -493,6 +509,7 @@ void CMainDlg::OnBtnWebkitRefresh()
 
 void CMainDlg::OnBtnSelectGIF()
 {
+#ifdef _WIN32
     SGifPlayer *pGifPlayer = FindChildByName2<SGifPlayer>(L"giftest");
     if(pGifPlayer)
     {
@@ -500,6 +517,7 @@ void CMainDlg::OnBtnSelectGIF()
         if(openDlg.DoModal()==IDOK)
             pGifPlayer->PlayGifFile(openDlg.m_szFileName);
     }
+#endif
 }
 
 void CMainDlg::OnBtnMenu()
@@ -518,35 +536,14 @@ void CMainDlg::OnCommand( UINT uNotifyCode, int nID, HWND wndCtl )
 {
     if(uNotifyCode==0)
     {
-        if(nID == 7)
-        {
-            if(GetRoot()->GetColorizeColor()==0) GetRoot()->DoColorize(RGB(255,255,0));//将图片调整为粉红
-            else GetRoot()->DoColorize(0);//恢复
-        }
-        else if(nID==6)
+        if(nID==6)
         {//nID==6对应menu_test定义的菜单的exit项。
             PostMessage(WM_CLOSE);
-        }else if(nID==54)
+        }else if(nID==5)
         {//about SOUI
             STabCtrl *pTabCtrl = FindChildByName2<STabCtrl>(L"tab_main");
             if(pTabCtrl) pTabCtrl->SetCurSel(_T("about"));
 		}
-		else if (nID == 51)
-		{//skin1
-			SSkinLoader::getSingleton().LoadSkin(_T("themes\\skin1"));
-			GetRoot()->Invalidate();
-		}
-		else if (nID == 52)
-		{//skin2
-			SSkinLoader::getSingleton().LoadSkin(_T("themes\\skin2"));
-			GetRoot()->Invalidate();
-		}
-		else if (nID == 53)
-		{//skin3
-			SSkinLoader::getSingleton().LoadSkin(_T("themes\\skin3"));
-			GetRoot()->Invalidate();
-		}
-		
 		else if(nID==100)
         {//delete item in mclistview
             SMCListView *pListView = FindChildByName2<SMCListView>(L"mclv_test");
@@ -579,6 +576,7 @@ void CMainDlg::OnBtnInsertGif2RE()
         CFileDialogEx openDlg(TRUE,_T("gif"),0,6,_T("gif files(*.gif)\0*.gif\0All files (*.*)\0*.*\0\0"));
         if(openDlg.DoModal()==IDOK)
         {
+#ifdef _WIN32
             ISmileySource* pSource = new CSmileySource2;
             HRESULT hr=pSource->LoadFromFile(S_CT2W(openDlg.m_szFileName));
             if(SUCCEEDED(hr))
@@ -624,6 +622,7 @@ void CMainDlg::OnBtnInsertGif2RE()
                 SMessageBox(m_hWnd,_T("加载表情失败"),_T("错误"),MB_OK|MB_ICONSTOP);
             }
             pSource->Release();
+#endif
         }
     }
 }
@@ -644,11 +643,11 @@ void CMainDlg::OnBtnAppendMsg()
 
 void CMainDlg::OnBtnMsgBox()
 {
-    SMessageBox(NULL,_T("this is a message box"),_T("haha"),MB_OK|MB_ICONEXCLAMATION);
-    SMessageBox(NULL,_T("this message box includes two buttons"),_T("haha"),MB_YESNO|MB_ICONQUESTION);
+    SMessageBox(0,_T("this is a message box"),_T("haha"),MB_OK|MB_ICONEXCLAMATION);
+    SMessageBox(0,_T("this message box includes two buttons"),_T("haha"),MB_YESNO|MB_ICONQUESTION);
 
 	SNativeWnd::SetTimer(TIMER_QUIT,3000,NULL);//3S后退出APP
-    SMessageBox(NULL,_T("this message box includes three buttons. \nthe app will quit after 3 seconds if you keep the msgbox open!"),_T("Alarm"),MB_ABORTRETRYIGNORE|MB_ICONSTOP);
+    SMessageBox(0,_T("this message box includes three buttons. \nthe app will quit after 3 seconds if you keep the msgbox open!"),_T("Alarm"),MB_ABORTRETRYIGNORE|MB_ICONSTOP);
 	SNativeWnd::KillTimer(TIMER_QUIT);
 }
 
@@ -659,15 +658,6 @@ public:
 
 
 protected:
-	void OnLButtonDown(UINT nFlags,CPoint pt)
-	{
-		SMessageBox(m_hWnd,_T("test"),_T("msgbox"),MB_OK);
-		SetMsgHandled(FALSE);
-	}
-BEGIN_MSG_MAP_EX(SSkiaTestWnd)
-	MSG_WM_LBUTTONDOWN(OnLButtonDown)
-	CHAIN_MSG_MAP(SHostWnd)
-END_MSG_MAP()
 
 	void OnFinalMessage(HWND hWnd){ 
 	    //演示OnFinalMessage用法,下面new出来的不需要显示调用delete
@@ -750,7 +740,11 @@ void CMainDlg::OnBtnFileWnd()
 {
     //由于资源中使用了相对路径，需要将当前路径指定到资源所在位置
     SStringT strCurDir = SApplication::getSingleton().GetAppDir();
+	#ifdef _WIN32
     strCurDir += _T("\\filewnd");
+	#else
+    strCurDir += _T("/filewnd");
+#endif //_WIN32
     SetCurrentDirectory(strCurDir);
     if(GetFileAttributes(_T("test.xml"))==INVALID_FILE_ATTRIBUTES)
     {
@@ -892,103 +886,10 @@ void CMainDlg::OnInitListBox()
 	}
 }
 
-// 
-// void CMainDlg::OnSetSkin(int iSkin)
-// {
-//     SStringW strSkin = SStringW().Format(L"skin_bkimg_%d",iSkin);
-//     SSkinImgList * pSkin = sobj_cast<SSkinImgList>(GETSKIN(strSkin));
-//     SASSERT(pSkin);
-//     COLORREF crAvg = SDIBHelper::CalcAvarageColor(pSkin->GetImage());
-//     FindChildByID(R.id.img_skin_layer)->SetAttribute(L"skin",strSkin);
-//     DoColorize(crAvg);
-// }
-
 void CMainDlg::OnBtnSkin()
 {
-	if (!::IsWindow(m_hSetSkinWnd))
-	{
-		CSetSkinWnd *pSetSkinWnd = new CSetSkinWnd();
-		pSetSkinWnd->Create(NULL);
-		pSetSkinWnd->CenterWindow(GetDesktopWindow());
-		pSetSkinWnd->ShowWindow(SW_SHOWDEFAULT);
-		m_hSetSkinWnd = pSetSkinWnd->m_hWnd;
-	}
-	else
-	{
-		SetForegroundWindow(m_hSetSkinWnd);
-		FlashWindow(m_hSetSkinWnd, TRUE);
-	}
-}
-
-
-UINT CMainDlg::Run()
-{
-	while(!IsStoped())
-	{
-		int nSleep = rand()%2000+500;
-#if _MSC_VER >= 1700	//VS2012
-		SRUNONUI(
-			SStringW strMsg = SStringW().Format(L"event thread, sleep = %d", nSleep);
-			SChatEdit *pOutput = FindChildByID2<SChatEdit>(R.id.re_notifycenter);
-			pOutput->AppendFormatText(strMsg);
-		);
-#else
-		EventThread *pEvt = new EventThread(NULL);
-		pEvt->nData = nSleep;
-		SNotifyCenter::getSingleton().FireEventAsync(pEvt);
-		pEvt->Release();
-#endif
-		Sleep(nSleep);
-	}
-	return 0;
-}
-
-void CMainDlg::OnBtnStartNotifyThread()
-{
-	if(IsRunning()) return;
-	SNotifyCenter::getSingleton().addEvent(EVENTID(EventThreadStart));
-	SNotifyCenter::getSingleton().addEvent(EVENTID(EventThreadStop));
-	SNotifyCenter::getSingleton().addEvent(EVENTID(EventThread));
-
-	EventThreadStart evt(NULL);
-	SNotifyCenter::getSingleton().FireEventSync(&evt);
-	BeginThread();	
-}
-
-void CMainDlg::OnBtnStopNotifyThread()
-{
-	if(!IsRunning()) return;
-
-	EndThread();
-	EventThreadStop evt(NULL);
-	SNotifyCenter::getSingleton().FireEventSync(&evt);
-
-	SNotifyCenter::getSingleton().removeEvent(EventThreadStart::EventID);
-	SNotifyCenter::getSingleton().removeEvent(EventThreadStop::EventID);
-	SNotifyCenter::getSingleton().removeEvent(EventThread::EventID);
-}
-
-BOOL CMainDlg::OnEventThreadStart(IEvtArgs *e)
-{
-	SChatEdit *pOutput = FindChildByID2<SChatEdit>(R.id.re_notifycenter);
-	pOutput->AppendFormatText(L"start Thread");
-	return true;
-}
-
-BOOL CMainDlg::OnEventThreadStop(IEvtArgs *e)
-{
-	SChatEdit *pOutput = FindChildByID2<SChatEdit>(R.id.re_notifycenter);
-	pOutput->AppendFormatText(L"stop Thread");
-	return true;
-}
-
-BOOL CMainDlg::OnEventThread(IEvtArgs *e)
-{
-	EventThread *pEvt = sobj_cast<EventThread>(e);
-	SStringW strMsg = SStringW().Format(L"event thread, sleep = %d",pEvt->nData);
-	SChatEdit *pOutput = FindChildByID2<SChatEdit>(R.id.re_notifycenter);
-	pOutput->AppendFormatText(strMsg);
-	return true;
+	CSetSkinWnd pSetSkinWnd;
+	pSetSkinWnd.DoModal(m_hWnd);
 }
 
 void CMainDlg::OnBtnTip()

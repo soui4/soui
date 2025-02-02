@@ -12,6 +12,6 @@
 
 #endif
 
-#define __suidof(ClassName) ClassName::GetIID()
+#define __suidof(ClassName) IID_##ClassName
 
 #endif//__SGUID_H_

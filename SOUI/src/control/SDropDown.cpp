@@ -151,4 +151,4 @@ IMessageLoop *SDropDownWnd::GetMsgLoop()
     return m_pOwner->GetDropDownOwner()->GetContainer()->GetMsgLoop();
 }
 
-} // end of namespace SOUI
+SNSEND

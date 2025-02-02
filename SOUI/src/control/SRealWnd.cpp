@@ -5,38 +5,44 @@
 
 SNSBEGIN
 
-class DefRealWndHandler : public  TObjRefImpl2<IRealWndHandler, DefRealWndHandler> {
-public:
-    DefRealWndHandler(SRealWnd* pRealWnd):m_owner(pRealWnd) {
-
+class DefRealWndHandler : public TObjRefImpl2<IRealWndHandler, DefRealWndHandler> {
+  public:
+    DefRealWndHandler(SRealWnd *pRealWnd)
+        : m_owner(pRealWnd)
+    {
     }
 
-    HWND WINAPI OnRealWndCreate(IWindow* pRealWnd) OVERRIDE {
+    HWND WINAPI OnRealWndCreate(IWindow *pRealWnd) OVERRIDE
+    {
         EventRealWndCreate evt(m_owner);
         evt.hRet = 0;
         m_owner->FireEvent(&evt);
         return evt.hRet;
     }
-    void WINAPI OnRealWndDestroy(IWindow* pRealWnd) OVERRIDE {
+    void WINAPI OnRealWndDestroy(IWindow *pRealWnd) OVERRIDE
+    {
         EventRealWndDestroy evt(m_owner);
         m_owner->FireEvent(&evt);
     }
-    BOOL WINAPI OnRealWndInit(IWindow* pRealWnd) OVERRIDE {
+    BOOL WINAPI OnRealWndInit(IWindow *pRealWnd) OVERRIDE
+    {
         EventRealWndInit evt(m_owner);
         evt.bRet = FALSE;
         m_owner->FireEvent(&evt);
         return evt.bRet;
     }
 
-    BOOL WINAPI OnRealWndPosition(IWindow* pRealWnd, const RECT* rcWnd) OVERRIDE {
+    BOOL WINAPI OnRealWndPosition(IWindow *pRealWnd, const RECT *rcWnd) OVERRIDE
+    {
         EventRealWndPosition evt(m_owner);
         evt.rc = *rcWnd;
         evt.bRet = FALSE;
         m_owner->FireEvent(&evt);
         return evt.bRet;
     }
-protected:
-    SRealWnd* m_owner;
+
+  protected:
+    SRealWnd *m_owner;
 };
 
 SRealWnd::SRealWnd()
@@ -50,7 +56,8 @@ SRealWnd::SRealWnd()
     GetEventSet()->addEvent(EVENTID(EventRealWndPosition));
 
     m_pRealWndHandler = GETREALWNDHANDLER;
-    if (!m_pRealWndHandler) {
+    if (!m_pRealWndHandler)
+    {
         m_pRealWndHandler.Attach(new DefRealWndHandler(this));
     }
 }
@@ -146,7 +153,7 @@ BOOL SRealWnd::OnRelayout(const CRect &rcWnd)
     return TRUE;
 }
 
-void SRealWnd::SetRealWndPos(HWND hRealWnd,const CRect* prc)
+void SRealWnd::SetRealWndPos(HWND hRealWnd, const CRect *prc)
 {
     if (!m_pRealWndHandler->OnRealWndPosition(this, prc))
     {

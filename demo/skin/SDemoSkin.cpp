@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "sdemoskin.h"
+#include "SDemoSkin.h"
 #include "helper/SDIBHelper.h"
 
 namespace SOUI
@@ -42,7 +42,7 @@ namespace SOUI
 		SSkinImgList::SetImage(NULL);
 	}
 
-	SIZE SDemoSkin::GetSkinSize()
+	SIZE SDemoSkin::GetSkinSize() const
 	{		
 		return SSkinImgList::GetSkinSize();
 	}
@@ -100,21 +100,21 @@ namespace SOUI
 		m_ISetOrLoadSkinHandler = skinhander;
 	}
 
-	void SDemoSkin::_Draw(IRenderTarget * pRT, LPCRECT rcDraw, DWORD dwState, BYTE byAlpha)
-	{
-		if (m_bIsColor)
-		{			
-			COLORREF bkColor = m_bkColor | (byAlpha << 24);
-			pRT->FillSolidRect(rcDraw, bkColor);
-		}
-		else if (GetImage())
-		{
-			SIZE sz = GetSkinSize();
-			CPoint pt(0, 0);
-			CRect rcSour(pt, sz);
-			pRT->DrawBitmap9Patch(rcDraw, GetImage(), &rcSour, &m_rcMargin, GetExpandMode(), byAlpha);
-		}		
-	}	
+	void SDemoSkin::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int idx, BYTE byAlpha) const
+    {
+        if (m_bIsColor)
+        {
+            COLORREF bkColor = m_bkColor | (byAlpha << 24);
+            pRT->FillSolidRect(rcDraw, bkColor);
+        }
+        else if (GetImage())
+        {
+            SIZE sz = GetSkinSize();
+            CPoint pt(0, 0);
+            CRect rcSour(pt, sz);
+            pRT->DrawBitmap9Patch(rcDraw, GetImage(), &rcSour, &m_rcMargin, GetExpandMode(), byAlpha);
+        }	
+    }
 
 	COLORREF SDemoSkin::GetThemeColor() const
 	{

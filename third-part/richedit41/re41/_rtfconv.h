@@ -249,11 +249,11 @@ protected:
 	TEXTFONTS	_fonts;				// @cmember Font table
 	COLORREFS	_colors;			// @cmember Color table
 	EC			_ecParseError;		// @cmember Error code
+	CCharFormat	_CF;				// @cmember Character formatting info
 	CTxtEdit *	_ped;				// @cmember CTxtEdit
 	CTxtRange *	_prg;				// @cmember CTxtRange to replace/write from
 	EDITSTREAM *_pes;				// @cmember EDITSTREAM to use
 	DWORD		_dwFlags;			// @cmember See #defines below
-	CCharFormat	_CF;				// @cmember Character formatting info
 	BYTE		_iCharRep;			// @cmember Converter char set (ANSI, UTF7, UTF8)
 	char		_bTableLevel;		// @cmember Table level (0 for no table)
 	char		_bTableLevelIP;		// @cmember Table level at insertion point

@@ -1,0 +1,80 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<roomlist>
+  <platform name="YY" desc="YY娱乐" url="https://www.yy.com" hot="1" expand="1">
+    <type name="美女" hot="1" expand="1">
+      <room id="54880976" desc="991" hot="1"/>
+      <room id="1382738518" desc="妈说，不要彩礼"/>
+      <room id="27650992" desc="光翼言七七 正在直播"/>
+      <room id="1454717441" desc="你来了就是我的全世界"/>
+      <room id="86300079" desc="超人气女神文er"/>
+      <room id="63260471" desc="实力女神歌手娜宝"/>
+      <room id="1346369664" desc="邻家甜美少女米可可"/>
+      <room id="2915096765" desc="好声音♪活力阳光-天使"/>
+    </type>
+    <type name="跳舞">
+      <room id="22490906" desc="993" hot="1"/>
+      <room id="1344874094" desc="甜系女友颜值爆表"/>
+      <room id="1512837" desc="燃舞女神33"/>
+      <room id="57092721" desc="小可爱上线了"/>
+      <room id="2909844780" desc="燃舞蹈-胡公子 旺旺旺"/>
+      <room id="9649520" desc="燃舞蹈-红宝"/>
+    </type>
+    <type name="游戏">
+      <room id="18578166" desc="不要怂 一起上"/>
+      <room id="1463537773" desc="虫你又老了一岁啊"/>
+    </type>
+  </platform>
+  <platform name="迅雷" url="https://live.xunlei.com/">
+    <type name="美女">
+      <room id="1784134215" desc="桃之"/>
+      <room id="1731858960" desc="黑米"/>
+    </type>
+    <type name="才艺">
+      <room id="1676067039" desc="慧"/>
+    </type>
+  </platform>
+  <platform name="映客" url_path="data/stream_addr/.0/stream_addr" url="https://www.inke.cn/" visible="1">
+    <!--映客的url下载不下来, 暂时先隐藏-->
+    <type name="girl">
+      <room id="761864571" desc="苹果（好运来）"/>
+      <room id="162294416" desc="娜比"/>
+      <room id="701796998" desc="雨媚er"/>
+    </type>
+  </platform>
+  <platform name="棉花糖">
+    <type name="girl">
+      <room id="931221" desc="柠檬谢十"/>
+      <room id="930935" desc="我是哇卡哇卡世界杯"/>
+      <room id="935718" desc="甜橙Yami"/>
+      <room id="930571" desc="Only-苏沛淇"/>
+    </type>
+  </platform>
+  <platform name="哔哩哔哩" url_path="data/.0" url="https://live.bilibili.com/">
+    <type name="游戏">
+      <room id="23564688" desc="咕咕咕噜oo"/>
+      <room id="31797565" desc="黑丝姐姐"/>
+      <room id="22302689" desc="韩国麟智乐队-麟"/>
+    </type>
+  </platform>
+  <platform name="我秀">
+    <type name="girl">
+      <room id="7842" desc="笑笑☆"/>
+    </type>
+  </platform>
+  <platform name="KK">
+    <type name="girl">
+      <room id="13144131" desc="别站门口 进来"/>
+    </type>
+  </platform>
+  <platform name="九秀" visible="0">
+    <type name="girl">
+      <room id="109993149" desc="新人热舞i冉妹儿"/>
+    </type>
+  </platform>
+  <platform name="花椒" visible="1">
+    <type name="girl">
+      <room id="336927703" desc="好哇塞少女 "/>
+    </type>
+  </platform>
+
+</roomlist>

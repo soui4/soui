@@ -52,7 +52,7 @@ BOOL SDropTargetDispatcher::UnregisterDragDrop(SWND swnd)
 #endif
 
 HRESULT SDropTargetDispatcher::QueryInterface(/* [in] */ REFIID riid,
-                                                                /* [iid_is][out] */ void  * *ppvObject)
+                                              /* [iid_is][out] */ void **ppvObject)
 {
     HRESULT hr = S_FALSE;
     if (riid == __uuidofsys(IUnknown))
@@ -62,10 +62,10 @@ HRESULT SDropTargetDispatcher::QueryInterface(/* [in] */ REFIID riid,
     return hr;
 }
 
-HRESULT  SDropTargetDispatcher::DragEnter(/* [unique][in] */ IDataObject *pDataObj,
-                                                           /* [in] */ DWORD grfKeyState,
-                                                           /* [in] */ POINTL pt,
-                                                           /* [out][in] */ DWORD *pdwEffect)
+HRESULT SDropTargetDispatcher::DragEnter(/* [unique][in] */ IDataObject *pDataObj,
+                                         /* [in] */ DWORD grfKeyState,
+                                         /* [in] */ POINTL pt,
+                                         /* [out][in] */ DWORD *pdwEffect)
 {
     m_pDataObj = pDataObj;
     m_pDataObj->AddRef();
@@ -73,8 +73,8 @@ HRESULT  SDropTargetDispatcher::DragEnter(/* [unique][in] */ IDataObject *pDataO
 }
 
 HRESULT SDropTargetDispatcher::DragOver(/* [in] */ DWORD grfKeyState,
-                                                          /* [in] */ POINTL pt,
-                                                          /* [out][in] */ DWORD *pdwEffect)
+                                        /* [in] */ POINTL pt,
+                                        /* [out][in] */ DWORD *pdwEffect)
 {
     *pdwEffect = DROPEFFECT_NONE;
     CPoint pt2 = PointL2FrameClient(pt);

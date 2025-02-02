@@ -260,12 +260,10 @@ namespace SOUI
     {
         UINT nWid,nHei;
         pFrame->GetSize(&nWid,&nHei);
-
         if(m_hBmp) DeleteObject(m_hBmp);
-        void * pBits=NULL;
-        m_hBmp = CreateGDIBitmap(nWid,nHei,&pBits);
+        m_hBmp = CreateGDIBitmap(nWid,nHei,NULL);
         if(!m_hBmp) return E_OUTOFMEMORY;
-        if(!UpdateDIBPixmap(m_hBmp,nWid,nHei,32,nWid*4,pFrame->GetPixels()))
+        if(UpdateDIBPixmap(m_hBmp,nWid,nHei,32,nWid*4,pFrame->GetPixels()))
             m_sz.cx=nWid,m_sz.cy=nHei;
         return S_OK;
     }
@@ -343,6 +341,8 @@ namespace SOUI
 	HRESULT SBitmap_GDI::Clone(IBitmapS **ppClone) const 
 	{
 		HRESULT hr = E_UNEXPECTED;
+        if(!m_hBmp)
+            return hr;
 		BOOL bOK = GetRenderFactory()->CreateBitmap(ppClone);
 		if(bOK)
 		{
@@ -760,21 +760,6 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::DrawLines(LPPOINT pPt,size_t nCount)
     {
-        RECT rc={100000,100000,0,0};
-        for(size_t i=0;i<nCount;i++)
-        {
-            if(pPt[i].x<rc.left) rc.left=pPt[i].x;
-            if(pPt[i].x>rc.right) rc.right=pPt[i].x;
-            if(pPt[i].y<rc.top) rc.top=pPt[i].y;
-            if(pPt[i].y>rc.bottom) rc.bottom=pPt[i].y;
-        }
-        rc.left -= 1;
-        rc.top -=1;
-        int nPenWidth = 1;
-        if(m_curPen) nPenWidth = m_curPen->GetWidth();
-        rc.bottom+=nPenWidth;
-        rc.right+=nPenWidth;
-
         ::Polyline(m_hdc,pPt,(int)nCount);
         return S_OK;
     }
@@ -999,9 +984,7 @@ namespace SOUI
 
     HRESULT SRenderTarget_GDI::ClearRect( LPCRECT pRect,COLORREF cr )
     {
-        HBRUSH br = CreateSolidBrush(cr);
-        FillRect(m_hdc, pRect,br);
-        DeleteObject(br);
+        ::ClearRect(m_hdc,pRect,cr);
         return S_OK;    
     }
 
@@ -1187,18 +1170,53 @@ namespace SOUI
 
 	HRESULT SRenderTarget_GDI::SetXfermode(int mode,int *pOldMode)
 	{
-		switch (mode)
-		{
-		case kSrcCopy:
-		case kDstInvert:
-		case kSrcInvert:
-		case kSrcAnd:
-			break;
-		default:
-			return E_INVALIDARG;
-		}
+        switch (mode)
+        {
+        case kClear_Mode:
+            mode = R2_EXT_CLEAR;
+            break;
+        case kSrc_Mode:
+            mode = R2_EXT_SOURCE;
+            break;
+        case kDst_Mode:
+            mode = R2_EXT_DEST;
+            break;
+        case kSrcIn_Mode:
+            mode = R2_EXT_IN;
+            break;
+        case kDstIn_Mode:
+            mode = R2_EXT_DEST_IN;
+            break;
+        case kSrcOut_Mode:
+            mode = R2_EXT_OUT;
+            break;
+        case kDstOut_Mode:
+            mode = R2_EXT_DEST_OUT;
+            break;
+        case kSrcOver_Mode:
+            mode = R2_EXT_OVER;
+            break;
+        case kDstOver_Mode:
+            mode = R2_EXT_DEST_OVER;
+            break;
+        case kSrcATop_Mode:
+            mode = R2_EXT_ATOP;
+            break;
+        case kDstATop_Mode:
+            mode = R2_EXT_DEST_ATOP;
+            break;
+        case kXor_Mode:
+            mode = R2_EXT_XOR;
+            break;
+        case kPlus_Mode:
+            mode = R2_EXT_ADD;
+            break;
+        }
 		int nOldMode = ::SetROP2(m_hdc,mode);
-		if(pOldMode) *pOldMode = nOldMode;
+        if (pOldMode)
+        {//todo:hjx oldMode was not been converted.
+            *pOldMode = nOldMode;
+        }
 		return S_OK;
 	}
 

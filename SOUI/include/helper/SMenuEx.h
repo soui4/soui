@@ -133,6 +133,11 @@ class SOUI_EXP SMenuEx
 
     STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT *lpItemString) OVERRIDE;
 
+    STDMETHOD_(IHostWnd *, GetHostWnd)(THIS) OVERRIDE
+    {
+        return this;
+    }
+
   public:
     static void EndMenu(int nCmdId = 0);
 
@@ -158,7 +163,9 @@ class SOUI_EXP SMenuEx
     END_MSG_MAP()
   protected:
     virtual BOOL _HandleEvent(IEvtArgs *pEvt);
-    SRootWindow* CreateRoot() override;
+
+    BOOL OnLoadLayoutFromResourceID(SXmlDoc &xmlDoc) override;
+    SRootWindow *CreateRoot() override;
 
     STDMETHOD_(LPCWSTR, GetTranslatorContext)(THIS) SCONST OVERRIDE;
     STDMETHOD_(int, GetScale)() SCONST OVERRIDE;

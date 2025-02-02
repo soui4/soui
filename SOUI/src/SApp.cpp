@@ -162,10 +162,10 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SComboBox>();
     objFactory->TplRegisterFactory<SComboView>();
     objFactory->TplRegisterFactory<SCaption>();
-#ifdef _WIN32
     objFactory->TplRegisterFactory<SMenuBar>();
+#ifdef _WIN32
     objFactory->TplRegisterFactory<SActiveX>();
-#endif//_WIN32
+#endif //_WIN32
 }
 
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
@@ -237,10 +237,10 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     , m_cbCreateTaskLoop(NULL)
 {
 #ifdef _WIN32
-	SWndSurface::Init();
-#endif//_WIN32
+    SWndSurface::Init();
+#endif //_WIN32
 
-	SNativeWnd::InitWndClass(hInst,pszHostClassName,bImeApp);
+    SNativeWnd::InitWndClass(hInst, pszHostClassName, bImeApp);
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
     _CreateSingletons();
 
@@ -275,7 +275,7 @@ void SApplication::_CreateSingletons()
     m_pSingletons[STimerGenerator::GetType()] = new STimerGenerator();
     m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
     m_pSingletons[SHostMgr::GetType()] = new SHostMgr();
- }
+}
 
 #define DELETE_SINGLETON(x)                  \
     delete (x *)m_pSingletons[x::GetType()]; \
@@ -353,7 +353,7 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc 
     SAutoBuf xmlBuf;
     if (!LoadRawBuffer(pszType, pszXmlName, pResProvider, xmlBuf))
         return FALSE;
-	xmlDoc.Reset();
+    xmlDoc.Reset();
     bool bLoad = xmlDoc.load_buffer(xmlBuf, xmlBuf.size(), xml_parse_default, enc_auto);
     if (!bLoad)
     {
@@ -473,16 +473,16 @@ UINT SApplication::LoadSystemNamedResource(IResProvider *pResProvider)
             uRet |= 0x01;
         }
     }
-	// load edit context menu
-	{
-		if(!SetEditCtxMenuTemplateResId(_T("XML:SYS_XML_EDITMENU"),pResProvider))
-		{
-			uRet |= 0x02;
-		}
-	}
+    // load edit context menu
+    {
+        if (!SetEditCtxMenuTemplateResId(_T("XML:SYS_XML_EDITMENU"), pResProvider))
+        {
+            uRet |= 0x02;
+        }
+    }
     // load messagebox template
     {
-		if(!SetMessageBoxTemplateResId(_T("XML:SYS_XML_MSGBOX"),pResProvider))
+        if (!SetMessageBoxTemplateResId(_T("XML:SYS_XML_MSGBOX"), pResProvider))
         {
             uRet |= 0x04;
         }
@@ -811,35 +811,34 @@ ITaskLoop *SApplication::GetTaskLoop(THIS_ int iTaskLoop)
     }
 }
 
-
 SXmlNode SApplication::GetMessageBoxTemplate() const
 {
-	return m_xmlMessageBoxTemplate.root().child(L"soui");
+    return m_xmlMessageBoxTemplate.root().child(L"soui");
 }
 
 SXmlNode SApplication::GetEditCtxMenuTemplate() const
 {
-	return m_xmlEditCtxMenuTemplate.root().first_child();
+    return m_xmlEditCtxMenuTemplate.root().first_child();
 }
 
-BOOL SApplication::SetEditCtxMenuTemplateResId(THIS_ LPCTSTR resId,IResProvider *pResProvider)
+BOOL SApplication::SetEditCtxMenuTemplateResId(THIS_ LPCTSTR resId, IResProvider *pResProvider)
 {
-	return LoadXmlDocment(m_xmlEditCtxMenuTemplate,resId,pResProvider);
+    return LoadXmlDocment(m_xmlEditCtxMenuTemplate, resId, pResProvider);
 }
 
-BOOL SApplication::SetMessageBoxTemplateResId(THIS_ LPCTSTR resId,IResProvider *pResProvider)
+BOOL SApplication::SetMessageBoxTemplateResId(THIS_ LPCTSTR resId, IResProvider *pResProvider)
 {
-	if(!LoadXmlDocment(m_xmlMessageBoxTemplate,resId,pResProvider))
-		return FALSE;
-	SXmlNode uiRoot = m_xmlMessageBoxTemplate.root().child(L"soui");
-	if(!uiRoot)
-		return FALSE;
-	if (!uiRoot.attribute(L"minSize").value()[0])
-	{
-		m_xmlMessageBoxTemplate.Reset();
-		return FALSE;
-	}
-	return TRUE;
+    if (!LoadXmlDocment(m_xmlMessageBoxTemplate, resId, pResProvider))
+        return FALSE;
+    SXmlNode uiRoot = m_xmlMessageBoxTemplate.root().child(L"soui");
+    if (!uiRoot)
+        return FALSE;
+    if (!uiRoot.attribute(L"minSize").value()[0])
+    {
+        m_xmlMessageBoxTemplate.Reset();
+        return FALSE;
+    }
+    return TRUE;
 }
 
 SNSEND

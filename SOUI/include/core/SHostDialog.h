@@ -1,17 +1,17 @@
 ﻿/**
-* Copyright (C) 2014-2050 
-* All rights reserved.
-* 
-* @file       SHostDialog.h
-* @brief 
-*
- * @version    v1.0      
-* @author     SOUI group   
-* @date       2014/08/02
-* 
-* Describe
+ * Copyright (C) 2014-2050
+ * All rights reserved.
+ *
+ * @file       SHostDialog.h
+ * @brief
+ *
+ * @version    v1.0
+ * @author     SOUI group
+ * @date       2014/08/02
+ *
+ * Describe
  * SOUI的Dialog模块
-*/
+ */
 
 #ifndef __SHOSTDIALOG__H__
 #define __SHOSTDIALOG__H__

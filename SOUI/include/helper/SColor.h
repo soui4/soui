@@ -7,14 +7,14 @@
 
 #include <windows.h>
 
-#define CR_INVALID       0x00FFFFFF
+#define CR_INVALID 0x00FFFFFF
 #ifndef GetAValue
-#define GetAValue(rgb)  (LOBYTE(rgb>>24))
-#endif//GetAValue
+#define GetAValue(rgb) (LOBYTE(rgb >> 24))
+#endif // GetAValue
 
 #ifndef RGBA
 #define RGBA(r, g, b, a) (RGB(r, g, b) | (a << 24))
-#endif//RGBA
+#endif // RGBA
 
 //以ARGB格式存储颜色值
 class SColor {

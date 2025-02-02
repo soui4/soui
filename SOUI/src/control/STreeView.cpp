@@ -65,23 +65,23 @@ void STreeViewItemLocator::_InitBranch(HSTREEITEM hItem)
         _SetItemWidth(hItem, 0);
     }
     if (m_adapter->HasChildren(hItem))
-    { //有子节点
+    { // 有子节点
         HSTREEITEM hChild = m_adapter->GetFirstChildItem(hItem);
         int nBranchHeight = 0;
         while (hChild != ITEM_NULL)
         {
-            //设置偏移
+            // 设置偏移
             _SetItemOffset(hChild, nBranchHeight);
             _InitBranch(hChild);
             nBranchHeight += _GetItemVisibleHeight(hChild);
             hChild = m_adapter->GetNextSiblingItem(hChild);
         }
         _SetBranchHeight(hItem, nBranchHeight);
-        //设置默认宽度
+        // 设置默认宽度
         _SetBranchWidth(hItem, m_szDef.cx + m_nIndent);
     }
     else
-    { //无子节点
+    { // 无子节点
         _SetBranchHeight(hItem, 0);
         _SetBranchWidth(hItem, 0);
     }
@@ -108,7 +108,7 @@ HSTREEITEM STreeViewItemLocator::_Position2Item(int position, HSTREEITEM hParent
     int nParentBranchHeight = _GetBranchHeight(hParent);
 
     if (position - nPos < nParentBranchHeight / 2)
-    { //从first开始查找
+    { // 从first开始查找
         HSTREEITEM hItem = m_adapter->GetFirstChildItem(hParent);
         while (hItem)
         {
@@ -122,7 +122,7 @@ HSTREEITEM STreeViewItemLocator::_Position2Item(int position, HSTREEITEM hParent
         }
     }
     else
-    { //从last开始查找
+    { // 从last开始查找
         nPos += nParentBranchHeight;
 
         HSTREEITEM hItem = m_adapter->GetLastChildItem(hParent);
@@ -138,7 +138,7 @@ HSTREEITEM STreeViewItemLocator::_Position2Item(int position, HSTREEITEM hParent
         }
     }
 
-    SASSERT(FALSE); //不应该走到这里来
+    SASSERT(FALSE); // 不应该走到这里来
     return ITEM_NULL;
 }
 
@@ -187,7 +187,7 @@ void STreeViewItemLocator::_UpdateSiblingsOffset(HSTREEITEM hItem)
         nOffset += _GetItemVisibleHeight(hSib);
         hSib = m_adapter->GetNextSiblingItem(hSib);
     }
-    //注意更新各级父节点的偏移量
+    // 注意更新各级父节点的偏移量
     HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
     if (hParent != ITEM_NULL && hParent != ITEM_ROOT && IsItemExpanded(hParent))
     {
@@ -240,16 +240,16 @@ void STreeViewItemLocator::_UpdateBranchWidth(HSTREEITEM hItem, int nOldWidth, i
 
     int nIndent = hParent == ITEM_ROOT ? 0 : m_nIndent;
     if (nCurBranchWidth != nOldWidth + nIndent)
-    { //父节点的宽度不是由当前结点控制的
+    { // 父节点的宽度不是由当前结点控制的
         if (nCurBranchWidth < nNewWidth + nIndent)
-        { //新宽度扩展了父节点的显示宽度
+        { // 新宽度扩展了父节点的显示宽度
             _SetBranchWidth(hParent, nNewWidth + nIndent);
             if (IsItemExpanded(hParent))
                 _UpdateBranchWidth(hParent, nCurBranchWidth, nNewWidth + nIndent);
         }
     }
     else
-    { //父节点的宽度正好是由hItem的显示宽度
+    { // 父节点的宽度正好是由hItem的显示宽度
         int nNewBranchWidth;
         if (nNewWidth > nOldWidth)
         {
@@ -348,15 +348,15 @@ int STreeViewItemLocator::Item2Position(HSTREEITEM hItem) const
     }
 
     int nRet = 0;
-    //获得父节点开始位置
+    // 获得父节点开始位置
     HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
     if (hParent != ITEM_NULL && hParent != ITEM_ROOT)
     {
         nRet = Item2Position(hParent);
-        //越过父节点
+        // 越过父节点
         nRet += GetItemHeight(hParent);
     }
-    //越过前面兄弟结点
+    // 越过前面兄弟结点
     nRet += _GetItemOffset(hItem);
 
     return nRet;
@@ -399,7 +399,7 @@ void STreeViewItemLocator::OnBranchExpandedChanged(HSTREEITEM hItem, BOOL bExpan
 
 void STreeViewItemLocator::OnBranchChanged(HSTREEITEM hItem)
 {
-    //初始化列表项高度等数据
+    // 初始化列表项高度等数据
     int nVisibleHeightOld = _GetItemVisibleHeight(hItem);
     _InitBranch(hItem);
     int nVisibleHeightNew = _GetItemVisibleHeight(hItem);
@@ -616,14 +616,14 @@ void STreeView::OnDestroy()
 
 void STreeView::EnsureVisible(HSTREEITEM hItem)
 {
-    //保证hItem被正确展开
+    // 保证hItem被正确展开
     HSTREEITEM hParent = m_adapter->GetParentItem(hItem);
     while (hParent != ITEM_ROOT)
     {
         m_adapter->ExpandItem(hParent, TVC_EXPAND);
         hParent = m_adapter->GetParentItem(hParent);
     }
-    //滚动视图
+    // 滚动视图
     int nPos = m_tvItemLocator->Item2Position(hItem);
     int nHeight = m_tvItemLocator->GetItemHeight(hItem);
     if (nPos + nHeight <= m_siVer.nPos)
@@ -799,7 +799,7 @@ void STreeView::UpdateScrollBar()
     szView.cy = m_tvItemLocator->GetTotalHeight();
 
     CRect rcClient;
-    SWindow::GetClientRect(&rcClient); //不计算滚动条大小
+    SWindow::GetClientRect(&rcClient); // 不计算滚动条大小
     CSize size = rcClient.Size();
     //  关闭滚动条
     m_wBarVisible = SSB_NULL;
@@ -816,7 +816,7 @@ void STreeView::UpdateScrollBar()
         {
             //  需要横向滚动条
             m_wBarVisible |= SSB_HORZ;
-            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; //注意同时调整纵向滚动条page信息
+            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; // 注意同时调整纵向滚动条page信息
 
             m_siHoz.nMin = 0;
             m_siHoz.nMax = szView.cx - 1;
@@ -885,7 +885,7 @@ void STreeView::UpdateVisibleItems()
     HSTREEITEM hItem = m_tvItemLocator->Position2Item(m_siVer.nPos);
     if (hItem == ITEM_NULL)
     {
-        //如果没有可显示的，则移除所有item
+        // 如果没有可显示的，则移除所有item
         SPOSITION pos = m_visible_items.GetHeadPosition();
         while (pos)
         {
@@ -903,7 +903,7 @@ void STreeView::UpdateVisibleItems()
                 ii.pItem->ModifyItemState(0, WndState_Check);
                 ii.pItem->GetFocusManager()->ClearFocus();
             }
-            ii.pItem->SetVisible(FALSE); //防止执行SItemPanel::OnTimeFrame()
+            ii.pItem->SetVisible(FALSE); // 防止执行SItemPanel::OnTimeFrame()
             ii.pItem->GetEventSet()->setMutedState(false);
 
             m_itemRecycle[ii.nType]->AddTail(ii.pItem);
@@ -941,7 +941,7 @@ void STreeView::UpdateVisibleItems()
         {
             SList<SItemPanel *> *lstRecycle = m_itemRecycle.GetAt(ii.nType);
             if (lstRecycle->IsEmpty())
-            { //创建一个新的列表项
+            { // 创建一个新的列表项
                 bNewItem = TRUE;
                 ii.pItem = SItemPanel::Create(this, SXmlNode(), this);
                 ii.pItem->GetEventSet()->subscribeEvent(EventItemPanelClick::EventID, Subscriber(&STreeView::OnItemClick, this));
@@ -977,7 +977,11 @@ void STreeView::UpdateVisibleItems()
         }
 
         CSize szItem;
+        CRect rcItem = GetClientRect();
         m_adapter->getViewDesiredSize(&szItem, hItem, ii.pItem, -1, -1);
+        // 不使宽度
+        if (m_adapter->isViewWidthMatchParent())
+            szItem.cx = rcItem.Width();
         ii.pItem->Move(CRect(0, 0, szItem.cx, szItem.cy));
         m_tvItemLocator->SetItemWidth(hItem, szItem.cx);
         m_tvItemLocator->SetItemHeight(hItem, szItem.cy);
@@ -1007,7 +1011,7 @@ void STreeView::UpdateVisibleItems()
             ii.pItem->GetFocusManager()->ClearFocus();
             m_hSelected = 0;
         }
-        ii.pItem->SetVisible(FALSE); //防止执行SItemPanel::OnTimeFrame()
+        ii.pItem->SetVisible(FALSE); // 防止执行SItemPanel::OnTimeFrame()
         ii.pItem->GetEventSet()->setMutedState(false);
 
         m_itemRecycle[ii.nType]->AddTail(ii.pItem);
@@ -1022,7 +1026,7 @@ void STreeView::UpdateVisibleItems()
     if (szOldView != szNewView)
     { // update scroll range
         UpdateScrollBar();
-        UpdateVisibleItems(); //根据新的滚动条状态重新记算显示列表项
+        UpdateVisibleItems(); // 根据新的滚动条状态重新记算显示列表项
     }
     else
     {
@@ -1201,7 +1205,7 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     else
     {
         if (uMsg == WM_LBUTTONDOWN || uMsg == WM_RBUTTONDOWN || uMsg == WM_MBUTTONDOWN)
-        { //交给panel处理
+        { // 交给panel处理
             CPoint pt2(pt);
             SItemPanel *pPanel = HitTest(pt2);
             if (!pPanel && m_hSelected) // hit in none-item area,so make item to killfocus
@@ -1239,7 +1243,7 @@ LRESULT STreeView::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
     }
 
     if (uMsg == WM_LBUTTONUP || uMsg == WM_RBUTTONUP || uMsg == WM_MBUTTONUP)
-    { //交给panel处理
+    { // 交给panel处理
         __baseCls::ProcessSwndMessage(uMsg, wParam, lParam, lRet);
     }
     SetMsgHandled(TRUE);
@@ -1301,7 +1305,7 @@ BOOL STreeView::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     {
         UpdateVisibleItems();
 
-        //加速滚动时UI的刷新
+        // 加速滚动时UI的刷新
         if (uCode == SB_THUMBTRACK)
             ScrollUpdate();
 
@@ -1462,7 +1466,7 @@ void STreeView::OnRebuildFont()
 {
     __baseCls::OnRebuildFont();
     DispatchMessage2Items(UM_UPDATEFONT, 0, 0);
-    UpdateVisibleItems(); //防止因为字体大小变化后，列表项大小发生变化没有更新。其它view不需要这个过程。
+    UpdateVisibleItems(); // 防止因为字体大小变化后，列表项大小发生变化没有更新。其它view不需要这个过程。
 }
 
 ITvAdapter *STreeView::GetAdapter() const

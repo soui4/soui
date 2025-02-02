@@ -201,13 +201,13 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      */
     STDMETHOD_(void, UpdateTooltip)(THIS) PURE;
 
-	 /**
+    /**
      * @brief 在指定位置显示tooltip
-	 * @param pt POINT tip显示位置，相对于container
-	 * @param pszTip LPCTSTR tip内容，为null时退出固定tip
+     * @param pt POINT tip显示位置，相对于container
+     * @param pszTip LPCTSTR tip内容，为null时退出固定tip
      * @return
      */
-    STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign,LPCTSTR pszTip) PURE;
+    STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign, LPCTSTR pszTip) PURE;
 
     /**
      * @brief 将当前Frame的矩形坐标转换成最终Host的坐标

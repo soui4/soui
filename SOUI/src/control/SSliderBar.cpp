@@ -13,10 +13,10 @@ SSliderBar::SSliderBar()
     , m_pSkinThumb(GETBUILTINSKIN(SKIN_SYS_SLIDER_THUMB))
     , m_bThumbInRail(FALSE)
     , m_bDrawRail(TRUE)
-	, m_bDragTip(FALSE)
+    , m_bDragTip(FALSE)
 {
     m_evtSet.addEvent(EVENTID(EventSliderPos));
-	m_evtSet.addEvent(EVENTID(EventSliderValueTip));	
+    m_evtSet.addEvent(EVENTID(EventSliderValueTip));
 }
 
 SSliderBar::~SSliderBar()
@@ -103,7 +103,7 @@ CRect SSliderBar::GetPartRect(UINT uSBCode)
         rc.DeflateRect((rcClient.Width() - nSliderSize) / 2, 0);
         if (uSBCode != SC_THUMB)
         {
-			rc.DeflateRect((nSliderSize - szRail.cx) / 2, 0);
+            rc.DeflateRect((nSliderSize - szRail.cx) / 2, 0);
         }
         return rc;
     }
@@ -114,7 +114,7 @@ CRect SSliderBar::GetPartRect(UINT uSBCode)
         rc.OffsetRect(rcClient.left, 0);
         int nSliderSize = smax(szThumb.cy, szRail.cy);
         rc.DeflateRect(0, (rcClient.Height() - nSliderSize) / 2);
-		if (uSBCode != SC_THUMB)
+        if (uSBCode != SC_THUMB)
         {
             rc.DeflateRect(0, (nSliderSize - szRail.cy) / 2);
         }
@@ -143,7 +143,7 @@ void SSliderBar::OnPaint(IRenderTarget *pRT)
     {
         CRect rcThumb = GetPartRect(SC_THUMB);
         int nState = 0; // normal
-        if (IsDisabled(TRUE) && m_pSkinThumb->GetStates()>3)
+        if (IsDisabled(TRUE) && m_pSkinThumb->GetStates() > 3)
             nState = 3;
         else if (m_bDrag)
             nState = 2; // pushback
@@ -163,10 +163,11 @@ void SSliderBar::OnLButtonUp(UINT nFlags, CPoint point)
         CRect rcThumb = GetPartRect(SC_THUMB);
         InvalidateRect(rcThumb);
         NotifyPos(SBA_MOUSE_UP, m_nValue);
-		if(m_bDragTip){
-			//hide tooltip
-			GetContainer()->SetToolTip(NULL,TA_AUTO,NULL);
-		}
+        if (m_bDragTip)
+        {
+            // hide tooltip
+            GetContainer()->SetToolTip(NULL, TA_AUTO, NULL);
+        }
     }
     OnMouseMove(nFlags, point);
 }
@@ -182,7 +183,7 @@ void SSliderBar::OnLButtonDown(UINT nFlags, CPoint point)
         m_ptDrag = point;
         m_nDragValue = m_nValue;
         Invalidate();
-		ShowValueInTip(m_nValue);
+        ShowValueInTip(m_nValue);
     }
     else
     {
@@ -228,7 +229,6 @@ void SSliderBar::OnMouseMove(UINT nFlags, CPoint point)
         }
         if (nNewTrackPos != m_nValue)
         {
-			SSLOGI()<<"set slider pos="<<nNewTrackPos;
             m_nValue = nNewTrackPos;
             Invalidate();
             NotifyPos(SBA_MOUSE_MOVING, m_nValue);
@@ -310,17 +310,18 @@ BOOL SSliderBar::SetValue(THIS_ int nValue)
 
 void SSliderBar::ShowValueInTip(int nValue)
 {
-	if(m_bDragTip){
-		CRect rcThumb = GetPartRect(SC_THUMB);
-		rcThumb.InflateRect(5,5);
-		SStringT buf=SStringT().Format(_T("%d"),nValue);
-		EventSliderValueTip evt(this);
-		evt.nPos=nValue;
-		evt.buf = &buf;
-		FireEvent(&evt);
-        UINT tipAlign = IsVertical()?(TA_X_RIGHT|TA_Y_CENTER):(TA_X_CENTER|TA_Y_TOP);        
-		GetContainer()->SetToolTip(&rcThumb, tipAlign,buf);
-	}
+    if (m_bDragTip)
+    {
+        CRect rcThumb = GetPartRect(SC_THUMB);
+        rcThumb.InflateRect(5, 5);
+        SStringT buf = SStringT().Format(_T("%d"), nValue);
+        EventSliderValueTip evt(this);
+        evt.nPos = nValue;
+        evt.buf = &buf;
+        FireEvent(&evt);
+        UINT tipAlign = IsVertical() ? (TA_X_RIGHT | TA_Y_CENTER) : (TA_X_CENTER | TA_Y_TOP);
+        GetContainer()->SetToolTip(&rcThumb, tipAlign, buf);
+    }
 }
 
 SNSEND

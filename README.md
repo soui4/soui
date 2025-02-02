@@ -24,7 +24,7 @@
 </div>
 
 
- _SOUI4_ 是一套已经持续开发维护 **12年** 的轻量级Windows平台客户端开发框架,
+ _SOUI4_ 是一套已经持续开发维护 **14年** 的轻量级Windows平台客户端开发框架,
 （内核编译后体积1M左右），
 框架设计吸收了`WTL`，`Android`，`QT`，`Flash`等流行框架的特点，
 UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.oschina.net/p/skia)渲染），
@@ -52,9 +52,6 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 每一个Demo一个单独的仓库，自己分别clone就好了。
 
-如果想一次拉取所有demo,可以直接运行SOUI仓库代码下的`clone_demos.bat`来clone，当然前提是已经安装了git命令行工具。
-
-
 ##  **开始** 
 
 使用SOUI需要一定的c++与win32的基础，请您确保您掌握了上述技能。
@@ -72,7 +69,7 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 [![CMake Test](https://github.com/soui4/soui/actions/workflows/cmaketest.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/cmaketest.yml)
 
-如果为他vs2008编译，可以直接打开soui.08.sln来编译，包含了32位及64位两种配置。其它版本VS可以使用cmake生成对应版本VS工程再编译，运动在cmake中统一修改配置。具体编译方法查看附带[编译文档](./doc/build.md)
+使用cmake生成对应版本VS工程再编译，运动在cmake中统一修改配置。具体编译方法查看附带[编译文档](./doc/build.md)
 
 ### UI可视化设计
 
@@ -98,21 +95,12 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 - SOUI讨论#2: [点击加入](http://shang.qq.com/wpa/qunwpa?idkey=03d3294a2551beb1b54b4012086cec14b3f66d5c253debaeed241d9c623966e0)
 
-##  **LICENSE** 
-
-请查看[`license.txt`](./license.txt)文档
-
 
 ##  **Linux编译** 
-安装git, cmake
-sudo apt-get install git cmake
+soui从5.0开始支持linux平台，soui通过链接swinx(https://github.com/soui4/swinx)项目提供在linux平台下的windows api实现跨平台支持。
+linux平台编译参见swinx中的build.md，安装后必须的依赖后，使用cmake即可完成编译。
 
-安装build-essential,gdb,xcb,xcb-util,cairo.
-sudo apt install build-essential gdb libcairo2-dev libxcb1-dev libxcb-util0-dev
-安装完成后，即可编译。
-要调试代码可以在linux系统上安装vscode，使用gdb进行调试
-
-使用vs远程调试
+##  **使用vs远程调试linux** 
 linux机器上安装
 sudo apt install -y openssh-server build-essential gdb rsync make zip ninja-build
 本机安装
@@ -121,3 +109,13 @@ CMake, Vcxsvr(https://sourceforge.net/projects/vcxsrv/files/vcxsrv/21.1.10/vcxsr
 工具\选项\跨平台 页面的列表中添加linux主机IP，注意配置好登陆启用名，密码
 然后就可以在VS里运行远程调试了。
 具体参考：https://learn.microsoft.com/zh-cn/cpp/build/get-started-linux-cmake?view=msvc-170
+
+##  **linux 内存泄漏检测** 
+valgrind --leak-check=full ./your_program
+
+## **贡献名单**
+参见[贡献名单](./contibutors.md)
+
+##  **LICENSE** 
+
+请查看[`license.txt`](./license.txt)文档

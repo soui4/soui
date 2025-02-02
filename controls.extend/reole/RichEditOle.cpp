@@ -1,10 +1,10 @@
-// RichEditOle.cpp : implementation file
+ï»¿// RichEditOle.cpp : implementation file
 //
 #include "stdafx.h"
 #include "RichEditOle.h"
 #include <atl.mini/SComHelper.h>
 #include <gdialpha.h>
-#include <GdiPlus.h>
+#include <gdiplus.h>
 #pragma comment(lib,"gdiplus")
 
 #include "dataobject.h"
@@ -247,13 +247,13 @@ HRESULT CSmileySource::Init(const ImageID &imgid)
     if(m_pImg)
     {
         if(!m_pImg->IsEqual(imgid))
-        {//ÉèÖÃÐÂÍ¼
+        {//è®¾ç½®æ–°å›¾
             ImageID oldID = m_pImg->GetImageID();
             if(m_pImg->Release() ==0 )
                 s_imgPool.RemoveKey(oldID);
             m_pImg = NULL;
         }else
-        {//ÏàÍ¬µÄÍ¼£¬Ö±½Ó·µ»Ø
+        {//ç›¸åŒçš„å›¾ï¼Œç›´æŽ¥è¿”å›ž
             return S_OK;
         }
     }
@@ -261,7 +261,7 @@ HRESULT CSmileySource::Init(const ImageID &imgid)
     SPOSITION pos = s_imgPool.Lookup(imgid);
     
     if(!pos)
-    {//ÔÚpoolÖÐÃ»ÓÐÕÒµ½
+    {//åœ¨poolä¸­æ²¡æœ‰æ‰¾åˆ°
         ImageItem *pImg = new ImageItem;
         if(!pImg->LoadImage(imgid))
         {
@@ -350,14 +350,14 @@ CRichEditOleCallback::GetNewStorage(LPSTORAGE* ppStg)
     swprintf(tName, L"REStorage_%d", ++m_iStorage);
 
     if(m_iStorage%100 == 0)
-    {//Ã¿100¸ö¶ÔÏóÌá½»Ò»´Î,±ÜÃâ´´½¨stream or storageÓÉÓÚÄÚ´æ²»×ã¶øÊ§°Ü
+    {//æ¯100ä¸ªå¯¹è±¡æäº¤ä¸€æ¬¡,é¿å…åˆ›å»ºstream or storageç”±äºŽå†…å­˜ä¸è¶³è€Œå¤±è´¥
         m_stg->Commit(STGC_DEFAULT);
     }
     HRESULT hr = m_stg->CreateStorage(tName, 
         STGM_READWRITE | STGM_SHARE_EXCLUSIVE | STGM_CREATE ,
         0, 0, ppStg );    
     if(FAILED(hr) && (hr & E_OUTOFMEMORY))
-    {//Ê§°ÜºóÏòstorageÌá½»ºóÖØÊÔ
+    {//å¤±è´¥åŽå‘storageæäº¤åŽé‡è¯•
         m_stg->Commit(STGC_DEFAULT);
         hr = m_stg->CreateStorage(tName, 
             STGM_READWRITE | STGM_SHARE_EXCLUSIVE | STGM_CREATE ,
@@ -447,7 +447,7 @@ CRichEditOleCallback::DeleteObject(LPOLEOBJECT lpoleobj)
 HRESULT STDMETHODCALLTYPE 
 CRichEditOleCallback::GetClipboardData(CHARRANGE FAR *lpchrg, DWORD reco, LPDATAOBJECT FAR *lplpdataobj)
 {
-    /*ÑÝÊ¾×Ô¶¨Òå¼ôÌù°å¸ñÊ½µÄ¸´ÖÆ
+    /*æ¼”ç¤ºè‡ªå®šä¹‰å‰ªè´´æ¿æ ¼å¼çš„å¤åˆ¶
     if(RECO_COPY == reco || RECO_CUT == reco)
     {
         wchar_t * pBuf = new WCHAR[lpchrg->cpMax - lpchrg->cpMin +1];
@@ -493,7 +493,7 @@ CRichEditOleCallback::QueryAcceptData(LPDATAOBJECT lpdataobj, CLIPFORMAT FAR *lp
 {
     if(!fReally) return S_OK;
 
-    /*ÑÝÊ¾×Ô¶¨Òå¼ôÌù°å¸ñÊ½µÄÕ³Ìù
+    /*æ¼”ç¤ºè‡ªå®šä¹‰å‰ªè´´æ¿æ ¼å¼çš„ç²˜è´´
     if(RECO_DROP == reco || RECO_PASTE == reco)
     {
         FORMATETC fmt;  
@@ -502,7 +502,7 @@ CRichEditOleCallback::QueryAcceptData(LPDATAOBJECT lpdataobj, CLIPFORMAT FAR *lp
         fmt.lindex = -1;  
         fmt.ptd = NULL;  
         fmt.tymed = TYMED_HGLOBAL;  
-        //Èç¹ûKCF_SMILEY ¼ôÌù°å¸ñÊ½¿ÉÓÃ  
+        //å¦‚æžœKCF_SMILEY å‰ªè´´æ¿æ ¼å¼å¯ç”¨  
         if (SUCCEEDED(lpdataobj->QueryGetData(&fmt)) )
         {  
             STGMEDIUM stg;  
@@ -555,7 +555,7 @@ CSmileyHost::CSmileyHost(SRichEdit *pRichedit,FunCreateSource pCreateSource)
 ,m_cTime(0)
 {
     SASSERT(m_pHost);
-    //¶©ÔÄricheditµÄEN_UPDATEÏûÏ¢,ÓÃÀ´¸üÐÂ±íÇé×ø±ê
+    //è®¢é˜…richeditçš„EN_UPDATEæ¶ˆæ¯,ç”¨æ¥æ›´æ–°è¡¨æƒ…åæ ‡
     m_pHost->GetEventSet()->subscribeEvent(EVT_VISIBLECHANGED,Subscriber(&CSmileyHost::OnHostVisibleChanged,this));
     m_pHost->GetEventSet()->subscribeEvent(EventRENotify::EventID,Subscriber(&CSmileyHost::OnHostUpdate,this));
     if(pRichedit->IsVisible(TRUE))
@@ -622,7 +622,7 @@ HRESULT STDMETHODCALLTYPE  CSmileyHost::OnTimer( int nInterval )
     if(++m_cTime<INTERVAL) return S_OK;
     m_cTime=0;
 
-    //ÕÒµ½ËùÓÐµ½Ê±¼äµÄ¶¨Ê±Æ÷,·ÀÖ¹ÔÚÖ´ÐÐ¶¨Ê±Æ÷Ê±²åÈëÐÂ¶¨Ê±Æ÷£¬ÐèÒªÏÈ²éÕÒÔÙÖ´ÐÐ¡£
+    //æ‰¾åˆ°æ‰€æœ‰åˆ°æ—¶é—´çš„å®šæ—¶å™¨,é˜²æ­¢åœ¨æ‰§è¡Œå®šæ—¶å™¨æ—¶æ’å…¥æ–°å®šæ—¶å™¨ï¼Œéœ€è¦å…ˆæŸ¥æ‰¾å†æ‰§è¡Œã€‚
     TIMERHANDLER_LIST lstDone;
     SPOSITION pos = m_lstTimerInfo.GetHeadPosition();
     while(pos)
@@ -638,7 +638,7 @@ HRESULT STDMETHODCALLTYPE  CSmileyHost::OnTimer( int nInterval )
     }
     if(lstDone.IsEmpty()) return S_OK;
 
-    //¼ÆËã³öË¢ÐÂÇøÓò
+    //è®¡ç®—å‡ºåˆ·æ–°åŒºåŸŸ
     SAutoRefPtr<IRegionS> rgn;
     GETRENDERFACTORY->CreateRegion(&rgn);;
     RECT rcSmiley;
@@ -655,7 +655,7 @@ HRESULT STDMETHODCALLTYPE  CSmileyHost::OnTimer( int nInterval )
     m_pHost->GetClientRect(&rcClient);
     rgn->CombineRect(&rcClient,RGN_AND);
 
-    //Ë¢ÐÂ±íÇé
+    //åˆ·æ–°è¡¨æƒ…
     IRenderTarget *pRT = m_pHost->GetRenderTarget(GRT_PAINTBKGND,rgn);
     m_pHost->SSendMessage(WM_ERASEBKGND,(WPARAM)pRT);
 

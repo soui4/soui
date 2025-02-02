@@ -1,6 +1,7 @@
 ﻿#ifndef __SDEF__H__
 #define __SDEF__H__
 
+#include <config.h>
 
 #ifdef __cplusplus
 #define SNS SOUI	//replase it to your ns

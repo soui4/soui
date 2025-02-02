@@ -1,0 +1,4 @@
+﻿<menu iconSkin="" itemHeight="26" iconMargin="4" textMargin="8" maxWidth="120">
+	<item name="menu_help" id="101">帮助</item>
+	<item name="menu_about" id="102">关于</item>
+</menu>

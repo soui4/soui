@@ -91,7 +91,7 @@ private:
  */
 inline CDrawInfo::CDrawInfo(
 	CTxtEdit *ped) 		//@parm Edit object used by the target device
-	: _ddTarget(ped), _dwDepth(0), _cRefs(0)							   
+	: _ddTarget(ped), _dwDepth(0), _cRefs(0), _dwDrawAspect(0),	_lindex(0),_pvAspect(NULL),  _ptd(NULL)
 {
 	// Header does the work
 }

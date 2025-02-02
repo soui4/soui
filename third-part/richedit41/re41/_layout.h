@@ -24,8 +24,8 @@
 class CLayout : public CLineArray				//CLayout *plo;
 {
 public:
-			CLayout()  {_iCFCells = -1; _iPFCells = -1;}
-			~CLayout() {DeleteSubLayouts(0, -1); ReleaseFormats(_iCFCells, _iPFCells);}
+	CLayout();
+	~CLayout() {DeleteSubLayouts(0, -1); ReleaseFormats(_iCFCells, _iPFCells);}
 
 	void	DeleteSubLayouts(LONG ili, LONG cLine);
 	virtual BOOL IsNestedLayout() const {return TRUE;}

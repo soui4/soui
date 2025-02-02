@@ -2223,6 +2223,7 @@ void SkCanvas::SetFontFallback(FunFontFallback fun)
 // These will become non-virtual, so they always call the (virtual) onDraw... method
 void SkCanvas::drawText(const void* text, size_t byteLength, SkScalar x, SkScalar y,const SkPaint& paint) {
 	SkTypeface *pfont = paint.getTypeface();
+    SkASSERT(pfont);
 	pfont->ref();
 	uint16_t  glyphs_[kLocalSize];
 	size_t length = byteLength/sizeof(wchar_t);

@@ -1,4 +1,4 @@
-#include "stdafx.h"
+ï»¿#include "stdafx.h"
 #include "SScrollText.h"
 
 namespace SOUI
@@ -75,7 +75,7 @@ void SScrollText::OnShowWindow(BOOL bShow, UINT nStatus)
 void SScrollText::SetWindowText(const SStringT &strText)
 {
     __baseCls::SetWindowText(strText);
-    UpdateScrollInfo(GetClientRect().Size()); //ÖØĞÂ¼ÆËã¹ö¶¯³¤¶È
+    UpdateScrollInfo(GetClientRect().Size()); //é‡æ–°è®¡ç®—æ»šåŠ¨é•¿åº¦
 }
 
 void SScrollText::UpdateScrollInfo(CSize size)

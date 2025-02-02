@@ -7,7 +7,6 @@
 #include <math.h>               // this is where I would normally get the warning message
 #pragma warning(pop)
 
-
 SNSBEGIN
 enum
 {

@@ -238,7 +238,7 @@ SXmlNode::SXmlNode(const SXmlNode& src):_node(src._node)
 void SXmlNode::ToString(THIS_ IStringW *out) SCONST
 {
 	pugi::xml_writer_buff writer;
-	_node.print(writer, L"\t", pugi::format_default, pugi::encoding_utf16);
+    _node.print(writer, L"\t", pugi::format_default, sizeof(wchar_t) == 2 ? pugi::encoding_utf16 : pugi::encoding_utf32);
 	out->Assign2(writer.buffer(), writer.size());
 }
 

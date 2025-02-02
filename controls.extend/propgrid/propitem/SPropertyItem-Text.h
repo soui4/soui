@@ -21,6 +21,8 @@ namespace SOUI
 		virtual BOOL HasValue() const ;
 		virtual void ClearValue() ;
 
+        void OnValueChanged() override;
+
         SOUI_ATTRS_BEGIN()
             ATTR_STRINGT(L"value",m_strValue,TRUE)
 			ATTR_BOOL(L"hasButton",m_hasButton,TRUE)

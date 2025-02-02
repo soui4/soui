@@ -96,7 +96,8 @@ void SDateTimePicker::OnCreateDropDown(SDropDownWnd *pDropDown)
     // pDropDown->SetAttribute(L"sendWheel2Hover", L"1", TRUE);
     pDropDown->GetRoot()->InsertChild(m_pCalendar);
     pDropDown->GetRoot()->UpdateChildrenPosition();
-
+    CRect rc = m_pCalendar->GetWindowRect();
+    SSLOGI() << "rc=" << rc.left << "," << rc.top << "," << rc.right << "," << rc.bottom;
     m_pCalendar->SetVisible(TRUE);
     m_pCalendar->SetFocus();
 
@@ -410,27 +411,23 @@ void SDateTimePicker::OnLButtonDown(UINT nFlags, CPoint pt)
         return;
 
     m_wCharNum = 0;
+    Invalidate();
 
     CRect rcBtn;
     GetDropBtnRect(&rcBtn);
     if (!rcBtn.PtInRect(pt)) // 没有点击 按钮
     {
-        __baseCls::OnLButtonDown(nFlags, pt);
-
         EnDateType eSelType = HitTest(pt);
         if (m_eSelDateType != eSelType)
         {
             m_eSelDateType = eSelType;
-            Invalidate();
         }
-
-        return;
     }
-
-    m_eSelDateType = eDT_NULL;
-    Invalidate();
-
-    DropDown();
+    else
+    {
+        m_eSelDateType = eDT_NULL;
+        DropDown();
+    }
 }
 
 void SDateTimePicker::OnMouseMove(UINT nFlags, CPoint pt)
@@ -669,6 +666,10 @@ void SDateTimePicker::CloseUp()
     if (NULL != m_pDropDownWnd)
     {
         m_pDropDownWnd->EndDropDown(IDCANCEL);
+        if (m_eSelDateType == eDT_NULL)
+        {
+            ReleaseCapture();
+        }
     }
 }
 

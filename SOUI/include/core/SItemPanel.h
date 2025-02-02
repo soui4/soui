@@ -203,7 +203,7 @@ class TOsrPanelProxy
 
     STDMETHOD_(HRESULT, QueryInterface)(REFGUID id, IObjRef **ppRet) OVERRIDE
     {
-        if (id == __suidof(T))
+        if (id == T::GetIID())
         {
             *ppRet = (T *)this;
             AddRef();

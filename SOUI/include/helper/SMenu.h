@@ -9,8 +9,6 @@
 
 SNSBEGIN
 
-#if defined(_WIN32) || defined(__linux__)
-
 #define CX_ICON 16 //支持的图标的宽度
 #define CY_ICON 16 //支持的图标的高度
 
@@ -247,15 +245,6 @@ class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
 
     STDMETHOD_(void, SetIconSkin)(THIS_ ISkinObj *icons) OVERRIDE;
 
-    /**
-     * SMenu::InsertMenu
-     * @brief    插入一个菜单项,参数和Windows API类似。
-     * @param    int iIcon -- 显示的标图在iconSkin中的索引
-     * @param    HICON hIcon -- 标图，默认为0，有值时，iIocn失效
-     * @return   BOOL - TRUE:成功
-     *
-     * Describe  hIcon会在菜单退出时自动调用DestroyIcon.
-     */
     STDMETHOD_(BOOL, InsertMenu)(THIS_ UINT uPosition, UINT uFlags, UINT_PTR nIDNewItem, LPCTSTR strText, int iIcon DEF_VAL(-1), HICON hIcon DEF_VAL(0)) OVERRIDE;
 
     STDMETHOD_(BOOL, AppendMenu)(THIS_ UINT uFlags, UINT_PTR uIDNewItem, LPCTSTR lpNewItem, int iIcon DEF_VAL(-1), HICON hIcon DEF_VAL(0)) OVERRIDE;
@@ -297,6 +286,5 @@ class SOUI_EXP SMenu : public TObjRefImpl<IMenu> {
     SAutoRefPtr<ISkinObj> m_icons;
 };
 
-#endif//_WIN32
 SNSEND
 #endif // __SMENU__H__

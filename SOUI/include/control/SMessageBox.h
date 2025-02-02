@@ -56,6 +56,7 @@ class SOUI_EXP SMessageBoxImpl
     INT_PTR MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType);
 
   protected:
+    SXmlNode OnGetInitXmlNode(SXmlDoc &xmlDoc) override;
     /**
      * OnInitDialog
      * @brief    MsgBox初始化

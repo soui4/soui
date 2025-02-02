@@ -1,5 +1,5 @@
-/*
- * 2022.1.29  by Ð¡ÐÂ
+ï»¿/*
+ * 2022.1.29  by å°æ–°
  */
 
 #include "stdafx.h"
@@ -658,7 +658,7 @@ void SHexEdit::PaintAddresses(IRenderTarget *pRT)
     UINT nEndAdr;
     SStringT cAdrFormatString;
     CRect cAdrRect(m_tPaintDetails.cPaintingRect);
-    _TCHAR pBuf[32];
+    TCHAR pBuf[32];
 
     // create the format string
     cAdrFormatString.Format(_T("%%0%uX"), m_nAdrSize);
@@ -778,7 +778,7 @@ void SHexEdit::PaintHexData(IRenderTarget *pRT)
             *pBufPtr++ = tabHexCharacters[*pDataPtr & 0xf];
             *pBufPtr++ = ' ';
         }
-        *--pBufPtr = '\0';
+        *(-- pBufPtr) = '\0';
         // set end-pointers
 
         if (pSelectionBufPtrEnd == NULL)
@@ -902,7 +902,7 @@ void SHexEdit::PaintAsciiData(IRenderTarget *pRT)
             }
 
             *pBufPtr = isprint(*pDataPtr) ? (char)*pDataPtr : '.';
-            // Ö§³Öºº×ÖµÄÏÔÊ¾, »áµ¼ÖÂAsciiÇø¶ÔÆë¼ÆËã²»ÕýÈ·
+            // æ”¯æŒæ±‰å­—çš„æ˜¾ç¤º, ä¼šå¯¼è‡´AsciiåŒºå¯¹é½è®¡ç®—ä¸æ­£ç¡®
             //*pBufPtr = (*pDataPtr >= 0x20) ? (char)*pDataPtr : '.';
         }
         *pBufPtr = '\0';
@@ -1371,9 +1371,9 @@ BOOL SHexEdit::OnScroll(BOOL bVertical, UINT uCode, int nPos)
     if (m_dragSb != SSB_NULL)
     {
         if (bVertical)
-            OnVScroll(uCode, nPos, NULL);
+            OnVScroll(uCode, nPos, 0);
         else
-            OnHScroll(uCode, nPos, NULL);
+            OnHScroll(uCode, nPos, 0);
     }
     else
         __baseCls::OnScroll(bVertical, uCode, nPos);
@@ -1553,7 +1553,7 @@ std::string SHexEdit::GetClipboardText()
     LPSTR lpszData;      // Pointer to clipboard data
     unsigned long nSize; // Size of clipboard data
 
-    OpenClipboard(NULL);
+    OpenClipboard(0);
 
     if (IsClipboardFormatAvailable(CF_TEXT))
         hGlobal = GetClipboardData(CF_TEXT);
@@ -1591,7 +1591,7 @@ int SHexEdit::SetClipboard(LPCSTR lpszBuffer)
     // be it's owner. If NULL is passed, the current process
     // is assumed. After opening, empty the clipboard so we
     // can put our text on it.
-    OpenClipboard(NULL);
+    OpenClipboard(0);
     EmptyClipboard();
 
     // Get the size of the string in the buffer that was

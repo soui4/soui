@@ -1,15 +1,15 @@
-#pragma once
+ï»¿#pragma once
 
 
 #include <souistd.h>
 #include <core/SHostDialog.h>
 #include <control/SMessageBox.h>
-#include <control/souictrls.h>
-#include <res.mgr/sobjdefattr.h>
+#include <control/SouiCtrls.h>
+#include <res.mgr/SObjDefAttr.h>
 #include <com-cfg.h>
 #include <event/SNotifyCenter.h>
 #include "resource.h"
-#define R_IN_CPP	//¶¨ÒåÕâ¸ö¿ª¹ØÀ´
+#define R_IN_CPP	//å®šä¹‰è¿™ä¸ªå¼€å…³æ¥
 #include "res\resource.h"
 using namespace SOUI;
 

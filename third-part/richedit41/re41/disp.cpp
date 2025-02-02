@@ -2324,7 +2324,7 @@ void CDisplay::Freeze()
  */
 void CDisplay::Thaw()
 {
-	BOOL fUpdateCaret, fScrollIntoView, fNeedRedisplay;
+	BOOL fUpdateCaret, fScrollIntoView, fNeedRedisplay=FALSE;
 	LONG cp, cchNew, cchDel;
 	CTxtSelection *psel;
 

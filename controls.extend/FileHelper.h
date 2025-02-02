@@ -1,4 +1,4 @@
-/**
+ï»¿/**
  * Copyright (C) 2014-2050
  * All rights reserved.
  *
@@ -8,20 +8,35 @@
  * @author     SOUI group
  * @date       2014/08/03
  *
- * Describe    ÊµÏÖÁ½¸öÎÄ¼şÏà¹ØµÄhelper
+ * Describe    å®ç°ä¸¤ä¸ªæ–‡ä»¶ç›¸å…³çš„helper
  */
 
-#pragma once
-
+#ifndef __FILE_HELPER_H__
+#define __FILE_HELPER_H__
 #include <commdlg.h>
+
+#ifndef _MAX_FNAME
+#define _MAX_FNAME  MAX_PATH
+#endif
+#ifndef _MAX_PATH
+#define _MAX_PATH  MAX_PATH
+#endif
+
+#ifdef _WIN32
+#define PATH_SEPARATOR '\\'
+#else
+#define PATH_SEPARATOR '/'
+#endif
+
+#define C2S(c) #c
 /**
  * BuildFilePath
- * @brief    µİ¹é´´½¨×ÓÄ¿Â¼
- * @param    LPCTSTR pszCurPath --  ´´½¨Â·¾¶µÄÆğÊ¼Î»ÖÃ
- * @param    LPCTSTR pszNewPath --  ĞÂÂ·¾¶
- * @param    BOOL bPath --  pszNewPathÊÇÒ»¸öÂ·¾¶±êÊ¶
- * @return   BOOL -- true´´½¨³É¹¦
- * Describe  pszNewPathÖ¸ÏòÒ»¸öÎÄ¼şÃûÊ±£¬Ö»´´½¨ÎÄ¼şÂ·¾¶²¿·Ö
+ * @brief    é€’å½’åˆ›å»ºå­ç›®å½•
+ * @param    LPCTSTR pszCurPath --  åˆ›å»ºè·¯å¾„çš„èµ·å§‹ä½ç½®
+ * @param    LPCTSTR pszNewPath --  æ–°è·¯å¾„
+ * @param    BOOL bPath --  pszNewPathæ˜¯ä¸€ä¸ªè·¯å¾„æ ‡è¯†
+ * @return   BOOL -- trueåˆ›å»ºæˆåŠŸ
+ * Describe  pszNewPathæŒ‡å‘ä¸€ä¸ªæ–‡ä»¶åæ—¶ï¼Œåªåˆ›å»ºæ–‡ä»¶è·¯å¾„éƒ¨åˆ†
  */
 inline BOOL BuildFilePath(LPCTSTR pszCurPath, LPCTSTR pszNewPath, BOOL bPath = TRUE)
 {
@@ -33,18 +48,18 @@ inline BOOL BuildFilePath(LPCTSTR pszCurPath, LPCTSTR pszNewPath, BOOL bPath = T
     _tcscpy_s(szNewPath, _countof(szNewPath), pszNewPath);
     if (bPath)
     {
-        int nLen = _tcslen(szNewPath);
-        if (szNewPath[nLen - 1] != _T('\\'))
-            _tcscat(szNewPath, _T("\\"));
+        size_t nLen = _tcslen(szNewPath);
+        if (szNewPath[nLen - 1] != _T(PATH_SEPARATOR))
+            _tcscat(szNewPath, _T(C2S(PATH_SEPARATOR)));
     }
-    LPTSTR pszPath = _tcschr(szNewPath, _T('\\'));
+    LPTSTR pszPath = _tcschr(szNewPath, _T(PATH_SEPARATOR));
     while (pszPath)
     {
         *pszPath = 0;
         if (!CreateDirectory(szNewPath, NULL))
             return FALSE;
-        *pszPath = _T('\\');
-        pszPath = _tcschr(pszPath + 1, _T('\\'));
+        *pszPath = _T(PATH_SEPARATOR);
+        pszPath = _tcschr(pszPath + 1, _T(PATH_SEPARATOR));
     }
     SetCurrentDirectory(szCurDir);
     return TRUE;
@@ -62,7 +77,7 @@ class CFileDialogEx {
                   LPCTSTR lpszFileName = NULL,
                   DWORD dwFlags = OFN_HIDEREADONLY | OFN_OVERWRITEPROMPT,
                   LPCTSTR lpszFilter = NULL,
-                  HWND hWndParent = NULL)
+                  HWND hWndParent = 0)
     {
         memset(&m_ofn, 0, sizeof(m_ofn)); // initialize structure to 0/NULL
         m_szFileName[0] = _T('\0');
@@ -86,7 +101,7 @@ class CFileDialogEx {
 
     INT_PTR DoModal(HWND hWndParent = ::GetActiveWindow())
     {
-        if (m_ofn.hwndOwner == NULL) // set only if not specified before
+        if (m_ofn.hwndOwner == 0) // set only if not specified before
             m_ofn.hwndOwner = hWndParent;
 
         if (m_bOpenFileDialog)
@@ -95,3 +110,5 @@ class CFileDialogEx {
             return ::GetSaveFileName(&m_ofn);
     }
 };
+
+#endif //__FILE_HELPER_H__

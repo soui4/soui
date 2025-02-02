@@ -83,9 +83,9 @@ HRESULT QueryInterface (
  *	@mfunc
  *		Constructor
  */
-CTxtFont::CTxtFont(CTxtRange *prg) : CTxtFormat(prg)
+CTxtFont::CTxtFont(CTxtRange *prg) : CTxtFormat(prg),_dwMask(0)
 {
-	Assert(!_dwMask);		// We assume that object is zeroed (new'd)
+	memset(&_tmpDisplayAttr,0,sizeof(_tmpDisplayAttr));
 }
 
 
@@ -978,7 +978,7 @@ STDMETHODIMP CTxtFont::SetBackColor (
 	}
 
 	_CF._dwEffects |= CFE_AUTOBACKCOLOR;		// Default AutoBackColor
-	if(Value != tomAutoColor)
+	if(Value != (COLORREF)tomAutoColor)
 	{
 		if(Value < 0)
 			return E_INVALIDARG;
@@ -1168,7 +1168,7 @@ STDMETHODIMP CTxtFont::SetForeColor (
 	}
 
 	_CF._dwEffects |= CFE_AUTOCOLOR;			// Default AutoColor
-	if(Value != tomAutoColor)
+	if(Value != (COLORREF)tomAutoColor)
 	{
 		_CF._dwEffects &= ~CFE_AUTOCOLOR;		// Turn off AutoColor
 		_CF._crTextColor = (COLORREF)Value;		// Use new TextColor
@@ -1544,7 +1544,7 @@ STDMETHODIMP CTxtFont::SetUnderline (
 
 	if (_fApplyToTmp)
 	{
-		if (Value == tomAutoColor)
+		if (Value == (COLORREF)tomAutoColor)
 			_tmpDisplayAttr.crUnderlineColor = (DWORD)tomAutoColor;
 		else if ((((DWORD)Value) & 0x0FF000000) == 0x0FF000000)
 			_tmpDisplayAttr.crUnderlineColor = ((DWORD)Value) & 0x000FFFFFF;	// Set UL color
@@ -1606,7 +1606,9 @@ STDMETHODIMP CTxtFont::SetWeight (
  */
 CTxtPara::CTxtPara(CTxtRange *prg) : CTxtFormat(prg)
 {
-	Assert(!_dwMask && !_PF._dwBorderColor); // We assume that object is zeroed (new'd)
+	_dwMask = 0;
+	_dwFlags = 0;
+	memset(_rgxTabs,0,sizeof(_rgxTabs));
 	_PF._iTabs = -1;
 }
 

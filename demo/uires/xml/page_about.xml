@@ -16,10 +16,13 @@
       <edit readOnly="1">385438344</edit>
       <link href="http://jq.qq.com/?_wv=1027&k=VRATCo"  class="cls_btn_weblink">申请群#2</link>
   </window>
-  <window size="-2,-1" layout="gridlayout" interval="10" columnCount="2" gravity="fill" extend_top="40">
-      <text >github：</text>
-      <edit readOnly="1">https://github.com/soui4/soui</edit>
-      <text>gitee：</text>
-      <edit readOnly="1">https://gitee.com/setousoft/soui4</edit>
-  </window>
+	<window size="-1,-1" layout="hbox" gravity="center" interval="20">
+		<window size="-1,-1" layout="gridlayout" interval="10" columnCount="2" gravity="fill">
+			<text >github：</text>
+			<edit readOnly="1">https://github.com/soui4/soui</edit>
+			<text>gitee：</text>
+			<edit readOnly="1">https://gitee.com/setousoft/soui4</edit>
+		</window>
+		<qrctrl size="100,100" text="Using Soui, UI just so so!"/>
+	</window>
 </window>

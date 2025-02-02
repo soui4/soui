@@ -1,4 +1,4 @@
-﻿{
+{
   "version": "0.2.1",
   "defaults": {},
   "configurations": [
@@ -7,38 +7,73 @@
       "name": "fun_test (bin\\fun_test)",
       "project": "CMakeLists.txt",
       "projectTarget": "fun_test (bin\\fun_test)",
-      "comment": "了解如何配置远程调试。有关详细信息，请参阅 http://aka.ms/vslinuxdebug",
       "debuggerConfiguration": "gdb",
       "MIMode": "gdb",
       "args": [],
       "env": {
-        "DISPLAY": "172.29.76.139:0.0"
+        "DISPLAY": "hjx:0.0"
       }
     },
-{
+    {
       "type": "cppgdb",
       "name": "ipc_svr (bin\\ipc_svr)",
       "project": "CMakeLists.txt",
       "projectTarget": "ipc_svr (bin\\ipc_svr)",
-      "comment": "了解如何配置远程调试。有关详细信息，请参阅 http://aka.ms/vslinuxdebug",
       "debuggerConfiguration": "gdb",
       "MIMode": "gdb",
       "args": [],
       "env": {
-        "DISPLAY": "172.29.76.139:0.0"
+        "DISPLAY": "hjx:0.0"
       }
     },
-{
+    {
       "type": "cppgdb",
       "name": "ipc_client (bin\\ipc_client)",
       "project": "CMakeLists.txt",
       "projectTarget": "ipc_client (bin\\ipc_client)",
-      "comment": "了解如何配置远程调试。有关详细信息，请参阅 http://aka.ms/vslinuxdebug",
       "debuggerConfiguration": "gdb",
       "MIMode": "gdb",
-      "args": ["2097152"],
+      "args": [
+        "2097152"
+      ],
       "env": {
-        "DISPLAY": "172.29.76.139:0.0"
+        "DISPLAY": "hjx:0.0"
+      }
+    },
+    {
+      "type": "cppgdb",
+      "name": "wxDemo (bin\\wxDemo)",
+      "project": "CMakeLists.txt",
+      "projectTarget": "wxDemo (bin\\wxDemo)",
+      "debuggerConfiguration": "gdb",
+      "MIMode": "gdb",
+      "args": [],
+      "env": {
+        "DISPLAY": "hjx:0.0"
+      }
+    },
+    {
+      "type": "cppgdb",
+      "name": "demo2 (bin\\demo2)",
+      "project": "CMakeLists.txt",
+      "projectTarget": "demo2 (bin\\demo2)",
+      "debuggerConfiguration": "gdb",
+      "MIMode": "gdb",
+      "args": [],
+      "env": {
+        "DISPLAY": "hjx:0.0"
+      }
+    },
+    {
+      "type": "cppgdb",
+      "name": "demo (bin\\demo)",
+      "project": "CMakeLists.txt",
+      "projectTarget": "demo (bin\\demo)",
+      "debuggerConfiguration": "gdb",
+      "MIMode": "gdb",
+      "args": [],
+      "env": {
+        "DISPLAY": "hjx:0.0"
       }
     }
   ]

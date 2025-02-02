@@ -1,5 +1,4 @@
-﻿#ifdef _WIN32
-#include "souistd.h"
+﻿#include "souistd.h"
 #include "helper/SMemDC.h"
 SNSBEGIN
 
@@ -97,5 +96,3 @@ BOOL SMemDC::InitDC(HDC hdc, const CRect &rc)
 }
 
 SNSEND
-
-#endif//_WIN32

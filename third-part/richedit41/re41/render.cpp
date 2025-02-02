@@ -244,19 +244,12 @@ void CRenderer::Init()
 {
 	TRACEBEGIN(TRCSUBSYSDISP, TRCSCOPEINTERN, "CRenderer::Init");
 	_fRenderer = TRUE;
+
+	int offset = FIELD_OFFSET(CRenderer,_rcView);
+	memset((char*)this+offset,0,sizeof(CRenderer)-offset);
+
 	CTxtEdit *ped	= GetPed();
 	_cpAccelerator = ped->GetCpAccelerator();
-
-	static const RECTUV zrect = { 0, 0, 0, 0 };
-	_rcView		= zrect;
-	_rcRender	= zrect;	  
-	_rc			= zrect;
-	_dupLine	= 0;
-	_dwFlags	= 0;
-	_hdcBitmap	= NULL;
-	_ptCur.u	= 0;
-	_ptCur.v	= 0;
-	_plogpalette   = NULL;
 
 	CDocInfo *pDocInfo = ped->GetDocInfoNC();
 	if(pDocInfo)
@@ -1463,10 +1456,10 @@ BOOL CRenderer::RenderChunk(
 
 	LONG		cchValid = cchChunk;
 	LONG		i;
-	const WCHAR *pchT;
+	const WCHAR *pchT=pchRender;
 
 	// Search for object in chunk
-	for(pchT = pchRender, i = 0; i < cchValid && *pchT != WCH_EMBEDDING; i++)
+	for(i = 0; i < cchValid && *pchT != WCH_EMBEDDING; i++)
 		pchT++;
 
 	if(i == 0)
@@ -2129,7 +2122,7 @@ void CRenderer::SetFontAndColor(
 void CRenderer::SetDefaultBackColor(
 	COLORREF cr)		//@parm Background color to use
 {
-	if(cr == tomAutoColor)
+	if(cr == (COLORREF)tomAutoColor)
 		cr = GetPed()->TxGetBackColor();		// Printer needs work...
 
 	if(_crBackground != cr)
@@ -2149,7 +2142,7 @@ void CRenderer::SetDefaultBackColor(
 void CRenderer::SetDefaultTextColor(
 	COLORREF cr)		//@parm Background color to use
 {
-	if(cr == tomAutoColor)
+	if(cr == (COLORREF)tomAutoColor)
 		cr = GetPed()->TxGetForeColor();		// Printer needs work...
 
 	if(_crTextColor != cr)
@@ -2664,7 +2657,7 @@ void CRenderer::RenderUnderline(
 	vpStart = rcIntersection.top;
 	dvp = rcIntersection.bottom - rcIntersection.top;
 
-	if (crUnderline == tomAutoColor || crUnderline == tomUndefined)
+	if (crUnderline == (COLORREF)tomAutoColor || crUnderline == (COLORREF)tomUndefined)
 	{
 		crUnderline = _crCurTextColor;
 	}

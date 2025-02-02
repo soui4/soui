@@ -4,7 +4,6 @@
 #include "souistd.h"
 #include <core/SWndContainerImpl.h>
 
-
 SNSBEGIN
 
 #define WM_NCMOUSEFIRST WM_NCMOUSEMOVE
@@ -30,7 +29,7 @@ void SwndContainerImpl::SetRoot(SWindow *pRoot)
 LRESULT SwndContainerImpl::DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
     LRESULT lRet = 0;
-	SWindow *pRoot = m_pRoot;//use a local value to avoid m_pRoot changed while handle message
+    SWindow *pRoot = m_pRoot; // use a local value to avoid m_pRoot changed while handle message
     pRoot->AddRef();
     pRoot->SetMsgHandled(TRUE);
 

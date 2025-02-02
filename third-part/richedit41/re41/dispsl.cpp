@@ -36,7 +36,6 @@ CDisplaySL::CDisplaySL ( CTxtEdit* ped )
   : CDisplay( ped )
 {
 	TRACEBEGIN(TRCSUBSYSDISP, TRCSCOPEINTERN, "CDisplaySL::CDisplaySL");
-
 	Assert(!_fMultiLine);
 }
 

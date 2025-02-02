@@ -54,31 +54,31 @@ source_group("Source Files" FILES ${ScriptModule-lua_src})
 
 if (NOT ENABLE_SOUI_COM_LIB)
     set (ScriptModule-Lua_src  ${ScriptModule-lua_src} ScriptModule-lua.rc)
-    add_library(ScriptModule-Lua SHARED ${ScriptModule-lua_src} ${ScriptModule-lua_header})
-    target_link_libraries(ScriptModule-Lua lua-54 utilities4 soui4)
+    add_library(scriptmodule-lua SHARED ${ScriptModule-lua_src} ${ScriptModule-lua_header})
+    target_link_libraries(scriptmodule-lua lua-54 utilities4 soui4)
 else()
-    add_library(ScriptModule-Lua STATIC ${ScriptModule-lua_src} ${ScriptModule-lua_header})
+    add_library(scriptmodule-lua STATIC ${ScriptModule-lua_src} ${ScriptModule-lua_header})
 endif()
 
 if (NOT ENABLE_SOUI_CORE_LIB)
-	message(STATUS "[DLL_CORE] ScriptModule-Lua: ON")
-    set(COM_LIBS ${COM_LIBS} ScriptModule-Lua CACHE INTERNAL "com_lib")
+	message(STATUS "[DLL_CORE] scriptmodule-lua: ON")
+    set(COM_LIBS ${COM_LIBS} scriptmodule-lua CACHE INTERNAL "com_lib")
 else()
-	message(STATUS "[LIB_CORE] ScriptModule-Lua: OFF")
+	message(STATUS "[LIB_CORE] scriptmodule-lua: OFF")
 endif()
 
-set_target_properties (ScriptModule-Lua PROPERTIES
+set_target_properties (scriptmodule-lua PROPERTIES
     FOLDER components
 )
 
-install(TARGETS ScriptModule-Lua
+install(TARGETS scriptmodule-lua
     CONFIGURATIONS Release
     RUNTIME DESTINATION bin/Release
     LIBRARY DESTINATION lib/Release
     ARCHIVE DESTINATION lib/Release
 )
 
-install(TARGETS ScriptModule-Lua
+install(TARGETS scriptmodule-lua
     CONFIGURATIONS Debug
     RUNTIME DESTINATION bin/Debug
     LIBRARY DESTINATION lib/Debug

@@ -142,4 +142,4 @@ HRESULT SAxContainer::QueryService(REFGUID guidService, REFIID riid, void **ppvO
 
 SNSEND
 
-#endif//_WIN32
+#endif //_WIN32

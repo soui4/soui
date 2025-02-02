@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 #include <interface/sipcobj-i.h>
 #include <helper/obj-ref-impl.hpp>
 #include <map>
@@ -77,7 +77,7 @@ SNSBEGIN
 
 
 	public:
-		// Í¨¹ý TObjRefImpl ¼Ì³Ð
+		// é€šè¿‡ TObjRefImpl ç»§æ‰¿
 		virtual HRESULT Init(ULONG_PTR idSvr, IIpcSvrCallback * pCallback) override;
 		virtual void CheckConnectivity() override;
 		virtual LRESULT OnMessage(ULONG_PTR idLocal, UINT uMsg, WPARAM wp, LPARAM lp,BOOL &bHandled) override;
@@ -97,7 +97,7 @@ SNSBEGIN
 	class SIpcFactory : public TObjRefImpl<IIpcFactory>
 	{
 	public:
-		// Í¨¹ý TObjRefImpl ¼Ì³Ð
+		// é€šè¿‡ TObjRefImpl ç»§æ‰¿
 		virtual HRESULT CreateIpcServer(IIpcServer ** ppServer) override;
 		virtual HRESULT CreateIpcHandle(IIpcHandle ** ppHandle) override;
 	};

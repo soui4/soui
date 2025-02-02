@@ -93,7 +93,6 @@ namespace SOUI
 
     void SPropertyItemColor::SetValue( const SStringT & strValue )
     {
-
 		COLORREF crTmp;
 		crTmp = CR_INVALID;
 		SColorParser::ParseValue(S_CT2W(strValue),crTmp);

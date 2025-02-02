@@ -1,4 +1,4 @@
-#pragma once
+О╩©#pragma once
 
 namespace SOUI
 {
@@ -40,7 +40,7 @@ class SScrollText
     int m_nOffset;
     int m_nScrollWidth;
     int m_nNextInterval;
-    int m_nRollType; // 0йвн╩он╫с 1 ╥гон╫с
+    int m_nRollType; // 0И╕√Д╫█Х║■Ф▌╔ 1 И²·Х║■Ф▌╔
 };
 
 } // namespace SOUI

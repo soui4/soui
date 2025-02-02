@@ -1,0 +1,36 @@
+﻿<SOUI name="mainWindow"
+      title="@string/title"
+      bigIcon="ICON_LOGO:32"
+      smallIcon="ICON_LOGO:16"
+      width="910" height="640"
+      minsize="910,640"
+      margin="5,5,5,5"
+      resizable="1"
+      wndType="appMain"
+      appWnd="1"
+      sendWheel2Hover="1"
+      translucent="1">
+	<root skin="skin_shadow" cache="1">
+		<caption pos="10,10,-10,-10" colorBkgnd="rgb(230,234,238)" show="1" font="adding:0">
+			<caption pos="0,0,@64,-0" colorBkgnd="rgb(40,40,40)">
+				<img name="main_logo" pos="|-16,20" skin="skin_default_logo32p" msgTransparent="0" cursor="hand"/>
+
+				<imgbtn name="btn_message" pos="{0,[40,@32,@32" skin="skin_message" cursor="hand"/>
+				<imgbtn name="btn_contact" pos="{0,[10,@32,@32" skin="skin_contact" cursor="hand"/>
+				<imgbtn name="btn_favorites" pos="{0,[10,@32,@32" skin="skin_favorites" cursor="hand"/>
+			</caption>
+			
+			<tabctrl pos="[0,0,-0,-0" name="tab_main_opt" tabHeight="0">
+				<page title="page_msg">
+					<include src="LAYOUT:XML_PAGE_MSG" />
+				</page>
+				<page title="page_contact">
+					<include src="LAYOUT:XML_PAGE_CONTACT" />
+				</page>
+				<page title="page_collect">
+					<include src="LAYOUT:XML_PAGE_COLLECT" />
+				</page>
+			</tabctrl>
+		</caption>
+	</root>
+</SOUI>

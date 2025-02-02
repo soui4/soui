@@ -389,9 +389,9 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      */
     STDMETHOD_(HRESULT, CreateScriptModule)(THIS_ IScriptModule * *ppScriptModule) PURE;
 
-	STDMETHOD_(BOOL,SetEditCtxMenuTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) PURE;
+    STDMETHOD_(BOOL, SetEditCtxMenuTemplateResId)(THIS_ LPCTSTR resId, IResProvider * pResProvider DEF_VAL(NULL)) PURE;
 
-	STDMETHOD_(BOOL,SetMessageBoxTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) PURE;
+    STDMETHOD_(BOOL, SetMessageBoxTemplateResId)(THIS_ LPCTSTR resId, IResProvider * pResProvider DEF_VAL(NULL)) PURE;
 };
 
 SNSEND

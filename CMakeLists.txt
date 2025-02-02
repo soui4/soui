@@ -10,11 +10,11 @@
 
 # mkdir build
 # cd build 
-# cmake .. -G"NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
+# cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
 # nmake
 #
 # or 
-# cmake .. -G"Visual Studio 14 2015"
+# cmake .. -G "Visual Studio 14 2015"
 # 
 # 生成SOUI.sln工程文件
 #   
@@ -31,18 +31,27 @@
 
 cmake_minimum_required(VERSION 3.1)
 project(SOUI4)
+set(CMAKE_CXX_STANDARD 11)
 
-set(CMAKE_BUILD_TYPE Debug)
+set(CMAKE_CONFIGURATION_TYPES Debug Release)
+if(NOT CMAKE_BUILD_TYPE)
+set(CMAKE_BUILD_TYPE "Release")
+endif()
+message("build type is ${CMAKE_BUILD_TYPE}")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
 include(__cmake/internal_utils.cmake)
 include(__cmake/global.cmake)
 
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
 IF (CMAKE_CL_64)
   set (CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/output_64 CACHE PATH "default install prefix" FORCE)
 ELSE (CMAKE_CL_64)
   set (CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/output_32 CACHE PATH "default install prefix" FORCE)
 ENDIF (CMAKE_CL_64)
+else()
+set (CMAKE_INSTALL_PREFIX "usr/local/soui5" CACHE PATH "default install prefix" FORCE)
+endif()
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
@@ -67,6 +76,16 @@ option(ENABLE_SOUI_COM_LIB "Enable compile 'components' as static lib" OFF)
 #
 #
 option(XP_TOOLSET "" ON)
+#
+#
+option(ENABLE_SPECTRE "Enable Spectre Mitigation" OFF)
+
+if (CMAKE_SYSTEM_NAME MATCHES Windows)
+option(BUILD_RICHEDIT "using richedit from source code" ON)
+else()
+set(BUILD_RICHEDIT ON)
+endif()
+
 
 config_compiler_and_linker()
 
@@ -74,9 +93,10 @@ configure_file("config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONL
 configure_file("config/build.cfg.in" "${PROJECT_BINARY_DIR}/config/build.cfg" @ONLY)
 include_directories(${PROJECT_BINARY_DIR}/config)
 install(FILES "${PROJECT_BINARY_DIR}/config/config.h" DESTINATION include/config)
+install(FILES "${PROJECT_BINARY_DIR}/config/build.cfg" DESTINATION include/config)
 
-
-
+set(CMAKE_C_FLAGS_RELEASE "-s")
+set(CMAKE_CPP_FLAGS_RELEASE "-s")
 # 设置库文件的输出路径
 set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
@@ -84,12 +104,16 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_definitions(-D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-  include_directories(${PROJECT_SOURCE_DIR}/third-part/stdint)
+  if(MSVC_VERSION LESS 1600)
+      include_directories(${PROJECT_SOURCE_DIR}/utilities/include/stdint)
+  endif()
   add_definitions(-DWCHAR_SIZE=2)
 elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
 else()
   # 添加调试标志
-  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -g -O0")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -O2")
+
   add_definitions(-DWCHAR_SIZE=4)
   include_directories(${PROJECT_SOURCE_DIR}/swinx/include)
   add_subdirectory(swinx)
@@ -107,11 +131,7 @@ endif()
 # 
 add_subdirectory(components)
 
-#
-#
-if (CMAKE_SYSTEM_NAME MATCHES Windows)
-add_subdirectory(demo)
 add_subdirectory(demo2)
-endif()
-
+add_subdirectory(demo)
 add_subdirectory(fun_test)
+add_subdirectory(wxDemo)

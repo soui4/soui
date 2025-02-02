@@ -13,7 +13,6 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
     virtual ~SMessageLoop();
 
   public:
-
     // Message filter operations
     STDMETHOD_(BOOL, AddMessageFilter)(THIS_ IMsgFilter *pMessageFilter) OVERRIDE;
 
@@ -54,7 +53,7 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
     static BOOL IsIdleMessage(MSG *pMsg);
 
   protected:
-	SMessageLoopPriv * m_priv;
+    SMessageLoopPriv *m_priv;
 };
 
 SNSEND

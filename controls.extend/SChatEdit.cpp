@@ -1,4 +1,4 @@
-#include "stdafx.h"
+Ôªø#include "stdafx.h"
 #include "SChatEdit.h"
 #include "reole/RichEditOle.h"
 
@@ -35,7 +35,7 @@ BOOL SChatEdit::AppendFormatText(const SStringW &strMsg, BOOL bNewLine, BOOL bCa
     LPWSTR pszBuf = strBuf.GetBuffer(strBuf.GetLength());
     {
         SXmlDoc doc;
-        if (doc.load_buffer_inplace(pszBuf, strBuf.GetLength() * 2, xml_parse_default, enc_utf16))
+        if (doc.load_buffer_inplace(pszBuf, strBuf.GetLength() * sizeof(wchar_t), xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
         {
             bRet = AppendFormatText(doc.root().child(L"msg"), bNewLine, bCanUndo);
         }
@@ -49,7 +49,7 @@ BOOL SChatEdit::AppendFormatText(const SXmlNode xmlMsg, BOOL bNewLine, BOOL bCan
     TCHAR szRet[] = { 0x0a, 0 };
     int nLen = (int)SSendMessage(WM_GETTEXTLENGTH);
     if (bNewLine)
-    { //≤Â»Î“ª∏ˆªª––∑˚
+    { //ÊèíÂÖ•‰∏Ä‰∏™Êç¢Ë°åÁ¨¶
         SSendMessage(EM_SETSEL, nLen, nLen);
         SSendMessage(EM_REPLACESEL, bCanUndo, (LPARAM)L"\r\n");
         nLen = (int)SSendMessage(WM_GETTEXTLENGTH);
@@ -75,7 +75,7 @@ BOOL SChatEdit::ReplaceSelectionByFormatText(const SStringW &strMsg, BOOL bCanUn
     LPWSTR pszBuf = strBuf.GetBuffer(strBuf.GetLength());
     {
         SXmlDoc doc;
-        if (doc.load_buffer_inplace(pszBuf, strBuf.GetLength() * 2, xml_parse_default, enc_utf16))
+        if (doc.load_buffer_inplace(pszBuf, strBuf.GetLength() * 2, xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
         {
             SSendMessage(EM_REPLACESEL, bCanUndo, (LPARAM)L"");
 
@@ -148,7 +148,12 @@ int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, B
         cfNew.crTextColor = GETCOLOR(xmlText.attribute(L"value").value());
         if (cfNew.crTextColor != CR_INVALID)
         {
+#ifdef _WIN32
             cfNew.crTextColor &= 0x00ffffff;
+#else
+            if ((cfNew.crTextColor&0xff000000)==0)
+                cfNew.crTextColor |= 0xffffff00;
+#endif
             cfNew.dwMask |= CFM_COLOR;
         }
     }
@@ -186,16 +191,22 @@ int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, B
         if (cr != CR_INVALID)
         {
             cfNew.dwMask |= CFM_COLOR;
-            cfNew.crTextColor = cr & 0x00ffffff;
+            #ifdef _WIN32
+            cr &= 0x00ffffff;
+            #else
+            if ((cr & 0xff000000) == 0)
+                cr |= 0xff000000;
+            #endif
+            cfNew.crTextColor = cr ;
         }
     }
     else if (xmlText.name() == KLabelSize)
     {
         cfNew.dwMask |= CFM_SIZE;
 
-        HDC hdc = GetDC(NULL);
+        HDC hdc = GetDC(0);
         LONG yPixPerInch = GetDeviceCaps(hdc, LOGPIXELSY);
-        ReleaseDC(NULL, hdc);
+        ReleaseDC(0, hdc);
         cfNew.yHeight
             = abs(MulDiv(xmlText.attribute(L"value").as_uint(12), LY_PER_INCH, yPixPerInch));
     }
@@ -270,7 +281,7 @@ SStringW SChatEdit::GetFormatText()
     for (int i = 0; i < strTxt.GetLength(); i++)
     {
         if (strTxt[i] == 0xfffc)
-        { //’“µΩ“ª∏ˆOLE∂‘œÛ
+        { //ÊâæÂà∞‰∏Ä‰∏™OLEÂØπË±°
             strMsg += strTxt.Mid(iPlainTxtBegin, i - iPlainTxtBegin);
             iPlainTxtBegin = i + 1;
 

@@ -21,7 +21,7 @@ static struct MsgBoxInfo
 
 INT_PTR SMessageBoxImpl::MessageBox(HWND hWnd, LPCTSTR lpText, LPCTSTR lpCaption, UINT uType)
 {
-	SXmlNode xmlTemplate = SApplication::getSingletonPtr()->GetMessageBoxTemplate();
+    SXmlNode xmlTemplate = SApplication::getSingletonPtr()->GetMessageBoxTemplate();
     if (!xmlTemplate)
         return ::MessageBox(hWnd, lpText, lpCaption, uType);
     s_MsgBoxInfo.pszText = lpText;
@@ -89,12 +89,14 @@ SStringT SMessageBoxImpl::OnGetButtonText(int nBtnID) const
     return SStringT();
 }
 
+SXmlNode SMessageBoxImpl::OnGetInitXmlNode(SXmlDoc &xmlDoc)
+{
+    return SApplication::getSingletonPtr()->GetMessageBoxTemplate();
+}
+
 BOOL SMessageBoxImpl::OnInitDialog(HWND wnd, LPARAM lInitParam)
 {
-	SXmlNode uiRoot = SApplication::getSingletonPtr()->GetMessageBoxTemplate();
-	SASSERT(uiRoot);
-    InitFromXml(&uiRoot);
-
+    SXmlNode uiRoot = SApplication::getSingletonPtr()->GetMessageBoxTemplate();
     UINT uType = s_MsgBoxInfo.uType & 0x0F;
 
     STabCtrl *pBtnSwitch = FindChildByName2<STabCtrl>(NAME_MSGBOX_BTNSWITCH);

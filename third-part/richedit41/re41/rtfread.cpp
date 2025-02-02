@@ -222,6 +222,8 @@ CRTFRead::CRTFRead (
 	TRACEBEGIN(TRCSUBSYSRTFR, TRCSCOPEINTERN, "CRTFRead::CRTFRead");
 
 	Assert(prg->GetCch() == 0);
+	int offset = FIELD_OFFSET(CRTFRead,_iParam);
+	memset((char*)this+offset,0,sizeof(CRTFRead)-offset);
 
 	//TODO(BradO):  We should examine the member data in the constructor
 	//	and determine which data we want initialized on construction and
@@ -1063,7 +1065,7 @@ COLORREF CRTFRead::GetColor(
 		_dwMaskCF	  |= dwMask;				// Turn on appropriate mask bit
 		_CF._dwEffects &= ~dwMask;				// auto(back)color off: color is to be used
 
-		if(Color == tomAutoColor)
+		if(Color == (COLORREF)tomAutoColor)
 		{
 			_CF._dwEffects |= dwMask;			// auto(back)color on				
 			Color = RGB(0,0,0);
@@ -1275,7 +1277,6 @@ EC CRTFRead::HandleChar(
 		_ecParseError = ecTruncateAtCRLF;
  	else
 	{
-		AssertNr(ch <= 0x7F || ch > 0xFF || FTokIsSymbol(ch));
 		_dwMaskCF2		|=  CFM2_RUNISDBCS;
 		_CF._dwEffects	&= ~CFE_RUNISDBCS;
 		AddText((WCHAR*)&ch, 1, CharGetsNumbering(ch));

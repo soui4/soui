@@ -254,7 +254,7 @@ class SOUI_EXP SGradientDesc {
     BOOL m_bFullArc;
 
   public:
-    GradientInfo GetGradientInfo(int nScale, int wid,int hei) const;
+    GradientInfo GetGradientInfo(int nScale, int wid, int hei) const;
     IGradient *GetGradient()
     {
         return m_gradient;
@@ -460,7 +460,7 @@ class SOUI_EXP SSkinShape : public SSkinObjBase {
         {
         }
 
-        IBrushS *CreateBrush(IRenderTarget *pRT, int nScale, BYTE byAlpha,int wid,int hei) const;
+        IBrushS *CreateBrush(IRenderTarget *pRT, int nScale, BYTE byAlpha, int wid, int hei) const;
 
         STDMETHOD_(void, OnInitFinished)(THIS_ IXmlNode *xmlNode) override;
 

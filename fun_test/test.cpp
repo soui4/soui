@@ -30,10 +30,7 @@
 #include <thread>
 #endif
 
-#ifndef _WIN32
-#include <cairo/cairo-xcb.h>
-#include <xcb/xcb_aux.h>
-#endif//_WIN32
+
 #include "../components/resprovider-zip/zipresprovider-param.h"
 #include <helper/SFunctor.hpp>
 #include <helper/SMenu.h>
@@ -351,7 +348,7 @@ TEST(memory, handle) {
 
 int run_window();
 TEST(demo,window){
-//    EXPECT_EQ(run_window(), 1);
+    //EXPECT_EQ(run_window(), 1);
 }
 
 int run_app(HINSTANCE hInst);

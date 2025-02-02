@@ -76,10 +76,9 @@ void SNcPainter::Reset()
 BOOL SNcPainter::InitFromXml(THIS_ IXmlNode *pXmlNode)
 {
     SXmlNode xmlNode(pXmlNode);
-    if (!xmlNode)
+    if (!xmlNode || m_pHost->IsTranslucent())
     {
         Reset();
-        return TRUE;
     }
     else
     {
@@ -92,8 +91,8 @@ BOOL SNcPainter::InitFromXml(THIS_ IXmlNode *pXmlNode)
         GETRENDERFACTORY->CreateRenderTarget(&m_memRight, 0, 0);
         GETRENDERFACTORY->CreateRenderTarget(&m_memTop, 0, 0);
         GETRENDERFACTORY->CreateRenderTarget(&m_memBottom, 0, 0);
-        return TRUE;
     }
+    return TRUE;
 }
 
 IWindow *SNcPainter::GetRoot(THIS)
@@ -226,7 +225,7 @@ BOOL SNcPainter::OnNcActivate(BOOL bActive)
         int nBorderWid = m_borderWidth.toPixelSize(GetScale());
         m_rcInvalid = m_root->GetClientRect();
         m_rcInvalid.OffsetRect(nBorderWid, nBorderWid);
-        m_pHost->SendMessage(WM_NCPAINT,1);
+        m_pHost->SendMessage(WM_NCPAINT, 1);
     }
     return TRUE;
 }
@@ -548,9 +547,9 @@ void SNcPainter::InvalidateHostRect(LPCRECT pRc, BOOL bClip)
         m_rcInvalid |= *pRc;
     else
         m_rcInvalid = GetHostRect();
-	HRGN hRgn = CreateRectRgnIndirect(&m_rcInvalid);
-    m_pHost->SendMessage(WM_NCPAINT,(WPARAM)hRgn);
-	DeleteObject(hRgn);
+    HRGN hRgn = CreateRectRgnIndirect(&m_rcInvalid);
+    m_pHost->SendMessage(WM_NCPAINT, (WPARAM)hRgn);
+    DeleteObject(hRgn);
 }
 
 void SNcPainter::OnLayoutDirty()

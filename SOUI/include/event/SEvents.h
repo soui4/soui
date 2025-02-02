@@ -109,7 +109,7 @@ typedef enum _SOUI_EVENTS
     EVT_RE_MENU,
 
     EVT_SLIDER_POS = 17000,
-	EVT_SLIDER_VALUETIP,
+    EVT_SLIDER_VALUETIP,
 
     EVT_HEADER_CLICK = 18000,
     EVT_HEADER_ITEMCHANGING,
@@ -139,7 +139,7 @@ typedef enum _SOUI_EVENTS
     EVT_SELECTMENU = 22150,
     EVT_POPMENU,
 
-    EVT_REALWND_CREATE=22160,
+    EVT_REALWND_CREATE = 22160,
     EVT_REALWND_DESTROY,
     EVT_REALWND_INIT,
     EVT_REALWND_POSITION,
@@ -493,10 +493,9 @@ DEF_EVT(EventSliderPos, EVT_SLIDER_POS, on_slider_pos, {
 })
 
 DEF_EVT(EventSliderValueTip, EVT_SLIDER_VALUETIP, on_slider_valuetip, {
-	int nPos;
-	IStringT *buf;
+    int nPos;
+    IStringT *buf;
 })
-
 
 //点击表头
 DEF_EVT(EventHeaderClick, EVT_HEADER_CLICK, on_header_click, { int iItem; })
@@ -529,7 +528,6 @@ DEF_EVT(EventCBDropdown, EVT_CB_DROPDOWN, on_combobox_dropdown, {
 })
 
 DEF_EVT(EventCBBeforeCloseUp, EVT_CB_BEFORE_CLOSEUP, on_combobox_before_closeup, { BOOL bCloseBlock; })
-
 
 DEF_EVT(EventLCSelChanging, EVT_LC_SELCHANGING, on_listctrl_sel_changing, {
     int nNewSel;
@@ -614,22 +612,16 @@ DEF_EVT(EventSetHotKey, EVT_HOT_KEY_SET, on_hot_key_set_event, {
     WORD wModifiers;
 })
 
-DEF_EVT(EventRealWndCreate, EVT_REALWND_CREATE, on_real_wnd_create, {
-    HWND       hRet;
-    })
+DEF_EVT(EventRealWndCreate, EVT_REALWND_CREATE, on_real_wnd_create, { HWND hRet; })
 
-DEF_EVT(EventRealWndDestroy, EVT_REALWND_DESTROY, on_real_wnd_destroy, {
-        int fake;
-    })
+DEF_EVT(EventRealWndDestroy, EVT_REALWND_DESTROY, on_real_wnd_destroy, { int fake; })
 
-DEF_EVT(EventRealWndInit, EVT_REALWND_INIT, on_real_wnd_init, {
-        BOOL bRet;
-    })
+DEF_EVT(EventRealWndInit, EVT_REALWND_INIT, on_real_wnd_init, { BOOL bRet; })
 
 DEF_EVT(EventRealWndPosition, EVT_REALWND_POSITION, on_real_wnd_position, {
-        RECT rc;
-        BOOL bRet;
-    })
+    RECT rc;
+    BOOL bRet;
+})
 SNSEND
 
 #endif // __SEVENTS__H__

@@ -26,12 +26,12 @@ else()
     message("---Building [soui components] with DLL_SOUI_COM")
 endif()
 
-macro( readSettingFile KEY DEFAULT_RESULT STRING_RESULT_OUT)
+macro( readSettingFile CFG_FILE KEY DEFAULT_RESULT STRING_RESULT_OUT)
 
     unset(STRING_RESULT)
 
-    file (TO_CMAKE_PATH "$ENV{SOUI3PATH}" SOUIROOTPATH)
-    file(STRINGS "${SOUIROOTPATH}/config/build.cfg" CONFIGSTRING )
+    file (TO_CMAKE_PATH "$ENV{SOUI4PATH}" SOUIROOTPATH)
+    file(STRINGS "${CFG_FILE}" CONFIGSTRING )
 
     foreach(LINE ${CONFIGSTRING})
         if("${LINE}" MATCHES "${KEY}=.*")

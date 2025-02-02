@@ -388,7 +388,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param id char--SetTimer创建的定时器ID
      * @return
      */
-    STDMETHOD_(void, KillTimer)(THIS_ char id) PURE;
+    STDMETHOD_(BOOL, KillTimer)(THIS_ char id) PURE;
 
     /**
      * @brief 获取鼠标捕获

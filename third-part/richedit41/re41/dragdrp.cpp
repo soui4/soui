@@ -554,6 +554,8 @@ CDropTarget::CDropTarget(
 	CTxtEdit *ped)
 {
 	TRACEBEGIN(TRCSUBSYSDTE, TRCSCOPEINTERN, "CDropTarget::CDropTarget");
+	int offset = FIELD_OFFSET(CDropTarget, _crefs);
+	memset((char*)this + offset, 0, sizeof(CDropTarget) - offset);
 
 	_ped 		= ped;
 	_crefs 		= 1;
@@ -898,6 +900,7 @@ CDropCaret::CDropCaret(
 	_dvp = -1;
 	_hdcWindow = NULL;
 	_fCaretOn = FALSE;
+	_ptCaret.u = _ptCaret.v = 0;
 }
 
 /*

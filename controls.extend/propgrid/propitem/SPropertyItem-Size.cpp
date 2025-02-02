@@ -1,4 +1,4 @@
-﻿#include "StdAfx.h"
+﻿#include "stdafx.h"
 #include "SPropertyItem-Size.h"
 #include "../SPropertyEmbedWndHelper.hpp"
 #include "../SPropertyGrid.h"
@@ -77,7 +77,7 @@ namespace SOUI
 			if(m_bDigit)
 			{
 				m_szValue.cy=_ttoi(pChild->GetValue());
-				m_strValue[0].Format(_T("%d"),m_szValue.cy);
+				m_strValue[1].Format(_T("%d"),m_szValue.cy);
 			}else
 			{
 				m_strValue[1]=pChild->GetValue();

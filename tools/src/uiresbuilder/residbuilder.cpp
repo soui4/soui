@@ -1,4 +1,4 @@
-// residbuilder.cpp : ¶¨Òå¿ØÖÆÌ¨Ó¦ÓÃ³ÌĞòµÄÈë¿Úµã¡£
+ï»¿// residbuilder.cpp : å®šä¹‰æ§åˆ¶å°åº”ç”¨ç¨‹åºçš„å…¥å£ç‚¹ã€‚
 //
 
 #include "stdafx.h"
@@ -11,7 +11,7 @@ L"    name type file_path\n\n";
 
 const wchar_t  RB_HEADER_ID[]=
 L"/*<------------------------------------------------------------------------------------------------->*/\n"
-L"/*¸ÃÎÄ¼şÓÉuiresbuilderÉú³É£¬Çë²»ÒªÊÖ¶¯ĞŞ¸Ä*/\n"
+L"/*è¯¥æ–‡ä»¶ç”±uiresbuilderç”Ÿæˆï¼Œè¯·ä¸è¦æ‰‹åŠ¨ä¿®æ”¹*/\n"
 L"/*<------------------------------------------------------------------------------------------------->*/\n";
 
 const wchar_t ROBJ_DEF[] =
@@ -27,17 +27,17 @@ struct IDMAPRECORD
 	bool  bBuildId;
 };
 
-//½âÎöÎª²¼¾ÖµÄÎÄ¼şÀàĞÍ
+//è§£æä¸ºå¸ƒå±€çš„æ–‡ä»¶ç±»å‹
 const wchar_t KXML_LAYOUT[]= L"layout";
 const wchar_t KXML_SMENU[]= L"smenu";
 const wchar_t KXML_SMENUEX[]= L"smenuex";
-//È«¾Ö×ÊÔ´¶¨Òå
+//å…¨å±€èµ„æºå®šä¹‰
 const wchar_t KXML_UIDEF[] = L"uidef";
 
-//×Ô¶¯±àºÅ¿ªÊ¼ID
+//è‡ªåŠ¨ç¼–å·å¼€å§‹ID
 const int KStartID = 0x00010000; 
 
-//»ñµÃÎÄ¼şµÄ×îºóĞŞ¸ÄÊ±¼ä
+//è·å¾—æ–‡ä»¶çš„æœ€åä¿®æ”¹æ—¶é—´
 __int64 GetLastWriteTime(LPCSTR pszFileName)
 {
 	__int64 tmFile=0;
@@ -51,7 +51,7 @@ __int64 GetLastWriteTime(LPCSTR pszFileName)
 	return tmFile;
 }
 
-//»ñµÃÎÄ¼şµÄ×îºóĞŞ¸ÄÊ±¼ä
+//è·å¾—æ–‡ä»¶çš„æœ€åä¿®æ”¹æ—¶é—´
 __int64 GetLastWriteTime(LPCWSTR pszFileName)
 {
     __int64 tmFile=0;
@@ -65,7 +65,7 @@ __int64 GetLastWriteTime(LPCWSTR pszFileName)
     return tmFile;
 }
 
-//½«µ¥·´Ğ±¿¸×ª»»³ÉË«·´Ğ±¿¸
+//å°†å•åæ–œæ‰›è½¬æ¢æˆåŒåæ–œæ‰›
 wstring BuildPath(LPCWSTR pszPath)
 {
 	LPCWSTR p=pszPath;
@@ -76,12 +76,12 @@ wstring BuildPath(LPCWSTR pszPath)
 		if(*p==L'\\')
 		{
 			if(*(p+1)!=L'\\')
-			{//µ¥Ğ±¿¸
+			{//å•æ–œæ‰›
 				p2[0]=p2[1]=L'\\';
 				p++;
 				p2+=2;
 			}else
-			{//ÒÑ¾­ÊÇË«Ğ±¿¸
+			{//å·²ç»æ˜¯åŒæ–œæ‰›
 				p2[0]=p2[1]=L'\\';
 				p+=2;
 				p2+=2;
@@ -166,7 +166,7 @@ void WriteFile(__int64 tmIdx, const std::string &strRes, const std::wstring &str
 		FILE * f=_tfopen(strRes.c_str(),_T("wb"));
 		if(f)
 		{
-			FILEHEAD::WriteTimeStamp(tmIdx,f,bUtf8);//Ğ´UTF16ÎÄ¼şÍ·¼°Ê±¼ä¡£-sizeof(WCHAR)ÓÃÀ´È¥³ıstamp×îºóÒ»¸ö\0
+			FILEHEAD::WriteTimeStamp(tmIdx,f,bUtf8);//å†™UTF16æ–‡ä»¶å¤´åŠæ—¶é—´ã€‚-sizeof(WCHAR)ç”¨æ¥å»é™¤stampæœ€åä¸€ä¸ª\0
 			if(!bUtf8)
 			{
 				fwrite(strOut.c_str(),sizeof(WCHAR),strOut.length(),f);
@@ -187,7 +187,7 @@ void WriteFile(__int64 tmIdx, const std::string &strRes, const std::wstring &str
 	}
 }
 
-//C++¹Ø¼ü×Ö
+//C++å…³é”®å­—
 wchar_t* szCppKey[] =
 {
     L"__asm",
@@ -301,7 +301,7 @@ wchar_t* szCppKey[] =
     L"while"
 };
 
-//ĞèÒª×ªÒåµÄÎŞĞ§×Ö·û,ÒÔÏÂ·ûºÅ¶¼×Ô¶¯×ª»»³É"_"
+//éœ€è¦è½¬ä¹‰çš„æ— æ•ˆå­—ç¬¦,ä»¥ä¸‹ç¬¦å·éƒ½è‡ªåŠ¨è½¬æ¢æˆ"_"
 const wchar_t g_CharEscape[] =L".+-*/~\'\"^%#!@?;|{[]}=";
 void EscapeChar(wchar_t &c)
 {
@@ -329,14 +329,14 @@ void MakeNameValid(const wchar_t * pszName,wchar_t * pszOut)
     const wchar_t * p1 = pszName;
     wchar_t * p2 = pszOut;
     
-    //Êı×Ö¿ªÍ·£¬Ç°Ãæ¼ÓÉÏnameÇ°×º
+    //æ•°å­—å¼€å¤´ï¼Œå‰é¢åŠ ä¸Šnameå‰ç¼€
     if(*p1 >= L'0' && *p1 <= L'9')
     {
         wcscpy(p2,L"name_");
         p2+=5;
     }
     
-    //×ªÒåpszNameÖĞµÄ²»ÄÜÓÃÓÚnameµÄ×Ö·û
+    //è½¬ä¹‰pszNameä¸­çš„ä¸èƒ½ç”¨äºnameçš„å­—ç¬¦
     while(*p1)
     {
         *p2 = *p1;
@@ -347,7 +347,7 @@ void MakeNameValid(const wchar_t * pszName,wchar_t * pszOut)
     
     *p2=0;
     
-    //·ÀÖ¹nameÊÇC++¹Ø¼ü×Ö
+    //é˜²æ­¢nameæ˜¯C++å…³é”®å­—
     void *pFind = bsearch(pszOut,szCppKey,ARRAYSIZE(szCppKey),sizeof(wchar_t*),wcscmp2);
     if(pFind)
     {
@@ -369,7 +369,7 @@ void ParseLayout(TiXmlElement *xmlNode,map<wstring,int> &vecName2ID,int & nStart
     const char * pszAttrName = xmlNode->Attribute("name");
 
     if(pszAttrName)
-    {//ÓĞnameÊôĞÔ²Å½âÎöid
+    {//æœ‰nameå±æ€§æ‰è§£æid
 		wchar_t szName[100]={0};
         int nID = nStartId;
 
@@ -392,7 +392,7 @@ void ParseLayout(TiXmlElement *xmlNode,map<wstring,int> &vecName2ID,int & nStart
 				{
 					nStartId++;
 				}else if(strnicmp(pszID,"ID",2) == 0)
-				{//IDÎªÃüÃûID£¬ÈçIDOK£¬IDCANCEL
+				{//IDä¸ºå‘½åIDï¼Œå¦‚IDOKï¼ŒIDCANCEL
 					if(stricmp(pszID,"IDOK")==0)
 						nID = IDOK;
 					if(stricmp(pszID,"IDCANCEL")==0)
@@ -443,7 +443,7 @@ void ParseLayoutFile(const wchar_t * pszFileName,map<wstring,int> &mapName2ID,in
     if(xmlLayout.LoadFile(f))
     {
         TiXmlElement *pXmlNode = xmlLayout.RootElement();
-        //±ÜÃâ½âÎöµ½skin½áµã
+        //é¿å…è§£æåˆ°skinç»“ç‚¹
         if(stricmp(pXmlNode->Value(),"soui") == 0)
 		{
 			ParseLayout(pXmlNode->FirstChildElement("ncPainter"),mapName2ID,nStartId);
@@ -460,7 +460,7 @@ void ParseLayoutFile(const wchar_t * pszFileName,map<wstring,int> &mapName2ID,in
     fclose(f);
 }
 
-//´ÓUIDefÖĞ½âÎöString,Color Table
+//ä»UIDefä¸­è§£æString,Color Table
 __int64 ParseUIDefFile(map<string,string> &mapFiles, const wchar_t * pszFileName,map<string,int> &mapString,map<string,int> &mapColor)
 {
     TiXmlDocument xmlUidef;
@@ -471,7 +471,7 @@ __int64 ParseUIDefFile(map<string,string> &mapFiles, const wchar_t * pszFileName
         TiXmlElement *pXmlNode = xmlUidef.RootElement();
         if(stricmp(pXmlNode->Value(),"uidef")==0)
         {
-            //½âÎö string table
+            //è§£æ string table
             TiXmlElement *pXmlString = pXmlNode->FirstChildElement("string");
             if(pXmlString)
             {
@@ -496,7 +496,7 @@ __int64 ParseUIDefFile(map<string,string> &mapFiles, const wchar_t * pszFileName
                     while(pStrEle)
                     {
                         string strName = pStrEle->Value();
-						//Òª±£Ö¤×Ö·û´®±íÖĞÃû×ÖÎ¨Ò»
+						//è¦ä¿è¯å­—ç¬¦ä¸²è¡¨ä¸­åå­—å”¯ä¸€
 						if(mapString.find(strName)!=mapString.end())
 						{
 							mapString.clear();
@@ -509,7 +509,7 @@ __int64 ParseUIDefFile(map<string,string> &mapFiles, const wchar_t * pszFileName
                 }
             }
             
-            //½âÎö color table
+            //è§£æ color table
             TiXmlElement *pXmlColor = pXmlNode->FirstChildElement("color");
             if(pXmlColor)
             {
@@ -534,7 +534,7 @@ __int64 ParseUIDefFile(map<string,string> &mapFiles, const wchar_t * pszFileName
                     while(pColorEle)
                     {
                         string strName = pColorEle->Value();
-						//Òª±£Ö¤ÑÕÉ«±íÖĞÃû×ÖÎ¨Ò»
+						//è¦ä¿è¯é¢œè‰²è¡¨ä¸­åå­—å”¯ä¸€
 						if(mapColor.find(strName)!=mapColor.end())
 						{
 							mapColor.clear();
@@ -554,12 +554,18 @@ __int64 ParseUIDefFile(map<string,string> &mapFiles, const wchar_t * pszFileName
     return tmStamp;
 }
 
+void wtoutf8(const std::wstring & src, std::string &out){
+	int len = WideCharToMultiByte(CP_UTF8,0,src.c_str(),src.length(),NULL,0,NULL,NULL);
+	out.resize(len);
+	WideCharToMultiByte(CP_UTF8,0,src.c_str(),src.length(),(char*)out.c_str(),len,NULL,NULL);
+}
+
 //uiresbuilder -p uires -i uires\uires.idx -r .\uires\winres.rc2 -h .\uires\resource.h idtable
 int _tmain(int argc, _TCHAR* argv[])
 {
-	string strSkinPath;	//Æ¤·ôÂ·¾¶,Ïà¶ÔÓÚ³ÌĞòµÄ.rcÎÄ¼ş
+	string strSkinPath;	//çš®è‚¤è·¯å¾„,ç›¸å¯¹äºç¨‹åºçš„.rcæ–‡ä»¶
 	string strIndexFile;
-	string strRes;		//rc2ÎÄ¼şÃû
+	string strRes;		//rc2æ–‡ä»¶å
 	string strHeadFile; // head file
 	string strJsFile;//js name and id file
     BOOL bBuildIDMap=FALSE;  //Build ID map
@@ -594,7 +600,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		return 1;
 	}
 
-	//´ò¿ªuirex.idxÎÄ¼ş
+	//æ‰“å¼€uirex.idxæ–‡ä»¶
 	TiXmlDocument xmlIndexFile;
 	if(!xmlIndexFile.LoadFile(strIndexFile.c_str()))
 	{
@@ -681,7 +687,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	strFiles += L"#endif//INIT_R_DATA\r\n";
     
 	if(strRes.length())
-	{//±àÒë×ÊÔ´.rc2ÎÄ¼ş
+	{//ç¼–è¯‘èµ„æº.rc2æ–‡ä»¶
 		//build output string by wide char
 		wstring strOut;
 		strOut += RB_HEADER_RC;
@@ -695,10 +701,10 @@ int _tmain(int argc, _TCHAR* argv[])
 			it2++;
 		}
         __int64 tmIdx=GetLastWriteTime(strIndexFile.c_str());
-		WriteFile(tmIdx, strRes, strOut);
+		WriteFile(tmIdx, strRes, strOut,FALSE);
 	}
 
-    //ÊäÈëname,id¶¨Òå,Ö»½âÎö×ÊÔ´ÖĞlayout×ÊÔ´µÄXML×ÊÔ´
+    //è¾“å…¥name,idå®šä¹‰,åªè§£æèµ„æºä¸­layoutèµ„æºçš„XMLèµ„æº
 	if (!strHeadFile.empty() || !strJsFile.empty())
 	{
 	    map<wstring,int> mapNameID;
@@ -713,11 +719,11 @@ int _tmain(int argc, _TCHAR* argv[])
         while(it2!=vecIdMapRecord.end())
         {
             if(it2->bBuildId || wcsicmp(it2->szType,KXML_LAYOUT)==0 || wcsicmp(it2->szType,KXML_SMENU) == 0 || wcsicmp(it2->szType,KXML_SMENUEX) == 0)
-            {//·¢ÏÖ²¼¾Ö»òÕß²Ëµ¥ÎÄ¼ş
+            {//å‘ç°å¸ƒå±€æˆ–è€…èœå•æ–‡ä»¶
                 tmResource += GetLastWriteTime(it2->szPath);
                 ParseLayoutFile(it2->szPath,mapNameID,nStartID);
             }else if(wcsicmp(it2->szType,KXML_UIDEF)==0)
-            {//ÕÒµ½UIDEF
+            {//æ‰¾åˆ°UIDEF
                 tmResource += GetLastWriteTime(it2->szPath);
                 tmResource += ParseUIDefFile(mapFiles,it2->szPath,mapString,mapColor);
             }
@@ -888,7 +894,7 @@ int _tmain(int argc, _TCHAR* argv[])
 			strOut += L"extern struct _R R;\r\n";
 			strOut += L"#endif//INIT_R_DATA\r\n";
 
-			WriteFile(tmResource, strHeadFile, strOut);
+			WriteFile(tmResource, strHeadFile, strOut,TRUE);
 		}
 		if(!strJsFile.empty()){
 			wstring strOut = RB_HEADER_ID;

@@ -64,6 +64,7 @@ public:
 
 inline CLed::CLed()
 {
+	memset(this,0,sizeof(CLed));
 #ifdef DEBUG
 	// We set this invalid so that we can assert on it in debug builds.
 	_vpMatchNewTop = -1;

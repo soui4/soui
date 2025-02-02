@@ -665,7 +665,7 @@ STabPage *STabCtrl::CreatePageFromXml(SXmlNode xmlPage)
 int STabCtrl::InsertItem(LPCWSTR lpContent, int iInsert /*=-1*/)
 {
     SXmlDoc xmlDoc;
-    if (!xmlDoc.load_buffer(lpContent, wcslen(lpContent) * sizeof(wchar_t), xml_parse_default, enc_utf16))
+    if (!xmlDoc.load_buffer(lpContent, wcslen(lpContent) * sizeof(wchar_t), xml_parse_default, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
         return -1;
     return InsertItem(xmlDoc.root().first_child(), iInsert);
 }

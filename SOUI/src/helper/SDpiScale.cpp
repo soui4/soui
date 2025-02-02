@@ -1,4 +1,4 @@
-#include "souistd.h"
+ï»¿#include "souistd.h"
 #include "helper/SDpiScale.h"
 
 SNSBEGIN
@@ -14,7 +14,7 @@ const int *SDpiScale::GetBuiltinScales()
     return KBuiltinScales;
 }
 
-/*±ê×¼»¯·Å´ó±ÈÀı, Ñ¡Ôñ±È×Ô¼ºÖ¸¶¨±ÈÀıĞ¡Ò»ºÅµÄ±ÈÀı*/
+/*æ ‡å‡†åŒ–æ”¾å¤§æ¯”ä¾‹, é€‰æ‹©æ¯”è‡ªå·±æŒ‡å®šæ¯”ä¾‹å°ä¸€å·çš„æ¯”ä¾‹*/
 int SDpiScale::NormalizeScale(int nScale)
 {
     for (int i = 1; i < ARRAYSIZE(KBuiltinScales); i++)

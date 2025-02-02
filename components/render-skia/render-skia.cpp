@@ -314,7 +314,11 @@ namespace SOUI
 		m_pRenderFactory = pRenderFactory;
 
 		m_SkCanvas = new SkCanvas();
+#if WCHAR_SIZE == 4
+		m_paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
+#else
 		m_paint.setTextEncoding(SkPaint::kUTF16_TextEncoding);
+#endif
 		m_paint.setAntiAlias(true);
 		m_paint.setLCDRenderText(true);
 		m_paint.setStyle(SkPaint::kStrokeAndFill_Style);
@@ -327,11 +331,7 @@ namespace SOUI
 
 		LOGFONT lf={0};
 		lf.lfHeight=20;
-#ifdef _WIN32
 		_tcscpy(lf.lfFaceName,_T("宋体"));
-#else
-		_tcscpy(lf.lfFaceName, _T("Arial"));
-#endif
 		pRenderFactory->CreateFont(&m_defFont,&lf);
 		SelectObject(m_defFont,NULL);
 
@@ -1441,8 +1441,11 @@ namespace SOUI
 			matrix[kMSkewY],matrix[kMScaleY],matrix[kMTransY],
 			matrix[kMPersp0], matrix[kMPersp1], matrix[kMPersp2]
 		);
-		m.preTranslate(-m_ptOrg.fX, -m_ptOrg.fY);
-		m.postTranslate(m_ptOrg.fX, m_ptOrg.fY);
+        if (m_ptOrg.fX != 0.0f || m_ptOrg.fY != 0.0f)
+        {
+			m.preTranslate(-m_ptOrg.fX, -m_ptOrg.fY);
+			m.postTranslate(m_ptOrg.fX, m_ptOrg.fY);
+        }
 		m_SkCanvas->setMatrix(m);
 		if(m.isIdentity()){
 			m_paint.setFilterLevel(SkPaint::kNone_FilterLevel);
@@ -1458,10 +1461,10 @@ namespace SOUI
 		const SkMatrix & m = m_SkCanvas->getTotalMatrix();
 		matrix[kMScaleX] = m.getScaleX();
 		matrix[kMSkewX] = m.getSkewX();
-		matrix[kMTransX] = m.getTranslateX();
+		matrix[kMTransX] = m.getTranslateX() - m_ptOrg.fX;
 		matrix[kMSkewY] = m.getSkewY();
 		matrix[kMScaleY] = m.getScaleY();
-		matrix[kMTransY] = m.getTranslateY();
+		matrix[kMTransY] = m.getTranslateY() - m_ptOrg.fY;
 		matrix[kMPersp0] = m.getPerspX();
 		matrix[kMPersp1] = m.getPerspY();
 		matrix[kMPersp2] = m.get(SkMatrix::kMPersp2);
@@ -1791,6 +1794,8 @@ namespace SOUI
 	HRESULT SBitmap_Skia::Clone(IBitmapS **ppClone) const 
 	{
 		HRESULT hr = E_UNEXPECTED;
+        if (!m_hBmp)
+            return hr;
 		BOOL bOK = GetRenderFactory()->CreateBitmap(ppClone);
 		if(bOK)
 		{
@@ -2399,7 +2404,11 @@ namespace SOUI
 		const SFont_Skia *pFontSkia = (const SFont_Skia *)pFont;
 		if(nLen < 0) nLen = (int)_tcslen(pszText);
 		SkPaint paint;
+#if WCHAR_SIZE == 4
+		paint.setTextEncoding(SkPaint::kUTF32_TextEncoding);
+#else
 		paint.setTextEncoding(SkPaint::kUTF16_TextEncoding);
+#endif
 		paint.setTypeface(pFontSkia->GetFont());
 		const LOGFONT *plf = pFont->LogFont();
 		paint.setTextSize(SkIntToScalar(abs(plf->lfHeight)));

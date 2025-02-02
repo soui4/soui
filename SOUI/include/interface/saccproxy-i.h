@@ -40,7 +40,7 @@ DECLARE_INTERFACE_(IAccProxy, IObjRef)
     STDMETHOD(put_accValue)(THIS_ BSTR szValue) PURE;
 };
 
-#endif//_WIN32
+#endif //_WIN32
 
 SNSEND
 #endif // __SACCPROXY_I__H__

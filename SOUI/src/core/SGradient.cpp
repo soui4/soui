@@ -76,7 +76,7 @@ int SGradient::LoadColorTable(IXmlNode *xmlNode)
     if (!xmlColor)
     {
         return 0;
-    }    
+    }
 
     m_arrGradient.RemoveAll();
     SXmlNode color(xmlColor);

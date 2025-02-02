@@ -1,4 +1,4 @@
-// test.cpp : Defines the entry point for the console application.
+ï»¿// test.cpp : Defines the entry point for the console application.
 //
 #include "SevenZip/SevenZipExtractor.h"
 #include "SevenZip/SevenZipExtractorMemory.h"
@@ -82,7 +82,7 @@ public:
 			wprintf_s(L"decompress 7z to dir failed %s \n", decompress.GetErrorString().c_str());
 		}
 
-		std::string sfile = "test\\20131127²èÒ¶°ü×°\\²èÒ¶\\°²×°¹âÅÌ02.00.0038820131127_171555\\HELP\\IMAGE\\¼Û¸ñĞ¡Êı.JPG"; 
+		std::string sfile = "test\\20131127èŒ¶å¶åŒ…è£…\\èŒ¶å¶\\å®‰è£…å…‰ç›˜02.00.0038820131127_171555\\HELP\\IMAGE\\ä»·æ ¼å°æ•°.JPG"; 
 
 		unsigned long as = fileStreams.GetFileSize(sfile.c_str());
 		(void)as;

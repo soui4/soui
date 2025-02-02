@@ -78,9 +78,9 @@ class SOUI_EXP STextHost : public ITextHost {
     }
 
   protected:
-      STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID riid, void** ppvObject) OVERRIDE;
-      STDMETHOD_(ULONG, AddRef)(THIS) OVERRIDE;
-      STDMETHOD_(ULONG, Release)(THIS) OVERRIDE;
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID riid, void **ppvObject) OVERRIDE;
+    STDMETHOD_(ULONG, AddRef)(THIS) OVERRIDE;
+    STDMETHOD_(ULONG, Release)(THIS) OVERRIDE;
 
     /**
      * STextHost::TxGetDC

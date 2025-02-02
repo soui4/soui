@@ -1,5 +1,5 @@
-#pragma once
-#include <core/sskin.h>
+О╩©#pragma once
+#include <core/SSkin.h>
 
 namespace SOUI
 {
@@ -21,8 +21,8 @@ class SSkinImgFrame3 : public SSkinImgFrame {
 
     SOUI_ATTRS_BEGIN()
     ATTR_CUSTOM(L"src", OnAttrSrc)
-    /* offcut-left/right/top/bottom рРн╙вИ╨ом╪мЫмЫвсм╪ж╝╪Дсп©у╟в */
-    /* уБюО╤╗рЕ╤тс╕╣двсм╪м╪ф╛гп╦Н╣ТиообвСср╤Юиыё╛╥юж╧гп╦НЁЖю╢╣дм╪ф╛спнчсц╣д╠ъяь   */
+    /* offcut-left/right/top/bottom Е⌡═Д╦╨Г╩└Е░┬Е⌡╬Е╬─Е╬─Е╜░Е⌡╬Д╧▀И≈╢Ф°┴Г╘╨Г≥╫ */
+    /* Х©≥И┤▄Е╝ Д╧┴Е╞╧Е╨■Г └Е╜░Е⌡╬Е⌡╬Г┴┤Е┬┤Е┴╡Ф▌┴Д╦┼Д╦▀Е╥╕Е▐ЁЕ╓ Е╟▒О╪▄И≤╡Ф╜╒Е┬┤Е┴╡Е┤╨Ф²╔Г └Е⌡╬Г┴┤Ф°┴Ф≈═Г■╗Г └Х╬╧Ф╡©   */
     ATTR_RECT(L"offcut", m_offset, FALSE)
     SOUI_ATTRS_END()
 

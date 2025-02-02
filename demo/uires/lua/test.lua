@@ -6,11 +6,11 @@ players = {};
 flag_win = nil;
 runTimer = nil;
 
-coins_all = 100;	--ÏÖÓĞ×Ê½ğ
-coins_bet = {0,0,0,0} --ÏÂ×¢½ğ¶î
-bet_rate = 4;		--ÅâÂÊ
-prog_max	 = 200;	--×î´ó²½Êı
-prog_all = {0,0,0,0} --ÂíÆ¥½ø¶È
+coins_all = 100;	--ç°æœ‰èµ„é‡‘
+coins_bet = {0,0,0,0} --ä¸‹æ³¨é‡‘é¢
+bet_rate = 4;		--èµ”ç‡
+prog_max	 = 200;	--æœ€å¤§æ­¥æ•°
+prog_all = {0,0,0,0} --é©¬åŒ¹è¿›åº¦
 
 function on_host_msg(hostWnd,msg, wp,lp,pRes)
 	--slog("test on host msg:" .. msg);
@@ -24,7 +24,7 @@ function onBtnLrc(e)
  slog("btn lrc clicked!");
  local btn = toSWindow(e:Sender());
  local hwnd = btn:GetHostHwnd();
- local ret = SMessageBox(hwnd,L("onBtnLrc, cancel origin proc?"),L("test"),1);
+ local ret = SMessageBox(hwnd,L"onBtnLrc(æˆ‘æ˜¯ä¸­æ–‡), cancel origin proc?",L"test",1);
  if ret == 1 then
 	 e:SetBubbleUp(0); --block origin behavior.
  end
@@ -32,7 +32,7 @@ function onBtnLrc(e)
 end
 
 function on_init(args)
-	--³õÊ¼»¯È«¾Ö¶ÔÏó
+	--åˆå§‹åŒ–å…¨å±€å¯¹è±¡
 	slog("on_init");
 	win = getHostFromInitEvent(args);
 	HostWnd_SetMsgHandler(win,"on_host_msg",win);
@@ -50,7 +50,7 @@ function on_init(args)
 					gamecanvas:FindChildByNameA("player_3",-1),
 					gamecanvas:FindChildByNameA("player_4",-1)
 				    };
-	--²¼¾Ö
+	--å¸ƒå±€
 	on_canvas_size(nil);
 
 	--show how to do SubscribeEvent
