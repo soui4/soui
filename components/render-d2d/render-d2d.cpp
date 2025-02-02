@@ -697,9 +697,11 @@ namespace SOUI
 		SAutoRefPtr<IImgX> imgDecoder;
 		GetRenderFactory()->GetImgDecoderFactory()->CreateImgX(&imgDecoder);
 #ifdef _UNICODE
-		if(imgDecoder->LoadFromFileW(pszFileName)==0) return S_FALSE;
+		if(imgDecoder->LoadFromFileW(pszFileName)==0) 
+			return E_FAIL;
 #else
-		if(imgDecoder->LoadFromFileA(pszFileName)==0) return S_FALSE;
+		if(imgDecoder->LoadFromFileA(pszFileName)==0) 
+			return E_FAIL;
 #endif
 		return ImgFromDecoder(imgDecoder);
 	}

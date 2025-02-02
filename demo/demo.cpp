@@ -112,51 +112,51 @@ protected:
 	STDMETHOD_(IBitmapS*, LoadImage)(THIS_ LPCTSTR pszType, LPCTSTR pszResName)
 	{
 		int nBufSize = GetRawBufferSize(pszType, pszResName);
-		char* pBuf = (char*)malloc(nBufSize);
+		SAutoBuf buf(nBufSize);
+		char * pBuf = buf;
 		BOOL bLoad = GetRawBuffer(pszType, pszResName, pBuf, nBufSize);
 		if (bLoad && nBufSize > 6)
 		{
-			if (_tcscmp(pszType, _T("svg")) != 0)
+			if (_tcscmp(pszType, _T("svg")) == 0)
 			{
-				return SResProviderMgr::LoadImage(pszType, pszResName);
-			}
-			const unsigned char bom16[2] = { 0xff,0xfe };
-			const unsigned char bom8[3] = { 0xef,0xbb,0xbf };
-			SStringA strBuf;
-			if (memcmp(pBuf, bom16, 2) == 0)
-			{
-				strBuf = S_CW2A(SStringW((WCHAR*)(pBuf + 2), (nBufSize - 2) / 2), CP_UTF8);
-			}
-			else if (memcmp(pBuf, bom8, 3) == 0)
-			{
-				strBuf = SStringA(pBuf + 3, nBufSize - 3);
-			}
-			else
-			{
-				strBuf = S_CA2A(SStringA(pBuf, nBufSize), CP_ACP, CP_UTF8);
-			}
-			if (strBuf.Left(4) == "<svg")
-			{
-				NSVGimage* image = nsvgParse((char*)strBuf.c_str(), "px", 96.0f);
-				IBitmapS* Ret = NULL;
-				if (image)
+				const unsigned char bom16[2] = { 0xff,0xfe };
+				const unsigned char bom8[3] = { 0xef,0xbb,0xbf };
+				SStringA strBuf;
+				if (memcmp(pBuf, bom16, 2) == 0)
 				{
-					int w = (int)image->width;
-					int h = (int)image->height;
-
-					NSVGrasterizer* rast = nsvgCreateRasterizer();
-
-					unsigned char* img = (unsigned char*)malloc(w * h * 4);
-					nsvgRasterize(rast, image, 0, 0, 1, img, w, h, w * 4);
-					GETRENDERFACTORY->CreateBitmap(&Ret);
-					Ret->Init(w, h, img);
-					free(img);
-
-					nsvgDeleteRasterizer(rast);
-					nsvgDelete(image);
-
+					strBuf = S_CW2A(SStringW((WCHAR*)(pBuf + 2), (nBufSize - 2) / 2), CP_UTF8);
 				}
-				return Ret;
+				else if (memcmp(pBuf, bom8, 3) == 0)
+				{
+					strBuf = SStringA(pBuf + 3, nBufSize - 3);
+				}
+				else
+				{
+					strBuf = S_CA2A(SStringA(pBuf, nBufSize), CP_ACP, CP_UTF8);
+				}
+				if (strBuf.Left(4) == "<svg")
+				{
+					NSVGimage* image = nsvgParse((char*)strBuf.c_str(), "px", 96.0f);
+					IBitmapS* Ret = NULL;
+					if (image)
+					{
+						int w = (int)image->width;
+						int h = (int)image->height;
+
+						NSVGrasterizer* rast = nsvgCreateRasterizer();
+
+						unsigned char* img = (unsigned char*)malloc(w * h * 4);
+						nsvgRasterize(rast, image, 0, 0, 1, img, w, h, w * 4);
+						GETRENDERFACTORY->CreateBitmap(&Ret);
+						Ret->Init(w, h, img);
+						free(img);
+
+						nsvgDeleteRasterizer(rast);
+						nsvgDelete(image);
+
+					}
+					return Ret;
+				}
 			}
 		}
 		return SResLoadFromMemory::LoadImage(pBuf, nBufSize);
@@ -361,11 +361,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->AddResProvider(pResProvider);
 
 		SSkinLoader* SkinLoader = new SSkinLoader(theApp);
-#ifdef _WIN32
-		SkinLoader->LoadSkin(_T("themes\\skin1"));
-#else
-		SkinLoader->LoadSkin(_T("themes/skin1"));
-#endif//_WIN32
+		SkinLoader->LoadDefSkin();
 		if (trans)
 		{//加载语言翻译包
 			theApp->SetTranslator(trans);

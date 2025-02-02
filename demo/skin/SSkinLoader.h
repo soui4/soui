@@ -14,6 +14,7 @@ SNSBEGIN
 		SSkinLoader(SApplication*);
 		~SSkinLoader();
 		void LoadSkin(SStringT respath,const TCHAR *strXmlSkin = _T("SkinXml:LoadSkinXml"));
+		void LoadDefSkin();
 	};
 
 SNSEND

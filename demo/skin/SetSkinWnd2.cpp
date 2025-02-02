@@ -117,6 +117,7 @@ void CSetSkinWnd::OnColor(IEvtArgs * e)
 
 void CSetSkinWnd::OnBuiltinSkin()
 {
+	SSkinLoader::getSingleton().LoadDefSkin();
 	SDemoSkin *skin = (SDemoSkin *)GETSKIN(L"demoskinbk", GetScale());
 	if (skin)
 	{

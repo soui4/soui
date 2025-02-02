@@ -140,15 +140,14 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
         return frames;
     }
 
+    #ifndef MAX_PATH
+    #define MAX_PATH 1000
+    #endif
+
     int SImgX_STB::LoadFromFileW( LPCWSTR pszFileName )
     {
 #ifdef _WIN32
         FILE *f=_wfopen(pszFileName,L"rb");
-#else
-        char szFileName[1000]={0};
-        WideCharToMultiByte(CP_UTF8,0,pszFileName,-1,szFileName,1000,NULL,NULL);
-        FILE *f = fopen(szFileName,"rb");
-#endif
         if(!f) return 0;
         fseek(f, 0, SEEK_END);
         LONG len = ftell(f);
@@ -158,18 +157,34 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
         int ret = LoadFromMemory(buf, len);
         fclose(f);
         return ret;
+#else
+        char szFileName[MAX_PATH]={0};
+        WideCharToMultiByte(CP_UTF8,0,pszFileName,-1,szFileName,MAX_PATH,NULL,NULL);
+        return LoadFromFileA(szFileName);
+#endif
     }
 
-    #ifndef MAX_PATH
-    #define MAX_PATH 1000
-    #endif
+
     int SImgX_STB::LoadFromFileA( LPCSTR pszFileName )
     {
+        #ifdef _WIN32
         wchar_t wszFileName[MAX_PATH+1];
         int cp = CP_ACP;
         MultiByteToWideChar(cp,0,pszFileName,-1,wszFileName,MAX_PATH);
         if(GetLastError()==ERROR_INSUFFICIENT_BUFFER) return 0;
         return LoadFromFileW(wszFileName);
+        #else
+        FILE *f=fopen(pszFileName,"rb");
+        if(!f) return 0;
+        fseek(f, 0, SEEK_END);
+        LONG len = ftell(f);
+        fseek(f, 0, SEEK_SET);
+        char *buf = (char *)malloc(len);
+        fread(buf, 1, len, f);
+        int ret = LoadFromMemory(buf, len);
+        fclose(f);
+        return ret;
+        #endif//_WIN32
     }
 
     SImgX_STB::SImgX_STB(BOOL bPremultiple)
