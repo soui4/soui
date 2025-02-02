@@ -114,7 +114,7 @@ CMake, Vcxsvr(https://sourceforge.net/projects/vcxsrv/files/vcxsrv/21.1.10/vcxsr
 valgrind --leak-check=full ./your_program
 
 ## **贡献名单**
-参见[贡献名单](./contibutors.md)
+参见[贡献名单](./contributors.md)
 
 ##  **LICENSE** 
 
