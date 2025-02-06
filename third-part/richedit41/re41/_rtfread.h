@@ -319,7 +319,7 @@ class CRTFRead : public CRTFConverter
 	COLORREF GetColor(DWORD dwMask);	//@cmember Get color _iParam for mask
 	LONG	GetStandardColorIndex();	//@cmember Get std index <-> _iparam
 	LONG	GetCellColorIndex();		//@cmember Get cell index <-> _iparam
-	EC		HandleChar(WORD ch);		//@cmember Insert single Unicode
+	EC		HandleChar(WCHAR ch);		//@cmember Insert single Unicode
 	EC		HandleEndGroup();			//@cmember Handle }
 	EC		HandleEndOfPara();			//@cmember Insert EOP into range
 	void	HandleCell();				//@cmember Handle \cell

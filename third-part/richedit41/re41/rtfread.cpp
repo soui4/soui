@@ -1268,8 +1268,7 @@ void CRTFRead::HandleCellx(
  *	@rdesc
  *		EC			The error code
  */
-EC CRTFRead::HandleChar(
-	WORD ch)			//@parm char token to be handled
+EC CRTFRead::HandleChar(WCHAR ch) //@parm char token to be handled
 {
 	TRACEBEGIN(TRCSUBSYSRTFR, TRCSCOPEINTERN, "CRTFRead::HandleChar");
 
