@@ -31,9 +31,9 @@ namespace SOUI
          */    
         virtual int LoadFromMemory(LPVOID pBits, size_t szData);
 
-		SIZE GetSkinSize() const;
+		SIZE WINAPI GetSkinSize() const;
 
-        int GetStates() const;
+        int WINAPI GetStates() const;
 
 		/**
         * ActiveNextFrame
