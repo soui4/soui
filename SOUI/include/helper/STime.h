@@ -78,7 +78,7 @@ class SOUI_EXP STime {
     bool operator>=(STime time) const;
 
   protected:
-    __time64_t m_time;
+    time_t m_time;
 };
 
 SNSEND

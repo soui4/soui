@@ -25,7 +25,6 @@ source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
 add_executable(wxDemo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${EXTENDCOTROLS})
-target_link_directories(wxDemo PRIVATE ${CMAKE_BINARY_DIR}/bin)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 add_dependencies(demo soui-sys-resource ${COM_LIBS})

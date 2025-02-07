@@ -26,7 +26,6 @@ endif ()
 endif()
 
 add_executable(demo2 WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
-target_link_directories(demo2 PRIVATE ${CMAKE_BINARY_DIR}/bin)
 
 if(CMAKE_DEBUG_POSTFIX)
     set_target_properties(demo2 PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})

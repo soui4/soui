@@ -19,7 +19,6 @@ test_native.cpp
 )
 
 add_executable(fun_test ${CURRENT_HEADERS} ${FUN_TEST_SRC})
-target_link_directories(fun_test PRIVATE ${CMAKE_BINARY_DIR}/bin)
 
 add_dependencies(fun_test utilities4 gtest soui4 resprovider-zip log4z  render-gdi  render-skia taskloop Scintilla)
 target_include_directories(fun_test 

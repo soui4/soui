@@ -321,11 +321,15 @@ WKE_API const utf8* wkeToString(const wkeString string);
 WKE_API const wchar_t* wkeToStringW(const wkeString string);
 
 /***JavaScript Bind***/
+#ifdef _WIN32
 #ifdef __x86_64__
 #define JS_CALL
 #else
 #define JS_CALL __fastcall
 #endif
+#else
+#define JS_CALL
+#endif//_WIN32
 typedef jsValue (JS_CALL *jsNativeFunction) (jsExecState es);
 
 typedef enum
