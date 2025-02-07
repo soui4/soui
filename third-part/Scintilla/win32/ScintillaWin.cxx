@@ -1506,7 +1506,7 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 			return DLGC_HASSETSEL | DLGC_WANTALLKEYS;
 
 		case WM_KILLFOCUS: {
-				HWND wOther = reinterpret_cast<HWND>(wParam);
+				HWND wOther = (HWND)wParam;
 				HWND wThis = MainHWND();
 				HWND wCT = reinterpret_cast<HWND>(ct.wCallTip.GetID());
 				if (!wParam ||
