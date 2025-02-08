@@ -1,10 +1,11 @@
 ﻿#ifndef __SCOMHELPER__H__
 #define __SCOMHELPER__H__
 
+#include <sdef.h>
 #include <unknwn.h>
 
-namespace SOUI
-{
+SNSBEGIN
+
     #define COM_INTERFACE_BEGIN() \
     public:\
     virtual HRESULT STDMETHODCALLTYPE QueryInterface2( \
@@ -94,6 +95,7 @@ namespace SOUI
     protected:
         volatile LONG m_cRef;
     };
-}
+
+SNSEND
 
 #endif // __SCOMHELPER__H__

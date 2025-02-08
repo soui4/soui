@@ -39,11 +39,7 @@
 
 #define IUNKNOWN_ADD_IID(iface) IUNKNOWN_ADD_IID2(__uuidof(iface), iface)
 
-#ifndef SOUI_EXP
-#define SOUI_EXP
-#endif // SOUI_EXP
-
-class SOUI_EXP SUnknown {
+class  SUnknown {
   public:
     SUnknown()
         : m_cRef(1)

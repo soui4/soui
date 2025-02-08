@@ -11,9 +11,10 @@
 #ifndef __SCOMCLI_H__
 #define __SCOMCLI_H__
 
-
-
+#include <sdef.h>
+#include <windows.h>
 #include <unknwn.h>
+#include <oaidl.h>
 
 #ifndef SASSERT
 #include <assert.h>
@@ -260,7 +261,6 @@ public:
     }
 };
 
-#ifdef _WIN32
 //specialization for IDispatch
 template <>
 class SComPtr<IDispatch> : public SComPtrBase<IDispatch>
@@ -516,8 +516,7 @@ public:
     }
 };
 
-typedef SComQIPtr<IDispatch, &__uuidof(IDispatch)> CComDispatchDriver;
-#endif//_WIN32
+typedef SComQIPtr<IDispatch, &IID_IDispatch> CComDispatchDriver;
 
 SNSEND
 #pragma pack(pop)

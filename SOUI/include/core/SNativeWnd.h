@@ -8,6 +8,50 @@
 
 SNSBEGIN
 
+class SOUI_EXP SNativeWndHelper {
+  public:
+    HANDLE GetHeap()
+    {
+        return m_hHeap;
+    }
+
+    void LockSharePtr(void *p);
+    void UnlockSharePtr();
+    void *GetSharePtr()
+    {
+        return m_sharePtr;
+    }
+
+    HINSTANCE GetAppInstance()
+    {
+        return m_hInst;
+    }
+    ATOM GetSimpleWndAtom()
+    {
+        return m_atom;
+    }
+
+    BOOL Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp);
+
+  public:
+    static SNativeWndHelper *instance()
+    {
+        static SNativeWndHelper _this;
+        return &_this;
+    }
+
+  private:
+    SNativeWndHelper();
+    ~SNativeWndHelper();
+
+    HANDLE m_hHeap;
+    SCriticalSection m_cs;
+    void *m_sharePtr;
+
+    ATOM m_atom;
+    HINSTANCE m_hInst;
+};
+
 struct tagThunk;
 class SOUI_EXP SNativeWnd : public INativeWnd {
   public:
