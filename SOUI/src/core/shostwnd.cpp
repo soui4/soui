@@ -371,7 +371,10 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
         {
             SSLOGW() << "OnGetInitXmlNode return empty xml";
         }
-        xmlInit = &xmlRoot;
+        else
+        {
+            xmlInit = &xmlRoot;
+        }
     }
     m_hostAttr.Init();
     m_hostAttr.InitFromXml(xmlInit);

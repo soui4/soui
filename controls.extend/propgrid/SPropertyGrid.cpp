@@ -469,7 +469,7 @@ BOOL SPropertyGrid::OnSetCursor(const CPoint &pt)
         || (pt.x - rcClient.left >= nItemHei + m_nTitleWidth - 1
             && pt.x - rcClient.left <= nItemHei + m_nTitleWidth + 1))
     {
-        SetCursor(SApplication::getSingleton().LoadCursor(MAKEINTRESOURCE(IDC_SIZEWE)));
+        SetCursor(SApplication::getSingleton().LoadCursor(IDC_SIZEWE));
     }
     else
     {
@@ -479,7 +479,7 @@ BOOL SPropertyGrid::OnSetCursor(const CPoint &pt)
             return FALSE;
         ITEMPART ip = HitTest(iItem, pt);
         if (ip == IP_SWITCH)
-            SetCursor(SApplication::getSingleton().LoadCursor(MAKEINTRESOURCE(IDC_HAND)));
+            SetCursor(SApplication::getSingleton().LoadCursor(IDC_HAND));
         else
             return FALSE;
     }
