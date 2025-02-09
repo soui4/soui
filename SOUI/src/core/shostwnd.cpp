@@ -345,6 +345,7 @@ void SHostWnd::_Init()
     m_evtHandler.fun = NULL;
     m_evtHandler.ctx = NULL;
     m_cEnableUiDefCount = 0;
+    m_xmlInit = NULL;
 }
 
 SHostWnd::~SHostWnd()
@@ -376,6 +377,7 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
             xmlInit = &xmlRoot;
         }
     }
+    //read translucent property
     m_hostAttr.Init();
     m_hostAttr.InitFromXml(xmlInit);
     if (m_hostAttr.m_bTranslucent)
@@ -385,7 +387,9 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
         dwExStyle |= WS_EX_COMPOSITED;
 #endif //_WIN32
     }
-    HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0, xmlInit);
+    m_xmlInit = xmlInit;
+    HWND hWnd = SNativeWnd::CreateNative(_T("HOSTWND"), dwStyle, dwExStyle, x, y, nWidth, nHeight, hWndParent, 0);
+    m_xmlInit = NULL;
     UpdateAutoSizeCount(false);
     if (!hWnd)
         return NULL;
@@ -868,7 +872,22 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_pRoot->SetContainer(this);
     SwndContainerImpl::SetRoot(m_pRoot);
 
-    IXmlNode *pXmlRoot = (IXmlNode *)lpCreateStruct->lpCreateParams;
+    //load xml resource
+    SXmlDoc xmlDoc;
+    SXmlNode xmlRoot;
+    IXmlNode *pXmlRoot = m_xmlInit;
+    if (!pXmlRoot)
+    {
+        xmlRoot = OnGetInitXmlNode(xmlDoc);
+        if (!xmlRoot)
+        {
+            SSLOGW() << "OnGetInitXmlNode return empty xml";
+        }
+        else
+        {
+            pXmlRoot = &xmlRoot;
+        }
+    }
     if (pXmlRoot && !InitFromXml(pXmlRoot))
         return -1;
     GetRoot()->RequestRelayout();

@@ -203,7 +203,7 @@ class SOUI_EXP SHostWnd
     SList<IRunnable *> m_runnables;
     SCriticalSection m_csRunningQueue;
     SList<IRunnable *> m_runningQueue;
-
+    IXmlNode *m_xmlInit;
     static BOOL s_HideLocalUiDef;  /**<隐藏局部uidef对象全局标志  */
     static int s_TaskQueueBufSize; /**<异步任务等待长度,默认为5  */
   public:
