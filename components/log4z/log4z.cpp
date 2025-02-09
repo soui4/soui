@@ -154,7 +154,7 @@ public:
 		MultiByteToWideChar(CP_UTF8,0,mod,-1,mod2,10);
         _file = _wfopen(path2, mod2);
         #else
-        _file = fopen(path2, mod2);
+        _file = fopen(path, mod);
         #endif//_WIN32
         return _file != NULL;
     }
