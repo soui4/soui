@@ -44,7 +44,6 @@
 #include <process.h>
 #pragma comment(lib, "shlwapi")
 #pragma warning(disable:4996)
-
 #else
 #include <unistd.h>
 #include <netinet/in.h>
@@ -82,7 +81,7 @@
 #include <list>
 #include <queue>
 #include <deque>
-
+#include <stdint.h>
 using namespace SOUI;
 
 //////////////////////////////////////////////////////////////////////////
@@ -149,10 +148,14 @@ public:
     inline bool open(const char *path, const char * mod)
     {
         if (_file != NULL){fclose(_file);_file = NULL;}
+        #ifdef _WIN32
 		wchar_t path2[1000]={0},mod2[10]={0};
 		MultiByteToWideChar(CP_UTF8,0,path,-1,path2,1000);
 		MultiByteToWideChar(CP_UTF8,0,mod,-1,mod2,10);
         _file = _wfopen(path2, mod2);
+        #else
+        _file = fopen(path2, mod2);
+        #endif//_WIN32
         return _file != NULL;
     }
     inline void close()
@@ -320,7 +323,7 @@ void * threadProc(void * pParam)
 struct LogData
 {
     int    _level;    //log level
-    unsigned __int64 _time;        //create time
+    uint64_t _time;        //create time
 	DWORD _pid;
 	DWORD _tid;
 	std::string _content; //content
@@ -1330,7 +1333,16 @@ BOOL LogerManager::isLoggerEnable() const
     return _loggerInfo._enable;
 }
 
-bool LogerManager::openLogger(LogData * pLog)
+static std::wstring towstr(const std::string &str)
+{
+    int len = MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), NULL, 0);
+    std::wstring ret;
+    ret.resize(len + 1);
+    MultiByteToWideChar(CP_UTF8, 0, str.c_str(), str.length(), (wchar_t*)ret.data(), len);
+    return ret;
+}
+
+bool LogerManager::openLogger(LogData *pLog)
 {
     LoggerInfo * pLogger = &_loggerInfo;
     if (!pLogger->_enable || !pLogger->_outfile || pLog->_level < pLogger->_level)
@@ -1350,14 +1362,25 @@ bool LogerManager::openLogger(LogData * pLog)
 		char buf[MAX_PATH];
 		m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,name.c_str(),_pid,LOG4Z_MAX_LOG_INDEX);        		
 		std::string path = pLogger->_path+buf;
-		remove(path.c_str());
+#ifdef _WIN32
+        std::wstring wpath = towstr(path);
+        _wremove(wpath.c_str());
+#else
+        remove(path.c_str());
+#endif                                                //_WIN32
 		for(int i=LOG4Z_MAX_LOG_INDEX;i>0;i--)//max to 5 log index.
 		{
 			m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,name.c_str(),_pid,i-1);        		
 			std::string pathOld = pLogger->_path+buf;
 			m_pOutputFileBuilder->buildOutputFile(buf,MAX_PATH,name.c_str(),_pid,i);        		
 			std::string pathNew = pLogger->_path+buf;
-			rename(pathOld.c_str(),pathNew.c_str());
+            #ifdef _WIN32
+            std::wstring wpathOld = towstr(pathOld);
+            std::wstring wpathNew = towstr(pathNew);
+            _wrename(wpathOld.c_str(), wpathNew.c_str());
+            #else
+            rename(pathOld.c_str(), pathNew.c_str());
+            #endif//_WIN32
 		}
     }
     if (!pLogger->_handle.isOpen())
@@ -1422,7 +1445,7 @@ bool LogerManager::popLog(LogData *& log)
 void LogerManager::run()
 {
     _runing = true;
-    pushLog(LOG_LEVEL_ALARM, "logger", "-----------------  log4z thread started!   ----------------------------", __FILE__, __LINE__ , __FUNCTION__,_ReturnAddress());
+    pushLog(LOG_LEVEL_ALARM, "logger", "-----------------  log4z thread started!   ----------------------------", __FILE__, __LINE__ , __FUNCTION__,RetAddr());
 	if (_loggerInfo._enable)
 	{
 		std::stringstream ss;
@@ -1430,7 +1453,7 @@ void LogerManager::run()
 			<<" path=" <<_loggerInfo._path
 			<<" level=" << _loggerInfo._level
 			<<" display=" << _loggerInfo._display;
-		pushLog(LOG_LEVEL_ALARM, "logger", ss.str().c_str(), __FILE__, __LINE__ , __FUNCTION__,_ReturnAddress());
+		pushLog(LOG_LEVEL_ALARM, "logger", ss.str().c_str(), __FILE__, __LINE__ , __FUNCTION__,RetAddr());
 	}
 
 

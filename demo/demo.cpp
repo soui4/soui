@@ -395,7 +395,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
 		theApp->EnableNotifyCenter(TRUE);
 		{
-			SmileyCreateHook  smileyHook;
+			//SmileyCreateHook  smileyHook;
 			//设置提示窗口布局
 			STipWnd::SetLayout(_T("layout:dlg_tip"));
 
