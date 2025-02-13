@@ -3083,7 +3083,7 @@ BOOL CTxtSelection::PutChar (
 	WCHAR str[2];									// Might need to insert
 	LONG  cch = 1;									//  Unicode surrogate pair
  	str[0] = (WCHAR)ch;								// Default single code
-
+#if WCHAR_SIZE==2
 	if(ch > 65535)									// Higher-plane char or
 	{												//  invalid
 		if(ch > 0x10FFFF)
@@ -3093,7 +3093,7 @@ BOOL CTxtSelection::PutChar (
 		str[1] = 0xDC00 + (ch & 0x3FF);
 		cch = 2;
 	}
-
+#endif//WCHAR_SIZE
 	// Some languages, e.g., Thai and Vietnamese, require verifying the input
 	// sequence order before submitting it to the backing store.
 

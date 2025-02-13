@@ -35,43 +35,7 @@
 
 #define NOSHELLDEBUG			//disables asserts in shell.h
 
-// Build dependent conditional definitions
-#if defined(EBOOK_CE)
-
-#define NOACCESSIBILITY
-#define NOMAGELLAN
-#define NODROPFILES
-#define NOMETAFILES
-#define NOFONTSUBINFO
-#define NOFEPROCESSING
-#define NOPRIVATEMESSAGE
-#define NOCOMPLEXSCRIPTS
-#define NODELAYLOAD
-#define NOANSIWINDOWS
-//#define NOWINDOWHOSTS - need hosted window for text boxes
-#define NORIGHTTOLEFT
-#define NOAUTOFONT
-#define NOPLAINTEXT
-#define NOPALETTE
-#define NOLISTCOMBOBOXES
-#define NOFULLDEBUG
-#define THICKCARET
-#define LIMITEDMEMORY
-#define SLOWCPU
-#define NOREGISTERTYPELIB
-#define NODRAGDROP
-#define NOWORDBREAKPROC
-#define NORBUTTON
-#define NODRAFTMODE
-#define NOVERSIONINFO
-#define NOINKOBJECT
-#define W32INCLUDE "w32wince.cpp"
-#pragma warning (disable : 4702)
-#else // Normal build
-
 #define W32INCLUDE "w32win32.cpp"
-
-#endif
 
 #define WINVER 0x0500
 

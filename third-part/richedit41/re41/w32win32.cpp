@@ -61,20 +61,6 @@ public:
 };
 static CIMM32_PROC	g_IMM32Proc;
 
-class CIMESHARE_PROC
-{
-public:
-	void *FSupportSty;
-	void *PIMEStyleFromAttr;
-	void *PColorStyleTextFromIMEStyle;
-	void *PColorStyleBackFromIMEStyle;
-	void *FBoldIMEStyle;
-	void *FItalicIMEStyle;
-	void *FUlIMEStyle;
-	void *IdUlIMEStyle;
-	void *RGBFromIMEColorStyle;
-};
-static CIMESHARE_PROC	g_IMEShareProc;
 
 class COLEAUT32_PROC
 {
@@ -677,216 +663,6 @@ HKL CW32System::FindDirectionalKeyboard(
 
 
 #ifndef NOFEPROCESSING
-
-
-// Return the GUID for IME Display attributes
-UINT CW32System::GetDisplayGUID(
-	HIMC hIMC,
-	UINT uAttribute)
-{
-	if (_fLoadAIMM10 || !pAIMM || uAttribute <= ATTR_FIXEDCONVERTED)
-		return uAttribute;
-
-	DWORD dwGuidatom;
-
-	if (((IActiveIMMAppEx *)pAIMM)->GetGuidAtom(hIMC, (BYTE)uAttribute, &dwGuidatom) == S_OK)
-		uAttribute = dwGuidatom;
-
-   return uAttribute;
-}
-
-// return TRUE if we have IMEShare in system
-// else return FALSE
-
-typedef IMESHAREAPI BOOL (IMECDECL*FINIT_CAST)(void);
-typedef IMESHAREAPI CIMEShare *  (IMECDECL*FPIME_CAST)(void);
-BOOL CW32System::HaveIMEShare()
-{
-	// return if IMEShare has been loaded
-	if (_fHaveIMMEShare)
-		return TRUE;
-
-	if (hIMEShare == (HINSTANCE)INVALID_HANDLE_VALUE)
-		return FALSE;
-
-	EnterCriticalSection(&g_CriticalSection);
-
-	// load if it has not been loaded
-	hIMEShare = W32->LoadLibrary(L"imeshare.dll");
-
-	_fHaveIMMEShare = TRUE;
-	// load fail, setup INVALID_HANDLE_VALUE
-	if (hIMEShare == NULL)
-	{
-		hIMEShare = (HINSTANCE)INVALID_HANDLE_VALUE;
-		_fHaveIMMEShare = FALSE;
-	}
-	else
-	{
-		// get the new IMEshare object and init the DLL
-		void *pPIMEShareCreate;
-		pPIMEShareCreate = GetProcAddress( hIMEShare, "PIMEShareCreate" );
-
-		if (pPIMEShareCreate)
-		{
-			_pIMEShare = ( (FPIME_CAST)pPIMEShareCreate) ();
-			
-			if ( _pIMEShare == NULL )
-				_fHaveIMMEShare = FALSE;
-			else
-			{
-				// Setup underline styles that RE supports
-				for (int i = IMESTY_UL_MIN; i <= IMESTY_UL_MAX; i++)
-				{
-					if (i == 2004 || i == 2007 || i == 2008 ||
-						i == 2009 || i == 2010)			// Obsolete styles
-						continue;
-    
-					_pIMEShare->FSupportSty(i, i);
-				}
-			}
-		}
-		else
-		{
-			// This is old IMEShare, init it the old way
-			void *pInitFunc;
-			pInitFunc = GetProcAddress( hIMEShare, "FInitIMEShare" );
-			if (pInitFunc)
-			{
-				_fHaveIMMEShare = ( (FINIT_CAST)pInitFunc)();
-			}
-			else
-				// init failed, forget it
-				_fHaveIMMEShare = FALSE;
-		}
-
-		if (_fHaveIMMEShare == FALSE)
-		{
-			// Init failed, forget it
-			FreeLibrary(hIMEShare);
-			hIMEShare = (HINSTANCE)INVALID_HANDLE_VALUE;
-		}
-	}
-	
-	LeaveCriticalSection(&g_CriticalSection);
-
-	return _fHaveIMMEShare;
-}
-
-BOOL CW32System::getIMEShareObject(CIMEShare **ppIMEShare)
-{
-	*ppIMEShare = _pIMEShare;
-
-	return (_pIMEShare != NULL);
-}
-
-HRESULT CW32System::AIMMDefWndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam, LRESULT *plres)
-{
-	if (pAIMM != NULL && pAIMM != (IActiveIMMApp *)INVALID_HANDLE_VALUE)
-	{
-		HRESULT hResult;
-		LRESULT	localLRes;
-
-		hResult = pAIMM->OnDefWindowProc(hWnd, msg, wparam, lparam, &localLRes);
-
-		if (hResult == S_OK)
-		{
-			*plres = localLRes;
-			return S_OK;
-		}
-	}
-	return S_FALSE;
-}
-
-HRESULT CW32System::AIMMGetCodePage(HKL hKL, UINT *uCodePage)
-{
-	if (pAIMM != NULL && pAIMM != (IActiveIMMApp *)INVALID_HANDLE_VALUE)
-	{
-		HRESULT hResult;
-		hResult = pAIMM->GetCodePageA(hKL, uCodePage);
-
-		if (SUCCEEDED(hResult))
-			return S_OK;
-	}
-	return S_FALSE;
-}
-
-HRESULT CW32System::AIMMActivate(BOOL fRestoreLayout)
-{
-	if (pAIMM != NULL && pAIMM != (IActiveIMMApp *)INVALID_HANDLE_VALUE)
-	{
-		HRESULT hResult;
-		hResult = pAIMM->Activate(fRestoreLayout);
-
-		if (SUCCEEDED(hResult))
-			return S_OK;
-	}
-	return S_FALSE;
-}
-
-HRESULT CW32System::AIMMDeactivate(void)
-{
-	if (pAIMM != NULL && pAIMM != (IActiveIMMApp *)INVALID_HANDLE_VALUE)
-	{
-		HRESULT hResult;
-		hResult = pAIMM->Deactivate();
-
-		if (SUCCEEDED(hResult))
-			return S_OK;
-	}
-	return S_FALSE;
-}
-
-HRESULT CW32System::AIMMFilterClientWindows(ATOM *aaClassList, UINT uSize, HWND hWnd)
-{
-	if (pAIMM != NULL && pAIMM != (IActiveIMMApp *)INVALID_HANDLE_VALUE)
-	{
-		HRESULT hResult;
-		IActiveIMMAppEx *pAIMMEx = (IActiveIMMAppEx *) NULL;
-		hResult = pAIMM->QueryInterface(IID_IActiveIMMAppEx, (LPVOID *)&pAIMMEx);
-
-		if (pAIMMEx)
-		{
-			hResult = pAIMMEx->FilterClientWindowsEx(hWnd, FALSE);
-			pAIMMEx->Release();
-
-			if (SUCCEEDED(hResult))
-				return S_OK;
-
-			Assert(FALSE);
-		}
-
-		hResult = pAIMM->FilterClientWindows(aaClassList, uSize);
-
-		if (SUCCEEDED(hResult))
-			return S_OK;
-	}
-	return S_FALSE;
-}
-
-HRESULT CW32System::AIMMUnfilterClientWindows(HWND hWnd)
-{
-	if (pAIMM != NULL && pAIMM != (IActiveIMMApp *)INVALID_HANDLE_VALUE)
-	{
-		HRESULT hResult;
-		IActiveIMMAppEx *pAIMMEx = (IActiveIMMAppEx *) NULL;
-		hResult = pAIMM->QueryInterface(IID_IActiveIMMAppEx, (LPVOID *)&pAIMMEx);
-
-		if (pAIMMEx)
-		{
-			hResult = pAIMMEx->UnfilterClientWindowsEx(hWnd);
-			pAIMMEx->Release();
-
-			if (SUCCEEDED(hResult))
-				return S_OK;
-		}
-	}
-	return S_FALSE;
-}
-
-
-
-
 BOOL CW32System::ImmInitialize( void )
 {
 	// MAC Only function.
@@ -989,82 +765,6 @@ VOID CW32System::NotifyWinEvent(DWORD dwEvent, HWND hWnd, LONG lObjectType, LONG
 
 #endif
 
-#ifndef NOFEPROCESSING
-
-
-
-typedef IMESHAREAPI BOOL (*FSS_CAST)(UINT, UINT);
-BOOL CW32System::FSupportSty ( UINT uSty, UINT uStyAltered)
-{
-	if (g_IMEShareProc.FSupportSty == NULL)
-		SetIMEProcAddr( g_IMEShareProc.FSupportSty, DLL_IMESHARE, "FSupportSty" );
-	return ((FSS_CAST)g_IMEShareProc.FSupportSty)(uSty, uStyAltered);
-}
-
-typedef IMESHAREAPI const IMESTYLE * (IMECDECL*PISFA_CAST)(const UINT);
-const IMESTYLE * CW32System::PIMEStyleFromAttr ( const UINT uAttr)
-{
-	if (g_IMEShareProc.PIMEStyleFromAttr == NULL)
-		SetIMEProcAddr( g_IMEShareProc.PIMEStyleFromAttr, DLL_IMESHARE, "PIMEStyleFromAttr" );
-	return ((PISFA_CAST)g_IMEShareProc.PIMEStyleFromAttr)( uAttr );
-}
-
-typedef IMESHAREAPI const IMECOLORSTY * (IMECDECL*PCSTFIS_CAST)(const IMESTYLE *);
-const IMECOLORSTY * CW32System::PColorStyleTextFromIMEStyle ( const IMESTYLE * pIMEStyle)
-{
-	if (g_IMEShareProc.PColorStyleTextFromIMEStyle == NULL)
-		SetIMEProcAddr( g_IMEShareProc.PColorStyleTextFromIMEStyle, DLL_IMESHARE, "PColorStyleTextFromIMEStyle" );
-	return ((PCSTFIS_CAST)g_IMEShareProc.PColorStyleTextFromIMEStyle)( pIMEStyle );
-}
-
-typedef IMESHAREAPI const IMECOLORSTY * (IMECDECL*PCSBFIS_CAST)(const IMESTYLE *);
-const IMECOLORSTY * CW32System::PColorStyleBackFromIMEStyle ( const IMESTYLE * pIMEStyle)
-{
-	if (g_IMEShareProc.PColorStyleBackFromIMEStyle == NULL)
-		SetIMEProcAddr( g_IMEShareProc.PColorStyleBackFromIMEStyle, DLL_IMESHARE, "PColorStyleBackFromIMEStyle" );
-	return ((PCSBFIS_CAST)g_IMEShareProc.PColorStyleBackFromIMEStyle)( pIMEStyle );
-}
-
-typedef IMESHAREAPI BOOL (IMECDECL*FBIS_CAST)(const IMESTYLE *);
-BOOL CW32System::FBoldIMEStyle ( const IMESTYLE * pIMEStyle)
-{
-	if (g_IMEShareProc.FBoldIMEStyle == NULL)
-		SetIMEProcAddr( g_IMEShareProc.FBoldIMEStyle, DLL_IMESHARE, "FBoldIMEStyle" );
-	return ((FBIS_CAST)g_IMEShareProc.FBoldIMEStyle)( pIMEStyle );
-}
-
-typedef IMESHAREAPI BOOL (IMECDECL*FIIS_CAST)(const IMESTYLE * );
-BOOL CW32System::FItalicIMEStyle ( const IMESTYLE * pIMEStyle)
-{
-	if (g_IMEShareProc.FItalicIMEStyle == NULL)
-		SetIMEProcAddr( g_IMEShareProc.FItalicIMEStyle, DLL_IMESHARE, "FItalicIMEStyle" );
-	return ((FIIS_CAST)g_IMEShareProc.FItalicIMEStyle)( pIMEStyle );
-}
-
-typedef IMESHAREAPI BOOL (IMECDECL*FUIS_CAST)(const IMESTYLE *);
-BOOL CW32System::FUlIMEStyle ( const IMESTYLE * pIMEStyle)
-{
-	if (g_IMEShareProc.FUlIMEStyle == NULL)
-		SetIMEProcAddr( g_IMEShareProc.FUlIMEStyle, DLL_IMESHARE, "FUlIMEStyle" );
-	return ((FUIS_CAST)g_IMEShareProc.FUlIMEStyle)( pIMEStyle );
-}
-
-typedef IMESHAREAPI UINT (IMECDECL*IUIS_CAST)(const IMESTYLE *);
-UINT CW32System::IdUlIMEStyle ( const IMESTYLE * pIMEStyle)
-{
-	if (g_IMEShareProc.IdUlIMEStyle == NULL)
-		SetIMEProcAddr( g_IMEShareProc.IdUlIMEStyle, DLL_IMESHARE, "IdUlIMEStyle" );
-	return ((IUIS_CAST)g_IMEShareProc.IdUlIMEStyle)( pIMEStyle );
-}
-
-typedef IMESHAREAPI COLORREF (IMECDECL*RFICS_CAST)(const IMECOLORSTY *);
-COLORREF CW32System::RGBFromIMEColorStyle ( const IMECOLORSTY * pColorStyle )
-{
-	if (g_IMEShareProc.RGBFromIMEColorStyle == NULL)
-		SetIMEProcAddr( g_IMEShareProc.RGBFromIMEColorStyle, DLL_IMESHARE, "RGBFromIMEColorStyle" );
-	return ((RFICS_CAST)g_IMEShareProc.RGBFromIMEColorStyle)( pColorStyle );
-}
-#endif	// NOFEPROCESSING
 
 CONVERTMODE WINAPI CW32System::DetermineConvertMode( HDC hdc, BYTE tmCharSet )
 {
@@ -4315,24 +4015,10 @@ bool CW32System::IsFontAvail(
 	return retCode;
 }
 
-
-
 void CW32System::FreeIME()
 {
 }
 
-
-// return TRUE if we load AIMM
-BOOL CW32System::LoadAIMM(BOOL fUseAimm12)
-{
-	return TRUE;
-}
-
-// Return the Aimm object and AddRef()
-BOOL CW32System::GetAimmObject(IUnknown **ppAimm)
-{
-	return FALSE;
-}
 
 typedef BOOL (WINAPI*III_CAST)(HKL);
 BOOL CW32System::ImmIsIME (
@@ -4405,7 +4091,7 @@ UINT CW32System::ImmGetVirtualKey (
 
 // NOTE: We only use ImmEscape for IME_ESC_HANJA_MODE.
 // Need to fix up if other methods are used.
-HIMC CW32System::ImmEscape ( 
+LRESULT CW32System::ImmEscape ( 
 							HKL hKL, 
 							HIMC hIMC, 
 							UINT uEscape, 

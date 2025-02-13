@@ -467,12 +467,6 @@ public :
 	static BYTE			_fLRMorRLM;
 
 	// Misc flags used for FE
-#ifndef NOFEPROCESSING
-	static BYTE			_fHaveIMMProcs;
-	static BYTE			_fHaveAIMM;
-	static BYTE			_fHaveIMMEShare;
-	static BYTE			_fLoadAIMM10;
-#endif	// NOFEPROCESSING
 	static	CTmpDisplayAttrArray *_arTmpDisplayAttrib;
 
 	CW32System();
@@ -693,7 +687,7 @@ public :
 	static BOOL ImmNotifyIME ( HIMC, DWORD, DWORD, DWORD, BOOL );
 	static HIMC ImmAssociateContext ( HWND, HIMC, BOOL );
 	static UINT ImmGetVirtualKey ( HWND, BOOL );
-	static HIMC ImmEscape ( HKL, HIMC, UINT, PVOID, BOOL );
+	static LRESULT ImmEscape ( HKL, HIMC, UINT, PVOID, BOOL );
 	static BOOL ImmGetOpenStatus ( HIMC, BOOL );
 	static BOOL ImmSetOpenStatus ( HIMC, BOOL, BOOL );
 	static BOOL ImmGetConversionStatus ( HIMC, LPDWORD, LPDWORD, BOOL );
@@ -701,15 +695,6 @@ public :
 	static HWND ImmGetDefaultIMEWnd ( HWND , BOOL);
 	static BOOL ImmSetCompositionStringW (HIMC, DWORD, PVOID, DWORD, PVOID, DWORD, BOOL);
 	static BOOL ImmIsIME ( HKL, BOOL );
-	static BOOL FSupportSty ( UINT, UINT );
-	static const IMESTYLE * PIMEStyleFromAttr ( const UINT );
-	static const IMECOLORSTY * PColorStyleTextFromIMEStyle ( const IMESTYLE * );
-	static const IMECOLORSTY * PColorStyleBackFromIMEStyle ( const IMESTYLE * );
-	static BOOL FBoldIMEStyle ( const IMESTYLE * );
-	static BOOL FItalicIMEStyle ( const IMESTYLE * );
-	static BOOL FUlIMEStyle ( const IMESTYLE * );
-	static UINT IdUlIMEStyle ( const IMESTYLE * );
-	static COLORREF RGBFromIMEColorStyle ( const IMECOLORSTY * );
 //#endif	// NOFEPROCESSING
 
 	// ----------------------------------
@@ -861,20 +846,6 @@ public :
 	static void FreeOle();
 
 	static void FreeIME();
-	static BOOL LoadAIMM(BOOL fUseAimm12);
-	static BOOL GetAimmObject(IUnknown **ppAimm);
-#ifndef NOFEPROCESSING
-	static BOOL HaveIMEShare();
-	static BOOL getIMEShareObject(CIMEShare **ppIMEShare);	
-	static BOOL IsAIMMLoaded() { return _fHaveAIMM; }
-	static HRESULT AIMMDefWndProc(HWND hWnd, UINT msg, WPARAM wparam, LPARAM lparam, LRESULT *plres);
-	static HRESULT AIMMGetCodePage (HKL hKL, UINT *uCodePage);
-	static HRESULT AIMMActivate (BOOL fRestoreLayout);
-	static HRESULT AIMMDeactivate (void);
-	static HRESULT AIMMFilterClientWindows(ATOM *aaClassList, UINT uSize, HWND hWnd);
-	static HRESULT AIMMUnfilterClientWindows(HWND hWnd);
-	static UINT GetDisplayGUID (HIMC hIMC, UINT uAttribute);
-#endif	// NOFEPROCESSING
 	
 	int __cdecl sprintf(char * buff, const char *fmt, ...);
 
@@ -1359,18 +1330,6 @@ extern CW32System *W32;
 #define ReleaseStgMedium			W32->ReleaseStgMedium
 #define CoCreateInstance			W32->CoCreateInstance
 
-#ifndef NOFEPROCESSING
-#define FSupportSty					W32->FSupportSty
-#define PIMEStyleFromAttr			W32->PIMEStyleFromAttr
-#define PColorStyleTextFromIMEStyle W32->PColorStyleTextFromIMEStyle
-#define PColorStyleBackFromIMEStyle W32->PColorStyleBackFromIMEStyle
-#define FBoldIMEStyle				W32->FBoldIMEStyle
-#define FItalicIMEStyle				W32->FItalicIMEStyle
-#define FUlIMEStyle					W32->FUlIMEStyle
-#define IdUlIMEStyle				W32->IdUlIMEStyle
-#define RGBFromIMEColorStyle		W32->RGBFromIMEColorStyle
-#endif	// NOFEPROCESSING
-
 #define icr3DDarkShadow				W32->_icr3DDarkShadow
 #define MSIMEMouseMsg				W32->_MSIMEMouseMsg				
 #define MSIMEReconvertMsg			W32->_MSIMEReconvertMsg		
@@ -1429,6 +1388,7 @@ extern CW32System *W32;
 #define VerifyFEString				W32->VerifyFEString		
 #define	GetKerningPairs				W32->GetKerningPairs
 
+#define fHaveAIMM                   W32->_fHaveAIMM
 #define CharLower					W32->CharLower
 #define CharLowerBuff				W32->CharLowerBuff
 #define CharUpperBuff				W32->CharUpperBuff
@@ -1475,15 +1435,6 @@ extern CW32System *W32;
 #define PtInRect					W32->PtInRect
 #define IntersectRect				W32->IntersectRect
 
-// AIMM wrapper
-#define IsAIMMLoaded				W32->IsAIMMLoaded
-#define LoadAIMM					W32->LoadAIMM
-#define CallAIMMDefaultWndProc		W32->AIMMDefWndProc
-#define GetAIMMKeyboardCP			W32->AIMMGetCodePage
-#define ActivateAIMM				W32->AIMMActivate
-#define DeactivateAIMM				W32->AIMMDeactivate
-#define FilterClientWindowsAIMM		W32->AIMMFilterClientWindows
-#define UnfilterClientWindowsAIMM	W32->AIMMUnfilterClientWindows
 #define sprintf						W32->sprintf
 
 #ifdef DEBUG

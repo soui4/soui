@@ -295,11 +295,14 @@ public:
 		}
 	}
 
-    BOOL CreateImgDecoder(IObjRef ** ppObj)
+    BOOL CreateImgDecoder(IObjRef ** ppObj,LPCTSTR pszImgDecoder=NULL)
     {
-        return imgDecLoader.CreateInstance(m_strDllPath+m_strImgDecoder,ppObj);
+        if (pszImgDecoder)
+            return imgDecLoader.CreateInstance(m_strDllPath + pszImgDecoder, ppObj);
+        else
+            return imgDecLoader.CreateInstance(m_strDllPath + m_strImgDecoder, ppObj);
     }
-    
+
     BOOL CreateRender_GDI(IObjRef **ppObj)
     {
         return renderLoader.CreateInstance(m_strDllPath+COM_RENDER_GDI,ppObj);

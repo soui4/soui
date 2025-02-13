@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <skin>
 	<!--全局skin对象-->
-	<imglist name="skin_switch" src="imgx:png_switch" states="8"/>
+	<imglist name="skin_switch" src="imgx:png_switch" states="8" checkAsPushdown="0"/>
 	<imglist name="skin_switch_bg" src="imgx:png_switch_bg" states="1"/>
 	<imglist name="skin_knob" src="imgx:png_knob" states="2">
 		<states>

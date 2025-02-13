@@ -53,7 +53,7 @@ class SOUI_EXP SNativeWndHelper {
 };
 
 struct tagThunk;
-class SOUI_EXP SNativeWnd : public INativeWnd {
+class SOUI_EXP SNativeWnd : public TObjRefImpl<INativeWnd> {
   public:
     SNativeWnd();
     virtual ~SNativeWnd(void);
@@ -164,6 +164,9 @@ class SOUI_EXP SNativeWnd : public INativeWnd {
     STDMETHOD_(BOOL, PostMessage)
     (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
 
+    STDMETHOD_(BOOL, SendNotifyMessage)
+    (THIS_ UINT message, WPARAM wParam DEF_VAL(0), LPARAM lParam DEF_VAL(0)) OVERRIDE;
+
     STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) OVERRIDE;
 
     STDMETHOD_(int, GetWindowText)(THIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST OVERRIDE;
@@ -185,8 +188,6 @@ class SOUI_EXP SNativeWnd : public INativeWnd {
 
     STDMETHOD_(BOOL, SetLayeredWindowAttributes)
     (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) OVERRIDE;
-
-    STDMETHOD_(BOOL, SetLayeredWindowAlpha)(THIS_ BYTE byAlpha) OVERRIDE;
 
     STDMETHOD_(BOOL, UpdateLayeredWindow)
     (THIS_ HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags) OVERRIDE;

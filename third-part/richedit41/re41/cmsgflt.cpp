@@ -22,15 +22,13 @@
 #endif	
 
 #include "_array.h"
-#include "msctf.h"
-#include "textstor.h"
-#include "msctfp.h"
+//#include "textstor.h"
+//#include "msctfp.h"
 
 #include "textserv.h"
 #include "_cmsgflt.h"
 #include "_ime.h"
 
-#include "_cuim.h"
 #include "imeapp.h"
 
 
@@ -49,6 +47,11 @@ void CreateIMEMessageFilter(ITextMsgFilter **ppMsgFilter)
 	*ppMsgFilter = pNewFilter ? pNewFilter : NULL;
 }
 
+CTextMsgFilter::CTextMsgFilter()
+{
+    int offset = FIELD_OFFSET(CTextMsgFilter, _ime);
+    memset((char *)this + offset, 0, sizeof(CTextMsgFilter) - offset);
+} 
 /*
  *	void CTextMsgFilter::~CTextMsgFilter
  *
@@ -70,17 +73,16 @@ CTextMsgFilter::~CTextMsgFilter ()
 	if (_hIMCContext)
 		ImmAssociateContext(_hwnd, _hIMCContext, _fUsingAIMM);	// Restore IME before exit
 
+	#ifndef NOPRIVATEMESSAGE
 	if (_pMsgCallBack)
 	{		
 		delete _pMsgCallBack;
 		_pMsgCallBack = NULL;
 	}
+	#endif//NOPRIVATEMESSAGE
 
 	// Release various objects
-	TurnOffUIM(FALSE);
 	
-	TurnOffAimm(FALSE);
-
 	if (_pFilter)
 		_pFilter->Release();
 	
@@ -182,43 +184,40 @@ STDMETHODIMP_(HRESULT) CTextMsgFilter::AttachDocument( HWND hwnd, ITextDocument2
 {
 	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::AttachDocument");
 
-	// Cache the values for possible later use.
-	// The TextDocument interface pointer is not AddRefed because it is a back pointer
-	// and the lifetime of message filters is assumed to be nested inside text documents	
-	_hwnd = hwnd;
-	_pTextDoc = pTextDoc;
-	_pTextService = (ITextServices *)punk;
+    // Cache the values for possible later use.
+    // The TextDocument interface pointer is not AddRefed because it is a back pointer
+    // and the lifetime of message filters is assumed to be nested inside text documents
+    _hwnd = hwnd;
+    _pTextDoc = pTextDoc;
 
-	// Don't get selection until it is needed
-	_pTextSel = NULL;
+    // Don't get selection until it is needed
+    _pTextSel = NULL;
 
-	_fUnicodeWindow = 0;	
-	if (hwnd)
-		_fUnicodeWindow = IsWindowUnicode(hwnd);
+    _fUnicodeWindow = 0;
+    if (hwnd)
+        _fUnicodeWindow = IsWindowUnicode(hwnd);
 
-	_fUsingAIMM = 0; 
+    _fUsingAIMM = 0;
 
-	_pTim = NULL;
-	_pCUIM = NULL;	
-	_fUsingUIM = 0;
+    _fUsingUIM = 0;
 
-	// Check if current keyboard is MSIME98 or later.
-	CheckIMEType(NULL);
+    // Check if current keyboard is MSIME98 or later.
+    CheckIMEType(NULL);
 
-	// Initialize some member data
-	_fHangulToHanja = FALSE;
-	_fIMECancelComplete = FALSE;	
-	_fIMEAlwaysNotify = FALSE;
-	_hIMCContext = NULL;
-	_pcrComp = NULL;
-	_pMsgCallBack = NULL;
+    // Initialize some member data
+    _fHangulToHanja = FALSE;
+    _fIMECancelComplete = FALSE;
+    _fIMEAlwaysNotify = FALSE;
+    _hIMCContext = NULL;
+    _pcrComp = NULL;
+    _pMsgCallBack = NULL;
 
-	_pTextDoc->GetFEFlags(&_lFEFlags);
-	_fRE10Mode = (_lFEFlags & tomRE10Mode);
+    _pTextDoc->GetFEFlags(&_lFEFlags);
+    _fRE10Mode = (_lFEFlags & tomRE10Mode);
 
-	_uSystemCodePage = GetACP();
+    _uSystemCodePage = GetACP();
 
-	return NOERROR;
+    return NOERROR;
 }
 
 /*
@@ -251,7 +250,7 @@ STDMETHODIMP_(HRESULT) CTextMsgFilter::HandleMessage(
 	if (hr == S_OK)
 		return hr;
 
- 	if (IsIMEComposition() || _pCUIM && _pCUIM->IsUIMTyping())
+ 	if (IsIMEComposition())
 	{
 		// During IME Composition, there are some messages we should
 		// not handle.  Also, there are other messages we need to handle by
@@ -394,14 +393,6 @@ STDMETHODIMP_(HRESULT) CTextMsgFilter::HandleMessage(
 						goto Exit;
 					}
 
-					// Cicero composition
-					if (_pCUIM->_fMosueSink)
-					{
-						bReleaseSelction = GetTxSelection();
-						if (_pTextSel)
-							hr = _pCUIM->MouseCheck(pmsg, pwparam, plparam, plres);
-						goto Exit;
-					}
 					if (IN_RANGE(WM_LBUTTONDOWN, *pmsg, WM_MOUSELAST) && !(*pmsg == WM_LBUTTONUP || *pmsg == WM_RBUTTONUP || *pmsg == WM_MBUTTONUP))
 						CompleteUIMTyping(CIme::TERMINATE_NORMAL);		// Terminate on Mouse down and double-click messages
 				}
@@ -461,10 +452,7 @@ STDMETHODIMP_(HRESULT) CTextMsgFilter::HandleMessage(
 			if (_hwnd && IsIMEComposition() && _ime->IgnoreIMECharMsg())
 			{
 				_ime->AcceptIMECharMsg();
-				if (fHaveAIMM)
-					hr = CallAIMMDefaultWndProc(_hwnd, *pmsg, *pwparam, *plparam, plres);
-				else
-					*plres = ::DefWindowProc(_hwnd, *pmsg, *pwparam, *plparam);				
+				*plres = ::DefWindowProc(_hwnd, *pmsg, *pwparam, *plparam);				
 
 				hr = S_OK;
 			}
@@ -565,28 +553,6 @@ STDMETHODIMP_(HRESULT) CTextMsgFilter::HandleMessage(
 			break;
 
 		case EM_RECONVERSION:
-			hResult = _pTextDoc->GetFEFlags(&_lFEFlags);
-			if (!(_lFEFlags & (ES_SELFIME | ES_NOIME)))
-			{
-				// Application initiates reconversion
-				bReleaseSelction = GetTxSelection();
-				if (_pTextSel)
-				{
-					if (!(IsIMEComposition() || _pCUIM && _pCUIM->IsUIMTyping()))
-					{
-						if (_pCUIM && _pCUIM->Reconverse() >= 0)
-							break;
-
-						if (_fMSIME && MSIMEReconvertRequestMsg)
-							IMEMessage( *this, MSIMEReconvertRequestMsg, 0, (LPARAM)_hwnd, TRUE );				
-						else
-						{
-							hr = OnIMEReconvert(pmsg, pwparam, plparam, plres, TRUE);							
-							*plres = 0;
-						}
-					}
-				}
-			}
 			hr = S_OK;
 			break;
 
@@ -609,85 +575,17 @@ STDMETHODIMP_(HRESULT) CTextMsgFilter::HandleMessage(
 
 		case EM_GETIMECOMPMODE:
 			// Get current IME level
-			if (_pCUIM && _pCUIM->IsUIMTyping())
-				*plres = ICM_CTF;
-			else
-				*plres = OnGetIMECompositionMode( *this );
-			hr = S_OK;
+            *plres = OnGetIMECompositionMode(*this);
+            hr = S_OK;
 			break;
 		
-		case EM_SETUIM:
-			// This is RE private message equivalent to EM_SETEDITSTYLE
-			if (!_fNoIme)							// Ignore if no IME
-			{
-				if (!_fUsingUIM && !_fUsingAIMM)	// Ignore if we already using something
-				{
-					if (*pwparam == SES_USEAIMM11 || *pwparam == SES_USEAIMM12)
-					{
-						if (!_fTurnOffAIMM)
-						StartAimm(*pwparam == SES_USEAIMM12);
-					}
-					else if (!_fTurnOffUIM)			// Client doesn't want UIM?
-						StartUIM();
-				}
-			}
-						
-			hr = S_OK;
-			break;
 
 		case EM_SETEDITSTYLE:
-			if (*plparam & SES_USECTF)
-			{
-				if ((*pwparam & SES_USECTF))
-				{
-					if (!_fRE10Mode)
-					{
-						if (_fUsingAIMM)
-							TurnOffAimm(TRUE);						
-						
-						// Turn on Cicero
-						if (!_fUsingUIM)
-							StartUIM();
-
-						goto SKIP_AIMM;
-					}
-				}
-				else
-				{
-					// Turn off Cicero
-					_fTurnOffUIM = 1;					// Flag to ignore in EM_SETUIM
-					if (_fUsingUIM)
-						TurnOffUIM(TRUE);
-				}
-			}
-
-			if ((*pwparam & SES_USEAIMM) && ((*plparam & SES_USEAIMM) || *plparam == 0))
-			{
-				if (_fUsingUIM)
-						TurnOffUIM(TRUE);
-					
-				if (!_fUsingAIMM)
-				{
-					hResult = _pTextDoc->GetFEFlags(&_lFEFlags);
-					if (!(_lFEFlags & ES_NOIME))		// No IME style on?
-						StartAimm(TRUE);
-				}
-			}
-			else if ((*plparam & SES_USEAIMM))
-			{
-				_fTurnOffAIMM = 1;					// Flag to ignore in EM_SETUIM
-				TurnOffAimm(TRUE);
-			}
-
-SKIP_AIMM:
 			if ((*plparam == 0 || *plparam & SES_NOIME) && _hwnd)
 			{
 				if (*pwparam & SES_NOIME)
 				{
 					_fNoIme = 1;
-					TurnOffUIM(TRUE);
-					TurnOffAimm(TRUE);
-
 					if (!_hIMCContext)
 						_hIMCContext = ImmAssociateContext(_hwnd, NULL, _fUsingAIMM);	// turn off IME									
 				}
@@ -703,8 +601,6 @@ SKIP_AIMM:
 			if (*plparam & SES_CTFALLOWEMBED)
 				_fAllowEmbedded = (*pwparam & SES_CTFALLOWEMBED) ? 1 : 0;
 
-			if (*plparam & (SES_CTFALLOWSMARTTAG | SES_CTFALLOWPROOFING))
-				HandleCTFService(*pwparam, *plparam);
 
 			// remove settings that are handled.
 			*pwparam &= ~(SES_NOIME | SES_USEAIMM | SES_USECTF | SES_CTFALLOWEMBED | SES_CTFALLOWSMARTTAG | SES_CTFALLOWPROOFING);
@@ -766,22 +662,6 @@ SKIP_AIMM:
 			hr = S_OK;
 			break;
 
-		case EM_SETCTFMODEBIAS:
-			OnSetUIMMode(*pwparam);
-				// following thru to return EM_GETCTFMODEBIAS
-		case EM_GETCTFMODEBIAS:
-			*plres = OnGetUIMMode();
-			hr = S_OK;
-			break;
-
-		case EM_SETCTFOPENSTATUS:
-		case EM_GETCTFOPENSTATUS:
-			*plres = 0;
-			if (_pCUIM)
-				*plres = _pCUIM->CTFOpenStatus(*pmsg == EM_GETCTFOPENSTATUS, *pwparam != 0);
-			hr = S_OK;
-			break;
-
 		case EM_ISIME:
 			*plres = CheckIMEType(NULL, 0);
 			hr = S_OK;
@@ -799,24 +679,10 @@ SKIP_AIMM:
 
 		case WM_SIZE:
 		case WM_MOVE:
+#ifndef NOPRIVATEMESSAGE
 			if (_pMsgCallBack)
 				_pMsgCallBack->NotifyEvents(NE_LAYOUTCHANGE);
-			break;
-
-		case EM_GETOLEINTERFACE:
-			if(*plparam && *pwparam == 0x0435446)		// 'CTF'
-			{
-				if (_pCUIM && _pCUIM->GetITfContext())
-				{
-					*(ITfContext **)(*plparam) = _pCUIM->GetITfContext();
-					_pCUIM->GetITfContext()->AddRef();
-				}
-				else
-					*(IUnknown **)(*plparam) = 0;
-				
-				*plres = TRUE;
-				hr = S_OK;
-			}
+#endif//NOPRIVATEMESSAGE
 			break;
 
 		default:
@@ -826,27 +692,14 @@ SKIP_AIMM:
 				if (*pmsg == MSIMEReconvertMsg || *pmsg == MSIMEDocFeedMsg
 					|| *pmsg == MSIMEQueryPositionMsg)
 				{
-					hResult = _pTextDoc->GetFEFlags(&_lFEFlags);
 					if (!(_lFEFlags & (ES_SELFIME | ES_NOIME)))
 					{
 						bReleaseSelction = GetTxSelection();
-						if (_pTextSel)
-						{
-							if (*pmsg == MSIMEQueryPositionMsg)
-								hr = OnIMEQueryPos(pmsg, pwparam, plparam, plres, TRUE);
-							else
-								hr = OnIMEReconvert(pmsg, pwparam, plparam, plres, TRUE);
-						}
-					}
-				}
-
-				if (_pCUIM && _pCUIM->_fMosueSink && 
-					(IN_RANGE(WM_MOUSEFIRST, *pmsg, WM_MBUTTONDBLCLK) || *pmsg == WM_SETCURSOR))
-				{
-					bReleaseSelction = GetTxSelection();
-
-					if (_pTextSel)
-						hr = _pCUIM->MouseCheck(pmsg, pwparam, plparam, plres);
+                        if (*pmsg == MSIMEQueryPositionMsg)
+                            hr = OnIMEQueryPos(pmsg, pwparam, plparam, plres, TRUE);
+                        else
+                            hr = OnIMEReconvert(pmsg, pwparam, plparam, plres, TRUE);
+                    }
 				}
 			}
 			break;
@@ -951,37 +804,6 @@ HRESULT CTextMsgFilter::OnWMIMEChar(
 		LRESULT *	plres)
 {
 	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::OnWMIMEChar");
-
-	TCHAR	unicodeConvert;
-	BYTE	bytes[2];
-
-	// We may receive IMECHAR even if we have handled the composition char already.
-	// This is the case when the host does not call the DefWinProc with the composition
-	// bit masked off.  So, we need to ignore this message to avoid double entry.
-	if (IsIMEComposition() && _ime->IgnoreIMECharMsg())
-	{
-		_ime->SkipIMECharMsg();		// Skip this ime char msg
-		return S_OK;	
-	}
-
-	if (_fUnicodeWindow && !W32->OnWin9x())
-		return S_FALSE;
-
-	bytes[0] = *pwparam >> 8;		// Interchange DBCS bytes in endian
-	bytes[1] = *pwparam;			// independent fashion (use byte array)
-	
-	// need to convert both single-byte KANA and DBC
-	if (!bytes[0] || GetTrailBytesCount(bytes[0], _uKeyBoardCodePage))
-	{
-		if( UnicodeFromMbcs((LPWSTR)&unicodeConvert, 1, 
-			bytes[0] == 0 ? (LPCSTR)&bytes[1] : (LPCSTR)bytes,
-			bytes[0] == 0 ? 1 : 2,
-			_uKeyBoardCodePage) == 1 )
-			*pwparam = unicodeConvert;
-
-		return InputFEChar(*pwparam);
-	}
-
 	return S_FALSE;
 }
 
@@ -1020,7 +842,7 @@ HRESULT CTextMsgFilter::OnIMEReconvert(
 
 	// NT doesn't support Ansi window when the CP_ACP isn't the same
 	// as keyboard codepage.
-	if (!fUnicode && !(W32->OnWin9x()) && _uKeyBoardCodePage != _uSystemCodePage)
+	if (!fUnicode && _uKeyBoardCodePage != _uSystemCodePage)
 		return S_OK;
 
 	bDocumentFeed = (MSIMEDocFeedMsg && *pmsg == MSIMEDocFeedMsg)
@@ -1314,7 +1136,7 @@ BOOL  CTextMsgFilter::CheckIMEChange(
 
 	if (fUnicode)
 	{
-		cpImeSelectStart = _cpReconvertStart + lpRCS->dwCompStrOffset / 2;
+		cpImeSelectStart = _cpReconvertStart + lpRCS->dwCompStrOffset / sizeof(WCHAR);
 		cpImeSelectEnd = cpImeSelectStart + lpRCS->dwCompStrLen;
 	}
 	else
@@ -1447,7 +1269,7 @@ HRESULT CTextMsgFilter::OnIMEQueryPos(
 
 	// NT doesn't support Ansi window when the CP_ACP isn't the same
 	// as keyboard codepage.
-	if (!fUnicode && !(W32->OnWin9x()) && _uKeyBoardCodePage != _uSystemCodePage)
+	if (!fUnicode && _uKeyBoardCodePage != _uSystemCodePage)
 		goto Exit;
 
 	if (IsIMEComposition() && _ime->GetIMELevel() == IME_LEVEL_3)
@@ -1742,11 +1564,7 @@ void CTextMsgFilter::OnSetFocus()
 {
 	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::OnSetFocus");
 
-	if (_fUsingUIM && _pCUIM)
-	{
-		_pCUIM->OnSetFocus();
-	}
-	else if (_fForceRemember && _fIMEHKL)
+	if (_fForceRemember && _fIMEHKL)
 	{
 		// Restore previous keyboard
 		ActivateKeyboardLayout(_fIMEHKL, 0);
@@ -1781,10 +1599,6 @@ void CTextMsgFilter::OnSetFocus()
 void CTextMsgFilter::OnKillFocus()
 {
 	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::OnKillFocus");
-
-	// Windowless mode, need to inform Cicero
-	if (!_hwnd && _fUsingUIM && _pCUIM)
-		_pCUIM->OnSetFocus(FALSE);
 
 	if (_fForceRemember)
 	{
@@ -1991,8 +1805,10 @@ void CTextMsgFilter::OnSetIMEMode(
 		fNotifyUIM = TRUE;
 	}
 
+	#ifndef NOPRIVATEMESSAGE
 	if (fNotifyUIM && _pMsgCallBack)
 		_pMsgCallBack->NotifyEvents(NE_MODEBIASCHANGE);
+	#endif//NOPRIVATEMESSAGE
 }
 
 /*
@@ -2117,8 +1933,7 @@ BOOL CTextMsgFilter::MouseOperation(
 	WPARAM			*pwParamBefore,
 	BOOL			*pfTerminateIME,
 	HWND			hwndIME,
-	LONG			*pCpCursor,
-	ITfMouseSink	*pMouseSink)
+	LONG			*pCpCursor)
 {
 	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::MouseOperation");
 	BOOL	fRetCode = FALSE;
@@ -2326,21 +2141,9 @@ LCheckButton:
 
 					if (hIMC)
 					{
-						fRetCode = SendMessage(hwndIME, MSIMEMouseMsg, *pwParamBefore, hIMC);
+						fRetCode = SendMessage(hwndIME, MSIMEMouseMsg, *pwParamBefore, (LPARAM)hIMC);
 						LocalReleaseImmContext(*this, hIMC);
 					}
-				}
-				else			// Cicero case
-				{
-					BOOL	fEaten = FALSE;
-					DWORD	dwBtn = 0;
-
-					dwBtn |= wButtons & IMEMOUSE_LDOWN ? MK_LBUTTON : 0;
-					dwBtn |= wButtons & IMEMOUSE_MDOWN ? MK_MBUTTON : 0;
-					dwBtn |= wButtons & IMEMOUSE_RDOWN ? MK_RBUTTON : 0;
-
-					if (S_OK == pMouseSink->OnMouseEvent(ichCursor - ichStart, wPos, dwBtn, &fEaten) && fEaten)
-						fRetCode = TRUE;
 				}
 			}
 			else
@@ -2377,24 +2180,6 @@ void CTextMsgFilter::CompleteUIMTyping(
 	{
 		Assert(!(_pCUIM && _pCUIM->IsUIMTyping()));
 		_ime->TerminateIMEComposition(*this, (CIme::TerminateMode)mode);
-	}
-	else
-	{
-		Assert (_pCUIM);
-		if (_pCUIM && _fSendTransaction == 0)
-		{
-			if (fTransaction)
-			{
-				ITextStoreACPSink *ptss = _pCUIM->_ptss;
-
-				if (ptss)
-				{
-					_fSendTransaction = 1;
-					ptss->OnStartEditTransaction();
-				}
-			}
-			_pCUIM->CompleteUIMText();
-		}
 	}
 }
 
@@ -2443,7 +2228,7 @@ COMPCOLOR* CTextMsgFilter::GetIMECompAttributes()
 void CTextMsgFilter::SetupCallback()
 {
 	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::SetupCallback");
-
+#ifndef NOPRIVATEMESSAGE
 	if (!_pMsgCallBack)
 		_pMsgCallBack = new CMsgCallBack(this);
 	if (_pMsgCallBack)
@@ -2451,626 +2236,8 @@ void CTextMsgFilter::SetupCallback()
 		LRESULT lresult;
 		_pTextService->TxSendMessage(EM_SETCALLBACK, 0, (LPARAM)_pMsgCallBack, &lresult);
 	}
+#endif//NOPRIVATEMESSAGE
 }
 
-/*
- *	CTextMsgFilter::SetupLangSink()
- *
- *	@mfunc
- *		Setup the Language sink to catch the keyboard changing event.  We are not
- *	getting WM_INPUTLANGCHANGEREQUEST and thus need this sink.
- *
- */
-void CTextMsgFilter::SetupLangSink()
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::SetupLangSink");
-
-	if (!_pITfIPP)
-	{
-		CoCreateInstance(CLSID_TF_InputProcessorProfiles, NULL, CLSCTX_INPROC_SERVER,
-			IID_ITfInputProcessorProfiles, (void**)&_pITfIPP);
-
-		if (_pITfIPP)
-		{
-			_pCLangProfileSink = new CLangProfileSink();
-			if (_pCLangProfileSink)
-			{
-				if (_pCLangProfileSink->_Advise(this, _pITfIPP) != S_OK)
-				{
-					_pCLangProfileSink->Release();
-					_pCLangProfileSink = NULL;
-					_pITfIPP->Release();
-					_pITfIPP = NULL;
-				}
-			}
-			else
-			{
-				_pITfIPP->Release();
-				_pITfIPP = NULL;
-			}
-		}
-	}
-}
-
-/*
- *	CTextMsgFilter::ReleaseLangSink()
- *
- *	@mfunc
- *		Release the lang sink object
- *
- */
-void CTextMsgFilter::ReleaseLangSink()
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::ReleaseLangSink");
-
-	if (_pITfIPP)
-	{
-		Assert(_pCLangProfileSink);
-
-		_pCLangProfileSink->_Unadvise();
-		_pCLangProfileSink->Release();
-		_pCLangProfileSink = NULL;
-
-		_pITfIPP->Release();
-		_pITfIPP = NULL;
-	}
-}
-
-/*
- *	CTextMsgFilter::StartUIM()
- *
- *	@mfunc
- *
- *	@rdesc
- *	
- */
-void CTextMsgFilter::StartUIM()
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::StartUIM");
-
-	if (NoIMEProcess())
-		return;
-
-	_fUsingUIM = CreateUIM(this);
-
-	if (_fUsingUIM)
-	{
-		SetupCallback();
-		SetupLangSink();
-	}
-}
-
-/*
- *	CTextMsgFilter::StartAimm()
- *
- *	@mfunc
- *
- *	@rdesc
- *	
- */
-void CTextMsgFilter::StartAimm(BOOL fUseAimm12)
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::StartAimm");
-
-	if (!_hwnd || NoIMEProcess())
-		return;
-
-	if (LoadAIMM(fUseAimm12))
-	{
-		HRESULT	hResult = ActivateAIMM(FALSE);
-
-		if (hResult == NOERROR)
-		{
-			DWORD	dwAtom;
-			ATOM	aClass;
-
-			// filter client windows
-			if (dwAtom = GetClassLong(_hwnd, GCW_ATOM))
-			{
-				aClass = dwAtom;				
-				hResult = FilterClientWindowsAIMM(&aClass, 1, _hwnd);
-			}
-			_fUsingAIMM = 1;
-			SetupCallback();
-
-			if (!fLoadAIMM10)
-				SetupLangSink();
-		}
-	}
-}
-
-/*
- *	CTextMsgFilter::TurnOffUIM()
- *
- *	@mfunc
- *
- *	@rdesc
- *	
- */
-void CTextMsgFilter::TurnOffUIM(BOOL fSafeToSendMessage)
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::TurnOffUIM");
-
-	if (fSafeToSendMessage && _fUsingUIM && _pCUIM && _pCUIM->IsUIMTyping())
-		CompleteUIMTyping(CIme::TERMINATE_NORMAL);
-
-	_fUsingUIM = FALSE;
-
-	ReleaseLangSink();
-
-	// Release various objects
-	if (_pCUIM)
-	{
-		CUIM *pCUIM = _pCUIM;
-		LRESULT lresult;
-
-		_pCUIM = NULL;
-
-		if (fSafeToSendMessage)
-			_pTextService->TxSendMessage(EM_SETUPNOTIFY, 0, (LPARAM)(ITxNotify *)pCUIM, &lresult);
-		else
-			pCUIM->_fShutDown = 1;
-
-		pCUIM->Uninit();
-		pCUIM->Release();
-	
-	}
-
-	if (_pTim)
-	{
-		ITfThreadMgr *pTim = _pTim;
-		
-		_pTim = NULL;
-		pTim->Deactivate();
-		pTim->Release();
-	}
-
-	// Turn off Callback
-	if (fSafeToSendMessage && _pMsgCallBack)
-	{
-		LRESULT lresult;
-		_pTextService->TxSendMessage(EM_SETCALLBACK, 0, (LPARAM)0, &lresult);
-		delete _pMsgCallBack;
-		_pMsgCallBack = NULL;
-	}
-}
-
-/*
- *	CTextMsgFilter::HandleCTFService(wparam, lparam)
- *
- *	@mfunc
- *		Setup Cicero setting to handle or disable smarttag and proofing services
- *	
- */
-void CTextMsgFilter::HandleCTFService(
-	WPARAM wparam, 
-	LPARAM lparam)
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::HandleCTFService");
-
-	BOOL	fChangeInSetting = FALSE;
-
-	if (lparam & SES_CTFALLOWSMARTTAG)
-	{
-		BOOL fAllowSmartTagLocal = (wparam & SES_CTFALLOWSMARTTAG) ? 1 : 0;
-
-		if ((BOOL)_fAllowSmartTag != fAllowSmartTagLocal)
-		{
-			_fAllowSmartTag = fAllowSmartTagLocal;
-			fChangeInSetting = TRUE;
-		}
-	}
-	if (lparam & SES_CTFALLOWPROOFING)
-	{
-		BOOL fAllowProofLocal = (wparam & SES_CTFALLOWPROOFING) ? 1 : 0;
-
-		if ((BOOL)_fAllowProofing != fAllowProofLocal)
-		{
-			_fAllowProofing = fAllowProofLocal;
-			fChangeInSetting = TRUE;
-		}
-	}
-
-	if (fChangeInSetting)
-	{
-		if (_fUsingUIM && _pCUIM)
-			_pCUIM->NotifyService();
-	}
-}
-
-/*
- *	CTextMsgFilter::TurnOffAimm()
- *
- *	@mfunc
- *		Turn off Aimm.
- *	
- */
-void CTextMsgFilter::TurnOffAimm(BOOL fSafeToSendMessage)
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::TurnOffAimm");
-
-	if (_fUsingAIMM)
-	{
-		if (IsIMEComposition())
-		{
-			if (fSafeToSendMessage)
-				CompleteUIMTyping(CIme::TERMINATE_NORMAL);
-			else
-			{
-				delete _ime;
-				_ime = NULL;
-			}
-		}
-
-		_fUsingAIMM = FALSE;
-
-		UnfilterClientWindowsAIMM(_hwnd);
-		DeactivateAIMM();
-
-		ReleaseLangSink();
-
-		// Turn off Callback
-		if (fSafeToSendMessage && _pMsgCallBack)
-		{
-			LRESULT lresult;
-			_pTextService->TxSendMessage(EM_SETCALLBACK, 0, (LPARAM)0, &lresult);
-			delete _pMsgCallBack;
-			_pMsgCallBack = NULL;
-		}
-	}
-}
-
-/*
- *	void CTextMsgFilter::OnSetUIMMode()
- *
- *	@mfunc
- *
- *	@rdesc
- *	
- */
-void CTextMsgFilter::OnSetUIMMode(WORD wUIMModeBias) 
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CTextMsgFilter::OnSetUIMMode");
-
-	if (_wUIMModeBias != wUIMModeBias && 
-		IN_RANGE(CTFMODEBIAS_DEFAULT, wUIMModeBias, CTFMODEBIAS_HALFWIDTHALPHANUMERIC))
-	{
-		_wUIMModeBias = wUIMModeBias;
-
-		if (_pMsgCallBack)
-			_pMsgCallBack->NotifyEvents(NE_MODEBIASCHANGE);
-	}
-}
-
-/*
- *	HRESULT CMsgCallBack::HandlePostMessage()
- *
- *	@mfunc
- *
- *	@rdesc
- *
- */
-HRESULT CMsgCallBack::HandlePostMessage(
-	HWND hWnd,
-	UINT msg, 
-	WPARAM wparam, 
-	LPARAM lparam, 
-	LRESULT *plres)
-{
-	//TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CMsgCallBack::HandlePostMessage");
-
-	if (_pTextMsgFilter->_fUsingAIMM)
-		return CallAIMMDefaultWndProc(hWnd, msg, wparam, lparam, plres);
-
-	return S_FALSE;
-}
-
-/*
- *	HRESULT CMsgCallBack::NotifyEvents()
- *
- *	@mfunc
- *
- *	@rdesc
- *
- */
-HRESULT CMsgCallBack::NotifyEvents(DWORD dwEvents)
-{
-	//TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CMsgCallBack::NotifyEvents");
-
-	CUIM	*pCUIM = _pTextMsgFilter->_pCUIM;
-
-	if (pCUIM)
-	{
-		ITextStoreACPSink *ptss = pCUIM->_ptss;
-
-		if (dwEvents & NE_ENTERTOPLEVELCALLMGR)
-		{
-			pCUIM->_cCallMgrLevels++;
-		}
-		else if (dwEvents & NE_EXITTOPLEVELCALLMGR)
-		{
-			Assert (pCUIM->_cCallMgrLevels > 0);
-			pCUIM->_cCallMgrLevels--;
-		}
-
-		if (pCUIM->_cCallMgrLevels)
-		{
-			// Save events to be sent later
-			if ((dwEvents & NE_CALLMGRSELCHANGE) && !pCUIM->_fReadLockOn)
-				pCUIM->_fSelChangeEventPending = 1;
-
-			if (dwEvents & (NE_CALLMGRCHANGE | NE_LAYOUTCHANGE))
-				pCUIM->_fLayoutEventPending = 1;
-
-			if (dwEvents & NE_MODEBIASCHANGE)
-				pCUIM->_fModeBiasPending = 1;
-		}
-		else
-		{
-			if (pCUIM->_fSelChangeEventPending || (dwEvents & NE_CALLMGRSELCHANGE))
-			{
-				pCUIM->_fSelChangeEventPending = 0;
-				if (ptss && !pCUIM->_fHoldCTFSelChangeNotify && !pCUIM->_fReadLockOn)
-					ptss->OnSelectionChange();
-			}
-
-			if (pCUIM->_fLayoutEventPending || (dwEvents & (NE_CALLMGRCHANGE | NE_LAYOUTCHANGE)))
-			{
-				pCUIM->_fLayoutEventPending = 0;
-				if (ptss)
-					ptss->OnLayoutChange(TS_LC_CHANGE, 0);	
-			}
-
-			if (pCUIM->_fModeBiasPending || (dwEvents & NE_MODEBIASCHANGE))
-			{
-				pCUIM->_fModeBiasPending = 0;
-				if (ptss)
-				{	
-					LONG	ccpMax = 0;
-
-					if (pCUIM->GetStoryLength(&ccpMax) != S_OK)
-						ccpMax = tomForward;
-
-					ptss->OnAttrsChange(0, ccpMax, 1, &GUID_PROP_MODEBIAS);		// only ModeBias for now
-				}
-			}
-
-			// Probably safe to let UIM to lock data now
-			if (ptss && (pCUIM->_fReadLockPending || pCUIM->_fWriteLockPending))
-			{
-				HRESULT hResult;
-				HRESULT hResult1;
-
-				hResult = pCUIM->RequestLock(pCUIM->_fWriteLockPending ? TS_LF_READWRITE : TS_LF_READ, &hResult1);
-			}
-
-			if (_pTextMsgFilter->_fSendTransaction)
-			{
-				_pTextMsgFilter->_fSendTransaction = 0;
-				if (ptss)
-					ptss->OnEndEditTransaction();
-			}
-
-			pCUIM->_fHoldCTFSelChangeNotify = 0;
-		}
-	}
-
-	return S_OK;
-}
-
-/*
- *	CLangProfileSink::QueryInterface()
- *
- *	@mfunc
- *
- *	@rdesc
- *
- */
-STDAPI CLangProfileSink::QueryInterface(REFIID riid, void **ppvObj)
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CLangProfileSink::QueryInterface");
-
-	*ppvObj = NULL;
-
-	if (IsEqualIID(riid, IID_IUnknown) ||
-		IsEqualIID(riid, IID_ITfLanguageProfileNotifySink))
-		*ppvObj = this;
-
-	if (*ppvObj)
-	{
-		AddRef();
-		return S_OK;
-	}
-
-	return E_NOINTERFACE;
-}
-
-/*
- *	CLangProfileSink::AddRef()
- *
- *	@mfunc
- *
- *	@rdesc
- *
- */
-STDAPI_(ULONG) CLangProfileSink::AddRef()
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CLangProfileSink::AddRef");
-
-	return ++_cRef;
-}
-
-/*
- *	CLangProfileSink::Release()
- *
- *	@mfunc
- *
- *	@rdesc
- *
- */
-STDAPI_(ULONG) CLangProfileSink::Release()
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CLangProfileSink::Release");
-
-	LONG cr;
-
-	cr = --_cRef;
-	Assert(cr >= 0);
-
-	if (cr == 0)
-		delete this;
-
-	return cr;
-}
-
-/*
- *	CLangProfileSink::CLangProfileSink()
- *
- *	@mfunc
- *
- *	@rdesc
- *
- */
-CLangProfileSink::CLangProfileSink()
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CLangProfileSink::CLangProfileSink");
-
-	_cRef = 1;
-	_dwCookie = (DWORD)(-1);
-}
-
-/*
- *	CLangProfileSink::OnLanguageChange()
- *
- *	@mfunc
- *
- *	@rdesc
- *
- */
-STDMETHODIMP CLangProfileSink::OnLanguageChange(LANGID langid, BOOL *pfAccept)
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CLangProfileSink::OnLanguageChange");
-
-	Assert (pfAccept);
-
-	*pfAccept = TRUE;
-
-	if (_pTextMsgFilter->_hwnd && GetFocus() == _pTextMsgFilter->_hwnd)
-	{
-		LRESULT		lresult = 0;
-		if ( S_OK == _pTextMsgFilter->_pTextService->TxSendMessage(
-				EM_GETDOCFLAGS, GDF_ALL, 0, &lresult))
-		{
-			if (lresult & GDF_SINGLECPG)
-			{
-				LCID syslcid = GetSysLCID();
-
-				// Check if new langid supported by the system
-				if (langid != syslcid)
-				{
-					LOCALESIGNATURE ls;
-
-					if(GetLocaleInfoA(langid, LOCALE_FONTSIGNATURE, (LPSTR)&ls, sizeof(ls)))
-					{
-						CHARSETINFO cs;
-						HDC hdc = GetDC(_pTextMsgFilter->_hwnd);
-						TranslateCharsetInfo((DWORD *)(DWORD_PTR)GetTextCharsetInfo(hdc, NULL, 0), &cs, TCI_SRCCHARSET);
-						ReleaseDC(_pTextMsgFilter->_hwnd, hdc);
-						DWORD fsShell = cs.fs.fsCsb[0];
-						if (!(fsShell & ls.lsCsbSupported[0]))
-							*pfAccept = FALSE;
-					}
-				}
-			}
-		}
-
-		if (*pfAccept == TRUE && _pTextMsgFilter-> _nIMEMode)
-			_pTextMsgFilter->SetIMESentenseMode(FALSE);
-	}
-
-    return S_OK;
-}
-
-/*
- *	CLangProfileSink::OnLanguageChanged()
- *
- *	@mfunc
- *
- *	@rdesc
- *
- */
-STDMETHODIMP CLangProfileSink::OnLanguageChanged()
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CLangProfileSink::OnLanguageChanged");
-
-    return S_OK;
-}
-
-/*
- *	CLangProfileSink::_Advise()
- *
- *	@mfunc
- *
- *	@rdesc
- *
- */
-HRESULT CLangProfileSink::_Advise(
-	CTextMsgFilter *pTextMsgFilter,
-	ITfInputProcessorProfiles *pipp)
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CLangProfileSink::_Advise");
-
-    HRESULT hr;
-    ITfSource *pSource = NULL;
-
-	_pTextMsgFilter = pTextMsgFilter;
-    _pITFIPP = pipp;
-    hr = E_FAIL;
-
-    if (FAILED(_pITFIPP->QueryInterface(IID_ITfSource, (void **)&pSource)))
-        goto Exit;
-
-    if (FAILED(pSource->AdviseSink(IID_ITfLanguageProfileNotifySink, this, &_dwCookie)))
-        goto Exit;
-
-    hr = S_OK;
-
-Exit:
-    pSource->Release();
-    return hr;
-}
-
-/*
- *	CLangProfileSink::_Unadvise()
- *
- *	@mfunc
- *
- *	@rdesc
- *
- */
-HRESULT CLangProfileSink::_Unadvise()
-{
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CLangProfileSink::_Unadvise");
-
-	HRESULT hr;
-	ITfSource *pSource = NULL;
-
-	hr = E_FAIL;
-
-	if (_pITFIPP == NULL)
-		return hr;
-
-	if (FAILED(_pITFIPP->QueryInterface(IID_ITfSource, (void **)&pSource)))
-		return hr;
-
-	if (FAILED(pSource->UnadviseSink(_dwCookie)))
-		goto Exit;
-
-	hr = S_OK;
-
-Exit:
-	pSource->Release();
-	return hr;
-}
 
 #endif // NOFEPROCESSING

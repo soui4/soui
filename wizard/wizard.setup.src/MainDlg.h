@@ -4,6 +4,8 @@
 
 #pragma once
 
+#include "shlobj.h"
+
 #define ENV_SOUI4  _T("SOUI4PATH")
 #define ENV_INSTALL_32 _T("SOUI4_INSTALL_32")
 #define ENV_INSTALL_64 _T("SOUI4_INSTALL_64")
@@ -28,6 +30,7 @@ class CMainDlg : public CDialogImpl<CMainDlg>
 		CString strEntrySrc;
 		CString strEntryTarget;
 		CString strScriptSrc;
+        CString strCreateDir;
 	};
 
 
@@ -291,6 +294,9 @@ public:
 			pEnvCfg->strEntryTarget = szBuf;
 			GetPrivateProfileString(entry, _T("wizarddatatarget"), NULL, szBuf, 1000, szVsList);
 			pEnvCfg->strDataTarget = szBuf;
+            GetPrivateProfileString(entry, _T("createdir"), NULL, szBuf, 1000, szVsList);
+            pEnvCfg->strCreateDir = szBuf;
+
 			//vs 2019
 			CString dataTarget = pEnvCfg->strVsDir + pEnvCfg->strEntryTarget;
             ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)dataTarget);
@@ -374,7 +380,7 @@ public:
 		}
 		return 0;
 	}
-
+	
 	LRESULT OnInstall(WORD /*wNotifyCode*/, WORD wID, HWND /*hWndCtl*/, BOOL& /*bHandled*/)
 	{
 		SetCurrentDirectory(m_strWizardDir);
@@ -516,7 +522,22 @@ public:
 					}
 				}
 			}
-
+			//C:\Users\用户名\Documents\Visual Studio 2022\Templates\ProjectTemplates
+            if (!pCfg->strCreateDir.IsEmpty())
+			{
+                TCHAR szFrom[1024] = { 0 };
+                SHGetFolderPath(NULL, CSIDL_MYDOCUMENTS, NULL, 0, szFrom);
+                CString strTargetDir = szFrom;
+                strTargetDir += L"\\";
+                strTargetDir += pCfg->strCreateDir;
+                strTargetDir += L"\\";
+                strTargetDir +=DIR_DST;
+               
+				if (!FolderExists(strTargetDir) && !CreateDirectory(strTargetDir, 0))
+                {
+                    ::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)L"无法创建SOUI5文件夹");
+                }
+			}
 			CString strMsg;
 			strMsg.Format(_T("为%s安装SOUI5向导:%s"), pCfg->strName, bOK ? _T("成功") : _T("失败"));
 			::SendMessage(GetDlgItem(IDC_LOG), LB_ADDSTRING, 0, (LPARAM)(LPCTSTR)strMsg);

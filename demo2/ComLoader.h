@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _COMLOADER_H_
+#define _COMLOADER_H_
+
 #include <interface/obj-ref-i.h>
 
 typedef enum _SComID{
@@ -20,3 +22,4 @@ typedef enum _SComID{
 EXTERN_C
 BOOL LoadComObj(SComID id,IObjRef ** ppObj);
 
+#endif//_COMLOADER_H_

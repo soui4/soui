@@ -53,6 +53,17 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
     static BOOL IsIdleMessage(MSG *pMsg);
 
   protected:
+    void RunIdle();
+  protected:
+
+    BOOL m_bRunning;
+    BOOL m_bQuit;
+    BOOL m_bDoIdle;
+    int m_nIdleCount;
+
+    SCriticalSection m_cs;
+    SCriticalSection m_csRunningQueue;
+    tid_t m_tid;
     SMessageLoopPriv *m_priv;
 };
 

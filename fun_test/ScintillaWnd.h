@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef _SCINTILLAWND_H_
+#define _SCINTILLAWND_H_
 
 #include <core/SNativeWnd.h>
 
@@ -43,3 +44,6 @@ protected:
 
 	SOUI::SStringT m_strFileName;
 };
+
+
+#endif//_SCINTILLAWND_H_

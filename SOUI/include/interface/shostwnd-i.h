@@ -18,28 +18,10 @@ typedef struct _EventHandlerInfo
 
 #undef INTERFACE
 #define INTERFACE IHostWnd
-DECLARE_INTERFACE_(IHostWnd, IObjRef)
+DECLARE_INTERFACE_(IHostWnd, INativeWnd)
 {
-    //!添加引用
-    /*!
-     */
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-
-    //!释放引用
-    /*!
-     */
-    STDMETHOD_(long, Release)(THIS) PURE;
-
-    //!释放对象
-    /*!
-     */
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+#include "SNativeWndApi.h"
     //////////////////////////////////////////////////////////////////////////
-    /**
-     * @brief 获取INativeWnd接口
-     * @return INativeWnd*
-     */
-    STDMETHOD_(INativeWnd *, GetNative)(THIS) PURE;
 
     /**
      * @brief 创建窗口
@@ -201,26 +183,7 @@ DECLARE_INTERFACE_(IHostWnd, IObjRef)
 #define INTERFACE IHostDialog
 DECLARE_INTERFACE_(IHostDialog, IHostWnd)
 {
-    //!添加引用
-    /*!
-     */
-    STDMETHOD_(long, AddRef)(THIS) PURE;
-
-    //!释放引用
-    /*!
-     */
-    STDMETHOD_(long, Release)(THIS) PURE;
-
-    //!释放对象
-    /*!
-     */
-    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-    //////////////////////////////////////////////////////////////////////////
-    /**
-     * @brief 获取NativeWnd接口
-     * @return INativeWnd*
-     */
-    STDMETHOD_(INativeWnd *, GetNative)(THIS) PURE;
+#include "SNativeWndApi.h"
 
     //////////////////////////////////////////////////////////////////////////
 

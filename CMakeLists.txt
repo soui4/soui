@@ -42,6 +42,16 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
 include(__cmake/internal_utils.cmake)
 include(__cmake/global.cmake)
 
+
+if (CMAKE_SYSTEM_NAME STREQUAL "MSYS")
+    message(STATUS "Overriding incorrect Linux detection for MSYS")
+    set(CMAKE_SYSTEM_NAME Windows CACHE STRING "Target system" FORCE)
+endif()
+if (CMAKE_SYSTEM_NAME STREQUAL "Linux" AND MINGW)
+    message(STATUS "Overriding incorrect Linux detection for MINGW")
+    set(CMAKE_SYSTEM_NAME Windows CACHE STRING "Target system" FORCE)
+endif()
+
 if(CMAKE_INSTALL_PREFIX_INITIALIZED_TO_DEFAULT)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 IF (CMAKE_CL_64)
@@ -79,6 +89,7 @@ option(XP_TOOLSET "" ON)
 #
 #
 option(ENABLE_SPECTRE "Enable Spectre Mitigation" OFF)
+
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 option(BUILD_RICHEDIT "using richedit from source code" ON)
@@ -126,6 +137,7 @@ add_subdirectory(utilities)
 add_subdirectory(SOUI)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 add_subdirectory(soui-sys-resource)
+add_subdirectory(soui-sys-resource2)
 endif()
 #
 #

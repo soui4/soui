@@ -10,7 +10,7 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS
 -DUNICODE 
 -DNOLISTCOMBOBOXES 
 -DNOCOMPLEXSCRIPTS
--DNOFEPROCESSING
+#-DNOFEPROCESSING
 -DNOPRIVATEMESSAGE
 -DNOANSIWINDOWS
 -DNOMETAFILES
@@ -95,7 +95,7 @@ w32sys.cpp
 utilmem.cpp 
 textnot.cpp 
 #cuim.cpp 
-#cmsgflt.cpp 
+cmsgflt.cpp 
 )
 
 source_group("Header Files" FILES ${re_header})

@@ -114,7 +114,7 @@ struct tagThunk // this should come out to 16 bytes
     }
 };
 #pragma pack(pop)
-#elif defined(__arm64__) || defined(_M_ARM64)
+#elif defined(__arm64__) || defined(_M_ARM64) || defined(__aarch64__)
 #pragma pack(push, 1)
 struct tagThunk // this should come out to 16 bytes
 {
@@ -426,7 +426,7 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
             hWndChild = (HWND)lParam;
             break;
         default:
-            //            hWndChild = GetDlgItem(m_hWnd, HIWORD(wParam));
+            hWndChild = GetDlgItem(m_hWnd, HIWORD(wParam));
             break;
         }
         break;
@@ -435,8 +435,8 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
             hWndChild = ((LPDRAWITEMSTRUCT)lParam)->hwndItem;
         break;
     case WM_MEASUREITEM:
-        // if (wParam) // not from a menu
-        //    hWndChild = GetDlgItem(m_hWnd, ((LPMEASUREITEMSTRUCT)lParam)->CtlID);
+        if (wParam) // not from a menu
+            hWndChild = GetDlgItem(m_hWnd, ((LPMEASUREITEMSTRUCT)lParam)->CtlID);
         break;
     case WM_COMPAREITEM:
         if (wParam) // not from a menu
@@ -453,15 +453,17 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     case WM_VSCROLL:
         hWndChild = (HWND)lParam;
         break;
-    //case WM_CTLCOLORBTN:
-    //case WM_CTLCOLORDLG:
-    //case WM_CTLCOLOREDIT:
-    //case WM_CTLCOLORLISTBOX:
-    //case WM_CTLCOLORMSGBOX:
-    //case WM_CTLCOLORSCROLLBAR:
-    //case WM_CTLCOLORSTATIC:
-    //    hWndChild = (HWND)lParam;
+#ifdef _WIN32
+    case WM_CTLCOLORBTN:
+    case WM_CTLCOLORDLG:
+    case WM_CTLCOLOREDIT:
+    case WM_CTLCOLORLISTBOX:
+    case WM_CTLCOLORMSGBOX:
+    case WM_CTLCOLORSCROLLBAR:
+    case WM_CTLCOLORSTATIC:
+        hWndChild = (HWND)lParam;
         break;
+#endif//_WIN32
     default:
         break;
     }
@@ -491,13 +493,15 @@ BOOL SNativeWnd::DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, L
     case OCM_CHARTOITEM:
     case OCM_HSCROLL:
     case OCM_VSCROLL:
-    //case OCM_CTLCOLORBTN:
-    //case OCM_CTLCOLORDLG:
-    //case OCM_CTLCOLOREDIT:
-    //case OCM_CTLCOLORLISTBOX:
-    //case OCM_CTLCOLORMSGBOX:
-    //case OCM_CTLCOLORSCROLLBAR:
-    //case OCM_CTLCOLORSTATIC:
+#ifdef _WIN32
+    case OCM_CTLCOLORBTN:
+    case OCM_CTLCOLORDLG:
+    case OCM_CTLCOLOREDIT:
+    case OCM_CTLCOLORLISTBOX:
+    case OCM_CTLCOLORMSGBOX:
+    case OCM_CTLCOLORSCROLLBAR:
+    case OCM_CTLCOLORSTATIC:
+#endif//_WIN32
         lResult = ::DefWindowProc(hWnd, uMsg - OCM__BASE, wParam, lParam);
         return TRUE;
     default:
@@ -674,12 +678,6 @@ BOOL SNativeWnd::SetLayeredWindowAttributes(COLORREF crKey, BYTE bAlpha, DWORD d
     return ::SetLayeredWindowAttributes(m_hWnd, crKey, bAlpha, dwFlags);
 }
 
-BOOL SNativeWnd::SetLayeredWindowAlpha(BYTE byAlpha)
-{
-    SASSERT(::IsWindow(m_hWnd));
-    return ::SetLayeredWindowAttributes(m_hWnd, 0, byAlpha, LWA_ALPHA);
-}
-
 int SNativeWnd::SetWindowRgn(HRGN hRgn, BOOL bRedraw /*=TRUE*/)
 {
     SASSERT(::IsWindow(m_hWnd));
@@ -732,6 +730,12 @@ BOOL SNativeWnd::SetWindowText(LPCTSTR lpszString)
 {
     SASSERT(::IsWindow(m_hWnd));
     return ::SetWindowText(m_hWnd, lpszString);
+}
+
+BOOL SNativeWnd::SendNotifyMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
+{
+    SASSERT(::IsWindow(m_hWnd));
+    return ::SendNotifyMessage(m_hWnd, message, wParam, lParam);
 }
 
 BOOL SNativeWnd::PostMessage(UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/)
@@ -795,8 +799,7 @@ int SNativeWnd::ReleaseDC(HDC hDC)
 HDC SNativeWnd::GetWindowDC()
 {
     SASSERT(::IsWindow(m_hWnd));
-    return 0;
-    // return ::GetWindowDC(m_hWnd);
+    return ::GetWindowDC(m_hWnd);
 }
 
 HDC SNativeWnd::GetDC()

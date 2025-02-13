@@ -19,6 +19,7 @@
 #include <helper/SplitString.h>
 #include <helper/swndspy.h>
 #include <helper/STimerGenerator.h>
+#include <proxy/SNativeWndProxy.h>
 SNSBEGIN
 
 // disable swnd spy for release by default.
@@ -156,8 +157,7 @@ class SOUI_EXP SRootWindow : public SWindow {
 
 class SDummyWnd;
 class SOUI_EXP SHostWnd
-    : public TObjRefImpl<IHostWnd>
-    , public SNativeWnd
+    : public TNativeWndProxy<IHostWnd>
     , public SwndContainerImpl {
     friend class SDummyWnd;
     friend class SRootWindow;
@@ -229,10 +229,6 @@ class SOUI_EXP SHostWnd
     };
 
   public:
-    STDMETHOD_(INativeWnd *, GetNative)(THIS) OVERRIDE
-    {
-        return (INativeWnd *)this;
-    }
     STDMETHOD_(BOOL, InitFromXml)(THIS_ IXmlNode *pNode) OVERRIDE;
 
     STDMETHOD_(BOOL, DestroyWindow)(THIS) OVERRIDE;
@@ -335,6 +331,11 @@ class SOUI_EXP SHostWnd
     SWindow *GetRoot() const
     {
         return m_pRoot;
+    }
+
+    SNativeWnd *GetNative()
+    {
+        return this;
     }
 
     CRect GetWindowRect() const;

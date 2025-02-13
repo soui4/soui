@@ -1,8 +1,5 @@
-﻿#include <souistd.h>
-#include <list>
-#include <vector>
-#include <helper/SCriticalSection.h>
-#include <core/SMsgLoop.h>
+﻿#include "souistd.h"
+#include "core/SMsgLoop.h"
 
 #ifndef WM_SYSTIMER
 #define WM_SYSTIMER 0x0118 //(caret blink)
@@ -11,101 +8,44 @@
 SNSBEGIN
 
 template <class T>
-BOOL RemoveElementFromArray(std::vector<T> &arr, T ele)
+BOOL RemoveElementFromArray(SArray<T> &arr, T ele)
 {
-    typename std::vector<T>::iterator it = arr.begin();
-    while (it != arr.end())
-    {
-        if (*it == ele)
-        {
-            arr.erase(it);
-            return TRUE;
-        }
-        it++;
-    }
-    return FALSE;
+    int idx = arr.Find(ele);
+    if (idx == -1)
+        return FALSE;
+    arr.RemoveAt(idx);
+    return TRUE;
 }
 
 class SMessageLoopPriv {
   public:
-    SMessageLoopPriv(IMessageLoop *pParentLoop);
-    virtual ~SMessageLoopPriv();
-
-  public:
-    // Message filter operations
-    STDMETHOD_(BOOL, AddMessageFilter)(THIS_ IMsgFilter *pMessageFilter);
-
-    STDMETHOD_(BOOL, RemoveMessageFilter)(THIS_ IMsgFilter *pMessageFilter);
-
-    // Idle handler operations
-    STDMETHOD_(BOOL, AddIdleHandler)(THIS_ IIdleHandler *pIdleHandler);
-
-    STDMETHOD_(BOOL, RemoveIdleHandler)(THIS_ IIdleHandler *pIdleHandler);
-
-    //  to change message filtering
-    STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG *pMsg);
-
-    //  to change idle processing
-    STDMETHOD_(BOOL, OnIdle)(THIS_ int /*nIdleCount*/);
-
-    STDMETHOD_(int, Run)(THIS);
-
-    STDMETHOD_(BOOL, IsRunning)(THIS) const;
-
-    STDMETHOD_(void, OnMsg)(THIS_ LPMSG pMsg);
-
-    STDMETHOD_(void, Quit)(THIS_ int exitCode);
-
-    STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable *runable);
-
-    STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj);
-
-    STDMETHOD_(void, ExecutePendingTask)();
-
-    STDMETHOD_(BOOL, PeekMsg)(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilterMax, BOOL bRemove);
-
-    STDMETHOD_(BOOL, WaitMsg)(THIS);
-
-    STDMETHOD_(int, HandleMsg)(THIS);
-
-  public:
-    static BOOL IsIdleMessage(MSG *pMsg);
-
-  protected:
-    typedef std::vector<IMsgFilter *> MsgFilterVector;
-    MsgFilterVector m_aMsgFilter;
-    typedef std::vector<IIdleHandler *> IdleHandlerVector;
-    IdleHandlerVector m_aIdleHandler;
-
-    BOOL m_bRunning;
-    BOOL m_bQuit;
-    BOOL m_bDoIdle;
-    int m_nIdleCount;
-
-    SCriticalSection m_cs;
-    typedef std::list<IRunnable *> RunnableList;
-    RunnableList m_runnables;
-    SCriticalSection m_csRunningQueue;
-    RunnableList m_runningQueue;
+    SMessageLoopPriv(IMessageLoop *pParentLoop = NULL)
+        : m_parentLoop(pParentLoop)
+    {
+    }
+    SArray<IMsgFilter *> m_aMsgFilter;
+    SArray<IIdleHandler *> m_aIdleHandler;
+    SList<IRunnable *> m_runnables;
+    SList<IRunnable *> m_runningQueue;
     SAutoRefPtr<IMessageLoop> m_parentLoop;
-    tid_t m_tid;
 };
 
-SMessageLoopPriv::SMessageLoopPriv(IMessageLoop *pParentLoop)
+SMessageLoop::SMessageLoop(IMessageLoop *pParentLoop)
     : m_bRunning(FALSE)
     , m_tid(0)
-    , m_parentLoop(pParentLoop)
     , m_bQuit(FALSE)
     , m_bDoIdle(FALSE)
     , m_nIdleCount(0)
 {
+    m_priv = new SMessageLoopPriv(pParentLoop);
 }
 
-SMessageLoopPriv::~SMessageLoopPriv()
+SMessageLoop::~SMessageLoop()
 {
+    delete m_priv;
 }
 
-void SMessageLoopPriv::OnMsg(LPMSG pMsg)
+void SMessageLoop::OnMsg(LPMSG pMsg)
 {
     if (!PreTranslateMessage(pMsg))
     {
@@ -114,14 +54,14 @@ void SMessageLoopPriv::OnMsg(LPMSG pMsg)
     }
 }
 
-void SMessageLoopPriv::Quit(int exitCode)
+void SMessageLoop::Quit(int exitCode)
 {
     if (!m_bRunning)
         return;
     PostThreadMessage(m_tid, WM_QUIT, (WPARAM)exitCode, 0);
 }
 
-int SMessageLoopPriv::Run()
+int SMessageLoop::Run()
 {
     m_bRunning = TRUE;
     m_bDoIdle = TRUE;
@@ -136,6 +76,7 @@ int SMessageLoopPriv::Run()
             break;
         if (!bGetMsg)
         {
+            SSLOGD() << "WaitMsg returned FALSE (error)";
             continue; // error, don't process
         }
         nRet = HandleMsg();
@@ -143,54 +84,53 @@ int SMessageLoopPriv::Run()
 
     {
         SAutoLock lock(m_cs);
-        RunnableList::iterator it = m_runnables.begin();
-        while (it != m_runnables.end())
+        SPOSITION pos = m_priv->m_runnables.GetHeadPosition();
+        while (pos)
         {
-            IRunnable *pRunnable = *it;
+            IRunnable *pRunnable = m_priv->m_runnables.GetNext(pos);
             pRunnable->Release();
-            it++;
         }
-        m_runnables.clear();
+        m_priv->m_runnables.RemoveAll();
     }
     m_bRunning = FALSE;
     return nRet;
 }
 
-BOOL SMessageLoopPriv::OnIdle(int nIdleCount)
+BOOL SMessageLoop::OnIdle(int nIdleCount)
 {
-    BOOL bContinue = !m_aIdleHandler.empty();
+    BOOL bContinue = !m_priv->m_aIdleHandler.IsEmpty();
 
-    for (size_t i = 0; i < m_aIdleHandler.size(); i++)
+    for (size_t i = 0; i < m_priv->m_aIdleHandler.GetCount(); i++)
     {
-        IIdleHandler *pIdleHandler = m_aIdleHandler[i];
+        IIdleHandler *pIdleHandler = m_priv->m_aIdleHandler[i];
         if (!pIdleHandler->OnIdle())
             bContinue = FALSE;
     }
-    if (m_parentLoop)
+    if (m_priv->m_parentLoop)
     {
-        if (!m_parentLoop->OnIdle(nIdleCount))
+        if (!m_priv->m_parentLoop->OnIdle(nIdleCount))
             bContinue = FALSE;
     }
     return bContinue;
 }
 
-BOOL SMessageLoopPriv::PreTranslateMessage(MSG *pMsg)
+BOOL SMessageLoop::PreTranslateMessage(MSG *pMsg)
 {
     // loop backwards
-    for (int i = (int)m_aMsgFilter.size() - 1; i >= 0; i--)
+    for (int i = (int)m_priv->m_aMsgFilter.GetCount() - 1; i >= 0; i--)
     {
-        IMsgFilter *pMessageFilter = m_aMsgFilter[i];
+        IMsgFilter *pMessageFilter = m_priv->m_aMsgFilter[i];
         if (pMessageFilter != NULL && pMessageFilter->PreTranslateMessage(pMsg))
             return TRUE;
     }
-    if (m_parentLoop)
+    if (m_priv->m_parentLoop)
     {
-        m_parentLoop->PreTranslateMessage(pMsg);
+        m_priv->m_parentLoop->PreTranslateMessage(pMsg);
     }
     return FALSE; // not translated
 }
 
-BOOL SMessageLoopPriv::IsIdleMessage(MSG *pMsg)
+BOOL SMessageLoop::IsIdleMessage(MSG *pMsg)
 {
     // These messages should NOT cause idle processing
     switch (pMsg->message)
@@ -205,123 +145,128 @@ BOOL SMessageLoopPriv::IsIdleMessage(MSG *pMsg)
     return TRUE;
 }
 
-BOOL SMessageLoopPriv::RemoveIdleHandler(IIdleHandler *pIdleHandler)
+BOOL SMessageLoop::RemoveIdleHandler(IIdleHandler *pIdleHandler)
 {
     if (!pIdleHandler)
         return FALSE;
-    return RemoveElementFromArray(m_aIdleHandler, pIdleHandler);
+    return RemoveElementFromArray(m_priv->m_aIdleHandler, pIdleHandler);
 }
 
-BOOL SMessageLoopPriv::AddIdleHandler(IIdleHandler *pIdleHandler)
+BOOL SMessageLoop::AddIdleHandler(IIdleHandler *pIdleHandler)
 {
     if (!pIdleHandler)
         return FALSE;
-    m_aIdleHandler.push_back(pIdleHandler);
+    m_priv->m_aIdleHandler.Add(pIdleHandler);
     return TRUE;
 }
 
-BOOL SMessageLoopPriv::RemoveMessageFilter(IMsgFilter *pMessageFilter)
+BOOL SMessageLoop::RemoveMessageFilter(IMsgFilter *pMessageFilter)
 {
-    return RemoveElementFromArray(m_aMsgFilter, pMessageFilter);
+    return RemoveElementFromArray(m_priv->m_aMsgFilter, pMessageFilter);
 }
 
-BOOL SMessageLoopPriv::AddMessageFilter(IMsgFilter *pMessageFilter)
+BOOL SMessageLoop::AddMessageFilter(IMsgFilter *pMessageFilter)
 {
-    m_aMsgFilter.push_back(pMessageFilter);
+    m_priv->m_aMsgFilter.Add(pMessageFilter);
     return TRUE;
 }
 
-BOOL SMessageLoopPriv::PostTask(IRunnable *runable)
+BOOL SMessageLoop::PostTask(IRunnable *runable)
 {
     SAutoLock lock(m_cs);
     if (m_tid == 0)
     {
-        // SSLOGW() << "msg loop not running now! pending task size:" << m_runnables.GetCount();
+        SSLOGW() << "msg loop not running now! pending task size:" << m_priv->m_runnables.GetCount();
     }
-    m_runnables.push_back(runable->clone());
-    if (m_runnables.size() > 5)
+    m_priv->m_runnables.AddTail(runable->clone());
+    if (m_priv->m_runnables.GetCount() > 5)
     {
         PostThreadMessage(m_tid, WM_NULL, 0, 0);
     }
     return TRUE;
 }
 
-int SMessageLoopPriv::RemoveTasksForObject(void *pObj)
+int SMessageLoop::RemoveTasksForObject(void *pObj)
 {
     int nRet = 0;
     SAutoLock lock(m_cs);
-    RunnableList::iterator it = m_runnables.begin();
-    while (it != m_runnables.end())
+    SPOSITION pos = m_priv->m_runnables.GetHeadPosition();
+    while (pos)
     {
-        RunnableList::iterator it2 = it++;
-        IRunnable *p = *it;
+        SPOSITION pos2 = pos;
+        IRunnable *p = m_priv->m_runnables.GetNext(pos);
         if (p->getObject() == pObj)
         {
             p->Release();
-            m_runnables.erase(it2);
+            m_priv->m_runnables.RemoveAt(pos2);
             nRet++;
         }
     }
     SAutoLock lock2(m_csRunningQueue);
-    it = m_runningQueue.begin();
-    while (it != m_runningQueue.end())
+    pos = m_priv->m_runningQueue.GetHeadPosition();
+    while (pos)
     {
-        RunnableList::iterator it2 = it++;
-        IRunnable *p = *it;
+        SPOSITION pos2 = pos;
+        IRunnable *p = m_priv->m_runningQueue.GetNext(pos);
         if (p->getObject() == pObj)
         {
             p->Release();
-            m_runningQueue.erase(it2);
+            m_priv->m_runningQueue.RemoveAt(pos2);
             nRet++;
         }
     }
     return nRet;
 }
 
-BOOL SMessageLoopPriv::IsRunning(THIS) const
+BOOL SMessageLoop::IsRunning(THIS) const
 {
     return m_bRunning;
 }
 
-void SMessageLoopPriv::ExecutePendingTask()
+void SMessageLoop::ExecutePendingTask()
 {
     m_cs.Enter();
-    m_runningQueue.swap(m_runnables);
+    m_priv->m_runningQueue.Swap(m_priv->m_runnables);
     m_cs.Leave();
     for (;;)
     {
         SAutoLock lock(m_csRunningQueue);
-        if (m_runningQueue.empty())
+        if (m_priv->m_runningQueue.IsEmpty())
             break;
-        IRunnable *pRunnable = m_runningQueue.front();
-        m_runningQueue.pop_front();
+        IRunnable *pRunnable = m_priv->m_runningQueue.GetHead();
+        m_priv->m_runningQueue.RemoveHead();
         pRunnable->run();
         pRunnable->Release();
     }
-    if (m_parentLoop)
+    if (m_priv->m_parentLoop)
     {
-        m_parentLoop->ExecutePendingTask();
+        m_priv->m_parentLoop->ExecutePendingTask();
     }
 }
 
-BOOL SMessageLoopPriv::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilterMax, BOOL bRemove)
+BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilterMax, BOOL bRemove)
 {
     return ::PeekMessage(pMsg, 0, wMsgFilterMin, wMsgFilterMax, bRemove ? PM_REMOVE : PM_NOREMOVE);
 }
 
-BOOL SMessageLoopPriv::WaitMsg(THIS)
+void SMessageLoop::RunIdle()
 {
     MSG msg;
     while (!m_bQuit && m_bDoIdle && !PeekMsg(&msg, 0, 0, FALSE))
     {
         m_bDoIdle = OnIdle(m_nIdleCount++);
     }
+}
+
+BOOL SMessageLoop::WaitMsg(THIS)
+{
+    RunIdle();
     if (m_bQuit)
         return FALSE;
     return ::WaitMessage();
 }
 
-int SMessageLoopPriv::HandleMsg(THIS)
+int SMessageLoop::HandleMsg(THIS)
 {
     MSG msg = { 0 };
     while (PeekMsg(&msg, 0, 0, TRUE) && !m_bQuit)
@@ -340,97 +285,6 @@ int SMessageLoopPriv::HandleMsg(THIS)
         }
     }
     return (int)msg.wParam;
-}
-
-//////////////////////////////////////////////////////////////////////////
-SMessageLoop::SMessageLoop(IMessageLoop *pParentLoop)
-{
-    m_priv = new SMessageLoopPriv(pParentLoop);
-}
-
-SMessageLoop::~SMessageLoop()
-{
-    delete m_priv;
-}
-
-BOOL SMessageLoop::AddMessageFilter(THIS_ IMsgFilter *pMessageFilter)
-{
-    return m_priv->AddMessageFilter(pMessageFilter);
-}
-
-BOOL SMessageLoop::RemoveMessageFilter(THIS_ IMsgFilter *pMessageFilter)
-{
-    return m_priv->RemoveMessageFilter(pMessageFilter);
-}
-
-BOOL SMessageLoop::AddIdleHandler(THIS_ IIdleHandler *pIdleHandler)
-{
-    return m_priv->AddIdleHandler(pIdleHandler);
-}
-
-BOOL SMessageLoop::RemoveIdleHandler(THIS_ IIdleHandler *pIdleHandler)
-{
-    return m_priv->RemoveIdleHandler(pIdleHandler);
-}
-
-BOOL SMessageLoop::PreTranslateMessage(THIS_ MSG *pMsg)
-{
-    return m_priv->PreTranslateMessage(pMsg);
-}
-
-BOOL SMessageLoop::OnIdle(THIS_ int nIdleCount)
-{
-    return m_priv->OnIdle(nIdleCount);
-}
-
-int SMessageLoop::Run(THIS)
-{
-    return m_priv->Run();
-}
-
-BOOL SMessageLoop::IsRunning(THIS) const
-{
-    return m_priv->IsRunning();
-}
-
-void SMessageLoop::OnMsg(THIS_ LPMSG pMsg)
-{
-    m_priv->OnMsg(pMsg);
-}
-
-void SMessageLoop::Quit(THIS_ int exitCode)
-{
-    m_priv->Quit(exitCode);
-}
-
-BOOL SMessageLoop::PostTask(THIS_ IRunnable *runable)
-{
-    return m_priv->PostTask(runable);
-}
-
-int SMessageLoop::RemoveTasksForObject(THIS_ void *pObj)
-{
-    return m_priv->RemoveTasksForObject(pObj);
-}
-
-void SMessageLoop::ExecutePendingTask()
-{
-    m_priv->ExecutePendingTask();
-}
-
-BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilterMax, BOOL bRemove)
-{
-    return m_priv->PeekMsg(pMsg, wMsgFilterMin, wMsgFilterMax, bRemove);
-}
-
-BOOL SMessageLoop::WaitMsg(THIS)
-{
-    return m_priv->WaitMsg();
-}
-
-int SMessageLoop::HandleMsg(THIS)
-{
-    return m_priv->HandleMsg();
 }
 
 SNSEND

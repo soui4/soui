@@ -104,7 +104,6 @@ SLogStream::SLogStream()
 
 SLogStream &SLogStream::writeWString(const wchar_t *t, int nLen)
 {
-#if defined(WIN32) || defined(_WIN64)
     DWORD dwLen = WideCharToMultiByte(CP_ACP, 0, t, nLen, NULL, 0, NULL, NULL);
     if (dwLen < Log::MAX_LOGLEN)
     {
@@ -116,9 +115,6 @@ SLogStream &SLogStream::writeWString(const wchar_t *t, int nLen)
             writeData("%s", buf);
         }
     }
-#else
-    // not support
-#endif
     return *this;
 }
 

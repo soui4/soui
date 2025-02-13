@@ -1,5 +1,5 @@
-#pragma once
-#include <wtypes.h>
+#ifndef _ENCODER_H_
+#define _ENCODER_H_
 #include <string>
 
 class Encoder
@@ -15,3 +15,5 @@ private:
     static char StrToBin(char *pString);
 
 };
+
+#endif//_ENCODER_H_

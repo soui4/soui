@@ -95,13 +95,7 @@ const unsigned short rgctype3Ansi[256] = {
 0x8003, 0x8003, 0x8003, 0x8003, 0x8003, 0x8003, 0x8000, 0x8003};//0xF8
 
 // Include the appropriate implementation.
-#include W32INCLUDE
-#if 0
-// Could be one of.
-// This list is here to allow the dependency generator to work.
 #include "w32win32.cpp"
-#include "w32wince.cpp"
-#endif
 
 ASSERTDATA
 
@@ -742,12 +736,6 @@ LONG CW32System::strtoul(const char *nptr)
 
 // CW32System static members
 BYTE	CW32System::_fLRMorRLM;
-#ifndef NOFEPROCESSING
-BYTE	CW32System::_fHaveIMMProcs;
-BYTE	CW32System::_fHaveIMMEShare;
-BYTE	CW32System::_fHaveAIMM;
-BYTE	CW32System::_fLoadAIMM10;
-#endif// NOFEPROCESSING
 UINT	CW32System::_fRegisteredXBox;
 LCID	CW32System::_syslcid;
 DWORD	CW32System::_dwMajorVersion;

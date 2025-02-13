@@ -15,6 +15,8 @@
 #define HIMETRIC_PER_INCH 2540
 #endif
 
+#define USE_MSFTEDIT
+
 SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 //  STextServiceHelper

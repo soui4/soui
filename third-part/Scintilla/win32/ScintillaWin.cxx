@@ -301,8 +301,8 @@ class ScintillaWin :
 	sptr_t WndPaint(uptr_t wParam);
 
 	sptr_t HandleCompositionWindowed(uptr_t wParam, sptr_t lParam);
-	sptr_t HandleCompositionInline(uptr_t wParam, sptr_t lParam);
-	static bool KoreanIME();
+    sptr_t HandleCompositionInline(uptr_t wParam, sptr_t lParam);
+    static bool KoreanIME();
 	void MoveImeCarets(int offset);
 	void DrawImeIndicator(int indicator, int len);
 	void SetCandidateWindowPos();
@@ -1229,7 +1229,12 @@ sptr_t ScintillaWin::WndProc(unsigned int iMessage, uptr_t wParam, sptr_t lParam
 		//Platform::DebugPrintf("S M:%x WP:%x L:%x\n", iMessage, wParam, lParam);
 		iMessage = SciMessageFromEM(iMessage);
 		switch (iMessage) {
-
+			case WM_IME_CHAR:
+			{
+				wchar_t c=(wchar_t)wParam;
+				AddWString(std::wstring(&c,1));
+				break;
+			}
 		case WM_CREATE:
 			ctrlID = ::GetDlgCtrlID(reinterpret_cast<HWND>(wMain.GetID()));
 			// Get Intellimouse scroll line parameters

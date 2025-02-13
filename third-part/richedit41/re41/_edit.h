@@ -907,8 +907,8 @@ public:
 	STDMETHOD(SetEffectColor)( LONG Index, COLORREF cr);
 	STDMETHOD(GetCaretType)( LONG *pCaretType);     
 	STDMETHOD(SetCaretType)( LONG CaretType);
-	STDMETHOD(GetImmContext)( LONG *pContext);
-	STDMETHOD(ReleaseImmContext)( LONG Context);
+	STDMETHOD(GetImmContext)( LONG_PTR *pContext);
+	STDMETHOD(ReleaseImmContext)( LONG_PTR Context);
 	STDMETHOD(GetPreferredFont)( LONG cp, LONG CodePage, LONG lOption, LONG curCodepage,
 		LONG curFontSize, BSTR *pFontName, LONG *pPitchAndFamily, LONG *pNewFontSize);
 	STDMETHOD(GetNotificationMode)( LONG *plMode);
