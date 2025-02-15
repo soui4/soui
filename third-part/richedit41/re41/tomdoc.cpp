@@ -1272,7 +1272,7 @@ STDMETHODIMP CTxtEdit::GetCaretType(
  *		HRESULT = ImmContext available ? NOERROR : E_INVALIDARG
  */
 STDMETHODIMP CTxtEdit::GetImmContext(
-	LONG *pContext)		//@parm Imm context
+	LONG_PTR *pContext)		//@parm Imm context
 {
 	if (!pContext)
 		return E_INVALIDARG;
@@ -1284,7 +1284,7 @@ STDMETHODIMP CTxtEdit::GetImmContext(
 		// ask host for Imm Context
 		HIMC hIMC = TxImmGetContext();
 		
-		*pContext = (LONG) hIMC;			
+		*pContext = (LONG_PTR) hIMC;			
 	}
 	
 	return *pContext ? NOERROR : S_FALSE;
@@ -1300,7 +1300,7 @@ STDMETHODIMP CTxtEdit::GetImmContext(
  *		HRESULT = ImmContext available ? NOERROR : E_INVALIDARG
  */
 STDMETHODIMP CTxtEdit::ReleaseImmContext(
-	LONG Context)		//@parm Imm context to be release
+	LONG_PTR Context)		//@parm Imm context to be release
 {
 	if (!_fInOurHost)
 	{

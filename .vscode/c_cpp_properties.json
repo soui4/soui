@@ -5,10 +5,9 @@
             "name": "linux",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/platform",
-                "${workspaceFolder}/platform/linux/include",
                 "${workspaceFolder}/utilities/include",
-                "${workspaceFolder}/third-part/gtest/include"
+                "${workspaceFolder}/third-part/gtest/include",
+                "${workspaceFolder}/swinx/thirdparty/xcb-imdkit/include"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/g++",

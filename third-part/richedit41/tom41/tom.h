@@ -3455,10 +3455,10 @@ struct    ITextDocument2 : public ITextDocument
             /* [in] */ LONG CaretType) = 0;
         
         virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE GetImmContext( 
-            /* [retval][out] */ LONG __RPC_FAR *pContext) = 0;
+            /* [retval][out] */ LONG_PTR __RPC_FAR *pContext) = 0;
         
         virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE ReleaseImmContext( 
-            /* [in] */ LONG Context) = 0;
+            /* [in] */ LONG_PTR Context) = 0;
         
         virtual /* [helpstring][id] */ HRESULT STDMETHODCALLTYPE GetPreferredFont( 
             /* [in] */ LONG cp,

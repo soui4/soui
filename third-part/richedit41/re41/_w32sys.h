@@ -693,7 +693,7 @@ public :
 	static BOOL ImmNotifyIME ( HIMC, DWORD, DWORD, DWORD, BOOL );
 	static HIMC ImmAssociateContext ( HWND, HIMC, BOOL );
 	static UINT ImmGetVirtualKey ( HWND, BOOL );
-	static HIMC ImmEscape ( HKL, HIMC, UINT, PVOID, BOOL );
+	static LRESULT ImmEscape ( HKL, HIMC, UINT, PVOID, BOOL );
 	static BOOL ImmGetOpenStatus ( HIMC, BOOL );
 	static BOOL ImmSetOpenStatus ( HIMC, BOOL, BOOL );
 	static BOOL ImmGetConversionStatus ( HIMC, LPDWORD, LPDWORD, BOOL );

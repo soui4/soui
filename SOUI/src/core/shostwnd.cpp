@@ -621,7 +621,7 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
             ModifyStyleEx(0, WS_EX_LAYERED | WS_EX_COMPOSITED);
 #endif //_WIN32
         }
-        SetLayeredWindowAlpha(GetRoot()->GetAlpha());
+        SetLayeredWindowAttributes(0, GetRoot()->GetAlpha(), LWA_ALPHA);
     }
     m_memRT = NULL;
     if (IsTranslucent())
@@ -1891,7 +1891,6 @@ void SHostWnd::UpdateAutoSizeCount(bool bInc)
 
 void SHostWnd::EnableIME(BOOL bEnable)
 {
-#ifdef _WIN32
     if (bEnable)
     {
         HIMC hImc = ImmGetContext(m_hWnd);
@@ -1910,7 +1909,6 @@ void SHostWnd::EnableIME(BOOL bEnable)
             ImmDestroyContext(hImc);
         }
     }
-#endif
 }
 
 void SHostWnd::OnUpdateCursor()
@@ -2242,7 +2240,7 @@ void SHostWnd::SHostAnimationHandler::OnNextFrame()
         }
         else if (m_pHostWnd->GetExStyle() & WS_EX_LAYERED)
         {
-            m_pHostWnd->GetNative()->SetLayeredWindowAlpha(xform.GetAlpha());
+            m_pHostWnd->SetLayeredWindowAttributes(0, xform.GetAlpha(), LWA_ALPHA);
         }
     }
     if (!bMore)

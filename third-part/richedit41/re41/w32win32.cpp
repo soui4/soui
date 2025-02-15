@@ -4405,7 +4405,7 @@ UINT CW32System::ImmGetVirtualKey (
 
 // NOTE: We only use ImmEscape for IME_ESC_HANJA_MODE.
 // Need to fix up if other methods are used.
-HIMC CW32System::ImmEscape ( 
+LRESULT CW32System::ImmEscape ( 
 							HKL hKL, 
 							HIMC hIMC, 
 							UINT uEscape, 
