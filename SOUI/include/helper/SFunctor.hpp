@@ -1,4 +1,6 @@
-#pragma once
+#ifndef _SFUNCTOR_H_
+#define _SFUNCTOR_H_
+
 #include <interface/STaskLoop-i.h>
 #include <interface/SMsgLoop-i.h>
 #include <interface/SWndContainer-i.h>
@@ -852,3 +854,5 @@ class STaskHelper {
 };
 
 SNSEND
+
+#endif//_SFUNCTOR_H_

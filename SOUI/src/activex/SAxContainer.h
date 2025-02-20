@@ -20,8 +20,6 @@
 #ifndef ATLACTIVEXCONTAINER_HPP
 #define ATLACTIVEXCONTAINER_HPP
 
-#pragma once
-
 #include "SAxUtil.h"
 #include <atl.mini/SComCli.h>
 #include <MsHtmHst.h>

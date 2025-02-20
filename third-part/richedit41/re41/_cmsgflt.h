@@ -19,53 +19,13 @@
 #endif
 
 class CIme;			
-class CUIM;
-class CTextMsgFilter;
-class CLangProfileSink;
-
+class CMsgCallBack;
 // CheckIMEType dwFlags
 #define CHECK_IME_SERVICE	0x0001
-
-#ifndef __ITfThreadMgr_INTERFACE_DEFINED__	
-class ITfThreadMgr;
-#endif
-
-class CLangProfileSink : public ITfLanguageProfileNotifySink
-{
-public:
-	CLangProfileSink();
-
-	//
-	// IUnknown methods
-	//
-	STDMETHODIMP QueryInterface(REFIID riid, void **ppvObj);
-	STDMETHODIMP_(ULONG) AddRef(void);
-	STDMETHODIMP_(ULONG) Release(void);
-
-	//
-	// ITfLanguageProfilesNotifySink
-	//
-	STDMETHODIMP OnLanguageChange(LANGID langid, BOOL *pfAccept);
-	STDMETHODIMP OnLanguageChanged();
-
-	HRESULT _Advise(CTextMsgFilter *, ITfInputProcessorProfiles *pipp);
-	HRESULT _Unadvise();
-
-private:
-
-	LONG _cRef;
-	CTextMsgFilter *_pTextMsgFilter;
-	ITfInputProcessorProfiles *_pITFIPP;
-	DWORD _dwCookie;
-};
 
 class CTextMsgFilter : public ITextMsgFilter
 {
 public :
-	
-	friend class CUIM;
-	friend class CLangProfileSink;
-
 	HRESULT STDMETHODCALLTYPE QueryInterface( 
 		REFIID riid,
 		void **ppvObject);
@@ -79,18 +39,15 @@ public :
 		LRESULT *plres);
 	HRESULT STDMETHODCALLTYPE AttachMsgFilter( ITextMsgFilter *pMsgFilter);
 
-	COMPCOLOR* GetIMECompAttributes();
-	
-	void	OnSetUIMMode(WORD wUIMModeBias); 
-	LRESULT	OnGetUIMMode() { return _wUIMModeBias; };
+	COMPCOLOR *GetIMECompAttributes();
 
+	CTextMsgFilter();
 	~CTextMsgFilter();
 
 	BOOL	IsIMEComposition()	{ return (_ime != NULL);};
 	BOOL	GetTxSelection();
 	BOOL	NoIMEProcess();
-	BOOL	MouseOperation(UINT msg, LONG ichStart, LONG cchComp, WPARAM wParam, WPARAM *pwParamBefore, 
-		BOOL *pfTerminateIME, HWND hwndIME, LONG *pCpCursor=NULL, ITfMouseSink *pMouseSink=NULL);
+    BOOL MouseOperation(UINT msg, LONG ichStart, LONG cchComp, WPARAM wParam, WPARAM *pwParamBefore, BOOL *pfTerminateIME, HWND hwndIME, LONG *pCpCursor = NULL);
 
 	CIme	*_ime;					// non-NULL when IME composition active
 	HWND	_hwnd;	
@@ -112,7 +69,6 @@ public :
 	DWORD	_fRE10Mode				:1;		// TRUE if running in RE1.0 Mode
 	DWORD	_fUsingUIM				:1;		// TRUE if Cicero is activated
 	DWORD	_fTurnOffUIM			:1;		// TRUE if Client doesn't want UIM
-	DWORD	_fTurnOffAIMM			:1;		// TRUE if Client doesn't want AIIM
 	DWORD	_nIMEMode				:2;		// 1 = IME_SMODE_PLAURALCLAUSE
 											// 2 = IME_SMODE_NONE
 	DWORD	_fNoIme					:1;		// TRUE if Client has turn off IME processing
@@ -137,17 +93,8 @@ public :
 
 	COMPCOLOR*			_pcrComp;			// Support 1.0 mode composition color
 	ITextDocument2		*_pTextDoc;	
-	ITextServices		*_pTextService;
 	ITextSelection		*_pTextSel;	
-	ITfThreadMgr		*_pTim;
-	CUIM				*_pCUIM;
-	TfClientId			_tid;
-#ifndef NOPRIVATEMESSAGE
 	CMsgCallBack		*_pMsgCallBack;
-#endif
-
-	ITfInputProcessorProfiles	*_pITfIPP;
-	CLangProfileSink	*_pCLangProfileSink;
 
 private:
 	ULONG				_crefs;
@@ -202,13 +149,7 @@ private:
 	LRESULT	OnGetIMEOptions();
 	void	SetupIMEOptions();
 	void	SetupCallback();
-	void	SetupLangSink();
-	void	ReleaseLangSink();
 	void	CompleteUIMTyping(LONG mode, BOOL fTransaction = TRUE);
-	void	StartUIM();
-	void	StartAimm(BOOL fUseAimm12);
-	void	TurnOffUIM(BOOL fSafeToSendMessage);
-	void	TurnOffAimm(BOOL fSafeToSendMessage);
 
 	int		OnGetIMECompText(WPARAM wparam, LPARAM lparam);
 	void OnSetIMEMode(WPARAM wparam, LPARAM lparam);
@@ -219,7 +160,5 @@ private:
 		return _nIMEMode == 1 ? IMF_SMODE_PLAURALCLAUSE : IMF_SMODE_NONE;
 	};
 	void	SetIMESentenseMode(BOOL fSetup, HKL hKL = NULL);
-
-	void	HandleCTFService(WPARAM wparam, LPARAM lparam);
 };
 

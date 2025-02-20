@@ -120,6 +120,15 @@ TEST(soui, semaphore) {
     semaphore.notify();
 }
 
+TEST(soui,mb){
+    const wchar_t * src = L"中文字符串test";
+    char sz936[100];
+    WideCharToMultiByte(936,0,src,-1,sz936,100,NULL,NULL);
+    wchar_t szWd[100];
+    MultiByteToWideChar(936,0,sz936,-1,szWd,100);
+    EXPECT_TRUE(wcscmp(src,szWd)==0);
+}
+
 class TaskHost {
 public:
     TaskHost(int id_) :id(id_) {}

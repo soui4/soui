@@ -158,7 +158,6 @@ BOOL CTxtEdit::LoadMsgFilter(
 #ifndef NOFEPROCESSING
 	if (!_fCheckAIMM)
 	{
-		DWORD	dwThreadId;
 		DWORD	dwLoadActiveInput = 0;
 
 		_fCheckAIMM = 1;
@@ -236,9 +235,6 @@ BOOL CTxtEdit::LoadMsgFilter(
 		case EM_SETIMECOLOR:
 		case EM_GETIMECOLOR:
 		case WM_IME_CHAR:
-#ifndef NOPRIVATEMESSAGE
-		case EM_SETUIM:
-#endif
 		case EM_SETIMEMODEBIAS:
 		case EM_GETIMEMODEBIAS:
 		case EM_GETCTFMODEBIAS:
@@ -1048,16 +1044,9 @@ update_kbd:
 	case EM_GETOLEINTERFACE:
 		if(lparam)
 		{
-#ifndef NOFEPROCESSING
-			if (wparam == 0x065737777)		// 'AIMM'
-				W32->GetAimmObject((IUnknown **)(lparam));
-			else
-#endif
-			{				
-				*(IRichEditOle **)lparam = (IRichEditOle *)this;
-				AddRef();				
-			}
-		} 
+            *(IRichEditOle **)lparam = (IRichEditOle *)this;
+            AddRef();
+        } 
 		lres = TRUE;
 		break;
 
@@ -2267,7 +2256,7 @@ update_kbd:
 		{
 			// This message supports Cicero InsertEmbedded
 			int	cpMin = ((CHARRANGE *)wparam)->cpMin;
-			int cpMost = ((CHARRANGE *)wparam)->cpMost;
+            int cpMost = ((CHARRANGE *)wparam)->cpMax;
 			CTxtRange	rg(this, cpMin, cpMin - cpMost);
 			REPASTESPECIAL rps;		// @parm Special paste info
 			rps.dwAspect = DVASPECT_CONTENT;
@@ -2361,7 +2350,7 @@ def:	hr = S_FALSE;
 	if(plresult)
 		*plresult = lres;
 
-#ifndef NOFEPROCESSING
+#ifndef NOPRIVATEMESSAGE
 	if (hr == S_FALSE && _pMsgFilter && _pMsgCallBack)
 	{
 		HWND hWnd;

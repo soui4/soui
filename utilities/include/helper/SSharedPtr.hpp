@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _SSHAREDPTR_H_
+#define _SSHAREDPTR_H_
 
 #include <helper/SCriticalSection.h>
 
@@ -225,3 +226,5 @@ SNSBEGIN
 	};
 
 SNSEND
+
+#endif//_SSHAREDPTR_H_

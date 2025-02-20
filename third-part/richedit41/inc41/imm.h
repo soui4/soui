@@ -18,19 +18,9 @@ extern "C" {
 #ifndef IMM_WINVER
 #define IMM_WINVER 0x040A
 #endif
-
-//#if(IMM_WINVER >= 0x040A)
-//DECLARE_HANDLE(HIMC);
-//#else
-typedef DWORD     HIMC;
-//#endif
-
-//#if(IMM_WINVER >= 0x040A)
-//DECLARE_HANDLE(HIMCC);
-//#else
-typedef DWORD     HIMCC;
-//#endif
-
+DECLARE_HANDLE(HIMC);
+DECLARE_HANDLE(HIMCC);
+ 
 typedef HKL FAR  *LPHKL;
 typedef UINT FAR *LPUINT;
 

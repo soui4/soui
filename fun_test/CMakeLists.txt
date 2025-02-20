@@ -20,7 +20,7 @@ test_native.cpp
 
 add_executable(fun_test ${CURRENT_HEADERS} ${FUN_TEST_SRC})
 
-add_dependencies(fun_test utilities4 gtest soui4 resprovider-zip log4z  render-gdi  render-skia taskloop Scintilla)
+add_dependencies(fun_test utilities4 gtest soui4 resprovider-zip log4z  render-gdi taskloop Scintilla)
 target_include_directories(fun_test 
     PUBLIC ${PROJECT_SOURCE_DIR}/third-part/Scintilla/include
 )

@@ -19,7 +19,6 @@
  */				
 #include "_common.h"
 #ifndef NOFEPROCESSING
-#include "msctf.h"
 #include "textserv.h"
 #include "_cmsgflt.h"				 
 #include "_ime.h"
@@ -56,71 +55,66 @@ HRESULT StartCompositionGlue (
 	CTextMsgFilter &TextMsgFilter)				// @parm containing message filter.
 
 {
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "StartCompositionGlue");
+    TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "StartCompositionGlue");
 
-	if(TextMsgFilter.IsIMEComposition() && TextMsgFilter._ime->IsTerminated()
-		&& !TextMsgFilter._ime->_compMessageRefCount && !(TextMsgFilter._fHangulToHanja))
-	{
-		delete TextMsgFilter._ime;
-		TextMsgFilter._ime = NULL;
-	}
+    if (TextMsgFilter.IsIMEComposition() && TextMsgFilter._ime->IsTerminated() && !TextMsgFilter._ime->_compMessageRefCount && !(TextMsgFilter._fHangulToHanja))
+    {
+        delete TextMsgFilter._ime;
+        TextMsgFilter._ime = NULL;
+    }
 
-	if(!TextMsgFilter.IsIMEComposition())
-	{
-		if(TextMsgFilter._pTextSel->CanEdit(NULL) == NOERROR &&
-			!TextMsgFilter.NoIMEProcess())
-		{
-			// Hold notification if needed
-			if (!(TextMsgFilter._fIMEAlwaysNotify))
-				TextMsgFilter._pTextDoc->SetNotificationMode(tomFalse);	
-	
-			// If a special UI, or IME is "near caret", then drop into lev. 2 mode.
-			DWORD imeProperties = ImmGetProperty(GetKeyboardLayout(0x0FFFFFFFF), IGP_PROPERTY, TextMsgFilter._fUsingAIMM);
-			
-			// use Unicode if not running under Win95
-			TextMsgFilter._fUnicodeIME =
-				(imeProperties & IME_PROP_UNICODE) && !W32->OnWin95();
+    if (!TextMsgFilter.IsIMEComposition())
+    {
+        if (TextMsgFilter._pTextSel->CanEdit(NULL) == NOERROR && !TextMsgFilter.NoIMEProcess())
+        {
+            // Hold notification if needed
+            if (!(TextMsgFilter._fIMEAlwaysNotify))
+                TextMsgFilter._pTextDoc->SetNotificationMode(tomFalse);
 
-			if ((imeProperties & IME_PROP_SPECIAL_UI) ||
-				!(imeProperties & IME_PROP_AT_CARET))
-			{
-				TextMsgFilter._ime = new CIme_Lev2(TextMsgFilter);		// level 2 IME.
-			}
-			else
-				TextMsgFilter._ime = new CIme_Lev3(TextMsgFilter);		// level 3 IME->TrueInline.
-		}
-		else													// Protect or read-only or NOFEPROCESSING:
-			TextMsgFilter._ime = new CIme_Protected;			// Ignore all ime input
-	}
-	else
-	{
-		// Ignore further StartCompositionMsg.
-		// Hanin 5.1 CHT symbol could cause multiple StartCompoisitonMsg.
-		return S_OK;								
-	}
+            // If a special UI, or IME is "near caret", then drop into lev. 2 mode.
+            DWORD imeProperties = ImmGetProperty(GetKeyboardLayout(0x0FFFFFFFF), IGP_PROPERTY, TextMsgFilter._fUsingAIMM);
 
-	if(TextMsgFilter.IsIMEComposition())					
-	{
-		LONG		lSelFlags;
-		HRESULT		hResult;
-		
-		hResult = TextMsgFilter._pTextSel->GetFlags(&lSelFlags);
-		if (hResult == NOERROR)
-		{
-			TextMsgFilter._fOvertypeMode = !!(lSelFlags & tomSelOvertype);		
-			if (TextMsgFilter._fOvertypeMode)
-				TextMsgFilter._pTextSel->SetFlags(lSelFlags & ~tomSelOvertype);	// Turn off overtype mode
-		}
-		
-		TextMsgFilter._pTextDoc->IMEInProgress(tomTrue);				// Inform client IME compostion in progress
+            // use Unicode if not running under Win95
+            TextMsgFilter._fUnicodeIME = (imeProperties & IME_PROP_UNICODE);
 
-		return TextMsgFilter._ime->StartComposition(TextMsgFilter);		// Make the method call.
-	}
-	else
-		TextMsgFilter._pTextDoc->SetNotificationMode(tomTrue);
+            if ((imeProperties & IME_PROP_SPECIAL_UI) || !(imeProperties & IME_PROP_AT_CARET))
+            {
+                TextMsgFilter._ime = new CIme_Lev2(TextMsgFilter); // level 2 IME.
+            }
+            else
+                TextMsgFilter._ime = new CIme_Lev3(TextMsgFilter); // level 3 IME->TrueInline.
+        }
+        else                                         // Protect or read-only or NOFEPROCESSING:
+            TextMsgFilter._ime = new CIme_Protected; // Ignore all ime input
+    }
+    else
+    {
+        // Ignore further StartCompositionMsg.
+        // Hanin 5.1 CHT symbol could cause multiple StartCompoisitonMsg.
+        return S_OK;
+    }
 
-	
-	return S_FALSE;
+    if (TextMsgFilter.IsIMEComposition())
+    {
+        LONG lSelFlags;
+        HRESULT hResult;
+
+        hResult = TextMsgFilter._pTextSel->GetFlags(&lSelFlags);
+        if (hResult == NOERROR)
+        {
+            TextMsgFilter._fOvertypeMode = !!(lSelFlags & tomSelOvertype);
+            if (TextMsgFilter._fOvertypeMode)
+                TextMsgFilter._pTextSel->SetFlags(lSelFlags & ~tomSelOvertype); // Turn off overtype mode
+        }
+
+        TextMsgFilter._pTextDoc->IMEInProgress(tomTrue); // Inform client IME compostion in progress
+
+        return TextMsgFilter._ime->StartComposition(TextMsgFilter); // Make the method call.
+    }
+    else
+        TextMsgFilter._pTextDoc->SetNotificationMode(tomTrue);
+
+    return S_FALSE;
 }
 
 /*
@@ -147,59 +141,58 @@ HRESULT CompositionStringGlue (
 	const LPARAM lparam,		// @parm associated with message.
 	CTextMsgFilter &TextMsgFilter)				// @parm the containing message filter.
 {
-	TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CompositionStringGlue");
+    TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "CompositionStringGlue");
 
-	HRESULT hr = S_FALSE;
+    HRESULT hr = S_FALSE;
 
-	if(TextMsgFilter.IsIMEComposition())						// A priori fHaveIMMProcs.
-	{
-		TextMsgFilter._ime->_compMessageRefCount++;			// For proper deletion.
-													// Make the method call.
-		hr = TextMsgFilter._ime->CompositionString(lparam, TextMsgFilter);
+    if (TextMsgFilter.IsIMEComposition()) // A priori fHaveIMMProcs.
+    {
+        TextMsgFilter._ime->_compMessageRefCount++; // For proper deletion.
+                                                    // Make the method call.
+        hr = TextMsgFilter._ime->CompositionString(lparam, TextMsgFilter);
 
-		TextMsgFilter._ime->_compMessageRefCount--;			// For proper deletion.
-		Assert (TextMsgFilter._ime->_compMessageRefCount >= 0);
+        TextMsgFilter._ime->_compMessageRefCount--; // For proper deletion.
+        Assert(TextMsgFilter._ime->_compMessageRefCount >= 0);
 
-		CheckDestroyIME (TextMsgFilter);						// Finished processing?
-	}
-	else // Even when not in composition mode, we may receive a result string.
-	{
-	
-		DWORD imeProperties = ImmGetProperty(GetKeyboardLayout(0x0FFFFFFFF), IGP_PROPERTY, TextMsgFilter._fUsingAIMM);
-		LONG		lSelFlags;
-		HRESULT		hResult;
-		LONG		cpMin, cpMax;
+        CheckDestroyIME(TextMsgFilter); // Finished processing?
+    }
+    else // Even when not in composition mode, we may receive a result string.
+    {
 
-		hResult = TextMsgFilter._pTextSel->GetFlags(&lSelFlags);
-		if (hResult == NOERROR)
-		{
-			TextMsgFilter._fOvertypeMode = !!(lSelFlags & tomSelOvertype);		
-			if (TextMsgFilter._fOvertypeMode)
-				TextMsgFilter._pTextSel->SetFlags(lSelFlags & ~tomSelOvertype);	// Turn off overtype mode
-		}
+        DWORD imeProperties = ImmGetProperty(GetKeyboardLayout(0x0FFFFFFFF), IGP_PROPERTY, TextMsgFilter._fUsingAIMM);
+        LONG lSelFlags;
+        HRESULT hResult;
+        LONG cpMin, cpMax;
 
-		// Use Unicode if not running under Win95
-		TextMsgFilter._fUnicodeIME =
-			(imeProperties & IME_PROP_UNICODE) && !W32->OnWin95();
-		
-		TextMsgFilter._pTextSel->GetStart(&cpMin);
-		TextMsgFilter._pTextSel->GetEnd(&cpMax);
-		
-		if (cpMin != cpMax)			
-			TextMsgFilter._pTextSel->SetText(NULL);							// Delete current selection
+        hResult = TextMsgFilter._pTextSel->GetFlags(&lSelFlags);
+        if (hResult == NOERROR)
+        {
+            TextMsgFilter._fOvertypeMode = !!(lSelFlags & tomSelOvertype);
+            if (TextMsgFilter._fOvertypeMode)
+                TextMsgFilter._pTextSel->SetFlags(lSelFlags & ~tomSelOvertype); // Turn off overtype mode
+        }
 
-		CIme::CheckKeyboardFontMatching (cpMin, &TextMsgFilter, NULL);
+        // Use Unicode if not running under Win95
+        TextMsgFilter._fUnicodeIME = (imeProperties & IME_PROP_UNICODE);
 
-		TextMsgFilter._pTextDoc->IMEInProgress(tomTrue);					// Inform client IME compostion in progress
-		hr = CIme::CheckInsertResultString(lparam, TextMsgFilter);
+        TextMsgFilter._pTextSel->GetStart(&cpMin);
+        TextMsgFilter._pTextSel->GetEnd(&cpMax);
 
-		if(TextMsgFilter._fOvertypeMode)
-			TextMsgFilter._pTextSel->SetFlags(lSelFlags | tomSelOvertype);	// Turn on overtype mode
+        if (cpMin != cpMax)
+            TextMsgFilter._pTextSel->SetText(NULL); // Delete current selection
 
-		TextMsgFilter._pTextDoc->IMEInProgress(tomFalse);					// Inform client IME compostion is done
-	}
+        CIme::CheckKeyboardFontMatching(cpMin, &TextMsgFilter, NULL);
 
-	return hr;
+        TextMsgFilter._pTextDoc->IMEInProgress(tomTrue); // Inform client IME compostion in progress
+        hr = CIme::CheckInsertResultString(lparam, TextMsgFilter);
+
+        if (TextMsgFilter._fOvertypeMode)
+            TextMsgFilter._pTextSel->SetFlags(lSelFlags | tomSelOvertype); // Turn on overtype mode
+
+        TextMsgFilter._pTextDoc->IMEInProgress(tomFalse); // Inform client IME compostion is done
+    }
+
+    return hr;
 }
 
 /*
@@ -300,7 +293,7 @@ HIMC LocalGetImmContext(
 	HIMC		hIMC = NULL;							// Host's IME context.
 	HRESULT		hResult;
 
-	hResult = TextMsgFilter._pTextDoc->GetImmContext((LONG *)&hIMC);
+	hResult = TextMsgFilter._pTextDoc->GetImmContext((LONG_PTR *)&hIMC);
 
 	if (hResult != NOERROR)
 		hIMC = ImmGetContext(TextMsgFilter._hwnd, TextMsgFilter._fUsingAIMM);		// Get host's IME context.
@@ -323,7 +316,7 @@ void LocalReleaseImmContext(
 
 	HRESULT		hResult;
 
-	hResult = TextMsgFilter._pTextDoc->ReleaseImmContext((LONG)hIMC);
+	hResult = TextMsgFilter._pTextDoc->ReleaseImmContext((LONG_PTR)hIMC);
 
 	if (hResult != NOERROR)
 		ImmReleaseContext(TextMsgFilter._hwnd, hIMC, TextMsgFilter._fUsingAIMM);
@@ -1357,13 +1350,13 @@ HRESULT CIme_Lev2::IMENotify(
 
 		if(hIMC)
 		{
-													// Convert bitID to INDEX.
+            DWORD dwMask(lparam);                // Convert bitID to INDEX.
 			for (index = 0; index < 32; index++)	//  because *stupid* API.
 			{
-				if((1 << index) & lparam)
+                if ((1 << index) & dwMask)
 					break;
 			}
-			Assert (((1 << index) & lparam) == lparam);	// Only 1 set?
+            Assert(((1 << index) & dwMask) == dwMask); // Only 1 set?
 			Assert (index < 32);						
 													// Reset to CFS_DEFAULT
 			if(ImmGetCandidateWindow(hIMC, index, &cdCandForm, TextMsgFilter._fUsingAIMM)
@@ -1524,20 +1517,6 @@ HRESULT CIme_Lev3::StartComposition(
 	{
 		_pTextFont->GetForeColor(&_crTextColor);
 		_pTextFont->GetBackColor(&_crBkColor);
-	}
-
-	// Setup IMEShare Lid if necessary
-	if (!TextMsgFilter._fRE10Mode && 
-		TextMsgFilter._uKeyBoardCodePage != CP_KOREAN &&
-		W32->HaveIMEShare())
-	{
-		CIMEShare *pIMEShare;
-		if (W32->getIMEShareObject(&pIMEShare))
-		{
-			LID hKL = (LID)GetKeyboardLayout(0x0FFFFFFFF);
-			if (pIMEShare->LidGetLid() != hKL)
-				pIMEShare->LidSetLid(hKL);
-		}
 	}
 
 	return S_OK;									// No DefWindowProc
@@ -1957,74 +1936,6 @@ void CIme_Lev3::SetCompositionStyle (
 		crText = pcrComp[attribute].crText;			
 		crBackground = pcrComp[attribute].crBackground;
 	}
-	else if (W32->HaveIMEShare())
-	{
-		CIMEShare *pIMEShare;
-		if (W32->getIMEShareObject(&pIMEShare))
-		{
-			if (TextMsgFilter._fUsingAIMM)
-			{
-				HIMC	hIMC = LocalGetImmContext(TextMsgFilter);	// Get host's IME context.
-
-				if (hIMC)
-				{
-					attribute = W32->GetDisplayGUID (hIMC, attribute);
-					LocalReleaseImmContext(TextMsgFilter, hIMC);	// Done with IME context.
-				}
-			}
-
-			// IMEShare 98 interface
-			fBold = pIMEShare->DwGetIMEStyle(attribute, IdstyIMEShareFBold);			
-			fItalic = pIMEShare->DwGetIMEStyle(attribute, IdstyIMEShareFItalic);
-
-			if (pIMEShare->DwGetIMEStyle(attribute, IdstyIMEShareFUl))
-			{
-				ulID = pIMEShare->DwGetIMEStyle(attribute, IdstyIMEShareUKul);
-				if(UINTIMEBOGUS != ulID)
-				{
-					LONG		lUnderlineCrIdx = 0;
-					COLORREF	crUl;
-
-					// get color for underline					
-					crUl = GetIMEShareColor(pIMEShare, attribute, IdstyIMEShareSubUl);					
-					if(UINTIMEBOGUS != crUl)
-					{
-						// NOTE:- attribute is 0 based and index for EffectColor is 1 based,
-						HRESULT hResult = TextMsgFilter._pTextDoc->SetEffectColor(attribute+1, crUl);
-						
-						// setup the high nibble for color index
-						if (hResult == NOERROR)
-							lUnderlineCrIdx = (attribute+1) << 8;
-					}
-
-					lUnderlineStyle = IMEShareToTomUL(ulID) + lUnderlineCrIdx;
-				}
-			}
-
-			crText = GetIMEShareColor(pIMEShare, attribute, IdstyIMEShareSubText);		
-			crBackground = GetIMEShareColor(pIMEShare, attribute, IdstyIMEShareSubBack);
-		}
-		else
-		{
-			// IMEShare 96 interface
-			const IMESTYLE	*pIMEStyle = PIMEStyleFromAttr(attribute);
-			if (NULL == pIMEStyle)
-				goto defaultStyle;		
-
-			fBold = FBoldIMEStyle(pIMEStyle);
-			fItalic = FItalicIMEStyle(pIMEStyle);
-
-			if (FUlIMEStyle(pIMEStyle))
-			{			
-				ulID = IdUlIMEStyle (pIMEStyle);
-				if(UINTIMEBOGUS != ulID)
-					lUnderlineStyle = IMEShareToTomUL(ulID);
-			}
-
-			crText = RGBFromIMEColorStyle(PColorStyleTextFromIMEStyle(pIMEStyle));						
-			crBackground = RGBFromIMEColorStyle(PColorStyleBackFromIMEStyle(pIMEStyle));
-		}
-	}
 	else // default styles when no IMEShare.dll exist.
 	{
 defaultStyle:
@@ -2144,12 +2055,13 @@ HRESULT CIme_Lev3::IMENotify(
 
 		if(hIMC)
 		{
+            DWORD dwMask(lparam);
 			for (index = 0; index < 32; index++)	// Convert bitID to INDEX
 			{										//  because *stupid* API
-				if((1 << index) & lparam)
+                if ((1 << index) & dwMask)
 					break;
 			}
-			Assert(((1 << index) & lparam) == lparam);	// Only 1 set?
+            Assert(((1 << index) & dwMask) == dwMask); // Only 1 set?
 			Assert(index < 32);
 
 			if(IMN_OPENCANDIDATE == wparam && !(TextMsgFilter._uKeyBoardCodePage == CP_KOREAN))	// Set candidate to caret.
@@ -2230,15 +2142,6 @@ HRESULT CIme_Lev3::IMENotify(
 			}
 
 			LocalReleaseImmContext(TextMsgFilter, hIMC);			// Done with IME context.
-
-			if (TextMsgFilter._fHangulToHanja == TRUE  &&
-				IMN_CLOSECANDIDATE == wparam &&					 
-				W32->OnWinNT4() && OnWinNTFE() && !TextMsgFilter._fUsingAIMM)
-			{
-				// By pass NT4.0 Kor Bug where we didn't get EndComposition message
-				// when user toggle the VK_HANJA key to terminate the reconversion.
-				TerminateIMEComposition(TextMsgFilter, CIme::TERMINATE_NORMAL);
-			}
 
 			if (IMN_CLOSECANDIDATE == wparam && CP_JAPAN == TextMsgFilter._uKeyBoardCodePage)
 				_fUpdateWindow = TRUE;			
@@ -2322,7 +2225,7 @@ BOOL CIme_Lev3::IMESupportMouse(
 		LocalReleaseImmContext(TextMsgFilter, hIMC);
 
 		// SendMessage returns TRUE if IME supports mouse operation
-		if (_hwndIME && SendMessage(_hwndIME, MSIMEMouseMsg, (WPARAM)IMEMOUSE_VERSION, hIMC) )
+		if (_hwndIME && SendMessage(_hwndIME, MSIMEMouseMsg, (WPARAM)IMEMOUSE_VERSION, (LPARAM)hIMC) )
 			_sIMESuportMouse = 1;
 	}
 

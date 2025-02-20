@@ -1,6 +1,9 @@
-#pragma once
-namespace SOUI
-{
+#ifndef _SEMPTYABLE_H_
+#define _SEMPTYABLE_H_
+
+#include <sdef.h>
+
+SNSBEGIN
 
 	/**
 	* This is an type which can represent an value or NULL.
@@ -123,4 +126,7 @@ namespace SOUI
 		T m_val;
 		bool m_empty;
 	};
-}
+
+SNSEND
+
+#endif//_SEMPTYABLE_H_
