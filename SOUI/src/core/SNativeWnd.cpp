@@ -114,7 +114,7 @@ struct tagThunk // this should come out to 16 bytes
     }
 };
 #pragma pack(pop)
-#elif defined(__arm64__) || defined(_M_ARM64)
+#elif defined(__arm64__) || defined(_M_ARM64) || defined(__aarch64__)
 #pragma pack(push, 1)
 struct tagThunk // this should come out to 16 bytes
 {
