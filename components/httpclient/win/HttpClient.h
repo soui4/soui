@@ -21,7 +21,6 @@ public:
 	STDMETHOD_(HttpError, GetErrorCode)(CTHIS) SCONST OVERRIDE{ return m_error;	}
 	STDMETHOD_(void,SetDownloadCallback)(THIS_ IHttpCallback* pCallback)  OVERRIDE{ m_pCallback = pCallback; }
 	STDMETHOD_(BOOL,DownloadFile)(THIS_ LPCSTR lpUrl, LPCSTR lpFilePath)  OVERRIDE;
-	STDMETHOD_(BOOL,DownloadToMem)(THIS_ LPCSTR lpUrl, OUT void** ppBuffer, OUT int* nSize) OVERRIDE;
 	STDMETHOD_(int,GetHttpCode)(CTHIS) SCONST  OVERRIDE{return m_httpCode;}
 protected:
 	BOOL	Init();

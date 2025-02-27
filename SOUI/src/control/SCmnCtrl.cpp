@@ -959,7 +959,11 @@ BOOL SProgress::SetValue(int dwValue)
 
 void SProgress::SetRange(int nMin, int nMax)
 {
-    SASSERT(nMax > nMin);
+    if(nMax<=nMin)
+    {
+        SSLOGW()<<"invalid range: min="<<nMin<<" max="<<nMax;
+        return;
+    }
     m_nMaxValue = nMax;
     m_nMinValue = nMin;
     if (m_nValue > m_nMaxValue)

@@ -192,66 +192,6 @@ BOOL CWinHttp::DownloadFile( LPCSTR lpUrl, LPCSTR lpFilePath )
 	return bRet;
 }
 
-BOOL CWinHttp::DownloadToMem(LPCSTR lpUrl, OUT void** ppBuffer, OUT int* nSize)
-{
-	BOOL bResult = false;
-	BYTE* lpFileMem = NULL;
-	void* lpBuff = NULL;
-	DWORD dwLength = 0, dwBytesToRead = 0,  dwReadSize = 0, dwRecvSize = 0;
-	try
-	{
-		if ( !InitConnect(lpUrl, Hr_Get) )
-			throw Hir_InitErr;
-		if ( !QueryContentLength(dwLength) )
-			throw Hir_QueryErr;
-		wstring strHeaders;
-		BOOL bQuery = QueryRawHeaders(strHeaders);
-		if ( bQuery && (strHeaders.find(L"404")!=wstring::npos) )
-			throw Hir_404;
-		if ( !::WinHttpQueryDataAvailable(m_hRequest, &dwBytesToRead) )
-			throw Hir_QueryErr;
-		lpFileMem = (BYTE*)malloc(dwLength);
-		if(!lpFileMem)
-			throw Hir_BufferErr;
-		lpBuff = malloc(HTTP_READBUF_LEN);
-		while( true )
-		{
-			if ( dwBytesToRead>HTTP_READBUF_LEN )
-			{
-				free(lpBuff);
-				lpBuff = malloc(dwBytesToRead);
-			}
-			if ( !::WinHttpReadData(m_hRequest, lpBuff, dwBytesToRead, &dwReadSize) )
-				throw Hir_DownloadErr;
-			memcpy(lpFileMem+dwRecvSize, lpBuff, dwReadSize);
-			dwRecvSize += dwReadSize;
-			if ( !::WinHttpQueryDataAvailable(m_hRequest, &dwBytesToRead) )
-				throw Hir_DownloadErr;
-			if ( dwBytesToRead<= 0 )
-			{
-				bResult = true;
-				break;
-			}
-		}
-	}
-	catch( HttpError error )
-	{
-		m_error = error;
-	}
-	if ( lpBuff )
-		free(lpBuff);
-	if ( bResult )
-	{
-		*ppBuffer = lpFileMem;
-		*nSize = dwRecvSize;
-	}
-	else if(lpFileMem)
-	{
-		free(lpFileMem);
-	}
-	return bResult;
-}
-
 int CWinHttp::QueryStatusCode()
 {
 	int http_code = 0;

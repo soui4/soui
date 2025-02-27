@@ -254,7 +254,7 @@ int SMessageLoopPriv::RemoveTasksForObject(void *pObj)
     while (it != m_runnables.end())
     {
         RunnableList::iterator it2 = it++;
-        IRunnable *p = *it;
+        IRunnable *p = *it2;
         if (p->getObject() == pObj)
         {
             p->Release();
@@ -267,7 +267,7 @@ int SMessageLoopPriv::RemoveTasksForObject(void *pObj)
     while (it != m_runningQueue.end())
     {
         RunnableList::iterator it2 = it++;
-        IRunnable *p = *it;
+        IRunnable *p = *it2;
         if (p->getObject() == pObj)
         {
             p->Release();

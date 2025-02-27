@@ -955,7 +955,7 @@ void SHostWnd::OnSize(UINT nType, CSize size)
         return;
 
     BOOL bSizeChange = size != m_szPrev;
-    SSLOGI() << "on host size,szPrev=" << m_szPrev.cx << "," << m_szPrev.cy << " size=" << size.cx << "," << size.cy << " sizeChange=" << bSizeChange;
+    //SSLOGI() << "on host size,szPrev=" << m_szPrev.cx << "," << m_szPrev.cy << " size=" << size.cx << "," << size.cy << " sizeChange=" << bSizeChange;
     if (bSizeChange)
     {
         if (m_nAutoSizing == 0)

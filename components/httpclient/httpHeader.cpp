@@ -1,5 +1,4 @@
-﻿#include <Windows.h>
-
+﻿
 #include "httpHeader.h"
 #include "define.h"
 
@@ -76,44 +75,18 @@ void CHttpHeader::setRange(__int64 range)
 		return;
 	}
 	char buffer[64] = { 0 };
-	sprintf_s(buffer, "bytes=%lld-", range);
+	#ifdef _WIN32
+	sprintf(buffer, "bytes=%lld-", range);
+	#else
+	sprintf(buffer, "bytes=%ld-", range);
+	#endif//_WIN32
 	http_headers.insert(std::make_pair(HEADER_RANGE, std::string(buffer)));
 }
 
 std::string CHttpHeader::toString(RequestType type)
 {
-	//填充默认值
-	if (http_version_.empty()) {
-		http_version_.assign(default_http_version);
-	}
-	if (http_headers.find(HEADER_USER_AGENT) == http_headers.end()) {
-		http_headers.insert(std::make_pair(HEADER_USER_AGENT, default_user_agent));
-	}
-	if (http_headers.find(HEADER_CONNECTION) == http_headers.end()) {
-		http_headers.insert(std::make_pair(HEADER_USER_AGENT, default_http_version));
-	}
-	if (http_headers.find(HEADER_ACCEPT) == http_headers.end()) {
-		http_headers.insert(std::make_pair(HEADER_ACCEPT, default_accept));
-	}
-	if (http_headers.find(HEADER_CONNECTION) == http_headers.end()) {
-		http_headers.insert(std::make_pair(HEADER_CONNECTION, default_connection));
-	}
-	if (http_headers.find(HEADER_ACCEPT_LANGUAGE) == http_headers.end()) {
-		http_headers.insert(std::make_pair(HEADER_ACCEPT_LANGUAGE, default_language));
-	}
 	std::string header((type == Hr_Post) ? "POST " : "GET ");
-	header += request_page_;
-	header.append(" ");
-	header += http_version_;
-	header.append(http_newline);
-	for (KEYMAP::iterator itor = http_headers.begin(); itor != http_headers.end(); ++itor) {
-		header += itor->first;
-		header.append(": ");
-		header += itor->second;
-		header.append(http_newline);
-	}
-	header.append(http_newline);
-	header.append(http_newline);
+	header += toHttpHeaders();
 	return header;
 }
 
@@ -135,12 +108,18 @@ std::string CHttpHeader::toHttpHeaders()
 		http_headers.insert(std::make_pair(HEADER_ACCEPT_LANGUAGE, default_language));
 	}
 	std::string header;
+
+	header += request_page_;
+	header.append(" ");
+	header += http_version_;
+	header.append(http_newline);
 	for (KEYMAP::iterator itor = http_headers.begin(); itor != http_headers.end(); ++itor) {
 		header += itor->first;
 		header.append(": ");
 		header += itor->second;
 		header.append(http_newline);
 	}
+	header.append(http_newline);
 	return header;
 }
 

@@ -7,9 +7,13 @@
 #endif
 
 #ifndef ZIP_DISABLE_WILDCARD
+#ifdef _WIN32
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
-#endif
+#else
+#include <shellapi.h>
+#endif//_WIN32
+#endif // ZIP_DISABLE_WILDCARD
 
 // Include ZLIB stuff. ZLIB is maintained by Jean-loup Gailly and Mark Adler.
 // It is a general GZIP and PKZIP compatible compression library.

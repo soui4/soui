@@ -14,13 +14,12 @@ Abstract:
 --*/
 
 
+#if !defined(_WINHTTPX_)
+#define _WINHTTPX_
 
-#pragma  once
 #include "WinInet.h"  // references some data defines
 #pragma warning(disable : 4005)	// disable C4005 warning
 
-#if !defined(_WINHTTPX_)
-#define _WINHTTPX_
 
 
 

@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef _HTTP_HEADER_H_
+#define _HTTP_HEADER_H_
+
 #include <string>
 #include <map>
 #include <interface/SHttpClient-i.h>
@@ -48,3 +50,5 @@ private:
 };
 
 SNSEND
+
+#endif//_HTTP_HEADER_H_
