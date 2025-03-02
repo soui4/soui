@@ -63,7 +63,7 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
     SCriticalSection m_cs;
     SCriticalSection m_csRunningQueue;
-    DWORD m_tid;
+    tid_t m_tid;
     SMessageLoopPriv *m_priv;
 };
 
