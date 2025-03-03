@@ -290,6 +290,10 @@ int run_app(HINSTANCE hInst) {
         }
         app.SetLogManager(pLogMgr);
     }
+    #ifndef _WIN32
+    //test for AddFontResource
+    AddFontResource((srcDir+"/simsun.ttc").c_str());
+    #endif//_WIN32
     SLOGI() << "start soui app";
     CMainDlg hostWnd("layout:XML_MAINWND");
     hostWnd.CreateEx(0, WS_POPUP, WS_EX_LAYERED, 300, 100, 0, 0);
