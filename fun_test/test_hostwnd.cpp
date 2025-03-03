@@ -163,6 +163,16 @@ public:
         CRect rc = GetWindowRect();
         pwnd->CreateEx(m_hWnd,WS_POPUP|WS_VISIBLE,WS_EX_LAYERED,rc.right+5,rc.top,0,0);
     }
+    void OnBtnSaveRtf(){
+        SRichEdit *pEdit = FindChildByName2<SRichEdit>("re_test");
+        if(pEdit){
+            std::string srcDir = getSourceDir();
+            srcDir += "/fun_test/uires/rtf/test.rtf";
+            pEdit->SaveRtf(srcDir.c_str());
+        }else{
+            SLOGE()<<"find re_test as richedit failed!";
+        }
+    }
 
     EVENT_MAP_BEGIN()
         EVENT_ID_COMMAND(1, OnClose)
@@ -172,6 +182,7 @@ public:
         EVENT_NAME_COMMAND(L"btn_msgbox", OnShowMsgbox)
         EVENT_NAME_COMMAND(L"btn_smenuex", OnBtnSMenuEx)
         EVENT_NAME_COMMAND(L"btn_soui", OnBtnSoui)
+        EVENT_NAME_COMMAND(L"btn_save_rtf",OnBtnSaveRtf)
         EVENT_HANDLER(EventRealWndCreate::EventID, OnRealWndCreate)
         EVENT_HANDLER(EventRealWndDestroy::EventID, OnRealWndDestroy)
         EVENT_HANDLER(EventInit::EventID,OnInit)
