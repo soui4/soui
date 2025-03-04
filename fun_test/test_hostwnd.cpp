@@ -2,6 +2,7 @@
 #include <helper/SMenu.h>
 #include <helper/SMenuEx.h>
 #include <Scintilla.h>
+#include <commdlg.h>
 #include <resprovider-zip/zipresprovider-param.h>
 #include "common.h"
 #include "ScintillaWnd.h"
@@ -173,6 +174,43 @@ public:
             SLOGE()<<"find re_test as richedit failed!";
         }
     }
+    void OnBtnPickColor(){
+        CHOOSECOLOR cc;                 // common dialog box structure 
+        // Initialize CHOOSECOLOR 
+        ZeroMemory(&cc, sizeof(cc));
+        cc.lStructSize = sizeof(cc);
+        cc.hwndOwner = m_hWnd;
+        cc.lpCustColors = NULL;
+        cc.rgbResult = RGBA(255,0,0,255);
+        cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+        if(ChooseColor(&cc)){
+            SStringA str=SStringA().Format("#%02x%02x%02x%02x",
+            GetRValue(cc.rgbResult),
+            GetGValue(cc.rgbResult),
+            GetBValue(cc.rgbResult),
+            GetAValue(cc.rgbResult));
+            SWindow *pWnd = FindChildByName("wnd_color");
+            if(pWnd) 
+                pWnd->SetAttributeA("colorBkgnd",str,FALSE);
+            SWindow *pTxt = FindChildByName("txt_color");
+            if(pTxt)
+                pTxt->SetWindowTextA(str);
+        }
+    }
+
+    void OnBtnPickFolder(){
+        #ifndef _WIN32
+        BROWSEINFO info={0};
+        TCHAR szBuf[MAX_PATH];
+        info.lpszPath = szBuf;
+        info.nMaxPath = MAX_PATH;
+        if(PickFolder(&info)){
+            SWindow *pWnd = FindChildByName("txt_folder");
+            if(pWnd) 
+                pWnd->SetWindowText(szBuf);
+        }
+        #endif//!_WIN32
+    }
 
     EVENT_MAP_BEGIN()
         EVENT_ID_COMMAND(1, OnClose)
@@ -183,6 +221,8 @@ public:
         EVENT_NAME_COMMAND(L"btn_smenuex", OnBtnSMenuEx)
         EVENT_NAME_COMMAND(L"btn_soui", OnBtnSoui)
         EVENT_NAME_COMMAND(L"btn_save_rtf",OnBtnSaveRtf)
+        EVENT_NAME_COMMAND(L"btn_pick_color",OnBtnPickColor)
+        EVENT_NAME_COMMAND(L"btn_pick_folder",OnBtnPickFolder)
         EVENT_HANDLER(EventRealWndCreate::EventID, OnRealWndCreate)
         EVENT_HANDLER(EventRealWndDestroy::EventID, OnRealWndDestroy)
         EVENT_HANDLER(EventInit::EventID,OnInit)

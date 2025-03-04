@@ -77,6 +77,12 @@
         "strfun.h": "c",
         "lsdefs.h": "c",
         "lsdntext.h": "c",
-        "cairo.h": "c"
+        "cairo.h": "c",
+        "charconv": "cpp",
+        "optional": "cpp",
+        "format": "cpp",
+        "span": "cpp",
+        "text_encoding": "cpp",
+        "variant": "cpp"
     }
 }

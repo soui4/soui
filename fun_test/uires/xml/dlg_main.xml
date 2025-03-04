@@ -18,11 +18,19 @@
 		</caption>
 
 		<tabctrl size="-2,0" weight="1" tabHeight="30" animateSteps="30" curSel="0">
-			<page title="test" layout="vbox">
+			<page title="test" layout="vbox" interval="10">
 				<dateTimePicker size="240,30" name="timepicker" padding="4,0,4,0" dropWidth="300" timeEnable="1">
 					<calstyle ncSkin="_skin.sys.border" daySkin="_skin.sys.btn.normal" margin="1" />
 				</dateTimePicker>
-				<edit extend_left="10" size="200,30" name="edit_test2" text="under" margin="2" enableDragdrop="0"/>
+				<window size="-2,-1"  layout="hbox" interval="10" gravity="center">
+					<button name="btn_pick_color" text="pick color" size="100,30"/>
+					<window name="wnd_color" size="50,50" colorBkgnd="@color/white"/>
+					<text name="txt_color" size="100,30"/>
+				</window>
+				<window size="-2,-1"  layout="hbox" interval="10" gravity="center">
+					<button name="btn_pick_folder" text="pick folder" size="100,30"/>
+					<text name="txt_folder" size="0,30" weight="1" colorBkgnd="@color/gray" text="test"/>
+				</window>
 			</page>
 			<page title="page1" layout="vbox" gravity="center" colorBkgnd="@color/white" interval="5">
 				<text text="hello soui in page1" colorText="@color/red" colorBkgnd="@color/gray"/>
