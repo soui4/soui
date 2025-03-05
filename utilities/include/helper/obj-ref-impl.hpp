@@ -1,6 +1,7 @@
 ﻿//IObjRef的实现类
 #ifndef __OBJ_REF_IMPL_HPP
 #define __OBJ_REF_IMPL_HPP
+#include <windows.h>
 #include <sdef.h>
 #include <objbase.h>
 #include <interface/obj-ref-i.h>
