@@ -1,4 +1,4 @@
 [submodule "swinx"]
 	path = swinx
 	url = https://gitee.com/setoutsoft/swinx.git
-	branch = rel_1.0
+	branch = master
