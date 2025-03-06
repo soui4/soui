@@ -1,9 +1,12 @@
 ﻿#include <souistd.h>
-#include "SSwitch.h"
+#include "control/SSwitch.h"
 
 SNSBEGIN
 
 	SSwitch::SSwitch()
+    : m_pSkin(GETBUILTINSKIN(SKIN_SYS_SWITCH_BG))
+    , m_pSkinForce(GETBUILTINSKIN(SKIN_SYS_SWITCH))
+    , m_animator(NULL)
 	{
 		m_animator.Attach(SApplication::getSingletonPtr()->CreateValueAnimatorByName(SFloatAnimator::GetClassName()));
 		m_animator->setDuration(200);

@@ -35,6 +35,8 @@
         <file name="SYS_BTN_NEXT" path="theme_sys_res\sys_btn_next.png"/>
         <file name="SYS_SPIN_DOWN" path="theme_sys_res\sys_spin_down.png"/>
         <file name="SYS_SPIN_UP" path="theme_sys_res\sys_spin_up.png"/>
+        <file name="SYS_SWITCH" path="theme_sys_res\sys_switch.png"/>
+        <file name="SYS_SWITCH_BG" path="theme_sys_res\sys_switch_bg.png"/>
     </PNG>
     <XML>
         <file name="SYS_XML_SKIN" path="theme_sys_res\sys_xml_skin.xml"/>

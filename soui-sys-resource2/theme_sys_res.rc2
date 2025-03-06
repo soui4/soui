@@ -12,7 +12,7 @@ SYS_DROPBTN             PNG                     "theme_sys_res\\sys_dropbtn.png"
 SYS_SCROLLBAR           PNG                     "theme_sys_res\\sys_scrollbar.png"
 SYS_TREE_CHECKBOX       PNG                     "theme_sys_res\\sys_tree_checkbox.png"
 SYS_TREE_TOGGLE         PNG                     "theme_sys_res\\sys_tree_toggle.png"
-SYS_TREE_LINES		    PNG						"theme_sys_res\\sys_tree_lines.png"
+SYS_TREE_LINES          PNG                     "theme_sys_res\\sys_tree_lines.png"
 SYS_HEADER              PNG                     "theme_sys_res\\sys_header.png"
 SYS_SPLIT_VERT          PNG                     "theme_sys_res\\sys_split_vert.png"
 SYS_SPLIT_HORZ          PNG                     "theme_sys_res\\sys_split_horz.png"
@@ -37,6 +37,8 @@ SYS_BTN_PREV           	PNG                     "theme_sys_res\\sys_btn_prev.png
 SYS_BTN_NEXT           	PNG                     "theme_sys_res\\sys_btn_next.png"
 SYS_SPIN_DOWN           PNG                     "theme_sys_res\\sys_spin_down.png"
 SYS_SPIN_UP             PNG                     "theme_sys_res\\sys_spin_up.png"
+SYS_SWITCH              PNG                     "theme_sys_res\\sys_switch.png"
+SYS_SWITCH_BG           PNG                     "theme_sys_res\\sys_switch_bg.png"
 /////////////////////////////////////////////////////////////////////////////
 //
 // XML

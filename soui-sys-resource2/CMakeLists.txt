@@ -18,7 +18,8 @@ else()
     add_library(soui-sys-resource2 STATIC  ${SRC_MAIN} ${RCS_MAIN})
 endif()
 if(MSVC)
-    set_target_properties(soui-sys-resource2 PROPERTIES LINK_FLAGS "/NOENTRY /FORCE")      
+    string(REPLACE "/RTC1" "" CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG}")
+    set_target_properties(soui-sys-resource2 PROPERTIES LINK_FLAGS "/NOENTRY")      
 endif()
 
 install(TARGETS soui-sys-resource

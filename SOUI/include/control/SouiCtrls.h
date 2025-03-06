@@ -27,6 +27,7 @@
 #include <control/SStackView.h>
 #include <control/SRichEdit.h>
 #include <control/SMenuBar.h>
+#include <control/SSwitch.h>
 #ifdef _WIN32
 #include <control/SActiveX.h>
 #endif

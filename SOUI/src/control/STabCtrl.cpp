@@ -672,6 +672,16 @@ int STabCtrl::InsertItem(LPCWSTR lpContent, int iInsert /*=-1*/)
 
 int STabCtrl::InsertItem(SXmlNode xmlNode, int iInsert /*=-1*/, BOOL bLoading /*=FALSE*/)
 {
+    if (_wcsicmp(xmlNode.name(), L"include") == 0)
+    { // support include tag
+        SStringT strSrc = S_CW2T(xmlNode.attribute(L"src").value());
+        SXmlDoc xmlDoc;
+        if (!LOADXML(xmlDoc, strSrc))
+            return NULL;
+        return InsertItem(xmlDoc.root().first_child(),iInsert,bLoading);
+    }
+    if (wcscmp(xmlNode.name(), STabPage::GetClassName()) != 0)
+        return NULL;
     STabPage *pChild = CreatePageFromXml(xmlNode);
     if (!pChild)
         return -1;

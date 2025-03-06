@@ -21,7 +21,6 @@
 #include "../controls.extend/SStaticGdip.h"
 #include "../controls.extend/SRoundWnd.h"
 #include "../controls.extend/SImageKnob.h"
-#include "../controls.extend/SSwitch.h"
 #include "../controls.extend/SMcListViewEx/SHeaderCtrlEx.h"
 #include "../controls.extend/SMcListViewEx/SMCListViewEx.h"
 
@@ -262,7 +261,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		theApp->RegisterWindowClass<SRoundWnd>();
 		theApp->RegisterWindowClass<SHexEdit>();
         theApp->RegisterWindowClass<SImageKnob>();
-        theApp->RegisterWindowClass<SSwitch>();
 		theApp->RegisterWindowClass<SFadeFrame>();//注册渐显隐动画控件
 		theApp->RegisterWindowClass<SRadioBox2>();//注册RadioBox2
 		theApp->RegisterWindowClass<SCalendar2>();//注册SCalendar2

@@ -37,6 +37,8 @@ SYS_BTN_PREV           	PNG                     "theme_sys_res\\sys_btn_prev.png
 SYS_BTN_NEXT           	PNG                     "theme_sys_res\\sys_btn_next.png"
 SYS_SPIN_DOWN           PNG                     "theme_sys_res\\sys_spin_down.png"
 SYS_SPIN_UP             PNG                     "theme_sys_res\\sys_spin_up.png"
+SYS_SWITCH              PNG                     "theme_sys_res\\sys_switch.png"
+SYS_SWITCH_BG           PNG                     "theme_sys_res\\sys_switch_bg.png"
 /////////////////////////////////////////////////////////////////////////////
 //
 // XML

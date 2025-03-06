@@ -230,8 +230,8 @@
 			<imgbtn name="btn_msgbox" width="200" height="40" accel="ctrl+alt+f9" font="bold:1" skin="win10btn" animate="1">show msg box</imgbtn>
 			<text>press "ctrl+alt+f9" to activate the msgbox button</text>
 			<window size="-1,-1" layout="hbox" interval="20">
-				<switch skin="skin_switch_bg" skinforce="skin_switch"/>
-				<switch skin="skin_switch_bg" skinforce="skin_switch" checked="1"/>
+				<switch />
+				<switch checked="1"/>
 			</window>
 			<link maxWidth="200" class="cls_btn_weblink" dotted="1" href="https://gitee.com/setoutsoft/soui4">https://gitee.com/setoutsoft/soui4</link>
 			<img size="100,100" skin="skin_page_icons" iconIndex="2" tip="the image show how to handle message in SImageWnd,\n you can do it by simply setting msgTransparent to 0" msgTransparent="0" />
