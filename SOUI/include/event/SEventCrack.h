@@ -143,6 +143,18 @@
             return TRUE;                                \
     }
 
+// void OnCommand(int magic)
+#define EVENT_ID_COMMAND_MAGIC(id, func,magic)          \
+    if (SOUI::EVT_CMD == uCode && id == pEvt->IdFrom()) \
+    {                                                   \
+        nCount++;                                       \
+        pEvt->SetBubbleUp(false);                       \
+        func(magic);                                         \
+        if (!pEvt->IsBubbleUp())                        \
+            return TRUE;                                \
+    }
+
+
 // void OnCommand(int nID)
 #define EVENT_ID_COMMAND_RANGE(idMin, idMax, func)                                    \
     if (SOUI::EVT_CMD == uCode && idMin <= pEvt->IdFrom() && idMax >= pEvt->IdFrom()) \
@@ -161,6 +173,17 @@
         nCount++;                                                                                  \
         pEvt->SetBubbleUp(false);                                                                  \
         func();                                                                                    \
+        if (!pEvt->IsBubbleUp())                                                                   \
+            return TRUE;                                                                           \
+    }
+
+// void OnCommand(int magic)
+#define EVENT_NAME_COMMAND_MAGIC(name, func,magic)                                                             \
+    if (SOUI::EVT_CMD == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
+    {                                                                                              \
+        nCount++;                                                                                  \
+        pEvt->SetBubbleUp(false);                                                                  \
+        func(magic);                                                                                    \
         if (!pEvt->IsBubbleUp())                                                                   \
             return TRUE;                                                                           \
     }
