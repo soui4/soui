@@ -167,8 +167,8 @@ public:
     void OnBtnSaveRtf(){
         SRichEdit *pEdit = FindChildByName2<SRichEdit>("re_test");
         if(pEdit){
-            std::string srcDir = getSourceDir();
-            srcDir += "/fun_test/uires/rtf/test.rtf";
+            std::tstring srcDir = getSourceDir();
+            srcDir += _T("/fun_test/uires/rtf/test.rtf");
             pEdit->SaveRtf(srcDir.c_str());
         }else{
             SLOGE()<<"find re_test as richedit failed!";
@@ -194,7 +194,7 @@ public:
                 pWnd->SetAttributeA("colorBkgnd",str,FALSE);
             SWindow *pTxt = FindChildByName("txt_color");
             if(pTxt)
-                pTxt->SetWindowTextA(str);
+                pTxt->SetWindowText(S_CA2T(str));
         }
     }
 
