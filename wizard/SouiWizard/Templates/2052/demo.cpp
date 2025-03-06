@@ -19,11 +19,7 @@
 #include "resprovider-7zip\zip7resprovider-param.h"
 #endif
 #endif
-#ifdef _DEBUG
-#define SYS_NAMED_RESOURCE _T("soui-sys-resourced.dll")
-#else
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
-#endif
 [!if CHECKBOX_USE_LUA]
 #ifdef _DEBUG
 #pragma comment(lib,"lua-54d")
