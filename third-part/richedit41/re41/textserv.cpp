@@ -2461,6 +2461,7 @@ HRESULT CTxtEdit::TxDraw(
 
 	// JMO : FUTURE : We should do something about reentrant draws sometime.
 	// If we do that may procide a simpler fix for RAID bug 7212.
+    COLORREF crTxt = GetTextColor(hdcDraw);//backup current text color
 
 #if !defined(NOMAGELLAN)
 	CMagellanBMPStateWrap bmpOff(*this, hdcDraw);
@@ -2618,6 +2619,7 @@ HRESULT CTxtEdit::TxDraw(
 		// and put it there!!
 		poleobjActive->OnReposition();
 	}
+    SetTextColor(hdcDraw,crTxt);//restore text color, in case of text color had been changed by richedit.
 
 	return hr;
 }
