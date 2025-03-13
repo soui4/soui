@@ -47,6 +47,7 @@ static const TCHAR * kPath_TestXml =_T("/demo2/uires/xml/dlg_main.xml");
 static const TCHAR* kPath_TestYyLogo = _T("/fun_test/uires/image/yy.png");
 
 TEST(sowinapi,file){
+    //CopyDir("/home/flyhigh/work/soui4js/wizard/template/*.*","/home/flyhigh/work/test");
     //DeleteFile("/home/flyhigh/work/test.txt");
     //DelDir("/home/flyhigh/work/tst",TRUE);
     //DelDir("/home/flyhigh/work/tst2",FALSE);
