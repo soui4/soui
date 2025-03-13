@@ -46,6 +46,12 @@ static const TCHAR * kPath_TestPng =_T("/demo/uires/image/soui.png");
 static const TCHAR * kPath_TestXml =_T("/demo2/uires/xml/dlg_main.xml");
 static const TCHAR* kPath_TestYyLogo = _T("/fun_test/uires/image/yy.png");
 
+TEST(sowinapi,file){
+    //DeleteFile("/home/flyhigh/work/test.txt");
+    //DelDir("/home/flyhigh/work/tst",TRUE);
+    //DelDir("/home/flyhigh/work/tst2",FALSE);
+}
+
 TEST(sowinapi, global_0){
     HGLOBAL h = GlobalAlloc(0,100);
     char * ptr = (char*)GlobalLock(h);
