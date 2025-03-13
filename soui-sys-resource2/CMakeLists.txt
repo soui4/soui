@@ -22,14 +22,14 @@ if(MSVC)
     set_target_properties(soui-sys-resource2 PROPERTIES LINK_FLAGS "/NOENTRY")      
 endif()
 
-install(TARGETS soui-sys-resource
+install(TARGETS soui-sys-resource2
     CONFIGURATIONS Release
     RUNTIME DESTINATION bin/Release
     LIBRARY DESTINATION lib/Release
     ARCHIVE DESTINATION lib/Release
 )
 
-install(TARGETS soui-sys-resource
+install(TARGETS soui-sys-resource2
     CONFIGURATIONS Debug
     RUNTIME DESTINATION bin/Debug
     LIBRARY DESTINATION lib/Debug
