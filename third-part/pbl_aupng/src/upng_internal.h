@@ -24,7 +24,9 @@ freely, subject to the following restrictions:
                 3. This notice may not be removed or altered from any source
                 distribution.
 */
-#pragma once
+#ifndef _UPNG_INTERNAL_H_
+#define _UPNG_INTERNAL_H_
+
 #include "upng.h"
 
 #define MAKE_BYTE(b) ((b)&0xFF)
@@ -163,3 +165,6 @@ struct upng_t
 };
 
 upng_error uz_inflate(uint8_t *out, unsigned long outsize, const uint8_t *in, unsigned long insize);
+
+
+#endif//_UPNG_INTERNAL_H_

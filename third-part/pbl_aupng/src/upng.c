@@ -160,26 +160,27 @@ static upng_error upng_process_chunks(upng_t* upng)
         }
         else if (upng_chunk_type(chunk_header) == CHUNK_FDAT)
         {
+			uint8_t sequence_number[4];
+			 upng_frame* frame;
             /* make sure the acTL chunk was already processed at this point */
             CHECK_RET(upng, upng->frames != NULL, UPNG_EMALFORMED);
 
             /* check sequence number */
-            uint8_t sequence_number[4];
             CHECK_RET(upng, upng->source.read(upng->source.user, chunk_data_offset, sequence_number, 4) == 4, UPNG_EREAD);
             CHECK_RET(upng, next_sequence_number == MAKE_DWORD_PTR(sequence_number), UPNG_EMALFORMED);
             next_sequence_number++;
 
-            upng_frame* frame = &upng->frames[cur_frame_index];
+            frame = &upng->frames[cur_frame_index];
             frame->compressed_size += length;
             if (frame->data_chunk_offset == 0)
                 frame->data_chunk_offset = chunk_offset;
         }
         else if (upng_chunk_type(chunk_header) == CHUNK_ACTL)
         {
+			uint8_t data[8];
             /* make sure the acTL chunk is present only once and before the first IDAT */
             CHECK_RET(upng, upng->frames == NULL, UPNG_EMALFORMED);
 
-            uint8_t data[8];
             CHECK_RET(upng, upng->source.read(upng->source.user, chunk_data_offset, data, 8) == 8, UPNG_EREAD);
 
             upng->frame_count = MAKE_DWORD_PTR(data);
@@ -192,19 +193,21 @@ static upng_error upng_process_chunks(upng_t* upng)
         }
         else if (upng_chunk_type(chunk_header) == CHUNK_FCTL)
         {
+			uint8_t data[26];
+			unsigned int sequence_number ;
+			upng_frame* frame;
             /* contrary to specs acTL *has* to come before the first fcTL chunk */
             CHECK_RET(upng, upng->frames != NULL, UPNG_EUNSUPPORTED);
 
-            uint8_t data[26];
             CHECK_RET(upng, upng->source.read(upng->source.user, chunk_data_offset, data, 26) == 26, UPNG_EREAD);
 
             /* check sequence number */
-            unsigned int sequence_number = MAKE_DWORD_PTR(data);
+            sequence_number = MAKE_DWORD_PTR(data);
             CHECK_RET(upng, next_sequence_number == sequence_number, UPNG_EMALFORMED);
             next_sequence_number++;
 
             /* read data into next frame structure */
-            upng_frame* frame = &upng->frames[++cur_frame_index];
+            frame = &upng->frames[++cur_frame_index];
             frame->rect.width = MAKE_DWORD_PTR(data + 4);
             frame->rect.height = MAKE_DWORD_PTR(data + 8);
             frame->rect.x_offset = MAKE_DWORD_PTR(data + 12);
@@ -264,13 +267,14 @@ static upng_error upng_process_chunks(upng_t* upng)
         }
         else if (upng_chunk_type(chunk_header) == CHUNK_TEXT)
         {
+			char* terminator;
             char* buffer = upng->text[upng->text_count].buffer = UPNG_MEM_ALLOC(length + 1);
             CHECK_RET(upng, buffer != NULL, UPNG_ENOMEM);
 
             CHECK_RET(upng, upng->source.read(upng->source.user, chunk_data_offset, buffer, length) == length, UPNG_EREAD);
 
             // Split into keyword and text (separated by null byte)
-            char* terminator = (char*)memchr(buffer, '\0', length);
+            terminator = (char*)memchr(buffer, '\0', length);
             CHECK_RET(upng, terminator != NULL, UPNG_EMALFORMED);
 
             upng->text[upng->text_count].keyword = buffer;
@@ -308,16 +312,16 @@ upng_error upng_header(upng_t *upng)
     {
         return upng->error;
     }
-
+	{
     /* minimum length of a valid PNG file is 29 bytes
         * FIXME: verify this against the specification, or
         * better against the actual code below */
     uint8_t header[29];
+	static const uint8_t PNG_HEADER[] = { 137, 80, 78, 71, 13, 10, 26, 10 };
     CHECK_RET(upng, upng->source.size >= 29, UPNG_ENOTPNG);
     CHECK_RET(upng, upng->source.read(upng->source.user, 0, header, 29) == 29, UPNG_EREAD);
 
     /* check that PNG header matches expected value */
-    static const uint8_t PNG_HEADER[] = { 137, 80, 78, 71, 13, 10, 26, 10 };
     CHECK_RET(upng, memcmp(header, PNG_HEADER, sizeof(PNG_HEADER)) == 0, UPNG_ENOTPNG);
 
     /* check that the first chunk is the IHDR chunk */
@@ -347,6 +351,7 @@ upng_error upng_header(upng_t *upng)
 
     upng->state = UPNG_HEADER;
     return upng->error;
+	}
 }
 
 upng_t *upng_new_from_source(upng_source source)
@@ -379,11 +384,11 @@ typedef struct upng_byte_source_context
 
 static unsigned long upng_byte_source_read(void* user, unsigned long offset, void* out_buffer, unsigned long read_size)
 {
+	unsigned long bytes_to_copy = read_size;
     upng_byte_source_context* context = (upng_byte_source_context*)user;
     if (offset >= context->size)
         return 0;
 
-    unsigned long bytes_to_copy = read_size;
     if (offset + bytes_to_copy > context->size)
         bytes_to_copy = context->size - offset;
 
@@ -398,30 +403,31 @@ static void upng_byte_source_free(void* user)
 
 upng_t *upng_new_from_bytes(const unsigned char *raw_buffer, unsigned long size)
 {
+	upng_source src;
     upng_byte_source_context* context = (upng_byte_source_context*)UPNG_MEM_ALLOC(sizeof(upng_byte_source_context));
     if (context == NULL)
         return NULL;
     context->buffer = raw_buffer;
     context->size = size;
-
-    return upng_new_from_source((upng_source) {
-        .user = context,
-        .size = size,
-        .read = upng_byte_source_read,
-        .free = upng_byte_source_free
-    });
+	src.user = context;
+	src.size = size;
+	src.read = upng_byte_source_read;
+	src.free = upng_byte_source_free;
+    return upng_new_from_source(src);
 }
 
 #ifdef UPNG_USE_STDIO
 static unsigned long upng_file_source_read(void* user, unsigned long offset, void* out_buffer, unsigned long read_size)
 {
     FILE* fp = (FILE*)user;
+	unsigned long size;
+	unsigned long bytes_to_read;
     fseek(fp, 0, SEEK_END);
-    unsigned long size = ftell(fp);
+    size = ftell(fp);
     if (offset >= size)
         return 0;
 
-    unsigned long bytes_to_read = read_size;
+    bytes_to_read = read_size;
     if (offset + bytes_to_read > size)
         bytes_to_read = size - offset;
 
@@ -438,12 +444,8 @@ static void upng_file_source_free(void* user)
 upng_t *upng_new_from_file(const char *filename)
 {
     FILE* fp = fopen(filename, "rb");
-    upng_t *upng = upng_new_from_source((upng_source) {
-        .user = fp,
-        .size = 0,
-        .read = upng_file_source_read,
-        .free = upng_file_source_free
-    });
+	upng_source src={fp,0,upng_file_source_free,upng_file_source_read};
+    upng_t *upng = upng_new_from_source(src);
     if (upng == NULL)
         return NULL;
 
@@ -488,7 +490,8 @@ void upng_free(upng_t *upng)
 
     if (upng->text_count)
     {
-        for (unsigned int i = 0; i < upng->text_count; i++)
+		unsigned int i = 0;
+        for (; i < upng->text_count; i++)
             UPNG_MEM_FREE(upng->text[i].buffer);
     }
     upng->text_count = 0;
@@ -616,16 +619,18 @@ unsigned int upng_get_frame_delay(const upng_t *upng)
 {
     if (upng->current_frame == FRAME_INDEX_NONE)
         return 0;
-    upng_frame* frame = upng->frames+upng->current_frame;
-    uint16_t delay_num = frame->delay_numerator, delay_den = frame->delay_denominator;
-    uint32_t ret = 0;
-    if (delay_den == 0 || delay_den == 100)
-        ret = delay_num;
-    else if (delay_den == 10)
-        ret = delay_num * 10;
-    else if (delay_den == 1000)
-        ret = delay_num / 10;
-    else
-        ret = delay_num * 100 / delay_den;
-    return ret*10;
+	else{
+		upng_frame* frame = upng->frames+upng->current_frame;
+		uint16_t delay_num = frame->delay_numerator, delay_den = frame->delay_denominator;
+		uint32_t ret = 0;
+		if (delay_den == 0 || delay_den == 100)
+			ret = delay_num;
+		else if (delay_den == 10)
+			ret = delay_num * 10;
+		else if (delay_den == 1000)
+			ret = delay_num / 10;
+		else
+			ret = delay_num * 100 / delay_den;
+		return ret*10;
+	}
 }

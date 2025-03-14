@@ -114,7 +114,7 @@ add_definitions(-D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
   if(MSVC_VERSION LESS 1600)
-      include_directories(${PROJECT_SOURCE_DIR}/utilities/include/stdint)
+      include_directories(${PROJECT_SOURCE_DIR}/third-part/stdint)
   endif()
   add_definitions(-DWCHAR_SIZE=2)
 elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)

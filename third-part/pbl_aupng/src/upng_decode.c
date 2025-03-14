@@ -195,11 +195,12 @@ static void post_process_scanlines(upng_t *upng, uint8_t *out, uint8_t *in, cons
         if (upng->error != UPNG_EOK)
         {
             return;
-        }
-        // remove_padding_bits(out, in, w * bpp, ((w * bpp + 7) / 8) * 8, h);
-        // fix for non-byte-aligned images
-        unsigned aligned_width = ((w * bpp + 7) / 8) * 8;
-        remove_padding_bits(in, in, aligned_width, aligned_width, h);
+		}else{
+			// remove_padding_bits(out, in, w * bpp, ((w * bpp + 7) / 8) * 8, h);
+			// fix for non-byte-aligned images
+			unsigned aligned_width = ((w * bpp + 7) / 8) * 8;
+			remove_padding_bits(in, in, aligned_width, aligned_width, h);
+		}
     }
     else
     {
@@ -216,7 +217,7 @@ upng_error upng_decode_frame(upng_t *upng, const upng_frame* frame)
     unsigned long chunk_offset;
     uint8_t chunk_header[12];
     upng_error error;
-
+	int width_aligned_bytes;
     /* parse the main header, if necessary */
     upng_header(upng);
     if (upng->error != UPNG_EOK)
@@ -267,7 +268,7 @@ upng_error upng_decode_frame(upng_t *upng, const upng_frame* frame)
     }
 
     /* allocate space to store inflated (but still filtered) data */
-    int width_aligned_bytes = (frame->rect.width * upng_get_bpp(upng) + 7) / 8;
+    width_aligned_bytes = (frame->rect.width * upng_get_bpp(upng) + 7) / 8;
     inflated_size = (width_aligned_bytes * frame->rect.height) + frame->rect.height; // pad byte
     if (upng->size < inflated_size)
     {
