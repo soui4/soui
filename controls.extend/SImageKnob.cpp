@@ -1,6 +1,7 @@
 #include <souistd.h>
 #include "SImageKnob.h"
 #include <matrix/SMatrix.h>
+#pragma warning(disable:4244)
 
 SNSBEGIN
 
