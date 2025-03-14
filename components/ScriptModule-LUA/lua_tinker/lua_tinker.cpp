@@ -380,7 +380,7 @@ HINSTANCE lua_tinker::read(lua_State *L, int index)
 	if(lua_isnumber(L,index))
 		return (HINSTANCE)(UINT_PTR)(UINT)lua_tonumber(L, index);
    else if(lua_isnil(L, index))
-      return nullptr;
+      return NULL;
 	else
 		return *(HINSTANCE*)lua_touserdata(L, index);
 }

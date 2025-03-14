@@ -14,8 +14,13 @@ namespace Constants {
 	static const float e = 2.7182818284590452354f;
 	static const float ln2 = 0.69314718055994530942f;
 	static const float sqrt2 = 1.41421356237309504880f;
+
+	static const float log2 = logf(2.0f);
 } // Constants
 
+static inline float mylog2f(float v){
+	return logf(v)/Constants::log2;
+}
 
 struct SImageKnob::MouseEditingState
 {
@@ -30,6 +35,17 @@ struct SImageKnob::MouseEditingState
 
 
 SImageKnob::SImageKnob() {
+	m_rulerWidth = 10.0f;
+	m_crRulerBack = RGBA(0x2F, 0x2F, 0x2F,0xff);
+	m_crRulerForeEnable = RGBA(0x00, 0xDE, 0xC1, 0xff);
+	m_crRulerForeDisable = RGBA(0x6D, 0x6E, 0x6E, 0xff);
+
+	m_bLogTransform=false;
+	m_startFromCenter = false;
+	m_startFromRight = false;
+	m_min=0.0, m_max=1.0, m_value=0.5;
+
+	m_state=NULL;
 	m_startAngle = (float)(3.f * Constants::quarter_pi);
 	m_rangeAngle = (float)(3.f * Constants::half_pi);
 	GetEventSet()->addEvent(EVENTID(EventKnobValue));
@@ -50,7 +66,7 @@ float SImageKnob::getValue(bool bRaw) const
 void SImageKnob::setValue(float v)
 {
 	if (m_bLogTransform)
-		m_value = log2f(v);
+		m_value = mylog2f(v);
 	else
 		m_value = v;
 	Invalidate();
@@ -78,7 +94,7 @@ void SImageKnob::setRange(float vMin, float vMax)
 void SImageKnob::setMin(float v)
 {
 	if (m_bLogTransform)
-		m_min = log2f(v);
+		m_min = mylog2f(v);
 	else
 		m_min = v;
 	Invalidate();
@@ -97,7 +113,7 @@ float SImageKnob::getMin(bool bRaw) const
 void SImageKnob::setMax(float v)
 {
 	if (m_bLogTransform)
-		m_max = log2f(v);
+		m_max = mylog2f(v);
 	else
 		m_max = v;
 	Invalidate();
@@ -151,7 +167,7 @@ float SImageKnob::valueFromPoint(CPoint& point) const
 void SImageKnob::OnLButtonDown(UINT nFlags, CPoint pt)
 {
 	__baseCls::OnLButtonDown(nFlags, pt);
-	auto& mouseState = getMouseEditingState();
+	MouseEditingState& mouseState = getMouseEditingState();
 	mouseState.firstPoint = pt;
 	mouseState.lastPoint=CPoint(-1, -1);
 	mouseState.startValue = m_value;
@@ -170,13 +186,9 @@ void SImageKnob::OnLButtonDown(UINT nFlags, CPoint pt)
 		mouseState.lastPoint = pt;
 		mouseState.modeLinear = true;
 		mouseState.coef = (getMax() - getMin()) / mouseState.range;
-		//if (m_dragCursorLinear)
-		//	SetCursor(m_dragCursorLinear);
 	}
 	else
 	{
-		//if (m_dragCursorCircle)
-		//	SetCursor(m_dragCursorCircle);
 		CPoint where2(pt);
 		CRect rc = GetClientRect();
 		where2+=CPoint(-rc.left, -rc.top);
@@ -190,10 +202,8 @@ void SImageKnob::OnLButtonUp(UINT nFlags, CPoint pt)
 	__baseCls::OnLButtonUp(nFlags, pt);
 	if (m_state)
 	{
-//		getFrame()->setCursor(kCursorDefault);
-//		endEdit();
 		delete m_state;
-		m_state = nullptr;
+		m_state = NULL;
 	}
 
 }
@@ -202,7 +212,7 @@ void SImageKnob::OnMouseMove(UINT nFlags, CPoint where)
 {
 	if (m_state)
 	{
-		auto& mouseState = getMouseEditingState();
+		MouseEditingState& mouseState = getMouseEditingState();
 		float middle = (getMax() - getMin()) * 0.5f;
 		CRect rc = GetClientRect();
 		if (where != mouseState.lastPoint)

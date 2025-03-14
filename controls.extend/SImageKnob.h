@@ -76,17 +76,17 @@ public:
 
 protected:
 	float m_startAngle, m_rangeAngle;
-	float m_rulerWidth = 10.0f;
-	COLORREF m_crRulerBack = RGBA(0x2F, 0x2F, 0x2F,0xff);
-	COLORREF m_crRulerForeEnable = RGBA(0x00, 0xDE, 0xC1, 0xff);
-	COLORREF m_crRulerForeDisable = RGBA(0x6D, 0x6E, 0x6E, 0xff);
+	float m_rulerWidth;
+	COLORREF m_crRulerBack;
+	COLORREF m_crRulerForeEnable;
+	COLORREF m_crRulerForeDisable;
 
-	bool  m_bLogTransform=false;
-	bool m_startFromCenter = false;
-	bool m_startFromRight = false;
-	float m_min=0.0, m_max=1.0, m_value=0.5;
+	bool  m_bLogTransform;
+	bool m_startFromCenter;
+	bool m_startFromRight;
+	float m_min, m_max, m_value;
 
-	MouseEditingState* m_state=nullptr;
+	MouseEditingState* m_state;
 };
 
 SNSEND

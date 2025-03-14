@@ -350,7 +350,7 @@ HRGN CreateRegionFromBitmap(HBITMAP hBmp, COLORREF crKey,COLORREF crMask)
             pRgn->rdh.nCount = lstRc.GetCount();
             pRgn->rdh.iType = RDH_RECTANGLES;
             memcpy(pRgn->Buffer, lstRc.GetData(), sizeof(RECT) * lstRc.GetCount());
-            HRGN hRgn = ExtCreateRegion(nullptr, len, pRgn);
+            HRGN hRgn = ExtCreateRegion(NULL, len, pRgn);
             free(pRgn);
             return hRgn;
         }
