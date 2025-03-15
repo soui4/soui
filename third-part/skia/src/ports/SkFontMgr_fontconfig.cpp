@@ -754,7 +754,7 @@ protected:
         SkAutoFcPattern strongPattern(NULL);
         if (familyName) {
             strongPattern.reset(FcPatternDuplicate(pattern));
-            remove_weak(strongPattern, FC_FAMILY);
+            //remove_weak(strongPattern, FC_FAMILY);
             matchPattern = strongPattern;
         } else {
             matchPattern = pattern;
@@ -762,10 +762,12 @@ protected:
 
         FcResult result;
         SkAutoFcPattern font(FcFontMatch(fFC, pattern, &result));
-        if (NULL == font || !FontAccessible(font) || !FontFamilyNameMatches(font, matchPattern)) {
+        if(!font)
             return NULL;
-        }
-
+        if(!FontAccessible(font))
+            return NULL;
+        //if(!FontFamilyNameMatches(font, matchPattern))
+        //    return NULL;
         return createTypefaceFromFcPattern(font);
     }
 

@@ -186,6 +186,16 @@ namespace SOUI
 		return ret;
 	}
 
+	SRenderFactory_D2D::SRenderFactory_D2D()
+	{
+		Init();
+	}
+
+	SRenderFactory_D2D::~SRenderFactory_D2D()
+	{
+		m_defFont=NULL;
+	}
+
 	BOOL SRenderFactory_D2D::Init()
 	{
 		HRESULT hr = D2D1CreateFactory(D2D1_FACTORY_TYPE_SINGLE_THREADED, &m_pD2DFactory);
@@ -207,6 +217,12 @@ namespace SOUI
 			reinterpret_cast<void **>(&m_pWICImageFactory)
 			);
 		if(!SUCCEEDED(hr)) return FALSE;
+
+		LOGFONT lf={0};
+		lf.lfHeight=20;
+		_tcscpy(lf.lfFaceName,_T("宋体"));
+		CreateFont(&m_defFont,&lf);
+
 		return TRUE;
 	}
 
@@ -1133,10 +1149,7 @@ namespace SOUI
 
 		CreateSolidColorBrush(SColor(0,0,0).toCOLORREF(),&m_defBrush);
 
-		LOGFONT lf={0};
-		lf.lfHeight=20;
-		_tcscpy(lf.lfFaceName,_T("宋体"));
-		pRenderFactory->CreateFont(&m_defFont,&lf);
+		m_defFont = pRenderFactory->GetDefFont();
 
 		SelectObject(m_defBrush,NULL);
 		SelectObject(m_defPen,NULL);

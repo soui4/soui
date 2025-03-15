@@ -18,13 +18,8 @@ SNSBEGIN
 class SRenderFactory_Gdi : public TObjRefImpl<IRenderFactory>
 {
 public:
-	SRenderFactory_Gdi()
-	{
-	}
-
-	~SRenderFactory_Gdi()
-	{
-	}
+	SRenderFactory_Gdi();
+	~SRenderFactory_Gdi();
 
 	STDMETHOD_(IImgDecoderFactory *,GetImgDecoderFactory)(THIS) OVERRIDE;
 	STDMETHOD_(void,SetImgDecoderFactory)(THIS_ IImgDecoderFactory *pImgDecoderFac) OVERRIDE;
@@ -44,8 +39,12 @@ public:
 	STDMETHOD_(BOOL,CreatePath)(THIS_ IPathS ** ppPath) OVERRIDE;
 
 	STDMETHOD_(BOOL,CreatePathEffect)(THIS_ REFGUID guidEffect,IPathEffect ** ppPathEffect) OVERRIDE;
+	STDMETHOD_(IFontS *,GetDefFont)(CTHIS) OVERRIDE{
+		return m_defFont;
+	}
 protected:
 	SAutoRefPtr<IImgDecoderFactory> m_imgDecoderFactory;
+	SAutoRefPtr<IFontS> m_defFont;
 };
 
 

@@ -170,10 +170,16 @@ namespace SOUI
 	{
 		SkGraphics::Init();
 		SkGraphics::SetFontCacheCountLimit(500);//cache up to 500 font resource.
+
+		LOGFONT lf={0};
+		lf.lfHeight=20;
+		_tcscpy(lf.lfFaceName,_T("宋体"));
+		CreateFont(&m_defFont,&lf);
 	}
 
 	SRenderFactory_Skia::~SRenderFactory_Skia()
 	{
+		m_defFont = NULL;
 		SkGraphics::Term();
 	}
 
@@ -329,10 +335,7 @@ namespace SOUI
 		CreateSolidColorBrush(SColor(0,0,0).toCOLORREF(),&m_defBrush);
 		SelectObject(m_defBrush,NULL);
 
-		LOGFONT lf={0};
-		lf.lfHeight=20;
-		_tcscpy(lf.lfFaceName,_T("宋体"));
-		pRenderFactory->CreateFont(&m_defFont,&lf);
+		m_defFont = pRenderFactory->GetDefFont();
 		SelectObject(m_defFont,NULL);
 
 		pRenderFactory->CreateBitmap(&m_defBmp);

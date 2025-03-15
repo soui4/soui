@@ -21,14 +21,9 @@ SNSBEGIN
 class SRenderFactory_D2D : public TObjRefImpl<IRenderFactory>
 {
 public:
-	SRenderFactory_D2D()
-	{
-		Init();
-	}
+	SRenderFactory_D2D();
 
-	~SRenderFactory_D2D()
-	{
-	}
+	~SRenderFactory_D2D();
 
 	STDMETHOD_(IImgDecoderFactory *,GetImgDecoderFactory)(THIS) OVERRIDE;
 	STDMETHOD_(void,SetImgDecoderFactory)(THIS_ IImgDecoderFactory *pImgDecoderFac) OVERRIDE;
@@ -49,7 +44,11 @@ public:
 	STDMETHOD_(HRESULT,CreateEmbossMaskFilter)(THIS_ float direction[3], float ambient, float specular, float blurRadius,IMaskFilter ** ppMaskFilter) OVERRIDE {return E_NOTIMPL;}
 
 	STDMETHOD_(BOOL,CreatePathEffect)(THIS_ REFGUID guidEffect,IPathEffect ** ppPathEffect) OVERRIDE;
-
+	STDMETHOD_(IFontS *,GetDefFont)(CTHIS) OVERRIDE{
+		return m_defFont;
+	}
+protected:
+	SAutoRefPtr<IFontS> m_defFont;
 public:
 	ID2D1Factory * GetD2D1Factory(){return m_pD2DFactory;}
 	IDWriteFactory * GetDWriteFactory(){return m_pDWriteFactory;}

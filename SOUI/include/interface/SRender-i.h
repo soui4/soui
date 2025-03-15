@@ -1330,6 +1330,8 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
     (THIS_ float direction[3], float ambient, float specular, float blurRadius, IMaskFilter **ppMaskFilter) PURE;
 
     STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFGUID guidEffect, IPathEffect * *ppPathEffect) PURE;
+
+    STDMETHOD_(IFontS *,GetDefFont)(CTHIS) PURE;
 };
 
 #ifdef __cplusplus

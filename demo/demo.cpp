@@ -172,16 +172,12 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 	SouiFactory souiFac;
     SComMgr2 *pComMgr = new SComMgr2();
     {
-		#ifdef _WIN32
 		int nType = MessageBox(GetActiveWindow(), _T("选择渲染类型：\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
 		if (nType == IDCANCEL)
 		{
 			nRet = -1;
 			goto exit;
 		}
-		#else
-		int nType = IDNO;
-		#endif//_WIN32
 
 		//定义一个唯一的SApplication对象，SApplication管理整个应用程序的资源
 		SApplication* theApp = new SApplication2(NULL, hInstance);

@@ -43,8 +43,12 @@ public:
 
 	STDMETHOD_(HRESULT,CreateEmbossMaskFilter)(THIS_ float direction[3], float ambient, float specular, float blurRadius,IMaskFilter ** ppMaskFilter) OVERRIDE;
 
+    STDMETHOD_(IFontS *,GetDefFont)(CTHIS) OVERRIDE{
+		return m_defFont;
+	}
 protected:
 	SAutoRefPtr<IImgDecoderFactory> m_imgDecoderFactory;
+	SAutoRefPtr<IFontS> m_defFont;
 };
 
 
