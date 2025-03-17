@@ -31,6 +31,11 @@
 					<button name="btn_pick_folder" text="pick folder" size="100,30"/>
 					<text name="txt_folder" size="0,30" weight="1" colorBkgnd="@color/gray" text="test"/>
 				</window>
+				<window size="-2,-1"  layout="hbox" interval="10" gravity="center">
+					<button name="btn_fork_normal" text="fork normal" size="100,30"/>
+					<button name="btn_fork_root" text="fork root" size="100,30"/>
+				</window>
+				<edit size="200,30" text="wss://localhost:4030" maring="2"/>
 			</page>
 			<page title="page1" layout="vbox" gravity="center" colorBkgnd="@color/white" interval="5">
 				<text text="hello soui in page1" colorText="@color/red" colorBkgnd="@color/gray"/>

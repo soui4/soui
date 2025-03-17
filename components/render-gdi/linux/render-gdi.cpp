@@ -1066,6 +1066,24 @@ namespace SOUI
     }
 
     HRESULT SRenderTarget_GDI::DrawArc2(LPCRECT pRect, float startAngle, float sweepAngle, int width) {
+        if(!m_curPen) return E_INVALIDARG;
+        RECT rcBuf = *pRect;
+		::InflateRect(&rcBuf,width/2,width/2);
+        HPEN hPen = ::CreatePen(m_curPen->GetStyle(),width,m_curPen->GetColor());
+        HGDIOBJ oldPen = ::SelectObject(m_hdc,hPen);
+        HGDIOBJ oldBr=::SelectObject(m_hdc,GetStockObject(NULL_BRUSH));
+        POINT ptCenter = {(pRect->left+pRect->right)/2,(pRect->top+pRect->bottom)/2};
+        int   a=ptCenter.x-pRect->left,b=ptCenter.y-pRect->top;
+        POINT pt1,pt2;
+        float startAngle2 =startAngle*PI/180.0f;
+        float endAngle2 = (startAngle+sweepAngle)*PI/180.0f;
+        pt1.x=ptCenter.x+(int)(a*cos(startAngle2));
+        pt1.y=ptCenter.y+(int)(b*sin(startAngle2));
+        pt2.x=ptCenter.x+(int)(a*cos(endAngle2));
+        pt2.y=ptCenter.y+(int)(b*sin(endAngle2));
+		::Arc(m_hdc,pRect->left,pRect->top,pRect->right,pRect->bottom,pt2.x,pt2.y,pt1.x,pt1.y);
+        ::SelectObject(m_hdc,oldBr);
+        ::SelectObject(m_hdc,oldPen);
         return E_NOTIMPL;
     }
 

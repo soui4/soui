@@ -749,7 +749,7 @@ namespace SOUI
 			mtx.postConcat(oldMtx);
 			m_SkCanvas->setMatrix(mtx);
 		}
-		fy -= metrics.fTop;
+		fy += -metrics.fTop;
 		m_SkCanvas->drawText((LPCWSTR)strW,strW.GetLength()*2,fx,fy,txtPaint);
 		if(m_curFont->LogFont()->lfEscapement!=0){
 			m_SkCanvas->setMatrix(oldMtx);

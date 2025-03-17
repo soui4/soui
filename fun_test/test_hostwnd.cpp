@@ -211,6 +211,31 @@ public:
         }
         #endif//!_WIN32
     }
+    void OnBtnForkNormal(){
+        SStringT strApp = SApplication::getSingletonPtr()->GetAppDir();
+        strApp += _T("/demo");
+        //open child normally
+            SHELLEXECUTEINFO exec={0};
+            exec.cbSize=sizeof(exec);
+            exec.lpVerb=_T("open");
+            exec.lpFile = strApp.c_str();
+            if(ShellExecuteEx(&exec)){
+
+            }
+        return;
+    }
+    void OnBtnForkRoot(){
+        SStringT strApp = SApplication::getSingletonPtr()->GetAppDir();
+        strApp += _T("/demo");
+        //open child normally
+            SHELLEXECUTEINFO exec={0};
+            exec.cbSize=sizeof(exec);
+            exec.lpVerb=_T("runas");
+            exec.lpFile = strApp.c_str();
+            if(ShellExecuteEx(&exec)){
+
+            }
+    }
 
     EVENT_MAP_BEGIN()
         EVENT_ID_COMMAND(1, OnClose)
@@ -223,6 +248,8 @@ public:
         EVENT_NAME_COMMAND(L"btn_save_rtf",OnBtnSaveRtf)
         EVENT_NAME_COMMAND(L"btn_pick_color",OnBtnPickColor)
         EVENT_NAME_COMMAND(L"btn_pick_folder",OnBtnPickFolder)
+        EVENT_NAME_COMMAND(L"btn_fork_normal",OnBtnForkNormal)
+        EVENT_NAME_COMMAND(L"btn_fork_root",OnBtnForkRoot)
         EVENT_HANDLER(EventRealWndCreate::EventID, OnRealWndCreate)
         EVENT_HANDLER(EventRealWndDestroy::EventID, OnRealWndDestroy)
         EVENT_HANDLER(EventInit::EventID,OnInit)
