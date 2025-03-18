@@ -2026,7 +2026,7 @@ namespace SOUI
 #ifdef UNICODE
 		SStringA strFace=S_CT2A(plf->lfFaceName,CP_UTF8);
 #else
-		SStringA strFace=S_CT2A(plf->lfFaceName,CP_ACP);
+		SStringA strFace=S_CT2A(plf->lfFaceName,CP_ACP,CP_UTF8);
 #endif
 		BYTE style=SkTypeface::kNormal;
 		if(plf->lfItalic) style |= SkTypeface::kItalic;
