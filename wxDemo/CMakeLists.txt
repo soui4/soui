@@ -26,13 +26,14 @@ source_group("Resource Files" FILES ${CURRENT_RC})
 
 add_executable(wxDemo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${EXTENDCOTROLS})
 
+add_dependencies(wxDemo utilities4 soui4 resprovider-zip log4z render-skia render-gdi)
+
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 add_dependencies(demo soui-sys-resource ${COM_LIBS})
-else()
-target_link_libraries(wxDemo dl)
-endif()
-
 target_link_libraries(wxDemo soui4 utilities4)
+else()
+target_link_libraries(wxDemo soui4 utilities4 dl)
+endif()
 
 set_target_properties (wxDemo PROPERTIES
     FOLDER demos

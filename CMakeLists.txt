@@ -131,6 +131,7 @@ else()
   add_subdirectory(swinx)
 endif()
 
+link_directories(${CMAKE_BINARY_DIR}/bin)
 add_subdirectory(third-part)
 add_subdirectory(utilities)
 
