@@ -35,7 +35,7 @@ BOOL CSnapshotDlg::OnInitDialog(HWND wnd, LPARAM lInitParam)
 
 	CDC hScrDC, hMemDC;
 	HBITMAP   hBitmap, hOldBitmap;
-	hScrDC = CreateDC(L"DISPLAY", NULL, NULL, NULL);
+	hScrDC = CreateDC(_T("DISPLAY"), NULL, NULL, NULL);
 	hMemDC = CreateCompatibleDC(hScrDC);
 	hBitmap = CreateCompatibleBitmap(hScrDC, nxScreen, nyScreen);
 	hOldBitmap = (HBITMAP)SelectObject(hMemDC, hBitmap);

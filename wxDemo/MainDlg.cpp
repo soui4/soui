@@ -739,9 +739,9 @@ void CMainDlg::OnBnClickImage()
     CFileDialogEx openDlg(TRUE, _T("图片"), 0, 6, _T("图片文件\0*.gif;*.bmp;*.jpg;*.png\0\0"));
     if (openDlg.DoModal() == IDOK)
     {
-        SStringW strFile = openDlg.m_szFileName;
+        SStringT strFile = openDlg.m_szFileName;
         int nFileSize;
-        FILE *fp = _wfopen(strFile, L"rb");
+        FILE *fp = _tfopen(strFile, _T("rb"));
         if (fp)
         {
             fseek(fp, 0L, SEEK_END);
@@ -767,9 +767,9 @@ void CMainDlg::OnBnClickFile()
     CFileDialogEx openDlg(TRUE, _T("文件"), 0, 6, _T("文件\0*.*\0\0"));
     if (openDlg.DoModal() == IDOK)
     {
-        SStringW strFile = openDlg.m_szFileName;
+        SStringT strFile = openDlg.m_szFileName;
         int nFileSize;
-        FILE *fp = _wfopen(strFile, L"rb");
+        FILE *fp = _tfopen(strFile, _T("rb"));
         if (fp)
         {
             fseek(fp, 0L, SEEK_END);
