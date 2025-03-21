@@ -362,6 +362,36 @@ TEST(memory, handle) {
     LocalFree(hData);
 }
 
+static const LPBYTE map_file(LPCSTR name, LPDWORD filesize)
+{
+	HANDLE hFile, hMapping;
+	LPBYTE ptr = NULL;
+
+	hFile = CreateFileA(name, GENERIC_READ|GENERIC_WRITE, FILE_SHARE_READ, NULL,
+		OPEN_EXISTING, FILE_FLAG_RANDOM_ACCESS, 0);
+	if (hFile != INVALID_HANDLE_VALUE)
+	{
+		hMapping = CreateFileMappingA(hFile, NULL, PAGE_READONLY, 0, 0, NULL);
+		if (hMapping != INVALID_HANDLE_VALUE)
+		{
+			ptr = (LPBYTE)MapViewOfFile(hMapping, FILE_MAP_READ|FILE_MAP_WRITE, 0, 0, 0);
+			CloseHandle(hMapping);
+			if (filesize)
+				*filesize = GetFileSize(hFile, NULL);
+		}
+		CloseHandle(hFile);
+	}
+	return ptr;
+}
+
+TEST(demo,fmap){
+    DWORD size=0;
+    LPBYTE pbuf = map_file(__FILE__,&size);
+    if(pbuf){
+        UnmapViewOfFile(pbuf);
+    }
+}
+
 int run_window();
 TEST(demo,window){
     //EXPECT_EQ(run_window(), 1);

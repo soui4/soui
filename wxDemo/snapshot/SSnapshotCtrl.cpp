@@ -101,7 +101,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             {
                 if (point.x > m_rcCapture.right && point.y > m_rcCapture.bottom)
                 {
-                    m_emPosType = EcPosType::BottomRight;
+                    m_emPosType = BottomRight;
 
                     m_rcCapture.left = m_rcCapture.right;
                     m_rcCapture.right = point.x;
@@ -110,13 +110,13 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
                 }
                 else if (point.x > m_rcCapture.right)
                 {
-                    m_emPosType = EcPosType::TopRight;
+                    m_emPosType = TopRight;
                     m_rcCapture.left = m_rcCapture.right;
                     m_rcCapture.right = point.x;
                 }
                 else if (point.y > m_rcCapture.bottom)
                 {
-                    m_emPosType = EcPosType::BottomLeft;
+                    m_emPosType = BottomLeft;
                     m_rcCapture.top = m_rcCapture.bottom;
                     m_rcCapture.bottom = point.y;
                 }
@@ -131,7 +131,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             {
                 if (point.y > m_rcCapture.bottom)
                 {
-                    m_emPosType = EcPosType::BottomCenter;
+                    m_emPosType = BottomCenter;
                     m_rcCapture.top = m_rcCapture.bottom;
                     m_rcCapture.bottom = point.y;
                 }
@@ -145,7 +145,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             {
                 if (point.x < m_rcCapture.left && point.y > m_rcCapture.bottom)
                 {
-                    m_emPosType = EcPosType::BottomLeft;
+                    m_emPosType = BottomLeft;
 
                     m_rcCapture.right = m_rcCapture.left;
                     m_rcCapture.left = point.x;
@@ -155,14 +155,14 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
                 }
                 else if (point.x < m_rcCapture.left)
                 {
-                    m_emPosType = EcPosType::TopLeft;
+                    m_emPosType = TopLeft;
 
                     m_rcCapture.right = m_rcCapture.left;
                     m_rcCapture.left = point.x;
                 }
                 else if (point.y > m_rcCapture.bottom)
                 {
-                    m_emPosType = EcPosType::BottomRight;
+                    m_emPosType = BottomRight;
 
                     m_rcCapture.top = m_rcCapture.bottom;
                     m_rcCapture.bottom = point.y;
@@ -178,7 +178,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             {
                 if (point.x < m_rcCapture.left)
                 { // 如果 过线了 就 换成 反的
-                    m_emPosType = EcPosType::LeftCenter;
+                    m_emPosType = LeftCenter;
                     m_rcCapture.right = m_rcCapture.left;
                     m_rcCapture.left = point.x;
                 }
@@ -192,7 +192,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             {
                 if (point.x < m_rcCapture.left && point.y < m_rcCapture.top)
                 {
-                    m_emPosType = EcPosType::TopLeft;
+                    m_emPosType = TopLeft;
 
                     m_rcCapture.right = m_rcCapture.left;
                     m_rcCapture.left = point.x;
@@ -202,14 +202,14 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
                 }
                 else if (point.x < m_rcCapture.left)
                 {
-                    m_emPosType = EcPosType::BottomLeft;
+                    m_emPosType = BottomLeft;
 
                     m_rcCapture.right = m_rcCapture.left;
                     m_rcCapture.left = point.x;
                 }
                 else if (point.y < m_rcCapture.top)
                 {
-                    m_emPosType = EcPosType::TopRight;
+                    m_emPosType = TopRight;
 
                     m_rcCapture.bottom = m_rcCapture.top;
                     m_rcCapture.top = point.y;
@@ -225,7 +225,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             {
                 if (point.y < m_rcCapture.top)
                 {
-                    m_emPosType = EcPosType::TopCenter;
+                    m_emPosType = TopCenter;
                     m_rcCapture.bottom = m_rcCapture.top;
                     m_rcCapture.top = point.y;
                 }
@@ -239,7 +239,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             {
                 if (point.x > m_rcCapture.right && point.y < m_rcCapture.top)
                 {
-                    m_emPosType = EcPosType::TopRight;
+                    m_emPosType = TopRight;
 
                     m_rcCapture.bottom = m_rcCapture.top;
                     m_rcCapture.top = point.y;
@@ -249,13 +249,13 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
                 }
                 else if (point.x > m_rcCapture.right)
                 {
-                    m_emPosType = EcPosType::BottomRight;
+                    m_emPosType = BottomRight;
                     m_rcCapture.left = m_rcCapture.right;
                     m_rcCapture.right = point.x;
                 }
                 else if (point.y < m_rcCapture.top)
                 {
-                    m_emPosType = EcPosType::TopLeft;
+                    m_emPosType = TopLeft;
                     m_rcCapture.bottom = m_rcCapture.top;
                     m_rcCapture.top = point.y;
                 }
@@ -270,7 +270,7 @@ void SSnapshotCtrl::OnMouseMove(UINT nFlags, SOUI::CPoint point)
             {
                 if (point.x > m_rcCapture.right)
                 {
-                    m_emPosType = EcPosType::RightCenter;
+                    m_emPosType = RightCenter;
                     m_rcCapture.left = m_rcCapture.right;
                     m_rcCapture.right = point.x;
                 }
@@ -421,21 +421,21 @@ void SSnapshotCtrl::CalcPos()
 
     SOUI::CPoint center = rcArea.CenterPoint();
     // 上左 方块
-    m_rcPos[(int)EcPosType::TopLeft].SetRect(rcArea.left, rcArea.top, rcArea.left + 6, rcArea.top + 6);
+    m_rcPos[(int)TopLeft].SetRect(rcArea.left, rcArea.top, rcArea.left + 6, rcArea.top + 6);
     // 上中 方块
-    m_rcPos[(int)EcPosType::TopCenter].SetRect(center.x - 3, rcArea.top, center.x + 3, rcArea.top + 6);
+    m_rcPos[(int)TopCenter].SetRect(center.x - 3, rcArea.top, center.x + 3, rcArea.top + 6);
     // 上右 方块
-    m_rcPos[(int)EcPosType::TopRight].SetRect(rcArea.right - 6, rcArea.top, rcArea.right, rcArea.top + 6);
+    m_rcPos[(int)TopRight].SetRect(rcArea.right - 6, rcArea.top, rcArea.right, rcArea.top + 6);
     // 右中 方块
-    m_rcPos[(int)EcPosType::RightCenter].SetRect(rcArea.right - 6, center.y - 3, rcArea.right, center.y + 3);
+    m_rcPos[(int)RightCenter].SetRect(rcArea.right - 6, center.y - 3, rcArea.right, center.y + 3);
     // 下右 方块
-    m_rcPos[(int)EcPosType::BottomRight].SetRect(rcArea.right - 6, rcArea.bottom - 6, rcArea.right, rcArea.bottom);
+    m_rcPos[(int)BottomRight].SetRect(rcArea.right - 6, rcArea.bottom - 6, rcArea.right, rcArea.bottom);
     // 下中 方块
-    m_rcPos[(int)EcPosType::BottomCenter].SetRect(center.x - 3, rcArea.bottom - 6, center.x + 3, rcArea.bottom);
+    m_rcPos[(int)BottomCenter].SetRect(center.x - 3, rcArea.bottom - 6, center.x + 3, rcArea.bottom);
     // 下左 方块
-    m_rcPos[(int)EcPosType::BottomLeft].SetRect(rcArea.left, rcArea.bottom - 6, rcArea.left + 6, rcArea.bottom);
+    m_rcPos[(int)BottomLeft].SetRect(rcArea.left, rcArea.bottom - 6, rcArea.left + 6, rcArea.bottom);
     // 左中 方块
-    m_rcPos[(int)EcPosType::LeftCenter].SetRect(rcArea.left, center.y - 3, rcArea.left + 6, center.y + 3);
+    m_rcPos[(int)LeftCenter].SetRect(rcArea.left, center.y - 3, rcArea.left + 6, center.y + 3);
 }
 
 EcPosType SSnapshotCtrl::HitPos(const SOUI::CPoint &pt)
@@ -448,9 +448,9 @@ EcPosType SSnapshotCtrl::HitPos(const SOUI::CPoint &pt)
                 return EcPosType(i);
         }
 
-        return EcPosType::SelectRect;
+        return SelectRect;
     }
-    return EcPosType::Null;
+    return Null;
 }
 
 BOOL SSnapshotCtrl::OnSetCursor(const CPoint& pt)
@@ -458,35 +458,35 @@ BOOL SSnapshotCtrl::OnSetCursor(const CPoint& pt)
     EcPosType hitTest = HitPos(pt);
     switch (hitTest)
     {
-    case EcPosType::TopLeft:
-    case EcPosType::BottomRight:
+    case TopLeft:
+    case BottomRight:
         ::SetCursor(m_hCurTopLeft);
         break;
-    case EcPosType::TopCenter:
-    case EcPosType::BottomCenter:
+    case TopCenter:
+    case BottomCenter:
         ::SetCursor(m_hCurTop);
         break;
-    case EcPosType::TopRight:
-    case EcPosType::BottomLeft:
+    case TopRight:
+    case BottomLeft:
         ::SetCursor(m_hCurTopRight);
         break;
-    case EcPosType::LeftCenter:
-    case EcPosType::RightCenter:
+    case LeftCenter:
+    case RightCenter:
         ::SetCursor(m_hCurLeft);
         break;
-    case EcPosType::SelectRect:
+    case SelectRect:
         ::SetCursor(m_hCurSelect);
         break;
-//     case EcPosType::Opt1:
+//     case Opt1:
 //         ::SetCursor(m_hCurOpt1);
 //         break;
-//     case EcPosType::Opt2:
+//     case Opt2:
 //         ::SetCursor(m_hCurOpt2);
 //         break;
-//     case EcPosType::Opt3:
+//     case Opt3:
 //         ::SetCursor(m_hCurOpt3[m_nPenSize == 1 ? 0 : (m_nPenSize == 2) ? 1 : 2]);
 //         break;
-    case EcPosType::Null:
+    case Null:
     default:
         __super::OnSetCursor(pt);
         break;
