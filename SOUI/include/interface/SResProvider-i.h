@@ -19,6 +19,12 @@
 
 #define UIRES_INDEX _T("uires.idx") //文件夹资源的文件映射表索引表文件名
 
+#ifdef _WIN32
+#define PATH_SLASH '\\'
+#else
+#define PATH_SLASH '/'
+#endif //_WIN32
+
 SNSBEGIN
 
 typedef enum BUILTIN_RESTYPE

@@ -429,8 +429,8 @@ void SResProviderMgr::SetFilePrefix(LPCTSTR pszFilePrefix)
 {
     SAutoLock lock(m_cs);
     m_strFilePrefix = pszFilePrefix;
-    if (!m_strFilePrefix.EndsWith(_T("\\")))
-        m_strFilePrefix.Append(_T("\\"));
+    if (!m_strFilePrefix.EndsWith(_T(PATH_SLASH)))
+        m_strFilePrefix.Append(_T(PATH_SLASH));
 }
 
 BOOL SResProviderMgr::LoadRawBuffer(LPCTSTR pszType, LPCTSTR pszResName, IResProvider *pResProvider, SAutoBuf &buf)

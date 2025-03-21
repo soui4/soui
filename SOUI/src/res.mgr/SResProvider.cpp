@@ -349,11 +349,6 @@ BOOL SResLoadFromFile::GetRawBuffer(LPCTSTR strPath, LPVOID pBuf, size_t size)
 
 //////////////////////////////////////////////////////////////////////////
 // SResProviderFiles
-#ifdef _WIN32
-#define kPath_Slash _T("\\")
-#else
-#define kPath_Slash _T("/")
-#endif //_WIN32
 
 SResProviderFiles::SResProviderFiles()
 {
@@ -364,7 +359,7 @@ SStringT SResProviderFiles::GetRes(LPCTSTR strType, LPCTSTR pszResName)
     if (!strType)
     {
         // pszResName is relative path
-        SStringT strRet = m_strPath + kPath_Slash + pszResName;
+        SStringT strRet = m_strPath + _T(PATH_SLASH) + pszResName;
         DWORD dwAttr = GetFileAttributes(strRet);
         if (dwAttr == INVALID_FILE_ATTRIBUTES || (dwAttr & FILE_ATTRIBUTE_ARCHIVE) == 0)
             strRet = _T("");
@@ -375,7 +370,7 @@ SStringT SResProviderFiles::GetRes(LPCTSTR strType, LPCTSTR pszResName)
     if (!p)
         return _T("");
 
-    SStringT strRet = m_strPath + kPath_Slash + p->m_value;
+    SStringT strRet = m_strPath + _T(PATH_SLASH) + p->m_value;
     return strRet;
 }
 
@@ -440,7 +435,7 @@ BOOL SResProviderFiles::Init(WPARAM wParam, LPARAM lParam)
     LPCTSTR pszPath = (LPCTSTR)wParam;
 
     SStringT strPathIndex = pszPath;
-    strPathIndex += kPath_Slash;
+    strPathIndex += _T(PATH_SLASH);
     strPathIndex += UIRES_INDEX;
 
     SXmlDoc xmlDoc;
