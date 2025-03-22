@@ -9,6 +9,14 @@
 #define UNICONVERSION_H
 #include <assert.h>
 
+#ifndef WCHAR_SIZE
+#ifdef _WIN32
+#define WCHAR_SIZE 2
+#else
+#define WCHAR_SIZE 4
+#endif//_WIN32
+#endif//WCHAR_SIZE
+
 #ifdef SCI_NAMESPACE
 namespace Scintilla {
 #endif
