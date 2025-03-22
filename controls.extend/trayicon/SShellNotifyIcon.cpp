@@ -92,5 +92,5 @@
 		nid.uCallbackMessage = callbackmsg;
 		nid.hIcon = hIcon;
 		m_hIconArray[20]=hIcon;//保存留闪烁用
-		_tcscpy_s(nid.szTip, szTip);
+		_tcscpy(nid.szTip, szTip);
 	}

@@ -1,6 +1,8 @@
-﻿#pragma once
+﻿#ifndef _SCOMBOBOXEX_H_
+#define _SCOMBOBOXEX_H_
 
-#include "slistboxex.h"
+#include "SListboxex.h"
+
 SNSBEGIN
 
 DEF_EVT_EXT(EventOfComoboxExItem,EVT_EXTERNAL_BEGIN + 300,{
@@ -232,3 +234,5 @@ class SComboBoxEx : public SComboBase {
 };
 
 SNSEND
+
+#endif//_SCOMBOBOXEX_H_

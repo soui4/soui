@@ -180,9 +180,13 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
         LONG len = ftell(f);
         fseek(f, 0, SEEK_SET);
         char *buf = (char *)malloc(len);
-        fread(buf, 1, len, f);
-        int ret = LoadFromMemory(buf, len);
+        int readed = fread(buf, 1, len, f);
         fclose(f);
+        if(readed != len){
+            free(buf);
+            return 0;
+        }
+        int ret = LoadFromMemory(buf, len);
         return ret;
         #endif//_WIN32
     }

@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SSplitBar.h"
-#include <layout\SouiLayoutParamStruct.h>
-#include <layout\SouiLayout.h>
+#include <layout/SouiLayoutParamStruct.h>
+#include <layout/SouiLayout.h>
 namespace SOUI
 {
 
@@ -20,7 +20,7 @@ SSplitBar::~SSplitBar()
 
 LRESULT SSplitBar::OnCreate(LPVOID)
 {
-    if (0 != __super::OnCreate(NULL))
+    if (0 != __baseCls::OnCreate(NULL))
         return 1;
     ORIENTATION pi = m_bVertical ? Vert : Horz;
     m_nOrginPos = GetLayoutParam()->GetSpecifiedSize(pi).toPixelSize(GetScale());
@@ -84,7 +84,7 @@ void SSplitBar::OnMouseMove(UINT nFlags, CPoint pt)
     SouiLayoutParamStruct *pLayout
         = (SouiLayoutParamStruct *)GetLayoutParamT<SouiLayoutParam>()->GetRawData();
 
-    int nNewPos = m_nOrginPos + nOffset * pLayout->posLeft.cMinus;
+    int nNewPos = m_nOrginPos + nOffset * (pLayout->posLeft.bMinus?-1:1);
 
     /*
      *  - 有一种情况要特殊处理:既要修改hostwnd的尺寸,top/left又是以-XXX的方式定义。
@@ -103,7 +103,7 @@ void SSplitBar::OnMouseMove(UINT nFlags, CPoint pt)
     HWND hWnd = GetContainer()->GetHostHwnd();
     BOOL bZoomed = ::IsZoomed(hWnd);
     BOOL bResizeWnd = m_bResizeHostWnd && !bZoomed;
-    if (!(bResizeWnd && pLayout->posLeft.cMinus < 0))
+    if (!(bResizeWnd && pLayout->posLeft.bMinus))
     {
         if (nNewPos > m_nSizeMax)
             nNewPos = m_nSizeMax;
@@ -120,7 +120,7 @@ void SSplitBar::OnMouseMove(UINT nFlags, CPoint pt)
     // 调整窗口
 
     nWindowOffset = nNewPos - m_nTrackingPos;
-    nWindowOffset *= pLayout->posLeft.cMinus;
+    nWindowOffset *= (pLayout->posLeft.bMinus?-1:1);
     m_nTrackingPos = nNewPos;
 
     if (bResizeWnd)

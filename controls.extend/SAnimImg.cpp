@@ -1,9 +1,6 @@
 ﻿#include "stdafx.h"
 #include "souistd.h"
-#include <strsafe.h>
-#include <process.h>
 #include "SAnimImg.h"
-#include <Strsafe.h>
  
 namespace SOUI
 {
@@ -52,18 +49,18 @@ namespace SOUI
 		m_nAutoElapseTime = 0;
 	    Invalidate();
 	    
-		__super::OnMouseHover(wParam,ptPos);
+		__baseCls::OnMouseHover(wParam,ptPos);
 	}
 
 	void SAnimImg::OnMouseLeave()
 	{
 		m_iHitTest--;//记录鼠标位置，为0表示已经移出
-		__super::OnMouseLeave();
+		__baseCls::OnMouseLeave();
 	}
 
 	int SAnimImg::OnCreate(void*)
 	{
-	    __super::OnCreate(NULL);
+	    __baseCls::OnCreate(NULL);
         GetContainer()->RegisterTimelineHandler(this);		
 		if (m_iAutorun >= 0)
 		{
@@ -78,7 +75,7 @@ namespace SOUI
     void SAnimImg::OnDestroy()
     {
         GetContainer()->UnregisterTimelineHandler(this);
-        __super::OnDestroy();
+        __baseCls::OnDestroy();
     }
 
 

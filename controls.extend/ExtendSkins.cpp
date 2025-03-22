@@ -1,6 +1,6 @@
 ﻿#include "stdafx.h"
 #include "souistd.h"
-#include "core/Sskin.h"
+#include "core/SSkin.h"
 #include "ExtendSkins.h"
 
 //////////////////////////////////////////////////////////////////////////

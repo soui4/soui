@@ -5,9 +5,8 @@
 //     Version: 2011.8.27 - 1.0 - Create
 //////////////////////////////////////////////////////////////////////////
 
-#pragma  once
 #include "stdafx.h"
-#include "Slistboxex.h"
+#include "SListboxex.h"
 #include <helper/SAutoBuf.h>
 
 #pragma warning(disable:4018)

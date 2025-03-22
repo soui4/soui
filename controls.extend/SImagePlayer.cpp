@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SImagePlayer.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SImagePlayer::SImagePlayer()
     : m_aniSkin(NULL)
@@ -17,7 +16,7 @@ SImagePlayer::~SImagePlayer()
 
 void SImagePlayer::OnPaint(IRenderTarget *pRT)
 {
-    __super::OnPaint(pRT);
+    __baseCls::OnPaint(pRT);
     if (m_aniSkin)
     {
         m_aniSkin->DrawByIndex(pRT, GetWindowRect(), m_iCurFrame);
@@ -26,7 +25,7 @@ void SImagePlayer::OnPaint(IRenderTarget *pRT)
 
 void SImagePlayer::OnShowWindow(BOOL bShow, UINT nStatus)
 {
-    __super::OnShowWindow(bShow, nStatus);
+    __baseCls::OnShowWindow(bShow, nStatus);
     if (!bShow)
     {
         GetContainer()->UnregisterTimelineHandler(this);
@@ -60,7 +59,7 @@ void SImagePlayer::OnNextFrame()
 
 HRESULT SImagePlayer::OnAttrSkin(const SStringW &strValue, BOOL bLoading)
 {
-    ISkinObj *pSkin = SSkinPoolMgr::getSingleton().GetSkin(strValue, GetScale());
+    ISkinObj *pSkin = GETSKIN(strValue, GetScale());
     if (!pSkin)
         return E_FAIL;
     if (!pSkin->IsClass(SSkinAni::GetClassName()))
@@ -126,7 +125,7 @@ void SImagePlayer::Resume()
 BOOL SImagePlayer::_PlayFile(LPCTSTR pszFileName, BOOL bGif)
 {
     SStringW key = S_CT2W(pszFileName);
-    SSkinPool *pBuiltinSkinPool = SSkinPoolMgr::getSingletonPtr()->GetBuiltinSkinPool();
+    ISkinPool *pBuiltinSkinPool = SUiDef::getSingletonPtr()->GetBuiltinSkinPool();
     ISkinObj *pSkin = pBuiltinSkinPool->GetSkin(key, GetScale());
     if (pSkin)
     {
@@ -145,10 +144,7 @@ BOOL SImagePlayer::_PlayFile(LPCTSTR pszFileName, BOOL bGif)
             pGifSkin->Release();
             return FALSE;
         }
-        SkinKey skey;
-        skey.scale = GetScale();
-        skey.strName = key;
-        pBuiltinSkinPool->AddKeyObject(skey, pGifSkin); //将创建的skin交给skinpool管理
+        pBuiltinSkinPool->AddSkin(pGifSkin); //将创建的skin交给skinpool管理
         m_aniSkin = pGifSkin;
     }
     if (GetLayoutParam()->IsWrapContent(Any))
@@ -162,6 +158,7 @@ BOOL SImagePlayer::_PlayFile(LPCTSTR pszFileName, BOOL bGif)
 void SImagePlayer::OnDestroy()
 {
     GetContainer()->UnregisterTimelineHandler(this);
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
-} // namespace SOUI
+
+SNSEND

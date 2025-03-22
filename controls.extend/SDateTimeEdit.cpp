@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "SDateTimeEdit.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 /////////////////////////////////////////////////////////////////////////////
 // CDxMaskEdit
@@ -148,7 +147,7 @@ BOOL SMaskEdit::MaskPaste()
 
     GetMaskState();
 
-    if (!OpenClipboard(NULL))
+    if (!OpenClipboard(0))
         return FALSE;
 
 #ifndef _UNICODE
@@ -281,7 +280,7 @@ BOOL SMaskEdit::SetEditMask(LPCTSTR lpszMask, LPCTSTR lpszLiteral, LPCTSTR lpszD
 
     // set the window text for the control.
     m_bModified = FALSE;
-    SetWindowText(S_CT2W(m_strWindowText));
+    SetWindowText(m_strWindowText);
 
     return TRUE;
 }
@@ -356,10 +355,10 @@ BOOL SMaskEdit::ProcessMask(TCHAR &nChar, int nEndPos)
         return IsPrintChar(nChar);
 
     case 'H': // hex digit
-        return _istxdigit(nChar);
+        return _istdigit(nChar);
 
     case 'X': // hex digit or space
-        return _istxdigit(nChar) || _istspace(nChar);
+        return _istdigit(nChar) || _istspace(nChar);
 
     case '>':
         if (IsAlphaChar(nChar))
@@ -469,7 +468,7 @@ void SMaskEdit::InsertCharAt(int nPos, TCHAR nChar)
 
 BOOL SMaskEdit::CopyToClipboard(const SStringT &strText)
 {
-    if (!OpenClipboard(NULL))
+    if (!OpenClipboard(0))
         return FALSE;
 
     ::EmptyClipboard();
@@ -505,7 +504,7 @@ SStringT SMaskEdit::GetMaskedText(int nStartPos, int nEndPos) const
     if (nEndPos == -1)
         nEndPos = m_strWindowText.GetLength();
     else
-        nEndPos = min(nEndPos, m_strWindowText.GetLength());
+        nEndPos = smin(nEndPos, m_strWindowText.GetLength());
 
     SStringT strBuffer;
 
@@ -900,17 +899,17 @@ void SMaskEdit::SetMaskState()
     SStringT strWindowText = GetWindowText();
 
     CorrectWindowText();
-    GetContainer()->GetCaret()->SetVisible(FALSE,m_swnd);
+    ShowCaret(FALSE);
 
     if (strWindowText != m_strWindowText)
     {
-        SetWindowText(S_CT2W(m_strWindowText));
+        SetWindowText(m_strWindowText);
 
         m_bModified = TRUE;
     }
 
     SetSel(m_nStartChar, m_nEndChar, FALSE);
-    GetContainer()->GetCaret()->SetVisible(TRUE,m_swnd);
+    ShowCaret(TRUE);
 }
 
 /////////////////////////////////////////////////////////////////////////////
@@ -940,7 +939,7 @@ int SDateEdit::OnCreate(LPVOID)
 void SDateEdit::SetDateTime(LPCTSTR strDate)
 {
     m_strWindowText = m_strDefault = strDate;
-    SetWindowText(S_CT2W(strDate));
+    SetWindowText(strDate);
 }
 
 void SDateEdit::SetDateTime(STime tm)
@@ -1010,6 +1009,8 @@ int STimeEdit::OnCreate(LPVOID)
     return 0;
 }
 
+
+
 BOOL STimeEdit::ProcessMask(TCHAR &nChar, int nEndPos)
 {
     // check the key against the mask
@@ -1066,8 +1067,8 @@ void STimeEdit::SetHours(int nHours)
 {
     m_nHours = nHours;
 
-    SStringW strText;
-    strText.Format(L"%02d:%02d", m_nHours, m_nMins);
+    SStringT strText;
+    strText.Format(_T("%02d:%02d"), m_nHours, m_nMins);
     SetWindowText(strText);
 }
 
@@ -1075,8 +1076,8 @@ void STimeEdit::SetMins(int nMins)
 {
     m_nMins = nMins;
 
-    SStringW strText;
-    strText.Format(L"%02d:%02d", m_nHours, m_nMins);
+    SStringT strText;
+    strText.Format(_T("%02d:%02d"), m_nHours, m_nMins);
     SetWindowText(strText);
 }
 
@@ -1085,9 +1086,9 @@ void STimeEdit::SetTime(int nHours, int nMins)
     m_nHours = nHours;
     m_nMins = nMins;
 
-    SStringW strText;
-    strText.Format(L"%02d:%02d", m_nHours, m_nMins);
+    SStringT strText;
+    strText.Format(_T("%02d:%02d"), m_nHours, m_nMins);
     SetWindowText(strText);
 }
 
-} // end of namespace SOUI
+SNSEND

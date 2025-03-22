@@ -1,5 +1,5 @@
 ﻿#include "souistd.h"
-#include "Stabctrl2.h"
+#include "STabCtrl2.h"
 #include "SAnimImg.h"
 
 namespace SOUI

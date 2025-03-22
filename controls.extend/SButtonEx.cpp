@@ -40,17 +40,17 @@ CSize SButtonEx::GetDesiredSize(IRenderTarget *pRT, LPCRECT pRcContainer)
     switch (m_drawMode)
     {
     case FREE_DRAW:
-        szRet.cx = max(szIcon.cx + m_ptIcon[0].toPixelSize(GetScale()), szText.cx + m_ptText[0].toPixelSize(GetScale()));
-        szRet.cy = max(szIcon.cy + m_ptIcon[1].toPixelSize(GetScale()), szText.cy + m_ptText[1].toPixelSize(GetScale()));
+        szRet.cx = smax(szIcon.cx + m_ptIcon[0].toPixelSize(GetScale()), szText.cx + m_ptText[0].toPixelSize(GetScale()));
+        szRet.cy = smax(szIcon.cy + m_ptIcon[1].toPixelSize(GetScale()), szText.cy + m_ptText[1].toPixelSize(GetScale()));
         break;
     case VERT_ICON_TEXT:
     case VERT_TEXT_ICON:
-        szRet.cx = max(szIcon.cx, szText.cx);
+        szRet.cx = smax(szIcon.cx, szText.cx);
         szRet.cy = szIcon.cy + szText.cy + m_nSepSize.toPixelSize(GetScale());
         break;
     case HORZ_ICON_TEXT:
     case HORZ_TEXT_ICON:
-        szRet.cy = max(szIcon.cy, szText.cy);
+        szRet.cy = smax(szIcon.cy, szText.cy);
         szRet.cx = szIcon.cx + szText.cx + m_nSepSize.toPixelSize(GetScale());
         break;
     default:
@@ -197,7 +197,7 @@ void SButtonEx::DrawIcon(IRenderTarget *pRT, CRect rcIcon)
 
 void SButtonEx::OnScaleChanged(int scale)
 {
-    __super::OnScaleChanged(scale);
+    __baseCls::OnScaleChanged(scale);
 
     if(m_pIcon)
         GetScaleSkin(m_pIcon, scale);

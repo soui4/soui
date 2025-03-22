@@ -27,8 +27,8 @@ BOOL SComboBoxEx::CreateListBox(SXmlNode xmlNode)
     m_pListBox
         = (SListBoxEx *)SApplication::getSingleton().CreateWindowByName(SListBoxEx::GetClassName());
     m_pListBox->SetContainer(GetContainer());
-
-    m_pListBox->InitFromXml(&xmlNode.child(L"liststyle"));
+    SXmlNode xmlStyle = xmlNode.child(L"liststyle");
+    m_pListBox->InitFromXml(&xmlStyle);
     m_pListBox->SetAttribute(L"pos", L"0,0,-0,-0", TRUE);
     m_pListBox->SetAttribute(L"hotTrack", L"1", TRUE);
     m_pListBox->SetOwner(this); // chain notify message to combobox
@@ -91,7 +91,7 @@ int SComboBoxEx::GetListBoxHeight()
     {
         int nItemHeight = m_pListBox->GetItemHeight();
         CRect rcMargin = m_pListBox->GetStyle().GetMargin();
-        nDropHeight = min(nDropHeight, nItemHeight * GetCount() + rcMargin.top + rcMargin.bottom);
+        nDropHeight = smin(nDropHeight, nItemHeight * GetCount() + rcMargin.top + rcMargin.bottom);
     }
     return nDropHeight;
 }

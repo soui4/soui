@@ -6,7 +6,7 @@
 //////////////////////////////////////////////////////////////////////////
 
 #include "stdafx.h"
-#include "Streebox.h"
+#include "STreeBox.h"
 #include <control/SCmnCtrl.h>
 
 SNSBEGIN
@@ -25,8 +25,8 @@ static const wchar_t NAME_SWITCH[] =   L"switch";
 STreeBox::STreeBox()
     : m_nItemHeight(20)         //默认为固定高度的列表项
     , m_nIndent(10)
-    , m_hSelItem(NULL)
-    , m_hHoverItem(NULL)
+    , m_hSelItem(0)
+    , m_hHoverItem(0)
     , m_pCapturedFrame(NULL)
     , m_crItemBg(CR_INVALID)
     , m_crItemSelBg(RGB(0,0,128))
@@ -92,8 +92,9 @@ HSTREEITEM STreeBox::InsertItem(SXmlNode xmlNode,DWORD dwData,HSTREEITEM hParent
 
     if(pItemObj->m_bVisible)
     {
-        int nViewHei = GetViewSize().cy;
-        SetViewHeight(nViewHei + nHeight);
+        CSize szView;
+        GetViewSize(&szView);
+        SetViewHeight(szView.cy + nHeight);
     }
 
     if(bEnsureVisible) EnsureVisible(hRet);
@@ -137,8 +138,8 @@ BOOL STreeBox::RemoveItem(HSTREEITEM hItem)
     STreeItem * pItem= CSTree<STreeItem*>::GetItem(hItem);
     int nBranchHei = pItem->m_bVisible?pItem->m_nBranchHeight:0;
 
-    if(IsAncestor(hItem,m_hHoverItem)) m_hHoverItem=NULL;
-    if(IsAncestor(hItem,m_hSelItem)) m_hSelItem=NULL;
+    if(IsAncestor(hItem,m_hHoverItem)) m_hHoverItem=0;
+    if(IsAncestor(hItem,m_hSelItem)) m_hSelItem=0;
 
     UpdateSwitchState(hParent);
     if(nBranchHei!=0) 
@@ -148,7 +149,9 @@ BOOL STreeBox::RemoveItem(HSTREEITEM hItem)
 
     DeleteItem(hItem);
 
-    SetViewHeight(GetViewSize().cy - nBranchHei);
+    CSize szView;
+    GetViewSize(&szView);
+    SetViewHeight(szView.cy - nBranchHei);
 
     return TRUE;
 }
@@ -192,7 +195,7 @@ HSTREEITEM STreeBox::GetParentItem(HSTREEITEM hItem)
 void STreeBox::OnDestroy()
 {
     DeleteAllItems();
-    __super::OnDestroy();
+    __baseCls::OnDestroy();
 }
 
 BOOL STreeBox::Expand(HSTREEITEM hItem , UINT nCode)
@@ -227,8 +230,9 @@ BOOL STreeBox::Expand(HSTREEITEM hItem , UINT nCode)
         if(pItem->m_bCollapsed) nChildrenHeight*=-1;
 
         UpdateAncestorBranchHeight(hItem,nChildrenHeight);
-
-        int nViewHei = GetViewSize().cy+nChildrenHeight;
+        CSize szView;
+        GetViewSize(&szView);
+        int nViewHei = szView.cy+nChildrenHeight;
         SetViewHeight(nViewHei);
     }
     return bRet;
@@ -264,7 +268,7 @@ BOOL STreeBox::EnsureVisible(HSTREEITEM hItem)
 
 HSTREEITEM STreeBox::_HitTest(HSTREEITEM hItem, int & yOffset, const CPoint & pt )
 {
-	if(!hItem) return NULL;
+	if(!hItem) return 0;
     CRect rcClient;
     GetClientRect(&rcClient);
     STreeItem * pItem = GetItem(hItem);
@@ -284,7 +288,7 @@ HSTREEITEM STreeBox::_HitTest(HSTREEITEM hItem, int & yOffset, const CPoint & pt
     }
 
     hItem = GetNextSiblingItem(hItem);
-    if(!hItem) return NULL;
+    if(!hItem) return 0;
 
     return _HitTest(hItem,yOffset,pt);
 }
@@ -294,7 +298,7 @@ HSTREEITEM STreeBox::HitTest(CPoint &pt)
 {
     CRect rcClient;
     GetClientRect(&rcClient);
-    if(!rcClient.PtInRect(pt)) return NULL;
+    if(!rcClient.PtInRect(pt)) return 0;
     int yOffset = 0;
     pt -= rcClient.TopLeft() - m_ptOrigin;//更新pt
     HSTREEITEM hHit = _HitTest(GetChildItem(STVI_ROOT,TRUE),yOffset,pt);
@@ -308,7 +312,7 @@ HSTREEITEM STreeBox::HitTest(CPoint &pt)
             return hHit;
         }
     }
-    return NULL;
+    return 0;
 }
 
 int STreeBox::SetChildrenVisible(HSTREEITEM hItem,BOOL bVisible)
@@ -376,8 +380,9 @@ void STreeBox::LoadBranch(HSTREEITEM hParent,pugi::xml_node xmlItem)
 
 void STreeBox::OnSize( UINT nType,CSize size )
 {
-    __super::OnSize(nType,size);
-    CSize szView = GetViewSize();
+    __baseCls::OnSize(nType,size);
+    CSize szView;
+    GetViewSize(&szView);
     CRect rcClient;
     SWindow::GetClientRect(&rcClient);
     if(szView.cy>rcClient.Height())
@@ -716,7 +721,7 @@ BOOL STreeBox::OnSetCursor(const CPoint &pt)
     }
     if(!bRet)
     {
-        bRet=__super::OnSetCursor(pt);
+        bRet=__baseCls::OnSetCursor(pt);
     }
     return bRet;
 }
@@ -760,13 +765,13 @@ BOOL STreeBox::OnItemGetRect( SItemPanel *pItem,CRect &rcItem )
 
 void STreeBox::OnSetFocus(SWND wndOld)
 {
-    __super::OnSetFocus(wndOld);
+    __baseCls::OnSetFocus(wndOld);
     if(m_hSelItem) CSTree<STreeItem*>::GetItem(m_hSelItem)->DoFrameEvent(WM_SETFOCUS,0,0);
 }
 
 void STreeBox::OnKillFocus(SWND wndFocus)
 {
-    __super::OnKillFocus(wndFocus);
+    __baseCls::OnKillFocus(wndFocus);
     if(m_hSelItem) CSTree<STreeItem*>::GetItem(m_hSelItem)->DoFrameEvent(WM_KILLFOCUS,0,0);
 }
 
@@ -838,7 +843,7 @@ void STreeBox::UpdateSwitchState( HSTREEITEM hItem )
 BOOL STreeBox::UpdateToolTip( CPoint pt, SwndToolTipInfo & tipInfo )
 {
     if(m_hHoverItem==NULL)
-        return __super::UpdateToolTip(pt,tipInfo);
+        return __baseCls::UpdateToolTip(pt,tipInfo);
     STreeItem *pItem = GetItem(m_hHoverItem);
     return pItem->UpdateToolTip(pt,tipInfo);
 }
@@ -867,7 +872,9 @@ BOOL STreeBox::OnItemStateChanged( IEvtArgs *pEvt )
         pItem->Move(CRect(0,0,rcClient.Width()-m_nIndent*pItem->m_nLevel,evt.nItemHeight));
         pItem->m_nItemHeight = evt.nItemHeight;
         UpdateAncestorBranchHeight(evt.hItem,nHeightChange);
-        SetViewHeight(GetViewSize().cy + nHeightChange);
+        CSize szView;
+        GetViewSize(&szView);
+        SetViewHeight(szView.cy + nHeightChange);
     }
 
     return true;
@@ -877,7 +884,8 @@ void STreeBox::SetViewHeight( int nHeight )
 {
     CRect rcClient;
     SWindow::GetClientRect(&rcClient);
-    CSize szView = GetViewSize();
+    CSize szView;
+    GetViewSize(&szView);
     szView.cy = nHeight;
     szView.cx = rcClient.Width();
     if(szView.cy > rcClient.Height())

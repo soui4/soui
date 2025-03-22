@@ -1,5 +1,7 @@
-﻿#pragma once
-#include "core\Swnd.h"
+﻿#ifndef _SLOOPBUTTON_H_
+#define _SLOOPBUTTON_H_
+
+#include <core/SWnd.h>
 
 SNSBEGIN
 
@@ -67,3 +69,5 @@ class SLoopButton : public SImageButton {
 };
 
 SNSEND
+
+#endif//_SLOOPBUTTON_H_

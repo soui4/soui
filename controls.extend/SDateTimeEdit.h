@@ -11,14 +11,13 @@
  * Describe    时间控件
  */
 
-#pragma once
+#ifndef _SDATETIMEEDIT_H_
+#define _SDATETIMEEDIT_H_
 
 #include <control/SRichEdit.h>
 #include <helper/STime.h>
 
-namespace SOUI
-{
-
+SNSBEGIN
 //===========================================================================
 // Summary:
 //     SMaskEdit is a CXTPEdit derived class. It allows text masking to be
@@ -375,4 +374,6 @@ inline void STimeEdit::SetMilitary(BOOL bMilitary)
     m_bMilitary = bMilitary;
 }
 
-} // namespace SOUI
+SNSEND
+
+#endif//_SDATETIMEEDIT_H_

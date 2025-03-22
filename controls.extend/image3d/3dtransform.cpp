@@ -1,5 +1,5 @@
 ﻿#include "stdafx.h"
-#include "3dtransform.h"
+#include "3dTransform.h"
 #include "PerspectiveTransform.h"
 #include "3dlib.h"
 #include <float.h>
@@ -21,8 +21,9 @@ void  C3DTransform::Initialize()
 
     if (false == g_bInitSinCosTable)
     {
+		#ifdef _WIN32
         _control87(_MCW_RC, _RC_DOWN); //设置FPU的舍入模式，在Bilinear函数中需要使用汇编加快float->int
-
+		#endif//_WIN32
         Build_Sin_Cos_Tables();
         g_bInitSinCosTable = true;
     }
@@ -219,10 +220,10 @@ void C3DTransform::Render(const PARAM3DTRANSFORM & param3d)
 	//将目标图片清空
 	memset(pDstBits, 0, nDstPitch * nHeightDst);
 
-	int nMinX = max(0, min(min(min(quad.Ax,quad.Bx),quad.Cx),quad.Dx));
-	int nMinY = max(0, min(min(min(quad.Ay,quad.By),quad.Cy),quad.Dy));
-	int nMaxX = min(nWidthDst,  max(max(max(quad.Ax,quad.Bx),quad.Cx),quad.Dx));
-	int nMaxY = min(nHeightDst, max(max(max(quad.Ay,quad.By),quad.Cy),quad.Dy));
+	int nMinX = smax(0, smin(smin(smin(quad.Ax,quad.Bx),quad.Cx),quad.Dx));
+	int nMinY = smax(0, smin(smin(smin(quad.Ay,quad.By),quad.Cy),quad.Dy));
+	int nMaxX = smin(nWidthDst,  smax(smax(smax(quad.Ax,quad.Bx),quad.Cx),quad.Dx));
+	int nMaxY = smin(nHeightDst, smax(smax(smax(quad.Ay,quad.By),quad.Cy),quad.Dy));
 
 	
 	pDstBits += (nMinY*nDstPitch);
@@ -243,7 +244,7 @@ void C3DTransform::Render(const PARAM3DTRANSFORM & param3d)
 			int ny = 0; //fy;   //     导致效率降低。这里使用内嵌汇编指令。(3D游戏编程大师技巧 P918)
 
 			// 浮点数转整数。 注意：默认的fistp是四舍五入模式。需要通过调用_control87(_MCW_RC, _RC_DOWN);进行调整
-#ifndef _WIN64
+#if defined(_WIN32) && !defined(_WIN64)
 			__asm	fld    fxSrc;
 			__asm	fistp  nx;
 
@@ -296,7 +297,7 @@ void C3DTransform::Render(const PARAM3DTRANSFORM & param3d)
 				float u = (float)fxSrc - nx;
 				float v = (float)fySrc - ny;
 			
-#ifndef _WIN64
+#if defined(_WIN32) && !defined(_WIN64)
 				float fpm3 = FLOAT_TO_FIXP16(u*v);
 				float fpm2 = FLOAT_TO_FIXP16(u*(1.0f-v));
 				float fpm1 = FLOAT_TO_FIXP16(v*(1.0f-u));
