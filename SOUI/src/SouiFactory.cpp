@@ -98,5 +98,5 @@ SNSEND
 
 EXTERN_C ISouiFactoryPtr CreateSouiFactory()
 {
-    return new SOUI::SouiFactory();
+    return new SNS::SouiFactory();
 }

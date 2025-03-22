@@ -16,33 +16,33 @@
     return FALSE;               \
     }
 
-// BOOL OnEraseBkgnd(SOUI::IRenderTarget * pRT)
+// BOOL OnEraseBkgnd(SNS::IRenderTarget * pRT)
 #define MSG_WM_ERASEBKGND_EX(func)                              \
     if (uMsg == WM_ERASEBKGND)                                  \
     {                                                           \
         SetMsgHandled(TRUE);                                    \
-        lResult = (LRESULT)func((SOUI::IRenderTarget *)wParam); \
+        lResult = (LRESULT)func((SNS::IRenderTarget *)wParam); \
         if (IsMsgHandled())                                     \
             return TRUE;                                        \
     }
 
-// void OnPaint(SOUI::IRenderTarget * pRT)
+// void OnPaint(SNS::IRenderTarget * pRT)
 #define MSG_WM_PAINT_EX(func)                \
     if (uMsg == WM_PAINT)                    \
     {                                        \
         SetMsgHandled(TRUE);                 \
-        func((SOUI::IRenderTarget *)wParam); \
+        func((SNS::IRenderTarget *)wParam); \
         lResult = 0;                         \
         if (IsMsgHandled())                  \
             return TRUE;                     \
     }
 
-// void OnNcPaint(SOUI::IRenderTarget * pRT)
+// void OnNcPaint(SNS::IRenderTarget * pRT)
 #define MSG_WM_NCPAINT_EX(func)              \
     if (uMsg == WM_NCPAINT)                  \
     {                                        \
         SetMsgHandled(TRUE);                 \
-        func((SOUI::IRenderTarget *)wParam); \
+        func((SNS::IRenderTarget *)wParam); \
         lResult = 0;                         \
         if (IsMsgHandled())                  \
             return TRUE;                     \

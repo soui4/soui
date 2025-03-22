@@ -25,21 +25,21 @@
 #include <helper/obj-ref-impl.hpp>
 #include <interface/SSkinobj-i.h>
 
-#define GETRESPROVIDER    SOUI::SApplication::getSingletonPtr()
-#define GETRENDERFACTORY  SOUI::SApplication::getSingleton().GetRenderFactory()
-#define GETREALWNDHANDLER SOUI::SApplication::getSingleton().GetRealWndHander()
-#define GETTOOLTIPFACTORY SOUI::SApplication::getSingleton().GetToolTipFactory()
+#define GETRESPROVIDER    SNS::SApplication::getSingletonPtr()
+#define GETRENDERFACTORY  SNS::SApplication::getSingleton().GetRenderFactory()
+#define GETREALWNDHANDLER SNS::SApplication::getSingleton().GetRealWndHander()
+#define GETTOOLTIPFACTORY SNS::SApplication::getSingleton().GetToolTipFactory()
 
-#define LOADXML(p1, p2)   SOUI::SApplication::getSingleton().LoadXmlDocment(p1, p2)
-#define LOADIMAGE(p1,p2)  ((IResProviderMgr*)SOUI::SApplication::getSingletonPtr())->LoadImage(p1,p2)
-#define LOADIMAGE2(p1)    SOUI::SApplication::getSingleton().LoadImage2(p1)
-#define LOADICON(p1, p2)  SOUI::SApplication::getSingleton().LoadIcon(p1, p2, p2)
-#define LOADICON2(p1)     SOUI::SApplication::getSingleton().LoadIcon2(p1)
-#define TR(p1, p2)        SOUI::SApplication::getSingleton().tr(p1, p2)
-#define STR2ID(p1)        SOUI::SApplication::getSingleton().Str2ID(p1)
+#define LOADXML(p1, p2)   SNS::SApplication::getSingleton().LoadXmlDocment(p1, p2)
+#define LOADIMAGE(p1,p2)  ((IResProviderMgr*)SNS::SApplication::getSingletonPtr())->LoadImage(p1,p2)
+#define LOADIMAGE2(p1)    SNS::SApplication::getSingleton().LoadImage2(p1)
+#define LOADICON(p1, p2)  SNS::SApplication::getSingleton().LoadIcon(p1, p2, p2)
+#define LOADICON2(p1)     SNS::SApplication::getSingleton().LoadIcon2(p1)
+#define TR(p1, p2)        SNS::SApplication::getSingleton().tr(p1, p2)
+#define STR2ID(p1)        SNS::SApplication::getSingleton().Str2ID(p1)
 
 
-#define CREATEINTERPOLATOR(x) SOUI::SApplication::getSingleton().CreateInterpolatorByName(x)
+#define CREATEINTERPOLATOR(x) SNS::SApplication::getSingleton().CreateInterpolatorByName(x)
 
 SNSBEGIN
 

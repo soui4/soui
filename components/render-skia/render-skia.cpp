@@ -1,4 +1,8 @@
-﻿#include <core/SkShader.h>
+﻿#ifndef _CRT_SECURE_NO_WARNINGS
+#define _CRT_SECURE_NO_WARNINGS
+#endif//_CRT_SECURE_NO_WARNINGS
+
+#include <core/SkShader.h>
 #include <core/SkDevice.h>
 #include <effects/SkDashPathEffect.h>
 #include <effects/SkGradientShader.h>

@@ -39,8 +39,8 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
   public:
     static ULONG Hash(INARGTYPE fontKey)
     {
-        ULONG uRet = SOUI::CElementTraits<SStringW>::Hash(fontKey.strFaceName);
-        uRet = (uRet << 5) + SOUI::CElementTraits<SStringW>::Hash(fontKey.strPropEx);
+        ULONG uRet = SNS::CElementTraits<SStringW>::Hash(fontKey.strFaceName);
+        uRet = (uRet << 5) + SNS::CElementTraits<SStringW>::Hash(fontKey.strPropEx);
         uRet = (uRet << 5) + (UINT)fontKey.style.syle + 1 + fontKey.scale;
         return uRet;
     }

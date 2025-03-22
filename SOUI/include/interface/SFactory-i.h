@@ -119,7 +119,7 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
 SNSEND
 
 #ifdef __cplusplus
-typedef SOUI::ISouiFactory *ISouiFactoryPtr;
+typedef SNS::ISouiFactory *ISouiFactoryPtr;
 #else
 typedef ISouiFactory *ISouiFactoryPtr;
 #endif

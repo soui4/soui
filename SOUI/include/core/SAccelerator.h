@@ -61,7 +61,7 @@ class SOUI_EXP SAccelerator : public IAccelerator {
     /**
      * FormatHotkey
      * @brief    获得当前加速键的字符串形式
-     * @return   SOUI::SStringT -- 加速键的字符串形式
+     * @return   SStringT -- 加速键的字符串形式
      * Describe
      */
     SStringT FormatHotkey();
@@ -71,7 +71,7 @@ class SOUI_EXP SAccelerator : public IAccelerator {
      * GetKeyName
      * @brief    将键盘值转换为对应的字符串
      * @param    WORD vk --  键盘值
-     * @return   SOUI::SStringT -- 键名
+     * @return   SStringT -- 键名
      * Describe
      */
     static SStringT GetKeyName(WORD vk);

@@ -40,7 +40,7 @@
 #define ICWND_LAST  NULL            /*子窗口插入在末尾*/
 
 #ifdef _DEBUG
-#define ASSERT_UI_THREAD() SOUI::SWindow::TestMainThread()
+#define ASSERT_UI_THREAD() SNS::SWindow::TestMainThread()
 #else
 #define ASSERT_UI_THREAD()
 #endif

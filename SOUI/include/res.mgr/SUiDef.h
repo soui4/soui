@@ -46,7 +46,7 @@ struct IUiDefInfo : IObjRef
     virtual SObjDefAttr *GetObjDefAttr() = 0;
 };
 
-#define GETUIDEF SOUI::SUiDef::getSingletonPtr()
+#define GETUIDEF SNS::SUiDef::getSingletonPtr()
 
 #define GETSTYLE(p)                GETUIDEF->GetStyle(p)
 #define GETSKIN(p1, scale)         GETUIDEF->GetSkin(p1, scale)

@@ -80,12 +80,12 @@ void SEvent::SetScriptHandler(const SStringA &strScriptHandler)
     m_strScriptHandler = strScriptHandler;
 }
 
-SOUI::SStringA SEvent::GetScriptHandler() const
+SStringA SEvent::GetScriptHandler() const
 {
     return m_strScriptHandler;
 }
 
-SOUI::SStringW SEvent::GetName() const
+SStringW SEvent::GetName() const
 {
     return m_strEventName;
 }

@@ -13,17 +13,17 @@
 
 #define EVENT_MAP_BEGIN()                           \
   public:                                           \
-    virtual BOOL _HandleEvent(SOUI::IEvtArgs *pEvt) \
+    virtual BOOL _HandleEvent(SNS::IEvtArgs *pEvt) \
     {                                               \
         UINT uCode = pEvt->GetID();                 \
         UINT nCount = 0;
 
 #define EVENT_MAP_DECLEAR() \
   protected:                \
-    virtual BOOL _HandleEvent(SOUI::IEvtArgs *pEvt);
+    virtual BOOL _HandleEvent(SNS::IEvtArgs *pEvt);
 
 #define EVENT_MAP_BEGIN2(classname)                    \
-    BOOL classname::_HandleEvent(SOUI::IEvtArgs *pEvt) \
+    BOOL classname::_HandleEvent(SNS::IEvtArgs *pEvt) \
     {                                                  \
         UINT uCode = pEvt->GetID();                    \
         UINT nCount = 0;
@@ -72,7 +72,7 @@
     {                                                                         \
         if (!pRoot)                                                           \
             return FALSE;                                                     \
-        SOUI::SWindow *pWnd = SOUI::sobj_cast<SOUI::SWindow>(pEvt->Sender()); \
+        SNS::SWindow *pWnd = SNS::sobj_cast<SNS::SWindow>(pEvt->Sender()); \
         if (pWnd && pRoot != pWnd && !pWnd->IsDescendant(pRoot))              \
             return FALSE;                                                     \
     }
@@ -123,7 +123,7 @@
 
 // void OnCommand(IEvtArgs *pEvt)
 #define EVENT_COMMAND(func)       \
-    if (SOUI::EVT_CMD == uCode)   \
+    if (SNS::EVT_CMD == uCode)   \
     {                             \
         nCount++;                 \
         pEvt->SetBubbleUp(false); \
@@ -134,7 +134,7 @@
 
 // void OnCommand()
 #define EVENT_ID_COMMAND(id, func)                      \
-    if (SOUI::EVT_CMD == uCode && id == pEvt->IdFrom()) \
+    if (SNS::EVT_CMD == uCode && id == pEvt->IdFrom()) \
     {                                                   \
         nCount++;                                       \
         pEvt->SetBubbleUp(false);                       \
@@ -145,7 +145,7 @@
 
 // void OnCommand(int magic)
 #define EVENT_ID_COMMAND_MAGIC(id, func,magic)          \
-    if (SOUI::EVT_CMD == uCode && id == pEvt->IdFrom()) \
+    if (SNS::EVT_CMD == uCode && id == pEvt->IdFrom()) \
     {                                                   \
         nCount++;                                       \
         pEvt->SetBubbleUp(false);                       \
@@ -157,7 +157,7 @@
 
 // void OnCommand(int nID)
 #define EVENT_ID_COMMAND_RANGE(idMin, idMax, func)                                    \
-    if (SOUI::EVT_CMD == uCode && idMin <= pEvt->IdFrom() && idMax >= pEvt->IdFrom()) \
+    if (SNS::EVT_CMD == uCode && idMin <= pEvt->IdFrom() && idMax >= pEvt->IdFrom()) \
     {                                                                                 \
         nCount++;                                                                     \
         pEvt->SetBubbleUp(false);                                                     \
@@ -168,7 +168,7 @@
 
 // void OnCommand()
 #define EVENT_NAME_COMMAND(name, func)                                                             \
-    if (SOUI::EVT_CMD == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
+    if (SNS::EVT_CMD == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
     {                                                                                              \
         nCount++;                                                                                  \
         pEvt->SetBubbleUp(false);                                                                  \
@@ -179,7 +179,7 @@
 
 // void OnCommand(int magic)
 #define EVENT_NAME_COMMAND_MAGIC(name, func,magic)                                                             \
-    if (SOUI::EVT_CMD == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
+    if (SNS::EVT_CMD == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
     {                                                                                              \
         nCount++;                                                                                  \
         pEvt->SetBubbleUp(false);                                                                  \
@@ -190,11 +190,11 @@
 
 // BOOL OnContextMenu(CPoint pt)
 #define EVENT_ID_CONTEXTMENU(id, func)                                \
-    if (SOUI::EVT_CTXMENU == uCode && pEvt->IdFrom() == id)           \
+    if (SNS::EVT_CTXMENU == uCode && pEvt->IdFrom() == id)           \
     {                                                                 \
         nCount++;                                                     \
         pEvt->SetBubbleUp(false);                                     \
-        SOUI::EventCtxMenu *pEvtCtxMenu = (SOUI::EventCtxMenu *)pEvt; \
+        SNS::EventCtxMenu *pEvtCtxMenu = (SNS::EventCtxMenu *)pEvt; \
         pEvtCtxMenu->bCancel = func(pEvtCtxMenu->pt);                 \
         if (!pEvt->IsBubbleUp())                                      \
             return TRUE;                                              \
@@ -202,11 +202,11 @@
 
 // BOOL OnContextMenu(CPoint pt)
 #define EVENT_NAME_CONTEXTMENU(name, func)                                                             \
-    if (SOUI::EVT_CTXMENU == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
+    if (SNS::EVT_CTXMENU == uCode && pEvt->NameFrom() != NULL && wcscmp(pEvt->NameFrom(), name) == 0) \
     {                                                                                                  \
         nCount++;                                                                                      \
         pEvt->SetBubbleUp(false);                                                                      \
-        SOUI::EventCtxMenu *pEvtCtxMenu = (SOUI::EventCtxMenu *)pEvt;                                  \
+        SNS::EventCtxMenu *pEvtCtxMenu = (SNS::EventCtxMenu *)pEvt;                                  \
         pEvtCtxMenu->bCancel = func(pEvtCtxMenu->pt);                                                  \
         if (!pEvt->IsBubbleUp())                                                                       \
             return TRUE;                                                                               \

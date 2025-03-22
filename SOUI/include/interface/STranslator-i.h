@@ -62,7 +62,7 @@ DECLARE_INTERFACE_(ITranslator, IObjRef)
     /**
      * name
      * @brief    获取翻译资源的name
-     * @return   SOUI::SStringW 翻译资源的name
+     * @return   SStringW 翻译资源的name
      *
      * Describe
      */
@@ -192,7 +192,7 @@ DECLARE_INTERFACE_(ITranslatorMgr, IObjRef)
      * @brief    翻译字符串
      * @param    const SStringW & strSrc --  原字符串
      * @param    const SStringW & strCtx --  翻译上下文
-     * @return   SOUI::SStringW 翻译后的字符串
+     * @return   SStringW 翻译后的字符串
      *
      * Describe  调用ITranslator的tr接口执行具体翻译过程
      */

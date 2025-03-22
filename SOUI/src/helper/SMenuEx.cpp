@@ -430,7 +430,7 @@ class SMenuExSep : public SMenuExItem {
         m_pBgSkin->DrawByIndex(pRT, GetClientRect(), 0);
         return TRUE;
     }
-    void OnPaint(SOUI::IRenderTarget *pRT)
+    void OnPaint(IRenderTarget *pRT)
     {
         (void)pRT;
     }

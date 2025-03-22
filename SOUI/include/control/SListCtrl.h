@@ -197,7 +197,7 @@ class SOUI_EXP SListCtrl : public SPanel {
      * @brief    获取子项文本
      * @param    int nItem -- 索引
      * @param    int nSubItem -- 子项索引
-     * @return   SOUI::SStringT -- 结果字符串
+     * @return   SNS::SStringT -- 结果字符串
      * Describe
      */
     SStringT GetSubItemText(int nItem, int nSubItem) const;

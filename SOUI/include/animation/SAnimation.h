@@ -31,7 +31,7 @@
 #define ATTR_VALUE_DESC(attribname, desc)                     \
     if (0 == strAttribName.CompareNoCase(attribname))         \
     {                                                         \
-        desc = SOUI::SValueDescription::parseValue(strValue); \
+        desc = SNS::SValueDescription::parseValue(strValue); \
         hRet = S_FALSE;                                       \
     }                                                         \
     else

@@ -17,7 +17,7 @@
 // Attribute Declaration
 #define SOUI_ATTRS_BEGIN()                                                                                                   \
   public:                                                                                                                    \
-    virtual HRESULT SetAttribute(const SOUI::SStringW &strAttribName, const SOUI::SStringW &strValue, BOOL bLoading = FALSE) \
+    virtual HRESULT SetAttribute(const SNS::SStringW &strAttribName, const SNS::SStringW &strValue, BOOL bLoading = FALSE) \
     {                                                                                                                        \
         HRESULT hRet = E_FAIL;
 
@@ -219,7 +219,7 @@
 #define ATTR_STRINGA(attribname, varname, allredraw)  \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        SOUI::SStringW strTmp = GETSTRING(strValue);  \
+        SNS::SStringW strTmp = GETSTRING(strValue);  \
         varname = S_CW2A(strTmp);                     \
         hRet = allredraw ? S_OK : S_FALSE;            \
     }                                                 \
@@ -247,7 +247,7 @@
 #define ATTR_I18NSTRA(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname))    \
     {                                                    \
-        SOUI::SStringW strTmp = tr(GETSTRING(strValue)); \
+        SNS::SStringW strTmp = tr(GETSTRING(strValue)); \
         varname = S_CW2A(strTmp);                        \
         hRet = allredraw ? S_OK : S_FALSE;               \
     }                                                    \
@@ -257,7 +257,7 @@
 #define ATTR_I18NSTRT(attribname, varname, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        SOUI::SStringW strTmp = GETSTRING(strValue);  \
+        SNS::SStringW strTmp = GETSTRING(strValue);  \
         varname.SetText(S_CW2T(strTmp));              \
         hRet = allredraw ? S_OK : S_FALSE;            \
     }                                                 \
@@ -345,12 +345,12 @@
     }                                                     \
     else
 
-// ATTR_IMAGE:直接使用IResProvider::LoadImage创建SOUI::IBitmapS对象，创建成功后引用计数为1
+// ATTR_IMAGE:直接使用IResProvider::LoadImage创建SNS::IBitmapS对象，创建成功后引用计数为1
 //不需要调用AddRef，但是用完后需要调用Release
 #define ATTR_IMAGE(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        SOUI::IBitmapS *pImg = LOADIMAGE2(strValue);  \
+        SNS::IBitmapS *pImg = LOADIMAGE2(strValue);  \
         if (!pImg)                                    \
             hRet = E_FAIL;                            \
         else                                          \
@@ -363,11 +363,11 @@
     }                                                 \
     else
 
-// ATTR_IMAGEAUTOREF:varname应该是一个SAutoRefPtr<SOUI::IBitmapS>对象
+// ATTR_IMAGEAUTOREF:varname应该是一个SAutoRefPtr<SNS::IBitmapS>对象
 #define ATTR_IMAGEAUTOREF(attribname, varname, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname))     \
     {                                                     \
-        SOUI::IBitmapS *pImg = LOADIMAGE2(strValue);      \
+        SNS::IBitmapS *pImg = LOADIMAGE2(strValue);      \
         if (!pImg)                                        \
             hRet = E_FAIL;                                \
         else                                              \
@@ -408,7 +408,7 @@
 #define ATTR_GRADIENT(attribname, varname, allredraw)                 \
     if (0 == strAttribName.CompareNoCase(attribname))                 \
     {                                                                 \
-        SOUI::IGradient *pGradient = GETUIDEF->GetGradient(strValue); \
+        SNS::IGradient *pGradient = GETUIDEF->GetGradient(strValue); \
         if (!pGradient)                                               \
             hRet = E_FAIL;                                            \
         else                                                          \

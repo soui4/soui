@@ -57,7 +57,7 @@ SNSBEGIN
 			}
 			rcDst.OffsetRect(rcWnd.TopLeft());
 
-			BYTE alpha2 = fac * 255;
+			BYTE alpha2 = (BYTE)(fac * 255);
 			BYTE alpha1 = 255 - alpha2;
 
 			DWORD dwState = GetState();
