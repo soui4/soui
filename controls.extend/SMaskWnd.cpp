@@ -100,7 +100,7 @@ namespace SOUI
 		if (m_bmpMask) {
 			CRect rcWnd = GetWindowRect();
 			CRect rccache(CPoint(0, 0), rcWnd.Size());
-			m_bmpMaskTemp = nullptr;
+			m_bmpMaskTemp = NULL;
 			GETRENDERFACTORY->CreateBitmap(&m_bmpMaskTemp);
 			m_bmpMaskTemp->Init(rccache.Width(), rccache.Height(), NULL);
 			SAutoRefPtr<IRenderTarget> pRT;

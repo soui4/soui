@@ -11,18 +11,21 @@ typedef struct IWindow IWindow;
 #define INTERFACE IAttrStorage
 DECLARE_INTERFACE_(IAttrStorage, IObjRef)
 {
-    //!添加引用
-    /*!
+    /**
+     * @brief 添加引用
+     * @return long -- 引用计数
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!释放引用
-    /*!
+    /**
+     * @brief 释放引用
+     * @return long -- 引用计数
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!释放对象
-    /*!
+    /**
+     * @brief 释放对象
+     * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
@@ -30,9 +33,9 @@ DECLARE_INTERFACE_(IAttrStorage, IObjRef)
 
     /**
      * @brief 响应IObject::SetAttribute的时保存attribute值的方法
-     * @param const IStringW *strName -- 属性名
-     * @param const IStringW *strValue -- 属性值
-     * @param BOOL bHandled -- 该属性是否已经被处理
+     * @param strName const IStringW* -- 属性名
+     * @param strValue const IStringW* -- 属性值
+     * @param bHandled BOOL -- 该属性是否已经被处理
      * @return void
      */
     STDMETHOD_(void, OnSetAttribute)
@@ -40,9 +43,9 @@ DECLARE_INTERFACE_(IAttrStorage, IObjRef)
 
     /**
      * @brief 响应IObject::GetAttribute调用
-     * @param const IStringW *strName -- 属性名
-     * @param[out] const IStringW *strValue -- 返回的属性值
-     * @return BOOL, TRUE--成功
+     * @param strName const IStringW* -- 属性名
+     * @param[out] strValue IStringW* -- 返回的属性值
+     * @return BOOL -- TRUE: 成功
      */
     STDMETHOD_(BOOL, OnGetAttribute)(CTHIS_ const IStringW *strName, IStringW *strValue) SCONST PURE;
 };
@@ -51,18 +54,21 @@ DECLARE_INTERFACE_(IAttrStorage, IObjRef)
 #define INTERFACE IAttrStorageFactory
 DECLARE_INTERFACE_(IAttrStorageFactory, IObjRef)
 {
-    //!添加引用
-    /*!
+    /**
+     * @brief 添加引用
+     * @return long -- 引用计数
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!释放引用
-    /*!
+    /**
+     * @brief 释放引用
+     * @return long -- 引用计数
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!释放对象
-    /*!
+    /**
+     * @brief 释放对象
+     * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
@@ -70,9 +76,9 @@ DECLARE_INTERFACE_(IAttrStorageFactory, IObjRef)
 
     /**
      * @brief 创建IAttrStorage对象
-     * @param IWindow * owner -- IAttrStorage的宿主
-     * @param[out] IAttrStorage * *ppAttrStorage -- 返回值
-     * @return HRESULT, S_OK--成功
+     * @param owner IWindow* -- IAttrStorage的宿主
+     * @param[out] ppAttrStorage IAttrStorage** -- 返回值
+     * @return HRESULT -- S_OK: 成功
      */
     STDMETHOD_(HRESULT, CreateAttrStorage)
     (CTHIS_ IWindow * owner, IAttrStorage * *ppAttrStorage) SCONST PURE;
@@ -80,3 +86,6 @@ DECLARE_INTERFACE_(IAttrStorageFactory, IObjRef)
 
 SNSEND
 #endif // __SATTRSTORAGE_I__H__
+
+
+

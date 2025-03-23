@@ -1,13 +1,13 @@
 ﻿#include "stdafx.h"
 #include "SChatEdit.h"
+#ifdef _WIN32
 #include "reole/RichEditOle.h"
-
+#endif//_WIN32
 #ifndef LY_PER_INCH
 #define LY_PER_INCH 1440
 #endif
 
-namespace SOUI
-{
+SNSBEGIN
 
 const SStringW KLabelColor = L"color";
 const SStringW KLabelLink = L"link";
@@ -100,6 +100,7 @@ BOOL SChatEdit::ReplaceSelectionByFormatText(const SStringW &strMsg, BOOL bCanUn
 int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, BOOL bCanUndo)
 {
     SStringW strText = xmlText.value();
+#ifdef _WIN32
     if (xmlText.name() == KLabelSmiley)
     { // insert smiley
         SComPtr<ISmileyCtrl> pSmiley;
@@ -140,7 +141,7 @@ int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, B
         }
         return SUCCEEDED(hr) ? 1 : 0;
     }
-
+#endif// _WIN32
     CHARFORMATW cfNew = cf;
     cfNew.dwMask = 0;
     if (xmlText.name() == KLabelColor)
@@ -153,7 +154,7 @@ int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, B
 #else
             if ((cfNew.crTextColor&0xff000000)==0)
                 cfNew.crTextColor |= 0xffffff00;
-#endif
+#endif//_WIN32
             cfNew.dwMask |= CFM_COLOR;
         }
     }
@@ -196,7 +197,7 @@ int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, B
             #else
             if ((cr & 0xff000000) == 0)
                 cr |= 0xff000000;
-            #endif
+            #endif//_WIN32
             cfNew.crTextColor = cr ;
         }
     }
@@ -273,15 +274,17 @@ SStringW SChatEdit::GetFormatText()
     SSendMessage(EM_GETTEXTRANGE, 0, (LPARAM)&txtRng);
     strTxt.ReleaseBuffer();
 
+#ifdef _WIN32
     SComPtr<IRichEditOle> ole;
     SSendMessage(EM_GETOLEINTERFACE, 0, (LPARAM)(void **)&ole);
-
+#endif//_WIN32
     SStringW strMsg;
     int iPlainTxtBegin = 0;
     for (int i = 0; i < strTxt.GetLength(); i++)
     {
         if (strTxt[i] == 0xfffc)
         { //找到一个OLE对象
+#ifdef _WIN32
             strMsg += strTxt.Mid(iPlainTxtBegin, i - iPlainTxtBegin);
             iPlainTxtBegin = i + 1;
 
@@ -319,6 +322,7 @@ SStringW SChatEdit::GetFormatText()
                 }
                 reobj.poleobj->Release();
             }
+#endif//_WIN32
         }
     }
     if (iPlainTxtBegin < strTxt.GetLength())
@@ -328,4 +332,4 @@ SStringW SChatEdit::GetFormatText()
     return strMsg;
 }
 
-} // namespace SOUI
+SNSEND

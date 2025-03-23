@@ -420,7 +420,7 @@ BOOL SResProviderMgr::CheckUsage(LPCTSTR pszName, LPCTSTR pszType, LPARAM lp)
     key.MakeLower();
     if (!mapResUsageCount->Lookup(key))
     { //发现未使用资源
-        SSLOGFMTD(_T("resource of [%s] was not used."), (LPCTSTR)key);
+        SSLOGD() << _T("resource of [") << key.c_str() << _T("] was not used.");
     }
     return TRUE;
 }

@@ -70,7 +70,7 @@ namespace SOUI
 	SStringT SPropertyItemRect::GetValue() const
 	{
 		if(HasValue())
-			return SStringT().Format(_T("%s,%s,%s,%s"),m_strValue[0],m_strValue[1],m_strValue[2],m_strValue[3]);
+			return SStringT().Format(_T("%s,%s,%s,%s"),m_strValue[0].c_str(), m_strValue[1].c_str(), m_strValue[2].c_str(), m_strValue[3].c_str());
 		else
 			return SStringT();
 	}

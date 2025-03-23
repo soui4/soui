@@ -26,7 +26,7 @@ SSkinPool::~SSkinPool()
         SkinKey skinKey = m_mapNamedObj->GetNextKey(pos);
         if (!m_mapSkinUseCount.Lookup(skinKey))
         {
-            SSLOGFMTD(L"skin of [%s.%d] was not used.", (LPCWSTR)skinKey.strName, skinKey.scale);
+            SSLOGD() << "skin of [" << skinKey.strName.c_str() << "." << skinKey.scale << "] was not used.";
         }
     }
     SSLOGD() << "!!!!Detecting Defined Skin Usage END";
@@ -57,7 +57,7 @@ ISkinObj *SSkinPool::_LoadSkin(SXmlNode xmlSkin, int nScale)
     }
     else
     {
-        SSLOGFMTW(L"load skin error,type=%s,name=%s", strTypeName.c_str(), strSkinName.c_str());
+        SSLOGW() << "load skin error,type=" << strTypeName << "name=" << strSkinName;
     }
     return pSkin;
 }

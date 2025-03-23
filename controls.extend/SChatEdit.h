@@ -1,7 +1,8 @@
-﻿#pragma once
+﻿#ifndef _SCHAT_EDIT_H_
+#define _SCHAT_EDIT_H_
 
-namespace SOUI
-{
+SNSBEGIN
+
 #define EVT_CHATEDIT_KEYRETURN (EVT_EXTERNAL_BEGIN + 500)
 
 DEF_EVT_EXT(EventChatEditKeyReturn, EVT_CHATEDIT_KEYRETURN, { bool bCancel; });
@@ -45,4 +46,7 @@ class SChatEdit : public SRichEdit {
     int _InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, BOOL bCanUndo);
 };
 
-} // namespace SOUI
+SNSEND
+
+#endif//_SCHAT_EDIT_H_
+

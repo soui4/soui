@@ -35,32 +35,31 @@ typedef struct IAnimation IAnimation;
 DECLARE_INTERFACE(IAnimationListener)
 {
     /**
-     * <p>Notifies the start of the animation.</p>
-     *
-     * @param animation The started animation.
+     * @brief 通知动画开始
+     * @param animation IAnimation* -- 开始的动画
+     * @return void
      */
     STDMETHOD_(void, OnAnimationStart)(THIS_ IAnimation * animation) PURE;
 
     /**
-     * <p>Notifies the end of the animation. This callback is not invoked
-     * for animations with repeat count set to INFINITE.</p>
-     *
-     * @param animation The animation which reached its end.
+     * @brief 通知动画结束。对于重复次数设置为INFINITE的动画，不会调用此回调。
+     * @param animation IAnimation* -- 结束的动画
+     * @return void
      */
     STDMETHOD_(void, OnAnimationStop)(THIS_ IAnimation * animation) PURE;
 
     /**
-     * <p>Notifies the repetition of the animation.</p>
-     *
-     * @param animation The animation which was repeated.
+     * @brief 通知动画重复
+     * @param animation IAnimation* -- 重复的动画
+     * @return void
      */
     STDMETHOD_(void, OnAnimationRepeat)(THIS_ IAnimation * animation) PURE;
 
     /**
-     * <p>Notifies the pause state of the animation.</p>
-     *
-     * @param animation The animation which pause state changed.
-     * @param paused true for paused
+     * @brief 通知动画暂停状态变化
+     * @param animation IAnimation* -- 状态变化的动画
+     * @param bPaused BOOL -- TRUE: 暂停，FALSE: 继续
+     * @return void
      */
     STDMETHOD_(void, OnAnimationPauseChange)(THIS_ IAnimation * animation, BOOL bPaused) PURE;
 };
@@ -130,291 +129,277 @@ DECLARE_INTERFACE_(IAnimation, IObject)
     DEF_OBJ_BASE(IAnimation, Animation)
 #include <interface/SobjectApi.h>
 
+    /**
+     * @brief 克隆动画对象
+     * @return IAnimation* -- 克隆的动画对象
+     */
     STDMETHOD_(IAnimation *, clone)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 复制动画对象
+     * @param src const IAnimation* -- 源动画对象
+     * @return void
+     */
     STDMETHOD_(void, copy)(THIS_ const IAnimation *src) PURE;
 
     /**
-     * Reset the initialization state of this animation.
-     *
-     * @see #initialize(int, int, int, int)
+     * @brief 重置动画的初始化状态
+     * @return void
      */
     STDMETHOD_(void, reset)(THIS) PURE;
 
     /**
-     * Cancel the animation. Cancelling an animation invokes the animation
-     * listener, if set, to notify the end of the animation.
-     *
-     * If you cancel an animation manually, you must call {@link #reset()}
-     * before starting the animation again.
-     *
-     * @see #reset()
-     * @see #start()
-     * @see #startNow()
+     * @brief 取消动画。取消动画会调用动画监听器（如果设置了）来通知动画结束。
+     * @return void
      */
     STDMETHOD_(void, cancel)(THIS) PURE;
 
     /**
-     * Sets the acceleration curve for this animation. Defaults to a linear
-     * interpolation.
-     *
-     * @param i The interpolator which defines the acceleration curve
-     * @attr ref android.R.styleable#Animation_interpolator
+     * @brief 设置动画的加速曲线。默认为线性插值。
+     * @param i IInterpolator* -- 定义加速曲线的插值器
+     * @return void
      */
     STDMETHOD_(void, setInterpolator)(THIS_ IInterpolator * i) PURE;
 
     /**
-     * How long this animation should last. The duration cannot be negative.
-     *
-     * @param durationMillis Duration in milliseconds
-     *
-     * @throws java.lang.IllegalArgumentException if the duration is < 0
-     *
-     * @attr ref android.R.styleable#Animation_duration
+     * @brief 设置动画持续时间。持续时间不能为负数。
+     * @param durationMillis long -- 持续时间（毫秒）
+     * @return void
      */
     STDMETHOD_(void, setDuration)(THIS_ long durationMillis) PURE;
 
     /**
-     * How much to scale the duration by.
-     *
-     * @param scale The amount to scale the duration.
+     * @brief 缩放当前持续时间
+     * @param scale float -- 缩放比例
+     * @return void
      */
     STDMETHOD_(void, scaleCurrentDuration)(THIS_ float scale) PURE;
 
+    /**
+     * @brief 设置动画开始前是否应用动画效果
+     * @param bFill BOOL -- TRUE: 应用，FALSE: 不应用
+     * @return void
+     */
     STDMETHOD_(void, setFillBefore)(THIS_ BOOL bFill) PURE;
 
+    /**
+     * @brief 设置动画结束后是否应用动画效果
+     * @param bFill BOOL -- TRUE: 应用，FALSE: 不应用
+     * @return void
+     */
     STDMETHOD_(void, setFillAfter)(THIS_ BOOL bFill) PURE;
 
+    /**
+     * @brief 获取动画开始前是否应用动画效果
+     * @return BOOL -- TRUE: 应用，FALSE: 不应用
+     */
     STDMETHOD_(BOOL, getFillBefore)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 获取动画结束后是否应用动画效果
+     * @return BOOL -- TRUE: 应用，FALSE: 不应用
+     */
     STDMETHOD_(BOOL, getFillAfter)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 设置动画开始偏移时间
+     * @param offset long -- 偏移时间（毫秒）
+     * @return void
+     */
     STDMETHOD_(void, setStartOffset)(THIS_ long offset) PURE;
 
     /**
-     * If fillEnabled is true, this animation will apply the value of fillBefore.
-     *
-     * @return true if the animation will take fillBefore into account
-     * @attr ref android.R.styleable#Animation_fillEnabled
+     * @brief 获取动画是否启用填充效果
+     * @return BOOL -- TRUE: 启用，FALSE: 不启用
      */
     STDMETHOD_(BOOL, isFillEnabled)(CTHIS) SCONST PURE;
 
     /**
-     * If fillEnabled is true, the animation will apply the value of fillBefore.
-     * Otherwise, fillBefore is ignored and the animation
-     * transformation is always applied until the animation ends.
-     *
-     * @param fillEnabled true if the animation should take the value of fillBefore into account
-     * @attr ref android.R.styleable#Animation_fillEnabled
-     *
-     * @see #setFillBefore(boolean)
-     * @see #setFillAfter(boolean)
+     * @brief 设置动画是否启用填充效果
+     * @param fillEnabled BOOL -- TRUE: 启用，FALSE: 不启用
+     * @return void
      */
     STDMETHOD_(void, setFillEnabled)(THIS_ BOOL fillEnabled) PURE;
 
     /**
-     * When this animation should start. When the start time is set to
-     * {@link #START_ON_FIRST_FRAME}, the animation will start the first time
-     * {@link #getTransformation(long, STransformation)} is invoked. The time passed
-     * to this method should be obtained by calling
-     * {@link AnimationUtils#currentAnimationTimeMillis()} instead of
-     * {@link System#currentTimeMillis()}.
-     *
-     * @param startTimeMillis the start time in milliseconds
+     * @brief 设置动画开始时间
+     * @param startTimeMillis int64_t -- 开始时间（毫秒）
+     * @return void
      */
     STDMETHOD_(void, setStartTime)(THIS_ int64_t startTimeMillis) PURE;
 
     /**
-     * Convenience method to start the animation the first time
-     * {@link #getTransformation(long, STransformation)} is invoked.
+     * @brief 方便方法，设置动画在第一次调用getTransformation时开始
+     * @return void
      */
     STDMETHOD_(void, start)(THIS) PURE;
 
     /**
-     * Convenience method to start the animation at the current time in
-     * milliseconds.
+     * @brief 方便方法，设置动画在当前时间开始
+     * @return void
      */
     STDMETHOD_(void, startNow)(THIS) PURE;
 
     /**
-     * Defines what this animation should do when it reaches the end. This
-     * setting is applied only when the repeat count is either greater than
-     * 0 or {@link #INFINITE}. Defaults to {@link #RESTART}.
-     *
-     * @param repeatMode {@link #RESTART} or {@link #REVERSE}
-     * @attr ref android.R.styleable#Animation_repeatMode
+     * @brief 设置动画结束时的行为
+     * @param repeatMode RepeatMode -- RESTART或REVERSE
+     * @return void
      */
     STDMETHOD_(void, setRepeatMode)(THIS_ RepeatMode repeatMode) PURE;
 
     /**
-     * Sets how many times the animation should be repeated. If the repeat
-     * count is 0, the animation is never repeated. If the repeat count is
-     * greater than 0 or {@link #INFINITE}, the repeat mode will be taken
-     * into account. The repeat count is 0 by default.
-     *
-     * @param repeatCount the number of times the animation should be repeated
-     * @attr ref android.R.styleable#Animation_repeatCount
+     * @brief 设置动画重复次数
+     * @param repeatCount int -- 重复次数
+     * @return void
      */
     STDMETHOD_(void, setRepeatCount)(THIS_ int repeatCount) PURE;
 
     /**
-     * Set the Z ordering mode to use while running the animation.
-     *
-     * @param zAdjustment The desired mode, one of {@link #ZORDER_NORMAL},
-     * {@link #ZORDER_TOP}, or {@link #ZORDER_BOTTOM}.
-     * @attr ref android.R.styleable#Animation_zAdjustment
+     * @brief 设置动画运行时的Z顺序模式
+     * @param zAdjustment ZAdjustment -- ZORDER_NORMAL, ZORDER_TOP, 或 ZORDER_BOTTOM
+     * @return void
      */
     STDMETHOD_(void, setZAdjustment)(THIS_ ZAdjustment zAdjustment) PURE;
 
     /**
-     * Gets the acceleration curve type for this animation.
-     *
-     * @return the {@link Interpolator} associated to this animation
-     * @attr ref android.R.styleable#Animation_interpolator
+     * @brief 获取动画的加速曲线类型
+     * @return IInterpolator* -- 插值器
      */
     STDMETHOD_(IInterpolator *, getInterpolator)(CTHIS) SCONST PURE;
 
     /**
-     * When this animation should start. If the animation has not startet yet,
-     * this method might return {@link #START_ON_FIRST_FRAME}.
-     *
-     * @return the time in milliseconds when the animation should start or
-     *         {@link #START_ON_FIRST_FRAME}
+     * @brief 获取动画开始时间
+     * @return int64_t -- 开始时间（毫秒）
      */
     STDMETHOD_(int64_t, getStartTime)(CTHIS) SCONST PURE;
 
     /**
-     * How long this animation should last
-     *
-     * @return the duration in milliseconds of the animation
-     * @attr ref android.R.styleable#Animation_duration
+     * @brief 获取动画持续时间
+     * @return long -- 持续时间（毫秒）
      */
     STDMETHOD_(long, getDuration)(CTHIS) SCONST PURE;
 
     /**
-     * When this animation should start, relative to StartTime
-     *
-     * @return the start offset in milliseconds
-     * @attr ref android.R.styleable#Animation_startOffset
+     * @brief 获取动画开始偏移时间
+     * @return long -- 偏移时间（毫秒）
      */
     STDMETHOD_(long, getStartOffset)(CTHIS) SCONST PURE;
 
     /**
-     * Defines what this animation should do when it reaches the end.
-     *
-     * @return either one of {@link #REVERSE} or {@link #RESTART}
-     * @attr ref android.R.styleable#Animation_repeatMode
+     * @brief 获取动画结束时的行为
+     * @return RepeatMode -- RESTART或REVERSE
      */
     STDMETHOD_(RepeatMode, getRepeatMode)(CTHIS) SCONST PURE;
 
     /**
-     * Defines how many times the animation should repeat. The default value
-     * is 0.
-     *
-     * @return the number of times the animation should repeat, or {@link #INFINITE}
-     * @attr ref android.R.styleable#Animation_repeatCount
+     * @brief 获取动画重复次数
+     * @return int -- 重复次数
      */
     STDMETHOD_(int, getRepeatCount)(CTHIS) SCONST PURE;
 
     /**
-     * Returns the Z ordering mode to use while running the animation as
-     * previously set by {@link #setZAdjustment}.
-     *
-     * @return Returns one of {@link #ZORDER_NORMAL},
-     * {@link #ZORDER_TOP}, or {@link #ZORDER_BOTTOM}.
-     * @attr ref android.R.styleable#Animation_zAdjustment
+     * @brief 获取动画运行时的Z顺序模式
+     * @return ZAdjustment -- ZORDER_NORMAL, ZORDER_TOP, 或 ZORDER_BOTTOM
      */
     STDMETHOD_(ZAdjustment, getZAdjustment)(CTHIS) SCONST PURE;
 
     /**
-     * <p>Binds an animation listener to this animation. The animation listener
-     * is notified of animation events such as the end of the animation or the
-     * repetition of the animation.</p>
-     *
-     * @param listener the animation listener to be notified
+     * @brief 绑定动画监听器
+     * @param listener IAnimationListener* -- 动画监听器
+     * @return void
      */
     STDMETHOD_(void, setAnimationListener)(THIS_ IAnimationListener * listener) PURE;
 
     /**
-     * Compute a hint at how long the entire animation may last, in milliseconds.
-     * Animations can be written to cause themselves to run for a different
-     * duration than what is computed here, but generally this should be
-     * accurate.
+     * @brief 计算整个动画可能持续的时间（毫秒）
+     * @return long -- 持续时间（毫秒）
      */
     STDMETHOD_(long, computeDurationHint)(CTHIS) SCONST PURE;
+
     /**
-     * Gets the transformation to apply at a specified point in time. Implementations of this
-     * method should always replace the specified STransformation or document they are doing
-     * otherwise.
-     *
-     * @param currentTime Where we are in the animation. This is wall clock time.
-     * @param outTransformation A transformation object that is provided by the
-     *        caller and will be filled in by the animation.
-     * @param scale Scaling factor to apply to any inputs to the transform operation, such
-     *        pivot points being rotated or scaled around.
-     * @return True if the animation is still running
+     * @brief 获取指定时间点的变换
+     * @param currentTime uint64_t -- 当前时间（毫秒）
+     * @param outTransformation ITransformation* -- 输出变换对象
+     * @param scale float -- 缩放比例
+     * @return BOOL -- TRUE: 动画仍在运行，FALSE: 动画已结束
      */
     STDMETHOD_(BOOL, getTransformation2)
     (THIS_ uint64_t currentTime, ITransformation * outTransformation, float scale) PURE;
 
     /**
-     * Gets the transformation to apply at a specified point in time. Implementations of this
-     * method should always replace the specified STransformation or document they are doing
-     * otherwise.
-     *
-     * @param currentTime Where we are in the animation. This is wall clock time.
-     * @param outTransformation A transformation object that is provided by the
-     *        caller and will be filled in by the animation.
-     * @return True if the animation is still running
+     * @brief 获取指定时间点的变换
+     * @param currentTime uint64_t -- 当前时间（毫秒）
+     * @param outTransformation ITransformation* -- 输出变换对象
+     * @return BOOL -- TRUE: 动画仍在运行，FALSE: 动画已结束
      */
     STDMETHOD_(BOOL, getTransformation)
     (THIS_ uint64_t currentTime, ITransformation * outTransformation) PURE;
 
     /**
-     * <p>Indicates whether this animation has started or not.</p>
-     *
-     * @return true if the animation has started, false otherwise
+     * @brief 判断动画是否已开始
+     * @return BOOL -- TRUE: 已开始，FALSE: 未开始
      */
     STDMETHOD_(BOOL, hasStarted)(CTHIS) SCONST PURE;
 
     /**
-     * <p>Indicates whether this animation has ended or not.</p>
-     *
-     * @return true if the animation has ended, false otherwise
+     * @brief 判断动画是否已结束
+     * @return BOOL -- TRUE: 已结束，FALSE: 未结束
      */
     STDMETHOD_(BOOL, hasEnded)(CTHIS) SCONST PURE;
 
     /**
-     * Helper for getTransformation. Subclasses should implement this to apply
-     * their transforms given an interpolation value.  Implementations of this
-     * method should always replace the specified STransformation or document
-     * they are doing otherwise.
-     *
-     * @param interpolatedTime The value of the normalized time (0.0 to 1.0)
-     *        after it has been run through the interpolation function.
-     * @param t The STransformation object to fill in with the current
-     *        transforms.
+     * @brief 应用变换
+     * @param interpolatedTime float -- 插值时间
+     * @param t ITransformation* -- 变换对象
+     * @return void
      */
     STDMETHOD_(void, applyTransformation)(THIS_ float interpolatedTime, ITransformation *t) PURE;
 
     /**
-     * Return true if this animation changes the view's alpha property.
-     *
-     * @hide
+     * @brief 判断动画是否改变视图的alpha属性
+     * @return BOOL -- TRUE: 改变，FALSE: 不改变
      */
     STDMETHOD_(BOOL, hasAlpha)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 初始化动画
+     * @param width int -- 宽度
+     * @param height int -- 高度
+     * @param parentWidth int -- 父级宽度
+     * @param parentHeight int -- 父级高度
+     * @param nScale int -- 缩放比例
+     * @return void
+     */
     STDMETHOD_(void, initialize)
     (THIS_ int width, int height, int parentWidth, int parentHeight, int nScale) PURE;
 
+    /**
+     * @brief 设置用户数据
+     * @param data ULONG_PTR -- 用户数据
+     * @return void
+     */
     STDMETHOD_(void, setUserData)(THIS_ ULONG_PTR data) PURE;
 
+    /**
+     * @brief 获取用户数据
+     * @return ULONG_PTR -- 用户数据
+     */
     STDMETHOD_(ULONG_PTR, getUserData)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 暂停动画
+     * @return void
+     */
     STDMETHOD_(void, pause)(THIS) PURE;
 
+    /**
+     * @brief 恢复动画
+     * @return void
+     */
     STDMETHOD_(void, resume)(THIS) PURE;
 };
 
 SNSEND
 #endif // __SANIMATION_I__H__
+
+

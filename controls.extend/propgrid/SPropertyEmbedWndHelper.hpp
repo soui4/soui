@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef _PROP_EMBED_WND_HELPER_H_
+#define _PROP_EMBED_WND_HELPER_H_
+
 
 SNSBEGIN
 
@@ -70,3 +72,5 @@ class TplPropEmbedWnd : public T {
 };
 
 SNSEND
+
+#endif//_PROP_EMBED_WND_HELPER_H_
