@@ -19,6 +19,7 @@ extern "C" void arm_memset32(uint32_t* dst, uint32_t value, int count);
 #endif
 
 SkMemset16Proc SkMemset16GetPlatformProc() {
+    return NULL;
     // FIXME: memset.arm.S is using syntax incompatible with XCode
 #if !defined(SK_CPU_LENDIAN) || defined(SK_BUILD_FOR_IOS)
     return NULL;
@@ -36,6 +37,7 @@ SkMemset16Proc SkMemset16GetPlatformProc() {
 }
 
 SkMemset32Proc SkMemset32GetPlatformProc() {
+    return NULL;
     // FIXME: memset.arm.S is using syntax incompatible with XCode
 #if !defined(SK_CPU_LENDIAN) || defined(SK_BUILD_FOR_IOS)
     return NULL;

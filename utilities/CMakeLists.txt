@@ -28,7 +28,7 @@ target_include_directories(utilities4
 )
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 add_dependencies(utilities4  swinx)
-target_link_libraries(utilities4  swinx)
+target_link_libraries(utilities4  swinx rt)
 endif()
 
 set(CORE_LIBS ${CORE_LIBS} utilities4)

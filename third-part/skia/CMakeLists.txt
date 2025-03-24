@@ -5,7 +5,14 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4355 /wd4225 /wd4244 /wd4996")
 else()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+# 检查目标平台是否为ARM
+if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
+set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a+simd")
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+simd")
+#enable_language(ASM)
+else()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+endif()
 add_definitions(-DSK_USE_POSIX_THREADS)
 endif()
 
@@ -937,17 +944,36 @@ else()
         "src/gpu/gl/unix/GrGLCreateNativeInterface_unix.cpp"
     )
 endif()
-
-if("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64")
+message("...........plat....${CMAKE_GENERATOR_PLATFORM}")
+if(("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64") OR (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64") OR (CMAKE_SYSTEM_PROCESSOR MATCHES "arm"))
 set(srcs
     ${srcs}
-    "src/opts/SkXfermode_opts_none.cpp"
-    "src/opts/SkBitmapProcState_opts_none.cpp"
-    "src/opts/SkBlitRow_opts_none.cpp"
-    "src/opts/SkBlurImage_opts_none.cpp"
-    "src/opts/SkMorphology_opts_none.cpp"
-    "src/opts/SkUtils_opts_none.cpp"
-    "src/opts/SkBlitMask_opts_none.cpp"
+    "src/opts/memset.arm.S"
+#    "src/opts/memset16_neon.S"
+#    "src/opts/memset32_neon.S"
+    "src/opts/SkBitmapProcState_arm_neon.cpp"
+    "src/opts/SkBitmapProcState_matrixProcs_neon.cpp"
+    "src/opts/SkBitmapProcState_opts_arm.cpp"
+    "src/opts/SkBlitMask_opts_arm_neon.cpp"
+    "src/opts/SkBlitMask_opts_arm.cpp"
+    "src/opts/SkBlitRow_opts_arm_neon.cpp"
+    "src/opts/SkBlitRow_opts_arm.cpp"
+    "src/opts/SkBlurImage_opts_arm.cpp"
+    "src/opts/SkBlurImage_opts_neon.cpp"
+    "src/opts/SkMorphology_opts_arm.cpp"
+    "src/opts/SkMorphology_opts_neon.cpp"
+    "src/opts/SkTextureCompression_opts_arm.cpp"
+    "src/opts/SkTextureCompression_opts_neon.cpp"
+    "src/opts/SkUtils_opts_arm.cpp"
+    "src/opts/SkXfermode_opts_arm_neon.cpp"
+    "src/opts/SkXfermode_opts_arm.cpp"
+#    "src/opts/SkXfermode_opts_none.cpp"
+#    "src/opts/SkBitmapProcState_opts_none.cpp"
+#    "src/opts/SkBlitRow_opts_none.cpp"
+#    "src/opts/SkBlurImage_opts_none.cpp"
+#    "src/opts/SkMorphology_opts_none.cpp"
+#    "src/opts/SkUtils_opts_none.cpp"
+#    "src/opts/SkBlitMask_opts_none.cpp"
 )
 else()
 set(srcs

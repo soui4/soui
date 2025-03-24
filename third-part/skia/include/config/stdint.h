@@ -68,7 +68,7 @@ typedef unsigned int uint_fast32_t;
 
 #ifndef _INTPTR_T_DEFINED
  #define _INTPTR_T_DEFINED
-#if defined(_WIN64) || defined(__x86_64__) 
+#if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__)
 typedef __int64 intptr_t;
  #else /* _WIN64 */
 typedef _W64 int intptr_t;
@@ -77,7 +77,7 @@ typedef _W64 int intptr_t;
 
 #ifndef _UINTPTR_T_DEFINED
  #define _UINTPTR_T_DEFINED
- #if defined(_WIN64) || defined(__x86_64__) 
+ #if defined(_WIN64) || defined(__x86_64__) || defined(__aarch64__)
 typedef unsigned long long uintptr_t;
  #else /* _WIN64 */
 typedef _W64 unsigned int uintptr_t;
