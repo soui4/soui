@@ -1222,20 +1222,20 @@ class SOUI_EXP SWindow
     UINT m_uZorder;           /**< 窗口Zorder */
     int m_nUpdateLockCnt;     /**< 暂时锁定更新Count，锁定后，不向宿主发送Invalidate */
 
-    DWORD m_dwState;             /**< 窗口在渲染过程中的状态 */
-    DWORD m_bVisible : 1;        /**< 窗口可见状态 */
-    DWORD m_bDisable : 1;        /**< 窗口禁用状状态 */
-    DWORD m_bDisplay : 1;        /**< 窗口隐藏时是否占位，不占位时启动重新布局 */
-    DWORD m_bClipClient : 1;     /**<窗口绘制时做clip客户区处理的标志,由于clip可能增加计算量，只在绘制可能走出客户区时才设置*/
-    DWORD m_bMsgTransparent : 1; /**< 接收消息标志 TRUE-不处理消息 */
-    DWORD m_bFocusable : 1;      /**< 窗口可获得焦点标志 */
-    DWORD m_bDrawFocusRect : 1;  /**< 绘制默认的焦点虚框 */
-    DWORD m_bCacheDraw : 1;      /**< 支持窗口内容的Cache标志 */
-    DWORD m_bCacheDirty : 1;     /**< 缓存窗口脏标志 */
-    DWORD m_bLayeredWindow : 1;  /**< 指示是否是一个分层窗口 */
-    DWORD m_isLoading : 1;       /**< loading状态标志 */
-    DWORD m_bHoverAware : 1;     /**< 感知Hover状态标志 */
-    DWORD m_bMsgHandled : 1;
+    BOOL m_dwState;           /**< 窗口在渲染过程中的状态 */
+    BOOL m_bVisible;          /**< 窗口可见状态 */
+    BOOL m_bDisable;          /**< 窗口禁用状状态 */
+    BOOL m_bDisplay;          /**< 窗口隐藏时是否占位，不占位时启动重新布局 */
+    BOOL m_bClipClient;       /**<窗口绘制时做clip客户区处理的标志,由于clip可能增加计算量，只在绘制可能走出客户区时才设置*/
+    BOOL m_bMsgTransparent;   /**< 接收消息标志 TRUE-不处理消息 */
+    BOOL m_bFocusable;        /**< 窗口可获得焦点标志 */
+    BOOL m_bDrawFocusRect;    /**< 绘制默认的焦点虚框 */
+    BOOL m_bCacheDraw;        /**< 支持窗口内容的Cache标志 */
+    BOOL m_bCacheDirty;       /**< 缓存窗口脏标志 */
+    BOOL m_bLayeredWindow;    /**< 指示是否是一个分层窗口 */
+    BOOL m_isLoading;         /**< loading状态标志 */
+    BOOL m_bHoverAware;       /**< 感知Hover状态标志 */
+    BOOL m_bMsgHandled;       /**< 消息处理标志 */
 
     LayoutDirtyType m_layoutDirty;         /**< 布局脏标志 参见LayoutDirtyType */
     SAutoRefPtr<IRenderTarget> m_cachedRT; /**< 缓存窗口绘制的RT */
