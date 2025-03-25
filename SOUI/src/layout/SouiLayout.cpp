@@ -220,7 +220,7 @@ HRESULT SouiLayoutParam::OnAttrPos(const SStringW &strValue, BOOL bLoading)
     SplitString(strValue, L',', strLst);
     if (strLst.GetCount() != 2 && strLst.GetCount() != 4)
     {
-        SASSERT_FMTW(false, L"Parse pos attribute failed, strPos=%s", strValue.c_str());
+        SSLOGW() << "Parse pos attribute failed, strPos=" << strValue;
         return E_INVALIDARG;
     }
     //增加pos属性中的空格兼容。

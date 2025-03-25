@@ -360,7 +360,8 @@ BOOL SApplication::_LoadXmlDocment(LPCTSTR pszXmlName, LPCTSTR pszType, SXmlDoc 
     {
         XmlParseResult result;
         xmlDoc.GetParseResult(&result);
-        SASSERT_FMTW(bLoad, L"parse xml error! xmlName=%s,desc=%s,offset=%d", pszXmlName, S_CA2W(SXmlDoc::GetErrDesc(result.status)).c_str(), (int)result.offset);
+        SStringA strMsg = SStringA().Format("parse xml error! xmlName=%s,desc=%s,offset=%d", S_CT2A(pszXmlName).c_str(), SXmlDoc::GetErrDesc(result.status), (int)result.offset);
+        SASSERT_MSGA(bLoad, strMsg);
     }
     return bLoad;
 }

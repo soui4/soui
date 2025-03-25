@@ -251,11 +251,14 @@ IBitmapS *SResProviderMgr::LoadImage(LPCTSTR pszType, LPCTSTR pszResName)
         IResProvider *pResProvider = GetMatchResProvider(pszType, pszResName);
         if (!pResProvider)
         {
-            SASSERT_FMT(false, _T("load image failed, resource index %s:%s not found!"), pszType, pszResName);
+            SSLOGW()<<"load image failed, resource index"<<pszType<<":"<<pszResName<<" not found!";
             return NULL;
         }
         IBitmapS *pRet = pResProvider->LoadImage(pszType, pszResName);
-        SASSERT_FMT(pRet, _T("load image failed, resource content %s:%s not found!"), pszType, pszResName);
+        if (!pRet)
+        {
+            SSLOGW()<<"load image failed, resource content"<<pszType<<":"<<pszResName<<" not found!";
+        }
         return pRet;
     }
 }
@@ -277,11 +280,13 @@ HBITMAP SResProviderMgr::LoadBitmap(LPCTSTR pszResName, BOOL bFromFile /*= FALSE
         IResProvider *pResProvider = GetMatchResProvider(KTypeBitmap, pszResName);
         if (!pResProvider)
         {
-            SASSERT_FMT(false, _T("load bitmap failed, resource index %s not found!"), pszResName);
+            SSLOGW()<<"load bitmap failed, resource index "<<pszResName<<" not found!";
             return NULL;
         }
         HBITMAP hBmp = pResProvider->LoadBitmap(pszResName);
-        SASSERT_FMT(hBmp, _T("load bitmap failed, resource content %s not found!"), pszResName);
+        if(!hBmp){
+            SSLOGW()<<"load bitmap failed, resource content "<<pszResName<<" not found!";
+        }
         return hBmp;
     }
 }
@@ -319,7 +324,8 @@ HCURSOR SResProviderMgr::LoadCursor(LPCTSTR pszResName, BOOL bFromFile /*= FALSE
         IResProvider *pResProvider = GetMatchResProvider(KTypeCursor, pszResName);
         if (!pResProvider)
         {
-            SASSERT_FMT(false, _T("load cursor failed, resource index %s not found!"), pszResName);
+            SSLOGW()<<"load cursor failed, resource index "<<pszResName<<" not found!";
+            return NULL;
         }
         else
         {
@@ -332,7 +338,7 @@ HCURSOR SResProviderMgr::LoadCursor(LPCTSTR pszResName, BOOL bFromFile /*= FALSE
     }
     else
     {
-        SASSERT_FMT(false, _T("load cursor failed, resource content %s not found!"), pszResName);
+        SSLOGW()<<"load cursor failed, resource content "<<pszResName<<" not found!";
     }
     return hRet;
 }
@@ -353,11 +359,13 @@ HICON SResProviderMgr::LoadIcon(LPCTSTR pszResName, int cx /*=0*/, int cy /*=0*/
         IResProvider *pResProvider = GetMatchResProvider(KTypeIcon, pszResName);
         if (!pResProvider)
         {
-            SASSERT_FMT(false, _T("load icon failed, resource %s not found!"), pszResName);
+            SSLOGW()<<"load icon failed, resource index "<<pszResName<<" not found!";
             return NULL;
         }
         HICON hRet = pResProvider->LoadIcon(pszResName, cx, cy);
-        SASSERT_FMT(hRet, _T("load icon failed, resource content %s not found!"), pszResName);
+        if(!hRet){
+            SSLOGW()<<"load icon failed, resource content "<<pszResName<<" not found!";
+        }
         return hRet;
     }
 }
