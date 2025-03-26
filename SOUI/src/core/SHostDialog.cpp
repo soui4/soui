@@ -23,7 +23,7 @@ SHostDialog::~SHostDialog(void)
     m_MsgLoop = NULL;
 }
 
-INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
+INT_PTR SHostDialog::DoModal(HWND hParent, DWORD dwStyle, DWORD dwExStyle)
 {
     SASSERT(!m_MsgLoop);
     SAutoRefPtr<IMessageLoop> parentMsgLoop = SApplication::getSingletonPtr()->GetMsgLoop();
@@ -41,7 +41,7 @@ INT_PTR SHostDialog::DoModal(HWND hParent /*=NULL*/)
         bEnableParent = TRUE;
     }
 
-    if (!SHostWnd::CreateEx(hParent, WS_POPUP | WS_CLIPCHILDREN, 0, 0, 0, 0, 0))
+    if (!SHostWnd::CreateEx(hParent, dwStyle, dwExStyle, 0, 0, 0, 0))
     {
         if (bEnableParent)
         {

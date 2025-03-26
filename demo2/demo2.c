@@ -211,7 +211,7 @@ BOOL OnBtnDialog(IEvtArgs *evt,void *Ctx)
 	IHostDialog* hostDialog = s_souiFac->lpVtbl->CreateHostDialog(s_souiFac,UIRES.LAYOUT.DLG_TEST);
 
 	hostDialog->lpVtbl->SetMsgHandler(hostDialog, OnHostMsg, hostDialog);
-	hostDialog->lpVtbl->DoModal(hostDialog,NULL);
+	hostDialog->lpVtbl->DoModal(hostDialog,NULL,WS_POPUP|WS_CLIPCHILDREN,0);
 
 	hostDialog->lpVtbl->Release(hostDialog);
 	return TRUE;

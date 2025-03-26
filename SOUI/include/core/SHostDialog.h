@@ -30,7 +30,7 @@ class SOUI_EXP SHostDialog : public THostWndProxy<IHostDialog> {
 
   public:
     STDMETHOD_(IMessageLoop *, GetMsgLoop)(THIS) OVERRIDE;
-    STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent DEF_VAL(0)) OVERRIDE;
+    STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent DEF_VAL(0), DWORD dwStyle DEF_VAL(WS_POPUP | WS_CLIPCHILDREN), DWORD dwExStyle DEF_VAL(0)) OVERRIDE;
     STDMETHOD_(void, EndDialog)(THIS_ INT_PTR nResult) OVERRIDE;
 
     SHostWnd *toSHostWnd()

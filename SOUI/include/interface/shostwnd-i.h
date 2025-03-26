@@ -349,7 +349,7 @@ DECLARE_INTERFACE_(IHostDialog, IHostWnd)
      * @param hParent 窗口的Owner
      * @return
      */
-    STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent /*=NULL*/) PURE;
+    STDMETHOD_(INT_PTR, DoModal)(THIS_ HWND hParent DEF_VAL(NULL), DWORD dwStyle DEF_VAL(WS_POPUP | WS_CLIPCHILDREN), DWORD dwExStyle DEF_VAL(0)) PURE;
 
     /**
      * @brief 退出当前模式窗口

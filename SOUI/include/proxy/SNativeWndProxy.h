@@ -107,7 +107,7 @@ public:
 	{
 		return SNativeWnd::SetWindowPos(hWndInsertAfter, x, y, cx, cy, nFlags);
 	}
-	STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter = NULL) OVERRIDE
+	STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter DEF_VAL(0)) OVERRIDE
 	{
 		return SNativeWnd::CenterWindow(hWndCenter);
 	}

@@ -115,6 +115,7 @@ SNSEND
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif //_WIN32
+#pragma warning(push, 0)
 
 #define SLOG(tag, level) SNS::Log(tag, level, __FILE__, FUNCNAME, __LINE__, RetAddr()).stream()
 #define SLOG_FMT(tag, level, logformat, ...)                                                      \
@@ -133,6 +134,8 @@ SNSEND
             SLOG(tag, level) << logbuf;                                                           \
         }                                                                                         \
     } while (false);
+
+#pragma warning(pop)
 
 //流式输出日志，当kLogTag有效时使用，否则编译失败，kLogTag可以是当前定义的宏，也可以是当前对象的成员变量。
 #define SLOGD() SLOG(kLogTag, SNS::LOG_LEVEL_DEBUG)
