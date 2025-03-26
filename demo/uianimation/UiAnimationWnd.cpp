@@ -1,4 +1,4 @@
-﻿#ifdef _WIN32
+﻿#if defined(_WIN32) && !defined(__MINGW32__)
 #include "stdafx.h"
 #include "UiAnimationWnd.h"
 #include <math.h>
@@ -577,4 +577,4 @@ namespace SOUI{
     }
 
 }
-#endif
+#endif//defined(_WIN32) && !defined(__MINGW32__)

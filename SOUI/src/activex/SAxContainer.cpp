@@ -1,4 +1,4 @@
-﻿#ifdef _WIN32
+﻿#if defined(_WIN32) && !defined(__MINGW32__)
 #include "souistd.h"
 #include "SAxContainer.h"
 
@@ -142,4 +142,4 @@ HRESULT SAxContainer::QueryService(REFGUID guidService, REFIID riid, void **ppvO
 
 SNSEND
 
-#endif //_WIN32
+#endif // defined(_WIN32) && !defined(__MINGW32__)

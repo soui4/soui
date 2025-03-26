@@ -111,7 +111,7 @@ HRESULT STDMETHODCALLTYPE SDocHostUIHandler::TranslateAccelerator(LPMSG lpMsg,
     return E_NOTIMPL;
 }
 
-HRESULT STDMETHODCALLTYPE SDocHostUIHandler::GetOptionKeyPath(__out LPOLESTR *pchKey, DWORD dw)
+HRESULT STDMETHODCALLTYPE SDocHostUIHandler::GetOptionKeyPath( LPOLESTR *pchKey, DWORD dw)
 {
     return E_NOTIMPL;
 }
@@ -130,8 +130,8 @@ HRESULT STDMETHODCALLTYPE SDocHostUIHandler::GetExternal(IDispatch **ppDispatch)
 }
 
 HRESULT STDMETHODCALLTYPE SDocHostUIHandler::TranslateUrl(DWORD dwTranslate,
-                                                          __in __nullterminated OLECHAR *pchURLIn,
-                                                          __out OLECHAR **ppchURLOut)
+                                                          OLECHAR *pchURLIn,
+                                                          OLECHAR **ppchURLOut)
 {
     return E_NOTIMPL;
 }

@@ -1,9 +1,10 @@
-﻿#include "stdafx.h"
+﻿#if defined(_WIN32) && !defined(__MINGW32__)
+
+#include "stdafx.h"
 #include "SIECtrl.h"
 #include "SDocHostUIHandler.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SIECtrl::SIECtrl(void)
     : m_dwCookie(0)
@@ -180,4 +181,6 @@ BOOL SIECtrl::Navigate(const SStringW &strUrl)
     return S_OK == m_pIE->Navigate(BSTR(strUrl.c_str()), NULL, NULL, NULL, NULL);
 }
 
-} // namespace SOUI
+SNSEND
+
+#endif//defined(_WIN32) && !defined(__MINGW32__)

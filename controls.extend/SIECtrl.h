@@ -1,11 +1,13 @@
-#pragma once
+#ifndef _SIECTRL_H_
+#define _SIECTRL_H_
 
 #include <control/SActiveX.h>
 #include <ExDisp.h>
 #include <ExDispid.h>
 #include <atl.mini/SComCli.h>
-namespace SOUI
-{
+
+SNSBEGIN
+
 struct IWebEvent
 {
     virtual void BeforeNavigate2(IDispatch *pDisp,
@@ -171,4 +173,6 @@ class SIECtrl
     HWND m_hIEWnd;
 };
 
-} // namespace SOUI
+SNSEND
+
+#endif//_SIECTRL_H_

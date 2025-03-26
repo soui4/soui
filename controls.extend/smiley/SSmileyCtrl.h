@@ -2,7 +2,6 @@
 #define SoSmileyCtrl_h__
 
 // SoSmileyCtrl.h : Declaration of the CSoSmileyCtrl
-#pragma once
 #include <richedit.h>
 #include <richole.h>
 

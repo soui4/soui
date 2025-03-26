@@ -1,4 +1,4 @@
-﻿#ifdef _WIN32
+﻿#if defined(_WIN32) && !defined(__MINGW32__)
 #include "souistd.h"
 #include "activex/SBStr.h"
 #include "../activex/SAxContainer.h"
@@ -217,4 +217,4 @@ void SActiveX::SetExternalUIHandler(IDocHostUIHandler *pUiHandler)
 
 SNSEND
 
-#endif //_WIN32
+#endif // defined(_WIN32) && !defined(__MINGW32__)

@@ -118,15 +118,15 @@ class SDocHostUIHandler : public SUnknownImpl<IDocHostUIHandler> {
 
     virtual STDMETHODIMP TranslateAccelerator(LPMSG lpMsg, const GUID *pguidCmdGroup, DWORD nCmdID);
 
-    virtual STDMETHODIMP GetOptionKeyPath(__out LPOLESTR *pchKey, DWORD dw);
+    virtual STDMETHODIMP GetOptionKeyPath( LPOLESTR *pchKey, DWORD dw);
 
     virtual STDMETHODIMP GetDropTarget(IDropTarget *pDropTarget, IDropTarget **ppDropTarget);
 
     virtual STDMETHODIMP GetExternal(IDispatch **ppDispatch);
 
     virtual STDMETHODIMP TranslateUrl(DWORD dwTranslate,
-                                      __in __nullterminated OLECHAR *pchURLIn,
-                                      __out OLECHAR **ppchURLOut);
+                                      OLECHAR *pchURLIn,
+                                      OLECHAR **ppchURLOut);
 
     virtual STDMETHODIMP FilterDataObject(IDataObject *pDO, IDataObject **ppDORet);
 

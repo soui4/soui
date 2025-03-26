@@ -1,5 +1,9 @@
 ﻿#pragma once
 
+#ifndef __in
+#define __in
+#define __out
+#endif
 #include "UIAnimation.h"
 #include <atl.mini/SComHelper.h>
 #include <atl.mini/SComCli.h>

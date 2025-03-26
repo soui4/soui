@@ -38,7 +38,7 @@ HBITMAP GetBitmapFromFile(const SStringW& strFilename,
     if (!bmpSrc) return NULL;
     GUID   pageGuid = FrameDimensionTime;
     // Get the number of frames in the first dimension.
-    nFrameCount = max(1, bmpSrc->GetFrameCount(&pageGuid));
+    nFrameCount = smax(1, bmpSrc->GetFrameCount(&pageGuid));
 
 
     CSize imSize(bmpSrc->GetWidth(),bmpSrc->GetHeight());
@@ -65,7 +65,7 @@ HBITMAP GetBitmapFromFile(const SStringW& strFilename,
             bmpSrc->SelectActiveFrame(&pageGuid, i);
             Rect rect(i*szImg.cx,0,szImg.cx, szImg.cy);
             g->DrawImage(bmpSrc,rect,0,0,bmpSrc->GetWidth(),bmpSrc->GetHeight(), UnitPixel/*, &attr*/);
-            pFrameDelays[i]=10*max(((int*) pDelays->value)[i], 10);
+            pFrameDelays[i]=10*smax(((int*) pDelays->value)[i], 10);
         }   
         delete [] pDelays;
     }
