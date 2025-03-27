@@ -1119,6 +1119,7 @@ SStringA::~SStringA()
 		pData->Release();
 }
 
+
 SStringA::SStringA(const char* psz)
 {
 	Init();
@@ -1192,4 +1193,30 @@ void SStringA::Release(THIS)
 	delete this;
 }
 
+
+UINT SStringA::ToUint() const
+{
+    return (UINT)atoi(m_pszData);
+}
+long SStringA::ToLong() const
+{
+    return atol(m_pszData);
+}
+
+int SStringA::ToInt() const
+{
+    return atoi(m_pszData);
+}
+float SStringA::ToFloat() const
+{
+    return (float)atof(m_pszData);
+}
+double SStringA::ToDouble() const
+{
+    return atof(m_pszData);
+}
+BOOL SStringA::ToBool() const
+{
+    return atoi(m_pszData) != 0;
+}
 SNSEND

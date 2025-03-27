@@ -1,0 +1,36 @@
+﻿<SOUI name="client" title="@string/client" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="appMain"
+appWnd="1"
+translucent="1"
+>
+	<root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="-1" layout="vbox" interval="10" padding="5">
+		<caption size="-2,30">
+			<icon pos="10,8" src="ICON_LOGO:16"/>
+			<text pos="29,9">@string/client</text>
+			<imgbtn name="btn_close" skin="_skin.sys.btn.close"    pos="-45,0" tip="close" animate="1"/>
+			<imgbtn name="btn_max" skin="_skin.sys.btn.maximize"  pos="-83,0" animate="1" />
+			<imgbtn name="btn_restore" skin="_skin.sys.btn.restore"  pos="-83,0" show="0" animate="1" />
+			<imgbtn name="btn_min" skin="_skin.sys.btn.minimize" pos="-121,0" animate="1" />
+		</caption>
+		<window size="-2,-1" layout="hbox" interval="5" gravity="center">
+			<text text="连接状态:"/>
+			<text size="0,-2" weight="1" name="txt_status"/>
+			<button size="100,30" name="btn_conn" text="Conn"/>
+		</window>
+		<window size="-2,-1" interval="10" layout="vbox">
+			<window size="-2,-1" layout="grid" interval="10" gravity="fill" columnCount="3" >
+				<text text="参数1" columnWeight="1"/>
+				<text text="参数2" columnWeight="1"/>
+				<text text="结果" columnWeight="1" colorText="@color/red"/>
+				<edit name="edit_param1" text="100"  size="0,30" margin="2"/>
+				<edit name="edit_param2" text="200" size="0,30" margin="2"/>
+				<edit name="edit_result" text="" size="0,30" margin="2"/>
+			</window>
+			<window size="-2,-1" layout="hbox" interval="-2" gravity="center">
+				<button size="100,30" name="btn_sum_math" text="+"/>
+				<button size="100,30" name="btn_sum_str" text="Concat"/>
+				<button size="100,30" name="btn_sum" text="Sum[1...n]"/>
+			</window>
+			<text size="-2,30" colorText="@color/red" name="txt_status"/>
+		</window>
+	</root>
+</SOUI>

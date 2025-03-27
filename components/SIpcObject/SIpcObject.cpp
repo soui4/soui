@@ -1,8 +1,8 @@
 #include "stdafx.h"
 #include "SIpcObject.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
 	SIpcHandle::SIpcHandle() 
 		:m_pConn(NULL), m_hLocalId(0),m_hRemoteId(0)
 		,m_uCallSeq(0),m_nCallStack(0),m_bSameThread(false)
@@ -48,11 +48,20 @@ namespace SOUI
 	LRESULT SIpcHandle::OnMessage(ULONG_PTR idLocal, UINT uMsg, WPARAM wp, LPARAM lp, BOOL &bHandled)
 	{
 		bHandled = FALSE;
-		if ((HWND)idLocal != m_hLocalId)
+        if ((HWND) idLocal != m_hLocalId)
 			return 0;
 		if (UM_CALL_FUN != uMsg)
 			return 0;
 		bHandled = TRUE;
+        if (wp == FUN_ID_DISCONNECT)
+        {
+            m_hRemoteId = 0;
+            m_recvBuf.Close();
+            m_hLocalId = 0;
+            m_sendBuf.Close();
+            return 0;
+        }
+
 		IShareBuffer *pBuf = GetRecvBuffer();
 		int iStack = (int)wp;//get call stack.
 		pBuf->Seek(IShareBuffer::seek_set, iStack * m_pConn->GetBufSize());//seek to parameter header.
@@ -91,13 +100,13 @@ namespace SOUI
 		return S_OK;
 	}
 
-	HRESULT SIpcHandle::Disconnect(ULONG_PTR idSvr)
+	HRESULT SIpcHandle::Disconnect()
 	{
 		if (m_hLocalId == 0)
 			return E_UNEXPECTED;
 		if (m_hRemoteId == 0)
 			return E_UNEXPECTED;
-		::PostMessage((HWND)idSvr, UM_CALL_FUN, FUN_ID_DISCONNECT, (LPARAM)m_hLocalId);
+        ::PostMessage((HWND)m_hRemoteId, UM_CALL_FUN, FUN_ID_DISCONNECT, (LPARAM)m_hLocalId);
 		m_hRemoteId = 0;
 		m_recvBuf.Close();
 		m_hLocalId = 0;
@@ -182,7 +191,12 @@ namespace SOUI
 		return msgRet.ret!=0;
 	}
 
-	void SIpcHandle::SetIpcConnection(IIpcConnection *pConn)
+	BOOL SIpcHandle::IsConnected() const
+    {
+        return m_hRemoteId!=0;
+    }
+
+    void SIpcHandle::SetIpcConnection(IIpcConnection *pConn)
 	{
 		m_pConn = pConn;
 	}
@@ -280,8 +294,15 @@ namespace SOUI
 			return OnConnect((HWND)lp);
 		else if (wp == FUN_ID_DISCONNECT)
 			return OnDisconnect((HWND)lp);
-		else
-			return 0;
+        else
+        {
+            HWND hClient = (HWND)lp;
+            std::map<HWND, IIpcConnection *>::iterator it = m_mapClients.find(hClient);
+            if (it == m_mapClients.end())
+                return 0;
+            BOOL bHandled = FALSE;
+            return it->second->GetIpcHandle()->OnMessage((ULONG_PTR)m_hSvr, uMsg, wp, lp, bHandled);
+        }
 	}
 
 	void SIpcServer::EnumClient(FunEnumConnection funEnum, ULONG_PTR data)
@@ -297,10 +318,16 @@ namespace SOUI
 		it = map2.begin();
 		while (it != map2.end())
 		{
-			funEnum(it->second, data);
-			it->second->Release();
+            if (!funEnum(it->second, data))
+                break;
 			it++;
 		}
+        it = map2.begin();
+        while (it != map2.end())
+        {
+            it->second->Release();
+            it++;
+        }
 	}
 
 	LRESULT SIpcServer::OnConnect(HWND hClient)
@@ -378,7 +405,18 @@ namespace SOUI
 	BOOL SIpcServer::FindConnection(ULONG_PTR idConn)
 	{
 		return m_mapClients.find((HWND)idConn)!=m_mapClients.end();
-	}
+    }
+
+    BOOL SIpcServer::Disconnect(ULONG_PTR idConn)
+    {
+        CLIENTMAP::iterator it = m_mapClients.find((HWND)idConn);
+        if (it == m_mapClients.end())
+            return FALSE;
+        it->second->GetIpcHandle()->Disconnect();
+        it->second->Release();
+        m_mapClients.erase(it);
+        return TRUE;
+    }
 
 	////////////////////////////////////////////////////////////////////////
 	HRESULT SIpcFactory::CreateIpcServer(IIpcServer ** ppServer)
@@ -392,16 +430,19 @@ namespace SOUI
 		return S_OK;
 	}
 
-	BOOL  IPC::SCreateInstance(IObjRef ** ppIpcFactory)
+	namespace IPC
 	{
-		*ppIpcFactory = new SIpcFactory();
-		return TRUE;
-	}
-}
+		BOOL  SCreateInstance(IObjRef ** ppIpcFactory)
+		{
+			*ppIpcFactory = new SIpcFactory();
+			return TRUE;
+		}
+	} // namespace IPC
+SNSEND
 
 EXTERN_C BOOL Ipc_SCreateInstance(IObjRef **ppIpcFactory)
 {
-	return SOUI::IPC::SCreateInstance(ppIpcFactory);
+	return SNS::IPC::SCreateInstance(ppIpcFactory);
 }
 
 

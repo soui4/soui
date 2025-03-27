@@ -251,13 +251,13 @@ IBitmapS *SResProviderMgr::LoadImage(LPCTSTR pszType, LPCTSTR pszResName)
         IResProvider *pResProvider = GetMatchResProvider(pszType, pszResName);
         if (!pResProvider)
         {
-            SSLOGW()<<"load image failed, resource index"<<pszType<<":"<<pszResName<<" not found!";
+            SSLOGW()<<"load image failed, resource index "<<pszType<<":"<<pszResName<<" not found!";
             return NULL;
         }
         IBitmapS *pRet = pResProvider->LoadImage(pszType, pszResName);
         if (!pRet)
         {
-            SSLOGW()<<"load image failed, resource content"<<pszType<<":"<<pszResName<<" not found!";
+            SSLOGW()<<"load image failed, resource content "<<pszType<<":"<<pszResName<<" not found!";
         }
         return pRet;
     }

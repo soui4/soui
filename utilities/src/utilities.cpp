@@ -7,6 +7,7 @@
 #include <shlwapi.h>
 #pragma comment(lib,"shlwapi.lib")
 #pragma comment(lib, "version.lib")
+#pragma warning(disable : 4996)
 #else
 #include <strapi.h>
 #include <sys/mman.h>
@@ -345,12 +346,12 @@ HRGN CreateRegionFromBitmap(HBITMAP hBmp, COLORREF crKey,COLORREF crMask)
         }
         if (!lstRc.IsEmpty())
         {
-            int len = sizeof(RGNDATAHEADER) + sizeof(RECT) * lstRc.GetCount();
+            size_t len = sizeof(RGNDATAHEADER) + sizeof(RECT) * lstRc.GetCount();
             RGNDATA *pRgn = (RGNDATA *)malloc(len);
-            pRgn->rdh.nCount = lstRc.GetCount();
+            pRgn->rdh.nCount = (DWORD)lstRc.GetCount();
             pRgn->rdh.iType = RDH_RECTANGLES;
             memcpy(pRgn->Buffer, lstRc.GetData(), sizeof(RECT) * lstRc.GetCount());
-            HRGN hRgn = ExtCreateRegion(NULL, len, pRgn);
+            HRGN hRgn = ExtCreateRegion(NULL, (DWORD)len, pRgn);
             free(pRgn);
             return hRgn;
         }

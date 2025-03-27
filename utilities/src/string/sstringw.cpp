@@ -1188,4 +1188,31 @@ void SStringW::Release(THIS)
 	delete this;
 }
 
+
+UINT SStringW::ToUint() const
+{
+    return (UINT)_wtoi(m_pszData);
+}
+
+long SStringW::ToLong() const
+{
+    return _wtol(m_pszData);
+}
+
+int SStringW::ToInt() const
+{
+    return _wtoi(m_pszData);
+}
+float SStringW::ToFloat() const
+{
+    return (float)_wtof(m_pszData);
+}
+double SStringW::ToDouble() const
+{
+    return _wtof(m_pszData);
+}
+BOOL SStringW::ToBool() const
+{
+    return _wtoi(m_pszData) != 0;
+}
 SNSEND

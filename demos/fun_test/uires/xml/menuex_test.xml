@@ -1,0 +1,8 @@
+﻿<menuRoot itemHeight="40" font="size:14" itemSkin="TrayMenu_menu_bkgnd" skin="TrayMenu_border"
+          maxWidth="138" minWidth="138"
+          margin="2,2,2,2">
+	<menuItem id="9" cursor="hand" margin-y="4" margin-x="1">显示主界面</menuItem>
+	<menuItem id="8" cursor="hand" margin-y="4" margin-x="1">设置</menuItem>
+	<sep/>
+	<menuItem id="6" icon="2" hotKey="x" cursor="hand" margin-y="4" margin-x="1">退出</menuItem>
+</menuRoot>

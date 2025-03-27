@@ -45,6 +45,7 @@ public:
 
 	~SStringW();
 
+  public:
 	STDMETHOD_(int, GetLength)(THIS) SCONST ;
 	STDMETHOD_(BOOL, IsEmpty)(THIS) SCONST ;
 	STDMETHOD_(void, Empty)(THIS) ;
@@ -89,6 +90,12 @@ public:
 	STDMETHOD_(void,AppendChar)(THIS_ wchar_t ch) OVERRIDE;
 	STDMETHOD_(void,AppendStr)(THIS_ const wchar_t *pszStr, int nLen DEF_VAL(-1)) OVERRIDE;
 	STDMETHOD_(void,Release)(THIS) OVERRIDE;
+    STDMETHOD_(UINT, ToUint)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(long, ToLong)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(int, ToInt)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(float, ToFloat)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(double, ToDouble)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, ToBool)(CTHIS) SCONST OVERRIDE;
 
 	// simple sub-string extraction
 	SStringW Mid(int nFirst) const;

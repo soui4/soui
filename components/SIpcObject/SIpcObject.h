@@ -4,18 +4,6 @@
 #include <map>
 #include "ShareMemBuffer.h"
 
-#if defined(_LIB) || !defined(_WIN32)
-#define SIPC_API
-#define SIPC_COM_C 
-#else
-#ifdef BUILD_SIPC
-#define SIPC_API __declspec(dllexport)
-#else
-#define SIPC_API __declspec(dllimport)
-#endif
-#define SIPC_COM_C  EXTERN_C
-#endif
-
 
 SNSBEGIN
 
@@ -26,7 +14,7 @@ SNSBEGIN
 		virtual ~SIpcHandle();
 
 	public:
-
+        virtual BOOL IsConnected() const override;
 		virtual void SetIpcConnection(IIpcConnection *pConn);
 
 		virtual IIpcConnection * GetIpcConnection() const;
@@ -35,7 +23,7 @@ SNSBEGIN
 
 		virtual HRESULT ConnectTo(ULONG_PTR idLocal, ULONG_PTR idSvr);
 
-		virtual HRESULT Disconnect(ULONG_PTR idSvr);
+		virtual HRESULT Disconnect();
 
 		virtual bool CallFun(IFunParams * pParam) const;
 
@@ -83,6 +71,8 @@ SNSBEGIN
 		virtual LRESULT OnMessage(ULONG_PTR idLocal, UINT uMsg, WPARAM wp, LPARAM lp,BOOL &bHandled) override;
 		virtual void EnumClient(FunEnumConnection funEnum, ULONG_PTR data) override;
 		virtual BOOL FindConnection(ULONG_PTR idConn) override;
+        virtual BOOL Disconnect(ULONG_PTR idConn) override;
+
 	private:
 		LRESULT OnConnect(HWND hClient);
 		LRESULT OnDisconnect(HWND hClient);
@@ -90,8 +80,8 @@ SNSBEGIN
 		WNDPROC			  m_prevWndProc;
 		IIpcSvrCallback * m_pCallback;
 		HWND			  m_hSvr;
-		std::map<HWND, IIpcConnection *> m_mapClients;
-
+        typedef std::map<HWND, IIpcConnection *> CLIENTMAP;
+        CLIENTMAP m_mapClients;
 	};
 
 	class SIpcFactory : public TObjRefImpl<IIpcFactory>
@@ -103,10 +93,10 @@ SNSBEGIN
 	};
 	namespace IPC
 	{
-		SIPC_COM_C BOOL SIPC_API SCreateInstance(IObjRef **ppIpcFactory);
+		SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **ppIpcFactory);
 	}
 
-
 SNSEND
-	EXTERN_C BOOL Ipc_SCreateInstance(IObjRef **ppIpcFactory);
+
+EXTERN_C BOOL SOUI_COM_API Ipc_SCreateInstance(IObjRef **ppIpcFactory);
 

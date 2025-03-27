@@ -1,7 +1,0 @@
-<gradient>
-    <grad_test>
-        <item color="@color/red" pos="0"/>
-        <item color="@color/blue" pos="0.5"/>
-        <item color="@color/green" pos="1.0"/>
-    </grad_test>
-</gradient>

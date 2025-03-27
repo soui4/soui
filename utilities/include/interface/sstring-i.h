@@ -51,6 +51,13 @@ DECLARE_INTERFACE(IStringA)
 	STDMETHOD_(void,AppendChar)(THIS_ char ch) PURE;
 	STDMETHOD_(void,AppendStr)(THIS_ const char *pszStr, int nLen DEF_VAL(-1)) PURE;
 	STDMETHOD_(void,Release)(THIS) PURE;
+
+	STDMETHOD_(UINT, ToUint)(CTHIS) SCONST PURE;
+    STDMETHOD_(long, ToLong)(CTHIS) SCONST PURE;
+    STDMETHOD_(int, ToInt)(CTHIS) SCONST PURE;
+    STDMETHOD_(float, ToFloat)(CTHIS) SCONST PURE;
+    STDMETHOD_(double, ToDouble)(CTHIS) SCONST PURE;
+    STDMETHOD_(BOOL, ToBool)(CTHIS) SCONST PURE;
 };
 
 
@@ -101,6 +108,13 @@ DECLARE_INTERFACE(IStringW)
 	STDMETHOD_(void,AppendChar)(THIS_ wchar_t ch) PURE;
 	STDMETHOD_(void,AppendStr)(THIS_ const wchar_t *pszStr, int nLen DEF_VAL(-1)) PURE;
 	STDMETHOD_(void,Release)(THIS) PURE;
+
+	STDMETHOD_(UINT, ToUint)(CTHIS) SCONST PURE;
+    STDMETHOD_(long, ToLong)(CTHIS) SCONST PURE;
+    STDMETHOD_(int, ToInt)(CTHIS) SCONST PURE;
+    STDMETHOD_(float, ToFloat)(CTHIS) SCONST PURE;
+    STDMETHOD_(double, ToDouble)(CTHIS) SCONST PURE;
+    STDMETHOD_(BOOL, ToBool)(CTHIS) SCONST PURE;
 };
 
 #ifdef _UNICODE

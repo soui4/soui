@@ -89,6 +89,9 @@ option(XP_TOOLSET "" ON)
 #
 #
 option(ENABLE_SPECTRE "Enable Spectre Mitigation" OFF)
+#
+#
+option(BUILD_DEMOS "Build builtin demos" ON)
 
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
@@ -140,12 +143,8 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
 add_subdirectory(soui-sys-resource)
 add_subdirectory(soui-sys-resource2)
 endif()
-#
-#
-# 
 add_subdirectory(components)
 
-add_subdirectory(demo2)
-add_subdirectory(demo)
-add_subdirectory(fun_test)
-add_subdirectory(wxDemo)
+if(BUILD_DEMOS)
+add_subdirectory(demos)
+endif(BUILD_DEMOS)

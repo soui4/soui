@@ -46,6 +46,7 @@ public:
 
 	~SStringA();
 
+  public:
 	STDMETHOD_(int, GetLength)(THIS) SCONST ;
 	STDMETHOD_(BOOL, IsEmpty)(THIS) SCONST ;
 	STDMETHOD_(void, Empty)(THIS) ;
@@ -90,6 +91,12 @@ public:
 	STDMETHOD_(void,AppendStr)(THIS_ const char *pszStr, int nLen DEF_VAL(-1)) OVERRIDE;
 	STDMETHOD_(void,Release)(THIS) OVERRIDE;
 
+	STDMETHOD_(UINT, ToUint)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(long, ToLong)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(int, ToInt)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(float, ToFloat)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(double, ToDouble)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, ToBool)(CTHIS) SCONST OVERRIDE;
 	// simple sub-string extraction
 	SStringA Mid(int nFirst) const;
 	SStringA Mid(int nFirst, int nCount) const;

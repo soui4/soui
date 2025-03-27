@@ -1,0 +1,48 @@
+﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="appMain"
+appWnd="1"
+translucent="0" 
+>
+  <ncpainter system="false" borderWidth="5dp" titleHeight="30dp" skinBorder="_skin.sys.wnd.bkgnd" 
+             skinActive="skin_active" skinInactive="skin_inactive"
+             colorActiveTitle="@color/white"
+             colorInactiveTitle="@color/white"
+             layout="hbox" gravity="center" >
+    <icon id="sysid_icon" src="ICON_LOGO:16"/>
+    <text id="sysid_title"/>
+    <window size="0,0" weight="1"/>
+    <imgbtn id="sysid_min" skin="_skin.sys.btn.minimize" animate="1" />
+    <window>
+      <imgbtn id="sysid_max" skin="_skin.sys.btn.maximize"  pos="0,0" animate="1" />
+      <imgbtn id="sysid_restore" skin="_skin.sys.btn.restore"  pos="0,0" show="0" animate="1" />
+    </window>
+    <imgbtn id="sysid_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
+  </ncpainter>
+  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" layout="vbox" gravity="center">
+    <window size="-2,30" layout="hbox" interval="10">
+      <window size="0,0" weight="1"/>
+      <button size="100,30" name="btn_flash" text="flash" tip="Flash Window"/>
+      <button size="100,30" name="btn_menu" text="menu" tip="Show Menu"/>
+      <button size="100,30" name="btn_menuex" text="menuex" tip="Show MenuEx"/>
+      <button size="100,30" name="btn_dialog" text="dialog" tip="Show Dialog"/>
+      <testCtrl size="-1,30" name="testWnd" text="hello c" colorBkgnd="#cccccc"/>
+      <window size="0,0" weight="1"/>
+    </window>
+    <window size="-2,30" layout="hbox">
+      <sliderbar size="0,-2" weight="1" name="tst_slider" min="0" max="100" value="50" font="test:12,test2:24"/>
+      <text size="100,-2" name="txt_pos" colorText="@color/red" text="50"/>
+    </window>
+    <window size="-2,0" weight="1" layout="hbox">
+      <listview size="0,-2" weight="1" name="lv_test" margin="1,1,1,1" colorBorder="@color/red">
+        <template itemHeight="50" layout="hbox" gravity="center" skin="skin_item_bk">
+          <text name="txt_test"/>
+        </template>
+      </listview>
+      <window size="100,-2" layout="vbox" interval="10">
+        <window size="0,0" weight="1"/>
+        <button size="-2,30" name="btn_add" text="Add"/>
+        <button size="-2,30" name="btn_clean" text="Clean"/>
+        <window size="0,0" weight="1"/>
+      </window>
+    </window>
+  </root>
+</SOUI>

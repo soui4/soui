@@ -86,6 +86,8 @@ struct IFunParams
 struct IIpcConnection;
 struct IIpcHandle : IObjRef
 {
+    virtual BOOL IsConnected() const = 0;
+
     virtual void SetIpcConnection(IIpcConnection *pConn) = 0;
 
     virtual IIpcConnection *GetIpcConnection() const = 0;
@@ -94,7 +96,7 @@ struct IIpcHandle : IObjRef
 
     virtual HRESULT ConnectTo(ULONG_PTR idLocal, ULONG_PTR idSvr) = 0;
 
-    virtual HRESULT Disconnect(ULONG_PTR idSvr) = 0;
+    virtual HRESULT Disconnect() = 0;
 
     virtual bool CallFun(IFunParams *pParam) const = 0;
 
@@ -128,6 +130,7 @@ struct IIpcConnection : IObjRef
 
 struct IIpcSvrCallback
 {
+    // return value is the HWND of the connection that used to reccive message.
     virtual ULONG_PTR OnNewConnection(IIpcHandle *pIpcHandle, IIpcConnection **ppConn) = 0;
     virtual void OnConnected(IIpcConnection *pConn) = 0;
     virtual void OnDisconnected(IIpcConnection *pConn) = 0;
@@ -135,7 +138,7 @@ struct IIpcSvrCallback
     virtual void ReleaseSecurityAttr(void *psa) const = 0;
 };
 
-typedef void (*FunEnumConnection)(IIpcConnection *pConn, ULONG_PTR data);
+typedef BOOL (*FunEnumConnection)(IIpcConnection *pConn, ULONG_PTR data);
 
 struct IIpcServer : IObjRef
 {
@@ -144,6 +147,7 @@ struct IIpcServer : IObjRef
     virtual LRESULT OnMessage(ULONG_PTR idLocal, UINT uMsg, WPARAM wp, LPARAM lp, BOOL &bHandled) = 0;
     virtual void EnumClient(FunEnumConnection funEnum, ULONG_PTR data) = 0;
     virtual BOOL FindConnection(ULONG_PTR idConn) = 0;
+    virtual BOOL Disconnect(ULONG_PTR idConn) = 0;
 };
 
 struct IIpcFactory : IObjRef

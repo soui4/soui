@@ -1,0 +1,19 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<skin>
+  <gradation name="skin_active" colorFrom="rgb(15,17,20)" colorTo="rgb(153,180,209)" vertical="false"/>
+  <gradation name="skin_inactive" colorFrom="rgb(191,205,219)" colorTo="rgb(191,205,219)" vertical="false"/>
+
+  <imglist name="TrayMenu_btn_circulation" src="ImgTrayMenu:circulation" states="8" />
+  <imglist name="TrayMenu_btn_ilike" src="ImgTrayMenu:ilike" states="4" />
+  <imglist name="TrayMenu_btn_next" src="ImgTrayMenu:next" states="3" />
+  <imglist name="TrayMenu_btn_pause" src="ImgTrayMenu:pause" states="3" />
+  <imglist name="TrayMenu_btn_play" src="ImgTrayMenu:play" states="3" />
+  <imglist name="TrayMenu_btn_pre" src="ImgTrayMenu:pre" states="3" />
+  <imglist name="TrayMenu_btn_volume" src="ImgTrayMenu:volume" states="4" />
+  <imglist name="TrayMenu_menu_ico" src="ImgTrayMenu:menu_ico" states="3" />
+  <colorrect name="TrayMenu_menu_bkgnd" hover="#cccccc" />
+  <colorrect name="TrayMenu_menu_sep" normal="#cccccc" />
+  <imgframe name="TrayMenu_border" src="ImgTrayMenu:png_menu_border" margin="2,2,2,2" />
+  <imgframe name="skin_item_bk" src="img:png_item_bk" states="3" margin="2,2,2,2"/>
+</skin>

@@ -1,0 +1,37 @@
+﻿<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef\init.xml"/>
+  </UIDEF>
+  <LAYOUT>
+    <file name="XML_MAINWND" path="xml\dlg_main.xml"/>
+    <file name="DLG_TEST" path="xml\dlg_test.xml"/>
+  </LAYOUT>
+  <SMENU>
+    <file name="menu_test" path="xml\menu_test.xml"/>
+    <file name="menuex_test" path="xml\menuex_test.xml"/>
+  </SMENU>
+  <values>
+  	<file name="string" path="values\string.xml"/>
+  	<file name="color" path="values\color.xml"/>
+  	<file name="skin" path="values\skin.xml"/>
+  </values>
+
+  <ImgTrayMenu>
+    <file name="circulation" path="image\TrayMenu\circulation.png" />
+    <file name="ilike" path="image\TrayMenu\ilike.png" />
+    <file name="next" path="image\TrayMenu\next.png" />
+    <file name="pause" path="image\TrayMenu\pause.png" />
+    <file name="play" path="image\TrayMenu\play.png" />
+    <file name="pre" path="image\TrayMenu\pre.png" />
+    <file name="volume" path="image\TrayMenu\volume.png" />
+    <file name="menu_ico" path="image\TrayMenu\menu_ico.png" />
+    <file name="png_menu_border" path="image\TrayMenu\menuborder.png" />
+  </ImgTrayMenu>
+  <IMG>
+    <file name="png_item_bk" path="image\item_bk.png"/>
+  </IMG>
+
+  <ICON>
+    <file name="ICON_LOGO"  path="image\soui.ico"/>
+  </ICON>
+</resource>

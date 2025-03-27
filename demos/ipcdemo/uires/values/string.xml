@@ -1,0 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+  <string>
+    <server value="ipc server"/>
+    <client value="ipc client"/>
+    <ver value="1.0"/>
+  </string>

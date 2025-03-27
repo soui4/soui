@@ -1,0 +1,87 @@
+﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:128" smallIcon="ICON_LOGO:64" margin="5,5,5,5"  resizable="1" wndType="appMain"
+	appWnd="1"
+	translucent="0"
+	toolwnd="0"
+>
+	<root  width="600" height="400" skin="_skin.sys.wnd.bkgnd" colorBkgnd="@color/white" layout="vbox" alpha1="200">
+		<caption size="-2,30" font="adding:2" layout="hbox" gravity="center" padding_left="10" colorBkgnd="@color/blue">
+			<text text="@string/title"/>
+			<text text="QQ群:" extend_left="5"/>
+			<text text="229313785" colorText="@color/red"/>
+			<window size="0,0" weight="1" visible="0"/>
+			<imgbtn id="sysid_min" skin="_skin.sys.btn.minimize" animate="1" />
+			<window>
+				<imgbtn id="sysid_max" skin="_skin.sys.btn.maximize"  pos="0,0" animate="1" />
+				<imgbtn id="sysid_restore" skin="_skin.sys.btn.restore"  pos="0,0" show="0" animate="1" />
+			</window>
+			<imgbtn id="sysid_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
+		</caption>
+
+		<tabctrl size="-2,0" weight="1" tabHeight="30" animateSteps="30" curSel="0">
+			<page title="test" layout="vbox" interval="10">
+				<dateTimePicker size="240,30" name="timepicker" padding="4,0,4,0" dropWidth="300" timeEnable="1">
+					<calstyle ncSkin="_skin.sys.border" daySkin="_skin.sys.btn.normal" margin="1" />
+				</dateTimePicker>
+				<window size="-2,-1"  layout="hbox" interval="10" gravity="center">
+					<button name="btn_pick_color" text="pick color" size="100,30"/>
+					<window name="wnd_color" size="50,50" colorBkgnd="@color/white"/>
+					<text name="txt_color" size="100,30"/>
+				</window>
+				<window size="-2,-1"  layout="hbox" interval="10" gravity="center">
+					<button name="btn_pick_folder" text="pick folder" size="100,30"/>
+					<text name="txt_folder" size="0,30" weight="1" colorBkgnd="@color/gray" text="test"/>
+				</window>
+				<window size="-2,-1"  layout="hbox" interval="10" gravity="center">
+					<button name="btn_fork_normal" text="fork normal" size="100,30"/>
+					<button name="btn_fork_root" text="fork root" size="100,30"/>
+				</window>
+				<edit size="200,30" text="wss://localhost:4030" maring="2"/>
+			</page>
+			<page title="page1" layout="vbox" gravity="center" colorBkgnd="@color/white" interval="5">
+				<text text="hello soui in page1" colorText="@color/red" colorBkgnd="@color/gray"/>
+				<window size="-2,-1" layout="hbox" gravity="center">
+					<icon src="ICON_LOGO:128"/>
+					<icon src="ICON_LOGO:64"/>
+					<icon src="ICON_LOGO:32"/>
+					<button size="100,30" name="btn_soui" text="transluent"/>
+				</window>
+				<window size="-1,-1" layout="hbox" interval="10" gravity="center">
+					<button name="btn_resize" size="100,30" text="resizing"/>
+					<window size="100,50" margin="2" ncskin="_skin.sys.border" text="draw border" colorTextHover="@color/red"/>
+				</window>
+				<window size="-1,-1" layout="hbox" interval="10" gravity="center">
+					<button name="btn_menu" size="100,30" text="menu(&X)"/>
+					<button name="btn_smenu" size="100,30" text="SMenu"/>
+					<button name="btn_msgbox" size="100,30" text="ShowMessageBox" visible="1" display="0"/>
+					<button name="btn_smenuex" size="100,30" text="SMenuEx" visible="1" display="0"/>
+				</window>
+				<window size="-2,-1" layout="hbox" interval="10">
+					<text text="edit1"/>
+					<edit size="200,30" name="edit_test" text="hello" margin="2" enableDragdrop="1"/>
+					<text text="edit2"/>
+					<edit size="200,30" name="edit_test2" text="soui5" margin="2" enableDragdrop="1"/>
+				</window>
+				<window size="-2,0" weight="1" layout="hbox" interval="10">
+					<window size="100,-2" skin="skin_grad_0"/>
+					<window size="100,-2" skin="skin_grad_90"/>
+					<window size="100,-2" skin="skin_grad_45"/>
+					<window size="100,-2" skin="skin_grad_radial"/>
+				</window>
+			</page>
+			<page title="page2" layout="vbox" gravity="center" colorBkgnd="@color/white">
+				<text text="hello soui in page2" colorText="@color/green" colorBkgnd="@color/gray" font="underline:1,strike:1"/>
+				<img skin="skin_girl"/>
+			</page>
+			<page title="richedit" padding="10,10,10,10" layout="vbox" interval="5">
+				<window size="-2,0" weight="1" layout="hbox" interval="5">
+					<richedit size="0,-2" weight="1" name="re_test" enableDragdrop="1" multiLines="1" vscrollBar="1"  wordWrap="1" autoVscroll="1" hscrollBar="0" wantReturn="1" wantTab="1" rtf="rtf:test"/>
+					<richedit size="0,-2" weight="1" name="re_test2" enableDragdrop="1" multiLines="1" vscrollBar="1"  wordWrap="1" autoVscroll="1" hscrollBar="0" wantReturn="1" wantTab="1" rtf="rtf:test"/>
+				</window>
+				<button size="100,30" name="btn_save_rtf" text="save rtf" layout_gravity="center"/>
+			</page>
+			<page title="scintilla">
+				<realwnd size="-2,-2" name="wnd_sci" wndclass="Scintilla" wndname="hello sci" init="1"/>
+			</page>
+		</tabctrl>
+	</root>
+</SOUI>

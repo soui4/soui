@@ -1,0 +1,11 @@
+﻿<window size="-2,-2" layout="vbox">
+	<text text="房间列表:"/>
+	<treeview name="room_tv" size="-2,0" weight="1" margin="1,1" colorBorder="@color/black" hasLines="true" indent="20">
+		<template data="xml:roomlist" height="30" layout="hbox"  skin="skin_item_bk" trackMouseEvent="1" gravity="center" interval="5"  font="face:宋体,size:16">
+			<img name="img_state" skin="skin_tree_icon" iconIndex="0"/>
+			<text name="txt_label" colorText="@color/black"/>
+			<animateimg name="ani_hot" skin="skin_hot" display="0" visible="0"/>
+			<button  size="50,28" name="btn_go_offcial_url" display="0" visible="0" text="www" tip="open platform website"/>
+		</template>
+	</treeview>
+</window>

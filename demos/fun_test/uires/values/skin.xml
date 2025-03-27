@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<skin>
+	<colorrect name="TrayMenu_menu_bkgnd" normal="#ffffff" hover="#cccccc" pushdown="#00ff00"/>
+	<imgframe name="TrayMenu_border" src="img:png_menu_border" margin="2,2,2,2" />
+
+    <imglist name="skin_girl" src="img:girl"/>
+    <imglist name="skin_soui" src="img:soui"/>
+    <gradation2 name="skin_grad_0" ratio_corners="0.2,0.2" type="linear" angle="0" gradient="grad_test"/>
+    <gradation2 name="skin_grad_90" ratio_corners="0.2,0.2" type="linear" angle="90" gradient="grad_test"/>
+    <gradation2 name="skin_grad_45" ratio_corners="0.2,0.2" type="linear" angle="45" gradient="grad_test"/>
+    <gradation2 name="skin_grad_radial" ratio_corners="0.2,0.2" type="radial" ratio_radius="0.5" gradient="grad_test" centerX="0.4" centerY="0.4"/>
+</skin>
