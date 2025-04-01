@@ -92,8 +92,7 @@
 #endif
 
 
-namespace SOUI
-{
+SNSBEGIN
     namespace IMGDECODOR_WIC
     {
         BOOL SCreateInstance(IObjRef **);
@@ -149,13 +148,13 @@ namespace SOUI
 	namespace HttpClient {
 		BOOL SCreateInstance(IObjRef **);
 	}
-}//end of soui
+SNSEND
 
-namespace SOUI{
+SNSBEGIN
 class SComMgr2
 {
 public:
-    SComMgr2(LPCTSTR pszImgDecoder = NULL):m_strImgDecoder(pszImgDecoder)
+    SComMgr2(LPCTSTR pszImgDecoder = _T("imgdecoder-stb")):m_strImgDecoder(pszImgDecoder)
     {
     }
 
@@ -262,7 +261,7 @@ public:
 	SStringT m_strImgDecoder;
 };
 
-}//end of soui
+SNSEND
 #else
 	
 #include <com-loader.hpp>
@@ -272,7 +271,7 @@ public:
 #define SPATH_SLASH _T("/")
 #endif//SPATH_SLASH
 
-namespace SOUI{
+SNSBEGIN
 
 class SComMgr2
 {
@@ -377,7 +376,7 @@ protected:
 	SStringT m_strDllPath;
 };
 
-}
-#endif
+SNSEND
+#endif//LIB_SOUI_COM
 
 #endif//_SOUI_COMMGR2_H_

@@ -1,8 +1,6 @@
 ﻿#ifndef __ZIPARCHIVE_H__
 #define __ZIPARCHIVE_H__
 
-#pragma once
-
 #define ZLIB_DECRYPTION
 ///////////////////////////////////////////////////////////////
 // Structures and defines

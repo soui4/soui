@@ -26,12 +26,15 @@ SNSBEGIN
  *
  * Describe
  */
-class SOUI_EXP STextServiceHelper {
+class STextServiceHelper * s_textServiceHelper = NULL;
+
+class STextServiceHelper {
+	friend class SRichEdit;
   public:
     static STextServiceHelper *instance()
     {
-        static STextServiceHelper _this;
-        return &_this;
+		SASSERT(s_textServiceHelper);
+        return s_textServiceHelper;
     }
 
   public:
@@ -97,6 +100,20 @@ HRESULT STextServiceHelper::CreateTextServices(IUnknown *punkOuter, ITextHost *p
     if (!m_funCreateTextServices)
         return E_NOTIMPL;
     return m_funCreateTextServices(punkOuter, pITextHost, ppUnk);
+}
+
+
+void SRichEdit::InitTextService()
+{
+	SASSERT(s_textServiceHelper==NULL);
+	s_textServiceHelper = new STextServiceHelper;
+}
+
+void SRichEdit::UninitTextService()
+{
+	SASSERT(s_textServiceHelper);
+	delete s_textServiceHelper;
+	s_textServiceHelper=NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -240,6 +257,465 @@ LONG HimetrictoD(LONG lHimetric, LONG dPerInch)
 {
     return (LONG)MulDiv(lHimetric, dPerInch, HIMETRIC_PER_INCH);
 }
+
+/**
+ * @class      STextHost
+ * @brief
+ *
+ * Describe
+ */
+class STextHost : public ITextHost {
+    friend class SRichEdit;
+
+  public:
+    /**
+     * STextHost::STextHost
+     * @brief    构造函数
+     *
+     * Describe  构造函数
+     */
+    STextHost(void);
+    /**
+     * STextHost::~STextHost
+     * @brief    析构函数
+     *
+     * Describe  析构函数
+     */
+    ~STextHost(void);
+    /**
+     * STextHost::Init
+     * @brief    初始化函数
+     * @param    SRichEdit* pRichEdit -- SRichEdit对象
+     *
+     * Describe  初始化函数
+     */
+    BOOL Init(SRichEdit *pRichEdit);
+    /**
+     * STextHost::GetTextService
+     * @brief
+     *
+     * Describe
+     */
+    ITextServices *GetTextService()
+    {
+        return pserv;
+    }
+
+  protected:
+    STDMETHOD_(HRESULT, QueryInterface)(THIS_ REFGUID riid, void **ppvObject) OVERRIDE;
+    STDMETHOD_(ULONG, AddRef)(THIS) OVERRIDE;
+    STDMETHOD_(ULONG, Release)(THIS) OVERRIDE;
+
+    /**
+     * STextHost::TxGetDC
+     * @brief     Get the DC for the host
+     * @return    返回HDC
+     *
+     * Describe   Get the DC for the host
+     */
+    virtual HDC TxGetDC();
+
+    /**
+     * STextHost::TxReleaseDC
+     * @brief     Release the DC gotten from the host
+     * @return    返回INT
+     *
+     * Describe   Release the DC gotten from the host
+     */
+    virtual INT TxReleaseDC(HDC hdc);
+
+    /**
+     * STextHost::TxShowScrollBar
+     * @brief     Show the scroll bar
+     * @param     INT fnBar --
+     * @param     BOOL fShow --
+     * @return    返回BOOL
+     *
+     * Describe   Show the scroll bar
+     */
+    virtual BOOL TxShowScrollBar(INT fnBar, BOOL fShow);
+
+    /**
+     * STextHost::TxEnableScrollBar
+     * @brief     Enable the scroll bar
+     * @param     INT fuSBFlags --
+     * @param     INT fuArrowflags --
+     * @return    返回BOOL
+     *
+     * Describe   Enable the scroll bar
+     */
+    virtual BOOL TxEnableScrollBar(INT fuSBFlags, INT fuArrowflags);
+
+    /**
+     * STextHost::TxEnableScrollBar
+     * @brief     Set the scroll range
+     * @param     INT fnBar --
+     * @param     LONG nMinPos --
+     * @param     INT nMaxPos --
+     * @param     BOOL fRedraw --
+     * @return    返回BOOL
+     *
+     * Describe   Set the scroll range
+     */
+    virtual BOOL TxSetScrollRange(INT fnBar, LONG nMinPos, INT nMaxPos, BOOL fRedraw);
+
+    /**
+     * STextHost::TxSetScrollPos
+     * @brief     Set the scroll position
+     * @param     INT fnBar --
+     * @param     INT nPos --
+     * @param     BOOL fRedraw --
+     * @return    返回BOOL
+     *
+     * Describe   Set the scroll position
+     */
+    virtual BOOL TxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw);
+
+    /**
+     * STextHost::TxInvalidateRect
+     * @brief     InvalidateRect
+     * @param     LPCRECT prc --
+     * @param     BOOL fMode --
+     *
+     * Describe   Set the scroll position
+     */
+    virtual void TxInvalidateRect(LPCRECT prc, BOOL fMode);
+
+    /**
+     * STextHost::TxViewChange
+     * @brief     Send a WM_PAINT to the window
+     * @param     BOOL fUpdate --
+     *
+     * Describe   Send a WM_PAINT to the window
+     */
+    virtual void TxViewChange(BOOL fUpdate);
+
+    /**
+     * STextHost::TxCreateCaret
+     * @brief     Create the caret
+     * @param     HBITMAP hbmp -- caret bitmap
+     * @param     INT xWidth -- caret width
+     * @param     INT yHeight -- caret height
+     * @return    返回BOOL
+     *
+     * Describe   Create the caret
+     */
+    virtual BOOL TxCreateCaret(HBITMAP hbmp, INT xWidth, INT yHeight);
+
+    /**
+     * STextHost::TxShowCaret
+     * @brief     Show the caret
+     * @param     BOOL fShow -- true to show the caret
+     * @return    返回BOOL
+     *
+     * Describe   Show the caret
+     */
+    virtual BOOL TxShowCaret(BOOL fShow);
+
+    /**
+     * STextHost::TxSetCaretPos
+     * @brief     Set the caret position
+     * @param     INT x -- caret position:x
+     * @param     INT y -- caret position:y
+     * @return    返回BOOL
+     *
+     * Describe   Set the caret position
+     */
+    virtual BOOL TxSetCaretPos(INT x, INT y);
+
+    /**
+     * STextHost::TxSetTimer
+     * @brief     Create a timer with the specified timeout
+     * @param     UINT idTimer -- timer ID
+     * @param     UINT uTimeout -- time interval
+     * @return    返回BOOL
+     *
+     * Describe   Create a timer with the specified timeout
+     */
+    virtual BOOL TxSetTimer(UINT idTimer, UINT uTimeout);
+
+    /**
+     * STextHost::TxSetTimer
+     * @brief     Destroy a timer
+     * @param     UINT idTimer -- timer id
+     * @return    返回BOOL
+     *
+     * Describe   Destroy a timer
+     */
+    virtual void TxKillTimer(UINT idTimer);
+
+    /**
+     * STextHost::TxScrollWindowEx
+     * @brief     Scroll the content of the specified window's client area
+     * @param     INT dx --
+     * @param     INT dy --
+     * @param     LPCRECT lprcScroll --
+     * @param     LPCRECT lprcClip --
+     * @param     HRGN hrgnUpdate --
+     * @param     LPRECT lprcUpdate --
+     * @param     UINT fuScroll --
+     *
+     * Describe   Scroll the content of the specified window's client area
+     */
+    virtual void TxScrollWindowEx(INT dx, INT dy, LPCRECT lprcScroll, LPCRECT lprcClip, HRGN hrgnUpdate, LPRECT lprcUpdate, UINT fuScroll);
+
+    /**
+     * STextHost::TxSetCapture
+     * @brief     Get mouse capture
+     * @param     BOOL fCapture --
+     *
+     * Describe   Get mouse capture
+     */
+    virtual void TxSetCapture(BOOL fCapture);
+
+    /**
+     * STextHost::TxSetFocus
+     * @brief     Set the focus to the text window
+     *
+     * Describe   Set the focus to the text window
+     */
+    virtual void TxSetFocus();
+
+    /**
+     * STextHost::TxSetCursor
+     * @brief     Establish a new cursor shape
+     * @param     HCURSOR hcur --
+     * @param     BOOL fText --
+     *
+     * Describe   Establish a new cursor shape
+     */
+    virtual void TxSetCursor(HCURSOR hcur, BOOL fText);
+
+    /**
+     * STextHost::TxScreenToClient
+     * @brief     Converts screen coordinates of a specified point to the client coordinates
+     * @param     LPPOINT lppt --
+     * @return    返回BOOL
+     *
+     * Describe   Converts screen coordinates of a specified point to the client coordinates
+     */
+    virtual BOOL TxScreenToClient(LPPOINT lppt);
+
+    /**
+     * STextHost::TxClientToScreen
+     * @brief     Converts the client coordinates of a specified point to screen coordinates
+     * @param     LPPOINT lppt --
+     * @return    返回BOOL
+     *
+     * Describe   Converts the client coordinates of a specified point to screen coordinates
+     */
+    virtual BOOL TxClientToScreen(LPPOINT lppt);
+
+    /**
+     * STextHost::TxActivate
+     * @brief     Request host to activate text services
+     * @param     LONG * plOldState --
+     * @return    返回HRESULT
+     *
+     * Describe   Request host to activate text services
+     */
+    virtual HRESULT TxActivate(LONG *plOldState);
+
+    /**
+     * STextHost::TxDeactivate
+     * @brief     Request host to deactivate text services
+     * @param     LONG lNewState --
+     * @return    返回HRESULT
+     *
+     * Describe   Request host to deactivate text services
+     */
+    virtual HRESULT TxDeactivate(LONG lNewState);
+
+    /**
+     * STextHost::TxGetClientRect
+     * @brief     Retrieves the coordinates of a window's client area
+     * @param     LPRECT prc --
+     * @return    返回HRESULT
+     *
+     * Describe   Retrieves the coordinates of a window's client area
+     */
+    virtual HRESULT TxGetClientRect(LPRECT prc);
+
+    /**
+     * STextHost::TxGetViewInset
+     * @brief     Get the view rectangle relative to the inset
+     * @param     LPRECT prc --
+     * @return    返回HRESULT
+     *
+     * Describe   Get the view rectangle relative to the inset
+     */
+    virtual HRESULT TxGetViewInset(LPRECT prc);
+
+    /**
+     * STextHost::TxGetCharFormat
+     * @brief     Get the default character format for the text
+     * @param     const CHARFORMATW **ppCF --
+     * @return    返回HRESULT
+     *
+     * Describe   Get the default character format for the text
+     */
+    virtual HRESULT TxGetCharFormat(const CHARFORMATW **ppCF);
+
+    /**
+     * STextHost::TxGetParaFormat
+     * @brief     Get the default paragraph format for the text
+     * @param     const PARAFORMAT **ppPF --
+     * @return    返回HRESULT
+     *
+     * Describe   Get the default character format for the text
+     */
+    virtual HRESULT TxGetParaFormat(const PARAFORMAT **ppPF);
+
+    /**
+     * STextHost::TxGetSysColor
+     * @brief     Get the background color for the window
+     * @param     int nIndex --
+     * @return    返回COLORREF
+     *
+     * Describe   Get the background color for the window
+     */
+    virtual COLORREF TxGetSysColor(int nIndex);
+
+    /**
+     * STextHost::TxGetBackStyle
+     * @brief     Get the background (either opaque or transparent)
+     * @param     TXTBACKSTYLE *pstyle --
+     * @return    返回HRESULT
+     *
+     * Describe   Get the background (either opaque or transparent)
+     */
+    virtual HRESULT TxGetBackStyle(TXTBACKSTYLE *pstyle);
+
+    /**
+     * STextHost::TxGetMaxLength
+     * @brief     Get the maximum length for the text
+     * @param     DWORD *plength --
+     * @return    返回HRESULT
+     *
+     * Describe   Get the maximum length for the text
+     */
+    virtual HRESULT TxGetMaxLength(DWORD *plength);
+
+    /**
+     * STextHost::TxGetScrollBars
+     * @brief     Get the bits representing requested scroll bars for the window
+     * @param     DWORD *pdwScrollBar --
+     * @return    返回HRESULT
+     *
+     * Describe   Get the bits representing requested scroll bars for the window
+     */
+    virtual HRESULT TxGetScrollBars(DWORD *pdwScrollBar);
+
+    /**
+     * STextHost::TxGetPasswordChar
+     * @brief     Get the character to display for password input
+     * @param     TCHAR *pch --
+     * @return    返回HRESULT
+     *
+     * Describe   Get the character to display for password input
+     */
+    virtual HRESULT TxGetPasswordChar(TCHAR *pch);
+
+    /**
+     * STextHost::TxGetAcceleratorPos
+     * @brief     Get the accelerator character
+     * @param     LONG *pcp --
+     * @return    返回HRESULT
+     *
+     * Describe   Get the accelerator character
+     */
+    virtual HRESULT TxGetAcceleratorPos(LONG *pcp);
+
+    /**
+     * STextHost::TxGetExtent
+     * @brief     Get the native size
+     * @param     LPSIZEL lpExtent --
+     * @return    返回HRESULT
+     *
+     * Describe   Get the native size
+     */
+    virtual HRESULT TxGetExtent(LPSIZEL lpExtent);
+
+    /**
+     * STextHost::OnTxCharFormatChange
+     * @brief     Notify host that default character format has changed
+     * @param     const CHARFORMATW * pcf --
+     * @return    返回HRESULT
+     *
+     * Describe   Notify host that default character format has changed
+     */
+    virtual HRESULT OnTxCharFormatChange(const CHARFORMATW *pcf);
+
+    /**
+     * STextHost::OnTxParaFormatChange
+     * @brief     Notify host that default paragraph format has changed
+     * @param     const PARAFORMAT * ppf --
+     * @return    返回HRESULT
+     *
+     * Describe   Notify host that default paragraph format has changed
+     */
+    virtual HRESULT OnTxParaFormatChange(const PARAFORMAT *ppf);
+
+    /**
+     * STextHost::TxGetPropertyBits
+     * @brief     Bulk access to bit properties
+     * @param     DWORD dwMask --
+     * @param     DWORD *pdwBits --
+     * @return    返回HRESULT
+     *
+     * Describe   Bulk access to bit properties
+     */
+    virtual HRESULT TxGetPropertyBits(DWORD dwMask, DWORD *pdwBits);
+
+    /**
+     * STextHost::TxNotify
+     * @brief     Notify host of events
+     * @param     DWORD iNotify  --
+     * @param     void *pv --
+     * @return    返回HRESULT
+     *
+     * Describe   Bulk access to bit properties
+     */
+    virtual HRESULT TxNotify(DWORD iNotify, void *pv);
+
+    // Far East Methods for getting the Input Context
+    //#ifdef WIN95_IME
+    /**
+     * STextHost::TxImmGetContext
+     * @brief
+     * @return     返回HIMC
+     *
+     * Describe
+     */
+    virtual HIMC TxImmGetContext();
+    /**
+     * STextHost::TxImmReleaseContext
+     * @brief
+     * @param     HIMC himc  --
+     *
+     * Describe
+     */
+    virtual void TxImmReleaseContext(HIMC himc);
+    //#endif
+
+    /**
+     * STextHost::TxGetSelectionBarWidth
+     * @brief     Returns HIMETRIC size of the control bar
+     * @param     LONG *plSelBarWidth  --
+     *
+     * Describe   Returns HIMETRIC size of the control bar
+     */
+    virtual HRESULT TxGetSelectionBarWidth(LONG *plSelBarWidth);
+
+  protected:
+    BOOL m_fUiActive; /**< Whether control is inplace active */
+
+    ULONG cRefs;            /**< Reference Count */
+    ITextServices *pserv;   /**< pointer to Text Services object */
+    SRichEdit *m_pRichEdit; /**< swindow for text host */
+    POINT m_ptCaret;
+};
+
 
 STextHost::STextHost(void)
     : m_pRichEdit(NULL)
@@ -1860,5 +2336,6 @@ BOOL SRichEdit::IsRichScale() const
 {
     return m_fRich || !m_fSingleLineVCenter || (m_dwStyle & ES_MULTILINE);
 }
+
 
 SNSEND
