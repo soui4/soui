@@ -121,8 +121,10 @@ void SetDefaultDir()
 {
 	char szPath[MAX_PATH];
 	strcpy(szPath, __FILE__);
-	char* p = strrchr(szPath, PATH_SLASH);
-	*p = 0;
+	{
+		char* p = strrchr(szPath, PATH_SLASH);
+		*p = 0;
+	}
 	SetCurrentDirectoryA(szPath);
 }
 

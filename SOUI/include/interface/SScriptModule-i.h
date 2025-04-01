@@ -32,13 +32,13 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
 {
     /**
      * @brief 增加引用计数
-     * @return 新引用计数
+     * @return long - 新引用计数
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
      * @brief 减少引用计数
-     * @return 新引用计数
+     * @return long - 新引用计数
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
@@ -49,82 +49,53 @@ DECLARE_INTERFACE_(IScriptModule, IObjRef)
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * GetScriptEngine
-     * @brief    获得脚本引擎的指针
-     * @return   void * -- 脚本引擎的指针
-     * Describe
+     * @brief 获取脚本引擎的指针
+     * @return void* - 脚本引擎的指针
      */
     STDMETHOD_(void *, GetScriptEngine)(THIS) PURE;
 
-    /*!
-    \brief
-        Return identification string for the ScriptModule.  If the internal id string has not been
-        set by the ScriptModule creator, a generic string of "Unknown scripting module" will be
-    returned.
-
-    \return
-        String object holding a string that identifies the ScriptModule in use.
-    */
+    /**
+     * @brief 获取脚本模块的标识字符串
+     * @return LPCSTR - 标识字符串
+     */
     STDMETHOD_(LPCSTR, getIdentifierString)(CTHIS) SCONST PURE;
 
-    /*!
-    \brief
-        Execute a script file.
-
-    \param pszScriptFile
-        String object holding the filename of the script file that is to be executed
-
-    */
+    /**
+     * @brief 执行脚本文件
+     * @param pszScriptFile - 脚本文件名
+     * @return BOOL - 成功返回TRUE，失败返回FALSE
+     */
     STDMETHOD_(BOOL, executeScriptFile)(THIS_ LPCSTR pszScriptFile) PURE;
 
-    /*!
-    \brief
-        Execute a script buffer.
-
-    \param buff
-        buffer of the script that is to be executed
-
-    \param sz
-        size of buffer
-    */
+    /**
+     * @brief 执行脚本缓冲区
+     * @param buff - 脚本缓冲区
+     * @param sz - 缓冲区大小
+     * @return void
+     */
     STDMETHOD_(void, executeScriptBuffer)(THIS_ LPCSTR buff, size_t sz) PURE;
 
-    /*!
-    \brief
-        Execute a scripted global 'event handler' function.  The function should take some kind of
-    IEvtArgs like parameter that the concrete implementation of this function can create from the
-    passed IEvtArgs based object.
-
-    \param handler_name
-        String object holding the name of the scripted handler function.
-
-    \param pEvt
-        IEvtArgs * based object that should be passed, by any appropriate means, to the scripted
-    function.
-
-    \return
-        - true if the event was handled.
-        - false if the event was not handled.
-    */
+    /**
+     * @brief 执行脚本化的事件处理函数
+     * @param handler_name - 处理函数名称
+     * @param pEvt - 事件参数
+     * @return BOOL - 事件被处理返回TRUE，否则返回FALSE
+     */
     STDMETHOD_(BOOL, executeScriptedEventHandler)(THIS_ LPCSTR handler_name, IEvtArgs * pEvt) PURE;
 
-    /*!
-     \brief
-         Execute main function
-
-     \param hInst
-         HINSTANCE handle of the instance.
-
-     \param pszWorkDir
-         LPCSTR work dir.
-
-     \param pszArgs
-         LPCSTR additional parameters.
-     \return
-         - int return code.
+    /**
+     * @brief 执行主函数
+     * @param hInst - 实例句柄
+     * @param pszWorkDir - 工作目录
+     * @param pszArgs - 额外参数
+     * @return int - 返回代码
      */
     STDMETHOD_(int, executeMain)(THIS_ HINSTANCE hInst, LPCSTR pszWorkDir, LPCSTR pszArgs) PURE;
 
+    /**
+     * @brief 获取空闲处理器
+     * @return IIdleHandler* - 空闲处理器指针
+     */
     STDMETHOD_(IIdleHandler *, getIdleHandler)(THIS) PURE;
 };
 
@@ -134,13 +105,13 @@ DECLARE_INTERFACE_(IScriptFactory, IObjRef)
 {
     /**
      * @brief 增加引用计数
-     * @return 新引用计数
+     * @return long - 新引用计数
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
      * @brief 减少引用计数
-     * @return 新引用计数
+     * @return long - 新引用计数
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
@@ -150,6 +121,11 @@ DECLARE_INTERFACE_(IScriptFactory, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
+    /**
+     * @brief 创建脚本模块
+     * @param ppScriptModule - 脚本模块指针的指针
+     * @return HRESULT
+     */
     STDMETHOD_(HRESULT, CreateScriptModule)(THIS_ IScriptModule * *ppScriptModule) PURE;
 };
 

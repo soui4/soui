@@ -11,6 +11,11 @@ typedef struct IValueAnimator IValueAnimator;
 #define INTERFACE IAnimatorUpdateListener
 DECLARE_INTERFACE(IAnimatorUpdateListener)
 {
+    /**
+     * @brief 动画更新时调用
+     * @param pAnimator - 动画指针
+     * @return void
+     */
     STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator * pAnimator) PURE;
 };
 
@@ -19,24 +24,23 @@ DECLARE_INTERFACE(IAnimatorUpdateListener)
 DECLARE_INTERFACE(IAnimatorListener)
 {
     /**
-     * <p>Notifies the start of the animation.</p>
-     *
-     * @param animation The started animation.
+     * @brief 动画开始时调用
+     * @param pAnimator - 动画指针
+     * @return void
      */
     STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator * pAnimator) PURE;
 
     /**
-     * <p>Notifies the end of the animation. This callback is not invoked
-     * for animations with repeat count set to INFINITE.</p>
-     *
-     * @param animation The animation which reached its end.
+     * @brief 动画结束时调用（不适用于无限重复的动画）
+     * @param pAnimator - 动画指针
+     * @return void
      */
     STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator * pAnimator) PURE;
 
     /**
-     * <p>Notifies the repetition of the animation.</p>
-     *
-     * @param animation The animation which was repeated.
+     * @brief 动画重复时调用
+     * @param pAnimator - 动画指针
+     * @return void
      */
     STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator * pAnimator) PURE;
 };
@@ -49,197 +53,192 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
 #include <interface/SobjectApi.h>
 
     /**
-     * Sets the length of the animation. The default duration is 300 milliseconds.
-     *
-     * @param duration The length of the animation, in milliseconds. This value cannot
-     * be negative.
-     * @return IValueAnimator The object called with setDuration(). This return
-     * value makes it easier to compose statements together that construct and then set the
-     * duration, as in <code>IValueAnimator.ofInt(0, 10).setDuration(500).start()</code>.
+     * @brief 设置动画时长
+     * @param duration - 动画时长（毫秒）
+     * @return void
      */
     STDMETHOD_(void, setDuration)(THIS_ long duration) PURE;
 
     /**
-     * Gets the length of the animation. The default duration is 300 milliseconds.
-     *
-     * @return The length of the animation, in milliseconds.
+     * @brief 获取动画时长
+     * @return long - 动画时长（毫秒）
      */
     STDMETHOD_(long, getDuration)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 获取动画总时长
+     * @return long - 动画总时长（毫秒）
+     */
     STDMETHOD_(long, getTotalDuration)(CTHIS) SCONST PURE;
 
     /**
-     * Sets the position of the animation to the specified point in time. This time should
-     * be between 0 and the total duration of the animation, including any repetition. If
-     * the animation has not yet been started, then it will not advance forward after it is
-     * set to this time; it will simply set the time to this value and perform any appropriate
-     * actions based on that time. If the animation is already running, then setCurrentPlayTime()
-     * will set the current playing time to this value and continue playing from that point.
-     *
-     * @param playTime The time, in milliseconds, to which the animation is advanced or rewound.
+     * @brief 设置动画当前播放时间
+     * @param playTime - 播放时间（毫秒）
+     * @return void
      */
     STDMETHOD_(void, setCurrentPlayTime)(THIS_ long playTime) PURE;
 
     /**
-     * Sets the position of the animation to the specified fraction. This fraction should
-     * be between 0 and the total fraction of the animation, including any repetition. That is,
-     * a fraction of 0 will position the animation at the beginning, a value of 1 at the end,
-     * and a value of 2 at the end of a reversing animator that repeats once. If
-     * the animation has not yet been started, then it will not advance forward after it is
-     * set to this fraction; it will simply set the fraction to this value and perform any
-     * appropriate actions based on that fraction. If the animation is already running, then
-     * setCurrentFraction() will set the current fraction to this value and continue
-     * playing from that point. {@link Animator.AnimatorListener} events are not called
-     * due to changing the fraction; those events are only processed while the animation
-     * is running.
-     *
-     * @param fraction The fraction to which the animation is advanced or rewound. Values
-     * outside the range of 0 to the maximum fraction for the animator will be clamped to
-     * the correct range.
+     * @brief 设置动画当前播放进度
+     * @param fraction - 播放进度（0到1之间）
+     * @return void
      */
     STDMETHOD_(void, setCurrentFraction)(THIS_ float fraction) PURE;
 
     /**
-     * Gets the current position of the animation in time, which is equal to the current
-     * time minus the time that the animation started. An animation that is not yet started will
-     * return a value of zero, unless the animation has has its play time set via
-     * {@link #setCurrentPlayTime(long)} or {@link #setCurrentFraction(float)}, in which case
-     * it will return the time that was set.
-     *
-     * @return The current position in time of the animation.
+     * @brief 获取动画当前播放时间
+     * @return long - 当前播放时间（毫秒）
      */
     STDMETHOD_(long, getCurrentPlayTime)(THIS) PURE;
 
     /**
-     * The amount of time, in milliseconds, to delay starting the animation after
-     * {@link #start()} is called.
-     *
-     * @return the number of milliseconds to delay running the animation
+     * @brief 获取动画开始延迟时间
+     * @return long - 开始延迟时间（毫秒）
      */
     STDMETHOD_(long, getStartDelay)(CTHIS) SCONST PURE;
 
     /**
-     * The amount of time, in milliseconds, to delay starting the animation after
-     * {@link #start()} is called. Note that the start delay should always be non-negative. Any
-     * negative start delay will be clamped to 0 on N and above.
-     *
-     * @param startDelay The amount of the delay, in milliseconds
+     * @brief 设置动画开始延迟时间
+     * @param startDelay - 开始延迟时间（毫秒）
+     * @return void
      */
     STDMETHOD_(void, setStartDelay)(THIS_ long startDelay) PURE;
 
     /**
-     * Sets how many times the animation should be repeated. If the repeat
-     * count is 0, the animation is never repeated. If the repeat count is
-     * greater than 0 or {@link #INFINITE}, the repeat mode will be taken
-     * into account. The repeat count is 0 by default.
-     *
-     * @param value the number of times the animation should be repeated
+     * @brief 设置动画重复次数
+     * @param value - 重复次数
+     * @return void
      */
     STDMETHOD_(void, setRepeatCount)(THIS_ int value) PURE;
+
     /**
-     * Defines how many times the animation should repeat. The default value
-     * is 0.
-     *
-     * @return the number of times the animation should repeat, or {@link #INFINITE}
+     * @brief 获取动画重复次数
+     * @return int - 重复次数
      */
     STDMETHOD_(int, getRepeatCount)(CTHIS) SCONST PURE;
 
     /**
-     * Defines what this animation should do when it reaches the end. This
-     * setting is applied only when the repeat count is either greater than
-     * 0 or {@link #INFINITE}. Defaults to {@link #RESTART}.
-     *
-     * @param value {@link #RESTART} or {@link #REVERSE}
+     * @brief 设置动画重复模式
+     * @param value - 重复模式（RESTART或REVERSE）
+     * @return void
      */
     STDMETHOD_(void, setRepeatMode)(THIS_ RepeatMode value) PURE;
 
     /**
-     * Defines what this animation should do when it reaches the end.
-     *
-     * @return either one of {@link #REVERSE} or {@link #RESTART}
+     * @brief 获取动画重复模式
+     * @return RepeatMode - 重复模式（RESTART或REVERSE）
      */
     STDMETHOD_(RepeatMode, getRepeatMode)(CTHIS) SCONST PURE;
 
     /**
-     * Adds a listener to the set of listeners that are sent update events through the life of
-     * an animation. This method is called on all listeners for every frame of the animation,
-     * after the values for the animation have been calculated.
-     *
-     * @param listener the listener to be added to the current set of listeners for this animation.
+     * @brief 添加动画更新监听器
+     * @param listener - 监听器指针
+     * @return void
      */
     STDMETHOD_(void, addUpdateListener)(THIS_ IAnimatorUpdateListener * listener) PURE;
 
     /**
-     * Removes all listeners from the set listening to frame updates for this animation.
+     * @brief 移除所有动画更新监听器
+     * @return void
      */
     STDMETHOD_(void, removeAllUpdateListeners)(THIS) PURE;
 
     /**
-     * Removes a listener from the set listening to frame updates for this animation.
-     *
-     * @param listener the listener to be removed from the current set of update listeners
-     * for this animation.
+     * @brief 移除动画更新监听器
+     * @param listener - 监听器指针
+     * @return void
      */
     STDMETHOD_(void, removeUpdateListener)(THIS_ IAnimatorUpdateListener * listener) PURE;
 
     /**
-     * The time interpolator used in calculating the elapsed fraction of this animation. The
-     * interpolator determines whether the animation runs with linear or non-linear motion,
-     * such as acceleration and deceleration. The default value is
-     * {@link android.view.animation.AccelerateDecelerateInterpolator}
-     *
-     * @param value the interpolator to be used by this animation. A value of <code>null</code>
-     * will result in linear interpolation.
+     * @brief 设置时间插值器
+     * @param value - 插值器指针
+     * @return void
      */
     STDMETHOD_(void, setInterpolator)(THIS_ IInterpolator * value) PURE;
 
     /**
-     * Returns the timing interpolator that this IValueAnimator uses.
-     *
-     * @return The timing interpolator for this IValueAnimator.
+     * @brief 获取时间插值器
+     * @return IInterpolator* - 插值器指针
      */
     STDMETHOD_(IInterpolator *, getInterpolator)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 添加动画监听器
+     * @param p - 监听器指针
+     * @return void
+     */
     STDMETHOD_(void, addListener)(THIS_ IAnimatorListener * p) PURE;
 
+    /**
+     * @brief 移除动画监听器
+     * @param p - 监听器指针
+     * @return void
+     */
     STDMETHOD_(void, removeListener)(THIS_ IAnimatorListener * p) PURE;
 
+    /**
+     * @brief 开始动画
+     * @param pContainer - 时间线管理器指针
+     * @return void
+     */
     STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr * pContainer) PURE;
 
+    /**
+     * @brief 结束动画
+     * @return void
+     */
     STDMETHOD_(void, end)(THIS) PURE;
 
+    /**
+     * @brief 检查动画是否正在运行
+     * @return BOOL - 正在运行返回TRUE，否则返回FALSE
+     */
     STDMETHOD_(BOOL, isRunning)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 检查动画是否已启动
+     * @return BOOL - 已启动返回TRUE，否则返回FALSE
+     */
     STDMETHOD_(BOOL, isStarted)(CTHIS) SCONST PURE;
 
     /**
-     * Plays the IValueAnimator in reverse. If the animation is already running,
-     * it will stop itself and play backwards from the point reached when reverse was called.
-     * If the animation is not currently running, then it will start from the end and
-     * play backwards. This behavior is only set for the current animation; future playing
-     * of the animation will use the default behavior of playing forward.
+     * @brief 反向播放动画
+     * @return void
      */
     STDMETHOD_(void, reverse)(THIS) PURE;
 
     /**
-     * Applies an adjustment to the animation to compensate for jank between when
-     * the animation first ran and when the frame was drawn.
-     * @hide
+     * @brief 提交动画帧
+     * @param frameTime - 帧时间
+     * @return void
      */
     STDMETHOD_(void, commitAnimationFrame)(THIS_ long frameTime) PURE;
 
     /**
-     * Returns the current animation fraction, which is the elapsed/interpolated fraction used in
-     * the most recent frame update on the animation.
-     *
-     * @return Elapsed/interpolated fraction of the animation.
+     * @brief 获取动画当前进度
+     * @return float - 当前进度
      */
     STDMETHOD_(float, getAnimatedFraction)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 克隆动画对象
+     * @return IValueAnimator* - 克隆的动画对象指针
+     */
     STDMETHOD_(IValueAnimator *, clone)(CTHIS) SCONST PURE;
 
+    /**
+     * @brief 复制动画对象
+     * @param src - 源动画对象指针
+     * @return void
+     */
     STDMETHOD_(void, copy)(THIS_ const IValueAnimator *src) PURE;
 
+    /**
+     * @brief 评估动画值
+     * @param fraction - 动画进度
+     * @return void
+     */
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) PURE;
 };
 
@@ -249,6 +248,11 @@ typedef struct IAnimatorGroup IAnimatorGroup;
 #define INTERFACE IAnimatorGroupListerer
 DECLARE_INTERFACE(IAnimatorGroupListerer)
 {
+    /**
+     * @brief 动画组结束时调用
+     * @param pGroup - 动画组指针
+     * @return void
+     */
     STDMETHOD_(void, OnAnimatorGroupEnd)(THIS_ IAnimatorGroup * pGroup) PURE;
 };
 
@@ -258,13 +262,13 @@ DECLARE_INTERFACE_(IAnimatorGroup, IObjRef)
 {
     /**
      * @brief 增加引用计数
-     * @return 新引用计数
+     * @return long - 新引用计数
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
      * @brief 减少引用计数
-     * @return 新引用计数
+     * @return long - 新引用计数
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
@@ -274,11 +278,25 @@ DECLARE_INTERFACE_(IAnimatorGroup, IObjRef)
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    //////////////////////////////////////////////////////////////////////////
+    /**
+     * @brief 添加动画
+     * @param ani - 动画指针
+     * @return BOOL - 成功返回TRUE，失败返回FALSE
+     */
     STDMETHOD_(BOOL, AddAnimator)(THIS_ IValueAnimator * ani) PURE;
 
+    /**
+     * @brief 移除动画
+     * @param ani - 动画指针
+     * @return BOOL - 成功返回TRUE，失败返回FALSE
+     */
     STDMETHOD_(BOOL, RemoveAnimator)(THIS_ IValueAnimator * ani) PURE;
 
+    /**
+     * @brief 设置动画组监听器
+     * @param listener - 监听器指针
+     * @return void
+     */
     STDMETHOD_(void, SetListener)(THIS_ IAnimatorGroupListerer * listener) PURE;
 };
 

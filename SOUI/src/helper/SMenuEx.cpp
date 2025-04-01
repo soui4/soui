@@ -930,7 +930,7 @@ void SMenuEx::RunMenu(HWND hRoot)
 
         if (bMsgQuit)
         {
-            PostQuitMessage(msg.wParam);
+            PostQuitMessage((int)msg.wParam);
             break;
         }
     }

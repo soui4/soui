@@ -29,7 +29,7 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
     /**
      * @brief 设置事件的发送对象ID
      * @param id int--发送对象ID
-     * @return
+     * @return void
      */
     STDMETHOD_(void, SetIdFrom)(THIS_ int id) PURE;
 
@@ -42,7 +42,7 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
     /**
      * @brief 设置事件发送对象Name
      * @param name LPCWSTR--事件发送对象Name
-     * @return
+     * @return void
      */
     STDMETHOD_(void, SetNameFrom)(THIS_ LPCWSTR name) PURE;
 
@@ -55,7 +55,7 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
     /**
      * @brief 设置事件的冒泡传递
      * @param bBubbleUp BOOL, FALSE--中止传递
-     * @return
+     * @return void
      */
     STDMETHOD_(void, SetBubbleUp)(THIS_ BOOL bBubbleUp) PURE;
 
@@ -67,13 +67,13 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
 
     /**
      * @brief 增加事件处理计数
-     * @return
+     * @return void
      */
     STDMETHOD_(void, IncreaseHandleCount)(THIS) PURE;
 
     /**
      * @brief 获取事件对象关联的数据结构体指针
-     * @return 事件对象关联的数据结构体指针
+     * @return LPVOID 事件对象关联的数据结构体指针
      * @remark 不同事件对象包含不同的数据，获取指针再转换为结构体指针。主要给C接口使用。
      */
     STDMETHOD_(LPVOID, Data)(THIS) PURE;
@@ -89,18 +89,21 @@ DECLARE_INTERFACE_(IEvtArgs, IObject)
 #define INTERFACE IEvtSlot
 DECLARE_INTERFACE_(IEvtSlot, IObjRef)
 {
-    //!添加引用
+    //! 添加引用
     /*!
+     * @return long - 当前引用计数
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!释放引用
+    //! 释放引用
     /*!
+     * @return long - 当前引用计数
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!释放对象
+    //! 释放对象
     /*!
+     * @return void
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
@@ -120,7 +123,7 @@ DECLARE_INTERFACE_(IEvtSlot, IObjRef)
     /**
      * @brief 判断两个IEvtSlot是否相等
      * @param sour IEvtSlot * 比较的IEvtSlot
-     * @return
+     * @return BOOL TRUE--相等, FALSE--不相等
      */
     STDMETHOD_(BOOL, Equal)(CTHIS_ const IEvtSlot *sour) SCONST PURE;
 
