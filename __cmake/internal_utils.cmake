@@ -44,10 +44,12 @@ macro(config_compiler_and_linker)
         message("-- Building with MT")
         add_compile_options($<$<CONFIG:Debug>:/MTd>)    # Runtime Library: /MTd = MultiThreaded Debug Runtime
         add_compile_options($<$<CONFIG:Release>:/MT>)   # Runtime Library: /MT  = MultiThreaded Runtime
+        set(BUILD_CONF_MT "1")
       else()
         message("-- Building with MD")
         add_compile_options($<$<CONFIG:Debug>:/MDd>)    # Runtime Library: /MDd = MultiThreadedDLL Debug Runtime
         add_compile_options($<$<CONFIG:Release>:/MD>)   # Runtime Library: /MD  = MultiThreadedDLL Runtime
+        set(BUILD_CONF_MT "0")
      endif(NOT SHARED_CRT)
     endif(MSVC)
     if (NOT WCHAR_AS_DEFAULT)
