@@ -50,7 +50,7 @@ function CreateCustomProject(strProjectName, strProjectPath) {
             strProjTemplatePath = wizard.FindSymbol('TEMPLATES_PATH');
             strProjTemplatePath += '\\porjectTemplates';
 
-			if (WizardVersion == 10.0)
+	     if (WizardVersion == 10.0)
                 strProjTemplatePath += '\\2010';
             else if (WizardVersion == 11.0)
                 strProjTemplatePath += '\\2012';
@@ -68,10 +68,17 @@ function CreateCustomProject(strProjectName, strProjectPath) {
 
         var strProjTemplate = '';
 
-        if (WizardVersion >= 10.0)
+        if (WizardVersion > 10.0) {
+            var projex = (supportXp32 == 1 ? '1' : '0') + (supportXp64 == 1 ? '1' : '0');
+            strProjTemplate = strProjTemplatePath + '\\default' + projex + '.vcxproj';
+        }else if(WizardVersion == 10.0){
+            //vs2010.WizardVersion==10.0, it need default.vcxproj
             strProjTemplate = strProjTemplatePath + '\\default.vcxproj';
+        }
         else
+        {
             strProjTemplate = strProjTemplatePath + '\\default.vcproj';
+        }
 
         var Solution = dte.Solution;
         var strSolutionName = "";
