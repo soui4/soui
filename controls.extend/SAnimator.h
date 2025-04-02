@@ -1,7 +1,8 @@
-﻿#pragma once
+﻿#ifndef _SANIMATOR_H_
+#define _SANIMATOR_H_
 
-namespace SOUI
-{
+SNSBEGIN
+
 class SAnimator {
   public:
     enum
@@ -81,4 +82,6 @@ class SAnimator {
     LPARAM m_lpUserdata;
     AnimatorStateHandler m_funAnimatorStateHandler;
 };
-} // namespace SOUI
+SNSEND
+
+#endif//_SANIMATOR_H_

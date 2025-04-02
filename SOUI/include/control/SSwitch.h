@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef _SWITCH_H_
+#define _SWITCH_H_
+
 #include <core/SWnd.h>
 
 SNSBEGIN
@@ -50,3 +52,5 @@ SNSBEGIN
 	};
 
 SNSEND
+
+#endif//_SWITCH_H_

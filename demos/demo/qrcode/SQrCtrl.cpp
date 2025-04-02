@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SQrCtrl.h"
 
+SNSBEGIN
 
 SQrCtrl::SQrCtrl()
 {
@@ -157,5 +158,4 @@ void SQrCtrl::CreateQrImg( SStringT strContent )
 	}
 }
 
-
-
+SNSEND

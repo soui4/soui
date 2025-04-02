@@ -51,6 +51,7 @@ endif()
 else()
     add_library(soui4 STATIC ${source})
 endif()
+target_precompile_headers(soui4 PRIVATE "include/souistd.h")
 
 target_include_directories(soui4
   PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}

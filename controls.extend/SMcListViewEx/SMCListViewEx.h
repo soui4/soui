@@ -10,7 +10,9 @@
 *
 * Describe    MCListViewEx控件
 */
-#pragma once
+#ifndef _SMCLISTVIEWEX_H_
+#define _SMCLISTVIEWEX_H_
+
 #include "core/SPanel.h"
 #include "core/SItemPanel.h"
 #include "control/SHeaderCtrl.h"
@@ -20,8 +22,8 @@
 #if _MSC_VER <1600
 #define override
 #endif
-namespace SOUI
-{
+SNSBEGIN
+
 	interface IMcAdapterEx : public IMcAdapter
 	{
 		//按下ctrl时，可以是选中也可能是取消选中
@@ -531,5 +533,5 @@ DECLARE_INTERFACE_(IMcListViewEx, IObjRef)
 		SLayoutSize		m_nHeaderHeight;  /**< 列表头高度 */
 		BOOL            m_bHotTrack;  /**<  */
 	};
-
-}//end of namespace
+SNSEND
+#endif//_SMCLISTVIEWEX_H_

@@ -1,7 +1,8 @@
-﻿#pragma once
+﻿#ifndef _SPROPTYITEM_I_H_
+#define _SPROPTYITEM_I_H_
 
-namespace SOUI
-{
+SNSBEGIN
+
     #define IC_FIRST    (IPropertyItem *)0
     #define IC_LAST     (IPropertyItem *)1
 
@@ -72,4 +73,6 @@ namespace SOUI
         virtual void UpdateData() =0;
     };
 
-}
+SNSEND
+
+#endif//_SPROPTYITEM_I_H_

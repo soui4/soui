@@ -10,7 +10,9 @@
  *
  * Describe
  */
-#pragma once
+#ifndef _SSHELL_TRAY_H_
+#define _SSHELL_TRAY_H_
+
 #include <shellapi.h>
 #include <core/SWnd.h>
 #include <core/SNativeWnd.h>
@@ -26,8 +28,8 @@
 #endif // !ID_TASKBARICON
 #define ANI_TIMER_ID 8
 
-namespace SOUI
-{
+SNSBEGIN
+
 	struct IShellTrayListener
 	{
 		virtual void NextFrame() = 0;
@@ -123,4 +125,7 @@ namespace SOUI
 		int m_iDefIcon, m_iCurFrame, m_iStartFrame, m_iDuration;
 		bool m_bRunAni;
 	};
-}
+
+SNSEND
+
+#endif//_SSHELL_TRAY_H_

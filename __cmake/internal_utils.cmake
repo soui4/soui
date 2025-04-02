@@ -39,15 +39,17 @@ macro(config_compiler_and_linker)
     #
     # 修正编译参数
     #
-    if (NOT SHARED_CRT)
+    if (MSVC)
+      if(NOT SHARED_CRT)
         message("-- Building with MT")
-        FIX_DEFAULT_COMPILER_SETTINGS_MT()
-        set(BUILD_CONF_MT "1")
-    else()
+        add_compile_options($<$<CONFIG:Debug>:/MTd>)    # Runtime Library: /MTd = MultiThreaded Debug Runtime
+        add_compile_options($<$<CONFIG:Release>:/MT>)   # Runtime Library: /MT  = MultiThreaded Runtime
+      else()
         message("-- Building with MD")
-        set(BUILD_CONF_MT "0")
-    endif()
-
+        add_compile_options($<$<CONFIG:Debug>:/MDd>)    # Runtime Library: /MDd = MultiThreadedDLL Debug Runtime
+        add_compile_options($<$<CONFIG:Release>:/MD>)   # Runtime Library: /MD  = MultiThreadedDLL Runtime
+     endif(NOT SHARED_CRT)
+    endif(MSVC)
     if (NOT WCHAR_AS_DEFAULT)
         FIX_DEFAULT_COMPILER_SETTINGS_WCHAR()
         set(BUILD_CONF_WCHAR "0")

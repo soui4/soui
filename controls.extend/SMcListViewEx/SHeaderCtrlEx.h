@@ -10,12 +10,11 @@
  *
  * Describe
  */
-#pragma once
-
+#ifndef _SHEADERCTRLEX_H_
+#define _SHEADERCTRLEX_H_
 
 #include "control/SHeaderCtrl.h"
-namespace SOUI
-{
+SNSBEGIN
 	/**
 	 * @class     SHeaderCtrlEx
 	 * @brief     表头控件
@@ -64,4 +63,5 @@ namespace SOUI
 		BOOL		m_bDrawSplitLine;
 		CPoint		m_Offset;
 	};
-}//end of namespace SOUI
+SNSEND
+#endif//_SHEADERCTRLEX_H_

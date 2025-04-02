@@ -3,7 +3,7 @@
 # 生成主要的SOUI库和demo
 # 使用帮助
 #
-# 使用cmake 3.4.3 或以上版本
+# 使用cmake 3.16 或以上版本
 # 
 #
 # 目前支持编译的库/可执行程序:
@@ -29,7 +29,7 @@
 # 1394020320@qq.com
 #
 
-cmake_minimum_required(VERSION 3.1)
+cmake_minimum_required(VERSION 3.16)
 project(SOUI4)
 set(CMAKE_CXX_STANDARD 11)
 

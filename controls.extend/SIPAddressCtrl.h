@@ -6,10 +6,10 @@
 
     purpose:	SOUI版的IP控件
 *********************************************************************/
-#pragma once
+#ifndef _SIPADDR_CTRL_H_
+#define _SIPADDR_CTRL_H_
 
-namespace SOUI
-{
+SNSBEGIN
 
 class SEditIP;
 
@@ -59,4 +59,6 @@ class SIPAddressCtrl : public SWindow {
     SEditIP *m_editFields[4];
     BYTE m_ipFields[4];
 };
-} // namespace SOUI
+SNSEND
+
+#endif//_SIPADDR_CTRL_H_

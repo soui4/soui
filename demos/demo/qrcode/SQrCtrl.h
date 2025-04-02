@@ -1,6 +1,10 @@
-﻿#pragma once
+﻿#ifndef _SQRCTRL_H_
+#define _SQRCTRL_H_
+
 #include "QR_Encode.h"
 #include "control/SCmnCtrl.h"
+
+SNSBEGIN
 
 class SQrCtrl :public SImageWnd
 {
@@ -23,3 +27,5 @@ private:
 	CRect m_QrRect;
 };
 
+SNSEND
+#endif//_SQRCTRL_H_

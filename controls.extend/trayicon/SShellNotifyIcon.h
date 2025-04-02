@@ -10,7 +10,9 @@
  * 
  * Describe     
  */
-#pragma once
+#ifndef _SSHELLNOTIFYICON_H_
+#define _SSHELLNOTIFYICON_H_
+
 #include <shellapi.h>
 #define WM_ICONNOTIFY (WM_USER + 1101) 
 
@@ -66,3 +68,4 @@ protected:
 	HICON m_hIconArray[MOVE_ICON];//托盘区动画图标数组
 };
 
+#endif//_SSHELLNOTIFYICON_H_

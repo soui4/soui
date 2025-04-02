@@ -944,7 +944,7 @@ else()
         "src/gpu/gl/unix/GrGLCreateNativeInterface_unix.cpp"
     )
 endif()
-message("...........plat....${CMAKE_GENERATOR_PLATFORM}")
+#message("...........plat....${CMAKE_GENERATOR_PLATFORM}")
 if(("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64") OR (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64") OR (CMAKE_SYSTEM_PROCESSOR MATCHES "arm"))
 set(srcs
     ${srcs}

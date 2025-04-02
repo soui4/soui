@@ -1,9 +1,10 @@
-﻿#pragma once
+﻿#ifndef _SPROPTYITEM_SIZE_H_
+#define _SPROPTYITEM_SIZE_H_
 
 #include "SPropertyItem-Text.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
     class SPropertyItemSize : public SPropertyItemText
     {
 		friend class SPropertyGrid;
@@ -44,4 +45,5 @@ namespace SOUI
     protected:
         SPropertyItemSize(SPropertyGrid *pOwner);
     };
-}
+SNSEND
+#endif//_SPROPTYITEM_SIZE_H_

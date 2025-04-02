@@ -1,9 +1,11 @@
-﻿#pragma once
+﻿#ifndef _SPROPTYITEM_TEXT_H_
+#define _SPROPTYITEM_TEXT_H_
+
 
 #include "../SPropertyItemBase.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
     class SPropertyItemText : public SPropertyItemBase
     {
 		friend class SPropertyGrid;
@@ -37,4 +39,6 @@ namespace SOUI
     protected:
         SPropertyItemText(SPropertyGrid *pOwner);
     };
-}
+SNSEND
+
+#endif//_SPROPTYITEM_TEXT_H_

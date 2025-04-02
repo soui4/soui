@@ -1,10 +1,12 @@
-﻿#pragma once
+﻿#ifndef _SPROPERTY_GRID_H
+#define _SPROPERTY_GRID_H
 
 #include <control/SListbox.h>
 #include "SPropertyItemBase.h"
 #include "propitem/SPropertyItem-Group.h"
-namespace SOUI
-{
+
+SNSBEGIN
+
 	enum{
 		EVT_PG_VALUECHANGED = EVT_EXTERNAL_BEGIN+100,
 		EVT_PG_ITEMACTIVE,
@@ -174,4 +176,6 @@ namespace SOUI
 		SXmlDoc m_inplaceItemProp;
 	};
 
-}
+SNSEND
+
+#endif//_SPROPERTY_GRID_H

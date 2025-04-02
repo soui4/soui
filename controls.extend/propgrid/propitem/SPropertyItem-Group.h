@@ -1,8 +1,10 @@
-#pragma once
+#ifndef _SPROPTYITEM_GROUP_H_
+#define _SPROPTYITEM_GROUP_H_
+
 #include "../SPropertyItemBase.h"
 
 
-namespace SOUI{
+SNSBEGIN
 
 class SPropertyGroup : public SPropertyItemBase
 {
@@ -19,4 +21,5 @@ protected:
 	SPropertyGroup(SPropertyGrid *pOwner);
 };
 
-}
+SNSEND
+#endif//_SPROPTYITEM_GROUP_H_

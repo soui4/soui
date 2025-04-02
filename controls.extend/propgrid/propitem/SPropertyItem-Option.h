@@ -1,10 +1,11 @@
-﻿#pragma once
+﻿#ifndef _SPROPTYITEM_OPTION_H_
+#define _SPROPTYITEM_OPTION_H_
 
 #include "../SPropertyItemBase.h"
 #include <souicoll.h>
 
-namespace SOUI
-{
+SNSBEGIN
+
     class SPropertyItemOption : public SPropertyItemBase
     {
 		friend class SPropertyGrid;
@@ -53,4 +54,5 @@ namespace SOUI
     protected:
         SPropertyItemOption(SPropertyGrid *pOwner);
     };
-}
+SNSEND
+#endif//_SPROPTYITEM_OPTION_H_

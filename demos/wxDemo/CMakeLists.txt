@@ -34,7 +34,7 @@ target_link_libraries(wxDemo soui4 utilities4)
 else()
 target_link_libraries(wxDemo soui4 utilities4 dl)
 endif()
-
+target_precompile_headers(wxDemo PRIVATE "stdafx.h")
 set_target_properties (wxDemo PROPERTIES
     FOLDER demos
 )

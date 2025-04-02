@@ -1,11 +1,12 @@
-﻿#pragma once
+﻿#ifndef _SPROPTYITEM_COLOR_H_
+#define _SPROPTYITEM_COLOR_H_
 
 #include "SPropertyItem-Text.h"
 #include "../colorpicker/SColorPicker.h"
 #include "../colorpicker/ColourPopup.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
     class SPropertyItemColor : public SPropertyItemText,public IColorPicker
     {
 		friend class SPropertyGrid;
@@ -48,4 +49,6 @@ namespace SOUI
 		virtual void OnColorEnd(BOOL bCancel,COLORREF cr);
 		virtual IMessageLoop * GetMsgLoop();
     };
-}
+SNSEND
+
+#endif//_SPROPTYITEM_COLOR_H_

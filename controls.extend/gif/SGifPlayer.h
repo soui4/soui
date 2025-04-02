@@ -1,9 +1,10 @@
-﻿#pragma once
+﻿#ifndef _SGIFPLAYER_H_
+#define _SGIFPLAYER_H_
+
 #include <core/SWnd.h>
 #include "SSkinAni.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 	DEF_EVT_EXT(EventGifPlayOver,EVT_EXTERNAL_BEGIN + 600,{});
 	
@@ -98,4 +99,6 @@ namespace SOUI
 		BOOL	m_bLoop;
    };
 
-}
+SNSEND
+
+#endif//_SGIFPLAYER_H_
