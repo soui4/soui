@@ -1,4 +1,7 @@
-#pragma once
+#ifndef _SDOCHOSTUIHANDLER_H_
+#define _SDOCHOSTUIHANDLER_H_
+
+#ifdef _WIN32
 
 #include <atl.mini/SComHelper.h>
 #include <atl.mini/SComCli.h>
@@ -7,8 +10,8 @@
 #include <vector>
 #include <string>
 
-namespace SOUI
-{
+SNSBEGIN
+
 struct IScriptCaller
 {
     virtual ~IScriptCaller()
@@ -140,4 +143,8 @@ class SDocHostUIHandler : public SUnknownImpl<IDocHostUIHandler> {
 };
 
 VARIANT ExecuteScript(IWebBrowser2 *pWebBrowser, const SStringW &fun, SArray<SStringW> &params);
-} // namespace SOUI
+
+SNSEND
+
+#endif//_WIN32
+#endif//_SDOCHOSTUIHANDLER_H_

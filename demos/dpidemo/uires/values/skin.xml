@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+
+<skin>
+  <imglist name="scale_pic"	src="img:pic_100"/>
+  <imgframe2 name="chat_bg" src="img:chat.9"/>
+  <shape name="shape_test" shape="oval">
+    <corners radius="5dp"/>
+    <size width="100dp" height="100dp"/>
+    <solid1 color="#ff0000"/>
+    <stroke style="solid" width="2dp" color="#00ff00"/>
+    <gradient type="sweep" startColor="#ff0000" centerColor="#00ff00" endColor="#0000ff" angle="45" radius="20dp"/>
+  </shape>
+</skin>

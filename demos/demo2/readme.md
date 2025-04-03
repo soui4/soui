@@ -1,0 +1,1 @@
+demo2主要演示如何在C语言中使用SOUI提供的COM接口调用SOUI功能。

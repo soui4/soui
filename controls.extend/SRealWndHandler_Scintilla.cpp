@@ -15,7 +15,7 @@ namespace SOUI
 	HWND SRealWndHandler_Scintilla::OnRealWndCreate( IWindow *pReal )
 	{
 		SAutoRefPtr<IRealWnd> pRealWnd;
-		pReal->QueryInterface(__uuidof(IRealWnd),(IObjRef**)&pRealWnd);
+		pReal->QueryInterface(IID_IRealWnd,(IObjRef**)&pRealWnd);
 		if(pRealWnd->GetRealClassName()->CompareNoCase(CScintillaWnd::GetScintillaWndClass())==0)
 		{
 			CScintillaWnd *pWnd=new CScintillaWnd();
@@ -37,7 +37,7 @@ namespace SOUI
 	void SRealWndHandler_Scintilla::OnRealWndDestroy( IWindow *pWnd )
 	{
 		SAutoRefPtr<IRealWnd> pRealWnd;
-		pWnd->QueryInterface(__uuidof(IRealWnd),(IObjRef**)&pRealWnd);
+		pWnd->QueryInterface(IID_IRealWnd,(IObjRef**)&pRealWnd);
 		if(pRealWnd->GetRealClassName()->CompareNoCase(CScintillaWnd::GetScintillaWndClass())==0)
 		{
 			CScintillaWnd *pWnd=(CScintillaWnd *)pRealWnd->GetData();
@@ -64,7 +64,7 @@ namespace SOUI
 	BOOL SRealWndHandler_Scintilla::OnRealWndPosition(IWindow *pWnd, const RECT *rcWnd)
 	{
 		SAutoRefPtr<IRealWnd> pRealWnd;
-		pWnd->QueryInterface(__uuidof(IRealWnd),(IObjRef**)&pRealWnd);
+        pWnd->QueryInterface(IID_IRealWnd, (IObjRef **)&pRealWnd);
 		HWND hRealWnd = pRealWnd->GetRealHwnd(TRUE);
 		if(IsWindow(hRealWnd))
 		{

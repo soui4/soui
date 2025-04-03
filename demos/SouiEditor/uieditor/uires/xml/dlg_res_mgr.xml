@@ -1,0 +1,47 @@
+<?xml version="1.0"?>
+<SOUI name="skinSel_mainWindow" title="资源管理" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="800" height="720" margin="5,5,5,5" resizable="1" wndType="8" toolWindow="1">
+	<root colorBkgnd="#2d2d30" colorText="#FFFFFF" margin="1" colorBorder="#ff0000">
+			<window pos="0,0,-0,-0" layout="vbox">
+				<window size="-2,30" colorBkgnd="#0063b1" colorText="#FFFFFF">
+					<caption pos="0,0,-0,30" show="1" font="adding:0">
+						<icon name="NAME_UIDESIGNER_main_icon" skin="skin_main_icon" pos="8,9" />
+					</caption>
+					<text pos="29,|0" offset="0, -0.5" class="CLASS_UIDESIGNER_ue_cls_title">资源管理</text>
+					<imgbtn id="IDCANCEL" skin="_skin.sys.btn.close" pos="-45,0" tip="close" animate="1" />
+				</window>
+        <window size="-2,0" weight="1" layout="vbox" padding="10,0,10,10" interval="10">
+				  <window size="-2, 0" weight="1" layout="vbox">
+            <window size="-2, 0" weight="1" layout="hbox" interval="10">
+              <window size="220, -2" layout="vbox" colorBkgnd="#ffffff20">
+                <window colorText="#FFFFFF">
+                  <imgbtn name="NAME_UIDESIGNER_btn_ZYLX_new" size="110,30" skin="skin_app_button2">新建资源类型</imgbtn>
+                  <imgbtn name="NAME_UIDESIGNER_btn_ZYLX_DEL" size="110,30" skin="skin_app_button2">移除资源类型</imgbtn>
+                </window>
+                <listbox name="NAME_UIDESIGNER_LB_ZYLX" width="-2" weight="1" extend="0,5,0,0" hotTrack="1" itemHeight="30" colorText="#FFFFFF" colorSelText="#FFFFFF" colorItemSelBkgnd="rgb(234,128,16)" text-x="20" />
+              </window>
+              <window size="0,-2" weight="1" layout="vbox" colorBkgnd="#ffffff20">
+                <window colorText="#FFFFFF">
+                  <imgbtn name="NAME_UIDESIGNER_btn_ZY_NEW" size="92,30" skin="skin_app_button2">新建资源</imgbtn>
+                  <imgbtn name="NAME_UIDESIGNER_btn_ZY_DEL" size="92,30" skin="skin_app_button2">移除资源</imgbtn>
+                  <imgbtn name="NAME_UIDESIGNER_btn_ZY_NEWALL" size="92,30" skin="skin_app_button2" visible="0">批量导入</imgbtn>
+                </window>
+                <edit size="-2,20" extend="0,5,0,5" name="NAME_UIDESIGNER_edit_SEARCH" cueText="过滤" />
+                <listview name="lv_res_path" size="-2,0" weight="1"  hotTrack="1">
+                  <template itemHeight="30" colorText="#FFFFFF" colorSelText="#FFFFFF" colorSelected="rgb(234,128,16)" layout="hbox">
+                    <text name="txt_name" size="150,-2" colorText="@color/white"/>
+                    <text name="txt_path" size="0,-2" weight="1" colorText="@color/white"/>
+                  </template>
+                </listview>
+              </window>
+            </window>
+            <group size="-2,200" colorText="#ffffffff">
+              <imgcanvas pos="20,20,-20,-20" name="NAME_UIDESIGNER_IMG_VIEW" clipClient="1" colorBkgnd="#ffffa0" colorText="#0000cc" />
+              图片预览
+              <text pos="10, 0" name="sel_image_size">900*900</text>
+            </group>
+          </window>
+          <imgbtn name="btnOK" size="90,30" colorText="#FFFFFF" skin="skin_app_button2" layout_gravity="right">确定</imgbtn>
+        </window>
+      </window>
+	</root>
+</SOUI>

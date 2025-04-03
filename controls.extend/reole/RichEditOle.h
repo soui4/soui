@@ -1,6 +1,8 @@
 ﻿#if !defined(AFX_OLERICHEDITCTRL_H__3DFF15EE_7336_4297_9620_7F00B611DAA1__INCLUDED_)
 #define AFX_OLERICHEDITCTRL_H__3DFF15EE_7336_4297_9620_7F00B611DAA1__INCLUDED_
 
+#ifdef _WIN32
+
 #if _MSC_VER > 1000
 #pragma once
 #endif // _MSC_VER > 1000
@@ -289,4 +291,5 @@ protected:
 
 BOOL SetSRicheditOleCallback(SRichEdit *pRichedit,FunCreateSource pCreateSource = NULL);
 
+#endif//_WIN32
 #endif // !defined(AFX_OLERICHEDITCTRL_H__3DFF15EE_7336_4297_9620_7F00B611DAA1__INCLUDED_)

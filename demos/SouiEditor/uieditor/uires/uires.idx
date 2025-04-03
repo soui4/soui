@@ -1,0 +1,49 @@
+<?xml version="1.0"?>
+<resource>
+	<UIDEF>
+		<file name="XML_INIT" path="uidef\init.xml" />
+	</UIDEF>
+	<LAYOUT>
+		<file name="xml_messagebox" path="xml\messagebox.xml" />
+		<file name="XML_MAINWND" path="xml\dlg_main.xml" />
+		<file name="xml_mainwnd_left" path="xml\dlg_main_left.xml" />
+		<file name="xml_mainwnd_right" path="xml\dlg_main_right.xml" />
+		<file name="xml_uidesigner_main" path="xml\dlg_uidesigner.xml" />
+		<file name="xml_res_mgr" path="xml\dlg_res_mgr.xml" />
+		<file name="UIDESIGNER_XML_NEW_LAYOUT" path="xml\dlg_new_layout.xml" />
+		<file name="UIDESIGNER_XML_NEW_SKIN" path="xml\dlg_new_skin.xml" />
+		<file name="UIDESIGNER_XML_INPUT" path="xml\dlg_input.xml" />
+		<file name="UIDESIGNER_XML_ABOUT" path="xml\dlg_about.xml" />
+		<file name="UIDESIGNER_XML_INSERT_ELEMENT" path="xml\dlg_insert_element.xml" />
+	</LAYOUT>
+	<values>
+		<file name="string" path="values\string.xml" />
+		<file name="color" path="values\color.xml" />
+		<file name="skin" path="values\skin.xml" />
+	</values>
+	<IMG>
+		<file name="icon_main" path="image\soui.png" />
+		<file name="caption_line" path="image\caption_line.png" />
+		<file name="png_tool_button" path="image\tool_button.png" />
+		<file name="png_prop_switch" path="image\propswitch.png" />
+		<file name="png_tab_skin" path="image\tab_skin.png" />
+		<file name="png_btn_blue" path="image\msg_btn_blue.png" />
+		<file name="png_app_button" path="image\app_button.png" />
+		<file name="default.scrollbar" path="image\default.scrollbar.png" />
+		<file name="open_menu_png" path="image\open_menu.png" />
+		<file name="tree_toggle_png" path="image\tree_toggle.png" />
+		<file name="menu_skin_png" path="image\menu_skin.png" />
+		<file name="menu_sep_png" path="image\menu_sep.png" />
+		<file name="png_logo" path="image\logo.png" />
+		<file name="png_toolbar_state" path="image\toolbar_state.png" />
+		<file name="png_toolbar_prop" path="image\tb_prop.png" />
+		<file name="png_btn_help" path="image\btn_help.png" />
+	</IMG>
+	<ICON>
+		<file name="ICON_logo" path="image\soui.ico" />
+	</ICON>
+	<smenu>
+		<file name="menu_layoutfile" path="smenu\menu_layoutfile.xml" />
+		<file name="menu_recent" path="smenu\menu_recent.xml" />
+	</smenu>
+</resource>

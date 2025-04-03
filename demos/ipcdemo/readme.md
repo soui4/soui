@@ -1,0 +1,2 @@
+ipcdemo用来演示如何使用sipcobject实现IPC功能。
+使用sipcobject可以实现类似本线程的本地函数调用功能。

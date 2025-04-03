@@ -1,0 +1,37 @@
+﻿<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="600" height="400" sendWheel2Hover="1" margin="5,5,5,5"  resizable="1" wndType="appMain"
+appWnd="1"
+translucent="1"
+>
+  <root >
+    <window size="-2,-2" colorText="@color/white" colorBkgnd ="@color/gray" margin="1,1,1,1" colorBorder="#000000">
+      <caption pos="0,0,-0,30" colorBkgnd="#00000033">
+        <icon pos="10,8" src="ICON_LOGO:16"/>
+        <text pos="29,9">@string/title</text>
+        <imgbtn name="btn_close" skin="_skin.sys.btn.close"  pos="-45,0" tip="close" animate="1"/>
+        <imgbtn name="btn_max" skin="_skin.sys.btn.maximize"  pos="-83,0" animate="1" />
+        <imgbtn name="btn_restore" skin="_skin.sys.btn.restore"  pos="-83,0" show="0" animate="1" />
+        <imgbtn name="btn_min" skin="_skin.sys.btn.minimize" pos="-121,0" animate="1" />
+      </caption>
+      <window pos="0,[,-0,-0" layout="hbox">
+        <listbox text-x="8" size="128,-2" name="lb_catetory" itemHeight="30"/>
+        <listview size="0,-2" weight="1" name="lv_thumbnail">
+          <template itemHeight="400" colorHover="#cccccc" colorSelected="#0000ff" trackMouseEvent="1">
+            <window size="-2,-2" layout="hbox" colorBkgnd="#cccccc">
+              <window size="0,-2" weight="2" layout="vbox">
+                <img size="-2,0" weight="2" name="img_1" id="500" msgTransparent="0"/>
+                <window size="-2,0" weight="1" layout="hbox">
+                  <img size="0,-2" weight="1" name="img_2"  id="501" msgTransparent="0"/>
+                  <img size="0,-2" weight="1" name="img_3"  id="502" msgTransparent="0"/>
+                </window>
+              </window>
+              <window size="0,-2" weight="1" layout="vbox">
+                <img size="-2,0" weight="1" name="img_4"  id="503" msgTransparent="0"/>
+                <img size="-2,0" weight="1" name="img_5"  id="504" msgTransparent="0"/>
+              </window>
+            </window>
+          </template>
+        </listview>
+      </window>
+    </window>
+  </root>
+</SOUI>

@@ -1,5 +1,6 @@
 ﻿// RichEditOle.cpp : implementation file
 //
+#ifdef _WIN32
 #include "stdafx.h"
 #include "RichEditOle.h"
 #include <atl.mini/SComHelper.h>
@@ -741,3 +742,5 @@ BOOL SetSRicheditOleCallback(SRichEdit *pRichedit,FunCreateSource pCreateSource 
     pHost->Release();
     return bRet;
 }
+
+#endif//_WIN32

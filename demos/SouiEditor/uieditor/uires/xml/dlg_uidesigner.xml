@@ -1,0 +1,31 @@
+<?xml version="1.0"?>
+	<splitrow name="xml_editor" sepSkin="" pos="1,[0,-0,-0" sepSize="6">
+		<pane idealSize="10" minSize="10" priority="0" clipClient="1">
+      <realwnd pos="0, 0, -0, -0" name="uidesigner_wnd_layout" wndclass="designer_wnd" id="100000" wndname="designer_wnd">
+        <params>
+          <root colorBkgnd="@color/bkBlack1">
+            <img size="-2,-2" skin="skin_logo" keepAspect="1"/>
+          </root>
+        </params>
+      </realwnd>
+		</pane>
+		<pane idealSize="300" minSize="30" priority="1" clipClient="1" layout="vbox">      
+      <listview size="-2,50" name="lv_tb_skin" display="0" vertical="0" visible="0">
+        <template skin="skin_toolbar_state" itemWidth="100" layout="hbox" gravity="center" clipClient="1" interval="5">
+          <window size="0,0" visible="0" weight="1"/>
+          <img name="item_icon" skin="skin_icon"/>
+          <text name="item_text"/>
+          <window size="0,0" visible="0" weight="1"/>
+        </template>
+      </listview>
+      <listview size="-2,50" name="lv_tb_widget" display="0" vertical="0" visible="0">
+        <template skin="skin_app_button" layout="hbox" itemWidth="110" gravity="center" clipClient="1" interval="5">
+          <window size="0,0" visible="0" weight="1"/>
+          <img name="item_icon" skin="widget_icons"/>
+          <text name="item_text"/>
+          <window size="0,0" visible="0" weight="1"/>
+        </template>
+      </listview>
+      <realwnd size="-2,0" weight="1" name="uidesigner_scintilla" wndclass="scintilla" id="100000" wndname="scintilla"/>
+    </pane>
+  </splitrow>

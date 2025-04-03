@@ -1,0 +1,762 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<root>
+  <toolbar>
+    <icons class_name="imglist" name="widget_icons" src="file:img/ctrl_icons.png" states="32"/>
+  </toolbar>
+  <controls>
+    <!-- pos和size都不是必须的，设计器根据鼠标按下的位置设置pos -->
+    <!-- 控件的大小最好是8的倍数，方便对齐 -->
+
+    <SOUI  icon="0">
+      <SOUI name="window" title="布局" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="400" height="300" margin="1,5,5,5" wndType="8" toolWindow="1"></SOUI>
+        <groups>
+        <propgroup name="属性: SOUI">
+          <proptext name ="trCtx"  description="在语言翻译时作为context使用"/>
+          <proptext name ="title"  description="宿主窗口标题"/>
+          <proptext name ="width" description="默认宿主宽度"/>
+          <proptext name ="height" description="默认宿主高度"/>
+
+          <proptext name ="maxInset"  />
+
+          <proprect name ="margin" description="窗口拉伸调节区尺寸"/>
+          <propsize name ="minsize" description="最小尺寸" />
+          <proptext name ="wndStyle" description="宿主样式,16进制"/>
+          <proptext name ="wndStyleEx" description="拓展样式,16进制"/>
+          <propoption name ="resizable" options="是:1|否:0" description="大小可变标志"/>
+          <propoption name ="translucent" options="是:1|否:0" description="宿主半透明标志"/>
+          <propoption name ="sendWheel2Hover" options="是:1|否:0" description="将滚轮消息发送到hover窗口"/>
+          <propoption name ="appWnd" options="是:1|否:0"  description="APP窗口，是否在任务栏上显示按钮"/>
+          <propoption name ="toolWindow" options="是:1|否:0" description="设置WS_ES_TOOLWINDOW属性"/>
+          <proptext name ="smallIcon" description="小图标资源, 格式[资源ID:尺寸]" />
+          <proptext name ="bigIcon" description="大图标资源, 格式[资源ID:尺寸]" />
+          <proptext name="alpha" description="宿主透明度,0-255"/>
+          <propoption name ="allowSpy" options="是:1|否:0" description="在编译的SOUI关闭DISABLE_SWNDSPY宏的情况下，通过该属性来控制当前窗口是不允许Spy"/>
+          <propoption name ="appMainWnd" options="是:1|否:0" description="窗口显示时是否在任务栏显示按钮"/>
+          <propoption name ="wndType"  options="undefine|appMain|normal" description="主窗口标志,有该appMain标志的窗口关闭时自动发送WM_QUIT"/>
+        </propgroup>
+      </groups>
+    </SOUI>
+
+    <base visible="0">
+      <groups>
+        <propgroup title="属性:SObject"  description="属性" expanded="false">
+          <proptext title="name" name="name" value="" description="Object Name"/>
+          <proptext title="ID" name="id" value="" description="Object ID"/>
+        </propgroup>
+      </groups>
+    </base>
+
+    <layout_soui visible="0">
+      <groups>
+        <propgroup title="锚点布局属性"  description="父窗口为锚点布局时有效的属性"  expanded="false">
+          <proptext title="位置" name ="pos" description="“|”代表参考父窗口的中心
+				      &#x000A;“%”代表在父窗口的百分比，可以是小数，负数
+				      &#x000A;“[”相对于前一兄弟窗口的右值(right,bottom)
+				      &#x000A;“]”相对于后一兄弟窗口的左值(left,top)
+				      &#x000A;“{”相对于前一兄弟窗口的左值(left,top)
+				      &#x000A;“}”相对于后一兄弟窗口的右值(right,bottom)			
+	            &#x000A;“@”标志用来指定窗口的大小，只能出现在pos属性的第3，4个值中，用来标识窗口的宽度。当后面的值为负时，代表自动计算窗口的宽度或者高度" />
+          <propsize title="偏移" name="offset" childrenTitles="水平偏移系数|垂直偏移系数" description="根据pos确定位置后再做偏移，单位为控件大小" />
+        </propgroup>
+      </groups>
+    </layout_soui>
+    <layout_grid visible="0">
+      <groups>
+        <propgroup title="网格布局属性"  description="父窗口为网格布局时有效的属性"  expanded="false">
+          <proptext name ="xInterval" description="Grid布局子控件的水平间距"/>
+          <proptext name ="yInterval" description="Grid布局子控件的垂直间距"/>
+          <propoption name ="xGravity" options="左:left|上:top|中:center|右:right|下:bottom|填充:fill" description="Grid布局子控件的水平对齐方式"/>
+          <propoption name ="yGravity" options="左:left|上:top|中:center|右:right|下:bottom|填充:fill" description="Grid布局子控件的垂直对齐方式"/>
+          <proptext name ="columnCount" description="Grid布局列数"/>
+          <proptext name ="rowCount" description="Grid布局行数"/>
+
+          <proptext name ="rowSpan" description="Grid布局,子控件行合并" />
+          <proptext name ="columnSpan" description="Grid布局,子控件列合并" />
+          <propoption name ="layout_xGravity" options="左:left|上:top|中:center|右:right|下:bottom|填充:fill" description="Grid布局,相对于父控件的水平对齐方式" />
+          <propoption name ="layout_yGravity" options="左:left|上:top|中:center|右:right|下:bottom|填充:fill" description="Grid布局,相对于父控件的垂直对齐方式" />
+          <proptext name ="columnWeight" description="Grid布局,子控件占用几列" />
+          <proptext name ="rowWeight" description="Grid布局,子控件占用几行" />
+        </propgroup>
+      </groups>
+    </layout_grid>
+    <layout_linear visible="0">
+      <groups>
+        <propgroup title="线性布局属性"  description="父窗口为线性布局时有效的属性"  expanded="false">
+          <propoption name ="orientation" options="horizontal|vertical" description="排列方式,默认水平布局" />
+          <proptext name ="weight" description="父窗口在根据size属性布局完所有子窗口后，在当前布局方向上剩下的空间的分配权重" />
+        </propgroup>
+      </groups>
+    </layout_linear>
+
+    <window icon="0" parent="base|layout_linear|layout_soui|layout_grid">
+      <window/>
+      <groups>
+        <propgroup title="属性:SWindow"  description="属性">
+          <proptext title="text" name="text" value="" description="text value"/>
+          <propoption title="水平对齐" name="align" value="" options="left|center|right" description="水平对齐方式"/>
+          <propoption title="垂直对齐" name="valign" value="" options="top|middle|bottom" description="垂直对齐方式"/>
+          <propcolor title="背景色" name="colorBkgnd" value="" description="背景颜色，不指定skin时有效"/>
+          <propcolor title="边框颜色" name="colorBorder" value="" description="边框颜色，需要和margin一起使用"/>
+          <proptext title="文本字体" name="font" value="" extendType="font" description="文本字体"/>
+          <proptext title="Hover字体" name="fontHover" value="" extendType="font" description="Hover状态文本字体"/>
+          <proptext title="Push字体" name="fontPush" value="" extendType="font" description="Push状态文本字体"/>
+          <proptext title="Disable字体" name="fontDisable" value="" extendType="font" description="Disable状态文本字体"/>
+          <propcolor title="文本颜色" name="colorText" value="" description="文本颜色"/>
+          <propcolor title="Hover颜色" name="colorTextHover" value="" description="Hover状态文本颜色"/>
+          <propcolor title="Push颜色" name="colorTextPush" value="" description="Push状态文本颜色"/>
+          <propcolor title="Disable颜色" name="colorTextDisable" value="" description="Disable状态文本颜色"/>
+          <proprect title="边框大小" name="margin" childrenTitles="左|上|右|下"  description="框架大小，和colorBorder或者ncSkin配合使用"/>
+          <proprect title="内边距" name="padding" childrenTitles="左|上|右|下"  description="控件内边距，和inset属性相同"/>
+          <propoption title="消息穿透" name="msgTransparent" value="" options="是:1|否:0" description="鼠标消息穿透，为TRUE是，控件不拦截鼠标消息"/>
+          <propoption title="省略号显示文本" name ="dotted" options="是:1|否:0" description="是否支持省略号显示文本" />
+          <proptext title="透明度" name ="alpha" description="数值在0-255之间"/>
+          <propoption title="跟踪鼠标" name ="trackMouseEvent" options="是:1|否:0" description="窗口不在最顶层时可以收到mouseHover,mouseLeave消息" />
+          <propoption title="背景融合" name ="blendBackground" options="是:1|否:0" description="渲染窗口内容和背景混合标志，默认为TRUE，为FALSE代表窗口不需要和背景做融合，如视频显示窗口" />
+
+          <propoption title="皮肤" name="skin"  dropDown="false" extendType="skin"/>
+          <propoption title="边框皮肤" name ="ncskin"  dropDown="false" extendType="skin"/>
+          <propoption title="样式" name ="class"  dropDown="false" extendType="class"/>
+          <propoption title="可用" name ="enable" options="是:1|否:0"/>
+          <propoption  title="可见" name ="visible" options="是:1|否:0" description="和show属性一样"/>
+          <propoption title="画布缓存" name ="cache"  options="是:1|否:0" description="将窗口绘制图像保存到缓存上，以加速渲染"/>
+          <propoption title="隐藏占位" name="display"  options="是:1|否:0" description="控件隐藏时是否占位0不占，1占，默认为1"/>
+          <proptext title="提示" name ="tip" />
+          <proptext title="用户数据" name ="data" />
+          <proptext title="最大宽度" name ="maxWidth"  description="自动计算大小时，窗口的最大宽度"/>
+          <propoption title="裁剪客户区" name ="clipClient"  options="是:1|否:0" description="限制子窗口渲染不超出当前窗口，默认False,可以减少一次裁剪操作"/>
+          <propoption  title="焦点" name ="focusable"  options="是:1|否:0" description="窗口是否可获得焦点标志"/>
+          <propoption  title="焦点虚框" name ="drawFocusRect" options="是:1|否:0" description="drawFocusRect:绘制默认的焦点虚框"/>
+
+          <propsize title="尺寸" name ="size" childrenTitles="宽度|高度" description="-1   窗口自适应内容大小
+			&#x000A;-2   使用父窗口的宽/高" />
+
+          <propoption title="光标" name ="cursor" options="arrow|ibeam|wait|cross|uparrow|size|sizenwse|sizenesw|sizewe|sizens|sizeall|no|hand|help" description="鼠标形状"/>
+          <propoption title="float" name ="float" options="是:1|否:0" description="窗口位置固定不动的标志"/>
+          <propoption  title="layout" name ="layout" options="锚点布局:soui|Grid布局:gridLayout|线性水平:hbox|线性垂直:vbox" description="布局形式"/>
+          <propoption title="gravity" name ="gravity" options="左:left|上:top|中:center|右:right|下:bottom" description="子控件的对齐方式"/>
+          <propoption title="layout_gravity" name ="layout_gravity" options="左:left|上:top|中:center|右:right|下:bottom" description="相对于父控件的对齐方式"/>
+
+
+          <proptext  name="extend" title ="外边距(extend)" description='extend = "0,0,0,0"
+		&#x000A;四个点分别表示左上右下的间距，与margin类似;' />
+
+        </propgroup>
+      </groups>
+    </window>
+
+    <text icon="21" parent="window">
+      <text text="text"/>
+      <groups>
+        <propgroup name="属性:text">
+          <proptext name ="interHeight" description="行间距"/>
+          <propoption name ="wordBreak" options="0|1" description="是否以字符为换行单位"/>
+        </propgroup>
+      </groups>
+    </text>
+
+    <div visible="0" parent="window">
+      <groups>
+        <propgroup title="属性:SPanel"  description="SPanel属性">
+          <propoption name="sbSkin" dropDown="false" extendType="skin" description="滚动条皮肤"/>
+          <proptext name="sbArrowSize" description="滚动条箭头大小"/>
+          <proptext name="sbWid" description="滚动条宽度"/>
+          <propoption name="sbEnable" options="启用:true|禁用:false" description="滚动条启用/禁用"/>
+          <proptext name="updateInterval" description="滚动时刷新时间间隔"/>
+          <proptext name="scrollSpeed" description="滚动速度"/>
+
+          <proptext name="sbLeft" description="滚动左留空"/>
+          <proptext name="sbRight" description="滚动右留空"/>
+          <proptext name="sbTop" description="滚动上留空"/>
+          <proptext name="sbBottom" description="滚动下留空"/>
+
+          <proptext name="sbFadeFrames" description="滚动条动画帧数"/>
+          <proptext name="sbTrumbTrackMinAlpha" description="滚动条滑块最小alpha值"/>
+        </propgroup>
+      </groups>
+    </div>
+
+    <scrollview icon="1" parent="div">
+      <scrollview pos="0,0" size="120,120" viewsize="-1,-1">
+      </scrollview>
+      <groups>
+        <propgroup title="属性:scrollview"  description="scrollview属性">
+          <proptext name="origin-x" description="原点x位置"/>
+          <proptext name="origin-y" description="原点y位置"/>
+          <propsize name="viewSize" description="视图大小"/>
+        </propgroup>
+      </groups>
+    </scrollview>
+
+    <animateimg text="图片动画" icon="2" parent="window">
+      <animateimg pos="0,0" size="96,96" autostart="1"  speed = "100"/>
+      <groups>
+        <propgroup title="属性:animateimg"  description="animateimg属性">
+          <proptext name="speed" description="切换帧时间"/>
+          <propoption name="autoStart" options="启用:true|禁用:false" description="显示时自动播放动画"/>
+          <proptext name="repeat" description="重复播放次数,默认无限循环"/>
+        </propgroup>
+      </groups>
+    </animateimg>
+
+    <button icon="3" parent="window">
+      <button pos="0,0" size="96,32" colorText="#000000" skin="_skin.sys.btn.normal" >按钮</button>
+      <groups>
+        <propgroup title="属性:button"  description="button属性">
+          <proptext name ="accel" description="快捷键"/>
+          <propoption name ="animate" options="无:0|有:1" description="浮动状态是否显示动画"/>
+          <proptext name="animateStep" description="动画切换帧数,帧数越大，动画过度越平滑，耗时越长"/>
+          <propoption name="disableAccelIfInvisible" options="启用:true|禁用:false" description="隐藏时不接收快捷键"/>
+        </propgroup>
+      </groups>
+    </button>
+
+    <calendar icon="4" parent="window">
+      <calendar size="96,96" daySkin="_skin.sys.btn.normal" footerHeight="30"/>
+      <groups>
+        <propgroup title="属性:calendar"  description="calendar属性">
+          <proptext name ="yearHeight" description="年月高度"/>
+          <proptext name ="weekHeight" description="星期高度"/>
+          <proptext name ="todayHeight" description="今天高度"/>
+          <propcolor name ="colorSelText" description="选中日期文字颜色"/>
+          <propcolor name ="colorOtherText" description="其它日期颜色"/>
+          <propcolor name ="colorSelBg" description="选中背景颜色"/>
+          <propcolor name ="colorHoverText" description="浮动日期文字颜色"/>
+          <propoption name="prevSkin" extendType="skin" description="上翻页按钮皮肤"/>
+          <propoption name="nextSkin" extendType="skin" description="下翻页按钮皮肤"/>
+          <propoption name="daySkin" extendType="skin" description="今天按钮皮肤"/>
+          <propoption name="weekSkin" extendType="skin" description="星期按钮皮肤"/>
+
+          <proptext name="textSunday" description="星期天文本，支持多语言"/>
+          <proptext name="textMonday" description="星期一文本，支持多语言"/>
+          <proptext name="textTuesday" description="星期二文本，支持多语言"/>
+          <proptext name="textWednesday" description="星期三文本，支持多语言"/>
+          <proptext name="textThursday" description="星期四文本，支持多语言"/>
+          <proptext name="textFriday" description="星期五文本，支持多语言"/>
+          <proptext name="textSaturday" description="星期六文本，支持多语言"/>
+        </propgroup>
+      </groups>
+
+    </calendar>
+
+    <caption  icon="0" parent="window">
+      <caption size="-2, 32" layout="hbox" gravity="center">
+        <text>标题</text>
+        <window size="0,0" weight="1" visible="0"/>
+        <imgbtn name="btn_min" skin="_skin.sys.btn.minimize" animate="1" />
+        <window>
+          <imgbtn name="btn_max" skin="_skin.sys.btn.maximize"  pos="0,0" animate="1" />
+          <imgbtn name="btn_restore" skin="_skin.sys.btn.restore"  pos="0,0" show="0" animate="1" />
+        </window>
+        <imgbtn name="btn_close" skin="_skin.sys.btn.close" tip="close" animate="1"/>
+      </caption>
+    </caption>
+
+
+    <check icon="5" parent="window">
+      <check checked="0">复选框</check>
+      <groups>
+        <propgroup title="属性:check"  description="check属性">
+          <propoption name ="focusSkin"  extendType="skin" description="焦点状态显示的皮肤"/>
+          <propoption name ="checked" options="是:1|否:0" description="初始化时的选中状态"/>
+        </propgroup>
+      </groups>
+    </check>
+
+    <toggle icon="23" parent="check">
+      <toggle pos="0,0" offset="0,-0.5" name="tgl_switch" skin="_skin.sys.tree.toggle" />
+    </toggle>
+
+    <radio icon="6" parent="window">
+      <radio pos="0,0" size="96,32">radio 1</radio>
+      <propgroup title="属性:radio"  description="radio属性">
+        <propoption name ="focusSkin"  extendType="skin" description="焦点状态显示的皮肤"/>
+        <propoption name ="checked" options="是:1|否:0" description="初始化时的选中状态"/>
+      </propgroup>
+    </radio>
+
+    <combobase visible="0" parent="window">
+      <groups>
+        <propgroup name="属性: combobase" description="combobase属性">
+          <propoption name ="dropDown" options="下拉:1|编辑:0" description="下拉样式或编辑样式"/>
+          <proptext name ="dropHeight" description="下拉列表高度"/>
+          <proptext name ="curSel" description="选中项"/>
+          <propoption name ="btnSkin"  extendType="skin" description="下拉按钮皮肤"/>
+          <proptext name ="animateTime" description="下拉框弹出动画时长"/>
+          <propoption name ="autoFitDropBtn" options="是:1|否:0" description="自适应下拉按钮皮肤" />
+        </propgroup>
+      </groups>
+    </combobase>
+    <combobox icon="7" parent="combobase">
+      <combobox size="120, 24" dropDown="1" dropHeight="150" dotted="0" animateTime="200" curSel="0" drawFocusRect="0" colorText="#000000ff" colorBkgnd="#FFFFFF">
+        <liststyle iconSkin="" itemSkin="" itemHeight="24" colorText="#000000" colorSelText="#FFFFFF" colorItemBkgnd="#FFFFFF" colorItemSelBkgnd="rgb(51,153,255)" />
+        <editstyle inset="5,0,5,0" colorText="#000000" align="left" colorBkgnd="#FFFFFF" />
+        <items>
+          <item text="" />
+          <item text="5" icon="2" data="100" />
+          <item text="6" icon="3" data="103" />
+          <item text="7" icon="4" data="100" />
+          <item text="8" icon="5" data="105" />
+          <item text="9" icon="0" data="100" />
+        </items>
+      </combobox>
+    </combobox>
+
+
+    <comboview icon="7" parent="combobase">
+      <comboview size="120,24"  dropDown="0" dropHeight="200" animateTime="0"  ncSkin="_skin.sys.border" margin-x="2" margin-y="2" curSel="0" id_text="3">
+        <editstyle inset="5,0,5,0" colorText="#000000" align="left" colorBkgnd="#FFFFFF" />
+        <liststyle  ncSkin="_skin.sys.border" margin-x="2" margin-y="2" colorBkgnd="#ffffff">
+          <template itemHeight="44" colorHover="#cccccc" colorSelected="#0000ff">
+            <img id="1" pos="1,|-20,@32,@32" skin="img_avatars" />
+            <text id="2" pos="49,9">麻花藤</text>
+            <text id="3" pos="48,26" colorText="#ff0000"/>
+            <imgbtn id="4" pos="-24,|-8,-10,|7" skin="btn_list_close" tip="删除账号信息"/>
+          </template>
+        </liststyle>
+        <editstyle vcenter="1" colorText="#000000" align="left" colorBkgnd="#FFFFFF" cueText="输入帐号"/>
+      </comboview>
+    </comboview>
+
+
+    <richedit icon="15" parent="div">
+      <richedit  size="96,96" multilines="1" autovscroll="1" wordwrap="1"  margin-x="2" margin-y="2" cueText="">
+        Richedit
+      </richedit>
+      <groups>
+        <propgroup name="属性: richedit" description="richedit属性">
+          <proptext name ="style" description="richedit style"/>
+          <proptext name ="maxBuf" description="最大可编辑缓冲长度"/>
+          <propoption name ="rich" options="是:1|否:0" description="是否支持富文本"/>
+          <propoption name ="vertical" options="是:1|否:0" description="是否支持文本竖排"/>
+          <propoption name ="wordWrap" options="是:1|否:0" description="是否支持文本折行"/>
+          <propoption name ="allowBeep" options="是:1|否:0" description="是否支持Beeping,不确定什么场景"/>
+          <propoption name ="autoWordSel" options="是:1|否:0" description="双击时自动选择单词"/>
+          <propoption name ="vcenter" options="是:1|否:0" description="单行文本时自动垂直居中"/>
+          <proptext name ="rtf" description="初始化时显示的rtf文件资源"/>
+          <propoption name ="notifyChange" options="是:1|否:0" description="内容改变时发送EN_CHANGE通知消息"/>
+          <propoption name ="hscrollBar" options="是:1|否:0" description="显示水平滚动条"/>
+          <propoption name ="vscrollBar" options="是:1|否:0" description="显示垂直滚动条"/>
+          <propoption name ="autoHscroll" options="是:1|否:0" description="显示水平滚动条,内容不够时自动隐藏"/>
+          <propoption name ="autoVscroll" options="是:1|否:0" description="显示垂直滚动条,内容不够时自动隐藏"/>
+          <propoption name ="multiLines" options="是:1|否:0" description="多行显示"/>
+          <propoption name ="readOnly" options="是:1|否:0" description="只读状态"/>
+          <propoption name ="wantReturn" options="是:1|否:0" description="处理回车按键，在Dialog中，该属性将导致Dialog的默认按钮接收不到Enter"/>
+          <propoption name ="password" options="是:1|否:0" description="密码框输入"/>
+          <proptext name ="passwordChar" description="密码输入时替换文本，只允许单字符"/>
+          <propoption name ="number" options="是:1|否:0" description="只允许输入数字"/>
+          <propoption name ="enableDragdrop" options="是:1|否:0" description="是否允许文件拖放"/>
+          <propoption name ="autoSel" options="是:1|否:0" description="获得焦点时自动选中所有文本"/>
+        </propgroup>
+      </groups>
+    </richedit>
+
+    <edit icon="8" parent="richedit">
+      <edit pos="0,0" size="96,24"  colorBkgnd="#FFFFFF" cueText="" colorText="#000000"/>
+      <groups>
+        <propgroup name="属性: edit">
+          <proptext name ="cueText" description="Cue文本"/>
+          <propcolor name ="cueColor" description="Cue文本颜色"/>
+        </propgroup>
+      </groups>
+    </edit>
+
+    <group icon="10" parent="window">
+      <group pos="0,0" size="120,120" align="left" headerHeight="0">组合框</group>
+      <groups>
+        <propgroup name="属性：group">
+          <propcolor name="colorLine1" description="线条颜色1"/>
+          <propcolor name="colorLine2" description="线条颜色2"/>
+          <proptext name="round" description="圆角大小"/>
+          <proptext name="headerHeight" description="头部高度"/>
+        </propgroup>
+      </groups>
+    </group>
+
+
+    <hotkey icon="30" parent="window">
+      <hotkey size="96,24" hotKey="ctrl+a"/>
+      <groups>
+        <propgroup name="属性:hotkey">
+          <proptext name="invalidComb" description="无效热键组合"/>
+          <proptext name="invalidModifier" description="无效组合键,如shift"/>
+          <proptext name="hotKey" description="快捷键"/>
+        </propgroup>
+      </groups>
+    </hotkey>
+
+    <sline visible="0" parent="window">
+      <groups>
+        <propgroup name="属性:hr">
+          <propcolor name="colorLine" description="线条颜色"/>
+          <propoption name="mode" options="水平:horizontal|垂直:vertical|斜线:tilt" description="线条方向"/>
+          <proptext name="lineSize" description="线条粗细"/>
+          <propoption name="lineStyle" options="solid|dash|dot|dashdot|dashdotdot" description="虚线类型"/>
+        </propgroup>
+      </groups>
+    </sline>
+    <hr text="水平线" icon="28" parent="sline">
+      <hr pos="0,0" size="200,1" mode="horizontal" colorLine="#ffFFFF"/>
+    </hr>
+
+    <hr text="垂直线" icon="29" parent="sline">
+      <hr pos="0,0" size="1,200" mode="vertical" colorLine="#ffFFFF"/>
+    </hr>
+
+    <icon icon="27">
+      <icon pos="0,0" src="ICON_LOGO:16"/>
+      <groups>
+        <propgroup name="属性:icon">
+          <proptext name="src" description="图标资源ID"/>
+        </propgroup>
+      </groups>
+    </icon>
+
+
+    <img icon="9" parent="window">
+      <img pos="0,0" size="120,120" iconIndex="0" keepAspect="true"/>
+      <groups>
+        <propgroup name="属性:img">
+          <proptext name="iconIndex" description="子图索引号"/>
+          <propoption name="tile" options="拉伸:0|原样:1|平铺:2" description="绘制模式"/>
+          <propoption name="keepAspect" option="不保持:0|保持:1" description="拉伸时是否保持宽高比例"/>
+        </propgroup>
+      </groups>
+    </img>
+
+    <imgbtn icon="26" parent="button">
+      <imgbtn pos="0,0" size="96,32"  tip="" animate="1"/>
+    </imgbtn>
+
+    <link icon="11" parent="window">
+      <link pos="0,0" size="200,24"  href="www.baidu.com"   cursor="hand" colorText="#FFFFFF" colorTextHover="rgb(231,155,64)" font="italic:1" fontHover="underline:1,italic:1" >点击进入百度</link>
+      <groups>
+        <propgroup name="属性:link">
+          <proptext name="href" description="链接跳转url"/>
+        </propgroup>
+      </groups>
+    </link>
+
+
+    <listbox icon="12" parent="scrollview">
+      <listbox pos="0,0" size="200,200" hotTrack="1"   itemHeight="30" colorText="#FFFFFF" colorSelText="#FFFFFF" colorItemSelBkgnd="rgb(234,128,16)" text-x="20">
+        <items>
+          <item text="item1" icon="1" data="100" />
+          <item text="item2" icon="2" data="100" />
+          <item text="item3" icon="3" data="103" />
+          <item text="item4" icon="4" data="100" />
+          <item text="item5" icon="5" data="105" />
+          <item text="item6" icon="0" data="100" />
+        </items>
+      </listbox>
+      <groups>
+        <propgroup name="属性:listbox">
+          <proptext name="itemHeight" description="行高" />
+          <propoption name ="itemSkin"  extendType="skin" description="列表行皮肤"/>
+          <propoption name ="iconSkin"  extendType="skin" description="图标皮肤"/>
+          <propcolor name ="colorItemBkgnd" description="列表行背景颜色"/>
+          <propcolor name ="colorItemBkgnd2" description="列表行背景颜色2,颜色隔行显示时有效"/>
+          <propcolor name ="colorItemSelBkgnd" description="选中行背景颜色"/>
+          <propcolor name ="colorItemHotBkgnd" description="鼠标浮动的行颜色"/>
+          <propcolor name ="colorText" description="文字颜色"/>
+          <propcolor name ="colorSelText" description="选中文字颜色"/>
+          <proptext name ="icon-x" description="图标显示位置X"/>
+          <proptext name ="icon-y" description="图标显示位置Y"/>
+          <proptext name ="text-x" description="文本显示位置X"/>
+          <proptext name ="text-y" description="文本显示位置Y"/>
+          <propotion name ="hotTrack" options="是:1|否:0" description="热点跟踪"/>
+        </propgroup>
+      </groups>
+    </listbox>
+
+    <listctrl icon="12" parent="div">
+      <listctrl pos="0,0" size="200,200" hotTrack="1" itemHeight="20" headerHeight="30"  font="underline:1" >
+        <header align="left" itemSwapEnable="1" fixWidth="0" sortHeader="1">
+          <items>
+            <item width="50">姓名</item>
+            <item width="50">年龄</item>
+            <item width="50">age</item>
+            <item width="50">score</item>
+          </items>
+        </header>
+      </listctrl>
+      <groups>
+        <propgroup name="属性:ListCtrl">
+          <proptext name ="headerHeight" description="表头控件高度"/>
+          <proptext name="itemHeight" description="行高" />
+          <propoption name ="checkBox"  options="支持:1|不支持:0" description="是否在第一列显示checkbox"/>
+          <propoption name ="multiSelection"  options="支持:1|不支持:0" description="是否支持多选"/>
+          <propoption name ="itemSkin"  extendType="skin" description="列表行皮肤"/>
+          <propoption name ="iconSkin"  extendType="skin" description="图标皮肤"/>
+          <propcolor name ="colorItemBkgnd" description="列表行背景颜色"/>
+          <propcolor name ="colorItemBkgnd2" description="列表行背景颜色2,颜色隔行显示时有效"/>
+          <propcolor name ="colorItemSelBkgnd" description="选中行背景颜色"/>
+          <propcolor name ="colorItemHotBkgnd" description="鼠标浮动的行颜色"/>
+          <propcolor name ="colorText" description="文字颜色"/>
+          <propcolor name ="colorSelText" description="选中文字颜色"/>
+          <proptext name ="icon-x" description="图标显示位置X"/>
+          <proptext name ="icon-y" description="图标显示位置Y"/>
+          <proptext name ="text-x" description="文本显示位置X"/>
+          <proptext name ="text-y" description="文本显示位置Y"/>
+          <propotion name ="hotTrack" options="是:1|否:0" description="热点跟踪"/>
+        </propgroup>
+      </groups>
+    </listctrl>
+
+    <listview icon="13" parent="div">
+      <listview size="120,120" dividerSize="5" wantTab="1">
+        <template itemHeight="50" colorHover="#cccccc" colorSelected="#0000ff" trackMouseEvent="1">
+
+          <button pos="10,5,@150,@25">按钮1</button>
+        </template>
+      </listview>
+      <groups>
+        <propgroup name="属性：listview">
+          <propoption name="dividerSkin" extendType="skin" description="分割行皮肤"/>
+          <proptext name="dividerSize" description="分割行高度"/>
+          <propoption name="wantTab" options="处理:1|不处理:0" description="处理tab按键,如果列表项中有edit控件，应该处理"/>
+          <propoption name="vertical" options="垂直:1|水平:0" description="列表排列方式"/>
+        </propgroup>
+      </groups>
+    </listview>
+
+    <mclistview icon="13" parent="listview">
+      <mclistview pos="5,[2,@200,@200" headerHeight="30">
+        <headerStyle align="center" itemSwapEnable="1" fixWidth="0" sortHeader="1" colorText="#000000ff">
+          <items>
+            <item width="50">姓名</item>
+            <item width="50">年龄</item>
+            <item width="50">age</item>
+          </items>
+        </headerStyle>
+        <template itemHeight="80" colorHover="#cccccc" colorSelected="#0000ff">
+          <window name="col1" clipClient="1">
+            <img name="img_icon" skin="" pos="10,8,@64,@64"/>
+            <text name="txt_name" pos="[5,16" font="bold:1,adding:-1">火狐浏览器</text>
+            <text name="txt_desc" pos="{0,36,-10,-10" font="bold:1,adding:-4" dotted="1">速度最快的浏览器</text>
+            <text name="txt_index" pos="|0,|0" offset="-0.5,-0.5" font="adding:10" colorText="#ff000088">10</text>
+          </window>
+          <window name="col2" clipClient="1">
+            <text name="txt_score" pos="10,36" font="adding:-5"  >8.5分</text>
+            <link pos="[5,36" cursor="hand" colorText="#1e78d5" href="www.163.com" font="adding:-5" >投票</link>
+          </window>
+          <window name="col3" clipClient="1">
+            <text name="txt_size" pos="0,26,-0,-26" font="adding:-4" align="center" >85.92M</text>
+          </window>
+        </template>
+      </mclistview>
+      <groups>
+        <propgroup name="属性:mclistview">
+          <proptext name ="headerHeight" description="表头高度"/>
+        </propgroup>
+      </groups>
+    </mclistview>
+
+    <progress icon="14" parent="window">
+      <progress  pos="0,0" size="200,16" value="20" min="0" max="100" showPercent="1"/>
+      <groups>
+        <propgroup name="属性:progress">
+          <propoption name ="bkgndSkin"  extendType="skin" description="背景皮肤"/>
+          <propoption name ="posSkin"  extendType="skin" description="数值显示皮肤"/>
+          <proptext name ="min" description="最小值"/>
+          <proptext name ="max" description="最大值"/>
+          <proptext name ="value" description="初始值"/>
+          <propoption name ="vertical" options="是:1|否:0" description="垂直显示"/>
+          <propoption name ="showPercent" options="是:1|否:0" description="显示进度文字"/>
+        </propgroup>
+      </groups>
+    </progress>
+
+    <realwnd icon="15" parent="window">
+      <realwnd pos="0,0" size="120,120" name="" wndclass="" id="" wndname="" />
+      <groups>
+        <propgroup name="属性:realwnd">
+          <proptext name ="wndclass" description="窗口类名，在realwndhandler中通过该类名来创建窗口"/>
+          <proptext name ="wndname" description="窗口名,在realwndhandler中通过该值设置Window text"/>
+          <proptext name ="style" description="窗口Style,16进制"/>
+          <proptext name ="exstyle" description="窗口exStyle,16进制"/>
+          <propoption name ="init" options="是:1|否:0" description="为0时窗口等到窗口显示时才创建"/>
+        </propgroup>
+      </groups>
+    </realwnd>
+
+    <scrollbar icon="16" parent="window">
+      <scrollbar size="200,16" min="0" max="100" value="10" page="10" vertical="0"/>
+      <groups>
+        <propgroup name="属性:scrollbar">
+          <proptext name ="arrowSize" description="箭头高度"/>
+          <proptext name ="min" description="最小值"/>
+          <proptext name ="max" description="最大值"/>
+          <proptext name ="value" description="初始值"/>
+          <proptext name ="page" description="翻页高度"/>
+          <propoption name ="vertical" options="水平:0|垂直:1"/>
+        </propgroup>
+      </groups>
+    </scrollbar>
+
+    <sliderbar icon="17" parent="progress">
+      <sliderbar size="120,24" thumbInRail="0"  alpha="200" width="200" value="20" min="0" max="100"/>
+      <groups>
+        <propgroup name="属性:sliderbar">
+          <propoption name ="thumbSkin"  extendType="skin" description="滑块皮肤"/>
+          <propoption name ="thumbInRail" options="是:1|否:0" description="是否限制滑块在轨道内"/>
+        </propgroup>
+      </groups>
+    </sliderbar>
+
+    <splitwnd visible="0" parent="window">
+      <groups>
+        <propgroup name="属性:splitwnd">
+          <proptext name ="sepSize" description="分割条大小"/>
+          <propoption name ="sepSkin"  extendType="skin" description="分割条皮肤"/>
+          <propoption name ="adjustable" options="是:1|否:0" description="分割窗口可调节标志"/>
+          <propoption name ="vertical" options="是:1|否:0" description="垂直排列"/>
+        </propgroup>
+      </groups>
+    </splitwnd>
+    <splitcol icon="19" parent="splitwnd">
+      <splitcol  size="300,300" sepSize="6">
+        <pane idealSize="50" minSize="30" priority="1" clipClient="1">
+        </pane>
+        <pane idealSize="100" minSize="30" priority="0" clipClient="1">
+        </pane>
+        <pane idealSize="100" minSize="30" priority="1" clipClient="1">
+        </pane>
+      </splitcol>
+    </splitcol>
+
+    <splitrow icon="19" parent="splitwnd">
+      <splitrow  size="300,300" sepSize="6">
+        <pane idealSize="50" minSize="30" priority="1" clipClient="1">
+        </pane>
+        <pane idealSize="100" minSize="30" priority="0" clipClient="1">
+        </pane>
+        <pane idealSize="100" minSize="30" priority="1" clipClient="1">
+        </pane>
+      </splitrow>
+    </splitrow>
+
+    <tabctrl icon="20" parent="window">
+      <tabctrl  pos="0,0" size="200,200"  tabAlign="left" tabSkin="" tabInterSize="2" tabWidth="70" tabHeight="30" colorText="#FFFFFF" focusable="0" show="1" curSel="0" >
+        <page title="页1" tip="提示1">
+        </page>
+        <page title="页2" tip="提示2">
+        </page>
+      </tabctrl>
+      <groups>
+        <propgroup name="属性:tabctrl">
+          <proptext name ="curSel" description="当前页索引"/>
+          <proptext name ="tabSize" description="tab尺寸"/>
+          <proptext name ="tabWidth" description="tab宽度"/>
+          <proptext name ="tabHeight" description="tab高度"/>
+          <proptext name ="tabPos" description="tab左偏移"/>
+          <proptext name ="tabInterSize" description="tab间隔宽度"/>
+          <propoption name ="tabInterSkin"  extendType="skin" description="tab间隔皮肤"/>
+          <propoption name ="tabSkin"  extendType="skin" description="tab皮肤"/>
+          <propoption name ="iconSkin"  extendType="skin" description="tab图标皮肤"/>
+          <propoption name ="frameSkin"  extendType="skin" description="tab"/>
+          <proptext name ="icon-x" description="图标显示位置X"/>
+          <proptext name ="icon-y" description="图标显示位置Y"/>
+          <proptext name ="text-x" description="文本显示位置X"/>
+          <proptext name ="text-y" description="文本显示位置Y"/>
+          <propoption name ="tabAlign" options="top|left|right|bottom" description="tab排列方式"/>
+          <propoption name ="textDir" options="hori|horizontal|vert|vertical" description="文本排列方式"/>
+          <proptext name ="animateSteps" description="动画次数" />
+          <propoption name ="animateType" options="0|1" description="动画样式：0-背景跟着动；1-背景不动"/>
+          <propoption name ="interpolator" description="动画插值器" options="Linear|Accelerate|Decelerate|AccelerateDecelerate|Anticipate|AnticipateOvershoot|Bounce|Cycle|Overshoot" />
+        </propgroup>
+      </groups>
+    </tabctrl>
+
+    <tileview icon="22" parent="div">
+      <tileview size="120,120"  wantTab="1" marginSize="5" >
+        <template itemHeight="130" itemWidth="135" colorHover="#cccccc" colorSelected="#0000ff" trackMouseEvent="1" skin="">
+          <img pos="|0,0,@100,@100" offset="-0.5,0" name="img_file_icon"/>
+          <button pos="|0,[5,@115,@22" offset="-0.5,0" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
+        </template>
+      </tileview>
+      <groups>
+        <propgroup name="属性:TileView">
+          <proptext name ="marginSize" description="边框大小"/>
+          <propoption name ="wantTab" options="是:1|否:0" description="是否处理tab按键"/>
+        </propgroup>
+      </groups>
+    </tileview>
+
+    <treectrl icon="24" parent="scrollview">
+      <treectrl size="200,200"  itemHeight="30" checkBox="1" font="underline:1">
+        <item text="组织机构" img="0" selImg="1"  expand="1">
+          <item text="市场部" img="0" selImg="1">
+            <item text="南一区" img="2"/>
+            <item text="北二区" img="2"/>
+            <item text="西三区" img="2">
+              <item text="第一分队" img="0" selImg="1" expand="0">
+                <item text="张三组" img="2"/>
+                <item text="李四组" img="2"/>
+                <item text="王五组" img="2"/>
+              </item>
+            </item>
+          </item>
+        </item>
+        <item text="宣传部" img="0" selImg="1" expand="0">
+          <item text="南一区" img="2"/>
+          <item text="北二区" img="2"/>
+          <item text="西三区" img="2"/>
+        </item>
+      </treectrl>
+      <groups>
+        <propgrouop name="属性:TreeCtrl">
+          <proptext name ="indent" description="缩进宽度"/>
+          <proptext name ="itemHeight" description="行高"/>
+          <proptext name ="itemMargin" />
+          <propoption name ="checkBox" options="是:1|否:0" description="有复选框"/>
+          <propoption name ="rightClickSel" options="是:1|否:0" description="右键选择"/>
+          <propoption name ="itemBkgndSkin"  extendType="skin" description="列表项背景皮肤"/>
+          <propoption name ="itemSelSkin"  extendType="skin" description="选中项皮肤"/>
+          <propoption name ="toggleSkin"  extendType="skin" description=""/>
+          <propoption name ="iconSkin"  extendType="skin" description="图标皮肤"/>
+          <propoption name ="checkSkin"  extendType="skin" description="复选框皮肤"/>
+          <propcolor name ="colorItemBkgnd" description="Item背景颜色"/>
+          <propcolor name ="colorItemSelBkgnd" description="选中项背景颜色"/>
+          <propcolor name ="colorItemText" description="Item文本颜色"/>
+          <propcolor name ="colorItemSelText" description="选中项文本颜色"/>
+        </propgrouop>
+      </groups>
+    </treectrl>
+
+    <treeview icon="25" parent="div">
+      <treeview size="200,200"  itemHeight="-1" colorItemBkgnd="#FFFFFF" colorItemSelBkgnd="#cccccc" indent="30">
+        <template height="60" colorHover="#cccccc" colorSelected="#0000ff" trackMouseEvent="1">
+          <toggle pos="[0,|0,@20,@20"  offset="0,-0.5" name="tgl_switch" skin="_skin.sys.tree.toggle" tip="show how to use switch"/>
+          <button pos="[0,5,@150,@25" name="btn_test" tip="click the button to see how to writing the response function">btn</button>
+          <animateimg pos="[10,{0" skin="skin_busy" name="ani_test" tip="animateimg is used here" msgTransparent="0" />
+          <text pos="[20,{0" colorText="#ff0000" name="txt_red">text item</text>
+        </template>
+      </treeview>
+      <groups>
+        <propgroup name="属性:TreeView">
+          <proptext name ="indent" description="缩进宽度"/>
+          <propoption name="wantTab" options="处理:1|不处理:0" description="处理tab按键,如果列表项中有edit控件，应该处理"/>
+        </propgroup>
+      </groups>
+    </treeview>
+    
+    <hexedit icon="31" parent="div">
+      <hexedit pos="0,0" size="200,200" AutoBytesPerRow="1" HexBkColor="#ffff80" AsciiBkColor="#78ebe6" clipClient="1" >        
+      </hexedit>
+      <groups>
+        <propgroup name="属性:hexedit">
+          <proptext name ="AddrSize" description="地址占几字节"/>
+          <proptext name="BytesPerRow" description="每行显示字节数" />
+          <propoption name="AutoBytesPerRow" options="是:1|否:0" description="自动计算每行字节数"/>
+          <propoption name ="readOnly" options="是:1|否:0" description="只读状态"/>
+          <propcolor name ="AddrBkColor" description="地址区背景颜色"/>
+          <propcolor name ="HexBkColor" description="Hex区背景颜色"/>
+          <propcolor name ="AsciiBkColor" description="文本区背景颜色"/>          
+        </propgroup>
+      </groups>
+    </hexedit>
+    
+  </controls>
+</root>
+

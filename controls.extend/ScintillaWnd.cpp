@@ -3,13 +3,12 @@
 
 #include "stdafx.h"
 #include "ScintillaWnd.h"
-#include <shlwapi.h>
 
 #include "SciLexer.h"
 
 static LPCTSTR KScintillaClass = _T("Scintilla");
 
-
+SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
 
@@ -308,3 +307,4 @@ LRESULT CScintillaWnd::OnNotify( int idCtrl, LPNMHDR pnmh )
 	return lRet;
 }
 
+SNSEND

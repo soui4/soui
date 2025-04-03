@@ -1,0 +1,35 @@
+﻿<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef\init.xml"  />
+  </UIDEF>
+  <LAYOUT>
+    <file name="XML_MAINWND" path="xml\dlg_main.xml"  />
+  </LAYOUT>
+
+  <values>
+    <file name="string" path="values\string.xml"/>
+    <file name="color" path="values\color.xml"/>
+    <file name="skin" path="values\skin.xml"/>
+    <file name="skin_125" path="values\skin_125.xml"/>
+    <file name="skin_150" path="values\skin_150.xml"/>
+    <file name="skin_200" path="values\skin_200.xml"/>
+  </values>
+
+  <lang>
+    <file name="cn" path="lang\lang_cn.xml"/>
+    <file name="en" path="lang\lang_en.xml"/>
+  </lang>
+  <ICON>
+    <file name="ICON_LOGO"  path="image\soui.ico"    />
+  </ICON>
+  <img>
+    <file name="pic_100" path="image\pic_100.png"/>
+    <file name="pic_125" path="image\pic_125.png"/>
+    <file name="pic_150" path="image\pic_150.png"/>
+    <file name="pic_200" path="image\pic_200.png"/>
+    <file name="chat.9" path="image\chat.9.png"/>
+  </img>
+  <smenu>
+    <file name="menu_lang" path="smenu\menu_lang.xml"/>
+  </smenu>
+</resource>

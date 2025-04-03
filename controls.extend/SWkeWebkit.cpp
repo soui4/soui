@@ -3,8 +3,9 @@
 #include <imm.h>
 #pragma comment(lib, "imm32.lib")
 #pragma comment(lib, "msimg32.lib")
-namespace SOUI
-{
+
+SNSBEGIN
+
 //////////////////////////////////////////////////////////////////////////
 // SWkeLoader
 SWkeLoader *SWkeLoader::s_pInst = 0;
@@ -299,4 +300,4 @@ BOOL SWkeWebkit::OnAttrUrl(SStringW strValue, BOOL bLoading)
     return !bLoading;
 }
 
-} // namespace SOUI
+SNSEND

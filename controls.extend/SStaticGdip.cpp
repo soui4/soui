@@ -1,3 +1,4 @@
+#ifdef _WIN32
 #include "stdafx.h"
 #include "SStaticGdip.h"
 #include <gdiplus.h>
@@ -88,5 +89,6 @@ SIZE SStaticGdip::OnMeasureText(IRenderTarget *pRT,LPCTSTR pszText,int cchLen)
 	return szRet;
 }
 
-
 SNSEND
+
+#endif//_WIN32

@@ -19,7 +19,7 @@ static SStringT getSourceDir()
 
 
 static const TCHAR* kPath_SysRes = _T("/../../soui-sys-resource");
-static const TCHAR* kPath_WxDemoRes = _T("/uires");
+static const TCHAR* kPath_DemoRes = _T("/uires");
 
 class SOUIEngine
 {
@@ -82,7 +82,7 @@ public:
 			m_theApp->LoadSystemNamedResource(sysResProvider);
 			//load use resource
 			SAutoRefPtr<IResProvider> pResProvider(m_souiFac.CreateResProvider(RES_FILE), FALSE);
-			SStringT appRes = getSourceDir() + kPath_WxDemoRes;
+			SStringT appRes = getSourceDir() + kPath_DemoRes;
 			bLoaded = pResProvider->Init((LPARAM)appRes.c_str(), 0);
 			if (!bLoaded) break;
 			m_theApp->AddResProvider(pResProvider);

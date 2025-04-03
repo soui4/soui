@@ -1,10 +1,12 @@
+#ifdef _WIN32
+
 #include "stdafx.h"
 #include "SDocHostUIHandler.h"
 #include <mshtml.h>
 #include <activex/SBStr.h>
 
-namespace SOUI
-{
+SNSBEGIN
+
 SDocHostUIHandler::SDocHostUIHandler(IScriptCaller *sc)
     : m_disContextMenu(FALSE)
     , m_disF5(FALSE)
@@ -295,4 +297,6 @@ VARIANT ExecuteScript(IWebBrowser2 *pWebBrowser, const SStringW &fun, SArray<SSt
     return varRet;
 }
 
-} // namespace SOUI
+SNSEND
+
+#endif//_WIN32

@@ -1,0 +1,1 @@
+wallpaper主要演示如何使用ITaskLoop及IHttpClient模块实现使用线程池异步执行网络请求。

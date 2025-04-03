@@ -8,8 +8,9 @@
 //  www.catch22.net
 //
 
-#pragma once
-  
+#ifndef _DATA_OBJECT_H_
+#define _DATA_OBJECT_H_
+
 // defined in enumformat.cpp
 // HRESULT CreateEnumFormatEtc(UINT nNumFormats, FORMATETC *pFormatEtc, IEnumFORMATETC **ppEnumFormatEtc);
 HRESULT CreateDataObject (FORMATETC *fmtetc, STGMEDIUM *stgmeds, UINT count, IDataObject **ppDataObject);
@@ -57,3 +58,5 @@ private:
     LONG       m_nNumFormats;
  
 };
+
+#endif//_DATA_OBJECT_H_

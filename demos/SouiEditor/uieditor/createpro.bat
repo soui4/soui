@@ -1,0 +1,1 @@
+%SOUI4PATH%\tools\qmake -project -spec %SOUI4PATH%\tools\mkspecs\win32-msvc2008

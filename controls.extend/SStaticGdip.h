@@ -1,4 +1,5 @@
-#pragma once
+#ifndef _SSTATIC_GDIP_H_
+#define _SSTATIC_GDIP_H_
 
 SNSBEGIN
 class SStaticGdip : public SStatic
@@ -19,3 +20,5 @@ private:
 };
 
 SNSEND
+
+#endif//_SSTATIC_GDIP_H_

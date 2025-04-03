@@ -1,9 +1,10 @@
-﻿#pragma once
+﻿#ifndef _SSCIINTILLA_WND_H_
+#define _SSCIINTILLA_WND_H_
 
 #include <core/SNativeWnd.h>
 #include <Scintilla.h>
 
-
+SNSBEGIN
 // CScintillaWnd
 class CScintillaWnd : public SNativeWnd
 {
@@ -45,3 +46,7 @@ protected:
 
 	SStringT m_strFileName;
 };
+
+SNSEND
+
+#endif //_SSCIINTILLA_WND_H_

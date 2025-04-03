@@ -1,8 +1,10 @@
-#pragma once
+#ifndef _SWKEWEBKIT_H_
+#define _SWKEWEBKIT_H_
+
 #include <wke.h>
 
-namespace SOUI
-{
+SNSBEGIN
+
 class SWkeLoader {
   public:
     typedef void (*FunWkeInit)();
@@ -95,4 +97,7 @@ class SWkeWebkit
     wkeWebView m_pWebView;
     SStringW m_strUrl;
 };
-} // namespace SOUI
+
+SNSEND
+
+#endif //_SWKEWEBKIT_H_
