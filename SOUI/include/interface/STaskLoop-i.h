@@ -112,5 +112,3 @@ DECLARE_INTERFACE_(ITaskLoop, IObjRef)
 
 SNSEND
 #endif // __STASKLOOP_I__H__
-
-

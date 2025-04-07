@@ -26,14 +26,15 @@ SNSBEGIN
  *
  * Describe
  */
-class STextServiceHelper * s_textServiceHelper = NULL;
+class STextServiceHelper *s_textServiceHelper = NULL;
 
 class STextServiceHelper {
-	friend class SRichEdit;
+    friend class SRichEdit;
+
   public:
     static STextServiceHelper *instance()
     {
-		SASSERT(s_textServiceHelper);
+        SASSERT(s_textServiceHelper);
         return s_textServiceHelper;
     }
 
@@ -102,18 +103,17 @@ HRESULT STextServiceHelper::CreateTextServices(IUnknown *punkOuter, ITextHost *p
     return m_funCreateTextServices(punkOuter, pITextHost, ppUnk);
 }
 
-
 void SRichEdit::InitTextService()
 {
-	SASSERT(s_textServiceHelper==NULL);
-	s_textServiceHelper = new STextServiceHelper;
+    SASSERT(s_textServiceHelper == NULL);
+    s_textServiceHelper = new STextServiceHelper;
 }
 
 void SRichEdit::UninitTextService()
 {
-	SASSERT(s_textServiceHelper);
-	delete s_textServiceHelper;
-	s_textServiceHelper=NULL;
+    SASSERT(s_textServiceHelper);
+    delete s_textServiceHelper;
+    s_textServiceHelper = NULL;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -715,7 +715,6 @@ class STextHost : public ITextHost {
     SRichEdit *m_pRichEdit; /**< swindow for text host */
     POINT m_ptCaret;
 };
-
 
 STextHost::STextHost(void)
     : m_pRichEdit(NULL)
@@ -2336,6 +2335,5 @@ BOOL SRichEdit::IsRichScale() const
 {
     return m_fRich || !m_fSingleLineVCenter || (m_dwStyle & ES_MULTILINE);
 }
-
 
 SNSEND

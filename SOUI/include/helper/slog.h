@@ -118,21 +118,21 @@ SNSEND
 #pragma warning(push, 0)
 
 #define SLOG(tag, level) SNS::Log(tag, level, __FILE__, FUNCNAME, __LINE__, RetAddr()).stream()
-#define SLOG_FMT(tag, level, logformat, ...)                                                      \
-    do                                                                                            \
-    {                                                                                             \
-        if (sizeof(logformat[0]) == sizeof(char))                                                 \
-        {                                                                                         \
+#define SLOG_FMT(tag, level, logformat, ...)                                                     \
+    do                                                                                           \
+    {                                                                                            \
+        if (sizeof(logformat[0]) == sizeof(char))                                                \
+        {                                                                                        \
             char logbuf[SNS::Log::MAX_LOGLEN] = { 0 };                                           \
             _snprintf(logbuf, SNS::Log::MAX_LOGLEN, (const char *)logformat, ##__VA_ARGS__);     \
-            SLOG(tag, level) << logbuf;                                                           \
-        }                                                                                         \
-        else                                                                                      \
-        {                                                                                         \
+            SLOG(tag, level) << logbuf;                                                          \
+        }                                                                                        \
+        else                                                                                     \
+        {                                                                                        \
             wchar_t logbuf[SNS::Log::MAX_LOGLEN] = { 0 };                                        \
             _snwprintf(logbuf, SNS::Log::MAX_LOGLEN, (const wchar_t *)logformat, ##__VA_ARGS__); \
-            SLOG(tag, level) << logbuf;                                                           \
-        }                                                                                         \
+            SLOG(tag, level) << logbuf;                                                          \
+        }                                                                                        \
     } while (false);
 
 #pragma warning(pop)

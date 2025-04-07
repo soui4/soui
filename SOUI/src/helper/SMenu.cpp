@@ -75,9 +75,13 @@ int SMenuAttr::GetMaxWidth()
 
 void SMenuAttr::OnInitFinished(SXmlNode xmlNode)
 {
-    SASSERT(m_pItemSkin);
     if (!m_nItemHei.isValid())
-        m_nItemHei.setSize((float)m_pItemSkin->GetSkinSize().cy, SLayoutSize::dp);
+    {
+        if (m_pItemSkin)
+            m_nItemHei.setSize((float)m_pItemSkin->GetSkinSize().cy, SLayoutSize::dp);
+        else
+            m_nItemHei.setSize(30, SLayoutSize::dp);
+    }
 }
 
 SAutoRefPtr<IFontS> SMenuAttr::GetFontPtr()
@@ -304,18 +308,25 @@ SMenu::~SMenu(void)
 
 BOOL SMenu::LoadMenu2(IXmlNode *pXmlNode)
 {
+    if (!pXmlNode)
+        return FALSE;
+    SXmlNode xmlMenu(pXmlNode);
+    SAutoRefPtr<SMenuAttr> pMenuAttr(new SMenuAttr, TRUE);
+    pMenuAttr->InitFromXml(&xmlMenu);
+    if (!pMenuAttr->m_pItemSkin)
+    {
+        SSLOGE() << "menu root doesn't has itemSkin defined";
+        return FALSE;
+    }
+
     SASSERT(m_hMenu == 0);
     m_hMenu = CreatePopupMenu();
     if (!m_hMenu)
+    {
         return FALSE;
-
-    SXmlNode xmlMenu(pXmlNode);
-    SMenuAttr *pMenuAttr = new SMenuAttr;
-    pMenuAttr->InitFromXml(&xmlMenu);
-    SASSERT(pMenuAttr->m_pItemSkin);
+    }
     SetMenuContextHelpId(m_hMenu, xmlMenu.attribute(L"contextHelpId").as_uint(0));
     SetMenuAttr(m_hMenu, pMenuAttr);
-    pMenuAttr->Release();
 
     if (m_icons)
     {

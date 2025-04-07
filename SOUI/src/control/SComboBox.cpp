@@ -21,12 +21,15 @@ SComboBox::~SComboBox()
 
 BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
 {
-    SASSERT(xmlNode);
+    if (!xmlNode)
+        return FALSE;
     //创建列表控件
     SXmlNode listStyle = xmlNode.child(L"listStyle");
     SStringW strListClass = listStyle.attribute(L"wndclass").as_string(SListBox::GetClassName());
-    m_pListBox = sobj_cast<SListBox>(CreateChildByName(strListClass));
-    SASSERT(m_pListBox);
+    SListBox *pListBox = sobj_cast<SListBox>(CreateChildByName(strListClass));
+    if (!pListBox)
+        return FALSE;
+    m_pListBox = pListBox;
 
     m_pListBox->SetContainer(GetContainer());
     m_pListBox->InitFromXml(&listStyle);

@@ -217,7 +217,7 @@ SStringT SCalendarCore::FormatYear(WORD iYear)
 
 SStringT SCalendarCore::FormatMonth(WORD iMonth)
 {
-    TCHAR szText[][7] = { _T("一"), _T("二"), _T("三"), _T("四"), _T("五"), _T("六"), _T("七"), _T("八"), _T("九"), _T("十"), _T("十一"), _T("十二") };
+    const TCHAR *szText[] = { _T("一"), _T("二"), _T("三"), _T("四"), _T("五"), _T("六"), _T("七"), _T("八"), _T("九"), _T("十"), _T("十一"), _T("十二") };
     SASSERT(iMonth <= 12 && iMonth >= 1);
     return szText[iMonth - 1];
 }

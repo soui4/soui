@@ -135,4 +135,3 @@ DECLARE_INTERFACE_(ISkinObj, IObject)
 
 SNSEND
 #endif // __SSKINOBJ_I__H__
-

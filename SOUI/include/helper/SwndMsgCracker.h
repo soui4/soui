@@ -17,35 +17,35 @@
     }
 
 // BOOL OnEraseBkgnd(SNS::IRenderTarget * pRT)
-#define MSG_WM_ERASEBKGND_EX(func)                              \
-    if (uMsg == WM_ERASEBKGND)                                  \
-    {                                                           \
-        SetMsgHandled(TRUE);                                    \
+#define MSG_WM_ERASEBKGND_EX(func)                             \
+    if (uMsg == WM_ERASEBKGND)                                 \
+    {                                                          \
+        SetMsgHandled(TRUE);                                   \
         lResult = (LRESULT)func((SNS::IRenderTarget *)wParam); \
-        if (IsMsgHandled())                                     \
-            return TRUE;                                        \
+        if (IsMsgHandled())                                    \
+            return TRUE;                                       \
     }
 
 // void OnPaint(SNS::IRenderTarget * pRT)
-#define MSG_WM_PAINT_EX(func)                \
-    if (uMsg == WM_PAINT)                    \
-    {                                        \
-        SetMsgHandled(TRUE);                 \
+#define MSG_WM_PAINT_EX(func)               \
+    if (uMsg == WM_PAINT)                   \
+    {                                       \
+        SetMsgHandled(TRUE);                \
         func((SNS::IRenderTarget *)wParam); \
-        lResult = 0;                         \
-        if (IsMsgHandled())                  \
-            return TRUE;                     \
+        lResult = 0;                        \
+        if (IsMsgHandled())                 \
+            return TRUE;                    \
     }
 
 // void OnNcPaint(SNS::IRenderTarget * pRT)
-#define MSG_WM_NCPAINT_EX(func)              \
-    if (uMsg == WM_NCPAINT)                  \
-    {                                        \
-        SetMsgHandled(TRUE);                 \
+#define MSG_WM_NCPAINT_EX(func)             \
+    if (uMsg == WM_NCPAINT)                 \
+    {                                       \
+        SetMsgHandled(TRUE);                \
         func((SNS::IRenderTarget *)wParam); \
-        lResult = 0;                         \
-        if (IsMsgHandled())                  \
-            return TRUE;                     \
+        lResult = 0;                        \
+        if (IsMsgHandled())                 \
+            return TRUE;                    \
     }
 
 // void OnSetFont(IFont *pFont, BOOL bRedraw)

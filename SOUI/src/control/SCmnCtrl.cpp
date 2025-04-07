@@ -558,7 +558,8 @@ SImageButton::SImageButton()
 
 SIZE SImageButton::MeasureContent(int wid, int hei)
 {
-    SASSERT(m_pBgSkin);
+    if (!m_pBgSkin)
+        return CSize(0, 0);
     return m_pBgSkin->GetSkinSize();
 }
 //////////////////////////////////////////////////////////////////////////
@@ -959,9 +960,9 @@ BOOL SProgress::SetValue(int dwValue)
 
 void SProgress::SetRange(int nMin, int nMax)
 {
-    if(nMax<=nMin)
+    if (nMax <= nMin)
     {
-        SSLOGW()<<"invalid range: min="<<nMin<<" max="<<nMax;
+        SSLOGW() << "invalid range: min=" << nMin << " max=" << nMax;
         return;
     }
     m_nMaxValue = nMax;
@@ -1048,7 +1049,8 @@ CRect SCheckBox::GetCheckRect()
 {
     CRect rcClient;
     GetClientRect(rcClient);
-    SASSERT(m_pSkin);
+    if (!m_pSkin)
+        return CRect();
     CSize szCheck = m_pSkin->GetSkinSize();
     CRect rcCheckBox(rcClient.TopLeft(), szCheck);
     rcCheckBox.OffsetRect(0, (rcClient.Height() - szCheck.cy) / 2);
@@ -1058,8 +1060,9 @@ CRect SCheckBox::GetCheckRect()
 void SCheckBox::GetTextRect(LPRECT pRect)
 {
     GetClientRect(pRect);
-    SASSERT(m_pSkin);
-    CSize szCheck = m_pSkin->GetSkinSize();
+    CSize szCheck;
+    if (m_pSkin)
+        szCheck = m_pSkin->GetSkinSize();
     pRect->left += szCheck.cx + CheckBoxSpacing;
 }
 
@@ -1085,7 +1088,8 @@ void SCheckBox::DrawFocus(IRenderTarget *pRT)
 
 SIZE SCheckBox::MeasureContent(int wid, int hei)
 {
-    SASSERT(m_pSkin);
+    if (!m_pSkin)
+        return __baseCls::MeasureContent(wid, hei);
     CSize szCheck = m_pSkin->GetSkinSize();
     CSize szRet = __baseCls::MeasureContent(wid, hei);
     szRet.cx += szCheck.cx + CheckBoxSpacing;
@@ -1232,7 +1236,8 @@ CRect SRadioBox::GetRadioRect()
 {
     CRect rcClient;
     GetClientRect(rcClient);
-    SASSERT(m_pSkin);
+    if (!m_pSkin)
+        return CRect();
     CSize szRadioBox = m_pSkin->GetSkinSize();
     CRect rcRadioBox = rcClient;
 
@@ -1263,8 +1268,9 @@ CRect SRadioBox::GetRadioRect()
 void SRadioBox::GetTextRect(LPRECT pRect)
 {
     GetClientRect(pRect);
-    SASSERT(m_pSkin);
-    CSize szRadioBox = m_pSkin->GetSkinSize();
+    CSize szRadioBox;
+    if (m_pSkin)
+        szRadioBox = m_pSkin->GetSkinSize();
 
     switch (m_uIconAlign)
     {
@@ -1288,7 +1294,6 @@ void SRadioBox::GetTextRect(LPRECT pRect)
 
 void SRadioBox::OnPaint(IRenderTarget *pRT)
 {
-    SASSERT(m_pSkin);
     CRect rcRadioBox = GetRadioRect();
     m_pSkin->DrawByState(pRT, rcRadioBox, GetState());
     __baseCls::OnPaint(pRT);
@@ -1496,7 +1501,8 @@ BOOL SToggle::GetToggle()
 
 void SToggle::OnPaint(IRenderTarget *pRT)
 {
-    SASSERT(m_pSkin);
+    if (!m_pSkin)
+        return;
     m_pSkin->DrawByState(pRT, GetWindowRect(), GetState());
 }
 

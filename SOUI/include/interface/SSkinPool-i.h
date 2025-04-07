@@ -68,5 +68,3 @@ DECLARE_INTERFACE_(ISkinPool, IObjRef)
 SNSEND
 
 #endif //_SSKINPOOL_I_H__
-
-

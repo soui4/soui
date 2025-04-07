@@ -384,5 +384,3 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
 
 SNSEND
 #endif // __SAPP_I__H__
-
-

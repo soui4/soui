@@ -145,7 +145,7 @@ struct tm *STime::GetLocalTm(struct tm *ptm) const
 
     if (ptm != NULL)
     {
-        struct tm * tmTemp = localtime(&m_time);
+        struct tm *tmTemp = localtime(&m_time);
         if (!tmTemp)
         {
             return NULL; // indicates that m_time was not initialized!
@@ -326,7 +326,7 @@ SStringT STime::Format(LPCTSTR pszFormat) const
 
     TCHAR szBuffer[kMaxTimeBufferSize];
 
-    struct tm * tmTemp = localtime(&m_time);
+    struct tm *tmTemp = localtime(&m_time);
     if (tmTemp || !_tcsftime(szBuffer, kMaxTimeBufferSize, pszFormat, tmTemp))
     {
         szBuffer[0] = '\0';

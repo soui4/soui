@@ -130,4 +130,3 @@ DECLARE_INTERFACE(IResProviderMgr)
 
 SNSEND
 #endif // __SRESPROVIDERMGR_I__H__
-

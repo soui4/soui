@@ -240,7 +240,7 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
 #ifdef _WIN32
     SWndSurface::Init();
 #endif //_WIN32
-	SRichEdit::InitTextService();
+    SRichEdit::InitTextService();
     SNativeWnd::InitWndClass(hInst, pszHostClassName, bImeApp);
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
     _CreateSingletons();
@@ -267,7 +267,7 @@ SApplication::~SApplication(void)
 {
     SResProviderMgr::RemoveAll();
     _DestroySingletons();
-	SRichEdit::UninitTextService();
+    SRichEdit::UninitTextService();
 }
 
 void SApplication::_CreateSingletons()

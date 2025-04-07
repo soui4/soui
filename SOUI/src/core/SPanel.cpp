@@ -320,8 +320,7 @@ int SPanel::OnCreate(LPVOID)
     int nRet = __baseCls::OnCreate(NULL);
     if (nRet != 0)
         return nRet;
-    SASSERT(m_pSkinSb);
-    return 0;
+    return m_pSkinSb ? 0 : -1;
 }
 
 void SPanel::OnDestroy()
@@ -611,7 +610,6 @@ HRESULT SPanel::OnAttrScrollbarSkin(SStringW strValue, BOOL bLoading)
     if (!pSbSkin || !pSbSkin->IsClass(SSkinScrollbar::GetClassName()))
         return E_FAIL;
     m_pSkinSb = (SSkinScrollbar *)pSbSkin;
-    SASSERT(m_pSkinSb);
     return bLoading ? S_FALSE : S_OK;
 }
 

@@ -855,4 +855,4 @@ class STaskHelper {
 
 SNSEND
 
-#endif//_SFUNCTOR_H_
+#endif //_SFUNCTOR_H_

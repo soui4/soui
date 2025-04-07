@@ -39,7 +39,7 @@
 
 #define IUNKNOWN_ADD_IID(iface) IUNKNOWN_ADD_IID2(__uuidof(iface), iface)
 
-class  SUnknown {
+class SUnknown {
   public:
     SUnknown()
         : m_cRef(1)

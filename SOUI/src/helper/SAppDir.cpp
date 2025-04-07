@@ -7,11 +7,11 @@ SAppDir::SAppDir(HINSTANCE hInst)
     TCHAR szCurrentDir[MAX_PATH] = { 0 };
     if (GetModuleFileName(hInst, szCurrentDir, MAX_PATH))
     {
-        #ifdef _WIN32
+#ifdef _WIN32
         LPTSTR lpInsertPos = _tcsrchr(szCurrentDir, _T('\\'));
-        #else
+#else
         LPTSTR lpInsertPos = _tcsrchr(szCurrentDir, _T('/'));
-        #endif//
+#endif //
         if (lpInsertPos)
         {
             *lpInsertPos = 0;

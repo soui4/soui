@@ -52,7 +52,7 @@ DECLARE_INTERFACE_(IMenuEx, IObjRef)
      * @param xmlMenu - IXmlNode对象
      * @return BOOL - 成功返回TRUE，失败返回FALSE
      */
-    STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode *xmlMenu) PURE;
+    STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode * xmlMenu) PURE;
 
     /**
      * @brief 插入一个菜单项
@@ -175,7 +175,7 @@ DECLARE_INTERFACE_(IMenuEx, IObjRef)
      * @param lpItemString - 项目文本
      * @return BOOL - 成功返回TRUE，失败返回FALSE
      */
-    STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT *lpItemString) PURE;
+    STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) PURE;
 
     /**
      * @brief 获取宿主窗口指针

@@ -239,19 +239,21 @@ void SMenuExItem::OnPaint(IRenderTarget *pRT)
 
     if (m_bCheck || m_bRadio)
     {
-        SASSERT(pMenuRoot->m_pCheckSkin);
-        int nState = 0;
-        if (m_bRadio)
+        if (pMenuRoot->m_pCheckSkin)
         {
-            nState = m_bCheck ? 1 : 2;
+            int nState = 0;
+            if (m_bRadio)
+            {
+                nState = m_bCheck ? 1 : 2;
+            }
+            if (icoY == Y_IMIDFLAG)
+            {
+                icoY = (rc.Height() - pMenuRoot->m_pCheckSkin->GetSkinSize().cy) / 2;
+            }
+            rc.top += icoY;
+            CRect rcIcon(rc.TopLeft(), pMenuRoot->m_pCheckSkin->GetSkinSize());
+            pMenuRoot->m_pCheckSkin->DrawByIndex(pRT, rcIcon, nState);
         }
-        if (icoY == Y_IMIDFLAG)
-        {
-            icoY = (rc.Height() - pMenuRoot->m_pCheckSkin->GetSkinSize().cy) / 2;
-        }
-        rc.top += icoY;
-        CRect rcIcon(rc.TopLeft(), pMenuRoot->m_pCheckSkin->GetSkinSize());
-        pMenuRoot->m_pCheckSkin->DrawByIndex(pRT, rcIcon, nState);
     }
     else if (pMenuRoot->m_pIconSkin)
     {
@@ -264,7 +266,7 @@ void SMenuExItem::OnPaint(IRenderTarget *pRT)
         pMenuRoot->m_pIconSkin->DrawByIndex(pRT, rcIcon, m_iIcon);
     }
 
-    if (m_pSubMenu)
+    if (m_pSubMenu && pMenuRoot->m_pArrowSkin)
     {
         CRect rcArrow = GetClientRect();
         CSize szArrow = pMenuRoot->m_pArrowSkin->GetSkinSize();
@@ -399,7 +401,6 @@ class SMenuExSep : public SMenuExItem {
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int wid, int hei) OVERRIDE
     {
         SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
-        (void)pMenuRoot;
         SASSERT(pMenuRoot);
         CSize szRet;
         szRet.cx = 0;
@@ -713,9 +714,9 @@ UINT SMenuEx::TrackPopupMenu(UINT flag, int x, int y, HWND hOwner, int nScale)
 void SMenuEx::ShowMenu(UINT uFlag, int x, int y)
 {
     SMenuExRoot *pMenuRoot = sobj_cast<SMenuExRoot>(GetRoot());
+    SASSERT(pMenuRoot);
 
     SendInitPopupMenu2Owner(0);
-    SASSERT(pMenuRoot);
     pMenuRoot->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
 
     CSize szMenu = pMenuRoot->CalcMenuSize();

@@ -437,7 +437,7 @@ int SouiLayout::PositionItem2Value(SList<WndPos> *pLstChilds, SPOSITION position
     {
     case PIT_CENTER: //参考中心
         if (nMax != SIZE_WRAP_CONTENT)
-            nRet = pos.nPos.toPixelSize(nScale) * (pos.bMinus?-1:1) + nMax / 2;
+            nRet = pos.nPos.toPixelSize(nScale) * (pos.bMinus ? -1 : 1) + nMax / 2;
         break;
     case PIT_NORMAL:
         if (pos.bMinus)

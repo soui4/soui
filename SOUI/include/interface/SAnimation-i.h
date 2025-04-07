@@ -401,5 +401,3 @@ DECLARE_INTERFACE_(IAnimation, IObject)
 
 SNSEND
 #endif // __SANIMATION_I__H__
-
-

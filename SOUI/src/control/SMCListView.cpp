@@ -142,7 +142,6 @@ BOOL SMCListView::SetAdapter(IMcAdapter *adapter)
 int SMCListView::InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware /*=TRUE*/, float fWeight /*=0.0f*/)
 {
     SASSERT(m_pHeader);
-
     int nRet = m_pHeader->InsertItem(nIndex, pszText, nWidth, fmt, lParam, bDpiAware, fWeight);
     UpdateScrollBar();
     return nRet;
@@ -156,7 +155,6 @@ BOOL SMCListView::CreateChildren(SXmlNode xmlNode)
     SXmlNode xmlHeader = xmlNode.child(L"headerStyle");
     xmlHeader.set_userdata(1);
     m_pHeader = sobj_cast<SHeaderCtrl>(CreateChildByName(xmlHeader.attribute(L"wndclass").as_string(SHeaderCtrl::GetClassName())));
-    SASSERT(m_pHeader);
     if (!m_pHeader)
         return FALSE;
     InsertChild(m_pHeader);
@@ -1263,7 +1261,6 @@ BOOL SMCListView::OnSetCursor(const CPoint &pt)
 BOOL SMCListView::OnItemClick(IEvtArgs *pEvt)
 {
     SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
-    SASSERT(pItemPanel);
     int iItem = (int)pItemPanel->GetItemIndex();
     if (iItem != m_iSelItem)
     {

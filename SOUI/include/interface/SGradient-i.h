@@ -48,6 +48,3 @@ DECLARE_INTERFACE_(IGradient, IObject)
 
 SNSEND
 #endif //_GRADIENT_I_H_
-
-
-

@@ -463,7 +463,7 @@ LRESULT SNativeWnd::ReflectNotifications(UINT uMsg, WPARAM wParam, LPARAM lParam
     case WM_CTLCOLORSTATIC:
         hWndChild = (HWND)lParam;
         break;
-#endif//_WIN32
+#endif //_WIN32
     default:
         break;
     }
@@ -501,7 +501,7 @@ BOOL SNativeWnd::DefaultReflectionHandler(HWND hWnd, UINT uMsg, WPARAM wParam, L
     case OCM_CTLCOLORMSGBOX:
     case OCM_CTLCOLORSCROLLBAR:
     case OCM_CTLCOLORSTATIC:
-#endif//_WIN32
+#endif //_WIN32
         lResult = ::DefWindowProc(hWnd, uMsg - OCM__BASE, wParam, lParam);
         return TRUE;
     default:

@@ -52,7 +52,12 @@ ISkinObj *SSkinPool::_LoadSkin(SXmlNode xmlSkin, int nScale)
             pSkin->SetScale(nScale);
         }
         SkinKey key = { strSkinName, pSkin->GetScale() };
-        SASSERT(!HasKey(key));
+        if (HasKey(key))
+        {
+            SSLOGW() << "load skin duplicated found,type=" << strTypeName << "name=" << strSkinName;
+            pSkin->Release();
+            return NULL;
+        }
         AddKeyObject(key, pSkin);
     }
     else

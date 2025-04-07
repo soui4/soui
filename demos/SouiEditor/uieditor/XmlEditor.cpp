@@ -142,7 +142,16 @@ bool CXmlEditor::UpdateXmlStruct(spugi::xml_node xmlNode, HSTREEITEM item,int iS
 
 	if(xmlNode.type() != spugi::node_element)
 		return false;
-	HSTREEITEM itemNew = m_treeXmlStruct->InsertItem(S_CA2T(xmlNode.name()), item);
+    SStringA strName = xmlNode.name();
+    if (xmlNode.attribute("name"))
+    {
+        strName += SStringA().Format(".%s", xmlNode.attribute("name").value());
+    }
+    else if (xmlNode.attribute("id"))
+    {
+        strName += SStringA().Format(".%s", xmlNode.attribute("id").value());
+	}
+    HSTREEITEM itemNew = m_treeXmlStruct->InsertItem(S_CA2T(strName), item);
 	m_treeXmlStruct->SetItemData(itemNew,iSib);
 
 	int iChild = 0;

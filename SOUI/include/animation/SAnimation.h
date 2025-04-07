@@ -28,12 +28,12 @@
 #include <animation/STransformation.h>
 #include <sobject/Sobject.hpp>
 
-#define ATTR_VALUE_DESC(attribname, desc)                     \
-    if (0 == strAttribName.CompareNoCase(attribname))         \
-    {                                                         \
+#define ATTR_VALUE_DESC(attribname, desc)                    \
+    if (0 == strAttribName.CompareNoCase(attribname))        \
+    {                                                        \
         desc = SNS::SValueDescription::parseValue(strValue); \
-        hRet = S_FALSE;                                       \
-    }                                                         \
+        hRet = S_FALSE;                                      \
+    }                                                        \
     else
 
 SNSBEGIN

@@ -23,8 +23,10 @@ BOOL SComboView::CreateListBox(SXmlNode xmlNode)
     //创建列表控件
     SXmlNode listStyle = xmlNode.child(L"listStyle");
     SStringW strListClass = listStyle.attribute(L"wndclass").as_string(SListView::GetClassName());
-    m_pListBox = sobj_cast<SListView>(CreateChildByName(strListClass));
-    SASSERT(m_pListBox);
+    SListView *pListBox = sobj_cast<SListView>(CreateChildByName(strListClass));
+    if (!pListBox)
+        return FALSE;
+    m_pListBox = pListBox;
 
     m_pListBox->SetContainer(GetContainer());
 

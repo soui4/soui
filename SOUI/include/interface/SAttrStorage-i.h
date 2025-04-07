@@ -86,6 +86,3 @@ DECLARE_INTERFACE_(IAttrStorageFactory, IObjRef)
 
 SNSEND
 #endif // __SATTRSTORAGE_I__H__
-
-
-

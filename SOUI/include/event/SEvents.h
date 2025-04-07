@@ -263,7 +263,7 @@ class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
         {                                              \
             EventID = id                               \
         };                                             \
-        evt(SNS::IObject *pSender = NULL)             \
+        evt(SNS::IObject *pSender = NULL)              \
             : SEvtArgs(pSender)                        \
         {                                              \
         }                                              \

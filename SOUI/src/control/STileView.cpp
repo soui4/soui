@@ -952,7 +952,6 @@ BOOL STileView::OnSetCursor(const CPoint &pt)
 BOOL STileView::OnItemClick(IEvtArgs *pEvt)
 {
     SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
-    SASSERT(pItemPanel);
     int iItem = (int)pItemPanel->GetItemIndex();
     if (iItem != m_iSelItem)
     {

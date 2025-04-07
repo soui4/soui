@@ -377,7 +377,7 @@ HWND SHostWnd::CreateEx(HWND hWndParent, DWORD dwStyle, DWORD dwExStyle, int x, 
             xmlInit = &xmlRoot;
         }
     }
-    //read translucent property
+    // read translucent property
     m_hostAttr.Init();
     m_hostAttr.InitFromXml(xmlInit);
     if (m_hostAttr.m_bTranslucent)
@@ -872,7 +872,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     m_pRoot->SetContainer(this);
     SwndContainerImpl::SetRoot(m_pRoot);
 
-    //load xml resource
+    // load xml resource
     SXmlDoc xmlDoc;
     SXmlNode xmlRoot;
     IXmlNode *pXmlRoot = m_xmlInit;
@@ -955,7 +955,7 @@ void SHostWnd::OnSize(UINT nType, CSize size)
         return;
 
     BOOL bSizeChange = size != m_szPrev;
-    //SSLOGI() << "on host size,szPrev=" << m_szPrev.cx << "," << m_szPrev.cy << " size=" << size.cx << "," << size.cy << " sizeChange=" << bSizeChange;
+    // SSLOGI() << "on host size,szPrev=" << m_szPrev.cx << "," << m_szPrev.cy << " size=" << size.cx << "," << size.cy << " sizeChange=" << bSizeChange;
     if (bSizeChange)
     {
         if (m_nAutoSizing == 0)

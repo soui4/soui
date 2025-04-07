@@ -326,6 +326,8 @@ class SOUI_EXP SComboBase
      */
     void OnDestroy();
 
+    int OnCreate(LPVOID);
+
     void OnKillFocus(SWND wndFocus);
 
     SStringT GetCueText(BOOL bRawText = FALSE) const;
@@ -353,6 +355,7 @@ class SOUI_EXP SComboBase
         MSG_WM_KEYDOWN(OnKeyDown)
         MSG_WM_CHAR(OnChar)
         MSG_WM_DESTROY(OnDestroy)
+        MSG_WM_CREATE(OnCreate)
         MSG_WM_KILLFOCUS_EX(OnKillFocus)
     SOUI_MSG_MAP_END()
 

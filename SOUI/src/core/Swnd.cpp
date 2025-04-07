@@ -822,7 +822,6 @@ const static wchar_t KTempParamFmt[] = L"{{%s}}";  //模板数据替换格式
 BOOL SWindow::CreateChildren(SXmlNode xmlNode)
 {
     ASSERT_UI_THREAD();
-    BOOL bRet = FALSE;
     SAutoEnableHostPrivUiDef enableUiDef(this);
     for (SXmlNode xmlChild = xmlNode.first_child(); xmlChild; xmlChild = xmlChild.next_sibling())
     {
@@ -839,7 +838,6 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                 if (_wcsicmp(xmlInclude.name(), KLabelInclude) == 0)
                 { // compatible with 2.9.0.1
                     CreateChildren(xmlInclude);
-                    bRet = TRUE;
                 }
                 else
                 {
@@ -857,7 +855,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                             xmlInclude.append_attribute(attr.name()).set_value(attr.value());
                         }
                     }
-                    bRet = CreateChild(xmlInclude);
+                    CreateChild(xmlInclude);
                 }
             }
             else
@@ -890,7 +888,6 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                         if (xmlDoc.load_buffer_inplace(strXml.GetBuffer(strXml.GetLength()), strXml.GetLength() * sizeof(WCHAR), 116, sizeof(wchar_t) == 2 ? enc_utf16 : enc_utf32))
                         {
                             CreateChilds(xmlDoc.root());
-                            bRet = TRUE;
                         }
                         strXml.ReleaseBuffer();
                         xmlData = xmlData.next_sibling(KTempData);
@@ -899,7 +896,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
             }
             else
             {
-                bRet = CreateChild(xmlChild);
+                CreateChild(xmlChild);
             }
         }
     }
@@ -1008,8 +1005,12 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
     SSendMessage(WM_SHOWWINDOW, IsVisible(TRUE), ParentShow);
 
     //创建子窗口
-    CreateChildren(xmlNode);
-
+    if (!CreateChildren(xmlNode))
+    {
+        if (m_pParent)
+            m_pParent->DestroyChild(this);
+        return FALSE;
+    }
     //请求根窗口重新布局。由于布局涉及到父子窗口同步进行，同步执行布局操作可能导致布局过程重复执行。
     RequestRelayout();
 

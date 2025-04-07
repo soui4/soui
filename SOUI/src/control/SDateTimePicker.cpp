@@ -281,8 +281,8 @@ void SDateTimePicker::OnPaint(IRenderTarget *pRT)
         rcBtn += CRect(1, 1, 1, 1);
         m_pNcSkin->DrawByIndex(pRT, rcBtn, 1);
     }
-    SASSERT(m_pSkinBtn);
-    m_pSkinBtn->DrawByState(pRT, rcSkin, m_dwBtnState);
+    if (m_pSkinBtn)
+        m_pSkinBtn->DrawByState(pRT, rcSkin, m_dwBtnState);
 }
 
 bool SDateTimePicker::CalcPopupRect(int nWidth, CRect &rcPopup)

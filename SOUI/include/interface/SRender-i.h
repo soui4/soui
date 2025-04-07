@@ -1331,7 +1331,7 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
 
     STDMETHOD_(BOOL, CreatePathEffect)(THIS_ REFGUID guidEffect, IPathEffect * *ppPathEffect) PURE;
 
-    STDMETHOD_(IFontS *,GetDefFont)(CTHIS) PURE;
+    STDMETHOD_(IFontS *, GetDefFont)(CTHIS) PURE;
 };
 
 #ifdef __cplusplus

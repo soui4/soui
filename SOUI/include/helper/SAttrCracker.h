@@ -15,10 +15,10 @@
 #define _SATTRCRACK_H
 
 // Attribute Declaration
-#define SOUI_ATTRS_BEGIN()                                                                                                   \
-  public:                                                                                                                    \
+#define SOUI_ATTRS_BEGIN()                                                                                                 \
+  public:                                                                                                                  \
     virtual HRESULT SetAttribute(const SNS::SStringW &strAttribName, const SNS::SStringW &strValue, BOOL bLoading = FALSE) \
-    {                                                                                                                        \
+    {                                                                                                                      \
         HRESULT hRet = E_FAIL;
 
 //从SObject派生的类是属性结尾
@@ -219,7 +219,7 @@
 #define ATTR_STRINGA(attribname, varname, allredraw)  \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        SNS::SStringW strTmp = GETSTRING(strValue);  \
+        SNS::SStringW strTmp = GETSTRING(strValue);   \
         varname = S_CW2A(strTmp);                     \
         hRet = allredraw ? S_OK : S_FALSE;            \
     }                                                 \
@@ -244,20 +244,20 @@
     else
 
 // StringA = StringA
-#define ATTR_I18NSTRA(attribname, varname, allredraw)    \
-    if (0 == strAttribName.CompareNoCase(attribname))    \
-    {                                                    \
+#define ATTR_I18NSTRA(attribname, varname, allredraw)   \
+    if (0 == strAttribName.CompareNoCase(attribname))   \
+    {                                                   \
         SNS::SStringW strTmp = tr(GETSTRING(strValue)); \
-        varname = S_CW2A(strTmp);                        \
-        hRet = allredraw ? S_OK : S_FALSE;               \
-    }                                                    \
+        varname = S_CW2A(strTmp);                       \
+        hRet = allredraw ? S_OK : S_FALSE;              \
+    }                                                   \
     else
 
 // STrText = StringA
 #define ATTR_I18NSTRT(attribname, varname, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        SNS::SStringW strTmp = GETSTRING(strValue);  \
+        SNS::SStringW strTmp = GETSTRING(strValue);   \
         varname.SetText(S_CW2T(strTmp));              \
         hRet = allredraw ? S_OK : S_FALSE;            \
     }                                                 \
@@ -350,7 +350,7 @@
 #define ATTR_IMAGE(attribname, varname, allredraw)    \
     if (0 == strAttribName.CompareNoCase(attribname)) \
     {                                                 \
-        SNS::IBitmapS *pImg = LOADIMAGE2(strValue);  \
+        SNS::IBitmapS *pImg = LOADIMAGE2(strValue);   \
         if (!pImg)                                    \
             hRet = E_FAIL;                            \
         else                                          \
@@ -367,7 +367,7 @@
 #define ATTR_IMAGEAUTOREF(attribname, varname, allredraw) \
     if (0 == strAttribName.CompareNoCase(attribname))     \
     {                                                     \
-        SNS::IBitmapS *pImg = LOADIMAGE2(strValue);      \
+        SNS::IBitmapS *pImg = LOADIMAGE2(strValue);       \
         if (!pImg)                                        \
             hRet = E_FAIL;                                \
         else                                              \
@@ -405,18 +405,18 @@
     }                                                                                 \
     else
 
-#define ATTR_GRADIENT(attribname, varname, allredraw)                 \
-    if (0 == strAttribName.CompareNoCase(attribname))                 \
-    {                                                                 \
+#define ATTR_GRADIENT(attribname, varname, allredraw)                \
+    if (0 == strAttribName.CompareNoCase(attribname))                \
+    {                                                                \
         SNS::IGradient *pGradient = GETUIDEF->GetGradient(strValue); \
-        if (!pGradient)                                               \
-            hRet = E_FAIL;                                            \
-        else                                                          \
-        {                                                             \
-            varname = pGradient;                                      \
-            hRet = allredraw ? S_OK : S_FALSE;                        \
-        }                                                             \
-    }                                                                 \
+        if (!pGradient)                                              \
+            hRet = E_FAIL;                                           \
+        else                                                         \
+        {                                                            \
+            varname = pGradient;                                     \
+            hRet = allredraw ? S_OK : S_FALSE;                       \
+        }                                                            \
+    }                                                                \
     else
 
 #endif //_SATTRCRACK_H

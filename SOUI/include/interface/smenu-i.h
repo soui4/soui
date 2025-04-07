@@ -70,14 +70,14 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
      * @param xmlMenu - IXmlNode对象
      * @return BOOL - 成功返回TRUE，失败返回FALSE
      */
-    STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode *xmlMenu) PURE;
+    STDMETHOD_(BOOL, LoadMenu2)(THIS_ IXmlNode * xmlMenu) PURE;
 
     /**
      * @brief 设置菜单项的图标皮肤
      * @param icons - 包含一组图标的ISkinObj对象
      * @return void
      */
-    STDMETHOD_(void, SetIconSkin)(THIS_ ISkinObj *icons) PURE;
+    STDMETHOD_(void, SetIconSkin)(THIS_ ISkinObj * icons) PURE;
 
     /**
      * @brief 插入一个菜单项
@@ -200,9 +200,8 @@ DECLARE_INTERFACE_(IMenu, IObjRef)
      * @param lpItemString - 项目文本
      * @return BOOL - 成功返回TRUE，失败返回FALSE
      */
-    STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT *lpItemString) PURE;
+    STDMETHOD_(BOOL, GetMenuString)(THIS_ UINT uPosition, UINT uFlags, IStringT * lpItemString) PURE;
 };
 
 SNSEND
 #endif // __SMENU_I__H__
-

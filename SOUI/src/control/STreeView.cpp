@@ -1355,7 +1355,6 @@ SItemPanel *STreeView::HitTest(CPoint &pt) const
 BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
 {
     SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
-    SASSERT(pItemPanel);
     HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
     if (hItem != m_hSelected)
     {
@@ -1367,7 +1366,6 @@ BOOL STreeView::OnItemClick(IEvtArgs *pEvt)
 BOOL STreeView::OnItemDblClick(IEvtArgs *pEvt)
 {
     SItemPanel *pItemPanel = sobj_cast<SItemPanel>(pEvt->Sender());
-    SASSERT(pItemPanel);
     HSTREEITEM hItem = (HSTREEITEM)pItemPanel->GetItemIndex();
     if (m_adapter->HasChildren(hItem))
     {

@@ -268,7 +268,8 @@ LRESULT SSliderBar::NotifyPos(SliderBarAction action, int nPos)
 
 SIZE SSliderBar::GetDesiredSize(int wid, int hei)
 {
-    SASSERT(m_pSkinBg);
+    if (!m_pBgSkin)
+        return CSize();
     CSize szRet;
     SIZE sizeBg = m_pSkinBg->GetSkinSize();
     SIZE sizeThumb = { 0 };

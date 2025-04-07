@@ -54,8 +54,8 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
   protected:
     void RunIdle();
-  protected:
 
+  protected:
     BOOL m_bRunning;
     BOOL m_bQuit;
     BOOL m_bDoIdle;

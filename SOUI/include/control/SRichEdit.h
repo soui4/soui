@@ -42,7 +42,8 @@ enum
 class STextHost;
 class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     friend class STextHost;
-	friend class SApplication;
+    friend class SApplication;
+
   public:
     DEF_SOBJECT(SPanel, L"richedit")
 
@@ -65,8 +66,8 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     }
 
   private:
-	  static void InitTextService();
-	  static void UninitTextService();
+    static void InitTextService();
+    static void UninitTextService();
 
   public: // richedit interface
     STDMETHOD_(DWORD, SaveRtf)(THIS_ LPCTSTR pszFileName) OVERRIDE;

@@ -67,7 +67,7 @@ void CScintillaWnd::UpdateLineNumberWidth(void)
 	int  iLineMarginWidthFit;  
 
 	sprintf((tchLines),(" %i "),    
-		SendMessage(SCI_GETLINECOUNT,0,0)); 
+		(int)SendMessage(SCI_GETLINECOUNT,0,0)); 
 
 	iLineMarginWidthNow = SendMessage(    
 		SCI_GETMARGINWIDTHN,0,0);    

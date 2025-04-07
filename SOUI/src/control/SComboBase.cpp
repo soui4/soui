@@ -105,13 +105,13 @@ SComboBase::~SComboBase(void)
 
 BOOL SComboBase::CreateChildren(SXmlNode xmlNode)
 {
-    SASSERT(m_pSkinBtn);
     m_xmlDropdownStyle.root().append_copy(xmlNode.child(KStyle_Dropdown));
     //创建edit对象
     SXmlNode xmlEditStyle = xmlNode.child(KStyle_Edit);
     SStringW strEditClass = xmlEditStyle.attribute(L"wndclass").as_string(SComboEdit::GetClassName());
     m_pEdit = sobj_cast<SComboEdit>(CreateChildByName(strEditClass));
-    SASSERT(m_pEdit);
+    if (!m_pEdit)
+        return FALSE;
     m_pEdit->SetOwner(this);
     InsertChild(m_pEdit);
     m_pEdit->GetEventSet()->setMutedState(TRUE);
@@ -524,6 +524,16 @@ void SComboBase::OnDestroy()
 {
     CloseUp();
     __baseCls::OnDestroy();
+}
+
+int SComboBase::OnCreate(LPVOID)
+{
+    int ret = __baseCls::OnCreate(NULL);
+    if (ret != 0)
+        return ret;
+    if (!m_pSkinBtn)
+        return -1;
+    return 0;
 }
 
 void SComboBase::OnSelChanged()

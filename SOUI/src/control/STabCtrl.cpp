@@ -678,7 +678,7 @@ int STabCtrl::InsertItem(SXmlNode xmlNode, int iInsert /*=-1*/, BOOL bLoading /*
         SXmlDoc xmlDoc;
         if (!LOADXML(xmlDoc, strSrc))
             return NULL;
-        return InsertItem(xmlDoc.root().first_child(),iInsert,bLoading);
+        return InsertItem(xmlDoc.root().first_child(), iInsert, bLoading);
     }
     if (wcscmp(xmlNode.name(), STabPage::GetClassName()) != 0)
         return NULL;

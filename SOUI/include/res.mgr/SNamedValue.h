@@ -36,7 +36,8 @@ class SNamedValue {
             wcscpy_s(namedValue.strName, MAX_NAME, xmlStr.name());
             if (ValueParser::ParseValue(xmlStr.attribute(L"value").as_string(), namedValue.value))
                 m_lstNamedValue.Add(namedValue);
-            else {
+            else
+            {
                 SStringW msg = SStringW().Format(L"parse value failed, name=%s,value=%s", xmlStr.name(), xmlStr.attribute(L"value").as_string());
                 SASSERT_MSGW(false, msg);
             }
