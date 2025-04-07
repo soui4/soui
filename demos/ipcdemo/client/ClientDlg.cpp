@@ -218,13 +218,13 @@ void CClientDlg::OnAddString()
 
 void CClientDlg::OnSum()
 {
-    #ifdef _WIN32
     SWindow *pEdit1 = FindChildByID(R.id.edit_param1);
     int n = pEdit1->GetWindowText().ToInt();
-    n = smin(n, 15);
+    if (n > 10)
+    {
+        pEdit1->SetWindowText(_T("10"));
+        n = 10;
+    }
     int ret = m_conn.Sum(n);
     FindChildByID(R.id.edit_result)->SetWindowText(SStringT().Format(_T("%d"), ret));
-    #else
-    SLOGW()<<"ipc can't call recursive for linux now";
-    #endif
 }

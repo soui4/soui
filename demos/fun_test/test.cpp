@@ -407,6 +407,17 @@ TEST(demo,fmap2){
 	}
 }
 
+TEST(demo, notifychange){
+    SStringT str = getSourceDir();
+    HANDLE h = FindFirstChangeNotification(str,TRUE,FILE_NOTIFY_CHANGE_SIZE);
+    EXPECT_TRUE(h!=INVALID_HANDLE_VALUE);
+    if(h!=INVALID_HANDLE_VALUE){
+        //to test the api, uncomment the next 2 lines.
+        //int ret = WaitForSingleObject(h,5000);
+        //EXPECT_EQ(ret,WAIT_OBJECT_0);
+        FindCloseChangeNotification(h);
+    }
+}
 
 int run_window();
 TEST(demo,window){
