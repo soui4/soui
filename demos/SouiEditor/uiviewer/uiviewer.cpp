@@ -21,7 +21,7 @@ void SWinxLog(const char* pLogStr, int level){
 	//SLOG("swinx",level)<<pLogStr;
 }
 
-static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
+static const TCHAR *kPath_SysRes = _T("/../../../soui-sys-resource");
 
 static SStringT getSourceDir()
 {
@@ -215,7 +215,6 @@ int main(int nArgs,char **args)
 		SUiViewer souiEngine(hInstance);
 		if (souiEngine)
 		{
-			souiEngine.LoadSystemRes();
 			souiEngine.RegCustomCtrls();
 			if(nArgs >= 3)
 			{
@@ -227,7 +226,7 @@ int main(int nArgs,char **args)
 				
 				SStringT resFolder = S_CA2T(args[1]);
 				resFolder.Trim('"');
-				souiEngine.LoadUserRes(resFolder);
+				souiEngine.LoadRes(resFolder);
 
 				CPreviewContainer prevWnd(S_CA2T(args[2]), hEditor);
 				nRet = souiEngine.Run(&prevWnd, hParent);

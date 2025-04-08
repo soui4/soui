@@ -31,7 +31,7 @@
 
 void RegisterExtendControl(SApplication *theApp);
 
-static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
+static const TCHAR *kPath_SysRes = _T("/../../../soui-sys-resource");
 static const TCHAR *kPath_DemoRes = _T("/uires");
 
 
