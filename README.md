@@ -73,7 +73,7 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 ### UI可视化设计
 
-`SOUI4 Editor`,仓库地址https://github.com/soui4-demo/SouiEditor
+最新版本souieditor已经集成到这个代码库的demos中，选择编译demo就可以获得souieditor。
 ### SOUI4JS
 `SOUI4的JavaScript导出版本，实现使用js开发客户端程序的框架，完美解决性能和灵活性的矛盾`,仓库地址(https://github.com/soui4/soui4js)
 
