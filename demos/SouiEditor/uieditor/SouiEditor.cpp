@@ -31,6 +31,65 @@
 
 void RegisterExtendControl(SApplication *theApp);
 
+static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
+static const TCHAR *kPath_DemoRes = _T("/uires");
+
+
+static SStringT getSourceDir()
+{
+    SStringA file(__FILE__);
+    file = file.Left(file.ReverseFind(PATH_SLASH));
+    return S_CA2T(file);
+}
+
+BOOL LoadRes(SouiFactory &souiFac, SApplication *theApp)
+{
+    BOOL bLoaded = FALSE;
+    do
+    {
+#ifdef _WIN32
+        SAutoRefPtr<IResProvider> sysResProvider;
+        HMODULE hModSysResource = LoadLibrary(SYS_NAMED_RESOURCE);
+        if (!hModSysResource)
+            break;
+        sysResProvider.Attach(souiFac.CreateResProvider(RES_PE));
+        sysResProvider->Init((WPARAM)hModSysResource, 0);
+        theApp->LoadSystemNamedResource(sysResProvider);
+        FreeLibrary(hModSysResource);
+
+        SAutoRefPtr<IResProvider> pResProvider;
+        pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
+        SStringT appRes = getSourceDir() + kPath_DemoRes;
+        bLoaded = pResProvider->Init((LPARAM)appRes.c_str(), 0);
+        if (!bLoaded)
+        {
+            pResProvider.Attach(souiFac.CreateResProvider(RES_PE));
+            bLoaded = pResProvider->Init((WPARAM)theApp->GetModule(), 0);
+        }
+        SASSERT_FMT(bLoaded, _T("load app resource failed"));
+        if (!bLoaded)
+            break;
+        theApp->AddResProvider(pResProvider);
+#else
+        SAutoRefPtr<IResProvider> sysResProvider;
+        sysResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
+        SStringT sysRes = getSourceDir() + kPath_SysRes;
+        if (!sysResProvider->Init((LPARAM)sysRes.c_str(), 0))
+            break;
+        theApp->LoadSystemNamedResource(sysResProvider);
+        // load use resource
+        SAutoRefPtr<IResProvider> pResProvider(souiFac.CreateResProvider(RES_FILE), FALSE);
+        SStringT appRes = getSourceDir() + kPath_DemoRes;
+        bLoaded = pResProvider->Init((LPARAM)appRes.c_str(), 0);
+        if (!bLoaded)
+            break;
+        theApp->AddResProvider(pResProvider);
+#endif //_WIN32
+    } while (false);
+    SASSERT(bLoaded);
+    theApp->InitXmlNamedID((const LPCWSTR *)&R.name, (const int *)&R.id, sizeof(R.id) / sizeof(int));
+    return bLoaded;
+}
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int /*nCmdShow*/)
 {
@@ -76,44 +135,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 
 		// 注册扩展控件
 		SCtrlsRegister::RegisterCtrls(theApp);
-#ifdef _WIN32
-		//从DLL加载系统资源
-		HMODULE hModSysResource = LoadLibrary(SYS_NAMED_RESOURCE);
-		if (hModSysResource)
-		{
-			SAutoRefPtr<IResProvider> sysResProvider;
-			sysResProvider.Attach(souiFac.CreateResProvider(RES_PE));
-			sysResProvider->Init((WPARAM)hModSysResource, 0);
-			theApp->LoadSystemNamedResource(sysResProvider);
-			FreeLibrary(hModSysResource);
-		}
-		else
-		{
-			SASSERT(0);
-		}
-#else
-		IResProvider* sysResProvider;
-		bLoaded = pComMgr->CreateResProvider_ZIP((IObjRef**)&sysResProvider);
-		SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), _T("resprovider_zip"));
-		ZIPRES_PARAM param;
-		ZipFile(&param,theApp->GetRenderFactory(),"soui-sys-resource.zip");
-		bLoaded = sysResProvider->Init((WPARAM)&param, 0);
-		SASSERT(bLoaded);
-		if(bLoaded){
-			theApp->LoadSystemNamedResource(sysResProvider);
-		}
-		sysResProvider->Release();
-#endif
-        SAutoRefPtr<IResProvider>   pResProvider;
-		pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
-        if (!pResProvider->Init((LPARAM)_T("uieditor_uires"), 0))
-        {
-            SASSERT(0);
-            return 1;
-        }
-
-		theApp->InitXmlNamedID((const LPCWSTR*)&R.name, (const int*)&R.id,sizeof(R.id)/sizeof(int));
-        theApp->AddResProvider(pResProvider);
+        LoadRes(souiFac, theApp);
 
 		//读取自定义消息框布局
         theApp->SetMessageBoxTemplateResId(_T("LAYOUT:xml_messagebox"));

@@ -13,19 +13,7 @@ add_custom_target(copy_files ALL
 )
 
 set(UIEDITOR_DIR ${CMAKE_CURRENT_SOURCE_DIR}/..)
-add_custom_command(TARGET copy_files PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy
-            ${UIEDITOR_DIR}/copy_files/soui-sys-resource.zip
-            ${TARGET_DIR}
-    COMMENT "Copying ${FILE} to ${TARGET_DIR}/soui-sys-resource.zip"
-)
 
-add_custom_command(TARGET copy_files PRE_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory
-            ${UIEDITOR_DIR}/uieditor/uires
-            ${TARGET_DIR}/uieditor_uires
-    COMMENT "Copying ${FILE} to ${TARGET_DIR}"
-)
 add_custom_command(TARGET copy_files PRE_BUILD
     COMMAND ${CMAKE_COMMAND} -E copy_directory
             ${UIEDITOR_DIR}/uieditor/Config

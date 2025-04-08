@@ -21,6 +21,16 @@ void SWinxLog(const char* pLogStr, int level){
 	//SLOG("swinx",level)<<pLogStr;
 }
 
+static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
+
+static SStringT getSourceDir()
+{
+    SStringA file(__FILE__);
+    file = file.Left(file.ReverseFind(PATH_SLASH));
+    return S_CA2T(file);
+}
+
+
 class SApp : public SApplication
 {
 public:
@@ -49,13 +59,11 @@ private:
 public:
 	SUiViewer(HINSTANCE hInstance):m_theApp(NULL), m_bInitSucessed(false){
 		
-		CAutoRefPtr<SOUI::IRenderFactory> pRenderFactory;
+		SAutoRefPtr<SOUI::IRenderFactory> pRenderFactory;
 		BOOL bLoaded = FALSE;
-		//使用GDI渲染界面
 		bLoaded = m_ComMgr.CreateRender_Skia((IObjRef * *)& pRenderFactory);
 		SASSERT_FMT(bLoaded, _T("load interface [render] failed!"));
-		//设置图像解码引擎。默认为GDIP。基本主流图片都能解码。系统自带，无需其它库
-		CAutoRefPtr<SOUI::IImgDecoderFactory> pImgDecoderFactory;
+		SAutoRefPtr<SOUI::IImgDecoderFactory> pImgDecoderFactory;
 		bLoaded = m_ComMgr.CreateImgDecoder((IObjRef * *)& pImgDecoderFactory);
 		SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), _T("imgdecoder"));
 
@@ -80,53 +88,52 @@ public:
 	{
 		return m_bInitSucessed;
 	}
-	//加载系统资源
-	BOOL LoadSystemRes()
-	{
-	#ifdef _WIN32
-		BOOL bLoaded = FALSE;
-		//从DLL加载系统资源
-		HMODULE hModSysResource = LoadLibrary(SYS_NAMED_RESOURCE);
-		if (hModSysResource)
-		{
-			SAutoRefPtr<IResProvider> sysResProvider;
-			sysResProvider.Attach(m_souiFac.CreateResProvider(RES_PE));
-			sysResProvider->Init((WPARAM)hModSysResource, 0);
-			m_theApp->LoadSystemNamedResource(sysResProvider);
-			FreeLibrary(hModSysResource);
-		}
-		else
-		{
-			SASSERT(0);
-		}
-		return bLoaded;
+
+    BOOL LoadRes(const SStringT &appRes)
+    {
+        BOOL bLoaded = FALSE;
+        do
+        {
+#ifdef _WIN32
+            SAutoRefPtr<IResProvider> sysResProvider;
+            HMODULE hModSysResource = LoadLibrary(SYS_NAMED_RESOURCE);
+            if (!hModSysResource)
+                break;
+            sysResProvider.Attach(m_souiFac.CreateResProvider(RES_PE));
+            sysResProvider->Init((WPARAM)hModSysResource, 0);
+            m_theApp->LoadSystemNamedResource(sysResProvider);
+            FreeLibrary(hModSysResource);
+
+            SAutoRefPtr<IResProvider> pResProvider;
+            pResProvider.Attach(m_souiFac.CreateResProvider(RES_FILE));
+            bLoaded = pResProvider->Init((LPARAM)appRes.c_str(), 0);
+            if (!bLoaded)
+            {
+                pResProvider.Attach(m_souiFac.CreateResProvider(RES_PE));
+                bLoaded = pResProvider->Init((WPARAM)m_theApp->GetModule(), 0);
+            }
+            SASSERT_FMT(bLoaded, _T("load app resource failed"));
+            if (!bLoaded)
+                break;
+            m_theApp->AddResProvider(pResProvider);
 #else
-		IResProvider* sysResProvider;
-		BOOL bLoaded = m_ComMgr.CreateResProvider_ZIP((IObjRef**)&sysResProvider);
-		SASSERT_FMT(bLoaded, _T("load interface [%s] failed!"), _T("resprovider_zip"));
-		ZIPRES_PARAM param;
-		ZipFile(&param,m_theApp->GetRenderFactory(),"soui-sys-resource.zip");
-		bLoaded = sysResProvider->Init((WPARAM)&param, 0);
-		SASSERT(bLoaded);
-		if(bLoaded){
-			m_theApp->LoadSystemNamedResource(sysResProvider);
-		}
-		sysResProvider->Release();
-		return bLoaded;
-#endif
-	}
-	//加载用户资源
-	BOOL LoadUserRes(LPCTSTR pszDir)
-	{
-		SAutoRefPtr<IResProvider>   pResProvider;
-		pResProvider.Attach(m_souiFac.CreateResProvider(RES_FILE));
-		BOOL bLoaded = pResProvider->Init((LPARAM)pszDir, 0);
-		if(bLoaded)
-		{
-			m_theApp->AddResProvider(pResProvider);
-		}
-		return bLoaded;
-	}
+            SAutoRefPtr<IResProvider> sysResProvider;
+            sysResProvider.Attach(m_souiFac.CreateResProvider(RES_FILE));
+            SStringT sysRes = getSourceDir() + kPath_SysRes;
+            if (!sysResProvider->Init((LPARAM)sysRes.c_str(), 0))
+                break;
+            m_theApp->LoadSystemNamedResource(sysResProvider);
+            // load use resource
+            SAutoRefPtr<IResProvider> pResProvider(m_souiFac.CreateResProvider(RES_FILE), FALSE);
+            bLoaded = pResProvider->Init((LPARAM)appRes.c_str(), 0);
+            if (!bLoaded)
+                break;
+            m_theApp->AddResProvider(pResProvider);
+#endif //_WIN32
+        } while (false);
+        SASSERT(bLoaded);
+        return bLoaded;
+    }
 	
 	void RegCustomCtrls()
 	{
@@ -168,15 +175,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	SASSERT(SUCCEEDED(hRes));
 	int nRet = 0;
 	{
-		//char szBuf[MAX_PATH] = { 0 };
-		//sprintf_s(szBuf, MAX_PATH, "C:\\Windows\\System32\\VSJitDebugger.exe -p %d",
-		//	GetCurrentProcessId());
-		//WinExec(szBuf, SW_SHOW);
-
 		SUiViewer souiEngine(hInstance);
 		if (souiEngine)
 		{
-			souiEngine.LoadSystemRes();
 			souiEngine.RegCustomCtrls();
 			int nArgs = 0;
 			LPWSTR pszCmds = GetCommandLineW();
@@ -193,7 +194,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 				
 				SStringT resFolder = S_CW2T(args[1]);
 				resFolder.Trim('"');
-				souiEngine.LoadUserRes(resFolder);
+				souiEngine.LoadRes(resFolder);
 			}
 			CPreviewContainer prevWnd(strLayout, hEditor);
 			LocalFree(args);
