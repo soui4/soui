@@ -140,6 +140,7 @@ class SOUI_EXP SMenuEx
 
   public:
     static void EndMenu(int nCmdId = 0);
+    static SMenuEx *GetEvtOwner();
 
     SMenuExItem *GetParentItem()
     {

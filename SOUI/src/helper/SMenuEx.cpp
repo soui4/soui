@@ -937,6 +937,32 @@ void SMenuEx::RunMenu(HWND hRoot)
     }
 }
 
+class SMenuExEventOwner {
+  public:
+    SMenuExEventOwner(SMenuEx *pMenuEx)
+    {
+        s_pMenuEx = pMenuEx;
+    }
+    ~SMenuExEventOwner()
+    {
+        s_pMenuEx = NULL;
+    }
+
+    static SMenuEx *GetEvtOwner()
+    {
+        return s_pMenuEx;
+    }
+  private:
+    static SMenuEx *s_pMenuEx;
+};
+
+SMenuEx *SMenuExEventOwner::s_pMenuEx = NULL;
+
+SMenuEx * SMenuEx::GetEvtOwner()
+{
+    return SMenuExEventOwner::GetEvtOwner();
+}
+
 BOOL SMenuEx::_HandleEvent(IEvtArgs *pEvt)
 {
     if (pEvt->Sender()->IsClass(SMenuExItem::GetClassName()))
@@ -979,7 +1005,8 @@ BOOL SMenuEx::_HandleEvent(IEvtArgs *pEvt)
     }
     else if (s_MenuData && ::IsWindow(s_MenuData->GetOwner()))
     {
-        return (BOOL)::SendMessage(s_MenuData->GetOwner(), UM_MENUEVENT, 0, (LPARAM)pEvt);
+        SMenuExEventOwner evtOwner(this);
+        return (BOOL)::SendMessage(s_MenuData->GetOwner(), UM_MENUEVENT, (WPARAM)this, (LPARAM)pEvt);
     }
     else
     {
