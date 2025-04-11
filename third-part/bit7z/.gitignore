@@ -43,7 +43,6 @@ gh-pages/
 lib/
 out/
 pack/
-third_party/
 x64/
 
 .mailmap
