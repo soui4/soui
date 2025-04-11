@@ -32,8 +32,8 @@ public:
 	STDMETHOD_(void,EnumResource)(THIS_ EnumResCallback funEnumCB,LPARAM lp);
 	STDMETHOD_(void, EnumFile)(THIS_ EnumFileCallback funEnumCB, LPARAM lp);
 protected:
-    BOOL _Init(LPCTSTR pszZipFile ,LPCSTR pszPsw);
-    BOOL _Init(HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType ,LPCSTR pszPsw);
+    BOOL _Init(LPCTSTR pszZipFile ,LPCTSTR pszPsw);
+    BOOL _Init(HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType ,LPCTSTR pszPsw);
 	BOOL _InitFileMap();
 	SStringT _GetFilePath(LPCTSTR pszResName,LPCTSTR pszType);
 	

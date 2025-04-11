@@ -18,11 +18,11 @@ SNSBEGIN
                 LPCTSTR pszResType;
             }peInfo;
         };
-        LPCSTR          pszPsw; 
+        LPCTSTR          pszPsw; 
 		LPCTSTR			pszChildDir;
     };
     
-         inline   void Zip7File(ZIP7RES_PARAM *param,IRenderFactory *_pRenderFac,LPCTSTR _pszFile,LPCSTR _pszPsw =NULL, LPCTSTR _pszChildDir = NULL)
+         inline   void Zip7File(ZIP7RES_PARAM *param,IRenderFactory *_pRenderFac,LPCTSTR _pszFile,LPCTSTR _pszPsw =NULL, LPCTSTR _pszChildDir = NULL)
         {
             param->type=ZIP7_FILE;
             param->pszZipFile = _pszFile;
@@ -30,7 +30,7 @@ SNSBEGIN
             param->pRenderFac = _pRenderFac;
             param->pszPsw     = _pszPsw;
         }
-       inline  void Zip7Resource(ZIP7RES_PARAM *param,IRenderFactory *_pRenderFac,HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszResType=_T("7z"),LPCSTR _pszPsw =NULL, LPCTSTR _pszChildDir = NULL)
+       inline  void Zip7Resource(ZIP7RES_PARAM *param,IRenderFactory *_pRenderFac,HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszResType=_T("SevenZip"),LPCTSTR _pszPsw =NULL, LPCTSTR _pszChildDir = NULL)
         {
             param->type=ZIP7_PEDATA;
             param->pRenderFac = _pRenderFac;

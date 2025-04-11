@@ -100,18 +100,21 @@ IImgX   * SResProvider7Zip::LoadImgX( LPCTSTR strType,LPCTSTR pszResName )
 	return pImgX;
 }
 
-BOOL SResProvider7Zip::_Init( LPCTSTR pszZipFile ,LPCSTR pszPsw)
+BOOL SResProvider7Zip::_Init( LPCTSTR pszZipFile,LPCTSTR pszPsw)
 {
 	if (!m_zipFile.Open(pszZipFile, pszPsw)) return FALSE;
 	_InitFileMap();
 	return TRUE;
 }
 
-BOOL SResProvider7Zip::_Init( HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType  ,LPCSTR pszPsw)
+BOOL SResProvider7Zip::_Init( HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType,LPCTSTR pszPsw)
 {
+#ifdef _WIN32
 	if(!m_zipFile.Open(hInst,pszResName,pszPsw,pszType)) return FALSE;
 	_InitFileMap();
 	return TRUE;
+#endif // _WIN32
+	return FALSE;
 }
 
 BOOL SResProvider7Zip::Init( WPARAM wParam,LPARAM lParam )
