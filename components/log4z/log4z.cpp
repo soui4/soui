@@ -1243,11 +1243,9 @@ BOOL LogerManager::pushLog(int level, const char * filter, const char * log, con
         pModuleName = strrchr(szPath,'\\')+1;
     }
 	pLog->_moduleName = pModuleName;
+#endif
     pLog->_pid = GetCurrentProcessId();
     pLog->_tid = GetCurrentThreadId();
-#endif
-
-
     
     AutoLock l(_logLock);
     _logs.push_back(pLog);

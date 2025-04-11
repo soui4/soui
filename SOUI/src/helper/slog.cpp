@@ -23,8 +23,12 @@ void Log::DefCallback(const char *tag, const char *pLogStr, int level, const cha
         GetLocalTime(&wtm);
         const int kMaxLog = Log::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);
-        DWORD tid = GetCurrentThreadId();
+        tid_t tid = GetCurrentThreadId();
+        #ifdef _WIN32
         int nLen = _snprintf(logbuf2, kMaxLog, "tid=%u,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, tag, pLogStr, fun, file, line);
+        #else
+        int nLen = _snprintf(logbuf2, kMaxLog, "tid=%ld,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, tag, pLogStr, fun, file, line);
+        #endif//_WIN32
         logbuf2[nLen] = 0;
         OutputDebugStringA(logbuf2);
         free(logbuf2);
