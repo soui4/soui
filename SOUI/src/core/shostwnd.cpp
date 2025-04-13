@@ -1128,7 +1128,7 @@ void SHostWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
     if (nState != WA_INACTIVE)
     {
         ::SetFocus(m_hWnd);
-    }   
+    }
     else
     {
         ::SetFocus(NULL);

@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SMatrixWindow.h"
 #include <matrix/SCamera.h>
+#pragma warning(disable : 4244)
 
 namespace SOUI
 {

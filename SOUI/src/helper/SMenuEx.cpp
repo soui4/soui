@@ -952,13 +952,14 @@ class SMenuExEventOwner {
     {
         return s_pMenuEx;
     }
+
   private:
     static SMenuEx *s_pMenuEx;
 };
 
 SMenuEx *SMenuExEventOwner::s_pMenuEx = NULL;
 
-SMenuEx * SMenuEx::GetEvtOwner()
+SMenuEx *SMenuEx::GetEvtOwner()
 {
     return SMenuExEventOwner::GetEvtOwner();
 }

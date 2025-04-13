@@ -7,7 +7,7 @@
 #define JSON_CONFIG_H_INCLUDED
 #include <stddef.h>
 #include <string> //typedef String
-#if _MSC_VER <= 1500
+#if defined(_WIN32) && _MSC_VER <= 1500
 #include "stdint.h" //typedef int64_t, uint64_t
 #else
 #include <stdint.h> //typedef int64_t, uint64_t

@@ -55,8 +55,10 @@ class SOUI_EXP SLogStream {
     SLogStream &operator<<(double t);
     SLogStream &operator<<(const SLogBinary &binary);
 
+    SLogStream &writeFormat(const char *format, ...);
+    SLogStream &writeFormat(const wchar_t *format, ...);
+
   private:
-    SLogStream &writeData(const char *ft, ...);
     SLogStream &writeLongLong(long long t);
     SLogStream &writeULongLong(unsigned long long t);
     SLogStream &writePointer(const void *t);
@@ -115,27 +117,9 @@ SNSEND
 #else
 #define FUNCNAME __PRETTY_FUNCTION__
 #endif //_WIN32
-#pragma warning(push, 0)
 
-#define SLOG(tag, level) SNS::Log(tag, level, __FILE__, FUNCNAME, __LINE__, RetAddr()).stream()
-#define SLOG_FMT(tag, level, logformat, ...)                                                     \
-    do                                                                                           \
-    {                                                                                            \
-        if (sizeof(logformat[0]) == sizeof(char))                                                \
-        {                                                                                        \
-            char logbuf[SNS::Log::MAX_LOGLEN] = { 0 };                                           \
-            _snprintf(logbuf, SNS::Log::MAX_LOGLEN, (const char *)logformat, ##__VA_ARGS__);     \
-            SLOG(tag, level) << logbuf;                                                          \
-        }                                                                                        \
-        else                                                                                     \
-        {                                                                                        \
-            wchar_t logbuf[SNS::Log::MAX_LOGLEN] = { 0 };                                        \
-            _snwprintf(logbuf, SNS::Log::MAX_LOGLEN, (const wchar_t *)logformat, ##__VA_ARGS__); \
-            SLOG(tag, level) << logbuf;                                                          \
-        }                                                                                        \
-    } while (false);
-
-#pragma warning(pop)
+#define SLOG(tag, level)                     SNS::Log(tag, level, __FILE__, FUNCNAME, __LINE__, RetAddr()).stream()
+#define SLOG_FMT(tag, level, logformat, ...) SLOG(tag, level).writeFormat(logformat, ##__VA_ARGS__)
 
 //流式输出日志，当kLogTag有效时使用，否则编译失败，kLogTag可以是当前定义的宏，也可以是当前对象的成员变量。
 #define SLOGD() SLOG(kLogTag, SNS::LOG_LEVEL_DEBUG)
