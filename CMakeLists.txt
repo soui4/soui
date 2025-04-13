@@ -33,11 +33,23 @@ cmake_minimum_required(VERSION 3.16)
 project(SOUI4)
 set(CMAKE_CXX_STANDARD 11)
 
+
+file(STRINGS  SOUI/include/soui-version.h ver_h_contents REGEX "^#define SOUI_VER[0-9]+ [0-9]+$")
+
+foreach(line IN LISTS ver_h_contents) 
+    string(REGEX MATCH "SOUI_VER([0-9]+) ([0-9]+)" match "${line}")
+    if(match)
+        set(SOUI_VER${CMAKE_MATCH_1} ${CMAKE_MATCH_2})
+    endif()
+endforeach()
+
+message(STATUS "SOUI_VER: ${SOUI_VER1}.${SOUI_VER2}.${SOUI_VER3}.${SOUI_VER4}")
+
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 if(NOT CMAKE_BUILD_TYPE)
 set(CMAKE_BUILD_TYPE "Release")
 endif()
-message("build type is ${CMAKE_BUILD_TYPE}")
+message(STATUS "build type is ${CMAKE_BUILD_TYPE}")
 set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
 include(__cmake/internal_utils.cmake)
 include(__cmake/global.cmake)
@@ -148,3 +160,34 @@ add_subdirectory(components)
 if(BUILD_DEMOS)
 add_subdirectory(demos)
 endif(BUILD_DEMOS)
+
+
+if (UNIX OR MINGW)
+
+
+# Generate and install pkgconfig.
+# (This is not indented, because the tabs will be part of the output)
+file(WRITE "${PROJECT_BINARY_DIR}/libsoui.pc"
+"prefix=\"${CMAKE_INSTALL_PREFIX}\"
+exec_prefix=\${prefix}
+libdir=\${exec_prefix}/lib
+includedir=\${prefix}/include
+
+
+Name: libsoui
+Description: soui app framework
+Version: ${SOUI_VER1}.${SOUI_VER2}.${SOUI_VER3}.${SOUI_VER4}
+
+Libs: -L\${libdir} -lsoui4 -lutilities4
+Cflags: -I\${includedir}
+"
+)
+if (NOT ${soui_requires} STREQUAL "")
+        file(APPEND "${PROJECT_BINARY_DIR}/libsoui.pc" "Requires: ${soui_requires}")
+endif()
+
+
+install(FILES "${PROJECT_BINARY_DIR}/libsoui.pc"
+		DESTINATION lib/pkgconfig)
+
+endif(UNIX OR MINGW)
