@@ -1,0 +1,101 @@
+name: build
+
+on:
+  push:
+    branches:
+      - build_test
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    name: Build for ${{ matrix.os }}-${{ matrix.arch }}
+    runs-on: ${{ matrix.dist }}
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [Windows, Linux]
+        arch: [x64, x86, arm64]
+        include:
+          - os: Windows
+            dist: windows-latest
+          - os: Linux
+            dist: ubuntu-latest
+          - os: Linux
+            arch: arm64
+            dist: ubuntu-22.04-arm
+          - os: Windows
+            arch: x86
+            platform: Win32
+          - os: Windows
+            arch: arm64
+            platform: ARM64
+        exclude:
+          - os: Linux
+            arch: x86
+
+    steps:
+    - name: Checkout repository
+      uses: actions/checkout@v2
+      with:
+        fetch-depth: 2
+        submodules: true  # 拉取子模块
+
+    - name: Set up CMake
+      uses: lukka/get-cmake@latest
+      with:
+        cmakeVersion: "^3.25.0"
+
+    - name: Install dependencies (Ubuntu)
+      if: startsWith(matrix.dist, 'ubuntu')
+      run: sudo apt install -y cmake git build-essential gdb libcairo2-dev libxcb1-dev libgl1-mesa-dev freeglut3-dev libgtk-3-dev
+
+    - name: Configure CMake
+      if: matrix.platform == ''
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+    - name: Configure CMake (Win32, WOA)
+      if: matrix.platform != ''
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -A ${{ matrix.platform }}
+
+    - name: Build
+      run: cmake --build build --config ${{ env.BUILD_TYPE }}
+
+    - name: Create file structure (Windows)
+      if: matrix.os == 'Windows'
+      run: tree /F /A | Out-File file_structure.txt
+
+    - name: Create file structure (Linux)
+      if: matrix.os == 'Linux'
+      run: tree -a > file_structure.txt
+
+    - name: Upload demo (Windows)
+      if: matrix.os == 'Windows'
+      uses: actions/upload-artifact@v4
+      with:
+        name: demo-${{ matrix.os }}-${{ matrix.arch }}
+        path: |
+          build/bin/${{ env.BUILD_TYPE }}/*.exe
+          build/bin/${{ env.BUILD_TYPE }}/*.dll
+          build/bin/${{ env.BUILD_TYPE }}/Config/**
+
+    - name: Upload demo (Linux)
+      if: matrix.os == 'Linux'
+      uses: actions/upload-artifact@v4
+      with:
+        name: demo-${{ matrix.os }}-${{ matrix.arch }}
+        path: |
+          build/bin/*
+          build/bin/Config/**
+          !build/bin/*.a
+          !build/bin/*.o
+
+    - name: Upload file structure
+      uses: actions/upload-artifact@v4
+      with:
+        name: file_structure-${{ matrix.os }}-${{ matrix.arch }}
+        path: file_structure.txt
+
+
