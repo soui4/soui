@@ -419,7 +419,8 @@ TEST(demo, notifychange){
     }
 }
 
-static DWORD Thread_Proc(void *p){
+static DWORD WINAPI Thread_Proc(void *p)
+{
     SLOGI()<<"Thread_Proc start";
     Sleep(100);
     SLOGI()<<"Thread_Proc quit";

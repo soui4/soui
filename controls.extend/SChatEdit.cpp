@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "SChatEdit.h"
+#include <atl.mini/SComCli.h>
 #ifdef _WIN32
 #include "reole/RichEditOle.h"
 #endif//_WIN32
@@ -274,14 +275,15 @@ SStringW SChatEdit::GetFormatText()
     SSendMessage(EM_GETTEXTRANGE, 0, (LPARAM)&txtRng);
     strTxt.ReleaseBuffer();
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
     SComPtr<IRichEditOle> ole;
     SSendMessage(EM_GETOLEINTERFACE, 0, (LPARAM)(void **)&ole);
-#endif//_WIN32
+#endif
     SStringW strMsg;
     int iPlainTxtBegin = 0;
     for (int i = 0; i < strTxt.GetLength(); i++)
     {
+        #if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
         if (strTxt[i] == 0xfffc)
         { //找到一个OLE对象
             strMsg += strTxt.Mid(iPlainTxtBegin, i - iPlainTxtBegin);
@@ -292,7 +294,6 @@ SStringW SChatEdit::GetFormatText()
             HRESULT hr = ole->GetObject(REO_IOB_USE_CP, &reobj, REO_GETOBJ_POLEOBJ);
             if (SUCCEEDED(hr) && reobj.poleobj)
             {
-#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
                 if (reobj.clsid == CLSID_SSmileyCtrl)
                 {
                     SComPtr<ISmileyCtrl> smiley;
@@ -320,10 +321,10 @@ SStringW SChatEdit::GetFormatText()
                         strMsg += strSmiley;
                     }
                 }
-#endif //_WIN32
                 reobj.poleobj->Release();
             }
         }
+        #endif //_WIN32
     }
     if (iPlainTxtBegin < strTxt.GetLength())
     {
