@@ -108,11 +108,11 @@ SLogStream::SLogStream()
 
 SLogStream &SLogStream::writeWString(const wchar_t *t, int nLen)
 {
-    DWORD dwLen = WideCharToMultiByte(CP_UTF8, 0, t, nLen, NULL, 0, NULL, NULL);
+    DWORD dwLen = WideCharToMultiByte(CP_ACP, 0, t, nLen, NULL, 0, NULL, NULL);
     if (dwLen < Log::MAX_LOGLEN)
     {
         char buf[Log::MAX_LOGLEN];
-        dwLen = WideCharToMultiByte(CP_UTF8, 0, t, nLen, buf, dwLen, NULL, NULL);
+        dwLen = WideCharToMultiByte(CP_ACP, 0, t, nLen, buf, dwLen, NULL, NULL);
         if (dwLen > 0)
         {
             buf[dwLen] = 0;

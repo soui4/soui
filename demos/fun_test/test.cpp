@@ -419,6 +419,21 @@ TEST(demo, notifychange){
     }
 }
 
+static DWORD Thread_Proc(void *p){
+    SLOGI()<<"Thread_Proc start";
+    Sleep(100);
+    SLOGI()<<"Thread_Proc quit";
+    return 0;
+}
+
+TEST(demo,CreateThread){
+    HANDLE hThread = CreateThread(NULL,0,Thread_Proc,nullptr,CREATE_SUSPENDED,nullptr);
+    ResumeThread(hThread);
+    WaitForSingleObject(hThread,INFINITE);
+    SLOGI()<<"wait Thread_Proc done";
+    CloseHandle(hThread);
+}
+
 int run_window();
 TEST(demo,window){
     //EXPECT_EQ(run_window(), 1);
