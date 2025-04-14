@@ -1,4 +1,5 @@
-﻿#pragma once
+﻿#ifndef SMILEYCREATEHOOK_H
+#define SMILEYCREATEHOOK_H
 
 class SmileyCreateHook
 {
@@ -7,3 +8,4 @@ public:
     ~SmileyCreateHook(void);
 };
 
+#endif // SMILEYCREATEHOOK_H

@@ -88,10 +88,6 @@
 #define DETOURS_X86
 #define DETOURS_OPTION_BITS 64
 
-#elif defined(_WIN64)
-#define DETOURS_X64
-#define DETOURS_OPTION_BITS 32
-
 #elif defined(_IA64_)
 #define DETOURS_IA64
 #define DETOURS_OPTION_BITS 32
@@ -101,6 +97,10 @@
 
 #elif defined(_ARM64_)
 #define DETOURS_ARM64
+
+#elif defined(_WIN64)
+#define DETOURS_X64
+#define DETOURS_OPTION_BITS 32
 
 #else
 #error Unknown architecture (x86, amd64, ia64, arm, arm64)

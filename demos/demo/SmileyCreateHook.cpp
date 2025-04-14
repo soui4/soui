@@ -10,13 +10,13 @@ static _CoCreateInstance TrueCoCreateInstance = (_CoCreateInstance)GetProcAddres
 
 HRESULT STDAPICALLTYPE HookCoCreateInstance(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFIID riid, LPVOID FAR* ppv)
 {
-    if(rclsid == CLSID_SSmileyCtrl)
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
+    if (rclsid == CLSID_SSmileyCtrl)
     {
-#ifdef _WIN32
         return CreateSmiley(riid,ppv);
-#endif
     }
-    return TrueCoCreateInstance(rclsid,pUnkOuter,dwClsContext,riid,ppv);
+#endif
+    return TrueCoCreateInstance(rclsid, pUnkOuter, dwClsContext, riid, ppv);
 }
 
 typedef HRESULT (STDAPICALLTYPE * _ProgIDFromCLSID) (REFCLSID clsid, LPOLESTR FAR* lplpszProgID);
@@ -25,13 +25,15 @@ _ProgIDFromCLSID TrueProgIDFromCLSID = (_ProgIDFromCLSID)GetProcAddress(GetModul
 
 HRESULT STDAPICALLTYPE HookProgIDFromCLSID (REFCLSID clsid, LPOLESTR FAR* lplpszProgID)
 {
-    if(clsid == CLSID_SSmileyCtrl)
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
+    if (clsid == CLSID_SSmileyCtrl)
     {
         const WCHAR KProgID[] = L"SSmileyCtrl.NoCOM.1";
         *lplpszProgID = (LPOLESTR)CoTaskMemAlloc(sizeof(KProgID));
         wcscpy(*lplpszProgID,KProgID);
         return S_OK;
     }
+#endif
     return TrueProgIDFromCLSID(clsid,lplpszProgID);
 }
 
