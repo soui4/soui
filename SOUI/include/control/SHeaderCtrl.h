@@ -1,31 +1,19 @@
-﻿/**
- * Copyright (C) 2014-2050 SOUI团队
- * All rights reserved.
- *
- * @file       SHeaderCtrl.h
- * @brief
- * @version    v1.0
- * @author     soui
- * @date       2014-07-02
- *
- * Describe
- */
-#ifndef __SHEADERCTRL__H__
+﻿#ifndef __SHEADERCTRL__H__
 #define __SHEADERCTRL__H__
 
 #include <core/SWnd.h>
 #include <interface/SCtrl-i.h>
 #include <proxy/SWindowProxy.h>
+
 SNSBEGIN
 
 #define SORT_MASK  (HDF_SORTDOWN | HDF_SORTUP)
 #define ALIGN_MASK (HDF_LEFT | HDF_RIGHT | HDF_CENTER)
 
 /**
- * @class     SHeaderCtrl
- * @brief     表头控件
- *
- * Describe   表头控件
+ * @class SHeaderCtrl
+ * @brief Header Control
+ * @details A header control that manages columns with titles and sorting indicators.
  */
 class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
     DEF_SOBJECT(SWindow, L"header")
@@ -43,37 +31,41 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
 
   public:
     /**
-     * SHeaderCtrl::SHeaderCtrl
-     * @brief    构造函数
-     *
-     * Describe  构造函数
+     * @brief Constructor
      */
     SHeaderCtrl(void);
+
     /**
-     * SHeaderCtrl::~SHeaderCtrl
-     * @brief    析构函数
-     *
-     * Describe  析构函数
+     * @brief Destructor
      */
     ~SHeaderCtrl(void);
 
   public:
     /**
-     * SHeaderCtrl::InsertItem
-     * @brief    插入新项
-     * @param    int iItem --  新项索引
-     * @param    LPCTSTR pszText  --  新项标题
-     * @param    int nWidth  -- 宽度
-     * @param    BOOL bDpiAware -- dpi aware
-     * @param    UINT fmt -- format flag
-     * @param    LPARAM lParam -- 附加参数
-     * @return   返回int
-     *
-     * Describe  插入新项
+     * @brief Insert a new item
+     * @param iItem Index of the new item
+     * @param pszText Title of the new item
+     * @param nWidth Width of the new item
+     * @param fmt Format flag
+     * @param lParam Additional parameter
+     * @param bDpiAware DPI awareness flag
+     * @param fWeight Font weight
+     * @return Index of the inserted item
      */
     STDMETHOD_(int, InsertItem)
     (THIS_ int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware = FALSE, float fWeight = 0.0f) OVERRIDE;
 
+    /**
+     * @brief Insert a new item (ANSI version)
+     * @param iItem Index of the new item
+     * @param pszText Title of the new item
+     * @param nWidth Width of the new item
+     * @param fmt Format flag
+     * @param lParam Additional parameter
+     * @param bDpiAware DPI awareness flag
+     * @param fWeight Font weight
+     * @return Index of the inserted item
+     */
     STDMETHOD_(int, InsertItemA)
     (THIS_ int iItem, LPCSTR pszText, int nWidth, UINT fmt, LPARAM lParam, BOOL bDpiAware = FALSE, float fWeight = 0.0f) OVERRIDE
     {
@@ -82,81 +74,99 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
     }
 
     /**
-     * SHeaderCtrl::GetItem
-     * @brief    获得新项
-     * @param    int iItem  --  索引
-     * @param    SHDITEM *pItem  -- 返回列表项结构
-     * @return   返回BOOL
-     *
-     * Describe  获得新项
+     * @brief Get an item
+     * @param iItem Index of the item
+     * @param pItem Output structure for the item
+     * @return TRUE if successful, FALSE otherwise
      */
     STDMETHOD_(BOOL, GetItem)(THIS_ int iItem, SHDITEM *pItem) SCONST OVERRIDE;
 
+    /**
+     * @brief Set an item
+     * @param iItem Index of the item
+     * @param pItem Structure for the item
+     * @return TRUE if successful, FALSE otherwise
+     */
     STDMETHOD_(BOOL, SetItem)(THIS_ int iItem, const SHDITEM *pItem) OVERRIDE;
 
     /**
-     * SHeaderCtrl::GetItemCount
-     * @brief    获取列表项个数
-     * @return   返回int
-     *
-     * Describe  获取列表项个数
+     * @brief Get the number of items
+     * @return Number of items
      */
     STDMETHOD_(UINT, GetItemCount)(THIS) SCONST OVERRIDE;
+
     /**
-     * SHeaderCtrl::GetTotalWidth
-     * @brief    获得所有宽度
-     * @return   返回int
-     *
-     * Describe  获得所有宽度
+     * @brief Get the total width of all items
+     * @param bMinWid Whether to get the minimum width
+     * @return Total width
      */
     STDMETHOD_(int, GetTotalWidth)(THIS_ BOOL bMinWid = FALSE) SCONST OVERRIDE;
 
+    /**
+     * @brief Check if auto-resize is enabled
+     * @return TRUE if auto-resize is enabled, FALSE otherwise
+     */
     STDMETHOD_(BOOL, IsAutoResize)(THIS) SCONST OVERRIDE;
 
     /**
-     * SHeaderCtrl::GetItemWidth
-     * @brief    获得指定项宽度
-     * @param    int iItem  --  索引
-     * @return   返回int
-     *
-     * Describe  获得新项
+     * @brief Get the width of a specific item
+     * @param iItem Index of the item
+     * @return Width of the item
      */
     STDMETHOD_(int, GetItemWidth)(THIS_ int iItem) SCONST OVERRIDE;
 
     /**
-     * SHeaderCtrl::DeleteItem
-     * @brief    删除指定项
-     * @param    int iItem  --  索引
-     * @return   返回BOOL
-     *
-     * Describe  删除指定项
+     * @brief Delete a specific item
+     * @param iItem Index of the item to delete
+     * @return TRUE if successful, FALSE otherwise
      */
     STDMETHOD_(BOOL, DeleteItem)(THIS_ int iItem) OVERRIDE;
 
     /**
-     * SHeaderCtrl::DeleteAllItems
-     * @brief    删除所有项
-     *
-     * Describe  获得新项
+     * @brief Delete all items
      */
     STDMETHOD_(void, DeleteAllItems)(THIS) OVERRIDE;
 
+    /**
+     * @brief Set the sort flag for an item
+     * @param iItem Index of the item
+     * @param sortFlag Sort flag
+     */
     STDMETHOD_(void, SetItemSort)(THIS_ int iItem, UINT sortFlag) OVERRIDE;
 
+    /**
+     * @brief Set the visibility of an item
+     * @param iItem Index of the item
+     * @param visible Visibility flag
+     */
     STDMETHOD_(void, SetItemVisible)(THIS_ int iItem, BOOL visible) OVERRIDE;
 
+    /**
+     * @brief Check if an item is visible
+     * @param iItem Index of the item
+     * @return TRUE if visible, FALSE otherwise
+     */
     STDMETHOD_(BOOL, IsItemVisible)(THIS_ int iItem) SCONST OVERRIDE;
 
+    /**
+     * @brief Get the original item index from the order
+     * @param iOrder Order index
+     * @return Original item index
+     */
     STDMETHOD_(int, GetOriItemIndex)(CTHIS_ int iOrder) SCONST OVERRIDE;
+
+    /**
+     * @brief Get the rectangle of an item
+     * @param iItem Index of the item
+     * @param prc Output rectangle
+     */
     STDMETHOD_(void, GetItemRect)(CTHIS_ int iItem, LPRECT prc) SCONST OVERRIDE;
 
   public:
     /**
-     * SHeaderCtrl::GetItemRect
-     * @brief    获取表头项得位置
-     * @param    UINT iItem  --  索引
-     *
-     * Describe  获取表头项得位置
+     * @brief Get the rectangle of an item
+     * @param iItem Index of the item
+     * @return Rectangle of the item
      */
     CRect GetItemRect(int iItem) const;
 
@@ -167,86 +177,84 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
         ATTR_INT(L"itemSwapEnable", m_bItemSwapEnable, FALSE)
         ATTR_INT(L"sortHeader", m_bSortHeader, FALSE)
     SOUI_ATTRS_END()
+
   protected:
     /**
-     * SHeaderCtrl::CreateChildren
-     * @brief    创建新项
-     * @param    SXmlNode xmlNode  -- xml配置文件
-     *
-     * Describe  创建新项
+     * @brief Create child items from XML configuration
+     * @param xmlNode XML node for the child items
+     * @return TRUE if successful, FALSE otherwise
      */
     virtual BOOL CreateChildren(SXmlNode xmlNode);
 
     /**
-     * SHeaderCtrl::OnSetCursor
-     * @brief    设置选中
-     * @param    const CPoint &pt  --  坐标点
-     *
-     * Describe  获得新项
+     * @brief Set the cursor based on the mouse position
+     * @param pt Mouse coordinates
+     * @return TRUE if successful, FALSE otherwise
      */
     virtual BOOL OnSetCursor(const CPoint &pt);
+
     /**
-     * SHeaderCtrl::OnPaint
-     * @brief    设置选中
-     * @param    IRenderTarget * pRT  --  渲染目标
-     *
-     * Describe  消息响应函数
+     * @brief Paint the control
+     * @param pRT Rendering target handle
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
-     * SHeaderCtrl::DrawItem
-     * @brief    绘画
-     * @param    IRenderTarget * pRT  --  渲染目标
-     * @param    CRect rcItem  --  目标区域
-     * @param    const LPSHDITEM pItem  --  列表头
-     *
-     * Describe  绘画
+     * @brief Draw an item
+     * @param pRT Rendering target handle
+     * @param rcItem Rectangle for the item
+     * @param pItem Pointer to the item structure
      */
     virtual void DrawItem(IRenderTarget *pRT, CRect rcItem, const LPSHDITEMEX pItem);
 
+    /**
+     * @brief Handle colorization event
+     * @param cr Color reference
+     */
     virtual void OnColorize(COLORREF cr);
 
+    /**
+     * @brief Handle language change event
+     * @return HRESULT
+     */
     virtual HRESULT OnLanguageChanged();
 
+    /**
+     * @brief Handle scale change event
+     * @param nScale Scale factor
+     */
     virtual void OnScaleChanged(int nScale);
 
-    virtual BOOL OnRelayout(const CRect &rcWnd);
     /**
-     * SHeaderCtrl::HitTest
-     * @brief
-     * @param    CPoint pt  --  坐标
-     *
-     * Describe  鼠标位置分析，返回一个DWORD，LOWORD为前面的项，
-     *           HIWORD为后面的项， 相同时代表在一个项的中间
+     * @brief Handle relayout event
+     * @param rcWnd Window rectangle
+     * @return TRUE if successful, FALSE otherwise
+     */
+    virtual BOOL OnRelayout(const CRect &rcWnd);
+
+    /**
+     * @brief Hit test to determine the item under the mouse
+     * @param pt Mouse coordinates
+     * @return Hit test result (DWORD)
      */
     DWORD HitTest(CPoint pt);
 
     /**
-     * SHeaderCtrl::RedrawItem
-     * @brief    重绘
-     * @param    CPoint pt  --  坐标
-     *
-     * Describe  重绘
+     * @brief Redraw a specific item
+     * @param iItem Index of the item to redraw
      */
     void RedrawItem(int iItem);
 
     /**
-     * SHeaderCtrl::DrawDraggingState
-     * @brief    绘制拖拽状态
-     * @param    DWORD dwDragTo  --
-     *
-     * Describe  绘制拖拽状态
+     * @brief Draw the dragging state
+     * @param dwDragTo Drag target
      */
     void DrawDraggingState(DWORD dwDragTo);
 
     /**
-     * SHeaderCtrl::IsItemHover
-     * @brief    判断是否Hover状态
-     * @param    DWORD dwHitTest
-     * @return   返回BOOL
-     *
-     * Describe  判断是否Hover状态
+     * @brief Check if an item is in hover state
+     * @param dwHitTest Hit test result
+     * @return TRUE if in hover state, FALSE otherwise
      */
     BOOL IsItemHover(DWORD dwHitTest)
     {
@@ -254,58 +262,48 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
     }
 
     /**
-     * SHeaderCtrl::CreateDragImage
-     * @brief    创建拖拽图片
-     * @param    UINT iItem -- 列表项
-     * @return   返回HBITMAP
-     *
-     * Describe  判断是否Hover状态
+     * @brief Create a drag image for an item
+     * @param iItem Index of the item
+     * @return Handle to the drag image
      */
     HBITMAP CreateDragImage(UINT iItem);
+
     /**
-     * SHeaderCtrl::OnLButtonDown
-     * @brief    左键按下事件
-     * @param    UINT nFlags -- 标志
-     * @param    CPoint point -- 鼠标坐标
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle left mouse button down event
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
      */
     void OnLButtonDown(UINT nFlags, CPoint pt);
+
     /**
-     * SHeaderCtrl::OnLButtonUp
-     * @brief    左键抬起事件
-     * @param    UINT nFlags -- 标志
-     * @param    CPoint point -- 鼠标坐标
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle left mouse button up event
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
      */
     void OnLButtonUp(UINT nFlags, CPoint pt);
+
     /**
-     * SHeaderCtrl::OnMouseMove
-     * @brief    鼠标移动事件
-     * @param    UINT nFlags -- 标志
-     * @param    CPoint point -- 鼠标坐标
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle mouse move event
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
      */
     void OnMouseMove(UINT nFlags, CPoint pt);
 
     /**
-     * SHeaderCtrl::OnMouseLeave
-     * @brief    鼠标离开事件
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle mouse leave event
      */
     void OnMouseLeave();
 
     /**
-     * SHeaderCtrl::OnDestroy
-     * @brief    销毁事件
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle destroy event
      */
     void OnDestroy();
 
+    /**
+     * @brief Handle activate application event
+     * @param bActive Activation flag
+     * @param dwThreadID Thread ID
+     */
     void OnActivateApp(BOOL bActive, DWORD dwThreadID);
 
     SOUI_MSG_MAP_BEGIN()
@@ -318,20 +316,23 @@ class SOUI_EXP SHeaderCtrl : public TWindowProxy<IHeaderCtrl> {
         MSG_WM_DESTROY(OnDestroy)
     SOUI_MSG_MAP_END()
 
-    SAutoRefPtr<ISkinObj> m_pSkinItem; /**< 表头绘制Skin */
-    SAutoRefPtr<ISkinObj> m_pSkinSort; /**< 排序标志Skin */
-    BOOL m_bSortHeader;                /**< 表头可以点击排序 */
-    BOOL m_bFixWidth;                  /**< 表项宽度固定开关 */
-    BOOL m_bItemSwapEnable;            /**< 允许拖动调整位置开关 */
+  protected:
+    SAutoRefPtr<ISkinObj> m_pSkinItem; /**< Skin for drawing header items */
+    SAutoRefPtr<ISkinObj> m_pSkinSort; /**< Skin for sorting indicators */
+    BOOL m_bSortHeader;                /**< Whether header can be clicked to sort */
+    BOOL m_bFixWidth;                  /**< Whether item widths are fixed */
+    BOOL m_bItemSwapEnable;            /**< Whether item swapping is enabled */
 
-    BOOL m_bDragging;             /**< 正在拖动标志 */
-    HBITMAP m_hDragImg;           /**< 显示拖动窗口的临时位图 */
-    CPoint m_ptClick;             /**< 当前点击坐标 */
-    DWORD m_dwHitTest;            /**< 鼠标位置 */
-    DWORD m_dwDragTo;             /**< 拖放目标 */
-    int m_nAdjItemOldWidth;       /**< 保存被拖动项的原始宽度 */
-    SArray<SHDITEMEX> m_arrItems; /**< 列表项集合 */
-    int m_nScale;                 /**< Current Scale */
+    BOOL m_bDragging;             /**< Dragging flag */
+    HBITMAP m_hDragImg;           /**< Bitmap for drag image */
+    CPoint m_ptClick;             /**< Click point */
+    DWORD m_dwHitTest;            /**< Hit test result */
+    DWORD m_dwDragTo;             /**< Drag target */
+    int m_nAdjItemOldWidth;       /**< Original width of the dragged item */
+    SArray<SHDITEMEX> m_arrItems; /**< Array of header items */
+    int m_nScale;                 /**< Current scale factor */
 };
+
 SNSEND
+
 #endif // __SHEADERCTRL__H__

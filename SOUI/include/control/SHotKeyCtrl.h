@@ -1,33 +1,23 @@
-﻿/**
- * Copyright (C) 2014-2050 SOUI团队
- * All rights reserved.
- *
- * @file       SHotKeyCtrl.h
- * @brief      热键控件
- * @version    v1.0
- * @author     soui
- * @date       2014-07-02
- *
- * Describe    热键控件
- */
-#ifndef __SHOTKEYCTRL__H__
+﻿#ifndef __SHOTKEYCTRL__H__
 #define __SHOTKEYCTRL__H__
+
 #include <core/SWnd.h>
 #include <core/SAccelerator.h>
 #include <proxy/SWindowProxy.h>
 #include <interface/SCtrl-i.h>
 
 SNSBEGIN
+
 /**
- * @class      SHotKeyCtrl
- * @brief      热键控件
- *
- * Describe    热键控件
+ * @class SHotKeyCtrl
+ * @brief HotKey Control
+ * @details A control for setting and displaying hotkeys.
  */
 class SOUI_EXP SHotKeyCtrl
     : public TWindowProxy<IHotKeyCtrl>
     , public SAccelerator {
     DEF_SOBJECT(SWindow, L"hotkey")
+
     enum
     {
         Mod_SC = Mod_Shift | Mod_Ctrl,
@@ -38,60 +28,50 @@ class SOUI_EXP SHotKeyCtrl
 
   public:
     /**
-     * SHotKeyCtrl::SHotKeyCtrl
-     * @brief    构造函数
-     *
-     * Describe  构造函数
+     * @brief Constructor
      */
     SHotKeyCtrl(void);
+
     /**
-     * SHotKeyCtrl::~SHotKeyCtrl
-     * @brief    析构函数
-     *
-     * Describe  析构函数
+     * @brief Destructor
      */
     virtual ~SHotKeyCtrl(void);
 
   public:
     /**
-     * SHotKeyCtrl::SetRule
-     * @brief    设置规则
-     * @param    WORD wInvalidComp --
-     * @param    WORD wModifier  --
-     *
-     * Describe  设置规则
+     * @brief Set the rules for invalid combinations and modifiers
+     * @param wInvalidComp Invalid combination flags
+     * @param wModifier Modifier flags
      */
     STDMETHOD_(void, SetRule)(THIS_ WORD wInvalidComp, WORD wModifier) OVERRIDE;
 
     /**
-     * SHotKeyCtrl::SetHotKey
-     * @brief    设置热键
-     * @param    WORD vKey --
-     * @param    WORD wModifiers  --
-     *
-     * Describe  设置热键
+     * @brief Set the hotkey
+     * @param wKey Key code
+     * @param wModifiers Modifier flags
      */
     STDMETHOD_(void, SetHotKey)(THIS_ WORD wKey, WORD wModifiers) OVERRIDE;
 
     /**
-     * SHotKeyCtrl::GetHotKey
-     * @brief    获取热键
-     * @param    WORD &vKey --
-     * @param    WORD wModifiers  --
-     *
-     * Describe  获取热键
+     * @brief Get the hotkey
+     * @param wKey Output key code
+     * @param wModifiers Output modifier flags
      */
-    STDMETHOD_(void, GetHotKey)(THIS_ WORD *wKey, WORD *wModifers) SCONST OVERRIDE;
+    STDMETHOD_(void, GetHotKey)(THIS_ WORD *wKey, WORD *wModifiers) SCONST OVERRIDE;
 
   public:
+    /**
+     * @brief Get the window text
+     * @param bRawText Whether to get raw text
+     * @return Window text
+     */
     virtual SStringT GetWindowText(BOOL bRawText = FALSE);
 
   protected:
     /**
-     * SHotKeyCtrl::OnGetDlgCode
-     * @brief    获取窗口消息码
-     *
-     * Describe  消息响应函数
+     * @brief Get the dialog code
+     * @return Dialog code
+     * @details This function is a message handler.
      */
     virtual UINT WINAPI OnGetDlgCode() const
     {
@@ -99,94 +79,120 @@ class SOUI_EXP SHotKeyCtrl
     }
 
     /**
-     * SHotKeyCtrl::OnLButtonDown
-     * @brief    左键按下事件
-     * @param    UINT nFlags -- 标志
-     * @param    CPoint point -- 鼠标坐标
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle left mouse button down event
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
+     * @details This function is a message handler.
      */
     void OnLButtonDown(UINT nFlags, CPoint pt);
 
     /**
-     * SHotKeyCtrl::OnPaint
-     * @brief    绘制消息
-     * @param    IRenderTarget *pRT -- 渲染目标
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Paint the control
+     * @param pRT Rendering target handle
+     * @details This function is a message handler.
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
-     * SHotKeyCtrl::OnSetFocus
-     * @brief    设置焦点
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle set focus event
+     * @param wndOld Previous focus window handle
+     * @details This function is a message handler.
      */
     void OnSetFocus(SWND wndOld);
 
     /**
-     * SHotKeyCtrl::OnKillFocus
-     * @brief    失去焦点
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle kill focus event
+     * @param wndFocus New focus window handle
+     * @details This function is a message handler.
      */
     void OnKillFocus(SWND wndFocus);
 
     /**
-     * SHotKeyCtrl::OnKeyDown
-     * @brief    键盘按下事件
-     * @param    UINT nChar -- 按键对应的码值
-     * @param    UINT nRepCnt -- 重复次数
-     * @param    UINT nFlags -- 标志
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle key down event
+     * @param nChar Key code
+     * @param nRepCnt Repeat count
+     * @param nFlags Flags
+     * @details This function is a message handler.
      */
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
+
     /**
-     * SHotKeyCtrl::OnKeyUp
-     * @brief    键盘抬起事件
-     * @param    UINT nChar -- 按键对应的码值
-     * @param    UINT nRepCnt -- 重复次数
-     * @param    UINT nFlags -- 标志
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle key up event
+     * @param nChar Key code
+     * @param nRepCnt Repeat count
+     * @param nFlags Flags
+     * @details This function is a message handler.
      */
     void OnKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
-     * SHotKeyCtrl::OnSysKeyDown
-     * @brief    系统按键按下事件
-     * @param    UINT nChar -- 按键对应的码值
-     * @param    UINT nRepCnt -- 重复次数
-     * @param    UINT nFlags -- 标志
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle system key down event
+     * @param nChar Key code
+     * @param nRepCnt Repeat count
+     * @param nFlags Flags
+     * @details This function is a message handler.
      */
     void OnSysKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
-     * SHotKeyCtrl::OnSysKeyUp
-     * @brief    系统按键抬起事件
-     * @param    UINT nChar -- 按键对应的码值
-     * @param    UINT nRepCnt -- 重复次数
-     * @param    UINT nFlags -- 标志
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle system key up event
+     * @param nChar Key code
+     * @param nRepCnt Repeat count
+     * @param nFlags Flags
+     * @details This function is a message handler.
      */
     void OnSysKeyUp(UINT nChar, UINT nRepCnt, UINT nFlags);
 
+    /**
+     * @brief Update the modifier keys
+     */
     void UpdateModifier();
 
+    /**
+     * @brief Update the caret position
+     * @param pRT Rendering target handle
+     */
     void UpdateCaret(IRenderTarget *pRT);
 
+    /**
+     * @brief Get the text alignment
+     * @return Text alignment
+     */
     UINT GetTextAlign();
 
   protected:
+    /**
+     * @brief Handle custom attribute "invalidComb"
+     * @param value Attribute value
+     * @param bLoading Loading flag
+     * @return HRESULT
+     */
     HRESULT OnAttrInvalidComb(const SStringW &value, BOOL bLoading);
+
+    /**
+     * @brief Handle custom attribute "invalidSysKey"
+     * @param value Attribute value
+     * @param bLoading Loading flag
+     * @return HRESULT
+     */
     HRESULT OnAttrInvalidSysKey(const SStringW &value, BOOL bLoading);
+
+    /**
+     * @brief Handle custom attribute "invalidModifier"
+     * @param value Attribute value
+     * @param bLoading Loading flag
+     * @return HRESULT
+     */
     HRESULT OnAttrInvalidModifier(const SStringW &value, BOOL bLoading);
+
+    /**
+     * @brief Handle custom attribute "hotKey"
+     * @param value Attribute value
+     * @param bLoading Loading flag
+     * @return HRESULT
+     */
     HRESULT OnAttrHotKey(const SStringW &value, BOOL bLoading);
+
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"invalidComb", OnAttrInvalidComb)
         ATTR_CUSTOM(L"invalidSysKey", OnAttrInvalidSysKey)
@@ -204,11 +210,13 @@ class SOUI_EXP SHotKeyCtrl
         MSG_WM_SYSKEYDOWN(OnSysKeyDown)
         MSG_WM_SYSKEYUP(OnSysKeyUp)
     SOUI_MSG_MAP_END()
-    WORD m_wInvalidComb;     /**< 无效的组合键 */
-    WORD m_wInvalidModifier; /**< 对无效组合键的替换方案,默认方案 */
 
-    BOOL m_bInSetting; /**< 正在设置中 */
+  protected:
+    WORD m_wInvalidComb;     /**< Flags for invalid key combinations */
+    WORD m_wInvalidModifier; /**< Replacement modifiers for invalid combinations */
+    BOOL m_bInSetting;       /**< Flag indicating if the control is being set */
 };
+
 SNSEND
 
 #endif // __SHOTKEYCTRL__H__

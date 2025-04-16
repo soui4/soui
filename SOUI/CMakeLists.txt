@@ -22,6 +22,10 @@ message("---disable thunk in soui")
 add_definitions(-DENABLE_THUNK=0)
 endif()
 
+if(${ENABLE_SOUI_ACC})
+add_definitions(-DSOUI_ENABLE_ACC)
+endif()
+
 file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_UIRES  *.xml *.idx *.ico)

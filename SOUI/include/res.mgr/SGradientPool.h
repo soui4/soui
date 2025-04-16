@@ -1,51 +1,48 @@
 ﻿/**
- * Copyright (C) 2014-2050 SOUI团队
- * All rights reserved.
+ * @file SGradientPool.h
+ * @brief Gradient Pool Management
+ * @version v1.0
+ * @author SOUI团队
+ * @date 2014-05-28
  *
- * @file       SStylePool.h
- * @brief      SkinObj Pool
- * @version    v1.0
- * @author     soui
- * @date       2014-05-28
- *
- * Describe    管理Style
+ * @details Manages a pool of gradients identified by names.
  */
 
 #ifndef __SGRADIENTPOOL__H__
 #define __SGRADIENTPOOL__H__
+
 #include <core/SCmnMap.h>
 #include <interface/obj-ref-i.h>
 #include <helper/obj-ref-impl.hpp>
 
 SNSBEGIN
+
 /**
- * @class      SGradientPool
- * @brief      name和IGradient的映射表
+ * @class SGradientPool
+ * @brief Manages the mapping of gradient names to IGradient objects.
  *
- * Describe
+ * @details This class provides functionality to store and retrieve gradient objects by their names.
+ *          It inherits from `SCmnMap` to manage the mapping and from `TObjRefImpl<IObjRef>` to handle reference counting.
  */
 class SOUI_EXP SGradientPool
     : public SCmnMap<SAutoRefPtr<IGradient>, SStringW>
     , public TObjRefImpl<IObjRef> {
   public:
     /**
-     * GetStyle
-     * @brief    Get IGradient from pool by name
-     * @param    LPCWSTR lpszName --  name of gradient
-     * @return   IGradient -- gradient object
-     * Describe
+     * @brief Retrieves the gradient object by its name.
+     * @param strName Name of the gradient.
+     * @return Pointer to the IGradient object, or nullptr if not found.
      */
     IGradient *GetGradient(const SStringW &strName);
 
     /**
-     * Init
-     * @brief    Load Style table from xml node
-     * @param    SXmlNode xmlNode --  xml node that describe style list
-     * @return   BOOL -- TRUE: loaded; FALSE:failed;
-     * Describe
+     * @brief Initializes the gradient pool from an XML node.
+     * @param xmlNode XML node containing the gradient definitions.
+     * @return TRUE if initialization is successful, FALSE otherwise.
      */
     BOOL Init(SXmlNode xmlNode);
 };
 
 SNSEND
+
 #endif // __SGRADIENTPOOL__H__

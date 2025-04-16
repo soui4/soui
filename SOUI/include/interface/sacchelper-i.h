@@ -1,18 +1,15 @@
 ﻿#ifndef __SACCHELPER_I__H__
 #define __SACCHELPER_I__H__
 
-#include <SGuidDef.h>
+#ifdef _WIN32
 SNSBEGIN
 
 typedef struct IWindow IWindow;
-// {727E4EAB-CFFA-4073-8C01-2815053FA44F}
-DEFINE_SGUID(IID_IAccHelper, 0x727e4eab, 0xcffa, 0x4073, 0x8c, 0x1, 0x28, 0x15, 0x5, 0x3f, 0xa4, 0x4f);
+
 #undef INTERFACE
 #define INTERFACE IAccHelper
-DECLARE_INTERFACE_(IAccHelper, IUnknown)
+DECLARE_INTERFACE_IID_(IAccHelper, IUnknown, "9FAF3067-6723-40DA-A56B-CDCB11B8902B")
 {
-    DECLARE_CLASS_SIID(IID_IAccHelper)
-
     STDMETHOD_(HRESULT, QueryInterface)
     (THIS_ REFIID riid, void **ppvObject) PURE;
 
@@ -25,4 +22,6 @@ DECLARE_INTERFACE_(IAccHelper, IUnknown)
 };
 
 SNSEND
+
+#endif //_WIN32
 #endif // __SACCHELPER_I__H__

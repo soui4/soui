@@ -1,58 +1,41 @@
-﻿/**
- * Copyright (C) 2014-2050 SOUI团队
- * All rights reserved.
- *
- * @file       SListCtrl.h
- * @brief
- * @version    v1.0
- * @author     soui
- * @date       2014-07-06
- *
- * Describe    ListCtrl控件
- */
-#ifndef __SLISTCTRL__H__
+﻿#ifndef __SLISTCTRL__H__
 #define __SLISTCTRL__H__
+
 #include "core/SPanel.h"
 #include "SHeaderCtrl.h"
 
 SNSBEGIN
+
 /**
- * @enum
- * @brief     类型
- *
- * Describe   类型
+ * @enum SListCtrlFlags
+ * @brief Flags for list control items
+ * @details Flags used to specify which attributes of a list item are valid.
  */
-enum
+enum SListCtrlFlags
 {
-    S_LVIF_TEXT = 0x01,
-    S_LVIF_IMAGE = 0x02,
-    S_LVIF_INDENT = 0x04,
+    S_LVIF_TEXT = 0x01,   /**< Text attribute is valid */
+    S_LVIF_IMAGE = 0x02,  /**< Image attribute is valid */
+    S_LVIF_INDENT = 0x04, /**< Indent attribute is valid */
 };
 
 /**
- * qsort_s
- * @brief     比较函数--函数指针
- *
- * Describe   函数指针
+ * @typedef PFNLVCOMPAREEX
+ * @brief Comparison function type for sorting
+ * @details Function pointer type for the comparison function used in sorting.
  */
-typedef int(__cdecl *PFNLVCOMPAREEX)(void *, const void *,
-                                     const void *); //使用快速排序算法中的比较函数,参考qsort_s
+typedef int(__cdecl *PFNLVCOMPAREEX)(void *, const void *, const void *);
 
 /**
- * @struct    _DXLVSUBITEM
- * @brief     子项结构
- *
- * @Describe  子项结构
+ * @struct DXLVSUBITEM
+ * @brief Subitem structure
+ * @details Structure representing a subitem in the list control.
  */
-typedef struct _DXLVSUBITEM
+typedef struct DXLVSUBITEM
 {
     /**
-     * _DXLVSUBITEM
-     * @brief     构造函数
-     *
-     * Describe   构造函数
+     * @brief Constructor
      */
-    _DXLVSUBITEM()
+    DXLVSUBITEM()
     {
         mask = 0;
         nImage = 0;
@@ -61,274 +44,251 @@ typedef struct _DXLVSUBITEM
         nIndent = 0;
     }
 
-    UINT mask;      /**<  */
-    LPTSTR strText; /**< 文本 */
-    int cchTextMax; /**< 文本最大数 */
-    UINT nImage;    /**< 图标 */
-    int nIndent;    /**< 缩进 */
+    UINT mask;      /**< Mask indicating which attributes are valid */
+    LPTSTR strText; /**< Text of the subitem */
+    int cchTextMax; /**< Maximum length of the text */
+    UINT nImage;    /**< Icon index */
+    int nIndent;    /**< Indent level */
 } DXLVSUBITEM;
 
-typedef SArray<DXLVSUBITEM> ArrSubItem; /**< 保存子项数组	 */
+typedef SArray<DXLVSUBITEM> ArrSubItem; /**< Array of subitems */
 
 /**
- * @struct    _DXLVITEM
- * @brief     条目结构
- *
- * @Describe  条目结构
+ * @struct DXLVITEM
+ * @brief Item structure
+ * @details Structure representing an item in the list control.
  */
-typedef struct _DXLVITEM
+typedef struct DXLVITEM
 {
     /**
-     * _DXLVITEM
-     * @brief     构造函数
-     *
-     * Describe   构造函数
+     * @brief Constructor
      */
-    _DXLVITEM()
+    DXLVITEM()
     {
         dwData = 0;
         arSubItems = NULL;
         checked = FALSE;
     }
 
-    ArrSubItem *arSubItems;
-    LPARAM dwData;
-    BOOL checked;
+    ArrSubItem *arSubItems; /**< Array of subitems */
+    LPARAM dwData;          /**< Additional data */
+    BOOL checked;           /**< Check state */
 } DXLVITEM;
 
-//////////////////////////////////////////////////////////////////////////
-//  SListCtrl
+/**
+ * @class SListCtrl
+ * @brief List Control
+ * @details A control that displays a list of items with multiple columns and subitems.
+ */
 class SOUI_EXP SListCtrl : public SPanel {
     DEF_SOBJECT(SPanel, L"listctrl")
 
   public:
     /**
-     * SListCtrl::SListCtrl
-     * @brief    构造函数
-     *
-     * Describe  构造函数
+     * @brief Constructor
      */
     SListCtrl();
 
     /**
-     * SListCtrl::~SListCtrl
-     * @brief    析构函数
-     *
-     * Describe  析构函数
+     * @brief Destructor
      */
     virtual ~SListCtrl();
+
     /**
-     * SListCtrl::InsertColumn
-     * @brief    插入一列
-     * @param    int nIndex -- 索引
-     * @param    LPCTSTR pszText -- 标题
-     * @param    int nWidth -- 宽度
-     * @param	 UINT fmt -- format
-     * @param    LPARAM lParam -- 附加参数
-     *
-     * Describe  插入一列
+     * @brief Insert a column
+     * @param nIndex Index at which to insert the column
+     * @param pszText Column title
+     * @param nWidth Column width
+     * @param fmt Format flags
+     * @param lParam Additional parameter
+     * @return Index of the inserted column
      */
     int InsertColumn(int nIndex, LPCTSTR pszText, int nWidth, UINT fmt, LPARAM lParam = 0);
+
     /**
-     * SListCtrl::InsertItem
-     * @brief    插入条目
-     * @param    int nIndex -- 索引
-     * @param    LPCTSTR pszText -- 标题
-     * @param    int nImage -- 图标
-     *
-     * Describe  插入条目
+     * @brief Insert an item
+     * @param nItem Index at which to insert the item
+     * @param pszText Text of the item
+     * @param nImage Icon index
+     * @return Index of the inserted item
      */
     int InsertItem(int nItem, LPCTSTR pszText, int nImage = -1);
 
     /**
-     * SListCtrl::SetItemData
-     * @brief    设置附加数据
-     * @param    int nItem -- 索引
-     * @param    LPARAM dwData-- 附加数据
-     *
-     * Describe  设置附加数据
+     * @brief Set the data associated with an item
+     * @param nItem Index of the item
+     * @param dwData Additional data
+     * @return TRUE if successful, FALSE otherwise
      */
     BOOL SetItemData(int nItem, LPARAM dwData);
+
     /**
-     * SListCtrl::GetItemData
-     * @brief    获取附加数据
-     * @param    int nItem -- 索引
-     * @return   返回DWORD
-     *
-     * Describe  获取附加数据
+     * @brief Get the data associated with an item
+     * @param nItem Index of the item
+     * @return Additional data
      */
     LPARAM GetItemData(int nItem);
+
     /**
-     * SListCtrl::SetSubItem
-     * @brief    设置子项
-     * @param    int nItem -- 索引
-     * @param    int nSubItem -- 子项索引
-     * @param    const DXLVSUBITEM* plv --
-     * @return   返回BOOL
-     *
-     * Describe  设置子项
+     * @brief Set a subitem
+     * @param nItem Index of the item
+     * @param nSubItem Index of the subitem
+     * @param plv Pointer to the subitem structure
+     * @return TRUE if successful, FALSE otherwise
      */
     BOOL SetSubItem(int nItem, int nSubItem, const DXLVSUBITEM *plv);
+
     /**
-     * SListCtrl::GetSubItem
-     * @brief    获取子项
-     * @param    int nItem -- 索引
-     * @param    int nSubItem -- 子项索引
-     * @param    DXLVSUBITEM* plv --
-     * @return   返回BOOL
-     *
-     * Describe  获取附加数据
+     * @brief Get a subitem
+     * @param nItem Index of the item
+     * @param nSubItem Index of the subitem
+     * @param plv Pointer to the subitem structure
+     * @return TRUE if successful, FALSE otherwise
      */
     BOOL GetSubItem(int nItem, int nSubItem, DXLVSUBITEM *plv) const;
+
     /**
-     * SListCtrl::SetSubItemText
-     * @brief    设置子项文本
-     * @param    int nItem -- 索引
-     * @param    int nSubItem -- 子项索引
-     * @param    LPCTSTR pszText -- 文本
-     * @return   返回BOOL
-     *
-     * Describe  设置子项文本
+     * @brief Set the text of a subitem
+     * @param nItem Index of the item
+     * @param nSubItem Index of the subitem
+     * @param pszText Text to set
+     * @return TRUE if successful, FALSE otherwise
      */
     BOOL SetSubItemText(int nItem, int nSubItem, LPCTSTR pszText);
 
     /**
-     * GetSubItemText
-     * @brief    获取子项文本
-     * @param    int nItem -- 索引
-     * @param    int nSubItem -- 子项索引
-     * @return   SNS::SStringT -- 结果字符串
-     * Describe
+     * @brief Get the text of a subitem
+     * @param nItem Index of the item
+     * @param nSubItem Index of the subitem
+     * @return Text of the subitem
      */
     SStringT GetSubItemText(int nItem, int nSubItem) const;
 
     /**
-     * SListCtrl::GetSelectedItem
-     * @brief    获取选中项
-     * @return   返回int
-     *
-     * Describe  设置选中项
+     * @brief Get the selected item
+     * @return Index of the selected item
      */
     int GetSelectedItem();
+
     /**
-     * SListCtrl::SetSelectedItem
-     * @brief    设置选中项
-     * @param    int nItem -- 索引
-     *
-     * Describe  设置选中项
+     * @brief Set the selected item
+     * @param nItem Index of the item to select
      */
     void SetSelectedItem(int nItem);
+
     /**
-     * SListCtrl::GetItemCount
-     * @brief    获取条目总数
-     * @return   返回int
-     *
-     * Describe  获取条目总数
+     * @brief Get the total number of items
+     * @return Number of items
      */
     int GetItemCount() const;
+
     /**
-     * SListCtrl::SetItemCount
-     * @brief    设置条目数
-     * @param    int nItems -- 索引
-     * @param    int nGrowBy --
-     * @return   返回BOOL
-     *
-     * Describe  设置条目数
+     * @brief Set the total number of items
+     * @param nItems Number of items
+     * @param nGrowBy Growth increment
+     * @return TRUE if successful, FALSE otherwise
      */
     BOOL SetItemCount(int nItems, int nGrowBy);
+
     /**
-     * SListCtrl::GetColumnCount
-     * @brief    获取列总数
-     * @return   返回int
-     *
-     * Describe  获取列总数
+     * @brief Get the total number of columns
+     * @return Number of columns
      */
     int GetColumnCount() const;
+
     /**
-     * SListCtrl::GetCountPerPage
-     * @brief    获取每页条目总数
-     * @return   返回int
-     *
-     * Describe  获取每页条目总数
+     * @brief Get the number of items per page
+     * @param bPartial Whether to include partial items
+     * @return Number of items per page
      */
     int GetCountPerPage(BOOL bPartial);
+
     /**
-     * SListCtrl::DeleteItem
-     * @brief    删除指定项
-     * @param    int nItem -- 索引
-     *
-     * Describe  删除指定项
+     * @brief Delete a specific item
+     * @param nItem Index of the item to delete
      */
     void DeleteItem(int nItem);
+
     /**
-     * SListCtrl::DeleteColumn
-     * @brief    删除指定列
-     * @param    int iCol -- 索引
-     *
-     * Describe  删除指定列
+     * @brief Delete a specific column
+     * @param iCol Index of the column to delete
      */
     void DeleteColumn(int iCol);
+
     /**
-     * SListCtrl::DeleteAllItems
-     * @brief    删除所有项
-     *
-     * Describe  删除所有项
+     * @brief Delete all items
      */
     void DeleteAllItems();
 
     /**
-     * SListCtrl::SortItems
-     * @brief    排序
-     * @param    PFNLVCOMPAREEX pfnCompare -- 比较函数
-     * @param    void * pContext -- 比较内容
-     * @return   返回BOOL
-     *
-     * Describe  排序
+     * @brief Sort items using a comparison function
+     * @param pfnCompare Comparison function
+     * @param pContext Context for the comparison function
+     * @return TRUE if successful, FALSE otherwise
      */
     BOOL SortItems(PFNLVCOMPAREEX pfnCompare, void *pContext);
 
     /**
-     * SListCtrl::GetCheckState
-     * @brief    获取某一行是否被选中
-     * @param    int nItem -- 指定哪一行
-     * @return   返回选中状态
-     *
-     * Describe  获取某一行是否被选中
+     * @brief Get the check state of an item
+     * @param nItem Index of the item
+     * @return Check state of the item
      */
     BOOL GetCheckState(int nItem);
 
     /**
-     * SListCtrl::SetCheckState
-     * @brief   设置某一行的选中状态
-     * @param   int nItem -- 指定行
-     * @param   BOOL bCheck -- 状态
-     * @return  返回函数执行是否成功
-     *
-     * Describe 设置某一行的选中状态
+     * @brief Set the check state of an item
+     * @param nItem Index of the item
+     * @param bCheck Check state to set
+     * @return TRUE if successful, FALSE otherwise
      */
     BOOL SetCheckState(int nItem, BOOL bCheck);
 
     /**
-     * SListCtrl::GetCheckedItemCount
-     * @brief   获取选中行的计数
-     * @return  返回计数
-     *
-     * Describe 获取选中行的计数
+     * @brief Get the number of checked items
+     * @return Number of checked items
      */
     int GetCheckedItemCount();
 
+    /**
+     * @brief Get the header control
+     * @return Pointer to the header control
+     */
     SHeaderCtrl *GetHeaderCtrl() const;
 
+    /**
+     * @brief Get the first checked item
+     * @return Index of the first checked item
+     */
     int GetFirstCheckedItem();
+
+    /**
+     * @brief Get the last checked item
+     * @return Index of the last checked item
+     */
     int GetLastCheckedItem();
+
+    /**
+     * @brief Enable or disable multiple selection
+     * @param enable Enable flag
+     */
     VOID EnableMultiSelection(BOOL enable)
     {
         m_bMultiSelection = enable;
     }
+
+    /**
+     * @brief Enable or disable checkboxes
+     * @param enable Enable flag
+     */
     VOID EnableCheckBox(BOOL enable)
     {
         m_bCheckBox = enable;
     }
+
+    /**
+     * @brief Enable or disable hot tracking
+     * @param enable Enable flag
+     */
     VOID EnableHotTrack(BOOL enable)
     {
         m_bHotTrack = enable;
@@ -336,238 +296,194 @@ class SOUI_EXP SListCtrl : public SPanel {
 
   protected:
     /**
-     * SListCtrl::CreateChildren
-     * @brief    创建新项
-     * @param    SXmlNode xmlNode -- xml文件
-     *
-     * Describe  通过解析xml文件创建
+     * @brief Create child items from XML configuration
+     * @param xmlNode XML node for the child items
+     * @return TRUE if successful, FALSE otherwise
      */
     virtual BOOL CreateChildren(SXmlNode xmlNode);
 
     /**
-     * SListCtrl::HitTest
-     * @brief    获取鼠标相关信息
-     * @param    CPoint &pt -- 坐标
-     *
-     * Describe
+     * @brief Hit test to determine the item under the mouse
+     * @param pt Mouse coordinates
+     * @return Index of the item or -1 if no item
      */
     int HitTest(const CPoint &pt);
 
     /**
-     * SListCtrl::GetTopIndex
-     * @brief    获取置顶项选项索引
-     * @return   返回int
-     *
-     * Describe  设置选中项
+     * @brief Get the index of the top visible item
+     * @return Index of the top visible item
      */
     int GetTopIndex() const;
+
     /**
-     * SListCtrl::GetItemRect
-     * @brief    获取item位置
-     * @param    int nItem -- 索引
-     * @param    int nSubItem -- 子项索引
-     * @return   返回int
-     *
-     * Describe  设置选中项
+     * @brief Get the rectangle of an item
+     * @param nItem Index of the item
+     * @param nSubItem Index of the subitem
+     * @return Rectangle of the item
      */
     CRect GetItemRect(int nItem, int nSubItem = 0);
 
     /**
-     * SListCtrl::DrawItem
-     * @brief    绘制
-     * @param    IRenderTarget *pRT -- 绘制设备
-     * @param    CRect &rc -- 目标区域
-     * @param    int iItem -- 选项
-     *
-     * Describe  绘制
+     * @brief Draw an item
+     * @param pRT Rendering target handle
+     * @param rcItem Rectangle for the item
+     * @param nItem Index of the item
      */
     virtual void DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem);
+
     /**
-     * SListCtrl::RedrawItem
-     * @brief    重绘选项
-     * @param    int iItem  -- 索引
-     *
-     * Describe  重绘选项
+     * @brief Redraw a specific item
+     * @param nItem Index of the item to redraw
      */
     void RedrawItem(int nItem);
 
     /**
-     * SListCtrl::NotifySelChange
-     * @brief    修改选中项
-     * @param    int nOldSel -- 旧选中项
-     * @param    int nNewSel -- 新选中项
-     *
-     * Describe  修改选中项
+     * @brief Notify of selection change
+     * @param nOldSel Old selected index
+     * @param nNewSel New selected index
+     * @param checkBox Whether the change is due to a checkbox
      */
     void NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox = FALSE);
+
     /**
-     * SListCtrl::OnPaint
-     * @brief    绘制
-     * @param    IRenderTarget *pRT -- 绘制设备
-     *
-     * Describe  消息响应函数
+     * @brief Paint the control
+     * @param pRT Rendering target handle
      */
     void OnPaint(IRenderTarget *pRT);
+
     /**
-     * SListCtrl::OnDestroy
-     * @brief    销毁
-     *
-     * Describe  销毁
+     * @brief Handle destroy event
      */
     void OnDestroy();
+
     /**
-     * SListCtrl::OnHeaderClick
-     * @brief    列表头单击事件 --
-     * @param    EventArgs *pEvt
-     *
-     * Describe  列表头单击事件
+     * @brief Handle header click event
+     * @param pEvt Event arguments
+     * @return TRUE if handled, FALSE otherwise
      */
     BOOL OnHeaderClick(IEvtArgs *pEvt);
+
     /**
-     * SListCtrl::OnHeaderSizeChanging
-     * @brief    列表头大小改变
-     * @param    EventArgs *pEvt --
-     *
-     * Describe  列表头大小改变
+     * @brief Handle header size changing event
+     * @param pEvt Event arguments
+     * @return TRUE if handled, FALSE otherwise
      */
     BOOL OnHeaderSizeChanging(IEvtArgs *pEvt);
+
     /**
-     * SListCtrl::OnHeaderSwap
-     * @brief    列表头交换
-     * @param    EventArgs *pEvt --
-     *
-     * Describe  列表头交换
+     * @brief Handle header swap event
+     * @param pEvt Event arguments
+     * @return TRUE if handled, FALSE otherwise
      */
     BOOL OnHeaderSwap(IEvtArgs *pEvt);
+
     /**
-     * SListCtrl::OnScroll
-     * @brief    滚动事件
-     * @param    BOOL bVertical -- 是否是垂直
-     * @param    UINT uCode -- 滚动类型
-     * @param    int nPos -- 滚动位置
-     *
-     * Describe  窗口滚动事件
+     * @brief Handle scroll event
+     * @param bVertical Whether the scroll is vertical
+     * @param uCode Scroll type
+     * @param nPos Scroll position
+     * @return TRUE if handled, FALSE otherwise
      */
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
+
     /**
-     * SListCtrl::OnLButtonDown
-     * @brief    左键按下
-     * @param    UINT nFlags -- 标志
-     * @param    CPoint pt -- 坐标
-     *
-     * Describe  消息响应函数
+     * @brief Handle left mouse button down event
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
      */
     void OnLButtonDown(UINT nFlags, CPoint pt);
 
     /**
-     * SListBox::OnLButtonDbClick
-     * @brief    左键双击
-     * @param    UINT nFlags -- 标志
-     * @param    CPoint pt -- 坐标
-     *
-     * Describe  消息响应函数
+     * @brief Handle left mouse button double-click event
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
      */
     void OnLButtonDbClick(UINT nFlags, CPoint pt);
 
     /**
-     * SListCtrl::OnLButtonUp
-     * @brief    左键抬起
-     * @param    UINT nFlags -- 标志
-     * @param    CPoint pt -- 坐标
-     *
-     * Describe  消息响应函数
+     * @brief Handle left mouse button up event
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
      */
     void OnLButtonUp(UINT nFlags, CPoint pt);
 
     /**
-     * OnMouseMove
-     * @brief    处理鼠标移动
-     * @param    UINT nFlags --  标志
-     * @param    CPoint pt --  坐标
-     * @return   void
-     * Describe
+     * @brief Handle mouse move event
+     * @param nFlags Flags
+     * @param pt Mouse coordinates
      */
     void OnMouseMove(UINT nFlags, CPoint pt);
 
     /**
-     * OnMouseLeave
-     * @brief    处理鼠标离开消息
-     * @return   void
-     * Describe
+     * @brief Handle mouse leave event
      */
     void OnMouseLeave();
 
     /**
-     * SListCtrl::OnSize
-     * @brief    消息响应函数
-     * @param    UINT nType --
-     * @param    CSize size --
-     *
-     * Describe  获取某项得索引
+     * @brief Handle size change event
+     * @param nType Size change type
+     * @param size New size
      */
     void OnSize(UINT nType, CSize size);
+
     /**
-     * SListCtrl::UpdateChildrenPosition
-     * @brief    更新子项位置
-     *
-     * Describe  更新子项位置
+     * @brief Update the position of child items
      */
     STDMETHOD_(void, UpdateChildrenPosition)(THIS) OVERRIDE;
+
     /**
-     * SListCtrl::GetListRect
-     * @brief    获取list位置
-     * @return   返回CRect
-     *
-     * Describe  获取list位置
+     * @brief Get the rectangle of the list
+     * @return Rectangle of the list
      */
     CRect GetListRect();
+
     /**
-     * SListCtrl::UpdateScrollBar
-     * @brief    更新滚动条
-     *
-     * Describe  更新滚动条
+     * @brief Update the scroll bar
      */
     void UpdateScrollBar();
+
     /**
-     * SListCtrl::UpdateHeaderCtrl
-     * @brief    更新列表头控件
-     *
-     * Describe  更新列表头控件
+     * @brief Update the header control
      */
     void UpdateHeaderCtrl();
 
+    /**
+     * @brief Hit test to determine if the point is on a checkbox
+     * @param pt Mouse coordinates
+     * @return TRUE if on a checkbox, FALSE otherwise
+     */
     BOOL HitCheckBox(const CPoint &pt);
 
   protected:
-    int m_nHeaderHeight; /**< 列表头高度 */
-    int m_nItemHeight;   /**< 条目高度 */
+    int m_nHeaderHeight; /**< Height of the header */
+    int m_nItemHeight;   /**< Height of the items */
 
-    int m_nSelectItem; /**< 选中项 */
-    int m_nHoverItem;  /**< Hover状态项 */
-    BOOL m_bHotTrack;  /**<  */
+    int m_nSelectItem; /**< Index of the selected item */
+    int m_nHoverItem;  /**< Index of the item under the mouse */
+    BOOL m_bHotTrack;  /**< Hot tracking flag */
 
-    CPoint m_ptIcon; /**< 图标位置 */
-    CPoint m_ptText; /**< 文本位置 */
+    CPoint m_ptIcon; /**< Icon position */
+    CPoint m_ptText; /**< Text position */
 
-    COLORREF m_crItemBg;    /**< 背景色 */
-    COLORREF m_crItemBg2;   /**< 背景色 */
-    COLORREF m_crItemSelBg; /**< 选中背景色 */
-    COLORREF m_crItemHotBg; /**< Hot背景色 */
-    COLORREF m_crText;      /**< 文本颜色 */
-    COLORREF m_crSelText;   /**< 选中文本颜色 */
+    COLORREF m_crItemBg;    /**< Background color */
+    COLORREF m_crItemBg2;   /**< Background color for even rows */
+    COLORREF m_crItemSelBg; /**< Selected item background color */
+    COLORREF m_crItemHotBg; /**< Hot item background color */
+    COLORREF m_crText;      /**< Text color */
+    COLORREF m_crSelText;   /**< Selected text color */
 
-    SAutoRefPtr<ISkinObj> m_pItemSkin;  /**< */
-    SAutoRefPtr<ISkinObj> m_pIconSkin;  /**< */
-    SAutoRefPtr<ISkinObj> m_pCheckSkin; /**< */
-    BOOL m_bCheckBox;
-    BOOL m_bMultiSelection;
+    SAutoRefPtr<ISkinObj> m_pItemSkin;  /**< Skin for items */
+    SAutoRefPtr<ISkinObj> m_pIconSkin;  /**< Skin for icons */
+    SAutoRefPtr<ISkinObj> m_pCheckSkin; /**< Skin for checkboxes */
+    BOOL m_bCheckBox;                   /**< Checkbox enable flag */
+    BOOL m_bMultiSelection;             /**< Multiple selection enable flag */
 
   protected:
-    typedef SArray<DXLVITEM> ArrLvItem; /**< 保存item数组 */
+    typedef SArray<DXLVITEM> ArrLvItem; /**< Array of items */
 
-    SHeaderCtrl *m_pHeader; /**< 列表头控件 */
-    ArrLvItem m_arrItems;   /**< */
-    CPoint m_ptOrigin;      /**< */
+    SHeaderCtrl *m_pHeader; /**< Header control */
+    ArrLvItem m_arrItems;   /**< Array of items */
+    CPoint m_ptOrigin;      /**< Origin point */
 
   protected:
     SOUI_ATTRS_BEGIN()

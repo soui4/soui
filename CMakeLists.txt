@@ -108,8 +108,10 @@ option(BUILD_DEMOS "Build builtin demos" ON)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 option(BUILD_RICHEDIT "using richedit from source code" ON)
+option(ENABLE_SOUI_ACC "Enable Acc" OFF)
 else()
 set(BUILD_RICHEDIT ON)
+set(ENABLE_SOUI_ACC OFF)
 endif()
 
 

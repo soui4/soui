@@ -1562,7 +1562,7 @@ LPCWSTR SHostWnd::GetTranslatorContext() const
 
 IMessageLoop *SHostWnd::GetMsgLoop()
 {
-    DWORD tid = m_dwThreadID;
+    tid_t tid = m_dwThreadID;
     if (tid == 0)
         tid = GetCurrentThreadId();
     return SApplication::getSingletonPtr()->GetMsgLoop(tid);

@@ -128,8 +128,8 @@ public:
 	STDMETHOD_(IXmlNode*, LastChild)(THIS) SCONST OVERRIDE;
 
 	// Get next/previous sibling in the children list of the parent node
-	STDMETHOD_(IXmlNode*, NextSibling)(THIS) SCONST OVERRIDE;
-	STDMETHOD_(IXmlNode*, PrevSibling)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(IXmlNode *, NextSibling)(CTHIS) SCONST OVERRIDE;
+    STDMETHOD_(IXmlNode *, PrevSibling)(CTHIS) SCONST OVERRIDE;
 	STDMETHOD_(IXmlNode*, NextSibling2)(THIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST OVERRIDE;
 	STDMETHOD_(IXmlNode*, PrevSibling2)(THIS_ const wchar_t* name,BOOL bCaseSensitive) SCONST OVERRIDE;
 

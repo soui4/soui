@@ -1,17 +1,6 @@
-﻿/**
- * Copyright (C) 2014-2050 SOUI团队
- * All rights reserved.
- *
- * @file       SRealWnd.h
- * @brief
- * @version    v1.0
- * @author     soui
- * @date       2014-07-06
- *
- * Describe
- */
-#ifndef __SREALWND__H__
+﻿#ifndef __SREALWND__H__
 #define __SREALWND__H__
+
 #include <core/SWnd.h>
 #include <interface/SCtrl-i.h>
 #include <proxy/SWindowProxy.h>
@@ -26,71 +15,80 @@
 SNSBEGIN
 
 /**
- * @class     SRealWnd
- * @brief
- *
- * Describe
+ * @class SRealWnd
+ * @brief Real Window Control
+ * @details A control that binds a real Windows window.
  */
 class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
     DEF_SOBJECT(SWindow, L"realwnd")
+
   public:
     /**
-     * SRealWnd::SRealWnd
-     * @brief    构造函数
-     *
-     * Describe  构造函数
+     * @brief Constructor
      */
     SRealWnd();
+
     /**
-     * SRealWnd::~SRealWnd
-     * @brief    析构函数
-     *
-     * Describe  析构函数
+     * @brief Destructor
      */
     virtual ~SRealWnd();
 
   public:
+    /**
+     * @brief Get the class name of the real window
+     * @return Pointer to the class name
+     */
     STDMETHOD_(const IStringT *, GetRealClassName)(CTHIS) SCONST OVERRIDE
     {
         return &m_strClassName;
     }
 
+    /**
+     * @brief Get the name of the real window
+     * @return Pointer to the window name
+     */
     STDMETHOD_(const IStringT *, GetRealWindowName)(CTHIS) SCONST OVERRIDE
     {
         return &m_strWindowName;
     }
 
+    /**
+     * @brief Get the style of the real window
+     * @return Window style
+     */
     STDMETHOD_(DWORD, GetRealStyle)(CTHIS) SCONST OVERRIDE
     {
         return m_dwStyle;
     }
 
+    /**
+     * @brief Get the extended style of the real window
+     * @return Extended window style
+     */
     STDMETHOD_(DWORD, GetRealStyleEx)(CTHIS) SCONST OVERRIDE
     {
         return m_dwExStyle;
     }
 
+    /**
+     * @brief Get the parameters of the real window
+     * @return Pointer to the XML node containing parameters
+     */
     STDMETHOD_(IXmlNode *, GetRealParam)(CTHIS) OVERRIDE
     {
         return m_xmlParams.Root();
     }
 
     /**
-     * SRealWnd::GetRealHwnd
-     * @brief    获取窗口句柄
-     * @param    BOOL bAutoCreate -- 自动创建
-     * @return   返回HWND
-     *
-     * Describe  获取窗口句柄
+     * @brief Get the handle of the real window
+     * @param bAutoCreate Whether to automatically create the window if it doesn't exist
+     * @return Handle to the real window
      */
     STDMETHOD_(HWND, GetRealHwnd)(THIS_ BOOL bAutoCreate = TRUE) OVERRIDE;
 
     /**
-     * SRealWnd::SetData
-     * @brief    获取附加数据
-     * @param    LPVOID lpData -- 附加数据
-     *
-     * Describe  获取附加数据
+     * @brief Set the additional data for the real window
+     * @param lpData Pointer to the additional data
      */
     STDMETHOD_(void, SetData)(THIS_ LPVOID lpData)
     {
@@ -98,11 +96,8 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
     }
 
     /**
-     * SRealWnd::GetData
-     * @brief    获取附加数据
-     * @return   返回LPVOID
-     *
-     * Describe  获取附加数据
+     * @brief Get the additional data for the real window
+     * @return Pointer to the additional data
      */
     STDMETHOD_(LPVOID, GetData)(THIS)
     {
@@ -110,78 +105,71 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
     }
 
     SOUI_ATTRS_BEGIN()
-        ATTR_STRINGT(L"wndclass", m_strClassName, FALSE)
-        ATTR_STRINGT(L"wndname", m_strWindowName, FALSE)
-        ATTR_HEX(L"style", m_dwStyle, FALSE)
-        ATTR_HEX(L"exstyle", m_dwExStyle, FALSE)
-        ATTR_BOOL(L"init", m_bInit, FALSE)
+        ATTR_STRINGT(L"wndclass", m_strClassName, FALSE) /**< Class name of the real window */
+        ATTR_STRINGT(L"wndname", m_strWindowName, FALSE) /**< Name of the real window */
+        ATTR_HEX(L"style", m_dwStyle, FALSE)             /**< Style of the real window */
+        ATTR_HEX(L"exstyle", m_dwExStyle, FALSE)         /**< Extended style of the real window */
+        ATTR_BOOL(L"init", m_bInit, FALSE)               /**< Initialization flag */
     SOUI_ATTRS_END()
+
   protected:
     /**
-     * SRealWnd::NeedRedrawWhenStateChange
-     * @brief    状态修改后重绘
-     * @return   返回BOOL
-     *
-     * Describe  状态修改后重绘
+     * @brief Determine if the control needs to be redrawn when its state changes
+     * @return TRUE if redraw is needed, FALSE otherwise
      */
     virtual BOOL NeedRedrawWhenStateChange();
-    /**
-     * SRealWnd::InitFromXml
-     * @brief    初始化
-     * @return   返回BOOL
-     *
-     * Describe  初始化
-     */
 
+    /**
+     * @brief Initialize the control from an XML node
+     * @param pNode XML node containing initialization parameters
+     * @return TRUE if initialization is successful, FALSE otherwise
+     */
     virtual BOOL WINAPI InitFromXml(IXmlNode *pNode);
 
+    /**
+     * @brief Handle layout changes
+     * @param rcWnd New window rectangle
+     * @return TRUE if layout is successful, FALSE otherwise
+     */
     virtual BOOL OnRelayout(const CRect &rcWnd);
 
     /**
-     * SRealWnd::OnShowWindow
-     * @brief    窗口显示
-     * @param    BOOL bShow -- 是否显示
-     * @param    UINT nStatus -- 状态
-     *
-     * Describe  窗口显示
+     * @brief Handle show window event
+     * @param bShow Whether to show the window
+     * @param nStatus Status code
      */
     void OnShowWindow(BOOL bShow, UINT nStatus);
 
     /**
-     * SRealWnd::OnDestroy
-     * @brief    销毁
-     *
-     * Describe  销毁
+     * @brief Handle destroy event
      */
     void OnDestroy();
 
     /**
-     * SRealWnd::OnPaint
-     * @brief    绘制
-     * @param    CDCHandle dc -- 绘制设备
-     *
-     * Describe  消息响应函数
+     * @brief Paint the control
+     * @param pRT Rendering target handle
      */
     void OnPaint(IRenderTarget *pRT)
     {
+        // Implementation can be added here if needed
     }
 
     /**
-     * SRealWnd::ShowRealWindow
-     * @brief    显示窗口
-     *
-     * Describe  显示窗口
+     * @brief Show the real window
      */
     void ShowRealWindow();
 
     /**
-     * SRealWnd::InitRealWnd
-     * @brief    初始化窗口
-     *
-     * Describe  初始化窗口
+     * @brief Initialize the real window
+     * @return TRUE if initialization is successful, FALSE otherwise
      */
     BOOL InitRealWnd();
 
+    /**
+     * @brief Set the position of the real window
+     * @param hRealWnd Handle to the real window
+     * @param prc Rectangle for the window position
+     */
     void SetRealWndPos(HWND hRealWnd, const CRect *prc);
 
     SOUI_MSG_MAP_BEGIN()
@@ -190,19 +178,21 @@ class SOUI_EXP SRealWnd : public TWindowProxy<IRealWnd> {
         MSG_WM_SHOWWINDOW(OnShowWindow)
     SOUI_MSG_MAP_END()
 
-    SStringT m_strClassName;  /**< 类名 */
-    SStringT m_strWindowName; /**< 窗口名 */
-    DWORD m_dwStyle;          /**< 窗口样式 */
-    DWORD m_dwExStyle;        /**< 窗口扩展样式 */
-    SXmlDoc m_xmlParams;      /**< 文档 */
+  protected:
+    SStringT m_strClassName;  /**< Class name of the real window */
+    SStringT m_strWindowName; /**< Name of the real window */
+    DWORD m_dwStyle;          /**< Style of the real window */
+    DWORD m_dwExStyle;        /**< Extended style of the real window */
+    SXmlDoc m_xmlParams;      /**< XML document containing parameters */
 
-    BOOL m_bInit; /**< 是否初始化 */
+    BOOL m_bInit; /**< Initialization flag */
 
-    HWND m_hRealWnd; /**< 窗口句柄 */
-    LPVOID m_lpData; /**< 附加参数 */
+    HWND m_hRealWnd; /**< Handle to the real window */
+    LPVOID m_lpData; /**< Pointer to additional data */
 
-    SAutoRefPtr<IRealWndHandler> m_pRealWndHandler;
+    SAutoRefPtr<IRealWndHandler> m_pRealWndHandler; /**< Pointer to the real window handler */
 };
 
 SNSEND
+
 #endif // __SREALWND__H__

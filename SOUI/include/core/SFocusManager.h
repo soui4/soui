@@ -2,194 +2,291 @@
  * Copyright (C) 2014-2050
  * All rights reserved.
  *
- * @file       FocusManager.h
- * @brief
+ * @file       SFocusManager.h
+ * @brief      Focus management module for DUI windows
  * @version    v1.0
  * @author     SOUI group
  * @date       2014/08/02
  *
- * Describe    SOUI中DUI窗口的焦点管理模块
+ * @details    Manages focus for DUI windows within the SOUI framework.
  */
 
 #ifndef __SFOCUSMANAGER__H__
 #define __SFOCUSMANAGER__H__
+
 #include <core/SWnd.h>
 #include <interface/SAccelerator-i.h>
 
 SNSBEGIN
 
-// FocusSearch is an object that implements the algorithm to find the
-// next view to focus.
+/**
+ * @class      FocusSearch
+ * @brief      Implements the algorithm to find the next view to focus.
+ *
+ * @details    This class is responsible for finding the next focusable view within a given
+ *             view hierarchy. It can cycle through the views and handle focus traversal.
+ */
 class FocusSearch {
   public:
-    // Constructor.
-    // - |root| is the root of the view hierarchy to traverse. Focus will be
-    //   trapped inside.
-    // - |cycle| should be true if you want FindNextFocusableView to cycle back
-    //           to the first view within this root when the traversal reaches
-    //           the end. If this is true, then if you pass a valid starting
-    //           view to FindNextFocusableView you will always get a valid view
-    //           out, even if it's the same view.
-    // - |accessibility_mode| should be true if full keyboard accessibility is
-    //   needed and you  want to check IsAccessibilityFocusableInRootView(),
-    //   rather than IsFocusableInRootView().
+    /**
+     * @brief    Constructor
+     * @param    root   Root of the view hierarchy to traverse
+     * @param    cycle  TRUE if focus should cycle back to the first view when reaching the end
+     *
+     * @details  Initializes the FocusSearch object with the specified root view and cycle behavior.
+     */
     FocusSearch(SWindow *root, bool cycle);
+
+    /**
+     * @brief    Destructor
+     */
     virtual ~FocusSearch()
     {
     }
 
-    // Finds the next view that should be focused and returns it. If a
-    // FocusTraversable is found while searching for the focusable view,
-    // returns NULL and sets |focus_traversable| to the FocusTraversable
-    // and |focus_traversable_view| to the view associated with the
-    // FocusTraversable.
-    //
-    // Return NULL if the end of the focus loop is reached, unless this object
-    // was initialized with |cycle|=true, in which case it goes back to the
-    // beginning when it reaches the end of the traversal.
-    // - |starting_view| is the view that should be used as the starting point
-    //   when looking for the previous/next view. It may be NULL (in which case
-    //   the first/last view should be used depending if normal/reverse).
-    // - |reverse| whether we should find the next (reverse is false) or the
-    //   previous (reverse is true) view.
-    // - |direction| specifies whether we are traversing down (meaning we should
-    //   look into child views) or traversing up (don't look at child views).
-    // - |check_starting_view| is true if starting_view may obtain the next focus.
-    // - |focus_traversable| is set to the focus traversable that should be
-    //   traversed if one is found (in which case the call returns NULL).
-    // - |focus_traversable_view| is set to the view associated with the
-    //   FocusTraversable set in the previous parameter (it is used as the
-    //   starting view when looking for the next focusable view).
+    /**
+     * @brief    Finds the next focusable view
+     * @param    starting_view      Starting view for the search
+     * @param    reverse            TRUE to find the previous view, FALSE for the next view
+     * @param    check_starting_view  TRUE if the starting view may obtain focus
+     * @return   Next focusable view or NULL if none found
+     *
+     * @details  Finds the next focusable view based on the specified parameters.
+     *           If a FocusTraversable is found, it sets the FocusTraversable and returns NULL.
+     */
     SWindow *FindNextFocusableView(SWindow *starting_view, bool reverse, bool check_starting_view);
 
   private:
-    // Convenience method that returns true if a view is focusable and does not
-    // belong to the specified group.
+    /**
+     * @brief    Checks if a view is a focusable candidate
+     * @param    v            View to check
+     * @param    pGroupOwner  Group owner to skip
+     * @return   TRUE if the view is focusable and not part of the specified group, otherwise FALSE
+     *
+     * @details  Determines if a view is a valid focusable candidate, excluding views in the specified group.
+     */
     bool IsViewFocusableCandidate(SWindow *v, SWindow *pGroupOwner);
 
-    // Convenience method; returns true if a view is not NULL and is focusable
-    // (checking IsAccessibilityFocusableInRootView() if accessibility_mode_ is
-    // true).
+    /**
+     * @brief    Checks if a view is focusable
+     * @param    view  View to check
+     * @return   TRUE if the view is focusable, otherwise FALSE
+     *
+     * @details  Determines if a view is focusable by checking its focusability.
+     */
     bool IsFocusable(const SWindow *view) const;
 
-    // Returns the next focusable view or view containing a FocusTraversable
-    // (NULL if none was found), starting at the starting_view.
-    // |check_starting_view|, |can_go_up| and |can_go_down| controls the
-    // traversal of the views hierarchy. |skip_group_id| specifies a group_id,
-    // -1 means no group. All views from a group are traversed in one pass.
+    /**
+     * @brief    Finds the next focusable view
+     * @param    starting_view      Starting view for the search
+     * @param    check_starting_view  TRUE if the starting view may obtain focus
+     * @param    can_go_up          TRUE if traversal can go up the hierarchy
+     * @param    can_go_down        TRUE if traversal can go down the hierarchy
+     * @param    pSkipGroupOwner    Group owner to skip
+     * @return   Next focusable view or NULL if none found
+     *
+     * @details  Implements the logic to find the next focusable view based on the specified parameters.
+     */
     SWindow *FindNextFocusableViewImpl(SWindow *starting_view, bool check_starting_view, bool can_go_up, bool can_go_down, SWindow *pSkipGroupOwner);
 
-    // Same as FindNextFocusableViewImpl but returns the previous focusable view.
+    /**
+     * @brief    Finds the previous focusable view
+     * @param    starting_view      Starting view for the search
+     * @param    check_starting_view  TRUE if the starting view may obtain focus
+     * @param    can_go_up          TRUE if traversal can go up the hierarchy
+     * @param    can_go_down        TRUE if traversal can go down the hierarchy
+     * @param    pSkipGroupOwner    Group owner to skip
+     * @return   Previous focusable view or NULL if none found
+     *
+     * @details  Implements the logic to find the previous focusable view based on the specified parameters.
+     */
     SWindow *FindPreviousFocusableViewImpl(SWindow *starting_view, bool check_starting_view, bool can_go_up, bool can_go_down, SWindow *pSkipGroupOwner);
 
-    SWindow *root_;
-    bool cycle_;
+    SWindow *root_; /**< Root of the view hierarchy to traverse. */
+    bool cycle_;    /**< TRUE if focus should cycle back to the first view when reaching the end. */
 };
 
 /**
- * @class      CFocusManager
- * @brief      焦点管理对象
+ * @class      SFocusManager
+ * @brief      Focus management object for DUI windows
  *
- * Describe
+ * @details    Manages the focus for DUI windows, handling focus traversal and keyboard accelerators.
  */
 class SOUI_EXP SFocusManager : public IAcceleratorMgr {
   public:
-    // The reason why the focus changed.
+    /**
+     * @enum       FocusChangeReason
+     * @brief      Reason for focus change
+     *
+     * @details    Enumerates the reasons why the focus might change.
+     */
     enum FocusChangeReason
     {
-        // The focus changed due to a click or a shortcut to jump directly to
-        // a particular view.
-        kReasonDirectFocusChange = 0,
-
-        // The focus changed because the user traversed focusable views using
-        // keys like Tab or Shift+Tab.
-        kReasonFocusTraversal,
-
-        // The focus changed due to restoring the focus.
-        kReasonFocusRestore,
-
+        kReasonDirectFocusChange = 0, /**< Focus changed due to a direct action like a click or shortcut. */
+        kReasonFocusTraversal,        /**< Focus changed due to keyboard traversal (e.g., Tab, Shift+Tab). */
+        kReasonFocusRestore           /**< Focus changed due to restoring the focus. */
     };
 
+    /**
+     * @brief    Constructor
+     */
     SFocusManager();
+
+    /**
+     * @brief    Destructor
+     */
     ~SFocusManager(void);
 
+    /**
+     * @brief    Sets the owner window
+     * @param    pOwner  Pointer to the owner window
+     *
+     * @details  Sets the owner window for the focus manager.
+     */
     void SetOwner(SWindow *pOwner);
 
+    /**
+     * @brief    Checks if a key is a tab traversal key
+     * @param    vKey  Virtual key code
+     * @return   TRUE if the key is a tab traversal key, otherwise FALSE
+     *
+     * @details  Determines if the specified virtual key code is a tab traversal key.
+     */
     BOOL IsTabTraversalKey(UINT vKey);
+
+    /**
+     * @brief    Handles key down events
+     * @param    vKey  Virtual key code
+     * @return   TRUE if the key event is handled, otherwise FALSE
+     *
+     * @details  Handles key down events and performs focus traversal if necessary.
+     */
     BOOL OnKeyDown(UINT vKey);
 
-    // Advances the focus (backward if reverse is true).
+    /**
+     * @brief    Advances the focus
+     * @param    reverse  TRUE to advance backward, FALSE to advance forward
+     *
+     * @details  Advances the focus to the next or previous focusable view based on the specified direction.
+     */
     void AdvanceFocus(bool reverse);
 
-    // Low-level methods to force the focus to change (and optionally provide
-    // a reason). If the focus change should only happen if the view is
-    // currenty focusable, enabled, and visible, call view->RequestFocus().
+    /**
+     * @brief    Sets the focused window with a reason
+     * @param    swnd    Handle to the window to focus
+     * @param    reason  Reason for the focus change
+     *
+     * @details  Sets the focused window and records the reason for the focus change.
+     */
     void SetFocusedHwndWithReason(SWND swnd, FocusChangeReason reason);
+
+    /**
+     * @brief    Sets the focused window
+     * @param    swnd  Handle to the window to focus
+     *
+     * @details  Sets the focused window without specifying a reason.
+     */
     void SetFocusedHwnd(SWND swnd);
 
-    // Clears the focused view. The window associated with the top root view gets
-    // the native focus (so we still get keyboard events).
+    /**
+     * @brief    Clears the focused window
+     *
+     * @details  Clears the focused window and sets the native focus to the top root view.
+     */
     void ClearFocus();
 
+    /**
+     * @brief    Gets the focused window
+     * @return   Handle to the focused window
+     *
+     * @details  Returns the handle to the currently focused window.
+     */
     SWND GetFocusedHwnd() const;
 
-    // Stores and restores the focused view. Used when the window becomes
-    // active/inactive.
+    /**
+     * @brief    Stores the focused view
+     *
+     * @details  Stores the currently focused view for later restoration.
+     */
     void StoreFocusedView();
+
+    /**
+     * @brief    Restores the focused view
+     *
+     * @details  Restores the focused view from the stored state.
+     */
     void RestoreFocusedView();
 
   protected:
     // IAcceleratorMgr
 
-    // Register a keyboard accelerator for the specified target. If multiple
-    // targets are registered for an accelerator, a target registered later has
-    // higher priority.
-    // Note that we are currently limited to accelerators that are either:
-    // - a key combination including Ctrl or Alt
-    // - the escape key
-    // - the enter key
-    // - any F key (F1, F2, F3 ...)
-    // - any browser specific keys (as available on special keyboards)
+    /**
+     * @brief    Registers a keyboard accelerator for a target
+     * @param    pAcc    Pointer to the accelerator
+     * @param    target  Pointer to the accelerator target
+     *
+     * @details  Registers a keyboard accelerator for the specified target.
+     */
     STDMETHOD_(void, RegisterAccelerator)
     (THIS_ const IAccelerator *pAcc, IAcceleratorTarget *target) OVERRIDE;
 
-    // Unregister the specified keyboard accelerator for the specified target.
+    /**
+     * @brief    Unregisters a keyboard accelerator for a target
+     * @param    pAcc    Pointer to the accelerator
+     * @param    target  Pointer to the accelerator target
+     *
+     * @details  Unregisters a keyboard accelerator for the specified target.
+     */
     STDMETHOD_(void, UnregisterAccelerator)
     (THIS_ const IAccelerator *pAcc, IAcceleratorTarget *target) OVERRIDE;
 
-    // Unregister all keyboard accelerator for the specified target.
+    /**
+     * @brief    Unregisters all keyboard accelerators for a target
+     * @param    target  Pointer to the accelerator target
+     *
+     * @details  Unregisters all keyboard accelerators for the specified target.
+     */
     STDMETHOD_(void, UnregisterAccelerators)(THIS_ IAcceleratorTarget *target) OVERRIDE;
 
   private:
-    // Activate the target associated with the specified accelerator.
-    // First, AcceleratorPressed handler of the most recently registered target
-    // is called, and if that handler processes the event (i.e. returns true),
-    // this method immediately returns. If not, we do the same thing on the next
-    // target, and so on.
-    // Returns true if an accelerator was activated.
+    /**
+     * @brief    Processes a keyboard accelerator
+     * @param    pAcc  Pointer to the accelerator
+     * @return   TRUE if the accelerator was activated, otherwise FALSE
+     *
+     * @details  Activates the target associated with the specified accelerator.
+     */
     bool ProcessAccelerator(const IAccelerator *pAcc);
 
-    // Returns the next focusable view.
+    /**
+     * @brief    Gets the next focusable view
+     * @param    pWndStarting       Starting view for the search
+     * @param    bReverse           TRUE to find the previous view, FALSE for the next view
+     * @param    bLoop              TRUE if focus should cycle back to the first view when reaching the end
+     * @return   Next focusable view or NULL if none found
+     *
+     * @details  Finds the next focusable view based on the specified parameters.
+     */
     SWindow *GetNextFocusableView(SWindow *pWndStarting, bool bReverse, bool bLoop);
 
-    // Validates the focused view, clearing it if the window it belongs too is not
-    // attached to the window hierarchy anymore.
+    /**
+     * @brief    Validates the focused view
+     *
+     * @details  Validates the focused view and clears it if the window is no longer attached to the hierarchy.
+     */
     void ValidateFocusedView();
 
   private:
-    // The view that currently is focused.
-    SWND focused_view_;
+    SWND focused_view_;                     /**< Handle to the currently focused window. */
+    SWND focused_backup_;                   /**< Backup handle to the focused window for restoration. */
+    FocusChangeReason focus_change_reason_; /**< Reason for the last focus change. */
+    SWindow *m_pOwner;                      /**< Pointer to the owner window. */
 
-    SWND focused_backup_;
-
-    FocusChangeReason focus_change_reason_;
-
-    SWindow *m_pOwner;
-
-    typedef SList<IAcceleratorTarget *> AcceleratorTargetList;
-    typedef SMap<DWORD, AcceleratorTargetList> AcceleratorMap;
-    AcceleratorMap accelerators_;
+    typedef SList<IAcceleratorTarget *> AcceleratorTargetList; /**< List of accelerator targets. */
+    typedef SMap<DWORD, AcceleratorTargetList> AcceleratorMap; /**< Map of accelerators to targets. */
+    AcceleratorMap accelerators_;                              /**< Map of registered accelerators. */
 };
 
 SNSEND
+
 #endif // __SFOCUSMANAGER__H__

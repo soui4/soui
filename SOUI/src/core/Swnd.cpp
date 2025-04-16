@@ -9,6 +9,7 @@
 #include "helper/STime.h"
 #include "animation/STransformation.h"
 #include "core/SCaret.h"
+#include <atl.mini/SComCli.h>
 
 SNSBEGIN
 
@@ -352,7 +353,7 @@ void SWindow::TestMainThread()
     {
         // 当你看到这个东西的时候，我不幸的告诉你，你的其他线程在刷界面
         // 这是一件很危险的事情
-        DWORD dwCurThreadID = GetCurrentThreadId();
+        tid_t dwCurThreadID = GetCurrentThreadId();
         DWORD dwProcID = GetCurrentProcessId();
         SASSERT_FMTW(m_nMainThreadId == dwCurThreadID, L"ProcessID:%d,请准备好红包再到群里提问", dwProcID);
     }

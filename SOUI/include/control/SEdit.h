@@ -1,38 +1,50 @@
 ﻿#ifndef _SEDIT_H_
 #define _SEDIT_H_
+
 #include <control/SRichEdit.h>
 
 SNSBEGIN
+
 /**
- * @class      SEdit
- * @brief      简单edit控件
- *
- * Describe
+ * @class SEdit
+ * @brief Simple Edit Control
+ * @details A simple edit control that supports cue text and color customization.
  */
 class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
     DEF_SOBJECT(SRichEdit, L"edit")
+
   public:
     /**
-     * SEdit::SEdit
-     * @brief    构造函数
-     *
-     * Describe  构造函数
+     * @brief Constructor
      */
     SEdit();
 
   public:
+    /**
+     * @brief Get the cue text
+     * @param pStr Output string for the cue text
+     */
     STDMETHOD_(void, GetCueText)(CTHIS_ IStringT *pStr) SCONST
     {
         SStringT str = GetCueText(FALSE);
         pStr->Copy(&str);
     }
 
+    /**
+     * @brief Get the cue text color
+     * @return Cue text color
+     */
     STDMETHOD_(COLORREF, GetCueColor)(CTHIS) SCONST
     {
         return m_crCue;
     }
 
   public:
+    /**
+     * @brief Get the cue text
+     * @param bRawText Whether to get raw text
+     * @return Cue text
+     */
     SStringT GetCueText(BOOL bRawText = FALSE) const;
 
     SOUI_ATTRS_BEGIN()
@@ -41,29 +53,36 @@ class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
     SOUI_ATTRS_END()
 
   protected:
+    /**
+     * @brief Handle language change event
+     * @return HRESULT
+     */
     virtual HRESULT OnLanguageChanged();
 
     /**
-     * SEdit::OnPaint
-     * @brief    绘制消息
-     * @param    IRenderTarget * pRT -- 绘画设备上下文
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Paint the control
+     * @param pRT Rendering target handle
+     * @details This function is a message handler.
      */
     void OnPaint(IRenderTarget *pRT);
+
     /**
-     * SEdit::OnSetFocus
-     * @brief    获得焦点
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle set focus event
+     * @param wndOld Previous focus window handle
+     * @details This function is a message handler.
      */
     void OnSetFocus(SWND wndOld);
-    UINT GetCueTextAlign();
+
     /**
-     * SEdit::OnKillFocus
-     * @brief    失去焦点
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Get the alignment of the cue text
+     * @return Alignment of the cue text
+     */
+    UINT GetCueTextAlign();
+
+    /**
+     * @brief Handle kill focus event
+     * @param wndFocus New focus window handle
+     * @details This function is a message handler.
      */
     void OnKillFocus(SWND wndFocus);
 
@@ -73,10 +92,11 @@ class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
         MSG_WM_KILLFOCUS_EX(OnKillFocus)
     SOUI_MSG_MAP_END()
 
-    COLORREF m_crCue;
-    STrText m_strCue;
+  protected:
+    COLORREF m_crCue; /**< Cue text color */
+    STrText m_strCue; /**< Cue text */
 };
 
 SNSEND
 
-#endif //_SEDIT_H_
+#endif // _SEDIT_H_
