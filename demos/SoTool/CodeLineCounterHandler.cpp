@@ -53,7 +53,7 @@ void CCodeLineCounterHandler::OnInit( SWindow *pRoot )
 
     SXmlDoc xmlCodeSyntax;
 
-    SStringT strSyntax = SApplication::getSingleton().GetAppDir() + _T("\\syntax.xml");
+    SStringT strSyntax = SApplication::getSingleton().GetAppDir() + _T("/syntax.xml");
     if(!xmlCodeSyntax.load_file(strSyntax))
     {
 		LOADXML(xmlCodeSyntax,_T("xml:syntax"));
@@ -89,7 +89,7 @@ DWORD CCodeLineCounterHandler::EnumFileInfo(const CODECFGMAP &cfg, const SString
 
     //枚举当前目录下的文件
     WIN32_FIND_DATAW fd;
-    SStringW strFind = strPath + L"\\*.*";
+    SStringW strFind = strPath + L"/*.*";
 
     HANDLE hFind = FindFirstFileW(strFind,&fd);
     if(hFind != INVALID_HANDLE_VALUE)
@@ -105,7 +105,7 @@ DWORD CCodeLineCounterHandler::EnumFileInfo(const CODECFGMAP &cfg, const SString
                 const CODECFGMAP::CPair * pPair = cfg.Lookup(pszExt);
                 if(!pPair) continue;
                 FILEINFO fi;
-                fi.strFileName = strPath + L"\\" + fd.cFileName;
+                fi.strFileName = strPath + L"/" + fd.cFileName;
                 fi.dwSize = fd.nFileSizeLow;
                 fileSizeDir += fi.dwSize;
                 fi.cfg = pPair->m_value;
@@ -123,7 +123,7 @@ DWORD CCodeLineCounterHandler::EnumFileInfo(const CODECFGMAP &cfg, const SString
         {
             SStringT strDirName;
             m_pDirTree->GetItemText(hChild,strDirName);
-            SStringW strPath2 = strPath + L"\\" + S_CT2W(strDirName);
+            SStringW strPath2 = strPath + L"/" + S_CT2W(strDirName);
             fileSizeDir += EnumFileInfo(cfg,strPath2,hChild,lstFileInfo,nDirs);
             nDirs ++;
         }

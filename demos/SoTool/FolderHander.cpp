@@ -70,7 +70,7 @@ void CFolderHander::InitDir( const SStringW & strDir,BOOL bInput/*=FALSE */)
 void CFolderHander::InitDirTree(HSTREEITEM hTreeItem,const SStringW & strPath)
 {
     WIN32_FIND_DATAW fd;
-    SStringW strFind = strPath + L"\\*.*";
+    SStringW strFind = strPath + L"/*.*";
     HANDLE hFind=FindFirstFileW(strFind,&fd);
     if(hFind != INVALID_HANDLE_VALUE)
     {
@@ -83,7 +83,7 @@ void CFolderHander::InitDirTree(HSTREEITEM hTreeItem,const SStringW & strPath)
                 if(strName != L"." && strName != L"..")
                 {
                     HSTREEITEM hItem = m_pDirTree->InsertItem(S_CW2T(strName),0,1,hTreeItem);
-                    InitDirTree(hItem,strPath + L"\\" + strName);
+                    InitDirTree(hItem,strPath + L"/" + strName);
                 }
             }
         }
