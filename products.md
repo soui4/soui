@@ -5,6 +5,7 @@
 |OfficeAid|OfficeAid.App.exe|1.0.0.3|贡献代码|北京云动智效网络科技有限公司|https://www.officeaid.com/|提供demo,pcmanager及souiviewer|
 |恒星播放器|StellarPlayer.exe|1.1.0.147|购买|冷湖科技(武汉)有限公司|https://www.stellarplayer.com/|购买授权|
 |壹加点图软件|YJApp.arx|1.0.2.0|贡献代码|壹加软件|适于于AutoCAD2010~2020|
+|山竹远程控制软件|Quick.exe|2.0|购买|苏州小庭花数字科技有限公司|无|购买授权|
 
 
 |购买授权企业|日期|备注|
@@ -22,6 +23,7 @@
 |购买授权个人|日期|备注|
 |:-|:-:|:-:|
 |炒炒|2020前|qq号:yuanchaolie@qq.com|
+|色即是空|2020前|qq号:1444832602|
 
 2022.1.27
 说明：还有几个用户购买了授权，具体信息我记不清了，看到名单后请联系我来补充，谢谢！

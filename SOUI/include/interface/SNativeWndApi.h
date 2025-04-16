@@ -1,330 +1,330 @@
-//!Ìí¼ÓÒıÓÃ
+ï»¿//!æ·»åŠ å¼•ç”¨
 /*!
  */
 STDMETHOD_(long, AddRef)(THIS) PURE;
 
-//!ÊÍ·ÅÒıÓÃ
+//!é‡Šæ”¾å¼•ç”¨
 /*!
  */
 STDMETHOD_(long, Release)(THIS) PURE;
 
-//!ÊÍ·Å¶ÔÏó
+//!é‡Šæ”¾å¯¹è±¡
 /*!
  */
 STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 //////////////////////////////////////////////////////////////////////////
 
 /**
- * @brief ´´½¨Ò»¸öNative´°¿Ú
- * @param lpWindowName ´°¿ÚÃû
- * @param dwStyle ´°¿Ústyle
- * @param dwExStyle ´°¿ÚexStyle
- * @param x ´°¿ÚÏÔÊ¾Î»ÖÃX
- * @param y ´°¿ÚÏÔÊ¾Î»ÖÃY
- * @param nWidth ´°¿ÚÏÔÊ¾¿í¶È
- * @param nHeight ´°¿ÚÏÔÊ¾¸ß¶È
- * @param hWndParent ¸¸´°¿Ú
- * @param nID ´°¿ÚID
- * @param lpParam ¸½¼Ó²ÎÊı
- * @return ´°¿ÚHWND
+ * @brief åˆ›å»ºä¸€ä¸ªNativeçª—å£
+ * @param lpWindowName çª—å£å
+ * @param dwStyle çª—å£style
+ * @param dwExStyle çª—å£exStyle
+ * @param x çª—å£æ˜¾ç¤ºä½ç½®X
+ * @param y çª—å£æ˜¾ç¤ºä½ç½®Y
+ * @param nWidth çª—å£æ˜¾ç¤ºå®½åº¦
+ * @param nHeight çª—å£æ˜¾ç¤ºé«˜åº¦
+ * @param hWndParent çˆ¶çª—å£
+ * @param nID çª—å£ID
+ * @param lpParam é™„åŠ å‚æ•°
+ * @return çª—å£HWND
  */
 STDMETHOD_(HWND, CreateNative)
 (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
 
 /**
- * @brief »ñÈ¡´°¿ÚHWND
- * @return ´°¿ÚHWND
+ * @brief è·å–çª—å£HWND
+ * @return çª—å£HWND
  */
 STDMETHOD_(HWND, GetHwnd)(THIS) PURE;
 
 /**
- * @brief ÓÃSNativeWnd¶ÔÏó×ÓÀà»¯Ò»¸öHWND
- * @param hWnd Ä¿±êHWND
- * @return TRUE-³É¹¦
+ * @brief ç”¨SNativeWndå¯¹è±¡å­ç±»åŒ–ä¸€ä¸ªHWND
+ * @param hWnd ç›®æ ‡HWND
+ * @return TRUE-æˆåŠŸ
  */
 STDMETHOD_(BOOL, SubclassWindow)(THIS_ HWND hWnd) PURE;
 
 /**
- * @brief ·´×ÓÀà»¯
- * @param bForce ÎªÕæÊÇ£¬Èç¹ûµ±Ç°´°¿ÚµÄwndproc²»ÊÇSNativeWnd¶ÔÏóµÄ´°¿Ú¹ı³ÌÒ²Ö´ĞĞ·´×ÓÀà»¯
- * @return Ö´ĞĞ·´×ÓÀà»¯µÄ´°¿ÚHWND
+ * @brief åå­ç±»åŒ–
+ * @param bForce ä¸ºçœŸæ˜¯ï¼Œå¦‚æœå½“å‰çª—å£çš„wndprocä¸æ˜¯SNativeWndå¯¹è±¡çš„çª—å£è¿‡ç¨‹ä¹Ÿæ‰§è¡Œåå­ç±»åŒ–
+ * @return æ‰§è¡Œåå­ç±»åŒ–çš„çª—å£HWND
  */
 STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) PURE;
 
 /**
- * @brief »ñÈ¡µ±Ç°µÄ´°¿ÚÏûÏ¢¶ÔÏó
- * @return ´°¿ÚÏûÏ¢¶ÔÏóÖ¸Õë
+ * @brief è·å–å½“å‰çš„çª—å£æ¶ˆæ¯å¯¹è±¡
+ * @return çª—å£æ¶ˆæ¯å¯¹è±¡æŒ‡é’ˆ
  */
 STDMETHOD_(const MSG *, GetCurrentMessage)(CTHIS) SCONST PURE;
 
 /**
- * @brief »ñÈ¡´°¿ÚID
+ * @brief è·å–çª—å£ID
  */
 STDMETHOD_(int, GetDlgCtrlID)(CTHIS) SCONST PURE;
 
 /**
- * @brief »ñÈ¡´°¿ÚStyle
+ * @brief è·å–çª—å£Style
  */
 STDMETHOD_(DWORD, GetStyle)(CTHIS) SCONST PURE;
 
 /**
- * @brief »ñÈ¡´°¿ÚexStyle
+ * @brief è·å–çª—å£exStyle
  */
 STDMETHOD_(DWORD, GetExStyle)(CTHIS) SCONST PURE;
 
 /**
- * @brief »ñÈ¡´°¿Ú¹ØÁªÊı¾İ
- * @param nIndex Êı¾İË÷Òı
- * @return Êı¾İÖµ
+ * @brief è·å–çª—å£å…³è”æ•°æ®
+ * @param nIndex æ•°æ®ç´¢å¼•
+ * @return æ•°æ®å€¼
  */
 STDMETHOD_(LONG_PTR, GetWindowLongPtr)(CTHIS_ int nIndex) SCONST PURE;
 
 /**
- * @brief ÉèÖÃ´°¿Ú¹ØÁªÊı¾İ
- * @param nIndex Êı¾İË÷Òı
- * @param dwNewLong Êı¾İÖµ
- * @return Ô­Êı¾İÖµ
+ * @brief è®¾ç½®çª—å£å…³è”æ•°æ®
+ * @param nIndex æ•°æ®ç´¢å¼•
+ * @param dwNewLong æ•°æ®å€¼
+ * @return åŸæ•°æ®å€¼
  */
 STDMETHOD_(LONG_PTR, SetWindowLongPtr)(THIS_ int nIndex, LONG_PTR dwNewLong) PURE;
 
 /**
- * @brief »ñÈ¡¸¸´°¿Ú
- * @return ¸¸´°¿ÚHWND
+ * @brief è·å–çˆ¶çª—å£
+ * @return çˆ¶çª—å£HWND
  */
 STDMETHOD_(HWND, GetParent)(THIS) PURE;
 
 /**
- * @brief ÉèÖÃ¸¸´°¿Ú
- * @param hWndNewParent ĞÂ¸¸´°¿ÚHWND
- * @return Ô­¸¸´°¿ÚHWND
+ * @brief è®¾ç½®çˆ¶çª—å£
+ * @param hWndNewParent æ–°çˆ¶çª—å£HWND
+ * @return åŸçˆ¶çª—å£HWND
  */
 STDMETHOD_(HWND, SetParent)(THIS_ HWND hWndNewParent) PURE;
 
 /**
- * @brief »ñÈ¡´°¿ÚµÄenable×´Ì¬
+ * @brief è·å–çª—å£çš„enableçŠ¶æ€
  * @return TRUE-enable
  */
 STDMETHOD_(BOOL, IsWindowEnabled)(CTHIS) SCONST PURE;
 
 /**
- * @brief ĞŞ¸Ä´°¿Ústyle
- * @param dwRemove ´ıÒÆ³ı±êÖ¾Î»
- * @param dwAdd ´ıÔö¼Ó±êÖ¾Î»
+ * @brief ä¿®æ”¹çª—å£style
+ * @param dwRemove å¾…ç§»é™¤æ ‡å¿—ä½
+ * @param dwAdd å¾…å¢åŠ æ ‡å¿—ä½
  * @param nFlags Window positioning flags
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
 
 /**
- * @brief ĞŞ¸Ä´°¿ÚexStyle
- * @param dwRemove ´ıÒÆ³ı±êÖ¾Î»
- * @param dwAdd ´ıÔö¼Ó±êÖ¾Î»
+ * @brief ä¿®æ”¹çª—å£exStyle
+ * @param dwRemove å¾…ç§»é™¤æ ‡å¿—ä½
+ * @param dwAdd å¾…å¢åŠ æ ‡å¿—ä½
  * @param nFlags Window positioning flags
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
 
 /**
- * @brief ÉèÖÃ´°¿ÚµÄPos
- * @param hWndInsertAfter zorderÎ»ÖÃ
+ * @brief è®¾ç½®çª—å£çš„Pos
+ * @param hWndInsertAfter zorderä½ç½®
  * @param x
  * @param y
  * @param cx
  * @param cy
- * @param nFlags ±êÖ¾Î»
+ * @param nFlags æ ‡å¿—ä½
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, SetWindowPos)
 (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) PURE;
 
 /**
- * @brief ´°¿Ú¾ÓÖĞ
- * @param hWndCenter Ïà¶Ô¾ÓÖĞ´°¿Ú
+ * @brief çª—å£å±…ä¸­
+ * @param hWndCenter ç›¸å¯¹å±…ä¸­çª—å£
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter /*= NULL*/) PURE;
 
 /**
- * @brief Ïú»Ù´°¿Ú
+ * @brief é”€æ¯çª—å£
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, DestroyWindow)(THIS) PURE;
 
 /**
- * @brief ¼ì²éÊÇ·ñÎªÓĞĞ§HWND
+ * @brief æ£€æŸ¥æ˜¯å¦ä¸ºæœ‰æ•ˆHWND
  * @return
  */
 STDMETHOD_(BOOL, IsWindow)(CTHIS) SCONST PURE;
 
 /**
- * @brief Ë¢ĞÂ´°¿Ú
- * @param bErase Çå³ı´°¿ÚÄÚÈİ
+ * @brief åˆ·æ–°çª—å£
+ * @param bErase æ¸…é™¤çª—å£å†…å®¹
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase /*= TRUE*/) PURE;
 
 /**
- * @brief Ë¢ĞÂ´°¿ÚÖ¸¶¨ÇøÓò
- * @param lpRect ´ıË¢ĞÂÇøÓò
- * @param bErase Çå³ı´°¿ÚÄÚÈİ
+ * @brief åˆ·æ–°çª—å£æŒ‡å®šåŒºåŸŸ
+ * @param lpRect å¾…åˆ·æ–°åŒºåŸŸ
+ * @param bErase æ¸…é™¤çª—å£å†…å®¹
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /* = TRUE*/) PURE;
 
 /**
- * @brief »ñÈ¡´°¿ÚÎ»ÖÃ
- * @param[out] lpRect ´°¿ÚÎ»ÖÃ
+ * @brief è·å–çª—å£ä½ç½®
+ * @param[out] lpRect çª—å£ä½ç½®
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, GetWindowRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
 /**
- * @brief »ñÈ¡´°¿Ú¿Í»§ÇøÎ»ÖÃ
- * @param[out] lpRect ¿Í»§ÇøÎ»ÖÃ
+ * @brief è·å–çª—å£å®¢æˆ·åŒºä½ç½®
+ * @param[out] lpRect å®¢æˆ·åŒºä½ç½®
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, GetClientRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
 /**
- * @brief ½«Ïà¶Ô´°¿ÚµÄ×ø±ê×ª»»ÎªÆÁÄ»×ø±ê
- * @param[in][out] lpPoint ´ı×ª»»×ø±ê
+ * @brief å°†ç›¸å¯¹çª—å£çš„åæ ‡è½¬æ¢ä¸ºå±å¹•åæ ‡
+ * @param[in][out] lpPoint å¾…è½¬æ¢åæ ‡
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, ClientToScreen)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
 
 /**
- * @brief ½«Ïà¶Ô´°¿ÚµÄ¾ØĞÎ×ø±ê×ª»»ÎªÆÁÄ»×ø±ê
- * @param[in][out] lpRect ´ı×ª»»×ø±ê
+ * @brief å°†ç›¸å¯¹çª—å£çš„çŸ©å½¢åæ ‡è½¬æ¢ä¸ºå±å¹•åæ ‡
+ * @param[in][out] lpRect å¾…è½¬æ¢åæ ‡
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, ClientToScreen2)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
 /**
- * @brief ½«ÆÁÄ»×ø±ê×ª»»Îª´°¿Ú×ø±ê
- * @param[in][out] lpPoint ´ı×ª»»×ø±ê
+ * @brief å°†å±å¹•åæ ‡è½¬æ¢ä¸ºçª—å£åæ ‡
+ * @param[in][out] lpPoint å¾…è½¬æ¢åæ ‡
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, ScreenToClient)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
 
 /**
- * @brief ½«ÆÁÄ»¾ØĞÎ×ø±ê×ª»»Îª´°¿Ú×ø±ê
- * @param[in][out] lpRect ´ı×ª»»×ø±ê
+ * @brief å°†å±å¹•çŸ©å½¢åæ ‡è½¬æ¢ä¸ºçª—å£åæ ‡
+ * @param[in][out] lpRect å¾…è½¬æ¢åæ ‡
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(BOOL, ScreenToClient2)(CTHIS_ LPRECT lpRect) SCONST PURE;
 
 /**
- * @brief ½«Ò»×é´°¿Ú×ø±ê×ª»»ÎªÏà¶ÔÓÚÁíÒ»¸ö´°¿ÚµÄ×ø±ê
- * @param hWndTo Ä¿±ê´°¿Ú
- * @param[in][out] lpPoint ×ø±êÊı×é
- * @param nCount Êı×é³¤¶È
+ * @brief å°†ä¸€ç»„çª—å£åæ ‡è½¬æ¢ä¸ºç›¸å¯¹äºå¦ä¸€ä¸ªçª—å£çš„åæ ‡
+ * @param hWndTo ç›®æ ‡çª—å£
+ * @param[in][out] lpPoint åæ ‡æ•°ç»„
+ * @param nCount æ•°ç»„é•¿åº¦
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(int, MapWindowPoints)(CTHIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST PURE;
 
 /**
- * @brief ½«Ò»¸ö´°¿Ú¾ØĞÎÓ³ÉäÎªÏà¶ÔÓÚÁíÒ»¸ö´°¿ÚµÄ¾ØĞÎ
- * @param hWndTo Ä¿±ê´°¿Ú
- * @param[in][out] lpRect ´ı×ª»»¾ØĞÎ
+ * @brief å°†ä¸€ä¸ªçª—å£çŸ©å½¢æ˜ å°„ä¸ºç›¸å¯¹äºå¦ä¸€ä¸ªçª—å£çš„çŸ©å½¢
+ * @param hWndTo ç›®æ ‡çª—å£
+ * @param[in][out] lpRect å¾…è½¬æ¢çŸ©å½¢
  * @return TRUE-SUCCEED
  */
 STDMETHOD_(int, MapWindowRect)(CTHIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
 
 /**
- * @brief Æô¶¯Ò»ÈË¶¨Ê±Æ÷
- * @param nIDEvent ¶¨Ê±Æ÷ID
- * @param nElapse ÑÓÊ±(ms)
- * @param lpfnTimer ¶¨Ê±Æ÷´¦Àíº¯Êı£¬ÎªnullÊ±²úÉúWM_TIMERÏûÏ¢
- * @return ¶¨Ê±Æ÷ID
+ * @brief å¯åŠ¨ä¸€äººå®šæ—¶å™¨
+ * @param nIDEvent å®šæ—¶å™¨ID
+ * @param nElapse å»¶æ—¶(ms)
+ * @param lpfnTimer å®šæ—¶å™¨å¤„ç†å‡½æ•°ï¼Œä¸ºnullæ—¶äº§ç”ŸWM_TIMERæ¶ˆæ¯
+ * @return å®šæ—¶å™¨ID
  */
 STDMETHOD_(UINT_PTR, SetTimer)
 (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
 
 /**
- * @brief É¾³ıÒ»¸ö¶¨Ê±Æ÷
- * @param nIDEvent ¶¨Ê±Æ÷ID
+ * @brief åˆ é™¤ä¸€ä¸ªå®šæ—¶å™¨
+ * @param nIDEvent å®šæ—¶å™¨ID
  * @return
  */
 STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) PURE;
 
 /**
- * @brief »ñÈ¡´°¿ÚµÄ¿Í»§ÇøDC
- * @return ¿Í»§ÇøDC
+ * @brief è·å–çª—å£çš„å®¢æˆ·åŒºDC
+ * @return å®¢æˆ·åŒºDC
  */
 STDMETHOD_(HDC, GetDC)(THIS) PURE;
 
 /**
- * @brief »ñÈ¡´°¿ÚDC
- * @return ´°¿ÚDC
+ * @brief è·å–çª—å£DC
+ * @return çª—å£DC
  */
 STDMETHOD_(HDC, GetWindowDC)(THIS) PURE;
 
 /**
- * @brief ÊÍ·ÅDC
+ * @brief é‡Šæ”¾DC
  * @param hDC DC
  * @return
  */
 STDMETHOD_(int, ReleaseDC)(THIS_ HDC hDC) PURE;
 
 /**
- * @brief ´´½¨Ò»¸ö¹â±ê
- * @param hBitmap ¹â±êÎ»Í¼
+ * @brief åˆ›å»ºä¸€ä¸ªå…‰æ ‡
+ * @param hBitmap å…‰æ ‡ä½å›¾
  * @return
  */
 STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP hBitmap, int nWidth, int nHeight) PURE;
 
 /**
- * @brief Òş²Ø¹â±ê
+ * @brief éšè—å…‰æ ‡
  * @return
  */
 STDMETHOD_(BOOL, HideCaret)(THIS) PURE;
 
 /**
- * @brief ÏÔÊ¾¹â±ê
+ * @brief æ˜¾ç¤ºå…‰æ ‡
  * @return
  */
 STDMETHOD_(BOOL, ShowCaret)(THIS) PURE;
 
 /**
- * @brief »ñÈ¡µ±Ç°ÓĞÊó±ê²¶»ñµÄHWND
- * @return Êó±ê²¶»ñµÄHWND
+ * @brief è·å–å½“å‰æœ‰é¼ æ ‡æ•è·çš„HWND
+ * @return é¼ æ ‡æ•è·çš„HWND
  */
 STDMETHOD_(HWND, GetCapture)(THIS) PURE;
 
 /**
- * @brief ½«µ±Ç°´°¿ÚÉèÖÃÎª²¶»ñÊó±êÊäÈë
- * @return Ç°Ò»¸öHWND
+ * @brief å°†å½“å‰çª—å£è®¾ç½®ä¸ºæ•è·é¼ æ ‡è¾“å…¥
+ * @return å‰ä¸€ä¸ªHWND
  */
 STDMETHOD_(HWND, SetCapture)(THIS) PURE;
 
 /**
- * @brief ÍË³öÊó±ê²¶»ñ
+ * @brief é€€å‡ºé¼ æ ‡æ•è·
  * @return
  */
 STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
 
 /**
- * @brief ÈÃ´°¿Ú³ÉÎª½ÓÊÕ¼üÅÌÊäÈëµÄ½¹µã´°¿Ú
- * @return Ç°Ò»¸ö½¹µã´°¿Ú
+ * @brief è®©çª—å£æˆä¸ºæ¥æ”¶é”®ç›˜è¾“å…¥çš„ç„¦ç‚¹çª—å£
+ * @return å‰ä¸€ä¸ªç„¦ç‚¹çª—å£
  */
 STDMETHOD_(HWND, SetFocus)(THIS) PURE;
 
 /**
- * @brief Í¬²½Ö´ĞĞÒ»¸öÏûÏ¢µ½´°¿Ú´¦Àí¹ı³Ì
+ * @brief åŒæ­¥æ‰§è¡Œä¸€ä¸ªæ¶ˆæ¯åˆ°çª—å£å¤„ç†è¿‡ç¨‹
  * @param message msg id
  * @param wParam
  * @param lParam
- * @return ÏûÏ¢´¦Àí·µ»ØÖµ
+ * @return æ¶ˆæ¯å¤„ç†è¿”å›å€¼
  */
 STDMETHOD_(LRESULT, SendMessage)
 (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
 
 /**
- * @brief Òì²½Ö´ĞĞÒ»¸öÏûÏ¢µ½´°¿Ú´¦Àí¹ı³Ì
+ * @brief å¼‚æ­¥æ‰§è¡Œä¸€ä¸ªæ¶ˆæ¯åˆ°çª—å£å¤„ç†è¿‡ç¨‹
  * @param message msg id
  * @param wParam
  * @param lParam
- * @return ÏûÏ¢´¦Àí·µ»ØÖµ
+ * @return æ¶ˆæ¯å¤„ç†è¿”å›å€¼
  */
 STDMETHOD_(BOOL, PostMessage)
 (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
@@ -333,85 +333,85 @@ STDMETHOD_(BOOL, SendNotifyMessage)
 (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
 
 /**
- * @brief ÉèÖÃ´°¿Ú±êÌâ
- * @param lpszString ±êÌâÎÄ±¾
+ * @brief è®¾ç½®çª—å£æ ‡é¢˜
+ * @param lpszString æ ‡é¢˜æ–‡æœ¬
  * @return
  */
 STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) PURE;
 
 /**
- * @brief »ñÈ¡´°¿Ú±êÌâÎÄ±¾
- * @param lpszStringBuf »º³åÇø
- * @param nMaxCount »º³åÇø³¤¶È
- * @return lpszStringBufÎªnullÊ±·µ»ØÊı¾İ³¤¶È
+ * @brief è·å–çª—å£æ ‡é¢˜æ–‡æœ¬
+ * @param lpszStringBuf ç¼“å†²åŒº
+ * @param nMaxCount ç¼“å†²åŒºé•¿åº¦
+ * @return lpszStringBufä¸ºnullæ—¶è¿”å›æ•°æ®é•¿åº¦
  */
 STDMETHOD_(int, GetWindowText)(CTHIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST PURE;
 
 /**
- * @brief ²éÑ¯ÊÇ·ñÎª×îĞ¡»¯×´Ì¬
- * @return TRUE-×îĞ¡»¯
+ * @brief æŸ¥è¯¢æ˜¯å¦ä¸ºæœ€å°åŒ–çŠ¶æ€
+ * @return TRUE-æœ€å°åŒ–
  */
 STDMETHOD_(BOOL, IsIconic)(CTHIS) SCONST PURE;
 
 /**
- * @brief ²éÑ¯ÊÇ·ñÎª×î´ó»¯×´Ì¬
- * @return TRUE-×î´ó»¯
+ * @brief æŸ¥è¯¢æ˜¯å¦ä¸ºæœ€å¤§åŒ–çŠ¶æ€
+ * @return TRUE-æœ€å¤§åŒ–
  */
 STDMETHOD_(BOOL, IsZoomed)(CTHIS) SCONST PURE;
 
 /**
- * @brief ²éÑ¯´°¿ÚÊÇ·ñ¿É¼û
- * @return TRUE-¿É¼û
+ * @brief æŸ¥è¯¢çª—å£æ˜¯å¦å¯è§
+ * @return TRUE-å¯è§
  */
 STDMETHOD_(BOOL, IsWindowVisible)(CTHIS) SCONST PURE;
 
 /**
- * @brief ÒÆ¶¯´°¿ÚÎ»ÖÃ
+ * @brief ç§»åŠ¨çª—å£ä½ç½®
  * @param x
  * @param y
  * @param nWidth
  * @param nHeight
- * @param bRepaint Ë¢ĞÂ´°¿Ú±êÖ¾
+ * @param bRepaint åˆ·æ–°çª—å£æ ‡å¿—
  * @return
  */
 STDMETHOD_(BOOL, MoveWindow)
 (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/) PURE;
 
 /**
- * @brief ÒÆ¶¯´°¿ÚÎ»ÖÃ
- * @param lpRect Ä¿±êÎ»ÖÃ
- * @param bRepaint Ë¢ĞÂ±êÖ¾
+ * @brief ç§»åŠ¨çª—å£ä½ç½®
+ * @param lpRect ç›®æ ‡ä½ç½®
+ * @param bRepaint åˆ·æ–°æ ‡å¿—
  * @return
  */
 STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint /*= TRUE*/) PURE;
 
 /**
- * @brief ÏÔÊ¾´°¿Ú
- * @param nCmdShow ÏÔÊ¾±êÖ¾
+ * @brief æ˜¾ç¤ºçª—å£
+ * @param nCmdShow æ˜¾ç¤ºæ ‡å¿—
  * @return
  */
 STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) PURE;
 
 /**
- * @brief ÉèÖÃ´°¿ÚÒìĞÎÇøÓò
- * @param hRgn ÒìĞÎÇøÓò
- * @param bRedraw Ë¢ĞÂ±êÖ¾
+ * @brief è®¾ç½®çª—å£å¼‚å½¢åŒºåŸŸ
+ * @param hRgn å¼‚å½¢åŒºåŸŸ
+ * @param bRedraw åˆ·æ–°æ ‡å¿—
  * @return
  */
 STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw /*=TRUE*/) PURE;
 
 /**
- * @brief ÉèÖÃ´°¿ÚµÄ·Ö²ãÊôĞÔ
- * @param crKey Í¸Ã÷É«
- * @param bAlpha Í¸Ã÷¶È
- * @param dwFlags ±êÖ¾Î»
+ * @brief è®¾ç½®çª—å£çš„åˆ†å±‚å±æ€§
+ * @param crKey é€æ˜è‰²
+ * @param bAlpha é€æ˜åº¦
+ * @param dwFlags æ ‡å¿—ä½
  * @return
  */
 STDMETHOD_(BOOL, SetLayeredWindowAttributes)
 (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
 
 /**
- * @brief ¸üĞÂ·Ö²ã´°¿Ú
+ * @brief æ›´æ–°åˆ†å±‚çª—å£
  * @param hdcDst
  * @param pptDst
  * @param psize
@@ -426,15 +426,15 @@ STDMETHOD_(BOOL, UpdateLayeredWindow)
 (THIS_ HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags) PURE;
 
 /**
- * @brief ÉèÖÃ´°¿ÚÏûÏ¢´¦Àíº¯Êı
- * @param fun ÏûÏ¢´¦Àíº¯Êı
- * @param ctx ÏûÏ¢´¦Àíº¯ÊıContext
+ * @brief è®¾ç½®çª—å£æ¶ˆæ¯å¤„ç†å‡½æ•°
+ * @param fun æ¶ˆæ¯å¤„ç†å‡½æ•°
+ * @param ctx æ¶ˆæ¯å¤„ç†å‡½æ•°Context
  * @return
  */
 STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
 
 /**
- * @brief »ñÈ¡´°¿ÚÏûÏ¢´¦Àí¶ÔÏó
- * @return ÏûÏ¢´¦Àí¶ÔÏó
+ * @brief è·å–çª—å£æ¶ˆæ¯å¤„ç†å¯¹è±¡
+ * @return æ¶ˆæ¯å¤„ç†å¯¹è±¡
  */
 STDMETHOD_(MsgHandlerInfo *, GetMsgHandler)(THIS) PURE;
