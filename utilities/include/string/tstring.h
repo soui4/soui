@@ -7,8 +7,7 @@
 #include "sstringa.h"
 #include "sstringw.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 #ifdef _UNICODE
     typedef SStringW                        SStringT;
@@ -78,7 +77,7 @@ namespace SOUI
     };
 
 
-}//end of namespace
+SNSEND
 
 
 #endif    //    __TSTRING_H__

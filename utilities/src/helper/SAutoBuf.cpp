@@ -5,7 +5,10 @@
 #include <memory>
 
 SNSBEGIN
-	SAutoBuf::SAutoBuf(size_t nElements) : m_pBuf(0)
+SAutoBuf::SAutoBuf(size_t nElements)
+    : m_pBuf(0)
+    , m_nSize(0)
+    , m_bExternalBuf(false)
 	{
 		Allocate(nElements);
 	}
@@ -36,12 +39,15 @@ SNSBEGIN
 
 	char* SAutoBuf::Allocate(size_t nBytes)
 	{
+        Free();
 		SASSERT(nBytes <= SIZE_MAX-1);
-		SASSERT(m_pBuf == NULL);
 		m_pBuf = static_cast<char*>(soui_mem_wrapper::SouiMalloc(nBytes+1));
-		m_nSize=nBytes;
-		memset(m_pBuf,0,nBytes+1);
-		m_bExternalBuf=false;
+        if (m_pBuf)
+        {
+            m_nSize = nBytes;
+            memset(m_pBuf, 0, nBytes + 1);
+            m_bExternalBuf = false;
+        }
 		return m_pBuf;
 	}
 

@@ -2,10 +2,13 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 #include "imgdecoder-stb.h"
+#include <string/strcpcvt.h>
+#include <upng.h>
 
 #define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
 #include <stb_image.h>
-#include <upng.h>
+#include <stb_image_write.h>
 
 namespace SOUI
 {
@@ -271,6 +274,22 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
 
 	HRESULT SImgDecoderFactory_STB::SaveImage2(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
 	{
+        SStringA fileu8 = S_CW2A(pszFileName, CP_UTF8);
+        if (imgFmt == Img_PNG)
+        {
+            int ret = stbi_write_png(fileu8.c_str(), nWid, nHei, 4, pBits, nWid * 4);
+            return ret ? S_OK : E_FAIL;
+        }
+        else if (imgFmt == Img_BMP)
+        {
+            int ret = stbi_write_bmp(fileu8.c_str(), nWid, nHei, 4, pBits);
+            return ret ? S_OK : E_FAIL;
+        }
+        else if (imgFmt == Img_JPG)
+        {
+            int ret = stbi_write_jpg(fileu8.c_str(), nWid, nHei, 4, pBits, 90);
+            return ret ? S_OK : E_FAIL;
+        }
 		return E_NOTIMPL;
 	}
 
