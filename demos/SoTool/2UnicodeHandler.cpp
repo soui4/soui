@@ -17,7 +17,7 @@ void C2UnicodeHandler::OnInit( SWindow *pPageRoot )
 
     SXmlDoc xmlCodeSyntax;
 
-    SStringT strSyntax = SApplication::getSingleton().GetAppDir() + _T("\\syntax.xml");
+    SStringT strSyntax = SApplication::getSingleton().GetAppDir() + _T("/syntax.xml");
     if(!xmlCodeSyntax.load_file(strSyntax))
     {
         LOADXML(xmlCodeSyntax,_T("xml:syntax"));
@@ -30,7 +30,7 @@ void C2UnicodeHandler::EnumFileInfo(const FILETYPEMAP &cfg, const SStringW & str
 {
     //枚举当前目录下的文件
     WIN32_FIND_DATAW fd;
-    SStringW strFind = strPath + L"\\*.*";
+    SStringW strFind = strPath + L"/*.*";
 
     HANDLE hFind = FindFirstFileW(strFind,&fd);
     if(hFind != INVALID_HANDLE_VALUE)
@@ -46,7 +46,7 @@ void C2UnicodeHandler::EnumFileInfo(const FILETYPEMAP &cfg, const SStringW & str
                 const FILETYPEMAP::CPair * pPair = cfg.Lookup(pszExt);
                 if(pPair)
                 {
-                    lstFileInfo.AddTail(strPath + L"\\" + fd.cFileName);
+                    lstFileInfo.AddTail(strPath + L"/" + fd.cFileName);
                 }
             }
         }
@@ -61,7 +61,7 @@ void C2UnicodeHandler::EnumFileInfo(const FILETYPEMAP &cfg, const SStringW & str
         {
             SStringT strDirName;
             m_pDirTree->GetItemText(hChild,strDirName);
-            SStringW strPath2 = strPath + L"\\" + S_CT2W(strDirName);
+            SStringW strPath2 = strPath + L"/" + S_CT2W(strDirName);
             EnumFileInfo(cfg,strPath2,hChild,lstFileInfo,nDirs);
             nDirs ++;
         }
