@@ -1,18 +1,33 @@
-﻿<window size="500,500">
-  <text pos="10,10">SOUI小工具 版本</text>
-  <text pos="[5,{0">@string/ver</text>
-  <text pos="10,[5">版权所有：启程软件</text>
-  <group pos="10,[10,-10,-10">
+﻿<window size="-2,-2" layout="vbox" interval="5" padding="10">
+  <window layout="hbox">
+    <text >SOUI小工具 版本:</text>
+    <text >@string/ver</text>
+  </window>
+  <text >版权所有：启程软件</text>
+  <group size="-2,0" weight="1" layout="vbox" padding="5" interval="5">
     关于SOUI
-    <text pos="10,10" multiLines="1">SOUI3是一个完全开源的DirectUI界面库，个人免费，商用收费，具体以协议为准!</text>
-    <text pos="10,[5">QQ群#1(500人)：</text><edit readOnly="1">229313785</edit>
-    <link href="http://jq.qq.com/?_wv=1027&k=PxXh59"  class="cls_btn_weblink">申请群#1</link>
-    <text pos="[10,{0">QQ群#2(2000人)：</text>
-    <edit readOnly="1">385438344</edit>
-    <link href="http://jq.qq.com/?_wv=1027&k=VRATCo"  class="cls_btn_weblink">申请群#2</link>
-    <text pos="10,[10">github：</text><edit pos="150,{0,@300,@30" readOnly="1">https://github.com/soui3/soui.git</edit>
-    <text pos="10,[10">gitee:</text><edit pos="150,{0,@300,@30" readOnly="1"> https://gitee.com/setoutsoft/soui3.git</edit>
-    <text pos="10,[5">SOUI教程:</text>
-    <link href="http://www.cnblogs.com/setoutsoft/" class="cls_btn_weblink">http://www.cnblogs.com/setoutsoft/</link>
+    <text multiLines="1">SOUI3是一个完全开源的DirectUI界面库，个人免费，商用收费，具体以协议为准!</text>
+    <window size="-2,-1" layout="hbox" gravity="center">
+      <text >QQ群#1(1000人)：</text>
+      <edit readOnly="1">229313785</edit>
+      <link href="http://jq.qq.com/?_wv=1027&k=PxXh59"  class="cls_btn_weblink">申请群#1</link>
+    </window>
+    <window size="-2,-1" layout="hbox" gravity="center">
+      <text>QQ群#2(2000人)：</text>
+      <edit readOnly="1">385438344</edit>
+      <link href="http://jq.qq.com/?_wv=1027&k=VRATCo"  class="cls_btn_weblink">申请群#2</link>
+    </window>
+    <window size="-2,-1" layout="hbox" gravity="center">
+      <text pos="10,[10">github：</text>
+      <edit pos="150,{0,@300,@30" readOnly="1">https://github.com/soui3/soui.git</edit>
+    </window>
+    <window size="-2,-1" layout="hbox" gravity="center">
+      <text pos="10,[10">gitee:</text>
+      <edit pos="150,{0,@300,@30" readOnly="1"> https://gitee.com/setoutsoft/soui3.git</edit>
+    </window>
+    <window size="-2,-1" layout="hbox" gravity="center">
+      <text pos="10,[5">SOUI教程:</text>
+      <link href="http://www.cnblogs.com/setoutsoft/" class="cls_btn_weblink">http://www.cnblogs.com/setoutsoft/</link>
+    </window>
   </group>
 </window>
