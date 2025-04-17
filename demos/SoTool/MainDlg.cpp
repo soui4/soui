@@ -24,6 +24,7 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     m_2UnicodeHandler.OnInit(GetRoot());
     m_folderScanHandler.OnInit(GetRoot());
     m_calcMd5Handler.OnInit(GetRoot());
+    m_windowHelperHander.OnInit(GetRoot());
 	return 0;
 }
 

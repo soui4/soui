@@ -5,7 +5,6 @@
 
 SNSBEGIN
 
-
 	DEF_EVT_EXT(EventCapture,EVT_EXTERNAL_BEGIN+100,{CPoint pt_;});
 
 	DEF_EVT_EXT(EventCaptureFinish,EVT_EXTERNAL_BEGIN+101,{CPoint pt_;});
@@ -18,7 +17,7 @@ SNSBEGIN
         ~SCaptureButton(void);
 
     protected:
-        virtual CSize GetDesiredSize(LPCRECT pRcContainer);  
+        STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE* psz, int nParentWid, int nParentHei) OVERRIDE;
         
         BOOL IsChecked();      
     protected:
@@ -38,4 +37,5 @@ SNSBEGIN
         SOUI_MSG_MAP_END()
     };
 SNSEND
+
 #endif//_SCAPTURE_BUTTON_H_

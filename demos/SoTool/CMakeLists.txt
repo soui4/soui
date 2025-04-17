@@ -9,7 +9,7 @@ include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
- 
+
 file(GLOB CURRENT_HEADERS  *.h *.hpp)
 file(GLOB CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_SOUIS  *.xml *.idx *.ico)

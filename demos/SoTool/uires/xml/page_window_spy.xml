@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<include>
-  <tabctrlex pos="4,4,-4,-4" colorTextPush="#FFFF00" tabInterSize="0" tabWidth="100" tabHeight="30" colorText="#FF00FF" drawFocusRect="0" show="1" curSel="0">
+<window size="-2,-2" layout="vbox" interval="5">
+  <captureButton name="img_capture_host" skin="skin_spyhost" tip="定位待SPY的SOUI窗口"/>
+  <tabctrlex size="-2,0" weight="1" colorTextPush="#FFFF00" tabInterSize="0" tabWidth="100" tabHeight="30" colorText="#FF00FF" drawFocusRect="0" show="1" curSel="0">
     <socrollviewStyle  sbWid="10" sbArrowSize="0"/>
     <pages>
       <pageex title="窗口信息" tip="窗口信息">
@@ -42,4 +43,4 @@
       </pageex>
     </pages>
   </tabctrlex>
-</include>
+</window>

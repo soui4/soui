@@ -10,7 +10,7 @@ namespace SOUI
         SwndFrame(void);
         ~SwndFrame(void);
         
-        BOOL Create(HWND hOwner=NULL);
+        BOOL Create(HWND hOwner=0);
 		void Hide();
         void Show(RECT rc,HWND hWnd=HWND_TOPMOST);
     protected:

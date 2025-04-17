@@ -35,12 +35,12 @@ namespace SOUI
 	void SwndFrame::Hide()
 	{
 		ShowWindow(SW_HIDE);
-		//KillTimer(nIDEvent);
 		MoveWindow(0, 0, 0, 0);
 	}
 
     void SwndFrame::Show( RECT rc,HWND hWnd)
     {
+        ReleaseCapture();
         RECT rcWnd = rc;
         ::InflateRect(&rcWnd,2,2);
         MoveWindow2(&rcWnd);

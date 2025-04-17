@@ -312,9 +312,8 @@ namespace SOUI
 		return true;
 	}
 
-	BOOL STabCtrlEx::CreateChildren(IXmlNode* pNode)
+	BOOL STabCtrlEx::CreateChildren(SXmlNode xmlNode)
 	{
-		SXmlNode xmlNode(pNode);
 		m_pItemPanel = (SScrollView *)SApplication::getSingleton().CreateWindowByName(SScrollView::GetClassName());
 		SASSERT(m_pItemPanel);
 		InsertChild(m_pItemPanel);
@@ -351,7 +350,7 @@ namespace SOUI
 	STabPageEx * STabCtrlEx::CreatePageFromXml(SXmlNode xmlPage)
 	{
 		if (wcscmp(xmlPage.name(), STabPageEx::GetClassName()) != 0) return NULL;
-		return new STabPageEx();//(STabPageEx *)SApplication::getSingleton().CreateWindowByName(STabPageEx::GetClassName());
+		return new STabPageEx();
 	}
 
 	int STabCtrlEx::InsertItem(LPCWSTR lpContent, int iInsert/*=-1*/)
