@@ -274,11 +274,24 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
 
 	HRESULT SImgDecoderFactory_STB::SaveImage2(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
 	{
+        //swap red and blue.
+        BYTE *p=pBits;
+        for(int y=0;y<nHei;y++){
+            for(int x=0;x<nWid;x++){
+                BYTE t = p[0];
+                p[0]=p[2];
+                p[2]=t;
+                p+=4;
+            }
+        }
         SStringA fileu8 = S_CW2A(pszFileName, CP_UTF8);
         if (imgFmt == Img_PNG)
         {
             int ret = stbi_write_png(fileu8.c_str(), nWid, nHei, 4, pBits, nWid * 4);
             return ret ? S_OK : E_FAIL;
+        }
+        else if(imgFmt == Img_TGA){
+            int ret = stbi_write_tga(fileu8.c_str(),nWid,nHei,4,pBits);
         }
         else if (imgFmt == Img_BMP)
         {

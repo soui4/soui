@@ -119,6 +119,7 @@ typedef enum _ImgFmt
     Img_TIFF,
     Img_JPG,
     Img_Webp,
+    Img_TGA,
 } ImgFmt;
 
 /**

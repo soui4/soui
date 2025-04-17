@@ -50,7 +50,7 @@ BOOL CFolderScanHandler::OnTreeDbclick(EventArgs *pEvt)
     {
         SStringT strItem;
         m_pTreelist->GetFolderTreeCtrl()->GetItemText(hItem,strItem);
-        strPath = strItem + _T("\\") + strPath;
+        strPath = strItem + _T("/") + strPath;
         hItem = m_pTreelist->GetFolderTreeCtrl()->GetParentItem(hItem);
     }
     
@@ -58,7 +58,7 @@ BOOL CFolderScanHandler::OnTreeDbclick(EventArgs *pEvt)
     
     SStringT strRoot = pEditDir->GetWindowText();
 
-    strPath = strRoot + _T("\\") + strPath;
+    strPath = strRoot + _T("/") + strPath;
     
     SStringT strCmd = SStringT().Format(_T("/select, %s"),strPath);
     ShellExecute( NULL, _T("open"), _T("explorer.exe"), strCmd, NULL, SW_SHOWNORMAL ); 
@@ -73,7 +73,7 @@ BOOL CFolderScanHandler::DoSomething()
     {
         if(msg.message == WM_QUIT)
         {
-            PostMessage(m_pPageRoot->GetContainer()->GetHostHwnd(),WM_QUIT,0,0);
+            PostQuitMessage(msg.wParam);
             return FALSE;
         }
         TranslateMessage(&msg);
@@ -86,7 +86,7 @@ BOOL CFolderScanHandler::EnumFiles(SStringT strPath,HSTREEITEM hParent)
 {
     BOOL bRet = TRUE;
     WIN32_FIND_DATA fd;
-    SStringT strFind = strPath + _T("\\*.*");
+    SStringT strFind = strPath + _T("/*.*");
     HANDLE hFind=FindFirstFile(strFind,&fd);
     if(hFind != INVALID_HANDLE_VALUE)
     {
@@ -103,7 +103,7 @@ BOOL CFolderScanHandler::EnumFiles(SStringT strPath,HSTREEITEM hParent)
                 bRet = FALSE;
             }else if(bFolder)
             {
-                bRet = EnumFiles(strPath + _T("\\") + strName,hItem);
+                bRet = EnumFiles(strPath + _T("/") + strName,hItem);
             }
         }
         FindClose(hFind);
