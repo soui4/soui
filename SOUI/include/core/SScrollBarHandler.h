@@ -9,8 +9,10 @@ SNSBEGIN
  *
  * Description: Defines the interface for the scrollbar host, which provides necessary methods for scrollbar operations.
  */
-struct IScrollBarHost {
-    enum kSbConst {
+struct IScrollBarHost
+{
+    enum kSbConst
+    {
         Timer_Wait = 100,
         Timer_Go = 101,
         kTime_Wait = 200,
@@ -121,12 +123,13 @@ struct IScrollBarHost {
  * Description: Manages the behavior and appearance of scrollbars.
  */
 class SOUI_EXP SScrollBarHandler : public ITimelineHandler {
-private:
-    SScrollBarHandler(const SScrollBarHandler &); // Private copy constructor
+  private:
+    SScrollBarHandler(const SScrollBarHandler &);                  // Private copy constructor
     const SScrollBarHandler &operator=(const SScrollBarHandler &); // Private assignment operator
 
-public:
-    enum {
+  public:
+    enum
+    {
         kSbRail = 100,
     };
 
@@ -137,7 +140,7 @@ public:
      */
     SScrollBarHandler(IScrollBarHost *pCB, bool bVert = false);
 
-public:
+  public:
     /**
      * @brief Gets the rectangle of a scrollbar part.
      * @param iPart Part identifier.
@@ -231,7 +234,7 @@ public:
      */
     void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
 
-protected:
+  protected:
     /**
      * @brief Gets the container for the scrollbar.
      * @return Pointer to the scrollbar container.
@@ -264,28 +267,29 @@ protected:
      */
     DWORD GetPartState(int iPart) const;
 
-protected:
+  protected:
     /**
      * @brief Handles the next frame in the timeline.
      */
     STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
 
-private:
-    enum FADEMODE {
+  private:
+    enum FADEMODE
+    {
         FADEOUT = -1,
         FADE_STOP = 0,
         FADEIN = 1,
     };
 
     IScrollBarHost *m_pSbHost; // Pointer to the scrollbar host
-    bool m_bVert; // TRUE if vertical, FALSE if horizontal
-    int m_iFrame; // Current frame index
-    FADEMODE m_fadeMode; // Fade mode
-    int m_iHitPart; // Hit part identifier
-    int m_iClickPart; // Clicked part identifier
-    CPoint m_ptClick; // Click point
-    CPoint m_ptCursor; // Cursor point
-    int m_nClickPos; // Click position
+    bool m_bVert;              // TRUE if vertical, FALSE if horizontal
+    int m_iFrame;              // Current frame index
+    FADEMODE m_fadeMode;       // Fade mode
+    int m_iHitPart;            // Hit part identifier
+    int m_iClickPart;          // Clicked part identifier
+    CPoint m_ptClick;          // Click point
+    CPoint m_ptCursor;         // Cursor point
+    int m_nClickPos;           // Click position
 };
 
 SNSEND

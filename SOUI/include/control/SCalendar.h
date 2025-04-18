@@ -1,11 +1,11 @@
 ﻿/**
  * @file SCalendar.h
- * @brief 日历时间控件
+ * @brief Calendar Control
  * @version v1.0
  * @author soui
  * @date 2014-05-25
  *
- * @details 此类完成日历控件的实现。
+ * @details This class implements a calendar control for date selection and display.
  */
 
 #ifndef __SCALENDAR__H__
@@ -17,231 +17,231 @@ SNSBEGIN
 
 /**
  * @class SCalendarCore
- * @brief 日历核心类
- * @details 此类是日历的核心类，大部分函数都是静态函数。
+ * @brief Calendar Core Class
+ * @details This class is the core of the calendar, with most functions being static.
  */
 class SOUI_EXP SCalendarCore {
   public:
     /**
-     * @brief 判断闰年
-     * @param wYear 待判断的公历年份
-     * @param bLeapYear 【输出参数】TRUE：闰年，FALSE：平年
-     * @return TRUE -- 成功  FALSE -- 失败
-     * @details 判断是否是闰年
-     *          注意：有效范围是（1600年到6999年）
+     * @brief Determines if a year is a leap year.
+     * @param wYear The year to check.
+     * @param bLeapYear [output] TRUE if leap year, FALSE if common year.
+     * @return TRUE -- Success, FALSE -- Failure
+     * @details Checks if the given year is a leap year.
+     *          Note: Valid range is (1600 to 6999).
      */
     static BOOL IsLeapYear(WORD wYear, BOOL &bLeapYear);
 
     /**
-     * @brief 计算日期在年内的序数（序数从0开始，即0为元旦）
-     * @param wYear 公历年
-     * @param wMonth 公历月
-     * @param wDay 公历日
-     * @param wDays 【输出参数】年内序数
-     * @return TRUE -- 成功  FALSE -- 失败
-     * @details 输入日期，计算该日期在这一年内的序数，序数从0开始
-     *          注意：有效范围是（START_YEAR年到END_YEAR-1年）
+     * @brief Calculates the day number within the year (starting from 0, where 0 is January 1st).
+     * @param wYear The year.
+     * @param wMonth The month.
+     * @param wDay The day.
+     * @param wDays [output] The day number within the year.
+     * @return TRUE -- Success, FALSE -- Failure
+     * @details Given a date, calculates the day number within that year, starting from 0.
+     *          Note: Valid range is (START_YEAR to END_YEAR-1).
      */
     static BOOL GetDaysNumInYear(WORD wYear, WORD wMonth, WORD wDay, WORD &wDays);
 
     /**
-     * @brief 从年内序数计算月、日
-     * @param wYear 公历年
-     * @param wDays 年内序数
-     * @param wMonth 【输出参数】公历月
-     * @param wDay 【输出参数】公历日
-     * @return TRUE -- 成功  FALSE -- 失败
-     * @details 输入年份以及年内序数，计算出月和日
-     *          注意：有效范围是（START_YEAR年到END_YEAR-1年）
+     * @brief Calculates the month and day from the day number within the year.
+     * @param wYear The year.
+     * @param wDays The day number within the year.
+     * @param wMonth [output] The month.
+     * @param wDay [output] The day.
+     * @return TRUE -- Success, FALSE -- Failure
+     * @details Given a year and day number, calculates the corresponding month and day.
+     *          Note: Valid range is (START_YEAR to END_YEAR-1).
      */
     static BOOL GetDateFromDays(WORD wYear, WORD wDays, WORD &wMonth, WORD &wDay);
 
     /**
-     * @brief 返回星期几
-     * @param wYear 公历年
-     * @param wMonth 公历月
-     * @param wDay 公历日
-     * @return 返回:0,1,2,3,4,5,6分别对应日、一、二、三、四、五、六，-1表示日期错误或超出范围
-     * @details 输入年月日返回星期几
-     *          注意:有效范围是(START_YEAR年1月1日 --- END_YEAR-1年12月31日)
+     * @brief Returns the day of the week.
+     * @param wYear The year.
+     * @param wMonth The month.
+     * @param wDay The day.
+     * @return Returns: 0, 1, 2, 3, 4, 5, 6 corresponding to Sunday, Monday, Tuesday, Wednesday, Thursday, Friday, Saturday; -1 if date is invalid or out of range.
+     * @details Given a date, returns the day of the week.
+     *          Note: Valid range is (START_YEAR-01-01 to END_YEAR-12-31).
      */
     static short GetDayOfWeek(WORD wYear, WORD wMonth, WORD wDay);
 
     /**
-     * @brief 返回指定月份的天数
-     * @param wYear 公历年
-     * @param wMonth 公历月
-     * @return 返回该月的天数，返回0表示输入年月有误
-     * @details 输入年月返回本月的天数
-     *          注意:有效范围是(START_YEAR年1月 --- END_YEAR-1年12月)
+     * @brief Returns the number of days in a specified month.
+     * @param wYear The year.
+     * @param wMonth The month.
+     * @return Returns the number of days in the month, returns 0 if the month/year is invalid.
+     * @details Given a year and month, returns the number of days in that month.
+     *          Note: Valid range is (START_YEAR-01 to END_YEAR-12).
      */
     static WORD GetDaysOfMonth(WORD wYear, WORD wMonth);
 
     /**
-     * @brief 检验年、月、日的合法性
-     * @param wYear 公历年
-     * @param wMonth 公历月
-     * @param wDay 公历日
-     * @return FALSE-失败，TRUE-成功
-     * @details 输入公历日期，检查日期的合法性
-     *          注意:有效范围是(START_YEAR年1月1日---END_YEAR-1年12月31日)
+     * @brief Validates the year, month, and day.
+     * @param wYear The year.
+     * @param wMonth The month.
+     * @param wDay The day.
+     * @return FALSE -- Failure, TRUE -- Success
+     * @details Validates the given date.
+     *          Note: Valid range is (START_YEAR-01-01 to END_YEAR-12-31).
      */
     static BOOL DateCheck(WORD wYear, WORD wMonth, WORD wDay);
 
     /**
-     * @brief 格式化年份显示型式
-     * @param iYear 年
-     * @return 格式化后的年份字符串
-     * @details 指定阴历年返回采用干支纪年法
+     * @brief Formats the year display.
+     * @param iYear The year.
+     * @return The formatted year string.
+     * @details Formats the year display, using the Chinese zodiac for the lunar year.
      */
     static SStringT FormatYear(WORD iYear);
 
     /**
-     * @brief 格式化月份显示型式
-     * @param iMonth 月
-     * @return 格式化后的月份字符串
+     * @brief Formats the month display.
+     * @param iMonth The month.
+     * @return The formatted month string.
      */
     static SStringT FormatMonth(WORD iMonth);
 
     /**
-     * @brief 格式化日期显示型式
-     * @param iDay 日
-     * @return 格式化后的日期字符串
+     * @brief Formats the day display.
+     * @param iDay The day.
+     * @return The formatted day string.
      */
     static SStringT FormatDay(WORD iDay);
 };
 
-// 按钮 宏定义
-#define HIT_NULL   -1  // 无
-#define HIT_LEFT   -10 // 上一个月 按钮
-#define HIT_RIGHT  -11 // 下一个月 按钮
-#define HIT_YEAR   -12 //  年月  还没用到
-#define HIT_YEAR_1 -13
-#define HIT_YEAR_2 -14
-#define HIT_YEAR_3 -15
-#define HIT_TODAY  42 //  今天
+// Button macro definitions
+#define HIT_NULL   -1  /**< No Hit */
+#define HIT_LEFT   -10 /**< Left button (previous month) */
+#define HIT_RIGHT  -11 /**< Right button (next month) */
+#define HIT_YEAR   -12 /**< Year-month button (not used yet)*/
+#define HIT_YEAR_1 -13 /**< Year-month button (not used yet)*/
+#define HIT_YEAR_2 -14 /**< Year-month button (not used yet)*/
+#define HIT_YEAR_3 -15 /**< Year-month button (not used yet)*/
+#define HIT_TODAY  42  /**< Today button */
 
-// 日历显示的状态
-#define SHOW_MONTH        -101 // 显示月份
-#define SHOW_YEAR         -102 // 显示年份
-#define SHOW_YEAR_DECADE  -103 // 显示近10年
-#define SHOW_YEAR_CENTURY -104 // 显示近100年
+// Calendar display states
+#define SHOW_MONTH        -101 /**< Show month */
+#define SHOW_YEAR         -102 /**< Show year */
+#define SHOW_YEAR_DECADE  -103 /**< Show decade */
+#define SHOW_YEAR_CENTURY -104 /**< Show century */
 
 /**
  * @class SCalendar
- * @brief 日历控件类
- * @details 此类实现了一个日历控件，支持日期选择和显示。
+ * @brief Calendar Control Class
+ * @details This class implements a calendar control for date selection and display.
  */
 class SOUI_EXP SCalendar : public SWindow {
     DEF_SOBJECT(SWindow, L"calendar")
 
   public:
     /**
-     * @brief 构造函数
-     * @param iYear 初始年份
-     * @param iMonth 初始月份
-     * @param iDay 初始日期
+     * @brief Constructor
+     * @param iYear Initial year
+     * @param iMonth Initial month
+     * @param iDay Initial day
      */
     SCalendar(WORD iYear, WORD iMonth, WORD iDay);
 
     /**
-     * @brief 默认构造函数
+     * @brief Default constructor
      */
     SCalendar();
 
     /**
-     * @brief 析构函数
+     * @brief Destructor
      */
     ~SCalendar();
 
     /**
-     * @brief 获取当前年份
-     * @return 当前年份
+     * @brief Gets the current year.
+     * @return The current year.
      */
     WORD GetYear();
 
     /**
-     * @brief 获取当前月份
-     * @return 当前月份
+     * @brief Gets the current month.
+     * @return The current month.
      */
     WORD GetMonth();
 
     /**
-     * @brief 获取当前日期
-     * @return 当前日期
+     * @brief Gets the current day.
+     * @return The current day.
      */
     WORD GetDay();
 
     /**
-     * @brief 获取当前日期
-     * @param iYear 【输出参数】年份
-     * @param iMonth 【输出参数】月份
-     * @param iDay 【输出参数】日期
+     * @brief Gets the current date.
+     * @param iYear [output] The year.
+     * @param iMonth [output] The month.
+     * @param iDay [output] The day.
      */
     void GetDate(WORD &iYear, WORD &iMonth, WORD &iDay);
 
     /**
-     * @brief 设置日期
-     * @param iYear 年份
-     * @param iMonth 月份
-     * @param iDay 日期
-     * @param nBtnType 按钮类型
-     * @param bNotify 是否通知事件
-     * @return TRUE -- 成功  FALSE -- 失败
+     * @brief Sets the date.
+     * @param iYear The year.
+     * @param iMonth The month.
+     * @param iDay The day.
+     * @param nBtnType Button type.
+     * @param bNotify Whether to notify events.
+     * @return TRUE -- Success, FALSE -- Failure
      */
     BOOL SetDate(WORD iYear, WORD iMonth, WORD iDay, int nBtnType = HIT_NULL, bool bNotify = false);
 
   protected:
     /**
-     * @brief 语言改变时调用
-     * @return HRESULT 表示操作结果
+     * @brief Called when the language changes.
+     * @return HRESULT indicating the result of the operation.
      */
     virtual HRESULT OnLanguageChanged();
 
   protected:
     /**
-     * @brief 初始化控件
+     * @brief Initializes the control.
      */
     void Init();
 
     /**
-     * @brief 绘制控件
-     * @param pRT 渲染目标
+     * @brief Paints the control.
+     * @param pRT The rendering target.
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
-     * @brief 处理左键按下事件
-     * @param nFlags 按键状态
-     * @param point 鼠标位置
+     * @brief Handles left mouse button down event.
+     * @param nFlags Key state.
+     * @param point Mouse position.
      */
     void OnLButtonDown(UINT nFlags, CPoint point);
 
     /**
-     * @brief 处理左键释放事件
-     * @param nFlags 按键状态
-     * @param point 鼠标位置
+     * @brief Handles left mouse button up event.
+     * @param nFlags Key state.
+     * @param point Mouse position.
      */
     void OnLButtonUp(UINT nFlags, CPoint point);
 
     /**
-     * @brief 处理鼠标移动事件
-     * @param nFlags 按键状态
-     * @param pt 鼠标位置
+     * @brief Handles mouse move event.
+     * @param nFlags Key state.
+     * @param pt Mouse position.
      */
     void OnMouseMove(UINT nFlags, CPoint pt);
 
     /**
-     * @brief 处理鼠标离开事件
+     * @brief Handles mouse leave event.
      */
     void OnMouseLeave();
 
     /**
-     * @brief 处理鼠标滚轮事件
-     * @param nFlags 按键状态
-     * @param zDelta 滚轮滚动值
-     * @param pt 鼠标位置
-     * @return TRUE -- 成功  FALSE -- 失败
+     * @brief Handles mouse wheel event.
+     * @param nFlags Key state.
+     * @param zDelta Wheel delta.
+     * @param pt Mouse position.
+     * @return TRUE -- Success, FALSE -- Failure
      */
     BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
@@ -268,9 +268,9 @@ class SOUI_EXP SCalendar : public SWindow {
 
   protected:
     /**
-     * @brief 创建控件时调用
-     * @param lp 创建参数
-     * @return HRESULT 表示操作结果
+     * @brief Called when the control is created.
+     * @param lp Creation parameters.
+     * @return HRESULT indicating the result of the operation.
      */
     int OnCreate(LPVOID lp);
 
@@ -286,258 +286,258 @@ class SOUI_EXP SCalendar : public SWindow {
 
   protected:
     /**
-     * @brief 测试鼠标点击位置
-     * @param pt 鼠标位置
-     * @return 点击位置对应的项
+     * @brief Tests the mouse click position.
+     * @param pt Mouse position.
+     * @return The item corresponding to the click position.
      */
     int HitTest(const CPoint &pt);
 
     /**
-     * @brief 绘制日历头（年月）
-     * @param pRT 渲染目标
-     * @param rect 绘制区域
+     * @brief Draws the calendar header (year and month).
+     * @param pRT The rendering target.
+     * @param rect The drawing area.
      */
     void DrawYearMonth(IRenderTarget *pRT, const CRect &rect);
 
     /**
-     * @brief 绘制星期
-     * @param pRT 渲染目标
-     * @param rect 绘制区域
+     * @brief Draws the week days.
+     * @param pRT The rendering target.
+     * @param rect The drawing area.
      */
     void DrawWeek(IRenderTarget *pRT, const CRect &rect);
 
     /**
-     * @brief 绘制日期
-     * @param pRT 渲染目标
-     * @param rcDay 日期区域
-     * @param nItem 日期项
+     * @brief Draws the day.
+     * @param pRT The rendering target.
+     * @param rcDay The day area.
+     * @param nItem The day item.
      */
     void DrawDay(IRenderTarget *pRT, CRect &rcDay, int nItem);
 
     /**
-     * @brief 绘制今天按钮
-     * @param pRT 渲染目标
-     * @param rcDay 今天按钮区域
+     * @brief Draws the "Today" button.
+     * @param pRT The rendering target.
+     * @param rcDay The "Today" button area.
      */
     void DrawToday(IRenderTarget *pRT, CRect &rcDay);
 
     /**
-     * @brief 获取项的绘制区域
-     * @param nItem 项索引
-     * @param rcItem 【输出参数】项区域
+     * @brief Gets the item drawing area.
+     * @param nItem The item index.
+     * @param rcItem [output] The item area.
      */
     void GetItemRect(int nItem, CRect &rcItem);
 
     /**
-     * @brief 设置上一个月
+     * @brief Sets the previous month.
      */
     void SetLastMonth();
 
     /**
-     * @brief 设置下一个月
+     * @brief Sets the next month.
      */
     void SetNextMonth();
 
     /**
-     * @brief 设置上一年
+     * @brief Sets the previous year.
      */
     void SetLastYear();
 
     /**
-     * @brief 设置下一年
+     * @brief Sets the next year.
      */
     void SetNextYear();
 
     /**
-     * @brief 设置上一个十年
+     * @brief Sets the previous decade.
      */
     void SetLastYearDecade();
 
     /**
-     * @brief 设置下一个十年
+     * @brief Sets the next decade.
      */
     void SetNextYearDecade();
 
     /**
-     * @brief 设置上一个世纪
+     * @brief Sets the previous century.
      */
     void SetLastYearCentury();
 
     /**
-     * @brief 设置下一个世纪
+     * @brief Sets the next century.
      */
     void SetNextYearCentury();
 
     /**
-     * @brief 设置年月
-     * @param iYear 年份
-     * @param iMonth 月份
+     * @brief Sets the year and month.
+     * @param iYear The year.
+     * @param iMonth The month.
      */
     void SetYearMonth(int iYear, int iMonth);
 
     /**
-     * @brief 绘制月份视图
-     * @param pRT 渲染目标
+     * @brief Paints the month view.
+     * @param pRT The rendering target.
      */
     void OnPaintMonth(IRenderTarget *pRT);
 
     /**
-     * @brief 绘制年份、十年、世纪视图
-     * @param pRT 渲染目标
+     * @brief Paints the year, decade, and century views.
+     * @param pRT The rendering target.
      */
     void OnPaintYearDecadeCentury(IRenderTarget *pRT);
 
     /**
-     * @brief 绘制年份、十年、世纪项
-     * @param pRT 渲染目标
-     * @param rect 绘制区域
-     * @param nItem 项索引
+     * @brief Draws the year, decade, and century items.
+     * @param pRT The rendering target.
+     * @param rect The drawing area.
+     * @param nItem The item index.
      */
     void DrawYearDecadeCentury(IRenderTarget *pRT, const CRect &rect, int nItem);
 
   public:
     /**
-     * @brief 设置日历显示类型
-     * @param showType 显示类型
+     * @brief Sets the calendar display type.
+     * @param showType The display type.
      */
     void SetShowType(int showType);
 
     /**
-     * @brief 设置年份、十年、世纪视图
+     * @brief Sets the year, decade, and century views.
      */
     void SetYearDecadeCentury();
 
   protected:
     /**
-     * @brief 年月高度
+     * @brief Height of the year and month.
      */
     SLayoutSize m_nYearMonthHeight;
 
     /**
-     * @brief 星期高度
+     * @brief Height of the week.
      */
     SLayoutSize m_nWeekHeight;
 
     /**
-     * @brief 今天按钮高度
+     * @brief Height of the "Today" button.
      */
     SLayoutSize m_nFooterHeight;
 
     /**
-     * @brief 选中文本颜色
+     * @brief Selected text color.
      */
     COLORREF m_crSelText;
 
     /**
-     * @brief 其他天的文本颜色
+     * @brief Color of other days' text.
      */
     COLORREF m_crOtherDayText;
 
     /**
-     * @brief 选中天的背景颜色
+     * @brief Background color of the selected day.
      */
     COLORREF m_crSelDayBack;
 
     /**
-     * @brief 悬停文本颜色
+     * @brief Color of the hover text.
      */
     COLORREF m_crHoverText;
 
     /**
-     * @brief 上一个按钮皮肤
+     * @brief Skin for the previous button.
      */
     SAutoRefPtr<ISkinObj> m_pSkinPrev;
 
     /**
-     * @brief 下一个按钮皮肤
+     * @brief Skin for the next button.
      */
     SAutoRefPtr<ISkinObj> m_pSkinNext;
 
     /**
-     * @brief 天皮肤
+     * @brief Skin for the day.
      */
     SAutoRefPtr<ISkinObj> m_pSkinDay;
 
     /**
-     * @brief 星期皮肤
+     * @brief Skin for the week.
      */
     SAutoRefPtr<ISkinObj> m_pSkinWeek;
 
     /**
-     * @brief 表头文本
+     * @brief Header text.
      */
     STrText m_strWeek[7];
 
     /**
-     * @brief 日期信息结构
+     * @brief Date information structure.
      */
     struct wDayInfo
     {
-        WORD iDay; // 日历天
-        int nType; // -1 前一个月 0 当月 1 下一个月
+        WORD iDay; // Calendar day
+        int nType; // -1 previous month, 0 current month, 1 next month
     };
 
     /**
-     * @brief 日期信息数组
+     * @brief Date information array.
      */
     wDayInfo m_arrDays[42];
 
     /**
-     * @brief 日期区域
+     * @brief Date area.
      */
     CRect m_rcDays;
 
     /**
-     * @brief 今天按钮区域
+     * @brief "Today" button area.
      */
     CRect m_rcToday;
 
     /**
-     * @brief 选中项
+     * @brief Selected item.
      */
     int m_nSelItem;
 
     /**
-     * @brief 悬停项
+     * @brief Hover item.
      */
     int m_nHoverItem;
 
     /**
-     * @brief 当前年份
+     * @brief Current year.
      */
     WORD m_iYear;
 
     /**
-     * @brief 当前月份
+     * @brief Current month.
      */
     WORD m_iMonth;
 
     /**
-     * @brief 当前日期
+     * @brief Current date.
      */
     SYSTEMTIME m_Today;
 
     /**
-     * @brief 日历显示状态
+     * @brief Calendar display state.
      */
     int m_showType;
 
     /**
-     * @brief 鼠标按下时的日历显示状态
+     * @brief Calendar display state when mouse button is down.
      */
     int m_showTypeLbdown;
 
     /**
-     * @brief 月份或年份信息结构
+     * @brief Month or year information structure.
      */
     struct wMonthOrYearInfo
     {
-        WORD iMonthOrYear; // 日历 月-年-年代-世纪
-        int nType;         // -1前一 0 当前 1后一
+        WORD iMonthOrYear; // Calendar month-year-decade-century
+        int nType;         // -1 previous, 0 current, 1 next
     };
 
     /**
-     * @brief 月份或年份信息数组
+     * @brief Month or year information array.
      */
     wMonthOrYearInfo m_arrMonthOrYear[12];
 };

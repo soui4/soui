@@ -10,12 +10,6 @@ SNSBEGIN
  * @brief A template class that can represent a value or be empty (NULL).
  * @details This class allows a variable to either hold a value of type `T` or be in an empty state.
  * @tparam T The type of the value to be stored.
- *
- * @example
- *      SEmptyable<int> a = 3;
- *      SEmptyable<int> b(4);
- *      a = 4;
- *      assert(!a.isEmpty());
  */
 template <class T>
 class SEmptyable

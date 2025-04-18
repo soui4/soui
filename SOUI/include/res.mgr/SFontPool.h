@@ -1,11 +1,11 @@
 ﻿/**
  * @file SFontPool.h
- * @brief SOUI字体管理模块
+ * @brief SOUI Font Management Module
  * @version v1.0
  * @author SOUI group
  * @date 2014/08/02
  *
- * @details SOUI字体管理模块，用于管理和获取字体资源。
+ * @details This module manages and retrieves font resources.
  */
 
 #ifndef __SFONTPOOL__H__
@@ -18,31 +18,29 @@
 
 #define FF_DEFAULTFONT L""
 
-
-
 SNSBEGIN
 
 /**
  * @class FontKey
- * @brief 一个FONT的KEY
+ * @brief Key for a FONT
  *
- * @details 用于实现一个font map，标识字体的唯一性。
+ * @details Used to implement a font map, uniquely identifying a font.
  */
 typedef FontInfo FontKey;
 
 /**
  * @class CElementTraits<FontInfo>
- * @brief FontInfo的Hash及比较模板
+ * @brief Hash and comparison template for FontInfo
  *
- * @details 用于实现一个font map，提供Hash和比较函数。
+ * @details Used to implement a font map, providing hash and comparison functions.
  */
 template <>
 class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
   public:
     /**
-     * @brief 计算FontInfo的哈希值
-     * @param fontKey FontInfo对象
-     * @return 哈希值
+     * @brief Calculate the hash value of a FontInfo object
+     * @param fontKey FontInfo object
+     * @return Hash value
      */
     static ULONG Hash(INARGTYPE fontKey)
     {
@@ -53,10 +51,10 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
     }
 
     /**
-     * @brief 比较两个FontInfo对象是否相等
-     * @param element1 第一个FontInfo对象
-     * @param element2 第二个FontInfo对象
-     * @return 如果相等返回true，否则返回false
+     * @brief Compare two FontInfo objects for equality
+     * @param element1 First FontInfo object
+     * @param element2 Second FontInfo object
+     * @return True if equal, false otherwise
      */
     static bool CompareElements(INARGTYPE element1, INARGTYPE element2)
     {
@@ -64,10 +62,10 @@ class CElementTraits<FontInfo> : public CElementTraitsBase<FontInfo> {
     }
 
     /**
-     * @brief 按顺序比较两个FontInfo对象
-     * @param element1 第一个FontInfo对象
-     * @param element2 第二个FontInfo对象
-     * @return 比较结果，0表示相等，负数表示element1小于element2，正数表示element1大于element2
+     * @brief Compare two FontInfo objects in order
+     * @param element1 First FontInfo object
+     * @param element2 Second FontInfo object
+     * @return Comparison result, 0 if equal, negative if element1 < element2, positive if element1 > element2
      */
     static int CompareElementsOrdered(INARGTYPE element1, INARGTYPE element2)
     {
@@ -88,120 +86,120 @@ typedef BOOL (*FunFontCheck)(const SStringW &strFontName);
 
 /**
  * @class SFontPool
- * @brief 字体池管理类
+ * @brief Font pool management class
  *
- * @details 管理和获取字体资源，支持字体的缓存和复用。
+ * @details Manages and retrieves font resources, supporting font caching and reuse.
  */
 class SOUI_EXP SFontPool : public SCmnMap<IFontPtr, FontInfo> {
   public:
     /**
-     * @brief 设置检查字体的回调函数
-     * @param fontCheck 检查字体的回调函数
+     * @brief Set the callback function for checking fonts
+     * @param fontCheck Callback function for checking fonts
      */
     static void SetFontChecker(FunFontCheck fontCheck);
 
     /**
-     * @brief 检查一个字体是否有效
-     * @param strFontName 字体名
-     * @return TRUE-有效，FALSE-无效
+     * @brief Check if a font is valid
+     * @param strFontName Font name
+     * @return TRUE if valid, FALSE if invalid
      */
     static BOOL CheckFont(const SStringW &strFontName);
 
     /**
-     * @brief 将字体描述转换为FontInfo
-     * @param strFontInfo 字体描述字符串
-     * @param defFontInfo 默认字体的FontInfo
-     * @return FontInfo对象
+     * @brief Convert font description to FontInfo
+     * @param strFontInfo Font description string
+     * @param defFontInfo Default FontInfo
+     * @return FontInfo object
      */
     static FontInfo FontInfoFromString(const SStringW &strFontInfo, const FontInfo &defFontInfo);
 
     /**
-     * @brief 将FontInfo转换为字体描述
-     * @param fi FontInfo对象
-     * @return 字体描述字符串
+     * @brief Convert FontInfo to font description
+     * @param fi FontInfo object
+     * @return Font description string
      */
     static SStringW FontInfoToString(const FontInfo &fi);
 
     /**
-     * @brief 获取与指定描述字符串对应的IFontPtr
-     * @param strFont 字体描述字符串
-     * @param scale 放大倍数
-     * @return IFontPtr 字体对象指针
+     * @brief Get IFontPtr corresponding to the specified description string
+     * @param strFont Font description string
+     * @param scale Scale factor
+     * @return IFontPtr Font object pointer
      *
-     * @details 描述字符串格式如：face:宋体,bold:0,italic:1,underline:1,strike:1,adding:10
+     * @details Description string format: face:宋体,bold:0,italic:1,underline:1,strike:1,adding:10
      */
     static IFontPtr GetFont(const SStringW &strFont, int scale);
 
     /**
-     * @brief 设置默认字体
-     * @param strFontInfo 默认字体描述字符串
+     * @brief Set default font
+     * @param strFontInfo Default font description string
      */
     static void SetDefFontInfo(const SStringW &strFontInfo);
 
     /**
-     * @brief 获取默认字体信息
-     * @return FontInfo 默认字体信息
+     * @brief Get default font information
+     * @return FontInfo Default font information
      */
     static FontInfo GetDefFontInfo();
 
   protected:
     /**
-     * @brief 当FontInfo被移除时的回调函数
-     * @param obj 移除的IFontPtr对象
+     * @brief Callback function when FontInfo is removed
+     * @param obj Removed IFontPtr object
      */
     static void OnKeyRemoved(const IFontPtr &obj);
 
   protected:
     /**
-     * @brief 构造函数
-     * @param fac 渲染工厂对象指针
+     * @brief Constructor
+     * @param fac Render factory object pointer
      */
     SFontPool(IRenderFactory *fac);
 
   protected:
     /**
-     * @brief 获取默认字体信息的常量引用
-     * @return FontInfo 默认字体信息的常量引用
+     * @brief Get constant reference to default font information
+     * @return FontInfo Constant reference to default font information
      */
     const FontInfo &_GetDefFontInfo() const;
 
     /**
-     * @brief 设置渲染工厂对象
-     * @param fac 渲染工厂对象指针
+     * @brief Set render factory object
+     * @param fac Render factory object pointer
      */
     void SetRenderFactory(IRenderFactory *fac);
 
     /**
-     * @brief 获取与指定描述字符串对应的IFontPtr
-     * @param strFont 字体描述字符串
-     * @param scale 放大倍数
-     * @return IFontPtr 字体对象指针
+     * @brief Get IFontPtr corresponding to the specified description string
+     * @param strFont Font description string
+     * @param scale Scale factor
+     * @return IFontPtr Font object pointer
      */
     IFontPtr _GetFont(const SStringW &strFont, int scale);
 
     /**
-     * @brief 设置默认字体描述字符串
-     * @param strFontInfo 默认字体描述字符串
+     * @brief Set default font description string
+     * @param strFontInfo Default font description string
      */
     void _SetDefFontInfo(const SStringW &strFontInfo);
 
     /**
-     * @brief 创建FontInfo对应的字体对象
-     * @param fontInfo FontInfo对象
-     * @return IFontPtr 字体对象指针
+     * @brief Create font object corresponding to FontInfo
+     * @param fontInfo FontInfo object
+     * @return IFontPtr Font object pointer
      */
     IFontPtr _CreateFont(const FontInfo &fontInfo);
 
     /**
-     * @brief 设置默认字体信息
-     * @param fontInfo FontInfo对象
+     * @brief Set default font information
+     * @param fontInfo FontInfo object
      */
     void _SetDefFontInfo(const FontInfo &fontInfo);
 
-    SAutoRefPtr<IRenderFactory> m_RenderFactory; // 渲染工厂对象指针
-    FontInfo m_defFontInfo;                      // 默认字体信息
+    SAutoRefPtr<IRenderFactory> m_RenderFactory; /**< Render factory object pointer */
+    FontInfo m_defFontInfo;                      /**< Default font information */
 
-    static FunFontCheck s_funFontCheck; // 字体检查回调函数
+    static FunFontCheck s_funFontCheck; /**< Font check callback function */
 };
 
 SNSEND

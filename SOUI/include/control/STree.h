@@ -1,21 +1,19 @@
 ﻿/**
- * Copyright (C) 2014-2050 SOUI团队
- * All rights reserved.
+ * @file STree.h
+ * @brief Tree template for general data types
+ * @version v1.0
+ * @author SOUI team
+ * @date 2014-07-13
  *
- * @file       stree.hpp
- * @brief      树模板--提供对一般的数据类型实现树结构
- * @version    v1.0
- * @author     soui
- * @date       2014-07-13
- *
- * Describe    此类是下拉窗口的父类 只需要派生该类即可
- *
- *              version: 1.0　2003-10-24 实现基本功能
- *                       2.0  2004-12-29 增加两个遍历接口，修改内存释放部分可能存在的bug
- *                       2.1  2006-10-17 为节点增加一个hChildLast数据,以加快在数据插入时的速度
- *                       2.2  2008-10-16 修改一个遍历接口的问题
- *                       2.3  2011-10-17 将数据释放的接口从回调函数改成虚函数
+ * @details This class provides a tree structure for general data types.
+ *          Version history:
+ *          - 1.0 2003-10-24: Initial implementation
+ *          - 2.0 2004-12-29: Added two traversal interfaces, fixed memory release issues
+ *          - 2.1 2006-10-17: Added hChildLast to speed up data insertion
+ *          - 2.2 2008-10-16: Fixed an issue in a traversal interface
+ *          - 2.3 2011-10-17: Changed data release interface from callback to virtual function
  */
+
 #ifndef __STREE__H__
 #define __STREE__H__
 
@@ -25,76 +23,76 @@
 
 // typedef ULONG_PTR HSTREEITEM;
 #ifdef _WIN64
-#define STVN_ROOT  ((HSTREENODE)(ULONG_PTR)0xFFFF000000000000) //=STVN_ROOT
-#define STVN_FIRST ((HSTREENODE)(ULONG_PTR)0xFFFF000000000001) //=STVN_FIRST
-#define STVN_LAST  ((HSTREENODE)(ULONG_PTR)0xFFFF000000000002) //=STVN_LAST
+#define STVN_ROOT  ((HSTREENODE)(ULONG_PTR)0xFFFF000000000000) /**< STVN_ROOT */
+#define STVN_FIRST ((HSTREENODE)(ULONG_PTR)0xFFFF000000000001) /**< STVN_FIRST */
+#define STVN_LAST  ((HSTREENODE)(ULONG_PTR)0xFFFF000000000002) /**< STVN_LAST */
 #define STVL_ROOT  ((PSTREELINK)(ULONG_PTR)0xFFFF000000000000)
 #else
-#define STVN_ROOT  ((HSTREENODE)(ULONG_PTR)0xFFFF0000) //=STVN_ROOT
-#define STVN_FIRST ((HSTREENODE)(ULONG_PTR)0xFFFF0001) //=STVN_FIRST
-#define STVN_LAST  ((HSTREENODE)(ULONG_PTR)0xFFFF0002) //=STVN_LAST
+#define STVN_ROOT  ((HSTREENODE)(ULONG_PTR)0xFFFF0000) /**< STVN_ROOT */
+#define STVN_FIRST ((HSTREENODE)(ULONG_PTR)0xFFFF0001) /**< STVN_FIRST */
+#define STVN_LAST  ((HSTREENODE)(ULONG_PTR)0xFFFF0002) /**< STVN_LAST */
 #define STVL_ROOT  ((PSTREELINK)(ULONG_PTR)0xFFFF0000)
 #endif
 
 #ifndef STVI_ROOT
 #ifdef _WIN64
-#define STVI_ROOT  ((HSTREEITEM)0xFFFF000000000000) //=TVI_ROOT
-#define STVI_FIRST ((HSTREEITEM)0xFFFF000000000001) //=TVI_FIRST
-#define STVI_LAST  ((HSTREEITEM)0xFFFF000000000002) //=TVI_LAST
+#define STVI_ROOT  ((HSTREEITEM)0xFFFF000000000000) /**< STVI_ROOT */
+#define STVI_FIRST ((HSTREEITEM)0xFFFF000000000001) /**< STVI_FIRST */
+#define STVI_LAST  ((HSTREEITEM)0xFFFF000000000002) /**< STVI_LAST */
 #else
-#define STVI_ROOT  ((HSTREEITEM)0xFFFF0000) //=TVI_ROOT
-#define STVI_FIRST ((HSTREEITEM)0xFFFF0001) //=TVI_FIRST
-#define STVI_LAST  ((HSTREEITEM)0xFFFF0002) //=TVI_LAST
+#define STVI_ROOT  ((HSTREEITEM)0xFFFF0000) /**< STVI_ROOT */
+#define STVI_FIRST ((HSTREEITEM)0xFFFF0001) /**< STVI_FIRST */
+#define STVI_LAST  ((HSTREEITEM)0xFFFF0002) /**< STVI_LAST */
 #endif
 #endif // STVI_ROOT
 
 /**
- * @class      CSTree 模板类
- * @brief      CSTree 模板类
+ * @class CSTree
+ * @brief Template class for a tree structure
  *
- * Describe    CSTree 模板类
+ * @details This template class provides a tree structure for general data types.
  */
 template <class T>
 class CSTree {
     /**
-     * @class      _STREENODE
-     * @brief      节点结构体
+     * @struct _STREENODE
+     * @brief Node structure
      *
-     * Describe    节点结构体
+     * @details Structure representing a node in the tree.
      */
     typedef struct _STREENODE
     {
-        struct _STREENODE *hParent;      /**< 父节点 */
-        struct _STREENODE *hChildFirst;  /**< 第一个子节点 */
-        struct _STREENODE *hChildLast;   /**< 最后一个子节点 */
-        struct _STREENODE *hPrevSibling; /**< 兄节点 */
-        struct _STREENODE *hNextSibling; /**< 弟节点 */
-        T data;                          /**< 数据 */
+        struct _STREENODE *hParent;      /**< Parent node */
+        struct _STREENODE *hChildFirst;  /**< First child node */
+        struct _STREENODE *hChildLast;   /**< Last child node */
+        struct _STREENODE *hPrevSibling; /**< Previous sibling node */
+        struct _STREENODE *hNextSibling; /**< Next sibling node */
+        T data;                          /**< Data stored in the node */
     } STREENODE, *HSTREENODE;
 
     /**
-     * @class      _STREELINK
-     * @brief      树结点的链接
+     * @struct _STREELINK
+     * @brief Tree node link structure
      *
-     * Describe    此结构体用于连接树节点
+     * @details Structure used to link tree nodes.
      */
     typedef struct _STREELINK
     {
-        HSTREENODE hParent;      /**< 父节点 */
-        HSTREENODE hChildFirst;  /**< 第一个子节点 */
-        HSTREENODE hChildLast;   /**< 最后一个子节点 */
-        HSTREENODE hPrevSibling; /**< 兄节点 */
-        HSTREENODE hNextSibling; /**< 弟节点 */
+        HSTREENODE hParent;      /**< Parent node */
+        HSTREENODE hChildFirst;  /**< First child node */
+        HSTREENODE hChildLast;   /**< Last child node */
+        HSTREENODE hPrevSibling; /**< Previous sibling node */
+        HSTREENODE hNextSibling; /**< Next sibling node */
     } STREELINK, *PSTREELINK;
 
     /**
-     * 回调函数
-     * @brief    下拉窗口鼠标左键按下事件
-     * @param    T *:当前遍历到的结点的数据
-     * @param    LPARAM:回调时使用的参数
-     * @return   FALSE－继续，TRUE－中断遍历
+     * @typedef CBTRAVERSING
+     * @brief Callback function for tree traversal
      *
-     * Describe  遍历一个树结点的回调函数原型，
+     * @details Prototype for the callback function used in tree traversal.
+     * @param T *: Current node data
+     * @param LPARAM: Additional parameter for the callback
+     * @return FALSE to continue traversal, TRUE to interrupt traversal
      */
     typedef BOOL (*CBTRAVERSING)(T *, LPARAM);
 
@@ -106,10 +104,7 @@ class CSTree {
 
   public:
     /**
-     * CSTree::CSTree
-     * @brief    构造函数
-     *
-     * Describe  构造函数
+     * @brief Constructor
      */
     CSTree()
         : m_hRootFirst(NULL)
@@ -119,10 +114,7 @@ class CSTree {
     }
 
     /**
-     * CSTree::~CSTree
-     * @brief    析构函数
-     *
-     * Describe  析构函数
+     * @brief Destructor
      */
     virtual ~CSTree()
     {
@@ -130,10 +122,7 @@ class CSTree {
     }
 
     /**
-     * CSTree::DeleteAllItems
-     * @brief    删除所有节点
-     *
-     * Describe  删除所有节点
+     * @brief Delete all items in the tree
      */
     void DeleteAllItems()
     {
@@ -146,12 +135,9 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetNextSiblingItem
-     * @brief    获取下一个兄弟
-     * @param    HSTREEITEM hItem  -- 节点
-     * @return   返回HSTREEITEM
-     *
-     * Describe  获取下一个兄弟
+     * @brief Get the next sibling item
+     * @param HSTREEITEM hItem: Node handle
+     * @return HSTREEITEM: Next sibling node handle
      */
     static HSTREEITEM GetNextSiblingItem(HSTREEITEM hItem)
     {
@@ -161,12 +147,9 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetPrevSiblingItem
-     * @brief    获取上一个兄弟
-     * @param    HSTREEITEM hItem  -- 节点
-     * @return   返回HSTREEITEM
-     *
-     * Describe  获取上一个兄弟
+     * @brief Get the previous sibling item
+     * @param HSTREEITEM hItem: Node handle
+     * @return HSTREEITEM: Previous sibling node handle
      */
     static HSTREEITEM GetPrevSiblingItem(HSTREEITEM hItem)
     {
@@ -176,12 +159,9 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetParentItem
-     * @brief    获取父结点
-     * @param    HSTREEITEM hItem  -- 节点
-     * @return   返回HSTREEITEM
-     *
-     * Describe  获取父结点
+     * @brief Get the parent item
+     * @param HSTREEITEM hItem: Node handle
+     * @return HSTREEITEM: Parent node handle
      */
     static HSTREEITEM GetParentItem(HSTREEITEM hItem)
     {
@@ -191,12 +171,9 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetItemLevel
-     * @brief    获取结点层数
-     * @param    HSTREEITEM hItem  -- 节点
-     * @return   返回int
-     *
-     * Describe  获取结点层数
+     * @brief Get the level of the item
+     * @param HSTREEITEM hItem: Node handle
+     * @return int: Level of the node
      */
     static int GetItemLevel(HSTREEITEM hItem)
     {
@@ -212,12 +189,9 @@ class CSTree {
     }
 
     /**
-     * GetRootItem
-     * @brief    获取指定节点的根节点
-     * @param    HSTREEITEM hItem -- 当前节点
-     * @return   HSTREEITEM 根节点
-     *
-     * Describe
+     * @brief Get the root item of the specified node
+     * @param HSTREEITEM hItem: Current node handle
+     * @return HSTREEITEM: Root node handle
      */
     static HSTREEITEM GetRootItem(HSTREEITEM hItem)
     {
@@ -230,13 +204,10 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetChildItem
-     * @brief    获取第一个子结点
-     * @param    HSTREEITEM hItem  -- 节点
-     * @param    BOOL bFirst       -- 是否第一个节点
-     * @return   返回HSTREEITEM
-     *
-     * Describe  获取第一个子结点
+     * @brief Get the child item
+     * @param HSTREEITEM hItem: Node handle
+     * @param BOOL bFirst: Whether to get the first child
+     * @return HSTREEITEM: Child node handle
      */
     HSTREEITEM GetChildItem(HSTREEITEM hItem, BOOL bFirst = TRUE) const
     {
@@ -259,12 +230,9 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetChildrenCount
-     * @brief    获取子结点数量
-     * @param    HSTREEITEM hItem  -- 节点
-     * @return   返回int
-     *
-     * Describe  获取子结点数量
+     * @brief Get the number of children
+     * @param HSTREEITEM hItem: Node handle
+     * @return int: Number of child nodes
      */
     int GetChildrenCount(HSTREEITEM hItem) const
     {
@@ -279,11 +247,8 @@ class CSTree {
     }
 
     /**
-     * CSTree::DeleteItem
-     * @brief    删除一个节点，可以被派生类重载
-     * @param    HSTREEITEM hItem  -- 节点
-     *
-     * Describe  删除一个节点，可以被派生类重载
+     * @brief Delete an item
+     * @param HSTREEITEM hItem: Node handle
      */
     virtual void DeleteItem(HSTREEITEM hItem)
     {
@@ -317,12 +282,9 @@ class CSTree {
     }
 
     /**
-     * CSTree::DeleteItemEx
-     * @brief    删除一个结点分枝，如果该结点的父结点没有其它子节点则一起删除
-     * @param    HSTREEITEM hItem  -- 节点
-     * @return   返回BOOL
-     *
-     * Describe  删除一个结点分枝，如果该结点的父结点没有其它子节点则一起删除
+     * @brief Delete an item and its branch
+     * @param HSTREEITEM hItem: Node handle
+     * @return BOOL: TRUE if successful, FALSE otherwise
      */
     BOOL DeleteItemEx(HSTREEITEM hItem)
     {
@@ -338,12 +300,9 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetItem
-     * @brief    获取结点中保存的数据
-     * @param    HSTREEITEM hItem  -- 节点
-     * @return   返回T
-     *
-     * Describe  获取结点中保存的数据
+     * @brief Get the item data
+     * @param HSTREEITEM hItem: Node handle
+     * @return T: Data stored in the node
      */
     static T GetItem(HSTREEITEM hItem)
     {
@@ -354,12 +313,9 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetItem
-     * @brief    获取结点中保存的数据
-     * @param    HSTREEITEM hItem  -- 节点
-     * @return   返回T
-     *
-     * Describe  获取结点中保存的数据
+     * @brief Get the item data reference
+     * @param HSTREEITEM hItem: Node handle
+     * @return T&: Reference to data stored in the node
      */
     static T &GetItemRef(HSTREEITEM hItem)
     {
@@ -370,12 +326,9 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetItemPt
-     * @brief    获取结点中保存的数据
-     * @param    HSTREEITEM hItem  -- 节点
-     * @return   返回T*
-     *
-     * Describe  获取结点中保存的数据
+     * @brief Get the item data pointer
+     * @param HSTREEITEM hItem: Node handle
+     * @return T*: Pointer to data stored in the node
      */
     static T *GetItemPt(HSTREEITEM hItem)
     {
@@ -386,14 +339,11 @@ class CSTree {
     }
 
     /**
-     * CSTree::InsertItem
-     * @brief    插入一个新结点
-     * @param    const T &data -- 结点数据
-     * @param    HSTREEITEM hParent -- 新结点的父结点
-     * @param    HSTREEITEM hInsertAfter -- 新结点的前一个兄弟结点
-     * @return   返回HSTREEITEM 新结点的指针
-     *
-     * Describe  获取结点中保存的数据
+     * @brief Insert a new item
+     * @param const T &data: Data to insert
+     * @param HSTREEITEM hParent: Parent node handle
+     * @param HSTREEITEM hInsertAfter: Insert after this node
+     * @return HSTREEITEM: Handle of the inserted node
      */
     HSTREEITEM InsertItem(const T &data, HSTREEITEM hParent = STVI_ROOT, HSTREEITEM hInsertAfter = STVI_LAST)
     {
@@ -479,14 +429,11 @@ class CSTree {
     }
 
     /**
-     * CSTree::TraversingRecursion
-     * @brief    采用递归方式遍历一个树结点
-     * @param    HSTREEITEM hItem -- 起始结点
-     * @param    CBTRAVERSING funTraversing -- 执行实际操作的回调函数
-     * @param    LPARAM lParam -- 回调时使用的参数
-     * @return   返回HSTREEITEM
-     *
-     * Describe  采用递归方式遍历一个树结点
+     * @brief Traverse the tree recursively
+     * @param HSTREEITEM hItem: Starting node handle
+     * @param CBTRAVERSING funTraversing: Callback function
+     * @param LPARAM lParam: Additional parameter for the callback
+     * @return HSTREEITEM: Handle of the node where traversal stopped
      */
     HSTREEITEM TraversingRecursion(HSTREEITEM hItem, CBTRAVERSING funTraversing, LPARAM lParam)
     {
@@ -517,14 +464,15 @@ class CSTree {
     }
 
     /**
-     * CSTree::TraversingSequence
-     * @brief    按顺序方式从指定结点开始查找后面的结点，包括自己的子节点及自己向下的兄弟结点
-     * @param    HSTREEITEM hItem -- 起始结点
-     * @param    CBTRAVERSING funTraversing -- 执行实际操作的回调函数
-     * @param    LPARAM lParam -- 回调时使用的参数
-     * @return   返回HSTREEITEM
+     * @brief Traverse the tree in sequence
+     * @param HSTREEITEM hItem: Starting node handle
+     * @param CBTRAVERSING funTraversing: Callback function
+     * @param LPARAM lParam: Additional parameter for the callback
+     * @return HSTREEITEM: Handle of the node where traversal stopped
      *
-     * Describe  按顺序方式从指定结点开始查找后面的结点，包括自己的子节点及自己向下的兄弟结点
+     * @details Traverses the tree in sequence starting from the specified node.
+     *          If the callback function returns TRUE, the traversal stops and the current node is returned.
+     *          Otherwise, it continues to the next node.
      */
     HSTREEITEM TraversingSequence(HSTREEITEM hItem, CBTRAVERSING funTraversing, LPARAM lParam)
     {
@@ -546,12 +494,12 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetRootItem
-     * @brief    获取根节点
-     * @param    BOOL bFirst -- 是否从根节点
-     * @return   返回HSTREEITEM
+     * @brief Get the root item
+     * @param BOOL bFirst: Whether to get the first root item (default is TRUE)
+     * @return HSTREEITEM: Handle of the root item
      *
-     * Describe  获取根节点
+     * @details Returns the root item of the tree. If `bFirst` is TRUE, it returns the first root item;
+     *          otherwise, it returns the last root item.
      */
     HSTREEITEM GetRootItem(BOOL bFirst = TRUE)
     {
@@ -559,12 +507,11 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetDesendants
-     * @brief    获取结点的子孙结点数
-     * @param    HSTREEITEM hItem -- 起始结点
-     * @return   返回int
+     * @brief Get the number of descendants of a node
+     * @param HSTREEITEM hItem: Starting node handle
+     * @return int: Number of descendant nodes
      *
-     * Describe  获取结点的子孙结点数
+     * @details Recursively counts the number of descendant nodes starting from the specified node.
      */
     int GetDesendants(HSTREEITEM hItem)
     {
@@ -579,15 +526,14 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetNextItem
-     * @brief    获取当前结点的下一个结点
-     * @param    HSTREEITEM hItem -- 当前结点
-     * @return   返回HSTREEITEM  当前结点的下一个结点
+     * @brief Get the next item in the tree
+     * @param HSTREEITEM hItem: Current node handle
+     * @return HSTREEITEM: Handle of the next node
      *
-     * Describe  获取当前结点的下一个结点
-     * 如果当前结点有子结点，则返回自己的第一个子结点，
-     * 否则如果有向下的兄弟结点，则返回自己向下兄弟结点、
-     * 否则搜索自己的父结点的向下兄弟结点
+     * @details Returns the next node in the tree. The traversal order is:
+     *          - First child of the current node
+     *          - Next sibling of the current node
+     *          - Next sibling of the parent node, if no children or siblings are available
      */
     HSTREEITEM GetNextItem(HSTREEITEM hItem) const
     {
@@ -609,17 +555,15 @@ class CSTree {
     }
 
     /**
-     * CSTree::GetNextItem
-     * @brief    获取当前结点的下一个结点
-     * @param    HSTREEITEM hItem -- 当前结点
-     * @param    int &nLevel -- 当前结点(hItem)与目标结点(return)的层次关系,
-     *                          1-父子关系，0－兄弟关系，-n－子->父的兄弟
-     * @return   返回HSTREEITEM  当前结点的下一个结点
+     * @brief Get the next item in the tree with level relationship
+     * @param HSTREEITEM hItem: Current node handle
+     * @param int &nLevel: Level relationship between the current node and the returned node
+     * @return HSTREEITEM: Handle of the next node
      *
-     * Describe  获取当前结点的下一个结点
-     *           如果当前结点有子结点，则返回自己的第一个子结点，
-     *           否则如果有向下的兄弟结点，则返回自己向下兄弟结点、
-     *           否则搜索自己的父结点的向下兄弟结点
+     * @details Returns the next node in the tree and sets the level relationship:
+     *          - 1: Parent-child relationship
+     *          - 0: Sibling relationship
+     *          - -n: Child to parent's sibling relationship
      */
     HSTREEITEM GetNextItem(HSTREEITEM hItem, int &nLevel) const
     {
@@ -648,6 +592,15 @@ class CSTree {
         return NULL;
     }
 
+    /**
+     * @brief Sort the children of a node
+     * @param HSTREEITEM hItem: Node handle
+     * @param int(__cdecl *funSort)(void *, const void *, const void *): Comparison function
+     * @param void *pCtx: Context for the comparison function
+     *
+     * @details Sorts the children of the specified node using the provided comparison function.
+     *          The comparison function should have the signature `int(__cdecl *)(void *, const void *, const void *)`.
+     */
     void SortChildren(HSTREEITEM hItem, int(__cdecl *funSort)(void *, const void *, const void *), void *pCtx)
     {
         int nChilds = GetChildrenCount(hItem);
@@ -661,9 +614,9 @@ class CSTree {
                 hChild = GetNextSiblingItem(hChild);
                 pChilds[i] = hChild;
             }
-            //调用qsort排序
+            // Call qsort to sort the children
             qsort_s(pChilds, nChilds, sizeof(HSTREEITEM), funSort, pCtx);
-            //重新整理链表
+            // Reorganize the linked list
             for (int i = 0; i < nChilds - 1; i++)
             {
                 HSTREENODE node = (HSTREENODE)pChilds[i];
@@ -691,7 +644,7 @@ class CSTree {
             }
             delete[] pChilds;
         }
-        //子节点排序
+        // Sort children recursively
         HSTREEITEM hChild = GetChildItem(hItem);
         while (hChild)
         {
@@ -704,6 +657,12 @@ class CSTree {
         }
     }
 
+    /**
+     * @brief Set the data freer callback
+     * @param IDataFreer *cbFree: Data freer callback object
+     *
+     * @details Sets the callback object for freeing node data.
+     */
     void SetDataFreer(IDataFreer *cbFree)
     {
         m_dataFreer = cbFree;
@@ -711,11 +670,14 @@ class CSTree {
 
   private:
     /**
-     * CSTree::FreeNode
-     * @brief    采用后序遍历的方式释放结点占用的空间
-     * @param    HSTREENODE hsNode -- 当前结点
+     * @fn void FreeNode(HSTREENODE hsNode)
+     * @brief Recursively frees all child nodes of the given node using post-order traversal.
      *
-     * Describe  采用后序遍历的方式释放结点占用的空间
+     * @param HSTREENODE hsNode: The current node to free.
+     *
+     * @details This function uses post-order traversal to ensure that all child nodes are freed before the parent node.
+     *          It iterates through all child nodes, recursively calling itself on each child. After freeing all children,
+     *          it calls `OnNodeFree` to release any associated data and then deletes the node itself.
      */
     void FreeNode(HSTREENODE hsNode)
     {
@@ -736,20 +698,23 @@ class CSTree {
 
   protected:
     /**
-     * CSTree::OnNodeFree
-     * @brief    在派生类中实现数据的释放操作
-     * @param    T & data -- 数据
+     * @fn virtual void OnNodeFree(T &data)
+     * @brief Virtual function to handle the freeing of node data.
      *
-     * Describe  在派生类中实现数据的释放操作
+     * @param T &data: Reference to the data stored in the node.
+     *
+     * @details This function is intended to be overridden in derived classes to implement specific data cleanup logic.
+     *          If a data freer callback (`m_dataFreer`) is set, it will call the callback's `OnDataFree` method to handle
+     *          the data cleanup.
      */
     virtual void OnNodeFree(T &data)
     {
         if (m_dataFreer)
             m_dataFreer->OnDataFree(data);
     }
-    IDataFreer *m_dataFreer;
-    HSTREENODE m_hRootFirst; /**< 第一个根节点 */
-    HSTREENODE m_hRootLast;  /**< 最后一个根节点 */
+    IDataFreer *m_dataFreer; /**< Pointer to an object implementing the `IDataFreer` interface for custom data cleanup. */
+    HSTREENODE m_hRootFirst; /**< Pointer to the first root node of the tree. */
+    HSTREENODE m_hRootLast;  /**< Pointer to the last root node of the tree. */
 };
 
 #endif // __STREE__H__

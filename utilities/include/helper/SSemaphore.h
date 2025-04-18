@@ -7,7 +7,6 @@
 SNSBEGIN
 
 /**
- * @enum SemaphoreReturnCodes
  * @brief Return codes for semaphore operations.
  */
 enum

@@ -45,23 +45,96 @@ SNSBEGIN
 
 struct IAccProxy;
 
+/**
+ * @interface ISystemObjectRegister
+ * @brief Interface for registering various system objects in SOUI.
+ *
+ * This interface defines methods to register different types of system objects
+ * such as layouts, skins, windows, interpolators, animations, and value animators
+ * into the system's object factory.
+ */
 interface SOUI_EXP ISystemObjectRegister
 {
+    /**
+     * @brief Register layout objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
     virtual void RegisterLayouts(SObjectFactoryMgr * objFactory) const PURE; 
-	virtual void RegisterSkins(SObjectFactoryMgr * objFactory) const PURE; 
-	virtual void RegisterWindows(SObjectFactoryMgr * objFactory) const PURE; 
-	virtual void RegisterInterpolator(SObjectFactoryMgr * objFactory) const PURE; 
-	virtual void RegisterAnimation(SObjectFactoryMgr * objFactory) const PURE; 
-	virtual void RegisterValueAnimator(SObjectFactoryMgr * objFactory) const PURE;
+
+    /**
+     * @brief Register skin objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    virtual void RegisterSkins(SObjectFactoryMgr * objFactory) const PURE; 
+
+    /**
+     * @brief Register window objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    virtual void RegisterWindows(SObjectFactoryMgr * objFactory) const PURE; 
+
+    /**
+     * @brief Register interpolator objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    virtual void RegisterInterpolator(SObjectFactoryMgr * objFactory) const PURE; 
+
+    /**
+     * @brief Register animation objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    virtual void RegisterAnimation(SObjectFactoryMgr * objFactory) const PURE; 
+
+    /**
+     * @brief Register value animator objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
+    virtual void RegisterValueAnimator(SObjectFactoryMgr * objFactory) const PURE;
 };
 
+/**
+ * @class SObjectDefaultRegister
+ * @brief Default implementation of ISystemObjectRegister.
+ *
+ * This class provides a default implementation for registering various system
+ * objects into the object factory by implementing the ISystemObjectRegister interface.
+ */
 class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
   public:
+    /**
+     * @brief Register window objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
     void RegisterWindows(SObjectFactoryMgr *objFactory) const;
+
+    /**
+     * @brief Register skin objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
     void RegisterSkins(SObjectFactoryMgr *objFactory) const;
+
+    /**
+     * @brief Register layout objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
     void RegisterLayouts(SObjectFactoryMgr *objFactory) const;
+
+    /**
+     * @brief Register interpolator objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
     void RegisterInterpolator(SObjectFactoryMgr *objFactory) const;
+
+    /**
+     * @brief Register animation objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
     void RegisterAnimation(SObjectFactoryMgr *objFactory) const;
+
+    /**
+     * @brief Register value animator objects into the object factory.
+     * @param objFactory Pointer to the object factory manager.
+     */
     void RegisterValueAnimator(SObjectFactoryMgr *objFactory) const;
 };
 
@@ -621,38 +694,131 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
     virtual IAccessible *CreateAccessible(IWindow *pWnd) const;
 #endif
   protected:
+    /**
+     * @brief Creates and initializes all singletons required by the application.
+     */
     void _CreateSingletons();
+
+    /**
+     * @brief Destroys and cleans up all singletons used by the application.
+     */
     void _DestroySingletons();
+
+    /**
+     * @brief Loads an XML document from a resource.
+     * @param pszXmlName The name of the XML resource.
+     * @param pszType The type of the XML resource.
+     * @param xmlDoc The output XML document object.
+     * @param pResProvider The resource provider to use for loading the resource.
+     * @return TRUE if the XML document is loaded successfully, FALSE otherwise.
+     * @details This protected method is used internally to load an XML document from a specified resource.
+     *          It takes the name and type of the XML resource, an output XML document object, and an optional
+     *          resource provider. If no resource provider is specified, the default resource provider is used.
+     */
     BOOL _LoadXmlDocment(LPCTSTR pszXmlName,
                          LPCTSTR pszType,
                          SXmlDoc &xmlDoc,
                          IResProvider *pResProvider = NULL);
 
+    /**
+     * @brief Pointer to the real window handler.
+     */
     SAutoRefPtr<IRealWndHandler> m_pRealWndHandler;
+
+    /**
+     * @brief Pointer to the script factory.
+     */
     SAutoRefPtr<IScriptFactory> m_pScriptFactory;
+
+    /**
+     * @brief Pointer to the render factory.
+     */
     SAutoRefPtr<IRenderFactory> m_RenderFactory;
+
+    /**
+     * @brief Pointer to the translator manager.
+     */
     SAutoRefPtr<ITranslatorMgr> m_translator;
+
+    /**
+     * @brief Pointer to the tooltip factory.
+     */
     SAutoRefPtr<IToolTipFactory> m_tooltipFactory;
+
+    /**
+     * @brief Pointer to the message loop factory.
+     */
     SAutoRefPtr<IMsgLoopFactory> m_msgLoopFactory;
+
+    /**
+     * @brief Pointer to the log manager.
+     */
     SAutoRefPtr<ILogMgr> m_logManager; // log manager
+
+    /**
+     * @brief Pointer to the attribute storage factory.
+     */
     SAutoRefPtr<IAttrStorageFactory> m_pAttrStroageFactory;
 
+    /**
+     * @brief Named ID manager.
+     */
     SNamedID m_namedID;
 
+    /**
+     * @brief Application directory path.
+     */
     SStringT m_strAppDir;
+
+    /**
+     * @brief Module handle.
+     */
     HMODULE m_hInst;
+
+    /**
+     * @brief Handle to the main window.
+     */
     HWND m_hMainWnd;
 
+    /**
+     * @brief Critical section for thread-safe operations.
+     */
     mutable SCriticalSection m_cs;
+
+    /**
+     * @brief Map of message loops for different threads.
+     */
     typedef SMap<tid_t, SAutoRefPtr<IMessageLoop>> MsgLoopMap;
     MsgLoopMap m_msgLoopMap;
 
+    /**
+     * @brief Callback function for creating objects.
+     */
     FunCreateObject m_cbCreateObj;
+
+    /**
+     * @brief Callback function for creating task loops.
+     */
     FunCrateTaskLoop m_cbCreateTaskLoop;
+
+    /**
+     * @brief List of task loops.
+     */
     SArray<SAutoRefPtr<ITaskLoop>> m_lstTaskLoop; // task loop list
-    // 一组单例指针
+
+    /**
+     * @brief Array of singleton pointers.
+     */
     void *m_pSingletons[SINGLETON_COUNT];
+
+    /**
+     * @brief XML document for the edit context menu template.
+     */
     SXmlDoc m_xmlEditCtxMenuTemplate;
+
+    /**
+     * @brief XML document for the message box template.
+     */
     SXmlDoc m_xmlMessageBoxTemplate;
 };
 

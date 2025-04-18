@@ -17,11 +17,13 @@ SNSBEGIN
  * It can be initialized from an XML node and supports default state-to-index mappings.
  */
 class SOUI_EXP SState2Index {
-public:
+  public:
     /**
      * @brief Default constructor.
      */
-    SState2Index() {}
+    SState2Index()
+    {
+    }
 
     /**
      * @brief Copy constructor.
@@ -59,7 +61,7 @@ public:
      */
     static DWORD String2State(const SStringW &strState);
 
-protected:
+  protected:
     SMap<DWORD, int> m_mapOfStates; // Map of states to indices.
 };
 
@@ -74,7 +76,7 @@ protected:
 class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
     DEF_SOBJECT(SObjectImpl<ISkinObj>, L"skinObjBase")
 
-public:
+  public:
     /**
      * @brief Constructor.
      */
@@ -180,7 +182,7 @@ public:
      */
     int State2Index(DWORD dwState) const;
 
-public:
+  public:
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"alpha", m_byAlpha, TRUE) // Skin transparency
         ATTR_BOOL(L"enableColorize", m_bEnableColorize, TRUE)
@@ -189,7 +191,7 @@ public:
         ATTR_BOOL(L"enableScale", m_bEnableScale, TRUE)
     SOUI_ATTRS_END()
 
-protected:
+  protected:
     /**
      * @brief Called when initialization is finished.
      * @param pNode Pointer to the XML node.
@@ -221,13 +223,13 @@ protected:
      */
     virtual void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const = 0;
 
-protected:
-    BYTE m_byAlpha; // Alpha value for transparency.
-    COLORREF m_crColorize; // Color for colorization.
-    bool m_bEnableColorize; // Flag to enable colorization.
-    int m_nScale; // Scale factor.
-    bool m_bEnableScale; // Flag to enable scaling.
-    bool m_checkAsPushdown; // Flag to check if the state should be treated as pushdown.
+  protected:
+    BYTE m_byAlpha;             // Alpha value for transparency.
+    COLORREF m_crColorize;      // Color for colorization.
+    bool m_bEnableColorize;     // Flag to enable colorization.
+    int m_nScale;               // Scale factor.
+    bool m_bEnableScale;        // Flag to enable scaling.
+    bool m_checkAsPushdown;     // Flag to check if the state should be treated as pushdown.
     SState2Index m_state2Index; // State-to-index mapping.
 };
 

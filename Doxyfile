@@ -54,20 +54,20 @@ PROJECT_NUMBER         = 5.0.0.1
 # for a project that appears at the top of each page and should give viewers a
 # quick idea about the purpose of the project. Keep the description short.
 
-PROJECT_BRIEF          =
+PROJECT_BRIEF          = "Soui5 Doc"
 
 # With the PROJECT_LOGO tag one can specify a logo or an icon that is included
 # in the documentation. The maximum height of the logo should not exceed 55
 # pixels and the maximum width should not exceed 200 pixels. Doxygen will copy
 # the logo to the output directory.
 
-PROJECT_LOGO           = ./doc/soui.png
+PROJECT_LOGO           = doc/logo.png
 
 # With the PROJECT_ICON tag one can specify an icon that is included in the tabs
 # when the HTML document is shown. Doxygen will copy the logo to the output
 # directory.
 
-PROJECT_ICON           =
+PROJECT_ICON           = doc/logo.png
 
 # The OUTPUT_DIRECTORY tag is used to specify the (relative or absolute) path
 # into which the generated documentation will be written. If a relative path is
@@ -607,7 +607,7 @@ HIDE_UNDOC_MEMBERS     = NO
 # if EXTRACT_ALL is enabled.
 # The default value is: NO.
 
-HIDE_UNDOC_CLASSES     = NO
+HIDE_UNDOC_CLASSES     = YES
 
 # If the HIDE_UNDOC_NAMESPACES tag is set to YES, Doxygen will hide all
 # undocumented namespaces that are normally visible in the namespace hierarchy.
@@ -892,7 +892,7 @@ WARNINGS               = YES
 # will automatically be disabled.
 # The default value is: YES.
 
-WARN_IF_UNDOCUMENTED   = YES
+WARN_IF_UNDOCUMENTED   = NO
 
 # If the WARN_IF_DOC_ERROR tag is set to YES, Doxygen will generate warnings for
 # potential errors in the documentation, such as documenting some parameters in
@@ -992,7 +992,11 @@ WARN_LOGFILE           =
 # Note: If this tag is empty the current directory is searched.
 
 INPUT                  = .\SOUI \
-                         .\utilities
+                         .\utilities \
+                         README.md \
+                         license.txt \
+                         .\SOUI \
+                         products.md
 
 # This tag can be used to specify the character encoding of the source files
 # that Doxygen parses. Internally Doxygen uses the UTF-8 encoding. Doxygen uses
@@ -1082,7 +1086,9 @@ FILE_PATTERNS          = *.c \
                          *.vhdl \
                          *.ucf \
                          *.qsf \
-                         *.ice
+                         *.ice \
+                         *.md \
+                         *.txt
 
 # The RECURSIVE tag can be used to specify whether or not subdirectories should
 # be searched for input files as well.
@@ -1097,7 +1103,8 @@ RECURSIVE              = YES
 # Note that relative paths are relative to the directory from which Doxygen is
 # run.
 
-EXCLUDE                = pugixml
+EXCLUDE                = utilities/src/pugixml \
+                         utilities/include/pugixml
 
 # The EXCLUDE_SYMLINKS tag can be used to select whether or not files or
 # directories that are symbolic links (a Unix file system feature) are excluded
@@ -1147,7 +1154,8 @@ EXAMPLE_RECURSIVE      = YES
 # that contain images that are to be included in the documentation (see the
 # \image command).
 
-IMAGE_PATH             =
+IMAGE_PATH             = doc/logo.png \
+                         doc/demo_png
 
 # The INPUT_FILTER tag can be used to specify a program that Doxygen should
 # invoke to filter for each input file. Doxygen will invoke the filter program
@@ -1208,7 +1216,7 @@ FILTER_SOURCE_PATTERNS =
 # (index.html). This can be useful if you have a project on for instance GitHub
 # and want to reuse the introduction page also for the Doxygen output.
 
-USE_MDFILE_AS_MAINPAGE =
+USE_MDFILE_AS_MAINPAGE = README.md
 
 # If the IMPLICIT_DIR_DOCS tag is set to YES, any README.md file found in sub-
 # directories of the project's root, is used as the documentation for that sub-
@@ -1253,7 +1261,7 @@ INLINE_SOURCES         = NO
 # Fortran comments will always remain visible.
 # The default value is: YES.
 
-STRIP_CODE_COMMENTS    = YES
+STRIP_CODE_COMMENTS    = NO
 
 # If the REFERENCED_BY_RELATION tag is set to YES then for each documented
 # entity all documented functions referencing it will be listed.
@@ -1467,7 +1475,8 @@ HTML_EXTRA_STYLESHEET  =
 # files will be copied as-is; there are no commands or markers available.
 # This tag requires that the tag GENERATE_HTML is set to YES.
 
-HTML_EXTRA_FILES       =
+HTML_EXTRA_FILES       = doc/demo_png/souidemo1.png \
+                         doc/demo_png/souidemo2.png
 
 # The HTML_COLORSTYLE tag can be used to specify if the generated HTML output
 # should be rendered with a dark or light theme.
@@ -2530,7 +2539,51 @@ PREDEFINED             = "STDMETHOD_(ret,func)=ret func" \
                          THIS_= \
                          CTHIS_= \
                          "DECLARE_INTERFACE(x)=struct x" \
-                         "DECLARE_INTERFACE_(a,b)=struct a : b"
+                         "DECLARE_INTERFACE_(a,b)=struct a : b" \
+                         "DEF_VAL(x)= =x" \
+                         "DEF_SOBJECT(x,y)=" \
+                         "SOUI_ATTRS_BEGIN()= virtual HRESULT SetAttribute(const SNS::SStringW &amp;amp;amp;amp;strAttribName, const SNS::SStringW &amp;amp;amp;amp;strValue, BOOL bLoading = FALSE){" \
+                         "SOUI_ATTRS_END()= }" \
+                         SOUI_ATTRS_BREAK()=} \
+                         "ATTR_CHAIN(varname, flag)=" \
+                         "ATTR_CHAIN_PTR(varname, flag)=" \
+                         ATTR_CHAIN_CLASS(cls)= \
+                         "ATTR_CUSTOM(attribname, func)=" \
+                         "ATTR_BOOL(attribname, varname, allredraw)=" \
+                         "ATTR_INT(attribname, varname, allredraw)=" \
+                         "ATTR_LAYOUTSIZE(attribname, varname, allredraw)=" \
+                         "ATTR_LAYOUTSIZE2(attribname, varname, allredraw)=" \
+                         "ATTR_LAYOUTSIZE4(attribname, varname, allredraw)=" \
+                         "ATTR_MARGIN(attribname, varname, allredraw)=" \
+                         "ATTR_RECT(attribname, varname, allredraw)=" \
+                         "ATTR_SIZE(attribname, varname, allredraw)=" \
+                         "ATTR_POINT(attribname, varname, allredraw)=" \
+                         "ATTR_SPOINT(attribname, varname, allredraw)=" \
+                         "ATTR_FLOAT(attribname, varname, allredraw)=" \
+                         "ATTR_UINT(attribname, varname, allredraw)=" \
+                         "ATTR_DWORD(attribname, varname, allredraw)=" \
+                         "ATTR_WORD(attribname, varname, allredraw)=" \
+                         "ATTR_BIT(attribname, varname, maskbit, allredraw)=" \
+                         "ATTR_STRINGA(attribname, varname, allredraw)=" \
+                         "ATTR_STRINGW(attribname, varname, allredraw)=" \
+                         "ATTR_STRINGT(attribname, varname, allredraw)=" \
+                         "ATTR_I18NSTRA(attribname, varname, allredraw)=" \
+                         "ATTR_I18NSTRT(attribname, varname, allredraw)=" \
+                         "ATTR_HEX(attribname, varname, allredraw)=" \
+                         "ATTR_COLOR(attribname, varname, allredraw)=" \
+                         "ATTR_FONT(attribname, varname, allredraw)=" \
+                         "ATTR_ENUM_BEGIN(attribname, vartype, allredraw)=" \
+                         "ATTR_ENUM_VALUE(enumstring, enumvalue)=" \
+                         ATTR_ENUM_END(varname)= \
+                         "ATTR_STYLE(attribname, varname, allredraw)=" \
+                         "ATTR_SKIN(attribname, varname, allredraw)=" \
+                         "ATTR_INTERPOLATOR(attribname, varname, allredraw)=" \
+                         "ATTR_IMAGE(attribname, varname, allredraw)=" \
+                         "ATTR_IMAGEAUTOREF(attribname, varname, allredraw)=" \
+                         "ATTR_ICON(attribname, varname, allredraw)=" \
+                         "ATTR_CHAR(attribname, varname, allredraw)=" \
+                         "ATTR_ANIMATION(attribname, varname, allredraw)=" \
+                         "ATTR_GRADIENT(attribname, varname, allredraw)="
 
 # If the MACRO_EXPANSION and EXPAND_ONLY_PREDEF tags are set to YES then this
 # tag can be used to specify a list of macro names that should be expanded. The
@@ -2549,7 +2602,7 @@ EXPAND_AS_DEFINED      =
 # The default value is: YES.
 # This tag requires that the tag ENABLE_PREPROCESSING is set to YES.
 
-SKIP_FUNCTION_MACROS   = NO
+SKIP_FUNCTION_MACROS   = YES
 
 #---------------------------------------------------------------------------
 # Configuration options related to external references

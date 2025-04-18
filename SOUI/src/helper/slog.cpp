@@ -29,8 +29,11 @@ void Log::DefCallback(const char *tag, const char *pLogStr, int level, const cha
 #else
         int nLen = _snprintf(logbuf2, kMaxLog, "tid=%ld,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, tag, pLogStr, fun, file, line);
 #endif //_WIN32
-        logbuf2[nLen] = 0;
-        OutputDebugStringA(logbuf2);
+        if (nLen > 0)
+        {
+            logbuf2[nLen] = 0;
+            OutputDebugStringA(logbuf2);
+        }
         free(logbuf2);
     }
 }
@@ -68,8 +71,11 @@ Log::~Log()
         const int kMaxLog = Log::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);
         int nLen = _snprintf(logbuf2, kMaxLog, "%s, %04d-%02d-%02d %02d:%02d:%02d %03dms %s %s %s:%d\n", m_tag, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_logBuf, m_func, m_file, m_line);
-        logbuf2[nLen] = 0;
-        OutputDebugStringA(logbuf2);
+        if (nLen > 0)
+        {
+            logbuf2[nLen] = 0;
+            OutputDebugStringA(logbuf2);
+        }
         free(logbuf2);
     }
 }

@@ -133,7 +133,8 @@ HRESULT STDMETHODCALLTYPE SDropTargetDispatcher::Drop(/* [unique][in] */ IDataOb
     if (m_hHover && pPair)
         pPair->m_value->Drop(pDataObj, grfKeyState, pt, pdwEffect);
     m_hHover = 0;
-    if(m_pDataObj){
+    if (m_pDataObj)
+    {
         m_pDataObj->Release();
         m_pDataObj = NULL;
     }

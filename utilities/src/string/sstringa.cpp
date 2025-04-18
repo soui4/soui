@@ -136,7 +136,7 @@ size_t char_traits::StrLen(const char* psz)
 //////////////////////////////////////////////////////////////////////////
 
 
-void SStringA::_ReleaseData(TStringData* pData)
+void SStringA::ReleaseData(TStringData* pData)
 {
 	if (pData != TStringData::InitDataNil())
 	{
@@ -207,7 +207,7 @@ bool SStringA::ReallocBuffer(int nNewLength)
 	{
 		int nLength = smin_tsr(pOldData->nDataLength, nNewLength) + 1;
 		memcpy(m_pszData, psz, nLength * sizeof(char));
-		_ReleaseData(pOldData);
+		ReleaseData(pOldData);
 		return true;
 	}
 	return false;

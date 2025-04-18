@@ -133,38 +133,74 @@ typedef enum _OBJTYPE
     OT_RGN,
     OT_PATH,
 } OBJTYPE;
-
 /**
- * @struct     IRenderObj
- * @brief      渲染对象基类
+ * @struct IRenderObj
+ * @brief Base class for all renderable objects.
  *
- * @describe   所有渲染对象全部使用引用计数管理生命周期
+ * @details All renderable objects use reference counting to manage their lifecycle.
  */
 #undef INTERFACE
 #define INTERFACE IRenderObj
 DECLARE_INTERFACE_(IRenderObj, IObjRef)
 {
-    // Increments the reference count for an interface on an object
+    /**
+     * @brief Increments the reference count for the object.
+     *
+     * @details This method is used to increase the reference count of the object,
+     * ensuring it remains valid as long as references exist.
+     *
+     * @return long The new reference count after incrementing.
+     */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    // Decrements the reference count for an interface on an object
+    /**
+     * @brief Decrements the reference count for the object.
+     *
+     * @details This method decreases the reference count of the object.
+     * When the count reaches zero, the object may be released.
+     *
+     * @return long The new reference count after decrementing.
+     */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    // Called when the final release of the object occurs
+    /**
+     * @brief Called when the final release of the object occurs.
+     *
+     * @details This method is invoked when the reference count reaches zero,
+     * allowing for any necessary cleanup before the object is destroyed.
+     */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    // Obtains the render factory that created this rendering object
+    /**
+     * @brief Obtains the render factory that created this rendering object.
+     *
+     * @details Retrieves a pointer to the render factory responsible for creating this object.
+     *
+     * @return IRenderFactory* Pointer to the render factory.
+     */
     STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
-    // Queries the type of the rendering object
+    /**
+     * @brief Queries the type of the rendering object.
+     *
+     * @details Returns an enumeration value representing the type of the object (e.g., brush, pen, bitmap).
+     *
+     * @return OBJTYPE The type of the rendering object.
+     */
     STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 };
 
+/**
+ * @enum _BrushType
+ * @brief Enumeration defining types of brushes.
+ *
+ * @details Specifies the different types of brushes available for rendering purposes.
+ */
 typedef enum _BrushType
 {
-    Brush_Color = 0, // 颜色画刷
-    Brush_Bitmap,    // 位图画刷
-    Brush_Shader,    // 渐变画刷
+    Brush_Color = 0, //!< Color brush.
+    Brush_Bitmap,    //!< Bitmap brush.
+    Brush_Shader     //!< Shader brush.
 } BrushType;
 
 typedef enum _TileMode
@@ -184,322 +220,803 @@ typedef enum _TileMode
 } TileMode;
 
 /**
- * @struct     IBrush
- * @brief      画刷对象
+ * @struct     IBrushS
+ * @brief      Brush object interface.
  *
  * @describe
  */
 #undef INTERFACE
 #define INTERFACE IBrushS
+/**
+ * @struct IBrushS
+ * @brief Brush object interface.
+ *
+ * @details This interface represents a brush used for rendering operations.
+ * It inherits from the IRenderObj interface and provides methods to query
+ * the brush type and manage the brush's lifecycle.
+ */
 DECLARE_INTERFACE_(IBrushS, IRenderObj)
 {
-    // Increments the reference count for an interface on an object
+    /**
+     * @brief Increments the reference count for the object.
+     *
+     * @details This method is used to increase the reference count of the object,
+     * ensuring it remains valid as long as references exist.
+     *
+     * @return long The new reference count after incrementing.
+     */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    // Decrements the reference count for an interface on an object
+    /**
+     * @brief Decrements the reference count for the object.
+     *
+     * @details This method decreases the reference count of the object.
+     * When the count reaches zero, the object may be released.
+     *
+     * @return long The new reference count after decrementing.
+     */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    // Called when the final release of the object occurs
+    /**
+     * @brief Called when the final release of the object occurs.
+     *
+     * @details This method is invoked when the reference count reaches zero,
+     * allowing for any necessary cleanup before the object is destroyed.
+     */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    // Obtains the render factory that created this rendering object
+    /**
+     * @brief Obtains the render factory that created this rendering object.
+     *
+     * @details Retrieves a pointer to the render factory responsible for creating this object.
+     *
+     * @return IRenderFactory* Pointer to the render factory.
+     */
     STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
-    // Queries the type of the rendering object
+    /**
+     * @brief Queries the type of the rendering object.
+     *
+     * @details Returns an enumeration value representing the type of the object (e.g., brush, pen, bitmap).
+     *
+     * @return OBJTYPE The type of the rendering object.
+     */
     STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
-    // Queries the type of the brush
+    /**
+     * @brief Queries the type of the brush.
+     *
+     * @details Returns an enumeration value representing the type of the brush (e.g., color, bitmap, shader).
+     *
+     * @return BrushType The type of the brush.
+     */
     STDMETHOD_(BrushType, GetBrushType)(CTHIS) SCONST PURE;
 };
 
 /**
- * @struct     IPen
- * @brief      画笔对象
+ * @struct IPenS
+ * @brief Pen object interface.
  *
- * @describe
+ * @details This interface represents a pen used for rendering operations.
+ * It inherits from the IRenderObj interface and provides methods to manage
+ * the pen's properties and lifecycle.
  */
 #undef INTERFACE
 #define INTERFACE IPenS
 DECLARE_INTERFACE_(IPenS, IRenderObj)
 {
-    // Increments the reference count for an interface on an object
+    /**
+     * @brief Increments the reference count for the object.
+     *
+     * @details This method is used to increase the reference count of the object,
+     * ensuring it remains valid as long as references exist.
+     *
+     * @return long The new reference count after incrementing.
+     */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    // Decrements the reference count for an interface on an object
+    /**
+     * @brief Decrements the reference count for the object.
+     *
+     * @details This method decreases the reference count of the object.
+     * When the count reaches zero, the object may be released.
+     *
+     * @return long The new reference count after decrementing.
+     */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    // Called when the final release of the object occurs
+    /**
+     * @brief Called when the final release of the object occurs.
+     *
+     * @details This method is invoked when the reference count reaches zero,
+     * allowing for any necessary cleanup before the object is destroyed.
+     */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    // Obtains the render factory that created this rendering object
+    /**
+     * @brief Obtains the render factory that created this rendering object.
+     *
+     * @details Retrieves a pointer to the render factory responsible for creating this object.
+     *
+     * @return IRenderFactory* Pointer to the render factory.
+     */
     STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
-    // Queries the type of the rendering object
+    /**
+     * @brief Queries the type of the rendering object.
+     *
+     * @details Returns an enumeration value representing the type of the object (e.g., brush, pen, bitmap).
+     *
+     * @return OBJTYPE The type of the rendering object.
+     */
     STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
-    // Retrieves the width of the pen
+    /**
+     * @brief Retrieves the width of the pen.
+     *
+     * @details Returns the current width of the pen.
+     *
+     * @return int The width of the pen.
+     */
     STDMETHOD_(int, GetWidth)(CTHIS) SCONST PURE;
 
-    // Sets the width of the pen
+    /**
+     * @brief Sets the width of the pen.
+     *
+     * @details Sets the width of the pen to the specified value.
+     *
+     * @param nWid The new width of the pen.
+     */
     STDMETHOD_(void, SetWidth)(THIS_ int nWid) PURE;
 
-    // Retrieves the style of the pen
+    /**
+     * @brief Retrieves the style of the pen.
+     *
+     * @details Returns the current style of the pen.
+     *
+     * @return int The style of the pen.
+     */
     STDMETHOD_(int, GetStyle)(CTHIS) SCONST PURE;
 
-    // Sets the style of the pen
+    /**
+     * @brief Sets the style of the pen.
+     *
+     * @details Sets the style of the pen to the specified value.
+     *
+     * @param nStyle The new style of the pen.
+     */
     STDMETHOD_(void, SetStyle)(THIS_ int nStyle) PURE;
 
-    // Retrieves the color of the pen
+    /**
+     * @brief Retrieves the color of the pen.
+     *
+     * @details Returns the current color of the pen.
+     *
+     * @return COLORREF The color of the pen.
+     */
     STDMETHOD_(COLORREF, GetColor)(CTHIS) SCONST PURE;
 
-    // Sets the color of the pen
+    /**
+     * @brief Sets the color of the pen.
+     *
+     * @details Sets the color of the pen to the specified value.
+     *
+     * @param cr The new color of the pen.
+     */
     STDMETHOD_(void, SetColor)(THIS_ COLORREF cr) PURE;
 };
-
 /**
- * @struct     IBitmap
- * @brief      位图对象
+ * @struct IBitmapS
+ * @brief Bitmap object interface.
  *
- * @describe
+ * @details This interface represents a bitmap used for rendering operations.
+ * It inherits from the IRenderObj interface and provides methods to manage
+ * the bitmap's properties and lifecycle, including initialization, loading,
+ * saving, and scaling operations.
  */
 #undef INTERFACE
 #define INTERFACE IBitmapS
 DECLARE_INTERFACE_(IBitmapS, IRenderObj)
 {
-    // Increments the reference count for an interface on an object
+    /**
+     * @brief Increments the reference count for the object.
+     *
+     * @details This method is used to increase the reference count of the object,
+     * ensuring it remains valid as long as references exist.
+     *
+     * @return long The new reference count after incrementing.
+     */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    // Decrements the reference count for an interface on an object
+    /**
+     * @brief Decrements the reference count for the object.
+     *
+     * @details This method decreases the reference count of the object.
+     * When the count reaches zero, the object may be released.
+     *
+     * @return long The new reference count after decrementing.
+     */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    // Called when the final release of the object occurs
+    /**
+     * @brief Called when the final release of the object occurs.
+     *
+     * @details This method is invoked when the reference count reaches zero,
+     * allowing for any necessary cleanup before the object is destroyed.
+     */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    // Obtains the render factory that created this rendering object
+    /**
+     * @brief Obtains the render factory that created this rendering object.
+     *
+     * @details Retrieves a pointer to the render factory responsible for creating this object.
+     *
+     * @return IRenderFactory* Pointer to the render factory.
+     */
     STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
-    // Queries the type of the rendering object
+    /**
+     * @brief Queries the type of the rendering object.
+     *
+     * @details Returns an enumeration value representing the type of the object (e.g., brush, pen, bitmap).
+     *
+     * @return OBJTYPE The type of the rendering object.
+     */
     STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
-    // Initializes the bitmap from 32-bit bitmap data
+    /**
+     * @brief Initializes the bitmap from 32-bit bitmap data.
+     *
+     * @details Initializes the bitmap with the specified width, height, and pixel data.
+     *
+     * @param nWid The width of the bitmap.
+     * @param nHei The height of the bitmap.
+     * @param pBits Pointer to the 32-bit bitmap data.
+     * @return HRESULT indicating success or failure.
+     */
     STDMETHOD_(HRESULT, Init)(THIS_ int nWid, int nHei, const LPVOID pBits) PURE;
 
-    // Initializes the bitmap from an IImgFrame
+    /**
+     * @brief Initializes the bitmap from an IImgFrame object.
+     *
+     * @details Initializes the bitmap using the data from the specified IImgFrame object.
+     *
+     * @param pImgFrame Pointer to the IImgFrame object.
+     * @return HRESULT indicating success or failure.
+     */
     STDMETHOD_(HRESULT, Init2)(THIS_ IImgFrame * pImgFrame) PURE;
 
-    // Loads the bitmap from a file
+    /**
+     * @brief Loads the bitmap from a file.
+     *
+     * @details Loads the bitmap data from the specified file.
+     *
+     * @param pszFileName Path to the file containing the bitmap data.
+     * @return HRESULT indicating success or failure.
+     */
     STDMETHOD_(HRESULT, LoadFromFile)(THIS_ LPCTSTR pszFileName) PURE;
 
-    // Loads the bitmap from memory
+    /**
+     * @brief Loads the bitmap from memory.
+     *
+     * @details Loads the bitmap data from the specified memory buffer.
+     *
+     * @param pBuf Pointer to the memory buffer containing the bitmap data.
+     * @param szLen Size of the memory buffer.
+     * @return HRESULT indicating success or failure.
+     */
     STDMETHOD_(HRESULT, LoadFromMemory)(THIS_ LPBYTE pBuf, size_t szLen) PURE;
 
-    // Retrieves the width of the bitmap
+    /**
+     * @brief Retrieves the width of the bitmap.
+     *
+     * @details Returns the current width of the bitmap.
+     *
+     * @return UINT The width of the bitmap.
+     */
     STDMETHOD_(UINT, Width)(CTHIS) SCONST PURE;
 
-    // Retrieves the height of the bitmap
+    /**
+     * @brief Retrieves the height of the bitmap.
+     *
+     * @details Returns the current height of the bitmap.
+     *
+     * @return UINT The height of the bitmap.
+     */
     STDMETHOD_(UINT, Height)(CTHIS) SCONST PURE;
 
-    // Retrieves the size of the bitmap
+    /**
+     * @brief Retrieves the size of the bitmap.
+     *
+     * @details Returns the current size of the bitmap as a SIZE structure.
+     *
+     * @return SIZE The size of the bitmap.
+     */
     STDMETHOD_(SIZE, Size)(CTHIS) SCONST PURE;
 
-    // Locks the pixel bits of the bitmap for writing
+    /**
+     * @brief Locks the pixel bits of the bitmap for writing.
+     *
+     * @details Locks the pixel data of the bitmap for writing operations.
+     *
+     * @return LPVOID Pointer to the locked pixel data.
+     */
     STDMETHOD_(LPVOID, LockPixelBits)(THIS) PURE;
 
-    // Unlocks the pixel bits of the bitmap
+    /**
+     * @brief Unlocks the pixel bits of the bitmap.
+     *
+     * @details Unlocks the pixel data of the bitmap after writing operations.
+     *
+     * @param pBuf Pointer to the locked pixel data.
+     */
     STDMETHOD_(void, UnlockPixelBits)(THIS_ LPVOID pBuf) PURE;
 
-    // Retrieves the pixel bits of the bitmap for reading
+    /**
+     * @brief Retrieves the pixel bits of the bitmap for reading.
+     *
+     * @details Retrieves the pixel data of the bitmap for reading operations.
+     *
+     * @return const LPVOID Pointer to the pixel data.
+     */
     STDMETHOD_(const LPVOID, GetPixelBits)(CTHIS) SCONST PURE;
 
-    // Clones the bitmap
+    /**
+     * @brief Clones the bitmap.
+     *
+     * @details Creates a copy of the bitmap.
+     *
+     * @param ppClone Pointer to receive the cloned bitmap object.
+     * @return HRESULT indicating success or failure.
+     */
     STDMETHOD_(HRESULT, Clone)(CTHIS_ IBitmapS * *ppClone) SCONST PURE;
 
-    // Scales the bitmap and clones it
+    /**
+     * @brief Scales the bitmap and clones it.
+     *
+     * @details Scales the bitmap by the specified factor and creates a copy.
+     *
+     * @param pOutput Pointer to receive the scaled bitmap object.
+     * @param nScale Scaling factor.
+     * @param filterLevel Filter level for scaling.
+     * @return HRESULT indicating success or failure.
+     */
     STDMETHOD_(HRESULT, Scale)
     (CTHIS_ IBitmapS * *pOutput, int nScale, FilterLevel filterLevel) SCONST PURE;
 
-    // Scales the bitmap to specified dimensions and clones it
+    /**
+     * @brief Scales the bitmap to specified dimensions and clones it.
+     *
+     * @details Scales the bitmap to the specified width and height and creates a copy.
+     *
+     * @param pOutput Pointer to receive the scaled bitmap object.
+     * @param nWid New width of the bitmap.
+     * @param nHei New height of the bitmap.
+     * @param filterLevel Filter level for scaling.
+     * @return HRESULT indicating success or failure.
+     */
     STDMETHOD_(HRESULT, Scale2)
     (CTHIS_ IBitmapS * *pOutput, int nWid, int nHei, FilterLevel filterLevel) SCONST PURE;
 
-    // Saves the bitmap to a file
-    STDMETHOD_(HRESULT, Save)(CTHIS_ LPCWSTR pszFileName, const LPVOID pFormat) SCONST PURE;
+    /**
+     * @brief Saves the bitmap to a file.
+     *
+     * @details Saves the bitmap data to the specified file with the given format.
+     *
+     * @param pszFileName Path to the file where the bitmap data will be saved.
+     * @param pFormat Format of the saved file.
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, Save)(THIS_ LPCWSTR pszFileName, const LPVOID pFormat) SCONST PURE;
 
-    STDMETHOD_(HRESULT, Save2)(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST PURE;
+    /**
+     * @brief Saves the bitmap to a file with a specified format.
+     *
+     * @details Saves the bitmap data to the specified file with the given image format.
+     *
+     * @param pszFileName Path to the file where the bitmap data will be saved.
+     * @param imgFmt Image format for saving.
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, Save2)(THIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST PURE;
 };
 
 typedef IBitmapS *IBitmapPtr;
 
+/**
+ * @enum _FillStyle
+ * @brief Enumeration defining fill styles.
+ *
+ * @details Specifies the different fill styles available for rendering purposes.
+ */
 typedef enum _FillStyle
 {
-    kFill_Style = 0,
-    kStroke_Style = 1,
-    kStrokeAndFill_Style = 2,
+    kFill_Style = 0,          //!< Fill only.
+    kStroke_Style = 1,        //!< Stroke only.
+    kStrokeAndFill_Style = 2, //!< Stroke and fill.
 } FillStyle;
 
 /**
- * @struct     IFont
- * @brief      字体对象
+ * @struct IFontS
+ * @brief Font object interface.
  *
- * @describe
+ * @details This interface represents a font used for rendering operations.
+ * It inherits from the IRenderObj interface and provides methods to manage
+ * the font's properties and lifecycle.
  */
 #undef INTERFACE
 #define INTERFACE IFontS
 DECLARE_INTERFACE_(IFontS, IRenderObj)
 {
-    // Increments the reference count for an interface on an object
+    /**
+     * @brief Increments the reference count for the object.
+     *
+     * @details This method is used to increase the reference count of the object,
+     * ensuring it remains valid as long as references exist.
+     *
+     * @return long The new reference count after incrementing.
+     */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    // Decrements the reference count for an interface on an object
+    /**
+     * @brief Decrements the reference count for the object.
+     *
+     * @details This method decreases the reference count of the object.
+     * When the count reaches zero, the object may be released.
+     *
+     * @return long The new reference count after decrementing.
+     */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    // Called when the final release of the object occurs
+    /**
+     * @brief Called when the final release of the object occurs.
+     *
+     * @details This method is invoked when the reference count reaches zero,
+     * allowing for any necessary cleanup before the object is destroyed.
+     */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    // Obtains the render factory that created this rendering object
+    /**
+     * @brief Obtains the render factory that created this rendering object.
+     *
+     * @details Retrieves a pointer to the render factory responsible for creating this object.
+     *
+     * @return IRenderFactory* Pointer to the render factory.
+     */
     STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
-    // Queries the type of the rendering object
+    /**
+     * @brief Queries the type of the rendering object.
+     *
+     * @details Returns an enumeration value representing the type of the object (e.g., brush, pen, bitmap).
+     *
+     * @return OBJTYPE The type of the rendering object.
+     */
     STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
-    // Retrieves the LOGFONT structure of the font
+    /**
+     * @brief Retrieves the LOGFONT structure of the font.
+     *
+     * @details Returns a pointer to the LOGFONT structure defining the font attributes.
+     *
+     * @return const LOGFONT* Pointer to the LOGFONT structure.
+     */
     STDMETHOD_(const LOGFONT *, LogFont)(CTHIS) SCONST PURE;
 
-    // Retrieves the family name of the font
+    /**
+     * @brief Retrieves the family name of the font.
+     *
+     * @details Returns the family name of the font.
+     *
+     * @return LPCTSTR The family name of the font.
+     */
     STDMETHOD_(LPCTSTR, FamilyName)(CTHIS) SCONST PURE;
 
-    // Retrieves the text size of the font
+    /**
+     * @brief Retrieves the text size of the font.
+     *
+     * @details Returns the text size of the font.
+     *
+     * @return int The text size of the font.
+     */
     STDMETHOD_(int, TextSize)(CTHIS) SCONST PURE;
 
-    // Checks if the font is bold
+    /**
+     * @brief Checks if the font is bold.
+     *
+     * @details Returns a boolean indicating whether the font is bold.
+     *
+     * @return BOOL TRUE if the font is bold, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, IsBold)(CTHIS) SCONST PURE;
 
-    // Checks if the font has an underline
+    /**
+     * @brief Checks if the font has an underline.
+     *
+     * @details Returns a boolean indicating whether the font has an underline.
+     *
+     * @return BOOL TRUE if the font has an underline, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, IsUnderline)(CTHIS) SCONST PURE;
 
-    // Checks if the font is italic
+    /**
+     * @brief Checks if the font is italic.
+     *
+     * @details Returns a boolean indicating whether the font is italic.
+     *
+     * @return BOOL TRUE if the font is italic, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, IsItalic)(CTHIS) SCONST PURE;
 
-    // Checks if the font has a strikeout
+    /**
+     * @brief Checks if the font has a strikeout.
+     *
+     * @details Returns a boolean indicating whether the font has a strikeout.
+     *
+     * @return BOOL TRUE if the font has a strikeout, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, IsStrikeOut)(CTHIS) SCONST PURE;
 
-    // Updates the font properties
+    /**
+     * @brief Updates the font properties.
+     *
+     * @details Updates the font properties using the specified LOGFONT structure.
+     *
+     * @param pLogFont Pointer to the LOGFONT structure defining the new font attributes.
+     * @return BOOL TRUE if the update was successful, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, UpdateFont)(THIS_ const LOGFONT *pLogFont) PURE;
 
-    // Sets properties from an XML node
+    /**
+     * @brief Sets properties from an XML node.
+     *
+     * @details Sets the font properties based on the attributes specified in the XML node.
+     *
+     * @param pXmlNode Pointer to the XML node containing the font properties.
+     */
     STDMETHOD_(void, SetProp)(THIS_ IXmlNode * pXmlNode) PURE;
 };
 
 /**
- * @struct     IRegion
- * @brief      Region对象
+ * @struct IRegionS
+ * @brief Region object interface.
  *
- * @describe
+ * @details This interface represents a region used for clipping and other rendering operations.
+ * It inherits from the IRenderObj interface and provides methods to manage
+ * the region's properties and lifecycle, including combining shapes, checking containment,
+ * and offsetting the region.
  */
 #undef INTERFACE
 #define INTERFACE IRegionS
 DECLARE_INTERFACE_(IRegionS, IRenderObj)
 {
-    // Increments the reference count for an interface on an object
+    /**
+     * @brief Increments the reference count for the object.
+     *
+     * @details This method is used to increase the reference count of the object,
+     * ensuring it remains valid as long as references exist.
+     *
+     * @return long The new reference count after incrementing.
+     */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    // Decrements the reference count for an interface on an object
+    /**
+     * @brief Decrements the reference count for the object.
+     *
+     * @details This method decreases the reference count of the object.
+     * When the count reaches zero, the object may be released.
+     *
+     * @return long The new reference count after decrementing.
+     */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    // Called when the final release of the object occurs
+    /**
+     * @brief Called when the final release of the object occurs.
+     *
+     * @details This method is invoked when the reference count reaches zero,
+     * allowing for any necessary cleanup before the object is destroyed.
+     */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
-    // Obtains the render factory that created this rendering object
+    /**
+     * @brief Obtains the render factory that created this rendering object.
+     *
+     * @details Retrieves a pointer to the render factory responsible for creating this object.
+     *
+     * @return IRenderFactory* Pointer to the render factory.
+     */
     STDMETHOD_(IRenderFactory *, GetRenderFactory)(CTHIS) SCONST PURE;
 
-    // Queries the type of the rendering object
+    /**
+     * @brief Queries the type of the rendering object.
+     *
+     * @details Returns an enumeration value representing the type of the object (e.g., brush, pen, bitmap).
+     *
+     * @return OBJTYPE The type of the rendering object.
+     */
     STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
-    // Combines a rectangle with the region
+    /**
+     * @brief Combines a rectangle with the region.
+     *
+     * @details Combines the specified rectangle with the current region using the specified mode.
+     *
+     * @param lprect Pointer to the rectangle to combine.
+     * @param nCombineMode Mode for combining the rectangle with the region.
+     */
     STDMETHOD_(void, CombineRect)(THIS_ LPCRECT lprect, int nCombineMode) PURE;
 
-    // Combines another region with the region
+    /**
+     * @brief Combines another region with the current region.
+     *
+     * @details Combines the specified region with the current region using the specified mode.
+     *
+     * @param pRgnSrc Pointer to the region to combine.
+     * @param nCombineMode Mode for combining the regions.
+     */
     STDMETHOD_(void, CombineRgn)(THIS_ const IRegionS *pRgnSrc, int nCombineMode) PURE;
 
-    // Combines a rounded rectangle with the region
+    /**
+     * @brief Combines a rounded rectangle with the region.
+     *
+     * @details Combines the specified rounded rectangle with the current region using the specified mode.
+     *
+     * @param lprect Pointer to the rectangle defining the bounds of the rounded rectangle.
+     * @param ptConner Point defining the corner radii of the rounded rectangle.
+     * @param nCombineMode Mode for combining the rounded rectangle with the region.
+     */
     STDMETHOD_(void, CombineRoundRect)(THIS_ LPCRECT lprect, POINT ptConner, int nCombineMode) PURE;
 
-    // Combines an ellipse with the region
+    /**
+     * @brief Combines an ellipse with the region.
+     *
+     * @details Combines the specified ellipse with the current region using the specified mode.
+     *
+     * @param lprect Pointer to the rectangle defining the bounds of the ellipse.
+     * @param nCombineMode Mode for combining the ellipse with the region.
+     */
     STDMETHOD_(void, CombineEllipse)(THIS_ LPCRECT lprect, int nCombineMode) PURE;
 
-    // Combines a polygon with the region
-    STDMETHOD_(void, CombinePolygon)
-    (THIS_ const POINT *pts, int count, int nPolygonMode, int nCombineMode) PURE;
+    /**
+     * @brief Combines a polygon with the region.
+     *
+     * @details Combines the specified polygon with the current region using the specified mode.
+     *
+     * @param pts Array of points defining the polygon.
+     * @param count Number of points in the polygon.
+     * @param nPolygonMode Mode for filling the polygon.
+     * @param nCombineMode Mode for combining the polygon with the region.
+     */
+    STDMETHOD_(void, CombinePolygon)(THIS_ const POINT *pts, int count, int nPolygonMode, int nCombineMode) PURE;
 
-    // Checks if a point is inside the region
+    /**
+     * @brief Checks if a point is inside the region.
+     *
+     * @details Determines whether the specified point lies within the region.
+     *
+     * @param pt Point to check.
+     * @return BOOL TRUE if the point is inside the region, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, PtInRegion)(CTHIS_ POINT pt) SCONST PURE;
 
-    // Checks if a rectangle intersects with the region
+    /**
+     * @brief Checks if a rectangle intersects with the region.
+     *
+     * @details Determines whether the specified rectangle intersects with the region.
+     *
+     * @param lprect Pointer to the rectangle to check.
+     * @return BOOL TRUE if the rectangle intersects with the region, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, RectInRegion)(CTHIS_ LPCRECT lprect) SCONST PURE;
 
-    // Retrieves the bounding rectangle of the region
+    /**
+     * @brief Retrieves the bounding rectangle of the region.
+     *
+     * @details Gets the smallest rectangle that completely encloses the region.
+     *
+     * @param lprect Pointer to the rectangle to receive the bounds.
+     */
     STDMETHOD_(void, GetRgnBox)(CTHIS_ LPRECT lprect) SCONST PURE;
 
-    // Checks if the region is empty
+    /**
+     * @brief Checks if the region is empty.
+     *
+     * @details Determines whether the region contains no area.
+     *
+     * @return BOOL TRUE if the region is empty, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, IsEmpty)(CTHIS) SCONST PURE;
 
-    // Offsets the region by a specified amount
+    /**
+     * @brief Offsets the region by a specified amount.
+     *
+     * @details Moves the region by the specified offset.
+     *
+     * @param pt Offset to apply to the region.
+     */
     STDMETHOD_(void, Offset)(THIS_ POINT pt) PURE;
 
-    // Clears the region
+    /**
+     * @brief Clears the region.
+     *
+     * @details Empties the region, making it contain no area.
+     */
     STDMETHOD_(void, Clear)(THIS) PURE;
 };
 
+/**
+ * @enum _xFormIndex
+ * @brief Enumeration defining indices for transformation matrix elements.
+ *
+ * @details Specifies the indices for accessing elements of a 3x3 transformation matrix.
+ */
 typedef enum _xFormIndex
 {
-    kMScaleX = 0,
-    kMSkewX,
-    kMTransX,
-    kMSkewY,
-    kMScaleY,
-    kMTransY,
-    kMPersp0,
-    kMPersp1,
-    kMPersp2,
-    kMCount,
+    kMScaleX = 0, //!< Index for the X-axis scaling factor.
+    kMSkewX,      //!< Index for the X-axis skew factor.
+    kMTransX,     //!< Index for the X-axis translation factor.
+    kMSkewY,      //!< Index for the Y-axis skew factor.
+    kMScaleY,     //!< Index for the Y-axis scaling factor.
+    kMTransY,     //!< Index for the Y-axis translation factor.
+    kMPersp0,     //!< Index for the first perspective factor.
+    kMPersp1,     //!< Index for the second perspective factor.
+    kMPersp2,     //!< Index for the third perspective factor.
+    kMCount,      //!< Total number of elements in the transformation matrix.
 } xFormIndex;
 
+/**
+ * @struct _IxForm
+ * @brief Structure representing a 3x3 transformation matrix.
+ *
+ * @details Contains the elements of a 3x3 transformation matrix used for transformations.
+ */
 typedef struct _IxForm
 {
-    float fMat[kMCount];
+    float fMat[kMCount]; //!< Array of floats representing the matrix elements.
 } IxForm;
 
+/**
+ * @enum _FillType
+ * @brief Enumeration defining fill types for path objects.
+ *
+ * @details Specifies the different fill types available for determining the "inside" of a path.
+ */
 typedef enum _FillType
 {
-    /** Specifies that "inside" is computed by a non-zero sum of signed
-    edge crossings
-    */
+    /** Specifies that "inside" is computed by a non-zero sum of signed edge crossings. */
     kWinding_FillType,
-    /** Specifies that "inside" is computed by an odd number of edge
-    crossings
-    */
+
+    /** Specifies that "inside" is computed by an odd number of edge crossings. */
     kEvenOdd_FillType,
-    /** Same as Winding, but draws outside of the path, rather than inside
-     */
+
+    /** Same as Winding, but draws outside of the path rather than inside. */
     kInverseWinding_FillType,
-    /** Same as EvenOdd, but draws outside of the path, rather than inside
-     */
+
+    /** Same as EvenOdd, but draws outside of the path rather than inside. */
     kInverseEvenOdd_FillType
 } FillType;
 
+/**
+ * @enum _Direction
+ * @brief Enumeration defining contour directions for path objects.
+ *
+ * @details Specifies the direction in which closed contours are added to a path.
+ */
 typedef enum _Direction
 {
-    /** Direction either has not been or could not be computed */
+    /** Direction either has not been or could not be computed. */
     kUnknown_Direction,
-    /** clockwise direction for adding closed contours */
+
+    /** Clockwise direction for adding closed contours. */
     kCW_Direction,
-    /** counter-clockwise direction for adding closed contours */
+
+    /** Counter-clockwise direction for adding closed contours. */
     kCCW_Direction,
 } Direction;
 
 /**
  * @struct     IPath
- * @brief      Path对象
+ * @brief      Interface for path objects.
  *
  * @describe
  */
@@ -507,13 +1024,32 @@ typedef enum _Direction
 #define INTERFACE IPathS
 DECLARE_INTERFACE_(IPathS, IRenderObj)
 {
-    //! Add a reference to the object.
+    /**
+     * @brief Increments the reference count for the object.
+     *
+     * @details This method is used to increase the reference count of the object,
+     * ensuring it remains valid as long as references exist.
+     *
+     * @return long The new reference count after incrementing.
+     */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //! Release a reference to the object.
+    /**
+     * @brief Decrements the reference count for the object.
+     *
+     * @details This method decreases the reference count of the object.
+     * When the count reaches zero, the object may be released.
+     *
+     * @return long The new reference count after decrementing.
+     */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //! Perform final release operations on the object.
+    /**
+     * @brief Called when the final release of the object occurs.
+     *
+     * @details This method is invoked when the reference count reaches zero,
+     * allowing for any necessary cleanup before the object is destroyed.
+     */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
@@ -530,34 +1066,34 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(OBJTYPE, ObjectType)(CTHIS) SCONST PURE;
 
-    /** 
+    /**
      * getFillType
      * @brief    Return the path's fill type, which defines how "inside" is computed.
      * @return   FillType -- The path's fill type.
      */
     STDMETHOD_(FillType, getFillType)(CTHIS) SCONST PURE;
 
-    /** 
+    /**
      * setFillType
      * @brief    Set the path's fill type, which defines how "inside" is computed.
      * @param ft The new fill type for this path.
      */
     STDMETHOD_(void, setFillType)(THIS_ FillType ft) PURE;
 
-    /** 
+    /**
      * reset
      * @brief    Clear any lines and curves from the path, making it empty. This frees up internal storage.
      */
     STDMETHOD_(void, reset)(THIS) PURE;
 
-    /** 
+    /**
      * isEmpty
      * @brief    Check if the path is empty (contains no lines or curves).
      * @return   BOOL -- TRUE if the path is empty.
      */
     STDMETHOD_(BOOL, isEmpty)(CTHIS) SCONST PURE;
 
-    /** 
+    /**
      * getBounds
      * @brief    Return the bounds of the path's points.
      * @param prc The rectangle to receive the bounds.
@@ -566,7 +1102,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
 
     //  Construction methods
 
-    /** 
+    /**
      * moveTo
      * @brief    Set the beginning of the next contour to the point (x,y).
      * @param x  The x-coordinate of the start of a new contour.
@@ -574,7 +1110,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, moveTo)(THIS_ float x, float y) PURE;
 
-    /** 
+    /**
      * rMoveTo
      * @brief    Set the beginning of the next contour relative to the last point on the previous contour.
      * @param dx The amount to add to the x-coordinate of the end of the previous contour.
@@ -582,7 +1118,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, rMoveTo)(THIS_ float dx, float dy) PURE;
 
-    /** 
+    /**
      * lineTo
      * @brief    Add a line from the last point to the specified point (x,y).
      * @param x  The x-coordinate of the end of a line.
@@ -590,7 +1126,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, lineTo)(THIS_ float x, float y) PURE;
 
-    /** 
+    /**
      * rLineTo
      * @brief    Add a line from the last point, but the coordinates are relative to the last point.
      * @param dx The amount to add to the x-coordinate of the previous point.
@@ -598,7 +1134,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, rLineTo)(THIS_ float dx, float dy) PURE;
 
-    /** 
+    /**
      * quadTo
      * @brief    Add a quadratic Bezier curve from the last point, approaching control point (x1,y1), and ending at (x2,y2).
      * @param x1 The x-coordinate of the control point.
@@ -608,7 +1144,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, quadTo)(THIS_ float x1, float y1, float x2, float y2) PURE;
 
-    /** 
+    /**
      * rQuadTo
      * @brief    Add a quadratic Bezier curve, but the coordinates are relative to the last point.
      * @param dx1 The amount to add to the x-coordinate of the last point to specify the control point.
@@ -618,7 +1154,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, rQuadTo)(THIS_ float dx1, float dy1, float dx2, float dy2) PURE;
 
-    /** 
+    /**
      * conicTo
      * @brief    Add a conic Bezier curve from the last point, approaching control point (x1,y1), and ending at (x2,y2).
      * @param x1 The x-coordinate of the control point.
@@ -629,7 +1165,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, conicTo)(THIS_ float x1, float y1, float x2, float y2, float w) PURE;
 
-    /** 
+    /**
      * rConicTo
      * @brief    Add a conic Bezier curve, but the coordinates are relative to the last point.
      * @param dx1 The amount to add to the x-coordinate of the last point to specify the control point.
@@ -640,7 +1176,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, rConicTo)(THIS_ float dx1, float dy1, float dx2, float dy2, float w) PURE;
 
-    /** 
+    /**
      * cubicTo
      * @brief    Add a cubic Bezier curve from the last point, approaching control points (x1,y1) and (x2,y2), and ending at (x3,y3).
      * @param x1 The x-coordinate of the 1st control point.
@@ -652,7 +1188,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, cubicTo)(THIS_ float x1, float y1, float x2, float y2, float x3, float y3) PURE;
 
-    /** 
+    /**
      * rCubicTo
      * @brief    Add a cubic Bezier curve, but the coordinates are relative to the last point.
      * @param x1 The x-coordinate of the 1st control point.
@@ -664,7 +1200,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, rCubicTo)(THIS_ float x1, float y1, float x2, float y2, float x3, float y3) PURE;
 
-    /** 
+    /**
      * addRect
      * @brief    Add a closed rectangle contour to the path.
      * @param rect The rectangle to add as a closed contour.
@@ -672,7 +1208,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addRect)(THIS_ const RECT *rect, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
-    /** 
+    /**
      * addRect2
      * @brief    Add a closed rectangle contour to the path.
      * @param left   The left side of the rectangle.
@@ -683,7 +1219,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addRect2)(THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
-    /** 
+    /**
      * addOval
      * @brief    Add a closed oval contour to the path.
      * @param oval The bounding oval to add as a closed contour.
@@ -691,7 +1227,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addOval)(THIS_ const RECT *oval, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
-    /** 
+    /**
      * addOval2
      * @brief    Add a closed oval contour to the path.
      * @param left   The left side of the oval.
@@ -702,7 +1238,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addOval2)(THIS_ float left, float top, float right, float bottom, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
-    /** 
+    /**
      * addCircle
      * @brief    Add a closed circle contour to the path.
      * @param x      The x-coordinate of the center of the circle.
@@ -712,7 +1248,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addCircle)(THIS_ float x, float y, float radius, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
-    /** 
+    /**
      * addArc
      * @brief    Add the specified arc to the path as a new contour.
      * @param oval       The bounds of the oval used to define the size of the arc.
@@ -721,7 +1257,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addArc)(THIS_ const RECT *oval, float startAngle, float sweepAngle) PURE;
 
-    /** 
+    /**
      * addArc2
      * @brief    Add the specified arc to the path as a new contour.
      * @param left       The left side of the oval.
@@ -733,7 +1269,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addArc2)(THIS_ float left, float top, float right, float bottom, float startAngle, float sweepAngle) PURE;
 
-    /** 
+    /**
      * addRoundRect
      * @brief    Add a closed round-rectangle contour to the path.
      * @param rect The bounds of the round-rectangle.
@@ -743,7 +1279,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addRoundRect)(THIS_ const RECT *rect, float rx, float ry, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
-    /** 
+    /**
      * addRoundRect2
      * @brief    Add a closed round-rectangle contour to the path.
      * @param left   The left side of the round-rectangle.
@@ -756,7 +1292,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addRoundRect2)(THIS_ float left, float top, float right, float bottom, float rx, float ry, Direction dir DEF_VAL(kCW_Direction)) PURE;
 
-    /** 
+    /**
      * addPoly
      * @brief    Add a new contour made of just lines.
      * @param pts  The array of points defining the polygon.
@@ -765,7 +1301,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addPoly)(THIS_ const POINT pts[], int count, BOOL close) PURE;
 
-    /** 
+    /**
      * offset
      * @brief    Offset the path by (dx,dy).
      * @param dx  The amount in the X direction to offset the entire path.
@@ -773,14 +1309,14 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, offset)(THIS_ float dx, float dy) PURE;
 
-    /** 
+    /**
      * transform
      * @brief    Transform the points in this path by the given matrix.
      * @param matrix The transformation matrix to apply to the path.
      */
     STDMETHOD_(void, transform)(THIS_ const IxForm *matrix) PURE;
 
-    /** 
+    /**
      * getLastPt
      * @brief    Return the last point on the path.
      * @param lastPt The structure to receive the last point.
@@ -788,7 +1324,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(BOOL, getLastPt)(CTHIS_ fPoint * lastPt) SCONST PURE;
 
-    /** 
+    /**
      * addString
      * @brief    Add a string to the path.
      * @param pszText The string to add.
@@ -799,14 +1335,14 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(void, addString)(THIS_ LPCTSTR pszText, int nLen, float x, float y, const IFontS *pFont) PURE;
 
-    /** 
+    /**
      * clone
      * @brief    Clone the current path.
      * @return   IPathS* -- A pointer to the cloned path.
      */
     STDMETHOD_(IPathS *, clone)(CTHIS) SCONST PURE;
 
-    /** 
+    /**
      * beginFigure
      * @brief    Begin a new figure in the path.
      * @param x  The x-coordinate of the starting point.
@@ -816,7 +1352,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(BOOL, beginFigure)(THIS_ float x, float y, BOOL bFill DEF_VAL(TRUE)) PURE;
 
-    /** 
+    /**
      * endFigure
      * @brief    End the current figure in the path.
      * @param bClose Whether to close the figure.
@@ -824,14 +1360,14 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(BOOL, endFigure)(THIS_ BOOL bClose) PURE;
 
-    /** 
+    /**
      * getLength
      * @brief    Get the length of the path.
      * @return   float -- The length of the path.
      */
     STDMETHOD_(float, getLength)(CTHIS) SCONST PURE;
 
-    /** 
+    /**
      * getPosTan
      * @brief    Get the position and tangent at a given distance along the path.
      * @param distance The distance along the path.
@@ -841,13 +1377,13 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(BOOL, getPosTan)(CTHIS_ float distance, fPoint *pos, fPoint *vec) SCONST PURE;
 
-    /** 
+    /**
      * close
      * @brief    Close the current path to stop editing.
      */
     STDMETHOD_(void, close)(THIS) PURE;
 
-    /** 
+    /**
      * hitTest
      * @brief    Test if a point hits the path.
      * @param x  The x-coordinate of the point.
@@ -856,7 +1392,7 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(BOOL, hitTest)(CTHIS_ float x, float y) SCONST PURE;
 
-    /** 
+    /**
      * hitTestStroke
      * @brief    Test if a point hits the stroked path.
      * @param x         The x-coordinate of the point.
@@ -866,7 +1402,6 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      */
     STDMETHOD_(BOOL, hitTestStroke)(CTHIS_ float x, float y, float strokeSize) SCONST PURE;
 };
-
 
 /**
  * @struct _GradientInfo
@@ -882,13 +1417,13 @@ typedef struct _GradientInfo
             float radius;  // Radius for radial gradient.
             float centerX; // X-coordinate of the center (0.0 -> 1.0, 0.5 is center).
             float centerY; // Y-coordinate of the center (0.0 -> 1.0, 0.5 is center).
-        } radial; // Parameters for radial gradient.
+        } radial;          // Parameters for radial gradient.
         struct
         {
             BOOL bFullArc; // True if the sweep gradient is rendered for a full circle.
             float centerX; // X-coordinate of the center (0.0 -> 1.0, 0.5 is center).
             float centerY; // Y-coordinate of the center (0.0 -> 1.0, 0.5 is center).
-        } sweep; // Parameters for sweep gradient.
+        } sweep;           // Parameters for sweep gradient.
     };
 } GradientInfo;
 
@@ -1278,197 +1813,197 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
      */
     STDMETHOD_(HRESULT, DrawBitmap)(THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, int xSrc, int ySrc, BYTE byAlpha DEF_VAL(0xFF)) PURE;
 
- /**
- * @brief Draws a bitmap with expansion mode.
- * @param pRcDest Destination rectangle for the bitmap.
- * @param pBitmap Pointer to the bitmap object to draw.
- * @param pRcSrc Source rectangle within the bitmap.
- * @param expendMode Expansion mode (e.g., stretch, tile).
- * @param byAlpha Optional alpha value for blending (default is 0xFF).
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, DrawBitmapEx)
-(THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, UINT expendMode, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    /**
+     * @brief Draws a bitmap with expansion mode.
+     * @param pRcDest Destination rectangle for the bitmap.
+     * @param pBitmap Pointer to the bitmap object to draw.
+     * @param pRcSrc Source rectangle within the bitmap.
+     * @param expendMode Expansion mode (e.g., stretch, tile).
+     * @param byAlpha Optional alpha value for blending (default is 0xFF).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, DrawBitmapEx)
+    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, UINT expendMode, BYTE byAlpha DEF_VAL(0xFF)) PURE;
 
-/**
- * @brief Draws a 9-patch bitmap.
- * @param pRcDest Destination rectangle for the bitmap.
- * @param pBitmap Pointer to the bitmap object to draw.
- * @param pRcSrc Source rectangle within the bitmap.
- * @param pRcSourMargin Margins for the 9-patch source.
- * @param expendMode Expansion mode (e.g., stretch, tile).
- * @param byAlpha Optional alpha value for blending (default is 0xFF).
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, DrawBitmap9Patch)
-(THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, LPCRECT pRcSourMargin, UINT expendMode, BYTE byAlpha DEF_VAL(0xFF)) PURE;
+    /**
+     * @brief Draws a 9-patch bitmap.
+     * @param pRcDest Destination rectangle for the bitmap.
+     * @param pBitmap Pointer to the bitmap object to draw.
+     * @param pRcSrc Source rectangle within the bitmap.
+     * @param pRcSourMargin Margins for the 9-patch source.
+     * @param expendMode Expansion mode (e.g., stretch, tile).
+     * @param byAlpha Optional alpha value for blending (default is 0xFF).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, DrawBitmap9Patch)
+    (THIS_ LPCRECT pRcDest, const IBitmapS *pBitmap, LPCRECT pRcSrc, LPCRECT pRcSourMargin, UINT expendMode, BYTE byAlpha DEF_VAL(0xFF)) PURE;
 
-/**
- * @brief Performs a bit-block transfer (BitBlt) operation.
- * @param pRcDest Destination rectangle for the BitBlt operation.
- * @param pRTSour Pointer to the source render target.
- * @param xSrc X-coordinate of the source point.
- * @param ySrc Y-coordinate of the source point.
- * @param dwRop Raster operation code (default is kSrcCopy).
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, BitBlt)
-(THIS_ LPCRECT pRcDest, IRenderTarget * pRTSour, int xSrc, int ySrc, DWORD dwRop DEF_VAL(kSrcCopy)) PURE;
+    /**
+     * @brief Performs a bit-block transfer (BitBlt) operation.
+     * @param pRcDest Destination rectangle for the BitBlt operation.
+     * @param pRTSour Pointer to the source render target.
+     * @param xSrc X-coordinate of the source point.
+     * @param ySrc Y-coordinate of the source point.
+     * @param dwRop Raster operation code (default is kSrcCopy).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, BitBlt)
+    (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSour, int xSrc, int ySrc, DWORD dwRop DEF_VAL(kSrcCopy)) PURE;
 
-/**
- * @brief Performs an alpha-blended transfer from one render target to another.
- * @param pRcDest Destination rectangle for the alpha blend.
- * @param pRTSrc Pointer to the source render target.
- * @param pRcSrc Source rectangle for the alpha blend.
- * @param byAlpha Alpha value for blending.
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, AlphaBlend)
-(THIS_ LPCRECT pRcDest, IRenderTarget * pRTSrc, LPCRECT pRcSrc, BYTE byAlpha) PURE;
+    /**
+     * @brief Performs an alpha-blended transfer from one render target to another.
+     * @param pRcDest Destination rectangle for the alpha blend.
+     * @param pRTSrc Pointer to the source render target.
+     * @param pRcSrc Source rectangle for the alpha blend.
+     * @param byAlpha Alpha value for blending.
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, AlphaBlend)
+    (THIS_ LPCRECT pRcDest, IRenderTarget * pRTSrc, LPCRECT pRcSrc, BYTE byAlpha) PURE;
 
-/**
- * @brief Retrieves the current rendering object of the specified type.
- * @param uType Type of the rendering object (e.g., pen, brush).
- * @return Pointer to the current rendering object.
- */
-STDMETHOD_(IRenderObj *, GetCurrentObject)(THIS_ OBJTYPE uType) PURE;
+    /**
+     * @brief Retrieves the current rendering object of the specified type.
+     * @param uType Type of the rendering object (e.g., pen, brush).
+     * @return Pointer to the current rendering object.
+     */
+    STDMETHOD_(IRenderObj *, GetCurrentObject)(THIS_ OBJTYPE uType) PURE;
 
-/**
- * @brief Resets the specified rendering object to its default state.
- * @param objType Type of the rendering object to reset.
- * @param pOldObj Optional pointer to receive the previous object (default is NULL).
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, SelectDefaultObject)
-(THIS_ OBJTYPE objType, IRenderObj * *pOldObj DEF_VAL(NULL)) PURE;
+    /**
+     * @brief Resets the specified rendering object to its default state.
+     * @param objType Type of the rendering object to reset.
+     * @param pOldObj Optional pointer to receive the previous object (default is NULL).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, SelectDefaultObject)
+    (THIS_ OBJTYPE objType, IRenderObj * *pOldObj DEF_VAL(NULL)) PURE;
 
-/**
- * @brief Selects a new rendering object and optionally retrieves the previous one.
- * @param pObj Pointer to the new rendering object.
- * @param pOldObj Optional pointer to receive the previous object (default is NULL).
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, SelectObject)
-(THIS_ IRenderObj * pObj, IRenderObj * *pOldObj DEF_VAL(NULL)) PURE;
+    /**
+     * @brief Selects a new rendering object and optionally retrieves the previous one.
+     * @param pObj Pointer to the new rendering object.
+     * @param pOldObj Optional pointer to receive the previous object (default is NULL).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, SelectObject)
+    (THIS_ IRenderObj * pObj, IRenderObj * *pOldObj DEF_VAL(NULL)) PURE;
 
-/**
- * @brief Retrieves the current text color.
- * @return COLORREF representing the current text color.
- */
-STDMETHOD_(COLORREF, GetTextColor)(THIS) PURE;
+    /**
+     * @brief Retrieves the current text color.
+     * @return COLORREF representing the current text color.
+     */
+    STDMETHOD_(COLORREF, GetTextColor)(THIS) PURE;
 
-/**
- * @brief Sets the current text color.
- * @param color New text color.
- * @return COLORREF representing the previous text color.
- */
-STDMETHOD_(COLORREF, SetTextColor)(THIS_ COLORREF color) PURE;
+    /**
+     * @brief Sets the current text color.
+     * @param color New text color.
+     * @return COLORREF representing the previous text color.
+     */
+    STDMETHOD_(COLORREF, SetTextColor)(THIS_ COLORREF color) PURE;
 
-/**
- * @brief Sets the mask filter for anti-aliasing effects.
- * @param pMaskFilter Pointer to the mask filter object.
- */
-STDMETHOD_(void, SetMaskFilter)(THIS_ IMaskFilter * pMaskFilter) PURE;
+    /**
+     * @brief Sets the mask filter for anti-aliasing effects.
+     * @param pMaskFilter Pointer to the mask filter object.
+     */
+    STDMETHOD_(void, SetMaskFilter)(THIS_ IMaskFilter * pMaskFilter) PURE;
 
-/**
- * @brief Retrieves the current mask filter.
- * @return Pointer to the current mask filter object.
- */
-STDMETHOD_(IMaskFilter *, GetMaskFilter)(THIS) PURE;
+    /**
+     * @brief Retrieves the current mask filter.
+     * @return Pointer to the current mask filter object.
+     */
+    STDMETHOD_(IMaskFilter *, GetMaskFilter)(THIS) PURE;
 
-/**
- * @brief Retrieves a device context (DC) compatible with the render target.
- * @param uFlag Flags for DC retrieval.
- * @return Handle to the device context (HDC).
- */
-STDMETHOD_(HDC, GetDC)(THIS_ UINT uFlag) PURE;
+    /**
+     * @brief Retrieves a device context (DC) compatible with the render target.
+     * @param uFlag Flags for DC retrieval.
+     * @return Handle to the device context (HDC).
+     */
+    STDMETHOD_(HDC, GetDC)(THIS_ UINT uFlag) PURE;
 
-/**
- * @brief Releases a previously retrieved device context (DC).
- * @param hdc Handle to the device context to release.
- * @param pRc Optional pointer to a rectangle defining the area to update (default is NULL).
- */
-STDMETHOD_(void, ReleaseDC)(THIS_ HDC hdc, LPCRECT pRc DEF_VAL(NULL)) PURE;
+    /**
+     * @brief Releases a previously retrieved device context (DC).
+     * @param hdc Handle to the device context to release.
+     * @param pRc Optional pointer to a rectangle defining the area to update (default is NULL).
+     */
+    STDMETHOD_(void, ReleaseDC)(THIS_ HDC hdc, LPCRECT pRc DEF_VAL(NULL)) PURE;
 
-/**
- * @brief Sets the coordinate transformation matrix.
- * @param matrix Array of 9 floats representing the new 3x3 transformation matrix.
- * @param oldMatrix Optional array of 9 floats to store the previous transformation matrix (default is NULL).
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, SetTransform)
-(THIS_ const float matrix[9], float oldMatrix[9] DEF_VAL(NULL)) PURE;
+    /**
+     * @brief Sets the coordinate transformation matrix.
+     * @param matrix Array of 9 floats representing the new 3x3 transformation matrix.
+     * @param oldMatrix Optional array of 9 floats to store the previous transformation matrix (default is NULL).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, SetTransform)
+    (THIS_ const float matrix[9], float oldMatrix[9] DEF_VAL(NULL)) PURE;
 
-/**
- * @brief Retrieves the current coordinate transformation matrix.
- * @param matrix Array of 9 floats to store the current 2x3 transformation matrix.
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, GetTransform)(CTHIS_ float matrix[9]) SCONST PURE;
+    /**
+     * @brief Retrieves the current coordinate transformation matrix.
+     * @param matrix Array of 9 floats to store the current 2x3 transformation matrix.
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, GetTransform)(CTHIS_ float matrix[9]) SCONST PURE;
 
-/**
- * @brief Retrieves the color of a specific pixel.
- * @param x X-coordinate of the pixel.
- * @param y Y-coordinate of the pixel.
- * @return COLORREF representing the color of the pixel.
- */
-STDMETHOD_(COLORREF, GetPixel)(THIS_ int x, int y) PURE;
+    /**
+     * @brief Retrieves the color of a specific pixel.
+     * @param x X-coordinate of the pixel.
+     * @param y Y-coordinate of the pixel.
+     * @return COLORREF representing the color of the pixel.
+     */
+    STDMETHOD_(COLORREF, GetPixel)(THIS_ int x, int y) PURE;
 
-/**
- * @brief Sets the color of a specific pixel.
- * @param x X-coordinate of the pixel.
- * @param y Y-coordinate of the pixel.
- * @param cr New color for the pixel.
- * @return COLORREF representing the previous color of the pixel.
- */
-STDMETHOD_(COLORREF, SetPixel)(THIS_ int x, int y, COLORREF cr) PURE;
+    /**
+     * @brief Sets the color of a specific pixel.
+     * @param x X-coordinate of the pixel.
+     * @param y Y-coordinate of the pixel.
+     * @param cr New color for the pixel.
+     * @return COLORREF representing the previous color of the pixel.
+     */
+    STDMETHOD_(COLORREF, SetPixel)(THIS_ int x, int y, COLORREF cr) PURE;
 
-/**
- * @brief Modifies the current clipping region using a path.
- * @param path Pointer to the path object to combine with the current clip.
- * @param mode Region operation mode (e.g., RGN_AND, RGN_OR).
- * @param doAntiAlias Boolean indicating whether anti-aliasing should be applied (default is FALSE).
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, PushClipPath)
-(THIS_ const IPathS *path, UINT mode, BOOL doAntiAlias DEF_VAL(FALSE)) PURE;
+    /**
+     * @brief Modifies the current clipping region using a path.
+     * @param path Pointer to the path object to combine with the current clip.
+     * @param mode Region operation mode (e.g., RGN_AND, RGN_OR).
+     * @param doAntiAlias Boolean indicating whether anti-aliasing should be applied (default is FALSE).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, PushClipPath)
+    (THIS_ const IPathS *path, UINT mode, BOOL doAntiAlias DEF_VAL(FALSE)) PURE;
 
-/**
- * @brief Draws the outline of a path using the currently selected pen.
- * @param path Pointer to the path object to draw.
- * @param pathEffect Optional pointer to a path effect object (default is NULL).
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, DrawPath)
-(THIS_ const IPathS *path, IPathEffect *pathEffect DEF_VAL(NULL)) PURE;
+    /**
+     * @brief Draws the outline of a path using the currently selected pen.
+     * @param path Pointer to the path object to draw.
+     * @param pathEffect Optional pointer to a path effect object (default is NULL).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, DrawPath)
+    (THIS_ const IPathS *path, IPathEffect *pathEffect DEF_VAL(NULL)) PURE;
 
-/**
- * @brief Fills the interior of a path using the currently selected brush.
- * @param path Pointer to the path object to fill.
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, FillPath)(THIS_ const IPathS *path) PURE;
+    /**
+     * @brief Fills the interior of a path using the currently selected brush.
+     * @param path Pointer to the path object to fill.
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, FillPath)(THIS_ const IPathS *path) PURE;
 
-/**
- * @brief Sets the transfer mode for drawing operations.
- * @param mode New transfer mode.
- * @param pOldMode Optional pointer to store the previous transfer mode (default is NULL).
- * @return HRESULT indicating success or failure.
- */
-STDMETHOD_(HRESULT, SetXfermode)(THIS_ int mode, int *pOldMode DEF_VAL(NULL)) PURE;
+    /**
+     * @brief Sets the transfer mode for drawing operations.
+     * @param mode New transfer mode.
+     * @param pOldMode Optional pointer to store the previous transfer mode (default is NULL).
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, SetXfermode)(THIS_ int mode, int *pOldMode DEF_VAL(NULL)) PURE;
 
-/**
- * @brief Enables or disables anti-aliasing for drawing operations.
- * @param bAntiAlias Boolean indicating whether anti-aliasing should be enabled.
- * @return BOOL indicating the previous anti-aliasing state.
- */
-STDMETHOD_(BOOL, SetAntiAlias)(THIS_ BOOL bAntiAlias) PURE;
+    /**
+     * @brief Enables or disables anti-aliasing for drawing operations.
+     * @param bAntiAlias Boolean indicating whether anti-aliasing should be enabled.
+     * @return BOOL indicating the previous anti-aliasing state.
+     */
+    STDMETHOD_(BOOL, SetAntiAlias)(THIS_ BOOL bAntiAlias) PURE;
 
-/**
- * @brief Retrieves the current anti-aliasing state.
- * @return BOOL indicating whether anti-aliasing is enabled.
- */
-STDMETHOD_(BOOL, GetAntiAlias)(CTHIS) SCONST PURE;
+    /**
+     * @brief Retrieves the current anti-aliasing state.
+     * @return BOOL indicating whether anti-aliasing is enabled.
+     */
+    STDMETHOD_(BOOL, GetAntiAlias)(CTHIS) SCONST PURE;
 };
 
 /**

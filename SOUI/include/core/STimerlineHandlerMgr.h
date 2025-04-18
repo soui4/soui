@@ -14,7 +14,7 @@ SNSBEGIN
  * It implements the ITimelineHandler interface and forwards the OnNextFrame notification to all registered handlers.
  */
 class STimerlineHandlerMgr : public ITimelineHandler {
-public:
+  public:
     /**
      * @brief Constructor.
      */
@@ -45,7 +45,7 @@ public:
      */
     bool IsEmpty() const;
 
-public:
+  public:
     /**
      * @brief Called when the next frame is ready.
      * @param THIS_ Pointer to the current instance.
@@ -53,9 +53,9 @@ public:
      */
     STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
 
-protected:
+  protected:
     typedef SMap<ITimelineHandler *, bool> TLMAP; // Map type for storing timeline handlers.
-    TLMAP m_mapHandlers; // Map of registered timeline handlers.
+    TLMAP m_mapHandlers;                          // Map of registered timeline handlers.
 };
 
 SNSEND

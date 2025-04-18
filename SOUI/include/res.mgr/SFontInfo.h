@@ -4,40 +4,57 @@
 SNSBEGIN
 
 /**
- * @union      FONTSTYLE
- * @brief      FONT的风格
+ * @union FONTSTYLE
+ * @brief Font style union
  *
- * Describe
+ * Describes the style of a font using a union of a 64-bit integer and a bitfield structure.
  */
 union FONTSTYLE {
-    uint64_t syle; // DWORD版本的风格
+    uint64_t syle; // DWORD version of the style
+
+    /**
+     * @struct attr
+     * @brief Bitfield structure for font style attributes
+     */
     struct
     {
-        uint64_t byCharset : 8;    //字符集
-        uint64_t byWeight : 8;     // weight/4
-        uint64_t fItalic : 1;      //斜体标志位
-        uint64_t fUnderline : 1;   //下划线标志位
-        uint64_t fBold : 1;        //粗体标志位
-        uint64_t fStrike : 1;      //删除线标志位
-        uint64_t fEscapement : 12; //角度, 以0.1角度为单位
-        uint64_t reserved : 13;    // reserved
-        uint64_t szIsAdding : 1;   // cSize is adding
-        uint64_t szUnit : 2;       // cSize unit,(0-3)
-        uint64_t nSize : 16;       //字体大小，为short有符号类型
+        uint64_t byCharset : 8;    /**< Character set */
+        uint64_t byWeight : 8;     /**< Weight/4 */
+        uint64_t fItalic : 1;      /**< Italic flag */
+        uint64_t fUnderline : 1;   /**< Underline flag */
+        uint64_t fBold : 1;        /**< Bold flag */
+        uint64_t fStrike : 1;      /**< Strike-through flag */
+        uint64_t fEscapement : 12; /**< Angle, in 0.1 degree units */
+        uint64_t reserved : 13;    /**< Reserved */
+        uint64_t szIsAdding : 1;   /**< cSize is adding */
+        uint64_t szUnit : 2;       /**< cSize unit (0-3) */
+        uint64_t nSize : 16;       /**< Font size, as a signed short */
     } attr;
 
+    /**
+     * @brief Constructor for FONTSTYLE
+     * @param _style Initial style value (default is 0)
+     */
     FONTSTYLE(uint64_t _style = 0)
         : syle(_style)
     {
     }
 };
 
+/**
+ * @struct FontInfo
+ * @brief Font information structure
+ *
+ * Contains details about a font, including style, face name, property extensions, and scale.
+ */
 struct FontInfo
 {
-    FONTSTYLE style;
-    SStringW strFaceName;
-    SStringW strPropEx;
-    int scale;
+    FONTSTYLE style;      /**< Font style */
+    SStringW strFaceName; /**< Font face name */
+    SStringW strPropEx;   /**< Font property extensions */
+    int scale;            /**< Font scale */
 };
+
 SNSEND
+
 #endif // __SFONTINFO__H__

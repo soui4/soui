@@ -6,11 +6,6 @@
 
 SNSBEGIN
 
-/**
- * @struct IRwLock
- * @brief Interface for a read-write lock.
- * @note This struct is intended for internal use.
- */
 struct IRwLock;
 
 /**

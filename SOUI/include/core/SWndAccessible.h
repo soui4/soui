@@ -20,10 +20,10 @@ class SOUI_EXP SAccessible
     : public IAccessible
     , public IAccHelper
     , public SUnknown {
-protected:
+  protected:
     SWindow *m_pWnd; // Pointer to the associated SWindow.
 
-public:
+  public:
     /**
      * @brief Constructor.
      * @param pWnd Pointer to the SWindow to provide accessibility support for.
@@ -35,7 +35,7 @@ public:
      */
     ~SAccessible();
 
-protected:
+  protected:
     /**
      * @brief Validates the navigation start point.
      * @param pvar Pointer to the VARIANT containing the navigation start point.
@@ -43,21 +43,23 @@ protected:
      */
     BOOL accValidateNavStart(VARIANT *pvar) const;
 
-public:
+  public:
     // Implement IAccHelper
     /**
      * @brief Sets the owner window for accessibility.
      * @param pOwner Pointer to the owner window.
      */
-    STDMETHOD_(void, SetOwner)(THIS_ IWindow *pOwner) OVERRIDE {
-        m_pWnd = (SWindow*)pOwner;
+    STDMETHOD_(void, SetOwner)(THIS_ IWindow *pOwner) OVERRIDE
+    {
+        m_pWnd = (SWindow *)pOwner;
     }
 
     /**
      * @brief Gets the owner window for accessibility.
      * @return Pointer to the owner window.
      */
-    STDMETHOD_(IWindow *, GetOwner)(CTHIS) SCONST OVERRIDE {
+    STDMETHOD_(IWindow *, GetOwner)(CTHIS) SCONST OVERRIDE
+    {
         return m_pWnd;
     }
 
@@ -273,7 +275,7 @@ public:
      */
     STDMETHODIMP Invoke(DISPID dispIdMember, REFIID riid, LCID lcid, WORD wFlags, DISPPARAMS FAR *pDispParams, VARIANT FAR *pVarResult, EXCEPINFO FAR *pExcepInfo, unsigned int FAR *puArgErr);
 
-public:
+  public:
     IUNKNOWN_BEGIN(IAccessible)
     IUNKNOWN_ADD_IID(IAccHelper)
     IUNKNOWN_ADD_IID(IDispatch)

@@ -1,4 +1,14 @@
-﻿#ifndef __STOOLTIP_I__H__
+﻿/**
+ * @file       stooltip-i.h
+ * @brief      Interface for Tooltip Objects
+ * @version    v1.0
+ * @author     SOUI group
+ * @date       2014/08/01
+ *
+ * @details    This file defines the interfaces for tooltip objects and their factory.
+ */
+
+#ifndef __STOOLTIP_I__H__
 #define __STOOLTIP_I__H__
 
 #include <interface/obj-ref-i.h>
@@ -7,129 +17,132 @@
 SNSBEGIN
 
 /**
- * @struct    TIPID
- * @brief     标识一个tooltip的ID
+ * @struct TIPID
+ * @brief  Identifier for a tooltip
  *
- * Describe
+ * @details This structure uniquely identifies a tooltip using two DWORD values and a boolean flag
+ * indicating whether it is a non-client area tooltip.
  */
 typedef struct TIPID
 {
-    DWORD dwHi;  // ID1, 用来保存一个SWND。
-    DWORD dwLow; // ID2, 用来保存附加数据
-    BOOL bNcTip; // 非客户区tip
+    DWORD dwHi;  //!< ID1, used to save a SWND.
+    DWORD dwLow; //!< ID2, used to save additional data.
+    BOOL bNcTip; //!< Flag indicating if the tooltip is for the non-client area.
 } TIPID;
 
 /**
- * @struct    IToolTip
- * @brief     tooltip对象接口
+ * @enum TipAlign
+ * @brief Alignment options for tooltips
  *
- * Describe
+ * @details These constants define the possible alignment options for tooltips, including horizontal and vertical alignments.
  */
-
 typedef enum TipAlign
 {
-    TA_AUTO = 0,
-    TA_X_LEFT = 1,
-    TA_X_CENTER = 2,
-    TA_X_RIGHT = 3,
-    TA_X_MASK = 0x0f,
-    TA_Y_TOP = 0x10,
-    TA_Y_CENTER = 0x20,
-    TA_Y_BOTTOM = 0x30,
-    TA_Y_MASK = 0xF0,
+    TA_AUTO = 0,        //!< Automatic alignment.
+    TA_X_LEFT = 1,      //!< Align left horizontally.
+    TA_X_CENTER = 2,    //!< Align center horizontally.
+    TA_X_RIGHT = 3,     //!< Align right horizontally.
+    TA_X_MASK = 0x0f,   //!< Mask for horizontal alignment.
+    TA_Y_TOP = 0x10,    //!< Align top vertically.
+    TA_Y_CENTER = 0x20, //!< Align center vertically.
+    TA_Y_BOTTOM = 0x30, //!< Align bottom vertically.
+    TA_Y_MASK = 0xF0,   //!< Mask for vertical alignment.
 } TipAlign;
 
+/**
+ * @struct IToolTip
+ * @brief Interface for Tooltip Objects
+ *
+ * @details This interface defines the methods for tooltip objects, which handle the display and management of tooltips.
+ */
 #undef INTERFACE
 #define INTERFACE IToolTip
 DECLARE_INTERFACE_(IToolTip, IMsgFilter)
 {
+    /**
+     * @brief Pre-translates messages for the tooltip.
+     *
+     * @param pMsg Pointer to the message to be translated.
+     * @return BOOL TRUE if the message is handled, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG * pMsg) PURE;
 
     /**
-     * UpdateTip
-     * @brief    更新当前的tooltip
-     * @param    const TIPID & id --  tooltip的ID
-     * @param    CRect rc --  tooltip的感应区
-     * @param    LPCTSTR pszTip --  tooltip字符串
-     * @param    int nScale -- 当前的缩放比例
-     * @return   void
+     * @brief Updates the current tooltip.
      *
-     * Describe
+     * @param id Pointer to the tooltip ID.
+     * @param rc Rectangle defining the tooltip's感应 area.
+     * @param pszTip Tooltip string.
+     * @param nScale Current scaling factor.
      */
     STDMETHOD_(void, UpdateTip)(THIS_ const TIPID *id, RECT rc, LPCTSTR pszTip, int nScale) PURE;
 
     /**
-     * @brief 在指定位置显示tooltip
-     * @param LPCRECT rc tip显示位置，相对于container
-     * @param UINT tipAlign tip对齐方式
-     * @param pszTip LPCTSTR tip内容，为null时退出固定tip
-     * @param int nScale -- 当前的缩放比例
-     * @return
+     * @brief Displays the tooltip at a specified position.
+     *
+     * @param rc Rectangle defining the tooltip's display position relative to the container.
+     * @param tipAlign Tooltip alignment options.
+     * @param pszTip Tooltip content. If NULL, the fixed tooltip is exited.
+     * @param nScale Current scaling factor.
      */
     STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign, LPCTSTR pszTip, int nScale) PURE;
 
     /**
-     * ClearTip
-     * @brief    清除当前的tooltip
-     * @return   void
-     *
-     * Describe
+     * @brief Clears the current tooltip.
      */
     STDMETHOD_(void, ClearTip)(THIS) PURE;
 
     /**
-     * RelayEvent
-     * @brief    鼠标消息的中继
-     * @param    const MSG * pMsg --  鼠标消息
-     * @return   void
+     * @brief Relays mouse messages to the tooltip.
      *
-     * Describe
+     * @param pMsg Pointer to the mouse message.
      */
     STDMETHOD_(void, RelayEvent)(THIS_ const MSG *pMsg) PURE;
 };
 
 /**
- * @struct    IToolTipFactory
- * @brief     tooltip类厂
+ * @struct IToolTipFactory
+ * @brief Interface for Tooltip Factory
  *
- * Describe
+ * @details This interface defines the methods for creating and destroying tooltip objects.
  */
 #undef INTERFACE
 #define INTERFACE IToolTipFactory
 DECLARE_INTERFACE_(IToolTipFactory, IObjRef)
 {
-    //!添加引用
-    /*!
+    /**
+     * @brief Increments the reference count of the object.
+     *
+     * @return long The new reference count.
      */
     STDMETHOD_(long, AddRef)(THIS) PURE;
 
-    //!释放引用
-    /*!
+    /**
+     * @brief Decrements the reference count of the object.
+     *
+     * @return long The new reference count.
      */
     STDMETHOD_(long, Release)(THIS) PURE;
 
-    //!释放对象
-    /*!
+    /**
+     * @brief Final release of the object, performing cleanup if necessary.
      */
     STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 
     /**
-     * CreateToolTip
-     * @brief    创建tooltip对象
-     * @param    HWND hHost --  soui host
-     * @return   IToolTip * 创建的tooltip对象
+     * @brief Creates a tooltip object.
      *
-     * Describe  不要将hHost做为tooltip的Owner，否则可能导致程序运行异常。
+     * @param hHost Handle to the SOUI host window.
+     * @return IToolTip* Pointer to the created tooltip object.
+     *
+     * @details Do not use hHost as the owner of the tooltip to avoid potential runtime issues.
      */
     STDMETHOD_(IToolTip *, CreateToolTip)(THIS_ HWND hHost) PURE;
 
     /**
-     * DestroyToolTip
-     * @brief    销毁tooltip对象
-     * @param    IToolTip * pToolTip --  待销毁tooltip
-     * @return   void
+     * @brief Destroys a tooltip object.
      *
-     * Describe
+     * @param pToolTip Pointer to the tooltip object to be destroyed.
      */
     STDMETHOD_(void, DestroyToolTip)(THIS_ IToolTip * pToolTip) PURE;
 };

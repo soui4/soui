@@ -11,6 +11,10 @@
 
 #undef INTERFACE
 #define INTERFACE IObjRef
+/**
+ * @brief Interface for reference counting.
+ * @details This interface provides methods for increasing and decreasing the reference count of an object.
+ */
 DECLARE_INTERFACE(IObjRef)
 {
     /**

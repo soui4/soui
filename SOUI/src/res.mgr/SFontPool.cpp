@@ -252,7 +252,8 @@ SStringW SFontPool::FontInfoToString(const FontInfo &fi)
 {
     char szBuf[200];
     SLogStream s(szBuf, 200);
-    s << KFontFace << KPropSeprator << "\'"<< fi.strFaceName.c_str() << "\'"<< ",";
+    s << KFontFace << KPropSeprator << "\'" << fi.strFaceName.c_str() << "\'"
+      << ",";
     s << KFontSize << KPropSeprator << (short)fi.style.attr.nSize << ",";
     s << KFontCharset << KPropSeprator << fi.style.attr.byCharset << ",";
     s << KFontWeight << KPropSeprator << fi.style.attr.byWeight * 4 << ",";

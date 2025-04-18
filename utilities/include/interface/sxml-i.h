@@ -101,7 +101,7 @@ DECLARE_INTERFACE(IXmlAttr)
 };
 
 /**
- * @enum XmlNodeType
+ * @enum _XmlNodeType
  * @brief Enumerates the types of XML nodes.
  */
 typedef enum _XmlNodeType
@@ -321,7 +321,7 @@ DECLARE_INTERFACE(IXmlNode)
 };
 
 /**
- * @enum XmlStatus
+ * @enum _XmlStatus
  * @brief Enumerates the possible parsing statuses.
  */
 typedef enum _XmlStatus
@@ -346,7 +346,7 @@ typedef enum _XmlStatus
 } XmlStatus;
 
 /**
- * @enum XmlEncoding
+ * @enum _XmlEncoding
  * @brief Enumerates the possible XML encodings.
  */
 typedef enum _XmlEncoding
@@ -365,7 +365,7 @@ typedef enum _XmlEncoding
 } XmlEncoding;
 
 /**
- * @enum XmlParseOpt
+ * @enum _XmlParseOpt
  * @brief Enumerates the parsing options.
  */
 typedef enum _XmlParseOpt
@@ -441,7 +441,7 @@ typedef enum _XmlParseOpt
 } XmlParseOpt;
 
 /**
- * @struct XmlParseResult
+ * @struct _XmlParseResult
  * @brief Structure containing the result of XML parsing.
  */
 typedef struct _XmlParseResult
@@ -464,6 +464,10 @@ typedef struct _XmlParseResult
 
 #undef INTERFACE
 #define INTERFACE IXmlDoc
+/**
+ * @interface IXmlDoc
+ * @brief Interface for XML Document.
+ */
 DECLARE_INTERFACE_(IXmlDoc, IObjRef)
 {
     /**
