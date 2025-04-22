@@ -41,7 +41,7 @@ SNSBEGIN
         void SortChildren(HSTREEITEM hItem,SORTINFO si);
         
     protected:
-        static int WINAPI SortChildrenCB(void* pCtx,const void *phItem1,const void *phItem2);
+        static int  SortChildrenCB(void *pCtx, const void *phItem1, const void *phItem2);
         
         virtual void DrawTreeItem(IRenderTarget *pRT, CRect & rc,HSTREEITEM hItem);
         virtual void DrawListItem(IRenderTarget *pRT, CRect & rc,HSTREEITEM hItem);

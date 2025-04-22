@@ -435,6 +435,24 @@ TEST(demo,CreateThread){
     CloseHandle(hThread);
 }
 
+
+TEST(demo,ini){
+    //test ini apis.
+    const TCHAR * sec1=_T("value_int=10\n");
+    const TCHAR * sec2=_T("value_str=hello soui");
+    TCHAR szTmpPath[MAX_PATH];
+    GetTempPath(MAX_PATH,szTmpPath);
+    TCHAR szPath[MAX_PATH];
+    GetTempFileName(szTmpPath,_T("ini_test"),0,szPath);
+    WritePrivateProfileSection(_T("test"),sec1,szPath);
+    WritePrivateProfileSection(_T("test2"),sec2,szPath);
+    int value = GetPrivateProfileInt(_T("test"),_T("value_int"),0,szPath);
+    EXPECT_EQ(value,10);
+    EXPECT_TRUE(GetPrivateProfileString(_T("test2"),_T("value_str"),_T(""),szTmpPath,MAX_PATH,szPath));
+    EXPECT_TRUE(_tcscmp(szTmpPath,_T("hello soui"))==0);
+    DeleteFile(szPath);
+}
+
 int run_window();
 TEST(demo,window){
     //EXPECT_EQ(run_window(), 1);

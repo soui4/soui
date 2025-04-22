@@ -1,10 +1,6 @@
 ﻿#include "stdafx.h"
 #include "SImgCanvas.h"
 
-#define INITGUID
-#include <SGuidDef.h>
-
-DEFINE_SGUID2(ImageFormatPNG, 0xb96b3caf, 0x0728, 0x11d3, 0x9d, 0x7b, 0x00, 0x00, 0xf8, 0x1e, 0xf3, 0x2e);//copy from gdi+
 
 namespace SOUI
 {
@@ -136,7 +132,7 @@ namespace SOUI
 		IBitmapS * pCache = (IBitmapS*)pMemRT->GetCurrentObject(OT_BITMAP);
 		if (nSplit == 1)
 		{
-			return pCache->Save(pszFileName, (const LPVOID)&ImageFormatPNG);
+			return pCache->Save2(pszFileName, Img_PNG);
 		}
 		else
 		{
@@ -156,7 +152,7 @@ namespace SOUI
 			{
 				pMemRT2->BitBlt(rcDst, pMemRT, rcSrc.left, rcSrc.top,0xFF);
 				IBitmapS *pCacheSub = (IBitmapS*)pMemRT2->GetCurrentObject(OT_BITMAP);
-				pCacheSub->Save(SStringW().Format(L"%s_%d.png", strSaveName, i + 1), (const LPVOID)&ImageFormatPNG);
+				pCacheSub->Save2(SStringW().Format(L"%s_%d.png", strSaveName, i + 1),Img_PNG);
 				pMemRT2->ClearRect(rcDst, 0);
 				if (m_bVert) rcSrc.OffsetRect(0, rcSrc.Height());
 				else rcSrc.OffsetRect(rcSrc.Width(), 0);

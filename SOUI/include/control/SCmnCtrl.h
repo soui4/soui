@@ -892,6 +892,20 @@ class SOUI_EXP SCheckBox : public SWindow {
      */
     SCheckBox();
 
+  public:
+    /**
+     * @brief Retrieves the layout rectangle of the children.
+     * @param prc Pointer to the rectangle to receive the layout area.
+     */
+    STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT *prc) SCONST OVERRIDE;
+    /**
+     * @brief Retrieves the desired size of the window.
+     * @param psz Pointer to the size structure to receive the desired size.
+     * @param nParentWid Width of the parent window.
+     * @param nParentHei Height of the parent window.
+     */
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
+
   protected:
     /**
      * @brief 状态图片资源
@@ -905,20 +919,14 @@ class SOUI_EXP SCheckBox : public SWindow {
      */
     SAutoRefPtr<ISkinObj> m_pFocusSkin;
 
+    int m_nCheckBoxSpacing; /** < 复选框与文本之间的间距 */
+
     /**
      * @brief 获取复选框矩形区域
      * @return 返回复选框的显示位置矩形 (CRect)。
      */
     CRect GetCheckRect();
-
-    /**
-     * @brief 测量内容所需的大小
-     * @param wid 父容器宽度
-     * @param hei 父容器高度
-     * @return 返回控件所需的内容大小 (SIZE)。
-     */
-    SIZE MeasureContent(int wid, int hei) override;
-
+    
     /**
      * @brief 获取文本显示区域的大小
      * @param pRect 输出参数，表示文本显示区域的矩形。
@@ -1005,6 +1013,7 @@ class SOUI_EXP SCheckBox : public SWindow {
         ATTR_SKIN(L"skin", m_pSkin, FALSE)           // 定义皮肤资源属性
         ATTR_SKIN(L"focusSkin", m_pFocusSkin, FALSE) // 定义焦点皮肤资源属性
         ATTR_CUSTOM(L"checked", OnAttrCheck)         // 定义自定义属性 "checked"
+        ATTR_INT(L"sep", m_nCheckBoxSpacing, TRUE)   // 定义间距属性
     SOUI_ATTRS_END()
 
     /**
@@ -1086,12 +1095,29 @@ class SOUI_EXP SIconWnd : public TWindowProxy<IIconWnd> {
 class SOUI_EXP SRadioBox : public SWindow {
     DEF_SOBJECT(SWindow, L"radio") // 定义对象类型为 "radio"
 
+    enum{
+      RadioBoxSpacing = 4,
+    };
   public:
     /**
      * @brief 构造函数
      * @details 初始化单选框控件。
      */
     SRadioBox();
+
+  public:
+    /**
+     * @brief Retrieves the layout rectangle of the children.
+     * @param prc Pointer to the rectangle to receive the layout area.
+     */
+    STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT *prc) SCONST OVERRIDE;
+    /**
+     * @brief Retrieves the desired size of the window.
+     * @param psz Pointer to the size structure to receive the desired size.
+     * @param nParentWid Width of the parent window.
+     * @param nParentHei Height of the parent window.
+     */
+    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
 
   protected:
     /**
@@ -1105,14 +1131,6 @@ class SOUI_EXP SRadioBox : public SWindow {
      * @param pRect 输出参数，表示文本显示区域的矩形。
      */
     virtual void GetTextRect(LPRECT pRect);
-
-    /**
-     * @brief 测量内容所需的大小
-     * @param wid 父容器宽度
-     * @param hei 父容器高度
-     * @return 返回控件所需的内容大小 (SIZE)。
-     */
-    SIZE MeasureContent(int wid, int hei) OVERRIDE;
 
     /**
      * @brief 获取对话框代码
