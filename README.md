@@ -30,7 +30,7 @@
 UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.oschina.net/p/skia)渲染），
 控件丰富，扩展灵活（可使用 xml + lua + jx  ），真正做到UI界面与逻辑分离。
 
-
+点击 [SOUI](https://www.soui.com.cn) 访问官网。
 
 ##  **demo基本界面** 
 ![demo1](./doc/demo_png/souidemo1.png)
