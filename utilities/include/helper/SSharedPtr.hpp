@@ -262,6 +262,23 @@ public:
         return _ptr == obj._ptr;
     }
 
+	void reset(T * ptr){
+		if (_ptr != ptr)
+		{
+			_sc->decRefCount();
+			_ptr = NULL;
+			_sc = new SSharedCount<T, Disposer>(ptr);
+			_ptr = ptr;
+		}
+	}
+
+	bool operator !() const{
+		return _ptr==NULL;
+	}
+
+	operator bool() const{
+		return _ptr!=NULL;
+	}
 private:
     T *_ptr;                        /**< Pointer to the managed object. */
     SSharedCount<T, Disposer> *_sc; /**< Pointer to the shared count object. */

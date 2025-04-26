@@ -87,7 +87,7 @@ void CHttpDownloader::_download(const std::string & url,long type, long category
 	std::string strUriMd5 = uri2md5(url);
 	std::string strCacheFile = m_u8CachePath + "/" + strUriMd5 + ".cache";
 
-	std::shared_ptr<SStringA> data;
+	SSharedPtr<SStringA> data;
 
 	//check local cache
 	bool isFoundCache = false;
@@ -100,6 +100,7 @@ void CHttpDownloader::_download(const std::string & url,long type, long category
 			fseek(f, 0, SEEK_END);
 			int nLen = ftell(f);
 			fseek(f, 0, SEEK_SET);
+
 			data.reset(new SStringA('\0',nLen));
 			fread((char*)data->c_str(), 1, nLen, f);
 			fclose(f);

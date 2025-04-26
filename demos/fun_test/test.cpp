@@ -428,7 +428,7 @@ static DWORD WINAPI Thread_Proc(void *p)
 }
 
 TEST(demo,CreateThread){
-    HANDLE hThread = CreateThread(NULL,0,Thread_Proc,nullptr,CREATE_SUSPENDED,nullptr);
+    HANDLE hThread = CreateThread(NULL,0,Thread_Proc,NULL,CREATE_SUSPENDED,NULL);
     ResumeThread(hThread);
     WaitForSingleObject(hThread,INFINITE);
     SLOGI()<<"wait Thread_Proc done";
