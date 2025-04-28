@@ -143,6 +143,10 @@ else()
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS_RELEASE} -s")
   set(CMAKE_C_FLAGS_RELEASE "${CMAKE_C_FLAGS_RELEASE} -s")
 
+  set(CMAKE_SKIP_BUILD_RPATH FALSE)
+  set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
+  set(CMAKE_INSTALL_RPATH $ORIGIN)
+
   add_definitions(-DWCHAR_SIZE=4)
   include_directories(${PROJECT_SOURCE_DIR}/swinx/include)
   add_subdirectory(swinx)
