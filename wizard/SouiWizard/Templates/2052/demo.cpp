@@ -33,7 +33,7 @@
 #define INIT_R_DATA
 #include "res/resource.h"
 
-using namespace SOUI;
+using namespace SNS;
 
 
 class SOUIEngine

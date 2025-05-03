@@ -60,7 +60,7 @@ BOOL CFolderScanHandler::OnTreeDbclick(EventArgs *pEvt)
 
     strPath = strRoot + _T("/") + strPath;
     
-    SStringT strCmd = SStringT().Format(_T("/select, %s"),strPath);
+    SStringT strCmd = SStringT().Format(_T("/select, %s"),strPath.c_str());
     ShellExecute( NULL, _T("open"), _T("explorer.exe"), strCmd, NULL, SW_SHOWNORMAL ); 
     
     return true;

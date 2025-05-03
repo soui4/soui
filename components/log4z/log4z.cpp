@@ -82,7 +82,7 @@
 #include <queue>
 #include <deque>
 #include <stdint.h>
-using namespace SOUI;
+using namespace SNS;
 
 //////////////////////////////////////////////////////////////////////////
 //! -----------------default logger config, can change on this.-----------

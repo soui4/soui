@@ -35,8 +35,7 @@
 #define PI         ((float)3.141592654f)
 #endif
 
-namespace SOUI
-{
+SNSBEGIN
 	//PS_SOLID
 	const float  ps_solid[] ={1.0f,0.0f};
 	const float  ps_dash[] ={5.0f,5.0f};
@@ -2677,7 +2676,7 @@ namespace SOUI
 		}
 	}
 
-}//end of namespace SOUI
+SNSEND
 
 
 EXTERN_C BOOL Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory)

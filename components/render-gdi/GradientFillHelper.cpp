@@ -5,8 +5,7 @@
 #pragma comment(lib,"msimg32.lib")
 #endif
 
-namespace SOUI
-{
+SNSBEGIN
 
 #ifndef GetAValue
 #define GetAValue(rgb)   (LOBYTE((rgb) >> 24))
@@ -60,4 +59,4 @@ void GradientFillRectV( HDC hdc,const RECT *rcFill, COLORREF crTop, COLORREF crB
 	GradientFillRect(hdc, rcFill, items,2,TRUE,0xff);
 }
 
-}//namespace DuiEngine
+SNSEND

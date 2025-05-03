@@ -9,7 +9,7 @@ extern "C"
 
 #include <lua_tinker.h>
 
-using namespace SOUI;
+using namespace SNS;
 
 #include "exp_Basic.h"
 #include "exp_string.h"

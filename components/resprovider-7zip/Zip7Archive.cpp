@@ -14,7 +14,7 @@
 #include <tchar.h>
 #include <malloc.h>
 
-using namespace SOUI;
+using namespace SNS;
 
 namespace SevenZip{
 

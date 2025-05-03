@@ -23,8 +23,7 @@
 // CRect
 
 
-namespace SOUI
-{
+SNSBEGIN
 
 // forward declarations
 class CSize;
@@ -773,6 +772,6 @@ inline void operator /=(SIZE & s, Num n)
 };
 
 
-}; // namespace SOUI
+SNSEND
 
 #endif // __SOUIMISC_H__

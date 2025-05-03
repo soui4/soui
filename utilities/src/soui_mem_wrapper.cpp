@@ -1,10 +1,8 @@
 ﻿#include "soui_mem_wrapper.h"
-#include <malloc.h>
 #include "utilities-def.h"
+#include <stdlib.h>
 
-namespace SOUI
-{
-    
+SNSBEGIN  
     void * soui_mem_wrapper::SouiMalloc( size_t szMem )
     {
         return malloc(szMem);
@@ -26,4 +24,4 @@ namespace SOUI
     }
 
 
-}
+SNSEND

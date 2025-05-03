@@ -10,8 +10,7 @@
 #define __SOUI_MEM_WRAPPER__H__
 #include "utilities-def.h"
 
-namespace SOUI
-{
+SNSBEGIN
     class UTILITIES_API soui_mem_wrapper
     {
     public:
@@ -20,6 +19,6 @@ namespace SOUI
         static void * SouiCalloc(size_t count, size_t szEle);
         static void   SouiFree(void *p);
     };
-}
+SNSEND
 
 #endif // __SOUI_MEM_WRAPPER__H__

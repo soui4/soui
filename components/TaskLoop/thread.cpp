@@ -45,7 +45,11 @@ static void SetThreadName(const char *threadName)
 #include <pthread.h>
 static void SetThreadName(const char *threadName)
 {
+	#ifdef __APPLE__
+	pthread_setname_np(threadName);
+	#else
 	pthread_setname_np(pthread_self(), threadName);
+	#endif
 }
 
 #endif
@@ -127,13 +131,19 @@ bool set_thread_priority(int priority) {
 		return false;
     struct sched_param param;
     int policy = 0;
-    pthread_getschedparam(tid, &policy, &param);
-    param.sched_priority = priority;
+	#ifdef __APPLE__
+    pthread_getschedparam((pthread_t)tid, &policy, &param);
+	param.sched_priority = priority;
+    return pthread_setschedparam((pthread_t)tid, policy, &param) != 0;
+	#else
+	pthread_getschedparam(tid, &policy, &param);
+	param.sched_priority = priority;
     return pthread_setschedparam(tid, policy, &param) != 0;
+	#endif
 }
 
 unsigned int threadProc(unsigned int (CALLBACK *proc)(void*), void *param){
-	tid = pthread_self();
+	tid = (tid_t)pthread_self();
 	return proc(param);
 }
 

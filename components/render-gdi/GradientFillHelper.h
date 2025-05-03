@@ -7,12 +7,10 @@
 #include <windows.h>
 #include <interface/SRender-i.h>
 
-namespace SOUI
-{
-
+SNSBEGIN
 void GradientFillRectV(HDC hdc,const RECT *rcFill, COLORREF crTop, COLORREF crBottom);
 
 void GradientFillRectH(HDC hdc,const RECT *rcFill, COLORREF crLeft, COLORREF crRight);
 
 void GradientFillRect(HDC hdc, const RECT *rcFill,const GradientItem * items, int nCount,BOOL bVert,BYTE byAlpha);
-}//namespace SOUI
+SNSEND

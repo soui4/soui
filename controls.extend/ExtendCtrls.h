@@ -1,8 +1,9 @@
-﻿#pragma once
+﻿#ifndef _SWINDOW_EX_H_
+#define _SWINDOW_EX_H_
+
 #include "core/SWnd.h"
 
-namespace SOUI
-{
+SNSBEGIN
 class SWindowEx : public SWindow {
   public:
     DEF_SOBJECT(SWindow, L"windowex")
@@ -13,4 +14,6 @@ class SWindowEx : public SWindow {
     SOUI_MSG_MAP_END()
 };
 
-}; // namespace SOUI
+SNSEND
+
+#endif//_SWINDOW_EX_H_

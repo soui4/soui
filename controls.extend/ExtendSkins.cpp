@@ -4,8 +4,7 @@
 #include "ExtendSkins.h"
 
 //////////////////////////////////////////////////////////////////////////
-namespace SOUI
-{
+SNSBEGIN
 // SColorMask
 SColorMask::SColorMask()
 {
@@ -123,4 +122,4 @@ void SColorMask::MakeCacheApha()
     m_bmpMask->UnlockPixelBits(pBitMask);
 }
 
-} // namespace SOUI
+SNSEND

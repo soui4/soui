@@ -11,8 +11,7 @@
 
 #include <interface/sipcobj-i.h>
 
-namespace SOUI
-{
+SNSBEGIN
 
 class CShareMemBuffer : public IShareBuffer
 {
@@ -54,6 +53,5 @@ protected:
 	BYTE      * m_pBuffer;
 };
 
-}
-
+SNSEND
 #endif // !defined(_SHAREMEMBUFFER_H__015AC2F8_C982_43A8_916D_EEA49B31428B__INCLUDED_)

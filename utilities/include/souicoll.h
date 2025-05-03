@@ -59,11 +59,9 @@
 #endif
 #define _SCATCHALL() __pragma(warning(push)) __pragma(warning(disable: 4571)) catch( ... ) __pragma(warning(pop))
 
-//#include <ctypes.h>
 
 #pragma pack(push,_S_PACKING)
-namespace SOUI
-{
+SNSBEGIN
 
 struct __SPOSITION
 {
@@ -3967,7 +3965,7 @@ bool SRBMap< K, V, KTraits, VTraits >::RemoveKey( typename SRBTree< K, V, KTrait
     }
 }
 
-}; // namespace SOUI
+SNSEND
 #pragma pack(pop)
 
 #pragma warning(pop)

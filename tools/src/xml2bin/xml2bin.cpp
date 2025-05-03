@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 using namespace pugi;
-using namespace SOUI;
+using namespace SNS;
 
 void convertDir(LPCTSTR pszDir,bool toBin)
 {

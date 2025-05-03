@@ -7,9 +7,7 @@
 #include <algorithm>
 #include "GradientFillHelper.h"
 
-namespace SOUI
-{
-
+SNSBEGIN
 
     //////////////////////////////////////////////////////////////////////////
     // SRenderFactory_GDI
@@ -1285,7 +1283,7 @@ namespace SOUI
             return TRUE;
         }
     }
-}
+SNSEND
 
 EXTERN_C BOOL Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory)
 {

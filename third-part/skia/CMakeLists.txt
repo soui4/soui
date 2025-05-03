@@ -2,7 +2,11 @@
 # 1394020320@qq.com
 #
 if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4355 /wd4225 /wd4244 /wd4996")
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /wd4355 /wd4225 /wd4244 /wd4996")
+  if(MSVC_VERSION LESS 1600)
+      include_directories(${PROJECT_SOURCE_DIR}/third-part/stdint)
+  endif()
+
 else()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
 # 检查目标平台是否为ARM
@@ -928,6 +932,20 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
         "src/ports/SkTime_win.cpp" 
         "src/utils/win/SkWGL_win.cpp" 
         "src/gpu/gl/win/GrGLCreateNativeInterface_win.cpp" 
+    )
+elseif(CMAKE_SYSTEM_NAME MATCHES Darwin)
+    set(srcs
+        ${srcs}
+        "src/ports/SkFontMgr_fontconfig.cpp"
+        "src/ports/SkFontHost_fontconfig.cpp"
+        "src/ports/SkOSFile_posix.cpp" 
+        "src/ports/SkTLS_pthread.cpp" 
+        "src/utils/SkThreadUtils_pthread.cpp" 
+        "src/utils/SkThreadUtils_pthread_mach.cpp" 
+        "src/ports/SkTime_Unix.cpp" 
+        "src/ports/SkFontHost_FreeType_common.cpp"
+        "src/ports/SkFontHost_FreeType.cpp"
+        "src/gpu/gl/mac/GrGLCreateNativeInterface_mac.cpp"
     )
 else()
     set(srcs

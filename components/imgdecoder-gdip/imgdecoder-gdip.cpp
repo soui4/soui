@@ -11,8 +11,7 @@
 
 using namespace Gdiplus;
 
-namespace SOUI
-{
+SNSBEGIN
     //////////////////////////////////////////////////////////////////////////
     //  SImgFrame_PNG
     SImgFrame_GDIP::SImgFrame_GDIP()
@@ -336,9 +335,7 @@ namespace SOUI
         }
     }
 
-
-}//end of namespace SOUI
-
+SNSEND
 
 EXTERN_C BOOL Decoder_Gdip_SCreateInstance(IObjRef **pImgDecoderFactory)
 {

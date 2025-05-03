@@ -8,8 +8,7 @@
 #ifdef _WIN32
 #pragma comment(lib,"Winmm.lib")
 #endif//_WIN32
-namespace SOUI
-{
+SNSBEGIN
 
 	STaskLoop::STaskLoop() :
 		m_taskListLock(),
@@ -328,7 +327,7 @@ namespace SOUI
 		return TRUE;
 	}
 
-}
+SNSEND
 
 EXTERN_C BOOL TaskLoop_SCreateInstance(IObjRef **ppTaskLoop)
 {

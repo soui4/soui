@@ -98,8 +98,7 @@ interface DX_DECLARE_INTERFACE("62baa2d2-ab54-41b7-b872-787e0106a421") ID2D1Path
 }; // interface ID2D1PathGeometry1
 #endif //_D2D1_1_H_
 
-namespace SOUI
-{
+SNSBEGIN
 	class D2DColor
 	{
 	public:
@@ -2738,7 +2737,7 @@ namespace SOUI
 
 	}
 
-}
+SNSEND
 
 EXTERN_C BOOL Render_D2D_SCreateInstance(IObjRef ** ppRenderFactory)
 {

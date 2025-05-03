@@ -11,8 +11,7 @@
 extern BOOL SOUI_Export_Lua(lua_State *L);
 
 
-namespace SOUI
-{
+SNSBEGIN
     wchar_t * cast_a2w(char * str)
     {
         return (wchar_t *)str;
@@ -131,7 +130,7 @@ namespace SOUI
 		}
 	}
 
-}
+SNSEND
 
 EXTERN_C BOOL Script_Lua_SCreateInstance(IObjRef ** ppScript)
 {

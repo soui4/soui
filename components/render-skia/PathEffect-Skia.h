@@ -6,8 +6,7 @@
 #include <effects/SkDashPathEffect.h>
 #include <effects/SkDiscretePathEffect.h>
 
-namespace SOUI
-{
+SNSBEGIN
 	class SPathEffect_Corner : public TObjRefImpl<ICornerPathEffect>
 	{
 	public:
@@ -49,5 +48,5 @@ namespace SOUI
 	};
 
 
-}
+SNSEND
 

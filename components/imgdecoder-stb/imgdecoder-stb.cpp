@@ -10,8 +10,7 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 
-namespace SOUI
-{
+SNSBEGIN
     //////////////////////////////////////////////////////////////////////////
     //  SImgFrame_STB
 SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
@@ -313,7 +312,7 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
         return TRUE;
     }
 
-}//end of namespace SOUI
+SNSEND
 
 EXTERN_C BOOL Decoder_Stb_SCreateInstance(IObjRef **pImgDecoderFactory)
 {

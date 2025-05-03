@@ -152,7 +152,7 @@ namespace SOUI
 			{
 				pMemRT2->BitBlt(rcDst, pMemRT, rcSrc.left, rcSrc.top,0xFF);
 				IBitmapS *pCacheSub = (IBitmapS*)pMemRT2->GetCurrentObject(OT_BITMAP);
-				pCacheSub->Save2(SStringW().Format(L"%s_%d.png", strSaveName, i + 1),Img_PNG);
+				pCacheSub->Save2(SStringW().Format(L"%s_%d.png", strSaveName.c_str(), i + 1),Img_PNG);
 				pMemRT2->ClearRect(rcDst, 0);
 				if (m_bVert) rcSrc.OffsetRect(0, rcSrc.Height());
 				else rcSrc.OffsetRect(rcSrc.Width(), 0);
