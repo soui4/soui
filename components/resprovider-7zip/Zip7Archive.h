@@ -2,17 +2,16 @@
 #define __ZIPARCHIVE_H__
 
 #pragma once
-
-
-#ifndef WIN32_LEAN_AND_MEAN
-#define WIN32_LEAN_AND_MEAN
-#endif // !WIN32_LEAN_AND_MEAN
-
-#include <windows.h>
-#include <tchar.h>
-
-
+#include <string>
+#include <vector>
+#include <bit7z/bit7zlibrary.hpp>
+#include <bit7z/bitarchivereader.hpp>
+#include <bit7z/bitmemextractor.hpp>
+#include <bit7z/bittypes.hpp>
 #include "SevenZip/FileStream.h"
+#include <tchar.h>
+#include <malloc.h>
+
 namespace SevenZip{
 
 class CZipFile;
@@ -49,8 +48,10 @@ public:
 	CZipArchive();
 	~CZipArchive();
 
-	BOOL Open(LPCTSTR pszFileName, LPCSTR pszPassword);
-	BOOL Open(HMODULE hModule, LPCTSTR pszName, LPCSTR pszPassword, LPCTSTR pszType = _T("7Z"));
+	BOOL Open(LPCTSTR pszFileName, LPCTSTR pszPassword);
+#ifdef _WIN32
+	BOOL Open(HMODULE hModule, LPCTSTR pszName, LPCTSTR pszPassword, LPCTSTR pszType = _T("7Z"));
+#endif // _WIN32
 
 	void Close();
 	BOOL IsOpen() const;
@@ -69,8 +70,11 @@ protected:
 	void CloseFile();
 
 	DWORD ReadFile(void* pBuffer, DWORD dwBytes);
+
+	bit7z::Bit7zLibrary& Get7zLibrary();
 private:
 	CFileStream m_fileStreams;
+	bit7z::Bit7zLibrary m_lib;
 };
 
 }//end of ns
