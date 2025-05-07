@@ -1102,7 +1102,7 @@ void SCheckBox::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei)
     if (!m_pSkin)
         return;
     CSize szCheck = m_pSkin->GetSkinSize();
-    psz->cx += szCheck.cx + m_nCheckBoxSpacing;
+    psz->cx = szCheck.cx + m_nCheckBoxSpacing;
 }
 
 void SCheckBox::OnLButtonUp(UINT nFlags, CPoint point)
@@ -1334,7 +1334,7 @@ void SRadioBox::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei)
     if (!m_pSkin)
         return;
     CSize szCheck = m_pSkin->GetSkinSize();
-    psz->cx += szCheck.cx + m_nRadioBoxSpacing;
+    psz->cx = szCheck.cx + m_nRadioBoxSpacing;
 }
 
 BOOL SRadioBox::NeedRedrawWhenStateChange()
@@ -1501,6 +1501,7 @@ void SRadioGroup::OnBeforeRemoveChild(SWindow *pChild)
 SToggle::SToggle()
 {
     m_pSkin = GETBUILTINSKIN(SKIN_SYS_TREE_TOGGLE);
+    m_nCheckBoxSpacing = 0;
 }
 
 void SToggle::SetToggle(BOOL bToggle, BOOL bUpdate /*=TRUE*/)
@@ -1519,7 +1520,7 @@ void SToggle::OnPaint(IRenderTarget *pRT)
 {
     if (!m_pSkin)
         return;
-    m_pSkin->DrawByState(pRT, GetWindowRect(), GetState());
+    m_pSkin->DrawByState(pRT, GetClientRect(), GetState());
 }
 
 SIZE SToggle::MeasureContent(int wid, int hei)
