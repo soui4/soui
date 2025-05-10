@@ -20,7 +20,9 @@
     <img alt="usage" src="https://img.shields.io/badge/%E4%BD%BF%E7%94%A8-%E6%96%87%E6%A1%A3-yellow?style=for-the-badge"/>
 </a>
 
-
+ <a href="https://deepwiki.com/soui4/soui">
+    <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg"/>
+</a>
 </div>
 
 
