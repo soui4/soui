@@ -18,14 +18,17 @@ class SRadioBox2 : public SRadioBox {
         else
             return SWindow::MeasureContent(wid, hei);
     }
-    virtual void GetTextRect(LPRECT pRect)
+    void GetTextRect(LPRECT pRect) override
     {
         SWindow::GetTextRect(pRect);
         pRect->left += m_nTextOffset;
     }
-    virtual void DrawFocus(IRenderTarget *pRT)
+
+    void DrawFocus(IRenderTarget *pRT) override
     {
     }
+
+    STDMETHOD_(void, GetChildrenLayoutRect)(THIS_ RECT *prc) SCONST OVERRIDE;
 
   protected:
     void OnPaint(IRenderTarget *pRT);

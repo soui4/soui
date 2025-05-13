@@ -904,7 +904,6 @@ class SOUI_EXP SCheckBox : public SWindow {
      * @param nParentWid Width of the parent window.
      * @param nParentHei Height of the parent window.
      */
-    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
 
   protected:
     /**
@@ -927,6 +926,15 @@ class SOUI_EXP SCheckBox : public SWindow {
      */
     CRect GetCheckRect();
     
+    /**
+     * @brief 测量内容所需的大小
+     * @param wid 父容器宽度
+     * @param hei 父容器高度
+     * @return 返回控件所需的内容大小 (SIZE)。
+     */
+    SIZE MeasureContent(int wid, int hei) override;
+    SIZE MeasureChildren(int wid, int hei) override;
+
     /**
      * @brief 获取文本显示区域的大小
      * @param pRect 输出参数，表示文本显示区域的矩形。
@@ -1117,7 +1125,6 @@ class SOUI_EXP SRadioBox : public SWindow {
      * @param nParentWid Width of the parent window.
      * @param nParentHei Height of the parent window.
      */
-    STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *psz, int nParentWid, int nParentHei) OVERRIDE;
 
   protected:
     /**
@@ -1131,6 +1138,15 @@ class SOUI_EXP SRadioBox : public SWindow {
      * @param pRect 输出参数，表示文本显示区域的矩形。
      */
     virtual void GetTextRect(LPRECT pRect);
+
+    /**
+     * @brief 测量内容所需的大小
+     * @param wid 父容器宽度
+     * @param hei 父容器高度
+     * @return 返回控件所需的内容大小 (SIZE)。
+     */
+    SIZE MeasureContent(int wid, int hei) OVERRIDE;
+    SIZE MeasureChildren(int wid, int hei) OVERRIDE;
 
     /**
      * @brief 获取对话框代码

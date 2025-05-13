@@ -13,6 +13,11 @@ SRadioBox2::~SRadioBox2(void)
 {
 }
 
+void SRadioBox2::GetChildrenLayoutRect(THIS_ RECT *prc) SCONST
+{
+    SWindow::GetChildrenLayoutRect(prc);
+}
+
 void SRadioBox2::OnPaint(IRenderTarget *pRT)
 {
     if (m_pSkin)

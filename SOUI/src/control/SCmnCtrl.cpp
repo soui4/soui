@@ -1087,6 +1087,7 @@ void SCheckBox::DrawFocus(IRenderTarget *pRT)
     }
 }
 
+
 void SCheckBox::GetChildrenLayoutRect(THIS_ RECT *prc) SCONST
 {
     __baseCls::GetChildrenLayoutRect(prc);
@@ -1096,13 +1097,28 @@ void SCheckBox::GetChildrenLayoutRect(THIS_ RECT *prc) SCONST
     prc->left += szCheck.cx + m_nCheckBoxSpacing;
 }
 
-void SCheckBox::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei)
+SIZE SCheckBox::MeasureContent(int wid, int hei)
 {
-    __baseCls::GetDesiredSize(psz, nParentWid, nParentHei);
-    if (!m_pSkin)
-        return;
-    CSize szCheck = m_pSkin->GetSkinSize();
-    psz->cx = szCheck.cx + m_nCheckBoxSpacing;
+    CSize szRet = __baseCls::MeasureContent(wid, hei);
+    if (m_pSkin)
+    {
+        CSize szCheck = m_pSkin->GetSkinSize();
+        szRet.cx += szCheck.cx + m_nCheckBoxSpacing;
+        szRet.cy = smax(szRet.cy, szCheck.cy);
+    }
+    return szRet;
+}
+
+SIZE SCheckBox::MeasureChildren(int wid, int hei)
+{
+    CSize szRet = __baseCls::MeasureChildren(wid, hei);
+    if (m_pSkin)
+    {
+        CSize szCheck = m_pSkin->GetSkinSize();
+        szRet.cx += szCheck.cx + m_nCheckBoxSpacing;
+        szRet.cy = smax(szRet.cy, szCheck.cy);
+    }
+    return szRet;
 }
 
 void SCheckBox::OnLButtonUp(UINT nFlags, CPoint point)
@@ -1328,13 +1344,28 @@ void SRadioBox::GetChildrenLayoutRect(THIS_ RECT *prc) SCONST{
     prc->left += szCheck.cx + m_nRadioBoxSpacing;
 }
 
-void SRadioBox::GetDesiredSize(THIS_ SIZE *psz, int nParentWid, int nParentHei)
+SIZE SRadioBox::MeasureContent(int wid, int hei)
 {
-    __baseCls::GetDesiredSize(psz,nParentWid,nParentHei);
-    if (!m_pSkin)
-        return;
-    CSize szCheck = m_pSkin->GetSkinSize();
-    psz->cx = szCheck.cx + m_nRadioBoxSpacing;
+    CSize szRet = __baseCls::MeasureContent(wid, hei);
+    if (m_pSkin)
+    {
+        CSize szRaio = m_pSkin->GetSkinSize();
+        szRet.cx += szRaio.cx + m_nRadioBoxSpacing;
+        szRet.cy = smax(szRet.cy, szRaio.cy);
+    }
+    return szRet;
+}
+
+SIZE SRadioBox::MeasureChildren(int wid, int hei)
+{
+    CSize szRet = __baseCls::MeasureChildren(wid, hei);
+    if (m_pSkin)
+    {
+        CSize szRaio = m_pSkin->GetSkinSize();
+        szRet.cx += szRaio.cx + m_nRadioBoxSpacing;
+        szRet.cy = smax(szRet.cy, szRaio.cy);
+    }
+    return szRet;
 }
 
 BOOL SRadioBox::NeedRedrawWhenStateChange()
