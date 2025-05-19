@@ -1,6 +1,6 @@
 // LangUtils.cpp
 
-
+#include "StdAfx.h"
 
 #include "../../../Common/Lang.h"
 
@@ -19,19 +19,23 @@ extern bool g_IsNT;
 
 UString g_LangID;
 
-static CLang g_Lang;
+// static
+CLang g_Lang;
 static bool g_Loaded = false;
 static NSynchronization::CCriticalSection g_CriticalSection;
 
+bool LangOpen(CLang &lang, CFSTR fileName);
 bool LangOpen(CLang &lang, CFSTR fileName)
 {
-  return lang.Open(fileName, L"7-Zip");
+  return lang.Open(fileName, "7-Zip");
 }
 
 FString GetLangDirPrefix()
 {
   return NDLL::GetModuleDirPrefix() + FTEXT("Lang") FSTRING_PATH_SEPARATOR;
 }
+
+#ifdef Z7_LANG
 
 void LoadLangOneTime()
 {
@@ -47,10 +51,14 @@ void LangSetDlgItemText(HWND dialog, UInt32 controlID, UInt32 langID)
   const wchar_t *s = g_Lang.Get(langID);
   if (s)
   {
-    CWindow window(GetDlgItem(dialog, controlID));
+    CWindow window(GetDlgItem(dialog, (int)controlID));
     window.SetText(s);
   }
 }
+
+#ifndef IDCONTINUE
+#define IDCONTINUE 11
+#endif
 
 static const CIDLangPair kLangPairs[] =
 {
@@ -58,17 +66,19 @@ static const CIDLangPair kLangPairs[] =
   { IDCANCEL, 402 },
   { IDYES,    406 },
   { IDNO,     407 },
-  { IDHELP,   409 }
+  { IDCLOSE,  408 },
+  { IDHELP,   409 },
+  { IDCONTINUE, 411 }
 };
 
 
 void LangSetDlgItems(HWND dialog, const UInt32 *ids, unsigned numItems)
 {
   unsigned i;
-  for (i = 0; i < ARRAY_SIZE(kLangPairs); i++)
+  for (i = 0; i < Z7_ARRAY_SIZE(kLangPairs); i++)
   {
     const CIDLangPair &pair = kLangPairs[i];
-    CWindow window(GetDlgItem(dialog, pair.ControlID));
+    CWindow window(GetDlgItem(dialog, (int)pair.ControlID));
     if (window)
     {
       const wchar_t *s = g_Lang.Get(pair.LangID);
@@ -79,7 +89,7 @@ void LangSetDlgItems(HWND dialog, const UInt32 *ids, unsigned numItems)
 
   for (i = 0; i < numItems; i++)
   {
-    UInt32 id = ids[i];
+    const UInt32 id = ids[i];
     LangSetDlgItemText(dialog, id, id);
   }
 }
@@ -88,13 +98,30 @@ void LangSetDlgItems_Colon(HWND dialog, const UInt32 *ids, unsigned numItems)
 {
   for (unsigned i = 0; i < numItems; i++)
   {
-    UInt32 id = ids[i];
+    const UInt32 id = ids[i];
     const wchar_t *s = g_Lang.Get(id);
     if (s)
     {
-      CWindow window(GetDlgItem(dialog, id));
+      CWindow window(GetDlgItem(dialog, (int)id));
       UString s2 = s;
-      s2 += L':';
+      s2.Add_Colon();
+      window.SetText(s2);
+    }
+  }
+}
+
+void LangSetDlgItems_RemoveColon(HWND dialog, const UInt32 *ids, unsigned numItems)
+{
+  for (unsigned i = 0; i < numItems; i++)
+  {
+    const UInt32 id = ids[i];
+    const wchar_t *s = g_Lang.Get(id);
+    if (s)
+    {
+      CWindow window(GetDlgItem(dialog, (int)id));
+      UString s2 = s;
+      if (!s2.IsEmpty() && s2.Back() == ':')
+        s2.DeleteBack();
       window.SetText(s2);
     }
   }
@@ -139,12 +166,12 @@ void LangString_OnlyFromLangFile(UInt32 langID, UString &dest)
     dest = s;
 }
 
-static const char *kLangs =
+static const char * const kLangs =
   "ar.bg.ca.zh.-tw.-cn.cs.da.de.el.en.es.fi.fr.he.hu.is."
-  "it.ja.ko.nl.no.=nb.=nn.pl.pt.-br.rm.ro.ru.sr.=hr.-spl.-spc.sk.sq.sv.th.tr."
+  "it.ja.ko.nl.no.=nb.=nn.pl.pt.-br.rm.ro.ru.sr.=hr.-spl.-spc.=hr.=bs.sk.sq.sv.th.tr."
   "ur.id.uk.be.sl.et.lv.lt.tg.fa.vi.hy.az.eu.hsb.mk."
   "st.ts.tn.ve.xh.zu.af.ka.fo.hi.mt.se.ga.yi.ms.kk."
-  "ky.sw.tk.uz.tt.bn.pa.-in.gu.or.ta.te.kn.ml.as.mr.sa."
+  "ky.sw.tk.uz.-latn.-cyrl.tt.bn.pa.-in.gu.or.ta.te.kn.ml.as.mr.sa."
   "mn.=mn.=mng.bo.cy.kh.lo.my.gl.kok..sd.syr.si..iu.am.tzm."
   "ks.ne.fy.ps.tl.dv..ff.ha..yo.qu.st.ba.lb.kl."
   "ig.kr.om.ti.gn..la.so.ii..arn..moh..br.."
@@ -153,7 +180,7 @@ static const char *kLangs =
   // ".gd."
   ;
 
-static void FindShortNames(UInt32 primeLang, UStringVector &names)
+static void FindShortNames(UInt32 primeLang, AStringVector &names)
 {
   UInt32 index = 0;
   for (const char *p = kLangs; *p != 0;)
@@ -167,7 +194,7 @@ static void FindShortNames(UInt32 primeLang, UStringVector &names)
     {
       if (index > primeLang)
         break;
-      UString s;
+      AString s;
       if (isSub)
       {
         if (p[0] == '-')
@@ -176,7 +203,7 @@ static void FindShortNames(UInt32 primeLang, UStringVector &names)
           p++;
       }
       while (p != p2)
-        s += (wchar_t)(Byte)*p++;
+        s.Add_Char((char)(Byte)*p++);
       names.Add(s);
     }
     p = p2 + 1;
@@ -195,7 +222,7 @@ static struct CC1Lang
       UString s;
       char ttt[32];
       ConvertUInt32ToHex(i, ttt);
-      s.AddAscii(ttt);
+      s += ttt;
       UStringVector names;
       FindShortNames(i, names);
 
@@ -212,14 +239,22 @@ static struct CC1Lang
 
 // typedef LANGID (WINAPI *GetUserDefaultUILanguageP)();
 
-static void OpenDefaultLang()
+void Lang_GetShortNames_for_DefaultLang(AStringVector &names, unsigned &subLang)
 {
-  LANGID sysLang = GetSystemDefaultLangID(); // "Language for non-Unicode programs" in XP64
-  LANGID userLang = GetUserDefaultLangID(); // "Standards and formats" language in XP64
+  names.Clear();
+  subLang = 0;
+  // Region / Administative / Language for non-Unicode programs:
+  const LANGID sysLang = GetSystemDefaultLangID();
 
-  if (sysLang != userLang)
+  // Region / Formats / Format:
+  const LANGID userLang = GetUserDefaultLangID();
+
+  if (PRIMARYLANGID(sysLang) !=
+      PRIMARYLANGID(userLang))
     return;
-  LANGID langID = userLang;
+  const LANGID langID = userLang;
+
+  // const LANGID langID = MAKELANGID(0x1a, 1); // for debug
   
   /*
   LANGID sysUILang; // english  in XP64
@@ -235,21 +270,31 @@ static void OpenDefaultLang()
     sysUILang = fn();
   */
 
-  WORD primLang = (WORD)(PRIMARYLANGID(langID));
-  WORD subLang = (WORD)(SUBLANGID(langID));
+  const WORD primLang = (WORD)(PRIMARYLANGID(langID));
+  subLang = SUBLANGID(langID);
+  FindShortNames(primLang, names);
+}
+
+
+static void OpenDefaultLang()
+{
+  AStringVector names;
+  unsigned subLang;
+  Lang_GetShortNames_for_DefaultLang(names, subLang);
   {
-    UStringVector names;
-    FindShortNames(primLang, names);
-    const FString dirPrefix = GetLangDirPrefix();
+    const FString dirPrefix (GetLangDirPrefix());
     for (unsigned i = 0; i < 2; i++)
     {
-      unsigned index = (i == 0 ? subLang : 0);
+      const unsigned index = (i == 0 ? subLang : 0);
       if (index < names.Size())
       {
-        const UString &name = names[index];
+        const AString &name = names[index];
         if (!name.IsEmpty())
         {
-          if (LangOpen(g_Lang, dirPrefix + us2fs(name) + FTEXT(".txt")))
+          FString path (dirPrefix);
+          path += name;
+          path += ".txt";
+          if (LangOpen(g_Lang, path))
           {
             g_LangID = name;
             return;
@@ -277,12 +322,14 @@ void ReloadLang()
   if (g_LangID.Len() > 1 || g_LangID[0] != L'-')
   {
     FString s = us2fs(g_LangID);
-    if (s.Find(FCHAR_PATH_SEPARATOR) < 0)
+    if (s.ReverseFind_PathSepar() < 0)
     {
-      if (s.Find(FTEXT('.')) < 0)
-        s += FTEXT(".txt");
+      if (s.ReverseFind_Dot() < 0)
+        s += ".txt";
       s.Insert(0, GetLangDirPrefix());
+      LangOpen(g_Lang, s);
     }
-    LangOpen(g_Lang, s);
   }
 }
+
+#endif

@@ -5,7 +5,7 @@
 #include "OutStreamWrapper.h"
 #include "PropVariant2.h"
 #include "UsefulFunctions.h"
-#include <tchar.h>
+#include "SevenString.h"
 
 namespace SevenZip
 {
@@ -61,9 +61,12 @@ HRESULT SevenZipCompressor::CompressFile(const TString& filePath, ProgressCallba
 {
 	std::vector< FilePathInfo > files = FileSys::GetFile( filePath );
 
-	if ( files.empty() )
-	{
+	if ( files.empty() ) {
+#ifdef _WIN32
         return ERROR_EMPTY;
+#else
+		return ENOENT;
+#endif
 	}
 
 	m_outputPath = filePath;
@@ -71,9 +74,13 @@ HRESULT SevenZipCompressor::CompressFile(const TString& filePath, ProgressCallba
 	return CompressFilesToArchive(TString(), files, callback, pSevenZipPassword);
 }
 
-CMyComPtr< IStream > SevenZipCompressor::OpenArchiveStream()
+FILE* SevenZipCompressor::OpenArchiveStream()
 {
-	CMyComPtr< IStream > fileStream = FileSys::OpenFileToWrite( m_archivePath );
+#if defined(_WIN32) && defined(_UNICODE)
+	FILE* fileStream = _wfopen(m_archivePath.c_str(), L"wb");
+#else
+	FILE* fileStream = fopen(ToPathNativeStr(m_archivePath).c_str(), "wb");
+#endif
 	if ( fileStream == NULL )
 	{
 		return NULL;
@@ -93,9 +100,12 @@ HRESULT SevenZipCompressor::FindAndCompressFiles(const TString& directory, const
 		return HRESULT_FROM_WIN32(GetLastError());	//Directory does not exist
 	}
 	
-	if ( FileSys::IsDirectoryEmptyRecursive( directory ) )
-	{
-        return ERROR_EMPTY;	//Directory \"%s\" is empty" ), directory.c_str()
+	if ( FileSys::IsDirectoryEmptyRecursive( directory ) ) {
+#ifdef _WIN32
+		return ERROR_EMPTY;	//Directory \"%s\" is empty" ), directory.c_str()
+#else
+		return ENOENT;
+#endif
 	}
 
 	m_outputPath = directory;
@@ -105,9 +115,9 @@ HRESULT SevenZipCompressor::FindAndCompressFiles(const TString& directory, const
     {
         if (callback->OnFileCount(files.size()))
         {
-            std::vector<std::wstring> itemNames;
+            std::vector<TString> itemNames;
             itemNames.reserve(files.size());
-            std::vector<unsigned __int64> itemSizes;
+            std::vector<uint64_t> itemSizes;
             itemSizes.reserve(files.size());
 
             for (size_t i = 0; i< files.size(); ++i)

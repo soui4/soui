@@ -1,125 +1,176 @@
 #include "PathScanner.h"
 #include "FileSys.h"
-#include <tchar.h>
+#include "SevenString.h"
 
-namespace SevenZip
-{
-namespace intl
-{
+namespace SevenZip {
+namespace intl {
 
-void PathScanner::Scan( const TString& root, Callback& cb )
-{
-	Scan( root, _T( "*" ), cb );
-}
+#ifdef _WIN32
+	const wchar_t PATH_SEP = L'\\';
+#else
+	const char PATH_SEP = '/';
+#endif
 
-void PathScanner::Scan( const TString& root, const TString& searchPattern, Callback& cb )
-{
-	std::deque< TString > directories;
-	directories.push_back( root );
+	void PathScanner::Scan(const TString& root, Callback& cb) {
+		Scan(root, _T("*"), cb);
+	}
 
-	while ( !directories.empty() )
-	{
-		TString directory = directories.front();
-		directories.pop_front();
+	void PathScanner::Scan(const TString& root, const TString& searchPattern, Callback& cb) {
+		std::deque<TString> directories;
+		directories.push_back(root);
 
-		if ( ExamineFiles( directory, searchPattern, cb ) )
-		{
-			break;
+		cb.BeginScan();
+
+		bool scanAborted = false;
+		while (!directories.empty() && !scanAborted) {
+			TString dir = directories.front();
+			directories.pop_front();
+
+			bool exitFlag = false;
+			bool dirProcessed = ProcessDirectory(dir, searchPattern, cb, directories, exitFlag);
+
+			if (exitFlag) {
+				scanAborted = true;
+				break;
+			}
 		}
 
-		ExamineDirectories( directory, directories, cb );
-	}
-}
-
-bool PathScanner::ExamineFiles( const TString& directory, const TString& searchPattern, Callback& cb )
-{
-	TString findStr = FileSys::AppendPath( directory, searchPattern );
-	bool exit = false;
-
-	WIN32_FIND_DATA fdata;
-	HANDLE hFile = FindFirstFile( findStr.c_str(), &fdata );
-	if ( hFile == INVALID_HANDLE_VALUE )
-	{
-		return exit;
+		cb.EndScan();
 	}
 
-	cb.EnterDirectory( directory );
+	bool PathScanner::ProcessDirectory(const TString& directory,
+		const TString& pattern,
+		Callback& cb,
+		std::deque<TString>& directories,
+		bool& exitFlag) {
+		cb.EnterDirectory(directory);
 
-	do
-	{
-		FilePathInfo fpInfo = ConvertFindInfo( directory, fdata );
-		if ( !fpInfo.IsDirectory && !IsSpecialFileName( fpInfo.FileName ) )
-		{
-			cb.ExamineFile( fpInfo, exit );
+#ifdef _WIN32
+		WIN32_FIND_DATAW fdata;
+		TString findPath = JoinPath(directory, _T("*"));
+		HANDLE hFind = FindFirstFileW(findPath.c_str(), &fdata);
+
+		if (hFind == INVALID_HANDLE_VALUE) {
+			cb.LeaveDirectory(directory);
+			return false;
 		}
-	} 
-	while ( !exit && FindNextFile( hFile, &fdata ) );
 
-	if ( !exit )
-	{
-		cb.LeaveDirectory( directory );
-	}
+		do {
+			if (IsSpecialFileName(fdata.cFileName)) continue;
 
-	FindClose( hFile );
-	return exit;
-}
+			TString fullPath = JoinPath(directory, fdata.cFileName);
+			bool isDir = (fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
+			FilePathInfo info = GetFileInfo(fullPath, isDir);
 
-void PathScanner::ExamineDirectories( const TString& directory, std::deque< TString >& subDirs, Callback& cb )
-{
-	TString findStr = FileSys::AppendPath( directory, _T( "*" ) );
+			if (isDir) {
+				if (cb.ShouldDescend(info)) {
+					directories.push_back(fullPath);
+				}
+			}
+			else {
+				if (MatchesPattern(info.FileName, pattern)) {
+					cb.ExamineFile(info, exitFlag);
+					if (exitFlag) break;
+				}
+			}
+		} while (FindNextFileW(hFind, &fdata));
 
-	WIN32_FIND_DATA fdata;
-	HANDLE hFile = FindFirstFile( findStr.c_str(), &fdata );
-	if ( hFile == INVALID_HANDLE_VALUE )
-	{
-		return;
-	}
+		FindClose(hFind);
 
-	do
-	{
-		FilePathInfo fpInfo = ConvertFindInfo( directory, fdata );
-		if ( fpInfo.IsDirectory && !IsSpecialFileName( fpInfo.FileName ) && cb.ShouldDescend( fpInfo ) )
-		{
-			subDirs.push_back( fpInfo.FilePath );
+#else
+		DIR* dir = opendir(ToPathNativeStr(directory).c_str());
+		if (!dir) {
+			cb.LeaveDirectory(directory);
+			return false;
 		}
-	} 
-	while ( FindNextFile( hFile, &fdata ) );
-		
-	FindClose( hFile );
+
+		struct dirent* entry;
+		while ((entry = readdir(dir)) != NULL && !exitFlag) {
+			if (IsSpecialFileName(ToWstring(entry->d_name))) continue;
+
+			TString fullPath = JoinPath(directory, ToWstring(entry->d_name));
+			struct stat st;
+			if (stat(ToPathNativeStr(fullPath).c_str(), &st) != 0) continue;
+
+			bool isDir = S_ISDIR(st.st_mode);
+			FilePathInfo info = GetFileInfo(fullPath, isDir);
+
+			if (isDir) {
+				if (cb.ShouldDescend(info)) {
+					directories.push_back(fullPath);
+			}
+		}
+			else {
+				if (MatchesPattern(info.FileName, pattern)) {
+					cb.ExamineFile(info, exitFlag);
+				}
+			}
+	}
+		closedir(dir);
+#endif
+
+		cb.LeaveDirectory(directory);
+		return exitFlag;
 }
 
-bool PathScanner::IsAllFilesPattern( const TString& searchPattern )
-{
-	return searchPattern == _T( "*" ) || searchPattern == _T( "*.*" );
+bool PathScanner::IsSpecialFileName(const TString& fileName) {
+#ifdef _UNICODE
+    return fileName == L"." || fileName == L"..";
+#else
+    return fileName == "." || fileName == "..";
+#endif
 }
 
-bool PathScanner::IsSpecialFileName( const TString& fileName )
-{
-	return fileName == _T( "." ) || fileName == _T( ".." );
+bool PathScanner::MatchesPattern(const TString& name, const TString& pattern) {
+#ifdef _WIN32
+    return PathMatchSpecW(name.c_str(), pattern.c_str()) == TRUE;
+#else
+    return fnmatch(ToPathNativeStr(pattern).c_str(), ToPathNativeStr(name).c_str(), FNM_PATHNAME) == 0;
+#endif
 }
 
-bool PathScanner::IsDirectory( const WIN32_FIND_DATA& fdata )
-{
-	return ( fdata.dwFileAttributes & FILE_ATTRIBUTE_DIRECTORY ) != 0;
+TString PathScanner::JoinPath(const TString& dir, const TString& name) {
+    if (dir.empty()) return name;
+    
+#ifdef _WIN32
+    if (dir[dir.size()-1] == _T('\\') || dir[dir.size()-1] == _T('/'))
+        return dir + name;
+    return dir + _T('\\') + name;
+#else
+    if (dir[dir.size()-1] == '/')
+        return dir + name;
+    return dir + _T("/") + name;
+#endif
 }
 
-FilePathInfo PathScanner::ConvertFindInfo( const TString& directory, const WIN32_FIND_DATA& fdata )
-{
-	FilePathInfo file;
-	file.FileName		= fdata.cFileName;
-	file.FilePath		= FileSys::AppendPath( directory, file.FileName );
-	file.LastWriteTime	= fdata.ftLastWriteTime;
-	file.CreationTime	= fdata.ftCreationTime;
-	file.LastAccessTime	= fdata.ftLastAccessTime;
-	file.Attributes		= fdata.dwFileAttributes;
-	file.IsDirectory	= IsDirectory( fdata );
+FilePathInfo PathScanner::GetFileInfo(const TString& fullPath, bool isDirectory) {
+    FilePathInfo info;
+    
+#ifdef _WIN32
+    size_t pos = fullPath.find_last_of(L"\\/");
+#else
+    size_t pos = fullPath.find_last_of('/');
+#endif
+    info.FileName = (pos != TString::npos) ? fullPath.substr(pos+1) : fullPath;
+    info.FilePath = fullPath;
+    info.IsDirectory = isDirectory;
 
-	ULARGE_INTEGER size;
-	size.LowPart = fdata.nFileSizeLow;
-	size.HighPart = fdata.nFileSizeHigh;
-	file.Size = size.QuadPart;
+#ifdef _WIN32
+    WIN32_FILE_ATTRIBUTE_DATA fdata;
+    if (GetFileAttributesExW(fullPath.c_str(), GetFileExInfoStandard, &fdata)) {
+        info.LastWriteTime = (static_cast<uint64_t>(fdata.ftLastWriteTime.dwHighDateTime) << 32) | 
+                            fdata.ftLastWriteTime.dwLowDateTime;
+        info.Size = (static_cast<uint64_t>(fdata.nFileSizeHigh) << 32) | fdata.nFileSizeLow;
+    }
+#else
+    struct stat st;
+    if (stat(ToPathNativeStr(fullPath).c_str(), &st) == 0) {
+        info.LastWriteTime = st.st_mtime;
+        info.Size = isDirectory ? 0 : static_cast<uint64_t>(st.st_size);
+    }
+#endif
 
-	return file;
+    return info;
 }
 
 }

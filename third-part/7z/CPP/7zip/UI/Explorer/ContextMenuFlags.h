@@ -1,7 +1,7 @@
 // ContextMenuFlags.h
 
-#ifndef __CONTEXT_MENU_FLAGS_H
-#define __CONTEXT_MENU_FLAGS_H
+#ifndef ZIP7_INC_CONTEXT_MENU_FLAGS_H
+#define ZIP7_INC_CONTEXT_MENU_FLAGS_H
 
 namespace NContextMenuFlags
 {
@@ -20,6 +20,7 @@ namespace NContextMenuFlags
   const UInt32 kCompressToZip = 1 << 12;
   const UInt32 kCompressToZipEmail = 1 << 13;
 
+  const UInt32 kCRC_Cascaded = (UInt32)1 << 30;
   const UInt32 kCRC = (UInt32)1 << 31;
 }
 

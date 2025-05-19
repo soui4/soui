@@ -1,6 +1,6 @@
 // PanelSort.cpp
 
-
+#include "StdAfx.h"
 
 #include "../../../../C/CpuArch.h"
 #include "../../../Windows/PropVariant.h"
@@ -52,8 +52,8 @@ int CompareFileNames_ForFolderList(const wchar_t *s1, const wchar_t *s2)
 
 static int CompareFileNames_Le16(const Byte *s1, unsigned size1, const Byte *s2, unsigned size2)
 {
-  size1 &= ~1;
-  size2 &= ~1;
+  size1 &= ~1u;
+  size2 &= ~1u;
   for (unsigned i = 0;; i += 2)
   {
     if (i >= size1)
@@ -76,8 +76,8 @@ static int CompareFileNames_Le16(const Byte *s1, unsigned size1, const Byte *s2,
 
 static inline const wchar_t *GetExtensionPtr(const UString &name)
 {
-  int dotPos = name.ReverseFind_Dot();
-  return name.Ptr((dotPos < 0) ? name.Len() : dotPos);
+  const int dotPos = name.ReverseFind_Dot();
+  return name.Ptr(dotPos < 0 ? name.Len() : (unsigned)dotPos);
 }
 
 void CPanel::SetSortRawStatus()
@@ -95,7 +95,7 @@ void CPanel::SetSortRawStatus()
 }
 
 
-int CALLBACK CompareItems2(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
+static int CALLBACK CompareItems2(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
 {
   if (lpData == 0)
     return 0;
@@ -142,9 +142,9 @@ int CALLBACK CompareItems2(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
     // if (panel->_sortIndex == 0)
     case kpidName:
     {
-      const UString name1 = panel->GetItemName((int)lParam1);
-      const UString name2 = panel->GetItemName((int)lParam2);
-      int res = CompareFileNames_ForFolderList(name1, name2);
+      const UString name1 = panel->GetItemName((unsigned)lParam1);
+      const UString name2 = panel->GetItemName((unsigned)lParam2);
+      const int res = CompareFileNames_ForFolderList(name1, name2);
       /*
       if (res != 0 || !panel->_flatMode)
         return res;
@@ -156,8 +156,8 @@ int CALLBACK CompareItems2(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
     }
     case kpidExtension:
     {
-      const UString name1 = panel->GetItemName((int)lParam1);
-      const UString name2 = panel->GetItemName((int)lParam2);
+      const UString name1 = panel->GetItemName((unsigned)lParam1);
+      const UString name2 = panel->GetItemName((unsigned)lParam2);
       return CompareFileNames_ForFolderList(
           GetExtensionPtr(name1),
           GetExtensionPtr(name2));
@@ -176,32 +176,28 @@ int CALLBACK CompareItems2(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
   panel->_folder->GetProperty((UInt32)lParam1, propID, &prop1);
   panel->_folder->GetProperty((UInt32)lParam2, propID, &prop2);
   if (prop1.vt != prop2.vt)
-  {
     return MyCompare(prop1.vt, prop2.vt);
-  }
   if (prop1.vt == VT_BSTR)
-  {
-    return _wcsicmp(prop1.bstrVal, prop2.bstrVal);
-  }
+    return MyStringCompareNoCase(prop1.bstrVal, prop2.bstrVal);
   return prop1.Compare(prop2);
-  // return 0;
 }
 
+int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2, LPARAM lpData);
 int CALLBACK CompareItems(LPARAM lParam1, LPARAM lParam2, LPARAM lpData)
 {
   if (lpData == 0) return 0;
-  if (lParam1 == kParentIndex) return -1;
-  if (lParam2 == kParentIndex) return 1;
+  if (lParam1 == (int)kParentIndex) return -1;
+  if (lParam2 == (int)kParentIndex) return 1;
 
   CPanel *panel = (CPanel*)lpData;
 
-  bool isDir1 = panel->IsItem_Folder((int)lParam1);
-  bool isDir2 = panel->IsItem_Folder((int)lParam2);
+  const bool isDir1 = panel->IsItem_Folder((unsigned)lParam1);
+  const bool isDir2 = panel->IsItem_Folder((unsigned)lParam2);
   
   if (isDir1 && !isDir2) return -1;
   if (isDir2 && !isDir1) return 1;
 
-  int result = CompareItems2(lParam1, lParam2, lpData);
+  const int result = CompareItems2(lParam1, lParam2, lpData);
   return panel->_ascending ? result: (-result);
 }
 

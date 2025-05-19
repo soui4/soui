@@ -1,51 +1,29 @@
 ﻿#include "Zip7Archive.h"
 #include <assert.h>
 #include <memory>
-#include <string/sstringa.h>
-#include <string/sstringw.h>
-#include <string/strcpcvt.h>
 
-#if ((defined(_MSVC_LANG) && _MSVC_LANG >= 201703L) || (defined(__cplusplus) && __cplusplus >= 201703L)) && defined(__has_include)
-#if __has_include(<filesystem>) && (!defined(__MAC_OS_X_VERSION_MIN_REQUIRED) || __MAC_OS_X_VERSION_MIN_REQUIRED >= 101500)
-#define GHC_USE_STD_FS
-#include <filesystem>
-namespace fs = std::filesystem;
-#endif
-#endif
-#ifndef GHC_USE_STD_FS
-#include <ghc/filesystem.hpp>
-namespace fs = ghc::filesystem;
-#endif
-
-#ifndef ZIP_DISABLE_WILDCARD
+#ifdef _WIN32
+#include <crtdbg.h>
+#include <tchar.h>
+#include <Windows.h>
 #include <shlwapi.h>
 #pragma comment(lib, "shlwapi.lib")
-#endif
-
-#ifndef _WIN32
+#else
+#include "SevenZip/../CPP/Common/MyCom.h"
 #define _ASSERTE assert
 #endif // _WIN32
 
-using namespace SNS;
+#include "SevenZip/SevenZipExtractor.h"
+#include "SevenZip/SevenZipExtractorMemory.h"
+#include "SevenZip/SevenZipLister.h" 
+#include "SevenZip/SevenString.h" 
+
+
+#include <malloc.h>
+
+//using namespace SNS;
 
 namespace SevenZip{
-
-	inline fs::path GetExePath()
-	{
-#ifdef _WIN32
-		std::array< wchar_t, MAX_PATH > path{ 0 };
-		GetModuleFileNameW(nullptr, path.data(), MAX_PATH);
-		return fs::path{ path.data() };
-#elif defined( __APPLE__ )
-		std::array< char, PROC_PIDPATHINFO_MAXSIZE > result{ 0 };
-		ssize_t result_size = proc_pidpath(getpid(), result.data(), result.size());
-		return (result_size > 0) ? std::string(result.data(), result_size) : "";
-#else
-		std::error_code error;
-		const fs::path result = fs::read_symlink("/proc/self/exe", error);
-		return error ? "" : result;
-#endif
-	}
 
     CZipFile::CZipFile(DWORD dwSize/*=0*/)
 		: m_dwPos(0)
@@ -171,45 +149,33 @@ namespace SevenZip{
 
 	BOOL CZipArchive::GetFile(LPCTSTR pszFileName, CZipFile& file)
 	{
-		SStringA fileName = S_CT2A(pszFileName);
+#ifdef _UNICODE
+		std::string fileName = ToString(pszFileName);
+#else
+		std::string fileName = pszFileName;
+#endif // _UNICODE
 		if (m_fileStreams.GetFile(fileName.c_str(),file.getBlob()))
 			return TRUE;
 
 		return FALSE;
 	}
 	 
-	BOOL CZipArchive::Open(LPCTSTR pszFileName,LPCTSTR pszPassword)
+	BOOL CZipArchive::Open(LPCTSTR pszFileName,LPCSTR pszPassword)
 	{
-		try {
-			fs::path zipPath(pszFileName);
-			if (!fs::is_regular_file(zipPath)) {
-				zipPath = GetExePath().parent_path() / zipPath;
-			}
-			std::unique_ptr<bit7z::BitArchiveReader> archivereader = std::make_unique<bit7z::BitArchiveReader>(Get7zLibrary(), zipPath.native(), bit7z::BitFormat::Auto);
-			archivereader->setPassword(pszPassword);
-			for (const auto& item : archivereader->items()) {
-				if (item.isDir()) continue;
-				std::vector<bit7z::byte_t> buffer;
-				archivereader->extractTo(buffer, item.index());
-				CZipFile zipFile;
-				zipFile.Attach(buffer.data(), buffer.size());
-#ifdef _WIN32
-				m_fileStreams.PutFile(S_CW2A(item.path().c_str()), zipFile.getBlob());
+#ifdef _UNICODE
+		TString strPwd = ToWstring(pszPassword);
 #else
-				m_fileStreams.PutFile(item.path().c_str(), zipFile.getBlob());
-#endif // _WIN32	
-			}
-		}
-		catch (const bit7z::BitException& e) {
-			std::cerr << "Error opening archive: " << e.what() << std::endl;
-			return FALSE;
-		}
-
-		return TRUE;
+		TString strPwd = pszPassword;
+#endif
+		SevenZip::SevenZipPassword pwd(true, strPwd);
+		SevenZip::SevenZipExtractorMemory decompress;
+		TString strFilename = pszFileName;
+		decompress.SetArchivePath(strFilename.c_str());
+		return (S_OK == decompress.ExtractArchive(m_fileStreams, NULL, &pwd));
 	}
 
 #ifdef _WIN32
-	BOOL CZipArchive::Open(HMODULE hModule, LPCTSTR pszName, LPCTSTR pszPassword, LPCTSTR pszType)
+	BOOL CZipArchive::Open(HMODULE hModule, LPCTSTR pszName, LPCSTR pszPassword, LPCTSTR pszType)
 	{
 		HRSRC hResInfo = ::FindResource(hModule, pszName, pszType);
 		if (hResInfo == NULL)
@@ -223,30 +189,12 @@ namespace SevenZip{
 		if (hResData == NULL)
 			return FALSE;
 
-		try {
-			std::vector<bit7z::byte_t> data(static_cast<size_t>(dwLength));
-			void* dataPtr = LockResource(hResData);
-			if (dataPtr != NULL) {
-				memcpy(data.data(), dataPtr, dwLength);
-			}
-
-			std::unique_ptr<bit7z::BitArchiveReader> archivereader = std::make_unique<bit7z::BitArchiveReader>(Get7zLibrary(), data, bit7z::BitFormat::Auto);
-			archivereader->setPassword(pszPassword);
-			for (const auto& item : archivereader->items()) {
-				if (item.isDir()) continue;
-				std::vector<bit7z::byte_t> buffer;
-				archivereader->extractTo(buffer, item.index());
-				CZipFile zipFile;
-				zipFile.Attach(buffer.data(), buffer.size());
-				m_fileStreams.PutFile(S_CW2A(item.path().c_str()), zipFile.getBlob());
-			}
-		}
-		catch (const bit7z::BitException& e) {
-			std::cerr << "Error opening archive: " << e.what() << std::endl;
-			return FALSE;
-		}
-
-		return TRUE;
+		TString strPsw = ToWstring(pszPassword);
+		TString s_pwd = strPsw.c_str();
+		SevenZip::SevenZipPassword pwd(true, s_pwd);
+		SevenZip::SevenZipExtractorMemory decompress;
+		decompress.SetArchiveData(hResData,dwLength);
+		return (S_OK == decompress.ExtractArchive(m_fileStreams, NULL, &pwd));
 	}
 #endif // _WIN32
 
@@ -261,26 +209,25 @@ namespace SevenZip{
 
 		return dwRead;
 	}
-
-	bit7z::Bit7zLibrary & CZipArchive::Get7zLibrary()
-	{
-#if defined(_WIN32)
-		static bit7z::Bit7zLibrary lib((GetExePath().parent_path() / "7z.dll").string< bit7z::tchar >());
-#else
-		static bit7z::Bit7zLibrary lib((GetExePath().parent_path() / "7z.so").string());
-#endif
-		return lib;
-	}
-
+ 
 	DWORD CZipArchive::GetFileSize( LPCTSTR pszFileName )
 	{
-		SStringA fileName = S_CT2A(pszFileName);
+#ifdef _UNICODE
+		std::string fileName = ToString(pszFileName);
+#else
+		std::string fileName = pszFileName;
+#endif // _UNICODE
 		return m_fileStreams.GetFileSize(fileName.c_str());
 	} 
 
 	BOOL CZipArchive::IsFileExist( LPCTSTR pszFileName )
 	{
-		SStringA fileName = S_CT2A(pszFileName);
+#ifdef _UNICODE
+		std::string fileName = ToString(pszFileName);
+#else
+		std::string fileName = pszFileName;
+#endif // _UNICODE
+
 		return m_fileStreams.GetFilePtr(fileName.c_str())!=NULL;
 	} 
 

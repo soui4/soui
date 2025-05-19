@@ -2,15 +2,26 @@
 #define __ZIPARCHIVE_H__
 
 #pragma once
-#include <string>
-#include <vector>
-#include <bit7z/bit7zlibrary.hpp>
-#include <bit7z/bitarchivereader.hpp>
-#include <bit7z/bitmemextractor.hpp>
-#include <bit7z/bittypes.hpp>
-#include "SevenZip/FileStream.h"
+
+#ifdef _WIN32
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#endif // !WIN32_LEAN_AND_MEAN
+#include <windows.h>
 #include <tchar.h>
-#include <malloc.h>
+#else
+#include "SevenZip/../CPP/Common/MyWindows.h"
+
+#define CopyMemory(Destination, Source, Length)  memcpy((Destination), (Source), (Length))
+
+#define FILE_BEGIN   0
+#define FILE_CURRENT 1
+#define FILE_END     2
+typedef DWORD *LPDWORD;
+typedef BYTE *LPBYTE;
+
+#endif
+#include "SevenZip/FileStream.h"
 
 namespace SevenZip{
 
@@ -48,9 +59,9 @@ public:
 	CZipArchive();
 	~CZipArchive();
 
-	BOOL Open(LPCTSTR pszFileName, LPCTSTR pszPassword);
+	BOOL Open(LPCTSTR pszFileName, LPCSTR pszPassword);
 #ifdef _WIN32
-	BOOL Open(HMODULE hModule, LPCTSTR pszName, LPCTSTR pszPassword, LPCTSTR pszType = _T("7Z"));
+	BOOL Open(HMODULE hModule, LPCTSTR pszName, LPCSTR pszPassword, LPCTSTR pszType = _T("7Z"));
 #endif // _WIN32
 
 	void Close();
@@ -70,11 +81,8 @@ protected:
 	void CloseFile();
 
 	DWORD ReadFile(void* pBuffer, DWORD dwBytes);
-
-	bit7z::Bit7zLibrary& Get7zLibrary();
 private:
 	CFileStream m_fileStreams;
-	bit7z::Bit7zLibrary m_lib;
 };
 
 }//end of ns

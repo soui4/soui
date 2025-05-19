@@ -1,6 +1,6 @@
 // UpdateAction.cpp
 
-
+#include "StdAfx.h"
 
 #include "UpdateAction.h"
 

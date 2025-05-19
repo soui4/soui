@@ -1,24 +1,24 @@
 // Compress/BZip2Decoder.h
 
-#ifndef __COMPRESS_BZIP2_DECODER_H
-#define __COMPRESS_BZIP2_DECODER_H
+#ifndef ZIP7_INC_COMPRESS_BZIP2_DECODER_H
+#define ZIP7_INC_COMPRESS_BZIP2_DECODER_H
 
 #include "../../Common/MyCom.h"
 
-#ifndef _7ZIP_ST
+// #define Z7_NO_READ_FROM_CODER
+// #define Z7_ST
+
+#ifndef Z7_ST
 #include "../../Windows/Synchronization.h"
 #include "../../Windows/Thread.h"
 #endif
 
 #include "../ICoder.h"
 
-#include "../Common/InBuffer.h"
-#include "../Common/OutBuffer.h"
-
-#include "BitmDecoder.h"
 #include "BZip2Const.h"
 #include "BZip2Crc.h"
 #include "HuffmanDecoder.h"
+#include "Mtf8.h"
 
 namespace NCompress {
 namespace NBZip2 {
@@ -26,212 +26,362 @@ namespace NBZip2 {
 bool IsEndSig(const Byte *p) throw();
 bool IsBlockSig(const Byte *p) throw();
 
-typedef NCompress::NHuffman::CDecoder<kMaxHuffmanLen, kMaxAlphaSize> CHuffmanDecoder;
+const unsigned kNumTableBits = 9;
 
-class CDecoder;
+typedef NHuffman::CDecoder<kMaxHuffmanLen, kMaxAlphaSize, kNumTableBits> CHuffmanDecoder;
 
-struct CState
-{
-  UInt32 *Counters;
-
-  #ifndef _7ZIP_ST
-
-  CDecoder *Decoder;
-  NWindows::CThread Thread;
-  bool m_OptimizeNumTables;
-
-  NWindows::NSynchronization::CAutoResetEvent StreamWasFinishedEvent;
-  NWindows::NSynchronization::CAutoResetEvent WaitingWasStartedEvent;
-
-  // it's not member of this thread. We just need one event per thread
-  NWindows::NSynchronization::CAutoResetEvent CanWriteEvent;
-
-  Byte MtPad[1 << 8]; // It's pad for Multi-Threading. Must be >= Cache_Line_Size.
-
-  HRESULT Create();
-  void FinishStream();
-  void ThreadFunc();
-
-  #endif
-
-  CState(): Counters(0) {}
-  ~CState() { Free(); }
-  bool Alloc();
-  void Free();
-};
 
 struct CBlockProps
 {
   UInt32 blockSize;
   UInt32 origPtr;
-  bool randMode;
+  unsigned randMode;
   
-  CBlockProps(): blockSize(0), origPtr(0), randMode(false) {}
+  CBlockProps(): blockSize(0), origPtr(0), randMode(0) {}
 };
 
-struct CBase
+
+struct CBitDecoder
 {
-  CMyComPtr<ISequentialInStream> InStreamRef;
-  NBitm::CDecoder<CInBuffer> BitDecoder;
+  unsigned _numBits;
+  UInt32 _value;
+  const Byte *_buf;
+  const Byte *_lim;
 
-private:
-  Byte m_Selectors[kNumSelectorsMax];
-  CHuffmanDecoder m_HuffmanDecoders[kNumTablesMax];
+  void InitBitDecoder()
+  {
+    _numBits = 0;
+    _value = 0;
+  }
 
-public:
-  UInt64 NumBlocks;
-
-  CBase(): NumBlocks(0) {}
-  UInt32 ReadBits(unsigned numBits);
-  unsigned ReadBit();
-  void InitNumBlocks() { NumBlocks = 0; }
+  void AlignToByte()
+  {
+    unsigned bits = _numBits & 7;
+    _numBits -= bits;
+    _value <<= bits;
+  }
 
   /*
-    ReadBlock() props->randMode:
-      in: need read randMode bit,
-      out: randMode status
+  bool AreRemainByteBitsEmpty() const
+  {
+    unsigned bits = _numBits & 7;
+    if (bits != 0)
+      return (_value >> (32 - bits)) == 0;
+    return true;
+  }
   */
-  HRESULT ReadBlock(UInt32 *charCounters, UInt32 blockSizeMax, CBlockProps *props);
+
+  SRes ReadByte(int &b);
+
+  CBitDecoder():
+    _buf(NULL),
+    _lim(NULL)
+  {
+    InitBitDecoder();
+  }
 };
 
-class CDecoder :
-  public ICompressCoder,
-  #ifndef _7ZIP_ST
-  public ICompressSetCoderMt,
-  #endif
-  public CMyUnknownImp
+
+// 19.03: we allow additional 8 selectors to support files created by lbzip2.
+const UInt32 kNumSelectorsMax_Decoder = kNumSelectorsMax + 8;
+
+struct CBase: public CBitDecoder
 {
-public:
-  COutBuffer m_OutStream;
-  Byte MtPad[1 << 8]; // It's pad for Multi-Threading. Must be >= Cache_Line_Size.
+  unsigned numInUse;
+  UInt32 groupIndex;
+  UInt32 groupSize;
+  unsigned runPower;
+  UInt32 runCounter;
+  UInt32 blockSize;
 
-  CBase Base;
+  UInt32 *Counters;
+  UInt32 blockSizeMax;
 
-  UInt64 _inStart;
+  unsigned state;
+  UInt32 state2;
+  unsigned state3;
+  unsigned state4;
+  unsigned state5;
+  unsigned numTables;
+  UInt32 numSelectors;
+
+  CBlockProps Props;
 
 private:
+  CMtf8Decoder mtf;
+  Byte selectors[kNumSelectorsMax_Decoder];
+  CHuffmanDecoder huffs[kNumTablesMax];
 
-  bool _needInStreamInit;
+  Byte lens[kMaxAlphaSize];
 
-  Byte ReadByte();
+  Byte temp[10];
 
-  HRESULT DecodeFile(ICompressProgressInfo *progress);
-  HRESULT CodeReal(ISequentialInStream *inStream, ISequentialOutStream *outStream, ICompressProgressInfo *progress);
+public:
+  UInt32 crc;
+  CBZip2CombinedCrc CombinedCrc;
   
-  class CDecoderFlusher
+  bool IsBz;
+  bool StreamCrcError;
+  bool MinorError;
+  bool NeedMoreInput;
+
+  bool DecodeAllStreams;
+  
+  UInt64 NumStreams;
+  UInt64 NumBlocks;
+  UInt64 FinishedPackSize;
+
+  ISequentialInStream *InStream;
+
+  #ifndef Z7_NO_READ_FROM_CODER
+  CMyComPtr<ISequentialInStream> InStreamRef;
+  #endif
+
+  CBase():
+      StreamCrcError(false),
+      MinorError(false),
+      NeedMoreInput(false),
+
+      DecodeAllStreams(false),
+      
+      NumStreams(0),
+      NumBlocks(0),
+      FinishedPackSize(0)
+      {}
+
+  void InitNumStreams2()
+  {
+    StreamCrcError = false;
+    MinorError = false;
+    NeedMoreInput = 0;
+    NumStreams = 0;
+    NumBlocks = 0;
+    FinishedPackSize = 0;
+  }
+
+  SRes ReadStreamSignature2();
+  SRes ReadBlockSignature2();
+
+  /* ReadBlock2() : Props->randMode:
+       in:  need read randMode bit
+       out: randMode status */
+  SRes ReadBlock2();
+};
+
+
+class CSpecState
+{
+  UInt32 _tPos;
+  unsigned _prevByte;
+  int _reps;
+
+public:
+  CBZip2Crc _crc;
+  UInt32 _blockSize;
+  UInt32 *_tt;
+
+  int _randToGo;
+  unsigned _randIndex;
+
+  void Init(UInt32 origPtr, unsigned randMode) throw();
+
+  bool Finished() const { return _reps <= 0 && _blockSize == 0; }
+
+  Byte *Decode(Byte *data, size_t size) throw();
+};
+
+
+  
+ 
+class CDecoder:
+  public ICompressCoder,
+  public ICompressSetFinishMode,
+  public ICompressGetInStreamProcessedSize,
+  public ICompressReadUnusedFromInBuf,
+#ifndef Z7_NO_READ_FROM_CODER
+  public ICompressSetInStream,
+  public ICompressSetOutStreamSize,
+  public ISequentialInStream,
+#endif
+#ifndef Z7_ST
+  public ICompressSetCoderMt,
+#endif
+  public CMyUnknownImp
+{
+  Z7_COM_QI_BEGIN2(ICompressCoder)
+  Z7_COM_QI_ENTRY(ICompressSetFinishMode)
+  Z7_COM_QI_ENTRY(ICompressGetInStreamProcessedSize)
+  Z7_COM_QI_ENTRY(ICompressReadUnusedFromInBuf)
+#ifndef Z7_NO_READ_FROM_CODER
+  Z7_COM_QI_ENTRY(ICompressSetInStream)
+  Z7_COM_QI_ENTRY(ICompressSetOutStreamSize)
+  Z7_COM_QI_ENTRY(ISequentialInStream)
+#endif
+#ifndef Z7_ST
+  Z7_COM_QI_ENTRY(ICompressSetCoderMt)
+#endif
+  Z7_COM_QI_END
+  Z7_COM_ADDREF_RELEASE
+
+  Z7_IFACE_COM7_IMP(ICompressCoder)
+  Z7_IFACE_COM7_IMP(ICompressSetFinishMode)
+  Z7_IFACE_COM7_IMP(ICompressGetInStreamProcessedSize)
+  Z7_IFACE_COM7_IMP(ICompressReadUnusedFromInBuf)
+#ifndef Z7_NO_READ_FROM_CODER
+  Z7_IFACE_COM7_IMP(ICompressSetInStream)
+  Z7_IFACE_COM7_IMP(ICompressSetOutStreamSize)
+  Z7_IFACE_COM7_IMP_NONFINAL(ISequentialInStream)
+#endif
+public:
+#ifndef Z7_ST
+  Z7_IFACE_COM7_IMP(ICompressSetCoderMt)
+#endif
+
+private:
+  Byte *_outBuf;
+  size_t _outPos;
+  UInt64 _outWritten;
+  ISequentialOutStream *_outStream;
+  HRESULT _writeRes;
+
+protected:
+  HRESULT ErrorResult; // for ISequentialInStream::Read mode only
+
+public:
+
+  UInt32 _calcedBlockCrc;
+  bool _blockFinished;
+  bool BlockCrcError;
+
+  bool FinishMode;
+  bool _outSizeDefined;
+  UInt64 _outSize;
+  UInt64 _outPosTotal;
+
+  CSpecState _spec;
+  UInt32 *_counters;
+
+  #ifndef Z7_ST
+
+  struct CBlock
+  {
+    bool StopScout;
+    
+    bool WasFinished;
+    bool Crc_Defined;
+    // bool NextCrc_Defined;
+    
+    UInt32 Crc;
+    UInt32 NextCrc;
+    HRESULT Res;
+    UInt64 PackPos;
+    
+    CBlockProps Props;
+  };
+
+  CBlock _block;
+
+  bool NeedWaitScout;
+  bool MtMode;
+
+  NWindows::CThread Thread;
+  NWindows::NSynchronization::CAutoResetEvent DecoderEvent;
+  NWindows::NSynchronization::CAutoResetEvent ScoutEvent;
+  // HRESULT ScoutRes;
+  
+  Byte MtPad[1 << 7]; // It's pad for Multi-Threading. Must be >= Cache_Line_Size.
+
+
+  void RunScout();
+
+  void WaitScout()
+  {
+    if (NeedWaitScout)
+    {
+      DecoderEvent.Lock();
+      NeedWaitScout = false;
+    }
+  }
+
+  class CWaitScout_Releaser
   {
     CDecoder *_decoder;
   public:
-    bool NeedFlush;
-    CDecoderFlusher(CDecoder *decoder): _decoder(decoder), NeedFlush(true) {}
-    ~CDecoderFlusher()
-    {
-      if (NeedFlush)
-        _decoder->Flush();
-    }
+    CWaitScout_Releaser(CDecoder *decoder): _decoder(decoder) {}
+    ~CWaitScout_Releaser() { _decoder->WaitScout(); }
   };
 
-public:
-  CBZip2CombinedCrc CombinedCrc;
-  ICompressProgressInfo *Progress;
+  HRESULT CreateThread();
 
-  #ifndef _7ZIP_ST
-  CState *m_States;
-  UInt32 m_NumThreadsPrev;
-
-  NWindows::NSynchronization::CManualResetEvent CanProcessEvent;
-  NWindows::NSynchronization::CCriticalSection CS;
-  UInt32 NumThreads;
-  bool MtMode;
-  UInt32 NextBlockIndex;
-  bool CloseThreads;
-  bool StreamWasFinished1;
-  bool StreamWasFinished2;
-  NWindows::NSynchronization::CManualResetEvent CanStartWaitingEvent;
-
-  HRESULT Result1;
-  HRESULT Result2;
-
-  UInt32 BlockSizeMax;
-
-  ~CDecoder();
-  HRESULT Create();
-  void Free();
-
-  #else
-  CState m_States[1];
   #endif
 
-  bool IsBz;
-  bool BzWasFinished; // bzip stream was finished with end signature
-  bool CrcError; // it can CRC error of block or CRC error of whole stream.
+  Byte *_inBuf;
+  UInt64 _inProcessed;
+  bool _inputFinished;
+  HRESULT _inputRes;
 
-  CDecoder();
-
-  HRESULT SetRatioProgress(UInt64 packSize);
-  HRESULT ReadSignature(UInt32 &crc);
-
-  HRESULT Flush() { return m_OutStream.Flush(); }
-
-  MY_QUERYINTERFACE_BEGIN2(ICompressCoder)
-  #ifndef _7ZIP_ST
-  MY_QUERYINTERFACE_ENTRY(ICompressSetCoderMt)
-  #endif
-
-  MY_QUERYINTERFACE_END
-  MY_ADDREF_RELEASE
-
-  
-  STDMETHOD(Code)(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-      const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress);
-
-  STDMETHOD(SetInStream)(ISequentialInStream *inStream);
-  STDMETHOD(ReleaseInStream)();
-
-  HRESULT CodeResume(ISequentialOutStream *outStream, ICompressProgressInfo *progress);
-
-  UInt64 GetStreamSize() const { return Base.BitDecoder.GetStreamSize(); }
-  UInt64 GetInputProcessedSize() const { return Base.BitDecoder.GetProcessedSize(); }
-
-  void InitNumBlocks() { Base.InitNumBlocks(); }
-  UInt64 GetNumBlocks() const { return Base.NumBlocks; }
-  
-  #ifndef _7ZIP_ST
-  STDMETHOD(SetNumberOfThreads)(UInt32 numThreads);
-  #endif
-};
-
-
-class CNsisDecoder :
-  public ISequentialInStream,
-  public ICompressSetInStream,
-  public ICompressSetOutStreamSize,
-  public CMyUnknownImp
-{
   CBase Base;
 
-  CState m_State;
+  bool GetCrcError() const { return BlockCrcError || Base.StreamCrcError; }
+
+  void InitOutSize(const UInt64 *outSize);
   
-  int _nsisState;
-  UInt32 _tPos;
-  unsigned _prevByte;
-  unsigned _repRem;
-  unsigned _numReps;
-  UInt32 _blockSize;
+  bool CreateInputBufer();
 
-public:
+  void InitInputBuffer()
+  {
+    // We use InitInputBuffer() before stream init.
+    // So don't read from stream here
+    _inProcessed = 0;
+    Base._buf = _inBuf;
+    Base._lim = _inBuf;
+    Base.InitBitDecoder();
+  }
 
-  MY_QUERYINTERFACE_BEGIN2(ISequentialInStream)
-  MY_QUERYINTERFACE_ENTRY(ICompressSetInStream)
-  MY_QUERYINTERFACE_ENTRY(ICompressSetOutStreamSize)
-  MY_QUERYINTERFACE_END
-  MY_ADDREF_RELEASE
+  UInt64 GetInputProcessedSize() const
+  {
+    // for NSIS case : we need also look the number of bits in bitDecoder
+    return _inProcessed + (size_t)(Base._buf - _inBuf);
+  }
 
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
-  STDMETHOD(SetInStream)(ISequentialInStream *inStream);
-  STDMETHOD(ReleaseInStream)();
-  STDMETHOD(SetOutStreamSize)(const UInt64 *outSize);
+  UInt64 GetInStreamSize() const
+  {
+    return _inProcessed + (size_t)(Base._buf - _inBuf) - (Base._numBits >> 3);
+  }
+
+  UInt64 GetOutProcessedSize() const { return _outWritten + _outPos; }
+
+  HRESULT ReadInput();
+
+  void StartNewStream();
+  
+  HRESULT ReadStreamSignature();
+  HRESULT StartRead();
+
+  HRESULT ReadBlockSignature();
+  HRESULT ReadBlock();
+
+  HRESULT Flush();
+  HRESULT DecodeBlock(const CBlockProps &props);
+  HRESULT DecodeStreams(ICompressProgressInfo *progress);
+
+  UInt64 GetNumStreams() const { return Base.NumStreams; }
+  UInt64 GetNumBlocks() const { return Base.NumBlocks; }
+
+  CDecoder();
+  virtual ~CDecoder();
 };
+
+
+
+#ifndef Z7_NO_READ_FROM_CODER
+
+class CNsisDecoder Z7_final: public CDecoder
+{
+  Z7_IFACE_COM7_IMP(ISequentialInStream)
+};
+
+#endif
 
 }}
 

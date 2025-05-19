@@ -6,9 +6,11 @@
 #include "../CPP/7zip/ICoder.h"
 #include "../CPP/Common/MyCom.h"
 #include "../CPP/Common/MyString.h"
+#include "../CPP/Common/MyWindows.h"
 
 #include "CompressionFormat.h"
 #include "ProgressCallback.h"
+#include <atomic>
 
 namespace SevenZip
 {
@@ -24,7 +26,7 @@ namespace intl
 		UString Password;
 	private:
 
-		long m_refCount;
+		std::atomic<long> m_refCount;
 		CMyComPtr< IInArchive > m_archiveHandler;
 		TString m_directory;
 

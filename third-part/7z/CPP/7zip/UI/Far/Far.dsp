@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FAR_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FAR_EXPORTS" /D "EXTERNAL_CODECS" /D "NEW_FOLDER_INTERFACE" /Yu"StdAfx.h" /FD /c
+# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FAR_EXPORTS" /D "Z7_EXTERNAL_CODECS" /Yu"StdAfx.h" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
@@ -53,7 +53,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"C:\Program Files\Far\Plugins\7-Zip\7-ZipFar.dll" /opt:NOWIN98
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386 /out:"C:\Progs\Far\Plugins\7-Zip\7-ZipFar.dll" /opt:NOWIN98
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "Far - Win32 Debug"
@@ -70,7 +70,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FAR_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /Gz /MTd /W4 /WX /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FAR_EXPORTS" /D "EXTERNAL_CODECS" /D "NEW_FOLDER_INTERFACE" /Yu"StdAfx.h" /FD /GZ /c
+# ADD CPP /nologo /Gz /MTd /W4 /WX /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "FAR_EXPORTS" /D "Z7_EXTERNAL_CODECS" /Yu"StdAfx.h" /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
@@ -80,7 +80,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"C:\Program Files\Far\Plugins\7-Zip\7-ZipFar.dll" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /out:"C:\Progs\Far\Plugins\7-Zip\7-ZipFar.dll" /pdbtype:sept
 
 !ENDIF 
 
@@ -114,7 +114,19 @@ SOURCE=.\StdAfx.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\..\Common\Common.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Common\CRC.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\DynLimBuf.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\DynLimBuf.h
 # End Source File
 # Begin Source File
 
@@ -126,6 +138,10 @@ SOURCE=..\..\..\Common\IntToString.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\Common\MyCom.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Common\MyString.cpp
 # End Source File
 # Begin Source File
@@ -134,11 +150,19 @@ SOURCE=..\..\..\Common\MyString.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\Common\MyTypes.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Common\MyVector.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\Common\MyVector.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\MyWindows.h
 # End Source File
 # Begin Source File
 
@@ -326,6 +350,14 @@ SOURCE=..\..\..\Windows\FileName.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\Windows\FileSystem.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Windows\FileSystem.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Windows\PropVariant.cpp
 # End Source File
 # Begin Source File
@@ -363,6 +395,14 @@ SOURCE=..\..\..\Windows\Synchronization.cpp
 # Begin Source File
 
 SOURCE=..\..\..\Windows\Synchronization.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Windows\System.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Windows\System.h
 # End Source File
 # Begin Source File
 
@@ -427,6 +467,14 @@ SOURCE=..\Common\ExtractMode.h
 # Begin Source File
 
 SOURCE=..\Common\HandlerLoader.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\Common\HashCalc.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\Common\HashCalc.h
 # End Source File
 # Begin Source File
 
@@ -546,10 +594,6 @@ SOURCE=..\Agent\ArchiveFolder.cpp
 # End Source File
 # Begin Source File
 
-SOURCE=..\Agent\ArchiveFolderOpen.cpp
-# End Source File
-# Begin Source File
-
 SOURCE=..\Agent\ArchiveFolderOut.cpp
 # End Source File
 # Begin Source File
@@ -622,6 +666,14 @@ SOURCE=..\..\Common\LimitedStreams.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\Common\MethodProps.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Common\MethodProps.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\Common\ProgressUtils.cpp
 # End Source File
 # Begin Source File
@@ -676,12 +728,24 @@ SOURCE=..\..\..\..\C\7zCrcOpt.c
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\..\C\7zTypes.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\7zWindows.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\C\Alloc.c
 # SUBTRACT CPP /YX /Yc /Yu
 # End Source File
 # Begin Source File
 
 SOURCE=..\..\..\..\C\Alloc.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\Compiler.h
 # End Source File
 # Begin Source File
 
@@ -710,6 +774,14 @@ SOURCE=..\..\..\..\C\Threads.h
 # Begin Group "Arc Common"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\Archive\Common\ItemNameUtils.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Archive\Common\ItemNameUtils.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\Archive\Common\OutStreamWithCRC.cpp

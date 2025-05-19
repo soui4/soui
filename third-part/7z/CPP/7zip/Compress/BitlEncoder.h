@@ -1,7 +1,7 @@
 // BitlEncoder.h -- the Least Significant Bit of byte is First
 
-#ifndef __BITL_ENCODER_H
-#define __BITL_ENCODER_H
+#ifndef ZIP7_INC_BITL_ENCODER_H
+#define ZIP7_INC_BITL_ENCODER_H
 
 #include "../Common/OutBuffer.h"
 
@@ -39,7 +39,7 @@ public:
     {
       if (numBits < _bitPos)
       {
-        _curByte |= (value & ((1 << numBits) - 1)) << (8 - _bitPos);
+        _curByte |= (Byte)((value & ((1 << numBits) - 1)) << (8 - _bitPos));
         _bitPos -= numBits;
         return;
       }

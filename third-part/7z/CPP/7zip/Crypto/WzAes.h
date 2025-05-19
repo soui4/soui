@@ -9,18 +9,15 @@ specified in "A Password Based File Encryption Utility":
   - 2 bytes contain Password Verifier's Code
 */
 
-#ifndef __CRYPTO_WZ_AES_H
-#define __CRYPTO_WZ_AES_H
-
-#include "../../../C/Aes.h"
+#ifndef ZIP7_INC_CRYPTO_WZ_AES_H
+#define ZIP7_INC_CRYPTO_WZ_AES_H
 
 #include "../../Common/MyBuffer.h"
-#include "../../Common/MyCom.h"
 
-#include "../ICoder.h"
 #include "../IPassword.h"
 
 #include "HmacSha1.h"
+#include "MyAes.h"
 
 namespace NCrypto {
 namespace NWzAes {
@@ -64,37 +61,65 @@ struct CKeyInfo
   unsigned GetNumSaltWords() const { return (KeySizeMode + 1); }
 
   CKeyInfo(): KeySizeMode(kKeySizeMode_AES256) {}
+
+  void Wipe()
+  {
+    Password.Wipe();
+    Z7_memset_0_ARRAY(Salt);
+    Z7_memset_0_ARRAY(PwdVerifComputed);
+  }
+
+  ~CKeyInfo() { Wipe(); }
 };
 
+/*
 struct CAesCtr2
 {
   unsigned pos;
-  unsigned offset;
-  UInt32 aes[4 + AES_NUM_IVMRK_WORDS + 3];
+  CAlignedBuffer aes;
+  UInt32 *Aes() { return (UInt32 *)(Byte *)aes; }
+
+  // unsigned offset;
+  // UInt32 aes[4 + AES_NUM_IVMRK_WORDS + 3];
+  // UInt32 *Aes() { return aes + offset; }
   CAesCtr2();
 };
 
 void AesCtr2_Init(CAesCtr2 *p);
 void AesCtr2_Code(CAesCtr2 *p, Byte *data, SizeT size);
+*/
 
 class CBaseCoder:
   public ICompressFilter,
   public ICryptoSetPassword,
   public CMyUnknownImp
 {
+  Z7_COM_UNKNOWN_IMP_1(ICryptoSetPassword)
+  Z7_COM7F_IMP(Init())
+public:
+  Z7_IFACE_COM7_IMP(ICryptoSetPassword)
 protected:
   CKeyInfo _key;
-  NSha1::CHmac _hmac;
-  CAesCtr2 _aes;
+
+  // NSha1::CHmac _hmac;
+  // NSha1::CHmac *Hmac() { return &_hmac; }
+  CAlignedBuffer1 _hmacBuf;
+  UInt32 _hmacOverCalc;
+
+  NSha1::CHmac *Hmac() { return (NSha1::CHmac *)(void *)(Byte *)_hmacBuf; }
+
+  // CAesCtr2 _aes;
+  CAesCoder *_aesCoderSpec;
+  CMyComPtr<ICompressFilter> _aesCoder;
+  CBaseCoder():
+    _hmacBuf(sizeof(NSha1::CHmac))
+  {
+    _aesCoderSpec = new CAesCtrCoder(32);
+    _aesCoder = _aesCoderSpec;
+  }
 
   void Init2();
 public:
-  MY_UNKNOWN_IMP1(ICryptoSetPassword)
-
-  STDMETHOD(CryptoSetPassword)(const Byte *data, UInt32 size);
-
-  STDMETHOD(Init)();
-  
   unsigned GetHeaderSize() const { return _key.GetSaltSize() + kPwdVerifSize; }
   unsigned GetAddPackSize() const { return GetHeaderSize() + kMacSize; }
 
@@ -105,26 +130,27 @@ public:
     _key.KeySizeMode = (EKeySizeMode)mode;
     return true;
   }
+
+  virtual ~CBaseCoder() {}
 };
 
-class CEncoder:
+class CEncoder Z7_final:
   public CBaseCoder
 {
+  Z7_COM7F_IMP2(UInt32, Filter(Byte *data, UInt32 size))
 public:
-  STDMETHOD_(UInt32, Filter)(Byte *data, UInt32 size);
   HRESULT WriteHeader(ISequentialOutStream *outStream);
   HRESULT WriteFooter(ISequentialOutStream *outStream);
 };
 
-class CDecoder:
+class CDecoder Z7_final:
   public CBaseCoder
   // public ICompressSetDecoderProperties2
 {
   Byte _pwdVerifFromArchive[kPwdVerifSize];
+  Z7_COM7F_IMP2(UInt32, Filter(Byte *data, UInt32 size))
 public:
-  // ICompressSetDecoderProperties2
-  // STDMETHOD(SetDecoderProperties2)(const Byte *data, UInt32 size);
-  STDMETHOD_(UInt32, Filter)(Byte *data, UInt32 size);
+  // Z7_IFACE_COM7_IMP(ICompressSetDecoderProperties2)
   HRESULT ReadHeader(ISequentialInStream *inStream);
   bool Init_and_CheckPassword();
   HRESULT CheckMac(ISequentialInStream *inStream, bool &isOK);

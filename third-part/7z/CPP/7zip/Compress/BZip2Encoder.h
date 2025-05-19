@@ -1,12 +1,12 @@
 // BZip2Encoder.h
 
-#ifndef __COMPRESS_BZIP2_ENCODER_H
-#define __COMPRESS_BZIP2_ENCODER_H
+#ifndef ZIP7_INC_COMPRESS_BZIP2_ENCODER_H
+#define ZIP7_INC_COMPRESS_BZIP2_ENCODER_H
 
 #include "../../Common/Defs.h"
 #include "../../Common/MyCom.h"
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 #include "../../Windows/Synchronization.h"
 #include "../../Windows/Thread.h"
 #endif
@@ -53,7 +53,7 @@ public:
       unsigned numNewBits = MyMin(numBits, _bitPos);
       numBits -= numNewBits;
       
-      _curByte <<= numNewBits;
+      _curByte = (Byte)(_curByte << numNewBits);
       UInt32 newBits = value >> numBits;
       _curByte |= Byte(newBits);
       value -= (newBits << numBits);
@@ -107,8 +107,6 @@ private:
   UInt32 m_CRCs[1 << kNumPassesMax];
   UInt32 m_NumCrcs;
 
-  UInt32 m_BlockIndex;
-
   void WriteBits2(UInt32 value, unsigned numBits);
   void WriteByte2(Byte b);
   void WriteBit2(Byte v);
@@ -120,7 +118,7 @@ private:
 public:
   bool m_OptimizeNumTables;
   CEncoder *Encoder;
-  #ifndef _7ZIP_ST
+ #ifndef Z7_ST
   NWindows::CThread Thread;
 
   NWindows::NSynchronization::CAutoResetEvent StreamWasFinishedEvent;
@@ -129,15 +127,17 @@ public:
   // it's not member of this thread. We just need one event per thread
   NWindows::NSynchronization::CAutoResetEvent CanWriteEvent;
 
-  UInt64 m_PackSize;
-
+private:
+  UInt32 m_BlockIndex;
+  UInt64 m_UnpackSize;
+public:
   Byte MtPad[1 << 8]; // It's pad for Multi-Threading. Must be >= Cache_Line_Size.
   HRESULT Create();
   void FinishStream(bool needLeave);
-  DWORD ThreadFunc();
-  #endif
+  THREAD_FUNC_RET_TYPE ThreadFunc();
+ #endif
 
-  CThreadInfo(): m_BlockSorterIndex(0), m_Block(0) {}
+  CThreadInfo(): m_Block(NULL), m_BlockSorterIndex(NULL)  {}
   ~CThreadInfo() { Free(); }
   bool Alloc();
   void Free();
@@ -149,33 +149,53 @@ struct CEncProps
 {
   UInt32 BlockSizeMult;
   UInt32 NumPasses;
+  UInt64 Affinity;
   
   CEncProps()
   {
     BlockSizeMult = (UInt32)(Int32)-1;
     NumPasses = (UInt32)(Int32)-1;
+    Affinity = 0;
   }
   void Normalize(int level);
   bool DoOptimizeNumTables() const { return NumPasses > 1; }
 };
 
-class CEncoder :
+class CEncoder Z7_final:
   public ICompressCoder,
   public ICompressSetCoderProperties,
-  #ifndef _7ZIP_ST
+ #ifndef Z7_ST
   public ICompressSetCoderMt,
-  #endif
+ #endif
   public CMyUnknownImp
 {
+  Z7_COM_QI_BEGIN2(ICompressCoder)
+  Z7_COM_QI_ENTRY(ICompressSetCoderProperties)
+ #ifndef Z7_ST
+  Z7_COM_QI_ENTRY(ICompressSetCoderMt)
+ #endif
+  Z7_COM_QI_END
+  Z7_COM_ADDREF_RELEASE
+
+  Z7_IFACE_COM7_IMP(ICompressCoder)
+  Z7_IFACE_COM7_IMP(ICompressSetCoderProperties)
+ #ifndef Z7_ST
+  Z7_IFACE_COM7_IMP(ICompressSetCoderMt)
+ #endif
+
+ #ifndef Z7_ST
   UInt32 m_NumThreadsPrev;
+ #endif
 public:
   CInBuffer m_InStream;
+ #ifndef Z7_ST
   Byte MtPad[1 << 8]; // It's pad for Multi-Threading. Must be >= Cache_Line_Size.
+ #endif
   CBitmEncoder<COutBuffer> m_OutStream;
   CEncProps _props;
   CBZip2CombinedCrc CombinedCrc;
 
-  #ifndef _7ZIP_ST
+ #ifndef Z7_ST
   CThreadInfo *ThreadsInfo;
   NWindows::NSynchronization::CManualResetEvent CanProcessEvent;
   NWindows::NSynchronization::CCriticalSection CS;
@@ -189,9 +209,13 @@ public:
 
   HRESULT Result;
   ICompressProgressInfo *Progress;
-  #else
+ #else
   CThreadInfo ThreadsInfo;
-  #endif
+ #endif
+
+  UInt64 NumBlocks;
+
+  UInt64 GetInProcessedSize() const { return m_InStream.GetProcessedSize(); }
 
   UInt32 ReadRleBlock(Byte *buf);
   void WriteBytes(const Byte *data, UInt32 sizeInBits, Byte lastByte);
@@ -201,37 +225,21 @@ public:
   // void WriteBit(Byte v);
   void WriteCrc(UInt32 v);
 
-  #ifndef _7ZIP_ST
+ #ifndef Z7_ST
   HRESULT Create();
   void Free();
-  #endif
+ #endif
 
 public:
   CEncoder();
-  #ifndef _7ZIP_ST
+ #ifndef Z7_ST
   ~CEncoder();
-  #endif
+ #endif
 
   HRESULT Flush() { return m_OutStream.Flush(); }
   
-  MY_QUERYINTERFACE_BEGIN2(ICompressCoder)
-  #ifndef _7ZIP_ST
-  MY_QUERYINTERFACE_ENTRY(ICompressSetCoderMt)
-  #endif
-  MY_QUERYINTERFACE_ENTRY(ICompressSetCoderProperties)
-  MY_QUERYINTERFACE_END
-  MY_ADDREF_RELEASE
-
   HRESULT CodeReal(ISequentialInStream *inStream, ISequentialOutStream *outStream,
       const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress);
-
-  STDMETHOD(Code)(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-      const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress);
-  STDMETHOD(SetCoderProperties)(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps);
-
-  #ifndef _7ZIP_ST
-  STDMETHOD(SetNumberOfThreads)(UInt32 numThreads);
-  #endif
 };
 
 }}

@@ -1,7 +1,7 @@
 // RarVol.h
 
-#ifndef __ARCHIVE_RAR_VOL_H
-#define __ARCHIVE_RAR_VOL_H
+#ifndef ZIP7_INC_ARCHIVE_RAR_VOL_H
+#define ZIP7_INC_ARCHIVE_RAR_VOL_H
 
 #include "../../../Common/StringConvert.h"
 
@@ -22,18 +22,18 @@ class CVolumeName
   UString _changed;
   UString _after;
 public:
-  CVolumeName(): _needChangeForNext(true) {};
+  CVolumeName(): _needChangeForNext(true) {}
 
   bool InitName(const UString &name, bool newStyle = true)
   {
     _needChangeForNext = true;
     _after.Empty();
-    UString base = name;
-    int dotPos = name.ReverseFind_Dot();
+    UString base (name);
+    const int dotPos = name.ReverseFind_Dot();
 
     if (dotPos >= 0)
     {
-      const UString ext = name.Ptr(dotPos + 1);
+      const UString ext (name.Ptr(dotPos + 1));
       if (ext.IsEqualTo_Ascii_NoCase("rar"))
       {
         _after = name.Ptr(dotPos);
@@ -41,7 +41,7 @@ public:
       }
       else if (ext.IsEqualTo_Ascii_NoCase("exe"))
       {
-        _after.SetFromAscii(".rar");
+        _after = ".rar";
         base.DeleteFrom(dotPos);
       }
       else if (!newStyle)
@@ -52,7 +52,7 @@ public:
             ext.IsEqualTo_Ascii_NoCase("r01"))
         {
           _changed = ext;
-          _before = name.Left(dotPos + 1);
+          _before.SetFrom(name.Ptr(), (unsigned)dotPos + 1);
           return true;
         }
       }
@@ -60,24 +60,31 @@ public:
 
     if (newStyle)
     {
-      unsigned i = base.Len();
+      unsigned k = base.Len();
+
+      for (; k != 0; k--)
+        if (IsDigit(base[k - 1]))
+          break;
+
+      unsigned i = k;
 
       for (; i != 0; i--)
         if (!IsDigit(base[i - 1]))
           break;
 
-      if (i != base.Len())
+      if (i != k)
       {
-        _before = base.Left(i);
-        _changed = base.Ptr(i);
+        _before.SetFrom(base.Ptr(), i);
+        _changed.SetFrom(base.Ptr(i), k - i);
+        _after.Insert(0, base.Ptr(k));
         return true;
       }
     }
     
     _after.Empty();
     _before = base;
-    _before += L'.';
-    _changed.SetFromAscii("r00");
+    _before.Add_Dot();
+    _changed = "r00";
     _needChangeForNext = false;
     return true;
   }

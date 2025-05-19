@@ -1,7 +1,7 @@
 // MyXml.h
 
-#ifndef __MY_XML_H
-#define __MY_XML_H
+#ifndef ZIP7_INC_MY_XML_H
+#define ZIP7_INC_MY_XML_H
 
 #include "MyString.h"
 
@@ -21,14 +21,14 @@ public:
   
   const char * ParseItem(const char *s, int numAllowedLevels);
 
-  bool IsTagged(const AString &tag) const throw();
-  int FindProp(const AString &propName) const throw();
-  AString GetPropVal(const AString &propName) const;
+  bool IsTagged(const char *tag) const throw();
+  int FindProp(const char *propName) const throw();
+  AString GetPropVal(const char *propName) const;
   AString GetSubString() const;
   const AString * GetSubStringPtr() const throw();
-  int FindSubTag(const AString &tag) const throw();
-  AString GetSubStringForTag(const AString &tag) const;
-
+  int FindSubTag(const char *tag) const throw();
+  const CXmlItem *FindSubTag_GetPtr(const char *tag) const throw();
+  AString GetSubStringForTag(const char *tag) const;
   void AppendTo(AString &s) const;
 };
 
@@ -39,5 +39,7 @@ struct CXml
   bool Parse(const char *s);
   // void AppendTo(AString &s) const;
 };
+
+void z7_xml_DecodeString(AString &s);
 
 #endif

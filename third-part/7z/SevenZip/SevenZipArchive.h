@@ -5,6 +5,10 @@
 #include "CompressionLevel.h"
 #include <vector>
 
+#ifndef _WIN32
+typedef void *              HGLOBAL;
+#endif // !_WIN32
+
 namespace SevenZip
 {
 	class SevenZipArchive

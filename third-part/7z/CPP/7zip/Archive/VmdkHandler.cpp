@@ -1,6 +1,6 @@
 // VmdkHandler.cpp
 
-
+#include "StdAfx.h"
 
 // #include <stdio.h>
 
@@ -31,17 +31,15 @@ namespace NVmdk {
 #define Get32(p) GetUi32(p)
 #define Get64(p) GetUi64(p)
 
-#define LE_16(offs, dest) dest = Get16(p + (offs));
-#define LE_32(offs, dest) dest = Get32(p + (offs));
-#define LE_64(offs, dest) dest = Get64(p + (offs));
+#define LE_16(offs, dest) dest = Get16(p + (offs))
+#define LE_32(offs, dest) dest = Get32(p + (offs))
+#define LE_64(offs, dest) dest = Get64(p + (offs))
 
 
-#define SIGNATURE { 'K', 'D', 'M', 'V' }
-  
-static const Byte k_Signature[] = SIGNATURE;
+static const Byte k_Signature[] = { 'K', 'D', 'M', 'V' };
 
 static const UInt32 k_Flags_NL         = (UInt32)1 << 0;
-static const UInt32 k_Flags_RGD        = (UInt32)1 << 1;
+// static const UInt32 k_Flags_RGD        = (UInt32)1 << 1;
 static const UInt32 k_Flags_ZeroGrain  = (UInt32)1 << 2;
 static const UInt32 k_Flags_Compressed = (UInt32)1 << 16;
 static const UInt32 k_Flags_Marker     = (UInt32)1 << 17;
@@ -65,10 +63,10 @@ struct CHeader
   UInt64 gdOffset;
   UInt64 overHead;
 
-  bool Is_NL()         const { return (flags & k_Flags_NL) != 0; };
-  bool Is_ZeroGrain()  const { return (flags & k_Flags_ZeroGrain) != 0; };
-  bool Is_Compressed() const { return (flags & k_Flags_Compressed) != 0; };
-  bool Is_Marker()     const { return (flags & k_Flags_Marker) != 0; };
+  bool Is_NL()         const { return (flags & k_Flags_NL) != 0; }
+  bool Is_ZeroGrain()  const { return (flags & k_Flags_ZeroGrain) != 0; }
+  bool Is_Compressed() const { return (flags & k_Flags_Compressed) != 0; }
+  bool Is_Marker()     const { return (flags & k_Flags_Marker) != 0; }
 
   bool Parse(const Byte *p);
 
@@ -138,7 +136,7 @@ static bool Str_to_ValName(const AString &s, AString &name, AString &val)
   int eq = s.Find('=');
   if (eq < 0 || (qu >= 0 && eq > qu))
     return false;
-  name = s.Left(eq);
+  name.SetFrom(s.Ptr(), eq);
   name.Trim();
   val = s.Ptr(eq + 1);
   val.Trim();
@@ -165,7 +163,7 @@ static const char *SkipSpaces(const char *s)
 static const char *GetNextWord(const char *s, AString &dest)
 {
   dest.Empty();
-  SKIP_SPACES(s);
+  SKIP_SPACES(s)
   const char *start = s;
   for (;; s++)
   {
@@ -180,7 +178,7 @@ static const char *GetNextWord(const char *s, AString &dest)
 
 static const char *GetNextNumber(const char *s, UInt64 &val)
 {
-  SKIP_SPACES(s);
+  SKIP_SPACES(s)
   if (*s == 0)
     return s;
   const char *end;
@@ -228,7 +226,7 @@ bool CExtentInfo::Parse(const char *s)
   if (Type.IsEmpty())
     return false;
 
-  SKIP_SPACES(s);
+  SKIP_SPACES(s)
 
   if (IsType_ZERO())
     return (*s == 0);
@@ -243,7 +241,7 @@ bool CExtentInfo::Parse(const char *s)
     FileName.SetFrom(s, (unsigned)(s2 - s));
     s = s2 + 1;
   }
-  SKIP_SPACES(s);
+  SKIP_SPACES(s)
   if (*s == 0)
     return true;
 
@@ -296,10 +294,15 @@ bool CDescriptor::Parse(const Byte *p, size_t size)
   AString name;
   AString val;
   
-  for (size_t i = 0;; i++)
+  for (;;)
   {
-    const char c = p[i];
-    if (i == size || c == 0 || c == 0xA || c == 0xD)
+    Byte c = 0;
+    if (size != 0)
+    {
+      size--;
+      c = *p++;
+    }
+    if (c == 0 || c == 0xA || c == 0xD)
     {
       if (!s.IsEmpty() && s[0] != '#')
       {
@@ -322,14 +325,12 @@ bool CDescriptor::Parse(const Byte *p, size_t size)
       }
       
       s.Empty();
-      if (c == 0 || i >= size)
-        break;
+      if (c == 0)
+        return true;
     }
     else
       s += (char)c;
   }
-
-  return true;
 }
 
 
@@ -366,7 +367,7 @@ struct CExtent
 
   UInt64 GetEndOffset() const { return StartOffset + NumBytes; }
   
-  bool IsVmdk() const { return !IsZero && !IsFlat; };
+  bool IsVmdk() const { return !IsZero && !IsFlat; }
   // if (IsOK && IsVmdk()), then VMDK header of this extent was read
   
   CExtent():
@@ -400,7 +401,7 @@ struct CExtent
   HRESULT Seek(UInt64 offset)
   {
     PosInArc = offset;
-    return Stream->Seek(offset, STREAM_SEEK_SET, NULL);
+    return InStream_SeekSet(Stream, offset);
   }
 
   HRESULT InitAndSeek()
@@ -419,7 +420,7 @@ struct CExtent
 };
   
 
-class CHandler: public CHandlerImg
+Z7_class_CHandler_final: public CHandlerImg
 {
   bool _isArc;
   bool _unsupported;
@@ -458,17 +459,17 @@ class CHandler: public CHandlerImg
     _virtPos = 0;
   }
 
-  virtual HRESULT Open2(IInStream *stream, IArchiveOpenCallback *openCallback);
-  virtual void CloseAtError();
+  virtual HRESULT Open2(IInStream *stream, IArchiveOpenCallback *openCallback) Z7_override;
+  virtual void CloseAtError() Z7_override;
 public:
-  INTERFACE_IInArchive_Img(;)
+  Z7_IFACE_COM7_IMP(IInArchive_Img)
 
-  STDMETHOD(GetStream)(UInt32 index, ISequentialInStream **stream);
-  STDMETHOD(Read)(void *data, UInt32 size, UInt32 *processedSize);
+  Z7_IFACE_COM7_IMP(IInArchiveGetStream)
+  Z7_IFACE_COM7_IMP(ISequentialInStream)
 };
 
 
-STDMETHODIMP CHandler::Read(void *data, UInt32 size, UInt32 *processedSize)
+Z7_COM7F_IMF(CHandler::Read(void *data, UInt32 size, UInt32 *processedSize))
 {
   if (processedSize)
     *processedSize = 0;
@@ -566,7 +567,7 @@ STDMETHODIMP CHandler::Read(void *data, UInt32 size, UInt32 *processedSize)
       UInt64 offset = extent.FlatOffset + vir;
       if (offset != extent.PosInArc)
       {
-        RINOK(extent.Seek(offset));
+        RINOK(extent.Seek(offset))
       }
       UInt32 size2 = 0;
       HRESULT res = extent.Stream->Read(data, size, &size2);
@@ -633,13 +634,13 @@ STDMETHODIMP CHandler::Read(void *data, UInt32 size, UInt32 *processedSize)
             if (offset != extent.PosInArc)
             {
               // printf("\n%12x %12x\n", (unsigned)offset, (unsigned)(offset - extent.PosInArc));
-              RINOK(extent.Seek(offset));
+              RINOK(extent.Seek(offset))
             }
             
             const size_t kStartSize = 1 << 9;
             {
               size_t curSize = kStartSize;
-              RINOK(extent.Read(_cacheCompressed, &curSize));
+              RINOK(extent.Read(_cacheCompressed, &curSize))
               // _stream_PackSize += curSize;
               if (curSize != kStartSize)
                 return S_FALSE;
@@ -661,7 +662,7 @@ STDMETHODIMP CHandler::Read(void *data, UInt32 size, UInt32 *processedSize)
                 return S_FALSE;
               size_t curSize = dataSize2 - kStartSize;
               const size_t curSize2 = curSize;
-              RINOK(extent.Read(_cacheCompressed + kStartSize, &curSize));
+              RINOK(extent.Read(_cacheCompressed + kStartSize, &curSize))
               // _stream_PackSize += curSize;
               if (curSize != curSize2)
                 return S_FALSE;
@@ -677,8 +678,8 @@ STDMETHODIMP CHandler::Read(void *data, UInt32 size, UInt32 *processedSize)
             _bufOutStreamSpec->Init(_cache, clusterSize);
             
             // Do we need to use smaller block than clusterSize for last cluster?
-            UInt64 blockSize64 = clusterSize;
-            HRESULT res = _zlibDecoderSpec->Code(_bufInStream, _bufOutStream, NULL, &blockSize64, NULL);
+            const UInt64 blockSize64 = clusterSize;
+            HRESULT res = _zlibDecoder->Code(_bufInStream, _bufOutStream, NULL, &blockSize64, NULL);
 
             /*
             if (_bufOutStreamSpec->GetPos() != clusterSize)
@@ -696,7 +697,7 @@ STDMETHODIMP CHandler::Read(void *data, UInt32 size, UInt32 *processedSize)
                   res = S_FALSE;
               }
 
-            RINOK(res);
+            RINOK(res)
             
             _cacheCluster = cluster;
             _cacheExtent = extentIndex;
@@ -715,7 +716,7 @@ STDMETHODIMP CHandler::Read(void *data, UInt32 size, UInt32 *processedSize)
             if (offset != extent.PosInArc)
             {
               // printf("\n%12x %12x\n", (unsigned)offset, (unsigned)(offset - extent.PosInArc));
-              RINOK(extent.Seek(offset));
+              RINOK(extent.Seek(offset))
             }
             UInt32 size2 = 0;
             HRESULT res = extent.Stream->Read(data, size, &size2);
@@ -759,6 +760,7 @@ static const Byte kProps[] =
 static const Byte kArcProps[] =
 {
   kpidNumVolumes,
+  kpidTotalPhySize,
   kpidMethod,
   kpidClusterSize,
   kpidHeadersSize,
@@ -771,7 +773,7 @@ IMP_IInArchive_Props
 IMP_IInArchive_ArcProps
 
 
-STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
+Z7_COM7F_IMF(CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value))
 {
   COM_TRY_BEGIN
   NCOM::CPropVariant prop;
@@ -791,6 +793,17 @@ STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
   {
     case kpidMainSubfile: prop = (UInt32)0; break;
     case kpidPhySize: if (_phySize != 0) prop = _phySize; break;
+    case kpidTotalPhySize:
+    {
+      UInt64 sum = _phySize;
+      if (_isMultiVol)
+      {
+        FOR_VECTOR (i, _extents)
+          sum += _extents[i].PhySize;
+      }
+      prop = sum;
+      break;
+    }
     case kpidClusterSize: prop = (UInt32)((UInt32)1 << _clusterBitsMax); break;
     case kpidHeadersSize: if (e) prop = (e->h.overHead << 9); break;
     case kpidMethod:
@@ -802,7 +815,7 @@ STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
 
       bool zlib = false;
       bool marker = false;
-      int algo = -1;
+      Int32 algo = -1;
 
       FOR_VECTOR (i, _extents)
       {
@@ -816,12 +829,10 @@ STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
         {
           if (h.algo == 1)
             zlib = true;
-          else if (algo != (int)h.algo)
+          else if (algo != h.algo)
           {
             s.Add_Space_if_NotEmpty();
-            char temp[16];
-            ConvertUInt32ToString(h.algo, temp);
-            s += temp;
+            s.Add_UInt32(h.algo);
             algo = h.algo;
           }
         }
@@ -831,16 +842,10 @@ STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
       }
 
       if (zlib)
-      {
-        s.Add_Space_if_NotEmpty();
-        s += "zlib";
-      }
+        s.Add_OptSpaced("zlib");
 
       if (marker)
-      {
-        s.Add_Space_if_NotEmpty();
-        s += "Marker";
-      }
+        s.Add_OptSpaced("Marker");
       
       if (!s.IsEmpty())
         prop = s;
@@ -860,11 +865,13 @@ STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
     }
     
     case kpidId:
+    {
       if (desc && !desc->CID.IsEmpty())
       {
         prop = desc->CID;
-        break;
       }
+      break;
+    }
 
     case kpidName:
     {
@@ -888,8 +895,7 @@ STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
     {
       if (_missingVol || !_missingVolName.IsEmpty())
       {
-        UString s;
-        s.SetFromAscii("Missing volume : ");
+        UString s ("Missing volume : ");
         if (!_missingVolName.IsEmpty())
           s += _missingVolName;
         prop = s;
@@ -900,7 +906,7 @@ STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
     case kpidErrorFlags:
     {
       UInt32 v = 0;
-      if (!_isArc) v |= kpv_ErrorFlags_IsNotArc;;
+      if (!_isArc) v |= kpv_ErrorFlags_IsNotArc;
       if (_unsupported) v |= kpv_ErrorFlags_UnsupportedMethod;
       if (_unsupportedSome) v |= kpv_ErrorFlags_UnsupportedMethod;
       if (_headerError) v |= kpv_ErrorFlags_HeadersError;
@@ -917,7 +923,7 @@ STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
 }
 
 
-STDMETHODIMP CHandler::GetProperty(UInt32 /* index */, PROPID propID, PROPVARIANT *value)
+Z7_COM7F_IMF(CHandler::GetProperty(UInt32 /* index */, PROPID propID, PROPVARIANT *value))
 {
   COM_TRY_BEGIN
   NCOM::CPropVariant prop;
@@ -966,9 +972,9 @@ static int inline GetLog(UInt64 num)
 HRESULT CExtent::ReadForHeader(IInStream *stream, UInt64 sector, void *data, size_t numSectors)
 {
   sector <<= 9;
-  RINOK(stream->Seek(sector, STREAM_SEEK_SET, NULL));
+  RINOK(InStream_SeekSet(stream, sector))
   size_t size = numSectors << 9;
-  RINOK(ReadStream_FALSE(stream, data, size));
+  RINOK(ReadStream_FALSE(stream, data, size))
   UInt64 end = sector + size;
   if (PhySize < end)
     PhySize = end;
@@ -983,12 +989,15 @@ void CHandler::CloseAtError()
 }
 
 
+static const char * const kSignature_Descriptor = "# Disk DescriptorFile";
+
+
 HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *openCallback)
 {
   const unsigned kSectoreSize = 512;
   Byte buf[kSectoreSize];
   size_t headerSize = kSectoreSize;
-  RINOK(ReadStream(stream, buf, &headerSize));
+  RINOK(ReadStream(stream, buf, &headerSize))
 
   if (headerSize < sizeof(k_Signature))
     return S_FALSE;
@@ -997,7 +1006,6 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *openCallback)
 
   if (memcmp(buf, k_Signature, sizeof(k_Signature)) != 0)
   {
-    const char *kSignature_Descriptor = "# Disk DescriptorFile";
     const size_t k_SigDesc_Size = strlen(kSignature_Descriptor);
     if (headerSize < k_SigDesc_Size)
       return S_FALSE;
@@ -1005,13 +1013,13 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *openCallback)
       return S_FALSE;
 
     UInt64 endPos;
-    RINOK(stream->Seek(0, STREAM_SEEK_END, &endPos));
+    RINOK(InStream_GetSize_SeekToEnd(stream, endPos))
     if (endPos > (1 << 20))
       return S_FALSE;
     const size_t numBytes = (size_t)endPos;
     _descriptorBuf.Alloc(numBytes);
-    RINOK(stream->Seek(0, STREAM_SEEK_SET, NULL));
-    RINOK(ReadStream_FALSE(stream, _descriptorBuf, numBytes));
+    RINOK(InStream_SeekToBegin(stream))
+    RINOK(ReadStream_FALSE(stream, _descriptorBuf, numBytes))
 
     if (!_descriptor.Parse(_descriptorBuf, _descriptorBuf.Size()))
       return S_FALSE;
@@ -1048,7 +1056,7 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *openCallback)
     if (_descriptor.Extents.Size() > 1)
     {
       const UInt64 numFiles = _descriptor.Extents.Size();
-      RINOK(openCallback->SetTotal(&numFiles, NULL));
+      RINOK(openCallback->SetTotal(&numFiles, NULL))
     }
   }
 
@@ -1119,7 +1127,7 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *openCallback)
       stream = nextStream;
 
       headerSize = kSectoreSize;
-      RINOK(ReadStream(stream, buf, &headerSize));
+      RINOK(ReadStream(stream, buf, &headerSize))
 
       if (headerSize != kSectoreSize)
         continue;
@@ -1178,7 +1186,7 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *openCallback)
   _needDeflate = false;
   _clusterBitsMax = 0;
   
-  unsigned numOKs = 0;
+  // unsigned numOKs = 0;
   unsigned numUnsupported = 0;
 
   FOR_VECTOR (i, _extents)
@@ -1188,7 +1196,7 @@ HRESULT CHandler::Open2(IInStream *stream, IArchiveOpenCallback *openCallback)
       numUnsupported++;
     if (!e.IsOK)
       continue;
-    numOKs++;
+    // numOKs++;
     if (e.IsVmdk())
     {
       if (e.NeedDeflate)
@@ -1214,7 +1222,7 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
         h.descriptorSize > (1 << 10))
       return S_FALSE;
     DescriptorBuf.Alloc((size_t)h.descriptorSize << 9);
-    RINOK(ReadForHeader(stream, h.descriptorOffset, DescriptorBuf, (size_t)h.descriptorSize));
+    RINOK(ReadForHeader(stream, h.descriptorOffset, DescriptorBuf, (size_t)h.descriptorSize))
     if (h.descriptorOffset == 1 && h.Is_Marker() && Get64(DescriptorBuf) == 0)
     {
       // We check data as end marker.
@@ -1233,7 +1241,7 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
   {
     // Grain Dir is at end of file
     UInt64 endPos;
-    RINOK(stream->Seek(0, STREAM_SEEK_END, &endPos));
+    RINOK(InStream_GetSize_SeekToEnd(stream, endPos))
     if ((endPos & 511) != 0)
       return S_FALSE;
 
@@ -1241,8 +1249,8 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
     Byte buf2[kEndSize];
     if (endPos < kEndSize)
       return S_FALSE;
-    RINOK(stream->Seek(endPos - kEndSize, STREAM_SEEK_SET, NULL));
-    RINOK(ReadStream_FALSE(stream, buf2, kEndSize));
+    RINOK(InStream_SeekSet(stream, endPos - kEndSize))
+    RINOK(ReadStream_FALSE(stream, buf2, kEndSize))
     
     CHeader h2;
     if (!h2.Parse(buf2 + 512))
@@ -1262,7 +1270,7 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
     PhySize = endPos;
   }
 
-  int grainSize_Log = GetLog(h.grainSize);
+  const int grainSize_Log = GetLog(h.grainSize);
   if (grainSize_Log < 3 || grainSize_Log > 30 - 9) // grain size must be >= 4 KB
     return S_FALSE;
   if (h.capacity >= ((UInt64)1 << (63 - 9)))
@@ -1271,7 +1279,7 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
     return S_FALSE;
 
   IsArc = true;
-  ClusterBits = (9 + grainSize_Log);
+  ClusterBits = (9 + (unsigned)grainSize_Log);
   VirtSize = h.capacity << 9;
   NeedDeflate = (h.algo >= 1);
 
@@ -1283,7 +1291,7 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
   }
 
   {
-    UInt64 overHeadBytes = h.overHead << 9;
+    const UInt64 overHeadBytes = h.overHead << 9;
     if (PhySize < overHeadBytes)
       PhySize = overHeadBytes;
   }
@@ -1292,8 +1300,8 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
   if (h.Is_ZeroGrain())
     ZeroSector = 1;
 
-  const UInt64 numSectorsPerGde = (UInt64)1 << (grainSize_Log + k_NumMidBits);
-  const UInt64 numGdeEntries = (h.capacity + numSectorsPerGde - 1) >> (grainSize_Log + k_NumMidBits);
+  const UInt64 numSectorsPerGde = (UInt64)1 << ((unsigned)grainSize_Log + k_NumMidBits);
+  const UInt64 numGdeEntries = (h.capacity + numSectorsPerGde - 1) >> ((unsigned)grainSize_Log + k_NumMidBits);
   CByteBuffer table;
   
   if (numGdeEntries != 0)
@@ -1322,7 +1330,7 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
       }
     }
 
-    RINOK(ReadForHeader(stream, h.gdOffset, table, numSectors));
+    RINOK(ReadForHeader(stream, h.gdOffset, table, numSectors))
   }
 
   const size_t clusterSize = (size_t)1 << ClusterBits;
@@ -1334,12 +1342,12 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
     complexity += (UInt64)numGdeEntries << (k_NumMidBits + 2);
     {
       const UInt64 numVols2 = numVols;
-      RINOK(openCallback->SetTotal((numVols == 1) ? NULL : &numVols2, &complexity));
+      RINOK(openCallback->SetTotal((numVols == 1) ? NULL : &numVols2, &complexity))
     }
     if (numVols != 1)
     {
       const UInt64 volIndex2 = volIndex;
-      RINOK(openCallback->SetCompleted(numVols == 1 ? NULL : &volIndex2, &complexityStart));
+      RINOK(openCallback->SetCompleted(numVols == 1 ? NULL : &volIndex2, &complexityStart))
     }
   }
 
@@ -1362,7 +1370,7 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
       {
         const UInt64 comp = complexityStart + ((UInt64)i << (k_NumMidBits + 2));
         const UInt64 volIndex2 = volIndex;
-        RINOK(openCallback->SetCompleted(numVols == 1 ? NULL : &volIndex2, &comp));
+        RINOK(openCallback->SetCompleted(numVols == 1 ? NULL : &volIndex2, &comp))
         numProcessed_Prev = i;
       }
       
@@ -1382,7 +1390,7 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
       }
       
       buf.Alloc(k_NumMidItems * 4);
-      RINOK(ReadForHeader(stream, v, buf, k_NumSectors));
+      RINOK(ReadForHeader(stream, v, buf, k_NumSectors))
     }
 
     for (size_t k = 0; k < k_NumMidItems; k++)
@@ -1429,10 +1437,9 @@ HRESULT CExtent::Open3(IInStream *stream, IArchiveOpenCallback *openCallback,
 }
 
 
-STDMETHODIMP CHandler::Close()
+Z7_COM7F_IMF(CHandler::Close())
 {
   _phySize = 0;
-  _size = 0;
   
   _cacheCluster = (UInt64)(Int64)-1;
   _cacheExtent = (unsigned)(int)-1;
@@ -1452,17 +1459,19 @@ STDMETHODIMP CHandler::Close()
   _descriptorBuf.Free();
   _descriptor.Clear();
 
-  _imgExt = NULL;
-  Stream.Release(); // Stream vriable is unused
+  // CHandlerImg:
+  Clear_HandlerImg_Vars();
+  Stream.Release();
+
   _extents.Clear();
   return S_OK;
 }
 
 
-STDMETHODIMP CHandler::GetStream(UInt32 /* index */, ISequentialInStream **stream)
+Z7_COM7F_IMF(CHandler::GetStream(UInt32 /* index */, ISequentialInStream **stream))
 {
   COM_TRY_BEGIN
-  *stream = 0;
+  *stream = NULL;
 
   if (_unsupported)
     return S_FALSE;
@@ -1497,7 +1506,7 @@ STDMETHODIMP CHandler::GetStream(UInt32 /* index */, ISequentialInStream **strea
 
   FOR_VECTOR (i, _extents)
   {
-    RINOK(_extents[i].InitAndSeek());
+    RINOK(_extents[i].InitAndSeek())
   }
 
   CMyComPtr<ISequentialInStream> streamTemp = this;

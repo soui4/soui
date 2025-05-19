@@ -1,7 +1,7 @@
 // RegistryUtils.h
 
-#ifndef __REGISTRY_UTILS_H
-#define __REGISTRY_UTILS_H
+#ifndef ZIP7_INC_REGISTRY_UTILS_H
+#define ZIP7_INC_REGISTRY_UTILS_H
 
 #include "../../../Common/MyTypes.h"
 #include "../../../Common/MyString.h"
@@ -14,6 +14,8 @@ void ReadRegEditor(bool useEditor, UString &path);
 
 void SaveRegDiff(const UString &path);
 void ReadRegDiff(UString &path);
+
+void ReadReg_VerCtrlPath(UString &path);
 
 struct CFmSettings
 {

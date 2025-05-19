@@ -2,9 +2,14 @@
 #include "PropVariant2.h"
 #include "FileSys.h"
 #include "OutStreamWrapper.h"
-#include <comdef.h>
-#include "../CPP/Common/MyCom.h"
-#include <tchar.h>
+#include "SevenString.h"
+
+#ifndef _WIN32
+#include <sys/stat.h>
+#include <fcntl.h>
+#include <utime.h>
+#endif
+
 namespace SevenZip
 {
     namespace intl
@@ -12,6 +17,19 @@ namespace SevenZip
 
         const TString EmptyFileAlias = _T("[Content]");
 
+		// 将Windows FILETIME转换为Unix时间戳（秒 + 纳秒）
+		void FileTimeToUnixTime(const FILETIME& ft, time_t& sec, long& nsec) {
+			// 直接通过位移组合dwLowDateTime和dwHighDateTime
+			uint64_t fileTime = static_cast<uint64_t>(ft.dwHighDateTime) << 32 | ft.dwLowDateTime;
+
+			// Windows FILETIME是从1601-01-01开始的100纳秒间隔数
+			// Unix时间戳是从1970-01-01开始的秒数
+			const uint64_t WINDOWS_TICK = 10000000ULL;
+			const uint64_t SEC_TO_UNIX_EPOCH = 11644473600ULL;
+
+			sec = static_cast<time_t>(fileTime / WINDOWS_TICK - SEC_TO_UNIX_EPOCH);
+			nsec = static_cast<long>((fileTime % WINDOWS_TICK) * 100);
+		}
 
         ArchiveExtractCallback::ArchiveExtractCallback(
             const CMyComPtr< IInArchive >& archiveHandler,
@@ -36,7 +54,7 @@ namespace SevenZip
 
         STDMETHODIMP ArchiveExtractCallback::QueryInterface(REFIID iid, void** ppvObject)
         {
-            if (iid == __uuidof(IUnknown))
+            if (iid == IID_IUnknown)
             {
                 *ppvObject = reinterpret_cast<IUnknown*>(this);
                 AddRef();
@@ -69,23 +87,24 @@ namespace SevenZip
 
         STDMETHODIMP_(ULONG) ArchiveExtractCallback::AddRef()
         {
-            return static_cast<ULONG>(InterlockedIncrement(&m_refCount));
+			return ++m_refCount;
         }
 
         STDMETHODIMP_(ULONG) ArchiveExtractCallback::Release()
         {
-            ULONG res = static_cast<ULONG>(InterlockedDecrement(&m_refCount));
-            if (res == 0)
-            {
-                delete this;
-            }
-            return res;
+			ULONG newRefCount = --m_refCount;
+			if (newRefCount == 0)
+			{
+				delete this;
+				return 0;
+			}
+			return newRefCount;
         }
 
         STDMETHODIMP ArchiveExtractCallback::SetTotal(UInt64 size)
         {
 #ifdef _DEBUG
-            wprintf_s(L"SetTotal:%llu\n", size);
+            //wprintf(L"SetTotal:%llu\n", size);
 #endif // _DEBUG
             m_totalSize = size;
             //	- SetTotal is never called for ZIP and 7z formats
@@ -99,7 +118,7 @@ namespace SevenZip
         STDMETHODIMP ArchiveExtractCallback::SetCompleted(const UInt64* completeValue)
         {
 #ifdef _DEBUG
-            wprintf_s(L"SetCompleted:%llu\n", *completeValue);
+			//wprintf(L"SetCompleted:%llu\n", *completeValue);
 #endif // _DEBUG
             completeValue;
             //Callback Event calls
@@ -120,7 +139,7 @@ namespace SevenZip
         STDMETHODIMP ArchiveExtractCallback::SetRatioInfo(const UInt64 *inSize, const UInt64 *outSize)
         {
 #ifdef _DEBUG
-            wprintf_s(L"SetRatioInfo:%llu-%llu\n", *inSize, *outSize);
+			//wprintf(L"SetRatioInfo:%llu-%llu\n", *inSize, *outSize);
 #endif // _DEBUG
             if (m_callback)
                 m_callback->OnRadio(*inSize, *outSize);
@@ -145,10 +164,10 @@ namespace SevenZip
                 GetPropertyAccessedTime(index);
                 GetPropertySize(index);
             }
-            catch (_com_error& ex)
+            catch (/*_com_error& ex*/...)
             {
-                wprintf_s(L"获取数据失败\n");
-                return ex.Error();
+                //return ex.Error();
+				return S_FALSE;
             }
 
             // TODO: m_directory could be a relative path as "..\"
@@ -206,7 +225,7 @@ namespace SevenZip
                     TString rename_path = FileSys::GetUniquePath(m_absPath);
                     if (!FileSys::RenameFile(m_absPath, rename_path))
                     {
-                        wprintf_s(L"重命名文件失败:%s-%s\n", m_absPath.c_str(), rename_path.c_str());
+						//wprintf(L"重命名文件失败:%s-%s\n", m_absPath.c_str(), rename_path.c_str());
                         return HRESULT_FROM_WIN32(GetLastError());
                     }
                 }
@@ -214,13 +233,13 @@ namespace SevenZip
                 {
                     if (!FileSys::RemovePath(m_absPath))
                     {
-                        wprintf_s(L"移除路径失败:%s\n", m_absPath.c_str());
+						//wprintf(L"移除路径失败:%s\n", m_absPath.c_str());
                         return HRESULT_FROM_WIN32(GetLastError());
                     }
                 }
                 else
                 {
-                    wprintf_s(L"文件已存在:%s\n", m_absPath.c_str());
+					//wprintf(L"文件已存在:%s\n", m_absPath.c_str());
                     return ERROR_FILE_EXISTS;
                 }
             }
@@ -228,22 +247,26 @@ namespace SevenZip
             TString absDir = FileSys::GetPath(m_absPath);
             if (!FileSys::CreateDirectoryTree(absDir))
             {
-                wprintf_s(L"创建目录失败:%s\n", absDir.c_str());
+				//wprintf(L"创建目录失败:%s\n", absDir.c_str());
+#if defined(_WIN32)
                 return ERROR_CREATE_FAILED;
+#else
+				return ENOENT;
+#endif
             }
 
-            CMyComPtr< IStream > fileStream = FileSys::OpenFileToWrite(m_absPath);
-            if (fileStream == NULL)
-            {
-                wprintf_s(L"创建文件失败:%s\n", m_absPath.c_str());
+#if defined(_WIN32) && defined(_UNICODE)
+			FILE* fileStream = _wfopen(m_absPath.c_str(), L"rb");
+#else
+			FILE* fileStream = fopen(ToPathNativeStr(m_absPath).c_str(), "rb");
+#endif
+            if (fileStream == NULL) {
                 m_absPath.clear();
                 return HRESULT_FROM_WIN32(GetLastError());
             }
 
             OutStreamWrapper* stream = new OutStreamWrapper(fileStream);
-            if (!stream)
-            {
-                wprintf_s(L"内存不足\n");
+            if (!stream){
                 return E_OUTOFMEMORY;
             }
 
@@ -278,6 +301,7 @@ namespace SevenZip
 
             if (m_hasModifiedTime || m_hasAccessedTime || m_hasCreatedTime)
             {
+#if defined(_WIN32)
                 HANDLE fileHandle = CreateFile(m_absPath.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
                 if (fileHandle != INVALID_HANDLE_VALUE)
                 {
@@ -287,11 +311,63 @@ namespace SevenZip
                         m_hasModifiedTime ? &m_modifiedTime : NULL);
                     CloseHandle(fileHandle);
                 }
+#else
+struct timespec times[2];
+        
+        // 获取当前时间（用于保留不需要修改的时间）
+        struct stat st;
+        if (stat(ToPathNativeStr(m_absPath).c_str(), &st) == 0) {
+            times[0] = st.st_atim; // 当前访问时间
+            times[1] = st.st_mtim; // 当前修改时间
+        } else {
+            // 如果获取失败，使用当前系统时间
+            time_t now = time(nullptr);
+            times[0].tv_sec = now;
+            times[0].tv_nsec = 0;
+            times[1].tv_sec = now;
+            times[1].tv_nsec = 0;
+        }
+
+        // 覆盖需要修改的时间
+        if (m_hasAccessedTime) {
+            time_t sec;
+            long nsec;
+            FileTimeToUnixTime(m_accessedTime, sec, nsec);
+            times[0].tv_sec = sec;
+            times[0].tv_nsec = nsec;
+        }
+
+        if (m_hasModifiedTime) {
+            time_t sec;
+            long nsec;
+            FileTimeToUnixTime(m_modifiedTime, sec, nsec);
+            times[1].tv_sec = sec;
+            times[1].tv_nsec = nsec;
+        }
+
+        utimensat(AT_FDCWD, ToPathNativeStr(m_absPath).c_str(), times, 0);
+#endif
             }
 
             if (m_hasAttrib)
             {
+#if defined(_WIN32)
                 SetFileAttributes(m_absPath.c_str(), m_attrib);
+#else
+struct stat st;
+        if (stat(ToPathNativeStr(m_absPath).c_str(), &st) == 0) {
+            mode_t new_mode = st.st_mode;
+
+            // 假设m_attrib的位0对应只读属性（类似Windows）
+            if (m_attrib & 0x1) { 
+                new_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH); // 去除所有写权限
+            } else {
+                new_mode |= S_IWUSR; // 至少恢复用户写权限
+            }
+
+            chmod(ToPathNativeStr(m_absPath).c_str(), new_mode);
+        }
+#endif
             }
 
             if (m_callback)
@@ -322,7 +398,7 @@ namespace SevenZip
             HRESULT hr = m_archiveHandler->GetProperty(index, kpidPath, &prop);
             if (hr != S_OK)
             {
-                _com_issue_error(hr);
+                // _com_issue_error(hr);
             }
 
             if ( prop.vt == VT_EMPTY )
@@ -331,7 +407,7 @@ namespace SevenZip
             }
             else if (prop.vt != VT_BSTR)
             {
-                _com_issue_error(E_FAIL);
+                // _com_issue_error(E_FAIL);
             }
             else
             {
@@ -352,7 +428,7 @@ namespace SevenZip
             HRESULT hr = m_archiveHandler->GetProperty(index, kpidAttrib, &prop);
             if (hr != S_OK)
             {
-                _com_issue_error(hr);
+                // _com_issue_error(hr);
             }
 
             if (prop.vt == VT_EMPTY)
@@ -362,7 +438,7 @@ namespace SevenZip
             }
             else if (prop.vt != VT_UI4)
             {
-                _com_issue_error(E_FAIL);
+                // _com_issue_error(E_FAIL);
             }
             else
             {
@@ -377,7 +453,7 @@ namespace SevenZip
             HRESULT hr = m_archiveHandler->GetProperty(index, kpidIsDir, &prop);
             if (hr != S_OK)
             {
-                _com_issue_error(hr);
+                // _com_issue_error(hr);
             }
 
             if (prop.vt == VT_EMPTY)
@@ -386,7 +462,7 @@ namespace SevenZip
             }
             else if (prop.vt != VT_BOOL)
             {
-                _com_issue_error(E_FAIL);
+                // _com_issue_error(E_FAIL);
             }
             else
             {
@@ -400,7 +476,7 @@ namespace SevenZip
             HRESULT hr = m_archiveHandler->GetProperty(index, kpidMTime, &prop);
             if (hr != S_OK)
             {
-                _com_issue_error(hr);
+                // _com_issue_error(hr);
             }
 
             if (prop.vt == VT_EMPTY)
@@ -409,7 +485,7 @@ namespace SevenZip
             }
             else if (prop.vt != VT_FILETIME)
             {
-                _com_issue_error(E_FAIL);
+                // _com_issue_error(E_FAIL);
             }
             else
             {
@@ -423,7 +499,7 @@ namespace SevenZip
             HRESULT hr = m_archiveHandler->GetProperty(index, kpidATime, &prop);
             if (hr != S_OK)
             {
-                _com_issue_error(hr);
+                // _com_issue_error(hr);
             }
 
             if (prop.vt == VT_EMPTY)
@@ -432,7 +508,7 @@ namespace SevenZip
             }
             else if (prop.vt != VT_FILETIME)
             {
-                _com_issue_error(E_FAIL);
+                // _com_issue_error(E_FAIL);
             }
             else
             {
@@ -447,7 +523,7 @@ namespace SevenZip
             HRESULT hr = m_archiveHandler->GetProperty(index, kpidCTime, &prop);
             if (hr != S_OK)
             {
-                _com_issue_error(hr);
+                // _com_issue_error(hr);
             }
 
             if (prop.vt == VT_EMPTY)
@@ -456,7 +532,7 @@ namespace SevenZip
             }
             else if (prop.vt != VT_FILETIME)
             {
-                _com_issue_error(E_FAIL);
+                // _com_issue_error(E_FAIL);
             }
             else
             {
@@ -471,7 +547,7 @@ namespace SevenZip
             HRESULT hr = m_archiveHandler->GetProperty(index, kpidSize, &prop);
             if (hr != S_OK)
             {
-                _com_issue_error(hr);
+                // _com_issue_error(hr);
             }
 
             switch (prop.vt)
@@ -492,7 +568,7 @@ namespace SevenZip
                 m_newFileSize = (UInt64)prop.uhVal.QuadPart;
                 break;
             default:
-                _com_issue_error(E_FAIL);
+				;// _com_issue_error(E_FAIL);
             }
 
             m_hasNewFileSize = true;

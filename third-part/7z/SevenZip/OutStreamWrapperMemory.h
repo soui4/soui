@@ -1,9 +1,9 @@
 #pragma once
 
-
 #include "../CPP/7zip/IStream.h"
 #include "../CPP/Common/MyCom.h"
-
+#include "FileStreamMemory.h"
+#include <atomic>
 
 namespace SevenZip
 {
@@ -13,12 +13,12 @@ namespace intl
 	{
 	private:
 
-		long				m_refCount;
-		CMyComPtr< IStream >	m_baseStream;
+		std::atomic<long>		m_refCount;
+		CMyComPtr< IMyStream >	m_baseStream;
 
 	public:
 
-		OutStreamWrapperMemory( const CMyComPtr< IStream >& baseStream );
+		OutStreamWrapperMemory( const CMyComPtr< IMyStream >& baseStream );
 		virtual ~OutStreamWrapperMemory();
 
 		STDMETHOD(QueryInterface)( REFIID iid, void** ppvObject );

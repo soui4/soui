@@ -32,7 +32,7 @@ namespace SevenZip
 
 	private:
 		TString m_outputPath;					//the final compression result compression path. Used for tracking in callbacks
-		CMyComPtr< IStream > OpenArchiveStream();
+		FILE* OpenArchiveStream();
         HRESULT FindAndCompressFiles(const TString& directory, const TString& searchPattern,
 			const TString& pathPrefix, bool recursion, ProgressCallback* callback, SevenZipPassword *pSevenZipPassword);
 		HRESULT CompressFilesToArchive(const TString& pathPrefix, const std::vector< intl::FilePathInfo >& filePaths, ProgressCallback* callback, SevenZipPassword *pSevenZipPassword);

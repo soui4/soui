@@ -1,6 +1,6 @@
 // Windows/Console.cpp
 
-
+#include "StdAfx.h"
 
 #include "Console.h"
 

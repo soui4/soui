@@ -1,13 +1,14 @@
 // NsisDecode.h
 
-#ifndef __NSIS_DECODE_H
-#define __NSIS_DECODE_H
+#ifndef ZIP7_INC_NSIS_DECODE_H
+#define ZIP7_INC_NSIS_DECODE_H
 
 #include "../../../Common/MyBuffer.h"
 
 #include "../../Common/FilterCoder.h"
 #include "../../Common/StreamUtils.h"
 
+#include "../../Compress/BZip2Decoder.h"
 #include "../../Compress/DeflateDecoder.h"
 #include "../../Compress/LzmaDecoder.h"
 
@@ -38,6 +39,7 @@ class CDecoder
   CMyComPtr<ISequentialInStream> _codecInStream;
   CMyComPtr<ISequentialInStream> _decoderInStream;
 
+  NCompress::NBZip2::CNsisDecoder *_bzDecoder;
   NCompress::NDeflate::NDecoder::CCOMCoder *_deflateDecoder;
   NCompress::NLzma::CDecoder *_lzmaDecoder;
 
@@ -50,13 +52,17 @@ public:
   bool Solid;
   bool IsNsisDeflate;
   
-  CByteBuffer Buffer; // temp buf.
+  CByteBuffer Buffer; // temp buf
 
   CDecoder():
       FilterFlag(false),
       Solid(true),
       IsNsisDeflate(true)
-      {}
+  {
+    _bzDecoder = NULL;
+    _deflateDecoder = NULL;
+    _lzmaDecoder = NULL;
+  }
 
   void Release()
   {
@@ -64,13 +70,19 @@ public:
     _codecInStream.Release();
     _decoderInStream.Release();
     InputStream.Release();
+
+    _bzDecoder = NULL;
+    _deflateDecoder = NULL;
     _lzmaDecoder = NULL;
   }
+
+  UInt64 GetInputProcessedSize() const;
   
   HRESULT Init(ISequentialInStream *inStream, bool &useFilter);
+
   HRESULT Read(void *data, size_t *processedSize)
   {
-    return ReadStream(_decoderInStream, data, processedSize);;
+    return ReadStream(_decoderInStream, data, processedSize);
   }
 
 

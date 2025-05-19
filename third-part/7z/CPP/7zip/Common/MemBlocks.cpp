@@ -1,27 +1,32 @@
 // MemBlocks.cpp
 
-
+#include "StdAfx.h"
 
 #include "../../../C/Alloc.h"
 
 #include "MemBlocks.h"
 #include "StreamUtils.h"
 
-bool CMemBlockManager::AllocateSpace(size_t numBlocks)
+bool CMemBlockManager::AllocateSpace_bool(size_t numBlocks)
 {
   FreeSpace();
-  if (_blockSize < sizeof(void *) || numBlocks < 1)
+  if (numBlocks == 0)
+  {
+    return true;
+    // return false;
+  }
+  if (_blockSize < sizeof(void *))
     return false;
-  size_t totalSize = numBlocks * _blockSize;
+  const size_t totalSize = numBlocks * _blockSize;
   if (totalSize / _blockSize != numBlocks)
     return false;
   _data = ::MidAlloc(totalSize);
-  if (_data == 0)
+  if (!_data)
     return false;
   Byte *p = (Byte *)_data;
   for (size_t i = 0; i + 1 < numBlocks; i++, p += _blockSize)
-    *(Byte **)p = (p + _blockSize);
-  *(Byte **)p = 0;
+    *(Byte **)(void *)p = (p + _blockSize);
+  *(Byte **)(void *)p = NULL;
   _headFree = _data;
   return true;
 }
@@ -29,47 +34,70 @@ bool CMemBlockManager::AllocateSpace(size_t numBlocks)
 void CMemBlockManager::FreeSpace()
 {
   ::MidFree(_data);
-  _data = 0;
-  _headFree= 0;
+  _data = NULL;
+  _headFree= NULL;
 }
 
 void *CMemBlockManager::AllocateBlock()
 {
-  if (_headFree == 0)
-    return 0;
   void *p = _headFree;
-  _headFree = *(void **)_headFree;
+  if (p)
+    _headFree = *(void **)p;
   return p;
 }
 
 void CMemBlockManager::FreeBlock(void *p)
 {
-  if (p == 0)
+  if (!p)
     return;
   *(void **)p = _headFree;
   _headFree = p;
 }
 
 
-HRes CMemBlockManagerMt::AllocateSpace(size_t numBlocks, size_t numNoLockBlocks)
+// #include <stdio.h>
+
+HRESULT CMemBlockManagerMt::AllocateSpace(size_t numBlocks, size_t numNoLockBlocks)
 {
   if (numNoLockBlocks > numBlocks)
     return E_INVALIDARG;
-  if (!CMemBlockManager::AllocateSpace(numBlocks))
+  const size_t numLockBlocks = numBlocks - numNoLockBlocks;
+  UInt32 maxCount = (UInt32)numLockBlocks;
+  if (maxCount != numLockBlocks)
     return E_OUTOFMEMORY;
-  size_t numLockBlocks = numBlocks - numNoLockBlocks;
+  if (!CMemBlockManager::AllocateSpace_bool(numBlocks))
+    return E_OUTOFMEMORY;
+  // we need (maxCount = 1), if we want to create non-use empty Semaphore
+  if (maxCount == 0)
+    maxCount = 1;
+
+  // printf("\n Synchro.Create() \n");
+  WRes wres;
+  #ifndef _WIN32
   Semaphore.Close();
-  return Semaphore.Create((LONG)numLockBlocks, (LONG)numLockBlocks);
+  wres = Synchro.Create();
+  if (wres != 0)
+    return HRESULT_FROM_WIN32(wres);
+  wres = Semaphore.Create(&Synchro, (UInt32)numLockBlocks, maxCount);
+  #else
+  wres = Semaphore.OptCreateInit((UInt32)numLockBlocks, maxCount);
+  #endif
+  
+  return HRESULT_FROM_WIN32(wres);
 }
 
-HRes CMemBlockManagerMt::AllocateSpaceAlways(size_t desiredNumberOfBlocks, size_t numNoLockBlocks)
+
+HRESULT CMemBlockManagerMt::AllocateSpaceAlways(size_t desiredNumberOfBlocks, size_t numNoLockBlocks)
 {
+  // desiredNumberOfBlocks = 0; // for debug
   if (numNoLockBlocks > desiredNumberOfBlocks)
     return E_INVALIDARG;
   for (;;)
   {
-    if (AllocateSpace(desiredNumberOfBlocks, numNoLockBlocks) == 0)
-      return 0;
+    // if (desiredNumberOfBlocks == 0) return E_OUTOFMEMORY;
+    const HRESULT hres = AllocateSpace(desiredNumberOfBlocks, numNoLockBlocks);
+    if (hres != E_OUTOFMEMORY)
+      return hres;
     if (desiredNumberOfBlocks == numNoLockBlocks)
       return E_OUTOFMEMORY;
     desiredNumberOfBlocks = numNoLockBlocks + ((desiredNumberOfBlocks - numNoLockBlocks) >> 1);
@@ -91,7 +119,7 @@ void *CMemBlockManagerMt::AllocateBlock()
 
 void CMemBlockManagerMt::FreeBlock(void *p, bool lockMode)
 {
-  if (p == 0)
+  if (!p)
     return;
   {
     NWindows::NSynchronization::CCriticalSectionLock lock(_criticalSection);
@@ -100,6 +128,8 @@ void CMemBlockManagerMt::FreeBlock(void *p, bool lockMode)
   if (lockMode)
     Semaphore.Release();
 }
+
+
 
 void CMemBlocks::Free(CMemBlockManagerMt *manager)
 {
@@ -122,22 +152,22 @@ HRESULT CMemBlocks::WriteToStream(size_t blockSize, ISequentialOutStream *outStr
   UInt64 totalSize = TotalSize;
   for (unsigned blockIndex = 0; totalSize > 0; blockIndex++)
   {
-    UInt32 curSize = (UInt32)blockSize;
-    if (totalSize < curSize)
-      curSize = (UInt32)totalSize;
+    size_t curSize = blockSize;
+    if (curSize > totalSize)
+      curSize = (size_t)totalSize;
     if (blockIndex >= Blocks.Size())
       return E_FAIL;
-    RINOK(WriteStream(outStream, Blocks[blockIndex], curSize));
+    RINOK(WriteStream(outStream, Blocks[blockIndex], curSize))
     totalSize -= curSize;
   }
   return S_OK;
 }
 
 
-void CMemLockBlocks::FreeBlock(int index, CMemBlockManagerMt *memManager)
+void CMemLockBlocks::FreeBlock(unsigned index, CMemBlockManagerMt *memManager)
 {
   memManager->FreeBlock(Blocks[index], LockMode);
-  Blocks[index] = 0;
+  Blocks[index] = NULL;
 }
 
 void CMemLockBlocks::Free(CMemBlockManagerMt *memManager)
@@ -150,6 +180,7 @@ void CMemLockBlocks::Free(CMemBlockManagerMt *memManager)
   TotalSize = 0;
 }
 
+/*
 HRes CMemLockBlocks::SwitchToNoLockMode(CMemBlockManagerMt *memManager)
 {
   if (LockMode)
@@ -162,20 +193,21 @@ HRes CMemLockBlocks::SwitchToNoLockMode(CMemBlockManagerMt *memManager)
   }
   return 0;
 }
+*/
 
 void CMemLockBlocks::Detach(CMemLockBlocks &blocks, CMemBlockManagerMt *memManager)
 {
   blocks.Free(memManager);
   blocks.LockMode = LockMode;
   UInt64 totalSize = 0;
-  size_t blockSize = memManager->GetBlockSize();
+  const size_t blockSize = memManager->GetBlockSize();
   FOR_VECTOR (i, Blocks)
   {
     if (totalSize < TotalSize)
       blocks.Blocks.Add(Blocks[i]);
     else
       FreeBlock(i, memManager);
-    Blocks[i] = 0;
+    Blocks[i] = NULL;
     totalSize += blockSize;
   }
   blocks.TotalSize = TotalSize;

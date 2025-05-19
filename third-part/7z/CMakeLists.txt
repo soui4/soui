@@ -1,8 +1,10 @@
 #INCLUDE_DIRECTORIES (${CMAKE_CURRENT_SOURCE_DIR})
 
 #-----------------------------------------------------------------------------
-# Define zlib Library
+# Define 7z Library
 #-----------------------------------------------------------------------------
+
+set(CMAKE_POSITION_INDEPENDENT_CODE ON)
 
 add_definitions(
 	-D_CRT_SECURE_NO_WARNINGS
@@ -53,10 +55,13 @@ set (7ZLIB_HEADERS
 	C/Sha1.h
 	C/Sha256.h
 	C/Sort.h
+	C/SwapBytes.h
 	C/Threads.h
+	C/Xxh64.h
 	C/Xz.h
 	C/XzCrc64.h
 	C/XzEnc.h
+	C/ZstdDec.h
 	SevenZip/ArchiveExtractCallback.h
 	SevenZip/ArchiveOpenCallback.h
 	SevenZip/ArchiveUpdateCallback.h
@@ -222,6 +227,7 @@ set (7ZLIB_HEADERS
 	CPP/7zip/Compress/LzOutWindow.h
 	CPP/7zip/Compress/Lzx.h
 	CPP/7zip/Compress/LzxDecoder.h
+	CPP/7zip/Compress/LzfseDecoder.h
 	CPP/7zip/Compress/Mtf8.h
 	CPP/7zip/Compress/PpmdDecoder.h
 	CPP/7zip/Compress/PpmdEncoder.h
@@ -237,6 +243,7 @@ set (7ZLIB_HEADERS
 	CPP/7zip/Compress/ZDecoder.h
 	CPP/7zip/Compress/ZlibDecoder.h
 	CPP/7zip/Compress/ZlibEncoder.h
+	CPP/7zip/Compress/ZstdDecoder.h
 	CPP/7zip/Crypto/7zAes.h
 	CPP/7zip/Crypto/HmacSha1.h
 	CPP/7zip/Crypto/HmacSha256.h
@@ -292,23 +299,32 @@ SET (7ZLIB_SRCS
 	C/Lzma2Enc.c
 	C/LzmaDec.c
 	C/LzmaEnc.c
+	C/Lzma2DecMt.c
+	C/LzFindOpt.c
 	C/MtCoder.c
+	C/MtDec.c
 	C/Ppmd7.c
+	C/Ppmd7aDec.c
 	C/Ppmd7Dec.c
 	C/Ppmd7Enc.c
 	C/Ppmd8.c
 	C/Ppmd8Dec.c
 	C/Ppmd8Enc.c
 	C/Sha1.c
+	C/Sha1Opt.c
 	C/Sha256.c
+	C/Sha256Opt.c
 	C/Sort.c
+	C/SwapBytes.c
 	C/Threads.c
+	C/Xxh64.c
 	C/Xz.c
 	C/XzCrc64.c
 	C/XzCrc64Opt.c
 	C/XzDec.c
 	C/XzEnc.c
 	C/XzIn.c
+	C/ZstdDec.c
 	SevenZip/ArchiveExtractCallback.cpp
 	SevenZip/ArchiveOpenCallback.cpp
 	SevenZip/ArchiveUpdateCallback.cpp
@@ -318,6 +334,7 @@ SET (7ZLIB_SRCS
 	SevenZip/OutStreamWrapper.cpp
 	SevenZip/PathScanner.cpp
 	SevenZip/PropVariant2.cpp
+	SevenZip/SevenString.cpp
 	SevenZip/SevenZipArchive.cpp
 	SevenZip/SevenZipCompressor.cpp
 	SevenZip/SevenZipException.cpp
@@ -438,6 +455,7 @@ SET (7ZLIB_SRCS
 	CPP/7zip/Compress/LzmsDecoder.cpp
 	CPP/7zip/Compress/LzOutWindow.cpp
 	CPP/7zip/Compress/LzxDecoder.cpp
+	CPP/7zip/Compress/LzfseDecoder.cpp
 	CPP/7zip/Compress/PpmdDecoder.cpp
 	CPP/7zip/Compress/PpmdEncoder.cpp
 	CPP/7zip/Compress/PpmdZip.cpp
@@ -452,6 +470,9 @@ SET (7ZLIB_SRCS
 	CPP/7zip/Compress/ZDecoder.cpp
 	CPP/7zip/Compress/ZlibDecoder.cpp
 	CPP/7zip/Compress/ZlibEncoder.cpp
+	CPP/7zip/Compress/ZstdDecoder.cpp
+	CPP/7zip/Compress/XzEncoder.cpp
+	CPP/7zip/Compress/XzDecoder.cpp
 	CPP/7zip/Crypto/7zAes.cpp
 	CPP/7zip/Crypto/HmacSha1.cpp
 	CPP/7zip/Crypto/HmacSha256.cpp
@@ -467,18 +488,10 @@ SET (7ZLIB_SRCS
 	CPP/7zip/Crypto/7zAesRegister.cpp
 )
 
-if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
-	if(${CMAKE_GENERATOR_PLATFORM} MATCHES ARM64)
-		set(ENABLE_7Z_ASM 0)
-	elseif(${CMAKE_GENERATOR_PLATFORM} MATCHES ARM)
-		set(ENABLE_7Z_ASM 0)
-	elseif(MSVC_VERSION LESS 1600 AND CMAKE_CL_64)
-  		set(ENABLE_7Z_ASM 0)
-	else()
-		set(ENABLE_7Z_ASM 1)
-  	endif()
+if (WIN32 AND MSVC)
+    set(ENABLE_7Z_ASM 1)
 else()
-	set(ENABLE_7Z_ASM 1)
+    set(ENABLE_7Z_ASM 0)
 endif()
 
 if(ENABLE_7Z_ASM)

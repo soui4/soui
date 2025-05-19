@@ -1,39 +1,58 @@
 #include "SevenZipException.h"
-#include <tchar.h>
+#include "SevenString.h"
+#include <vector>
 
 namespace SevenZip
 {
+	std::string StrFmt(const char* format, ...) {
+		std::string result;
+		va_list args;
+		va_start(args, format);
 
-TString StrFmt( const TCHAR* format, ... )
-{
-	TString result;
-	TCHAR*	buffer;
-	int		sz;
-	va_list	args;
+#ifdef _WIN32
+		int sz = _vscprintf(format, args) + 1; // 计算所需缓冲区大小（含终止符）
+		std::vector<char> buffer(sz);
+		_vsnprintf_s(buffer.data(), sz, _TRUNCATE, format, args);
+#else
+		va_list args_copy;
+		va_copy(args_copy, args);
 
-	va_start( args, format );
+		int sz = vsnprintf(nullptr, 0, format, args_copy);
+		if (sz < 0) {
+			va_end(args_copy);
+			va_end(args);
+			return {};
+		}
 
-	sz		= _vsctprintf( format, args ) + 1;
-	buffer	= new TCHAR[sz];
-	_vsntprintf_s( buffer, sz, _TRUNCATE, format, args );
-	result	= buffer;
-	delete [] buffer;
+		std::vector<char> buffer(sz + 1); // +1 为终止符预留空间
+		vsnprintf(buffer.data(), buffer.size(), format, args);
+		va_end(args_copy);
+#endif
+		result = buffer.data();
 
-	va_end( args );
-
-	return result;
-}
+		va_end(args);
+		return result;
+	}
 
 TString GetWinErrMsg( const TString& contextMessage, DWORD lastError )
 {
 	// TODO: use FormatMessage to get the appropriate message from the 
-	return StrFmt( _T( "%s: GetLastError = %lu" ), contextMessage.c_str(), lastError );
+#ifdef _UNICODE
+	return ToWstring(StrFmt("%s: GetLastError = %lu", contextMessage.c_str(), lastError));
+#else
+	return StrFmt("%s: GetLastError = %lu", contextMessage.c_str(), lastError);
+#endif
+
 }
 
 TString GetCOMErrMsg( const TString& contextMessage, HRESULT lastError )
 {
 	// TODO: use FormatMessage to get the appropriate message from the 
-	return StrFmt( _T( "%s: HRESULT = 0x%08X" ), contextMessage.c_str(), lastError );
+#ifdef _UNICODE
+	return ToWstring(StrFmt("%s: HRESULT = 0x%08X", contextMessage.c_str(), lastError ));
+#else
+	return StrFmt("%s: HRESULT = 0x%08X", contextMessage.c_str(), lastError);
+#endif
 }
 
 SevenZipException::SevenZipException()

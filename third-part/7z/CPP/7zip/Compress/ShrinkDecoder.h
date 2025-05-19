@@ -1,7 +1,7 @@
 // ShrinkDecoder.h
 
-#ifndef __COMPRESS_SHRINK_DECODER_H
-#define __COMPRESS_SHRINK_DECODER_H
+#ifndef ZIP7_INC_COMPRESS_SHRINK_DECODER_H
+#define ZIP7_INC_COMPRESS_SHRINK_DECODER_H
 
 #include "../../Common/MyCom.h"
 
@@ -13,21 +13,20 @@ namespace NShrink {
 const unsigned kNumMaxBits = 13;
 const unsigned kNumItems = 1 << kNumMaxBits;
 
-class CDecoder :
-  public ICompressCoder,
-  public CMyUnknownImp
-{
+Z7_CLASS_IMP_NOQIB_3(
+  CDecoder
+  , ICompressCoder
+  , ICompressSetFinishMode
+  , ICompressGetInStreamProcessedSize
+)
+  bool _fullStreamMode;
+  UInt64 _inProcessed;
+
   UInt16 _parents[kNumItems];
   Byte _suffixes[kNumItems];
   Byte _stack[kNumItems];
 
-public:
-  MY_UNKNOWN_IMP
-
   HRESULT CodeReal(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-      const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress);
-  
-  STDMETHOD(Code)(ISequentialInStream *inStream, ISequentialOutStream *outStream,
       const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress);
 };
 

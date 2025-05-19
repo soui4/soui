@@ -1,7 +1,7 @@
 // Archive/CabIn.h
 
-#ifndef __ARCHIVE_CAB_IN_H
-#define __ARCHIVE_CAB_IN_H
+#ifndef ZIP7_INC_ARCHIVE_CAB_IN_H
+#define ZIP7_INC_ARCHIVE_CAB_IN_H
 
 #include "../../../Common/MyBuffer.h"
 #include "../../../Common/MyCom.h"
@@ -100,7 +100,7 @@ struct CDatabase
   
   int GetNumberOfNewFolders() const
   {
-    int res = Folders.Size();
+    int res = (int)Folders.Size();
     if (IsTherePrevFolder())
       res--;
     return res;

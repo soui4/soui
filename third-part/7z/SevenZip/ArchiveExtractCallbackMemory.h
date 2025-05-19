@@ -11,6 +11,7 @@
 #include "ProgressCallback.h"
 #include "FileStream.h"
 #include "FileStreamMemory.h"
+#include <atomic>
 
 namespace SevenZip
 {
@@ -28,7 +29,7 @@ namespace intl
 		bool PasswordIsDefined;
 		UString Password;
 	private:
-		long m_refCount;
+		std::atomic<long> m_refCount;
 		CMyComPtr< IInArchive > m_archiveHandler;
 		
 		TString m_relPath;
@@ -53,6 +54,9 @@ namespace intl
         std::vector<RollBack_Info> m_rollbacks;
 
 		CFileStream &_fileStreams;
+
+		CMyComPtr< ISequentialOutStream > m_outMemStream;
+		std::vector<BYTE> m_buffer;
 	public:
 
 		ArchiveExtractCallbackMemory(const CMyComPtr< IInArchive >& archiveHandler, ProgressCallback* callback, CFileStream &fileStreams);

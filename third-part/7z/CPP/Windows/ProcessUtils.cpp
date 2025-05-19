@@ -1,6 +1,6 @@
 // ProcessUtils.cpp
 
-
+#include "StdAfx.h"
 
 #include "../Common/StringConvert.h"
 
@@ -15,15 +15,30 @@ namespace NWindows {
 #ifndef UNDER_CE
 static UString GetQuotedString(const UString &s)
 {
-  UString s2 = L'\"';
+  UString s2 ('\"');
   s2 += s;
-  s2 += L'\"';
+  s2.Add_Char('\"');
   return s2;
 }
 #endif
 
 WRes CProcess::Create(LPCWSTR imageName, const UString &params, LPCWSTR curDir)
 {
+  /*
+  OutputDebugStringW(L"CProcess::Create");
+  OutputDebugStringW(imageName);
+  if (params)
+  {
+    OutputDebugStringW(L"params:");
+    OutputDebugStringW(params);
+  }
+  if (curDir)
+  {
+    OutputDebugStringW(L"cur dir:");
+    OutputDebugStringW(curDir);
+  }
+  */
+
   Close();
   const UString params2 =
       #ifndef UNDER_CE
@@ -31,9 +46,9 @@ WRes CProcess::Create(LPCWSTR imageName, const UString &params, LPCWSTR curDir)
       #endif
       params;
   #ifdef UNDER_CE
-  curDir = 0;
+  curDir = NULL;
   #else
-  imageName = 0;
+  imageName = NULL;
   #endif
   PROCESS_INFORMATION pi;
   BOOL result;
@@ -42,17 +57,18 @@ WRes CProcess::Create(LPCWSTR imageName, const UString &params, LPCWSTR curDir)
   {
     STARTUPINFOA si;
     si.cb = sizeof(si);
-    si.lpReserved = 0;
-    si.lpDesktop = 0;
-    si.lpTitle = 0;
+    si.lpReserved = NULL;
+    si.lpDesktop = NULL;
+    si.lpTitle = NULL;
     si.dwFlags = 0;
     si.cbReserved2 = 0;
-    si.lpReserved2 = 0;
+    si.lpReserved2 = NULL;
     
     CSysString curDirA;
     if (curDir != 0)
       curDirA = GetSystemString(curDir);
-    result = ::CreateProcessA(NULL, (LPSTR)(LPCSTR)GetSystemString(params2),
+    const AString s = GetSystemString(params2);
+    result = ::CreateProcessA(NULL, s.Ptr_non_const(),
         NULL, NULL, FALSE, 0, NULL, ((curDir != 0) ? (LPCSTR)curDirA: 0), &si, &pi);
   }
   else
@@ -60,15 +76,15 @@ WRes CProcess::Create(LPCWSTR imageName, const UString &params, LPCWSTR curDir)
   {
     STARTUPINFOW si;
     si.cb = sizeof(si);
-    si.lpReserved = 0;
-    si.lpDesktop = 0;
-    si.lpTitle = 0;
+    si.lpReserved = NULL;
+    si.lpDesktop = NULL;
+    si.lpTitle = NULL;
     si.dwFlags = 0;
     si.cbReserved2 = 0;
-    si.lpReserved2 = 0;
+    si.lpReserved2 = NULL;
     
-    result = CreateProcessW(imageName, (LPWSTR)(LPCWSTR)params2,
-        NULL, NULL, FALSE, 0, NULL, (LPWSTR)curDir, &si, &pi);
+    result = CreateProcessW(imageName, params2.Ptr_non_const(),
+        NULL, NULL, FALSE, 0, NULL, curDir, &si, &pi);
   }
   if (result == 0)
     return ::GetLastError();
@@ -80,7 +96,7 @@ WRes CProcess::Create(LPCWSTR imageName, const UString &params, LPCWSTR curDir)
 WRes MyCreateProcess(LPCWSTR imageName, const UString &params)
 {
   CProcess process;
-  return process.Create(imageName, params, 0);
+  return process.Create(imageName, params, NULL);
 }
 
 }

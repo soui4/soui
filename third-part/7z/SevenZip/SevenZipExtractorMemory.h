@@ -4,6 +4,7 @@
 #include "ProgressCallback.h"
 #include "SevenZipPwd.h"
 #include "FileStream.h"
+#include "../CPP/7zip/IStream.h"
 
 namespace SevenZip
 {
@@ -18,7 +19,7 @@ namespace SevenZip
         const TString& GetErrorString(); 
     private:
 
-		HRESULT ExtractArchive(CFileStream &fileStreams,const CMyComPtr< IStream >& archiveStream,  ProgressCallback* callback, SevenZipPassword *pSevenZipPassword);
+		HRESULT ExtractArchive(CFileStream &fileStreams, FILE* archiveStream,  ProgressCallback* callback, SevenZipPassword *pSevenZipPassword);
 		 
         TString m_message;
     };

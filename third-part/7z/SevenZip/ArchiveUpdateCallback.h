@@ -10,6 +10,7 @@
 #include <vector>
 #include "FileInfo.h"
 #include "ProgressCallback.h"
+#include <atomic>
 
 namespace SevenZip
 {
@@ -26,7 +27,7 @@ namespace intl
 		UString Password;
 	private:
 
-		long m_refCount;
+		std::atomic<long> m_refCount;
 		TString m_dirPrefix;
 		TString m_outputPath;
 		const std::vector< FilePathInfo >& m_filePaths;

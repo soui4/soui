@@ -1,6 +1,6 @@
 // CabHeader.cpp
 
-
+#include "StdAfx.h"
 
 #include "CabHeader.h"
 
