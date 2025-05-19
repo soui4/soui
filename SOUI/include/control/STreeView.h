@@ -9,79 +9,256 @@
 #include <proxy/SPanelProxy.h>
 
 SNSBEGIN
-//////////////////////////////////////////////////////////////////////////
+
+/**
+ * @class STreeViewItemLocator
+ * @brief Class responsible for locating and managing tree view items.
+ */
 class SOUI_EXP STreeViewItemLocator : public TObjRefImpl<ITreeViewItemLocator> {
   public:
+    /**
+     * @brief Constructor for STreeViewItemLocator.
+     * @param nIndent Indentation between levels.
+     */
     STreeViewItemLocator(int nIndent = 16);
 
+    /**
+     * @brief Destructor for STreeViewItemLocator.
+     */
     ~STreeViewItemLocator();
 
   public:
+    /**
+     * @brief Sets the adapter for the tree view items.
+     * @param pAdapter Pointer to the adapter.
+     */
     STDMETHOD_(void, SetAdapter)(THIS_ ITvAdapter *pAdapter) OVERRIDE;
+
+    /**
+     * @brief Notifies the locator that a branch has changed.
+     * @param hItem Handle to the branch item.
+     */
     STDMETHOD_(void, OnBranchChanged)(THIS_ HSTREEITEM hItem) OVERRIDE;
+
+    /**
+     * @brief Notifies the locator that the expanded state of a branch has changed.
+     * @param hItem Handle to the branch item.
+     * @param bExpandedOld Old expanded state.
+     * @param bExpandedNew New expanded state.
+     */
     STDMETHOD_(void, OnBranchExpandedChanged)
     (THIS_ HSTREEITEM hItem, BOOL bExpandedOld, BOOL bExpandedNew) OVERRIDE;
 
+    /**
+     * @brief Gets the total height of the tree view.
+     * @return Total height.
+     */
     STDMETHOD_(int, GetTotalHeight)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Gets the total width of the tree view.
+     * @return Total width.
+     */
     STDMETHOD_(int, GetTotalWidth)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Converts an item handle to its position.
+     * @param hItem Handle to the item.
+     * @return Position of the item.
+     */
     STDMETHOD_(int, Item2Position)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+
+    /**
+     * @brief Converts a position to an item handle.
+     * @param position Position in the tree view.
+     * @return Handle to the item.
+     */
     STDMETHOD_(HSTREEITEM, Position2Item)(THIS_ int position) SCONST OVERRIDE;
+
+    /**
+     * @brief Gets the scroll line size.
+     * @return Scroll line size.
+     */
     STDMETHOD_(int, GetScrollLineSize)(THIS) SCONST OVERRIDE;
 
+    /**
+     * @brief Sets the width of an item.
+     * @param hItem Handle to the item.
+     * @param nWidth New width of the item.
+     */
     STDMETHOD_(void, SetItemWidth)(THIS_ HSTREEITEM hItem, int nWidth) OVERRIDE;
+
+    /**
+     * @brief Gets the width of an item.
+     * @param hItem Handle to the item.
+     * @return Width of the item.
+     */
     STDMETHOD_(int, GetItemWidth)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+
+    /**
+     * @brief Sets the height of an item.
+     * @param hItem Handle to the item.
+     * @param nHeight New height of the item.
+     */
     STDMETHOD_(void, SetItemHeight)(THIS_ HSTREEITEM hItem, int nHeight) OVERRIDE;
+
+    /**
+     * @brief Gets the height of an item.
+     * @param hItem Handle to the item.
+     * @return Height of the item.
+     */
     STDMETHOD_(int, GetItemHeight)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+
+    /**
+     * @brief Gets the indentation of an item.
+     * @param hItem Handle to the item.
+     * @return Indentation of the item.
+     */
     STDMETHOD_(int, GetItemIndent)(THIS_ HSTREEITEM hItem) SCONST OVERRIDE;
+
+    /**
+     * @brief Gets the indentation between levels.
+     * @return Indentation between levels.
+     */
     STDMETHOD_(int, GetIndent)(CTHIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Sets the indentation between levels.
+     * @param nIndent New indentation value.
+     */
     STDMETHOD_(void, SetIndent)(THIS_ int nIndent) OVERRIDE;
 
   protected:
+    /**
+     * @brief Checks if an item is expanded.
+     * @param hItem Handle to the item.
+     * @return TRUE if the item is expanded, otherwise FALSE.
+     */
     BOOL IsItemExpanded(HSTREEITEM hItem) const;
 
-    //更新hItem所在的父窗口中分枝宽度数据
-    // hItem:显示宽度发生变化的节点，可以是节点本身宽度变化，也可能是子节点宽度发生了变化
-    // nOldWidth：原显示宽度
-    // nNewWidth: 新显示宽度
+    /**
+     * @brief Updates the branch width data in the parent window.
+     * @param hItem Handle to the item.
+     * @param nOldWidth Old width of the branch.
+     * @param nNewWidth New width of the branch.
+     */
     void _UpdateBranchWidth(HSTREEITEM hItem, int nOldWidth, int nNewWidth);
 
+    /**
+     * @brief Gets the width of a branch.
+     * @param hBranch Handle to the branch.
+     * @return Width of the branch.
+     */
     int _GetBranchWidth(HSTREEITEM hBranch) const;
 
+    /**
+     * @brief Sets the width of a branch.
+     * @param hBranch Handle to the branch.
+     * @param nWidth New width of the branch.
+     */
     void _SetBranchWidth(HSTREEITEM hBranch, int nWidth);
 
+    /**
+     * @brief Sets the width of an item.
+     * @param hItem Handle to the item.
+     * @param nWidth New width of the item.
+     */
     void _SetItemWidth(HSTREEITEM hItem, int nWidth);
 
+    /**
+     * @brief Gets the height of a branch.
+     * @param hItem Handle to the item.
+     * @return Height of the branch.
+     */
     int _GetBranchHeight(HSTREEITEM hItem) const;
 
+    /**
+     * @brief Sets the height of a branch.
+     * @param hItem Handle to the item.
+     * @param nHeight New height of the branch.
+     */
     void _SetBranchHeight(HSTREEITEM hItem, int nHeight);
 
+    /**
+     * @brief Updates the height of a branch.
+     * @param hItem Handle to the item.
+     * @param nDiff Difference in height.
+     */
     void _UpdateBranchHeight(HSTREEITEM hItem, int nDiff);
 
-    //向后更新兄弟结点的偏移量
+    /**
+     * @brief Updates the offset of sibling items.
+     * @param hItem Handle to the item.
+     */
     void _UpdateSiblingsOffset(HSTREEITEM hItem);
 
+    /**
+     * @brief Gets the offset of an item.
+     * @param hItem Handle to the item.
+     * @return Offset of the item.
+     */
     int _GetItemOffset(HSTREEITEM hItem) const;
 
+    /**
+     * @brief Sets the offset of an item.
+     * @param hItem Handle to the item.
+     * @param nOffset New offset of the item.
+     */
     void _SetItemOffset(HSTREEITEM hItem, int nOffset);
 
+    /**
+     * @brief Sets the height of an item.
+     * @param hItem Handle to the item.
+     * @param nHeight New height of the item.
+     */
     void _SetItemHeight(HSTREEITEM hItem, int nHeight);
 
+    /**
+     * @brief Gets the visible height of an item.
+     * @param hItem Handle to the item.
+     * @return Visible height of the item.
+     */
     int _GetItemVisibleHeight(HSTREEITEM hItem) const;
 
+    /**
+     * @brief Gets the visible width of an item.
+     * @param hItem Handle to the item.
+     * @return Visible width of the item.
+     */
     int _GetItemVisibleWidth(HSTREEITEM hItem) const;
 
+    /**
+     * @brief Converts a position to an item handle.
+     * @param position Position in the tree view.
+     * @param hParent Handle to the parent item.
+     * @param nParentPosition Position of the parent item.
+     * @return Handle to the item.
+     */
     HSTREEITEM _Position2Item(int position, HSTREEITEM hParent, int nParentPosition) const;
 
+    /**
+     * @brief Checks if an item is visible.
+     * @param hItem Handle to the item.
+     * @return TRUE if the item is visible, otherwise FALSE.
+     */
     BOOL _IsItemVisible(HSTREEITEM hItem) const;
 
+    /**
+     * @brief Initializes a branch.
+     * @param hItem Handle to the item.
+     */
     void _InitBranch(HSTREEITEM hItem);
 
-    SAutoRefPtr<ITvAdapter> m_adapter;
-    int m_nLineHeight;
-    int m_nIndent;
-    CSize m_szDef;
+    SAutoRefPtr<ITvAdapter> m_adapter; /**< Adapter for the tree view items. */
+    int m_nLineHeight;                 /**< Line height. */
+    int m_nIndent;                     /**< Indentation between levels. */
+    CSize m_szDef;                     /**< Default size. */
 };
 
+/**
+ * @class STreeView
+ * @brief Class representing a tree view control.
+ */
 class SOUI_EXP STreeView
     : public TPanelProxy<ITreeView>
     , protected SHostProxy
@@ -90,51 +267,195 @@ class SOUI_EXP STreeView
     friend class STreeViewDataSetObserver;
 
   public:
+    /**
+     * @brief Constructor for STreeView.
+     */
     STreeView();
+
+    /**
+     * @brief Destructor for STreeView.
+     */
     ~STreeView();
 
   public:
+    /**
+     * @brief Sets the adapter for the tree view.
+     * @param adapter Pointer to the adapter.
+     * @return TRUE if successful, otherwise FALSE.
+     */
     STDMETHOD_(BOOL, SetAdapter)(THIS_ ITvAdapter *adapter) OVERRIDE;
 
+    /**
+     * @brief Gets the adapter for the tree view.
+     * @return Pointer to the adapter.
+     */
     STDMETHOD_(ITvAdapter *, GetAdapter)(THIS) SCONST OVERRIDE;
 
+    /**
+     * @brief Sets the item locator for the tree view.
+     * @param pItemLocator Pointer to the item locator.
+     */
     STDMETHOD_(void, SetItemLocator)(THIS_ ITreeViewItemLocator *pItemLocator) OVERRIDE;
 
+    /**
+     * @brief Gets the item locator for the tree view.
+     * @return Pointer to the item locator.
+     */
     STDMETHOD_(ITreeViewItemLocator *, GetItemLocator)(THIS) SCONST OVERRIDE;
 
+    /**
+     * @brief Sets the selected item.
+     * @param hItem Handle to the item.
+     * @param bNotify TRUE to notify listeners, FALSE otherwise.
+     */
     STDMETHOD_(void, SetSel)(THIS_ HSTREEITEM hItem, BOOL bNotify = FALSE) OVERRIDE;
 
+    /**
+     * @brief Gets the selected item.
+     * @return Handle to the selected item.
+     */
     STDMETHOD_(HSTREEITEM, GetSel)(THIS) SCONST OVERRIDE;
 
+    /**
+     * @brief Ensures an item is visible.
+     * @param hItem Handle to the item.
+     */
     STDMETHOD_(void, EnsureVisible)(THIS_ HSTREEITEM hItem) OVERRIDE;
 
+    /**
+     * @brief Performs a hit test on the tree view.
+     * @param pt Mouse position.
+     * @return Pointer to the item panel at the specified position.
+     */
     STDMETHOD_(IItemPanel *, HitTest)(THIS_ const POINT *pt) SCONST OVERRIDE;
 
   public:
+    /**
+     * @brief Performs a hit test on the tree view.
+     * @param pt Mouse position.
+     * @return Pointer to the item panel at the specified position.
+     */
     SItemPanel *HitTest(CPoint &pt) const;
 
   protected:
+    /**
+     * @brief Handles the item click event.
+     * @param pEvt Event arguments.
+     * @return TRUE if the event is handled, otherwise FALSE.
+     */
     BOOL OnItemClick(IEvtArgs *pEvt);
+
+    /**
+     * @brief Handles the item double-click event.
+     * @param pEvt Event arguments.
+     * @return TRUE if the event is handled, otherwise FALSE.
+     */
     BOOL OnItemDblClick(IEvtArgs *pEvt);
 
+    /**
+     * @brief Notifies the tree view that a branch has changed.
+     * @param hBranch Handle to the branch item.
+     */
     void onBranchChanged(HSTREEITEM hBranch);
+
+    /**
+     * @brief Notifies the tree view that a branch has been invalidated.
+     * @param hBranch Handle to the branch item.
+     * @param bInvalidParents TRUE to invalidate parent branches, FALSE otherwise.
+     * @param bInvalidChildren TRUE to invalidate child branches, FALSE otherwise.
+     */
     void onBranchInvalidated(HSTREEITEM hBranch, BOOL bInvalidParents, BOOL bInvalidChildren);
+
+    /**
+     * @brief Notifies the tree view that the expanded state of a branch has changed.
+     * @param hBranch Handle to the branch item.
+     * @param bExpandedOld Old expanded state.
+     * @param bExpandedNew New expanded state.
+     */
     void onBranchExpandedChanged(HSTREEITEM hBranch, BOOL bExpandedOld, BOOL bExpandedNew);
+
+    /**
+     * @brief Notifies the tree view that an item is about to be removed.
+     * @param hItem Handle to the item.
+     */
     void onItemBeforeRemove(HSTREEITEM hItem);
 
   protected:
+    /**
+     * @brief Handles the paint event.
+     * @param pRT Pointer to the rendering target.
+     */
     void OnPaint(IRenderTarget *pRT);
+
+    /**
+     * @brief Handles the size event.
+     * @param nType Type of size change.
+     * @param size New size.
+     */
     void OnSize(UINT nType, CSize size);
+
+    /**
+     * @brief Handles the destruction event.
+     */
     void OnDestroy();
-    void OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags); //实现键盘选择
+
+    /**
+     * @brief Handles the key down event.
+     * @param nChar Character code.
+     * @param nRepCnt Repeat count.
+     * @param nFlags Flags associated with the key event.
+     */
+    void OnKeyDown(TCHAR nChar, UINT nRepCnt, UINT nFlags);
+
+    /**
+     * @brief Handles key events.
+     * @param uMsg Message identifier.
+     * @param wParam Additional message information.
+     * @param lParam Additional message information.
+     * @return Result of the message processing.
+     */
     LRESULT OnKeyEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+    /**
+     * @brief Handles the mouse leave event.
+     */
     void OnMouseLeave();
+
+    /**
+     * @brief Handles the mouse wheel event.
+     * @param nFlags Flags associated with the mouse event.
+     * @param zDelta Wheel delta.
+     * @param pt Mouse position.
+     * @return TRUE if the event is handled, otherwise FALSE.
+     */
     BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+
+    /**
+     * @brief Handles mouse events.
+     * @param uMsg Message identifier.
+     * @param wParam Additional message information.
+     * @param lParam Additional message information.
+     * @return Result of the message processing.
+     */
     LRESULT OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+    /**
+     * @brief Handles the kill focus event.
+     * @param wndFocus Window receiving focus.
+     */
     void OnKillFocus(SWND wndFocus);
+
+    /**
+     * @brief Handles the set focus event.
+     * @param wndOld Window losing focus.
+     */
     void OnSetFocus(SWND wndOld);
+
+    /**
+     * @brief Handles the left mouse button down event.
+     * @param nFlags Flags associated with the mouse event.
+     * @param pt Mouse position.
+     */
     void OnLButtonDown(UINT nFlags, CPoint pt);
 
     SOUI_MSG_MAP_BEGIN()
@@ -156,6 +477,12 @@ class SOUI_EXP STreeView
     SOUI_MSG_MAP_END()
 
   protected:
+    /**
+     * @brief Handles the indentation attribute.
+     * @param strValue Attribute value.
+     * @param bLoading TRUE if loading, FALSE otherwise.
+     * @return Result of the attribute handling.
+     */
     HRESULT OnAttrIndent(const SStringW &strValue, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
@@ -164,61 +491,163 @@ class SOUI_EXP STreeView
         ATTR_BOOL(L"hasLines", m_bHasLines, TRUE)
         ATTR_SKIN(L"lineSkin", m_pLineSkin, TRUE)
     SOUI_ATTRS_END()
+
   protected:
+    /**
+     * @brief Gets the dialog code for the tree view.
+     * @return Dialog code.
+     */
     virtual UINT WINAPI OnGetDlgCode() const;
+
+    /**
+     * @brief Sets the cursor for the tree view.
+     * @param pt Mouse position.
+     * @return TRUE if the cursor is set, otherwise FALSE.
+     */
     virtual BOOL OnSetCursor(const CPoint &pt);
+
+    /**
+     * @brief Updates the tooltip information.
+     * @param pt Mouse position.
+     * @param tipInfo Tooltip information.
+     * @return TRUE if the tooltip is updated, otherwise FALSE.
+     */
     virtual BOOL UpdateToolTip(CPoint pt, SwndToolTipInfo &tipInfo);
+
+    /**
+     * @brief Applies colorization to the tree view.
+     * @param cr Color reference.
+     */
     virtual void OnColorize(COLORREF cr);
+
+    /**
+     * @brief Handles scale changes.
+     * @param nScale New scale.
+     */
     virtual void OnScaleChanged(int nScale);
+
+    /**
+     * @brief Handles language change events.
+     * @return Result of the language change handling.
+     */
     virtual HRESULT OnLanguageChanged();
+
+    /**
+     * @brief Rebuilds the font settings.
+     */
     virtual void OnRebuildFont();
 
+    /**
+     * @brief Handles scroll events.
+     * @param bVertical TRUE if the scroll is vertical, FALSE if horizontal.
+     * @param uCode Scroll code.
+     * @param nPos New position.
+     * @return TRUE if the scroll event is handled, otherwise FALSE.
+     */
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
+
+    /**
+     * @brief Gets the scroll line size.
+     * @param bVertical TRUE if the scroll is vertical, FALSE if horizontal.
+     * @return Scroll line size.
+     */
     virtual int GetScrollLineSize(BOOL bVertical);
+
+    /**
+     * @brief Creates child elements from XML node.
+     * @param xmlNode XML node containing child elements.
+     * @return TRUE if successful, otherwise FALSE.
+     */
     virtual BOOL CreateChildren(SXmlNode xmlNode);
 
-    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);          //设置or释放鼠标捕获
-    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const; //获得表项的显示位置
-    virtual BOOL IsItemRedrawDelay() const;                                  //指示表项的更新方式
+    /**
+     * @brief Sets or releases mouse capture for an item.
+     * @param pItem Pointer to the item panel.
+     * @param bCapture TRUE to set capture, FALSE to release capture.
+     */
+    virtual void OnItemSetCapture(SOsrPanel *pItem, BOOL bCapture);
 
+    /**
+     * @brief Gets the rectangle of an item.
+     * @param pItem Pointer to the item panel.
+     * @param rcItem Rectangle to receive the item position.
+     * @return TRUE if successful, otherwise FALSE.
+     */
+    virtual BOOL OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const;
+
+    /**
+     * @brief Indicates if item redraw is delayed.
+     * @return TRUE if redraw is delayed, otherwise FALSE.
+     */
+    virtual BOOL IsItemRedrawDelay() const;
+
+    /**
+     * @brief Draws lines for an item.
+     * @param pRT Pointer to the rendering target.
+     * @param rc Rectangle to draw the lines.
+     * @param hItem Handle to the item.
+     */
     virtual void DrawLines(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem);
 
   protected:
+    /**
+     * @brief Updates the scroll bar.
+     */
     void UpdateScrollBar();
+
+    /**
+     * @brief Updates the visible items.
+     */
     void UpdateVisibleItems();
 
+    /**
+     * @brief Redraws an item.
+     * @param pItem Pointer to the item panel.
+     */
     void RedrawItem(SItemPanel *pItem);
+
+    /**
+     * @brief Gets the item panel for a given item handle.
+     * @param hItem Handle to the item.
+     * @return Pointer to the item panel.
+     */
     SItemPanel *GetItemPanel(HSTREEITEM hItem);
 
+    /**
+     * @brief Dispatches a message to items.
+     * @param uMsg Message identifier.
+     * @param wParam Additional message information.
+     * @param lParam Additional message information.
+     */
     void DispatchMessage2Items(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
   protected:
-    SAutoRefPtr<ITvAdapter> m_adapter;
-    SAutoRefPtr<ITvDataSetObserver> m_observer;
-    SAutoRefPtr<ITreeViewItemLocator> m_tvItemLocator;
+    SAutoRefPtr<ITvAdapter> m_adapter;                 /**< Adapter for the tree view items. */
+    SAutoRefPtr<ITvDataSetObserver> m_observer;        /**< Observer for data set changes. */
+    SAutoRefPtr<ITreeViewItemLocator> m_tvItemLocator; /**< Item locator for the tree view. */
 
     struct ItemInfo
     {
-        SItemPanel *pItem;
-        int nType;
+        SItemPanel *pItem; /**< Pointer to the item panel. */
+        int nType;         /**< Type of the item. */
     };
-    SArray<SList<SItemPanel *> *> m_itemRecycle; // item回收站,每一种样式在回收站中保持一个列表，以便重复利用
-    SList<ItemInfo> m_visible_items;             //可见元素
+    SArray<SList<SItemPanel *> *> m_itemRecycle; /**< Item recycle bin, each style has a list for reuse. */
+    SList<ItemInfo> m_visible_items;             /**< List of visible items. */
 
     typedef SMap<HSTREEITEM, ItemInfo> VISIBLEITEMSMAP;
-    VISIBLEITEMSMAP *m_pVisibleMap;
+    VISIBLEITEMSMAP *m_pVisibleMap; /**< Map of visible items. */
 
-    SXmlDoc m_xmlTemplate;
+    SXmlDoc m_xmlTemplate; /**< XML template for items. */
 
-    SOsrPanel *m_itemCapture;
-    SOsrPanel *m_pHoverItem;
+    SOsrPanel *m_itemCapture; /**< Item that has capture. */
+    SOsrPanel *m_pHoverItem;  /**< Item under hover state. */
 
-    HSTREEITEM m_hSelected; /**< 当前选择项 */
+    HSTREEITEM m_hSelected; /**< Current selected item. */
 
-    BOOL m_bWantTab;  /**< want tab */
-    BOOL m_bHasLines; /**< has lines*/
-    SAutoRefPtr<ISkinObj> m_pLineSkin;
-    SLayoutSize m_indent;
+    BOOL m_bWantTab;                   /**< Flag indicating if tab is wanted. */
+    BOOL m_bHasLines;                  /**< Flag indicating if lines are drawn between items. */
+    SAutoRefPtr<ISkinObj> m_pLineSkin; /**< Skin for the lines. */
+    SLayoutSize m_indent;              /**< Indentation between levels. */
 };
 SNSEND
 #endif // __STREEVIEW__H__

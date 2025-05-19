@@ -1,440 +1,517 @@
-//!Ìí¼ÓÒýÓÃ
-/*!
- */
-STDMETHOD_(long, AddRef)(THIS) PURE;
-
-//!ÊÍ·ÅÒýÓÃ
-/*!
- */
-STDMETHOD_(long, Release)(THIS) PURE;
-
-//!ÊÍ·Å¶ÔÏó
-/*!
- */
-STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
-//////////////////////////////////////////////////////////////////////////
-
-/**
- * @brief ´´½¨Ò»¸öNative´°¿Ú
- * @param lpWindowName ´°¿ÚÃû
- * @param dwStyle ´°¿Ústyle
- * @param dwExStyle ´°¿ÚexStyle
- * @param x ´°¿ÚÏÔÊ¾Î»ÖÃX
- * @param y ´°¿ÚÏÔÊ¾Î»ÖÃY
- * @param nWidth ´°¿ÚÏÔÊ¾¿í¶È
- * @param nHeight ´°¿ÚÏÔÊ¾¸ß¶È
- * @param hWndParent ¸¸´°¿Ú
- * @param nID ´°¿ÚID
- * @param lpParam ¸½¼Ó²ÎÊý
- * @return ´°¿ÚHWND
- */
-STDMETHOD_(HWND, CreateNative)
-(THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
-
-/**
- * @brief »ñÈ¡´°¿ÚHWND
- * @return ´°¿ÚHWND
- */
-STDMETHOD_(HWND, GetHwnd)(THIS) PURE;
-
-/**
- * @brief ÓÃSNativeWnd¶ÔÏó×ÓÀà»¯Ò»¸öHWND
- * @param hWnd Ä¿±êHWND
- * @return TRUE-³É¹¦
- */
-STDMETHOD_(BOOL, SubclassWindow)(THIS_ HWND hWnd) PURE;
-
-/**
- * @brief ·´×ÓÀà»¯
- * @param bForce ÎªÕæÊÇ£¬Èç¹ûµ±Ç°´°¿ÚµÄwndproc²»ÊÇSNativeWnd¶ÔÏóµÄ´°¿Ú¹ý³ÌÒ²Ö´ÐÐ·´×ÓÀà»¯
- * @return Ö´ÐÐ·´×ÓÀà»¯µÄ´°¿ÚHWND
- */
-STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) PURE;
-
-/**
- * @brief »ñÈ¡µ±Ç°µÄ´°¿ÚÏûÏ¢¶ÔÏó
- * @return ´°¿ÚÏûÏ¢¶ÔÏóÖ¸Õë
- */
-STDMETHOD_(const MSG *, GetCurrentMessage)(CTHIS) SCONST PURE;
-
-/**
- * @brief »ñÈ¡´°¿ÚID
- */
-STDMETHOD_(int, GetDlgCtrlID)(CTHIS) SCONST PURE;
-
-/**
- * @brief »ñÈ¡´°¿ÚStyle
- */
-STDMETHOD_(DWORD, GetStyle)(CTHIS) SCONST PURE;
-
-/**
- * @brief »ñÈ¡´°¿ÚexStyle
- */
-STDMETHOD_(DWORD, GetExStyle)(CTHIS) SCONST PURE;
-
-/**
- * @brief »ñÈ¡´°¿Ú¹ØÁªÊý¾Ý
- * @param nIndex Êý¾ÝË÷Òý
- * @return Êý¾ÝÖµ
- */
-STDMETHOD_(LONG_PTR, GetWindowLongPtr)(CTHIS_ int nIndex) SCONST PURE;
-
-/**
- * @brief ÉèÖÃ´°¿Ú¹ØÁªÊý¾Ý
- * @param nIndex Êý¾ÝË÷Òý
- * @param dwNewLong Êý¾ÝÖµ
- * @return Ô­Êý¾ÝÖµ
- */
-STDMETHOD_(LONG_PTR, SetWindowLongPtr)(THIS_ int nIndex, LONG_PTR dwNewLong) PURE;
-
-/**
- * @brief »ñÈ¡¸¸´°¿Ú
- * @return ¸¸´°¿ÚHWND
- */
-STDMETHOD_(HWND, GetParent)(THIS) PURE;
-
-/**
- * @brief ÉèÖÃ¸¸´°¿Ú
- * @param hWndNewParent ÐÂ¸¸´°¿ÚHWND
- * @return Ô­¸¸´°¿ÚHWND
- */
-STDMETHOD_(HWND, SetParent)(THIS_ HWND hWndNewParent) PURE;
-
-/**
- * @brief »ñÈ¡´°¿ÚµÄenable×´Ì¬
- * @return TRUE-enable
- */
-STDMETHOD_(BOOL, IsWindowEnabled)(CTHIS) SCONST PURE;
-
-/**
- * @brief ÐÞ¸Ä´°¿Ústyle
- * @param dwRemove ´ýÒÆ³ý±êÖ¾Î»
- * @param dwAdd ´ýÔö¼Ó±êÖ¾Î»
- * @param nFlags Window positioning flags
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
-
-/**
- * @brief ÐÞ¸Ä´°¿ÚexStyle
- * @param dwRemove ´ýÒÆ³ý±êÖ¾Î»
- * @param dwAdd ´ýÔö¼Ó±êÖ¾Î»
- * @param nFlags Window positioning flags
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
-
-/**
- * @brief ÉèÖÃ´°¿ÚµÄPos
- * @param hWndInsertAfter zorderÎ»ÖÃ
- * @param x
- * @param y
- * @param cx
- * @param cy
- * @param nFlags ±êÖ¾Î»
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, SetWindowPos)
-(THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) PURE;
-
-/**
- * @brief ´°¿Ú¾ÓÖÐ
- * @param hWndCenter Ïà¶Ô¾ÓÖÐ´°¿Ú
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter /*= NULL*/) PURE;
-
-/**
- * @brief Ïú»Ù´°¿Ú
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, DestroyWindow)(THIS) PURE;
-
-/**
- * @brief ¼ì²éÊÇ·ñÎªÓÐÐ§HWND
- * @return
- */
-STDMETHOD_(BOOL, IsWindow)(CTHIS) SCONST PURE;
-
-/**
- * @brief Ë¢ÐÂ´°¿Ú
- * @param bErase Çå³ý´°¿ÚÄÚÈÝ
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase /*= TRUE*/) PURE;
-
-/**
- * @brief Ë¢ÐÂ´°¿ÚÖ¸¶¨ÇøÓò
- * @param lpRect ´ýË¢ÐÂÇøÓò
- * @param bErase Çå³ý´°¿ÚÄÚÈÝ
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /* = TRUE*/) PURE;
-
-/**
- * @brief »ñÈ¡´°¿ÚÎ»ÖÃ
- * @param[out] lpRect ´°¿ÚÎ»ÖÃ
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, GetWindowRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-/**
- * @brief »ñÈ¡´°¿Ú¿Í»§ÇøÎ»ÖÃ
- * @param[out] lpRect ¿Í»§ÇøÎ»ÖÃ
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, GetClientRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-/**
- * @brief ½«Ïà¶Ô´°¿ÚµÄ×ø±ê×ª»»ÎªÆÁÄ»×ø±ê
- * @param[in][out] lpPoint ´ý×ª»»×ø±ê
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, ClientToScreen)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
-
-/**
- * @brief ½«Ïà¶Ô´°¿ÚµÄ¾ØÐÎ×ø±ê×ª»»ÎªÆÁÄ»×ø±ê
- * @param[in][out] lpRect ´ý×ª»»×ø±ê
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, ClientToScreen2)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-/**
- * @brief ½«ÆÁÄ»×ø±ê×ª»»Îª´°¿Ú×ø±ê
- * @param[in][out] lpPoint ´ý×ª»»×ø±ê
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, ScreenToClient)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
-
-/**
- * @brief ½«ÆÁÄ»¾ØÐÎ×ø±ê×ª»»Îª´°¿Ú×ø±ê
- * @param[in][out] lpRect ´ý×ª»»×ø±ê
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(BOOL, ScreenToClient2)(CTHIS_ LPRECT lpRect) SCONST PURE;
-
-/**
- * @brief ½«Ò»×é´°¿Ú×ø±ê×ª»»ÎªÏà¶ÔÓÚÁíÒ»¸ö´°¿ÚµÄ×ø±ê
- * @param hWndTo Ä¿±ê´°¿Ú
- * @param[in][out] lpPoint ×ø±êÊý×é
- * @param nCount Êý×é³¤¶È
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(int, MapWindowPoints)(CTHIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST PURE;
-
-/**
- * @brief ½«Ò»¸ö´°¿Ú¾ØÐÎÓ³ÉäÎªÏà¶ÔÓÚÁíÒ»¸ö´°¿ÚµÄ¾ØÐÎ
- * @param hWndTo Ä¿±ê´°¿Ú
- * @param[in][out] lpRect ´ý×ª»»¾ØÐÎ
- * @return TRUE-SUCCEED
- */
-STDMETHOD_(int, MapWindowRect)(CTHIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
-
-/**
- * @brief Æô¶¯Ò»ÈË¶¨Ê±Æ÷
- * @param nIDEvent ¶¨Ê±Æ÷ID
- * @param nElapse ÑÓÊ±(ms)
- * @param lpfnTimer ¶¨Ê±Æ÷´¦Àíº¯Êý£¬ÎªnullÊ±²úÉúWM_TIMERÏûÏ¢
- * @return ¶¨Ê±Æ÷ID
- */
-STDMETHOD_(UINT_PTR, SetTimer)
-(THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
-
-/**
- * @brief É¾³ýÒ»¸ö¶¨Ê±Æ÷
- * @param nIDEvent ¶¨Ê±Æ÷ID
- * @return
- */
-STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) PURE;
-
-/**
- * @brief »ñÈ¡´°¿ÚµÄ¿Í»§ÇøDC
- * @return ¿Í»§ÇøDC
- */
-STDMETHOD_(HDC, GetDC)(THIS) PURE;
-
-/**
- * @brief »ñÈ¡´°¿ÚDC
- * @return ´°¿ÚDC
- */
-STDMETHOD_(HDC, GetWindowDC)(THIS) PURE;
-
-/**
- * @brief ÊÍ·ÅDC
- * @param hDC DC
- * @return
- */
-STDMETHOD_(int, ReleaseDC)(THIS_ HDC hDC) PURE;
-
-/**
- * @brief ´´½¨Ò»¸ö¹â±ê
- * @param hBitmap ¹â±êÎ»Í¼
- * @return
- */
-STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP hBitmap, int nWidth, int nHeight) PURE;
-
-/**
- * @brief Òþ²Ø¹â±ê
- * @return
- */
-STDMETHOD_(BOOL, HideCaret)(THIS) PURE;
-
-/**
- * @brief ÏÔÊ¾¹â±ê
- * @return
- */
-STDMETHOD_(BOOL, ShowCaret)(THIS) PURE;
-
-/**
- * @brief »ñÈ¡µ±Ç°ÓÐÊó±ê²¶»ñµÄHWND
- * @return Êó±ê²¶»ñµÄHWND
- */
-STDMETHOD_(HWND, GetCapture)(THIS) PURE;
-
-/**
- * @brief ½«µ±Ç°´°¿ÚÉèÖÃÎª²¶»ñÊó±êÊäÈë
- * @return Ç°Ò»¸öHWND
- */
-STDMETHOD_(HWND, SetCapture)(THIS) PURE;
-
-/**
- * @brief ÍË³öÊó±ê²¶»ñ
- * @return
- */
-STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
-
-/**
- * @brief ÈÃ´°¿Ú³ÉÎª½ÓÊÕ¼üÅÌÊäÈëµÄ½¹µã´°¿Ú
- * @return Ç°Ò»¸ö½¹µã´°¿Ú
- */
-STDMETHOD_(HWND, SetFocus)(THIS) PURE;
-
-/**
- * @brief Í¬²½Ö´ÐÐÒ»¸öÏûÏ¢µ½´°¿Ú´¦Àí¹ý³Ì
- * @param message msg id
- * @param wParam
- * @param lParam
- * @return ÏûÏ¢´¦Àí·µ»ØÖµ
- */
-STDMETHOD_(LRESULT, SendMessage)
-(THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
-
-/**
- * @brief Òì²½Ö´ÐÐÒ»¸öÏûÏ¢µ½´°¿Ú´¦Àí¹ý³Ì
- * @param message msg id
- * @param wParam
- * @param lParam
- * @return ÏûÏ¢´¦Àí·µ»ØÖµ
- */
-STDMETHOD_(BOOL, PostMessage)
-(THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
-
-STDMETHOD_(BOOL, SendNotifyMessage)
-(THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
-
-/**
- * @brief ÉèÖÃ´°¿Ú±êÌâ
- * @param lpszString ±êÌâÎÄ±¾
- * @return
- */
-STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) PURE;
-
-/**
- * @brief »ñÈ¡´°¿Ú±êÌâÎÄ±¾
- * @param lpszStringBuf »º³åÇø
- * @param nMaxCount »º³åÇø³¤¶È
- * @return lpszStringBufÎªnullÊ±·µ»ØÊý¾Ý³¤¶È
- */
-STDMETHOD_(int, GetWindowText)(CTHIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST PURE;
-
-/**
- * @brief ²éÑ¯ÊÇ·ñÎª×îÐ¡»¯×´Ì¬
- * @return TRUE-×îÐ¡»¯
- */
-STDMETHOD_(BOOL, IsIconic)(CTHIS) SCONST PURE;
-
-/**
- * @brief ²éÑ¯ÊÇ·ñÎª×î´ó»¯×´Ì¬
- * @return TRUE-×î´ó»¯
- */
-STDMETHOD_(BOOL, IsZoomed)(CTHIS) SCONST PURE;
-
-/**
- * @brief ²éÑ¯´°¿ÚÊÇ·ñ¿É¼û
- * @return TRUE-¿É¼û
- */
-STDMETHOD_(BOOL, IsWindowVisible)(CTHIS) SCONST PURE;
-
-/**
- * @brief ÒÆ¶¯´°¿ÚÎ»ÖÃ
- * @param x
- * @param y
- * @param nWidth
- * @param nHeight
- * @param bRepaint Ë¢ÐÂ´°¿Ú±êÖ¾
- * @return
- */
-STDMETHOD_(BOOL, MoveWindow)
-(THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/) PURE;
-
-/**
- * @brief ÒÆ¶¯´°¿ÚÎ»ÖÃ
- * @param lpRect Ä¿±êÎ»ÖÃ
- * @param bRepaint Ë¢ÐÂ±êÖ¾
- * @return
- */
-STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint /*= TRUE*/) PURE;
-
-/**
- * @brief ÏÔÊ¾´°¿Ú
- * @param nCmdShow ÏÔÊ¾±êÖ¾
- * @return
- */
-STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) PURE;
-
-/**
- * @brief ÉèÖÃ´°¿ÚÒìÐÎÇøÓò
- * @param hRgn ÒìÐÎÇøÓò
- * @param bRedraw Ë¢ÐÂ±êÖ¾
- * @return
- */
-STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw /*=TRUE*/) PURE;
-
-/**
- * @brief ÉèÖÃ´°¿ÚµÄ·Ö²ãÊôÐÔ
- * @param crKey Í¸Ã÷É«
- * @param bAlpha Í¸Ã÷¶È
- * @param dwFlags ±êÖ¾Î»
- * @return
- */
-STDMETHOD_(BOOL, SetLayeredWindowAttributes)
-(THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
-
-/**
- * @brief ¸üÐÂ·Ö²ã´°¿Ú
- * @param hdcDst
- * @param pptDst
- * @param psize
- * @param hdcSrc
- * @param pptSrc
- * @param crKey
- * @param pblend
- * @param dwFlags
- * @return
- */
-STDMETHOD_(BOOL, UpdateLayeredWindow)
-(THIS_ HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags) PURE;
-
-/**
- * @brief ÉèÖÃ´°¿ÚÏûÏ¢´¦Àíº¯Êý
- * @param fun ÏûÏ¢´¦Àíº¯Êý
- * @param ctx ÏûÏ¢´¦Àíº¯ÊýContext
- * @return
- */
-STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
-
-/**
- * @brief »ñÈ¡´°¿ÚÏûÏ¢´¦Àí¶ÔÏó
- * @return ÏûÏ¢´¦Àí¶ÔÏó
- */
-STDMETHOD_(MsgHandlerInfo *, GetMsgHandler)(THIS) PURE;
+ï»¿ //! Add reference
+ /*!
+  * @brief Increments the reference count of the object.
+  *
+  * @return long The new reference count.
+  */
+ STDMETHOD_(long, AddRef)(THIS) PURE;
+ 
+ //! Release reference
+ /*!
+  * @brief Decrements the reference count of the object.
+  *
+  * @return long The new reference count.
+  */
+ STDMETHOD_(long, Release)(THIS) PURE;
+ 
+ //! Final release of the object
+ /*!
+  * @brief Final release of the object, performing cleanup if necessary.
+  */
+ STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+ 
+ //////////////////////////////////////////////////////////////////////////
+ 
+ /**
+  * @brief Creates a Native window.
+  *
+  * @param lpWindowName Name of the window.
+  * @param dwStyle Window style.
+  * @param dwExStyle Extended window style.
+  * @param x X position of the window.
+  * @param y Y position of the window.
+  * @param nWidth Width of the window.
+  * @param nHeight Height of the window.
+  * @param hWndParent Handle to the parent window.
+  * @param nID Control ID of the window.
+  * @param lpParam Additional parameters.
+  * @return HWND Handle to the created window.
+  */
+ STDMETHOD_(HWND, CreateNative)
+ (THIS_ LPCTSTR lpWindowName, DWORD dwStyle, DWORD dwExStyle, int x, int y, int nWidth, int nHeight, HWND hWndParent, int nID, LPVOID lpParam) PURE;
+ 
+ /**
+  * @brief Retrieves the handle to the window.
+  *
+  * @return HWND Handle to the window.
+  */
+ STDMETHOD_(HWND, GetHwnd)(THIS) PURE;
+ 
+ /**
+  * @brief Subclasses an existing window with the SNativeWnd object.
+  *
+  * @param hWnd Handle to the window to subclass.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, SubclassWindow)(THIS_ HWND hWnd) PURE;
+ 
+ /**
+  * @brief Unsubclasses the window.
+  *
+  * @param bForce If TRUE, forces the unsubclassing even if the current window procedure is not SNativeWnd's.
+  * @return HWND Handle to the unsubclassed window.
+  */
+ STDMETHOD_(HWND, UnsubclassWindow)(THIS_ BOOL bForce /*= FALSE*/) PURE;
+ 
+ /**
+  * @brief Retrieves the current window message object.
+  *
+  * @return const MSG* Pointer to the current message object.
+  */
+ STDMETHOD_(const MSG *, GetCurrentMessage)(CTHIS) SCONST PURE;
+ 
+ /**
+  * @brief Retrieves the window ID.
+  *
+  * @return int Window ID.
+  */
+ STDMETHOD_(int, GetDlgCtrlID)(CTHIS) SCONST PURE;
+ 
+ /**
+  * @brief Retrieves the window style.
+  *
+  * @return DWORD Window style.
+  */
+ STDMETHOD_(DWORD, GetStyle)(CTHIS) SCONST PURE;
+ 
+ /**
+  * @brief Retrieves the extended window style.
+  *
+  * @return DWORD Extended window style.
+  */
+ STDMETHOD_(DWORD, GetExStyle)(CTHIS) SCONST PURE;
+ 
+ /**
+  * @brief Retrieves the long pointer value at the specified index.
+  *
+  * @param nIndex Index of the value to retrieve.
+  * @return LONG_PTR Long pointer value.
+  */
+ STDMETHOD_(LONG_PTR, GetWindowLongPtr)(CTHIS_ int nIndex) SCONST PURE;
+ 
+ /**
+  * @brief Sets the long pointer value at the specified index.
+  *
+  * @param nIndex Index of the value to set.
+  * @param dwNewLong New long pointer value.
+  * @return LONG_PTR Previous long pointer value.
+  */
+ STDMETHOD_(LONG_PTR, SetWindowLongPtr)(THIS_ int nIndex, LONG_PTR dwNewLong) PURE;
+ 
+ /**
+  * @brief Retrieves the handle to the parent window.
+  *
+  * @return HWND Handle to the parent window.
+  */
+ STDMETHOD_(HWND, GetParent)(THIS) PURE;
+ 
+ /**
+  * @brief Sets the handle to the parent window.
+  *
+  * @param hWndNewParent Handle to the new parent window.
+  * @return HWND Handle to the previous parent window.
+  */
+ STDMETHOD_(HWND, SetParent)(THIS_ HWND hWndNewParent) PURE;
+ 
+ /**
+  * @brief Checks if the window is enabled.
+  *
+  * @return BOOL TRUE if the window is enabled, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, IsWindowEnabled)(CTHIS) SCONST PURE;
+ 
+ /**
+  * @brief Modifies the window style.
+  *
+  * @param dwRemove Styles to remove.
+  * @param dwAdd Styles to add.
+  * @param nFlags Window positioning flags.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, ModifyStyle)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
+ 
+ /**
+  * @brief Modifies the extended window style.
+  *
+  * @param dwRemove Styles to remove.
+  * @param dwAdd Styles to add.
+  * @param nFlags Window positioning flags.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, ModifyStyleEx)(THIS_ DWORD dwRemove, DWORD dwAdd, UINT nFlags /*=0*/) PURE;
+ 
+ /**
+  * @brief Sets the window position.
+  *
+  * @param hWndInsertAfter Handle to the window to insert after.
+  * @param x X position of the window.
+  * @param y Y position of the window.
+  * @param cx Width of the window.
+  * @param cy Height of the window.
+  * @param nFlags Window positioning flags.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, SetWindowPos)
+ (THIS_ HWND hWndInsertAfter, int x, int y, int cx, int cy, UINT nFlags) PURE;
+ 
+ /**
+  * @brief Centers the window relative to another window.
+  *
+  * @param hWndCenter Handle to the window to center relative to.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, CenterWindow)(THIS_ HWND hWndCenter /*= NULL*/) PURE;
+ 
+ /**
+  * @brief Destroys the window.
+  *
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, DestroyWindow)(THIS) PURE;
+ 
+ /**
+  * @brief Checks if the handle is a valid window handle.
+  *
+  * @return BOOL TRUE if valid, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, IsWindow)(CTHIS) SCONST PURE;
+ 
+ /**
+  * @brief Invalidates the entire window.
+  *
+  * @param bErase Flag indicating if the background should be erased.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, Invalidate)(THIS_ BOOL bErase /*= TRUE*/) PURE;
+ 
+ /**
+  * @brief Invalidates a specified rectangle of the window.
+  *
+  * @param lpRect Rectangle to invalidate.
+  * @param bErase Flag indicating if the background should be erased.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, InvalidateRect)(THIS_ LPCRECT lpRect, BOOL bErase /* = TRUE*/) PURE;
+ 
+ /**
+  * @brief Retrieves the window rectangle.
+  *
+  * @param[out] lpRect Rectangle to receive the window rectangle.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, GetWindowRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
+ 
+ /**
+  * @brief Retrieves the client rectangle.
+  *
+  * @param[out] lpRect Rectangle to receive the client rectangle.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, GetClientRect)(CTHIS_ LPRECT lpRect) SCONST PURE;
+ 
+ /**
+  * @brief Converts client coordinates to screen coordinates.
+  *
+  * @param[in][out] lpPoint Point to convert.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, ClientToScreen)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
+ 
+ /**
+  * @brief Converts client rectangle coordinates to screen coordinates.
+  *
+  * @param[in][out] lpRect Rectangle to convert.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, ClientToScreen2)(CTHIS_ LPRECT lpRect) SCONST PURE;
+ 
+ /**
+  * @brief Converts screen coordinates to client coordinates.
+  *
+  * @param[in][out] lpPoint Point to convert.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, ScreenToClient)(CTHIS_ LPPOINT lpPoint) SCONST PURE;
+ 
+ /**
+  * @brief Converts screen rectangle coordinates to client coordinates.
+  *
+  * @param[in][out] lpRect Rectangle to convert.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, ScreenToClient2)(CTHIS_ LPRECT lpRect) SCONST PURE;
+ 
+ /**
+  * @brief Maps a set of points from one window to another.
+  *
+  * @param hWndTo Handle to the destination window.
+  * @param[in][out] lpPoint Array of points to map.
+  * @param nCount Number of points.
+  * @return int Number of points mapped.
+  */
+ STDMETHOD_(int, MapWindowPoints)(CTHIS_ HWND hWndTo, LPPOINT lpPoint, UINT nCount) SCONST PURE;
+ 
+ /**
+  * @brief Maps a rectangle from one window to another.
+  *
+  * @param hWndTo Handle to the destination window.
+  * @param[in][out] lpRect Rectangle to map.
+  * @return int Number of points mapped.
+  */
+ STDMETHOD_(int, MapWindowRect)(CTHIS_ HWND hWndTo, LPRECT lpRect) SCONST PURE;
+ 
+ /**
+  * @brief Sets a timer for the window.
+  *
+  * @param nIDEvent Timer ID.
+  * @param nElapse Elapse time in milliseconds.
+  * @param lpfnTimer Timer callback function, if NULL, a WM_TIMER message is generated.
+  * @return UINT_PTR Timer ID.
+  */
+ STDMETHOD_(UINT_PTR, SetTimer)
+ (THIS_ UINT_PTR nIDEvent, UINT nElapse, void(CALLBACK *lpfnTimer)(HWND, UINT, UINT_PTR, DWORD) /*= NULL*/) PURE;
+ 
+ /**
+  * @brief Kills a timer for the window.
+  *
+  * @param nIDEvent Timer ID.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, KillTimer)(THIS_ UINT_PTR nIDEvent) PURE;
+ 
+ /**
+  * @brief Retrieves a device context for the window.
+  *
+  * @return HDC Handle to the device context.
+  */
+ STDMETHOD_(HDC, GetDC)(THIS) PURE;
+ 
+ /**
+  * @brief Retrieves a device context for the entire window.
+  *
+  * @return HDC Handle to the device context.
+  */
+ STDMETHOD_(HDC, GetWindowDC)(THIS) PURE;
+ 
+ /**
+  * @brief Releases a device context.
+  *
+  * @param hDC Handle to the device context to release.
+  * @return int Number of times the device context was released.
+  */
+ STDMETHOD_(int, ReleaseDC)(THIS_ HDC hDC) PURE;
+ 
+ /**
+  * @brief Creates a caret for the window.
+  *
+  * @param hBitmap Handle to the bitmap for the caret.
+  * @param nWidth Width of the caret.
+  * @param nHeight Height of the caret.
+  * * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP hBitmap, int nWidth, int nHeight) PURE;
+ 
+ /**
+  * @brief Hides the caret.
+  *
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, HideCaret)(THIS) PURE;
+ 
+ /**
+  * @brief Shows the caret.
+  *
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, ShowCaret)(THIS) PURE;
+ 
+ /**
+  * @brief Retrieves the handle to the window that has captured the mouse.
+  *
+  * @return HWND Handle to the capturing window.
+  */
+ STDMETHOD_(HWND, GetCapture)(THIS) PURE;
+ 
+ /**
+  * @brief Sets the window to capture the mouse input.
+  *
+  * @return HWND Handle to the previous capturing window.
+  */
+ STDMETHOD_(HWND, SetCapture)(THIS) PURE;
+ 
+ /**
+  * @brief Releases the mouse capture.
+  *
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, ReleaseCapture)(THIS) PURE;
+ 
+ /**
+  * @brief Sets the input focus to the window.
+  *
+  * @return HWND Handle to the previous focused window.
+  */
+ STDMETHOD_(HWND, SetFocus)(THIS) PURE;
+ 
+ /**
+  * @brief Sends a message to the window.
+  *
+  * @param message Message ID.
+  * @param wParam WPARAM for the message.
+  * @param lParam LPARAM for the message.
+  * @return LRESULT Result of the message processing.
+  */
+ STDMETHOD_(LRESULT, SendMessage)
+ (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+ 
+ /**
+  * @brief Posts a message to the window.
+  *
+  * @param message Message ID.
+  * @param wParam WPARAM for the message.
+  * @param lParam LPARAM for the message.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, PostMessage)
+ (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+ 
+ /**
+  * @brief Sends a notify message to the window.
+  *
+  * @param message Message ID.
+  * @param wParam WPARAM for the message.
+  * @param lParam LPARAM for the message.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, SendNotifyMessage)
+ (THIS_ UINT message, WPARAM wParam /*= 0*/, LPARAM lParam /*= 0*/) PURE;
+ 
+ /**
+  * @brief Sets the window text.
+  *
+  * @param lpszString String to set as the window text.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, SetWindowText)(THIS_ LPCTSTR lpszString) PURE;
+ 
+ /**
+  * @brief Retrieves the window text.
+  *
+  * @param lpszStringBuf Buffer to receive the window text.
+  * @param nMaxCount Maximum number of characters to copy to the buffer.
+  * @return int Length of the string copied to the buffer, not including the terminating null character.
+  */
+ STDMETHOD_(int, GetWindowText)(CTHIS_ LPTSTR lpszStringBuf, int nMaxCount) SCONST PURE;
+ 
+ /**
+  * @brief Checks if the window is iconic (minimized).
+  *
+  * @return BOOL TRUE if the window is iconic, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, IsIconic)(CTHIS) SCONST PURE;
+ 
+ /**
+  * @brief Checks if the window is zoomed (maximized).
+  *
+  * @return BOOL TRUE if the window is zoomed, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, IsZoomed)(CTHIS) SCONST PURE;
+ 
+ /**
+  * @brief Checks if the window is visible.
+  *
+  * @return BOOL TRUE if the window is visible, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, IsWindowVisible)(CTHIS) SCONST PURE;
+ 
+ /**
+  * @brief Moves the window to the specified position and resizes it.
+  *
+  * @param x X position of the window.
+  * @param y Y position of the window.
+  * @param nWidth Width of the window.
+  * @param nHeight Height of the window.
+  * @param bRepaint Flag indicating if the window should be repainted.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, MoveWindow)
+ (THIS_ int x, int y, int nWidth, int nHeight, BOOL bRepaint /*= TRUE*/) PURE;
+ 
+ /**
+  * @brief Moves the window to the specified position and resizes it using a rectangle.
+  *
+  * @param lpRect Rectangle defining the new position and size of the window.
+  * @param bRepaint Flag indicating if the window should be repainted.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, MoveWindow2)(THIS_ LPCRECT lpRect, BOOL bRepaint /*= TRUE*/) PURE;
+ 
+ /**
+  * @brief Sets the show state of the window.
+  *
+  * @param nCmdShow Command to show the window (e.g., SW_SHOW, SW_HIDE).
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, ShowWindow)(THIS_ int nCmdShow) PURE;
+ 
+ /**
+  * @brief Sets the window region.
+  *
+  * @param hRgn Handle to the region.
+  * @param bRedraw Flag indicating if the window should be redrawn.
+  * @return int Previous region handle.
+  */
+ STDMETHOD_(int, SetWindowRgn)(THIS_ HRGN hRgn, BOOL bRedraw /*=TRUE*/) PURE;
+ 
+ /**
+  * @brief Sets the layered window attributes.
+  *
+  * @param crKey Color key for transparency.
+  * @param bAlpha Alpha value for transparency.
+  * @param dwFlags Flags for the layered window attributes.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, SetLayeredWindowAttributes)
+ (THIS_ COLORREF crKey, BYTE bAlpha, DWORD dwFlags) PURE;
+ 
+ /**
+  * @brief Updates the layered window.
+  *
+  * @param hdcDst Destination device context.
+  * @param pptDst Destination point.
+  * @param psize Size of the destination.
+  * @param hdcSrc Source device context.
+  * @param pptSrc Source point.
+  * @param crKey Color key for transparency.
+  * @param pblend Blend function.
+  * @param dwFlags Flags for the update.
+  * @return BOOL TRUE if successful, FALSE otherwise.
+  */
+ STDMETHOD_(BOOL, UpdateLayeredWindow)
+ (THIS_ HDC hdcDst, POINT *pptDst, SIZE *psize, HDC hdcSrc, POINT *pptSrc, COLORREF crKey, BLENDFUNCTION *pblend, DWORD dwFlags) PURE;
+ 
+ /**
+  * @brief Sets the message handler for the window.
+  *
+  * @param fun Function pointer to the message handler.
+  * @param ctx Context pointer for the message handler.
+  */
+ STDMETHOD_(void, SetMsgHandler)(THIS_ FunMsgHandler fun, void *ctx) PURE;
+ 
+ /**
+  * @brief Retrieves the message handler for the window.
+  *
+  * @return MsgHandlerInfo* Pointer to the message handler information.
+  */
+ STDMETHOD_(MsgHandlerInfo *, GetMsgHandler)(THIS) PURE;
+ 

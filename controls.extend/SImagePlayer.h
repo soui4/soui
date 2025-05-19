@@ -36,8 +36,7 @@ class SImagePlayer
     virtual CSize GetDesiredSize(LPCRECT pRcContainer);
 
   protected: // ITimerLineHander
-    virtual void OnNextFrame();
-
+    STDMETHOD_(void, OnNextFrame)(THIS) OVERRIDE;
   public: //属性处理
     SOUI_ATTRS_BEGIN()
     ATTR_CUSTOM(L"skin", OnAttrSkin) //为控件提供一个skin属性，用来接收SSkinObj对象的name

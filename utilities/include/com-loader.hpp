@@ -5,7 +5,7 @@
 #include <interface/obj-ref-i.h>
 #include <string/tstring.h>
 
-namespace SOUI {
+SNSBEGIN
 //加载组件辅助类
 //组件需要提供SCreateInstance接口。接口定义必须是funSCreateInstance
 class SComLoader
@@ -30,6 +30,8 @@ public:
         {
             #ifdef _WIN32
             strPath+=_T(".dll");
+            #elif defined(__APPLE__)
+            strPath+=_T(".dylib");
             #else
             strPath+=_T(".so");
             #endif
@@ -61,6 +63,6 @@ protected:
     TCHAR   m_szDllPath[MAX_PATH];
 };
 
-}//end of soui
+SNSEND
 
 #endif//_COM_LOADER_H_

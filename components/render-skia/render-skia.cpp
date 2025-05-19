@@ -25,6 +25,8 @@
 #include <vector>
 #include <map>
 #include <windows.h>
+#include <string/strcpcvt.h>
+#include <helper/SAutoBuf.h>
 
 #define getTotalClip internal_private_getTotalClip
 // #include <vld.h>
@@ -33,8 +35,7 @@
 #define PI         ((float)3.141592654f)
 #endif
 
-namespace SOUI
-{
+SNSBEGIN
 	//PS_SOLID
 	const float  ps_solid[] ={1.0f,0.0f};
 	const float  ps_dash[] ={5.0f,5.0f};
@@ -1851,17 +1852,58 @@ namespace SOUI
 		return hr;
 	}
 
-	HRESULT SBitmap_Skia::Save(LPCWSTR pszFileName,const LPVOID pFormat) SCONST
-	{
-		LPBYTE pBits = (LPBYTE)GetPixelBits();
-		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage(pBits,Width(),Height(),pszFileName,pFormat);
-	}
+	
+    static void premultiply_to_non_premultiply(unsigned char *data, int width, int height)
+    {
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                int idx = (y * width + x) * 4;
+                unsigned char alpha = data[idx + 3];
+                if (alpha != 0)
+                {
+                    data[idx + 0] = (data[idx + 0] * 255) / alpha; // R
+                    data[idx + 1] = (data[idx + 1] * 255) / alpha; // G
+                    data[idx + 2] = (data[idx + 2] * 255) / alpha; // B
+                }
+                else
+                {
+                    data[idx + 0] = 0; // R
+                    data[idx + 1] = 0; // G
+                    data[idx + 2] = 0; // B
+                }
+            }
+        }
+    }
 
-	HRESULT SBitmap_Skia::Save2(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
-	{
-		LPBYTE pBits = (LPBYTE)GetPixelBits();
-		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2(pBits,Width(),Height(),pszFileName,imgFmt);
-	}
+    HRESULT SBitmap_Skia::Save(LPCWSTR pszFileName, const LPVOID pFormat) SCONST
+    {
+        LPBYTE pBits = (LPBYTE)GetPixelBits();
+        int nWid = Width();
+        int nHei = Height();
+        SAutoBuf buf(nWid * 4 * nHei);
+        if (!buf)
+            return E_OUTOFMEMORY;
+        memcpy(buf, pBits, nWid * 4 * nHei);
+        premultiply_to_non_premultiply((unsigned char *)(char *)buf, nWid, nHei);
+        return GetRenderFactory()->GetImgDecoderFactory()->SaveImage((BYTE *)(char *)buf, nWid, nHei, pszFileName, pFormat);
+    }
+
+    HRESULT SBitmap_Skia::Save2(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
+    {
+        LPBYTE pBits = (LPBYTE)GetPixelBits();
+        int nWid = Width();
+        int nHei = Height();
+        SAutoBuf buf(nWid * 4 * nHei);
+        if (!buf)
+            return E_OUTOFMEMORY;
+        memcpy(buf, pBits, nWid * 4 * nHei);
+        premultiply_to_non_premultiply((unsigned char *)(char *)buf, nWid, nHei);
+
+        return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2((BYTE *)(char *)buf, nWid, nHei, pszFileName, imgFmt);
+    }
+
 
 	//////////////////////////////////////////////////////////////////////////
 	static int s_cRgn =0;
@@ -2634,7 +2676,7 @@ namespace SOUI
 		}
 	}
 
-}//end of namespace SOUI
+SNSEND
 
 
 EXTERN_C BOOL Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory)

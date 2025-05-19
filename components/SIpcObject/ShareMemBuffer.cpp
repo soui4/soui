@@ -13,8 +13,7 @@ static char THIS_FILE[]=__FILE__;
 //////////////////////////////////////////////////////////////////////
 // Construction/Destruction
 //////////////////////////////////////////////////////////////////////
-namespace SOUI
-{
+SNSBEGIN
 
 CShareMemBuffer::CShareMemBuffer()
 	:m_pMemBuf(NULL)
@@ -168,4 +167,4 @@ void CShareMemBuffer::Unlock()
 	SetEvent(m_hMutex);//make mutex waitable.
 }
 
-}
+SNSEND

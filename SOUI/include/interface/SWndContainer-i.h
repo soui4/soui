@@ -26,22 +26,22 @@ SNSBEGIN
 
 enum
 {
-    ZORDER_MIN = 0,
-    ZORDER_MAX = (UINT)-1,
+    ZORDER_MIN = 0,        /**< Minimum Z-Order */
+    ZORDER_MAX = (UINT)-1, /**< Maximum Z-Order */
 };
 
 typedef enum GrtFlag
 {
-    GRT_NODRAW = 0,
-    GRT_PAINTBKGND,
-    GRT_OFFSCREEN,
+    GRT_NODRAW = 0, /**< No drawing */
+    GRT_PAINTBKGND, /**< Paint background */
+    GRT_OFFSCREEN,  /**< Offscreen drawing */
 } GrtFlag;
 
 /**
  * @struct     ISwndContainer
- * @brief      SOUI窗口容器接口
+ * @brief      SOUI Window Container Interface
  *
- * Describe
+ * This interface defines the methods for managing a window container in SOUI.
  */
 
 typedef struct IRegionS IRegionS;
@@ -51,254 +51,252 @@ typedef struct IRegionS IRegionS;
 DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
 {
     /**
-     * @brief 注册动画帧处理接口
-     * @param pHandler ITimelineHandler* -- 动画帧处理接口
-     * @return BOOL -- TRUE: 成功
+     * @brief Registers an animation frame handler.
+     * @param pHandler Pointer to the ITimelineHandler interface.
+     * @return TRUE if successful.
      */
     STDMETHOD_(BOOL, RegisterTimelineHandler)(THIS_ ITimelineHandler * pHandler) PURE;
 
     /**
-     * @brief 注销动画帧处理接口
-     * @param pHandler ITimelineHandler* -- 动画帧处理接口
-     * @return BOOL -- TRUE: 成功
+     * @brief Unregisters an animation frame handler.
+     * @param pHandler Pointer to the ITimelineHandler interface.
+     * @return TRUE if successful.
      */
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler * pHandler) PURE;
 
-    //-----------------------------------------------------------------------------
-
     /**
-     * @brief 向Swnd注册IDropTarget
-     * @param swnd SWND -- 目标窗口
-     * @param pDropTarget IDropTarget* -- IDropTarget接口
-     * @return BOOL -- TRUE: 成功
+     * @brief Registers an IDropTarget with a Swnd.
+     * @param swnd Handle to the target window.
+     * @param pDropTarget Pointer to the IDropTarget interface.
+     * @return TRUE if successful.
      */
     STDMETHOD_(BOOL, RegisterDragDrop)(THIS_ SWND swnd, IDropTarget * pDropTarget) PURE;
 
     /**
-     * @brief 从Swnd注销IDropTarget
-     * @param swnd SWND -- 目标窗口
-     * @return BOOL -- TRUE: 成功
+     * @brief Unregisters an IDropTarget from a Swnd.
+     * @param swnd Handle to the target window.
+     * @return TRUE if successful.
      */
     STDMETHOD_(BOOL, UnregisterDragDrop)(THIS_ SWND swnd) PURE;
 
     /**
-     * @brief 响应事件
-     * @param evt IEvtArgs* -- 事件指针
-     * @return BOOL -- TRUE: 事件被处理
+     * @brief Fires an event.
+     * @param evt Pointer to the IEvtArgs event.
+     * @return TRUE if the event was handled.
      */
     STDMETHOD_(BOOL, OnFireEvent)(THIS_ IEvtArgs * evt) PURE;
 
     /**
-     * @brief 获取当前的Message Loop
-     * @return IMessageLoop* -- 当前的Message Loop
+     * @brief Retrieves the current message loop.
+     * @return Pointer to the IMessageLoop interface.
      */
     STDMETHOD_(IMessageLoop *, GetMsgLoop)(THIS) PURE;
 
     /**
-     * @brief 获取脚本模块
-     * @return IScriptModule* -- 脚本模块
+     * @brief Retrieves the script module.
+     * @return Pointer to the IScriptModule interface.
      */
     STDMETHOD_(IScriptModule *, GetScriptModule)(THIS) PURE;
 
     /**
-     * @brief 获取宿主窗口HWND
-     * @return HWND -- 宿主窗口HWND
+     * @brief Retrieves the handle to the host window.
+     * @return Handle to the host window (HWND).
      */
     STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
 
     /**
-     * @brief 获取宿主窗口半透明标志
-     * @return BOOL -- TRUE: 宿主窗口半透明
+     * @brief Checks if the host window is translucent.
+     * @return TRUE if the host window is translucent.
      */
     STDMETHOD_(BOOL, IsTranslucent)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取将mouseWheel消息分发到hover窗口的标志
-     * @return BOOL -- TRUE: mouseWheel消息发到hover窗口，FALSE: mouseWheel分发到焦点窗口
+     * @brief Checks if mouseWheel messages are sent to the hover window.
+     * @return TRUE if mouseWheel messages are sent to the hover window, FALSE if sent to the focus window.
      */
     STDMETHOD_(BOOL, IsSendWheel2Hover)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取当前dpi放大倍数
-     * @return int -- 放大倍数
+     * @brief Retrieves the current DPI scale factor.
+     * @return The scale factor.
      */
     STDMETHOD_(int, GetScale)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取翻译上下文
-     * @return LPCWSTR -- 翻译上下文
+     * @brief Retrieves the translation context.
+     * @return The translation context.
      */
     STDMETHOD_(LPCWSTR, GetTranslatorContext)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取容器显示位置
-     * @param ret RECT* -- 容器显示位置
+     * @brief Retrieves the container's display rectangle.
+     * @param ret Pointer to the RECT structure to receive the container's display rectangle.
      * @return void
      */
     STDMETHOD_(void, GetContainerRect)(CTHIS_ RECT * ret) SCONST PURE;
 
     /**
-     * @brief 刷新指定区域的内存位图
-     * @param rgn IRegionS* -- 刷新位置
+     * @brief Updates the specified region of the memory bitmap.
+     * @param rgn Pointer to the IRegionS region to update.
      * @return void
      */
     STDMETHOD_(void, UpdateRegion)(THIS_ IRegionS * rgn) PURE;
 
     /**
-     * @brief 请求重绘
-     * @param rc LPCRECT -- 重绘位置
-     * @param bClip BOOL -- 是否剪裁
+     * @brief Requests a redraw of the specified area.
+     * @param rc Pointer to the LPCRECT structure defining the area to redraw.
+     * @param bClip TRUE if the area should be clipped.
      * @return void
      */
     STDMETHOD_(void, OnRedraw)(THIS_ LPCRECT rc, BOOL bClip) PURE;
 
     /**
-     * @brief 获取捕获鼠标的Swnd对象
-     * @return SWND -- 捕获鼠标的Swnd对象
+     * @brief Retrieves the Swnd object that has captured the mouse.
+     * @return Handle to the Swnd object that has captured the mouse.
      */
     STDMETHOD_(SWND, OnGetSwndCapture)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置捕获鼠标的Swnd对象
-     * @param swnd SWND -- 捕获鼠标的Swnd对象
-     * @return SWND -- 原捕获鼠标的Swnd对象
+     * @brief Sets the Swnd object to capture the mouse.
+     * @param swnd Handle to the Swnd object to capture the mouse.
+     * @return Handle to the previous Swnd object that had capture.
      */
     STDMETHOD_(SWND, OnSetSwndCapture)(THIS_ SWND swnd) PURE;
 
     /**
-     * @brief 释放捕获鼠标的Swnd
-     * @return BOOL -- TRUE: 成功
+     * @brief Releases the mouse capture from the Swnd object.
+     * @return TRUE if successful.
      */
     STDMETHOD_(BOOL, OnReleaseSwndCapture)(THIS) PURE;
 
     /**
-     * @brief 获取Hover的Swnd
-     * @return SWND -- Hover的Swnd
+     * @brief Retrieves the Swnd object that is hovered over.
+     * @return Handle to the Swnd object that is hovered over.
      */
     STDMETHOD_(SWND, GetHover)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 获取焦点的Swnd
-     * @return SWND -- 焦点的Swnd
+     * @brief Retrieves the Swnd object that has focus.
+     * @return Handle to the Swnd object that has focus.
      */
     STDMETHOD_(SWND, GetFocus)(CTHIS) SCONST PURE;
 
     /**
-     * @brief 设置窗口焦点
-     * @param swnd SWND -- 焦点窗口
+     * @brief Sets the focus to the specified Swnd object.
+     * @param swnd Handle to the Swnd object to set focus to.
      * @return void
      */
     STDMETHOD_(void, OnSetSwndFocus)(THIS_ SWND swnd) PURE;
 
     /**
-     * @brief 请求立即更新窗口
-     * @param bForce BOOL -- TRUE: 强制刷新，FALSE: 有invalid region才刷新
-     * @return BOOL -- TRUE: 成功
+     * @brief Requests an immediate update of the window.
+     * @param bForce TRUE to force a refresh, FALSE to refresh only if there are invalid regions.
+     * @return TRUE if successful.
      */
     STDMETHOD_(BOOL, UpdateWindow)(THIS_ BOOL bForce DEF_VAL(TRUE)) PURE;
 
     /**
-     * @brief 请求更新tooltip
+     * @brief Requests an update of the tooltip.
      * @return void
      */
     STDMETHOD_(void, UpdateTooltip)(THIS) PURE;
 
     /**
-     * @brief 在指定位置显示tooltip
-     * @param rc LPCRECT -- tip显示位置，相对于container
-     * @param tipAlign UINT -- tip对齐方式
-     * @param pszTip LPCTSTR -- tip内容，为null时退出固定tip
+     * @brief Displays a tooltip at the specified position.
+     * @param rc Pointer to the LPCRECT structure defining the position of the tooltip relative to the container.
+     * @param tipAlign Alignment flags for the tooltip.
+     * @param pszTip Content of the tooltip, set to NULL to exit a fixed tooltip.
      * @return void
      */
     STDMETHOD_(void, SetToolTip)(THIS_ LPCRECT rc, UINT tipAlign, LPCTSTR pszTip) PURE;
 
     /**
-     * @brief 将当前Frame的矩形坐标转换成最终Host的坐标
-     * @param rc RECT* -- 待转换的矩形
+     * @brief Converts the rectangle coordinates of the current frame to the final host coordinates.
+     * @param rc Pointer to the RECT structure containing the rectangle to convert.
      * @return void
      */
     STDMETHOD_(void, FrameToHost)(CTHIS_ RECT * rc) SCONST PURE;
 
     /**
-     * @brief 获取加速键管理器
-     * @return IAcceleratorMgr* -- 加速键管理器
+     * @brief Retrieves the accelerator manager.
+     * @return Pointer to the IAcceleratorMgr interface.
      */
     STDMETHOD_(IAcceleratorMgr *, GetAcceleratorMgr)(THIS) PURE;
 
     /**
-     * @brief 将Swnd注册为TrackMouseEvent窗口
-     * @param swnd SWND -- 目标窗口
-     * @return BOOL -- TRUE: 成功
-     * @remark 注册为TrackMouseEvent后，该Swnd被其它窗口挡住仍然可以捕获hover, leave消息
+     * @brief Registers a Swnd as a TrackMouseEvent window.
+     * @param swnd Handle to the target window.
+     * @return TRUE if successful.
+     * @remark After registration, the Swnd can capture hover and leave messages even if it is obscured by other windows.
      */
     STDMETHOD_(BOOL, RegisterTrackMouseEvent)(THIS_ SWND swnd) PURE;
 
     /**
-     * @brief 将Swnd注销TrackMouseEvent窗口
-     * @param swnd SWND -- 目标窗口
-     * @return BOOL -- TRUE: 成功
-     * @remark 注册为TrackMouseEvent后，该Swnd被其它窗口挡住仍然可以捕获hover, leave消息
+     * @brief Unregisters a Swnd as a TrackMouseEvent window.
+     * @param swnd Handle to the target window.
+     * @return TRUE if successful.
+     * @remark After registration, the Swnd can capture hover and leave messages even if it is obscured by other windows.
      */
     STDMETHOD_(BOOL, UnregisterTrackMouseEvent)(THIS_ SWND swnd) PURE;
 
     /**
-     * @brief 标记窗口树的zorder失效
+     * @brief Marks the window tree's z-order as dirty.
      * @return void
      */
     STDMETHOD_(void, MarkWndTreeZorderDirty)(THIS) PURE;
 
     /**
-     * @brief 重建窗口树的zorder
+     * @brief Rebuilds the window tree's z-order.
      * @return void
      */
     STDMETHOD_(void, BuildWndTreeZorder)(THIS) PURE;
 
     /**
-     * @brief 启用/关闭输入法
-     * @param bEnable BOOL -- 启用/关闭输入法标志
+     * @brief Enables or disables the input method editor (IME).
+     * @param bEnable TRUE to enable IME, FALSE to disable.
      * @return void
      */
     STDMETHOD_(void, EnableIME)(THIS_ BOOL bEnable) PURE;
 
     /**
-     * @brief 更新Cursor
+     * @brief Updates the cursor.
      * @return void
      */
     STDMETHOD_(void, OnUpdateCursor)(THIS) PURE;
 
     /**
-     * @brief 注册VideoCanvas窗口
-     * @param swnd SWND -- VideoCanvas handle
-     * @return BOOL -- TRUE: 成功
+     * @brief Registers a VideoCanvas window.
+     * @param swnd Handle to the VideoCanvas window.
+     * @return TRUE if successful.
      */
     STDMETHOD_(BOOL, RegisterVideoCanvas)(THIS_ SWND swnd) PURE;
 
     /**
-     * @brief 注销VideoCanvas窗口
-     * @param swnd SWND -- VideoCanvas handle
-     * @return BOOL -- TRUE: 成功
+     * @brief Unregisters a VideoCanvas window.
+     * @param swnd Handle to the VideoCanvas window.
+     * @return TRUE if successful.
      */
     STDMETHOD_(BOOL, UnregisterVideoCanvas)(THIS_ SWND swnd) PURE;
 
     /**
-     * @brief 启用/禁用宿主私有UI定义
-     * @param bEnable BOOL -- 启用/禁用标志
+     * @brief Enables or disables the host's private UI definitions.
+     * @param bEnable TRUE to enable, FALSE to disable.
      * @return void
      */
     STDMETHOD_(void, EnableHostPrivateUiDef)(THIS_ BOOL bEnable) PURE;
 
     /**
-     * @brief 提交任务
-     * @param runable IRunnable* -- 任务对象
-     * @param bAsync BOOL -- 是否异步执行
-     * @return BOOL -- TRUE: 成功
+     * @brief Posts a task to the message queue.
+     * @param runable Pointer to the IRunnable task object.
+     * @param bAsync TRUE to execute asynchronously, FALSE to execute synchronously.
+     * @return TRUE if successful.
      */
     STDMETHOD_(BOOL, PostTask)(THIS_ IRunnable * runable, BOOL bAsync DEF_VAL(TRUE)) PURE;
 
     /**
-     * @brief 移除对象的任务
-     * @param pObj void* -- 对象指针
-     * @return int -- 移除的任务数量
+     * @brief Removes all tasks associated with an object.
+     * @param pObj Pointer to the object.
+     * @return The number of tasks removed.
      */
     STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) PURE;
 };

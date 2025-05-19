@@ -1,13 +1,3 @@
-/*
- *  Copyright (c) 2012 The WebRTC project authors. All Rights Reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree. An additional intellectual property rights grant can be found
- *  in the file PATENTS.  All contributing project authors may
- *  be found in the AUTHORS file in the root of the source tree.
- */
-
 #ifndef _SRW_LOCK_H_
 #define _SRW_LOCK_H_
 
@@ -17,44 +7,111 @@
 SNSBEGIN
 
 struct IRwLock;
+
+/**
+ * @class SRwLock
+ * @brief A read-write lock class.
+ * @details This class provides methods to acquire and release shared and exclusive locks.
+ * @note This class is non-copyable.
+ */
 class UTILITIES_API SRwLock : public SNoCopyable {
- public:
-	SRwLock();
-	~SRwLock();
+public:
+    /**
+     * @brief Constructor.
+     * Initializes a new read-write lock.
+     */
+    SRwLock();
 
-  void LockExclusive();
-  void UnlockExclusive();
+    /**
+     * @brief Destructor.
+     * Destroys the read-write lock.
+     */
+    ~SRwLock();
 
-  void LockShared();
-  void UnlockShared();
+    /**
+     * @brief Acquires an exclusive lock.
+     * @details This method blocks the calling thread until the exclusive lock is available.
+     */
+    void LockExclusive();
 
- private:
-	 IRwLock* impl;
+    /**
+     * @brief Releases an exclusive lock.
+     * @details This method releases the exclusive lock, allowing other threads to acquire it.
+     */
+    void UnlockExclusive();
+
+    /**
+     * @brief Acquires a shared lock.
+     * @details This method blocks the calling thread until the shared lock is available.
+     */
+    void LockShared();
+
+    /**
+     * @brief Releases a shared lock.
+     * @details This method releases the shared lock, allowing other threads to acquire it.
+     */
+    void UnlockShared();
+
+private:
+    IRwLock* impl; /**< Pointer to the read-write lock implementation. */
 };
 
-class UTILITIES_API SAutoReadLock : public SNoCopyable{
-  public:
-  SAutoReadLock(SRwLock *plock):m_pLock(plock){
-    m_pLock->LockShared();
-  }
-  ~SAutoReadLock(){
-    m_pLock->UnlockShared();
-  }
-  private:
-  SRwLock * m_pLock;
+/**
+ * @class SAutoReadLock
+ * @brief Auto-lock class for managing shared locks.
+ * @details This class automatically acquires a shared lock upon construction and releases it upon destruction.
+ * @note This class is non-copyable.
+ */
+class UTILITIES_API SAutoReadLock : public SNoCopyable {
+public:
+    /**
+     * @brief Constructor.
+     * @param plock Pointer to the SRwLock object to manage.
+     * @details Acquires a shared lock.
+     */
+    SAutoReadLock(SRwLock *plock) : m_pLock(plock) {
+        m_pLock->LockShared();
+    }
+
+    /**
+     * @brief Destructor.
+     * @details Releases the shared lock.
+     */
+    ~SAutoReadLock() {
+        m_pLock->UnlockShared();
+    }
+
+private:
+    SRwLock *m_pLock; /**< Pointer to the managed SRwLock object. */
 };
 
+/**
+ * @class SAutoWriteLock
+ * @brief Auto-lock class for managing exclusive locks.
+ * @details This class automatically acquires an exclusive lock upon construction and releases it upon destruction.
+ * @note This class is non-copyable.
+ */
+class UTILITIES_API SAutoWriteLock : public SNoCopyable {
+public:
+    /**
+     * @brief Constructor.
+     * @param plock Pointer to the SRwLock object to manage.
+     * @details Acquires an exclusive lock.
+     */
+    SAutoWriteLock(SRwLock *plock) : m_pLock(plock) {
+        m_pLock->LockExclusive();
+    }
 
-class UTILITIES_API SAutoWriteLock : public SNoCopyable{
-  public:
-  SAutoWriteLock(SRwLock *plock):m_pLock(plock){
-    m_pLock->LockExclusive();
-  }
-  ~SAutoWriteLock(){
-    m_pLock->UnlockExclusive();
-  }
-  private:
-  SRwLock * m_pLock;
+    /**
+     * @brief Destructor.
+     * @details Releases the exclusive lock.
+     */
+    ~SAutoWriteLock() {
+        m_pLock->UnlockExclusive();
+    }
+
+private:
+    SRwLock *m_pLock; /**< Pointer to the managed SRwLock object. */
 };
 
 SNSEND

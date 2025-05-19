@@ -3,54 +3,66 @@
 
 #include <utilities-def.h>
 #include <helper/SNoCopyable.hpp>
+
 SNSBEGIN
 
-	enum
-	{
-		RETURN_OK = 0,
-		RETURN_TIMEOUT = 1,
-		RETURN_ERROR = -1,
-	};
+/**
+ * @brief Return codes for semaphore operations.
+ */
+enum
+{
+    RETURN_OK = 0,       /**< Operation was successful. */
+    RETURN_TIMEOUT = 1,  /**< Operation timed out. */
+    RETURN_ERROR = -1    /**< An error occurred. */
+};
 
 class SemaphorePrivate;
+
 /**
- * Semaphore class for thread synchronization.
+ * @class SSemaphore
+ * @brief A class for thread synchronization using semaphores.
+ * @details This class provides methods to wait for and notify semaphores.
+ * @note This class is non-copyable.
  */
 class UTILITIES_API SSemaphore : public SNoCopyable
 {
 public:
     /**
-     * Wait for notified permanently.
-     * @return RETURN_OK if notified. RETURN_ERROR if error occurs.
+     * @brief Waits indefinitely for the semaphore to be notified.
+     * @return RETURN_OK if the semaphore is notified successfully.
+     * @return RETURN_ERROR if an error occurs.
      */
     int wait();
 
     /**
-     * Wait for notified during a time.
-     * @param msec waiting time in milliseconds.
-     * @return RETURN_OK if notified. RETURN_TIMEOUT if time out. RETURN_ERROR
-     * if error occurs.
+     * @brief Waits for the semaphore to be notified within a specified time.
+     * @param msec The maximum time to wait in milliseconds.
+     * @return RETURN_OK if the semaphore is notified successfully.
+     * @return RETURN_TIMEOUT if the wait times out.
+     * @return RETURN_ERROR if an error occurs.
      */
     int wait(unsigned int msec);
 
     /**
-     * Notify object. This function could be called before wait, and the notify
-     * count will increase.
+     * @brief Notifies the semaphore.
+     * @details This function increases the semaphore count, allowing one or more waiting threads to proceed.
      */
     void notify();
 
     /**
-     * Default constructor.
+     * @brief Default constructor.
+     * Initializes the semaphore.
      */
-	SSemaphore();
+    SSemaphore();
 
     /**
-     * Destructor.
+     * @brief Destructor.
+     * Cleans up the semaphore resources.
      */
     virtual ~SSemaphore();
 
 private:
-    SemaphorePrivate &_private;
+    SemaphorePrivate &_private; /**< Pointer to the private implementation of the semaphore. */
 };
 
 SNSEND

@@ -1,0 +1,19 @@
+﻿<window size="-2,-2" layout="vbox">
+  <imgcanvas size="-2,0" weight="1" name="wnd_canvas" skin="skin_transbkgnd" clipClient="1" colorText="#0000cc">
+    拖动图片到本窗口,支持多个图片
+  </imgcanvas>
+  <window size="-2,30" name="toolbar" layout="hbox" interval="5" gravity="center">
+    <button size="80,25" name="btn_save">保存(&amp;s)</button>
+    <button size="100,25" name="btn_save_ico">另存为ico(&i)</button>
+    <button size="80,25" name="btn_clear">清空</button>
+    <window size="-1,-2" layout="hbox" interval="5" gravity="center">
+      <!--arrange mode-->
+      <radio name="radio_horz" checked="1">水平排列</radio>
+      <radio name="radio_vert">垂直排列</radio>
+    </window>
+    <window size="0,0" weight="1" visible="0"/>
+    <button size="80,25" name="btn_split">拆分</button>
+    <edit size="30,25" name="edit_number"/>
+    <button size="80,25" name="btn_save_sub">保存子图</button>
+  </window>
+</window>

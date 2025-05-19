@@ -1,28 +1,35 @@
 ﻿#ifndef __SACCHELPER_I__H__
 #define __SACCHELPER_I__H__
 
-#include <SGuidDef.h>
+#ifdef _WIN32
 SNSBEGIN
 
+// Forward declaration of IWindow interface
 typedef struct IWindow IWindow;
-// {727E4EAB-CFFA-4073-8C01-2815053FA44F}
-DEFINE_SGUID(IID_IAccHelper, 0x727e4eab, 0xcffa, 0x4073, 0x8c, 0x1, 0x28, 0x15, 0x5, 0x3f, 0xa4, 0x4f);
+
+// IAccHelper interface declaration with IID
 #undef INTERFACE
 #define INTERFACE IAccHelper
-DECLARE_INTERFACE_(IAccHelper, IUnknown)
+DECLARE_INTERFACE_IID_(IAccHelper, IUnknown, "9FAF3067-6723-40DA-A56B-CDCB11B8902B")
 {
-    DECLARE_CLASS_SIID(IID_IAccHelper)
-
+    // Standard COM method to query for a pointer to a specified interface
     STDMETHOD_(HRESULT, QueryInterface)
     (THIS_ REFIID riid, void **ppvObject) PURE;
 
+    // Standard COM method to increment the reference count for an interface on an object
     STDMETHOD_(ULONG, AddRef)(THIS) PURE;
 
+    // Standard COM method to decrement the reference count for an interface on an object
     STDMETHOD_(ULONG, Release)(THIS) PURE;
 
+    // Method to set the owner window for the accessibility helper
     STDMETHOD_(void, SetOwner)(THIS_ IWindow * pOwner) PURE;
+
+    // Method to get the owner window of the accessibility helper
     STDMETHOD_(IWindow *, GetOwner)(CTHIS) SCONST PURE;
 };
 
 SNSEND
+
+#endif //_WIN32
 #endif // __SACCHELPER_I__H__

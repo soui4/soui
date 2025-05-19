@@ -1040,6 +1040,7 @@ void SLine::OnPaint(IRenderTarget *pRT)
 SCheckBox::SCheckBox()
     : m_pSkin(GETBUILTINSKIN(SKIN_SYS_CHECKBOX))
     , m_pFocusSkin(GETBUILTINSKIN(SKIN_SYS_FOCUSCHECKBOX))
+    , m_nCheckBoxSpacing(CheckBoxSpacing)
 {
     m_style.SetAlign(DT_LEFT);
     m_bFocusable = TRUE;
@@ -1063,7 +1064,7 @@ void SCheckBox::GetTextRect(LPRECT pRect)
     CSize szCheck;
     if (m_pSkin)
         szCheck = m_pSkin->GetSkinSize();
-    pRect->left += szCheck.cx + CheckBoxSpacing;
+    pRect->left += szCheck.cx + m_nCheckBoxSpacing;
 }
 
 void SCheckBox::OnPaint(IRenderTarget *pRT)
@@ -1086,14 +1087,37 @@ void SCheckBox::DrawFocus(IRenderTarget *pRT)
     }
 }
 
+
+void SCheckBox::GetChildrenLayoutRect(THIS_ RECT *prc) SCONST
+{
+    __baseCls::GetChildrenLayoutRect(prc);
+    if (!m_pSkin)
+        return;
+    CSize szCheck = m_pSkin->GetSkinSize();
+    prc->left += szCheck.cx + m_nCheckBoxSpacing;
+}
+
 SIZE SCheckBox::MeasureContent(int wid, int hei)
 {
-    if (!m_pSkin)
-        return __baseCls::MeasureContent(wid, hei);
-    CSize szCheck = m_pSkin->GetSkinSize();
     CSize szRet = __baseCls::MeasureContent(wid, hei);
-    szRet.cx += szCheck.cx + CheckBoxSpacing;
-    szRet.cy = smax(szRet.cy, szCheck.cy);
+    if (m_pSkin)
+    {
+        CSize szCheck = m_pSkin->GetSkinSize();
+        szRet.cx += szCheck.cx + m_nCheckBoxSpacing;
+        szRet.cy = smax(szRet.cy, szCheck.cy);
+    }
+    return szRet;
+}
+
+SIZE SCheckBox::MeasureChildren(int wid, int hei)
+{
+    CSize szRet = __baseCls::MeasureChildren(wid, hei);
+    if (m_pSkin)
+    {
+        CSize szCheck = m_pSkin->GetSkinSize();
+        szRet.cx += szCheck.cx + m_nCheckBoxSpacing;
+        szRet.cy = smax(szRet.cy, szCheck.cy);
+    }
     return szRet;
 }
 
@@ -1226,7 +1250,7 @@ SRadioBox::SRadioBox()
     , m_pFocusSkin(GETBUILTINSKIN(SKIN_SYS_FOCUSRADIO))
     , m_uIconAlign(SwndStyle::Align_Left)
     , m_uIconVAlign(SwndStyle::VAlign_Middle)
-    , m_nRadioBoxSpacing(4)
+    , m_nRadioBoxSpacing(RadioBoxSpacing)
 {
     m_style.SetAlign(DT_LEFT);
     m_bFocusable = TRUE;
@@ -1312,12 +1336,35 @@ void SRadioBox::DrawFocus(IRenderTarget *pRT)
     }
 }
 
+void SRadioBox::GetChildrenLayoutRect(THIS_ RECT *prc) SCONST{
+    __baseCls::GetChildrenLayoutRect(prc);
+    if(!m_pSkin)
+        return;
+    CSize szCheck = m_pSkin->GetSkinSize();
+    prc->left += szCheck.cx + m_nRadioBoxSpacing;
+}
+
 SIZE SRadioBox::MeasureContent(int wid, int hei)
 {
     CSize szRet = __baseCls::MeasureContent(wid, hei);
-    CSize szRaio = m_pSkin->GetSkinSize();
-    szRet.cx += szRaio.cx + m_nRadioBoxSpacing;
-    szRet.cy = smax(szRet.cy, szRaio.cy);
+    if (m_pSkin)
+    {
+        CSize szRaio = m_pSkin->GetSkinSize();
+        szRet.cx += szRaio.cx + m_nRadioBoxSpacing;
+        szRet.cy = smax(szRet.cy, szRaio.cy);
+    }
+    return szRet;
+}
+
+SIZE SRadioBox::MeasureChildren(int wid, int hei)
+{
+    CSize szRet = __baseCls::MeasureChildren(wid, hei);
+    if (m_pSkin)
+    {
+        CSize szRaio = m_pSkin->GetSkinSize();
+        szRet.cx += szRaio.cx + m_nRadioBoxSpacing;
+        szRet.cy = smax(szRet.cy, szRaio.cy);
+    }
     return szRet;
 }
 
@@ -1485,6 +1532,7 @@ void SRadioGroup::OnBeforeRemoveChild(SWindow *pChild)
 SToggle::SToggle()
 {
     m_pSkin = GETBUILTINSKIN(SKIN_SYS_TREE_TOGGLE);
+    m_nCheckBoxSpacing = 0;
 }
 
 void SToggle::SetToggle(BOOL bToggle, BOOL bUpdate /*=TRUE*/)
@@ -1503,7 +1551,7 @@ void SToggle::OnPaint(IRenderTarget *pRT)
 {
     if (!m_pSkin)
         return;
-    m_pSkin->DrawByState(pRT, GetWindowRect(), GetState());
+    m_pSkin->DrawByState(pRT, GetClientRect(), GetState());
 }
 
 SIZE SToggle::MeasureContent(int wid, int hei)

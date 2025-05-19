@@ -3,7 +3,6 @@
 #include "PerspectiveTransform.h"
 #include "3dlib.h"
 #include <float.h>
-#include <malloc.h>
 
 bool  g_bInitSinCosTable = false;
 

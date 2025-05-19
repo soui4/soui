@@ -1,6 +1,4 @@
-﻿#ifndef __SVALUEANIMATOR__H__
-#define __SVALUEANIMATOR__H__
-/*
+﻿/*
  * Copyright (C) 2010 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,560 +14,545 @@
  * limitations under the License.
  */
 
+#ifndef __SVALUEANIMATOR__H__
+#define __SVALUEANIMATOR__H__
+
 /**
- * This class provides a simple timing engine for running animations
- * which calculate animated values and set them on target objects.
+ * @file SValueAnimator.h
+ * @brief Provides a simple timing engine for running animations which calculate animated values and set them on target objects.
  *
- * <p>There is a single timing pulse that all animations use. It runs in a
- * custom handler to ensure that property changes happen on the UI thread.</p>
- *
- * <p>By default, SValueAnimator uses non-linear time interpolation, via the
- * {@link AccelerateDecelerateInterpolator} class, which accelerates into and decelerates
- * out of an animation. This behavior can be changed by calling
- * {@link SValueAnimator#setInterpolator(TimeInterpolator)}.</p>
- *
- * <p>Animators can be created from either code or resource files. Here is an example
- * of a SValueAnimator resource file:</p>
- *
- * {@sample development/samples/ApiDemos/res/anim/animator.xml ValueAnimatorResources}
- *
- * <p>Starting from API 23, it is also possible to use a combination of {@link PropertyValuesHolder}
- * and {@link Keyframe} resource tags to create a multi-step animation.
- * Note that you can specify explicit fractional values (from 0 to 1) for
- * each keyframe to determine when, in the overall duration, the animation should arrive at that
- * value. Alternatively, you can leave the fractions off and the keyframes will be equally
- * distributed within the total duration:</p>
- *
- * {@sample development/samples/ApiDemos/res/anim/value_animator_pvh_kf.xml
- * ValueAnimatorKeyframeResources}
- *
- * <div class="special reference">
- * <h3>Developer Guides</h3>
- * <p>For more information about animating with {@code SValueAnimator}, read the
- * <a href="{@docRoot}guide/topics/graphics/prop-animation.html#value-animator">Property
- * Animation</a> developer guide.</p>
- * </div>
+ * @details This class provides a simple timing engine for running animations which calculate animated values and set them on target objects.
+ * There is a single timing pulse that all animations use. It runs in a custom handler to ensure that property changes happen on the UI thread.
+ * By default, SValueAnimator uses non-linear time interpolation, via the AccelerateDecelerateInterpolator class, which accelerates into and decelerates
+ * out of an animation. This behavior can be changed by calling setInterpolator(TimeInterpolator).
  */
 
 #include <interface/SValueAnimator-i.h>
 #include <valueAnimator/TypeEvaluator.h>
 #include <sobject/Sobject.hpp>
+
 SNSBEGIN
 
+/**
+ * @class SValueAnimator
+ * @brief A simple timing engine for running animations which calculate animated values and set them on target objects.
+ *
+ * @details This class provides a simple timing engine for running animations which calculate animated values and set them on target objects.
+ * There is a single timing pulse that all animations use. It runs in a custom handler to ensure that property changes happen on the UI thread.
+ * By default, SValueAnimator uses non-linear time interpolation, via the AccelerateDecelerateInterpolator class, which accelerates into and decelerates
+ * out of an animation. This behavior can be changed by calling setInterpolator(TimeInterpolator).
+ */
 class SOUI_EXP SValueAnimator
     : public TObjRefImpl<SObjectImpl<IValueAnimator>>
     , ITimelineHandler {
     DEF_SOBJECT(SObjectImpl<IValueAnimator>, L"valueAnimator")
+
   protected:
     /**
-     * The first time that the animation's animateFrame() method is called. This time is used to
-     * determine elapsed time (and therefore the elapsed fraction) in subsequent calls
-     * to animateFrame().
-     *
+     * @brief The first time that the animation's animateFrame() method is called.
+     * @details This time is used to determine elapsed time (and therefore the elapsed fraction) in subsequent calls to animateFrame().
      * Whenever mStartTime is set, you must also update mStartTimeCommitted.
      */
     uint64_t mStartTime;
 
     /**
-     * When true, the start time has been firmly committed as a chosen reference point in
-     * time by which the progress of the animation will be evaluated.  When false, the
-     * start time may be updated when the first animation frame is committed so as
-     * to compensate for jank that may have occurred between when the start time was
-     * initialized and when the frame was actually drawn.
-     *
-     * This flag is generally set to false during the first frame of the animation
-     * when the animation playing state transitions from STOPPED to RUNNING or
-     * resumes after having been paused.  This flag is set to true when the start time
-     * is firmly committed and should not be further compensated for jank.
+     * @brief Flag indicating whether the start time has been firmly committed.
+     * @details When true, the start time has been firmly committed as a chosen reference point in time by which the progress of the animation
+     * will be evaluated. When false, the start time may be updated when the first animation frame is committed so as to compensate for jank
+     * that may have occurred between when the start time was initialized and when the frame was actually drawn.
      */
     bool mStartTimeCommitted;
 
     /**
-     * Set when setCurrentPlayTime() is called. If negative, animation is not currently seeked
-     * to a value.
+     * @brief Set when setCurrentPlayTime() is called.
+     * @details If negative, animation is not currently seeked to a value.
      */
     float mSeekFraction;
 
     /**
-     * Flag to indicate whether this animator is playing in reverse mode, specifically
-     * by being started or interrupted by a call to reverse(). This flag is different than
-     * mPlayingBackwards, which indicates merely whether the current iteration of the
-     * animator is playing in reverse. It is used in corner cases to determine proper end
-     * behavior.
+     * @brief Flag to indicate whether this animator is playing in reverse mode.
+     * @details This flag is different than mPlayingBackwards, which indicates merely whether the current iteration of the animator is playing in reverse.
+     * It is used in corner cases to determine proper end behavior.
      */
     bool mReversing;
 
     /**
-     * Tracks the overall fraction of the animation, ranging from 0 to mRepeatCount + 1
+     * @brief Tracks the overall fraction of the animation, ranging from 0 to mRepeatCount + 1.
      */
     float mOverallFraction;
 
     /**
-     * Tracks current elapsed/eased fraction, for querying in getAnimatedFraction().
-     * This is calculated by interpolating the fraction (range: [0, 1]) in the current iteration.
+     * @brief Tracks current elapsed/eased fraction, for querying in getAnimatedFraction().
+     * @details This is calculated by interpolating the fraction (range: [0, 1]) in the current iteration.
      */
     float mCurrentFraction;
 
     /**
-     * Tracks the time (in milliseconds) when the last frame arrived.
+     * @brief Tracks the time (in milliseconds) when the last frame arrived.
      */
     uint64_t mLastFrameTime;
 
     /**
-     * Tracks the time (in milliseconds) when the first frame arrived. Note the frame may arrive
-     * during the start delay.
+     * @brief Tracks the time (in milliseconds) when the first frame arrived.
+     * @details Note the frame may arrive during the start delay.
      */
     uint64_t mFirstFrameTime;
 
     /**
-     * Additional playing state to indicate whether an animator has been start()'d. There is
-     * some lag between a call to start() and the first animation frame. We should still note
-     * that the animation has been started, even if it's first animation frame has not yet
-     * happened, and reflect that state in isRunning().
-     * Note that delayed animations are different: they are not started until their first
-     * animation frame, which occurs after their delay elapses.
+     * @brief Additional playing state to indicate whether an animator has been start()'d.
+     * @details There is some lag between a call to start() and the first animation frame. We should still note that the animation has been started,
+     * even if its first animation frame has not yet happened, and reflect that state in isRunning(). Note that delayed animations are different:
+     * they are not started until their first animation frame, which occurs after their delay elapses.
      */
     bool mRunning;
 
     /**
-     * Additional playing state to indicate whether an animator has been start()'d, whether or
-     * not there is a nonzero startDelay.
+     * @brief Additional playing state to indicate whether an animator has been start()'d, whether or not there is a nonzero startDelay.
      */
     bool mStarted;
 
     /**
-     * Tracks whether we've notified listeners of the onAnimationStart() event. This can be
-     * complex to keep track of since we notify listeners at different times depending on
-     * startDelay and whether start() was called before end().
+     * @brief Tracks whether we've notified listeners of the onAnimationStart() event.
+     * @details This can be complex to keep track of since we notify listeners at different times depending on startDelay and whether start() was
+     * called before end().
      */
     bool mStartListenersCalled;
 
     /**
-     * Flag that denotes whether the animation is set up and ready to go. Used to
-     * set up animation that has not yet been started.
+     * @brief Flag that denotes whether the animation is set up and ready to go.
+     * @details Used to set up animation that has not yet been started.
      */
     bool mInitialized;
 
     /**
-     * Flag that tracks whether animation has been requested to end.
+     * @brief Flag that tracks whether animation has been requested to end.
      */
     bool mAnimationEndRequested;
 
-    // How long the animation should last in ms
+    /**
+     * @brief How long the animation should last in milliseconds.
+     */
     long mDuration;
 
-    // The amount of time in ms to delay starting the animation after start() is called. Note
-    // that this start delay is unscaled. When there is a duration scale set on the animator, the
-    // scaling factor will be applied to this delay.
+    /**
+     * @brief The amount of time in milliseconds to delay starting the animation after start() is called.
+     * @details Note that this start delay is unscaled. When there is a duration scale set on the animator, the scaling factor will be applied to this delay.
+     */
     long mStartDelay;
 
-    // The number of times the animation will repeat. The default is 0, which means the animation
-    // will play only once
+    /**
+     * @brief The number of times the animation will repeat.
+     * @details The default is 0, which means the animation will play only once.
+     */
     int mRepeatCount;
 
-    float sDurationScale;
     /**
-     * The type of repetition that will occur when repeatMode is nonzero. RESTART means the
-     * animation will start from the beginning on every new cycle. REVERSE means the animation
-     * will reverse directions on each iteration.
+     * @brief Scaling factor for the duration.
+     */
+    float sDurationScale;
+
+    /**
+     * @brief The type of repetition that will occur when repeatMode is nonzero.
+     * @details RESTART means the animation will start from the beginning on every new cycle. REVERSE means the animation will reverse directions on each iteration.
      */
     RepeatMode mRepeatMode;
 
     /**
-     * The time interpolator to be used. The elapsed fraction of the animation will be passed
-     * through this interpolator to calculate the interpolated fraction, which is then used to
-     * calculate the animated values.
+     * @brief The time interpolator to be used.
+     * @details The elapsed fraction of the animation will be passed through this interpolator to calculate the interpolated fraction, which is then used to calculate the animated values.
      */
-
     SAutoRefPtr<IInterpolator> mInterpolator;
 
     /**
-     * The set of listeners to be sent events through the life of an animation.
+     * @brief The set of listeners to be sent update events through the life of an animation.
      */
     SArray<IAnimatorUpdateListener *> mUpdateListeners;
     SArray<IAnimatorListener *> mListeners;
 
+    /**
+     * @brief The container managing the timeline handlers.
+     */
     ITimelineHandlersMgr *mContainer;
 
   public:
     /**
-     * Creates a new SValueAnimator object. This default constructor is primarily for
-     * use internally; the factory methods which take parameters are more generally
-     * useful.
+     * @brief Creates a new SValueAnimator object.
+     * @details This default constructor is primarily for use internally; the factory methods which take parameters are more generally useful.
      */
     SValueAnimator();
 
+    /**
+     * @brief Destructor.
+     */
     ~SValueAnimator();
 
     /**
-     * Sets the length of the animation. The default duration is 300 milliseconds.
-     *
-     * @param duration The length of the animation, in milliseconds. This value cannot
-     * be negative.
-     * @return SValueAnimator The object called with setDuration(). This return
-     * value makes it easier to compose statements together that construct and then set the
-     * duration, as in <code>SValueAnimator.ofInt(0, 10).setDuration(500).start()</code>.
+     * @brief Sets the length of the animation.
+     * @param duration The length of the animation, in milliseconds. This value cannot be negative.
+     * @return SValueAnimator The object called with setDuration(). This return value makes it easier to compose statements together that construct
+     * and then set the duration, as in SValueAnimator.ofInt(0, 10).setDuration(500).start().
      */
     STDMETHOD_(void, setDuration)(THIS_ long duration) OVERRIDE;
 
   private:
+    /**
+     * @brief Gets the scaled duration of the animation.
+     * @return The scaled duration of the animation.
+     */
     long getScaledDuration();
 
   public:
     /**
-     * Gets the length of the animation. The default duration is 300 milliseconds.
-     *
+     * @brief Gets the length of the animation.
      * @return The length of the animation, in milliseconds.
      */
     STDMETHOD_(long, getDuration)(THIS) SCONST OVERRIDE;
-    ;
-
-    STDMETHOD_(long, getTotalDuration)(THIS) SCONST OVERRIDE;
-    ;
 
     /**
-     * Sets the position of the animation to the specified point in time. This time should
-     * be between 0 and the total duration of the animation, including any repetition. If
-     * the animation has not yet been started, then it will not advance forward after it is
-     * set to this time; it will simply set the time to this value and perform any appropriate
-     * actions based on that time. If the animation is already running, then setCurrentPlayTime()
-     * will set the current playing time to this value and continue playing from that point.
-     *
+     * @brief Gets the total duration of the animation, including any repetitions.
+     * @return The total duration of the animation, in milliseconds.
+     */
+    STDMETHOD_(long, getTotalDuration)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Sets the position of the animation to the specified point in time.
      * @param playTime The time, in milliseconds, to which the animation is advanced or rewound.
      */
     STDMETHOD_(void, setCurrentPlayTime)(THIS_ long playTime) OVERRIDE;
 
     /**
-     * Sets the position of the animation to the specified fraction. This fraction should
-     * be between 0 and the total fraction of the animation, including any repetition. That is,
-     * a fraction of 0 will position the animation at the beginning, a value of 1 at the end,
-     * and a value of 2 at the end of a reversing animator that repeats once. If
-     * the animation has not yet been started, then it will not advance forward after it is
-     * set to this fraction; it will simply set the fraction to this value and perform any
-     * appropriate actions based on that fraction. If the animation is already running, then
-     * setCurrentFraction() will set the current fraction to this value and continue
-     * playing from that point. {@link Animator.AnimatorListener} events are not called
-     * due to changing the fraction; those events are only processed while the animation
-     * is running.
-     *
-     * @param fraction The fraction to which the animation is advanced or rewound. Values
-     * outside the range of 0 to the maximum fraction for the animator will be clamped to
-     * the correct range.
+     * @brief Sets the position of the animation to the specified fraction.
+     * @param fraction The fraction to which the animation is advanced or rewound. Values outside the range of 0 to the maximum fraction for the animator
+     * will be clamped to the correct range.
      */
     STDMETHOD_(void, setCurrentFraction)(THIS_ float fraction) OVERRIDE;
 
   private:
     /**
-     * Calculates current iteration based on the overall fraction. The overall fraction will be
-     * in the range of [0, mRepeatCount + 1]. Both current iteration and fraction in the current
-     * iteration can be derived from it.
+     * @brief Calculates current iteration based on the overall fraction.
+     * @param fraction The overall fraction of the animation.
+     * @return The current iteration.
      */
     int getCurrentIteration(float fraction);
 
     /**
-     * Calculates the fraction of the current iteration, taking into account whether the animation
-     * should be played backwards. E.g. When the animation is played backwards in an iteration,
-     * the fraction for that iteration will go from 1.f to 0.f.
+     * @brief Calculates the fraction of the current iteration.
+     * @param fraction The overall fraction of the animation.
+     * @param inReverse Whether the animation is playing backwards.
+     * @return The fraction of the current iteration.
      */
     float getCurrentIterationFraction(float fraction, bool inReverse);
 
     /**
-     * Clamps fraction into the correct range: [0, mRepeatCount + 1]. If repeat count is infinite,
-     * no upper bound will be set for the fraction.
-     *
-     * @param fraction fraction to be clamped
-     * @return fraction clamped into the range of [0, mRepeatCount + 1]
+     * @brief Clamps fraction into the correct range: [0, mRepeatCount + 1].
+     * @param fraction The fraction to be clamped.
+     * @return The clamped fraction.
      */
     float clampFraction(float fraction);
 
     /**
-     * Calculates the direction of animation playing (i.e. forward or backward), based on 1)
-     * whether the entire animation is being reversed, 2) repeat mode applied to the current
-     * iteration.
+     * @brief Calculates the direction of animation playing (i.e., forward or backward).
+     * @param iteration The current iteration.
+     * @param inReverse Whether the animation is being reversed.
+     * @return TRUE if the animation should play backward, FALSE otherwise.
      */
     bool shouldPlayBackward(int iteration, bool inReverse);
 
   public:
     /**
-     * Gets the current position of the animation in time, which is equal to the current
-     * time minus the time that the animation started. An animation that is not yet started will
-     * return a value of zero, unless the animation has has its play time set via
-     * {@link #setCurrentPlayTime(long)} or {@link #setCurrentFraction(float)}, in which case
-     * it will return the time that was set.
-     *
+     * @brief Gets the current position of the animation in time.
      * @return The current position in time of the animation.
      */
     STDMETHOD_(long, getCurrentPlayTime)(THIS) OVERRIDE;
 
     /**
-     * The amount of time, in milliseconds, to delay starting the animation after
-     * {@link #start()} is called.
-     *
-     * @return the number of milliseconds to delay running the animation
+     * @brief Gets the amount of time, in milliseconds, to delay starting the animation after start() is called.
+     * @return The number of milliseconds to delay running the animation.
      */
     STDMETHOD_(long, getStartDelay)(THIS) SCONST OVERRIDE;
 
     /**
-     * The amount of time, in milliseconds, to delay starting the animation after
-     * {@link #start()} is called. Note that the start delay should always be non-negative. Any
-     * negative start delay will be clamped to 0 on N and above.
-     *
-     * @param startDelay The amount of the delay, in milliseconds
+     * @brief Sets the amount of time, in milliseconds, to delay starting the animation after start() is called.
+     * @param startDelay The amount of the delay, in milliseconds.
      */
     STDMETHOD_(void, setStartDelay)(THIS_ long startDelay) OVERRIDE;
 
     /**
-     * Sets how many times the animation should be repeated. If the repeat
-     * count is 0, the animation is never repeated. If the repeat count is
-     * greater than 0 or {@link #INFINITE}, the repeat mode will be taken
-     * into account. The repeat count is 0 by default.
-     *
-     * @param value the number of times the animation should be repeated
+     * @brief Sets how many times the animation should be repeated.
+     * @param value The number of times the animation should be repeated. If the repeat count is 0, the animation is never repeated.
+     * If the repeat count is greater than 0 or INFINITE, the repeat mode will be taken into account. The repeat count is 0 by default.
      */
     STDMETHOD_(void, setRepeatCount)(THIS_ int value) OVERRIDE;
-    /**
-     * Defines how many times the animation should repeat. The default value
-     * is 0.
-     *
-     * @return the number of times the animation should repeat, or {@link #INFINITE}
-     */
-    STDMETHOD_(int, getRepeatCount)(THIS) SCONST OVERRIDE;
-    ;
 
     /**
-     * Defines what this animation should do when it reaches the end. This
-     * setting is applied only when the repeat count is either greater than
-     * 0 or {@link #INFINITE}. Defaults to {@link #RESTART}.
-     *
-     * @param value {@link #RESTART} or {@link #REVERSE}
+     * @brief Defines how many times the animation should repeat.
+     * @return The number of times the animation should repeat, or INFINITE.
+     */
+    STDMETHOD_(int, getRepeatCount)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Defines what this animation should do when it reaches the end.
+     * @param value Either RESTART or REVERSE. Defaults to RESTART.
      */
     STDMETHOD_(void, setRepeatMode)(THIS_ RepeatMode value) OVERRIDE;
 
     /**
-     * Defines what this animation should do when it reaches the end.
-     *
-     * @return either one of {@link #REVERSE} or {@link #RESTART}
+     * @brief Defines what this animation should do when it reaches the end.
+     * @return Either REVERSE or RESTART.
      */
     STDMETHOD_(RepeatMode, getRepeatMode)(THIS) SCONST OVERRIDE;
 
     /**
-     * Adds a listener to the set of listeners that are sent update events through the life of
-     * an animation. This method is called on all listeners for every frame of the animation,
-     * after the values for the animation have been calculated.
-     *
-     * @param listener the listener to be added to the current set of listeners for this animation.
+     * @brief Adds a listener to the set of listeners that are sent update events through the life of an animation.
+     * @param listener The listener to be added to the current set of listeners for this animation.
      */
     STDMETHOD_(void, addUpdateListener)(THIS_ IAnimatorUpdateListener *listener) OVERRIDE;
 
     /**
-     * Removes all listeners from the set listening to frame updates for this animation.
+     * @brief Removes all listeners from the set listening to frame updates for this animation.
      */
     STDMETHOD_(void, removeAllUpdateListeners)(THIS) OVERRIDE;
 
     /**
-     * Removes a listener from the set listening to frame updates for this animation.
-     *
-     * @param listener the listener to be removed from the current set of update listeners
-     * for this animation.
+     * @brief Removes a listener from the set listening to frame updates for this animation.
+     * @param listener The listener to be removed from the current set of update listeners for this animation.
      */
     STDMETHOD_(void, removeUpdateListener)(THIS_ IAnimatorUpdateListener *listener) OVERRIDE;
 
     /**
-     * The time interpolator used in calculating the elapsed fraction of this animation. The
-     * interpolator determines whether the animation runs with linear or non-linear motion,
-     * such as acceleration and deceleration. The default value is
-     * {@link android.view.animation.AccelerateDecelerateInterpolator}
-     *
-     * @param value the interpolator to be used by this animation. A value of <code>null</code>
-     * will result in linear interpolation.
+     * @brief Sets the time interpolator used in calculating the elapsed fraction of this animation.
+     * @param value The interpolator to be used by this animation. A value of nullptr will result in linear interpolation.
      */
     STDMETHOD_(void, setInterpolator)(THIS_ IInterpolator *value) OVERRIDE;
 
     /**
-     * Returns the timing interpolator that this SValueAnimator uses.
-     *
+     * @brief Returns the timing interpolator that this SValueAnimator uses.
      * @return The timing interpolator for this SValueAnimator.
      */
     STDMETHOD_(IInterpolator *, getInterpolator)(THIS) SCONST OVERRIDE;
-    ;
 
+    /**
+     * @brief Adds an animator listener.
+     * @param p The listener to be added.
+     */
     STDMETHOD_(void, addListener)(THIS_ IAnimatorListener *p) OVERRIDE;
 
+    /**
+     * @brief Removes an animator listener.
+     * @param p The listener to be removed.
+     */
     STDMETHOD_(void, removeListener)(THIS_ IAnimatorListener *p) OVERRIDE;
 
   private:
+    /**
+     * @brief Notifies start listeners.
+     */
     void notifyStartListeners();
 
     /**
-     * Start the animation playing. This version of start() takes a bool flag that indicates
-     * whether the animation should play in reverse. The flag is usually false, but may be set
-     * to true if called from the reverse() method.
-     *
-     * <p>The animation started by calling this method will be run on the thread that called
-     * this method. This thread should have a Looper on it (a runtime exception will be thrown if
-     * this is not the case). Also, if the animation will animate
-     * properties of objects in the view hierarchy, then the calling thread should be the UI
-     * thread for that view hierarchy.</p>
-     *
+     * @brief Starts the animation playing.
      * @param playBackwards Whether the SValueAnimator should start playing in reverse.
      */
     void start(bool playBackwards);
 
   public:
+    /**
+     * @brief Starts the animation playing.
+     * @param pContainer The container managing the timeline handlers.
+     */
     STDMETHOD_(void, start)(THIS_ ITimelineHandlersMgr *pContainer) OVERRIDE;
 
+    /**
+     * @brief Ends the animation.
+     */
     STDMETHOD_(void, end)(THIS) OVERRIDE;
 
+    /**
+     * @brief Checks if the animation is running.
+     * @return TRUE if the animation is running, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, isRunning)(THIS) SCONST OVERRIDE;
-    ;
-
-    STDMETHOD_(BOOL, isStarted)(THIS) SCONST OVERRIDE;
-    ;
 
     /**
-     * Plays the SValueAnimator in reverse. If the animation is already running,
-     * it will stop itself and play backwards from the point reached when reverse was called.
-     * If the animation is not currently running, then it will start from the end and
-     * play backwards. This behavior is only set for the current animation; future playing
-     * of the animation will use the default behavior of playing forward.
+     * @brief Checks if the animation has been started.
+     * @return TRUE if the animation has been started, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, isStarted)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Plays the SValueAnimator in reverse.
+     * @details If the animation is already running, it will stop itself and play backwards from the point reached when reverse was called.
+     * If the animation is not currently running, then it will start from the end and play backwards. This behavior is only set for the current
+     * animation; future playing of the animation will use the default behavior of playing forward.
      */
     STDMETHOD_(void, reverse)(THIS) OVERRIDE;
 
+    /**
+     * @brief Creates a clone of the current animation.
+     * @return A clone of the current animation.
+     */
     STDMETHOD_(IValueAnimator *, clone)(THIS) SCONST OVERRIDE;
 
+    /**
+     * @brief Copies the properties of another animation to this animation.
+     * @param pSrc The source animation to copy properties from.
+     */
     STDMETHOD_(void, copy)(THIS_ const IValueAnimator *pSrc) OVERRIDE;
 
   private:
     /**
-     * @hide
+     * @brief Checks if the animation can reverse.
+     * @return TRUE if the animation can reverse, FALSE otherwise.
      */
     bool canReverse();
 
     /**
-     * Called internally to end an animation by removing it from the animations list. Must be
-     * called on the UI thread.
+     * @brief Ends the animation by removing it from the animations list.
+     * @details Must be called on the UI thread.
      */
     void endAnimation();
 
     /**
-     * Called internally to start an animation by adding it to the active animations list. Must be
-     * called on the UI thread.
+     * @brief Starts the animation by adding it to the active animations list.
+     * @details Must be called on the UI thread.
      */
     void startAnimation();
 
     /**
-     * Internal only: This tracks whether the animation has gotten on the animation loop. Note
-     * this is different than {@link #isRunning()} in that the latter tracks the time after start()
+     * @brief Checks if the animation is pulsing internally.
+     * @details This is different than isRunning() in that the latter tracks the time after start()
      * is called (or after start delay if any), which may be before the animation loop starts.
+     * @return TRUE if the animation is pulsing, FALSE otherwise.
      */
     bool isPulsingInternal();
 
   public:
     /**
-     * Applies an adjustment to the animation to compensate for jank between when
-     * the animation first ran and when the frame was drawn.
-     * @hide
+     * @brief Applies an adjustment to the animation to compensate for jank between when the animation first ran and when the frame was drawn.
+     * @param frameTime The current frame time.
      */
     STDMETHOD_(void, commitAnimationFrame)(THIS_ long frameTime) OVERRIDE;
 
   private:
     /**
-     * This internal function processes a single animation frame for a given animation. The
-     * currentTime parameter is the timing pulse sent by the handler, used to calculate the
-     * elapsed duration, and therefore
-     * the elapsed fraction, of the animation. The return value indicates whether the animation
-     * should be ended (which happens when the elapsed time of the animation exceeds the
-     * animation's duration, including the repeatCount).
-     *
-     * @param currentTime The current time, as tracked by the static timing handler
-     * @return true if the animation's duration, including any repetitions due to
-     * <code>repeatCount</code> has been exceeded and the animation should be ended.
+     * @brief Processes a single animation frame for a given animation.
+     * @param currentTime The current time, as tracked by the static timing handler.
+     * @return TRUE if the animation's duration, including any repetitions due to repeatCount, has been exceeded and the animation should be ended.
      */
     bool animateBasedOnTime(uint64_t currentTime);
 
     /**
-     * Internal use only.
-     *
-     * This method does not modify any fields of the animation. It should be called when seeking
-     * in an AnimatorSet. When the last play time and current play time are of different repeat
-     * iterations,
-     * {@link android.view.animation.Animation.AnimationListener#onAnimationRepeat(Animation)}
-     * will be called.
+     * @brief Animates the animation based on the current and last play times.
+     * @param currentPlayTime The current play time.
+     * @param lastPlayTime The last play time.
+     * @param inReverse Whether the animation is playing in reverse.
      */
     void animateBasedOnPlayTime(long currentPlayTime, long lastPlayTime, bool inReverse);
 
     /**
-     * Internal use only.
-     * Skips the animation value to end/start, depending on whether the play direction is forward
-     * or backward.
-     *
-     * @param inReverse whether the end value is based on a reverse direction. If yes, this is
-     *                  equivalent to skip to start value in a forward playing direction.
+     * @brief Skips the animation value to the end/start, depending on whether the play direction is forward or backward.
+     * @param inReverse Whether the end value is based on a reverse direction.
      */
     void skipToEndValue(bool inReverse);
 
+    /**
+     * @brief Checks if the animation is initialized.
+     * @return TRUE if the animation is initialized, FALSE otherwise.
+     */
     bool isInitialized();
 
     /**
-     * Processes a frame of the animation, adjusting the start time if needed.
-     *
+     * @brief Processes a frame of the animation, adjusting the start time if needed.
      * @param frameTime The frame time.
-     * @return true if the animation has ended.
-     * @hide
+     * @return TRUE if the animation has ended.
      */
     bool doAnimationFrame(uint64_t frameTime);
 
   public:
     /**
-     * Returns the current animation fraction, which is the elapsed/interpolated fraction used in
-     * the most recent frame update on the animation.
-     *
-     * @return Elapsed/interpolated fraction of the animation.
+     * @brief Returns the current animation fraction.
+     * @details This is the elapsed/interpolated fraction used in the most recent frame update on the animation.
+     * @return The elapsed/interpolated fraction of the animation.
      */
     STDMETHOD_(float, getAnimatedFraction)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Handles the next frame of the animation.
+     */
     STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
 
   private:
     /**
-     * This method is called with the elapsed fraction of the animation during every
-     * animation frame. This function turns the elapsed fraction into an interpolated fraction
-     * and then into an animated value (from the evaluator. The function is called mostly during
-     * animation updates, but it is also called when the <code>end()</code>
-     * function is called, to set the value on the property.
-     *
-     * <p>Overrides of this method must call the superclass to perform the calculation
-     * of the animated value.</p>
-     *
+     * @brief This method is called with the elapsed fraction of the animation during every animation frame.
+     * @details This function turns the elapsed fraction into an interpolated fraction and then into an animated value (from the evaluator).
+     * The function is called mostly during animation updates, but it is also called when the end() function is called, to set the value on the property.
      * @param fraction The elapsed fraction of the animation.
      */
     void animateValue(float fraction);
 
+    /**
+     * @brief Removes the animation callback.
+     */
     void removeAnimationCallback();
+
+    /**
+     * @brief Adds the animation callback.
+     */
     void addAnimationCallback();
 };
 
+/**
+ * @class TValueAnimator
+ * @brief Template class for creating value animators.
+ * @tparam T The type of the animated value.
+ */
 template <class T>
 class TValueAnimator : public SValueAnimator {
   protected:
+    /**
+     * @brief Type evaluator for the animated value.
+     */
     TypeEvaluator<T> mValueEvaluator;
+
+    /**
+     * @brief Current animated value.
+     */
     T mValue;
 
   public:
+    /**
+     * @brief Constructor.
+     * @param from Initial value.
+     * @param to Final value.
+     */
     TValueAnimator(T from, T to)
         : mValueEvaluator(from, to)
     {
     }
 
+    /**
+     * @brief Gets the current animated value.
+     * @return The current animated value.
+     */
     T getValue() const
     {
         return mValue;
     }
 
+    /**
+     * @brief Sets the range of the animation.
+     * @param from Initial value.
+     * @param to Final value.
+     */
     void setRange(T from, T to)
     {
         mValueEvaluator.setRange(from, to);
     }
 
+    /**
+     * @brief Copies the properties of another animation to this animation.
+     * @param pSrc The source animation to copy properties from.
+     */
     STDMETHOD_(void, copy)(THIS_ const IValueAnimator *pSrc) OVERRIDE
     {
         SValueAnimator::copy(pSrc);
@@ -579,12 +562,19 @@ class TValueAnimator : public SValueAnimator {
     }
 
   protected:
+    /**
+     * @brief Evaluates the animated value based on the given fraction.
+     * @param fraction The elapsed fraction of the animation.
+     */
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) OVERRIDE
     {
         mValue = mValueEvaluator.evaluate(fraction);
     }
 
   public:
+    /**
+     * @brief Defines the attributes for TValueAnimator.
+     */
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"duration", mDuration, FALSE)
         ATTR_INT(L"repeatCount", mRepeatCount, FALSE)
@@ -597,130 +587,266 @@ class TValueAnimator : public SValueAnimator {
     SOUI_ATTRS_END()
 };
 
+/**
+ * @class SIntAnimator
+ * @brief Animator for integer values.
+ */
 class SOUI_EXP SIntAnimator : public TValueAnimator<int> {
     DEF_SOBJECT(TValueAnimator<int>, L"IntAnimator")
+
   public:
+    /**
+     * @brief Constructor.
+     */
     SIntAnimator()
         : TValueAnimator<int>(0, 100)
     {
     }
 
   public:
+    /**
+     * @brief Defines the attributes for SIntAnimator.
+     */
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"valueFrom", mValueEvaluator.mStart, FALSE)
         ATTR_INT(L"valueTo", mValueEvaluator.mEnd, FALSE)
     SOUI_ATTRS_END()
 };
 
+/**
+ * @class SSizeAnimator
+ * @brief Animator for SIZE values.
+ */
 class SOUI_EXP SSizeAnimator : public TValueAnimator<SIZE> {
     DEF_SOBJECT(TValueAnimator<SIZE>, L"SizeAnimator")
+
   public:
+    /**
+     * @brief Constructor.
+     */
     SSizeAnimator()
         : TValueAnimator<SIZE>(CSize(), CSize())
     {
     }
 
   public:
+    /**
+     * @brief Defines the attributes for SSizeAnimator.
+     */
     SOUI_ATTRS_BEGIN()
         ATTR_SIZE(L"valueFrom", mValueEvaluator.mStart, FALSE)
         ATTR_SIZE(L"valueTo", mValueEvaluator.mEnd, FALSE)
     SOUI_ATTRS_END()
 };
 
+/**
+ * @class SPointAnimator
+ * @brief Animator for POINT values.
+ */
 class SOUI_EXP SPointAnimator : public TValueAnimator<POINT> {
     DEF_SOBJECT(TValueAnimator<POINT>, L"PointAnimator")
+
   public:
+    /**
+     * @brief Constructor.
+     */
     SPointAnimator()
         : TValueAnimator<POINT>(CPoint(), CPoint())
     {
     }
 
   public:
+    /**
+     * @brief Defines the attributes for SPointAnimator.
+     */
     SOUI_ATTRS_BEGIN()
         ATTR_POINT(L"valueFrom", mValueEvaluator.mStart, FALSE)
         ATTR_POINT(L"valueTo", mValueEvaluator.mEnd, FALSE)
     SOUI_ATTRS_END()
 };
 
+/**
+ * @class SRectAnimator
+ * @brief Animator for RECT values.
+ */
 class SOUI_EXP SRectAnimator : public TValueAnimator<RECT> {
     DEF_SOBJECT(TValueAnimator<RECT>, L"RectAnimator")
+
   public:
+    /**
+     * @brief Constructor.
+     */
     SRectAnimator()
         : TValueAnimator<RECT>(CRect(), CRect())
     {
     }
 
   public:
+    /**
+     * @brief Defines the attributes for SRectAnimator.
+     */
     SOUI_ATTRS_BEGIN()
         ATTR_RECT(L"valueFrom", mValueEvaluator.mStart, FALSE)
         ATTR_RECT(L"valueTo", mValueEvaluator.mEnd, FALSE)
     SOUI_ATTRS_END()
 };
 
+/**
+ * @class SFloatAnimator
+ * @brief Animator for float values.
+ */
 class SOUI_EXP SFloatAnimator : public TValueAnimator<float> {
     DEF_SOBJECT(TValueAnimator<float>, L"FloatAnimator")
+
   public:
+    /**
+     * @brief Constructor.
+     */
     SFloatAnimator()
         : TValueAnimator<float>(0.f, 1.f)
     {
     }
 
   public:
+    /**
+     * @brief Defines the attributes for SFloatAnimator.
+     */
     SOUI_ATTRS_BEGIN()
         ATTR_FLOAT(L"valueFrom", mValueEvaluator.mStart, FALSE)
         ATTR_FLOAT(L"valueTo", mValueEvaluator.mEnd, FALSE)
     SOUI_ATTRS_END()
 };
 
+/**
+ * @class SColorAnimator
+ * @brief Animator for COLORREF values.
+ */
 class SOUI_EXP SColorAnimator : public TValueAnimator<COLORREF> {
     DEF_SOBJECT(TValueAnimator<COLORREF>, L"ColorAnimator")
+
   public:
+    /**
+     * @brief Constructor.
+     */
     SColorAnimator()
         : TValueAnimator<COLORREF>(0, 0)
     {
     }
 
   protected:
+    /**
+     * @brief Handles the "valueFrom" attribute.
+     * @param strValue The attribute value as a string.
+     * @param bLoading TRUE if the attribute is being loaded, FALSE otherwise.
+     * @return HRESULT indicating success or failure.
+     */
     HRESULT OnAttrFrom(const SStringW &strValue, BOOL bLoading);
+
+    /**
+     * @brief Handles the "valueTo" attribute.
+     * @param strValue The attribute value as a string.
+     * @param bLoading TRUE if the attribute is being loaded, FALSE otherwise.
+     * @return HRESULT indicating success or failure.
+     */
     HRESULT OnAttrTo(const SStringW &strValue, BOOL bLoading);
 
+  public:
+    /**
+     * @brief Defines the attributes for SColorAnimator.
+     */
     SOUI_ATTRS_BEGIN()
         ATTR_CUSTOM(L"valueFrom", OnAttrFrom)
         ATTR_CUSTOM(L"valueTo", OnAttrTo)
     SOUI_ATTRS_END()
 };
 
+/**
+ * @class SAnimatorGroup
+ * @brief Manages a group of animations.
+ */
 class SOUI_EXP SAnimatorGroup
     : public TObjRefImpl<IAnimatorGroup>
     , public IAnimatorListener {
   public:
+    /**
+     * @enum AniState
+     * @brief Enumeration of animation states.
+     */
     enum AniState
     {
         idle,
         started,
         running,
     };
+
+    /**
+     * @brief Constructor.
+     */
     SAnimatorGroup();
 
+    /**
+     * @brief Destructor.
+     */
     ~SAnimatorGroup();
 
+    /**
+     * @brief Adds an animator to the group.
+     * @param ani Pointer to the animator to add.
+     * @return TRUE if the animator was added successfully, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, AddAnimator)(THIS_ IValueAnimator *ani) OVERRIDE;
 
+    /**
+     * @brief Removes an animator from the group.
+     * @param ani Pointer to the animator to remove.
+     * @return TRUE if the animator was removed successfully, FALSE otherwise.
+     */
     STDMETHOD_(BOOL, RemoveAnimator)(THIS_ IValueAnimator *ani) OVERRIDE;
 
+    /**
+     * @brief Sets the listener for the animator group.
+     * @param listener Pointer to the listener.
+     */
     STDMETHOD_(void, SetListener)(THIS_ IAnimatorGroupListerer *listener) OVERRIDE;
 
   protected:
+    /**
+     * @brief Called when an animation starts.
+     * @param pAnimator Pointer to the animator that started.
+     */
     STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator *pAnimator);
+
+    /**
+     * @brief Called when an animation repeats.
+     * @param pAnimator Pointer to the animator that repeated.
+     */
     STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator *pAnimator)
     {
     }
+
+    /**
+     * @brief Called when an animation ends.
+     * @param pAnimator Pointer to the animator that ended.
+     */
     STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator);
 
   protected:
+    /**
+     * @brief Map of animators and their states.
+     */
     typedef SMap<IValueAnimator *, AniState> AnimatorStateMap;
+
+    /**
+     * @brief Map of animators and their states.
+     */
     AnimatorStateMap m_lstAnimator;
+
+    /**
+     * @brief Listener for the animator group.
+     */
     IAnimatorGroupListerer *m_listener;
 };
+
 SNSEND
+
 #endif // __SVALUEANIMATOR__H__

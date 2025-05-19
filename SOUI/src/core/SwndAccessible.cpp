@@ -1,12 +1,13 @@
 #include "souistd.h"
 #include <core/SWndAccessible.h>
+#include <atl.mini/SComCli.h>
 
 SNSBEGIN
 #ifdef SOUI_ENABLE_ACC
 #pragma comment(lib, "oleacc.lib")
 
-SAccessible::SAccessible(SWindow *pWnd)
-    : m_pWnd(pWnd)
+SAccessible::SAccessible(IWindow *pWnd)
+    : m_pWnd((SWindow *)pWnd)
 {
 }
 

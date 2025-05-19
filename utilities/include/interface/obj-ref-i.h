@@ -7,29 +7,33 @@
 #include <sguid.h>
 #else
 #include <guiddef.h>
-#endif//_WIN32
+#endif // _WIN32
 
 #undef INTERFACE
 #define INTERFACE IObjRef
+/**
+ * @brief Interface for reference counting.
+ * @details This interface provides methods for increasing and decreasing the reference count of an object.
+ */
 DECLARE_INTERFACE(IObjRef)
 {
     /**
-     * @brief 增加引用计数
-     * @return 新引用计数
-    */
-    STDMETHOD_(long,AddRef) (THIS) PURE;
+     * @brief Increases the reference count.
+     * @return The new reference count.
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
 
     /**
-     * @brief 减少引用计数
-     * @return 新引用计数
-    */
-    STDMETHOD_(long,Release) (THIS) PURE;
+     * @brief Decreases the reference count.
+     * @return The new reference count.
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
 
-	/**
-	 * @brief 释放对象
-	 * @return void
-	*/
-	STDMETHOD_(void,OnFinalRelease) (THIS) PURE;
+    /**
+     * @brief Called when the reference count reaches zero and the object is about to be released.
+     * @details This method is intended to perform any necessary cleanup before the object is deleted.
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
 };
 
 #endif // __OBJ_REF_I__H__

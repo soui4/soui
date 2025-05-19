@@ -2,13 +2,15 @@
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
 #include <windows.h>
 #include "imgdecoder-stb.h"
-
-#define STB_IMAGE_IMPLEMENTATION
-#include <stb_image.h>
+#include <string/strcpcvt.h>
 #include <upng.h>
 
-namespace SOUI
-{
+#define STB_IMAGE_IMPLEMENTATION
+#define STB_IMAGE_WRITE_IMPLEMENTATION
+#include <stb_image.h>
+#include <stb_image_write.h>
+
+SNSBEGIN
     //////////////////////////////////////////////////////////////////////////
     //  SImgFrame_STB
 SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
@@ -271,6 +273,35 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
 
 	HRESULT SImgDecoderFactory_STB::SaveImage2(BYTE* pBits, int nWid,int nHei, LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
 	{
+        //swap red and blue.
+        BYTE *p=pBits;
+        for(int y=0;y<nHei;y++){
+            for(int x=0;x<nWid;x++){
+                BYTE t = p[0];
+                p[0]=p[2];
+                p[2]=t;
+                p+=4;
+            }
+        }
+        SStringA fileu8 = S_CW2A(pszFileName, CP_UTF8);
+        if (imgFmt == Img_PNG)
+        {
+            int ret = stbi_write_png(fileu8.c_str(), nWid, nHei, 4, pBits, nWid * 4);
+            return ret ? S_OK : E_FAIL;
+        }
+        else if(imgFmt == Img_TGA){
+            int ret = stbi_write_tga(fileu8.c_str(),nWid,nHei,4,pBits);
+        }
+        else if (imgFmt == Img_BMP)
+        {
+            int ret = stbi_write_bmp(fileu8.c_str(), nWid, nHei, 4, pBits);
+            return ret ? S_OK : E_FAIL;
+        }
+        else if (imgFmt == Img_JPG)
+        {
+            int ret = stbi_write_jpg(fileu8.c_str(), nWid, nHei, 4, pBits, 90);
+            return ret ? S_OK : E_FAIL;
+        }
 		return E_NOTIMPL;
 	}
 
@@ -281,7 +312,7 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
         return TRUE;
     }
 
-}//end of namespace SOUI
+SNSEND
 
 EXTERN_C BOOL Decoder_Stb_SCreateInstance(IObjRef **pImgDecoderFactory)
 {

@@ -2,6 +2,7 @@
 #include <interface/STaskLoop-i.h>
 #include <string>
 #include <helper/SCriticalSection.h>
+#include <helper/SSharedPtr.hpp>
 #include <commgr2.h>
 #include <memory>
 
@@ -10,7 +11,7 @@
 
 DEF_EVT_EXT(EventDownloadFinish,EVT_DOWNLOAD_FINISH,{
 	std::string url;
-	std::shared_ptr<SStringA> data;
+	SSharedPtr<SStringA> data;
 	long   type;
 	long   catetory;
 	SAutoRefPtr<IBitmap> pImg;

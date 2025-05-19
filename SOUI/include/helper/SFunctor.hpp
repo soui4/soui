@@ -5,7 +5,13 @@
 #include <interface/SMsgLoop-i.h>
 #include <interface/SWndContainer-i.h>
 #include <helper/obj-ref-impl.hpp>
-#if _MSC_VER >= 1700
+#if !defined(_WIN32) || _MSC_VER >= 1700
+#define ENABLE_STD_FUNCTIONAL 1
+#else
+#define ENABLE_STD_FUNCTIONAL 0
+#endif
+
+#if ENABLE_STD_FUNCTIONAL
 #include <functional>
 #endif
 
@@ -40,7 +46,7 @@ class SRunnable : public TObjRefImpl<IRunnable> {
         return __PRETTY_FUNCTION__;                     \
     }
 
-#if _MSC_VER >= 1700
+#if ENABLE_STD_FUNCTIONAL
 
 class StdRunnable : public SRunnable {
     IMPL_GETCLASSINFO
@@ -69,7 +75,7 @@ class StdRunnable : public SRunnable {
   protected:
     std::function<void(void)> _func;
 };
-#endif
+#endif // ENABLE_STD_FUNCTIONAL
 
 template <typename TClass, typename Func>
 class SFunctor0 : public SRunnable {

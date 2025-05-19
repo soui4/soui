@@ -294,8 +294,9 @@ void SApplication::_DestroySingletons()
     DELETE_SINGLETON(STimerGenerator);
     DELETE_SINGLETON(SWindowMgr);
 }
+
 #ifdef _WIN32
-IAccProxy *SApplication::CreateAccProxy(SWindow *pWnd) const
+IAccProxy *SApplication::CreateAccProxy(IWindow *pWnd) const
 {
 #ifdef SOUI_ENABLE_ACC
     if (pWnd->IsClass(SProgress::GetClassName()))
@@ -333,7 +334,7 @@ IAccProxy *SApplication::CreateAccProxy(SWindow *pWnd) const
 #endif // SOUI_ENABLE_ACC
 }
 
-IAccessible *SApplication::CreateAccessible(SWindow *pWnd) const
+IAccessible *SApplication::CreateAccessible(IWindow *pWnd) const
 {
 #ifdef SOUI_ENABLE_ACC
     return new SAccessible(pWnd);
@@ -694,7 +695,7 @@ BOOL SApplication::AddMsgLoop(IMessageLoop *pMsgLoop, BOOL bReplace)
 {
     SAutoLock autoLock(m_cs);
     SASSERT(pMsgLoop != NULL);
-    DWORD dwThreadID = ::GetCurrentThreadId();
+    tid_t dwThreadID = ::GetCurrentThreadId();
     if (m_msgLoopMap.Lookup(dwThreadID) != NULL && !bReplace)
         return false; // in map yet
 
@@ -714,7 +715,7 @@ BOOL SApplication::RemoveMsgLoop()
     return TRUE;
 }
 
-IMessageLoop *SApplication::GetMsgLoop(DWORD dwThreadID /*= ::GetCurrentThreadId()*/) const
+IMessageLoop *SApplication::GetMsgLoop(tid_t dwThreadID /*= ::GetCurrentThreadId()*/) const
 {
     SAutoLock autoLock(m_cs);
     const MsgLoopMap::CPair *p = m_msgLoopMap.Lookup(dwThreadID);

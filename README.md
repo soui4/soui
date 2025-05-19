@@ -20,7 +20,9 @@
     <img alt="usage" src="https://img.shields.io/badge/%E4%BD%BF%E7%94%A8-%E6%96%87%E6%A1%A3-yellow?style=for-the-badge"/>
 </a>
 
-
+ <a href="https://deepwiki.com/soui4/soui">
+    <img alt="Ask DeepWiki" src="https://deepwiki.com/badge.svg"/>
+</a>
 </div>
 
 
@@ -28,9 +30,9 @@
 （内核编译后体积1M左右），
 框架设计吸收了`WTL`，`Android`，`QT`，`Flash`等流行框架的特点，
 UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.oschina.net/p/skia)渲染），
-控件丰富，扩展灵活（可使用 _xml_ + _lua_ ），真正做到UI界面与逻辑分离。
+控件丰富，扩展灵活（可使用 xml + lua + jx  ），真正做到UI界面与逻辑分离。
 
-
+点击 [SOUI](https://www.soui.com.cn) 访问官网。
 
 ##  **demo基本界面** 
 ![demo1](./doc/demo_png/souidemo1.png)
@@ -38,7 +40,7 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 如果您初次了解此库，可以下载自动化静态编译的[demo.exe](https://github.com/soui4/soui/actions)进行尝鲜体验（无需下载源代码和其他依赖，直接下载运行）
 具体方法
-[![CMake Test](https://github.com/soui4/soui/actions/workflows/cmaketest.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/cmaketest.yml)
+[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
 
 ```
 1.点击上方图标,进入页面
@@ -67,7 +69,7 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 ### [编译](./doc/build.md)
 
-[![CMake Test](https://github.com/soui4/soui/actions/workflows/cmaketest.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/cmaketest.yml)
+[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml.
 
 使用cmake生成对应版本VS工程再编译，运动在cmake中统一修改配置。具体编译方法查看附带[编译文档](./doc/build.md)
 

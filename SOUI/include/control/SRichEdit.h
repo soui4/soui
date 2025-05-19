@@ -1,16 +1,4 @@
-﻿/**
- * Copyright (C) 2014-2050 SOUI团队
- * All rights reserved.
- *
- * @file       SRichEdit.h
- * @brief      RichEdit控件
- * @version    v1.0
- * @author     soui
- * @date       2014-07-13
- *
- * Describe    RichEdit控件
- */
-#ifndef __SRICHEDIT__H__
+﻿#ifndef __SRICHEDIT__H__
 #define __SRICHEDIT__H__
 
 #include <richedit.h>
@@ -22,6 +10,7 @@
 #include <textserv.h>
 
 SNSBEGIN
+
 enum
 {
     MENU_CUT = 1,
@@ -34,10 +23,9 @@ enum
 };
 
 /**
- * @class      SRichEdit
- * @brief      使用Windowless Richedit实现的edit控件
- *
- * Describe    SRichEdit
+ * @class SRichEdit
+ * @brief RichEdit Control
+ * @details A control that uses a windowless RichEdit to implement an edit control.
  */
 class STextHost;
 class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
@@ -48,488 +36,472 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     DEF_SOBJECT(SPanel, L"richedit")
 
     /**
-     * SRichEdit::SRichEdit
-     * @brief     构造函数
-     *
-     * Describe   构造函数
+     * @brief Constructor
      */
     SRichEdit();
 
     /**
-     * SRichEdit::~SRichEdit
-     * @brief     析构函数
-     *
-     * Describe   析构函数
+     * @brief Destructor
      */
     virtual ~SRichEdit()
     {
     }
 
   private:
+    /**
+     * @brief Initialize text service
+     */
     static void InitTextService();
+
+    /**
+     * @brief Uninitialize text service
+     */
     static void UninitTextService();
 
-  public: // richedit interface
+  public: // RichEdit Interface
+    /**
+     * @brief Save content to an RTF file
+     * @param pszFileName File name to save the RTF content
+     * @return Number of bytes written
+     */
     STDMETHOD_(DWORD, SaveRtf)(THIS_ LPCTSTR pszFileName) OVERRIDE;
 
+    /**
+     * @brief Load content from an RTF file
+     * @param pszFileName File name to load the RTF content
+     * @return Number of bytes read
+     */
     STDMETHOD_(DWORD, LoadRtf)(THIS_ LPCTSTR pszFileName) OVERRIDE;
 
     /**
-     * SRichEdit::SetSel
-     * @brief     设置选中
-     * @param     long nStartChar --
-     * @param     long nEndChar --
-     * @param     BOOL bNoScroll --
-     *
-     * Describe   设置选中, 支持超长文本
+     * @brief Set the selection range
+     * @param nStartChar Start character position
+     * @param nEndChar End character position
+     * @param bNoScroll Whether to scroll to the selection
      */
     STDMETHOD_(void, SetSel)(THIS_ long nStartChar, long nEndChar, BOOL bNoScroll) OVERRIDE;
+
     /**
-     * SRichEdit::ReplaceSel
-     * @brief     替换选中项
-     * @param     LPCWSTR pszText --
-     * @param     BOOL bCanUndo --
-     *
-     * Describe   替换选中项
+     * @brief Replace the selected text
+     * @param pszText Text to replace the selection
+     * @param bCanUndo Whether the operation can be undone
      */
     STDMETHOD_(void, ReplaceSel)(THIS_ LPCTSTR pszText, BOOL bCanUndo = TRUE) OVERRIDE;
+
     /**
-     * SRichEdit::GetWordWrap
-     * @brief
-     * @return   返回BOOL
-     *
-     * Describe
+     * @brief Get the word wrap setting
+     * @return TRUE if word wrap is enabled, FALSE otherwise
      */
     STDMETHOD_(BOOL, GetWordWrap)(THIS) SCONST OVERRIDE;
+
     /**
-     * SRichEdit::SetWordWrap
-     * @brief
-     * @param     BOOL fWordWrap --
-     *
-     * Describe
+     * @brief Set the word wrap setting
+     * @param fWordWrap TRUE to enable word wrap, FALSE to disable
      */
     STDMETHOD_(void, SetWordWrap)(THIS_ BOOL fWordWrap) OVERRIDE;
 
     /**
-     * SRichEdit::GetReadOnly
-     * @brief    判断是否只读
-     * @return   返回BOOL
-     *
-     * Describe  判断是否只读
+     * @brief Check if the control is read-only
+     * @return TRUE if read-only, FALSE otherwise
      */
     STDMETHOD_(BOOL, GetReadOnly)(THIS) SCONST OVERRIDE;
 
     /**
-     * SRichEdit::SetReadOnly
-     * @brief     设置只读
-     * @param     BOOL bReadOnly -- 是否只读
-     * @return    返回BOOL
-     *
-     * Describe   设置只读
+     * @brief Set the read-only state
+     * @param bReadOnly TRUE to set read-only, FALSE to allow editing
+     * @return TRUE if successful, FALSE otherwise
      */
     STDMETHOD_(BOOL, SetReadOnly)(THIS_ BOOL bReadOnly) OVERRIDE;
 
     /**
-     * SRichEdit::GetLimitText
-     * @brief     获取最小文本长度
-     * @return    返回BOOL
-     *
-     * Describe   获取最小文本长度
+     * @brief Get the maximum text length
+     * @return Maximum text length
      */
     STDMETHOD_(LONG, GetLimitText)(THIS) SCONST OVERRIDE;
 
     /**
-     * SRichEdit::SetLimitText
-     * @brief     设置最小文本长度
-     * @param     int nLength -- 长度
-     * @return    返回BOOL
-     *
-     * Describe   设置最小文本长度
+     * @brief Set the maximum text length
+     * @param nLength Maximum text length
+     * @return TRUE if successful, FALSE otherwise
      */
     STDMETHOD_(BOOL, SetLimitText)(THIS_ int nLength) OVERRIDE;
 
     /**
-     * SRichEdit::GetDefaultAlign
-     * @brief     获取对齐方式
-     * @return    返回WORD
-     *
-     * Describe   设置最小文本长度
+     * @brief Get the default text alignment
+     * @return Default text alignment
      */
     STDMETHOD_(WORD, GetDefaultAlign)(THIS) SCONST OVERRIDE;
 
     /**
-     * SRichEdit::SetDefaultAlign
-     * @brief     设置默认对齐方式
-     * @param     WORD wNewAlign -- 对齐方式
-     *
-     * Describe   设置默认对齐方式
+     * @brief Set the default text alignment
+     * @param wNewAlign New text alignment
      */
     STDMETHOD_(void, SetDefaultAlign)(THIS_ WORD wNewAlign) OVERRIDE;
 
     /**
-     * SRichEdit::GetRichTextFlag
-     * @brief     获取标志
-     * @return    返回BOOL
-     *
-     * Describe   获取标志
+     * @brief Get the rich text flag
+     * @return TRUE if rich text is enabled, FALSE otherwise
      */
     STDMETHOD_(BOOL, GetRichTextFlag)(THIS) SCONST OVERRIDE;
 
     /**
-     * SRichEdit::SetRichTextFlag
-     * @brief     设置标志
-     * @param     BOOL fRich -- 标志
-     *
-     * Describe   设置标志
+     * @brief Set the rich text flag
+     * @param fRich TRUE to enable rich text, FALSE to disable
      */
     STDMETHOD_(void, SetRichTextFlag)(THIS_ BOOL fRich) OVERRIDE;
 
     /**
-     * SRichEdit::SetRichTextFlag
-     * @brief     设置标志
-     * @param     BOOL fRich -- 标志
-     * @return    返回LONG
-     *
-     * Describe   设置标志
+     * @brief Get the default left indent
+     * @return Default left indent
      */
     STDMETHOD_(LONG, GetDefaultLeftIndent)(THIS) SCONST OVERRIDE;
 
     /**
-     * SRichEdit::SetDefaultLeftIndent
-     * @brief     设置缩进
-     * @param     LONG lNewIndent -- 缩进字符数
-     *
-     * Describe   设置缩进
+     * @brief Set the default left indent
+     * @param lNewIndent New left indent
      */
     STDMETHOD_(void, SetDefaultLeftIndent)(THIS_ LONG lNewIndent) OVERRIDE;
 
     /**
-     * SRichEdit::SetSaveSelection
-     * @brief
-     * @param     BOOL fSaveSelection
-     * @return    返回BOOL
-     *
-     * Describe
+     * @brief Set the save selection flag
+     * @param fSaveSelection TRUE to save selection, FALSE otherwise
+     * @return TRUE if successful, FALSE otherwise
      */
     STDMETHOD_(BOOL, SetSaveSelection)(THIS_ BOOL fSaveSelection) OVERRIDE;
 
     /**
-     * SRichEdit::SetDefaultTextColor
-     * @brief     默认文本颜色
-     * @param     COLORREF cr -- 颜色
-     * @return    返回COLORREF
-     *
-     * Describe   设置默认文本颜色
+     * @brief Set the default text color
+     * @param cr New text color
+     * @return Previous text color
      */
     STDMETHOD_(COLORREF, SetDefaultTextColor)(THIS_ COLORREF cr) OVERRIDE;
 
     /**
-     * SRichEdit::SetWindowText
-     * @brief     设置窗口标题
-     * @param     LPCWSTR lpszText -- 窗口标题
-     *
-     * Describe   设置窗口标题
+     * @brief Set the window text
+     * @param lpszText New window text
      */
     STDMETHOD_(void, SetWindowText)(LPCTSTR lpszText) OVERRIDE;
 
+    /**
+     * @brief Get the window text
+     * @param pBuf Buffer to store the text
+     * @param nBufLen Length of the buffer
+     * @param bRawText Whether to get raw text
+     * @return Length of the text
+     */
     STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) OVERRIDE;
 
+    /**
+     * @brief Process window messages
+     * @param uMsg Message identifier
+     * @param wParam Additional message-specific information
+     * @param lParam Additional message-specific information
+     * @param lResult Pointer to the result
+     * @return TRUE if the message was processed, FALSE otherwise
+     */
     STDMETHOD_(BOOL, SwndProc)(THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult) OVERRIDE;
 
+    /**
+     * @brief Create a caret
+     * @param pBmp Bitmap for the caret
+     * @param nWid Width of the caret
+     * @param nHeight Height of the caret
+     * @return TRUE if successful, FALSE otherwise
+     */
     STDMETHOD_(BOOL, CreateCaret)(THIS_ HBITMAP pBmp, int nWid, int nHeight) OVERRIDE;
 
   public:
     /**
-     * SRichEdit::GetWindowText
-     * @brief     获取窗口标题
-     * @return    返回SStringT
-     *
-     * Describe   获取窗口标题
+     * @brief Get the window text
+     * @param bRawText Whether to get raw text
+     * @return Window text
      */
     SStringT GetWindowText(BOOL bRawText = FALSE);
 
     /**
-     * SRichEdit::SetSel
-     * @brief     设置选中
-     * @param     DWORD dwSelection --
-     * @param     BOOL bNoScroll --
-     *
-     * Describe   设置选中
+     * @brief Set the selection range
+     * @param dwSelection Selection range
+     * @param bNoScroll Whether to scroll to the selection
      */
     void SetSel(DWORD dwSelection, BOOL bNoScroll = FALSE);
 
+    /**
+     * @brief Get the length of the window text
+     * @return Length of the window text
+     */
     int GetWindowTextLength() const;
 
   protected:
     /**
-     * SRichEdit::OnCreate
-     * @brief    创建
-     * @return   LRESULT
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle creation of the control
+     * @param lpCreateStruct Create structure
+     * @return Result of the creation
      */
-    int OnCreate(LPVOID);
+    int OnCreate(LPVOID lpCreateStruct);
+
     /**
-     * SRichEdit::OnDestroy
-     * @brief    销毁窗口
-     *
-     * Describe  消息响应函数
+     * @brief Handle destruction of the control
      */
     void OnDestroy();
+
     /**
-     * SRichEdit::OnPaint
-     * @brief    绘制消息
-     * @param    IRenderTarget * pRT -- 绘画设备上下文
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle paint message
+     * @param pRT Rendering target handle
      */
     void OnPaint(IRenderTarget *pRT);
+
     /**
-     * SRichEdit::OnSetFocus
-     * @brief    获得焦点
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle set focus message
+     * @param wndOld Previous focus window handle
      */
     void OnSetFocus(SWND wndOld);
+
     /**
-     * SRichEdit::OnKillFocus
-     * @brief    失去焦点
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle kill focus message
+     * @param wndFocus New focus window handle
      */
     void OnKillFocus(SWND wndFocus);
+
     /**
-     * SRichEdit::OnTimer
-     * @brief    定时器
-     * @param    char idEvent idEvent
-     *
-     * Describe  定时器
+     * @brief Handle timer message
+     * @param idEvent Timer ID
      */
     void OnTimer(char idEvent);
 
     /**
-     * SRichEdit::OnGetDlgCode
-     * @brief    获取窗口消息码
-     * @return   返回UINT
-     *
-     * Describe  获取窗口消息码
+     * @brief Get dialog code
+     * @return Dialog code
      */
     virtual UINT WINAPI OnGetDlgCode() const;
 
     /**
-     * SRichEdit::OnScroll
-     * @brief    滚动条事件
-     * @param    BOOL bVertical -- 是否垂直滚动
-     * @param    UINT uCode -- 消息码
-     * @param    int nPos -- 位置
-     * @return   返回BOOL
-     *
-     * Describe  滚动条事件
+     * @brief Handle scroll message
+     * @param bVertical TRUE if vertical scroll, FALSE if horizontal
+     * @param uCode Scroll code
+     * @param nPos Scroll position
+     * @return TRUE if successful, FALSE otherwise
      */
     virtual BOOL OnScroll(BOOL bVertical, UINT uCode, int nPos);
+
     /**
-     * SRichEdit::OnSetCursor
-     * @brief    设置鼠标位置
-     * @param    const CPoint &pt -- 坐标
-     * @return   返回BOOL
-     *
-     * Describe  设置鼠标位置
+     * @brief Handle set cursor message
+     * @param pt Mouse coordinates
+     * @return TRUE if successful, FALSE otherwise
      */
     virtual BOOL OnSetCursor(const CPoint &pt);
 
+    /**
+     * @brief Handle scale change message
+     * @param nScale New scale factor
+     */
     virtual void OnScaleChanged(int nScale);
 
+    /**
+     * @brief Handle rebuild font message
+     */
     virtual void OnRebuildFont();
 
+    /**
+     * @brief Check if rich text scaling is enabled
+     * @return TRUE if enabled, FALSE otherwise
+     */
     BOOL IsRichScale() const;
 
-    void OnEnable(BOOL bEnable, UINT nStatus);
     /**
-     * SRichEdit::InitDefaultCharFormat
-     * @brief
-     * @param    CHARFORMAT2W* pcf --
-     * @param    IFont *pFont --
-     * @return   返回HRESULT
-     *
-     * Describe
+     * @brief Handle enable message
+     * @param bEnable Enable flag
+     * @param nStatus Status code
+     */
+    void OnEnable(BOOL bEnable, UINT nStatus);
+
+    /**
+     * @brief Initialize default character format
+     * @param pcf Character format structure
+     * @param pFont Font to apply
+     * @return Result of the initialization
      */
     HRESULT InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont = NULL);
+
     /**
-     * SRichEdit::InitDefaultParaFormat
-     * @brief
-     * @param    PARAFORMAT2* ppf
-     * @return   返回HRESULT
-     *
-     * Describe
+     * @brief Initialize default paragraph format
+     * @param ppf Paragraph format structure
+     * @return Result of the initialization
      */
     HRESULT InitDefaultParaFormat(PARAFORMAT2 *ppf);
-    /**
-     * SRichEdit::OnTxNotify
-     * @brief
-     * @param    DWORD iNotify --
-     * @param    LPVOID pv  --
-     * @return   返回HRESULT
-     *
-     * Describe
-     */
 
+    /**
+     * @brief Handle text notification
+     * @param iNotify Notification code
+     * @param pv Notification data
+     * @return Result of the notification handling
+     */
     virtual HRESULT OnTxNotify(DWORD iNotify, LPVOID pv);
 
     /**
-     * SRichEdit::OnLButtonDown
-     * @brief    左键按下事件
-     * @param    UINT nFlags -- 标志
-     * @param    CPoint point -- 鼠标坐标
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle left button down message
+     * @param nFlags Mouse flags
+     * @param point Mouse coordinates
      */
     void OnLButtonDown(UINT nFlags, CPoint point);
+
+    /**
+     * @brief Handle left button up message
+     * @param nFlags Mouse flags
+     * @param point Mouse coordinates
+     */
     void OnLButtonUp(UINT nFlags, CPoint point);
 
     /**
-     * SRichEdit::OnRButtonDown
-     * @brief    右键按下事件
-     * @param    UINT nFlags -- 标志
-     * @param    CPoint point -- 鼠标坐标
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle right button down message
+     * @param nFlags Mouse flags
+     * @param point Mouse coordinates
      */
     void OnRButtonDown(UINT nFlags, CPoint point);
 
     /**
-     * SRichEdit::OnMouseMove
-     * @brief    鼠标移动
-     * @param    UINT nFlags -- 标志
-     * @param    CPoint point -- 鼠标坐标
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle mouse move message
+     * @param nFlags Mouse flags
+     * @param point Mouse coordinates
      */
     void OnMouseMove(UINT nFlags, CPoint point);
 
+    /**
+     * @brief Handle mouse wheel message
+     * @param nFlags Mouse flags
+     * @param zDelta Wheel delta
+     * @param pt Mouse coordinates
+     * @return TRUE if successful, FALSE otherwise
+     */
     BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
 
     /**
-     * SRichEdit::OnKeyDown
-     * @brief    键盘按下事件
-     * @param    UINT nChar -- 按键对应的码值
-     * @param    UINT nRepCnt -- 重复次数
-     * @param    UINT nFlags -- 标志
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle key down message
+     * @param nChar Key code
+     * @param nRepCnt Repeat count
+     * @param nFlags Key flags
      */
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags);
 
     /**
-     * SRichEdit::OnButtonClick
-     * @brief    通用鼠标事件
-     * @param    UINT uMsg -- msg
-     * @param    WPARAM wParam -- wParam
-     * @param    LPARAM lParam -- lParam
-     * @return   返回LRESULT
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle button click message
+     * @param uMsg Message identifier
+     * @param wParam Additional message-specific information
+     * @param lParam Additional message-specific information
+     * @return Result of the message processing
      */
     LRESULT OnButtonClick(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     /**
-     * SRichEdit::OnChar
-     * @brief    字符事件
-     * @param    UINT nChar -- 按键对应的码值
-     * @param    UINT nRepCnt -- 重复次数
-     * @param    UINT nFlags -- 标志
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Handle character message
+     * @param nChar Character code
+     * @param nRepCnt Repeat count
+     * @param nFlags Character flags
      */
     void OnChar(UINT nChar, UINT nRepCnt, UINT nFlags);
+
     /**
-     * SRichEdit::OnSetFont
-     * @brief    设置字体
-     * @param    IFont * font -- 字体
-     * @param    BOOL bRedraw -- 是否重绘
-     *
-     * Describe  设置字体
+     * @brief Handle set font message
+     * @param font Font to apply
+     * @param bRedraw Whether to redraw the control
      */
     void OnSetFont(IFontS *font, BOOL bRedraw);
+
     /**
-     * SRichEdit::OnSetText
-     * @brief    设置文本
-     * @param    UINT uMsg -- 消息码
-     * @param    WPARAM wparam --
-     * @param    LPARAM lparam --
-     * @return   返回LRESULT
-     *
-     * Describe  设置文本
+     * @brief Handle set text message
+     * @param uMsg Message identifier
+     * @param wParam Additional message-specific information
+     * @param lParam Additional message-specific information
+     * @return Result of the message processing
      */
-    LRESULT OnSetText(UINT uMsg, WPARAM wparam, LPARAM lparam);
+    LRESULT OnSetText(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
     /**
-     * SRichEdit::OnSetCharFormat
-     * @brief
-     * @param    UINT uMsg -- 消息码
-     * @param    WPARAM wparam --
-     * @param    LPARAM lparam --
-     * @return   返回LRESULT
-     *
-     * Describe
+     * @brief Handle set character format message
+     * @param uMsg Message identifier
+     * @param wParam Additional message-specific information
+     * @param lParam Additional message-specific information
+     * @return Result of the message processing
      */
     LRESULT OnSetCharFormat(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
     /**
-     * SRichEdit::OnSetParaFormat
-     * @brief
-     * @param    UINT uMsg -- 消息码
-     * @param    WPARAM wparam --
-     * @param    LPARAM lparam --
-     * @return   返回LRESULT
-     *
-     * Describe
+     * @brief Handle set paragraph format message
+     * @param uMsg Message identifier
+     * @param wParam Additional message-specific information
+     * @param lParam Additional message-specific information
+     * @return Result of the message processing
      */
     LRESULT OnSetParaFormat(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
     /**
-     * SRichEdit::OnSetReadOnly
-     * @brief    设置只读
-     * @param    UINT uMsg -- 消息码
-     * @param    WPARAM wparam --
-     * @param    LPARAM lparam --
-     * @return   返回LRESULT
-     *
-     * Describe  设置只读
+     * @brief Handle set read-only message
+     * @param uMsg Message identifier
+     * @param wParam Additional message-specific information
+     * @param lParam Additional message-specific information
+     * @return Result of the message processing
      */
     LRESULT OnSetReadOnly(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
     /**
-     * SRichEdit::OnSetLimitText
-     * @brief    设置文本长度
-     * @param    UINT uMsg -- 消息码
-     * @param    WPARAM wparam --
-     * @param    LPARAM lparam --
-     * @return   返回LRESULT
-     *
-     * Describe  设置文本长度
+     * @brief Handle set limit text message
+     * @param uMsg Message identifier
+     * @param wParam Additional message-specific information
+     * @param lParam Additional message-specific information
+     * @return Result of the message processing
      */
     LRESULT OnSetLimitText(UINT uMsg, WPARAM wParam, LPARAM lParam);
+
     /**
-     * SRichEdit::OnNcCalcSize
-     * @brief    计算非客户大小
-     * @param    BOOL bCalcValidRects --
-     * @param    LPARAM lparam --
-     * @return   返回LRESULT
-     *
-     * Describe  消息响应函数
+     * @brief Handle non-client calculate size message
+     * @param bCalcValidRects Whether to calculate valid rectangles
+     * @param lParam Additional message-specific information
+     * @return Result of the message processing
      */
     LRESULT OnNcCalcSize(BOOL bCalcValidRects, LPARAM lParam);
+
     /**
-     * SRichEdit::OnEnableDragDrop
-     * @brief    是否允许拖拽
-     * @param    BOOL bEnable
-     *
-     * Describe  是否允许拖拽
+     * @brief Enable or disable drag-and-drop
+     * @param bEnable Enable flag
      */
     void OnEnableDragDrop(BOOL bEnable);
 
+    /**
+     * @brief Handle get rectangle message
+     * @param uMsg Message identifier
+     * @param wp Additional message-specific information
+     * @param lp Additional message-specific information
+     * @return Result of the message processing
+     */
     LRESULT OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp);
 
+    /**
+     * @brief Handle set scroll position message
+     * @param fnBar Scroll bar identifier
+     * @param nPos Scroll position
+     * @param fRedraw Whether to redraw the control
+     * @return TRUE if successful, FALSE otherwise
+     */
     BOOL OnTxSetScrollPos(INT fnBar, INT nPos, BOOL fRedraw);
 
+    /**
+     * @brief Handle set timer message
+     * @param idTimer Timer ID
+     * @param uTimeout Timeout interval
+     * @return TRUE if successful, FALSE otherwise
+     */
     BOOL OnTxSetTimer(UINT idTimer, UINT uTimeout);
+
+    /**
+     * @brief Handle kill timer message
+     * @param idTimer Timer ID
+     */
     void OnTxKillTimer(UINT idTimer);
+
+    /**
+     * @brief Handle timer timeout message
+     * @param e Event arguments
+     * @return TRUE if successful, FALSE otherwise
+     */
     BOOL OnTimeout(IEvtArgs *e);
 
   protected:
@@ -567,25 +539,95 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     else
 
     /**
-     * SRichEdit::OnAttrTextColor
-     * @brief    设置文本颜色
-     * @param    const SStringW &  strValue -- 字符串
-     * @param    BOOL bLoading -- 是否加载
-     * @return   返回HRESULT
-     *
-     * Describe  设置文本颜色
+     * @brief Set text color attribute
+     * @param strValue Attribute value
+     * @param bLoading Loading flag
+     * @return Result of the attribute setting
      */
     HRESULT OnAttrTextColor(const SStringW &strValue, BOOL bLoading);
+
+    /**
+     * @brief Set RTF attribute
+     * @param strValue Attribute value
+     * @param bLoading Loading flag
+     * @return Result of the attribute setting
+     */
     HRESULT OnAttrRTF(const SStringW &strValue, BOOL bLoading);
+
+    /**
+     * @brief Set alignment attribute
+     * @param strValue Attribute value
+     * @param bLoading Loading flag
+     * @return Result of the attribute setting
+     */
     HRESULT OnAttrAlign(const SStringW &strValue, BOOL bLoading);
+
+    /**
+     * SRichEdit::OnAttrNotifyChange
+     * @brief    Handle the notify change attribute
+     * @param    const SStringW &strValue -- The attribute value as a string
+     * @param    BOOL bLoading -- Indicates if the attribute is being loaded
+     * @return   Returns HRESULT indicating success or failure
+     *
+     * Describe  This function processes the "notifyChange" attribute, which determines whether the control should receive notifications when data changes.
+     */
     HRESULT OnAttrNotifyChange(const SStringW &strValue, BOOL bLoading);
+
+    /**
+     * SRichEdit::OnAttrPasswordChar
+     * @brief    Handle the password character attribute
+     * @param    const SStringW &strValue -- The attribute value as a string
+     * @param    BOOL bLoading -- Indicates if the attribute is being loaded
+     * @return   Returns HRESULT indicating success or failure
+     *
+     * Describe  This function processes the "passwordChar" attribute, which sets the character used to display password input.
+     */
     HRESULT OnAttrPasswordChar(const SStringW &strValue, BOOL bLoading);
+
+    /**
+     * SRichEdit::OnAttrEnableDragdrop
+     * @brief    Handle the enable dragdrop attribute
+     * @param    const SStringW &strValue -- The attribute value as a string
+     * @param    BOOL bLoading -- Indicates if the attribute is being loaded
+     * @return   Returns HRESULT indicating success or failure
+     *
+     * Describe  This function processes the "enableDragdrop" attribute, which determines whether drag-and-drop operations are enabled in the control.
+     */
     HRESULT OnAttrEnableDragdrop(const SStringW &strValue, BOOL bLoading);
 
+    /**
+     * SRichEdit::OnAttrReStyle
+     * @brief    Handle the restyle attribute
+     * @param    const SStringW &strValue -- The attribute value as a string
+     * @param    DWORD dwStyle -- The style to apply
+     * @param    DWORD txtBit -- The text bit to apply
+     * @param    BOOL bLoading -- Indicates if the attribute is being loaded
+     * @return   Returns HRESULT indicating success or failure
+     *
+     * Describe  This function processes various restyle attributes, applying the specified style and text bit to the control.
+     */
     HRESULT OnAttrReStyle(const SStringW &strValue, DWORD dwStyle, DWORD txtBit, BOOL bLoading);
+
+    /**
+     * SRichEdit::OnAttrReStyle2
+     * @brief    Handle the restyle attribute (variant)
+     * @param    const SStringW &strValue -- The attribute value as a string
+     * @param    DWORD dwStyle -- The style to apply
+     * @param    DWORD txtBit -- The text bit to apply
+     * @param    BOOL bLoading -- Indicates if the attribute is being loaded
+     * @return   Returns HRESULT indicating success or failure
+     *
+     * Describe  This function processes additional restyle attributes, applying the specified style and text bit to the control.
+     */
     HRESULT OnAttrReStyle2(const SStringW &strValue, DWORD dwStyle, DWORD txtBit, BOOL bLoading);
 
   public:
+    /**
+     * SRichEdit::SOUI_ATTRS_BEGIN
+     * @brief    Begin the attribute map for the SRichEdit class
+     *
+     * Describe  This macro starts the definition of the attribute map, which maps XML attributes to member variables and custom handlers.
+     */
     SOUI_ATTRS_BEGIN()
         ATTR_INT(L"style", m_dwStyle, TRUE)
         ATTR_INT(L"maxBuf", m_cchTextMost, FALSE)
@@ -617,18 +659,19 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
         ATTR_CUSTOM(L"passwordChar", OnAttrPasswordChar)
         ATTR_CUSTOM(L"enableDragdrop", OnAttrEnableDragdrop)
     SOUI_ATTRS_END()
+
   protected:
     CHARFORMAT2W m_cfDef;   /**< Default character format  */
     PARAFORMAT2 m_pfDef;    /**< Default paragraph format  */
-    DWORD m_cchTextMost;    /**< Maximize Characters       */
-    TCHAR m_chPasswordChar; /**< Password character        */
-    LONG m_lAccelPos;       /**< Accelerator position      */
+    DWORD m_cchTextMost;    /**< Maximum number of characters       */
+    TCHAR m_chPasswordChar; /**< Character used for password input        */
+    LONG m_lAccelPos;       /**< Position of accelerator      */
     SIZEL m_sizelExtent;    /**< Extent array              */
-    CRect m_rcInset;        /**< inset margin              */
-    int m_nFontHeight;      /**< 单行文字输出高度          */
+    CRect m_rcInset;        /**< Inset margin              */
+    int m_nFontHeight;      /**< Height of single line text output          */
     DWORD m_dwStyle;
 
-    UINT m_fEnableAutoWordSel : 1;              /**< enable Word style auto word selection?  */
+    UINT m_fEnableAutoWordSel : 1;              /**< Enable Word style auto word selection?  */
     UINT m_fWordWrap : 1;                       /**< Whether control should word wrap */
     UINT m_fRich : 1;                           /**< Whether control is rich text */
     UINT m_fSaveSelection : 1;                  /**< Whether to save the selection when inactive */

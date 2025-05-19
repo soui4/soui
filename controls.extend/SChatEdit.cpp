@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "SChatEdit.h"
+#include <atl.mini/SComCli.h>
 #ifdef _WIN32
 #include "reole/RichEditOle.h"
 #endif//_WIN32
@@ -100,7 +101,7 @@ BOOL SChatEdit::ReplaceSelectionByFormatText(const SStringW &strMsg, BOOL bCanUn
 int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, BOOL bCanUndo)
 {
     SStringW strText = xmlText.value();
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
     if (xmlText.name() == KLabelSmiley)
     { // insert smiley
         SComPtr<ISmileyCtrl> pSmiley;
@@ -274,17 +275,17 @@ SStringW SChatEdit::GetFormatText()
     SSendMessage(EM_GETTEXTRANGE, 0, (LPARAM)&txtRng);
     strTxt.ReleaseBuffer();
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
     SComPtr<IRichEditOle> ole;
     SSendMessage(EM_GETOLEINTERFACE, 0, (LPARAM)(void **)&ole);
-#endif//_WIN32
+#endif
     SStringW strMsg;
     int iPlainTxtBegin = 0;
     for (int i = 0; i < strTxt.GetLength(); i++)
     {
+        #if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
         if (strTxt[i] == 0xfffc)
         { //找到一个OLE对象
-#ifdef _WIN32
             strMsg += strTxt.Mid(iPlainTxtBegin, i - iPlainTxtBegin);
             iPlainTxtBegin = i + 1;
 
@@ -322,8 +323,8 @@ SStringW SChatEdit::GetFormatText()
                 }
                 reobj.poleobj->Release();
             }
-#endif//_WIN32
         }
+        #endif //_WIN32
     }
     if (iPlainTxtBegin < strTxt.GetLength())
     {

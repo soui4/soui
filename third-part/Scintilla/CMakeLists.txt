@@ -2,6 +2,10 @@
 # 1394020320@qq.com
 #
 
+if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+add_compile_options(-Wno-deprecated-declarations)
+endif()
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/lexlib)

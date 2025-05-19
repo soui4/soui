@@ -576,8 +576,8 @@ void CMainDlg::OnBtnInsertGif2RE()
         CFileDialogEx openDlg(TRUE,_T("gif"),0,6,_T("gif files(*.gif)\0*.gif\0All files (*.*)\0*.*\0\0"));
         if(openDlg.DoModal()==IDOK)
         {
-#ifdef _WIN32
-            ISmileySource* pSource = new CSmileySource2;
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
+            ISmileySource *pSource = new CSmileySource2;
             HRESULT hr=pSource->LoadFromFile(S_CT2W(openDlg.m_szFileName));
             if(SUCCEEDED(hr))
             {

@@ -1,8 +1,7 @@
 #include "stdafx.h"
 #include "PathEffect-Skia.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 	SPathEffect_Corner::SPathEffect_Corner():m_skPathEffect(NULL)
 	{
@@ -86,4 +85,4 @@ namespace SOUI
 
 	}
 
-}
+SNSEND

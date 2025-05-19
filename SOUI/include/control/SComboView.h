@@ -5,21 +5,62 @@
 #include "SListView.h"
 
 SNSBEGIN
+
+/**
+ * @class SComboView
+ * @brief ComboBox Control with ListView
+ * @details A ComboBox control that uses a ListView for its dropdown content.
+ */
 class SOUI_EXP SComboView : public TComboBaseProxy<IComboView> {
     DEF_SOBJECT(SComboBase, L"comboview")
+
   public:
+    /**
+     * @brief Constructor
+     */
     SComboView(void);
+
+    /**
+     * @brief Destructor
+     */
     ~SComboView(void);
 
   public:
+    /**
+     * @brief Set the current selection index
+     * @param iSel Index to set as the current selection
+     * @return TRUE if successful, FALSE otherwise
+     */
     STDMETHOD_(BOOL, SetCurSel)(int iSel) OVERRIDE;
 
+    /**
+     * @brief Get the current selection index
+     * @return Current selection index
+     */
     STDMETHOD_(int, GetCurSel)() SCONST OVERRIDE;
 
+    /**
+     * @brief Get the number of items in the list view
+     * @return Number of items
+     */
     STDMETHOD_(int, GetCount)() SCONST OVERRIDE;
 
+    /**
+     * @brief Get the text of a list view item
+     * @param iItem Item index
+     * @param bRawText Whether to get raw text
+     * @param str Output string for the item text
+     * @return TRUE if successful, FALSE otherwise
+     */
     STDMETHOD_(BOOL, GetItemText)(int iItem, BOOL bRawText, IStringT *str) SCONST OVERRIDE;
 
+    /**
+     * @brief Get the text of a list view item (ANSI version)
+     * @param iItem Item index
+     * @param bRawText Whether to get raw text
+     * @param str Output string for the item text
+     * @return TRUE if successful, FALSE otherwise
+     */
     STDMETHOD_(BOOL, GetItemTextA)(int iItem, BOOL bRawText, IStringA *str) SCONST OVERRIDE
     {
         SStringT strBuf;
@@ -29,79 +70,72 @@ class SOUI_EXP SComboView : public TComboBaseProxy<IComboView> {
         return bRet;
     }
 
+    /**
+     * @brief Get the list view interface
+     * @return Pointer to the list view interface
+     */
     STDMETHOD_(IListView *, GetIListView)(THIS) OVERRIDE;
 
   public:
     /**
-     * SComboView::GetListBox
-     * @brief    获取下拉列表指针
-     * @param    返回SListBox *
-     *
-     * Describe  获取下拉列表指针
+     * @brief Get the list view pointer
+     * @return Pointer to the list view
      */
     SListView *GetListView();
 
   protected:
     /**
-     * SComboView::FireEvent
-     * @brief    通知消息
-     * @param    EventArgs &evt -- 事件对象
-     *
-     * Describe  此函数是消息响应函数
+     * @brief Notify event
+     * @param evt Event object
+     * @return TRUE if successful, FALSE otherwise
+     * @details This function is a message handler.
      */
     STDMETHOD_(BOOL, FireEvent)(THIS_ IEvtArgs *evt) OVERRIDE;
 
+    /**
+     * @brief Handle scale change event
+     * @param nScale Scale factor
+     */
     virtual void OnScaleChanged(int nScale);
 
     /**
-     * SComboView::CreateListBox
-     * @brief    创建下拉列表
-     * @param    返回BOOL TRUE -- 成功 FALSE -- 失败
-     *
-     * Describe  创建下拉列表
+     * @brief Handle language change event
+     * @return HRESULT
+     */
+    virtual HRESULT OnLanguageChanged() override;
+
+    /**
+     * @brief Create the list view
+     * @param xmlNode XML node for the list view
+     * @return TRUE if successful, FALSE otherwise
      */
     virtual BOOL CreateListBox(SXmlNode xmlNode);
 
     /**
-     * SComboView::GetListBoxHeight
-     * @brief    获取下拉列表高度
-     * @param    返回int
-     *
-     * Describe  获取下拉列表高度
+     * @brief Get the height of the list view
+     * @return Height of the list view
      */
     virtual int GetListBoxHeight();
 
     /**
-     * SComboView::OnCreateDropDown
-     * @brief    下拉列表事件
-     * @param    SDropDownWnd *pDropDown -- 下拉列表指针
-     *
-     * Describe  下拉列表事件
+     * @brief Handle creation of the dropdown window
+     * @param pDropDown Dropdown window pointer
      */
     virtual void OnCreateDropDown(SDropDownWnd *pDropDown);
 
     /**
-     * SComboView::OnDestroyDropDown
-     * @brief    下拉列表关闭事件
-     * @param    SDropDownWnd *pDropDown -- 下拉列表指针
-     * @param    UINT uCode -- 消息码
-     *
-     * Describe  获取下拉列表指针
+     * @brief Handle destruction of the dropdown window
+     * @param pDropDown Dropdown window pointer
      */
     virtual void OnDestroyDropDown(SDropDownWnd *pDropDown);
 
     /**
-     * SComboView::OnSelChanged
-     * @brief    下拉列表selected事件
-     *
-     * Describe  下拉列表selected事件
+     * @brief Handle selection change in the dropdown window
      */
     virtual void OnSelChanged();
 
-    virtual HRESULT OnLanguageChanged() override;
-
   protected:
-    SListView *m_pListBox; /**< SListBox指针 */
+    SListView *m_pListBox; /**< Pointer to the list view */
 };
 
 SNSEND

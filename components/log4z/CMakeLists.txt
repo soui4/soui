@@ -21,11 +21,15 @@ else()
     add_library(log4z STATIC ${log4z_src} ${log4z_header})
 endif()
 
+if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+    target_link_libraries(log4z swinx)
+endif()
+
 set(COM_LIBS ${COM_LIBS} log4z CACHE INTERNAL "com_lib")
 set_target_properties (log4z PROPERTIES
     FOLDER components
 )
-#target_link_libraries(log4z shlwapi)
+
 
 install(TARGETS log4z
     CONFIGURATIONS Release

@@ -54,8 +54,7 @@
 #pragma comment(lib,"log4z")
 #pragma comment(lib,"taskloop")
 
-namespace SOUI
-{
+SNSBEGIN
 	namespace IMGDECODOR_WIC
 	{
 		BOOL SCreateInstance(IObjRef **);
@@ -182,13 +181,13 @@ namespace SOUI
 		SStringT    m_strImgDecoder;
 	};
 
-}//end of soui
+SNSEND
 
 #else
 
 #include <com-loader.hpp>
 
-namespace SOUI {
+SNSBEGIN
 	class SComMgr
 	{
 	public:
@@ -277,7 +276,7 @@ namespace SOUI {
 		SStringT m_strDllPath;
 	};
 
-}//end of soui
+SNSEND
 #endif
 
 #endif//_SOUI_COM_CFG_H_

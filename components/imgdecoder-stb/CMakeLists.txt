@@ -1,4 +1,4 @@
-
+add_definitions(-DSTBIW_WINDOWS_UTF8)
 set(imgdecoder-stb_header
 	imgdecoder-stb.h
 	${PROJECT_SOURCE_DIR}/third-part/stb/stb_image.h

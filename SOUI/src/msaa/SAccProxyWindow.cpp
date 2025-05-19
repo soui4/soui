@@ -6,27 +6,26 @@ SNSBEGIN
 /////////////////////////////////////////////////////////////////////////////////////////
 STDMETHODIMP SAccProxyWindow::get_accName(BSTR *pszName)
 {
-    SStringW strText = S_CT2W(m_pWnd->GetWindowText());
-    if (strText.IsEmpty())
+    SStringA strTextA;
+    m_pWnd->GetWindowTextU8(&strTextA, TRUE);
+    if (strTextA.IsEmpty())
         return E_INVALIDARG;
+    SStringW strText = S_CA2W(strTextA, CP_UTF8);
     *pszName = ::SysAllocString(strText);
     return S_OK;
 }
 
 STDMETHODIMP SAccProxyWindow::get_accValue(BSTR *pszValue)
 {
-    *pszValue = ::SysAllocString(S_CT2W(m_pWnd->GetWindowText()));
+    SStringA strText;
+    m_pWnd->GetWindowTextU8(&strText, TRUE);
+    *pszValue = ::SysAllocString(S_CA2W(strText, CP_UTF8));
     return S_OK;
 }
 
 STDMETHODIMP SAccProxyWindow::get_accDescription(BSTR *pszDescription)
 {
-#ifdef _DEBUG
-    *pszDescription = ::SysAllocString(m_pWnd->m_strXml);
-    return S_OK;
-#else
     return E_NOTIMPL;
-#endif
 }
 
 STDMETHODIMP SAccProxyWindow::get_accRole(VARIANT *pvarRole)

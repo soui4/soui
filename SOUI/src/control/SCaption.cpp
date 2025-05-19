@@ -2,7 +2,7 @@
  * Copyright (C) 2014-2050 SOUI团队
  * All rights reserved.
  *
- * @file       DuiCaption.cpp
+ * @file       SCaption.cpp
  * @brief      标签控件
  * @version    v1.0
  * @author     soui

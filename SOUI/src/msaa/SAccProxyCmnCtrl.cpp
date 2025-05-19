@@ -41,7 +41,7 @@ STDMETHODIMP SAccProxyEdit::get_accRole(VARIANT *pvarRole)
 }
 
 ///////////////////////////////////////////////////////////////////////////
-SAccProxyProgress::SAccProxyProgress(SWindow *pWnd)
+SAccProxyProgress::SAccProxyProgress(IWindow *pWnd)
     : SAccProxyWindow(pWnd)
 {
 }

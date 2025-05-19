@@ -1,6 +1,6 @@
 ﻿#include "gdialpha.h"
-#include <malloc.h>
 #ifdef _WIN32
+#include <malloc.h>
 SNSBEGIN
 
 #define  MAX_ALPHABUF    1<<16

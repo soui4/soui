@@ -26,7 +26,7 @@ namespace fs = ghc::filesystem;
 #define _ASSERTE assert
 #endif // _WIN32
 
-using namespace SOUI;
+using namespace SNS;
 
 namespace SevenZip{
 

@@ -259,7 +259,7 @@ void ResManger::LoadResFileEx(SStringT& filepath, pugi::xml_document& xmlDoc, SS
 				if (!result)
 				{
 					SStringT tmpstr;
-					tmpstr.Format(_T("加载%s文件失败"), tagname);
+					tmpstr.Format(_T("加载%s文件失败"), tagname.c_str());
 					SMessageBox(0, _T("Resmgr"), tmpstr, MB_OK);
 				}
 			}

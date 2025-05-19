@@ -10,7 +10,7 @@ SNSBEGIN
     public:\
     virtual HRESULT STDMETHODCALLTYPE QueryInterface2( \
         /* [in] */ REFIID riid,\
-        /* [iid_is][out] */  void __RPC_FAR *__RPC_FAR *ppvObject)\
+        /* [iid_is][out] */  void  * *ppvObject)\
         {\
             HRESULT hr = E_NOINTERFACE; \
             
@@ -46,7 +46,7 @@ SNSBEGIN
         
         virtual HRESULT STDMETHODCALLTYPE QueryInterface2( 
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */  void __RPC_FAR *__RPC_FAR *ppvObject)
+            /* [iid_is][out] */  void  **ppvObject)
         {
 			(riid);
 			(ppvObject);
@@ -55,10 +55,10 @@ SNSBEGIN
 
         HRESULT STDMETHODCALLTYPE QueryInterface( 
             /* [in] */ REFIID riid,
-            /* [iid_is][out] */  void __RPC_FAR *__RPC_FAR *ppvObject)
+            /* [iid_is][out] */  void  * *ppvObject)
         {
             HRESULT hr = E_NOINTERFACE;
-            if(riid == __uuidof(IUnknown))
+            if(riid == IID_IUnknown)
             {
                 *ppvObject = this;
                 hr =  S_OK;

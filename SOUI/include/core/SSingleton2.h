@@ -2,13 +2,13 @@
  * Copyright (C) 2014-2050
  * All rights reserved.
  *
- * @file       SSingleton.h
- * @brief
+ * @file       SSingleton2.h
+ * @brief      Pseudo-Singleton Template
  * @version    v1.0
  * @author     SOUI group
  * @date       2014/08/02
  *
- * Describe    SOUI系统中使用的单件模块
+ * Description: Provides a pseudo-singleton template in SOUI, which uses the true singleton SApplication to manage instances.
  */
 
 #ifndef __SSINGLETON2__H__
@@ -28,24 +28,45 @@ SNSBEGIN
 
 /**
  * @class      SSingleton2
- * @brief      伪单件模板，通过真当件SApplication来获取指针。
+ * @brief      Pseudo-Singleton Template
  *
- * Describe
+ * Description: Implements a pseudo-singleton pattern where the actual singleton management is handled by the SApplication class.
+ *              This allows for centralized management of singleton instances.
+ * @tparam     T Type of the class that will be made a pseudo-singleton.
  */
 template <typename T>
 class SSingleton2 {
   public:
+    /**
+     * @brief Constructor for SSingleton2.
+     */
     SSingleton2(void)
     {
     }
+
+    /**
+     * @brief Destructor for SSingleton2.
+     */
     virtual ~SSingleton2(void)
     {
     }
+
+    /**
+     * @brief Gets the singleton instance.
+     * @return Reference to the singleton instance.
+     * @note Asserts that the singleton instance exists.
+     */
     static T &getSingleton(void)
     {
         assert(getObjPtr());
         return (*getObjPtr());
     }
+
+    /**
+     * @brief Gets the pointer to the singleton instance.
+     * @return Pointer to the singleton instance.
+     * @note Asserts that the singleton instance exists.
+     */
     static T *getSingletonPtr(void)
     {
         assert(getObjPtr());
@@ -53,19 +74,34 @@ class SSingleton2 {
     }
 
   private:
+    /**
+     * @brief Gets the pointer to the singleton object managed by SApplication.
+     * @return Pointer to the singleton object.
+     */
     static T *getObjPtr()
     {
         return (T *)SApplication::getSingletonPtr()->GetInnerSingleton(T::GetType());
     }
 
+    /**
+     * @brief Private copy assignment operator to prevent copying.
+     * @param rhs Right-hand side object.
+     * @return Reference to the current object.
+     */
     SSingleton2 &operator=(const SSingleton2 &)
     {
         return *this;
     }
+
+    /**
+     * @brief Private copy constructor to prevent copying.
+     * @param rhs Right-hand side object.
+     */
     SSingleton2(const SSingleton2 &)
     {
     }
 };
 
 SNSEND
+
 #endif // __SSINGLETON2__H__

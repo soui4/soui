@@ -8,10 +8,9 @@
 #include <tchar.h>
 #include <algorithm>
 #include <utilities.h>
+#include <helper/SAutoBuf.h>
 
-namespace SOUI
-{
-
+SNSBEGIN
 
     //////////////////////////////////////////////////////////////////////////
     // SRenderFactory_GDI
@@ -445,16 +444,56 @@ namespace SOUI
 		return hr;
 	}
 
+    static void premultiply_to_non_premultiply(unsigned char *data, int width, int height)
+    {
+        for (int y = 0; y < height; ++y)
+        {
+            for (int x = 0; x < width; ++x)
+            {
+                int idx = (y * width + x) * 4;
+                unsigned char alpha = data[idx + 3];
+                if (alpha != 0)
+                {
+                    data[idx + 0] = (data[idx + 0] * 255) / alpha; // R
+                    data[idx + 1] = (data[idx + 1] * 255) / alpha; // G
+                    data[idx + 2] = (data[idx + 2] * 255) / alpha; // B
+                }
+                else
+                {
+                    data[idx + 0] = 0; // R
+                    data[idx + 1] = 0; // G
+                    data[idx + 2] = 0; // B
+                }
+            }
+        }
+    }
+
+
 	HRESULT SBitmap_GDI::Save(LPCWSTR pszFileName,const LPVOID pFormat) SCONST
 	{
 		LPBYTE pBits = (LPBYTE)GetPixelBits();
-		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage(pBits,Width(),Height(),pszFileName,pFormat);
+        int nWid = Width();
+        int nHei = Height();
+        SAutoBuf buf(nWid*4*nHei);
+        if (!buf)
+            return E_OUTOFMEMORY;
+        memcpy(buf, pBits, nWid * 4 * nHei);
+        premultiply_to_non_premultiply((unsigned char *)(char*)buf, nWid, nHei);
+		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage((BYTE*)(char*)buf, nWid, nHei,pszFileName, pFormat);
 	}
 
 	HRESULT SBitmap_GDI::Save2(CTHIS_ LPCWSTR pszFileName, ImgFmt imgFmt) SCONST
 	{
-		LPBYTE pBits = (LPBYTE)GetPixelBits();
-		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2(pBits,Width(),Height(),pszFileName,imgFmt);
+        LPBYTE pBits = (LPBYTE)GetPixelBits();
+        int nWid = Width();
+        int nHei = Height();
+        SAutoBuf buf(nWid * 4 * nHei);
+        if (!buf)
+            return E_OUTOFMEMORY;
+        memcpy(buf, pBits, nWid * 4 * nHei);
+        premultiply_to_non_premultiply((unsigned char *)(char *)buf, nWid, nHei);
+
+		return GetRenderFactory()->GetImgDecoderFactory()->SaveImage2((BYTE *)(char *)buf, nWid, nHei, pszFileName, imgFmt);
 	}
 
 
@@ -1562,7 +1601,7 @@ namespace SOUI
             return TRUE;
         }
     }
-}
+SNSEND
 
 EXTERN_C BOOL Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory)
 {

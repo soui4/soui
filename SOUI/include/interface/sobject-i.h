@@ -2,7 +2,7 @@
  * Copyright (C) 2014-2050
  * All rights reserved.
  *
- * @file       Sobject.h
+ * @file       sobject-i.h
  * @brief
  * @version    v1.0
  * @author     SOUI group

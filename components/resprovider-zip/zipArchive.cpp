@@ -22,7 +22,6 @@
 
 //#include <crtdbg.h>
 #include <tchar.h>
-#include <malloc.h>
 
 #define _ASSERTE assert
 

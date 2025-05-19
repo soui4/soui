@@ -3,15 +3,16 @@
  * All rights reserved.
  *
  * @file       SScrollBar.h
- * @brief
+ * @brief      Scrollbar control
  * @version    v1.0
  * @author     soui
  * @date       2014-07-08
  *
- * Describe
+ * Describe    Scrollbar control implementation
  */
 #ifndef __SSCROLLBAR__H__
 #define __SSCROLLBAR__H__
+
 #include <core/SWnd.h>
 #include <core/SScrollBarHandler.h>
 
@@ -19,69 +20,76 @@ SNSBEGIN
 
 /**
  * @class     SScrollBar
- * @brief     滚动条
+ * @brief     Scrollbar control
  *
- * Describe   滚动条
+ * Describe    This class implements a scrollbar control.
  */
 class SOUI_EXP SScrollBar
     : public SWindow
     , protected IScrollBarHost {
     DEF_SOBJECT(SWindow, L"scrollbar")
+
   public:
     /**
      * SScrollBar::SScrollBar
-     * @brief    构造函数
+     * @brief    Constructor
      *
-     * Describe  构造函数
+     * Describe  Initializes the scrollbar control.
      */
     SScrollBar();
+
     /**
      * SScrollBar::~SScrollBar
-     * @brief    析构函数
+     * @brief    Destructor
      *
-     * Describe  析构函数
+     * Describe  Cleans up the scrollbar control.
      */
     virtual ~SScrollBar();
 
   public:
     /**
      * SScrollBar::IsVertical
-     * @brief    是否是竖直
-     * @return   返回BOOL
+     * @brief    Checks if the scrollbar is vertical
+     * @return   Returns TRUE if the scrollbar is vertical, FALSE otherwise
      *
-     * Describe  是否是竖直
+     * Describe  Determines the orientation of the scrollbar.
      */
     BOOL IsVertical() const;
 
     /**
      * SScrollBar::SetPos
-     * @brief    设置位置
+     * @brief    Sets the position of the scrollbar
+     * @param    int nPos -- New position of the scrollbar
+     * @return   Returns the new position of the scrollbar
      *
-     * Describe  设置位置
+     * Describe  Updates the position of the scrollbar thumb.
      */
     int SetPos(int nPos);
 
     /**
      * SScrollBar::GetPos
-     * @brief    获取位置
+     * @brief    Gets the current position of the scrollbar
+     * @return   Returns the current position of the scrollbar
      *
-     * Describe  获取位置
+     * Describe  Retrieves the current position of the scrollbar thumb.
      */
     int GetPos();
 
     /**
      * SScrollBar::GetMax
-     * @brief    获取最大值
+     * @brief    Gets the maximum position of the scrollbar
+     * @return   Returns the maximum position of the scrollbar
      *
-     * Describe  获取最大值
+     * Describe  Retrieves the maximum position of the scrollbar thumb.
      */
     int GetMax();
 
     /**
-     * SScrollBar::GetMax
-     * @brief    获取最小值
+     * SScrollBar::GetMin
+     * @brief    Gets the minimum position of the scrollbar
+     * @return   Returns the minimum position of the scrollbar
      *
-     * Describe  获取最小值
+     * Describe  Retrieves the minimum position of the scrollbar thumb.
      */
     int GetMin();
 
@@ -104,20 +112,20 @@ class SOUI_EXP SScrollBar
   protected:
     /**
      * SScrollBar::OnInitFinished
-     * @brief    初始化
-     * @param    SXmlNode xmlNode  -- 初始化
+     * @brief    Initialization after creation
+     * @param    IXmlNode *pNode -- XML node containing initialization data
      *
-     * Describe  初始化
+     * Describe  Performs additional initialization after the control is created.
      */
     virtual void WINAPI OnInitFinished(IXmlNode *pNode);
 
     /**
      * SScrollBar::NotifySbCode
-     * @brief    通知
-     * @param    UINT uCode  -- 消息码
-     * @param    int nPos  -- 坐标
+     * @brief    Notifies the parent window of scrollbar events
+     * @param    int nCode -- Scrollbar notification code
+     * @param    int nPos -- Current position of the scrollbar
      *
-     * Describe  自定义消息响应函数
+     * Describe  Sends notifications to the parent window about scrollbar events.
      */
     void NotifySbCode(int nCode, int nPos);
 
@@ -125,108 +133,116 @@ class SOUI_EXP SScrollBar
     HRESULT OnAttrVertical(const SStringW &value, BOOL bLoading);
 
     SOUI_ATTRS_BEGIN()
-        ATTR_SKIN(L"skin", m_pSkin, TRUE)
-        ATTR_UINT(L"arrowSize", m_uAllowSize, TRUE)
-        ATTR_INT(L"min", m_si.nMin, TRUE)
-        ATTR_INT(L"max", m_si.nMax, TRUE)
-        ATTR_INT(L"value", m_si.nPos, TRUE)
-        ATTR_INT(L"page", m_si.nPage, TRUE)
-        ATTR_CUSTOM(L"vertical", OnAttrVertical)
-        ATTR_INT(L"fadeFrames", m_fadeFrames, FALSE)
-        ATTR_INT(L"thumbTrackMinAlpha", m_byThumbTrackMinAlpha, FALSE)
-        ATTR_INTERPOLATOR(L"fadeInterpolator", m_fadeInterpolator, FALSE)
-        ATTR_CHAIN_PTR(m_fadeInterpolator, 0)
+        ATTR_SKIN(L"skin", m_pSkin, TRUE)                                 /**< Skin object */
+        ATTR_UINT(L"arrowSize", m_uAllowSize, TRUE)                       /**< Arrow size */
+        ATTR_INT(L"min", m_si.nMin, TRUE)                                 /**< Minimum position */
+        ATTR_INT(L"max", m_si.nMax, TRUE)                                 /**< Maximum position */
+        ATTR_INT(L"value", m_si.nPos, TRUE)                               /**< Current position */
+        ATTR_INT(L"page", m_si.nPage, TRUE)                               /**< Page size */
+        ATTR_CUSTOM(L"vertical", OnAttrVertical)                          /**< Vertical orientation */
+        ATTR_INT(L"fadeFrames", m_fadeFrames, FALSE)                      /**< Fade frames */
+        ATTR_INT(L"thumbTrackMinAlpha", m_byThumbTrackMinAlpha, FALSE)    /**< Minimum alpha for thumb tracking */
+        ATTR_INTERPOLATOR(L"fadeInterpolator", m_fadeInterpolator, FALSE) /**< Fade interpolator */
+        ATTR_CHAIN_PTR(m_fadeInterpolator, 0)                             /**< Chain pointer for fade interpolator */
     SOUI_ATTRS_END()
 
   protected:
     /**
      * SScrollBar::OnPaint
-     * @brief    绘制
-     * @param    IRenderTarget * pRT  -- 绘画设备
+     * @brief    Paints the scrollbar
+     * @param    IRenderTarget *pRT -- Rendering target
      *
-     * Describe  绘制
+     * Describe  Handles the painting of the scrollbar.
      */
     void OnPaint(IRenderTarget *pRT);
 
     /**
      * SScrollBar::OnLButtonUp
-     * @brief    左键抬起
-     * @param    UINT nFlags --  虚拟键标志
-     * @param    CPoint point -- 坐标
+     * @brief    Handles left button up event
+     * @param    UINT nFlags -- Virtual key flags
+     * @param    CPoint point -- Mouse position
      *
-     * Describe  消息响应函数
+     * Describe  Handles the left mouse button up event.
      */
     void OnLButtonUp(UINT nFlags, CPoint point);
 
     /**
      * SScrollBar::OnLButtonDown
-     * @brief    左键按下
-     * @param    UINT nFlags --  虚拟键标志
-     * @param    CPoint point -- 坐标
+     * @brief    Handles left button down event
+     * @param    UINT nFlags -- Virtual key flags
+     * @param    CPoint point -- Mouse position
      *
-     * Describe  消息响应函数
+     * Describe  Handles the left mouse button down event.
      */
     void OnLButtonDown(UINT nFlags, CPoint point);
 
     /**
      * SScrollBar::OnMouseMove
-     * @brief    鼠标移动
-     * @param    UINT nFlags --  虚拟键标志
-     * @param    CPoint point -- 坐标
+     * @brief    Handles mouse move event
+     * @param    UINT nFlags -- Virtual key flags
+     * @param    CPoint point -- Mouse position
      *
-     * Describe  消息响应函数
+     * Describe  Handles the mouse move event.
      */
     void OnMouseMove(UINT nFlags, CPoint point);
 
     /**
      * SScrollBar::OnTimer
-     * @brief    定时器
-     * @param    char nIDEvent  -- 定时器ID
+     * @brief    Handles timer event
+     * @param    char nIDEvent -- Timer ID
      *
-     * Describe  定时器ID
+     * Describe  Handles the timer event.
      */
     void OnTimer(char nIDEvent);
 
     /**
      * SScrollBar::OnMouseHover
-     * @param    UINT nFlags --  虚拟键标志
-     * @param    CPoint point -- 坐标
-     * @brief    鼠标进入事件
+     * @brief    Handles mouse hover event
+     * @param    UINT nFlags -- Virtual key flags
+     * @param    CPoint ptPos -- Mouse position
      *
-     * Describe  消息响应函数
+     * Describe  Handles the mouse hover event.
      */
     void OnMouseHover(UINT nFlags, CPoint ptPos);
 
     /**
      * SScrollBar::OnMouseLeave
-     * @brief    鼠标移动事件
+     * @brief    Handles mouse leave event
      *
-     * Describe  消息响应函数
+     * Describe  Handles the mouse leave event.
      */
     void OnMouseLeave();
 
     /**
      * SScrollBar::OnSetScrollInfo
-     * @brief    设置滚动条信息
-     * @param    UINT uMsg  -- 消息码
-     * @param    WPARAM wParam
-     * @param    LPARAM lParam
+     * @brief    Handles setting scroll information
+     * @param    UINT uMsg -- Message code
+     * @param    WPARAM wParam -- Additional message-specific information
+     * @param    LPARAM lParam -- Additional message-specific information
+     * @return   Returns the result of the message processing
      *
-     * Describe  消息响应函数
+     * Describe  Handles the setting of scroll information.
      */
     LRESULT OnSetScrollInfo(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
     /**
      * SScrollBar::OnGetScrollInfo
-     * @brief    获取滚动条信息
-     * @param    UINT uMsg  -- 消息码
-     * @param    WPARAM wParam
-     * @param    LPARAM lParam
+     * @brief    Handles getting scroll information
+     * @param    UINT uMsg -- Message code
+     * @param    WPARAM wParam -- Additional message-specific information
+     * @param    LPARAM lParam -- Additional message-specific information
+     * @return   Returns the result of the message processing
      *
-     * Describe  自定义消息响应函数
+     * Describe  Handles the retrieval of scroll information.
      */
     LRESULT OnGetScrollInfo(UINT uMsg, WPARAM wParam, LPARAM lParam);
 
+    /**
+     * SScrollBar::OnDestroy
+     * @brief    Handles destruction of the control
+     *
+     * Describe  Cleans up resources when the control is destroyed.
+     */
     void OnDestroy();
 
     SOUI_MSG_MAP_BEGIN()
@@ -244,15 +260,15 @@ class SOUI_EXP SScrollBar
     SOUI_MSG_MAP_END()
 
   protected:
-    SAutoRefPtr<ISkinObj> m_pSkin; /**< 皮肤对象 */
-    UINT m_uAllowSize;             /**< 大小 */
+    SAutoRefPtr<ISkinObj> m_pSkin; /**< Skin object */
+    UINT m_uAllowSize;             /**< Arrow size */
 
-    SCROLLINFO m_si; /**< 结构体 */
+    SCROLLINFO m_si; /**< Scroll information structure */
 
-    int m_fadeFrames;
-    mutable SAutoRefPtr<IInterpolator> m_fadeInterpolator;
-    BYTE m_byThumbTrackMinAlpha;
-    SScrollBarHandler m_sbHandler;
+    int m_fadeFrames;                                      /**< Number of fade frames */
+    mutable SAutoRefPtr<IInterpolator> m_fadeInterpolator; /**< Fade interpolator */
+    BYTE m_byThumbTrackMinAlpha;                           /**< Minimum alpha for thumb tracking */
+    SScrollBarHandler m_sbHandler;                         /**< Scrollbar handler */
 };
 
 SNSEND
