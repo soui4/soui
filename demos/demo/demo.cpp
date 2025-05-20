@@ -287,22 +287,20 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 			FreeLibrary(hSysResource);
 #endif
 		}
+#else
+		static const TCHAR* kPath_SysRes = _T("/../../soui-sys-resource");
+		static const TCHAR* kPath_DemoRes = _T("/uires");
+        SStringT srcDir = getSourceDir();
+        SAutoRefPtr<IResProvider> sysResProvider;
+		sysResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
+		SStringT sysRes = srcDir + kPath_SysRes;
+		sysResProvider->Init((WPARAM)sysRes.c_str(), 0);
+		theApp->LoadSystemNamedResource(sysResProvider);
+#endif
 		//定义一人个资源提供对象,SOUI系统中实现了3种资源加载方式，分别是从文件加载，从EXE的资源加载及从ZIP压缩包加载
 		SAutoRefPtr<IResProvider>   pResProvider;
-#if (RES_TYPE == RESTYPE_FILE)//从文件加载
-		pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
-		if (!pResProvider->Init((LPARAM)_T("uires"), 0))
-		{
-			pResProvider.Attach(souiFac.CreateResProvider(RES_PE));
-			if (!pResProvider->Init((WPARAM)hInstance, 0))
-			{
-				SASSERT(0);
-				delete theApp;
-				nRet = 1;
-				goto exit;
-			}
-		}
-#elif (RES_TYPE==RESTYPE_PE)//从EXE资源加载
+
+#if (RES_TYPE==RESTYPE_PE)//从EXE资源加载
 		pResProvider.Attach(souiFac.CreateResProvider(RES_PE));
 		pResProvider->Init((WPARAM)hInstance, 0);
 #elif (RES_TYPE==RESTYPE_ZIP)//从ZIP包加载
@@ -321,21 +319,21 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		Zip7File(&param,pRenderFactory, _T("uires.zip"), "souizip");
 		bLoaded = pResProvider->Init((WPARAM)&param, 0);
 		SASSERT(bLoaded);
+#else //#if (RES_TYPE == RESTYPE_FILE)//从文件加载
+		pResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
+		if (!pResProvider->Init((LPARAM)_T("uires"), 0))
+		{
+			pResProvider.Attach(souiFac.CreateResProvider(RES_PE));
+			if (!pResProvider->Init((WPARAM)hInstance, 0))
+			{
+				SASSERT(0);
+				delete theApp;
+				nRet = 1;
+				goto exit;
+			}
+		}
 #endif//RES_TYPE
-#else//_WIN32
-		static const TCHAR* kPath_SysRes = _T("/../../soui-sys-resource");
-		static const TCHAR* kPath_DemoRes = _T("/uires");
-        SStringT srcDir = getSourceDir();
-        SAutoRefPtr<IResProvider> sysResProvider;
-		sysResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
-		SStringT sysRes = srcDir + kPath_SysRes;
-		sysResProvider->Init((WPARAM)sysRes.c_str(), 0);
-		theApp->LoadSystemNamedResource(sysResProvider);
-		SAutoRefPtr<IResProvider> pResProvider(souiFac.CreateResProvider(RES_FILE));
-		SStringT appRes = srcDir + kPath_DemoRes;
-		bLoaded = pResProvider->Init((LPARAM)appRes.c_str(), 0);
-		SASSERT(bLoaded);
-#endif//_WIN32
+
 		pRenderFactory = NULL;
 		//将创建的IResProvider交给SApplication对象
 		theApp->AddResProvider(pResProvider);

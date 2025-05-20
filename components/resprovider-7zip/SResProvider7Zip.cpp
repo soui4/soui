@@ -23,7 +23,7 @@ HBITMAP SResProvider7Zip::LoadBitmap(LPCTSTR pszResName )
 	CZipFile zf;
 	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
 
-	HDC hDC = GetDC(NULL);
+	HDC hDC = GetDC(0);
 	//读取位图头
 	BITMAPFILEHEADER *pBmpFileHeader=(BITMAPFILEHEADER *)zf.GetData(); 
 	//检测位图头
@@ -39,7 +39,7 @@ HBITMAP SResProvider7Zip::LoadBitmap(LPCTSTR pszResName )
 	LPBITMAPINFO lpBitmap=(LPBITMAPINFO)(pBmpFileHeader+1); 
 	LPVOID lpBits=(LPBYTE)zf.GetData()+pBmpFileHeader->bfOffBits;
 	HBITMAP hBitmap= CreateDIBitmap(hDC,&lpBitmap->bmiHeader,CBM_INIT,lpBits,lpBitmap,DIB_RGB_COLORS);
-	ReleaseDC(NULL,hDC);
+	ReleaseDC(0,hDC);
 
 	return hBitmap;
 }
@@ -109,9 +109,12 @@ BOOL SResProvider7Zip::_Init( LPCTSTR pszZipFile ,LPCSTR pszPsw)
 
 BOOL SResProvider7Zip::_Init( HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType  ,LPCSTR pszPsw)
 {
+#ifdef _WIN32
 	if(!m_zipFile.Open(hInst,pszResName,pszPsw,pszType)) return FALSE;
 	_InitFileMap();
 	return TRUE;
+#endif // _WIN32
+	return FALSE;
 }
 
 BOOL SResProvider7Zip::Init( WPARAM wParam,LPARAM lParam )

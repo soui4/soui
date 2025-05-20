@@ -1,19 +1,13 @@
 PROG = 7zFM.exe
 CFLAGS = $(CFLAGS) \
-  -DLANG \
-  -DNEW_FOLDER_INTERFACE \
-  -DEXTERNAL_CODECS \
+  -DZ7_EXTERNAL_CODECS \
 
-!IFDEF UNDER_CE
-LIBS = $(LIBS) ceshell.lib Commctrl.lib
-!ELSE
-LIBS = $(LIBS) comctl32.lib htmlhelp.lib comdlg32.lib Mpr.lib Gdi32.lib
-CFLAGS = $(CFLAGS) -DWIN_LONG_PATH -DSUPPORT_DEVICE_FILE
-!ENDIF
+# -DZ7_NO_LARGE_PAGES
 
 !include "FM.mak"
 
 COMMON_OBJS = \
+  $O\DynLimBuf.obj \
   $O\IntToString.obj \
   $O\Lang.obj \
   $O\MyString.obj \
@@ -93,6 +87,7 @@ UI_COMMON_OBJS = \
 
 EXPLORER_OBJS = \
   $O\ContextMenu.obj \
+  $O\MyMessages.obj \
   $O\RegistryContextMenu.obj \
 
 GUI_OBJS = \
@@ -102,8 +97,13 @@ GUI_OBJS = \
 COMPRESS_OBJS = \
   $O\CopyCoder.obj \
 
-C_OBJS = \
+AR_COMMON_OBJS = \
+  $O\ItemNameUtils.obj \
+
+
+C_OBJS = $(C_OBJS) \
   $O\Alloc.obj \
+  $O\CpuArch.obj \
   $O\Sort.obj \
   $O\Threads.obj \
 

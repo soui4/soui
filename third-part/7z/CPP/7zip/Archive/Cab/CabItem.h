@@ -1,7 +1,7 @@
 // Archive/CabItem.h
 
-#ifndef __ARCHIVE_CAB_ITEM_H
-#define __ARCHIVE_CAB_ITEM_H
+#ifndef ZIP7_INC_ARCHIVE_CAB_ITEM_H
+#define ZIP7_INC_ARCHIVE_CAB_ITEM_H
 
 #include "../../../Common/MyString.h"
 
@@ -56,8 +56,8 @@ struct CItem
     if (ContinuedFromPrev())
       return 0;
     if (ContinuedToNext())
-      return numFolders - 1;
-    return FolderIndex;
+      return (int)numFolders - 1;
+    return (int)FolderIndex;
   }
 };
 

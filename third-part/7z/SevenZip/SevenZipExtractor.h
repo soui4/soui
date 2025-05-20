@@ -20,7 +20,7 @@ namespace SevenZip
         OverwriteModeEnum GetOverwriteMode();
     private:
 
-		HRESULT ExtractArchive(const CMyComPtr< IStream >& archiveStream, const TString& directory, ProgressCallback* callback, SevenZipPassword *pSevenZipPassword);
+		HRESULT ExtractArchive(FILE* archiveStream, const TString& directory, ProgressCallback* callback, SevenZipPassword *pSevenZipPassword);
 
         OverwriteModeEnum m_overwriteMode;
         TString m_message;

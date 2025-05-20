@@ -65,7 +65,7 @@
 #include "../CPP/7zip/Compress/Lzma2Register.cpp"
 #include "../CPP/7zip/Compress/LzmaRegister.cpp"
  
-#include "../CPP/7zip/Compress/bcj2Register.cpp"
+#include "../CPP/7zip/Compress/Bcj2Register.cpp"
 #include "../CPP/7zip/Compress/BcjRegister.cpp"
 
 // #include "../CPP/7zip/Compress/BranchRegister.cpp"
@@ -170,14 +170,14 @@ namespace SevenZip
 //          RegisterArc(&NArchive::NChm::NChm::g_ArcInfo);
 //          RegisterArc(&NArchive::NNsis::g_ArcInfo);
             
-			RegisterCodec(&NCompress::g_CodecInfo);
-			RegisterCodec(&NCompress::g_CodecInfo);
-			RegisterCodec(&NCompress::NLzma2::g_CodecInfo);
-			RegisterCodec(&NCompress::NLzma::g_CodecInfo); 
+			RegisterCodec(NCompress::g_CodecsInfo);
+			RegisterCodec(&NCompress::g_CodecInfo_Copy);
+			RegisterCodec(&NCompress::NLzma2::g_CodecInfo_LZMA2);
+			RegisterCodec(&NCompress::NLzma::g_CodecInfo_LZMA); 
 			
 //          RegisterCodec(&NCompress::NPpmd::g_CodecInfo);
 //          RegisterCodec(&NCompress::NBZip2::g_CodecInfo);
-			RegisterCodec(&NCompress::NDeflate::g_CodecInfo);
+//			RegisterCodec(&NCompress::NDeflate::g_CodecInfo);
 
 			RegisterCodec(&NCompress::NByteSwap::g_CodecsInfo[0]);
 			RegisterCodec(&NCompress::NByteSwap::g_CodecsInfo[1]);
@@ -193,8 +193,8 @@ namespace SevenZip
 //          RegisterCodec(&NCompress::g_CodecsInfo[2]);
 //          RegisterCodec(&NCompress::g_CodecsInfo[3]);
 
-			RegisterCodec(&NCrypto::N7z::g_CodecInfo);
-			RegisterCodec(&NCrypto::g_CodecInfo);
+			RegisterCodec(&NCrypto::N7z::g_CodecInfo_SzAES);
+			RegisterCodec(&NCrypto::g_CodecInfo_AES256CBC);
 
             inited = true;
             CrcGenerateTable();
@@ -223,13 +223,14 @@ namespace SevenZip
     bool UsefulFunctions::GetNumberOfItems(const TString & archivePath,
         CompressionFormatEnum &format, size_t & numberofitems)
     {
-        CMyComPtr< IStream > fileStream = FileSys::OpenFileToRead(archivePath);
-
-        if (fileStream == NULL)
-        {
-            return false;
-            //throw SevenZipException( StrFmt( _T( "Could not open archive \"%s\"" ), m_archivePath.c_str() ) );
-        }
+#if defined(_WIN32) && defined(_UNICODE)
+		FILE* fileStream = _wfopen(archivePath.c_str(), L"rb");
+#else
+		FILE* fileStream = fopen(archivePath.c_str(), "rb");
+#endif
+		if (fileStream == NULL) {
+			return HRESULT_FROM_WIN32(GetLastError());
+		}
 
         CMyComPtr< IInArchive > archive = UsefulFunctions::GetArchiveReader(format);
         CMyComPtr< InStreamWrapper > inFile = new InStreamWrapper(fileStream);
@@ -259,13 +260,14 @@ namespace SevenZip
         CompressionFormatEnum &format, size_t & numberofitems,
         std::vector<TString> & itemnames, std::vector<size_t> & origsizes)
     {
-        CMyComPtr< IStream > fileStream = FileSys::OpenFileToRead(archivePath);
-
-        if (fileStream == NULL)
-        {
-            return false;
-            //throw SevenZipException( StrFmt( _T( "Could not open archive \"%s\"" ), m_archivePath.c_str() ) );
-        }
+#if defined(_WIN32) && defined(_UNICODE)
+		FILE* fileStream = _wfopen(archivePath.c_str(), L"rb");
+#else
+		FILE* fileStream = fopen(archivePath.c_str(), "rb");
+#endif
+		if (fileStream == NULL) {
+			return HRESULT_FROM_WIN32(GetLastError());
+		}
 
         CMyComPtr< IInArchive > archive = UsefulFunctions::GetArchiveReader(format);
         CMyComPtr< InStreamWrapper > inFile = new InStreamWrapper(fileStream);
@@ -320,7 +322,12 @@ namespace SevenZip
                 if (prop.vt == VT_BSTR) {
                     WCHAR* path = prop.bstrVal;
                     std::wstring mypath(path);
+                    #ifdef _UNICODE
                     itemnames[i] = mypath;
+                    #else
+                    itemnames[i] = ToString(mypath);
+                    #endif
+                    
                 }
             }
         }
@@ -332,14 +339,11 @@ namespace SevenZip
     bool UsefulFunctions::DetectCompressionFormat(const TString & archivePath,
         CompressionFormatEnum & archiveCompressionFormat)
     {
-        CMyComPtr< IStream > fileStream = FileSys::OpenFileToRead(archivePath);
-
-        if (fileStream == NULL)
-        {
-            return false;
-            //throw SevenZipException( StrFmt( _T( "Could not open archive \"%s\"" ), m_archivePath.c_str() ) );
-        }
-
+#if defined(_UNICODE)
+		FILE* fileStream = _wfopen(archivePath.c_str(), L"rb");
+#else
+		FILE* fileStream = fopen(archivePath.c_str(), "rb");
+#endif
         std::vector<CompressionFormatEnum> myAvailableFormats;
         myAvailableFormats.reserve(12);
 
@@ -372,6 +376,8 @@ namespace SevenZip
             archiveCompressionFormat = myAvailableFormats[i];
 
             CMyComPtr< IInArchive > archive = UsefulFunctions::GetArchiveReader(archiveCompressionFormat);
+
+			if (!archive) continue;
 
 			CMyComPtr< InStreamWrapper > inFile = new InStreamWrapper(fileStream);
 			inFile->Seek(0, STREAM_SEEK_SET, NULL);
@@ -413,37 +419,28 @@ namespace SevenZip
         switch (format)
         {
         case CompressionFormat::Zip:
-            return L".zip";
-            break;
+            return _T(".zip");
 		case CompressionFormat::SevenZip:
-			return L".7z";
-			break;
+			return _T(".7z");
 //         case CompressionFormat::Rar:
 //             return L".rar";
-//             break;
 //         case CompressionFormat::GZip:
 //             return L".gz";
-//             break;
 //         case CompressionFormat::BZip2:
 //             return L".bz";
-//             break;
 //         case CompressionFormat::Tar:
 //             return L".tar";
-//             break;
         case CompressionFormat::Lzma:
-            return L".lzma";
-            break;
+            return _T(".lzma");
         case CompressionFormat::Lzma86:
-            return L".lzma86";
-            break;
+            return _T(".lzma86");
         case CompressionFormat::Cab:
-            return L".cab";
-            break;
+            return _T(".cab");
 //         case CompressionFormat::Iso:
 //             return L".iso";
             break;
         }
-        return L".7z";
+        return _T(".7z");
     }
 
 }

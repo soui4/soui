@@ -1,15 +1,16 @@
 // MyXml.cpp
 
-
+#include "StdAfx.h"
 
 #include "MyXml.h"
+#include "StringToInt.h"
 
 static bool IsValidChar(char c)
 {
   return
-    c >= 'a' && c <= 'z' ||
-    c >= 'A' && c <= 'Z' ||
-    c >= '0' && c <= '9' ||
+    (c >= 'a' && c <= 'z') ||
+    (c >= 'A' && c <= 'Z') ||
+    (c >= '0' && c <= '9') ||
     c == '-';
 }
 
@@ -20,33 +21,44 @@ static bool IsSpaceChar(char c)
 
 #define SKIP_SPACES(s) while (IsSpaceChar(*s)) s++;
 
-int CXmlItem::FindProp(const AString &propName) const throw()
+int CXmlItem::FindProp(const char *propName) const throw()
 {
   FOR_VECTOR (i, Props)
     if (Props[i].Name == propName)
-      return i;
+      return (int)i;
   return -1;
 }
 
-AString CXmlItem::GetPropVal(const AString &propName) const
+AString CXmlItem::GetPropVal(const char *propName) const
 {
-  int index = FindProp(propName);
+  const int index = FindProp(propName);
   if (index >= 0)
-    return Props[index].Value;
+    return Props[(unsigned)index].Value;
   return AString();
 }
 
-bool CXmlItem::IsTagged(const AString &tag) const throw()
+bool CXmlItem::IsTagged(const char *tag) const throw()
 {
   return (IsTag && Name == tag);
 }
 
-int CXmlItem::FindSubTag(const AString &tag) const throw()
+int CXmlItem::FindSubTag(const char *tag) const throw()
 {
   FOR_VECTOR (i, SubItems)
     if (SubItems[i].IsTagged(tag))
-      return i;
+      return (int)i;
   return -1;
+}
+
+const CXmlItem *CXmlItem::FindSubTag_GetPtr(const char *tag) const throw()
+{
+  FOR_VECTOR (i, SubItems)
+  {
+    const CXmlItem *p = &SubItems[i];
+    if (p->IsTagged(tag))
+      return p;
+  }
+  return NULL;
 }
 
 AString CXmlItem::GetSubString() const
@@ -71,17 +83,17 @@ const AString * CXmlItem::GetSubStringPtr() const throw()
   return NULL;
 }
 
-AString CXmlItem::GetSubStringForTag(const AString &tag) const
+AString CXmlItem::GetSubStringForTag(const char *tag) const
 {
-  int index = FindSubTag(tag);
-  if (index >= 0)
-    return SubItems[index].GetSubString();
+  const CXmlItem *item = FindSubTag_GetPtr(tag);
+  if (item)
+    return item->GetSubString();
   return AString();
 }
 
 const char * CXmlItem::ParseItem(const char *s, int numAllowedLevels)
 {
-  SKIP_SPACES(s);
+  SKIP_SPACES(s)
 
   const char *beg = s;
   for (;;)
@@ -92,17 +104,20 @@ const char * CXmlItem::ParseItem(const char *s, int numAllowedLevels)
   }
   if (*s == 0)
     return NULL;
-  if (s != beg)
   {
-    IsTag = false;
-    Name.SetFrom(beg, (unsigned)(s - beg));
-    return s;
+    const size_t num = (size_t)(s - beg);
+    if (num)
+    {
+      IsTag = false;
+      Name.SetFrom_Chars_SizeT(beg, num);
+      return s;
+    }
   }
   
   IsTag = true;
 
   s++;
-  SKIP_SPACES(s);
+  SKIP_SPACES(s)
 
   beg = s;
   for (;; s++)
@@ -110,16 +125,16 @@ const char * CXmlItem::ParseItem(const char *s, int numAllowedLevels)
       break;
   if (s == beg || *s == 0)
     return NULL;
-  Name.SetFrom(beg, (unsigned)(s - beg));
+  Name.SetFrom_Chars_SizeT(beg, (size_t)(s - beg));
 
   for (;;)
   {
     beg = s;
-    SKIP_SPACES(s);
+    SKIP_SPACES(s)
     if (*s == '/')
     {
       s++;
-      // SKIP_SPACES(s);
+      // SKIP_SPACES(s)
       if (*s != '>')
         return NULL;
       return s + 1;
@@ -132,7 +147,7 @@ const char * CXmlItem::ParseItem(const char *s, int numAllowedLevels)
       SubItems.Clear();
       for (;;)
       {
-        SKIP_SPACES(s);
+        SKIP_SPACES(s)
         if (s[0] == '<' && s[1] == '/')
           break;
         CXmlItem &item = SubItems.AddNew();
@@ -142,11 +157,12 @@ const char * CXmlItem::ParseItem(const char *s, int numAllowedLevels)
       }
 
       s += 2;
-      unsigned len = Name.Len();
+      const unsigned len = Name.Len();
+      const char *name = Name.Ptr();
       for (unsigned i = 0; i < len; i++)
-        if (s[i] != Name[i])
+        if (*s++ != *name++)
           return NULL;
-      s += len;
+      // s += len;
       if (s[0] != '>')
         return NULL;
       return s + 1;
@@ -166,13 +182,13 @@ const char * CXmlItem::ParseItem(const char *s, int numAllowedLevels)
     }
     if (s == beg)
       return NULL;
-    prop.Name.SetFrom(beg, (unsigned)(s - beg));
+    prop.Name.SetFrom_Chars_SizeT(beg, (size_t)(s - beg));
     
-    SKIP_SPACES(s);
+    SKIP_SPACES(s)
     if (*s != '=')
       return NULL;
     s++;
-    SKIP_SPACES(s);
+    SKIP_SPACES(s)
     if (*s != '\"')
       return NULL;
     s++;
@@ -187,14 +203,14 @@ const char * CXmlItem::ParseItem(const char *s, int numAllowedLevels)
         break;
       s++;
     }
-    prop.Value.SetFrom(beg, (unsigned)(s - beg));
+    prop.Value.SetFrom_Chars_SizeT(beg, (size_t)(s - beg));
     s++;
   }
 }
 
 static const char * SkipHeader(const char *s, const char *startString, const char *endString)
 {
-  SKIP_SPACES(s);
+  SKIP_SPACES(s)
   if (IsString1PrefixedByString2(s, startString))
   {
     s = strstr(s, endString);
@@ -215,7 +231,7 @@ void CXmlItem::AppendTo(AString &s) const
     FOR_VECTOR (i, Props)
     {
       const CXmlProp &prop = Props[i];
-      s += ' ';
+      s.Add_Space();
       s += prop.Name;
       s += '=';
       s += '\"';
@@ -228,7 +244,7 @@ void CXmlItem::AppendTo(AString &s) const
   {
     const CXmlItem &item = SubItems[i];
     if (i != 0 && !SubItems[i - 1].IsTag)
-      s += ' ';
+      s.Add_Space();
     item.AppendTo(s);
   }
   if (IsTag)
@@ -248,7 +264,7 @@ bool CXml::Parse(const char *s)
   s = Root.ParseItem(s, 1000);
   if (!s || !Root.IsTag)
     return false;
-  SKIP_SPACES(s);
+  SKIP_SPACES(s)
   return *s == 0;
 }
 
@@ -258,3 +274,76 @@ void CXml::AppendTo(AString &s) const
   Root.AppendTo(s);
 }
 */
+
+
+void z7_xml_DecodeString(AString &temp)
+{
+  char * const beg = temp.GetBuf();
+  char *dest = beg;
+  const char *p = beg;
+  for (;;)
+  {
+    char c = *p++;
+    if (c == 0)
+      break;
+    if (c == '&')
+    {
+      if (p[0] == '#')
+      {
+        const char *end;
+        const UInt32 number = ConvertStringToUInt32(p + 1, &end);
+        if (*end == ';' && number != 0 && number <= 127)
+        {
+          p = end + 1;
+          c = (char)number;
+        }
+      }
+      else if (
+          p[0] == 'a' &&
+          p[1] == 'm' &&
+          p[2] == 'p' &&
+          p[3] == ';')
+      {
+        p += 4;
+      }
+      else if (
+          p[0] == 'l' &&
+          p[1] == 't' &&
+          p[2] == ';')
+      {
+        p += 3;
+        c = '<';
+      }
+      else if (
+          p[0] == 'g' &&
+          p[1] == 't' &&
+          p[2] == ';')
+      {
+        p += 3;
+        c = '>';
+      }
+      else if (
+          p[0] == 'a' &&
+          p[1] == 'p' &&
+          p[2] == 'o' &&
+          p[3] == 's' &&
+          p[4] == ';')
+      {
+        p += 5;
+        c = '\'';
+      }
+      else if (
+          p[0] == 'q' &&
+          p[1] == 'u' &&
+          p[2] == 'o' &&
+          p[3] == 't' &&
+          p[4] == ';')
+      {
+        p += 5;
+        c = '\"';
+      }
+    }
+    *dest++ = c;
+  }
+  temp.ReleaseBuf_SetEnd((unsigned)(dest - beg));
+}

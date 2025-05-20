@@ -1,20 +1,27 @@
 ﻿#include "Zip7Archive.h"
 #include <assert.h>
-#include <string/sstringa.h>
-#include <string/sstringw.h>
-#include <string/strcpcvt.h>
+#include <memory>
+
+#ifdef _WIN32
+#include <crtdbg.h>
+#include <tchar.h>
+#include <Windows.h>
+#include <shlwapi.h>
+#pragma comment(lib, "shlwapi.lib")
+#else
+#include "SevenZip/../CPP/Common/MyCom.h"
+#define _ASSERTE assert
+#endif // _WIN32
 
 #include "SevenZip/SevenZipExtractor.h"
 #include "SevenZip/SevenZipExtractorMemory.h"
 #include "SevenZip/SevenZipLister.h" 
+#include "SevenZip/SevenString.h" 
 
-#include <shlwapi.h>
-#pragma comment(lib, "shlwapi.lib")
-#include <crtdbg.h>
-#include <tchar.h>
+
 #include <malloc.h>
 
-using namespace SNS;
+//using namespace SNS;
 
 namespace SevenZip{
 
@@ -106,7 +113,7 @@ namespace SevenZip{
 	BOOL CZipFile::Attach(LPBYTE pData, DWORD dwSize)
 	{
 		_ASSERTE(pData);
-		_ASSERTE(!::IsBadReadPtr(pData,dwSize));
+		//_ASSERTE(!::IsBadReadPtr(pData,dwSize));
 
 		m_blob.SetBlobContent(pData, dwSize);
 		return TRUE;
@@ -138,11 +145,23 @@ namespace SevenZip{
 		return TRUE;
 	} 
 
+	static std::string toUtf8String(LPCTSTR pszFileName){
+#ifdef _UNICODE
+		return ToString(pszFileName,CP_UTF8);
+#else
+#ifdef _WIN32
+		std::wstring str = ToWstring(pszFileName);
+		return ToString(str,CP_UTF8);
+#else
+		return pszFileName;
+#endif//_WIN32
+#endif // _UNICODE
+	}
 	// ZIP File API
 
 	BOOL CZipArchive::GetFile(LPCTSTR pszFileName, CZipFile& file)
 	{
-		SStringA fileName = S_CT2A(pszFileName);
+		std::string fileName = toUtf8String(pszFileName);
 		if (m_fileStreams.GetFile(fileName.c_str(),file.getBlob()))
 			return TRUE;
 
@@ -151,16 +170,19 @@ namespace SevenZip{
 	 
 	BOOL CZipArchive::Open(LPCTSTR pszFileName,LPCSTR pszPassword)
 	{
-		SStringW strPsw = S_CA2W(pszPassword,CP_UTF8);
-		TString s_pwd = strPsw.c_str();
-		SevenZip::SevenZipPassword pwd(true, s_pwd);
+#ifdef _UNICODE
+		TString strPwd = ToWstring(pszPassword);
+#else
+		TString strPwd = pszPassword;
+#endif
+		SevenZip::SevenZipPassword pwd(true, strPwd);
 		SevenZip::SevenZipExtractorMemory decompress;
-		SStringW strFilename = S_CT2W(pszFileName);
+		TString strFilename = pszFileName;
 		decompress.SetArchivePath(strFilename.c_str());
-		 
 		return (S_OK == decompress.ExtractArchive(m_fileStreams, NULL, &pwd));
 	}
 
+#ifdef _WIN32
 	BOOL CZipArchive::Open(HMODULE hModule, LPCTSTR pszName, LPCSTR pszPassword, LPCTSTR pszType)
 	{
 		HRSRC hResInfo = ::FindResource(hModule, pszName, pszType);
@@ -175,14 +197,14 @@ namespace SevenZip{
 		if (hResData == NULL)
 			return FALSE;
 
-		SStringW strPsw = S_CA2W(pszPassword,CP_UTF8);
+		TString strPsw = ToWstring(pszPassword);
 		TString s_pwd = strPsw.c_str();
 		SevenZip::SevenZipPassword pwd(true, s_pwd);
 		SevenZip::SevenZipExtractorMemory decompress;
 		decompress.SetArchiveData(hResData,dwLength);
-
 		return (S_OK == decompress.ExtractArchive(m_fileStreams, NULL, &pwd));
 	}
+#endif // _WIN32
 
 	void CZipArchive::CloseFile()
 	{ 
@@ -198,13 +220,13 @@ namespace SevenZip{
  
 	DWORD CZipArchive::GetFileSize( LPCTSTR pszFileName )
 	{
-		SStringA fileName = S_CT2A(pszFileName);
+		std::string fileName = toUtf8String(pszFileName);
 		return m_fileStreams.GetFileSize(fileName.c_str());
 	} 
 
 	BOOL CZipArchive::IsFileExist( LPCTSTR pszFileName )
 	{
-		SStringA fileName = S_CT2A(pszFileName);
+		std::string fileName = toUtf8String(pszFileName);
 		return m_fileStreams.GetFilePtr(fileName.c_str())!=NULL;
 	} 
 

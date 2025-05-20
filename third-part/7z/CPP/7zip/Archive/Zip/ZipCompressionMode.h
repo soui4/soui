@@ -1,11 +1,11 @@
 // CompressionMode.h
 
-#ifndef __ZIP_COMPRESSION_MODE_H
-#define __ZIP_COMPRESSION_MODE_H
+#ifndef ZIP7_INC_ZIP_COMPRESSION_MODE_H
+#define ZIP7_INC_ZIP_COMPRESSION_MODE_H
 
 #include "../../../Common/MyString.h"
 
-#ifndef _7ZIP_ST
+#ifndef Z7_ST
 #include "../../../Windows/System.h"
 #endif
 
@@ -14,26 +14,18 @@
 namespace NArchive {
 namespace NZip {
 
-struct CBaseProps
-{
-  CMethodProps MethodInfo;
-  Int32 Level;
+const CMethodId kMethodId_ZipBase = 0x040100;
+const CMethodId kMethodId_BZip2   = 0x040202;
 
-  #ifndef _7ZIP_ST
-  UInt32 NumThreads;
-  bool NumThreadsWasChanged;
-  #endif
+struct CBaseProps: public CMultiMethodProps
+{
   bool IsAesMode;
   Byte AesKeyMode;
 
   void Init()
   {
-    MethodInfo.Clear();
-    Level = -1;
-    #ifndef _7ZIP_ST
-    NumThreads = NWindows::NSystem::GetNumberOfProcessors();;
-    NumThreadsWasChanged = false;
-    #endif
+    CMultiMethodProps::Init();
+    
     IsAesMode = false;
     AesKeyMode = 3;
   }
@@ -42,19 +34,27 @@ struct CBaseProps
 struct CCompressionMethodMode: public CBaseProps
 {
   CRecordVector<Byte> MethodSequence;
-  bool PasswordIsDefined;
-  AString Password;
+  AString Password; // _Wipe
+  bool Password_Defined;
+  bool Force_SeqOutMode;
+  bool DataSizeReduce_Defined;
+  UInt64 DataSizeReduce;
 
-  UInt64 _dataSizeReduce;
-  bool _dataSizeReduceDefined;
-  
-  bool IsRealAesMode() const { return PasswordIsDefined && IsAesMode; }
+  bool IsRealAesMode() const { return Password_Defined && IsAesMode; }
 
-  CCompressionMethodMode(): PasswordIsDefined(false)
+  CCompressionMethodMode()
   {
-    _dataSizeReduceDefined = false;
-    _dataSizeReduce = 0;
+    Password_Defined = false;
+    Force_SeqOutMode = false;
+    DataSizeReduce_Defined = false;
+    DataSizeReduce = 0;
   }
+
+#ifdef Z7_CPP_IS_SUPPORTED_default
+  CCompressionMethodMode(const CCompressionMethodMode &) = default;
+  CCompressionMethodMode& operator =(const CCompressionMethodMode &) = default;
+#endif
+  ~CCompressionMethodMode() { Password.Wipe_and_Empty(); }
 };
 
 }}

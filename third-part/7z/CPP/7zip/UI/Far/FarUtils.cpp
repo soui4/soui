@@ -1,8 +1,8 @@
 // FarUtils.cpp
 
+#include "StdAfx.h"
 
-
-#include "../../../Common/IntToString.h"
+// #include "../../../Common/IntToString.h"
 #include "../../../Common/StringConvert.h"
 
 #ifndef UNDER_CE
@@ -19,13 +19,15 @@ namespace NFar {
 
 CStartupInfo g_StartupInfo;
 
+const char kRegistryKeyDelimiter = '\\';
+
 void CStartupInfo::Init(const PluginStartupInfo &pluginStartupInfo,
-    const CSysString &pluginNameForRegestry)
+    const char *pluginNameForRegistry)
 {
   m_Data = pluginStartupInfo;
-  m_RegistryPath = GetSystemString(pluginStartupInfo.RootKey);
-  m_RegistryPath += TEXT('\\');
-  m_RegistryPath += pluginNameForRegestry;
+  m_RegistryPath = pluginStartupInfo.RootKey;
+  m_RegistryPath += kRegistryKeyDelimiter;
+  m_RegistryPath += pluginNameForRegistry;
 }
 
 const char *CStartupInfo::GetMsgString(int messageId)
@@ -33,11 +35,11 @@ const char *CStartupInfo::GetMsgString(int messageId)
   return (const char*)m_Data.GetMsg(m_Data.ModuleNumber, messageId);
 }
 
-int CStartupInfo::ShowMessage(unsigned int flags,
-    const char *helpTopic, const char **items, int numItems, int numButtons)
+int CStartupInfo::ShowMessage(UInt32 flags,
+    const char *helpTopic, const char **items, unsigned numItems, int numButtons)
 {
   return m_Data.Message(m_Data.ModuleNumber, flags, helpTopic,
-      items, numItems, numButtons);
+      items, (int)numItems, numButtons);
 }
 
 namespace NMessageID
@@ -51,7 +53,7 @@ namespace NMessageID
   };
 }
 
-int CStartupInfo::ShowWarningWithOk(const char **items, int numItems)
+int CStartupInfo::ShowWarningWithOk(const char **items, unsigned numItems)
 {
   return ShowMessage(FMSG_WARNING | FMSG_MB_OK, NULL, items, numItems, 0);
 }
@@ -74,7 +76,7 @@ int CStartupInfo::ShowErrorMessage(const char *message)
   AString s;
   SetErrorTitle(s);
   const char *items[]= { s, message };
-  return ShowWarningWithOk(items, ARRAY_SIZE(items));
+  return ShowWarningWithOk(items, Z7_ARRAY_SIZE(items));
 }
 */
 
@@ -83,7 +85,7 @@ int CStartupInfo::ShowErrorMessage2(const char *m1, const char *m2)
   AString s;
   SetErrorTitle(s);
   const char *items[]= { s, m1, m2 };
-  return ShowWarningWithOk(items, ARRAY_SIZE(items));
+  return ShowWarningWithOk(items, Z7_ARRAY_SIZE(items));
 }
 
 static void SplitString(const AString &src, AStringVector &destStrings)
@@ -114,7 +116,7 @@ static void SplitString(const AString &src, AStringVector &destStrings)
 int CStartupInfo::ShowErrorMessage(const char *message)
 {
   AStringVector strings;
-  SplitString(message, strings);
+  SplitString((AString)message, strings);
   const unsigned kNumStringsMax = 20;
   const char *items[kNumStringsMax + 1];
   unsigned pos = 0;
@@ -143,14 +145,14 @@ int CStartupInfo::ShowMessage(int messageId)
 }
 
 int CStartupInfo::ShowDialog(int X1, int Y1, int X2, int Y2,
-    const char *helpTopic, struct FarDialogItem *items, int numItems)
+    const char *helpTopic, struct FarDialogItem *items, unsigned numItems)
 {
-  return m_Data.Dialog(m_Data.ModuleNumber, X1, Y1, X2, Y2, (char *)helpTopic,
-      items, numItems);
+  return m_Data.Dialog(m_Data.ModuleNumber, X1, Y1, X2, Y2, const_cast<char *>(helpTopic),
+      items, (int)numItems);
 }
 
 int CStartupInfo::ShowDialog(int sizeX, int sizeY,
-    const char *helpTopic, struct FarDialogItem *items, int numItems)
+    const char *helpTopic, struct FarDialogItem *items, unsigned numItems)
 {
   return ShowDialog(-1, -1, sizeX, sizeY, helpTopic, items, numItems);
 }
@@ -158,9 +160,9 @@ int CStartupInfo::ShowDialog(int sizeX, int sizeY,
 inline static BOOL GetBOOLValue(bool v) { return (v? TRUE: FALSE); }
 
 void CStartupInfo::InitDialogItems(const CInitDialogItem  *srcItems,
-    FarDialogItem *destItems, int numItems)
+    FarDialogItem *destItems, unsigned numItems)
 {
-  for (int i = 0; i < numItems; i++)
+  for (unsigned i = 0; i < numItems; i++)
   {
     const CInitDialogItem &srcItem = srcItems[i];
     FarDialogItem &destItem = destItems[i];
@@ -184,8 +186,8 @@ void CStartupInfo::InitDialogItems(const CInitDialogItem  *srcItems,
       MyStringCopy(destItem.Data, GetMsgString(srcItem.DataMessageId));
 
     /*
-    if ((unsigned int)Init[i].Data < 0xFFF)
-      MyStringCopy(destItem.Data, GetMsg((unsigned int)srcItem.Data));
+    if ((unsigned)Init[i].Data < 0xFFF)
+      MyStringCopy(destItem.Data, GetMsg((unsigned)srcItem.Data));
     else
       MyStringCopy(destItem.Data,srcItem.Data);
     */
@@ -209,28 +211,31 @@ void CStartupInfo::RestoreScreen(HANDLE handle)
   m_Data.RestoreScreen(handle);
 }
 
-const TCHAR kRegestryKeyDelimiter = TEXT('\'');
-
-CSysString CStartupInfo::GetFullKeyName(const CSysString &keyName) const
+CSysString CStartupInfo::GetFullKeyName(const char *keyName) const
 {
-  return (keyName.IsEmpty()) ? m_RegistryPath:
-    (m_RegistryPath + kRegestryKeyDelimiter + keyName);
+  AString s (m_RegistryPath);
+  if (keyName && *keyName)
+  {
+    s += kRegistryKeyDelimiter;
+    s += keyName;
+  }
+  return (CSysString)s;
 }
 
 
 LONG CStartupInfo::CreateRegKey(HKEY parentKey,
-    const CSysString &keyName, NRegistry::CKey &destKey) const
+    const char *keyName, NRegistry::CKey &destKey) const
 {
   return destKey.Create(parentKey, GetFullKeyName(keyName));
 }
 
 LONG CStartupInfo::OpenRegKey(HKEY parentKey,
-    const CSysString &keyName, NRegistry::CKey &destKey) const
+    const char *keyName, NRegistry::CKey &destKey) const
 {
   return destKey.Open(parentKey, GetFullKeyName(keyName));
 }
 
-void CStartupInfo::SetRegKeyValue(HKEY parentKey, const CSysString &keyName,
+void CStartupInfo::SetRegKeyValue(HKEY parentKey, const char *keyName,
     LPCTSTR valueName, LPCTSTR value) const
 {
   NRegistry::CKey regKey;
@@ -238,7 +243,7 @@ void CStartupInfo::SetRegKeyValue(HKEY parentKey, const CSysString &keyName,
   regKey.SetValue(valueName, value);
 }
 
-void CStartupInfo::SetRegKeyValue(HKEY parentKey, const CSysString &keyName,
+void CStartupInfo::SetRegKeyValue(HKEY parentKey, const char *keyName,
     LPCTSTR valueName, UInt32 value) const
 {
   NRegistry::CKey regKey;
@@ -246,7 +251,7 @@ void CStartupInfo::SetRegKeyValue(HKEY parentKey, const CSysString &keyName,
   regKey.SetValue(valueName, value);
 }
 
-void CStartupInfo::SetRegKeyValue(HKEY parentKey, const CSysString &keyName,
+void CStartupInfo::SetRegKeyValue(HKEY parentKey, const char *keyName,
     LPCTSTR valueName, bool value) const
 {
   NRegistry::CKey regKey;
@@ -254,7 +259,7 @@ void CStartupInfo::SetRegKeyValue(HKEY parentKey, const CSysString &keyName,
   regKey.SetValue(valueName, value);
 }
 
-CSysString CStartupInfo::QueryRegKeyValue(HKEY parentKey, const CSysString &keyName,
+CSysString CStartupInfo::QueryRegKeyValue(HKEY parentKey, const char *keyName,
     LPCTSTR valueName, const CSysString &valueDefault) const
 {
   NRegistry::CKey regKey;
@@ -268,7 +273,7 @@ CSysString CStartupInfo::QueryRegKeyValue(HKEY parentKey, const CSysString &keyN
   return value;
 }
 
-UInt32 CStartupInfo::QueryRegKeyValue(HKEY parentKey, const CSysString &keyName,
+UInt32 CStartupInfo::QueryRegKeyValue(HKEY parentKey, const char *keyName,
     LPCTSTR valueName, UInt32 valueDefault) const
 {
   NRegistry::CKey regKey;
@@ -276,13 +281,13 @@ UInt32 CStartupInfo::QueryRegKeyValue(HKEY parentKey, const CSysString &keyName,
     return valueDefault;
   
   UInt32 value;
-  if (regKey.QueryValue(valueName, value) != ERROR_SUCCESS)
+  if (regKey.GetValue_UInt32_IfOk(valueName, value) != ERROR_SUCCESS)
     return valueDefault;
   
   return value;
 }
 
-bool CStartupInfo::QueryRegKeyValue(HKEY parentKey, const CSysString &keyName,
+bool CStartupInfo::QueryRegKeyValue(HKEY parentKey, const char *keyName,
     LPCTSTR valueName, bool valueDefault) const
 {
   NRegistry::CKey regKey;
@@ -290,7 +295,7 @@ bool CStartupInfo::QueryRegKeyValue(HKEY parentKey, const CSysString &keyName,
     return valueDefault;
   
   bool value;
-  if (regKey.QueryValue(valueName, value) != ERROR_SUCCESS)
+  if (regKey.GetValue_bool_IfOk(valueName, value) != ERROR_SUCCESS)
     return valueDefault;
   
   return value;
@@ -351,7 +356,7 @@ bool CStartupInfo::ControlClearPanelSelection()
   if (!ControlGetActivePanelInfo(panelInfo))
     return false;
   for (int i = 0; i < panelInfo.ItemsNumber; i++)
-    panelInfo.PanelItems[i].Flags &= ~PPIF_SELECTED;
+    panelInfo.PanelItems[i].Flags &= ~(DWORD)PPIF_SELECTED;
   return ControlSetSelection(panelInfo);
 }
 
@@ -362,35 +367,38 @@ int CStartupInfo::Menu(
     int x,
     int y,
     int maxHeight,
-    unsigned int flags,
+    unsigned flags,
     const char *title,
     const char *aBottom,
     const char *helpTopic,
     int *breakKeys,
     int *breakCode,
     struct FarMenuItem *items,
-    int numItems)
+    unsigned numItems)
 {
-  return m_Data.Menu(m_Data.ModuleNumber, x, y, maxHeight, flags, (char *)title,
-      (char *)aBottom, (char *)helpTopic, breakKeys, breakCode, items, numItems);
+  return m_Data.Menu(m_Data.ModuleNumber, x, y, maxHeight, flags,
+      const_cast<char *>(title),
+      const_cast<char *>(aBottom),
+      const_cast<char *>(helpTopic),
+      breakKeys, breakCode, items, (int)numItems);
 }
 
 int CStartupInfo::Menu(
-    unsigned int flags,
+    unsigned flags,
     const char *title,
     const char *helpTopic,
     struct FarMenuItem *items,
-    int numItems)
+    unsigned numItems)
 {
   return Menu(-1, -1, 0, flags, title, NULL, helpTopic, NULL,
       NULL, items, numItems);
 }
 
 int CStartupInfo::Menu(
-    unsigned int flags,
+    unsigned flags,
     const char *title,
     const char *helpTopic,
-    const CSysStringVector &items,
+    const AStringVector &items,
     int selectedItem)
 {
   CRecordVector<FarMenuItem> farMenuItems;
@@ -400,11 +408,11 @@ int CStartupInfo::Menu(
     item.Checked = 0;
     item.Separator = 0;
     item.Selected = ((int)i == selectedItem);
-    CSysString reducedString = items[i].Left(ARRAY_SIZE(item.Text) - 1);
-    MyStringCopy(item.Text, (const char *)GetOemString(reducedString));
+    const AString reducedString (items[i].Left(Z7_ARRAY_SIZE(item.Text) - 1));
+    MyStringCopy(item.Text, reducedString);
     farMenuItems.Add(item);
   }
-  return Menu(flags, title, helpTopic, &farMenuItems.Front(), farMenuItems.Size());
+  return Menu(flags, title, helpTopic, farMenuItems.NonConstData(), farMenuItems.Size());
 }
 
 
@@ -430,15 +438,13 @@ void CScreenRestorer::Restore()
     g_StartupInfo.RestoreScreen(m_HANDLE);
     m_Saved = false;
   }
-};
+}
 
 int PrintErrorMessage(const char *message, unsigned code)
 {
-  AString s = message;
+  AString s (message);
   s += " #";
-  char temp[16];
-  ConvertUInt32ToString((UInt32)code, temp);
-  s += temp;
+  s.Add_UInt32((UInt32)code);
   return g_StartupInfo.ShowErrorMessage(s);
 }
 
@@ -468,7 +474,7 @@ int PrintErrorMessage(const char *message, const wchar_t *name, unsigned maxLen)
 
 int ShowSysErrorMessage(DWORD errorCode)
 {
-  UString message = NError::MyFormatMessage(errorCode);
+  const UString message = NError::MyFormatMessage(errorCode);
   return g_StartupInfo.ShowErrorMessage(UnicodeStringToMultiByte(message, CP_OEMCP));
 }
 
@@ -479,10 +485,10 @@ int ShowLastErrorMessage()
 
 int ShowSysErrorMessage(DWORD errorCode, const wchar_t *name)
 {
-  UString s = NError::MyFormatMessage(errorCode);
-  AString s1 = UnicodeStringToMultiByte(s, CP_OEMCP);
-  AString s2 = UnicodeStringToMultiByte(name, CP_OEMCP);
-  return g_StartupInfo.ShowErrorMessage2(s1, s2);
+  const UString s = NError::MyFormatMessage(errorCode);
+  return g_StartupInfo.ShowErrorMessage2(
+      UnicodeStringToMultiByte(s, CP_OEMCP),
+      UnicodeStringToMultiByte(name, CP_OEMCP));
 }
 
 

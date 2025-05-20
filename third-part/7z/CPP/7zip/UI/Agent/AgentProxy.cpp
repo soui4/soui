@@ -1,6 +1,6 @@
 // AgentProxy.cpp
 
-
+#include "StdAfx.h"
 
 // #include <stdio.h>
 #ifdef _WIN32
@@ -18,6 +18,8 @@
 #include "../../../Windows/PropVariant.h"
 #include "../../../Windows/PropVariantConv.h"
 
+#include "../../Archive/Common/ItemNameUtils.h"
+
 #include "AgentProxy.h"
 
 using namespace NWindows;
@@ -33,12 +35,12 @@ int CProxyArc::FindSubDir(unsigned dirIndex, const wchar_t *name, unsigned &inse
       insertPos = left;
       return -1;
     }
-    unsigned mid = (left + right) / 2;
-    unsigned dirIndex2 = subDirs[mid];
-    int compare = CompareFileNames(name, Dirs[dirIndex2].Name);
-    if (compare == 0)
-      return dirIndex2;
-    if (compare < 0)
+    const unsigned mid = (unsigned)(((size_t)left + (size_t)right) / 2);
+    const unsigned dirIndex2 = subDirs[mid];
+    const int comp = CompareFileNames(name, Dirs[dirIndex2].Name);
+    if (comp == 0)
+      return (int)dirIndex2;
+    if (comp < 0)
       right = mid;
     else
       left = mid + 1;
@@ -51,31 +53,42 @@ int CProxyArc::FindSubDir(unsigned dirIndex, const wchar_t *name) const
   return FindSubDir(dirIndex, name, insertPos);
 }
 
+static const wchar_t *AllocStringAndCopy(const wchar_t *s, size_t len)
+{
+  wchar_t *p = new wchar_t[len + 1];
+  MyStringCopy(p, s);
+  return p;
+}
+
+static const wchar_t *AllocStringAndCopy(const UString &s)
+{
+  return AllocStringAndCopy(s, s.Len());
+}
+                         
 unsigned CProxyArc::AddDir(unsigned dirIndex, int arcIndex, const UString &name)
 {
   unsigned insertPos;
   int subDirIndex = FindSubDir(dirIndex, name, insertPos);
-  if (subDirIndex >= 0)
+  if (subDirIndex != -1)
   {
-    if (arcIndex >= 0)
+    if (arcIndex != -1)
     {
-      CProxyDir &item = Dirs[subDirIndex];
-      if (item.ArcIndex < 0)
+      CProxyDir &item = Dirs[(unsigned)subDirIndex];
+      if (item.ArcIndex == -1)
         item.ArcIndex = arcIndex;
     }
-    return subDirIndex;
+    return (unsigned)subDirIndex;
   }
-  subDirIndex = Dirs.Size();
-  Dirs[dirIndex].SubDirs.Insert(insertPos, subDirIndex);
+  subDirIndex = (int)Dirs.Size();
+  Dirs[dirIndex].SubDirs.Insert(insertPos, (unsigned)subDirIndex);
   CProxyDir &item = Dirs.AddNew();
 
   item.NameLen = name.Len();
-  item.Name = new wchar_t[item.NameLen + 1];
-  MyStringCopy((wchar_t *)item.Name, name);
+  item.Name = AllocStringAndCopy(name);
 
   item.ArcIndex = arcIndex;
-  item.ParentDir = dirIndex;
-  return subDirIndex;
+  item.ParentDir = (int)dirIndex;
+  return (unsigned)subDirIndex;
 }
 
 void CProxyDir::Clear()
@@ -84,30 +97,36 @@ void CProxyDir::Clear()
   SubFiles.Clear();
 }
 
-void CProxyArc::GetDirPathParts(int dirIndex, UStringVector &pathParts) const
+void CProxyArc::GetDirPathParts(unsigned dirIndex, UStringVector &pathParts) const
 {
   pathParts.Clear();
-  while (dirIndex >= 0)
+  // while (dirIndex != -1)
+  for (;;)
   {
     const CProxyDir &dir = Dirs[dirIndex];
-    dirIndex = dir.ParentDir;
-    if (dirIndex < 0)
+    dirIndex = (unsigned)dir.ParentDir;
+    if (dir.ParentDir == -1)
       break;
     pathParts.Insert(0, dir.Name);
+    // 22.00: we normalize name
+    NArchive::NItemName::NormalizeSlashes_in_FileName_for_OsPath(pathParts[0]);
   }
 }
 
-UString CProxyArc::GetDirPath_as_Prefix(int dirIndex) const
+UString CProxyArc::GetDirPath_as_Prefix(unsigned dirIndex) const
 {
   UString s;
-  while (dirIndex >= 0)
+  // while (dirIndex != -1)
+  for (;;)
   {
     const CProxyDir &dir = Dirs[dirIndex];
-    dirIndex = dir.ParentDir;
-    if (dirIndex < 0)
+    dirIndex = (unsigned)dir.ParentDir;
+    if (dir.ParentDir == -1)
       break;
     s.InsertAtFront(WCHAR_PATH_SEPARATOR);
     s.Insert(0, dir.Name);
+    // 22.00: we normalize name
+    NArchive::NItemName::NormalizeSlashes_in_FileName_for_OsPath(s.GetBuf(), MyStringLen(dir.Name));
   }
   return s;
 }
@@ -116,7 +135,7 @@ void CProxyArc::AddRealIndices(unsigned dirIndex, CUIntVector &realIndices) cons
 {
   const CProxyDir &dir = Dirs[dirIndex];
   if (dir.IsLeaf())
-    realIndices.Add(dir.ArcIndex);
+    realIndices.Add((unsigned)dir.ArcIndex);
   unsigned i;
   for (i = 0; i < dir.SubDirs.Size(); i++)
     AddRealIndices(dir.SubDirs[i], realIndices);
@@ -127,7 +146,7 @@ void CProxyArc::AddRealIndices(unsigned dirIndex, CUIntVector &realIndices) cons
 int CProxyArc::GetRealIndex(unsigned dirIndex, unsigned index) const
 {
   const CProxyDir &dir = Dirs[dirIndex];
-  unsigned numDirItems = dir.SubDirs.Size();
+  const unsigned numDirItems = dir.SubDirs.Size();
   if (index < numDirItems)
   {
     const CProxyDir &f = Dirs[dir.SubDirs[index]];
@@ -135,7 +154,7 @@ int CProxyArc::GetRealIndex(unsigned dirIndex, unsigned index) const
       return f.ArcIndex;
     return -1;
   }
-  return dir.SubFiles[index - numDirItems];
+  return (int)dir.SubFiles[index - numDirItems];
 }
 
 void CProxyArc::GetRealIndices(unsigned dirIndex, const UInt32 *indices, UInt32 numItems, CUIntVector &realIndices) const
@@ -144,14 +163,14 @@ void CProxyArc::GetRealIndices(unsigned dirIndex, const UInt32 *indices, UInt32 
   realIndices.Clear();
   for (UInt32 i = 0; i < numItems; i++)
   {
-    UInt32 index = indices[i];
-    unsigned numDirItems = dir.SubDirs.Size();
+    const UInt32 index = indices[i];
+    const unsigned numDirItems = dir.SubDirs.Size();
     if (index < numDirItems)
       AddRealIndices(dir.SubDirs[index], realIndices);
     else
       realIndices.Add(dir.SubFiles[index - numDirItems]);
   }
-  HeapSort(&realIndices.Front(), realIndices.Size());
+  HeapSort(realIndices.NonConstData(), realIndices.Size());
 }
 
 ///////////////////////////////////////////////
@@ -179,9 +198,9 @@ void CProxyArc::CalculateSizes(unsigned dirIndex, IInArchive *archive)
   
   for (i = 0; i < dir.SubFiles.Size(); i++)
   {
-    UInt32 index = (UInt32)dir.SubFiles[i];
+    const UInt32 index = (UInt32)dir.SubFiles[i];
     UInt64 size, packSize;
-    bool sizeDefined = GetSize(archive, index, kpidSize, size);
+    const bool sizeDefined = GetSize(archive, index, kpidSize, size);
     dir.Size += size;
     GetSize(archive, index, kpidPackSize, packSize);
     dir.PackSize += packSize;
@@ -225,10 +244,10 @@ HRESULT CProxyArc::Load(const CArc &arc, IProgress *progress)
   IInArchive *archive = arc.Archive;
 
   UInt32 numItems;
-  RINOK(archive->GetNumberOfItems(&numItems));
+  RINOK(archive->GetNumberOfItems(&numItems))
   
   if (progress)
-    RINOK(progress->SetTotal(numItems));
+    RINOK(progress->SetTotal(numItems))
   
   Files.Alloc(numItems);
 
@@ -240,13 +259,17 @@ HRESULT CProxyArc::Load(const CArc &arc, IProgress *progress)
   {
     if (progress && (i & 0xFFFF) == 0)
     {
-      UInt64 currentItemIndex = i;
-      RINOK(progress->SetCompleted(&currentItemIndex));
+      const UInt64 currentItemIndex = i;
+      RINOK(progress->SetCompleted(&currentItemIndex))
     }
     
     const wchar_t *s = NULL;
     unsigned len = 0;
     bool isPtrName = false;
+
+   #if WCHAR_PATH_SEPARATOR != L'/'
+    wchar_t separatorChar = WCHAR_PATH_SEPARATOR;
+   #endif
 
     #if defined(MY_CPU_LE) && defined(_WIN32)
     // it works only if (sizeof(wchar_t) == 2)
@@ -263,13 +286,16 @@ HRESULT CProxyArc::Load(const CArc &arc, IProgress *progress)
         len = size / 2 - 1;
         s = (const wchar_t *)p;
         isPtrName = true;
+       #if WCHAR_PATH_SEPARATOR != L'/'
+        separatorChar = L'/';  // 0
+       #endif
       }
     }
     if (!s)
     #endif
     {
       prop.Clear();
-      RINOK(arc.Archive->GetProperty(i, kpidPath, &prop));
+      RINOK(arc.Archive->GetProperty(i, kpidPath, &prop))
       if (prop.vt == VT_BSTR)
       {
         s = prop.bstrVal;
@@ -279,7 +305,7 @@ HRESULT CProxyArc::Load(const CArc &arc, IProgress *progress)
         return E_FAIL;
       if (len == 0)
       {
-        RINOK(arc.GetDefaultItemPath(i, path));
+        RINOK(arc.GetItem_DefaultPath(i, path))
         len = path.Len();
         s = path;
       }
@@ -309,16 +335,22 @@ HRESULT CProxyArc::Load(const CArc &arc, IProgress *progress)
 
     for (unsigned j = 0; j < len; j++)
     {
-      wchar_t c = s[j];
-      if (c == WCHAR_PATH_SEPARATOR || c == L'/')
+      const wchar_t c = s[j];
+      if (c == L'/'
+        #if WCHAR_PATH_SEPARATOR != L'/'
+          || (c == separatorChar)
+        #endif
+          )
       {
         const unsigned kLevelLimit = 1 << 10;
         if (numLevels <= kLevelLimit)
         {
           if (numLevels == kLevelLimit)
-            name.SetFromAscii("[LONG_PATH]");
+            name = "[LONG_PATH]";
           else
             name.SetFrom(s + namePos, j - namePos);
+          // 22.00: we can normalize dir here
+          // NArchive::NItemName::NormalizeSlashes_in_FileName_for_OsPath(name);
           curItem = AddDir(curItem, -1, name);
         }
         namePos = j + 1;
@@ -340,7 +372,7 @@ HRESULT CProxyArc::Load(const CArc &arc, IProgress *progress)
     */
 
     bool isDir;
-    RINOK(Archive_IsItem_Dir(archive, i, isDir));
+    RINOK(Archive_IsItem_Dir(archive, i, isDir))
 
     CProxyFile &f = Files[i];
 
@@ -351,14 +383,15 @@ HRESULT CProxyArc::Load(const CArc &arc, IProgress *progress)
       f.Name = s;
     else
     {
-      f.Name = new wchar_t[f.NameLen + 1];
+      f.Name = AllocStringAndCopy(s, f.NameLen);
       f.NeedDeleteName = true;
-      MyStringCopy((wchar_t *)f.Name, s);
     }
 
     if (isDir)
     {
       name = s;
+      // 22.00: we can normalize dir here
+      // NArchive::NItemName::NormalizeSlashes_in_FileName_for_OsPath(name);
       AddDir(curItem, (int)i, name);
     }
     else
@@ -376,7 +409,7 @@ HRESULT CProxyArc::Load(const CArc &arc, IProgress *progress)
 
 // ---------- for Tree-mode archive ----------
 
-void CProxyArc2::GetDirPathParts(int dirIndex, UStringVector &pathParts, bool &isAltStreamDir) const
+void CProxyArc2::GetDirPathParts(unsigned dirIndex, UStringVector &pathParts, bool &isAltStreamDir) const
 {
   pathParts.Clear();
   
@@ -393,14 +426,15 @@ void CProxyArc2::GetDirPathParts(int dirIndex, UStringVector &pathParts, bool &i
   while (dirIndex >= k_Proxy2_NumRootDirs)
   {
     const CProxyDir2 &dir = Dirs[dirIndex];
-    const CProxyFile2 &file = Files[dir.ArcIndex];
-    if (pathParts.IsEmpty() && dirIndex == file.AltDirIndex)
+    const CProxyFile2 &file = Files[(unsigned)dir.ArcIndex];
+    if (pathParts.IsEmpty() && (int)dirIndex == file.AltDirIndex)
       isAltStreamDir = true;
     pathParts.Insert(0, file.Name);
-    int par = file.Parent;
-    if (par < 0)
+    const int par = file.Parent;
+    if (par == -1)
       break;
-    dirIndex = Files[par].DirIndex;
+    dirIndex = (unsigned)Files[(unsigned)par].DirIndex;
+    // if ((int)dirIndex == -1) break;
   }
 }
 
@@ -411,7 +445,7 @@ bool CProxyArc2::IsAltDir(unsigned dirIndex) const
   if (dirIndex == k_Proxy2_AltRootDirIndex)
     return true;
   const CProxyDir2 &dir = Dirs[dirIndex];
-  const CProxyFile2 &file = Files[dir.ArcIndex];
+  const CProxyFile2 &file = Files[(unsigned)dir.ArcIndex];
   return ((int)dirIndex == file.AltDirIndex);
 }
 
@@ -423,7 +457,7 @@ UString CProxyArc2::GetDirPath_as_Prefix(unsigned dirIndex, bool &isAltStreamDir
     isAltStreamDir = true;
   else if (dirIndex >= k_Proxy2_NumRootDirs)
   {
-    const CProxyFile2 &file = Files[dir.ArcIndex];
+    const CProxyFile2 &file = Files[(unsigned)dir.ArcIndex];
     isAltStreamDir = ((int)dirIndex == file.AltDirIndex);
   }
   return dir.PathPrefix;
@@ -433,10 +467,10 @@ void CProxyArc2::AddRealIndices_of_ArcItem(unsigned arcIndex, bool includeAltStr
 {
   realIndices.Add(arcIndex);
   const CProxyFile2 &file = Files[arcIndex];
-  if (file.DirIndex >= 0)
-    AddRealIndices_of_Dir(file.DirIndex, includeAltStreams, realIndices);
-  if (includeAltStreams && file.AltDirIndex >= 0)
-    AddRealIndices_of_Dir(file.AltDirIndex, includeAltStreams, realIndices);
+  if (file.DirIndex != -1)
+    AddRealIndices_of_Dir((unsigned)file.DirIndex, includeAltStreams, realIndices);
+  if (includeAltStreams && file.AltDirIndex != -1)
+    AddRealIndices_of_Dir((unsigned)file.AltDirIndex, includeAltStreams, realIndices);
 }
 
 void CProxyArc2::AddRealIndices_of_Dir(unsigned dirIndex, bool includeAltStreams, CUIntVector &realIndices) const
@@ -461,7 +495,7 @@ void CProxyArc2::GetRealIndices(unsigned dirIndex, const UInt32 *indices, UInt32
   {
     AddRealIndices_of_ArcItem(dir.Items[indices[i]], includeAltStreams, realIndices);
   }
-  HeapSort(&realIndices.Front(), realIndices.Size());
+  HeapSort(realIndices.NonConstData(), realIndices.Size());
 }
 
 void CProxyArc2::CalculateSizes(unsigned dirIndex, IInArchive *archive)
@@ -477,7 +511,7 @@ void CProxyArc2::CalculateSizes(unsigned dirIndex, IInArchive *archive)
   {
     UInt32 index = dir.Items[i];
     UInt64 size, packSize;
-    bool sizeDefined = GetSize(archive, index, kpidSize, size);
+    const bool sizeDefined = GetSize(archive, index, kpidSize, size);
     dir.Size += size;
     GetSize(archive, index, kpidPackSize, packSize);
     dir.PackSize += packSize;
@@ -495,16 +529,19 @@ void CProxyArc2::CalculateSizes(unsigned dirIndex, IInArchive *archive)
     }
 
     const CProxyFile2 &subFile = Files[index];
-    if (subFile.DirIndex < 0)
+    if (subFile.DirIndex == -1)
     {
       dir.NumSubFiles++;
     }
     else
     {
+      // 22.00: we normalize name
+      UString s = subFile.Name;
+      NArchive::NItemName::NormalizeSlashes_in_FileName_for_OsPath(s);
       dir.NumSubDirs++;
       CProxyDir2 &f = Dirs[subFile.DirIndex];
-      f.PathPrefix = dir.PathPrefix + subFile.Name + WCHAR_PATH_SEPARATOR;
-      CalculateSizes(subFile.DirIndex, archive);
+      f.PathPrefix = dir.PathPrefix + s + WCHAR_PATH_SEPARATOR;
+      CalculateSizes((unsigned)subFile.DirIndex, archive);
       dir.Size += f.Size;
       dir.PackSize += f.PackSize;
       dir.NumSubFiles += f.NumSubFiles;
@@ -514,7 +551,7 @@ void CProxyArc2::CalculateSizes(unsigned dirIndex, IInArchive *archive)
         dir.CrcIsDefined = false;
     }
 
-    if (subFile.AltDirIndex < 0)
+    if (subFile.AltDirIndex == -1)
     {
       // dir.NumSubFiles++;
     }
@@ -523,7 +560,7 @@ void CProxyArc2::CalculateSizes(unsigned dirIndex, IInArchive *archive)
       // dir.NumSubDirs++;
       CProxyDir2 &f = Dirs[subFile.AltDirIndex];
       f.PathPrefix = dir.PathPrefix + subFile.Name + L':';
-      CalculateSizes(subFile.AltDirIndex, archive);
+      CalculateSizes((unsigned)subFile.AltDirIndex, archive);
     }
   }
 }
@@ -555,9 +592,9 @@ HRESULT CProxyArc2::Load(const CArc &arc, IProgress *progress)
   IInArchive *archive = arc.Archive;
 
   UInt32 numItems;
-  RINOK(archive->GetNumberOfItems(&numItems));
+  RINOK(archive->GetNumberOfItems(&numItems))
   if (progress)
-    RINOK(progress->SetTotal(numItems));
+    RINOK(progress->SetTotal(numItems))
   UString fileName;
 
 
@@ -569,7 +606,7 @@ HRESULT CProxyArc2::Load(const CArc &arc, IProgress *progress)
   {
     // Dirs[1] - for alt streams of root dir
     CProxyDir2 &dir = Dirs.AddNew();
-    dir.PathPrefix = L':';
+    dir.PathPrefix = ':';
   }
 
   Files.Alloc(numItems);
@@ -583,7 +620,7 @@ HRESULT CProxyArc2::Load(const CArc &arc, IProgress *progress)
     if (progress && (i & 0xFFFFF) == 0)
     {
       UInt64 currentItemIndex = i;
-      RINOK(progress->SetCompleted(&currentItemIndex));
+      RINOK(progress->SetCompleted(&currentItemIndex))
     }
     
     CProxyFile2 &file = Files[i];
@@ -591,7 +628,7 @@ HRESULT CProxyArc2::Load(const CArc &arc, IProgress *progress)
     const void *p;
     UInt32 size;
     UInt32 propType;
-    RINOK(arc.GetRawProps->GetRawProp(i, kpidName, &p, &size, &propType));
+    RINOK(arc.GetRawProps->GetRawProp(i, kpidName, &p, &size, &propType))
     
     #ifdef MY_CPU_LE
     if (p && propType == PROP_DATA_TYPE_wchar_t_PTR_Z_LE)
@@ -608,14 +645,13 @@ HRESULT CProxyArc2::Load(const CArc &arc, IProgress *progress)
       tempAString = (const char *)p;
       ConvertUTF8ToUnicode(tempAString, tempUString);
       file.NameLen = tempUString.Len();
-      file.Name = new wchar_t[file.NameLen + 1];
+      file.Name = AllocStringAndCopy(tempUString);
       file.NeedDeleteName = true;
-      wmemcpy((wchar_t *)file.Name, tempUString.Ptr(), file.NameLen + 1);
     }
     else
     {
       NCOM::CPropVariant prop;
-      RINOK(arc.Archive->GetProperty(i, kpidName, &prop));
+      RINOK(arc.Archive->GetProperty(i, kpidName, &prop))
       const wchar_t *s;
       if (prop.vt == VT_BSTR)
         s = prop.bstrVal;
@@ -624,20 +660,19 @@ HRESULT CProxyArc2::Load(const CArc &arc, IProgress *progress)
       else
         return E_FAIL;
       file.NameLen = MyStringLen(s);
-      file.Name = new wchar_t[file.NameLen + 1];
+      file.Name = AllocStringAndCopy(s, file.NameLen);
       file.NeedDeleteName = true;
-      wmemcpy((wchar_t *)file.Name, s, file.NameLen + 1);
     }
     
     UInt32 parent = (UInt32)(Int32)-1;
     UInt32 parentType = 0;
-    RINOK(arc.GetRawProps->GetParent(i, &parent, &parentType));
+    RINOK(arc.GetRawProps->GetParent(i, &parent, &parentType))
     file.Parent = (Int32)parent;
 
     if (arc.Ask_Deleted)
     {
       bool isDeleted = false;
-      RINOK(Archive_IsItem_Deleted(archive, i, isDeleted));
+      RINOK(Archive_IsItem_Deleted(archive, i, isDeleted))
       if (isDeleted)
       {
         // continue;
@@ -646,16 +681,16 @@ HRESULT CProxyArc2::Load(const CArc &arc, IProgress *progress)
     }
 
     bool isDir;
-    RINOK(Archive_IsItem_Dir(archive, i, isDir));
+    RINOK(Archive_IsItem_Dir(archive, i, isDir))
     
     if (isDir)
     {
-      file.DirIndex = Dirs.Size();
+      file.DirIndex = (int)Dirs.Size();
       CProxyDir2 &dir = Dirs.AddNew();
-      dir.ArcIndex = i;
+      dir.ArcIndex = (int)i;
     }
     if (arc.Ask_AltStream)
-      RINOK(Archive_IsItem_AltStream(archive, i, file.IsAltStream));
+      RINOK(Archive_IsItem_AltStream(archive, i, file.IsAltStream))
   }
 
   for (i = 0; i < numItems; i++)
@@ -665,14 +700,14 @@ HRESULT CProxyArc2::Load(const CArc &arc, IProgress *progress)
     
     if (file.IsAltStream)
     {
-      if (file.Parent < 0)
+      if (file.Parent == -1)
         dirIndex = k_Proxy2_AltRootDirIndex;
       else
       {
-        int &folderIndex2 = Files[file.Parent].AltDirIndex;
-        if (folderIndex2 < 0)
+        int &folderIndex2 = Files[(unsigned)file.Parent].AltDirIndex;
+        if (folderIndex2 == -1)
         {
-          folderIndex2 = Dirs.Size();
+          folderIndex2 = (int)Dirs.Size();
           CProxyDir2 &dir = Dirs.AddNew();
           dir.ArcIndex = file.Parent;
         }
@@ -681,12 +716,12 @@ HRESULT CProxyArc2::Load(const CArc &arc, IProgress *progress)
     }
     else
     {
-      if (file.Parent < 0)
+      if (file.Parent == -1)
         dirIndex = k_Proxy2_RootDirIndex;
       else
       {
-        dirIndex = Files[file.Parent].DirIndex;
-        if (dirIndex < 0)
+        dirIndex = Files[(unsigned)file.Parent].DirIndex;
+        if (dirIndex == -1)
           return E_FAIL;
       }
     }
@@ -708,10 +743,10 @@ int CProxyArc2::FindItem(unsigned dirIndex, const wchar_t *name, bool foldersOnl
   FOR_VECTOR (i, dir.Items)
   {
     const CProxyFile2 &file = Files[dir.Items[i]];
-    if (foldersOnly && file.DirIndex < 0)
+    if (foldersOnly && file.DirIndex == -1)
       continue;
     if (CompareFileNames(file.Name, name) == 0)
-      return i;
+      return (int)i;
   }
   return -1;
 }

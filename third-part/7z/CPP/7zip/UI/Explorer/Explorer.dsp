@@ -45,7 +45,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MT /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /YX /FD /c
-# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "LANG" /Yu"StdAfx.h" /FD /c
+# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "Z7_LANG" /D "Z7_LONG_PATH" /FAcs /Yu"StdAfx.h" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
@@ -55,7 +55,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /machine:I386
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib htmlhelp.lib /nologo /dll /machine:I386 /out:"C:\Program Files\7-ZIP\7-Zip.dll" /opt:NOWIN98
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib htmlhelp.lib /nologo /dll /machine:I386 /out:"C:\Util\7-Zip.dll" /opt:NOWIN98
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "Explorer - Win32 Debug"
@@ -72,7 +72,7 @@ LINK32=link.exe
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "WIN32" /D "_DEBUG" /D "_WINDOWS" /D "_MBCS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /YX /FD /GZ /c
-# ADD CPP /nologo /Gz /MTd /W4 /WX /Gm /GX /ZI /Od /D "_DEBUG" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "LANG" /Yu"StdAfx.h" /FD /GZ /c
+# ADD CPP /nologo /Gz /MTd /W4 /WX /Gm /GX /ZI /Od /D "_DEBUG" /D "_MBCS" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "Z7_LANG" /D "Z7_LONG_PATH" /Yu"StdAfx.h" /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
@@ -82,7 +82,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib /nologo /dll /debug /machine:I386 /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib htmlhelp.lib /nologo /dll /debug /machine:I386 /out:"C:\Program Files\7-ZIP\7-Zip.dll" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib htmlhelp.lib /nologo /dll /debug /machine:I386 /out:"C:\Util\7-Zip.dll" /pdbtype:sept
 
 !ELSEIF  "$(CFG)" == "Explorer - Win32 ReleaseU"
 
@@ -98,8 +98,8 @@ LINK32=link.exe
 # PROP Intermediate_Dir "ReleaseU"
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "LANG" /D "_MBCS" /Yu"StdAfx.h" /FD /c
-# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "_UNICODE" /D "UNICODE" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "LANG" /Yu"StdAfx.h" /FD /c
+# ADD BASE CPP /nologo /MD /W3 /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "Z7_LANG" /D "_MBCS" /Yu"StdAfx.h" /FD /c
+# ADD CPP /nologo /Gz /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "_UNICODE" /D "UNICODE" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "Z7_LANG" /D "Z7_LONG_PATH" /Yu"StdAfx.h" /FD /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
@@ -110,7 +110,7 @@ BSC32=bscmake.exe
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib htmlhelp.lib /nologo /dll /machine:I386 /out:"C:\Program Files\7-ZIP\7-Zip.dll" /opt:NOWIN98
 # SUBTRACT BASE LINK32 /pdb:none
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib htmlhelp.lib /nologo /dll /machine:I386 /out:"C:\Program Files\7-ZIP\7-Zipn.dll" /opt:NOWIN98
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib htmlhelp.lib /nologo /dll /machine:I386 /out:"C:\Util\7-Zip.dll" /opt:NOWIN98
 # SUBTRACT LINK32 /pdb:none
 
 !ELSEIF  "$(CFG)" == "Explorer - Win32 DebugU"
@@ -127,8 +127,8 @@ LINK32=link.exe
 # PROP Intermediate_Dir "DebugU"
 # PROP Ignore_Export_Lib 1
 # PROP Target_Dir ""
-# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "LANG" /D "_MBCS" /Yu"StdAfx.h" /FD /GZ /c
-# ADD CPP /nologo /Gz /MTd /W4 /WX /Gm /GX /ZI /Od /D "_DEBUG" /D "_UNICODE" /D "UNICODE" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "LANG" /Yu"StdAfx.h" /FD /GZ /c
+# ADD BASE CPP /nologo /MTd /W3 /Gm /GX /ZI /Od /D "_DEBUG" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "Z7_LANG" /D "_MBCS" /Yu"StdAfx.h" /FD /GZ /c
+# ADD CPP /nologo /Gz /MTd /W4 /WX /Gm /GX /ZI /Od /D "_DEBUG" /D "_UNICODE" /D "UNICODE" /D "WIN32" /D "_WINDOWS" /D "_USRDLL" /D "EXPLORER_EXPORTS" /D "Z7_LANG" /D "Z7_LONG_PATH" /Yu"StdAfx.h" /FD /GZ /c
 # ADD BASE MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "_DEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "_DEBUG"
@@ -138,7 +138,7 @@ BSC32=bscmake.exe
 # ADD BSC32 /nologo
 LINK32=link.exe
 # ADD BASE LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib htmlhelp.lib /nologo /dll /debug /machine:I386 /out:"C:\Program Files\7-ZIP\7-Zip.dll" /pdbtype:sept
-# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib htmlhelp.lib /nologo /dll /debug /machine:I386 /out:"C:\Program Files\7-ZIP\7-Zip.dll" /pdbtype:sept
+# ADD LINK32 kernel32.lib user32.lib gdi32.lib winspool.lib comdlg32.lib advapi32.lib shell32.lib ole32.lib oleaut32.lib uuid.lib odbc32.lib odbccp32.lib comctl32.lib htmlhelp.lib /nologo /dll /debug /machine:I386 /out:"C:\Util\7-Zip.dll" /pdbtype:sept
 
 !ENDIF 
 
@@ -226,6 +226,10 @@ SOURCE=.\ContextMenu.h
 # End Source File
 # Begin Source File
 
+SOURCE=.\MyExplorerCommand.h
+# End Source File
+# Begin Source File
+
 SOURCE=.\MyMessages.cpp
 # End Source File
 # Begin Source File
@@ -266,11 +270,23 @@ SOURCE=..\FileManager\LangUtils.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\FileManager\MyCom2.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\FileManager\ProgramLocation.cpp
 # End Source File
 # Begin Source File
 
 SOURCE=..\FileManager\ProgramLocation.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\FileManager\PropertyName.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\FileManager\PropertyName.h
 # End Source File
 # Begin Source File
 
@@ -286,6 +302,36 @@ SOURCE=..\FileManager\RegistryUtils.h
 # PROP Default_Filter ""
 # Begin Source File
 
+SOURCE=..\..\..\..\C\7zTypes.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\7zWindows.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\Compiler.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\CpuArch.c
+# SUBTRACT CPP /YX /Yc /Yu
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\CpuArch.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\Sort.c
+# SUBTRACT CPP /YX /Yc /Yu
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\..\C\Sort.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\..\C\Threads.c
 # SUBTRACT CPP /YX /Yc /Yu
 # End Source File
@@ -297,6 +343,10 @@ SOURCE=..\..\..\..\C\Threads.h
 # Begin Group "Common"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\..\Common\Common.h
+# End Source File
 # Begin Source File
 
 SOURCE=..\..\..\Common\IntToString.cpp
@@ -332,6 +382,10 @@ SOURCE=..\..\..\Common\MyVector.cpp
 # Begin Source File
 
 SOURCE=..\..\..\Common\MyVector.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Common\MyWindows.h
 # End Source File
 # Begin Source File
 
@@ -419,6 +473,10 @@ SOURCE=..\..\..\Windows\Control\PropertyPage.h
 # End Group
 # Begin Source File
 
+SOURCE=..\..\..\Windows\COM.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Windows\DLL.cpp
 # End Source File
 # Begin Source File
@@ -479,6 +537,14 @@ SOURCE=..\..\..\Windows\MemoryGlobal.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\Windows\MemoryLock.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Windows\MemoryLock.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Windows\Menu.cpp
 # End Source File
 # Begin Source File
@@ -523,6 +589,14 @@ SOURCE=..\..\..\Windows\Synchronization.h
 # End Source File
 # Begin Source File
 
+SOURCE=..\..\..\Windows\TimeUtils.cpp
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\..\Windows\TimeUtils.h
+# End Source File
+# Begin Source File
+
 SOURCE=..\..\..\Windows\Window.cpp
 # End Source File
 # Begin Source File
@@ -537,6 +611,10 @@ SOURCE=".\7-zip.dll.manifest"
 # Begin Source File
 
 SOURCE=.\ContextMenuFlags.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\FileManager\FM.ico
 # End Source File
 # End Target
 # End Project

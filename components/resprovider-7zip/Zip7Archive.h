@@ -3,16 +3,26 @@
 
 #pragma once
 
-
+#ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif // !WIN32_LEAN_AND_MEAN
-
 #include <windows.h>
 #include <tchar.h>
+#else
+#include "SevenZip/../CPP/Common/MyWindows.h"
 
+#define CopyMemory(Destination, Source, Length)  memcpy((Destination), (Source), (Length))
 
+#define FILE_BEGIN   0
+#define FILE_CURRENT 1
+#define FILE_END     2
+typedef DWORD *LPDWORD;
+typedef BYTE *LPBYTE;
+
+#endif
 #include "SevenZip/FileStream.h"
+
 namespace SevenZip{
 
 class CZipFile;
@@ -50,7 +60,9 @@ public:
 	~CZipArchive();
 
 	BOOL Open(LPCTSTR pszFileName, LPCSTR pszPassword);
+#ifdef _WIN32
 	BOOL Open(HMODULE hModule, LPCTSTR pszName, LPCSTR pszPassword, LPCTSTR pszType = _T("7Z"));
+#endif // _WIN32
 
 	void Close();
 	BOOL IsOpen() const;

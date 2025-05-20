@@ -1,6 +1,6 @@
 // RarCodecsRegister.cpp
 
-
+#include "StdAfx.h"
 
 #include "../Common/RegisterCodec.h"
 

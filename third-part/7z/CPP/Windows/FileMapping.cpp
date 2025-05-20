@@ -1,6 +1,6 @@
 // Windows/FileMapping.cpp
 
-
+#include "StdAfx.h"
 
 #include "FileMapping.h"
 

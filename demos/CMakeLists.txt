@@ -1,6 +1,6 @@
 add_subdirectory(demo2)
 add_subdirectory(demo)
-add_subdirectory(fun_test)
+#add_subdirectory(fun_test)
 add_subdirectory(wxDemo)
 add_subdirectory(ipcdemo)
 if (TARGET httpclient)

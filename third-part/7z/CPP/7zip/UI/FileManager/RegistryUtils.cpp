@@ -1,6 +1,6 @@
 // RegistryUtils.cpp
 
-
+#include "StdAfx.h"
 
 #include "../../../Common/IntToString.h"
 
@@ -13,31 +13,32 @@ using namespace NRegistry;
 
 #define REG_PATH_7Z TEXT("Software") TEXT(STRING_PATH_SEPARATOR) TEXT("7-Zip")
 
-static const TCHAR *kCUBasePath = REG_PATH_7Z;
-static const TCHAR *kCU_FMPath = REG_PATH_7Z TEXT(STRING_PATH_SEPARATOR) TEXT("FM");
-// static const TCHAR *kLM_Path = REG_PATH_7Z TEXT(STRING_PATH_SEPARATOR) TEXT("FM");
+static LPCTSTR const kCUBasePath = REG_PATH_7Z;
+static LPCTSTR const kCU_FMPath = REG_PATH_7Z TEXT(STRING_PATH_SEPARATOR) TEXT("FM");
+// static LPCTSTR const kLM_Path = REG_PATH_7Z TEXT(STRING_PATH_SEPARATOR) TEXT("FM");
 
-static const WCHAR *kLangValueName = L"Lang";
+static LPCWSTR const kLangValueName = L"Lang";
 
-static const WCHAR *kViewer = L"Viewer";
-static const WCHAR *kEditor = L"Editor";
-static const WCHAR *kDiff = L"Diff";
+static LPCWSTR const kViewer = L"Viewer";
+static LPCWSTR const kEditor = L"Editor";
+static LPCWSTR const kDiff = L"Diff";
+static LPCWSTR const kVerCtrlPath = L"7vc";
 
-static const TCHAR *kShowDots = TEXT("ShowDots");
-static const TCHAR *kShowRealFileIcons = TEXT("ShowRealFileIcons");
-static const TCHAR *kFullRow = TEXT("FullRow");
-static const TCHAR *kShowGrid = TEXT("ShowGrid");
-static const TCHAR *kSingleClick = TEXT("SingleClick");
-static const TCHAR *kAlternativeSelection = TEXT("AlternativeSelection");
-// static const TCHAR *kUnderline = TEXT("Underline");
+static LPCTSTR const kShowDots = TEXT("ShowDots");
+static LPCTSTR const kShowRealFileIcons = TEXT("ShowRealFileIcons");
+static LPCTSTR const kFullRow = TEXT("FullRow");
+static LPCTSTR const kShowGrid = TEXT("ShowGrid");
+static LPCTSTR const kSingleClick = TEXT("SingleClick");
+static LPCTSTR const kAlternativeSelection = TEXT("AlternativeSelection");
+// static LPCTSTR const kUnderline = TEXT("Underline");
 
-static const TCHAR *kShowSystemMenu = TEXT("ShowSystemMenu");
+static LPCTSTR const kShowSystemMenu = TEXT("ShowSystemMenu");
 
-// static const TCHAR *kLockMemoryAdd = TEXT("LockMemoryAdd");
-static const TCHAR *kLargePages = TEXT("LargePages");
+// static LPCTSTR const kLockMemoryAdd = TEXT("LockMemoryAdd");
+static LPCTSTR const kLargePages = TEXT("LargePages");
 
-static const TCHAR *kFlatViewName = TEXT("FlatViewArc");
-// static const TCHAR *kShowDeletedFiles = TEXT("ShowDeleted");
+static LPCTSTR const kFlatViewName = TEXT("FlatViewArc");
+// static LPCTSTR const kShowDeletedFiles = TEXT("ShowDeleted");
 
 static void SaveCuString(LPCTSTR keyPath, LPCWSTR valuePath, LPCWSTR value)
 {
@@ -63,48 +64,48 @@ void ReadRegEditor(bool useEditor, UString &path) { ReadCuString(kCU_FMPath, use
 void SaveRegDiff(const UString &path) { SaveCuString(kCU_FMPath, kDiff, path); }
 void ReadRegDiff(UString &path) { ReadCuString(kCU_FMPath, kDiff, path); }
 
-static void Save7ZipOption(const TCHAR *value, bool enabled)
+void ReadReg_VerCtrlPath(UString &path) { ReadCuString(kCU_FMPath, kVerCtrlPath, path); }
+
+static void Save7ZipOption(LPCTSTR value, bool enabled)
 {
   CKey key;
   key.Create(HKEY_CURRENT_USER, kCUBasePath);
   key.SetValue(value, enabled);
 }
 
-static void SaveOption(const TCHAR *value, bool enabled)
+static void SaveOption(LPCTSTR value, bool enabled)
 {
   CKey key;
   key.Create(HKEY_CURRENT_USER, kCU_FMPath);
   key.SetValue(value, enabled);
 }
 
-static bool Read7ZipOption(const TCHAR *value, bool defaultValue)
+static bool Read7ZipOption(LPCTSTR value, bool defaultValue)
 {
   CKey key;
   if (key.Open(HKEY_CURRENT_USER, kCUBasePath, KEY_READ) == ERROR_SUCCESS)
   {
     bool enabled;
-    if (key.QueryValue(value, enabled) == ERROR_SUCCESS)
+    if (key.GetValue_bool_IfOk(value, enabled) == ERROR_SUCCESS)
       return enabled;
   }
   return defaultValue;
 }
 
-static void ReadOption(CKey &key, const TCHAR *value, bool &dest)
+static void ReadOption(CKey &key, LPCTSTR name, bool &dest)
 {
-  bool enabled = false;
-  if (key.QueryValue(value, enabled) == ERROR_SUCCESS)
-    dest = enabled;
+  key.GetValue_bool_IfOk(name, dest);
 }
 
 /*
-static void SaveLmOption(const TCHAR *value, bool enabled)
+static void SaveLmOption(LPCTSTR value, bool enabled)
 {
   CKey key;
   key.Create(HKEY_LOCAL_MACHINE, kLM_Path);
   key.SetValue(value, enabled);
 }
 
-static bool ReadLmOption(const TCHAR *value, bool defaultValue)
+static bool ReadLmOption(LPCTSTR value, bool defaultValue)
 {
   CKey key;
   if (key.Open(HKEY_LOCAL_MACHINE, kLM_Path, KEY_READ) == ERROR_SUCCESS)
@@ -134,6 +135,11 @@ void CFmSettings::Load()
 {
   ShowDots = false;
   ShowRealFileIcons = false;
+  /* if (FullRow == false), we can use mouse click on another columns
+     to select group of files. We need to implement additional
+     way to select files in any column as in Explorer.
+     Then we can enable (FullRow == true) default mode. */
+  // FullRow = true;
   FullRow = false;
   ShowGrid = false;
   SingleClick = false;

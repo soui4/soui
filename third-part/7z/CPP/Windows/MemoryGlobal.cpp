@@ -1,6 +1,6 @@
 // Windows/MemoryGlobal.cpp
 
-
+#include "StdAfx.h"
 
 #include "MemoryGlobal.h"
 

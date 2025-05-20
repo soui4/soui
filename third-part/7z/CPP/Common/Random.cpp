@@ -1,6 +1,6 @@
 // Common/Random.cpp
 
-
+#include "StdAfx.h"
 
 #include <stdlib.h>
 
@@ -12,11 +12,11 @@
 
 #include "Random.h"
 
-void CRandom::Init(unsigned int seed) { srand(seed); }
+void CRandom::Init(unsigned seed) { srand(seed); }
 
 void CRandom::Init()
 {
-  Init((unsigned int)
+  Init((unsigned)
     #ifdef _WIN32
     GetTickCount()
     #else

@@ -1,7 +1,7 @@
 // ZipHeader.h
 
-#ifndef __ARCHIVE_ZIP_HEADER_H
-#define __ARCHIVE_ZIP_HEADER_H
+#ifndef ZIP7_INC_ARCHIVE_ZIP_HEADER_H
+#define ZIP7_INC_ARCHIVE_ZIP_HEADER_H
 
 #include "../../../Common/MyTypes.h"
 
@@ -23,7 +23,8 @@ namespace NSignature
 }
 
 const unsigned kLocalHeaderSize = 4 + 26; // including signature
-const unsigned kDataDescriptorSize = 4 + 12;  // including signature
+const unsigned kDataDescriptorSize32 = 4 + 4 + 4 * 2;  // including signature
+const unsigned kDataDescriptorSize64 = 4 + 4 + 8 * 2;  // including signature
 const unsigned kCentralHeaderSize = 4 + 42; // including signature
 
 const unsigned kEcdSize = 22; // including signature
@@ -37,28 +38,33 @@ namespace NFileHeader
   {
     enum EType
     {
-      kStored = 0,
-      kShrunk = 1,
-      kReduced1 = 2,
-      kReduced2 = 3,
-      kReduced3 = 4,
-      kReduced4 = 5,
-      kImploded = 6,
-      kReservedTokenizing = 7, // reserved for tokenizing
-      kDeflated = 8,
-      kDeflated64 = 9,
+      kStore = 0,
+      kShrink = 1,
+      kReduce1 = 2,
+      kReduce2 = 3,
+      kReduce3 = 4,
+      kReduce4 = 5,
+      kImplode = 6,
+      kTokenize = 7,
+      kDeflate = 8,
+      kDeflate64 = 9,
       kPKImploding = 10,
       
       kBZip2 = 12,
+      
       kLZMA = 14,
+      
       kTerse = 18,
       kLz77 = 19,
+      kZstdPk = 20,
       
-      kXz = 0x5F,
-      kJpeg = 0x60,
-      kWavPack = 0x61,
-      kPPMd = 0x62,
-      kWzAES = 0x63
+      kZstdWz = 93,
+      kMP3 = 94,
+      kXz = 95,
+      kJpeg = 96,
+      kWavPack = 97,
+      kPPMd = 98,
+      kWzAES = 99
     };
 
     const Byte kMadeByProgramVersion = 63;
@@ -73,6 +79,7 @@ namespace NFileHeader
     const Byte kExtractVersion_Aes = 51;
     const Byte kExtractVersion_LZMA = 63;
     const Byte kExtractVersion_PPMd = 63;
+    const Byte kExtractVersion_Xz = 20; // test it
   }
 
   namespace NExtraID
@@ -81,11 +88,17 @@ namespace NFileHeader
     {
       kZip64 = 0x01,
       kNTFS = 0x0A,
+      kUnix0 = 0x0D,                // Info-ZIP : (UNIX) PK
       kStrongEncrypt = 0x17,
-      kUnixTime = 0x5455,
+      kIzNtSecurityDescriptor = 0x4453,
+      kUnixTime = 0x5455,           // "UT" (time) Info-ZIP
+      kUnix1 = 0x5855,              // Info-ZIP
       kIzUnicodeComment = 0x6375,
       kIzUnicodeName = 0x7075,
-      kWzAES = 0x9901
+      kUnix2 = 0x7855,              // Info-ZIP
+      kUnixN = 0x7875,              // Info-ZIP
+      kWzAES = 0x9901,
+      kApkAlign = 0xD935
     };
   }
 
@@ -110,6 +123,15 @@ namespace NFileHeader
     };
   }
 
+  namespace NUnixExtra
+  {
+    enum
+    {
+      kATime = 0,
+      kMTime
+    };
+  }
+
   namespace NFlags
   {
     const unsigned kEncrypted = 1 << 0;
@@ -117,14 +139,17 @@ namespace NFileHeader
     const unsigned kDescriptorUsedMask = 1 << 3;
     const unsigned kStrongEncrypted = 1 << 6;
     const unsigned kUtf8 = 1 << 11;
+    const unsigned kAltStream = 1 << 14;
 
     const unsigned kImplodeDictionarySizeMask = 1 << 1;
     const unsigned kImplodeLiteralsOnMask     = 1 << 2;
     
+    /*
     const unsigned kDeflateTypeBitStart = 1;
     const unsigned kNumDeflateTypeBits = 2;
     const unsigned kNumDeflateTypes = (1 << kNumDeflateTypeBits);
     const unsigned kDeflateTypeMask = (1 << kNumDeflateTypeBits) - 1;
+    */
   }
   
   namespace NHostOS

@@ -6,8 +6,10 @@
 #pragma once
 #define _CRT_NON_CONFORMING_SWPRINTFS
 #define WIN32_LEAN_AND_MEAN             // Exclude rarely-used stuff from Windows headers
+#ifdef _WIN32
 // Windows Header Files:
 #include <windows.h>
 #include <tchar.h>
+#endif
 
 // TODO: reference additional headers your program requires here

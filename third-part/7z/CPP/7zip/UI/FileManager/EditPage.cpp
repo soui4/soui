@@ -1,6 +1,6 @@
 // EditPage.cpp
 
-
+#include "StdAfx.h"
 
 #include "EditPage.h"
 #include "EditPageRes.h"
@@ -12,6 +12,7 @@
 
 using namespace NWindows;
 
+#ifdef Z7_LANG
 static const UInt32 kLangIDs[] =
 {
   IDT_EDIT_EDITOR,
@@ -22,15 +23,18 @@ static const UInt32 kLangIDs_Colon[] =
 {
   IDT_EDIT_VIEWER
 };
+#endif
 
-static LPCWSTR kEditTopic = L"FM/options.htm#editor";
+#define kEditTopic "FM/options.htm#editor"
 
 bool CEditPage::OnInit()
 {
   _initMode = true;
 
-  LangSetDlgItems(*this, kLangIDs, ARRAY_SIZE(kLangIDs));
-  LangSetDlgItems_Colon(*this, kLangIDs_Colon, ARRAY_SIZE(kLangIDs_Colon));
+  #ifdef Z7_LANG
+  LangSetDlgItems(*this, kLangIDs, Z7_ARRAY_SIZE(kLangIDs));
+  LangSetDlgItems_Colon(*this, kLangIDs_Colon, Z7_ARRAY_SIZE(kLangIDs_Colon));
+  #endif
 
   _ctrls[0].Ctrl = IDE_EDIT_VIEWER; _ctrls[0].Button = IDB_EDIT_VIEWER;
   _ctrls[1].Ctrl = IDE_EDIT_EDITOR; _ctrls[1].Button = IDB_EDIT_EDITOR;
@@ -76,22 +80,51 @@ LONG CEditPage::OnApply()
 
 void CEditPage::OnNotifyHelp()
 {
-  ShowHelpWindow(NULL, kEditTopic);
+  ShowHelpWindow(kEditTopic);
 }
+
+void SplitCmdLineSmart(const UString &cmd, UString &prg, UString &params);
 
 static void Edit_BrowseForFile(NWindows::NControl::CEdit &edit, HWND hwnd)
 {
-  UString path;
-  edit.GetText(path);
-  UString resPath;
-  if (MyBrowseForFile(hwnd, 0, path, NULL, L"*.exe", resPath))
+  UString cmd;
+  edit.GetText(cmd);
+
+  UString param;
+  UString prg;
+  
+  SplitCmdLineSmart(cmd, prg, param);
+
+  CObjectVector<CBrowseFilterInfo> filters;
+  CBrowseFilterInfo &bfi = filters.AddNew();
+  bfi.Description = "*.exe";
+  bfi.Masks.Add(UString("*.exe"));
+
+  CBrowseInfo bi;
+  bi.FilterIndex = 0;
+  bi.FilePath = prg;
+  bi.hwndOwner = hwnd;
+
+  if (bi.BrowseForFile(filters))
   {
-    edit.SetText(resPath);
+    cmd = bi.FilePath;
+    cmd.Trim();
+    /*
+    if (!param.IsEmpty() && !resPath.IsEmpty())
+    {
+      cmd.InsertAtFront(L'\"');
+      cmd += L'\"';
+      cmd.Add_Space();
+      cmd += param;
+    }
+    */
+
+    edit.SetText(cmd);
     // Changed();
   }
 }
 
-bool CEditPage::OnButtonClicked(int buttonID, HWND buttonHWND)
+bool CEditPage::OnButtonClicked(unsigned buttonID, HWND buttonHWND)
 {
   for (unsigned i = 0; i < 3; i++)
   {
@@ -106,7 +139,7 @@ bool CEditPage::OnButtonClicked(int buttonID, HWND buttonHWND)
   return CPropertyPage::OnButtonClicked(buttonID, buttonHWND);
 }
 
-bool CEditPage::OnCommand(int code, int itemID, LPARAM param)
+bool CEditPage::OnCommand(unsigned code, unsigned itemID, LPARAM param)
 {
   if (!_initMode && code == EN_CHANGE)
   {

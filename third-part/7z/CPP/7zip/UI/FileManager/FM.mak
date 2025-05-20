@@ -1,6 +1,20 @@
+CFLAGS = $(CFLAGS) \
+  -DZ7_LANG \
+
+!IFDEF UNDER_CE
+LIBS = $(LIBS) ceshell.lib Commctrl.lib
+!ELSE
+LIBS = $(LIBS) comctl32.lib htmlhelp.lib comdlg32.lib Mpr.lib Gdi32.lib
+CFLAGS = $(CFLAGS) -DZ7_DEVICE_FILE
+# -DZ7_LONG_PATH
+LFLAGS = $(LFLAGS) /DELAYLOAD:mpr.dll
+LIBS = $(LIBS) delayimp.lib
+!ENDIF
+
 FM_OBJS = \
   $O\App.obj \
   $O\BrowseDialog.obj \
+  $O\BrowseDialog2.obj \
   $O\ClassDefs.obj \
   $O\EnumFormatEtc.obj \
   $O\ExtractCallback.obj \
@@ -13,6 +27,7 @@ FM_OBJS = \
   $O\FSFolderCopy.obj \
   $O\HelpUtils.obj \
   $O\LangUtils.obj \
+  $O\MemDialog.obj \
   $O\MenuPage.obj \
   $O\MyLoadMenu.obj \
   $O\OpenCallback.obj \
@@ -34,7 +49,6 @@ FM_OBJS = \
   $O\ProgramLocation.obj \
   $O\PropertyName.obj \
   $O\RegistryAssociations.obj \
-  $O\RegistryPlugins.obj \
   $O\RegistryUtils.obj \
   $O\RootFolder.obj \
   $O\SplitUtils.obj \
@@ -46,6 +60,7 @@ FM_OBJS = \
   $O\AboutDialog.obj \
   $O\ComboDialog.obj \
   $O\CopyDialog.obj \
+  $O\EditDialog.obj \
   $O\EditPage.obj \
   $O\LangPage.obj \
   $O\ListViewDialog.obj \
@@ -56,6 +71,7 @@ FM_OBJS = \
   $O\SettingsPage.obj \
   $O\SplitDialog.obj \
   $O\SystemPage.obj \
+  $O\VerCtrl.obj \
 
 !IFNDEF UNDER_CE
 
@@ -72,6 +88,9 @@ WIN_OBJS = $(WIN_OBJS) \
 
 !ENDIF
 
+C_OBJS = $(C_OBJS) \
+  $O\DllSecur.obj \
+
 AGENT_OBJS = \
   $O\Agent.obj \
   $O\AgentOut.obj \
@@ -80,3 +99,5 @@ AGENT_OBJS = \
   $O\ArchiveFolderOpen.obj \
   $O\ArchiveFolderOut.obj \
   $O\UpdateCallbackAgent.obj \
+
+# we need empty line after last line above

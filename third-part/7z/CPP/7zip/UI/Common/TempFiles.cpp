@@ -1,6 +1,6 @@
 // TempFiles.cpp
 
-
+#include "StdAfx.h"
 
 #include "../../../Windows/FileDir.h"
 
@@ -13,7 +13,8 @@ void CTempFiles::Clear()
 {
   while (!Paths.IsEmpty())
   {
-    NDir::DeleteFileAlways(Paths.Back());
+    if (NeedDeleteFiles)
+      NDir::DeleteFileAlways(Paths.Back());
     Paths.DeleteBack();
   }
 }

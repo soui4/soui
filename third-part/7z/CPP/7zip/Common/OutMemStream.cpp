@@ -1,6 +1,8 @@
 // OutMemStream.cpp
 
+#include "StdAfx.h"
 
+// #include <stdio.h>
 
 #include "OutMemStream.h"
 
@@ -29,16 +31,17 @@ void COutMemStream::DetachData(CMemLockBlocks &blocks)
 
 HRESULT COutMemStream::WriteToRealStream()
 {
-  RINOK(Blocks.WriteToStream(_memManager->GetBlockSize(), OutSeqStream));
+  RINOK(Blocks.WriteToStream(_memManager->GetBlockSize(), OutSeqStream))
   Blocks.Free(_memManager);
   return S_OK;
 }
 
-STDMETHODIMP COutMemStream::Write(const void *data, UInt32 size, UInt32 *processedSize)
+
+Z7_COM7F_IMF(COutMemStream::Write(const void *data, UInt32 size, UInt32 *processedSize))
 {
   if (_realStreamMode)
     return OutSeqStream->Write(data, size, processedSize);
-  if (processedSize != 0)
+  if (processedSize)
     *processedSize = 0;
   while (size != 0)
   {
@@ -49,13 +52,13 @@ STDMETHODIMP COutMemStream::Write(const void *data, UInt32 size, UInt32 *process
       if (size < curSize)
         curSize = size;
       memcpy(p, data, curSize);
-      if (processedSize != 0)
+      if (processedSize)
         *processedSize += (UInt32)curSize;
       data = (const void *)((const Byte *)data + curSize);
       size -= (UInt32)curSize;
       _curBlockPos += curSize;
 
-      UInt64 pos64 = GetPos();
+      const UInt64 pos64 = GetPos();
       if (pos64 > Blocks.TotalSize)
         Blocks.TotalSize = pos64;
       if (_curBlockPos == _memManager->GetBlockSize())
@@ -65,8 +68,14 @@ STDMETHODIMP COutMemStream::Write(const void *data, UInt32 size, UInt32 *process
       }
       continue;
     }
-    HANDLE events[3] = { StopWritingEvent, WriteToRealStreamEvent, /* NoLockEvent, */ _memManager->Semaphore };
-    DWORD waitResult = ::WaitForMultipleObjects((Blocks.LockMode ? 3 : 2), events, FALSE, INFINITE);
+
+    const NWindows::NSynchronization::CHandle_WFMO events[3] =
+      { StopWritingEvent, WriteToRealStreamEvent, /* NoLockEvent, */ _memManager->Semaphore };
+    const DWORD waitResult = NWindows::NSynchronization::WaitForMultiObj_Any_Infinite(
+        ((Blocks.LockMode /* && _memManager->Semaphore.IsCreated() */) ? 3 : 2), events);
+    
+    // printf("\n 1- outMemStream %d\n", waitResult - WAIT_OBJECT_0);
+
     switch (waitResult)
     {
       case (WAIT_OBJECT_0 + 0):
@@ -74,35 +83,42 @@ STDMETHODIMP COutMemStream::Write(const void *data, UInt32 size, UInt32 *process
       case (WAIT_OBJECT_0 + 1):
       {
         _realStreamMode = true;
-        RINOK(WriteToRealStream());
+        RINOK(WriteToRealStream())
         UInt32 processedSize2;
-        HRESULT res = OutSeqStream->Write(data, size, &processedSize2);
-        if (processedSize != 0)
+        const HRESULT res = OutSeqStream->Write(data, size, &processedSize2);
+        if (processedSize)
           *processedSize += processedSize2;
         return res;
       }
-      /*
       case (WAIT_OBJECT_0 + 2):
       {
         // it has bug: no write.
+        /*
         if (!Blocks.SwitchToNoLockMode(_memManager))
           return E_FAIL;
+        */
         break;
       }
-      */
-      case (WAIT_OBJECT_0 + 2):
-        break;
       default:
+      {
+        if (waitResult == WAIT_FAILED)
+        {
+          const DWORD res = ::GetLastError();
+          if (res != 0)
+            return HRESULT_FROM_WIN32(res);
+        }
         return E_FAIL;
+      }
     }
-    Blocks.Blocks.Add(_memManager->AllocateBlock());
-    if (Blocks.Blocks.Back() == 0)
+    void *p = _memManager->AllocateBlock();
+    if (!p)
       return E_FAIL;
+    Blocks.Blocks.Add(p);
   }
   return S_OK;
 }
 
-STDMETHODIMP COutMemStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition)
+Z7_COM7F_IMF(COutMemStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPosition))
 {
   if (_realStreamMode)
   {
@@ -129,7 +145,7 @@ STDMETHODIMP COutMemStream::Seek(Int64 offset, UInt32 seekOrigin, UInt64 *newPos
   return S_OK;
 }
 
-STDMETHODIMP COutMemStream::SetSize(UInt64 newSize)
+Z7_COM7F_IMF(COutMemStream::SetSize(UInt64 newSize))
 {
   if (_realStreamMode)
   {

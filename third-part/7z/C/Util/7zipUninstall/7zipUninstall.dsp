@@ -43,7 +43,7 @@ RSC=rc.exe
 # PROP Ignore_Export_Lib 0
 # PROP Target_Dir ""
 # ADD BASE CPP /nologo /W3 /GX /O2 /D "WIN32" /D "NDEBUG" /D "_WINDOWS" /D "_MBCS" /YX /FD /c
-# ADD CPP /nologo /MD /W4 /WX /GX /O2 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE2" /D "UNICODE2" /Yu"Precomp.h" /FD /c
+# ADD CPP /nologo /Gr /MD /W4 /WX /GX /O1 /D "NDEBUG" /D "WIN32" /D "_WINDOWS" /D "_UNICODE2" /D "UNICODE2" /FAcs /Yu"Precomp.h" /FD /GF /c
 # ADD BASE MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD MTL /nologo /D "NDEBUG" /mktyplib203 /win32
 # ADD BASE RSC /l 0x419 /d "NDEBUG"
@@ -102,6 +102,14 @@ SOURCE=..\..\7zVersion.h
 # Begin Group "Spec"
 
 # PROP Default_Filter ""
+# Begin Source File
+
+SOURCE=..\..\7zWindows.h
+# End Source File
+# Begin Source File
+
+SOURCE=..\..\Compiler.h
+# End Source File
 # Begin Source File
 
 SOURCE=.\Precomp.c

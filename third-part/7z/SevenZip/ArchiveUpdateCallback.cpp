@@ -27,7 +27,7 @@ ArchiveUpdateCallback::~ArchiveUpdateCallback()
 
 STDMETHODIMP ArchiveUpdateCallback::QueryInterface( REFIID iid, void** ppvObject )
 {
-	if ( iid == __uuidof( IUnknown ) )
+	if ( iid == IID_IUnknown )
 	{
 		*ppvObject = reinterpret_cast< IUnknown* >( this );
 		AddRef();
@@ -67,22 +67,23 @@ STDMETHODIMP ArchiveUpdateCallback::QueryInterface( REFIID iid, void** ppvObject
 
 STDMETHODIMP_(ULONG) ArchiveUpdateCallback::AddRef()
 {
-	return static_cast< ULONG >( InterlockedIncrement( &m_refCount ) );
+	return InterlockedIncrement(&m_refCount);
 }
 
 STDMETHODIMP_(ULONG) ArchiveUpdateCallback::Release()
 {
-	ULONG res = static_cast< ULONG >( InterlockedDecrement( &m_refCount ) );
-	if ( res == 0 )
+	ULONG newRefCount = InterlockedDecrement(&m_refCount);
+	if (newRefCount == 0)
 	{
 		delete this;
+		return 0;
 	}
-	return res;
+	return newRefCount;
 }
 
 STDMETHODIMP ArchiveUpdateCallback::SetTotal( UInt64 size )
 {
-    wprintf_s(L"SetTotal:%llu\n", size);
+	//wprintf(L"SetTotal:%llu\n", size);
 	if (m_callback)
 	{
 		m_callback->OnStart(m_outputPath, size);
@@ -92,7 +93,7 @@ STDMETHODIMP ArchiveUpdateCallback::SetTotal( UInt64 size )
 
 STDMETHODIMP ArchiveUpdateCallback::SetCompleted( const UInt64* completeValue )
 {
-    wprintf_s(L"SetCompleted:%llu\n", *completeValue);
+	//wprintf(L"SetCompleted:%llu\n", *completeValue);
 	if (m_callback)
 	{
 		m_callback->OnProgress(m_outputPath, *completeValue);
@@ -166,12 +167,15 @@ STDMETHODIMP ArchiveUpdateCallback::GetStream( UInt32 index, ISequentialInStream
 	{
 		return S_OK;
 	}
-    wprintf_s(L"GetStream:%s\n", fileInfo.FilePath.c_str());
+	//wprintf(L"GetStream:%s\n", fileInfo.FilePath.c_str());
 
-	CMyComPtr< IStream > fileStream = FileSys::OpenFileToRead( fileInfo.FilePath );
-	if ( fileStream == NULL )
-	{
-		return HRESULT_FROM_WIN32( GetLastError() );
+#if defined(_UNICODE)
+	FILE* fileStream = _wfopen(fileInfo.FilePath.c_str(), L"rb");
+#else
+	FILE* fileStream = fopen(fileInfo.FilePath.c_str(), "rb");
+#endif
+	if (fileStream == NULL) {
+		return HRESULT_FROM_WIN32(GetLastError());
 	}
 
 	CMyComPtr< InStreamWrapper > wrapperStream = new InStreamWrapper( fileStream );
@@ -182,7 +186,7 @@ STDMETHODIMP ArchiveUpdateCallback::GetStream( UInt32 index, ISequentialInStream
 
 STDMETHODIMP ArchiveUpdateCallback::SetOperationResult( Int32 operationResult )
 {
-    wprintf_s(L"SetOperationResult:%u\n", operationResult);
+	//wprintf(L"SetOperationResult:%u\n", operationResult);
 	return S_OK;
 }
 
@@ -218,7 +222,7 @@ STDMETHODIMP ArchiveUpdateCallback::CryptoGetTextPassword(BSTR* password)
 
 STDMETHODIMP ArchiveUpdateCallback::SetRatioInfo( const UInt64* inSize, const UInt64* outSize )
 {
-    wprintf_s(L"SetRatioInfo:%llu-%llu\n", *inSize, *outSize);
+	//wprintf(L"SetRatioInfo:%llu-%llu\n", *inSize, *outSize);
 	return S_OK;
 }
 

@@ -1,6 +1,6 @@
 // Windows/COM.cpp
 
-
+#include "StdAfx.h"
 
 /*
 

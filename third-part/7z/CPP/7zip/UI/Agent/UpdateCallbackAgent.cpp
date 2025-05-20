@@ -1,6 +1,6 @@
 // UpdateCallbackAgent.h
 
-
+#include "StdAfx.h"
 
 #include "../../../Common/IntToString.h"
 
@@ -22,10 +22,10 @@ void CUpdateCallbackAgent::SetCallback(IFolderArchiveUpdateCallback *callback)
   }
 }
 
-HRESULT CUpdateCallbackAgent::SetNumItems(UInt64 numItems)
+HRESULT CUpdateCallbackAgent::SetNumItems(const CArcToDoStat &stat)
 {
   if (Callback)
-    return Callback->SetNumFiles(numItems);
+    return Callback->SetNumFiles(stat.Get_NumDataItems_Total());
   return S_OK;
 }
 
@@ -71,22 +71,22 @@ HRESULT CUpdateCallbackAgent::Finalize()
 
 HRESULT CUpdateCallbackAgent::OpenFileError(const FString &path, DWORD systemError)
 {
-  HRESULT hres = HRESULT_FROM_WIN32(systemError);
+  const HRESULT hres = HRESULT_FROM_WIN32(systemError);
   // if (systemError == ERROR_SHARING_VIOLATION)
   {
     if (Callback2)
     {
-      RINOK(Callback2->OpenFileError(fs2us(path), hres));
+      RINOK(Callback2->OpenFileError(fs2us(path), hres))
       return S_FALSE;
     }
     
     if (Callback)
     {
-      UString s = L"WARNING: ";
+      UString s ("WARNING: ");
       s += NError::MyFormatMessage(systemError);
-      s += L": ";
+      s += ": ";
       s += fs2us(path);
-      RINOK(Callback->UpdateErrorMessage(s));
+      RINOK(Callback->UpdateErrorMessage(s))
       return S_FALSE;
     }
   }
@@ -96,21 +96,21 @@ HRESULT CUpdateCallbackAgent::OpenFileError(const FString &path, DWORD systemErr
 
 HRESULT CUpdateCallbackAgent::ReadingFileError(const FString &path, DWORD systemError)
 {
-  HRESULT hres = HRESULT_FROM_WIN32(systemError);
+  const HRESULT hres = HRESULT_FROM_WIN32(systemError);
 
   // if (systemError == ERROR_SHARING_VIOLATION)
   {
     if (Callback2)
     {
-      RINOK(Callback2->ReadingFileError(fs2us(path), hres));
+      RINOK(Callback2->ReadingFileError(fs2us(path), hres))
     }
     else if (Callback)
     {
-      UString s = L"ERROR: ";
+      UString s ("ERROR: ");
       s += NError::MyFormatMessage(systemError);
-      s += L": ";
+      s += ": ";
       s += fs2us(path);
-      RINOK(Callback->UpdateErrorMessage(s));
+      RINOK(Callback->UpdateErrorMessage(s))
     }
   }
   // FailedFiles.Add(name);
@@ -153,7 +153,7 @@ HRESULT CUpdateCallbackAgent::ReportExtractResult(Int32 opRes, Int32 isEncrypted
   return S_OK;
 }
 
-HRESULT CUpdateCallbackAgent::ReportUpdateOpeartion(UInt32 op, const wchar_t *name, bool isDir)
+HRESULT CUpdateCallbackAgent::ReportUpdateOperation(UInt32 op, const wchar_t *name, bool isDir)
 {
   if (Callback2)
   {
@@ -164,12 +164,12 @@ HRESULT CUpdateCallbackAgent::ReportUpdateOpeartion(UInt32 op, const wchar_t *na
 
 /*
 HRESULT CUpdateCallbackAgent::SetPassword(const UString &
-    #ifndef _NO_CRYPTO
+    #ifndef Z7_NO_CRYPTO
     password
     #endif
     )
 {
-  #ifndef _NO_CRYPTO
+  #ifndef Z7_NO_CRYPTO
   PasswordIsDefined = true;
   Password = password;
   #endif

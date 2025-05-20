@@ -1,6 +1,6 @@
 // Archive/ChmIn.cpp
 
-
+#include "StdAfx.h"
 
 // #include <stdio.h>
 
@@ -10,10 +10,10 @@
 #include "../../../Common/UTFConvert.h"
 
 #include "../../Common/LimitedStreams.h"
+#include "../../Common/StreamUtils.h"
 
 #include "ChmIn.h"
 
-#define Get16(p) GetUi16(p)
 #define Get32(p) GetUi32(p)
 #define Get64(p) GetUi64(p)
 
@@ -38,62 +38,27 @@ struct CHeaderErrorException {};
 // define CHM_LOW, if you want to see low level items
 // #define CHM_LOW
 
-static const GUID kChmLzxGuid   = { 0x7FC28940, 0x9D31, 0x11D0, { 0x9B, 0x27, 0x00, 0xA0, 0xC9, 0x1E, 0x9C, 0x7C } };
-static const GUID kHelp2LzxGuid = { 0x0A9007C6, 0x4076, 0x11D3, { 0x87, 0x89, 0x00, 0x00, 0xF8, 0x10, 0x57, 0x54 } };
-static const GUID kDesGuid =      { 0x67F6E4A2, 0x60BF, 0x11D3, { 0x85, 0x40, 0x00, 0xC0, 0x4F, 0x58, 0xC3, 0xCF } };
+static const Byte kChmLzxGuid[16]   = { 0x40, 0x89, 0xC2, 0x7F, 0x31, 0x9D, 0xD0, 0x11, 0x9B, 0x27, 0x00, 0xA0, 0xC9, 0x1E, 0x9C, 0x7C };
+static const Byte kHelp2LzxGuid[16] = { 0xC6, 0x07, 0x90, 0x0A, 0x76, 0x40, 0xD3, 0x11, 0x87, 0x89, 0x00, 0x00, 0xF8, 0x10, 0x57, 0x54 };
+static const Byte kDesGuid[16]      = { 0xA2, 0xE4, 0xF6, 0x67, 0xBF, 0x60, 0xD3, 0x11, 0x85, 0x40, 0x00, 0xC0, 0x4F, 0x58, 0xC3, 0xCF };
 
-static bool AreGuidsEqual(REFGUID g1, REFGUID g2)
+static bool inline AreGuidsEqual(const Byte *g1, const Byte *g2)
 {
-  if (g1.Data1 != g2.Data1 ||
-      g1.Data2 != g2.Data2 ||
-      g1.Data3 != g2.Data3)
-    return false;
-  for (int i = 0; i < 8; i++)
-    if (g1.Data4[i] != g2.Data4[i])
-      return false;
-  return true;
+  return memcmp(g1, g2, 16) == 0;
 }
 
-static char GetHex(unsigned v)
+static void PrintByte(unsigned b, AString &s)
 {
-  return (char)((v < 10) ? ('0' + v) : ('A' + (v - 10)));
-}
-
-static void PrintByte(Byte b, AString &s)
-{
-  s += GetHex(b >> 4);
-  s += GetHex(b & 0xF);
-}
-
-static void PrintUInt16(UInt16 v, AString &s)
-{
-  PrintByte((Byte)(v >> 8), s);
-  PrintByte((Byte)v, s);
-}
-
-static void PrintUInt32(UInt32 v, AString &s)
-{
-  PrintUInt16((UInt16)(v >> 16), s);
-  PrintUInt16((UInt16)v, s);
+  s += (char)GET_HEX_CHAR_UPPER(b >> 4);
+  s += (char)GET_HEX_CHAR_LOWER(b & 0xF);
 }
 
 AString CMethodInfo::GetGuidString() const
 {
-  AString s;
-  s += '{';
-  PrintUInt32(Guid.Data1, s);
-  s += '-';
-  PrintUInt16(Guid.Data2, s);
-  s += '-';
-  PrintUInt16(Guid.Data3, s);
-  s += '-';
-  PrintByte(Guid.Data4[0], s);
-  PrintByte(Guid.Data4[1], s);
-  s += '-';
-  for (int i = 2; i < 8; i++)
-    PrintByte(Guid.Data4[i], s);
-  s += '}';
-  return s;
+  char s[16 * 2 + 8];
+  RawLeGuidToString_Braced(Guid, s);
+  // MyStringUpper_Ascii(s);
+  return (AString)s;
 }
 
 bool CMethodInfo::IsLzx() const
@@ -108,32 +73,30 @@ bool CMethodInfo::IsDes() const
   return AreGuidsEqual(Guid, kDesGuid);
 }
 
-UString CMethodInfo::GetName() const
+AString CMethodInfo::GetName() const
 {
-  UString s;
+  AString s;
   if (IsLzx())
   {
-    s.SetFromAscii("LZX:");
-    char temp[16];
-    ConvertUInt32ToString(LzxInfo.GetNumDictBits(), temp);
-    s.AddAscii(temp);
+    s = "LZX:";
+    s.Add_UInt32(LzxInfo.GetNumDictBits());
   }
   else
   {
-    AString s2;
     if (IsDes())
-      s2 = "DES";
+      s = "DES";
     else
     {
-      s2 = GetGuidString();
-      if (ControlData.Size() > 0)
+      s = GetGuidString();
+      /*
+      if (ControlData.Size() > 0 && ControlData.Size() <= (1 << 6))
       {
-        s2 += ':';
+        s.Add_Colon();
         for (size_t i = 0; i < ControlData.Size(); i++)
-          PrintByte(ControlData[i], s2);
+          PrintByte(ControlData[i], s);
       }
+      */
     }
-    ConvertUTF8ToUnicode(s2, s);
   }
   return s;
 }
@@ -151,9 +114,9 @@ UString CSectionInfo::GetMethodName() const
   if (!IsLzx())
   {
     UString temp;
-    if (ConvertUTF8ToUnicode(Name, temp))
+    ConvertUTF8ToUnicode(Name, temp);
       s += temp;
-    s.AddAscii(": ");
+    s += ": ";
   }
   FOR_VECTOR (i, Methods)
   {
@@ -211,7 +174,7 @@ UInt64 CInArchive::ReadEncInt()
   UInt64 val = 0;
   for (int i = 0; i < 9; i++)
   {
-    Byte b = ReadByte();
+    const unsigned b = ReadByte();
     val |= (b & 0x7F);
     if (b < 0x80)
       return val;
@@ -220,12 +183,9 @@ UInt64 CInArchive::ReadEncInt()
   throw CHeaderErrorException();
 }
 
-void CInArchive::ReadGUID(GUID &g)
+void CInArchive::ReadGUID(Byte *g)
 {
-  g.Data1 = ReadUInt32();
-  g.Data2 = ReadUInt16();
-  g.Data3 = ReadUInt16();
-  ReadBytes(g.Data4, 8);
+  ReadBytes(g, 16);
 }
 
 void CInArchive::ReadString(unsigned size, AString &s)
@@ -243,7 +203,7 @@ void CInArchive::ReadUString(unsigned size, UString &s)
   s.Empty();
   while (size-- != 0)
   {
-    wchar_t c = ReadUInt16();
+    const wchar_t c = ReadUInt16();
     if (c == 0)
     {
       Skip(2 * size);
@@ -255,7 +215,7 @@ void CInArchive::ReadUString(unsigned size, UString &s)
 
 HRESULT CInArchive::ReadChunk(IInStream *inStream, UInt64 pos, UInt64 size)
 {
-  RINOK(inStream->Seek(pos, STREAM_SEEK_SET, NULL));
+  RINOK(InStream_SeekSet(inStream, pos))
   CLimitedSequentialInStream *streamSpec = new CLimitedSequentialInStream;
   CMyComPtr<ISequentialInStream> limitedStream(streamSpec);
   streamSpec->SetStream(inStream);
@@ -269,7 +229,7 @@ HRESULT CInArchive::ReadChunk(IInStream *inStream, UInt64 pos, UInt64 size)
 HRESULT CInArchive::ReadDirEntry(CDatabase &database)
 {
   CItem item;
-  UInt64 nameLen = ReadEncInt();
+  const UInt64 nameLen = ReadEncInt();
   if (nameLen == 0 || nameLen > (1 << 13))
     return S_FALSE;
   ReadString((unsigned)nameLen, item.Name);
@@ -299,7 +259,7 @@ HRESULT CInArchive::OpenChm(IInStream *inStream, CDatabase &database)
       // The third and fourth bytes may contain even more fractional bits.
       // The 4 least significant bits in the last byte are constant.
   /* UInt32 lang = */ ReadUInt32();
-  GUID g;
+  Byte g[16];
   ReadGUID(g); // {7C01FD10-7BAA-11D0-9E0C-00A0-C922-E6EC}
   ReadGUID(g); // {7C01FD11-7BAA-11D0-9E0C-00A0-C922-E6EC}
   const unsigned kNumSections = 2;
@@ -370,7 +330,7 @@ HRESULT CInArchive::OpenChm(IInStream *inStream, CDatabase &database)
       // One quickref entry exists for every n entries in the file, where n
       // is calculated as 1 + (1 << quickref density). So for density = 2, n = 5.
 
-      UInt32 quickrefLength = ReadUInt32(); // Len of free space and/or quickref area at end of directory chunk
+      const UInt32 quickrefLength = ReadUInt32(); // Len of free space and/or quickref area at end of directory chunk
       if (quickrefLength > dirChunkSize || quickrefLength < 2)
         return S_FALSE;
       ReadUInt32(); // Always 0
@@ -382,19 +342,19 @@ HRESULT CInArchive::OpenChm(IInStream *inStream, CDatabase &database)
       
       for (;;)
       {
-        UInt64 offset = _inBuffer.GetProcessedSize() - chunkPos;
-        UInt32 offsetLimit = dirChunkSize - quickrefLength;
+        const UInt64 offset = _inBuffer.GetProcessedSize() - chunkPos;
+        const UInt32 offsetLimit = dirChunkSize - quickrefLength;
         if (offset > offsetLimit)
           return S_FALSE;
         if (offset == offsetLimit)
           break;
-        RINOK(ReadDirEntry(database));
+        RINOK(ReadDirEntry(database))
         numItems++;
       }
       
       Skip(quickrefLength - 2);
       
-      unsigned rrr = ReadUInt16();
+      const unsigned rrr = ReadUInt16();
       if (rrr != numItems)
       {
         // Lazarus 9-26-2 chm contains 0 here.
@@ -422,7 +382,7 @@ HRESULT CInArchive::OpenHelp2(IInStream *inStream, CDatabase &database)
   IsArc = true;
 
   ReadUInt32(); // Len of post-header table
-  GUID g;
+  Byte g[16];
   ReadGUID(g);  // {0A9007C1-4076-11D3-8789-0000F8105754}
 
   // header section table
@@ -575,40 +535,46 @@ HRESULT CInArchive::OpenHelp2(IInStream *inStream, CDatabase &database)
       unsigned numItems = 0;
       for (;;)
       {
-        UInt64 offset = _inBuffer.GetProcessedSize() - chunkPos;
-        UInt32 offsetLimit = dirChunkSize - quickrefLength;
+        const UInt64 offset = _inBuffer.GetProcessedSize() - chunkPos;
+        const UInt32 offsetLimit = dirChunkSize - quickrefLength;
         if (offset > offsetLimit)
           return S_FALSE;
         if (offset == offsetLimit)
           break;
         if (database.NewFormat)
         {
-          UInt16 nameLen = ReadUInt16();
+          const unsigned nameLen = ReadUInt16();
           if (nameLen == 0)
             return S_FALSE;
           UString name;
-          ReadUString((unsigned)nameLen, name);
+          ReadUString(nameLen, name);
           AString s;
           ConvertUnicodeToUTF8(name, s);
-          Byte b = ReadByte();
-          s.Add_Space();
-          PrintByte(b, s);
+          {
+            const unsigned b = ReadByte();
+            s.Add_Space();
+            PrintByte(b, s);
+          }
           s.Add_Space();
           UInt64 len = ReadEncInt();
           // then number of items ?
           // then length ?
           // then some data (binary encoding?)
-          while (len-- != 0)
+          if (len > 1u << 29) // what limit here we need?
+            return S_FALSE;
+          if (len)
+          do
           {
-            b = ReadByte();
+            const unsigned b = ReadByte();
             PrintByte(b, s);
           }
+          while (--len);
           database.NewFormatString += s;
           database.NewFormatString += "\r\n";
         }
         else
         {
-          RINOK(ReadDirEntry(database));
+          RINOK(ReadDirEntry(database))
         }
         numItems++;
       }
@@ -637,24 +603,24 @@ HRESULT CInArchive::DecompressStream(IInStream *inStream, const CDatabase &datab
 
 
 #define DATA_SPACE "::DataSpace/"
-static const char *kNameList = DATA_SPACE "NameList";
-static const char *kStorage = DATA_SPACE "Storage/";
-static const char *kContent = "Content";
-static const char *kControlData = "ControlData";
-static const char *kSpanInfo = "SpanInfo";
-static const char *kTransform = "Transform/";
-static const char *kResetTable = "/InstanceData/ResetTable";
-static const char *kTransformList = "List";
+#define kNameList DATA_SPACE "NameList"
+#define kStorage DATA_SPACE "Storage/"
+#define kContent "Content"
+#define kControlData "ControlData"
+#define kSpanInfo "SpanInfo"
+#define kTransform "Transform/"
+#define kResetTable "/InstanceData/ResetTable"
+#define kTransformList "List"
 
 static AString GetSectionPrefix(const AString &name)
 {
-  AString s = kStorage;
+  AString s (kStorage);
   s += name;
-  s += '/';
+  s.Add_Slash();
   return s;
 }
 
-#define RINOZ(x) { int __tt = (x); if (__tt != 0) return __tt; }
+#define RINOZ(x) { int _tt_ = (x); if (_tt_ != 0) return _tt_; }
 
 static int CompareFiles(const unsigned *p1, const unsigned *p2, void *param)
 {
@@ -672,9 +638,9 @@ static int CompareFiles(const unsigned *p1, const unsigned *p2, void *param)
   }
   else
   {
-    RINOZ(MyCompare(item1.Section, item2.Section));
-    RINOZ(MyCompare(item1.Offset, item2.Offset));
-    RINOZ(MyCompare(item1.Size, item2.Size));
+    RINOZ(MyCompare(item1.Section, item2.Section))
+    RINOZ(MyCompare(item1.Offset, item2.Offset))
+    RINOZ(MyCompare(item1.Size, item2.Size))
   }
   return MyCompare(*p1, *p2);
 }
@@ -743,13 +709,13 @@ HRESULT CInArchive::OpenHighLevel(IInStream *inStream, CFilesDatabase &database)
 {
   {
     // The NameList file
-    RINOK(DecompressStream(inStream, database, kNameList));
+    RINOK(DecompressStream(inStream, database, (AString)kNameList))
     /* UInt16 length = */ ReadUInt16();
     UInt16 numSections = ReadUInt16();
     for (unsigned i = 0; i < numSections; i++)
     {
       CSectionInfo section;
-      UInt16 nameLen = ReadUInt16();
+      const unsigned nameLen = ReadUInt16();
       UString name;
       ReadUString(nameLen, name);
       if (ReadUInt16() != 0)
@@ -764,7 +730,7 @@ HRESULT CInArchive::OpenHighLevel(IInStream *inStream, CFilesDatabase &database)
   for (si = 1; si < database.Sections.Size(); si++)
   {
     CSectionInfo &section = database.Sections[si];
-    AString sectionPrefix = GetSectionPrefix(section.Name);
+    AString sectionPrefix (GetSectionPrefix(section.Name));
     {
       // Content
       int index = database.FindItem(sectionPrefix + kContent);
@@ -774,11 +740,11 @@ HRESULT CInArchive::OpenHighLevel(IInStream *inStream, CFilesDatabase &database)
       section.Offset = item.Offset;
       section.CompressedSize = item.Size;
     }
-    AString transformPrefix = sectionPrefix + kTransform;
+    AString transformPrefix (sectionPrefix + kTransform);
     if (database.Help2Format)
     {
       // Transform List
-      RINOK(DecompressStream(inStream, database, transformPrefix + kTransformList));
+      RINOK(DecompressStream(inStream, database, transformPrefix + kTransformList))
       if ((_chunkSize & 0xF) != 0)
         return S_FALSE;
       unsigned numGuids = (unsigned)(_chunkSize / 0x10);
@@ -794,13 +760,13 @@ HRESULT CInArchive::OpenHighLevel(IInStream *inStream, CFilesDatabase &database)
     else
     {
       CMethodInfo method;
-      method.Guid = kChmLzxGuid;
+      memcpy(method.Guid, kChmLzxGuid, 16);
       section.Methods.Add(method);
     }
 
     {
       // Control Data
-      RINOK(DecompressStream(inStream, database, sectionPrefix + kControlData));
+      RINOK(DecompressStream(inStream, database, sectionPrefix + kControlData))
       
       FOR_VECTOR (mi, section.Methods)
       {
@@ -819,38 +785,43 @@ HRESULT CInArchive::OpenHighLevel(IInStream *inStream, CFilesDatabase &database)
           
           {
             // There is bug in VC6, if we use function call as parameter for inline function
-            UInt32 val32 = ReadUInt32();
-            int n = GetLog(val32);
+            const UInt32 val32 = ReadUInt32();
+            const int n = GetLog(val32);
             if (n < 0 || n > 16)
               return S_FALSE;
-            li.ResetIntervalBits = n;
+            li.ResetIntervalBits = (unsigned)n;
           }
           
           {
-            UInt32 val32 = ReadUInt32();
-            int n = GetLog(val32);
+            const UInt32 val32 = ReadUInt32();
+            const int n = GetLog(val32);
             if (n < 0 || n > 16)
               return S_FALSE;
-            li.WindowSizeBits = n;
+            li.WindowSizeBits = (unsigned)n;
           }
 
           li.CacheSize = ReadUInt32();
           numDWORDS -= 5;
-          while (numDWORDS-- != 0)
+          if (numDWORDS)
+          do
             ReadUInt32();
+          while (--numDWORDS);
         }
         else
         {
-          UInt32 numBytes = numDWORDS * 4;
-          method.ControlData.Alloc(numBytes);
-          ReadBytes(method.ControlData, numBytes);
+          if (numDWORDS > 1u << 27)
+            return S_FALSE;
+          const size_t numBytes = (size_t)numDWORDS * 4;
+          // method.ControlData.Alloc(numBytes);
+          // ReadBytes(method.ControlData, numBytes);
+          Skip(numBytes);
         }
       }
     }
 
     {
       // SpanInfo
-      RINOK(DecompressStream(inStream, database, sectionPrefix + kSpanInfo));
+      RINOK(DecompressStream(inStream, database, sectionPrefix + kSpanInfo))
       section.UncompressedSize = ReadUInt64();
     }
 
@@ -862,7 +833,7 @@ HRESULT CInArchive::OpenHighLevel(IInStream *inStream, CFilesDatabase &database)
       {
         // ResetTable;
         RINOK(DecompressStream(inStream, database, transformPrefix +
-            method.GetGuidString() + kResetTable));
+            method.GetGuidString() + kResetTable))
         CResetTable &rt = method.LzxInfo.ResetTable;
         
         if (_chunkSize < 4)
@@ -878,10 +849,10 @@ HRESULT CInArchive::OpenHighLevel(IInStream *inStream, CFilesDatabase &database)
         }
         else
         {
-          UInt32 ver = ReadUInt32(); // 2  unknown (possibly a version number)
+          const UInt32 ver = ReadUInt32(); // 2  unknown (possibly a version number)
           if (ver != 2 && ver != 3)
             return S_FALSE;
-          UInt32 numEntries = ReadUInt32();
+          const UInt32 numEntries = ReadUInt32();
           const unsigned kEntrySize = 8;
           if (ReadUInt32() != kEntrySize)
             return S_FALSE;
@@ -944,7 +915,7 @@ HRESULT CInArchive::Open2(IInStream *inStream,
   database.Help2Format = _help2;
   const UInt32 chmVersion = 3;
 
-  RINOK(inStream->Seek(0, STREAM_SEEK_CUR, &database.StartPosition));
+  RINOK(InStream_GetPos(inStream, database.StartPosition))
 
   if (!_inBuffer.Create(1 << 14))
     return E_OUTOFMEMORY;
@@ -980,7 +951,7 @@ HRESULT CInArchive::Open2(IInStream *inStream,
     }
     
     database.StartPosition += _inBuffer.GetProcessedSize() - kSignatureSize;
-    RINOK(OpenHelp2(inStream, database));
+    RINOK(OpenHelp2(inStream, database))
     if (database.NewFormat)
       return S_OK;
   }
@@ -990,7 +961,7 @@ HRESULT CInArchive::Open2(IInStream *inStream,
       return S_FALSE;
     if (ReadUInt32() != chmVersion)
       return S_FALSE;
-    RINOK(OpenChm(inStream, database));
+    RINOK(OpenChm(inStream, database))
   }
 
 
@@ -1007,7 +978,7 @@ HRESULT CInArchive::Open2(IInStream *inStream,
         database.HighLevelClear();
         return S_OK;
       }
-      RINOK(res);
+      RINOK(res)
       if (!database.CheckSectionRefs())
         HeadersError = true;
       database.LowLevel = false;

@@ -1,5 +1,5 @@
 /* HuffEnc.c -- functions for Huffman encoding
-2016-05-16 : Igor Pavlov : Public domain */
+2023-09-07 : Igor Pavlov : Public domain */
 
 #include "Precomp.h"
 
@@ -8,7 +8,7 @@
 
 #define kMaxLen 16
 #define NUM_BITS 10
-#define MASK ((1 << NUM_BITS) - 1)
+#define MASK ((1u << NUM_BITS) - 1)
 
 #define NUM_COUNTERS 64
 
@@ -106,14 +106,14 @@ void Huffman_Generate(const UInt32 *freqs, UInt32 *p, Byte *lens, UInt32 numSymb
       
       p[--e] &= MASK;
       lenCounters[1] = 2;
-      while (e > 0)
+      while (e != 0)
       {
         UInt32 len = (p[p[--e] >> NUM_BITS] >> NUM_BITS) + 1;
         p[e] = (p[e] & MASK) | (len << NUM_BITS);
         if (len >= maxLen)
           for (len = maxLen - 1; lenCounters[len] == 0; len--);
         lenCounters[len]--;
-        lenCounters[len + 1] += 2;
+        lenCounters[(size_t)len + 1] += 2;
       }
       
       {
@@ -133,7 +133,7 @@ void Huffman_Generate(const UInt32 *freqs, UInt32 *p, Byte *lens, UInt32 numSymb
           UInt32 code = 0;
           UInt32 len;
           for (len = 1; len <= kMaxLen; len++)
-            nextCodes[len] = code = (code + lenCounters[len - 1]) << 1;
+            nextCodes[len] = code = (code + lenCounters[(size_t)len - 1]) << 1;
         }
         /* if (code + lenCounters[kMaxLen] - 1 != (1 << kMaxLen) - 1) throw 1; */
 
@@ -146,3 +146,9 @@ void Huffman_Generate(const UInt32 *freqs, UInt32 *p, Byte *lens, UInt32 numSymb
     }
   }
 }
+
+#undef kMaxLen
+#undef NUM_BITS
+#undef MASK
+#undef NUM_COUNTERS
+#undef HUFFMAN_SPEED_OPT

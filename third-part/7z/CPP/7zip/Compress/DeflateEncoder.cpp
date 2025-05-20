@@ -1,18 +1,20 @@
 // DeflateEncoder.cpp
 
-
+#include "StdAfx.h"
 
 #include "../../../C/Alloc.h"
 #include "../../../C/HuffEnc.h"
 
 #include "../../Common/ComTry.h"
 
+#include "../Common/CWrappers.h"
+
 #include "DeflateEncoder.h"
 
 #undef NO_INLINE
 
 #ifdef _MSC_VER
-#define NO_INLINE MY_NO_INLINE
+#define NO_INLINE Z7_NO_INLINE
 #else
 #define NO_INLINE
 #endif
@@ -34,15 +36,19 @@ static const UInt32 kMatchArrayLimit = kMatchArraySize - kMatchMaxLen * 4 * size
 static const UInt32 kBlockUncompressedSizeThreshold = kMaxUncompressedBlockSize -
     kMatchMaxLen - kNumOpts;
 
-static const unsigned kMaxCodeBitLength = 11;
+// static const unsigned kMaxCodeBitLength = 11;
 static const unsigned kMaxLevelBitLength = 7;
 
 static const Byte kNoLiteralStatPrice = 11;
 static const Byte kNoLenStatPrice = 11;
 static const Byte kNoPosStatPrice = 6;
 
+MY_ALIGN(64)
 static Byte g_LenSlots[kNumLenSymbolsMax];
-static Byte g_FastPos[1 << 9];
+
+#define kNumLogBits 9    // do not change it
+MY_ALIGN(64)
+static Byte g_FastPos[1 << kNumLogBits];
 
 class CFastPosInit
 {
@@ -53,17 +59,17 @@ public:
     for (i = 0; i < kNumLenSlots; i++)
     {
       unsigned c = kLenStart32[i];
-      unsigned j = 1 << kLenDirectBits32[i];
+      const unsigned j = 1u << kLenDirectBits32[i];
       for (unsigned k = 0; k < j; k++, c++)
         g_LenSlots[c] = (Byte)i;
     }
     
-    const unsigned kFastSlots = 18;
+    const unsigned kFastSlots = kNumLogBits * 2;
     unsigned c = 0;
     for (Byte slotFast = 0; slotFast < kFastSlots; slotFast++)
     {
-      UInt32 k = (1 << kDistDirectBits[slotFast]);
-      for (UInt32 j = 0; j < k; j++, c++)
+      const unsigned k = 1u << kDistDirectBits[slotFast];
+      for (unsigned j = 0; j < k; j++, c++)
         g_FastPos[c] = slotFast;
     }
   }
@@ -71,13 +77,23 @@ public:
 
 static CFastPosInit g_FastPosInit;
 
-
 inline UInt32 GetPosSlot(UInt32 pos)
 {
+  /*
   if (pos < 0x200)
     return g_FastPos[pos];
   return g_FastPos[pos >> 8] + 16;
+  */
+  // const unsigned zz = (pos < ((UInt32)1 << (kNumLogBits))) ? 0 : 8;
+  /*
+  const unsigned zz = (kNumLogBits - 1) &
+      ((UInt32)0 - (((((UInt32)1 << kNumLogBits) - 1) - pos) >> 31));
+  */
+  const unsigned zz = (kNumLogBits - 1) &
+      (((((UInt32)1 << kNumLogBits) - 1) - pos) >> (31 - 3));
+  return g_FastPos[pos >> zz] + (zz * 2);
 }
+
 
 void CEncProps::Normalize()
 {
@@ -87,7 +103,7 @@ void CEncProps::Normalize()
   if (algo < 0) algo = (level < 5 ? 0 : 1);
   if (fb < 0) fb = (level < 7 ? 32 : (level < 9 ? 64 : 128));
   if (btMode < 0) btMode = (algo == 0 ? 0 : 1);
-  if (mc == 0) mc = (16 + (fb >> 1));
+  if (mc == 0) mc = (16 + ((unsigned)fb >> 1));
   if (numPasses == (UInt32)(Int32)-1) numPasses = (level < 7 ? 1 : (level < 9 ? 3 : 10));
 }
 
@@ -98,7 +114,7 @@ void CCoder::SetProps(const CEncProps *props2)
 
   m_MatchFinderCycles = props.mc;
   {
-    unsigned fb = props.fb;
+    unsigned fb = (unsigned)props.fb;
     if (fb < kMatchMinLen)
       fb = kMatchMinLen;
     if (fb > m_MatchMaxLen)
@@ -123,12 +139,12 @@ void CCoder::SetProps(const CEncProps *props2)
 }
 
 CCoder::CCoder(bool deflate64Mode):
-  m_Deflate64Mode(deflate64Mode),
-  m_OnePosMatchesMemory(0),
-  m_DistanceMemory(0),
+  m_Values(NULL),
+  m_OnePosMatchesMemory(NULL),
+  m_DistanceMemory(NULL),
   m_Created(false),
-  m_Values(0),
-  m_Tables(0)
+  m_Deflate64Mode(deflate64Mode),
+  m_Tables(NULL)
 {
   m_MatchMaxLen = deflate64Mode ? kMatchMaxLen64 : kMatchMaxLen32;
   m_NumLenCombinations = deflate64Mode ? kNumLenSymbols64 : kNumLenSymbols32;
@@ -144,34 +160,34 @@ CCoder::CCoder(bool deflate64Mode):
 HRESULT CCoder::Create()
 {
   // COM_TRY_BEGIN
-  if (m_Values == 0)
+  if (!m_Values)
   {
     m_Values = (CCodeValue *)MyAlloc((kMaxUncompressedBlockSize) * sizeof(CCodeValue));
-    if (m_Values == 0)
+    if (!m_Values)
       return E_OUTOFMEMORY;
   }
-  if (m_Tables == 0)
+  if (!m_Tables)
   {
     m_Tables = (CTables *)MyAlloc((kNumTables) * sizeof(CTables));
-    if (m_Tables == 0)
+    if (!m_Tables)
       return E_OUTOFMEMORY;
   }
 
   if (m_IsMultiPass)
   {
-    if (m_OnePosMatchesMemory == 0)
+    if (!m_OnePosMatchesMemory)
     {
       m_OnePosMatchesMemory = (UInt16 *)::MidAlloc(kMatchArraySize * sizeof(UInt16));
-      if (m_OnePosMatchesMemory == 0)
+      if (!m_OnePosMatchesMemory)
         return E_OUTOFMEMORY;
     }
   }
   else
   {
-    if (m_DistanceMemory == 0)
+    if (!m_DistanceMemory)
     {
       m_DistanceMemory = (UInt16 *)MyAlloc((kMatchMaxLen + 2) * 2 * sizeof(UInt16));
-      if (m_DistanceMemory == 0)
+      if (!m_DistanceMemory)
         return E_OUTOFMEMORY;
       m_MatchDistances = m_DistanceMemory;
     }
@@ -181,10 +197,11 @@ HRESULT CCoder::Create()
   {
     _lzInWindow.btMode = (Byte)(_btMode ? 1 : 0);
     _lzInWindow.numHashBytes = 3;
+    _lzInWindow.numHashBytes_Min = 3;
     if (!MatchFinder_Create(&_lzInWindow,
         m_Deflate64Mode ? kHistorySize64 : kHistorySize32,
         kNumOpts + kMaxUncompressedBlockSize,
-        m_NumFastBytes, m_MatchMaxLen - m_NumFastBytes, &g_Alloc))
+        m_NumFastBytes, m_MatchMaxLen - m_NumFastBytes, &g_AlignedAlloc))
       return E_OUTOFMEMORY;
     if (!m_OutStream.Create(1 << 20))
       return E_OUTOFMEMORY;
@@ -211,10 +228,10 @@ HRESULT CCoder::BaseSetEncoderProperties2(const PROPID *propIDs, const PROPVARIA
     switch (propID)
     {
       case NCoderPropID::kNumPasses: props.numPasses = v; break;
-      case NCoderPropID::kNumFastBytes: props.fb = v; break;
+      case NCoderPropID::kNumFastBytes: props.fb = (int)v; break;
       case NCoderPropID::kMatchFinderCycles: props.mc = v; break;
-      case NCoderPropID::kAlgorithm: props.algo = v; break;
-      case NCoderPropID::kLevel: props.Level = v; break;
+      case NCoderPropID::kAlgorithm: props.algo = (int)v; break;
+      case NCoderPropID::kLevel: props.Level = (int)v; break;
       case NCoderPropID::kNumThreads: break;
       default: return E_INVALIDARG;
     }
@@ -225,16 +242,16 @@ HRESULT CCoder::BaseSetEncoderProperties2(const PROPID *propIDs, const PROPVARIA
   
 void CCoder::Free()
 {
-  ::MidFree(m_OnePosMatchesMemory); m_OnePosMatchesMemory = 0;
-  ::MyFree(m_DistanceMemory); m_DistanceMemory = 0;
-  ::MyFree(m_Values); m_Values = 0;
-  ::MyFree(m_Tables); m_Tables = 0;
+  ::MidFree(m_OnePosMatchesMemory); m_OnePosMatchesMemory = NULL;
+  ::MyFree(m_DistanceMemory); m_DistanceMemory = NULL;
+  ::MyFree(m_Values); m_Values = NULL;
+  ::MyFree(m_Tables); m_Tables = NULL;
 }
 
 CCoder::~CCoder()
 {
   Free();
-  MatchFinder_Free(&_lzInWindow, &g_Alloc);
+  MatchFinder_Free(&_lzInWindow, &g_AlignedAlloc);
 }
 
 NO_INLINE void CCoder::GetMatches()
@@ -251,30 +268,30 @@ NO_INLINE void CCoder::GetMatches()
 
   UInt32 distanceTmp[kMatchMaxLen * 2 + 3];
   
-  UInt32 numPairs = (_btMode) ?
+  const UInt32 numPairs = (UInt32)((_btMode ?
       Bt3Zip_MatchFinder_GetMatches(&_lzInWindow, distanceTmp):
-      Hc3Zip_MatchFinder_GetMatches(&_lzInWindow, distanceTmp);
+      Hc3Zip_MatchFinder_GetMatches(&_lzInWindow, distanceTmp)) - distanceTmp);
 
   *m_MatchDistances = (UInt16)numPairs;
    
-  if (numPairs > 0)
+  if (numPairs != 0)
   {
     UInt32 i;
     for (i = 0; i < numPairs; i += 2)
     {
-      m_MatchDistances[i + 1] = (UInt16)distanceTmp[i];
-      m_MatchDistances[i + 2] = (UInt16)distanceTmp[i + 1];
+      m_MatchDistances[(size_t)i + 1] = (UInt16)distanceTmp[i];
+      m_MatchDistances[(size_t)i + 2] = (UInt16)distanceTmp[(size_t)i + 1];
     }
-    UInt32 len = distanceTmp[numPairs - 2];
+    UInt32 len = distanceTmp[(size_t)numPairs - 2];
     if (len == m_NumFastBytes && m_NumFastBytes != m_MatchMaxLen)
     {
       UInt32 numAvail = Inline_MatchFinder_GetNumAvailableBytes(&_lzInWindow) + 1;
       const Byte *pby = Inline_MatchFinder_GetPointerToCurrentPos(&_lzInWindow) - 1;
-      const Byte *pby2 = pby - (distanceTmp[numPairs - 1] + 1);
+      const Byte *pby2 = pby - (distanceTmp[(size_t)numPairs - 1] + 1);
       if (numAvail > m_MatchMaxLen)
         numAvail = m_MatchMaxLen;
       for (; len < numAvail && pby[len] == pby2[len]; len++);
-      m_MatchDistances[i - 1] = (UInt16)len;
+      m_MatchDistances[(size_t)i - 1] = (UInt16)len;
     }
   }
   if (m_IsMultiPass)
@@ -337,11 +354,11 @@ NO_INLINE UInt32 CCoder::GetOptimal(UInt32 &backRes)
     if (numDistancePairs == 0)
       return 1;
     const UInt16 *matchDistances = m_MatchDistances + 1;
-    lenEnd = matchDistances[numDistancePairs - 2];
+    lenEnd = matchDistances[(size_t)numDistancePairs - 2];
     
     if (lenEnd > m_NumFastBytes)
     {
-      backRes = matchDistances[numDistancePairs - 1];
+      backRes = matchDistances[(size_t)numDistancePairs - 1];
       MovePos(lenEnd - 1);
       return lenEnd;
     }
@@ -356,10 +373,10 @@ NO_INLINE UInt32 CCoder::GetOptimal(UInt32 &backRes)
   
     for (UInt32 i = kMatchMinLen; i <= lenEnd; i++)
     {
-      UInt32 distance = matchDistances[offs + 1];
+      UInt32 distance = matchDistances[(size_t)offs + 1];
       m_Optimum[i].PosPrev = 0;
       m_Optimum[i].BackPrev = (UInt16)distance;
-      m_Optimum[i].Price = m_LenPrices[i - kMatchMinLen] + m_PosPrices[GetPosSlot(distance)];
+      m_Optimum[i].Price = m_LenPrices[(size_t)i - kMatchMinLen] + m_PosPrices[GetPosSlot(distance)];
       if (i == matchDistances[offs])
         offs += 2;
     }
@@ -378,11 +395,11 @@ NO_INLINE UInt32 CCoder::GetOptimal(UInt32 &backRes)
     UInt32 newLen = 0;
     if (numDistancePairs != 0)
     {
-      newLen = matchDistances[numDistancePairs - 2];
+      newLen = matchDistances[(size_t)numDistancePairs - 2];
       if (newLen > m_NumFastBytes)
       {
         UInt32 len = Backward(backRes, cur);
-        m_Optimum[cur].BackPrev = matchDistances[numDistancePairs - 1];
+        m_Optimum[cur].BackPrev = matchDistances[(size_t)numDistancePairs - 1];
         m_OptimumEndIndex = cur + newLen;
         m_Optimum[cur].PosPrev = (UInt16)m_OptimumEndIndex;
         MovePos(newLen - 1);
@@ -392,7 +409,7 @@ NO_INLINE UInt32 CCoder::GetOptimal(UInt32 &backRes)
     UInt32 curPrice = m_Optimum[cur].Price;
     {
       const UInt32 curAnd1Price = curPrice + m_LiteralPrices[*(Inline_MatchFinder_GetPointerToCurrentPos(&_lzInWindow) + cur - m_AdditionalOffset)];
-      COptimal &optimum = m_Optimum[cur + 1];
+      COptimal &optimum = m_Optimum[(size_t)cur + 1];
       if (curAnd1Price < optimum.Price)
       {
         optimum.Price = curAnd1Price;
@@ -404,11 +421,11 @@ NO_INLINE UInt32 CCoder::GetOptimal(UInt32 &backRes)
     while (lenEnd < cur + newLen)
       m_Optimum[++lenEnd].Price = kIfinityPrice;
     UInt32 offs = 0;
-    UInt32 distance = matchDistances[offs + 1];
+    UInt32 distance = matchDistances[(size_t)offs + 1];
     curPrice += m_PosPrices[GetPosSlot(distance)];
     for (UInt32 lenTest = kMatchMinLen; ; lenTest++)
     {
-      UInt32 curAndLenPrice = curPrice + m_LenPrices[lenTest - kMatchMinLen];
+      UInt32 curAndLenPrice = curPrice + m_LenPrices[(size_t)lenTest - kMatchMinLen];
       COptimal &optimum = m_Optimum[cur + lenTest];
       if (curAndLenPrice < optimum.Price)
       {
@@ -422,7 +439,7 @@ NO_INLINE UInt32 CCoder::GetOptimal(UInt32 &backRes)
         if (offs == numDistancePairs)
           break;
         curPrice -= m_PosPrices[GetPosSlot(distance)];
-        distance = matchDistances[offs + 1];
+        distance = matchDistances[(size_t)offs + 1];
         curPrice += m_PosPrices[GetPosSlot(distance)];
       }
     }
@@ -435,7 +452,7 @@ UInt32 CCoder::GetOptimalFast(UInt32 &backRes)
   UInt32 numDistancePairs = m_MatchDistances[0];
   if (numDistancePairs == 0)
     return 1;
-  UInt32 lenMain = m_MatchDistances[numDistancePairs - 1];
+  UInt32 lenMain = m_MatchDistances[(size_t)numDistancePairs - 1];
   backRes = m_MatchDistances[numDistancePairs];
   MovePos(lenMain - 1);
   return lenMain;
@@ -470,7 +487,7 @@ NO_INLINE void CCoder::LevelTableDummy(const Byte *levels, unsigned numLevels, U
   for (unsigned n = 0; n < numLevels; n++)
   {
     unsigned curLen = nextLen;
-    nextLen = (n < numLevels - 1) ? levels[n + 1] : 0xFF;
+    nextLen = (n < numLevels - 1) ? levels[(size_t)n + 1] : 0xFF;
     count++;
     if (count < maxCount && curLen == nextLen)
       continue;
@@ -537,7 +554,7 @@ NO_INLINE void CCoder::LevelTableCode(const Byte *levels, unsigned numLevels, co
   for (unsigned n = 0; n < numLevels; n++)
   {
     unsigned curLen = nextLen;
-    nextLen = (n < numLevels - 1) ? levels[n + 1] : 0xFF;
+    nextLen = (n < numLevels - 1) ? levels[(size_t)n + 1] : 0xFF;
     count++;
     if (count < maxCount && curLen == nextLen)
       continue;
@@ -593,7 +610,7 @@ NO_INLINE void CCoder::MakeTables(unsigned maxHuffLen)
   Huffman_Generate(distFreqs, distCodes, m_NewLevels.distLevels, kDistTableSize64, maxHuffLen);
 }
 
-NO_INLINE UInt32 Huffman_GetPrice(const UInt32 *freqs, const Byte *lens, UInt32 num)
+static NO_INLINE UInt32 Huffman_GetPrice(const UInt32 *freqs, const Byte *lens, UInt32 num)
 {
   UInt32 price = 0;
   UInt32 i;
@@ -602,7 +619,7 @@ NO_INLINE UInt32 Huffman_GetPrice(const UInt32 *freqs, const Byte *lens, UInt32 
   return price;
 }
 
-NO_INLINE UInt32 Huffman_GetPrice_Spec(const UInt32 *freqs, const Byte *lens, UInt32 num, const Byte *extraBits, UInt32 extraBase)
+static NO_INLINE UInt32 Huffman_GetPrice_Spec(const UInt32 *freqs, const Byte *lens, UInt32 num, const Byte *extraBits, UInt32 extraBase)
 {
   return Huffman_GetPrice(freqs, lens, num) +
     Huffman_GetPrice(freqs + extraBase, extraBits, num - extraBase);
@@ -627,8 +644,9 @@ NO_INLINE void CCoder::TryBlock()
   {
     if (m_OptimumCurrentIndex == m_OptimumEndIndex)
     {
-      if (m_Pos >= kMatchArrayLimit || BlockSizeRes >= blockSize || !m_SecondPass &&
-          ((Inline_MatchFinder_GetNumAvailableBytes(&_lzInWindow) == 0) || m_ValueIndex >= m_ValueBlockSize))
+      if (m_Pos >= kMatchArrayLimit
+          || BlockSizeRes >= blockSize
+          || (!m_SecondPass && ((Inline_MatchFinder_GetNumAvailableBytes(&_lzInWindow) == 0) || m_ValueIndex >= m_ValueBlockSize)))
         break;
     }
     UInt32 pos;
@@ -642,7 +660,7 @@ NO_INLINE void CCoder::TryBlock()
     {
       UInt32 newLen = len - kMatchMinLen;
       codeValue.Len = (UInt16)newLen;
-      mainFreqs[kSymbolMatch + g_LenSlots[newLen]]++;
+      mainFreqs[kSymbolMatch + (size_t)g_LenSlots[newLen]]++;
       codeValue.Pos = (UInt16)pos;
       distFreqs[GetPosSlot(pos)]++;
     }
@@ -675,7 +693,7 @@ NO_INLINE void CCoder::SetPrices(const CLevels &levels)
   for (i = 0; i < m_NumLenCombinations; i++)
   {
     UInt32 slot = g_LenSlots[i];
-    Byte price = levels.litLenLevels[kSymbolMatch + slot];
+    Byte price = levels.litLenLevels[kSymbolMatch + (size_t)slot];
     m_LenPrices[i] = (Byte)(((price != 0) ? price : kNoLenStatPrice) + m_LenDirectBits[slot]);
   }
   
@@ -686,7 +704,7 @@ NO_INLINE void CCoder::SetPrices(const CLevels &levels)
   }
 }
 
-NO_INLINE void Huffman_ReverseBits(UInt32 *codes, const Byte *lens, UInt32 num)
+static NO_INLINE void Huffman_ReverseBits(UInt32 *codes, const Byte *lens, UInt32 num)
 {
   for (UInt32 i = 0; i < num; i++)
   {
@@ -780,11 +798,11 @@ NO_INLINE UInt32 CCoder::TryDynBlock(unsigned tableIndex, UInt32 numPasses)
   (CLevels &)t = m_NewLevels;
 
   m_NumLitLenLevels = kMainTableSize;
-  while (m_NumLitLenLevels > kNumLitLenCodesMin && m_NewLevels.litLenLevels[m_NumLitLenLevels - 1] == 0)
+  while (m_NumLitLenLevels > kNumLitLenCodesMin && m_NewLevels.litLenLevels[(size_t)m_NumLitLenLevels - 1] == 0)
     m_NumLitLenLevels--;
   
   m_NumDistLevels = kDistTableSize64;
-  while (m_NumDistLevels > kNumDistCodesMin && m_NewLevels.distLevels[m_NumDistLevels - 1] == 0)
+  while (m_NumDistLevels > kNumDistCodesMin && m_NewLevels.distLevels[(size_t)m_NumDistLevels - 1] == 0)
     m_NumDistLevels--;
   
   UInt32 levelFreqs[kLevelTableSize];
@@ -923,14 +941,6 @@ void CCoder::CodeBlock(unsigned tableIndex, bool finalBlock)
   }
 }
 
-SRes Read(void *object, void *data, size_t *size)
-{
-  const UInt32 kStepSize = (UInt32)1 << 31;
-  UInt32 curSize = ((*size < kStepSize) ? (UInt32)*size : kStepSize);
-  HRESULT res = ((CSeqInStream *)object)->RealStream->Read(data, curSize, &curSize);
-  *size = curSize;
-  return (SRes)res;
-}
 
 HRESULT CCoder::CodeReal(ISequentialInStream *inStream, ISequentialOutStream *outStream,
     const UInt64 * /* inSize */ , const UInt64 * /* outSize */ , ICompressProgressInfo *progress)
@@ -938,15 +948,19 @@ HRESULT CCoder::CodeReal(ISequentialInStream *inStream, ISequentialOutStream *ou
   m_CheckStatic = (m_NumPasses != 1 || m_NumDivPasses != 1);
   m_IsMultiPass = (m_CheckStatic || (m_NumPasses != 1 || m_NumDivPasses != 1));
 
-  RINOK(Create());
+  /* we can set stream mode before MatchFinder_Create
+    if default MatchFinder mode was not STREAM_MODE) */
+  // MatchFinder_SET_STREAM_MODE(&_lzInWindow);
+
+  CSeqInStreamWrap _seqInStream;
+  _seqInStream.Init(inStream);
+  MatchFinder_SET_STREAM(&_lzInWindow, &_seqInStream.vt)
+
+  RINOK(Create())
 
   m_ValueBlockSize = (7 << 10) + (1 << 12) * m_NumDivPasses;
 
   UInt64 nowPos = 0;
-
-  _seqInStream.RealStream = inStream;
-  _seqInStream.SeqInStream.Read = Read;
-  _lzInWindow.stream = &_seqInStream.SeqInStream;
 
   MatchFinder_Init(&_lzInWindow);
   m_OutStream.SetStream(outStream);
@@ -969,12 +983,16 @@ HRESULT CCoder::CodeReal(ISequentialInStream *inStream, ISequentialOutStream *ou
     if (progress != NULL)
     {
       UInt64 packSize = m_OutStream.GetProcessedSize();
-      RINOK(progress->SetRatioInfo(&nowPos, &packSize));
+      RINOK(progress->SetRatioInfo(&nowPos, &packSize))
     }
   }
   while (Inline_MatchFinder_GetNumAvailableBytes(&_lzInWindow) != 0);
+  
+  if (_seqInStream.Res != S_OK)
+    return _seqInStream.Res;
+
   if (_lzInWindow.result != SZ_OK)
-    return _lzInWindow.result;
+    return SResToHRESULT(_lzInWindow.result);
   return m_OutStream.Flush();
 }
 
@@ -986,18 +1004,18 @@ HRESULT CCoder::BaseCode(ISequentialInStream *inStream, ISequentialOutStream *ou
   catch(...) { return E_FAIL; }
 }
 
-STDMETHODIMP CCOMCoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-    const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress)
+Z7_COM7F_IMF(CCOMCoder::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
+    const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress))
   { return BaseCode(inStream, outStream, inSize, outSize, progress); }
 
-STDMETHODIMP CCOMCoder::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps)
+Z7_COM7F_IMF(CCOMCoder::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps))
   { return BaseSetEncoderProperties2(propIDs, props, numProps); }
 
-STDMETHODIMP CCOMCoder64::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
-    const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress)
+Z7_COM7F_IMF(CCOMCoder64::Code(ISequentialInStream *inStream, ISequentialOutStream *outStream,
+    const UInt64 *inSize, const UInt64 *outSize, ICompressProgressInfo *progress))
   { return BaseCode(inStream, outStream, inSize, outSize, progress); }
 
-STDMETHODIMP CCOMCoder64::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps)
+Z7_COM7F_IMF(CCOMCoder64::SetCoderProperties(const PROPID *propIDs, const PROPVARIANT *props, UInt32 numProps))
   { return BaseSetEncoderProperties2(propIDs, props, numProps); }
 
 }}}

@@ -1,9 +1,14 @@
 #pragma once
-
-
+#include <stdio.h>
+#include <stdint.h>
 #include "../CPP/7zip/IStream.h"
 #include "../CPP/Common/MyCom.h"
-
+#ifdef _WIN32
+#include <io.h>
+#include <windows.h>
+#else
+#include <unistd.h>
+#endif
 
 namespace SevenZip
 {
@@ -13,12 +18,12 @@ namespace intl
 	{
 	private:
 
-		long				m_refCount;
-		CMyComPtr< IStream >	m_baseStream;
+		LONG	m_refCount;
+		FILE*				m_pFile;
 
 	public:
 
-		OutStreamWrapper( const CMyComPtr< IStream >& baseStream );
+		OutStreamWrapper(FILE* fp);
 		virtual ~OutStreamWrapper();
 
 		STDMETHOD(QueryInterface)( REFIID iid, void** ppvObject );

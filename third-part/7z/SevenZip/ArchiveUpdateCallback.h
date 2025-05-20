@@ -26,7 +26,7 @@ namespace intl
 		UString Password;
 	private:
 
-		long m_refCount;
+		LONG m_refCount;
 		TString m_dirPrefix;
 		TString m_outputPath;
 		const std::vector< FilePathInfo >& m_filePaths;

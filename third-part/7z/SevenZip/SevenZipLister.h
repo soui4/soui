@@ -3,7 +3,6 @@
 #include "CompressionFormat.h"
 #include "ListCallback.h"
 
-
 namespace SevenZip
 {
 	class SevenZipLister : public SevenZipArchive
@@ -16,6 +15,6 @@ namespace SevenZip
 		virtual bool ListArchive(ListCallback* callback);
 
 	private:
-		bool ListArchive(const CMyComPtr< IStream >& archiveStream, ListCallback* callback);
+		bool ListArchive(FILE* archiveStream, ListCallback* callback);
 	};
 }

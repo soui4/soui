@@ -1,11 +1,13 @@
 /* 7zTypes.h -- Basic types
-2013-11-12 : Igor Pavlov : Public domain */
+2024-01-24 : Igor Pavlov : Public domain */
 
-#ifndef __7Z_TYPES_H
-#define __7Z_TYPES_H
+#ifndef ZIP7_7Z_TYPES_H
+#define ZIP7_7Z_TYPES_H
 
 #ifdef _WIN32
 /* #include <windows.h> */
+#else
+#include <errno.h>
 #endif
 
 #include <stddef.h>
@@ -42,22 +44,42 @@ EXTERN_C_BEGIN
 
 typedef int SRes;
 
-#ifdef _WIN32
-/* typedef DWORD WRes; */
-typedef unsigned WRes;
+
+#ifdef _MSC_VER
+  #if _MSC_VER > 1200
+    #define MY_ALIGN(n) __declspec(align(n))
+  #else
+    #define MY_ALIGN(n)
+  #endif
 #else
-typedef int WRes;
+  /*
+  // C11/C++11:
+  #include <stdalign.h>
+  #define MY_ALIGN(n) alignas(n)
+  */
+  #define MY_ALIGN(n) __attribute__ ((aligned(n)))
 #endif
 
+/* typedef DWORD WRes; */
+typedef unsigned WRes;
+#define MY_SRes_HRESULT_FROM_WRes(x) HRESULT_FROM_WIN32(x)
+
+#define MY_E_ERROR_NEGATIVE_SEEK 1
+#define FILE_ATTRIBUTE_UNIX_EXTENSION 0x8000   /* trick for Unix */
+
 #ifndef RINOK
-#define RINOK(x) { int __result__ = (x); if (__result__ != 0) return __result__; }
+#define RINOK(x) { const int _result_ = (x); if (_result_ != 0) return _result_; }
+#endif
+
+#ifndef RINOK_WRes
+#define RINOK_WRes(x) { const WRes _result_ = (x); if (_result_ != 0) return _result_; }
 #endif
 
 typedef unsigned char Byte;
 typedef short Int16;
 typedef unsigned short UInt16;
 
-#ifdef _LZMA_UINT32_IS_ULONG
+#ifdef Z7_DECL_Int32_AS_long
 typedef long Int32;
 typedef unsigned long UInt32;
 #else
@@ -65,95 +87,155 @@ typedef int Int32;
 typedef unsigned int UInt32;
 #endif
 
-#ifdef _SZ_NO_INT_64
+#define MY_HRES_ERROR_INTERNAL_ERROR  ((HRESULT)0x8007054FL)
 
-/* define _SZ_NO_INT_64, if your compiler doesn't support 64-bit integers.
-   NOTES: Some code will work incorrectly in that case! */
+
+#ifdef Z7_DECL_Int64_AS_long
 
 typedef long Int64;
 typedef unsigned long UInt64;
 
 #else
 
-#if defined(_MSC_VER) || defined(__BORLANDC__)
+#if (defined(_MSC_VER) || defined(__BORLANDC__)) && !defined(__clang__)
 typedef __int64 Int64;
 typedef unsigned __int64 UInt64;
-#define UINT64_CONST(n) n
+#else
+#if defined(__clang__) || defined(__GNUC__)
+#include <stdint.h>
+typedef int64_t Int64;
+typedef uint64_t UInt64;
 #else
 typedef long long int Int64;
 typedef unsigned long long int UInt64;
-#define UINT64_CONST(n) n ## ULL
+// #define UINT64_CONST(n) n ## ULL
+#endif
 #endif
 
 #endif
 
-#ifdef _LZMA_NO_SYSTEM_SIZE_T
-typedef UInt32 SizeT;
+#define UINT64_CONST(n) n
+
+
+#ifdef Z7_DECL_SizeT_AS_unsigned_int
+typedef unsigned int SizeT;
 #else
 typedef size_t SizeT;
 #endif
 
-typedef int Bool;
+/*
+#if (defined(_MSC_VER) && _MSC_VER <= 1200)
+typedef size_t MY_uintptr_t;
+#else
+#include <stdint.h>
+typedef uintptr_t MY_uintptr_t;
+#endif
+*/
+
+typedef int BoolInt;
+/* typedef BoolInt Bool; */
 #define True 1
 #define False 0
 
 
 #ifdef _WIN32
-#define MY_STD_CALL __stdcall
+#define Z7_STDCALL __stdcall
 #else
-#define MY_STD_CALL
+#define Z7_STDCALL
 #endif
 
 #ifdef _MSC_VER
 
 #if _MSC_VER >= 1300
-#define MY_NO_INLINE __declspec(noinline)
+#define Z7_NO_INLINE __declspec(noinline)
 #else
-#define MY_NO_INLINE
+#define Z7_NO_INLINE
 #endif
 
-#define MY_CDECL __cdecl
-#define MY_FAST_CALL __fastcall
+#define Z7_FORCE_INLINE __forceinline
 
+#define Z7_CDECL      __cdecl
+#define Z7_FASTCALL  __fastcall
+
+#else //  _MSC_VER
+
+#if (defined(__GNUC__) && (__GNUC__ >= 4)) \
+    || (defined(__clang__) && (__clang_major__ >= 4)) \
+    || defined(__INTEL_COMPILER) \
+    || defined(__xlC__)
+#define Z7_NO_INLINE      __attribute__((noinline))
+#define Z7_FORCE_INLINE   __attribute__((always_inline)) inline
 #else
-
-#define MY_NO_INLINE
-#define MY_CDECL
-#define MY_FAST_CALL
-
+#define Z7_NO_INLINE
+#define Z7_FORCE_INLINE
 #endif
+
+#define Z7_CDECL
+
+#if  defined(_M_IX86) \
+  || defined(__i386__)
+// #define Z7_FASTCALL __attribute__((fastcall))
+// #define Z7_FASTCALL __attribute__((cdecl))
+#define Z7_FASTCALL
+#elif defined(MY_CPU_AMD64)
+// #define Z7_FASTCALL __attribute__((ms_abi))
+#define Z7_FASTCALL
+#else
+#define Z7_FASTCALL
+#endif
+
+#endif //  _MSC_VER
 
 
 /* The following interfaces use first parameter as pointer to structure */
 
-typedef struct
-{
-  Byte (*Read)(void *p); /* reads one byte, returns 0 in case of EOF or error */
-} IByteIn;
+// #define Z7_C_IFACE_CONST_QUAL
+#define Z7_C_IFACE_CONST_QUAL const
 
-typedef struct
-{
-  void (*Write)(void *p, Byte b);
-} IByteOut;
+#define Z7_C_IFACE_DECL(a) \
+  struct a ## _; \
+  typedef Z7_C_IFACE_CONST_QUAL struct a ## _ * a ## Ptr; \
+  typedef struct a ## _ a; \
+  struct a ## _
 
-typedef struct
+
+Z7_C_IFACE_DECL (IByteIn)
 {
-  SRes (*Read)(void *p, void *buf, size_t *size);
+  Byte (*Read)(IByteInPtr p); /* reads one byte, returns 0 in case of EOF or error */
+};
+#define IByteIn_Read(p) (p)->Read(p)
+
+
+Z7_C_IFACE_DECL (IByteOut)
+{
+  void (*Write)(IByteOutPtr p, Byte b);
+};
+#define IByteOut_Write(p, b) (p)->Write(p, b)
+
+
+Z7_C_IFACE_DECL (ISeqInStream)
+{
+  SRes (*Read)(ISeqInStreamPtr p, void *buf, size_t *size);
     /* if (input(*size) != 0 && output(*size) == 0) means end_of_stream.
        (output(*size) < input(*size)) is allowed */
-} ISeqInStream;
+};
+#define ISeqInStream_Read(p, buf, size) (p)->Read(p, buf, size)
 
+/* try to read as much as avail in stream and limited by (*processedSize) */
+SRes SeqInStream_ReadMax(ISeqInStreamPtr stream, void *buf, size_t *processedSize);
 /* it can return SZ_ERROR_INPUT_EOF */
-SRes SeqInStream_Read(ISeqInStream *stream, void *buf, size_t size);
-SRes SeqInStream_Read2(ISeqInStream *stream, void *buf, size_t size, SRes errorType);
-SRes SeqInStream_ReadByte(ISeqInStream *stream, Byte *buf);
+// SRes SeqInStream_Read(ISeqInStreamPtr stream, void *buf, size_t size);
+// SRes SeqInStream_Read2(ISeqInStreamPtr stream, void *buf, size_t size, SRes errorType);
+SRes SeqInStream_ReadByte(ISeqInStreamPtr stream, Byte *buf);
 
-typedef struct
+
+Z7_C_IFACE_DECL (ISeqOutStream)
 {
-  size_t (*Write)(void *p, const void *buf, size_t size);
+  size_t (*Write)(ISeqOutStreamPtr p, const void *buf, size_t size);
     /* Returns: result - the number of actually written bytes.
        (result < size) means error */
-} ISeqOutStream;
+};
+#define ISeqOutStream_Write(p, buf, size) (p)->Write(p, buf, size)
 
 typedef enum
 {
@@ -162,95 +244,219 @@ typedef enum
   SZ_SEEK_END = 2
 } ESzSeek;
 
-typedef struct
-{
-  SRes (*Read)(void *p, void *buf, size_t *size);  /* same as ISeqInStream::Read */
-  SRes (*Seek)(void *p, Int64 *pos, ESzSeek origin);
-} ISeekInStream;
 
-typedef struct
+Z7_C_IFACE_DECL (ISeekInStream)
 {
-  SRes (*Look)(void *p, const void **buf, size_t *size);
+  SRes (*Read)(ISeekInStreamPtr p, void *buf, size_t *size);  /* same as ISeqInStream::Read */
+  SRes (*Seek)(ISeekInStreamPtr p, Int64 *pos, ESzSeek origin);
+};
+#define ISeekInStream_Read(p, buf, size)   (p)->Read(p, buf, size)
+#define ISeekInStream_Seek(p, pos, origin) (p)->Seek(p, pos, origin)
+
+
+Z7_C_IFACE_DECL (ILookInStream)
+{
+  SRes (*Look)(ILookInStreamPtr p, const void **buf, size_t *size);
     /* if (input(*size) != 0 && output(*size) == 0) means end_of_stream.
        (output(*size) > input(*size)) is not allowed
        (output(*size) < input(*size)) is allowed */
-  SRes (*Skip)(void *p, size_t offset);
+  SRes (*Skip)(ILookInStreamPtr p, size_t offset);
     /* offset must be <= output(*size) of Look */
-
-  SRes (*Read)(void *p, void *buf, size_t *size);
+  SRes (*Read)(ILookInStreamPtr p, void *buf, size_t *size);
     /* reads directly (without buffer). It's same as ISeqInStream::Read */
-  SRes (*Seek)(void *p, Int64 *pos, ESzSeek origin);
-} ILookInStream;
+  SRes (*Seek)(ILookInStreamPtr p, Int64 *pos, ESzSeek origin);
+};
 
-SRes LookInStream_LookRead(ILookInStream *stream, void *buf, size_t *size);
-SRes LookInStream_SeekTo(ILookInStream *stream, UInt64 offset);
+#define ILookInStream_Look(p, buf, size)   (p)->Look(p, buf, size)
+#define ILookInStream_Skip(p, offset)      (p)->Skip(p, offset)
+#define ILookInStream_Read(p, buf, size)   (p)->Read(p, buf, size)
+#define ILookInStream_Seek(p, pos, origin) (p)->Seek(p, pos, origin)
+
+
+SRes LookInStream_LookRead(ILookInStreamPtr stream, void *buf, size_t *size);
+SRes LookInStream_SeekTo(ILookInStreamPtr stream, UInt64 offset);
 
 /* reads via ILookInStream::Read */
-SRes LookInStream_Read2(ILookInStream *stream, void *buf, size_t size, SRes errorType);
-SRes LookInStream_Read(ILookInStream *stream, void *buf, size_t size);
+SRes LookInStream_Read2(ILookInStreamPtr stream, void *buf, size_t size, SRes errorType);
+SRes LookInStream_Read(ILookInStreamPtr stream, void *buf, size_t size);
 
-#define LookToRead_BUF_SIZE (1 << 14)
 
 typedef struct
 {
-  ILookInStream s;
-  ISeekInStream *realStream;
+  ILookInStream vt;
+  ISeekInStreamPtr realStream;
+ 
   size_t pos;
-  size_t size;
-  Byte buf[LookToRead_BUF_SIZE];
-} CLookToRead;
+  size_t size; /* it's data size */
+  
+  /* the following variables must be set outside */
+  Byte *buf;
+  size_t bufSize;
+} CLookToRead2;
 
-void LookToRead_CreateVTable(CLookToRead *p, int lookahead);
-void LookToRead_Init(CLookToRead *p);
+void LookToRead2_CreateVTable(CLookToRead2 *p, int lookahead);
+
+#define LookToRead2_INIT(p) { (p)->pos = (p)->size = 0; }
+
 
 typedef struct
 {
-  ISeqInStream s;
-  ILookInStream *realStream;
+  ISeqInStream vt;
+  ILookInStreamPtr realStream;
 } CSecToLook;
 
 void SecToLook_CreateVTable(CSecToLook *p);
 
+
+
 typedef struct
 {
-  ISeqInStream s;
-  ILookInStream *realStream;
+  ISeqInStream vt;
+  ILookInStreamPtr realStream;
 } CSecToRead;
 
 void SecToRead_CreateVTable(CSecToRead *p);
 
-typedef struct
+
+Z7_C_IFACE_DECL (ICompressProgress)
 {
-  SRes (*Progress)(void *p, UInt64 inSize, UInt64 outSize);
+  SRes (*Progress)(ICompressProgressPtr p, UInt64 inSize, UInt64 outSize);
     /* Returns: result. (result != SZ_OK) means break.
        Value (UInt64)(Int64)-1 for size means unknown value. */
-} ICompressProgress;
+};
 
-typedef struct
+#define ICompressProgress_Progress(p, inSize, outSize) (p)->Progress(p, inSize, outSize)
+
+
+
+typedef struct ISzAlloc ISzAlloc;
+typedef const ISzAlloc * ISzAllocPtr;
+
+struct ISzAlloc
 {
-  void *(*Alloc)(void *p, size_t size);
-  void (*Free)(void *p, void *address); /* address can be 0 */
-} ISzAlloc;
+  void *(*Alloc)(ISzAllocPtr p, size_t size);
+  void (*Free)(ISzAllocPtr p, void *address); /* address can be 0 */
+};
 
-#define IAlloc_Alloc(p, size) (p)->Alloc((p), size)
-#define IAlloc_Free(p, a) (p)->Free((p), a)
+#define ISzAlloc_Alloc(p, size) (p)->Alloc(p, size)
+#define ISzAlloc_Free(p, a) (p)->Free(p, a)
 
-#ifdef _WIN32
+/* deprecated */
+#define IAlloc_Alloc(p, size) ISzAlloc_Alloc(p, size)
+#define IAlloc_Free(p, a) ISzAlloc_Free(p, a)
+
+
+
+
+
+#ifndef MY_offsetof
+  #ifdef offsetof
+    #define MY_offsetof(type, m) offsetof(type, m)
+    /*
+    #define MY_offsetof(type, m) FIELD_OFFSET(type, m)
+    */
+  #else
+    #define MY_offsetof(type, m) ((size_t)&(((type *)0)->m))
+  #endif
+#endif
+
+
+
+#ifndef Z7_container_of
+
+/*
+#define Z7_container_of(ptr, type, m) container_of(ptr, type, m)
+#define Z7_container_of(ptr, type, m) CONTAINING_RECORD(ptr, type, m)
+#define Z7_container_of(ptr, type, m) ((type *)((char *)(ptr) - offsetof(type, m)))
+#define Z7_container_of(ptr, type, m) (&((type *)0)->m == (ptr), ((type *)(((char *)(ptr)) - MY_offsetof(type, m))))
+*/
+
+/*
+  GCC shows warning: "perhaps the 'offsetof' macro was used incorrectly"
+    GCC 3.4.4 : classes with constructor
+    GCC 4.8.1 : classes with non-public variable members"
+*/
+
+#define Z7_container_of(ptr, type, m) \
+  ((type *)(void *)((char *)(void *) \
+  (1 ? (ptr) : &((type *)NULL)->m) - MY_offsetof(type, m)))
+
+#define Z7_container_of_CONST(ptr, type, m) \
+  ((const type *)(const void *)((const char *)(const void *) \
+  (1 ? (ptr) : &((type *)NULL)->m) - MY_offsetof(type, m)))
+
+/*
+#define Z7_container_of_NON_CONST_FROM_CONST(ptr, type, m) \
+  ((type *)(void *)(const void *)((const char *)(const void *) \
+  (1 ? (ptr) : &((type *)NULL)->m) - MY_offsetof(type, m)))
+*/
+
+#endif
+
+#define Z7_CONTAINER_FROM_VTBL_SIMPLE(ptr, type, m) ((type *)(void *)(ptr))
+
+// #define Z7_CONTAINER_FROM_VTBL(ptr, type, m) Z7_CONTAINER_FROM_VTBL_SIMPLE(ptr, type, m)
+#define Z7_CONTAINER_FROM_VTBL(ptr, type, m) Z7_container_of(ptr, type, m)
+// #define Z7_CONTAINER_FROM_VTBL(ptr, type, m) Z7_container_of_NON_CONST_FROM_CONST(ptr, type, m)
+
+#define Z7_CONTAINER_FROM_VTBL_CONST(ptr, type, m) Z7_container_of_CONST(ptr, type, m)
+
+#define Z7_CONTAINER_FROM_VTBL_CLS(ptr, type, m) Z7_CONTAINER_FROM_VTBL_SIMPLE(ptr, type, m)
+/*
+#define Z7_CONTAINER_FROM_VTBL_CLS(ptr, type, m) Z7_CONTAINER_FROM_VTBL(ptr, type, m)
+*/
+#if defined (__clang__) || defined(__GNUC__)
+#define Z7_DIAGNOSTIC_IGNORE_BEGIN_CAST_QUAL \
+  _Pragma("GCC diagnostic push") \
+  _Pragma("GCC diagnostic ignored \"-Wcast-qual\"")
+#define Z7_DIAGNOSTIC_IGNORE_END_CAST_QUAL \
+  _Pragma("GCC diagnostic pop")
+#else
+#define Z7_DIAGNOSTIC_IGNORE_BEGIN_CAST_QUAL
+#define Z7_DIAGNOSTIC_IGNORE_END_CAST_QUAL
+#endif
+
+#define Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR(ptr, type, m, p) \
+  Z7_DIAGNOSTIC_IGNORE_BEGIN_CAST_QUAL \
+  type *p = Z7_CONTAINER_FROM_VTBL(ptr, type, m); \
+  Z7_DIAGNOSTIC_IGNORE_END_CAST_QUAL
+
+#define Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR_pp_vt_p(type) \
+  Z7_CONTAINER_FROM_VTBL_TO_DECL_VAR(pp, type, vt, p)
+
+
+// #define ZIP7_DECLARE_HANDLE(name)  typedef void *name;
+#define Z7_DECLARE_HANDLE(name)  struct name##_dummy{int unused;}; typedef struct name##_dummy *name;
+
+
+#define Z7_memset_0_ARRAY(a)  memset((a), 0, sizeof(a))
+
+#ifndef Z7_ARRAY_SIZE
+#define Z7_ARRAY_SIZE(a) (sizeof(a) / sizeof((a)[0]))
+#endif
 
 #define CHAR_PATH_SEPARATOR '\\'
 #define WCHAR_PATH_SEPARATOR L'\\'
 #define STRING_PATH_SEPARATOR "\\"
 #define WSTRING_PATH_SEPARATOR L"\\"
 
-#else
 
-#define CHAR_PATH_SEPARATOR '/'
-#define WCHAR_PATH_SEPARATOR L'/'
-#define STRING_PATH_SEPARATOR "/"
-#define WSTRING_PATH_SEPARATOR L"/"
-
-#endif
+#define k_PropVar_TimePrec_0        0
+#define k_PropVar_TimePrec_Unix     1
+#define k_PropVar_TimePrec_DOS      2
+#define k_PropVar_TimePrec_HighPrec 3
+#define k_PropVar_TimePrec_Base     16
+#define k_PropVar_TimePrec_100ns (k_PropVar_TimePrec_Base + 7)
+#define k_PropVar_TimePrec_1ns   (k_PropVar_TimePrec_Base + 9)
 
 EXTERN_C_END
 
 #endif
+
+/*
+#ifndef Z7_ST
+#ifdef _7ZIP_ST
+#define Z7_ST
+#endif
+#endif
+*/

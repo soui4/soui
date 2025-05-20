@@ -1,6 +1,6 @@
 // PluginRead.cpp
 
-
+#include "StdAfx.h"
 
 #include "Plugin.h"
 
@@ -21,11 +21,11 @@ using namespace NFile;
 using namespace NDir;
 using namespace NFar;
 
-static const char *kHelpTopicExtrFromSevenZip =  "Extract";
+static const char * const kHelpTopicExtrFromSevenZip =  "Extract";
 
-static const char kDirDelimiter = '\\';
+static const char kDirDelimiter = CHAR_PATH_SEPARATOR;
 
-static const char *kExractPathHistoryName  = "7-ZipExtractPath";
+static const char * const kExractPathHistoryName  = "7-ZipExtractPath";
 
 HRESULT CPlugin::ExtractFiles(
     bool decompressAllItems,
@@ -37,6 +37,12 @@ HRESULT CPlugin::ExtractFiles(
     const UString &destPath,
     bool passwordIsDefined, const UString &password)
 {
+  if (_agent->_isHashHandler)
+  {
+    g_StartupInfo.ShowMessage(NMessageID::kMoveIsNotSupported);
+    return NFileOperationReturnCode::kError;
+  }
+
   CScreenRestorer screenRestorer;
   CProgressBox progressBox;
   CProgressBox *progressBoxPointer = NULL;
@@ -80,14 +86,14 @@ HRESULT CPlugin::ExtractFiles(
 }
 
 NFileOperationReturnCode::EEnum CPlugin::GetFiles(struct PluginPanelItem *panelItems,
-    int itemsNumber, int move, char *destPath, int opMode)
+    unsigned itemsNumber, int move, char *destPath, int opMode)
 {
   return GetFilesReal(panelItems, itemsNumber, move,
       destPath, opMode, (opMode & OPM_SILENT) == 0);
 }
 
 NFileOperationReturnCode::EEnum CPlugin::GetFilesReal(struct PluginPanelItem *panelItems,
-    int itemsNumber, int move, const char *destPathLoc, int opMode, bool showBox)
+    unsigned itemsNumber, int move, const char *destPathLoc, int opMode, bool showBox)
 {
   if (move != 0)
   {
@@ -95,7 +101,7 @@ NFileOperationReturnCode::EEnum CPlugin::GetFilesReal(struct PluginPanelItem *pa
     return NFileOperationReturnCode::kError;
   }
 
-  AString destPath = destPathLoc;
+  AString destPath (destPathLoc);
   UString destPathU = GetUnicodeString(destPath, CP_OEMCP);
   NName::NormalizeDirPathPrefix(destPathU);
   destPath = UnicodeStringToMultiByte(destPathU, CP_OEMCP);
@@ -106,7 +112,7 @@ NFileOperationReturnCode::EEnum CPlugin::GetFilesReal(struct PluginPanelItem *pa
   extractionInfo.PathMode = NExtract::NPathMode::kCurPaths;
   extractionInfo.OverwriteMode = NExtract::NOverwriteMode::kOverwrite;
 
-  bool silent = (opMode & OPM_SILENT) != 0;
+  const bool silent = (opMode & OPM_SILENT) != 0;
   bool decompressAllItems = false;
   UString password = Password;
   bool passwordIsDefined = PasswordIsDefined;
@@ -127,7 +133,7 @@ NFileOperationReturnCode::EEnum CPlugin::GetFilesReal(struct PluginPanelItem *pa
     
     const int kXMid = kXSize / 2;
 
-    AString oemPassword = UnicodeStringToMultiByte(password, CP_OEMCP);
+    AString oemPassword (UnicodeStringToMultiByte(password, CP_OEMCP));
     
     struct CInitDialogItem initItems[]={
       { DI_DOUBLEBOX, 3, 1, kXSize - 4, kYSize - 2, false, false, 0, false, NMessageID::kExtractTitle, NULL, NULL },
@@ -178,9 +184,9 @@ NFileOperationReturnCode::EEnum CPlugin::GetFilesReal(struct PluginPanelItem *pa
       { DI_BUTTON, 0, kYSize - 3, 0, 0, false, false, DIF_CENTERGROUP, false, NMessageID::kExtractCancel, NULL, NULL  }
     };
    
-    const int kNumDialogItems = ARRAY_SIZE(initItems);
-    const int kOkButtonIndex = kNumDialogItems - 2;
-    const int kPasswordIndex = kNumDialogItems - 4;
+    const unsigned kNumDialogItems = Z7_ARRAY_SIZE(initItems);
+    const unsigned kOkButtonIndex = kNumDialogItems - 2;
+    const unsigned kPasswordIndex = kNumDialogItems - 4;
 
     FarDialogItem dialogItems[kNumDialogItems];
     g_StartupInfo.InitDialogItems(initItems, dialogItems, kNumDialogItems);
@@ -196,7 +202,7 @@ NFileOperationReturnCode::EEnum CPlugin::GetFilesReal(struct PluginPanelItem *pa
       if (destPathU.IsEmpty())
       {
         #ifdef UNDER_CE
-        destPathU = L"\\";
+        destPathU = "\\";
         #else
         FString destPathF = us2fs(destPathU);
         if (!GetCurrentDir(destPathF))
@@ -269,10 +275,10 @@ NFileOperationReturnCode::EEnum CPlugin::GetFilesReal(struct PluginPanelItem *pa
     GetRealIndexes(panelItems, itemsNumber, realIndices);
   */
   CObjArray<UInt32> indices(itemsNumber);
-  for (int i = 0; i < itemsNumber; i++)
+  for (unsigned i = 0; i < itemsNumber; i++)
     indices[i] = (UInt32)panelItems[i].UserData;
 
-  HRESULT result = ExtractFiles(decompressAllItems, indices, itemsNumber,
+  const HRESULT result = ExtractFiles(decompressAllItems, indices, itemsNumber,
       !showBox, extractionInfo.PathMode, extractionInfo.OverwriteMode,
       destPathU,
       passwordIsDefined, password);

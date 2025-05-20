@@ -1,6 +1,6 @@
 // SevenZip/Plugin.cpp
 
-
+#include "StdAfx.h"
 
 #include "Plugin.h"
 

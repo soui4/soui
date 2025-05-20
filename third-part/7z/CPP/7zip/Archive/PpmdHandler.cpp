@@ -1,10 +1,10 @@
 /* PpmdHandler.cpp -- PPMd format handler
-2015-11-30 : Igor Pavlov : Public domain
+2020 : Igor Pavlov : Public domain
 This code is based on:
   PPMd var.H (2001) / var.I (2002): Dmitry Shkarin : Public domain
   Carryless rangecoder (1999): Dmitry Subbotin : Public domain */
 
-
+#include "StdAfx.h"
 
 #include "../../../C/CpuArch.h"
 #include "../../../C/Alloc.h"
@@ -12,7 +12,6 @@ This code is based on:
 #include "../../../C/Ppmd8.h"
 
 #include "../../Common/ComTry.h"
-#include "../../Common/IntToString.h"
 #include "../../Common/StringConvert.h"
 
 #include "../../Windows/PropVariant.h"
@@ -34,13 +33,13 @@ struct CBuf
 {
   Byte *Buf;
   
-  CBuf(): Buf(0) {}
+  CBuf(): Buf(NULL) {}
   ~CBuf() { ::MidFree(Buf); }
   bool Alloc()
   {
     if (!Buf)
       Buf = (Byte *)::MidAlloc(kBufSize);
-    return (Buf != 0);
+    return (Buf != NULL);
   }
 };
 
@@ -60,18 +59,22 @@ struct CItem
   unsigned Restor;
 
   HRESULT ReadHeader(ISequentialInStream *s, UInt32 &headerSize);
-  bool IsSupported() const { return Ver == 7 || (Ver == 8 && Restor <= 1); }
+  bool IsSupported() const
+  {
+    return (Ver == 7 && Order >= PPMD7_MIN_ORDER)
+        || (Ver == 8 && Order >= PPMD8_MIN_ORDER && Restor < PPMD8_RESTORE_METHOD_UNSUPPPORTED);
+  }
 };
 
 HRESULT CItem::ReadHeader(ISequentialInStream *s, UInt32 &headerSize)
 {
   Byte h[kHeaderSize];
-  RINOK(ReadStream_FALSE(s, h, kHeaderSize));
+  RINOK(ReadStream_FALSE(s, h, kHeaderSize))
   if (GetUi32(h) != kSignature)
     return S_FALSE;
   Attrib = GetUi32(h + 4);
   Time = GetUi32(h + 12);
-  unsigned info = GetUi16(h + 8);
+  const unsigned info = GetUi16(h + 8);
   Order = (info & 0xF) + 1;
   MemInMB = ((info >> 4) & 0xFF) + 1;
   Ver = info >> 12;
@@ -87,27 +90,23 @@ HRESULT CItem::ReadHeader(ISequentialInStream *s, UInt32 &headerSize)
   if (nameLen > (1 << 9))
     return S_FALSE;
   char *name = Name.GetBuf(nameLen);
-  HRESULT res = ReadStream_FALSE(s, name, nameLen);
+  const HRESULT res = ReadStream_FALSE(s, name, nameLen);
   Name.ReleaseBuf_CalcLen(nameLen);
   headerSize = kHeaderSize + nameLen;
   return res;
 }
 
-class CHandler:
-  public IInArchive,
-  public IArchiveOpenSeq,
-  public CMyUnknownImp
-{
+
+Z7_CLASS_IMP_CHandler_IInArchive_1(
+  IArchiveOpenSeq
+)
   CItem _item;
   UInt32 _headerSize;
   bool _packSize_Defined;
   UInt64 _packSize;
   CMyComPtr<ISequentialInStream> _stream;
 
-public:
-  MY_UNKNOWN_IMP2(IInArchive, IArchiveOpenSeq)
-  INTERFACE_IInArchive(;)
-  STDMETHOD(OpenSeq)(ISequentialInStream *stream);
+  void GetVersion(NCOM::CPropVariant &prop);
 };
 
 static const Byte kProps[] =
@@ -118,36 +117,51 @@ static const Byte kProps[] =
   kpidMethod
 };
 
-IMP_IInArchive_Props
-IMP_IInArchive_ArcProps_NO_Table
+static const Byte kArcProps[] =
+{
+  kpidMethod
+};
 
-STDMETHODIMP CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value)
+IMP_IInArchive_Props
+IMP_IInArchive_ArcProps
+
+void CHandler::GetVersion(NCOM::CPropVariant &prop)
+{
+  AString s ("PPMd");
+  s.Add_Char((char)('A' + _item.Ver));
+  s += ":o";
+  s.Add_UInt32(_item.Order);
+  s += ":mem";
+  s.Add_UInt32(_item.MemInMB);
+  s.Add_Char('m');
+  if (_item.Ver >= kNewHeaderVer && _item.Restor != 0)
+  {
+    s += ":r";
+    s.Add_UInt32(_item.Restor);
+  }
+  prop = s;
+}
+
+Z7_COM7F_IMF(CHandler::GetArchiveProperty(PROPID propID, PROPVARIANT *value))
 {
   NCOM::CPropVariant prop;
   switch (propID)
   {
     case kpidPhySize: if (_packSize_Defined) prop = _packSize; break;
+    case kpidMethod: GetVersion(prop); break;
   }
   prop.Detach(value);
   return S_OK;
 }
 
 
-STDMETHODIMP CHandler::GetNumberOfItems(UInt32 *numItems)
+Z7_COM7F_IMF(CHandler::GetNumberOfItems(UInt32 *numItems))
 {
   *numItems = 1;
   return S_OK;
 }
 
-static void UIntToString(AString &s, const char *prefix, unsigned value)
-{
-  s += prefix;
-  char temp[16];
-  ::ConvertUInt32ToString((UInt32)value, temp);
-  s += temp;
-}
-
-STDMETHODIMP CHandler::GetProperty(UInt32 /* index */, PROPID propID, PROPVARIANT *value)
+Z7_COM7F_IMF(CHandler::GetProperty(UInt32 /* index */, PROPID propID, PROPVARIANT *value))
 {
   COM_TRY_BEGIN
   NCOM::CPropVariant prop;
@@ -158,35 +172,25 @@ STDMETHODIMP CHandler::GetProperty(UInt32 /* index */, PROPID propID, PROPVARIAN
     {
       // time can be in Unix format ???
       FILETIME utc;
-      if (NTime::DosTimeToFileTime(_item.Time, utc))
+      if (NTime::DosTime_To_FileTime(_item.Time, utc))
         prop = utc;
       break;
     }
     case kpidAttrib: prop = _item.Attrib; break;
     case kpidPackSize: if (_packSize_Defined) prop = _packSize; break;
-    case kpidMethod:
-    {
-      AString s = "PPMd";
-      s += (char)('A' + _item.Ver);
-      UIntToString(s, ":o", _item.Order);
-      UIntToString(s, ":mem", _item.MemInMB);
-      s += 'm';
-      if (_item.Ver >= kNewHeaderVer && _item.Restor != 0)
-        UIntToString(s, ":r", _item.Restor);
-      prop = s;
-    }
+    case kpidMethod: GetVersion(prop); break;
   }
   prop.Detach(value);
   return S_OK;
   COM_TRY_END
 }
 
-STDMETHODIMP CHandler::Open(IInStream *stream, const UInt64 *, IArchiveOpenCallback *)
+Z7_COM7F_IMF(CHandler::Open(IInStream *stream, const UInt64 *, IArchiveOpenCallback *))
 {
   return OpenSeq(stream);
 }
 
-STDMETHODIMP CHandler::OpenSeq(ISequentialInStream *stream)
+Z7_COM7F_IMF(CHandler::OpenSeq(ISequentialInStream *stream))
 {
   COM_TRY_BEGIN
   HRESULT res;
@@ -204,7 +208,7 @@ STDMETHODIMP CHandler::OpenSeq(ISequentialInStream *stream)
   COM_TRY_END
 }
 
-STDMETHODIMP CHandler::Close()
+Z7_COM7F_IMF(CHandler::Close())
 {
   _packSize = 0;
   _packSize_Defined = false;
@@ -212,89 +216,11 @@ STDMETHODIMP CHandler::Close()
   return S_OK;
 }
 
-static const UInt32 kTopValue = (1 << 24);
-static const UInt32 kBot = (1 << 15);
 
-struct CRangeDecoder
-{
-  IPpmd7_RangeDec s;
-  UInt32 Range;
-  UInt32 Code;
-  UInt32 Low;
-  CByteInBufWrap *Stream;
-
-public:
-  bool Init()
-  {
-    Code = 0;
-    Low = 0;
-    Range = 0xFFFFFFFF;
-    for (int i = 0; i < 4; i++)
-      Code = (Code << 8) | Stream->ReadByte();
-    return Code < 0xFFFFFFFF;
-  }
-
-  void Normalize()
-  {
-    while ((Low ^ (Low + Range)) < kTopValue ||
-       Range < kBot && ((Range = (0 - Low) & (kBot - 1)), 1))
-    {
-      Code = (Code << 8) | Stream->ReadByte();
-      Range <<= 8;
-      Low <<= 8;
-    }
-  }
-
-  CRangeDecoder();
-};
-
-
-extern "C" {
-
-static UInt32 Range_GetThreshold(void *pp, UInt32 total)
-{
-  CRangeDecoder *p = (CRangeDecoder *)pp;
-  return p->Code / (p->Range /= total);
-}
-
-static void Range_Decode(void *pp, UInt32 start, UInt32 size)
-{
-  CRangeDecoder *p = (CRangeDecoder *)pp;
-  start *= p->Range;
-  p->Low += start;
-  p->Code -= start;
-  p->Range *= size;
-  p->Normalize();
-}
-
-static UInt32 Range_DecodeBit(void *pp, UInt32 size0)
-{
-  CRangeDecoder *p = (CRangeDecoder *)pp;
-  if (p->Code / (p->Range >>= 14) < size0)
-  {
-    Range_Decode(p, 0, size0);
-    return 0;
-  }
-  else
-  {
-    Range_Decode(p, size0, (1 << 14) - size0);
-    return 1;
-  }
-}
-
-}
-
-CRangeDecoder::CRangeDecoder()
-{
-  s.GetThreshold = Range_GetThreshold;
-  s.Decode = Range_Decode;
-  s.DecodeBit = Range_DecodeBit;
-}
 
 struct CPpmdCpp
 {
   unsigned Ver;
-  CRangeDecoder _rc;
   CPpmd7 _ppmd7;
   CPpmd8 _ppmd8;
   
@@ -324,34 +250,34 @@ struct CPpmdCpp
     if (Ver == 7)
       Ppmd7_Init(&_ppmd7, order);
     else
-      Ppmd8_Init(&_ppmd8, order, restor);;
+      Ppmd8_Init(&_ppmd8, order, restor);
   }
     
   bool InitRc(CByteInBufWrap *inStream)
   {
     if (Ver == 7)
     {
-      _rc.Stream = inStream;
-      return _rc.Init();
+      _ppmd7.rc.dec.Stream = &inStream->vt;
+      return (Ppmd7a_RangeDec_Init(&_ppmd7.rc.dec) != 0);
     }
     else
     {
-      _ppmd8.Stream.In = &inStream->p;
-      return Ppmd8_RangeDec_Init(&_ppmd8) != 0;
+      _ppmd8.Stream.In = &inStream->vt;
+      return Ppmd8_Init_RangeDec(&_ppmd8) != 0;
     }
   }
 
   bool IsFinishedOK()
   {
     if (Ver == 7)
-      return Ppmd7z_RangeDec_IsFinishedOK(&_rc);
+      return Ppmd7z_RangeDec_IsFinishedOK(&_ppmd7.rc.dec);
     return Ppmd8_RangeDec_IsFinishedOK(&_ppmd8);
   }
 };
 
 
-STDMETHODIMP CHandler::Extract(const UInt32 *indices, UInt32 numItems,
-    Int32 testMode, IArchiveExtractCallback *extractCallback)
+Z7_COM7F_IMF(CHandler::Extract(const UInt32 *indices, UInt32 numItems,
+    Int32 testMode, IArchiveExtractCallback *extractCallback))
 {
   if (numItems == 0)
     return S_OK;
@@ -360,16 +286,18 @@ STDMETHODIMP CHandler::Extract(const UInt32 *indices, UInt32 numItems,
 
   // extractCallback->SetTotal(_packSize);
   UInt64 currentTotalPacked = 0;
-  RINOK(extractCallback->SetCompleted(&currentTotalPacked));
+  RINOK(extractCallback->SetCompleted(&currentTotalPacked))
+  Int32 opRes;
+{
   CMyComPtr<ISequentialOutStream> realOutStream;
-  Int32 askMode = testMode ?
+  const Int32 askMode = testMode ?
       NExtract::NAskMode::kTest :
       NExtract::NAskMode::kExtract;
-  RINOK(extractCallback->GetStream(0, &realOutStream, askMode));
+  RINOK(extractCallback->GetStream(0, &realOutStream, askMode))
   if (!testMode && !realOutStream)
     return S_OK;
 
-  extractCallback->PrepareOperation(askMode);
+  RINOK(extractCallback->PrepareOperation(askMode))
 
   CByteInBufWrap inBuf;
   if (!inBuf.Alloc(1 << 20))
@@ -380,15 +308,14 @@ STDMETHODIMP CHandler::Extract(const UInt32 *indices, UInt32 numItems,
   if (!outBuf.Alloc())
     return E_OUTOFMEMORY;
 
-  CLocalProgress *lps = new CLocalProgress;
-  CMyComPtr<ICompressProgressInfo> progress = lps;
+  CMyComPtr2_Create<ICompressProgressInfo, CLocalProgress> lps;
   lps->Init(extractCallback, true);
 
   CPpmdCpp ppmd(_item.Ver);
   if (!ppmd.Alloc(_item.MemInMB))
     return E_OUTOFMEMORY;
   
-  Int32 opRes = NExtract::NOperationResult::kUnsupportedMethod;
+  opRes = NExtract::NOperationResult::kUnsupportedMethod;
 
   if (_item.IsSupported())
   {
@@ -403,19 +330,20 @@ STDMETHODIMP CHandler::Extract(const UInt32 *indices, UInt32 numItems,
     {
       lps->InSize = _packSize = inBuf.GetProcessed();
       lps->OutSize = outSize;
-      RINOK(lps->SetCur());
+      RINOK(lps->SetCur())
 
       size_t i;
       int sym = 0;
 
+      Byte *buf = outBuf.Buf;
       if (ppmd.Ver == 7)
       {
         for (i = 0; i < kBufSize; i++)
         {
-          sym = Ppmd7_DecodeSymbol(&ppmd._ppmd7, &ppmd._rc.s);
+          sym = Ppmd7a_DecodeSymbol(&ppmd._ppmd7);
           if (inBuf.Extra || sym < 0)
             break;
-          outBuf.Buf[i] = (Byte)sym;
+          buf[i] = (Byte)sym;
         }
       }
       else
@@ -425,7 +353,7 @@ STDMETHODIMP CHandler::Extract(const UInt32 *indices, UInt32 numItems,
           sym = Ppmd8_DecodeSymbol(&ppmd._ppmd8);
           if (inBuf.Extra || sym < 0)
             break;
-          outBuf.Buf[i] = (Byte)sym;
+          buf[i] = (Byte)sym;
         }
       }
 
@@ -434,7 +362,7 @@ STDMETHODIMP CHandler::Extract(const UInt32 *indices, UInt32 numItems,
       _packSize_Defined = true;
       if (realOutStream)
       {
-        RINOK(WriteStream(realOutStream, outBuf.Buf, i));
+        RINOK(WriteStream(realOutStream, outBuf.Buf, i))
       }
 
       if (inBuf.Extra)
@@ -451,10 +379,9 @@ STDMETHODIMP CHandler::Extract(const UInt32 *indices, UInt32 numItems,
       }
     }
     
-    RINOK(inBuf.Res);
+    RINOK(inBuf.Res)
   }
-  
-  realOutStream.Release();
+}
   return extractCallback->SetOperationResult(opRes);
 }
 
@@ -462,7 +389,7 @@ STDMETHODIMP CHandler::Extract(const UInt32 *indices, UInt32 numItems,
 static const Byte k_Signature[] = { 0x8F, 0xAF, 0xAC, 0x84 };
 
 REGISTER_ARC_I(
-  "Ppmd", "pmd", 0, 0xD,
+  "Ppmd", "pmd", NULL, 0xD,
   k_Signature,
   0,
   0,

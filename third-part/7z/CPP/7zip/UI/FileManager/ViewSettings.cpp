@@ -1,6 +1,6 @@
 // ViewSettings.cpp
 
-
+#include "StdAfx.h"
 
 #include "../../../../C/CpuArch.h"
  
@@ -17,25 +17,27 @@ using namespace NRegistry;
 
 #define REG_PATH_FM TEXT("Software") TEXT(STRING_PATH_SEPARATOR) TEXT("7-Zip") TEXT(STRING_PATH_SEPARATOR) TEXT("FM")
 
-static const TCHAR *kCUBasePath = REG_PATH_FM;
-static const TCHAR *kCulumnsKeyName = REG_PATH_FM TEXT(STRING_PATH_SEPARATOR) TEXT("Columns");
+static LPCTSTR const kCUBasePath = REG_PATH_FM;
+static LPCTSTR const kCulumnsKeyName = REG_PATH_FM TEXT(STRING_PATH_SEPARATOR) TEXT("Columns");
 
-static const TCHAR *kPositionValueName = TEXT("Position");
-static const TCHAR *kPanelsInfoValueName = TEXT("Panels");
-static const TCHAR *kToolbars = TEXT("Toolbars");
+static LPCTSTR const kPositionValueName = TEXT("Position");
+static LPCTSTR const kPanelsInfoValueName = TEXT("Panels");
+static LPCTSTR const kToolbars = TEXT("Toolbars");
 
-static const WCHAR *kPanelPathValueName = L"PanelPath";
-static const TCHAR *kListMode = TEXT("ListMode");
-static const TCHAR *kFolderHistoryValueName = TEXT("FolderHistory");
-static const TCHAR *kFastFoldersValueName = TEXT("FolderShortcuts");
-static const TCHAR *kCopyHistoryValueName = TEXT("CopyHistory");
+static LPCWSTR const kPanelPathValueName = L"PanelPath";
+
+static LPCTSTR const kListMode = TEXT("ListMode");
+static LPCTSTR const kFolderHistoryValueName = TEXT("FolderHistory");
+static LPCTSTR const kFastFoldersValueName = TEXT("FolderShortcuts");
+static LPCTSTR const kCopyHistoryValueName = TEXT("CopyHistory");
 
 static NSynchronization::CCriticalSection g_CS;
 
 #define Set32(p, v) SetUi32(((Byte *)p), v)
 #define SetBool(p, v) Set32(p, ((v) ? 1 : 0))
 
-#define Get32(p, dest) dest = GetUi32((const Byte *)p)
+#define Get32(p, dest) dest = GetUi32((const Byte *)p);
+#define Get32_LONG(p, dest) dest = (LONG)GetUi32((const Byte *)p);
 #define GetBool(p, dest) dest = (GetUi32(p) != 0);
 
 /*
@@ -56,16 +58,16 @@ void CListViewInfo::Save(const UString &id) const
   const UInt32 dataSize = kListViewHeaderSize + kColumnInfoSize * Columns.Size();
   CByteArr buf(dataSize);
 
-  Set32(buf, kListViewVersion);
-  Set32(buf + 4, SortID);
-  SetBool(buf + 8, Ascending);
+  Set32(buf, kListViewVersion)
+  Set32(buf + 4, SortID)
+  SetBool(buf + 8, Ascending)
   FOR_VECTOR (i, Columns)
   {
     const CColumnInfo &column = Columns[i];
     Byte *p = buf + kListViewHeaderSize + i * kColumnInfoSize;
-    Set32(p, column.PropID);
-    SetBool(p + 4, column.IsVisible);
-    Set32(p + 8, column.Width);
+    Set32(p, column.PropID)
+    SetBool(p + 4, column.IsVisible)
+    Set32(p + 8, column.Width)
   }
   {
     NSynchronization::CCriticalSectionLock lock(g_CS);
@@ -79,38 +81,40 @@ void CListViewInfo::Read(const UString &id)
 {
   Clear();
   CByteBuffer buf;
-  UInt32 size;
   {
     NSynchronization::CCriticalSectionLock lock(g_CS);
     CKey key;
     if (key.Open(HKEY_CURRENT_USER, kCulumnsKeyName, KEY_READ) != ERROR_SUCCESS)
       return;
-    if (key.QueryValue(GetSystemString(id), buf, size) != ERROR_SUCCESS)
+    if (key.QueryValue_Binary(GetSystemString(id), buf) != ERROR_SUCCESS)
       return;
   }
+  unsigned size = (unsigned)buf.Size();
   if (size < kListViewHeaderSize)
     return;
   UInt32 version;
-  Get32(buf, version);
+  Get32(buf, version)
   if (version != kListViewVersion)
     return;
-  Get32(buf + 4, SortID);
-  GetBool(buf + 8, Ascending);
+  Get32(buf + 4, SortID)
+  GetBool(buf + 8, Ascending)
 
   IsLoaded = true;
 
   size -= kListViewHeaderSize;
   if (size % kColumnInfoSize != 0)
     return;
-  unsigned numItems = size / kColumnInfoSize;
+  if (size > 1000 * kColumnInfoSize)
+    return;
+  const unsigned numItems = size / kColumnInfoSize;
   Columns.ClearAndReserve(numItems);
   for (unsigned i = 0; i < numItems; i++)
   {
     CColumnInfo column;
     const Byte *p = buf + kListViewHeaderSize + i * kColumnInfoSize;
-    Get32(p, column.PropID);
-    GetBool(p + 4, column.IsVisible);
-    Get32(p + 8, column.Width);
+    Get32(p, column.PropID)
+    GetBool(p + 4, column.IsVisible)
+    Get32(p + 8, column.Width)
     Columns.AddInReserved(column);
   }
 }
@@ -141,26 +145,25 @@ void CWindowInfo::Save() const
   key.Create(HKEY_CURRENT_USER, kCUBasePath);
   {
     Byte buf[kWindowPositionHeaderSize];
-    Set32(buf,      rect.left);
-    Set32(buf +  4, rect.top);
-    Set32(buf +  8, rect.right);
-    Set32(buf + 12, rect.bottom);
-    SetBool(buf + 16, maximized);
+    Set32(buf,      (UInt32)rect.left)
+    Set32(buf +  4, (UInt32)rect.top)
+    Set32(buf +  8, (UInt32)rect.right)
+    Set32(buf + 12, (UInt32)rect.bottom)
+    SetBool(buf + 16, maximized)
     key.SetValue(kPositionValueName, buf, kWindowPositionHeaderSize);
   }
   {
     Byte buf[kPanelsInfoHeaderSize];
-    Set32(buf,      numPanels);
-    Set32(buf +  4, currentPanel);
-    Set32(buf +  8, splitterPos);
+    Set32(buf,      numPanels)
+    Set32(buf +  4, currentPanel)
+    Set32(buf +  8, splitterPos)
     key.SetValue(kPanelsInfoValueName, buf, kPanelsInfoHeaderSize);
   }
 }
 
 static bool QueryBuf(CKey &key, LPCTSTR name, CByteBuffer &buf, UInt32 dataSize)
 {
-  UInt32 size;
-  return key.QueryValue(name, buf, size) == ERROR_SUCCESS && size == dataSize;
+  return key.QueryValue_Binary(name, buf) == ERROR_SUCCESS && buf.Size() == dataSize;
 }
 
 void CWindowInfo::Read(bool &windowPosDefined, bool &panelInfoDefined)
@@ -174,37 +177,37 @@ void CWindowInfo::Read(bool &windowPosDefined, bool &panelInfoDefined)
   CByteBuffer buf;
   if (QueryBuf(key, kPositionValueName, buf, kWindowPositionHeaderSize))
   {
-    Get32(buf,      rect.left);
-    Get32(buf +  4, rect.top);
-    Get32(buf +  8, rect.right);
-    Get32(buf + 12, rect.bottom);
-    GetBool(buf + 16, maximized);
+    Get32_LONG(buf,      rect.left)
+    Get32_LONG(buf +  4, rect.top)
+    Get32_LONG(buf +  8, rect.right)
+    Get32_LONG(buf + 12, rect.bottom)
+    GetBool(buf + 16, maximized)
     windowPosDefined = true;
   }
   if (QueryBuf(key, kPanelsInfoValueName, buf, kPanelsInfoHeaderSize))
   {
-    Get32(buf,      numPanels);
-    Get32(buf +  4, currentPanel);
-    Get32(buf +  8, splitterPos);
+    Get32(buf,      numPanels)
+    Get32(buf +  4, currentPanel)
+    Get32(buf +  8, splitterPos)
     panelInfoDefined = true;
   }
   return;
 }
 
 
-void SaveUi32Val(const TCHAR *name, UInt32 value)
+static void SaveUi32Val(const TCHAR *name, UInt32 value)
 {
   CKey key;
   key.Create(HKEY_CURRENT_USER, kCUBasePath);
   key.SetValue(name, value);
 }
 
-bool ReadUi32Val(const TCHAR *name, UInt32 &value)
+static bool ReadUi32Val(const TCHAR *name, UInt32 &value)
 {
   CKey key;
   if (key.Open(HKEY_CURRENT_USER, kCUBasePath, KEY_READ) != ERROR_SUCCESS)
     return false;
-  return key.QueryValue(name, value) == ERROR_SUCCESS;
+  return key.GetValue_UInt32_IfOk(name, value) == ERROR_SUCCESS;
 }
 
 void SaveToolbarsMask(UInt32 toolbarMask)
@@ -227,7 +230,7 @@ void CListMode::Save() const
 {
   UInt32 t = 0;
   for (int i = 0; i < 2; i++)
-    t |= ((Panels[i]) & 0xFF) << (i * 8);
+    t |= (Panels[i] & 0xFF) << (i * 8);
   SaveUi32Val(kListMode, t);
 }
 
@@ -239,16 +242,16 @@ void CListMode::Read()
     return;
   for (int i = 0; i < 2; i++)
   {
-    Panels[i] = (t & 0xFF);
+    Panels[i] = t & 0xFF;
     t >>= 8;
   }
 }
 
 static UString GetPanelPathName(UInt32 panelIndex)
 {
-  WCHAR s[16];
-  ConvertUInt32ToString(panelIndex, s);
-  return (UString)kPanelPathValueName + s;
+  UString s (kPanelPathValueName);
+  s.Add_UInt32(panelIndex);
+  return s;
 }
 
 void SavePanelPath(UInt32 panel, const UString &path)

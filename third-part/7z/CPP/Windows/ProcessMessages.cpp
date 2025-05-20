@@ -1,6 +1,6 @@
 // Windows/ProcessMessages.cpp
 
-
+#include "StdAfx.h"
 
 #include "ProcessMessages.h"
 

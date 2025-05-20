@@ -6,7 +6,7 @@ namespace SevenZip
 namespace intl
 {
 
-OutStreamWrapperMemory::OutStreamWrapperMemory( const CMyComPtr< IStream >& baseStream )
+OutStreamWrapperMemory::OutStreamWrapperMemory( const CMyComPtr< IMyStream >& baseStream )
 	: m_refCount( 0 )
 	, m_baseStream( baseStream )
 {
@@ -18,7 +18,7 @@ OutStreamWrapperMemory::~OutStreamWrapperMemory()
 
 HRESULT STDMETHODCALLTYPE OutStreamWrapperMemory::QueryInterface( REFIID iid, void** ppvObject )
 { 
-	if ( iid == __uuidof( IUnknown ) )
+	if ( iid == IID_IUnknown )
 	{
 		*ppvObject = static_cast< IUnknown* >( this );
 		AddRef();
@@ -44,24 +44,25 @@ HRESULT STDMETHODCALLTYPE OutStreamWrapperMemory::QueryInterface( REFIID iid, vo
 
 ULONG STDMETHODCALLTYPE OutStreamWrapperMemory::AddRef()
 {
-	return static_cast< ULONG >( InterlockedIncrement( &m_refCount ) );
+	return InterlockedIncrement(&m_refCount);
 }
 
 ULONG STDMETHODCALLTYPE OutStreamWrapperMemory::Release()
 {
-	ULONG res = static_cast< ULONG >( InterlockedDecrement( &m_refCount ) );
-	if ( res == 0 )
+	ULONG newRefCount = InterlockedDecrement(&m_refCount);
+	if (newRefCount == 0)
 	{
 		delete this;
+		return 0;
 	}
-	return res;
+	return newRefCount;
 }
 
 STDMETHODIMP OutStreamWrapperMemory::Write( const void* data, UInt32 size, UInt32* processedSize )
 {
 	ULONG written = 0;
-	HRESULT hr = m_baseStream->Write( data, size, &written );
-	if ( processedSize != NULL )
+	HRESULT hr = m_baseStream->Write(data, size, &written);
+	if (processedSize != NULL)
 	{
 		*processedSize = written;
 	}
@@ -74,10 +75,10 @@ STDMETHODIMP OutStreamWrapperMemory::Seek( Int64 offset, UInt32 seekOrigin, UInt
 	ULARGE_INTEGER newPos;
 
 	move.QuadPart = offset;
-	HRESULT hr = m_baseStream->Seek( move, seekOrigin, &newPos );
-	if ( newPosition != NULL )
+	HRESULT hr = m_baseStream->Seek(move, seekOrigin, &newPos);
+	if (newPosition != NULL)
 	{
-		*newPosition =  newPos.QuadPart;
+		*newPosition = newPos.QuadPart;
 	}
 	return hr;
 }
@@ -86,7 +87,8 @@ STDMETHODIMP OutStreamWrapperMemory::SetSize( UInt64 newSize )
 {
 	ULARGE_INTEGER size;
 	size.QuadPart = newSize;
-	return m_baseStream->SetSize( size );
+	//return m_baseStream->SetSize(size);
+	return S_OK;
 }
 
 }

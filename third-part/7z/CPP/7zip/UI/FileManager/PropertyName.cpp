@@ -1,6 +1,6 @@
 // PropertyName.cpp
 
-
+#include "StdAfx.h"
 
 #include "../../../Common/IntToString.h"
 

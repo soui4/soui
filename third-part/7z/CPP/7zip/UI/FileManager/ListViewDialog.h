@@ -1,7 +1,7 @@
 // ListViewDialog.h
 
-#ifndef __LISTVIEW_DIALOG_H
-#define __LISTVIEW_DIALOG_H
+#ifndef ZIP7_INC_LISTVIEW_DIALOG_H
+#define ZIP7_INC_LISTVIEW_DIALOG_H
 
 #include "../../../Windows/Control/Dialog.h"
 #include "../../../Windows/Control/ListView.h"
@@ -11,20 +11,36 @@
 class CListViewDialog: public NWindows::NControl::CModalDialog
 {
   NWindows::NControl::CListView _listView;
-  virtual void OnOK();
-  virtual bool OnInit();
-  virtual bool OnSize(WPARAM wParam, int xSize, int ySize);
-  virtual bool OnNotify(UINT controlID, LPNMHDR header);
+  virtual void OnOK() Z7_override;
+  virtual bool OnInit() Z7_override;
+  virtual bool OnSize(WPARAM wParam, int xSize, int ySize) Z7_override;
+  virtual bool OnNotify(UINT controlID, LPNMHDR header) Z7_override;
+  void CopyToClipboard();
+  void DeleteItems();
+  void ShowItemInfo();
+  void OnEnter();
 public:
   UString Title;
+  
+  bool SelectFirst;
   bool DeleteIsAllowed;
   bool StringsWereChanged;
+  
   UStringVector Strings;
+  UStringVector Values;
+  
   int FocusedItemIndex;
+  unsigned NumColumns;
 
-  INT_PTR Create(HWND wndParent = 0) { return CModalDialog::Create(IDD_LISTVIEW, wndParent); }
+  INT_PTR Create(HWND wndParent = NULL) { return CModalDialog::Create(IDD_LISTVIEW, wndParent); }
 
-  CListViewDialog(): DeleteIsAllowed(false) {}
+  CListViewDialog():
+    SelectFirst(false),
+    DeleteIsAllowed(false),
+    StringsWereChanged(false),
+    FocusedItemIndex(-1),
+    NumColumns(1)
+    {}
 };
 
 #endif

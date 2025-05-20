@@ -1,12 +1,12 @@
 // PpmdRegister.cpp
 
-
+#include "StdAfx.h"
 
 #include "../Common/RegisterCodec.h"
 
 #include "PpmdDecoder.h"
 
-#ifndef EXTRACT_ONLY
+#ifndef Z7_EXTRACT_ONLY
 #include "PpmdEncoder.h"
 #endif
 

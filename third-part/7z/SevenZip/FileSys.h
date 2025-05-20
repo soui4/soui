@@ -33,9 +33,6 @@ namespace intl
 
 		static std::vector< FilePathInfo > GetFile( const TString& filePathOrName );
 		static std::vector< FilePathInfo > GetFilesInDirectory( const TString& directory, const TString& searchPattern, bool recursive );
-
-		static CMyComPtr< IStream > OpenFileToRead( const TString& filePath );
-		static CMyComPtr< IStream > OpenFileToWrite( const TString& filePath );
 	};
 }
 }

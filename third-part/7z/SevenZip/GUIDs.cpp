@@ -1,2 +1,2 @@
-#include <InitGuid.h>
+#define INITGUID
 #include "GUIDs.h"

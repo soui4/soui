@@ -1,7 +1,7 @@
 // Archive/IsoHeader.h
 
-#ifndef __ARCHIVE_ISO_HEADER_H
-#define __ARCHIVE_ISO_HEADER_H
+#ifndef ZIP7_INC_ARCHIVE_ISO_HEADER_H
+#define ZIP7_INC_ARCHIVE_ISO_HEADER_H
 
 #include "../../../Common/MyTypes.h"
 
@@ -25,7 +25,7 @@ namespace NFileFlags
   const Byte kNonFinalExtent = 1 << 7;
 }
 
-extern const char *kElToritoSpec;
+extern const char * const kElToritoSpec;
 
 const UInt32 kStartPos = 0x8000;
 

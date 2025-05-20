@@ -17,7 +17,7 @@ ArchiveOpenCallback::~ArchiveOpenCallback()
 
 STDMETHODIMP ArchiveOpenCallback::QueryInterface( REFIID iid, void** ppvObject )
 {
-	if ( iid == __uuidof( IUnknown ) )
+	if ( iid == IID_IUnknown )
 	{
 		*ppvObject = reinterpret_cast< IUnknown* >( this );
 		AddRef();
@@ -43,17 +43,18 @@ STDMETHODIMP ArchiveOpenCallback::QueryInterface( REFIID iid, void** ppvObject )
 
 STDMETHODIMP_(ULONG) ArchiveOpenCallback::AddRef()
 {
-	return static_cast< ULONG >( InterlockedIncrement( &m_refCount ) );
+	return InterlockedIncrement(&m_refCount);
 }
 
 STDMETHODIMP_(ULONG) ArchiveOpenCallback::Release()
 {
-	ULONG res = static_cast< ULONG >( InterlockedDecrement( &m_refCount ) );
-	if ( res == 0 )
+	ULONG newRefCount = InterlockedDecrement(&m_refCount);
+	if (newRefCount == 0)
 	{
 		delete this;
+		return 0;
 	}
-	return res;
+	return newRefCount;
 }
 
 STDMETHODIMP ArchiveOpenCallback::SetTotal( const UInt64* /*files*/, const UInt64* /*bytes*/ )

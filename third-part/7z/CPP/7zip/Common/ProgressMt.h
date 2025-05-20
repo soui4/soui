@@ -1,7 +1,7 @@
 // ProgressMt.h
 
-#ifndef __PROGRESSMT_H
-#define __PROGRESSMT_H
+#ifndef ZIP7_INC_PROGRESSMT_H
+#define ZIP7_INC_PROGRESSMT_H
 
 #include "../../Common/MyCom.h"
 #include "../../Common/MyVector.h"
@@ -19,28 +19,25 @@ class CMtCompressProgressMixer
   UInt64 TotalOutSize;
 public:
   NWindows::NSynchronization::CCriticalSection CriticalSection;
-  void Init(int numItems, ICompressProgressInfo *progress);
-  void Reinit(int index);
-  HRESULT SetRatioInfo(int index, const UInt64 *inSize, const UInt64 *outSize);
+  void Init(unsigned numItems, ICompressProgressInfo *progress);
+  void Reinit(unsigned index);
+  HRESULT SetRatioInfo(unsigned index, const UInt64 *inSize, const UInt64 *outSize);
 };
 
-class CMtCompressProgress:
-  public ICompressProgressInfo,
-  public CMyUnknownImp
-{
+
+Z7_CLASS_IMP_NOQIB_1(
+  CMtCompressProgress
+  , ICompressProgressInfo
+)
+  unsigned _index;
   CMtCompressProgressMixer *_progress;
-  int _index;
 public:
-  void Init(CMtCompressProgressMixer *progress, int index)
+  void Init(CMtCompressProgressMixer *progress, unsigned index)
   {
     _progress = progress;
     _index = index;
   }
   void Reinit() { _progress->Reinit(_index); }
-
-  MY_UNKNOWN_IMP
-
-  STDMETHOD(SetRatioInfo)(const UInt64 *inSize, const UInt64 *outSize);
 };
 
 #endif

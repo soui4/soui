@@ -5,6 +5,7 @@
 #include "../CPP/7zip/IPassword.h"
 #include "../CPP/Common/MyString.h"
 
+
 namespace SevenZip
 {
 namespace intl
@@ -16,7 +17,7 @@ namespace intl
 		UString Password;
 	private:
 
-		long m_refCount;
+		LONG m_refCount;
 	public:
 
 		ArchiveOpenCallback();

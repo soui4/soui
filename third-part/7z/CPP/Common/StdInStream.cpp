@@ -1,29 +1,35 @@
 // Common/StdInStream.cpp
 
+#include "StdAfx.h"
 
-
+#ifdef _WIN32
 #include <tchar.h>
+#endif
 
 #include "StdInStream.h"
 #include "StringConvert.h"
 #include "UTFConvert.h"
 
-static const char kNewLineChar = '\n';
+// #define kEOFMessage "Unexpected end of input stream"
+// #define kReadErrorMessage "Error reading input stream"
+// #define kIllegalCharMessage "Illegal zero character in input stream"
 
-static const char *kEOFMessage = "Unexpected end of input stream";
-static const char *kReadErrorMessage  ="Error reading input stream";
-static const char *kIllegalCharMessage = "Illegal character in input stream";
-
-static LPCTSTR kFileOpenMode = TEXT("r");
-
-extern int g_CodePage;
 
 CStdInStream g_StdIn(stdin);
+
+/*
+#define kFileOpenMode TEXT("r")
 
 bool CStdInStream::Open(LPCTSTR fileName) throw()
 {
   Close();
-  _stream = _tfopen(fileName, kFileOpenMode);
+  _stream =
+    #ifdef _WIN32
+      _tfopen
+    #else
+      fopen
+    #endif
+      (fileName, kFileOpenMode);
   _streamIsOpen = (_stream != 0);
   return _streamIsOpen;
 }
@@ -35,60 +41,58 @@ bool CStdInStream::Close() throw()
   _streamIsOpen = (fclose(_stream) != 0);
   return !_streamIsOpen;
 }
+*/
 
-AString CStdInStream::ScanStringUntilNewLine(bool allowEOF)
+bool CStdInStream::ScanAStringUntilNewLine(AString &s)
 {
+  s.Empty();
+  for (;;)
+  {
+    const int intChar = GetChar();
+    if (intChar == EOF)
+      return true;
+    const char c = (char)intChar;
+    if (c == 0)
+      return false;
+    if (c == '\n')
+      return true;
+    s.Add_Char(c);
+  }
+}
+
+bool CStdInStream::ScanUStringUntilNewLine(UString &dest)
+{
+  dest.Empty();
   AString s;
+  const bool res = ScanAStringUntilNewLine(s);
+  int codePage = CodePage;
+  if (codePage == -1)
+    codePage = CP_OEMCP;
+  if ((unsigned)codePage == CP_UTF8)
+    ConvertUTF8ToUnicode(s, dest);
+  else
+    MultiByteToUnicodeString2(dest, s, (UINT)(unsigned)codePage);
+  return res;
+}
+
+/*
+bool CStdInStream::ReadToString(AString &resultString)
+{
+  resultString.Empty();
   for (;;)
   {
     int intChar = GetChar();
     if (intChar == EOF)
-    {
-      if (allowEOF)
-        break;
-      throw kEOFMessage;
-    }
+      return !Error();
     char c = (char)intChar;
     if (c == 0)
-      throw kIllegalCharMessage;
-    if (c == kNewLineChar)
-      break;
-    s += c;
+      return false;
+    resultString += c;
   }
-  return s;
 }
-
-UString CStdInStream::ScanUStringUntilNewLine()
-{
-  AString s = ScanStringUntilNewLine(true);
-  int codePage = g_CodePage;
-  if (codePage == -1)
-    codePage = CP_OEMCP;
-  UString dest;
-  if (codePage == CP_UTF8)
-    ConvertUTF8ToUnicode(s, dest);
-  else
-    dest = MultiByteToUnicodeString(s, (UINT)codePage);
-  return dest;
-}
-
-void CStdInStream::ReadToString(AString &resultString)
-{
-  resultString.Empty();
-  int c;
-  while ((c = GetChar()) != EOF)
-    resultString += (char)c;
-}
-
-bool CStdInStream::Eof() throw()
-{
-  return (feof(_stream) != 0);
-}
+*/
 
 int CStdInStream::GetChar()
 {
-  int c = fgetc(_stream); // getc() doesn't work in BeOS?
-  if (c == EOF && !Eof())
-    throw kReadErrorMessage;
-  return c;
+  return fgetc(_stream); // getc() doesn't work in BeOS?
 }
