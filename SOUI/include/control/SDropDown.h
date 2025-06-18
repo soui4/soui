@@ -170,9 +170,7 @@ class SOUI_EXP SDropDownWnd
      * @param bMinimized Minimized flag
      * @param wndOther Handle to the previous active window
      */
-    void OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
-    {
-    } // Interrupt message processing to prevent setting focus
+    void OnActivate(UINT nState, BOOL bMinimized, HWND wndOther); // Interrupt message processing to prevent setting focus
 
     /**
      * @brief Handle final message

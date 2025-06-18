@@ -55,3 +55,33 @@ endmacro()
 
 set(CORE_LIBS CACHE INTERNAL "core_lib")
 set(COM_LIBS CACHE INTERNAL "com_lib")
+
+
+macro(add_soui_exe exe_name)
+if (WIN32)
+    add_executable(${exe_name} WIN32 ${ARGN})
+elseif (UNIX AND NOT APPLE)
+    add_executable(${exe_name} ${ARGN})
+elseif (APPLE)
+    add_executable(${exe_name} MACOSX_BUNDLE ${ARGN})
+endif()
+endmacro()
+
+macro(add_soui_resource app res_path res_name icon)
+if (APPLE)
+# 添加整个文件夹作为资源
+file(GLOB_RECURSE DATA_FILES ${res_path}/*)
+foreach(file ${DATA_FILES})
+    #message(STATUS "add resource ${file}")
+    target_sources(${app} PRIVATE ${file})
+    file(RELATIVE_PATH relative_file "${res_path}" "${file}")
+    set_source_files_properties(${file} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${res_name}/${relative_file})
+endforeach()
+
+message(STATUS "add resource ${icon}")
+target_sources(${app} PRIVATE ${icon})
+set_source_files_properties(${icon} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
+get_filename_component(APP_ICON_FILE ${icon} NAME)
+set(MACOSX_BUNDLE_ICON_FILE ${APP_ICON_FILE})
+endif()
+endmacro()

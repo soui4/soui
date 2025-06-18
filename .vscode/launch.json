@@ -8,13 +8,14 @@
             "name": "(gdb) Launch",
             "type": "cppdbg",
             "request": "launch",
-            "program": "${workspaceFolder}/build/bin/demo",
+            "program": "${workspaceFolder}/build2/bin/fun_test",
             "args": ["50331648"],
             "stopAtEntry": false,
-            "cwd": "${workspaceFolder}/build/bin",
+            "cwd": "${workspaceFolder}/build2/bin",
             "environment": [],
             "externalConsole": true,
             "MIMode": "gdb",
+            "miDebuggerPath": "/usr/bin/gdb",
             "setupCommands": [
             {
              "description": "Enable pretty-printing for gdb",
@@ -23,6 +24,25 @@
             }
             ]
         },
+        {
+      "name": "(lldb) 调试 C++ 程序",
+      "type": "cppdbg",
+      "request": "launch",
+      "program": "${workspaceFolder}/build2/bin/fun_test",  // 替换为你的可执行文件路径
+      "args": [],                         // 可选：程序参数
+      "stopAtEntry": false,
+      "cwd": "${workspaceFolder}/build2/bin",
+      "environment": [],
+      "externalConsole": false,
+      "MIMode": "lldb",
+      "setupCommands": [
+        {
+          "description": "为 lldb 启用整齐打印",
+          "text": "enable-pretty-printing",
+          "ignoreFailures": true
+        }
+      ]
+    },
         {
             "name": "(gdb) Attach",            
             "type": "cppdbg",

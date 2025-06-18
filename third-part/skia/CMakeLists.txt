@@ -20,6 +20,11 @@ endif()
 add_definitions(-DSK_USE_POSIX_THREADS)
 endif()
 
+if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+find_package(Fontconfig REQUIRED)
+include_directories(${Fontconfig_INCLUDE_DIRS})
+endif()
+
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/config)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/core)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include/gpu)

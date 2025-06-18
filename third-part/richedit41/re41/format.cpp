@@ -598,15 +598,15 @@ HRESULT CreateFormatCaches()					// Called by DllMain()
     pPFCache = new CParaFormatArray();
 	if(!pPFCache)
 	{
-		delete pCFCache;
+		pCFCache->Destroy();
 		return E_OUTOFMEMORY;
 	}
 
     pTabsCache = new CTabsArray();
 	if(!pTabsCache)
 	{
-		delete pCFCache;
-		delete pPFCache;
+		pCFCache->Destroy();
+		pPFCache->Destroy();
 		return E_OUTOFMEMORY;
 	}
 	return S_OK;

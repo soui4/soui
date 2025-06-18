@@ -30,7 +30,7 @@ struct tagThunk
         m_this = (DWORD)(ULONG_PTR)pThis;
         m_jmp = 0xe9;
         m_relproc = (DWORD)((INT_PTR)proc - ((INT_PTR)this + sizeof(tagThunk)));
-        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+        FlushInstructionCache(INVALID_HANDLE_VALUE, this, sizeof(tagThunk));
     }
     void *GetCodeAddress()
     {
@@ -55,7 +55,7 @@ struct tagThunk
         RaxMov = 0xb848;         // mov rax, target
         RaxImm = (ULONG64)proc;  //
         RaxJmp = 0xe0ff;         // jmp rax
-        BOOL b = FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+        BOOL b = FlushInstructionCache(INVALID_HANDLE_VALUE, this, sizeof(tagThunk));
     }
     // some thunks will dynamically allocate the memory for the code
     void *GetCodeAddress()
@@ -79,7 +79,7 @@ struct tagThunk
         RaxMov = 0xb848;         // mov rax, target
         RaxImm = (ULONG64)proc;  //
         RaxJmp = 0xe0ff;         // jmp rax
-        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+        FlushInstructionCache(INVALID_HANDLE_VALUE, this, sizeof(tagThunk));
     }
     // some thunks will dynamically allocate the memory for the code
     void *GetCodeAddress()
@@ -106,7 +106,7 @@ struct tagThunk // this should come out to 16 bytes
         m_pFunc = (DWORD)proc;
         // write block from data cache and
         //  flush from instruction cache
-        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+        FlushInstructionCache(INVALID_HANDLE_VALUE, this, sizeof(tagThunk));
     }
     void *GetCodeAddress()
     {
@@ -134,7 +134,7 @@ struct tagThunk // this should come out to 16 bytes
         m_pFunc = (ULONG64)proc;
         // write block from data cache and
         //  flush from instruction cache
-        FlushInstructionCache(GetCurrentProcess(), this, sizeof(tagThunk));
+        FlushInstructionCache(INVALID_HANDLE_VALUE, this, sizeof(tagThunk));
     }
     void *GetCodeAddress()
     {

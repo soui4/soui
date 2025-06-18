@@ -764,7 +764,7 @@ LONG CLinePtr::CountPages (
 	if(!_pdp->IsInPageView())
 	{
 		cPage = 0;
-		return tomBackward;					// Signal error
+		return (LONG)tomBackward;					// Signal error
 	}
 	Assert(IsValid());
 

@@ -1012,8 +1012,8 @@ static LSERR EndFormatting (PLSC plsc, enum endres endr,
 	return lserrNone;
 }
 
-/*----------------------------------------------------------------------------
-/* L S  M O D I F Y  L I N E  H E I G H T */
+//----------------------------------------------------------------------------
+// L S  M O D I F Y  L I N E  H E I G H T */
 /*----------------------------------------------------------------------------
     %%Function: LsModifyLineHeight
     %%Contact: igorzv
@@ -1056,8 +1056,8 @@ LSERR WINAPI LsModifyLineHeight(PLSC plsc,
 	return lserrNone;
 }
 
-/*----------------------------------------------------------------------------
-/* L S  D E S T R O Y   L I N E  */
+//----------------------------------------------------------------------------
+// L S  D E S T R O Y   L I N E  */
 /*----------------------------------------------------------------------------
     %%Function: LsDestroyLine
     %%Contact: igorzv
@@ -1608,8 +1608,8 @@ static LSERR FillTextParams(PLSC plsc, LSCP cp, LONG duaCol, PLSPAP plspap,
 	return lserrNone;
 	}
 
-/*----------------------------------------------------------------------------
-/* F E T C H  U N T I L  V I S I B L E */
+//----------------------------------------------------------------------------
+// F E T C H  U N T I L  V I S I B L E */
 /*----------------------------------------------------------------------------
     %%Function: FetchUntilVisible
     %%Contact: igorzv
@@ -1808,8 +1808,8 @@ static LSERR InitCurLine(PLSC plsc, LSCP cpFirst)
 }
 
 
-/*----------------------------------------------------------------------------
-/* C A N N O T  C R E A T E  L I N E */
+//----------------------------------------------------------------------------
+// C A N N O T  C R E A T E  L I N E */
 /*----------------------------------------------------------------------------
     %%Function: CannotCreateLine
     %%Contact: igorzv
@@ -1834,8 +1834,8 @@ static LSERR CannotCreateLine(PLSLINE* pplsline, LSERR lserr)
 	return lserr;
 }
 
-/*----------------------------------------------------------------------------
-/* E R R  R E L E A S E  P R E F E T C H E D  R U N */
+//----------------------------------------------------------------------------
+// E R R  R E L E A S E  P R E F E T C H E D  R U N */
 /*----------------------------------------------------------------------------
     %%Function: ErrReleasePreFetchedRun
     %%Contact: igorzv

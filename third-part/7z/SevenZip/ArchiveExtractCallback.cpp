@@ -317,8 +317,13 @@ struct timespec times[2];
         // 获取当前时间（用于保留不需要修改的时间）
         struct stat st;
         if (stat(m_absPath.c_str(), &st) == 0) {
+            #ifdef __APPLE__
+            times[0] = st.st_atimespec; // 当前访问时间
+            times[1] = st.st_mtimespec; // 当前修改时间
+            #else
             times[0] = st.st_atim; // 当前访问时间
             times[1] = st.st_mtim; // 当前修改时间
+            #endif
         } else {
             // 如果获取失败，使用当前系统时间
             time_t now = time(nullptr);

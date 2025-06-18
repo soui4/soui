@@ -33,7 +33,7 @@ SNSBEGIN
 
         static void __cdecl RelocateElements(T* pDest, T* pSrc, size_t nElements)
         {
-            memmove_s(pDest, nElements * sizeof(T), pSrc, nElements * sizeof(T));
+            memmove_s((void*)pDest, nElements * sizeof(T), (const void*)pSrc, nElements * sizeof(T));
         }
 
         static ULONG __cdecl Hash(INARGTYPE  str)

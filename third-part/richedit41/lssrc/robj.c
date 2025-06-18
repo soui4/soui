@@ -190,7 +190,7 @@ static LSERR ReverseFmtFailed (PDOBJ pdobj, LSERR lserr)
 	return lserr;
 }
 
-/* T R A N S L A T E  C P  L I M  S U B L I N E  T O  D C P  E X T E R N A L
+// T R A N S L A T E  C P  L I M  S U B L I N E  T O  D C P  E X T E R N A L
 /*----------------------------------------------------------------------------
 	%%Function: TranslateCpLimSublineToDcpExternal
 	%%Contact: antons
@@ -215,7 +215,7 @@ LSDCP TranslateCpLimSublineToDcpExternal (PDOBJ pdobj, LSCP cpLim)
 	return cpLim - pdobj->cpStart;
 }
 
-/* T R A N S L A T E  D C P  E X T E R N A L  T O  C P  L I M  S U B L I N E
+// T R A N S L A T E  D C P  E X T E R N A L  T O  C P  L I M  S U B L I N E
 /*----------------------------------------------------------------------------
 	%%Function: TranslateCpLimInternalToExternal
 	%%Contact: antons

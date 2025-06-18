@@ -834,7 +834,6 @@ BOOL SHostWnd::OnLoadLayoutFromResourceID(SXmlDoc &xmlDoc)
 {
     if (m_strXmlLayout.IsEmpty())
     {
-        SSLOGW() << "resId is empty";
         return FALSE;
     }
     return LOADXML(xmlDoc, m_strXmlLayout);
@@ -881,7 +880,10 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
         xmlRoot = OnGetInitXmlNode(xmlDoc);
         if (!xmlRoot)
         {
-            SSLOGW() << "OnGetInitXmlNode return empty xml";
+            if (!m_strXmlLayout.IsEmpty())
+            {
+                SSLOGW() << "OnGetInitXmlNode return empty xml";
+            }
         }
         else
         {
@@ -1125,6 +1127,7 @@ BOOL SHostWnd::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 void SHostWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
 {
+    SSLOGI() << "OnActivate, nState=" << nState << " m_hWnd=" << m_hWnd;
     if (nState != WA_INACTIVE)
     {
         ::SetFocus(m_hWnd);

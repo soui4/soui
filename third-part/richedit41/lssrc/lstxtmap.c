@@ -164,7 +164,8 @@ LONG IwchFirstFromIgind(PTXTOBJ ptxtobj, LONG igind)
 		
 	while (! (pginf [igindLast] & ginffLastInContext)) igindLast++;
 
-	/* The following LOOP goes ahead checking context after context 	/* beginning of txtobj
+	// The following LOOP goes ahead checking context after context 	
+	/* beginning of txtobj
 
 	   INVARIANT:
 

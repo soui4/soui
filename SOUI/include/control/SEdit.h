@@ -24,11 +24,7 @@ class SOUI_EXP SEdit : public TCtrlProxy<IEdit, SRichEdit> {
      * @brief Get the cue text
      * @param pStr Output string for the cue text
      */
-    STDMETHOD_(void, GetCueText)(CTHIS_ IStringT *pStr) SCONST
-    {
-        SStringT str = GetCueText(FALSE);
-        pStr->Copy(&str);
-    }
+    STDMETHOD_(void, GetCueText)(CTHIS_ IStringT *pStr) SCONST;
 
     /**
      * @brief Get the cue text color

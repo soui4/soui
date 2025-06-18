@@ -2387,11 +2387,7 @@ HBITMAP WINAPI CW32System::LoadBitmap(HINSTANCE hInstance, LPCWSTR lpBitmapName)
 
 HCURSOR WINAPI CW32System::LoadCursor(HINSTANCE hInstance, LPCWSTR lpCursorName)
 {
-#ifdef _WIN32
 	return ::LoadCursorW(hInstance, lpCursorName);
-#else
-	return 0;
-#endif//_WIN32
 }
 
 HINSTANCE WINAPI CW32System::LoadLibrary(LPCWSTR lpLibFileName)

@@ -160,7 +160,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 	SouiFactory souiFac;
     SComMgr2 *pComMgr = new SComMgr2();
     {
-		int nType = MessageBox(GetActiveWindow(), _T("选择渲染类型：\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
+		int nType =  MessageBox(GetActiveWindow(), _T("选择渲染类型：\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
 		if (nType == IDCANCEL)
 		{
 			nRet = -1;
@@ -300,7 +300,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		//定义一人个资源提供对象,SOUI系统中实现了3种资源加载方式，分别是从文件加载，从EXE的资源加载及从ZIP压缩包加载
 		SAutoRefPtr<IResProvider>   pResProvider;
 
-#if (RES_TYPE==RESTYPE_PE)//从EXE资源加载
+#if defined(_WIN32) && (RES_TYPE==RESTYPE_PE)//从EXE资源加载
 		pResProvider.Attach(souiFac.CreateResProvider(RES_PE));
 		pResProvider->Init((WPARAM)hInstance, 0);
 #elif (RES_TYPE==RESTYPE_ZIP)//从ZIP包加载

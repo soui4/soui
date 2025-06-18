@@ -1100,7 +1100,7 @@ static LSERR CheckNewPara(PLSC plsc, LSCP cpPrev, LSCP cpThis, BOOL* pfQuit)
 		plsc->fLimSplat = lspap.grpf & fFmiLimSplat;
 		plsc->fIgnoreSplatBreak = lspap.grpf & fFmiIgnoreSplatBreak;
 
-		/* we don't invalidate tabs info and other paragraph properties 
+		// we don't invalidate tabs info and other paragraph properties 
 		/* that we stored in context */
 
 		*pfQuit = fFalse;
@@ -1829,7 +1829,7 @@ LONG RightMarginIncreasing(PLSC plsc, LONG urColumnMax)
 			}
 	}
 
-/*----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 /* E R R  R E L E A S E  R U N  T O  F O R M A T */
 /*----------------------------------------------------------------------------
     %%Function: ErrReleaseRunToFormat

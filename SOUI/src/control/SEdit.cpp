@@ -62,6 +62,12 @@ SStringT SEdit::GetCueText(BOOL bRawText) const
     return m_strCue.GetText(bRawText);
 }
 
+void SEdit::GetCueText(IStringT *pStr) const
+{
+    SStringT str = m_strCue.GetText(FALSE);
+    pStr->Copy(&str);
+}
+
 HRESULT SEdit::OnLanguageChanged()
 {
     HRESULT hr = __baseCls::OnLanguageChanged();

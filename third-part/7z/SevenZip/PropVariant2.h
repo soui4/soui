@@ -42,6 +42,9 @@ namespace intl
 		CPropVariant& operator=(Int64 value);
 		CPropVariant& operator=(UInt64 value);
 		CPropVariant& operator=(const FILETIME &value);
+		#ifdef __APPLE__
+		CPropVariant& operator=(long value);
+		#endif//__APPLE__
 
 		HRESULT Clear();
 		HRESULT Copy(const PROPVARIANT *pSrc);

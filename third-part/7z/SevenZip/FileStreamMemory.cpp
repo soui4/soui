@@ -15,10 +15,6 @@ namespace SevenZip
 			std::string file_name = ToPathNativeStr(m_fileName);
 			m_streams.PutFile(file_name.c_str(), m_blob); 			
 		}
-		else
-		{
-			m_fileName = m_fileName;
-		}
     }  
     
     STDMETHODIMP FileStreamMemory::QueryInterface(REFIID iid, void ** ppvObject)  

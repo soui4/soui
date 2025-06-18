@@ -33,7 +33,7 @@ public:
 
     SkTLazy(const SkTLazy<T>& src) : fPtr(NULL) {
         if (src.isValid()) {
-            fPtr = new (fStorage) T(*src->get());
+            fPtr = new (fStorage) T(src.get());
         } else {
             fPtr = NULL;
         }

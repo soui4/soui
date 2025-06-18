@@ -97,7 +97,6 @@ void SDateTimePicker::OnCreateDropDown(SDropDownWnd *pDropDown)
     pDropDown->GetRoot()->InsertChild(m_pCalendar);
     pDropDown->GetRoot()->UpdateChildrenPosition();
     CRect rc = m_pCalendar->GetWindowRect();
-    SSLOGI() << "rc=" << rc.left << "," << rc.top << "," << rc.right << "," << rc.bottom;
     m_pCalendar->SetVisible(TRUE);
     m_pCalendar->SetFocus();
 

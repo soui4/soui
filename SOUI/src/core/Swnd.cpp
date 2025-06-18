@@ -1171,10 +1171,15 @@ void SWindow::_RedrawNonClient()
     CRect rcClient = SWindow::GetClientRect();
     if (rcWnd == rcClient)
         return;
+    #ifdef __APPLE__
+    //Update is invalidate on mac
+    InvalidateRect(rcWnd, TRUE, FALSE);
+    #else
     Update();
     InvalidateRect(rcWnd, TRUE, FALSE);   // invalid window rect
     InvalidateRect(rcClient, TRUE, TRUE); // but clip client rect
     Update();
+    #endif//__APPLE__
 }
 
 static SAutoRefPtr<IRegionS> ConvertRect2RenderRegion(const CRect &rc, const SMatrix &mtx)

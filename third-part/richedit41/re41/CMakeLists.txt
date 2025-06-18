@@ -19,6 +19,8 @@ add_definitions(-D_CRT_SECURE_NO_WARNINGS
 
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 	add_compile_options(-Wno-invalid-offsetof)
+    set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -w")
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} -w")
 endif()
 
 

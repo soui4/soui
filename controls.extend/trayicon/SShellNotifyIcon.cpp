@@ -67,7 +67,7 @@
 		}
 		else
 		{
-			nid.hIcon = m_hIconArray[20];
+			nid.hIcon = m_hIconArray[MOVE_ICON];
 			int m = Shell_NotifyIcon(NIM_MODIFY,&nid);
 			m_bIsIcon = true;
 		}
@@ -91,6 +91,6 @@
 		nid.uFlags = flags;//NIF_ICON | NIF_MESSAGE | NIF_TIP;
 		nid.uCallbackMessage = callbackmsg;
 		nid.hIcon = hIcon;
-		m_hIconArray[20]=hIcon;//保存留闪烁用
+		m_hIconArray[MOVE_ICON]=hIcon;//保存留闪烁用
 		_tcscpy(nid.szTip, szTip);
 	}

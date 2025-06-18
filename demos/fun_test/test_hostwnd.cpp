@@ -174,12 +174,13 @@ public:
         }
     }
     void OnBtnPickColor(){
+        static COLORREF acrCustClr[16]; // array of custom colors
         CHOOSECOLOR cc;                 // common dialog box structure 
         // Initialize CHOOSECOLOR 
         ZeroMemory(&cc, sizeof(cc));
         cc.lStructSize = sizeof(cc);
         cc.hwndOwner = m_hWnd;
-        cc.lpCustColors = NULL;
+        cc.lpCustColors = (LPDWORD)acrCustClr;
         cc.rgbResult = RGBA(255,0,0,255);
         cc.Flags = CC_FULLOPEN | CC_RGBINIT;
         if(ChooseColor(&cc)){
@@ -315,7 +316,6 @@ int run_app(HINSTANCE hInst) {
     SStringT srcDir = getSourceDir();
     UINT_PTR uid = SetTimer(0, 0, 5, OnTimeout);
     SLOGI() << "settimer: id=" << uid;
-
     CScintillaWnd::InitScintilla(hInst);
     SComMgr2 comMgr;
     SAutoRefPtr<IRenderFactory> renderFac;

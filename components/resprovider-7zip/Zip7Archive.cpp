@@ -19,8 +19,6 @@
 #include "SevenZip/SevenString.h" 
 
 
-#include <malloc.h>
-
 //using namespace SNS;
 
 namespace SevenZip{

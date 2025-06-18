@@ -56,3 +56,4 @@ build
 /out
 output*/
 skin_config.xml
+xcode/

@@ -1,6 +1,10 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <UIDEF>
-  <deffont value="face:微软雅黑,size:16"/>
+  <deffont>
+    <macosx value="face:Heiti SC,size:16"/>
+    <linux value="face:宋体,size:16"/>
+    <win32 value="face:微软雅黑,size:16"/>
+  </deffont>
   
   <string src="values:string" />
   <skin src="values:skin"/>

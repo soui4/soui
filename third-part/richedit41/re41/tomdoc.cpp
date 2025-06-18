@@ -604,12 +604,11 @@ STDMETHODIMP CTxtEdit::Open (
 	LONG		CodePage)	//@parm Code page to use
 {
 	TRACEBEGIN(TRCSUBSYSTOM, TRCSCOPEEXTERN, "CTxtEdit::Open");
-
 	LONG		cb;								// Byte count for RTF check
 	EDITSTREAM	es		= {0, NOERROR, MyRead};
 	BOOL		fReplaceSel = Flags & tomPasteFile;
 	HCURSOR		hcur;
-	LRESULT		lres;
+	LRESULT		lres;  
 	TCHAR		szType[10];
 
 	if(!pVar || CodePage && !IsUnicodeCP(CodePage) && !IsValidCodePage(CodePage))
@@ -841,7 +840,6 @@ STDMETHODIMP CTxtEdit::Save (
 	LONG		CodePage)	//@parm Code page to use
 {
 	TRACEBEGIN(TRCSUBSYSTOM, TRCSCOPEEXTERN, "CTxtEdit::Save");
-
 	LONG		cb;			// Byte count for writing Unicode BOM
 	EDITSTREAM	es		= {0, NOERROR, MyWrite};
 	BOOL		fChange	= FALSE;				// No doc info change yet

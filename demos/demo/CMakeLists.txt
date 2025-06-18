@@ -1,5 +1,5 @@
 add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-
+include(${PROJECT_SOURCE_DIR}/__cmake/global.cmake)
 include_directories(${PROJECT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR}/components)
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
@@ -144,7 +144,8 @@ else ()
 endif ()
 endif()
 
-add_executable(demo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${EXTENDCOTROLS})
+add_soui_exe(demo ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${EXTENDCOTROLS})
+add_soui_resource(demo ${CMAKE_CURRENT_SOURCE_DIR}/uires uires ${CMAKE_CURRENT_SOURCE_DIR}/demo.icns)
 add_dependencies(demo resprovider-zip)
 if(CMAKE_DEBUG_POSTFIX)
     set_target_properties(demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
@@ -173,16 +174,3 @@ set_target_properties (demo PROPERTIES
     FOLDER demos
 )
 
-install(TARGETS demo
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION bin/Release
-    LIBRARY DESTINATION lib/Release
-    ARCHIVE DESTINATION lib/Release
-)
-
-install(TARGETS demo
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION bin/Debug
-    LIBRARY DESTINATION lib/Debug
-    ARCHIVE DESTINATION lib/Debug
-)

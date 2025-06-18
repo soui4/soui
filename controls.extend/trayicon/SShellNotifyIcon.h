@@ -65,7 +65,7 @@ protected:
 
 	bool m_bIsIcon;
 
-	HICON m_hIconArray[MOVE_ICON];//托盘区动画图标数组
+	HICON m_hIconArray[MOVE_ICON+1];//托盘区动画图标数组
 };
 
 #endif//_SSHELLNOTIFYICON_H_

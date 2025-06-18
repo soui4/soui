@@ -12,7 +12,6 @@
 
 #include "BlobBuffer.h"
 #include <stdio.h>
-#include <malloc.h>
 #include <string.h>
 #include <windows.h>
 #include <string>

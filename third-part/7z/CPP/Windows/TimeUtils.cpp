@@ -1,10 +1,7 @@
 // Windows/TimeUtils.cpp
 
 #include "StdAfx.h"
-#ifndef _WIN32
-#include <sys/time.h>
-#include <time.h>
-#endif
+#include <windows.h>
 
 #include "Defs.h"
 #include "TimeUtils.h"
@@ -12,38 +9,19 @@
 namespace NWindows {
 namespace NTime {
 
-static const UInt32 kNumTimeQuantumsInSecond = 10000000;
+
+static const uint32_t kNumTimeQuantumsInSecond = 10000000;
 static const unsigned kFileTimeStartYear = 1601;
-#if !defined(_WIN32) || defined(UNDER_CE)
-static const unsigned kDosTimeStartYear = 1980;
-#endif
 static const unsigned kUnixTimeStartYear = 1970;
-static const UInt64 kUnixTimeOffset =
-    (UInt64)60 * 60 * 24 * (89 + 365 * (UInt32)(kUnixTimeStartYear - kFileTimeStartYear));
-static const UInt64 kNumSecondsInFileTime = (UInt64)(Int64)-1 / kNumTimeQuantumsInSecond;
+static const unsigned kDosTimeStartYear = 1980;
+static const uint64_t kUnixTimeOffset =
+    (uint64_t)60 * 60 * 24 * (89 + 365 * (uint32_t)(kUnixTimeStartYear - kFileTimeStartYear));
+static const uint64_t kNumSecondsInFileTime = (uint64_t)(int64_t)-1 / kNumTimeQuantumsInSecond;
+
 
 bool DosTime_To_FileTime(UInt32 dosTime, FILETIME &ft) throw()
 {
-  #if defined(_WIN32) && !defined(UNDER_CE)
   return BOOLToBool(::DosDateTimeToFileTime((UInt16)(dosTime >> 16), (UInt16)(dosTime & 0xFFFF), &ft));
-  #else
-  ft.dwLowDateTime = 0;
-  ft.dwHighDateTime = 0;
-  UInt64 res;
-  if (!GetSecondsSince1601(
-      kDosTimeStartYear + (unsigned)(dosTime >> 25),
-      (unsigned)((dosTime >> 21) & 0xF),
-      (unsigned)((dosTime >> 16) & 0x1F),
-      (unsigned)((dosTime >> 11) & 0x1F),
-      (unsigned)((dosTime >>  5) & 0x3F),
-      (unsigned)((dosTime & 0x1F)) * 2,
-      res))
-    return false;
-  res *= kNumTimeQuantumsInSecond;
-  ft.dwLowDateTime = (UInt32)res;
-  ft.dwHighDateTime = (UInt32)(res >> 32);
-  return true;
-  #endif
 }
 
 static const UInt32 kHighDosTime = 0xFF9FBF7D;
@@ -51,8 +29,6 @@ static const UInt32 kLowDosTime = 0x210000;
 
 bool FileTime_To_DosTime(const FILETIME &ft, UInt32 &dosTime) throw()
 {
-  #if defined(_WIN32) && !defined(UNDER_CE)
-
   WORD datePart, timePart;
   if (!::FileTimeToDosDateTime(&ft, &datePart, &timePart))
   {
@@ -60,111 +36,8 @@ bool FileTime_To_DosTime(const FILETIME &ft, UInt32 &dosTime) throw()
     return false;
   }
   dosTime = (((UInt32)datePart) << 16) + timePart;
-
-  #else
-
-#define PERIOD_4 (4 * 365 + 1)
-#define PERIOD_100 (PERIOD_4 * 25 - 1)
-#define PERIOD_400 (PERIOD_100 * 4 + 1)
-
-  unsigned year, mon, day, hour, min, sec;
-  UInt64 v64 = ft.dwLowDateTime | ((UInt64)ft.dwHighDateTime << 32);
-  Byte ms[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-  unsigned temp;
-  UInt32 v;
-  v64 += (kNumTimeQuantumsInSecond * 2 - 1);
-  v64 /= kNumTimeQuantumsInSecond;
-  sec = (unsigned)(v64 % 60);
-  v64 /= 60;
-  min = (unsigned)(v64 % 60);
-  v64 /= 60;
-  hour = (unsigned)(v64 % 24);
-  v64 /= 24;
-
-  v = (UInt32)v64;
-
-  year = kFileTimeStartYear + (unsigned)(v / PERIOD_400 * 400);
-  v %= PERIOD_400;
-
-  temp = (unsigned)(v / PERIOD_100);
-  if (temp == 4)
-    temp = 3;
-  year += temp * 100;
-  v -= temp * PERIOD_100;
-
-  temp = v / PERIOD_4;
-  if (temp == 25)
-    temp = 24;
-  year += temp * 4;
-  v -= temp * PERIOD_4;
-
-  temp = v / 365;
-  if (temp == 4)
-    temp = 3;
-  year += temp;
-  v -= temp * 365;
-
-  if (year % 4 == 0 && (year % 100 != 0 || year % 400 == 0))
-    ms[1] = 29;
-  for (mon = 1; mon <= 12; mon++)
-  {
-    unsigned s = ms[mon - 1];
-    if (v < s)
-      break;
-    v -= s;
-  }
-  day = (unsigned)v + 1;
-
-  dosTime = kLowDosTime;
-  if (year < kDosTimeStartYear)
-    return false;
-  year -= kDosTimeStartYear;
-  dosTime = kHighDosTime;
-  if (year >= 128)
-    return false;
-  dosTime =
-      ((UInt32)year << 25)
-    | ((UInt32)mon  << 21)
-    | ((UInt32)day  << 16)
-    | ((UInt32)hour << 11)
-    | ((UInt32)min  << 5)
-    | ((UInt32)sec  >> 1);
-  #endif
   return true;
 }
-
-#ifndef _WIN32
-
-static LONG TIME_GetBias(void)
-{
-  const time_t utc = time(NULL);
-  struct tm *ptm = localtime(&utc);
-  const int localdaylight = ptm->tm_isdst; /* daylight for local timezone */
-  ptm = gmtime(&utc);
-  ptm->tm_isdst = localdaylight; /* use local daylight, not that of Greenwich */
-  return (int)(mktime(ptm) - utc);
-}
-
-#define TICKS_PER_SEC 10000000
-
-#define GET_TIME_64(pft) ((pft)->dwLowDateTime | ((UInt64)(pft)->dwHighDateTime << 32))
-
-#define SET_FILETIME(ft, v64) \
-   (ft)->dwLowDateTime = (DWORD)v64; \
-   (ft)->dwHighDateTime = (DWORD)(v64 >> 32);
-
-#define WINAPI
-#define TRUE 1
-
-static BOOL WINAPI FileTimeToLocalFileTime(const FILETIME *fileTime, FILETIME *localFileTime)
-{
-  UInt64 v = GET_TIME_64(fileTime);
-  v = (UInt64)((Int64)v - (Int64)TIME_GetBias() * TICKS_PER_SEC);
-  SET_FILETIME(localFileTime, v)
-  return TRUE;
-}
-
-#endif//_WIN32
 
 bool UtcFileTime_To_LocalDosTime(const FILETIME &utc, UInt32 &dosTime) throw()
 {

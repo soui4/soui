@@ -32,7 +32,6 @@ CPropVariant::CPropVariant(LPCOLESTR lpszSrc)
   vt = VT_EMPTY;
   *this = lpszSrc;
 }
-
 CPropVariant& CPropVariant::operator=(const CPropVariant &varSrc)
 {
   InternalCopy(&varSrc);
@@ -111,7 +110,9 @@ SET_PROP_FUNC(Int32, VT_I4, lVal)
 SET_PROP_FUNC(UInt32, VT_UI4, ulVal)
 SET_PROP_FUNC(UInt64, VT_UI8, uhVal.QuadPart)
 SET_PROP_FUNC(const FILETIME &, VT_FILETIME, filetime)
-
+#ifdef __APPLE__
+SET_PROP_FUNC(long, VT_I8, lVal)
+#endif//__APPLE__
 static HRESULT MyPropVariantClear(PROPVARIANT *prop)
 {
   switch(prop->vt)

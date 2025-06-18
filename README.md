@@ -97,12 +97,16 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 - SOUI讨论#2: [点击加入](http://shang.qq.com/wpa/qunwpa?idkey=03d3294a2551beb1b54b4012086cec14b3f66d5c253debaeed241d9c623966e0)
 
+##  **编译**
+###  **Windows编译**
+- 直接使用cmake 生成工程文件，然后使用Visual Studio打开工程文件，编译即可。
 
-##  **Linux编译** 
-soui从5.0开始支持linux平台，soui通过链接swinx(https://github.com/soui4/swinx)项目提供在linux平台下的windows api实现跨平台支持。
-linux平台编译参见swinx中的build.md，安装后必须的依赖后，使用cmake即可完成编译。
+###  **Linux编译** 
+- 拉取子模块swinx：git submodule update --init
+- 安装依赖：sudo apt install cmake git build-essential gdb libcairo2-dev libxcb1-dev libgl1-mesa-dev freeglut3-dev
+- 编译：mkdir build && cd build && cmake .. && make -j8
 
-##  **使用vs远程调试linux** 
+-  **使用vs远程调试linux** 
 linux机器上安装
 sudo apt install -y openssh-server build-essential gdb rsync make zip ninja-build
 本机安装
@@ -112,8 +116,15 @@ CMake, Vcxsvr(https://sourceforge.net/projects/vcxsrv/files/vcxsrv/21.1.10/vcxsr
 然后就可以在VS里运行远程调试了。
 具体参考：https://learn.microsoft.com/zh-cn/cpp/build/get-started-linux-cmake?view=msvc-170
 
-##  **linux 内存泄漏检测** 
+-  **linux 内存泄漏检测** 
 valgrind --leak-check=full ./your_program
+
+###  **macos 编译**
+- 拉取子模块swinx：git submodule update --init
+- 安装brew,国内建议使用[中国镜像](https://gitee.com/cunkai/HomebrewCN)
+- 安装homebrew-core 和 homebrew-cask: brew tap homebrew/core && brew tap homebrew/cask
+- 安装编译工具及依赖: brew install cmake ninja pkgconf cairo glfw3 glew
+- 编译: mkdir build && cd build && cmake .. -G Ninja && ninja -j8
 
 ## **贡献名单**
 参见[贡献名单](./contributors.md)

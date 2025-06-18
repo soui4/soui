@@ -321,6 +321,7 @@ void _cdecl operator delete (void* pv)
 
 #else //DEBUG
 
+#ifdef _WIN32
 void* _cdecl operator new (size_t size)
 {
 	TRACEBEGIN(TRCSUBSYSEDIT, TRCSCOPEINTERN, "new");
@@ -335,6 +336,7 @@ void _cdecl operator delete (void* pv)
 	W32->FreePv(pv);
 }
 
+#endif//_WIN32
 
 #endif //DEBUG
 

@@ -871,7 +871,11 @@ void SMenuEx::RunMenu(HWND hRoot)
                 msgLoop->WaitMsg();
             }
         }
-
+        if (msg.message == WM_CANCELMODE)
+        {
+            s_MenuData->ExitMenu(0);
+            break;
+        }
         if (msg.message == WM_KEYDOWN || msg.message == WM_KEYUP || msg.message == WM_SYSKEYDOWN || msg.message == WM_SYSKEYUP)
         { //拦截alt键
             if (msg.wParam == VK_MENU)

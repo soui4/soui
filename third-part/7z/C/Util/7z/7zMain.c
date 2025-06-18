@@ -344,16 +344,6 @@ static LONG TIME_GetBias(void)
    (ft)->dwLowDateTime = (DWORD)v64; \
    (ft)->dwHighDateTime = (DWORD)(v64 >> 32);
 
-#define WINAPI
-#define TRUE 1
-
-static BOOL WINAPI FileTimeToLocalFileTime(const FILETIME *fileTime, FILETIME *localFileTime)
-{
-  UInt64 v = GET_TIME_64(fileTime);
-  v = (UInt64)((Int64)v - (Int64)TIME_GetBias() * TICKS_PER_SEC);
-  SET_FILETIME(localFileTime, v)
-  return TRUE;
-}
 
 static const UInt32 kNumTimeQuantumsInSecond = 10000000;
 static const UInt32 kFileTimeStartYear = 1601;

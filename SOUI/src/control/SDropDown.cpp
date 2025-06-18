@@ -151,4 +151,12 @@ IMessageLoop *SDropDownWnd::GetMsgLoop()
     return m_pOwner->GetDropDownOwner()->GetContainer()->GetMsgLoop();
 }
 
+void SDropDownWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
+{
+    if (nState == WA_INACTIVE)
+    {
+        EndDropDown();
+    }
+}
+
 SNSEND

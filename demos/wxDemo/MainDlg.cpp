@@ -335,12 +335,12 @@ void CMainDlg::OnLanguage(int nID)
 	SASSERT(pTransMgr);
 	bool bCnLang = nID == 1;
 
-	SXmlDoc xmlLang;
-	if (SApplication::getSingletonPtr()->LoadXmlDocment(xmlLang, bCnLang ? _T("translator:lang_cn") : _T("translator:lang_jp")))
+	SXmlDoc docLang;
+	if (SApplication::getSingletonPtr()->LoadXmlDocment(docLang, bCnLang ? _T("translator:lang_cn") : _T("translator:lang_jp")))
 	{
 		CAutoRefPtr<ITranslator> lang;
 		pTransMgr->CreateTranslator(&lang);
-		SXmlNode xmlLang = xmlLang.root().child(L"language");
+		SXmlNode xmlLang = docLang.root().child(L"language");
 		lang->Load(&xmlLang, 1);//1=LD_XML
 		wchar_t lngName[TR_MAX_NAME_LEN] = {0};
 		lang->GetName(lngName);
