@@ -514,7 +514,7 @@ void SButton::OnStateChanged(DWORD dwOldState, DWORD dwNewState)
 
     if (m_bAnimate && ((dwOldState == WndState_Normal && dwNewState == WndState_Hover) || (dwOldState == WndState_Hover && dwNewState == WndState_Normal)))
     { //启动动画
-        m_byAlphaAni = 50;
+        m_byAlphaAni = 50;//ani alpha from 50 to 255
         GetContainer()->RegisterTimelineHandler(this);
     }
 }
