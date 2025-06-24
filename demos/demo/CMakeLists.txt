@@ -144,7 +144,9 @@ else ()
 endif ()
 endif()
 
+set(MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE "true")
 add_soui_exe(demo ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${EXTENDCOTROLS})
+
 add_soui_resource(demo ${CMAKE_CURRENT_SOURCE_DIR}/uires uires ${CMAKE_CURRENT_SOURCE_DIR}/demo.icns)
 add_dependencies(demo resprovider-zip)
 if(CMAKE_DEBUG_POSTFIX)

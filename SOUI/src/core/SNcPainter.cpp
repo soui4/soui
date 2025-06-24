@@ -751,12 +751,13 @@ void SNcPainter::updateSystemButton(SWindow *pRoot, UINT nResizeMode)
     SWindow *pRestore = pRoot->FindChildByID(IDC_SYS_RESTORE);
     if (pMax && pRestore)
     {
-        if (nResizeMode == SIZE_MAXIMIZED)
+        BOOL bZoomed = ::IsZoomed(pRoot->GetHostHwnd());
+        if (bZoomed)
         {
             pMax->SetVisible(FALSE);
             pRestore->SetVisible(TRUE);
         }
-        else if (nResizeMode == SIZE_RESTORED)
+        else
         {
             pMax->SetVisible(TRUE);
             pRestore->SetVisible(FALSE);

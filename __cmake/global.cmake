@@ -83,5 +83,16 @@ target_sources(${app} PRIVATE ${icon})
 set_source_files_properties(${icon} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 get_filename_component(APP_ICON_FILE ${icon} NAME)
 set(MACOSX_BUNDLE_ICON_FILE ${APP_ICON_FILE})
+
+if(NOT DEFINED MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE)
+    set(MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE "false")
+endif()
+
+set_target_properties(
+      ${app}
+      PROPERTIES
+      MACOSX_BUNDLE_INFO_PLIST ./plist.in
+   )
+
 endif()
 endmacro()
