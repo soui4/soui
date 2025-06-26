@@ -483,7 +483,7 @@ SET (7ZLIB_SRCS
 	CPP/7zip/Crypto/7zAesRegister.cpp
 )
 
-if (WIN32 AND MSVC)
+if (WIN32 AND MSVC AND NOT CMAKE_VS_PLATFORM_NAME MATCHES "ARM64")
     set(ENABLE_7Z_ASM 1)
 else()
     set(ENABLE_7Z_ASM 0)
