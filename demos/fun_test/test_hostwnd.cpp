@@ -314,6 +314,12 @@ static VOID CALLBACK OnTimeout(HWND hwnd, UINT msg, UINT_PTR id, DWORD ts)
 int run_app(HINSTANCE hInst) {
 
     SStringT srcDir = getSourceDir();
+    #ifndef _WIN32
+    //test for AddFontResource
+    AddFontResource((srcDir+"/../../simsun.ttc").c_str());
+    int nType =  MessageBox(GetActiveWindow(), _T("选择渲染类型：\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
+    #endif//_WIN32
+
     UINT_PTR uid = SetTimer(0, 0, 5, OnTimeout);
     SLOGI() << "settimer: id=" << uid;
     CScintillaWnd::InitScintilla(hInst);
@@ -367,10 +373,7 @@ int run_app(HINSTANCE hInst) {
         }
         app.SetLogManager(pLogMgr);
     }
-    #ifndef _WIN32
-    //test for AddFontResource
-    AddFontResource((srcDir+"/../simsun.ttc").c_str());
-    #endif//_WIN32
+
     SLOGI() << "start soui app";
     CMainDlg hostWnd("layout:XML_MAINWND");
     hostWnd.CreateEx(0, WS_POPUP, WS_EX_LAYERED, 300, 100, 0, 0);

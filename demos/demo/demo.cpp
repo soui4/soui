@@ -157,6 +157,12 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 	SASSERT(SUCCEEDED(hRes));
 	int nRet = 0;
 
+	//将程序的运行路径修改到demo所在的目录
+	SStringT appDir = getSourceDir();
+	#ifndef _WIN32
+		//for AddFontResource
+		AddFontResource((appDir+"/../../simsun.ttc").c_str());
+	#endif//_WIN32
 	SouiFactory souiFac;
     SComMgr2 *pComMgr = new SComMgr2();
     {
@@ -264,8 +270,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 		//如果需要在代码中使用R::id::namedid这种方式来使用控件必须要这一行代码：2016年2月2日，R::id,R.name是由uiresbuilder 增加-h .\res\resource.h 这2个参数后生成的。
 		theApp->InitXmlNamedID((const LPCWSTR*)&R.name, (const int*)&R.id, sizeof(R.id) / sizeof(int));
 
-		//将程序的运行路径修改到demo所在的目录
-		SStringT appDir = getSourceDir();
         theApp->SetAppDir(appDir.c_str());
         SetCurrentDirectory(appDir.c_str());
 
@@ -290,10 +294,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #else
 		static const TCHAR* kPath_SysRes = _T("/../../soui-sys-resource");
 		static const TCHAR* kPath_DemoRes = _T("/uires");
-        SStringT srcDir = getSourceDir();
+
         SAutoRefPtr<IResProvider> sysResProvider;
 		sysResProvider.Attach(souiFac.CreateResProvider(RES_FILE));
-		SStringT sysRes = srcDir + kPath_SysRes;
+		SStringT sysRes = appDir + kPath_SysRes;
 		sysResProvider->Init((WPARAM)sysRes.c_str(), 0);
 		theApp->LoadSystemNamedResource(sysResProvider);
 #endif

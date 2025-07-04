@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <UIDEF>
-  <deffont value="face:Heiti SC,size:16"/>
+  <deffont value="face:宋体,size:16"/>
   <unit defUnit="dp"/>
   <caret color="rgb(255,0,0)" animate="true" fadeTime="20" showTime="10" interpolator="Accelerate"/>
   <!--2.0重要更新：string,color,skin这3个节点在有src属性时切换到src指定的XML中去加载，style, objattr保持不变-->
