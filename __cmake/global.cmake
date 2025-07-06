@@ -67,7 +67,7 @@ elseif (APPLE)
 endif()
 endmacro()
 
-macro(add_soui_resource app res_path res_name icon)
+macro(add_macos_res_folder app res_path res_name)
 if (APPLE)
 # 添加整个文件夹作为资源
 file(GLOB_RECURSE DATA_FILES ${res_path}/*)
@@ -75,14 +75,33 @@ foreach(file ${DATA_FILES})
     #message(STATUS "add resource ${file}")
     target_sources(${app} PRIVATE ${file})
     file(RELATIVE_PATH relative_file "${res_path}" "${file}")
-    set_source_files_properties(${file} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${res_name}/${relative_file})
+    get_filename_component(relative_dir ${relative_file} DIRECTORY)
+    set_source_files_properties(${file} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${res_name}/${relative_dir})
 endforeach()
 
+endif(APPLE)
+endmacro()
+
+macro(add_macos_res_file app res_file dest_path)
+    if(APPLE)
+        message(STATUS "Adding resource file: ${res_file}")
+        target_sources(${app} PRIVATE ${res_file})
+        set_source_files_properties(${res_file} 
+            PROPERTIES 
+            MACOSX_PACKAGE_LOCATION "Resources/${dest_path}"
+        )
+
+    endif()
+endmacro()
+
+macro(set_macos_icon app icon)
+if (APPLE)
 message(STATUS "add resource ${icon}")
 target_sources(${app} PRIVATE ${icon})
 set_source_files_properties(${icon} PROPERTIES MACOSX_PACKAGE_LOCATION Resources)
 get_filename_component(APP_ICON_FILE ${icon} NAME)
 set(MACOSX_BUNDLE_ICON_FILE ${APP_ICON_FILE})
+
 
 if(NOT DEFINED MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE)
     set(MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE "false")
@@ -94,5 +113,5 @@ set_target_properties(
       MACOSX_BUNDLE_INFO_PLIST ./plist.in
    )
 
-endif()
+endif(APPLE)
 endmacro()

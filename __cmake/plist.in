@@ -41,6 +41,6 @@
   <key>NSPrincipalClass</key>
   <string>NSApplication</string>
   <key>ATSApplicationFontsPath</key>
-  <string>.</string>
+  <string>fonts</string>
 </dict>
 </plist>

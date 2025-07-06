@@ -311,15 +311,14 @@ static VOID CALLBACK OnTimeout(HWND hwnd, UINT msg, UINT_PTR id, DWORD ts)
         KillTimer(0, id);
 }
 
+
 int run_app(HINSTANCE hInst) {
 
     SStringT srcDir = getSourceDir();
     #ifndef _WIN32
     //test for AddFontResource
     AddFontResource((srcDir+"/../../simsun.ttc").c_str());
-    int nType =  MessageBox(GetActiveWindow(), _T("选择渲染类型：\n[yes]: Skia\n[no]:GDI\n[cancel]:Quit"), _T("select a render"), MB_ICONQUESTION | MB_YESNOCANCEL);
     #endif//_WIN32
-
     UINT_PTR uid = SetTimer(0, 0, 5, OnTimeout);
     SLOGI() << "settimer: id=" << uid;
     CScintillaWnd::InitScintilla(hInst);
