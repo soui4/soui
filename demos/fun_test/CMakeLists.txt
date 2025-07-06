@@ -24,8 +24,8 @@ add_dependencies(fun_test utilities4 gtest soui4 resprovider-zip log4z render-gd
 target_include_directories(fun_test 
     PUBLIC ${PROJECT_SOURCE_DIR}/third-part/Scintilla/include
 )
-find_library(COCOA_LIBRARY Cocoa)
-target_link_libraries(fun_test utilities4 gtest soui4 Scintilla ${COCOA_LIBRARY})
+
+target_link_libraries(fun_test utilities4 gtest soui4 Scintilla)
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
     add_dependencies(fun_test swinx)
     target_link_libraries(fun_test swinx pthread dl)
