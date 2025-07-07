@@ -16,7 +16,7 @@ SNSBEGIN
 
 		LOGFONT lf={0};
 		lf.lfHeight=20;
-		_tcscpy(lf.lfFaceName,_T("宋体"));
+        _tcscpy(lf.lfFaceName, _T("simsun"));
 		CreateFont(&m_defFont,&lf);
 	}
 

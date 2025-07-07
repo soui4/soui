@@ -149,7 +149,7 @@ UINT SUiDefInfo::Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResPr
         {
             defFontInfo = xmlFont.attribute(L"value").as_string();
             #ifdef __APPLE__
-            const wchar_t *kPlatName = L"macosx";
+            const wchar_t *kPlatName = L"macos";
             #elif defined(__linux__)
             const wchar_t *kPlatName = L"linux";
             #else
