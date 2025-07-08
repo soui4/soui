@@ -64,8 +64,9 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 - [国外Git下载站点](https://github.com/soui4/soui)
 
-- [国内Git下载站点](https://gitee.com/setoutsoft/soui4)(作为镜像使用)
+- [国内Gitee](https://gitee.com/setoutsoft/soui4)
 
+- [国内gitcode](https://gitcode.com/setoutsoft/soui4)
 
 ### [编译](./doc/build.md)
 

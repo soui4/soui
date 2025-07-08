@@ -22,6 +22,8 @@
 			<edit readOnly="1">https://github.com/soui4/soui</edit>
 			<text>gitee：</text>
 			<edit readOnly="1">https://gitee.com/setousoft/soui4</edit>
+			<text>gitcode：</text>
+			<edit readOnly="1">https://gitcode.com/setousoft/soui4</edit>
 		</window>
 		<qrctrl size="100,100" text="Using Soui, UI just so so!"/>
 	</window>
