@@ -23,6 +23,8 @@ endif()
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
     target_link_libraries(log4z swinx)
+else()
+    target_link_libraries(log4z shlwapi)
 endif()
 
 set(COM_LIBS ${COM_LIBS} log4z CACHE INTERNAL "com_lib")

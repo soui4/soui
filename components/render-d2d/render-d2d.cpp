@@ -440,7 +440,6 @@ SNSBEGIN
 
 	SFont_D2D::SFont_D2D(IRenderFactory * pRenderFac,const LOGFONT * plf) 
 		:TD2DRenderObjImpl<IFontS,OT_FONT>(pRenderFac)
-		,m_hFont(NULL)
 	{
 		memcpy(&m_lf,plf,sizeof(LOGFONT));
 		CreateD2DFont();
@@ -931,16 +930,16 @@ SNSBEGIN
 
 	//////////////////////////////////////////////////////////////////////////
 	//	SRegion_D2D
-	SRegion_D2D::SRegion_D2D( IRenderFactory *pRenderFac ,SComPtr<ID2D1Geometry> rgn)
+	SRegion_D2D::SRegion_D2D( IRenderFactory *pRenderFac ,ID2D1Geometry* rgn)
 		:TD2DRenderObjImpl<IRegionS,OT_RGN>(pRenderFac)
 	{
 		if(!rgn)
 		{
 			ID2D1Factory *pFac = toD2DFac(GetRenderFactory());
 			D2D1_RECT_F rc={0};
-			SComPtr<ID2D1RectangleGeometry> rgn;
-			pFac->CreateRectangleGeometry(&rc,&rgn);
-			m_hRgn = rgn;
+			SComPtr<ID2D1RectangleGeometry> rgn2;
+			pFac->CreateRectangleGeometry(&rc,&rgn2);
+			m_hRgn = rgn2;
 			m_bRect=TRUE;
 		}else
 		{
@@ -2017,7 +2016,8 @@ SNSBEGIN
 
 	HRESULT SRenderTarget_D2D::InvertRect(LPCRECT pRect)
 	{
-		SComQIPtr<ID2D1GdiInteropRenderTarget> gdiRt(m_rt);
+		SComPtr<ID2D1GdiInteropRenderTarget> gdiRt;
+		m_rt->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget),(void**)&gdiRt);
 		if(!gdiRt)
 			return E_FAIL;
 		HDC hdc=0;
@@ -2109,7 +2109,8 @@ SNSBEGIN
 
 	COLORREF SRenderTarget_D2D::GetPixel( int x, int y )
 	{
-		SComQIPtr<ID2D1GdiInteropRenderTarget> gdiRt(m_rt);
+		SComPtr<ID2D1GdiInteropRenderTarget> gdiRt;
+		m_rt->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget),(void**)&gdiRt);
 		if(gdiRt){
 			HDC hdc=0;
 			gdiRt->GetDC(D2D1_DC_INITIALIZE_MODE_COPY,&hdc);
@@ -2123,7 +2124,8 @@ SNSBEGIN
 
 	COLORREF SRenderTarget_D2D::SetPixel( int x, int y, COLORREF cr )
 	{
-		SComQIPtr<ID2D1GdiInteropRenderTarget> gdiRt(m_rt);
+		SComPtr<ID2D1GdiInteropRenderTarget> gdiRt;
+		m_rt->QueryInterface(__uuidof(ID2D1GdiInteropRenderTarget),(void**)&gdiRt);
 		if(gdiRt){
 			HDC hdc=0;
 			gdiRt->GetDC(D2D1_DC_INITIALIZE_MODE_COPY,&hdc);
@@ -2706,7 +2708,8 @@ SNSBEGIN
 	BOOL SPath_D2D::getPosTan(CTHIS_ float distance, fPoint *pos, fPoint *vec) const
 	{
 		D2D1_POINT_DESCRIPTION pointDescription;
-		SComQIPtr<ID2D1PathGeometry1> path2(m_path);
+		SComPtr<ID2D1PathGeometry1> path2;
+		m_path->QueryInterface(__uuidof(ID2D1PathGeometry1), (void **)&path2);
 		if(!path2)
 			return FALSE;
 		HRESULT hr = path2->ComputePointAndSegmentAtLength(distance,0,NULL,&pointDescription);

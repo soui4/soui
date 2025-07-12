@@ -21,8 +21,23 @@ struct SComInfo
 };
 
 #ifdef _WIN32
+#if defined(__MINGW32__) || defined(__MINGW64__)
 struct SComInfo s_comInfo[]={
-	{Decoder_Png,_T("imgdecoder-png.dll"),NULL},
+	{Decoder_Gdip,_T("libimgdecoder-gdip.dll"),NULL},
+	{Decoder_Wic,_T("libimgdecoder-wic.dll"),NULL},
+	{Decoder_Stb,_T("libimgdecoder-stb.dll"),NULL},
+	{Render_Gdi,_T("librender-gdi.dll"),NULL},
+	{Render_Skia,_T("librender-skia.dll"),NULL},
+	{Render_D2D,_T("librender-d2d.dll"),NULL},
+	{Log4Z,_T("liblog4z.dll"),NULL},
+	{Resprovider_7Zip,_T("libresprovider-7zip.dll"),NULL},
+	{Resprovider_Zip,_T("libresprovider-zip.dll"),NULL},
+	{Script_Lua,_T("libscriptmodule-lua.dll"),NULL},
+	{TaskLoop,_T("libtaskloop.dll"),NULL},
+	{Translator,_T("libtranslator.dll"),NULL},
+};
+#else
+struct SComInfo s_comInfo[]={
 	{Decoder_Gdip,_T("imgdecoder-gdip.dll"),NULL},
 	{Decoder_Wic,_T("imgdecoder-wic.dll"),NULL},
 	{Decoder_Stb,_T("imgdecoder-stb.dll"),NULL},
@@ -36,9 +51,9 @@ struct SComInfo s_comInfo[]={
 	{TaskLoop,_T("taskloop.dll"),NULL},
 	{Translator,_T("translator.dll"),NULL},
 };
+#endif
 #else
 struct SComInfo s_comInfo[] = {
-	{Decoder_Png,_T("libimgdecoder-png.so"),NULL},
 	{Decoder_Gdip,_T("libimgdecoder-gdip.so"),NULL},
 	{Decoder_Wic,_T("libimgdecoder-wic.so"),NULL},
 	{Decoder_Stb,_T("libimgdecoder-stb.so"),NULL},

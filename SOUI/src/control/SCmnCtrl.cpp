@@ -716,7 +716,8 @@ void SImageWnd::OnColorize(COLORREF cr)
 void SImageWnd::OnScaleChanged(int scale)
 {
     __baseCls::OnScaleChanged(scale);
-    GetScaleSkin(m_pSkin, scale);
+    if (!m_bManaged)
+        GetScaleSkin(m_pSkin, scale);
 }
 
 ISkinObj *SImageWnd::GetSkin()

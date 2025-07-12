@@ -227,8 +227,13 @@ void SObjectDefaultRegister::RegisterValueAnimator(SObjectFactoryMgr *objFactory
 //////////////////////////////////////////////////////////////////////////
 // SApplication
 
+#if defined(_WIN32) && (defined(__MINGW32__) || defined(__MINGW64__))
+template <>
+SOUI_EXP SApplication *SSingleton<SApplication>::ms_Singleton = 0;
+#else
 template <>
 SApplication *SSingleton<SApplication>::ms_Singleton = 0;
+#endif//__MINGW32__
 
 SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTSTR pszHostClassName, const ISystemObjectRegister &sysObjRegister, BOOL bImeApp)
     : m_hInst(hInst)

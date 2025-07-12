@@ -95,13 +95,11 @@ class SDpiHandler {
             {
                 ScaleHost(hWnd);
                 lResult = 0;
-                return TRUE;
             }
             if (uMsg == WM_DPICHANGED)
             {
                 OnDpiChanged((WORD)HIWORD(wParam), (RECT *const)lParam);
                 lResult = 0;
-                return TRUE;
             }
             break;
         }

@@ -2885,7 +2885,6 @@ CleanUpNoEndGroup:
 			_ecParseError = ecUTF8NotUsed;
 
 		TRACEERRSZSC("CRTFW::WriteRtf()", _ecParseError);
-		Tracef(TRCSEVERR, "Writing error: %s", rgszParseError[_ecParseError]);
 		
 		if(!_pes->dwError || ped->Get10Mode())			// Make error code OLE-like
 			_pes->dwError = -abs(_ecParseError);

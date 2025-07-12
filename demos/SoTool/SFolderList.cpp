@@ -52,6 +52,7 @@ namespace SOUI
         m_rcCheckBox.SetRect(0, 0, 0, 0);
         m_rcIcon.SetRect(0, 0, 0, 0);
 
+        int nItemHei = m_nItemHei.toPixelSize(GetScale());
         //计算位置    
         if (m_pToggleSkin)
         {
@@ -59,9 +60,7 @@ namespace SOUI
             sizeSkin = m_pToggleSkin->GetSkinSize();        
             m_rcToggle.SetRect( 
                 nOffset, 
-                (m_nItemHei - sizeSkin.cy) / 2,
-                nOffset + sizeSkin.cx,
-                m_nItemHei - (m_nItemHei - sizeSkin.cy) / 2);
+                (nItemHei - sizeSkin.cy) / 2, nOffset + sizeSkin.cx, nItemHei - (nItemHei - sizeSkin.cy) / 2);
             nOffset += sizeSkin.cx;
         }
 
@@ -71,9 +70,7 @@ namespace SOUI
             sizeSkin = m_pCheckSkin->GetSkinSize();    
             m_rcCheckBox.SetRect( 
                 nOffset, 
-                (m_nItemHei - sizeSkin.cy) / 2,
-                nOffset + sizeSkin.cx,
-                m_nItemHei - (m_nItemHei - sizeSkin.cy) / 2);
+                (nItemHei - sizeSkin.cy) / 2, nOffset + sizeSkin.cx, nItemHei - (nItemHei - sizeSkin.cy) / 2);
             nOffset += sizeSkin.cx;
         }
 
@@ -83,9 +80,7 @@ namespace SOUI
             sizeSkin = CSize(::GetSystemMetrics(SM_CXSMICON),::GetSystemMetrics(SM_CYSMICON));
             m_rcIcon.SetRect( 
                 nOffset, 
-                (m_nItemHei - sizeSkin.cy) / 2,
-                nOffset + sizeSkin.cx,
-                m_nItemHei - (m_nItemHei - sizeSkin.cy) / 2);
+                (nItemHei - sizeSkin.cy) / 2, nOffset + sizeSkin.cx, nItemHei - (nItemHei - sizeSkin.cy) / 2);
             nOffset += sizeSkin.cx;
         }
 
@@ -98,11 +93,13 @@ namespace SOUI
         CRect rcItemBg;
         LPTVITEM pItem=CSTree<LPTVITEM>::GetItem(hItem);
 
-        pRT->OffsetViewportOrg(rc.left + pItem->nLevel * m_nIndent,rc.top);
-
-        rcItemBg.SetRect( m_nItemOffset + m_nItemMargin, 0, pItem->nContentWidth, m_nItemHei);
-        if(rcItemBg.right > rc.Width() - pItem->nLevel * m_nIndent)
-            rcItemBg.right = rc.Width() - pItem->nLevel * m_nIndent;
+        int nIndent = m_nIndent.toPixelSize(GetScale());
+        int nItemMargin = m_nItemMargin.toPixelSize(GetScale());
+        int nItemHei = m_nItemHei.toPixelSize(GetScale());
+        pRT->OffsetViewportOrg(rc.left + pItem->nLevel * nIndent, rc.top);
+        rcItemBg.SetRect(m_nItemOffset + nItemMargin, 0, pItem->nContentWidth, nItemHei);
+        if (rcItemBg.right > rc.Width() - pItem->nLevel * nIndent)
+            rcItemBg.right = rc.Width() - pItem->nLevel * nIndent;
         //绘制背景
         if (hItem == m_hSelItem)
         {
@@ -159,13 +156,13 @@ namespace SOUI
         #endif//_WIN32
 
         UINT align=DT_VCENTER|DT_SINGLELINE|DT_END_ELLIPSIS;
-        rcItemBg.OffsetRect(m_nItemMargin, 0);
+        rcItemBg.OffsetRect(nItemMargin, 0);
         pRT->DrawText(pItem->strText,-1,rcItemBg,align);    
 
         if (bTextColorChanged)
             pRT->SetTextColor(crOldText);
 
-        pRT->OffsetViewportOrg(-(rc.left  + pItem->nLevel * m_nIndent),-rc.top);
+        pRT->OffsetViewportOrg(-(rc.left  + pItem->nLevel * nIndent),-rc.top);
     }
 
     

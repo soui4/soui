@@ -3,7 +3,9 @@
 //  are changed infrequently
 //
 
-#pragma once
+#ifndef __STDAFX_H_
+#define __STDAFX_H_
+
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif
@@ -43,4 +45,6 @@
 #include "SPathView.h"
 
 using namespace SOUI;
+
+#endif//__STDAFX_H_
 

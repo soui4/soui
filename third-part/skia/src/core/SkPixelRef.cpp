@@ -8,7 +8,7 @@
 #include "SkPixelRef.h"
 #include "SkThread.h"
 
-#ifdef SK_USE_POSIX_THREADS
+#ifndef _WIN32
 
     static SkBaseMutex gPixelRefMutexRing[] = {
         SK_BASE_MUTEX_INIT, SK_BASE_MUTEX_INIT,

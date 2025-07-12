@@ -2,7 +2,7 @@
 
 #include "StdAfx.h"
 #include <windows.h>
-
+#include <stdint.h>
 #include "Defs.h"
 #include "TimeUtils.h"
 

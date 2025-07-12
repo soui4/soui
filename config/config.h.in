@@ -1,19 +1,35 @@
-//
+ï»¿//
 // cmake config.h.in
 //
 #cmakedefine ENABLE_SOUI_COM_LIB
 #cmakedefine ENABLE_SOUI_CORE_LIB
 #cmakedefine OUTPATH_WITHOUT_TYPE
+#cmakedefine ENABLE_SOUI_ACC
+#cmakedefine ENABLE_SOUI_SPY
+
+#ifdef _WIN32
+#ifdef ENABLE_SOUI_SPY
+#define DISABLE_SWNDSPY 0
+#else
+#define DISABLE_SWNDSPY 1
+#endif//ENABLE_SOUI_SPY
+
+#ifdef ENABLE_SOUI_ACC
+#define SOUI_ENABLE_ACC
+#endif//ENABLE_SOUI_ACC
+#else
+#define DISABLE_SWNDSPY 1
+#endif
 
 #ifdef ENABLE_SOUI_COM_LIB
-    #define LIB_SOUI_COM		//SOUI×é¼þ±àÒëÎªlib
+    #define LIB_SOUI_COM		//SOUIç»„ä»¶ç¼–è¯‘ä¸ºlib
 #else
-    #define DLL_SOUI_COM	//SOUI×é¼þ±àÒëÎªdll
+    #define DLL_SOUI_COM	//SOUIç»„ä»¶ç¼–è¯‘ä¸ºdll
 #endif
 
 #ifdef ENABLE_SOUI_CORE_LIB
-    #define LIB_CORE		//SOUI ÄÚºË±àÒëÎªlib
+    #define LIB_CORE		//SOUI å†…æ ¸ç¼–è¯‘ä¸ºlib
 #else
-    #define DLL_CORE		//SOUI ÄÚºË±àÒëÎªdll
+    #define DLL_CORE		//SOUI å†…æ ¸ç¼–è¯‘ä¸ºdll
 #endif
 

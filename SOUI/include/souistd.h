@@ -1,7 +1,4 @@
-﻿//需要IAccessible接口支持打开下面的宏: 2018.10.17
-//#define SOUI_ENABLE_ACC
-
-// Change these values to use different versions
+﻿// Change these values to use different versions
 #ifndef WINVER
 #define WINVER       0x0500
 #endif // WINVER
@@ -34,8 +31,8 @@
 #endif
 
 #include <windows.h>
-#include <stdio.h>
 #include <tchar.h>
+#include <stdio.h>
 
 #ifdef _WIN32
 #include <commctrl.h>

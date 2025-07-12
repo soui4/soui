@@ -22,10 +22,6 @@ message("---disable thunk in soui")
 add_definitions(-DENABLE_THUNK=0)
 endif()
 
-if(${ENABLE_SOUI_ACC})
-add_definitions(-DSOUI_ENABLE_ACC)
-endif()
-
 file(GLOB_RECURSE CURRENT_HEADERS  *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  *.cpp)
 file(GLOB_RECURSE CURRENT_UIRES  *.xml *.idx *.ico)
@@ -70,6 +66,8 @@ target_link_libraries(soui4 utilities4)
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 add_dependencies(soui4  swinx)
 target_link_libraries(soui4  swinx)
+else()
+target_link_libraries(soui4  imm32)
 endif()
 
 

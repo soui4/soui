@@ -164,7 +164,7 @@ class SIECtrl
     DWORD m_dwCookie;
 
     SIECtrlEvtDispatch m_eventDispatch;
-    SComQIPtr<IWebBrowser2> m_pIE;
+    SComPtr<IWebBrowser2> m_pIE;
 
     BOOL m_bDisableScrollbar;
     BOOL m_bDisable3DBorder;

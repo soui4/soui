@@ -121,4 +121,10 @@ HRESULT SSwitch::OnAttrCheck(const SStringW &strValue, BOOL bLoading)
     return bLoading ? S_OK : S_FALSE;
 }
 
+void SSwitch::OnScaleChanged(int scale)
+{
+    SWindow::OnScaleChanged(scale);
+    GetScaleSkin(m_pSkin, scale);
+    GetScaleSkin(m_pSkinForce, scale);
+}
 SNSEND

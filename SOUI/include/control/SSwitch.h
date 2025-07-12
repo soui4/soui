@@ -86,6 +86,8 @@ class SSwitch
         return TRUE;
     }
 
+    void OnScaleChanged(int scale) override;
+
   protected: // Message handling, similar to WTL and MFC
     /**
      * @brief Handles the paint event.

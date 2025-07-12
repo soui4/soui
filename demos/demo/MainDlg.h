@@ -17,7 +17,7 @@ using namespace SOUI;
 
 #include "magnet/MagnetFrame.h"
 #include "skin/SDemoSkin.h"
-#include "../../controls.extend/SMcListViewEx/STabCtrlHeaderBinder.h"
+#include <controls.extend/SMcListViewEx/STabCtrlHeaderBinder.h>
 #include <helper/SDpiHelper.hpp>
 #include "trayicon/SShellTray.h"
 
@@ -252,6 +252,7 @@ protected:
 
     //HOST消息及响应函数映射表
 	BEGIN_MSG_MAP_EX(CMainDlg)
+		CHAIN_MSG_MAP(SDpiHandler<CMainDlg>)
 		MSG_WM_CREATE(OnCreate)
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_DESTROY(OnDestory)
@@ -261,7 +262,6 @@ protected:
 		MSG_WM_TIMER(OnTimer)
 		MESSAGE_HANDLER(g_dwSkinChangeMessage, OnSkinChangeMessage)
 		CHAIN_MSG_MAP(SHostWnd)
-		CHAIN_MSG_MAP(SDpiHandler<CMainDlg>)
 		REFLECT_NOTIFICATIONS_EX()
 	END_MSG_MAP()
 

@@ -213,7 +213,7 @@ STDMETHODIMP_(HRESULT) CTextMsgFilter::AttachDocument( HWND hwnd, ITextDocument2
     _pMsgCallBack = NULL;
 
     _pTextDoc->GetFEFlags(&_lFEFlags);
-    _fRE10Mode = (_lFEFlags & tomRE10Mode);
+    _fRE10Mode = (_lFEFlags & tomRE10Mode)!=0;
 
     _uSystemCodePage = GetACP();
 

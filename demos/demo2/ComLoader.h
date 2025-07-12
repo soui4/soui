@@ -4,8 +4,7 @@
 #include <interface/obj-ref-i.h>
 
 typedef enum _SComID{
-	Decoder_Png = 0,
-	Decoder_Gdip,
+	Decoder_Gdip=0,
 	Decoder_Wic,
 	Decoder_Stb,
 	Render_Gdi,

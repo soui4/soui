@@ -75,7 +75,7 @@ HRESULT StartCompositionGlue (
             DWORD imeProperties = ImmGetProperty(GetKeyboardLayout(0x0FFFFFFFF), IGP_PROPERTY, TextMsgFilter._fUsingAIMM);
 
             // use Unicode if not running under Win95
-            TextMsgFilter._fUnicodeIME = (imeProperties & IME_PROP_UNICODE);
+            TextMsgFilter._fUnicodeIME = (imeProperties & IME_PROP_UNICODE)!=0;
 
             if ((imeProperties & IME_PROP_SPECIAL_UI) || !(imeProperties & IME_PROP_AT_CARET))
             {
@@ -173,7 +173,7 @@ HRESULT CompositionStringGlue (
         }
 
         // Use Unicode if not running under Win95
-        TextMsgFilter._fUnicodeIME = (imeProperties & IME_PROP_UNICODE);
+        TextMsgFilter._fUnicodeIME = (imeProperties & IME_PROP_UNICODE)!=0;
 
         TextMsgFilter._pTextSel->GetStart(&cpMin);
         TextMsgFilter._pTextSel->GetEnd(&cpMax);

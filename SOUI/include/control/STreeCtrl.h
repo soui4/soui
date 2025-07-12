@@ -406,6 +406,8 @@ class SOUI_EXP STreeCtrl
     }
 
   protected:
+    void CalcItemWidth(IRenderTarget *pRT, HSTREEITEM hItem, DWORD dwFlags);
+    void RecalcItemsWidth();
     /**
      * @brief Handles the page up action.
      */
@@ -426,7 +428,9 @@ class SOUI_EXP STreeCtrl
      * @param xmlNode XML node containing the child window definitions.
      * @return TRUE if successful, otherwise FALSE.
      */
-    virtual BOOL CreateChildren(SXmlNode xmlNode);
+    BOOL CreateChildren(SXmlNode xmlNode) override;
+
+    void OnScaleChanged(int scale) override;
 
     /**
      * @brief Loads a branch of items from an XML node.
@@ -709,17 +713,17 @@ class SOUI_EXP STreeCtrl
     /**
      * @brief Height of each item.
      */
-    int m_nItemHei;
+    SLayoutSize m_nItemHei;
 
     /**
      * @brief Indentation between levels.
      */
-    int m_nIndent;
+    SLayoutSize m_nIndent;
 
     /**
      * @brief Margin around each item.
      */
-    int m_nItemMargin;
+    SLayoutSize m_nItemMargin;
 
     /**
      * @brief Flag indicating if checkboxes are enabled.
@@ -792,9 +796,9 @@ class SOUI_EXP STreeCtrl
     BOOL m_bHasLines; /**< has lines*/
 
     SOUI_ATTRS_BEGIN()
-        ATTR_INT(L"indent", m_nIndent, TRUE)
-        ATTR_INT(L"itemHeight", m_nItemHei, TRUE)
-        ATTR_INT(L"itemMargin", m_nItemMargin, TRUE)
+        ATTR_LAYOUTSIZE(L"indent", m_nIndent, TRUE)
+        ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHei, TRUE)
+        ATTR_LAYOUTSIZE(L"itemMargin", m_nItemMargin, TRUE)
         ATTR_BOOL(L"checkBox", m_bCheckBox, TRUE)
         ATTR_BOOL(L"rightClickSel", m_bRightClickSel, TRUE)
         ATTR_SKIN(L"itemBkgndSkin", m_pItemBgSkin, TRUE)

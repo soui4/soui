@@ -42,7 +42,6 @@
 #include <io.h>
 #include <shlwapi.h>
 #include <process.h>
-#pragma comment(lib, "shlwapi")
 #pragma warning(disable:4996)
 #else
 #include <unistd.h>

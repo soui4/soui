@@ -10,7 +10,7 @@
 #define SCOM_MASK scom_mask_scom_all
 #endif 
 
-#ifdef _WIN32
+#if  defined(_WIN32) && !defined(__MINGW32__) && !defined(__MINGW64__) 
 #define COM_IMGDECODER  _T("imgdecoder-stb")
 #define COM_RENDER_GDI  _T("render-gdi")
 #define COM_RENDER_SKIA _T("render-skia")

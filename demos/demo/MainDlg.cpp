@@ -528,7 +528,7 @@ void CMainDlg::OnBtnMenu()
     //使用自绘菜单
     SMenu menu;
 	menu.LoadMenu(_T("SMenu:menu_test"));
-    menu.TrackPopupMenu(0,pt.x,pt.y,m_hWnd);
+    menu.TrackPopupMenu(0,pt.x,pt.y,m_hWnd,0,GetScale());
 }
 
 //演示如何响应菜单事件

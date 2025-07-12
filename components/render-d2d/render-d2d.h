@@ -308,7 +308,7 @@ class SRegion_D2D: public TD2DRenderObjImpl<IRegionS,OT_RGN>
 {
 	friend class SRenderTarget_D2D;
 public:
-	SRegion_D2D(IRenderFactory *pRenderFac,SComPtr<ID2D1Geometry> rgn=NULL);
+	SRegion_D2D(IRenderFactory *pRenderFac,ID2D1Geometry* rgn=NULL);
 	~SRegion_D2D();
 
 	STDMETHOD_(void,CombineRect)(THIS_ LPCRECT lprect,int nCombineMode) OVERRIDE;

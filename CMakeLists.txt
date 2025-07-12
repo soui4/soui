@@ -107,11 +107,17 @@ option(BUILD_DEMOS "Build builtin demos" ON)
 
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
+if(NOT MINGW)
 option(BUILD_RICHEDIT "using richedit from source code" ON)
+else()
+set(BUILD_RICHEDIT OFF)
+endif()
 option(ENABLE_SOUI_ACC "Enable Acc" OFF)
+option(ENABLE_SOUI_SPY "Enable Swnd Spy" OFF)
 else()
 set(BUILD_RICHEDIT ON)
 set(ENABLE_SOUI_ACC OFF)
+set(ENABLE_SOUI_SPY OFF)
 endif()
 
 

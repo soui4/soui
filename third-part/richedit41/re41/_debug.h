@@ -384,7 +384,7 @@ typedef BOOL(CALLBACK* PFNASSERTHOOK)(LPSTR, LPSTR, int*);
 extern PFNASSERTHOOK pfnAssert;
 #else // !defined(NOFULLDEBUG)
 #ifdef _WIN32
-#define Tracef	;/##/
+#define Tracef	;
 #else
 #define Tracef(...)	;
 #endif//_WIN32

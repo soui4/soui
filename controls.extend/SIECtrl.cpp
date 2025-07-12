@@ -101,7 +101,7 @@ STDMETHODIMP SIECtrlEvtDispatch::Invoke(/* [in] */ DISPID dispIdMember,
 
 void SIECtrl::OnAxActivate(IUnknown *pUnknwn)
 {
-    m_pIE = pUnknwn;
+    pUnknwn->QueryInterface(IID_IWebBrowser2, (void **)&m_pIE);
     if (m_pIE)
     {
         RegisterEventHandler(TRUE);

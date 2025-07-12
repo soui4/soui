@@ -677,11 +677,11 @@ int STabCtrl::InsertItem(SXmlNode xmlNode, int iInsert /*=-1*/, BOOL bLoading /*
         SStringT strSrc = S_CW2T(xmlNode.attribute(L"src").value());
         SXmlDoc xmlDoc;
         if (!LOADXML(xmlDoc, strSrc))
-            return NULL;
+            return -1;
         return InsertItem(xmlDoc.root().first_child(), iInsert, bLoading);
     }
     if (wcscmp(xmlNode.name(), STabPage::GetClassName()) != 0)
-        return NULL;
+        return -1;
     STabPage *pChild = CreatePageFromXml(xmlNode);
     if (!pChild)
         return -1;
