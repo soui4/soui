@@ -60,6 +60,11 @@ BOOL SDateTimePicker::CreateChildren(SXmlNode xmlNode)
     return TRUE;
 }
 
+void SDateTimePicker::OnScaleChanged(int scale){
+    __baseCls::OnScaleChanged(scale);
+    if(m_pCalendar)
+        m_pCalendar->SSendMessage(UM_SETSCALE,scale);
+}
 BOOL SDateTimePicker::OnDateChanged(EventCalendarExChanged *pEvt)
 {
     if (NULL == pEvt)

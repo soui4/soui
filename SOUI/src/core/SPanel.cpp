@@ -75,34 +75,22 @@ void SPanel::OnScrollUpdatePart(BOOL bVert, int iPart)
     if (iPart == -1)
     {
         CRect rc = GetScrollBarRect(bVert);
-        IRenderTarget *pRT = GetRenderTarget(&rc, GRT_PAINTBKGND, FALSE);
-        sbHandler.OnDraw(pRT, SB_LINEUP);
-        sbHandler.OnDraw(pRT, SScrollBarHandler::kSbRail);
-        sbHandler.OnDraw(pRT, SB_THUMBTRACK);
-        sbHandler.OnDraw(pRT, SB_LINEDOWN);
-        ReleaseRenderTarget(pRT);
+        InvalidateRect(&rc);
     }
     else if (iPart == SB_THUMBTRACK)
     {
         CRect rcRail = sbHandler.GetPartRect(SScrollBarHandler::kSbRail);
-        SAutoRefPtr<IRenderTarget> pRT = GetRenderTarget(&rcRail, GRT_PAINTBKGND, FALSE);
-        sbHandler.OnDraw(pRT, SScrollBarHandler::kSbRail);
-        sbHandler.OnDraw(pRT, SB_THUMBTRACK);
-        ReleaseRenderTarget(pRT);
+        InvalidateRect(&rcRail);
     }
     else if (iPart == SB_PAGEDOWN || iPart == SB_PAGEUP)
     {
         CRect rc = sbHandler.GetPartRect(iPart);
-        IRenderTarget *pRT = GetRenderTarget(&rc, GRT_PAINTBKGND, FALSE);
-        sbHandler.OnDraw(pRT, SScrollBarHandler::kSbRail);
-        ReleaseRenderTarget(pRT);
+        InvalidateRect(&rc);
     }
     else
     {
         CRect rc = sbHandler.GetPartRect(iPart);
-        IRenderTarget *pRT = GetRenderTarget(&rc, GRT_PAINTBKGND, FALSE);
-        sbHandler.OnDraw(pRT, iPart);
-        ReleaseRenderTarget(pRT);
+        InvalidateRect(&rc);
     }
 }
 
@@ -120,10 +108,7 @@ void SPanel::OnScrollUpdateThumbTrack(BOOL bVert, int nPos)
     CRect rcThumb = sbHandler.GetPartRect(SB_THUMBTRACK);
     CRect rcUnion;
     rcUnion.UnionRect(rcOldThumb, rcThumb);
-    IRenderTarget *pRT = GetRenderTarget(&rcUnion, GRT_PAINTBKGND, FALSE);
-    sbHandler.OnDraw(pRT, SScrollBarHandler::kSbRail);
-    sbHandler.OnDraw(pRT, SB_THUMBTRACK);
-    ReleaseRenderTarget(pRT);
+    InvalidateRect(&rcUnion);
     OnScroll(bVert, SB_THUMBTRACK, nPos);
 }
 

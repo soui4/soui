@@ -348,6 +348,7 @@ HRGN CreateRegionFromBitmap(HBITMAP hBmp, COLORREF crKey,COLORREF crMask)
         {
             size_t len = sizeof(RGNDATAHEADER) + sizeof(RECT) * lstRc.GetCount();
             RGNDATA *pRgn = (RGNDATA *)malloc(len);
+            pRgn->rdh.dwSize = sizeof(RGNDATAHEADER);
             pRgn->rdh.nCount = (DWORD)lstRc.GetCount();
             pRgn->rdh.iType = RDH_RECTANGLES;
             memcpy(pRgn->Buffer, lstRc.GetData(), sizeof(RECT) * lstRc.GetCount());

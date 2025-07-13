@@ -140,6 +140,12 @@ class SOUI_EXP SDateTimePicker
     virtual BOOL CreateChildren(SXmlNode xmlNode);
 
     /**
+     * @brief Called when the scale of the window changes.
+     * @param scale The new scale value.
+     */
+    virtual void OnScaleChanged(int scale);
+
+    /**
      * @brief Handle date change event
      * @param pEvt Event object
      * @return TRUE if handled, FALSE otherwise

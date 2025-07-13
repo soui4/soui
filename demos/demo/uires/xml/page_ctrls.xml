@@ -335,7 +335,7 @@
 		<page title="calendar" layout="vbox">
 			<window size="-2,-1" layout="hbox" padding="5,5,5,5">
 				<dateTimePicker size="240,30" name="timepicker" padding="4,0,4,0" dropWidth="300" timeEnable="1">
-					<calstyle ncSkin="_skin.sys.border" daySkin="_skin.sys.btn.normal" margin="1" />
+					<calstyle ncSkin="_skin.sys.border" daySkin="_skin.sys.btn.normal" margin="1" font="face:微软雅黑,size=14" />
 				</dateTimePicker>
 			</window>
 			<calendar size="-2,0" weight="1" daySkin="_skin.sys.btn.normal" todayHeight="0" yearHeight="0" weekHeight="50" textSunday="sunday" textMonday="monday" textTuesday="tuesday" textWednesday="Wednesday" textThursday="thursday" textFriday="friday" textSaturday="saturday" />

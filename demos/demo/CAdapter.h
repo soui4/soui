@@ -118,7 +118,7 @@ const wchar_t* KNodeName_Item[] = {
 class CTestAdapterFlex : public SAdapterBase
 {
 public:
-	int m_nItemHeight[3];
+	SLayoutSize m_nItemHeight[3];
 
 
 	CTestAdapterFlex()
@@ -128,9 +128,9 @@ public:
 
 	virtual void WINAPI InitByTemplate(SXmlNode xmlTemplate)
 	{
-		m_nItemHeight[0] = xmlTemplate.attribute(KAttrName_Height[0]).as_int(50);
-		m_nItemHeight[1] = xmlTemplate.attribute(KAttrName_Height[1]).as_int(60);
-		m_nItemHeight[2] = xmlTemplate.attribute(KAttrName_Height[2]).as_int(70);
+        m_nItemHeight[0] = GETLAYOUTSIZE(xmlTemplate.attribute(KAttrName_Height[0]).as_string());
+        m_nItemHeight[1] = GETLAYOUTSIZE(xmlTemplate.attribute(KAttrName_Height[1]).as_string());
+        m_nItemHeight[2] = GETLAYOUTSIZE(xmlTemplate.attribute(KAttrName_Height[2]).as_string());
 	}
 
 	virtual int WINAPI getCount() override
@@ -154,7 +154,7 @@ public:
 	{
 		DWORD dwState = pItem->GetState();
 		int viewType = getItemViewType(position, dwState);
-        *retSize = CSize(0, m_nItemHeight[viewType]); // cx在listview，mclistview中没有使用，不需要计算
+        *retSize = CSize(0, m_nItemHeight[viewType].toPixelSize(pItem->GetScale())); // cx在listview，mclistview中没有使用，不需要计算
 	}
 
 	virtual void WINAPI getView(int position, SItemPanel* pItem, SXmlNode xmlTemplate)
