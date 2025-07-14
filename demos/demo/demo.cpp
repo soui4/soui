@@ -162,6 +162,11 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 	#ifdef __linux__
 		//AddFontResource only for linux
 		AddFontResource((appDir+"/../../simsun.ttc").c_str());
+	#elif defined(__APPLE__)
+		char szPath[MAX_PATH];
+		GetAppleBundlePath(szPath, MAX_PATH);
+		strcat(szPath, "/Contents/Resources/fonts/simsun.ttc");
+		AddFontResource(szPath);
 	#endif
 	SouiFactory souiFac;
     SComMgr2 *pComMgr = new SComMgr2();
