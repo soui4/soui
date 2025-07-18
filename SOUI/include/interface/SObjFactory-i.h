@@ -50,7 +50,7 @@ DECLARE_INTERFACE_(IObjectFactory, IObjRef)
      * @brief 获取对象信息
      * @return SObjectInfo - 对象信息结构体
      */
-    STDMETHOD_(SObjectInfo, GetObjectInfo)(CTHIS) SCONST PURE;
+    STDMETHOD_(SObjectInfo *, GetObjectInfo)(CTHIS) SCONST PURE;
 
     /**
      * @brief 克隆对象工厂
@@ -58,6 +58,7 @@ DECLARE_INTERFACE_(IObjectFactory, IObjRef)
      */
     STDMETHOD_(IObjectFactory *, Clone)(CTHIS) SCONST PURE;
 };
-
+EXTERN_C SOUI_EXP SObjectInfo ObjInfo_New(LPCWSTR name, int type, LPCWSTR alise);
+EXTERN_C SOUI_EXP BOOL ObjInfo_IsValid(const SObjectInfo *pObjInfo);
 SNSEND
 #endif // __SOBJFACTORY_I__H__

@@ -777,7 +777,7 @@ BOOL SApplication::RegisterObjFactory(THIS_ const IObjectFactory *objFac, BOOL b
 
 BOOL SApplication::UnregisterObjFactory(THIS_ const IObjectFactory *objFac)
 {
-    return UnregisterFactory(objFac->GetObjectInfo());
+    return UnregisterFactory(*objFac->GetObjectInfo());
 }
 
 void SApplication::SetDefaultFontInfo(THIS_ LPCWSTR pszFontInfo)
