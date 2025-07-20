@@ -37,13 +37,13 @@ SObjectFactoryMgr::SObjectFactoryMgr(void)
 //************************************
 BOOL SObjectFactoryMgr::RegisterFactory(const IObjectFactory *objFactory, BOOL bReplace)
 {
-    if (HasKey(objFactory->GetObjectInfo()))
+    if (HasKey(*objFactory->GetObjectInfo()))
     {
         if (!bReplace)
             return FALSE;
-        RemoveKeyObject(objFactory->GetObjectInfo());
+        RemoveKeyObject(*objFactory->GetObjectInfo());
     }
-    SObjectInfo objInfo = objFactory->GetObjectInfo();
+    SObjectInfo objInfo = *objFactory->GetObjectInfo();
     AddKeyObject(objInfo, objFactory->Clone());
     if (objInfo.szAlise)
     {
