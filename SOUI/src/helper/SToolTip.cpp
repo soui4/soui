@@ -37,7 +37,6 @@ BOOL STipCtrl::Create()
     LOGFONT lf;
     GetObject(GetStockObject(DEFAULT_GUI_FONT), sizeof(lf), &lf);
     lf.lfHeight = -12;
-    _tcscpy(lf.lfFaceName, _T("宋体"));
     m_font = CreateFontIndirect(&lf);
 
     return TRUE;
@@ -112,7 +111,6 @@ void STipCtrl::UpdateFont(int nScale)
         LOGFONT lf;
         GetObject(GetStockObject(DEFAULT_GUI_FONT), sizeof(lf), &lf);
         lf.lfHeight = -12 * nScale / 100;
-        _tcscpy(lf.lfFaceName, _T("宋体"));
         m_font = CreateFontIndirect(&lf);
         m_nScale = nScale;
     }

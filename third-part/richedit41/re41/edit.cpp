@@ -1961,7 +1961,11 @@ HRESULT CTxtEdit::OnTxKeyDown(
 	}
 
 	BOOL  fAlt	 = GetKeyboardFlag(ALT, VK_MENU);
+	#ifdef __APPLE__
+	BOOL  fCtrl  = GetKeyboardFlag(CTRL, VK_LWIN) || GetKeyboardFlag(CTRL, VK_RWIN);
+	#else
 	BOOL  fCtrl  = GetKeyboardFlag(CTRL, VK_CONTROL);
+	#endif
 	BOOL  fShift = GetKeyboardFlag(SHIFT, VK_SHIFT);
 
 	BOOL  fRet	 = FALSE;			// Converted to HRESULT on return
