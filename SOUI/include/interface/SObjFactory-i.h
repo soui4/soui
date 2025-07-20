@@ -1,7 +1,6 @@
 ﻿#ifndef __SOBJFACTORY_I__H__
 #define __SOBJFACTORY_I__H__
 #include <interface/obj-ref-i.h>
-SNSBEGIN
 
 #define MAX_OBJNAME 100
 
@@ -12,6 +11,7 @@ typedef struct _SObjectInfo
     int nType;
 } SObjectInfo;
 
+SNSBEGIN
 #undef INTERFACE
 #define INTERFACE IObjectFactory
 DECLARE_INTERFACE_(IObjectFactory, IObjRef)
@@ -50,7 +50,7 @@ DECLARE_INTERFACE_(IObjectFactory, IObjRef)
      * @brief 获取对象信息
      * @return SObjectInfo - 对象信息结构体
      */
-    STDMETHOD_(SObjectInfo *, GetObjectInfo)(CTHIS) SCONST PURE;
+    STDMETHOD_(void, GetObjectInfo)(CTHIS_ SObjectInfo *info) SCONST PURE;
 
     /**
      * @brief 克隆对象工厂
@@ -58,7 +58,8 @@ DECLARE_INTERFACE_(IObjectFactory, IObjRef)
      */
     STDMETHOD_(IObjectFactory *, Clone)(CTHIS) SCONST PURE;
 };
-EXTERN_C SOUI_EXP SObjectInfo ObjInfo_New(LPCWSTR name, int type, LPCWSTR alise);
-EXTERN_C SOUI_EXP BOOL ObjInfo_IsValid(const SObjectInfo *pObjInfo);
 SNSEND
+
+EXTERN_C SOUI_EXP void ObjInfo_New(SObjectInfo *pInfo, LPCWSTR name, int type, LPCWSTR alise);
+EXTERN_C SOUI_EXP BOOL ObjInfo_IsValid(const SObjectInfo *pObjInfo);
 #endif // __SOBJFACTORY_I__H__

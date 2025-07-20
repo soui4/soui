@@ -52,7 +52,7 @@ CScintillaWnd::~CScintillaWnd()
 
 BOOL CScintillaWnd::Create(LPCTSTR lpszWindowName, DWORD dwStyle, const RECT& rect, HWND hParent, UINT nID,HINSTANCE hInst)
 {
-	HWND hWnd=CreateWindowEx(WS_EX_CLIENTEDGE, KScintillaClass, lpszWindowName, dwStyle,rect.left,rect.top,rect.right-rect.left,rect.bottom-rect.top, hParent,(HMENU)nID,hInst,NULL);
+	HWND hWnd=CreateWindowEx(WS_EX_CLIENTEDGE, KScintillaClass, lpszWindowName, dwStyle,rect.left,rect.top,rect.right-rect.left,rect.bottom-rect.top, hParent,(HMENU)(LONG_PTR)nID,hInst,NULL);
 	if(!hWnd) return FALSE;
 	SubclassWindow(hWnd);
 	InitScintillaWnd();

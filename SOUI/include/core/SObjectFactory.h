@@ -18,8 +18,6 @@
 #include <helper/obj-ref-impl.hpp>
 #include <interface/SObjFactory-i.h>
 
-SNSBEGIN
-
 /**
  * @brief Creates a new object information structure.
  * @param name Name of the object.
@@ -27,7 +25,7 @@ SNSBEGIN
  * @param alise Alias for the object (optional).
  * @return New object information structure.
  */
-EXTERN_C SOUI_EXP SObjectInfo ObjInfo_New(LPCWSTR name, int type, LPCWSTR alise = NULL);
+EXTERN_C SOUI_EXP void ObjInfo_New(SObjectInfo *info,LPCWSTR name, int type, LPCWSTR alise = NULL);
 
 /**
  * @brief Checks if the object information is valid.
@@ -35,6 +33,8 @@ EXTERN_C SOUI_EXP SObjectInfo ObjInfo_New(LPCWSTR name, int type, LPCWSTR alise 
  * @return TRUE if valid, FALSE otherwise.
  */
 EXTERN_C SOUI_EXP BOOL ObjInfo_IsValid(const SObjectInfo *pObjInfo);
+
+SNSBEGIN
 
 /**
  * @class     CElementTraits< SObjectInfo >
@@ -84,7 +84,6 @@ class TplSObjectFactory : public TObjRefImpl<IObjectFactory> {
      */
     TplSObjectFactory()
     {
-        m_objInfo = ObjInfo_New(T::GetClassName(), T::GetClassType(), T::GetClassAlise());
     }
 
     /**
@@ -126,12 +125,10 @@ class TplSObjectFactory : public TObjRefImpl<IObjectFactory> {
      * @brief Gets the object information for the factory.
      * @return Object information structure.
      */
-    STDMETHOD_(SObjectInfo *, GetObjectInfo)(CTHIS) SCONST OVERRIDE
+    STDMETHOD_(void, GetObjectInfo)(CTHIS_ SObjectInfo *info) SCONST OVERRIDE
     {
-        return (SObjectInfo *)&m_objInfo;
+        ObjInfo_New(info, T::GetClassName(), T::GetClassType(), T::GetClassAlise());
     }
-private:
-    SObjectInfo m_objInfo;
 };
 
 typedef IObjectFactory *SObjectFactoryPtr;

@@ -761,7 +761,8 @@ IObject *SApplication::CreateObject(LPCWSTR pszName, SObjectType nType) const
             return pRet;
         }
     }
-    SObjectInfo objInfo = ObjInfo_New(pszName, nType);
+    SObjectInfo objInfo;
+    ObjInfo_New(&objInfo,pszName, nType);
     return SObjectFactoryMgr::CreateObject(objInfo);
 }
 
@@ -777,7 +778,9 @@ BOOL SApplication::RegisterObjFactory(THIS_ const IObjectFactory *objFac, BOOL b
 
 BOOL SApplication::UnregisterObjFactory(THIS_ const IObjectFactory *objFac)
 {
-    return UnregisterFactory(*objFac->GetObjectInfo());
+    SObjectInfo objInfo;
+    objFac->GetObjectInfo(&objInfo);
+    return UnregisterFactory(objInfo);
 }
 
 void SApplication::SetDefaultFontInfo(THIS_ LPCWSTR pszFontInfo)

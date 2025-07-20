@@ -3,24 +3,23 @@
 #include "res.mgr/SObjDefAttr.h"
 #include "res.mgr/SUiDef.h"
 
-SNSBEGIN
 
-SObjectInfo ObjInfo_New(LPCWSTR name, int type, LPCWSTR alise)
+void ObjInfo_New(SObjectInfo *ret, LPCWSTR name, int type, LPCWSTR alise)
 {
-    SObjectInfo ret;
-    SStringW strName(name);
+    SNS::SStringW strName(name);
     strName.MakeLower();
     SASSERT(strName.GetLength() < MAX_OBJNAME);
-    wcscpy(ret.szName, strName.c_str());
-    ret.nType = type;
-    ret.szAlise = alise;
-    return ret;
+    wcscpy(ret->szName, strName.c_str());
+    ret->nType = type;
+    ret->szAlise = alise;
 }
 
 BOOL ObjInfo_IsValid(const SObjectInfo *pObjInfo)
 {
-    return pObjInfo->nType >= Undef && pObjInfo->szName[0] != 0;
+    return pObjInfo->nType >= SNS::Undef && pObjInfo->szName[0] != 0;
 }
+
+SNSBEGIN
 
 SObjectFactoryMgr::SObjectFactoryMgr(void)
 {
@@ -37,13 +36,14 @@ SObjectFactoryMgr::SObjectFactoryMgr(void)
 //************************************
 BOOL SObjectFactoryMgr::RegisterFactory(const IObjectFactory *objFactory, BOOL bReplace)
 {
-    if (HasKey(*objFactory->GetObjectInfo()))
+    SObjectInfo objInfo;
+    objFactory->GetObjectInfo(&objInfo);
+    if (HasKey(objInfo))
     {
         if (!bReplace)
             return FALSE;
-        RemoveKeyObject(*objFactory->GetObjectInfo());
+        RemoveKeyObject(objInfo);
     }
-    SObjectInfo objInfo = *objFactory->GetObjectInfo();
     AddKeyObject(objInfo, objFactory->Clone());
     if (objInfo.szAlise)
     {
@@ -51,7 +51,8 @@ BOOL SObjectFactoryMgr::RegisterFactory(const IObjectFactory *objFactory, BOOL b
         SplitString(SStringW(objInfo.szAlise), L'|', aliseList);
         for (size_t i = 0; i < aliseList.GetCount(); i++)
         {
-            SObjectInfo objInfoAlise = ObjInfo_New(aliseList[i], objInfo.nType);
+            SObjectInfo objInfoAlise;
+            ObjInfo_New(&objInfoAlise, aliseList[i], objInfo.nType);
             AddKeyObject(objInfoAlise, objFactory->Clone());
         }
     }
@@ -90,16 +91,17 @@ IObject *SObjectFactoryMgr::CreateObject(const SObjectInfo &objInfo) const
 
 SObjectInfo SObjectFactoryMgr::BaseObjectInfoFromObjectInfo(const SObjectInfo &objInfo)
 {
+    SObjectInfo ret = { L"", NULL, Undef };
     if (!HasKey(objInfo))
     {
-        return SObjectInfo();
+        return ret;
     }
 
     SStringW strBaseClass = GetKeyObject(objInfo)->BaseClassName();
     if (strBaseClass == objInfo.szName)
-        return SObjectInfo();
-
-    return ObjInfo_New(strBaseClass, objInfo.nType);
+        return ret;
+    ObjInfo_New(&ret,strBaseClass, objInfo.nType);
+    return ret;
 }
 
 void SObjectFactoryMgr::SetSwndDefAttr(IObject *pObject) const
