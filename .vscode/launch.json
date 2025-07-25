@@ -47,9 +47,18 @@
             "name": "(gdb) Attach",            
             "type": "cppdbg",
             "request": "attach",
-            "program": "${workspaceFolder}/build/bin/fun_test",
+            "program": "${workspaceFolder}/build/bin/demo.app/Contents/MacOS/demo",
             "processId": "${command:pickProcess}",
             "MIMode": "gdb"
+          }
+    ,
+        {
+            "name": "(lldb) Attach",            
+            "type": "cppdbg",
+            "request": "attach",
+            "program": "${workspaceFolder}/build/bin/demo.app/Contents/MacOS/demo",
+            "processId": "${command:pickProcess}",
+            "MIMode": "lldb"
           }
     ]
 }

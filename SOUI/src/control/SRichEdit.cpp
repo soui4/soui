@@ -71,7 +71,7 @@ class STextServiceHelper {
     PCreateTextServices m_funCreateTextServices; /**< 回调函数 */
 };
 
-STextServiceHelper::STextServiceHelper()
+STextServiceHelper::STextServiceHelper():m_funCreateTextServices(NULL)
 {
 #ifdef _WIN32
     m_rich20 = LoadLibrary(_T("Msftedit.dll"));

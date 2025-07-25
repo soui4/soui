@@ -147,6 +147,24 @@ endif()
 set(MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE "true")
 set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.soui.demo")
 add_soui_exe(demo ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${EXTENDCOTROLS})
+    # 准备要复制的目标列表
+set(DEMO_TARGET_LIST
+	cairo
+    swinx
+    soui4
+	msftedit
+    utilities4
+	imgdecoder-stb
+	resprovider-zip
+	resprovider-7z
+	log4z
+	taskloop
+	translator
+	scriptmodule-lua
+	render-gdi
+	render-skia
+)
+copy_targets_to_bundle(demo "${DEMO_TARGET_LIST}")
 
 add_macos_res_folder(demo ${CMAKE_CURRENT_SOURCE_DIR}/uires uires)
 add_macos_res_file(demo ${PROJECT_SOURCE_DIR}/simsun.ttc fonts)

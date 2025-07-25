@@ -115,3 +115,97 @@ set_target_properties(
 
 endif(APPLE)
 endmacro()
+
+# 宏：复制dylib列表到macOS bundle的Frameworks目录
+# 参数：
+#   app_name - 应用程序目标名称
+#   dylib_list - 要复制的dylib文件路径列表
+macro(copy_dylibs_to_bundle app_name dylib_list)
+if(APPLE)
+    # 创建Frameworks目录
+    add_custom_command(TARGET ${app_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks"
+        COMMENT "Creating Frameworks directory in ${app_name} bundle"
+    )
+
+    # 复制每个dylib文件
+    foreach(dylib_path ${dylib_list})
+        # 检查文件是否存在（在配置时检查）
+        if(EXISTS "${dylib_path}")
+            get_filename_component(dylib_name "${dylib_path}" NAME)
+            add_custom_command(TARGET ${app_name} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${dylib_path}"
+                    "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks/"
+                COMMENT "Copying ${dylib_name} to ${app_name} bundle"
+            )
+        else()
+            message(WARNING "Dylib file not found: ${dylib_path}")
+        endif()
+    endforeach()
+
+    # 设置bundle的运行时库搜索路径
+    set_target_properties(${app_name} PROPERTIES
+        INSTALL_RPATH "@executable_path/../Frameworks"
+        BUILD_WITH_INSTALL_RPATH TRUE
+    )
+
+    # 修复库依赖路径（可选，需要fix_bundle_deps.cmake脚本）
+    if(EXISTS "${CMAKE_SOURCE_DIR}/__cmake/fix_bundle_deps.cmake")
+        add_custom_command(TARGET ${app_name} POST_BUILD
+            COMMAND ${CMAKE_COMMAND}
+                -DCMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}
+                -DBUNDLE_NAME=${app_name}
+                -DDYLIB_LIST="${dylib_list}"
+                -P "${CMAKE_SOURCE_DIR}/__cmake/fix_bundle_deps.cmake"
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            COMMENT "Fixing library dependencies in ${app_name} bundle"
+        )
+    endif()
+
+endif(APPLE)
+endmacro()
+
+# 宏：从目标列表复制dylib到bundle（自动检测目标文件）
+# 参数：
+#   app_name - 应用程序目标名称
+#   target_list - CMake目标名称列表
+macro(copy_targets_to_bundle app_name target_list)
+if(APPLE)
+    # 创建Frameworks目录
+    add_custom_command(TARGET ${app_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks"
+        COMMENT "Creating Frameworks directory in ${app_name} bundle"
+    )
+
+    # 复制每个目标的库文件
+    foreach(target_name ${target_list})
+        if(TARGET ${target_name})
+            # 检查目标类型
+            get_target_property(target_type ${target_name} TYPE)
+            message(STATUS "Target name: ${target_name}, type: ${target_type}")
+            if(target_type STREQUAL "SHARED_LIBRARY" OR target_type STREQUAL "MODULE_LIBRARY")
+                add_custom_command(TARGET ${app_name} POST_BUILD
+                    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                        "$<TARGET_FILE:${target_name}>"
+                        "$<TARGET_BUNDLE_DIR:${app_name}>/Contents/Frameworks/"
+                    COMMENT "Copying ${target_name} library to ${app_name} bundle"
+                )
+            else()
+                message(STATUS "Skipping ${target_name} (not a shared library)")
+            endif()
+        else()
+            message(WARNING "Target not found: ${target_name}")
+        endif()
+    endforeach()
+
+    # 设置bundle的运行时库搜索路径
+    set_target_properties(${app_name} PROPERTIES
+        INSTALL_RPATH "@executable_path/../Frameworks"
+        BUILD_WITH_INSTALL_RPATH TRUE
+    )
+
+endif(APPLE)
+endmacro()

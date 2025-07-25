@@ -52,6 +52,21 @@ struct SComInfo s_comInfo[]={
 	{Translator,_T("translator.dll"),NULL},
 };
 #endif
+#elif defined(__APPLE__)
+struct SComInfo s_comInfo[] = {
+	{Decoder_Gdip,_T("libimgdecoder-gdip.dylib"),NULL},
+	{Decoder_Wic,_T("libimgdecoder-wic.dylib"),NULL},
+	{Decoder_Stb,_T("libimgdecoder-stb.dylib"),NULL},
+	{Render_Gdi,_T("librender-gdi.dylib"),NULL},
+	{Render_Skia,_T("librender-skia.dylib"),NULL},
+	{Render_D2D,_T("librender-d2d.dylib"),NULL},
+	{Log4Z,_T("liblog4z.dylib"),NULL},
+	{Resprovider_7Zip,_T("libresprovider-7zip.dylib"),NULL},
+	{Resprovider_Zip,_T("libresprovider-zip.dylib"),NULL},
+	{Script_Lua,_T("libscriptmodule-lua.dylib"),NULL},
+	{TaskLoop,_T("libtaskloop.dylib"),NULL},
+	{Translator,_T("libtranslator.dylib"),NULL},
+};
 #else
 struct SComInfo s_comInfo[] = {
 	{Decoder_Gdip,_T("libimgdecoder-gdip.so"),NULL},

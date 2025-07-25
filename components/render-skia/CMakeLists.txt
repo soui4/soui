@@ -25,16 +25,16 @@ if (NOT ENABLE_SOUI_COM_LIB)
     if (CMAKE_SYSTEM_NAME MATCHES Windows)
         target_link_libraries(render-skia skia utilities4 Usp10 opengl32 soui4)
     else()
-        find_package(Fontconfig REQUIRED)
-        find_package(Freetype REQUIRED)
+        # 通过swinx间接获取fontconfig和freetype支持
+        # swinx已经包含了这些库，不需要直接链接
         add_dependencies(render-skia swinx)
         if(CMAKE_SYSTEM_NAME MATCHES Darwin)
-                # 查找GLEW和GLFW包 
-            find_package(GLEW REQUIRED) 
+                # 查找GLEW和GLFW包
+            find_package(GLEW REQUIRED)
             find_package(glfw3 REQUIRED)
-            target_link_libraries(render-skia swinx skia ${FREETYPE_LIBRARIES} Fontconfig::Fontconfig utilities4 soui4 GLEW::GLEW glfw)
+            target_link_libraries(render-skia swinx skia utilities4 soui4 GLEW::GLEW glfw)
         else()
-            target_link_libraries(render-skia swinx skia ${FREETYPE_LIBRARIES} Fontconfig::Fontconfig utilities4 soui4 GL)
+            target_link_libraries(render-skia swinx skia utilities4 soui4 GL)
         endif()
     endif()
 else()

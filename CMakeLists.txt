@@ -123,17 +123,6 @@ endif()
 
 config_compiler_and_linker()
 
-configure_file("config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONLY)
-configure_file("config/build.cfg.in" "${PROJECT_BINARY_DIR}/config/build.cfg" @ONLY)
-include_directories(${PROJECT_BINARY_DIR}/config)
-install(FILES "${PROJECT_BINARY_DIR}/config/config.h" DESTINATION include/config)
-install(FILES "${PROJECT_BINARY_DIR}/config/build.cfg" DESTINATION include/config)
-
-# 设置库文件的输出路径
-set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
-
-add_definitions(-D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
   if(MSVC_VERSION LESS 1600)
@@ -169,6 +158,18 @@ else()
   include_directories(${PROJECT_SOURCE_DIR}/swinx/include)
   add_subdirectory(swinx)
 endif()
+
+configure_file("config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONLY)
+configure_file("config/build.cfg.in" "${PROJECT_BINARY_DIR}/config/build.cfg" @ONLY)
+include_directories(${PROJECT_BINARY_DIR}/config)
+install(FILES "${PROJECT_BINARY_DIR}/config/config.h" DESTINATION include/config)
+install(FILES "${PROJECT_BINARY_DIR}/config/build.cfg" DESTINATION include/config)
+
+# 设置库文件的输出路径
+set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+
+add_definitions(-D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 
 link_directories(${CMAKE_BINARY_DIR}/bin)
 add_subdirectory(third-part)
