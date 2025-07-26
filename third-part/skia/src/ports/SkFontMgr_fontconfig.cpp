@@ -598,7 +598,7 @@ class SkFontMgr_fontconfig : public SkFontMgr {
 
 public:
     SkFontMgr_fontconfig()
-        : fFC(FcConfigGetCurrent())
+        : fFC(FcConfigReference(FcConfigGetCurrent()))
         , fFamilyNames(GetFamilyNames(fFC)) { }
 
     /** Takes control of the reference to 'config'. */

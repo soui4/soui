@@ -18,7 +18,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [Windows, Linux]
+        os: [Windows, Linux, macOS]
         arch: [x64, x86, arm64]
         include:
           - os: Windows
@@ -34,9 +34,16 @@ jobs:
           - os: Windows
             arch: arm64
             platform: ARM64
+          - os: macOS
+            arch: x64
+            dist: macos-13  # Intel-based runner for x64
         exclude:
           - os: Linux
             arch: x86
+          - os: macOS
+            arch: x86  # macOS doesn't support x86 anymore
+          - os: macOS
+            arch: arm64  # Disable macOS arm64 build
 
     steps:
     - name: Checkout repository
@@ -52,18 +59,41 @@ jobs:
 
     - name: Install dependencies (Ubuntu)
       if: startsWith(matrix.dist, 'ubuntu')
-      run: sudo apt install -y cmake  build-essential libcairo2-dev libxcb1-dev libgl1-mesa-dev freeglut3-dev libgtk-3-dev
+      run: sudo apt-get update && sudo apt install -y cmake  build-essential gperf libxcb1-dev libgl1-mesa-dev freeglut3-dev libgtk-3-dev --fix-missing
 
-    - name: Configure CMake
-      if: matrix.platform == ''
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macOS'
+      run: |
+        brew update
+        brew install cmake ninja pkgconf glfw3 glew
+
+    - name: Configure CMake (Linux)
+      if: matrix.os == 'Linux' && matrix.platform == ''
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+    - name: Configure CMake (Windows)
+      if: matrix.os == 'Windows' && matrix.platform == ''
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
     - name: Configure CMake (Win32, WOA)
-      if: matrix.platform != ''
+      if: matrix.os == 'Windows' && matrix.platform != ''
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -A ${{ matrix.platform }}
 
-    - name: Build
+    - name: Configure CMake (macOS x64)
+      if: matrix.os == 'macOS' && matrix.arch == 'x64'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja -DCMAKE_OSX_ARCHITECTURES=x86_64
+
+    - name: Configure CMake (macOS arm64)
+      if: matrix.os == 'macOS' && matrix.arch == 'arm64'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja -DCMAKE_OSX_ARCHITECTURES=arm64
+
+    - name: Build (Windows/Linux)
+      if: matrix.os != 'macOS'
       run: cmake --build build --config ${{ env.BUILD_TYPE }}
+
+    - name: Build (macOS)
+      if: matrix.os == 'macOS'
+      run: ninja -C build
 
     - name: Create file structure (Windows)
       if: matrix.os == 'Windows'
@@ -72,6 +102,10 @@ jobs:
     - name: Create file structure (Linux)
       if: matrix.os == 'Linux'
       run: tree -a > file_structure.txt
+
+    - name: Create file structure (macOS)
+      if: matrix.os == 'macOS'
+      run: find . -type f -name "*.dylib" -o -name "*.app" -o -name "demo*" | head -50 > file_structure.txt
 
     - name: Upload demo (Windows)
       if: matrix.os == 'Windows'
@@ -85,6 +119,17 @@ jobs:
 
     - name: Upload demo (Linux)
       if: matrix.os == 'Linux'
+      uses: actions/upload-artifact@v4
+      with:
+        name: demo-${{ matrix.os }}-${{ matrix.arch }}
+        path: |
+          build/bin/*
+          build/bin/Config/**
+          !build/bin/*.a
+          !build/bin/*.o
+
+    - name: Upload demo (macOS)
+      if: matrix.os == 'macOS'
       uses: actions/upload-artifact@v4
       with:
         name: demo-${{ matrix.os }}-${{ matrix.arch }}

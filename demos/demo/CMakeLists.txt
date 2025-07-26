@@ -156,7 +156,7 @@ set(DEMO_TARGET_LIST
     utilities4
 	imgdecoder-stb
 	resprovider-zip
-	resprovider-7z
+	resprovider-7zip
 	log4z
 	taskloop
 	translator
