@@ -483,24 +483,29 @@ SET (7ZLIB_SRCS
 	CPP/7zip/Crypto/7zAesRegister.cpp
 )
 
-if (WIN32 AND MSVC AND NOT CMAKE_VS_PLATFORM_NAME MATCHES "ARM64")
+# Only enable ASM on Windows with MSVC (not ARM64)
+if (WIN32 AND MSVC AND NOT CMAKE_VS_PLATFORM_NAME MATCHES "ARM64" AND NOT APPLE)
     set(ENABLE_7Z_ASM 1)
 else()
     set(ENABLE_7Z_ASM 0)
 endif()
 
 if(ENABLE_7Z_ASM)
-ENABLE_LANGUAGE(ASM_MASM)
-set(7ZIP_ASMS
-	Asm/x86/7zCrcOpt.asm
-	Asm/x86/AesOpt.asm
-)
+    # Only enable ASM_MASM language when we actually need it
+    ENABLE_LANGUAGE(ASM_MASM)
+    set(7ZIP_ASMS
+        Asm/x86/7zCrcOpt.asm
+        Asm/x86/AesOpt.asm
+    )
+    message(STATUS "7z: Using ASM optimizations")
 else()
-SET (7ZLIB_SRCS
-	${7ZLIB_SRCS}
-	C/7zCrcOpt.c
-	C/AesOpt.c
-)
+    # Use C implementations instead of ASM
+    SET (7ZLIB_SRCS
+        ${7ZLIB_SRCS}
+        C/7zCrcOpt.c
+        C/AesOpt.c
+    )
+    message(STATUS "7z: Using C implementations (ASM disabled)")
 endif()
 
 if (CMAKE_CL_64)

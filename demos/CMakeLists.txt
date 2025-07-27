@@ -1,7 +1,7 @@
 add_subdirectory(demo2)
 if(NOT MINGW)
 add_subdirectory(demo)
-#add_subdirectory(fun_test)
+add_subdirectory(fun_test)
 add_subdirectory(wxDemo)
 if (TARGET httpclient)
 add_subdirectory(wallpaper)

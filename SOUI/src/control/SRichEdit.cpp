@@ -1220,7 +1220,9 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
     CRect rcClient;
     GetClientRect(&rcClient);
     pRT->PushClipRect(&rcClient, RGN_AND);
-
+    //save font and text color
+    SAutoRefPtr<IRenderObj> pFont = pRT->GetCurrentObject(OT_FONT);
+    COLORREF crText = pRT->GetTextColor();
     float fMtx[9];
     pRT->GetTransform(fMtx);
     SMatrix mtx(fMtx);
@@ -1278,6 +1280,9 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
         pRT->AlphaBlend(&rcClient, rt, &rcClient, 255);
         rt = NULL;
     }
+    //restore font and text color
+    pRT->SelectObject(pFont);
+    pRT->SetTextColor(crText);
     pRT->PopClip();
 }
 

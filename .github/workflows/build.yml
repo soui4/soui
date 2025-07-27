@@ -37,13 +37,14 @@ jobs:
           - os: macOS
             arch: x64
             dist: macos-13  # Intel-based runner for x64
+          - os: macOS
+            arch: arm64
+            dist: macos-14  # Apple Silicon runner for arm64
         exclude:
           - os: Linux
             arch: x86
           - os: macOS
             arch: x86  # macOS doesn't support x86 anymore
-          - os: macOS
-            arch: arm64  # Disable macOS arm64 build
 
     steps:
     - name: Checkout repository
@@ -67,25 +68,40 @@ jobs:
         brew update
         brew install cmake ninja pkgconf glfw3 glew
 
-    - name: Configure CMake (Linux)
-      if: matrix.os == 'Linux' && matrix.platform == ''
+    - name: Configure CMake (Linux x64)
+      if: matrix.os == 'Linux' && matrix.arch == 'x64'
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
+
+    - name: Configure CMake (Linux arm64)
+      if: matrix.os == 'Linux' && matrix.arch == 'arm64'
+      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} \
+            -DPNG_HARDWARE_OPTIMIZATIONS=OFF
 
     - name: Configure CMake (Windows)
       if: matrix.os == 'Windows' && matrix.platform == ''
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
-    - name: Configure CMake (Win32, WOA)
-      if: matrix.os == 'Windows' && matrix.platform != ''
+    - name: Configure CMake (Win32)
+      if: matrix.os == 'Windows' && matrix.platform == 'Win32'
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -A ${{ matrix.platform }}
 
     - name: Configure CMake (macOS x64)
       if: matrix.os == 'macOS' && matrix.arch == 'x64'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja -DCMAKE_OSX_ARCHITECTURES=x86_64
+      run: |
+        cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja \
+          -DCMAKE_OSX_ARCHITECTURES=x86_64 \
+          -DCMAKE_C_COMPILER=/usr/bin/clang \
+          -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+          -DCMAKE_DISABLE_FIND_PACKAGE_ASM=TRUE
 
     - name: Configure CMake (macOS arm64)
       if: matrix.os == 'macOS' && matrix.arch == 'arm64'
-      run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja -DCMAKE_OSX_ARCHITECTURES=arm64
+      run: |
+        cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja \
+          -DCMAKE_OSX_ARCHITECTURES=arm64 \
+          -DCMAKE_C_COMPILER=/usr/bin/clang \
+          -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
+          -DPNG_HARDWARE_OPTIMIZATIONS=OFF
 
     - name: Build (Windows/Linux)
       if: matrix.os != 'macOS'
