@@ -950,7 +950,8 @@ SNSBEGIN
 			{expendMode,expendMode,expendMode},
 			{EM_NULL,expendMode,EM_NULL}
 		};
-
+        bool bAntiAlias = m_paint.isAntiAlias();
+        m_paint.setAntiAlias(false);
 		for(int y=0;y<3;y++)
 		{
 			if(ySrc[y] == ySrc[y+1]) continue;
@@ -962,7 +963,7 @@ SNSBEGIN
 				DrawBitmapEx(&rcDest,pBitmap,&rcSrc,mode[y][x],byAlpha);
 			}
 		}
-
+        m_paint.setAntiAlias(bAntiAlias);
 		return S_OK;
 	}
 

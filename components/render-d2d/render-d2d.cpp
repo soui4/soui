@@ -1743,7 +1743,8 @@ SNSBEGIN
 			{expendMode,expendMode,expendMode},
 			{EM_NULL,expendMode,EM_NULL}
 		};
-
+        D2D1_ANTIALIAS_MODE oldAntiAliasMode = m_rt->GetAntialiasMode();
+        m_rt->SetAntialiasMode(D2D1_ANTIALIAS_MODE_ALIASED);
 		for(int y=0;y<3;y++)
 		{
 			if(ySrc[y] == ySrc[y+1]) continue;
@@ -1755,7 +1756,7 @@ SNSBEGIN
 				DrawBitmapEx(&rcDest,pBitmap,&rcSrc,mode[y][x],byAlpha);
 			}
 		}
-
+        m_rt->SetAntialiasMode(oldAntiAliasMode);
 		return S_OK;
 	}
 
