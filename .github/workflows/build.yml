@@ -81,8 +81,8 @@ jobs:
       if: matrix.os == 'Windows' && matrix.platform == ''
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }}
 
-    - name: Configure CMake (Win32)
-      if: matrix.os == 'Windows' && matrix.platform == 'Win32'
+    - name: Configure CMake (Win32, WOA)
+      if: matrix.os == 'Windows' && matrix.platform != ''
       run: cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -A ${{ matrix.platform }}
 
     - name: Configure CMake (macOS x64)
@@ -91,8 +91,7 @@ jobs:
         cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja \
           -DCMAKE_OSX_ARCHITECTURES=x86_64 \
           -DCMAKE_C_COMPILER=/usr/bin/clang \
-          -DCMAKE_CXX_COMPILER=/usr/bin/clang++ \
-          -DCMAKE_DISABLE_FIND_PACKAGE_ASM=TRUE
+          -DCMAKE_CXX_COMPILER=/usr/bin/clang++
 
     - name: Configure CMake (macOS arm64)
       if: matrix.os == 'macOS' && matrix.arch == 'arm64'

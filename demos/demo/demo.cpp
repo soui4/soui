@@ -85,9 +85,15 @@
 #include "res/resource.h"
 
 static SStringT getSourceDir() {
+#ifdef __APPLE__
+	char szBunblePath[1024];
+	GetAppleBundlePath(szBunblePath, sizeof(szBunblePath));
+	return S_CA2T(szBunblePath)+_T("/Contents/Resources");
+#else
 	SStringA file(__FILE__);
     file = file.Left(file.ReverseFind(PATH_SLASH));
 	return S_CA2T(file);
+#endif
 }
 
 class SApplication2 : public SApplication
@@ -160,13 +166,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 	//将程序的运行路径修改到demo所在的目录
 	SStringT appDir = getSourceDir();
 	#ifdef __linux__
-		//AddFontResource only for linux
 		AddFontResource((appDir+"/../../simsun.ttc").c_str());
 	#elif defined(__APPLE__)
-		char szPath[MAX_PATH];
-		GetAppleBundlePath(szPath, MAX_PATH);
-		strcat(szPath, "/Contents/Resources/fonts/simsun.ttc");
-		AddFontResource(szPath);
+		AddFontResource((appDir+"/fonts/simsun.ttc").c_str());
 	#endif
 	SouiFactory souiFac;
     SComMgr2 *pComMgr = new SComMgr2();
@@ -297,7 +299,11 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #endif
 		}
 #else
+#ifdef __APPLE__
+		static const TCHAR* kPath_SysRes = _T("/soui-sys-resource");
+#else
 		static const TCHAR* kPath_SysRes = _T("/../../soui-sys-resource");
+#endif//__APPLE__
 		static const TCHAR* kPath_DemoRes = _T("/uires");
 
         SAutoRefPtr<IResProvider> sysResProvider;
