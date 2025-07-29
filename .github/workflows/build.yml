@@ -28,9 +28,6 @@ jobs:
           - os: Linux
             arch: arm64
             dist: ubuntu-22.04-arm
-          - os: Linux
-            arch: x86
-            dist: ubuntu-18.04  # Use Ubuntu 18.04 for x86 support
           - os: Windows
             arch: x86
             platform: Win32
@@ -44,6 +41,8 @@ jobs:
             arch: arm64
             dist: macos-14  # Apple Silicon runner for arm64
         exclude:
+          - os: Linux
+            arch: x86
           - os: macOS
             arch: x86  # macOS doesn't support x86 anymore
 
