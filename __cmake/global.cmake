@@ -203,8 +203,60 @@ if(APPLE)
 
     # 设置bundle的运行时库搜索路径
     set_target_properties(${app_name} PROPERTIES
-        INSTALL_RPATH "@executable_path/../Frameworks"
+        INSTALL_RPATH "@executable_path/../Frameworks;@loader_path/../Frameworks"
         BUILD_WITH_INSTALL_RPATH TRUE
+        MACOSX_RPATH TRUE
+    )
+
+    # 创建并使用脚本修复动态库依赖关系
+    set(fix_script "${CMAKE_CURRENT_BINARY_DIR}/fix_${app_name}_deps.cmake")
+
+    # 生成修复脚本内容
+    set(script_content "# Auto-generated script to fix dylib dependencies\n")
+    string(APPEND script_content "set(BUNDLE_DIR \"$<TARGET_BUNDLE_DIR:${app_name}>\")\n")
+    string(APPEND script_content "set(EXECUTABLE_PATH \"\${BUNDLE_DIR}/Contents/MacOS/${app_name}\")\n")
+    string(APPEND script_content "set(FRAMEWORKS_DIR \"\${BUNDLE_DIR}/Contents/Frameworks\")\n\n")
+
+    # 添加修复主可执行文件依赖的命令
+    string(APPEND script_content "# Fix executable dependencies\n")
+    foreach(target_name ${target_list})
+        if(TARGET ${target_name})
+            get_target_property(target_type ${target_name} TYPE)
+            if(target_type STREQUAL "SHARED_LIBRARY" OR target_type STREQUAL "MODULE_LIBRARY")
+                string(APPEND script_content "execute_process(COMMAND install_name_tool -change \"$<TARGET_FILE:${target_name}>\" \"@executable_path/../Frameworks/$<TARGET_FILE_NAME:${target_name}>\" \"\${EXECUTABLE_PATH}\" ERROR_QUIET)\n")
+            endif()
+        endif()
+    endforeach()
+
+    string(APPEND script_content "\n# Fix dylib install names and inter-dependencies\n")
+    foreach(target_name ${target_list})
+        if(TARGET ${target_name})
+            get_target_property(target_type ${target_name} TYPE)
+            if(target_type STREQUAL "SHARED_LIBRARY" OR target_type STREQUAL "MODULE_LIBRARY")
+                # 设置install_name
+                string(APPEND script_content "execute_process(COMMAND install_name_tool -id \"@rpath/$<TARGET_FILE_NAME:${target_name}>\" \"\${FRAMEWORKS_DIR}/$<TARGET_FILE_NAME:${target_name}>\" ERROR_QUIET)\n")
+
+                # 修复对其他库的依赖
+                foreach(dep_target ${target_list})
+                    if(TARGET ${dep_target} AND NOT "${target_name}" STREQUAL "${dep_target}")
+                        get_target_property(dep_type ${dep_target} TYPE)
+                        if(dep_type STREQUAL "SHARED_LIBRARY" OR dep_type STREQUAL "MODULE_LIBRARY")
+                            string(APPEND script_content "execute_process(COMMAND install_name_tool -change \"$<TARGET_FILE:${dep_target}>\" \"@loader_path/$<TARGET_FILE_NAME:${dep_target}>\" \"\${FRAMEWORKS_DIR}/$<TARGET_FILE_NAME:${target_name}>\" ERROR_QUIET)\n")
+                        endif()
+                    endif()
+                endforeach()
+            endif()
+        endif()
+    endforeach()
+
+    # 写入脚本文件
+    file(GENERATE OUTPUT "${fix_script}" CONTENT "${script_content}")
+
+    # 执行修复脚本
+    add_custom_command(TARGET ${app_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -P "${fix_script}"
+        COMMENT "Fixing dylib dependencies for ${app_name} bundle"
+        VERBATIM
     )
 
 endif(APPLE)
