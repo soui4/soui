@@ -67,7 +67,8 @@ elseif (APPLE)
 endif()
 endmacro()
 
-macro(add_macos_res_folder app res_path res_name)
+# 添加macOS资源文件夹, app为可执行文件名, res_path为资源路径, res_name为资源名, sys_resources为系统资源包
+macro(add_macos_res_folder app res_path res_name sys_resources)
 if (APPLE)
 # 添加整个文件夹作为资源
 file(GLOB_RECURSE DATA_FILES ${res_path}/*)
@@ -77,6 +78,19 @@ foreach(file ${DATA_FILES})
     file(RELATIVE_PATH relative_file "${res_path}" "${file}")
     get_filename_component(relative_dir ${relative_file} DIRECTORY)
     set_source_files_properties(${file} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${res_name}/${relative_dir})
+endforeach()
+
+# 添加整个文件夹作为资源
+file(GLOB_RECURSE SYSRES_FILES ${sys_resources}/*)
+foreach(file ${SYSRES_FILES})
+    #message(STATUS "add system resource ${file}")
+    get_filename_component(ext ${file} EXT)
+    if (NOT ${ext} STREQUAL ".rc" AND NOT ${ext} STREQUAL ".txt" AND NOT ${ext} STREQUAL ".h" AND NOT ${ext} STREQUAL ".rc2")
+        target_sources(${app} PRIVATE ${file})
+        file(RELATIVE_PATH relative_file "${sys_resources}" "${file}")
+        get_filename_component(relative_dir ${relative_file} DIRECTORY)
+        set_source_files_properties(${file} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/soui-sys-resource/${relative_dir})
+    endif()
 endforeach()
 
 endif(APPLE)
