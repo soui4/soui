@@ -72,7 +72,7 @@ ELSE (CMAKE_CL_64)
   set (CMAKE_INSTALL_PREFIX ${PROJECT_SOURCE_DIR}/output_32 CACHE PATH "default install prefix" FORCE)
 ENDIF (CMAKE_CL_64)
 else()
-set (CMAKE_INSTALL_PREFIX "usr/local/soui5" CACHE PATH "default install prefix" FORCE)
+set (CMAKE_INSTALL_PREFIX "/usr/local/soui5" CACHE PATH "default install prefix" FORCE)
 endif()
 endif()
 
@@ -193,26 +193,20 @@ if (UNIX OR MINGW)
 # Generate and install pkgconfig.
 # (This is not indented, because the tabs will be part of the output)
 file(WRITE "${PROJECT_BINARY_DIR}/libsoui.pc"
-"prefix=\"${CMAKE_INSTALL_PREFIX}\"
+"prefix=${CMAKE_INSTALL_PREFIX}
 exec_prefix=\${prefix}
 libdir=\${exec_prefix}/lib
 includedir=\${prefix}/include
 
-
 Name: libsoui
-Description: soui app framework
+Description: SOUI app framework
 Version: ${SOUI_VER1}.${SOUI_VER2}.${SOUI_VER3}.${SOUI_VER4}
-
 Libs: -L\${libdir} -lsoui4 -lutilities4
-Cflags: -I\${includedir}
+Cflags: -I\${includedir}/config -I\${includedir}/components -I\${includedir}/utilities/include -I\${includedir}/SOUI/include
 "
 )
-if (NOT ${soui_requires} STREQUAL "")
-        file(APPEND "${PROJECT_BINARY_DIR}/libsoui.pc" "Requires: ${soui_requires}")
-endif()
-
 
 install(FILES "${PROJECT_BINARY_DIR}/libsoui.pc"
-		DESTINATION lib/pkgconfig)
+        DESTINATION /usr/share/pkgconfig)
 
 endif(UNIX OR MINGW)
