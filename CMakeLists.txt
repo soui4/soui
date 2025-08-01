@@ -188,23 +188,8 @@ endif(BUILD_DEMOS)
 
 
 if (UNIX OR MINGW)
-
-
 # Generate and install pkgconfig.
-# (This is not indented, because the tabs will be part of the output)
-file(WRITE "${PROJECT_BINARY_DIR}/libsoui.pc"
-"prefix=${CMAKE_INSTALL_PREFIX}
-exec_prefix=\${prefix}
-libdir=\${exec_prefix}/lib
-includedir=\${prefix}/include
-
-Name: libsoui
-Description: SOUI app framework
-Version: ${SOUI_VER1}.${SOUI_VER2}.${SOUI_VER3}.${SOUI_VER4}
-Libs: -L\${libdir} -lsoui4 -lutilities4
-Cflags: -I\${includedir}/config -I\${includedir}/components -I\${includedir}/utilities/include -I\${includedir}/SOUI/include
-"
-)
+configure_file("${PROJECT_SOURCE_DIR}/__cmake/libsoui.pc.in" "${PROJECT_BINARY_DIR}/libsoui.pc" @ONLY)
 
 install(FILES "${PROJECT_BINARY_DIR}/libsoui.pc"
         DESTINATION /usr/share/pkgconfig)

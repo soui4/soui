@@ -951,7 +951,7 @@ HGLOBAL CW32System::TextHGlobalWtoA(
 	HGLOBAL hnew = NULL;
 	LPWSTR 	pwstr = (LPWSTR)GlobalLock(hglobalW);
 	DWORD	dwSize = GlobalSize(hglobalW);
-	LONG	cbSize = (dwSize * 4) * sizeof(CHAR);
+	LONG	cbSize = (dwSize/sizeof(WCHAR) * 4) * sizeof(CHAR);
 	hnew = GlobalAlloc(GMEM_FIXED, cbSize);
 
 	if( hnew )
