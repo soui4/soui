@@ -278,7 +278,7 @@ void SImageKnob::OnPaint(IRenderTarget* pRT) {
 		
 		pRT->DrawArc(r, startDegree, rangeDegree, false);
 		pen->SetColor(GetState() & WndState_Disable ? m_crRulerForeDisable : m_crRulerForeEnable);
-
+		pRT->SelectObject(pen);//reset pen
 		if (!m_startFromCenter && !m_startFromRight)
 		{
 			pRT->DrawArc(r, startDegree, rangeDegree * alpha, false);
