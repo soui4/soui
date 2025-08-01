@@ -1127,7 +1127,7 @@ BOOL SHostWnd::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 void SHostWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
 {
-    SSLOGI() << "OnActivate, nState=" << nState << " m_hWnd=" << m_hWnd;
+//    SSLOGI() << "OnActivate, nState=" << nState << " m_hWnd=" << m_hWnd;
     if (nState != WA_INACTIVE)
     {
         ::SetFocus(m_hWnd);

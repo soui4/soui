@@ -343,7 +343,6 @@ LRESULT SMenuBar::MenuSwitch(int code, WPARAM wParam, LPARAM lParam)
                             SMenuBar::m_pMenuBar->m_lstMenuItem[i]->KillTimer(TIMER_POP);
                         }
                         menuItem->SetTimer(TIMER_POP, 10); // delay popup new menu.
-                        SSLOGI() << "###set timer for " << nIndex;
                         return TRUE;
                     }
                 }
