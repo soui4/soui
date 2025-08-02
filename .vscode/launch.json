@@ -28,10 +28,10 @@
       "name": "(lldb) 调试 C++ 程序",
       "type": "cppdbg",
       "request": "launch",
-      "program": "${workspaceFolder}/build2/bin/fun_test",  // 替换为你的可执行文件路径
+      "program": "${workspaceFolder}/build/bin/demo.app/Contents/MacOS/demo",  // 替换为你的可执行文件路径
       "args": [],                         // 可选：程序参数
       "stopAtEntry": false,
-      "cwd": "${workspaceFolder}/build2/bin",
+      "cwd": "${workspaceFolder}/build/bin",
       "environment": [],
       "externalConsole": false,
       "MIMode": "lldb",

@@ -34,13 +34,14 @@ void STipWnd::SetLayout(LPCTSTR pszLayout)
     s_TipLayout = pszLayout;
 }
 
-void STipWnd::ShowTip(int x, int y, AnchorType at, const SStringT &strTip)
+void STipWnd::ShowTip(int x, int y, AnchorType at, const SStringT &strTip, int scale)
 {
     STipWnd *pTipWnd = new STipWnd(s_TipLayout);
     pTipWnd->m_ptAnchor.x = x;
     pTipWnd->m_ptAnchor.y = y;
     pTipWnd->m_anchorType = at;
     pTipWnd->Create(0);
+    pTipWnd->GetRoot()->SDispatchMessage(UM_SETSCALE, scale, 0);
     pTipWnd->SetTip(strTip);
     pTipWnd->SetWindowPos(HWND_TOPMOST, 0, 0, 0, 0,
                           SWP_NOMOVE | SWP_NOSIZE | SWP_NOACTIVATE | SWP_SHOWWINDOW);

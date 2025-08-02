@@ -329,7 +329,7 @@ class SOUI_EXP SHostWnd
     BOOL m_bNeedRepaint; /**< Indicates if a repaint is required. */
     BOOL m_bNeedAllRepaint; /**< Indicates if a full repaint is required. */
 
-    IToolTip *m_pTipCtrl; /**< Interface for tooltip control. */
+    SAutoRefPtr<IToolTip> m_pTipCtrl; /**< Interface for tooltip control. */
 
     SAutoRefPtr<IRegionS> m_rgnInvalidate; /**< Invalid region requiring redraw. */
     SAutoRefPtr<IRenderTarget> m_memRT; /**< Rendering cache. */

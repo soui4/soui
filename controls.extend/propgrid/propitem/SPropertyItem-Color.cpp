@@ -5,7 +5,6 @@
 #include <commdlg.h>
 #include <res.mgr/SNamedValue.h>
 
-const int KColorWidth   = 30;
 const int KTransGridSize    =5;
 namespace SOUI
 {
@@ -17,7 +16,7 @@ namespace SOUI
     void SPropertyItemColor::DrawItem( IRenderTarget *pRT,CRect rc )
     {
         CRect rcColor = rc;
-        rcColor.right = rcColor.left + KColorWidth;
+        rcColor.right = rcColor.left + rc.Height();
         rcColor.DeflateRect(2,2);
         
         //画一个代表透明的网格背景
@@ -40,7 +39,7 @@ namespace SOUI
 			pRT->FillSolidRect(&rcColor,m_crValue);
 			pRT->DrawRectangle(&rcColor);
 			CRect rcValue = rc;
-			rcValue.left += KColorWidth;
+			rcValue.left += rc.Height();
 			SStringT strValue = GetValue();
 			pRT->DrawText(strValue,strValue.GetLength(),&rcValue,DT_SINGLELINE|DT_VCENTER);
 		}else
@@ -83,7 +82,7 @@ namespace SOUI
 			CRect rcColor;
 			m_pEdit->GetWindowRect(&rcColor);
 			rcColor.right=rcColor.left;
-			rcColor.left -= KColorWidth;
+			rcColor.left -= rcColor.Height();
 			m_pOwner->InvalidateRect(&rcColor);
 			}
         }
@@ -116,7 +115,7 @@ namespace SOUI
     void SPropertyItemColor::AdjustInplaceActiveWndRect( CRect & rc )
     {
         __baseCls::AdjustInplaceActiveWndRect(rc);
-        rc.left += KColorWidth;
+        rc.left += rc.Height();
     }
 
 	void SPropertyItemColor::OnColorChanged( COLORREF cr )

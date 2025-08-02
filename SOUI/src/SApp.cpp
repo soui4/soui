@@ -87,7 +87,7 @@ class SDefToolTipFactory : public TObjRefImpl<IToolTipFactory> {
         STipCtrl *pTipCtrl = new STipCtrl;
         if (!pTipCtrl->Create())
         {
-            delete pTipCtrl;
+            pTipCtrl->Release();
             return NULL;
         }
         return pTipCtrl;
@@ -97,8 +97,8 @@ class SDefToolTipFactory : public TObjRefImpl<IToolTipFactory> {
     {
         if (pToolTip)
         {
-            STipCtrl *pTipCtrl = (STipCtrl *)pToolTip;
-            pTipCtrl->DestroyWindow();
+            pToolTip->Destroy();
+            pToolTip->Release();
         }
     }
 };

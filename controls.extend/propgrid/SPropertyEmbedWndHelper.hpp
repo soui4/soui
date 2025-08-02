@@ -12,12 +12,14 @@ class TplPropEmbedWnd : public T {
         : T(p1)
         , m_bUpdateData(TRUE)
     {
+        T::GetStyle().SetScale(p1->GetOwner()->GetScale());
     }
     template <class P1, class P2>
     TplPropEmbedWnd(P1 p1, P2 p2)
         : T(p1, p2)
         , m_bUpdateData(TRUE)
     {
+        T::GetStyle().SetScale(p1->GetOwner()->GetScale());
     }
 
     void OnKeyDown(UINT nChar, UINT nRepCnt, UINT nFlags)

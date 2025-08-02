@@ -1,5 +1,6 @@
 ﻿#include "souistd.h"
 #include "helper/SToolTip.h"
+#include "helper/slog.h"
 //增加对多显示器的支持
 #define COMPILE_MULTIMON_STUBS
 #include <multimon.h>
@@ -23,7 +24,7 @@ STipCtrl::STipCtrl(void)
 }
 
 STipCtrl::~STipCtrl(void)
-{
+{ 
     if (m_font)
         DeleteObject(m_font);
 }
@@ -33,12 +34,19 @@ BOOL STipCtrl::Create()
     HWND hWnd = SNativeWnd::CreateNative(_T("soui tooltip"), WS_POPUP | TTS_NOPREFIX | TTS_ALWAYSTIP, WS_EX_TOOLWINDOW | WS_EX_TOPMOST | WS_EX_NOACTIVATE, 0, 0, 0, 0, NULL, 0, NULL);
     if (!hWnd)
         return FALSE;
-
+    AddRef();
     LOGFONT lf;
     GetObject(GetStockObject(DEFAULT_GUI_FONT), sizeof(lf), &lf);
     lf.lfHeight = -12;
     m_font = CreateFontIndirect(&lf);
+    return TRUE;
+}
 
+BOOL STipCtrl::Destroy()
+{
+    if(!IsWindow())
+        return FALSE;
+    DestroyWindow();
     return TRUE;
 }
 
@@ -294,6 +302,6 @@ BOOL STipCtrl::PreTranslateMessage(MSG *pMsg)
 void STipCtrl::OnFinalMessage(HWND hWnd)
 {
     SNativeWnd::OnFinalMessage(hWnd);
-    delete this;
+    Release();
 }
 SNSEND

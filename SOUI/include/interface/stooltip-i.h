@@ -57,8 +57,29 @@ typedef enum TipAlign
  */
 #undef INTERFACE
 #define INTERFACE IToolTip
-DECLARE_INTERFACE_(IToolTip, IMsgFilter)
+DECLARE_INTERFACE_(IToolTip, IObjRef)
 {
+    /**
+     * @brief create tooltip object.
+     *
+     * @return BOOL TRUE if successful, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL,Create)(THIS) PURE;
+
+    /**
+     * @brief destroy tooltip object.
+     *
+     * @return BOOL TRUE if successful, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL,Destroy)(THIS) PURE;
+
+    /**
+     * @brief get message filter object.
+     *
+     * @return IMsgFilter * message filter object.
+     */
+    STDMETHOD_(IMsgFilter *, GetMsgFilter)(THIS) PURE;
+    
     /**
      * @brief Pre-translates messages for the tooltip.
      *

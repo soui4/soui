@@ -16,7 +16,7 @@ class STipWnd : public SHostWnd {
         AT_RIGHT_BOTTOM,
     };
     static void SetLayout(LPCTSTR pszLayout);
-    static void ShowTip(int x, int y, AnchorType at, const SStringT &strTip);
+    static void ShowTip(int x, int y, AnchorType at, const SStringT &strTip, int scale = 100);
 
   protected:
     virtual void OnFinalMessage(HWND hWnd);

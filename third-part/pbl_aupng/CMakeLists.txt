@@ -17,7 +17,10 @@ add_library(aupng
 target_include_directories(aupng
     PUBLIC include
 )
-target_compile_options(aupng PRIVATE $<$<CXX_COMPILER_ID:GNU>:-fPIC> $<$<CXX_COMPILER_ID:Clang>:-fPIC>)
+
+if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+target_compile_options(aupng PRIVATE -fPIC)
+endif()
 
 set(COM_LIBS ${COM_LIBS} aupng CACHE INTERNAL "com_lib")
 set_target_properties (aupng PROPERTIES

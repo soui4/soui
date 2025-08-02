@@ -1,5 +1,6 @@
 ﻿#include "souistd.h"
 #include "core/SMsgLoop.h"
+#include "helper/slog.h"
 
 #ifndef WM_SYSTIMER
 #define WM_SYSTIMER 0x0118 //(caret blink)
@@ -156,6 +157,8 @@ BOOL SMessageLoop::AddIdleHandler(IIdleHandler *pIdleHandler)
 {
     if (!pIdleHandler)
         return FALSE;
+    if (m_priv->m_aIdleHandler.Find(pIdleHandler) != -1)
+        return TRUE;
     m_priv->m_aIdleHandler.Add(pIdleHandler);
     return TRUE;
 }
@@ -167,6 +170,10 @@ BOOL SMessageLoop::RemoveMessageFilter(IMsgFilter *pMessageFilter)
 
 BOOL SMessageLoop::AddMessageFilter(IMsgFilter *pMessageFilter)
 {
+    if (!pMessageFilter)
+        return FALSE;
+    if (m_priv->m_aMsgFilter.Find(pMessageFilter) != -1)
+        return TRUE;
     m_priv->m_aMsgFilter.Add(pMessageFilter);
     return TRUE;
 }

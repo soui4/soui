@@ -43,7 +43,10 @@ set(COM_LIBS ${COM_LIBS} zlib CACHE INTERNAL "com_lib")
 set_target_properties (zlib PROPERTIES
     FOLDER third-part
 )
+if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 target_compile_options(zlib PRIVATE -fPIC)
+endif()
+
 install(TARGETS zlib
     CONFIGURATIONS Release
     RUNTIME DESTINATION bin/Release

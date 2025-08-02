@@ -895,7 +895,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     GetRoot()->RequestRelayout();
     m_pTipCtrl = CreateTooltip();
     if (m_pTipCtrl && m_hostAttr.m_bHasMsgLoop)
-        GetMsgLoop()->AddMessageFilter(m_pTipCtrl);
+        GetMsgLoop()->AddMessageFilter(m_pTipCtrl->GetMsgFilter());
     UpdateAutoSizeCount(false);
     return 0;
 }
@@ -912,7 +912,7 @@ void SHostWnd::OnDestroy()
     if (m_pTipCtrl)
     {
         if (m_hostAttr.m_bHasMsgLoop)
-            GetMsgLoop()->RemoveMessageFilter(m_pTipCtrl);
+            GetMsgLoop()->RemoveMessageFilter(m_pTipCtrl->GetMsgFilter());
         DestroyTooltip(m_pTipCtrl);
         m_pTipCtrl = NULL;
     }

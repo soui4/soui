@@ -13,6 +13,7 @@ SNSBEGIN
  */
 class STipCtrl
     : public IToolTip
+    , public IMsgFilter
     , public SNativeWnd {
   public:
     /**
@@ -25,19 +26,26 @@ class STipCtrl
      */
     virtual ~STipCtrl(void);
 
-    /**
-     * @brief 创建提示控件
-     * @return 如果成功创建返回TRUE，否则返回FALSE
-     */
-    BOOL Create();
-
-  public: // IToolTip
-    /**
-     * @brief 预翻译消息
-     * @param pMsg 消息结构指针
-     * @return 如果消息被处理返回TRUE，否则返回FALSE
-     */
+  public: // IMsgFilter
     STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG *pMsg) OVERRIDE;
+  public: // IToolTip
+    STDMETHOD_(long, AddRef)(THIS) OVERRIDE{
+      return SNativeWnd::AddRef();
+    }
+    STDMETHOD_(long, Release)(THIS) OVERRIDE{
+      return SNativeWnd::Release();
+    }
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE{
+      SNativeWnd::OnFinalRelease();
+    }
+
+    STDMETHOD_(IMsgFilter *, GetMsgFilter)(THIS) OVERRIDE{
+      return this;
+    }
+
+
+    STDMETHOD_(BOOL, Create)(THIS) OVERRIDE;
+    STDMETHOD_(BOOL, Destroy)(THIS) OVERRIDE;
 
     /**
      * @brief 更新提示信息
