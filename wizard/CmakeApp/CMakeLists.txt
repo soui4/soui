@@ -56,6 +56,7 @@ source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
 link_directories(${SOUI_ROOT}/lib)
+link_directories(${SOUI_ROOT}/lib/${CMAKE_BUILD_TYPE})
 add_executable(${project_name} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
 
 target_link_libraries(${project_name} soui4 utilities4)

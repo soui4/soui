@@ -26,6 +26,14 @@
 
 using namespace SNS;
 
+SStringT srcDir() {
+	SStringA file(__FILE__);
+	int pos = file.ReverseFind(PATH_SLASH);
+	if (pos >= 0) {
+		file = file.Left(pos);
+	}
+	return S_CA2T(file);
+}
 
 class SOUIEngine
 {
@@ -162,16 +170,16 @@ public:
 //debug时方便调试设置当前目录以便从文件加载资源
 void SetDefaultDir()
 {
+#ifdef _DEBUG
+	SStringT strSrcDir = srcDir();
+	SetCurrentDirectory(strSrcDir);
+#else
 	TCHAR szCurrentDir[MAX_PATH] = { 0 };
 	GetModuleFileName(NULL, szCurrentDir, sizeof(szCurrentDir));
-
 	LPTSTR lpInsertPos = _tcsrchr(szCurrentDir, _T('\\'));
-#ifdef _DEBUG
-	_tcscpy(lpInsertPos + 1, _T("..\\Soui5Wizard"));
-#else
 	_tcscpy(lpInsertPos + 1, _T("\0"));
-#endif
 	SetCurrentDirectory(szCurrentDir);
+#endif
 }
 
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int /*nCmdShow*/)
