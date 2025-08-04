@@ -192,6 +192,7 @@ if (UNIX OR MINGW)
 configure_file("${PROJECT_SOURCE_DIR}/__cmake/libsoui.pc.in" "${PROJECT_BINARY_DIR}/libsoui.pc" @ONLY)
 
 install(FILES "${PROJECT_BINARY_DIR}/libsoui.pc"
-        DESTINATION /usr/share/pkgconfig)
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
+        COMPONENT pkgconfig)
 
 endif(UNIX OR MINGW)
