@@ -203,7 +203,7 @@ void CDisplaySL::Render(
 		_fUseOffscreenDC = _fOffscreenOnce = FALSE;
 
     // If line metrics are not yet up to date, get them from renderer
-    if(_dup == -1)
+    if(_dup == 0xFFFF)
     {
         _dup			= re._li._dup;
         _dvpHeight		= re._li._dvpHeight;

@@ -2071,7 +2071,7 @@ void CRenderer::SetFontAndColor(
 	SelectFont(_hdc, _pccs->_hfont);
 
 	// Compute height and descent if not yet done
-	if(_li._dvpHeight == -1)
+	if(_li._dvpHeight == 0xffff)
 	{
 		SHORT	dvpAdjustFE = _pccs->AdjustFEHeight(!fUseUIFont() && ped->_pdp->IsMultiLine());
 		// Note: this assumes plain text 

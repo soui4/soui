@@ -75,10 +75,10 @@ void CHttpHeader::setRange(__int64 range)
 		return;
 	}
 	char buffer[64] = { 0 };
-	#ifdef _WIN32
-	sprintf(buffer, "bytes=%lld-", range);
-	#else
+	#if defined(__linux__)
 	sprintf(buffer, "bytes=%ld-", range);
+	#else
+	sprintf(buffer, "bytes=%lld-", range);
 	#endif//_WIN32
 	http_headers.insert(std::make_pair(HEADER_RANGE, std::string(buffer)));
 }
