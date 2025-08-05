@@ -170,7 +170,6 @@ struct SComInfo
 	FunCreateInstance fun;
 };
 
-SOUI_COM_C BOOL Decoder_Png_SCreateInstance(IObjRef **ppObj);
 SOUI_COM_C BOOL Decoder_Gdip_SCreateInstance(IObjRef **ppObj);
 SOUI_COM_C BOOL Decoder_Wic_SCreateInstance(IObjRef **ppObj);
 SOUI_COM_C BOOL Decoder_Stb_SCreateInstance(IObjRef **ppObj);
@@ -185,7 +184,6 @@ SOUI_COM_C BOOL TaskLoop_SCreateInstance(IObjRef **ppObj);
 SOUI_COM_C BOOL Translator_SCreateInstance(IObjRef **ppObj);
 
 struct SComInfo s_comInfo[]={
-	{Decoder_Png,Translator_SCreateInstance},
 	{Decoder_Gdip,Decoder_Gdip_SCreateInstance},
 	{Decoder_Wic,Decoder_Wic_SCreateInstance},
 	{Decoder_Stb,Decoder_Stb_SCreateInstance},
