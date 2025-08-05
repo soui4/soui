@@ -1414,7 +1414,7 @@ static LSERR ChooseNearestBreak (
 
 		PLSSUBL		plssubl,		/* (IN): Subline to find break */
 		LONG		urTruncate2,	/* (IN): Truncation point multiplied by 2
-									/*       (we *2 to avoid rounding erros) */
+									//       (we *2 to avoid rounding erros) */
 		LSCP		cpLookBefore,	/* (IN): Result must be before this cp */
 		BOOL		*pfSuccessful,	/* (OUT): Did we find any break ? */
 		LSCP		*pcpBreak,		/* (OUT): Cp of break */
@@ -1887,7 +1887,7 @@ static LSCP GetCpLimOfWLayout (PDOBJ pdobj, WLAYOUT *pwlayout)
 
 
 /* R E F O R M A T  C L O S I N G  B R A C E  F O R  W O R D 9
-/*----------------------------------------------------------------------------
+----------------------------------------------------------------------------
 	%%Function: ReformatClosingBraceForWord9
 	%%Contact: antons
 

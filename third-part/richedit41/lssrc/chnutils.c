@@ -267,7 +267,7 @@ Parameters:
 Calculates location of the chunk. We assume here that pointUv.u in locchunk
 contains before this procedure width of border before dnode.
 After procedure we put location there 
-/*----------------------------------------------------------------------------*/
+----------------------------------------------------------------------------*/
 
 
 static void LocateChunk(PLSCHUNKCONTEXT plschunkcontext, PLSDNODE plsdnInChunk, 

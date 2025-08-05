@@ -142,7 +142,7 @@ LSERR WINAPI DestroyILSObjText(PILSOBJ pilsobj)
 			pilsobj->plnobj = NULL;
 			}
 
-		if (pilsobj->pbreakinf != NULL);
+		if (pilsobj->pbreakinf != NULL)
 			{
 			(*pilsobj->plscbk->pfnDisposePtr)(pilsobj->pols, pilsobj->pbreakinf);
 			pilsobj->pbreakinf = NULL;

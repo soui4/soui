@@ -26,14 +26,33 @@ int wchar_traits::Format(wchar_t** ppszDst, const wchar_t* pszFormat, va_list & 
 	vswprintf_s(*ppszDst, len + 1, pszFormat, args);
 	return len;
 #else
-	wchar_t* fmt = wcsdup(pszFormat);
-	wchar_t* p = wcsstr(fmt, L"%s");
-	while (p) {
-		p[1] = L'S';
-		p = wcsstr(p + 2, L"%s");
+	// On macOS and Linux, convert %s to %ls and %c to %lc for wide string formatting, up to MAX_STRINGS times
+	#define MAX_STRINGS 50
+	size_t fmtLen = wcslen(pszFormat);
+	// 最多MAX_STRINGS个%s，每个替换多1字符（l），所以分配fmtLen+MAX_STRINGS+1
+	wchar_t* fmt = (wchar_t*)malloc((fmtLen + MAX_STRINGS + 1) * sizeof(wchar_t));
+	if (!fmt) return 0;
+	const wchar_t* src = pszFormat;
+	wchar_t* dst = fmt;
+	int replaced = 0;
+	while (*src) {
+		if (replaced < MAX_STRINGS && src[0] == L'%' && (src[1] == L's' || src[1] == L'c')) {
+			*dst++ = L'%';
+			*dst++ = L'l';
+			*dst++ = src[1];
+			src += 2;
+			replaced++;
+		} else {
+			*dst++ = *src++;
+		}
 	}
+	*dst = 0;
+
 	wchar_t stkBuf[512];
-	int len = vswprintf_s(stkBuf, 512, fmt, args);
+	va_list argsCopy;
+	va_copy(argsCopy, args);
+	int len = vswprintf_s(stkBuf, 512, fmt, argsCopy);
+	va_end(argsCopy);
 	if (len >= 0) {
 		*ppszDst = (wchar_t*)soui_mem_wrapper::SouiMalloc((len + 1) * sizeof(wchar_t));
 		memcpy(*ppszDst, stkBuf, (len) * sizeof(wchar_t));
@@ -44,7 +63,10 @@ int wchar_traits::Format(wchar_t** ppszDst, const wchar_t* pszFormat, va_list & 
 		int bufLen = 1024;
 		wchar_t* buf = (wchar_t*)malloc(sizeof(wchar_t) * bufLen);
 		for (;;) {
-			len = vswprintf_s(buf, bufLen, fmt, args);
+			va_list argsCopy;
+			va_copy(argsCopy, args);
+			len = vswprintf_s(buf, bufLen, fmt, argsCopy);
+			va_end(argsCopy);
 			if (len != -1)
 				break;
 			bufLen *= 2;
@@ -1191,28 +1213,28 @@ void SStringW::Release(THIS)
 
 UINT SStringW::ToUint() const
 {
-    return (UINT)_wtoi(m_pszData);
+	return (UINT)_wtoi(m_pszData);
 }
 
 long SStringW::ToLong() const
 {
-    return _wtol(m_pszData);
+	return _wtol(m_pszData);
 }
 
 int SStringW::ToInt() const
 {
-    return _wtoi(m_pszData);
+	return _wtoi(m_pszData);
 }
 float SStringW::ToFloat() const
 {
-    return (float)_wtof(m_pszData);
+	return (float)_wtof(m_pszData);
 }
 double SStringW::ToDouble() const
 {
-    return _wtof(m_pszData);
+	return _wtof(m_pszData);
 }
 BOOL SStringW::ToBool() const
 {
-    return _wtoi(m_pszData) != 0;
+	return _wtoi(m_pszData) != 0;
 }
 SNSEND

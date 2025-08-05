@@ -335,14 +335,19 @@ BOOL WINAPI DllMain(HANDLE hmod, DWORD dwReason, LPVOID lpvReserved)
 
 #ifndef _WIN32
 #include <dlfcn.h>
+#ifdef __APPLE__
+#define lib_name "libmsftedit.dylib"
+#else
+#define lib_name "libmsftedit.so"
+#endif//__APPLE__
 __attribute__((constructor)) void OnSoInit(){
-	void* hMod = dlopen("libmsftedit.so", RTLD_LAZY);
+	void* hMod = dlopen(lib_name, RTLD_LAZY);
 	DllMain((HANDLE)hMod, DLL_PROCESS_ATTACH, NULL);
 	dlclose(hMod);
 }
 
 __attribute__((destructor)) void OnSoUninit(){
-	void* hMod = dlopen("libmsftedit.so", RTLD_LAZY);
+	void* hMod = dlopen(lib_name, RTLD_LAZY);
 	DllMain((HANDLE)hMod,DLL_PROCESS_DETACH,NULL);
 	dlclose(hMod);
 }

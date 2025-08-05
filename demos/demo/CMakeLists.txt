@@ -201,6 +201,7 @@ set_target_properties (demo PROPERTIES
     FOLDER demos
 )
 
+if(NOT CMAKE_SYSTEM_NAME MATCHES Darwin)
 install(TARGETS demo
     CONFIGURATIONS Release
     RUNTIME DESTINATION bin/Release
@@ -214,3 +215,4 @@ install(TARGETS demo
     LIBRARY DESTINATION lib/Debug
     ARCHIVE DESTINATION lib/Debug
 )
+endif()

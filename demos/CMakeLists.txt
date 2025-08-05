@@ -8,7 +8,7 @@ add_subdirectory(wallpaper)
 endif()
 add_subdirectory(dpidemo)
 add_subdirectory(SoTool)
-if(NOT CMAKE_SYSTEM_NAME MATCHES DARWIN)
+if(NOT CMAKE_SYSTEM_NAME MATCHES Darwin)
 #darwin不支持ipc
 add_subdirectory(ipcdemo)
 add_subdirectory(SouiEditor)

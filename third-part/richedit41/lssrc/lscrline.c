@@ -190,7 +190,7 @@ static LSERR FiniChangeAfter(
 	BreakGeneralCase().
 ----------------------------------------------------------------------------*/
 #define FTryQuickBreak(plsc) ((((plsc)->grpfManager & fFmiQuickBreakProhibited) == 0) && \
-							  ((plsc)->lMarginIncreaseCoefficient == LONG_MIN) \
+							  ((plsc)->lMarginIncreaseCoefficient == INT_MIN) \
                              )
 
 
@@ -305,7 +305,7 @@ LSERR WINAPI LsCreateLine(PLSC plsc,
 
 		if (!fSuccessful)
 			{	/* coefficient has not been sufficient before so increase it */
-			if (plsc->lMarginIncreaseCoefficient == LONG_MIN)
+			if (plsc->lMarginIncreaseCoefficient == INT_MIN)
 				plsc->lMarginIncreaseCoefficient = 1;
 			else
 				{
@@ -515,10 +515,10 @@ static LSERR CreateLineCore(PLSC plsc,
 
 	/* it is possible that width of column is negative: in such scase we'll 
 	use another right margin*/
-	if (plsc->urRightMarginBreak <= 0 && plsc->lMarginIncreaseCoefficient == LONG_MIN)
+	if (plsc->urRightMarginBreak <= 0 && plsc->lMarginIncreaseCoefficient == INT_MIN)
 		plsc->lMarginIncreaseCoefficient = 1;
 
-	if (plsc->lMarginIncreaseCoefficient != LONG_MIN)
+	if (plsc->lMarginIncreaseCoefficient != INT_MIN)
 		{
 		urColumnMaxIncreased = RightMarginIncreasing(plsc, plsc->urRightMarginBreak);
 		}
@@ -646,7 +646,7 @@ static LSERR FiniFormatGeneralCase (PLSC  plsc,
 	
 	*pfSuccessful = fTrue;
 
-	if (plsc->lMarginIncreaseCoefficient == LONG_MIN) /* we are here for the first time */
+	if (plsc->lMarginIncreaseCoefficient == INT_MIN) /* we are here for the first time */
 		{
 		/* increase right margin for nominal to ideal and compression */
 		if (!FBreakJustSimple(plsc->lsadjustcontext.lsbrj))
@@ -896,7 +896,7 @@ static LSERR FiniAuto(
 	LSERR lserr;
 
 
-		if (plsc->lMarginIncreaseCoefficient == LONG_MIN)
+		if (plsc->lMarginIncreaseCoefficient == INT_MIN)
 			plsc->lMarginIncreaseCoefficient = 1;
 
 		if (fAutonumber)		/*autonumbering  */
