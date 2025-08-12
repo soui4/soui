@@ -64,11 +64,16 @@ elseif (UNIX AND NOT APPLE)
     add_executable(${exe_name} ${ARGN})
 elseif (APPLE)
     add_executable(${exe_name} MACOSX_BUNDLE ${ARGN})
+    set_target_properties(${exe_name} PROPERTIES
+        INSTALL_RPATH "@executable_path/../Frameworks;@loader_path/../Frameworks"
+        BUILD_WITH_INSTALL_RPATH TRUE
+        MACOSX_RPATH TRUE
+    )
 endif()
 endmacro()
 
-# 添加macOS资源文件夹, app为可执行文件名, res_path为资源路径, res_name为资源名, sys_resources为系统资源包
-macro(add_macos_res_folder app res_path res_name sys_resources)
+# 添加macOS资源文件夹, app为可执行文件名, res_path为资源路径, res_name为资源名
+macro(add_macos_res_folder app res_path res_name)
 if (APPLE)
 # 添加整个文件夹作为资源
 file(GLOB_RECURSE DATA_FILES ${res_path}/*)
@@ -78,19 +83,6 @@ foreach(file ${DATA_FILES})
     file(RELATIVE_PATH relative_file "${res_path}" "${file}")
     get_filename_component(relative_dir ${relative_file} DIRECTORY)
     set_source_files_properties(${file} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${res_name}/${relative_dir})
-endforeach()
-
-# 添加整个文件夹作为资源
-file(GLOB_RECURSE SYSRES_FILES ${sys_resources}/*)
-foreach(file ${SYSRES_FILES})
-    #message(STATUS "add system resource ${file}")
-    get_filename_component(ext ${file} EXT)
-    if (NOT ${ext} STREQUAL ".rc" AND NOT ${ext} STREQUAL ".txt" AND NOT ${ext} STREQUAL ".h" AND NOT ${ext} STREQUAL ".rc2")
-        target_sources(${app} PRIVATE ${file})
-        file(RELATIVE_PATH relative_file "${sys_resources}" "${file}")
-        get_filename_component(relative_dir ${relative_file} DIRECTORY)
-        set_source_files_properties(${file} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/soui-sys-resource/${relative_dir})
-    endif()
 endforeach()
 
 endif(APPLE)
@@ -124,7 +116,7 @@ endif()
 set_target_properties(
       ${app}
       PROPERTIES
-      MACOSX_BUNDLE_INFO_PLIST ./plist.in
+      MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/__cmake/plist.in
    )
 
 endif(APPLE)
@@ -134,7 +126,7 @@ endmacro()
 # 参数：
 #   app_name - 应用程序目标名称
 #   dylib_list - 要复制的dylib文件路径列表
-macro(copy_dylibs_to_bundle app_name dylib_list)
+macro(copy_frameworks_to_bundle app_name framework_list)
 if(APPLE)
     # 创建Frameworks目录
     add_custom_command(TARGET ${app_name} POST_BUILD
@@ -144,9 +136,10 @@ if(APPLE)
     )
 
     # 复制每个dylib文件
-    foreach(dylib_path ${dylib_list})
+    foreach(dylib_path ${framework_list})
         # 检查文件是否存在（在配置时检查）
         if(EXISTS "${dylib_path}")
+            #message(STATUS "Dylib file found: ${dylib_path}")
             get_filename_component(dylib_name "${dylib_path}" NAME)
             add_custom_command(TARGET ${app_name} POST_BUILD
                 COMMAND ${CMAKE_COMMAND} -E copy_if_different
@@ -158,25 +151,6 @@ if(APPLE)
             message(WARNING "Dylib file not found: ${dylib_path}")
         endif()
     endforeach()
-
-    # 设置bundle的运行时库搜索路径
-    set_target_properties(${app_name} PROPERTIES
-        INSTALL_RPATH "@executable_path/../Frameworks"
-        BUILD_WITH_INSTALL_RPATH TRUE
-    )
-
-    # 修复库依赖路径（可选，需要fix_bundle_deps.cmake脚本）
-    if(EXISTS "${CMAKE_SOURCE_DIR}/__cmake/fix_bundle_deps.cmake")
-        add_custom_command(TARGET ${app_name} POST_BUILD
-            COMMAND ${CMAKE_COMMAND}
-                -DCMAKE_CURRENT_BINARY_DIR=${CMAKE_CURRENT_BINARY_DIR}
-                -DBUNDLE_NAME=${app_name}
-                -DDYLIB_LIST="${dylib_list}"
-                -P "${CMAKE_SOURCE_DIR}/__cmake/fix_bundle_deps.cmake"
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            COMMENT "Fixing library dependencies in ${app_name} bundle"
-        )
-    endif()
 
 endif(APPLE)
 endmacro()
@@ -214,64 +188,6 @@ if(APPLE)
             message(WARNING "Target not found: ${target_name}")
         endif()
     endforeach()
-
-    # 设置bundle的运行时库搜索路径
-    set_target_properties(${app_name} PROPERTIES
-        INSTALL_RPATH "@executable_path/../Frameworks;@loader_path/../Frameworks"
-        BUILD_WITH_INSTALL_RPATH TRUE
-        MACOSX_RPATH TRUE
-    )
-
-    # 创建并使用脚本修复动态库依赖关系
-    set(fix_script "${CMAKE_CURRENT_BINARY_DIR}/fix_${app_name}_deps.cmake")
-
-    # 生成修复脚本内容
-    set(script_content "# Auto-generated script to fix dylib dependencies\n")
-    string(APPEND script_content "set(BUNDLE_DIR \"$<TARGET_BUNDLE_DIR:${app_name}>\")\n")
-    string(APPEND script_content "set(EXECUTABLE_PATH \"\${BUNDLE_DIR}/Contents/MacOS/${app_name}\")\n")
-    string(APPEND script_content "set(FRAMEWORKS_DIR \"\${BUNDLE_DIR}/Contents/Frameworks\")\n\n")
-
-    # 添加修复主可执行文件依赖的命令
-    string(APPEND script_content "# Fix executable dependencies\n")
-    foreach(target_name ${target_list})
-        if(TARGET ${target_name})
-            get_target_property(target_type ${target_name} TYPE)
-            if(target_type STREQUAL "SHARED_LIBRARY" OR target_type STREQUAL "MODULE_LIBRARY")
-                string(APPEND script_content "execute_process(COMMAND install_name_tool -change \"$<TARGET_FILE:${target_name}>\" \"@executable_path/../Frameworks/$<TARGET_FILE_NAME:${target_name}>\" \"\${EXECUTABLE_PATH}\" ERROR_QUIET)\n")
-            endif()
-        endif()
-    endforeach()
-
-    string(APPEND script_content "\n# Fix dylib install names and inter-dependencies\n")
-    foreach(target_name ${target_list})
-        if(TARGET ${target_name})
-            get_target_property(target_type ${target_name} TYPE)
-            if(target_type STREQUAL "SHARED_LIBRARY" OR target_type STREQUAL "MODULE_LIBRARY")
-                # 设置install_name
-                string(APPEND script_content "execute_process(COMMAND install_name_tool -id \"@rpath/$<TARGET_FILE_NAME:${target_name}>\" \"\${FRAMEWORKS_DIR}/$<TARGET_FILE_NAME:${target_name}>\" ERROR_QUIET)\n")
-
-                # 修复对其他库的依赖
-                foreach(dep_target ${target_list})
-                    if(TARGET ${dep_target} AND NOT "${target_name}" STREQUAL "${dep_target}")
-                        get_target_property(dep_type ${dep_target} TYPE)
-                        if(dep_type STREQUAL "SHARED_LIBRARY" OR dep_type STREQUAL "MODULE_LIBRARY")
-                            string(APPEND script_content "execute_process(COMMAND install_name_tool -change \"$<TARGET_FILE:${dep_target}>\" \"@loader_path/$<TARGET_FILE_NAME:${dep_target}>\" \"\${FRAMEWORKS_DIR}/$<TARGET_FILE_NAME:${target_name}>\" ERROR_QUIET)\n")
-                        endif()
-                    endif()
-                endforeach()
-            endif()
-        endif()
-    endforeach()
-
-    # 写入脚本文件
-    file(GENERATE OUTPUT "${fix_script}" CONTENT "${script_content}")
-
-    # 执行修复脚本
-    add_custom_command(TARGET ${app_name} POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -P "${fix_script}"
-        COMMENT "Fixing dylib dependencies for ${app_name} bundle"
-        VERBATIM
-    )
 
 endif(APPLE)
 endmacro()

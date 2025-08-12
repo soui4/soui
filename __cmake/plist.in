@@ -8,6 +8,8 @@
   <${MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE}/>
   <key>CFBundleDevelopmentRegion</key>
   <string>en</string>
+  <key>CFBundleName</key>
+  <string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
   <key>CFBundleDisplayName</key>
   <string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
   <key>CFBundleExecutable</key>
@@ -22,8 +24,6 @@
   <string>6.0</string>
   <key>CFBundleLongVersionString</key>
   <string>${MACOSX_BUNDLE_LONG_VERSION_STRING}</string>
-  <key>CFBundleName</key>
-  <string>${MACOSX_BUNDLE_BUNDLE_NAME}</string>
   <key>CFBundlePackageType</key>
   <string>APPL</string>
   <key>CFBundleShortVersionString</key>

@@ -226,14 +226,17 @@ void SObjectDefaultRegister::RegisterValueAnimator(SObjectFactoryMgr *objFactory
 }
 //////////////////////////////////////////////////////////////////////////
 // SApplication
+SApplication *SApplication::ms_Singleton = NULL;
+SApplication &SApplication::getSingleton(void)
+{
+    assert(ms_Singleton);
+    return *ms_Singleton;
+}
 
-#if defined(_WIN32) && (defined(__MINGW32__) || defined(__MINGW64__))
-template <>
-SOUI_EXP SApplication *SSingleton<SApplication>::ms_Singleton = 0;
-#else
-template <>
-SApplication *SSingleton<SApplication>::ms_Singleton = 0;
-#endif//__MINGW32__
+SApplication *SApplication::getSingletonPtr(void)
+{
+    return ms_Singleton;
+}
 
 SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTSTR pszHostClassName, const ISystemObjectRegister &sysObjRegister, BOOL bImeApp)
     : m_hInst(hInst)
@@ -242,6 +245,8 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     , m_cbCreateObj(NULL)
     , m_cbCreateTaskLoop(NULL)
 {
+    assert(!ms_Singleton);
+    ms_Singleton = this;
 #ifdef _WIN32
     SWndSurface::Init();
 #endif //_WIN32

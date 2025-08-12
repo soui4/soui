@@ -44,7 +44,6 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/sfnt)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/gpu)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/utils)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/src/core)
-include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../freetype/include)
 
 add_definitions (
     -D_CRT_SECURE_NO_WARNINGS
@@ -1034,10 +1033,22 @@ source_group("Source Files" FILES ${srcs})
 add_library(skia STATIC ${srcs} ${headers})
 
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+    if(NOT TARGET freetype)
+        message(FATAL_ERROR "freetype target not found. Make sure freetype is built before cairo.")
+    endif()
+
+    if(NOT TARGET fontconfig)
+        message(FATAL_ERROR "fontconfig target not found. Make sure fontconfig is built before cairo.")
+    endif()
+
+    get_target_property(FREETYPE_INCLUDE_DIRS freetype INTERFACE_INCLUDE_DIRECTORIES)
+    get_target_property(FONTCONFIG_INCLUDE_DIRS fontconfig INTERFACE_INCLUDE_DIRECTORIES)
+    # 使用项目中的freetype和fontconfig而不是系统库
+    target_include_directories(skia PRIVATE 
+        ${FREETYPE_INCLUDE_DIRS}
+        ${FONTCONFIG_INCLUDE_DIRS}
+    )
     target_compile_options(skia PRIVATE -fPIC)
-    find_package(Freetype REQUIRED)
-    target_include_directories(skia PRIVATE ${FREETYPE_INCLUDE_DIRS})
-    target_link_libraries(skia ${FREETYPE_LIBRARIES})
 endif()
 
 set(COM_LIBS ${COM_LIBS} skia CACHE INTERNAL "com_lib")

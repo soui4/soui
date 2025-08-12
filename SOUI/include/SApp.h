@@ -145,8 +145,7 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
   * Describe   SOUI Application
   */
  class SOUI_EXP SApplication
-     : public SSingleton<SApplication>
-     , public TObjRefImpl<IApplication>
+     : public TObjRefImpl<IApplication>
      , public SResProviderMgr
      , public SObjectFactoryMgr {
    public:
@@ -168,7 +167,20 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
       * @brief Destructor for SApplication
       */
      ~SApplication(void);
- 
+
+   public:
+     /**
+      * @brief Gets the singleton instance.
+      * @return Reference to the singleton instance.
+      */
+     static SApplication &getSingleton(void);
+
+     /**
+      * @brief Gets the pointer to the singleton instance.
+      * @return Pointer to the singleton instance.
+      */
+     static SApplication *getSingletonPtr(void);
+
    public:
      /**
       * @brief Get the render factory
@@ -820,6 +832,8 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
      * @brief XML document for the message box template.
      */
     SXmlDoc m_xmlMessageBoxTemplate;
+
+    static SApplication *ms_Singleton;
 };
 
 SNSEND
