@@ -812,15 +812,23 @@ void STreeView::UpdateScrollBar()
         m_siVer.nMax = szView.cy - 1;
         m_siVer.nPage = rcClient.Height();
 
-        if (size.cx - GetSbWidth() < szView.cx && !m_adapter->isViewWidthMatchParent())
+        if (size.cx - GetSbWidth() < szView.cx)
         {
-            //  需要横向滚动条
-            m_wBarVisible |= SSB_HORZ;
-            m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; // 注意同时调整纵向滚动条page信息
+            // 如果是适应宽度，则说明需要更新项宽度，否则需要横向滚动条
+            if (m_adapter->isViewWidthMatchParent())
+            {
+                UpdateVisibleItems();
+            }
+            else
+            {
+                //  需要横向滚动条
+                m_wBarVisible |= SSB_HORZ;
+                m_siVer.nPage = size.cy - GetSbWidth() > 0 ? size.cy - GetSbWidth() : 0; // 注意同时调整纵向滚动条page信息
 
-            m_siHoz.nMin = 0;
-            m_siHoz.nMax = szView.cx - 1;
-            m_siHoz.nPage = (size.cx - GetSbWidth()) > 0 ? (size.cx - GetSbWidth()) : 0;
+                m_siHoz.nMin = 0;
+                m_siHoz.nMax = szView.cx - 1;
+                m_siHoz.nPage = (size.cx - GetSbWidth()) > 0 ? (size.cx - GetSbWidth()) : 0;
+            }
         }
         else
         {
@@ -839,7 +847,7 @@ void STreeView::UpdateScrollBar()
         m_siVer.nMax = size.cy - 1;
         m_siVer.nPos = 0;
 
-        if (size.cx < szView.cx && !m_adapter->isViewWidthMatchParent())
+        if (size.cx < szView.cx)
         {
             //  需要横向滚动条
             m_wBarVisible |= SSB_HORZ;
