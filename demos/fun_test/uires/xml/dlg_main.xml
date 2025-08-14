@@ -35,7 +35,7 @@
 					<button name="btn_fork_normal" text="fork normal" size="100,30"/>
 					<button name="btn_fork_root" text="fork root" size="100,30"/>
 				</window>
-				<edit size="200,30" text="wss://localhost:4030" maring="2"/>
+				<edit size="200,30" text="wss://localhost:4030" margin="2"/>
 				<check name="chk_test" interval="5" layout="hbox" gravity="center" clipClient="1">
 					<text text="check"/>
 					<text text="box" colorText="@color/red"/>

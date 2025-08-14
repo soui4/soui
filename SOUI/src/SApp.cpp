@@ -278,6 +278,7 @@ SApplication::~SApplication(void)
     SResProviderMgr::RemoveAll();
     _DestroySingletons();
     SRichEdit::UninitTextService();
+    ms_Singleton = NULL;
 }
 
 void SApplication::_CreateSingletons()
