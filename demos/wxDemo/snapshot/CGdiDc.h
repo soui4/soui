@@ -1292,47 +1292,6 @@ public:
 		return ::GetTextFace(m_hDC, 0, NULL);
 	}
 
-#ifdef _OLEAUTO_H_
-	BOOL GetTextFace(BSTR& bstrFace) const
-	{
-		USES_CONVERSION;
-		SASSERT(m_hDC != NULL);
-		SASSERT(bstrFace == NULL);
-
-		int nLen = GetTextFaceLen();
-		if (nLen == 0)
-			return FALSE;
-
-		ATL::CTempBuffer<TCHAR, _WTL_STACK_ALLOC_THRESHOLD> buff;
-		LPTSTR lpszText = buff.Allocate(nLen);
-		if (lpszText == NULL)
-			return FALSE;
-
-		if (!GetTextFace(lpszText, nLen))
-			return FALSE;
-
-		bstrFace = ::SysAllocString(T2OLE(lpszText));
-		return (bstrFace != NULL) ? TRUE : FALSE;
-	}
-#endif
-
-#ifdef __ATLSTR_H__
-	int GetTextFace(ATL::CString& strFace) const
-	{
-		SASSERT(m_hDC != NULL);
-
-		int nLen = GetTextFaceLen();
-		if (nLen == 0)
-			return 0;
-
-		LPTSTR lpstr = strFace.GetBufferSetLength(nLen);
-		if (lpstr == NULL)
-			return 0;
-		int nRet = GetTextFace(lpstr, nLen);
-		strFace.ReleaseBuffer();
-		return nRet;
-	}
-#endif // __ATLSTR_H__
 
 	BOOL GetTextMetrics(LPTEXTMETRIC lpMetrics) const
 	{
@@ -1718,70 +1677,6 @@ public:
 			DeleteObject(grayBitmap);
 		}
 		return (halftoneBrush);
-	}
-
-	void DrawDragRect(LPCRECT lpRect, SIZE size, LPCRECT lpRectLast, SIZE sizeLast, HBRUSH hBrush = NULL, HBRUSH hBrushLast = NULL)
-	{
-		// first, determine the update region and select it
-		CRgn rgnOutside;
-		rgnOutside.CreateRectRgnIndirect(lpRect);
-		RECT rect = *lpRect;
-		::InflateRect(&rect, -size.cx, -size.cy);
-		::IntersectRect(&rect, &rect, lpRect);
-		CRgn rgnInside;
-		rgnInside.CreateRectRgnIndirect(&rect);
-		CRgn rgnNew;
-		rgnNew.CreateRectRgn(0, 0, 0, 0);
-		rgnNew.CombineRgn(rgnOutside, rgnInside, RGN_XOR);
-
-		HBRUSH hBrushOld = NULL;
-		CBrush brushHalftone;
-		if (hBrush == NULL)
-			brushHalftone = hBrush = CDCHandle::GetHalftoneBrush();
-		if (hBrushLast == NULL)
-			hBrushLast = hBrush;
-
-		CRgn rgnLast;
-		CRgn rgnUpdate;
-		if (lpRectLast != NULL)
-		{
-			// find difference between new region and old region
-			rgnLast.CreateRectRgn(0, 0, 0, 0);
-			rgnOutside.SetRectRgn(lpRectLast->left, lpRectLast->top, lpRectLast->right, lpRectLast->bottom);
-			rect = *lpRectLast;
-			::InflateRect(&rect, -sizeLast.cx, -sizeLast.cy);
-			::IntersectRect(&rect, &rect, lpRectLast);
-			rgnInside.SetRectRgn(rect.left, rect.top, rect.right, rect.bottom);
-			rgnLast.CombineRgn(rgnOutside, rgnInside, RGN_XOR);
-
-			// only diff them if brushes are the same
-			if (hBrush == hBrushLast)
-			{
-				rgnUpdate.CreateRectRgn(0, 0, 0, 0);
-				rgnUpdate.CombineRgn(rgnLast, rgnNew, RGN_XOR);
-			}
-		}
-		if ((hBrush != hBrushLast) && (lpRectLast != NULL))
-		{
-			// brushes are different -- erase old region first
-			SelectClipRgn(rgnLast);
-			GetClipBox(&rect);
-			hBrushOld = SelectBrush(hBrushLast);
-			PatBlt(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, PATINVERT);
-			SelectBrush(hBrushOld);
-			hBrushOld = NULL;
-		}
-
-		// draw into the update/new region
-		SelectClipRgn(rgnUpdate.IsNull() ? rgnNew : rgnUpdate);
-		GetClipBox(&rect);
-		hBrushOld = SelectBrush(hBrush);
-		PatBlt(rect.left, rect.top, rect.right - rect.left, rect.bottom - rect.top, PATINVERT);
-
-		// cleanup DC
-		if (hBrushOld != NULL)
-			SelectBrush(hBrushOld);
-		SelectClipRgn(NULL);
 	}
 
 	void FillSolidRect(LPCRECT lpRect, COLORREF clr)

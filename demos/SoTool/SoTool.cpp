@@ -124,7 +124,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 }
 
 
-#ifndef _WIN32
+#if !defined(_WIN32) || defined(__MINGW32__) 
 int main(int argc, char **argv)
 {
     HINSTANCE hInst = GetModuleHandle(NULL);

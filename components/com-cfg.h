@@ -5,8 +5,8 @@
 #include <config.h>
 #include <string/tstring.h>
 
-#ifdef _WIN32
-#define COM_IMGDECODER  _T("imgdecoder-gdip")
+#if defined(_WIN32) && !defined(__MINGW32__)
+#define COM_IMGDECODER  _T("imgdecoder-stb")
 #define COM_RENDER_GDI  _T("render-gdi")
 #define COM_RENDER_SKIA _T("render-skia")
 #define COM_RENDER_D2D _T("render-d2d")
@@ -223,7 +223,7 @@ SNSBEGIN
 		{
 			return renderLoader.CreateInstance(m_strDllPath + COM_RENDER_SKIA, ppObj);
 		}
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
 		BOOL CreateRender_D2D(IObjRef **ppObj)
 		{
 			return renderLoader.CreateInstance(m_strDllPath + COM_RENDER_D2D, ppObj);

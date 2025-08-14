@@ -204,7 +204,7 @@ ATOM SNativeWnd::RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName, BO
     WNDCLASSEX wcex = { sizeof(WNDCLASSEX), 0 };
     wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | (bImeWnd ? CS_IME : 0);
-    wcex.lpfnWndProc = StartWindowProc; // ��һ����������
+    wcex.lpfnWndProc = StartWindowProc; 
     wcex.hInstance = hInst;
     wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
     wcex.lpszClassName = pszSimpleWndName;

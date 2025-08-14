@@ -15,7 +15,7 @@ class SHostWnd;
  * @brief Non-client area painter class.
  * This class handles the painting and event processing for the non-client area of a window.
  */
-class SNcPainter
+class SOUI_EXP SNcPainter
     : public TObjRefImpl<SObjectImpl<INcPainter>>
     , public IItemContainer
     , public IHostProxy {

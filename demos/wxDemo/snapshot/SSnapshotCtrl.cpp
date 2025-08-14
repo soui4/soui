@@ -488,7 +488,7 @@ BOOL SSnapshotCtrl::OnSetCursor(const CPoint& pt)
 //         break;
     case Null:
     default:
-        __super::OnSetCursor(pt);
+        __baseCls::OnSetCursor(pt);
         break;
     }
     return TRUE;

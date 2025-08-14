@@ -189,7 +189,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      * @param bRawText Whether to get raw text
      * @return Length of the text
      */
-    STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) OVERRIDE;
+    STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) SCONST OVERRIDE;
 
     /**
      * @brief Process window messages
@@ -216,7 +216,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
      * @param bRawText Whether to get raw text
      * @return Window text
      */
-    SStringT GetWindowText(BOOL bRawText = FALSE);
+    SStringT GetWindowText(BOOL bRawText = FALSE) SCONST OVERRIDE;
 
     /**
      * @brief Set the selection range

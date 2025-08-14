@@ -91,7 +91,7 @@ class SOUI_EXP SDateTimePicker
      * @param bRawText Whether to get raw text
      * @return Window text
      */
-    SStringT GetWindowText(BOOL bRawText = FALSE);
+    SStringT GetWindowText(BOOL bRawText = FALSE) SCONST OVERRIDE;
 
     /**
      * @brief Set the time using SYSTEMTIME structure

@@ -65,7 +65,7 @@ class SOUI_EXP SHotKeyCtrl
      * @param bRawText Whether to get raw text
      * @return Window text
      */
-    virtual SStringT GetWindowText(BOOL bRawText = FALSE);
+    virtual SStringT GetWindowText(BOOL bRawText = FALSE) SCONST OVERRIDE;
 
   protected:
     /**

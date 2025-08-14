@@ -8,7 +8,7 @@ private:
 	SArray<IBitmap*> m_pBitmapList;
 	bool createFile(LPCTSTR pszFileName)
 	{
-		m_hFile = ::CreateFile(pszFileName, GENERIC_ALL, NULL, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
+		m_hFile = ::CreateFile(pszFileName, GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
 		if (INVALID_HANDLE_VALUE == m_hFile)
 			return false;
 		return true;

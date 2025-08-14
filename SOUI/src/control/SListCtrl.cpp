@@ -230,7 +230,7 @@ CRect SListCtrl::GetListRect()
     CRect rcList;
 
     GetClientRect(&rcList);
-    rcList.top += m_nHeaderHeight;
+    rcList.top += m_nHeaderHeight.toPixelSize(GetScale());
 
     return rcList;
 }
@@ -242,11 +242,11 @@ void SListCtrl::UpdateScrollBar()
     CSize szView;
     szView.cx = m_pHeader->GetTotalWidth(false);
     int nMinWid = m_pHeader->GetTotalWidth(true);
-    szView.cy = GetItemCount() * m_nItemHeight;
+    szView.cy = GetItemCount() * m_nItemHeight.toPixelSize(GetScale());
 
     CRect rcClient;
     SWindow::GetClientRect(&rcClient); //不计算滚动条大小
-    rcClient.top += m_nHeaderHeight;
+    rcClient.top += m_nHeaderHeight.toPixelSize(GetScale());
     if (rcClient.bottom < rcClient.top)
         rcClient.bottom = rcClient.top;
     CSize size = rcClient.Size();
@@ -347,7 +347,7 @@ void SListCtrl::UpdateHeaderCtrl()
     CRect rcClient;
     GetClientRect(&rcClient);
     CRect rcHeader(rcClient);
-    rcHeader.bottom = rcHeader.top + m_nHeaderHeight;
+    rcHeader.bottom = rcHeader.top + m_nHeaderHeight.toPixelSize(GetScale());
     rcHeader.left -= m_ptOrigin.x;
     if (m_pHeader)
         m_pHeader->Move(rcHeader);
@@ -435,8 +435,9 @@ CRect SListCtrl::GetItemRect(int nItem, int nSubItem)
         return CRect();
 
     CRect rcItem;
-    rcItem.top = m_nItemHeight * nItem;
-    rcItem.bottom = rcItem.top + m_nItemHeight;
+    int itemHeight = m_nItemHeight.toPixelSize(GetScale());
+    rcItem.top = itemHeight * nItem;
+    rcItem.bottom = rcItem.top + itemHeight;
     rcItem.left = 0;
     rcItem.right = 0;
 
@@ -469,7 +470,7 @@ int SListCtrl::HitTest(const CPoint &pt)
     CPoint pt2 = pt;
     pt2.y -= rcList.top - m_ptOrigin.y;
 
-    int nRet = pt2.y / m_nItemHeight;
+    int nRet = pt2.y / m_nItemHeight.toPixelSize(GetScale());
     if (nRet >= GetItemCount())
     {
         nRet = -1;
@@ -486,12 +487,13 @@ void SListCtrl::RedrawItem(int nItem)
     CRect rcList = GetListRect();
 
     int nTopItem = GetTopIndex();
-    int nPageItems = (rcList.Height() + m_nItemHeight - 1) / m_nItemHeight;
+    int nItemHeight = m_nItemHeight.toPixelSize(GetScale());
+    int nPageItems = (rcList.Height() + nItemHeight - 1) / nItemHeight;
 
     if (nItem >= nTopItem && nItem < GetItemCount() && nItem <= nTopItem + nPageItems)
     {
-        CRect rcItem(0, 0, rcList.Width(), m_nItemHeight);
-        rcItem.OffsetRect(0, m_nItemHeight * nItem - m_ptOrigin.y);
+        CRect rcItem(0, 0, rcList.Width(), nItemHeight);
+        rcItem.OffsetRect(0, nItemHeight * nItem - m_ptOrigin.y);
         rcItem.OffsetRect(rcList.TopLeft());
         CRect rcDC;
         rcDC.IntersectRect(rcItem, rcList);
@@ -509,7 +511,7 @@ int SListCtrl::GetCountPerPage(BOOL bPartial)
     CRect rcClient = GetListRect();
 
     // calculate number of items per control height (include partial item)
-    div_t divHeight = div(rcClient.Height(), m_nItemHeight);
+    div_t divHeight = div(rcClient.Height(), m_nItemHeight.toPixelSize(GetScale()));
 
     // round up to nearest item count
     return smax((int)(bPartial && divHeight.rem > 0 ? divHeight.quot + 1 : divHeight.quot), 1);
@@ -533,10 +535,11 @@ void SListCtrl::OnPaint(IRenderTarget *pRT)
     CRect rcItem(rcList);
 
     rcItem.bottom = rcItem.top;
-    rcItem.OffsetRect(0, -(m_ptOrigin.y % m_nItemHeight));
+    int nItemHeight = m_nItemHeight.toPixelSize(GetScale());
+    rcItem.OffsetRect(0, -(m_ptOrigin.y % nItemHeight));
     for (int nItem = nTopItem; nItem <= (nTopItem + GetCountPerPage(TRUE)) && nItem < GetItemCount(); rcItem.top = rcItem.bottom, nItem++)
     {
-        rcItem.bottom = rcItem.top + m_nItemHeight;
+        rcItem.bottom = rcItem.top + nItemHeight;
 
         DrawItem(pRT, rcItem, nItem);
     }
@@ -630,7 +633,7 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
     CRect rcCol(rcItem);
     rcCol.right = rcCol.left;
     rcCol.OffsetRect(-m_ptOrigin.x, 0);
-
+    int nItemHeight = m_nItemHeight.toPixelSize(GetScale());
     for (int nCol = 0; nCol < GetColumnCount(); nCol++)
     {
         CRect rcVisiblePart;
@@ -650,7 +653,7 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
         {
             CSize sizeSkin = m_pCheckSkin->GetSkinSize();
             int nOffsetX = 3;
-            int nOffsetY = (m_nItemHeight - sizeSkin.cy) / 2;
+            int nOffsetY = (nItemHeight - sizeSkin.cy) / 2;
             CRect rcCheck;
             rcCheck.SetRect(0, 0, sizeSkin.cx, sizeSkin.cy);
             rcCheck.OffsetRect(rcCol.left + nOffsetX, rcCol.top + nOffsetY);
@@ -669,10 +672,10 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
             rcIcon.SetRect(0, 0, sizeSkin.cx, sizeSkin.cy);
 
             if (m_ptIcon.x == -1)
-                nOffsetX = m_nItemHeight / 6;
+                nOffsetX = nItemHeight / 6;
 
             if (m_ptIcon.y == -1)
-                nOffsetY = (m_nItemHeight - sizeSkin.cy) / 2;
+                nOffsetY = (nItemHeight - sizeSkin.cy) / 2;
 
             rcIcon.OffsetRect(rcCol.left + nOffsetX, rcCol.top + nOffsetY);
             m_pIconSkin->DrawByIndex(pRT, rcIcon, subItem.nImage);
@@ -682,7 +685,7 @@ void SListCtrl::DrawItem(IRenderTarget *pRT, CRect rcItem, int nItem)
         rcText = rcCol;
 
         if (m_ptText.x == -1)
-            rcText.left = rcIcon.Width() > 0 ? rcIcon.right + m_nItemHeight / 6 : rcCol.left;
+            rcText.left = rcIcon.Width() > 0 ? rcIcon.right + nItemHeight / 6 : rcCol.left;
         else
             rcText.left = rcCol.left + m_ptText.x;
 
@@ -715,7 +718,7 @@ int SListCtrl::GetColumnCount() const
 
 int SListCtrl::GetTopIndex() const
 {
-    return m_ptOrigin.y / m_nItemHeight;
+    return m_ptOrigin.y / m_nItemHeight.toPixelSize(GetScale());
 }
 
 void SListCtrl::NotifySelChange(int nOldSel, int nNewSel, BOOL checkBox)

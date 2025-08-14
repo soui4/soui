@@ -13,11 +13,8 @@
 
 #include <commdlg.h>
 #include <shlobj.h>
-
-#if (_WIN32_WINNT >= 0x0600) && !defined(_WIN32_WCE)
-#include <shobjidl.h>
-#endif // (_WIN32_WINNT >= 0x0600) && !defined(_WIN32_WCE)
-#include <core\SNativeWnd.h>
+#include <core/SNativeWnd.h>
+#include <atl.mini/SComCli.h>
 
 #ifndef _Post_writable_byte_size_
 #define _Post_writable_byte_size_(x)
@@ -89,7 +86,15 @@
 // Global functions:
 //   AtlTaskDialog()
 
-
+namespace SecureHelper{
+	static void strcat_x(LPTSTR pszDest, size_t cchDest, LPCTSTR pszSrc){
+		#ifdef _UNICODE
+			wcscat_s(pszDest, cchDest, pszSrc);
+		#else
+			strcat_s(pszDest, cchDest, pszSrc);
+		#endif
+	}
+}
 SNSBEGIN
 
 	///////////////////////////////////////////////////////////////////////////////
@@ -133,7 +138,7 @@ SNSBEGIN
 		return (!bRet || !((ovi.dwMajorVersion >= 5) || (ovi.dwMajorVersion == 4 && ovi.dwMinorVersion >= 90)));
 #endif // _versionhelpers_H_INCLUDED_
 	}
-#define ATLTRYALLOC(x) __pragma(warning(push)) __pragma(warning(disable: 4571)) try{x;} catch(...) {} __pragma(warning(pop))
+#define ATLTRYALLOC(x)   try{x;} catch(...) {} 
 #ifndef ATLTRY
 #define ATLTRY(x) ATLTRYALLOC(x)
 #endif	//ATLTRY
@@ -148,6 +153,7 @@ public: \
 #else
 #define _ATL_DECLSPEC_ALLOCATOR
 #endif
+#define ATLVERIFY(x)
 
 #define ATL_NOINLINE __declspec( noinline )
 	class CCRTAllocator
@@ -180,8 +186,8 @@ public: \
 		{
 		}
 
-#pragma warning(suppress: 4987)  // nonstandard extension used: 'throw(...)'
-		CTempBuffer(_In_ size_t nElements) throw(...) :
+#pragma warning(suppress: 4987)  // nonstandard extension used: ''
+		CTempBuffer(_In_ size_t nElements)  :
 			m_p(NULL)
 		{
 			Allocate(nElements);
@@ -205,14 +211,14 @@ public: \
 			return(m_p);
 		}
 
-#pragma warning(suppress: 4987)  // nonstandard extension used: 'throw(...)'
-		_Ret_maybenull_ _Post_writable_byte_size_(nElements * sizeof(T)) T* Allocate(_In_ size_t nElements) throw(...)
+#pragma warning(suppress: 4987)  // nonstandard extension used: ''
+		_Ret_maybenull_ _Post_writable_byte_size_(nElements * sizeof(T)) T* Allocate(_In_ size_t nElements) 
 		{
-			return(AllocateBytes(::ATL::AtlMultiplyThrow(nElements, sizeof(T))));
+			return(AllocateBytes(nElements *sizeof(T)));
 		}
 
-#pragma warning(suppress: 4987)  // nonstandard extension used: 'throw(...)'
-		_Ret_maybenull_ _Post_writable_byte_size_(nElements * sizeof(T)) T* Reallocate(_In_ size_t nElements) throw(...)
+#pragma warning(suppress: 4987)  // nonstandard extension used: ''
+		_Ret_maybenull_ _Post_writable_byte_size_(nElements * sizeof(T)) T* Reallocate(_In_ size_t nElements) 
 		{
 			ATLENSURE(nElements < size_t(-1) / sizeof(T));
 			size_t nNewSize = nElements * sizeof(T);
@@ -226,7 +232,7 @@ public: \
 				{
 					// We have to allocate from the heap and copy the contents into the new buffer
 					AllocateHeap(nNewSize);
-					Checked::memcpy_s(m_p, nNewSize, m_abFixedBuffer, t_nFixedBytes);
+					memcpy_s(m_p, nNewSize, m_abFixedBuffer, t_nFixedBytes);
 				}
 				else
 				{
@@ -237,7 +243,7 @@ public: \
 			{
 				if (m_p != reinterpret_cast<T*>(m_abFixedBuffer))
 				{
-					Checked::memcpy_s(m_abFixedBuffer, t_nFixedBytes, m_p, nNewSize);
+					memcpy_s(m_abFixedBuffer, t_nFixedBytes, m_p, nNewSize);
 					FreeHeap();
 				}
 				m_p = reinterpret_cast<T*>(m_abFixedBuffer);
@@ -275,10 +281,6 @@ public: \
 		ATL_NOINLINE void ReAllocateHeap(_In_ size_t nNewSize)
 		{
 			T* p = static_cast<T*>(Allocator::Reallocate(m_p, nNewSize));
-			if (p == NULL)
-			{
-				AtlThrow(E_OUTOFMEMORY);
-			}
 			m_p = p;
 		}
 
@@ -358,16 +360,14 @@ public: \
 			ATLASSERT(m_hWnd == NULL);
 
 			//ModuleHelper::AddCreateWndData(&m_thunk.cd, (ATL::CDialogImplBase*)this);
-			SNativeWndHelper::getSingletonPtr()->LockSharePtr(this);
-			m_pThunk = (tagThunk*)HeapAlloc(SNativeWndHelper::getSingletonPtr()->GetHeap(), HEAP_ZERO_MEMORY, sizeof(tagThunk));
+			SNativeWndHelper::instance()->LockSharePtr(this);
 			BOOL bRet;
 			if (m_bOpenFileDialog)
 				bRet = ::GetOpenFileName(&m_ofn);
 			else
 				bRet = ::GetSaveFileName(&m_ofn);
-			SNativeWndHelper::getSingletonPtr()->UnlockSharePtr();
+			SNativeWndHelper::instance()->UnlockSharePtr();
 			m_hWnd = NULL;
-			HeapFree(SNativeWndHelper::getSingletonPtr()->GetHeap(), 0, m_pThunk);
 			return bRet ? IDOK : IDCANCEL;
 		}
 		// Attributes
@@ -375,6 +375,13 @@ public: \
 		{
 			ATLASSERT(::IsWindow(m_hWnd));
 			return ::GetParent(m_hWnd);
+		}
+
+		void GetFilePath(SStringT &strPath) const {
+			int nLen = GetFilePath(NULL, 0);
+			TCHAR* buf = strPath.GetBuffer(nLen);
+			GetFilePath(buf, nLen);
+			strPath.ReleaseBuffer();
 		}
 
 		int GetFilePath(LPTSTR lpstrFilePath, int nLength) const
@@ -612,7 +619,7 @@ public: \
 			: CFileDialogImpl<T>(TRUE, lpszDefExt, lpszFileName, dwFlags, lpszFilter, hWndParent),
 			m_pNextFile(NULL)
 		{
-			m_ofn.Flags |= OFN_ALLOWMULTISELECT;   // Force multiple selection mode
+			CFileDialogImpl< T >::m_ofn.Flags |= OFN_ALLOWMULTISELECT;   // Force multiple selection mode
 
 #ifndef _UNICODE
 #ifdef _versionhelpers_H_INCLUDED_
@@ -629,15 +636,15 @@ public: \
 			{
 				// On NT platforms, GetOpenFileNameA thunks to GetOpenFileNameW and there 
 				// is absolutely nothing we can do except to start off with a large buffer.
-				ATLVERIFY(ResizeFilenameBuffer(_WTL_FIXED_OFN_BUFFER_LENGTH));
+				ResizeFilenameBuffer(_WTL_FIXED_OFN_BUFFER_LENGTH);
 			}
 #endif
 		}
 
 		~CMultiFileDialogImpl()
 		{
-			if (m_ofn.lpstrFile != m_szFileName)   // Free the buffer if we allocated it
-				delete[] m_ofn.lpstrFile;
+			if (CFileDialogImpl< T >::m_ofn.lpstrFile != CFileDialogImpl< T >::m_szFileName)   // Free the buffer if we allocated it
+				delete[] CFileDialogImpl< T >::m_ofn.lpstrFile;
 		}
 
 		// Operations
@@ -647,10 +654,10 @@ public: \
 			// If the function fails, the return value is zero.
 		int GetDirectory(LPTSTR pBuffer, int nBufLen) const
 		{
-			if (m_ofn.lpstrFile == NULL)
+			if (CFileDialogImpl< T >::m_ofn.lpstrFile == NULL)
 				return 0;
 
-			LPCTSTR pStr = m_ofn.lpstrFile;
+			LPCTSTR pStr = CFileDialogImpl< T >::m_ofn.lpstrFile;
 			int nLength = lstrlen(pStr);
 			if (pStr[nLength + 1] == 0)
 			{
@@ -692,12 +699,12 @@ public: \
 		// Get the first filename as a pointer into the buffer.
 		LPCTSTR GetFirstFileName() const
 		{
-			if (m_ofn.lpstrFile == NULL)
+			if (CFileDialogImpl< T >::m_ofn.lpstrFile == NULL)
 				return NULL;
 
 			m_pNextFile = NULL;   // Reset internal buffer pointer
 
-			LPCTSTR pStr = m_ofn.lpstrFile;
+			LPCTSTR pStr = CFileDialogImpl< T >::m_ofn.lpstrFile;
 			int nLength = lstrlen(pStr);
 			if (pStr[nLength + 1] != 0)
 			{
@@ -851,14 +858,14 @@ public: \
 		// Implementation
 		bool ResizeFilenameBuffer(DWORD dwLength)
 		{
-			if (dwLength > m_ofn.nMaxFile)
+			if (dwLength > CFileDialogImpl< T >::m_ofn.nMaxFile)
 			{
 				// Free the old buffer.
-				if (m_ofn.lpstrFile != m_szFileName)
+				if (CFileDialogImpl< T >::m_ofn.lpstrFile != CFileDialogImpl< T >::m_szFileName)
 				{
-					delete[] m_ofn.lpstrFile;
-					m_ofn.lpstrFile = NULL;
-					m_ofn.nMaxFile = 0;
+					delete[] CFileDialogImpl< T >::m_ofn.lpstrFile;
+					CFileDialogImpl< T >::m_ofn.lpstrFile = NULL;
+					CFileDialogImpl< T >::m_ofn.nMaxFile = 0;
 				}
 
 				// Allocate the new buffer.
@@ -866,13 +873,13 @@ public: \
 				ATLTRY(lpstrBuff = new TCHAR[dwLength]);
 				if (lpstrBuff != NULL)
 				{
-					m_ofn.lpstrFile = lpstrBuff;
-					m_ofn.lpstrFile[0] = 0;
-					m_ofn.nMaxFile = dwLength;
+					CFileDialogImpl< T >::m_ofn.lpstrFile = lpstrBuff;
+					CFileDialogImpl< T >::m_ofn.lpstrFile[0] = 0;
+					CFileDialogImpl< T >::m_ofn.nMaxFile = dwLength;
 				}
 			}
 
-			return (m_ofn.lpstrFile != NULL);
+			return (CFileDialogImpl< T >::m_ofn.lpstrFile != NULL);
 		}
 
 		void OnSelChange(LPOFNOTIFY /*lpon*/)
@@ -884,12 +891,12 @@ public: \
 #endif
 
 			// Get the buffer length required to hold the spec.
-			int nLength = GetSpec(NULL, 0);
+			int nLength = CFileDialogImpl< T >::GetSpec(NULL, 0);
 			if (nLength <= 1)
 				return; // no files are selected, presumably
 
 			// Add room for the directory, and an extra terminating zero.
-			nLength += GetFolderPath(NULL, 0) + 1;
+			nLength += CFileDialogImpl< T >::GetFolderPath(NULL, 0) + 1;
 
 			if (!ResizeFilenameBuffer(nLength))
 			{
@@ -898,22 +905,22 @@ public: \
 			}
 
 			// If we are not following links then our work is done.
-			if ((m_ofn.Flags & OFN_NODEREFERENCELINKS) != 0)
+			if ((CFileDialogImpl< T >::m_ofn.Flags & OFN_NODEREFERENCELINKS) != 0)
 				return;
 
 			// Get the file spec, which is the text in the edit control.
-			if (GetSpec(m_ofn.lpstrFile, m_ofn.nMaxFile) <= 0)
+			if (CFileDialogImpl< T >::GetSpec(CFileDialogImpl< T >::m_ofn.lpstrFile, CFileDialogImpl< T >::m_ofn.nMaxFile) <= 0)
 				return;
 
 			// Get the ID-list of the current folder.
-			int nBytes = GetFolderIDList(NULL, 0);
+			int nBytes = CFileDialogImpl< T >::GetFolderIDList(NULL, 0);
 #ifdef STRICT_TYPED_ITEMIDS
 			CTempBuffer<ITEMIDLIST_RELATIVE> idlist;
 #else
 			CTempBuffer<ITEMIDLIST> idlist;
 #endif
 			idlist.AllocateBytes(nBytes);
-			if ((nBytes <= 0) || (GetFolderIDList(idlist, nBytes) <= 0))
+			if ((nBytes <= 0) || (CFileDialogImpl< T >::GetFolderIDList(idlist, nBytes) <= 0))
 				return;
 
 			// First bind to the desktop folder, then to the current folder.
@@ -927,8 +934,8 @@ public: \
 			// we need to add enough extra buffer space to hold its target path.
 			DWORD nExtraChars = 0;
 			bool bInsideQuotes = false;
-			LPCTSTR pAnchor = m_ofn.lpstrFile;
-			LPCTSTR pChar = m_ofn.lpstrFile;
+			LPCTSTR pAnchor = CFileDialogImpl< T >::m_ofn.lpstrFile;
+			LPCTSTR pChar = CFileDialogImpl< T >::m_ofn.lpstrFile;
 			for (; *pChar; ++pChar)
 			{
 				// Look for quotation marks.
@@ -992,7 +999,7 @@ public: \
 
 			// If we need more space for shortcut targets, then reallocate.
 			if (nExtraChars > 0)
-				SASSERT(ResizeFilenameBuffer(m_ofn.nMaxFile + nExtraChars));
+				SASSERT(ResizeFilenameBuffer(CFileDialogImpl< T >::m_ofn.nMaxFile + nExtraChars));
 		}
 	};
 
@@ -1071,7 +1078,7 @@ public: \
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg != NULL);
 
-			ATL::CComPtr<IShellItem> spItem;
+			SComPtr<IShellItem> spItem;
 			HRESULT hRet = pT->m_spFileDlg->GetResult(&spItem);
 
 			if (SUCCEEDED(hRet))
@@ -1085,7 +1092,7 @@ public: \
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg != NULL);
 
-			ATL::CComPtr<IShellItem> spItem;
+			SComPtr<IShellItem> spItem;
 			HRESULT hRet = pT->m_spFileDlg->GetResult(&spItem);
 
 			if (SUCCEEDED(hRet))
@@ -1095,7 +1102,7 @@ public: \
 		}
 
 
-		HRESULT GetFilePath(SStringT& strFilePath)
+		HRESULT GetFilePath(SStringW& strFilePath)
 		{
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg != NULL);
@@ -1109,12 +1116,12 @@ public: \
 			return hRet;
 		}
 
-		HRESULT GetFileTitle(SStringT& strFileTitle)
+		HRESULT GetFileTitle(SStringW& strFileTitle)
 		{
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg != NULL);
 
-			ATL::CComPtr<IShellItem> spItem;
+			SComPtr<IShellItem> spItem;
 			HRESULT hRet = pT->m_spFileDlg->GetResult(&spItem);
 
 			if (SUCCEEDED(hRet))
@@ -1150,7 +1157,7 @@ public: \
 		}
 
 
-		static HRESULT GetFileNameFromShellItem(IShellItem* pShellItem, SIGDN type, SStringT& str)
+		static HRESULT GetFileNameFromShellItem(IShellItem* pShellItem, SIGDN type, SStringW& str)
 		{
 			ATLASSERT(pShellItem != NULL);
 
@@ -1240,7 +1247,7 @@ public: \
 		}
 
 		// Implementation - IFileDialogEvents interface
-		virtual HRESULT STDMETHODCALLTYPE IFileDialogEvents::OnFileOk(IFileDialog* pfd)
+		virtual HRESULT STDMETHODCALLTYPE OnFileOk(IFileDialog* pfd)
 		{
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg.IsEqualObject(pfd));
@@ -1248,7 +1255,7 @@ public: \
 			return pT->OnFileOk();
 		}
 
-		virtual HRESULT STDMETHODCALLTYPE IFileDialogEvents::OnFolderChanging(IFileDialog* pfd, IShellItem* psiFolder)
+		virtual HRESULT STDMETHODCALLTYPE OnFolderChanging(IFileDialog* pfd, IShellItem* psiFolder)
 		{
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg.IsEqualObject(pfd));
@@ -1256,7 +1263,7 @@ public: \
 			return pT->OnFolderChanging(psiFolder);
 		}
 
-		virtual HRESULT STDMETHODCALLTYPE IFileDialogEvents::OnFolderChange(IFileDialog* pfd)
+		virtual HRESULT STDMETHODCALLTYPE OnFolderChange(IFileDialog* pfd)
 		{
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg.IsEqualObject(pfd));
@@ -1264,7 +1271,7 @@ public: \
 			return pT->OnFolderChange();
 		}
 
-		virtual HRESULT STDMETHODCALLTYPE IFileDialogEvents::OnSelectionChange(IFileDialog* pfd)
+		virtual HRESULT STDMETHODCALLTYPE OnSelectionChange(IFileDialog* pfd)
 		{
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg.IsEqualObject(pfd));
@@ -1272,7 +1279,7 @@ public: \
 			return pT->OnSelectionChange();
 		}
 
-		virtual HRESULT STDMETHODCALLTYPE IFileDialogEvents::OnShareViolation(IFileDialog* pfd, IShellItem* psi, FDE_SHAREVIOLATION_RESPONSE* pResponse)
+		virtual HRESULT STDMETHODCALLTYPE OnShareViolation(IFileDialog* pfd, IShellItem* psi, FDE_SHAREVIOLATION_RESPONSE* pResponse)
 		{
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg.IsEqualObject(pfd));
@@ -1280,7 +1287,7 @@ public: \
 			return pT->OnShareViolation(psi, pResponse);
 		}
 
-		virtual HRESULT STDMETHODCALLTYPE IFileDialogEvents::OnTypeChange(IFileDialog* pfd)
+		virtual HRESULT STDMETHODCALLTYPE OnTypeChange(IFileDialog* pfd)
 		{
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg.IsEqualObject(pfd));
@@ -1288,7 +1295,7 @@ public: \
 			return pT->OnTypeChange();
 		}
 
-		virtual HRESULT STDMETHODCALLTYPE IFileDialogEvents::OnOverwrite(IFileDialog* pfd, IShellItem* psi, FDE_OVERWRITE_RESPONSE* pResponse)
+		virtual HRESULT STDMETHODCALLTYPE OnOverwrite(IFileDialog* pfd, IShellItem* psi, FDE_OVERWRITE_RESPONSE* pResponse)
 		{
 			T* pT = static_cast<T*>(this);
 			ATLASSERT(pT->m_spFileDlg.IsEqualObject(pfd));
@@ -1333,7 +1340,39 @@ public: \
 		}
 	};
 
+	class ATL_NO_VTABLE CShellFileDialog : public CShellFileDialogImpl< CShellFileDialog> {
+	public:
+		SComPtr<IFileDialog> m_spFileDlg;
 
+	public:
+		CShellFileDialog(bool bSave, LPCWSTR lpszFileName = NULL,
+			DWORD dwOptions = FOS_FORCEFILESYSTEM | FOS_PATHMUSTEXIST | FOS_FILEMUSTEXIST,
+			LPCWSTR lpszDefExt = NULL,
+			const COMDLG_FILTERSPEC* arrFilterSpec = NULL,
+			UINT uFilterSpecCount = 0U) {
+			HRESULT hRet = 0;
+			if (bSave) {
+				hRet = m_spFileDlg.CoCreateInstance(CLSID_FileSaveDialog);
+			}
+			else {
+				hRet = m_spFileDlg.CoCreateInstance(CLSID_FileOpenDialog);
+			}
+			if (SUCCEEDED(hRet)) {
+				CShellFileDialogImpl< CShellFileDialog>::_Init(lpszFileName, dwOptions, lpszDefExt, arrFilterSpec, uFilterSpecCount);
+			}
+		}
+	public:
+		IFileDialog* GetPtr()
+		{
+			return m_spFileDlg;
+		}
+		// Implementation (remove _Advise/_Unadvise code using template magic)
+		void _Advise(DWORD& /*dwCookie*/)
+		{ }
+
+		void _Unadvise(DWORD /*dwCookie*/)
+		{ }
+	};
 	///////////////////////////////////////////////////////////////////////////////
 	// CShellFileOpenDialogImpl - implements new Shell File Open dialog
 
@@ -1352,7 +1391,7 @@ public: \
 			HRESULT hRet = m_spFileDlg.CoCreateInstance(CLSID_FileOpenDialog);
 
 			if (SUCCEEDED(hRet))
-				_Init(lpszFileName, dwOptions, lpszDefExt, arrFilterSpec, uFilterSpecCount);
+				CShellFileDialogImpl<T>::_Init(lpszFileName, dwOptions, lpszDefExt, arrFilterSpec, uFilterSpecCount);
 		}
 
 		IFileOpenDialog* GetPtr()
@@ -1402,7 +1441,7 @@ public: \
 			HRESULT hRet = m_spFileDlg.CoCreateInstance(CLSID_FileSaveDialog);
 
 			if (SUCCEEDED(hRet))
-				_Init(lpszFileName, dwOptions, lpszDefExt, arrFilterSpec, uFilterSpecCount);
+				CShellFileDialogImpl< T >::_Init(lpszFileName, dwOptions, lpszDefExt, arrFilterSpec, uFilterSpecCount);
 		}
 
 		IFileSaveDialog* GetPtr()
@@ -1676,9 +1715,8 @@ public: \
 			const UINT BFFM_SETOKTEXT = WM_USER + 105;
 #endif
 			ATLASSERT(m_hWnd != NULL);
-			USES_CONVERSION;
-			LPCWSTR lpstr = T2CW(lpstrOKText);
-			::SendMessage(m_hWnd, BFFM_SETOKTEXT, 0, (LPARAM)lpstr);
+			SStringW str = S_CT2W(lpstrOKText);
+			::SendMessage(m_hWnd, BFFM_SETOKTEXT, 0, (LPARAM)str.c_str());
 		}
 
 		void SetExpanded(LPCITEMIDLIST pItemIDList)
@@ -1709,83 +1747,6 @@ public: \
 			: CFolderDialogImpl<CFolderDialog>(hWndParent, lpstrTitle, uFlags)
 		{ }
 	};
-	//这是一个用法示例，此在文件夹对话框上添加一个包括子目录的check;
-	class fun
-	{
-	public:
-		virtual void IncludeChildDir(bool) = NULL;
-	};
-
-	class CWindowImpl:public SNativeWnd
-	{
-	protected:
-		fun* m_pHostWnd;
-
-		void OnLButtonUp(UINT nFlags, CPoint point)
-		{
-			LRESULT r = SendMessage(BM_GETCHECK, 0, 0);
-			if (r == BST_CHECKED)//被选中//BM_SETCHECK  
-			{
-				SendMessage(BM_SETCHECK, BST_UNCHECKED, 0);
-				m_pHostWnd->IncludeChildDir(false);
-			}
-			else if (r == BST_UNCHECKED)//不被选中 
-			{
-				SendMessage(BM_SETCHECK, BST_CHECKED, 0);
-				m_pHostWnd->IncludeChildDir(true);
-			}
-			SetMsgHandled(FALSE);
-		}
-		virtual void OnFinalMessage(HWND hWnd)
-		{
-			__super::OnFinalMessage(hWnd);
-			delete this;
-		}
-	public:
-		CWindowImpl(fun* pHostWnd) :m_pHostWnd(pHostWnd) {}
-		HWND Create(LPCTSTR lpClassName,LPCTSTR lpWindowName,DWORD dwStyle,int x,int y,int nWidth,int nHeight,HWND hWndParent,HMENU hMenu,HINSTANCE hInstance,LPVOID lpParam=NULL)
-		{	
-			HWND hWnd = ::CreateWindow(lpClassName,lpWindowName,dwStyle,x,y,nWidth,nHeight,hWndParent,hMenu,hInstance,lpParam);
-			SubclassWindow(hWnd);
-			return hWnd;
-		}
-		BEGIN_MSG_MAP_EX(CWindowImpl)
-			MSG_WM_LBUTTONUP(OnLButtonUp)
-			CHAIN_MSG_MAP(SNativeWnd)
-		END_MSG_MAP()
-	};
-
-	class SFolderDialogTest :public CFolderDialogImpl<SFolderDialogTest>,public fun
-	{
-		CWindowImpl *m_pSCheckBtn;
-		bool m_bIncludeChildDir;
-	public:
-		SFolderDialogTest(HWND hWndParent = NULL, LPCTSTR lpstrTitle = NULL,bool bIncludeChildDir=false, UINT uFlags = BIF_RETURNONLYFSDIRS)
-			: CFolderDialogImpl<SFolderDialogTest>(hWndParent, lpstrTitle, uFlags), m_pSCheckBtn(NULL),m_bIncludeChildDir(bIncludeChildDir)
-		{ }
-		
-		virtual void IncludeChildDir(bool bCheck)
-		{
-			m_bIncludeChildDir = bCheck;
-		}
-		bool IsIncludeChildDir()const
-		{
-			return m_bIncludeChildDir;
-		}
-		void OnInitialized()
-		{			
-			CRect rc;
-			::GetClientRect(m_hWnd, &rc);
-			HFONT hFont = CreateFont(-12, 0, 0, 0, 0, 0, 0, 0, GB2312_CHARSET, OUT_DEFAULT_PRECIS, CLIP_DEFAULT_PRECIS, DEFAULT_QUALITY, DEFAULT_PITCH | FF_DONTCARE, L"宋体");
-			m_pSCheckBtn=new CWindowImpl(this);
-			HWND hWnd = m_pSCheckBtn->Create(L"BUTTON", L"包括子目录", WS_CHILD | BS_CHECKBOX, 20, rc.bottom - 50, 100, 30, m_hWnd,NULL,SApplication::getSingleton().GetModule());
-			m_pSCheckBtn->SendMessage(WM_SETFONT, (WPARAM)hFont, 0);
-			m_pSCheckBtn->SendMessage(BM_SETCHECK,m_bIncludeChildDir?BST_CHECKED: BST_UNCHECKED, 0);			
-			m_pSCheckBtn->ShowWindow(TRUE);
-		}
-	};
-
-
 
 	///////////////////////////////////////////////////////////////////////////////
 	// CCommonDialogImplBase - base class for common dialog classes
@@ -1797,7 +1758,7 @@ public: \
 		{
 			if (uMsg != WM_INITDIALOG)
 				return 0;
-			CCommonDialogImplBase* pT = (CCommonDialogImplBase*)SNativeWndHelper::getSingletonPtr()->GetSharePtr();
+			CCommonDialogImplBase* pT = (CCommonDialogImplBase*)SNativeWndHelper::instance()->GetSharePtr();
 			ATLASSERT(pT != NULL);
 			ATLASSERT(pT->m_hWnd == NULL);
 			ATLASSERT(::IsWindow(hWnd));
@@ -1887,9 +1848,9 @@ public: \
 
 
 			//ModuleHelper::AddCreateWndData(&m_thunk.cd, (CCommonDialogImplBase*)this);
-			SNativeWndHelper::getSingletonPtr()->LockSharePtr(this);
+			SNativeWndHelper::instance()->LockSharePtr(this);
 			BOOL bRet = ::ChooseFont(&m_cf);
-			SNativeWndHelper::getSingletonPtr()->UnlockSharePtr();
+			SNativeWndHelper::instance()->UnlockSharePtr();
 			m_hWnd = NULL;
 
 			if (bRet)   // copy logical font from user's initialization buffer (if needed)
@@ -2022,52 +1983,51 @@ public: \
 			HWND hWndParent = NULL)
 			: CFontDialogImpl< T >(NULL, dwFlags, hDCPrinter, hWndParent)
 		{
-			m_cf.Flags |= CF_INITTOLOGFONTSTRUCT;
-			m_cf.Flags |= FillInLogFont(charformat);
-			m_cf.lpLogFont = &m_lf;
+			CFontDialogImpl< T >::m_cf.Flags |= CF_INITTOLOGFONTSTRUCT;
+			CFontDialogImpl< T >::m_cf.Flags |= FillInLogFont(charformat);
 
 			if ((charformat.dwMask & CFM_COLOR) != 0)
-				m_cf.rgbColors = charformat.crTextColor;
+				CFontDialogImpl< T >::m_cf.rgbColors = charformat.crTextColor;
 		}
 
 		void GetCharFormat(CHARFORMAT& cf) const
 		{
 			cf.dwEffects = 0;
 			cf.dwMask = 0;
-			if ((m_cf.Flags & CF_NOSTYLESEL) == 0)
+			if ((CFontDialogImpl< T >::m_cf.Flags & CF_NOSTYLESEL) == 0)
 			{
 				cf.dwMask |= CFM_BOLD | CFM_ITALIC;
-				cf.dwEffects |= IsBold() ? CFE_BOLD : 0;
-				cf.dwEffects |= IsItalic() ? CFE_ITALIC : 0;
+				cf.dwEffects |= CFontDialogImpl< T >::IsBold() ? CFE_BOLD : 0;
+				cf.dwEffects |= CFontDialogImpl< T >::IsItalic() ? CFE_ITALIC : 0;
 			}
-			if ((m_cf.Flags & CF_NOSIZESEL) == 0)
+			if ((CFontDialogImpl< T >::m_cf.Flags & CF_NOSIZESEL) == 0)
 			{
 				cf.dwMask |= CFM_SIZE;
 				// GetSize() returns in tenths of points so mulitply by 2 to get twips
-				cf.yHeight = GetSize() * 2;
+				cf.yHeight = CFontDialogImpl< T >::GetSize() * 2;
 			}
 
-			if ((m_cf.Flags & CF_NOFACESEL) == 0)
+			if ((CFontDialogImpl< T >::m_cf.Flags & CF_NOFACESEL) == 0)
 			{
 				cf.dwMask |= CFM_FACE;
-				cf.bPitchAndFamily = m_cf.lpLogFont->lfPitchAndFamily;
+				cf.bPitchAndFamily = CFontDialogImpl< T >::m_cf.lpLogFont->lfPitchAndFamily;
 #if (_RICHEDIT_VER >= 0x0200)
-				_tcscpy_s(cf.szFaceName, _countof(cf.szFaceName), GetFaceName());
+				_tcscpy_s(cf.szFaceName, _countof(cf.szFaceName), CFontDialogImpl< T >::GetFaceName());
 #else // !(_RICHEDIT_VER >= 0x0200)
 #error  不支持richedit2.0之前的版本
 #endif // !(_RICHEDIT_VER >= 0x0200)
 			}
 
-			if ((m_cf.Flags & CF_EFFECTS) != 0)
+			if ((CFontDialogImpl< T >::m_cf.Flags & CF_EFFECTS) != 0)
 			{
 				cf.dwMask |= CFM_UNDERLINE | CFM_STRIKEOUT | CFM_COLOR;
-				cf.dwEffects |= IsUnderline() ? CFE_UNDERLINE : 0;
-				cf.dwEffects |= IsStrikeOut() ? CFE_STRIKEOUT : 0;
-				cf.crTextColor = GetColor();
+				cf.dwEffects |= CFontDialogImpl< T >::IsUnderline() ? CFE_UNDERLINE : 0;
+				cf.dwEffects |= CFontDialogImpl< T >::IsStrikeOut() ? CFE_STRIKEOUT : 0;
+				cf.crTextColor = CFontDialogImpl< T >::GetColor();
 			}
-			if ((m_cf.Flags & CF_NOSCRIPTSEL) == 0)
+			if ((CFontDialogImpl< T >::m_cf.Flags & CF_NOSCRIPTSEL) == 0)
 			{
-				cf.bCharSet = m_cf.lpLogFont->lfCharSet;
+				cf.bCharSet = CFontDialogImpl< T >::m_cf.lpLogFont->lfCharSet;
 				cf.dwMask |= CFM_CHARSET;
 			}
 			cf.yOffset = 0;
@@ -2080,59 +2040,59 @@ public: \
 			{
 				HDC hDC = ::CreateDC(_T("DISPLAY"), NULL, NULL, NULL);
 				LONG yPerInch = ::GetDeviceCaps(hDC, LOGPIXELSY);
-				m_lf.lfHeight = -(int)((cf.yHeight * yPerInch) / 1440);
+				CFontDialogImpl< T >::m_lf.lfHeight = -(int)((cf.yHeight * yPerInch) / 1440);
 			}
 			else
-				m_lf.lfHeight = 0;
+				CFontDialogImpl< T >::m_lf.lfHeight = 0;
 
-			m_lf.lfWidth = 0;
-			m_lf.lfEscapement = 0;
-			m_lf.lfOrientation = 0;
+			CFontDialogImpl< T >::m_lf.lfWidth = 0;
+			CFontDialogImpl< T >::m_lf.lfEscapement = 0;
+			CFontDialogImpl< T >::m_lf.lfOrientation = 0;
 
 			if ((cf.dwMask & (CFM_ITALIC | CFM_BOLD)) == (CFM_ITALIC | CFM_BOLD))
 			{
-				m_lf.lfWeight = ((cf.dwEffects & CFE_BOLD) != 0) ? FW_BOLD : FW_NORMAL;
-				m_lf.lfItalic = (BYTE)(((cf.dwEffects & CFE_ITALIC) != 0) ? TRUE : FALSE);
+				CFontDialogImpl< T >::m_lf.lfWeight = ((cf.dwEffects & CFE_BOLD) != 0) ? FW_BOLD : FW_NORMAL;
+				CFontDialogImpl< T >::m_lf.lfItalic = (BYTE)(((cf.dwEffects & CFE_ITALIC) != 0) ? TRUE : FALSE);
 			}
 			else
 			{
 				dwFlags |= CF_NOSTYLESEL;
-				m_lf.lfWeight = FW_DONTCARE;
-				m_lf.lfItalic = FALSE;
+				CFontDialogImpl< T >::m_lf.lfWeight = FW_DONTCARE;
+				CFontDialogImpl< T >::m_lf.lfItalic = FALSE;
 			}
 
 			if ((cf.dwMask & (CFM_UNDERLINE | CFM_STRIKEOUT | CFM_COLOR)) == (CFM_UNDERLINE | CFM_STRIKEOUT | CFM_COLOR))
 			{
 				dwFlags |= CF_EFFECTS;
-				m_lf.lfUnderline = (BYTE)(((cf.dwEffects & CFE_UNDERLINE) != 0) ? TRUE : FALSE);
-				m_lf.lfStrikeOut = (BYTE)(((cf.dwEffects & CFE_STRIKEOUT) != 0) ? TRUE : FALSE);
+				CFontDialogImpl< T >::m_lf.lfUnderline = (BYTE)(((cf.dwEffects & CFE_UNDERLINE) != 0) ? TRUE : FALSE);
+				CFontDialogImpl< T >::m_lf.lfStrikeOut = (BYTE)(((cf.dwEffects & CFE_STRIKEOUT) != 0) ? TRUE : FALSE);
 			}
 			else
 			{
-				m_lf.lfUnderline = (BYTE)FALSE;
-				m_lf.lfStrikeOut = (BYTE)FALSE;
+				CFontDialogImpl< T >::m_lf.lfUnderline = (BYTE)FALSE;
+				CFontDialogImpl< T >::m_lf.lfStrikeOut = (BYTE)FALSE;
 			}
 
 			if ((cf.dwMask & CFM_CHARSET) != 0)
-				m_lf.lfCharSet = cf.bCharSet;
+				CFontDialogImpl< T >::m_lf.lfCharSet = cf.bCharSet;
 			else
 				dwFlags |= CF_NOSCRIPTSEL;
-			m_lf.lfOutPrecision = OUT_DEFAULT_PRECIS;
-			m_lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
-			m_lf.lfQuality = DEFAULT_QUALITY;
+			CFontDialogImpl< T >::m_lf.lfOutPrecision = OUT_DEFAULT_PRECIS;
+			CFontDialogImpl< T >::m_lf.lfClipPrecision = CLIP_DEFAULT_PRECIS;
+			CFontDialogImpl< T >::m_lf.lfQuality = DEFAULT_QUALITY;
 			if ((cf.dwMask & CFM_FACE) != 0)
 			{
-				m_lf.lfPitchAndFamily = cf.bPitchAndFamily;
+				CFontDialogImpl< T >::m_lf.lfPitchAndFamily = cf.bPitchAndFamily;
 #if (_RICHEDIT_VER >= 0x0200)
-				_tcscpy_s(m_lf.lfFaceName, _countof(m_lf.lfFaceName), cf.szFaceName);
+				_tcscpy_s(CFontDialogImpl< T >::m_lf.lfFaceName, _countof(CFontDialogImpl< T >::m_lf.lfFaceName), cf.szFaceName);
 #else // !(_RICHEDIT_VER >= 0x0200)
 				_tcscpy_s(m_lf.lfFaceName, _countof(m_lf.lfFaceName), A2T((LPSTR)cf.szFaceName));
 #endif // !(_RICHEDIT_VER >= 0x0200)
 			}
 			else
 			{
-				m_lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
-				m_lf.lfFaceName[0] = (TCHAR)0;
+				CFontDialogImpl< T >::m_lf.lfPitchAndFamily = DEFAULT_PITCH | FF_DONTCARE;
+				CFontDialogImpl< T >::m_lf.lfFaceName[0] = (TCHAR)0;
 			}
 			return dwFlags;
 		}
@@ -2192,10 +2152,10 @@ public: \
 
 			ATLASSERT(m_hWnd == NULL);
 
-			SNativeWndHelper::getSingletonPtr()->LockSharePtr(this);
+			SNativeWndHelper::instance()->LockSharePtr(this);
 
 			BOOL bRet = ::ChooseColor(&m_cc);
-			SNativeWndHelper::getSingletonPtr()->UnlockSharePtr();
+			SNativeWndHelper::instance()->UnlockSharePtr();
 			m_hWnd = NULL;
 
 			return bRet ? IDOK : IDCANCEL;
@@ -2225,7 +2185,7 @@ public: \
 
 			if (uMsg == WM_INITDIALOG)
 			{
-				pT = (CCommonDialogImplBase*)SNativeWndHelper::getSingletonPtr()->GetSharePtr();
+				pT = (CCommonDialogImplBase*)SNativeWndHelper::instance()->GetSharePtr();
 				lpCC->lCustData = (LPARAM)pT;
 				ATLASSERT(pT != NULL);
 				ATLASSERT(pT->m_hWnd == NULL);
@@ -2412,9 +2372,9 @@ public: \
 
 			ATLASSERT(m_hWnd == NULL);
 
-			SNativeWndHelper::getSingletonPtr()->LockSharePtr(this);
+			SNativeWndHelper::instance()->LockSharePtr(this);
 			BOOL bRet = ::PrintDlg(&m_pd);
-			SNativeWndHelper::getSingletonPtr()->UnlockSharePtr();
+			SNativeWndHelper::instance()->UnlockSharePtr();
 			m_hWnd = NULL;
 			return bRet ? IDOK : IDCANCEL;
 		}

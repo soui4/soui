@@ -202,7 +202,7 @@ class SOUI_EXP SComboBase
      * @param bRawText Whether to get raw text
      * @return Window text
      */
-    SStringT GetWindowText(BOOL bRawText = FALSE) OVERRIDE;
+    SStringT GetWindowText(BOOL bRawText = FALSE) SCONST OVERRIDE;
 
     /**
      * @brief Get the text of a list box item
@@ -210,7 +210,7 @@ class SOUI_EXP SComboBase
      * @param bRawText Whether to get raw text
      * @return Item text
      */
-    SStringT GetLBText(int iItem, BOOL bRawText = FALSE);
+    SStringT GetLBText(int iItem, BOOL bRawText = FALSE) SCONST;
 
   protected:
     /**

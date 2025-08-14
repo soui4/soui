@@ -660,7 +660,7 @@ void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     *psz = szRet;
 }
 
-SStringT SComboBase::GetWindowText(BOOL bRawText /*=TRUE*/)
+SStringT SComboBase::GetWindowText(BOOL bRawText /*=TRUE*/) const
 {
     if (!m_bDropdown)
     {
@@ -760,7 +760,7 @@ void SComboBase::SetFocus()
         __baseCls::SetFocus();
 }
 
-SStringT SComboBase::GetLBText(int iItem, BOOL bRawText /*= FALSE*/)
+SStringT SComboBase::GetLBText(int iItem, BOOL bRawText /*= FALSE*/) const
 {
     SStringT str;
     GetItemText(iItem, bRawText, &str);
