@@ -455,8 +455,8 @@ class SOUI_EXP SListCtrl : public SPanel {
     BOOL HitCheckBox(const CPoint &pt);
 
   protected:
-    int m_nHeaderHeight; /**< Height of the header */
-    int m_nItemHeight;   /**< Height of the items */
+    SLayoutSize m_nHeaderHeight; /**< Height of the header */
+    SLayoutSize m_nItemHeight;   /**< Height of the items */
 
     int m_nSelectItem; /**< Index of the selected item */
     int m_nHoverItem;  /**< Index of the item under the mouse */
@@ -487,8 +487,8 @@ class SOUI_EXP SListCtrl : public SPanel {
 
   protected:
     SOUI_ATTRS_BEGIN()
-        ATTR_INT(L"headerHeight", m_nHeaderHeight, FALSE)
-        ATTR_INT(L"itemHeight", m_nItemHeight, FALSE)
+        ATTR_LAYOUTSIZE(L"headerHeight", m_nHeaderHeight, FALSE)
+        ATTR_LAYOUTSIZE(L"itemHeight", m_nItemHeight, FALSE)
         ATTR_BOOL(L"checkBox", m_bCheckBox, TRUE)
         ATTR_BOOL(L"multiSelection", m_bMultiSelection, TRUE)
         ATTR_SKIN(L"itemSkin", m_pItemSkin, TRUE)
