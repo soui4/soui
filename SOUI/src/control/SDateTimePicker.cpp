@@ -397,7 +397,7 @@ void SDateTimePicker::GetTime(WORD *wYear, WORD *wMonth, WORD *wDay, WORD *wHour
         *wSecond = m_sysTime.wSecond;
 }
 
-SStringT SDateTimePicker::GetWindowText(BOOL bRawText)
+SStringT SDateTimePicker::GetWindowText(BOOL bRawText) const
 {
     (bRawText);
     SStringT szText;

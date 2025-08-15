@@ -710,9 +710,9 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param bRawText BOOL--获取翻译前文本标志
      * @return int--复制的文本长度，pBuf为NULL时返回总缓冲区长度
      */
-    STDMETHOD_(int, GetWindowText)(THIS_ TCHAR * pBuf, int nBufLen, BOOL bRawText) PURE;
+    STDMETHOD_(int, GetWindowText)(THIS_ TCHAR * pBuf, int nBufLen, BOOL bRawText) SCONST PURE;
 
-    STDMETHOD_(int, GetWindowTextU8)(THIS_ IStringA * pStr, BOOL bRawText) PURE;
+    STDMETHOD_(int, GetWindowTextU8)(THIS_ IStringA * pStr, BOOL bRawText) SCONST PURE;
 
     /**
      * @brief 获取窗口状态

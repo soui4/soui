@@ -83,7 +83,7 @@ class SOUI_EXP SAccelerator : public IAccelerator {
      *
      * @details  Converts the accelerator key into a human-readable string format.
      */
-    SStringT FormatHotkey();
+    SStringT FormatHotkey() const;
 
     /**
      * @brief    Converts a string to a virtual key code

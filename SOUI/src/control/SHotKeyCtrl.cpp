@@ -213,7 +213,7 @@ void SHotKeyCtrl::GetHotKey(WORD *wKey, WORD *wModifers) const
         *wModifers = m_wModifier;
 }
 
-SStringT SHotKeyCtrl::GetWindowText(BOOL bRawText)
+SStringT SHotKeyCtrl::GetWindowText(BOOL bRawText) const
 {
     return FormatHotkey();
 }

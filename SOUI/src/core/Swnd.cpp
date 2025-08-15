@@ -247,12 +247,12 @@ CRect SWindow::GetClientRect() const
     return rc;
 }
 
-SStringT SWindow::GetWindowText(BOOL bRawText /*=FALSE*/)
+SStringT SWindow::GetWindowText(BOOL bRawText /*=FALSE*/) const
 {
     return m_strText.GetText(bRawText);
 }
 
-int SWindow::GetWindowTextU8(THIS_ IStringA *pStr, BOOL bRawText)
+int SWindow::GetWindowTextU8(THIS_ IStringA *pStr, BOOL bRawText) const
 {
     SStringT strText = GetWindowText(bRawText);
     SStringA strA = S_CT2A(strText, CP_UTF8);
@@ -260,7 +260,7 @@ int SWindow::GetWindowTextU8(THIS_ IStringA *pStr, BOOL bRawText)
     return pStr->GetLength();
 }
 
-int SWindow::GetWindowText(TCHAR *pBuf, int nBufLen, BOOL bRawText)
+int SWindow::GetWindowText(TCHAR *pBuf, int nBufLen, BOOL bRawText) const
 {
     SStringT str = GetWindowText(bRawText);
     if (!pBuf)

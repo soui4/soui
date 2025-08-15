@@ -25,7 +25,7 @@ SAccelerator::~SAccelerator(void)
 {
 }
 
-SStringT SAccelerator::FormatHotkey()
+SStringT SAccelerator::FormatHotkey() const
 {
     return FormatAccelKey(MAKELONG(m_wVK, m_wModifier));
 }

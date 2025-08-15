@@ -940,7 +940,7 @@ class SOUI_EXP SWindow
      * @param bRawText Flag to indicate if raw text should be retrieved.
      * @return Length of the text copied to the buffer.
      */
-    STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) OVERRIDE;
+    STDMETHOD_(int, GetWindowText)(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) SCONST OVERRIDE;
 
     /**
      * @brief Retrieves the window text as a UTF-8 string.
@@ -948,7 +948,7 @@ class SOUI_EXP SWindow
      * @param bRawText Flag to indicate if raw text should be retrieved.
      * @return Length of the text copied to the string object.
      */
-    STDMETHOD_(int, GetWindowTextU8)(THIS_ IStringA *pStr, BOOL bRawText) OVERRIDE;
+    STDMETHOD_(int, GetWindowTextU8)(THIS_ IStringA *pStr, BOOL bRawText) SCONST OVERRIDE;
 
     /**
      * @brief Sets the event mute state.
@@ -1275,7 +1275,7 @@ class SOUI_EXP SWindow
      * @param bRawText Flag indicating whether to retrieve raw text.
      * @return SStringT Window text as a string.
      */
-    virtual SStringT GetWindowText(BOOL bRawText = FALSE);
+    virtual SStringT GetWindowText(BOOL bRawText = FALSE) SCONST;
 
     /**
      * @brief Retrieves the tooltip text of the window.

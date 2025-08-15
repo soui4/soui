@@ -4,6 +4,7 @@
 #include "helper/SMenu.h"
 #include "helper/SplitString.h"
 #include "helper/SAutoBuf.h"
+#include "string/tstring.h"
 #include <gdialpha.h>
 #include <helper/STimer.h>
 
@@ -1950,7 +1951,7 @@ void SRichEdit::SetWindowText(LPCTSTR lpszText)
     Invalidate();
 }
 
-int SRichEdit::GetWindowText(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText)
+int SRichEdit::GetWindowText(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText) const
 {
     if (!pBuf)
     {
@@ -1966,25 +1967,33 @@ int SRichEdit::GetWindowText(THIS_ TCHAR *pBuf, int nBufLen, BOOL bRawText)
     return str.GetLength();
 }
 
-SStringT SRichEdit::GetWindowText(BOOL bRawText)
+SStringT SRichEdit::GetWindowText(BOOL bRawText) const
 {
-    (bRawText);
     SStringW strRet;
-    int nLen = GetWindowTextLength();
-    wchar_t *pBuf = strRet.GetBufferSetLength(nLen);
-    SSendMessage(WM_GETTEXT, (WPARAM)nLen + 1, (LPARAM)pBuf);
-    strRet.ReleaseBuffer();
+    if (m_pTxtHost)
+    {
+        LRESULT nLen = 0;
+        m_pTxtHost->GetTextService()->TxSendMessage(WM_GETTEXTLENGTH, 0, 0, &nLen);
+        wchar_t *pBuf = strRet.GetBufferSetLength(nLen);
+        m_pTxtHost->GetTextService()->TxSendMessage(WM_GETTEXT, (WPARAM)nLen + 1, (LPARAM)pBuf,NULL);
+        strRet.ReleaseBuffer();
+    }
     return S_CW2T(strRet);
 }
 
 int SRichEdit::GetWindowTextLength() const
 {
+    #ifdef _UNICODE
     LRESULT lResult = 0;
     if (m_pTxtHost)
     {
         m_pTxtHost->GetTextService()->TxSendMessage(WM_GETTEXTLENGTH, 0, 0, &lResult);
     }
     return (int)lResult;
+    #else
+    SStringT strRet=GetWindowText(TRUE);
+    return strRet.GetLength();
+    #endif//_UNICODE
 }
 
 void SRichEdit::ReplaceSel(LPCTSTR pszText, BOOL bCanUndo)
