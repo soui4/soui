@@ -194,7 +194,9 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
     template <class T>
     BOOL TplUnregisterFactory()
     {
-        return UnregisterFactory(ObjInfo_New(T::GetClassName(), T::GetClassType()));
+        SObjectInfo info;
+        ObjInfo_New(&info, T::GetClassName(), T::GetClassType());
+        return UnregisterFactory(info);
     }
 
   protected:
