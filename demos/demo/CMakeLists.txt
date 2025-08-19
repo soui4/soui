@@ -182,7 +182,8 @@ set(DEMO_TARGET_LIST
 )
 copy_targets_to_bundle(demo "${DEMO_TARGET_LIST}")
 
-add_macos_res_folder(demo ${CMAKE_CURRENT_SOURCE_DIR}/uires uires ${PROJECT_SOURCE_DIR}/soui-sys-resource)
+add_macos_res_folder(demo ${PROJECT_SOURCE_DIR}/soui-sys-resource soui-sys-resource)
+add_macos_res_folder(demo ${CMAKE_CURRENT_SOURCE_DIR}/uires uires)
 add_macos_res_file(demo ${PROJECT_SOURCE_DIR}/simsun.ttc fonts)
 set_macos_icon(demo ${CMAKE_CURRENT_SOURCE_DIR}/demo.icns)
 add_dependencies(demo resprovider-zip)
