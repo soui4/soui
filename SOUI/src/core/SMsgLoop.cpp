@@ -203,7 +203,7 @@ BOOL SMessageLoop::PostTask(IRunnable *runable)
     if (m_priv->m_runnables.GetCount() > 5)
     {
         PostThreadMessage(m_tid, WM_NULL, 0, 0);
-    }else{
+    }else if(m_bRunning){
         m_priv->m_msgWnd.SetTimer(TM_POSTTASK, 100, OnTimer);//set max waitting time to 100ms.
     }
     return TRUE;
