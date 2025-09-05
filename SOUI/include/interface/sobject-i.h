@@ -87,6 +87,7 @@ typedef HRESULT (*FunAttrHandler)(IObject *pObj, const IStringW *attrName, const
 
 typedef enum _SObjectType
 {
+    Invalid = -1,
     Undef = 0,
     Window,
     Skin,

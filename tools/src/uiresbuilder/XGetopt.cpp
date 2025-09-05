@@ -39,7 +39,7 @@
 
 #include "XGetopt.h"
 
-
+#ifdef _WIN32
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  X G e t o p t . c p p
@@ -217,3 +217,5 @@ int getopt(int argc, TCHAR *argv[], TCHAR *optstring)
 
 	return c;
 }
+
+#endif//_WIN32

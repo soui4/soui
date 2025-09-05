@@ -172,7 +172,7 @@ typedef enum _MouseClickId
  * @class SEvtArgs
  * @brief 事件参数基类
  */
-class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
+class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs> > {
     DEF_SOBJECT(SObjectImpl<IEvtArgs>, L"event")
 
   public:

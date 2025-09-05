@@ -282,7 +282,7 @@ class SOUI_EXP STrText {
  * event handling, and rendering.
  */
 class SOUI_EXP SWindow
-    : public TObjRefImpl<SObjectImpl<IWindow>>
+    : public TObjRefImpl<SObjectImpl<IWindow> >
     , protected IAnimationListener {
     DEF_SOBJECT(SObjectImpl<IWindow>, L"window")
 

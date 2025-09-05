@@ -21,7 +21,6 @@ add_definitions(-DSK_USE_POSIX_THREADS)
 endif()
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
-find_package(Fontconfig REQUIRED)
 include_directories(${Fontconfig_INCLUDE_DIRS})
 endif()
 

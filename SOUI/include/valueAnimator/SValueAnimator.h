@@ -43,7 +43,7 @@ SNSBEGIN
  * out of an animation. This behavior can be changed by calling setInterpolator(TimeInterpolator).
  */
 class SOUI_EXP SValueAnimator
-    : public TObjRefImpl<SObjectImpl<IValueAnimator>>
+    : public TObjRefImpl<SObjectImpl<IValueAnimator> >
     , ITimelineHandler {
     DEF_SOBJECT(SObjectImpl<IValueAnimator>, L"valueAnimator")
 

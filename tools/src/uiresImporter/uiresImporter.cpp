@@ -14,7 +14,7 @@ void ImportResource(xml_node xmlNode, const tstring & strUiresDir,const tstring 
 
 bool g_bEnableColorize = true;//默认皮肤允许着色
 
-int _tmain(int argc, _TCHAR* argv[])
+int _tmain(int argc, TCHAR* argv[])
 {
     tstring strUiresDir;    //uires路径，相对于当前路径
     tstring strSubDirs;     //搜索的子目录列表，子目录之间使用“|”分开.
@@ -113,7 +113,7 @@ void printUsage()
     };
     for(int i= 0;i< ARRAYSIZE(szUsage);i++)
     {
-        _tprintf(szUsage[i]);
+        _tprintf(_T("%s"),szUsage[i]);
     }
 }
 
@@ -134,6 +134,7 @@ void ImportResource(xml_node xmlNode, const tstring & strUiresDir,const tstring 
             {
                 xml_node newFile = xmlNode.append_child(_T("file"));
                 TCHAR szName[MAX_PATH],szExt[50];
+                //splitpath(fd.cFileName,NULL,NULL,szName,szExt);
                 _tsplitpath(fd.cFileName,NULL,NULL,szName,szExt);
 
                 tstring strName,strPath;
@@ -221,10 +222,18 @@ void ImportResource(xml_node xmlNode, const tstring & strUiresDir,const tstring 
 						}
 					}
 				}
-                newFile.append_attribute(L"name").set_value(strName.c_str());
-                newFile.append_attribute(L"path").set_value(strPath.c_str());
+                newFile.append_attribute(_T("name")).set_value(strName.c_str());
+                newFile.append_attribute(_T("path")).set_value(strPath.c_str());
             }
         }
         ::FindClose(hContext);
     }
 }
+
+
+#ifndef _WIN32
+int main(int argc, char* argv[])
+{
+	return _tmain(argc, argv); 
+}
+#endif//_WIN32

@@ -546,6 +546,30 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
       */
      STDMETHOD_(BOOL,SetMessageBoxTemplateResId)(THIS_ LPCTSTR resId,IResProvider *pResProvider DEF_VAL(NULL)) OVERRIDE;
  
+    /**
+     * @brief 设置属性别名获取接口
+     * @param pAttrAlias IAttrAlias* -- 属性别名接口
+     * @return void
+     */
+    STDMETHOD_(void, SetAttrAlias)(THIS_ IAttrAlias * pAttrAlias) OVERRIDE;
+
+    /**
+     * @brief 获取属性别名
+     * @param pszAttr LPCWSTR -- 属性名
+     * @param pszClsName LPCWSTR -- 类名
+     * @param objType int -- 对象类型
+     * @return LPCWSTR -- 属性别名
+     */
+    STDMETHOD_(const IAttrAlias *, GetAttrAlias)(CTHIS) SCONST OVERRIDE;
+
+    /**
+     * @brief 获取基类名
+     * @param pszClassName LPCWSTR -- 类名
+     * @param objType int -- 对象类型
+     * @param pszBaseClassName[MAX_OBJNAME] wchar_t -- 基类名称
+     * @return BOOL -- TRUE: 成功
+     */
+    STDMETHOD_(BOOL, GetBaseClassName)(CTHIS_ LPCWSTR pszClassName, int objType, wchar_t pszBaseClassName[MAX_OBJNAME]) SCONST OVERRIDE;
    public:
     /**
      * @brief Initialize XML named IDs from an array of named values
@@ -800,7 +824,7 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
     /**
      * @brief Map of message loops for different threads.
      */
-    typedef SMap<tid_t, SAutoRefPtr<IMessageLoop>> MsgLoopMap;
+    typedef SMap<tid_t, SAutoRefPtr<IMessageLoop> > MsgLoopMap;
     MsgLoopMap m_msgLoopMap;
 
     /**
@@ -816,7 +840,12 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
     /**
      * @brief List of task loops.
      */
-    SArray<SAutoRefPtr<ITaskLoop>> m_lstTaskLoop; // task loop list
+    SArray<SAutoRefPtr<ITaskLoop> > m_lstTaskLoop;
+
+    /**
+     * @brief Pointer to the attribute alias object.
+     */
+    SAutoRefPtr<IAttrAlias> m_pAttrAlias;
 
     /**
      * @brief Array of singleton pointers.

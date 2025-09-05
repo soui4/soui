@@ -15,9 +15,12 @@
 #ifndef XGETOPT_H
 #define XGETOPT_H
 
+#ifdef _WIN32
 extern int optind, opterr;
 extern TCHAR *optarg;
 
 int getopt(int argc, TCHAR *argv[], TCHAR *optstring);
+
+#endif//_WIN32
 
 #endif //XGETOPT_H

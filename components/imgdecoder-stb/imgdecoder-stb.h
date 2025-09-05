@@ -44,7 +44,7 @@ SNSBEGIN
         void _DoPromultiply(BYTE *pdata,int nWid,int nHei);
 
         BOOL m_bPremultiple;
-        SArray<SAutoRefPtr<IImgFrame>> m_arrFrames;
+        SArray<SAutoRefPtr<IImgFrame> > m_arrFrames;
     };
 
     #define DESC_IMGDECODER L"stb"

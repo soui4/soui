@@ -12,7 +12,7 @@ SNSBEGIN
  * @brief Soui布局参数类
  */
 class SouiLayoutParam
-    : public TObjRefImpl<SObjectImpl<ILayoutParam>>
+    : public TObjRefImpl<SObjectImpl<ILayoutParam> >
     , protected SouiLayoutParamStruct {
     DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"SouiLayoutParam")
 
@@ -184,7 +184,7 @@ class SouiLayoutParam
  * @class SouiLayout
  * @brief Soui布局类
  */
-class SOUI_EXP SouiLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
+class SOUI_EXP SouiLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     DEF_SOBJECT(SObjectImpl<ILayout>, L"SouiLayout")
 
   public:

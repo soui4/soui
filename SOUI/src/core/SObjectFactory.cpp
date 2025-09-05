@@ -89,9 +89,9 @@ IObject *SObjectFactoryMgr::CreateObject(const SObjectInfo &objInfo) const
     return pRet;
 }
 
-SObjectInfo SObjectFactoryMgr::BaseObjectInfoFromObjectInfo(const SObjectInfo &objInfo)
+SObjectInfo SObjectFactoryMgr::BaseObjectInfoFromObjectInfo(const SObjectInfo &objInfo) const
 {
-    SObjectInfo ret = { L"", NULL, Undef };
+    SObjectInfo ret = { L"", NULL, Invalid };
     if (!HasKey(objInfo))
     {
         return ret;

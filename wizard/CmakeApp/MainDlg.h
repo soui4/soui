@@ -4,6 +4,7 @@
 #pragma once
 
 class CMainDlg : public SHostWnd
+			   , public SDpiHandler<CMainDlg>
 {
 public:
 	CMainDlg();
@@ -23,11 +24,11 @@ protected:
 		EVENT_NAME_COMMAND(L"btn_min", OnMinimize)
 		EVENT_NAME_COMMAND(L"btn_max", OnMaximize)
 		EVENT_NAME_COMMAND(L"btn_restore", OnRestore)
-
-	EVENT_MAP_END()
+	EVENT_MAP_END2(SHostWnd)
 		
 	//HostWnd真实窗口消息处理
 	BEGIN_MSG_MAP_EX(CMainDlg)
+		CHAIN_MSG_MAP(SDpiHandler<CMainDlg>)
 		MSG_WM_INITDIALOG(OnInitDialog)
 		MSG_WM_CLOSE(OnClose)
 		MSG_WM_SIZE(OnSize)

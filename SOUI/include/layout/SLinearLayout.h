@@ -12,7 +12,7 @@ SNSBEGIN
  * @brief 线性布局参数类
  */
 class SLinearLayoutParam
-    : public TObjRefImpl<SObjectImpl<ILayoutParam>>
+    : public TObjRefImpl<SObjectImpl<ILayoutParam> >
     , protected SLinearLayoutParamStruct {
     DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"LinearLayoutParam")
 
@@ -147,7 +147,7 @@ class SLinearLayoutParam
  * @class SLinearLayout
  * @brief 线性布局类
  */
-class SOUI_EXP SLinearLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
+class SOUI_EXP SLinearLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     DEF_SOBJECT(SObjectImpl<ILayout>, L"linearLayout")
 
   public:

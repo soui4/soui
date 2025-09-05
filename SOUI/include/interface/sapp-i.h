@@ -18,6 +18,7 @@
 #include <interface/SObjFactory-i.h>
 #include <interface/SHostPresenter-i.h>
 #include <interface/STaskLoop-i.h>
+#include <interface/SAttrAlias-i.h>
 
 SNSBEGIN
 
@@ -380,6 +381,28 @@ DECLARE_INTERFACE_(IApplication, IObjRef)
      * @return BOOL -- TRUE: 成功
      */
     STDMETHOD_(BOOL, SetMessageBoxTemplateResId)(THIS_ LPCTSTR resId, IResProvider * pResProvider DEF_VAL(NULL)) PURE;
+
+    /**
+     * @brief 设置属性别名获取接口
+     * @param pAttrAlias IAttrAlias* -- 属性别名接口
+     * @return void
+     */
+    STDMETHOD_(void, SetAttrAlias)(THIS_ IAttrAlias * pAttrAlias) PURE;
+
+    /**
+     * @brief 获取属性别名接口
+     * @return const IAttrAlias* -- 属性别名接口
+     */
+    STDMETHOD_(const IAttrAlias *, GetAttrAlias)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief 获取对象的基类名称
+     * @param pszClassName LPCWSTR -- 对象类名
+     * @param objType int -- 对象类型
+     * @param pszBaseClassName[MAX_OBJNAME] wchar_t -- 基类名称
+     * @return BOOL -- TRUE: 成功
+     */
+    STDMETHOD_(BOOL, GetBaseClassName)(CTHIS_ LPCWSTR pszClassName, int objType, wchar_t pszBaseClassName[MAX_OBJNAME]) SCONST PURE;
 };
 
 SNSEND

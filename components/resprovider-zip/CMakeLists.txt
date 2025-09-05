@@ -51,3 +51,6 @@ install(TARGETS resprovider-zip
     LIBRARY DESTINATION lib/Debug
     ARCHIVE DESTINATION lib/Debug
 )
+
+install(FILES "${CMAKE_CURRENT_SOURCE_DIR}/zipresprovider-param.h"
+        DESTINATION include/components/resprovider-zip)

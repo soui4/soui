@@ -71,7 +71,7 @@ DECLARE_INTERFACE_(IMcListViewEx, IObjRef)
 	};
 
 
-	class SMcAdapterBaseEx : public TObjRefImpl<LvAdatperImpl<IMcAdapterEx>>
+	class SMcAdapterBaseEx : public TObjRefImpl<LvAdatperImpl<IMcAdapterEx> >
 	{
 	protected:
 		SList<long> m_selList;

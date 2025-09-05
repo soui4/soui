@@ -859,4 +859,31 @@ BOOL SApplication::SetMessageBoxTemplateResId(THIS_ LPCTSTR resId, IResProvider 
     return TRUE;
 }
 
+void SApplication::SetAttrAlias(THIS_ IAttrAlias *pAttrAlias)
+{
+    m_pAttrAlias = pAttrAlias;
+}
+const IAttrAlias * SApplication::GetAttrAlias() const
+{
+    return m_pAttrAlias;
+}   
+
+BOOL SApplication::GetBaseClassName(THIS_ LPCWSTR pszClassName, int objType, wchar_t pszBaseClassName[MAX_OBJNAME]) const
+{
+    SObjectInfo objInfo;
+    ObjInfo_New(&objInfo,pszClassName, objType);
+    SObjectInfo baseClassInfo =  BaseObjectInfoFromObjectInfo(objInfo);
+    if (!ObjInfo_IsValid(&baseClassInfo))
+        return FALSE;
+    wcscpy_s(pszBaseClassName,MAX_OBJNAME, baseClassInfo.szName);
+    return TRUE;
+}
+LPCWSTR SOUI_EXP GetAttrAlias(LPCWSTR pszAttr, IObject *pObject){
+    if(const IAttrAlias * pAttrAlias = SApplication::getSingletonPtr()->GetAttrAlias()){
+        return pAttrAlias->GetAttrAlias(pszAttr, pObject->GetObjectClass(), pObject->GetObjectType());
+    }else{
+        return pszAttr;
+    }
+}
+
 SNSEND

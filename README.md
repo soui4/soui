@@ -30,7 +30,7 @@
 （内核编译后体积1M左右），
 框架设计吸收了`WTL`，`Android`，`QT`，`Flash`等流行框架的特点，
 UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.oschina.net/p/skia)渲染），
-控件丰富，扩展灵活（可使用 xml + lua + jx  ），真正做到UI界面与逻辑分离。
+控件丰富，扩展灵活（可使用 xml + lua + js  ），真正做到UI界面与逻辑分离。
 
 点击 [SOUI](https://www.soui.com.cn) 访问官网。
 
@@ -82,15 +82,11 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 使用教程见文档
 
-### 其他教程
+### SOUI教程
 
-- 阅读作者[博客](http://www.cnblogs.com/setoutsoft/)，能让你更快掌握如何使用SOUI快速开发Window桌面应用
-
+- 最新[教程](https://gitee.com/setoutsoft/soui-docs) ，自己在本地搭建http服务器,本地查看教程。发现教程有问题，欢迎随时提issue。
+- 作者[博客](http://www.cnblogs.com/setoutsoft/)，能让你更快掌握如何使用SOUI快速开发Window桌面应用
 - 作者录制的b站[视频教程](https://space.bilibili.com/110611388)
-
-## 使用soui的软件展示
-
-请点击[链接](https://2926295173.github.io/SoUIDocs/Show/show/)查看，持续更新
 
 ##  **QQ群** 
 

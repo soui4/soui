@@ -15,6 +15,9 @@ SNSBEGIN
 #endif
 #endif
 
+// Get attribute alias
+extern LPCWSTR SOUI_EXP GetAttrAlias(LPCWSTR pszAttr, IObject *pObject);
+
 /**
  * @class SObjectImpl
  * @brief Template class for implementing the SObject interface.
@@ -177,6 +180,7 @@ public:
      * @return Result of setting the attribute.
      */
     STDMETHOD_(HRESULT, SetAttribute)(THIS_ LPCWSTR pszAttr, LPCWSTR pszValue, BOOL bLoading) OVERRIDE {
+        pszAttr = GetAttrAlias(pszAttr, this);
         SStringW strName(pszAttr), strValue(pszValue);
         if (m_attrHandler) {
             HRESULT hr = m_attrHandler(this, &strName, &strValue, bLoading);

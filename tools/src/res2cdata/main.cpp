@@ -4,7 +4,7 @@
 #include <tchar.h>
 #include <string>
 #include "XGetopt.h"
-#include <Windows.h>
+#include <windows.h>
 
 using namespace std;
 #ifdef _UNICODE
@@ -50,7 +50,7 @@ bool convertResFile2CData(const tstring & filename,FILE *output){
 	return true;
 }
 
-int _tmain(int argc, _TCHAR* argv[]){
+int _tmain(int argc, TCHAR* argv[]){
 
 	int c;
 	tstring strInput;	//皮肤路径,相对于程序的.rc文件
@@ -102,3 +102,11 @@ int _tmain(int argc, _TCHAR* argv[]){
 
 	return 0;
 }
+
+
+#ifndef _WIN32
+int main(int argc, char* argv[])
+{
+	return _tmain(argc, argv); 
+}
+#endif//_WIN32

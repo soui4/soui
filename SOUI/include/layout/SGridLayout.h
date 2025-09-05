@@ -21,9 +21,9 @@ SNSBEGIN
  * @brief 网格布局参数类
  */
 class SGridLayoutParam
-    : public TObjRefImpl<SObjectImpl<ILayoutParam>>
+    : public TObjRefImpl<SObjectImpl<ILayoutParam> >
     , protected SGridLayoutParamStruct {
-    DEF_SOBJECT(TObjRefImpl<SObjectImpl<ILayoutParam>>, L"GridLayoutParam")
+    DEF_SOBJECT(TObjRefImpl<SObjectImpl<ILayoutParam> >, L"GridLayoutParam")
 
     friend class SGridLayout;
 
@@ -149,7 +149,7 @@ class SGridLayoutParam
  * @class SGridLayout
  * @brief 网格布局类
  */
-class SOUI_EXP SGridLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
+class SOUI_EXP SGridLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     DEF_SOBJECT_EX(SObjectImpl<ILayout>, L"gridLayout", L"grid")
 
   public:

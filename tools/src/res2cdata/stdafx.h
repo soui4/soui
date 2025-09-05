@@ -13,7 +13,6 @@
 #define _CRT_NON_CONFORMING_SWPRINTFS
 #pragma warning(disable:4267)
 
-#include <io.h>
 #include <stdio.h>
 #include <tchar.h>
 #include <windows.h>

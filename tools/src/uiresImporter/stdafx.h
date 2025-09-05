@@ -12,6 +12,7 @@
 #include <windows.h>
 #include <string>
 #include <vector>
+#include <tchar.h>
 using namespace std;
 
 #include "XGetopt.h"

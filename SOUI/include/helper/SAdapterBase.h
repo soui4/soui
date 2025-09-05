@@ -313,7 +313,7 @@ class LvAdatperImpl : public BaseClass {
  * @class SAdapterBase
  * @brief 列表适配器基类
  */
-class SAdapterBase : public TObjRefImpl<LvAdatperImpl<ILvAdapter>> {
+class SAdapterBase : public TObjRefImpl<LvAdatperImpl<ILvAdapter> > {
   public:
     /**
      * @brief 构造函数
@@ -334,7 +334,7 @@ class SAdapterBase : public TObjRefImpl<LvAdatperImpl<ILvAdapter>> {
  * @class SMcAdapterBase
  * @brief 多列适配器基类
  */
-class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter>> {
+class SMcAdapterBase : public TObjRefImpl<LvAdatperImpl<IMcAdapter> > {
   public:
     /**
      * @brief 构造函数
@@ -621,7 +621,7 @@ class TvAdatperImpl : public BaseClass {
  * @tparam T 数据类型
  */
 template <typename T>
-class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter>> {
+class STreeAdapterBase : public TObjRefImpl<TvAdatperImpl<ITvAdapter> > {
   public:
     /**
      * @brief 数据释放函数类型

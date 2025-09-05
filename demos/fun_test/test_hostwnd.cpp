@@ -9,6 +9,7 @@
 
 using namespace SOUI;
 #define kLogTag "test_hostwnd"
+#define SYS_MENUID_TEST 1000
 
 void RunMenu(POINT pt) {
     HMENU hMenu = CreatePopupMenu();
@@ -198,6 +199,47 @@ public:
         }
     }
 
+
+    void OnBtnOpenFile()
+    {
+        TCHAR szBuf[MAX_PATH];
+        OPENFILENAME ofn = { 0 };
+        ofn.lStructSize = sizeof(ofn);
+        ofn.hwndOwner = m_hWnd;
+        ofn.lpstrFile = szBuf;
+        ofn.nMaxFile = MAX_PATH;
+        ofn.lpstrTitle = _T("Select Xml File");
+        ofn.lpstrDefExt = _T("xml");
+        ofn.lpstrFilter = _T("Xml Files\0*.xml\0");
+        ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER;
+        if(GetOpenFileName(&ofn))
+        {
+            SWindow *pWnd = FindChildByName("txt_open_file");
+            if(pWnd) 
+                pWnd->SetWindowText(szBuf);
+        }
+    }
+
+    void OnBtnSaveFile()
+    {
+        TCHAR szBuf[MAX_PATH];
+        OPENFILENAME ofn = { 0 };
+        ofn.lStructSize = sizeof(ofn);
+        ofn.hwndOwner = m_hWnd;
+        ofn.lpstrFile = szBuf;
+        ofn.nMaxFile = MAX_PATH;
+        ofn.lpstrTitle = _T("Select Txt File");
+        ofn.lpstrDefExt = _T("txt");
+        ofn.lpstrFilter = _T("txt Files\0*.txt\0");
+        ofn.Flags = OFN_FILEMUSTEXIST | OFN_HIDEREADONLY | OFN_EXPLORER;
+        if(GetSaveFileName(&ofn))
+        {
+            SWindow *pWnd = FindChildByName("txt_save_file");
+            if(pWnd) 
+                pWnd->SetWindowText(szBuf);
+        }
+    }
+
     void OnBtnPickFolder(){
         #ifndef _WIN32
         BROWSEINFO info={0};
@@ -247,6 +289,8 @@ public:
         EVENT_NAME_COMMAND(L"btn_soui", OnBtnSoui)
         EVENT_NAME_COMMAND(L"btn_save_rtf",OnBtnSaveRtf)
         EVENT_NAME_COMMAND(L"btn_pick_color",OnBtnPickColor)
+        EVENT_NAME_COMMAND(L"btn_open_file",OnBtnOpenFile)
+        EVENT_NAME_COMMAND(L"btn_save_file",OnBtnSaveFile)
         EVENT_NAME_COMMAND(L"btn_pick_folder",OnBtnPickFolder)
         EVENT_NAME_COMMAND(L"btn_fork_normal",OnBtnForkNormal)
         EVENT_NAME_COMMAND(L"btn_fork_root",OnBtnForkRoot)
@@ -291,9 +335,21 @@ protected:
         return 0;
     }
 
+    void OnSysCommand(UINT nID, CPoint lParam){
+        switch(nID){
+        case SYS_MENUID_TEST:
+            SLOGI() << "sys command test";
+            break;
+        default:
+            SetMsgHandled(FALSE);
+            break;
+        }
+    }
+
    BEGIN_MSG_MAP_EX(CMainDlg)
         MSG_WM_TIMER(OnTimer)
         MSG_WM_SIZE(OnSize)
+        MSG_WM_SYSCOMMAND(OnSysCommand)
         MSG_WM_NOTIFY(OnNotify)
         CHAIN_MSG_MAP(SHostWnd)
         END_MSG_MAP()
@@ -338,6 +394,12 @@ int run_app(HINSTANCE hInst) {
     SouiFactory sfac;
     SAutoRefPtr<IResProvider> sysResouce(sfac.CreateResProvider(RES_FILE), FALSE);
 
+    {//test get base class name
+        wchar_t szBaseClsName[MAX_OBJNAME];
+        app.GetBaseClassName(SListView::GetClassName(), SListView::GetClassType(), szBaseClsName);
+        SLOGI() << "base class name: " << szBaseClsName;
+    }
+
     SStringT sysRes = srcDir + kPath_SysRes;
     sysResouce->Init((LPARAM)sysRes.c_str(), 0);
     app.LoadSystemNamedResource(sysResouce);
@@ -375,9 +437,22 @@ int run_app(HINSTANCE hInst) {
 
     SLOGI() << "start soui app";
     CMainDlg hostWnd("layout:XML_MAINWND");
-    hostWnd.CreateEx(0, WS_POPUP, WS_EX_LAYERED, 300, 100, 0, 0);
+    hostWnd.CreateEx(0, WS_POPUP|WS_SYSMENU, WS_EX_LAYERED, 300, 100, 0, 0);
     hostWnd.ShowWindow(SW_SHOW);
     //hostWnd.SetLayeredWindowAttributes(0,200,LWA_ALPHA);
+    HMENU hMenu = GetSystemMenu(hostWnd.m_hWnd, FALSE);
+    if(hMenu){
+        MENUITEMINFO info;
+        info.fMask = MIIM_TYPE | MIIM_STATE | MIIM_ID | MIIM_SUBMENU;
+        info.cbSize = sizeof(info);
+        info.fType = MFT_STRING;
+        info.fState = MF_ENABLED;
+        info.wID = SYS_MENUID_TEST;
+        info.dwTypeData = (LPTSTR)_T("test");
+        info.cch = 5;
+        info.hSubMenu = NULL;
+        InsertMenuItem(hMenu, 0, TRUE, &info);
+    }
     int ret = app.Run(hostWnd.m_hWnd);
     SLOGI() << "soui app end, exit code=" << ret;
     CScintillaWnd::UninitScintilla();

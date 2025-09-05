@@ -100,7 +100,7 @@ macro(add_macos_res_file app res_file dest_path)
     endif()
 endmacro()
 
-macro(set_macos_icon app icon)
+macro(set_macos_icon app icon plist_in)
 if (APPLE)
 message(STATUS "add resource ${icon}")
 target_sources(${app} PRIVATE ${icon})
@@ -116,7 +116,7 @@ endif()
 set_target_properties(
       ${app}
       PROPERTIES
-      MACOSX_BUNDLE_INFO_PLIST ${CMAKE_SOURCE_DIR}/__cmake/plist.in
+      MACOSX_BUNDLE_INFO_PLIST ${plist_in}
    )
 
 endif(APPLE)

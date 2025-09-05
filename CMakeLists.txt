@@ -80,6 +80,9 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
   option(USE_UNICODE "Use Unicode" ON)
 else()
   set(USE_UNICODE OFF)
+  if(CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_definitions(-D_DEBUG)
+  endif()
 endif()
 
 # When other libraries are using a shared version of runtime libraries,
@@ -185,6 +188,7 @@ add_subdirectory(soui-sys-resource)
 add_subdirectory(soui-sys-resource2)
 endif()
 add_subdirectory(components)
+add_subdirectory(tools)
 
 if(BUILD_DEMOS)
 add_subdirectory(demos)
@@ -192,6 +196,9 @@ endif(BUILD_DEMOS)
 
 
 if (UNIX OR MINGW)
+set(SWINX_LIB_FLAGS "-lswinx")
+set(SWINX_CFLAGS "-I\$\{includedir\}/swinx/include")
+
 # Generate and install pkgconfig.
 configure_file("${PROJECT_SOURCE_DIR}/__cmake/libsoui.pc.in" "${PROJECT_BINARY_DIR}/libsoui.pc" @ONLY)
 
@@ -200,3 +207,22 @@ install(FILES "${PROJECT_BINARY_DIR}/libsoui.pc"
         COMPONENT pkgconfig)
 
 endif(UNIX OR MINGW)
+
+# Install cmake files
+install(DIRECTORY ${PROJECT_SOURCE_DIR}/__cmake
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
+        FILES_MATCHING PATTERN "*.cmake"
+)
+install(FILES ${PROJECT_SOURCE_DIR}/__cmake/plist.in
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/__cmake
+)
+
+install(FILES 
+        ${PROJECT_SOURCE_DIR}/simsun.ttc
+        ${PROJECT_SOURCE_DIR}/soui-sys-resource.zip
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/resources
+)
+
+install(FILES ${PROJECT_SOURCE_DIR}/license.txt
+        DESTINATION ${CMAKE_INSTALL_PREFIX}
+)

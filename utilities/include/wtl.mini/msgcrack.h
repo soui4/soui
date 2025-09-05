@@ -1441,12 +1441,12 @@ public: \
             return TRUE; \
     }
 
-// BOOL OnDeviceChange(UINT nEventType, DWORD dwData)
+// BOOL OnDeviceChange(UINT nEventType, LPARAM data)
 #define MSG_WM_DEVICECHANGE(func) \
     if (uMsg == WM_DEVICECHANGE) \
     { \
         SetMsgHandled(TRUE); \
-        lResult = (LRESULT)func((UINT)wParam, (DWORD)lParam); \
+        lResult = (LRESULT)func((UINT)wParam, lParam); \
         if(IsMsgHandled()) \
             return TRUE; \
     }

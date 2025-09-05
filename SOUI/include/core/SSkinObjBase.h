@@ -73,7 +73,7 @@ class SOUI_EXP SState2Index {
  * the visual appearance of UI elements. It includes methods for drawing, scaling, and
  * colorizing skins, as well as managing state-to-index mappings.
  */
-class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj>> {
+class SOUI_EXP SSkinObjBase : public TObjRefImpl<SObjectImpl<ISkinObj> > {
     DEF_SOBJECT(SObjectImpl<ISkinObj>, L"skinObjBase")
 
   public:

@@ -4,6 +4,10 @@
 #include "stdafx.h"
 #include "tinyxml/tinyxml.h"
 
+#ifndef _WIN32
+#define swprintf_s swprintf
+#endif//_WIN32
+
 const wchar_t  RB_HEADER_RC[]=
 L"/*<------------------------------------------------------------------------------------------------->*/\n"
 L"#define DEFINE_UIRES(name, type, file_path)\\\n"
@@ -103,8 +107,8 @@ wstring BuildPath(LPCWSTR pszPath)
 
 #pragma pack(push,1)
 
-static const char kBomU8[3]={0xef,0xbb,0xbf};
-static const char kBomU16[2]={0xff,0xfe};
+static const unsigned char kBomU8[3]={0xef,0xbb,0xbf};
+static const unsigned char kBomU16[2]={0xff,0xfe};
 class FILEHEAD
 {
 public:
@@ -163,7 +167,7 @@ void WriteFile(__int64 tmIdx, const std::string &strRes, const std::wstring &str
 	//write output string to target res file
 	if(tmIdx!=tmSave)
 	{
-		FILE * f=_tfopen(strRes.c_str(),_T("wb"));
+		FILE * f=fopen(strRes.c_str(),"wb");
 		if(f)
 		{
 			FILEHEAD::WriteTimeStamp(tmIdx,f,bUtf8);//写UTF16文件头及时间。-sizeof(WCHAR)用来去除stamp最后一个\0
@@ -188,7 +192,7 @@ void WriteFile(__int64 tmIdx, const std::string &strRes, const std::wstring &str
 }
 
 //C++关键字
-wchar_t* szCppKey[] =
+const wchar_t* szCppKey[] =
 {
     L"__asm",
     L"__assume",
@@ -561,7 +565,7 @@ void wtoutf8(const std::wstring & src, std::string &out){
 }
 
 //uiresbuilder -p uires -i uires\uires.idx -r .\uires\winres.rc2 -h .\uires\resource.h idtable
-int _tmain(int argc, _TCHAR* argv[])
+int _tmain(int argc, TCHAR* argv[])
 {
 	string strSkinPath;	//皮肤路径,相对于程序的.rc文件
 	string strIndexFile;
@@ -572,7 +576,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	int c;
 
 	printf("%s\n",GetCommandLineA());
-	while ((c = getopt(argc, argv, _T("i:r:p:h:j:"))) != EOF || optarg!=NULL)
+	while ((c = getopt(argc, argv, "i:r:p:h:j:")) != EOF || optarg!=NULL)
 	{
 		switch (c)
 		{
@@ -591,7 +595,7 @@ int _tmain(int argc, _TCHAR* argv[])
 	if(strIndexFile.empty())
 	{
 		printf("not specify input file, using -i to define the input file\n");
-		printf("usage: uiresbuilder -p uires -i uires\\uires.idx -r .\\uires\\winres.rc2 -h .\\uires\\resource.h -j .\\uires\\R.js idtable\n");
+		printf("usage: uiresbuilder -p uires -i uires\\uires.idx -r ./uires/winres.rc2 -h ./uires/resource.h -j ./uires/R.js idtable\n");
         printf("\tparam -i : define uires.idx path\n");
         printf("\tparam -p : define path of uires folder\n");
         printf("\tparam -r : define path of output .rc2 file\n");
@@ -696,7 +700,7 @@ int _tmain(int argc, _TCHAR* argv[])
 		{
 			WCHAR szRec[2000];
 			wstring strPath=BuildPath(it2->szPath);
-			swprintf(szRec,L"DEFINE_UIRES(%s,\t%s,\t%\"%s\")\n",it2->szName,it2->szType,strPath.c_str());
+			swprintf_s(szRec,2000,L"DEFINE_UIRES(%s,\t%s,\t%\"%s\")\n",it2->szName,it2->szType,strPath.c_str());
 			strOut+=szRec;
 			it2++;
 		}
@@ -754,42 +758,42 @@ int _tmain(int argc, _TCHAR* argv[])
 			WCHAR szName[200]={0},szBuf[2000] = { 0 };
 			MakeNameValid(it->first.c_str(),szName);
             			
-			swprintf(szBuf,L"\t\t const wchar_t * %s;\r\n",szName);
+			swprintf_s(szBuf,2000,L"\t\t const wchar_t * %s;\r\n",szName);
 			strNameStruct += szBuf;			
-			swprintf(szBuf, L"\t\tint %s;\r\n", szName);
+			swprintf_s(szBuf,2000, L"\t\tint %s;\r\n", szName);
 			strIdStruct += szBuf;
 			
 			if(idx == nNames-1)
 			{
-				swprintf(szBuf,L"\t\tL\"%s\"\r\n",it->first.c_str());
+				swprintf_s(szBuf,2000,L"\t\tL\"%s\"\r\n",it->first.c_str());
 				strNameData += szBuf;
-				swprintf(szBuf, L"\t\t%d\r\n",it->second);
+				swprintf_s(szBuf,2000, L"\t\t%d\r\n",it->second);
 				strIdData += szBuf;
 
-				swprintf(szBuf,L"\t\t%s:\"%s\"\r\n",it->first.c_str(),it->first.c_str());
+				swprintf_s(szBuf,2000,L"\t\t%s:\"%s\"\r\n",it->first.c_str(),it->first.c_str());
 				strJsName += szBuf;
-				swprintf(szBuf, L"\t\t%s:%d\r\n",it->first.c_str(),it->second);
+				swprintf_s(szBuf, 2000,L"\t\t%s:%d\r\n",it->first.c_str(),it->second);
 				strJsId += szBuf;
 
-				swprintf(szBuf,L"\t\t\"%s\"\r\n",it->first.c_str());
+				swprintf_s(szBuf,2000,L"\t\t\"%s\"\r\n",it->first.c_str());
 				arrJsName += szBuf;
-				swprintf(szBuf, L"\t\t%d\r\n",it->second);
+				swprintf_s(szBuf, 2000,L"\t\t%d\r\n",it->second);
 				arrJsId += szBuf;
 			}
 			else{
-				swprintf(szBuf,L"\t\tL\"%s\",\r\n",it->first.c_str());
+				swprintf_s(szBuf,2000,L"\t\tL\"%s\",\r\n",it->first.c_str());
 				strNameData += szBuf;
-				swprintf(szBuf, L"\t\t%d,\r\n",it->second);
+				swprintf_s(szBuf,2000, L"\t\t%d,\r\n",it->second);
 				strIdData += szBuf;
 
-				swprintf(szBuf,L"\t\t%s:\"%s\",\r\n",it->first.c_str(),it->first.c_str());
+				swprintf_s(szBuf,2000,L"\t\t%s:\"%s\",\r\n",it->first.c_str(),it->first.c_str());
 				strJsName += szBuf;
-				swprintf(szBuf, L"\t\t%s:%d,\r\n",it->first.c_str(),it->second);
+				swprintf_s(szBuf, 2000,L"\t\t%s:%d,\r\n",it->first.c_str(),it->second);
 				strJsId += szBuf;
 
-				swprintf(szBuf,L"\t\t\"%s\",\r\n",it->first.c_str());
+				swprintf_s(szBuf,2000,L"\t\t\"%s\",\r\n",it->first.c_str());
 				arrJsName += szBuf;
-				swprintf(szBuf, L"\t\t%d,\r\n",it->second);
+				swprintf_s(szBuf,2000, L"\t\t%d,\r\n",it->second);
 				arrJsId += szBuf;
 			}
 
@@ -818,13 +822,13 @@ int _tmain(int argc, _TCHAR* argv[])
             {
                 WCHAR szName[200],szBuf[2000] = { 0 };
                 MakeNameValid(it->first.c_str(),szName);
-                swprintf(szBuf, L"\t\tint %s;\r\n", szName);
+                swprintf_s(szBuf, 2000,L"\t\tint %s;\r\n", szName);
                 strStringStruct += szBuf;
 
 				if(idx == nStrings-1)
-					swprintf(szBuf, L"\t\t%d\r\n", idx);
+					swprintf_s(szBuf,2000, L"\t\t%d\r\n", idx);
 				else
-					swprintf(szBuf, L"\t\t%d,\r\n", idx);
+					swprintf_s(szBuf,2000, L"\t\t%d,\r\n", idx);
 				strStringData += szBuf;
 				idx ++;
                 it ++;
@@ -844,12 +848,12 @@ int _tmain(int argc, _TCHAR* argv[])
             {
                 WCHAR szName[200],szBuf[2000] = { 0 };
                 MakeNameValid(it->first.c_str(),szName);
-                swprintf(szBuf, L"\t\tint %s;\r\n", szName);
+                swprintf_s(szBuf,2000, L"\t\tint %s;\r\n", szName);
                 strColorStruct += szBuf;
 				if(idx == nColors-1)
-					swprintf(szBuf, L"\t\t%d\r\n", idx);
+					swprintf_s(szBuf, 2000,L"\t\t%d\r\n", idx);
 				else
-					swprintf(szBuf, L"\t\t%d,\r\n", idx);
+					swprintf_s(szBuf,2000, L"\t\t%d,\r\n", idx);
 				strColorData += szBuf;
 				idx ++;
                 it ++;
@@ -918,4 +922,9 @@ int _tmain(int argc, _TCHAR* argv[])
 	return 0;
 }
 
-
+#ifndef _WIN32
+int main(int argc, char* argv[])
+{
+	return _tmain(argc, argv); 
+}
+#endif//_WIN32

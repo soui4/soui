@@ -1,5 +1,6 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <UIDEF>
+  <unit defUnit="dp"/>
   <deffont value="face:宋体,size:15"/>
 
   <string src="values:string" />

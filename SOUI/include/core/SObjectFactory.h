@@ -172,7 +172,7 @@ class SOUI_EXP SObjectFactoryMgr : public SCmnMap<SObjectFactoryPtr, SObjectInfo
      * @param objInfo Object information structure.
      * @return Base object information structure.
      */
-    SObjectInfo BaseObjectInfoFromObjectInfo(const SObjectInfo &objInfo);
+    SObjectInfo BaseObjectInfoFromObjectInfo(const SObjectInfo &objInfo) const;
 
     /**
      * @brief Template method to register a factory for a specific object type.
