@@ -22,11 +22,6 @@
 #define _MAX_PATH  MAX_PATH
 #endif
 
-#ifdef _WIN32
-#define PATH_SEPARATOR '\\'
-#else
-#define PATH_SEPARATOR '/'
-#endif
 
 #define C2S(c) #c
 /**
@@ -49,17 +44,17 @@ inline BOOL BuildFilePath(LPCTSTR pszCurPath, LPCTSTR pszNewPath, BOOL bPath = T
     if (bPath)
     {
         size_t nLen = _tcslen(szNewPath);
-        if (szNewPath[nLen - 1] != _T(PATH_SEPARATOR))
+        if (szNewPath[nLen - 1] != TPATH_SLASH)
             _tcscat(szNewPath, _T(C2S(PATH_SEPARATOR)));
     }
-    LPTSTR pszPath = _tcschr(szNewPath, _T(PATH_SEPARATOR));
+    LPTSTR pszPath = _tcschr(szNewPath, TPATH_SLASH);
     while (pszPath)
     {
         *pszPath = 0;
         if (!CreateDirectory(szNewPath, NULL))
             return FALSE;
-        *pszPath = _T(PATH_SEPARATOR);
-        pszPath = _tcschr(pszPath + 1, _T(PATH_SEPARATOR));
+        *pszPath = TPATH_SLASH;
+        pszPath = _tcschr(pszPath + 1, TPATH_SLASH);
     }
     SetCurrentDirectory(szCurDir);
     return TRUE;

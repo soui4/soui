@@ -296,7 +296,7 @@ BOOL IsSupportMaxMove() {
     return FALSE;
 }
 
-long file_length(const char* path)
+long file_length_A(const char* path)
 {
     struct stat st;
     int fd = stat(path, &st);
@@ -307,6 +307,10 @@ long file_length(const char* path)
     return st.st_size;
 }
 
+long file_length_W(const wchar_t* path) {
+    SOUI::SStringA str = SNS::S_CW2A(path);
+    return file_length_A(str.c_str());
+}
 #endif//_WIN32
 
 

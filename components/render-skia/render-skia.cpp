@@ -2674,7 +2674,7 @@ SNSBEGIN
 
 	namespace RENDER_SKIA
 	{
-		BOOL SCreateInstance( IObjRef ** ppRenderFactory )
+		SOUI_COM_C BOOL SOUI_COM_API SCreateInstance( IObjRef ** ppRenderFactory )
 		{
 			*ppRenderFactory = new SRenderFactory_Skia;
 			return TRUE;
@@ -2686,7 +2686,7 @@ SNSEND
 
 EXTERN_C BOOL Render_Skia_SCreateInstance(IObjRef ** ppRenderFactory)
 {
-	return SOUI::RENDER_SKIA::SCreateInstance(ppRenderFactory);
+	return SNS::RENDER_SKIA::SCreateInstance(ppRenderFactory);
 }
 
 static FontFallback s_fontFallback=NULL;

@@ -1277,7 +1277,7 @@ SNSBEGIN
     //////////////////////////////////////////////////////////////////////////
     namespace RENDER_GDI
     {
-        BOOL SCreateInstance(IObjRef ** ppRenderFactory)
+        SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppRenderFactory)
         {
             *ppRenderFactory = new SRenderFactory_Gdi;
             return TRUE;
@@ -1287,7 +1287,9 @@ SNSEND
 
 EXTERN_C BOOL Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory)
 {
-	return SOUI::RENDER_GDI::SCreateInstance(ppRenderFactory);
+    SNS::SRenderFactory_Gdi *p = new SNS::SRenderFactory_Gdi();
+    *ppRenderFactory = p;
+    return TRUE;
 }
 
 

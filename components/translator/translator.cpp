@@ -336,7 +336,7 @@ void STranslatorMgr::GetLanguageA(THIS_ IStringA * out) const
 //  
 namespace TRANSLATOR
 {
-	BOOL SCreateInstance( IObjRef **ppTrans )
+	SOUI_COM_C BOOL SOUI_COM_API SCreateInstance( IObjRef **ppTrans )
 	{
 		*ppTrans = new STranslatorMgr;
 		return TRUE;
@@ -348,5 +348,5 @@ SNSEND
 
 EXTERN_C BOOL Translator_SCreateInstance(IObjRef **ppTrans)
 {
-	return SOUI::TRANSLATOR::SCreateInstance(ppTrans);
+	return SNS::TRANSLATOR::SCreateInstance(ppTrans);
 }

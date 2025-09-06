@@ -373,7 +373,7 @@ int run_app(HINSTANCE hInst) {
     SStringT srcDir = getSourceDir();
     #ifndef _WIN32
     //test for AddFontResource
-    AddFontResource((srcDir+"/../../simsun.ttc").c_str());
+    AddFontResource((srcDir+_T("/../../simsun.ttc")).c_str());
     #endif//_WIN32
     UINT_PTR uid = SetTimer(0, 0, 5, OnTimeout);
     SLOGI() << "settimer: id=" << uid;

@@ -230,7 +230,7 @@ void SResProvider7Zip::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
 
 namespace RESPROVIDER_7ZIP
 {
-	BOOL SCreateInstance( IObjRef ** ppObj )
+	SOUI_COM_C BOOL SOUI_COM_API SCreateInstance( IObjRef ** ppObj )
 	{
 		*ppObj = new SResProvider7Zip;
 		return TRUE;
@@ -241,6 +241,6 @@ SNSEND
 
 EXTERN_C BOOL Resp_7zip_SCreateInstance(IObjRef ** ppObj)
 {
-	return SOUI::RESPROVIDER_7ZIP::SCreateInstance(ppObj);
+	return SNS::RESPROVIDER_7ZIP::SCreateInstance(ppObj);
 }
 

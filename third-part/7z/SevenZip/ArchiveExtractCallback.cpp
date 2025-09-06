@@ -301,78 +301,20 @@ namespace SevenZip
 
             if (m_hasModifiedTime || m_hasAccessedTime || m_hasCreatedTime)
             {
-#if defined(_WIN32)
                 HANDLE fileHandle = CreateFile(m_absPath.c_str(), GENERIC_WRITE, FILE_SHARE_READ, NULL, OPEN_EXISTING, FILE_ATTRIBUTE_NORMAL, NULL);
                 if (fileHandle != INVALID_HANDLE_VALUE)
                 {
-                    SetFileTime(fileHandle,
+                    GetFileTime(fileHandle,
                         m_hasCreatedTime ? &m_createdTime : NULL,
                         m_hasAccessedTime ? &m_accessedTime : NULL,
                         m_hasModifiedTime ? &m_modifiedTime : NULL);
                     CloseHandle(fileHandle);
                 }
-#else
-struct timespec times[2];
-        
-        // 获取当前时间（用于保留不需要修改的时间）
-        struct stat st;
-        if (stat(m_absPath.c_str(), &st) == 0) {
-            #ifdef __APPLE__
-            times[0] = st.st_atimespec; // 当前访问时间
-            times[1] = st.st_mtimespec; // 当前修改时间
-            #else
-            times[0] = st.st_atim; // 当前访问时间
-            times[1] = st.st_mtim; // 当前修改时间
-            #endif
-        } else {
-            // 如果获取失败，使用当前系统时间
-            time_t now = time(nullptr);
-            times[0].tv_sec = now;
-            times[0].tv_nsec = 0;
-            times[1].tv_sec = now;
-            times[1].tv_nsec = 0;
-        }
-
-        // 覆盖需要修改的时间
-        if (m_hasAccessedTime) {
-            time_t sec;
-            long nsec;
-            FileTimeToUnixTime(m_accessedTime, sec, nsec);
-            times[0].tv_sec = sec;
-            times[0].tv_nsec = nsec;
-        }
-
-        if (m_hasModifiedTime) {
-            time_t sec;
-            long nsec;
-            FileTimeToUnixTime(m_modifiedTime, sec, nsec);
-            times[1].tv_sec = sec;
-            times[1].tv_nsec = nsec;
-        }
-
-        utimensat(AT_FDCWD, m_absPath.c_str(), times, 0);
-#endif
             }
 
             if (m_hasAttrib)
             {
-#if defined(_WIN32)
                 SetFileAttributes(m_absPath.c_str(), m_attrib);
-#else
-struct stat st;
-        if (stat(m_absPath.c_str(), &st) == 0) {
-            mode_t new_mode = st.st_mode;
-
-            // 假设m_attrib的位0对应只读属性（类似Windows）
-            if (m_attrib & 0x1) { 
-                new_mode &= ~(S_IWUSR | S_IWGRP | S_IWOTH); // 去除所有写权限
-            } else {
-                new_mode |= S_IWUSR; // 至少恢复用户写权限
-            }
-
-            chmod(m_absPath.c_str(), new_mode);
-        }
-#endif
             }
 
             if (m_callback)

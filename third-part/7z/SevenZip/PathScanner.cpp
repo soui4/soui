@@ -45,8 +45,7 @@ namespace intl {
 		bool& exitFlag) {
 		cb.EnterDirectory(directory);
 
-#ifdef _WIN32
-		WIN32_FIND_DATAW fdata;
+		WIN32_FIND_DATA fdata;
 		TString findPath = JoinPath(directory, _T("*"));
 		HANDLE hFind = FindFirstFileW(findPath.c_str(), &fdata);
 
@@ -73,41 +72,9 @@ namespace intl {
 					if (exitFlag) break;
 				}
 			}
-		} while (FindNextFileW(hFind, &fdata));
+		} while (FindNextFile(hFind, &fdata));
 
 		FindClose(hFind);
-
-#else
-		DIR* dir = opendir(directory.c_str());
-		if (!dir) {
-			cb.LeaveDirectory(directory);
-			return false;
-		}
-
-		struct dirent* entry;
-		while ((entry = readdir(dir)) != NULL && !exitFlag) {
-			if (IsSpecialFileName(entry->d_name)) continue;
-
-			TString fullPath = JoinPath(directory, entry->d_name);
-			struct stat st;
-			if (stat(fullPath.c_str(), &st) != 0) continue;
-
-			bool isDir = S_ISDIR(st.st_mode);
-			FilePathInfo info = GetFileInfo(fullPath, isDir);
-
-			if (isDir) {
-				if (cb.ShouldDescend(info)) {
-					directories.push_back(fullPath);
-			}
-		}
-			else {
-				if (MatchesPattern(info.FileName, pattern)) {
-					cb.ExamineFile(info, exitFlag);
-				}
-			}
-	}
-		closedir(dir);
-#endif
 
 		cb.LeaveDirectory(directory);
 		return exitFlag;
@@ -150,21 +117,6 @@ FilePathInfo PathScanner::GetFileInfo(const TString& fullPath, bool isDirectory)
     info.FileName = (pos != TString::npos) ? fullPath.substr(pos+1) : fullPath;
     info.FilePath = fullPath;
     info.IsDirectory = isDirectory;
-
-#ifdef _WIN32
-    WIN32_FILE_ATTRIBUTE_DATA fdata;
-    if (GetFileAttributesExW(fullPath.c_str(), GetFileExInfoStandard, &fdata)) {
-        info.LastWriteTime = (static_cast<unsigned __int64>(fdata.ftLastWriteTime.dwHighDateTime) << 32) | 
-                            fdata.ftLastWriteTime.dwLowDateTime;
-        info.Size = (static_cast<unsigned __int64>(fdata.nFileSizeHigh) << 32) | fdata.nFileSizeLow;
-    }
-#else
-    struct stat st;
-    if (stat(fullPath.c_str(), &st) == 0) {
-        info.LastWriteTime = st.st_mtime;
-        info.Size = isDirectory ? 0 : static_cast<uint64_t>(st.st_size);
-    }
-#endif
 
     return info;
 }

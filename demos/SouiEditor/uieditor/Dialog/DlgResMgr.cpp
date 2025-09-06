@@ -123,7 +123,7 @@ namespace SOUI
 		,m_pResFileManger(pResFileManger)
 		,m_pResAdapter(NULL)
 	{
-		m_strProPath = strPath.Mid(0, strPath.ReverseFind(_T(PATH_SLASH)));
+		m_strProPath = strPath.Mid(0, strPath.ReverseFind(TPATH_SLASH));
 	}
 	
 	SResMgrDlg::~SResMgrDlg(void)
@@ -417,7 +417,7 @@ namespace SOUI
 
 	void SResMgrDlg::ShowImage(const SStringT& strImgname)
 	{
-		SStringT strImgPath = m_strProPath + _T(SLASH) + strImgname;
+		SStringT strImgPath = m_strProPath + TPATH_SLASH + strImgname;
 
 		m_imgView->Clear();
 		m_imgView->AddFile(strImgPath);

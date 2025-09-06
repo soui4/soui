@@ -328,7 +328,7 @@ SNSBEGIN
     //////////////////////////////////////////////////////////////////////////
     namespace IMGDECODOR_GDIP
     {
-        BOOL SCreateInstance( IObjRef **pImgDecoderFactory )
+        SOUI_COM_C BOOL SOUI_COM_API SCreateInstance( IObjRef **pImgDecoderFactory )
         {
             *pImgDecoderFactory = new SImgDecoderFactory_GDIP();
             return TRUE;

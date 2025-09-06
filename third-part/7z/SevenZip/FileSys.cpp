@@ -144,7 +144,6 @@ TString FileSys::ExtractRelativePath( const TString& basePath, const TString& fu
 
 bool FileSys::DirectoryExists( const TString& path )
 {
-#ifdef _WIN32
 	DWORD attributes = GetFileAttributes(path.c_str());
 
 	if (attributes == INVALID_FILE_ATTRIBUTES)
@@ -155,19 +154,11 @@ bool FileSys::DirectoryExists( const TString& path )
 	{
 		return (attributes & FILE_ATTRIBUTE_DIRECTORY) != 0;
 	}
-#else
-	struct stat info;
-	if (stat(path.c_str(), &info) != 0) {
-		return false;
-	}
-	return S_ISDIR(info.st_mode);
-#endif
 }
 
 
 bool FileSys::FileExists(const TString& path)
 {
-#ifdef _WIN32
     DWORD attributes = GetFileAttributes(path.c_str());
 
     if (attributes == INVALID_FILE_ATTRIBUTES)
@@ -178,28 +169,14 @@ bool FileSys::FileExists(const TString& path)
     {
         return (attributes & FILE_ATTRIBUTE_DIRECTORY) == 0;
     }
-#else 
-	struct stat info;
-	if (stat(path.c_str(), &info) != 0) {
-		return false;
-	}
-	return S_ISREG(info.st_mode);
-#endif
 }
 
 
 bool FileSys::PathExists(const TString& path)
 {
-#ifdef _WIN32
     DWORD attributes = GetFileAttributes(path.c_str());
     return attributes != INVALID_FILE_ATTRIBUTES;
-#else
-	struct stat info;
-	return stat(path.c_str(), &info) == 0;
-#endif
 }
-
-
 
 bool FileSys::RemovePath(const TString& path)
 {
@@ -241,30 +218,7 @@ bool FileSys::RemovePath(const TString& path)
         return false;
     }
 #else
-	if (DirectoryExists(path)) {
-		std::string strPath = path;
-		DIR* dir = opendir(strPath.c_str());
-		if (dir == nullptr) {
-			return false;
-		}
-
-		struct dirent* entry;
-		while ((entry = readdir(dir)) != nullptr) {
-			if (std::string(entry->d_name) == "." || std::string(entry->d_name) == "..") {
-				continue;
-			}
-			TString subPath = AppendPath(strPath, entry->d_name);
-			if (!RemovePath(subPath)) {
-				closedir(dir);
-				return false;
-			}
-		}
-		closedir(dir);
-		return rmdir(strPath.c_str()) == 0;
-}
-	else {
-		return unlink(path.c_str()) == 0;
-	}
+	return false;
 #endif
 }
 
@@ -274,7 +228,7 @@ bool FileSys::RenameFile(const TString& oldfile, const TString&newfile)
 #ifdef _WIN32
     return MoveFileEx(oldfile.c_str(), newfile.c_str(), MOVEFILE_REPLACE_EXISTING) != FALSE;
 #else
-	return rename(oldfile.c_str(), newfile.c_str()) == 0;
+	return _trename(oldfile.c_str(), newfile.c_str()) == 0;
 #endif
 }
 
@@ -285,7 +239,7 @@ bool FileSys::BackupFile(const TString&orignal, const TString&backup)
     return MoveFileEx(orignal.c_str(), backup.c_str(), MOVEFILE_REPLACE_EXISTING) != FALSE
         || BackupFile(orignal.c_str(), backup.c_str()) != FALSE;
 #else
-	return rename(orignal.c_str(), backup.c_str()) == 0;
+	return _trename(orignal.c_str(), backup.c_str()) == 0;
 #endif
 }
 
@@ -378,20 +332,7 @@ bool FileSys::CreateDirectoryTree( const TString& path )
 	int ret = SHCreateDirectoryEx( NULL, path.c_str(), NULL );
     return ret == ERROR_SUCCESS || ret == ERROR_ALREADY_EXISTS;
 #else
-	TString tempPath = path;
-	size_t pos = 0;
-	while ((pos = tempPath.find_first_of(_T('/'), pos + 1)) != std::string::npos) {
-		TString subPath = tempPath.substr(0, pos);
-		if (!DirectoryExists(subPath)) {
-			if (mkdir(subPath.c_str(), 0755) != 0 && errno != EEXIST) {
-				return false;
-			}
-		}
-	}
-	if (!DirectoryExists(tempPath)) {
-		return mkdir(tempPath.c_str(), 0755) == 0 || errno == EEXIST;
-	}
-	return true;
+	return false;
 #endif
 }
 

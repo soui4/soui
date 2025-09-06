@@ -87,7 +87,7 @@ BOOL CXmlEditor::LoadXml(SStringT strFileName, SStringT layoutName)
 	m_strXmlFile.ReplaceChar(_T('\\'),_T('/'));
 	m_strLayoutName = layoutName;
 	m_pScintillaWnd->SendMessage(SCI_SETREADONLY, 0, 0);
-	SStringT strPath = m_strProPath + _T(SLASH) + m_strXmlFile;
+	SStringT strPath = m_strProPath + TPATH_SLASH + m_strXmlFile;
 	m_pScintillaWnd->OpenFile(strPath);
 
 	if(!layoutName.IsEmpty())
@@ -129,7 +129,7 @@ bool CXmlEditor::SaveFile()
 		return false;
 	}
 	
-	return m_pScintillaWnd->SaveFile(m_strProPath + _T(SLASH)+ m_strXmlFile);
+	return m_pScintillaWnd->SaveFile(m_strProPath + TPATH_SLASH+ m_strXmlFile);
 }
 
 bool CXmlEditor::UpdateXmlStruct(spugi::xml_node xmlNode, HSTREEITEM item,int iSib)

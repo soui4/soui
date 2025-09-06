@@ -21,9 +21,20 @@
 
 #ifdef _WIN32
 #define PATH_SLASH '\\'
+#ifdef _UNICODE
+#define TPATH_SLASH L'\\'
+#else
+#define TPATH_SLASH '\\'
+#endif
 #else
 #define PATH_SLASH '/'
+#ifdef _UNICODE
+#define TPATH_SLASH L'/'
+#else
+#define TPATH_SLASH '/'
+#endif
 #endif //_WIN32
+
 
 SNSBEGIN
 

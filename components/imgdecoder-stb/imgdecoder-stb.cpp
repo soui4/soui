@@ -306,15 +306,18 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
 	}
 
     //////////////////////////////////////////////////////////////////////////
-    BOOL IMGDECODOR_STB::SCreateInstance( IObjRef **pImgDecoderFactory )
-    {
-        *pImgDecoderFactory = new SImgDecoderFactory_STB();
-        return TRUE;
+    namespace IMGDECODOR_STB{
+        SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef **pImgDecoderFactory)
+        {
+            *pImgDecoderFactory = new SImgDecoderFactory_STB();
+            return TRUE;
+        }
     }
-
 SNSEND
 
 EXTERN_C BOOL Decoder_Stb_SCreateInstance(IObjRef **pImgDecoderFactory)
 {
-	return SOUI::IMGDECODOR_STB::SCreateInstance(pImgDecoderFactory);
+    SOUI::SImgDecoderFactory_STB *p = new SOUI::SImgDecoderFactory_STB();
+    *pImgDecoderFactory = p;
+    return TRUE;
 }

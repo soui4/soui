@@ -294,7 +294,7 @@ void CMainDlg::OpenProject(SStringT strFileName)
 	m_xmlDocUiRes.reset();
 	
 	SStringT strFile = strFileName;
-	int n = strFileName.ReverseFind(_T(SLASH));
+	int n = strFileName.ReverseFind(TPATH_SLASH);
 	m_strUiresPath = strFileName;
 	m_strProPath = strFileName.Mid(0, n);
 	

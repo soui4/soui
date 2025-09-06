@@ -432,7 +432,7 @@ SNSBEGIN
 
 	namespace IPC
 	{
-		BOOL  SCreateInstance(IObjRef ** ppIpcFactory)
+		SOUI_COM_C BOOL SOUI_COM_API  SCreateInstance(IObjRef ** ppIpcFactory)
 		{
 			*ppIpcFactory = new SIpcFactory();
 			return TRUE;

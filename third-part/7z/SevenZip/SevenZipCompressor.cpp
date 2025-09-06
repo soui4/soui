@@ -76,11 +76,7 @@ HRESULT SevenZipCompressor::CompressFile(const TString& filePath, ProgressCallba
 
 FILE* SevenZipCompressor::OpenArchiveStream()
 {
-#if defined(_WIN32) && defined(_UNICODE)
-	FILE* fileStream = _wfopen(m_archivePath.c_str(), L"wb");
-#else
-	FILE* fileStream = fopen(m_archivePath.c_str(), "wb");
-#endif
+	FILE* fileStream = _tfopen(m_archivePath.c_str(), _T("wb"));
 	if ( fileStream == NULL )
 	{
 		return NULL;

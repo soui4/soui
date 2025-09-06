@@ -223,11 +223,7 @@ namespace SevenZip
     bool UsefulFunctions::GetNumberOfItems(const TString & archivePath,
         CompressionFormatEnum &format, size_t & numberofitems)
     {
-#if defined(_WIN32) && defined(_UNICODE)
-		FILE* fileStream = _wfopen(archivePath.c_str(), L"rb");
-#else
-		FILE* fileStream = fopen(archivePath.c_str(), "rb");
-#endif
+    	FILE* fileStream = _tfopen(archivePath.c_str(), _T("rb"));
 		if (fileStream == NULL) {
 			return HRESULT_FROM_WIN32(GetLastError());
 		}
@@ -260,11 +256,7 @@ namespace SevenZip
         CompressionFormatEnum &format, size_t & numberofitems,
         std::vector<TString> & itemnames, std::vector<size_t> & origsizes)
     {
-#if defined(_WIN32) && defined(_UNICODE)
-		FILE* fileStream = _wfopen(archivePath.c_str(), L"rb");
-#else
-		FILE* fileStream = fopen(archivePath.c_str(), "rb");
-#endif
+    	FILE* fileStream = _tfopen(archivePath.c_str(), _T("rb"));
 		if (fileStream == NULL) {
 			return HRESULT_FROM_WIN32(GetLastError());
 		}

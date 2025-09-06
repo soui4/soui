@@ -359,7 +359,7 @@ SStringT SResProviderFiles::GetRes(LPCTSTR strType, LPCTSTR pszResName)
     if (!strType)
     {
         // pszResName is relative path
-        SStringT strRet = m_strPath + _T(PATH_SLASH) + pszResName;
+        SStringT strRet = m_strPath + TPATH_SLASH + pszResName;
         DWORD dwAttr = GetFileAttributes(strRet);
         if (dwAttr == INVALID_FILE_ATTRIBUTES || (dwAttr & FILE_ATTRIBUTE_ARCHIVE) == 0)
             strRet = _T("");
@@ -370,7 +370,7 @@ SStringT SResProviderFiles::GetRes(LPCTSTR strType, LPCTSTR pszResName)
     if (!p)
         return _T("");
 
-    SStringT strRet = m_strPath + _T(PATH_SLASH) + p->m_value;
+    SStringT strRet = m_strPath + TPATH_SLASH + p->m_value;
     return strRet;
 }
 
@@ -435,7 +435,7 @@ BOOL SResProviderFiles::Init(WPARAM wParam, LPARAM lParam)
     LPCTSTR pszPath = (LPCTSTR)wParam;
 
     SStringT strPathIndex = pszPath;
-    strPathIndex += _T(PATH_SLASH);
+    strPathIndex += TPATH_SLASH;
     strPathIndex += UIRES_INDEX;
 
     SXmlDoc xmlDoc;
@@ -500,7 +500,6 @@ void SResProviderFiles::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
 
 void SResProviderFiles::_EnumFile(LPCTSTR pszPath, EnumFileCallback funEnumCB, LPARAM lp)
 {
-#ifdef _WIN32
     WIN32_FIND_DATA wfd;
     SStringT strFilter;
     if (pszPath)
@@ -531,44 +530,7 @@ void SResProviderFiles::_EnumFile(LPCTSTR pszPath, EnumFileCallback funEnumCB, L
         } while (FindNextFile(hFind, &wfd));
         FindClose(hFind);
     }
-#else
-    DIR *dir;
-    struct dirent *entry;
 
-    SStringT strFilter;
-    if (pszPath)
-        strFilter = m_strPath + _T("/") + pszPath;
-    else
-        strFilter = m_strPath;
-
-    dir = opendir(pszPath); // 替换为需要枚举的文件夹路径
-    if (dir == NULL)
-    {
-        return;
-    }
-
-    while ((entry = readdir(dir)) != NULL)
-    {
-        SStringT strPath;
-        if (pszPath == NULL)
-            strPath = entry->d_name;
-        else
-            strPath = SStringT().Format(_T("%s\\%s"), pszPath, entry->d_name);
-        if (entry->d_type & DT_DIR)
-        {
-            if (_tcscmp(entry->d_name, _T(".")) == 0 || _tcscmp(entry->d_name, _T("..")) == 0)
-                continue;
-            _EnumFile(strPath.c_str(), funEnumCB, lp);
-        }
-        else if (entry->d_type & DT_REG)
-        {
-            if (!funEnumCB(strPath.c_str(), lp))
-                break;
-        }
-    }
-
-    closedir(dir);
-#endif //_WIN32
 }
 
 SNSEND

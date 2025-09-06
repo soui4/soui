@@ -276,7 +276,7 @@ void SResProviderZip::_EnumFile(LPCTSTR pszPath,EnumFileCallback funEnumCB, LPAR
 
 namespace RESPROVIDER_ZIP
 {
-	BOOL SCreateInstance( IObjRef ** ppObj )
+	SOUI_COM_C BOOL SOUI_COM_API SCreateInstance( IObjRef ** ppObj )
 	{
 		*ppObj = new SResProviderZip;
 		return TRUE;
@@ -288,5 +288,5 @@ SNSEND
 
 EXTERN_C BOOL Resp_Zip_SCreateInstance(IObjRef ** ppObj)
 {
-	return SOUI::RESPROVIDER_ZIP::SCreateInstance(ppObj);
+	return SNS::RESPROVIDER_ZIP::SCreateInstance(ppObj);
 }

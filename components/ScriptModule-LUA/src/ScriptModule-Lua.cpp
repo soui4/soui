@@ -123,7 +123,7 @@ SNSBEGIN
 
 	namespace SCRIPT_LUA
 	{
-		BOOL SCreateInstance(IObjRef ** ppScript)
+		SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppScript)
 		{
 			*ppScript= new SOUI::SIScriptFactory;
 			return TRUE;
@@ -134,7 +134,7 @@ SNSEND
 
 EXTERN_C BOOL Script_Lua_SCreateInstance(IObjRef ** ppScript)
 {
-	return SOUI::SCRIPT_LUA::SCreateInstance(ppScript);
+	return SNS::SCRIPT_LUA::SCreateInstance(ppScript);
 }
 
 //////////////////////////////////////////////////////////////////////////

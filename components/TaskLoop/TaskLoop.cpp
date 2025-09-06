@@ -331,5 +331,5 @@ SNSEND
 
 EXTERN_C BOOL TaskLoop_SCreateInstance(IObjRef **ppTaskLoop)
 {
-	return SOUI::TASKLOOP::SCreateInstance(ppTaskLoop);
+	return SNS::TASKLOOP::SCreateInstance(ppTaskLoop);
 }

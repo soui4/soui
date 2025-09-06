@@ -21,7 +21,7 @@ SStringT GetFileExtname(const SStringT& filepath)
 	if(pos==-1)
 		return _T("");
 	else{
-		if(pos>0 && filepath[pos-1]==_T(SLASH))
+		if(pos>0 && filepath[pos-1]==TPATH_SLASH)
 			return _T("");
 		return filepath.Right(filepath.GetLength()-pos-1);
 	}

@@ -16,7 +16,7 @@ ResManger::~ResManger()
 
 void ResManger::LoadUIResFromFile(SStringT strPath)
 {
-	m_strProPath = strPath.Mid(0, strPath.ReverseFind(_T(PATH_SLASH)));
+	m_strProPath = strPath.Mid(0, strPath.ReverseFind(TPATH_SLASH));
 	m_strUIResFile = strPath;
 
 	LoadUIRes();
@@ -229,7 +229,7 @@ SStringT ResManger::GetResPathByName(const SStringT& resname)
 	if (pFilePair == NULL)
 		return _T("");
 
-	return m_strProPath + _T(SLASH) + pFilePair->m_value;
+	return m_strProPath + TPATH_SLASH + pFilePair->m_value;
 }
 
 void ResManger::LoadResFileEx(SStringT& filepath, pugi::xml_document& xmlDoc, SStringT tagname)
@@ -254,7 +254,7 @@ void ResManger::LoadResFileEx(SStringT& filepath, pugi::xml_document& xmlDoc, SS
 					return;
 				}
 				
-				filepath = m_strProPath + _T(SLASH) + pFilePair->m_value;
+				filepath = m_strProPath + TPATH_SLASH + pFilePair->m_value;
 				result = xmlDoc.load_file(filepath, pugi::parse_full);
 				if (!result)
 				{
