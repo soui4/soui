@@ -166,9 +166,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 	//将程序的运行路径修改到demo所在的目录
 	SStringT appDir = getSourceDir();
 	#ifdef __linux__
-		AddFontResource((appDir+"/../../simsun.ttc").c_str());
+		AddFontResource((appDir+_T("/../../simsun.ttc")).c_str());
 	#elif defined(__APPLE__)
-		AddFontResource((appDir+"/fonts/simsun.ttc").c_str());
+		AddFontResource((appDir+_T("/fonts/simsun.ttc")).c_str());
 	#endif
 	SouiFactory souiFac;
     SComMgr2 *pComMgr = new SComMgr2();
