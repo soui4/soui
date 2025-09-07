@@ -12,6 +12,9 @@ file(GLOB_RECURSE HEADERS
     "*.h"
 )
 
+if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+    remove_definitions(-DUNICODE -D_UNICODE)
+endif()
 
 # 创建可执行文件
 add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})

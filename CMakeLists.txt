@@ -79,7 +79,7 @@ endif()
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
   option(USE_UNICODE "Use Unicode" ON)
 else()
-  set(USE_UNICODE OFF)
+  option(USE_UNICODE "Use Unicode" OFF)
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-D_DEBUG)
   endif()
@@ -179,6 +179,7 @@ set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 add_definitions(-D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
 
 link_directories(${CMAKE_BINARY_DIR}/bin)
+
 add_subdirectory(third-part)
 add_subdirectory(utilities)
 

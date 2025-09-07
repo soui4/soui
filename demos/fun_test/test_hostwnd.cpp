@@ -21,33 +21,22 @@ void RunMenu(POINT pt) {
         MENUITEMINFO info;
         info.fMask = MIIM_SUBMENU;
         info.hSubMenu = CreatePopupMenu();
-        // �����Ӳ˵�
         for (int i = 0; i < 6; i++)
-            InsertMenu(info.hSubMenu, -1, MF_BYPOSITION | MF_CHECKED, 20 + i, SStringT().Format(_T("child menu_1����%d"), i).c_str());
+            InsertMenu(info.hSubMenu, -1, MF_BYPOSITION | MF_CHECKED, 20 + i, SStringT().Format(_T("child menu_1_%d"), i).c_str());
         SetMenuItemInfo(hMenu, 0, TRUE, &info);
 
         info.hSubMenu = CreatePopupMenu();
-        // �����Ӳ˵�
         for (int i = 0; i < 6; i++)
-            InsertMenu(info.hSubMenu, -1, MF_BYPOSITION, 30 + i, SStringT().Format(_T("child menu_2����%d"), i).c_str());
+            InsertMenu(info.hSubMenu, -1, MF_BYPOSITION, 30 + i, SStringT().Format(_T("child menu_2_%d"), i).c_str());
 
         MENUITEMINFO info2;
         info2.fMask = MIIM_SUBMENU;
         info2.hSubMenu = CreatePopupMenu();
         for (int i = 0; i < 6; i++)
-            InsertMenu(info2.hSubMenu, -1, MF_BYPOSITION, 40 + i, SStringT().Format(_T("child menu_3����%d"), i).c_str());
+            InsertMenu(info2.hSubMenu, -1, MF_BYPOSITION, 40 + i, SStringT().Format(_T("child menu_3_%d"), i).c_str());
         SetMenuItemInfo(info.hSubMenu, 4, TRUE, &info2);
 
         SetMenuItemInfo(hMenu, 3, TRUE, &info);
-
-        // ��ɫ�ҽ���
-        //EnableMenuItem(hMenu, 0, MF_GRAYED | MF_BYPOSITION);
-        // ���ò���ʾ��ɫ
-       // EnableMenuItem(hMenu, 12, MF_DISABLED | MF_BYCOMMAND);
-        // ʹ�ò˵�ID��ɫ�Ӳ˵�
-        //EnableMenuItem(hMenu, 31, MF_GRAYED | MF_CHECKED);
-        // ʹ�ò˵�ID��ɫ�Ӳ˵�
-        //EnableMenuItem(hMenu, 42, MF_GRAYED);
 
         TrackPopupMenu(hMenu, 0, pt.x, pt.y, 0, GetActiveWindow(), NULL);
 

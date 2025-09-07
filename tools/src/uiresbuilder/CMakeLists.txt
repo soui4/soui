@@ -19,7 +19,10 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 # 设置包含目录
 target_include_directories(${PROJECT_NAME} PRIVATE .)
 
- remove_definitions(-DUNICODE -D_UNICODE) 
+if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+    remove_definitions(-DUNICODE -D_UNICODE)
+endif()
+
 # 根据操作系统设置特定选项
 if(NOT WIN32)
     add_dependencies(${PROJECT_NAME} swinx)

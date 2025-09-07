@@ -45,7 +45,7 @@ inline BOOL BuildFilePath(LPCTSTR pszCurPath, LPCTSTR pszNewPath, BOOL bPath = T
     {
         size_t nLen = _tcslen(szNewPath);
         if (szNewPath[nLen - 1] != TPATH_SLASH)
-            _tcscat(szNewPath, _T(C2S(PATH_SEPARATOR)));
+            _tcscat(szNewPath, TPATH_SLASH2);
     }
     LPTSTR pszPath = _tcschr(szNewPath, TPATH_SLASH);
     while (pszPath)

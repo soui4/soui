@@ -47,7 +47,7 @@ namespace intl {
 
 		WIN32_FIND_DATA fdata;
 		TString findPath = JoinPath(directory, _T("*"));
-		HANDLE hFind = FindFirstFileW(findPath.c_str(), &fdata);
+		HANDLE hFind = FindFirstFile(findPath.c_str(), &fdata);
 
 		if (hFind == INVALID_HANDLE_VALUE) {
 			cb.LeaveDirectory(directory);
