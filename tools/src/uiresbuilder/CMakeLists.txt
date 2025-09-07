@@ -19,9 +19,7 @@ add_executable(${PROJECT_NAME} ${SOURCES} ${HEADERS})
 # 设置包含目录
 target_include_directories(${PROJECT_NAME} PRIVATE .)
 
-if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
-    remove_definitions(-DUNICODE -D_UNICODE)
-endif()
+remove_definitions(-DUNICODE -D_UNICODE)
 
 # 根据操作系统设置特定选项
 if(NOT WIN32)
