@@ -26,10 +26,17 @@ if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 add_compile_options(-Wno-c++11-extensions)
 add_compile_options(-Wno-inconsistent-missing-override)
 endif()
+
+if(MSVC)
+include(${SOUI_INSTALL_DIR}/lib/pkgconfig/soui-config.cmake)
+else()
 # 查找 pkg-config
 find_package(PkgConfig REQUIRED)
 set(ENV{PKG_CONFIG_PATH} "${SOUI_INSTALL_DIR}/lib/pkgconfig:$ENV{PKG_CONFIG_PATH}")
-pkg_check_modules(SOUI REQUIRED libsoui)
+set(CMAKE_PREFIX_PATH ${CMAKE_PREFIX_PATH} ${SOUI_INSTALL_DIR}/lib/pkgconfig)
+find_package(SOUI REQUIRED libsoui)
+endif()
+
 message(STATUS "SOUI_INCLUDE_DIRS: ${SOUI_INCLUDE_DIRS}")
 include_directories(${SOUI_INCLUDE_DIRS})
 link_directories(${SOUI_LIBRARY_DIRS})

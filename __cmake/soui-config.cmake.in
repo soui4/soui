@@ -1,0 +1,12 @@
+#Name: libsoui
+
+set(prefix @CMAKE_INSTALL_PREFIX@)
+set(exec_prefix ${prefix})
+set(libdir ${exec_prefix}/lib)
+set(includedir ${prefix}/include)
+
+set(SOUI_VER "@SOUI_VER1@.@SOUI_VER2@.@SOUI_VER3@.@SOUI_VER4@")
+set(SOUI_PREFIX ${prefix})
+set(SOUI_INCLUDE_DIRS ${includedir}/config ${includedir}/components ${includedir}/utilities/include ${includedir}/SOUI/include @SWINX_CFLAGS@)
+set(SOUI_LIBRARY_DIRS ${libdir})
+set(SOUI_LIBRARIES soui4.lib utilities4.lib @SWINX_LIBS@)

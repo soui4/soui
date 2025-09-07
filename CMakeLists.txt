@@ -197,8 +197,8 @@ endif(BUILD_DEMOS)
 
 
 if (UNIX OR MINGW)
-set(SWINX_LIB_FLAGS "-lswinx")
-set(SWINX_CFLAGS "-I\$\{includedir\}/swinx/include")
+set(SWINX_LIB_FLAGS "swinx")
+set(SWINX_CFLAGS "\$\{includedir\}/swinx/include")
 
 # Generate and install pkgconfig.
 configure_file("${PROJECT_SOURCE_DIR}/__cmake/libsoui.pc.in" "${PROJECT_BINARY_DIR}/libsoui.pc" @ONLY)
@@ -206,7 +206,11 @@ configure_file("${PROJECT_SOURCE_DIR}/__cmake/libsoui.pc.in" "${PROJECT_BINARY_D
 install(FILES "${PROJECT_BINARY_DIR}/libsoui.pc"
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
         COMPONENT pkgconfig)
+else()
+configure_file("${PROJECT_SOURCE_DIR}/__cmake/soui-config.cmake.in" "${PROJECT_BINARY_DIR}/soui-config.cmake" @ONLY)
 
+install(FILES "${PROJECT_BINARY_DIR}/soui-config.cmake"
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
 endif(UNIX OR MINGW)
 
 # Install cmake files
