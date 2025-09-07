@@ -70,7 +70,7 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 ### [编译](./doc/build.md)
 
-[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml.
+[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml).
 
 使用cmake生成对应版本VS工程再编译，运动在cmake中统一修改配置。具体编译方法查看附带[编译文档](./doc/build.md)
 
@@ -78,9 +78,11 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 最新版本souieditor已经集成到这个代码库的demos中，选择编译demo就可以获得souieditor。
 ### SOUI4JS
-`SOUI4的JavaScript导出版本，实现使用js开发客户端程序的框架，完美解决性能和灵活性的矛盾`,仓库地址(https://github.com/soui4/soui4js)
-
-使用教程见文档
+- `SOUI4的JavaScript导出版本，实现使用js开发客户端程序的框架，完美解决性能和灵活性的矛盾`,仓库地址(https://github.com/soui4/soui4js)
+- 目前已经支持windows,linux,macos三平台。
+### SOUI4PY
+- `SOUI4的Python3版本，实现使用python3开发客户端程序的框架，完美解决性能和灵活性的矛盾`,仓库地址(https://gitee.com/setoutsoft/soui4py)
+- 目前已经支持windows,linux平台，mmacos平台正在开发中。
 
 ### SOUI教程
 
@@ -97,30 +99,18 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 ##  **编译**
 ###  **Windows编译**
 - 直接使用cmake 生成工程文件，然后使用Visual Studio打开工程文件，编译即可。
+- 使用mingw32/64编译：mkdir build && cd build && cmake .. && make -j8
 
 ###  **Linux编译** 
 - 拉取子模块swinx：git submodule update --init
-- 安装依赖：sudo apt install cmake git build-essential gdb libcairo2-dev libxcb1-dev libgl1-mesa-dev freeglut3-dev
+- 安装依赖：sudo apt install cmake git build-essential gdb libxcb1-dev libgl1-mesa-dev freeglut3-dev
 - 编译：mkdir build && cd build && cmake .. && make -j8
-
--  **使用vs远程调试linux** 
-linux机器上安装
-sudo apt install -y openssh-server build-essential gdb rsync make zip ninja-build
-本机安装
-CMake, Vcxsvr(https://sourceforge.net/projects/vcxsrv/files/vcxsrv/21.1.10/vcxsrv-64.21.1.10.0.installer.exe/download)
-在VS菜单：
-工具\选项\跨平台 页面的列表中添加linux主机IP，注意配置好登陆启用名，密码
-然后就可以在VS里运行远程调试了。
-具体参考：https://learn.microsoft.com/zh-cn/cpp/build/get-started-linux-cmake?view=msvc-170
-
--  **linux 内存泄漏检测** 
-valgrind --leak-check=full ./your_program
 
 ###  **macos 编译**
 - 拉取子模块swinx：git submodule update --init
 - 安装brew,国内建议使用[中国镜像](https://gitee.com/cunkai/HomebrewCN)
 - 安装homebrew-core 和 homebrew-cask: brew tap homebrew/core && brew tap homebrew/cask
-- 安装编译工具及依赖: brew install cmake ninja pkgconf cairo glfw3 glew
+- 安装编译工具及依赖: brew install cmake ninja pkgconf glfw3 glew
 - 编译: mkdir build && cd build && cmake .. -G Ninja && ninja -j8
 
 ## **贡献名单**
