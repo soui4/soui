@@ -70,7 +70,7 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 ### [编译](./doc/build.md)
 
-[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml.
+[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml).
 
 使用cmake生成对应版本VS工程再编译，运动在cmake中统一修改配置。具体编译方法查看附带[编译文档](./doc/build.md)
 
@@ -100,7 +100,7 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 ###  **Linux编译** 
 - 拉取子模块swinx：git submodule update --init
-- 安装依赖：sudo apt install cmake git build-essential gdb libcairo2-dev libxcb1-dev libgl1-mesa-dev freeglut3-dev
+- 安装依赖：sudo apt install cmake git build-essential gdb libxcb1-dev libgl1-mesa-dev freeglut3-dev
 - 编译：mkdir build && cd build && cmake .. && make -j8
 
 -  **使用vs远程调试linux** 
@@ -120,7 +120,7 @@ valgrind --leak-check=full ./your_program
 - 拉取子模块swinx：git submodule update --init
 - 安装brew,国内建议使用[中国镜像](https://gitee.com/cunkai/HomebrewCN)
 - 安装homebrew-core 和 homebrew-cask: brew tap homebrew/core && brew tap homebrew/cask
-- 安装编译工具及依赖: brew install cmake ninja pkgconf cairo glfw3 glew
+- 安装编译工具及依赖: brew install cmake ninja pkgconf glfw3 glew
 - 编译: mkdir build && cd build && cmake .. -G Ninja && ninja -j8
 
 ## **贡献名单**
