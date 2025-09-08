@@ -139,7 +139,7 @@ BOOL CWinHttp::DownloadFile( LPCSTR lpUrl, LPCSTR lpFilePath )
     }
 	bRet =  res == CURLE_OK && m_httpCode==200;
 	if(!bRet){//下载失败，删除文件
-		DeleteFile(lpFilePath);
+		DeleteFileA(lpFilePath);
 	}
 	if(m_pCallback){
 		m_pCallback->OnDownloadCallback(bRet?DS_Finished:DS_Failed, 0, 0);
