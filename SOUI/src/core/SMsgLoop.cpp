@@ -265,7 +265,9 @@ void SMessageLoop::ExecutePendingTask()
     {
         m_priv->m_parentLoop->ExecutePendingTask();
     }
-    m_priv->m_msgWnd.KillTimer(TM_POSTTASK);
+    if(m_bRunning){
+        m_priv->m_msgWnd.KillTimer(TM_POSTTASK);
+    }
 }
 
 BOOL SMessageLoop::PeekMsg(THIS_ LPMSG pMsg, UINT wMsgFilterMin, UINT wMsgFilterMax, BOOL bRemove)
