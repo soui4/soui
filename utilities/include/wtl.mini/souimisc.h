@@ -853,25 +853,10 @@ public:
 		return m_hRgn;
 	}
 
-	HRGN CreatePolyPolygonRgn(const POINT* lpPoints, const INT* lpPolyCounts, int nCount, int nPolyFillMode)
-	{
-		SASSERT(m_hRgn == NULL);
-		m_hRgn = ::CreatePolyPolygonRgn(lpPoints, lpPolyCounts, nCount, nPolyFillMode);
-		return m_hRgn;
-	}
-
 	HRGN CreateRoundRectRgn(int x1, int y1, int x2, int y2, int x3, int y3)
 	{
 		SASSERT(m_hRgn == NULL);
 		m_hRgn = ::CreateRoundRectRgn(x1, y1, x2, y2, x3, y3);
-		return m_hRgn;
-	}
-
-	HRGN CreateFromPath(HDC hDC)
-	{
-		SASSERT(m_hRgn == NULL);
-		SASSERT(hDC != NULL);
-		m_hRgn = ::PathToRegion(hDC);
 		return m_hRgn;
 	}
 
@@ -964,7 +949,7 @@ public:
 		return ::RectInRegion(m_hRgn, lpRect);
 	}
 
-	int GetRegionData(LPRGNDATA lpRgnData, int nDataSize) const
+	int GetRegionData(RGNDATA * lpRgnData, int nDataSize) const
 	{
 		SASSERT(m_hRgn != NULL);
 		return (int)::GetRegionData(m_hRgn, nDataSize, lpRgnData);
