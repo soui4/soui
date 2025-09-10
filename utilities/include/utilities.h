@@ -110,6 +110,10 @@ UTILITIES_API StringW* CreateIStringW(LPCWSTR src);
  */
 UTILITIES_API XmlDoc* CreateIXmlDoc();
 
+#ifdef _WIN32
+BOOL UTILITIES_API PEVersion(LPCTSTR pszFileName, WORD* wMajor, WORD* wMinor, WORD* wVer3, WORD* wVer4);
+#endif//_WIN32
+
 /**
  * @brief Gets the scaling factor of a window.
  * 

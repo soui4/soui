@@ -109,7 +109,7 @@ static int getScaleOld(HWND hWnd = NULL)
 }
 
 // 获取一个PE文件的version
-static BOOL PEVersion(LPCTSTR pszFileName, WORD& wMajor, WORD& wMinor, WORD& wVer3, WORD& wVer4)
+BOOL PEVersion(LPCTSTR pszFileName, WORD * wMajor, WORD* wMinor, WORD* wVer3, WORD* wVer4)
 {
     DWORD dwResHandle;
     void* pBuf;
@@ -124,10 +124,10 @@ static BOOL PEVersion(LPCTSTR pszFileName, WORD& wMajor, WORD& wMinor, WORD& wVe
     VS_FIXEDFILEINFO* pstFileVersion;
     if (VerQueryValue(pBuf, _T("\\"), (void**)&pstFileVersion, &nVersionLen) && nVersionLen >= sizeof(VS_FIXEDFILEINFO))
     {
-        wVer4 = LOWORD(pstFileVersion->dwFileVersionLS);
-        wVer3 = HIWORD(pstFileVersion->dwFileVersionLS);
-        wMinor = LOWORD(pstFileVersion->dwFileVersionMS);
-        wMajor = HIWORD(pstFileVersion->dwFileVersionMS);
+        *wVer4 = LOWORD(pstFileVersion->dwFileVersionLS);
+        *wVer3 = HIWORD(pstFileVersion->dwFileVersionLS);
+        *wMinor = LOWORD(pstFileVersion->dwFileVersionMS);
+        *wMajor = HIWORD(pstFileVersion->dwFileVersionMS);
     }
     free(pBuf);
     return TRUE;
@@ -150,7 +150,7 @@ static BOOL IsVerOrGreater(WORD wVers[4], WORD wMajor, WORD wMinor, WORD wSpBuil
 int GetWindowScale(HWND hWnd)
 {
     WORD wVers[4];
-    PEVersion(_T("ntdll.dll"), wVers[0], wVers[1], wVers[2], wVers[3]);
+    PEVersion(_T("ntdll.dll"), wVers+0, wVers+1, wVers+2, wVers+3);
     // win7
     if (!IsVerOrGreater(wVers, 6, 1, 7600))
         return 100;
