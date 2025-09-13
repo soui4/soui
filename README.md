@@ -28,7 +28,7 @@
 ## Language Versions / 语言版本
 
 This README is available in the following languages:
-- [English Version (README_EN.md)](README_EN.md)
+- [English Version (README.md)](README.md)
 - [Chinese Version (README.zh-CN.md)](README.zh-CN.md)
 
 SOUI4 is a lightweight Windows client development framework that has been continuously developed and maintained for **14 years**,

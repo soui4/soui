@@ -28,7 +28,7 @@
 ## Language Versions / 语言版本
 
 This README is available in the following languages:
-- [English Version (README_EN.md)](README_EN.md)
+- [English Version (README.md)](README.md)
 - [Chinese Version (README.zh-CN.md)](README.zh-CN.md)
 
 以下是指南的中文版本和英文版本：
