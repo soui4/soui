@@ -1179,7 +1179,7 @@ void SHostWnd::GetContainerRect(RECT *ret) const
     *ret = GetRoot()->GetWindowRect();
 }
 
-HWND SHostWnd::GetHostHwnd()
+HWND SHostWnd::GetHostHwnd() const
 {
     return m_hWnd;
 }

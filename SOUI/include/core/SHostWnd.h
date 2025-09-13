@@ -1131,14 +1131,14 @@ public: // IContainer
      * 
      * @return Handle to the host window.
      */
-    STDMETHOD_(HWND, GetHostHwnd)() OVERRIDE;
+    STDMETHOD_(HWND, GetHostHwnd)(CTHIS) SCONST OVERRIDE;
 
     /**
      * @brief Gets the translator context for the container.
      * 
      * @return Pointer to the translator context string.
      */
-    STDMETHOD_(LPCWSTR, GetTranslatorContext)() const OVERRIDE;
+    STDMETHOD_(LPCWSTR, GetTranslatorContext)(CTHIS) SCONST OVERRIDE;
 
     /**
      * @brief Updates the specified region in the container.

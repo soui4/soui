@@ -164,6 +164,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SCaption>();
     objFactory->TplRegisterFactory<SMenuBar>();
     objFactory->TplRegisterFactory<SSwitch>();
+    objFactory->TplRegisterFactory<SGridCtrl>();
 #if defined(_WIN32) && !defined(__MINGW32__)
     objFactory->TplRegisterFactory<SActiveX>();
 #endif //_WIN32

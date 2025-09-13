@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOUI name="mainWindow" title="SOUI GridCtrl Demo" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="800" height="600" margin="5,5,5,5" resizable="1" wndType="appMain">
+  <root skin="_skin.sys.wnd.bkgnd" cache="1" layout="vbox">
+    <caption size="-2,30">
+      <icon pos="10,8" src="ICON_LOGO:16"/>
+      <text pos="29,9">SOUI GridCtrl Demo</text>
+      <imgbtn name="btn_close" skin="_skin.sys.btn.close" pos="-45,0,-0,30" tip="Close" animate="1"/>
+      <imgbtn name="btn_max" skin="_skin.sys.btn.maximize" pos="-83,0,-45,30" tip="Maximize" animate="1"/>
+      <imgbtn name="btn_restore" skin="_skin.sys.btn.restore" pos="-83,0,-45,30" tip="Restore" show="0" animate="1"/>
+      <imgbtn name="btn_min" skin="_skin.sys.btn.minimize" pos="-121,0,-83,30" tip="Minimize" animate="1"/>
+    </caption>
+    
+    <window size="-2,0" weight="1" layout="vbox">
+      <text  text="SOUI GridCtrl Demo - Basic Grid Control" font="size:14,weight:bold"/>
+      
+      <!-- Grid Control -->
+      <gridctrl name="grid_test" size="-2,0" weight="1" extend_left="0"
+                rowCount="10" 
+                colCount="5" 
+                fixedRows="1" 
+                fixedCols="1" 
+                defRowHeight="25" 
+                defColWidth="100" 
+                gridLines="3" 
+                gridLineColor="#C8C8C8" 
+                gridBkColor="#FFFFFF" 
+                editable="1"/>
+      
+      <!-- Status bar -->
+      <window size="-2,30" colorBkgnd="#F0F0F0">
+        <text pos="10,5,-10,-5" text="Ready - Use mouse to select cells, double-click to edit"/>
+      </window>
+    </window>
+  </root>
+</SOUI>

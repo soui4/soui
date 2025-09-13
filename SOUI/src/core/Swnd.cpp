@@ -3618,7 +3618,7 @@ void SWindow::SetSwndProc(FunSwndProc swndProc)
     m_funSwndProc = swndProc;
 }
 
-HWND SWindow::GetHostHwnd(THIS)
+HWND SWindow::GetHostHwnd(THIS) const
 {
     return GetContainer()->GetHostHwnd();
 }

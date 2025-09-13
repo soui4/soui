@@ -192,7 +192,7 @@ SWND SOsrPanel::OnSetSwndCapture(SWND swnd)
     return SwndContainerImpl::OnSetSwndCapture(swnd);
 }
 
-HWND SOsrPanel::GetHostHwnd()
+HWND SOsrPanel::GetHostHwnd() const
 {
     return m_pHostProxy->GetHostContainer()->GetHostHwnd();
 }

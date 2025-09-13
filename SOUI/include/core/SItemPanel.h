@@ -116,7 +116,7 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(BOOL, OnReleaseSwndCapture)() OVERRIDE;
 
     STDMETHOD_(SWND, OnSetSwndCapture)(SWND swnd) OVERRIDE;
-    STDMETHOD_(HWND, GetHostHwnd)() OVERRIDE;
+    STDMETHOD_(HWND, GetHostHwnd)() SCONST OVERRIDE;
     STDMETHOD_(LPCWSTR, GetTranslatorContext)() const OVERRIDE;
     STDMETHOD_(void, FrameToHost)(RECT *rc) const OVERRIDE;
     STDMETHOD_(BOOL, IsTranslucent)() const OVERRIDE;

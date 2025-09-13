@@ -1118,7 +1118,7 @@ class SOUI_EXP SWindow
      * @brief Retrieves the host window handle.
      * @return Host window handle.
      */
-    STDMETHOD_(HWND, GetHostHwnd)(THIS) OVERRIDE;
+    STDMETHOD_(HWND, GetHostHwnd)(THIS) SCONST OVERRIDE;
 
     /**
      * @brief Retrieves the timeline handlers manager.

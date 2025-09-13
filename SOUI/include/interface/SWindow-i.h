@@ -872,7 +872,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      *
      * Describe
      */
-    STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
+    STDMETHOD_(HWND, GetHostHwnd)(THIS) SCONST PURE;
 
     /**
      * GetTimelineHandlersMgr

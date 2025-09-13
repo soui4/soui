@@ -16,6 +16,10 @@
 #ifndef RGBA
 #define RGBA(r, g, b, a) (RGB(r, g, b) | (a << 24))
 #endif // RGBA
+#ifdef RGB
+#undef RGB
+#endif // RGB
+#define RGB(r, g, b) ((DWORD)(((BYTE)(r) | ((WORD)((BYTE)(g)) << 8)) | (((DWORD)(BYTE)(b)) << 16)) | 0xff000000)
 
 /**
  * @class SColor

@@ -379,16 +379,14 @@ int run_app(HINSTANCE hInst) {
     renderFac->SetImgDecoderFactory(imgDecoder);
 
     SApplication app(renderFac, hInst);
-
-    SouiFactory sfac;
-    SAutoRefPtr<IResProvider> sysResouce(sfac.CreateResProvider(RES_FILE), FALSE);
-
     {//test get base class name
         wchar_t szBaseClsName[MAX_OBJNAME];
         app.GetBaseClassName(SListView::GetClassName(), SListView::GetClassType(), szBaseClsName);
         SLOGI() << "base class name: " << szBaseClsName;
     }
 
+    SouiFactory sfac;
+    SAutoRefPtr<IResProvider> sysResouce(sfac.CreateResProvider(RES_FILE), FALSE);
     SStringT sysRes = srcDir + kPath_SysRes;
     sysResouce->Init((LPARAM)sysRes.c_str(), 0);
     app.LoadSystemNamedResource(sysResouce);
