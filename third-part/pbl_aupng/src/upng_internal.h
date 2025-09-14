@@ -132,6 +132,7 @@ typedef struct upng_text
     const char *text;
 } upng_text;
 
+#define kMax_TextChunk 10
 struct upng_t
 {
     upng_rgb *palette;
@@ -149,7 +150,7 @@ struct upng_t
     upng_frame* frames;
     upng_frame defaultImage;
 
-    upng_text text[10];
+    upng_text text[kMax_TextChunk];
     unsigned int text_count;
 
     upng_error error;

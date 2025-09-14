@@ -267,21 +267,23 @@ static upng_error upng_process_chunks(upng_t* upng)
         }
         else if (upng_chunk_type(chunk_header) == CHUNK_TEXT)
         {
-			char* terminator;
-            char* buffer = upng->text[upng->text_count].buffer = UPNG_MEM_ALLOC(length + 1);
-            CHECK_RET(upng, buffer != NULL, UPNG_ENOMEM);
+			if(upng->text_count<kMax_TextChunk){
+				char* terminator;
+				char* buffer = upng->text[upng->text_count].buffer = UPNG_MEM_ALLOC(length + 1);
+				CHECK_RET(upng, buffer != NULL, UPNG_ENOMEM);
 
-            CHECK_RET(upng, upng->source.read(upng->source.user, chunk_data_offset, buffer, length) == length, UPNG_EREAD);
+				CHECK_RET(upng, upng->source.read(upng->source.user, chunk_data_offset, buffer, length) == length, UPNG_EREAD);
 
-            // Split into keyword and text (separated by null byte)
-            terminator = (char*)memchr(buffer, '\0', length);
-            CHECK_RET(upng, terminator != NULL, UPNG_EMALFORMED);
+				// Split into keyword and text (separated by null byte)
+				terminator = (char*)memchr(buffer, '\0', length);
+				CHECK_RET(upng, terminator != NULL, UPNG_EMALFORMED);
 
-            upng->text[upng->text_count].keyword = buffer;
-            upng->text[upng->text_count].text = terminator + 1;
-            buffer[length] = '\0';
+				upng->text[upng->text_count].keyword = buffer;
+				upng->text[upng->text_count].text = terminator + 1;
+				buffer[length] = '\0';
 
-            upng->text_count++;
+				upng->text_count++;
+			}
         }
         else if (upng_chunk_type(chunk_header) == CHUNK_IEND)
         {
