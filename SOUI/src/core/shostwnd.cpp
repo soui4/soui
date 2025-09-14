@@ -893,7 +893,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     if (pXmlRoot && !InitFromXml(pXmlRoot))
         return -1;
     GetRoot()->RequestRelayout();
-    m_pTipCtrl = CreateTooltip();
+    m_pTipCtrl.Attach(CreateTooltip());
     if (m_pTipCtrl && m_hostAttr.m_bHasMsgLoop)
         GetMsgLoop()->AddMessageFilter(m_pTipCtrl->GetMsgFilter());
     UpdateAutoSizeCount(false);
