@@ -1,8 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SColorPicker.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SColorPicker::SColorPicker(void):m_crDef(RGBA(0,0,0,255)),m_crCur(RGBA(0,0,0,255))
 {
@@ -58,4 +57,4 @@ IMessageLoop * SColorPicker::GetMsgLoop()
     return GetContainer()->GetMsgLoop();
 }
 
-}//end of namespace
+SNSEND

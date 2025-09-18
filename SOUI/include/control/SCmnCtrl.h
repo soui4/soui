@@ -13,7 +13,7 @@
 #include <core/SWnd.h>
 #include <core/SAccelerator.h>
 #include <core/SFocusManager.h>
-#include <interface/SCtrl-i.h>
+#include <interface/SCtrls-i.h>
 #include <proxy/SWindowProxy.h>
 
 SNSBEGIN

@@ -3,7 +3,7 @@
 
 #include <core/SPanel.h>
 #include <proxy/SPanelProxy.h>
-#include <interface/SCtrl-i.h>
+#include <interface/SCtrls-i.h>
 
 SNSBEGIN
 

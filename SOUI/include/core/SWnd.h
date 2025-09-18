@@ -37,9 +37,6 @@
 #define SC_WANTALLKEYS 0xFFFF     /* Control wants all keys           */
 #define SC_WANTSYSKEY  0x80000000 /* System Key */
 
-#define ICWND_FIRST ((SWindow *)-1) /* 子窗口插入在开头 */
-#define ICWND_LAST  NULL            /* 子窗口插入在末尾 */
-
 #ifdef _DEBUG
 #define ASSERT_UI_THREAD() SNS::SWindow::TestMainThread()
 #else
@@ -1118,7 +1115,7 @@ class SOUI_EXP SWindow
      * @brief Retrieves the host window handle.
      * @return Host window handle.
      */
-    STDMETHOD_(HWND, GetHostHwnd)(THIS) OVERRIDE;
+    STDMETHOD_(HWND, GetHostHwnd)(THIS) SCONST OVERRIDE;
 
     /**
      * @brief Retrieves the timeline handlers manager.

@@ -88,6 +88,58 @@ endforeach()
 endif(APPLE)
 endmacro()
 
+macro(add_app_res_files app_name res_files dest_path)
+    add_custom_command(TARGET ${app_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:${app_name}>/${dest_path}"
+        COMMENT "Creating Frameworks directory in ${app_name}"
+    )
+    foreach(res_file ${res_files})
+        # 检查文件是否存在（在配置时检查）
+        if(EXISTS "${res_file}")
+            #message(STATUS "resource file found: ${res_file}")
+            get_filename_component(res_id "${res_file}" NAME)
+            add_custom_command(TARGET ${app_name} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${res_file}"
+                    "$<TARGET_FILE_DIR:${app_name}>/${dest_path}/${res_id}"
+                COMMENT "Copying ${res_file} to ${app_name} "
+            )
+        else()
+            message(WARNING "resource file not found: ${res_file}")
+        endif()
+    endforeach()
+endmacro()
+
+
+macro(add_app_res_folder app_name res_path res_name)
+    file(GLOB_RECURSE DATA_FILES ${res_path}/*)
+    add_custom_command(TARGET ${app_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:${app_name}>/${res_name}"
+        COMMENT "Creating Frameworks directory in ${app_name}"
+    )
+    foreach(res_file ${DATA_FILES})
+        # 检查文件是否存在（在配置时检查）
+        if(EXISTS "${res_file}")
+            #message(STATUS "resource file found: ${res_file}")
+            get_filename_component(res_id "${res_file}" NAME)
+            file(RELATIVE_PATH relative_file "${res_path}" "${res_file}")
+            get_filename_component(relative_dir ${relative_file} DIRECTORY)
+
+            add_custom_command(TARGET ${app_name} POST_BUILD
+                COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                    "${res_file}"
+                    "$<TARGET_FILE_DIR:${app_name}>/${res_name}/${relative_dir}/${res_id}"
+                COMMENT "Copying ${res_file} to ${app_name} "
+            )
+        else()
+            message(WARNING "resource file not found: ${res_file}")
+        endif()
+    endforeach()
+endmacro()
+
+
 macro(add_macos_res_file app res_file dest_path)
     if(APPLE)
         message(STATUS "Adding resource file: ${res_file}")

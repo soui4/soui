@@ -656,9 +656,11 @@ void SWindow::SetVisible(BOOL bVisible, BOOL bUpdate /*=FALSE*/)
 {
     if (bUpdate)
         InvalidateRect(GetWindowRect());
+    AddRef();
     SSendMessage(WM_SHOWWINDOW, bVisible);
     if (bUpdate)
         InvalidateRect(GetWindowRect());
+    Release();
 }
 
 void SWindow::EnableWindow(BOOL bEnable, BOOL bUpdate)
@@ -3618,7 +3620,7 @@ void SWindow::SetSwndProc(FunSwndProc swndProc)
     m_funSwndProc = swndProc;
 }
 
-HWND SWindow::GetHostHwnd(THIS)
+HWND SWindow::GetHostHwnd(THIS) const
 {
     return GetContainer()->GetHostHwnd();
 }

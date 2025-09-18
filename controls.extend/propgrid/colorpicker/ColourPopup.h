@@ -22,8 +22,7 @@
 
 #include "Tooltipctrl.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 struct IColorPicker{
 	virtual void OnColorChanged(COLORREF cr)=0;
@@ -106,7 +105,7 @@ protected:
 };
 
 
-}//end of namespace
+SNSEND
 
 /////////////////////////////////////////////////////////////////////////////
 

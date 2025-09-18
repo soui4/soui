@@ -353,6 +353,10 @@ public:
 	STDMETHOD_(HRESULT,FillArc)(THIS_ LPCRECT pRect,float startAngle,float sweepAngle) OVERRIDE;
 
 	STDMETHOD_(HRESULT,DrawLines)(THIS_ LPPOINT pPt,size_t nCount) OVERRIDE;
+	STDMETHOD_(HRESULT, DrawLine)(THIS_ POINT pt1, POINT pt2) OVERRIDE{
+		POINT pts[2] = {pt1,pt2};
+		return DrawLines(pts,2);
+	}
 	STDMETHOD_(HRESULT, DrawGradientRect)(THIS_ LPCRECT pRect,  BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha DEF_VAL(0xFF)) OVERRIDE;
 	STDMETHOD_(HRESULT, DrawGradientRectEx)
 		(THIS_ LPCRECT pRect, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF)) OVERRIDE;

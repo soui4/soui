@@ -4,7 +4,7 @@
 #include <core/SWnd.h>
 #include <core/SAccelerator.h>
 #include <proxy/SWindowProxy.h>
-#include <interface/SCtrl-i.h>
+#include <interface/SCtrls-i.h>
 
 SNSBEGIN
 

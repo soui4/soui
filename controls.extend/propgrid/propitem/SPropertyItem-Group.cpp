@@ -2,8 +2,8 @@
 #include "SPropertyItem-Group.h"
 #include "../SPropertyGrid.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
 	SPropertyGroup::SPropertyGroup(SPropertyGrid *pOwner) :SPropertyItemBase(pOwner)
 	{
 	}
@@ -28,4 +28,4 @@ namespace SOUI
 		GetOwner()->OnItemValueChanged(pChild);
 	}
 
-}
+SNSEND

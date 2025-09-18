@@ -37,6 +37,9 @@ enum
 
 typedef BOOL (*FunSwndProc)(IWindow *pSwnd, UINT uMsg, WPARAM wp, LPARAM lp, LRESULT *pbHandled);
 
+#define ICWND_FIRST ((SWindow *)-1) /* 子窗口插入在开头 */
+#define ICWND_LAST  NULL            /* 子窗口插入在末尾 */
+
 #undef INTERFACE
 #define INTERFACE IWindow
 DECLARE_INTERFACE_(IWindow, IObject)
@@ -211,7 +214,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @return
      */
     STDMETHOD_(LRESULT, SSendMessage)
-    (THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL * pbMsgHandled) PURE;
+    (THIS_ UINT uMsg, WPARAM wParam, LPARAM lParam, BOOL * pbMsgHandled DEF_VAL(NULL)) PURE;
 
     /**
      * @brief 分发一个消息到当前窗口及它所有子窗口
@@ -575,7 +578,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      *
      * Describe  一般用于UI初始化的时候创建，插入的窗口不会自动进入布局流程
      */
-    STDMETHOD_(void, InsertIChild)(THIS_ IWindow * pNewChild, IWindow * pInsertAfter) PURE;
+    STDMETHOD_(void, InsertIChild)(THIS_ IWindow * pNewChild, IWindow * pInsertAfter DEF_VAL(ICWND_LAST)) PURE;
 
     /**
      * RemoveChild
@@ -872,7 +875,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      *
      * Describe
      */
-    STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
+    STDMETHOD_(HWND, GetHostHwnd)(THIS) SCONST PURE;
 
     /**
      * GetTimelineHandlersMgr

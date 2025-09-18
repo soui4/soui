@@ -84,6 +84,13 @@
         "span": "cpp",
         "text_encoding": "cpp",
         "variant": "cpp",
-        "__config": "cpp"
+        "__config": "cpp",
+        "any": "cpp",
+        "future": "cpp",
+        "xmemory": "cpp",
+        "xtr1common": "cpp",
+        "xutility": "cpp",
+        "*.inc": "cpp",
+        "xlocale": "cpp"
     }
 }

@@ -157,7 +157,18 @@ BOOL SNativeWndHelper::Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp)
 {
     SAutoLock lock(m_cs);
     if (m_hHeap)
-        return FALSE;
+    {
+        if (m_hHeap)
+        {
+            HeapDestroy(m_hHeap);
+            m_hHeap = NULL;
+        }
+        if (m_atom)
+        {
+            UnregisterClass((LPCTSTR)(UINT_PTR)m_atom, m_hInst);
+            m_atom = 0;
+        }
+    }
     m_hInst = hInst;
     m_hHeap = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE, 0, 0);
     m_atom = SNativeWnd::RegisterSimpleWnd(m_hInst, pszClassName, bImeApp);

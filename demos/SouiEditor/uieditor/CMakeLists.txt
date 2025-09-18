@@ -68,7 +68,7 @@ set(CURRENT_HEADERS
     Dialog/DlgResMgr.h
     Dialog/DlgInsertXmlElement.h
     SImgCanvas.h
-    ../ExtendCtrls/SCtrlsRegister.h
+    ${PROJECT_SOURCE_DIR}/controls.extend/SCtrlsRegister.h
 )
 
 file(GLOB_RECURSE CURRENT_SOUIS  *.xml *.idx *.ico)

@@ -7,6 +7,5 @@ set(SOUI_INCLUDE ${CMAKE_SOURCE_DIR})
 include_directories(${SOUI_INCLUDE}/components/resprovider-zip)
 
 add_subdirectory(copy_files)
-add_subdirectory(ExtendCtrls)
 add_subdirectory(uieditor)
 add_subdirectory(uiviewer)

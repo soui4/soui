@@ -3,9 +3,10 @@
 
 #include <control/SListbox.h>
 #include "SPropertyItemBase.h"
-#include "propitem/SPropertyItem-Group.h"
+
 
 SNSBEGIN
+	class SPropertyGroup;
 
 	enum{
 		EVT_PG_VALUECHANGED = EVT_EXTERNAL_BEGIN+100,

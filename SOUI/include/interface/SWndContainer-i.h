@@ -102,7 +102,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @brief Retrieves the handle to the host window.
      * @return Handle to the host window (HWND).
      */
-    STDMETHOD_(HWND, GetHostHwnd)(THIS) PURE;
+    STDMETHOD_(HWND, GetHostHwnd)(CTHIS) SCONST PURE;
 
     /**
      * @brief Checks if the host window is translucent.

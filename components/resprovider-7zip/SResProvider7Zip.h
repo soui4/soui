@@ -5,13 +5,15 @@
 #include <string/tstring.h>
 #include <string/strcpcvt.h>
 #include <souicoll.h>
-//#define _COLL_NS SOUI
 #include <helper/SResID.h>
 #include <interface/SRender-i.h>
 
-#include "Zip7Archive.h"
 #include "zip7resprovider-param.h"
 
+namespace SevenZip
+{
+	class CZipArchive;
+}
 SNSBEGIN
 
 class SResProvider7Zip : public TObjRefImpl<IResProvider>
@@ -39,7 +41,7 @@ protected:
 	
 	SMap<SResID,SStringT> m_mapFiles;
     SAutoRefPtr<IRenderFactory> m_renderFactory;
-	SevenZip::CZipArchive m_zipFile;
+    SevenZip::CZipArchive * m_zipFile;
 	SStringT m_childDir;
 };
 

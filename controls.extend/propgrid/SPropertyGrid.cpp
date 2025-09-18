@@ -1,13 +1,13 @@
 ﻿#include "stdafx.h"
 #include "SPropertyGrid.h"
+#include "propitem/SPropertyItem-Group.h"
 #include "propitem/SPropertyItem-Text.h"
 #include "propitem/SPropertyItem-Option.h"
 #include "propitem/SPropertyItem-Color.h"
 #include "propitem/SPropertyItem-Size.h"
 #include "propitem/SPropertyItem-Rect.h"
 
-namespace SOUI
-{
+SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 IPropertyItem *SPropertyGrid::CreateItem(const SStringW &strName)
 {
@@ -825,4 +825,4 @@ HRESULT SPropertyGrid::OnAttrOrderType(const SStringW &strValue, BOOL bLoading)
     return bLoading ? S_OK : S_FALSE;
 }
 
-} // namespace SOUI
+SNSEND

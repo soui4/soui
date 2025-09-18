@@ -5,7 +5,7 @@
 #include "PreviewHost.h"
 #include <shellapi.h>
 #include "PreviewContainer.h"
-#include "../ExtendCtrls/SCtrlsRegister.h"
+#include "SCtrlsRegister.h"
 #include <SouiFactory.h>
 #include <zipresprovider-param.h>
 #ifndef _WIN32

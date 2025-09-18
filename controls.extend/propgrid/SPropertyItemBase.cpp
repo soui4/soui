@@ -2,8 +2,8 @@
 #include "SPropertyItemBase.h"
 #include "SPropertyGrid.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
 int SPropertyItemBase::GetLevel() const
 {
     int iLevel = 0;
@@ -230,4 +230,4 @@ void SPropertyItemBase::SetReadOnly(BOOL bReadOnly)
     GetOwner()->OnItemInvalidate(this);
 }
 
-} // namespace SOUI
+SNSEND

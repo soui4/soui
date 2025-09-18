@@ -13,7 +13,7 @@
 #define __SSTACKVIEW__H__
 
 #include <valueAnimator/SValueAnimator.h>
-#include <interface/SCtrl-i.h>
+#include <interface/SCtrls-i.h>
 #include <core/SWnd.h>
 #include <proxy/SWindowProxy.h>
 

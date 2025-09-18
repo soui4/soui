@@ -15,7 +15,7 @@
 #include <core/SWnd.h>
 #include <helper/SplitString.h>
 #include <proxy/SWindowProxy.h>
-#include <interface/SCtrl-i.h>
+#include <interface/SCtrls-i.h>
 
 SNSBEGIN
 

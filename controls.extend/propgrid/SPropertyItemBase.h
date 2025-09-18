@@ -1,11 +1,13 @@
-﻿#pragma once
+﻿#ifndef __SPropertyItemBase_H__
+#define __SPropertyItemBase_H__
+
 
 #include "SPropertyItem-i.h"
 #include <sobject/Sobject.hpp>
 #include <helper/obj-ref-impl.hpp>
 
-namespace SOUI
-{
+SNSBEGIN
+
     class SPropertyItemBase : public TObjRefImpl<IPropertyItem>
     {
         DEF_SOBJECT(TObjRefImpl<IPropertyItem>,L"propitembase")
@@ -115,4 +117,6 @@ namespace SOUI
         }
     };
 
-}
+SNSEND
+
+#endif//_SPropertyItemBase_H_

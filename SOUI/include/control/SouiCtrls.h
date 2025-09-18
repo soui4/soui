@@ -30,6 +30,6 @@
 #include <control/SSwitch.h>
 #ifdef _WIN32
 #include <control/SActiveX.h>
-#endif
+#endif//_WIN32
 
 #endif // __SOUICTRLS__H__

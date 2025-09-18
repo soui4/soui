@@ -1756,6 +1756,14 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, DrawLines)(THIS_ LPPOINT pPt, size_t nCount) PURE;
 
     /**
+     * @brief Draw a single line.
+     * @param pt1 Starting point of the line.
+     * @param pt2 Ending point of the line.
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, DrawLine)(THIS_ POINT pt1, POINT pt2) PURE;
+    
+    /**
      * @brief Draw a gradient-filled rectangle.
      * @param pRect Rectangle to fill.
      * @param bVert Vertical gradient flag.

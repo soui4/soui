@@ -6,9 +6,9 @@
 #include <res.mgr/SNamedValue.h>
 
 const int KTransGridSize    =5;
-namespace SOUI
-{
-	SPropertyItemColor::SPropertyItemColor(SPropertyGrid *pOwner) :SPropertyItemText(pOwner),m_crValue(CR_INVALID)
+SNSBEGIN
+
+SPropertyItemColor::SPropertyItemColor(SPropertyGrid *pOwner) :SPropertyItemText(pOwner),m_crValue(CR_INVALID)
 	{
 		m_strFormat = _T("#%02x%02x%02x%02x");
 	}
@@ -174,4 +174,4 @@ namespace SOUI
 		OnValueChanged();
 	}
 
-}
+SNSEND

@@ -21,8 +21,6 @@ SComboBox::~SComboBox()
 
 BOOL SComboBox::CreateListBox(SXmlNode xmlNode)
 {
-    if (!xmlNode)
-        return FALSE;
     //创建列表控件
     SXmlNode listStyle = xmlNode.child(L"listStyle");
     SStringW strListClass = listStyle.attribute(L"wndclass").as_string(SListBox::GetClassName());

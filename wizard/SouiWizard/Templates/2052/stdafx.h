@@ -20,7 +20,5 @@
 #include "trayicon/SShellTray.h"
 [!endif]
 #include "resource.h"
-#define R_IN_CPP	//定义这个开关来
-#include "res/resource.h"
 using namespace SNS;
 

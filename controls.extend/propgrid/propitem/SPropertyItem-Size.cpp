@@ -5,8 +5,8 @@
 
 #include <helper/SplitString.h>
 
-namespace SOUI
-{
+
+SNSBEGIN
     SPropertyItemSize::SPropertyItemSize( SPropertyGrid *pOwner ) :SPropertyItemText(pOwner),m_bChildChanged(FALSE),m_bDigit(TRUE)
     {
 		IPropertyItem *pWidth = pOwner->CreateItem(SPropertyItemText::GetClassName());
@@ -134,4 +134,4 @@ namespace SOUI
 		OnValueChanged();
 	}
 
-}
+SNSEND

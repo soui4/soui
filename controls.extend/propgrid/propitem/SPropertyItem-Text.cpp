@@ -3,9 +3,9 @@
 #include "../SPropertyEmbedWndHelper.hpp"
 #include "../SPropertyGrid.h"
 
-namespace SOUI
-{
-    class SPropEdit: public SEdit
+SNSBEGIN
+
+class SPropEdit: public SEdit
                    , public IPropInplaceWnd
     {
     public:
@@ -128,4 +128,5 @@ namespace SOUI
         }
         __baseCls::OnValueChanged();
     }
-}
+
+SNSEND

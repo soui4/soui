@@ -4,9 +4,9 @@
 #include "../SPropertyGrid.h"
 #include <helper/SplitString.h>
 
-namespace SOUI
-{
-    class SPropCombobox: public SComboBox
+SNSBEGIN
+
+class SPropCombobox: public SComboBox
                    , public IPropInplaceWnd
     {
     public:
@@ -216,4 +216,4 @@ namespace SOUI
 		return value;
 	}
 
-}
+SNSEND

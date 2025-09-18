@@ -12,7 +12,7 @@
 #include <interface/SMessageBox-i.h>
 #include <zipresprovider-param.h>
 #include "Global.h"
-#include "../ExtendCtrls/SCtrlsRegister.h"
+#include "SCtrlsRegister.h"
 #pragma comment(lib, "shlwapi.lib")
 
 

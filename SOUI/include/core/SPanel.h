@@ -16,7 +16,7 @@
 
 #include <core/SWnd.h>
 #include <core/SScrollBarHandler.h>
-#include <interface/SCtrl-i.h>
+#include <interface/SCtrls-i.h>
 #include <proxy/SWindowProxy.h>
 
 SNSBEGIN

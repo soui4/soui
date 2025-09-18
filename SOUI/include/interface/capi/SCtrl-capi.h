@@ -1,7 +1,7 @@
 #ifndef __SCTRL_CAPI_H__
 #define __SCTRL_CAPI_H__
 
-#include "../SCtrl-i.h"
+#include "../SCtrls-i.h"
 
 #ifdef __cplusplus
 extern "C" {
@@ -12,7 +12,7 @@ extern "C" {
  * These macros provide C-style function call syntax for C++ interface methods
  * 
  * Note: This file covers the main control interfaces. Due to the large number
- * of control interfaces in SCtrl-i.h (3475+ lines), this implementation focuses
+ * of control interfaces in SCtrls-i.h (3475+ lines), this implementation focuses
  * on the most commonly used base interfaces.
  */
 
@@ -381,7 +381,7 @@ static inline BOOL ICtrl_IsItemPanel_C(ICtrl* pThis)
 }
 
 /*
- * Note: Additional control interfaces from SCtrl-i.h can be added here
+ * Note: Additional control interfaces from SCtrls-i.h can be added here
  * as needed. The file contains many specialized control interfaces such as:
  * - IListBox, IComboBox, IEdit, IButton
  * - ITreeView, IListView, ITabCtrl

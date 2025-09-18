@@ -93,6 +93,35 @@ add_macos_res_file(${project_name} ${SOUI_ROOT}/resources/soui-sys-resource.zip 
 add_macos_res_file(${project_name} ${SOUI_ROOT}/resources/simsun.ttc fonts) 
 add_macos_res_folder(${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/uires data/uires)
 set_macos_icon(${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/res/soui-app.icns ${SOUI_ROOT}/__cmake/plist.in)
+else()
+	# add UI resources folder (shared for all configs)
+	add_app_res_folder(${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/uires data/uires)
+	file(GLOB_RECURSE SOUI_RES ${SOUI_ROOT}/resources/*.*)
+	add_app_res_files(${project_name} "${SOUI_RES}" data)
+	# For multi-config generators (Visual Studio, Xcode), copy the DLLs
+	# from the configuration-specific subfolder (e.g. bin/Debug, bin/Release)
+	# at post-build time using a generator expression $<CONFIG> so the correct
+	# folder is used for each config.
+	if(MSVC OR CMAKE_CONFIGURATION_TYPES)
+		add_custom_command(TARGET ${project_name} POST_BUILD
+			COMMAND ${CMAKE_COMMAND} -E echo "Copying SOUI DLLs from ${SOUI_ROOT}/bin/$<CONFIG> to target output"
+			COMMAND ${CMAKE_COMMAND} -E copy_directory
+				"${SOUI_ROOT}/bin/$<CONFIG>"
+				$<TARGET_FILE_DIR:${project_name}>
+			COMMENT "Copying SOUI DLLs for configuration $<CONFIG>")
+	else()
+		# Single-config generators (Makefile, Ninja): use CMAKE_BUILD_TYPE
+		if(NOT CMAKE_BUILD_TYPE)
+			set(CMAKE_BUILD_TYPE Release)
+		endif()
+		set(SOUI_BINARY_DIR ${SOUI_ROOT}/bin/${CMAKE_BUILD_TYPE}) 
+		if(CMAKE_SYSTEM_NAME STREQUAL "Windows")
+			file(GLOB_RECURSE SOUI_DLL_FILES ${SOUI_BINARY_DIR}/*.dll)
+		else()
+			file(GLOB_RECURSE SOUI_DLL_FILES ${SOUI_BINARY_DIR}/*.so)
+		endif()
+		add_app_res_files(${project_name} "${SOUI_DLL_FILES}" "") 
+	endif()
 endif()
 
 target_link_libraries(${project_name} ${SOUI_LIBRARIES})

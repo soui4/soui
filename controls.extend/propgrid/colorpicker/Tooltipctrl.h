@@ -1,8 +1,10 @@
-﻿#pragma once
+﻿#ifndef __TOOLTIPCTRL_H__
+#define __TOOLTIPCTRL_H__
+
 
 #include <core/SNativeWnd.h>
 
-namespace SOUI{
+SNSBEGIN
 
 typedef struct tagAFX_OLDTOOLINFO1 {
 	UINT cbSize;
@@ -73,4 +75,6 @@ protected:
 };
 
 
-}//end of namespace
+SNSEND
+
+#endif//_TOOLTIPCTRL_H__

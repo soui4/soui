@@ -164,9 +164,12 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SCaption>();
     objFactory->TplRegisterFactory<SMenuBar>();
     objFactory->TplRegisterFactory<SSwitch>();
-#if defined(_WIN32) && !defined(__MINGW32__)
+    #if defined(_WIN32) && !defined(__MINGW32__)
     objFactory->TplRegisterFactory<SActiveX>();
-#endif //_WIN32
+    #endif //_WIN32
+    #ifdef SOUI_BUILD_EXCTRL
+    objFactory->TplRegisterFactory<SGridCtrl>();
+    #endif//SOUI_BUILD_EXCTRL
 }
 
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
@@ -238,12 +241,7 @@ SApplication *SApplication::getSingletonPtr(void)
     return ms_Singleton;
 }
 
-SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTSTR pszHostClassName, const ISystemObjectRegister &sysObjRegister, BOOL bImeApp)
-    : m_hInst(hInst)
-    , m_RenderFactory(pRendFactory)
-    , m_hMainWnd(NULL)
-    , m_cbCreateObj(NULL)
-    , m_cbCreateTaskLoop(NULL)
+void SApplication::_InitApp(const ISystemObjectRegister &sysObjRegister)
 {
     assert(!ms_Singleton);
     ms_Singleton = this;
@@ -251,7 +249,6 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     SWndSurface::Init();
 #endif //_WIN32
     SRichEdit::InitTextService();
-    SNativeWnd::InitWndClass(hInst, pszHostClassName, bImeApp);
     memset(m_pSingletons, 0, sizeof(m_pSingletons));
     _CreateSingletons();
 
@@ -259,7 +256,7 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     m_tooltipFactory.Attach(new SDefToolTipFactory);
     m_msgLoopFactory.Attach(new SDefMsgLoopFactory);
 
-    SAppDir appDir(hInst);
+    SAppDir appDir(m_hInst);
     m_strAppDir = appDir.AppDir();
 
     SAutoRefPtr<IMessageLoop> pMsgLoop;
@@ -271,6 +268,28 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     sysObjRegister.RegisterInterpolator(this);
     sysObjRegister.RegisterAnimation(this);
     sysObjRegister.RegisterValueAnimator(this);
+}
+
+SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTSTR pszHostClassName, const ISystemObjectRegister &sysObjRegister, BOOL bImeApp)
+    : m_hInst(hInst)
+    , m_RenderFactory(pRendFactory)
+    , m_hMainWnd(NULL)
+    , m_cbCreateObj(NULL)
+    , m_cbCreateTaskLoop(NULL)
+{
+    SNativeWnd::InitWndClass(m_hInst, pszHostClassName, bImeApp);
+    _InitApp(sysObjRegister);
+}
+
+SApplication::SApplication(HINSTANCE hInst,const ISystemObjectRegister &sysObjRegister)
+    : m_hInst(hInst)
+    , m_RenderFactory(NULL)
+    , m_hMainWnd(NULL)
+    , m_cbCreateObj(NULL)
+    , m_cbCreateTaskLoop(NULL)
+{
+    SNativeWnd::InitWndClass(m_hInst, _T("SOUI4HOST"), FALSE);
+    _InitApp(sysObjRegister);
 }
 
 SApplication::~SApplication(void)
@@ -884,6 +903,10 @@ LPCWSTR SOUI_EXP GetAttrAlias(LPCWSTR pszAttr, IObject *pObject){
     }else{
         return pszAttr;
     }
+}
+
+BOOL SApplication::DoConfig(const SAppCfg &cfg){
+    return cfg.DoConfig(this);
 }
 
 SNSEND

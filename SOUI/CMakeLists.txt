@@ -43,10 +43,9 @@ endif()
 set(source ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
 
 if (NOT ENABLE_SOUI_CORE_LIB)
-
-if (CMAKE_SYSTEM_NAME MATCHES Windows)
-    set (source  ${source} soui.rc)
-endif()
+    if (CMAKE_SYSTEM_NAME MATCHES Windows)
+        set (source  ${source} soui.rc)
+    endif()
     add_library(soui4 SHARED ${source})
 else()
     add_library(soui4 STATIC ${source})
@@ -58,11 +57,20 @@ target_include_directories(soui4
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/include
   PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/interface
   PUBLIC ${PROJECT_SOURCE_DIR}/utilities/include
+  PUBLIC ${PROJECT_SOURCE_DIR}/components
 )
 
 add_dependencies(soui4 utilities4)
 target_link_libraries(soui4 utilities4)
- 
+if(ENABLE_SOUI_COM_LIB)
+    if(TARGET resprovider-7zip)
+        target_link_libraries(soui4 resprovider-7zip)
+    endif()
+    if(TARGET resprovider-zip)
+        target_link_libraries(soui4 resprovider-zip)
+    endif()
+endif()
+
 if (NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 add_dependencies(soui4  swinx)
 target_link_libraries(soui4  swinx)

@@ -3,17 +3,19 @@
 
 #include "SResProvider7Zip.h"
 #include <xml/SXml.h>
-
+#include "Zip7Archive.h"
 
 using namespace SevenZip;
 SNSBEGIN
 
 SResProvider7Zip::SResProvider7Zip():m_renderFactory(NULL)
 {
+    m_zipFile = new SevenZip::CZipArchive;
 }
 
 SResProvider7Zip::~SResProvider7Zip(void)
 {
+    delete m_zipFile;
 }
 
 HBITMAP SResProvider7Zip::LoadBitmap(LPCTSTR pszResName )
@@ -21,7 +23,7 @@ HBITMAP SResProvider7Zip::LoadBitmap(LPCTSTR pszResName )
 	SStringT strPath=_GetFilePath(pszResName,_T("BITMAP"));
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
-	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
+	if(!m_zipFile->GetFile(strPath,zf)) return NULL;
 
 	HDC hDC = GetDC(0);
 	//读取位图头
@@ -49,7 +51,7 @@ HICON SResProvider7Zip::LoadIcon(LPCTSTR pszResName ,int cx/*=0*/,int cy/*=0*/)
 	SStringT strPath=_GetFilePath(pszResName,_T("ICON"));
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
-	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
+	if(!m_zipFile->GetFile(strPath,zf)) return NULL;
 
 	return (HICON)LoadIconFromMemory(zf.GetData(),zf.GetSize(),TRUE,cx,cy,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
 }
@@ -59,7 +61,7 @@ HCURSOR SResProvider7Zip::LoadCursor( LPCTSTR pszResName )
 	SStringT strPath=_GetFilePath(pszResName,_T("CURSOR"));
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
-	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
+	if(!m_zipFile->GetFile(strPath,zf)) return NULL;
 	return (HCURSOR)LoadIconFromMemory(zf.GetData(),zf.GetSize(),FALSE,0,0,LR_DEFAULTSIZE|LR_DEFAULTCOLOR);
 }
 
@@ -70,7 +72,7 @@ IBitmapS * SResProvider7Zip::LoadImage( LPCTSTR strType,LPCTSTR pszResName)
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
-	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
+	if(!m_zipFile->GetFile(strPath,zf)) return NULL;
 	IBitmapS * pBmp=NULL;
 	m_renderFactory->CreateBitmap(&pBmp);
 	if(!pBmp) return NULL;
@@ -86,7 +88,7 @@ IImgX   * SResProvider7Zip::LoadImgX( LPCTSTR strType,LPCTSTR pszResName )
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return NULL;
 	CZipFile zf;
-	if(!m_zipFile.GetFile(strPath,zf)) return NULL;
+	if(!m_zipFile->GetFile(strPath,zf)) return NULL;
 
 	IImgX *pImgX=NULL;
 	m_renderFactory->GetImgDecoderFactory()->CreateImgX(&pImgX);
@@ -102,7 +104,7 @@ IImgX   * SResProvider7Zip::LoadImgX( LPCTSTR strType,LPCTSTR pszResName )
 
 BOOL SResProvider7Zip::_Init( LPCTSTR pszZipFile ,LPCSTR pszPsw)
 {
-	if (!m_zipFile.Open(pszZipFile, pszPsw)) return FALSE;
+	if (!m_zipFile->Open(pszZipFile, pszPsw)) return FALSE;
 	_InitFileMap();
 	return TRUE;
 }
@@ -110,7 +112,7 @@ BOOL SResProvider7Zip::_Init( LPCTSTR pszZipFile ,LPCSTR pszPsw)
 BOOL SResProvider7Zip::_Init( HINSTANCE hInst,LPCTSTR pszResName,LPCTSTR pszType  ,LPCSTR pszPsw)
 {
 #ifdef _WIN32
-	if(!m_zipFile.Open(hInst,pszResName,pszPsw,pszType)) return FALSE;
+	if(!m_zipFile->Open(hInst,pszResName,pszPsw,pszType)) return FALSE;
 	_InitFileMap();
 	return TRUE;
 #endif // _WIN32
@@ -138,7 +140,7 @@ SStringT SResProvider7Zip::_GetFilePath( LPCTSTR pszResName,LPCTSTR pszType )
 {
 	if(!pszType){
 		//pszResName is a path
-		if(!m_zipFile.IsFileExist(pszResName))
+		if(!m_zipFile->IsFileExist(pszResName))
 			return _T("");
 		return pszResName;
 	}
@@ -153,7 +155,7 @@ size_t SResProvider7Zip::GetRawBufferSize( LPCTSTR strType,LPCTSTR pszResName )
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return FALSE;
 
-	return m_zipFile.GetFileSize(strPath);
+	return m_zipFile->GetFileSize(strPath);
 }
 
 BOOL SResProvider7Zip::GetRawBuffer( LPCTSTR strType,LPCTSTR pszResName,LPVOID pBuf,size_t size )
@@ -161,7 +163,7 @@ BOOL SResProvider7Zip::GetRawBuffer( LPCTSTR strType,LPCTSTR pszResName,LPVOID p
 	SStringT strPath=_GetFilePath(pszResName,strType);
 	if(strPath.IsEmpty()) return FALSE;
 	CZipFile zf;
-	if(!m_zipFile.GetFile(strPath,zf)) 
+	if(!m_zipFile->GetFile(strPath,zf)) 
 		return FALSE;
 	if(size<zf.GetSize())
 	{
@@ -192,7 +194,7 @@ BOOL SResProvider7Zip::HasResource( LPCTSTR strType,LPCTSTR pszResName )
 BOOL SResProvider7Zip::_InitFileMap()
 {
 	CZipFile zf;
-	BOOL bIdx=m_zipFile.GetFile(m_childDir + UIRES_INDEX,zf);
+	BOOL bIdx=m_zipFile->GetFile(m_childDir + UIRES_INDEX,zf);
 	if(!bIdx) return FALSE;
 
 	SXmlDoc xmlDoc;
@@ -218,13 +220,13 @@ BOOL SResProvider7Zip::_InitFileMap()
 
 void SResProvider7Zip::EnumFile(THIS_ EnumFileCallback funEnumCB, LPARAM lp)
 {
-	unsigned int pos = m_zipFile.GetFirstFilePos();
-	while(!m_zipFile.Eof(pos)){
-		std::string name = m_zipFile.GetFileName(pos);
+	unsigned int pos = m_zipFile->GetFirstFilePos();
+	while(!m_zipFile->Eof(pos)){
+		std::string name = m_zipFile->GetFileName(pos);
 		SStringT str = S_CA2T(name.c_str());
 		if(!funEnumCB(str.c_str(),lp))
 			break;
-		pos = m_zipFile.GetNextFilePos(pos);
+		pos = m_zipFile->GetNextFilePos(pos);
 	}
 }
 

@@ -1,26 +1,13 @@
-﻿#ifndef __ZIPARCHIVE_H__
-#define __ZIPARCHIVE_H__
+﻿#ifndef __ZIP7ARCHIVE_H__
+#define __ZIP7ARCHIVE_H__
 
-#pragma once
 
-#ifdef _WIN32
 #ifndef WIN32_LEAN_AND_MEAN
 #define WIN32_LEAN_AND_MEAN
 #endif // !WIN32_LEAN_AND_MEAN
 #include <windows.h>
 #include <tchar.h>
-#else
-#include "SevenZip/../CPP/Common/MyWindows.h"
 
-#define CopyMemory(Destination, Source, Length)  memcpy((Destination), (Source), (Length))
-
-#define FILE_BEGIN   0
-#define FILE_CURRENT 1
-#define FILE_END     2
-typedef DWORD *LPDWORD;
-typedef BYTE *LPBYTE;
-
-#endif
 #include "SevenZip/FileStream.h"
 
 namespace SevenZip{

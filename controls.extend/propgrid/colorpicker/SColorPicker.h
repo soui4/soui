@@ -1,8 +1,11 @@
-﻿#pragma once
+﻿#ifndef __SCOLORPICKER_H__
+#define __SCOLORPICKER_H__
+
+
 #include "ColourPopup.h"
 
-namespace SOUI
-{
+SNSBEGIN
+
 	DEF_EVT_EXT(EventColorChange,EVT_EXTERNAL_BEGIN+100,{
 		COLORREF crSel;
 	});
@@ -39,4 +42,6 @@ protected:
 	COLORREF	m_crCur;
 };
 
-}
+SNSEND
+
+#endif//_SCOLORPICKER_H__

@@ -3,7 +3,7 @@
 
 #include <core/SWnd.h>
 #include <proxy/SWindowProxy.h>
-#include <interface/SCtrl-i.h>
+#include <interface/SCtrls-i.h>
 #include <control/SDropDown.h>
 #include <control/SCalendar.h>
 

@@ -7,7 +7,7 @@
 #define __SSPINBUTTONCTRL__H__
 
 #include <core/SWnd.h>
-#include <interface/SCtrl-i.h>
+#include <interface/SCtrls-i.h>
 #include <proxy/SWindowProxy.h>
 
 SNSBEGIN

@@ -6,6 +6,8 @@ add_subdirectory(wxDemo)
 add_subdirectory(dpidemo)
 add_subdirectory(fun_test)
 add_subdirectory(SoTool)
+add_subdirectory(gridctrl_demo)
+
 if (TARGET httpclient)
 add_subdirectory(wallpaper)
 endif()

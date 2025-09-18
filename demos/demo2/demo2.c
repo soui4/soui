@@ -36,7 +36,7 @@
 #include <interface/SRender-i.h>
 #include <interface/SWindow-i.h>
 #include <interface/SAdapter-i.h>
-#include <interface/SCtrl-i.h>
+#include <interface/SCtrls-i.h>
 
 #include <event/SEvents.h>
 #define INIT_R_DATA

@@ -182,15 +182,14 @@ link_directories(${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(third-part)
 add_subdirectory(utilities)
-
+add_subdirectory(components)
 add_subdirectory(SOUI)
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
 add_subdirectory(soui-sys-resource)
 add_subdirectory(soui-sys-resource2)
 endif()
-add_subdirectory(components)
 add_subdirectory(tools)
-
+add_subdirectory(controls.extend)
 if(BUILD_DEMOS)
 add_subdirectory(demos)
 endif(BUILD_DEMOS)

@@ -24,6 +24,7 @@
 #include <core/SObjectFactory.h>
 #include <helper/obj-ref-impl.hpp>
 #include <interface/SSkinobj-i.h>
+#include <SAppCfg.h>
 
 #define GETRESPROVIDER    SNS::SApplication::getSingletonPtr()
 #define GETRENDERFACTORY  SNS::SApplication::getSingleton().GetRenderFactory()
@@ -148,6 +149,7 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
      : public TObjRefImpl<IApplication>
      , public SResProviderMgr
      , public SObjectFactoryMgr {
+        friend class SAppCfg;
    public:
      /**
       * @brief Constructor for SApplication
@@ -159,10 +161,13 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
       */
      SApplication(IRenderFactory *pRendFactory,
                   HINSTANCE hInst,
-                  LPCTSTR pszHostClassName = _T("SOUIHOST"),
+                  LPCTSTR pszHostClassName = _T("SOUI4HOST"),
                   const ISystemObjectRegister &sysObjRegister = SObjectDefaultRegister(),
                   BOOL bImeApp = FALSE);
  
+     SApplication( HINSTANCE hInst,const ISystemObjectRegister &sysObjRegister = SObjectDefaultRegister());
+
+
      /**
       * @brief Destructor for SApplication
       */
@@ -181,6 +186,7 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
       */
      static SApplication *getSingletonPtr(void);
 
+     BOOL DoConfig(const SAppCfg &cfg);
    public:
      /**
       * @brief Get the render factory
@@ -730,6 +736,7 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
     virtual IAccessible *CreateAccessible(IWindow *pWnd) const;
 #endif
   protected:
+    void _InitApp(const ISystemObjectRegister &sysObjRegister);
     /**
      * @brief Creates and initializes all singletons required by the application.
      */

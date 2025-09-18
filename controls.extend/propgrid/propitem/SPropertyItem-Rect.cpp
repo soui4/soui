@@ -5,9 +5,9 @@
 
 #include <helper/SplitString.h>
 
-namespace SOUI
-{
-    SPropertyItemRect::SPropertyItemRect( SPropertyGrid *pOwner ) :SPropertyItemText(pOwner),m_bChildChanged(FALSE),m_bDigit(TRUE)
+SNSBEGIN
+
+SPropertyItemRect::SPropertyItemRect( SPropertyGrid *pOwner ) :SPropertyItemText(pOwner),m_bChildChanged(FALSE),m_bDigit(TRUE)
     {
 		IPropertyItem *pLeft = pOwner->CreateItem(SPropertyItemText::GetClassName());
         pLeft->SetID(CHILD_LEFT);
@@ -156,4 +156,4 @@ namespace SOUI
 		OnValueChanged();
 	}
 
-}
+SNSEND
