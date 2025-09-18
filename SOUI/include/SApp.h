@@ -165,7 +165,10 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
                   const ISystemObjectRegister &sysObjRegister = SObjectDefaultRegister(),
                   BOOL bImeApp = FALSE);
  
-     SApplication( HINSTANCE hInst,const ISystemObjectRegister &sysObjRegister = SObjectDefaultRegister());
+     SApplication(HINSTANCE hInst,
+        LPCTSTR pszHostClassName = _T("SOUI4HOST"),
+        const ISystemObjectRegister &sysObjRegister = SObjectDefaultRegister(),
+        BOOL bImeApp = FALSE);
 
 
      /**

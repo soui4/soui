@@ -71,14 +71,15 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	//加载多语言翻译模块。
 	cfg.EnableMultiLang(_T("translator:lang_cn"), TRUE);
 [!endif]
-    if (!app.DoConfig(cfg))
-    {
-        return -1;
-    }
     // regisger external widget and skinobj
 [!if CHECKBOX_SHELLNOTIFYICON]
 	app.RegisterWindowClass<SShellTray>();
 [!endif]
+
+	if (!app.DoConfig(cfg))
+    {
+        return -1;
+    }
     // 如果需要在代码中使用R::id::namedid这种方式来使用控件必须要这一行代码：2016年2月2日，R::id,R.name是由uiresbuilder
     // 增加-h .\res\resource.h 这2个参数后生成的。
     app.InitXmlNamedID((const LPCWSTR *)&R.name, (const int *)&R.id, sizeof(R.id) / sizeof(int));

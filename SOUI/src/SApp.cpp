@@ -281,14 +281,17 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     _InitApp(sysObjRegister);
 }
 
-SApplication::SApplication(HINSTANCE hInst,const ISystemObjectRegister &sysObjRegister)
+SApplication::SApplication(HINSTANCE hInst,
+        LPCTSTR pszHostClassName,
+        const ISystemObjectRegister &sysObjRegister,
+        BOOL bImeApp)
     : m_hInst(hInst)
     , m_RenderFactory(NULL)
     , m_hMainWnd(NULL)
     , m_cbCreateObj(NULL)
     , m_cbCreateTaskLoop(NULL)
 {
-    SNativeWnd::InitWndClass(m_hInst, _T("SOUI4HOST"), FALSE);
+    SNativeWnd::InitWndClass(m_hInst, pszHostClassName, bImeApp);
     _InitApp(sysObjRegister);
 }
 

@@ -79,13 +79,9 @@ void CSetSkinWnd::OnSetSkin(IEvtArgs * e)
 	SDemoSkin *skin = (SDemoSkin *) GETSKIN(L"demoskinbk",GetScale());
 	SStringT strSkinFile;
 	SStringT strLoadSkin;
-	#ifdef _WIN32
-	strSkinFile.Format(_T("%s\\themes\\%d.png"), SApplication::getSingleton().GetAppDir().c_str(),nIndex - 9);
-	strLoadSkin.Format(_T("themes\\skin%d"), ((nIndex - 9)%3)+1);
-	#else
-	strSkinFile.Format(_T("%s/themes/%d.png"), SApplication::getSingleton().GetAppDir().c_str(),nIndex - 9);
-	strLoadSkin.Format(_T("themes/skin%d"), ((nIndex - 9)%3)+1);
-	#endif//_WIN32
+
+    strSkinFile.Format(_T("%s/themes/%d.png"), SApplication::getSingleton().GetAppDir().c_str(), nIndex - 9);
+    strLoadSkin.Format(_T("themes/skin%d"), ((nIndex - 9) % 3) + 1);
 
 	SSkinLoader::getSingleton().LoadSkin(strLoadSkin);
 

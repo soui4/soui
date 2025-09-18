@@ -64,12 +64,10 @@ public:
 };
 class SOUI_EXP SAppCfg {
 public:
-    SAppCfg(LPCTSTR pszHostClass=_T("SOUI4HOST"));
+    SAppCfg();
     ~SAppCfg(void);
 
 protected:
-    BOOL m_bImeApp;
-    SStringT m_hostClsName;
     SStringT m_appDir;
     Render m_render;
     ImgDecoder m_imgDecoder;
@@ -87,10 +85,6 @@ protected:
     }
     SAppCfg & SetImgDecoder(ImgDecoder decoder){
         m_imgDecoder = decoder; 
-        return *this;
-    }
-    SAppCfg & SetImeApp(BOOL bImeApp){
-        m_bImeApp = bImeApp; 
         return *this;
     }
 

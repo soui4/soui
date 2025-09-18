@@ -47,6 +47,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     //cfg.EnableMultiLang(_T("translator:lang_cn"), TRUE);
     //cfg.EnableScript(TRUE);
 
+    // regisger external widget and skinobj
+
     if (!app.DoConfig(cfg))
     {
         return -1;
@@ -54,7 +56,6 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 #ifndef _WIN32
     AddFontResource("fonts/simsun.ttc");
 #endif //_WIN32
-    // regisger external widget and skinobj
 
     // 如果需要在代码中使用R::id::namedid这种方式来使用控件必须要这一行代码：2016年2月2日，R::id,R.name是由uiresbuilder
     // 增加-h .\res\resource.h 这2个参数后生成的。

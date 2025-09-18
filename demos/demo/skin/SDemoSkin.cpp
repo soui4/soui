@@ -4,11 +4,11 @@
 
 namespace SOUI
 {	
-	SDemoSkin::SDemoSkin():m_csSize(0, 0),m_bkColor(RGB(255, 255, 255)), m_bIsColor(false), m_ISetOrLoadSkinHandler(NULL)
+	SDemoSkin::SDemoSkin():m_csSize(0, 0),m_bkColor(RGBA(255, 255, 255,255)), m_bIsColor(false), m_ISetOrLoadSkinHandler(NULL)
 	{
 	}
 
-	SDemoSkin::SDemoSkin(ISetOrLoadSkinHandler *handle) : m_csSize(0, 0), m_bkColor(RGB(255, 255, 255)), m_bIsColor(false), m_ISetOrLoadSkinHandler(handle)
+	SDemoSkin::SDemoSkin(ISetOrLoadSkinHandler *handle) : m_csSize(0, 0), m_bkColor(RGBA(255, 255, 255,255)), m_bIsColor(false), m_ISetOrLoadSkinHandler(handle)
 	{
 	}
 

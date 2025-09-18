@@ -5084,6 +5084,7 @@ BOOL SGridCtrl::StartInplaceEdit(int nRow, int nCol)
     SStringW strXmlStyle;
     EventGridGetInplaceStyle evGetInplaceStyle(this);
     evGetInplaceStyle.pstrXmlStyle = &strXmlStyle;
+    evGetInplaceStyle.pCell = gridCell;
     FireEvent(evGetInplaceStyle);
     if(strXmlStyle.IsEmpty()){
         pInplaceWnd->InitFromXml(NULL);

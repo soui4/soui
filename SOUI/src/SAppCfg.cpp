@@ -84,10 +84,8 @@ BOOL SResLoader::LoadResFromRes(HMODULE hResModule)
 
 //-------------------------------------------------------------
 
-SAppCfg::SAppCfg(LPCTSTR pszHostClass)
-    : m_bImeApp(FALSE)
-    , m_hostClsName(pszHostClass)
-    , m_render(Render_Skia)
+SAppCfg::SAppCfg()
+    : m_render(Render_Skia)
     , m_imgDecoder(ImgDecoder_Stb)
     , m_uidefId(_T("uidef:xml_init"))
     , m_enableScript(FALSE)
@@ -108,11 +106,6 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
     if (m_sysResDesc.m_type == ResType_Unknown)
     {
         SLOGW()<<"system resource file not specified";
-        return FALSE;
-    }
-    if (m_hostClsName.IsEmpty())
-    {
-        SLOGW()<<"host window class name not specified";
         return FALSE;
     }
     if (!m_appDir.IsEmpty() && GetFileAttributes(m_appDir) != INVALID_FILE_ATTRIBUTES)
@@ -167,7 +160,6 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
     }
 
     pRendFac->SetImgDecoderFactory(pImgDecoderFac);
-    SNativeWnd::InitWndClass(pApp->m_hInst, m_hostClsName, m_bImeApp);
     pApp->SetRenderFactory(pRendFac);
 
     {

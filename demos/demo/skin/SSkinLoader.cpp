@@ -41,11 +41,7 @@ void SSkinLoader::LoadSkin(SStringT respath,const TCHAR *strXmlSkin /*= _T("Skin
 
 void SSkinLoader::LoadDefSkin()
 {
-#ifdef _WIN32
-		LoadSkin(_T("themes\\skin1"));
-#else
-		LoadSkin(_T("themes/skin1"));
-#endif//_WIN32
+	LoadSkin(_T("themes/skin1"));
 }
 
 SNSEND
