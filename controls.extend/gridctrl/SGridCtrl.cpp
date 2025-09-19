@@ -1,8 +1,9 @@
-﻿#include "stdafx.h"
+#include "stdafx.h"
 #include "SGridCtrl.h"
 #include <control/SEdit.h>
 #include <control/SComboBox.h>
 #include <control/SCmnCtrl.h>
+#include "SSelRangeMgr.h"
 
 SNSBEGIN
 
@@ -502,7 +503,10 @@ IMPLMETHOD(IGridInplaceWnd *, SGridURLCell::CreateInplaceWnd)(CTHIS_ int nRow,in
     return NULL;
 }
 
+//------------------------------------------------------------------------
 
+//////////////////////////////////////////////////////////////////////////
+// SGridCtrl implementation
 //////////////////////////////////////////////////////////////////////////
 // SGridURLCell implementation
 
@@ -835,7 +839,6 @@ SGridCtrl::SGridCtrl()
     , m_bSingleRowSelection(FALSE)
     , m_bSingleColSelection(FALSE)
     , m_cellFocus(-1, -1)
-    , m_SelectedCellRange(-1, -1, -1, -1)
     , m_bInEdit(FALSE)
     , m_cellEdit(-1, -1)
     , m_pInplaceWnd(NULL)
@@ -972,8 +975,26 @@ BOOL SGridCtrl::SetRowCount(int nRows)
     // Update focus and selection if necessary
     if (m_cellFocus.row >= m_nRows)
         m_cellFocus.row = -1;
-    if (m_SelectedCellRange.maxRow >= m_nRows)
-        m_SelectedCellRange.maxRow = m_nRows - 1;
+    // Trim selection ranges that exceed new row count
+    SCellRange bound = m_SelectedCellRange.GetBoundingRange();
+    if (bound.maxRow >= m_nRows)
+    {
+        // remove ranges beyond new row count
+        SList<SCellRange> newRanges;
+        SPOSITION pos = m_SelectedCellRange.GetRanges().GetHeadPosition();
+        while (pos)
+        {
+            SCellRange r = m_SelectedCellRange.GetRanges().GetNext(pos);
+            if (r.minRow < m_nRows)
+            {
+                r.maxRow = smin(r.maxRow, m_nRows - 1);
+                newRanges.AddTail(r);
+            }
+        }
+        m_SelectedCellRange.Clear();
+        SPOSITION pos2 = newRanges.GetHeadPosition();
+        while(pos2){ m_SelectedCellRange.AddRange(newRanges.GetNext(pos2)); }
+    }
 
     RecalcLayout();
     Invalidate();
@@ -1032,8 +1053,25 @@ BOOL SGridCtrl::SetColumnCount(int nCols)
     // Update focus and selection if necessary
     if (m_cellFocus.col >= m_nCols)
         m_cellFocus.col = -1;
-    if (m_SelectedCellRange.maxCol >= m_nCols)
-        m_SelectedCellRange.maxCol = m_nCols - 1;
+    // Trim selection ranges that exceed new col count
+    SCellRange bound = m_SelectedCellRange.GetBoundingRange();
+    if (bound.maxCol >= m_nCols)
+    {
+        SList<SCellRange> newRanges;
+        SPOSITION pos = m_SelectedCellRange.GetRanges().GetHeadPosition();
+        while (pos)
+        {
+            SCellRange r = m_SelectedCellRange.GetRanges().GetNext(pos);
+            if (r.minCol < m_nCols)
+            {
+                r.maxCol = smin(r.maxCol, m_nCols - 1);
+                newRanges.AddTail(r);
+            }
+        }
+        m_SelectedCellRange.Clear();
+        SPOSITION pos2 = newRanges.GetHeadPosition();
+        while(pos2){ m_SelectedCellRange.AddRange(newRanges.GetNext(pos2)); }
+    }
 
     RecalcLayout();
     Invalidate();
@@ -1444,7 +1482,8 @@ int SGridCtrl::GetSelectedCount() const
 
 BOOL SGridCtrl::GetSelectedCellRange(SCELLRANGE *pRange) const
 {
-    *pRange = m_SelectedCellRange;
+    if (!pRange) return FALSE;
+    *pRange = m_SelectedCellRange.GetBoundingRange();
     return TRUE;
 }
 
@@ -1456,11 +1495,14 @@ void SGridCtrl::SetSelectedRange2(const SCELLRANGE *pRange, BOOL bForceRepaint)
 void SGridCtrl::SetSelectedRange(int nMinRow, int nMinCol, int nMaxRow, int nMaxCol, BOOL bForceRepaint)
 {
     // Clear old selection
-    if (m_SelectedCellRange.IsValid())
+    // Clear old selection highlights
+    SPOSITION posOld = m_SelectedCellRange.GetRanges().GetHeadPosition();
+    while(posOld)
     {
-        for (int row = m_SelectedCellRange.minRow; row <= m_SelectedCellRange.maxRow; row++)
+        SCellRange r = m_SelectedCellRange.GetRanges().GetNext(posOld);
+        for (int row = r.minRow; row <= r.maxRow; row++)
         {
-            for (int col = m_SelectedCellRange.minCol; col <= m_SelectedCellRange.maxCol; col++)
+            for (int col = r.minCol; col <= r.maxCol; col++)
             {
                 IGridCell* pCell = GetCell(row, col);
                 if (pCell)
@@ -1476,21 +1518,29 @@ void SGridCtrl::SetSelectedRange(int nMinRow, int nMinCol, int nMaxRow, int nMax
     }
 
     // Set new selection
-    m_SelectedCellRange = SCellRange(nMinRow, nMinCol, nMaxRow, nMaxCol);
-    if (m_SelectedCellRange.IsValid() && IsRangeValid(&m_SelectedCellRange))
+    m_SelectedCellRange.Clear();
+    SCellRange newRange(nMinRow, nMinCol, nMaxRow, nMaxCol);
+    if (newRange.IsValid() && IsRangeValid(&newRange))
     {
-        for (int row = m_SelectedCellRange.minRow; row <= m_SelectedCellRange.maxRow; row++)
+        m_SelectedCellRange.AddRange(newRange);
+        // Highlight new selection
+        SPOSITION pos = m_SelectedCellRange.GetRanges().GetHeadPosition();
+        while(pos)
         {
-            for (int col = m_SelectedCellRange.minCol; col <= m_SelectedCellRange.maxCol; col++)
+            SCellRange r = m_SelectedCellRange.GetRanges().GetNext(pos);
+            for (int row = r.minRow; row <= r.maxRow; row++)
             {
-                IGridCell* pCell = GetCell(row, col);
-                if (pCell)
+                for (int col = r.minCol; col <= r.maxCol; col++)
                 {
-                    DWORD state = pCell->GetState();
-                    state |= SGVIS_SELECTED;
-                    pCell->SetState(state);
-                    if (bForceRepaint)
-                        RedrawCell(row, col);
+                    IGridCell* pCell = GetCell(row, col);
+                    if (pCell)
+                    {
+                        DWORD state = pCell->GetState();
+                        state |= SGVIS_SELECTED;
+                        pCell->SetState(state);
+                        if (bForceRepaint)
+                            RedrawCell(row, col);
+                    }
                 }
             }
         }
@@ -1933,15 +1983,22 @@ BOOL SGridCtrl::DeleteColumn(int nColumn)
     else if (m_cellFocus.col > nColumn)
         m_cellFocus.col--;
 
-    if (m_SelectedCellRange.minCol == nColumn && m_SelectedCellRange.maxCol == nColumn)
-        m_SelectedCellRange = SCellRange(-1, -1, -1, -1);
-    else
+    // Adjust selection ranges
+    SList<SCellRange> newRanges;
+    SPOSITION pos = m_SelectedCellRange.GetRanges().GetHeadPosition();
+    while (pos)
     {
-        if (m_SelectedCellRange.minCol > nColumn)
-            m_SelectedCellRange.minCol--;
-        if (m_SelectedCellRange.maxCol >= nColumn)
-            m_SelectedCellRange.maxCol--;
+        SCellRange r = m_SelectedCellRange.GetRanges().GetNext(pos);
+        // remove single-column ranges matching this column
+        if (r.minCol == nColumn && r.maxCol == nColumn)
+            continue;
+        if (r.minCol > nColumn) r.minCol--;
+        if (r.maxCol >= nColumn) r.maxCol--;
+        if (r.IsValid()) newRanges.AddTail(r);
     }
+    m_SelectedCellRange.Clear();
+    SPOSITION pos2 = newRanges.GetHeadPosition();
+    while(pos2){ m_SelectedCellRange.AddRange(newRanges.GetNext(pos2)); }
 
     RecalcLayout();
     Invalidate();
@@ -1977,15 +2034,21 @@ BOOL SGridCtrl::DeleteRow(int nRow)
     else if (m_cellFocus.row > nRow)
         m_cellFocus.row--;
 
-    if (m_SelectedCellRange.minRow == nRow && m_SelectedCellRange.maxRow == nRow)
-        m_SelectedCellRange = SCellRange(-1, -1, -1, -1);
-    else
+    // Adjust selection ranges
+    SList<SCellRange> newRanges;
+    SPOSITION pos = m_SelectedCellRange.GetRanges().GetHeadPosition();
+    while (pos)
     {
-        if (m_SelectedCellRange.minRow > nRow)
-            m_SelectedCellRange.minRow--;
-        if (m_SelectedCellRange.maxRow >= nRow)
-            m_SelectedCellRange.maxRow--;
+        SCellRange r = m_SelectedCellRange.GetRanges().GetNext(pos);
+        if (r.minRow == nRow && r.maxRow == nRow)
+            continue;
+        if (r.minRow > nRow) r.minRow--;
+        if (r.maxRow >= nRow) r.maxRow--;
+        if (r.IsValid()) newRanges.AddTail(r);
     }
+    m_SelectedCellRange.Clear();
+    SPOSITION pos2 = newRanges.GetHeadPosition();
+    while(pos2){ m_SelectedCellRange.AddRange(newRanges.GetNext(pos2)); }
 
     RecalcLayout();
     Invalidate();
@@ -2000,7 +2063,7 @@ BOOL SGridCtrl::DeleteAllItems()
     m_arRowHeights.RemoveAll();
     m_arColWidths.RemoveAll();
     m_cellFocus = SCellID(-1, -1);
-    m_SelectedCellRange = SCellRange(-1, -1, -1, -1);
+    m_SelectedCellRange.Clear();
 
     RecalcLayout();
     Invalidate();
@@ -3363,11 +3426,17 @@ void SGridCtrl::ToggleCellSelection(SCellID cell)
     IGridCell* pCell = GetCell(cell.row, cell.col);
     if (pCell)
     {
+        SCellRange range(cell.row, cell.col,cell.row, cell.col);
         DWORD state = pCell->GetState();
         if (state & SGVIS_SELECTED)
+        {
             state &= ~SGVIS_SELECTED;
-        else
+            m_SelectedCellRange.RemoveRange(range);
+        }    
+        else{
             state |= SGVIS_SELECTED;
+            m_SelectedCellRange.AddRange(range);
+        }
         pCell->SetState(state);
         RedrawCell(cell.row, cell.col);
     }
@@ -3489,7 +3558,6 @@ void SGridCtrl::OnBeginDrag()
 {
     if (!m_bAllowDragAndDrop)
         return;
-
     // Get selected text for drag operation
     SStringT strText = FormatCellsAsText(m_SelectedCellRange);
     if (strText.IsEmpty())
@@ -4273,18 +4341,25 @@ BOOL SGridCtrl::OnKeyEscape(SCellID& newFocus, BOOL bShift, BOOL bCtrl)
 BOOL SGridCtrl::OnKeyDelete(SCellID& newFocus, BOOL bShift, BOOL bCtrl)
 {
     // Delete content of selected cells
-    if (m_SelectedCellRange.IsValid())
+    SPOSITION pos = m_SelectedCellRange.GetRanges().GetHeadPosition();
+    bool any = false;
+    while (pos)
     {
-        for (int row = m_SelectedCellRange.minRow; row <= m_SelectedCellRange.maxRow; row++)
+        SCellRange r = m_SelectedCellRange.GetRanges().GetNext(pos);
+        for (int row = r.minRow; row <= r.maxRow; row++)
         {
-            for (int col = m_SelectedCellRange.minCol; col <= m_SelectedCellRange.maxCol; col++)
+            for (int col = r.minCol; col <= r.maxCol; col++)
             {
                 if (!IsCellFixed(row, col) && IsCellEditable(SCellID(row, col)))
                 {
                     SetItemText(row, col, _T(""));
+                    any = true;
                 }
             }
         }
+    }
+    if (any)
+    {
         Invalidate();
         return TRUE;
     }
@@ -4449,11 +4524,13 @@ BOOL SGridCtrl::ValidateEdit(SCellID cell, LPCTSTR lpszText)
 // Selection and highlighting helpers
 void SGridCtrl::InvalidateSelection()
 {
-    if (m_SelectedCellRange.IsValid())
+    SPOSITION pos = m_SelectedCellRange.GetRanges().GetHeadPosition();
+    while (pos)
     {
-        for (int row = m_SelectedCellRange.minRow; row <= m_SelectedCellRange.maxRow; row++)
+        SCellRange r = m_SelectedCellRange.GetRanges().GetNext(pos);
+        for (int row = r.minRow; row <= r.maxRow; row++)
         {
-            for (int col = m_SelectedCellRange.minCol; col <= m_SelectedCellRange.maxCol; col++)
+            for (int col = r.minCol; col <= r.maxCol; col++)
             {
                 RedrawCell(row, col);
             }
@@ -4808,7 +4885,6 @@ BOOL SGridCtrl::Copy()
 {
     if (!CanCopy())
         return FALSE;
-
     SStringT strText = FormatCellsAsText(m_SelectedCellRange);
     return SetClipboardText(strText);
 }
@@ -4823,11 +4899,13 @@ BOOL SGridCtrl::Cut()
         return FALSE;
 
     // Then clear the selected cells
-    if (m_SelectedCellRange.IsValid())
+    SPOSITION pos = m_SelectedCellRange.GetRanges().GetHeadPosition();
+    while(pos)
     {
-        for (int row = m_SelectedCellRange.minRow; row <= m_SelectedCellRange.maxRow; row++)
+        SCellRange r = m_SelectedCellRange.GetRanges().GetNext(pos);
+        for (int row = r.minRow; row <= r.maxRow; row++)
         {
-            for (int col = m_SelectedCellRange.minCol; col <= m_SelectedCellRange.maxCol; col++)
+            for (int col = r.minCol; col <= r.maxCol; col++)
             {
                 if (!IsCellFixed(row, col) && IsCellEditable(SCellID(row, col)))
                 {
@@ -4835,8 +4913,8 @@ BOOL SGridCtrl::Cut()
                 }
             }
         }
-        Invalidate();
     }
+    Invalidate();
 
     return TRUE;
 }
@@ -4858,31 +4936,33 @@ BOOL SGridCtrl::Paste()
 
 BOOL SGridCtrl::CanCopy() const
 {
-    return m_SelectedCellRange.IsValid();
+    // True if any selection ranges exist
+    return !m_SelectedCellRange.GetRanges().IsEmpty();
 }
 
 BOOL SGridCtrl::CanCut() const
 {
-    if (!m_SelectedCellRange.IsValid())
-        return FALSE;
-
-    // Check if any selected cell is editable
-    for (int row = m_SelectedCellRange.minRow; row <= m_SelectedCellRange.maxRow; row++)
+    // Check if any selected range contains an editable cell
+    SPOSITION pos = m_SelectedCellRange.GetRanges().GetHeadPosition();
+    while (pos)
     {
-        for (int col = m_SelectedCellRange.minCol; col <= m_SelectedCellRange.maxCol; col++)
+        SCellRange r = m_SelectedCellRange.GetRanges().GetNext(pos);
+        for (int row = r.minRow; row <= r.maxRow; row++)
         {
-            if (!IsCellFixed(row, col) && IsCellEditable(SCellID(row, col)))
-                return TRUE;
+            for (int col = r.minCol; col <= r.maxCol; col++)
+            {
+                if (!IsCellFixed(row, col) && IsCellEditable(SCellID(row, col)))
+                    return TRUE;
+            }
         }
     }
-
     return FALSE;
 }
 
 BOOL SGridCtrl::CanPaste() const
 {
     // Check if we have a valid paste location
-    if (m_SelectedCellRange.IsValid() || m_cellFocus.IsValid())
+    if (!m_SelectedCellRange.GetRanges().IsEmpty() || m_cellFocus.IsValid())
     {
         // Check if clipboard has text
         SStringT strText = GetClipboardText();
@@ -4982,6 +5062,45 @@ SStringT SGridCtrl::FormatCellsAsText(const SCellRange& range) const
         }
     }
 
+    return strResult;
+}
+
+SStringT SGridCtrl::FormatCellsAsText(const SSelRangeMgr& ranges) const
+{
+    SStringT strResult;
+    SPOSITION pos = ranges.GetRanges().GetHeadPosition();
+    bool firstRange = true;
+    while (pos)
+    {
+        SCellRange r = ranges.GetRanges().GetNext(pos);
+        if (!r.IsValid()) continue;
+        // For multiple ranges, separate ranges by a blank line
+        if (!firstRange)
+            strResult += _T("\r\n");
+        firstRange = false;
+
+        for (int row = r.minRow; row <= r.maxRow; row++)
+        {
+            if (row > r.minRow)
+                strResult += _T("\r\n");
+
+            for (int col = r.minCol; col <= r.maxCol; col++)
+            {
+                if (col > r.minCol)
+                    strResult += _T("\t");
+
+                IGridCell* pCell = GetCell(row, col);
+                if (pCell)
+                {
+                    SStringT strText = pCell->GetText();
+                    strText.Replace(_T("\t"), _T(" "));
+                    strText.Replace(_T("\r\n"), _T(" "));
+                    strText.Replace(_T("\n"), _T(" "));
+                    strResult += strText;
+                }
+            }
+        }
+    }
     return strResult;
 }
 

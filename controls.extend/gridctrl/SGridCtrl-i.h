@@ -1,6 +1,7 @@
 ﻿#ifndef __SGRIDCTRL__I__H__
 #define __SGRIDCTRL__I__H__
 
+#include <interface/SSkinobj-i.h>
 #include <interface/SCtrl-i.h>
 
 SNSBEGIN
