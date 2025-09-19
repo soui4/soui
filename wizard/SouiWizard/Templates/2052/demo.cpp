@@ -3,6 +3,7 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"
+#include <SAppCfg.h>
 #pragma comment(lib, "shlwapi.lib")
 
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
@@ -76,7 +77,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 	app.RegisterWindowClass<SShellTray>();
 [!endif]
 
-	if (!app.DoConfig(cfg))
+	if (!cfg.DoConfig(&app))
     {
         return -1;
     }

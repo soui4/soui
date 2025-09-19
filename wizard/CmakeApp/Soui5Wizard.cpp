@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "MainDlg.h"
-
+#include <SAppCfg.h>
 #define SYS_NAMED_RESOURCE _T("soui-sys-resource.dll")
 
 #define INIT_R_DATA
@@ -49,7 +49,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 
     // regisger external widget and skinobj
 
-    if (!app.DoConfig(cfg))
+    if (!cfg.DoConfig(&app))
     {
         return -1;
     }
