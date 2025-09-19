@@ -278,7 +278,7 @@ public:
         // A simple memmove works for nearly all types.
         // You'll have to override this for types that have pointers to their
         // own members.
-        memmove_s( pDest, nElements*sizeof( T ), pSrc, nElements*sizeof( T ));
+        memmove_s((void*)pDest, nElements*sizeof( T ), (const void*)pSrc, nElements*sizeof( T ));
     }
 };
 

@@ -156,31 +156,28 @@ SNativeWndHelper::SNativeWndHelper()
 BOOL SNativeWndHelper::Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp)
 {
     SAutoLock lock(m_cs);
-    if (m_hHeap)
-    {
-        if (m_hHeap)
-        {
-            HeapDestroy(m_hHeap);
-            m_hHeap = NULL;
-        }
-        if (m_atom)
-        {
-            UnregisterClass((LPCTSTR)(UINT_PTR)m_atom, m_hInst);
-            m_atom = 0;
-        }
-    }
+    if(m_hHeap)
+        return FALSE;
     m_hInst = hInst;
     m_hHeap = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE, 0, 0);
     m_atom = SNativeWnd::RegisterSimpleWnd(m_hInst, pszClassName, bImeApp);
     return TRUE;
 }
 
-SNativeWndHelper::~SNativeWndHelper()
+BOOL SNativeWndHelper::Uninit()
 {
-    if (m_hHeap)
-        HeapDestroy(m_hHeap);
+    SAutoLock lock(m_cs);
+    if (!m_hHeap)
+        return FALSE;
     if (m_atom)
         UnregisterClass((LPCTSTR)(UINT_PTR)m_atom, m_hInst);
+    HeapDestroy(m_hHeap);
+    m_hHeap = NULL;
+    return TRUE;
+}
+SNativeWndHelper::~SNativeWndHelper()
+{
+    SASSERT(m_hHeap == NULL);
 }
 
 void SNativeWndHelper::LockSharePtr(void *p)

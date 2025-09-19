@@ -91,6 +91,10 @@
       */
      BOOL Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp);
  
+     /**
+      * @brief unregister window class.      
+     */
+     BOOL Uninit();
    public:
      /**
       * @brief Retrieves the singleton instance of SNativeWndHelper.

@@ -300,6 +300,7 @@ SApplication::~SApplication(void)
     SResProviderMgr::RemoveAll();
     _DestroySingletons();
     SRichEdit::UninitTextService();
+    SNativeWndHelper::instance()->Uninit();
     ms_Singleton = NULL;
 }
 
