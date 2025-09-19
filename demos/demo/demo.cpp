@@ -1,4 +1,5 @@
 ﻿#include "stdafx.h"
+#include <SAppCfg.h>
 #include <SouiFactory.h>
 #include <helper/SMenuWndHook.h>
 #include <helper/SAutoBuf.h>
@@ -252,7 +253,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     }
 #endif
 
-    if (!app.DoConfig(cfg))
+    if (!cfg.DoConfig(&app))
     {
         return -1;
     }

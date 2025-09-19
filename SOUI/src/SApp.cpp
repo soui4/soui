@@ -909,8 +909,4 @@ LPCWSTR SOUI_EXP GetAttrAlias(LPCWSTR pszAttr, IObject *pObject){
     }
 }
 
-BOOL SApplication::DoConfig(const SAppCfg &cfg){
-    return cfg.DoConfig(this);
-}
-
 SNSEND

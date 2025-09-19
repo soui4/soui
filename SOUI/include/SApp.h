@@ -24,7 +24,6 @@
 #include <core/SObjectFactory.h>
 #include <helper/obj-ref-impl.hpp>
 #include <interface/SSkinobj-i.h>
-#include <SAppCfg.h>
 
 #define GETRESPROVIDER    SNS::SApplication::getSingletonPtr()
 #define GETRENDERFACTORY  SNS::SApplication::getSingleton().GetRenderFactory()
@@ -149,7 +148,6 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
      : public TObjRefImpl<IApplication>
      , public SResProviderMgr
      , public SObjectFactoryMgr {
-        friend class SAppCfg;
    public:
      /**
       * @brief Constructor for SApplication
@@ -189,7 +187,6 @@ class SOUI_EXP SObjectDefaultRegister : public ISystemObjectRegister {
       */
      static SApplication *getSingletonPtr(void);
 
-     BOOL DoConfig(const SAppCfg &cfg);
    public:
      /**
       * @brief Get the render factory

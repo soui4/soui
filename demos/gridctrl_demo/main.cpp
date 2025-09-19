@@ -2,6 +2,7 @@
 #include <SouiFactory.h>
 #include <com-cfg.h>
 #include <SGridCtrl.h>
+#include <SAppCfg.h>
 
 static const TCHAR * kPath_SysRes = _T("/../../soui-sys-resource");
 static const TCHAR *kPath_UiRes = _T("/uires");
@@ -291,7 +292,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         .SetSysResFile(srcDir + kPath_SysRes)
         .SetAppResFile(srcDir + kPath_UiRes)
         .SetLog(TRUE);
-    if (!app.DoConfig(cfg))
+    if (!cfg.DoConfig(&app))
     {
         return -1;
     }
