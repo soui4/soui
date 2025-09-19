@@ -186,7 +186,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 #else
     static const TCHAR *kPath_SysRes = _T("/../../soui-sys-resource");
 #endif //__APPLE__
-    cfg.SetSysResPath(appDir + kPath_SysRes);
+    cfg.SetSysResFile(appDir + kPath_SysRes);
 #endif
 #if defined(_WIN32) && (RES_TYPE == RESTYPE_PE) // 从EXE资源加载
     cfg.SetAppResPeHandle(hInstance);
