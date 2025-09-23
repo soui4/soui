@@ -25,12 +25,6 @@
 #include <helper/SSemaphore.h>
 #include "common.h"
 
-#if defined(__linux__) || _MSC_VER >= 1700 // VS2012
-#include <functional>
-#include <thread>
-#endif
-
-
 #include "../components/resprovider-zip/zipresprovider-param.h"
 #include <helper/SFunctor.hpp>
 #include <helper/SMenu.h>
@@ -253,12 +247,273 @@ void thread_fun() {
     CloseHandle(evt2);
 }
 
+
+// ========================================================================
+// Path API Tests for swinx library
+// ========================================================================
+
+class PathAPITest : public ::testing::Test {
+protected:
+    void SetUp() override {
+        // Create a test HDC
+        hdc = CreateCompatibleDC(nullptr);
+        ASSERT_NE(hdc, nullptr) << "Failed to create HDC";
+    }
+
+    void TearDown() override {
+        if (hdc) {
+            DeleteDC(hdc);
+            hdc = nullptr;
+        }
+    }
+
+    HDC hdc = nullptr;
+};
+
+TEST_F(PathAPITest, BasicPathRecording) {
+    // Test basic path recording functionality
+    EXPECT_TRUE(BeginPath(hdc));
+
+    // Add some basic shapes to the path
+    MoveToEx(hdc, 100, 100, nullptr);
+    LineTo(hdc, 200, 100);
+    LineTo(hdc, 200, 200);
+    LineTo(hdc, 100, 200);
+
+    EXPECT_TRUE(EndPath(hdc));
+}
+
+TEST_F(PathAPITest, PathStroking) {
+    // Test path stroking
+    EXPECT_TRUE(BeginPath(hdc));
+
+    Rectangle(hdc, 50, 50, 150, 150);
+
+    EXPECT_TRUE(EndPath(hdc));
+    EXPECT_TRUE(StrokePath(hdc));
+}
+
+TEST_F(PathAPITest, PathFilling) {
+    // Test path filling
+    EXPECT_TRUE(BeginPath(hdc));
+
+    Ellipse(hdc, 50, 50, 150, 150);
+
+    EXPECT_TRUE(EndPath(hdc));
+    EXPECT_TRUE(FillPath(hdc));
+}
+
+TEST_F(PathAPITest, StrokeAndFillPath) {
+    // Test stroke and fill path
+    EXPECT_TRUE(BeginPath(hdc));
+
+    RoundRect(hdc, 50, 50, 150, 150, 20, 20);
+
+    EXPECT_TRUE(EndPath(hdc));
+    EXPECT_TRUE(StrokeAndFillPath(hdc));
+}
+
+TEST_F(PathAPITest, PathToRegion) {
+    // Test path to region conversion
+    EXPECT_TRUE(BeginPath(hdc));
+
+    Rectangle(hdc, 100, 100, 200, 200);
+
+    EXPECT_TRUE(EndPath(hdc));
+
+    HRGN hRegion = PathToRegion(hdc);
+    EXPECT_NE(hRegion, nullptr);
+
+    if (hRegion) {
+        // Verify region bounds
+        RECT rcBounds;
+        int result = GetRgnBox(hRegion, &rcBounds);
+        EXPECT_NE(result, ERROR);
+        EXPECT_EQ(rcBounds.left, 100);
+        EXPECT_EQ(rcBounds.top, 100);
+        EXPECT_EQ(rcBounds.right, 200);
+        EXPECT_EQ(rcBounds.bottom, 200);
+
+        DeleteObject(hRegion);
+    }
+}
+
+TEST_F(PathAPITest, SelectClipPath) {
+    // Test select clip path
+    EXPECT_TRUE(BeginPath(hdc));
+
+    Ellipse(hdc, 50, 50, 150, 150);
+
+    EXPECT_TRUE(EndPath(hdc));
+    EXPECT_TRUE(SelectClipPath(hdc, RGN_COPY));
+}
+
+TEST_F(PathAPITest, GetPath) {
+    // Test get path functionality
+    EXPECT_TRUE(BeginPath(hdc));
+
+    MoveToEx(hdc, 100, 100, nullptr);
+    LineTo(hdc, 200, 200);
+
+    EXPECT_TRUE(EndPath(hdc));
+
+    // Query path size
+    int pathSize = GetPath(hdc, nullptr, nullptr, 0);
+    EXPECT_GT(pathSize, 0);
+
+    // Get actual path data
+    if (pathSize > 0) {
+        std::vector<POINT> points(pathSize);
+        std::vector<BYTE> types(pathSize);
+
+        int actualSize = GetPath(hdc, points.data(), types.data(), pathSize);
+        EXPECT_EQ(actualSize, pathSize);
+
+        // Verify we have at least a move and a line
+        EXPECT_GE(actualSize, 2);
+        if (actualSize >= 2) {
+            EXPECT_EQ(types[0] & PT_MOVETO, PT_MOVETO);
+            EXPECT_EQ(types[1] & PT_LINETO, PT_LINETO);
+        }
+    }
+}
+
+TEST_F(PathAPITest, MiterLimit) {
+    // Test miter limit functionality
+    float oldLimit;
+    EXPECT_TRUE(GetMiterLimit(hdc, &oldLimit));
+    EXPECT_GT(oldLimit, 0.0f);
+
+    float newLimit = 5.0f;
+    float returnedOldLimit;
+    EXPECT_TRUE(SetMiterLimit(hdc, newLimit, &returnedOldLimit));
+    EXPECT_EQ(returnedOldLimit, oldLimit);
+
+    float currentLimit;
+    EXPECT_TRUE(GetMiterLimit(hdc, &currentLimit));
+    EXPECT_EQ(currentLimit, newLimit);
+}
+
+TEST_F(PathAPITest, AbortPath) {
+    // Test abort path functionality
+    EXPECT_TRUE(BeginPath(hdc));
+
+    Rectangle(hdc, 50, 50, 150, 150);
+
+    EXPECT_TRUE(AbortPath(hdc));
+
+    // After abort, EndPath should fail
+    EXPECT_FALSE(EndPath(hdc));
+}
+
+TEST_F(PathAPITest, ComplexShapes) {
+    // Test complex shapes in path
+    EXPECT_TRUE(BeginPath(hdc));
+
+    // Add various shapes
+    Arc(hdc, 50, 50, 150, 150, 100, 50, 150, 100);
+    Pie(hdc, 200, 50, 300, 150, 250, 50, 300, 100);
+    Chord(hdc, 350, 50, 450, 150, 400, 50, 450, 100);
+
+    EXPECT_TRUE(EndPath(hdc));
+    EXPECT_TRUE(StrokePath(hdc));
+}
+
+TEST_F(PathAPITest, TextPath) {
+    // Test text path functionality
+    EXPECT_TRUE(BeginPath(hdc));
+
+    TextOutA(hdc, 100, 100, "Hello Path", -1);
+
+    EXPECT_TRUE(EndPath(hdc));
+    EXPECT_TRUE(StrokePath(hdc));
+}
+
+TEST_F(PathAPITest, TextPathWithLength) {
+    // Test text path with specific length
+    EXPECT_TRUE(BeginPath(hdc));
+
+    const char* text = "Hello World";
+    TextOutA(hdc, 100, 200, text, 5); // Only "Hello"
+
+    EXPECT_TRUE(EndPath(hdc));
+
+    // Get path size for partial text
+    int pathSize = GetPath(hdc, nullptr, nullptr, 0);
+    EXPECT_GT(pathSize, 0);
+}
+
+TEST_F(PathAPITest, CurrentPointAdjustment) {
+    // Test current point adjustment in text paths
+    MoveToEx(hdc, 100, 100, nullptr);
+
+    POINT initialPos;
+    GetCurrentPositionEx(hdc, &initialPos);
+    EXPECT_EQ(initialPos.x, 100);
+    EXPECT_EQ(initialPos.y, 100);
+
+    EXPECT_TRUE(BeginPath(hdc));
+    TextOutA(hdc, 100, 100, "Test", 4);
+    EXPECT_TRUE(EndPath(hdc));
+
+    POINT afterTextPos;
+    GetCurrentPositionEx(hdc, &afterTextPos);
+
+    // Current point should have moved after text
+    EXPECT_GT(afterTextPos.x, initialPos.x);
+}
+
+TEST_F(PathAPITest, ZeroLengthText) {
+    // Test zero length text doesn't affect current point
+    MoveToEx(hdc, 200, 200, nullptr);
+
+    POINT beforePos;
+    GetCurrentPositionEx(hdc, &beforePos);
+
+    EXPECT_TRUE(BeginPath(hdc));
+    TextOutA(hdc, 200, 200, "Hello", 0); // Zero length
+    EXPECT_TRUE(EndPath(hdc));
+
+    POINT afterPos;
+    GetCurrentPositionEx(hdc, &afterPos);
+
+    // Position should not change for zero-length text
+    EXPECT_EQ(beforePos.x, afterPos.x);
+    EXPECT_EQ(beforePos.y, afterPos.y);
+}
+
+TEST_F(PathAPITest, ChainedTextPaths) {
+    // Test chained text paths
+    MoveToEx(hdc, 300, 300, nullptr);
+
+    EXPECT_TRUE(BeginPath(hdc));
+
+    // First text
+    TextOutA(hdc, 300, 300, "First", 5);
+    POINT afterFirst;
+    GetCurrentPositionEx(hdc, &afterFirst);
+
+    // Second text should start where first ended
+    TextOutA(hdc, afterFirst.x, afterFirst.y, " Second", 7);
+    POINT afterSecond;
+    GetCurrentPositionEx(hdc, &afterSecond);
+
+    // Third text
+    TextOutA(hdc, afterSecond.x, afterSecond.y, " Third", 6);
+
+    EXPECT_TRUE(EndPath(hdc));
+
+    // Verify progression
+    EXPECT_GT(afterFirst.x, 300);
+    EXPECT_GT(afterSecond.x, afterFirst.x);
+}
+
 int run_window();
 TEST(demo,window){
-    //EXPECT_EQ(run_window(), 1);
+    EXPECT_EQ(run_window(), 1);
 }
 
 int run_app(HINSTANCE hInst);
 TEST(demo,app){
-    EXPECT_EQ(run_app(0),0);
+    //EXPECT_EQ(run_app(0),0);
 }

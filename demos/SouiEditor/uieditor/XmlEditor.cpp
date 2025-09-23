@@ -54,10 +54,10 @@ void CXmlEditor::StartPreviewProcess()
 	strCommandLine += _T("\" ");
 	strCommandLine += m_strLayoutName;
 	strCommandLine += _T(" ");
-	SStringT strWnd = SStringT().Format(_T("%d"),(int)m_pMainDlg->m_hWnd);
+	SStringT strWnd = SStringT().Format(_T("%ld"),(INT_PTR)m_pMainDlg->m_hWnd);
 	strCommandLine += strWnd;
 	strCommandLine += _T(" ");
-	SStringT strReal = SStringT().Format(_T("%d"),(int)m_pViewerHost->GetRealHwnd());
+	SStringT strReal = SStringT().Format(_T("%ld"),(INT_PTR)m_pViewerHost->GetRealHwnd());
 	strCommandLine += strReal;
 	
 	PROCESS_INFORMATION pi;

@@ -1400,7 +1400,8 @@ SNSBEGIN
     HRESULT SRenderTarget_GDI::DrawArc( LPCRECT pRect,float startAngle,float sweepAngle,BOOL useCenter )
     {
 		if(!m_curPen) return E_INVALIDARG;
-
+        if(sweepAngle==0)
+            return S_OK;
 		RECT rcBuf = *pRect;
 		::InflateRect(&rcBuf,m_curPen->GetWidth()/2,m_curPen->GetWidth()/2);
         DCBuffer dcBuf(m_hdc,&rcBuf,GetAValue(m_curPen->GetColor()));

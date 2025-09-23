@@ -19,7 +19,7 @@
 extern int optind, opterr;
 extern TCHAR *optarg;
 
-int getopt(int argc, TCHAR *argv[], TCHAR *optstring);
+int getopt(int argc, TCHAR *argv[], const TCHAR *optstring);
 
 #endif//_WIN32
 

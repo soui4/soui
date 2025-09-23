@@ -220,7 +220,6 @@ public: \
 #pragma warning(suppress: 4987)  // nonstandard extension used: ''
 		_Ret_maybenull_ _Post_writable_byte_size_(nElements * sizeof(T)) T* Reallocate(_In_ size_t nElements) 
 		{
-			ATLENSURE(nElements < size_t(-1) / sizeof(T));
 			size_t nNewSize = nElements * sizeof(T);
 
 			if (m_p == NULL)

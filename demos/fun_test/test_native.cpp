@@ -1,6 +1,7 @@
 ﻿#include <souistd.h>
 #include "common.h"
 #include "ScintillaWnd.h"
+#include <math.h>
 
 using namespace SOUI;
 #define kLogTag "test_native"
@@ -241,6 +242,7 @@ void SNativeWnd2::OnPaint(HDC hdc) {
         HDC memdc = CreateCompatibleDC(hdc);
         HBITMAP bmp = CreateCompatibleBitmap(hdc, rcWnd.right, rcWnd.bottom);
         HGDIOBJ oldBmp = SelectObject(memdc, bmp);
+        FillRect(memdc, &rcWnd, (HBRUSH)GetStockObject(WHITE_BRUSH));
         HBRUSH hbr = CreateSolidBrush(RGB(255, 0, 0));
         int save = SaveDC(memdc);
         RestoreDC(memdc, save);
@@ -405,6 +407,98 @@ void SNativeWnd2::OnPaint(HDC hdc) {
         FillRect(hdc, CRect(300, 100, 400, 200), br);
         DeleteObject(br);
     }
+    if (1) {//test Path API
+        // Test BeginPath/EndPath with complex path
+        BeginPath(hdc);
+
+        // Create a star shape using MoveTo and LineTo
+        MoveToEx(hdc, 450, 150, NULL);
+        LineTo(hdc, 470, 120);
+        LineTo(hdc, 500, 120);
+        LineTo(hdc, 480, 140);
+        LineTo(hdc, 490, 170);
+        LineTo(hdc, 450, 155);
+        LineTo(hdc, 410, 170);
+        LineTo(hdc, 420, 140);
+        LineTo(hdc, 400, 120);
+        LineTo(hdc, 430, 120);
+        CloseFigure(hdc);
+
+        // Add a circle to the path
+        MoveToEx(hdc, 520, 150, NULL);
+        for (int i = 0; i <= 360; i += 10) {
+            double angle = i * 3.14159 / 180.0;
+            int x = 520 + (int)(20 * cos(angle));
+            int y = 150 + (int)(20 * sin(angle));
+            if (i == 0) {
+                MoveToEx(hdc, x, y, NULL);
+            } else {
+                LineTo(hdc, x, y);
+            }
+        }
+        CloseFigure(hdc);
+
+        EndPath(hdc);
+
+        // Test StrokePath
+        HPEN pathPen = CreatePen(PS_SOLID, 2, RGB(255, 0, 255));
+        HPEN oldPathPen = (HPEN)SelectObject(hdc, pathPen);
+        StrokePath(hdc);
+        SelectObject(hdc, oldPathPen);
+        DeleteObject(pathPen);
+
+        // Test FillPath with a different path
+        BeginPath(hdc);
+        MoveToEx(hdc, 450, 200, NULL);
+        LineTo(hdc, 500, 220);
+        LineTo(hdc, 480, 250);
+        LineTo(hdc, 420, 250);
+        LineTo(hdc, 400, 220);
+        CloseFigure(hdc);
+        EndPath(hdc);
+
+        HBRUSH pathBrush = CreateSolidBrush(RGB(0, 255, 128));
+        HBRUSH oldPathBrush = (HBRUSH)SelectObject(hdc, pathBrush);
+        FillPath(hdc);
+        SelectObject(hdc, oldPathBrush);
+        DeleteObject(pathBrush);
+
+        // Test PathToRegion
+        BeginPath(hdc);
+        MoveToEx(hdc, 550, 200, NULL);
+        LineTo(hdc, 580, 200);
+        LineTo(hdc, 580, 230);
+        LineTo(hdc, 550, 230);
+        CloseFigure(hdc);
+        EndPath(hdc);
+
+        HRGN pathRegion = PathToRegion(hdc);
+        if (pathRegion) {
+            HBRUSH regionBrush = CreateSolidBrush(RGB(255, 128, 0));
+            FillRgn(hdc, pathRegion, regionBrush);
+            DeleteObject(regionBrush);
+            DeleteObject(pathRegion);
+        }
+
+        // Test SelectClipPath
+        BeginPath(hdc);
+        MoveToEx(hdc, 450, 280, NULL);
+        LineTo(hdc, 500, 280);
+        LineTo(hdc, 500, 320);
+        LineTo(hdc, 450, 320);
+        CloseFigure(hdc);
+        EndPath(hdc);
+
+        int saveState = SaveDC(hdc);
+        SelectClipPath(hdc, RGN_COPY);
+
+        // Draw something that will be clipped
+        HBRUSH clipBrush = CreateSolidBrush(RGB(128, 0, 255));
+        FillRect(hdc, CRect(440, 270, 510, 330), clipBrush);
+        DeleteObject(clipBrush);
+
+        RestoreDC(hdc, saveState);
+    }
     if (1) {//invert rect
         RECT rc = { 10,60,40,80 };
         InvertRect(hdc, &rc);
@@ -423,6 +517,23 @@ void SNativeWnd2::OnPaint(HDC hdc) {
         DrawFocusRect(hdc, &rc);
         DrawFocusRect(hdc, &rc);//clear focus rect
     }
+    
+    if (1) {//test Ellipse api
+        CRect rcArc(CPoint(0,200),CSize(50,80));
+        HBRUSH oldbr = (HBRUSH)SelectObject(hdc, GetStockObject(GRAY_BRUSH));
+        HPEN oldPen = (HPEN)SelectObject(hdc, GetStockObject(BLACK_PEN));
+        Ellipse(hdc, rcArc.left, rcArc.top, rcArc.right, rcArc.bottom);
+        rcArc.OffsetRect(0, rcArc.Height()+5);
+        SelectObject(hdc, GetStockObject(NULL_BRUSH));
+        Ellipse(hdc, rcArc.left, rcArc.top, rcArc.right, rcArc.bottom);
+        rcArc.OffsetRect(0, rcArc.Height()+5);
+        SelectObject(hdc, GetStockObject(NULL_PEN));
+        SelectObject(hdc, GetStockObject(GRAY_BRUSH));
+        Ellipse(hdc, rcArc.left, rcArc.top, rcArc.right, rcArc.bottom);
+        SelectObject(hdc, oldPen);
+        SelectObject(hdc, oldbr);
+    }
+
     EndPaint(m_hWnd, &ps);
 }
 void SNativeWnd2::OnClose() {
@@ -433,7 +544,7 @@ void SNativeWnd2::OnClose() {
 int run_window() {
     int ret = 0;
     CScintillaWnd::InitScintilla(0);
-    SNativeWnd::InitWndClass(0, _T("soui_host"), FALSE);
+    SNativeWndHelper::instance()->Init(0, _T("soui_host"), FALSE);
     SNativeWnd2 wnd;
     SOUI::SStringT iconPath = getSourceDir() + _T("/fun_test/uires/image/soui.ico");
     HICON hIcon = (HICON)LoadImage(0, iconPath.c_str(), IMAGE_ICON, 128, 128, LR_LOADFROMFILE | LR_CREATEDIBSECTION);
@@ -462,5 +573,6 @@ int run_window() {
     }
     DestroyIcon(hIcon);
     CScintillaWnd::UninitScintilla();
+    SNativeWndHelper::instance()->Uninit();
     return ret;
 }

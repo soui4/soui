@@ -1,6 +1,7 @@
 // Microsoft Visual C++ generated resource script.
 //
 #include "resource.h"
+#include <config.h>
 
 #define APSTUDIO_READONLY_SYMBOLS
 /////////////////////////////////////////////////////////////////////////////
@@ -12,11 +13,13 @@
 #undef APSTUDIO_READONLY_SYMBOLS
 
 /////////////////////////////////////////////////////////////////////////////
-// 中文(简体，中国) resources
+// resources
 
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
+#ifdef _WIN32
 LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 #pragma code_page(936)
+#endif //_WIN32
 
 #ifdef APSTUDIO_INVOKED
 /////////////////////////////////////////////////////////////////////////////
@@ -24,26 +27,26 @@ LANGUAGE LANG_CHINESE, SUBLANG_CHINESE_SIMPLIFIED
 // TEXTINCLUDE
 //
 
-1 TEXTINCLUDE 
+1 TEXTINCLUDE
 BEGIN
-    "resource.h\0"
+"resource.h\0"
 END
 
-2 TEXTINCLUDE 
+2 TEXTINCLUDE
 BEGIN
-    "#include ""winres.h"\0"
+"#include ""winres.h""\r\0"
 END
 
-3 TEXTINCLUDE 
+3 TEXTINCLUDE
 BEGIN
-    "#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
-    "LANGUAGE 4, 2\r\n"
-    "#pragma code_page(936)\r\n"
-    "#include ""res\\soui_res.rc2"" //SOUI资源\r\n"
+"#if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)\r\n"
+"LANGUAGE 4, 2\r\n"
+"#pragma code_page(936)\r\n"
+    "#include ""res\\soui_res.rc2"" //SOUI Resource\r\n"
 #if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
-    "#include ""..\soui-sys-resource\\theme_sys_res.rc2"" //SOUI SYS资源\r\n"
+    "#include ""..\soui-sys-resource\\theme_sys_res.rc2"" //SOUI SYS Resource\r\n"
 #endif
-    "#endi\0"
+"#endif\r\n"
 END
 
 #endif    // APSTUDIO_INVOKED
@@ -55,47 +58,39 @@ END
 //
 
 VS_VERSION_INFO VERSIONINFO
- FILEVERSION 1,0,0,1
- PRODUCTVERSION 1,0,0,1
- FILEFLAGSMASK 0x17L
+FILEVERSION 1, 0, 0, 1
+PRODUCTVERSION 1, 0, 0, 1
+FILEFLAGSMASK 0x17L
 #ifdef _DEBUG
- FILEFLAGS 0x1L
+FILEFLAGS 0x1L
 #else
- FILEFLAGS 0x0L
+FILEFLAGS 0x0L
 #endif
- FILEOS 0x4L
- FILETYPE 0x0L
- FILESUBTYPE 0x0L
+FILEOS 0x4L
+FILETYPE 0x0L
+FILESUBTYPE 0x0L
 BEGIN
-    BLOCK "StringFileInfo"
-    BEGIN
-        BLOCK "080404b0"
-        BEGIN
-            VALUE "CompanyName", "启程软件"
-            VALUE "FileDescription", "Demo"
-            VALUE "FileVersion", "1, 0, 0, 1"
-            VALUE "InternalName", "Demo"
-            VALUE "LegalCopyright", "Copyright (C) 2011"
-            VALUE "OriginalFilename", "Demo.exe"
-            VALUE "ProductName", "Demo"
-            VALUE "ProductVersion", "1, 0, 0, 1"
-        END
-    END
-    BLOCK "VarFileInfo"
-    BEGIN
-        VALUE "Translation", 0x804, 1200
-    END
+BLOCK "StringFileInfo"
+BEGIN
+BLOCK "080404b0"
+BEGIN
+VALUE "FileDescription", "demo2"
+VALUE "FileVersion", "1, 0, 0, 1"
+VALUE "InternalName", "demo2"
+VALUE "LegalCopyright", "Copyright (C) 2011"
+VALUE "OriginalFilename", "demo2.exe"
+VALUE "ProductName", "demo2"
+VALUE "ProductVersion", "1, 0, 0, 1"
+END
+END
+BLOCK "VarFileInfo"
+BEGIN
+VALUE "Translation", 0x804, 1200
+END
 END
 
 
-/////////////////////////////////////////////////////////////////////////////
-//
-// RT_MANIFEST
-//
-
-IDR_RT_MANIFEST1        RT_MANIFEST             "res\\DeclareDPIAware.manifest"
-
-#endif    // 中文(简体，中国) resources
+#endif    //  resources
 /////////////////////////////////////////////////////////////////////////////
 
 
@@ -108,10 +103,11 @@ IDR_RT_MANIFEST1        RT_MANIFEST             "res\\DeclareDPIAware.manifest"
 #if !defined(AFX_RESOURCE_DLL) || defined(AFX_TARG_CHS)
 LANGUAGE 4, 2
 #pragma code_page(936)
-#include "res\soui_res.rc2" //SOUI资源
+#include "res\soui_res.rc2" //SOUI Resource
 #if (defined(LIB_CORE) && defined(LIB_SOUI_COM))
-    #include "..\soui-sys-resource\theme_sys_res.rc2" //SOUI SYS资源
+#include "..\soui-sys-resource\theme_sys_res.rc2" //SOUI SYS Resource
 #endif
+
 #endif
 /////////////////////////////////////////////////////////////////////////////
 #endif    // not APSTUDIO_INVOKED

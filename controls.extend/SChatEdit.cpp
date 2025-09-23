@@ -101,7 +101,7 @@ BOOL SChatEdit::ReplaceSelectionByFormatText(const SStringW &strMsg, BOOL bCanUn
 int SChatEdit::_InsertFormatText(int iCaret, CHARFORMATW cf, SXmlNode xmlText, BOOL bCanUndo)
 {
     SStringW strText = xmlText.value();
-#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_) && !defined(__MINGW32__)
     if (xmlText.name() == KLabelSmiley)
     { // insert smiley
         SComPtr<ISmileyCtrl> pSmiley;
@@ -275,7 +275,7 @@ SStringW SChatEdit::GetFormatText()
     SSendMessage(EM_GETTEXTRANGE, 0, (LPARAM)&txtRng);
     strTxt.ReleaseBuffer();
 
-#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_) &&!defined(__MINGW32__)
     SComPtr<IRichEditOle> ole;
     SSendMessage(EM_GETOLEINTERFACE, 0, (LPARAM)(void **)&ole);
 #endif
@@ -283,7 +283,7 @@ SStringW SChatEdit::GetFormatText()
     int iPlainTxtBegin = 0;
     for (int i = 0; i < strTxt.GetLength(); i++)
     {
-        #if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
+        #if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_) &&!defined(__MINGW32__)
         if (strTxt[i] == 0xfffc)
         { //找到一个OLE对象
             strMsg += strTxt.Mid(iPlainTxtBegin, i - iPlainTxtBegin);

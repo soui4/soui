@@ -2,10 +2,8 @@
 #include <souistd.h>
 #include <SInitGuid.h>
 
-#ifdef _WIN32
 #undef SOUI_EXP
 #define SOUI_EXP
-#endif
 
 DEFINE_GUID(IID_IRichEditOleCallback, 0x00020D03, 0, 0, 0xC0,0,0,0,0,0,0,0x46);
 

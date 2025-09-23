@@ -1,0 +1,34 @@
+SOUI 3+ License
+
+SOUI is an open-source client-side directui engine that has been maintained free of charge for more than 10 years. Starting from version 3.0, the open-source license has been changed from MIT to free for individual users (commercial use by individuals requires payment), and companies need to pay for usage. Please contact the author for payment methods.
+
+Please abide by the following agreement when using SOUI:
+
+1. Since SOUI was open-sourced from version 1.x, it has received support from many enthusiastic netizens. All friends who have submission records in the commit history automatically receive lifetime free authorization. All those who have submitted demos to https://github.com/soui-demo and https://github.com/soui4-demo also automatically receive lifetime free authorization. The above terms are valid for life!
+
+2. All future pull requests to soui4 that are accepted and cumulatively exceed 500 lines of code will also enjoy lifetime free usage.
+
+3. SOUI has two QQ groups: 229313785 and 385438344. The administrators have spent a lot of effort on SOUI's growth, so all SOUI administrators automatically receive lifetime free authorization (see contributors.md).
+
+4. Individuals who have free authorization can also obtain free authorization when developing commercial products for companies.
+
+5. SOUI still has many requirements that need further improvement. If there is revenue in the future, the author will use 20% of it to reward contributing authors. If a netizen's submitted code (excluding comments and demos) is included and exceeds 1000 lines, they will automatically receive equity, with the share size determined by the author!
+
+6. SOUI 2.X and earlier versions are free and open-source for life. Users can modify the SOUI 2.x version themselves, but cannot transplant and use SOUI 3+ version code, otherwise it will be treated as using SOUI 3+ and must comply with the SOUI 3+ open-source license.
+
+7. Products that obtain SOUI 3+ authorization through any method should contact the author for authorization before release. The author is responsible for recording the product information in the products.md file. Users can check this file to confirm whether their product has obtained authorization.
+
+8. https://github.com/soui4/soui.git is the only designated code repository for SOUI 4.0, and https://gitee.com/setoutsoft/soui4.git is the backup repository. products.md follows github as the standard.
+
+9. Unauthorized commercial use of SOUI 3+ in commercial projects will be recorded in the unauthorized project list in product.md once discovered. Even if authorization is purchased later, data can only be deleted from the latest version, and historical records will permanently exist. The user bears the consequences of any impact caused.
+
+10. The final interpretation right of this agreement belongs to the author.
+
+Modification History:
+1.4 2025.2.12
+1.3 2022.2.11
+1.2 2021.12.16
+1.1 2020.6.16
+1.0 2019.10.6
+
+Start Journey Software

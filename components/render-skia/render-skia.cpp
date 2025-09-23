@@ -1474,10 +1474,10 @@ SNSBEGIN
 		const SkMatrix & m = m_SkCanvas->getTotalMatrix();
 		matrix[kMScaleX] = m.getScaleX();
 		matrix[kMSkewX] = m.getSkewX();
-		matrix[kMTransX] = m.getTranslateX() - m_ptOrg.fX;
+		matrix[kMTransX] = m.getTranslateX();
 		matrix[kMSkewY] = m.getSkewY();
 		matrix[kMScaleY] = m.getScaleY();
-		matrix[kMTransY] = m.getTranslateY() - m_ptOrg.fY;
+		matrix[kMTransY] = m.getTranslateY();
 		matrix[kMPersp0] = m.getPerspX();
 		matrix[kMPersp1] = m.getPerspY();
 		matrix[kMPersp2] = m.get(SkMatrix::kMPersp2);

@@ -10,7 +10,7 @@ static _CoCreateInstance TrueCoCreateInstance = (_CoCreateInstance)GetProcAddres
 
 HRESULT STDAPICALLTYPE HookCoCreateInstance(REFCLSID rclsid, LPUNKNOWN pUnkOuter, DWORD dwClsContext, REFIID riid, LPVOID FAR* ppv)
 {
-#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_) && !defined(__MINGW32__)
     if (rclsid == CLSID_SSmileyCtrl)
     {
         return CreateSmiley(riid,ppv);
@@ -25,7 +25,7 @@ _ProgIDFromCLSID TrueProgIDFromCLSID = (_ProgIDFromCLSID)GetProcAddress(GetModul
 
 HRESULT STDAPICALLTYPE HookProgIDFromCLSID (REFCLSID clsid, LPOLESTR FAR* lplpszProgID)
 {
-#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_)
+#if defined(_WIN32) && !defined(_ARM64_) && !defined(_ARM_) && !defined(__MINGW32__)
     if (clsid == CLSID_SSmileyCtrl)
     {
         const WCHAR KProgID[] = L"SSmileyCtrl.NoCOM.1";
@@ -40,7 +40,7 @@ HRESULT STDAPICALLTYPE HookProgIDFromCLSID (REFCLSID clsid, LPOLESTR FAR* lplpsz
 
 SmileyCreateHook::SmileyCreateHook(void)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
     DetourAttach(&(PVOID &)TrueCoCreateInstance, HookCoCreateInstance);
@@ -52,7 +52,7 @@ SmileyCreateHook::SmileyCreateHook(void)
 
 SmileyCreateHook::~SmileyCreateHook(void)
 {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
     DetourTransactionBegin();
     DetourUpdateThread(GetCurrentThread());
     DetourDetach(&(PVOID &)TrueCoCreateInstance, HookCoCreateInstance);

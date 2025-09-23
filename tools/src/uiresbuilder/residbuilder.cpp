@@ -112,13 +112,15 @@ static const unsigned char kBomU16[2]={0xff,0xfe};
 class FILEHEAD
 {
 public:
-	static void WriteTimeStamp(__int64 ts,FILE *f,BOOL bUtf8){
+	static void WriteTimeStamp(__int64 ts,FILE *f,BOOL bUtf8,BOOL bWriteBOM){
 		if(bUtf8){
-			fwrite(kBomU8,1,3,f);
+			if(bWriteBOM)
+				fwrite(kBomU8,1,3,f);
 			fprintf(f,STAMP_FORMAT2_U8,(ULONG)((ts>>32)&0xffffffff),(ULONG)(ts&0xffffffff));
 		}
 		else{
-			fwrite(kBomU16,1,2,f);
+			if(bWriteBOM)
+				fwrite(kBomU16,1,2,f);
 			fwprintf(f,STAMP_FORMAT2,(ULONG)((ts>>32)&0xffffffff),(ULONG)(ts&0xffffffff));		
 		}
 	}
@@ -153,6 +155,17 @@ public:
 					sscanf(szHeadLine,STAMP_FORMAT2_U8,&dHi,&dLow);
 					ts=((__int64)dHi)<<32|dLow;
 				}
+			}else{
+				//no bom
+				fseek(f,0,SEEK_SET);
+				char szHeadLine[ARRAYSIZE(STAMP_FORMAT)];
+				fread(szHeadLine,sizeof(szHeadLine),1,f);
+				DWORD dHi=0,dLow=0;
+				if(strncmp(szHeadLine,STAMP_FORMAT2_U8,8)==0)
+				{
+					sscanf(szHeadLine,STAMP_FORMAT2_U8,&dHi,&dLow);
+					ts=((__int64)dHi)<<32|dLow;
+				}
 			}
 			fclose(f);
 		}
@@ -161,7 +174,7 @@ public:
 };
 #pragma  pack(pop)
 
-void WriteFile(__int64 tmIdx, const std::string &strRes, const std::wstring &strOut, BOOL bUtf8=FALSE)
+static void WriteFile(__int64 tmIdx, const std::string &strRes, const std::wstring &strOut, BOOL bUtf8=FALSE,BOOL bWriteBOM=TRUE)
 {
 	__int64 tmSave=FILEHEAD::ExactTimeStamp(strRes.c_str());
 	//write output string to target res file
@@ -170,7 +183,7 @@ void WriteFile(__int64 tmIdx, const std::string &strRes, const std::wstring &str
 		FILE * f=fopen(strRes.c_str(),"wb");
 		if(f)
 		{
-			FILEHEAD::WriteTimeStamp(tmIdx,f,bUtf8);//写UTF16文件头及时间。-sizeof(WCHAR)用来去除stamp最后一个\0
+			FILEHEAD::WriteTimeStamp(tmIdx,f,bUtf8,bWriteBOM);//写UTF16文件头及时间。-sizeof(WCHAR)用来去除stamp最后一个\0
 			if(!bUtf8)
 			{
 				fwrite(strOut.c_str(),sizeof(WCHAR),strOut.length(),f);
@@ -700,12 +713,12 @@ int _tmain(int argc, TCHAR* argv[])
 		{
 			WCHAR szRec[2000];
 			wstring strPath=BuildPath(it2->szPath);
-			swprintf_s(szRec,2000,L"DEFINE_UIRES(%s,\t%s,\t%\"%s\")\n",it2->szName,it2->szType,strPath.c_str());
+			swprintf_s(szRec,2000,L"DEFINE_UIRES(%s,\t%s,\t\"%s\")\n",it2->szName,it2->szType,strPath.c_str());
 			strOut+=szRec;
 			it2++;
 		}
         __int64 tmIdx=GetLastWriteTime(strIndexFile.c_str());
-		WriteFile(tmIdx, strRes, strOut,FALSE);
+		WriteFile(tmIdx, strRes, strOut,TRUE,FALSE);//no bom
 	}
 
     //输入name,id定义,只解析资源中layout资源的XML资源

@@ -1,4 +1,4 @@
-﻿//stamp:33fef1d9f08b52a3
+﻿//stamp:34140c856d04394f
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -27,7 +27,6 @@
 			const TCHAR * ICON_Loading6;
 			}ICON;
 		struct _CURSOR{
-			const TCHAR * ANI_ARROW;
 			const TCHAR * CUR_TST;
 			}CURSOR;
 		struct _SMENU{
@@ -240,7 +239,6 @@ struct _UIRES UIRES={
 			_T("ICON:ICON_Loading6"),
 		},
 		{
-			_T("CURSOR:ANI_ARROW"),
 			_T("CURSOR:CUR_TST"),
 		},
 		{

@@ -8,9 +8,7 @@
 #include <controls.extend/SVscrollbar.h>
 #include <controls.extend/SSkinNewScrollBar.h>
 #include <controls.extend/SChromeTabCtrl.h>
-#ifdef _WIN32
-#include <controls.extend/SIECtrl.h>
-#endif
+
 #include <controls.extend/SChatEdit.h>
 #include <controls.extend/SScrollText.h>
 #include <controls.extend/SCalendar2.h>
@@ -22,14 +20,15 @@
 #include <controls.extend/SMcListViewEx/SHeaderCtrlEx.h>
 #include <controls.extend/SMcListViewEx/SMCListViewEx.h>
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
+#include <controls.extend/SIECtrl.h>
 #include "uianimation/UiAnimationWnd.h"
-#endif
-#include "appledock/SDesktopDock.h"
-#include "SMatrixWindow.h"
-#ifdef _WIN32
 #include "SmileyCreateHook.h"
 #endif
+
+#include "appledock/SDesktopDock.h"
+#include "SMatrixWindow.h"
+
 #include "clock/sclock.h"
 #include "FpsWnd.h"
 
@@ -244,7 +243,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     app.RegisterWindowClass<SShellTray>();
     app.RegisterWindowClass<FpsWnd>();
 
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
     app.RegisterWindowClass<SIECtrl>(); // 注册IECtrl
     app.RegisterWindowClass<SStaticGdip>();
     if (SUCCEEDED(CUiAnimation::Init()))
@@ -264,7 +263,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
 #ifdef _WIN32
     // 采用hook绘制菜单的边框
-    SMenuWndHook::InstallHook(hInstance, L"_skin.sys.menu.border");
+        SMenuWndHook::InstallHook(hInstance, L"_skin.sys.menu.border");
 #endif
 
     // 演示R.color.xxx,R.string.xxx在代码中的使用。
@@ -273,7 +272,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
 
     app.EnableNotifyCenter(TRUE);
     {
-#ifdef _WIN32
+#if defined(_WIN32) && !defined(__MINGW32__)
         SmileyCreateHook smileyHook;
 #endif
         // 设置提示窗口布局
@@ -291,15 +290,17 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*
     delete SkinLoader;
 
 #ifdef _WIN32
-    // 卸载菜单边框绘制hook
-    SMenuWndHook::UnInstallHook();
-    CUiAnimation::Free();
+        // 卸载菜单边框绘制hook
+        SMenuWndHook::UnInstallHook();
+#endif
+#if defined(_WIN32) && !defined(__MINGW32__)
+        CUiAnimation::Free();
 #endif
     OleUninitialize();
     return nRet;
 }
 
-#ifndef _WIN32
+#if !defined(_WIN32) || defined(__MINGW32__) 
 int main(int argc, char **argv)
 {
     HINSTANCE hInst = GetModuleHandle(NULL);

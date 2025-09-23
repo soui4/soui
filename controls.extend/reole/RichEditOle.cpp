@@ -379,11 +379,14 @@ CRichEditOleCallback::QueryInterface(REFIID iid, void ** ppvObject)
     {
         *ppvObject = this;
         AddRef();
-    }else if( iid == __uuidof(ISmileyHost))
+    }
+#ifndef __MINGW32__
+    else if( iid == __uuidof(ISmileyHost))
     {
         *ppvObject = m_pSmileyHost;
         m_pSmileyHost->AddRef();
     }
+#endif
     else
     {
         hr = E_NOINTERFACE;

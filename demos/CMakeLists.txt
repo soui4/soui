@@ -1,6 +1,4 @@
-if(NOT MINGW)
 add_subdirectory(demo)
-endif()
 add_subdirectory(demo2)
 add_subdirectory(wxDemo)
 add_subdirectory(dpidemo)

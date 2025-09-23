@@ -187,8 +187,6 @@ public:
                 pTxt->SetWindowText(S_CA2T(str));
         }
     }
-
-
     void OnBtnOpenFile()
     {
         TCHAR szBuf[MAX_PATH];
@@ -242,6 +240,22 @@ public:
         }
         #endif//!_WIN32
     }
+
+    void OnBtnChooseFont(){
+        LOGFONT logfont;
+        CHOOSEFONT cf;
+        memset(&logfont, 0, sizeof(logfont));
+        memset(&cf, 0, sizeof(cf));
+        cf.lStructSize = sizeof(cf);
+        cf.lpLogFont = &logfont;
+        cf.Flags = CF_SCREENFONTS | CF_EFFECTS | CF_INITTOLOGFONTSTRUCT;
+        if(ChooseFont(&cf)){
+            SWindow *pWnd = FindChildByName("txt_font");
+            if(pWnd) 
+                pWnd->SetWindowText(logfont.lfFaceName);
+        }
+    }
+
     void OnBtnForkNormal(){
         SStringT strApp = SApplication::getSingletonPtr()->GetAppDir();
         strApp += _T("/demo");
@@ -281,6 +295,7 @@ public:
         EVENT_NAME_COMMAND(L"btn_open_file",OnBtnOpenFile)
         EVENT_NAME_COMMAND(L"btn_save_file",OnBtnSaveFile)
         EVENT_NAME_COMMAND(L"btn_pick_folder",OnBtnPickFolder)
+        EVENT_NAME_COMMAND(L"btn_font",OnBtnChooseFont)
         EVENT_NAME_COMMAND(L"btn_fork_normal",OnBtnForkNormal)
         EVENT_NAME_COMMAND(L"btn_fork_root",OnBtnForkRoot)
         EVENT_HANDLER(EventRealWndCreate::EventID, OnRealWndCreate)

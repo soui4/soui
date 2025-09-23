@@ -22,7 +22,6 @@
 		<file name="ICON_Loading6" path="image\32\loading_6.ico" />
 	</ICON>
 	<CURSOR>
-		<file name="ANI_ARROW" path="image\021.ani" />
 		<file name="CUR_TST" path="image\camera_capture.cur" />
 	</CURSOR>
 	<SMENU>
@@ -171,7 +170,7 @@
 		<file name="apng_haha" path="image\apng_haha.png" />
 	</apng>
 	<rtf>
-		<file name="rtf_test" path="rtf\RTF测试.rtf" />
+		<file name="rtf_test" path="rtf\test.rtf" />
 	</rtf>
 	<lua>
 		<file name="lua_test" path="lua\test.lua" />
