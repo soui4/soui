@@ -784,13 +784,14 @@ SWindow *SWindow::FindChildByID(int id, int nDeep /* =-1*/)
 {
     if (id == SWindowMgr::SWND_INVALID || nDeep == 0)
         return NULL;
-    SWindow *pRet = SWindowFinder::getSingletonPtr()->FindChildByID(this, id, nDeep);
+    ISwndFinder *pFinder = GetContainer()->GetSwndFinder();
+    SWindow *pRet = (SWindow*)pFinder->FindChildByID(this, id, nDeep);
     if (pRet)
         return pRet;
 
     pRet = _FindChildByID(id, nDeep);
     if (pRet)
-        SWindowFinder::getSingletonPtr()->CacheResultForID(this, id, nDeep, pRet);
+        pFinder->CacheResultForID(this, id, nDeep, pRet);
     return pRet;
 }
 
@@ -802,13 +803,14 @@ SWindow *SWindow::FindChildByName(LPCWSTR pszName, int nDeep)
     if (strName.IsEmpty())
         return NULL;
 
-    SWindow *pRet = SWindowFinder::getSingletonPtr()->FindChildByName(this, strName, nDeep);
+    ISwndFinder *pFinder = GetContainer()->GetSwndFinder();
+    SWindow *pRet = (SWindow*)pFinder->FindChildByName(this, strName, nDeep);
     if (pRet)
         return pRet;
 
     pRet = _FindChildByName(strName, nDeep);
     if (pRet)
-        SWindowFinder::getSingletonPtr()->CacheResultForName(this, strName, nDeep, pRet);
+        pFinder->CacheResultForName(this, strName, nDeep, pRet);
     return pRet;
 }
 

@@ -846,6 +846,7 @@ SRootWindow *SHostWnd::CreateRoot()
 
 int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
+    //SSLOGI()<<"SHostWnd::OnCreate, m_hWnd="<<m_hWnd<<" tid="<<GetCurrentThreadId();
     if (!m_presenter)
     {
         m_presenter.Attach(new SHostPresenter(this));
@@ -868,6 +869,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
         m_pRoot = NULL;
     }
     m_pRoot = CreateRoot();
+    //SSLOGI()<<"CreateRoot, root="<<m_pRoot<<" tid="<<GetCurrentThreadId()<<" hwnd="<<m_hWnd;
     m_pRoot->SetContainer(this);
     SwndContainerImpl::SetRoot(m_pRoot);
 

@@ -17,6 +17,7 @@ SwndContainerImpl::SwndContainerImpl()
     , m_bZorderDirty(TRUE)
     , m_pRoot(NULL)
 {
+    m_swndFinder.Attach(new SWindowFinder());
 }
 
 void SwndContainerImpl::SetRoot(SWindow *pRoot)

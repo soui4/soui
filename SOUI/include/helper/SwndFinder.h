@@ -1,7 +1,8 @@
 ﻿#ifndef __SWNDFINDER__H__
 #define __SWNDFINDER__H__
 
-#include <core/SSingleton2.h>
+#include <interface/SWndFinder-i.h>
+#include <helper/obj-ref-impl.hpp>
 
 SNSBEGIN
 
@@ -18,7 +19,7 @@ struct SFindInfo
      * @param strName 窗口名称
      * @param nDeep 查找深度
      */
-    SFindInfo(SWindow *pParent, const SStringW &strName, int nDeep);
+    SFindInfo(IWindow *pParent, const SStringW &strName, int nDeep);
 
     /**
      * @brief 构造函数，通过ID查找
@@ -26,7 +27,7 @@ struct SFindInfo
      * @param nID 窗口ID
      * @param nDeep 查找深度
      */
-    SFindInfo(SWindow *pParent, int nID, int nDeep);
+    SFindInfo(IWindow *pParent, int nID, int nDeep);
 
     SWND hParent;     // 父窗口句柄
     bool findByName;  // 是否通过名称查找
@@ -117,13 +118,10 @@ class CElementTraits<SFindInfo> : public CElementTraitsBase<SFindInfo> {
 
 /**
  * @class SWindowFinder
- * @brief 窗口查找器类，继承自单例类
+ * @brief 窗口查找器类
  */
-class SWindowFinder : public SSingleton2<SWindowFinder> {
-    SINGLETON2_TYPE(SINGLETON_WINDOWFINDER)
-
+class SWindowFinder : public TObjRefImpl<ISwndFinder> {
     friend class SWindow;
-
   protected:
     /**
      * @brief 通过名称查找子窗口
@@ -132,7 +130,7 @@ class SWindowFinder : public SSingleton2<SWindowFinder> {
      * @param nDeep 查找深度
      * @return 找到的窗口指针，未找到返回NULL
      */
-    SWindow *FindChildByName(SWindow *pParent, const SStringW &strName, int nDeep);
+    IWindow * WINAPI FindChildByName(IWindow *pParent, LPCWSTR strName, int nDeep) override;
 
     /**
      * @brief 通过ID查找子窗口
@@ -141,7 +139,7 @@ class SWindowFinder : public SSingleton2<SWindowFinder> {
      * @param nDeep 查找深度
      * @return 找到的窗口指针，未找到返回NULL
      */
-    SWindow *FindChildByID(SWindow *pParent, int nID, int nDeep);
+    IWindow * WINAPI FindChildByID(IWindow *pParent, int nID, int nDeep) override;
 
     /**
      * @brief 缓存通过名称查找的结果
@@ -150,7 +148,7 @@ class SWindowFinder : public SSingleton2<SWindowFinder> {
      * @param nDeep 查找深度
      * @param pResult 找到的窗口指针
      */
-    void CacheResultForName(SWindow *pParent, const SStringW &strName, int nDeep, SWindow *pResult);
+    void WINAPI CacheResultForName(IWindow *pParent, LPCWSTR strName, int nDeep, IWindow *pResult) override;
 
     /**
      * @brief 缓存通过ID查找的结果
@@ -159,7 +157,7 @@ class SWindowFinder : public SSingleton2<SWindowFinder> {
      * @param nDeep 查找深度
      * @param pResult 找到的窗口指针
      */
-    void CacheResultForID(SWindow *pParent, int nID, int nDeep, SWindow *pResult);
+    void WINAPI CacheResultForID(IWindow *pParent, int nID, int nDeep, IWindow *pResult) override;
 
   protected:
     /**
@@ -168,7 +166,7 @@ class SWindowFinder : public SSingleton2<SWindowFinder> {
      * @param fi 查找信息对象
      * @return 找到的窗口指针，未找到返回NULL
      */
-    SWindow *FindChildByKey(SWindow *pParent, const SFindInfo &fi);
+    IWindow *FindChildByKey(IWindow *pParent, const SFindInfo &fi);
 
     typedef SMap<SFindInfo, SWND> FINDCACHE; // 查找缓存类型
     FINDCACHE m_findCache;                   // 查找缓存

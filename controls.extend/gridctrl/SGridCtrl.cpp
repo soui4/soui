@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include <SInitGuid.h>
 #include "SGridCtrl-i.h"
 

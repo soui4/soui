@@ -309,7 +309,6 @@ void SApplication::_CreateSingletons()
     m_pSingletons[SUiDef::GetType()] = new SUiDef(m_RenderFactory);
     m_pSingletons[SWindowMgr::GetType()] = new SWindowMgr();
     m_pSingletons[STimerGenerator::GetType()] = new STimerGenerator();
-    m_pSingletons[SWindowFinder::GetType()] = new SWindowFinder();
     m_pSingletons[SHostMgr::GetType()] = new SHostMgr();
 }
 
@@ -323,7 +322,6 @@ void SApplication::_DestroySingletons()
         DELETE_SINGLETON(SNotifyCenter);
 
     DELETE_SINGLETON(SHostMgr);
-    DELETE_SINGLETON(SWindowFinder);
     DELETE_SINGLETON(SUiDef);
     DELETE_SINGLETON(STimerGenerator);
     DELETE_SINGLETON(SWindowMgr);

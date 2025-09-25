@@ -21,6 +21,7 @@
 #include <interface/scaret-i.h>
 #include <interface/STimelineHandler-i.h>
 #include <interface/SAccelerator-i.h>
+#include <interface/SWndFinder-i.h>
 
 SNSBEGIN
 
@@ -299,6 +300,12 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @return The number of tasks removed.
      */
     STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) PURE;
+
+    /**
+     * @brief Gets the window finder object.
+     * @return Pointer to the window finder object.
+     */
+    STDMETHOD_(ISwndFinder*, GetSwndFinder)(THIS) PURE;
 };
 
 SNSEND

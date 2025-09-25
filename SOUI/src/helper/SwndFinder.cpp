@@ -4,7 +4,7 @@
 
 SNSBEGIN
 
-SFindInfo::SFindInfo(SWindow *pParent, const SStringW &_strName, int _nDeep)
+SFindInfo::SFindInfo(IWindow *pParent, const SStringW &_strName, int _nDeep)
     : hParent(pParent->GetSwnd())
     , strName(_strName)
     , nDeep(_nDeep)
@@ -12,7 +12,7 @@ SFindInfo::SFindInfo(SWindow *pParent, const SStringW &_strName, int _nDeep)
 {
 }
 
-SFindInfo::SFindInfo(SWindow *pParent, int _nID, int _nDeep)
+SFindInfo::SFindInfo(IWindow *pParent, int _nID, int _nDeep)
     : hParent(pParent->GetSwnd())
     , nID(_nID)
     , nDeep(_nDeep)
@@ -21,19 +21,19 @@ SFindInfo::SFindInfo(SWindow *pParent, int _nID, int _nDeep)
 }
 
 //////////////////////////////////////////////////////////////////////////
-SWindow *SWindowFinder::FindChildByName(SWindow *pParent, const SStringW &strName, int nDeep)
+IWindow *SWindowFinder::FindChildByName(IWindow *pParent, LPCWSTR strName, int nDeep)
 {
     SFindInfo fi(pParent, strName, nDeep);
     return FindChildByKey(pParent, fi);
 }
 
-SWindow *SWindowFinder::FindChildByID(SWindow *pParent, int nID, int nDeep)
+IWindow *SWindowFinder::FindChildByID(IWindow *pParent, int nID, int nDeep)
 {
     SFindInfo fi(pParent, nID, nDeep);
     return FindChildByKey(pParent, fi);
 }
 
-SWindow *SWindowFinder::FindChildByKey(SWindow *pParent, const SFindInfo &fi)
+IWindow *SWindowFinder::FindChildByKey(IWindow *pParent, const SFindInfo &fi)
 {
     FINDCACHE::CPair *pFind = m_findCache.Lookup(fi);
     if (!pFind)
@@ -51,7 +51,7 @@ SWindow *SWindowFinder::FindChildByKey(SWindow *pParent, const SFindInfo &fi)
     }
 }
 
-void SWindowFinder::CacheResultForName(SWindow *pParent, const SStringW &strName, int nDeep, SWindow *pResult)
+void SWindowFinder::CacheResultForName(IWindow *pParent, LPCWSTR strName, int nDeep, IWindow *pResult)
 {
     SFindInfo fi(pParent, strName, nDeep);
     SASSERT(m_findCache.Lookup(fi) == NULL);
@@ -59,7 +59,7 @@ void SWindowFinder::CacheResultForName(SWindow *pParent, const SStringW &strName
     m_findCache[fi] = pResult->GetSwnd();
 }
 
-void SWindowFinder::CacheResultForID(SWindow *pParent, int nID, int nDeep, SWindow *pResult)
+void SWindowFinder::CacheResultForID(IWindow *pParent, int nID, int nDeep, IWindow *pResult)
 {
     SFindInfo fi(pParent, nID, nDeep);
     SASSERT(m_findCache.Lookup(fi) == NULL);
