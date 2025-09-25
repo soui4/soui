@@ -243,6 +243,11 @@ public:
         return pt;
     }
 
+    T * Get() const
+    {
+        return p;
+    }
+    
     /// @brief Copies the pointer to another location and adds a reference.
     /// @param ppT The destination pointer.
     /// @return S_OK if successful, E_POINTER if ppT is NULL.

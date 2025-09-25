@@ -43,9 +43,16 @@ protected:
         pGrid->SetFixedRowCount(1);
         pGrid->SetFixedColumnCount(1);
 
-        // Set column headers
+        // Set column headers with specific names for different cell types
         pGrid->SetItemText(0, 0, _T(""));
-        for (int col = 1; col < kNumCols; col++)
+        pGrid->SetItemText(0, 1, _T("Name"));
+        pGrid->SetItemText(0, 2, _T("Number"));
+        pGrid->SetItemText(0, 3, _T("Date"));
+        pGrid->SetItemText(0, 4, _T("Color"));
+        pGrid->SetItemText(0, 5, _T("DateTime"));
+        pGrid->SetItemText(0, 6, _T("Checkbox"));
+        pGrid->SetItemText(0, 7, _T("URL"));
+        for (int col = 8; col < kNumCols; col++)
         {
             SStringT strHeader;
             strHeader.Format(_T("Column %d"), col);
@@ -60,7 +67,7 @@ protected:
             pGrid->SetItemText(row, 0, strRow);
         }
 
-        // Fill with sample data - mix of text and numbers for sorting demo
+        // Fill with sample data and set different cell types
         for (int row = 1; row < kNumRows; row++)
         {
             for (int col = 1; col < kNumCols; col++)
@@ -68,29 +75,67 @@ protected:
                 SStringT strText;
                 if (col == 1)
                 {
-                    // First column: Names
+                    // First column: Names (Text cells)
                     LPCTSTR names[] = {_T("Alice"), _T("Bob"), _T("Charlie"), _T("David"), _T("Eve"),
                                       _T("Frank"), _T("Grace"), _T("Henry"), _T("Ivy"), _T("Jack"),
                                       _T("Kate"), _T("Liam"), _T("Mia"), _T("Noah"), _T("Olivia"),
                                       _T("Paul"), _T("Quinn"), _T("Ruby"), _T("Sam")};
                     strText = names[(row - 1) % 19];
+                    pGrid->SetItemText(row, col, strText);
                 }
                 else if (col == 2)
                 {
-                    // Second column: Numbers
+                    // Second column: Numbers (Text cells)
                     strText.Format(_T("%d"), (row * 7 + col * 3) % 100);
+                    pGrid->SetItemText(row, col, strText);
                 }
                 else if (col == 3)
                 {
-                    // Third column: Dates
+                    // Third column: Dates (Text cells for now)
                     strText.Format(_T("2024-%02d-%02d"), (row % 12) + 1, (row % 28) + 1);
+                    pGrid->SetItemText(row, col, strText);
+                }
+                else if (col == 4)
+                {
+                    // Fourth column: Color cells
+                    pGrid->SetCellType(row, col, CELL_TYPE_COLOR);
+                    // Set different colors for demonstration
+                    COLORREF colors[] = {RGB(255, 0, 0), RGB(0, 255, 0), RGB(0, 0, 255),
+                                       RGB(255, 255, 0), RGB(255, 0, 255), RGB(0, 255, 255),
+                                       RGB(128, 128, 128), RGB(255, 128, 0), RGB(128, 255, 128)};
+                    COLORREF cr = colors[(row - 1) % 9];
+                    strText.Format(_T("#%02X%02X%02X"), GetRValue(cr), GetGValue(cr), GetBValue(cr));
+                    pGrid->SetItemText(row, col, strText);
+                }
+                else if (col == 5)
+                {
+                    // Fifth column: DateTime cells
+                    pGrid->SetCellType(row, col, CELL_TYPE_DATETIMEPICKER);
+                    strText.Format(_T("2024-%02d-%02d %02d:%02d:00"),
+                                  (row % 12) + 1, (row % 28) + 1,
+                                  (row % 24), (row * 15) % 60);
+                    pGrid->SetItemText(row, col, strText);
+                }
+                else if (col == 6)
+                {
+                    // Sixth column: Checkbox cells
+                    pGrid->SetCellType(row, col, CELL_TYPE_CHECKBOX);
+                    strText = (row % 2 == 0) ? _T("1") : _T("0");
+                    pGrid->SetItemText(row, col, strText);
+                }
+                else if (col == 7)
+                {
+                    // Seventh column: URL cells
+                    pGrid->SetCellType(row, col, CELL_TYPE_URL);
+                    strText.Format(_T("https://example.com/user%d"), row);
+                    pGrid->SetItemText(row, col, strText);
                 }
                 else
                 {
-                    // Other columns: Mixed data
+                    // Other columns: Mixed data (Text cells)
                     strText.Format(_T("Cell(%d,%d)"), row, col);
+                    pGrid->SetItemText(row, col, strText);
                 }
-                pGrid->SetItemText(row, col, strText);
             }
         }
 
@@ -246,7 +291,8 @@ protected:
     void OnGridGetInplaceStyle(IEvtArgs *e){
         EventGridGetInplaceStyle* pEvt = sobj_cast<EventGridGetInplaceStyle>(e);
         IGridCell * pCell = pEvt->pCell;
-        if(pCell->GetType() == CELL_TYPE_OPTION){
+		int cellType = pCell->GetType();
+        if(cellType == CELL_TYPE_OPTION){
             const wchar_t * kOptionStyle = L"<combobox dropDown=\"0\" dropHeight=\"300\" class=\"cls_edit\" dotted=\"0\" animateTime=\"200\" curSel=\"2\"> \
 						<dropdownStyle>\
 							<root colorBkgnd=\"#ffffff\"/>\
@@ -255,7 +301,12 @@ protected:
 						<editstyle inset=\"5,0,5,0\" margin=\"0\" colorText=\"#000000\" align=\"left\" colorBkgnd=\"#FFFFFF\" />\
 					</combobox>";
             pEvt->pstrXmlStyle->Assign(kOptionStyle);
-        }
+        }else if(cellType == CELL_TYPE_DATETIMEPICKER){
+			const wchar_t * kDatePickerStyle =  L"<dateTimePicker  padding=\"4,0,4,0\" dropWidth=\"300\" timeEnable=\"1\"> \
+				<calstyle ncSkin=\"_skin.sys.border\" daySkin=\"_skin.sys.btn.normal\" margin=\"1\" font=\"face:微软雅黑,size=14\" />\
+				</dateTimePicker>";
+			pEvt->pstrXmlStyle->Assign(kDatePickerStyle);
+		}
     }
 
     EVENT_MAP_BEGIN()

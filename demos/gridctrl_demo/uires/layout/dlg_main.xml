@@ -14,9 +14,10 @@
     </caption>
     
     <window size="-2,0" weight="1" layout="vbox">
-      <text  text="SOUI GridCtrl Demo - Basic Grid Control" font="size:14,weight:bold"/>
-      
-      <window size="-2,0" weight="1" layout="hbox" interval="5"> 
+      <text  text="SOUI GridCtrl Demo - Enhanced Cell Types" font="size:14,weight:bold"/>
+      <text  text="Features: Color Picker Cells, DateTime Picker Cells, Type-aware Copy/Paste" font="size:10" colorText="#666666"/>
+
+      <window size="-2,0" weight="1" layout="hbox" interval="5">
         <!-- Grid Control -->
         <gridctrl name="grid_test" size="0,-2" weight="1"
                   rowCount="10" 
@@ -29,14 +30,26 @@
                   gridLineColor="#C8C8C8" 
                   gridBkColor="#FFFFFF" 
                   editable="1"/>
-        <window size="-1,-2" layout="vbox" interval="10">
-          <button name="btn_merge" text="Merge" width="80" height="25" tip="Merge selected cells"/>
-          <button name="btn_unmerge" text="Unmerge" width="80" height="25" tip="Unmerge selected cells"/>
+        <window size="200,-2" layout="vbox" interval="5">
+          <text text="Cell Types:" font="size:12,weight:bold"/>
+          <text text="• Column 4: Color Picker" font="size:9"/>
+          <text text="• Column 5: DateTime Picker" font="size:9"/>
+          <text text="• Column 6: Checkbox" font="size:9"/>
+          <text text="• Column 7: URL Links" font="size:9"/>
+          <text text="" size="-2,5"/>
+          <text text="Instructions:" font="size:12,weight:bold"/>
+          <text text="• Click color cells to pick colors" font="size:9"/>
+          <text text="• Click datetime cells for picker" font="size:9"/>
+          <text text="• Copy/paste respects cell types" font="size:9"/>
+          <text text="• Use Ctrl+C/V for copy/paste" font="size:9"/>
+          <text text="" size="-2,10"/>
+          <button name="btn_merge" text="Merge Cells" width="120" height="25" tip="Merge selected cells"/>
+          <button name="btn_unmerge" text="Unmerge Cells" width="120" height="25" tip="Unmerge selected cells"/>
         </window>
       </window>
       <!-- Status bar -->
       <window size="-2,30" colorBkgnd="#F0F0F0">
-        <text pos="10,5,-10,-5" text="Ready - Use mouse to select cells, double-click to edit"/>
+        <text pos="10,5,-10,-5" text="Ready - Click color/datetime cells to test new features. Copy/paste between same cell types."/>
       </window>
     </window>
   </root>

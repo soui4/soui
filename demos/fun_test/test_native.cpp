@@ -533,7 +533,149 @@ void SNativeWnd2::OnPaint(HDC hdc) {
         SelectObject(hdc, oldPen);
         SelectObject(hdc, oldbr);
     }
+    if(1){//test bezier curve.
+        printf("Testing PolyBezier and PolyBezierTo functions...\n");
 
+        // Test 1: Basic PolyBezier (single curve)
+        printf("1. Testing PolyBezier with single curve:\n");
+        POINT bezierPoints1[4] = {
+            {50, 100},   // Start point
+            {100, 50},   // Control point 1
+            {150, 150},  // Control point 2
+            {200, 100}   // End point
+        };
+
+        BOOL result1 = PolyBezier(hdc, bezierPoints1, 4);
+        printf("   PolyBezier single curve: %s\n", result1 ? "SUCCESS" : "FAILED");
+
+        // Verify current position unchanged
+        POINT currentPos;
+        if (GetCurrentPositionEx(hdc, &currentPos)) {
+            printf("   Current position after PolyBezier: (%d,%d) - should be unchanged\n",
+                   currentPos.x, currentPos.y);
+        }
+
+        // Test 2: PolyBezier with multiple curves
+        printf("2. Testing PolyBezier with multiple curves:\n");
+        POINT bezierPoints2[7] = {
+            {250, 100},  // Start point
+            {300, 50},   // Curve 1: Control point 1
+            {350, 150},  // Curve 1: Control point 2
+            {400, 100},  // Curve 1: End point
+            {450, 50},   // Curve 2: Control point 1
+            {500, 150},  // Curve 2: Control point 2
+            {550, 100}   // Curve 2: End point
+        };
+
+        BOOL result2 = PolyBezier(hdc, bezierPoints2, 7);
+        printf("   PolyBezier multiple curves: %s\n", result2 ? "SUCCESS" : "FAILED");
+
+        // Test 3: PolyBezierTo (requires current position)
+        printf("3. Testing PolyBezierTo:\n");
+        BOOL moveResult = MoveToEx(hdc, 50, 200, NULL);
+        printf("   Set current position to (50,200): %s\n", moveResult ? "SUCCESS" : "FAILED");
+
+        POINT bezierToPoints1[3] = {
+            {100, 150},  // Control point 1
+            {150, 250},  // Control point 2
+            {200, 200}   // End point
+        };
+
+        BOOL result3 = PolyBezierTo(hdc, bezierToPoints1, 3);
+        printf("   PolyBezierTo single curve: %s\n", result3 ? "SUCCESS" : "FAILED");
+
+        // Verify current position updated
+        if (GetCurrentPositionEx(hdc, &currentPos)) {
+            printf("   Current position after PolyBezierTo: (%d,%d)\n", currentPos.x, currentPos.y);
+            printf("   Expected: (200,200) - %s\n",
+                   (currentPos.x == 200 && currentPos.y == 200) ? "MATCH" : "MISMATCH");
+        }
+
+        // Test 4: Chain multiple PolyBezierTo calls
+        printf("4. Testing chained PolyBezierTo calls:\n");
+        POINT bezierToPoints2[6] = {
+            {250, 150},  // Curve 1: Control point 1
+            {300, 250},  // Curve 1: Control point 2
+            {350, 200},  // Curve 1: End point
+            {400, 150},  // Curve 2: Control point 1
+            {450, 250},  // Curve 2: Control point 2
+            {500, 200}   // Curve 2: End point
+        };
+
+        BOOL result4 = PolyBezierTo(hdc, bezierToPoints2, 6);
+        printf("   Chained PolyBezierTo: %s\n", result4 ? "SUCCESS" : "FAILED");
+
+        if (GetCurrentPositionEx(hdc, &currentPos)) {
+            printf("   Final current position: (%d,%d)\n", currentPos.x, currentPos.y);
+            printf("   Expected: (500,200) - %s\n",
+                   (currentPos.x == 500 && currentPos.y == 200) ? "MATCH" : "MISMATCH");
+        }
+
+        // Test 5: Bezier curves with Path API
+        printf("5. Testing Bezier curves with Path recording:\n");
+        BOOL beginResult = BeginPath(hdc);
+        printf("   BeginPath: %s\n", beginResult ? "SUCCESS" : "FAILED");
+
+        // Add PolyBezier to path
+        MoveToEx(hdc, 50, 300, NULL);
+        POINT pathBezierPoints[4] = {
+            {50, 300},   // Start point
+            {100, 250},  // Control point 1
+            {150, 350},  // Control point 2
+            {200, 300}   // End point
+        };
+
+        BOOL pathResult1 = PolyBezier(hdc, pathBezierPoints, 4);
+        printf("   Add PolyBezier to path: %s\n", pathResult1 ? "SUCCESS" : "FAILED");
+
+        // Add PolyBezierTo to path
+        POINT pathBezierToPoints[3] = {
+            {250, 250},  // Control point 1
+            {300, 350},  // Control point 2
+            {350, 300}   // End point
+        };
+
+        BOOL pathResult2 = PolyBezierTo(hdc, pathBezierToPoints, 3);
+        printf("   Add PolyBezierTo to path: %s\n", pathResult2 ? "SUCCESS" : "FAILED");
+
+        BOOL endResult = EndPath(hdc);
+        printf("   EndPath: %s\n", endResult ? "SUCCESS" : "FAILED");
+
+        BOOL strokeResult = StrokePath(hdc);
+        printf("   StrokePath: %s\n", strokeResult ? "SUCCESS" : "FAILED");
+
+        // Test 6: Error handling
+        printf("6. Testing error conditions:\n");
+        POINT invalidPoints[5] = {{0,0}, {10,10}, {20,20}, {30,30}, {40,40}};
+
+        // Invalid point count for PolyBezier
+        BOOL errorResult1 = PolyBezier(hdc, invalidPoints, 5);
+        printf("   PolyBezier invalid point count (5): %s\n",
+               errorResult1 ? "UNEXPECTED SUCCESS" : "CORRECTLY FAILED");
+
+        // Invalid point count for PolyBezierTo
+        BOOL errorResult2 = PolyBezierTo(hdc, invalidPoints, 4);
+        printf("   PolyBezierTo invalid point count (4): %s\n",
+               errorResult2 ? "UNEXPECTED SUCCESS" : "CORRECTLY FAILED");
+
+        // NULL points
+        BOOL errorResult3 = PolyBezier(hdc, NULL, 4);
+        printf("   PolyBezier with NULL points: %s\n",
+               errorResult3 ? "UNEXPECTED SUCCESS" : "CORRECTLY FAILED");
+
+        BOOL errorResult4 = PolyBezierTo(hdc, NULL, 3);
+        printf("   PolyBezierTo with NULL points: %s\n",
+               errorResult4 ? "UNEXPECTED SUCCESS" : "CORRECTLY FAILED");
+
+        // Test PolyBezierTo without current position
+        HDC newHdc = CreateCompatibleDC(NULL);
+        BOOL errorResult5 = PolyBezierTo(newHdc, bezierToPoints1, 3);
+        printf("   PolyBezierTo without current position: %s\n",
+               errorResult5 ? "UNEXPECTED SUCCESS" : "CORRECTLY FAILED");
+        DeleteDC(newHdc);
+
+        printf("Bezier curve testing completed!\n\n");
+    }
     EndPaint(m_hWnd, &ps);
 }
 void SNativeWnd2::OnClose() {

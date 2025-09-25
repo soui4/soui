@@ -1764,6 +1764,23 @@ DECLARE_INTERFACE_(IRenderTarget, IObjRef)
     STDMETHOD_(HRESULT, DrawLine)(THIS_ POINT pt1, POINT pt2) PURE;
     
     /**
+     * @brief Draw a polygon.
+     * @param pPt Array of points that define the polygon.
+     * @param nCount Number of points in the array.
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, DrawPolygon)(THIS_ LPPOINT pPt, size_t nCount) PURE;
+
+    /**
+     * @brief Fill a polygon.
+     * @param pPt Array of points that define the polygon.
+     * @param nCount Number of points in the array.
+     * @return HRESULT indicating success or failure.
+     */
+    STDMETHOD_(HRESULT, FillPolygon)(THIS_ LPPOINT pPt, size_t nCount) PURE;
+
+
+    /**
      * @brief Draw a gradient-filled rectangle.
      * @param pRect Rectangle to fill.
      * @param bVert Vertical gradient flag.

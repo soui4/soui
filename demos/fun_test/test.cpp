@@ -248,26 +248,29 @@ void thread_fun() {
 }
 
 
+#ifndef _WIN32
 // ========================================================================
 // Path API Tests for swinx library
 // ========================================================================
 
 class PathAPITest : public ::testing::Test {
+public:
+	PathAPITest():hdc(NULL){}
 protected:
     void SetUp() override {
         // Create a test HDC
-        hdc = CreateCompatibleDC(nullptr);
-        ASSERT_NE(hdc, nullptr) << "Failed to create HDC";
+        hdc = CreateCompatibleDC(NULL);
+        ASSERT_NE(hdc, (HDC)NULL) << "Failed to create HDC";
     }
 
     void TearDown() override {
         if (hdc) {
             DeleteDC(hdc);
-            hdc = nullptr;
+            hdc = NULL;
         }
     }
 
-    HDC hdc = nullptr;
+    HDC hdc;
 };
 
 TEST_F(PathAPITest, BasicPathRecording) {
@@ -275,7 +278,7 @@ TEST_F(PathAPITest, BasicPathRecording) {
     EXPECT_TRUE(BeginPath(hdc));
 
     // Add some basic shapes to the path
-    MoveToEx(hdc, 100, 100, nullptr);
+    MoveToEx(hdc, 100, 100, NULL);
     LineTo(hdc, 200, 100);
     LineTo(hdc, 200, 200);
     LineTo(hdc, 100, 200);
@@ -322,7 +325,7 @@ TEST_F(PathAPITest, PathToRegion) {
     EXPECT_TRUE(EndPath(hdc));
 
     HRGN hRegion = PathToRegion(hdc);
-    EXPECT_NE(hRegion, nullptr);
+    EXPECT_NE(hRegion, (HRGN)NULL);
 
     if (hRegion) {
         // Verify region bounds
@@ -352,13 +355,13 @@ TEST_F(PathAPITest, GetPath) {
     // Test get path functionality
     EXPECT_TRUE(BeginPath(hdc));
 
-    MoveToEx(hdc, 100, 100, nullptr);
+    MoveToEx(hdc, 100, 100, NULL);
     LineTo(hdc, 200, 200);
 
     EXPECT_TRUE(EndPath(hdc));
 
     // Query path size
-    int pathSize = GetPath(hdc, nullptr, nullptr, 0);
+    int pathSize = GetPath(hdc, NULL, NULL, 0);
     EXPECT_GT(pathSize, 0);
 
     // Get actual path data
@@ -366,7 +369,7 @@ TEST_F(PathAPITest, GetPath) {
         std::vector<POINT> points(pathSize);
         std::vector<BYTE> types(pathSize);
 
-        int actualSize = GetPath(hdc, points.data(), types.data(), pathSize);
+        int actualSize = GetPath(hdc, &points[0], &types[0], pathSize);
         EXPECT_EQ(actualSize, pathSize);
 
         // Verify we have at least a move and a line
@@ -439,13 +442,13 @@ TEST_F(PathAPITest, TextPathWithLength) {
     EXPECT_TRUE(EndPath(hdc));
 
     // Get path size for partial text
-    int pathSize = GetPath(hdc, nullptr, nullptr, 0);
+    int pathSize = GetPath(hdc, NULL, NULL, 0);
     EXPECT_GT(pathSize, 0);
 }
 
 TEST_F(PathAPITest, CurrentPointAdjustment) {
     // Test current point adjustment in text paths
-    MoveToEx(hdc, 100, 100, nullptr);
+    MoveToEx(hdc, 100, 100, NULL);
 
     POINT initialPos;
     GetCurrentPositionEx(hdc, &initialPos);
@@ -465,7 +468,7 @@ TEST_F(PathAPITest, CurrentPointAdjustment) {
 
 TEST_F(PathAPITest, ZeroLengthText) {
     // Test zero length text doesn't affect current point
-    MoveToEx(hdc, 200, 200, nullptr);
+    MoveToEx(hdc, 200, 200, NULL);
 
     POINT beforePos;
     GetCurrentPositionEx(hdc, &beforePos);
@@ -484,7 +487,7 @@ TEST_F(PathAPITest, ZeroLengthText) {
 
 TEST_F(PathAPITest, ChainedTextPaths) {
     // Test chained text paths
-    MoveToEx(hdc, 300, 300, nullptr);
+    MoveToEx(hdc, 300, 300, NULL);
 
     EXPECT_TRUE(BeginPath(hdc));
 
@@ -508,12 +511,137 @@ TEST_F(PathAPITest, ChainedTextPaths) {
     EXPECT_GT(afterSecond.x, afterFirst.x);
 }
 
+// ========================================================================
+// Bézier Curve API Tests
+// ========================================================================
+
+TEST_F(PathAPITest, PolyBezierBasic) {
+    // Test basic Bézier curve (4 points: start + 3 control/end points)
+    POINT points[4] = {
+        {10, 10},   // Start point
+        {20, 5},    // Control point 1
+        {30, 15},   // Control point 2
+        {40, 10}    // End point
+    };
+
+    EXPECT_TRUE(PolyBezier(hdc, points, 4));
+
+    // Verify current position is not changed by PolyBezier
+    POINT currentPos;
+    EXPECT_TRUE(GetCurrentPositionEx(hdc, &currentPos));
+    // Current position should be unchanged (PolyBezier doesn't update it)
+}
+
+TEST_F(PathAPITest, PolyBezierMultiple) {
+    // Test multiple Bézier curves (7 points: start + 2 curves * 3 points each)
+    POINT points[7] = {
+        {10, 10},   // Start point
+        {20, 5},    // Curve 1: Control point 1
+        {30, 15},   // Curve 1: Control point 2
+        {40, 10},   // Curve 1: End point
+        {50, 5},    // Curve 2: Control point 1
+        {60, 15},   // Curve 2: Control point 2
+        {70, 10}    // Curve 2: End point
+    };
+
+    EXPECT_TRUE(PolyBezier(hdc, points, 7));
+}
+
+TEST_F(PathAPITest, PolyBezierToBasic) {
+    // Set current position first
+    EXPECT_TRUE(MoveToEx(hdc, 10, 10, NULL));
+
+    // Test PolyBezierTo (3 points per curve)
+    POINT points[3] = {
+        {20, 5},    // Control point 1
+        {30, 15},   // Control point 2
+        {40, 10}    // End point
+    };
+
+    EXPECT_TRUE(PolyBezierTo(hdc, points, 3));
+
+    // Verify current position is updated to end point
+    POINT currentPos;
+    EXPECT_TRUE(GetCurrentPositionEx(hdc, &currentPos));
+    EXPECT_EQ(currentPos.x, 40);
+    EXPECT_EQ(currentPos.y, 10);
+}
+
+TEST_F(PathAPITest, PolyBezierToMultiple) {
+    // Set current position first
+    EXPECT_TRUE(MoveToEx(hdc, 10, 10, NULL));
+
+    // Test multiple curves (6 points: 2 curves * 3 points each)
+    POINT points[6] = {
+        {20, 5},    // Curve 1: Control point 1
+        {30, 15},   // Curve 1: Control point 2
+        {40, 10},   // Curve 1: End point
+        {50, 5},    // Curve 2: Control point 1
+        {60, 15},   // Curve 2: Control point 2
+        {70, 10}    // Curve 2: End point
+    };
+
+    EXPECT_TRUE(PolyBezierTo(hdc, points, 6));
+
+    // Verify current position is updated to final end point
+    POINT currentPos;
+    EXPECT_TRUE(GetCurrentPositionEx(hdc, &currentPos));
+    EXPECT_EQ(currentPos.x, 70);
+    EXPECT_EQ(currentPos.y, 10);
+}
+
+TEST_F(PathAPITest, PolyBezierErrorHandling) {
+    // Test with invalid point count (not 1 + 3*n)
+    POINT points[5] = {{10,10}, {20,5}, {30,15}, {40,10}, {50,5}};
+    EXPECT_FALSE(PolyBezier(hdc, points, 5));
+
+    // Test with too few points
+    EXPECT_FALSE(PolyBezier(hdc, points, 3));
+
+    // Test with NULL points
+    EXPECT_FALSE(PolyBezier(hdc, NULL, 4));
+}
+
+TEST_F(PathAPITest, PolyBezierToErrorHandling) {
+    // Test with invalid point count (not 3*n)
+    POINT points[4] = {{20,5}, {30,15}, {40,10}, {50,5}};
+    EXPECT_FALSE(PolyBezierTo(hdc, points, 4));
+
+    // Test with too few points
+    EXPECT_FALSE(PolyBezierTo(hdc, points, 2));
+
+    // Test with NULL points
+    EXPECT_FALSE(PolyBezierTo(hdc, NULL, 3));
+
+    // Test without current position (should fail)
+    // Create new HDC without setting current position
+    HDC newHdc = CreateCompatibleDC(NULL);
+    EXPECT_FALSE(PolyBezierTo(newHdc, points, 3));
+    DeleteDC(newHdc);
+}
+
+TEST_F(PathAPITest, BezierWithPathRecording) {
+    EXPECT_TRUE(BeginPath(hdc));
+
+    // Add PolyBezier to path
+    POINT bezierPoints[4] = {{10,10}, {20,5}, {30,15}, {40,10}};
+    EXPECT_TRUE(PolyBezier(hdc, bezierPoints, 4));
+
+    // Add PolyBezierTo to path
+    EXPECT_TRUE(MoveToEx(hdc, 50, 10, NULL));
+    POINT bezierToPoints[3] = {{60,5}, {70,15}, {80,10}};
+    EXPECT_TRUE(PolyBezierTo(hdc, bezierToPoints, 3));
+
+    EXPECT_TRUE(EndPath(hdc));
+    EXPECT_TRUE(StrokePath(hdc));
+}
+#endif//!_WIN32
 int run_window();
 TEST(demo,window){
-    EXPECT_EQ(run_window(), 1);
+    //EXPECT_EQ(run_window(), 1);
 }
 
 int run_app(HINSTANCE hInst);
 TEST(demo,app){
-    //EXPECT_EQ(run_app(0),0);
+    EXPECT_EQ(run_app(0),0);
 }

@@ -20,7 +20,6 @@
 #include <SChromeTabCtrl.h>
 #include <SScrollText.h>
 #include "SHexEdit.h"
-#include "gridctrl/SGridCtrl.h"
 
 namespace SOUI{
 
@@ -41,7 +40,6 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SGroupList>();
 	theApp->RegisterWindowClass<SScrollText>();
 	theApp->RegisterWindowClass<SHexEdit>();
-	theApp->RegisterWindowClass<SGridCtrl>();
 
 	//extened skins
 	theApp->RegisterSkinClass<SColorMask>();

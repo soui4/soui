@@ -1,9 +1,20 @@
 #include "stdafx.h"
-#include "SGridCtrl.h"
+#include <SInitGuid.h>
+#include "SGridCtrl-i.h"
+
 #include <control/SEdit.h>
 #include <control/SComboBox.h>
 #include <control/SCmnCtrl.h>
+#include <control/SDateTimePicker.h>
+#include <control/SCalendar.h>
 #include "SSelRangeMgr.h"
+#include <commdlg.h>
+#include <res.mgr/SNamedValue.h>
+#include "SGridCtrl.h"
+
+
+// Custom clipboard format for cell types
+static UINT CF_GRIDCELLTYPES = 0;
 
 SNSBEGIN
 
@@ -29,50 +40,55 @@ SGridCell::~SGridCell()
 {
 }
 
-#define IMPLMETHOD(type, name) type name
 
-IMPLMETHOD(void, SGridCell::Init)(THIS_ IGridCtrl* pGrid, int nRow, int nCol){
+void  SGridCell::Init(THIS_ IGridCtrl* pGrid, int nRow, int nCol){
     m_pGrid = pGrid;
     m_nRow = nRow;
     m_nCol = nCol;
 }
 // IGridCell interface implementation
-IMPLMETHOD(void, SGridCell::SetText)(LPCTSTR szText)
+void  SGridCell::SetText(LPCTSTR szText)
 {
     m_strText = szText ? szText : _T("");
+    Invalidate();
 }
 
-IMPLMETHOD(void, SGridCell::SetImage)(int nImage)
+void  SGridCell::SetImage(int nImage)
 {
     m_nImage = nImage;
+    Invalidate();
 }
 
-IMPLMETHOD(void, SGridCell::SetData)(LPARAM lParam)
+void  SGridCell::SetData(LPARAM lParam)
 {
     m_lParam = lParam;
 }
 
-IMPLMETHOD(void, SGridCell::SetState)(DWORD nState)
+void  SGridCell::SetState(DWORD nState)
 {
     m_nState = nState;
+    Invalidate();
 }
 
-IMPLMETHOD(void, SGridCell::SetFormat)(DWORD nFormat)
+void  SGridCell::SetFormat(DWORD nFormat)
 {
     m_nFormat = nFormat;
+    Invalidate();
 }
 
-IMPLMETHOD(void, SGridCell::SetTextClr)(COLORREF clr)
+void  SGridCell::SetTextClr(COLORREF clr)
 {
     m_crFgClr = clr;
+    Invalidate();
 }
 
-IMPLMETHOD(void, SGridCell::SetBackClr)(COLORREF clr)
+void  SGridCell::SetBackClr(COLORREF clr)
 {
     m_crBkClr = clr;
+    Invalidate();
 }
 
-IMPLMETHOD(void, SGridCell::SetFont)(const LOGFONT* plf)
+void  SGridCell::SetFont(const LOGFONT* plf)
 {
     if (plf)
     {
@@ -84,114 +100,115 @@ IMPLMETHOD(void, SGridCell::SetFont)(const LOGFONT* plf)
         memset(&m_lfFont, 0, sizeof(LOGFONT));
         m_bDefaultFont = TRUE;
     }
+    Invalidate();
 }
 
-IMPLMETHOD(void, SGridCell::SetReadOnly)(BOOL bReadOnly)
+void  SGridCell::SetReadOnly(BOOL bReadOnly)
 {
-    m_nState &= ~SGVIS_READONLY;
+    m_nState &= ~SGVIS_READONLY; 
 }
 
-IMPLMETHOD(void, SGridCell::SetMargin)(UINT nMargin)
+void  SGridCell::SetMargin(UINT nMargin)
 {
     m_nMargin = nMargin;
 }
 
-IMPLMETHOD(LPCTSTR, SGridCell::GetText)() SCONST
+LPCTSTR  SGridCell::GetText() SCONST
 {
     return m_strText.c_str();
 }
 
-IMPLMETHOD(LPCTSTR, SGridCell::GetTipText)() SCONST
+LPCTSTR  SGridCell::GetTipText() SCONST
 {
     return GetText(); // Default implementation returns the same as GetText
 }
 
-IMPLMETHOD(int, SGridCell::GetImage)() SCONST
+int  SGridCell::GetImage() SCONST
 {
     return m_nImage;
 }
 
-IMPLMETHOD(LPARAM, SGridCell::GetData)() SCONST
+LPARAM  SGridCell::GetData() SCONST
 {
     return m_lParam;
 }
 
-IMPLMETHOD(DWORD, SGridCell::GetState)() SCONST
+DWORD  SGridCell::GetState() SCONST
 {
     return m_nState;
 }
 
-IMPLMETHOD(DWORD, SGridCell::GetFormat)() SCONST
+DWORD  SGridCell::GetFormat() SCONST
 {
     return m_nFormat;
 }
 
-IMPLMETHOD(COLORREF, SGridCell::GetTextClr)() SCONST
+COLORREF  SGridCell::GetTextClr() SCONST
 {
     return m_crFgClr;
 }
 
-IMPLMETHOD(COLORREF, SGridCell::GetBackClr)() SCONST
+COLORREF  SGridCell::GetBackClr() SCONST
 {
     return m_crBkClr;
 }
 
-IMPLMETHOD(LOGFONT*, SGridCell::GetFont)() SCONST
+LOGFONT*  SGridCell::GetFont() SCONST
 {
     return m_bDefaultFont ? NULL : const_cast<LOGFONT*>(&m_lfFont);
 }
 
-IMPLMETHOD(UINT, SGridCell::GetMargin)() SCONST
+UINT  SGridCell::GetMargin() SCONST
 {
     return m_nMargin;
 }
 
-IMPLMETHOD(BOOL, SGridCell::IsEditing)() SCONST
+BOOL  SGridCell::IsEditing() SCONST
 {
     return FALSE; // TODO: Implement editing state check
 }
 
-IMPLMETHOD(BOOL, SGridCell::IsFocused)() SCONST
+BOOL  SGridCell::IsFocused() SCONST
 {
     return (m_nState & SGVIS_FOCUSED) != 0;
 }
 
-IMPLMETHOD(BOOL, SGridCell::IsFixed)() SCONST
+BOOL  SGridCell::IsFixed() SCONST
 {
     return (m_nState & SGVIS_FIXED) != 0;
 }
 
-IMPLMETHOD(BOOL, SGridCell::IsFixedCol)() SCONST
+BOOL  SGridCell::IsFixedCol() SCONST
 {
     return (m_nState & SGVIS_FIXEDCOL) != 0;
 }
 
-IMPLMETHOD(BOOL, SGridCell::IsFixedRow)() SCONST
+BOOL  SGridCell::IsFixedRow() SCONST
 {
     return (m_nState & SGVIS_FIXEDROW) != 0;
 }
 
-IMPLMETHOD(BOOL, SGridCell::IsSelected)() SCONST
+BOOL  SGridCell::IsSelected() SCONST
 {
     return (m_nState & SGVIS_SELECTED) != 0;
 }
 
-IMPLMETHOD(BOOL, SGridCell::IsReadOnly)() SCONST
+BOOL  SGridCell::IsReadOnly() SCONST
 {
     return (m_nState & SGVIS_READONLY) != 0;
 }
 
-IMPLMETHOD(BOOL, SGridCell::IsModified)() SCONST
+BOOL  SGridCell::IsModified() SCONST
 {
     return (m_nState & SGVIS_MODIFIED) != 0;
 }
 
-IMPLMETHOD(BOOL, SGridCell::IsDropHighlighted)() SCONST
+BOOL  SGridCell::IsDropHighlighted() SCONST
 {
     return (m_nState & SGVIS_DROPHILITED) != 0;
 }
 
-IMPLMETHOD(void, SGridCell::Reset)()
+void  SGridCell::Reset()
 {
     m_strText.Empty();
     m_nImage = -1;
@@ -205,7 +222,7 @@ IMPLMETHOD(void, SGridCell::Reset)()
     memset(&m_lfFont, 0, sizeof(LOGFONT));
 }
 
-IMPLMETHOD(BOOL, SGridCell::Draw)(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd)
+BOOL  SGridCell::Draw(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd)
 {
     if (!pRT)
         return FALSE;
@@ -300,7 +317,7 @@ IMPLMETHOD(BOOL, SGridCell::Draw)(IRenderTarget* pRT, int nRow, int nCol, RECT r
     return TRUE;
 }
 
-IMPLMETHOD(BOOL, SGridCell::GetTextRect)(LPRECT pRect)
+BOOL  SGridCell::GetTextRect(LPRECT pRect)
 {
     if (!pRect)
         return FALSE;
@@ -329,7 +346,7 @@ IMPLMETHOD(BOOL, SGridCell::GetTextRect)(LPRECT pRect)
     return TRUE;
 }
 
-IMPLMETHOD(void, SGridCell::GetTextExtent)(LPCTSTR str, SIZE* pSize)
+void  SGridCell::GetTextExtent(LPCTSTR str, SIZE* pSize)
 {
     if (!pSize)
         return;
@@ -394,7 +411,7 @@ IMPLMETHOD(void, SGridCell::GetTextExtent)(LPCTSTR str, SIZE* pSize)
 }
 
 
-IMPLMETHOD(void, SGridCell::GetCellExtent)(IRenderTarget* pRT, SIZE* pSize)
+void  SGridCell::GetCellExtent(IRenderTarget* pRT, SIZE* pSize)
 {
     if (!pSize)
         return;
@@ -441,7 +458,7 @@ IMPLMETHOD(void, SGridCell::GetCellExtent)(IRenderTarget* pRT, SIZE* pSize)
     *pSize = cellSize;
 }
 
-IMPLMETHOD(BOOL, SGridCell::Edit)(int nRow, int nCol, RECT rect, POINT point, UINT nID, UINT nChar)
+BOOL  SGridCell::Edit(int nRow, int nCol, RECT rect, POINT point, UINT nID, UINT nChar)
 {
     // Check if cell is read-only
     if (IsReadOnly())
@@ -461,7 +478,7 @@ IMPLMETHOD(BOOL, SGridCell::Edit)(int nRow, int nCol, RECT rect, POINT point, UI
     return m_pGrid->IsInEdit();
 }
 
-IMPLMETHOD(void, SGridCell::EndEdit)()
+void  SGridCell::EndEdit()
 {
     // Let the grid handle ending the edit
     if (m_pGrid)
@@ -470,19 +487,19 @@ IMPLMETHOD(void, SGridCell::EndEdit)()
     }
 }
 
-IMPLMETHOD(BOOL, SGridCell::ValidateEdit)(LPCTSTR str)
+BOOL  SGridCell::ValidateEdit(LPCTSTR str)
 {
     // Default implementation accepts all input
     return TRUE;
 }
 
-IMPLMETHOD(BOOL, SGridCell::PrintCell)(IRenderTarget* pRT, int nRow, int nCol, RECT rect)
+BOOL  SGridCell::PrintCell(IRenderTarget* pRT, int nRow, int nCol, RECT rect)
 {
     // Default implementation uses the same drawing as screen
     return Draw(pRT, nRow, nCol, rect, TRUE);
 }
 
-IMPLMETHOD(IGridInplaceWnd *, SGridCell::CreateInplaceWnd)(CTHIS_ int nRow,int nCol) SCONST{
+IGridInplaceWnd *  SGridCell::CreateInplaceWnd(CTHIS_ int nRow,int nCol) SCONST{
     TplGridInplaceWnd<SEdit>* pEdit = new TplGridInplaceWnd<SEdit>(m_pGrid, nRow, nCol);
     if (!pEdit)
         return NULL;
@@ -494,12 +511,25 @@ IMPLMETHOD(IGridInplaceWnd *, SGridCell::CreateInplaceWnd)(CTHIS_ int nRow,int n
     return pEdit;
 }
 
-IMPLMETHOD(IGridInplaceWnd *, SGridCheckBoxCell::CreateInplaceWnd)(CTHIS_ int nRow,int nCol) SCONST{
+IGridInplaceWnd *  SGridNumricCell::CreateInplaceWnd(CTHIS_ int nRow,int nCol) SCONST{
+    TplGridInplaceWnd<SEdit>* pEdit = new TplGridInplaceWnd<SEdit>(m_pGrid, nRow, nCol);
+    if (!pEdit)
+        return NULL;
+    // Set edit properties
+    pEdit->SetAttribute(L"colorBkgnd", L"#FFFFFF", TRUE);
+    pEdit->SetAttribute(L"colorText", L"#000000", TRUE);
+    pEdit->SetAttribute(L"autoWordSel", L"1", TRUE);
+    pEdit->SetAttribute(L"number", L"1", TRUE);
+
+    return pEdit;
+}
+
+IGridInplaceWnd *  SGridCheckBoxCell::CreateInplaceWnd(CTHIS_ int nRow,int nCol) SCONST{
     return NULL;
 }
 
 
-IMPLMETHOD(IGridInplaceWnd *, SGridURLCell::CreateInplaceWnd)(CTHIS_ int nRow,int nCol) SCONST{
+IGridInplaceWnd *  SGridURLCell::CreateInplaceWnd(CTHIS_ int nRow,int nCol) SCONST{
     return NULL;
 }
 
@@ -521,7 +551,7 @@ SGridURLCell::~SGridURLCell()
 {
 }
 
-IMPLMETHOD(BOOL, SGridURLCell::Draw)(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd)
+BOOL  SGridURLCell::Draw(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd)
 {
     if (!pRT)
         return FALSE;
@@ -551,7 +581,7 @@ IMPLMETHOD(BOOL, SGridURLCell::Draw)(IRenderTarget* pRT, int nRow, int nCol, REC
     }
 }
 
-IMPLMETHOD(void, SGridURLCell::OnClickUp)(POINT PointCellRelative)
+void  SGridURLCell::OnClickUp(POINT PointCellRelative)
 {
     if (!m_bAutoLaunch)
         return;
@@ -566,7 +596,7 @@ IMPLMETHOD(void, SGridURLCell::OnClickUp)(POINT PointCellRelative)
     }
 }
 
-IMPLMETHOD(BOOL, SGridURLCell::OnSetCursor)(POINT PointCellRelative)
+BOOL  SGridURLCell::OnSetCursor(POINT PointCellRelative)
 {
     if (m_pGrid)
     {
@@ -627,7 +657,7 @@ SGridCheckBoxCell::~SGridCheckBoxCell()
 {
 }
 
-IMPLMETHOD(BOOL, SGridCheckBoxCell::Draw)(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd)
+BOOL  SGridCheckBoxCell::Draw(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd)
 {
     if (!pRT)
         return FALSE;
@@ -705,19 +735,13 @@ IMPLMETHOD(BOOL, SGridCheckBoxCell::Draw)(IRenderTarget* pRT, int nRow, int nCol
     return TRUE;
 }
 
-IMPLMETHOD(void, SGridCheckBoxCell::OnClickUp)(POINT PointCellRelative)
+void  SGridCheckBoxCell::OnClickUp(POINT PointCellRelative)
 {
     if (IsReadOnly())
         return;
 
     // Toggle checkbox state
-    m_bChecked = !m_bChecked;
-
-    // Redraw cell
-    if (m_pGrid)
-    {
-        m_pGrid->RedrawCell(m_nRow, m_nCol);
-    }
+    SetCheck(!m_bChecked);
 }
 
 //------------------------------------------------------------------------
@@ -725,7 +749,7 @@ SGridOptionCell::SGridOptionCell(){}
 
 SGridOptionCell::~SGridOptionCell(){}
 
-IMPLMETHOD(BOOL, SGridOptionCell::Draw)(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd)
+BOOL  SGridOptionCell::Draw(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd)
 {
     // Draw background first
     if (bEraseBkgnd)
@@ -760,17 +784,32 @@ IMPLMETHOD(BOOL, SGridOptionCell::Draw)(IRenderTarget* pRT, int nRow, int nCol, 
                          GetFormat() | DT_VCENTER | DT_SINGLELINE);
         }
     }
-    //Draw arrow
-    CRect rcArrow = rect;
+    // Draw dropdown arrow - simple triangle
+    RECT rcArrow = rect;
     rcArrow.left = rect.right - 16;
-    ISkinObj *pComboArrow = GETBUILTINSKIN2(SKIN_SYS_DROPBTN, m_pGrid->ToIWindow()->GetScale());
-    if(pComboArrow){
-        pComboArrow->DrawByIndex(pRT, rcArrow, 0);
-    }
+
+    // Draw simple dropdown arrow
+    int centerX = (rcArrow.left + rcArrow.right) / 2;
+    int centerY = (rcArrow.top + rcArrow.bottom) / 2;
+    POINT pts[3] = {
+        {centerX - 3, centerY - 1},
+        {centerX + 3, centerY - 1},
+        {centerX, centerY + 2}
+    };
+
+    SAutoRefPtr<IBrushS> pBrush;
+    pRT->CreateSolidColorBrush(RGBA(0, 0, 0,255), &pBrush);
+    SAutoRefPtr<IBrushS> pOldBrush;
+    pRT->SelectObject(pBrush, (IRenderObj**)&pOldBrush);
+
+    // Draw triangle
+    pRT->FillPolygon(pts, 3);
+
+    pRT->SelectObject(pOldBrush, NULL);
     return TRUE;
 }
 
-IMPLMETHOD(void, SGridOptionCell::OnDblClick)(THIS_ POINT PointCellRelative)
+void  SGridOptionCell::OnDblClick(THIS_ POINT PointCellRelative)
 {
     if (GetGrid()->IsEditable() && !IsReadOnly())
     {
@@ -788,7 +827,7 @@ IMPLMETHOD(void, SGridOptionCell::OnDblClick)(THIS_ POINT PointCellRelative)
     }
 }
 
-IMPLMETHOD(void, SGridOptionCell::OnClickUp)(THIS_ POINT PointCellRelative){
+void  SGridOptionCell::OnClickUp(THIS_ POINT PointCellRelative){
     if (GetGrid()->IsEditable() && !IsReadOnly()){
         CRect rcCell;
         GetGrid()->GetCellRectEx(GetRow(), GetCol(),&rcCell);
@@ -810,7 +849,7 @@ IMPLMETHOD(void, SGridOptionCell::OnClickUp)(THIS_ POINT PointCellRelative){
     }
 }
 
-IMPLMETHOD(IGridInplaceWnd *, SGridOptionCell::CreateInplaceWnd)(CTHIS_ int nRow,int nCol) SCONST{
+IGridInplaceWnd *  SGridOptionCell::CreateInplaceWnd(CTHIS_ int nRow,int nCol) SCONST{
     TplGridInplaceWnd<SComboBox>* pCombo = new TplGridInplaceWnd<SComboBox>(m_pGrid, nRow, nCol);
     if (!pCombo)
         return NULL;
@@ -861,6 +900,7 @@ SGridCtrl::SGridCtrl()
     , m_bAllowColumnResize(TRUE)
     , m_nResizeCaptureRange(3)
     , m_sizeGrid(0, 0)
+    , m_bPainting(FALSE)
 {
     m_bClipClient = TRUE;
     m_bFocusable = TRUE;
@@ -869,6 +909,9 @@ SGridCtrl::SGridCtrl()
     RegisterCellFactory<SGridCheckBoxCell>();
     RegisterCellFactory<SGridURLCell>();
     RegisterCellFactory<SGridOptionCell>();
+    RegisterCellFactory<SGridColorCell>();
+    RegisterCellFactory<SGridDateTimeCell>();
+    RegisterCellFactory<SGridNumricCell>();
     
     // Create default cell implementations
     m_pDefaultCell.Attach(CreateCellByType(CELL_TYPE_TEXT));
@@ -880,6 +923,12 @@ SGridCtrl::SGridCtrl()
 
     GetEventSet()->addEvent(EVENTID(EventGridInitInplaceWnd));
     GetEventSet()->addEvent(EVENTID(EventGridGetInplaceStyle));
+
+    // Register custom clipboard format for cell types
+    if (CF_GRIDCELLTYPES == 0)
+    {
+        CF_GRIDCELLTYPES = RegisterClipboardFormat(_T("SOUI_GridCellTypes"));
+    }
 }
 
 SGridCtrl::~SGridCtrl()
@@ -1366,7 +1415,6 @@ BOOL SGridCtrl::SetItemText(int nRow, int nCol, LPCTSTR str)
         return FALSE;
 
     pCell->SetText(str);
-    RedrawCell(nRow, nCol);
     return TRUE;
 }
 
@@ -2416,7 +2464,7 @@ void SGridCtrl::OnPaint(IRenderTarget *pRT)
 {
     SPainter painter;
     BeforePaint(pRT, painter);
-
+    m_bPainting = TRUE;
     CRect rcClient = GetClientRect();
 
     // Fill background
@@ -2431,7 +2479,7 @@ void SGridCtrl::OnPaint(IRenderTarget *pRT)
         DrawGridLines(pRT, rcClient);
     }
     DrawMergedCells(pRT,rcClient);
-
+    m_bPainting = FALSE;
     AfterPaint(pRT, painter);
 }
 
@@ -2865,6 +2913,8 @@ void SGridCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
 
 void SGridCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
 {
+    __baseCls::OnLButtonUp(nFlags, pt);
+
     m_bLMouseButtonDown = FALSE;
     // Handle mouse mode cleanup
     switch (m_MouseMode)
@@ -2906,7 +2956,6 @@ void SGridCtrl::OnLButtonUp(UINT nFlags, CPoint pt)
         }
 
     }
-    __baseCls::OnLButtonUp(nFlags, pt);
 }
 
 void SGridCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
@@ -2923,6 +2972,7 @@ void SGridCtrl::OnLButtonDbClick(UINT nFlags, CPoint pt)
 
 void SGridCtrl::OnRButtonDown(UINT nFlags, CPoint pt)
 {
+    __baseCls::OnRButtonDown(nFlags, pt);
     SCellID cell;
     GetCellFromPt(pt, TRUE, &cell);
 
@@ -2931,7 +2981,6 @@ void SGridCtrl::OnRButtonDown(UINT nFlags, CPoint pt)
         OnCellRClick(cell, nFlags,pt);
     }
 
-    __baseCls::OnRButtonDown(nFlags, pt);
 }
 
 void SGridCtrl::OnMouseMove(UINT nFlags, CPoint pt)
@@ -3325,6 +3374,8 @@ void SGridCtrl::OnCellMouseOver(SCellID cell)
 // Refresh and redraw implementation
 BOOL SGridCtrl::RedrawCell(int nRow, int nCol)
 {
+    if(m_bPainting)
+        return FALSE;
     if (!IsValid(nRow, nCol))
         return FALSE;
 
@@ -3871,6 +3922,16 @@ BOOL SGridCtrl::MergeCells(int nStartRow, int nStartCol, int nEndRow, int nEndCo
         return FALSE;
     if(nStartRow < m_nFixedRows || nStartCol < m_nFixedCols)
         return FALSE;
+    // check if all cells are the same cell type
+    int cellType = GetCellType(nStartRow, nStartCol);
+    for (int row = nStartRow; row <= nEndRow; row++)
+    {
+        for (int col = nStartCol; col <= nEndCol; col++)
+        {
+            if (GetCellType(row, col) != cellType)
+                return FALSE;
+        }
+    }
     // Check if any cells in the range are already merged
     for (int row = nStartRow; row <= nEndRow; row++)
     {
@@ -4885,8 +4946,73 @@ BOOL SGridCtrl::Copy()
 {
     if (!CanCopy())
         return FALSE;
+
+    // Format both text and cell types
     SStringT strText = FormatCellsAsText(m_SelectedCellRange);
-    return SetClipboardText(strText);
+    SStringT strTypes = FormatCellTypesAsText(m_SelectedCellRange);
+
+    BOOL bResult = FALSE;
+
+    if (OpenClipboard(GetContainer()->GetHostHwnd()))
+    {
+        EmptyClipboard();
+
+        // Set text data
+        int nTextLen = strText.GetLength();
+        HGLOBAL hTextData = GlobalAlloc(GMEM_MOVEABLE, (nTextLen + 1) * sizeof(TCHAR));
+        if (hTextData)
+        {
+            LPCTSTR lpszTextBuffer = (LPCTSTR)GlobalLock(hTextData);
+            if (lpszTextBuffer)
+            {
+                _tcscpy((LPTSTR)lpszTextBuffer, strText);
+                GlobalUnlock(hTextData);
+
+                if (SetClipboardData(CF_UNICODETEXT, hTextData))
+                {
+                    bResult = TRUE;
+                }
+                else
+                {
+                    GlobalFree(hTextData);
+                }
+            }
+            else
+            {
+                GlobalFree(hTextData);
+            }
+        }
+
+        // Set cell types data
+        if (bResult && !strTypes.IsEmpty())
+        {
+            int nTypesLen = strTypes.GetLength();
+            HGLOBAL hTypesData = GlobalAlloc(GMEM_MOVEABLE, (nTypesLen + 1) * sizeof(TCHAR));
+            if (hTypesData)
+            {
+                LPCTSTR lpszTypesBuffer = (LPCTSTR)GlobalLock(hTypesData);
+                if (lpszTypesBuffer)
+                {
+                    _tcscpy((LPTSTR)lpszTypesBuffer, strTypes);
+                    GlobalUnlock(hTypesData);
+
+                    if (!SetClipboardData(CF_GRIDCELLTYPES, hTypesData))
+                    {
+                        GlobalFree(hTypesData);
+                        // Don't fail the entire operation if types can't be set
+                    }
+                }
+                else
+                {
+                    GlobalFree(hTypesData);
+                }
+            }
+        }
+
+        CloseClipboard();
+    }
+
+    return bResult;
 }
 
 BOOL SGridCtrl::Cut()
@@ -4931,7 +5057,10 @@ BOOL SGridCtrl::Paste()
     if (!m_cellFocus.IsValid())
         return FALSE;
 
-    return PasteMultiCellData(m_cellFocus, strText);
+    // Get cell types from clipboard if available
+    SStringT strTypes = GetClipboardCellTypes();
+
+    return PasteMultiCellDataWithTypes(m_cellFocus, strText, strTypes);
 }
 
 BOOL SGridCtrl::CanCopy() const
@@ -5032,6 +5161,36 @@ BOOL SGridCtrl::SetClipboardText(LPCTSTR lpszText)
     return bResult;
 }
 
+SStringT SGridCtrl::GetClipboardCellTypes() const
+{
+    SStringT strTypes;
+
+    if (OpenClipboard(GetContainer()->GetHostHwnd()))
+    {
+        HANDLE hData = GetClipboardData(CF_GRIDCELLTYPES);
+        if (hData)
+        {
+            LPCTSTR lpszTypes = (LPCTSTR)GlobalLock(hData);
+            if (lpszTypes)
+            {
+                strTypes = lpszTypes;
+                GlobalUnlock(hData);
+            }
+        }
+        CloseClipboard();
+    }
+
+    return strTypes;
+}
+
+BOOL SGridCtrl::SetClipboardCellTypes(LPCTSTR lpszTypes)
+{
+    // This method is now primarily used by Copy() method
+    // which handles clipboard operations directly
+    // Keep this for potential future use or compatibility
+    return TRUE;
+}
+
 SStringT SGridCtrl::FormatCellsAsText(const SCellRange& range) const
 {
     if (!range.IsValid())
@@ -5098,6 +5257,63 @@ SStringT SGridCtrl::FormatCellsAsText(const SSelRangeMgr& ranges) const
                     strText.Replace(_T("\n"), _T(" "));
                     strResult += strText;
                 }
+            }
+        }
+    }
+    return strResult;
+}
+
+SStringT SGridCtrl::FormatCellTypesAsText(const SCellRange& range) const
+{
+    if (!range.IsValid())
+        return _T("");
+
+    SStringT strResult;
+
+    for (int row = range.minRow; row <= range.maxRow; row++)
+    {
+        if (row > range.minRow)
+            strResult += _T("\r\n"); // New line for each row
+
+        for (int col = range.minCol; col <= range.maxCol; col++)
+        {
+            if (col > range.minCol)
+                strResult += _T("\t"); // Tab between columns
+
+            ECellType cellType = GetCellType(row, col);
+            strResult += SStringT().Format(_T("%d"), (int)cellType);
+        }
+    }
+
+    return strResult;
+}
+
+SStringT SGridCtrl::FormatCellTypesAsText(const SSelRangeMgr& ranges) const
+{
+    SStringT strResult;
+    SPOSITION pos = ranges.GetRanges().GetHeadPosition();
+    bool firstRange = true;
+    while (pos)
+    {
+        SCellRange r = ranges.GetRanges().GetNext(pos);
+        if (!r.IsValid()) continue;
+        // For multiple ranges, separate ranges by a blank line
+        if (!firstRange)
+            strResult += _T("\r\n");
+        firstRange = false;
+
+        for (int row = r.minRow; row <= r.maxRow; row++)
+        {
+            if (row > r.minRow)
+                strResult += _T("\r\n");
+
+            for (int col = r.minCol; col <= r.maxCol; col++)
+            {
+                if (col > r.minCol)
+                    strResult += _T("\t");
+
+                ECellType cellType = GetCellType(row, col);
+                strResult += SStringT().Format(_T("%d"), (int)cellType);
             }
         }
     }
@@ -5178,6 +5394,248 @@ BOOL SGridCtrl::ParseTextIntoCells(LPCTSTR lpszText, const SCellRange& range)
 
     Invalidate();
     return TRUE;
+}
+
+BOOL SGridCtrl::ParseCellTypesFromText(LPCTSTR lpszTypes, const SCellRange& range)
+{
+    if (!lpszTypes || !range.IsValid())
+        return FALSE;
+
+    SStringT strTypes = lpszTypes;
+    SArray<SStringT> lines;
+
+    // Split into lines
+    int nStart = 0;
+    int nPos = 0;
+    while (nPos < strTypes.GetLength())
+    {
+        if (strTypes[nPos] == _T('\n') || strTypes[nPos] == _T('\r'))
+        {
+            if (nPos > nStart)
+            {
+                lines.Add(strTypes.Mid(nStart, nPos - nStart));
+            }
+            nStart = nPos + 1;
+            if (nPos + 1 < strTypes.GetLength() && strTypes[nPos + 1] == _T('\n'))
+            {
+                nPos++;
+                nStart++;
+            }
+        }
+        nPos++;
+    }
+
+    // Add last line
+    if (nStart < strTypes.GetLength())
+    {
+        lines.Add(strTypes.Mid(nStart));
+    }
+
+    // Parse each line
+    int nRow = range.minRow;
+    for (int i = 0; i < lines.GetCount() && nRow <= range.maxRow && nRow < m_nRows; i++, nRow++)
+    {
+        SStringT strLine = lines[i];
+        SArray<SStringT> cells;
+
+        // Split line into cells by tabs
+        nStart = 0;
+        nPos = 0;
+        while (nPos < strLine.GetLength())
+        {
+            if (strLine[nPos] == _T('\t'))
+            {
+                cells.Add(strLine.Mid(nStart, nPos - nStart));
+                nStart = nPos + 1;
+            }
+            nPos++;
+        }
+
+        // Add last cell
+        if (nStart <= strLine.GetLength())
+        {
+            cells.Add(strLine.Mid(nStart));
+        }
+
+        // Parse cell types into row
+        int nCol = range.minCol;
+        for (int j = 0; j < cells.GetCount() && nCol <= range.maxCol && nCol < m_nCols; j++, nCol++)
+        {
+            if (!IsCellFixed(nRow, nCol))
+            {
+                int nType = _ttoi(cells[j]);
+                if (nType >= CELL_TYPE_TEXT && nType < CELL_TYPE_COUNT)
+                {
+                    SetCellType(nRow, nCol, (ECellType)nType);
+                }
+            }
+        }
+    }
+
+    return TRUE;
+}
+
+BOOL SGridCtrl::CheckCellTypeCompatibility(LPCTSTR lpszTypes, const SCellRange& range) const
+{
+    if (!lpszTypes || !range.IsValid())
+        return TRUE; // If no type data, allow paste
+
+    SStringT strTypes = lpszTypes;
+    SArray<SStringT> lines;
+
+    // Split into lines
+    int nStart = 0;
+    int nPos = 0;
+    while (nPos < strTypes.GetLength())
+    {
+        if (strTypes[nPos] == _T('\n') || strTypes[nPos] == _T('\r'))
+        {
+            if (nPos > nStart)
+            {
+                lines.Add(strTypes.Mid(nStart, nPos - nStart));
+            }
+            nStart = nPos + 1;
+            if (nPos + 1 < strTypes.GetLength() && strTypes[nPos + 1] == _T('\n'))
+            {
+                nPos++;
+                nStart++;
+            }
+        }
+        nPos++;
+    }
+
+    // Add last line
+    if (nStart < strTypes.GetLength())
+    {
+        lines.Add(strTypes.Mid(nStart));
+    }
+
+    // Check each line for type compatibility
+    int nRow = range.minRow;
+    for (int i = 0; i < lines.GetCount() && nRow <= range.maxRow && nRow < m_nRows; i++, nRow++)
+    {
+        SStringT strLine = lines[i];
+        SArray<SStringT> cells;
+
+        // Split line into cells by tabs
+        nStart = 0;
+        nPos = 0;
+        while (nPos < strLine.GetLength())
+        {
+            if (strLine[nPos] == _T('\t'))
+            {
+                cells.Add(strLine.Mid(nStart, nPos - nStart));
+                nStart = nPos + 1;
+            }
+            nPos++;
+        }
+
+        // Add last cell
+        if (nStart <= strLine.GetLength())
+        {
+            cells.Add(strLine.Mid(nStart));
+        }
+
+        // Check cell types compatibility
+        int nCol = range.minCol;
+        for (int j = 0; j < cells.GetCount() && nCol <= range.maxCol && nCol < m_nCols; j++, nCol++)
+        {
+            if (!IsCellFixed(nRow, nCol) && IsCellEditable(SCellID(nRow, nCol)))
+            {
+                int nSourceType = _ttoi(cells[j]);
+                ECellType targetType = GetCellType(nRow, nCol);
+                if (nSourceType != targetType)
+                {
+                    return FALSE;
+                }
+            }
+        }
+    }
+
+    return TRUE; // All types are compatible
+}
+
+BOOL SGridCtrl::PasteMultiCellDataWithTypes(SCellID startCell, LPCTSTR lpszData, LPCTSTR lpszTypes)
+{
+    if (!lpszData || !startCell.IsValid())
+        return FALSE;
+
+    // First, determine the paste range based on the data
+    SStringT strData = lpszData;
+    SArray<SStringT> lines;
+
+    // Split data into lines to determine dimensions
+    int nStart = 0;
+    int nPos = 0;
+    while (nPos < strData.GetLength())
+    {
+        if (strData[nPos] == _T('\n') || strData[nPos] == _T('\r'))
+        {
+            if (nPos > nStart)
+            {
+                lines.Add(strData.Mid(nStart, nPos - nStart));
+            }
+            nStart = nPos + 1;
+            if (nPos + 1 < strData.GetLength() && strData[nPos + 1] == _T('\n'))
+            {
+                nPos++;
+                nStart++;
+            }
+        }
+        nPos++;
+    }
+
+    // Add last line
+    if (nStart < strData.GetLength())
+    {
+        lines.Add(strData.Mid(nStart));
+    }
+
+    if (lines.GetCount() == 0)
+        return FALSE;
+
+    // Determine max columns by checking first line
+    SArray<SStringT> firstLineCells;
+    SStringT strFirstLine = lines[0];
+    nStart = 0;
+    nPos = 0;
+    while (nPos < strFirstLine.GetLength())
+    {
+        if (strFirstLine[nPos] == _T('\t'))
+        {
+            firstLineCells.Add(strFirstLine.Mid(nStart, nPos - nStart));
+            nStart = nPos + 1;
+        }
+        nPos++;
+    }
+    if (nStart <= strFirstLine.GetLength())
+    {
+        firstLineCells.Add(strFirstLine.Mid(nStart));
+    }
+
+    // Calculate paste range
+    SCellRange pasteRange;
+    pasteRange.minRow = startCell.row;
+    pasteRange.minCol = startCell.col;
+    pasteRange.maxRow = startCell.row + lines.GetCount() - 1;
+    pasteRange.maxCol = startCell.col + firstLineCells.GetCount() - 1;
+
+    // Ensure range is within grid bounds
+    pasteRange.maxRow = smin(pasteRange.maxRow, m_nRows - 1);
+    pasteRange.maxCol = smin(pasteRange.maxCol, m_nCols - 1);
+
+    // Check cell type compatibility if type data is available
+    if (lpszTypes && _tcslen(lpszTypes) > 0)
+    {
+        if (!CheckCellTypeCompatibility(lpszTypes, pasteRange))
+        {
+            // Types don't match, abort paste operation
+            return FALSE;
+        }
+    }
+
+    // Parse text data only if types are compatible
+    return ParseTextIntoCells(lpszData, pasteRange);
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -5275,6 +5733,378 @@ void SGridCtrl::EndInplaceEdit(BOOL bSave)
     SetFocus();
 }
 
+//////////////////////////////////////////////////////////////////////////
+// SGridColorCell implementation
 
+SGridColorCell::SGridColorCell()
+    : m_crColor(RGBA(255, 255, 255,255))
+    , m_strFormat(_T("#%02X%02X%02X%02X"))
+{
+}
+
+SGridColorCell::~SGridColorCell()
+{
+}
+
+BOOL SGridColorCell::Draw(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd)
+{
+    if (!pRT)
+        return FALSE;
+
+    // Draw color rectangle
+    RECT rcColor = rect;
+    rcColor.left += 2;
+    rcColor.top += 2;
+    rcColor.bottom -= 2;
+    rcColor.right = rcColor.left + (rcColor.bottom - rcColor.top);
+
+    DrawColorRect(pRT, rcColor);
+
+    // Draw color text
+    RECT rcText = rect;
+    rcText.left = rcColor.right + 4;
+    rcText.left += 2;
+    rcText.top += 2;
+    rcText.right -= 2;
+    rcText.bottom -= 2;
+
+    SStringT strText = GetColorText();
+    pRT->DrawText(strText, strText.GetLength(), &rcText, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
+
+    return TRUE;
+}
+
+void SGridColorCell::DrawColorRect(IRenderTarget* pRT, const RECT& rect)
+{
+    // Draw checkerboard background for transparency
+    const int gridSize = 4;
+    pRT->PushClipRect(&rect, RGN_AND);
+
+    bool bDrawY = true;
+    for (int y = rect.top; y < rect.bottom; y += gridSize)
+    {
+        bool bDraw = bDrawY;
+        for (int x = rect.left; x < rect.right; x += gridSize)
+        {
+            if (bDraw)
+            {
+                RECT rcGrid = {x, y, x + gridSize, y + gridSize};
+                pRT->FillSolidRect(&rcGrid, RGBA(204, 204, 204,255));
+            }
+            bDraw = !bDraw;
+        }
+        bDrawY = !bDrawY;
+    }
+    pRT->PopClip();
+
+    // Draw color
+    pRT->FillSolidRect(&rect, m_crColor);
+    pRT->DrawRectangle(&rect);
+}
+
+void SGridColorCell::OnClickUp(POINT PointCellRelative)
+{
+    RECT rect = {0, 0, 100, 25}; // Default rect, will be updated by grid
+    ShowColorPicker(&rect);
+}
+
+void SGridColorCell::OnDblClick(POINT PointCellRelative)
+{
+    // Same as single click for color picker
+    OnClickUp(PointCellRelative);
+}
+
+BOOL SGridColorCell::ShowColorPicker(const RECT* pRect)
+{
+    if (!pRect)
+        return FALSE;
+
+    CHOOSECOLOR cc = { 0 };
+    static COLORREF acrCustClr[16] = { 0 };
+
+    cc.lStructSize = sizeof(cc);
+    cc.hwndOwner = GetActiveWindow();
+    cc.lpCustColors = acrCustClr;
+    #if defined(_WIN32)
+        cc.rgbResult = m_crColor&0x00FFFFFF;
+    #else
+        cc.rgbResult = m_crColor;
+    #endif
+    cc.Flags = CC_FULLOPEN | CC_RGBINIT;
+
+    if (!ChooseColor(&cc))
+        return FALSE;
+#ifdef _WIN32
+    SetColor(cc.rgbResult | 0xFF000000);
+#else
+    SetColor(cc.rgbResult);
+#endif
+    return TRUE;
+}
+
+// Remove StartEdit method as it's not part of the standard IGridCell interface
+
+void SGridColorCell::SetColor(COLORREF cr)
+{
+    if (m_crColor != cr)
+    {
+        m_crColor = cr;
+        // Notify grid of change if needed
+		int r = GetRValue(cr), g = GetGValue(cr), b = GetBValue(cr), a= GetAValue(cr);
+		SStringT strTxt = SStringT().Format(m_strFormat,r,g,b,a);
+		__baseCls::SetText(strTxt);
+    }
+}
+
+SStringT SGridColorCell::GetColorText() const
+{
+    SStringT str;
+    int a = GetAValue(m_crColor);
+    int r = GetRValue(m_crColor);
+    int g = GetGValue(m_crColor);
+    int b = GetBValue(m_crColor);
+    str.Format(m_strFormat, a, r, g, b);
+    return str;
+}
+
+void SGridColorCell::SetText(LPCTSTR szText)
+{
+    int v[4];
+    int ret = _stscanf(szText, m_strFormat, v, v+1, v+2, v+3);
+    if(ret < 3)
+        return;
+    if(ret == 3)
+        m_crColor = RGBA(v[0], v[1], v[2], 255); // rgb
+    else
+        m_crColor = RGBA(v[3], v[0], v[1], v[2]); // argb
+    __baseCls::SetText(GetColorText());
+}
+
+//////////////////////////////////////////////////////////////////////////
+// SGridDateTimeCell implementation
+
+SGridDateTimeCell::SGridDateTimeCell()
+    : m_strFormat(_T("%04d-%02d-%02d %02d:%02d:%02d"))
+    , m_bTimeEnabled(TRUE)
+    , m_bHasValue(FALSE)
+{
+    GetLocalTime(&m_sysTime);
+}
+
+SGridDateTimeCell::~SGridDateTimeCell()
+{
+}
+
+BOOL SGridDateTimeCell::Draw(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd)
+{
+    if (!pRT)
+        return FALSE;
+
+    // Draw background first
+    if (bEraseBkgnd)
+    {
+        COLORREF crBk = GetBackClr();
+        if (crBk == CLR_DEFAULT)
+        {
+            if (IsSelected())
+                crBk = RGBA(51, 153, 255, 255);
+            else if (IsFixed())
+                crBk = RGBA(240, 240, 240, 255);
+            else
+                crBk = RGBA(255, 255, 255, 255);
+        }
+        pRT->FillSolidRect(&rect, crBk);
+    }
+
+    // Draw date/time text
+    SStringT strText = GetDateTimeText();
+    if (strText.IsEmpty())
+        strText = _T("(Select Date/Time)");
+
+    if (!strText.IsEmpty())
+    {
+        RECT rcText = rect;
+        rcText.left = rect.left + 4;
+        rcText.right = rect.right - 16; // Leave space for dropdown arrow
+
+        if (rcText.left < rcText.right)
+        {
+            COLORREF crText = GetTextClr();
+            if (crText == CLR_DEFAULT)
+                crText = RGBA(0, 0, 0, 255);
+
+            pRT->DrawText(strText, strText.GetLength(), &rcText,
+                         GetFormat() | DT_VCENTER | DT_SINGLELINE);
+        }
+    }
+
+    // Draw dropdown arrow - simple triangle
+    RECT rcArrow = rect;
+    rcArrow.left = rect.right - 16;
+
+    // Draw simple dropdown arrow
+    int centerX = (rcArrow.left + rcArrow.right) / 2;
+    int centerY = (rcArrow.top + rcArrow.bottom) / 2;
+    POINT pts[3] = {
+        {centerX - 3, centerY - 1},
+        {centerX + 3, centerY - 1},
+        {centerX, centerY + 2}
+    };
+
+    SAutoRefPtr<IBrushS> pBrush;
+    pRT->CreateSolidColorBrush(RGBA(0, 0, 0,255), &pBrush);
+    SAutoRefPtr<IBrushS> pOldBrush;
+    pRT->SelectObject(pBrush, (IRenderObj**)&pOldBrush);
+
+    // Draw triangle
+    pRT->FillPolygon(pts, 3);
+
+    pRT->SelectObject(pOldBrush, NULL);
+
+    return TRUE;
+}
+
+void  SGridDateTimeCell::OnClickUp(POINT PointCellRelative)
+{
+    if (GetGrid()->IsEditable() && !IsReadOnly())
+    {
+        RECT rcCell;
+        GetGrid()->GetCellRectEx(GetRow(), GetCol(), &rcCell);
+        // Convert to relative coordinates
+        rcCell.right = rcCell.right - rcCell.left;
+        rcCell.bottom = rcCell.bottom - rcCell.top;
+        rcCell.left = 0;
+        rcCell.top = 0;
+
+        // Check if clicked in dropdown area (right 16 pixels)
+        if (PointCellRelative.x >= rcCell.right - 16 && PointCellRelative.x <= rcCell.right &&
+            PointCellRelative.y >= rcCell.top && PointCellRelative.y <= rcCell.bottom)
+        {
+            // Clicked in dropdown area - start edit and show dropdown
+            SCellID cellID(GetRow(), GetCol());
+            GetGrid()->StartEdit(cellID);
+            IGridInplaceWnd *inplaceWnd = GetGrid()->GetInplaceWnd();
+            if (inplaceWnd)
+            {
+                IWindow *pWnd = inplaceWnd->GetIWindow();
+                SAutoRefPtr<IDateTimePicker> pDateTimePicker;
+                pWnd->QueryInterface(IID_IDateTimePicker, (IObjRef**)&pDateTimePicker);
+                if (pDateTimePicker)
+                {
+                    pDateTimePicker->DropDown(); // Show dropdown
+                }
+            }
+        }
+    }
+}
+
+void  SGridDateTimeCell::OnDblClick(POINT PointCellRelative)
+{
+    if (GetGrid()->IsEditable() && !IsReadOnly())
+    {
+        SCellID cellID(GetRow(), GetCol());
+        GetGrid()->StartEdit(cellID);
+        IGridInplaceWnd *inplaceWnd = GetGrid()->GetInplaceWnd();
+        if (inplaceWnd)
+        {
+            IWindow *pWnd = inplaceWnd->GetIWindow();
+            SAutoRefPtr<IDateTimePicker> pDateTimePicker;
+            pWnd->QueryInterface(IID_IDateTimePicker, (IObjRef**)&pDateTimePicker);
+            if (pDateTimePicker)
+            {
+                pDateTimePicker->DropDown(); // Show dropdown on double click
+            }
+        }
+    }
+}
+
+class SGridDateTimeInplaceWnd : public TplGridInplaceWnd<SDateTimePicker>{
+    SGridDateTimeCell *m_pCell;
+public:
+    SGridDateTimeInplaceWnd(SGridDateTimeCell *pCell, IGridCtrl* pGrid, int nRow, int nCol):
+        TplGridInplaceWnd<SDateTimePicker>(pGrid, nRow, nCol)
+    {
+        m_pCell = pCell;
+    }
+
+    STDMETHOD_(void, UpdateData)(THIS) override{
+        SAutoRefPtr<IDateTimePicker> pDateTimePicker;
+        GetIWindow()->QueryInterface(IID_IDateTimePicker, (IObjRef**)&pDateTimePicker);
+        if (pDateTimePicker)
+        {
+            SYSTEMTIME st = {0};
+            pDateTimePicker->GetTime(&st.wYear,&st.wMonth,&st.wDay,&st.wHour,&st.wMinute,&st.wSecond);
+            m_pCell->SetDateTime(&st);
+        }
+    }
+    STDMETHOD_(void, InitData)(THIS_ LPCTSTR szText) override{
+        SAutoRefPtr<IDateTimePicker> pDateTimePicker;
+        GetIWindow()->QueryInterface(IID_IDateTimePicker, (IObjRef**)&pDateTimePicker);
+        if (pDateTimePicker)
+        {
+            SYSTEMTIME st;
+            m_pCell->GetDateTime(&st);
+            pDateTimePicker->SetTime(st.wYear,st.wMonth,st.wDay,st.wHour,st.wMinute,st.wSecond);
+        }
+    }
+};
+
+IGridInplaceWnd *  SGridDateTimeCell::CreateInplaceWnd(int nRow,int nCol) const
+{
+	SGridDateTimeInplaceWnd * pRet = new SGridDateTimeInplaceWnd( const_cast<SGridDateTimeCell*>(this), m_pGrid, nRow, nCol);
+	if (!pRet)
+		return NULL;
+
+	// Set combo properties
+	pRet->SetAttribute(L"dropDown", L"1", TRUE);
+	pRet->SetAttribute(L"colorBkgnd", L"#FFFFFF", TRUE);
+	pRet->SetAttribute(L"drawFocusRect", L"0", TRUE);
+	return pRet;
+}
+
+void SGridDateTimeCell::SetText(LPCTSTR lpszText)
+{
+    SYSTEMTIME st;
+    int ret = _stscanf(lpszText, m_strFormat, &st.wYear, &st.wMonth, &st.wDay, &st.wHour, &st.wMinute, &st.wSecond);
+    if(ret == 6 || (ret == 3 && !m_bTimeEnabled))
+    {
+        m_sysTime = st;
+        m_bHasValue = TRUE;
+        __baseCls::SetText(GetDateTimeText());
+    }
+}
+
+void SGridDateTimeCell::SetDateTime(const SYSTEMTIME* pSysTime)
+{
+    if (pSysTime)
+    {
+        m_sysTime = *pSysTime;
+        m_bHasValue = TRUE;
+        SStringT strText = GetDateTimeText();
+        __baseCls::SetText(strText);
+        Invalidate();
+    }
+}
+
+
+SStringT SGridDateTimeCell::GetDateTimeText() const
+{
+    if (!m_bHasValue)
+        return _T("");
+
+    SStringT str;
+    if (m_bTimeEnabled)
+    {
+        str.Format(m_strFormat,
+                   m_sysTime.wYear, m_sysTime.wMonth, m_sysTime.wDay,
+                   m_sysTime.wHour, m_sysTime.wMinute, m_sysTime.wSecond);
+    }
+    else
+    {
+        str.Format(m_strFormat,
+                   m_sysTime.wYear, m_sysTime.wMonth, m_sysTime.wDay);
+    }
+    return str;
+}
 
 SNSEND

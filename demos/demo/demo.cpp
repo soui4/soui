@@ -77,6 +77,11 @@ static SStringT getSourceDir()
 #else
     SStringA file(__FILE__);
     file = file.Left(file.ReverseFind(PATH_SLASH));
+	if(*__FILE__=='.'){
+		char absPath[MAX_PATH]={0};
+		GetFullPathNameA(file,MAX_PATH,absPath,NULL);
+		file = absPath;
+	}
     return S_CA2T(file);
 #endif
 }

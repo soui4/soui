@@ -58,7 +58,8 @@ SNSBEGIN
 
 	BOOL SRenderFactory_Gdi::CreatePath(IPathS ** ppPath)
 	{
-		return FALSE;
+		*ppPath = new SPath_GDI(this);
+		return TRUE;
 	}
 
 	BOOL SRenderFactory_Gdi::CreatePathEffect(REFGUID guidEffect,IPathEffect ** ppPathEffect)
@@ -775,6 +776,58 @@ SNSBEGIN
         return S_OK;
     }
 
+    HRESULT SRenderTarget_GDI::DrawPolygon(LPPOINT pPt,size_t nCount)
+    {
+        if(!pPt || nCount < 3) return E_INVALIDARG;
+
+        RECT rc={100000,100000,0,0};
+        for(size_t i=0;i<nCount;i++)
+        {
+            if(pPt[i].x<rc.left) rc.left=pPt[i].x;
+            if(pPt[i].x>rc.right) rc.right=pPt[i].x;
+            if(pPt[i].y<rc.top) rc.top=pPt[i].y;
+            if(pPt[i].y>rc.bottom) rc.bottom=pPt[i].y;
+        }
+        rc.left -= 1;
+        rc.top -=1;
+        int nPenWidth = 1;
+        if(m_curPen) nPenWidth = m_curPen->GetWidth();
+        rc.bottom+=nPenWidth;
+        rc.right+=nPenWidth;
+
+        // Select null brush to draw outline only
+        HBRUSH hOldBrush = (HBRUSH)::SelectObject(m_hdc, ::GetStockObject(NULL_BRUSH));
+        ::Polygon(m_hdc,pPt,(int)nCount);
+        ::SelectObject(m_hdc, hOldBrush);
+
+        return S_OK;
+    }
+
+    HRESULT SRenderTarget_GDI::FillPolygon(LPPOINT pPt,size_t nCount)
+    {
+        if(!pPt || nCount < 3) return E_INVALIDARG;
+
+        RECT rc={100000,100000,0,0};
+        for(size_t i=0;i<nCount;i++)
+        {
+            if(pPt[i].x<rc.left) rc.left=pPt[i].x;
+            if(pPt[i].x>rc.right) rc.right=pPt[i].x;
+            if(pPt[i].y<rc.top) rc.top=pPt[i].y;
+            if(pPt[i].y>rc.bottom) rc.bottom=pPt[i].y;
+        }
+        rc.left -= 1;
+        rc.top -=1;
+        rc.bottom+=1;
+        rc.right+=1;
+
+        // Select null pen to fill without outline
+        HPEN hOldPen = (HPEN)::SelectObject(m_hdc, ::GetStockObject(NULL_PEN));
+        ::Polygon(m_hdc,pPt,(int)nCount);
+        ::SelectObject(m_hdc, hOldPen);
+
+        return S_OK;
+    }
+
     HRESULT SRenderTarget_GDI::TextOut( int x, int y, LPCTSTR lpszString, int nCount)
     {
         if(nCount<0) nCount = _tcslen(lpszString);
@@ -1275,11 +1328,768 @@ SNSBEGIN
 
 
     //////////////////////////////////////////////////////////////////////////
+    //  SPath_GDI
+    //////////////////////////////////////////////////////////////////////////
+    SPath_GDI::SPath_GDI(IRenderFactory *pRenderFac)
+        : TGdiRenderObjImpl<IPathS,OT_PATH>(pRenderFac)
+        , m_fillType(kWinding_FillType)
+        , m_bBoundsValid(FALSE)
+        , m_bHasLastPoint(FALSE)
+    {
+        SetRect(&m_bounds, 0, 0, 0, 0);
+        m_lastPoint.fX = m_lastPoint.fY = 0.0f;
+    }
+
+    SPath_GDI::~SPath_GDI()
+    {
+        // Commands will be automatically cleaned up by SArray destructor
+    }
+
+    FillType SPath_GDI::getFillType() const
+    {
+        return m_fillType;
+    }
+
+    void SPath_GDI::setFillType(FillType ft)
+    {
+        m_fillType = ft;
+    }
+
+    void SPath_GDI::reset()
+    {
+        m_commands.RemoveAll();
+        m_bHasLastPoint = FALSE;
+        m_bBoundsValid = FALSE;
+        SetRect(&m_bounds, 0, 0, 0, 0);
+    }
+
+    BOOL SPath_GDI::isEmpty() const
+    {
+        return m_commands.GetCount() == 0;
+    }
+
+    void SPath_GDI::getBounds(LPRECT prc) const
+    {
+        if (!m_bBoundsValid)
+        {
+            const_cast<SPath_GDI*>(this)->UpdateBounds();
+        }
+        *prc = m_bounds;
+    }
+
+    void SPath_GDI::moveTo(float x, float y)
+    {
+        PathCommand cmd;
+        cmd.type = PATH_CMD_MOVETO;
+        cmd.data.moveTo.x = x;
+        cmd.data.moveTo.y = y;
+        AddCommand(cmd);
+
+        m_lastPoint.fX = x;
+        m_lastPoint.fY = y;
+        m_bHasLastPoint = TRUE;
+        m_bBoundsValid = FALSE;
+    }
+
+    void SPath_GDI::rMoveTo(float dx, float dy)
+    {
+        if (m_bHasLastPoint)
+        {
+            moveTo(m_lastPoint.fX + dx, m_lastPoint.fY + dy);
+        }
+        else
+        {
+            moveTo(dx, dy);
+        }
+    }
+
+    void SPath_GDI::lineTo(float x, float y)
+    {
+        PathCommand cmd;
+        cmd.type = PATH_CMD_LINETO;
+        cmd.data.lineTo.x = x;
+        cmd.data.lineTo.y = y;
+        AddCommand(cmd);
+
+        m_lastPoint.fX = x;
+        m_lastPoint.fY = y;
+        m_bHasLastPoint = TRUE;
+        m_bBoundsValid = FALSE;
+    }
+
+    void SPath_GDI::rLineTo(float dx, float dy)
+    {
+        if (m_bHasLastPoint)
+        {
+            lineTo(m_lastPoint.fX + dx, m_lastPoint.fY + dy);
+        }
+        else
+        {
+            lineTo(dx, dy);
+        }
+    }
+
+    void SPath_GDI::quadTo(float x1, float y1, float x2, float y2)
+    {
+        // GDI doesn't have native quadratic Bezier support, so we approximate with cubic
+        // Convert quadratic to cubic Bezier
+        if (!m_bHasLastPoint) return;
+
+        float x0 = m_lastPoint.fX;
+        float y0 = m_lastPoint.fY;
+
+        // Cubic control points for quadratic approximation
+        float cx1 = x0 + 2.0f/3.0f * (x1 - x0);
+        float cy1 = y0 + 2.0f/3.0f * (y1 - y0);
+        float cx2 = x2 + 2.0f/3.0f * (x1 - x2);
+        float cy2 = y2 + 2.0f/3.0f * (y1 - y2);
+
+        cubicTo(cx1, cy1, cx2, cy2, x2, y2);
+    }
+
+    void SPath_GDI::rQuadTo(float dx1, float dy1, float dx2, float dy2)
+    {
+        if (m_bHasLastPoint)
+        {
+            quadTo(m_lastPoint.fX + dx1, m_lastPoint.fY + dy1,
+                   m_lastPoint.fX + dx2, m_lastPoint.fY + dy2);
+        }
+    }
+
+    void SPath_GDI::conicTo(float x1, float y1, float x2, float y2, float w)
+    {
+        // GDI doesn't support conic curves, approximate with quadratic
+        quadTo(x1, y1, x2, y2);
+    }
+
+    void SPath_GDI::rConicTo(float dx1, float dy1, float dx2, float dy2, float w)
+    {
+        if (m_bHasLastPoint)
+        {
+            conicTo(m_lastPoint.fX + dx1, m_lastPoint.fY + dy1,
+                    m_lastPoint.fX + dx2, m_lastPoint.fY + dy2, w);
+        }
+    }
+
+    void SPath_GDI::cubicTo(float x1, float y1, float x2, float y2, float x3, float y3)
+    {
+        if (!m_bHasLastPoint) return;
+
+        PathCommand cmd;
+        cmd.type = PATH_CMD_CUBICTO;
+        cmd.data.cubicTo.x1 = x1;
+        cmd.data.cubicTo.y1 = y1;
+        cmd.data.cubicTo.x2 = x2;
+        cmd.data.cubicTo.y2 = y2;
+        cmd.data.cubicTo.x3 = x3;
+        cmd.data.cubicTo.y3 = y3;
+        AddCommand(cmd);
+
+        m_lastPoint.fX = x3;
+        m_lastPoint.fY = y3;
+        m_bBoundsValid = FALSE;
+    }
+
+    void SPath_GDI::rCubicTo(float x1, float y1, float x2, float y2, float x3, float y3)
+    {
+        if (m_bHasLastPoint)
+        {
+            cubicTo(m_lastPoint.fX + x1, m_lastPoint.fY + y1,
+                    m_lastPoint.fX + x2, m_lastPoint.fY + y2,
+                    m_lastPoint.fX + x3, m_lastPoint.fY + y3);
+        }
+    }
+
+    void SPath_GDI::addRect(const RECT *rect, Direction dir)
+    {
+        addRect2((float)rect->left, (float)rect->top,
+                 (float)rect->right, (float)rect->bottom, dir);
+    }
+
+    void SPath_GDI::addRect2(float left, float top, float right, float bottom, Direction dir)
+    {
+        PathCommand cmd;
+        cmd.type = PATH_CMD_ADDRECT;
+        cmd.data.addRect.left = left;
+        cmd.data.addRect.top = top;
+        cmd.data.addRect.right = right;
+        cmd.data.addRect.bottom = bottom;
+        cmd.data.addRect.dir = dir;
+        AddCommand(cmd);
+
+        m_bBoundsValid = FALSE;
+    }
+
+    void SPath_GDI::addOval(const RECT *oval, Direction dir)
+    {
+        addOval2((float)oval->left, (float)oval->top,
+                 (float)oval->right, (float)oval->bottom, dir);
+    }
+
+    void SPath_GDI::addOval2(float left, float top, float right, float bottom, Direction dir)
+    {
+        PathCommand cmd;
+        cmd.type = PATH_CMD_ADDOVAL;
+        cmd.data.addOval.left = left;
+        cmd.data.addOval.top = top;
+        cmd.data.addOval.right = right;
+        cmd.data.addOval.bottom = bottom;
+        cmd.data.addOval.dir = dir;
+        AddCommand(cmd);
+
+        // Update last point to bottom of ellipse
+        m_lastPoint.fX = (left + right) / 2.0f;
+        m_lastPoint.fY = bottom;
+        m_bHasLastPoint = TRUE;
+        m_bBoundsValid = FALSE;
+    }
+
+    void SPath_GDI::addCircle(float x, float y, float radius, Direction dir)
+    {
+        addOval2(x - radius, y - radius, x + radius, y + radius, dir);
+    }
+
+    void SPath_GDI::addArc(const RECT *oval, float startAngle, float sweepAngle)
+    {
+        addArc2((float)oval->left, (float)oval->top,
+                (float)oval->right, (float)oval->bottom, startAngle, sweepAngle);
+    }
+
+    void SPath_GDI::addArc2(float left, float top, float right, float bottom, float startAngle, float sweepAngle)
+    {
+        PathCommand cmd;
+        cmd.type = PATH_CMD_ADDARC;
+        cmd.data.addArc.left = left;
+        cmd.data.addArc.top = top;
+        cmd.data.addArc.right = right;
+        cmd.data.addArc.bottom = bottom;
+        cmd.data.addArc.startAngle = startAngle;
+        cmd.data.addArc.sweepAngle = sweepAngle;
+        AddCommand(cmd);
+
+        // Calculate end point for last point tracking
+        float centerX = (left + right) / 2.0f;
+        float centerY = (top + bottom) / 2.0f;
+        float radiusX = (right - left) / 2.0f;
+        float radiusY = (bottom - top) / 2.0f;
+        float endRad = (startAngle + sweepAngle) * 3.14159f / 180.0f;
+
+        m_lastPoint.fX = centerX + radiusX * cos(endRad);
+        m_lastPoint.fY = centerY - radiusY * sin(endRad);
+        m_bHasLastPoint = TRUE;
+        m_bBoundsValid = FALSE;
+    }
+
+    void SPath_GDI::addRoundRect(const RECT *rect, float rx, float ry, Direction dir)
+    {
+        addRoundRect2((float)rect->left, (float)rect->top,
+                      (float)rect->right, (float)rect->bottom, rx, ry, dir);
+    }
+
+    void SPath_GDI::addRoundRect2(float left, float top, float right, float bottom, float rx, float ry, Direction dir)
+    {
+        PathCommand cmd;
+        cmd.type = PATH_CMD_ADDROUNDRECT;
+        cmd.data.addRoundRect.left = left;
+        cmd.data.addRoundRect.top = top;
+        cmd.data.addRoundRect.right = right;
+        cmd.data.addRoundRect.bottom = bottom;
+        cmd.data.addRoundRect.rx = rx;
+        cmd.data.addRoundRect.ry = ry;
+        cmd.data.addRoundRect.dir = dir;
+        AddCommand(cmd);
+
+        // Update last point
+        m_lastPoint.fX = left;
+        m_lastPoint.fY = top;
+        m_bHasLastPoint = TRUE;
+        m_bBoundsValid = FALSE;
+    }
+
+    void SPath_GDI::addPoly(const POINT pts[], int count, BOOL close)
+    {
+        if (count < 2) return;
+
+        PathCommand cmd;
+        cmd.type = PATH_CMD_ADDPOLY;
+        cmd.addPoly.reset(new PathCommand::AddPolyData());
+        cmd.addPoly->close = close;
+        for (int i = 0; i < count; i++)
+        {
+            cmd.addPoly->points.Add(pts[i]);
+        }
+        AddCommand(cmd);
+
+        m_lastPoint.fX = (float)pts[count-1].x;
+        m_lastPoint.fY = (float)pts[count-1].y;
+        m_bHasLastPoint = TRUE;
+        m_bBoundsValid = FALSE;
+    }
+
+    void SPath_GDI::offset(float dx, float dy)
+    {
+        for (UINT i = 0; i < m_commands.GetCount(); i++) {
+            PathCommand& cmd = m_commands[i];
+
+            switch (cmd.type) {
+            case PATH_CMD_MOVETO:
+                cmd.data.moveTo.x += dx;
+                cmd.data.moveTo.y += dy;
+                break;
+
+            case PATH_CMD_LINETO:
+                cmd.data.lineTo.x += dx;
+                cmd.data.lineTo.y += dy;
+                break;
+
+            case PATH_CMD_QUADTO:
+                cmd.data.quadTo.x1 += dx;
+                cmd.data.quadTo.y1 += dy;
+                cmd.data.quadTo.x2 += dx;
+                cmd.data.quadTo.y2 += dy;
+                break;
+
+            case PATH_CMD_CUBICTO:
+                cmd.data.cubicTo.x1 += dx;
+                cmd.data.cubicTo.y1 += dy;
+                cmd.data.cubicTo.x2 += dx;
+                cmd.data.cubicTo.y2 += dy;
+                cmd.data.cubicTo.x3 += dx;
+                cmd.data.cubicTo.y3 += dy;
+                break;
+
+            case PATH_CMD_ADDRECT:
+                cmd.data.addRect.left += dx;
+                cmd.data.addRect.top += dy;
+                cmd.data.addRect.right += dx;
+                cmd.data.addRect.bottom += dy;
+                break;
+
+            case PATH_CMD_ADDOVAL:
+                cmd.data.addOval.left += dx;
+                cmd.data.addOval.top += dy;
+                cmd.data.addOval.right += dx;
+                cmd.data.addOval.bottom += dy;
+                break;
+
+            case PATH_CMD_ADDCIRCLE:
+                cmd.data.addCircle.x += dx;
+                cmd.data.addCircle.y += dy;
+                break;
+
+            case PATH_CMD_ADDARC:
+                cmd.data.addArc.left += dx;
+                cmd.data.addArc.top += dy;
+                cmd.data.addArc.right += dx;
+                cmd.data.addArc.bottom += dy;
+                break;
+
+            case PATH_CMD_ADDROUNDRECT:
+                cmd.data.addRoundRect.left += dx;
+                cmd.data.addRoundRect.top += dy;
+                cmd.data.addRoundRect.right += dx;
+                cmd.data.addRoundRect.bottom += dy;
+                break;
+
+            case PATH_CMD_ADDPOLY:
+                if (cmd.addPoly) {
+                    for (int j = 0; j < cmd.addPoly->points.GetCount(); j++) {
+                        cmd.addPoly->points[j].x += (LONG)dx;
+                        cmd.addPoly->points[j].y += (LONG)dy;
+                    }
+                }
+                break;
+
+            case PATH_CMD_ADDSTRING:
+                if (cmd.addString) {
+                    cmd.addString->stringX += dx;
+                    cmd.addString->stringY += dy;
+                }
+                break;
+
+            case PATH_CMD_BEGINFIGURE:
+                cmd.data.beginFigure.x += dx;
+                cmd.data.beginFigure.y += dy;
+                break;
+
+            // 其他命令类型不需要处理坐标偏移
+            case PATH_CMD_RESET:
+            case PATH_CMD_TRANSFORM:
+            case PATH_CMD_ENDFIGURE:
+            case PATH_CMD_CLOSE:
+            case PATH_CMD_UNKNOWN:
+            default:
+                break;
+            }
+        }
+
+        // 更新最后点坐标
+        if (m_bHasLastPoint) {
+            m_lastPoint.fX += dx;
+            m_lastPoint.fY += dy;
+        }
+
+        // 如果边界已计算，则也需要更新
+        if (m_bBoundsValid) {
+            OffsetRect(&m_bounds, (int)dx, (int)dy);
+        }
+    }
+
+    void SPath_GDI::transform(const IxForm *matrix)
+    {
+        if (!matrix) return;
+
+        PathCommand cmd;
+        cmd.type = PATH_CMD_TRANSFORM;
+        for (int i = 0; i < 9; i++)
+        {
+            cmd.data.transform.matrix[i] = matrix->fMat[i];
+        }
+        AddCommand(cmd);
+
+        m_bBoundsValid = FALSE;
+    }
+
+    BOOL SPath_GDI::getLastPt(fPoint * lastPt) const
+    {
+        if (!m_bHasLastPoint) return FALSE;
+        *lastPt = m_lastPoint;
+        return TRUE;
+    }
+
+    void SPath_GDI::addString(LPCTSTR pszText, int nLen, float x, float y, const IFontS *pFont)
+    {
+        if (!pszText || !pFont) return;
+
+        PathCommand cmd;
+        cmd.type = PATH_CMD_ADDSTRING;
+        cmd.addString.reset(new PathCommand::AddStringData());
+        cmd.addString->stringText = pszText;
+        cmd.addString->stringX = x;
+        cmd.addString->stringY = y;
+        cmd.addString->stringFont = const_cast<IFontS*>(pFont);
+        AddCommand(cmd);
+
+        m_bBoundsValid = FALSE;
+    }
+
+    IPathS * SPath_GDI::clone() const
+    {
+        SPath_GDI* pClone = new SPath_GDI(m_pRenderFactory);
+        pClone->m_fillType = m_fillType;
+        pClone->m_bounds = m_bounds;
+        pClone->m_bBoundsValid = m_bBoundsValid;
+        pClone->m_lastPoint = m_lastPoint;
+        pClone->m_bHasLastPoint = m_bHasLastPoint;
+
+        // Copy path data would require more complex implementation
+        // For now, return empty clone
+        return pClone;
+    }
+
+    BOOL SPath_GDI::beginFigure(float x, float y, BOOL bFill)
+    {
+        PathCommand cmd;
+        cmd.type = PATH_CMD_BEGINFIGURE;
+        cmd.data.beginFigure.x = x;
+        cmd.data.beginFigure.y = y;
+        cmd.data.beginFigure.bFill = bFill;
+        AddCommand(cmd);
+
+        moveTo(x, y);
+        return TRUE;
+    }
+
+    BOOL SPath_GDI::endFigure(BOOL bClose)
+    {
+        PathCommand cmd;
+        cmd.type = PATH_CMD_ENDFIGURE;
+        cmd.data.endFigure.bClose = bClose;
+        AddCommand(cmd);
+
+        return TRUE;
+    }
+
+    float SPath_GDI::getLength() const
+    {
+        // GDI doesn't provide direct path length calculation
+        // This would require complex implementation
+        return 0.0f;
+    }
+
+    BOOL SPath_GDI::getPosTan(float distance, fPoint *pos, fPoint *vec) const
+    {
+        // GDI doesn't provide direct path position/tangent calculation
+        return FALSE;
+    }
+
+    void SPath_GDI::close()
+    {
+        PathCommand cmd;
+        cmd.type = PATH_CMD_CLOSE;
+        AddCommand(cmd);
+    }
+
+    BOOL SPath_GDI::hitTest(float x, float y) const
+    {
+        HRGN hRgn = CreateRegionFromCommands();
+        if (!hRgn) return FALSE;
+
+        BOOL bHit = PtInRegion(hRgn, (int)x, (int)y);
+        DeleteObject(hRgn);
+        return bHit;
+    }
+
+    BOOL SPath_GDI::hitTestStroke(float x, float y, float strokeSize) const
+    {
+        // For stroke hit testing, we'd need to widen the path
+        // Simplified implementation using region
+        return hitTest(x, y);
+    }
+
+    // Protected helper methods
+    void SPath_GDI::AddCommand(const PathCommand& cmd)
+    {
+        m_commands.Add(cmd);
+    }
+
+    void SPath_GDI::ExecuteCommands(HDC hdc) const
+    {
+        if (!hdc) return;
+
+        // Set fill mode based on current fill type
+        int fillMode = (m_fillType == kWinding_FillType) ? WINDING : ALTERNATE;
+        SetPolyFillMode(hdc, fillMode);
+
+        ::BeginPath(hdc);
+
+        for (int i = 0; i < m_commands.GetCount(); i++)
+        {
+            const PathCommand& cmd = m_commands[i];
+
+            switch (cmd.type)
+            {
+            case PATH_CMD_RESET:
+                ::AbortPath(hdc);
+                ::BeginPath(hdc);
+                break;
+
+            case PATH_CMD_MOVETO:
+                ::MoveToEx(hdc, (int)cmd.data.moveTo.x, (int)cmd.data.moveTo.y, NULL);
+                break;
+
+            case PATH_CMD_LINETO:
+                ::LineTo(hdc, (int)cmd.data.lineTo.x, (int)cmd.data.lineTo.y);
+                break;
+
+            case PATH_CMD_QUADTO:
+                {
+                    // Convert quadratic to cubic Bezier
+                    POINT currentPos;
+                    GetCurrentPositionEx(hdc, &currentPos);
+
+                    float x0 = (float)currentPos.x;
+                    float y0 = (float)currentPos.y;
+                    float x1 = cmd.data.quadTo.x1;
+                    float y1 = cmd.data.quadTo.y1;
+                    float x2 = cmd.data.quadTo.x2;
+                    float y2 = cmd.data.quadTo.y2;
+
+                    // Cubic control points for quadratic approximation
+                    float cx1 = x0 + 2.0f/3.0f * (x1 - x0);
+                    float cy1 = y0 + 2.0f/3.0f * (y1 - y0);
+                    float cx2 = x2 + 2.0f/3.0f * (x1 - x2);
+                    float cy2 = y2 + 2.0f/3.0f * (y1 - y2);
+
+                    POINT pts[3];
+                    pts[0].x = (LONG)cx1; pts[0].y = (LONG)cy1;
+                    pts[1].x = (LONG)cx2; pts[1].y = (LONG)cy2;
+                    pts[2].x = (LONG)x2; pts[2].y = (LONG)y2;
+                    ::PolyBezierTo(hdc, pts, 3);
+                }
+                break;
+
+            case PATH_CMD_CUBICTO:
+                {
+                    POINT pts[3];
+                    pts[0].x = (LONG)cmd.data.cubicTo.x1; pts[0].y = (LONG)cmd.data.cubicTo.y1;
+                    pts[1].x = (LONG)cmd.data.cubicTo.x2; pts[1].y = (LONG)cmd.data.cubicTo.y2;
+                    pts[2].x = (LONG)cmd.data.cubicTo.x3; pts[2].y = (LONG)cmd.data.cubicTo.y3;
+                    ::PolyBezierTo(hdc, pts, 3);
+                }
+                break;
+
+            case PATH_CMD_ADDRECT:
+                {
+                    float left = cmd.data.addRect.left;
+                    float top = cmd.data.addRect.top;
+                    float right = cmd.data.addRect.right;
+                    float bottom = cmd.data.addRect.bottom;
+                    Direction dir = cmd.data.addRect.dir;
+
+                    if (dir == kCW_Direction)
+                    {
+                        ::MoveToEx(hdc, (int)left, (int)top, NULL);
+                        ::LineTo(hdc, (int)right, (int)top);
+                        ::LineTo(hdc, (int)right, (int)bottom);
+                        ::LineTo(hdc, (int)left, (int)bottom);
+                        ::LineTo(hdc, (int)left, (int)top);
+                    }
+                    else
+                    {
+                        ::MoveToEx(hdc, (int)left, (int)top, NULL);
+                        ::LineTo(hdc, (int)left, (int)bottom);
+                        ::LineTo(hdc, (int)right, (int)bottom);
+                        ::LineTo(hdc, (int)right, (int)top);
+                        ::LineTo(hdc, (int)left, (int)top);
+                    }
+                }
+                break;
+
+            case PATH_CMD_ADDOVAL:
+                ::Ellipse(hdc, (int)cmd.data.addOval.left, (int)cmd.data.addOval.top,
+                         (int)cmd.data.addOval.right, (int)cmd.data.addOval.bottom);
+                break;
+
+            case PATH_CMD_ADDCIRCLE:
+                {
+                    float x = cmd.data.addCircle.x;
+                    float y = cmd.data.addCircle.y;
+                    float r = cmd.data.addCircle.radius;
+                    ::Ellipse(hdc, (int)(x-r), (int)(y-r), (int)(x+r), (int)(y+r));
+                }
+                break;
+
+            case PATH_CMD_ADDARC:
+                {
+                    float left = cmd.data.addArc.left;
+                    float top = cmd.data.addArc.top;
+                    float right = cmd.data.addArc.right;
+                    float bottom = cmd.data.addArc.bottom;
+                    float startAngle = cmd.data.addArc.startAngle;
+                    float sweepAngle = cmd.data.addArc.sweepAngle;
+
+                    // Convert angles and calculate points
+                    float centerX = (left + right) / 2.0f;
+                    float centerY = (top + bottom) / 2.0f;
+                    float radiusX = (right - left) / 2.0f;
+                    float radiusY = (bottom - top) / 2.0f;
+
+                    float startRad = startAngle * 3.14159f / 180.0f;
+                    float endRad = (startAngle + sweepAngle) * 3.14159f / 180.0f;
+
+                    int xStart = (int)(centerX + radiusX * cos(startRad));
+                    int yStart = (int)(centerY - radiusY * sin(startRad));
+                    int xEnd = (int)(centerX + radiusX * cos(endRad));
+                    int yEnd = (int)(centerY - radiusY * sin(endRad));
+
+                    ::Arc(hdc, (int)left, (int)top, (int)right, (int)bottom,
+                         xStart, yStart, xEnd, yEnd);
+                }
+                break;
+
+            case PATH_CMD_ADDROUNDRECT:
+                ::RoundRect(hdc, (int)cmd.data.addRoundRect.left, (int)cmd.data.addRoundRect.top,
+                           (int)cmd.data.addRoundRect.right, (int)cmd.data.addRoundRect.bottom,
+                           (int)(cmd.data.addRoundRect.rx * 2), (int)(cmd.data.addRoundRect.ry * 2));
+                break;
+
+            case PATH_CMD_ADDPOLY:
+                if (cmd.addPoly && cmd.addPoly->points.GetCount() >= 2)
+                {
+                    ::MoveToEx(hdc, cmd.addPoly->points[0].x, cmd.addPoly->points[0].y, NULL);
+                    for (int j = 1; j < cmd.addPoly->points.GetCount(); j++)
+                    {
+                        ::LineTo(hdc, cmd.addPoly->points[j].x, cmd.addPoly->points[j].y);
+                    }
+                    if (cmd.addPoly->close)
+                    {
+                        ::LineTo(hdc, cmd.addPoly->points[0].x, cmd.addPoly->points[0].y);
+                    }
+                }
+                break;
+
+            case PATH_CMD_ADDSTRING:
+                if (cmd.addString && !cmd.addString->stringText.IsEmpty() && cmd.addString->stringFont)
+                {
+                    const SFont_GDI* pGdiFont = static_cast<const SFont_GDI*>((IFontS*)cmd.addString->stringFont);
+                    HFONT hOldFont = (HFONT)SelectObject(hdc, pGdiFont->GetFont());
+
+                    TextOut(hdc, (int)cmd.addString->stringX, (int)cmd.addString->stringY,
+                           cmd.addString->stringText, cmd.addString->stringText.GetLength());
+
+                    SelectObject(hdc, hOldFont);
+                }
+                break;
+
+            case PATH_CMD_TRANSFORM:
+                {
+                    XFORM xform;
+                    xform.eM11 = cmd.data.transform.matrix[0];  // scaleX
+                    xform.eM12 = cmd.data.transform.matrix[1];  // skewY
+                    xform.eM21 = cmd.data.transform.matrix[3];  // skewX
+                    xform.eM22 = cmd.data.transform.matrix[4];  // scaleY
+                    xform.eDx = cmd.data.transform.matrix[6];   // translateX
+                    xform.eDy = cmd.data.transform.matrix[7];   // translateY;
+
+                    SetGraphicsMode(hdc, GM_ADVANCED);
+                    SetWorldTransform(hdc, &xform);
+                }
+                break;
+
+            case PATH_CMD_BEGINFIGURE:
+                // Begin figure is handled by the path system automatically
+                break;
+
+            case PATH_CMD_ENDFIGURE:
+                if (cmd.data.endFigure.bClose)
+                {
+                    ::CloseFigure(hdc);
+                }
+                break;
+
+            case PATH_CMD_CLOSE:
+                ::CloseFigure(hdc);
+                break;
+            }
+        }
+
+        ::EndPath(hdc);
+    }
+
+    HRGN SPath_GDI::CreateRegionFromCommands() const
+    {
+        // Create a temporary memory DC to execute commands and create region
+        HDC hMemDC = CreateCompatibleDC(NULL);
+        if (!hMemDC) return NULL;
+
+        ExecuteCommands(hMemDC);
+        HRGN hRgn = ::PathToRegion(hMemDC);
+
+        DeleteDC(hMemDC);
+        return hRgn;
+    }
+
+    void SPath_GDI::UpdateBounds()
+    {
+        HRGN hRgn = CreateRegionFromCommands();
+        if (hRgn)
+        {
+            GetRgnBox(hRgn, &m_bounds);
+            DeleteObject(hRgn);
+        }
+        else
+        {
+            SetRect(&m_bounds, 0, 0, 0, 0);
+        }
+
+        m_bBoundsValid = TRUE;
+    }
+
     namespace RENDER_GDI
     {
-        SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppRenderFactory)
-        {
-            *ppRenderFactory = new SRenderFactory_Gdi;
+        SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppRenderFactory){
+            *ppRenderFactory = new SRenderFactory_Gdi();
             return TRUE;
         }
     }
@@ -1291,6 +2101,3 @@ EXTERN_C BOOL Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory)
     *ppRenderFactory = p;
     return TRUE;
 }
-
-
-

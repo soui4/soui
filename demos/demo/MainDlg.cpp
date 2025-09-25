@@ -445,7 +445,6 @@ LRESULT CMainDlg::OnInitDialog( HWND hWnd, LPARAM lParam )
 	SPathView *pPathView = FindChildByName2<SPathView>("pv_test");
 	if(pPathView)
 	{
-		CRect rc=pPathView->GetClientRect();
 		POINT pts[10];
 		for(int i=0;i<ARRAYSIZE(pts);i++)
 		{

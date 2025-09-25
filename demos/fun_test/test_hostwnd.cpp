@@ -174,6 +174,9 @@ public:
         cc.rgbResult = RGBA(255,0,0,255);
         cc.Flags = CC_FULLOPEN | CC_RGBINIT;
         if(ChooseColor(&cc)){
+            #ifdef _WIN32
+            cc.rgbResult |= 0xff000000;
+            #endif
             SStringA str=SStringA().Format("#%02x%02x%02x%02x",
             GetRValue(cc.rgbResult),
             GetGValue(cc.rgbResult),

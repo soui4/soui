@@ -78,7 +78,7 @@ DECLARE_INTERFACE_(IGridInplaceWnd, IObjRef)
 };
 
 // {F2A8B7C3-4D5E-4F6A-8B9C-1D2E3F4A5B6C}
-DEFINE_SGUID(IID_IGridCell, 0xf2a8b7c3, 0x4d5e, 0x4f6a, 0x8b, 0x9c, 0x1d, 0x2e, 0x3f, 0x4a, 0x5b, 0x6d);
+DEFINE_SGUID2(IID_IGridCell, 0xf2a8b7c3, 0x4d5e, 0x4f6a, 0x8b, 0x9c, 0x1d, 0x2e, 0x3f, 0x4a, 0x5b, 0x6d);
 #undef INTERFACE
 #define INTERFACE IGridCell
 DECLARE_INTERFACE_(IGridCell, IObjRef)
@@ -242,7 +242,7 @@ typedef enum _ESortOrder
 
 
 // {F2A8B7C3-4D5E-4F6A-8B9C-1D2E3F4A5B6C}
-DEFINE_SGUID(IID_IGridCtrl, 0xf2a8b7c3, 0x4d5e, 0x4f6a, 0x8b, 0x9c, 0x1d, 0x2e, 0x3f, 0x4a, 0x5b, 0x6c);
+DEFINE_SGUID2(IID_IGridCtrl, 0xf2a8b7c3, 0x4d5e, 0x4f6a, 0x8b, 0x9c, 0x1d, 0x2e, 0x3f, 0x4a, 0x5b, 0x6c);
 #undef INTERFACE
 #define INTERFACE IGridCtrl
 DECLARE_INTERFACE_(IGridCtrl, ICtrl)
@@ -411,7 +411,7 @@ DECLARE_INTERFACE_(IGridCtrl, ICtrl)
 };
 
 // {F2A8B7C3-4D5E-4F6A-8B9C-1D2E3F4A5B00}
-DEFINE_SGUID(IID_IGridCellUrl, 0xf2a8b7c3, 0x4d5e, 0x4f6a, 0x8b, 0x9c, 0x1d, 0x2e, 0x3f, 0x4a, 0x5b, 0x00);
+DEFINE_SGUID2(IID_IGridCellUrl, 0xf2a8b7c3, 0x4d5e, 0x4f6a, 0x8b, 0x9c, 0x1d, 0x2e, 0x3f, 0x4a, 0x5b, 0x00);
 
 #undef INTERFACE
 #define INTERFACE IGridCellUrl
@@ -445,7 +445,7 @@ DECLARE_INTERFACE_(IGridCellUrl, IObjRef)
 
 
 // {F2A8B7C3-4D5E-4F6A-8B9C-1D2E3F4A5B01}
-DEFINE_SGUID(IID_IGridCellCheck, 0xf2a8b7c3, 0x4d5e, 0x4f6a, 0x8b, 0x9c, 0x1d, 0x2e, 0x3f, 0x4a, 0x5b, 0x01);
+DEFINE_SGUID2(IID_IGridCellCheck, 0xf2a8b7c3, 0x4d5e, 0x4f6a, 0x8b, 0x9c, 0x1d, 0x2e, 0x3f, 0x4a, 0x5b, 0x01);
 
 #undef INTERFACE
 #define INTERFACE IGridCellCheck
@@ -472,6 +472,140 @@ DECLARE_INTERFACE_(IGridCellCheck, IObjRef)
     //--------------------------------------------------------------------------
     STDMETHOD_(BOOL, GetCheck)() SCONST PURE;
     STDMETHOD_(void, SetCheck)(BOOL bCheck) PURE;
+};
+
+// {F2A8B7C3-4D5E-4F6A-8B9C-1D2E3F4A5B02}
+DEFINE_SGUID2(IID_IGridCellColor, 0xf2a8b7c3, 0x4d5e, 0x4f6a, 0x8b, 0x9c, 0x1d, 0x2e, 0x3f, 0x4a, 0x5b, 0x02);
+
+#undef INTERFACE
+#define INTERFACE IGridCellColor
+DECLARE_INTERFACE_(IGridCellColor, IObjRef)
+{
+    DECLARE_CLASS_SIID(IID_IGridCellColor)
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    //--------------------------------------------------------------------------
+
+    /**
+     * @brief 获取颜色值
+     * @return 颜色值 (COLORREF)
+     */
+    STDMETHOD_(COLORREF, GetColor)() SCONST PURE;
+
+    /**
+     * @brief 设置颜色值
+     * @param cr 颜色值
+     */
+    STDMETHOD_(void, SetColor)(COLORREF cr) PURE;
+
+    /**
+     * @brief 获取颜色格式字符串
+     * @return 格式字符串 (如 "#%02X%02X%02X")
+     */
+    STDMETHOD_(LPCTSTR, GetColorFormat)() SCONST PURE;
+
+    /**
+     * @brief 设置颜色格式字符串
+     * @param lpszFormat 格式字符串
+     */
+    STDMETHOD_(void, SetColorFormat)(LPCTSTR lpszFormat) PURE;
+
+    /**
+     * @brief 显示颜色选择器
+     * @param pRect 单元格矩形区域
+     * @return 是否成功显示
+     */
+    STDMETHOD_(BOOL, ShowColorPicker)(const RECT* pRect) PURE;
+};
+
+// {F2A8B7C3-4D5E-4F6A-8B9C-1D2E3F4A5B03}
+DEFINE_SGUID2(IID_IGridCellDateTime, 0xf2a8b7c3, 0x4d5e, 0x4f6a, 0x8b, 0x9c, 0x1d, 0x2e, 0x3f, 0x4a, 0x5b, 0x03);
+
+#undef INTERFACE
+#define INTERFACE IGridCellDateTime
+DECLARE_INTERFACE_(IGridCellDateTime, IObjRef)
+{
+    DECLARE_CLASS_SIID(IID_IGridCellDateTime)
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+    //--------------------------------------------------------------------------
+
+    /**
+     * @brief 获取日期时间值
+     * @param pSysTime 输出的系统时间结构
+     */
+    STDMETHOD_(void, GetDateTime)(SYSTEMTIME* pSysTime) SCONST PURE;
+
+    /**
+     * @brief 设置日期时间值
+     * @param pSysTime 系统时间结构
+     */
+    STDMETHOD_(void, SetDateTime)(const SYSTEMTIME* pSysTime) PURE;
+
+    /**
+     * @brief 获取日期时间格式字符串
+     * @return 格式字符串
+     */
+    STDMETHOD_(LPCTSTR, GetDateTimeFormat)() SCONST PURE;
+
+    /**
+     * @brief 设置日期时间格式字符串
+     * @param lpszFormat 格式字符串
+     */
+    STDMETHOD_(void, SetDateTimeFormat)(LPCTSTR lpszFormat) PURE;
+
+    /**
+     * @brief 获取是否启用时间部分
+     * @return 是否启用时间
+     */
+    STDMETHOD_(BOOL, IsTimeEnabled)() SCONST PURE;
+
+    /**
+     * @brief 设置是否启用时间部分
+     * @param bEnable 是否启用时间
+     */
+    STDMETHOD_(void, SetTimeEnabled)(BOOL bEnable) PURE;
+
+    /**
+     * @brief 检查是否有有效的日期时间值
+     * @return 是否有有效值
+     */
+    STDMETHOD_(BOOL, HasValue)() SCONST PURE;
+
+    /**
+     * @brief 清除日期时间值
+     */
+    STDMETHOD_(void, ClearValue)() PURE;
 };
 
 

@@ -2,6 +2,7 @@
 #define __SGRIDCTRL__H__
 
 #include "SSelRangeMgr.h"
+#include "SGridCtrl-i.h"
 #include <core/SPanel.h>
 #include <proxy/SPanelProxy.h>
 
@@ -144,14 +145,14 @@ struct SMergedCell
 enum ECellType
 {
     CELL_TYPE_TEXT = 0,         /**< Standard text cell */
+    CELL_TYPE_NUMERIC,          /**< Numeric input cell */
     CELL_TYPE_URL,              /**< URL/hyperlink cell */
-    CELL_TYPE_BUTTON,           /**< Button cell */
     CELL_TYPE_CHECKBOX,         /**< Checkbox cell */
     CELL_TYPE_OPTION,           /**< Combobox cell */
-    CELL_TYPE_NUMERIC,          /**< Numeric input cell */
-    CELL_TYPE_DATETIME,         /**< Date/time picker cell */
-    CELL_TYPE_PROGRESS,         /**< Progress bar cell */
-    CELL_TYPE_CUSTOM            /**< Custom cell type */
+    CELL_TYPE_COLOR,            /**< Color picker cell */
+    CELL_TYPE_DATETIMEPICKER,   /**< Enhanced date/time picker cell */
+    CELL_TYPE_CUSTOM,           /**< Custom cell type */
+    CELL_TYPE_COUNT             /**< Total number of cell types */
 };
 
 #define DEF_CELL_TYPE(T) \
@@ -180,6 +181,7 @@ public:
      */
     virtual ~SGridCell();
 
+public:
     // IGridCell interface implementation
     STDMETHOD_(void, Init)(THIS_ IGridCtrl* pGrid, int nRow, int nCol) OVERRIDE;
     STDMETHOD_(IGridCtrl *, GetGrid)(CTHIS) SCONST OVERRIDE{return m_pGrid;}
@@ -251,6 +253,12 @@ public:
         }
     }
     STDMETHOD_(BOOL, OnSetCursor)(THIS_ POINT PointCellRelative) OVERRIDE { return FALSE; }
+
+public:
+    void Invalidate(){
+        if(m_pGrid)
+            m_pGrid->RedrawCell(GetRow(), GetCol());
+    }
 protected:
     SStringT m_strText;         /**< Cell text */
     int m_nImage;               /**< Image index */
@@ -267,6 +275,16 @@ protected:
     int m_nCol;                 /**< Column index */
 
     IGridCtrl* m_pGrid;         /**< Parent grid */
+};
+
+class SGridNumricCell : public SGridCell{
+    DEF_CELL_TYPE(CELL_TYPE_NUMERIC)
+public:
+    SGridNumricCell(){}
+    virtual ~SGridNumricCell(){}
+
+public:
+    STDMETHOD_(IGridInplaceWnd *, CreateInplaceWnd)(CTHIS_ int nRow,int nCol) SCONST OVERRIDE;
 };
 
 template <class T>
@@ -335,6 +353,80 @@ protected:
 };
 
 /**
+ * @class SGridColorCell
+ * @brief Color picker cell for grid control
+ */
+class SGridColorCell : public TplCellOp<IGridCellColor>
+{
+    DEF_CELL_TYPE(CELL_TYPE_COLOR)
+	typedef SGridCell __baseCls;
+public:
+    SGridColorCell();
+    virtual ~SGridColorCell();
+
+    // IGridCell interface
+    STDMETHOD_(BOOL, Draw)(THIS_ IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd) OVERRIDE;
+    STDMETHOD_(void, OnClickUp)(THIS_ POINT PointCellRelative) OVERRIDE;
+    STDMETHOD_(void, OnDblClick)(THIS_ POINT PointCellRelative) OVERRIDE;
+
+    // IGridCellColor interface
+    STDMETHOD_(COLORREF, GetColor)() SCONST OVERRIDE { return m_crColor; }
+    STDMETHOD_(void, SetColor)(COLORREF cr) OVERRIDE;
+    STDMETHOD_(LPCTSTR, GetColorFormat)() SCONST OVERRIDE { return m_strFormat; }
+    STDMETHOD_(void, SetColorFormat)(LPCTSTR lpszFormat) OVERRIDE { m_strFormat = lpszFormat; }
+    STDMETHOD_(BOOL, ShowColorPicker)(const RECT* pRect) OVERRIDE;
+
+	STDMETHOD_(void, SetText)(LPCTSTR szText) OVERRIDE;
+    // Additional methods for compatibility
+    SStringT GetColorText() const;
+
+protected:
+    void DrawColorRect(IRenderTarget* pRT, const RECT& rect);
+protected:
+    COLORREF m_crColor;         /**< Current color value */
+    SStringT m_strFormat;       /**< Color format string */
+};
+
+/**
+ * @class SGridDateTimeCell
+ * @brief Date/time picker cell for grid control
+ */
+class SGridDateTimeCell : public TplCellOp<IGridCellDateTime>
+{
+    DEF_CELL_TYPE(CELL_TYPE_DATETIMEPICKER)
+	typedef SGridCell __baseCls;
+public:
+    SGridDateTimeCell();
+    virtual ~SGridDateTimeCell();
+
+    // IGridCell interface
+    STDMETHOD_(BOOL, Draw)(THIS_ IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd) OVERRIDE;
+    STDMETHOD_(void, OnClickUp)(THIS_ POINT PointCellRelative) OVERRIDE;
+    STDMETHOD_(void, OnDblClick)(THIS_ POINT PointCellRelative) OVERRIDE;
+	STDMETHOD_(IGridInplaceWnd *, CreateInplaceWnd)(CTHIS_ int nRow,int nCol) SCONST OVERRIDE;
+    STDMETHOD_(void, SetText)(THIS_ LPCTSTR szText) OVERRIDE;
+
+    // IGridCellDateTime interface
+    STDMETHOD_(void, GetDateTime)(SYSTEMTIME* pSysTime) SCONST OVERRIDE { *pSysTime = m_sysTime; }
+    STDMETHOD_(void, SetDateTime)(const SYSTEMTIME* pSysTime) OVERRIDE;
+    STDMETHOD_(LPCTSTR, GetDateTimeFormat)() SCONST OVERRIDE { return m_strFormat; }
+    STDMETHOD_(void, SetDateTimeFormat)(LPCTSTR lpszFormat) OVERRIDE { m_strFormat = lpszFormat; Invalidate(); }
+    STDMETHOD_(BOOL, IsTimeEnabled)() SCONST OVERRIDE { return m_bTimeEnabled; }
+    STDMETHOD_(void, SetTimeEnabled)(BOOL bEnable) OVERRIDE { m_bTimeEnabled = bEnable; Invalidate(); }
+    STDMETHOD_(BOOL, HasValue)() SCONST OVERRIDE { return m_bHasValue; }
+    STDMETHOD_(void, ClearValue)() OVERRIDE { m_bHasValue = FALSE; Invalidate(); }
+
+    // Additional methods for compatibility
+    SStringT GetDateTimeText() const;
+
+protected:
+    SYSTEMTIME m_sysTime;       /**< Current date/time value */
+    SStringT m_strFormat;       /**< Date/time format string */
+    BOOL m_bTimeEnabled;        /**< Whether time part is enabled */
+    BOOL m_bHasValue;           /**< Whether has valid date/time value */
+};
+
+/**
  * @class SGridCheckBoxCell
  * @brief Checkbox cell implementation
  */
@@ -351,7 +443,7 @@ public:
     STDMETHOD_(IGridInplaceWnd *, CreateInplaceWnd)(CTHIS_ int nRow,int nCol) SCONST OVERRIDE;
 
     // Checkbox specific methods
-    STDMETHOD_(void, SetCheck)(BOOL bChecked) OVERRIDE { m_bChecked = bChecked; }
+    STDMETHOD_(void, SetCheck)(BOOL bChecked) OVERRIDE { m_bChecked = bChecked; Invalidate(); }
     STDMETHOD_(BOOL, GetCheck)() SCONST OVERRIDE { return m_bChecked; }
 protected:
     BOOL m_bChecked;            /**< Checkbox state */
@@ -532,6 +624,7 @@ public:
     virtual BOOL OnDrop(CPoint point, LPCTSTR lpszText);
     BOOL PasteTextToCell(SCellID cell, LPCTSTR lpszText);
     BOOL PasteMultiCellData(SCellID startCell, LPCTSTR lpszData);
+    BOOL PasteMultiCellDataWithTypes(SCellID startCell, LPCTSTR lpszData, LPCTSTR lpszTypes);
     void SplitString(const SStringT& str, LPCTSTR delimiter, SArray<SStringT>& result);
 
     // Row/Column resizing support
@@ -734,6 +827,14 @@ protected:
     virtual SStringT FormatCellsAsText(const SSelRangeMgr& ranges) const;
     virtual BOOL ParseTextIntoCells(LPCTSTR lpszText, const SCellRange& range);
 
+    // Enhanced clipboard operations with cell type support
+    virtual SStringT GetClipboardCellTypes() const;
+    virtual BOOL SetClipboardCellTypes(LPCTSTR lpszTypes);
+    virtual SStringT FormatCellTypesAsText(const SCellRange& range) const;
+    virtual SStringT FormatCellTypesAsText(const SSelRangeMgr& ranges) const;
+    virtual BOOL ParseCellTypesFromText(LPCTSTR lpszTypes, const SCellRange& range);
+    virtual BOOL CheckCellTypeCompatibility(LPCTSTR lpszTypes, const SCellRange& range) const;
+
     // Cell management (implemented methods only)
     void ClearCells();
     int GetFixedColsWidth() const;
@@ -845,7 +946,7 @@ protected:
     CSize m_sizeGrid;               /**< Total grid size */
 
     SArray<SAutoRefPtr<IGridCellFactory> > m_cellFactories; 
-
+    BOOL m_bPainting;               /**< Whether we are currently painting */
 };
 
 SNSEND

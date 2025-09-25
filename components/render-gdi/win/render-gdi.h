@@ -1,4 +1,6 @@
-﻿#pragma once
+﻿#ifndef _SOUI_RENDER_GDI_H_
+#define _SOUI_RENDER_GDI_H_
+
 #include <interface/SRender-i.h>
 
 #include <helper/SColor.h>
@@ -7,7 +9,8 @@
 #include <string/tstring.h>
 #include <string/strcpcvt.h>
 #include <souicoll.h>
-
+#include <helper/SSharedPtr.hpp>
+#include <memory>
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -175,7 +178,7 @@ public:
 
 	STDMETHOD_(void,SetProp)(THIS_ IXmlNode *pXmlNode) OVERRIDE;
 
-	HFONT GetFont(){return m_hFont;}
+	HFONT GetFont() const {return m_hFont;}
 protected:
 	LOGFONT     m_lf;
 	HFONT       m_hFont;
@@ -296,6 +299,134 @@ protected:
 };
 
 //////////////////////////////////////////////////////////////////////////
+//	SPath_GDI
+
+// Path command types for command queue
+enum PathCommandType
+{
+	PATH_CMD_UNKNOWN = 0,
+	PATH_CMD_RESET,
+	PATH_CMD_MOVETO,
+	PATH_CMD_LINETO,
+	PATH_CMD_QUADTO,
+	PATH_CMD_CUBICTO,
+	PATH_CMD_ADDRECT,
+	PATH_CMD_ADDOVAL,
+	PATH_CMD_ADDCIRCLE,
+	PATH_CMD_ADDARC,
+	PATH_CMD_ADDROUNDRECT,
+	PATH_CMD_ADDPOLY,
+	PATH_CMD_ADDSTRING,
+	PATH_CMD_OFFSET,
+	PATH_CMD_TRANSFORM,
+	PATH_CMD_BEGINFIGURE,
+	PATH_CMD_ENDFIGURE,
+	PATH_CMD_CLOSE
+};
+
+// Path command structure
+struct PathCommand
+{
+	PathCommandType type;
+	struct AddPolyData{
+		SArray<POINT> points; BOOL close;
+	};
+	struct AddStringData{
+		SAutoRefPtr<IFontS> stringFont;
+		SStringT stringText;
+		float stringX, stringY;
+	};
+	union {
+		struct { float x, y; } moveTo;
+		struct { float x, y; } lineTo;
+		struct { float x1, y1, x2, y2; } quadTo;
+		struct { float x1, y1, x2, y2, x3, y3; } cubicTo;
+		struct { float left, top, right, bottom; Direction dir; } addRect;
+		struct { float left, top, right, bottom; Direction dir; } addOval;
+		struct { float x, y, radius; Direction dir; } addCircle;
+		struct { float left, top, right, bottom, startAngle, sweepAngle; } addArc;
+		struct { float left, top, right, bottom, rx, ry; Direction dir; } addRoundRect;
+		struct { float dx, dy; } offset;
+		struct { float matrix[9]; } transform;
+		struct { float x, y; BOOL bFill; } beginFigure;
+		struct { BOOL bClose; } endFigure;
+	} data;
+	SSharedPtr<struct AddPolyData> addPoly;
+	SSharedPtr<struct AddStringData> addString;
+	PathCommand() { type = PATH_CMD_UNKNOWN; }
+};
+
+class SPath_GDI: public TGdiRenderObjImpl<IPathS,OT_PATH>
+{
+	friend class SRenderTarget_GDI;
+public:
+	SPath_GDI(IRenderFactory *pRenderFac);
+	~SPath_GDI();
+
+	// IPathS interface implementation
+	STDMETHOD_(FillType,getFillType)(CTHIS) SCONST OVERRIDE;
+	STDMETHOD_(void,setFillType)(THIS_ FillType ft) OVERRIDE;
+	STDMETHOD_(void,reset)(THIS) OVERRIDE;
+	STDMETHOD_(BOOL,isEmpty)(CTHIS) SCONST OVERRIDE;
+	STDMETHOD_(void,getBounds)(CTHIS_ LPRECT prc) SCONST OVERRIDE;
+
+	// Construction methods
+	STDMETHOD_(void,moveTo)(THIS_ float x, float y) OVERRIDE;
+	STDMETHOD_(void,rMoveTo)(THIS_ float dx, float dy) OVERRIDE;
+	STDMETHOD_(void,lineTo)(THIS_ float x, float y) OVERRIDE;
+	STDMETHOD_(void,rLineTo)(THIS_ float dx, float dy) OVERRIDE;
+	STDMETHOD_(void,quadTo)(THIS_ float x1, float y1, float x2, float y2) OVERRIDE;
+	STDMETHOD_(void,rQuadTo)(THIS_ float dx1, float dy1, float dx2, float dy2) OVERRIDE;
+	STDMETHOD_(void,conicTo)(THIS_ float x1, float y1, float x2, float y2, float w) OVERRIDE;
+	STDMETHOD_(void,rConicTo)(THIS_ float dx1, float dy1, float dx2, float dy2, float w) OVERRIDE;
+	STDMETHOD_(void,cubicTo)(THIS_ float x1, float y1, float x2, float y2, float x3, float y3) OVERRIDE;
+	STDMETHOD_(void,rCubicTo)(THIS_ float x1, float y1, float x2, float y2, float x3, float y3) OVERRIDE;
+
+	// Shape methods
+	STDMETHOD_(void,addRect)(THIS_ const RECT *rect, Direction dir) OVERRIDE;
+	STDMETHOD_(void,addRect2)(THIS_ float left, float top, float right, float bottom, Direction dir) OVERRIDE;
+	STDMETHOD_(void,addOval)(THIS_ const RECT *oval, Direction dir) OVERRIDE;
+	STDMETHOD_(void,addOval2)(THIS_ float left, float top, float right, float bottom, Direction dir) OVERRIDE;
+	STDMETHOD_(void,addCircle)(THIS_ float x, float y, float radius, Direction dir) OVERRIDE;
+	STDMETHOD_(void,addArc)(THIS_ const RECT *oval, float startAngle, float sweepAngle) OVERRIDE;
+	STDMETHOD_(void,addArc2)(THIS_ float left, float top, float right, float bottom, float startAngle, float sweepAngle) OVERRIDE;
+	STDMETHOD_(void,addRoundRect)(THIS_ const RECT *rect, float rx, float ry, Direction dir) OVERRIDE;
+	STDMETHOD_(void,addRoundRect2)(THIS_ float left, float top, float right, float bottom, float rx, float ry, Direction dir) OVERRIDE;
+	STDMETHOD_(void,addPoly)(THIS_ const POINT pts[], int count, BOOL close) OVERRIDE;
+
+	// Transform methods
+	STDMETHOD_(void,offset)(THIS_ float dx, float dy) OVERRIDE;
+	STDMETHOD_(void,transform)(THIS_ const IxForm *matrix) OVERRIDE;
+	STDMETHOD_(BOOL,getLastPt)(CTHIS_ fPoint * lastPt) SCONST OVERRIDE;
+
+	// Text and utility methods
+	STDMETHOD_(void,addString)(THIS_ LPCTSTR pszText, int nLen, float x, float y, const IFontS *pFont) OVERRIDE;
+	STDMETHOD_(IPathS *,clone)(CTHIS) SCONST OVERRIDE;
+	STDMETHOD_(BOOL,beginFigure)(THIS_ float x, float y, BOOL bFill) OVERRIDE;
+	STDMETHOD_(BOOL,endFigure)(THIS_ BOOL bClose) OVERRIDE;
+	STDMETHOD_(float,getLength)(CTHIS) SCONST OVERRIDE;
+	STDMETHOD_(BOOL,getPosTan)(CTHIS_ float distance, fPoint *pos, fPoint *vec) SCONST OVERRIDE;
+	STDMETHOD_(void,close)(THIS) OVERRIDE;
+	STDMETHOD_(BOOL,hitTest)(CTHIS_ float x, float y) SCONST OVERRIDE;
+	STDMETHOD_(BOOL,hitTestStroke)(CTHIS_ float x, float y, float strokeSize) SCONST OVERRIDE;
+
+	// Execute all commands on the given HDC
+	void ExecuteCommands(HDC hdc) const;
+	HRGN CreateRegionFromCommands() const;
+
+protected:
+	void AddCommand(const PathCommand& cmd);
+	void UpdateBounds();
+
+	SArray<PathCommand> m_commands; // Command queue
+	FillType m_fillType;           // Current fill type
+	RECT m_bounds;                 // Cached bounds
+	BOOL m_bBoundsValid;           // Whether bounds are valid
+	fPoint m_lastPoint;            // Last point for relative operations
+	BOOL m_bHasLastPoint;          // Whether we have a valid last point
+};
+
+//////////////////////////////////////////////////////////////////////////
 //	SRenderTarget_GDI
 //////////////////////////////////////////////////////////////////////////
 class SRenderTarget_GDI: public TObjRefImpl<IRenderTarget>
@@ -357,6 +488,8 @@ public:
 		POINT pts[2] = {pt1,pt2};
 		return DrawLines(pts,2);
 	}
+	STDMETHOD_(HRESULT,DrawPolygon)(THIS_ LPPOINT pPt,size_t nCount) OVERRIDE;
+	STDMETHOD_(HRESULT,FillPolygon)(THIS_ LPPOINT pPt,size_t nCount) OVERRIDE;
 	STDMETHOD_(HRESULT, DrawGradientRect)(THIS_ LPCRECT pRect,  BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha DEF_VAL(0xFF)) OVERRIDE;
 	STDMETHOD_(HRESULT, DrawGradientRectEx)
 		(THIS_ LPCRECT pRect, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, const GradientInfo *info, BYTE byAlpha DEF_VAL(0xFF)) OVERRIDE;
@@ -414,3 +547,6 @@ namespace RENDER_GDI
 SNSEND
 
 EXTERN_C BOOL SOUI_COM_API Render_Gdi_SCreateInstance(IObjRef ** ppRenderFactory);
+
+
+#endif//_SOUI_RENDER_GDI_H__

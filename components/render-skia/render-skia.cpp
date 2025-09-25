@@ -730,6 +730,61 @@ SNSBEGIN
 		return S_OK;
 	}
 
+	HRESULT SRenderTarget_Skia::DrawPolygon(LPPOINT pPt,size_t nCount)
+	{
+		if(!pPt || nCount < 3) return E_INVALIDARG;
+
+		SkPath path;
+		path.moveTo((SkScalar)pPt[0].x + m_ptOrg.fX, (SkScalar)pPt[0].y + m_ptOrg.fY);
+		for(size_t i = 1; i < nCount; i++)
+		{
+			path.lineTo((SkScalar)pPt[i].x + m_ptOrg.fX, (SkScalar)pPt[i].y + m_ptOrg.fY);
+		}
+		path.close();
+
+		SkPaint paint = m_paint;
+		if(m_bAntiAlias)
+		{
+			SkScalar wid = (SkScalar)m_curPen->GetWidth();
+			if(wid > 1.0f) wid -= 0.5f;
+			paint.setStrokeWidth(wid);
+		}
+		else
+		{
+			paint.setStrokeWidth((SkScalar)m_curPen->GetWidth());
+		}
+
+		paint.setColor(SColor(m_curPen->GetColor()).toARGB());
+		SLineDashEffect skDash(m_curPen->GetStyle());
+		paint.setPathEffect(skDash.Get());
+		SStrokeCap strokeCap(m_curPen->GetStyle());
+		paint.setStrokeCap(strokeCap.Get());
+		SStrokeJoin strokeJoin(m_curPen->GetStyle());
+		paint.setStrokeJoin(strokeJoin.Get());
+		paint.setStyle(SkPaint::kStroke_Style);
+
+		m_SkCanvas->drawPath(path, paint);
+		return S_OK;
+	}
+
+	HRESULT SRenderTarget_Skia::FillPolygon(LPPOINT pPt,size_t nCount)
+	{
+		if(!pPt || nCount < 3) return E_INVALIDARG;
+
+		SkPath path;
+		path.moveTo((SkScalar)pPt[0].x + m_ptOrg.fX, (SkScalar)pPt[0].y + m_ptOrg.fY);
+		for(size_t i = 1; i < nCount; i++)
+		{
+			path.lineTo((SkScalar)pPt[i].x + m_ptOrg.fX, (SkScalar)pPt[i].y + m_ptOrg.fY);
+		}
+		path.close();
+		SkRect rcPath = path.getBounds();
+		SkPaint paint = m_paint;
+		m_curBrush->InitPaint(paint,rcPath);
+		m_SkCanvas->drawPath(path, paint);
+		return S_OK;
+	}
+
 	HRESULT SRenderTarget_Skia::TextOut( int x, int y, LPCTSTR lpszString, int nCount)
 	{
 		if(nCount<0) nCount= (int)_tcslen(lpszString);

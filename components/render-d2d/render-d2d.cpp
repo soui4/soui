@@ -1583,6 +1583,57 @@ SNSBEGIN
 		return S_OK;
 	}
 
+	HRESULT SRenderTarget_D2D::DrawPolygon(LPPOINT pts,size_t nCount)
+	{
+		if(!pts || nCount < 3) return E_INVALIDARG;
+
+		SComPtr<ID2D1PathGeometry> path;
+		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
+		fac->CreatePathGeometry(&path);
+		SComPtr<ID2D1GeometrySink> sink;
+		path->Open(&sink);
+		sink->BeginFigure(Point2F(pts[0].x,pts[0].y),D2D1_FIGURE_BEGIN_HOLLOW);
+		for(size_t i=1; i<nCount; i++)
+		{
+			sink->AddLine(Point2F(pts[i].x,pts[i].y));
+		}
+		sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+		sink->Close();
+
+		SPen_D2D *pen=m_curPen;
+		m_rt->DrawGeometry(path,pen->GetColorBrush(m_rt),pen->GetWidth(),pen->GetStrokeStyle());
+		return S_OK;
+	}
+
+	HRESULT SRenderTarget_D2D::FillPolygon(LPPOINT pts,size_t nCount)
+	{
+		if(!pts || nCount < 3) return E_INVALIDARG;
+
+		SComPtr<ID2D1PathGeometry> path;
+		ID2D1Factory *fac = toD2DFac(m_pRenderFactory);
+		fac->CreatePathGeometry(&path);
+		SComPtr<ID2D1GeometrySink> sink;
+		path->Open(&sink);
+		sink->BeginFigure(Point2F(pts[0].x,pts[0].y),D2D1_FIGURE_BEGIN_FILLED);
+		for(size_t i=1; i<nCount; i++)
+		{
+			sink->AddLine(Point2F(pts[i].x,pts[i].y));
+		}
+		sink->EndFigure(D2D1_FIGURE_END_CLOSED);
+		sink->Close();
+
+		D2D1_RECT_F rcBox;
+		path->GetBounds(NULL,&rcBox);
+		RECT rcBox2;
+		rcBox2.left = rcBox.left;
+		rcBox2.top = rcBox.top;
+		rcBox2.right = rcBox.right;
+		rcBox2.bottom = rcBox.bottom;
+		SComPtr<ID2D1Brush> br = m_curBrush->toBrush(m_rt,&rcBox2);
+		m_rt->FillGeometry(path,br);
+		return S_OK;
+	}
+
 	HRESULT SRenderTarget_D2D::TextOut( int x, int y, LPCTSTR lpszString, int nCount)
 	{
 		if(nCount<0) nCount = (int)_tcslen(lpszString);
