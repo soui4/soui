@@ -1,4 +1,4 @@
-// render-gdi.cpp : Defines the exported functions for the DLL application.
+﻿// render-gdi.cpp : Defines the exported functions for the DLL application.
 //
 
 #include "render-gdi.h"
