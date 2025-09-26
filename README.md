@@ -2,7 +2,6 @@
 <img align="center" width=200 src="./doc/logo.png" />
 </div>
 
-
 <div align= "center">
  <h1>SOUI 4</h1>
 
@@ -31,98 +30,88 @@ This README is available in the following languages:
 - [English Version (README.md)](README.md)
 - [Chinese Version (README.zh-CN.md)](README.zh-CN.md)
 
-SOUI4 is a lightweight Windows client development framework that has been continuously developed and maintained for **14 years**,
-(The core compiled size is about 1M),
-The framework design absorbs the characteristics of popular frameworks such as `WTL`, `Android`, `QT`, and `Flash`,
-The UI presentation is based on `xml` configuration, with efficient performance (you can choose GDI or [Skia](https://www.oschina.net/p/skia) rendering),
-Rich controls and flexible extensions (can use xml + lua + js), truly separating the UI interface from logic.
+---
 
-Click [SOUI](https://www.soui.com.cn) to visit the official website.
+## Guide
 
-## **Basic demo interface** 
+SOUI4 is a lightweight Windows client development framework, continuously developed and maintained for **14 years**. The compiled core is about 1MB. The framework design draws inspiration from popular frameworks such as WTL, Android, QT, and Flash. UI presentation is based on XML configuration, with high performance (choose GDI or [Skia](https://www.oschina.net/p/skia) rendering), rich controls, and flexible extension (supports xml + lua + js), truly separating UI and logic.
+
+Visit the [SOUI Official Website](https://www.soui.com.cn).
+
+## Demo Screenshots
 ![demo1](./doc/demo_png/souidemo1.png)
 ![demo2](./doc/demo_png/souidemo2.png)
 
-If you are new to this library, you can download the automatically statically compiled [demo.exe](https://github.com/soui4/soui/actions) for a fresh experience (no need to download source code and other dependencies, download and run directly)
-Specific method
+If you are new to SOUI, you can download the statically compiled [demo.exe](https://github.com/soui4/soui/actions) for a quick try (no need for source code or dependencies, just download and run).
+
 [![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
 
-```
-1. Click the icon above to enter the page
-2. Click any link behind the green circle to enter
-3. Pull down the interface and find the `Artifacts` column
-4. Click `PC_Demo` in the column to download, decompress and run.
-```
-If you want to compile more interface cases yourself, please pull the DEMO repository:
+Steps:
+1. Click the badge above to enter the page
+2. Click any link after the green circle
+3. Scroll down to find the `Artifacts` section
+4. Download and extract `PC_Demo` to run
 
+For more demo cases, visit the DEMO repository:
 - https://github.com/soui4-demo
+Each demo is in a separate repository, clone as needed.
 
-Each Demo has a separate repository, just clone them separately.
+## Getting Started
 
-## **Getting Started** 
+SOUI requires basic knowledge of C++ and Win32. Please ensure you are familiar with these skills.
+For more details, see the [official documentation](http://doc.soui.com.cn/).
 
-Using SOUI requires a certain foundation in c++ and win32, please make sure you have mastered the above skills.
+### Git Repositories
+- [GitHub](https://github.com/soui4/soui)
+- [Gitee](https://gitee.com/setoutsoft/soui4)
+- [GitCode](https://gitcode.com/setoutsoft/soui4)
 
-In addition to the instructions on this page, you can also view more detailed [official documentation](https://2926295173.github.io/SoUIDocs/)
+### [Build Instructions](./doc/build.md)
 
-### Git download address
+[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml)
 
-- [Foreign Git download site](https://github.com/soui4/soui)
+Use CMake to generate Visual Studio projects, then compile. All configuration is managed in CMake. For details, see [build documentation](./doc/build.md).
 
-- [Domestic Gitee](https://gitee.com/setoutsoft/soui4)
-
-- [Domestic gitcode](https://gitcode.com/setoutsoft/soui4)
-
-### [Compile](./doc/build.md)
-
-[![CMake Build](https://github.com/soui4/soui/actions/workflows/build.yml/badge.svg)](https://github.com/soui4/soui/actions/workflows/build.yml).
-
-Use cmake to generate the corresponding version of the VS project and then compile, modify the configuration uniformly in cmake. For specific compilation methods, see the attached [compilation documentation](./doc/build.md)
-
-### UI visual design
-
-The latest version of souieditor has been integrated into the demos in this code base. Select to compile demo to get souieditor.
+### UI Visual Designer
+The latest souieditor is integrated in the demos folder. Build the demo to get souieditor.
 
 ### SOUI4JS
-- `SOUI4 JavaScript export version, a framework that implements client program development using js, perfectly solving the contradiction between performance and flexibility`, repository address(https://github.com/soui4/soui4js)
-- Currently supports windows, linux and macos platforms.
+- JavaScript export version for client development. Repository: [soui4js](https://github.com/soui4/soui4js)
+- Supports Windows, Linux, macOS.
 
 ### SOUI4PY
-- `SOUI4 Python3 version, a framework that implements client program development using python3, perfectly solving the contradiction between performance and flexibility`, repository address(https://gitee.com/setoutsoft/soui4py)
-- Currently supports windows， linux and macOs platforms.
+- Python3 version for client development. Repository: [soui4py](https://gitee.com/setoutsoft/soui4py)
+- Supports Windows, Linux, macOS.
 
-### SOUI Tutorial
+### Tutorials
+- Latest [Online Tutorial](http://doc.soui.com.cn) (most complete, updated regularly)
+- [Tutorial Source Code](https://gitee.com/setoutsoft/soui-docs) (host locally with http server)
+- Author's [Blog](http://www.cnblogs.com/setoutsoft/)
+- Author's Bilibili [Video Tutorials](https://space.bilibili.com/110611388)
 
-- Latest [Tutorial](https://gitee.com/setoutsoft/soui-docs), set up an http server locally to view the tutorial locally. If you find any problems with the tutorial, please feel free to submit an issue.
-- Author's [Blog](http://www.cnblogs.com/setoutsoft/), which will help you master how to quickly develop Window desktop applications using SOUI
-- Author's Bilibili [Video Tutorial](https://space.bilibili.com/110611388)
+## QQ Groups
+- SOUI Discussion #1: [Join](http://shang.qq.com/wpa/qunwpa?idkey=9653a811a72365d798a5247d6ba6885a568bdcf51c624f906c8ce7b8fd9e4eda)
+- SOUI Discussion #2: [Join](http://shang.qq.com/wpa/qunwpa?idkey=03d3294a2551beb1b54b4012086cec14b3f66d5c253debaeed241d9c623966e0)
 
-## **QQ Group** 
+## Build Instructions
+### Windows
+- Use CMake to generate project files, open with Visual Studio, and compile
+- Or use mingw32/64: `mkdir build && cd build && cmake .. && make -j8`
 
-- SOUI Discussion #1: [Click to join](http://shang.qq.com/wpa/qunwpa?idkey=9653a811a72365d798a5247d6ba6885a568bdcf51c624f906c8ce7b8fd9e4eda)
+### Linux
+- Pull submodule swinx: `git submodule update --init`
+- Install dependencies: `sudo apt install cmake git build-essential gdb libxcb1-dev libgl1-mesa-dev freeglut3-dev`
+- Build: `mkdir build && cd build && cmake .. && make -j8`
 
-- SOUI Discussion #2: [Click to join](http://shang.qq.com/wpa/qunwpa?idkey=03d3294a2551beb1b54b4012086cec14b3f66d5c253debaeed241d9c623966e0)
+### macOS
+- Pull submodule swinx: `git submodule update --init`
+- Install Homebrew ([China mirror](https://gitee.com/cunkai/HomebrewCN) recommended)
+- Install homebrew-core and homebrew-cask: `brew tap homebrew/core && brew tap homebrew/cask`
+- Install tools and dependencies: `brew install cmake ninja pkgconf glfw3 glew`
+- Build: `mkdir build && cd build && cmake .. -G Ninja && ninja -j8`
 
-## **Compile**
-### **Windows Compile**
-- Directly use cmake to generate project files, then use Visual Studio to open the project file and compile.
-- Compile using mingw32/64: mkdir build && cd build && cmake .. && make -j8
+## Contributors
+See [contributors.md](./contributors.md)
 
-### **Linux Compile** 
-- Pull submodule swinx: git submodule update --init
-- Install dependencies: sudo apt install cmake git build-essential gdb libxcb1-dev libgl1-mesa-dev freeglut3-dev
-- Compile: mkdir build && cd build && cmake .. && make -j8
-
-### **macos Compile**
-- Pull submodule swinx: git submodule update --init
-- Install brew, domestic users are advised to use [Chinese mirror](https://gitee.com/cunkai/HomebrewCN)
-- Install homebrew-core and homebrew-cask: brew tap homebrew/core && brew tap homebrew/cask
-- Install compilation tools and dependencies: brew install cmake ninja pkgconf glfw3 glew
-- Compile: mkdir build && cd build && cmake .. -G Ninja && ninja -j8
-
-## **Contributor List**
-See [Contributor List](./contributors.md)
-
-## **LICENSE** 
-
-Please refer to [`license.txt`](./license.txt) document
+## License
+See [`license.txt`](./license.txt)

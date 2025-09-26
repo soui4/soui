@@ -67,7 +67,7 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 使用SOUI需要一定的c++与win32的基础，请您确保您掌握了上述技能。
 
-除本页说明外，您还可以查看更详细的[官方文档](https://2926295173.github.io/SoUIDocs/)
+除本页说明外，您还可以查看更详细的[官方文档](http://doc.soui.com.cn/)
 
 ### Git下载地址
 
@@ -95,7 +95,8 @@ UI展示基于`xml`配置，性能高效（可选择GDI或[Skia](https://www.osc
 
 ### SOUI教程
 
-- 最新[教程](https://gitee.com/setoutsoft/soui-docs) ，自己在本地搭建http服务器,本地查看教程。发现教程有问题，欢迎随时提issue。
+- 最新[教程](http://doc.soui.com.cn) ，目前最完整的SOUI在线教程，不断更新，请持续关注。
+- 最新[教程源代码](https://gitee.com/setoutsoft/soui-docs) ，自己在本地搭建http服务器,本地查看教程。发现教程有问题，欢迎随时提issue。
 - 作者[博客](http://www.cnblogs.com/setoutsoft/)，能让你更快掌握如何使用SOUI快速开发Window桌面应用
 - 作者录制的b站[视频教程](https://space.bilibili.com/110611388)
 
