@@ -12,29 +12,9 @@ SNSBEGIN
 void Log::DefCallback(const char *tag, const char *pLogStr, int level, const char *file, int line, const char *fun, void *retAddr)
 {
     ILogMgr *pLogMgr = GETLOGMGR();
-    BOOL bLog = false;
     if (pLogMgr && pLogMgr->prePushLog(level))
     {
-        bLog = pLogMgr->pushLog(level, tag, pLogStr, file, line, fun, retAddr);
-    }
-    if (!bLog || Log::s_enableEcho)
-    {
-        SYSTEMTIME wtm;
-        GetLocalTime(&wtm);
-        const int kMaxLog = Log::MAX_LOGLEN + 100;
-        char *logbuf2 = (char *)malloc(kMaxLog + 1);
-        tid_t tid = GetCurrentThreadId();
-#ifdef _WIN32
-        int nLen = _snprintf(logbuf2, kMaxLog, "tid=%u,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, tag, pLogStr, fun, file, line);
-#else
-        int nLen = _snprintf(logbuf2, kMaxLog, "tid=%ld,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, tag, pLogStr, fun, file, line);
-#endif //_WIN32
-        if (nLen > 0)
-        {
-            logbuf2[nLen] = 0;
-            OutputDebugStringA(logbuf2);
-        }
-        free(logbuf2);
+        pLogMgr->pushLog(level, tag, pLogStr, file, line, fun, retAddr);
     }
 }
 
@@ -64,13 +44,18 @@ Log::~Log()
     {
         gs_logCallback(m_tag, m_logBuf, m_level, m_file, m_line, m_func, m_pAddr);
     }
-    else if (s_enableEcho)
+    if (s_enableEcho)
     {
         SYSTEMTIME wtm;
         GetLocalTime(&wtm);
         const int kMaxLog = Log::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);
-        int nLen = _snprintf(logbuf2, kMaxLog, "%s, %04d-%02d-%02d %02d:%02d:%02d %03dms %s %s %s:%d\n", m_tag, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_logBuf, m_func, m_file, m_line);
+        tid_t tid = GetCurrentThreadId();
+#ifdef _WIN32
+        int nLen = _snprintf(logbuf2, kMaxLog, "tid=%u,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
+#else
+        int nLen = _snprintf(logbuf2, kMaxLog, "tid=%ld,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
+#endif //_WIN32
         if (nLen > 0)
         {
             logbuf2[nLen] = 0;
