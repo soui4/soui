@@ -327,7 +327,7 @@ SStringT STime::Format(LPCTSTR pszFormat) const
     TCHAR szBuffer[kMaxTimeBufferSize];
 
     struct tm *tmTemp = localtime(&m_time);
-    if (tmTemp || !_tcsftime(szBuffer, kMaxTimeBufferSize, pszFormat, tmTemp))
+    if (!tmTemp || !_tcsftime(szBuffer, kMaxTimeBufferSize, pszFormat, tmTemp))
     {
         szBuffer[0] = '\0';
     }
