@@ -37,7 +37,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 #ifdef _WIN32
     cfg.SetSysResPeFile(SYS_NAMED_RESOURCE);
 #else
-    cfg.SetSysResZipFile(srcDir+_T("data/soui-sys-resource.zip"));
+    cfg.SetSysResZip(srcDir+_T("data/soui-sys-resource.zip"));
 #endif //_WIN32
 #if !defined(_WIN32) || defined(_DEBUG)
     cfg.SetAppResFile(srcDir+_T("data/uires"));

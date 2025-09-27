@@ -44,7 +44,7 @@ foreach(line IN LISTS ver_h_contents)
 endforeach()
 
 message(STATUS "SOUI_VER: ${SOUI_VER1}.${SOUI_VER2}.${SOUI_VER3}.${SOUI_VER4}")
-
+message(STATUS "install prefix=${CMAKE_INSTALL_PREFIX}")
 set(CMAKE_CONFIGURATION_TYPES Debug Release)
 if(NOT CMAKE_BUILD_TYPE)
 set(CMAKE_BUILD_TYPE "Release")
@@ -194,23 +194,14 @@ if(BUILD_DEMOS)
 add_subdirectory(demos)
 endif(BUILD_DEMOS)
 
-
-if (UNIX OR MINGW)
-set(SWINX_LIB_FLAGS "swinx")
-set(SWINX_CFLAGS "\$\{includedir\}/swinx/include")
-
-# Generate and install pkgconfig.
-configure_file("${PROJECT_SOURCE_DIR}/__cmake/libsoui.pc.in" "${PROJECT_BINARY_DIR}/libsoui.pc" @ONLY)
-
-install(FILES "${PROJECT_BINARY_DIR}/libsoui.pc"
-        DESTINATION ${CMAKE_INSTALL_LIBDIR}/pkgconfig
-        COMPONENT pkgconfig)
-else()
+if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
+set(SWINX_LIBS swinx)
+set(SWINX_CFLAGS swinx/include)
+endif()
 configure_file("${PROJECT_SOURCE_DIR}/__cmake/soui-config.cmake.in" "${PROJECT_BINARY_DIR}/soui-config.cmake" @ONLY)
-
 install(FILES "${PROJECT_BINARY_DIR}/soui-config.cmake"
         DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
-endif(UNIX OR MINGW)
+
 
 # Install cmake files
 install(DIRECTORY ${PROJECT_SOURCE_DIR}/__cmake

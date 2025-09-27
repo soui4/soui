@@ -3,7 +3,7 @@
 
 #include "stdafx.h"
 #include "tinyxml/tinyxml.h"
-
+#include <algorithm>
 #ifndef _WIN32
 #define swprintf_s swprintf
 #endif//_WIN32
@@ -673,6 +673,7 @@ int _tmain(int argc, TCHAR* argv[])
                 {
                     if(!strSkinPath.empty()){ strPath=strSkinPath+"\\"+pszPath;}
                     else strPath=pszPath;
+					std::replace(strPath.begin(),strPath.end(),'\\','/');
                     MultiByteToWideChar(CP_UTF8,0,strPath.c_str(),strPath.length(),rec.szPath,MAX_PATH);
                 }
 
@@ -713,7 +714,11 @@ int _tmain(int argc, TCHAR* argv[])
 		{
 			WCHAR szRec[2000];
 			wstring strPath=BuildPath(it2->szPath);
+			#ifdef _WIN32
 			swprintf_s(szRec,2000,L"DEFINE_UIRES(%s,\t%s,\t\"%s\")\n",it2->szName,it2->szType,strPath.c_str());
+			#else
+			swprintf_s(szRec,2000,L"DEFINE_UIRES(%ls,\t%ls,\t\"%ls\")\n",it2->szName,it2->szType,strPath.c_str());	
+			#endif//_WIN32
 			strOut+=szRec;
 			it2++;
 		}
@@ -771,40 +776,69 @@ int _tmain(int argc, TCHAR* argv[])
 			WCHAR szName[200]={0},szBuf[2000] = { 0 };
 			MakeNameValid(it->first.c_str(),szName);
             			
+			#ifdef _WIN32
 			swprintf_s(szBuf,2000,L"\t\t const wchar_t * %s;\r\n",szName);
 			strNameStruct += szBuf;			
 			swprintf_s(szBuf,2000, L"\t\tint %s;\r\n", szName);
 			strIdStruct += szBuf;
-			
+			#else
+			swprintf_s(szBuf,2000,L"\t\t const wchar_t * %ls;\r\n",szName);
+			strNameStruct += szBuf;			
+			swprintf_s(szBuf,2000, L"\t\tint %ls;\r\n", szName);
+			strIdStruct += szBuf;
+			#endif//_WIN32
 			if(idx == nNames-1)
 			{
+				#ifdef _WIN32
 				swprintf_s(szBuf,2000,L"\t\tL\"%s\"\r\n",it->first.c_str());
+				#else
+				swprintf_s(szBuf,2000,L"\t\tL\"%ls\"\r\n",it->first.c_str());
+				#endif//_WIN32
 				strNameData += szBuf;
 				swprintf_s(szBuf,2000, L"\t\t%d\r\n",it->second);
 				strIdData += szBuf;
 
+				#ifdef _WIN32
 				swprintf_s(szBuf,2000,L"\t\t%s:\"%s\"\r\n",it->first.c_str(),it->first.c_str());
 				strJsName += szBuf;
 				swprintf_s(szBuf, 2000,L"\t\t%s:%d\r\n",it->first.c_str(),it->second);
 				strJsId += szBuf;
-
 				swprintf_s(szBuf,2000,L"\t\t\"%s\"\r\n",it->first.c_str());
+				#else
+				swprintf_s(szBuf,2000,L"\t\t%ls:\"%ls\"\r\n",it->first.c_str(),it->first.c_str());
+				strJsName += szBuf;
+				swprintf_s(szBuf, 2000,L"\t\t%ls:%d\r\n",it->first.c_str(),it->second);
+				strJsId += szBuf;
+				swprintf_s(szBuf,2000,L"\t\t\"%ls\"\r\n",it->first.c_str());
+				#endif
+
 				arrJsName += szBuf;
 				swprintf_s(szBuf, 2000,L"\t\t%d\r\n",it->second);
 				arrJsId += szBuf;
 			}
 			else{
+				#ifdef _WIN32
 				swprintf_s(szBuf,2000,L"\t\tL\"%s\",\r\n",it->first.c_str());
+				#else
+				swprintf_s(szBuf,2000,L"\t\tL\"%ls\",\r\n",it->first.c_str());
+				#endif//_WIN32
 				strNameData += szBuf;
 				swprintf_s(szBuf,2000, L"\t\t%d,\r\n",it->second);
 				strIdData += szBuf;
 
+				#ifdef _WIN32
 				swprintf_s(szBuf,2000,L"\t\t%s:\"%s\",\r\n",it->first.c_str(),it->first.c_str());
 				strJsName += szBuf;
 				swprintf_s(szBuf, 2000,L"\t\t%s:%d,\r\n",it->first.c_str(),it->second);
 				strJsId += szBuf;
-
 				swprintf_s(szBuf,2000,L"\t\t\"%s\",\r\n",it->first.c_str());
+				#else
+				swprintf_s(szBuf,2000,L"\t\t%ls:\"%ls\",\r\n",it->first.c_str(),it->first.c_str());
+				strJsName += szBuf;
+				swprintf_s(szBuf, 2000,L"\t\t%ls:%d,\r\n",it->first.c_str(),it->second);
+				strJsId += szBuf;
+				swprintf_s(szBuf,2000,L"\t\t\"%ls\",\r\n",it->first.c_str());
+				#endif//_WIN32
 				arrJsName += szBuf;
 				swprintf_s(szBuf,2000, L"\t\t%d,\r\n",it->second);
 				arrJsId += szBuf;
@@ -835,7 +869,11 @@ int _tmain(int argc, TCHAR* argv[])
             {
                 WCHAR szName[200],szBuf[2000] = { 0 };
                 MakeNameValid(it->first.c_str(),szName);
+				#ifdef _WIN32
                 swprintf_s(szBuf, 2000,L"\t\tint %s;\r\n", szName);
+				#else
+                swprintf_s(szBuf, 2000,L"\t\tint %ls;\r\n", szName);
+				#endif//_WIN32
                 strStringStruct += szBuf;
 
 				if(idx == nStrings-1)
@@ -861,7 +899,11 @@ int _tmain(int argc, TCHAR* argv[])
             {
                 WCHAR szName[200],szBuf[2000] = { 0 };
                 MakeNameValid(it->first.c_str(),szName);
+				#ifdef _WIN32
                 swprintf_s(szBuf,2000, L"\t\tint %s;\r\n", szName);
+				#else
+				swprintf_s(szBuf,2000, L"\t\tint %ls;\r\n", szName);
+				#endif//_WIN32
                 strColorStruct += szBuf;
 				if(idx == nColors-1)
 					swprintf_s(szBuf, 2000,L"\t\t%d\r\n", idx);

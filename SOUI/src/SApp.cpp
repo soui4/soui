@@ -164,12 +164,9 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SCaption>();
     objFactory->TplRegisterFactory<SMenuBar>();
     objFactory->TplRegisterFactory<SSwitch>();
-    #if defined(_WIN32) && !defined(__MINGW32__)
+#if defined(_WIN32) && !defined(__MINGW32__)
     objFactory->TplRegisterFactory<SActiveX>();
-    #endif //_WIN32
-    #ifdef SOUI_BUILD_EXCTRL
-    objFactory->TplRegisterFactory<SGridCtrl>();
-    #endif//SOUI_BUILD_EXCTRL
+#endif //_WIN32
 }
 
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
