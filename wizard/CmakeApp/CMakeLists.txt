@@ -32,7 +32,7 @@ if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-D_DEBUG)
 endif()
 
-include(${SOUI_INSTALL_DIR}/lib/pkgconfig/soui-config.cmake)
+include(${SOUI_INSTALL_DIR}/__cmake/soui-config.cmake)
 
 
 message(STATUS "SOUI_INCLUDE_DIRS: ${SOUI_INCLUDE_DIRS}")

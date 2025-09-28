@@ -200,7 +200,7 @@ set(SWINX_CFLAGS swinx/include)
 endif()
 configure_file("${PROJECT_SOURCE_DIR}/__cmake/soui-config.cmake.in" "${PROJECT_BINARY_DIR}/soui-config.cmake" @ONLY)
 install(FILES "${PROJECT_BINARY_DIR}/soui-config.cmake"
-        DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/pkgconfig)
+        DESTINATION ${CMAKE_INSTALL_PREFIX}/__cmake)
 
 
 # Install cmake files
