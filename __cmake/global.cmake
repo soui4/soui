@@ -207,6 +207,57 @@ if(APPLE)
 endif(APPLE)
 endmacro()
 
+# 宏：复制资源目录中的所有文件到目标目录，并能检测文件变化
+# 参数：
+#   app_name - 应用程序目标名称
+#   res_path - 资源目录路径
+#   dest_path - 目标目录路径
+macro(add_app_res_folder_with_deps app_name res_path dest_path)
+    file(GLOB_RECURSE RES_FILES ${res_path}/*)
+    
+    # 创建目标目录
+    add_custom_command(TARGET ${app_name} POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E make_directory
+            "$<TARGET_FILE_DIR:${app_name}>/${dest_path}"
+        COMMENT "Creating directory ${dest_path}"
+    )
+    
+    # 为每个资源文件创建复制命令
+    foreach(res_file ${RES_FILES})
+        file(RELATIVE_PATH relative_file "${res_path}" "${res_file}")
+        get_filename_component(relative_dir ${relative_file} DIRECTORY)
+        
+        add_custom_command(TARGET ${app_name} POST_BUILD
+            COMMAND ${CMAKE_COMMAND} -E make_directory
+                "$<TARGET_FILE_DIR:${app_name}>/${dest_path}/${relative_dir}"
+            COMMAND ${CMAKE_COMMAND} -E copy_if_different
+                "${res_file}"
+                "$<TARGET_FILE_DIR:${app_name}>/${dest_path}/${relative_dir}"
+            DEPENDS ${res_file}
+            COMMENT "Copying ${relative_file}"
+        )
+    endforeach()
+endmacro()
+
+# 添加macOS资源文件夹，能检测文件变化, app为可执行文件名, res_path为资源路径, res_name为资源名
+macro(add_macos_res_folder_with_deps app res_path res_name)
+if (APPLE)
+    # 添加整个文件夹作为资源
+    file(GLOB_RECURSE DATA_FILES ${res_path}/*)
+    foreach(file ${DATA_FILES})
+        #message(STATUS "add resource ${file}")
+        target_sources(${app} PRIVATE ${file})
+        file(RELATIVE_PATH relative_file "${res_path}" "${file}")
+        get_filename_component(relative_dir ${relative_file} DIRECTORY)
+        set_source_files_properties(${file} PROPERTIES MACOSX_PACKAGE_LOCATION Resources/${res_name}/${relative_dir})
+        # 添加对文件的依赖，确保文件变化时重新构建
+        set_source_files_properties(${file} PROPERTIES 
+            OBJECT_DEPENDS ${file})
+    endforeach()
+
+endif(APPLE)
+endmacro()
+
 # 宏：从目标列表复制dylib到bundle（自动检测目标文件）
 # 参数：
 #   app_name - 应用程序目标名称

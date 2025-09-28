@@ -76,7 +76,7 @@ set(UIRES_RES_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/res/resource.h)
 add_custom_command(
     OUTPUT ${UIRES_RES_HEADER}
     COMMAND ${RESBUILD_EXE} -i ${CMAKE_CURRENT_SOURCE_DIR}/uires/uires.idx -p ${CMAKE_CURRENT_SOURCE_DIR}/uires -r ${CMAKE_CURRENT_SOURCE_DIR}/res/soui_res.rc2 -h ${CMAKE_CURRENT_SOURCE_DIR}/res/resource.h idtable
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/uires/uires.idx
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/uires/uires.idx ${CURRENT_SOUIS}
     COMMENT "Processing uires.idx to generate soui_res.rc2"
     VERBATIM
 )
@@ -85,7 +85,7 @@ add_custom_command(
 set_source_files_properties(${UIRES_RES_HEADER} PROPERTIES GENERATED TRUE)
 
 add_soui_exe(${project_name} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${UIRES_RES_HEADER} ${CURRENT_RC})
-	if(CMAKE_SYSTEM_NAME MATCHES Darwin)
+if(CMAKE_SYSTEM_NAME MATCHES Darwin)
 	set(MACOSX_BUNDLE_HIGH_RESOLUTION_CAPABLE "true")
 	set(MACOSX_BUNDLE_GUI_IDENTIFIER "com.soui.app")
 	set(MACOSX_BUNDLE_BUNDLE_NAME "soui5_app")
@@ -105,11 +105,12 @@ add_soui_exe(${project_name} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_
 
 	add_macos_res_file(${project_name} ${SOUI_ROOT}/resources/soui-sys-resource.zip data) 
 	add_macos_res_file(${project_name} ${SOUI_ROOT}/resources/simsun.ttc fonts) 
-	add_macos_res_folder(${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/uires data/uires)
+	add_macos_res_folder_with_deps(${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/uires data/uires)
 	set_macos_icon(${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/res/soui-app.icns ${SOUI_ROOT}/__cmake/plist.in)
 else()
-	# add UI resources folder (shared for all configs)
-	add_app_res_folder(${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/uires data/uires)
+	# add UI resources folder
+	add_app_res_folder_with_deps(${project_name} ${CMAKE_CURRENT_SOURCE_DIR}/uires data/uires)
+	
 	file(GLOB_RECURSE SOUI_RES ${SOUI_ROOT}/resources/*.*)
 	add_app_res_files(${project_name} "${SOUI_RES}" data)
 
