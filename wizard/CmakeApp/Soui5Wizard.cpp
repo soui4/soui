@@ -16,7 +16,7 @@ static SStringT getResourceDir()
 #ifdef __APPLE__
     char szBunblePath[1024];
     GetAppleBundlePath(szBunblePath, sizeof(szBunblePath));
-    return S_CA2T(szBunblePath) + _T("/Contents/Resources");
+    return S_CA2T(szBunblePath) + _T("/Contents/Resources/");
 #else
     TCHAR szModule[MAX_PATH];
     ::GetModuleFileName(NULL, szModule, MAX_PATH);
@@ -54,7 +54,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         return -1;
     }
 #ifndef _WIN32
-    AddFontResource("fonts/simsun.ttc");
+    AddFontResource(srcDir+"fonts/simsun.ttc");
 #endif //_WIN32
 
     // 如果需要在代码中使用R::id::namedid这种方式来使用控件必须要这一行代码：2016年2月2日，R::id,R.name是由uiresbuilder

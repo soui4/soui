@@ -24,7 +24,7 @@ int _tmain(int argc, TCHAR* argv[])
 
     _tprintf(_T("%s\n"),GetCommandLine());
 
-    while ((c = getopt(argc, argv, _T("p:s:i:b:c:"))) != EOF || optarg!=NULL)
+    while ((c = xgetopt(argc, argv, _T("p:s:i:b:c:"))) != EOF || optarg!=NULL)
     {
         switch (c)
         {

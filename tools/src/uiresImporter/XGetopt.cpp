@@ -39,7 +39,6 @@
 
 #include "XGetopt.h"
 
-#ifdef _WIN32
 ///////////////////////////////////////////////////////////////////////////////
 //
 //  X G e t o p t . c p p
@@ -155,7 +154,7 @@
 TCHAR	*optarg;		// global argument pointer
 int		optind = 0; 	// global argv index
 
-int getopt(int argc, TCHAR *argv[], const TCHAR *optstring)
+int xgetopt(int argc, TCHAR *argv[], const TCHAR *optstring)
 {
 	static TCHAR *next = NULL;
 	if (optind == 0)
@@ -217,5 +216,3 @@ int getopt(int argc, TCHAR *argv[], const TCHAR *optstring)
 
 	return c;
 }
-
-#endif//_WIN32

@@ -56,7 +56,7 @@ int _tmain(int argc, TCHAR* argv[]){
 	tstring strInput;	//皮肤路径,相对于程序的.rc文件
 	tstring strOutput;
 	tstring strFilter = _T("*.*");
-	while ((c = getopt(argc, argv, _T("i:o:f:"))) != EOF)
+	while ((c = xgetopt(argc, argv, _T("i:o:f:"))) != EOF)
 	{
 		switch (c)
 		{

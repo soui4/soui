@@ -587,9 +587,9 @@ int _tmain(int argc, TCHAR* argv[])
 	string strJsFile;//js name and id file
     BOOL bBuildIDMap=FALSE;  //Build ID map
 	int c;
-
-	printf("%s\n",GetCommandLineA());
-	while ((c = getopt(argc, argv, "i:r:p:h:j:")) != EOF || optarg!=NULL)
+	LPSTR cmdLine = GetCommandLineA();
+	printf("%s\n",cmdLine);
+	while ((c = xgetopt(argc, argv, "i:r:p:h:j:")) != EOF || optarg!=NULL)
 	{
 		switch (c)
 		{
