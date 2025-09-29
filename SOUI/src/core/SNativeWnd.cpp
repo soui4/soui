@@ -156,7 +156,7 @@ SNativeWndHelper::SNativeWndHelper()
 BOOL SNativeWndHelper::Init(HINSTANCE hInst, LPCTSTR pszClassName, BOOL bImeApp)
 {
     SAutoLock lock(m_cs);
-    if(m_hHeap)
+    if (m_hHeap)
         return FALSE;
     m_hInst = hInst;
     m_hHeap = HeapCreate(HEAP_CREATE_ENABLE_EXECUTE, 0, 0);
@@ -212,7 +212,7 @@ ATOM SNativeWnd::RegisterSimpleWnd(HINSTANCE hInst, LPCTSTR pszSimpleWndName, BO
     WNDCLASSEX wcex = { sizeof(WNDCLASSEX), 0 };
     wcex.cbSize = sizeof(WNDCLASSEX);
     wcex.style = CS_HREDRAW | CS_VREDRAW | CS_DBLCLKS | (bImeWnd ? CS_IME : 0);
-    wcex.lpfnWndProc = StartWindowProc; 
+    wcex.lpfnWndProc = StartWindowProc;
     wcex.hInstance = hInst;
     wcex.hCursor = ::LoadCursor(NULL, IDC_ARROW);
     wcex.lpszClassName = pszSimpleWndName;

@@ -50,7 +50,7 @@ DECLARE_INTERFACE_(IObjectFactory, IObjRef)
      * @brief 获取对象信息
      * @return SObjectInfo - 对象信息结构体
      */
-    STDMETHOD_(void, GetObjectInfo)(CTHIS_ SObjectInfo *info) SCONST PURE;
+    STDMETHOD_(void, GetObjectInfo)(CTHIS_ SObjectInfo * info) SCONST PURE;
 
     /**
      * @brief 克隆对象工厂

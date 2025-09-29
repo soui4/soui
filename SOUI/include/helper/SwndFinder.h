@@ -122,6 +122,7 @@ class CElementTraits<SFindInfo> : public CElementTraitsBase<SFindInfo> {
  */
 class SWindowFinder : public TObjRefImpl<ISwndFinder> {
     friend class SWindow;
+
   protected:
     /**
      * @brief 通过名称查找子窗口
@@ -130,7 +131,7 @@ class SWindowFinder : public TObjRefImpl<ISwndFinder> {
      * @param nDeep 查找深度
      * @return 找到的窗口指针，未找到返回NULL
      */
-    IWindow * WINAPI FindChildByName(IWindow *pParent, LPCWSTR strName, int nDeep) override;
+    IWindow *WINAPI FindChildByName(IWindow *pParent, LPCWSTR strName, int nDeep) override;
 
     /**
      * @brief 通过ID查找子窗口
@@ -139,7 +140,7 @@ class SWindowFinder : public TObjRefImpl<ISwndFinder> {
      * @param nDeep 查找深度
      * @return 找到的窗口指针，未找到返回NULL
      */
-    IWindow * WINAPI FindChildByID(IWindow *pParent, int nID, int nDeep) override;
+    IWindow *WINAPI FindChildByID(IWindow *pParent, int nID, int nDeep) override;
 
     /**
      * @brief 缓存通过名称查找的结果

@@ -339,7 +339,7 @@ HCURSOR SResProviderMgr::LoadCursor(LPCTSTR pszResName, BOOL bFromFile /*= FALSE
     }
     else
     {
-        //SSLOGW() << "load cursor failed, resource content " << pszResName << " not found!";
+        // SSLOGW() << "load cursor failed, resource content " << pszResName << " not found!";
     }
     return hRet;
 }

@@ -1,7 +1,7 @@
 ﻿#ifndef __SASSERTFMT__H__
 #define __SASSERTFMT__H__
 
-#if defined(_DEBUG) && defined (_WIN32)
+#if defined(_DEBUG) && defined(_WIN32)
 #include <crtdbg.h>
 #define SASSERT_FMTW(expr, format, ...) (void)((!!(expr)) || (1 != _CrtDbgReportW(_CRT_ASSERT, _CRT_WIDE(__FILE__), __LINE__, NULL, format, __VA_ARGS__)) || (_CrtDbgBreak(), 0))
 

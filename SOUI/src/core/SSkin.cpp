@@ -743,7 +743,7 @@ void SSkinShape::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
             pRT->FillEllipse(&rcDest);
             break;
         case ring:
-            //todo:hjx
+            // todo:hjx
             break;
         }
         pRT->SelectObject(oldBrush, NULL);

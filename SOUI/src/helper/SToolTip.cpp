@@ -24,7 +24,7 @@ STipCtrl::STipCtrl(void)
 }
 
 STipCtrl::~STipCtrl(void)
-{ 
+{
     if (m_font)
         DeleteObject(m_font);
 }
@@ -44,7 +44,7 @@ BOOL STipCtrl::Create()
 
 BOOL STipCtrl::Destroy()
 {
-    if(!IsWindow())
+    if (!IsWindow())
         return FALSE;
     DestroyWindow();
     return TRUE;

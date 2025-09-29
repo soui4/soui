@@ -530,7 +530,6 @@ void SResProviderFiles::_EnumFile(LPCTSTR pszPath, EnumFileCallback funEnumCB, L
         } while (FindNextFile(hFind, &wfd));
         FindClose(hFind);
     }
-
 }
 
 SNSEND

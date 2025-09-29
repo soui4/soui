@@ -305,7 +305,7 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @brief Gets the window finder object.
      * @return Pointer to the window finder object.
      */
-    STDMETHOD_(ISwndFinder*, GetSwndFinder)(THIS) PURE;
+    STDMETHOD_(ISwndFinder *, GetSwndFinder)(THIS) PURE;
 };
 
 SNSEND

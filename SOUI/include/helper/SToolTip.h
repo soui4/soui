@@ -28,21 +28,25 @@ class STipCtrl
 
   public: // IMsgFilter
     STDMETHOD_(BOOL, PreTranslateMessage)(THIS_ MSG *pMsg) OVERRIDE;
+
   public: // IToolTip
-    STDMETHOD_(long, AddRef)(THIS) OVERRIDE{
-      return SNativeWnd::AddRef();
+    STDMETHOD_(long, AddRef)(THIS) OVERRIDE
+    {
+        return SNativeWnd::AddRef();
     }
-    STDMETHOD_(long, Release)(THIS) OVERRIDE{
-      return SNativeWnd::Release();
+    STDMETHOD_(long, Release)(THIS) OVERRIDE
+    {
+        return SNativeWnd::Release();
     }
-    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE{
-      SNativeWnd::OnFinalRelease();
+    STDMETHOD_(void, OnFinalRelease)(THIS) OVERRIDE
+    {
+        SNativeWnd::OnFinalRelease();
     }
 
-    STDMETHOD_(IMsgFilter *, GetMsgFilter)(THIS) OVERRIDE{
-      return this;
+    STDMETHOD_(IMsgFilter *, GetMsgFilter)(THIS) OVERRIDE
+    {
+        return this;
     }
-
 
     STDMETHOD_(BOOL, Create)(THIS) OVERRIDE;
     STDMETHOD_(BOOL, Destroy)(THIS) OVERRIDE;

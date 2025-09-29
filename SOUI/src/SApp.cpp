@@ -278,10 +278,7 @@ SApplication::SApplication(IRenderFactory *pRendFactory, HINSTANCE hInst, LPCTST
     _InitApp(sysObjRegister);
 }
 
-SApplication::SApplication(HINSTANCE hInst,
-        LPCTSTR pszHostClassName,
-        const ISystemObjectRegister &sysObjRegister,
-        BOOL bImeApp)
+SApplication::SApplication(HINSTANCE hInst, LPCTSTR pszHostClassName, const ISystemObjectRegister &sysObjRegister, BOOL bImeApp)
     : m_hInst(hInst)
     , m_RenderFactory(NULL)
     , m_hMainWnd(NULL)
@@ -786,7 +783,7 @@ IObject *SApplication::CreateObject(LPCWSTR pszName, SObjectType nType) const
         }
     }
     SObjectInfo objInfo;
-    ObjInfo_New(&objInfo,pszName, nType);
+    ObjInfo_New(&objInfo, pszName, nType);
     return SObjectFactoryMgr::CreateObject(objInfo);
 }
 
@@ -881,25 +878,29 @@ void SApplication::SetAttrAlias(THIS_ IAttrAlias *pAttrAlias)
 {
     m_pAttrAlias = pAttrAlias;
 }
-const IAttrAlias * SApplication::GetAttrAlias() const
+const IAttrAlias *SApplication::GetAttrAlias() const
 {
     return m_pAttrAlias;
-}   
+}
 
 BOOL SApplication::GetBaseClassName(THIS_ LPCWSTR pszClassName, int objType, wchar_t pszBaseClassName[MAX_OBJNAME]) const
 {
     SObjectInfo objInfo;
-    ObjInfo_New(&objInfo,pszClassName, objType);
-    SObjectInfo baseClassInfo =  BaseObjectInfoFromObjectInfo(objInfo);
+    ObjInfo_New(&objInfo, pszClassName, objType);
+    SObjectInfo baseClassInfo = BaseObjectInfoFromObjectInfo(objInfo);
     if (!ObjInfo_IsValid(&baseClassInfo))
         return FALSE;
-    wcscpy_s(pszBaseClassName,MAX_OBJNAME, baseClassInfo.szName);
+    wcscpy_s(pszBaseClassName, MAX_OBJNAME, baseClassInfo.szName);
     return TRUE;
 }
-LPCWSTR SOUI_EXP GetAttrAlias(LPCWSTR pszAttr, IObject *pObject){
-    if(const IAttrAlias * pAttrAlias = SApplication::getSingletonPtr()->GetAttrAlias()){
+LPCWSTR SOUI_EXP GetAttrAlias(LPCWSTR pszAttr, IObject *pObject)
+{
+    if (const IAttrAlias *pAttrAlias = SApplication::getSingletonPtr()->GetAttrAlias())
+    {
         return pAttrAlias->GetAttrAlias(pszAttr, pObject->GetObjectClass(), pObject->GetObjectType());
-    }else{
+    }
+    else
+    {
         return pszAttr;
     }
 }

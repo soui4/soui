@@ -186,7 +186,8 @@ BOOL SMessageLoop::AddMessageFilter(IMsgFilter *pMessageFilter)
     return TRUE;
 }
 
-static void CALLBACK OnTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime){
+static void CALLBACK OnTimer(HWND hwnd, UINT uMsg, UINT_PTR idEvent, DWORD dwTime)
+{
     KillTimer(hwnd, idEvent);
     tid_t tid = GetCurrentThreadId();
     PostThreadMessage(tid, WM_NULL, 0, 0);
@@ -203,8 +204,10 @@ BOOL SMessageLoop::PostTask(IRunnable *runable)
     if (m_priv->m_runnables.GetCount() > 5)
     {
         PostThreadMessage(m_tid, WM_NULL, 0, 0);
-    }else if(m_bRunning){
-        m_priv->m_msgWnd.SetTimer(TM_POSTTASK, 100, OnTimer);//set max waitting time to 100ms.
+    }
+    else if (m_bRunning)
+    {
+        m_priv->m_msgWnd.SetTimer(TM_POSTTASK, 100, OnTimer); // set max waitting time to 100ms.
     }
     return TRUE;
 }
@@ -265,7 +268,8 @@ void SMessageLoop::ExecutePendingTask()
     {
         m_priv->m_parentLoop->ExecutePendingTask();
     }
-    if(m_bRunning){
+    if (m_bRunning)
+    {
         m_priv->m_msgWnd.KillTimer(TM_POSTTASK);
     }
 }

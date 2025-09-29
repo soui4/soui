@@ -72,7 +72,8 @@ class STextServiceHelper {
     PCreateTextServices m_funCreateTextServices; /**< 回调函数 */
 };
 
-STextServiceHelper::STextServiceHelper():m_funCreateTextServices(NULL)
+STextServiceHelper::STextServiceHelper()
+    : m_funCreateTextServices(NULL)
 {
 #ifdef _WIN32
     m_rich20 = LoadLibrary(_T("Msftedit.dll"));
@@ -1221,7 +1222,7 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
     CRect rcClient;
     GetClientRect(&rcClient);
     pRT->PushClipRect(&rcClient, RGN_AND);
-    //save font and text color
+    // save font and text color
     SAutoRefPtr<IRenderObj> pFont = pRT->GetCurrentObject(OT_FONT);
     COLORREF crText = pRT->GetTextColor();
     float fMtx[9];
@@ -1281,7 +1282,7 @@ void SRichEdit::OnPaint(IRenderTarget *pRT)
         pRT->AlphaBlend(&rcClient, rt, &rcClient, 255);
         rt = NULL;
     }
-    //restore font and text color
+    // restore font and text color
     pRT->SelectObject(pFont);
     pRT->SetTextColor(crText);
     pRT->PopClip();
@@ -1975,7 +1976,7 @@ SStringT SRichEdit::GetWindowText(BOOL bRawText) const
         LRESULT nLen = 0;
         m_pTxtHost->GetTextService()->TxSendMessage(WM_GETTEXTLENGTH, 0, 0, &nLen);
         wchar_t *pBuf = strRet.GetBufferSetLength(nLen);
-        m_pTxtHost->GetTextService()->TxSendMessage(WM_GETTEXT, (WPARAM)nLen + 1, (LPARAM)pBuf,NULL);
+        m_pTxtHost->GetTextService()->TxSendMessage(WM_GETTEXT, (WPARAM)nLen + 1, (LPARAM)pBuf, NULL);
         strRet.ReleaseBuffer();
     }
     return S_CW2T(strRet);
@@ -1983,17 +1984,17 @@ SStringT SRichEdit::GetWindowText(BOOL bRawText) const
 
 int SRichEdit::GetWindowTextLength() const
 {
-    #ifdef _UNICODE
+#ifdef _UNICODE
     LRESULT lResult = 0;
     if (m_pTxtHost)
     {
         m_pTxtHost->GetTextService()->TxSendMessage(WM_GETTEXTLENGTH, 0, 0, &lResult);
     }
     return (int)lResult;
-    #else
-    SStringT strRet=GetWindowText(TRUE);
+#else
+    SStringT strRet = GetWindowText(TRUE);
     return strRet.GetLength();
-    #endif//_UNICODE
+#endif //_UNICODE
 }
 
 void SRichEdit::ReplaceSel(LPCTSTR pszText, BOOL bCanUndo)
@@ -2317,7 +2318,7 @@ LRESULT SRichEdit::OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp)
 
 BOOL SRichEdit::OnTxSetTimer(UINT idTimer, UINT uTimeout)
 {
-    SMap<UINT, SAutoRefPtr<ITimer>>::CPair *p = m_mapTimer.Lookup(idTimer);
+    SMap<UINT, SAutoRefPtr<ITimer> >::CPair *p = m_mapTimer.Lookup(idTimer);
     if (p)
     {
         p->m_value->KillTimer();

@@ -100,12 +100,12 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
 {
     if (m_appResDesc.m_type == ResType_Unknown)
     {
-        SLOGW()<<"app resource file not specified";
+        SLOGW() << "app resource file not specified";
         return FALSE;
     }
     if (m_sysResDesc.m_type == ResType_Unknown)
     {
-        SLOGW()<<"system resource file not specified";
+        SLOGW() << "system resource file not specified";
         return FALSE;
     }
     if (!m_appDir.IsEmpty() && GetFileAttributes(m_appDir) != INVALID_FILE_ATTRIBUTES)
@@ -128,34 +128,32 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
     }
     if (!pRendFac)
     {
-        SLOGW()<<"Create render factory failed! render: "<<m_render;
+        SLOGW() << "Create render factory failed! render: " << m_render;
         return FALSE;
-    }    
+    }
     SAutoRefPtr<IImgDecoderFactory> pImgDecoderFac;
 #if !defined(WIN32) || defined(__MINGW32__)
-    static const LPCTSTR  kImgDecoderPath[] =
-    {
+    static const LPCTSTR kImgDecoderPath[] = {
         _T("libimgdecoder-stb"),
         _T("libimgdecoder-gdip"),
         _T("libimgdecoder-wic"),
     };
 #else
-    static const LPCTSTR  kImgDecoderPath[] =
-    {
+    static const LPCTSTR kImgDecoderPath[] = {
         _T("imgdecoder-stb"),
         _T("imgdecoder-wic"),
         _T("imgdecoder-gdip"),
     };
 #endif
-    if(m_imgDecoder < 0 || m_imgDecoder>= ARRAYSIZE(kImgDecoderPath))
+    if (m_imgDecoder < 0 || m_imgDecoder >= ARRAYSIZE(kImgDecoderPath))
     {
-        SLOGW()<<"Invalid img decoder index: "<<m_imgDecoder;
+        SLOGW() << "Invalid img decoder index: " << m_imgDecoder;
         return FALSE;
     }
-     g_comMgr.CreateImgDecoder((IObjRef **)&pImgDecoderFac, kImgDecoderPath[m_imgDecoder]);
+    g_comMgr.CreateImgDecoder((IObjRef **)&pImgDecoderFac, kImgDecoderPath[m_imgDecoder]);
     if (!pImgDecoderFac)
     {
-        SLOGW()<<"Create img decoder factory failed! img decoder: "<<m_imgDecoder<<" path: "<<kImgDecoderPath[m_imgDecoder];
+        SLOGW() << "Create img decoder factory failed! img decoder: " << m_imgDecoder << " path: " << kImgDecoderPath[m_imgDecoder];
         return FALSE;
     }
 
@@ -183,7 +181,8 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
             break;
         case ResType_PeFile:
             hModResource = LoadLibrary(m_sysResDesc.m_szFile);
-            if(hModResource){
+            if (hModResource)
+            {
                 bLoaded = resLoader.LoadResFromRes(hModResource);
             }
             break;
@@ -191,11 +190,12 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         SASSERT(bLoaded);
         if (!bLoaded)
         {
-            SLOGW()<<"Load system resource failed! sys res type: "<<m_sysResDesc.m_type;
+            SLOGW() << "Load system resource failed! sys res type: " << m_sysResDesc.m_type;
             return FALSE;
         }
         pApp->LoadSystemNamedResource(resLoader.GetResProvider());
-        if(hModResource){
+        if (hModResource)
+        {
             FreeLibrary(hModResource);
         }
     }
@@ -219,18 +219,19 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
             bLoaded = resLoader.LoadResFromRes(m_appResDesc.m_hResModule);
             break;
         case ResType_PeFile:
+        {
+            HMODULE hModule = LoadLibrary(m_appResDesc.m_szFile);
+            if (hModule)
             {
-                HMODULE hModule = LoadLibrary(m_appResDesc.m_szFile);
-                if(hModule){
-                    bLoaded = resLoader.LoadResFromRes(hModule);
-                }
+                bLoaded = resLoader.LoadResFromRes(hModule);
             }
-            break;
+        }
+        break;
         }
         SASSERT(bLoaded);
         if (!bLoaded)
         {
-            SLOGW()<<"Load application resource failed! app res type: "<<m_appResDesc.m_type;
+            SLOGW() << "Load application resource failed! app res type: " << m_appResDesc.m_type;
             return FALSE;
         }
         pApp->AddResProvider(resLoader.GetResProvider(), m_uidefId);
@@ -241,7 +242,7 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         if (g_comMgr.CreateLog4z((IObjRef **)&pLogMgr) && pLogMgr)
         {
             // uncomment next line to disable log mgr to output debug string.
-            if(!m_logDesc.m_strLogName.IsEmpty())
+            if (!m_logDesc.m_strLogName.IsEmpty())
                 pLogMgr->setLoggerName(m_logDesc.m_strLogName);
             // uncomment next line to record info level log.
             pLogMgr->setLoggerLevel(m_logDesc.m_nLogLevel);
@@ -249,13 +250,16 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
             pApp->SetLogManager(pLogMgr);
         }
     }
-    if(m_langDesc.enable){
+    if (m_langDesc.enable)
+    {
         SAutoRefPtr<ITranslatorMgr> trans;
         BOOL bLoaded = g_comMgr.CreateTranslator((IObjRef **)&trans);
-        if (trans && bLoaded) { //加载语言翻译包
+        if (trans && bLoaded)
+        { //加载语言翻译包
             pApp->SetTranslator(trans);
             SXmlDoc xmlLang;
-            if (pApp->LoadXmlDocment(xmlLang, m_langDesc.langResId)) {
+            if (pApp->LoadXmlDocment(xmlLang, m_langDesc.langResId))
+            {
                 SAutoRefPtr<ITranslator> langCN;
                 trans->CreateTranslator(&langCN);
                 SXmlNode nodeLang = xmlLang.root().child(L"language");
@@ -264,10 +268,12 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
             }
         }
     }
-    if(m_enableScript){
+    if (m_enableScript)
+    {
         SAutoRefPtr<IScriptFactory> pScriptLuaFactory;
         BOOL bLoaded = g_comMgr.CreateScrpit_Lua((IObjRef **)&pScriptLuaFactory);
-        if(bLoaded && pScriptLuaFactory){
+        if (bLoaded && pScriptLuaFactory)
+        {
             pApp->SetScriptFactory(pScriptLuaFactory);
         }
     }

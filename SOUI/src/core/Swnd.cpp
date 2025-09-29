@@ -785,7 +785,7 @@ SWindow *SWindow::FindChildByID(int id, int nDeep /* =-1*/)
     if (id == SWindowMgr::SWND_INVALID || nDeep == 0)
         return NULL;
     ISwndFinder *pFinder = GetContainer()->GetSwndFinder();
-    SWindow *pRet = (SWindow*)pFinder->FindChildByID(this, id, nDeep);
+    SWindow *pRet = (SWindow *)pFinder->FindChildByID(this, id, nDeep);
     if (pRet)
         return pRet;
 
@@ -804,7 +804,7 @@ SWindow *SWindow::FindChildByName(LPCWSTR pszName, int nDeep)
         return NULL;
 
     ISwndFinder *pFinder = GetContainer()->GetSwndFinder();
-    SWindow *pRet = (SWindow*)pFinder->FindChildByName(this, strName, nDeep);
+    SWindow *pRet = (SWindow *)pFinder->FindChildByName(this, strName, nDeep);
     if (pRet)
         return pRet;
 
@@ -1175,15 +1175,15 @@ void SWindow::_RedrawNonClient()
     CRect rcClient = SWindow::GetClientRect();
     if (rcWnd == rcClient)
         return;
-    #ifdef __APPLE__
-    //Update is invalidate on mac
+#ifdef __APPLE__
+    // Update is invalidate on mac
     InvalidateRect(rcWnd, TRUE, FALSE);
-    #else
+#else
     Update();
     InvalidateRect(rcWnd, TRUE, FALSE);   // invalid window rect
     InvalidateRect(rcClient, TRUE, TRUE); // but clip client rect
     Update();
-    #endif//__APPLE__
+#endif //__APPLE__
 }
 
 static SAutoRefPtr<IRegionS> ConvertRect2RenderRegion(const CRect &rc, const SMatrix &mtx)
