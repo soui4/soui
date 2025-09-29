@@ -64,7 +64,7 @@ class SOUI_EXP SValueDescription {
  *
  * See the {@link android.view.animation animation package description file}.
  */
-class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation> > {
+class SOUI_EXP SAnimation : public TObjRefImpl<SObjectImpl<IAnimation>> {
     DEF_SOBJECT(SObjectImpl<IAnimation>, L"animation")
 
   protected:

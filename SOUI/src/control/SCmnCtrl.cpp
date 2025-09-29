@@ -513,8 +513,8 @@ void SButton::OnStateChanged(DWORD dwOldState, DWORD dwNewState)
         return;
 
     if (m_bAnimate && ((dwOldState == WndState_Normal && dwNewState == WndState_Hover) || (dwOldState == WndState_Hover && dwNewState == WndState_Normal)))
-    { //启动动画
-        m_byAlphaAni = 50;//ani alpha from 50 to 255
+    {                      //启动动画
+        m_byAlphaAni = 50; // ani alpha from 50 to 255
         GetContainer()->RegisterTimelineHandler(this);
     }
 }
@@ -1088,7 +1088,6 @@ void SCheckBox::DrawFocus(IRenderTarget *pRT)
     }
 }
 
-
 void SCheckBox::GetChildrenLayoutRect(THIS_ RECT *prc) SCONST
 {
     __baseCls::GetChildrenLayoutRect(prc);
@@ -1337,9 +1336,10 @@ void SRadioBox::DrawFocus(IRenderTarget *pRT)
     }
 }
 
-void SRadioBox::GetChildrenLayoutRect(THIS_ RECT *prc) SCONST{
+void SRadioBox::GetChildrenLayoutRect(THIS_ RECT *prc) SCONST
+{
     __baseCls::GetChildrenLayoutRect(prc);
-    if(!m_pSkin)
+    if (!m_pSkin)
         return;
     CSize szCheck = m_pSkin->GetSkinSize();
     prc->left += szCheck.cx + m_nRadioBoxSpacing;

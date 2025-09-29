@@ -3,7 +3,6 @@
 #include "res.mgr/SObjDefAttr.h"
 #include "res.mgr/SUiDef.h"
 
-
 void ObjInfo_New(SObjectInfo *ret, LPCWSTR name, int type, LPCWSTR alise)
 {
     SNS::SStringW strName(name);
@@ -100,7 +99,7 @@ SObjectInfo SObjectFactoryMgr::BaseObjectInfoFromObjectInfo(const SObjectInfo &o
     SStringW strBaseClass = GetKeyObject(objInfo)->BaseClassName();
     if (strBaseClass == objInfo.szName)
         return ret;
-    ObjInfo_New(&ret,strBaseClass, objInfo.nType);
+    ObjInfo_New(&ret, strBaseClass, objInfo.nType);
     return ret;
 }
 

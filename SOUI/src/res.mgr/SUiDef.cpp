@@ -148,14 +148,15 @@ UINT SUiDefInfo::Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResPr
         if (xmlFont)
         {
             defFontInfo = xmlFont.attribute(L"value").as_string();
-            #ifdef __APPLE__
+#ifdef __APPLE__
             const wchar_t *kPlatName = L"macos";
-            #elif defined(__linux__)
+#elif defined(__linux__)
             const wchar_t *kPlatName = L"linux";
-            #else
+#else
             const wchar_t *kPlatName = L"win32";
-            #endif
-            if(SXmlNode xmlPlat = xmlFont.child(kPlatName)){
+#endif
+            if (SXmlNode xmlPlat = xmlFont.child(kPlatName))
+            {
                 defFontInfo = xmlPlat.attribute(L"value").as_string();
             }
         }

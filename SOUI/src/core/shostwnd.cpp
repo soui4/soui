@@ -847,7 +847,7 @@ SRootWindow *SHostWnd::CreateRoot()
 
 int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
 {
-    //SSLOGI()<<"SHostWnd::OnCreate, m_hWnd="<<m_hWnd<<" tid="<<GetCurrentThreadId();
+    // SSLOGI()<<"SHostWnd::OnCreate, m_hWnd="<<m_hWnd<<" tid="<<GetCurrentThreadId();
     if (!m_presenter)
     {
         m_presenter.Attach(new SHostPresenter(this));
@@ -870,7 +870,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
         m_pRoot = NULL;
     }
     m_pRoot = CreateRoot();
-    //SSLOGI()<<"CreateRoot, root="<<m_pRoot<<" tid="<<GetCurrentThreadId()<<" hwnd="<<m_hWnd;
+    // SSLOGI()<<"CreateRoot, root="<<m_pRoot<<" tid="<<GetCurrentThreadId()<<" hwnd="<<m_hWnd;
     m_pRoot->SetContainer(this);
     SwndContainerImpl::SetRoot(m_pRoot);
 
@@ -896,7 +896,7 @@ int SHostWnd::OnCreate(LPCREATESTRUCT lpCreateStruct)
     if (pXmlRoot && !InitFromXml(pXmlRoot))
         return -1;
     GetRoot()->RequestRelayout();
-    m_pTipCtrl=CreateTooltip();
+    m_pTipCtrl = CreateTooltip();
     if (m_pTipCtrl && m_hostAttr.m_bHasMsgLoop)
         GetMsgLoop()->AddMessageFilter(m_pTipCtrl->GetMsgFilter());
     UpdateAutoSizeCount(false);
@@ -1038,7 +1038,7 @@ void SHostWnd::OnTimer(UINT_PTR idEvent)
         SWindow *pSwnd = SWindowMgr::GetWindow((SWND)sTimerID.swnd);
         if (pSwnd)
         {
-            if(!m_bBlockTimer)
+            if (!m_bBlockTimer)
                 pSwnd->SSendMessage(WM_TIMER, sTimerID.uTimerID, 0);
         }
         else
@@ -1131,7 +1131,7 @@ BOOL SHostWnd::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 void SHostWnd::OnActivate(UINT nState, BOOL bMinimized, HWND wndOther)
 {
-//    SSLOGI() << "OnActivate, nState=" << nState << " m_hWnd=" << m_hWnd;
+    //    SSLOGI() << "OnActivate, nState=" << nState << " m_hWnd=" << m_hWnd;
     if (nState != WA_INACTIVE)
     {
         ::SetFocus(m_hWnd);

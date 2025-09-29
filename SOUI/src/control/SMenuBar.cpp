@@ -107,7 +107,7 @@ UINT SMenuBarItem::PopMenu()
                                                   GetCurrentThreadId()); // m_bLoop may become TRUE
 
     int iRet = 0;
-    iRet = TrackPopupMenu(TPM_RETURNCMD, rcHost.left + rcMenu.left, rcHost.top + rcMenu.bottom + 2, m_pHostMenu->m_hWnd,0,GetScale());
+    iRet = TrackPopupMenu(TPM_RETURNCMD, rcHost.left + rcMenu.left, rcHost.top + rcMenu.bottom + 2, m_pHostMenu->m_hWnd, 0, GetScale());
 
     SetCheck(FALSE);
     m_pHostMenu->m_bIsShow = FALSE;

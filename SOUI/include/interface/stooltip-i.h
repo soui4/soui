@@ -59,7 +59,7 @@ typedef enum TipAlign
 #define INTERFACE IToolTip
 DECLARE_INTERFACE_(IToolTip, IObjRef)
 {
-	 /**
+    /**
      * @brief Increases the reference count.
      * @return The new reference count.
      */
@@ -83,14 +83,14 @@ DECLARE_INTERFACE_(IToolTip, IObjRef)
      *
      * @return BOOL TRUE if successful, FALSE otherwise.
      */
-    STDMETHOD_(BOOL,Create)(THIS) PURE;
+    STDMETHOD_(BOOL, Create)(THIS) PURE;
 
     /**
      * @brief destroy tooltip object.
      *
      * @return BOOL TRUE if successful, FALSE otherwise.
      */
-    STDMETHOD_(BOOL,Destroy)(THIS) PURE;
+    STDMETHOD_(BOOL, Destroy)(THIS) PURE;
 
     /**
      * @brief get message filter object.
@@ -98,7 +98,7 @@ DECLARE_INTERFACE_(IToolTip, IObjRef)
      * @return IMsgFilter * message filter object.
      */
     STDMETHOD_(IMsgFilter *, GetMsgFilter)(THIS) PURE;
-    
+
     /**
      * @brief Pre-translates messages for the tooltip.
      *

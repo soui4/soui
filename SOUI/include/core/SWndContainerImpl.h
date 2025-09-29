@@ -142,10 +142,11 @@ class SOUI_EXP SwndContainerImpl
         return &m_focusMgr;
     }
 
-    STDMETHOD_(ISwndFinder *, GetSwndFinder)(THIS) OVERRIDE{
+    STDMETHOD_(ISwndFinder *, GetSwndFinder)(THIS) OVERRIDE
+    {
         return m_swndFinder;
     }
-    
+
     /**
      * @brief Registers a timeline handler.
      * @param pHandler Pointer to the timeline handler.

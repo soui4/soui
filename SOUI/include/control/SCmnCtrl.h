@@ -925,7 +925,7 @@ class SOUI_EXP SCheckBox : public SWindow {
      * @return 返回复选框的显示位置矩形 (CRect)。
      */
     CRect GetCheckRect();
-    
+
     /**
      * @brief 测量内容所需的大小
      * @param wid 父容器宽度
@@ -1103,9 +1103,11 @@ class SOUI_EXP SIconWnd : public TWindowProxy<IIconWnd> {
 class SOUI_EXP SRadioBox : public SWindow {
     DEF_SOBJECT(SWindow, L"radio") // 定义对象类型为 "radio"
 
-    enum{
-      RadioBoxSpacing = 4,
+    enum
+    {
+        RadioBoxSpacing = 4,
     };
+
   public:
     /**
      * @brief 构造函数

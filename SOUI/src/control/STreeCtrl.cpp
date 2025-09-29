@@ -810,7 +810,6 @@ void STreeCtrl::DrawItem(IRenderTarget *pRT, const CRect &rc, HSTREEITEM hItem)
     int nItemHei = m_nItemHei.toPixelSize(GetScale());
     pRT->OffsetViewportOrg(rc.left + pItem->nLevel * nIndent, rc.top, NULL);
 
-
     rcItemBg.SetRect(m_nItemOffset + m_nItemMargin.toPixelSize(GetScale()), 0, pItem->nContentWidth, nItemHei);
     if (rcItemBg.right > rc.Width() - pItem->nLevel * nIndent)
         rcItemBg.right = rc.Width() - pItem->nLevel * nIndent;
@@ -1447,7 +1446,8 @@ HSTREEITEM STreeCtrl::GetNextItem(HSTREEITEM hItem) const
     return CSTree<LPTVITEM>::GetNextItem(hItem);
 }
 
-void STreeCtrl::CalcItemWidth(IRenderTarget *pRT, HSTREEITEM hItem, DWORD dwFlags){
+void STreeCtrl::CalcItemWidth(IRenderTarget *pRT, HSTREEITEM hItem, DWORD dwFlags)
+{
     LPTVITEM pItem = GetItem(hItem);
     CRect rcTest;
     DrawText(pRT, pItem->strText, pItem->strText.GetLength(), rcTest, dwFlags);
@@ -1466,7 +1466,8 @@ void STreeCtrl::RecalcItemsWidth()
     GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
     BeforePaintEx(pRT);
     int dwFlags = DT_CALCRECT | (GetTextAlign() & ~(DT_CENTER | DT_RIGHT | DT_VCENTER | DT_BOTTOM));
-    for (HSTREEITEM hItem = GetRootItem(); hItem; hItem = GetNextItem(hItem)){
+    for (HSTREEITEM hItem = GetRootItem(); hItem; hItem = GetNextItem(hItem))
+    {
         CalcItemWidth(pRT, hItem, dwFlags);
     }
 }

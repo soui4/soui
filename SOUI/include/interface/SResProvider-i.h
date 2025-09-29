@@ -22,23 +22,22 @@
 #ifdef _WIN32
 #define PATH_SLASH '\\'
 #ifdef _UNICODE
-#define TPATH_SLASH L'\\'
+#define TPATH_SLASH  L'\\'
 #define TPATH_SLASH2 L"\\"
 #else
-#define TPATH_SLASH '\\'
+#define TPATH_SLASH  '\\'
 #define TPATH_SLASH2 "\\"
 #endif
 #else
 #define PATH_SLASH '/'
 #ifdef _UNICODE
-#define TPATH_SLASH L'/'
+#define TPATH_SLASH  L'/'
 #define TPATH_SLASH2 L"/"
 #else
-#define TPATH_SLASH '/'
+#define TPATH_SLASH  '/'
 #define TPATH_SLASH2 "/"
 #endif
 #endif //_WIN32
-
 
 SNSBEGIN
 

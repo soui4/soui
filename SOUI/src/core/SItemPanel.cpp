@@ -438,7 +438,8 @@ int SOsrPanel::RemoveTasksForObject(THIS_ void *pObj)
     return m_pHostProxy->GetHostContainer()->RemoveTasksForObject(pObj);
 }
 
-void SOsrPanel::BlockTimers(THIS_ BOOL bBlock){
+void SOsrPanel::BlockTimers(THIS_ BOOL bBlock)
+{
     m_pHostProxy->GetHostContainer()->BlockTimers(bBlock);
 }
 //////////////////////////////////////////////////////////////////////////

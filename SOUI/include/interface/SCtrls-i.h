@@ -2295,7 +2295,7 @@ DECLARE_INTERFACE_(IDateTimePicker, ICtrl)
     STDMETHOD_(void, Clear)(THIS) PURE;
 };
 
-typedef int(*FunTreeSortCallback)(void *pCtx, const void *phItem1, const void *phItem2);
+typedef int (*FunTreeSortCallback)(void *pCtx, const void *phItem1, const void *phItem2);
 
 #ifndef STVI_ROOT
 #ifdef _WIN64

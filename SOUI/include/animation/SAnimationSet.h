@@ -43,7 +43,7 @@ class SOUI_EXP SAnimationSet : public SAnimation {
     int mFlags;                                  ///< Flags to manage properties like fillAfter, fillBefore, duration, and shareInterpolator.
     bool mDirty;                                 ///< Indicates if the animation set needs to be reinitialized.
     bool mHasAlpha;                              ///< Indicates if any child animation affects the alpha property.
-    SArray<SAutoRefPtr<IAnimation> > mAnimations; ///< Array of child animations.
+    SArray<SAutoRefPtr<IAnimation>> mAnimations; ///< Array of child animations.
     bool mChildStarted;                          ///< Indicates if any child animation has started.
     long mLastEnd;                               ///< The end time of the last child animation.
 

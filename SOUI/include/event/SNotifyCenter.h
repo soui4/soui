@@ -202,7 +202,7 @@ class SOUI_EXP SNotifyCenter
     BOOL m_bRunning;               // 运行状态标志
     int m_nInterval;               // 事件处理间隔时间（毫秒）
 
-    SList<SAutoRefPtr<IRunnable> > m_asyncRunnable; // 异步可运行对象列表
+    SList<SAutoRefPtr<IRunnable>> m_asyncRunnable; // 异步可运行对象列表
 };
 
 template <class T>
