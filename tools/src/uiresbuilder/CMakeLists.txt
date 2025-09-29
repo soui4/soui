@@ -21,8 +21,11 @@ target_include_directories(${PROJECT_NAME} PRIVATE .)
 
 remove_definitions(-DUNICODE -D_UNICODE)
 
+if(CMAKE_C_COMPILER MATCHES "mingw")
+    message(STATUS "Detected MinGW compiler")
+endif()
 # 根据操作系统设置特定选项
-if(NOT WIN32)
+if(NOT WIN32 AND NOT CMAKE_C_COMPILER MATCHES "mingw")
     add_dependencies(${PROJECT_NAME} swinx)
     target_link_libraries(${PROJECT_NAME} PRIVATE swinx)
 endif()

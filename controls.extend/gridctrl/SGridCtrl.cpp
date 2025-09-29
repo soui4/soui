@@ -4948,8 +4948,8 @@ BOOL SGridCtrl::Copy()
         return FALSE;
 
     // Format both text and cell types
-    SStringT strText = FormatCellsAsText(m_SelectedCellRange);
-    SStringT strTypes = FormatCellTypesAsText(m_SelectedCellRange);
+    SStringW strText = S_CT2W(FormatCellsAsText(m_SelectedCellRange));
+    SStringW strTypes = S_CT2W(FormatCellTypesAsText(m_SelectedCellRange));
 
     BOOL bResult = FALSE;
 
@@ -4959,13 +4959,13 @@ BOOL SGridCtrl::Copy()
 
         // Set text data
         int nTextLen = strText.GetLength();
-        HGLOBAL hTextData = GlobalAlloc(GMEM_MOVEABLE, (nTextLen + 1) * sizeof(TCHAR));
+        HGLOBAL hTextData = GlobalAlloc(GMEM_MOVEABLE, (nTextLen + 1) * sizeof(wchar_t));
         if (hTextData)
         {
-            LPCTSTR lpszTextBuffer = (LPCTSTR)GlobalLock(hTextData);
+            LPWSTR lpszTextBuffer = (LPWSTR)GlobalLock(hTextData);
             if (lpszTextBuffer)
             {
-                _tcscpy((LPTSTR)lpszTextBuffer, strText);
+                wcscpy(lpszTextBuffer, strText);
                 GlobalUnlock(hTextData);
 
                 if (SetClipboardData(CF_UNICODETEXT, hTextData))
@@ -4987,13 +4987,13 @@ BOOL SGridCtrl::Copy()
         if (bResult && !strTypes.IsEmpty())
         {
             int nTypesLen = strTypes.GetLength();
-            HGLOBAL hTypesData = GlobalAlloc(GMEM_MOVEABLE, (nTypesLen + 1) * sizeof(TCHAR));
+            HGLOBAL hTypesData = GlobalAlloc(GMEM_MOVEABLE, (nTypesLen + 1) * sizeof(wchar_t));
             if (hTypesData)
             {
-                LPCTSTR lpszTypesBuffer = (LPCTSTR)GlobalLock(hTypesData);
+                LPWSTR lpszTypesBuffer = (LPWSTR)GlobalLock(hTypesData);
                 if (lpszTypesBuffer)
                 {
-                    _tcscpy((LPTSTR)lpszTypesBuffer, strTypes);
+                    wcscpy(lpszTypesBuffer, strTypes);
                     GlobalUnlock(hTypesData);
 
                     if (!SetClipboardData(CF_GRIDCELLTYPES, hTypesData))
@@ -5110,10 +5110,10 @@ SStringT SGridCtrl::GetClipboardText() const
         HANDLE hData = GetClipboardData(CF_UNICODETEXT);
         if (hData)
         {
-            LPCTSTR lpszText = (LPCTSTR)GlobalLock(hData);
+            LPCWSTR lpszText = (LPCWSTR)GlobalLock(hData);
             if (lpszText)
             {
-                strText = lpszText;
+                strText = S_CW2T(lpszText);
                 GlobalUnlock(hData);
             }
         }
@@ -5133,15 +5133,14 @@ BOOL SGridCtrl::SetClipboardText(LPCTSTR lpszText)
     if (OpenClipboard(GetContainer()->GetHostHwnd()))
     {
         EmptyClipboard();
-
-        int nLen = _tcslen(lpszText);
-        HGLOBAL hData = GlobalAlloc(GMEM_MOVEABLE, (nLen + 1) * sizeof(TCHAR));
+        SStringW strText = S_CT2W(lpszText);
+        HGLOBAL hData = GlobalAlloc(GMEM_MOVEABLE, (strText.GetLength() + 1) * sizeof(wchar_t));
         if (hData)
         {
-            LPCTSTR lpszBuffer = (LPCTSTR)GlobalLock(hData);
+            LPWSTR lpszBuffer = (LPWSTR)GlobalLock(hData);
             if (lpszBuffer)
             {
-                _tcscpy((LPTSTR)lpszBuffer, lpszText);
+                wcscpy(lpszBuffer, strText);
                 GlobalUnlock(hData);
 
                 if (SetClipboardData(CF_UNICODETEXT, hData))
@@ -5750,7 +5749,21 @@ BOOL SGridColorCell::Draw(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOO
 {
     if (!pRT)
         return FALSE;
-
+    if (bEraseBkgnd)
+    {
+        COLORREF crBk = GetBackClr();
+        if (crBk == CLR_DEFAULT)
+        {
+            // Use default background color based on cell state
+            if (IsSelected())
+                crBk = RGBA(51, 153, 255,255); // Brighter selection color
+            else if (IsFixed())
+                crBk = RGBA(240, 240, 240,255); // Default fixed cell color
+            else
+                crBk = RGBA(255, 255, 255,255); // Default cell color
+        }
+        pRT->FillSolidRect(&rect, crBk);
+    }
     // Draw color rectangle
     RECT rcColor = rect;
     rcColor.left += 2;

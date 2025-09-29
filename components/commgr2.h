@@ -154,24 +154,28 @@ SNSBEGIN
 class SComMgr2
 {
 public:
-    SComMgr2(LPCTSTR pszImgDecoder = _T("imgdecoder-stb")):m_strImgDecoder(pszImgDecoder)
+    SComMgr2(LPCTSTR pszImgDecoder = NULL)
     {
+        if(pszImgDecoder) m_strImgDecoder = pszImgDecoder;
+        else m_strImgDecoder = COM_IMGDECODER;
     }
 
 	void SetDllPath(const SStringT & strDllPath){}
 
-    BOOL CreateImgDecoder(IObjRef ** ppObj)
+    BOOL CreateImgDecoder(IObjRef ** ppObj,LPCTSTR pszImgDecoder=NULL)
     {
+        SStringT strImgDecoder = pszImgDecoder?SStringT(pszImgDecoder):m_strImgDecoder;
+        strImgDecoder.MakeLower();
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
-        if(m_strImgDecoder == _T("imgdecoder-wic"))
+        if(strImgDecoder == _T("imgdecoder-wic"))
             return IMGDECODOR_WIC::SCreateInstance(ppObj);
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_stb)
-        if(m_strImgDecoder == _T("imgdecoder-stb"))
+        if(strImgDecoder == _T("imgdecoder-stb"))
             return IMGDECODOR_STB::SCreateInstance(ppObj);
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_gdip)
-        if(m_strImgDecoder == _T("imgdecoder-gdip"))
+        if(strImgDecoder == _T("imgdecoder-gdip"))
             return IMGDECODOR_GDIP::SCreateInstance(ppObj);
 #endif
          SASSERT(0);
@@ -296,10 +300,9 @@ public:
 
     BOOL CreateImgDecoder(IObjRef ** ppObj,LPCTSTR pszImgDecoder=NULL)
     {
-        if (pszImgDecoder)
-            return imgDecLoader.CreateInstance(m_strDllPath + pszImgDecoder, ppObj);
-        else
-            return imgDecLoader.CreateInstance(m_strDllPath + m_strImgDecoder, ppObj);
+        SStringT strImgDecoder = pszImgDecoder?SStringT(pszImgDecoder):m_strImgDecoder;
+        strImgDecoder.MakeLower();
+        return imgDecLoader.CreateInstance(m_strDllPath + strImgDecoder, ppObj);
     }
 
     BOOL CreateRender_GDI(IObjRef **ppObj)
