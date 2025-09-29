@@ -319,6 +319,7 @@ void SScrollBarHandler::OnMouseUp(CPoint pt)
         const SCROLLINFO *psi = m_pSbHost->GetScrollBarInfo(m_bVert);
         if (psi->nTrackPos != -1)
             m_pSbHost->OnScrollCommand(m_bVert, SB_THUMBPOSITION, psi->nTrackPos);
+        GetContainer()->BlockTimers(FALSE);
     }
 
     if (iClickPart != -1 && m_iHitPart == -1)
@@ -359,6 +360,9 @@ bool SScrollBarHandler::OnMouseDown(CPoint pt)
     case SB_PAGEUP:
     case SB_PAGEDOWN:
         m_pSbHost->OnScrollSetTimer(m_bVert, IScrollBarHost::Timer_Wait, IScrollBarHost::kTime_Wait);
+        break;
+    case SB_THUMBTRACK:
+        GetContainer()->BlockTimers(TRUE);
         break;
     }
     return true;

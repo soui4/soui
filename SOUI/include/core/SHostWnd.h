@@ -342,11 +342,12 @@ class SOUI_EXP SHostWnd
     CSize m_szAppSetted; /**< Window size set by the application layer. */
     CSize m_szPrev; /**< Previous window size. */
     int m_nAutoSizing; /**< Auto-sizing trigger count for WM_SIZE messages. */
-    bool m_bResizing; /**< Indicates if resizing is in progress. */
+    BOOL m_bResizing; /**< Indicates if resizing is in progress. */
 
     SAutoRefPtr<IAnimation> m_hostAnimation; /**< Host animation object. */
     DWORD m_AniState; /**< Animation state. */
     BOOL m_bFirstShow; /**< Indicates if it's the first time the window is shown. */
+    BOOL m_bBlockTimer; /**< Indicates if timer blocking is enabled. */
     tid_t m_dwThreadID; /**< Thread ID. */
     SRootWindow *m_pRoot; /**< Pointer to the root window. */
 
@@ -585,6 +586,9 @@ STDMETHOD_(void, EnablePrivateUiDef)(THIS_ BOOL bEnable) OVERRIDE;
  * @param pDestRect Destination rectangle.
  */
 STDMETHOD_(void, SetScale)(THIS_ int nScale, LPCRECT pDestRect) OVERRIDE;
+
+
+    STDMETHOD_(void, BlockTimers)(THIS_ BOOL bBlock) OVERRIDE;
 
 /**
  * @brief Finds a child window by its name (Unicode version).

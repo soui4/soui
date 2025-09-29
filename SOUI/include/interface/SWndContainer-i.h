@@ -306,6 +306,13 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @return Pointer to the window finder object.
      */
     STDMETHOD_(ISwndFinder*, GetSwndFinder)(THIS) PURE;
+
+    /**
+     * @brief Blocks or unblocks timers.
+     * @param bBlock TRUE to block timers, FALSE to unblock timers.
+     * @return void.
+     */
+    STDMETHOD_(void, BlockTimers)(THIS_ BOOL bBlock) PURE;
 };
 
 SNSEND

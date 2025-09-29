@@ -334,7 +334,8 @@ void SHostWnd::_Init()
     m_dummyWnd = NULL;
     m_szAppSetted = CSize(0, 0);
     m_nAutoSizing = 0;
-    m_bResizing = false;
+    m_bResizing = FALSE;
+    m_bBlockTimer = FALSE;
     m_dwThreadID = 0;
     m_AniState = 0;
     m_pRoot = NULL;
@@ -1019,7 +1020,7 @@ void SHostWnd::OnTimer(UINT_PTR idEvent)
         return;
     if (idEvent == kPulseTimer)
     {
-        if (!IsIconic())
+        if (!IsIconic() && !m_bBlockTimer)
         {
             SwndContainerImpl::OnNextFrame();
         }
@@ -1037,7 +1038,8 @@ void SHostWnd::OnTimer(UINT_PTR idEvent)
         SWindow *pSwnd = SWindowMgr::GetWindow((SWND)sTimerID.swnd);
         if (pSwnd)
         {
-            pSwnd->SSendMessage(WM_TIMER, sTimerID.uTimerID, 0);
+            if(!m_bBlockTimer)
+                pSwnd->SSendMessage(WM_TIMER, sTimerID.uTimerID, 0);
         }
         else
         {
@@ -2113,6 +2115,11 @@ void SHostWnd::SetScale(THIS_ int nScale, LPCRECT desRect)
     SetWindowPos(NULL, desRect->left, desRect->top, desRect->right - desRect->left, desRect->bottom - desRect->top, SWP_NOZORDER | SWP_NOACTIVATE);
     UpdateAutoSizeCount(false);
     EnablePrivateUiDef(FALSE);
+}
+
+void SHostWnd::BlockTimers(THIS_ BOOL bBlock)
+{
+    m_bBlockTimer = bBlock;
 }
 
 LRESULT SHostWnd::OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp)
