@@ -175,7 +175,10 @@ BOOL CClientDlg::Connect()
 {
     HWND hSvr = FindWindow(NULL, SVR_NAME);
     if (!hSvr)
+    {
+        SLOGI()<<"server not found";
         return FALSE;
+    }
     SLOGI()<<"connect to remote:"<<hSvr<<" local:"<<m_hWnd;
     HRESULT hr = m_conn.GetIpcHandle()->ConnectTo((ULONG_PTR)m_hWnd, (ULONG_PTR)hSvr);
     BOOL bRet = hr == S_OK;
