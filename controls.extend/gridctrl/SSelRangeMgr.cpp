@@ -157,7 +157,10 @@ SNSBEGIN
     {
         return IsSelected(cellID.row, cellID.col);
     }
-
+    BOOL SSelRangeMgr::IsEmpty() const
+    {
+        return m_lstSelRanges.IsEmpty();
+    }
     const SList<SCellRange> &SSelRangeMgr::GetRanges() const
     {
         return m_lstSelRanges;

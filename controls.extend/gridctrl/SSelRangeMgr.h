@@ -23,6 +23,7 @@ SNSBEGIN
 
         SCellRange GetBoundingRange() const;
 
+        BOOL IsEmpty() const;
     private:
         BOOL IsRangesIntersect(const SCellRange &range1, const SCellRange &range2) const;
 

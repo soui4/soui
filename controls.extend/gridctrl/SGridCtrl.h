@@ -236,6 +236,10 @@ public:
     STDMETHOD_(BOOL, PrintCell)(THIS_ IRenderTarget* pRT, int nRow, int nCol, RECT rect) OVERRIDE;
 
     STDMETHOD_(IGridInplaceWnd *, CreateInplaceWnd)(CTHIS_ int nRow,int nCol) SCONST OVERRIDE;
+    STDMETHOD_(void, GetInplaceRect)(CTHIS_ int nRow, int nCol, RECT* pRect) SCONST OVERRIDE {
+        m_pGrid->GetCellRectEx(nRow, nCol, pRect);
+        InflateRect(pRect, -1, -1);
+    }
 
 public:
     STDMETHOD_(HRESULT,QueryInterface)(REFIID riid, LPVOID * ppvObject){return E_NOINTERFACE;}
@@ -245,7 +249,9 @@ public:
     STDMETHOD_(void, OnMouseLeave)(THIS) OVERRIDE {}
     STDMETHOD_(void, OnClickUp)(THIS_ POINT PointCellRelative) OVERRIDE {}
     STDMETHOD_(void, OnClickDown)(THIS_ POINT PointCellRelative) OVERRIDE {}
-    STDMETHOD_(void, OnRClick)(THIS_ POINT PointCellRelative) OVERRIDE {}
+    STDMETHOD_(BOOL, OnRClick)(THIS_ POINT PointCellRelative) OVERRIDE {
+        return FALSE;
+    }
     STDMETHOD_(void, OnDblClick)(THIS_ POINT PointCellRelative) OVERRIDE {
         if(GetGrid()->IsEditable() && !IsReadOnly()){
             SCellID cellID(GetRow(), GetCol());
@@ -368,6 +374,8 @@ public:
     STDMETHOD_(BOOL, Draw)(THIS_ IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOOL bEraseBkgnd) OVERRIDE;
     STDMETHOD_(void, OnClickUp)(THIS_ POINT PointCellRelative) OVERRIDE;
     STDMETHOD_(void, OnDblClick)(THIS_ POINT PointCellRelative) OVERRIDE;
+    STDMETHOD_(IGridInplaceWnd*, CreateInplaceWnd)(CTHIS_ int nRow, int nCol) SCONST OVERRIDE;
+    STDMETHOD_(void, GetInplaceRect)(CTHIS_ int nRow, int nCol, RECT* pRect) SCONST OVERRIDE;
 
     // IGridCellColor interface
     STDMETHOD_(COLORREF, GetColor)() SCONST OVERRIDE { return m_crColor; }
@@ -382,6 +390,8 @@ public:
 
 protected:
     void DrawColorRect(IRenderTarget* pRT, const RECT& rect);
+    RECT GetColorRect(const RECT& cellRect) const;
+    RECT GetTextRect(const RECT& cellRect) const;
 protected:
     COLORREF m_crColor;         /**< Current color value */
     SStringT m_strFormat;       /**< Color format string */
@@ -670,6 +680,7 @@ public:
     }
 
     // Selection and highlighting
+    STDMETHOD_(void, ClearSelection)(THIS) OVERRIDE;
     STDMETHOD_(void, SelectAll)(THIS) OVERRIDE;
     STDMETHOD_(void, SelectNone)(THIS) OVERRIDE;
     STDMETHOD_(void, SelectRow)(THIS_ int nRow, BOOL bAdd) OVERRIDE;
@@ -775,7 +786,7 @@ protected:
     virtual void OnFixedCellClick(SCellID cell);
     virtual void OnCellClick(SCellID cell, UINT nFlags, CPoint pt);
     virtual void OnCellDblClick(SCellID cell, UINT nFlags,CPoint pt);
-    virtual void OnCellRClick(SCellID cell, UINT nFlags,CPoint pt);
+    virtual BOOL OnCellRClick(SCellID cell, UINT nFlags,CPoint pt);
     virtual void OnCellMouseEnter(SCellID cell);
     virtual void OnCellMouseLeave(SCellID cell);
     virtual void OnCellMouseOver(SCellID cell);

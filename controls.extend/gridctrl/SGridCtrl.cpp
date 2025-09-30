@@ -7,6 +7,7 @@
 #include <control/SCmnCtrl.h>
 #include <control/SDateTimePicker.h>
 #include <control/SCalendar.h>
+#include <helper/SMenu.h>
 #include "SSelRangeMgr.h"
 #include <commdlg.h>
 #include <res.mgr/SNamedValue.h>
@@ -2908,6 +2909,8 @@ void SGridCtrl::OnLButtonDown(UINT nFlags, CPoint pt)
                 SetFocusCell(cell.row, cell.col);
             }
         }
+    }else{
+        SelectNone();
     }
 }
 
@@ -2976,11 +2979,66 @@ void SGridCtrl::OnRButtonDown(UINT nFlags, CPoint pt)
     SCellID cell;
     GetCellFromPt(pt, TRUE, &cell);
 
+    BOOL bCancel = FALSE;
     if (cell.IsValid())
     {
-        OnCellRClick(cell, nFlags,pt);
+        bCancel = OnCellRClick(cell, nFlags, pt);
     }
+    if (bCancel)
+        return;
+    if (FireCtxMenu(pt))
+        return; // 用户自己响应右键
+    // 弹出默认编辑窗菜单
+    SXmlNode xmlMenu = SApplication::getSingletonPtr()->GetEditCtxMenuTemplate();
+    if (xmlMenu)
+    {
+        SMenu menu;
+        if (menu.LoadMenu2(&xmlMenu))
+        {
+            CRect rcCantainer;
+            GetContainer()->GetContainerRect(&rcCantainer);
+            pt.Offset(rcCantainer.TopLeft());
+            HWND hHost = GetContainer()->GetHostHwnd();
+            ::ClientToScreen(hHost, &pt);
+            BOOL hasSel = !m_SelectedCellRange.IsEmpty();
+            BOOL bReadOnly = !m_bEditable;
+            BOOL canPaste = CanPaste();
 
+            EnableMenuItem(menu.m_hMenu, MENU_CUT, MF_BYCOMMAND | ((hasSel && (!bReadOnly)) ? 0 : MF_GRAYED));
+            EnableMenuItem(menu.m_hMenu, MENU_COPY, MF_BYCOMMAND | (hasSel ? 0 : MF_GRAYED));
+            EnableMenuItem(menu.m_hMenu, MENU_PASTE, MF_BYCOMMAND | ((canPaste && (!bReadOnly)) ? 0 : MF_GRAYED));
+            EnableMenuItem(menu.m_hMenu, MENU_DEL, MF_BYCOMMAND | ((hasSel && (!bReadOnly)) ? 0 : MF_GRAYED));
+
+            UINT uCmd = menu.TrackPopupMenu(TPM_RETURNCMD | TPM_LEFTALIGN, pt.x, pt.y, hHost, NULL, GetScale());
+
+            EventREMenu evt(this);
+            evt.uCmd = uCmd;
+            FireEvent(evt);
+            if (evt.handled)
+                return;
+
+            switch (uCmd)
+            {
+            case MENU_CUT:
+                Cut();
+                break;
+            case MENU_COPY:
+                Copy();
+                break;
+            case MENU_PASTE:
+                Paste();
+                break;
+            case MENU_DEL:
+                ClearSelection();
+                break;
+            case MENU_SELALL:
+                SelectAll();
+                break;
+            default:
+                break;
+            }
+        }
+    }
 }
 
 void SGridCtrl::OnMouseMove(UINT nFlags, CPoint pt)
@@ -3319,10 +3377,10 @@ void SGridCtrl::OnCellDblClick(SCellID cell, UINT nFlags,CPoint pt)
     }
 }
 
-void SGridCtrl::OnCellRClick(SCellID cell, UINT nFlags,CPoint pt)
+BOOL SGridCtrl::OnCellRClick(SCellID cell, UINT nFlags,CPoint pt)
 {
     if (!cell.IsValid())
-        return;
+        return FALSE;
 
     // Set focus to right-clicked cell
     SetFocusCell2(cell);
@@ -3330,9 +3388,9 @@ void SGridCtrl::OnCellRClick(SCellID cell, UINT nFlags,CPoint pt)
     IGridCell *pCell = GetCell(cell.row, cell.col);
     if(pCell){
         CPoint pt2 = pt-rcCell.TopLeft();
-        pCell->OnRClick(pt2);
+        return pCell->OnRClick(pt2);
     }
-    // TODO: Show context menu
+    return FALSE;
 }
 
 void SGridCtrl::OnCellMouseEnter(SCellID cell)
@@ -4671,6 +4729,26 @@ BOOL SGridCtrl::IsRangeVisible(const SCellRange& range) const
              range.minCol > visibleRange.maxCol);
 }
 
+void SGridCtrl::ClearSelection()
+{
+    SPOSITION posOld = m_SelectedCellRange.GetRanges().GetHeadPosition();
+    while(posOld)
+    {
+        SCellRange r = m_SelectedCellRange.GetRanges().GetNext(posOld);
+        for (int row = r.minRow; row <= r.maxRow; row++)
+        {
+            for (int col = r.minCol; col <= r.maxCol; col++)
+            {
+                IGridCell* pCell = GetCell(row, col);
+                if (pCell)
+                {
+                    pCell->SetText(_T(""));
+                }
+            }
+        }
+    }
+}
+
 void SGridCtrl::SelectAll()
 {
     if (m_nRows > 0 && m_nCols > 0)
@@ -5047,9 +5125,6 @@ BOOL SGridCtrl::Cut()
 
 BOOL SGridCtrl::Paste()
 {
-    if (!CanPaste())
-        return FALSE;
-
     SStringT strText = GetClipboardText();
     if (strText.IsEmpty())
         return FALSE;
@@ -5682,11 +5757,10 @@ BOOL SGridCtrl::StartInplaceEdit(int nRow, int nCol)
         m_pInplaceWnd->InitData(strText);
     }
 
-    // Position the inplace window
-    CRect rcCell = GetCellRectEx(nRow, nCol);
-    rcCell.DeflateRect(1, 1);
-    pInplaceWnd->Move(rcCell);
-
+    // Check if cell has custom inplace rect
+    CRect rcInplace;
+    gridCell->GetInplaceRect(nRow, nCol, &rcInplace);
+    pInplaceWnd->Move(rcInplace);
 
     // Show and focus the inplace window
     pInplaceWnd->SetVisible(TRUE, TRUE);
@@ -5774,12 +5848,7 @@ BOOL SGridColorCell::Draw(IRenderTarget* pRT, int nRow, int nCol, RECT rect, BOO
     DrawColorRect(pRT, rcColor);
 
     // Draw color text
-    RECT rcText = rect;
-    rcText.left = rcColor.right + 4;
-    rcText.left += 2;
-    rcText.top += 2;
-    rcText.right -= 2;
-    rcText.bottom -= 2;
+    RECT rcText = GetTextRect(rect);
 
     SStringT strText = GetColorText();
     pRT->DrawText(strText, strText.GetLength(), &rcText, DT_LEFT | DT_VCENTER | DT_SINGLELINE);
@@ -5817,14 +5886,34 @@ void SGridColorCell::DrawColorRect(IRenderTarget* pRT, const RECT& rect)
 
 void SGridColorCell::OnClickUp(POINT PointCellRelative)
 {
-    RECT rect = {0, 0, 100, 25}; // Default rect, will be updated by grid
-    ShowColorPicker(&rect);
+    if (GetGrid()->IsEditable() && !IsReadOnly())
+    {
+        // Get cell rectangle
+        CRect rcCell;
+        GetGrid()->GetCellRectEx(GetRow(), GetCol(), &rcCell);
+        rcCell.MoveToXY(0, 0); // Convert to relative coordinates
+
+        // Get color rectangle (left side of cell)
+        RECT rcColor = GetColorRect(rcCell);
+
+        // Check if click is in color rectangle
+        if (PointCellRelative.x >= rcColor.left && PointCellRelative.x <= rcColor.right &&
+            PointCellRelative.y >= rcColor.top && PointCellRelative.y <= rcColor.bottom)
+        {
+            // Click on color block - show color picker
+            ShowColorPicker(&rcColor);
+        }
+    }
 }
 
 void SGridColorCell::OnDblClick(POINT PointCellRelative)
 {
-    // Same as single click for color picker
-    OnClickUp(PointCellRelative);
+    if (GetGrid()->IsEditable() && !IsReadOnly())
+    {
+        // Double click always starts text editing
+        SCellID cellID(GetRow(), GetCol());
+        GetGrid()->StartEdit(cellID);
+    }
 }
 
 BOOL SGridColorCell::ShowColorPicker(const RECT* pRect)
@@ -5876,7 +5965,7 @@ SStringT SGridColorCell::GetColorText() const
     int r = GetRValue(m_crColor);
     int g = GetGValue(m_crColor);
     int b = GetBValue(m_crColor);
-    str.Format(m_strFormat, a, r, g, b);
+    str.Format(m_strFormat, a, b, g, r);
     return str;
 }
 
@@ -5889,8 +5978,56 @@ void SGridColorCell::SetText(LPCTSTR szText)
     if(ret == 3)
         m_crColor = RGBA(v[0], v[1], v[2], 255); // rgb
     else
-        m_crColor = RGBA(v[3], v[0], v[1], v[2]); // argb
+        m_crColor = RGBA(v[3], v[2], v[1], v[0]); // argb
     __baseCls::SetText(GetColorText());
+}
+
+IGridInplaceWnd* SGridColorCell::CreateInplaceWnd(int nRow, int nCol) const
+{
+    TplGridInplaceWnd<SEdit>* pEdit = new TplGridInplaceWnd<SEdit>(m_pGrid, nRow, nCol);
+    if (!pEdit)
+        return NULL;
+
+    // Set edit properties
+    pEdit->SetAttribute(L"colorBkgnd", L"#FFFFFF", TRUE);
+    pEdit->SetAttribute(L"colorText", L"#000000", TRUE);
+    pEdit->SetAttribute(L"autoWordSel", L"1", TRUE);
+
+    return pEdit;
+}
+
+void SGridColorCell::GetInplaceRect(int nRow, int nCol, RECT* pRect) const
+{
+    if (!pRect || !m_pGrid)
+        return;
+
+    // Get full cell rectangle
+    CRect rcCell;
+    __baseCls::GetInplaceRect(nRow, nCol, &rcCell);
+    // Get text area rectangle (excluding color block)
+    RECT rcText = GetTextRect(rcCell);
+    *pRect = rcText;
+}
+
+RECT SGridColorCell::GetColorRect(const RECT& cellRect) const
+{
+    RECT rcColor = cellRect;
+    rcColor.left += 2;
+    rcColor.top += 2;
+    rcColor.bottom -= 2;
+    rcColor.right = rcColor.left + (rcColor.bottom - rcColor.top);
+    return rcColor;
+}
+
+RECT SGridColorCell::GetTextRect(const RECT& cellRect) const
+{
+    RECT rcColor = GetColorRect(cellRect);
+    RECT rcText = cellRect;
+    rcText.left = rcColor.right + 4;
+    rcText.top += 2;
+    rcText.right -= 2;
+    rcText.bottom -= 2;
+    return rcText;
 }
 
 //////////////////////////////////////////////////////////////////////////

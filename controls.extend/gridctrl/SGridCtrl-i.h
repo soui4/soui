@@ -163,11 +163,20 @@ DECLARE_INTERFACE_(IGridCell, IObjRef)
     STDMETHOD_(void, OnMouseLeave)(THIS) PURE;
     STDMETHOD_(void, OnClickDown)(THIS_ POINT PointCellRelative) PURE;
     STDMETHOD_(void, OnClickUp)(THIS_ POINT PointCellRelative) PURE;
-    STDMETHOD_(void, OnRClick)(THIS_ POINT PointCellRelative) PURE;
+    STDMETHOD_(BOOL, OnRClick)(THIS_ POINT PointCellRelative) PURE;
     STDMETHOD_(void, OnDblClick)(THIS_ POINT PointCellRelative) PURE;
     STDMETHOD_(BOOL, OnSetCursor)(THIS_ POINT PointCellRelative) PURE;
 
     STDMETHOD_(IGridInplaceWnd *, CreateInplaceWnd)(CTHIS_ int nRow,int nCol) SCONST PURE;
+
+    /**
+     * @brief 获取编辑控件的位置矩形
+     * @param nRow 行号
+     * @param nCol 列号
+     * @param pRect 输出的矩形区域
+     * @details 允许单元格自定义编辑控件的位置，如果返回全0矩形则使用默认位置
+     */
+    STDMETHOD_(void, GetInplaceRect)(CTHIS_ int nRow, int nCol, RECT* pRect) SCONST PURE;
 };
 
 
@@ -381,6 +390,7 @@ DECLARE_INTERFACE_(IGridCtrl, ICtrl)
     STDMETHOD_(BOOL, EndEdit)(THIS_ BOOL bSaveChanges) PURE;
 
     // Selection and highlighting
+    STDMETHOD_(void, ClearSelection)(THIS) PURE;
     STDMETHOD_(void, SelectAll)(THIS) PURE;
     STDMETHOD_(void, SelectNone)(THIS) PURE;
     STDMETHOD_(void, SelectRow)(THIS_ int nRow, BOOL bAdd) PURE;
