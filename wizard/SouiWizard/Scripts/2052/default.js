@@ -187,7 +187,7 @@ function AddConfig(proj, strProjectName) {
         CLTool.TreatWChar_tAsBuiltInType = (wcharSet == 1);
         CLTool.WarningLevel = warningLevelOption.warningLevel_3;
         if (WizardVersion < 10.0) {
-            CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\include\\utilities\\include\\stdint"';
+            CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\third-part\\stdint"';
         } else {
             CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include"';
         }
@@ -235,7 +235,7 @@ function AddConfig(proj, strProjectName) {
         CLTool.TreatWChar_tAsBuiltInType = (wcharSet == 1);
         CLTool.WarningLevel = warningLevelOption.warningLevel_3;
         if (WizardVersion < 10.0) {
-            CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\include\\utilities\\include\\stdint"';
+            CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\third-part\\stdint"';
         } else {
             CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include"';
         }
@@ -283,7 +283,7 @@ function AddConfig(proj, strProjectName) {
             CLTool_x64.TreatWChar_tAsBuiltInType = (wcharSet == 1);
             CLTool_x64.WarningLevel = warningLevelOption.warningLevel_3;
             if (WizardVersion < 10.0) {
-                CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\include\\utilities\\include\\stdint"';
+                CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\third-part\\stdint"';
             } else {
                 CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include"';
             }
@@ -326,7 +326,7 @@ function AddConfig(proj, strProjectName) {
             CLTool_x64.TreatWChar_tAsBuiltInType = (wcharSet == 1);
             CLTool_x64.WarningLevel = warningLevelOption.warningLevel_3;
             if (WizardVersion < 10.0) {
-                CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\include\\utilities\\include\\stdint"';
+                CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\third-part\\stdint"';
             } else {
                 CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include"';
             }

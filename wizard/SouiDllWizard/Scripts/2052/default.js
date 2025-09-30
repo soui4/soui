@@ -1,4 +1,4 @@
-
+ï»¿
 function OnFinish(selProj, selObj) {
     try {
         var strProjectPath = wizard.FindSymbol('PROJECT_PATH');
@@ -123,7 +123,7 @@ function CreateCustomProject(strProjectName, strProjectPath) {
 
 function AddFilters(proj) {
     try {
-        // ½«ÎÄ¼ş¼ĞÌí¼Óµ½ÏîÄ¿
+        // å°†æ–‡ä»¶å¤¹æ·»åŠ åˆ°é¡¹ç›®
         var strSrcFilter = wizard.FindSymbol('SOURCE_FILTER');
         var group = proj.Object.AddFilter('Source Files');
         group.Filter = strSrcFilter;
@@ -157,7 +157,7 @@ function AddConfig(proj, strProjectName) {
 
         var wcharSet = wizard.FindSymbol('WCHAR');
         var mtSet = wizard.FindSymbol('MT');
-        // DebugÉèÖÃ
+        // Debugè®¾ç½®
         var config = proj.Object.Configurations('Debug|Win32');
 		config.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_32%\\bin\\Debug\\;%PATH%';
         config.ConfigurationType = typeDynamicLibrary;
@@ -172,13 +172,13 @@ function AddConfig(proj, strProjectName) {
         }
 
         var CLTool = config.Tools('VCCLCompilerTool');
-        //Ìí¼Ó±àÒëÆ÷ÉèÖÃ
-        CLTool.UsePrecompiledHeader = 2;    // 2-Ê¹ÓÃÔ¤±àÒëÍ·,1-´´½¨,0-²»Ê¹ÓÃ
+        //æ·»åŠ ç¼–è¯‘å™¨è®¾ç½®
+        CLTool.UsePrecompiledHeader = 2;    // 2-ä½¿ç”¨é¢„ç¼–è¯‘å¤´,1-åˆ›å»º,0-ä¸ä½¿ç”¨
         CLTool.SuppressStartupBanner = true;
         CLTool.TreatWChar_tAsBuiltInType = (wcharSet == 1);
         CLTool.WarningLevel = warningLevelOption.warningLevel_3;
 	  if(WizardVersion < 10.0){
-         	CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\include\\utilities\\include\\stdint"';			
+         	CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\third-part\\stdint"';			
          }else{
          	CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include"';			
          }
@@ -189,7 +189,7 @@ function AddConfig(proj, strProjectName) {
         CLTool.DebugInformationFormat = debugOption.debugEditAndContinue;//Edit and continue
 
         var LinkTool = config.Tools('VCLinkerTool');
-        //Ìí¼ÓÁ´½ÓÆ÷ÉèÖÃ
+        //æ·»åŠ é“¾æ¥å™¨è®¾ç½®
         LinkTool.GenerateDebugInformation = true;
         LinkTool.LinkIncremental = linkIncrementalYes;
         LinkTool.SuppressStartupBanner = true;  // nologo
@@ -206,7 +206,7 @@ function AddConfig(proj, strProjectName) {
 		else {
 			resCplTool.PreprocessorDefinitions += ';_DEBUG';	
 		}
-        // ReleaseÉèÖÃ
+        // Releaseè®¾ç½®
         var config = proj.Object.Configurations('Release|Win32');
  		config.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_32%\\bin\\Release\\;%PATH%';
         config.ConfigurationType = typeDynamicLibrary;
@@ -220,22 +220,22 @@ function AddConfig(proj, strProjectName) {
             config.OutputDirectory = '$(SolutionDir)$(ConfigurationName)';
         }
         var CLTool = config.Tools('VCCLCompilerTool');
-        //Ìí¼Ó±àÒëÆ÷ÉèÖÃ
-        CLTool.UsePrecompiledHeader = 2;    // 2-Ê¹ÓÃÔ¤±àÒëÍ·,1-´´½¨,0-²»Ê¹ÓÃ
+        //æ·»åŠ ç¼–è¯‘å™¨è®¾ç½®
+        CLTool.UsePrecompiledHeader = 2;    // 2-ä½¿ç”¨é¢„ç¼–è¯‘å¤´,1-åˆ›å»º,0-ä¸ä½¿ç”¨
         CLTool.SuppressStartupBanner = true;
         CLTool.TreatWChar_tAsBuiltInType = (wcharSet == 1);
         CLTool.WarningLevel = warningLevelOption.warningLevel_3;
 	  if(WizardVersion < 10.0){
-         	CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\include\\utilities\\include\\stdint"';			
+         	CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include";;"$(SOUI4_INSTALL_32)\\third-part\\stdint"';			
          }else{
          	CLTool.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_32)\\include\\config";"$(SOUI4_INSTALL_32)\\include\\components";"$(SOUI4_INSTALL_32)\\include\\SOUI";"$(SOUI4_INSTALL_32)\\include\\SOUI\\include";"$(SOUI4_INSTALL_32)\\include\\utilities\\include"';			
          }
         CLTool.PreprocessorDefinitions = 'WIN32;_WINDOWS;_USRDLL;NDEBUG';
         CLTool.RuntimeLibrary = (mtSet == 1) ? 0 : 2;; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
-        CLTool.WholeProgramOptimization = true;	//È«³ÌĞòÓÅ»¯£ºÆô¶¯Á´½ÓÊ±´úÂëÉú³É
+        CLTool.WholeProgramOptimization = true;	//å…¨ç¨‹åºä¼˜åŒ–ï¼šå¯åŠ¨é“¾æ¥æ—¶ä»£ç ç”Ÿæˆ
 
         var LinkTool = config.Tools('VCLinkerTool');
-        //Ìí¼ÓÁ´½ÓÆ÷ÉèÖÃ
+        //æ·»åŠ é“¾æ¥å™¨è®¾ç½®
         LinkTool.GenerateDebugInformation = true;
         LinkTool.LinkIncremental = linkIncrementalYes;
         LinkTool.SuppressStartupBanner = true;  // nologoif(UserDll)
@@ -249,7 +249,7 @@ function AddConfig(proj, strProjectName) {
         if (SysResBuiltin && (ResLoadType == 0)) {
             resCplTool.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\soui-sys-resource"';
         }
-        //x64ÅäÖÃ,Ä¬ÈÏÇé¿ö15ÒÔÇ°µÄ°æ±¾ÊÇÃ»ÓĞX64µÄÅäÖÃµÄ
+        //x64é…ç½®,é»˜è®¤æƒ…å†µ15ä»¥å‰çš„ç‰ˆæœ¬æ˜¯æ²¡æœ‰X64çš„é…ç½®çš„
         var config_x64 = proj.Object.Configurations('Debug|x64');
         if (config_x64 != null) {
 			config_x64.CharacterSet = charSetUNICODE;
@@ -263,13 +263,13 @@ function AddConfig(proj, strProjectName) {
                 config_x64.OutputDirectory = '$(SolutionDir)$(ConfigurationName)64';
             }
             var CLTool_x64 = config_x64.Tools('VCCLCompilerTool');
-            //Ìí¼Ó64Î»±àÒëÆ÷ÉèÖÃ
-            CLTool_x64.UsePrecompiledHeader = 2;    // 2-Ê¹ÓÃÔ¤±àÒëÍ·,1-´´½¨,0-²»Ê¹ÓÃ
+            //æ·»åŠ 64ä½ç¼–è¯‘å™¨è®¾ç½®
+            CLTool_x64.UsePrecompiledHeader = 2;    // 2-ä½¿ç”¨é¢„ç¼–è¯‘å¤´,1-åˆ›å»º,0-ä¸ä½¿ç”¨
             CLTool_x64.SuppressStartupBanner = true;
             CLTool_x64.TreatWChar_tAsBuiltInType = (wcharSet == 1);
             CLTool_x64.WarningLevel = warningLevelOption.warningLevel_3;
 	  if(WizardVersion < 10.0){
-         	CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\include\\utilities\\include\\stdint"';			
+         	CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\third-part\\stdint"';			
          }else{
          	CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include"';			
          }
@@ -280,7 +280,7 @@ function AddConfig(proj, strProjectName) {
             CLTool_x64.DebugInformationFormat = debugOption.debugEditAndContinue;//Edit and continue
 
             var LinkTool_64 = config_x64.Tools('VCLinkerTool');
-            //Ìí¼ÓÁ´½ÓÆ÷ÉèÖÃ
+            //æ·»åŠ é“¾æ¥å™¨è®¾ç½®
             LinkTool_64.GenerateDebugInformation = true;
             LinkTool_64.LinkIncremental = linkIncrementalYes;
             LinkTool_64.SuppressStartupBanner = true;  // nologo
@@ -306,21 +306,21 @@ function AddConfig(proj, strProjectName) {
                 config_64.OutputDirectory = '$(SolutionDir)$(ConfigurationName)64';
             }
             var CLTool_x64 = config_64.Tools('VCCLCompilerTool');
-            //Ìí¼Ó±àÒëÆ÷ÉèÖÃ
-            CLTool_x64.UsePrecompiledHeader = 2;    // 2-Ê¹ÓÃÔ¤±àÒëÍ·,1-´´½¨,0-²»Ê¹ÓÃ
+            //æ·»åŠ ç¼–è¯‘å™¨è®¾ç½®
+            CLTool_x64.UsePrecompiledHeader = 2;    // 2-ä½¿ç”¨é¢„ç¼–è¯‘å¤´,1-åˆ›å»º,0-ä¸ä½¿ç”¨
             CLTool_x64.SuppressStartupBanner = true;
             CLTool_x64.TreatWChar_tAsBuiltInType = (wcharSet == 1);
             CLTool_x64.WarningLevel = warningLevelOption.warningLevel_3;
 	  if(WizardVersion < 10.0){
-         	CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\include\\utilities\\include\\stdint"';			
+         	CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include";;"$(SOUI4_INSTALL_64)\\third-part\\stdint"';			
          }else{
          	CLTool_x64.AdditionalIncludeDirectories = '"$(SOUI4_INSTALL_64)\\include\\config";"$(SOUI4_INSTALL_64)\\include\\components";"$(SOUI4_INSTALL_64)\\include\\SOUI";"$(SOUI4_INSTALL_64)\\include\\SOUI\\include";"$(SOUI4_INSTALL_64)\\include\\utilities\\include"';			
          }
             CLTool_x64.PreprocessorDefinitions = 'WIN64;_WINDOWS;_USRDLL;NDEBUG';
             CLTool_x64.RuntimeLibrary = (mtSet == 1) ? 0 : 2;; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
-            CLTool_x64.WholeProgramOptimization = true;	//È«³ÌĞòÓÅ»¯£ºÆô¶¯Á´½ÓÊ±´úÂëÉú³É
+            CLTool_x64.WholeProgramOptimization = true;	//å…¨ç¨‹åºä¼˜åŒ–ï¼šå¯åŠ¨é“¾æ¥æ—¶ä»£ç ç”Ÿæˆ
             var LinkTool_x64 = config_64.Tools('VCLinkerTool');
-            //Ìí¼ÓÁ´½ÓÆ÷ÉèÖÃ
+            //æ·»åŠ é“¾æ¥å™¨è®¾ç½®
             LinkTool_x64.GenerateDebugInformation = true;
             LinkTool_x64.LinkIncremental = linkIncrementalYes;
             LinkTool_x64.SuppressStartupBanner = true;  // nologoif(UserDll)
@@ -343,7 +343,7 @@ function AddConfig(proj, strProjectName) {
 }
 
 function PchSettings(proj) {
-    // TODO: Ö¸¶¨ pch ÉèÖÃ
+    // TODO: æŒ‡å®š pch è®¾ç½®
 }
 
 function DelFile(fso, strWizTempFile) {
@@ -401,7 +401,7 @@ function GetSourceName(strName) {
 function GetTargetName(strName, strProjectName) {
     try {
         strName.toLowerCase();
-        // TODO: »ùÓÚÄ£°åÎÄ¼şÃûÉèÖÃ³ÊÏÖÎÄ¼şµÄÃû³Æ
+        // TODO: åŸºäºæ¨¡æ¿æ–‡ä»¶åè®¾ç½®å‘ˆç°æ–‡ä»¶çš„åç§°
         var strTarget = strName;
 
         if (strName == 'demo.cpp')
@@ -410,7 +410,7 @@ function GetTargetName(strName, strProjectName) {
         if (strName == 'demo.rc')
             strTarget = strProjectName + '.rc';
 
-        if (strName.indexOf('[uires]') == 0) // UI×ÊÔ´ÎÄ¼ş
+        if (strName.indexOf('[uires]') == 0) // UIèµ„æºæ–‡ä»¶
         {
             strTarget = "uires\\" + strName.substr(7);
         }
@@ -433,7 +433,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         var strTpl = '';
         var strName = '';
 
-        // ¹ıÂËÆ÷¶ÔÏó
+        // è¿‡æ»¤å™¨å¯¹è±¡
         var projFilters = proj.Object.Filters;
         var filterRes = projFilters.Item('Resource Files');
         var filterUIRES = projFilters.Item('SoUI Resource');
@@ -441,17 +441,17 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         var strTextStream = InfFile.OpenAsTextStream(1, -2);
         while (!strTextStream.AtEndOfStream) {
             strTpl = strTextStream.ReadLine();
-            if (strTpl != '' && strTpl.indexOf(';') != 0) // ;×¢ÊÍĞĞ
+            if (strTpl != '' && strTpl.indexOf(';') != 0) // ;æ³¨é‡Šè¡Œ
             {
-                var bCopyOnly = false;  //¡°true¡±½ö½«ÎÄ¼ş´Ó strTemplate ¸´ÖÆµ½ strTarget£¬¶ø²»¶ÔÏîÄ¿½øĞĞ³ÊÏÖ/Ìí¼Ó
+                var bCopyOnly = false;  //â€œtrueâ€ä»…å°†æ–‡ä»¶ä» strTemplate å¤åˆ¶åˆ° strTargetï¼Œè€Œä¸å¯¹é¡¹ç›®è¿›è¡Œå‘ˆç°/æ·»åŠ 
                 var bBinary = false;
-                if (strTpl.indexOf('=') == 0) // ¶ş½øÖÆÎÄ¼ş
+                if (strTpl.indexOf('=') == 0) // äºŒè¿›åˆ¶æ–‡ä»¶
                 {
                     bBinary = true;
                     strTpl = strTpl.substr(1);
                 }
 
-                if (strTpl.indexOf('-') == 0) // Ö»¿½±´²»ĞèÒªÌí¼ÓµÄÎÄ¼ş
+                if (strTpl.indexOf('-') == 0) // åªæ‹·è´ä¸éœ€è¦æ·»åŠ çš„æ–‡ä»¶
                 {
                     bCopyOnly = true;
                     strTpl = strTpl.substr(1);
@@ -476,7 +476,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
                 var strExt = strName.substr(strName.lastIndexOf("."));
                 if (strExt == ".bmp" || strExt == ".ico" || strExt == ".gif" || strExt == ".rtf" || strExt == ".css" || strExt == ".png" || strExt == ".jpg" || strExt == ".lua")
                     bBinary = true;
-                // ¸´ÖÆÎÄ¼şºÍÌí¼Óµ½¹¤³Ì
+                // å¤åˆ¶æ–‡ä»¶å’Œæ·»åŠ åˆ°å·¥ç¨‹
                 wizard.RenderTemplate(strTemplate, strFile, bBinary);
                 if (!bCopyOnly) {
                     if (filter) {
@@ -489,7 +489,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         }
         strTextStream.Close();
 
-        // ÉèÖÃÄ³Ğ©ÎÄ¼şµÄ±àÒëÑ¡Ïî
+        // è®¾ç½®æŸäº›æ–‡ä»¶çš„ç¼–è¯‘é€‰é¡¹
         var files = proj.Object.Files;
         var file = files.Item('stdafx.cpp');
         var fileConfig = file.FileConfigurations('Debug');
@@ -511,7 +511,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         var psw = wizard.FindSymbol("ZIP_PSW");
         var ResLoadType = wizard.FindSymbol('ResLoaderType');
 
-        //Ö¸¶¨uires.idxµÄ±àÒëÃüÁî
+        //æŒ‡å®šuires.idxçš„ç¼–è¯‘å‘½ä»¤
         var WizardVersion = wizard.FindSymbol('WIZARD_VERSION');
         var DirFor7z;
         var outFile = '';
