@@ -18,38 +18,38 @@ source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
 
-# Add executable
-add_executable(hellocharts_demo WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CHARTCTRL_SRC})
- 
-# Link libraries
-target_link_libraries(hellocharts_demo soui4 utilities4)
+set(current_project "hellocharts_demo")
+add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${CHARTCTRL_SRC})
 
-# Set target properties
-if(CMAKE_DEBUG_POSTFIX)
-    set_target_properties(hellocharts_demo PROPERTIES DEBUG_POSTFIX ${CMAKE_DEBUG_POSTFIX})
+add_dependencies(${current_project} soui4 )
+link_directories(${SOUI_ROOT}/lib)
+target_link_libraries(${current_project} soui4 utilities4)
+if(ENABLE_SOUI_COM_LIB)
+    if(MSVC_VERSION LESS 1600 AND ENABLE_SOUI_COM_LIB)
+    message("vs is less than vs2008")
+    if (CMAKE_CL_64)
+	    link_directories("${PROJECT_SOURCE_DIR}/components/render-d2d/sdk7.1_d2d/lib/x64")
+    else ()
+	    link_directories("${PROJECT_SOURCE_DIR}/components/render-d2d/sdk7.1_d2d/lib/x86")
+    endif ()
+    endif()
+	target_link_libraries(${current_project} d2d1.lib dwrite.lib)
 endif()
-if(CMAKE_INSTALL_PREFIX)
-    set_target_properties(hellocharts_demo PROPERTIES INSTALL_RPATH ${CMAKE_INSTALL_PREFIX})
-endif()
-
-# Copy resources
-add_custom_command(TARGET hellocharts_demo POST_BUILD
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${CMAKE_CURRENT_SOURCE_DIR}/uires ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}
-)
-set_target_properties (hellocharts_demo PROPERTIES
+set_target_properties (${current_project} PROPERTIES
     FOLDER demos
 )
 
-install(TARGETS hellocharts_demo
+install(TARGETS ${current_project}
     CONFIGURATIONS Release
     RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/Release
     LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/Release
     ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/Release
 )
 
-install(TARGETS hellocharts_demo
+install(TARGETS ${current_project}
     CONFIGURATIONS Debug
     RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/Debug
     LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/Debug
     ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/Debug
 )
+
