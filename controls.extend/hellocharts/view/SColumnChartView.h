@@ -79,8 +79,8 @@ public:
 
     // SOUI attributes
     SOUI_ATTRS_BEGIN()
-        ATTR_BOOL(L"stacked", m_bStacked, FALSE)
-        ATTR_FLOAT(L"fillRatio", m_fillRatio, 0.75f)
+        ATTR_BOOL(L"stacked", m_bStacked, TRUE)
+        ATTR_FLOAT(L"fillRatio", m_fillRatio, TRUE)
     SOUI_ATTRS_END()
 
 protected:
