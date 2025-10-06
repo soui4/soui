@@ -438,6 +438,10 @@ int SOsrPanel::RemoveTasksForObject(THIS_ void *pObj)
     return m_pHostProxy->GetHostContainer()->RemoveTasksForObject(pObj);
 }
 
+BOOL SOsrPanel::IsTimelineEnabled() const
+{
+    return m_pItemContainer->IsTimelineEnabled();
+}
 //////////////////////////////////////////////////////////////////////////
 SItemPanel *SItemPanel::Create(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
 {

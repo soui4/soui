@@ -815,6 +815,11 @@ BOOL SMCListView::IsItemRedrawDelay() const
     return TRUE;
 }
 
+BOOL SMCListView::IsTimelineEnabled() const
+{
+    return !m_sbHorz.IsThumbTracking() && !m_sbVert.IsThumbTracking();
+}
+
 BOOL SMCListView::OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const
 {
     int iPosition = (int)pItem->GetItemIndex();

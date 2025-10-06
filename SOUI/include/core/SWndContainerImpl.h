@@ -199,6 +199,11 @@ class SOUI_EXP SwndContainerImpl
      */
     STDMETHOD_(BOOL, UnregisterVideoCanvas)(THIS_ SWND swnd) OVERRIDE;
 
+    /**
+     * @brief Checks if the timeline is enabled.
+     * @return TRUE if timeline is enabled, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, IsTimelineEnabled)(CTHIS) SCONST OVERRIDE;
   public: // ITimelineHandler
     /**
      * @brief Called when the next frame is ready.

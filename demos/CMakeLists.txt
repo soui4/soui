@@ -5,6 +5,7 @@ add_subdirectory(dpidemo)
 add_subdirectory(fun_test)
 add_subdirectory(SoTool)
 add_subdirectory(gridctrl_demo)
+add_subdirectory(hellocharts_demo)
 
 if (TARGET httpclient)
 add_subdirectory(wallpaper)

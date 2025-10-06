@@ -306,6 +306,12 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @return Pointer to the window finder object.
      */
     STDMETHOD_(ISwndFinder *, GetSwndFinder)(THIS) PURE;
+
+    /**
+     * @brief Checks if the timeline is enabled.
+     * @return TRUE if timeline is enabled, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, IsTimelineEnabled)(CTHIS) SCONST PURE;
 };
 
 SNSEND

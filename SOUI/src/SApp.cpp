@@ -121,7 +121,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SImageWnd>();
     objFactory->TplRegisterFactory<SProgress>();
     objFactory->TplRegisterFactory<SImageButton>();
-    objFactory->TplRegisterFactory<SLine>();
+    objFactory->TplRegisterFactory<SHrLine>();
     objFactory->TplRegisterFactory<SCheckBox>();
     objFactory->TplRegisterFactory<SIconWnd>();
     objFactory->TplRegisterFactory<SRadioBox>();

@@ -346,9 +346,9 @@ DECLARE_INTERFACE_(IMcListViewEx, IObjRef)
 		virtual BOOL OnItemGetRect(const SOsrPanel* pItem, CRect& rcItem)const;
 
 		virtual BOOL IsItemRedrawDelay()const;
+		virtual BOOL IsTimelineEnabled()const;
 
 		virtual void OnItemRequestRelayout(SItemPanel* pItem);
-
 	protected:
 
 		void onDataSetChanged();

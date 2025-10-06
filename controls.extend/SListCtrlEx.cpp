@@ -1127,6 +1127,11 @@ BOOL SListCtrlEx::IsItemRedrawDelay() const
     return m_bItemRedrawDelay;
 }
 
+BOOL SListCtrlEx::IsTimelineEnabled() const
+{
+    return !m_sbHorz.IsThumbTracking() && !m_sbVert.IsThumbTracking();
+}
+
 void SListCtrlEx::SwapItem(int srcIdx, int desIdx)
 {
     if ((srcIdx >= 0) && srcIdx < m_arrItems.GetCount())

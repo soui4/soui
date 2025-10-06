@@ -474,7 +474,10 @@ BOOL STileView::IsItemRedrawDelay() const
 {
     return TRUE;
 }
-
+BOOL STileView::IsTimelineEnabled() const
+{
+    return !m_sbHorz.IsThumbTracking() && !m_sbVert.IsThumbTracking();
+}
 CRect STileView::CalcItemDrawRect(int iItem) const
 {
     //相对整个窗体的实际绘制位置

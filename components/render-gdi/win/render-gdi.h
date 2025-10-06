@@ -488,6 +488,9 @@ public:
 		POINT pts[2] = {pt1,pt2};
 		return DrawLines(pts,2);
 	}
+	STDMETHOD_(HRESULT, MoveToEx)(THIS_ POINT pt, LPPOINT lpPoint) OVERRIDE;
+    STDMETHOD_(HRESULT, LineTo)(THIS_ POINT pt) OVERRIDE;
+    STDMETHOD_(HRESULT, GetCurrentPositionEx)(THIS_ LPPOINT lpPoint) OVERRIDE;
 	STDMETHOD_(HRESULT,DrawPolygon)(THIS_ LPPOINT pPt,size_t nCount) OVERRIDE;
 	STDMETHOD_(HRESULT,FillPolygon)(THIS_ LPPOINT pPt,size_t nCount) OVERRIDE;
 	STDMETHOD_(HRESULT, DrawGradientRect)(THIS_ LPCRECT pRect,  BOOL bVert, POINT ptRoundCorner, const GradientItem *pGradients, int nCount, BYTE byAlpha DEF_VAL(0xFF)) OVERRIDE;

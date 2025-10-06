@@ -325,7 +325,8 @@ SNSBEGIN
 		,m_xferMode(kSrcOver_Mode)
 		,m_lastSave(0)
 	{
-		m_ptOrg.fX=m_ptOrg.fY=0.0f;
+		m_ptOrg.set(0,0);
+		m_ptCur.set(0,0);
 		m_pRenderFactory = pRenderFactory;
 
 		m_SkCanvas = new SkCanvas();
@@ -784,6 +785,37 @@ SNSBEGIN
 		m_SkCanvas->drawPath(path, paint);
 		return S_OK;
 	}
+
+	HRESULT SRenderTarget_Skia::MoveToEx(POINT pt, LPPOINT lpPoint)
+	{
+		if(lpPoint){
+			lpPoint->x = m_ptCur.fX;
+			lpPoint->y = m_ptCur.fY;
+		}
+		m_ptCur.set(pt.x,pt.y);
+		return S_OK;
+	}
+
+	HRESULT SRenderTarget_Skia::LineTo(POINT pt)
+	{
+		SkPaint paint=m_paint;
+		paint.setColor(SColor(m_curPen->GetColor()).toARGB());
+		SLineDashEffect skDash(m_curPen->GetStyle());
+		paint.setPathEffect(skDash.Get());
+		paint.setStyle(SkPaint::kStroke_Style);
+		m_SkCanvas->drawLine(m_ptCur.fX+m_ptOrg.fX,m_ptCur.fY+m_ptOrg.fY,pt.x+m_ptOrg.fX,pt.y+m_ptOrg.fY,paint);
+		m_ptCur.set(pt.x,pt.y);
+		return S_OK;
+	}
+
+	HRESULT SRenderTarget_Skia::GetCurrentPositionEx(LPPOINT lpPoint)
+	{
+		if(lpPoint){
+			lpPoint->x = m_ptCur.fX;
+			lpPoint->y = m_ptCur.fY;
+		}
+		return S_OK;
+	}	
 
 	HRESULT SRenderTarget_Skia::TextOut( int x, int y, LPCTSTR lpszString, int nCount)
 	{
@@ -2137,7 +2169,6 @@ SNSBEGIN
 		BYTE style=SkTypeface::kNormal;
 		if(plf->lfItalic) style |= SkTypeface::kItalic;
 		if(plf->lfWeight == FW_BOLD) style |= SkTypeface::kBold;
-
 		m_skFont=SkTypeface::CreateFromName(strFace,(SkTypeface::Style)style,plf->lfCharSet);
 		//         STRACE(L"font new: objects = %d", ++s_cFont);
 	}

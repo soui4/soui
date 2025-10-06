@@ -2425,6 +2425,27 @@ SNSBEGIN
 		return S_OK;
 	}
 
+    HRESULT SRenderTarget_GDI::MoveToEx(POINT pt,LPPOINT lpPointRet){
+        if(lpPointRet){
+            ::GetCurrentPositionEx(m_hdc,lpPointRet);
+        }
+        ::MoveToEx(m_hdc,pt.x,pt.y,NULL);
+        return S_OK;
+    }
+    HRESULT SRenderTarget_GDI::LineTo(POINT pt){
+        // CPoint ptStart;
+        // ::GetCurrentPositionEx(m_hdc,&ptStart);
+        // CRect rc(ptStart,pt)
+        // DCBuffer dcBuf(m_hdc,&rc,0xff);
+        // ::LineTo(dcBuf,pt.x,pt.y);
+        return S_OK;
+    }
+
+    HRESULT SRenderTarget_GDI::GetCurrentPositionEx(LPPOINT lpPoint){
+        ::GetCurrentPositionEx(m_hdc,lpPoint);
+        return S_OK;
+    }
+
 	HRESULT SRenderTarget_GDI::FillPath(const IPathS * path)
 	{
 		if (!path) return E_INVALIDARG;

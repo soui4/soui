@@ -116,6 +116,8 @@ class SOUI_EXP SListView
      */
     virtual BOOL IsItemRedrawDelay() const;
 
+    virtual BOOL IsTimelineEnabled() const;
+  
   protected:
     /**
      * @brief Handle data set changed event

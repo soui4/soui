@@ -1634,6 +1634,20 @@ SNSBEGIN
 		return S_OK;
 	}
 
+    HRESULT SRenderTarget_D2D::MoveToEx(POINT pt,LPPOINT lpPointRet){
+		//todo:hjx
+        return S_OK;
+    }
+    HRESULT SRenderTarget_D2D::LineTo(POINT pt){
+		//todo:hjx
+        return S_OK;
+    }
+
+    HRESULT SRenderTarget_D2D::GetCurrentPositionEx(LPPOINT lpPoint){
+		//todo:hjx
+        return S_OK;
+    }
+
 	HRESULT SRenderTarget_D2D::TextOut( int x, int y, LPCTSTR lpszString, int nCount)
 	{
 		if(nCount<0) nCount = (int)_tcslen(lpszString);

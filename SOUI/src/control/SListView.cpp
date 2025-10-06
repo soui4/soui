@@ -572,6 +572,10 @@ BOOL SListView::IsItemRedrawDelay() const
     return TRUE;
 }
 
+BOOL SListView::IsTimelineEnabled() const
+{
+    return !m_sbHorz.IsThumbTracking() && !m_sbVert.IsThumbTracking();
+}
 BOOL SListView::OnItemGetRect(const SOsrPanel *pItem, CRect &rcItem) const
 {
     int iPosition = (int)pItem->GetItemIndex();

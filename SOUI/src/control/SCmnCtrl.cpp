@@ -1003,7 +1003,7 @@ void SProgress::OnScaleChanged(int scale)
 // Line Control
 // Simple HTML "HR" tag
 
-SLine::SLine()
+SHrLine::SHrLine()
     : m_nLineStyle(PS_SOLID)
     , m_nLineSize(1)
     , m_mode(HR_HORZ)
@@ -1011,7 +1011,7 @@ SLine::SLine()
 {
 }
 
-void SLine::OnPaint(IRenderTarget *pRT)
+void SHrLine::OnPaint(IRenderTarget *pRT)
 {
     CPoint pts[2];
     CRect rcWnd = GetWindowRect();

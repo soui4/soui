@@ -96,6 +96,9 @@ class SOUI_EXP SNcPainter
      */
     virtual BOOL IsItemRedrawDelay() const;
 
+    virtual BOOL IsTimelineEnabled() const{
+        return TRUE;
+    }
     /**
      * @brief Gets the host object.
      * @return Pointer to the host object.

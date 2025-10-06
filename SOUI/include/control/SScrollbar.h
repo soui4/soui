@@ -108,7 +108,6 @@ class SOUI_EXP SScrollBar
     STDMETHOD_(const IInterpolator *, GetScrollInterpolator)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(int, GetScrollFadeFrames)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(BYTE, GetScrollThumbTrackMinAlpha)(CTHIS) SCONST OVERRIDE;
-
   protected:
     /**
      * SScrollBar::OnInitFinished

@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef\init.xml"  />
+  </UIDEF>
+  <LAYOUT>
+    <file name="dlg_main" path="layout\dlg_main.xml"/>
+  </LAYOUT>
+  
+  <ICON>
+    <file name="ICON_LOGO" path="image\soui.ico"/>
+  </ICON>
+  
+  <values>
+    <file name="string" path="values\string.xml"/>
+    <file name="color" path="values\color.xml"/>
+    <file name="skin" path="values\skin.xml"/>
+  </values>
+</resource>

@@ -494,6 +494,8 @@ void SwndContainerImpl::OnNextFrame()
 {
     if (!m_pRoot->IsVisible(FALSE))
         return;
+    if(!IsTimelineEnabled())
+        return;
     m_timelineHandlerMgr.OnNextFrame();
 }
 
@@ -513,6 +515,11 @@ BOOL SwndContainerImpl::UnregisterVideoCanvas(SWND swnd)
         return FALSE;
 
     m_lstVideoCanvas.RemoveAt(pos);
+    return TRUE;
+}
+
+BOOL SwndContainerImpl::IsTimelineEnabled() const
+{
     return TRUE;
 }
 

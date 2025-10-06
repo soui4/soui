@@ -230,6 +230,7 @@ class SListCtrlEx
      */
     virtual BOOL IsItemRedrawDelay() const override;
 
+    virtual BOOL IsTimelineEnabled() const override;
   protected:
     /**
      * SListCtrlEx::UpdatePanelsIndex

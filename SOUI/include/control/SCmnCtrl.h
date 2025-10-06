@@ -802,19 +802,19 @@ class SOUI_EXP SProgress : public TWindowProxy<IProgress> {
 };
 
 /**
- * @class SLine
+ * @class SHrLine
  * @brief 线条控件
  * @details 线条控件。
  * @usage `<hr size=1 mode="vert" lineStyle="dash"/>`
  */
-class SOUI_EXP SLine : public SWindow {
+class SOUI_EXP SHrLine : public SWindow {
     DEF_SOBJECT(SWindow, L"hr")
 
   public:
     /**
      * @brief 构造函数
      */
-    SLine();
+    SHrLine();
 
     /**
      * @brief 绘制控件

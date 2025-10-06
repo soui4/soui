@@ -424,4 +424,8 @@ void SScrollBarHandler::OnContainerChanged(ISwndContainer *pOldContainer, ISwndC
         pOldContainer->UnregisterTimelineHandler(this);
 }
 
+BOOL SScrollBarHandler::IsThumbTracking() const
+{
+    return m_iClickPart == SB_THUMBTRACK;
+}
 SNSEND

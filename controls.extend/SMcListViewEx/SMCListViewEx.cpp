@@ -981,6 +981,11 @@ namespace SOUI
 		return TRUE;
 	}
 
+	BOOL SMCListViewEx::IsTimelineEnabled() const
+	{
+		return !m_sbHorz.IsThumbTracking() && !m_sbVert.IsThumbTracking();
+	}
+
 	BOOL SMCListViewEx::OnItemGetRect(const SOsrPanel* pItem, CRect& rcItem)const
 	{
 		int iPosition = (int)pItem->GetItemIndex();

@@ -234,6 +234,11 @@ class SOUI_EXP SScrollBarHandler : public ITimelineHandler {
      */
     void OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *pNewContainer);
 
+    /**
+     * @brief Checks if the scrollbar is in thumb tracking mode.
+     * @return TRUE if in thumb tracking mode, FALSE otherwise.
+     */
+    BOOL IsThumbTracking() const;
   protected:
     /**
      * @brief Gets the container for the scrollbar.

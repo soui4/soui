@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<skin>
+  <!-- Basic skins for the demo -->
+  <imglist name="skin_btn" src="img:btn_skin" states="4"/>
+  <button name="skin_button" up="0" down="1" hover="2" disable="3"/>
+</skin>

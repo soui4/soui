@@ -1080,6 +1080,11 @@ BOOL STreeView::IsItemRedrawDelay() const
     return TRUE;
 }
 
+BOOL STreeView::IsTimelineEnabled() const
+{
+    return !m_sbHorz.IsThumbTracking() && !m_sbVert.IsThumbTracking();
+}
+
 void STreeView::onBranchChanged(HSTREEITEM hBranch)
 {
     if (m_adapter == NULL)
