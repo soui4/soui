@@ -68,7 +68,7 @@ public:
      * @brief Set current viewport
      * @param viewport Current viewport
      */
-    void SetCurrentViewport(const SViewport& viewport) { m_currentViewport = viewport; }
+    void SetCurrentViewport(const SViewport& viewport);
 
     /**
      * @brief Get current viewport

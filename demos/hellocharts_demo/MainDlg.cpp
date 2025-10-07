@@ -377,6 +377,26 @@ void CMainDlg::ClearChartData()
         m_pColumnChart->SetColumnChartData(pColumnData);
     }
 
+    if(m_pPieChart)
+    {
+        SPieChartData* pPieData = new SPieChartData();
+        m_pPieChart->SetPieChartData(pPieData);
+    }
+    if(m_pBubbleChart)
+    {
+        SBubbleChartData* pBubbleData = new SBubbleChartData();
+        m_pBubbleChart->SetBubbleChartData(pBubbleData);
+    }
+    if(m_pRadarChart)
+    {
+        SRadarChartData* pRadarData = new SRadarChartData();
+        m_pRadarChart->SetRadarChartData(pRadarData);
+    }
+    if(m_pComboChart)
+    {
+        SComboChartData* pComboData = new SComboChartData();
+        m_pComboChart->SetComboChartData(pComboData);
+    }
     // Update status
     SWindow* pStatus = FindChildByName(L"txt_status");
     if (pStatus)
@@ -594,7 +614,16 @@ float CMainDlg::GetTotalPieValue()
     return total > 0.0f ? total : 1.0f;
 }
 
-
+void CMainDlg::OnTabChartSelChanged(IEvtArgs *pEvt)
+{
+    EventTabSelChanged *e2= sobj_cast<EventTabSelChanged>(pEvt);
+    STabCtrl *pTab = sobj_cast<STabCtrl>(e2->Sender());
+    SWindow *pPage = pTab->GetItem(e2->uNewSel);
+    SAbstractChartView *pChart = sobj_cast<SAbstractChartView>(pPage->GetWindow(GSW_FIRSTCHILD));
+    if(pChart){
+        pChart->StartDataAnimation(500);
+    }
+}
 
 void CMainDlg::GenerateBubbleChartData()
 {

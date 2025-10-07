@@ -60,7 +60,7 @@ protected:
     void UpdateChartStatistics();
     float GetTotalPieValue();
 
-
+    void OnTabChartSelChanged(IEvtArgs* pEvt);
 
 private:
     SOUI::SLineChartView* m_pLineChart;
@@ -90,6 +90,8 @@ private:
         EVENT_NAME_HANDLER(L"bubble_chart", EVT_CHART_BUBBLE_VALUE_SELECT, OnBubbleChartValueSelect)
         EVENT_NAME_HANDLER(L"radar_chart", EVT_CHART_RADAR_VALUE_SELECT, OnRadarChartValueSelect)
         EVENT_NAME_HANDLER(L"combo_chart", EVT_CHART_COMBO_VALUE_SELECT, OnComboChartValueSelect)
+
+        EVENT_NAME_HANDLER(L"chart_tabs", EventTabSelChanged::EventID, OnTabChartSelChanged)
     EVENT_MAP_END2(SHostDialog)
 
     BEGIN_MSG_MAP_EX(CMainDlg)

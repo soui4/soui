@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<SOUI name="mainWindow" title="HelloCharts Demo" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="800" height="600" margin="5,5,5,5" resizable="1" wndType="appMain" translucent="1"  margin="5,5,5,5">
+<SOUI name="mainWindow" title="HelloCharts Demo" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="800" height="600" margin="5,5,5,5" resizable="1" wndType="appMain" translucent="1"  margin="5,5,5,5" sendWheel2Hover="1">
   <root skin="_skin.sys.wnd.bkgnd" cache="1" layout="vbox">
     <!-- Title bar -->
     <caption size="-2,30" layout="hbox" gravity="center">

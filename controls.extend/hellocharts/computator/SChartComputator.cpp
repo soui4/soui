@@ -18,6 +18,9 @@ SChartComputator::~SChartComputator()
 {
 }
 
+void SChartComputator::SetCurrentViewport(const SViewport& viewport) { 
+    m_currentViewport = viewport; 
+}
 void SChartComputator::SetContentRect(int width, int height, int paddingLeft, int paddingTop, 
                                      int paddingRight, int paddingBottom)
 {
@@ -141,28 +144,58 @@ SViewport SChartComputator::ConstrainViewport(const SViewport& viewport) const
     }
     
     // Constrain zoom level
-    float currentZoom = m_maximumViewport.GetWidth() / constrainedViewport.GetWidth();
-    if (currentZoom < m_minViewportZoom)
+    // Protect against degenerate sizes
+    const float eps = 1e-6f;
+    float cWidth = constrainedViewport.GetWidth();
+    float cHeight = constrainedViewport.GetHeight();
+    if (cWidth < eps) cWidth = eps;
+    if (cHeight < eps) cHeight = eps;
+
+    float currentZoom = m_maximumViewport.GetWidth() / cWidth;
+    // clamp desired zoom into allowed range
+    float desiredZoom = currentZoom;
+    if (desiredZoom < m_minViewportZoom) desiredZoom = m_minViewportZoom;
+    else if (desiredZoom > m_maxViewportZoom) desiredZoom = m_maxViewportZoom;
+
+    if (desiredZoom != currentZoom)
     {
-        float scale = m_minViewportZoom / currentZoom;
+        // compute new width from desiredZoom: desiredZoom = maxWidth / newWidth
+        float newWidth = m_maximumViewport.GetWidth() / desiredZoom;
+        // scale height to keep aspect ratio
+        float scale = newWidth / cWidth;
+        float newHeight = cHeight * scale;
+
         float centerX = (constrainedViewport.GetLeft() + constrainedViewport.GetRight()) / 2.0f;
         float centerY = (constrainedViewport.GetTop() + constrainedViewport.GetBottom()) / 2.0f;
-        float newWidth = constrainedViewport.GetWidth() * scale;
-        float newHeight = constrainedViewport.GetHeight() * scale;
-        
+
         constrainedViewport.Set(centerX - newWidth / 2.0f, centerY - newHeight / 2.0f,
                                centerX + newWidth / 2.0f, centerY + newHeight / 2.0f);
-    }
-    else if (currentZoom > m_maxViewportZoom)
-    {
-        float scale = m_maxViewportZoom / currentZoom;
-        float centerX = (constrainedViewport.GetLeft() + constrainedViewport.GetRight()) / 2.0f;
-        float centerY = (constrainedViewport.GetTop() + constrainedViewport.GetBottom()) / 2.0f;
-        float newWidth = constrainedViewport.GetWidth() * scale;
-        float newHeight = constrainedViewport.GetHeight() * scale;
-        
-        constrainedViewport.Set(centerX - newWidth / 2.0f, centerY - newHeight / 2.0f,
-                               centerX + newWidth / 2.0f, centerY + newHeight / 2.0f);
+
+        // After zoom adjustment, re-clamp to maximum viewport bounds so we don't drift out of range
+        if (constrainedViewport.GetLeft() < m_maximumViewport.GetLeft())
+        {
+            float diff = m_maximumViewport.GetLeft() - constrainedViewport.GetLeft();
+            constrainedViewport.SetLeft(m_maximumViewport.GetLeft());
+            constrainedViewport.SetRight(constrainedViewport.GetRight() + diff);
+        }
+        if (constrainedViewport.GetRight() > m_maximumViewport.GetRight())
+        {
+            float diff = constrainedViewport.GetRight() - m_maximumViewport.GetRight();
+            constrainedViewport.SetRight(m_maximumViewport.GetRight());
+            constrainedViewport.SetLeft(constrainedViewport.GetLeft() - diff);
+        }
+        if (constrainedViewport.GetTop() < m_maximumViewport.GetTop())
+        {
+            float diff = m_maximumViewport.GetTop() - constrainedViewport.GetTop();
+            constrainedViewport.SetTop(m_maximumViewport.GetTop());
+            constrainedViewport.SetBottom(constrainedViewport.GetBottom() + diff);
+        }
+        if (constrainedViewport.GetBottom() > m_maximumViewport.GetBottom())
+        {
+            float diff = constrainedViewport.GetBottom() - m_maximumViewport.GetBottom();
+            constrainedViewport.SetBottom(m_maximumViewport.GetBottom());
+            constrainedViewport.SetTop(constrainedViewport.GetTop() - diff);
+        }
     }
     
     return constrainedViewport;

@@ -255,7 +255,18 @@ public:
      */
     BOOL IsValid() const;
 
-private:
+
+    float GetCenterX() const
+    {
+        return (m_left + m_right) / 2;
+    }
+
+    float GetCenterY() const
+    {
+        return (m_top + m_bottom) / 2;
+    }
+
+  private:
     float m_left;
     float m_top;
     float m_right;

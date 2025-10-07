@@ -421,7 +421,6 @@ void SChartTouchHandler::HandleScroll(CPoint delta)
 {
     if (!m_pChart)
         return;
-
     SChartComputator* pComputator = m_pChart->GetChartComputator();
     if (!pComputator)
         return;
@@ -433,13 +432,14 @@ void SChartTouchHandler::HandleScroll(CPoint delta)
                    pComputator->ComputeRawDistanceX(0.0f);
     float deltaY = pComputator->ComputeRawDistanceY((float)delta.y) -
                    pComputator->ComputeRawDistanceY(0.0f);
-
+    if (isnan(deltaX) || isnan(deltaY))
+        return;
     // Apply scroll
     SViewport newViewport(
         currentViewport.GetLeft() - deltaX,
         currentViewport.GetTop() - deltaY,
-        currentViewport.GetRight() - deltaX,
-        currentViewport.GetBottom() - deltaY
+        currentViewport.GetRight() + deltaX,
+        currentViewport.GetBottom() + deltaY
     );
 
     m_pChart->SetCurrentViewport(newViewport);
@@ -470,17 +470,10 @@ void SChartTouchHandler::HandleZoom(float scaleFactor, CPoint center)
         scaleFactor = MAX_ZOOM_SCALE / currentScale;
     }
 
-    // Convert center point to data coordinates
-    CRect rcClient;
-    m_pChart->GetRect(&rcClient);
-    CPoint relativeCenter = center;
-    relativeCenter.x -= rcClient.left;
-    relativeCenter.y -= rcClient.top;
-
-    float centerX = pComputator->ComputeRawX((float)relativeCenter.x);
-    float centerY = pComputator->ComputeRawY((float)relativeCenter.y);
 
     // Calculate new viewport size
+    float centerX = currentViewport.GetCenterX();
+    float centerY = currentViewport.GetCenterY();
     float newWidth = currentViewport.GetWidth() / scaleFactor;
     float newHeight = currentViewport.GetHeight() / scaleFactor;
 
