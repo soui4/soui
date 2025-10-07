@@ -19,7 +19,6 @@ void SComboChartRenderer::SComboLineChartAdapter::AnimationDataFinished() { if (
 void SComboChartRenderer::SComboLineChartAdapter::StartDataAnimation(DWORD duration) { if (m_pComboView) m_pComboView->StartDataAnimation(duration); }
 void SComboChartRenderer::SComboLineChartAdapter::CancelDataAnimation() { if (m_pComboView) m_pComboView->CancelDataAnimation(); }
 BOOL SComboChartRenderer::SComboLineChartAdapter::IsDataAnimationRunning() { return m_pComboView ? m_pComboView->IsDataAnimationRunning() : FALSE; }
-void SComboChartRenderer::SComboLineChartAdapter::SetViewportChangeListener(void* pListener) { if (m_pComboView) m_pComboView->SetViewportChangeListener(pListener); }
 SViewport SComboChartRenderer::SComboLineChartAdapter::GetCurrentViewport() { return m_pComboView ? m_pComboView->GetCurrentViewport() : SViewport(); }
 void SComboChartRenderer::SComboLineChartAdapter::SetCurrentViewport(const SViewport& viewport) { if (m_pComboView) m_pComboView->SetCurrentViewport(viewport); }
 SViewport SComboChartRenderer::SComboLineChartAdapter::GetMaximumViewport() { return m_pComboView ? m_pComboView->GetMaximumViewport() : SViewport(); }
@@ -50,7 +49,6 @@ void SComboChartRenderer::SComboColumnChartAdapter::AnimationDataFinished() { if
 void SComboChartRenderer::SComboColumnChartAdapter::StartDataAnimation(DWORD duration) { if (m_pComboView) m_pComboView->StartDataAnimation(duration); }
 void SComboChartRenderer::SComboColumnChartAdapter::CancelDataAnimation() { if (m_pComboView) m_pComboView->CancelDataAnimation(); }
 BOOL SComboChartRenderer::SComboColumnChartAdapter::IsDataAnimationRunning() { return m_pComboView ? m_pComboView->IsDataAnimationRunning() : FALSE; }
-void SComboChartRenderer::SComboColumnChartAdapter::SetViewportChangeListener(void* pListener) { if (m_pComboView) m_pComboView->SetViewportChangeListener(pListener); }
 SViewport SComboChartRenderer::SComboColumnChartAdapter::GetCurrentViewport() { return m_pComboView ? m_pComboView->GetCurrentViewport() : SViewport(); }
 void SComboChartRenderer::SComboColumnChartAdapter::SetCurrentViewport(const SViewport& viewport) { if (m_pComboView) m_pComboView->SetCurrentViewport(viewport); }
 SViewport SComboChartRenderer::SComboColumnChartAdapter::GetMaximumViewport() { return m_pComboView ? m_pComboView->GetMaximumViewport() : SViewport(); }

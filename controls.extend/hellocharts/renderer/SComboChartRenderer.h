@@ -131,7 +131,6 @@ private:
         virtual void StartDataAnimation(DWORD duration);
         virtual void CancelDataAnimation();
         virtual BOOL IsDataAnimationRunning();
-        virtual void SetViewportChangeListener(void* pListener);
         virtual SViewport GetCurrentViewport();
         virtual void SetCurrentViewport(const SViewport& viewport);
         virtual SViewport GetMaximumViewport();
@@ -171,7 +170,6 @@ private:
         virtual void StartDataAnimation(DWORD duration);
         virtual void CancelDataAnimation();
         virtual BOOL IsDataAnimationRunning();
-        virtual void SetViewportChangeListener(void* pListener);
         virtual SViewport GetCurrentViewport();
         virtual void SetCurrentViewport(const SViewport& viewport);
         virtual SViewport GetMaximumViewport();
@@ -204,24 +202,5 @@ private:
     BOOL m_bSubRenderersInitialized;
 };
 
-/**
- * @interface IComboChartOnValueSelectListener
- * @brief Interface for combo chart value selection events
- */
-struct IComboChartOnValueSelectListener
-{
-    /**
-     * @brief Called when a combo chart value is selected
-     * @param chartType Chart type (0=line, 1=column)
-     * @param valueIndex Selected value index
-     * @param subValueIndex Selected sub-value index
-     */
-    virtual void OnValueSelected(int chartType, int valueIndex, int subValueIndex) = 0;
-
-    /**
-     * @brief Called when combo chart value is deselected
-     */
-    virtual void OnValueDeselected() = 0;
-};
 
 SNSEND

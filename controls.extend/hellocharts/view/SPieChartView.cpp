@@ -10,11 +10,11 @@ const float SPieChartView::DEFAULT_CIRCLE_FILL_RATIO = 0.0f;
 SPieChartView::SPieChartView()
     : m_pData(NULL)
     , m_pPieChartRenderer(NULL)
-    , m_pOnValueSelectListener(NULL)
     , m_circleFillRatio(DEFAULT_CIRCLE_FILL_RATIO)
     , m_bLabelsEnabled(TRUE)
     , m_bLabelLinesEnabled(FALSE)
 {
+    AddEvent(EVENTID(SPieChartValueSelectEvent));
 }
 
 SPieChartView::~SPieChartView()
@@ -33,11 +33,11 @@ SChartData* SPieChartView::GetChartData()
 
 void SPieChartView::SetPieChartData(SPieChartData* pData)
 {
+    CancelDataAnimation();
     if (m_pData)
     {
         delete m_pData;
     }
-    
     m_pData = pData;
 
     // Refresh axes margins after data change
@@ -55,10 +55,7 @@ void SPieChartView::SetPieChartData(SPieChartData* pData)
     Invalidate();
 }
 
-void SPieChartView::SetOnValueSelectListener(IPieChartOnValueSelectListener* pListener)
-{
-    m_pOnValueSelectListener = pListener;
-}
+
 
 void SPieChartView::SetCircleFillRatio(float ratio)
 {
@@ -115,41 +112,35 @@ void SPieChartView::OnLButtonDown(UINT nFlags, CPoint point)
 
 void SPieChartView::CallTouchListener()
 {
-    if (m_pOnValueSelectListener && m_pPieChartRenderer)
+    if (m_pPieChartRenderer)
     {
         SSelectedValue selectedValue = m_pPieChartRenderer->GetSelectedValue();
         if (selectedValue.IsSet())
         {
-            // Get the actual slice value from the data
+            // 有选中值，触发select事件
             SSliceValue* pValue = NULL;
-            if (m_pData && selectedValue.GetFirstIndex() >= 0 && 
+            if (m_pData && selectedValue.GetFirstIndex() >= 0 &&
                 selectedValue.GetFirstIndex() < (int)m_pData->GetValueCount())
             {
                 pValue = m_pData->GetValue(selectedValue.GetFirstIndex());
             }
-            
-            m_pOnValueSelectListener->OnValueSelected(
-                selectedValue.GetFirstIndex(),
-                pValue
-            );
+
+            FireValueSelectEvent(selectedValue.GetFirstIndex(), pValue);
         }
         else
         {
-            m_pOnValueSelectListener->OnValueDeselected();
+            // 没有选中值，触发deselect事件（传递无效参数）
+            FireValueSelectEvent(-1, NULL);
         }
     }
 }
 
-void SPieChartView::OnSliceValueSelected(int sliceIndex, SSliceValue* pValue)
+void SPieChartView::FireValueSelectEvent(int sliceIndex, SSliceValue* pValue)
 {
-    // Default implementation - can be overridden by derived classes
-    // This method is called by the default listener
-}
-
-void SPieChartView::OnSliceValueDeselected()
-{
-    // Default implementation - can be overridden by derived classes
-    // This method is called by the default listener
+    SPieChartValueSelectEvent evt(this);
+    evt.sliceIndex = sliceIndex;
+    evt.pValue = pValue;
+    FireEvent(evt);
 }
 
 SNSEND

@@ -7,4 +7,7 @@
 
 #include "resource.h"
 
+// Include HelloCharts headers
+#include "../../controls.extend/hellocharts/SHelloCharts.h"
+
 using namespace SOUI;

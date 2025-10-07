@@ -26,28 +26,13 @@ public:
 protected:
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 
-    // Chart value selection listeners
-    class CLineChartValueSelectListener : public SOUI::ILineChartOnValueSelectListener
-    {
-    public:
-        CLineChartValueSelectListener(CMainDlg* pDlg) : m_pDlg(pDlg) {}
-        
-        virtual void OnValueSelected(int lineIndex, int pointIndex, SOUI::SPointValue* pValue) override;
-        virtual void OnValueDeselected() override;
-        
-    private:
-        CMainDlg* m_pDlg;
-    };
-
-    class CColumnChartValueSelectListener : public SOUI::IColumnChartOnValueSelectListener
-    {
-    public:
-        CColumnChartValueSelectListener(CMainDlg* pDlg) : m_pDlg(pDlg) {}
-        virtual void OnValueSelected(int columnIndex, int subcolumnIndex, SOUI::SSubcolumnValue* pValue) override;
-        virtual void OnValueDeselected() override;
-    private:
-        CMainDlg* m_pDlg;
-    };
+    // Chart event handlers (using SOUI event system)
+    BOOL OnLineChartValueSelect(IEvtArgs* pEvt);
+    BOOL OnColumnChartValueSelect(IEvtArgs* pEvt);
+    BOOL OnPieChartValueSelect(IEvtArgs* pEvt);
+    BOOL OnBubbleChartValueSelect(IEvtArgs* pEvt);
+    BOOL OnRadarChartValueSelect(IEvtArgs* pEvt);
+    BOOL OnComboChartValueSelect(IEvtArgs* pEvt);
 
     void OnChartValueSelected(int lineIndex, int pointIndex, SOUI::SPointValue* pValue);
     void OnChartValueDeselected();
@@ -75,49 +60,7 @@ protected:
     void UpdateChartStatistics();
     float GetTotalPieValue();
 
-    // Pie chart value selection listener
-    class CPieChartValueSelectListener : public SOUI::IPieChartOnValueSelectListener
-    {
-    public:
-        CPieChartValueSelectListener(CMainDlg* pDlg) : m_pDlg(pDlg) {}
-        virtual void OnValueSelected(int sliceIndex, SOUI::SSliceValue* pValue) override;
-        virtual void OnValueDeselected() override;
-    private:
-        CMainDlg* m_pDlg;
-    };
 
-    // Bubble chart value selection listener
-    class CBubbleChartValueSelectListener : public SOUI::IBubbleChartOnValueSelectListener
-    {
-    public:
-        CBubbleChartValueSelectListener(CMainDlg* pDlg) : m_pDlg(pDlg) {}
-        virtual void OnValueSelected(int bubbleIndex, SOUI::SBubbleValue* pValue) override;
-        virtual void OnValueDeselected() override;
-    private:
-        CMainDlg* m_pDlg;
-    };
-
-    // Radar chart value selection listener
-    class CRadarChartValueSelectListener : public SOUI::IRadarChartOnValueSelectListener
-    {
-    public:
-        CRadarChartValueSelectListener(CMainDlg* pDlg) : m_pDlg(pDlg) {}
-        virtual void OnValueSelected(int seriesIndex, SOUI::SRadarValue* pValue);
-        virtual void OnValueDeselected();
-    private:
-        CMainDlg* m_pDlg;
-    };
-
-    // Combo chart value selection listener
-    class CComboChartValueSelectListener : public SOUI::IComboChartOnValueSelectListener
-    {
-    public:
-        CComboChartValueSelectListener(CMainDlg* pDlg) : m_pDlg(pDlg) {}
-        virtual void OnValueSelected(int chartType, int valueIndex, int subValueIndex);
-        virtual void OnValueDeselected();
-    private:
-        CMainDlg* m_pDlg;
-    };
 
 private:
     SOUI::SLineChartView* m_pLineChart;
@@ -126,12 +69,6 @@ private:
     SOUI::SBubbleChartView* m_pBubbleChart;
     SOUI::SRadarChartView* m_pRadarChart;
     SOUI::SComboChartView* m_pComboChart;
-    CLineChartValueSelectListener* m_pValueSelectListener;
-    CColumnChartValueSelectListener* m_pColumnValueSelectListener;
-    CPieChartValueSelectListener* m_pPieValueSelectListener;
-    CBubbleChartValueSelectListener* m_pBubbleValueSelectListener;
-    CRadarChartValueSelectListener* m_pRadarValueSelectListener;
-    CComboChartValueSelectListener* m_pComboValueSelectListener;
     BOOL m_bAnimationEnabled;
     int m_currentPieScenario; // Current pie chart test scenario
 
@@ -145,6 +82,14 @@ private:
         EVENT_NAME_COMMAND(L"btn_toggle_animation", OnBtnToggleAnimation)
         EVENT_NAME_COMMAND(L"btn_replay_animation", OnBtnReplayAnimation)
         EVENT_NAME_COMMAND(L"btn_test_pie", OnBtnTestPieScenarios)
+
+        // Chart value selection events
+        EVENT_NAME_HANDLER(L"line_chart", EVT_CHART_LINE_VALUE_SELECT, OnLineChartValueSelect)
+        EVENT_NAME_HANDLER(L"column_chart", EVT_CHART_COLUMN_VALUE_SELECT, OnColumnChartValueSelect)
+        EVENT_NAME_HANDLER(L"pie_chart", EVT_CHART_PIE_VALUE_SELECT, OnPieChartValueSelect)
+        EVENT_NAME_HANDLER(L"bubble_chart", EVT_CHART_BUBBLE_VALUE_SELECT, OnBubbleChartValueSelect)
+        EVENT_NAME_HANDLER(L"radar_chart", EVT_CHART_RADAR_VALUE_SELECT, OnRadarChartValueSelect)
+        EVENT_NAME_HANDLER(L"combo_chart", EVT_CHART_COMBO_VALUE_SELECT, OnComboChartValueSelect)
     EVENT_MAP_END2(SHostDialog)
 
     BEGIN_MSG_MAP_EX(CMainDlg)

@@ -7,11 +7,10 @@ SNSBEGIN
 SColumnChartView::SColumnChartView()
     : SAbstractChartView()
     , m_pData(NULL)
-    , m_pOnValueSelectListener(NULL)
     , m_bStacked(FALSE)
     , m_fillRatio(0.75f)
 {
-    // Note: Don't set data in constructor, do it after window is fully initialized
+    AddEvent(EVENTID(SColumnChartValueSelectEvent));
 }
 
 SColumnChartView::~SColumnChartView()
@@ -25,11 +24,11 @@ SColumnChartView::~SColumnChartView()
 
 void SColumnChartView::SetColumnChartData(SColumnChartData* pData)
 {
+    CancelDataAnimation();
     if (m_pData && m_pData != pData)
     {
         delete m_pData;
     }
-    
     m_pData = pData;
 
     // Refresh axes margins after data change
@@ -116,8 +115,7 @@ void SColumnChartView::SetColumnChartData(SColumnChartData* pData)
 
 void SColumnChartView::CallTouchListener()
 {
-    // Call the touch listener if available
-    if (m_pOnValueSelectListener && m_pChartRenderer)
+    if (m_pChartRenderer)
     {
         SColumnChartRenderer* pColumnRenderer = dynamic_cast<SColumnChartRenderer*>(m_pChartRenderer);
         if (pColumnRenderer)
@@ -126,7 +124,7 @@ void SColumnChartView::CallTouchListener()
             SSelectedValue selectedValue = pColumnRenderer->GetSelectedValue();
             if (selectedValue.IsSet())
             {
-                // Get the actual subcolumn value from the data
+                // 有选中值，触发select事件
                 SSubcolumnValue* pValue = NULL;
                 if (m_pData && selectedValue.GetFirstIndex() >= 0 &&
                     selectedValue.GetFirstIndex() < (int)m_pData->GetColumns().size())
@@ -139,8 +137,8 @@ void SColumnChartView::CallTouchListener()
                     }
                 }
 
-                // Call listener with column-specific parameters
-                m_pOnValueSelectListener->OnValueSelected(
+                // Fire select event
+                FireValueSelectEvent(
                     selectedValue.GetFirstIndex(),
                     selectedValue.GetSecondIndex(),
                     pValue
@@ -148,10 +146,20 @@ void SColumnChartView::CallTouchListener()
             }
             else
             {
-                m_pOnValueSelectListener->OnValueDeselected();
+                // 没有选中值，触发deselect事件（传递无效参数）
+                FireValueSelectEvent(-1, -1, NULL);
             }
         }
     }
+}
+
+void SColumnChartView::FireValueSelectEvent(int columnIndex, int subcolumnIndex, SSubcolumnValue* pValue)
+{
+    SColumnChartValueSelectEvent evt(this);
+    evt.columnIndex = columnIndex;
+    evt.subcolumnIndex = subcolumnIndex;
+    evt.pValue = pValue;
+    FireEvent(evt);
 }
 
 void SColumnChartView::InitializeRenderers()
@@ -174,28 +182,6 @@ void SColumnChartView::OnInitFinished(IXmlNode* xmlNode)
     }
 }
 
-void SColumnChartView::OnValueSelected(int columnIndex, int subcolumnIndex)
-{
-    if (m_pOnValueSelectListener && m_pData)
-    {
-        SColumn* pColumn = m_pData->GetColumn(columnIndex);
-        if (pColumn)
-        {
-            SSubcolumnValue* pValue = pColumn->GetValue(subcolumnIndex);
-            if (pValue)
-            {
-                m_pOnValueSelectListener->OnValueSelected(columnIndex, subcolumnIndex, pValue);
-            }
-        }
-    }
-}
 
-void SColumnChartView::OnValueDeselected()
-{
-    if (m_pOnValueSelectListener)
-    {
-        m_pOnValueSelectListener->OnValueDeselected();
-    }
-}
 
 SNSEND

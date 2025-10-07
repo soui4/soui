@@ -46,7 +46,10 @@ BOOL SLineChartRenderer::IsTouched(float touchX, float touchY)
     SChartComputator* pComputator = m_pChart->GetChartComputator();
     if (!pComputator)
         return FALSE;
-        
+    CRect rcClient;
+    m_pChart->GetRect(&rcClient);    
+    touchX -= rcClient.left;
+    touchY -= rcClient.top;    
     // Check each line and point
     for (size_t lineIndex = 0; lineIndex < pData->GetLineCount(); ++lineIndex)
     {

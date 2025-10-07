@@ -11,12 +11,12 @@ const float SRadarChartView::DEFAULT_MAX_VALUE = 100.0f;
 SRadarChartView::SRadarChartView()
     : m_pData(NULL)
     , m_pRadarChartRenderer(NULL)
-    , m_pOnValueSelectListener(NULL)
     , m_bRadarLabelsEnabled(TRUE)
     , m_bWebLinesEnabled(TRUE)
     , m_webRings(DEFAULT_WEB_RINGS)
     , m_maxValue(DEFAULT_MAX_VALUE)
 {
+    AddEvent(EVENTID(SRadarChartValueSelectEvent));
 }
 
 SRadarChartView::~SRadarChartView()
@@ -35,11 +35,11 @@ SChartData* SRadarChartView::GetChartData()
 
 void SRadarChartView::SetRadarChartData(SRadarChartData* pData)
 {
+    CancelDataAnimation();
     if (m_pData)
     {
         delete m_pData;
     }
-    
     m_pData = pData;
 
     // Refresh axes margins after data change
@@ -64,10 +64,7 @@ void SRadarChartView::SetRadarChartData(SRadarChartData* pData)
     Invalidate();
 }
 
-void SRadarChartView::SetOnValueSelectListener(IRadarChartOnValueSelectListener* pListener)
-{
-    m_pOnValueSelectListener = pListener;
-}
+
 
 void SRadarChartView::SetRadarLabelsEnabled(BOOL bEnabled)
 {
@@ -136,41 +133,37 @@ void SRadarChartView::OnLButtonDown(UINT nFlags, CPoint point)
 
 void SRadarChartView::CallTouchListener()
 {
-    if (m_pOnValueSelectListener && m_pRadarChartRenderer)
+    if (m_pRadarChartRenderer)
     {
         SSelectedValue selectedValue = m_pRadarChartRenderer->GetSelectedValue();
         if (selectedValue.IsSet())
         {
-            // Get the actual radar value from the data
+            // 有选中值，触发select事件
             SRadarValue* pValue = NULL;
-            if (m_pData && selectedValue.GetFirstIndex() >= 0 && 
+            if (m_pData && selectedValue.GetFirstIndex() >= 0 &&
                 selectedValue.GetFirstIndex() < (int)m_pData->GetValueCount())
             {
                 pValue = m_pData->GetValue(selectedValue.GetFirstIndex());
             }
-            
-            m_pOnValueSelectListener->OnValueSelected(
-                selectedValue.GetFirstIndex(),
-                pValue
-            );
+
+            // For radar chart, we use valueIndex and axisIndex (0 for now)
+            FireValueSelectEvent(selectedValue.GetFirstIndex(), 0, pValue);
         }
         else
         {
-            m_pOnValueSelectListener->OnValueDeselected();
+            // 没有选中值，触发deselect事件（传递无效参数）
+            FireValueSelectEvent(-1, -1, NULL);
         }
     }
 }
 
-void SRadarChartView::OnRadarValueSelected(int seriesIndex, SRadarValue* pValue)
+void SRadarChartView::FireValueSelectEvent(int valueIndex, int axisIndex, SRadarValue* pValue)
 {
-    // Default implementation - can be overridden by derived classes
-    // This method is called by the default listener
-}
-
-void SRadarChartView::OnRadarValueDeselected()
-{
-    // Default implementation - can be overridden by derived classes
-    // This method is called by the default listener
+    SRadarChartValueSelectEvent evt(this);
+    evt.valueIndex = valueIndex;
+    evt.axisIndex = axisIndex;
+    evt.pValue = pValue;
+    FireEvent(evt);
 }
 
 SNSEND

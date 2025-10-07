@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "SAbstractChartView.h"
 #include <math.h>
 
@@ -21,7 +21,6 @@ SAbstractChartView::SAbstractChartView()
     , m_bZoomEnabled(TRUE)
     , m_bScrollEnabled(TRUE)
     , m_bContainerScrollEnabled(FALSE)
-    , m_pViewportChangeListener(NULL)
     , m_bTouchDown(FALSE)
     , m_lastTouchDistance(0.0f)
 {
@@ -29,6 +28,11 @@ SAbstractChartView::SAbstractChartView()
     InitializeChart();
     m_animator.addUpdateListener(this);
 	m_animator.addListener(this);
+    AddEvent(EVENTID(SChartViewportChangedEvent));
+    AddEvent(EVENTID(SChartSelectionChangedEvent));
+    AddEvent(EVENTID(SChartDataAnimationStartEvent));
+    AddEvent(EVENTID(SChartDataAnimationUpdateEvent));
+    AddEvent(EVENTID(SChartDataAnimationEndEvent));
 }
 
 SAbstractChartView::~SAbstractChartView()
@@ -109,6 +113,9 @@ void SAbstractChartView::SetCurrentViewport(const SViewport& viewport)
     {
         SViewport constrainedViewport = m_pChartComputator->ConstrainViewport(viewport);
         m_pChartComputator->SetCurrentViewport(constrainedViewport);
+        SChartViewportChangedEvent event(this);
+        event.viewport = constrainedViewport;
+        FireEvent(event);
         Invalidate();
     }
 }
@@ -138,7 +145,15 @@ SSelectedValue SAbstractChartView::GetSelectedValue()
 
 BOOL SAbstractChartView::SelectValue(float x, float y)
 {
+    SSelectedValue currentSelection = GetSelectedValue();
     if (m_pChartRenderer && m_pChartRenderer->IsTouched(x, y))
+    {
+        // 选中了某个值
+        CallTouchListener();
+        Invalidate();
+        return TRUE;
+    }
+    else if (currentSelection.IsSet())
     {
         CallTouchListener();
         Invalidate();
@@ -245,8 +260,6 @@ BOOL SAbstractChartView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 {
     if (m_bInteractive && m_bZoomEnabled && m_pTouchHandler)
     {
-        //todo:hjx
-        //ScreenToClient(&pt);
         return m_pTouchHandler->HandleMouseWheel(nFlags, zDelta, pt);
     }
     
@@ -255,28 +268,24 @@ BOOL SAbstractChartView::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 
 void SAbstractChartView::OnLButtonDown(UINT nFlags, CPoint point)
 {
+    __baseCls::OnLButtonDown(nFlags, point);
     if (m_bInteractive)
     {
         m_bTouchDown = TRUE;
-        m_lastTouchPoint = point;
-        SetCapture();
-        
+        m_lastTouchPoint = point;        
         if (m_pTouchHandler)
         {
             m_pTouchHandler->HandleTouchEvent(nFlags, point);
         }
     }
-    
-    __baseCls::OnLButtonDown(nFlags, point);
 }
 
 void SAbstractChartView::OnLButtonUp(UINT nFlags, CPoint point)
 {
+    __baseCls::OnLButtonUp(nFlags, point);
     if (m_bTouchDown)
     {
-        m_bTouchDown = FALSE;
-        ReleaseCapture();
-        
+        m_bTouchDown = FALSE;        
         if (m_pTouchHandler)
         {
             m_pTouchHandler->HandleTouchEvent(nFlags, point);
@@ -286,7 +295,6 @@ void SAbstractChartView::OnLButtonUp(UINT nFlags, CPoint point)
         SelectValue((float)point.x, (float)point.y);
     }
     
-    __baseCls::OnLButtonUp(nFlags, point);
 }
 
 void SAbstractChartView::OnMouseMove(UINT nFlags, CPoint point)
@@ -486,14 +494,26 @@ void SChartTouchHandler::HandleZoom(float scaleFactor, CPoint center)
     m_pChart->SetCurrentViewport(newViewport);
 }
 
+void SAbstractChartView::onAnimationStart(THIS_ IValueAnimator * pAnimator)
+{
+    SChartDataAnimationStartEvent evt(this);
+    evt.dwDuration = pAnimator->getDuration();
+    FireEvent(evt);
+}
+
 void SAbstractChartView::onAnimationEnd(THIS_ IValueAnimator * pAnimator)
 {
     AnimationDataFinished();
+    SChartDataAnimationEndEvent evt(this);
+    FireEvent(evt);
 }
 void SAbstractChartView::onAnimationUpdate(THIS_ IValueAnimator * pAnimator)
 {
     float scale = pAnimator->getAnimatedFraction();
     OnAnimationUpdate(scale);
+    SChartDataAnimationUpdateEvent evt(this);
+    evt.scale = scale;
+    FireEvent(evt);
 }
 void SAbstractChartView::RefreshAxesMargins()
 {
@@ -504,7 +524,6 @@ void SAbstractChartView::RefreshAxesMargins()
         GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
         m_pAxesRenderer->OnChartSizeChanged(pRT);
     }
-
     // Invalidate to trigger repaint with new margins
     Invalidate();
 }

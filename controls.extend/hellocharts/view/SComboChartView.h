@@ -38,10 +38,12 @@ public:
     void SetComboChartData(SComboChartData* pData);
 
     /**
-     * @brief Set value select listener
-     * @param pListener Pointer to value select listener
+     * @brief Fire combo chart value select event
+     * @param chartType Chart type (0=line, 1=column)
+     * @param valueIndex Value index
+     * @param pValue Value pointer
      */
-    void SetOnValueSelectListener(IComboChartOnValueSelectListener* pListener);
+    void FireValueSelectEvent(int chartType, int valueIndex, void* pValue);
 
     /**
      * @brief Get combo chart type
@@ -144,7 +146,6 @@ private:
 private:
     SComboChartData* m_pData;
     SComboChartRenderer* m_pComboChartRenderer;
-    IComboChartOnValueSelectListener* m_pOnValueSelectListener;
     
     // Chart properties
     int m_comboType;
@@ -157,38 +158,6 @@ private:
     static const int DEFAULT_COMBO_TYPE;
     static const float DEFAULT_LINE_ALPHA;
     static const float DEFAULT_COLUMN_ALPHA;
-
-    friend class SComboChartValueSelectListener;
-};
-
-/**
- * @class SComboChartValueSelectListener
- * @brief Default implementation of combo chart value select listener
- */
-class SComboChartValueSelectListener : public IComboChartOnValueSelectListener
-{
-public:
-    SComboChartValueSelectListener(SComboChartView* pView) : m_pView(pView) {}
-    virtual ~SComboChartValueSelectListener() {}
-
-    virtual void OnValueSelected(int chartType, int valueIndex, int subValueIndex)
-    {
-        if (m_pView)
-        {
-            m_pView->OnComboValueSelected(chartType, valueIndex, subValueIndex);
-        }
-    }
-
-    virtual void OnValueDeselected()
-    {
-        if (m_pView)
-        {
-            m_pView->OnComboValueDeselected();
-        }
-    }
-
-private:
-    SComboChartView* m_pView;
 };
 
 SNSEND

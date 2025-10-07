@@ -38,10 +38,12 @@ public:
     void SetRadarChartData(SRadarChartData* pData);
 
     /**
-     * @brief Set value select listener
-     * @param pListener Pointer to value select listener
+     * @brief Fire radar chart value select event
+     * @param valueIndex Value index
+     * @param axisIndex Axis index
+     * @param pValue Radar value
      */
-    void SetOnValueSelectListener(IRadarChartOnValueSelectListener* pListener);
+    void FireValueSelectEvent(int valueIndex, int axisIndex, SRadarValue* pValue);
 
     /**
      * @brief Check if radar labels are enabled
@@ -113,7 +115,6 @@ protected:
 private:
     SRadarChartData* m_pData;
     SRadarChartRenderer* m_pRadarChartRenderer;
-    IRadarChartOnValueSelectListener* m_pOnValueSelectListener;
     
     // Chart properties
     BOOL m_bRadarLabelsEnabled;
@@ -124,38 +125,6 @@ private:
     // Default values
     static const int DEFAULT_WEB_RINGS;
     static const float DEFAULT_MAX_VALUE;
-
-    friend class SRadarChartValueSelectListener;
-};
-
-/**
- * @class SRadarChartValueSelectListener
- * @brief Default implementation of radar chart value select listener
- */
-class SRadarChartValueSelectListener : public IRadarChartOnValueSelectListener
-{
-public:
-    SRadarChartValueSelectListener(SRadarChartView* pView) : m_pView(pView) {}
-    virtual ~SRadarChartValueSelectListener() {}
-
-    virtual void OnValueSelected(int seriesIndex, SRadarValue* pValue)
-    {
-        if (m_pView)
-        {
-            m_pView->OnRadarValueSelected(seriesIndex, pValue);
-        }
-    }
-
-    virtual void OnValueDeselected()
-    {
-        if (m_pView)
-        {
-            m_pView->OnRadarValueDeselected();
-        }
-    }
-
-private:
-    SRadarChartView* m_pView;
 };
 
 SNSEND

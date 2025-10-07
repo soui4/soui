@@ -7,26 +7,6 @@ SNSBEGIN
 
 // Forward declarations
 class SPieChartRenderer;
-struct IPieChartOnValueSelectListener;
-
-/**
- * @interface IPieChartOnValueSelectListener
- * @brief Interface for pie chart value selection events
- */
-struct IPieChartOnValueSelectListener
-{
-    /**
-     * @brief Called when a slice value is selected
-     * @param sliceIndex Selected slice index
-     * @param pValue Selected slice value
-     */
-    virtual void OnValueSelected(int sliceIndex, SSliceValue* pValue) = 0;
-
-    /**
-     * @brief Called when slice value is deselected
-     */
-    virtual void OnValueDeselected() = 0;
-};
 
 /**
  * @class SPieChartView
@@ -58,10 +38,11 @@ public:
     void SetPieChartData(SPieChartData* pData);
 
     /**
-     * @brief Set value select listener
-     * @param pListener Pointer to value select listener
+     * @brief Fire pie chart value select event
+     * @param sliceIndex Slice index
+     * @param pValue Slice value
      */
-    void SetOnValueSelectListener(IPieChartOnValueSelectListener* pListener);
+    void FireValueSelectEvent(int sliceIndex, SSliceValue* pValue);
 
     /**
      * @brief Get circle fill ratio (for donut charts)
@@ -121,7 +102,6 @@ protected:
 private:
     SPieChartData* m_pData;
     SPieChartRenderer* m_pPieChartRenderer;
-    IPieChartOnValueSelectListener* m_pOnValueSelectListener;
     
     // Chart properties
     float m_circleFillRatio;
@@ -132,34 +112,6 @@ private:
     static const float DEFAULT_CIRCLE_FILL_RATIO;
 };
 
-/**
- * @class SPieChartValueSelectListener
- * @brief Default implementation of pie chart value select listener
- */
-class SPieChartValueSelectListener : public IPieChartOnValueSelectListener
-{
-public:
-    SPieChartValueSelectListener(SPieChartView* pView) : m_pView(pView) {}
-    virtual ~SPieChartValueSelectListener() {}
 
-    virtual void OnValueSelected(int sliceIndex, SSliceValue* pValue) OVERRIDE
-    {
-        if (m_pView)
-        {
-            m_pView->OnSliceValueSelected(sliceIndex, pValue);
-        }
-    }
-
-    virtual void OnValueDeselected() OVERRIDE
-    {
-        if (m_pView)
-        {
-            m_pView->OnSliceValueDeselected();
-        }
-    }
-
-private:
-    SPieChartView* m_pView;
-};
 
 SNSEND

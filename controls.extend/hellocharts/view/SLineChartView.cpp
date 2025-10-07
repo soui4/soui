@@ -10,8 +10,8 @@ SNSBEGIN
 SLineChartView::SLineChartView()
     : SAbstractChartView()
     , m_pData(NULL)
-    , m_pOnValueSelectListener(NULL)
 {
+    AddEvent(EVENTID(SLineChartValueSelectEvent));
     // Create default dummy data
     SetLineChartData(SLineChartData::GenerateDummyData());
 }
@@ -29,11 +29,11 @@ void SLineChartView::SetLineChartData(SLineChartData* pData)
 {
     if (m_pData != pData)
     {
+        CancelDataAnimation();
         if (m_pData)
         {
             delete m_pData;
         }
-        
         m_pData = pData ? pData : SLineChartData::GenerateDummyData();
 
         // Refresh axes margins after data change
@@ -82,31 +82,39 @@ void SLineChartView::SetLineChartData(SLineChartData* pData)
 
 void SLineChartView::CallTouchListener()
 {
-    if (!m_pOnValueSelectListener)
-        return;
-        
-    ILineChartOnValueSelectListener* pListener = m_pOnValueSelectListener;
-    
     SSelectedValue selectedValue = GetSelectedValue();
-    
+
     if (selectedValue.IsSet() && m_pData)
     {
+        // 有选中值，触发select事件
         int lineIndex = selectedValue.GetFirstIndex();
         int pointIndex = selectedValue.GetSecondIndex();
-        
+
         SLine* pLine = m_pData->GetLine(lineIndex);
         if (pLine)
         {
             SPointValue* pValue = pLine->GetValue(pointIndex);
             if (pValue)
             {
-                pListener->OnValueSelected(lineIndex, pointIndex, pValue);
+                FireValueSelectEvent(lineIndex, pointIndex, pValue);
                 return;
             }
         }
     }
-    
-    pListener->OnValueDeselected();
+    else
+    {
+        // 没有选中值，触发deselect事件（传递无效参数）
+        FireValueSelectEvent(-1, -1, NULL);
+    }
+}
+
+void SLineChartView::FireValueSelectEvent(int lineIndex, int pointIndex, SPointValue* pValue)
+{
+    SLineChartValueSelectEvent evt(this);
+    evt.lineIndex = lineIndex;
+    evt.pointIndex = pointIndex;
+    evt.pValue = pValue;
+    FireEvent(evt);
 }
 
 void SLineChartView::InitializeRenderers()

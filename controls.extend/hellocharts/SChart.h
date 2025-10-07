@@ -87,12 +87,6 @@ struct ISChart
     virtual BOOL IsDataAnimationRunning() = 0;
 
     /**
-     * @brief Set viewport change listener
-     * @param pListener Pointer to viewport change listener
-     */
-    virtual void SetViewportChangeListener(void* pListener) = 0;
-
-    /**
      * @brief Get current viewport
      * @return Current viewport
      */

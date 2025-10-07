@@ -12,13 +12,13 @@ const float SComboChartView::DEFAULT_COLUMN_ALPHA = 0.8f;
 SComboChartView::SComboChartView()
     : m_pData(NULL)
     , m_pComboChartRenderer(NULL)
-    , m_pOnValueSelectListener(NULL)
     , m_comboType(DEFAULT_COMBO_TYPE)
     , m_bUseSeparateYAxes(FALSE)
     , m_bSecondaryAxisOnRight(TRUE)
     , m_lineChartAlpha(DEFAULT_LINE_ALPHA)
     , m_columnChartAlpha(DEFAULT_COLUMN_ALPHA)
 {
+    AddEvent(EVENTID(SComboChartValueSelectEvent));
 }
 
 SComboChartView::~SComboChartView()
@@ -37,11 +37,11 @@ SChartData* SComboChartView::GetChartData()
 
 void SComboChartView::SetComboChartData(SComboChartData* pData)
 {
+    CancelDataAnimation();
     if (m_pData)
     {
         delete m_pData;
     }
-    
     m_pData = pData;
 
     // Refresh axes margins after data change
@@ -64,10 +64,7 @@ void SComboChartView::SetComboChartData(SComboChartData* pData)
     Invalidate();
 }
 
-void SComboChartView::SetOnValueSelectListener(IComboChartOnValueSelectListener* pListener)
-{
-    m_pOnValueSelectListener = pListener;
-}
+
 
 void SComboChartView::SetComboType(int type)
 {
@@ -161,35 +158,65 @@ void SComboChartView::OnLButtonDown(UINT nFlags, CPoint point)
 
 void SComboChartView::CallTouchListener()
 {
-    if (m_pOnValueSelectListener && m_pComboChartRenderer)
+    if (m_pComboChartRenderer)
     {
         SSelectedValue selectedValue = m_pComboChartRenderer->GetSelectedValue();
         if (selectedValue.IsSet())
         {
+            // 有选中值，触发select事件
             int chartType = m_pComboChartRenderer->IsLineChartSelection() ? 0 : 1;
-            m_pOnValueSelectListener->OnValueSelected(
-                chartType,
-                selectedValue.GetFirstIndex(),
-                selectedValue.GetSecondIndex()
-            );
+
+            // Get the actual value pointer based on chart type
+            void* pValue = NULL;
+            if (m_pData)
+            {
+                if (chartType == 0) // Line chart
+                {
+                    SLineChartData* pLineData = m_pData->GetLineChartData();
+                    if (pLineData && selectedValue.GetFirstIndex() >= 0 &&
+                        selectedValue.GetFirstIndex() < (int)pLineData->GetLines().size())
+                    {
+                        SLine* pLine = pLineData->GetLines()[selectedValue.GetFirstIndex()];
+                        if (pLine && selectedValue.GetSecondIndex() >= 0 &&
+                            selectedValue.GetSecondIndex() < (int)pLine->GetValues().size())
+                        {
+                            pValue = pLine->GetValues()[selectedValue.GetSecondIndex()];
+                        }
+                    }
+                }
+                else // Column chart
+                {
+                    SColumnChartData* pColumnData = m_pData->GetColumnChartData();
+                    if (pColumnData && selectedValue.GetFirstIndex() >= 0 &&
+                        selectedValue.GetFirstIndex() < (int)pColumnData->GetColumns().size())
+                    {
+                        SColumn* pColumn = pColumnData->GetColumns()[selectedValue.GetFirstIndex()];
+                        if (pColumn && selectedValue.GetSecondIndex() >= 0 &&
+                            selectedValue.GetSecondIndex() < (int)pColumn->GetValues().size())
+                        {
+                            pValue = pColumn->GetValues()[selectedValue.GetSecondIndex()];
+                        }
+                    }
+                }
+            }
+
+            FireValueSelectEvent(chartType, selectedValue.GetFirstIndex(), pValue);
         }
         else
         {
-            m_pOnValueSelectListener->OnValueDeselected();
+            // 没有选中值，触发deselect事件（传递无效参数）
+            FireValueSelectEvent(-1, -1, NULL);
         }
     }
 }
 
-void SComboChartView::OnComboValueSelected(int chartType, int valueIndex, int subValueIndex)
+void SComboChartView::FireValueSelectEvent(int chartType, int valueIndex, void* pValue)
 {
-    // Default implementation - can be overridden by derived classes
-    // This method is called by the default listener
-}
-
-void SComboChartView::OnComboValueDeselected()
-{
-    // Default implementation - can be overridden by derived classes
-    // This method is called by the default listener
+    SComboChartValueSelectEvent evt(this);
+    evt.chartType = chartType;
+    evt.valueIndex = valueIndex;
+    evt.pValue = pValue;
+    FireEvent(evt);
 }
 
 void SComboChartView::CalculateCombinedViewport()

@@ -64,6 +64,10 @@ BOOL SBubbleChartRenderer::IsTouched(float touchX, float touchY)
     if (!pComputator)
         return FALSE;
 
+    CRect rcClient;
+    m_pChart->GetRect(&rcClient);
+    touchX -= rcClient.left;
+    touchY -= rcClient.top;
     // Check each bubble from largest to smallest (for proper hit testing)
     for (int i = (int)pData->GetValueCount() - 1; i >= 0; --i)
     {

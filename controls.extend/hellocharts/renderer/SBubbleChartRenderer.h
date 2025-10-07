@@ -112,23 +112,4 @@ private:
     static const float SELECTED_BUBBLE_ALPHA;
 };
 
-/**
- * @interface IBubbleChartOnValueSelectListener
- * @brief Interface for bubble chart value selection events
- */
-struct IBubbleChartOnValueSelectListener
-{
-    /**
-     * @brief Called when a bubble value is selected
-     * @param bubbleIndex Selected bubble index
-     * @param pValue Selected bubble value
-     */
-    virtual void OnValueSelected(int bubbleIndex, SBubbleValue* pValue) = 0;
-
-    /**
-     * @brief Called when bubble value is deselected
-     */
-    virtual void OnValueDeselected() = 0;
-};
-
 SNSEND

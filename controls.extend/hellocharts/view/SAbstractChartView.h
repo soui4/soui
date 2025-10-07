@@ -1,10 +1,12 @@
-#pragma once
+﻿#ifndef __SABSTRACTCHARTVIEW_H__
+#define __SABSTRACTCHARTVIEW_H__
 
 #include <core/SWnd.h>
+#include <valueAnimator/SValueAnimator.h>
 #include "../SChart.h"
 #include "../computator/SChartComputator.h"
 #include "../renderer/SChartRenderer.h"
-#include <valueAnimator/SValueAnimator.h>
+#include "../event/SChartEvents.h"
 
 SNSBEGIN
 
@@ -34,7 +36,6 @@ public:
     virtual void CancelDataAnimation() OVERRIDE;
     virtual BOOL IsDataAnimationRunning() OVERRIDE;
 
-    virtual void SetViewportChangeListener(void* pListener) OVERRIDE { m_pViewportChangeListener = pListener; }
     virtual SViewport GetCurrentViewport() OVERRIDE;
     virtual void SetCurrentViewport(const SViewport& viewport) OVERRIDE;
     virtual SViewport GetMaximumViewport() OVERRIDE;
@@ -78,7 +79,7 @@ protected:
        // MESSAGE_HANDLER_EX(WM_TOUCH, OnTouch)
     SOUI_MSG_MAP_END()
 protected:
-    STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator * pAnimator) OVERRIDE{}
+    STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
     STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator * pAnimator) OVERRIDE{}
     STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
     STDMETHOD_(void, onAnimationUpdate)(THIS_ IValueAnimator * pAnimator) OVERRIDE;
@@ -115,8 +116,6 @@ protected:
 
     // Animation
     SFloatAnimator m_animator;
-    // Listeners
-    void* m_pViewportChangeListener;
 
     // Touch handling
     BOOL m_bTouchDown;
@@ -223,3 +222,5 @@ protected:
 };
 
 SNSEND
+
+#endif//__SABSTRACTCHARTVIEW_H__

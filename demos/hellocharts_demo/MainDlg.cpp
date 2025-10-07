@@ -1,7 +1,7 @@
 #include "stdafx.h"
 #include "MainDlg.h"
 #include <time.h>
-//#include "../../controls.extend/hellocharts/model/SAxis.h"
+#include "hellocharts/view/SAbstractChartView.h"
 
 using namespace SOUI;
 
@@ -13,12 +13,6 @@ CMainDlg::CMainDlg()
     , m_pBubbleChart(NULL)
     , m_pRadarChart(NULL)
     , m_pComboChart(NULL)
-    , m_pValueSelectListener(NULL)
-    , m_pColumnValueSelectListener(NULL)
-    , m_pPieValueSelectListener(NULL)
-    , m_pBubbleValueSelectListener(NULL)
-    , m_pRadarValueSelectListener(NULL)
-    , m_pComboValueSelectListener(NULL)
     , m_bAnimationEnabled(TRUE)
     , m_currentPieScenario(0)
 {
@@ -26,98 +20,18 @@ CMainDlg::CMainDlg()
 
 CMainDlg::~CMainDlg()
 {
-    if (m_pValueSelectListener)
-    {
-        delete m_pValueSelectListener;
-        m_pValueSelectListener = NULL;
-    }
-
-    if (m_pColumnValueSelectListener)
-    {
-        delete m_pColumnValueSelectListener;
-        m_pColumnValueSelectListener = NULL;
-    }
-
-    if (m_pPieValueSelectListener)
-    {
-        delete m_pPieValueSelectListener;
-        m_pPieValueSelectListener = NULL;
-    }
-
-    if (m_pBubbleValueSelectListener)
-    {
-        delete m_pBubbleValueSelectListener;
-        m_pBubbleValueSelectListener = NULL;
-    }
-
-    if (m_pRadarValueSelectListener)
-    {
-        delete m_pRadarValueSelectListener;
-        m_pRadarValueSelectListener = NULL;
-    }
-
-    if (m_pComboValueSelectListener)
-    {
-        delete m_pComboValueSelectListener;
-        m_pComboValueSelectListener = NULL;
-    }
+    // 无需手动删除listener对象，SOUI自动处理事件订阅
 }
 
 BOOL CMainDlg::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-    // Initialize line chart
+    // Initialize charts (events are automatically handled by EVENT_MAP)
     m_pLineChart = FindChildByName2<SLineChartView>(L"line_chart");
-    if (m_pLineChart)
-    {
-        // Set up value selection listener
-        m_pValueSelectListener = new CLineChartValueSelectListener(this);
-        m_pLineChart->SetOnValueSelectListener(m_pValueSelectListener);
-    }
-
-    // Initialize column chart
     m_pColumnChart = FindChildByName2<SColumnChartView>(L"column_chart");
-    if (m_pColumnChart)
-    {
-        // Set up value selection listener
-        m_pColumnValueSelectListener = new CColumnChartValueSelectListener(this);
-        m_pColumnChart->SetOnValueSelectListener(m_pColumnValueSelectListener);
-    }
-
-    // Initialize pie chart
     m_pPieChart = FindChildByName2<SPieChartView>(L"pie_chart");
-    if (m_pPieChart)
-    {
-        // Set up value selection listener
-        m_pPieValueSelectListener = new CPieChartValueSelectListener(this);
-        m_pPieChart->SetOnValueSelectListener(m_pPieValueSelectListener);
-    }
-
-    // Initialize bubble chart
     m_pBubbleChart = FindChildByName2<SBubbleChartView>(L"bubble_chart");
-    if (m_pBubbleChart)
-    {
-        // Set up value selection listener
-        m_pBubbleValueSelectListener = new CBubbleChartValueSelectListener(this);
-        m_pBubbleChart->SetOnValueSelectListener(m_pBubbleValueSelectListener);
-    }
-
-    // Initialize radar chart
     m_pRadarChart = FindChildByName2<SRadarChartView>(L"radar_chart");
-    if (m_pRadarChart)
-    {
-        // Set up value selection listener
-        m_pRadarValueSelectListener = new CRadarChartValueSelectListener(this);
-        m_pRadarChart->SetOnValueSelectListener(m_pRadarValueSelectListener);
-    }
-
-    // Initialize combo chart
     m_pComboChart = FindChildByName2<SComboChartView>(L"combo_chart");
-    if (m_pComboChart)
-    {
-        // Set up value selection listener
-        m_pComboValueSelectListener = new CComboChartValueSelectListener(this);
-        m_pComboChart->SetOnValueSelectListener(m_pComboValueSelectListener);
-    }
 
     // Generate initial sample data for all charts
     GenerateSampleData();
@@ -544,40 +458,7 @@ void CMainDlg::OnColumnValueDeselected()
     }
 }
 
-//////////////////////////////////////////////////////////////////////////
-// CLineChartValueSelectListener implementation
 
-void CMainDlg::CLineChartValueSelectListener::OnValueSelected(int lineIndex, int pointIndex, SPointValue* pValue)
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnChartValueSelected(lineIndex, pointIndex, pValue);
-    }
-}
-
-void CMainDlg::CLineChartValueSelectListener::OnValueDeselected()
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnChartValueDeselected();
-    }
-}
-
-void CMainDlg::CColumnChartValueSelectListener::OnValueSelected(int columnIndex, int subcolumnIndex, SSubcolumnValue* pValue)
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnColumnValueSelected(columnIndex, subcolumnIndex, pValue);
-    }
-}
-
-void CMainDlg::CColumnChartValueSelectListener::OnValueDeselected()
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnColumnValueDeselected();
-    }
-}
 
 void CMainDlg::GeneratePieChartData()
 {
@@ -713,21 +594,7 @@ float CMainDlg::GetTotalPieValue()
     return total > 0.0f ? total : 1.0f;
 }
 
-void CMainDlg::CPieChartValueSelectListener::OnValueSelected(int sliceIndex, SSliceValue* pValue)
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnPieValueSelected(sliceIndex, pValue);
-    }
-}
 
-void CMainDlg::CPieChartValueSelectListener::OnValueDeselected()
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnPieValueDeselected();
-    }
-}
 
 void CMainDlg::GenerateBubbleChartData()
 {
@@ -873,21 +740,7 @@ void CMainDlg::OnBubbleValueDeselected()
     }
 }
 
-void CMainDlg::CBubbleChartValueSelectListener::OnValueSelected(int bubbleIndex, SBubbleValue* pValue)
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnBubbleValueSelected(bubbleIndex, pValue);
-    }
-}
 
-void CMainDlg::CBubbleChartValueSelectListener::OnValueDeselected()
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnBubbleValueDeselected();
-    }
-}
 
 void CMainDlg::GenerateRadarChartData()
 {
@@ -1017,21 +870,7 @@ void CMainDlg::OnRadarValueDeselected()
     }
 }
 
-void CMainDlg::CRadarChartValueSelectListener::OnValueSelected(int seriesIndex, SRadarValue* pValue)
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnRadarValueSelected(seriesIndex, pValue);
-    }
-}
 
-void CMainDlg::CRadarChartValueSelectListener::OnValueDeselected()
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnRadarValueDeselected();
-    }
-}
 
 void CMainDlg::GenerateComboChartData()
 {
@@ -1222,21 +1061,7 @@ void CMainDlg::OnComboValueDeselected()
     }
 }
 
-void CMainDlg::CComboChartValueSelectListener::OnValueSelected(int chartType, int valueIndex, int subValueIndex)
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnComboValueSelected(chartType, valueIndex, subValueIndex);
-    }
-}
 
-void CMainDlg::CComboChartValueSelectListener::OnValueDeselected()
-{
-    if (m_pDlg)
-    {
-        m_pDlg->OnComboValueDeselected();
-    }
-}
 
 void CMainDlg::OnBtnTestPieScenarios()
 {
@@ -1402,4 +1227,121 @@ void CMainDlg::UpdateChartStatistics()
     {
         pInfo->SetWindowText(statsInfo);
     }
+}
+
+//////////////////////////////////////////////////////////////////////////
+// Chart Event Handlers (using SOUI event system)
+
+BOOL CMainDlg::OnLineChartValueSelect(IEvtArgs * e)
+{
+    SLineChartValueSelectEvent* pEvt = sobj_cast<SLineChartValueSelectEvent>(e);
+    if (pEvt)
+    {
+        if (pEvt->pValue && pEvt->lineIndex >= 0 && pEvt->pointIndex >= 0)
+        {
+            // 选中事件
+            OnChartValueSelected(pEvt->lineIndex, pEvt->pointIndex, pEvt->pValue);
+        }
+        else
+        {
+            // 取消选中事件
+            OnChartValueDeselected();
+        }
+    }
+    return TRUE;
+}
+
+BOOL CMainDlg::OnColumnChartValueSelect(IEvtArgs * e)
+{
+    SColumnChartValueSelectEvent* pEvt = sobj_cast<SColumnChartValueSelectEvent>(e);
+    if (pEvt)
+    {
+        if (pEvt->pValue && pEvt->columnIndex >= 0 && pEvt->subcolumnIndex >= 0)
+        {
+            // 选中事件
+            OnColumnValueSelected(pEvt->columnIndex, pEvt->subcolumnIndex, pEvt->pValue);
+        }
+        else
+        {
+            // 取消选中事件
+            OnColumnValueDeselected();
+        }
+    }
+    return TRUE;
+}
+
+BOOL CMainDlg::OnPieChartValueSelect(IEvtArgs * e)
+{
+    SPieChartValueSelectEvent* pEvt = sobj_cast<SPieChartValueSelectEvent>(e);
+    if (pEvt)
+    {
+        if (pEvt->pValue && pEvt->sliceIndex >= 0)
+        {
+            // 选中事件
+            OnPieValueSelected(pEvt->sliceIndex, pEvt->pValue);
+        }
+        else
+        {
+            // 取消选中事件
+            OnPieValueDeselected();
+        }
+    }
+    return TRUE;
+}
+
+BOOL CMainDlg::OnBubbleChartValueSelect(IEvtArgs * e)
+{
+    SBubbleChartValueSelectEvent* pEvt = sobj_cast<SBubbleChartValueSelectEvent>(e);
+    if (pEvt)
+    {
+        if (pEvt->pValue && pEvt->bubbleIndex >= 0)
+        {
+            // 选中事件
+            OnBubbleValueSelected(pEvt->bubbleIndex, pEvt->pValue);
+        }
+        else
+        {
+            // 取消选中事件
+            OnBubbleValueDeselected();
+        }
+    }
+    return TRUE;
+}
+
+BOOL CMainDlg::OnRadarChartValueSelect(IEvtArgs * e)
+{
+    SRadarChartValueSelectEvent* pEvt = sobj_cast<SRadarChartValueSelectEvent>(e);
+    if (pEvt)
+    {
+        if (pEvt->pValue && pEvt->valueIndex >= 0)
+        {
+            // 选中事件
+            OnRadarValueSelected(pEvt->valueIndex, pEvt->pValue);
+        }
+        else
+        {
+            // 取消选中事件
+            OnRadarValueDeselected();
+        }
+    }
+    return TRUE;
+}
+
+BOOL CMainDlg::OnComboChartValueSelect(IEvtArgs * e)
+{
+    SComboChartValueSelectEvent* pEvt = sobj_cast<SComboChartValueSelectEvent>(e);
+    if (pEvt)
+    {
+        if (pEvt->pValue && pEvt->chartType >= 0 && pEvt->valueIndex >= 0)
+        {
+            // 选中事件
+            OnComboValueSelected(pEvt->chartType, pEvt->valueIndex, 0);
+        }
+        else
+        {
+            // 取消选中事件
+            OnComboValueDeselected();
+        }
+    }
+    return TRUE;
 }

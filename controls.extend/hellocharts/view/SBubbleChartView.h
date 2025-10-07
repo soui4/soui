@@ -38,10 +38,11 @@ public:
     void SetBubbleChartData(SBubbleChartData* pData);
 
     /**
-     * @brief Set value select listener
-     * @param pListener Pointer to value select listener
+     * @brief Fire bubble chart value select event
+     * @param bubbleIndex Bubble index
+     * @param pValue Bubble value
      */
-    void SetOnValueSelectListener(IBubbleChartOnValueSelectListener* pListener);
+    void FireValueSelectEvent(int bubbleIndex, SBubbleValue* pValue);
 
     /**
      * @brief Check if bubble labels are enabled
@@ -113,7 +114,6 @@ protected:
 private:
     SBubbleChartData* m_pData;
     SBubbleChartRenderer* m_pBubbleChartRenderer;
-    IBubbleChartOnValueSelectListener* m_pOnValueSelectListener;
     
     // Chart properties
     BOOL m_bBubbleLabelsEnabled;
@@ -125,38 +125,6 @@ private:
     static const int DEFAULT_MIN_BUBBLE_RADIUS;
     static const int DEFAULT_MAX_BUBBLE_RADIUS;
     static const int DEFAULT_BUBBLE_SCALE;
-
-    friend class SBubbleChartValueSelectListener;
-};
-
-/**
- * @class SBubbleChartValueSelectListener
- * @brief Default implementation of bubble chart value select listener
- */
-class SBubbleChartValueSelectListener : public IBubbleChartOnValueSelectListener
-{
-public:
-    SBubbleChartValueSelectListener(SBubbleChartView* pView) : m_pView(pView) {}
-    virtual ~SBubbleChartValueSelectListener() {}
-
-    virtual void OnValueSelected(int bubbleIndex, SBubbleValue* pValue) override
-    {
-        if (m_pView)
-        {
-            m_pView->OnBubbleValueSelected(bubbleIndex, pValue);
-        }
-    }
-
-    virtual void OnValueDeselected() override
-    {
-        if (m_pView)
-        {
-            m_pView->OnBubbleValueDeselected();
-        }
-    }
-
-private:
-    SBubbleChartView* m_pView;
 };
 
 SNSEND

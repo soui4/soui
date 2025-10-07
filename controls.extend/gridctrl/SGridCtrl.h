@@ -482,8 +482,11 @@ public:
     STDMETHOD_(IGridCellFactory *, Clone)() const { return new SGridCellFactory<T>; }
 };
 
+#ifndef EVT_GRID_BEGIN
+#define EVT_GRID_BEGIN (EVT_EXTERNAL_BEGIN + 1000)
+#endif//EVT_GRID_BEGIN
 enum{
-    EVT_GRID_INIT_INPLACE_WND = EVT_EXTERNAL_BEGIN + 1000,
+    EVT_GRID_INIT_INPLACE_WND = EVT_GRID_BEGIN,
     EVT_GRID_GET_INPLACE_STYLE,
 };
 

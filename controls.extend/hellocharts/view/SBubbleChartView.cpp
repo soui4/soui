@@ -12,12 +12,12 @@ const int SBubbleChartView::DEFAULT_BUBBLE_SCALE = 0;
 SBubbleChartView::SBubbleChartView()
     : m_pData(NULL)
     , m_pBubbleChartRenderer(NULL)
-    , m_pOnValueSelectListener(NULL)
     , m_bBubbleLabelsEnabled(FALSE)
     , m_minBubbleRadius(DEFAULT_MIN_BUBBLE_RADIUS)
     , m_maxBubbleRadius(DEFAULT_MAX_BUBBLE_RADIUS)
     , m_bubbleScale(DEFAULT_BUBBLE_SCALE)
 {
+    AddEvent(EVENTID(SBubbleChartValueSelectEvent));
 }
 
 SBubbleChartView::~SBubbleChartView()
@@ -36,11 +36,11 @@ SChartData* SBubbleChartView::GetChartData()
 
 void SBubbleChartView::SetBubbleChartData(SBubbleChartData* pData)
 {
+    CancelDataAnimation();
     if (m_pData)
     {
         delete m_pData;
     }
-    
     m_pData = pData;
 
     // Refresh axes margins after data change
@@ -95,10 +95,7 @@ void SBubbleChartView::SetBubbleChartData(SBubbleChartData* pData)
     Invalidate();
 }
 
-void SBubbleChartView::SetOnValueSelectListener(IBubbleChartOnValueSelectListener* pListener)
-{
-    m_pOnValueSelectListener = pListener;
-}
+
 
 void SBubbleChartView::SetBubbleLabelsEnabled(BOOL bEnabled)
 {
@@ -153,6 +150,7 @@ void SBubbleChartView::InitializeRenderers()
 
 void SBubbleChartView::OnLButtonDown(UINT nFlags, CPoint point)
 {
+    __baseCls::OnLButtonDown(nFlags, point);
     if (m_bInteractive && m_pBubbleChartRenderer)
     {
         if (m_pBubbleChartRenderer->IsTouched(point.x, point.y))
@@ -161,47 +159,39 @@ void SBubbleChartView::OnLButtonDown(UINT nFlags, CPoint point)
             Invalidate();
         }
     }
-    
-    __baseCls::OnLButtonDown(nFlags, point);
 }
 
 void SBubbleChartView::CallTouchListener()
 {
-    if (m_pOnValueSelectListener && m_pBubbleChartRenderer)
+    if (m_pBubbleChartRenderer)
     {
         SSelectedValue selectedValue = m_pBubbleChartRenderer->GetSelectedValue();
         if (selectedValue.IsSet())
         {
-            // Get the actual bubble value from the data
+            // 有选中值，触发select事件
             SBubbleValue* pValue = NULL;
-            if (m_pData && selectedValue.GetFirstIndex() >= 0 && 
+            if (m_pData && selectedValue.GetFirstIndex() >= 0 &&
                 selectedValue.GetFirstIndex() < (int)m_pData->GetValueCount())
             {
                 pValue = m_pData->GetValue(selectedValue.GetFirstIndex());
             }
-            
-            m_pOnValueSelectListener->OnValueSelected(
-                selectedValue.GetFirstIndex(),
-                pValue
-            );
+
+            FireValueSelectEvent(selectedValue.GetFirstIndex(), pValue);
         }
         else
         {
-            m_pOnValueSelectListener->OnValueDeselected();
+            // 没有选中值，触发deselect事件（传递无效参数）
+            FireValueSelectEvent(-1, NULL);
         }
     }
 }
 
-void SBubbleChartView::OnBubbleValueSelected(int bubbleIndex, SBubbleValue* pValue)
+void SBubbleChartView::FireValueSelectEvent(int bubbleIndex, SBubbleValue* pValue)
 {
-    // Default implementation - can be overridden by derived classes
-    // This method is called by the default listener
-}
-
-void SBubbleChartView::OnBubbleValueDeselected()
-{
-    // Default implementation - can be overridden by derived classes
-    // This method is called by the default listener
+    SBubbleChartValueSelectEvent evt(this);
+    evt.bubbleIndex = bubbleIndex;
+    evt.pValue = pValue;
+    FireEvent(evt);
 }
 
 SNSEND

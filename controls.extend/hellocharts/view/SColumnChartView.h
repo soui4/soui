@@ -6,27 +6,6 @@ SNSBEGIN
 
 // Forward declarations
 class SColumnChartRenderer;
-struct IColumnChartOnValueSelectListener;
-
-/**
- * @interface IColumnChartOnValueSelectListener
- * @brief Interface for column chart value selection events
- */
-struct IColumnChartOnValueSelectListener
-{
-    /**
-     * @brief Called when a column value is selected
-     * @param columnIndex Selected column index
-     * @param subcolumnIndex Selected subcolumn index
-     * @param pValue Selected value
-     */
-    virtual void OnValueSelected(int columnIndex, int subcolumnIndex, SSubcolumnValue* pValue) = 0;
-    
-    /**
-     * @brief Called when selection is cleared
-     */
-    virtual void OnValueDeselected() = 0;
-};
 
 /**
  * @class SColumnChartView
@@ -60,16 +39,12 @@ public:
     void SetColumnChartData(SColumnChartData* pData);
     
     /**
-     * @brief Get value selection listener
-     * @return Pointer to listener
+     * @brief Fire column chart value select event
+     * @param columnIndex Column index
+     * @param subcolumnIndex Subcolumn index
+     * @param pValue Subcolumn value
      */
-    IColumnChartOnValueSelectListener* GetOnValueSelectListener() const { return m_pOnValueSelectListener; }
-    
-    /**
-     * @brief Set value selection listener
-     * @param pListener Pointer to listener
-     */
-    void SetOnValueSelectListener(IColumnChartOnValueSelectListener* pListener) { m_pOnValueSelectListener = pListener; }
+    void FireValueSelectEvent(int columnIndex, int subcolumnIndex, SSubcolumnValue* pValue);
 
     // SAbstractChartView interface
     virtual SChartData* GetChartData() OVERRIDE { return m_pData; }
@@ -98,7 +73,6 @@ protected:
 
 private:
     SColumnChartData* m_pData;
-    IColumnChartOnValueSelectListener* m_pOnValueSelectListener;
     
     // Attributes
     BOOL m_bStacked;
