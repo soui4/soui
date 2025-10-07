@@ -204,6 +204,24 @@ void SObjectDefaultRegister::RegisterInterpolator(SObjectFactoryMgr *objFactory)
     objFactory->TplRegisterFactory<SBounceInterpolator>();
     objFactory->TplRegisterFactory<SCycleInterpolator>();
     objFactory->TplRegisterFactory<SOvershootInterpolator>();
+    objFactory->TplRegisterFactory<SQuadInOutInterpolator>();
+    objFactory->TplRegisterFactory<SQuadInInterpolator>();
+    objFactory->TplRegisterFactory<SQuadOutInterpolator>();
+    objFactory->TplRegisterFactory<SCubicInOutInterpolator>();
+    objFactory->TplRegisterFactory<SCubicInInterpolator>();
+    objFactory->TplRegisterFactory<SCubicOutInterpolator>();
+    objFactory->TplRegisterFactory<SSineInInterpolator>();
+    objFactory->TplRegisterFactory<SSineOutInterpolator>();
+    objFactory->TplRegisterFactory<SSineInOutInterpolator>();
+    objFactory->TplRegisterFactory<SExpoInInterpolator>();
+    objFactory->TplRegisterFactory<SExpoOutInterpolator>();
+    objFactory->TplRegisterFactory<SExpoInOutInterpolator>();
+    objFactory->TplRegisterFactory<SBackInInterpolator>();
+    objFactory->TplRegisterFactory<SBackOutInterpolator>();
+    objFactory->TplRegisterFactory<SBackInOutInterpolator>();
+    objFactory->TplRegisterFactory<SQuintInOutInterpolator>();
+    objFactory->TplRegisterFactory<SQuintInInterpolator>();
+    objFactory->TplRegisterFactory<SQuintOutInterpolator>();
 }
 
 void SObjectDefaultRegister::RegisterAnimation(SObjectFactoryMgr *objFactory) const

@@ -293,5 +293,144 @@ class SOUI_EXP SOvershootInterpolator : public SInterpolatorBase {
     SOUI_ATTRS_END()
 };
 
+/**
+ * Additional common easing interpolators
+ */
+
+// Quad (power 2) interpolators
+// Quad (power 2) interpolators
+class SOUI_EXP SQuadInInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"QuadIn")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SQuadOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"QuadOut")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SQuadInOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"QuadInOut")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+// Cubic (power 3) interpolators
+// Cubic (power 3) interpolators
+class SOUI_EXP SCubicInInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"CubicIn")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SCubicOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"CubicOut")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SCubicInOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"CubicInOut")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+// Sine interpolators
+class SOUI_EXP SSineInInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"SineIn")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SSineOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"SineOut")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SSineInOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"SineInOut")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+// Exponential interpolators
+class SOUI_EXP SExpoInInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"ExpoIn")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SExpoOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"ExpoOut")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SExpoInOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"ExpoInOut")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+// Back interpolators (overshoot) - similar to Anticipate/Overshoot but simpler
+class SOUI_EXP SBackInInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"BackIn")
+  private:
+    float mTension;
+  public:
+    SBackInInterpolator(float tension = 1.70158f);
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+    SOUI_ATTRS_BEGIN()
+        ATTR_FLOAT(L"tension", mTension, FALSE)
+    SOUI_ATTRS_END()
+};
+
+// Quint (power 5) interpolators
+// Quint (power 5) interpolators
+class SOUI_EXP SQuintInInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"QuintIn")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SQuintOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"QuintOut")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SQuintInOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"QuintInOut")
+  public:
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+};
+
+class SOUI_EXP SBackOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"BackOut")
+  private:
+    float mTension;
+  public:
+    SBackOutInterpolator(float tension = 1.70158f);
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+    SOUI_ATTRS_BEGIN()
+        ATTR_FLOAT(L"tension", mTension, FALSE)
+    SOUI_ATTRS_END()
+};
+
+class SOUI_EXP SBackInOutInterpolator : public SInterpolatorBase {
+    DEF_SOBJECT(SInterpolatorBase, L"BackInOut")
+  private:
+    float mTension;
+  public:
+    SBackInOutInterpolator(float tension = 1.70158f);
+    STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
+    SOUI_ATTRS_BEGIN()
+        ATTR_FLOAT(L"tension", mTension, FALSE)
+    SOUI_ATTRS_END()
+};
+
 SNSEND
 #endif // __SINTERPOLATORIMPL__H__
