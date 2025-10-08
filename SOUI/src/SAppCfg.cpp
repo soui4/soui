@@ -438,109 +438,90 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
 
 // IAppCfg接口方法实现
 IAppCfg* SAppCfg::ISetRender(Render render){
-    m_render = render; 
+    SetRender(render);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetImgDecoder(ImgDecoder decoder){
-    m_imgDecoder = decoder; 
+    SetImgDecoder(decoder);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetSysResPeHandle(HMODULE hResModule){
-    m_sysResDesc->m_type = ResType_PeHandle;
-    m_sysResDesc->m_hResModule = hResModule;
+    SetSysResPeHandle(hResModule);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetSysResPeFile(LPCTSTR pszPath){
-    m_sysResDesc->m_type = ResType_PeFile;
-    m_sysResDesc->m_szFile = pszPath;
+    SetSysResPeFile(pszPath);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetSysResFile(LPCTSTR pszPath) {
-    m_sysResDesc->m_type = ResType_ResFile;
-    m_sysResDesc->m_szFile = pszPath;
+    SetSysResFile(pszPath);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetSysResZip(LPCTSTR pszZipFile, LPCSTR pszPwd){
-    m_sysResDesc->m_type = ResType_ZipFile;
-    m_sysResDesc->m_szFile = pszZipFile;
-    if(pszPwd) m_sysResDesc->m_szPwd = pszPwd;
+    SetSysResZip(pszZipFile, pszPwd);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetSysRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd){
-    m_sysResDesc->m_type = ResType_7zFile;
-    m_sysResDesc->m_szFile = psz7zFile;
-    if(pszPwd) m_sysResDesc->m_szPwd = pszPwd;
+    SetSysRes7z(psz7zFile, pszPwd);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetAppResPeHandle(HMODULE hResModule){
-    m_appResDesc->m_type = ResType_PeHandle;
-    m_appResDesc->m_hResModule = hResModule;
+    SetAppResPeHandle(hResModule);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetAppResPeFile(LPCTSTR pszPath){ 
-    m_appResDesc->m_type = ResType_PeFile;
-    m_appResDesc->m_szFile = pszPath;
+    SetAppResPeFile(pszPath);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetAppResFile(LPCTSTR pszPath)
 {
-    m_appResDesc->m_type = ResType_ResFile;
-    m_appResDesc->m_szFile = pszPath;
+    SetAppResFile(pszPath);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd)
 {
-    m_appResDesc->m_type = ResType_ZipFile;
-    m_appResDesc->m_szFile = pszZipFile;
-    if (pszPwd)
-        m_appResDesc->m_szPwd = pszPwd;
+    SetAppResZip(pszZipFile, pszPwd);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
 {
-    m_appResDesc->m_type = ResType_7zFile;
-    m_appResDesc->m_szFile = psz7zFile;
-    if (pszPwd)
-        m_appResDesc->m_szPwd = pszPwd;
+    SetAppRes7z(psz7zFile, pszPwd);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetUidefId(LPCTSTR strUidefId){
-    m_uidefId = strUidefId;
+    SetUidefId(strUidefId);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetLog(BOOL bLogEnable, int nLogLevel, LPCSTR pszLogName){
-    m_logDesc->m_bLogEnable = bLogEnable;
-    m_logDesc->m_nLogLevel = nLogLevel;
-    if(pszLogName) m_logDesc->m_strLogName = pszLogName;
+    SetLog(bLogEnable, nLogLevel, pszLogName);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::ISetAppDir(LPCTSTR pszAppDir){
-    m_appDir = pszAppDir;
+    SetAppDir(pszAppDir);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::IEnableScript(BOOL bEnable){
-    m_enableScript = bEnable;
+    EnableScript(bEnable);
     return (IAppCfg*)this;
 }
 
 IAppCfg* SAppCfg::IEnableMultiLang(LPCTSTR langResId, BOOL bEnable){
-    m_langDesc->enable = bEnable;
-    m_langDesc->langResId = langResId;
+    EnableMultiLang(langResId, bEnable);
     return (IAppCfg*)this;
 }
 
