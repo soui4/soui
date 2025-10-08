@@ -12,7 +12,7 @@
 #include <interface/smenuex-i.h>
 #include <interface/STimer-i.h>
 #include <interface/SValueAnimator-i.h>
-
+#include <interface/SAppCfg-i.h>
 #include <soui_exp.h>
 SNSBEGIN
 
@@ -114,6 +114,12 @@ DECLARE_INTERFACE_(ISouiFactory, IObjRef)
      * @return IAnimatorGroup * -- 动画组
      */
     STDMETHOD_(IAnimatorGroup *, CreateAnimatorGroup)(THIS) PURE;
+
+    /** CreateAppCfg
+     * @brief 创建AppCfg对象
+     * @return IAppCfg * -- AppCfg对象
+     */
+    STDMETHOD_(IAppCfg *, CreateAppCfg)(THIS) PURE;
 };
 
 SNSEND

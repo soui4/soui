@@ -49,6 +49,7 @@ extern "C" {
 #include "SCtrl-capi.h"
 #include "SHttpClient-capi.h"
 #include "SMsgLoop-capi.h"
+#include "SAppCfg-capi.h"
 #include "SNativeWnd-capi.h"
 #include "SNotifyCenter-capi.h"
 #include "SObjFactory-capi.h"

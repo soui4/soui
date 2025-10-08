@@ -953,7 +953,12 @@ void CMainDlg::OnCbxInterpolotorChange(IEvtArgs *e)
 			SInterpolatorView *pView = FindChildByID2<SInterpolatorView>(R.id.view_interpolator);
 			pView->SetInterpolator(pInterpolator);
 			pInterpolator->Release();
-		}
+            SSLOGI() << "CREATEINTERPOLATOR " << str.c_str() << " succeed!";
+        }
+        else
+        {
+            SSLOGW() << "CREATEINTERPOLATOR " << str.c_str() << " failed!";
+        }
 	}
 }
 

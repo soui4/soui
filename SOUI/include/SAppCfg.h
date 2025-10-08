@@ -1,68 +1,17 @@
 #ifndef _SAPP_CFG_H_
 #define _SAPP_CFG_H_
 
+#include <interface/SAppCfg-i.h>
+#include <helper/obj-ref-impl.hpp>
+#include <SApp.h>
+
 SNSBEGIN
 
-class SApplication;
-typedef enum _Render
-{
-    Render_Gdi,
-    Render_Skia,
-    Render_D2D
-}Render;
+class SResDesc;
+class SLogDesc;
+class SMultiLangDesc;
 
-typedef enum _ImgDecoder
-{
-    ImgDecoder_Stb,
-    ImgDecoder_Gdip,
-    ImgDecoder_WIC,
-} ImgDecoder;
-
-typedef enum _ResType
-{
-    ResType_Unknown = 0,
-    ResType_ResFile, // ◊ ‘¥Œƒº˛
-    ResType_PeHandle,   // ◊ ‘¥ƒ£øÈ
-    ResType_PeFile,     // ◊ ‘¥ƒ£øÈ√˚≥∆
-    ResType_ZipFile, // zip—πÀı∞¸
-    ResType_7zFile,  // 7z—πÀı∞¸
-} ResType;
-
-class SOUI_EXP SResDesc {
-  public:
-    ResType m_type;
-    SStringT m_szFile;    // ◊ ‘¥Œƒº˛√˚
-    SStringA m_szPwd;     // —πÀı∞¸√‹¬Î
-    HMODULE m_hResModule; // ◊ ‘¥ƒ£øÈæ‰±˙
-
-    SResDesc()
-    {
-        m_type = ResType_Unknown;
-        m_hResModule = NULL;
-    }
-};
-
-class SOUI_EXP SLogDesc{
-public:
-    BOOL m_bLogEnable;
-    SStringA m_strLogName;  //default set to app_name
-    int m_nLogLevel;
-    SLogDesc()
-    {
-        m_bLogEnable = FALSE;
-        m_nLogLevel = LOG_LEVEL_INFO;
-    }
-};
-
-class SOUI_EXP SMultiLangDesc{
-public:
-    BOOL enable;
-    SStringT langResId;
-    SMultiLangDesc():enable(FALSE)
-    {
-    }
-};
-class SOUI_EXP SAppCfg {
+class SOUI_EXP SAppCfg : public TObjRefImpl<IAppCfg> {
 public:
     SAppCfg();
     ~SAppCfg(void);
@@ -71,112 +20,54 @@ protected:
     SStringT m_appDir;
     Render m_render;
     ImgDecoder m_imgDecoder;
-    SLogDesc m_logDesc;
-    SResDesc m_sysResDesc;
-    SResDesc m_appResDesc;
+    SLogDesc *m_logDesc;
+    SResDesc *m_sysResDesc;
+    SResDesc *m_appResDesc;
+    SMultiLangDesc *m_langDesc;
     SStringT m_uidefId;
-
     BOOL m_enableScript;
-    SMultiLangDesc m_langDesc;
-  public:
-    SAppCfg & SetRender(Render render){
-        m_render = render; 
-        return *this;
-    }
-    SAppCfg & SetImgDecoder(ImgDecoder decoder){
-        m_imgDecoder = decoder; 
-        return *this;
-    }
-
-    SAppCfg & SetSysResPeHandle(HMODULE hResModule){
-        m_sysResDesc.m_type = ResType_PeHandle;
-        m_sysResDesc.m_hResModule = hResModule;
-        return *this;
-    }
-
-    SAppCfg & SetSysResPeFile(LPCTSTR pszPath){
-        m_sysResDesc.m_type = ResType_PeFile;
-        m_sysResDesc.m_szFile = pszPath;
-        return *this;
-    }
-      SAppCfg &SetSysResFile(LPCTSTR pszPath) {
-          m_sysResDesc.m_type = ResType_ResFile;
-          m_sysResDesc.m_szFile = pszPath;
-          return *this;
-      }
-    SAppCfg & SetSysResZip(LPCTSTR pszZipFile, LPCSTR pszPwd=NULL){
-        m_sysResDesc.m_type = ResType_ZipFile;
-        m_sysResDesc.m_szFile = pszZipFile;
-        if(pszPwd) m_sysResDesc.m_szPwd = pszPwd;
-        return *this;
-    }
-    SAppCfg & SetSysRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd=NULL){
-        m_sysResDesc.m_type = ResType_7zFile;
-        m_sysResDesc.m_szFile = psz7zFile;
-        if(pszPwd) m_sysResDesc.m_szPwd = pszPwd;
-        return *this;
-    }
-    SAppCfg & SetAppResPeHandle(HMODULE hResModule){
-        m_appResDesc.m_type = ResType_PeHandle;
-        m_appResDesc.m_hResModule = hResModule;
-        return *this;
-    }
-    SAppCfg & SetAppResPeFile(LPCTSTR pszPath){ 
-        m_appResDesc.m_type = ResType_PeFile;
-        m_appResDesc.m_szFile = pszPath;
-        return *this;
-    }
-    SAppCfg &SetAppResFile(LPCTSTR pszPath)
-    {
-        m_appResDesc.m_type = ResType_ResFile;
-        m_appResDesc.m_szFile = pszPath;
-        return *this;
-    }
-    SAppCfg &SetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd = NULL)
-    {
-        m_appResDesc.m_type = ResType_ZipFile;
-        m_appResDesc.m_szFile = pszZipFile;
-        if (pszPwd)
-            m_appResDesc.m_szPwd = pszPwd;
-        return *this;
-    }
-    SAppCfg &SetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd = NULL)
-    {
-        m_appResDesc.m_type = ResType_7zFile;
-        m_appResDesc.m_szFile = psz7zFile;
-        if (pszPwd)
-            m_appResDesc.m_szPwd = pszPwd;
-        return *this;
-    }
-
-    SAppCfg &SetUidefId(const SStringT &strUidefId){
-        m_uidefId = strUidefId;
-        return *this;
-    }
-
-    SAppCfg &SetLog(BOOL bLogEnable, int nLogLevel = LOG_LEVEL_INFO, LPCSTR pszLogName = NULL){
-        m_logDesc.m_bLogEnable = bLogEnable;
-        m_logDesc.m_nLogLevel = nLogLevel;
-        if(pszLogName) m_logDesc.m_strLogName = pszLogName;
-        return *this;
-    }
-
-    SAppCfg &SetAppDir(LPCTSTR pszAppDir){
-        m_appDir = pszAppDir;
-        return *this;
-    }
-
-    SAppCfg &EnableScript(BOOL bEnable = TRUE){
-        m_enableScript = bEnable;
-        return *this;
-    }
-    SAppCfg &EnableMultiLang(const SStringT &langResId,BOOL bEnable = TRUE){
-        m_langDesc.enable = bEnable;
-        m_langDesc.langResId = langResId;
-        return *this;
-    }
-  public:
+    
+public:
+    // C++ÁâàÊú¨ÁöÑÈìæÂºèË∞ÉÁî®ÊñπÊ≥ïÔºåËøîÂõûÂºïÁî®
+    SAppCfg & SetRender(Render render);
+    SAppCfg & SetImgDecoder(ImgDecoder decoder);
+    SAppCfg & SetSysResPeHandle(HMODULE hResModule);
+    SAppCfg & SetSysResPeFile(LPCTSTR pszPath);
+    SAppCfg & SetSysResFile(LPCTSTR pszPath);
+    SAppCfg & SetSysResZip(LPCTSTR pszZipFile, LPCSTR pszPwd=NULL);
+    SAppCfg & SetSysRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd=NULL);
+    SAppCfg & SetAppResPeHandle(HMODULE hResModule);
+    SAppCfg & SetAppResPeFile(LPCTSTR pszPath); 
+    SAppCfg & SetAppResFile(LPCTSTR pszPath);
+    SAppCfg & SetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd = NULL);
+    SAppCfg & SetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd = NULL);
+    SAppCfg & SetUidefId(const SStringT &strUidefId);
+    SAppCfg & SetLog(BOOL bLogEnable, int nLogLevel = LOG_LEVEL_INFO, LPCSTR pszLogName = NULL);
+    SAppCfg & SetAppDir(LPCTSTR pszAppDir);
+    SAppCfg & EnableScript(BOOL bEnable = TRUE);
+    SAppCfg & EnableMultiLang(const SStringT &langResId,BOOL bEnable = TRUE);
     BOOL DoConfig(SApplication *pApp) const;
+    
+    public:
+    // IAppCfgÊé•Âè£ÂÆûÁé∞ÔºåËøîÂõûÊåáÈíà
+    STDMETHOD_(IAppCfg*, ISetRender)(Render render);
+    STDMETHOD_(IAppCfg*, ISetImgDecoder)(ImgDecoder decoder);
+    STDMETHOD_(IAppCfg*, ISetSysResPeHandle)(HMODULE hResModule);
+    STDMETHOD_(IAppCfg*, ISetSysResPeFile)(LPCTSTR pszPath);
+    STDMETHOD_(IAppCfg*, ISetSysResFile)(LPCTSTR pszPath);
+    STDMETHOD_(IAppCfg*, ISetSysResZip)(LPCTSTR pszZipFile, LPCSTR pszPwd);
+    STDMETHOD_(IAppCfg*, ISetSysRes7z)(LPCTSTR psz7zFile, LPCSTR pszPwd);
+    STDMETHOD_(IAppCfg*, ISetAppResPeHandle)(HMODULE hResModule);
+    STDMETHOD_(IAppCfg*, ISetAppResPeFile)(LPCTSTR pszPath);
+    STDMETHOD_(IAppCfg*, ISetAppResFile)(LPCTSTR pszPath);
+    STDMETHOD_(IAppCfg*, ISetAppResZip)(LPCTSTR pszZipFile, LPCSTR pszPwd);
+    STDMETHOD_(IAppCfg*, ISetAppRes7z)(LPCTSTR psz7zFile, LPCSTR pszPwd);
+    STDMETHOD_(IAppCfg*, ISetUidefId)(LPCTSTR strUidefId);
+    STDMETHOD_(IAppCfg*, ISetLog)(BOOL bLogEnable, int nLogLevel, LPCSTR pszLogName);
+    STDMETHOD_(IAppCfg*, ISetAppDir)(LPCTSTR pszAppDir);
+    STDMETHOD_(IAppCfg*, IEnableScript)(BOOL bEnable);
+    STDMETHOD_(IAppCfg*, IEnableMultiLang)(LPCTSTR langResId, BOOL bEnable);
+    STDMETHOD_(BOOL, IDoConfig)(IApplication *pApp) SCONST;
 };
 
 SNSEND

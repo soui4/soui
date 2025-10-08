@@ -13,6 +13,42 @@ SNSBEGIN
 
 static SComMgr2 g_comMgr;
 
+class SResDesc {
+  public:
+    ResType m_type;
+    SStringT m_szFile;    // 资源文件名
+    SStringA m_szPwd;     // 压缩包密码
+    HMODULE m_hResModule; // 资源模块句柄
+
+    SResDesc()
+    {
+        m_type = ResType_Unknown;
+        m_hResModule = NULL;
+    }
+};
+
+class SLogDesc{
+public:
+    BOOL m_bLogEnable;
+    SStringA m_strLogName;  //default set to app_name
+    int m_nLogLevel;
+    SLogDesc()
+    {
+        m_bLogEnable = FALSE;
+        m_nLogLevel = LOG_LEVEL_INFO;
+    }
+};
+
+class SMultiLangDesc{
+public:
+    BOOL enable;
+    SStringT langResId;
+    SMultiLangDesc():enable(FALSE)
+    {
+    }
+};
+
+
 class SResLoader {
   public:
     SResLoader(IRenderFactory *pRenderFactory);
@@ -90,20 +126,140 @@ SAppCfg::SAppCfg()
     , m_uidefId(_T("uidef:xml_init"))
     , m_enableScript(FALSE)
 {
+    m_logDesc = new SLogDesc();
+    m_sysResDesc = new SResDesc();
+    m_appResDesc = new SResDesc();
+    m_langDesc = new SMultiLangDesc();
 }
 
 SAppCfg ::~SAppCfg(void)
 {
+    if (m_logDesc)
+        delete m_logDesc;
+    if (m_sysResDesc)
+        delete m_sysResDesc;
+    if (m_appResDesc)
+        delete m_appResDesc;
+    if (m_langDesc)
+        delete m_langDesc;
+}
+
+// C++版本的链式调用方法实现
+SAppCfg & SAppCfg::SetRender(Render render){
+    m_render = render; 
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetImgDecoder(ImgDecoder decoder){
+    m_imgDecoder = decoder; 
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetSysResPeHandle(HMODULE hResModule){
+    m_sysResDesc->m_type = ResType_PeHandle;
+    m_sysResDesc->m_hResModule = hResModule;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetSysResPeFile(LPCTSTR pszPath){
+    m_sysResDesc->m_type = ResType_PeFile;
+    m_sysResDesc->m_szFile = pszPath;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetSysResFile(LPCTSTR pszPath) {
+    m_sysResDesc->m_type = ResType_ResFile;
+    m_sysResDesc->m_szFile = pszPath;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetSysResZip(LPCTSTR pszZipFile, LPCSTR pszPwd){
+    m_sysResDesc->m_type = ResType_ZipFile;
+    m_sysResDesc->m_szFile = pszZipFile;
+    if(pszPwd) m_sysResDesc->m_szPwd = pszPwd;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetSysRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd){
+    m_sysResDesc->m_type = ResType_7zFile;
+    m_sysResDesc->m_szFile = psz7zFile;
+    if(pszPwd) m_sysResDesc->m_szPwd = pszPwd;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetAppResPeHandle(HMODULE hResModule){
+    m_appResDesc->m_type = ResType_PeHandle;
+    m_appResDesc->m_hResModule = hResModule;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetAppResPeFile(LPCTSTR pszPath){ 
+    m_appResDesc->m_type = ResType_PeFile;
+    m_appResDesc->m_szFile = pszPath;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetAppResFile(LPCTSTR pszPath)
+{
+    m_appResDesc->m_type = ResType_ResFile;
+    m_appResDesc->m_szFile = pszPath;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd)
+{
+    m_appResDesc->m_type = ResType_ZipFile;
+    m_appResDesc->m_szFile = pszZipFile;
+    if (pszPwd)
+        m_appResDesc->m_szPwd = pszPwd;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
+{
+    m_appResDesc->m_type = ResType_7zFile;
+    m_appResDesc->m_szFile = psz7zFile;
+    if (pszPwd)
+        m_appResDesc->m_szPwd = pszPwd;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetUidefId(const SStringT &strUidefId){
+    m_uidefId = strUidefId;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetLog(BOOL bLogEnable, int nLogLevel, LPCSTR pszLogName){
+    m_logDesc->m_bLogEnable = bLogEnable;
+    m_logDesc->m_nLogLevel = nLogLevel;
+    if(pszLogName) m_logDesc->m_strLogName = pszLogName;
+    return *this;
+}
+
+SAppCfg & SAppCfg::SetAppDir(LPCTSTR pszAppDir){
+    m_appDir = pszAppDir;
+    return *this;
+}
+
+SAppCfg & SAppCfg::EnableScript(BOOL bEnable){
+    m_enableScript = bEnable;
+    return *this;
+}
+
+SAppCfg & SAppCfg::EnableMultiLang(const SStringT &langResId, BOOL bEnable){
+    m_langDesc->enable = bEnable;
+    m_langDesc->langResId = langResId;
+    return *this;
 }
 
 BOOL SAppCfg::DoConfig(SApplication *pApp) const
 {
-    if (m_appResDesc.m_type == ResType_Unknown)
+    if (m_appResDesc->m_type == ResType_Unknown)
     {
         SLOGW() << "app resource file not specified";
         return FALSE;
     }
-    if (m_sysResDesc.m_type == ResType_Unknown)
+    if (m_sysResDesc->m_type == ResType_Unknown)
     {
         SLOGW() << "system resource file not specified";
         return FALSE;
@@ -118,7 +274,7 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
     case Render_Gdi:
         g_comMgr.CreateRender_GDI((IObjRef **)&pRendFac);
         break;
-    case Render_D2D:
+    case Render_D2d:
         g_comMgr.CreateRender_D2D((IObjRef **)&pRendFac);
         break;
     case Render_Skia:
@@ -141,8 +297,8 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
 #else
     static const LPCTSTR kImgDecoderPath[] = {
         _T("imgdecoder-stb"),
-        _T("imgdecoder-wic"),
         _T("imgdecoder-gdip"),
+        _T("imgdecoder-wic"),
     };
 #endif
     if (m_imgDecoder < 0 || m_imgDecoder >= ARRAYSIZE(kImgDecoderPath))
@@ -165,22 +321,22 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         // load system resource
         SResLoader resLoader(pRendFac);
         BOOL bLoaded = FALSE;
-        switch (m_sysResDesc.m_type)
+        switch (m_sysResDesc->m_type)
         {
         case ResType_7zFile:
-            bLoaded = resLoader.LoadResFrom7z(m_sysResDesc.m_szFile, m_sysResDesc.m_szPwd);
+            bLoaded = resLoader.LoadResFrom7z(m_sysResDesc->m_szFile, m_sysResDesc->m_szPwd);
             break;
         case ResType_ZipFile:
-            bLoaded = resLoader.LoadResFromZip(m_sysResDesc.m_szFile, m_sysResDesc.m_szPwd);
+            bLoaded = resLoader.LoadResFromZip(m_sysResDesc->m_szFile, m_sysResDesc->m_szPwd);
             break;
         case ResType_ResFile:
-            bLoaded = resLoader.LoadResFromFile(m_sysResDesc.m_szFile);
+            bLoaded = resLoader.LoadResFromFile(m_sysResDesc->m_szFile);
             break;
         case ResType_PeHandle:
-            bLoaded = resLoader.LoadResFromRes(m_sysResDesc.m_hResModule);
+            bLoaded = resLoader.LoadResFromRes(m_sysResDesc->m_hResModule);
             break;
         case ResType_PeFile:
-            hModResource = LoadLibrary(m_sysResDesc.m_szFile);
+            hModResource = LoadLibrary(m_sysResDesc->m_szFile);
             if (hModResource)
             {
                 bLoaded = resLoader.LoadResFromRes(hModResource);
@@ -190,7 +346,7 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         SASSERT(bLoaded);
         if (!bLoaded)
         {
-            SLOGW() << "Load system resource failed! sys res type: " << m_sysResDesc.m_type;
+            SLOGW() << "Load system resource failed! sys res type: " << m_sysResDesc->m_type;
             return FALSE;
         }
         pApp->LoadSystemNamedResource(resLoader.GetResProvider());
@@ -204,23 +360,23 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         // load application resource.
         SResLoader resLoader(pRendFac);
         BOOL bLoaded = FALSE;
-        switch (m_appResDesc.m_type)
+        switch (m_appResDesc->m_type)
         {
         case ResType_7zFile:
-            bLoaded = resLoader.LoadResFrom7z(m_appResDesc.m_szFile, m_appResDesc.m_szPwd);
+            bLoaded = resLoader.LoadResFrom7z(m_appResDesc->m_szFile, m_appResDesc->m_szPwd);
             break;
         case ResType_ZipFile:
-            bLoaded = resLoader.LoadResFromZip(m_appResDesc.m_szFile, m_appResDesc.m_szPwd);
+            bLoaded = resLoader.LoadResFromZip(m_appResDesc->m_szFile, m_appResDesc->m_szPwd);
             break;
         case ResType_ResFile:
-            bLoaded = resLoader.LoadResFromFile(m_appResDesc.m_szFile);
+            bLoaded = resLoader.LoadResFromFile(m_appResDesc->m_szFile);
             break;
         case ResType_PeHandle:
-            bLoaded = resLoader.LoadResFromRes(m_appResDesc.m_hResModule);
+            bLoaded = resLoader.LoadResFromRes(m_appResDesc->m_hResModule);
             break;
         case ResType_PeFile:
         {
-            HMODULE hModule = LoadLibrary(m_appResDesc.m_szFile);
+            HMODULE hModule = LoadLibrary(m_appResDesc->m_szFile);
             if (hModule)
             {
                 bLoaded = resLoader.LoadResFromRes(hModule);
@@ -231,26 +387,26 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         SASSERT(bLoaded);
         if (!bLoaded)
         {
-            SLOGW() << "Load application resource failed! app res type: " << m_appResDesc.m_type;
+            SLOGW() << "Load application resource failed! app res type: " << m_appResDesc->m_type;
             return FALSE;
         }
         pApp->AddResProvider(resLoader.GetResProvider(), m_uidefId);
     }
-    if (m_logDesc.m_bLogEnable)
+    if (m_logDesc->m_bLogEnable)
     {
         SAutoRefPtr<ILogMgr> pLogMgr; // log4z对象
         if (g_comMgr.CreateLog4z((IObjRef **)&pLogMgr) && pLogMgr)
         {
             // uncomment next line to disable log mgr to output debug string.
-            if (!m_logDesc.m_strLogName.IsEmpty())
-                pLogMgr->setLoggerName(m_logDesc.m_strLogName);
+            if (!m_logDesc->m_strLogName.IsEmpty())
+                pLogMgr->setLoggerName(m_logDesc->m_strLogName);
             // uncomment next line to record info level log.
-            pLogMgr->setLoggerLevel(m_logDesc.m_nLogLevel);
+            pLogMgr->setLoggerLevel(m_logDesc->m_nLogLevel);
             pLogMgr->start();
             pApp->SetLogManager(pLogMgr);
         }
     }
-    if (m_langDesc.enable)
+    if (m_langDesc->enable)
     {
         SAutoRefPtr<ITranslatorMgr> trans;
         BOOL bLoaded = g_comMgr.CreateTranslator((IObjRef **)&trans);
@@ -258,7 +414,7 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         { //加载语言翻译包
             pApp->SetTranslator(trans);
             SXmlDoc xmlLang;
-            if (pApp->LoadXmlDocment(xmlLang, m_langDesc.langResId))
+            if (pApp->LoadXmlDocment(xmlLang, m_langDesc->langResId))
             {
                 SAutoRefPtr<ITranslator> langCN;
                 trans->CreateTranslator(&langCN);
@@ -278,6 +434,119 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
         }
     }
     return TRUE;
+}
+
+// IAppCfg接口方法实现
+IAppCfg* SAppCfg::ISetRender(Render render){
+    m_render = render; 
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetImgDecoder(ImgDecoder decoder){
+    m_imgDecoder = decoder; 
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetSysResPeHandle(HMODULE hResModule){
+    m_sysResDesc->m_type = ResType_PeHandle;
+    m_sysResDesc->m_hResModule = hResModule;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetSysResPeFile(LPCTSTR pszPath){
+    m_sysResDesc->m_type = ResType_PeFile;
+    m_sysResDesc->m_szFile = pszPath;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetSysResFile(LPCTSTR pszPath) {
+    m_sysResDesc->m_type = ResType_ResFile;
+    m_sysResDesc->m_szFile = pszPath;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetSysResZip(LPCTSTR pszZipFile, LPCSTR pszPwd){
+    m_sysResDesc->m_type = ResType_ZipFile;
+    m_sysResDesc->m_szFile = pszZipFile;
+    if(pszPwd) m_sysResDesc->m_szPwd = pszPwd;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetSysRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd){
+    m_sysResDesc->m_type = ResType_7zFile;
+    m_sysResDesc->m_szFile = psz7zFile;
+    if(pszPwd) m_sysResDesc->m_szPwd = pszPwd;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetAppResPeHandle(HMODULE hResModule){
+    m_appResDesc->m_type = ResType_PeHandle;
+    m_appResDesc->m_hResModule = hResModule;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetAppResPeFile(LPCTSTR pszPath){ 
+    m_appResDesc->m_type = ResType_PeFile;
+    m_appResDesc->m_szFile = pszPath;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetAppResFile(LPCTSTR pszPath)
+{
+    m_appResDesc->m_type = ResType_ResFile;
+    m_appResDesc->m_szFile = pszPath;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd)
+{
+    m_appResDesc->m_type = ResType_ZipFile;
+    m_appResDesc->m_szFile = pszZipFile;
+    if (pszPwd)
+        m_appResDesc->m_szPwd = pszPwd;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
+{
+    m_appResDesc->m_type = ResType_7zFile;
+    m_appResDesc->m_szFile = psz7zFile;
+    if (pszPwd)
+        m_appResDesc->m_szPwd = pszPwd;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetUidefId(LPCTSTR strUidefId){
+    m_uidefId = strUidefId;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetLog(BOOL bLogEnable, int nLogLevel, LPCSTR pszLogName){
+    m_logDesc->m_bLogEnable = bLogEnable;
+    m_logDesc->m_nLogLevel = nLogLevel;
+    if(pszLogName) m_logDesc->m_strLogName = pszLogName;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::ISetAppDir(LPCTSTR pszAppDir){
+    m_appDir = pszAppDir;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::IEnableScript(BOOL bEnable){
+    m_enableScript = bEnable;
+    return (IAppCfg*)this;
+}
+
+IAppCfg* SAppCfg::IEnableMultiLang(LPCTSTR langResId, BOOL bEnable){
+    m_langDesc->enable = bEnable;
+    m_langDesc->langResId = langResId;
+    return (IAppCfg*)this;
+}
+
+BOOL SAppCfg::IDoConfig(IApplication *pApp) SCONST
+{
+    return DoConfig((SApplication*)pApp);
 }
 
 SNSEND

@@ -5,6 +5,8 @@
 #include <helper/STimer.h>
 #include <core/SHostDialog.h>
 #include <valueAnimator/SValueAnimator.h>
+#include <SAppCfg.h>
+
 SNSBEGIN
 
 SouiFactory::SouiFactory(void)
@@ -94,6 +96,9 @@ IAnimatorGroup *SouiFactory::CreateAnimatorGroup(THIS)
     return new SAnimatorGroup();
 }
 
+IAppCfg * SouiFactory::CreateAppCfg(THIS) {
+    return new SAppCfg();
+}
 SNSEND
 
 EXTERN_C ISouiFactoryPtr CreateSouiFactory()

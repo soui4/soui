@@ -101,6 +101,12 @@ class SOUI_EXP SouiFactory : public TObjRefImpl<ISouiFactory> {
      * @return IAnimatorGroup* 动画组对象
      */
     STDMETHOD_(IAnimatorGroup *, CreateAnimatorGroup)(THIS) OVERRIDE;
+
+    /**
+     * @brief 创建AppCfg对象
+     * @return IAppCfg* AppCfg对象
+  */
+    STDMETHOD_(IAppCfg *, CreateAppCfg)(THIS) OVERRIDE;
 };
 
 SNSEND

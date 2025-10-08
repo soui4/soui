@@ -25,6 +25,24 @@
           <item text="SBounceInterpolator" icon="0" data="100"/>
           <item text="SCycleInterpolator" icon="0" data="100"/>
           <item text="SOvershootInterpolator" icon="0" data="100"/>
+          <item text="SQuadInInterpolator" icon="0" data="100"/>
+          <item text="SQuadOutInterpolator" icon="0" data="100"/>
+          <item text="SQuadInOutInterpolator" icon="0" data="100"/>
+          <item text="SQuintInInterpolator" icon="0" data="100"/>
+          <item text="SQuintOutInterpolator" icon="0" data="100"/>
+          <item text="SQuintInOutInterpolator" icon="0" data="100"/>
+          <item text="SCubicInInterpolator" icon="0" data="100"/>
+          <item text="SCubicOutInterpolator" icon="0" data="100"/>
+          <item text="SCubicInOutInterpolator" icon="0" data="100"/>
+          <item text="SSineInInterpolator" icon="0" data="100"/>
+          <item text="SSineOutInterpolator" icon="0" data="100"/>
+          <item text="SSineInOutInterpolator" icon="0" data="100"/>
+          <item text="SExpoInInterpolator" icon="0" data="100"/>
+          <item text="SExpoOutInterpolator" icon="0" data="100"/>
+          <item text="SExpoInOutInterpolator" icon="0" data="100"/>
+          <item text="SBackInInterpolator" icon="0" data="100"/>
+          <item text="SBackOutInterpolator" icon="0" data="100"/>
+          <item text="SBackInOutInterpolator" icon="0" data="100"/>
         </items>
       </combobox>
       <interpolatorView pos="10,[10,-10,@50" colorBkgnd="#cccccc" name="view_interpolator" speed="2"/>
