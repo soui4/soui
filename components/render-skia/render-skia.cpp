@@ -2164,7 +2164,7 @@ SNSBEGIN
 #ifdef UNICODE
 		SStringA strFace=S_CT2A(plf->lfFaceName,CP_UTF8);
 #else
-		SStringA strFace=S_CT2A(plf->lfFaceName,CP_ACP,CP_UTF8);
+		SStringA strFace=plf->lfFaceName;
 #endif
 		BYTE style=SkTypeface::kNormal;
 		if(plf->lfItalic) style |= SkTypeface::kItalic;
@@ -2246,7 +2246,7 @@ SNSBEGIN
 #ifdef UNICODE
 		SStringA strFace=S_CT2A(plf->lfFaceName,CP_UTF8);
 #else
-		SStringA strFace=S_CT2A(plf->lfFaceName,CP_ACP);
+		SStringA strFace=plf->lfFaceName;
 #endif
 		BYTE style=SkTypeface::kNormal;
 		if(plf->lfItalic) style |= SkTypeface::kItalic;
