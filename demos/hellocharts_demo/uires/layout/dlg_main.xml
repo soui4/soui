@@ -2,9 +2,11 @@
 <SOUI name="mainWindow" title="HelloCharts Demo" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="800" height="600" margin="5,5,5,5" resizable="1" wndType="appMain" translucent="1"  margin="5,5,5,5" sendWheel2Hover="1">
   <root skin="_skin.sys.wnd.bkgnd" cache="1" layout="vbox">
     <!-- Title bar -->
-    <caption size="-2,30" layout="hbox" gravity="center">
+    <caption size="-2,30" layout="hbox" gravity="center" interval="5">
       <icon size="-1,-1" src="ICON_LOGO:16"/>
-      <text size="-1,-1" extend_left="5" font="name:test,bold:1">@string/title</text>
+      <text size="-1,-1" font="name:test,bold:1">@string/title</text>
+      <text>QQ群:</text>
+      <text colorText="@color/red">229313785</text>
       <window size="0,0" weight="1" visible="0"/>
       <imgbtn size="-1,-1" name="btn_min" skin="_skin.sys.btn.minimize"  animate="1" />
       <window size="-1,-1">
@@ -17,12 +19,10 @@
     <!-- Main content area -->
     <window layout="vbox" size="-2,0" weight="1" padding="5">
       <!-- Control panel -->
-      <window layout="hbox" size="-2,40" margin="0,0,0,10">
+      <window layout="hbox" size="-2,40" margin="0,0,0,10" gravity="center">
         <button name="btn_generate_data" class="cls_btn_border" width="120" height="30" margin="0,5,10,5">Generate Data</button>
         <button name="btn_clear_data" class="cls_btn_border" width="100" height="30" margin="0,5,10,5">Clear Data</button>
-        <button name="btn_toggle_animation" class="cls_btn_border" width="120" height="30" margin="0,5,10,5">Disable Animation</button>
-        <button name="btn_replay_animation" class="cls_btn_border" width="120" height="30" margin="0,5,10,5">Replay Animation</button>
-        <button name="btn_test_pie" class="cls_btn_border" width="130" height="30" margin="0,5,10,5">Test Pie Scenarios</button>
+        <check name="btn_toggle_animation" class="cls_btn_border">Disable Animation</check>
         <window weight="1"/>
         <text name="txt_status" width="300" height="30" margin="0,5,0,5" textAlign="right|vcenter">Ready</text>
       </window>
@@ -41,10 +41,12 @@
                          interactive="1" fillRatio="0.75"
                          animationDuration="500"/>
           </page>
-          <page title="Pie Chart">
-            <pieChart name="pie_chart" size="-2,-2"
+          <page title="Pie Chart" layout="vbox">
+            <pieChart name="pie_chart" size="-2,0"
+                      weight="1"
                       interactive="1"
                       animationDuration="500"/>
+            <button name="btn_test_pie" class="cls_btn_border" height="30" margin="0,5,10,5">Test Pie Scenarios</button>
           </page>
           <page title="Bubble Chart">
             <bubbleChart name="bubble_chart" size="-2,-2"

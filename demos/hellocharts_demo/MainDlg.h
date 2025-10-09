@@ -20,7 +20,6 @@ public:
     void OnBtnGenerateData();
     void OnBtnClearData();
     void OnBtnToggleAnimation();
-    void OnBtnReplayAnimation();
     void OnBtnTestPieScenarios();
 
 protected:
@@ -34,8 +33,8 @@ protected:
     BOOL OnRadarChartValueSelect(IEvtArgs* pEvt);
     BOOL OnComboChartValueSelect(IEvtArgs* pEvt);
 
-    void OnChartValueSelected(int lineIndex, int pointIndex, SOUI::SPointValue* pValue);
-    void OnChartValueDeselected();
+    void OnLineChartValueSelected(int lineIndex, int pointIndex, SOUI::SPointValue* pValue);
+    void OnLineChartValueDeselected();
     void OnColumnValueSelected(int columnIndex, int subcolumnIndex, SOUI::SSubcolumnValue* pValue);
     void OnColumnValueDeselected();
     void OnPieValueSelected(int sliceIndex, SOUI::SSliceValue* pValue);
@@ -80,7 +79,6 @@ private:
         EVENT_NAME_COMMAND(L"btn_generate_data", OnBtnGenerateData)
         EVENT_NAME_COMMAND(L"btn_clear_data", OnBtnClearData)
         EVENT_NAME_COMMAND(L"btn_toggle_animation", OnBtnToggleAnimation)
-        EVENT_NAME_COMMAND(L"btn_replay_animation", OnBtnReplayAnimation)
         EVENT_NAME_COMMAND(L"btn_test_pie", OnBtnTestPieScenarios)
 
         // Chart value selection events

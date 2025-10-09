@@ -83,41 +83,8 @@ void CMainDlg::OnBtnClearData()
 
 void CMainDlg::OnBtnToggleAnimation()
 {
-    m_bAnimationEnabled = !m_bAnimationEnabled;
-
     SWindow* pBtn = FindChildByName(L"btn_toggle_animation");
-    if (pBtn)
-    {
-        SStringT text = m_bAnimationEnabled ? _T("Disable Animation") : _T("Enable Animation");
-        pBtn->SetWindowText(text);
-    }
-}
-
-void CMainDlg::OnBtnReplayAnimation()
-{
-    if (!m_bAnimationEnabled)
-        return;
-
-    // Replay animation for all charts
-    if (m_pLineChart)
-        m_pLineChart->StartDataAnimation(500);
-    if (m_pColumnChart)
-        m_pColumnChart->StartDataAnimation(500);
-    if (m_pPieChart)
-        m_pPieChart->StartDataAnimation(500);
-    if (m_pBubbleChart)
-        m_pBubbleChart->StartDataAnimation(800);
-    if (m_pRadarChart)
-        m_pRadarChart->StartDataAnimation(1000);
-    if (m_pComboChart)
-        m_pComboChart->StartDataAnimation(1200);
-
-    // Update status
-    SWindow* pStatus = FindChildByName(L"txt_status");
-    if (pStatus)
-    {
-        pStatus->SetWindowText(_T("Animation replaying..."));
-    }
+    m_bAnimationEnabled = !pBtn->IsChecked();
 }
 
 void CMainDlg::GenerateSampleData()
@@ -405,7 +372,7 @@ void CMainDlg::ClearChartData()
     }
 }
 
-void CMainDlg::OnChartValueSelected(int lineIndex, int pointIndex, SPointValue* pValue)
+void CMainDlg::OnLineChartValueSelected(int lineIndex, int pointIndex, SPointValue* pValue)
 {
     if (!pValue)
         return;
@@ -414,19 +381,19 @@ void CMainDlg::OnChartValueSelected(int lineIndex, int pointIndex, SPointValue* 
     status.Format(_T("Selected: Line %d, Point %d, Value (%.2f, %.2f)"), 
                   lineIndex, pointIndex, pValue->GetX(), pValue->GetY());
     
-    SWindow* pStatus = FindChildByName(L"txt_status");
-    if (pStatus)
+    SWindow* pSelectionInfo = FindChildByName(_T("txt_selection_info"));
+    if (pSelectionInfo)
     {
-        pStatus->SetWindowText(status);
+        pSelectionInfo->SetWindowText(status);
     }
 }
 
-void CMainDlg::OnChartValueDeselected()
+void CMainDlg::OnLineChartValueDeselected()
 {
-    SWindow* pStatus = FindChildByName(L"txt_status");
-    if (pStatus)
+    SWindow* pSelectionInfo = FindChildByName(_T("txt_selection_info"));
+    if (pSelectionInfo)
     {
-        pStatus->SetWindowText(_T("No selection"));
+        pSelectionInfo->SetWindowText(_T("No selection"));
     }
 }
 
@@ -620,7 +587,7 @@ void CMainDlg::OnTabChartSelChanged(IEvtArgs *pEvt)
     STabCtrl *pTab = sobj_cast<STabCtrl>(e2->Sender());
     SWindow *pPage = pTab->GetItem(e2->uNewSel);
     SAbstractChartView *pChart = sobj_cast<SAbstractChartView>(pPage->GetWindow(GSW_FIRSTCHILD));
-    if(pChart){
+    if(pChart && m_bAnimationEnabled){
         pChart->StartDataAnimation(500);
     }
 }
@@ -1269,12 +1236,12 @@ BOOL CMainDlg::OnLineChartValueSelect(IEvtArgs * e)
         if (pEvt->pValue && pEvt->lineIndex >= 0 && pEvt->pointIndex >= 0)
         {
             // 选中事件
-            OnChartValueSelected(pEvt->lineIndex, pEvt->pointIndex, pEvt->pValue);
+            OnLineChartValueSelected(pEvt->lineIndex, pEvt->pointIndex, pEvt->pValue);
         }
         else
         {
             // 取消选中事件
-            OnChartValueDeselected();
+            OnLineChartValueDeselected();
         }
     }
     return TRUE;
