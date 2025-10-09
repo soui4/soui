@@ -59,7 +59,12 @@ Log::~Log()
         if (nLen > 0)
         {
             logbuf2[nLen] = 0;
+#if defined(_WIN32) && !defined(__MINGW32__)
             OutputDebugStringA(logbuf2);
+#else
+            fwrite(logbuf2, 1, nLen, stdout);
+            fflush(stdout);
+#endif
         }
         free(logbuf2);
     }
