@@ -11,13 +11,6 @@
 typedef std::wstring _bstr_t;
 #endif
 
-#if defined(_UNICODE)
-#if !defined(_WIN32)
-#define _T(x) L##x
-#endif
-#else
-#define _T(x) x
-#endif
 
 namespace SevenZip
 {

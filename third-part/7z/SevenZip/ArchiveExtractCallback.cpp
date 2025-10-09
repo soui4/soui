@@ -363,7 +363,7 @@ namespace SevenZip
                 m_relPath = bstr;
 #else
                 char relPath[MAX_PATH];
-                int size = WideCharToMultiByte(CP_UTF8, 0, bstr.c_str(), bstr.length(), relPath, MAX_PATH, NULL, NULL);
+                int size = WideCharToMultiByte(CP_UTF8, 0, bstr, bstr.length(), relPath, MAX_PATH, NULL, NULL);
                 m_relPath.assign(relPath, size);
 #endif
             }

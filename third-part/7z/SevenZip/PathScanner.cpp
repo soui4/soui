@@ -110,7 +110,7 @@ FilePathInfo PathScanner::GetFileInfo(const TString& fullPath, bool isDirectory)
     FilePathInfo info;
     
 #ifdef _WIN32
-    size_t pos = fullPath.find_last_of(L"\\/");
+    size_t pos = fullPath.find_last_of(_T('\\'));
 #else
     size_t pos = fullPath.find_last_of('/');
 #endif

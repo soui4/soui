@@ -1,4 +1,4 @@
-#ifndef _SAPP_CFG_H_
+﻿#ifndef _SAPP_CFG_H_
 #define _SAPP_CFG_H_
 
 #include <interface/SAppCfg-i.h>

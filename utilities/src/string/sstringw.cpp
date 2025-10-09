@@ -91,7 +91,21 @@ int wchar_traits::Format(wchar_t** ppszDst, const wchar_t* pszFormat, va_list & 
 
 wchar_t* wchar_traits::CharNext(wchar_t* psz)
 {
+#if WCHAR_SIZE == 4
 	return psz + 1;
+#else
+    // For UTF-16, we need to check if this is a surrogate pair
+    // Check if it's a high surrogate (0xD800-0xDBFF)
+    if (*psz >= 0xD800 && *psz <= 0xDBFF) {
+        // Check if the next one is a low surrogate (0xDC00-0xDFFF)
+        if (*(psz + 1) >= 0xDC00 && *(psz + 1) <= 0xDFFF) {
+            // This is a surrogate pair, move 2 positions
+            return psz + 2;
+        }
+    }
+    // Regular character, move 1 position
+    return psz + 1;
+#endif
 }
 
 wchar_t wchar_traits::CharUpper(wchar_t ch)

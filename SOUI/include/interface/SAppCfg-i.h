@@ -1,4 +1,4 @@
-#ifndef __SAPPCFG_I__H__
+﻿#ifndef __SAPPCFG_I__H__
 #define __SAPPCFG_I__H__
 
 #include <interface/obj-ref-i.h>

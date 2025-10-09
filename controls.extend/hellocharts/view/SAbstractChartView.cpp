@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "SAbstractChartView.h"
 #include <math.h>
-
+#include <float.h>
 SNSBEGIN
 
 // Static constants
@@ -432,7 +432,7 @@ void SChartTouchHandler::HandleScroll(CPoint delta)
                    pComputator->ComputeRawDistanceX(0.0f);
     float deltaY = pComputator->ComputeRawDistanceY((float)delta.y) -
                    pComputator->ComputeRawDistanceY(0.0f);
-    if (isnan(deltaX) || isnan(deltaY))
+	if (_isnan(deltaX) || _isnan(deltaY))
         return;
     // Apply scroll
     SViewport newViewport(

@@ -194,8 +194,11 @@ namespace SevenZip{
 		HGLOBAL hResData = ::LoadResource(hModule, hResInfo);
 		if (hResData == NULL)
 			return FALSE;
-
+#ifdef _UNICODE
 		TString strPsw = ToWstring(pszPassword);
+#else
+		TString strPsw = pszPassword;
+#endif
 		TString s_pwd = strPsw.c_str();
 		SevenZip::SevenZipPassword pwd(true, s_pwd);
 		SevenZip::SevenZipExtractorMemory decompress;
