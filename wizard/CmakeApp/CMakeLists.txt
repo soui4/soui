@@ -1,7 +1,3 @@
-#
-# 1394020320@qq.com
-#
-
 cmake_minimum_required(VERSION 3.16)
 set(project_name "soui5_app")
 project(${project_name})
@@ -15,18 +11,24 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 	endif()
 else()
 	file (TO_CMAKE_PATH "$ENV{SOUI4_INSTALL}" SOUI_INSTALL_DIR)
-	#set(SOUI_INSTALL_DIR "/home/flyhigh/work/soui4_install")
 endif()
-if(DEFINED SOUI_INSTALL_DIR)
-	message(STATUS "SOUI_INSTALL_DIR: ${SOUI_INSTALL_DIR}")
-else()
-	set(SOUI_INSTALL_DIR "/Users/jianxionghuang/work/soui4_install")
+if("${SOUI_INSTALL_DIR}" STREQUAL "" OR NOT EXISTS ${SOUI_INSTALL_DIR})
+	message(FATAL_ERROR "FATAL:can't find env variable SOUI4_INSTALL.")
+	set(SOUI_INSTALL_DIR "/home/flyhigh/work/soui4_install")
 endif()
 
+message(STATUS "SOUI_INSTALL_DIR: ${SOUI_INSTALL_DIR}")
 if(CMAKE_SYSTEM_NAME MATCHES "Darwin")
 add_compile_options(-Wno-c++11-extensions)
 add_compile_options(-Wno-inconsistent-missing-override)
 endif()
+
+
+set(CMAKE_CONFIGURATION_TYPES Debug Release)
+if(NOT CMAKE_BUILD_TYPE)
+set(CMAKE_BUILD_TYPE "Debug")
+endif()
+message(STATUS "build type is ${CMAKE_BUILD_TYPE}")
 
 if(CMAKE_BUILD_TYPE STREQUAL "Debug")
   add_definitions(-D_DEBUG)
