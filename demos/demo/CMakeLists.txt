@@ -217,19 +217,3 @@ target_precompile_headers(demo PRIVATE "stdafx.h")
 set_target_properties (demo PROPERTIES
     FOLDER demos
 )
-
-if(NOT CMAKE_SYSTEM_NAME MATCHES Darwin)
-install(TARGETS demo
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION bin/Release
-    LIBRARY DESTINATION lib/Release
-    ARCHIVE DESTINATION lib/Release
-)
-
-install(TARGETS demo
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION bin/Debug
-    LIBRARY DESTINATION lib/Debug
-    ARCHIVE DESTINATION lib/Debug
-)
-endif()

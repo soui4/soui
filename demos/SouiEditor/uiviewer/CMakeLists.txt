@@ -27,17 +27,3 @@ target_precompile_headers(uiviewer PRIVATE "stdafx.h")
 set_target_properties (uiviewer PROPERTIES
     FOLDER demos/uieditor
 )
-
-install(TARGETS uiviewer
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION bin/Release
-    LIBRARY DESTINATION lib/Release
-    ARCHIVE DESTINATION lib/Release
-)
-
-install(TARGETS uiviewer
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION bin/Debug
-    LIBRARY DESTINATION lib/Debug
-    ARCHIVE DESTINATION lib/Debug
-)

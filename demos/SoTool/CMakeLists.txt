@@ -31,17 +31,3 @@ target_precompile_headers(SoTool PRIVATE "stdafx.h")
 set_target_properties (SoTool PROPERTIES
     FOLDER demos
 )
-
-install(TARGETS SoTool
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION bin/Release
-    LIBRARY DESTINATION lib/Release
-    ARCHIVE DESTINATION lib/Release
-)
-
-install(TARGETS SoTool
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION bin/Debug
-    LIBRARY DESTINATION lib/Debug
-    ARCHIVE DESTINATION lib/Debug
-)

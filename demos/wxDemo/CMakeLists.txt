@@ -38,17 +38,3 @@ target_precompile_headers(wxDemo PRIVATE "stdafx.h")
 set_target_properties (wxDemo PROPERTIES
     FOLDER demos
 )
-
-install(TARGETS wxDemo
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION bin/Release
-    LIBRARY DESTINATION lib/Release
-    ARCHIVE DESTINATION lib/Release
-)
-
-install(TARGETS wxDemo
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION bin/Debug
-    LIBRARY DESTINATION lib/Debug
-    ARCHIVE DESTINATION lib/Debug
-)

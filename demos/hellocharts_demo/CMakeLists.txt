@@ -1,4 +1,3 @@
-message(STATUS "PROJECT_ROOT_DIR=${PROJECT_ROOT_DIR}")
 # Include directories
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 include_directories(${PROJECT_SOURCE_DIR})
@@ -38,18 +37,3 @@ endif()
 set_target_properties (${current_project} PROPERTIES
     FOLDER demos
 )
-
-install(TARGETS ${current_project}
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/Release
-    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/Release
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/Release
-)
-
-install(TARGETS ${current_project}
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION ${CMAKE_INSTALL_PREFIX}/bin/Debug
-    LIBRARY DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/Debug
-    ARCHIVE DESTINATION ${CMAKE_INSTALL_PREFIX}/lib/Debug
-)
-

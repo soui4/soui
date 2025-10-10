@@ -91,17 +91,3 @@ target_precompile_headers(uieditor PRIVATE "stdafx.h")
 set_target_properties (uieditor PROPERTIES
     FOLDER demos/uieditor
 )
-
-install(TARGETS uieditor
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION bin/Release
-    LIBRARY DESTINATION lib/Release
-    ARCHIVE DESTINATION lib/Release
-)
-
-install(TARGETS uieditor
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION bin/Debug
-    LIBRARY DESTINATION lib/Debug
-    ARCHIVE DESTINATION lib/Debug
-)

@@ -25,17 +25,3 @@ target_precompile_headers(wallpaper PRIVATE "stdafx.h")
 set_target_properties (wallpaper PROPERTIES
     FOLDER demos
 )
-
-install(TARGETS wallpaper
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION bin/Release
-    LIBRARY DESTINATION lib/Release
-    ARCHIVE DESTINATION lib/Release
-)
-
-install(TARGETS wallpaper
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION bin/Debug
-    LIBRARY DESTINATION lib/Debug
-    ARCHIVE DESTINATION lib/Debug
-)

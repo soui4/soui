@@ -34,20 +34,6 @@ set_target_properties (ipc_client PROPERTIES
     FOLDER demos
 )
 
-install(TARGETS ipc_client
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION bin/Release
-    LIBRARY DESTINATION lib/Release
-    ARCHIVE DESTINATION lib/Release
-)
-
-install(TARGETS ipc_client
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION bin/Debug
-    LIBRARY DESTINATION lib/Debug
-    ARCHIVE DESTINATION lib/Debug
-)
-
 
 add_executable(ipc_server WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${SVR_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
 add_dependencies(ipc_server utilities4 soui4 log4z render-skia render-gdi sipcobject)
@@ -61,18 +47,4 @@ endif()
 
 set_target_properties (ipc_server PROPERTIES
     FOLDER demos
-)
-
-install(TARGETS ipc_server
-    CONFIGURATIONS Release
-    RUNTIME DESTINATION bin/Release
-    LIBRARY DESTINATION lib/Release
-    ARCHIVE DESTINATION lib/Release
-)
-
-install(TARGETS ipc_server
-    CONFIGURATIONS Debug
-    RUNTIME DESTINATION bin/Debug
-    LIBRARY DESTINATION lib/Debug
-    ARCHIVE DESTINATION lib/Debug
 )
