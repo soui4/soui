@@ -251,7 +251,7 @@ BOOL LoadRenderFac(IRenderFactory ** ppRenderFac){
 	IImgDecoderFactory *pImgDecoderFactory;
 	do{
 		//使用GDI渲染界面
-		bLoaded = LoadComObj(Render_Gdi,(IObjRef * *)ppRenderFac);
+		bLoaded = LoadComObj(Render_GDI,(IObjRef * *)ppRenderFac);
 		SASSERT(bLoaded);
 		if(!bLoaded) break;
 		//设置图像解码引擎。默认为GDIP。基本主流图片都能解码。系统自带，无需其它库
