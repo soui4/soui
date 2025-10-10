@@ -358,12 +358,12 @@ namespace SevenZip
             }
             else
             {
-                _bstr_t bstr = prop.bstrVal;
+                std::wstring bstr = prop.bstrVal;
 #ifdef _UNICODE
                 m_relPath = bstr;
 #else
                 char relPath[MAX_PATH];
-                int size = WideCharToMultiByte(CP_UTF8, 0, bstr, bstr.length(), relPath, MAX_PATH, NULL, NULL);
+                int size = WideCharToMultiByte(CP_UTF8, 0, bstr.c_str(), bstr.length(), relPath, MAX_PATH, NULL, NULL);
                 m_relPath.assign(relPath, size);
 #endif
             }

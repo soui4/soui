@@ -2,6 +2,11 @@
 #include "SAbstractChartView.h"
 #include <math.h>
 #include <float.h>
+
+#if !defined(_WIN32)
+#define _isnan isnan
+#endif
+
 SNSBEGIN
 
 // Static constants
