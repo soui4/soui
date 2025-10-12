@@ -209,9 +209,6 @@ endif(MSVC)
 else()
 target_link_libraries(demo soui4 utilities4 dl)
 endif()
-if(ENABLE_SOUI_COM_LIB)
-	target_link_libraries(demo d2d1.lib dwrite.lib)
-endif()
 target_precompile_headers(demo PRIVATE "stdafx.h")
 
 set_target_properties (demo PROPERTIES

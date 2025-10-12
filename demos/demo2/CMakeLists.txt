@@ -43,10 +43,6 @@ else()
     target_link_libraries(demo2 dl)
 endif()
 
-if(ENABLE_SOUI_COM_LIB)
-	target_link_libraries(demo2 d2d1.lib dwrite.lib)
-endif()
-
 set_target_properties (demo2 PROPERTIES
     FOLDER demos
 )

@@ -51,7 +51,11 @@
     #pragma comment(lib,"render-gdi")
 #endif
 #if(SCOM_MASK&scom_mask_render_d2d)
+#if defined(_WIN32)  && !defined(__MINGW32__)
 #pragma comment(lib,"render-d2d")
+#pragma comment(lib,"d2d1")
+#pragma comment(lib,"dwrite")
+#endif
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_wic)
     #pragma comment(lib,"imgdecoder-wic")
@@ -61,7 +65,9 @@
     #pragma comment(lib,"imgdecoder-stb")
 #endif
 #if(SCOM_MASK&scom_mask_imgdecoder_gdip)
+#if defined(_WIN32)  && !defined(__MINGW32__)
     #pragma comment(lib,"imgdecoder-gdip")
+#endif
 #endif
 #if(SCOM_MASK&scom_mask_resprovider_zip)
     #pragma comment(lib,"zlib")
@@ -101,11 +107,12 @@ SNSBEGIN
     {
         BOOL SCreateInstance(IObjRef **);
     }
+#if defined(_WIN32)  && !defined(__MINGW32__)
     namespace IMGDECODOR_GDIP
     {
         BOOL SCreateInstance(IObjRef **);
     }
-
+#endif//_WIN32
     namespace RENDER_GDI
     {
         BOOL SCreateInstance(IObjRef **);
@@ -114,11 +121,12 @@ SNSBEGIN
     {
         BOOL SCreateInstance(IObjRef **);
     }
+#if defined(_WIN32)  && !defined(__MINGW32__)
 	namespace RENDER_D2D
 	{
 		BOOL SCreateInstance(IObjRef **);
 	}
-
+#endif//_WIN32
     namespace SCRIPT_LUA
     {
         BOOL SCreateInstance(IObjRef **);

@@ -26,17 +26,7 @@ add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CUR
 add_dependencies(${current_project} soui4 )
 link_directories(${SOUI_ROOT}/lib)
 target_link_libraries(${current_project} soui4 utilities4)
-if(ENABLE_SOUI_COM_LIB)
-    if(MSVC_VERSION LESS 1600 AND ENABLE_SOUI_COM_LIB)
-    message("vs is less than vs2008")
-    if (CMAKE_CL_64)
-	    link_directories("${PROJECT_SOURCE_DIR}/components/render-d2d/sdk7.1_d2d/lib/x64")
-    else ()
-	    link_directories("${PROJECT_SOURCE_DIR}/components/render-d2d/sdk7.1_d2d/lib/x86")
-    endif ()
-    endif()
-	target_link_libraries(${current_project} d2d1.lib dwrite.lib)
-endif()
+
 set_target_properties (${current_project} PROPERTIES
     FOLDER demos
 )

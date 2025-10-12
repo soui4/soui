@@ -43,16 +43,21 @@
 #pragma comment(lib, "aupng")
 #pragma comment(lib,"imgdecoder-wic")
 #pragma comment(lib,"imgdecoder-stb")
-#pragma comment(lib,"imgdecoder-gdip")
 #pragma comment(lib,"render-gdi")
 #pragma comment(lib,"render-skia")
-#pragma comment(lib,"render-d2d")
 #pragma comment(lib,"translator")
 #pragma comment(lib,"resprovider-zip")
 #pragma comment(lib,"7z")
 #pragma comment(lib,"resprovider-7zip")
 #pragma comment(lib,"log4z")
 #pragma comment(lib,"taskloop")
+
+#if defined(_WIN32)  && !defined(__MINGW32__)
+#pragma comment(lib,"imgdecoder-gdip")
+#pragma comment(lib,"render-d2d")
+#pragma comment(lib,"d2d1")
+#pragma comment(lib,"dwrite")
+#endif//_WIN32
 
 SNSBEGIN
 	namespace IMGDECODOR_WIC
@@ -63,20 +68,22 @@ SNSBEGIN
 	{
 		BOOL SCreateInstance(IObjRef **);
 	}
+
+#if defined(_WIN32)  && !defined(__MINGW32__)
 	namespace IMGDECODOR_GDIP
 	{
 		BOOL SCreateInstance(IObjRef **);
 	}
-
+	namespace RENDER_D2D
+	{
+		BOOL SCreateInstance(IObjRef **);
+	}
+#endif//_WIN32
 	namespace RENDER_GDI
 	{
 		BOOL SCreateInstance(IObjRef **);
 	}
 	namespace RENDER_SKIA
-	{
-		BOOL SCreateInstance(IObjRef **);
-	}
-	namespace RENDER_D2D
 	{
 		BOOL SCreateInstance(IObjRef **);
 	}
@@ -121,8 +128,10 @@ SNSBEGIN
 				return IMGDECODOR_WIC::SCreateInstance(ppObj);
 			else if (m_strImgDecoder == _T("imgdecoder-stb"))
 				return IMGDECODOR_STB::SCreateInstance(ppObj);
+#if defined(_WIN32)  && !defined(__MINGW32__)
 			else if (m_strImgDecoder == _T("imgdecoder-gdip"))
 				return IMGDECODOR_GDIP::SCreateInstance(ppObj);
+#endif//_WIN32
 			else
 			{
 				SASSERT(0);
@@ -139,10 +148,12 @@ SNSBEGIN
 		{
 			return RENDER_SKIA::SCreateInstance(ppObj);
 		}
+#if defined(_WIN32)  && !defined(__MINGW32__)
 		BOOL CreateRender_D2D(IObjRef **ppObj)
 		{
 			return RENDER_D2D::SCreateInstance(ppObj);
 		}
+#endif//_WIN32
 
 		BOOL CreateScrpit_Lua(IObjRef **ppObj)
 		{
