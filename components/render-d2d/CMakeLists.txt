@@ -12,6 +12,15 @@ set(src
 source_group("Header Files" FILES ${header})
 source_group("Source Files" FILES ${src})
 
+if (NOT ENABLE_SOUI_COM_LIB)
+    set (src  ${src} render-d2d.rc)
+    add_library(render-d2d SHARED ${src} ${header})
+    target_link_libraries(render-d2d utilities4 d2d1.lib dwrite.lib)
+else()
+    add_library(render-d2d STATIC ${src} ${header})
+    target_link_libraries(render-d2d PUBLIC utilities4 d2d1.lib dwrite.lib)
+endif()
+
 if(MSVC_VERSION LESS 1600)
 message("vs is less than vs2008 d2d")
 target_include_directories(render-d2d
@@ -22,15 +31,6 @@ if (CMAKE_CL_64)
 else ()
 	target_link_directories(render-d2d PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/sdk7.1_d2d/lib/x86")
 endif ()
-endif()
-
-if (NOT ENABLE_SOUI_COM_LIB)
-    set (src  ${src} render-d2d.rc)
-    add_library(render-d2d SHARED ${src} ${header})
-    target_link_libraries(render-d2d utilities4 d2d1.lib dwrite.lib)
-else()
-    add_library(render-d2d STATIC ${src} ${header})
-    target_link_libraries(render-d2d PUBLIC utilities4 d2d1.lib dwrite.lib)
 endif()
 
 target_include_directories(render-d2d
