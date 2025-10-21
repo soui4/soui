@@ -133,7 +133,6 @@ function CreateCustomProject(strProjectName, strProjectPath) {
 
 function AddFilters(proj) {
     try {
-        // ���ļ������ӵ���Ŀ
         var strSrcFilter = wizard.FindSymbol('SOURCE_FILTER');
         var group = proj.Object.AddFilter('Source Files');
         group.Filter = strSrcFilter;
@@ -165,9 +164,14 @@ function AddConfig(proj, strProjectName) {
         var SysResBuiltin = wizard.FindSymbol('CHECKBOX_SYSRES_BUILTIN');
         var ResLoadType = wizard.FindSymbol('ResLoaderType');
 
+        var soui_com_lib = ' imgdecoder-gdip.lib imgdecoder-stb.lib aupng.lib imgdecoder-wic.lib log4z.lib render-d2d.lib render-gdi.lib render-skia.lib skia.lib resprovider-7zip.lib 7z.lib resprovider-zip.lib  zlib.lib scriptmodule-lua.lib  lua-54.lib  translator.lib';
+        var ENABLE_SOUI_COM_LIB_32 = wizard.FindSymbol('ENABLE_SOUI_COM_LIB_32');
+        var ENABLE_SOUI_COM_LIB_64 = wizard.FindSymbol('ENABLE_SOUI_COM_LIB_64');
+
         var wcharSet = wizard.FindSymbol('WCHAR_32');
         var mtSet = wizard.FindSymbol('MT_32');
         var charSetUNICODE = wizard.FindSymbol('UNICODE_32');
+        
         // Debug����
         var config = proj.Object.Configurations('Debug|Win32');
         config.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_32%\\bin\\Debug\\;%PATH%';
@@ -181,8 +185,8 @@ function AddConfig(proj, strProjectName) {
             config.OutputDirectory = '$(SolutionDir)$(ConfigurationName)';
         }
         var CLTool = config.Tools('VCCLCompilerTool');
-        //���ӱ���������
-        CLTool.UsePrecompiledHeader = 2;    // 2-ʹ��Ԥ����ͷ,1-����,0-��ʹ��
+		//添加编译器设置
+        CLTool.UsePrecompiledHeader = 2;    //  2-使用预编译头,1-创建,0-不使用
         CLTool.SuppressStartupBanner = true;
         CLTool.TreatWChar_tAsBuiltInType = (wcharSet == 1);
         CLTool.WarningLevel = warningLevelOption.warningLevel_3;
@@ -198,13 +202,17 @@ function AddConfig(proj, strProjectName) {
         CLTool.DebugInformationFormat = debugOption.debugEditAndContinue;//Edit and continue
 
         var LinkTool = config.Tools('VCLinkerTool');
-        //��������������
+		//添加链接器设置
         LinkTool.GenerateDebugInformation = true;
         LinkTool.LinkIncremental = linkIncrementalYes;
         LinkTool.SuppressStartupBanner = true;  // nologo
         LinkTool.GenerateDebugInformation = true;
         LinkTool.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_32)\\lib\\debug"';
         LinkTool.AdditionalDependencies = 'utilities4.lib soui4.lib'
+        if(ENABLE_SOUI_COM_LIB_32){
+            LinkTool.AdditionalDependencies += soui_com_lib;
+        }
+
         LinkTool.SubSystem = subSystemOption.subSystemWindows;
 
         var resCplTool = config.Tools('VCResourceCompilerTool');
@@ -216,7 +224,7 @@ function AddConfig(proj, strProjectName) {
         else {
             resCplTool.PreprocessorDefinitions += ';_DEBUG';
         }
-        // Release����
+		// Release设置
         var config = proj.Object.Configurations('Release|Win32');
         config.DebugSettings.Environment = 'PATH=%SOUI4_INSTALL_32%\\bin\\Release\\;%PATH%';
         config.CharacterSet = charSetUNICODE;
@@ -228,9 +236,9 @@ function AddConfig(proj, strProjectName) {
             config.IntermediateDirectory = '$(ConfigurationName)';
             config.OutputDirectory = '$(SolutionDir)$(ConfigurationName)';
         }
-        var CLTool = config.Tools('VCCLCompilerTool');
-        //���ӱ���������
-        CLTool.UsePrecompiledHeader = 2;    // 2-ʹ��Ԥ����ͷ,1-����,0-��ʹ��
+		var CLTool = config.Tools('VCCLCompilerTool');
+		//添加编译器设置
+		CLTool.UsePrecompiledHeader = 2;    // 2-使用预编译头,1-创建,0-不使用
         CLTool.SuppressStartupBanner = true;
         CLTool.TreatWChar_tAsBuiltInType = (wcharSet == 1);
         CLTool.WarningLevel = warningLevelOption.warningLevel_3;
@@ -241,15 +249,17 @@ function AddConfig(proj, strProjectName) {
         }
         CLTool.PreprocessorDefinitions = 'WIN32;_WINDOWS;NDEBUG';
         CLTool.RuntimeLibrary = (mtSet == 1) ? 0 : 2;; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
-        CLTool.WholeProgramOptimization = true;	//ȫ�����Ż�����������ʱ��������
+		CLTool.WholeProgramOptimization = true;	//全程序优化：启动链接时代码生成
 
         var LinkTool = config.Tools('VCLinkerTool');
-        //��������������
         LinkTool.GenerateDebugInformation = true;
         LinkTool.LinkIncremental = linkIncrementalYes;
         LinkTool.SuppressStartupBanner = true;  // nologoif(UserDll)
         LinkTool.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_32)\\lib\\release"';
         LinkTool.AdditionalDependencies = 'utilities4.lib soui4.lib'
+        if(ENABLE_SOUI_COM_LIB_32){
+            LinkTool.AdditionalDependencies += soui_com_lib;
+        }
         LinkTool.LinkIncremental = 1;
         LinkTool.SubSystem = subSystemOption.subSystemWindows;
 
@@ -259,7 +269,7 @@ function AddConfig(proj, strProjectName) {
             resCplTool.AdditionalIncludeDirectories = '"$(SOUI4PATH)\\soui-sys-resource"';
         }
 
-        //x64����,Ĭ�����15��ǰ�İ汾��û��X64�����õ�
+        //x64配置,默认情况15以前的版本是没有X64的配置的
         wcharSet = wizard.FindSymbol('WCHAR_64');
         mtSet = wizard.FindSymbol('MT_64');
         charSetUNICODE = wizard.FindSymbol('UNICODE_64');
@@ -277,8 +287,8 @@ function AddConfig(proj, strProjectName) {
                 config_x64.OutputDirectory = '$(SolutionDir)$(ConfigurationName)64';
             }
             var CLTool_x64 = config_x64.Tools('VCCLCompilerTool');
-            //����64λ����������
-            CLTool_x64.UsePrecompiledHeader = 2;    // 2-ʹ��Ԥ����ͷ,1-����,0-��ʹ��
+			//添加64位编译器设置
+			CLTool_x64.UsePrecompiledHeader = 2;    // 2-使用预编译头,1-创建,0-不使用
             CLTool_x64.SuppressStartupBanner = true;
             CLTool_x64.TreatWChar_tAsBuiltInType = (wcharSet == 1);
             CLTool_x64.WarningLevel = warningLevelOption.warningLevel_3;
@@ -294,13 +304,16 @@ function AddConfig(proj, strProjectName) {
             CLTool_x64.DebugInformationFormat = debugOption.debugEditAndContinue;//Edit and continue
 
             var LinkTool_64 = config_x64.Tools('VCLinkerTool');
-            //��������������
+			//添加链接器设置
             LinkTool_64.GenerateDebugInformation = true;
             LinkTool_64.LinkIncremental = linkIncrementalYes;
             LinkTool_64.SuppressStartupBanner = true;  // nologo
             LinkTool_64.GenerateDebugInformation = true;
             LinkTool_64.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_64)\\lib\\debug"';
             LinkTool_64.AdditionalDependencies = 'utilities4.lib soui4.lib'
+            if(ENABLE_SOUI_COM_LIB_64){
+                LinkTool_64.AdditionalDependencies += soui_com_lib;
+            }
             LinkTool_64.SubSystem = subSystemOption.subSystemWindows;
             var resCplTool_64 = config_x64.Tools('VCResourceCompilerTool');
             resCplTool_64.Culture = 0x804;
@@ -320,8 +333,8 @@ function AddConfig(proj, strProjectName) {
                 config_64.OutputDirectory = '$(SolutionDir)$(ConfigurationName)64';
             }
             var CLTool_x64 = config_64.Tools('VCCLCompilerTool');
-            //���ӱ���������
-            CLTool_x64.UsePrecompiledHeader = 2;    // 2-ʹ��Ԥ����ͷ,1-����,0-��ʹ��
+			//添加编译器设置
+			CLTool_x64.UsePrecompiledHeader = 2;    // 2-使用预编译头,1-创建,0-不使用
             CLTool_x64.SuppressStartupBanner = true;
             CLTool_x64.TreatWChar_tAsBuiltInType = (wcharSet == 1);
             CLTool_x64.WarningLevel = warningLevelOption.warningLevel_3;
@@ -332,14 +345,17 @@ function AddConfig(proj, strProjectName) {
             }
             CLTool_x64.PreprocessorDefinitions = 'WIN64;_WINDOWS;NDEBUG';
             CLTool_x64.RuntimeLibrary = (mtSet == 1) ? 0 : 2;; // 0=MT, 1=MTd, 2=MD (DLL), 3=MDd
-            CLTool_x64.WholeProgramOptimization = true;	//ȫ�����Ż�����������ʱ��������
+            CLTool_x64.WholeProgramOptimization = true;	//全程序优化：启动链接时代码生成
             var LinkTool_x64 = config_64.Tools('VCLinkerTool');
-            //��������������
+			//添加链接器设置
             LinkTool_x64.GenerateDebugInformation = true;
             LinkTool_x64.LinkIncremental = linkIncrementalYes;
             LinkTool_x64.SuppressStartupBanner = true;  // nologoif(UserDll)
             LinkTool_x64.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_64)\\lib\\release"';
             LinkTool_x64.AdditionalDependencies = 'utilities4.lib soui4.lib'
+            if(ENABLE_SOUI_COM_LIB_64){
+                LinkTool_x64.AdditionalDependencies += soui_com_lib;
+            }
             LinkTool_x64.LinkIncremental = 1;
             LinkTool_x64.SubSystem = subSystemOption.subSystemWindows;
 
@@ -357,7 +373,7 @@ function AddConfig(proj, strProjectName) {
 }
 
 function PchSettings(proj) {
-    // TODO: ָ�� pch ����
+	// TODO: 指定 pch 设置
 }
 
 function DelFile(fso, strWizTempFile) {
@@ -414,17 +430,17 @@ function GetSourceName(strName) {
 
 function GetTargetName(strName, strProjectName) {
     try {
-        strName.toLowerCase();
-        // TODO: ����ģ���ļ������ó����ļ�������
-        var strTarget = strName;
+		strName.toLowerCase();
+		// TODO: 基于模板文件名设置呈现文件的名称
+		var strTarget = strName;
 
-        if (strName == 'demo.cpp')
-            strTarget = strProjectName + '.cpp';
+		if (strName == 'demo.cpp')
+			strTarget = strProjectName + '.cpp';
 
-        if (strName == 'demo.rc')
-            strTarget = strProjectName + '.rc';
+		if (strName == 'demo.rc')
+			strTarget = strProjectName + '.rc';
 
-        if (strName.indexOf('[uires]') == 0) // UI��Դ�ļ�
+		if (strName.indexOf('[uires]') == 0) // UI资源文件
         {
             strTarget = "uires\\" + strName.substr(7);
         }
@@ -447,7 +463,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         var strTpl = '';
         var strName = '';
 
-        // ����������
+		// 过滤器对象
         var projFilters = proj.Object.Filters;
         var filterRes = projFilters.Item('Resource Files');
         var filterUIRES = projFilters.Item('SoUI Resource');
@@ -455,17 +471,17 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         var strTextStream = InfFile.OpenAsTextStream(1, -2);
         while (!strTextStream.AtEndOfStream) {
             strTpl = strTextStream.ReadLine();
-            if (strTpl != '' && strTpl.indexOf(';') != 0) // ;ע����
+			if (strTpl != '' && strTpl.indexOf(';') != 0) // ;注释行
             {
-                var bCopyOnly = false;  //��true�������ļ��� strTemplate ���Ƶ� strTarget����������Ŀ���г���/����
+				var bCopyOnly = false;  //“true”仅将文件从 strTemplate 复制到 strTarget，而不对项目进行呈现/添加
                 var bBinary = false;
-                if (strTpl.indexOf('=') == 0) // �������ļ�
+				if (strTpl.indexOf('=') == 0) // 二进制文件
                 {
                     bBinary = true;
                     strTpl = strTpl.substr(1);
                 }
 
-                if (strTpl.indexOf('-') == 0) // ֻ��������Ҫ���ӵ��ļ�
+				if (strTpl.indexOf('-') == 0) // 只拷贝不需要添加的文件
                 {
                     bCopyOnly = true;
                     strTpl = strTpl.substr(1);
@@ -490,7 +506,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
                 var strExt = strName.substr(strName.lastIndexOf("."));
                 if (strExt == ".bmp" || strExt == ".ico" || strExt == ".gif" || strExt == ".rtf" || strExt == ".css" || strExt == ".png" || strExt == ".jpg" || strExt == ".lua")
                     bBinary = true;
-                // �����ļ������ӵ�����
+				// 复制文件和添加到工程
                 wizard.RenderTemplate(strTemplate, strFile, bBinary);
                 if (!bCopyOnly) {
                     if (filter) {
@@ -503,7 +519,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         }
         strTextStream.Close();
 
-        // ����ĳЩ�ļ��ı���ѡ��
+		// 设置某些文件的编译选项
         var files = proj.Object.Files;
         var file = files.Item('stdafx.cpp');
         var fileConfig = file.FileConfigurations('Debug|Win32');
@@ -525,7 +541,7 @@ function AddFilesToCustomProj(proj, strProjectName, strProjectPath, InfFile) {
         var psw = wizard.FindSymbol("ZIP_PSW");
         var ResLoadType = wizard.FindSymbol('ResLoaderType');
 
-        //ָ��uires.idx�ı�������
+		//指定uires.idx的编译命令
         var WizardVersion = wizard.FindSymbol('WIZARD_VERSION');
         var DirFor7z;
         var outFile = '';

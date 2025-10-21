@@ -2,14 +2,14 @@
 <html dir="LTR">
 
 <head>
-    <title>SOUI ��̬���ӿ�(Dll)��</title>
+    <title>SOUI 动态链接库(Dll)向导</title>
     <meta name="vs_targetSchema" content="http://schemas.microsoft.com/intellisense/ie5">
     <meta http-equiv="Content-Type" content="text/html; charset=gb2312">
     <meta http-equiv="MSThemeCompatible" content="Yes">
     <link id="LINKURL" rel="stylesheet" href="../../2052/NewStyles.css">
 
-    <!-- SYMBOL ������������û�������ŵ�Ĭ��ֵ��-->
-    <symbol name='WIZARD_DIALOG_TITLE' type="text" value='ʹ��SOUI��������Ӧ��'></symbol>
+    <!-- SYMBOL 标记用于设置用户定义符号的默认值。-->
+    <symbol name='WIZARD_DIALOG_TITLE' type="text" value='使用SOUI构建您的应用'></symbol>
     <symbol name='CHECKBOX_TRANSLATOR_SUPPORT' type=checkbox value=false></symbol>
     <symbol name='CHECKBOX_DYNAMIC_TRANSLATOR_SUPPORT' type=checkbox value=false></symbol>
     <symbol name='CHECKBOX_USE_LUA' type=checkbox value=false></symbol>
@@ -25,20 +25,31 @@
     <symbol name='HEADER_FILTER' type="text" value='h;hpp;hxx;hm;inl;inc'></symbol>
     <symbol name='RESOURCE_FILTER' type="text" value='rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;jpg;jpeg;jpe;manifest'></symbol>
     <symbol name='SOUIRES_FILTER' type="text" value='idx;xml;png;gif;jpg;ico;lua;bmp'></symbol>
-    <!-- ������ʽ��-->
+    <!-- 窗口样式。-->
     <symbol name="WIN_STYLES_TAB" type="radio" value="false"></symbol>
     <symbol name="WIN_STYLES_DLG" type="radio" value="true"></symbol>
-    <!-- ϵͳ��Դ���뵽EXE�С�-->
+    <!-- 系统资源编译到EXE中。-->
     <symbol name='CHECKBOX_SYSRES_BUILTIN' type=checkbox value=true></symbol>
      <symbol name='CHECKBOX_RES_PACK_ONLAY_RELEASE' type=checkbox value=true></symbol>
-    <!-- �����ڰ�͸����-->
+    <!-- 主窗口半透明。-->
     <symbol name='CHECKBOX_TRANSLUCENT' type=checkbox value=true></symbol>
-    <!--����ѡ��-->
-    <SYMBOL NAME="UNICODE" TYPE=select-one VALUE=1></SYMBOL>
-    <SYMBOL NAME="WCHAR" TYPE=select-one VALUE=1></SYMBOL>
-    <SYMBOL NAME="MT" TYPE=select-one VALUE=1></SYMBOL>
-    <SYMBOL NAME="SUPPORT_XP" TYPE="select-one" VALUE="0"></SYMBOL>
-    <SYMBOL NAME="DYNAMIC_SOUI" TYPE="select-one" VALUE="0"></SYMBOL>
+    <!--编译选项-->
+    <SYMBOL NAME="UNICODE_32" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="WCHAR_32" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="MT_32" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="SUPPORT_XP_32" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="DYNAMIC_SOUI_32" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="ENABLE_SOUI_CORE_LIB_32" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="ENABLE_SOUI_COM_LIB_32" TYPE="select-one" VALUE="0"></SYMBOL>
+
+    <SYMBOL NAME="UNICODE_64" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="WCHAR_64" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="MT_64" TYPE=select-one VALUE=1></SYMBOL>
+    <SYMBOL NAME="SUPPORT_XP_64" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="DYNAMIC_SOUI_64" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="ENABLE_SOUI_CORE_LIB_64" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="ENABLE_SOUI_COM_LIB_64" TYPE="select-one" VALUE="0"></SYMBOL>
+    
     <symbol name="APP_TITLE" type="string" value=""></symbol>
     
     <style type="text/css">
@@ -97,8 +108,8 @@
                         </td>
 
                         <td valign="TOP" height="65">
-                            <h4 class="HEAD" id="HEAD">��ӭʹ��SOUI Ӧ�ó�����</h4>
-                            <p class="SUBHEAD" id="SUBHEAD">���򵼽�ʹ����ָ������������һ�� SOUI Ӧ�ó�����Ŀ��</p>
+                            <h4 class="HEAD" id="HEAD">欢迎使用SOUI 应用程序向导</h4>
+                            <p class="SUBHEAD" id="SUBHEAD">此向导将使用您指定的属性生成一个 SOUI 应用程序项目。</p>
                         </td>
                         <td valign="TOP" height="65" width="12">
                             &nbsp;
@@ -168,7 +179,7 @@
                                             <table width="160" height="28" border="0" cellpadding="0" cellspacing="0" class="LINKTEXTSELECTED">
                                                 <tr valign="MIDDLE">
                                                     <td width="100%">
-                                                        <span id="Default" title="�鿴��ѡ���ݵĸ�����">����</span>
+                                                        <span id="Default" title="查看所选内容的概述。">概述</span>
                                                     </td>
                                                     <td width="4">
                                                         <img src="../../2052/Images/spacer.gif" height="1" width="1">
@@ -181,7 +192,7 @@
                                             <table width="100%" height="28" border="0" cellpadding="0" cellspacing="0" class="LINKTEXT">
                                                 <tr valign="MIDDLE">
                                                     <td width="100%">
-                                                        <span class="ACTIVELINK" id="AppType" title="ΪӦ�ó���ָ�����ڣ�������ʽѡ�" onclick="Next(document, 'AppType.htm');" tabindex="1">Ӧ�ó�������</span>
+                                                        <span class="ACTIVELINK" id="AppType" title="为应用程序指定窗口，界面样式选项。" onclick="Next(document, 'AppType.htm');" tabindex="1">应用程序类型</span>
                                                     </td>
                                                     <td width="4">
                                                         <img src="../../2052/Images/spacer.gif" height="1" width="1">
@@ -194,7 +205,7 @@
                                             <table width="100%" height="28" border="0" cellpadding="0" cellspacing="0" class="LINKTEXT">
                                                 <tr valign="MIDDLE">
                                                     <td width="100%">
-                                                        <span class="ACTIVELINK" id="UIFeatures" title="ָ������Ӧ�ó�����۵�ѡ�" onclick="Next(document, 'UIFeatures.htm');" tabindex="2">�û����湦��</span>
+                                                        <span class="ACTIVELINK" id="UIFeatures" title="指定控制应用程序外观的选项。" onclick="Next(document, 'UIFeatures.htm');" tabindex="2">用户界面功能</span>
                                                     </td>
                                                     <td width="4">
                                                         <img src="../../2052/Images/spacer.gif" height="1" width="1">
@@ -207,7 +218,7 @@
                                             <table width="100%" height="28" border="0" cellpadding="0" cellspacing="0" class="LINKTEXT">
                                                 <tr valign="MIDDLE">
                                                     <td width="100%">
-                                                        <span class="ACTIVELINK" id="Advanced" title="ָ��������Ӧ�ó����еĸ���֧�֡�" onclick="Next(document, 'Advanced.htm');" tabindex="3">�߼�����</span>
+                                                        <span class="ACTIVELINK" id="Advanced" title="指定将置入应用程序中的附加支持。" onclick="Next(document, 'Advanced.htm');" tabindex="3">高级功能</span>
                                                     </td>
                                                     <td width="4">
                                                         <img src="../../2052/Images/spacer.gif" height="1" width="1">
@@ -220,7 +231,7 @@
                                             <table width="100%" height="28" border="0" cellpadding="0" cellspacing="0" class="LINKTEXT">
                                                 <tr valign="MIDDLE">
                                                     <td width="100%">
-                                                        <span class="ACTIVELINK" id="ProjectOption" title="ָ��������ı���ѡ�" onclick="Next(document, 'ProjectOption.htm');" tabindex="4">����ѡ��</span>
+                                                        <span class="ACTIVELINK" id="ProjectOption" title="指定将程序的编译选项。" onclick="Next(document, 'ProjectOption.htm');" tabindex="4">编译选项</span>
                                                     </td>
                                                     <td width="4">
                                                         <img src="../../2052/Images/spacer.gif" height="1" width="1">
@@ -269,7 +280,7 @@
 
                                     </td>
                                     <td valign="TOP">
-                                        <span class="ItemTextTop" id="PROJECT_SETTINGS">��Щ�ǵ�ǰ��Ŀ����: </span>
+                                        <span class="ItemTextTop" id="PROJECT_SETTINGS">这些是当前项目设置: </span>
 
                                         <ul>
                                             <li class="LIST">
@@ -305,11 +316,11 @@
 
                                         </ul>
 
-                                        <span class="ItemText" id="FinishText">����һ�����е�������ɡ�<b></b>�����ܵ�ǰ���á�</span>
+                                        <span class="ItemText" id="FinishText">在任一窗口中单击“完成”<b></b>，接受当前设置。</span>
 
                                         <p class="ElementSpacer2">&nbsp;</p>
 
-                                        <span class="ItemText" id="README_REMINDER" title="">������Ŀ������ĸ���Ŀ�� readme.txt �ļ����˽��й���Ŀ���ܺ������ɵ��ļ�����Ϣ��</span>
+                                        <span class="ItemText" id="README_REMINDER" title="">创建项目后，请参阅该项目的 readme.txt 文件，了解有关项目功能和所生成的文件的信息。</span>
                                     </td>
 
                                 </tr>
@@ -359,21 +370,21 @@
 
                                     </td>
                                     <td valign="MIDDLE" height="23" width="75">
-                                        <button class="BUTTONS" id="FinishBtn" onclick="OnFinish(document);">���</button>
+                                        <button class="BUTTONS" id="FinishBtn" onclick="OnFinish(document);">完成</button>
                                     </td>
                                     <td valign="MIDDLE" height="23" width="4">
                                         &nbsp;
 
                                     </td>
                                     <td valign="MIDDLE" height="23" width="75">
-                                        <button class="BUTTONS" id="CancelBtn" onclick="window.external.Finish(document, 'cancel');">ȡ��</button>
+                                        <button class="BUTTONS" id="CancelBtn" onclick="window.external.Finish(document, 'cancel');">ȡ��</button>
                                     </td>
                                     <td valign="MIDDLE" height="23" width="4">
                                         &nbsp;
 
                                     </td>
                                     <td valign="MIDDLE" height="23" width="75">
-                                        <button class="BUTTONS" id="HelpBtn" onclick="window.external.OnHelp('vc.appwiz.mfc.exe.overview');">����</button>
+                                        <button class="BUTTONS" id="HelpBtn" onclick="window.external.OnHelp('vc.appwiz.mfc.exe.overview');">����</button>
                                     </td>
                                     <td valign="MIDDLE" height="23" width="12">
                                         &nbsp;
@@ -413,66 +424,68 @@
 
     function InitControls() {
         if (window.external.FindSymbol("RADIO_RANDER_GDI")) {
-            L_REN_Text = "ʹ��GDI��Ⱦ�����ɳ����С��";
+            L_REN_Text = "使用GDI渲染（生成程序更小）";
             APP_RANDER_SUMMARY.innerText = L_REN_Text;
         }
         else {
-            L_REN_Text = "ʹ��SKIA��Ⱦ�������и����ִ���ٶȣ�";
+            L_REN_Text = "使用SKIA渲染（可以有更快的执行速度）";
             APP_RANDER_SUMMARY.innerText = L_REN_Text;
         }
         if (window.external.FindSymbol("WIN_STYLES_TAB")) {
-            L_WIN_Text = "ʹ��ѡ�ʽ����";
+            L_WIN_Text = "使用选项卡式窗口";
             WIN_STYTLE_SUMMARY.innerText = L_WIN_Text;
         }
         else {
-            L_WIN_Text = "ʹ�ó�����ʽ����";
+            L_WIN_Text = "使用常规样式窗口";
             WIN_STYTLE_SUMMARY.innerText = L_WIN_Text;
         }
         if (window.external.FindSymbol("CHECKBOX_TRANSLATOR_SUPPORT")) {
-            L_TRA_Text = "֧�����Է���";
+            L_TRA_Text = "支持语言翻译";
             TRANSLATOR_SUMMARY.innerText = L_TRA_Text;
         }
         else {
-            L_TRA_Text = "��ʹ�����Է���";
+            L_TRA_Text = "不使用语言翻译";
             TRANSLATOR_SUMMARY.innerText = L_TRA_Text;
         }
 
         if (window.external.FindSymbol("CHECKBOX_SYSRES_BUILTIN")) {
-            L_SYSRES_Text = "��ϵͳ��Դ���뵽EXE��";
+            L_SYSRES_Text = "将系统资源编译到EXE中";
             SYSRES_SUMMARY.innerText = L_SYSRES_Text;
         }
         else {
-            L_SYSRES_Text = "��ϵͳ��ԴDLL�м���ϵͳ��Դ";
+            L_SYSRES_Text = "从系统资源DLL中加载系统资源";
             SYSRES_SUMMARY.innerText = L_SYSRES_Text;
         }
 
         if (window.external.FindSymbol("CHECKBOX_RES_PE")) {
-            L_USERRES_Text = "���û���Դ���뵽EXE��";
+            L_USERRES_Text = "将用户资源编译到EXE中";
             USERRES_SUMMARY.innerText = L_USERRES_Text;
         }
         else {
-            L_USERRES_Text = "�����û���Դ���뵽EXE�У�Ĭ�Ϲ��̴��ļ�������Դ��";
+            L_USERRES_Text = "不把用户资源编译到EXE中（默认工程从文件加载资源）";
             USERRES_SUMMARY.innerText = L_USERRES_Text;
         }
 
         if (window.external.FindSymbol("CHECKBOX_TRANSLUCENT")) {
-            L_SYSRES_Text = "�����ڰ�͸�����������������Ϸ����洰�ڣ���IE�ؼ���";
+            L_SYSRES_Text = "主窗口半透明（不能在主窗口上放置真窗口，如IE控件）";
             TRANSLUCENT_SUMMARY.innerText = L_SYSRES_Text;
         }
         else {
-            L_SYSRES_Text = "�����ڲ�͸�����������������Ϸ����洰�ڣ���IE�ؼ���";
+            L_SYSRES_Text = "主窗口不透明（可以在主窗口上放置真窗口，如IE控件）";
             TRANSLUCENT_SUMMARY.innerText = L_SYSRES_Text;
         }       
     }
 
     function LoadConfig(configFile,bX64)
     {
-            var keyValue = {};
+        var keyValue = {};
 			keyValue["UNICODE"] = 1;//unicode
 			keyValue["WCHAR"] = 1;//wchar
 			keyValue["MT"] = 1;//static linked to CRT
             keyValue["SUPPORT_XP"] = 0;//dont support XP
             keyValue["DYNAMIC_SOUI"] = 1;
+            keyValue["ENABLE_SOUI_CORE_LIB"] = 0;
+            keyValue["ENABLE_SOUI_COM_LIB"] = 0;
         try {
             var fso = new ActiveXObject("Scripting.FileSystemObject");
             var reg2 = /(\w+)=(\d+)/;
@@ -497,6 +510,8 @@
                 window.external.AddSymbol('MT_64', keyValue["MT"]);
                 window.external.AddSymbol('SUPPORT_XP_64', keyValue["SUPPORT_XP"]);
                 window.external.AddSymbol('DYNAMIC_SOUI_64', keyValue["DYNAMIC_SOUI"]);
+                window.external.AddSymbol('ENABLE_SOUI_CORE_LIB_64', keyValue["ENABLE_SOUI_CORE_LIB"]);
+                window.external.AddSymbol('ENABLE_SOUI_COM_LIB_64', keyValue["ENABLE_SOUI_COM_LIB"]);
             }
             else {
                 window.external.AddSymbol('UNICODE_32', keyValue["UNICODE"]);
@@ -504,20 +519,22 @@
                 window.external.AddSymbol('MT_32', keyValue["MT"]);
                 window.external.AddSymbol('SUPPORT_XP_32', keyValue["SUPPORT_XP"]);
                 window.external.AddSymbol('DYNAMIC_SOUI_32', keyValue["DYNAMIC_SOUI"]);
+                window.external.AddSymbol('ENABLE_SOUI_CORE_LIB_32', keyValue["ENABLE_SOUI_CORE_LIB"]);
+                window.external.AddSymbol('ENABLE_SOUI_COM_LIB_32', keyValue["ENABLE_SOUI_COM_LIB"]);
             }
     }
 
-    // ����һ����ʼ��ҳ��ĺ�����ʾ��
+    // 这是一个初始化页面的函数的示例
     //
     function InitDocument(document) {
         setDirection();
 
         if (window.external.FindSymbol('DOCUMENT_FIRST_LOAD')) {
-            // �˺������������ SYMBOL
-            // �����ָ����ֵ����Ĭ�Ϸ���
+            // 此函数基于上面的 SYMBOL
+            // 标记中指定的值设置默认符号
             //
             window.external.SetDefaults(document);
-            //���ļ����ر���ѡ��
+            //从文件加载编译选项
 
             var wsh = new ActiveXObject("WScript.Shell");
             var strConfigPath32 = wsh.Environment("system").Item("SOUI4_INSTALL_32");
@@ -528,22 +545,22 @@
             LoadConfig(strConfigFile64,true);
         }
 
-        // �����ĵ����ú��ʵ�
-        // ����ֵ��ʼ���ؼ�
+        // 加载文档并用合适的
+        // 符号值初始化控件
         //
         window.external.Load(document);
         InitControls();
     }
 
-    // ����򵼶��� 1 ҳ�����
-    // �����������ָ����ҳ
+    // 如果向导多于 1 页，则此
+    // 函数将浏览到指定的页
     //
     function Next(document, linkto) {
         window.external.Next(document, linkto);
     }
 
-    // ����һ�����û�����"���"ʱ
-    // �����õĺ�����ʾ��
+    // 这是一个在用户单击"完成"时
+    // 被调用的函数的示例
     //
     function OnFinish(document) {
         OnWizFinish(document);
@@ -556,9 +573,9 @@
 <script id="INCLUDE_COMMON" language="JSCRIPT"></script>
 
 <!--
-Common.js ��һ���ű��ļ������а�����ʹ�õ� Helper
-���������Ҫ�� Html �ű�������Щ
-��������������С�
+Common.js 是一个脚本文件，其中包含向导使用的 Helper
+函数。如果要从 Html 脚本调用这些
+函数，请包含此行。
 //-->
 
 <script>    

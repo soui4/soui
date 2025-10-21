@@ -39,12 +39,16 @@
     <SYMBOL NAME="MT_32" TYPE=select-one VALUE=1></SYMBOL>
     <SYMBOL NAME="SUPPORT_XP_32" TYPE="select-one" VALUE="0"></SYMBOL>
     <SYMBOL NAME="DYNAMIC_SOUI_32" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="ENABLE_SOUI_CORE_LIB_32" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="ENABLE_SOUI_COM_LIB_32" TYPE="select-one" VALUE="0"></SYMBOL>
 
     <SYMBOL NAME="UNICODE_64" TYPE=select-one VALUE=1></SYMBOL>
     <SYMBOL NAME="WCHAR_64" TYPE=select-one VALUE=1></SYMBOL>
     <SYMBOL NAME="MT_64" TYPE=select-one VALUE=1></SYMBOL>
     <SYMBOL NAME="SUPPORT_XP_64" TYPE="select-one" VALUE="0"></SYMBOL>
     <SYMBOL NAME="DYNAMIC_SOUI_64" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="ENABLE_SOUI_CORE_LIB_64" TYPE="select-one" VALUE="0"></SYMBOL>
+    <SYMBOL NAME="ENABLE_SOUI_COM_LIB_64" TYPE="select-one" VALUE="0"></SYMBOL>
 
     <symbol name="APP_TITLE" type="string" value=""></symbol>
 
@@ -480,6 +484,8 @@
 			keyValue["MT"] = 1;//static linked to CRT
             keyValue["SUPPORT_XP"] = 0;//dont support XP
             keyValue["DYNAMIC_SOUI"] = 1;
+            keyValue["ENABLE_SOUI_CORE_LIB"] = 0;
+            keyValue["ENABLE_SOUI_COM_LIB"] = 0;
         try {
             var fso = new ActiveXObject("Scripting.FileSystemObject");
             var reg2 = /(\w+)=(\d+)/;
@@ -504,6 +510,8 @@
                 window.external.AddSymbol('MT_64', keyValue["MT"]);
                 window.external.AddSymbol('SUPPORT_XP_64', keyValue["SUPPORT_XP"]);
                 window.external.AddSymbol('DYNAMIC_SOUI_64', keyValue["DYNAMIC_SOUI"]);
+                window.external.AddSymbol('ENABLE_SOUI_CORE_LIB_64', keyValue["ENABLE_SOUI_CORE_LIB"]);
+                window.external.AddSymbol('ENABLE_SOUI_COM_LIB_64', keyValue["ENABLE_SOUI_COM_LIB"]);
             }
             else {
                 window.external.AddSymbol('UNICODE_32', keyValue["UNICODE"]);
@@ -511,6 +519,8 @@
                 window.external.AddSymbol('MT_32', keyValue["MT"]);
                 window.external.AddSymbol('SUPPORT_XP_32', keyValue["SUPPORT_XP"]);
                 window.external.AddSymbol('DYNAMIC_SOUI_32', keyValue["DYNAMIC_SOUI"]);
+                window.external.AddSymbol('ENABLE_SOUI_CORE_LIB_32', keyValue["ENABLE_SOUI_CORE_LIB"]);
+                window.external.AddSymbol('ENABLE_SOUI_COM_LIB_32', keyValue["ENABLE_SOUI_COM_LIB"]);
             }
     }
 
