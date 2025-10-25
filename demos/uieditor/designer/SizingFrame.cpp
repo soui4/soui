@@ -68,13 +68,11 @@ void SSizingFrame::OnLButtonDown(UINT nFlags, CPoint point)
 		m_ptDragStart = point;
 		GetWindowRect(&m_rcDragStart);
 	}
-    SSLOGI() << "OnLButtonDown, m_nHitTest=" << m_nHitTest << " m_bDragging=" << m_bDragging;
 }
 
 void SSizingFrame::OnLButtonUp(UINT nFlags, CPoint point)
 {
 	__baseCls::OnLButtonUp(nFlags, point);
-    SSLOGI() << "OnLButtonUp, m_nHitTest=" << m_nHitTest << " m_bDragging=" << m_bDragging;
     if (m_bDragging)
     {
 		m_bDragging = FALSE;
@@ -188,7 +186,6 @@ void SSizingFrame::OnMouseMove(UINT nFlags, CPoint point)
 			
 		// 更新窗口位置和大小
 		Move(rcWnd);
-        SSLOGI() << "OnMouseMove, m_nHitTest=" << m_nHitTest << " m_bDragging=" << m_bDragging;
     }
     else
     {
