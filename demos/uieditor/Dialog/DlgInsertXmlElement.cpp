@@ -320,8 +320,16 @@ namespace SOUI{
 			e3->bPopup = FALSE;
 		}
     }
-    void DlgInsertXmlElement::OnPropGridItemAutoCompleteSelected(IEvtArgs *pEvt)
+    void DlgInsertXmlElement::OnPropGridItemAutoCompleteSelected(IEvtArgs *e)
     {
+		EventPropGridItemAutoCompleteSelected *e2 = sobj_cast<EventPropGridItemAutoCompleteSelected>(e);
+		EventDropdownListSelected *e3 = sobj_cast<EventDropdownListSelected>(e2->pOriginEvt);
+		CAutoCompleteAdapter *pAdapter = (CAutoCompleteAdapter*)(e3->pListView->GetAdapter());
+		if (e3->nValue != -1)
+		{
+			SStringT strSelected = pAdapter->getItemText(e3->nValue);
+			e2->pItem->SetValue(strSelected);
+		}   
     }
 
     } // namespace SOUI
