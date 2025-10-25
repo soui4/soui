@@ -20,7 +20,7 @@ translucent="1"
 			<window size="-2,-1" layout="grid" interval="10" gravity="fill" columnCount="3" >
 				<text text="参数1" columnWeight="1"/>
 				<text text="参数2" columnWeight="1"/>
-				<text text="结果" columnWeight="1" colorText="@color/red"/>
+				<text text="结果" columnWeight="1" colorText="@color/green"/>
 				<edit name="edit_param1" text="100"  size="0,30" margin="2"/>
 				<edit name="edit_param2" text="200" size="0,30" margin="2"/>
 				<edit name="edit_result" text="" size="0,30" margin="2"/>

@@ -20,6 +20,9 @@ SwndContainerImpl::SwndContainerImpl()
     m_swndFinder.Attach(new SWindowFinder());
 }
 
+SwndContainerImpl::~SwndContainerImpl()
+{
+}
 void SwndContainerImpl::SetRoot(SWindow *pRoot)
 {
     m_pRoot = pRoot;

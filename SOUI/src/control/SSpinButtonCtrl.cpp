@@ -48,9 +48,20 @@ int SSpinButtonCtrl::GetValue() const
 
 IWindow *SSpinButtonCtrl::GetIBuddy() const
 {
-    return GetBuddy();
+    return m_pBuddy;
 }
 
+void SSpinButtonCtrl::SetBuddy(IWindow *pBuddy)
+{
+    MemberFunctionSlot<SSpinButtonCtrl, IEvtArgs> slot = Subscriber(&SSpinButtonCtrl::OnBuddyChange, this);
+    if(m_pBuddy){
+        m_pBuddy->UnsubscribeEvent(EVT_RE_NOTIFY, &slot);
+    }
+    m_pBuddy = pBuddy;
+    if(m_pBuddy){
+        m_pBuddy->SubscribeEvent(EVT_RE_NOTIFY, &slot);
+    }
+}
 void SSpinButtonCtrl::GetDesiredSize(SIZE *psz, int wid, int hei)
 {
     CSize szRet;
@@ -210,13 +221,18 @@ int SSpinButtonCtrl::OnCreate(void *)
     if (nRet != 0)
         return nRet;
     OnValueChanged(true);
-
-    SWindow *pBuddy = GetBuddy();
-    if (pBuddy)
-        pBuddy->GetEventSet()->subscribeEvent(EVT_RE_NOTIFY, Subscriber(&SSpinButtonCtrl::OnBuddyChange, this));
+    if(m_strBuddy.IsEmpty()) 
+        return 0;
+    SWindow * pBuddy = GetParent()->FindChildByName(m_strBuddy);
+    SetBuddy(pBuddy);
     return 0;
 }
 
+void SSpinButtonCtrl::OnDestroy()
+{
+    SetBuddy(NULL);
+    __baseCls::OnDestroy();
+}
 void SSpinButtonCtrl::OnClick()
 {
     SASSERT(m_iActionBtn != ACTION_NULL);

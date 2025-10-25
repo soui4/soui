@@ -8,7 +8,6 @@
 SNSBEGIN
 
 #define IDC_CB_EDIT       -100
-#define IDC_DROPDOWN_LIST -200
 
 /**
  * @class SComboEdit

@@ -18,7 +18,7 @@ source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
-add_definitions(-DSTATIC_BUILD -D_CRT_SECURE_NO_WARNINGS)
+add_definitions(-DSCI_LEXER -DSTATIC_BUILD -D_CRT_SECURE_NO_WARNINGS)
 
 add_library(Scintilla STATIC ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_RC})
 

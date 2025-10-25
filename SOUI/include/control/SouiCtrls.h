@@ -28,6 +28,7 @@
 #include <control/SRichEdit.h>
 #include <control/SMenuBar.h>
 #include <control/SSwitch.h>
+#include <control/SSearchDropdownList.h>
 #ifdef _WIN32
 #include <control/SActiveX.h>
 #endif//_WIN32

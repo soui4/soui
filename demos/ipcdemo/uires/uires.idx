@@ -13,8 +13,12 @@
   	<file name="skin" path="values\skin.xml"/>
   </values>
 
-  <IMG>
-  </IMG>
+	<image>
+		<file name="cmn.border" path="image\cmn.border[2{2,2}].png" />
+		<file name="sms.help" path="image\sms.help.png" />
+		<file name="sms.record" path="image\sms.record.png" />
+		<file name="sms.search" path="image\sms.search.png" />
+	</image>
   <ICON>
     <file name="ICON_LOGO"  path="image\soui.ico"/>
   </ICON>

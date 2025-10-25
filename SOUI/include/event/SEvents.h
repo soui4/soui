@@ -147,6 +147,10 @@ typedef enum _SOUI_EVENTS
     EVT_REALWND_INIT,           ///< 真实窗口初始化事件
     EVT_REALWND_POSITION,       ///< 真实窗口位置改变事件
 
+    EVT_DROPDOWN_LIST_FILL = 22170,
+    EVT_DROPDOWN_LIST_SELECTED,
+    EVT_DROPDOWN_LIST_GET_BUDDY_RECT,
+
     EVT_EXTERNAL_BEGIN = 10000000, ///< 外部事件开始ID
 } SOUI_EVENTS;
 
@@ -698,6 +702,24 @@ DEF_EVT(EventRealWndPosition, EVT_REALWND_POSITION, on_real_wnd_position, {
     RECT rc;   ///< 窗口位置矩形
     BOOL bRet; ///< 返回值
 })
+
+typedef struct IListView IListView;
+
+DEF_EVT(EventDropdownListGetBuddyRect, EVT_DROPDOWN_LIST_GET_BUDDY_RECT, on_dropdown_list_get_buddy_rect, {
+    RECT rcBuddy;
+})
+
+DEF_EVT(EventDropdownListFill, EVT_DROPDOWN_LIST_FILL,  on_dropdown_list_fill, {
+    const IStringT* strKey;
+    IListView *pListView;
+    BOOL bPopup;
+})
+
+DEF_EVT(EventDropdownListSelected, EVT_DROPDOWN_LIST_SELECTED, on_dropdown_list_selected, {
+    IListView *pListView;
+    int nValue;
+})
+
 SNSEND
 
 #endif // __SEVENTS__H__

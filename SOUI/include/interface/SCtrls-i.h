@@ -3264,6 +3264,13 @@ DECLARE_INTERFACE_(ISpinButtonCtrl, ICtrl)
      * @return IWindow *--关联的窗口对象
      */
     STDMETHOD_(IWindow *, GetIBuddy)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief 设置关联的窗口对象
+     * @param pBuddy --关联的窗口对象
+     * @return void
+     */
+    STDMETHOD_(void, SetBuddy)(THIS_ IWindow *pBuddy) PURE;
 };
 
 // {80E930E7-BFC2-4e5e-8FFC-A2F0B4EC24E9}
@@ -3433,6 +3440,64 @@ DECLARE_INTERFACE_(IStackView, ICtrl)
     STDMETHOD_(void, SetAniDir)(THIS_ BOOL bVert) PURE;
     STDMETHOD_(IWindow *, GetSelPage)(CTHIS) SCONST PURE;
     STDMETHOD_(IWindow *, GetPage)(CTHIS_ int iPage) SCONST PURE;
+};
+
+
+
+// {59D1145E-C906-404e-8128-29C7CC80E3DD}
+DEFINE_SGUID(IID_ISearchDropdownList, 0x59d1145e, 0xc906, 0x404e, 0x81, 0x28, 0x29, 0xc7, 0xcc, 0x80, 0xe3, 0xdd);
+#undef INTERFACE
+#define INTERFACE ISearchDropdownList
+DECLARE_INTERFACE_(ISearchDropdownList, ICtrl)
+{
+    DECLARE_CLASS_SIID(IID_ISearchDropdownList)
+    /**
+     * @brief 增加引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, AddRef)(THIS) PURE;
+
+    /**
+     * @brief 减少引用计数
+     * @return 新引用计数
+     */
+    STDMETHOD_(long, Release)(THIS) PURE;
+
+    /**
+     * @brief 释放对象
+     * @return void
+     */
+    STDMETHOD_(void, OnFinalRelease)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 转换为IWindow*接口
+     * @return IWindow*接口
+     */
+    STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
+
+    //////////////////////////////////////////////////////////////////////////
+
+    /**
+     * @brief 显示下拉框
+     * @param pText 显示的文本
+     * @return void
+     */
+    STDMETHOD_(void, DropDown)(THIS_ const IStringT *pText) PURE;
+
+    /**
+     * @brief 关闭下拉框
+     * @param code 结束代码
+     * @return void
+     */
+    STDMETHOD_(void, CloseUp)(THIS_ int code DEF_VAL(IDCANCEL)) PURE;
+
+    /**
+     * @brief 测试是否是下拉框
+     * @return BOOL
+     */
+    STDMETHOD_(BOOL, IsDropdown)(THIS) SCONST PURE;
 };
 
 SNSEND

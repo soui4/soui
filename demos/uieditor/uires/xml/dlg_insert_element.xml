@@ -1,0 +1,75 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOUI name="insert_element" title="" bigIcon="ICON_LOGO:48"  wndType="appMain" smallIcon="ICON_LOGO:32" width="800" height="600" margin="5,5,5,5" resizable="1">
+  <root colorBkgnd="@color/bkBlack1" margin="1" colorBorder="#6f1111" layout="vbox">
+    <caption size="-2,40" colorBkgnd="#FFFFFF20">
+      <icon src="ICON_LOGO:32" pos="8,|0" offset="0,-0.5" />
+      <text name="apptitle" pos="[8,|0" offset="0, -0.5" class="ue_cls_title">@string/skin_build</text>
+      <imgbtn id="IDCANCEL" skin="_skin.sys.btn.close" pos="-45,0" tip="close" animate="1" />
+    </caption>
+    <splitcol size="-2,0" weight="1">
+      <pane priority="1" idealSize="300" colorBkgnd="@color/gray" layout="vbox">
+        <toolbar size="-2,30" name="tb_prop" itemSize="30" showText="false" stateSkin="skin_toolbar_state" iconSkin="skin_toolbar_prop">
+          <data>
+            <item iconIndex="0" id="0" tip="按分组排序" checked="true"/>
+            <item iconIndex="1" id="1" tip="按名称排序"/>
+          </data>
+        </toolbar>
+        <propgrid size="-2,0" weight="1" name="propgrid_element" switchSkin="skin_prop_switch"	titleWidth="150" orderType="group" itemHeight="26" colorGroup="RGB(96,112,138)" colorTitle="rgb(200,200,200)" colorTitleSel="rgb(234,128,16)" colorTitleTextSel="#ffffff" colorItem="@color/white">
+            <cmdbtnstyle skin="_skin.sys.btn.normal">...</cmdbtnstyle>
+            <editStyle colorBkgnd="#FFFFFF" colorText="#000000" autoWordSel="1"/>
+            <optionStyle dropDown="1" btnSkin="skin_open_menu_png" colorBkgnd="#ffffff" drawFocusRect="0" colorText="#000000">
+              <liststyle colorBorder="#000000" margin-x="1" margin-y="1" colorText="#000000" colorSelText="#FFFFFF" colorItemBkgnd="#FFFFFF" colorItemSelBkgnd="#000088"/>
+            </optionStyle>
+            <autoCompleteStyle>
+              <dropdownStyle translucent="1" resizable="0" sendWheel2Hover="1">
+                    <root colorBorder="@color/border" margin="1" colorBkgnd="@color/white"/>
+              </dropdownStyle>
+              <liststyles>
+                <!--template for different extend item type-->
+                <default size="-2,-2" >
+                  <template itemHeight="40" layout="vbox" colorNormal="@color/white" colorSelected="#e4f0fc" colorHover="#e4f0fc">
+                    <text name="txt_desc" colorText="@color/red"/>
+                    <window size="0,0" weight="1" visible="0"/>
+                    <text name="txt_value" colorText="@color/black"/>
+                  </template>
+                </default>
+                <imageSrc size="-2,-2" >
+                  <template itemHeight="40" layout="vbox" gravity="left" interval="2" colorNormal="@color/white" colorSelected="#e4f0fc" colorHover="#e4f0fc">
+                    <text name="txt_desc" colorText="@color/red"/>
+                    <window size="0,0" weight="1"/>
+                    <text name="txt_path" size="-2,-1" colorText="@color/black"/>
+                  </template>
+                </imageSrc>
+                <color size="-2,-2" >
+                  <template itemHeight="30" layout="hbox" gravity="center" colorNormal="@color/white" colorSelected="#e4f0fc" colorHover="#e4f0fc">
+                    <text name="txt_desc" colorText="@color/red"/>
+                    <window size="0,0" weight="1"/>
+                    <window name="color_preview" width="20" height="20"/>
+                  </template>
+                </color>
+              </liststyles>
+            </autoCompleteStyle>
+          </propgrid>
+        <window size="-2,100" layout="vbox" colorBkgnd="RGB(96,112,138)" interval="5">
+          <text name="txt_prop_title" font="bold:1" />
+          <text size="-2,0" weight="1" name="txt_prop_desc" multiLines="1" valign="top"/>
+        </window>
+      </pane>
+      <pane priority="0" idealSize="100" colorBkgnd="#ffffff" layout="vbox">
+        <splitrow size="-2,0" weight="1">
+          <pane priority="0" idealSize="100">
+            <realwnd size="-2,-2" name="xml_editor" wndclass="scintilla" wndname="scintilla" />
+          </pane>
+          <pane priority="1" idealSize="100" minSize="100">
+           <img size="-2,-2" name="img_preview" iconIndex="0" colorBkgnd="RGB(255,255,255)" /> 
+          </pane>
+        </splitrow>
+      </pane>
+    </splitcol>
+    <window size="-2,30" layout="hbox" interval="20">
+      <window size="0,0" weight="1" visible="0"/>
+      <button size="100,-2" id="IDOK" text="OK"/>
+      <button size="100,-2" id="IDCANCEL" text="Cancel"/>
+    </window>
+  </root>
+</SOUI>

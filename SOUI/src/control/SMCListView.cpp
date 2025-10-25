@@ -164,6 +164,7 @@ BOOL SMCListView::CreateChildren(SXmlNode xmlNode)
         return FALSE;
     if (xmlTemplate)
     {
+        m_xmlTemplate.Reset();
         m_xmlTemplate.root().append_copy(xmlTemplate);
         SLayoutSize nItemHei = GETLAYOUTSIZE(xmlTemplate.attribute(L"itemHeight").value());
         if (nItemHei.fSize > 0.0f)
@@ -698,17 +699,19 @@ void SMCListView::UpdateVisibleItems()
                 SStringW strColName;
                 m_adapter->GetColumnName(hditem.iOrder, &strColName);
                 SWindow *pColWnd = ii.pItem->FindChildByName(strColName);
-                SASSERT(pColWnd);
-                if (m_pHeader->IsItemVisible(i))
+                if (pColWnd)
                 {
-                    pColWnd->SetVisible(true);
-                    rcSubItem.left = rcSubItem.right;
-                    rcSubItem.right += hditem.cx;
-                    pColWnd->Move(rcSubItem);
-                }
-                else
-                {
-                    pColWnd->SetVisible(false);
+                    if (m_pHeader->IsItemVisible(i))
+                    {
+                        pColWnd->SetVisible(true);
+                        rcSubItem.left = rcSubItem.right;
+                        rcSubItem.right += hditem.cx;
+                        pColWnd->Move(rcSubItem);
+                    }
+                    else
+                    {
+                        pColWnd->SetVisible(false);
+                    }
                 }
             }
 

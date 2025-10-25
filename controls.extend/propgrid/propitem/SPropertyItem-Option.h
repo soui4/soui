@@ -25,6 +25,12 @@ SNSBEGIN
 
 		SStringT Value2Option(const SStringT& value) const;
 
+        void ClearOptions();
+        void AddOption(const SStringT & strOption);
+        int GetOptionCount() const;
+        SStringT GetOption(int iIndex) const;
+
+    public:
         SOUI_ATTRS_BEGIN()
             ATTR_CUSTOM(L"options",OnAttrOptions)
 			ATTR_CUSTOM(L"value",OnAttrValue)

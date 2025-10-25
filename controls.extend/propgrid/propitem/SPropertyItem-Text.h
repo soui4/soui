@@ -22,12 +22,13 @@ SNSBEGIN
 		virtual void DrawItem(IRenderTarget *pRT,CRect rc);
 		virtual BOOL HasValue() const ;
 		virtual void ClearValue() ;
-
+        virtual BOOL IsAutoComplete() const;
         void OnValueChanged() override;
 
         SOUI_ATTRS_BEGIN()
             ATTR_STRINGT(L"value",m_strValue,TRUE)
 			ATTR_BOOL(L"hasButton",m_hasButton,TRUE)
+            ATTR_BOOL(L"autoComplete",m_bAutoComplete,FALSE)
         SOUI_ATTRS_END()
 
     protected:
@@ -35,6 +36,7 @@ SNSBEGIN
     protected:
         SStringT m_strValue;
         BOOL	m_hasButton;
+        BOOL    m_bAutoComplete;
         SEdit  * m_pEdit;
     protected:
         SPropertyItemText(SPropertyGrid *pOwner);

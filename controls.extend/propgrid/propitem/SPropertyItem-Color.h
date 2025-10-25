@@ -40,8 +40,6 @@ SNSBEGIN
         COLORREF    m_crValue;
         
     protected:
-        bool OnReNotify(IEvtArgs *pEvt);
-
         SPropertyItemColor(SPropertyGrid *pOwner);
 
 	protected://IColorPicker

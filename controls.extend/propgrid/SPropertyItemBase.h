@@ -69,7 +69,7 @@ SNSBEGIN
 		
 		virtual BOOL IsReadOnly() const{return m_bReadOnly;}
 		virtual void SetReadOnly(BOOL bReadOnly);
-		virtual SStringW GetExtendType() const{return m_strExType;}
+		virtual SStringW GetExtendType() const;
 
 		IPropertyItem * FindChildByName(LPCWSTR pszName) const;
 		IPropertyItem * FindChildById(int nID);

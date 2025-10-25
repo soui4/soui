@@ -41,9 +41,13 @@ class SPropEdit: public SEdit
         SAutoRefPtr<IPropertyItem> m_pOwner;
 
     };
-    
-	SPropertyItemText::SPropertyItemText(SPropertyGrid *pOwner) :SPropertyItemBase(pOwner),m_pEdit(NULL),m_hasButton(FALSE)
-	{
+
+    SPropertyItemText::SPropertyItemText(SPropertyGrid *pOwner)
+        : SPropertyItemBase(pOwner)
+        , m_pEdit(NULL)
+        , m_hasButton(FALSE)
+        , m_bAutoComplete(FALSE)
+    {
 	}
 
 	static const WCHAR * kEditStyle = L"editStyle";
@@ -59,7 +63,23 @@ class SPropEdit: public SEdit
 		rc.left += 5;
         pRT->DrawText(strValue,strValue.GetLength(),rc,DT_SINGLELINE|DT_VCENTER);
     }
-    
+    BOOL SPropertyItemText::IsAutoComplete() const{
+        BOOL hasChild = ChildrenCount()!=0;
+        BOOL hasParent = GetParent()!=NULL;
+        if (hasChild)
+            return FALSE;
+        BOOL bAutoComplete = m_bAutoComplete;
+        if (hasParent)
+        {
+            IPropertyItem *pParent = GetParent();
+            if (pParent && pParent->IsClass(SPropertyItemText::GetClassName()))
+            {
+                SPropertyItemText *pParentText = (SPropertyItemText *)pParent;
+                bAutoComplete = pParentText->m_bAutoComplete;
+            }
+        }
+        return bAutoComplete;
+    }
     void SPropertyItemText::OnInplaceActive(BOOL bActive)
     {
         __baseCls::OnInplaceActive(bActive);
@@ -79,6 +99,9 @@ class SPropEdit: public SEdit
             m_pOwner->OnInplaceActiveWndCreate(this,m_pEdit,inplaceStyle);
             m_pEdit->SetWindowText(GetValue());
 			m_pEdit->SetFocus();
+            if(IsAutoComplete()){
+                m_pEdit->SSendMessage(EM_SETEVENTMASK,0,ENM_CHANGE);
+            }
         }else
         {
             if(m_pEdit)

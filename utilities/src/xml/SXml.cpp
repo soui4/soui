@@ -238,7 +238,7 @@ SXmlNode::SXmlNode(const SXmlNode& src):_node(src._node)
 void SXmlNode::ToString(THIS_ IStringW *out) SCONST
 {
 	pugi::xml_writer_buff writer;
-    _node.print(writer, L"\t", pugi::format_default, sizeof(wchar_t) == 2 ? pugi::encoding_utf16 : pugi::encoding_utf32);
+    _node.print(writer, L"\t", pugi::format_raw, sizeof(wchar_t) == 2 ? pugi::encoding_utf16 : pugi::encoding_utf32);
 	out->Assign2(writer.buffer(), writer.size());
 }
 
@@ -265,6 +265,11 @@ const wchar_t * SXmlNode::Value(THIS) SCONST
 const wchar_t * SXmlNode::Text(THIS) SCONST
 {
 	return _node.text().get();
+}
+
+BOOL SXmlNode::SetText(THIS_ const wchar_t* text)
+{
+	return _node.text().set(text);
 }
 
 BOOL SXmlNode::set_userdata(THIS_ int data)
@@ -420,14 +425,24 @@ SXmlNode SXmlNode::root() const
 	return _node.root();
 }
 
-SXmlNode SXmlNode::child(const wchar_t* name,bool bCaseSensitive/*=false*/) const
+SXmlNode SXmlNode::child(const wchar_t* name,bool bCaseSensitive/*=false*/,bool auto_create/*=false*/) const
 {
-	return _node.child(name,bCaseSensitive);
+	pugi::xml_node node = _node.child(name,bCaseSensitive);
+	if(!node && auto_create)
+	{
+		node = _node.append_child(name);
+	}
+	return node;
 }
 
-SXmlAttr SXmlNode::attribute(const wchar_t* name,bool bCaseSensitive/*=false*/) const
+SXmlAttr SXmlNode::attribute(const wchar_t* name,bool bCaseSensitive/*=false*/,bool auto_create/*=false*/) const
 {
-	return _node.attribute(name,bCaseSensitive);
+	pugi::xml_attribute attr =  _node.attribute(name,bCaseSensitive);
+	if(!attr && auto_create)
+	{
+		attr = _node.append_attribute(name);
+	}
+	return attr;
 }
 
 SXmlAttr SXmlNode::attribute(const wchar_t* name, SXmlAttr& hint,bool bCaseSensitive/*=false*/) const
@@ -452,7 +467,7 @@ bool SXmlNode::set_name(const wchar_t* rhs)
 
 bool SXmlNode::set_value(const wchar_t* rhs)
 {
-	return _node.set_value(rhs);
+	return _node.set_value(rhs);	
 }
 
 SXmlAttr SXmlNode::append_attribute(const wchar_t* name)
@@ -605,7 +620,12 @@ bool SXmlNode::remove_children()
 	return _node.remove_children();
 }
 
-
+SStringW SXmlNode::toString() const
+{
+	pugi::xml_writer_buff writer;
+    _node.print(writer, L"\t", pugi::format_raw, sizeof(wchar_t) == 2 ? pugi::encoding_utf16 : pugi::encoding_utf32);
+	return SStringW(writer.buffer(), writer.size());
+}
 //////////////////////////////////////////////////////////////////////////
 
 SXmlDoc::SXmlDoc()

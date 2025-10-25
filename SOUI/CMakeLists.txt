@@ -39,7 +39,7 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fpermissive" )
 set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fpermissive")
 add_compile_options(-Wno-conversion-null -Wno-pointer-arith -Wno-format)
 endif()
-
+ 
 set(source ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
 
 if (NOT ENABLE_SOUI_CORE_LIB)

@@ -194,6 +194,11 @@ void SPropertyItemBase::OnValueChanged()
         GetOwner()->OnItemValueChanged(this);
 }
 
+SStringW SPropertyItemBase::GetExtendType() const{
+    if(m_strExType.IsEmpty() && GetParent())
+        return GetParent()->GetExtendType();
+    return m_strExType;
+}
 IPropertyItem *SPropertyItemBase::FindChildByName(LPCWSTR pszName) const
 {
     SPOSITION pos = m_childs.GetHeadPosition();

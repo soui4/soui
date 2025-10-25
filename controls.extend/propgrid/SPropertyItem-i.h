@@ -44,7 +44,6 @@ SNSBEGIN
         virtual SStringT GetTitle() const =0;
 		virtual SStringW GetName2() const = 0;
         virtual void SetTitle(const SStringT & strName) =0;
-        //virtual void SetID(int nID) =0;
         virtual SStringT GetDescription() const =0;
         virtual void SetDescription(const SStringT & strDescription) =0;
         virtual SStringT GetValue() const =0;

@@ -39,6 +39,11 @@ class SOUI_EXP SwndContainerImpl
     SwndContainerImpl();
 
     /**
+     * @brief Destructor.
+     */
+    ~SwndContainerImpl();
+
+    /**
      * @brief Retrieves the drop target.
      * @return Pointer to the drop target.
      */

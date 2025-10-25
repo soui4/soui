@@ -1071,7 +1071,8 @@ void SCheckBox::GetTextRect(LPRECT pRect)
 void SCheckBox::OnPaint(IRenderTarget *pRT)
 {
     CRect rcCheckBox = GetCheckRect();
-    m_pSkin->DrawByState(pRT, rcCheckBox, GetState());
+    if(m_pSkin)
+        m_pSkin->DrawByState(pRT, rcCheckBox, GetState());
     __baseCls::OnPaint(pRT);
 }
 
@@ -1319,7 +1320,9 @@ void SRadioBox::GetTextRect(LPRECT pRect)
 void SRadioBox::OnPaint(IRenderTarget *pRT)
 {
     CRect rcRadioBox = GetRadioRect();
-    m_pSkin->DrawByState(pRT, rcRadioBox, GetState());
+    if(m_pSkin){
+        m_pSkin->DrawByState(pRT, rcRadioBox, GetState());
+    }
     __baseCls::OnPaint(pRT);
 }
 

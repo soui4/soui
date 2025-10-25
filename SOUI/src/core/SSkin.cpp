@@ -59,13 +59,21 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
         OffsetRect(&rcSrc, 0, iState * sz.cy);
     else
         OffsetRect(&rcSrc, iState * sz.cx, 0);
-    pRT->DrawBitmapEx(rcDraw, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
+    if(m_bTile){
+        SAutoRefPtr<IBrushS> brush,oldBrush;
+        pRT->CreateBitmapBrush(GetImage(),kRepeat_TileMode, kRepeat_TileMode, &brush);
+        pRT->SelectObject(brush,(IRenderObj**)&oldBrush);
+        pRT->FillRectangle(rcDraw);
+        pRT->SelectObject(oldBrush,NULL);
+    }else{
+        pRT->DrawBitmapEx(rcDraw, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
+    }
 }
 
 UINT SSkinImgList::GetExpandMode() const
 {
     if (m_bAutoFit)
-        return MAKELONG(m_bTile ? EM_TILE : EM_STRETCH, m_filterLevel);
+        return MAKELONG(EM_STRETCH, m_filterLevel);
     else
         return MAKELONG(EM_NULL, m_filterLevel);
 }

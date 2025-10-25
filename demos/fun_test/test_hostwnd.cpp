@@ -387,7 +387,7 @@ int run_app(HINSTANCE hInst) {
     CScintillaWnd::InitScintilla(hInst);
     SComMgr2 comMgr;
     SAutoRefPtr<IRenderFactory> renderFac;
-    BOOL useGdi = 1;
+    BOOL useGdi = 0;
     if (useGdi)
         comMgr.CreateRender_GDI((IObjRef**)&renderFac);
     else

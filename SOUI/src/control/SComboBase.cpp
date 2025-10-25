@@ -3,8 +3,8 @@
 
 SNSBEGIN
 
-const wchar_t *KStyle_Dropdown = L"dropdownStyle"; //下拉列表风格，只包含root节点
-const wchar_t *KStyle_Edit = L"editStyle";         //编辑框风格
+static const wchar_t *KStyle_Dropdown = L"dropdownStyle"; //下拉列表风格，只包含root节点
+static const wchar_t *KStyle_Edit = L"editStyle";         //编辑框风格
 
 //////////////////////////////////////////////////////////////////////////
 // CComboEdit
@@ -532,7 +532,10 @@ int SComboBase::OnCreate(LPVOID)
     if (ret != 0)
         return ret;
     if (!m_pSkinBtn)
+    {
+        SSLOGW()<<"SComboBase::OnCreate failed! skin of btn is null!";
         return -1;
+    }
     return 0;
 }
 

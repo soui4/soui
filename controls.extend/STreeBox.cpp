@@ -685,7 +685,7 @@ void STreeBox::OnMouseLeave()
     if(m_hHoverItem)
     {
         CSTree<STreeItem*>::GetItem(m_hHoverItem)->DoFrameEvent(WM_MOUSELEAVE,0,0);
-        m_hHoverItem=NULL;
+        m_hHoverItem=0;
     }
 }
 
@@ -842,7 +842,7 @@ void STreeBox::UpdateSwitchState( HSTREEITEM hItem )
 
 BOOL STreeBox::UpdateToolTip( CPoint pt, SwndToolTipInfo & tipInfo )
 {
-    if(m_hHoverItem==NULL)
+    if(m_hHoverItem==0)
         return __baseCls::UpdateToolTip(pt,tipInfo);
     STreeItem *pItem = GetItem(m_hHoverItem);
     return pItem->UpdateToolTip(pt,tipInfo);

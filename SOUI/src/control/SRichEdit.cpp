@@ -2131,6 +2131,8 @@ COLORREF SRichEdit::SetDefaultTextColor(COLORREF cr)
 
 void SRichEdit::OnEnableDragDrop(BOOL bEnable)
 {
+	if(!GetContainer())
+		return;
     if (bEnable)
     {
         SRicheditDropTarget *pDropTarget = new SRicheditDropTarget(m_pTxtHost->GetTextService());

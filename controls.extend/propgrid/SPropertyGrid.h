@@ -2,17 +2,24 @@
 #define _SPROPERTY_GRID_H
 
 #include <control/SListbox.h>
+#include <control/SSearchDropdownList.h>
 #include "SPropertyItemBase.h"
 
 
 SNSBEGIN
 	class SPropertyGroup;
 
+	#ifndef EVT_PROP_BEGIN
+	#define EVT_PROP_BEGIN (EVT_EXTERNAL_BEGIN+100)
+	#endif//EVT_PROP_BEGIN
 	enum{
-		EVT_PG_VALUECHANGED = EVT_EXTERNAL_BEGIN+100,
+		EVT_PG_VALUECHANGED = EVT_PROP_BEGIN,
 		EVT_PG_ITEMACTIVE,
 		EVT_PG_ITEM_BUTTON_CLICK,
 		EVT_PG_ITEM_INPLACE_INIT,
+		EVT_PG_AUTOCOMPLETE_FILL,
+		EVT_PG_AUTOCOMPLETE_SELECTED,
+		EVT_PG_CONVERT_COLOR,
 	};
 
 	DEF_EVT_EXT(EventPropGridValueChanged,EVT_PG_VALUECHANGED,{
@@ -32,7 +39,20 @@ SNSBEGIN
 		SWindow *pInplaceWnd;
 	});
 
+	DEF_EVT_EXT(EventPropGridItemAutoCompleteFill,EVT_PG_AUTOCOMPLETE_FILL,{
+		IPropertyItem * pItem;
+		IEvtArgs *pOriginEvt;
+	});
+	DEF_EVT_EXT(EventPropGridItemAutoCompleteSelected,EVT_PG_AUTOCOMPLETE_SELECTED,{
+		IPropertyItem * pItem;
+		IEvtArgs *pOriginEvt;
+	});
 
+	DEF_EVT_EXT(EventPropGridConvertColor,EVT_PG_CONVERT_COLOR,{
+		SStringT strValue;
+		COLORREF crValue;
+		BOOL bConverted;
+	});
 #define IG_FIRST (SPropertyGroup*)0
 #define IG_LAST  (SPropertyGroup*)1
 
@@ -84,10 +104,11 @@ SNSBEGIN
 
 		void EnumProp(FunEnumProp funEnum,void* opaque);
 
+		COLORREF ConvertColor(const SStringT &strValue,COLORREF crDefault);
 	protected:
 		HRESULT OnAttrOrderType(const SStringW &strValue,BOOL bLoading);
 
-		SOUI_ATTRS_BEGIN()
+        SOUI_ATTRS_BEGIN()
 			ATTR_INT(L"titleWidth",m_nTitleWidth,TRUE)
 			ATTR_CUSTOM(L"orderType",OnAttrOrderType)
 			ATTR_ENUM_BEGIN(L"orderType",ORDERTYPE,TRUE)
@@ -95,11 +116,13 @@ SNSBEGIN
 				ATTR_ENUM_VALUE(L"name",OT_NAME)
 			ATTR_ENUM_END(m_orderType)
 			ATTR_SKIN(L"switchSkin",m_switchSkin,TRUE)
-			ATTR_COLOR(L"colorGroup",m_crGroup,FALSE)
-			ATTR_COLOR(L"colorItem",m_crItem,FALSE)
-			ATTR_COLOR(L"colorItemText",m_crItemText,FALSE)
-			ATTR_COLOR(L"colorItemSel",m_crItemSel,FALSE)
-			ATTR_COLOR(L"colorItemBorder",m_crItemBorder,FALSE)
+			ATTR_COLOR(L"colorGroup",m_crGroup,TRUE)
+			ATTR_COLOR(L"colorTitle",m_crTitle,TRUE)
+			ATTR_COLOR(L"colorTitleSel",m_crTitleSel,TRUE)
+			ATTR_COLOR(L"colorTitleText",m_crTitleText,TRUE)
+			ATTR_COLOR(L"colorTitleTextSel",m_crTitleTextSel,TRUE)
+			ATTR_COLOR(L"colorItem",m_crItem,TRUE)
+			ATTR_COLOR(L"colorItemBorder",m_crItemBorder,TRUE)
 		SOUI_ATTRS_END()
 
 	protected:
@@ -113,13 +136,13 @@ SNSBEGIN
 		ITEMPART HitTest(int iItem, const CPoint &pt);
 		void SortItems(SList<IPropertyItem*> & lstItems);
 
-		virtual BOOL CreateChildren(SXmlNode xmlNode);
+		virtual BOOL CreateChildren(SXmlNode xmlNode) override;
+		virtual BOOL WINAPI FireEvent(IEvtArgs *evt) override;
+		virtual UINT WINAPI OnGetDlgCode() const{return SC_WANTALLKEYS;}
 
 		virtual void DrawItem(IRenderTarget *pRT, CRect &rc, int iItem);
-		virtual UINT WINAPI OnGetDlgCode() const{return SC_WANTALLKEYS;}
 		virtual BOOL OnSetCursor(const CPoint &pt);
 		virtual BOOL OnScroll(BOOL bVertical,UINT uCode,int nPos);
-
 
 		void OnLButtonDown(UINT nFlags,CPoint pt);
 		void OnLButtonUp(UINT nFlags,CPoint pt);
@@ -142,9 +165,12 @@ SNSBEGIN
 		void OnItemValueChanged(IPropertyItem *pItem);
 		void OnItemInvalidate(IPropertyItem *pItem);
 		void OnItemButtonClick(IPropertyItem *pItem);
+
+		BOOL OnTextChanged(IEvtArgs *e);
 	protected:
 		SWindow *   m_pInplaceActiveWnd;    //属性内嵌的窗口
-
+		SAutoRefPtr<IPropertyItem>  m_pActiveItem;
+        SSearchDropdownList *m_pSearchDropdownList; //搜索下拉列表框，用于自动完成功能。
 	protected:
 		BOOL OnSelChanged(IEvtArgs *pEvt);
 		BOOL OnCmdBtnClicked(IEvtArgs *pEvt);
@@ -162,19 +188,22 @@ SNSBEGIN
 		int m_nTitleWidth;    //属性名占用空间
 		ORDERTYPE   m_orderType;
 		SList<SPropertyGroup *> m_lstGroup; //根分类列表
-		ISkinObj  *  m_switchSkin;
+		SAutoRefPtr<ISkinObj >   m_switchSkin;
 		SWindow   *  m_pCmdBtn; //有弹出按钮的表项使用的按钮
 
 		CPoint      m_ptDrag;
 		BOOL        m_bDraging;
 
-		COLORREF m_crGroup;       //Group背景颜色
-		COLORREF m_crItem;        //Item背景颜色
-		COLORREF m_crItemText;    //Item文本颜色
-		COLORREF m_crItemSel;     //Item选中时的背景色
+		COLORREF m_crGroup;     
+		COLORREF m_crTitle;     
+		COLORREF m_crTitleSel;  
+		COLORREF m_crTitleText; 
+		COLORREF m_crTitleTextSel; 
+		COLORREF m_crItem;
 		COLORREF m_crItemBorder;      //边框颜色
 
 		SXmlDoc m_inplaceItemProp;
+		SXmlDoc m_autoCompleteStyle;
 	};
 
 SNSEND

@@ -5,6 +5,8 @@
 
 SNSBEGIN
 
+#define IDC_DROPDOWN_LIST -200
+
 class SDropDownWnd;
 
 /**

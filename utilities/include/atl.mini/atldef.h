@@ -24,7 +24,7 @@
 #endif // ATLASSUME
 
 #ifndef ATL_NO_VTABLE
-#ifdef _WIN32
+#if  defined(_WIN32) && !defined(__MINGW32__)
 #define ATL_NO_VTABLE    __declspec(novtable)
 #else
 #define ATL_NO_VTABLE

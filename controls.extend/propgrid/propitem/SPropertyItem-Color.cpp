@@ -62,43 +62,15 @@ SPropertyItemColor::SPropertyItemColor(SPropertyGrid *pOwner) :SPropertyItemText
     void SPropertyItemColor::OnInplaceActive(BOOL bActive)
     {
         SPropertyItemText::OnInplaceActive(bActive);
-        if(bActive)
-        {
-            LRESULT lr=m_pEdit->SSendMessage(EM_SETEVENTMASK,0,ENM_CHANGE);
-        }
-    }
 
-    bool SPropertyItemColor::OnReNotify(IEvtArgs *pEvt)
-    {
-        EventRENotify *pReEvt = (EventRENotify*)pEvt;
-        if(pReEvt->iNotify == EN_CHANGE)
-        {
-			SStringT strValue=m_pEdit->GetWindowText();
-			int r,g,b,a;
-			int nGet=_stscanf(strValue,m_strFormat,&r,&g,&b,&a);
-			if(nGet==4)
-			{
-			m_crValue = RGBA(r,g,b,a);
-			CRect rcColor;
-			m_pEdit->GetWindowRect(&rcColor);
-			rcColor.right=rcColor.left;
-			rcColor.left -= rcColor.Height();
-			m_pOwner->InvalidateRect(&rcColor);
-			}
-        }
-        return true;
     }
-    
-
     void SPropertyItemColor::SetValue( const SStringT & strValue )
     {
-		COLORREF crTmp;
-		crTmp = CR_INVALID;
-		SColorParser::ParseValue(S_CT2W(strValue),crTmp);
+		COLORREF crTmp = m_pOwner->ConvertColor(strValue,CR_INVALID);
 		if (m_crValue != crTmp)
 		{
 			m_crValue = crTmp;
-			OnValueChanged();
+            __baseCls::SetValue(strValue);
 		}
     }
 
@@ -126,18 +98,7 @@ SPropertyItemColor::SPropertyItemColor(SPropertyGrid *pOwner) :SPropertyItemText
 	{
 		if(!bCancel)
 		{
-			COLORREF crTmp = cr|0xff000000;
-
-		  if (m_crValue == crTmp)
-		  {
-			  return;
-		  }else
-		  {
-			  m_crValue = crTmp;
-		  }
-		  OnValueChanged();
-		  CRect rc=GetOwner()->GetItemRect(this);
-		  GetOwner()->InvalidateRect(&rc);
+			SetValue(SStringT().Format(_T("#%02x%02x%02x"),GetRValue(cr),GetGValue(cr),GetBValue(cr)));
 		}
 	}
 
@@ -152,15 +113,7 @@ SPropertyItemColor::SPropertyItemColor(SPropertyGrid *pOwner) :SPropertyItemText
 		{
 			return _T("");
 		}
-
-		SStringT str;
-		int r,g,b,a;
-		r = GetRValue(m_crValue);
-		g = GetGValue(m_crValue);
-		b = GetBValue(m_crValue);
-		a = GetAValue(m_crValue);
-		str.Format(m_strFormat,r,g,b,a);
-		return str;
+        return __baseCls::GetValue();
 	}
 
 	BOOL SPropertyItemColor::HasValue() const

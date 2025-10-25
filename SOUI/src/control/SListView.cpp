@@ -883,6 +883,7 @@ BOOL SListView::CreateChildren(SXmlNode xmlNode)
     SXmlNode xmlTemplate = xmlNode.child(L"template");
     if (xmlTemplate)
     {
+        m_xmlTemplate.Reset();
         m_xmlTemplate.root().append_copy(xmlTemplate);
         LPCWSTR kItemSize = m_bVertical ? L"itemHeight" : L"itemWidth";
         SLayoutSize nItemHei = GETLAYOUTSIZE(xmlTemplate.attribute(kItemSize).value());

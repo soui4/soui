@@ -784,6 +784,7 @@ BOOL STileView::CreateChildren(SXmlNode xmlNode)
     SXmlNode xmlTemplate = xmlNode.child(L"template");
     if (xmlTemplate)
     {
+        m_xmlTemplate.Reset();
         m_xmlTemplate.root().append_copy(xmlTemplate);
         {
             //创建一个定位器

@@ -163,6 +163,13 @@ DECLARE_INTERFACE(IXmlNode)
     STDMETHOD_(const wchar_t*, Text)(CTHIS) SCONST PURE;
 
     /**
+     * @brief Sets the name of the node.
+     * @param name The name of the node.
+     * @return S_OK if successful, or an error code otherwise.
+     */
+    STDMETHOD_(BOOL, SetText)(THIS_ const wchar_t* text) PURE;
+    
+    /**
      * @brief Sets user-defined data associated with the node.
      * @param data User-defined data.
      * @return TRUE if successful, FALSE otherwise.

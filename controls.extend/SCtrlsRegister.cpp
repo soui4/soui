@@ -21,9 +21,11 @@
 #include <SScrollText.h>
 #include "SHexEdit.h"
 #include "hellocharts/SHelloCharts.h"
+#include "propgrid/SPropertyGrid.h"
+#include "gridctrl/SGridCtrl.h"
+#include "SToolBar.h"
 
-namespace SOUI{
-
+SNSBEGIN
 
 void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 {
@@ -41,7 +43,9 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SGroupList>();
 	theApp->RegisterWindowClass<SScrollText>();
 	theApp->RegisterWindowClass<SHexEdit>();
-
+	theApp->RegisterWindowClass<SPropertyGrid>();
+	theApp->RegisterWindowClass<SGridCtrl>();
+	theApp->RegisterWindowClass<SToolBar>();
 	// Register HelloCharts controls
 	SHelloChartsRegister::RegisterControls(theApp);
 
@@ -53,4 +57,4 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 }
 
 
-}
+SNSEND

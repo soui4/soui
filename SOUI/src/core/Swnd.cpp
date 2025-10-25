@@ -865,7 +865,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
             }
             else
             {
-                SASSERT(FALSE);
+                SSLOGW() << "load include file failed, file name=" << strSrc;
             }
         }
         else if (!xmlChild.get_userdata()) //通过userdata来标记一个节点是否可以忽略

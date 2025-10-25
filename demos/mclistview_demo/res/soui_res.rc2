@@ -1,0 +1,16 @@
+//stamp:01dc3f4535ff4a4c
+/*<------------------------------------------------------------------------------------------------->*/
+#define DEFINE_UIRES(name, type, file_path)\
+    name type file_path
+
+DEFINE_UIRES(XML_INIT,	UIDEF,	"uires/uidef/init.xml")
+DEFINE_UIRES(string,	values,	"uires/values/string.xml")
+DEFINE_UIRES(color,	values,	"uires/values/color.xml")
+DEFINE_UIRES(skin,	values,	"uires/values/skin.xml")
+DEFINE_UIRES(dlg.student.sms,	layout,	"uires/layout/dlg.student.sms.xml")
+DEFINE_UIRES(logo,	icon,	"uires/icon/logo.ico")
+DEFINE_UIRES(cmn.scrollbar,	imgx,	"uires/imgx/cmn.scrollbar.png")
+DEFINE_UIRES(cmn.border,	image,	"uires/image/cmn.border[2{2,2}].png")
+DEFINE_UIRES(sms.help,	image,	"uires/image/sms.help.png")
+DEFINE_UIRES(sms.record,	image,	"uires/image/sms.record.png")
+DEFINE_UIRES(sms.search,	image,	"uires/image/sms.search.png")

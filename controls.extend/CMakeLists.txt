@@ -12,16 +12,10 @@ include_directories(${PROJECT_SOURCE_DIR}/third-part/Scintilla/include)
 include_directories(${PROJECT_SOURCE_DIR}/third-part/wke/include)
 file(GLOB_RECURSE CTRLS_SRC ${PROJECT_SOURCE_DIR}/controls.extend/*.*)
 
-set(CURRENT_SRCS
-    SCtrlsRegister.cpp
-)
  
-set(CURRENT_HEADERS
-    stdafx.h
-    SCtrlsRegister.h
-)
- 
-add_library(ExtendCtrls STATIC ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CTRLS_SRC})
+add_library(ExtendCtrls STATIC ${CTRLS_SRC})
+
+target_link_libraries(ExtendCtrls soui4 utilities4)
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
 target_compile_options(ExtendCtrls PRIVATE -fPIC)

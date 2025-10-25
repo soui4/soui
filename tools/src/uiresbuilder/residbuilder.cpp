@@ -440,7 +440,7 @@ void ParseLayout(TiXmlElement *xmlNode,map<wstring,int> &vecName2ID,int & nStart
 			}
 		}else
 		{
-			printf("Warning!!! a empty name was assigned to a window object!");
+			printf("Warning!!! a empty name was assigned to a window object!\n");
 		}
     }
     TiXmlElement *pChild = xmlNode->FirstChildElement();

@@ -1,7 +1,7 @@
 ﻿<SOUI name="svr" title="@string/server" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="appMain"
 appWnd="0"
 translucent="1"
-toolWindow="1"
+toolWindow="0"
 >
 	<root skin="_skin.sys.wnd.bkgnd" cache="1"  width="600" height="400" layout="vbox">
 		<caption size="-2,30">

@@ -51,7 +51,7 @@ SWindow *SDropDownWnd::GetDropDownOwner()
 BOOL SDropDownWnd::Create(LPCRECT lpRect, LPVOID lParam, DWORD dwStyle, DWORD dwExStyle)
 {
     HWND hParent = m_pOwner->GetDropDownOwner()->GetContainer()->GetHostHwnd();
-    HWND hWnd = SNativeWnd::CreateNative(NULL, dwStyle, dwExStyle, lpRect->left, lpRect->top, lpRect->right - lpRect->left, lpRect->bottom - lpRect->top, hParent, 0, NULL);
+    HWND hWnd = SNativeWnd::CreateNative(NULL, dwStyle, dwExStyle, lpRect->left, lpRect->top, lpRect->right - lpRect->left, lpRect->bottom - lpRect->top, hParent, 0, lParam);
     if (!hWnd)
         return FALSE;
     GetMsgLoop()->AddMessageFilter(this);
@@ -65,7 +65,15 @@ void SDropDownWnd::OnLButtonDown(UINT nFlags, CPoint point)
     SNativeWnd::GetClientRect(&rcWnd);
     if (!rcWnd.PtInRect(point))
     {
+        ClientToScreen(&point);
+        HWND hwndTarget = WindowFromPoint(point);
         EndDropDown();
+        if (hwndTarget)
+        {
+            CPoint ptTarget = point;
+            ::ScreenToClient(hwndTarget, &ptTarget);
+            ::SendMessage(hwndTarget, WM_LBUTTONDOWN, nFlags, MAKELPARAM(ptTarget.x, ptTarget.y));
+        }
     }
     else
     {

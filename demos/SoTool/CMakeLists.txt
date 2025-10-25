@@ -12,7 +12,7 @@ include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
 file(GLOB CURRENT_HEADERS  *.h *.hpp)
 file(GLOB CURRENT_SRCS  *.cpp)
-file(GLOB_RECURSE CURRENT_SOUIS  *.xml *.idx *.ico)
+file(GLOB_RECURSE CURRENT_SOUIS  uires/*.*)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})

@@ -216,4 +216,24 @@ class SPropCombobox: public SComboBox
 		return value;
 	}
 
+    void SPropertyItemOption::ClearOptions()
+    {
+		m_options.RemoveAll();
+    }
+
+	void SPropertyItemOption::AddOption(const SStringT & strOption)
+	{
+		m_options.Add(strOption);
+	}
+
+	int SPropertyItemOption::GetOptionCount() const
+	{
+		return m_options.GetCount();
+	}
+
+	SStringT SPropertyItemOption::GetOption(int iIndex) const
+	{
+		return m_options[iIndex];
+	}
+
 SNSEND

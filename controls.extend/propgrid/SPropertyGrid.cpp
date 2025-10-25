@@ -7,6 +7,7 @@
 #include "propitem/SPropertyItem-Size.h"
 #include "propitem/SPropertyItem-Rect.h"
 
+#define IDC_AUTOCOMPLETE_DROPLIST -400
 SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 IPropertyItem *SPropertyGrid::CreateItem(const SStringW &strName)
@@ -57,18 +58,21 @@ SPropertyGrid::SPropertyGrid(void)
     , m_pInplaceActiveWnd(NULL)
     , m_crGroup(RGBA(233, 236, 250, 255))
     , m_crItemBorder(m_crGroup)
-    , m_crItem(CR_INVALID)
-    , m_crItemText(RGBA(0, 0, 0, 255))
-    , m_crItemSel(RGBA(0, 120, 215, 255))
+    , m_crTitle(CR_INVALID)
+    , m_crTitleSel(CR_INVALID)
+    , m_crTitleText(RGBA(0, 0, 0, 255))
+    , m_crTitleTextSel(CR_INVALID)
+	, m_crItem(RGBA(255,255,255,255))
     , m_orderType(OT_GROUP)
+    , m_pSearchDropdownList(NULL)
 {
-    //注册事件
-    // 1、item的值改变的时候响应
-    // 2、Sel改变的时候响应
     GetEventSet()->addEvent(EVENTID(EventPropGridValueChanged));
     GetEventSet()->addEvent(EVENTID(EventPropGridItemButtonClick));
     GetEventSet()->addEvent(EVENTID(EventPropGridItemActive));
     GetEventSet()->addEvent(EVENTID(EventPropGridItemInplaceInit));
+    GetEventSet()->addEvent(EVENTID(EventPropGridItemAutoCompleteFill));
+    GetEventSet()->addEvent(EVENTID(EventPropGridItemAutoCompleteSelected));
+    GetEventSet()->addEvent(EVENTID(EventPropGridConvertColor));
 
     GetEventSet()->subscribeEvent(EventLBSelChanged::EventID,
                                   Subscriber(&SPropertyGrid::OnSelChanged, this));
@@ -111,7 +115,9 @@ int SPropertyGrid::IndexOfPropertyItem(const IPropertyItem *pItem) const
 CRect SPropertyGrid::GetItemRect(IPropertyItem *pItem) const
 {
     int idx = IndexOfPropertyItem(pItem);
-    SASSERT(idx != -1);
+	if(idx == -1){
+		return CRect();
+	}
     int iTopIdx = GetTopIndex();
 
     int nItemHei = m_itemHeight.toPixelSize(GetScale());
@@ -260,10 +266,9 @@ void SPropertyGrid::DrawItem(IRenderTarget *pRT, CRect &rc, int iItem)
     rcTitle.left = rcSwitch.right;
     rcTitle.right = rcTitle.left + m_nTitleWidth;
     pRT->FillSolidRect(rcSwitch, m_crGroup);
+    BOOL bSel = iItem == SListBox::GetCurSel();
     pRT->FillSolidRect(rcTitle,
-                       iItem == SListBox::GetCurSel()
-                           ? m_crItemSel
-                           : (pItem->GetType() == PT_GROUP ? m_crGroup : m_crItem));
+                       bSel ? m_crTitleSel : (pItem->GetType() == PT_GROUP ? m_crGroup : m_crTitle));
     int iLevel = pItem->GetLevel();
     if (iLevel > 1)
         rcSwitch.OffsetRect(rcSwitch.Width() * (iLevel - 1), 0);
@@ -281,12 +286,15 @@ void SPropertyGrid::DrawItem(IRenderTarget *pRT, CRect &rc, int iItem)
     rcText.left = rcSwitch.right;
 
     SStringT strTitle = pItem->GetTitle();
+    COLORREF crText = (bSel && m_crTitleTextSel != CR_INVALID) ? m_crTitleTextSel : m_crTitleText;
+    COLORREF oldColor = pRT->SetTextColor(crText);
     pRT->DrawText(strTitle, strTitle.GetLength(), rcText, DT_SINGLELINE | DT_VCENTER);
+    pRT->SetTextColor(oldColor);
     CRect rcItem = rc;
     rcItem.left = rcTitle.right + 1;
+    pRT->FillSolidRect(rcItem, m_crItem);
     if (pItem->HasButton())
         rcItem.right -= rcItem.Height();
-
     pItem->DrawItem(pRT, rcItem); //绘制Item
 
     SAutoRefPtr<IPenS> pen, oldPen;
@@ -328,9 +336,17 @@ BOOL SPropertyGrid::CreateChildren(SXmlNode xmlNode)
     InsertChild(m_pCmdBtn);
     m_pCmdBtn->InitFromXml(&xmlCmdBtn);
     m_pCmdBtn->SetVisible(FALSE);
-    m_pCmdBtn->GetEventSet()->subscribeEvent(EventCmd::EventID,
-                                             Subscriber(&SPropertyGrid::OnCmdBtnClicked, this));
-
+    m_pCmdBtn->GetEventSet()->subscribeEvent(EventCmd::EventID, Subscriber(&SPropertyGrid::OnCmdBtnClicked, this));
+    SXmlNode xmlAutoComplete = xmlNode.child(L"autoCompleteStyle");
+    if(xmlAutoComplete){
+        m_pSearchDropdownList = (SSearchDropdownList*)CreateChildByName(SSearchDropdownList::GetClassName());
+        InsertChild(m_pSearchDropdownList);
+        m_pSearchDropdownList->InitFromXml(&xmlAutoComplete);
+        m_pSearchDropdownList->SetOwner(this);
+        m_pSearchDropdownList->SetID(IDC_AUTOCOMPLETE_DROPLIST);
+        m_autoCompleteStyle.root().append_copy(xmlAutoComplete);
+    }
+    // load inplace item style
     SXmlNode xmlProp = xmlNode.first_child();
     while (xmlProp)
     {
@@ -340,9 +356,48 @@ BOOL SPropertyGrid::CreateChildren(SXmlNode xmlNode)
         }
         xmlProp = xmlProp.next_sibling();
     }
+
     SXmlNode xmlGroups = xmlNode.child(L"groups");
     LoadFromXml(xmlGroups);
     return TRUE;
+}
+
+BOOL SPropertyGrid::FireEvent(IEvtArgs *evt)
+{
+    if (evt->IdFrom() == IDC_AUTOCOMPLETE_DROPLIST && m_pActiveItem)
+    {
+        if(evt->GetID() == EventDropdownListFill::EventID){
+            EventPropGridItemAutoCompleteFill e(this);
+            e.pItem = m_pActiveItem;
+            e.pOriginEvt = evt;
+            SStringW strType = m_pActiveItem->GetExtendType();
+            SXmlNode lvStyle = m_autoCompleteStyle.root().first_child().child(L"liststyles").child(strType);
+            if(!lvStyle){
+                lvStyle = m_autoCompleteStyle.root().first_child().child(L"liststyles").child(L"default");
+                SASSERT(lvStyle);
+            }
+            if(lvStyle){
+                //apply listview style for different prop item type.
+                EventDropdownListFill *e2 = sobj_cast<EventDropdownListFill>(evt);            
+                e2->pListView->ToIWindow()->InitFromXml(&lvStyle);
+            }
+            return __baseCls::FireEvent(&e);
+        }else if(evt->GetID() == EventDropdownListSelected::EventID){
+            EventPropGridItemAutoCompleteSelected e(this);
+            e.pItem = m_pActiveItem;
+            e.pOriginEvt = evt;
+            __baseCls::FireEvent(&e);
+            return TRUE;
+        }else if(evt->GetID() == EventDropdownListGetBuddyRect::EventID){
+            EventDropdownListGetBuddyRect *e2 = sobj_cast<EventDropdownListGetBuddyRect>(evt);
+            CRect rcItem = GetItemRect(m_pActiveItem);
+            rcItem.left += rcItem.Height() + m_nTitleWidth;
+            e2->rcBuddy = rcItem;
+            return TRUE;
+        }
+        return FALSE;
+    }
+    return __baseCls::FireEvent(evt);
 }
 
 void SPropertyGrid::OnSize(UINT nType, CSize size)
@@ -409,7 +464,7 @@ void SPropertyGrid::OnLButtonDown(UINT nFlags, CPoint pt)
                 {
                     EventPropGridItemActive evt(this);
                     evt.pItem = pItem;
-                    FireEvent(evt);
+                    FireEvent(&evt);
 
                     pItem->OnInplaceActive(TRUE);
                 }
@@ -421,7 +476,7 @@ void SPropertyGrid::OnLButtonDown(UINT nFlags, CPoint pt)
                 {
                     EventPropGridItemActive evt(this);
                     evt.pItem = pItem;
-                    FireEvent(evt);
+                    FireEvent(&evt);
                 }
             }
         }
@@ -551,11 +606,21 @@ void SPropertyGrid::OnInplaceActiveWndCreate(IPropertyItem *pItem, SWindow *pWnd
     CRect rcValue = GetInplaceWndPos(pItem);
     pWnd->Move(rcValue);
     m_pInplaceActiveWnd = pWnd;
+    m_pActiveItem = pItem;
 
     EventPropGridItemInplaceInit evt(this);
     evt.pItem = pItem;
     evt.pInplaceWnd = pWnd;
-    FireEvent(evt);
+    FireEvent(&evt);
+
+    if(m_pSearchDropdownList && pItem->IsClass(SPropertyItemText::GetClassName())){
+        SPropertyItemText *pItemText = (SPropertyItemText *)pItem;
+        if(pItemText->IsAutoComplete()){
+            pWnd->GetEventSet()->subscribeEvent(EventRENotify::EventID, Subscriber(&SPropertyGrid::OnTextChanged, this));
+            SStringT strText;
+            m_pSearchDropdownList->DropDown(&strText);
+        }
+    }
 }
 
 void SPropertyGrid::OnInplaceActiveWndDestroy(IPropertyItem *pItem, SWindow *pWnd)
@@ -564,6 +629,7 @@ void SPropertyGrid::OnInplaceActiveWndDestroy(IPropertyItem *pItem, SWindow *pWn
     pWnd->SSendMessage(WM_DESTROY);
     RemoveChild(pWnd);
     m_pInplaceActiveWnd = NULL;
+    m_pActiveItem = NULL;
 }
 
 void SPropertyGrid::UpdateChildrenPos(UINT childs)
@@ -598,13 +664,19 @@ void SPropertyGrid::UpdateChildrenPos(UINT childs)
 
 void SPropertyGrid::OnItemValueChanged(IPropertyItem *pItem)
 {
+    OnItemInvalidate(pItem);
     EventPropGridValueChanged evt(this);
     evt.pItem = pItem;
-    FireEvent(evt);
+    FireEvent(&evt);
 }
 
 void SPropertyGrid::RemoveAllItems()
 {
+    if(m_pInplaceActiveWnd){
+		m_pInplaceActiveWnd->KillFocus();
+		SASSERT(m_pInplaceActiveWnd==NULL);
+    }
+    m_pCmdBtn->SetVisible(FALSE);
     SPOSITION pos = m_lstGroup.GetHeadPosition();
     while (pos)
     {
@@ -654,7 +726,7 @@ void SPropertyGrid::OnItemButtonClick(IPropertyItem *pItem)
     {
         EventPropGridItemButtonClick evt(this);
         evt.pItem = pItem;
-        FireEvent(evt);
+        FireEvent(&evt);
     }
 }
 
@@ -704,15 +776,7 @@ COLORREF SPropertyGrid::GetGroupColor() const
 
 void SPropertyGrid::OnItemInvalidate(IPropertyItem *pItem)
 {
-    for (int i = 0; i < GetCount(); i++)
-    {
-        IPropertyItem *p = (IPropertyItem *)GetItemData(i);
-        if (p == pItem)
-        {
-            RedrawItem(i);
-            break;
-        }
-    }
+    InvalidateRect(GetItemRect(pItem));
 }
 
 void SPropertyGrid::EnumProp(FunEnumProp funEnum, void *opaque)
@@ -731,6 +795,25 @@ void SPropertyGrid::EnumProp(FunEnumProp funEnum, void *opaque)
             pItem = pItem->GetItem(IPropertyItem::GPI_NEXTSIBLING);
         }
     }
+}
+
+COLORREF SPropertyGrid::ConvertColor(const SStringT &strValue, COLORREF crDefault)
+{
+    EventPropGridConvertColor evt(this);
+    evt.strValue = strValue;
+    evt.crValue = crDefault;
+    evt.bConverted = FALSE;
+    FireEvent(&evt);
+    if (evt.bConverted)
+        return evt.crValue;
+    SStringW wstrValue=S_CT2W(strValue);
+    if(!SColorParser::ParseValue(wstrValue,evt.crValue))
+    {
+        evt.crValue = GETUIDEF->GetColor(wstrValue);
+        if(evt.crValue == CR_INVALID)
+            evt.crValue = crDefault;
+	}
+    return evt.crValue;
 }
 
 CRect SPropertyGrid::GetInplaceWndPos(IPropertyItem *pItem) const
@@ -823,6 +906,18 @@ HRESULT SPropertyGrid::OnAttrOrderType(const SStringW &strValue, BOOL bLoading)
         return E_INVALIDARG;
     SetOrderType(orderType);
     return bLoading ? S_OK : S_FALSE;
+}
+
+BOOL SPropertyGrid::OnTextChanged(IEvtArgs *e)
+{
+    EventRENotify *e2 = sobj_cast<EventRENotify>(e);
+    if(e2->iNotify != EN_CHANGE) 
+        return FALSE;
+    SASSERT(m_pSearchDropdownList);
+    SWindow *pEdit = sobj_cast<SWindow>(e->Sender());
+    SStringT strText = pEdit->GetWindowText();
+    m_pSearchDropdownList->DropDown(&strText);
+    return TRUE;
 }
 
 SNSEND
