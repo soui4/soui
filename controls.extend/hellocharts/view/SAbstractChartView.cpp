@@ -345,6 +345,49 @@ void SAbstractChartView::InitializeRenderers()
     // Override in derived classes
 }
 
+void SAbstractChartView::onAnimationStart(THIS_ IValueAnimator * pAnimator)
+{
+    SChartDataAnimationStartEvent evt(this);
+    evt.dwDuration = pAnimator->getDuration();
+    FireEvent(evt);
+}
+
+void SAbstractChartView::onAnimationEnd(THIS_ IValueAnimator * pAnimator)
+{
+    AnimationDataFinished();
+    SChartDataAnimationEndEvent evt(this);
+    FireEvent(evt);
+}
+void SAbstractChartView::onAnimationUpdate(THIS_ IValueAnimator * pAnimator)
+{
+    float scale = pAnimator->getAnimatedFraction();
+    OnAnimationUpdate(scale);
+    SChartDataAnimationUpdateEvent evt(this);
+    evt.scale = scale;
+    FireEvent(evt);
+}
+void SAbstractChartView::RefreshAxesMargins()
+{
+    // Recalculate axes margins based on current data
+    if (m_pAxesRenderer)
+    {
+        SAutoRefPtr<IRenderTarget> pRT;
+        GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
+        m_pAxesRenderer->OnChartSizeChanged(pRT);
+    }
+    // Invalidate to trigger repaint with new margins
+    Invalidate();
+}
+
+void SAbstractChartView::OnAnimationUpdate(float scale)
+{
+    SChartData* pChartData = GetChartData();
+    if (pChartData)
+    {
+        pChartData->Update(scale);
+        Invalidate();
+    }
+}
 //////////////////////////////////////////////////////////////////////////
 // SChartTouchHandler implementation
 
@@ -492,48 +535,6 @@ void SChartTouchHandler::HandleZoom(float scaleFactor, CPoint center)
     m_pChart->SetCurrentViewport(newViewport);
 }
 
-void SAbstractChartView::onAnimationStart(THIS_ IValueAnimator * pAnimator)
-{
-    SChartDataAnimationStartEvent evt(this);
-    evt.dwDuration = pAnimator->getDuration();
-    FireEvent(evt);
-}
 
-void SAbstractChartView::onAnimationEnd(THIS_ IValueAnimator * pAnimator)
-{
-    AnimationDataFinished();
-    SChartDataAnimationEndEvent evt(this);
-    FireEvent(evt);
-}
-void SAbstractChartView::onAnimationUpdate(THIS_ IValueAnimator * pAnimator)
-{
-    float scale = pAnimator->getAnimatedFraction();
-    OnAnimationUpdate(scale);
-    SChartDataAnimationUpdateEvent evt(this);
-    evt.scale = scale;
-    FireEvent(evt);
-}
-void SAbstractChartView::RefreshAxesMargins()
-{
-    // Recalculate axes margins based on current data
-    if (m_pAxesRenderer)
-    {
-        SAutoRefPtr<IRenderTarget> pRT;
-        GETRENDERFACTORY->CreateRenderTarget(&pRT, 0, 0);
-        m_pAxesRenderer->OnChartSizeChanged(pRT);
-    }
-    // Invalidate to trigger repaint with new margins
-    Invalidate();
-}
-
-void SAbstractChartView::OnAnimationUpdate(float scale)
-{
-    SChartData* pChartData = GetChartData();
-    if (pChartData)
-    {
-        pChartData->Update(scale);
-        Invalidate();
-    }
-}
 
 SNSEND
