@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "DesignWnd.h"
 #include "../XmlEditor.h"
 
@@ -7,6 +7,7 @@ CDesignWnd::CDesignWnd(LPCTSTR pszLayoutId)
 :SHostWnd(pszLayoutId)
 ,m_previewHost(NULL)
 ,m_pXmlEditor(NULL)
+,m_nDelta(0)
 {
 }
 
@@ -158,6 +159,21 @@ void CDesignWnd::OnRePos(const POINT *pt)
 	SetWindowPos(0,pt->x,pt->y,0,0,SWP_NOSIZE|SWP_NOZORDER);
 }
 
+BOOL CDesignWnd::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
+{
+	m_nDelta += zDelta;
+	int nDelta = m_nDelta / WHEEL_DELTA; // 1个滚动单位为120个delta值
+	m_nDelta %= WHEEL_DELTA; // 一个滚动单位的delta值，下次滚动时，需要减去这个值，才能得到正确的滚动值。
+	for(int i=0, cnt=abs(nDelta);i<cnt;i++){
+		if(GetKeyState(VK_MENU)&0x8000)
+		{
+			OnScroll(SB_HORZ,zDelta>0?SB_LINEUP:SB_LINEDOWN,0,NULL);
+		}else{
+			OnScroll(SB_VERT,zDelta>0?SB_LINEUP:SB_LINEDOWN,0,NULL);
+		}
+	}
+	return TRUE;
+}
 void CDesignWnd::OnSelectedCtrl(const int *pOrder, int nLen)
 {
 	m_pXmlEditor->OnSelectedCtrl(pOrder,nLen);

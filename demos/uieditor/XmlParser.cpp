@@ -38,6 +38,11 @@ spugi::xml_node CXmlParser::_findNodeRange(spugi::xml_node node, int pos)
 		spugi::xml_node child = node.first_child();
 		while(child)
 		{
+            if (child.type() != spugi::node_element)
+			{
+				child = child.next_sibling();
+				continue;
+            }
 			NodeRange *pChildRange = (NodeRange*)child.get_userdata();
 			if(pChildRange->begin<=pos && pChildRange->end>=pos)
 			{

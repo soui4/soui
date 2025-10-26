@@ -349,8 +349,17 @@ void CXmlEditor::InitPropGrid(const SStringW &strNodeName, SStringW strParents)
                 }
             }
         }
-    }
-    m_pPropGrid->LoadFromXml(xmlNode.child(L"groups"));
+		m_pPropGrid->LoadFromXml(xmlNode.child(L"groups"));
+    }else
+	{
+		//check if strNodeName is a window object
+		IWindow *pWnd = SApplication::getSingletonPtr()->CreateWindowByName(strNodeName);
+		if(pWnd){
+			//using default window property
+			pWnd->Release();
+			InitPropGrid(SWindow::GetClassName(),L"");
+		}
+	}
 }
 
 void CXmlEditor::SelectCtrlByOrder(const int *pOrder,int nLen)

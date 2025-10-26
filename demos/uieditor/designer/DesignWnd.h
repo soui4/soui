@@ -9,6 +9,7 @@ class CDesignWnd : public SHostWnd,IListener
 {
 	CPreviewHost	*m_previewHost;
 	CXmlEditor *m_pXmlEditor;
+	int m_nDelta;
 public:
 	CDesignWnd(LPCTSTR pszLayoutId);
 	~CDesignWnd(void);
@@ -36,10 +37,13 @@ protected:
 	void OnHScroll(int nSBCode, int nPos, HWND hScrollBar);
 	void OnVScroll(int nSBCode, int nPos, HWND hScrollBar);
 	void OnSize(UINT nType, CSize size);
+	BOOL OnMouseWheel(UINT nFlags, short zDelta, CPoint pt);
+
 	BEGIN_MSG_MAP_EX(CDesignWnd)
 		MSG_WM_CREATE(OnCreate)
 		MSG_WM_HSCROLL(OnHScroll)
 		MSG_WM_VSCROLL(OnVScroll)
+		MSG_WM_MOUSEWHEEL(OnMouseWheel)
 		MSG_WM_SIZE(OnSize)
 		CHAIN_MSG_MAP(SHostWnd)
 	END_MSG_MAP()

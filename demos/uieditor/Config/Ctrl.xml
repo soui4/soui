@@ -1,6 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 <root>
+  <user_widgets>
+    <!-- 用户没有注册的自定义控件，自动识别为它的父类型,test_widget为用户自定义的类型,parent为父类型,编辑时自动创建为父类型 -->
+    <test_widget parent="SWindow"/>
+  </user_widgets>
+
   <toolbar>
     <icons class_name="imglist" name="widget_icons" src="file:img/ctrl_icons.png" states="32"/>
   </toolbar>
@@ -635,7 +640,18 @@
         </pane>
       </splitrow>
     </splitrow>
-
+    <pane icon="19" parent="window">
+      <pane idealSize="50" minSize="30" priority="1" clipClient="1">
+      </pane>
+      <groups>
+        <propgroup name="属性:pane">
+           <proptext name="idealSize" extendType="dim" autoComplete="1" description="理想大小"/>
+           <proptext name="minSize" extendType="dim" autoComplete="1" description="最小大小"/>
+           <proptext name="maxSize" extendType="dim" autoComplete="1" description="最大大小"/>
+           <proptext name="priority" extendType="undef" autoComplete="1" description="优先级,值越大优先级越高,优先级越高，窗格越先到达idealSize "/>
+        </propgroup>
+      </groups>
+    </pane>
     <tabctrl icon="20" parent="window">
       <tabctrl  pos="0,0" size="200,200"  tabAlign="left" tabSkin="" tabInterSize="2" tabWidth="70" tabHeight="30" colorText="#FFFFFF" focusable="0" show="1" curSel="0" >
         <page title="页1" tip="提示1">
@@ -667,7 +683,15 @@
         </propgroup>
       </groups>
     </tabctrl>
-
+    <page icon="21" parent="window">
+      <page title="Page 1" layout="vbox"> 
+      </page>
+      <groups>
+        <propgroup name="属性:page">
+          <proptext name ="title" extendType="string" autoComplete="1" description="页标题"/>
+        </propgroup>
+      </groups>
+    </page>
     <tileview icon="22" parent="div">
       <tileview size="120,120"  wantTab="1" marginSize="5" >
         <template itemHeight="130" itemWidth="135" colorHover="#cccccc" colorSelected="#0000ff" trackMouseEvent="1" skin="">

@@ -46,6 +46,8 @@ public:
 	SOUI::SXmlNode getCtrlDefNode();
 
 	SOUI::SXmlNode getSkinDefNode();
+
+	SStringW GetUserWidgetParent(SStringW strWidgetName) const;
 private:
 	void _GetSkinAttrs(SStringW skinName,std::set<SStringW> &attrs);
 	void _GetCtrlAttrs(SStringW skinName,std::set<SStringW> &attrs);
@@ -53,6 +55,5 @@ private:
 	SOUI::SXmlDoc m_xmlCtrlDef;
 
 	SOUI::SXmlDoc m_xmlSkinProp;
-
 	SStringT m_strConfigDir;
 };

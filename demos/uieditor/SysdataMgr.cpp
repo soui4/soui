@@ -73,6 +73,18 @@ SOUI::SXmlNode CSysDataMgr::getSkinDefNode()
 	return m_xmlSkinProp.root().child(L"root");
 }
 
+SStringW CSysDataMgr::GetUserWidgetParent(SStringW strWidgetName) const
+{
+    SXmlNode xmlUserWidgets = m_xmlCtrlDef.root().child(L"root").child(L"user_widgets");
+	if(xmlUserWidgets){
+		SXmlNode xmlWidget = xmlUserWidgets.child(strWidgetName);
+		if(xmlWidget){
+			return xmlWidget.attribute(L"parent").value();
+		}
+	}
+	return L"";
+}
+
 SOUI::SStringT CSysDataMgr::GetConfigDir() const
 {
 	return m_strConfigDir;

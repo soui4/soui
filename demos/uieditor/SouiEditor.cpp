@@ -11,7 +11,7 @@
 #include "SCtrlsRegister.h"
 #include "AttrStorage.h"
 #include "designer/SizingFrame.h"
-
+#include "SysdataMgr.h"
 #pragma comment(lib, "shlwapi.lib")
 
 
@@ -23,13 +23,38 @@
 static const TCHAR *kPath_SysRes = _T("/soui-sys-resource.zip");
 static const TCHAR *kPath_AppRes = _T("/uieditor_uires");
 
+class CUiEditorApp : public SApplication
+{
+public:
+    CUiEditorApp(HINSTANCE hInst):SApplication(hInst)
+    {
+    }
+
+    ~CUiEditorApp()
+    {
+    }
+
+    public:
+    virtual IWindow *CreateWindowByName(LPCWSTR pszWndClass) const{
+        IWindow *pRet = SApplication::CreateWindowByName(pszWndClass);
+        if(pRet)
+            return pRet;
+        SStringW strParent = CSysDataMgr::getSingleton().GetUserWidgetParent(pszWndClass);
+        if(!strParent.IsEmpty())
+        {
+            return SApplication::CreateWindowByName(strParent);
+        }
+        return NULL;
+    }
+};
+
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int /*nCmdShow*/)
 {
     HRESULT hRes = OleInitialize(NULL);
     SASSERT(SUCCEEDED(hRes));
     int nRet = 0;
 
-    SApplication theApp(hInstance);
+    CUiEditorApp theApp(hInstance);
 
     SStringT appDir = theApp.GetAppDir();
     SetCurrentDirectory(appDir);
