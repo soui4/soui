@@ -6,7 +6,6 @@
 #include "CmdLine.h"
 #include <helper/SAppDir.h>
 #include <interface/SMessageBox-i.h>
-#include <zipresprovider-param.h>
 #include <SAppCfg.h>
 #include "SCtrlsRegister.h"
 #include "AttrStorage.h"

@@ -26,6 +26,7 @@
 // Include stddef.h for size_t and ptrdiff_t
 #include <stddef.h>
 #include <stdio.h>
+#include <windows.h>
 // Include exception header for XPath
 #if !defined(SPUGIXML_NO_XPATH) && !defined(SPUGIXML_NO_EXCEPTIONS)
 #	include <exception>
