@@ -33,9 +33,10 @@ spugi::xml_node CXmlParser::_findNodeRange(spugi::xml_node node, int pos)
 	if(!node)
 		return spugi::xml_node();
 	NodeRange *pRange = (NodeRange*)node.get_userdata();
-	if(pRange->begin<=pos && pRange->end>=pos)
+	if(pRange->begin<=pos && pRange->end>pos)
 	{
 		spugi::xml_node child = node.first_child();
+        spugi::xml_node ret = node;
 		while(child)
 		{
             if (child.type() != spugi::node_element)
@@ -44,13 +45,18 @@ spugi::xml_node CXmlParser::_findNodeRange(spugi::xml_node node, int pos)
 				continue;
             }
 			NodeRange *pChildRange = (NodeRange*)child.get_userdata();
-			if(pChildRange->begin<=pos && pChildRange->end>=pos)
+			if(pChildRange->begin<=pos && pChildRange->end>pos)
 			{
 				return _findNodeRange(child,pos);
+            }
+            else if (pChildRange->begin > pos)
+			{
+                break;
 			}
+            ret = child;
 			child = child.next_sibling();
 		}
-		return node;
+		return ret;
 	}else{
 		return spugi::xml_node();
 	}

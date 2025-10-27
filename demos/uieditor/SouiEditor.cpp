@@ -35,7 +35,7 @@ public:
     }
 
     public:
-    virtual IWindow *CreateWindowByName(LPCWSTR pszWndClass) const{
+    IWindow *CreateWindowByName(LPCWSTR pszWndClass) const override{
         IWindow *pRet = SApplication::CreateWindowByName(pszWndClass);
         if(pRet)
             return pRet;
@@ -43,6 +43,18 @@ public:
         if(!strParent.IsEmpty())
         {
             return SApplication::CreateWindowByName(strParent);
+        }
+        return NULL;
+    }
+
+    ISkinObj *CreateSkinByName(LPCWSTR pszSkinClass) const override{
+        ISkinObj *pRet = SApplication::CreateSkinByName(pszSkinClass);
+        if(pRet)
+            return pRet;
+        SStringW strParent = CSysDataMgr::getSingleton().GetUserSkinParent(pszSkinClass);
+        if(!strParent.IsEmpty())
+        {
+            return SApplication::CreateSkinByName(strParent);
         }
         return NULL;
     }

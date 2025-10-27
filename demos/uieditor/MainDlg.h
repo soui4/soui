@@ -13,7 +13,7 @@
 #include <control/STreeCtrl.h>
 #include "DropTarget.h"
 #include "SToolBar.h"
-
+#include <algorithm>
 #define MenuId_Start  20000
 
 
@@ -32,6 +32,9 @@ public:
 	};
 	SAutoRefPtr<SSkinPool> m_skinPool;
 public:
+	static bool Compare(const IconInfo &a,const IconInfo &b){
+		return a.strTxt < b.strTxt;
+	}
 	CWidgetTBAdapter(SXmlNode xmlNode,IListener* pListener):m_pListener(pListener)
 	{
 		m_skinPool.Attach(new SSkinPool());
@@ -64,6 +67,8 @@ public:
 			}
 			xmlWidget = xmlWidget.next_sibling();
 		}
+		//sort m_arrIcons by strTxt
+		std::sort(m_arrIcons.GetData(),m_arrIcons.GetData()+m_arrIcons.GetCount(),Compare);
 	}
 	~CWidgetTBAdapter(){
 		SUiDef::getSingleton().PopSkinPool(m_skinPool);
@@ -115,6 +120,9 @@ public:
 	{
 		virtual void OnInertSkin(IconInfo * info) = 0;
 	};
+	static bool Compare(const IconInfo &a,const IconInfo &b){
+		return a.strTxt < b.strTxt;
+	}
 public:
 	~CSkinTBAdapter(){
 		SUiDef::getSingleton().PopSkinPool(m_skinPool);
@@ -148,6 +156,8 @@ public:
 			}
 			xmlSkin = xmlSkin.next_sibling();
 		}
+		//sort m_arrIcons by strTxt
+		std::sort(m_arrIcons.GetData(),m_arrIcons.GetData()+m_arrIcons.GetCount(),Compare);
 	}
 protected:
 	virtual int WINAPI getCount()

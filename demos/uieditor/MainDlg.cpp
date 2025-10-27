@@ -499,10 +499,12 @@ BOOL CMainDlg::OnDrop(LPCTSTR pszName)
 void CMainDlg::OnInsertWidget(CWidgetTBAdapter::IconInfo *info)
 {
 	m_pXmlEdtior->InsertWidget(info->strContent);
+	m_lvWidget->SetSel(-1,FALSE);
 }
 
 void CMainDlg::OnInertSkin(CSkinTBAdapter::IconInfo * info)
 {
+	m_lvSkin->SetSel(-1,FALSE);
 	DlgInsertXmlElement dlg(&m_UIResFileMgr,g_SysDataMgr.getSkinDefNode().child(L"skins"),S_CT2W(info->strElement));
 	if(IDOK==dlg.DoModal())
 	{

@@ -7,7 +7,7 @@
   </user_widgets>
 
   <toolbar>
-    <icons class_name="imglist" name="widget_icons" src="file:img/ctrl_icons.png" states="32"/>
+    <icons class_name="imglist" name="widget_icons" src="file:img/ctrl_icons.png" states="37"/>
   </toolbar>
   <controls>
     <!-- pos和size都不是必须的，设计器根据鼠标按下的位置设置pos -->
@@ -619,7 +619,7 @@
         </propgroup>
       </groups>
     </splitwnd>
-    <splitcol icon="19" parent="splitwnd">
+    <splitcol icon="32" parent="splitwnd">
       <splitcol  size="300,300" sepSize="6">
         <pane idealSize="50" minSize="30" priority="1" clipClient="1">
         </pane>
@@ -630,7 +630,7 @@
       </splitcol>
     </splitcol>
 
-    <splitrow icon="19" parent="splitwnd">
+    <splitrow icon="33" parent="splitwnd">
       <splitrow  size="300,300" sepSize="6">
         <pane idealSize="50" minSize="30" priority="1" clipClient="1">
         </pane>
@@ -683,7 +683,7 @@
         </propgroup>
       </groups>
     </tabctrl>
-    <page icon="21" parent="window">
+    <page icon="35" parent="window">
       <page title="Page 1" layout="vbox"> 
       </page>
       <groups>
@@ -781,5 +781,35 @@
         </propgroup>
       </groups>
     </hexedit>
+	
+    <stack icon="34" parent="window">
+      <stack pos="0,0" size="200,200" curSel="0" aniType="none">
+        <stackPage aniType="fade">
+          <text pos="10,10">Page 1 Content</text>
+        </stackPage>
+        <stackPage aniType="move">
+          <text pos="10,10">Page 2 Content</text>
+        </stackPage>
+      </stack>
+      <groups>
+        <propgroup name="属性:stack">
+          <proptext name="curSel" extendType="undef" description="当前选中页面索引"/>
+          <propoption name="vertical" extendType="undef" options="是:1|否:0" description="垂直动画"/>
+          <propoption name="aniType" extendType="undef" options="none|fade|move|push" description="动画类型"/>
+          <propoption name="samePageSize" extendType="undef" options="是:1|否:0" description="所有页面大小相同"/>
+        </propgroup>
+      </groups>
+    </stack>
+	
+    <switch icon="36" parent="check">
+      <switch pos="0,0" size="60,30" checked="0"/>
+      <groups>
+        <propgroup name="属性:switch">
+          <proptext name="skin" extendType="skin" autoComplete="1" description="开关皮肤"/>
+          <proptext name="skinforce" extendType="skin" autoComplete="1" description="强制状态皮肤"/>
+          <propoption name="checked" extendType="undef" options="是:1|否:0" description="初始化时的选中状态"/>
+        </propgroup>
+      </groups>
+    </switch>
   </controls>
 </root>

@@ -2,6 +2,10 @@
   <toolbar>
     <icons class_name="imglist" name="skin_icon" src="file:img/skin_icons.png" states="10"/>
   </toolbar>
+  <user_skins>
+    <!-- 项目中使用到的未注册的皮肤对象，在这里配置，用它的父对象来代替 -->
+    <test_skin parent="imglist"/>
+  </user_skins>
   <skins>
     <base visible="0">
       <groups>

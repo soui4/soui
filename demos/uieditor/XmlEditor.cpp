@@ -468,11 +468,14 @@ BOOL CXmlEditor::InsertElement(SStringA xmlElement)
 		return FALSE;
 	if(range.begin!=-1)
 	{
-		if(range._break!=-1)
+		if(pos > range.begin && pos < range.end)
 		{
-			pos = range._break+1;
-		}else{
-			pos = range.end+1;
+			if(range._break!=-1)
+			{
+				pos = range._break;
+			}else{
+				pos = range.end;
+			}
 		}
 		m_pScintillaWnd->SendEditor(SCI_GOTOPOS,pos);
 		m_pScintillaWnd->InsertText(pos,xmlElement.c_str());

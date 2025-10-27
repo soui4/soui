@@ -85,6 +85,18 @@ SStringW CSysDataMgr::GetUserWidgetParent(SStringW strWidgetName) const
 	return L"";
 }
 
+SStringW CSysDataMgr::GetUserSkinParent(SStringW strSkinName) const
+{
+    SXmlNode xmlUserWidgets = m_xmlSkinProp.root().child(L"root").child(L"user_skins");
+	if(xmlUserWidgets){
+		SXmlNode xmlWidget = xmlUserWidgets.child(strSkinName);
+		if(xmlWidget){
+			return xmlWidget.attribute(L"parent").value();
+		}
+	}
+	return L"";
+}
+
 SOUI::SStringT CSysDataMgr::GetConfigDir() const
 {
 	return m_strConfigDir;
