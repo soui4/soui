@@ -371,6 +371,8 @@ public:
 
 	STDMETHOD_(BOOL, hitTestStroke)(CTHIS_ float x,float y,float strokeSize) SCONST OVERRIDE;
 
+	STDMETHOD_(BOOL, op)(CTHIS_ const IPathS *other, PathOP op, IPathS * out) SCONST OVERRIDE;
+
 protected:
 	SkPath      m_skPath;
 };

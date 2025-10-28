@@ -409,7 +409,7 @@ public:
 	STDMETHOD_(void,close)(THIS) OVERRIDE;
 	STDMETHOD_(BOOL,hitTest)(CTHIS_ float x, float y) SCONST OVERRIDE;
 	STDMETHOD_(BOOL,hitTestStroke)(CTHIS_ float x, float y, float strokeSize) SCONST OVERRIDE;
-
+	STDMETHOD_(BOOL, op)(CTHIS_ const IPathS *other, PathOP op, IPathS * out) SCONST OVERRIDE;
 	// Execute all commands on the given HDC
 	void ExecuteCommands(HDC hdc) const;
 	HRGN CreateRegionFromCommands() const;

@@ -25,6 +25,7 @@
 #include "propgrid/SPropertyGrid.h"
 #include "gridctrl/SGridCtrl.h"
 #include "SToolBar.h"
+#include "SLightButton.h"
 
 SNSBEGIN
 
@@ -48,6 +49,7 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SPropertyGrid>();
 	theApp->RegisterWindowClass<SGridCtrl>();
 	theApp->RegisterWindowClass<SToolBar>();
+	theApp->RegisterWindowClass<SLightButton>();
 
 	// Register HelloCharts controls
 	SHelloChartsRegister::RegisterControls(theApp);

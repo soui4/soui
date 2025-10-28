@@ -10,7 +10,7 @@
 #include <core/SkGraphics.h>
 #include <core/SkPathMeasure.h>
 #include <src/effects/SkBlurMask.h>
-
+#include <pathops/SkPathOps.h>
 #include <gdialpha.h>
 
 #include "drawtext-skia.h"
@@ -2740,6 +2740,13 @@ SNSBEGIN
 		return FALSE;
 	}
 
+	BOOL SPath_Skia::op(const IPathS *other,PathOP op,IPathS *out) const{
+		if (!other || !out)
+			return FALSE;
+		const SPath_Skia *pPath2 = (const SPath_Skia*)other;
+		SPath_Skia *pOut = (SPath_Skia*)out;
+		return Op(m_skPath, pPath2->m_skPath, (SkPathOp)op, &pOut->m_skPath);
+	}
 	//--------------------------------------------------------------------------------
 	SMaskFilter_Skia::SMaskFilter_Skia(SkMaskFilter *maskFilter):m_maskFilter(maskFilter)
 	{

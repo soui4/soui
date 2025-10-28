@@ -1,4 +1,4 @@
-﻿// render-gdi.cpp : Defines the exported functions for the DLL application.
+// render-gdi.cpp : Defines the exported functions for the DLL application.
 //
 
 #include "render-d2d.h"
@@ -2806,6 +2806,85 @@ SNSBEGIN
 
 	}
 
+	BOOL SPath_D2D::op(CTHIS_ const IPathS *other, PathOP op, IPathS * out) SCONST{
+		if (!other || !out)
+			return FALSE;
+
+		// 获取other路径的几何对象
+		ID2D1Geometry* pOtherGeometry = ((SPath_D2D*)other)->GetPath();
+		if (!pOtherGeometry)
+			return FALSE;
+
+		// 将out转换为SPath_D2D对象
+		SPath_D2D* pOutPath = (SPath_D2D*)out;
+		if (!pOutPath)
+			return FALSE;
+
+		// 创建几何操作工厂
+		ID2D1Factory* pFactory = GetRenderFactory()->GetD2DFactory();
+		if (!pFactory)
+			return FALSE;
+
+		// 创建新的几何对象
+		SComPtr<ID2D1PathGeometry> pNewGeometry;
+		HRESULT hr = pFactory->CreatePathGeometry(&pNewGeometry);
+		if (FAILED(hr) || !pNewGeometry)
+			return FALSE;
+
+		// 创建几何汇聚器
+		SComPtr<ID2D1GeometrySink> pSink;
+		hr = pNewGeometry->Open(&pSink);
+		if (FAILED(hr) || !pSink)
+			return FALSE;
+
+		// 将PathOP转换为D2D1_COMBINE_MODE
+		D2D1_COMBINE_MODE combineMode;
+		switch (op) {
+		case kDifference_PathOp:
+			combineMode = D2D1_COMBINE_MODE_EXCLUDE;
+			break;
+		case kIntersect_PathOp:
+			combineMode = D2D1_COMBINE_MODE_INTERSECT;
+			break;
+		case kUnion_PathOp:
+			combineMode = D2D1_COMBINE_MODE_UNION;
+			break;
+		case kXOR_PathOp:
+			combineMode = D2D1_COMBINE_MODE_XOR;
+			break;
+		case kReverseDifference_PathOp:
+			// D2D1不直接支持反向差集，需要交换操作数
+			// 交换m_path和pOtherGeometry的角色
+			hr = pOtherGeometry->CombineWithGeometry(m_path, D2D1_COMBINE_MODE_EXCLUDE, NULL, D2D1_DEFAULT_FLATTENING_TOLERANCE, pSink);
+			break;
+		default:
+			combineMode = D2D1_COMBINE_MODE_UNION;
+			break;
+		}
+
+		// 执行几何操作
+		if (op != kReverseDifference_PathOp) {
+			hr = m_path->CombineWithGeometry(pOtherGeometry, combineMode, NULL, D2D1_DEFAULT_FLATTENING_TOLERANCE, pSink);
+		}
+
+		if (FAILED(hr)) {
+			pSink.Release();
+			return FALSE;
+		}
+
+		// 关闭汇聚器
+		hr = pSink->Close();
+		if (FAILED(hr)) {
+			pSink.Release();
+			return FALSE;
+		}
+
+		// 更新输出路径的几何对象
+		pOutPath->m_path = pNewGeometry;
+		// 注意：这里假设SPath_D2D有适当的成员变量来存储新的几何对象
+
+		return TRUE;
+	}
 SNSEND
 
 EXTERN_C BOOL Render_D2D_SCreateInstance(IObjRef ** ppRenderFactory)

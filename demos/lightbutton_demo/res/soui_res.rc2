@@ -1,0 +1,10 @@
+//stamp:01dc46f485b624df
+/*<------------------------------------------------------------------------------------------------->*/
+#define DEFINE_UIRES(name, type, file_path)\
+    name type file_path
+
+DEFINE_UIRES(XML_MAINWND,	LAYOUT,	"uires/layout/dlg_main.xml")
+DEFINE_UIRES(string,	values,	"uires/values/string.xml")
+DEFINE_UIRES(color,	values,	"uires/values/color.xml")
+DEFINE_UIRES(skin,	values,	"uires/values/skin.xml")
+DEFINE_UIRES(ICON_LOGO,	ICON,	"uires/image/soui.ico")

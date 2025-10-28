@@ -2103,6 +2103,11 @@ SNSBEGIN
         m_bBoundsValid = TRUE;
     }
 
+    BOOL SPath_GDI::op(const IPathS *other, PathOP op, IPathS *out) const
+    {
+        return FALSE;
+    }
+    
     namespace RENDER_GDI
     {
         SOUI_COM_C BOOL SOUI_COM_API SCreateInstance(IObjRef ** ppRenderFactory){

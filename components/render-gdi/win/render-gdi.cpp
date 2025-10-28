@@ -1024,6 +1024,12 @@ SNSBEGIN
         return hitTest(x, y);
     }
 
+    BOOL SPath_GDI::op(const IPathS * other, PathOP op, IPathS * out) const
+    {
+        // GDI doesn't provide direct path operations
+        return FALSE;
+    }
+
     // Protected helper methods
     void SPath_GDI::AddCommand(const PathCommand& cmd)
     {
@@ -2433,11 +2439,11 @@ SNSBEGIN
         return S_OK;
     }
     HRESULT SRenderTarget_GDI::LineTo(POINT pt){
-        // CPoint ptStart;
-        // ::GetCurrentPositionEx(m_hdc,&ptStart);
-        // CRect rc(ptStart,pt)
-        // DCBuffer dcBuf(m_hdc,&rc,0xff);
-        // ::LineTo(dcBuf,pt.x,pt.y);
+        POINT ptStart;
+        ::GetCurrentPositionEx(m_hdc,&ptStart);
+        RECT rc={ptStart.x,ptStart.y,pt.x+1,pt.y+1};
+        DCBuffer dcBuf(m_hdc,&rc,0xff);
+        ::LineTo(dcBuf,pt.x,pt.y);
         return S_OK;
     }
 

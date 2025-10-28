@@ -21,7 +21,7 @@ if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
 target_compile_options(ExtendCtrls PRIVATE -fPIC)
 target_link_libraries(ExtendCtrls swinx)
 endif()
-target_precompile_headers(ExtendCtrls PRIVATE "stdafx.h")
+# target_precompile_headers(ExtendCtrls PRIVATE "stdafx.h")
 
 
 install(TARGETS ExtendCtrls

@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" width="800" height="600" margin="5,5,5,5" resizable="1" wndType="appMain" translucent="0">
+  <root skin="_skin.sys.wnd.bkgnd" cache="1" layout="vbox" interval="5" inset="5,5,5,5">
+    
+    <!-- 标题栏 -->
+    <caption size="-2,30" layout="hbox" gravity="center" interval="5">
+      <icon size="-1,-1" src="ICON_LOGO:16"/>
+      <text size="-1,-1" font="name:test,bold:1">@string/title</text>
+      <text>QQ群:</text>
+      <text colorText="@color/red">229313785</text>
+      <window size="0,0" weight="1" visible="0"/>
+      <imgbtn size="-1,-1" name="btn_min" skin="_skin.sys.btn.minimize"  animate="1" />
+      <window size="-1,-1">
+        <imgbtn pos="0,0" name="btn_max" skin="_skin.sys.btn.maximize"  animate="1" />
+        <imgbtn pos="0,0" name="btn_restore" skin="_skin.sys.btn.restore"  show="0" animate="1" />
+      </window>
+      <imgbtn size="-1,-1" name="btn_close" skin="_skin.sys.btn.close"  tip="close" animate="1"/>
+    </caption>
+    <!-- 主内容区域 -->
+    <window layout="hbox" weight="1" interval="10">
+      
+      <!-- 左侧：LightButton 展示区域 -->
+      <window layout="vbox" weight="2" interval="10" font="size:16,bold:1">
+        <!-- 第一行按钮 -->
+        <window layout="hbox" height="100" interval="10">
+          <lightbutton name="lightbutton1" width="100" height="100" text="按钮1" bgColor="#64B8FF"/>
+          <lightbutton name="lightbutton2" width="100" height="100" text="按钮2" bgColor="#FF6B6B"/>
+          <lightbutton name="lightbutton3" width="100" height="100" text="按钮3" bgColor="#18BD9B"/>
+        </window>
+        
+        <!-- 第二行按钮 -->
+        <window layout="hbox" height="100" interval="10">
+          <lightbutton id="100" name="lightbutton4" width="100" height="100" text="矩形" showRect="1" bgColor="#FFFF00"/>
+          <lightbutton id="200" name="lightbutton5" width="100" height="100" text="可移动" canMove="1" bgColor="#818181"/>
+          <lightbutton name="lightbutton6" width="100" height="100" text="报警" bgColor="#A60000"/>
+        </window>
+        
+        <!-- 说明文字 -->
+        <text colorText="#666666" font="size:12">
+          点击上面的按钮选择要操作的控件，然后使用右侧的控制面板进行设置。
+        </text>
+        
+        <window weight="1"/>
+      </window>
+      
+      <!-- 右侧：控制面板 -->
+      <window layout="vbox" width="250" interval="5">
+        <text colorText="#333333" font="size:16,weight:bold">控制面板</text>
+        
+        <!-- 颜色设置组 -->
+        <window layout="vbox" interval="5">
+          <text colorText="#666666" font="size:14,weight:bold">预设颜色</text>
+          
+          <window layout="hbox" height="30" interval="5">
+            <button name="btn_green" width="70" height="30">绿色</button>
+            <button name="btn_red" width="70" height="30">红色</button>
+            <button name="btn_yellow" width="70" height="30">黄色</button>
+          </window>
+          
+          <window layout="hbox" height="30" interval="5">
+            <button name="btn_blue" width="70" height="30">蓝色</button>
+            <button name="btn_black" width="70" height="30">黑色</button>
+            <button name="btn_gray" width="70" height="30">灰色</button>
+          </window>
+          
+          <window layout="hbox" height="30" interval="5">
+            <button name="btn_light_blue" width="70" height="30">淡蓝</button>
+            <button name="btn_light_red" width="70" height="30">淡红</button>
+            <button name="btn_light_green" width="70" height="30">淡绿</button>
+          </window>
+        </window>
+        
+        <!-- 分隔线 -->
+        <hr height="1" colorBorder="#E0E0E0"/>
+        
+        <!-- 功能控制组 -->
+        <window layout="vbox" interval="5">
+          <text colorText="#666666" font="size:14,weight:bold">功能控制</text>
+          
+          <window layout="hbox" height="30" interval="5">
+            <button name="btn_start_alarm" width="70" height="30">开始报警</button>
+            <button name="btn_stop_alarm" width="70" height="30">停止报警</button>
+          </window>
+          
+          <window layout="hbox" height="30" interval="5">
+            <button name="btn_toggle_rect" width="70" height="30">切换形状</button>
+          </window>
+          
+          <window layout="hbox" height="30" interval="5">
+            <button name="btn_toggle_overlay" width="70" height="30">切换遮罩</button>
+          </window>
+        </window>
+        
+        <!-- 分隔线 -->
+        <hr height="1" colorBorder="#E0E0E0"/>
+        
+        <!-- 说明文字 -->
+        <window layout="vbox" interval="5">
+          <text colorText="#666666" font="size:14,weight:bold">功能说明</text>
+          <text colorText="#999999" font="size:11" multiLines="1">
+            • 点击按钮选择要操作的控件
+            • 使用预设颜色快速设置按钮颜色
+            • 报警功能会让按钮闪烁
+            • 形状切换可在圆形和矩形间切换
+            • 移动功能允许拖拽按钮
+            • 遮罩功能控制高光效果显示
+          </text>
+        </window>
+        
+        <window weight="1"/>
+      </window>
+      
+    </window>
+    
+  </root>
+</SOUI>
