@@ -1,4 +1,4 @@
-// render-gdi.cpp : Defines the exported functions for the DLL application.
+﻿// render-gdi.cpp : Defines the exported functions for the DLL application.
 //
 
 #include "render-d2d.h"
@@ -2821,7 +2821,7 @@ SNSBEGIN
 			return FALSE;
 
 		// 创建几何操作工厂
-		ID2D1Factory* pFactory = GetRenderFactory()->GetD2DFactory();
+		ID2D1Factory* pFactory =( (SRenderFactory_D2D *)GetRenderFactory())->GetD2D1Factory();
 		if (!pFactory)
 			return FALSE;
 
