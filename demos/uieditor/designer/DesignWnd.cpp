@@ -167,9 +167,9 @@ BOOL CDesignWnd::OnMouseWheel(UINT nFlags, short zDelta, CPoint pt)
 	for(int i=0, cnt=abs(nDelta);i<cnt;i++){
 		if(GetKeyState(VK_MENU)&0x8000)
 		{
-			OnScroll(SB_HORZ,zDelta>0?SB_LINEUP:SB_LINEDOWN,0,NULL);
+			OnScroll(SB_HORZ,zDelta>0?SB_LINEUP:SB_LINEDOWN,0,0);
 		}else{
-			OnScroll(SB_VERT,zDelta>0?SB_LINEUP:SB_LINEDOWN,0,NULL);
+			OnScroll(SB_VERT,zDelta>0?SB_LINEUP:SB_LINEDOWN,0,0);
 		}
 	}
 	return TRUE;
