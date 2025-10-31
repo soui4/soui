@@ -1,0 +1,34 @@
+<html>
+    <head>
+        <title>Websocket Test</title>
+        
+            <script>
+        var connection = new WebSocket('ws://localhost:4043/test/?roomid=100&userid=1000', ['websocket']);
+
+        // When the connection is open, send some data to the server
+        connection.onopen = function () {
+            let json = {
+                timestamp: "yyyy-MM-dd HH:mm:ss.SSS)",
+                payloadType : "sendDebug",
+                payload: {
+                    information: "Hello Server"
+                }
+            }
+            connection.send(JSON.stringify(json)); // Send the message to the server
+            document.write("Sent: " + JSON.stringify(json) + "<br>");
+        };
+
+        // Log errors
+        connection.onerror = function (error) {
+            document.write("Error: "+error+"<br>");
+        };
+
+        // Log messages from the server
+        connection.onmessage = function (e) {
+            document.write("Received: "+e.data+"<br>");
+        };
+    </script>
+    </head>
+    <body>
+    </body>
+</html>

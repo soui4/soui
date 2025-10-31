@@ -315,7 +315,7 @@ void CXmlEditor::OnPropGridValueChanged(IEvtArgs *e)
 			xmlNode.SetText(strValue);
 		}
 	}else{
-		xmlNode.attribute(strName,false,true).set_value(strValue);
+		xmlNode.attribute2(strName).set_value(strValue);
 	}
 
 	SStringW strXml;
@@ -580,7 +580,7 @@ void CXmlEditor::OnUpdatePos(SStringW strPos)
 	xmlNode.RemoveAttribute(L"size");
 	xmlNode.RemoveAttribute(L"width");
 	xmlNode.RemoveAttribute(L"height");
-	xmlNode.attribute(L"pos",false,true).set_value(strPos);
+	xmlNode.attribute2(L"pos").set_value(strPos);
 	OnMoveCtrl();
 }
 

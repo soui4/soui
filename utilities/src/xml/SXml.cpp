@@ -425,26 +425,35 @@ SXmlNode SXmlNode::root() const
 	return _node.root();
 }
 
-SXmlNode SXmlNode::child(const wchar_t* name,bool bCaseSensitive/*=false*/,bool auto_create/*=false*/) const
+SXmlNode SXmlNode::child(const wchar_t* name,bool bCaseSensitive/*=false*/) const
+{
+	return  _node.child(name,bCaseSensitive);
+}
+
+SXmlNode SXmlNode::child2(const wchar_t* name,bool bCaseSensitive/*=false*/) 
 {
 	pugi::xml_node node = _node.child(name,bCaseSensitive);
-	if(!node && auto_create)
+	if(!node)
 	{
 		node = _node.append_child(name);
 	}
 	return node;
 }
 
-SXmlAttr SXmlNode::attribute(const wchar_t* name,bool bCaseSensitive/*=false*/,bool auto_create/*=false*/) const
+SXmlAttr SXmlNode::attribute(const wchar_t* name,bool bCaseSensitive/*=false*/) const
+{
+	return  _node.attribute(name,bCaseSensitive);
+}
+
+SXmlAttr SXmlNode::attribute2(const wchar_t* name,bool bCaseSensitive/*=false*/)
 {
 	pugi::xml_attribute attr =  _node.attribute(name,bCaseSensitive);
-	if(!attr && auto_create)
+	if(!attr)
 	{
 		attr = _node.append_attribute(name);
 	}
 	return attr;
 }
-
 SXmlAttr SXmlNode::attribute(const wchar_t* name, SXmlAttr& hint,bool bCaseSensitive/*=false*/) const
 {
 	return _node.attribute(name,hint._attr,bCaseSensitive);

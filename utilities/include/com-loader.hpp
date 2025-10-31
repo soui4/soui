@@ -2,8 +2,8 @@
 #define _COM_LOADER_H_
 
 #include <windows.h>
+#include <tchar.h>
 #include <interface/obj-ref-i.h>
-#include <string/tstring.h>
 
 SNSBEGIN
 //加载组件辅助类
@@ -25,17 +25,18 @@ public:
 
     BOOL CreateInstance(LPCTSTR pszDllPath,IObjRef **ppObj,LPCSTR pszFnName = "SCreateInstance")
     {
-        SStringT strPath(pszDllPath);
+        TCHAR szDllPath[MAX_PATH];
+        _tcscpy(szDllPath,pszDllPath);
         if(!m_funCreateInst)
         {
             #ifdef _WIN32
-            strPath+=_T(".dll");
+            _tcscat(szDllPath,_T(".dll"));
             #elif defined(__APPLE__)
-            strPath+=_T(".dylib");
+            _tcscat(szDllPath,_T(".dylib"));
             #else
-            strPath+=_T(".so");
+            _tcscat(szDllPath,_T(".so"));
             #endif
-            m_hMod=LoadLibrary(strPath);
+            m_hMod=LoadLibrary(szDllPath);
             if (!m_hMod) {
 #ifndef _WIN32
                 const char * err = dlerror();
@@ -49,7 +50,7 @@ public:
                 FreeLibrary(m_hMod);
                 return FALSE;
             }
-            _tcscpy(m_szDllPath,strPath);
+            _tcscpy(m_szDllPath,szDllPath);
         }
         return m_funCreateInst(ppObj);
     }

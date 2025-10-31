@@ -699,18 +699,29 @@ public:
     /// @return The root node.
     SXmlNode root() const;
 
-    /// @brief Gets the child node, attribute, or next/previous sibling with the specified name.
+    /// @brief Gets the child node with the specified name.
     /// @param name The name of the child node, attribute, or sibling.
     /// @param bCaseSensitive Whether the search should be case-sensitive.
-    /// @param auto_create Whether to create the node if it does not exist.
     /// @return The requested node or attribute.
-    SXmlNode child(const wchar_t* name,bool bCaseSensitive=false,bool auto_create=false) const;
+    SXmlNode child(const wchar_t* name,bool bCaseSensitive=false) const;
+
+    /// @brief Gets the child node with the specified name, if it does not exist, create it.
+    /// @param name The name of the child node, attribute, or sibling.
+    /// @param bCaseSensitive Whether the search should be case-sensitive.
+    /// @return The requested node or attribute.
+    SXmlNode child2(const wchar_t* name,bool bCaseSensitive=false);
 
     /// @brief Gets the attribute with the specified name.
     /// @param name The name of the attribute.
     /// @param bCaseSensitive Whether the search should be case-sensitive.
     /// @return The requested attribute.
-    SXmlAttr attribute(const wchar_t* name,bool bCaseSensitive=false,bool auto_create=false) const;
+    SXmlAttr attribute(const wchar_t* name,bool bCaseSensitive=false) const;
+
+    /// @brief Gets the attribute with the specified name, if not exist, create it.
+    /// @param name The name of the attribute.
+    /// @param bCaseSensitive Whether the search should be case-sensitive.
+    /// @return The requested attribute.
+    SXmlAttr attribute2(const wchar_t* name,bool bCaseSensitive=false);
 
     /// @brief Gets the next sibling node with the specified name.
     /// @param name The name of the sibling node.

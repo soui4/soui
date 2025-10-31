@@ -13,7 +13,7 @@
 #endif
 
 #include <interface/slog-i.h>
-
+#include <soui_exp.h>
 #ifndef GETLOGMGR
 #define GETLOGMGR() SNS::SApplication::getSingletonPtr() ? SNS::SApplication::getSingleton().GetLogManager() : NULL
 #endif

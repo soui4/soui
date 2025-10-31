@@ -1,38 +1,5 @@
-#
-# SOUI cmake配置文件
-# 生成主要的SOUI库和demo
-# 使用帮助
-#
-# 使用cmake 3.16 或以上版本
-# 
-#
-# 目前支持编译的库/可执行程序:
-
-# mkdir build
-# cd build 
-# cmake .. -G "NMake Makefiles" -DCMAKE_BUILD_TYPE=Release
-# nmake
-#
-# or 
-# cmake .. -G "Visual Studio 14 2015"
-# 
-# 生成SOUI.sln工程文件
-#   
-# options:
-#   SHARED_CRT             ON 
-#   USE_UNICODE            ON
-#   WCHAR_AS_DEFAULT       ON 
-#   XP_TOOLSET             ON   # visual studio 2012
-#   ENABLE_SOUI_CORE_LIB   OFF 
-#   ENABLE_SOUI_COM_LIB    OFF
-# 
-# 1394020320@qq.com
-#
-
 cmake_minimum_required(VERSION 3.16)
 project(SOUI4)
-set(CMAKE_CXX_STANDARD 11)
-
 
 file(STRINGS  SOUI/include/soui-version.h ver_h_contents REGEX "^#define SOUI_VER[0-9]+ [0-9]+$")
 
@@ -108,13 +75,19 @@ option(ENABLE_SPECTRE "Enable Spectre Mitigation" OFF)
 #
 option(BUILD_DEMOS "Build builtin demos" ON)
 
+if(MSVC AND MSVC_VERSION LESS 1800)
+set(BUILD_WS OFF)
+message(STATUS "Build Websocket module disabled for VS2013 or lower")
+else()
+if(EXISTS "${PROJECT_SOURCE_DIR}/third-part/libwebsockets/CMakeLists.txt")
+option(BUILD_WS "Build Websocket module" ON)
+else()
+set(BUILD_WS OFF)
+endif()
+endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-if(NOT MINGW)
-option(BUILD_RICHEDIT "using richedit from source code" ON)
-else()
-set(BUILD_RICHEDIT OFF)
-endif()
+option(BUILD_RICHEDIT "using richedit from source code" OFF)
 option(ENABLE_SOUI_ACC "Enable Acc" OFF)
 option(ENABLE_SOUI_SPY "Enable Swnd Spy" OFF)
 if (MSVC)
@@ -136,6 +109,28 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
   endif()
   add_definitions(-DWCHAR_SIZE=2)
 else()
+        if(NOT EXISTS "${PROJECT_SOURCE_DIR}/swinx/CMakeLists.txt")
+                message(WARNING "swinx submodule not found. Attempting to initialize it...")
+                find_package(Git QUIET)
+                if(GIT_FOUND AND EXISTS "${PROJECT_SOURCE_DIR}/.git")
+                        message(STATUS "Initializing and updating sinx submodule...")
+                        execute_process(COMMAND ${GIT_EXECUTABLE} submodule update --init -- swinx
+                                WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
+                                RESULT_VARIABLE GIT_SUBMOD_RESULT)
+                        if(NOT GIT_SUBMOD_RESULT EQUAL "0")
+                                message(FATAL_ERROR "git submodule update failed with ${GIT_SUBMOD_RESULT}, please checkout submodules manually")
+                        endif()
+                else()
+                        message(WARNING "Git not found or not a git repository. Please manually initialize the libwebsockets submodule")
+                endif()
+        endif()
+        
+        if(EXISTS "${CMAKE_CURRENT_SOURCE_DIR}/swinx/CMakeLists.txt")
+                add_subdirectory(swinx)
+        else()
+                message(FATAL_ERROR "swinx submodule not available, please checkout submodules manually")
+        endif()
+
   # 添加调试标志
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS_DEBUG} -O0")
   set(CMAKE_C_FLAGS_DEBUG "${CMAKE_C_FLAGS_DEBUG} -O0")
@@ -163,7 +158,6 @@ else()
 
   add_definitions(-DWCHAR_SIZE=4)
   include_directories(${PROJECT_SOURCE_DIR}/swinx/include)
-  add_subdirectory(swinx)
 endif()
 
 configure_file("config/config.h.in" "${PROJECT_BINARY_DIR}/config/config.h" @ONLY)

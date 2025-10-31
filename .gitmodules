@@ -2,3 +2,7 @@
 	path = swinx
 	url = https://gitee.com/setoutsoft/swinx.git
 	branch = master
+[submodule "third-part/libwebsockets"]
+	path = third-part/libwebsockets
+	url = https://gitee.com/setoutsoft/libwebsockets.git
+	branch = soui_ws

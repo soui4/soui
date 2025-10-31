@@ -111,7 +111,7 @@ namespace SOUI{
 					SPropertyItemOption* pOption = ( SPropertyItemOption* )pItem;
 					value = S_CT2W(pOption->Option2Value(pItem->GetValue()));
 				}
-				root.attribute(name,false,true).set_value(value);
+				root.attribute2(name).set_value(value);
 			}else
 			{
 				root.remove_attribute(name);
