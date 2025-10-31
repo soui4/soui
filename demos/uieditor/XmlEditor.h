@@ -38,7 +38,7 @@ SNSBEGIN
         void OnSelectedCtrl(const int *pOrder, int nLen);
 		void OnUpdateSize(int nWidth, int nHeight);
 		void OnUpdatePos(SStringW strPos);
-		void SelectCtrlByOrder(const int *pOrder,int nLen);
+		void SelectCtrlByOrder(const int *pOrder,int nLen,BOOL bSelXml);
 
 		bool isDirty() const;
 
@@ -66,10 +66,12 @@ SNSBEGIN
 		EVENT_MAP_BREAK()
 	protected:
 		void OnCommand(UINT uNotifyCode, int nID, HWND wndCtl);
+		LRESULT OnNotify(int idCtrl, LPNMHDR pnmh);
         void OnTimer(UINT_PTR id);
 
         BEGIN_MSG_MAP_EX(CXmlEditor)
 			MSG_WM_COMMAND(OnCommand)
+			MSG_WM_NOTIFY(OnNotify)
 			MSG_WM_TIMER(OnTimer)
 		END_MSG_MAP()
 
@@ -96,6 +98,8 @@ SNSBEGIN
 		BOOL	 m_bChanged;
 		BOOL     m_bUpdateDesigner;
 		BOOL	 m_bValidXml;	
+		int      m_nCaretPos;
+		BOOL     m_bSetCaretPos;
 		std::vector<int> m_vecSelectOrder;
 		SXmlDoc  m_xmlEditing;
 		ResManger *m_pResManger;

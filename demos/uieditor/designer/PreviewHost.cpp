@@ -49,6 +49,7 @@ LRESULT CPreviewHost::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 				SWindow *p = SWindowMgr::GetWindow(swnd);
 				CRect rcSel = p->GetWindowRect();
 				m_pSel->Move(rcSel);
+                m_pSel->SetTarget(swnd);
 				SList<int> lstIndex;
 				GetSwndIndex(p,lstIndex);
 				if(m_bVirtualRoot)
@@ -117,15 +118,18 @@ void CPreviewHost::SelectCtrlByOrder(const int *pOrder,int nLen)
 		pChild = pChild->GetChild(child_index+1);
 		if (!pChild)
 			break;
-
-		if (i == nLen - 1)
-		{
-			CRect rcSel = pChild->GetWindowRect();
-			m_pSel->SetTarget(pChild->GetSwnd());
-			m_pSel->Move(rcSel);
-			m_pSel->SetVisible(TRUE);
-		}
-	}	
+	}
+    if (pChild && pChild->IsVisible(TRUE))
+    {
+        CRect rcSel = pChild->GetWindowRect();
+        m_pSel->SetTarget(pChild->GetSwnd());
+        m_pSel->Move(rcSel);
+        m_pSel->SetVisible(TRUE,TRUE);
+    }
+    else
+    {
+        m_pSel->SetVisible(FALSE,TRUE);
+    }
 }
 
 void CPreviewHost::GetSwndIndex(SWindow *pWnd,SList<int> &lstIndex)
@@ -527,7 +531,7 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
     {
         SLOGW()<<"unknown layout type";
     }
-	pTarget->RequestRelayout();
+    pParent->RequestRelayout();
 	
 	GetRoot()->UpdateLayout();
 	m_pSel->Move(pTarget->GetWindowRect());

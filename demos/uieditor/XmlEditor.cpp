@@ -84,8 +84,9 @@ BOOL CXmlEditor::LoadXml(SStringT strFileName, SStringT layoutName)
 	m_pScintillaWnd->SendMessage(SCI_SETREADONLY, 0, 0);
 	SStringT strPath = m_strProPath + TPATH_SLASH + m_strXmlFile;
 	m_pScintillaWnd->OpenFile(strPath);
+	m_nCaretPos = m_pScintillaWnd->SendEditor(SCI_GETCURRENTPOS);
+    m_bSetCaretPos = FALSE;
 	m_treeXmlStruct->RemoveAllItems();
-	
 	if(!layoutName.IsEmpty())
 	{
 		m_xml_editor->ShowPane(0);
@@ -190,7 +191,7 @@ void CXmlEditor::OnTCSelChanged(IEvtArgs *pEvt)
 		item = m_treeXmlStruct->GetParentItem(item);
 		iLevel--;
 	}
-	SelectCtrlByOrder(idx,nLevel);
+	SelectCtrlByOrder(idx,nLevel,TRUE);
 	delete []idx;
 }
 
@@ -324,8 +325,10 @@ void CXmlEditor::OnPropGridValueChanged(IEvtArgs *e)
 	NodeRange nr = m_xmlParser.getNodePos(&m_vecSelectOrder[0],m_vecSelectOrder.size());
 	if(nr.begin!=-1)
 	{
+		m_bSetCaretPos = TRUE;
 		m_pScintillaWnd->SetSel(nr.begin,nr.end);
 		m_pScintillaWnd->ReplaseSel(S_CW2A(strXml,CP_UTF8));
+		m_bSetCaretPos = FALSE;
 	}
 }
 void CXmlEditor::InitPropGrid(const SStringW &strNodeName, SStringW strParents)
@@ -362,14 +365,18 @@ void CXmlEditor::InitPropGrid(const SStringW &strNodeName, SStringW strParents)
 	}
 }
 
-void CXmlEditor::SelectCtrlByOrder(const int *pOrder,int nLen)
+void CXmlEditor::SelectCtrlByOrder(const int *pOrder, int nLen, BOOL bSelXml)
 {
+	#ifdef _DEBUG
 	SStringA str;
 	for(int i=0;i<nLen;i++)
 	{
 		str += SStringA().Format("%d,",pOrder[i]);
 	}
 	SLOGI()<<"order:"<<str;
+	#endif
+	if(m_vecSelectOrder.size()==nLen && memcmp(&m_vecSelectOrder[0],pOrder,nLen*sizeof(int))==0)
+		return;
 	NodeRange range = m_xmlParser.getNodePos(pOrder,nLen);
 	if(range.begin!=-1)
 	{
@@ -377,7 +384,12 @@ void CXmlEditor::SelectCtrlByOrder(const int *pOrder,int nLen)
 		int end = range.end!=-1?range.end:range._break;
 		if(end != -1)
 		{
-			m_pScintillaWnd->SetSel(begin,end);
+            if (bSelXml)
+            {
+                m_bSetCaretPos = TRUE;
+                m_pScintillaWnd->SetSel(begin, end);
+                m_bSetCaretPos = FALSE;
+            }
 			SStringA strXml = m_pScintillaWnd->GetRange(begin,end);
 			m_xmlEditing.Reset();
 			if(m_xmlEditing.LoadBufferInplace((void*)strXml.c_str(),strXml.GetLength(),xml_parse_default,enc_utf8)){
@@ -496,10 +508,34 @@ BOOL CXmlEditor::InsertWidget(SStringA xmlWidget)
 		int nOrder = m_xmlParser.findElementOrder(pos,order);
 		if(nOrder>1)
 		{//skip the root element
-			SelectCtrlByOrder(&order[1],nOrder-1);
+			SelectCtrlByOrder(&order[1],nOrder-1,TRUE);
 		}
 	}
 	return bRet;
+}
+
+LRESULT CXmlEditor::OnNotify(int idCtrl, LPNMHDR pnmh)
+{
+	if (pnmh->hwndFrom == m_pScintillaWnd->m_hWnd && pnmh->code == SCN_UPDATEUI)
+	{
+		int nCaretPos = m_pScintillaWnd->SendEditor(SCI_GETCURRENTPOS);
+		if (nCaretPos != m_nCaretPos)
+		{
+			m_nCaretPos = nCaretPos;
+			if(m_bSetCaretPos)
+				return 0;
+            OnTimer(300); // update xml data if needed
+			std::vector<int> order;
+			m_xmlParser.findElementOrder(nCaretPos,order);
+			if(order.size()>1)
+			{//skip the root element
+				SelectCtrlByOrder(&order[1],order.size()-1,FALSE);
+			}
+		}
+	}else{
+		SetMsgHandled(FALSE);
+	}
+    return 0;
 }
 
 void CXmlEditor::OnTimer(UINT_PTR id)
@@ -534,9 +570,9 @@ void CXmlEditor::OnSelectedCtrl(const int *pData, int nCount)
     pOrder[0] = 0;
     memcpy(pOrder + 1, pData, nCount * sizeof(int));
     if (bRootLayout)
-        SelectCtrlByOrder(pOrder, nCount + 1);
+        SelectCtrlByOrder(pOrder, nCount + 1,TRUE);
     else
-        SelectCtrlByOrder(pOrder + 1, nCount);
+        SelectCtrlByOrder(pOrder + 1, nCount,TRUE);
     delete[] pOrder;
 }
 
@@ -547,8 +583,10 @@ void CXmlEditor::OnMoveCtrl()
     NodeRange nr = m_xmlParser.getNodePos(&m_vecSelectOrder[0], m_vecSelectOrder.size());
     if (nr.begin != -1)
     {
+		m_bSetCaretPos = TRUE;
         m_pScintillaWnd->SetSel(nr.begin, nr.end);
         m_pScintillaWnd->ReplaseSel(S_CW2A(strXml, CP_UTF8));
+		m_bSetCaretPos = FALSE;
         m_bUpdateDesigner = FALSE;
         OnTimer(300); // reload right now.
         UpdatePropGridLayout();
