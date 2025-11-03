@@ -282,9 +282,14 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
     SASSERT(pParent);
     CRect rcParent;
     pParent->GetChildrenLayoutRect(&rcParent);
-    rcOld.OffsetRect(-rcParent.left, -rcParent.top);
-    rcNew.OffsetRect(-rcParent.left, -rcParent.top);
-
+	if(rcNew.left < rcParent.left)
+		rcNew.left = rcParent.left;
+	if(rcNew.right > rcParent.right)
+		rcNew.right = rcParent.right;
+	if(rcNew.top < rcParent.top)
+		rcNew.top = rcParent.top;
+	if(rcNew.bottom > rcParent.bottom)
+		rcNew.bottom = rcParent.bottom;
 	int nWidth = rcNew.Width();
 	int nHeight = rcNew.Height();
 
@@ -327,7 +332,14 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
 		SStringW strPos;
 		SouiLayoutParam *pSouiLayoutParam = (SouiLayoutParam *)pLayoutParam;
 		SouiLayoutParamStruct *pRawData = (SouiLayoutParamStruct *)pSouiLayoutParam->GetRawData();
-		if(pRawData->nCount >= 2){
+		if(pRawData->nCount == 0){
+			strPos.Format(L"%d,%d,@%d,@%d", 
+				rcNew.left-rcParent.left, 
+				rcNew.top-rcParent.top,
+				rcNew.Width(),
+				rcNew.Height());
+		}
+		else if(pRawData->nCount >= 2){
 			//update left pos desc
 			if(pRawData->posLeft.pit == PIT_CENTER){
 				//support center mode
@@ -419,12 +431,10 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
 			{
 				if(pLayoutParam->IsSpecifiedSize(Horz))
 				{
-					pLayoutParam->SetSpecifiedSize(Horz, SLayoutSize(nWidth));
 					strPos += SStringW().Format(L",@%d",nWidth);
 				}	
 				if(pLayoutParam->IsSpecifiedSize(Vert))
 				{
-					pLayoutParam->SetSpecifiedSize(Vert, SLayoutSize(nHeight));
 					strPos += SStringW().Format(L",@%d",nHeight);
 				}
 			}
@@ -525,6 +535,7 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
 				}
 			}
 		}
+		pTarget->SetAttribute(L"pos",strPos,FALSE);
 		m_pListener->OnUpdatePos(strPos);
     }
     else

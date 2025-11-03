@@ -308,26 +308,40 @@ void CXmlEditor::OnPropGridValueChanged(IEvtArgs *e)
 	SStringW strName = e2->pItem->GetName2();
 	SStringW strValue = S_CT2W(e2->pItem->GetValue());
 	SXmlNode xmlNode = m_xmlEditing.root().first_child();
+	BOOL bSetText = FALSE;
 	if(strName.CompareNoCase(L"text")==0)
 	{
 		if(xmlNode.attribute(strName)){
 			xmlNode.attribute(strName).set_value(strValue);
 		}else{
 			xmlNode.SetText(strValue);
+			bSetText = TRUE;
 		}
 	}else{
 		xmlNode.attribute2(strName).set_value(strValue);
 	}
 
-	SStringW strXml;
-	xmlNode.ToString(&strXml);
 
 	NodeRange nr = m_xmlParser.getNodePos(&m_vecSelectOrder[0],m_vecSelectOrder.size());
 	if(nr.begin!=-1)
 	{
 		m_bSetCaretPos = TRUE;
-		m_pScintillaWnd->SetSel(nr.begin,nr.end);
-		m_pScintillaWnd->ReplaseSel(S_CW2A(strXml,CP_UTF8));
+		if(bSetText)
+		{
+			SStringW strXml;
+			xmlNode.ToString(&strXml);
+			m_pScintillaWnd->SetSel(nr.begin,nr.end);
+			m_pScintillaWnd->ReplaseSel(S_CW2A(strXml,CP_UTF8));
+		}else if(nr._break!=-1){
+			//update attribute value
+			SStringW strXml= SStringW().Format(L"<%s",xmlNode.name());
+			for(SXmlAttr attr = xmlNode.first_attribute();attr;attr = attr.next_attribute()){
+				strXml.AppendFormat(L" %s=\"%s\"",attr.name(),attr.value());
+			}
+			strXml.Append(L">");
+			m_pScintillaWnd->SetSel(nr.begin,nr._break);
+			m_pScintillaWnd->ReplaseSel(S_CW2A(strXml,CP_UTF8));
+		}
 		m_bSetCaretPos = FALSE;
 	}
 }
@@ -578,14 +592,26 @@ void CXmlEditor::OnSelectedCtrl(const int *pData, int nCount)
 
 void CXmlEditor::OnMoveCtrl()
 {
-    SStringW strXml;
-    m_xmlEditing.root().ToString(&strXml);
     NodeRange nr = m_xmlParser.getNodePos(&m_vecSelectOrder[0], m_vecSelectOrder.size());
     if (nr.begin != -1)
     {
 		m_bSetCaretPos = TRUE;
-        m_pScintillaWnd->SetSel(nr.begin, nr.end);
-        m_pScintillaWnd->ReplaseSel(S_CW2A(strXml, CP_UTF8));
+		SXmlNode xmlNode = m_xmlEditing.root().first_child();
+		if(nr._break!=-1)
+		{
+			SStringW strXml= SStringW().Format(L"<%s ",xmlNode.name());
+			for(SXmlAttr attr = xmlNode.first_attribute();attr;attr = attr.next_attribute()){
+				strXml.AppendFormat(L" %s=\"%s\"",attr.name(),attr.value());
+			}
+			strXml.Append(L">");
+			m_pScintillaWnd->SetSel(nr.begin, nr._break);
+			m_pScintillaWnd->ReplaseSel(S_CW2A(strXml, CP_UTF8));
+		}else{
+			SStringW strXml;
+			xmlNode.ToString(&strXml);
+			m_pScintillaWnd->SetSel(nr.begin, nr.end);
+			m_pScintillaWnd->ReplaseSel(S_CW2A(strXml, CP_UTF8));
+		}
 		m_bSetCaretPos = FALSE;
         m_bUpdateDesigner = FALSE;
         OnTimer(300); // reload right now.

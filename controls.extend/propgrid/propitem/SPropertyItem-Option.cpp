@@ -113,7 +113,9 @@ class SPropCombobox: public SComboBox
 			{
 				SStringT strOption = Value2Option(m_strValue);
 				int iFind = m_pCombobox->FindString(strOption);
+				m_pCombobox->GetEventSet()->setMutedState(TRUE);
 				m_pCombobox->SetCurSel(iFind);
+				m_pCombobox->GetEventSet()->setMutedState(FALSE);
 				if(iFind == -1)
 				{
 					m_pCombobox->SetWindowText(strOption);
@@ -173,7 +175,9 @@ class SPropCombobox: public SComboBox
 		int iSel = m_pCombobox->GetCurSel();
 		if(iSel != -1)
 		{
-			SetValue(m_pCombobox->GetLBText(iSel));
+            SStringT strOption = m_pCombobox->GetLBText(iSel);
+            SStringT strValue = Option2Value(strOption);
+			SetValue(strValue);
 		}
 		return true;
 	}
