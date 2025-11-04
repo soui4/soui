@@ -279,7 +279,7 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
     SWindow *pTarget = SWindowMgr::GetWindow(hTarget);
     SASSERT(pTarget);
     SWindow *pParent = pTarget->GetParent();
-	if(pParent)
+	if(!pParent)
 		return;
     CRect rcParent;
 	pParent->GetChildrenLayoutRect(&rcParent);
