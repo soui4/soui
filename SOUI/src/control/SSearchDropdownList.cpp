@@ -3,17 +3,16 @@
 
 SNSBEGIN
 
-static const wchar_t *KStyle_Dropdown = L"dropdownStyle"; //下拉列表风格，只包含root节点
+static const wchar_t *KStyle_Dropdown = L"dropdownStyle"; // 下拉列表风格，只包含root节点
 static const wchar_t *KStyle_DropdownList = L"listStyle";
 
 //---------------------------------------------------------------------
 
-class SDropdownList
-    : public SDropDownWnd {
+class SDropdownList : public SDropDownWnd {
   public:
     SDropdownList(ISDropDownOwner *pOwner);
 
-    BOOL Create();
+    BOOL Create(IXmlNode *initxml=NULL);
 
   protected:
     BOOL WINAPI PreTranslateMessage(MSG *pMsg) OVERRIDE
@@ -35,10 +34,10 @@ SDropdownList::SDropdownList(ISDropDownOwner *pOwner)
 {
 }
 
-BOOL SDropdownList::Create()
+BOOL SDropdownList::Create(IXmlNode *initXml)
 {
     CRect rc;
-    return SDropDownWnd::Create(&rc, 0, WS_POPUP, WS_EX_TOPMOST | WS_EX_TOOLWINDOW);
+    return SDropDownWnd::Create(&rc, initXml, WS_POPUP, WS_EX_TOPMOST | WS_EX_TOOLWINDOW);
 }
 
 //---------------------------------------------------------------------
@@ -61,7 +60,7 @@ void SSearchDropdownList::AdjustDropdownList()
     SASSERT(m_pDropDownWnd);
     EventDropdownListGetBuddyRect evt(this);
     FireEvent(&evt);
-    CRect rcBuddy=evt.rcBuddy;
+    CRect rcBuddy = evt.rcBuddy;
     GetContainer()->FrameToHost(rcBuddy);
 
     ClientToScreen(GetContainer()->GetHostHwnd(), (LPPOINT)&rcBuddy);
@@ -84,9 +83,18 @@ void SSearchDropdownList::AdjustDropdownList()
     CSize szDropdown;
     szDropdown.cx = rcBuddy.Width();
     SLayoutSize szBorder(1,SLayoutSize::dp);
-    szDropdown.cy = m_pListBox->GetItemLocator()->GetTotalHeight() + szBorder.toPixelSize(GetScale())*2;
+    CRect rcPadding = m_pDropDownWnd->GetRoot()->GetStyle().GetPadding();
+    CRect rcMargin = m_pDropDownWnd->GetRoot()->GetStyle().GetMargin();
+    int nItemHeight = rcPadding.top + rcPadding.bottom + rcMargin.top + rcMargin.bottom;
+    // 如果没有设置padding和margin，则使用添加默认高度
+    if (nItemHeight == 0)
+    {
+        nItemHeight = szBorder.toPixelSize(GetScale()) * 2;
+    }
+    szDropdown.cy = m_pListBox->GetItemLocator()->GetTotalHeight() + nItemHeight;
 
     int nMaxHeight = m_nMaxDropHeight.toPixelSize(GetScale());
+
     if (szDropdown.cy > nMaxHeight)
         szDropdown.cy = nMaxHeight;
 
@@ -110,25 +118,8 @@ SWindow *SSearchDropdownList::GetDropDownOwner()
     return this;
 }
 
-static const wchar_t *KAttrTrCtx = L"trCtx";
 void SSearchDropdownList::OnCreateDropDown(SDropDownWnd *pDropDown)
 {
-    GetContainer()->EnableHostPrivateUiDef(TRUE);
-    SXmlNode xmlDropdownStyleNode = m_xmlDropdownStyle.root().child(KStyle_Dropdown);
-    if (xmlDropdownStyleNode)
-    {
-        if (!xmlDropdownStyleNode.attribute(KAttrTrCtx))
-        {
-            xmlDropdownStyleNode.append_attribute(KAttrTrCtx).set_value(GetTrCtx());
-        }
-        pDropDown->InitFromXml(&xmlDropdownStyleNode);
-    }
-    else
-    {
-        pDropDown->GetHostAttr().SetTrCtx(GetTrCtx());
-    }
-    GetContainer()->EnableHostPrivateUiDef(FALSE);
-
     pDropDown->GetRoot()->InsertChild(m_pListBox);
     pDropDown->GetRoot()->UpdateChildrenPosition();
     m_pListBox->SetVisible(TRUE);
@@ -161,7 +152,7 @@ void SSearchDropdownList::CloseUp(int code)
 }
 
 BOOL SSearchDropdownList::IsDropdown() const
-{ 
+{
     return m_pDropDownWnd != NULL;
 }
 
@@ -170,7 +161,13 @@ void SSearchDropdownList::DropDown(const IStringT *pText)
     if (!m_pDropDownWnd)
     {
         m_pDropDownWnd = new SDropdownList(this);
-        m_pDropDownWnd->Create();
+        GetContainer()->EnableHostPrivateUiDef(TRUE);
+        SXmlNode xmlDropdownStyleNode = m_xmlDropdownStyle.root().child(KStyle_Dropdown);
+        if (xmlDropdownStyleNode)
+            m_pDropDownWnd->Create(&xmlDropdownStyleNode);
+        else
+            m_pDropDownWnd->Create();
+        GetContainer()->EnableHostPrivateUiDef(FALSE);
         m_pDropDownWnd->GetRoot()->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
     }
 
@@ -200,7 +197,7 @@ BOOL SSearchDropdownList::CreateChildren(SXmlNode xmlNode)
 
 BOOL SSearchDropdownList::FireEvent(IEvtArgs *evt)
 {
-    if (evt->IdFrom()== IDC_DROPDOWN_LIST)
+    if (evt->IdFrom() == IDC_DROPDOWN_LIST)
     {
         if (evt->GetID() == EVT_CMD)
         {
@@ -211,11 +208,10 @@ BOOL SSearchDropdownList::FireEvent(IEvtArgs *evt)
     return __baseCls::FireEvent(evt);
 }
 
-
 BOOL SSearchDropdownList::CreateListBox(SXmlNode xmlNode)
 {
     SASSERT(xmlNode);
-    //创建列表控件
+    // 创建列表控件
     SXmlNode listStyle = xmlNode.child(KStyle_DropdownList);
     SStringW strListClass = listStyle.attribute(L"wndclass").as_string(SListView::GetClassName());
     SListView *pListBox = sobj_cast<SListView>(CreateChildByName(strListClass));
@@ -234,6 +230,5 @@ BOOL SSearchDropdownList::CreateListBox(SXmlNode xmlNode)
 }
 
 //////////////////////////////////////////////////////////////////////////
-
 
 SNSEND

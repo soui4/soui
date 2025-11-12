@@ -33,7 +33,7 @@
                 <edit pos="[0,0,-0,-0" name="edit_input"  cueText="@string/cue_search" margin="0" notifyChange="1"/>
                 <searchDropdownList name="search_dropdown">
                   <dropdownStyle translucent="1" resizable="0" sendWheel2Hover="1">
-                    <root colorBorder="@color/border" margin="1" colorBkgnd="@color/white"/>
+                    <root colorBorder="@color/border" margin="1" colorBkgnd="#ffffff66" padding="2,2,2,2" alpha="200"/>
                   </dropdownStyle>
                   <listStyle wndclass="listview">
                     <template itemHeight="30" colorNormal="@color/white" colorSelected="#e4f0fc" colorHover="#e4f0fc">

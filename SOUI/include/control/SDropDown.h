@@ -66,12 +66,12 @@ class SOUI_EXP SDropDownWnd
     /**
      * @brief Create the dropdown window
      * @param lpRect Rectangle for the dropdown window
-     * @param lParam Associated data for the dropdown window
+     * @param pInitXml initialization XML node
      * @param dwStyle Window style
      * @param dwExStyle Extended window style
      * @return TRUE if successful, FALSE otherwise
      */
-    virtual BOOL Create(LPCRECT lpRect, LPVOID lParam, DWORD dwStyle = WS_POPUP, DWORD dwExStyle = WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
+    BOOL Create(LPCRECT lpRect, IXmlNode * pInitXml, DWORD dwStyle = WS_POPUP, DWORD dwExStyle = WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
 
     /**
      * @brief End the dropdown window

@@ -48,10 +48,10 @@ SWindow *SDropDownWnd::GetDropDownOwner()
     return m_pOwner->GetDropDownOwner();
 }
 
-BOOL SDropDownWnd::Create(LPCRECT lpRect, LPVOID lParam, DWORD dwStyle, DWORD dwExStyle)
+BOOL SDropDownWnd::Create(LPCRECT lpRect, IXmlNode * pInitXml, DWORD dwStyle, DWORD dwExStyle)
 {
     HWND hParent = m_pOwner->GetDropDownOwner()->GetContainer()->GetHostHwnd();
-    HWND hWnd = SNativeWnd::CreateNative(NULL, dwStyle, dwExStyle, lpRect->left, lpRect->top, lpRect->right - lpRect->left, lpRect->bottom - lpRect->top, hParent, 0, lParam);
+    HWND hWnd = CreateEx(hParent, dwStyle, dwExStyle, lpRect->left, lpRect->top, lpRect->right - lpRect->left, lpRect->bottom - lpRect->top, pInitXml);
     if (!hWnd)
         return FALSE;
     GetMsgLoop()->AddMessageFilter(this);
