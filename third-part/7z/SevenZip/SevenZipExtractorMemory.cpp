@@ -7,16 +7,16 @@
 #include "PropVariant2.h"
 #include "UsefulFunctions.h"
 
+
 namespace SevenZip
 {
 
-    using namespace intl;
+	using namespace intl;
 
 
-#ifdef _WIN32
 	//////////////////////////////////////////////////////////////////////////
-
-	class CResStream : public IMyStream{
+#ifdef _WIN32
+	class CResStream : public IStream{
 	protected:
 		int m_nRef;
 		const BYTE * m_pBufPtr;
@@ -29,13 +29,13 @@ namespace SevenZip
 			m_nPos = 0;
 		}
 	public:
-		static IMyStream * CreateResStream(HGLOBAL hRes,DWORD dwSize){
+		static IStream * CreateResStream(HGLOBAL hRes,DWORD dwSize){
 			return new CResStream(hRes,dwSize);
 		}
 	public:
 		virtual HRESULT STDMETHODCALLTYPE QueryInterface( 
 			/* [in] */ REFIID riid,
-			/* [iid_is][out] */ __RPC__deref_out void __RPC_FAR *__RPC_FAR *ppvObject) {
+			/* [iid_is][out] */ __RPC__deref_out void  **ppvObject) {
 				HRESULT hRet = S_OK;
 				if(riid == IID_IUnknown){
 					*ppvObject = this;
@@ -90,15 +90,15 @@ namespace SevenZip
 			/* [in] */ DWORD dwOrigin,
 			/* [out] */ ULARGE_INTEGER *plibNewPosition){
 				switch(dwOrigin){
-					case STREAM_SEEK_SET:
-						m_nPos = (UINT)dlibMove.QuadPart;
-						break;
-					case STREAM_SEEK_CUR:
-						m_nPos += (UINT)dlibMove.QuadPart;
-						break;
-					case STREAM_SEEK_END:
-						m_nPos = m_szBuf+(UINT)dlibMove.QuadPart;
-						break;
+				case STREAM_SEEK_SET:
+					m_nPos = (UINT)dlibMove.QuadPart;
+					break;
+				case STREAM_SEEK_CUR:
+					m_nPos += (UINT)dlibMove.QuadPart;
+					break;
+				case STREAM_SEEK_END:
+					m_nPos = m_szBuf+(UINT)dlibMove.QuadPart;
+					break;
 				}
 				if(plibNewPosition){
 					plibNewPosition->QuadPart = m_nPos;
@@ -154,121 +154,113 @@ namespace SevenZip
 		}
 
 	};
+#endif//_WIN32
 
-#endif // _WIN32
 
-    SevenZipExtractorMemory::SevenZipExtractorMemory()
-        : SevenZipArchive()        
-    {
-    }
+	SevenZipExtractorMemory::SevenZipExtractorMemory()
+		: SevenZipArchive()        
+	{
+	}
 
-    SevenZipExtractorMemory::~SevenZipExtractorMemory()
-    {
-    }
+	SevenZipExtractorMemory::~SevenZipExtractorMemory()
+	{
+	}
 
 
 	HRESULT SevenZipExtractorMemory::ExtractArchive(CFileStream &fileStreams, ProgressCallback* callback, SevenZipPassword *pSevenZipPassword)
-    {
-        DetectCompressionFormat();
-#if defined(_UNICODE)
-		FILE* fileStream = _wfopen(m_archivePath.c_str(), L"rb");
-#else
-		FILE* fileStream = fopen(m_archivePath.c_str(), "rb");
-#endif
+	{
+		DetectCompressionFormat();
+
+		CMyComPtr< IStream > fileStream;
+		if(m_hData)
+		{
+			#ifdef _WIN32
+			fileStream = CResStream::CreateResStream(m_hData,m_dwDataSize);
+			#endif//_WIN32
+		}
+		else{
+			fileStream = FileSys::OpenFileToRead(m_archivePath);
+		}
 		if (fileStream == NULL)
 		{
-#ifdef _WIN32
-			LPVOID msgBuf;
-			if (::FormatMessage(FORMAT_MESSAGE_ALLOCATE_BUFFER |
-				FORMAT_MESSAGE_FROM_SYSTEM | FORMAT_MESSAGE_IGNORE_INSERTS,
-				NULL, ERROR_OPEN_FAILED, 0, (LPTSTR)&msgBuf, 0, NULL) == 0)
-			{
-				m_message = (LPCTSTR)msgBuf;
-				::LocalFree(msgBuf);
-			}
 			return ERROR_OPEN_FAILED;	//Could not open archive
-#else
-			m_message = _T("Could not open archive");
-			return ENOENT;
-#endif
 		}
 
 		return ExtractArchive(fileStreams,fileStream, callback, pSevenZipPassword);
-    }
+	}
 
-	HRESULT SevenZipExtractorMemory::ExtractArchive(CFileStream &fileStreams, FILE* archiveStream, ProgressCallback* callback, SevenZipPassword *pSevenZipPassword)
-    {
-        CMyComPtr< IInArchive > archive = UsefulFunctions::GetArchiveReader(m_compressionFormat);
-        CMyComPtr< InStreamWrapper > inFile = new InStreamWrapper(archiveStream);
-        CMyComPtr< ArchiveOpenCallback > openCallback = new ArchiveOpenCallback();
-		 
+	HRESULT SevenZipExtractorMemory::ExtractArchive(CFileStream &fileStreams,const CMyComPtr< IStream >& archiveStream, ProgressCallback* callback, SevenZipPassword *pSevenZipPassword)
+	{
+		CMyComPtr< IInArchive > archive = UsefulFunctions::GetArchiveReader(m_compressionFormat);
+		CMyComPtr< InStreamWrapper > inFile = new InStreamWrapper(archiveStream);
+		CMyComPtr< ArchiveOpenCallback > openCallback = new ArchiveOpenCallback();
+
 		if (NULL != pSevenZipPassword)
 		{ 
 			openCallback->PasswordIsDefined = pSevenZipPassword->PasswordIsDefined;
 			openCallback->Password = pSevenZipPassword->Password.c_str();
 		}
 
-        HRESULT hr = archive->Open(inFile, 0, openCallback);
-        if (hr != S_OK)
-        {
-			m_message = _T("open error");
-            return hr;	//Open archive error
-        }
+		HRESULT hr = archive->Open(inFile, 0, openCallback);
+		if (hr != S_OK)
+		{
+			return hr;	//Open archive error
+		}
 
-        if (callback)
-        {
-            UInt32 mynumofitems = 0;
-            hr = archive->GetNumberOfItems(&mynumofitems);
-            if (callback->OnFileCount(mynumofitems))
-            {
-                size_t numberofitems = size_t(mynumofitems);
-                
-                std::vector<std::wstring> itemnames;
-                itemnames.reserve(numberofitems);
+		if (callback)
+		{
+			UInt32 mynumofitems = 0;
+			hr = archive->GetNumberOfItems(&mynumofitems);
+			if (callback->OnFileCount(mynumofitems))
+			{
+				size_t numberofitems = size_t(mynumofitems);
 
-                std::vector<uint64_t> origsizes;
-                origsizes.reserve(numberofitems);
+				std::vector<std::wstring> itemnames;
+				itemnames.reserve(numberofitems);
 
-                bool succ = true;
-                for (UInt32 i = 0; i < numberofitems; ++i)
-                {
-                    // Get uncompressed size of file
-                    CPropVariant prop;
-                    hr = archive->GetProperty(i, kpidSize, &prop);
-                    if (hr != S_OK)
-                    {
-                        succ = false;
-                        break;
-                    }
+				std::vector<unsigned __int64> origsizes;
+				origsizes.reserve(numberofitems);
 
-                    uint64_t size = prop.uhVal.QuadPart;
-                    origsizes.push_back(size);
+				bool succ = true;
+				for (UInt32 i = 0; i < numberofitems; ++i)
+				{
+					// Get uncompressed size of file
+					CPropVariant prop;
+					hr = archive->GetProperty(i, kpidSize, &prop);
+					if (hr != S_OK)
+					{
+						succ = false;
+						break;
+					}
 
-                    // Get name of file
-                    hr = archive->GetProperty(i, kpidPath, &prop);
-                    if (hr != S_OK)
-                    {
-                        succ = false;
-                        break;
-                    }
-                    itemnames.push_back(prop.vt == VT_BSTR?prop.bstrVal:L"");
-                }
+					uint64_t size = prop.uhVal.QuadPart;
+					origsizes.push_back(size);
 
-                if (!succ)
-                {
-                    archive->Close();
-                    return E_FAIL;
-                    
-                }
+					// Get name of file
+					hr = archive->GetProperty(i, kpidPath, &prop);
+					if (hr != S_OK)
+					{
+						succ = false;
+						break;
+					}
+					itemnames.push_back(prop.vt == VT_BSTR?prop.bstrVal:L"");
+				}
 
-                if (!callback->OnFileItems(itemnames, origsizes))
-                {
-                    //只为了取得文件信息,所以直接返回.
-                    archive->Close();
-                    return S_OK;
-                }
-            }
-        }
+				if (!succ)
+				{
+					archive->Close();
+					return E_FAIL;
+
+				}
+
+				if (!callback->OnFileItems(itemnames, origsizes))
+				{
+					//只为了取得文件信息,所以直接返回.
+					archive->Close();
+					return S_OK;
+				}
+			}
+		}
 
 		CMyComPtr< ArchiveExtractCallbackMemory > extractCallback = new ArchiveExtractCallbackMemory(archive, callback,fileStreams);
 		if (NULL != pSevenZipPassword)
@@ -277,23 +269,19 @@ namespace SevenZip
 			extractCallback->Password = pSevenZipPassword->Password.c_str();
 		}
 
-        hr = archive->Extract(NULL, UInt32(-1), false, extractCallback);
-        if (hr != S_OK)
-        {
-			m_message = _T("extract error");
-        }
-        if (callback)
-        {
-            callback->OnEnd(m_archivePath);
-        }
-        archive->Close();
-        return hr;
-    }
+		hr = archive->Extract(NULL, UInt32(-1), false, extractCallback);
+		if (callback)
+		{
+			callback->OnEnd(m_archivePath);
+		}
+		archive->Close();
+		return hr;
+	}
 
-    const TString& SevenZipExtractorMemory::GetErrorString()
-    {
-        return m_message;
-    }
+	const TString& SevenZipExtractorMemory::GetErrorString()
+	{
+		return m_message;
+	}
 
 
 }

@@ -161,21 +161,16 @@ STDMETHODIMP ArchiveUpdateCallback::GetStream( UInt32 index, ISequentialInStream
 	{
 		return E_INVALIDARG;
 	}
-
 	const FilePathInfo& fileInfo = m_filePaths.at( index );
 	if ( fileInfo.IsDirectory )
 	{
 		return S_OK;
 	}
-	//wprintf(L"GetStream:%s\n", fileInfo.FilePath.c_str());
 
-#if defined(_UNICODE)
-	FILE* fileStream = _wfopen(fileInfo.FilePath.c_str(), L"rb");
-#else
-	FILE* fileStream = fopen(fileInfo.FilePath.c_str(), "rb");
-#endif
-	if (fileStream == NULL) {
-		return HRESULT_FROM_WIN32(GetLastError());
+	CMyComPtr< IStream > fileStream = FileSys::OpenFileToRead( fileInfo.FilePath );
+	if ( fileStream == NULL )
+	{
+		return HRESULT_FROM_WIN32( GetLastError() );
 	}
 
 	CMyComPtr< InStreamWrapper > wrapperStream = new InStreamWrapper( fileStream );

@@ -17,9 +17,9 @@
 #include "SevenZip/SevenZipExtractorMemory.h"
 #include "SevenZip/SevenZipLister.h" 
 #include "SevenZip/SevenString.h" 
+#include <string/strcpcvt.h>
 
-
-//using namespace SNS;
+using namespace SNS;
 
 namespace SevenZip{
 
@@ -144,16 +144,9 @@ namespace SevenZip{
 	} 
 
 	static std::string toUtf8String(LPCTSTR pszFileName){
-#ifdef _UNICODE
-		return ToString(pszFileName,CP_UTF8);
-#else
-#ifdef _WIN32
-		std::wstring str = ToWstring(pszFileName);
-		return ToString(str,CP_UTF8);
-#else
-		return pszFileName;
-#endif//_WIN32
-#endif // _UNICODE
+		SStringW wstr = S_CT2W(pszFileName);
+		SStringA utf8= S_CW2A(wstr,CP_UTF8);
+		return std::string(utf8.c_str(),utf8.GetLength());
 	}
 	// ZIP File API
 
@@ -168,11 +161,11 @@ namespace SevenZip{
 	 
 	BOOL CZipArchive::Open(LPCTSTR pszFileName,LPCSTR pszPassword)
 	{
-#ifdef _UNICODE
-		TString strPwd = ToWstring(pszPassword);
-#else
-		TString strPwd = pszPassword;
-#endif
+		TString strPwd;
+		if(pszPassword){
+			SStringT str=S_CA2T(pszPassword);
+			strPwd = str.c_str();
+		}
 		SevenZip::SevenZipPassword pwd(true, strPwd);
 		SevenZip::SevenZipExtractorMemory decompress;
 		TString strFilename = pszFileName;
@@ -194,13 +187,12 @@ namespace SevenZip{
 		HGLOBAL hResData = ::LoadResource(hModule, hResInfo);
 		if (hResData == NULL)
 			return FALSE;
-#ifdef _UNICODE
-		TString strPsw = ToWstring(pszPassword);
-#else
-		TString strPsw = pszPassword;
-#endif
-		TString s_pwd = strPsw.c_str();
-		SevenZip::SevenZipPassword pwd(true, s_pwd);
+		TString strPsw;
+		if(pszPassword){
+			SStringT str = S_CA2T(pszPassword);
+			strPsw = TString(str.c_str(),str.GetLength());
+		}
+		SevenZip::SevenZipPassword pwd(true, strPsw);
 		SevenZip::SevenZipExtractorMemory decompress;
 		decompress.SetArchiveData(hResData,dwLength);
 		return (S_OK == decompress.ExtractArchive(m_fileStreams, NULL, &pwd));

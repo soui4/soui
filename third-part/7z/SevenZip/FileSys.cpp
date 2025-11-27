@@ -4,10 +4,9 @@
 #include "../CPP/Common/MyCom.h"
 #include "../CPP/Common/MyWindows.h"
 
-#ifdef _WIN32
-#include <ShlObj.h>
-#include <Shlwapi.h>
-#endif
+
+#include <shlobj.h>
+#include <shellapi.h>
 
 namespace SevenZip
 {
@@ -351,6 +350,27 @@ std::vector< FilePathInfo > FileSys::GetFilesInDirectory( const TString& directo
 	ScannerCallback cb( recursive );
 	PathScanner::Scan( directory, searchPattern, cb );
 	return cb.GetFiles();
+}
+
+CMyComPtr< IStream > FileSys::OpenFileToRead( const TString& filePath )
+{
+	CMyComPtr< IStream > fileStream;
+	if ( FAILED( SHCreateStreamOnFile( filePath.c_str(), STGM_READ, &fileStream ) ) )
+	{
+		return NULL;
+	}
+
+	return fileStream;
+}
+
+CMyComPtr< IStream > FileSys::OpenFileToWrite( const TString& filePath )
+{
+	CMyComPtr< IStream > fileStream;
+	if ( FAILED( SHCreateStreamOnFile( filePath.c_str(), STGM_CREATE | STGM_WRITE, &fileStream ) ) )
+	{
+		return NULL;
+	}
+	return fileStream;
 }
 
 }

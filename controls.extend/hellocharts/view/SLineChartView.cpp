@@ -2,6 +2,7 @@
 #include "SLineChartView.h"
 #include "../renderer/SLineChartRenderer.h"
 #include <float.h>
+#include <algorithm>
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
