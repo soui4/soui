@@ -2,7 +2,7 @@
 #include <algorithm>
 #include <vector>
 #include <map>
-#include <string>
+#include <cstring>
 #include <assert.h>
 void CUpgAlgorithm::InitCard(int nCards[108])
 { 
