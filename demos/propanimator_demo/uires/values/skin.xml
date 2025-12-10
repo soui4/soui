@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <skin>
+    <button name="skin_btn_blue" colorBkgnd="#4285f4" colorBorder="#3367d6" colorText="#ffffff" margin="5,5,5,5" cornerRadius="3"/>
+    <button name="skin_btn_green" colorBkgnd="#34a853" colorBorder="#2d8f47" colorText="#ffffff" margin="5,5,5,5" cornerRadius="3"/>
+    <button name="skin_btn_red" colorBkgnd="#ea4335" colorBorder="#d33b2c" colorText="#ffffff" margin="5,5,5,5" cornerRadius="3"/>
+    <button name="skin_btn_orange" colorBkgnd="#fbbc04" colorBorder="#f9ab00" colorText="#ffffff" margin="5,5,5,5" cornerRadius="3"/>
+    <button name="skin_btn_purple" colorBkgnd="#9c27b0" colorBorder="#8e24aa" colorText="#ffffff" margin="5,5,5,5" cornerRadius="3"/>
+    <button name="skin_btn_gray" colorBkgnd="#6c757d" colorBorder="#5a6268" colorText="#ffffff" margin="5,5,5,5" cornerRadius="3"/>
+  </skin>

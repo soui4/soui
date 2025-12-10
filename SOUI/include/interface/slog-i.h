@@ -13,17 +13,6 @@ enum
     LOG4Z_LOG_BUF_SIZE = 10240,
 };
 
-//! LOG Level
-enum ENUM_LOG_LEVEL
-{
-    LOG_LEVEL_TRACE = 0,
-    LOG_LEVEL_DEBUG,
-    LOG_LEVEL_INFO,
-    LOG_LEVEL_WARN,
-    LOG_LEVEL_ERROR,
-    LOG_LEVEL_ALARM,
-    LOG_LEVEL_FATAL,
-};
 
 #undef INTERFACE
 #define INTERFACE IOutputFileBuilder

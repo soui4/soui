@@ -29,6 +29,12 @@ CPreviewHost::~CPreviewHost()
 {
 }
 
+void CPreviewHost::OnFinalMessage(HWND hWnd)
+{
+	SHostWnd::OnFinalMessage(hWnd);
+	delete this;
+}
+
 LRESULT CPreviewHost::OnMouseEvent(UINT uMsg, WPARAM wParam, LPARAM lParam)
 {
 	SASSERT(m_pSel);
@@ -299,13 +305,18 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
     if (pLayout->IsClass(SLinearLayout::GetClassName()))
     {
         if (nWidth != rcOld.Width())
-            pLayoutParam->SetSpecifiedSize(Horz, SLayoutSize(nWidth));
+        {
+			SLayoutSize width(nWidth, px);
+			pLayoutParam->SetSpecifiedSize(Horz, &width);
+		}    
         else if (pLayoutParam->IsWrapContent(Horz))
             nWidth = SIZE_WRAP_CONTENT;
         else if (pLayoutParam->IsMatchParent(Horz))
             nWidth = SIZE_MATCH_PARENT;
-        if (nHeight != rcOld.Height())
-			pLayoutParam->SetSpecifiedSize(Vert, SLayoutSize(nHeight));
+        if (nHeight != rcOld.Height()){
+			SLayoutSize height(nHeight, px);
+			pLayoutParam->SetSpecifiedSize(Vert, &height);
+		}
 		else if (pLayoutParam->IsWrapContent(Vert))
 			nHeight = SIZE_WRAP_CONTENT;
 		else if (pLayoutParam->IsMatchParent(Vert))
@@ -315,13 +326,18 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
     else if (pLayout->IsClass(SGridLayout::GetClassName()))
     {
         if (nWidth != rcOld.Width())
-            pLayoutParam->SetSpecifiedSize(Horz, SLayoutSize(nWidth));
+        {
+			SLayoutSize width(nWidth, px);
+			pLayoutParam->SetSpecifiedSize(Horz, &width);
+		}   
         else if (pLayoutParam->IsWrapContent(Horz))
             nWidth = SIZE_WRAP_CONTENT;
         else if (pLayoutParam->IsMatchParent(Horz))
             nWidth = SIZE_MATCH_PARENT;
-        if (nHeight != rcOld.Height())
-            pLayoutParam->SetSpecifiedSize(Vert, SLayoutSize(nHeight));
+        if (nHeight != rcOld.Height()){
+			SLayoutSize height(nHeight, px);
+			pLayoutParam->SetSpecifiedSize(Vert, &height);
+		}
         else if (pLayoutParam->IsWrapContent(Vert))
             nHeight = SIZE_WRAP_CONTENT;
         else if (pLayoutParam->IsMatchParent(Vert))

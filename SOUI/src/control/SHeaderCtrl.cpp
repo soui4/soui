@@ -36,7 +36,7 @@ int SHeaderCtrl::InsertItem(int iItem, LPCTSTR pszText, int nWidth, UINT fmt, LP
     item.mask = SHDI_ALL;
     item.fmt = fmt;
     item.fWeight = fWeight;
-    SLayoutSize szWid((float)nWidth, bDpiAware ? SLayoutSize::dp : SLayoutSize::px);
+    SLayoutSize szWid((float)nWidth, bDpiAware ? dp : px);
     item.cx = szWid.toPixelSize(GetScale());
     item.bDpiAware = bDpiAware;
     item.strText.SetOwner(this);
@@ -487,7 +487,7 @@ BOOL SHeaderCtrl::CreateChildren(SXmlNode xmlNode)
         SLayoutSize szItem = GETLAYOUTSIZE(xmlItem.attribute(L"width").as_string(L"50"));
         item.cx = szItem.toPixelSize(GetScale());
         item.fWeight = xmlItem.attribute(L"weight").as_float();
-        item.bDpiAware = (szItem.unit != SLayoutSize::px);
+        item.bDpiAware = (szItem.unit != px);
         item.lParam = xmlItem.attribute(L"userData").as_uint(0);
         item.bVisible = xmlItem.attribute(L"visible").as_bool(true);
         item.fmt = 0;

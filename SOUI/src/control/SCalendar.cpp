@@ -268,9 +268,9 @@ void SCalendar::Init()
 
     m_evtSet.addEvent(EVENTID(EventCalendarExChanged));
 
-    m_nYearMonthHeight.setSize(30.f, SLayoutSize::dp);
-    m_nWeekHeight.setSize(20.f, SLayoutSize::dp);
-    m_nFooterHeight.setSize(20.f, SLayoutSize::dp);
+    m_nYearMonthHeight.setSize(30.f, dp);
+    m_nWeekHeight.setSize(20.f, dp);
+    m_nFooterHeight.setSize(20.f, dp);
 
     m_crSelText = RGBA(0xFF, 0xFF, 0xFF, 255);
     m_crSelDayBack = RGBA(0x0, 0x7A, 0xCC, 255);

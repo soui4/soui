@@ -57,7 +57,7 @@ public:
  * @tparam Disposer The disposer class used to delete the pointer.
  * @details This class maintains the reference count and ensures that the pointer is deleted when the reference count reaches zero.
  */
-template <class T, class Disposer = DefaultPtrDisposer<T>>
+template <class T, class Disposer = DefaultPtrDisposer<T> >
 class SSharedCount
 {
 public:
@@ -130,7 +130,7 @@ private:
  * @tparam Disposer The disposer class used to delete the pointer.
  * @details This class automatically deletes the managed object when the last reference to it is destroyed.
  */
-template <class T, class Disposer = DefaultPtrDisposer<T>>
+template <class T, class Disposer = DefaultPtrDisposer<T> >
 class SSharedPtr
 {
 public:

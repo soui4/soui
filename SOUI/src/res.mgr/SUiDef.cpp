@@ -132,8 +132,8 @@ UINT SUiDefInfo::Init2(IXmlNode *pNode, BOOL bGlobalDomain, IResProvider *pResPr
         if (xmlUnit)
         {
             SStringW strUnit = xmlUnit.attribute(L"defUnit").as_string(L"px");
-            SLayoutSize::Unit unit = SLayoutSize::unitFromString(strUnit);
-            if (unit != SLayoutSize::unknow)
+            Unit unit = SLayoutSize::unitFromString(strUnit);
+            if (unit != unknow)
                 SLayoutSize::defUnit = unit;
         }
 

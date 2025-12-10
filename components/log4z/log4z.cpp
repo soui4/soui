@@ -36,6 +36,7 @@
 
 #include "log4z.h"
 #include <helper/obj-ref-impl.hpp>
+#include <helper/slog.h>
 #include <windows.h>
 
 #if defined (WIN32) || defined(_WIN64)

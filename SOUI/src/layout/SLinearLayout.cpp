@@ -58,19 +58,21 @@ BOOL SLinearLayoutParam::IsSpecifiedSize(ORIENTATION orientation) const
     }
 }
 
-SLayoutSize SLinearLayoutParam::GetSpecifiedSize(ORIENTATION orientation) const
+BOOL SLinearLayoutParam::GetSpecifiedSize(ORIENTATION orientation, LAYOUTSIZE *pLayoutSize) const
 {
     switch (orientation)
     {
     case Horz:
-        return width;
+        *pLayoutSize = width;
+        return TRUE;
     case Vert:
-        return height;
+        *pLayoutSize = height;
+        return TRUE;
     case Any:
     case Both:
     default:
         SASSERT_MSGA(FALSE, "GetSpecifiedSize can only be applied for Horz or Vert");
-        return SLayoutSize();
+        return FALSE;
     }
 }
 
@@ -169,18 +171,18 @@ void SLinearLayoutParam::SetWrapContent(ORIENTATION orientation)
     }
 }
 
-void SLinearLayoutParam::SetSpecifiedSize(ORIENTATION orientation, const SLayoutSize &layoutSize)
+void SLinearLayoutParam::SetSpecifiedSize(ORIENTATION orientation, const LAYOUTSIZE *pLayoutSize)
 {
     switch (orientation)
     {
     case Horz:
-        width = layoutSize;
+        width = *pLayoutSize;
         break;
     case Vert:
-        height = layoutSize;
+        height = *pLayoutSize;
         break;
     case Both:
-        width = height = layoutSize;
+        width = height = *pLayoutSize;
         break;
     }
 }
@@ -195,6 +197,47 @@ ILayoutParam *SLinearLayoutParam::Clone() const
     SLinearLayoutParam *pRet = new SLinearLayoutParam();
     memcpy(pRet->GetRawData(), (SLinearLayoutParamStruct *)this, sizeof(SLinearLayoutParamStruct));
     return pRet;
+}
+
+BOOL SLinearLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
+{
+    SStringW strName = pHolder->GetPropertyName();
+    if(strName.CompareNoCase(LayoutProperty::WIDTH)==0)
+    {
+        pHolder->GetAnimatedValue(fraction, &width);
+        return TRUE;
+    }
+    if(strName.CompareNoCase(LayoutProperty::HEIGHT)==0)
+    {
+        pHolder->GetAnimatedValue(fraction, &height);
+        return TRUE;
+    }
+    if(strName.CompareNoCase(LayoutProperty::EXTEND_LEFT)==0)
+    {
+        pHolder->GetAnimatedValue(fraction, &extend_left);
+        return TRUE;
+    }
+    if(strName.CompareNoCase(LayoutProperty::EXTEND_RIGHT)==0)
+    {
+        pHolder->GetAnimatedValue(fraction, &extend_right);
+        return TRUE;
+    }
+    if(strName.CompareNoCase(LayoutProperty::EXTEND_TOP)==0)
+    {
+        pHolder->GetAnimatedValue(fraction, &extend_top);
+        return TRUE;
+    }
+    if(strName.CompareNoCase(LayoutProperty::EXTEND_BOTTOM)==0)
+    {
+        pHolder->GetAnimatedValue(fraction, &extend_bottom);
+        return TRUE;
+    }
+    if(strName.CompareNoCase(LayoutProperty::WEIGHT)==0)
+    {
+        pHolder->GetAnimatedValue(fraction, &weight);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -237,7 +280,9 @@ void SLinearLayout::LayoutChildren(IWindow *pParent)
                 szChild.cx = rcParent.Width();
             else if (pLinearLayoutParam->IsSpecifiedSize(Horz))
             {
-                szChild.cx = pLinearLayoutParam->GetSpecifiedSize(Horz).toPixelSize(nScale);
+                SLayoutSize layoutSize;
+                pLinearLayoutParam->GetSpecifiedSize(Horz, &layoutSize);
+                szChild.cx = layoutSize.toPixelSize(nScale);
                 szChild.cx += pLinearLayoutParam->extend_left.toPixelSize(nScale) + pLinearLayoutParam->extend_right.toPixelSize(nScale);
             }
 
@@ -245,7 +290,9 @@ void SLinearLayout::LayoutChildren(IWindow *pParent)
                 szChild.cy = rcParent.Height();
             else if (pLinearLayoutParam->IsSpecifiedSize(Vert))
             {
-                szChild.cy = pLinearLayoutParam->GetSpecifiedSize(Vert).toPixelSize(nScale);
+                SLayoutSize layoutSize;
+                pLinearLayoutParam->GetSpecifiedSize(Vert, &layoutSize);
+                szChild.cy = layoutSize.toPixelSize(nScale);
                 szChild.cy += pLinearLayoutParam->extend_top.toPixelSize(nScale) + pLinearLayoutParam->extend_bottom.toPixelSize(nScale);
             }
 
@@ -312,7 +359,8 @@ void SLinearLayout::LayoutChildren(IWindow *pParent)
                     if (pLinearLayoutParam->IsWrapContent(orienOther))
                     {
                         ILayoutParam *backup = pLinearLayoutParam->Clone();
-                        pLinearLayoutParam->SetSpecifiedSize(m_orientation, SLayoutSize((float)szChild, SLayoutSize::dp));
+                        SLayoutSize layoutSize(szChild, dp);
+                        pLinearLayoutParam->SetSpecifiedSize(m_orientation, &layoutSize);
                         int nWid = pSize[iChild].cx, nHei = pSize[iChild].cy;
 
                         if (orienOther == Vert)
@@ -447,7 +495,9 @@ measureChilds:
             }
             else if (pLinearLayoutParam->IsSpecifiedSize(Horz))
             {
-                szChild.cx = pLinearLayoutParam->GetSpecifiedSize(Horz).toPixelSize(nScale);
+                SLayoutSize layoutSize;
+                pLinearLayoutParam->GetSpecifiedSize(Horz, &layoutSize);
+                szChild.cx = layoutSize.toPixelSize(nScale);
                 szChild.cx += pLinearLayoutParam->extend_left.toPixelSize(nScale) + pLinearLayoutParam->extend_right.toPixelSize(nScale);
             }
             if (pLinearLayoutParam->IsMatchParent(Vert))
@@ -464,7 +514,9 @@ measureChilds:
             }
             else if (pLinearLayoutParam->IsSpecifiedSize(Vert))
             {
-                szChild.cy = pLinearLayoutParam->GetSpecifiedSize(Vert).toPixelSize(nScale);
+                SLayoutSize layoutSize;
+                pLinearLayoutParam->GetSpecifiedSize(Vert, &layoutSize);
+                szChild.cy = layoutSize.toPixelSize(nScale);
                 szChild.cy += pLinearLayoutParam->extend_top.toPixelSize(nScale) + pLinearLayoutParam->extend_bottom.toPixelSize(nScale);
             }
             if (szChild.cx == SIZE_WRAP_CONTENT || szChild.cy == SIZE_WRAP_CONTENT)
@@ -559,7 +611,8 @@ measureChilds:
                     { // As pChild->GetDesiredSize may use layout param to get specified size, we
                       // must set it to new size.
                         ILayoutParam *backup = pLinearLayoutParam->Clone();
-                        pLinearLayoutParam->SetSpecifiedSize(m_orientation, SLayoutSize((float)szChild, SLayoutSize::dp));
+                        SLayoutSize layoutSize((float)szChild, dp);
+                        pLinearLayoutParam->SetSpecifiedSize(m_orientation, &layoutSize);
                         pLinearLayoutParam->SetWrapContent(orienOther);
                         int nWid = pSize[iChild].cx, nHei = pSize[iChild].cy;
 

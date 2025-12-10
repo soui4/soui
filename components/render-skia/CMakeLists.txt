@@ -18,7 +18,7 @@ set(render-skia_src
 source_group("Header Files" FILES ${render-skia_header})
 source_group("Source Files" FILES ${render-skia_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (render-skia_src  ${render-skia_src} render-skia.rc)
     add_library(render-skia SHARED ${render-skia_src} ${render-skia_header})
     add_dependencies(render-skia skia utilities4)

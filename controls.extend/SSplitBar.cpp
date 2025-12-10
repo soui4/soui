@@ -23,7 +23,10 @@ LRESULT SSplitBar::OnCreate(LPVOID)
     if (0 != __baseCls::OnCreate(NULL))
         return 1;
     ORIENTATION pi = m_bVertical ? Vert : Horz;
-    m_nOrginPos = GetLayoutParam()->GetSpecifiedSize(pi).toPixelSize(GetScale());
+    
+    SLayoutSize layoutSize;
+    GetLayoutParam()->GetSpecifiedSize(pi, &layoutSize);
+    m_nOrginPos = layoutSize.toPixelSize(GetScale());
     m_nTrackingPos = m_nOrginPos;
 
     return 0;
@@ -50,7 +53,9 @@ void SSplitBar::OnLButtonUp(UINT nFlags, CPoint pt)
 
     m_bDragging = FALSE;
     ORIENTATION pi = m_bVertical ? Vert : Horz;
-    m_nOrginPos = GetLayoutParam()->GetSpecifiedSize(pi).toPixelSize(GetScale());
+    SLayoutSize layoutSize;
+    GetLayoutParam()->GetSpecifiedSize(pi, &layoutSize);
+    m_nOrginPos = layoutSize.toPixelSize(GetScale());
     m_nTrackingPos = m_nOrginPos;
 }
 

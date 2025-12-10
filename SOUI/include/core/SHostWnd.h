@@ -397,7 +397,6 @@ class SOUI_EXP SHostWnd
     enum
     {
         kPulseTimer = 4321,    /**< SOUI timer ID (do not use in applications). */
-        kPulseInterval = 10,   /**< Pulse interval in milliseconds. */
         kNcCheckTimer = 4322,  /**< Timer ID for non-client area checks. */
         kNcCheckInterval = 50, /**< Interval for non-client area checks in milliseconds. */
         kTaskTimer = 4323,     /**< Timer ID for task execution. */
@@ -1221,6 +1220,22 @@ class SOUI_EXP SHostWnd
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
 
     /**
+     * @brief Registers a value animator.
+     *
+     * @param pAnimator Pointer to the value animator.
+     * @return TRUE if the animator was registered, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, RegisterValueAnimator)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
+
+    /**
+     * @brief Unregisters a value animator.
+     *
+     * @param pAnimator Pointer to the value animator.
+     * @return TRUE if the animator was unregistered, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, UnregisterValueAnimator)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
+
+    /**
      * @brief Enables or disables host private UI definitions.
      *
      * @param bEnable TRUE to enable, FALSE to disable.
@@ -1269,7 +1284,6 @@ class SOUI_EXP SHostWnd
      * @return Number of tasks removed.
      */
     STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE;
-
   protected:
     /**
      * @brief Creates a tooltip for the container.
@@ -1316,6 +1330,10 @@ class SOUI_EXP SHostWnd
      */
     virtual SRootWindow *CreateRoot();
 
+    /**
+     * @brief Called when the scale of the window changes.
+     * */
+    virtual void OnScaleChanged(int nScale);
   public:
     /**
      * @brief Handles the resize event of the root window.

@@ -1,10 +1,4 @@
-#
-# SOUI4 cmake配置文件
-#
 
-#
-# 1394020320@qq.com
-#
 
 add_definitions(-DSOUI_EXPORTS -D_CRT_SECURE_NO_WARNINGS)
 
@@ -42,7 +36,7 @@ endif()
  
 set(source ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_UIRES})
 
-if (NOT ENABLE_SOUI_CORE_LIB)
+if (NOT SOUI_ENABLE_CORE_LIB)
     if (CMAKE_SYSTEM_NAME MATCHES Windows)
         set (source  ${source} soui.rc)
     endif()
@@ -62,7 +56,7 @@ target_include_directories(soui4
 
 add_dependencies(soui4 utilities4)
 target_link_libraries(soui4 utilities4)
-if(ENABLE_SOUI_COM_LIB)
+if(SOUI_ENABLE_COM_LIB)
     if(TARGET resprovider-7zip)
         target_link_libraries(soui4 resprovider-7zip)
     endif()

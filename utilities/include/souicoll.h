@@ -36,7 +36,7 @@
 #define SASSERT(expr) 
 #endif // SASSERT
 
-#define SThrow(expr) SASSERT(expr)
+#define SThrow(expr)
 #define SASSERT_VALID(x)
 
 #ifndef SASSUME

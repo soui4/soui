@@ -12,7 +12,7 @@ set(src
 source_group("Header Files" FILES ${header})
 source_group("Source Files" FILES ${src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (src  ${src} render-d2d.rc)
     add_library(render-d2d SHARED ${src} ${header})
     target_link_libraries(render-d2d utilities4 d2d1.lib dwrite.lib)

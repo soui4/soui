@@ -114,10 +114,10 @@ int main()
         IWsServer *pSvr = NULL;
         comLoader.CreateInstance(_T("ws"), (IObjRef **)&pWs);
         pSvr = pWs->CreateWsServer(&svrListener);
-        int nPort = 4043;
+        int nPort = 3310;
         std::cout << "Started on port " << nPort << std::endl;
-        SvrOption optoin = { true, ".\\server.crt", ".\\server.key" };
-        pSvr->start(nPort, "websocket", optoin);
+        SvrOption optoin = { FALSE, NULL, NULL };
+        pSvr->start(nPort, "upgrade", optoin);
         bool bFinish = pSvr->wait(-1);
         std::cout << "server wait ret:" << bFinish << std::endl;
         pSvr->Release();

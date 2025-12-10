@@ -10,6 +10,7 @@ include_directories(${PROJECT_SOURCE_DIR}/controls.extend/hellocharts)
 # Source files
 file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS *.cpp)
+file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 file(GLOB_RECURSE CURRENT_SOUIS *.xml *.idx *.ico *.cur *.bmp *.jpg *.png *.gif *.rtf *.html)
 file(GLOB_RECURSE CHARTCTRL_SRC ${PROJECT_SOURCE_DIR}/controls.extend/hellocharts/*.*)
  

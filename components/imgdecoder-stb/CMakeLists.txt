@@ -12,7 +12,7 @@ set(imgdecoder-stb_src
 source_group("Header Files" FILES ${imgdecoder-stb_header})
 source_group("Source Files" FILES ${imgdecoder-stb_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (imgdecoder-stb_src  ${imgdecoder-stb_src} imgdecoder-stb.rc)
     add_library(imgdecoder-stb SHARED ${imgdecoder-stb_src} ${imgdecoder-stb_header})
     target_link_libraries(imgdecoder-stb utilities4 aupng)

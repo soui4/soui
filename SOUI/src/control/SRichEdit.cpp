@@ -724,6 +724,7 @@ STextHost::STextHost(void)
     , m_fUiActive(FALSE)
     , pserv(NULL)
 {
+    m_ptCaret.x = m_ptCaret.y = -1;
 }
 
 STextHost::~STextHost(void)
@@ -1122,7 +1123,7 @@ BOOL STextHost::Init(SRichEdit *pRichEdit)
 }
 
 //////////////////////////////////////////////////////////////////////////
-// dui interface
+// SRichEdit
 
 SRichEdit::SRichEdit()
     : m_pTxtHost(NULL)
@@ -1145,6 +1146,7 @@ SRichEdit::SRichEdit()
     , m_lAccelPos(-1)
     , m_dwStyle(ES_LEFT | ES_AUTOHSCROLL)
     , m_byDbcsLeadByte(0)
+    , m_nFontHeight(10)
 {
     m_pNcSkin = GETBUILTINSKIN(SKIN_SYS_BORDER);
 
@@ -1487,7 +1489,7 @@ HRESULT SRichEdit::InitDefaultCharFormat(CHARFORMAT2W *pcf, IFontS *pFont)
     ReleaseDC(NULL, hdc);
     const LOGFONT *plf = pFont->LogFont();
     pcf->yHeight = abs(MulDiv(pFont->TextSize(), LY_PER_INCH, yPixPerInch));
-    if (SLayoutSize::defUnit != SLayoutSize::px && IsRichScale())
+    if (SLayoutSize::defUnit != px && IsRichScale())
     {
         // rich scale 的情况下，edit内部已经对文字进行了放大，不再放大默认字体。
         pcf->yHeight /= (GetScale() / 100);

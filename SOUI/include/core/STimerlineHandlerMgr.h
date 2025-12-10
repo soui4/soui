@@ -40,6 +40,20 @@ class STimerlineHandlerMgr : public ITimelineHandler {
     bool UnregisterTimelineHandler(ITimelineHandler *pHandler);
 
     /**
+     * @brief Registers a value animator.
+     * @param pAnimator Pointer to the value animator.
+     * @return TRUE if registration is successful, FALSE otherwise.
+     */
+    bool RegisterValueAnimator(IValueAnimator *pAnimator);
+
+    /**
+     * @brief Unregisters a value animator.
+     * @param pAnimator Pointer to the value animator.
+     * @return TRUE if unregistration is successful, FALSE otherwise.
+     */
+    bool UnregisterValueAnimator(IValueAnimator *pAnimator);
+
+    /**
      * @brief Checks if the manager is empty (no handlers registered).
      * @return TRUE if no handlers are registered, FALSE otherwise.
      */
@@ -54,6 +68,7 @@ class STimerlineHandlerMgr : public ITimelineHandler {
     STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
 
   protected:
+    SList<SAutoRefPtr<IValueAnimator> > m_lstAnimators;
     typedef SMap<ITimelineHandler *, bool> TLMAP; // Map type for storing timeline handlers.
     TLMAP m_mapHandlers;                          // Map of registered timeline handlers.
 };

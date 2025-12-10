@@ -17,7 +17,7 @@ CHttpDownloader::CHttpDownloader(void)
 	TCHAR szCurDir[MAX_PATH];
 	GetCurrentDirectory(MAX_PATH, szCurDir);
 	SStringT path = szCurDir;
-	path += _T("\\image_cache");
+	path += _T("/image_cache");
 	CreateDirectory(path.c_str(),NULL);
 	m_u8CachePath = S_CT2A(szCurDir, CP_UTF8).c_str();
 	for(int i=0;i<MAX_DOWNLOADER;i++)

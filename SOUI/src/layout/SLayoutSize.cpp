@@ -15,15 +15,15 @@ static const wchar_t *kUnitMap[] = {
 };
 
 SLayoutSize::SLayoutSize(float _fSize)
-    : fSize(_fSize)
-    , unit(defUnit)
 {
+    fSize = _fSize;
+    unit = defUnit;
 }
 
 SLayoutSize::SLayoutSize(float _fSize, Unit _unit)
-    : fSize(_fSize)
-    , unit(_unit)
 {
+    fSize = _fSize;
+    unit = _unit;
 }
 
 static int fround(float v)
@@ -143,8 +143,14 @@ void SLayoutSize::parseString(const SStringW &strSize)
     }
 }
 
-//只复制数值,不复制方向
 SLayoutSize &SLayoutSize::operator=(const SLayoutSize &src)
+{
+    fSize = src.fSize;
+    unit = src.unit;
+    return *this;
+}
+
+SLayoutSize &SLayoutSize::operator=(const LAYOUTSIZE &src)
 {
     fSize = src.fSize;
     unit = src.unit;
@@ -158,7 +164,7 @@ SLayoutSize SLayoutSize::fromString(const SStringW &strSize)
     return ret;
 }
 
-SLayoutSize::Unit SLayoutSize::unitFromString(const SStringW &strUnit)
+Unit SLayoutSize::unitFromString(const SStringW &strUnit)
 {
     Unit ret = unknow;
     SStringW strUnit2 = strUnit;
@@ -174,5 +180,5 @@ SLayoutSize::Unit SLayoutSize::unitFromString(const SStringW &strUnit)
     return ret;
 }
 
-SLayoutSize::Unit SLayoutSize::defUnit = SLayoutSize::px;
+Unit SLayoutSize::defUnit = px;
 SNSEND

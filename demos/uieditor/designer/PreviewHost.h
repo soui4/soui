@@ -20,7 +20,8 @@ public:
 	void UpdateLayoutBuf(SStringA strUtf8);
 	void SelectCtrlByOrder(const int *pOrder,int nLen);
 protected:
-	virtual BOOL OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) override;
+	BOOL OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) override;
+    void OnFinalMessage(HWND hWnd) override;
 
 protected:
 	void GetSwndIndex(SWindow *pWnd,SList<int> &lstIndex);

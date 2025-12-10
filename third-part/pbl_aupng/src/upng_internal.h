@@ -86,14 +86,6 @@ typedef enum upng_state
     UPNG_NEW = 2
 } upng_state;
 
-typedef enum upng_color
-{
-    UPNG_LUM = 0,
-    UPNG_RGB = 2,
-    UPNG_PLT = 3,
-    UPNG_LUMA = 4,
-    UPNG_RGBA = 6
-} upng_color;
 
 typedef enum upng_dispose_op
 {
@@ -117,8 +109,8 @@ typedef struct upng_frame
     upng_rect rect;
     unsigned short delay_numerator;
     unsigned short delay_denominator;
-    upng_dispose_op dispose_op;
-    upng_blend_op blend_op;
+    upng_dispose_op next_frame_dispose_op;
+    upng_blend_op next_frame_blend_op;
 
     unsigned long data_chunk_offset; // of the first data chunk
     unsigned long compressed_size;
@@ -160,8 +152,8 @@ struct upng_t
     upng_source source;
 
     const upng_frame* decodedFrame;
-    uint8_t *buffer;
-    unsigned long size;
+    uint8_t *buffer;          // frame buffer for composited image (full image size)
+    unsigned long size;       // size of frame buffer
     unsigned int current_frame;
 };
 

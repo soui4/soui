@@ -56,6 +56,14 @@ DECLARE_INTERFACE(IResProviderMgr)
      */
     STDMETHOD_(void, SetFilePrefix)(THIS_ LPCTSTR pszFilePrefix) PURE;
 
+    /**
+     * @brief Retrieves the file prefix for resource paths.
+     * @param pszFilePrefix Pointer to a buffer to receive the file prefix.
+     * @param cchMax Maximum size of the buffer.
+     * @return File prefix string.
+     */
+    STDMETHOD_(BOOL, GetFilePrefix)(THIS_ LPTSTR pszFilePrefix, int cchMax) SCONST PURE;
+
     //////////////////////////////////////////////////////////////////////////
 
     /**

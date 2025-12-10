@@ -69,12 +69,12 @@ void SMessageLoop::Quit(int exitCode)
 
 int SMessageLoop::Run()
 {
-    m_bRunning = TRUE;
     m_bDoIdle = TRUE;
     m_nIdleCount = 0;
     m_tid = GetCurrentThreadId();
     m_priv->m_msgWnd.CreateNative(NULL, 0, 0, 0, 0, 0, 0, HWND_MESSAGE, 0);
-
+    SASSERT(m_priv->m_msgWnd.IsWindow());
+    m_bRunning = TRUE;
     m_bQuit = FALSE;
     int nRet = 0;
     do

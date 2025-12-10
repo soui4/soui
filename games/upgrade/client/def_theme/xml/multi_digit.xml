@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<stack size="-1,-1" curSel="0" aniType="push" vertical="1" duration="600">
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="1" tip="0"/>
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="2" tip="1"/>
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="3" tip="2"/>
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="4" tip="3"/>
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="5" tip="4"/>
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="6" tip="5"/>
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="7" tip="6"/>
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="8" tip="7"/>
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="9" tip="8"/>
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="10" tip="9"/>
+    <img size="-1,-1" skin="skin_multi_digit" iconIndex="0" tip="x"/>
+</stack>

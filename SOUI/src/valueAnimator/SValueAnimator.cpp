@@ -7,6 +7,7 @@ SNSBEGIN
 
 SValueAnimator::SValueAnimator()
     : mContainer(NULL)
+    ,m_pUserData(NULL)
 {
     sDurationScale = 1.0f;
     mStartTime = -1;
@@ -46,13 +47,28 @@ SValueAnimator::SValueAnimator()
 
 SValueAnimator::~SValueAnimator()
 {
-    removeAnimationCallback();
 }
 
 void SValueAnimator::addAnimationCallback()
 {
     SASSERT(mContainer);
-    mContainer->RegisterTimelineHandler(this);
+    mContainer->RegisterValueAnimator(this);//this value animator will holded by mContainer.
+}
+
+void SValueAnimator::removeAnimationCallback()
+{
+    if (mContainer)
+    {
+        AddRef();
+        mContainer->UnregisterValueAnimator(this);
+        mContainer = NULL;
+        Release();//may be call deconstructor here.
+    }
+}
+
+void SValueAnimator::OnNextFrame()
+{
+    doAnimationFrame(STime::GetCurrentTimeMs());
 }
 
 void SValueAnimator::copy(const IValueAnimator *pSrc)
@@ -64,21 +80,8 @@ void SValueAnimator::copy(const IValueAnimator *pSrc)
     mRepeatMode = pSrc2->mRepeatMode;
     mInterpolator = pSrc2->mInterpolator;
     m_strName = pSrc2->m_strName;
+    m_pUserData = pSrc2->m_pUserData;
     m_nID = pSrc2->m_nID;
-}
-
-void SValueAnimator::removeAnimationCallback()
-{
-    if (mContainer)
-    {
-        mContainer->UnregisterTimelineHandler(this);
-        mContainer = NULL;
-    }
-}
-
-void SValueAnimator::OnNextFrame()
-{
-    doAnimationFrame(STime::GetCurrentTimeMs());
 }
 
 void SValueAnimator::animateValue(float fraction)
@@ -281,7 +284,6 @@ void SValueAnimator::endAnimation()
     {
         return;
     }
-    removeAnimationCallback();
 
     mAnimationEndRequested = true;
     bool notify = (mStarted || mRunning);
@@ -292,11 +294,11 @@ void SValueAnimator::endAnimation()
     }
     mRunning = false;
     mStarted = false;
+    
     mStartListenersCalled = false;
     mLastFrameTime = -1;
     mFirstFrameTime = -1;
     mStartTime = -1;
-    AddRef();
     if (notify)
     {
         SArray<IAnimatorListener *> tmpListeners = mListeners;
@@ -307,7 +309,7 @@ void SValueAnimator::endAnimation()
         }
     }
     mReversing = false;
-    Release();
+    removeAnimationCallback();
 }
 
 bool SValueAnimator::canReverse()
@@ -362,6 +364,7 @@ void SValueAnimator::end()
 
 void SValueAnimator::start(ITimelineHandlersMgr *pContainer)
 {
+    SASSERT(pContainer);
     mContainer = pContainer;
     start(false);
 }
@@ -385,6 +388,7 @@ void SValueAnimator::start(bool playBackwards)
         }
     }
     mStarted = true;
+ 
     mRunning = false;
     mAnimationEndRequested = false;
     // Resets mLastFrameTime when start() is called, so that if the animation was running,
@@ -435,6 +439,21 @@ void SValueAnimator::removeListener(IAnimatorListener *p)
     {
         mListeners.RemoveAt(iFind);
     }
+}
+
+ITimelineHandler *SValueAnimator::GetTimelineHandler()
+{
+    return this;
+}
+
+LPVOID SValueAnimator::GetUserData() const
+{
+    return m_pUserData;
+}
+
+void SValueAnimator::SetUserData(LPVOID pUserData)
+{
+    m_pUserData = pUserData;
 }
 
 void SValueAnimator::addListener(IAnimatorListener *p)
@@ -655,8 +674,9 @@ HRESULT SColorAnimator::OnAttrTo(const SStringW &strValue, BOOL bLoading)
 }
 
 //////////////////////////////////////////////////////////////////////////
-SAnimatorGroup::SAnimatorGroup()
+SAnimatorGroup::SAnimatorGroup(int nID)
     : m_listener(NULL)
+    , m_nID(nID)
 {
 }
 
@@ -734,7 +754,7 @@ void SAnimatorGroup::onAnimationEnd(THIS_ IValueAnimator *pAnimator)
 
     if (bAllStop && m_listener)
     {
-        m_listener->OnAnimatorGroupEnd(this);
+        m_listener->OnAnimatorGroupEnd(this, m_nID);
     }
 }
 

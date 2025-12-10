@@ -105,18 +105,18 @@ void SGridLayoutParam::SetWrapContent(ORIENTATION orientation)
     }
 }
 
-void SGridLayoutParam::SetSpecifiedSize(ORIENTATION orientation, const SLayoutSize &layoutSize)
+void SGridLayoutParam::SetSpecifiedSize(ORIENTATION orientation, const LAYOUTSIZE *pLayoutSize)
 {
     switch (orientation)
     {
     case Horz:
-        width = layoutSize;
+        width = *pLayoutSize;
         break;
     case Vert:
-        height = layoutSize;
+        height = *pLayoutSize;
         break;
     case Both:
-        width = height = layoutSize;
+        width = height = *pLayoutSize;
         break;
     }
 }
@@ -169,19 +169,21 @@ BOOL SGridLayoutParam::IsSpecifiedSize(ORIENTATION orientation) const
     }
 }
 
-SLayoutSize SGridLayoutParam::GetSpecifiedSize(ORIENTATION orientation) const
+BOOL SGridLayoutParam::GetSpecifiedSize(ORIENTATION orientation, LAYOUTSIZE *pLayoutSize) const
 {
     switch (orientation)
     {
     case Horz:
-        return width;
+        *pLayoutSize = width;
+        return TRUE;
     case Vert:
-        return height;
+        *pLayoutSize = height;
+        return TRUE;
     case Any:
     case Both:
     default:
         SASSERT_MSGA(FALSE, "GetSpecifiedSize can only be applied for Horz or Vert");
-        return SLayoutSize();
+        return FALSE;
     }
 }
 
@@ -197,6 +199,21 @@ ILayoutParam *SGridLayoutParam::Clone() const
     return pRet;
 }
 
+BOOL SGridLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
+{
+    SStringW strPropName = pHolder->GetPropertyName();
+    if(strPropName.CompareNoCase(LayoutProperty::WIDTH) == 0)
+    {
+        pHolder->GetAnimatedValue(fraction, &width);
+        return TRUE;
+    }
+    if(strPropName.CompareNoCase(LayoutProperty::HEIGHT) == 0)
+    {
+        pHolder->GetAnimatedValue(fraction, &height);
+        return TRUE;
+    }
+    return FALSE; 
+}
 //////////////////////////////////////////////////////////////////////////
 SGridLayout::SGridLayout(void)
     : m_GravityX(gCenter)

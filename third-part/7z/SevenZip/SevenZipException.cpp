@@ -10,7 +10,7 @@ namespace SevenZip
 		va_start(args, format);
 
 #ifdef _WIN32
-		int sz = _vscprintf(format, args) + 1; // 计算所需缓冲区大小（含终止符）
+		int sz = _vscprintf(format, args) + 1;
 		std::vector<char> buffer(sz);
 		_vsnprintf_s(&buffer[0], sz, _TRUNCATE, format, args);
 #else
@@ -21,10 +21,10 @@ namespace SevenZip
 		if (sz < 0) {
 			va_end(args_copy);
 			va_end(args);
-			return {};
+			return result;
 		}
 
-		std::vector<char> buffer(sz + 1); // +1 为终止符预留空间
+		std::vector<char> buffer(sz + 1); 
 		vsnprintf(buffer.data(), buffer.size(), format, args);
 		va_end(args_copy);
 #endif

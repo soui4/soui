@@ -23,6 +23,7 @@
 #include "layout/SouiLayout.h"
 #include "layout/SLinearLayout.h"
 #include "layout/SGridLayout.h"
+#include "layout/SAnchorLayout.h"
 #include "animation/SInterpolatorImpl.h"
 #include "core/SWndAccessible.h"
 
@@ -39,6 +40,15 @@
 #include "core/SHostPresenter.h"
 
 SNSBEGIN
+
+static void SouiLog_Callback(const char *tag, const char *pLogStr, int level, const char *file, int line, const char *fun, void *retAddr)
+{
+    ILogMgr *pLogMgr = SApplication::getSingleton().GetLogManager();
+    if (pLogMgr && pLogMgr->prePushLog(level))
+    {
+        pLogMgr->pushLog(level, tag, pLogStr, file, line, fun, retAddr);
+    }
+}
 
 class SNullTranslator : public TObjRefImpl<ITranslatorMgr> {
   public:
@@ -192,6 +202,7 @@ void SObjectDefaultRegister::RegisterLayouts(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SHBox>();
     objFactory->TplRegisterFactory<SVBox>();
     objFactory->TplRegisterFactory<SGridLayout>();
+    objFactory->TplRegisterFactory<SAnchorLayout>();
 }
 
 void SObjectDefaultRegister::RegisterInterpolator(SObjectFactoryMgr *objFactory) const
@@ -709,6 +720,11 @@ IValueAnimator *SApplication::CreateValueAnimatorByName(LPCWSTR pszName) const
 void SApplication::SetLogManager(ILogMgr *pLogMgr)
 {
     m_logManager = pLogMgr;
+    if(m_logManager){
+        Log::setLogCallback(SouiLog_Callback);
+    }else{
+        Log::setLogCallback(NULL);
+    }
 }
 
 ILogMgr *SApplication::GetLogManager()

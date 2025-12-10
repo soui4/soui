@@ -40,6 +40,8 @@ class SOUI_EXP SViewSwitchAnimator : public TValueAnimator<float> {
         , m_iFrom(-1)
         , m_iTo(-1)
         , m_isOwnerResize(FALSE)
+        , m_bVertAni(TRUE)
+        , m_aniStyle(kAniNone)
     {
     }
 

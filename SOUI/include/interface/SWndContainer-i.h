@@ -19,7 +19,7 @@
 #include <interface/SMsgLoop-i.h>
 #include <interface/SScriptModule-i.h>
 #include <interface/scaret-i.h>
-#include <interface/STimelineHandler-i.h>
+#include <interface/STimelineHandlersMgr-i.h>
 #include <interface/SAccelerator-i.h>
 #include <interface/SWndFinder-i.h>
 
@@ -64,6 +64,20 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @return TRUE if successful.
      */
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler * pHandler) PURE;
+
+    /**
+     * @brief Registers a value animator.
+     * @param pAnimator Pointer to the value animator.
+     * @return TRUE if registration is successful, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, RegisterValueAnimator)(THIS_ IValueAnimator *pAnimator) PURE;
+
+    /**
+     * @brief Unregisters a value animator.
+     * @param pAnimator Pointer to the value animator.
+     * @return TRUE if unregistration is successful, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, UnregisterValueAnimator)(THIS_ IValueAnimator *pAnimator) PURE;
 
     /**
      * @brief Registers an IDropTarget with a Swnd.
@@ -312,6 +326,12 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @return TRUE if timeline is enabled, FALSE otherwise.
      */
     STDMETHOD_(BOOL, IsTimelineEnabled)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief Checks if the designer mode is enabled.
+     * @return TRUE if designer mode is enabled, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, IsDesignerMode)(CTHIS) SCONST PURE;
 };
 
 SNSEND

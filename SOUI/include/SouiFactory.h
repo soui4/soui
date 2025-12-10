@@ -9,7 +9,12 @@ class SOUI_EXP SouiFactory : public TObjRefImpl<ISouiFactory> {
   public:
     SouiFactory(void);
     ~SouiFactory(void);
-
+    
+    /**
+      * @brief Gets the global factory instance.
+      * @return Reference to the singleton instance.
+      */
+     static SouiFactory &instance(void);
   public:
     /**
      * @brief 创建应用程序对象

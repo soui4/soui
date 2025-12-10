@@ -31,7 +31,6 @@
         <!-- 第二行按钮 -->
         <window layout="hbox" height="100" interval="10">
           <lightbutton id="100" name="lightbutton4" width="100" height="100" text="矩形" showRect="1" bgColor="#FFFF00"/>
-          <lightbutton id="200" name="lightbutton5" width="100" height="100" text="可移动" canMove="1" bgColor="#818181"/>
           <lightbutton name="lightbutton6" width="100" height="100" text="报警" bgColor="#A60000"/>
         </window>
         
@@ -102,7 +101,6 @@
             • 使用预设颜色快速设置按钮颜色
             • 报警功能会让按钮闪烁
             • 形状切换可在圆形和矩形间切换
-            • 移动功能允许拖拽按钮
             • 遮罩功能控制高光效果显示
           </text>
         </window>

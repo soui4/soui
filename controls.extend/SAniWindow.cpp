@@ -25,7 +25,9 @@ void SAniWindow::OnNextFrame()
     SASSERT(m_iAniStep < m_nSteps);
     SASSERT(m_aniMode != AM_NONE);
     m_iAniStep++;
-    m_layoutParamTmp->SetSpecifiedSize(Vert, SLayoutSize((float)GetHeight(), SLayoutSize::px));
+    
+    SLayoutSize height((float)GetHeight(), px);
+    m_layoutParamTmp->SetSpecifiedSize(Vert, &height);
     RequestRelayout();
     Update();
     if (m_iAniStep == m_nSteps)
@@ -77,7 +79,9 @@ void SAniWindow::OnShowWindow(BOOL bShow, UINT nStatus)
         m_bSaveSize = false;
         m_iAniStep = 0;
         GetContainer()->RegisterTimelineHandler(this);
-        m_layoutParamTmp->SetSpecifiedSize(Vert, SLayoutSize((float)GetHeight(), SLayoutSize::px));
+        
+        SLayoutSize height((float)GetHeight(), px);
+        m_layoutParamTmp->SetSpecifiedSize(Vert, &height);
     }
     else
     {

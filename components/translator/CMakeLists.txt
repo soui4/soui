@@ -19,7 +19,7 @@ set(translator_src
 source_group("Header Files" FILES ${translator_header})
 source_group("Source Files" FILES ${translator_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (translator_src  ${translator_src} translator.rc)
     add_library(translator SHARED ${translator_src} ${translator_header})
     target_link_libraries(translator utilities4 soui4)

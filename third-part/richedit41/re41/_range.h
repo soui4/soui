@@ -135,7 +135,7 @@ public:
  */
 class CTxtRange : public ITextSelection, public CRchTxtPtr
 {
-	friend CTxtFont;
+	friend class CTxtFont;
 
 //@access Protected Data
 protected:

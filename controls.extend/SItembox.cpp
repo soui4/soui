@@ -38,8 +38,10 @@ SWindow *SItemBox::InsertItem(LPCWSTR pszXml, int iItem /*=-1*/, BOOL bEnsureVis
 
     pPanel->CreateChildren(xmlDoc.first_child());
     pPanel->SetVisible(TRUE);
-    pPanel->GetLayoutParam()->SetSpecifiedSize(Horz, m_nItemWid);
-    pPanel->GetLayoutParam()->SetSpecifiedSize(Vert, m_nItemHei);
+    SLayoutSize layoutWid(m_nItemWid, px);
+    pPanel->GetLayoutParam()->SetSpecifiedSize(Horz, &layoutWid);
+    SLayoutSize layoutHei(m_nItemHei, px);
+    pPanel->GetLayoutParam()->SetSpecifiedSize(Vert, &layoutHei);
 
     UpdateScroll();
     ReLayout();
@@ -73,8 +75,10 @@ SWindow *SItemBox::InsertItem(pugi::xml_node xmlNode,
     pPanel->CreateChildren(xmlNode);
     pPanel->SetVisible(TRUE);
 
-    pPanel->GetLayoutParam()->SetSpecifiedSize(Horz, m_nItemWid);
-    pPanel->GetLayoutParam()->SetSpecifiedSize(Vert, m_nItemHei);
+    SLayoutSize layoutWid(m_nItemWid, px);
+    SLayoutSize layoutHei(m_nItemHei, px);
+    pPanel->GetLayoutParam()->SetSpecifiedSize(Horz, &layoutWid);
+    pPanel->GetLayoutParam()->SetSpecifiedSize(Vert, &layoutHei);
 
     UpdateScroll();
     ReLayout();
@@ -361,8 +365,10 @@ BOOL SItemBox::CreateChildren(SXmlNode xmlNode)
         pChild->InitFromXml(&xmlItem);
         pChild->SetVisible(TRUE);
 
-        pChild->GetLayoutParam()->SetSpecifiedSize(Horz, m_nItemWid);
-        pChild->GetLayoutParam()->SetSpecifiedSize(Vert, m_nItemHei);
+        SLayoutSize layoutWid(m_nItemWid, px);
+        pChild->GetLayoutParam()->SetSpecifiedSize(Horz, &layoutWid);
+        SLayoutSize layoutHei(m_nItemHei, px);
+        pChild->GetLayoutParam()->SetSpecifiedSize(Vert, &layoutHei);
 
         xmlItem = xmlItem.next_sibling(L"item");
     }

@@ -4,6 +4,7 @@
 #include <windows.h>
 #include <tchar.h>
 #include <interface/obj-ref-i.h>
+#include <stdio.h>
 
 SNSBEGIN
 //加载组件辅助类
@@ -41,8 +42,19 @@ public:
 #ifndef _WIN32
                 const char * err = dlerror();
                 printf("load so failed, err=%s\n", err);
+#else
+                int err = GetLastError();
+                printf("load so failed, err=%d\n",err);
 #endif
-                return FALSE;
+#if defined(_WIN32) && (defined(__MINGW32__) || defined(__MINGW64__))
+                if(_tcsnicmp(pszDllPath,_T("lib"),3) != 0)
+                {//try to load libxxx.dll
+                    _stprintf(szDllPath,_T("lib%s.dll"),pszDllPath);
+                    m_hMod=LoadLibrary(szDllPath);
+                }
+#endif
+                if(!m_hMod)
+                    return FALSE;
             }
             m_funCreateInst=(funSCreateInstance)GetProcAddress(m_hMod,pszFnName);
             if(!m_funCreateInst)

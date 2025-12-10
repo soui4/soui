@@ -528,7 +528,8 @@ void SButton::OnSize(UINT nType, CSize size)
 //中止原来的动画
 void SButton::StopCurAnimate()
 {
-    GetContainer()->UnregisterTimelineHandler(this);
+    if (GetContainer())
+        GetContainer()->UnregisterTimelineHandler(this);
     m_byAlphaAni = 0xFF;
 }
 
@@ -574,7 +575,8 @@ SImageWnd::SImageWnd()
     , m_fl(kNone_FilterLevel)
     , m_bManaged(FALSE)
     , m_iTile(0)
-    , m_bKeepAspect(0)
+    , m_bKeepAspect(FALSE)
+    , m_bFitImage(FALSE)
 {
     m_bMsgTransparent = TRUE;
 }
@@ -658,8 +660,6 @@ BOOL SImageWnd::SetSkin(ISkinObj *pSkin, int iFrame /*=0*/, BOOL bAutoFree /*=TR
         m_bManaged = FALSE;
     }
 
-    SASSERT(GetParent());
-
     if (GetLayoutParam()->IsWrapContent(Any) && GetParent())
     {
         //重新计算坐标
@@ -704,6 +704,15 @@ SIZE SImageWnd::MeasureContent(int wid, int hei)
     szRet.cx += rcPadding.left + rcPadding.right;
     szRet.cy += rcPadding.top + rcPadding.bottom;
     return szRet;
+}
+
+void SImageWnd::GetDesiredSize(SIZE *pSize, int nParentWid, int nParentHei)
+{
+    if(m_bFitImage){
+        *pSize = MeasureContent(nParentWid, nParentHei);
+    }else{
+        __baseCls::GetDesiredSize(pSize, nParentWid, nParentHei);
+    }
 }
 
 void SImageWnd::OnColorize(COLORREF cr)
@@ -887,16 +896,22 @@ void SProgress::GetDesiredSize(SIZE *psz, int wid, int hei)
     if (IsVertical())
     {
         szRet.cx = sizeBg.cx + rcMargin.left + rcMargin.right;
-        if (GetLayoutParam()->IsSpecifiedSize(Vert))
-            szRet.cy = GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale());
+        if (GetLayoutParam()->IsSpecifiedSize(Vert)){
+            SLayoutSize layoutSize;
+            GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
+            szRet.cy = layoutSize.toPixelSize(GetScale());
+        }
         else
             szRet.cy = sizeBg.cy + rcMargin.top + rcMargin.bottom;
     }
     else
     {
         szRet.cy = sizeBg.cy + rcMargin.top + rcMargin.bottom;
-        if (GetLayoutParam()->IsSpecifiedSize(Horz))
-            szRet.cx = GetLayoutParam()->GetSpecifiedSize(Horz).toPixelSize(GetScale());
+        if (GetLayoutParam()->IsSpecifiedSize(Horz)){
+            SLayoutSize layoutSize;
+            GetLayoutParam()->GetSpecifiedSize(Horz, &layoutSize);
+            szRet.cx = layoutSize.toPixelSize(GetScale());
+        }
         else
             szRet.cx = sizeBg.cx + rcMargin.left + rcMargin.right;
     }
@@ -1573,8 +1588,8 @@ SGroup::SGroup()
     : m_crLine1(RGBA(0xF0, 0xF0, 0xF0, 0xFF))
     , m_crLine2(RGBA(0xA0, 0xA0, 0xA0, 0xFF))
 {
-    m_nRound.setSize(GROUP_ROUNDCORNOR, SLayoutSize::dp);
-    m_nHeaderHeight.setSize(GROUP_HEADER, SLayoutSize::dp);
+    m_nRound.setSize(GROUP_ROUNDCORNOR, dp);
+    m_nHeaderHeight.setSize(GROUP_HEADER, dp);
 }
 
 void SGroup::OnPaint(IRenderTarget *pRT)

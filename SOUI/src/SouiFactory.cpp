@@ -17,6 +17,12 @@ SouiFactory::~SouiFactory(void)
 {
 }
 
+SouiFactory &SouiFactory::instance(void)
+{
+    static SouiFactory factory;
+    return factory;
+}
+
 IApplication *SouiFactory::CreateApp(THIS_ IRenderFactory *pRenderFac, HMODULE hInst, LPCTSTR pszHostClassName, BOOL bImeApp)
 {
     return new SApplication(pRenderFac, hInst, pszHostClassName, SObjectDefaultRegister(), bImeApp);

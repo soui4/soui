@@ -67,7 +67,9 @@ void SSpinButtonCtrl::GetDesiredSize(SIZE *psz, int wid, int hei)
     CSize szRet;
     if (GetLayoutParam()->IsSpecifiedSize(Horz))
     {
-        szRet.cx = GetLayoutParam()->GetSpecifiedSize(Horz).toPixelSize(GetScale());
+        SLayoutSize layoutSize;
+        GetLayoutParam()->GetSpecifiedSize(Horz, &layoutSize);
+        szRet.cx = layoutSize.toPixelSize(GetScale());
     }
     else
     {
@@ -75,7 +77,9 @@ void SSpinButtonCtrl::GetDesiredSize(SIZE *psz, int wid, int hei)
     }
     if (GetLayoutParam()->IsSpecifiedSize(Vert))
     {
-        szRet.cy = GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale());
+        SLayoutSize layoutSize;
+        GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
+        szRet.cy = layoutSize.toPixelSize(GetScale());
     }
     else
     {

@@ -443,16 +443,26 @@ void SResProviderMgr::SetFilePrefix(LPCTSTR pszFilePrefix)
         m_strFilePrefix.Append(TPATH_SLASH);
 }
 
+BOOL SResProviderMgr::GetFilePrefix(LPTSTR pszFilePrefix, int cchMax) const
+{
+    SAutoLock lock(m_cs);
+    if (cchMax <= m_strFilePrefix.GetLength() + 1)
+        return FALSE;
+    _tcscpy_s(pszFilePrefix, cchMax, m_strFilePrefix.c_str());
+    return TRUE;
+}
+
 BOOL SResProviderMgr::LoadRawBuffer(LPCTSTR pszType, LPCTSTR pszResName, IResProvider *pResProvider, SAutoBuf &buf)
 {
     SAutoLock lock(m_cs);
     if (IsFileType(pszType))
     {
-        size_t dwSize = SResLoadFromFile::GetRawBufferSize(pszResName);
+        SStringT strPath = m_strFilePrefix + pszResName;
+        size_t dwSize = SResLoadFromFile::GetRawBufferSize(strPath);
         if (dwSize == 0)
             return FALSE;
         buf.Allocate(dwSize);
-        SResLoadFromFile::GetRawBuffer(pszResName, buf, dwSize);
+        SResLoadFromFile::GetRawBuffer(strPath, buf, dwSize);
         return TRUE;
     }
     if (!pResProvider)

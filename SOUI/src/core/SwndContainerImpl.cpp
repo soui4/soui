@@ -466,20 +466,8 @@ void SwndContainerImpl::BuildWndTreeZorder()
 {
     if (m_bZorderDirty)
     {
-        UINT uInitZorder = 0;
-        _BuildWndTreeZorder(m_pRoot, uInitZorder);
+        m_pRoot->OnBuildTreeZorder(0);
         m_bZorderDirty = FALSE;
-    }
-}
-
-void SwndContainerImpl::_BuildWndTreeZorder(IWindow *pWnd, UINT &iOrder)
-{
-    ((SWindow *)pWnd)->m_uZorder = iOrder++;
-    IWindow *pChild = pWnd->GetIWindow(GSW_FIRSTCHILD);
-    while (pChild)
-    {
-        _BuildWndTreeZorder(pChild, iOrder);
-        pChild = pChild->GetIWindow(GSW_NEXTSIBLING);
     }
 }
 
@@ -491,6 +479,16 @@ BOOL SwndContainerImpl::RegisterTimelineHandler(ITimelineHandler *pHandler)
 BOOL SwndContainerImpl::UnregisterTimelineHandler(ITimelineHandler *pHandler)
 {
     return m_timelineHandlerMgr.UnregisterTimelineHandler(pHandler);
+}
+
+BOOL SwndContainerImpl::RegisterValueAnimator(IValueAnimator *pAnimator)
+{
+    return m_timelineHandlerMgr.RegisterValueAnimator(pAnimator);
+}
+
+BOOL SwndContainerImpl::UnregisterValueAnimator(IValueAnimator *pAnimator)
+{
+    return m_timelineHandlerMgr.UnregisterValueAnimator(pAnimator);
 }
 
 void SwndContainerImpl::OnNextFrame()
@@ -524,6 +522,11 @@ BOOL SwndContainerImpl::UnregisterVideoCanvas(SWND swnd)
 BOOL SwndContainerImpl::IsTimelineEnabled() const
 {
     return TRUE;
+}
+
+BOOL SwndContainerImpl::IsDesignerMode() const
+{
+    return FALSE;
 }
 
 SNSEND

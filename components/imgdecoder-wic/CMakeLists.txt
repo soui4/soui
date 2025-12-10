@@ -10,7 +10,7 @@ set(imgdecoder-wic_src
 source_group("Header Files" FILES ${imgdecoder-wic_header})
 source_group("Source Files" FILES ${imgdecoder-wic_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (imgdecoder-wic_src  ${imgdecoder-wic_src} imgdecoder-wic.rc)
     add_library(imgdecoder-wic SHARED ${imgdecoder-wic_src} ${imgdecoder-wic_header})
 else()

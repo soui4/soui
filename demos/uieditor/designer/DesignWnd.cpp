@@ -43,7 +43,6 @@ void CDesignWnd::Close()
 {
 	if(m_previewHost){
 		m_previewHost->DestroyWindow();
-		delete m_previewHost;
 		m_previewHost = NULL;
 	}
 }

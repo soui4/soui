@@ -31,6 +31,10 @@ protected:
 	void UpdateViewPos();
 
 protected:
+    STDMETHOD_(BOOL,IsDesignerMode)(THIS) SCONST override{
+		return TRUE;
+    }
+protected:
 	void SetScrollMax(int hmax, int vmax) const;
 	int OnCreate(LPCREATESTRUCT lpCreateStruct);
 	void OnScroll(int nBar,int nSBCode, int nPos, HWND hScrollBar);

@@ -17,7 +17,7 @@
 #endif
 #endif
 
-#define sround(x) ((int)(x + 0.5f))
+#define sround(x) ((int)((x) + 0.5f))
 
 #ifndef GET_X_LPARAM
 #define GET_X_LPARAM(lParam) ((int)(short)LOWORD(lParam))

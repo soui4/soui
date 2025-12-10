@@ -73,7 +73,7 @@ int WsServer::start(uint16_t port, const char *protocolName_, SvrOption option)
         lwsl_err("%s: Could not initialize websocket\n", __func__);
         return -1;
     }
-    this->m_worker = std::thread{ &WsServer::run, this };
+    this->m_worker = std::thread(&WsServer::run, this);
     return 0;
 }
 
@@ -100,16 +100,21 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
         lws_hdr_copy(websocket, uriArgs, kMaxArgs, WSI_TOKEN_HTTP_URI_ARGS);
         lws_hdr_copy(websocket, uriPath, kMaxPath, WSI_TOKEN_GET_URI);
 
-        SvrConnection *connection  = new SvrConnection(m_context, websocket, m_pListener);
-        if (!m_pListener->onConnected(connection, uriPath, uriArgs)) {
-            lwsl_info("invalid args");
-            lws_close_reason(websocket, LWS_CLOSE_STATUS_PROTOCOL_ERR, NULL, 0);
-            connection->Release();
-            *(SvrConnection**)userData = nullptr;
-            ret = -1;
-        }
-        else {
-            *(SvrConnection**)userData = (SvrConnection*)connection;
+        if(m_pListener){
+            SvrConnection *connection  = new SvrConnection(m_context, websocket, m_pListener);
+            lock_guard_rev rev(m_mutex);
+            if (!m_pListener->onConnected(connection, uriPath, uriArgs))
+            {
+                lwsl_info("invalid args");
+                lws_close_reason(websocket, LWS_CLOSE_STATUS_PROTOCOL_ERR, NULL, 0);
+                connection->Release();
+                *(SvrConnection **)userData = nullptr;
+                ret = -1;
+            }
+            else
+            {
+                *(SvrConnection **)userData = (SvrConnection *)connection;
+            }
         }
         break;
     }
@@ -118,7 +123,11 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
         SvrConnection*conn = *(SvrConnection**)userData;
         if (!conn)
             break;
-        m_pListener->onDisconnect(conn); 
+        if (m_pListener)
+        {
+            lock_guard_rev rev(m_mutex);
+            m_pListener->onDisconnect(conn); 
+        }
         conn->Release();
         break;
     }
@@ -130,6 +139,7 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
         const std::size_t remaining = lws_remaining_packet_payload(websocket);
         const bool isFinalFragment = lws_is_final_fragment(websocket);
         const bool isBinary = lws_frame_is_binary(websocket);
+        lock_guard_rev rev(m_mutex);
         conn->onRecv(std::string((const char*)data, len), !remaining && isFinalFragment, isBinary);
     }
     break;
@@ -138,6 +148,7 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
         SvrConnection* conn = *(SvrConnection**)userData;
         if (conn)
         {
+            lock_guard_rev rev(m_mutex);
             conn->sendBuf();
         }
     }

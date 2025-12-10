@@ -865,15 +865,9 @@ SNSBEGIN
 
 		ALPHAINFO ai;
 		RECT rc={xLeft,yTop,xLeft+cxWidth,yTop+cyWidth};
-		if(bm.bmBitsPixel!=32)
-		{
-			CGdiAlpha::AlphaBackup(hdc,&rc,ai);
-		}
+		CGdiAlpha::AlphaBackup(hdc,&rc,ai);
 		BOOL bRet=::DrawIconEx(hdc,xLeft,yTop,hIcon,cxWidth,cyWidth,0,NULL,diFlags);
-		if(bm.bmBitsPixel!=32)
-		{
-			CGdiAlpha::AlphaRestore(ai);
-		}
+		CGdiAlpha::AlphaRestore(ai);
 		if(ii.hbmColor) DeleteObject(ii.hbmColor);
 		if(ii.hbmMask) DeleteObject(ii.hbmMask);
 #else

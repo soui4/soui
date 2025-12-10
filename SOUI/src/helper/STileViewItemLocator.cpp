@@ -5,10 +5,10 @@ SNSBEGIN
 //////////////////////////////////////////////////////////////////////////
 // STileViewItemLocatorFix
 STileViewItemLocator::STileViewItemLocator(SWindow *owner, int nItemHei, int nItemWid, int nMarginSize /*= 0*/)
-    : m_nItemHeight((float)nItemHei, SLayoutSize::px)
-    , m_nItemWidth((float)nItemWid, SLayoutSize::px)
-    , m_nItemMargin((float)nMarginSize, SLayoutSize::px)
-    , m_nTileViewWidth(0.f, SLayoutSize::px)
+    : m_nItemHeight((float)nItemHei, px)
+    , m_nItemWidth((float)nItemWid, px)
+    , m_nItemMargin((float)nMarginSize, px)
+    , m_nTileViewWidth(0.f, px)
     , m_nCountInRow(1)
     , m_pOwner(owner)
 {
@@ -18,7 +18,7 @@ STileViewItemLocator::STileViewItemLocator(SWindow *owner, LPCWSTR szItemHei, LP
     : m_nItemHeight(GETLAYOUTSIZE(szItemHei))
     , m_nItemWidth(GETLAYOUTSIZE(szItemWid))
     , m_nItemMargin(marginSize)
-    , m_nTileViewWidth(0, SLayoutSize::px)
+    , m_nTileViewWidth(0, px)
     , m_nCountInRow(1)
     , m_scale(100)
     , m_pOwner(owner)
@@ -137,7 +137,7 @@ RECT STileViewItemLocator::GetItemRect(int iItem)
 
 void STileViewItemLocator::SetTileViewWidth(int width, BOOL bDpiAware)
 {
-    m_nTileViewWidth.setSize((float)width, bDpiAware ? SLayoutSize::dp : SLayoutSize::px);
+    m_nTileViewWidth.setSize((float)width, bDpiAware ? dp : px);
     m_nCountInRow = m_nTileViewWidth.toPixelSize(m_scale) / (m_nItemWidth.toPixelSize(m_scale) + m_nItemMargin.toPixelSize(m_scale));
     if (m_nCountInRow == 0)
         m_nCountInRow = 1;

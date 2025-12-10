@@ -442,6 +442,11 @@ BOOL SOsrPanel::IsTimelineEnabled() const
 {
     return m_pItemContainer->IsTimelineEnabled();
 }
+
+BOOL SOsrPanel::IsDesignerMode() const
+{
+    return m_pHostProxy->GetHostContainer()->IsDesignerMode();
+}
 //////////////////////////////////////////////////////////////////////////
 SItemPanel *SItemPanel::Create(IHostProxy *pFrameHost, SXmlNode xmlNode, IItemContainer *pItemContainer)
 {

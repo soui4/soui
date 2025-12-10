@@ -78,9 +78,9 @@ void SMenuAttr::OnInitFinished(SXmlNode xmlNode)
     if (!m_nItemHei.isValid())
     {
         if (m_pItemSkin)
-            m_nItemHei.setSize((float)m_pItemSkin->GetSkinSize().cy, SLayoutSize::dp);
+            m_nItemHei.setSize((float)m_pItemSkin->GetSkinSize().cy, dp);
         else
-            m_nItemHei.setSize(30, SLayoutSize::dp);
+            m_nItemHei.setSize(30, dp);
     }
 }
 

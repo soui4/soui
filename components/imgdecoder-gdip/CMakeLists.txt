@@ -9,7 +9,7 @@ set(imgdecoder-gdip_src
 source_group("Header Files" FILES ${imgdecoder-gdip_header})
 source_group("Source Files" FILES ${imgdecoder-gdip_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (imgdecoder-gdip_src  ${imgdecoder-gdip_src} imgdecoder-gdip.rc)
     add_library(imgdecoder-gdip SHARED ${imgdecoder-gdip_src} ${imgdecoder-gdip_header})
 else()

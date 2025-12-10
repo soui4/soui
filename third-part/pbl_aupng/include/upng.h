@@ -74,6 +74,16 @@ extern "C"
         UPNG_LUMINANCE_ALPHA8
     } upng_format;
 
+    
+    typedef enum upng_color
+    {
+        UPNG_LUM = 0,
+        UPNG_RGB = 2,
+        UPNG_PLT = 3,
+        UPNG_LUMA = 4,
+        UPNG_RGBA = 6
+    } upng_color;
+
     typedef struct upng_t upng_t;
 
     typedef struct upng_rect
@@ -115,9 +125,9 @@ extern "C"
     // jumps to first frame
     upng_error upng_reset(upng_t *upng);
     // decodes only the main image (as if no apng support)
-    upng_error upng_decode_default(upng_t *upng);
+    upng_error upng_decode_default(upng_t *upng, uint8_t *out, uint32_t out_size);
     // decodes only the next animation frame
-    upng_error upng_decode_next_frame(upng_t *upng);
+    upng_error upng_decode_next_frame(upng_t *upng, uint8_t *out, uint32_t out_size);
     // moves ownership out of upng
     uint8_t *upng_move_frame_buffer(upng_t *upng);
     unsigned upng_get_frame_delay(const upng_t *upng);
@@ -134,6 +144,7 @@ extern "C"
     unsigned upng_get_bitdepth(const upng_t *upng);
     unsigned upng_get_components(const upng_t *upng);
     upng_format upng_get_format(const upng_t *upng);
+    upng_color upng_get_color_type(const upng_t *upng);
     // 0 means unlimited plays
     unsigned upng_get_plays(const upng_t *upng);
     // returns count of entries in palette

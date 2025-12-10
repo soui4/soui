@@ -38,6 +38,7 @@ DECLARE_INTERFACE_(ISvrConnection, IConnection)
     STDMETHOD_(int, isValid)(CTHIS) SCONST PURE;
     STDMETHOD_(int, sendText)(THIS_ const char *text, int nLen DEF_VAL(-1)) PURE;
     STDMETHOD_(int, sendBinary)(THIS_ const void *data, int nLen) PURE;
+    STDMETHOD_(int, sendBinary2)(THIS_ DWORD dwType, const void *data, int nLen) PURE;
     
     STDMETHOD_(void, close)(THIS_ const char* reason) PURE;
     STDMETHOD_(void, setId)(THIS_ int id) PURE;
@@ -116,6 +117,7 @@ DECLARE_INTERFACE_(IWsClient, IConnection)
     STDMETHOD_(int, isValid)(CTHIS) SCONST PURE;
     STDMETHOD_(int, sendText)(THIS_ const char *text, int nLen DEF_VAL(-1)) PURE;
     STDMETHOD_(int, sendBinary)(THIS_ const void *data, int nLen) PURE;
+    STDMETHOD_(int, sendBinary2)(THIS_ DWORD dwType, const void *data, int nLen) PURE;    
     
     STDMETHOD_(int, connectTo)(THIS_ const char *pszSvr, const char *pszPath, uint16_t nPort, const char *pszProtocol, ClientOption option) PURE;
     STDMETHOD_(void, disconnect)(THIS) PURE;

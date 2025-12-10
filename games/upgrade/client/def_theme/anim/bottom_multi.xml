@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set>
+    <scale duration="500" fromXScale="1" toXScale="2" fromYScale="1" toYScale="2"  pivotX="50%" pivotY="50%" fillAfter="0"/>
+    <scale duration="1000" startOffset="500" fromXScale="2" toXScale="1" fromYScale="2" toYScale="1"  pivotX="50%" pivotY="50%"/>
+</set>   

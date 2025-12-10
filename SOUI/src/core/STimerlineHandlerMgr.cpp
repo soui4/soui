@@ -23,6 +23,31 @@ bool STimerlineHandlerMgr::UnregisterTimelineHandler(ITimelineHandler *pHandler)
     return m_mapHandlers.RemoveKey(pHandler);
 }
 
+bool STimerlineHandlerMgr::RegisterValueAnimator(IValueAnimator *pAnimator)
+{
+    for(SPOSITION pos = m_lstAnimators.GetHeadPosition(); pos; ){
+        IValueAnimator *p = m_lstAnimators.GetNext(pos);
+        if (p == pAnimator)
+            return false;
+    }
+    m_lstAnimators.AddTail(pAnimator);
+    return true;
+}
+
+bool STimerlineHandlerMgr::UnregisterValueAnimator(IValueAnimator *pAnimator)
+{
+    for(SPOSITION pos = m_lstAnimators.GetHeadPosition(); pos; ){
+        SPOSITION pos2 = pos;
+        IValueAnimator *p = m_lstAnimators.GetNext(pos);
+        if (p == pAnimator)
+        {
+            m_lstAnimators.RemoveAt(pos2);
+            return true;
+        }
+    }
+    return false;
+}
+
 void STimerlineHandlerMgr::OnNextFrame()
 {
     ITimelineHandler **pHandlers = new ITimelineHandler *[m_mapHandlers.GetCount()];
@@ -45,11 +70,19 @@ void STimerlineHandlerMgr::OnNextFrame()
         pHandlers[i]->OnNextFrame();
     }
     delete[] pHandlers;
+    SList<SAutoRefPtr<IValueAnimator> > lstAnimators;
+    lstAnimators.Copy(m_lstAnimators);
+    pos = lstAnimators.GetHeadPosition();
+    while (pos)
+    {
+        IValueAnimator *p = lstAnimators.GetNext(pos);
+        p->GetTimelineHandler()->OnNextFrame();
+    }
 }
 
 bool STimerlineHandlerMgr::IsEmpty() const
 {
-    return m_mapHandlers.IsEmpty();
+    return m_mapHandlers.IsEmpty() && m_lstAnimators.IsEmpty();
 }
 
 SNSEND

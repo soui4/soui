@@ -20,7 +20,7 @@ add_definitions(-DRESPROVIDER7ZIP_EXPORTS)
 source_group("Header Files" FILES ${resprovider-7zip_header})
 source_group("Source Files" FILES ${resprovider-7zip_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (resprovider-7zip_src  ${resprovider-7zip_src} resprovider-7zip.rc)
     add_library(resprovider-7zip SHARED ${resprovider-7zip_src} ${resprovider-7zip_header})
     target_link_libraries(resprovider-7zip utilities4 7z)
