@@ -4,23 +4,23 @@
     <template itemWidth="200" itemHeight="250" layout="vbox" gravity="center" skin="skin_item_bk">
         <window size="-2,0" weight="1"  layout="grid" columnCount="3" gravity="fill">
             <window visible="0" columnWeight="1" rowWeight="1"/>
-            <button columnWeight="1" rowWeight="1" name="seat_2" id="12" text="2">
+            <button columnWeight="1" rowWeight="1" name="seat_2" id="12" text="2" cursor="hand">
                 <img name="seat_ready" skin="skin_handup" visible="0"/>
             </button>
             <window visible="0" columnWeight="1" rowWeight="1"/>
 
-            <button columnWeight="1" rowWeight="1" name="seat_1" id="11" text="1">
+            <button columnWeight="1" rowWeight="1" name="seat_1" id="11" text="1" cursor="hand">
                 <img name="seat_ready" skin="skin_handup" visible="0"/>
             </button>
             <img columnWeight="1" rowWeight="1" skin="skin_table">
                 <img name="img_playing" pos="|0,|-10" offset="-0.5,-0.5" skin="skin_playing" visible="0"/>
             </img>
-            <button columnWeight="1" rowWeight="1" name="seat_3" id="13" text="3">
+            <button columnWeight="1" rowWeight="1" name="seat_3" id="13" text="3" cursor="hand">
                 <img name="seat_ready" skin="skin_handup" visible="0"/>
             </button>
 
             <window visible="0" columnWeight="1" rowWeight="1"/>
-            <button columnWeight="1" rowWeight="1" name="seat_0" id="10" text="0">
+            <button columnWeight="1" rowWeight="1" name="seat_0" id="10" text="0" cursor="hand">
                 <img name="seat_ready" skin="skin_handup" visible="0"/>
             </button>
             <window visible="0" columnWeight="1" rowWeight="1"/>

@@ -19,6 +19,7 @@ translucent="1"
     <tabctrl size="-2,0" weight="1" tabHeight="30">
       <include src="layout:page_lobby"/>
       <include src="layout:page_upgrade"/>
+      <include src="layout:page_about"/>
     </tabctrl>
   </root>
 </SOUI>

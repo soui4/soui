@@ -5,6 +5,7 @@
   <login value="登录" />
   <lobby value="大厅" />
   <upgrade value="开心升级" />
+  <about value="关于" />
 
   <err_putcard_0 value="出的牌花色不相同"/>
   <err_putcard_1 value="出的牌张数不符" />
