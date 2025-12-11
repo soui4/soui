@@ -25,7 +25,7 @@ public:
     void OnSize(UINT nType, CSize size);
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 
-    void PlayWave(LPCWSTR pszSound);
+    void PlayWave(LPCTSTR pszSound);
 
   protected:
     void OnScaleChanged(int nScale) override;

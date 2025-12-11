@@ -165,7 +165,7 @@ void CMainDlg::OnBtnUnmute()
     m_bMute = FALSE;
 }
 
-void CMainDlg::PlayWave(LPCWSTR pszSound)
+void CMainDlg::PlayWave(LPCTSTR pszSound)
 {
     if(m_bMute) return;
     ::PlaySound(pszSound,NULL,SND_ASYNC | SND_NOSTOP | SND_FILENAME);
