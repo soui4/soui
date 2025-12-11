@@ -152,12 +152,12 @@ void UpgradeGame::OnBtnStart()
 {
     MyProfile *pMyProfile = MyProfile::getSingletonPtr();
     if(pMyProfile->GetUID() == 0){
-        SLOGE() << "OnBtnStart: not logged in";
+        PlayTip(_T("请先登录"));
         return;
     }
     if(pMyProfile->GetTableId()==-1 || pMyProfile->GetSeatIndex()==-1)
     {
-        SLOGE()<<" OnBtnStart, not seat down yet.";
+        PlayTip(_T("请先在大厅找个桌子坐下:)"));
         return;
     }
 
