@@ -5,10 +5,12 @@ class CLoginDlg : public SHostDialog, public SDpiHandler<CLoginDlg>
 public:
     CLoginDlg(); 
 public:
+    void OnBtnLocal();
     //soui消息
     EVENT_MAP_BEGIN()
         EVENT_NAME_COMMAND(L"btn_close", OnClose)
         EVENT_NAME_COMMAND(L"btn_login", OnLogin)
+        EVENT_NAME_COMMAND(L"btn_svr_local", OnBtnLocal)
     EVENT_MAP_END2(SHostDialog)
     
     //HostWnd真实窗口消息处理

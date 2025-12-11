@@ -10,8 +10,12 @@ translucent="1"
       <imgbtn name="btn_close" skin="_skin.sys.btn.close"     tip="close" animate="1"/>
     </caption>
     <window size="-2,-1" layout="gridlayout" columnCount="2" interval="5" gravity="fill">
+    
         <text text="服务器地址:"/>
-        <edit name="edt_svr" text="soui.com.cn:3310" columnWeight="1" margin="2"/>
+        <window layout="hbox" interval="5" gravity="center">        
+            <edit name="edt_svr" text="soui.com.cn:3310" columnWeight="1" margin="2"/>
+            <button name="btn_svr_local" size="50,30" text="本地"/>
+        </window>
         <text text="用户名:"/>
         <edit name="edt_name" text="张三" margin="2"/>
         <text text="性别:"/>
