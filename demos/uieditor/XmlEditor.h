@@ -37,7 +37,7 @@ SNSBEGIN
 		
         void OnSelectedCtrl(const int *pOrder, int nLen);
 		void OnUpdateSize(int nWidth, int nHeight);
-		void OnUpdatePos(SStringW strPos);
+		void OnUpdatePos(SStringW strPos, BOOL bRemoveSize);
 		void SelectCtrlByOrder(const int *pOrder,int nLen,BOOL bSelXml);
 
 		bool isDirty() const;

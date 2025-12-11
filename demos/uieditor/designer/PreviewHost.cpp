@@ -328,13 +328,75 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
 			SAnchorLayoutParam *pAnchorParam = (SAnchorLayoutParam *)pLayoutParam;
 			SAnchorLayoutParamStruct *pRawData = (SAnchorLayoutParamStruct *)pAnchorParam->GetRawData();
 			AnchorPos &anchorPos = pRawData->pos;
-			
+
+			//将移动后的布局真实坐标转换成锚点坐标的配置。
+			CPoint ptAnchor;
 			switch(anchorPos.type){
+				case APT_Left_Top:
+				{
+					ptAnchor.x = rcParent.left;
+					ptAnchor.y = rcParent.top;
+				}
+				break;
+				case APT_Center_Top:
+				{
+					ptAnchor.x = rcParent.CenterPoint().x;
+					ptAnchor.y = rcParent.top;
+				}
+				break;
+				case APT_Right_Top:
+				{
+					ptAnchor.x = rcParent.right;
+					ptAnchor.y = rcParent.top;
+				}
+				break;
+				case APT_Left_Center:
+				{
+					ptAnchor.x = rcParent.left;
+					ptAnchor.y = rcParent.CenterPoint().y;
+				}
+				break;
+				case APT_Center_Center:
+				{
+					ptAnchor = rcParent.CenterPoint();
+				}	
+				break;
+				case APT_Right_Center:
+				{
+					ptAnchor.x = rcParent.right;
+					ptAnchor.y = rcParent.CenterPoint().y;
+				}
+				break;
+				case APT_Left_Bottom:
+				{
+					ptAnchor.x = rcParent.left;
+					ptAnchor.y = rcParent.bottom;
+				}
+				break;
+				case APT_Center_Bottom:
+				{
+					ptAnchor.x = rcParent.CenterPoint().x;
+					ptAnchor.y = rcParent.bottom;
+				}
+				break;
+				case APT_Right_Bottom:
+				{
+					ptAnchor.x = rcParent.right;
+					ptAnchor.y = rcParent.bottom;
+				}
+				break;
 				default:
 				break;
 			}
+			//suppose config position is pos, then the real position is pos + ptAnchor + szOffset.
+			//so config position = real position - ptAnchor - szOffset.
+			CPoint pos = rcNew.TopLeft();
+			float fOffsetX = anchorPos.fOffsetX;
+			float fOffsetY = anchorPos.fOffsetY;
+			CPoint szOffset(nWidth*fOffsetX, nHeight*fOffsetY);
+			CPoint ptConfig = pos - ptAnchor - szOffset;
+			m_pListener->OnUpdatePos(SStringW().Format(L"%d,%d,%d",ptConfig.x,ptConfig.y,anchorPos.type),FALSE);
 		}
-		//m_pListener->OnUpdatePos(SStringW().Format(L"%d,%d",rcNew.left,rcNew.top));
 	}
     else if (pLayout->IsClass(SLinearLayout::GetClassName()))
     {
@@ -587,7 +649,7 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
 			}
 		}
 		pTarget->SetAttribute(L"pos",strPos,FALSE);
-		m_pListener->OnUpdatePos(strPos);
+		m_pListener->OnUpdatePos(strPos,TRUE);
     }
     else
     {

@@ -7,7 +7,7 @@ struct IListener{
 	virtual void OnRePos(const POINT *pt) = 0;
 	virtual void OnSelectedCtrl(const int * pOrder, int nLen) = 0;
 	virtual void OnUpdateSize(int nWidth, int nHeight) = 0;
-	virtual void OnUpdatePos(SStringW strPos) = 0;
+	virtual void OnUpdatePos(SStringW strPos,BOOL bRemoveSize) = 0;
 };
 
 class CPreviewHost : public SHostWnd
