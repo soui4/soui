@@ -20,4 +20,6 @@
     <text name="txt_website" text="官方网站：https://gitee.com/setoutsoft/soui4" font="size:14" margin="20dp,5dp"/>
     
     <text name="txt_info" text="SOUI是一套轻量级的Windows客户端UI开发框架，具有高效、稳定、易用的特点。如果您对此项目感兴趣，欢迎加入我们的QQ群交流学习！" font="size:12" align="center" margin="10dp,30dp,10dp,10dp"/>
+    <text name="txt_thanks" text="所有游戏图片资源来自网络，版权归原作者所有。" font="size:12" align="center" margin="10dp,10dp,10dp,10dp"/>
+    <text name="txt_copyright" text="Copyright © 2015-2020 Setoutsoft" font="size:12" align="center"/>
 </page>
