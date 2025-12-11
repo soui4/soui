@@ -13,6 +13,12 @@ int Log::s_logLevel = LOG_LEVEL_INFO;
 bool Log::s_enableEcho = true;
 LogCallback Log::gs_logCallback = NULL;
 
+static bool IsConsoleProgram()
+{
+    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
+    return hStdOut != INVALID_HANDLE_VALUE;
+}
+
 Log::Log(const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr)
     : m_level(level)
     , m_pAddr(pAddr)
@@ -49,12 +55,15 @@ Log::~Log()
         if (nLen > 0)
         {
             logbuf2[nLen] = 0;
-#if defined(_WIN32) && !defined(__MINGW32__)
-            OutputDebugStringA(logbuf2);
-#else
-            fwrite(logbuf2, 1, nLen, stdout);
-            fflush(stdout);
-#endif
+            if (IsConsoleProgram())
+            {
+                fwrite(logbuf2, 1, nLen, stdout);
+                fflush(stdout);
+            }
+            else
+            {
+                OutputDebugStringA(logbuf2);
+            }
         }
         free(logbuf2);
     }

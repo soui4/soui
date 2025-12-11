@@ -41,7 +41,7 @@ include_directories(
 
 set(current_project upgrade_server)
 # 创建可执行文件
-add_executable(${current_project} WIN32
+add_executable(${current_project} 
     ${SERVER_SOURCES}
     ${SERVER_HEADERS}
     ${SERVER_RESOURCES}

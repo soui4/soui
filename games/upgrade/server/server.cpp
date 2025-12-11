@@ -14,27 +14,19 @@
 #include "PropBag.h"
 #define kLogTag "UpgradeServer"
 
-int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR /*lpstrCmdLine*/, int /*nCmdShow*/)
+int _tmain(int argc, TCHAR **argv)
 {
-    LPTSTR pCmd = GetCommandLine();
-    if (pCmd[0] == _T('\"'))
-    {
-        pCmd = _tcsstr(pCmd, _T("\" "));
-        if (pCmd)
-            pCmd += 2;
-    }
-    PropBag * propBag = new PropBag;
-    propBag->Init(pCmd);
+    PropBag *propBag = new PropBag;
+    if (argc>1)
+        propBag->Init(argv[1]);
     int nPort = propBag->GetPort();
-
     SLOGI() << "start upgrade server on port " << nPort;
     CWebSocketGame game;
     BOOL bRet = game.GameStart(nPort);
     delete propBag;
-    SLOGI() << " upgrade server quit, ret="<<bRet;
-    return bRet?0:1;
+    SLOGI() << " upgrade server quit, ret=" << bRet;
+    return bRet ? 0 : 1;
 }
-
 
 
 #if !defined(_WIN32) || defined(__MINGW32__) 
