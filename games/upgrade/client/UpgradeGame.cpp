@@ -1987,7 +1987,7 @@ void UpgradeGame::PlayEffectSound(LPCWSTR pszSound)
         TCHAR szResPrefix[MAX_PATH]={0};
         SApplication::getSingletonPtr()->GetFilePrefix(szResPrefix, MAX_PATH);
         SStringT strFull = SStringT(szResPrefix) + _T("/") + S_CW2T(strFile);
-        ::PlaySound(strFull,NULL,SND_ASYNC | SND_NOSTOP | SND_FILENAME);
+        m_pMainDlg->PlayWave(strFull);
     }   
 }
 
@@ -2009,7 +2009,7 @@ void UpgradeGame::PlayProcessSound(LPCWSTR pszSound,int nSex)
         TCHAR szResPrefix[MAX_PATH]={0};
         SApplication::getSingletonPtr()->GetFilePrefix(szResPrefix, MAX_PATH);
         SStringT strFull = SStringT(szResPrefix) + _T("/") + S_CW2T(strFile);
-        ::PlaySound(strFull,NULL,SND_ASYNC | SND_NOSTOP | SND_FILENAME);
+        m_pMainDlg->PlayWave(strFull);
     } 
 }
 

@@ -8,11 +8,13 @@
 #include <helper/SMenuEx.h>
 #include <helper/SFunctor.hpp>
 #include <helper/slog.h>
+#include <mmsystem.h>
 #define kLogTag "MainDlg"
 
 CMainDlg::CMainDlg(SGameTheme* pTheme) 
 : SHostWnd(_T("LAYOUT:XML_MAINWND"))
 , m_pTheme(pTheme)
+, m_bMute(FALSE)
 {
     m_pUpgradeGame = new UpgradeGame(this,pTheme);
     m_pLobbyHandler = new LobbyHandler();
@@ -87,7 +89,6 @@ void CMainDlg::OnSize(UINT nType, CSize size)
         pBtnMax->SetVisible(TRUE);
     }
 }
-
 void CMainDlg::OnScaleChanged(int nScale)
 {
 }
@@ -149,3 +150,24 @@ BOOL CMainDlg::_OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data
     bRet = m_pUpgradeGame->OnMessage(dwType, data);
     return bRet;
 }
+
+void CMainDlg::OnBtnMute()
+{
+    FindChildByName(L"btn_mute")->SetVisible(FALSE);
+    FindChildByName(L"btn_unmute")->SetVisible(TRUE);
+    m_bMute = TRUE;
+}
+
+void CMainDlg::OnBtnUnmute()
+{
+    FindChildByName(L"btn_mute")->SetVisible(TRUE);
+    FindChildByName(L"btn_unmute")->SetVisible(FALSE);
+    m_bMute = FALSE;
+}
+
+void CMainDlg::PlayWave(LPCWSTR pszSound)
+{
+    if(m_bMute) return;
+    ::PlaySound(pszSound,NULL,SND_ASYNC | SND_NOSTOP | SND_FILENAME);
+}
+

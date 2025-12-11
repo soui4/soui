@@ -23,5 +23,7 @@
     <file name="PNG_ITEM_BK" path="image\item_bk.png"/>"
     <file name="PNG_HANDUP" path="image\handup.png"/>"
     <file name="PNG_PLAYING" path="image\playing.png"/>
+    <file name="PNG_MUTE" path="image\mute.png"/>
+    <file name="PNG_UNMUTE" path="image\unmute.png"/>
   </image>
 </resource>

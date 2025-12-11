@@ -25,6 +25,8 @@ public:
     void OnSize(UINT nType, CSize size);
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 
+    void PlayWave(LPCWSTR pszSound);
+
   protected:
     void OnScaleChanged(int nScale) override;
   protected:
@@ -34,14 +36,18 @@ public:
     void OnDisconnected();
     BOOL _OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data);
   protected:
+    void OnBtnMute();
+    void OnBtnUnmute();
     //soui消息
     EVENT_MAP_BEGIN()
         EVENT_NAME_COMMAND(L"btn_close", OnClose)
         EVENT_NAME_COMMAND(L"btn_min", OnMinimize)
         EVENT_NAME_COMMAND(L"btn_max", OnMaximize)
         EVENT_NAME_COMMAND(L"btn_restore", OnRestore)
+        EVENT_NAME_COMMAND(L"btn_mute", OnBtnMute)
+        EVENT_NAME_COMMAND(L"btn_unmute", OnBtnUnmute)  
         CHAIN_EVENT_MAP_MEMBER(*m_pUpgradeGame)
-        CHAIN_EVENT_MAP_MEMBER(*m_pLobbyHandler)         // 网络通信消息处理
+        CHAIN_EVENT_MAP_MEMBER(*m_pLobbyHandler) 
     EVENT_MAP_END2(SHostWnd)
         
     //HostWnd真实窗口消息处理
@@ -61,4 +67,5 @@ private:
         // 网络通信
     WebSocketClient m_webSocketClient;
     SAutoRefPtr<SGameTheme> m_pTheme;
+    BOOL m_bMute;
 };
