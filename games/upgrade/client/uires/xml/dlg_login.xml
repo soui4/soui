@@ -11,9 +11,9 @@ translucent="1"
     </caption>
     <window size="-2,-1" layout="gridlayout" columnCount="2" interval="5" gravity="fill">
         <text text="服务器地址:"/>
-        <edit name="edt_svr" text="127.0.0.1:3310" columnWeight="1" margin="2"/>
+        <edit name="edt_svr" text="soui.com.cn:3310" columnWeight="1" margin="2"/>
         <text text="用户名:"/>
-        <edit name="edt_name" text="hjx" margin="2"/>
+        <edit name="edt_name" text="张三" margin="2"/>
         <text text="性别:"/>
         <combobox name="cbx_sex" curSel="0" margin="2" ncskin="_skin.sys.border">
           <items>
