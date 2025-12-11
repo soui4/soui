@@ -36,7 +36,7 @@ jobs:
             platform: ARM64
           - os: macOS
             arch: x64
-            dist: macos-13  # Intel-based runner for x64
+            dist: macos-15  # Intel-based runner for x64
           - os: macOS
             arch: arm64
             dist: macos-14  # Apple Silicon runner for arm64
