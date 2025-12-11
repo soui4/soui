@@ -9,6 +9,7 @@
 #include <layout/SouiLayout.h>
 #include <layout/SLinearLayout.h>
 #include <layout/SGridLayout.h>
+#include <layout/SAnchorLayout.h>
 
 #define kLogTag "CPreviewHost"
 
@@ -302,7 +303,40 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
 
     ILayout *pLayout = pParent->GetLayout();
 	ILayoutParam *pLayoutParam = pTarget->GetLayoutParam();
-    if (pLayout->IsClass(SLinearLayout::GetClassName()))
+	if(pLayout->IsClass(SAnchorLayout::GetClassName())){
+        if (nWidth != rcOld.Width())
+        {
+			SLayoutSize width(nWidth, px);
+			pLayoutParam->SetSpecifiedSize(Horz, &width);
+		}    
+        else if (pLayoutParam->IsWrapContent(Horz))
+            nWidth = SIZE_WRAP_CONTENT;
+        else if (pLayoutParam->IsMatchParent(Horz))
+            nWidth = SIZE_MATCH_PARENT;
+        if (nHeight != rcOld.Height()){
+			SLayoutSize height(nHeight, px);
+			pLayoutParam->SetSpecifiedSize(Vert, &height);
+		}
+		else if (pLayoutParam->IsWrapContent(Vert))
+			nHeight = SIZE_WRAP_CONTENT;
+		else if (pLayoutParam->IsMatchParent(Vert))
+            nHeight = SIZE_MATCH_PARENT;
+		m_pListener->OnUpdateSize(nWidth,nHeight);
+		SAnchorLayout *pAnchorLayout = (SAnchorLayout *)pLayout;
+		if(pAnchorLayout->GetAnchor2PosCallback() == SAnchorLayout::DefaultAnchor2Pos)
+		{
+			SAnchorLayoutParam *pAnchorParam = (SAnchorLayoutParam *)pLayoutParam;
+			SAnchorLayoutParamStruct *pRawData = (SAnchorLayoutParamStruct *)pAnchorParam->GetRawData();
+			AnchorPos &anchorPos = pRawData->pos;
+			
+			switch(anchorPos.type){
+				default:
+				break;
+			}
+		}
+		//m_pListener->OnUpdatePos(SStringW().Format(L"%d,%d",rcNew.left,rcNew.top));
+	}
+    else if (pLayout->IsClass(SLinearLayout::GetClassName()))
     {
         if (nWidth != rcOld.Width())
         {

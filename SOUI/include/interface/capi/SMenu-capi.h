@@ -21,17 +21,29 @@ extern "C" {
 #define IMenu_Attach(This, hMenu) \
     ((This)->lpVtbl->Attach(This, hMenu))
 
+#define IMenu_Detach(This) \
+    ((This)->lpVtbl->Detach(This))
+
+#define IMenu_GetHMenu(This) \
+    ((This)->lpVtbl->GetHMenu(This))
+
 #define IMenu_LoadMenu(This, resId) \
     ((This)->lpVtbl->LoadMenu(This, resId))
+
+#define IMenu_LoadMenuU8(This, resId) \
+    ((This)->lpVtbl->LoadMenuU8(This, resId))
 
 #define IMenu_LoadMenu2(This, xmlNode) \
     ((This)->lpVtbl->LoadMenu2(This, xmlNode))
 
-#define IMenu_InsertMenu(This, uPos, uFlag, dwID, lpNewItem, iIcon) \
-    ((This)->lpVtbl->InsertMenu(This, uPos, uFlag, dwID, lpNewItem, iIcon))
+#define IMenu_SetIconSkin(This, icons) \
+    ((This)->lpVtbl->SetIconSkin(This, icons))
 
-#define IMenu_AppendMenu(This, uFlag, dwID, lpNewItem, iIcon) \
-    ((This)->lpVtbl->AppendMenu(This, uFlag, dwID, lpNewItem, iIcon))
+#define IMenu_InsertMenu(This, uPos, uFlag, dwID, lpNewItem, iIcon, hIcon) \
+    ((This)->lpVtbl->InsertMenu(This, uPos, uFlag, dwID, lpNewItem, iIcon, hIcon))
+
+#define IMenu_AppendMenu(This, uFlag, dwID, lpNewItem, iIcon, hIcon) \
+    ((This)->lpVtbl->AppendMenu(This, uFlag, dwID, lpNewItem, iIcon, hIcon))
 
 #define IMenu_CheckMenuItem(This, uIdCheckItem, uCheck) \
     ((This)->lpVtbl->CheckMenuItem(This, uIdCheckItem, uCheck))
@@ -50,6 +62,9 @@ extern "C" {
 
 #define IMenu_DeleteMenu(This, uPosition, uFlags) \
     ((This)->lpVtbl->DeleteMenu(This, uPosition, uFlags))
+
+#define IMenu_TrackPopupMenu(This, uFlags, x, y, hWnd, prcRect, nScale) \
+    ((This)->lpVtbl->TrackPopupMenu(This, uFlags, x, y, hWnd, prcRect, nScale))
 
 #define IMenu_DestroyMenu(This) \
     ((This)->lpVtbl->DestroyMenu(This))

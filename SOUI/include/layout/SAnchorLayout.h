@@ -208,6 +208,11 @@ class SOUI_EXP SAnchorLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     (THIS_ const IWindow *pParent, int nWidth, int nHeight) SCONST OVERRIDE;
 
     void SetAnchor2PosCallback(PFN_ANCHOR_TO_POS pfnAnchor2Pos);
+    PFN_ANCHOR_TO_POS GetAnchor2PosCallback() const{
+        return m_pfnAnchor2Pos;
+    }
+
+    static CPoint CALLBACK DefaultAnchor2Pos(const CRect &rcParent, int type);
   protected:
     POINT Position2Point(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale) const;
     POINT CalcPoint4Animator(const AnchorPos &start, const AnchorPos &end, float fraction, const CRect &rcParent, const CSize & szChild, int nScale) const;

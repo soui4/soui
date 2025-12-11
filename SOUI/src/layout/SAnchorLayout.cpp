@@ -304,7 +304,7 @@ BOOL SAnchorLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float 
 }
 
 //////////////////////////////////////////////////////////////////////////
-static CPoint CALLBACK DefaultAnchor2Pos(const CRect &rcParent, int type)
+CPoint SAnchorLayout::DefaultAnchor2Pos(const CRect &rcParent, int type)
 {
     CPoint pt;
     switch (type)

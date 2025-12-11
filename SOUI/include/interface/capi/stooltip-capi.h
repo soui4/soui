@@ -39,21 +39,6 @@ extern "C" {
 #define IToolTip_UpdateTip(This, id, rc, pszTip, nScale) \
     ((This)->lpVtbl->UpdateTip(This, id, rc, pszTip, nScale))
 
-#define IToolTip_RemoveTip(This, id) \
-    ((This)->lpVtbl->RemoveTip(This, id))
-
-#define IToolTip_SetTipOffset(This, offset) \
-    ((This)->lpVtbl->SetTipOffset(This, offset))
-
-#define IToolTip_GetTipOffset(This) \
-    ((This)->lpVtbl->GetTipOffset(This))
-
-#define IToolTip_SetTipAlign(This, align) \
-    ((This)->lpVtbl->SetTipAlign(This, align))
-
-#define IToolTip_GetTipAlign(This) \
-    ((This)->lpVtbl->GetTipAlign(This))
-
 #define IToolTip_SetToolTip(This, rc, tipAlign, pszTip, nScale) \
     ((This)->lpVtbl->SetToolTip(This, rc, tipAlign, pszTip, nScale))
 
@@ -82,4 +67,5 @@ extern "C" {
 #ifdef __cplusplus
 }
 #endif
-#endif//__STOOLTIP_CAPI_H__
+
+#endif /* __STOOLTIP_CAPI_H__ */

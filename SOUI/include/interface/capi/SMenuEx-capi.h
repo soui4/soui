@@ -21,6 +21,9 @@ extern "C" {
 #define IMenuEx_LoadMenu(This, resId) \
     ((This)->lpVtbl->LoadMenu(This, resId))
 
+#define IMenuEx_LoadMenuU8(This, resId) \
+    ((This)->lpVtbl->LoadMenuU8(This, resId))
+
 #define IMenuEx_LoadMenu2(This, xmlNode) \
     ((This)->lpVtbl->LoadMenu2(This, xmlNode))
 
@@ -39,11 +42,14 @@ extern "C" {
 #define IMenuEx_CheckMenuRadioItem(This, idFirst, idLast, idCheck, uFlags) \
     ((This)->lpVtbl->CheckMenuRadioItem(This, idFirst, idLast, idCheck, uFlags))
 
-#define IMenuEx_SetMenuUserData(This, uID, dwUserData) \
-    ((This)->lpVtbl->SetMenuUserData(This, uID, dwUserData))
+#define IMenuEx_ModifyMenuString(This, uPosition, uFlags, lpItemString) \
+    ((This)->lpVtbl->ModifyMenuString(This, uPosition, uFlags, lpItemString))
 
-#define IMenuEx_GetMenuUserData(This, uID) \
-    ((This)->lpVtbl->GetMenuUserData(This, uID))
+#define IMenuEx_SetMenuUserData(This, uPosition, uFlags, ulUserData) \
+    ((This)->lpVtbl->SetMenuUserData(This, uPosition, uFlags, ulUserData))
+
+#define IMenuEx_GetMenuUserData(This, uPosition, uFlags) \
+    ((This)->lpVtbl->GetMenuUserData(This, uPosition, uFlags))
 
 #define IMenuEx_DeleteMenu(This, uPosition, uFlags) \
     ((This)->lpVtbl->DeleteMenu(This, uPosition, uFlags))
@@ -51,11 +57,11 @@ extern "C" {
 #define IMenuEx_DestroyMenu(This) \
     ((This)->lpVtbl->DestroyMenu(This))
 
-#define IMenuEx_GetSubMenu(This, uPosition) \
-    ((This)->lpVtbl->GetSubMenu(This, uPosition))
+#define IMenuEx_GetSubMenu(This, nPos) \
+    ((This)->lpVtbl->GetSubMenu(This, nPos))
 
-#define IMenuEx_TrackPopupMenu(This, uFlags, x, y, hwnd, prcRect, uAnimate) \
-    ((This)->lpVtbl->TrackPopupMenu(This, uFlags, x, y, hwnd, prcRect, uAnimate))
+#define IMenuEx_TrackPopupMenu(This, uFlags, x, y, hWnd, nScale) \
+    ((This)->lpVtbl->TrackPopupMenu(This, uFlags, x, y, hWnd, nScale))
 
 #define IMenuEx_GetMenuItemCount(This) \
     ((This)->lpVtbl->GetMenuItemCount(This))
@@ -69,11 +75,11 @@ extern "C" {
 #define IMenuEx_HiliteMenuItem(This, hwnd, uIDHiliteItem, uHilite) \
     ((This)->lpVtbl->HiliteMenuItem(This, hwnd, uIDHiliteItem, uHilite))
 
-#define IMenuEx_GetMenuContextHelpId(This) \
-    ((This)->lpVtbl->GetMenuContextHelpId(This))
+#define IMenuEx_GetContextHelpId(This) \
+    ((This)->lpVtbl->GetContextHelpId(This))
 
-#define IMenuEx_SetMenuContextHelpId(This, dwContextHelpId) \
-    ((This)->lpVtbl->SetMenuContextHelpId(This, dwContextHelpId))
+#define IMenuEx_SetContextHelpId(This, dwId) \
+    ((This)->lpVtbl->SetContextHelpId(This, dwId))
 
 #define IMenuEx_GetMenuData(This) \
     ((This)->lpVtbl->GetMenuData(This))
@@ -93,8 +99,11 @@ extern "C" {
 #define IMenuEx_InsertMenuByXml(This, uPos, xmlNode) \
     ((This)->lpVtbl->InsertMenuByXml(This, uPos, xmlNode))
 
-#define IMenuEx_GetMenuWrapper(This) \
-    ((This)->lpVtbl->GetMenuWrapper(This))
+#define IMenuEx_GetMenuString(This, uPosition, uFlags, lpItemString) \
+    ((This)->lpVtbl->GetMenuString(This, uPosition, uFlags, lpItemString))
+
+#define IMenuEx_GetHostWnd(This) \
+    ((This)->lpVtbl->GetHostWnd(This))
 
 #ifdef __cplusplus
 }
