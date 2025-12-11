@@ -176,6 +176,7 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSwndAnimationStart));
     m_evtSet.addEvent(EVENTID(EventSwndAnimationStop));
     m_evtSet.addEvent(EVENTID(EventSwndAnimationRepeat));
+    m_evtSet.addEvent(EVENTID(EventSwndAnimatorFractor));
 
     IAttrStorageFactory *pAttrFac = SApplication::getSingleton().GetAttrStorageFactory();
     if (pAttrFac)
@@ -1788,6 +1789,13 @@ BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, A
         if(GetParent())
             GetParent()->RequestRelayout();
         InvalidateRect(NULL);
+    }else{
+        //fire event to external
+        EventSwndAnimatorFractor evt(this);
+        evt.fraction = fraction;
+        evt.pHolder = pHolder;
+        evt.state = state;
+        bRet = FireEvent(evt);
     }
     return bRet;
 }
