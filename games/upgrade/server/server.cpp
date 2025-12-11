@@ -32,7 +32,6 @@ int _tmain(int argc, TCHAR **argv)
 #if !defined(_WIN32) || defined(__MINGW32__) 
 int main(int argc, char **argv)
 {
-    HINSTANCE hInst = GetModuleHandle(NULL);
-    return _tWinMain(hInst, 0, NULL, SW_SHOWNORMAL);
+    return _tmain(argc, argv);
 }
 #endif //_WIN32
