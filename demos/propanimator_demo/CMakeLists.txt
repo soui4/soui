@@ -14,8 +14,8 @@ file(GLOB_RECURSE CURRENT_SOUIS *.xml *.idx *.ico *.cur *.bmp *.jpg *.png *.gif 
  
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
-source_group("Resouece Files" FILES ${CURRENT_RC})
-source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
+source_group("Resource Files" FILES ${CURRENT_RC})
+source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
  
 set(current_project "propanimator_demo")
 add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})

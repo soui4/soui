@@ -16,7 +16,7 @@ file(GLOB_RECURSE CHARTCTRL_SRC ${PROJECT_SOURCE_DIR}/controls.extend/hellochart
  
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
-source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
+source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 
 set(current_project "hellocharts_demo")
 add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC} ${CHARTCTRL_SRC})

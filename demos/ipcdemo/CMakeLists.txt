@@ -17,7 +17,7 @@ file(GLOB CLIENT_SRCS  client/*.cpp)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
-source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
+source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
 add_executable(ipc_client WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CLIENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})

@@ -130,7 +130,7 @@ endif()
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
-source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
+source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 source_group("Extend Cotrols" FILES ${EXTENDCOTROLS})
 

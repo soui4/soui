@@ -17,7 +17,7 @@ file(GLOB_RECURSE GRIDCTRL_SRC ${PROJECT_SOURCE_DIR}/controls.extend/gridctrl/*.
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS}) 
-source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
+source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
 set(current_project "gridctrl_demo")

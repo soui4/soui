@@ -29,15 +29,31 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     app.RegisterSkinClass<SSkinAni>();
 
     app.RegisterWindowClass<SGifPlayer>();
-
+    SStringT appDir = app.GetAppDir();
 
     SAppCfg cfg;
     SStringT srcDir = getSourceDir();
+
+
     cfg.SetRender(Render_Skia)
         .SetImgDecoder(ImgDecoder_Stb)
-        .SetSysResFile(srcDir + kPath_SysRes)
-        .SetAppResFile(srcDir + kPath_UiRes)
         .SetLog(TRUE);
+#ifdef _WIN32
+    cfg.SetSysResPeFile(appDir + _T("/soui-sys-resource.dll"));
+    cfg.SetAppResPeHandle(hInstance);
+#else
+    SStringT strAppRes = appDir+_T("/upgrade_uires.zip");
+    if(GetFileAttributes(strAppRes) != INVALID_FILE_ATTRIBUTES)
+        cfg.SetAppResZip(strAppRes, "");
+    else
+        cfg.SetAppResFile(srcDir + kPath_UiRes);
+
+    SStringT strSysRes = appDir + _T("/soui-sys-resource.zip");
+    if(GetFileAttributes(strSysRes) != INVALID_FILE_ATTRIBUTES)
+        cfg.SetSysResZip(strSysRes, "");
+    else
+        cfg.SetSysResFile(srcDir + kPath_SysRes);
+#endif
     if (!cfg.DoConfig(&app))
     {
         return -1;
@@ -58,9 +74,8 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         theme->Load(themeDir);
 
         // 加载头像
-        SStringT strAppDir = app.GetAppDir();
         static LPCTSTR kMyAvatar = _T("/avatar/myshow.gif");
-        SStringT strAvatarPath = strAppDir + kMyAvatar;
+        SStringT strAvatarPath = appDir + kMyAvatar;
         if(GetFileAttributes(strAvatarPath) == INVALID_FILE_ATTRIBUTES){
             strAvatarPath = srcDir + kMyAvatar;
         }

@@ -7,7 +7,8 @@ include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 include_directories(${PROJECT_SOURCE_DIR}/components)
 include_directories(${PROJECT_SOURCE_DIR}/controls.extend)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
-message(STATUS "PROJECT_SOURCE_DIR = ${PROJECT_SOURCE_DIR}")
+include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
+
 # Source files 
 file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS *.cpp)
@@ -16,8 +17,8 @@ file(GLOB_RECURSE CURRENT_SOUIS *.xml *.idx *.ico *.cur *.bmp *.jpg *.png *.gif 
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
-source_group("Resouece Files" FILES ${CURRENT_RC})
-source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
+source_group("Resource Files" FILES ${CURRENT_RC})
+source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 
 set(current_project "upgrade_client")
 add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
