@@ -33,7 +33,6 @@
 
 
 #ifdef LIB_SOUI_COM
-#pragma message("LIB_SOUI_COM")
 
 #pragma comment(lib,"Usp10")
 #pragma comment(lib,"opengl32")
