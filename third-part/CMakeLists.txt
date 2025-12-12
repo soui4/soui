@@ -24,6 +24,13 @@ add_subdirectory(7z)
 add_subdirectory(stdint)
 if(SOUI_BUILD_WS)
         add_subdirectory(openssl-cmake)
+
+        get_target_property(OPENSSL_INCLUDE_DIRS crypto INTERFACE_INCLUDE_DIRECTORIES)
+        message(STATUS "OpenSSL include directories: ${OPENSSL_INCLUDE_DIRS}")
+        set(OPENSSL_LIBRARIES crypto ssl)
+        set(LWS_OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIRS})
+        set(LWS_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES})
+
         set(LWS_WITH_MINIMAL_EXAMPLES OFF)
         set(LWS_WITHOUT_TESTAPPS ON)
         set(LWS_WITH_STATIC ON)
