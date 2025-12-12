@@ -965,7 +965,7 @@ else()
     )
 endif()
 #message("...........plat....${CMAKE_GENERATOR_PLATFORM}")
-if(("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64") OR (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64") OR (CMAKE_SYSTEM_PROCESSOR MATCHES "arm"))
+if(BUILD_FOR_ARM)
 if(MSVC)
 set(srcs
     ${srcs}
