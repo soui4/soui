@@ -101,9 +101,9 @@ SNSBEGIN
         typedef SList<IPropertyItemPtr> PropItemList;
         PropItemList    m_childs;
 
-		BOOL            m_bExpanded:1;  //折叠或展开
-		BOOL            m_bReadOnly:1;
-		BOOL            m_bInplaceActive:1;
+		BOOL            m_bExpanded;  //折叠或展开
+		BOOL            m_bReadOnly;
+		BOOL            m_bInplaceActive;
     protected:
         SPropertyItemBase(SPropertyGrid * pOwner)
             :m_pOwner(pOwner)

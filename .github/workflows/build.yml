@@ -91,6 +91,7 @@ jobs:
         cmake -B build -DCMAKE_BUILD_TYPE=${{ env.BUILD_TYPE }} -G Ninja \
           -DCMAKE_OSX_ARCHITECTURES=x86_64 \
           -DCMAKE_C_COMPILER=/usr/bin/clang \
+          -DSOUI_BUILD_WS=OFF \
           -DCMAKE_CXX_COMPILER=/usr/bin/clang++
 
     - name: Configure CMake (macOS arm64)
