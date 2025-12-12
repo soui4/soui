@@ -28,8 +28,9 @@ if(SOUI_BUILD_WS)
         get_target_property(OPENSSL_INCLUDE_DIRS crypto INTERFACE_INCLUDE_DIRECTORIES)
         message(STATUS "OpenSSL include directories: ${OPENSSL_INCLUDE_DIRS}")
         set(OPENSSL_LIBRARIES crypto ssl)
-        set(LWS_OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIRS})
-        set(LWS_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES})
+
+        set(LWS_OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIRS} CACHE PATH "Path to the OpenSSL include directory" FORCE)
+        set(LWS_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES} CACHE PATH "Path to the OpenSSL library" FORCE)
 
         set(LWS_WITH_MINIMAL_EXAMPLES OFF)
         set(LWS_WITHOUT_TESTAPPS ON)
