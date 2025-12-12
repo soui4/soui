@@ -51,7 +51,7 @@ protected:
 		{
 
 
-			std::map<std::string, IBitmap*>::iterator iter =
+			std::map<std::string, IBitmapS*>::iterator iter =
 				CGlobalUnits::instance()->m_mapFace.find(pItemData->m_strID);
 			if (iter != CGlobalUnits::instance()->m_mapFace.end())
 			{

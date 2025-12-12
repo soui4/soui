@@ -2196,16 +2196,6 @@ DECLARE_INTERFACE_(IRenderFactory, IObjRef)
     STDMETHOD_(IFontS *, GetDefFont)(CTHIS) PURE;
 };
 
-#ifdef __cplusplus
-// Simplify naming conventions for compatibility with SOUI3 without conflicting with system interfaces.
-typedef IFontS IFont;
-typedef IPenS IPen;
-typedef IBrushS IBrush;
-typedef IBitmapS IBitmap;
-typedef IRegionS IRegion;
-typedef IPathS IPath;
-#endif //__cplusplus
-
 SNSEND
 
 /**

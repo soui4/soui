@@ -5,7 +5,7 @@ class CRGBA2ICON
 {
 private:
 	HANDLE m_hFile;
-	SArray<IBitmap*> m_pBitmapList;
+	SArray<IBitmapS*> m_pBitmapList;
 	bool createFile(LPCTSTR pszFileName)
 	{
 		m_hFile = ::CreateFile(pszFileName, GENERIC_ALL, 0, NULL, CREATE_ALWAYS, FILE_ATTRIBUTE_NORMAL, NULL);
@@ -102,7 +102,7 @@ public:
 	{
 		return createIconFile(pszFileName);
 	}
-	void AddBitmapToIco(IBitmap *pBitmap)
+	void AddBitmapToIco(IBitmapS *pBitmap)
 	{
 		pBitmap->AddRef();
 		m_pBitmapList.Add(pBitmap);

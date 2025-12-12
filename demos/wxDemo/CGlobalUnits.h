@@ -16,7 +16,7 @@ public:
 
 	//id-name
 	std::map<std::string, std::string>			m_mapEmojisIndex;
-	std::map<std::string, IBitmap*>				m_mapFace;
+	std::map<std::string, IBitmapS*>				m_mapFace;
 
 	SStringT m_sstrEmojiFolder;
 

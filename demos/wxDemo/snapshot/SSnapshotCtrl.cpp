@@ -39,7 +39,7 @@ void SSnapshotCtrl::OnPaint(IRenderTarget* pRT)
 
 	//绘制灰色遮罩
 	{
-		CAutoRefPtr<IPath> path;
+		CAutoRefPtr<IPathS> path;
 		GETRENDERFACTORY->CreatePath(&path);
 		path->addRect(rcWindow);
 
@@ -51,7 +51,7 @@ void SSnapshotCtrl::OnPaint(IRenderTarget* pRT)
             pRT->PushClipRect(m_rcPos[i], RGN_XOR);
 		}
 
-		CAutoRefPtr<IBrush> brush, oldbrush;
+		CAutoRefPtr<IBrushS> brush, oldbrush;
 		pRT->CreateSolidColorBrush(RGBA(0, 0, 0, 100), &brush);
 		pRT->SelectObject(brush, (IRenderObj**)&oldbrush);
 		pRT->FillPath(path);
@@ -60,7 +60,7 @@ void SSnapshotCtrl::OnPaint(IRenderTarget* pRT)
 
 
 	{//绘制8个操作点
-        CAutoRefPtr<IBrush> brush, oldbrush;
+        CAutoRefPtr<IBrushS> brush, oldbrush;
         pRT->CreateSolidColorBrush(RGBA(255, 0, 0, 255), &brush);
         pRT->SelectObject(brush, (IRenderObj **)&oldbrush);
         for (int i = 0; i < 8; ++i)
@@ -417,7 +417,7 @@ void SSnapshotCtrl::CalcPos()
         return;
 
     rcArea.InflateRect(1, 1);
-    CAutoRefPtr<IPen> curPen, oldPen;
+    SAutoRefPtr<IPenS> curPen, oldPen;
 
     SOUI::CPoint center = rcArea.CenterPoint();
     // 上左 方块

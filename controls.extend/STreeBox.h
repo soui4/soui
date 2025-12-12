@@ -464,7 +464,7 @@ protected:
 
     CRect GetItemRectInView(HSTREEITEM hItem);
 
-    void  PaintVisibleItem(IRenderTarget *pRT,IRegion *pRgn,HSTREEITEM hItem,int & yOffset);
+    void  PaintVisibleItem(IRenderTarget *pRT,IRegionS *pRgn,HSTREEITEM hItem,int & yOffset);
 
     HSTREEITEM _HitTest(HSTREEITEM hItem,int & yOffset,const CPoint & pt );
 protected:

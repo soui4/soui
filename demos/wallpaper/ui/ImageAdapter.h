@@ -8,7 +8,7 @@ public:
 	~CImageAdapter(void);
 
 	void setCategory(int nCategory);
-	void OnDownloadFinish(const std::string &uri, const SStringA &data, long type, long category, IBitmap * pImg);
+	void OnDownloadFinish(const std::string &uri, const SStringA &data, long type, long category, IBitmapS * pImg);
 protected:
 	STDMETHOD_(int, getCount)() override;
 
@@ -24,7 +24,7 @@ private:
 		string uriBig;
 	};
 
-	typedef map<string,SAutoRefPtr<IBitmap> > URL2IMGMAP;
+	typedef map<string,SAutoRefPtr<IBitmapS> > URL2IMGMAP;
 
 	typedef vector<IMGINFO> IMGS;
 	typedef map<int,IMGS * > DATAMAP;

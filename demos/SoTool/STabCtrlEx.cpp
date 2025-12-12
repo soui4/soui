@@ -420,7 +420,7 @@ namespace SOUI
 		//根据状态从style中获得字体，颜色
 		IFontPtr font = m_style.GetTextFont(0);
 		COLORREF crTxt = m_style.GetTextColor(0);
-		CAutoRefPtr<IFont> oldFont;
+		SAutoRefPtr<IFontS> oldFont;
 		if (font) pRT->SelectObject(font, (IRenderObj**)&oldFont);
 		COLORREF crOld = 0;
 		if (crTxt != CR_INVALID) crOld = pRT->SetTextColor(crTxt);

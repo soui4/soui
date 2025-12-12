@@ -504,7 +504,7 @@ void STreeBox::DrawItem(IRenderTarget * pRT, CRect & rc, HSTREEITEM hItem)
 }
 
 
-void STreeBox::PaintVisibleItem( IRenderTarget *pRT,IRegion *pRgn,HSTREEITEM hItem,int &yOffset )
+void STreeBox::PaintVisibleItem( IRenderTarget *pRT,IRegionS *pRgn,HSTREEITEM hItem,int &yOffset )
 {
 	if(!hItem) return;
     CRect rcClient;
@@ -547,7 +547,7 @@ void STreeBox::OnPaint(IRenderTarget *pRT)
     SPainter painter;
     BeforePaint(pRT,painter);
     
-    CAutoRefPtr<IRegion> pClipRgn;
+    SAutoRefPtr<IRegionS> pClipRgn;
     pRT->GetClipRegion(&pClipRgn);
     
     int yOffset =0;

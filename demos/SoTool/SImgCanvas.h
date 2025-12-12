@@ -30,7 +30,7 @@ class SImgCanvas : public SWindow
 
 		SList<int>		m_size;
         BOOL            m_bVert;
-        SList<IBitmap*> m_lstImg;
+        SList<IBitmapS*> m_lstImg;
     };
 SNSEND
 
