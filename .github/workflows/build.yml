@@ -62,17 +62,11 @@ jobs:
       if: startsWith(matrix.dist, 'ubuntu')
       run: sudo apt-get update && sudo apt install -y cmake  build-essential gperf libxcb1-dev libgl1-mesa-dev freeglut3-dev libgtk-3-dev libssl-dev --fix-missing
 
-    - name: Install dependencies (macOS.arm64)
-      if: matrix.os == 'macOS' && matrix.arch == 'arm64'
+    - name: Install dependencies (macOS)
+      if: matrix.os == 'macOS'
       run: |
         brew update
-        brew install ninja pkgconf glfw3 glew openssl
-
-    - name: Install dependencies (macOS.x64)
-      if: matrix.os == 'macOS' && matrix.arch == 'x64'
-      run: |
-        brew update
-        arch -x86_64 brew install ninja pkgconf glfw3 glew openssl
+        brew install ninja pkgconf glfw3 glew
 
     - name: Configure CMake (Linux x64)
       if: matrix.os == 'Linux' && matrix.arch == 'x64'
