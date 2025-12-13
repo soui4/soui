@@ -33,6 +33,8 @@ DWORD PropBag::GetProp(DWORD dwProp) const
 
 void PropBag::Init(LPCTSTR pszPropXml)
 {
+    if (!pszPropXml)
+        return;
 	SXmlDoc xmlDoc;
     if (!xmlDoc.load_file(pszPropXml))
     {
