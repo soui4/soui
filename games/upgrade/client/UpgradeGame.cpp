@@ -1570,6 +1570,9 @@ void UpgradeGame::OnTurnOverTimer(GAME_UPGRADE_TURNOVER *pMsg){
         int nNextSeat = Index2Seat(m_iCurPutCardIndex);
         m_pTheme->GetWidget(Sprites::btn_put_card)->SetVisible(nNextSeat == SEAT_INDEX_ME, TRUE);
         MoveClock(nNextSeat, m_dwProps[PI_TIME_PUTCARD]);
+        if(GetForegroundWindow() != m_pMainDlg->m_hWnd){
+            FlashWindow(m_pMainDlg->m_hWnd,TRUE);
+        }
     }
     
     // 添加音效播放
