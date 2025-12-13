@@ -1,10 +1,11 @@
 #include "wsServer.h"
 
 SNSBEGIN
-WsServer::WsServer(ISvrListener *pListener)
+WsServer::WsServer(ISvrListener *pListener, const WsCfg &cfg)
     : m_pListener(pListener)
     , m_context(nullptr)
     , m_finished(true)
+    , m_cfg(cfg)
 {
 }
 
@@ -85,6 +86,11 @@ void WsServer::run()
     }
 }
 
+static void lws_send_ping(struct lws *wsi) {
+    unsigned char ping[LWS_PRE + 125];
+    int len = lws_snprintf((char *)ping + LWS_PRE, 125, "ping data");
+    lws_write(wsi, ping + LWS_PRE, len, LWS_WRITE_PING);
+}
 int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userData, void *data, size_t len)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
@@ -93,6 +99,33 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
     int ret = 0;
     switch (reasons)
     {
+    case LWS_CALLBACK_TIMER:
+        {
+            SvrConnection* conn = *(SvrConnection**)userData;
+
+            if (time(NULL) - conn->last_activity > m_cfg.nHeartbeatSeconds) {
+                // 超时，关闭连接
+                lws_close_reason(websocket, LWS_CLOSE_STATUS_GOINGAWAY,
+                                (unsigned char *)"heartbeat timeout", 18);
+                return -1;
+            }
+            
+            if (time(NULL) - conn->last_ping > m_cfg.pingIntervalSeconds) {
+                // 发送ping
+                lws_send_ping(websocket);
+                conn->last_ping = time(NULL);
+                conn->ping_timeout_count++;
+                
+                if (conn->ping_timeout_count > m_cfg.nPingTimeoutCount) {
+                    lws_close_reason(websocket, LWS_CLOSE_STATUS_POLICY_VIOLATION,
+                                    (unsigned char *)"too many ping timeouts", 22);
+                    return -1;
+                }
+            }
+            
+            lws_set_timer_usecs(websocket, m_cfg.nHeartbeatSeconds * LWS_USEC_PER_SEC);
+        }
+        break;
     case LWS_CALLBACK_ESTABLISHED:
     {
         static const int kMaxArgs = 1024, kMaxPath = 100;
@@ -114,6 +147,8 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
             else
             {
                 *(SvrConnection **)userData = (SvrConnection *)connection;
+                connection->last_activity = time(NULL);
+                lws_set_timer_usecs(websocket, m_cfg.nHeartbeatSeconds * LWS_USEC_PER_SEC);
             }
         }
         break;
@@ -136,6 +171,8 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
         SvrConnection* conn = *(SvrConnection**)userData;
         if (!conn)
             break;
+        conn->last_activity = time(NULL);
+        conn->ping_timeout_count = 0; // 重置计数器
         const std::size_t remaining = lws_remaining_packet_payload(websocket);
         const bool isFinalFragment = lws_is_final_fragment(websocket);
         const bool isBinary = lws_frame_is_binary(websocket);

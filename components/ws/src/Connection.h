@@ -28,7 +28,14 @@ class lock_guard_rev {
     std::mutex &m_mutex;
 };
 
-class SvrConnection : public TObjRefImpl<ISvrConnection> {
+typedef struct _heartbeat_data_t {
+    time_t last_activity;
+    time_t last_ping;
+    int ping_timeout_count;
+} heartbeat_data_t;
+
+class SvrConnection : public TObjRefImpl<ISvrConnection> , heartbeat_data_t{
+  friend class WsServer;
   public:
     SvrConnection(lws_context *ctx, lws *socket, ISvrListener *pSvrListener);
     ~SvrConnection();

@@ -10,6 +10,8 @@ SvrConnection::SvrConnection(lws_context *ctx, lws *socket,ISvrListener *pSvrLis
     , m_msgId(0)
     , m_svrListener(pSvrListener)
 {
+    last_activity = last_ping =0;
+    ping_timeout_count = 0;
 }
 
 SvrConnection::~SvrConnection()
