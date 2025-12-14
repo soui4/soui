@@ -526,6 +526,7 @@ void UpgradeGame::InitGame()
         pParamStruct->pos = m_pTheme->GetAnchorPos(AnchorName::kCardCenter);
         pParamStruct->pos.x = -nAllWid/2+i*kCardInterval;
         pSprite->SetLayer(i);
+        pSprite->SetSelectable(FALSE);
         m_pGameBoard->InsertIChild(pSprite);
 	}
 }
@@ -1381,20 +1382,13 @@ void UpgradeGame::OnPutCard(const void *lpData, int nSize)
     {
         m_pTheme->GetWidget(Sprites::btn_put_card)->SetVisible(FALSE,TRUE);
 
-        BOOL bSuccess = FALSE;
         SList<SAutoRefPtr<SSpriteCard> > cards;
-        m_cardInHand[SEAT_INDEX_ME].GetSelectedCards(cards);
-        if(cards.GetCount() == nCardCount){
-            cards.RemoveAll();
-            bSuccess = m_cardInHand[SEAT_INDEX_ME].PutCard(cards);
-            for(SPOSITION pos = cards.GetHeadPosition();pos;){
+        BOOL bSuccess = m_cardInHand[SEAT_INDEX_ME].PutCard2(req->nCard, nCardCount,cards);
+        if(bSuccess){
+             for(SPOSITION pos = cards.GetHeadPosition();pos;){
                 SSpriteCard *pCard = cards.GetNext(pos);
                 pCard->ClearSelect();
             }
-        }else{
-            bSuccess = m_cardInHand[SEAT_INDEX_ME].PutCard2(req->nCard, nCardCount,cards);
-        }
-        if(bSuccess){
             m_putCard.SetPutCard(0,cards);
         }else{
             SLOGE()<<"OnPutCard, put card failed";
@@ -1792,10 +1786,7 @@ void UpgradeGame::OnThrowFailed(const void *lpData, int nSize)
     if(index == m_iSelfIndex)
     {
         SList<SAutoRefPtr<SSpriteCard> > cards;
-        m_cardInHand[SEAT_INDEX_BOTTOM].GetSelectedCards(cards);
-        SASSERT(cards.GetCount() == nCardCount);
-        cards.RemoveAll();
-        BOOL bRet = m_cardInHand[SEAT_INDEX_BOTTOM].PutCard(cards);
+        BOOL bRet = m_cardInHand[SEAT_INDEX_BOTTOM].PutCard2(req->nPutCard, nCardCount,cards);
         for(SPOSITION pos = cards.GetHeadPosition();pos;){
             SSpriteCard *pCard = cards.GetNext(pos);
             pCard->ClearSelect();

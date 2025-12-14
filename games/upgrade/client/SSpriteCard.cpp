@@ -127,7 +127,6 @@ static CMovingCardMgr s_movingCardMgr;
 SSpriteCard::SSpriteCard():m_bSelected(FALSE),m_bDraging(FALSE),m_bSelectable(FALSE)
 {
     m_pLayoutParam.Attach(new SAnchorLayoutParam());
-    m_bMsgTransparent = FALSE;
     AddEvent(EVENTID(EventSpriteCardDragStart));
     AddEvent(EVENTID(EventSpriteCardDrag));
     AddEvent(EVENTID(EventSpriteCardDragEnd));
@@ -185,7 +184,7 @@ void SSpriteCard::SetMaskSkin(ISkinObj *pSkin)
 void SSpriteCard::SetSelectable(BOOL bSelectable)
 {
     m_bSelectable = bSelectable;
-
+    m_bMsgTransparent = !bSelectable;
     Invalidate();
 }
 

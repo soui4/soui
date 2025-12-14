@@ -181,7 +181,6 @@ public:
      * @brief 清除选择状态
      */
     void ClearSelect();
-    
 public:
     /**
      * @brief 属性映射表
