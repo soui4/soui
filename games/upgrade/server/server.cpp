@@ -12,6 +12,8 @@
 #include <helper/slog.h>
 #include <com-loader.hpp>
 #include <interface/slog-i.h>
+#define  SCOM_MASK scom_mask_log4z
+#include <commgr2.h>
 #include "WebSocketGame.h"
 #include "Upgrade.h"
 #include "PropBag.h"
@@ -28,24 +30,26 @@ static void SouiLog_Callback(const char *tag, const char *pLogStr, int level, co
 }
 
 int run(LPCTSTR pszCfg){
-    SComLoader loader;
-    SAutoRefPtr<ILogMgr> log;
-    loader.CreateInstance(_T("log4z"),(IObjRef**)&log);
-    if(log){
-        s_logMgr = log;
-        Log::setLogCallback(SouiLog_Callback);
-        log->setLoggerName("UpgradeServer");
-        log->start();
+    SComMgr2 comMgr;
+    {
+        SAutoRefPtr<ILogMgr> log;
+        comMgr.CreateLog4z((IObjRef**)&log);
+        if(log){
+            s_logMgr = log;
+            Log::setLogCallback(SouiLog_Callback);
+            log->setLoggerName("UpgradeServer");
+            log->start();
+        }
+        PropBag *propBag = new PropBag;
+        propBag->Init(pszCfg);
+        int nPort = propBag->GetPort();
+        SLOGI() << "start upgrade server on port " << nPort;
+        CWebSocketGame game;
+        BOOL bRet = game.GameStart(nPort);
+        delete propBag;
+        SLOGI() << " upgrade server quit, ret=" << bRet;
+        return bRet ? 0 : 1;
     }
-    PropBag *propBag = new PropBag;
-    propBag->Init(pszCfg);
-    int nPort = propBag->GetPort();
-    SLOGI() << "start upgrade server on port " << nPort;
-    CWebSocketGame game;
-    BOOL bRet = game.GameStart(nPort);
-    delete propBag;
-    SLOGI() << " upgrade server quit, ret=" << bRet;
-    return bRet ? 0 : 1;
 }
 int _tmain(int argc, TCHAR **argv)
 {
