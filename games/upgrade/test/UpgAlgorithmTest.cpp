@@ -1,4 +1,4 @@
-﻿#include "UpgAlgorithm.h"
+#include "UpgAlgorithm.h"
 #include <gtest/gtest.h>
 
 // 测试获取牌的花色
@@ -734,6 +734,39 @@ TEST(UpgAlgorithmTest, CheckThrowFailed) {
 
     int result7_2 = CUpgAlgorithm::ValidateFirstPlay(play_cards7, 3, COLOR_HEART, 8, true);
     EXPECT_EQ(PUT_CARD_RESULT_SUCCESS, result7_2); // AAK是最大的，甩牌应该成功
+
+    // 测试8: 甩牌失败 - 混合牌型（对子+单张），对子被大过
+    // 首家出方块4,4,A（一对+一单），其他玩家有更大的对子方块6,6
+    int play_cards8[] = { 10, 10, 0 }; // 方块4,4,A (value: 3=4, 0=A)
+    const int other_hands8[3][25] = {
+        { 11, 11 }, // 方块6,6（更大的对子）
+        { 3+13 },   // 梅花4
+        { 0+26 }    // 红桃A
+    };
+    int other_counts8[3] = { 2, 1, 1 };
+    int failed_cards8[26];
+
+    int result8 = CUpgAlgorithm::CheckThrowFailed(play_cards8, 3, other_hands8, other_counts8,
+                                                  COLOR_HEART, 8, false, failed_cards8);
+    EXPECT_EQ(2, result8); // 甩牌失败，返回2张牌（对子）
+    EXPECT_EQ(10, failed_cards8[0]); // 方块4
+    EXPECT_EQ(10, failed_cards8[1]); // 方块4
+
+    {
+    int play_cards8[] = { 10, 10, 12 }; // 方块J,J,K 
+    const int other_hands8[3][25] = {
+        { 11, 12 , 0}, // 方块Q,K, A（更大的单张）
+        { 3+13 },   // 梅花4
+        { 0+26 }    // 红桃A
+    };
+    int other_counts8[3] = { 3, 1, 1 };
+    int failed_cards8[26];
+
+    int result8 = CUpgAlgorithm::CheckThrowFailed(play_cards8, 3, other_hands8, other_counts8,
+                                                  COLOR_HEART, 8, false, failed_cards8);
+    EXPECT_EQ(1, result8); // 甩牌失败，返回1张牌（单张）
+    EXPECT_EQ(12, failed_cards8[0]); // 方块K
+    }
 }
 
 // 测试2为常主的处理

@@ -1,4 +1,4 @@
-#include "wsServer.h"
+﻿#include "wsServer.h"
 
 SNSBEGIN
 WsServer::WsServer(ISvrListener *pListener, const WsCfg &cfg)
