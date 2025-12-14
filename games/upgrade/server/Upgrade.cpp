@@ -467,16 +467,17 @@ void CUpgrade::OnReqPutCard(PCLIENT pClient, LPVOID lpData, DWORD dwSize)
 			bool bIsMainColor = (CUpgAlgorithm::GetMainValue(pReq->nCard[0], m_nMainColor, GetLevel(),is2ConstMain) >= 0);
 			// 如果是主牌，传递COLOR_MAIN标识；如果是副牌，传递具体花色
 			int nColor = bIsMainColor ? 10 : CUpgAlgorithm::GetCardColor(pReq->nCard[0]);  // COLOR_MAIN = 10
-			int nCardColor[PLAYER_COUNT-1][25];
+            const int *pHandCards[PLAYER_COUNT - 1];
 			int nCardCount[PLAYER_COUNT-1];
 			for(int i=0;i<PLAYER_COUNT-1;i++)
 			{
 				int iSeat=(i+m_nTurnFirstSeat+1)%PLAYER_COUNT;
 				PCLIENTDATA tmp=(PCLIENTDATA)m_clients[iSeat]->m_dwData;
-				nCardCount[i] = CUpgAlgorithm::GetColorCards(tmp->nCards, tmp->nCardCount, nColor, m_nMainColor, GetLevel(), is2ConstMain, nCardColor[i]);
+                pHandCards[i] = tmp->nCards;
+                nCardCount[i] = tmp->nCardCount;
 			}
 			int nFailedCard[26]={0};
-			int nFailedCount=CUpgAlgorithm::CheckThrowFailed(pReq->nCard,pReq->nCount, nCardColor, nCardCount, m_nMainColor, GetLevel(), is2ConstMain, nFailedCard);
+            int nFailedCount = CUpgAlgorithm::CheckThrowFailed(pReq->nCard, pReq->nCount, pHandCards, nCardCount, m_nMainColor, GetLevel(), is2ConstMain, nFailedCard);
 			if(nFailedCount)
 			{//甩牌失败,强制出小
 				//print 4 player cards to log

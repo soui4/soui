@@ -844,9 +844,16 @@ static int ExtractMinTractorType(const int* pairs, int pairCount, int mainColor,
     return 0;
 }
 
+void CUpgAlgorithm::SortCards(int* cards, int count, int mainColor, int levelCard, bool is2ConstMain){
+    std::sort(cards, cards + count, [mainColor, levelCard, is2ConstMain](int a, int b) {
+        return GetCardCompareValue(a, mainColor, levelCard, is2ConstMain) >
+               GetCardCompareValue(b, mainColor, levelCard, is2ConstMain);
+    });
+}
+
 // 检测首家甩牌是否失败
-int CUpgAlgorithm::CheckThrowFailed(const int* playCards, int playCount,
-                                    const int otherHands[3][25], const int otherCounts[3],
+int CUpgAlgorithm::CheckThrowFailed(const int* playCards_, int playCount,
+                                    const int* otherHands_[3], const int otherCounts[3],
                                     int mainColor, int levelCard, bool is2ConstMain,
                                     int* failedCards)
 {
@@ -855,8 +862,8 @@ int CUpgAlgorithm::CheckThrowFailed(const int* playCards, int playCount,
     bool allSameColor = true;
 
     for (int i = 0; i < playCount; i++) {
-        int cardMainValue = GetMainValue(playCards[i], mainColor, levelCard, is2ConstMain);
-        int cardColor = GetCardColor(playCards[i]);
+        int cardMainValue = GetMainValue(playCards_[i], mainColor, levelCard, is2ConstMain);
+        int cardColor = GetCardColor(playCards_[i]);
 
         int currentColor;
         if (cardMainValue >= 0) {
@@ -876,6 +883,18 @@ int CUpgAlgorithm::CheckThrowFailed(const int* playCards, int playCount,
     // 如果不是同一花色，不能甩牌
     if (!allSameColor) {
         return 0;
+    }
+
+    int playCards[26];
+    memcpy(playCards, playCards_, playCount * sizeof(int));
+    int otherHands[3][26];
+    for (int i = 0; i < 3; i++) {
+        memcpy(otherHands[i], otherHands_[i], otherCounts[i] * sizeof(int));
+    }
+    //sort input cards.
+    SortCards(playCards, playCount, mainColor, levelCard, is2ConstMain);
+    for (int i = 0; i < 3; i++) {
+        SortCards(otherHands[i], otherCounts[i], mainColor, levelCard, is2ConstMain);
     }
 
     // 将出牌分成对子和单张

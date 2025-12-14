@@ -202,7 +202,7 @@ public:
      * @return 甩牌失败时必须出的牌数量，0表示甩牌成功
      */
     static int CheckThrowFailed(const int* playCards, int playCount,
-                                const int otherHands[3][25], const int otherCounts[3],
+                                const int* otherHands[3], const int otherCounts[3],
                                 int mainColor, int levelCard, bool is2ConstMain,
                                 int* failedCards);
 
@@ -216,6 +216,17 @@ public:
      * @return 是否成功
      */
     static bool ExtractCards(int *pnSour, int nSour, int *pnDest, int nDest,bool bTest);
+
+    /**
+     * 对牌进行排序
+     * @param cards 牌数组
+     * @param count 牌数量
+     * @param mainColor 主花色
+     * @param levelCard 级牌
+     * @param is2ConstMain 2是否为常主
+     * @return 无
+     */
+    static void SortCards(int* cards, int count, int mainColor, int levelCard, bool is2ConstMain);
 };
 
 #endif // __UPGALGORITHM_H__

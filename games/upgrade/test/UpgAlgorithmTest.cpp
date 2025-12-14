@@ -1,4 +1,4 @@
-#include "UpgAlgorithm.h"
+﻿#include "UpgAlgorithm.h"
 #include <gtest/gtest.h>
 
 // 测试获取牌的花色
@@ -766,6 +766,23 @@ TEST(UpgAlgorithmTest, CheckThrowFailed) {
                                                   COLOR_HEART, 8, false, failed_cards8);
     EXPECT_EQ(1, result8); // 甩牌失败，返回1张牌（单张）
     EXPECT_EQ(12, failed_cards8[0]); // 方块K
+    }
+
+    {
+        //test
+        int play_cards8[] = { 4, 4, 52, 52 }; // 方块J,J,K
+        const int other_hands8[3][25] = {
+            { 53, 53, 0 }, // 方块Q,K, A（更大的单张）
+            { 3 + 13 },    // 梅花4
+            { 0 + 26 }     // 红桃A
+        };
+        int other_counts8[3] = { 3, 1, 1 };
+        int failed_cards8[26];
+
+        int result8 = CUpgAlgorithm::CheckThrowFailed(play_cards8, 4, other_hands8, other_counts8, COLOR_DIAMOND, 4, false, failed_cards8);
+        EXPECT_EQ(2, result8);           // 甩牌失败，返回1张牌（单张）
+        EXPECT_EQ(4, failed_cards8[0]); // 方块K
+        EXPECT_EQ(4, failed_cards8[1]);  // 方块K
     }
 }
 
