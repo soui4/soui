@@ -5,6 +5,7 @@
 #include "stdafx.h"
 #include "Upgrade.h"
 #include <math.h>
+#include <sstream>
 #include <upgradeProtocol.h>
 #include "PropBag.h"
 #include <helper/slog.h>
@@ -322,6 +323,15 @@ void CUpgrade::OnReqPutBottom(PCLIENT pClient, LPVOID lpData, DWORD dwSize)
 		}
 		m_clients[m_nBankerSeat]->m_dwState=1;	//该用户可以出牌标志
 		m_nTurnFirstSeat=m_nBankerSeat;
+		//通知庄家开始出牌
+		SLOGI()<<"OnReqPutBottom done, ============================================";
+		for(int i=0;i<PLAYER_COUNT;i++){
+			std::stringstream ss;
+			for(int j=0;j<25;j++){
+				ss<<pClientData->nCards[j]<<" ";
+			}
+			SLOGI() << "player " << i << " : cards=" << ss.str().c_str();
+		}
 		SendMsg(NULL,GMT_UPGRADE_STARTPUTCARD,&m_nTurnFirstSeat,sizeof(int));
 	}
 }
@@ -469,6 +479,27 @@ void CUpgrade::OnReqPutCard(PCLIENT pClient, LPVOID lpData, DWORD dwSize)
 			int nFailedCount=CUpgAlgorithm::CheckThrowFailed(pReq->nCard,pReq->nCount, nCardColor, nCardCount, m_nMainColor, GetLevel(), is2ConstMain, nFailedCard);
 			if(nFailedCount)
 			{//甩牌失败,强制出小
+				//print 4 player cards to log
+				for(int i=0;i<PLAYER_COUNT;i++){
+					PCLIENTDATA pClientData=(PCLIENTDATA)m_clients[i]->m_dwData;
+					std::stringstream ss;
+					for(int j=0;j<pClientData->nCardCount;j++){
+						ss<<pClientData->nCards[j]<<" ";
+					}
+					SLOGI() << "player " << i << " : cards=" << ss.str().c_str();
+				}
+				//print throw failed cards
+				{
+					std::stringstream ss;
+					for(int i=0;i<pReq->nCount;i++){
+						ss<<pReq->nCard[i]<<" ";
+					}
+					SLOGI() << "throw cards: " << ss.str().c_str();
+					for(int i=0;i<nFailedCount;i++){
+						ss<<nFailedCard[i]<<" ";
+					}
+					SLOGI() << "failed and put cards: " << ss.str().c_str();
+				}
 				GAME_UPGRADE_THROWFAILED ack;
 				ack.nIndex=pClient->m_nIndex;
 				ack.nPutCount=pReq->nCount;
@@ -479,6 +510,14 @@ void CUpgrade::OnReqPutCard(PCLIENT pClient, LPVOID lpData, DWORD dwSize)
 				//将必出牌信息加出到出牌数据中
 				CUpgAlgorithm::ExtractCards(pClientData->nCards, pClientData->nCardCount, nFailedCard, nFailedCount, FALSE);
 				pClientData->nCardCount -= nFailedCount;
+
+				{
+					std::stringstream ss;
+					for(int i=0;i<pClientData->nCardCount;i++){
+						ss<<pClientData->nCards[i]<<" ";
+					}
+				}
+				
 				memcpy(pClientData->nCardPut+1, nFailedCard, nFailedCount * sizeof(int));
 				pClientData->nCardPut[0] = nFailedCount;
 				pClient->m_dwState=0;
@@ -517,6 +556,12 @@ void CUpgrade::OnReqPutCard(PCLIENT pClient, LPVOID lpData, DWORD dwSize)
 	//广播出牌消息
 	CUpgAlgorithm::ExtractCards(pClientData->nCards,pClientData->nCardCount,pReq->nCard,pReq->nCount,FALSE);
 	pClientData->nCardCount-=pReq->nCount;
+	std::stringstream ss;
+	for(int i=0;i<pReq->nCount;i++){
+		ss<<pReq->nCard[i]<<" ";
+	}
+	SLOGI() << "player " << pClient->m_nIndex << " put cards: " << ss.str().c_str();
+
 	SendMsg(NULL,GMT_UPGRADE_REQPUTCARD,lpData,dwSize);
 	pClientData->nCardPut[0]=pReq->nCount;
 	memcpy(pClientData->nCardPut+1,pReq->nCard,pReq->nCount*sizeof(int));

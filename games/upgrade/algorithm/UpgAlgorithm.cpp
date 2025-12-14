@@ -1044,32 +1044,21 @@ int CUpgAlgorithm::CheckThrowFailed(const int* playCards, int playCount,
 }
 
 bool CUpgAlgorithm::ExtractCards(int *pnSour, int nSour, int *pnDest, int nDest,bool bTest){
+    if(nSour < nDest) 
+        return false;
     // 创建临时数组存储源数据
-    int pTemp[MAX_CARDS+8];
-    memcpy(pTemp, pnSour, nSour * sizeof(int));
-    int nTempLen = nSour;
-    bool bRet = true;
-    
-    // 从源数据中移除目标数据
-    for(int i = 0; i < nDest; i++) {
-        bool bOK = false;
-        for(int j = 0; j < nTempLen; j++) {
-            if(pTemp[j] == pnDest[i]) {
-                memmove(pTemp + j, pTemp + j + 1, (nTempLen - j - 1) * sizeof(int));
-                nTempLen--;
-                bOK = true;
-                break;
-            }
-        }
-        if(!bOK) {
-            bRet = false;
-            break;
+    std::vector<int> temp(pnSour, pnSour + nSour);
+    for(int i=0; i< nDest; i++){
+        auto it = std::find(temp.begin(), temp.end(), pnDest[i]);
+        if(it != temp.end()){
+            temp.erase(it);
+        }else{
+            return false;
         }
     }
-    
     // 如果成功且非测试模式，则更新源数据
-    if(bRet && !bTest) {
-        memcpy(pnSour, pTemp, (nSour - nDest) * sizeof(int));
+    if(!bTest) {
+        memcpy(pnSour, temp.data(), temp.size() * sizeof(int));
     }
-    return bRet;
+    return true;
 }
