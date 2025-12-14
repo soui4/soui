@@ -206,6 +206,12 @@ public:
                                 int mainColor, int levelCard, bool is2ConstMain,
                                 int* failedCards);
 
+    static int CheckThrowFailed(const int* playCards, int playCount,
+                                const int otherHands[3][25], const int otherCounts[3],
+                                int mainColor, int levelCard, bool is2ConstMain,
+                                int* failedCards);
+
+
     /**
      * 抽取牌
      * @param pnSour 源牌（输入参数）

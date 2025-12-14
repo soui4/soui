@@ -851,6 +851,14 @@ void CUpgAlgorithm::SortCards(int* cards, int count, int mainColor, int levelCar
     });
 }
 
+int CUpgAlgorithm::CheckThrowFailed(const int* playCards_, int playCount,
+                                    const int otherHands[3][25], const int otherCounts[3],
+                                    int mainColor, int levelCard, bool is2ConstMain,
+                                    int* failedCards){
+    const int * otherHandsPtr[3] = {otherHands[0], otherHands[1], otherHands[2]};             
+    return CheckThrowFailed(playCards_, playCount, otherHandsPtr, otherCounts, mainColor, levelCard, is2ConstMain, failedCards);                       
+}
+
 // 检测首家甩牌是否失败
 int CUpgAlgorithm::CheckThrowFailed(const int* playCards_, int playCount,
                                     const int* otherHands_[3], const int otherCounts[3],
