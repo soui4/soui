@@ -125,7 +125,17 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
             
             lws_set_timer_usecs(websocket, m_cfg.nHeartbeatSeconds * LWS_USEC_PER_SEC);
         }
-        break;
+    break;
+    case LWS_CALLBACK_RECEIVE_PONG:
+    {
+        // 处理收到的pong包，重置ping超时计数器
+        SvrConnection* conn = *(SvrConnection**)userData;
+        if (conn) {
+            conn->ping_timeout_count = 0;
+            conn->last_ping = conn->last_activity = time(NULL);
+        }
+    }
+    break;
     case LWS_CALLBACK_ESTABLISHED:
     {
         static const int kMaxArgs = 1024, kMaxPath = 100;
