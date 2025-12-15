@@ -48,6 +48,7 @@ public:
 	virtual ~CWebSocketGame();
 
 	BOOL GameStart( unsigned short uPort);
+	void GameStop();  // 添加GameStop方法声明
 	unsigned short GetPort() { return m_uPort; }
 protected:
 	// 消息发送接口

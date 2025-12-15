@@ -178,6 +178,13 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
 	return TRUE;
 }
 
+void CWebSocketGame::GameStop()
+{
+	if (m_pWsServer)
+	{
+		m_pWsServer->quit();
+	}
+}
 
 PWSCLIENT CWebSocketGame::CreateClient(ISvrConnection *pConn, LPCSTR uriPath, LPCSTR pszArgs)
 {
