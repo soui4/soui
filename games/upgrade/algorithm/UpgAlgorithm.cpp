@@ -940,7 +940,8 @@ int CUpgAlgorithm::CheckThrowFailed(const int* playCards_, int playCount,
             
             // 检查对家是否有比最小对子更大的对子
             for (int i = 0; i < 3; i++) {
-                if (otherColorCounts[i] < 2) continue;
+                if (otherColorCounts[i] < 2) 
+                    continue;
                 
                 int otherPairs[26], otherPairCount;
                 int otherSingles[26], otherSingleCount;
@@ -1030,38 +1031,19 @@ int CUpgAlgorithm::CheckThrowFailed(const int* playCards_, int playCount,
 
     // 检查单张是否被大过（只有在有对子或多个单张时才检查）
     if (playSingleCount > 0 && (playPairCount > 0 || playSingleCount > 1)) {
-        // 找到最小的单张
-        int minSingleValue = GetCardCompareValue(playSingles[0], mainColor, levelCard, is2ConstMain);
-        int minSingleCard = playSingles[0];
-
-        for (int i = 1; i < playSingleCount; i++) {
-            int value = GetCardCompareValue(playSingles[i], mainColor, levelCard, is2ConstMain);
-            if (value < minSingleValue) {
-                minSingleValue = value;
-                minSingleCard = playSingles[i];
-            }
-        }
-
+        // 最小的单张
+        int minSingleValue = GetCardCompareValue(playSingles[playSingleCount - 1], mainColor, levelCard, is2ConstMain);
         // 检查其他家是否有更大的单张
-        for (int i = 0; i < 3; i++) {
-            if (otherColorCounts[i] == 0) continue;
-
-            // 将其他家的牌分成对子和单张
-            int otherPairs[26], otherPairCount;
-            int otherSingles[26], otherSingleCount;
-            SplitPairsAndSingles(otherColorCards[i], otherColorCounts[i],
-                                otherPairs, &otherPairCount, otherSingles, &otherSingleCount);
-
-            // 如果其他家有单张，检查是否有比我方最小单张更大的
-            if (otherSingleCount > 0) {
-                for (int j = 0; j < otherSingleCount; j++) {
-                    int value = GetCardCompareValue(otherSingles[j], mainColor, levelCard, is2ConstMain);
-                    if (value > minSingleValue) {
-                        // 其他家有更大的单张，甩牌失败
-                        failedCards[0] = minSingleCard;
-                        return 1;
-                    }
-                }
+        for (int i = 0; i < 3; i++)
+        {
+            if (otherColorCounts[i] == 0)
+                continue;
+            int value = GetCardCompareValue(otherColorCards[i][0], mainColor, levelCard, is2ConstMain);
+            if (value > minSingleValue)
+            {
+                // 其他家有更大的单张，甩牌失败
+                failedCards[0] = playSingles[playSingleCount - 1];
+                return 1;
             }
         }
     }
