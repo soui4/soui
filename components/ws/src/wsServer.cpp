@@ -1,4 +1,6 @@
 ﻿#include "wsServer.h"
+#include <helper/slog.h>
+#define kLogTag "WsServer"
 
 SNSBEGIN
 WsServer::WsServer(ISvrListener *pListener, const WsCfg &cfg)
@@ -102,21 +104,21 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
     case LWS_CALLBACK_TIMER:
         {
             SvrConnection* conn = *(SvrConnection**)userData;
-
-            if (time(NULL) - conn->last_activity > m_cfg.nHeartbeatSeconds) {
-                // 超时，关闭连接
+            time_t now = time(NULL);
+            if (now - conn->last_activity > m_cfg.nHeartbeatSeconds) {
+                //SLOGI() << "timeout, close connection!"<<m_cfg.nHeartbeatSeconds<<" connection="<<conn;
                 lws_close_reason(websocket, LWS_CLOSE_STATUS_GOINGAWAY,
                                 (unsigned char *)"heartbeat timeout", 18);
                 return -1;
             }
             
-            if (time(NULL) - conn->last_ping > m_cfg.pingIntervalSeconds) {
-                // 发送ping
+            if (now - conn->last_ping > m_cfg.pingIntervalSeconds) {
                 lws_send_ping(websocket);
-                conn->last_ping = time(NULL);
+                conn->last_ping = now;
                 conn->ping_timeout_count++;
                 
                 if (conn->ping_timeout_count > m_cfg.nPingTimeoutCount) {
+                    //SLOGI() << "ping timeout, close connection! timeout times="<<conn->ping_timeout_count<<" connection="<<conn;
                     lws_close_reason(websocket, LWS_CLOSE_STATUS_POLICY_VIOLATION,
                                     (unsigned char *)"too many ping timeouts", 22);
                     return -1;
@@ -128,11 +130,11 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
     break;
     case LWS_CALLBACK_RECEIVE_PONG:
     {
-        // 处理收到的pong包，重置ping超时计数器
         SvrConnection* conn = *(SvrConnection**)userData;
         if (conn) {
             conn->ping_timeout_count = 0;
             conn->last_ping = conn->last_activity = time(NULL);
+            SLOGI() << "receive pong, connection="<<conn;
         }
     }
     break;

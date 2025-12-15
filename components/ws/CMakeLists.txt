@@ -13,7 +13,7 @@ project(ws)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
 add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS} ws.rc)
-target_link_libraries(${PROJECT_NAME}  websockets)
+target_link_libraries(${PROJECT_NAME}  websockets utilities4)
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
     target_link_libraries(${PROJECT_NAME} swinx)
