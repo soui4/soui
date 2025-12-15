@@ -635,6 +635,34 @@ void UpgradeGame::OnTableInfo(IEvtArgs *e)
         OnStageChanged(STAGE_WAIT_START);
     }
     if(!m_bReady[0] && m_stage != STAGE_CONTINUE){
+        if(m_stage == STAGE_POSTCARD){
+            m_pMainDlg->KillTimer(TIMERID_POSTCARD);
+            m_pGameBoard->FindChildByName(Sprites::win_show_main_box)->SetVisible(FALSE, TRUE);
+        }
+        if(m_stage == STAGE_SETBOTTOM){
+            m_pMainDlg->KillTimer(TIMERID_SETBOTTOM);
+            m_pGameBoard->FindChildByName(Sprites::btn_set_bottom)->SetVisible(FALSE, TRUE);
+        }
+        if(m_stage == STAGE_SHOW_BOTTOM){
+            m_pMainDlg->KillTimer(TIMERID_SHOW_BOTTOM);
+        }
+        if(m_stage == STAGE_REBELBOTTOM){
+            m_pMainDlg->KillTimer(TIMERID_SETBOTTOM);
+            m_pGameBoard->FindChildByName(Sprites::win_show_main_box)->SetVisible(FALSE, TRUE);
+            if(IWindow *pBtnSetBottom = m_pGameBoard->FindChildByName(Sprites::btn_set_bottom)){
+                m_pGameBoard->RemoveIChild(pBtnSetBottom);
+                pBtnSetBottom->Release();
+            }
+        }
+        if(m_stage == STAGE_PUTCARD){
+            m_pMainDlg->KillTimer(TIMERID_AUTO_PUTCARD);
+            if(IWindow *pBtnPutCard = m_pGameBoard->FindChildByName(Sprites::btn_put_card)){
+                m_pGameBoard->RemoveIChild(pBtnPutCard);
+                pBtnPutCard->Release();
+            }
+        }   
+        HideClock();
+        StopWatingAnimation();
         OnStageChanged(STAGE_CONTINUE);
     }
 }

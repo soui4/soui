@@ -131,6 +131,13 @@ void CGameTable::OnGameStart()
 void CGameTable::OnGameEnd()
 {
     m_state = TABLE_STATE_WAIT;
+    for (auto &client : m_clients)
+    {
+        if (client != nullptr)
+        {
+            client->m_bReady = FALSE;
+        }
+    }
 }
 
 void CGameTable::OnRoundEnd()
