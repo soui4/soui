@@ -93,7 +93,9 @@ static void lws_send_ping(struct lws *wsi) {
     int len = lws_snprintf((char *)ping + LWS_PRE, 125, "ping data");
     lws_write(wsi, ping + LWS_PRE, len, LWS_WRITE_PING);
 }
-int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userData, void *data, size_t len)
+
+int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
+    void *userData, void *data, size_t len)
 {
     std::unique_lock<std::mutex> lock(m_mutex);
     if (m_finished)
@@ -105,20 +107,27 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
         {
             SvrConnection* conn = *(SvrConnection**)userData;
             time_t now = time(NULL);
-            if (now - conn->last_activity > m_cfg.nHeartbeatSeconds) {
-                //SLOGI() << "timeout, close connection!"<<m_cfg.nHeartbeatSeconds<<" connection="<<conn;
+            
+            // 检查总体活动超时（心跳超时）
+            // 增加2秒的冗余时间，避免因计时误差导致的误判
+            static const int kMaxHeartbeatRedundancy = 2;
+            if (now - conn->last_activity > m_cfg.nHeartbeatSeconds + kMaxHeartbeatRedundancy) {
+                SLOGI() << "timeout, close connection!"<<m_cfg.nHeartbeatSeconds;
                 lws_close_reason(websocket, LWS_CLOSE_STATUS_GOINGAWAY,
                                 (unsigned char *)"heartbeat timeout", 18);
                 return -1;
             }
             
-            if (now - conn->last_ping > m_cfg.pingIntervalSeconds) {
+            // 检查是否需要发送ping（ping间隔独立于心跳间隔）
+            // 只有当距离上次ping的时间超过ping间隔，并且距离上次活动的时间也超过一定时间才发送ping
+            if (now - conn->last_ping >= m_cfg.pingIntervalSeconds && 
+                now - conn->last_activity >= m_cfg.pingIntervalSeconds/2) {
                 lws_send_ping(websocket);
                 conn->last_ping = now;
                 conn->ping_timeout_count++;
                 
                 if (conn->ping_timeout_count > m_cfg.nPingTimeoutCount) {
-                    //SLOGI() << "ping timeout, close connection! timeout times="<<conn->ping_timeout_count<<" connection="<<conn;
+                    SLOGI() << "ping timeout, close connection!"<<conn->ping_timeout_count;
                     lws_close_reason(websocket, LWS_CLOSE_STATUS_POLICY_VIOLATION,
                                     (unsigned char *)"too many ping timeouts", 22);
                     return -1;
@@ -133,8 +142,7 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
         SvrConnection* conn = *(SvrConnection**)userData;
         if (conn) {
             conn->ping_timeout_count = 0;
-            conn->last_ping = conn->last_activity = time(NULL);
-            SLOGI() << "receive pong, connection="<<conn;
+            conn->last_activity = time(NULL); // 只更新活动时间，不更新last_ping
         }
     }
     break;
@@ -160,6 +168,7 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons, void *userDa
             {
                 *(SvrConnection **)userData = (SvrConnection *)connection;
                 connection->last_activity = time(NULL);
+                connection->last_ping = connection->last_activity; // 初始化last_ping
                 lws_set_timer_usecs(websocket, m_cfg.nHeartbeatSeconds * LWS_USEC_PER_SEC);
             }
         }
