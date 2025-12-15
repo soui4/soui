@@ -5,7 +5,7 @@ SOUI窗口布局接口
 #define __SLAYOUT_I__H__
 
 #include <interface/sobject-i.h>
-
+#include <interface/sproperty-values-holder-i.h>
 SNSBEGIN
 
 typedef struct IWindow IWindow;
@@ -25,6 +25,37 @@ enum
     SIZE_MATCH_PARENT = -2,
     SIZE_SPEC = 0,
 };
+
+/**
+ * @enum Unit
+ * @brief 布局大小单位枚举
+ */
+typedef enum _Unit
+{
+    unknow = -1, // 未知单位
+    px = 0,      // 像素
+    dp,          // 设备独立像素
+    dip = dp,    // 设备独立像素（别名）
+    sp           // 缩放像素
+}Unit;
+
+typedef struct _LAYOUTSIZE
+{
+    float fSize; // 大小值
+    Unit unit;   // 大小单位
+}LAYOUTSIZE;
+
+
+/**
+ * @brief 动画状态枚举
+ */
+typedef enum _ANI_STATE{
+    ANI_START=0,    /**< 动画开始状态 */
+    ANI_PROGRESS,   /**< 动画进行中状态 */
+    ANI_END,        /**< 动画结束状态 */
+}ANI_STATE;
+
+
 
 #undef INTERFACE
 #define INTERFACE ILayoutParam
@@ -67,7 +98,15 @@ DECLARE_INTERFACE_(ILayoutParam, IObject)
      * @param orientation ORIENTATION--布局方向
      * @return SLayoutSize--布局大小
      */
-    STDMETHOD_(SLayoutSize, GetSpecifiedSize)(CTHIS_ ORIENTATION orientation) SCONST PURE;
+    STDMETHOD_(BOOL, GetSpecifiedSize)(CTHIS_ ORIENTATION orientation, LAYOUTSIZE *pLayoutSize) SCONST PURE;
+
+    /**
+     * @brief 设定布局大小
+     * @param orientation ORIENTATION--布局方向
+     * @param layoutSize SLayoutSize--布局大小
+     * @return
+     */
+    STDMETHOD_(void, SetSpecifiedSize)(THIS_ ORIENTATION orientation, const LAYOUTSIZE *layoutSize) PURE;
 
     /**
      * @brief 设定布局适应父窗口大小
@@ -84,13 +123,13 @@ DECLARE_INTERFACE_(ILayoutParam, IObject)
     STDMETHOD_(void, SetWrapContent)(THIS_ ORIENTATION orientation) PURE;
 
     /**
-     * @brief 设定布局大小
-     * @param orientation ORIENTATION--布局方向
-     * @param layoutSize SLayoutSize--布局大小
-     * @return
+     * @brief 更新属性动画器状态
+     * @param pHolder IPropertyValuesHolder*--属性值持有者
+     * @param fraction float--动画进度（0.0-1.0）
+     * @param state ANI_STATE--动画状态（ANI_START/ANI_PROGRESS/ANI_END）
+     * @note 此方法在动画过程中被调用，用于处理动画状态变化和触发布局更新
      */
-    STDMETHOD_(void, SetSpecifiedSize)
-    (THIS_ ORIENTATION orientation, const SLayoutSize &layoutSize) PURE;
+    STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) PURE;
 
     /**
      * @brief 获取布局结构体数据

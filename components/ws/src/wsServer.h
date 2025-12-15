@@ -1,4 +1,4 @@
-/**
+﻿/**
  * @file WsServer.hpp
  * @author paul
  * @date 10.03.19
@@ -17,11 +17,26 @@
 
 SNSBEGIN
 
+/**
+ * @brief WebSocket服务器配置
+ */
+class WsCfg{
+  public:
+  WsCfg(){
+    pingIntervalSeconds = 5;
+    nHeartbeatSeconds = 10;
+    nPingTimeoutCount = 3;
+  }
+  int pingIntervalSeconds;  // ping间隔时间，单位秒
+  int nHeartbeatSeconds;   // 心跳间隔时间，单位秒，ping间隔时间的2倍即可
+  int nPingTimeoutCount;   // ping超时次数，超过此次数则关闭连接
+};
+
 class WsServer : public TObjRefImpl<IWsServer> {
     friend class SvrConnection;
 
   public:
-    WsServer(ISvrListener *pListener);
+    WsServer(ISvrListener *pListener, const WsCfg &cfg = WsCfg());
     ~WsServer();
   public:
     STDMETHODIMP_(int) start(THIS_ uint16_t port, const char *protocolName, SvrOption option) OVERRIDE;
@@ -40,6 +55,8 @@ class WsServer : public TObjRefImpl<IWsServer> {
     std::thread m_worker;
 
     std::string m_protocolName;
+    WsCfg m_cfg;
+
     lws_context *m_context;
 
     static int cb_lws(lws *websocket, lws_callback_reasons reasons, void *userData, void *data, std::size_t len);

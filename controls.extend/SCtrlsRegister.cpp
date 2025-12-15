@@ -26,7 +26,8 @@
 #include "gridctrl/SGridCtrl.h"
 #include "SToolBar.h"
 #include "SLightButton.h"
-
+#include "SAniWindow.h"
+#include "SCheckBox2.h"
 SNSBEGIN
 
 void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
@@ -50,6 +51,8 @@ void SCtrlsRegister::RegisterCtrls(SApplication *theApp)
 	theApp->RegisterWindowClass<SGridCtrl>();
 	theApp->RegisterWindowClass<SToolBar>();
 	theApp->RegisterWindowClass<SLightButton>();
+	theApp->RegisterWindowClass<SAniWindow>();
+	theApp->RegisterWindowClass<SCheckBox2>();
 
 	// Register HelloCharts controls
 	SHelloChartsRegister::RegisterControls(theApp);

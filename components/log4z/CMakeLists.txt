@@ -14,7 +14,7 @@ set(log4z_src
 source_group("Header Files" FILES ${log4z_header})
 source_group("Source Files" FILES ${log4z_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (log4z_src  ${log4z_src} log4z.rc)
     add_library(log4z SHARED ${log4z_src} ${log4z_header})
 else()

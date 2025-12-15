@@ -7,9 +7,9 @@ SNSBEGIN
 
 SSplitPane::SSplitPane()
     : m_nPriority(0)
-    , m_nSizeIdeal(20, SLayoutSize::dp)
-    , m_nSizeMin(0, SLayoutSize::dp)
-    , m_nSizeMax(10000, SLayoutSize::dp)
+    , m_nSizeIdeal(20, dp)
+    , m_nSizeMin(0, dp)
+    , m_nSizeMax(10000, dp)
 {
     GetEventSet()->addEvent(EVENTID(EventSplitPaneMoved));
 }

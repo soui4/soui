@@ -155,7 +155,9 @@ static upng_error upng_process_chunks(upng_t* upng)
             /* is the main image also the first animation frame? */
             if (cur_frame_index == 0)
             {
-                upng->frames[0] = upng->defaultImage;
+                upng->frames[0].rect = upng->defaultImage.rect;
+                upng->frames[0].data_chunk_offset = upng->defaultImage.data_chunk_offset;
+                upng->frames[0].compressed_size = upng->defaultImage.compressed_size;
             }
         }
         else if (upng_chunk_type(chunk_header) == CHUNK_FDAT)
@@ -214,8 +216,8 @@ static upng_error upng_process_chunks(upng_t* upng)
             frame->rect.y_offset = MAKE_DWORD_PTR(data + 16);
             frame->delay_numerator = MAKE_WORD_PTR(data + 20);
             frame->delay_denominator = MAKE_WORD_PTR(data + 22);
-            frame->dispose_op = (upng_dispose_op)data[24];
-            frame->blend_op = (upng_blend_op)data[25];
+            frame->next_frame_dispose_op = (upng_dispose_op)data[24];
+            frame->next_frame_blend_op = (upng_blend_op)data[25];
             frame->compressed_size = 0;
 
             /* validate data */
@@ -223,8 +225,8 @@ static upng_error upng_process_chunks(upng_t* upng)
             CHECK_RET(upng, frame->rect.width > 0 && frame->rect.height > 0, UPNG_EMALFORMED);
             CHECK_RET(upng, frame->rect.x_offset + frame->rect.width <= upng->defaultImage.rect.width, UPNG_EMALFORMED);
             CHECK_RET(upng, frame->rect.y_offset + frame->rect.height <= upng->defaultImage.rect.height, UPNG_EMALFORMED);
-            CHECK_RET(upng, frame->dispose_op <= UPNG_LAST_DISPOSE_OP, UPNG_EUNSUPPORTED);
-            CHECK_RET(upng, frame->blend_op <= UPNG_LAST_BLEND_OP, UPNG_EUNSUPPORTED);
+            CHECK_RET(upng, frame->next_frame_dispose_op <= UPNG_LAST_DISPOSE_OP, UPNG_EUNSUPPORTED);
+            CHECK_RET(upng, frame->next_frame_blend_op <= UPNG_LAST_BLEND_OP, UPNG_EUNSUPPORTED);
 
             /* the first frame has special requirements */
             if (cur_frame_index == 0)
@@ -564,6 +566,11 @@ int upng_get_alpha(const upng_t *upng, uint8_t **alpha)
 unsigned upng_get_bpp(const upng_t *upng)
 {
     return upng_get_bitdepth(upng) * upng_get_components(upng);
+}
+
+upng_color upng_get_color_type(const upng_t *upng)
+{
+    return upng->color_type;
 }
 
 unsigned upng_get_components(const upng_t *upng)

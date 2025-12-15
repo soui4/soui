@@ -540,7 +540,7 @@ namespace SOUI
 			pRT->PushClipRect(&rcClient, RGN_AND);
 
 			CRect rcClip, rcInter;
-			SAutoRefPtr<IRegion> rgnClip;
+			SAutoRefPtr<IRegionS> rgnClip;
 			pRT->GetClipBox(&rcClip);
 			pRT->GetClipRegion(&rgnClip);
 
@@ -549,7 +549,7 @@ namespace SOUI
 			IRenderObj* oldPen = NULL;
 			if (m_crGrid != CR_INVALID)
 			{
-				SAutoRefPtr<IPen> pen;
+				SAutoRefPtr<IPenS> pen;
 				pRT->CreatePen(PS_SOLID, m_crGrid, 1, &pen);
 				pRT->SelectObject(pen, &oldPen);
 			}
@@ -627,7 +627,7 @@ namespace SOUI
 				pRT->FillSolidRect(updataRc, colorDropBk.toCOLORREF());
 				POINT line[2];
 				size_t linenum = 2;
-				SAutoRefPtr<IPen> linepen;
+				SAutoRefPtr<IPenS> linepen;
 				IRenderObj* oldpen;
 				pRT->CreatePen(PS_SOLID, m_colorDropBk, 1, &linepen);
 				pRT->SelectObject(linepen, &oldpen);

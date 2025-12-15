@@ -19,7 +19,7 @@ namespace SOUI
             SWindow::OnPaint(pRT);
         }else
         {
-            IBitmap * pBmp = m_lstImg.GetHead();
+            IBitmapS * pBmp = m_lstImg.GetHead();
             
             CRect rcClient = GetClientRect();
             CSize szBmp(pBmp->Size());
@@ -43,7 +43,7 @@ namespace SOUI
             rcAll.DeflateRect((rcClient.Size()-szAll)/2);
             CRect rcBmp(rcAll.TopLeft(),szBmp);
             
-			SAutoRefPtr<IPen> pen,oldpen;
+			SAutoRefPtr<IPenS> pen,oldpen;
 			pRT->CreatePen(PS_DASHDOT,RGBA(255,0,255,128),1,&pen);
 			pRT->SelectObject(pen,(IRenderObj**)&oldpen);
             
@@ -73,7 +73,7 @@ namespace SOUI
 		__baseCls::OnRButtonDown(nFlags, point);
 		if (m_lstImg.IsEmpty())
 			return;
-		IBitmap* pBmp = m_lstImg.GetHead();
+		IBitmapS* pBmp = m_lstImg.GetHead();
 
 		CRect rcClient = GetClientRect();
 		CSize szBmp(pBmp->Size());
@@ -116,7 +116,7 @@ namespace SOUI
 
     BOOL SImgCanvas::AddFile(LPCWSTR pszFileName)
     {
-        IBitmap *pImg=SResLoadFromFile::LoadImage(S_CW2T(pszFileName));
+        IBitmapS *pImg=SResLoadFromFile::LoadImage(S_CW2T(pszFileName));
         if(!pImg) return FALSE;
         m_lstImg.AddTail(pImg);
         Invalidate();
@@ -128,7 +128,7 @@ namespace SOUI
         SPOSITION pos = m_lstImg.GetHeadPosition();
         while(pos)
         {
-            IBitmap *pbmp = m_lstImg.GetNext(pos);
+            IBitmapS *pbmp = m_lstImg.GetNext(pos);
             pbmp->Release();
         }
         m_lstImg.RemoveAll();
@@ -144,7 +144,7 @@ namespace SOUI
 			SPOSITION pos = m_size.GetHeadPosition();			
 			while (pos)
 			{
-				IBitmap *_bitmap=NULL;				
+				IBitmapS *_bitmap=NULL;				
 				int szBmp = m_size.GetNext(pos);
 				m_lstImg.GetHead()->Scale2(&_bitmap,szBmp, szBmp, kHigh_FilterLevel);
 				iconfile.AddBitmapToIco(_bitmap);
@@ -155,7 +155,7 @@ namespace SOUI
 			SPOSITION pos = m_lstImg.GetHeadPosition();
 			while (pos)
 			{
-				IBitmap* pBmp = m_lstImg.GetNext(pos);
+				IBitmapS* pBmp = m_lstImg.GetNext(pos);
 				iconfile.AddBitmapToIco(pBmp);
 			}
 		}
@@ -171,7 +171,7 @@ namespace SOUI
 
     BOOL SImgCanvas::Save2File(LPCWSTR pszFileName)
     {
-        IBitmap *pBmp = m_lstImg.GetHead();
+        IBitmapS *pBmp = m_lstImg.GetHead();
         CSize szBmp = pBmp->Size();
         if(m_bVert) szBmp.cy *= m_lstImg.GetCount();
         else szBmp.cx *= m_lstImg.GetCount();
@@ -190,7 +190,7 @@ namespace SOUI
             else rcDst.OffsetRect(rcDst.Width(),0);
         }
         
-        IBitmap * pCache = (IBitmap*)pMemRT->GetCurrentObject(OT_BITMAP);
+        IBitmapS * pCache = (IBitmapS*)pMemRT->GetCurrentObject(OT_BITMAP);
         return pCache->Save2(pszFileName, Img_PNG);
     }
 
@@ -202,7 +202,7 @@ namespace SOUI
 
 	void SImgCanvas::Split(int nSplit)
 	{
-		IBitmap *pBmp = m_lstImg.GetHead();
+		IBitmapS *pBmp = m_lstImg.GetHead();
 		CSize szBmp = pBmp->Size();
 		CSize szImg = szBmp;
 		if(m_bVert)
@@ -220,7 +220,7 @@ namespace SOUI
 			CRect rcDst(CPoint(),szImg);
 			while(pos)
 			{
-				IBitmap *pImg = m_lstImg.GetNext(pos);
+				IBitmapS *pImg = m_lstImg.GetNext(pos);
 				pMemRT->DrawBitmap(rcDst,pImg,0,0);
 				if(m_bVert)
 					rcDst.OffsetRect(0,szImg.cy);
@@ -245,7 +245,7 @@ namespace SOUI
 				GETRENDERFACTORY->CreateRenderTarget(&pMemRT2,szSub.cx,szSub.cy);
 				pMemRT2->ClearRect(&rcDst,0);
 				pMemRT2->AlphaBlend(rcDst,pMemRT,rcSrc,255);
-				IBitmap *pCache = (IBitmap*)pMemRT2->GetCurrentObject(OT_BITMAP);
+				IBitmapS *pCache = (IBitmapS*)pMemRT2->GetCurrentObject(OT_BITMAP);
 				m_lstImg.AddTail(pCache);
 				pCache->AddRef();
 				if(m_bVert) rcSrc.OffsetRect(0,szSub.cy);
@@ -261,7 +261,7 @@ namespace SOUI
 		SPOSITION pos = m_lstImg.GetHeadPosition();
 		while(pos)
 		{
-			IBitmap *pBmp = m_lstImg.GetNext(pos);
+			IBitmapS *pBmp = m_lstImg.GetNext(pos);
 			SStringW strName = pszFileName;
 			strName += SStringW().Format(L"_%d.png",i++);
             pBmp->Save2(strName, Img_PNG);

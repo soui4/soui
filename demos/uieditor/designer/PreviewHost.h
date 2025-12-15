@@ -7,7 +7,7 @@ struct IListener{
 	virtual void OnRePos(const POINT *pt) = 0;
 	virtual void OnSelectedCtrl(const int * pOrder, int nLen) = 0;
 	virtual void OnUpdateSize(int nWidth, int nHeight) = 0;
-	virtual void OnUpdatePos(SStringW strPos) = 0;
+	virtual void OnUpdatePos(SStringW strPos,BOOL bRemoveSize) = 0;
 };
 
 class CPreviewHost : public SHostWnd
@@ -20,7 +20,8 @@ public:
 	void UpdateLayoutBuf(SStringA strUtf8);
 	void SelectCtrlByOrder(const int *pOrder,int nLen);
 protected:
-	virtual BOOL OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) override;
+	BOOL OnLoadLayoutFromResourceID(SXmlDoc& xmlDoc) override;
+    void OnFinalMessage(HWND hWnd) override;
 
 protected:
 	void GetSwndIndex(SWindow *pWnd,SList<int> &lstIndex);

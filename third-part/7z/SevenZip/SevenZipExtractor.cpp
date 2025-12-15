@@ -66,7 +66,7 @@ namespace SevenZip
                 std::vector<std::wstring> itemnames;
                 itemnames.reserve(numberofitems);
 
-                std::vector<unsigned __int64> origsizes;
+                std::vector<uint64_t> origsizes;
                 origsizes.reserve(numberofitems);
 
                 bool succ = true;
@@ -105,7 +105,6 @@ namespace SevenZip
 
                 if (!callback->OnFileItems(itemnames, origsizes))
                 {
-                    //ֻΪ��ȡ���ļ���Ϣ,����ֱ�ӷ���.
                     archive->Close();
                     return S_OK;
                 }

@@ -4,13 +4,15 @@
 #include "helper/SColor.h"
 #include "helper/SplitString.h"
 #include "layout/SouiLayout.h"
+#include "layout/SAnchorLayout.h"
+#include "layout/SLinearLayout.h"
+#include "layout/SGridLayout.h"
 #include "interface/sacchelper-i.h"
 #include "helper/SwndFinder.h"
 #include "helper/STime.h"
 #include "animation/STransformation.h"
 #include "core/SCaret.h"
 #include <atl.mini/SComCli.h>
-
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -111,6 +113,8 @@ SWindow::SWindow()
     , m_pPrevSibling(NULL)
     , m_nChildrenCount(0)
     , m_uZorder(0)
+    , m_nLayer(0)
+    , m_bEnableLayer(FALSE)
     , m_dwState(WndState_Normal)
     , m_bMsgTransparent(FALSE)
     , m_bVisible(TRUE)
@@ -172,6 +176,7 @@ SWindow::SWindow()
     m_evtSet.addEvent(EVENTID(EventSwndAnimationStart));
     m_evtSet.addEvent(EVENTID(EventSwndAnimationStop));
     m_evtSet.addEvent(EVENTID(EventSwndAnimationRepeat));
+    m_evtSet.addEvent(EVENTID(EventSwndAnimatorFractor));
 
     IAttrStorageFactory *pAttrFac = SApplication::getSingleton().GetAttrStorageFactory();
     if (pAttrFac)
@@ -535,13 +540,8 @@ UINT SWindow::GetChildrenCount() const
     return m_nChildrenCount;
 }
 
-void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /*=ICWND_LAST*/)
+void SWindow::_InsertChild(SWindow *pNewChild, SWindow *pInsertAfter)
 {
-    ASSERT_UI_THREAD();
-    if (pNewChild->GetParent() == this)
-        return;
-    OnBeforeInsertChild(pNewChild);
-    pNewChild->SetContainer(GetContainer());
     pNewChild->m_pParent = this;
     pNewChild->m_pPrevSibling = pNewChild->m_pNextSibling = NULL;
 
@@ -580,7 +580,18 @@ void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /*=ICWND_LAS
         pNewChild->m_pNextSibling = pNext;
         pNext->m_pPrevSibling = pNewChild;
     }
-    m_nChildrenCount++;
+    m_nChildrenCount++; 
+}
+
+void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /*=ICWND_LAST*/)
+{
+    ASSERT_UI_THREAD();
+    if (pNewChild->GetParent() == this)
+        return;
+    OnBeforeInsertChild(pNewChild);
+    pNewChild->SetContainer(GetContainer());
+
+    _InsertChild(pNewChild, pInsertAfter);
 
     m_layoutDirty = dirty_self;
 
@@ -595,19 +606,21 @@ void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /*=ICWND_LAS
     pNewChild->OnEnable(!IsDisabled(TRUE), ParentEnable);
 
     //只在插入新控件时需要标记zorder失效,删除控件不需要标记
-    GetContainer()->MarkWndTreeZorderDirty();
+    if(GetContainer())
+        GetContainer()->MarkWndTreeZorderDirty();
     OnAfterInsertChild(pNewChild);
+    if(!m_isLoading){
+        RequestRelayout();
+        pNewChild->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
+        pNewChild->SDispatchMessage(UM_SETCOLORIZE, GetColorizeColor(), 0);
+        if(pNewChild->IsVisible(FALSE) && IsVisible(TRUE)){
+            pNewChild->SSendMessage(WM_SHOWWINDOW, TRUE);
+        }
+    }
 }
 
-BOOL SWindow::RemoveChild(SWindow *pChild)
+void SWindow::_RemoveChild(SWindow *pChild)
 {
-    ASSERT_UI_THREAD();
-    if (this != pChild->GetParent())
-        return FALSE;
-
-    OnBeforeRemoveChild(pChild);
-    pChild->SetContainer(NULL);
-
     SWindow *pPrevSib = pChild->m_pPrevSibling;
     SWindow *pNextSib = pChild->m_pNextSibling;
 
@@ -625,6 +638,20 @@ BOOL SWindow::RemoveChild(SWindow *pChild)
     pChild->m_pNextSibling = NULL;
     pChild->m_pPrevSibling = NULL;
     m_nChildrenCount--;
+}
+
+BOOL SWindow::RemoveChild(SWindow *pChild)
+{
+    ASSERT_UI_THREAD();
+    if (this != pChild->GetParent())
+        return FALSE;
+    CRect rcChild = pChild->GetWindowRect();
+    InvalidateRect(&rcChild);
+
+    OnBeforeRemoveChild(pChild);
+    pChild->SetContainer(NULL);
+
+    _RemoveChild(pChild);
 
     OnAfterRemoveChild(pChild);
     return TRUE;
@@ -779,7 +806,6 @@ SWindow *SWindow::_FindChildByName(const SStringW &strName, int nDeep)
     return NULL;
 }
 
-//改用广度优先算法搜索控件,便于逐级查找 2014年12月8日
 SWindow *SWindow::FindChildByID(int id, int nDeep /* =-1*/)
 {
     if (id == SWindowMgr::SWND_INVALID || nDeep == 0)
@@ -787,7 +813,11 @@ SWindow *SWindow::FindChildByID(int id, int nDeep /* =-1*/)
     ISwndFinder *pFinder = GetContainer()->GetSwndFinder();
     SWindow *pRet = (SWindow *)pFinder->FindChildByID(this, id, nDeep);
     if (pRet)
-        return pRet;
+    {
+        if (pRet->IsDescendant(this) && pRet->GetID() == id)
+            return pRet;    
+        pFinder->EraseCacheForID(this, id, nDeep);
+    }
 
     pRet = _FindChildByID(id, nDeep);
     if (pRet)
@@ -802,11 +832,15 @@ SWindow *SWindow::FindChildByName(LPCWSTR pszName, int nDeep)
     SStringW strName(pszName);
     if (strName.IsEmpty())
         return NULL;
-
     ISwndFinder *pFinder = GetContainer()->GetSwndFinder();
     SWindow *pRet = (SWindow *)pFinder->FindChildByName(this, strName, nDeep);
     if (pRet)
-        return pRet;
+    {
+        if (pRet->IsDescendant(this) && wcsicmp(pRet->GetName(), pszName)==0)
+            return pRet;
+        //update find cache.
+        pFinder->EraseCacheForName(this, strName, nDeep);
+    }
 
     pRet = _FindChildByName(strName, nDeep);
     if (pRet)
@@ -951,7 +985,6 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
 {
     ASSERT_UI_THREAD();
     SXmlNode xmlNode(pNode);
-    SASSERT(m_pContainer);
     m_isLoading = true;
     if (xmlNode)
     {
@@ -988,27 +1021,28 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
             }
         }
     }
-
-    //发送WM_CREATE消息
-    if (0 != SSendMessage(WM_CREATE))
+    if (m_pContainer)
     {
+        // 发送WM_CREATE消息
+        if (0 != SSendMessage(WM_CREATE))
+        {
+            if (m_pParent)
+                m_pParent->DestroyChild(this);
+            return FALSE;
+        }
+
+        // 给this发一个WM_SHOWWINDOW消息，一些控件需要在WM_SHOWWINDOW中处理状态
+        // 初始化的WM_SHOWWINDOW只影响this,子窗口的SHOW由子窗口发出。
+        // 不改变窗口的m_bVisible状态，需要使用ParentShow标志
         if (m_pParent)
-            m_pParent->DestroyChild(this);
-        return FALSE;
+        { // 从父窗口更新状态
+            if (!m_pParent->IsVisible(TRUE))
+                m_dwState |= WndState_Invisible;
+            if (m_pParent->IsDisabled(TRUE))
+                m_dwState |= WndState_Disable;
+        }
+        SSendMessage(WM_SHOWWINDOW, IsVisible(TRUE), ParentShow);
     }
-
-    //给this发一个WM_SHOWWINDOW消息，一些控件需要在WM_SHOWWINDOW中处理状态
-    //初始化的WM_SHOWWINDOW只影响this,子窗口的SHOW由子窗口发出。
-    //不改变窗口的m_bVisible状态，需要使用ParentShow标志
-    if (m_pParent)
-    { //从父窗口更新状态
-        if (!m_pParent->IsVisible(TRUE))
-            m_dwState |= WndState_Invisible;
-        if (m_pParent->IsDisabled(TRUE))
-            m_dwState |= WndState_Disable;
-    }
-    SSendMessage(WM_SHOWWINDOW, IsVisible(TRUE), ParentShow);
-
     //创建子窗口
     if (!CreateChildren(xmlNode))
     {
@@ -1016,11 +1050,13 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
             m_pParent->DestroyChild(this);
         return FALSE;
     }
-    //请求根窗口重新布局。由于布局涉及到父子窗口同步进行，同步执行布局操作可能导致布局过程重复执行。
-    RequestRelayout();
-
-    EventSwndInitFinish evt(this);
-    FireEvent(&evt);
+    if (m_pContainer)
+    {
+        // 请求根窗口重新布局。由于布局涉及到父子窗口同步进行，同步执行布局操作可能导致布局过程重复执行。
+        RequestRelayout();
+        EventSwndInitFinish evt(this);
+        FireEvent(&evt);
+    }
     m_isLoading = false;
     return TRUE;
 }
@@ -1660,6 +1696,110 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
     return TRUE;
 }
 
+static int LayerCompare(const void *arg1, const void *arg2)
+{
+    IWindow *pWnd1 = *(IWindow **)arg1;
+    IWindow *pWnd2 = *(IWindow **)arg2;
+    return pWnd1->GetLayer() - pWnd2->GetLayer();
+}
+
+UINT SWindow::OnBuildTreeZorder(UINT iOrder)
+{
+    m_uZorder = iOrder++;
+    if(m_bEnableLayer && !GetContainer()->IsDesignerMode()){
+        SArray<SWindow *> lstChild;
+        lstChild.SetCount(GetChildrenCount());
+        int i = 0;
+        SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
+        while (pChild)
+        {
+            lstChild[i++] = pChild;
+            pChild = pChild->GetWindow(GSW_NEXTSIBLING);
+        }
+        // sort children by layer
+        SArray<SWindow *> lstChildSorted;
+        lstChildSorted.SetCount(lstChild.GetCount());
+        memcpy(lstChildSorted.GetData(),lstChild.GetData(),lstChild.GetCount()*sizeof(SWindow *));
+        qsort(lstChildSorted.GetData(), lstChildSorted.GetCount(), sizeof(SWindow *), LayerCompare);
+        if(memcmp(lstChild.GetData(),lstChildSorted.GetData(),lstChild.GetCount()*sizeof(SWindow *)) != 0){
+            //reorder children by layer
+            for (UINT i = 0; i < lstChild.GetCount(); i++)
+            {
+                SWindow *pChild = lstChild[i];
+                _RemoveChild(pChild);
+            }
+            for (UINT i = 0; i < lstChildSorted.GetCount(); i++)
+            {
+                SWindow *pChild = lstChildSorted[i];
+                _InsertChild(pChild, ICWND_LAST);
+            }          
+        }
+    }
+    SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
+    while (pChild)
+    {
+        iOrder = pChild->OnBuildTreeZorder(iOrder);
+        pChild = pChild->GetWindow(GSW_NEXTSIBLING);
+    }
+    return iOrder;
+}
+
+void SWindow::SetLayer(int nLayer)
+{
+    if (m_nLayer == nLayer)
+        return;
+    m_nLayer = nLayer;
+    if (GetContainer())
+    {
+        GetContainer()->MarkWndTreeZorderDirty();
+        Invalidate();
+    }
+}
+
+int SWindow::GetLayer() const
+{
+    return m_nLayer;
+}
+
+BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
+{
+    SStringW strPropName = pHolder->GetPropertyName();
+    if(strPropName.CompareNoCase(WindowProperty::ALPHA)==0){
+        BYTE byAlpha;
+        pHolder->GetAnimatedValue(fraction, &byAlpha);
+        SetAlpha(byAlpha);
+        return TRUE;
+    }
+    if(strPropName.CompareNoCase(WindowProperty::COLOR_BKGND)==0){
+        COLORREF crBkgnd;
+        pHolder->GetAnimatedValue(fraction, &crBkgnd);
+        GetStyle().m_crBg = crBkgnd;
+        InvalidateRect(NULL);
+        return TRUE;
+    }
+    if(strPropName.CompareNoCase(WindowProperty::COLOR_TEXT)==0){
+        COLORREF crText;
+        pHolder->GetAnimatedValue(fraction, &crText);
+        GetStyle().SetTextColor(0,crText);
+        InvalidateRect(NULL);
+        return TRUE;
+    }
+    BOOL bRet = GetLayoutParam()->SetAnimatorValue(pHolder, fraction, state);
+    if(bRet){
+        if(GetParent())
+            GetParent()->RequestRelayout();
+        InvalidateRect(NULL);
+    }else{
+        //fire event to external
+        EventSwndAnimatorFractor evt(this);
+        evt.fraction = fraction;
+        evt.pHolder = pHolder;
+        evt.state = state;
+        bRet = FireEvent(evt);
+    }
+    return bRet;
+}
+
 int SWindow::OnCreate(LPVOID)
 {
     SASSERT(GetContainer());
@@ -1868,7 +2008,9 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     CSize szRet(KWnd_MaxSize, KWnd_MaxSize);
     if (pLayoutParam->IsSpecifiedSize(Horz))
     { //检查设置大小
-        szRet.cx = pLayoutParam->GetSpecifiedSize(Horz).toPixelSize(GetScale());
+        SLayoutSize layoutSize;
+        pLayoutParam->GetSpecifiedSize(Horz, &layoutSize);
+        szRet.cx = layoutSize.toPixelSize(GetScale());
     }
     else if (pLayoutParam->IsMatchParent(Horz) && nParentWid >= 0)
     {
@@ -1877,7 +2019,9 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 
     if (pLayoutParam->IsSpecifiedSize(Vert))
     { //检查设置大小
-        szRet.cy = pLayoutParam->GetSpecifiedSize(Vert).toPixelSize(GetScale());
+        SLayoutSize layoutSize;
+        pLayoutParam->GetSpecifiedSize(Vert, &layoutSize);
+        szRet.cy = layoutSize.toPixelSize(GetScale());
     }
     else if (pLayoutParam->IsMatchParent(Vert) && nParentHei >= 0)
     {
@@ -2259,11 +2403,12 @@ void SWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
 
 void SWindow::UpdateLayout()
 {
-    if (m_layoutDirty == dirty_clean)
-        return;
-    if (GetChildrenCount())
+    if (m_layoutDirty != dirty_clean && GetChildrenCount())
+    {
         UpdateChildrenPosition();
-    m_layoutDirty = dirty_clean;
+        if(m_layoutDirty == dirty_child)
+            m_layoutDirty = dirty_clean;
+    }
 }
 
 IWindow *SWindow::GetNextLayoutIChild(THIS_ const IWindow *pCurChild) const
@@ -2616,13 +2761,12 @@ BYTE SWindow::GetAlpha() const
 void SWindow::SetMatrix(const IMatrix *mtx)
 {
     SMatrix smtx(mtx->Data()->fMat);
-    SetMatrix(&smtx);
+    m_transform.setMatrix(smtx);
 }
 
 void SWindow::GetMatrix(IMatrix *mtx) SCONST
 {
     SMatrix smtx = m_transform.getMatrix();
-    smtx.postConcat(m_animationHandler.GetTransformation().getMatrix());
     memcpy(mtx->Data()->fMat, smtx.fMat, sizeof(smtx.fMat));
 }
 
@@ -2984,6 +3128,13 @@ HRESULT SWindow::OnAttrText(const SStringW &strValue, BOOL bLoading)
     return S_OK;
 }
 
+HRESULT SWindow::OnAttrLayer(const SStringW &strValue, BOOL bLoading)
+{
+    int nLayer = _wtoi(strValue);
+    SetLayer(nLayer);
+    return S_OK;
+}
+
 SWindow *SWindow::GetSelectedChildInGroup()
 {
     SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
@@ -3194,6 +3345,27 @@ HRESULT SWindow::OnAttrLayout(const SStringW &strValue, BOOL bLoading)
     return S_OK;
 }
 
+HRESULT SWindow::OnAttrOwnerLayout(const SStringW &strValue, BOOL bLoading)
+{
+    if(GetParent())
+        return E_INVALIDARG;
+    if(strValue.CompareNoCase(SouiLayout::GetClassName()) == 0)
+        m_pLayoutParam.Attach(new SouiLayoutParam());
+    else if(strValue.CompareNoCase(SLinearLayout::GetClassName()) == 0)
+        m_pLayoutParam.Attach(new SLinearLayoutParam());
+    else if(strValue.CompareNoCase(SHBox::GetClassName()) == 0)
+        m_pLayoutParam.Attach(new SLinearLayoutParam());
+    else if(strValue.CompareNoCase(SVBox::GetClassName()) == 0)
+        m_pLayoutParam.Attach(new SLinearLayoutParam());
+    else if(strValue.CompareNoCase(SGridLayout::GetClassName()) == 0)
+        m_pLayoutParam.Attach(new SGridLayoutParam());
+    else if(strValue.CompareNoCase(SAnchorLayout::GetClassName()) == 0)
+        m_pLayoutParam.Attach(new SAnchorLayoutParam());
+    else
+        return E_INVALIDARG;
+    return S_FALSE;
+}
+
 HRESULT SWindow::AfterAttribute(const SStringW &strAttribName, const SStringW &strValue, BOOL bLoading, HRESULT hr)
 {
     if (m_attrStorage)
@@ -3351,6 +3523,8 @@ void SWindow::accNotifyEvent(DWORD dwEvt)
 BOOL SWindow::SetLayoutParam(ILayoutParam *pLayoutParam)
 {
     SWindow *pParent = GetParent();
+    if (!pParent)
+        return FALSE;
     if (!pParent->GetLayout()->IsParamAcceptable(pLayoutParam))
         return FALSE;
     m_pLayoutParam = pLayoutParam;
@@ -3372,6 +3546,8 @@ void SWindow::OnAnimationStop(THIS_ IAnimation *pAni)
 {
     if (GetContainer())
         GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
+    InvalidateRect(NULL);
+    pAni->setStartTime(START_ON_FIRST_FRAME);
     m_animationHandler.OnAnimationStop();
     m_isAnimating = false;
     UpdateCacheMode();

@@ -1,4 +1,6 @@
-#pragma once
+#ifndef __SCHECKBOX2_H__
+#define __SCHECKBOX2_H__
+
 
 SNSBEGIN
 
@@ -28,3 +30,5 @@ SNSBEGIN
 
 
 SNSEND
+
+#endif//__SCHECKBOX2_H__

@@ -21,6 +21,9 @@ set (CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_SOURCE_DIR}/__cmake/")
 include(__cmake/internal_utils.cmake)
 include(__cmake/global.cmake)
 
+set(BUILD_FOR_ARM OFF)
+detectArmTarget(BUILD_FOR_ARM)
+message(STATUS "BUILD_FOR_ARM: ${BUILD_FOR_ARM}")
 
 if (CMAKE_SYSTEM_NAME STREQUAL "MSYS")
     message(STATUS "Overriding incorrect Linux detection for MSYS")
@@ -44,9 +47,9 @@ endif()
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-  option(USE_UNICODE "Use Unicode" ON)
+  option(SOUI_USE_UNICODE "Use Unicode" ON)
 else()
-  option(USE_UNICODE "Use Unicode" OFF)
+  option(SOUI_USE_UNICODE "Use Unicode" OFF)
   if(CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_definitions(-D_DEBUG)
   endif()
@@ -54,49 +57,50 @@ endif()
 
 # When other libraries are using a shared version of runtime libraries,
 # Google Test also has to use one.
-option(SHARED_CRT "Use shared crt runtime library." ON)
+option(SOUI_SHARED_CRT "Use shared crt runtime library." ON)
 
 # When other libraries are using a shared version of runtime libraries,
 # Google Test also has to use one.
-option(WCHAR_AS_DEFAULT "Use wchar_t as internal type" ON)
+option(SOUI_WCHAR_AS_DEFAULT "Use wchar_t as internal type" ON)
 #
 #
-option(ENABLE_SOUI_CORE_LIB "Enable compile 'core' as static lib" OFF)
+option(SOUI_ENABLE_CORE_LIB "Enable compile 'core' as static lib" OFF)
 #
 #
-option(ENABLE_SOUI_COM_LIB "Enable compile 'components' as static lib" OFF)
+option(SOUI_ENABLE_COM_LIB "Enable compile 'components' as static lib" OFF)
 #
 #
-option(XP_TOOLSET "" ON)
+option(SOUI_XP_TOOLSET "" ON)
 #
 #
-option(ENABLE_SPECTRE "Enable Spectre Mitigation" OFF)
+option(SOUI_ENABLE_SPECTRE "Enable Spectre Mitigation" OFF)
 #
 #
-option(BUILD_DEMOS "Build builtin demos" ON)
+option(SOUI_BUILD_DEMOS "Build builtin demos" ON)
 
+message(STATUS "MSVC_VERSION: ${MSVC_VERSION}")
 if(MSVC AND MSVC_VERSION LESS 1800)
-set(BUILD_WS OFF)
+set(SOUI_BUILD_WS OFF)
 message(STATUS "Build Websocket module disabled for VS2013 or lower")
 else()
 if(EXISTS "${PROJECT_SOURCE_DIR}/third-part/libwebsockets/CMakeLists.txt")
-option(BUILD_WS "Build Websocket module" ON)
+option(SOUI_BUILD_WS "Build Websocket module" ON)
 else()
-set(BUILD_WS OFF)
+set(SOUI_BUILD_WS OFF)
 endif()
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-option(BUILD_RICHEDIT "using richedit from source code" OFF)
-option(ENABLE_SOUI_ACC "Enable Acc" OFF)
-option(ENABLE_SOUI_SPY "Enable Swnd Spy" OFF)
+option(SOUI_BUILD_RICHEDIT "using richedit from source code" OFF)
+option(SOUI_ENABLE_ACC "Enable Acc" OFF)
+option(SOUI_ENABLE_SPY "Enable Swnd Spy" OFF)
 if (MSVC)
     add_compile_options(/MP)
 endif()
 else()
-set(BUILD_RICHEDIT ON)
-set(ENABLE_SOUI_ACC OFF)
-set(ENABLE_SOUI_SPY OFF)
+set(SOUI_BUILD_RICHEDIT ON)
+set(SOUI_ENABLE_ACC OFF)
+set(SOUI_ENABLE_SPY OFF)
 endif()
 
 
@@ -150,6 +154,8 @@ else()
   add_compile_options(-Wno-switch)
   add_compile_options(-Wno-unsequenced)
   add_compile_options(-Wno-undefined-var-template)
+  add_compile_options(-Wno-c++11-extensions)
+  set(CMAKE_CXX_STANDARD 11)
   else()
   set(CMAKE_SKIP_BUILD_RPATH FALSE)
   set(CMAKE_BUILD_WITH_INSTALL_RPATH TRUE)
@@ -171,7 +177,6 @@ set(CMAKE_LIBRARY_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 set(CMAKE_ARCHIVE_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 add_definitions(-D_CRT_NONSTDC_NO_WARNINGS -D_SILENCE_TR1_NAMESPACE_DEPRECATION_WARNING)
-
 link_directories(${CMAKE_BINARY_DIR}/bin)
 
 add_subdirectory(third-part)
@@ -184,10 +189,12 @@ add_subdirectory(soui-sys-resource2)
 endif()
 add_subdirectory(tools)
 add_subdirectory(controls.extend)
-if(BUILD_DEMOS)
+if(SOUI_BUILD_DEMOS)
 add_subdirectory(demos)
-endif(BUILD_DEMOS)
-
+endif(SOUI_BUILD_DEMOS)
+if(TARGET websockets)
+        add_subdirectory(games) 
+endif()
 if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
 set(SWINX_LIBS swinx)
 set(SWINX_CFLAGS swinx/include)

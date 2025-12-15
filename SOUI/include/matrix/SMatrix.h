@@ -33,7 +33,7 @@ class SOUI_EXP SMatrix
      * @brief Constructor that initializes the matrix with the given data array.
      * @param data Array of 9 floats representing the matrix elements.
      */
-    SMatrix(const float data[9]);
+    SMatrix(const float data[9], int type = kUnknown_Mask);
 
   public:
     /**

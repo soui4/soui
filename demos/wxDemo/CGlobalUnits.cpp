@@ -65,7 +65,7 @@ void CGlobalUnits::OperateEmojis()
 			m_mapEmojisIndex.insert(std::make_pair(strUUID, strName));
 
 			SStringT strPath = m_sstrEmojiFolder + sstrName;
-			IBitmap* pRes = SResLoadFromFile::LoadImage(strPath);
+			IBitmapS* pRes = SResLoadFromFile::LoadImage(strPath);
 			if (pRes)
 				m_mapFace.insert(std::make_pair(strUUID, pRes));
 		} while (FindNextFile(hFind, &findFileData) != 0);

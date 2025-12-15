@@ -38,6 +38,8 @@ class WsClient : public TObjRefImpl<IWsClient> {
     {
         return send(std::string((const char *)data, nLen), true);
     }
+
+    STDMETHODIMP_(int) sendBinary2(THIS_ DWORD dwType, const void *data, int nLen) OVERRIDE;
     
     // IWsClient methods
     STDMETHODIMP_(int) connectTo(THIS_ const char *server_, const char *path_, uint16_t port, const char *protocolName_, ClientOption option) OVERRIDE;

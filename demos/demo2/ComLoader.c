@@ -110,9 +110,6 @@ struct SComInfo s_comInfo[] = {
 	}
 #else
 
-#ifdef _MSC_VER
-#pragma message("LIB_SOUI_COM")
-#endif
 
 #pragma comment(lib,"Usp10")
 #pragma comment(lib,"opengl32")

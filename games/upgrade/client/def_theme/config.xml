@@ -1,0 +1,289 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme name="default">
+    <skin>
+        <imglist name="skin_ready" src="file:image/ready.png"/>
+        <gif name="gif_chair" src="file:avatar/chair.gif"/>
+        <gif name="gif_avatar_male" src="file:avatar/male.gif"/>
+        <gif name="gif_avatar_female" src="file:avatar/female.gif"/>
+        <gif name="ani_conn" src="file:Sprite/connect.gif"/>
+        <apng name="ani_shuffle" src="file:Sprite/洗牌.png"/>
+        <apng name="ani_diamond" src="file:Sprite/方块.png"/>"
+        <apng name="ani_club" src="file:Sprite/梅花.png"/>"
+        <apng name="ani_heart" src="file:Sprite/红桃.png"/>"
+        <apng name="ani_spade" src="file:Sprite/黑桃.png"/>"
+        <apng name="ani_little_joker" src="file:Sprite/小王.png"/>"
+        <apng name="ani_big_joker" src="file:Sprite/大王.png"/>"
+
+        <apng name="ani_wait_1" src="file:Sprite/等待1.png"/>
+        <apng name="ani_wait_2" src="file:Sprite/等待2.png"/>
+        <apng name="ani_wait_3" src="file:Sprite/等待3.png"/>
+        <apng name="ani_wait_4" src="file:Sprite/等待4.png"/>
+
+        <apng name="ani_vectory_1" src="file:Sprite/礼花1.png"/>"
+        <apng name="ani_vectory_2" src="file:Sprite/礼花2.png"/>"
+        <apng name="ani_vectory_3" src="file:Sprite/礼花3.png"/>"
+
+        <card name="skin_card" src="file:image/card.png"/>
+        <imglist name="skin_put_card" src="file:image/出牌.png" states="4"/>
+        <colorrect name="skin_card_sel" normal="rgba(255,255,0,128)"/>
+        <imglist name="skin_back" src="file:image/back.bmp" tile="1"/>
+        <imglist name="skin_score_back" src="file:image/scoreback.bmp" tile="1"/>
+        <imglist name="skin_score_board" src="file:image/score_board.bmp"/>
+        <imglist name="skin_btn_prev_round" src="file:image/上轮牌按纽.png" states="4"/>
+        <imglist name="skin_btn_see_bottom" src="file:image/看底牌按纽.png" states="4"/>
+        <imglist name="skin_btn_start" src="file:image/开始.png" states="4"/>
+        <imglist name="skin_main_diamond" src="file:image/亮主-方块.png" states="4"/>
+        <imglist name="skin_main_club" src="file:image/亮主-梅花.bmp" states="4"/>
+        <imglist name="skin_main_heart" src="file:image/亮主-红桃.bmp" states="4"/>
+        <imglist name="skin_main_spade" src="file:image/亮主-黑桃.bmp" states="4"/>
+        <imglist name="skin_main_little_joker" src="file:image/亮主-小王.bmp" states="4"/>
+        <imglist name="skin_main_big_joker" src="file:image/亮主-大王.bmp" states="4"/>
+        <imglist name="skin_main_pass" src="file:image/亮主-放弃.png" states="4"/>
+
+        <imglist name="skin_digit" src="file:image/digital_score.png" states="12"/>
+        <imglist name="skin_multi_digit" src="file:image/dig_multiple.png" states="11"/>
+        <imglist name="skin_levela" src="file:image/levela.png" states="13"/>
+        <imglist name="skin_levelb" src="file:image/levelb.png" states="13"/>
+        <imglist name="skin_clock" src="file:image/闹钟.png"/>
+        <imglist name="skin_clock_digital" src="file:image/闹钟数字.png" states="10"/>
+        <imglist name="skin_color" src="file:image/花色.png" states="6"/>
+        <imglist name="skin_banker" src="file:image/庄家.png" states="1"/>
+        <imglist name="skin_btn_setbottom" src="file:image/扣底牌.png" states="4"/>
+    </skin>
+    <template>
+        <tip wndclass="text" colorText="#FF0000FF" ownerLayout="anchor" pos="0,100,4" offset="-0.5,-0.5" layer="300000"/>
+        <avatar wndclass="window" layout="vbox" size="-1,-1" interval="5" gravity="center">
+            <window size="150,190">
+                <gifplayer pos="0,0" name="gif_avatar" skin="gif_chair" />
+                <img pos="|0,|0" offset="-0.5,-0.5" name="flag_ready" skin="skin_ready" visible="0"/>
+            </window>
+            <text name="txt_name" text=" " font="size:16"/>
+        </avatar>
+        <avatar_flags wndclass="window" layout="hbox" size="-1,-1" interval="5" gravity="center">
+            <img id="1" skin="skin_color" visible="0" />
+            <img id="2" skin="skin_color" visible="0" />
+            <img id="3" skin="skin_banker" visible="0" />
+        </avatar_flags>
+    </template>
+    <widgets>
+
+        <gifplayer name="sprite_connecting" skin="ani_conn" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="100" />
+        <gifplayer name="sprite_shuffle" skin="ani_shuffle" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="100" loopCount="1"/>
+        <gifplayer name="sprite_waiting" skin="ani_waiting_0" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="100" />"
+        <gifplayer name="sprite_vectory" skin="ani_vectory_0" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="1000" loopCount="1" msgTransparent="1" />"
+        <imgbtn name="btn_start" skin="skin_btn_start" ownerLayout="anchor" pos="0,0,4" offset="-0.5,0"/>
+        <imgbtn name="btn_put_card" skin="skin_put_card" ownerLayout="anchor" pos="0,0,4" offset="-0.5,0"/>
+        <imgbtn name="btn_set_bottom" skin="skin_btn_setbottom" ownerLayout="anchor" pos="0,0,4" offset="-0.5,0"/>
+        
+        <window name="win_show_main_box" size="-1,-1" layout="hbox" ownerLayout="anchor" pos="0,30,4" offset="-0.5,0" layer="50">
+            <imgbtn name="btn_main_diamond" id="100" skin="skin_main_diamond">
+                <gifplayer msgTransparent="1" id="200" skin="ani_diamond" loopCount="1" pos="|0,|0" offset="-0.5,-0.5" visible="0"/>
+            </imgbtn>
+            <imgbtn name="btn_main_club" id="101" skin="skin_main_club">
+                <gifplayer msgTransparent="1" id="200" skin="ani_club" loopCount="1" pos="|0,|0" offset="-0.5,-0.5" visible="0"/>
+            </imgbtn>
+            <imgbtn name="btn_main_heart" id="102" skin="skin_main_heart">
+                <gifplayer msgTransparent="1" id="200" skin="ani_heart" loopCount="1" pos="|0,|0" offset="-0.5,-0.5" visible="0"/>
+            </imgbtn>
+            <imgbtn name="btn_main_spade" id="103" skin="skin_main_spade">
+                <gifplayer msgTransparent="1" id="200" skin="ani_spade" loopCount="1" pos="|0,|0" offset="-0.5,-0.5" visible="0"/>
+            </imgbtn>
+            <imgbtn name="btn_main_little_joker" id="104" skin="skin_main_little_joker">
+                <gifplayer msgTransparent="1" id="200" skin="ani_little_joker" loopCount="1" pos="|0,|0" offset="-0.5,-0.5" visible="0"/>
+            </imgbtn>
+            <imgbtn name="btn_main_big_joker" id="105" skin="skin_main_big_joker">
+                <gifplayer msgTransparent="1" id="200" skin="ani_big_joker" loopCount="1" pos="|0,|0" offset="-0.5,-0.5" visible="0"/>
+            </imgbtn>
+            <imgbtn name="btn_main_pass" id="106" skin="skin_main_pass"/>
+        </window>
+        <img name="win_score_container" ownerLayout="anchor" pos="0,0,7" offset="0,-1" size="-2,-1" layout="vbox" skin="skin_score_back" msgTransparent="0" padding="0,0,0,0">
+          <window size="0,6"/>
+          <window size="-2,-2" layout="hbox">
+            <img skin="skin_score_board">
+                <window name="win_levela" pos="9,4,@44,@25" layout="hbox">
+                    <img name="img_banker" skin="skin_banker" visible="0"/>
+                    <include src="file:xml/levela.xml" name="level"/>
+                </window>
+                <window name="win_levelb" pos="57,4,@44,@25" layout="hbox">
+                    <include src="file:xml/levelb.xml" name="level"/>
+                    <img name="img_banker" skin="skin_banker" visible="0"/>
+                </window>
+                <window pos="46,44,@55,@20" layout="hbox" name="win_score">
+                    <include src="file:xml/digit.xml" name="digit1"/>
+                    <include src="file:xml/digit.xml" name="digit2"/>
+                    <include src="file:xml/digit.xml" name="digit3"/>
+                    <include src="file:xml/digit.xml" name="digit4"/>
+                </window>
+                <window pos="46,74,@55,@20" layout="hbox" name="win_discount">
+                    <include src="file:xml/digit.xml" name="digit1"/>
+                    <include src="file:xml/digit.xml" name="digit2"/>
+                    <include src="file:xml/digit.xml" name="digit3"/>
+                    <include src="file:xml/digit.xml" name="digit4"/>
+                </window>
+            </img>
+            <window name="score_board" size="0,-2" weight="1" layout="hbox">
+            </window>
+            <window size="-1,-2" layout="vbox" interval="-2">
+              <imgbtn name="btn_prev_round" skin="skin_btn_prev_round" tip="previous round" />
+              <imgbtn name="btn_see_bottom" skin="skin_btn_see_bottom" tip="see bottom" />
+            </window>
+          </window>
+        </img>
+        <img name="img_clock"  ownerLayout="anchor" pos="0,-100,4" offset="-0.5,-0.5" skin="skin_clock" fitImage="1" layout="hbox" gravity="center" layer="100000">
+            <window size="0,0" weight="1"/>
+            <include src="file:xml/clock_digit.xml" name="digit1" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
+            <include src="file:xml/clock_digit.xml" name="digit2" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
+            <window size="0,0" weight="1"/>
+        </img>
+        <!--扣底倍数显示窗口-->
+        <window name="win_bottom_score_multi" size="-1,-1" layout="hbox" ownerLayout="anchor" pos="100,-150,4" offset="0,0" layer="10000" msgTransparent="1">
+            <include src="file:xml/multi_digit.xml" name="digit_x" curSel="10"/>
+            <include src="file:xml/multi_digit.xml" name="digit_1" visible="0" display="0"/>
+            <include src="file:xml/multi_digit.xml" name="digit_0"/>
+        </window>
+    </widgets>
+    <anchors>
+        <!-- 卡牌中心点位置 -->
+        <card_center pos="0,-90,4" offsetX="-0.5" offsetY="-0.5"/>
+        <!-- 0号用户放牌中心位置 -->
+        <card_bottom pos="0,-105,7" offsetX="-0.5" offsetY="-1"/>
+        <!-- 1号用户放牌中心位置 -->
+        <card_left pos="0,-105,3" offsetX="0" offsetY="0"/>
+        <!-- 2号用户放牌中心位置 -->
+        <card_top pos="0,0,1" offsetX="-0.5" offsetY="0"/>
+        <!-- 3号用户放牌中心位置 -->
+        <card_right pos="0,-105,5" offsetX="-1" offsetY="0"/>
+
+        <!-- 0号用户出牌中心位置 -->
+        <putcard_bottom pos="0,-205,7" offsetX="-0.5" offsetY="-1"/>
+        <!-- 1号用户出牌左侧位置 -->
+        <putcard_left pos="90,-105,3" offsetX="0" offsetY="0"/>
+        <!-- 2号用户出牌中心位置 -->
+        <putcard_top pos="0,100,1" offsetX="-0.5" offsetY="0"/>
+        <!-- 3号用户出牌右侧位置 -->
+        <putcard_right pos="0,-105,5" offsetX="-1" offsetY="0"/>
+
+        <!-- 0号用户头像位置 -->
+        <avatar_bottom pos="0,-105,6" offsetX="0" offsetY="-1"/>
+        <!-- 1号用户头像位置 -->
+        <avatar_left pos="0,20,0" offsetX="0" offsetY="0"/>
+        <!-- 2号用户头像位置 -->
+        <avatar_top pos="0,20,2" offsetX="-1" offsetY="0"/>
+        <!-- 3号用户头像位置 -->
+        <avatar_right pos="0,-105,8" offsetX="-1" offsetY="-1"/>
+        <!-- 得分牌位置 -->
+        <score_card pos="95,0,6" offsetX="0" offsetY="-1"/>
+
+        <!-- 时钟位置 -->
+        <clock_bottom pos="150,-200,6" offsetX="0" offsetY="-0.5"/>
+        <clock_left pos="150,95,0" offsetX="0" offsetY="0"/>
+        <clock_top pos="-150,95,2" offsetX="-1" offsetY="0"/>
+        <clock_right pos="-150,-200,8" offsetX="-1" offsetY="-0.5"/>
+
+        <!-- 亮主花色显示位置 -->
+        <color_bottom pos="150,-310,6" offsetX="-1" offsetY="-1"/>
+        <color_left pos="150,0,0" offsetX="-1" offsetY="0"/>
+        <color_top pos="-150,0,2" offsetX="0" offsetY="0"/>
+        <color_right pos="-150,-310,8" offsetX="0" offsetY="-1"/>
+    </anchors>
+    <anims>
+        <anim name="clock_alarm" src="file:anim/clock_alarm.xml"/>
+        <anim name="bottom_multi" src="file:anim/bottom_multi.xml"/>
+    </anims>
+    <sounds>
+        <!--音效, processes分为男女声音，weight可以控制播放频率-->
+        <effects>
+            <file name="进入游戏" src="Sound/effect/ty_进入游戏-01.wav"/>
+            <file name="退出游戏" src="Sound/effect/ty_退出游戏-01.wav"/>
+            <file name="开始游戏" src="Sound/effect/Sj_开始-01.wav"/>
+            <file name="洗牌" src="Sound/effect/ty_洗牌-02.wav"/>
+            <file name="发牌" src="Sound/effect/ty_发牌-01.wav"/>
+            <file name="扣底牌" src="Sound/effect/Sj_扣底牌-01.wav"/>
+            <file name="抽牌" src="Sound/effect/Sj_抽牌-02.wav"/>
+            <file name="翻倍" src="Sound/effect/ty_翻倍-01.wav"/>
+            <file name="倒计时" src="Sound/effect/ty_倒计时-02.wav"/>
+            <file name="出牌错误" src="Sound/effect/ty_出牌错误-02.wav"/>
+            <file name="出牌1~2" src="Sound/effect/ty_出牌1-2张-01.wav"/>
+            <file name="出牌3~5" src="Sound/effect/ty_出牌3-5张-01.wav"/>
+            <file name="出牌>6" src="Sound/effect/ty_出牌6张以上-01.wav"/>
+            <file name="级牌" src="Sound/effect/sj_摸到级牌-01.wav"/>
+            <file name="本轮最大" src="Sound/effect/sj_本轮最大-07.wav"/>
+            <file name="按钮焦点" src="Sound/effect/ty-按钮-01.wav"/>
+            <file name="庄家" src="Sound/effect/ty_庄家-02.wav"/>
+            <file name="反主" src="Sound/effect/sj_反主、反底-01.wav"/>
+            <file name="焰火" src="Sound/effect/ty_焰火-02.wav"/>
+            <file name="得分" src="Sound/effect/sj_得分-06.wav"/>
+            <file name="拖拉机" src="Sound/effect/bh_拖拉机-02.wav"/>
+            <file name="杀牌" src="Sound/effect/sj_杀牌-02.wav"/>
+            <file name="甩牌" src="Sound/effect/sh_甩牌-03.wav"/>
+            <file name="等待_走动" src="Sound/effect/sj_等待_walk.wav"/>
+            <file name="等待_转身" src="Sound/effect/sj_等待_turn.wav"/>
+        </effects>
+        <processes>
+            <male>
+                <process name="亮主">
+                    <file id="0" weight="1" src="Sound/effect/male/1.wav"/>
+                    <file id="1" weight="1" src="Sound/effect/male/2.wav"/>
+                    <file id="2" weight="1" src="Sound/effect/male/3.wav"/>
+                    <file id="3" weight="1" src="Sound/effect/male/4.wav"/>
+                </process>
+                <process name="反主">
+                    <file id="0" weight="1" src="Sound/effect/male/5.wav"/>
+                    <file id="1" weight="1" src="Sound/effect/male/6.wav"/>
+                    <file id="2" weight="1" src="Sound/effect/male/7.wav"/>
+                    <file id="3" weight="1" src="Sound/effect/male/8.wav"/>
+                </process>
+                <process name="拖拉机">
+                    <file id="0" weight="1" src="Sound/effect/male/9.wav"/>
+                    <file id="1" weight="1" src="Sound/effect/male/10.wav"/>
+                    <file id="2" weight="1" src="Sound/effect/male/11.wav"/>
+                    <file id="3" weight="1" src="Sound/effect/male/12.wav"/>
+                </process>
+                <process name="杀牌">
+                    <file id="0" weight="1" src="Sound/effect/male/13.wav"/>
+                    <file id="1" weight="1" src="Sound/effect/male/14.wav"/>
+                    <file id="2" weight="1" src="Sound/effect/male/15.wav"/>
+                    <file id="3" weight="1" src="Sound/effect/male/16.wav"/>
+                </process>
+                <process name="甩牌">
+                    <file id="0" weight="1" src="Sound/effect/male/17.wav"/>
+                    <file id="1" weight="1" src="Sound/effect/male/18.wav"/>
+                    <file id="2" weight="1" src="Sound/effect/male/19.wav"/>
+                    <file id="3" weight="1" src="Sound/effect/male/20.wav"/>
+                </process>
+            </male>
+            <female>
+                <process name="亮主">
+                    <file id="0" weight="1" src="Sound/effect/female/1.wav"/>
+                    <file id="1" weight="1" src="Sound/effect/female/2.wav"/>
+                    <file id="2" weight="1" src="Sound/effect/female/3.wav"/>
+                    <file id="3" weight="1" src="Sound/effect/female/4.wav"/>
+                </process>
+                <process name="反主">
+                    <file id="0" weight="1" src="Sound/effect/female/5.wav"/>
+                    <file id="1" weight="1" src="Sound/effect/female/6.wav"/>
+                    <file id="2" weight="1" src="Sound/effect/female/7.wav"/>
+                    <file id="3" weight="1" src="Sound/effect/female/8.wav"/>
+                </process>
+                <process name="拖拉机">
+                    <file id="0" weight="1" src="Sound/effect/female/9.wav"/>
+                    <file id="1" weight="1" src="Sound/effect/female/10.wav"/>
+                    <file id="2" weight="1" src="Sound/effect/female/11.wav"/>
+                    <file id="3" weight="1" src="Sound/effect/female/12.wav"/>
+                </process>
+                <process name="杀牌">
+                    <file id="0" weight="1" src="Sound/effect/female/13.wav"/>
+                    <file id="1" weight="1" src="Sound/effect/female/14.wav"/>
+                    <file id="2" weight="1" src="Sound/effect/female/15.wav"/>
+                    <file id="3" weight="1" src="Sound/effect/female/16.wav"/>
+                </process>
+                <process name="甩牌">
+                    <file id="0" weight="1" src="Sound/effect/female/17.wav"/>
+                    <file id="1" weight="1" src="Sound/effect/female/18.wav"/>
+                    <file id="2" weight="1" src="Sound/effect/female/19.wav"/>
+                    <file id="3" weight="1" src="Sound/effect/female/20.wav"/>
+                </process>
+            </female>
+        </processes>
+    </sounds>
+</theme>

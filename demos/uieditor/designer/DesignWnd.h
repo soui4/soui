@@ -25,11 +25,15 @@ protected:
 	void OnRePos(const POINT *pt) override;
 	void OnSelectedCtrl(const int * pOrder, int nLen) override;
 	void OnUpdateSize(int nWidth, int nHeight) override;
-	void OnUpdatePos(SStringW strPos) override;
+	void OnUpdatePos(SStringW strPos,BOOL bRemoveSize) override;
 protected:
 	CPoint GetViewPos() const;
 	void UpdateViewPos();
 
+protected:
+    STDMETHOD_(BOOL,IsDesignerMode)(THIS) SCONST override{
+		return TRUE;
+    }
 protected:
 	void SetScrollMax(int hmax, int vmax) const;
 	int OnCreate(LPCREATESTRUCT lpCreateStruct);

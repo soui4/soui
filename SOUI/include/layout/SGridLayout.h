@@ -26,7 +26,6 @@ class SGridLayoutParam
     DEF_SOBJECT(TObjRefImpl<SObjectImpl<ILayoutParam> >, L"GridLayoutParam")
 
     friend class SGridLayout;
-
   public:
     /**
      * @brief 解析网格对齐方式
@@ -71,7 +70,7 @@ class SGridLayoutParam
      * @param orientation 方向（水平或垂直）
      * @return 指定大小
      */
-    STDMETHOD_(SLayoutSize, GetSpecifiedSize)(THIS_ ORIENTATION orientation) SCONST OVERRIDE;
+    STDMETHOD_(BOOL, GetSpecifiedSize)(THIS_ ORIENTATION orientation, LAYOUTSIZE *pLayoutSize) SCONST OVERRIDE;
 
     /**
      * @brief 设置匹配父容器大小
@@ -90,8 +89,7 @@ class SGridLayoutParam
      * @param orientation 方向（水平或垂直）
      * @param layoutSize 指定大小
      */
-    STDMETHOD_(void, SetSpecifiedSize)
-    (THIS_ ORIENTATION orientation, const SLayoutSize &layoutSize) OVERRIDE;
+    STDMETHOD_(void, SetSpecifiedSize)(THIS_ ORIENTATION orientation, const LAYOUTSIZE *pLayoutSize) OVERRIDE;
 
     /**
      * @brief 获取原始数据指针
@@ -104,6 +102,14 @@ class SGridLayoutParam
      * @return 克隆的布局参数对象指针
      */
     STDMETHOD_(ILayoutParam *, Clone)(THIS) SCONST OVERRIDE;
+
+    /**
+     * @brief 更新属性动画器状态
+     * @param pHolder IPropertyValuesHolder*--属性值持有者
+     * @param fraction float--动画进度（0.0-1.0）
+     * @param state ANI_STATE--动画状态（ANI_START/ANI_PROGRESS/ANI_END）
+     */
+    STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) OVERRIDE;
 
   public:
     SOUI_ATTRS_BEGIN()
@@ -178,9 +184,10 @@ class SOUI_EXP SGridLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
 
     /**
      * @brief 创建布局参数对象
+     * @param pOwner IWindow*--布局参数的拥有者窗口对象
      * @return 布局参数对象指针
      */
-    STDMETHOD_(ILayoutParam *, CreateLayoutParam)(THIS) SCONST OVERRIDE;
+    STDMETHOD_(ILayoutParam *, CreateLayoutParam)(CTHIS) SCONST OVERRIDE;
 
     /**
      * @brief 测量子窗口大小

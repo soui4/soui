@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<stack size="-1,-1" curSel="2" aniType="push" vertical="1" duration="200">
+    <img size="-2,-2" skin="skin_levelb" iconIndex="12" name="A"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="0" name="2"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="1" name="3"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="2" name="4"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="3" name="5"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="4" name="6"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="5" name="7"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="6" name="8"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="7" name="9"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="8" name="10"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="9" name="j"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="10" name="Q"/>
+    <img size="-2,-2" skin="skin_levelb" iconIndex="11" name="k"/>
+</stack>

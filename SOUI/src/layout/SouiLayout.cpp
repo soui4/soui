@@ -14,8 +14,7 @@ enum
     POS_WAIT = 0x12000000, //坐标的计算依赖于其它窗口的布局
 };
 
-SouiLayoutParam::SouiLayoutParam()
-{
+SouiLayoutParam::SouiLayoutParam(){
     Clear();
 }
 
@@ -67,12 +66,13 @@ BOOL SouiLayoutParam::IsWrapContent(ORIENTATION orientation) const
     }
 }
 
-SLayoutSize SouiLayoutParam::GetSpecifiedSize(ORIENTATION orientation) const
+BOOL SouiLayoutParam::GetSpecifiedSize(ORIENTATION orientation, LAYOUTSIZE *pLayoutSize) const
 {
     if (orientation == Vert)
-        return height;
+        *pLayoutSize = height;
     else
-        return width;
+        *pLayoutSize = width;
+    return TRUE;
 }
 
 HRESULT SouiLayoutParam::OnAttrOffset(const SStringW &strValue, BOOL bLoading)
@@ -376,18 +376,18 @@ void SouiLayoutParam::SetWrapContent(ORIENTATION orientation)
     }
 }
 
-void SouiLayoutParam::SetSpecifiedSize(ORIENTATION orientation, const SLayoutSize &layoutSize)
+void SouiLayoutParam::SetSpecifiedSize(ORIENTATION orientation, const LAYOUTSIZE *pLayoutSize)
 {
     switch (orientation)
     {
     case Horz:
-        width = layoutSize;
+        width = *pLayoutSize;
         break;
     case Vert:
-        height = layoutSize;
+        height = *pLayoutSize;
         break;
     case Both:
-        width = height = layoutSize;
+        width = height = *pLayoutSize;
         break;
     }
 }
@@ -402,6 +402,29 @@ ILayoutParam *SouiLayoutParam::Clone() const
     SouiLayoutParam *pRet = new SouiLayoutParam();
     memcpy(pRet->GetRawData(), (SouiLayoutParamStruct *)this, sizeof(SouiLayoutParamStruct));
     return pRet;
+}
+
+BOOL SouiLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state){
+    SStringW strPropName = pHolder->GetPropertyName();
+    if(strPropName.CompareNoCase(LayoutProperty::WIDTH) == 0){
+        LAYOUTSIZE layoutSize;
+        pHolder->GetAnimatedValue(fraction, &width);
+        return TRUE;
+    }
+    if(strPropName.CompareNoCase(LayoutProperty::HEIGHT) == 0){
+        LAYOUTSIZE layoutSize;
+        pHolder->GetAnimatedValue(fraction, &height);
+        return TRUE;
+    }
+    if(strPropName.CompareNoCase(LayoutProperty::OFFSET_X) == 0){
+        pHolder->GetAnimatedValue(fraction, &fOffsetX);
+        return TRUE;
+    }
+    if(strPropName.CompareNoCase(LayoutProperty::OFFSET_Y) == 0){
+        pHolder->GetAnimatedValue(fraction, &fOffsetY);
+        return TRUE;
+    }
+    return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////
@@ -716,7 +739,9 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
                     {
                         if (!IsWaitingPos(wndPos.rc.left))
                         {
-                            wndPos.rc.right = wndPos.rc.left + pLayoutParam->GetSpecifiedSize(Horz).toPixelSize(nScale);
+                            SLayoutSize layoutSize;
+                            pLayoutParam->GetSpecifiedSize(Horz, &layoutSize);
+                            wndPos.rc.right = wndPos.rc.left + layoutSize.toPixelSize(nScale);
                             nResolved++;
                         }
                     }
@@ -737,7 +762,9 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
                     {
                         if (!IsWaitingPos(wndPos.rc.top))
                         {
-                            wndPos.rc.bottom = wndPos.rc.top + pLayoutParam->GetSpecifiedSize(Vert).toPixelSize(nScale);
+                            SLayoutSize layoutSize;
+                            pLayoutParam->GetSpecifiedSize(Vert, &layoutSize);
+                            wndPos.rc.bottom = wndPos.rc.top + layoutSize.toPixelSize(nScale);
                             nResolved++;
                         }
                     }
@@ -769,8 +796,8 @@ int SouiLayout::CalcPostion(SList<WndPos> *pListChildren, int nWidth, int nHeigh
 
                     if ((IsWaitingPos(wndPos.rc.right) && pLayoutParam->IsWrapContent(Horz)) || (IsWaitingPos(wndPos.rc.bottom) && pLayoutParam->IsWrapContent(Vert)))
                     { //
-                        int nWid = IsWaitingPos(wndPos.rc.right) ? nWidth : (wndPos.rc.right - wndPos.rc.left);
-                        int nHei = IsWaitingPos(wndPos.rc.bottom) ? nHeight : (wndPos.rc.bottom - wndPos.rc.top);
+                        int nWid = IsWaitingPos(wndPos.rc.right) ? SIZE_WRAP_CONTENT : (wndPos.rc.right - wndPos.rc.left);
+                        int nHei = IsWaitingPos(wndPos.rc.bottom) ? SIZE_WRAP_CONTENT : (wndPos.rc.bottom - wndPos.rc.top);
                         CSize szWnd;
                         wndPos.pWnd->GetDesiredSize(&szWnd, nWid, nHei);
                         if (pLayoutParam->IsWrapContent(Horz))

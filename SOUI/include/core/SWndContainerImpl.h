@@ -167,6 +167,20 @@ class SOUI_EXP SwndContainerImpl
     STDMETHOD_(BOOL, UnregisterTimelineHandler)(THIS_ ITimelineHandler *pHandler) OVERRIDE;
 
     /**
+     * @brief Registers a value animator.
+     * @param pAnimator Pointer to the value animator.
+     * @return TRUE if registration is successful, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, RegisterValueAnimator)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
+
+    /**
+     * @brief Unregisters a value animator.
+     * @param pAnimator Pointer to the value animator.
+     * @return TRUE if unregistration is successful, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, UnregisterValueAnimator)(THIS_ IValueAnimator *pAnimator) OVERRIDE;
+
+    /**
      * @brief Registers a window for tracking mouse events.
      * @param swnd Window handle.
      * @return TRUE if registration is successful, FALSE otherwise.
@@ -209,6 +223,12 @@ class SOUI_EXP SwndContainerImpl
      * @return TRUE if timeline is enabled, FALSE otherwise.
      */
     STDMETHOD_(BOOL, IsTimelineEnabled)(CTHIS) SCONST OVERRIDE;
+
+    /**
+     * @brief Checks if the designer mode is enabled.
+     * @return TRUE if designer mode is enabled, FALSE otherwise.
+     */
+    STDMETHOD_(BOOL, IsDesignerMode)(CTHIS) SCONST OVERRIDE;
   public: // ITimelineHandler
     /**
      * @brief Called when the next frame is ready.
@@ -280,14 +300,6 @@ class SOUI_EXP SwndContainerImpl
      * @param dwThreadID Thread identifier of the application.
      */
     void OnActivateApp(BOOL bActive, DWORD dwThreadID);
-
-  protected:
-    /**
-     * @brief Recursively builds the z-order of the window tree.
-     * @param pWnd Pointer to the window.
-     * @param iOrder Current z-order index.
-     */
-    void _BuildWndTreeZorder(IWindow *pWnd, UINT &iOrder);
 
   protected:
     SWindow *m_pRoot;                          /**< Root window of the container */

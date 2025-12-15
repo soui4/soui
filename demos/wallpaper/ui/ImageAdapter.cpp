@@ -53,7 +53,7 @@ void CImageAdapter::getView(int position, SItemPanel * pItem, SXmlNode xmlTempla
 	}
 }
 
-void CImageAdapter::OnDownloadFinish(const std::string &uri, const SStringA &data, long id,long category, IBitmap * pImg)
+void CImageAdapter::OnDownloadFinish(const std::string &uri, const SStringA &data, long id,long category, IBitmapS * pImg)
 {
 	if(id == URL_IMGINFO)
 	{

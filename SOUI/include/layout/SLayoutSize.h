@@ -1,26 +1,16 @@
 ﻿#ifndef __SLAYOUTSIZE__H__
 #define __SLAYOUTSIZE__H__
 
+#include <interface/slayout-i.h>
+
 SNSBEGIN
 
 /**
  * @class SLayoutSize
  * @brief 布局大小类
  */
-class SOUI_EXP SLayoutSize {
+class SOUI_EXP SLayoutSize : public LAYOUTSIZE{
   public:
-    /**
-     * @enum Unit
-     * @brief 布局大小单位枚举
-     */
-    enum Unit
-    {
-        unknow = -1, // 未知单位
-        px = 0,      // 像素
-        dp,          // 设备独立像素
-        dip = dp,    // 设备独立像素（别名）
-        sp           // 缩放像素
-    };
 
     /**
      * @brief 默认构造函数
@@ -35,9 +25,9 @@ class SOUI_EXP SLayoutSize {
      */
     SLayoutSize(float fSize, Unit unit);
 
-    float fSize; // 大小值
-    Unit unit;   // 大小单位
-
+    SLayoutSize(const SLayoutSize &src) { *this = src; }
+    SLayoutSize(const LAYOUTSIZE &src) { *this = src; }
+    
     /**
      * @brief 设置为包裹内容大小
      */
@@ -115,6 +105,7 @@ class SOUI_EXP SLayoutSize {
      * @return 当前大小对象的引用
      */
     SLayoutSize &operator=(const SLayoutSize &src);
+    SLayoutSize &operator=(const LAYOUTSIZE &src);
 
     /**
      * @brief 比较大小值是否相等
@@ -143,9 +134,9 @@ class SOUI_EXP SLayoutSize {
      * @param strUnit 单位字符串
      * @return 单位枚举值
      */
-    static SLayoutSize::Unit unitFromString(const SStringW &strUnit);
+    static Unit unitFromString(const SStringW &strUnit);
 
-    static SLayoutSize::Unit defUnit; // 默认单位
+    static Unit defUnit; // 默认单位
 };
 
 SNSEND

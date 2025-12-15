@@ -699,7 +699,7 @@ void SDateTimePicker::DropDown()
     m_pDropDownWnd = new SDropDownWnd_ComboBox(this);
     CRect rcPopup;
     SLayoutSize nWid;
-    nWid.setSize((float)m_nDropWidth, SLayoutSize::dp);
+    nWid.setSize((float)m_nDropWidth, dp);
     bool bDown = CalcPopupRect(nWid.toPixelSize(GetScale()), rcPopup);
     m_pDropDownWnd->Create(rcPopup, 0);
 

@@ -8,6 +8,7 @@
 #include <interface/SMatrix-i.h>
 #include <interface/SWndContainer-i.h>
 #include <interface/SScriptModule-i.h>
+#include <interface/slayout-i.h>
 SNSBEGIN
 
 typedef struct ILayout ILayout;
@@ -895,8 +896,45 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(BOOL, IsVideoCanvas)(CTHIS) SCONST PURE;
 
+    /** 
+    * RegisterDragDrop
+    * @brief    注册窗口为拖拽目标
+    * @param    IDropTarget * pDragTarget --  拖拽目标对象
+    * @return   BOOL -- TRUE:成功
+    *
+    * Describe
+    */
     STDMETHOD_(BOOL, RegisterDragDrop)(THIS_ IDropTarget * pDragTarget) PURE;
+
+    /** 
+    * UnregisterDragDrop
+    * @brief    取消注册拖拽目标
+    * @return   BOOL -- TRUE:成功
+    *
+    * Describe
+    */
     STDMETHOD_(BOOL, UnregisterDragDrop)(THIS) PURE;
+
+    /**
+     * @brief 设置窗口所在图层
+     * @param nLayer int--窗口所在图层
+     * @return
+     */
+    STDMETHOD_(void, SetLayer)(THIS_ int nLayer) PURE;
+
+    /**
+     * @brief 获取窗口所在图层
+     * @return int--窗口所在图层
+     */
+    STDMETHOD_(int, GetLayer)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief 更新属性动画器状态
+     * @param pHolder IPropertyValuesHolder*--属性值持有者
+     * @param fraction float--动画进度（0.0-1.0）
+     * @param state ANI_STATE--动画状态（ANI_START/ANI_PROGRESS/ANI_END）
+     */
+    STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) PURE;
 };
 
 SNSEND

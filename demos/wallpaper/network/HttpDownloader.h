@@ -14,7 +14,7 @@ DEF_EVT_EXT(EventDownloadFinish,EVT_DOWNLOAD_FINISH,{
 	SSharedPtr<SStringA> data;
 	long   type;
 	long   catetory;
-	SAutoRefPtr<IBitmap> pImg;
+	SAutoRefPtr<IBitmapS> pImg;
 }
 )
 

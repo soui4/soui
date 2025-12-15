@@ -76,7 +76,7 @@ SComboBase::SComboBase(void)
     : m_pSkinBtn(GETBUILTINSKIN(SKIN_SYS_DROPBTN))
     , m_pEdit(NULL)
     , m_bDropdown(TRUE)
-    , m_nDropHeight(200, SLayoutSize::dp)
+    , m_nDropHeight(200, dp)
     , m_dwBtnState(WndState_Normal)
     , m_nAnimTime(200)
     , m_pDropDownWnd(NULL)
@@ -611,7 +611,9 @@ void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     CSize szRet(-1, -1);
     if (GetLayoutParam()->IsSpecifiedSize(Horz))
     { //检查设置大小
-        szRet.cx = GetLayoutParam()->GetSpecifiedSize(Horz).toPixelSize(GetScale());
+        SLayoutSize layoutSize;
+        GetLayoutParam()->GetSpecifiedSize(Horz, &layoutSize);
+        szRet.cx = layoutSize.toPixelSize(GetScale());
     }
     else if (GetLayoutParam()->IsMatchParent(Horz))
     {
@@ -620,7 +622,9 @@ void SComboBase::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 
     if (GetLayoutParam()->IsSpecifiedSize(Vert))
     { //检查设置大小
-        szRet.cy = GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale());
+        SLayoutSize layoutSize;
+        GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
+        szRet.cy = layoutSize.toPixelSize(GetScale());
     }
     else if (GetLayoutParam()->IsMatchParent(Vert))
     {

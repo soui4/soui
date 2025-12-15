@@ -60,7 +60,7 @@ source_group("Source Files" FILES ${srcs})
 
 include_directories(${CMAKE_CURRENT_SOURCE_DIR})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     if (CMAKE_SYSTEM_NAME MATCHES Windows)
         set (srcs  ${srcs} httpclient.rc)
         add_library(httpclient SHARED ${srcs} ${headers})

@@ -231,12 +231,16 @@ void SRootWindow::UpdateLayout()
         int nWid = szAppSet.cx;
         if (nWid <= 0)
         {
-            nWid = GetLayoutParam()->IsSpecifiedSize(Horz) ? GetLayoutParam()->GetSpecifiedSize(Horz).toPixelSize(GetScale()) : SIZE_WRAP_CONTENT;
+            SLayoutSize layoutSize;
+            GetLayoutParam()->GetSpecifiedSize(Horz, &layoutSize);
+            nWid = layoutSize.toPixelSize(GetScale());
         }
         int nHei = szAppSet.cy;
         if (nHei <= 0)
         {
-            nHei = GetLayoutParam()->IsSpecifiedSize(Vert) ? GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale()) : SIZE_WRAP_CONTENT;
+            SLayoutSize layoutSize;
+            GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
+            nHei = layoutSize.toPixelSize(GetScale());
         }
         CSize szRoot;
         GetDesiredSize(&szRoot, nWid, nHei);
@@ -650,11 +654,15 @@ BOOL SHostWnd::InitFromXml(IXmlNode *pNode)
     ILayoutParam *pLayoutParam = GetRoot()->GetLayoutParam();
     if (nWidth == 0 && pLayoutParam->IsSpecifiedSize(Horz))
     {
-        nWidth = pLayoutParam->GetSpecifiedSize(Horz).toPixelSize(GetScale()) + szNc.cx;
+        SLayoutSize layoutSize;
+        pLayoutParam->GetSpecifiedSize(Horz, &layoutSize);
+        nWidth = layoutSize.toPixelSize(GetScale()) + szNc.cx;
     }
     if (nHeight == 0 && pLayoutParam->IsSpecifiedSize(Vert))
     {
-        nHeight = pLayoutParam->GetSpecifiedSize(Vert).toPixelSize(GetScale()) + szNc.cy;
+        SLayoutSize layoutSize;
+        pLayoutParam->GetSpecifiedSize(Vert, &layoutSize);
+        nHeight = layoutSize.toPixelSize(GetScale()) + szNc.cy;
     }
 
     if (nWidth <= 0 || nHeight <= 0)
@@ -1543,7 +1551,7 @@ BOOL SHostWnd::RegisterTimelineHandler(ITimelineHandler *pHandler)
     bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
     if (bEmpty1 && !bEmpty2)
     {
-        SNativeWnd::SetTimer(kPulseTimer, kPulseInterval, NULL);
+        SNativeWnd::SetTimer(kPulseTimer, ITimelineHandler::kPulseInterval, NULL);
     }
     return bRet;
 }
@@ -1552,6 +1560,28 @@ BOOL SHostWnd::UnregisterTimelineHandler(ITimelineHandler *pHandler)
 {
     bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
     BOOL bRet = SwndContainerImpl::UnregisterTimelineHandler(pHandler);
+    bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
+    if (!bEmpty1 && bEmpty2)
+    {
+        SNativeWnd::KillTimer(kPulseTimer);
+    }
+    return bRet;
+}
+
+BOOL SHostWnd::RegisterValueAnimator(IValueAnimator *pAnimator){
+    bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
+    BOOL bRet = SwndContainerImpl::RegisterValueAnimator(pAnimator);
+    bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
+    if (bEmpty1 && !bEmpty2)
+    {
+        SNativeWnd::SetTimer(kPulseTimer, ITimelineHandler::kPulseInterval, NULL);
+    }
+    return bRet;
+}
+
+BOOL SHostWnd::UnregisterValueAnimator(IValueAnimator *pAnimator){
+    bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
+    BOOL bRet = SwndContainerImpl::UnregisterValueAnimator(pAnimator);
     bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
     if (!bEmpty1 && bEmpty2)
     {
@@ -2104,6 +2134,10 @@ void SHostWnd::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
     }
 }
 
+void SHostWnd::OnScaleChanged(int nScale)
+{ 
+}
+
 void SHostWnd::SetScale(THIS_ int nScale, LPCRECT desRect)
 {
     EnablePrivateUiDef(TRUE);
@@ -2113,6 +2147,7 @@ void SHostWnd::SetScale(THIS_ int nScale, LPCRECT desRect)
     SetWindowPos(NULL, desRect->left, desRect->top, desRect->right - desRect->left, desRect->bottom - desRect->top, SWP_NOZORDER | SWP_NOACTIVATE);
     UpdateAutoSizeCount(false);
     EnablePrivateUiDef(FALSE);
+    OnScaleChanged(nScale);
 }
 
 LRESULT SHostWnd::OnUpdateFont(UINT uMsg, WPARAM wp, LPARAM lp)

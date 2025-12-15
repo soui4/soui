@@ -20,7 +20,7 @@ set(TaskLoop_src
 source_group("Header Files" FILES ${TaskLoop_header})
 source_group("Source Files" FILES ${TaskLoop_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (TaskLoop_src  ${TaskLoop_src} TaskLoop.rc)
     add_library(taskloop SHARED ${TaskLoop_src} ${TaskLoop_header})
     target_link_libraries(taskloop utilities4)

@@ -71,6 +71,14 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
      */
     STDMETHOD_(void, SetFilePrefix)(THIS_ LPCTSTR pszFilePrefix) OVERRIDE;
 
+    /**
+     * @brief Retrieves the file prefix for resource paths.
+     * @param pszFilePrefix Pointer to a buffer to receive the file prefix.
+     * @param cchMax Maximum size of the buffer.
+     * @return File prefix string.
+     */
+    STDMETHOD_(BOOL, GetFilePrefix)(THIS_ LPTSTR pszFilePrefix, int cchMax) SCONST OVERRIDE;
+
     //////////////////////////////////////////////////////////////////////////
     /**
      * @brief Checks if a resource exists.
@@ -207,7 +215,7 @@ class SOUI_EXP SResProviderMgr : public IResProviderMgr {
     typedef SMap<SStringT, HCURSOR> CURSORMAP;
     CURSORMAP m_mapCachedCursor; // Map of cached cursors
 
-    SCriticalSection m_cs; // Critical section for thread safety
+    mutable SCriticalSection m_cs; // Critical section for thread safety
 
 #ifdef _DEBUG
     // Resource usage count map (debug only)

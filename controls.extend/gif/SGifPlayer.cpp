@@ -1,19 +1,23 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "SGifPlayer.h"
 #include "SSkinAni.h"
 
-namespace SOUI
-{
+SNSBEGIN
 
 SGifPlayer::SGifPlayer() 
 	: m_iCurFrame(0)
 	, m_nNextInterval(0)
 	, m_bEnableScale(TRUE)
 	, m_nScale(100)
-	, m_bLoop(TRUE)
+	, m_nLoop(-1)
+	, m_iLoop(0)
 	, m_bTile(TRUE)
+	, m_bAutoPlay(TRUE)
+	, m_bPlaying(FALSE)
 {
-
+	AddEvent(EVENTID(EventGifLoopOver));
+	AddEvent(EVENTID(EventGifPlayOver));
+	AddEvent(EVENTID(EventGifPlayFrame));
 }
 
 SGifPlayer::~SGifPlayer()
@@ -33,43 +37,48 @@ void SGifPlayer::OnPaint( IRenderTarget *pRT )
 void SGifPlayer::OnShowWindow( BOOL bShow, UINT nStatus )
 {
 	__baseCls::OnShowWindow(bShow,nStatus);
-	if(!bShow)
+	if(!IsVisible(TRUE))
 	{
-        GetContainer()->UnregisterTimelineHandler(this);
+		Stop();
 	}else if(m_aniSkin && m_aniSkin->GetStates()>1)
 	{
-        GetContainer()->RegisterTimelineHandler(this);
-        if(m_aniSkin->GetFrameDelay()==0)
-            m_nNextInterval = 90;
-        else
-            m_nNextInterval = m_aniSkin->GetFrameDelay();
+		if(m_bAutoPlay)
+			Start();
 	}
 }
 
 void SGifPlayer::OnNextFrame()
 {
-    if (!IsVisible(TRUE))
-        return;
-    m_nNextInterval -= 10;
+    m_nNextInterval -= ITimelineHandler::kPulseInterval;
     if(m_nNextInterval <= 0 && m_aniSkin)
     {
         int nStates=m_aniSkin->GetStates();
 		if(nStates==0)
 			return;
         m_iCurFrame++;
-		if (!m_bLoop && m_iCurFrame >= nStates)
-    	{
-			GetContainer()->UnregisterTimelineHandler(this);
-			EventGifPlayOver evt(this);
-			FireEvent(evt);
-			return;
-    	}
-        m_iCurFrame%=nStates;
-        Invalidate();
-        if(m_aniSkin->GetFrameDelay()==0)
+		m_iCurFrame%=nStates;
+
+		EventGifPlayFrame evt(this);
+		evt.iFrame = m_iCurFrame;
+		FireEvent(evt);
+		
+		Invalidate();
+        if(m_aniSkin->GetFrameDelay(m_iCurFrame)==0)
             m_nNextInterval = 90;
         else
-            m_nNextInterval =m_aniSkin->GetFrameDelay();	
+            m_nNextInterval =m_aniSkin->GetFrameDelay(m_iCurFrame);	
+		if(m_iCurFrame == 0){
+			m_iLoop++;
+			EventGifLoopOver evt(this);
+			evt.iLoop = m_iLoop;
+			evt.nLoop = m_nLoop;
+			FireEvent(evt);
+			if(m_nLoop>=0 && m_iLoop>=m_nLoop){
+				Stop();
+				EventGifPlayOver evt(this);
+				FireEvent(evt);
+			}
+		}
     }
 }
 
@@ -90,24 +99,83 @@ HRESULT SGifPlayer::OnAttrSkin( const SStringW & strValue, BOOL bLoading )
 	return bLoading?S_OK:S_FALSE;
 }
 
-SIZE SGifPlayer::MeasureContent(int wid,int hei )
+void SGifPlayer::SetLoop(int  nLoop)
+{
+	m_nLoop = nLoop;
+	m_iLoop = 0;
+}
+
+int SGifPlayer::GetFrameCount() const
+{
+    return m_aniSkin ? m_aniSkin->GetStates() : 0;
+}
+
+void SGifPlayer::SetCurFrame(int iFrame)
+{
+	if(iFrame>=0 && iFrame<m_aniSkin->GetStates())
+	{
+		m_iCurFrame = iFrame;
+		Invalidate();
+	}	
+
+}
+
+int SGifPlayer::GetCurFrame() const
+{
+    return m_iCurFrame;
+}
+
+SIZE SGifPlayer::MeasureContent(int wid, int hei)
 {
 	CSize sz;
 	if(m_aniSkin) sz=m_aniSkin->GetSkinSize();
 	return sz;
 }
 
-BOOL SGifPlayer::PlayGifFile( LPCTSTR pszFileName )
+BOOL SGifPlayer::PlayGifFile( LPCTSTR pszFileName)
 {
-    return _PlayFile(pszFileName,TRUE);
+    return _PlayFile(pszFileName);
 }
 
-BOOL SGifPlayer::PlayAPNGFile( LPCTSTR pszFileName )
+BOOL SGifPlayer::PlayAPNGFile( LPCTSTR pszFileName)
 {
-    return _PlayFile(pszFileName,FALSE);
+    return _PlayFile(pszFileName);
 }
 
-BOOL SGifPlayer::_PlayFile( LPCTSTR pszFileName, BOOL bGif )
+BOOL SGifPlayer::LoadFromMemory(LPVOID pBits, size_t szData)
+{
+    SSkinAni *pAniSkin = (SSkinAni *)SApplication::getSingleton().CreateSkinByName(SSkinAni::GetClassName());
+	if(!pAniSkin) return FALSE;
+	if(0==pAniSkin->LoadFromMemory(pBits,szData))
+	{
+		pAniSkin->Release();
+		return FALSE;
+	}
+	SetAniSkin(pAniSkin);
+	pAniSkin->Release();
+	return TRUE;
+}
+
+void SGifPlayer::Start(int iFrame)
+{
+	if(iFrame>=0 && iFrame<m_aniSkin->GetStates())
+		m_iCurFrame = iFrame;	//设置当前帧
+	GetContainer()->RegisterTimelineHandler(this);
+    if (m_aniSkin->GetFrameDelay(m_iCurFrame) == 0)
+        m_nNextInterval = 90;
+    else
+        m_nNextInterval = m_aniSkin->GetFrameDelay(m_iCurFrame);
+	m_iLoop = 0;
+    m_bPlaying = TRUE;	//设置播放状态
+}
+
+void SGifPlayer::Stop()
+{
+	GetContainer()->UnregisterTimelineHandler(this);
+	m_bPlaying = FALSE;
+}
+
+BOOL SGifPlayer::_PlayFile( LPCTSTR pszFileName)
 {
     SSkinAni *pAniSkin = (SSkinAni *)SApplication::getSingleton().CreateSkinByName(SSkinAni::GetClassName());
 	if(!pAniSkin) return FALSE;
@@ -116,45 +184,57 @@ BOOL SGifPlayer::_PlayFile( LPCTSTR pszFileName, BOOL bGif )
 		pAniSkin->Release();
 		return FALSE;
 	}
-
-	GetContainer()->UnregisterTimelineHandler(this);
-
-	m_aniSkin = pAniSkin;
+	SetAniSkin(pAniSkin);
 	pAniSkin->Release();
+	return TRUE;
+}
 
+void SGifPlayer::SetAniSkin(SSkinAni *pAniSkin)
+{
+	if(!pAniSkin)
+		return;
+	Stop();
+	if(pAniSkin->GetScale() != GetScale()){
+		m_aniSkin = (SSkinAni *)pAniSkin->Scale(GetScale());
+	}else{
+		m_aniSkin = pAniSkin;
+	}
 	m_iCurFrame = 0;
-    SStringW str;
-    str.Format(L"%d", m_bEnableScale);
-    m_aniSkin->SetAttribute(L"enableScale", str);
-    str.Format(L"%d", m_nScale);
-    m_aniSkin->SetAttribute(L"scale", str);
-    str.Format(L"%d", m_bTile);
-    m_aniSkin->SetAttribute(L"tile", str);
-	
 	if(GetLayoutParam()->IsWrapContent(Any))
 	{
 		RequestRelayout();
 	}
-	if(IsVisible(TRUE))
+	if(IsVisible(TRUE) && m_bAutoPlay)
 	{
-		GetContainer()->RegisterTimelineHandler(this);
+		Start();
 	}
-	return TRUE;
 }
-	
+
 void SGifPlayer::OnDestroy()
 {
-    GetContainer()->UnregisterTimelineHandler(this);
+    Stop();
     __baseCls::OnDestroy();
 }
 
 void SGifPlayer::OnContainerChanged(ISwndContainer *pOldContainer,ISwndContainer *pNewContainer)
 {
-	if(pOldContainer)
+	if(pOldContainer && m_bPlaying)
+	{
 		pOldContainer->UnregisterTimelineHandler(this);
-	if(pNewContainer)
+	}
+	if(pNewContainer && m_bPlaying){
 		pNewContainer->RegisterTimelineHandler(this);
+	}
 	SWindow::OnContainerChanged(pOldContainer,pNewContainer);
 }
 
+
+void SGifPlayer::OnScaleChanged(int scale)
+{
+    __baseCls::OnScaleChanged(scale);
+	SAutoRefPtr<ISkinObj> pSkin = (ISkinObj *)m_aniSkin;
+    GetScaleSkin(pSkin, scale);
+	m_aniSkin = (SSkinAni *)(ISkinObj*)pSkin;
 }
+
+SNSEND

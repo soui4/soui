@@ -14,7 +14,7 @@
 #endif // GetAValue
 
 #ifndef RGBA
-#define RGBA(r, g, b, a) (RGB(r, g, b) | (a << 24))
+#define RGBA(r, g, b, a) ((r) | (g) << 8 | (b) << 16 | ((uint32_t)a) << 24)
 #endif // RGBA
 
 /**
@@ -70,7 +70,7 @@ class SColor {
      */
     const COLORREF toCOLORREF() const
     {
-        return RGB(r, g, b) | (a << 24);
+        return RGBA(r, g, b, a);
     }
 
     /**

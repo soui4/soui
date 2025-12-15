@@ -58,8 +58,8 @@ int main(int cArgs, const char **argv)
     {
         sprintf(szUri, "/test/?%s", argv[1]);
     }
-    ClientOption optoin = { true, ".\\server.crt", true, true, true };
-    int nRet = pClient->connectTo("localhost", szUri, 4043, "", optoin);
+    ClientOption optoin = { false, NULL, false,false,false };
+    int nRet = pClient->connectTo("127.0.0.1", szUri, 3310, "", optoin);
 
     for (int i = 0; i < 10; i++)
     {

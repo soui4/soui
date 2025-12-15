@@ -13,7 +13,7 @@
 SNSBEGIN
 
 SListBox::SListBox()
-    : m_itemHeight(20.f, SLayoutSize::dp)
+    : m_itemHeight(20.f, dp)
     , m_iSelItem(-1)
     , m_iHoverItem(-1)
     , m_crItemBg(CR_INVALID)
@@ -141,7 +141,7 @@ int SListBox::GetItemHeight() const
 
 void SListBox::SetItemHeight(int cyItemHeight)
 {
-    m_itemHeight = SLayoutSize((float)cyItemHeight, SLayoutSize::px);
+    m_itemHeight = SLayoutSize((float)cyItemHeight, px);
     UpdateScrollBar();
 }
 

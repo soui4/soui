@@ -13,21 +13,20 @@
 SNSBEGIN
     //////////////////////////////////////////////////////////////////////////
     //  SImgFrame_STB
-SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
+SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay,BOOL bMove)
         :m_nWid(w),m_nHei(h)
         ,m_nDelay(nDelay)
     {
-        m_data = (unsigned char *)malloc(w * h * 4);
-        assert(m_data);
-        memcpy(m_data, data, w * h * 4);
-    }
-
-    SImgFrame_STB::SImgFrame_STB(BYTE *data, int w, int h, int nDelay)
-        : m_nWid(w)
-        , m_nHei(h)
-        , m_nDelay(nDelay)
-        , m_data(data)
-    {
+        if (bMove)
+        {
+            m_data = (unsigned char *)data;
+        }
+        else
+        {
+            m_data = (unsigned char *)malloc(w * h * 4);
+            assert(m_data);
+            memcpy(m_data, data, w * h * 4);
+        }
     }
 
     SImgFrame_STB::~SImgFrame_STB()
@@ -64,38 +63,38 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
         int width, height, frames = 0, comp;
         //test for apng
         upng_t *upng = upng_new_from_bytes((const unsigned char *)pBuf, (unsigned long)bufLen);
-        if (upng_header(upng) == UPNG_EOK && upng_get_components(upng) == 4)
+        // Accept RGBA format or formats that will be auto-converted to RGBA (PLT, RGB, LUMA, LUM)
+        if (upng_header(upng) == UPNG_EOK)
         { // apng
             upng_set_inflate(upng_inflate);
             width = upng_get_width(upng);
             height = upng_get_height(upng);
             frames = upng_get_frame_count(upng);
-            if (UPNG_EOK != upng_decode_default(upng))
-            {
-                upng_free(upng);
-                return 0;
-            }
             if (frames == 0)
             {
-                m_arrFrames.SetCount(1);
-                BYTE *buf = upng_move_frame_buffer(upng);
-                _DoPromultiply(buf, width, height);
-                SImgFrame_STB *pFrame = new SImgFrame_STB(buf, width, height, 0);
-                m_arrFrames.SetAt(0, pFrame);
-                pFrame->Release();
+                if (UPNG_EOK == upng_decode_default(upng, NULL, 0))
+                {
+                    m_arrFrames.SetCount(1);
+                    uint8_t *buf = upng_move_frame_buffer(upng);
+                    _DoPromultiply(buf, width, height);
+                    SImgFrame_STB *pFrame = new SImgFrame_STB(buf, width, height, 0, TRUE);
+                    m_arrFrames.SetAt(0, pFrame);
+                    pFrame->Release();
+                }
             }
             else
             {
                 m_arrFrames.SetCount(frames);
+                uint32_t buf_size = width * height * 4;
+                uint8_t *buf = (uint8_t *)calloc(buf_size,1);
                 for (int i = 0; i < frames; i++)
                 {
-                    if(UPNG_EOK==upng_decode_next_frame(upng))
+                    if(UPNG_EOK==upng_decode_next_frame(upng, buf, buf_size))
                     {
                         int nDelay = upng_get_frame_delay(upng);
-                        BYTE *buf = (BYTE*)upng_get_frame_buffer(upng);
                         _DoPromultiply(buf, width, height);
                         // don't move frame buffer from upng. the frame buffer will be reused by upng.
-                        SImgFrame_STB *pFrame = new SImgFrame_STB((const BYTE*)buf, width, height, nDelay);
+                        SImgFrame_STB *pFrame = new SImgFrame_STB(buf, width, height, nDelay,FALSE);
                         m_arrFrames.SetAt(i, pFrame);
                         pFrame->Release();
                     }
@@ -104,6 +103,7 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
                         break;
                     }
                 }
+                free(buf);
             }
             upng_free(upng);
             return m_arrFrames.GetCount();
@@ -132,7 +132,7 @@ SImgFrame_STB::SImgFrame_STB(const BYTE *data, int w, int h, int nDelay)
         for (int i = 0; i < frames; i++)
         {
             _DoPromultiply(p, width, height);
-            SImgFrame_STB *pFrame = new SImgFrame_STB((const BYTE*)p, width, height, delays[i]);
+            SImgFrame_STB *pFrame = new SImgFrame_STB(p, width, height, delays[i],FALSE);
             m_arrFrames.SetAt(i, pFrame);
             p += (width * height * 4);
             pFrame->Release();

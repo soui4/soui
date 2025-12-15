@@ -27,7 +27,7 @@ endif()
 source_group("Header Files" FILES ${render-gdi_header})
 source_group("Source Files" FILES ${render-gdi_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (render-gdi_src  ${render-gdi_src} render-gdi.rc)
     add_library(render-gdi SHARED ${render-gdi_src} ${render-gdi_header})
     if (CMAKE_SYSTEM_NAME MATCHES Windows)

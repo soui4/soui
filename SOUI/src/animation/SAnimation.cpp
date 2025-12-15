@@ -16,12 +16,12 @@ SValueDescription SValueDescription::parseValue(const SStringW &value)
     else if (value.EndsWith(L"%", true))
     {
         d.type = RELATIVE_TO_SELF;
-        d.value = SLayoutSize((float)_wtof(value.Left(value.GetLength() - 1)) / 100, SLayoutSize::px);
+        d.value = SLayoutSize((float)_wtof(value.Left(value.GetLength() - 1)) / 100, px);
     }
     else if (value.EndsWith(L"%p", true))
     {
         d.type = RELATIVE_TO_PARENT;
-        d.value = SLayoutSize((float)_wtof(value.Left(value.GetLength() - 2)) / 100, SLayoutSize::px);
+        d.value = SLayoutSize((float)_wtof(value.Left(value.GetLength() - 2)) / 100, px);
     }
     else
     {
@@ -40,7 +40,7 @@ BOOL SAnimation::hasAlpha() const
 int SAnimation::resolveSize(const SValueDescription &value, int size, int parentSize, int nScale)
 {
     float fValue = 0.0f;
-    if (value.value.unit == SLayoutSize::px)
+    if (value.value.unit == px)
         fValue = value.value.fSize;
     else
         fValue = value.value.fSize * nScale / 100;
@@ -112,7 +112,8 @@ BOOL SAnimation::getTransformation(uint64_t currentTime, ITransformation *outTra
     float normalizedTime;
     if (duration != 0)
     {
-        normalizedTime = ((float)(currentTime - (mStartTime + startOffset))) / (float)duration;
+        int64_t diff = (int64_t)(currentTime - (mStartTime+startOffset));
+        normalizedTime = (float)diff/ (float)duration;
     }
     else
     {
@@ -123,10 +124,10 @@ BOOL SAnimation::getTransformation(uint64_t currentTime, ITransformation *outTra
     BOOL expired = normalizedTime >= 1.0f || isCanceled();
     BOOL bMore = !expired;
 
-    if (!mFillEnabled || mRepeatCount != 0)
+    if (!mFillEnabled)
         normalizedTime = smax(smin(normalizedTime, 1.0f), 0.0f);
 
-    if ((normalizedTime >= 0.0f || mFillBefore) && (normalizedTime <= 1.0f || mFillAfter))
+    if ((normalizedTime >= 0.0f || mFillBefore) && (normalizedTime < 1.0f || mFillAfter))
     {
         if (!mStarted)
         {
@@ -359,20 +360,8 @@ void SAnimation::reset()
 
     mStartTime = START_ON_FIRST_FRAME;
 
-    mStartOffset = 0;
-    mDuration = 0;
-    mRepeatCount = 0;
     mRepeated = 0;
-    mRepeatMode = RESTART;
-    mZAdjustment = ZORDER_NORMAL;
     mListener = NULL;
-    mScaleFactor = 1.0f;
-
-    mFillBefore = false;
-
-    mFillAfter = true;
-
-    mFillEnabled = true;
 
     mUserData = 0;
     ensureInterpolator();
@@ -413,6 +402,15 @@ void SAnimation::initialize(int width, int height, int parentWidth, int parentHe
 
 SAnimation::SAnimation()
 {
+    mScaleFactor = 1.0f;
+    mZAdjustment = ZORDER_NORMAL;
+    mRepeatMode = RESTART;
+    mStartOffset = 0;
+    mDuration = 0;
+    mRepeatCount = 0;
+    mFillBefore = true;
+    mFillAfter = true;
+    mFillEnabled = false;
     reset();
 }
 

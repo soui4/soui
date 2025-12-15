@@ -6,7 +6,7 @@ add_definitions(-DUTILITIES_EXPORTS -D_CRT_SECURE_NO_WARNINGS)
 
 file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS  src/*.cpp)
-
+ 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
     list(APPEND CURRENT_SRCS cursoricon/cursoricon.cpp)
 endif()
@@ -15,7 +15,7 @@ source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 
 
-if (NOT ENABLE_SOUI_CORE_LIB)
+if (NOT SOUI_ENABLE_CORE_LIB)
     add_library(utilities4 SHARED ${CURRENT_SRCS} ${CURRENT_HEADERS})
 else()
     add_library(utilities4 STATIC ${CURRENT_SRCS} ${CURRENT_HEADERS})

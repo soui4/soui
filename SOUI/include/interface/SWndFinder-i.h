@@ -65,6 +65,24 @@ DECLARE_INTERFACE_(ISwndFinder, IObjRef)
      * @param pResult 找到的窗口指针
      */
     STDMETHOD_(void, CacheResultForID)(THIS_ IWindow * pParent, int nID, int nDeep, IWindow *pResult) PURE;
+
+    /**
+     * @brief 删除缓存结果
+     * @param pParent 父窗口指针
+     * @param strName 窗口名称
+     * @param nDeep 缓存深度
+     * @return 删除成功返回TRUE，否则返回FALSE
+     */
+    STDMETHOD_(BOOL, EraseCacheForName)(THIS_ IWindow * pParent, LPCWSTR strName, int nDeep) PURE;
+
+    /**
+     * @brief 删除缓存结果
+     * @param pParent 父窗口指针
+     * @param nID 窗口ID
+     * @param nDeep 缓存深度
+     * @return 删除成功返回TRUE，否则返回FALSE
+     */
+    STDMETHOD_(BOOL, EraseCacheForID)(THIS_ IWindow * pParent, int nID, int nDeep) PURE;
 };
 
 SNSEND

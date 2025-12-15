@@ -36,7 +36,7 @@
 #define SASSERT(expr) 
 #endif // SASSERT
 
-#define SThrow(expr) SASSERT(expr)
+#define SThrow(expr) ;
 #define SASSERT_VALID(x)
 
 #ifndef SASSUME
@@ -546,9 +546,6 @@ template< typename E, class ETraits >
 inline const E& SArray< E, ETraits >::GetAt( size_t iElement ) const
 {
     SASSERT( iElement < m_nSize );
-    if(iElement >= m_nSize)
-        SThrow(E_INVALIDARG);
-
     return( m_pData[iElement] );
 }
 
@@ -557,7 +554,7 @@ inline void SArray< E, ETraits >::SetAt( size_t iElement, INARGTYPE element )
 {
     SASSERT( iElement < m_nSize );
     if(iElement >= m_nSize)
-        SThrow(E_INVALIDARG);
+        return;
 
     m_pData[iElement] = element;
 }
@@ -566,8 +563,6 @@ template< typename E, class ETraits >
 inline E& SArray< E, ETraits >::GetAt( size_t iElement )
 {
     SASSERT( iElement < m_nSize );
-    if(iElement >= m_nSize)
-        SThrow(E_INVALIDARG);
 
     return( m_pData[iElement] );
 }
@@ -628,8 +623,6 @@ template< typename E, class ETraits >
 inline const E& SArray< E, ETraits >::operator[]( size_t iElement ) const
 {
     SASSERT( iElement < m_nSize );
-    if(iElement >= m_nSize)
-        SThrow(E_INVALIDARG);
 
     return( m_pData[iElement] );
 }
@@ -638,8 +631,6 @@ template< typename E, class ETraits >
 inline E& SArray< E, ETraits >::operator[]( size_t iElement )
 {
     SASSERT( iElement < m_nSize );
-    if(iElement >= m_nSize)
-        SThrow(E_INVALIDARG);
 
     return( m_pData[iElement] );
 }
@@ -927,7 +918,7 @@ void SArray< E, ETraits >::RemoveAt( size_t iElement, size_t nElements )
 
     size_t newCount = iElement+nElements;
     if ((newCount < iElement) || (newCount < nElements) || (newCount > m_nSize))
-        SThrow(E_INVALIDARG);
+        return;
 
     // just remove a range
     size_t nMoveCount = m_nSize-(newCount);

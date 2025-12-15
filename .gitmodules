@@ -6,3 +6,6 @@
 	path = third-part/libwebsockets
 	url = https://gitee.com/setoutsoft/libwebsockets.git
 	branch = soui_ws
+[submodule "third-part/openssl-cmake"]
+	path = third-part/openssl-cmake
+	url = https://gitee.com/setoutsoft/openssl-cmake.git

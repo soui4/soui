@@ -263,6 +263,17 @@ extern "C" {
 #define IWindow_SetToolTipText(This, pszText) \
     ((This)->lpVtbl->SetToolTipText(This, pszText))
 
+
+#define IWindow_SetLayer(This, nLayer) \
+    ((This)->lpVtbl->SetLayer(This, nLayer))
+
+#define IWindow_GetLayer(This) \
+    ((This)->lpVtbl->GetLayer(This))
+
+#define IWindow_SetAnimatorValue(This, pHolder, fraction, state) \
+    ((This)->lpVtbl->SetAnimatorValue(pHolder, fraction, state))
+
+
 /*
  * C API Helper Functions (Optional - for more C-like usage)
  */

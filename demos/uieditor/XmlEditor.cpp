@@ -638,12 +638,14 @@ void CXmlEditor::OnUpdateSize(int nWidth, int nHeight)
 	OnMoveCtrl();
 }
 
-void CXmlEditor::OnUpdatePos(SStringW strPos)
+void CXmlEditor::OnUpdatePos(SStringW strPos, BOOL bRemoveSize)
 {
 	SXmlNode xmlNode = m_xmlEditing.root().first_child();
-	xmlNode.RemoveAttribute(L"size");
-	xmlNode.RemoveAttribute(L"width");
-	xmlNode.RemoveAttribute(L"height");
+	if(bRemoveSize){
+		xmlNode.RemoveAttribute(L"size");
+		xmlNode.RemoveAttribute(L"width");
+		xmlNode.RemoveAttribute(L"height");
+	}
 	xmlNode.attribute2(L"pos").set_value(strPos);
 	OnMoveCtrl();
 }

@@ -52,7 +52,7 @@ set(ScriptModule-lua_src
 source_group("Header Files" FILES ${ScriptModule-lua_header})
 source_group("Source Files" FILES ${ScriptModule-lua_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     set (ScriptModule-Lua_src  ${ScriptModule-lua_src} ScriptModule-lua.rc)
     add_library(scriptmodule-lua SHARED ${ScriptModule-lua_src} ${ScriptModule-lua_header})
     target_link_libraries(scriptmodule-lua soui4 lua-54 utilities4)
@@ -60,7 +60,7 @@ else()
     add_library(scriptmodule-lua STATIC ${ScriptModule-lua_src} ${ScriptModule-lua_header})
 endif()
 
-if (NOT ENABLE_SOUI_CORE_LIB)
+if (NOT SOUI_ENABLE_CORE_LIB)
 	message(STATUS "[DLL_CORE] scriptmodule-lua: ON")
     set(COM_LIBS ${COM_LIBS} scriptmodule-lua CACHE INTERNAL "com_lib")
 else()

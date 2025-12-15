@@ -165,8 +165,8 @@ function AddConfig(proj, strProjectName) {
         var ResLoadType = wizard.FindSymbol('ResLoaderType');
 
         var soui_com_lib = ' imgdecoder-gdip.lib imgdecoder-stb.lib aupng.lib imgdecoder-wic.lib log4z.lib render-d2d.lib render-gdi.lib render-skia.lib skia.lib resprovider-7zip.lib 7z.lib resprovider-zip.lib  zlib.lib scriptmodule-lua.lib  lua-54.lib  translator.lib';
-        var ENABLE_SOUI_COM_LIB_32 = wizard.FindSymbol('ENABLE_SOUI_COM_LIB_32');
-        var ENABLE_SOUI_COM_LIB_64 = wizard.FindSymbol('ENABLE_SOUI_COM_LIB_64');
+        var SOUI_ENABLE_COM_LIB_32 = wizard.FindSymbol('SOUI_ENABLE_COM_LIB_32');
+        var SOUI_ENABLE_COM_LIB_64 = wizard.FindSymbol('SOUI_ENABLE_COM_LIB_64');
 
         var wcharSet = wizard.FindSymbol('WCHAR_32');
         var mtSet = wizard.FindSymbol('MT_32');
@@ -209,7 +209,7 @@ function AddConfig(proj, strProjectName) {
         LinkTool.GenerateDebugInformation = true;
         LinkTool.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_32)\\lib\\debug"';
         LinkTool.AdditionalDependencies = 'utilities4.lib soui4.lib'
-        if(ENABLE_SOUI_COM_LIB_32){
+        if(SOUI_ENABLE_COM_LIB_32){
             LinkTool.AdditionalDependencies += soui_com_lib;
         }
 
@@ -257,7 +257,7 @@ function AddConfig(proj, strProjectName) {
         LinkTool.SuppressStartupBanner = true;  // nologoif(UserDll)
         LinkTool.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_32)\\lib\\release"';
         LinkTool.AdditionalDependencies = 'utilities4.lib soui4.lib'
-        if(ENABLE_SOUI_COM_LIB_32){
+        if(SOUI_ENABLE_COM_LIB_32){
             LinkTool.AdditionalDependencies += soui_com_lib;
         }
         LinkTool.LinkIncremental = 1;
@@ -311,7 +311,7 @@ function AddConfig(proj, strProjectName) {
             LinkTool_64.GenerateDebugInformation = true;
             LinkTool_64.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_64)\\lib\\debug"';
             LinkTool_64.AdditionalDependencies = 'utilities4.lib soui4.lib'
-            if(ENABLE_SOUI_COM_LIB_64){
+            if(SOUI_ENABLE_COM_LIB_64){
                 LinkTool_64.AdditionalDependencies += soui_com_lib;
             }
             LinkTool_64.SubSystem = subSystemOption.subSystemWindows;
@@ -353,7 +353,7 @@ function AddConfig(proj, strProjectName) {
             LinkTool_x64.SuppressStartupBanner = true;  // nologoif(UserDll)
             LinkTool_x64.AdditionalLibraryDirectories = '"$(SOUI4_INSTALL_64)\\lib\\release"';
             LinkTool_x64.AdditionalDependencies = 'utilities4.lib soui4.lib'
-            if(ENABLE_SOUI_COM_LIB_64){
+            if(SOUI_ENABLE_COM_LIB_64){
                 LinkTool_x64.AdditionalDependencies += soui_com_lib;
             }
             LinkTool_x64.LinkIncremental = 1;

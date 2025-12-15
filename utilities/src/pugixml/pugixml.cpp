@@ -5552,7 +5552,12 @@ namespace pugi
 
 		return impl::set_value_bool(_attr->value, _attr->header, impl::xml_memory_page_value_allocated_mask, rhs);
 	}
-
+	
+	PUGI__FN void * xml_attribute::get_doc_extra_data() const
+	{
+		impl::xml_document_struct *doc = &impl::get_document(_attr);
+		return doc->extraData;
+	}
 #ifdef PUGIXML_HAS_LONG_LONG
 	PUGI__FN bool xml_attribute::set_value(long long rhs)
 	{
@@ -5567,13 +5572,6 @@ namespace pugi
 
 		return impl::set_value_integer<unsigned long long>(_attr->value, _attr->header, impl::xml_memory_page_value_allocated_mask, rhs, false);
 	}
-
-	PUGI__FN void * xml_attribute::get_doc_extra_data() const
-	{
-		impl::xml_document_struct *doc = &impl::get_document(_attr);
-		return doc->extraData;
-	}
-
 #endif
 
 #ifdef __BORLANDC__

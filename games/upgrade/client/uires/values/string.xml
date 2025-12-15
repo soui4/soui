@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<string>
+  <title value="棋牌游戏demo" />
+  <ver value="1.0" />
+  <login value="登录" />
+  <lobby value="大厅" />
+  <upgrade value="开心升级" />
+  <about value="关于" />
+
+  <err_putcard_0 value="出的牌花色不相同"/>
+  <err_putcard_1 value="出的牌张数不符" />
+  <err_putcard_2 value="请先跟首家的出牌花色" />
+  <err_putcard_3 value="牌形错误" />
+  <err_putcard_4 value="未知错误" />
+
+  <msg_discount value="甩牌失败，强制出小并扣%d分"/>
+</string>

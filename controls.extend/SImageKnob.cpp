@@ -268,7 +268,7 @@ void SImageKnob::OnPaint(IRenderTarget* pRT) {
 		pRT->SetTransform(oldMtx.fMat);
 	}
 	if(1){
-		SAutoRefPtr<IPen> pen, oldPen;
+		SAutoRefPtr<IPenS> pen, oldPen;
 		pRT->CreatePen(PS_SOLID|PS_ENDCAP_FLAT, m_crRulerBack, m_rulerWidth, &pen);
 		pRT->SelectObject(pen, (IRenderObj**)&oldPen);
 

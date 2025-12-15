@@ -12,13 +12,14 @@ source_group("Source Files" FILES ${SOURCES})
 project(ws)
 include_directories(${PROJECT_SOURCE_DIR}/include)
 
-if (NOT ENABLE_SOUI_COM_LIB)
-    add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS} ws.rc)
-    target_link_libraries(${PROJECT_NAME}  websockets)
-else()
-    add_library(${PROJECT_NAME} STATIC ${SOURCES} ${HEADERS})
-    target_link_libraries(${PROJECT_NAME} PUBLIC  websockets)
+add_library(${PROJECT_NAME} SHARED ${SOURCES} ${HEADERS} ws.rc)
+target_link_libraries(${PROJECT_NAME}  websockets utilities4)
+
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_link_libraries(${PROJECT_NAME} swinx)
 endif()
+
+
 get_target_property(websockets_includes websockets INTERFACE_INCLUDE_DIRECTORIES)
 if(CMAKE_SIZEOF_VOID_P EQUAL 8)
         set(platform "x64")
@@ -51,9 +52,15 @@ install(TARGETS ${PROJECT_NAME}
 if(0)
 project(ServerTest)
 add_executable(${PROJECT_NAME} test/ServerTest.cpp)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_link_libraries(${PROJECT_NAME} swinx)
+endif()
 
 project(ClientTest)
 add_executable(${PROJECT_NAME} test/ClientTest.cpp)
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_link_libraries(${PROJECT_NAME} swinx)
+endif()
 endif()
 
 

@@ -43,7 +43,6 @@ void CDesignWnd::Close()
 {
 	if(m_previewHost){
 		m_previewHost->DestroyWindow();
-		delete m_previewHost;
 		m_previewHost = NULL;
 	}
 }
@@ -184,9 +183,9 @@ void CDesignWnd::OnUpdateSize(int nWidth, int nHeight)
 	m_pXmlEditor->OnUpdateSize(nWidth,nHeight);
 }
 
-void CDesignWnd::OnUpdatePos(SStringW strPos)
+void CDesignWnd::OnUpdatePos(SStringW strPos,BOOL bRemoveSize)
 {
-	m_pXmlEditor->OnUpdatePos(strPos);
+	m_pXmlEditor->OnUpdatePos(strPos,bRemoveSize);
 }
 
 SNSEND

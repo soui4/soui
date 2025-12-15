@@ -5,6 +5,7 @@
 
 SNSBEGIN
 
+typedef struct ITimelineHandlersMgr ITimelineHandlersMgr;
 typedef struct IValueAnimator IValueAnimator;
 
 #undef INTERFACE
@@ -240,6 +241,25 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      * @return void
      */
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) PURE;
+
+    /**
+     * @brief 获取时间线处理器
+     * @return ITimelineHandler* - 时间线处理器指针
+     */
+    STDMETHOD_(ITimelineHandler *, GetTimelineHandler)(CTHIS) PURE;
+
+    /**
+     * @brief 获取用户数据
+     * @return LPVOID - 用户数据指针
+     */
+    STDMETHOD_(LPVOID, GetUserData)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief 设置用户数据
+     * @param pUserData - 用户数据指针
+     * @return void
+     */
+    STDMETHOD_(void, SetUserData)(THIS_ LPVOID pUserData) PURE;
 };
 
 typedef struct IAnimatorGroup IAnimatorGroup;
@@ -253,7 +273,7 @@ DECLARE_INTERFACE(IAnimatorGroupListerer)
      * @param pGroup - 动画组指针
      * @return void
      */
-    STDMETHOD_(void, OnAnimatorGroupEnd)(THIS_ IAnimatorGroup * pGroup) PURE;
+    STDMETHOD_(void, OnAnimatorGroupEnd)(THIS_ IAnimatorGroup * pGroup, int nID) PURE;
 };
 
 #undef INTERFACE

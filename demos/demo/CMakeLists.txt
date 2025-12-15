@@ -130,12 +130,12 @@ endif()
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
-source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
+source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 source_group("Extend Cotrols" FILES ${EXTENDCOTROLS})
 
 
-if(MSVC_VERSION LESS 1600 AND ENABLE_SOUI_COM_LIB)
+if(MSVC_VERSION LESS 1600 AND SOUI_ENABLE_COM_LIB)
 message("vs is less than vs2008")
 if (CMAKE_CL_64)
 	link_directories("${PROJECT_SOURCE_DIR}/components/render-d2d/sdk7.1_d2d/lib/x64")
@@ -192,7 +192,13 @@ if(CMAKE_DEBUG_POSTFIX)
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)
-add_dependencies(demo soui-sys-resource ${COM_LIBS})
+	add_dependencies(demo soui-sys-resource ${COM_LIBS})
+    if(MSVC)
+    set(DPI_AWARE_MANIFEST "${PROJECT_SOURCE_DIR}/__cmake/dpi_aware.manifest")
+    set_target_properties(${current_project} PROPERTIES
+            LINK_FLAGS "/MANIFEST:EMBED /MANIFESTINPUT:${DPI_AWARE_MANIFEST}"
+        )
+    endif(MSVC)
 endif()
 
 if (CMAKE_SYSTEM_NAME MATCHES Windows)

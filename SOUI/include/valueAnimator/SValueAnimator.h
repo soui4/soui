@@ -173,7 +173,7 @@ class SOUI_EXP SValueAnimator
      * @brief The container managing the timeline handlers.
      */
     ITimelineHandlersMgr *mContainer;
-
+    void * m_pUserData;
   public:
     /**
      * @brief Creates a new SValueAnimator object.
@@ -343,6 +343,24 @@ class SOUI_EXP SValueAnimator
      */
     STDMETHOD_(void, removeListener)(THIS_ IAnimatorListener *p) OVERRIDE;
 
+    /**
+     * @brief Gets the timeline handler.
+     * @return The timeline handler.
+     */
+    STDMETHOD_(ITimelineHandler *, GetTimelineHandler)(THIS) OVERRIDE;
+
+        /**
+     * @brief 获取用户数据
+     * @return LPVOID - 用户数据指针
+     */
+    STDMETHOD_(LPVOID, GetUserData)(CTHIS) SCONST OVERRIDE;
+
+    /**
+     * @brief 设置用户数据
+     * @param pUserData - 用户数据指针
+     * @return void
+     */
+    STDMETHOD_(void, SetUserData)(THIS_ LPVOID pUserData) OVERRIDE;
   private:
     /**
      * @brief Notifies start listeners.
@@ -527,6 +545,7 @@ class TValueAnimator : public SValueAnimator {
      */
     TValueAnimator(T from, T to)
         : mValueEvaluator(from, to)
+        , mValue(from)
     {
     }
 
@@ -782,7 +801,7 @@ class SOUI_EXP SAnimatorGroup
     /**
      * @brief Constructor.
      */
-    SAnimatorGroup();
+    SAnimatorGroup(int nID=0);
 
     /**
      * @brief Destructor.
@@ -845,6 +864,11 @@ class SOUI_EXP SAnimatorGroup
      * @brief Listener for the animator group.
      */
     IAnimatorGroupListerer *m_listener;
+
+    /**
+     * @brief ID of the animator group.
+     */
+    int m_nID;
 };
 
 SNSEND

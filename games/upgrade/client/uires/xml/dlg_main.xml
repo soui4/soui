@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<SOUI name="mainWindow" title="@string/title" bigIcon="ICON_LOGO:32" smallIcon="ICON_LOGO:16" margin="5,5,5,5"  resizable="1" wndType="appMain"
+appWnd="1"
+translucent="1" 
+>
+  <root skin="_skin.sys.wnd.bkgnd" cache="1"  width="1000" height="800" layout="vbox" padding="5,5,5,5">
+    <caption size="-2,30" layout="hbox" interval="0" gravity="center">
+      <icon src="ICON_LOGO:16"/>
+      <text >@string/title</text>
+      <text name="txt_title" colorText="@color/red"/>
+      <window size="0,0" weight="1"/>
+      <window>
+        <imgbtn pos="0,0" name="btn_mute" skin="skin_btn_mute"  animate="1" />
+        <imgbtn pos="0,0" name="btn_unmute" skin="skin_btn_unmute"  show="0" animate="1" />
+      </window>
+      <imgbtn name="btn_min" skin="_skin.sys.btn.minimize"  animate="1" />
+      <window>
+        <imgbtn pos="0,0" name="btn_max" skin="_skin.sys.btn.maximize"   animate="1" />
+        <imgbtn pos="0,0" name="btn_restore" skin="_skin.sys.btn.restore"   show="0" animate="1" />
+      </window>
+      <imgbtn name="btn_close" skin="_skin.sys.btn.close"     tip="close" animate="1"/>
+    </caption>
+    <tabctrl size="-2,0" weight="1" tabHeight="30">
+      <include src="layout:page_lobby"/>
+      <include src="layout:page_upgrade"/>
+      <include src="layout:page_about"/>
+    </tabctrl>
+  </root>
+</SOUI>

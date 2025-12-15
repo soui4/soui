@@ -20,7 +20,7 @@ set(SIpcObject_src
 source_group("Header Files" FILES ${SIpcObject_header})
 source_group("Source Files" FILES ${SIpcObject_src})
 
-if (NOT ENABLE_SOUI_COM_LIB)
+if (NOT SOUI_ENABLE_COM_LIB)
     add_definitions(-DBUILD_SIPC)
     set (SIpcObject_src  ${SIpcObject_src} SIpcObject.rc)
     add_library(sipcobject SHARED ${SIpcObject_src} ${SIpcObject_header})

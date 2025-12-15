@@ -83,9 +83,9 @@ class SMenuExRoot : public SRootWindow {
         , m_dwContextHelpId(0)
         , SRootWindow(pMenuEx)
     {
-        m_nItemHei.setSize(26.f, SLayoutSize::dp);
-        m_nIconBarWidth.setSize(24.f, SLayoutSize::dp);
-        m_nMinWidth.setSize(WIDTH_MENU_MIN, SLayoutSize::dp);
+        m_nItemHei.setSize(26.f, dp);
+        m_nIconBarWidth.setSize(24.f, dp);
+        m_nMinWidth.setSize(WIDTH_MENU_MIN, dp);
         OnAttrLayout(SVBox::GetClassName(), TRUE); // set layout to vbox
         GetLayoutParam()->SetWrapContent(Both);
     }
@@ -417,7 +417,9 @@ class SMenuExSep : public SMenuExItem {
         }
         else
         {
-            szRet.cy = GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale());
+            SLayoutSize layoutSize;
+            GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
+            szRet.cy = layoutSize.toPixelSize(GetScale());
         }
         szRet.cy += m_style.GetMargin().top + m_style.GetMargin().bottom;
         *psz = szRet;

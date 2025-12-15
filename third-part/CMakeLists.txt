@@ -13,7 +13,7 @@ if (CMAKE_SYSTEM_NAME MATCHES Windows)
                 add_subdirectory(smiley)
         endif()
 endif()
-if(BUILD_RICHEDIT)
+if(SOUI_BUILD_RICHEDIT)
         message("---Building with richedit41")
         add_subdirectory(richedit41)
 endif()
@@ -22,41 +22,21 @@ add_subdirectory(Scintilla)
 add_subdirectory(skia)
 add_subdirectory(7z)
 add_subdirectory(stdint)
-if(BUILD_WS)
-        message("---Building with libwebsockets")
-        if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-                if(CMAKE_SIZEOF_VOID_P EQUAL 8)
-                        set(platform "x64")
-                else()
-                        set(platform "x86")
-                endif()
-                set(LWS_OPENSSL_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/openssl_1.1.1d/${platform}/include
-                        CACHE PATH "Path to the OpenSSL include directory" FORCE
-                        )
-                if(MSVC)
-                        set(LWS_OPENSSL_LIBRARIES 
-                                "${CMAKE_CURRENT_SOURCE_DIR}/openssl_1.1.1d/${platform}/lib/$(Configuration)/libssl.lib"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/openssl_1.1.1d/${platform}/lib/$(Configuration)/libcrypto.lib"
-                                CACHE PATH "Path to the OpenSSL library" FORCE
-                        )
-                else()
-                        set(LWS_OPENSSL_LIBRARIES 
-                                "${CMAKE_CURRENT_SOURCE_DIR}/openssl_1.1.1d/${platform}/lib/mingw/libssl.a"
-                                "${CMAKE_CURRENT_SOURCE_DIR}/openssl_1.1.1d/${platform}/lib/mingw/libcrypto.a"
-                                CACHE PATH "Path to the OpenSSL library" FORCE
-                        )
-                endif()
-        endif()
-        message("LWS_OPENSSL_LIBRARIES is ${LWS_OPENSSL_LIBRARIES}")
-        set_property(GLOBAL PROPERTY USE_FOLDERS ON)
+if(SOUI_BUILD_WS)
+        add_subdirectory(openssl-cmake)
+
+        get_target_property(OPENSSL_INCLUDE_DIRS crypto INTERFACE_INCLUDE_DIRECTORIES)
+        message(STATUS "OpenSSL include directories: ${OPENSSL_INCLUDE_DIRS}")
+        set(OPENSSL_LIBRARIES crypto ssl)
+
+        set(LWS_OPENSSL_INCLUDE_DIRS ${OPENSSL_INCLUDE_DIRS} CACHE PATH "Path to the OpenSSL include directory" FORCE)
+        set(LWS_OPENSSL_LIBRARIES ${OPENSSL_LIBRARIES} CACHE PATH "Path to the OpenSSL library" FORCE)
+
         set(LWS_WITH_MINIMAL_EXAMPLES OFF)
         set(LWS_WITHOUT_TESTAPPS ON)
         set(LWS_WITH_STATIC ON)
         set(LWS_WITH_SHARED OFF)
         set(LWS_STATIC_PIC ON)
+        message("---Building with libwebsockets")
         add_subdirectory(libwebsockets)
-        get_property(libwebsocket_targets DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/libwebsockets PROPERTY BUILDSYSTEM_TARGETS)
-        foreach(target ${libwebsocket_targets})
-                set_target_properties(${target} PROPERTIES FOLDER "libwebsocket")
-        endforeach()
 endif()

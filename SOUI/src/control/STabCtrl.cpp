@@ -289,8 +289,8 @@ STabCtrl::STabCtrl()
     , m_pSkinIcon(NULL)
     , m_pSkinTabInter(NULL)
     , m_pSkinFrame(NULL)
-    , m_nTabInterSize(0, SLayoutSize::px)
-    , m_nTabPos(0, SLayoutSize::px)
+    , m_nTabInterSize(0, px)
+    , m_nTabPos(0, px)
     , m_nHoverTabItem(-1)
     , m_nTabAlign(AlignTop)
     , m_nAnimateSteps(0)
@@ -298,8 +298,8 @@ STabCtrl::STabCtrl()
     , m_txtDir(Text_Horz)
     , m_nAniamteType(0)
 {
-    m_ptText[0] = m_ptText[1] = SLayoutSize(-1.f, SLayoutSize::px);
-    m_szTab[0] = m_szTab[1] = SLayoutSize(-1.f, SLayoutSize::px);
+    m_ptText[0] = m_ptText[1] = SLayoutSize(-1.f, px);
+    m_szTab[0] = m_szTab[1] = SLayoutSize(-1.f, px);
 
     m_bFocusable = TRUE;
     // create a linear animation interpolator

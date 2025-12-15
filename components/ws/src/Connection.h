@@ -11,7 +11,31 @@
 
 SNSBEGIN
 
-class SvrConnection : public TObjRefImpl<ISvrConnection> {
+
+class lock_guard_rev {
+  public:
+    explicit lock_guard_rev(std::mutex &m)
+        : m_mutex(m)
+    {
+        m_mutex.unlock();
+    }
+    ~lock_guard_rev()
+    {
+        m_mutex.lock();
+    }
+
+  private:
+    std::mutex &m_mutex;
+};
+
+typedef struct _heartbeat_data_t {
+    time_t last_activity;
+    time_t last_ping;
+    int ping_timeout_count;
+} heartbeat_data_t;
+
+class SvrConnection : public TObjRefImpl<ISvrConnection> , heartbeat_data_t{
+  friend class WsServer;
   public:
     SvrConnection(lws_context *ctx, lws *socket, ISvrListener *pSvrListener);
     ~SvrConnection();
@@ -20,6 +44,7 @@ class SvrConnection : public TObjRefImpl<ISvrConnection> {
     STDMETHODIMP_(int) isValid(THIS) SCONST OVERRIDE;
     STDMETHODIMP_(int) sendText(THIS_ const char *text, int nLen DEF_VAL(-1)) OVERRIDE;
     STDMETHODIMP_(int) sendBinary(THIS_ const void *data, int nLen) OVERRIDE;
+    STDMETHODIMP_(int) sendBinary2(THIS_ DWORD dwType, const void *data, int nLen) OVERRIDE;
     
     // ISvrConnection methods
     STDMETHODIMP_(void) close(THIS_ const char* reason) OVERRIDE;

@@ -36,7 +36,7 @@ jobs:
             platform: ARM64
           - os: macOS
             arch: x64
-            dist: macos-13  # Intel-based runner for x64
+            dist: macos-15  # Intel-based runner for x64
           - os: macOS
             arch: arm64
             dist: macos-14  # Apple Silicon runner for arm64
@@ -60,7 +60,7 @@ jobs:
 
     - name: Install dependencies (Ubuntu)
       if: startsWith(matrix.dist, 'ubuntu')
-      run: sudo apt-get update && sudo apt install -y cmake  build-essential gperf libxcb1-dev libgl1-mesa-dev freeglut3-dev libgtk-3-dev --fix-missing
+      run: sudo apt-get update && sudo apt install -y cmake  build-essential gperf libxcb1-dev libgl1-mesa-dev freeglut3-dev pkg-config --fix-missing
 
     - name: Install dependencies (macOS)
       if: matrix.os == 'macOS'

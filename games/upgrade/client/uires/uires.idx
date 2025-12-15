@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resource>
+  <UIDEF>
+    <file name="XML_INIT" path="uidef\init.xml"/>
+  </UIDEF>
+  <LAYOUT>
+    <file name="XML_MAINWND" path="xml\dlg_main.xml"/>
+    <file name="XML_LOGIN" path="xml\dlg_login.xml"/>
+    <file name="page_lobby" path="xml\page_lobby.xml"/>
+    <file name="page_upgrade" path="xml\page_upgrade.xml"/>
+    <file name="page_about" path="xml\page_about.xml"/>
+  </LAYOUT>
+  <values>
+    <file name="string" path="values\string.xml"/>
+    <file name="color" path="values\color.xml"/>
+    <file name="skin" path="values\skin.xml"/>
+  </values>
+  <ICON>
+    <file name="ICON_LOGO" path="icon\logo.ico"/>
+  </ICON>
+  <image>
+    <file name="PNG_TABLE" path="image\table.png"/>
+    <file name="PNG_ITEM_BK" path="image\item_bk.png"/>"
+    <file name="PNG_HANDUP" path="image\handup.png"/>"
+    <file name="PNG_PLAYING" path="image\playing.png"/>
+    <file name="PNG_MUTE" path="image\mute.png"/>
+    <file name="PNG_UNMUTE" path="image\unmute.png"/>
+  </image>
+</resource>

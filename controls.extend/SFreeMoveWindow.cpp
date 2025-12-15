@@ -21,8 +21,12 @@ SFreeMoveWindow::~SFreeMoveWindow(void)
 
 void SFreeMoveWindow::OnUpdateFloatPosition(const CRect &rcParent)
 {
-    CSize sz(GetLayoutParam()->GetSpecifiedSize(Horz).toPixelSize(GetScale()),
-             GetLayoutParam()->GetSpecifiedSize(Vert).toPixelSize(GetScale()));
+    SLayoutSize width, height;
+    GetLayoutParam()->GetSpecifiedSize(Horz, &width);
+    GetLayoutParam()->GetSpecifiedSize(Vert, &height);
+
+    CSize sz(width.toPixelSize(GetScale()),
+             height.toPixelSize(GetScale()));
     CRect rcWnd(CPoint(), sz);
 
     if (m_nFloatHAlign & HALIGN_LEFT)
@@ -207,8 +211,10 @@ void SFreeMoveWindow::OnNcMouseMove(UINT nFlags, CPoint pt)
         {
             m_nDistY = rcParent.bottom - rcWnd.bottom;
         }
-        GetLayoutParam()->SetSpecifiedSize(Horz, SLayoutSize(rcWnd.Width(), SLayoutSize::px));
-        GetLayoutParam()->SetSpecifiedSize(Vert, SLayoutSize(rcWnd.Height(), SLayoutSize::px));
+        SLayoutSize width(rcWnd.Width(), px);
+        SLayoutSize height(rcWnd.Height(), px);
+        GetLayoutParam()->SetSpecifiedSize(Horz, &width);
+        GetLayoutParam()->SetSpecifiedSize(Vert, &height);
     }
 }
 

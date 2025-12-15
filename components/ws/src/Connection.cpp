@@ -1,7 +1,7 @@
 #include "Connection.h"
 #include "wsServer.h"
 #include <vector>
-
+#include <sstream>
 SNSBEGIN
 
 SvrConnection::SvrConnection(lws_context *ctx, lws *socket,ISvrListener *pSvrListener)
@@ -10,6 +10,8 @@ SvrConnection::SvrConnection(lws_context *ctx, lws *socket,ISvrListener *pSvrLis
     , m_msgId(0)
     , m_svrListener(pSvrListener)
 {
+    last_activity = last_ping =0;
+    ping_timeout_count = 0;
 }
 
 SvrConnection::~SvrConnection()
@@ -72,9 +74,9 @@ void SvrConnection::onRecv(const std::string &message, bool isLastMessage, bool 
     {
         if (m_svrListener)
         {
-            m_svrListener->onDataRecv(this, message.c_str(), message.length(), bBinary);
+            m_svrListener->onDataRecv(this, receiveStream.str().c_str(), receiveStream.str().length(), bBinary);
         }
-        this->receiveStream.str(std::string{});
+        this->receiveStream.str(std::string());
     }
 }
 
@@ -88,6 +90,16 @@ int SvrConnection::sendBinary(const void *data, int nLen)
 {
     return send(std::string((const char *)data, nLen), true);
 }
+
+int SvrConnection::sendBinary2(DWORD dwType, const void *data, int nLen)
+{
+    std::stringstream ss;
+    ss.write((const char *)&dwType, sizeof(dwType));
+    ss.write((const char *)&nLen, sizeof(nLen));
+    ss.write((const char *)data, nLen);
+    return send(ss.str(), true);
+}
+
 void SvrConnection::close(const char *buf)
 {
     lws_close_reason(m_socket, LWS_CLOSE_STATUS_NORMAL, (unsigned char*)buf, strlen(buf));

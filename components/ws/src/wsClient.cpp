@@ -1,5 +1,7 @@
 #include "wsClient.h"
 #include <vector>
+#include "Connection.h"
+#include <sstream>
 
 SNSBEGIN
 WsClient::WsClient(IConnListener *pGroup)
@@ -109,7 +111,7 @@ int WsClient::connectTo(const char *server_, const char *path_, uint16_t port_, 
         m_finished = true;
         return -1;
     }
-    this->m_worker = std::thread{ &WsClient::run, this };
+    this->m_worker = std::thread(&WsClient::run, this);
     return 0;
 }
 
@@ -143,6 +145,15 @@ BOOL WsClient::wait(int timeout)
         return m_cvQuit.wait_for(lock, std::chrono::milliseconds(timeout), waitPred);
 }
 
+int WsClient::sendBinary2(DWORD dwType, const void *data, int nLen)
+{
+    std::stringstream ss;
+    ss.write((const char *)&dwType, sizeof(dwType));
+    ss.write((const char *)&nLen, sizeof(nLen));
+    ss.write((const char *)data, nLen);
+    return send(ss.str(), true);
+}
+
 int WsClient::send(const std::string &text, bool bBinary)
 {
     std::lock_guard<std::mutex> lockGuard(m_mutex);
@@ -170,6 +181,7 @@ void WsClient::run()
     m_cvQuit.notify_all();
 }
 
+
 int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data, std::size_t len)
 {
     std::lock_guard<std::mutex> lockGuard(m_mutex);
@@ -183,8 +195,10 @@ int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data
     case LWS_CALLBACK_CLIENT_ESTABLISHED:
     {
         this->m_connected = true;
+        
         if (m_pListener)
         {
+            lock_guard_rev rev(m_mutex);
             m_pListener->onConnected();
         }
     }
@@ -202,9 +216,10 @@ int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data
         {
             if (m_pListener)
             {
+                lock_guard_rev rev(m_mutex);
                 m_pListener->onDataRecv(m_receiveStream.str().c_str(), m_receiveStream.str().length(), isBinary);
             }
-            m_receiveStream.str(std::string{});
+            m_receiveStream.str(std::string());
         }
     }
     break;
@@ -221,6 +236,7 @@ int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data
             lws_write(m_wsi, buf.data() + LWS_PRE, msgData.buf.length(), msgData.bBinary ? LWS_WRITE_BINARY : LWS_WRITE_TEXT);
             if (m_pListener)
             {
+                lock_guard_rev rev(m_mutex);
                 m_pListener->onDataSent(msgData.msgId);
             }
             if (lws_send_pipe_choked(m_wsi))
@@ -237,6 +253,7 @@ int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data
         this->m_connected = false;
         if (m_pListener)
         {
+            lock_guard_rev rev(m_mutex);
             m_pListener->onConnError(err);
         }
         lws_cancel_service(m_context);
@@ -248,6 +265,7 @@ int WsClient::handler(lws_callback_reasons reasons, void *user, const void *data
         this->m_connected = false;
         if (m_pListener)
         {
+            lock_guard_rev rev(m_mutex);
             m_pListener->onDisconnect();
         }
         lws_cancel_service(m_context);

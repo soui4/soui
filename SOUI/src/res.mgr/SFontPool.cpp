@@ -105,14 +105,14 @@ IFontPtr SFontPool::_CreateFont(const FontInfo &fontInfo)
     lfNew.lfEscapement = lfNew.lfOrientation = fontInfo.style.attr.fEscapement;
     if (fontInfo.style.attr.szIsAdding)
     {
-        SLayoutSize defFontSize((float)(short)m_defFontInfo.style.attr.nSize, (SLayoutSize::Unit)m_defFontInfo.style.attr.szUnit);
+        SLayoutSize defFontSize((float)(short)m_defFontInfo.style.attr.nSize, (Unit)m_defFontInfo.style.attr.szUnit);
         lfNew.lfHeight = -defFontSize.toPixelSize(fontInfo.scale);
-        SLayoutSize layoutSize((float)(short)fontInfo.style.attr.nSize, (SLayoutSize::Unit)fontInfo.style.attr.szUnit);
+        SLayoutSize layoutSize((float)(short)fontInfo.style.attr.nSize, (Unit)fontInfo.style.attr.szUnit);
         lfNew.lfHeight -= layoutSize.toPixelSize(fontInfo.scale);
     }
     else
     {
-        SLayoutSize layoutSize((float)(int)fontInfo.style.attr.nSize, (SLayoutSize::Unit)fontInfo.style.attr.szUnit);
+        SLayoutSize layoutSize((float)(int)fontInfo.style.attr.nSize, (Unit)fontInfo.style.attr.szUnit);
         lfNew.lfHeight = -layoutSize.toPixelSize(fontInfo.scale);
     }
     lfNew.lfQuality = CLEARTYPE_QUALITY;

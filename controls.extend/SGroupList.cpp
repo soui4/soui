@@ -61,14 +61,15 @@ void SGroupList::OnDestroy()
     {
         GroupInfo *pGroupInfo = (GroupInfo *)pGroup->GetUserData();
         delete pGroupInfo;
-        SWindow *pContainer = pGroup->FindChildByName(L"container");
-        SASSERT(pContainer);
-        SWindow *pItem = pContainer->GetWindow(GSW_FIRSTCHILD);
-        while (pItem)
+        if(SWindow *pContainer = pGroup->FindChildByName(L"container"))
         {
-            ItemInfo *pItemInfo = (ItemInfo *)pItem->GetUserData();
-            delete pItemInfo;
-            pItem = pItem->GetWindow(GSW_NEXTSIBLING);
+            SWindow *pItem = pContainer->GetWindow(GSW_FIRSTCHILD);
+            while (pItem)
+            {
+                ItemInfo *pItemInfo = (ItemInfo *)pItem->GetUserData();
+                delete pItemInfo;
+                pItem = pItem->GetWindow(GSW_NEXTSIBLING);
+            }
         }
         pGroup = pGroup->GetWindow(GSW_NEXTSIBLING);
     }
@@ -127,8 +128,9 @@ SWindow *SGroupList::InsertGroup(int iGroup,
     pItemInfo->iIcon = iIcon;
     pItemInfo->id = nID;
     pGroup->SetUserData((ULONG_PTR)pItemInfo);
-
-    pGroup->FindChildByName(L"container")->SetVisible(!pItemInfo->bCollapsed);
+    if(SWindow *pContainer = pGroup->FindChildByName(L"container")){
+        pContainer->SetVisible(!pItemInfo->bCollapsed);
+    }
 
     EventGroupListInitGroup evt(this);
     evt.pItem = pGroup->FindChildByName(L"title");
