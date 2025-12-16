@@ -1,42 +1,42 @@
 #include "stdafx.h"
-#include "SSkinChess.h"
+#include "SSkinPiece.h"
 
 SNSBEGIN
 
-SIZE SSkinChess::GetSkinSize() const
+SIZE SSkinPiece::GetSkinSize() const
 {
     SIZE sz = m_pImgShadow->Size();
     return sz;
 }
 
-int SSkinChess::GetStates() const
+int SSkinPiece::GetStates() const
 {
-    return CHESS_COLS*CHESS_ROWS;
+    return PIECE_COLS*PIECE_ROWS;
 }
 
-CPoint SSkinChess::GetCenter() const
+CPoint SSkinPiece::GetCenter() const
 {
     if(m_ptCenter.x != -1)
         return m_ptCenter;
     SIZE szImg = GetImage()->Size();
-    SIZE szChess = {szImg.cx/CHESS_COLS,szImg.cy/CHESS_ROWS};
+    SIZE szChess = {szImg.cx/PIECE_COLS,szImg.cy/PIECE_ROWS};
     m_ptCenter = CPoint(szChess.cx/2,szChess.cy/2);
     return m_ptCenter;
 }
 
-void SSkinChess::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
+void SSkinPiece::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
     if (!GetImage())
         return;
 
-    int iCol = iState % CHESS_COLS;
-    int iRow = iState / CHESS_ROWS;
+    int iCol = iState % PIECE_COLS;
+    int iRow = iState / PIECE_COLS;
 
     if(iCol == 1){
         pRT->DrawBitmapEx(rcDraw, m_pImgShadow, NULL, GetExpandMode(), byAlpha);
     }
     SIZE szImg = GetImage()->Size();
-    SIZE szChess = {szImg.cx/CHESS_COLS,szImg.cy/CHESS_ROWS};
+    SIZE szChess = {szImg.cx/PIECE_COLS,szImg.cy/PIECE_ROWS};
     CRect rcSrc(CPoint(),szChess);
     OffsetRect(&rcSrc, iCol * szChess.cx, iRow * szChess.cy);
     CRect rcDst = *rcDraw;

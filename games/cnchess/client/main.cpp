@@ -2,7 +2,7 @@
 #include <SAppCfg.h>
 #include "MainDlg.h"
 #include "SGameTheme.h"
-#include "SSkinChess.h"
+#include "SSkinPiece.h"
 
 static const TCHAR * kPath_SysRes = _T("/../../../soui-sys-resource");
 static const TCHAR *kPath_UiRes = _T("/uires");
@@ -26,7 +26,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     SApplication app(hInstance);
     // Register external window class
     app.RegisterSkinClass<SSkinAni>();
-    app.RegisterSkinClass<SSkinChess>();
+    app.RegisterSkinClass<SSkinPiece>();
     app.RegisterWindowClass<SGifPlayer>();
     SStringT appDir = app.GetAppDir();
 

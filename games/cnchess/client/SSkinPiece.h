@@ -1,21 +1,21 @@
-#ifndef __SSKINCHESS_H__
-#define __SSKINCHESS_H__
+#ifndef __SSKINPIECE_H__
+#define __SSKINPIECE_H__
 
 #include <core/SSkin.h>
 
 SNSBEGIN
 
-class SSkinChess : public SSkinImgList
+class SSkinPiece : public SSkinImgList
 {
-	DEF_SOBJECT(SSkinImgList, L"chess")
+	DEF_SOBJECT(SSkinImgList, L"piece")
 
     enum{
-        CHESS_COLS=3,
-        CHESS_ROWS=14,
+        PIECE_COLS=3,
+        PIECE_ROWS=14,
     };
 public:
-	SSkinChess(void):m_ptCenter(-1,-1){}
-	~SSkinChess(void){ }
+	SSkinPiece(void):m_ptCenter(-1,-1){}
+	~SSkinPiece(void){ }
     CPoint GetCenter() const;
    
 public:
@@ -35,4 +35,4 @@ private:
 
 SNSEND
 
-#endif//__SSKINCHESS_H__
+#endif//__SSKINPIECE_H__

@@ -11,7 +11,7 @@
         <apng name="ani_vectory_2" src="file:Sprite/礼花2.png"/>"
         <apng name="ani_vectory_3" src="file:Sprite/礼花3.png"/>"
 
-        <chess name="skin_chess" src="file:image/chess.png"/>
+        <piece name="skin_pieces" src="file:image/pieces.png" shadow="file:image/pieces_shadow.png"/>
 
         <imglist name="skin_digit" src="file:image/digital_score.png" states="12"/>
         <imglist name="skin_clock" src="file:image/闹钟.png"/>
