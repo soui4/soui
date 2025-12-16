@@ -16,7 +16,7 @@ source_group("Header Files" FILES ${SERVER_HEADERS})
 source_group("Source Files" FILES ${SERVER_SOURCES})
 source_group("Resource Files" FILES ${SERVER_RESOURCES})
 
-set(current_project "chess_server")
+set(current_project "cnchess_server")
 
 # 创建可执行文件
 add_executable(${current_project} 
