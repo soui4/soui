@@ -1,49 +1,29 @@
-#pragma once
+// stdafx.h : include file for standard system include files,
+//  or project specific include files that are used frequently, but
+//      are changed infrequently
+//
 
-#include <souistd.h>
-#include <core/SHostWnd.h>
-#include <control/SMessageBox.h>
-#include <helper/SMenuEx.h>
-#include <helper/SMenu.h>
-#include <helper/STrayIcon.h>
-#include <helper/SHostDialog.h>
-#include <helper/findplace.h>
-#include <helper/SkinPool.h>
-#include <helper/templethelper.hpp>
-#include <layout/SLinearLayout.h>
-#include <layout/SHBox.h>
-#include <layout/SVBox.h>
-#include <control/SButton.h>
-#include <control/SCheckBox.h>
-#include <control/SRadioBox.h>
-#include <control/SSliderBar.h>
-#include <control/STabCtrl.h>
-#include <control/SScrollBar.h>
-#include <control/SHeaderCtrl.h>
-#include <control/SListCtrl.h>
-#include <control/SListBox.h>
-#include <control/SComboBox.h>
-#include <control/STreeCtrl.h>
-#include <control/SMCListView.h>
-#include <control/SRichEdit.h>
-#include <control/SCalendar.h>
-#include <control/SSpinButtonCtrl.h>
-#include <control/SActiveX.h>
-#include <control/SSplitPane.h>
-#include <control/SFlashCtrl.h>
-#include <control/SIECtrl.h>
-#include <control/SMediaPlayer.h>
-#include <control/SChart.h>
-#include <control/SWordBreak.h>
-#include <gif/SAniImgFrame.h>
-#include <gif/SGifPlayer.h>
-#include <activex/flash11.tlh>
-#include <animator/SInterpolatorImpl.h>
-#include <SApp.h>
-#include <interface/ws-i.h>
-#include <helper/obj-ref-impl.hpp>
-#include <com-loader.hpp>
-#include <helper/slog.h>
+#if !defined(AFX_STDAFX_H__A9DB83DB_A9FD_11D0_BFD1_444553540001__INCLUDED_)
+#define AFX_STDAFX_H__A9DB83DB_A9FD_11D0_BFD1_444553540001__INCLUDED_
+
+#if _MSC_VER > 1000
+#pragma once
+#endif // _MSC_VER > 1000
+
+#define WIN32_LEAN_AND_MEAN		// Exclude rarely-used stuff from Windows headers
+
+
+// Windows Header Files:
+#include <windows.h>
+
+// C RunTime Header Files
+#include <stdlib.h>
+#include <memory.h>
+#include <tchar.h>
+#include <assert.h>
+// Local Header Files
+#define ASSERT	assert
+
 
 // 象棋游戏消息类型定义
 #define CHESS_MSG_MOVE          1001  // 走棋消息
@@ -57,4 +37,5 @@
 #define CHESS_MSG_GAME_START    1009  // 游戏开始
 #define CHESS_MSG_GAME_END      1010  // 游戏结束
 
-using namespace SOUI;
+
+#endif//AFX_STDAFX_H__A9DB83DB_A9FD_11D0_BFD1_444553540001__INCLUDED_

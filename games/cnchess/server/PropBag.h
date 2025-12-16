@@ -2,7 +2,7 @@
 #define __PROPBAG_H__
 
 #include <core/SSingleton.h>
-#include <upgradeProtocol.h>
+#include <cnchessProtocol.h>
 #include <windows.h>
 SNSBEGIN
 class PropBag : public SSingleton<PropBag>

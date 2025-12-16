@@ -4,13 +4,13 @@
 
 #include "stdafx.h"
 #include "WebSocketGame.h"
-#include <upgradeProtocol.h>
+#include <protocol.h>
 #include <tchar.h>
 #include <string>
 #include <map>
 #include <algorithm>
 #include <sstream>
-#include "Upgrade.h"
+#include "ChessGame.h"
 #include "PropBag.h"
 #include <helper/slog.h>
 #define kLogTag "WebSocketGame"
@@ -431,7 +431,7 @@ BOOL CWebSocketGame::ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSiz
     auto it = m_tableClients.find(pSeatID->nTableId);
     if (it == m_tableClients.end())
     {
-		SAutoRefPtr<IGameTable> pTable(new CUpgrade(),false);
+		SAutoRefPtr<IGameTable> pTable(new CChessGame(),false);
         it = m_tableClients.insert(std::make_pair(pSeatID->nTableId, pTable)).first;
     }else{
 		if(it->second->HasPlayer( pSeatID->nSeat))

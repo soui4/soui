@@ -2,7 +2,7 @@
 
 #include "GameTable-i.h"
 #include <vector>
-
+#include <cnchessProtocol.h>
 // 象棋游戏状态枚举
 enum ChessGameState
 {
