@@ -1,31 +1,45 @@
 #include "stdafx.h"
-#include "MainDlg.h"
+#include "MainDlg.h"    
+#include "LoginDlg.h"
+#include <helper/SMenuEx.h>
+#include <helper/SFunctor.hpp>
+#include <helper/slog.h>
+#include <mmsystem.h>
+#define kLogTag "MainDlg"
 
-CMainDlg::CMainDlg()
-    : SHostWnd(_T("layout:dlg_main"))
-    , m_pChessGame(NULL)
+CMainDlg::CMainDlg(SGameTheme* pTheme) 
+: SHostWnd(_T("LAYOUT:XML_MAINWND"))
+, m_pTheme(pTheme)
+, m_bMute(FALSE)
 {
+    m_pChessGame = new CChessGame(this, pTheme);
+    m_pLobbyHandler = new LobbyHandler();
+    m_webSocketClient.SetMessageHandler(this);
 }
 
 CMainDlg::~CMainDlg()
 {
-    if (m_pChessGame)
-    {
-        delete m_pChessGame;
-        m_pChessGame = NULL;
-    }
+    delete m_pChessGame;
+    delete m_pLobbyHandler;
 }
 
-BOOL CMainDlg::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
+BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
 {
-    // 获取游戏容器窗口
-    SWindow* pGameContainer = FindChildByName(L"game_container");
-    if (pGameContainer)
-    {
-        m_pChessGame = new ChessGame(this);
-        m_pChessGame->Init(pGameContainer);
+    CLoginDlg dlgLogin;
+    if (dlgLogin.DoModal() != IDOK) {
+        OnClose();
+        return FALSE;
     }
     
+    SStringT strTitle = SStringT().Format(_T("中国象棋"));
+    FindChildByName(L"txt_title")->SetWindowText(strTitle);
+    SetWindowText(strTitle);
+    m_pLobbyHandler->Init(FindChildByName(L"room_container"), &m_webSocketClient);
+    m_pChessGame->Init(FindChildByName(L"game_container"), &m_webSocketClient);
+
+    SStringA svr = S_CT2A(dlgLogin.m_strSvr);
+    BOOL bRet = m_webSocketClient.ConnectToServer(svr, "");
+    SLOGI()<<"connect to server ret:"<<bRet;
     return TRUE;
 }
 

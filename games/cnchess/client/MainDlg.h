@@ -1,13 +1,17 @@
 #pragma once
 
 #include <helper/SDpiHelper.hpp>
+#include "SGameTheme.h"
+#include "WebSocketClient.h"
+#include "LobbyHandler.h"
 #include "ChessGame.h"
 
 class CMainDlg : public SHostWnd
                , public SDpiHandler<CMainDlg>
+               , public WebSocketClient::IListener
 {
 public:
-    CMainDlg();
+    CMainDlg(SGameTheme* pTheme);
     ~CMainDlg();
 
     void OnClose();
@@ -17,17 +21,29 @@ public:
     void OnSize(UINT nType, CSize size);
     BOOL OnInitDialog(HWND wndFocus, LPARAM lInitParam);
 
-protected:
+    void PlayWave(LPCTSTR pszSound);
+
+  protected:
     void OnScaleChanged(int nScale) override;
-    
-protected:
+  protected:
+    virtual BOOL OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data) override;
+
+    void OnConnected();
+    void OnDisconnected();
+    BOOL _OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data);
+  protected:
+    void OnBtnMute();
+    void OnBtnUnmute();
     //soui消息
     EVENT_MAP_BEGIN()
         EVENT_NAME_COMMAND(L"btn_close", OnClose)
         EVENT_NAME_COMMAND(L"btn_min", OnMinimize)
         EVENT_NAME_COMMAND(L"btn_max", OnMaximize)
         EVENT_NAME_COMMAND(L"btn_restore", OnRestore)
+        EVENT_NAME_COMMAND(L"btn_mute", OnBtnMute)
+        EVENT_NAME_COMMAND(L"btn_unmute", OnBtnUnmute)  
         CHAIN_EVENT_MAP_MEMBER(*m_pChessGame)
+        CHAIN_EVENT_MAP_MEMBER(*m_pLobbyHandler) 
     EVENT_MAP_END2(SHostWnd)
         
     //HostWnd真实窗口消息处理
@@ -42,5 +58,10 @@ protected:
     END_MSG_MAP()
 
 private:
-    ChessGame* m_pChessGame;  // 象棋游戏核心逻辑
+    CChessGame* m_pChessGame;  // 象棋游戏核心逻辑
+    LobbyHandler* m_pLobbyHandler;
+        // 网络通信
+    WebSocketClient m_webSocketClient;
+    SAutoRefPtr<SGameTheme> m_pTheme;
+    BOOL m_bMute;
 };

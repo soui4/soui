@@ -40,6 +40,9 @@
 #include <activex/flash11.tlh>
 #include <animator/SInterpolatorImpl.h>
 #include <SApp.h>
+#include <interface/ws-i.h>
+#include <helper/obj-ref-impl.hpp>
+#include <com-loader.hpp>
 
 #ifdef _DEBUG
     #define SYS_NAMED_RESOURCE_LUA  _T("soui_named_resource.lua")

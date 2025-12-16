@@ -1,6 +1,7 @@
 #include "stdafx.h"
 #include <SAppCfg.h>
 #include "MainDlg.h"
+#include "SGameTheme.h"
 
 static const TCHAR * kPath_SysRes = _T("/../../../soui-sys-resource");
 static const TCHAR *kPath_UiRes = _T("/uires");
@@ -14,6 +15,7 @@ static SStringT getSourceDir()
     return S_CA2T(file);
 }
 
+
 int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lpstrCmdLine, int /*nCmdShow*/)
 {
     HRESULT hRes = OleInitialize(NULL);
@@ -21,12 +23,12 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 
     int nRet = 0;
     SApplication app(hInstance);
-
-    app.RegisterWindowClass<SGifPlayer>();
+    
     SStringT appDir = app.GetAppDir();
 
     SAppCfg cfg;
     SStringT srcDir = getSourceDir();
+
 
     cfg.SetRender(Render_Skia)
         .SetImgDecoder(ImgDecoder_Stb)
@@ -51,10 +53,20 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     {
         return -1;
     }
-
+#ifndef _WIN32
+    AddFontResource((srcDir + _T("/../../../simsun.ttc")).c_str());
+#endif
     // Show main dialog
     {
-        CMainDlg dlgMain;
+        SAutoRefPtr<SGameTheme> theme(new SGameTheme(),FALSE);
+        SStringT themeDir = appDir + _T("/def_theme");
+        if(GetFileAttributes(themeDir) == INVALID_FILE_ATTRIBUTES)
+        {
+            themeDir = srcDir + _T("/def_theme");
+        }
+        theme->Load(themeDir);
+
+        CMainDlg dlgMain(theme);
         dlgMain.Create(GetActiveWindow());
         if(dlgMain.SendMessage(WM_INITDIALOG))
         {
@@ -67,3 +79,12 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     OleUninitialize();
     return nRet;
 }
+
+
+#if !defined(_WIN32) || defined(__MINGW32__) 
+int main(int argc, char **argv)
+{
+    HINSTANCE hInst = GetModuleHandle(NULL);
+    return _tWinMain(hInst, 0, NULL, SW_SHOWNORMAL);
+}
+#endif //_WIN32

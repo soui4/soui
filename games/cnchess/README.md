@@ -12,10 +12,25 @@ cnchess/
 │   └── CMakeLists.txt
 ├── client/             # 客户端主程序
 │   ├── uires/          # UI资源文件
+│   │   ├── icon/       # 图标资源
+│   │   ├── image/      # 图片资源
+│   │   ├── uidef/      # UI定义文件
+│   │   ├── values/     # 配置值
+│   │   └── xml/        # XML布局文件
+│   ├── def_theme/      # 默认主题资源
+│   ├── avatar/         # 用户头像资源
 │   ├── MainDlg.h       # 主对话框声明
 │   ├── MainDlg.cpp     # 主对话框实现
 │   ├── ChessGame.h     # 游戏逻辑声明
 │   ├── ChessGame.cpp   # 游戏逻辑实现
+│   ├── LoginDlg.h      # 登录对话框声明
+│   ├── LoginDlg.cpp    # 登录对话框实现
+│   ├── LobbyHandler.h  # 大厅处理器声明
+│   ├── LobbyHandler.cpp# 大厅处理器实现
+│   ├── WebSocketClient.h # WebSocket客户端声明
+│   ├── WebSocketClient.cpp # WebSocket客户端实现
+│   ├── SGameTheme.h    # 游戏主题声明
+│   ├── SGameTheme.cpp  # 游戏主题实现
 │   ├── main.cpp        # 程序入口
 │   ├── stdafx.h        # 预编译头文件
 │   ├── stdafx.cpp      # 预编译头源文件
@@ -56,6 +71,10 @@ make
 - [x] 主程序入口(main.cpp)
 - [x] 主对话框(MainDlg.h/cpp)
 - [x] 游戏逻辑框架(ChessGame.h/cpp)
+- [x] 登录对话框(LoginDlg.h/cpp)
+- [x] 大厅处理器(LobbyHandler.h/cpp)
+- [x] WebSocket客户端(WebSocketClient.h/cpp)
+- [x] 游戏主题系统(SGameTheme.h/cpp)
 - [x] 象棋算法基础类(Chessman.h/cpp, ChessLayout.h/cpp)
 - [x] UI资源文件结构
 - [x] 服务器框架(ChessServer.h/cpp)

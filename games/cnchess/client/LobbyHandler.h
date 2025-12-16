@@ -1,17 +1,15 @@
 #pragma once
 
-#include <helper/SDpiHelper.hpp>
 #include "protocol.h"
-#include "SGameTheme.h"
 #include "WebSocketClient.h"
+#include <helper/obj-ref-impl.hpp>
 
-class CChessGame 
+class LobbyHandler
     : public SOUI::TObjRefImpl<WebSocketClient::IHandler>
-    , public SDpiHandler<CChessGame>
 {
 public:
-    CChessGame(SOUI::IWindow* pParent, SGameTheme* pTheme);
-    virtual ~CChessGame();
+    LobbyHandler();
+    virtual ~LobbyHandler();
 
     void Init(SOUI::IWindow* pParent, WebSocketClient* pWsClient);
 
@@ -24,10 +22,10 @@ protected:
     virtual void OnDisconnected() override;
 
 protected:
-    void OnScaleChanged(int nScale) override;
+    void OnBtnCreateRoom();
+    void OnBtnJoinRoom();
 
 protected:
     SOUI::IWindow* m_pParent;
-    SGameTheme*    m_pTheme;
     WebSocketClient* m_pWsClient;
 };
