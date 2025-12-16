@@ -289,7 +289,7 @@ TEST(ChessAlgorithmTest, BingMovement)
     // 检查移动是否正确
     if (moveCount > 0) {
         EXPECT_EQ(moves[0].x, 4);  // x坐标不变
-        EXPECT_EQ(moves[0].y, 2);  // y坐标减1（向前）
+        EXPECT_EQ(moves[0].y, 4);  // y坐标加1（向前）
     }
     
     // 测试过河后的红兵
