@@ -3,6 +3,7 @@
 # 设置包含目录
 include_directories(${PROJECT_SOURCE_DIR}/third-part/gtest/include)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../algorithm)
 
 # 收集源文件
 file(GLOB CNCHESS_TEST_SRC 

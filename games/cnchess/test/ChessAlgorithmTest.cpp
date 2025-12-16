@@ -1,236 +1,412 @@
 #include <gtest/gtest.h>
-#include "../algorithm/ChessAlgorithm.h"
+#include "../algorithm/Chessman.h"
+#include "../algorithm/ChessLayout.h"
 
 // 测试棋盘初始化
 TEST(ChessAlgorithmTest, BoardInitialization)
 {
-    CChessAlgorithm chess;
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
+    
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
+    
+    // 设置一些测试棋子
+    initLayout[0][4] = CHSMAN_RED_JIANG;  // 红帅
+    initLayout[9][4] = CHSMAN_BLK_JIANG;  // 黑将
+    
+    layout.InitLayout(initLayout, CS_RED);
     
     // 检查初始状态下棋盘是否正确设置
-    // 红方棋子检查
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_ROOK, chess.GetPiece(0, 0));
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_KNIGHT, chess.GetPiece(1, 0));
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_BISHOP, chess.GetPiece(2, 0));
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_ADVISOR, chess.GetPiece(3, 0));
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_KING, chess.GetPiece(4, 0));
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_ADVISOR, chess.GetPiece(5, 0));
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_BISHOP, chess.GetPiece(6, 0));
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_KNIGHT, chess.GetPiece(7, 0));
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_ROOK, chess.GetPiece(8, 0));
-    
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_CANNON, chess.GetPiece(1, 2));
-    EXPECT_EQ(CChessAlgorithm::PIECE_RED_CANNON, chess.GetPiece(7, 2));
-    
-    // 检查红方兵的位置
-    for (int i = 0; i < 9; i += 2) {
-        EXPECT_EQ(CChessAlgorithm::PIECE_RED_PAWN, chess.GetPiece(i, 3));
-    }
-    
-    // 黑方棋子检查
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_ROOK, chess.GetPiece(0, 9));
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_KNIGHT, chess.GetPiece(1, 9));
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_BISHOP, chess.GetPiece(2, 9));
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_ADVISOR, chess.GetPiece(3, 9));
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_KING, chess.GetPiece(4, 9));
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_ADVISOR, chess.GetPiece(5, 9));
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_BISHOP, chess.GetPiece(6, 9));
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_KNIGHT, chess.GetPiece(7, 9));
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_ROOK, chess.GetPiece(8, 9));
-    
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_CANNON, chess.GetPiece(1, 7));
-    EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_CANNON, chess.GetPiece(7, 7));
-    
-    // 检查黑方卒的位置
-    for (int i = 0; i < 9; i += 2) {
-        EXPECT_EQ(CChessAlgorithm::PIECE_BLACK_PAWN, chess.GetPiece(i, 6));
-    }
-    
-    // 检查空位
-    EXPECT_EQ(CChessAlgorithm::PIECE_NONE, chess.GetPiece(0, 1));
-    EXPECT_EQ(CChessAlgorithm::PIECE_NONE, chess.GetPiece(4, 1));
-    EXPECT_EQ(CChessAlgorithm::PIECE_NONE, chess.GetPiece(8, 1));
+    EXPECT_EQ(CHSMAN_RED_JIANG, layout.m_chesses[0][4]);
+    EXPECT_EQ(CHSMAN_BLK_JIANG, layout.m_chesses[9][4]);
 }
 
 // 测试帅/将的移动规则
-TEST(ChessAlgorithmTest, KingMovement)
+TEST(ChessAlgorithmTest, JiangMovement)
 {
-    CChessAlgorithm chess;
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
     
-    // 测试红帅在九宫格内的移动
-    // 红帅只能在九宫格内移动，每次只能移动一格
-    EXPECT_TRUE(chess.MovePiece(4, 0, 3, 0)); // 横向移动
-    EXPECT_TRUE(chess.MovePiece(3, 0, 3, 1)); // 纵向移动
-    EXPECT_TRUE(chess.MovePiece(3, 1, 4, 1)); // 横向移动
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
     
-    // 测试试图移出九宫格的情况
-    EXPECT_FALSE(chess.MovePiece(4, 1, 2, 1)); // 试图横向移动两格（超出九宫格范围）
-    EXPECT_FALSE(chess.MovePiece(4, 1, 4, 3)); // 试图纵向移动两格（超出九宫格范围）
+    // 放置红帅和黑将
+    initLayout[1][4] = CHSMAN_RED_JIANG;  // 红帅放在九宫格内
+    initLayout[8][4] = CHSMAN_BLK_JIANG;  // 黑将放在九宫格内
     
-    // 测试黑将在九宫格内的移动
-    // 注意：这里需要模拟黑方回合
-    // 由于简单起见，我们直接测试移动验证函数
+    layout.InitLayout(initLayout, CS_RED);
     
-    // 测试黑将的移动
-    // 首先移动几步让黑方获得回合权（模拟）
-    chess.MovePiece(4, 1, 4, 0); // 红方移动回去
-    chess.MovePiece(4, 9, 3, 9); // 黑将横向移动
-    chess.MovePiece(4, 0, 4, 1); // 红帅横向移动
-    chess.MovePiece(3, 9, 3, 8); // 黑将纵向移动
-}
-
-// 测试士/仕的移动规则
-TEST(ChessAlgorithmTest, AdvisorMovement)
-{
-    CChessAlgorithm chess;
+    POINT moves[MAX_MOVES];
     
-    // 士只能在九宫格内斜向移动一格
-    EXPECT_TRUE(chess.MovePiece(3, 0, 4, 1)); // 红仕斜向移动
-    EXPECT_TRUE(chess.MovePiece(4, 1, 3, 0)); // 移动回去
+    // 测试红帅的移动
+    int moveCount = layout.GetPossiableMoves(4, 1, moves);
     
-    // 测试试图直走的情况（非法）
-    EXPECT_FALSE(chess.MovePiece(3, 0, 3, 1)); // 直走是非法的
+    // 红帅应该能在九宫格内移动
+    EXPECT_GT(moveCount, 0);
     
-    // 测试试图移出九宫格的情况
-    EXPECT_FALSE(chess.MovePiece(3, 0, 2, 1)); // 移动到九宫格外
-}
-
-// 测试象/相的移动规则
-TEST(ChessAlgorithmTest, BishopMovement)
-{
-    CChessAlgorithm chess;
-    
-    // 相/象走"田"字，且不能过河
-    // 红象初始位置在(2,0)和(6,0)
-    
-    // 测试红象的合法移动
-    EXPECT_TRUE(chess.MovePiece(2, 0, 4, 2)); // 正常走田字
-    
-    // 移动回去
-    chess.MovePiece(4, 2, 2, 0);
-    
-    // 测试试图过河的移动（非法）
-    EXPECT_FALSE(chess.MovePiece(2, 0, 0, 2)); // 这种移动会过河，非法
-    
-    // 测试被阻挡的情况（象眼被堵）
-    // 在(3,1)放置一个棋子阻挡象眼
-    // 由于我们不能直接修改棋盘，这种测试需要更复杂的设置
+    // 检查是否所有移动都在九宫格内
+    for (int i = 0; i < moveCount; i++) {
+        // 九宫格范围：x: 3-5, y: 0-2
+        EXPECT_GE(moves[i].x, 3);
+        EXPECT_LE(moves[i].x, 5);
+        EXPECT_GE(moves[i].y, 0);
+        EXPECT_LE(moves[i].y, 2);
+    }
 }
 
 // 测试车的移动规则
-TEST(ChessAlgorithmTest, RookMovement)
+TEST(ChessAlgorithmTest, JuMovement)
 {
-    CChessAlgorithm chess;
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
     
-    // 车可以横竖直线移动任意距离，直到遇到阻挡
-    // 先清除路径上的棋子
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
     
-    // 移动红方兵以便车可以移动
-    chess.MovePiece(0, 3, 0, 4); // 移动兵
+    // 放置一个红车在中心位置
+    initLayout[4][4] = CHSMAN_RED_JU;
     
-    // 测试车的横向移动
-    EXPECT_TRUE(chess.MovePiece(0, 0, 1, 0)); // 车横向移动（吃掉马）
+    layout.InitLayout(initLayout, CS_RED);
     
-    // 移动回去
-    chess.MovePiece(1, 0, 0, 0);
+    POINT moves[MAX_MOVES];
     
-    // 测试车的纵向移动
-    EXPECT_TRUE(chess.MovePiece(0, 0, 0, 1)); // 车纵向移动
+    // 测试红车的移动
+    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    
+    // 车应该能在没有阻挡的情况下沿直线移动
+    EXPECT_GT(moveCount, 0);
+    
+    // 检查移动是否都是直线（同一行或同一列）
+    for (int i = 0; i < moveCount; i++) {
+        bool isHorizontal = (moves[i].y == 4);  // 同一行
+        bool isVertical = (moves[i].x == 4);    // 同一列
+        EXPECT_TRUE(isHorizontal || isVertical);
+    }
 }
 
 // 测试马的移动规则
-TEST(ChessAlgorithmTest, KnightMovement)
+TEST(ChessAlgorithmTest, MaMovement)
 {
-    CChessAlgorithm chess;
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
     
-    // 马走"日"字，先直一格再斜一格
-    // 需要先移动兵才能让马有路可走
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
     
-    // 移动红方兵
-    chess.MovePiece(1, 3, 1, 4);
+    // 放置一个红马
+    initLayout[4][4] = CHSMAN_RED_MA;
     
-    // 测试马的合法移动
-    EXPECT_TRUE(chess.MovePiece(1, 0, 2, 2)); // 马走日字
+    layout.InitLayout(initLayout, CS_RED);
     
-    // 移动回去
-    chess.MovePiece(2, 2, 1, 0);
+    POINT moves[MAX_MOVES];
     
-    // 测试马腿被蹩的情况（非法）
-    // 这种测试需要更复杂的设置
+    // 测试红马的移动
+    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    
+    // 马应该能走"日"字形状
+    EXPECT_GT(moveCount, 0);
+    
+    // 检查马的移动是否符合"日"字规律
+    bool foundValidMove = false;
+    for (int i = 0; i < moveCount; i++) {
+        int dx = abs(moves[i].x - 4);
+        int dy = abs(moves[i].y - 4);
+        
+        // 马走"日"字：一个方向走1格，另一个方向走2格
+        if ((dx == 1 && dy == 2) || (dx == 2 && dy == 1)) {
+            foundValidMove = true;
+        }
+    }
+    
+    EXPECT_TRUE(foundValidMove);
 }
 
 // 测试炮的移动规则
-TEST(ChessAlgorithmTest, CannonMovement)
+TEST(ChessAlgorithmTest, PaoMovement)
 {
-    CChessAlgorithm chess;
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
     
-    // 炮移动时和车一样，横竖直线移动
-    // 吃子时需要隔着一个棋子（炮架）
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
     
-    // 测试炮的移动
-    EXPECT_TRUE(chess.MovePiece(1, 2, 1, 1)); // 炮纵向移动
+    // 放置一个红炮
+    initLayout[4][4] = CHSMAN_RED_PAO;
     
-    // 移动回去
-    chess.MovePiece(1, 1, 1, 2);
+    layout.InitLayout(initLayout, CS_RED);
     
-    // 测试炮的吃子需要炮架
-    // 这种测试需要更复杂的设置
+    POINT moves[MAX_MOVES];
+    
+    // 测试红炮的移动
+    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    
+    // 炮应该能沿直线移动（不吃子时）
+    EXPECT_GT(moveCount, 0);
+    
+    // 检查移动是否都是直线（同一行或同一列）
+    for (int i = 0; i < moveCount; i++) {
+        bool isHorizontal = (moves[i].y == 4);  // 同一行
+        bool isVertical = (moves[i].x == 4);    // 同一列
+        EXPECT_TRUE(isHorizontal || isVertical);
+    }
+}
+
+// 测试士的移动规则
+TEST(ChessAlgorithmTest, ShiMovement)
+{
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
+    
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
+    
+    // 放置一个红士在九宫格中心
+    initLayout[1][4] = CHSMAN_RED_SHI;
+    
+    layout.InitLayout(initLayout, CS_RED);
+    
+    POINT moves[MAX_MOVES];
+    
+    // 测试红士的移动
+    int moveCount = layout.GetPossiableMoves(4, 1, moves);
+    
+    // 士应该只能斜着走一格，且不能走出九宫格
+    EXPECT_GT(moveCount, 0);
+    
+    // 检查士的移动是否符合规则
+    for (int i = 0; i < moveCount; i++) {
+        int dx = abs(moves[i].x - 4);
+        int dy = abs(moves[i].y - 1);
+        
+        // 士斜着走一格：dx=1且dy=1
+        EXPECT_EQ(dx, 1);
+        EXPECT_EQ(dy, 1);
+        
+        // 士不能走出九宫格：x: 3-5, y: 0-2
+        EXPECT_GE(moves[i].x, 3);
+        EXPECT_LE(moves[i].x, 5);
+        EXPECT_GE(moves[i].y, 0);
+        EXPECT_LE(moves[i].y, 2);
+    }
+}
+
+// 测试相/象的移动规则
+TEST(ChessAlgorithmTest, XiangMovement)
+{
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
+    
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
+    
+    // 放置一个红相
+    initLayout[4][4] = CHSMAN_RED_XIANG;
+    
+    layout.InitLayout(initLayout, CS_RED);
+    
+    POINT moves[MAX_MOVES];
+    
+    // 测试红相的移动
+    int moveCount = layout.GetPossiableMoves(4, 4, moves);
+    
+    // 相应该走"田"字，且不能过河
+    EXPECT_GT(moveCount, 0);
+    
+    // 检查相的移动是否符合规则
+    for (int i = 0; i < moveCount; i++) {
+        int dx = abs(moves[i].x - 4);
+        int dy = abs(moves[i].y - 4);
+        
+        // 相走"田"字：dx=2且dy=2
+        EXPECT_EQ(dx, 2);
+        EXPECT_EQ(dy, 2);
+        
+        // 相不能过河：红相y坐标不能大于4
+        EXPECT_LE(moves[i].y, 4);
+    }
 }
 
 // 测试兵/卒的移动规则
-TEST(ChessAlgorithmTest, PawnMovement)
+TEST(ChessAlgorithmTest, BingMovement)
 {
-    CChessAlgorithm chess;
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
     
-    // 兵/卒只能向前走一格，过河后可以横向移动
-    // 测试红兵向前移动
-    EXPECT_TRUE(chess.MovePiece(0, 3, 0, 4)); // 红兵向前移动
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
     
-    // 移动回去
-    chess.MovePiece(0, 4, 0, 3);
+    // 放置一个红兵在起始位置
+    initLayout[3][4] = CHSMAN_RED_BING;
     
-    // 测试试图后退（非法）
-    EXPECT_FALSE(chess.MovePiece(0, 3, 0, 2)); // 红兵试图后退
+    layout.InitLayout(initLayout, CS_RED);
     
-    // 测试试图横向移动（未过河时非法）
-    EXPECT_FALSE(chess.MovePiece(0, 3, 1, 3)); // 红兵试图横向移动
+    POINT moves[MAX_MOVES];
+    
+    // 测试红兵的移动（未过河）
+    int moveCount = layout.GetPossiableMoves(4, 3, moves);
+    
+    // 兵未过河只能向前走
+    EXPECT_EQ(moveCount, 1);
+    
+    // 检查移动是否正确
+    if (moveCount > 0) {
+        EXPECT_EQ(moves[0].x, 4);  // x坐标不变
+        EXPECT_EQ(moves[0].y, 2);  // y坐标减1（向前）
+    }
+    
+    // 测试过河后的红兵
+    initLayout[3][4] = CHSMAN_NULL;
+    initLayout[5][4] = CHSMAN_RED_BING;  // 放在河对面
+    layout.InitLayout(initLayout, CS_RED);
+    
+    moveCount = layout.GetPossiableMoves(4, 5, moves);
+    
+    // 过河后兵可以向前或横向移动
+    EXPECT_GE(moveCount, 1);
+    
+    // 检查移动是否符合规则
+    bool foundForward = false;
+    bool foundHorizontal = false;
+    
+    for (int i = 0; i < moveCount; i++) {
+        if (moves[i].x == 4 && moves[i].y == 4) {
+            foundForward = true;  // 向前移动
+        }
+        if ((moves[i].x == 3 && moves[i].y == 5) || 
+            (moves[i].x == 5 && moves[i].y == 5)) {
+            foundHorizontal = true;  // 横向移动
+        }
+    }
+    
+    EXPECT_TRUE(foundForward || foundHorizontal);
 }
 
-// 测试将军检测
-TEST(ChessAlgorithmTest, CheckDetection)
+// 测试走棋功能
+TEST(ChessAlgorithmTest, MoveFunction)
 {
-    CChessAlgorithm chess;
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
     
-    // 简单测试将军检测功能
-    // 这个测试需要实现具体的将军检测逻辑
-    EXPECT_FALSE(chess.IsCheck(true));  // 红方未被将军
-    EXPECT_FALSE(chess.IsCheck(false)); // 黑方未被将军
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
+    
+    // 放置一个红车
+    initLayout[4][4] = CHSMAN_RED_JU;
+    
+    layout.InitLayout(initLayout, CS_RED);
+    
+    // 执行一次移动
+    MOVESTEP move = layout.Move({4, 4}, {4, 2});
+    
+    // 检查移动结果
+    EXPECT_EQ(move.pt1.x, 4);
+    EXPECT_EQ(move.pt1.y, 4);
+    EXPECT_EQ(move.pt2.x, 4);
+    EXPECT_EQ(move.pt2.y, 2);
+    EXPECT_EQ(move.enemy, CHSMAN_NULL);
+    
+    // 检查棋盘状态
+    EXPECT_EQ(layout.m_chesses[4][4], CHSMAN_NULL);  // 原位置为空
+    EXPECT_EQ(layout.m_chesses[2][4], CHSMAN_RED_JU);  // 新位置为车
 }
 
-// 测试将死检测
-TEST(ChessAlgorithmTest, CheckmateDetection)
+// 测试悔棋功能
+TEST(ChessAlgorithmTest, UndoMove)
 {
-    CChessAlgorithm chess;
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
     
-    // 简单测试将死检测功能
-    // 这个测试需要实现具体的将死检测逻辑
-    EXPECT_FALSE(chess.IsCheckmate(true));  // 红方未被将死
-    EXPECT_FALSE(chess.IsCheckmate(false)); // 黑方未被将死
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
+    
+    // 放置一个红车
+    initLayout[4][4] = CHSMAN_RED_JU;
+    
+    layout.InitLayout(initLayout, CS_RED);
+    
+    // 执行一次移动
+    MOVESTEP move = layout.Move({4, 4}, {4, 2});
+    
+    // 检查移动后的状态
+    EXPECT_EQ(layout.m_chesses[4][4], CHSMAN_NULL);
+    EXPECT_EQ(layout.m_chesses[2][4], CHSMAN_RED_JU);
+    
+    // 执行悔棋
+    BOOL undoResult = layout.UndoMove(move);
+    
+    // 检查悔棋结果
+    EXPECT_TRUE(undoResult);
+    
+    // 检查棋盘状态是否恢复
+    EXPECT_EQ(layout.m_chesses[4][4], CHSMAN_RED_JU);  // 原位置恢复为车
+    EXPECT_EQ(layout.m_chesses[2][4], CHSMAN_NULL);    // 新位置变为空
 }
 
-// 测试回合交替
-TEST(ChessAlgorithmTest, TurnAlternation)
+// 测试走棋描述功能
+TEST(ChessAlgorithmTest, MoveDescription)
 {
-    CChessAlgorithm chess;
+    CChessLayout layout;
+    CHESSMAN initLayout[10][9];
     
-    // 测试回合交替机制
-    EXPECT_TRUE(chess.MovePiece(4, 0, 4, 1)); // 红方移动
+    // 初始化一个空棋盘
+    for (int y = 0; y < 10; y++) {
+        for (int x = 0; x < 9; x++) {
+            initLayout[y][x] = CHSMAN_NULL;
+        }
+    }
     
-    // 尝试再次移动红方棋子（应该失败）
-    EXPECT_FALSE(chess.MovePiece(4, 1, 4, 2)); // 红方不能连续移动两次
+    // 放置一个红帅
+    initLayout[0][4] = CHSMAN_RED_JIANG;
     
-    // 黑方移动
-    chess.MovePiece(4, 9, 4, 8); // 黑方移动
+    layout.InitLayout(initLayout, CS_RED);
     
-    // 再次轮到红方
-    EXPECT_TRUE(chess.MovePiece(4, 1, 4, 0)); // 红方移动
+    // 执行一次移动
+    MOVESTEP move = layout.Move({4, 0}, {4, 1});
+    
+    TCHAR desc[100];
+    layout.GetMoveDescription(move, desc);
+    
+    // 检查描述不为空
+    EXPECT_GT(_tcslen(desc), 0);
 }

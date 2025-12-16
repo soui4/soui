@@ -7,8 +7,8 @@
 ```
 cnchess/
 ├── algorithm/          # 象棋算法实现
-│   ├── ChessAlgorithm.h
-│   ├── ChessAlgorithm.cpp
+│   ├── Chessman.h/cpp  # 棋子定义和移动规则
+│   ├── ChessLayout.h/cpp # 棋局布局和状态管理
 │   └── CMakeLists.txt
 ├── client/             # 客户端主程序
 │   ├── uires/          # UI资源文件
@@ -56,11 +56,11 @@ make
 - [x] 主程序入口(main.cpp)
 - [x] 主对话框(MainDlg.h/cpp)
 - [x] 游戏逻辑框架(ChessGame.h/cpp)
-- [x] 象棋算法基础类(ChessAlgorithm.h/cpp)
+- [x] 象棋算法基础类(Chessman.h/cpp, ChessLayout.h/cpp)
 - [x] UI资源文件结构
 - [x] 服务器框架(ChessServer.h/cpp)
 - [x] 服务器游戏逻辑(CnChess.h/cpp，替代了原来的CUpgrade类)
-- [x] 算法测试模块(test/)
+- [x] 算法测试模块(test/)，基于新的算法模块重写
 - [ ] 棋子资源图片
 - [ ] 完整的游戏逻辑实现
 - [ ] 网络对战功能
@@ -76,6 +76,12 @@ make
 
 1. 编译测试程序
 2. 运行测试程序: ./cnchess_test
+
+测试模块现已更新，包含以下测试用例：
+- 棋盘初始化测试
+- 各种棋子移动规则测试（帅/将、车、马、炮、士、相/象、兵/卒）
+- 走棋和悔棋功能测试
+- 走棋描述功能测试
 
 ## 后续工作
 

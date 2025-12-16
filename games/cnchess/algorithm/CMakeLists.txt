@@ -15,3 +15,5 @@ add_library(${current_project} STATIC ${CURRENT_HEADERS} ${CURRENT_SRCS})
 set_target_properties (${current_project} PROPERTIES
     FOLDER "games/cnchess"
 )
+
+target_link_libraries(${current_project} soui4)
