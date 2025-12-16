@@ -20,6 +20,16 @@ chess/
 │   ├── stdafx.h        # 预编译头文件
 │   ├── stdafx.cpp      # 预编译头源文件
 │   └── CMakeLists.txt
+├── server/             # 服务器程序
+│   ├── ChessServer.h   # 服务器主类声明
+│   ├── ChessServer.cpp # 服务器主类实现
+│   ├── ChessGame.h     # 游戏逻辑声明
+│   ├── ChessGame.cpp   # 游戏逻辑实现
+│   ├── server.cpp      # 服务器入口
+│   ├── stdafx.h        # 预编译头文件
+│   ├── stdafx.cpp      # 预编译头源文件
+│   ├── config.ini      # 服务器配置文件
+│   └── CMakeLists.txt
 └── CMakeLists.txt      # 顶层CMake配置
 ```
 
@@ -45,10 +55,18 @@ make
 - [x] 游戏逻辑框架(ChessGame.h/cpp)
 - [x] 象棋算法基础类(ChessAlgorithm.h/cpp)
 - [x] UI资源文件结构
+- [x] 服务器框架(ChessServer.h/cpp)
+- [x] 服务器游戏逻辑(ChessGame.h/cpp)
 - [ ] 棋子资源图片
 - [ ] 完整的游戏逻辑实现
 - [ ] 网络对战功能
 - [ ] AI对手功能
+
+## 服务器使用说明
+
+1. 编译服务器程序
+2. 修改config.ini配置文件
+3. 运行服务器程序: ./chess_server [config_file]
 
 ## 后续工作
 
@@ -67,3 +85,4 @@ make
 - 网格布局(Grid Layout)
 - 窗口管理
 - 资源管理系统
+- WebSocket网络通信
