@@ -10,7 +10,7 @@
 #include <map>
 #include <algorithm>
 #include <sstream>
-#include "ChessGame.h"
+#include "CnChess.h"
 #include "PropBag.h"
 #include <helper/slog.h>
 #define kLogTag "WebSocketGame"
@@ -431,7 +431,7 @@ BOOL CWebSocketGame::ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSiz
     auto it = m_tableClients.find(pSeatID->nTableId);
     if (it == m_tableClients.end())
     {
-		SAutoRefPtr<IGameTable> pTable(new CChessGame(),false);
+		SAutoRefPtr<IGameTable> pTable(new CCnChess(),false);
         it = m_tableClients.insert(std::make_pair(pSeatID->nTableId, pTable)).first;
     }else{
 		if(it->second->HasPlayer( pSeatID->nSeat))

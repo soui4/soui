@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <chrono>
 #include <map>
@@ -11,8 +12,10 @@
 #include <interface/slog-i.h>
 #define  SCOM_MASK scom_mask_log4z
 #include <commgr2.h>
-#include "ChessServer.h"
-#define kLogTag "ChessServer"
+#include "WebSocketGame.h"
+
+#include "PropBag.h"
+#define kLogTag "CnChessServer"
 
 #ifdef _WIN32
 #include <windows.h>
@@ -22,7 +25,7 @@
 #endif
 
 static ILogMgr *s_logMgr = NULL;
-static CChessServer* g_game = nullptr;
+static CWebSocketGame* g_game = nullptr;
 
 static void SouiLog_Callback(const char *tag, const char *pLogStr, int level, const char *file, int line, const char *fun, void *retAddr)
 {
@@ -75,7 +78,7 @@ int run(LPCTSTR pszCfg){
         
         int nPort = 8080; // 默认端口
         SLOGI() << "start chess server on port " << nPort;
-        CChessServer game;
+        CWebSocketGame game;
         g_game = &game;
         
 #ifdef _WIN32

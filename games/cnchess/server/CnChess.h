@@ -4,6 +4,9 @@
 #include "GameTable-i.h"
 #include <helper/obj-ref-impl.hpp>
 #include <vector>
+#include "Game.h"
+
+SNSBEGIN
 
 typedef class GameClient WSCLIENT, *PWSCLIENT;
 
@@ -20,7 +23,7 @@ enum tagChessState
 
 typedef tagChessState ChessState;
 
-class CCnChess : public SOUI::TObjRefImpl<IGameTable>
+class CCnChess : public CGameTable
 {
 public:
     CCnChess();
@@ -60,5 +63,7 @@ protected:
     int m_nMoveCount;       // 走棋步数
     int m_moveHistory[256][4]; // 走棋历史记录 [fromX, fromY, toX, toY]
 };
+
+SNSEND
 
 #endif // !__CNCHESSTABLE_H__

@@ -6,8 +6,7 @@ include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 include_directories(${PROJECT_SOURCE_DIR}/components)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
-include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
-
+ 
 # Source files 
 file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS *.cpp)

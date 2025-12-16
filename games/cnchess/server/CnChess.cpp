@@ -5,6 +5,8 @@
 #include <helper/slog.h>
 #define kLogTag "CCnChess"
 
+SNSBEGIN
+
 CCnChess::CCnChess()
 {
     m_clients.assign(2, nullptr); // 象棋只有两个玩家：红方和黑方
@@ -287,3 +289,5 @@ BOOL CCnChess::IsCheckmate(BOOL bRed)
     // 这里需要实现具体的将死检测逻辑
     return FALSE;
 }
+
+SNSEND
