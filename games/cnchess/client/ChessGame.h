@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include <cnchessProtocol.h>
 #include <gif/SGifPlayer.h>

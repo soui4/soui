@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "ChessGame.h"
 #include "MainDlg.h"
 #include <helper/SFunctor.hpp>
