@@ -43,6 +43,7 @@
 #include <interface/ws-i.h>
 #include <helper/obj-ref-impl.hpp>
 #include <com-loader.hpp>
+#include <helper/slog.h>
 
 // 象棋游戏消息类型定义
 #define CHESS_MSG_MOVE          1001  // 走棋消息

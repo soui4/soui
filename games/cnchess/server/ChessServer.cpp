@@ -3,7 +3,7 @@
 #include "CnChess.h" // 引入中国象棋逻辑类
 
 CChessServer::CChessServer()
-    : m_bRunning(FALSE), m_ChessGame()
+    : m_bRunning(FALSE)
 {
 }
 
@@ -49,43 +49,25 @@ BOOL CChessServer::OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD dw
 
 BOOL CChessServer::ClientMove(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
 {
-    if (dwSize != sizeof(MoveData)) // 假设 MoveData 是走法数据结构
-        return FALSE;
-
-    MoveData* pMove = static_cast<MoveData*>(pData);
-    
-    // 使用 CCnChess 验证并执行走法
-    if (!m_ChessGame.DoMove(*pMove))
-        return FALSE; // 走法不合法
-
-    // 广播走法给所有客户端
-    BroadcastMessage(CHESS_MSG_MOVE, pMove, dwSize);
-
+    // 处理客户端走棋请求
+    // 这里需要验证走法合法性并广播给其他客户端
     return TRUE;
 }
 
 BOOL CChessServer::ClientUndoRequest(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
 {
-    // 可以记录请求，等待双方同意
-    // 此处简化为直接尝试悔棋（实际应用需协商）
-    if (m_ChessGame.CanUndo())
-    {
-        m_ChessGame.UndoMove();
-        BroadcastMessage(CHESS_MSG_UNDO_REQUEST, nullptr, 0); // 通知悔棋成功
-    }
+    // 处理客户端悔棋请求
     return TRUE;
 }
 
 BOOL CChessServer::ClientDrawRequest(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
 {
-    // 通常需要对方同意，此处仅广播请求
-    BroadcastMessage(CHESS_MSG_DRAW_REQUEST, nullptr, 0);
+    // 处理客户端和棋请求
     return TRUE;
 }
 
 BOOL CChessServer::ClientSurrender(PWSCLIENT pClient, LPVOID pData, DWORD dwSize)
 {
-    m_ChessGame.SetGameOver(); // 标记游戏结束
-    BroadcastMessage(CHESS_MSG_SURRENDER, nullptr, 0); // 广播认输
+    // 处理客户端认输消息
     return TRUE;
 }
