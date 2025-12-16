@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resource>
+  <uidef>
+    <file name="uidef/window_define.xml" />
+  </uidef>
+  <xml>
+    <file name="xml/dlg_main.xml" />
+  </xml>
+</resource>
