@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "ChessLayout.h"
 #include <sstream>
-#include <algorithm>
+#include <sdef.h>
 
 #ifdef _UNICODE
 #define tstringstream wstringstream
@@ -89,8 +89,8 @@ void CChsLytState::UpdateState()
 						int n1,n2;
 						if(p->x==x)
 						{
-							n1=std::min(p->y,y);
-							n2=std::max(p->y,y);
+							n1=smin(p->y,y);
+							n2=smax(p->y,y);
 							for(int i=n1+1;i<=n2-1;i++)
 								if(m_pLayout->m_chesses[i][x]!=CHSMAN_NULL)
 								{
@@ -99,8 +99,8 @@ void CChsLytState::UpdateState()
 								}
 						}else //if(p->y==y)
 						{
-							n1=std::min(p->x,x);
-							n2=std::max(p->x,x);
+							n1=smin(p->x,x);
+							n2=smax(p->x,x);
 							for(int i=n1+1;i<=n2-1;i++)
 								if(m_pLayout->m_chesses[y][i]!=CHSMAN_NULL)
 								{

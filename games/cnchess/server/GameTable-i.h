@@ -1,4 +1,4 @@
-#ifndef __GAMETABLE_I_H__
+﻿#ifndef __GAMETABLE_I_H__
 #define __GAMETABLE_I_H__
 
 #include <windows.h>

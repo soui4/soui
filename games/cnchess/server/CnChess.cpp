@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "CnChess.h"
 #include "GameClient.h"
 #include <algorithm>
