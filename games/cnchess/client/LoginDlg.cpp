@@ -31,5 +31,5 @@ void CLoginDlg::OnLogin()
 void CLoginDlg::OnBtnLocal()
 {
     SWindow * pEdtSvr = FindChildByName2<SEdit>(L"edt_svr");
-    pEdtSvr->SetWindowText(_T("127.0.0.1:3310"));
+    pEdtSvr->SetWindowText(_T("127.0.0.1:3311"));
 }
