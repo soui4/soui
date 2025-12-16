@@ -118,11 +118,6 @@ IAnimation *SGameTheme::GetAnimation(LPCWSTR pszName)
     return nullptr;
 }
 
-SIZE SGameTheme::GetCardSize() const
-{
-    ISkinObj *pCard = GETSKIN(L"skin_card",100);
-    return pCard->GetSkinSize();
-}
 
 SStringW SGameTheme::GetEffectSoundFile(LPCWSTR pszName)
 {

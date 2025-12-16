@@ -41,48 +41,16 @@
         </img>
     </widgets>
     <anchors>
-        <!-- 卡牌中心点位置 -->
-        <card_center pos="0,-90,4" offsetX="-0.5" offsetY="-0.5"/>
-        <!-- 0号用户放牌中心位置 -->
-        <card_bottom pos="0,-105,7" offsetX="-0.5" offsetY="-1"/>
-        <!-- 1号用户放牌中心位置 -->
-        <card_left pos="0,-105,3" offsetX="0" offsetY="0"/>
-        <!-- 2号用户放牌中心位置 -->
-        <card_top pos="0,0,1" offsetX="-0.5" offsetY="0"/>
-        <!-- 3号用户放牌中心位置 -->
-        <card_right pos="0,-105,5" offsetX="-1" offsetY="0"/>
-
-        <!-- 0号用户出牌中心位置 -->
-        <putcard_bottom pos="0,-205,7" offsetX="-0.5" offsetY="-1"/>
-        <!-- 1号用户出牌左侧位置 -->
-        <putcard_left pos="90,-105,3" offsetX="0" offsetY="0"/>
-        <!-- 2号用户出牌中心位置 -->
-        <putcard_top pos="0,100,1" offsetX="-0.5" offsetY="0"/>
-        <!-- 3号用户出牌右侧位置 -->
-        <putcard_right pos="0,-105,5" offsetX="-1" offsetY="0"/>
-
         <!-- 0号用户头像位置 -->
-        <avatar_bottom pos="0,-105,6" offsetX="0" offsetY="-1"/>
+        <avatar_self pos="0,-105,6" offsetX="0" offsetY="-1"/>
         <!-- 1号用户头像位置 -->
-        <avatar_left pos="0,20,0" offsetX="0" offsetY="0"/>
-        <!-- 2号用户头像位置 -->
-        <avatar_top pos="0,20,2" offsetX="-1" offsetY="0"/>
-        <!-- 3号用户头像位置 -->
-        <avatar_right pos="0,-105,8" offsetX="-1" offsetY="-1"/>
-        <!-- 得分牌位置 -->
-        <score_card pos="95,0,6" offsetX="0" offsetY="-1"/>
+        <avatar_enemy pos="0,20,0" offsetX="0" offsetY="0"/>
+
 
         <!-- 时钟位置 -->
-        <clock_bottom pos="150,-200,6" offsetX="0" offsetY="-0.5"/>
-        <clock_left pos="150,95,0" offsetX="0" offsetY="0"/>
-        <clock_top pos="-150,95,2" offsetX="-1" offsetY="0"/>
-        <clock_right pos="-150,-200,8" offsetX="-1" offsetY="-0.5"/>
+        <clock_self pos="150,-200,6" offsetX="0" offsetY="-0.5"/>
+        <clock_enemy pos="-150,95,2" offsetX="-1" offsetY="0"/>"
 
-        <!-- 亮主花色显示位置 -->
-        <color_bottom pos="150,-310,6" offsetX="-1" offsetY="-1"/>
-        <color_left pos="150,0,0" offsetX="-1" offsetY="0"/>
-        <color_top pos="-150,0,2" offsetX="0" offsetY="0"/>
-        <color_right pos="-150,-310,8" offsetX="0" offsetY="-1"/>
     </anchors>
     <anims>
         <anim name="clock_alarm" src="file:anim/clock_alarm.xml"/>
