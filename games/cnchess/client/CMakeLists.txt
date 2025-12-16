@@ -14,10 +14,12 @@ include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
 file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
 file(GLOB_RECURSE CURRENT_SRCS *.cpp)
 file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
+file(GLOB_RECURSE CURRENT_UIRES uires/*.*)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("Resource Files" FILES ${CURRENT_RC})
+source_group("SoUI Resource" FILES ${CURRENT_UIRES})
 
 set(current_project "cnchess_client")
 add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
