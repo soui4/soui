@@ -1,0 +1,101 @@
+<?xml version="1.0" encoding="utf-8"?>
+<theme name="default">
+    <skin>
+        <gif name="ani_conn" src="file:Sprite/connect.gif"/>
+        <imglist name="skin_ready" src="file:image/ready.png"/>
+        <gif name="gif_chair" src="file:avatar/chair.gif"/>
+        <gif name="gif_avatar_male" src="file:avatar/male.gif"/>
+        <gif name="gif_avatar_female" src="file:avatar/female.gif"/>
+
+        <apng name="ani_vectory_1" src="file:Sprite/礼花1.png"/>"
+        <apng name="ani_vectory_2" src="file:Sprite/礼花2.png"/>"
+        <apng name="ani_vectory_3" src="file:Sprite/礼花3.png"/>"
+
+        <chess name="skin_chess" src="file:image/chess.png"/>
+
+        <imglist name="skin_digit" src="file:image/digital_score.png" states="12"/>
+        <imglist name="skin_clock" src="file:image/闹钟.png"/>
+        <imglist name="skin_clock_digital" src="file:image/闹钟数字.png" states="10"/>
+    </skin>
+    <template>
+        <tip wndclass="text" colorText="#FF0000FF" ownerLayout="anchor" pos="0,100,4" offset="-0.5,-0.5" layer="300000"/>
+        <avatar wndclass="window" layout="vbox" size="-1,-1" interval="5" gravity="center">
+            <window size="150,190">
+                <gifplayer pos="0,0" name="gif_avatar" skin="gif_chair" />
+                <img pos="|0,|0" offset="-0.5,-0.5" name="flag_ready" skin="skin_ready" visible="0"/>
+            </window>
+            <text name="txt_name" text=" " font="size:16"/>
+        </avatar>
+    </template>
+    <widgets>
+        <gifplayer name="sprite_connecting" skin="ani_conn" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="100" />
+        <gifplayer name="sprite_shuffle" skin="ani_shuffle" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="100" loopCount="1"/>
+        <gifplayer name="sprite_vectory" skin="ani_vectory_0" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="1000" loopCount="1" msgTransparent="1" />"
+        <imgbtn name="btn_start" skin="skin_btn_start" ownerLayout="anchor" pos="0,0,4" offset="-0.5,0"/>
+        
+        <img name="img_clock"  ownerLayout="anchor" pos="0,-100,4" offset="-0.5,-0.5" skin="skin_clock" fitImage="1" layout="hbox" gravity="center" layer="100000">
+            <window size="0,0" weight="1"/>
+            <include src="file:xml/clock_digit.xml" name="digit1" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
+            <include src="file:xml/clock_digit.xml" name="digit2" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
+            <window size="0,0" weight="1"/>
+        </img>
+    </widgets>
+    <anchors>
+        <!-- 卡牌中心点位置 -->
+        <card_center pos="0,-90,4" offsetX="-0.5" offsetY="-0.5"/>
+        <!-- 0号用户放牌中心位置 -->
+        <card_bottom pos="0,-105,7" offsetX="-0.5" offsetY="-1"/>
+        <!-- 1号用户放牌中心位置 -->
+        <card_left pos="0,-105,3" offsetX="0" offsetY="0"/>
+        <!-- 2号用户放牌中心位置 -->
+        <card_top pos="0,0,1" offsetX="-0.5" offsetY="0"/>
+        <!-- 3号用户放牌中心位置 -->
+        <card_right pos="0,-105,5" offsetX="-1" offsetY="0"/>
+
+        <!-- 0号用户出牌中心位置 -->
+        <putcard_bottom pos="0,-205,7" offsetX="-0.5" offsetY="-1"/>
+        <!-- 1号用户出牌左侧位置 -->
+        <putcard_left pos="90,-105,3" offsetX="0" offsetY="0"/>
+        <!-- 2号用户出牌中心位置 -->
+        <putcard_top pos="0,100,1" offsetX="-0.5" offsetY="0"/>
+        <!-- 3号用户出牌右侧位置 -->
+        <putcard_right pos="0,-105,5" offsetX="-1" offsetY="0"/>
+
+        <!-- 0号用户头像位置 -->
+        <avatar_bottom pos="0,-105,6" offsetX="0" offsetY="-1"/>
+        <!-- 1号用户头像位置 -->
+        <avatar_left pos="0,20,0" offsetX="0" offsetY="0"/>
+        <!-- 2号用户头像位置 -->
+        <avatar_top pos="0,20,2" offsetX="-1" offsetY="0"/>
+        <!-- 3号用户头像位置 -->
+        <avatar_right pos="0,-105,8" offsetX="-1" offsetY="-1"/>
+        <!-- 得分牌位置 -->
+        <score_card pos="95,0,6" offsetX="0" offsetY="-1"/>
+
+        <!-- 时钟位置 -->
+        <clock_bottom pos="150,-200,6" offsetX="0" offsetY="-0.5"/>
+        <clock_left pos="150,95,0" offsetX="0" offsetY="0"/>
+        <clock_top pos="-150,95,2" offsetX="-1" offsetY="0"/>
+        <clock_right pos="-150,-200,8" offsetX="-1" offsetY="-0.5"/>
+
+        <!-- 亮主花色显示位置 -->
+        <color_bottom pos="150,-310,6" offsetX="-1" offsetY="-1"/>
+        <color_left pos="150,0,0" offsetX="-1" offsetY="0"/>
+        <color_top pos="-150,0,2" offsetX="0" offsetY="0"/>
+        <color_right pos="-150,-310,8" offsetX="0" offsetY="-1"/>
+    </anchors>
+    <anims>
+        <anim name="clock_alarm" src="file:anim/clock_alarm.xml"/>
+    </anims>
+    <sounds>
+        <!--音效, processes分为男女声音，weight可以控制播放频率-->
+        <effects>
+            <file name="进入游戏" src="Sound/effect/ty_进入游戏-01.wav"/>
+            <file name="退出游戏" src="Sound/effect/ty_退出游戏-01.wav"/>
+            <file name="开始游戏" src="Sound/effect/Sj_开始-01.wav"/>
+        </effects>
+        <processes>
+
+        </processes>
+    </sounds>
+</theme>
