@@ -5,6 +5,7 @@
 #include <helper/obj-ref-impl.hpp>
 #include <vector>
 #include "Game.h"
+#include <cnchessProtocol.h>
 
 SNSBEGIN
 

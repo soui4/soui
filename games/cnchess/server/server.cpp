@@ -101,3 +101,21 @@ int _tmain(int argc, TCHAR **argv)
         pszCfg = argv[1];
     return run(pszCfg);
 }
+
+
+#if !defined(_WIN32) || defined(__MINGW32__) 
+int main(int argc, char **argv)
+{
+    if(argc>1)
+    {
+        #ifdef _UNICODE
+        SStringW strArg=S_CA2W(argv[1]);
+        return run(strArg);
+        #else
+        return run(argv[1]);
+        #endif
+    }else{
+        return run(NULL);
+    }
+}
+#endif //_WIN32

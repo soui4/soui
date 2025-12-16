@@ -8,24 +8,34 @@ include_directories(${PROJECT_SOURCE_DIR}/components)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
  
 # Source files 
-file(GLOB_RECURSE CURRENT_HEADERS *.h *.hpp)
-file(GLOB_RECURSE CURRENT_SRCS *.cpp)
-file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
+file(GLOB_RECURSE SERVER_HEADERS *.h *.hpp)
+file(GLOB_RECURSE SERVER_SOURCES *.cpp)
+file(GLOB_RECURSE SERVER_RESOURCES *.rc *.rc2)
 
-source_group("Header Files" FILES ${CURRENT_HEADERS})
-source_group("Source Files" FILES ${CURRENT_SRCS})
-source_group("Resource Files" FILES ${CURRENT_RC})
+source_group("Header Files" FILES ${SERVER_HEADERS})
+source_group("Source Files" FILES ${SERVER_SOURCES})
+source_group("Resource Files" FILES ${SERVER_RESOURCES})
 
 set(current_project "chess_server")
-add_executable(${current_project} ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_RC})
 
-add_dependencies(${current_project} soui4)
-link_directories(${SOUI_ROOT}/lib)
-target_link_libraries(${current_project} soui4 utilities4)
+# 创建可执行文件
+add_executable(${current_project} 
+    ${SERVER_SOURCES}
+    ${SERVER_HEADERS}
+    ${SERVER_RESOURCES}
+)
 
-if(CMAKE_SYSTEM_NAME MATCHES "Windows")
-    target_link_libraries(${current_project} ws2_32)
+# 链接库
+target_link_libraries(${current_project}
+    utilities4
+    chess_algorithm
+)
+
+
+if(NOT CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_link_libraries(${current_project} swinx)
 endif()
+
 
 set_target_properties (${current_project} PROPERTIES
     FOLDER "games/cnchess"

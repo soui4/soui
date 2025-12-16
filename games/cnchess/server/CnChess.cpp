@@ -7,9 +7,8 @@
 
 SNSBEGIN
 
-CCnChess::CCnChess()
+CCnChess::CCnChess():CGameTable(PLAYER_COUNT)
 {
-    m_clients.assign(2, nullptr); // 象棋只有两个玩家：红方和黑方
     m_state = CS_WAITSTART;
     
     // 初始化棋盘
