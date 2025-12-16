@@ -119,7 +119,7 @@ BOOL WebSocketClient::ConnectToServer(LPCSTR pszSvr, LPCSTR args)
 	// 连接到服务器
 	ClientOption option = { FALSE, NULL, TRUE, TRUE, TRUE }; // 非安全连接
 	char szPath[256];
-	snprintf(szPath, sizeof(szPath), "/upgrade/?%s", args);
+	snprintf(szPath, sizeof(szPath), "/cnchess/?%s", args);
 
 	int nRet = m_pWsClient->connectTo(m_szServerIP, szPath, m_wPort, "", option);
 	if (nRet != 0)

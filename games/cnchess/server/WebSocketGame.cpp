@@ -77,7 +77,7 @@ BOOL WebSocketSvrListener::onConnected(ISvrConnection* pConn, const char* uriPat
 		return FALSE;
 
 	// 检查路径是否正确
-	if (strcmp(uriPath, "/upgrade/") != 0)
+	if (strcmp(uriPath, "/cnchess/") != 0)
 		return FALSE;
 
 	// 创建客户端对象
