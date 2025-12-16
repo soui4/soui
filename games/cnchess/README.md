@@ -21,10 +21,10 @@ cnchess/
 │   ├── stdafx.cpp      # 预编译头源文件
 │   └── CMakeLists.txt
 ├── server/             # 服务器程序
+│   ├── CnChess.h       # 象棋游戏逻辑声明 (替代原来的Upgrade类)
+│   ├── CnChess.cpp     # 象棋游戏逻辑实现
 │   ├── ChessServer.h   # 服务器主类声明
 │   ├── ChessServer.cpp # 服务器主类实现
-│   ├── ChessGame.h     # 游戏逻辑声明
-│   ├── ChessGame.cpp   # 游戏逻辑实现
 │   ├── server.cpp      # 服务器入口
 │   ├── stdafx.h        # 预编译头文件
 │   ├── stdafx.cpp      # 预编译头源文件
@@ -59,7 +59,7 @@ make
 - [x] 象棋算法基础类(ChessAlgorithm.h/cpp)
 - [x] UI资源文件结构
 - [x] 服务器框架(ChessServer.h/cpp)
-- [x] 服务器游戏逻辑(ChessGame.h/cpp)
+- [x] 服务器游戏逻辑(CnChess.h/cpp，替代了原来的CUpgrade类)
 - [x] 算法测试模块(test/)
 - [ ] 棋子资源图片
 - [ ] 完整的游戏逻辑实现

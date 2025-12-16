@@ -29,5 +29,5 @@ if(CMAKE_SYSTEM_NAME MATCHES "Windows")
 endif()
 
 set_target_properties (${current_project} PROPERTIES
-    FOLDER "games/chess"
+    FOLDER "games/cnchess"
 )

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "WebSocketGame.h"
-#include "ChessGame.h"
+#include "CnChess.h"
 
 // 象棋游戏服务器类
 class CChessServer : public CWebSocketGame
