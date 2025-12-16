@@ -7,6 +7,7 @@ include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 include_directories(${PROJECT_SOURCE_DIR}/components)
 include_directories(${PROJECT_SOURCE_DIR}/controls.extend)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../algorithm)
 include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
 
 # Source files 

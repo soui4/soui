@@ -9,7 +9,7 @@ file(GLOB_RECURSE CURRENT_SRCS *.cpp)
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 
-set(current_project "chess_algorithm")
+set(current_project "cnchess_algorithm")
 add_library(${current_project} STATIC ${CURRENT_HEADERS} ${CURRENT_SRCS})
 
 set_target_properties (${current_project} PROPERTIES

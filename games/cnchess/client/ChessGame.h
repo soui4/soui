@@ -9,14 +9,22 @@
 #include "ConnListener-i.h"
 #include <sobject/Sobject.hpp>
 #include <helper/obj-ref-impl.hpp>
+#include <ChessLayout.h>
 
 class CMainDlg;
+
+/**
+ * @brief 中国象棋游戏核心逻辑类
+ * 
+ * 该类负责处理中国象棋游戏的核心逻辑，包括：
+ * 1. 游戏状态管理
+ * 2. 玩家交互处理
+ * 3. 游戏数据管理
+ * 4. 与UI的交互
+ */
 class CChessGame : public TObjRefImpl<SObject>, public WebSocketClient::IListener, public IConnListener2, public IAnimatorGroupListerer
 {
     DEF_SOBJECT(SObject, L"chessgame")     // 定义SObject的类名和类别名
-public:
-    CChessGame(CMainDlg* pMainDlg, SGameTheme* pTheme);
-    virtual ~CChessGame();
     
     /**
      * @brief 游戏阶段枚举
@@ -25,10 +33,32 @@ public:
         STAGE_INIT=0,       ///< 初始化阶段
         STAGE_CONNECTING,   ///< 正在连接服务器
         STAGE_CONTINUE,     ///< 游戏尚未开始
+        STAGE_WAIT_START,   ///< 等待开始
         STAGE_PLAYING,      ///< 游戏中
     };
     
-   
+    /**
+     * @brief 座位索引枚举
+     */
+    enum SEAT_INDEX{
+        SEAT_INDEX_ME = 0,      ///< 自己的位置
+        SEAT_INDEX_BOTTOM = 0,  ///< 界面底部座位，等于自己
+        SEAT_INDEX_TOP = 1,     ///< 界面顶部座位
+    };
+
+public:
+    /**
+     * @brief 构造函数
+     * @param pMainDlg 主窗口指针
+     * @param pTheme 游戏主题指针
+     */
+    CChessGame(CMainDlg* pMainDlg, SGameTheme* pTheme);
+    
+    /**
+     * @brief 析构函数
+     */
+    virtual ~CChessGame();
+    
     /**
      * @brief 初始化游戏
      * @param pGameBoard 游戏面板窗口指针
@@ -82,8 +112,103 @@ public:
      * @return 是否处理成功
      */
     BOOL OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data) override;    
-
+    
+public:
+    /**
+     * @brief 事件映射表
+     */
+    EVENT_MAP_BEGIN()
+        EVENT_CHECK_SENDER_ROOT(m_pGameBoard)
+    EVENT_MAP_BREAK()
+public:
+    /**
+     * @brief 定时器事件处理
+     * @param uIDEvent 定时器ID
+     */
+    void OnTimer(UINT_PTR uIDEvent){}
+    
+    /**
+     * @brief 消息映射表
+     */
+    BEGIN_MSG_MAP_EX(UpgradeGame)
+        MSG_WM_TIMER(OnTimer)
+    END_MSG_MAP()
 protected:
+    /**
+     * @brief 处理游戏开始消息
+     * @param pData 消息数据指针
+     * @param nSize 消息数据大小
+     */
+    void OnGameStart(const void *pData, int nSize);
+    
+    /**
+     * @brief 处理走棋消息
+     * @param pData 消息数据指针
+     * @param nSize 消息数据大小
+     */
+    void OnMoveChess(const void *pData, int nSize);
+    
+    /**
+     * @brief 处理悔棋请求消息
+     * @param pData 消息数据指针
+     * @param nSize 消息数据大小
+     */
+    void OnUndoRequest(const void *pData, int nSize);
+    
+    /**
+     * @brief 处理悔棋响应消息
+     * @param pData 消息数据指针
+     * @param nSize 消息数据大小
+     */
+    void OnUndoResponse(const void *pData, int nSize);
+    
+    /**
+     * @brief 处理游戏结束消息
+     * @param pData 消息数据指针
+     * @param nSize 消息数据大小
+     */
+    void OnGameOver(const void *pData, int nSize);
+    
+    /**
+     * @brief 登录应答消息处理函数
+     * @param pData 消息数据指针
+     * @param nSize 消息数据大小
+     */
+    void OnLoginAck(const void *pData, int nSize);
+    
+    /**
+     * @brief 头像应答消息处理函数
+     * @param pData 消息数据指针
+     * @param nSize 消息数据大小
+     */
+    void OnAvatarAck(const void *pData, int nSize);
+    
+    /**
+     * @brief 更新时钟显示
+     * @param nSecond 剩余秒数
+     */
+    void UpdateClock(int nSecond);
+    
+    /**
+     * @brief 显示提示信息
+     * @param strTip 提示信息
+     */
+    void PlayTip(const SStringT &strTip);
+    
+    /**
+     * @brief 通过WebSocket发送消息
+     * @param dwType 消息类型
+     * @param lpData 消息数据指针
+     * @param dwSize 消息数据大小
+     */
+    void wsSendMsg(DWORD dwType, LPVOID lpData, DWORD dwSize);
+    
+    /**
+     * @brief 播放特效音效
+     * @param pszSound 音效名称
+     */
+    void PlayEffectSound(LPCWSTR pszSound);
+    
 private:
     CMainDlg* m_pMainDlg;               ///< 主窗口指针
     SWindow * m_pGameBoard;             ///< 游戏面板

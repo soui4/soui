@@ -14,7 +14,7 @@ file(GLOB CNCHESS_TEST_SRC
 add_executable(cnchess_test ${CNCHESS_TEST_SRC})
 
 target_link_libraries(cnchess_test
-    chess_algorithm gtest
+    cnchess_algorithm gtest
 )
 
 # 设置库属性

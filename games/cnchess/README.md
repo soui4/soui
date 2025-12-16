@@ -21,7 +21,7 @@ cnchess/
 │   ├── avatar/         # 用户头像资源
 │   ├── MainDlg.h       # 主对话框声明
 │   ├── MainDlg.cpp     # 主对话框实现
-│   ├── ChessGame.h     # 游戏逻辑声明
+│   ├── ChessGame.h     # 游戏逻辑声明（基于升级游戏框架同步）
 │   ├── ChessGame.cpp   # 游戏逻辑实现
 │   ├── LoginDlg.h      # 登录对话框声明
 │   ├── LoginDlg.cpp    # 登录对话框实现
@@ -70,7 +70,7 @@ make
 - [x] CMakeLists.txt配置文件创建
 - [x] 主程序入口(main.cpp)
 - [x] 主对话框(MainDlg.h/cpp)
-- [x] 游戏逻辑框架(ChessGame.h/cpp)
+- [x] 游戏逻辑框架(ChessGame.h/cpp)，基于升级游戏框架同步实现
 - [x] 登录对话框(LoginDlg.h/cpp)
 - [x] 大厅处理器(LobbyHandler.h/cpp)
 - [x] WebSocket客户端(WebSocketClient.h/cpp)

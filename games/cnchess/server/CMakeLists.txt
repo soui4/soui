@@ -28,7 +28,7 @@ add_executable(${current_project}
 # 链接库
 target_link_libraries(${current_project}
     utilities4
-    chess_algorithm
+    cnchess_algorithm
 )
 
 

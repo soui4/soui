@@ -1,5 +1,6 @@
 ﻿#include "stdafx.h"
 #include "WebSocketClient.h"
+#include <protocol.h>
 #include <tchar.h>
 #include <string.h>
 

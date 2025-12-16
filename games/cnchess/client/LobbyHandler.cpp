@@ -1,7 +1,7 @@
 ﻿#include "stdafx.h"
 #include "LobbyHandler.h"
 #include "myprofile.h"
-#include <protocol.h>
+#include <cnchessProtocol.h>
 #include <helper/slog.h>
 #include <helper/SAdapterBase.h>
 #include <map>
@@ -223,20 +223,20 @@ BOOL LobbyHandler::OnLoginAck(const void *lpData, int nSize)
     MyProfile *pMyProfile = MyProfile::getSingletonPtr();
     pMyProfile->SetUID(pAck->uid);
     SStringT strInfo;
-    if(pAck->dwProps[PI_RULE_LEVEL_5_10_K])
-    {
-        strInfo = _T("只打5，10，K");
-    }else
-    {
-        strInfo = _T("打2-A");
-    }
-    if(pAck->dwProps[PI_RULE_2_MAIN]){
-        strInfo += _T("，2为常主");
-    }
-    if(pAck->dwProps[PI_RULE_REBEL])
-    {
-        strInfo += _T("，支持反主");
-    }
+    // if(pAck->dwProps[PI_RULE_LEVEL_5_10_K])
+    // {
+    //     strInfo = _T("只打5，10，K");
+    // }else
+    // {
+    //     strInfo = _T("打2-A");
+    // }
+    // if(pAck->dwProps[PI_RULE_2_MAIN]){
+    //     strInfo += _T("，2为常主");
+    // }
+    // if(pAck->dwProps[PI_RULE_REBEL])
+    // {
+    //     strInfo += _T("，支持反主");
+    // }
     m_pRoot->FindChildByName(L"txt_table_info")->SetWindowText(strInfo);
     return TRUE;
 }

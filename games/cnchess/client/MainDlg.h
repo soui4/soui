@@ -62,7 +62,7 @@ public:
     END_MSG_MAP()
 
 private:
-    UpgradeGame* m_pUpgradeGame;  // 升级游戏核心逻辑
+    CChessGame* m_pUpgradeGame;  // 升级游戏核心逻辑
     LobbyHandler* m_pLobbyHandler;
         // 网络通信
     WebSocketClient m_webSocketClient;

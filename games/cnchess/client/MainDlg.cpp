@@ -16,7 +16,7 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 , m_pTheme(pTheme)
 , m_bMute(FALSE)
 {
-    m_pUpgradeGame = new UpgradeGame(this,pTheme);
+    m_pUpgradeGame = new CChessGame(this,pTheme);
     m_pLobbyHandler = new LobbyHandler();
     m_webSocketClient.SetMessageHandler(this);
 }
