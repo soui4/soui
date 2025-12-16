@@ -5,7 +5,7 @@
 ## 项目结构
 
 ```
-chess/
+cnchess/
 ├── algorithm/          # 象棋算法实现
 │   ├── ChessAlgorithm.h
 │   ├── ChessAlgorithm.cpp
@@ -30,6 +30,9 @@ chess/
 │   ├── stdafx.cpp      # 预编译头源文件
 │   ├── config.ini      # 服务器配置文件
 │   └── CMakeLists.txt
+├── test/               # 算法测试模块
+│   ├── ChessAlgorithmTest.cpp # 算法测试实现
+│   └── CMakeLists.txt  # 测试模块构建配置
 └── CMakeLists.txt      # 顶层CMake配置
 ```
 
@@ -57,6 +60,7 @@ make
 - [x] UI资源文件结构
 - [x] 服务器框架(ChessServer.h/cpp)
 - [x] 服务器游戏逻辑(ChessGame.h/cpp)
+- [x] 算法测试模块(test/)
 - [ ] 棋子资源图片
 - [ ] 完整的游戏逻辑实现
 - [ ] 网络对战功能
@@ -67,6 +71,11 @@ make
 1. 编译服务器程序
 2. 修改config.ini配置文件
 3. 运行服务器程序: ./chess_server [config_file]
+
+## 测试模块使用说明
+
+1. 编译测试程序
+2. 运行测试程序: ./cnchess_test
 
 ## 后续工作
 
@@ -86,3 +95,4 @@ make
 - 窗口管理
 - 资源管理系统
 - WebSocket网络通信
+- Google Test单元测试框架

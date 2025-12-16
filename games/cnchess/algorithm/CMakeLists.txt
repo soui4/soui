@@ -13,5 +13,5 @@ set(current_project "chess_algorithm")
 add_library(${current_project} STATIC ${CURRENT_HEADERS} ${CURRENT_SRCS})
 
 set_target_properties (${current_project} PROPERTIES
-    FOLDER "games/chess"
+    FOLDER "games/cnchess"
 )
