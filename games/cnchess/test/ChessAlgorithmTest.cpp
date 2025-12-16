@@ -1,6 +1,9 @@
 #include <gtest/gtest.h>
-#include "../algorithm/Chessman.h"
-#include "../algorithm/ChessLayout.h"
+#include <windows.h>
+#include <tchar.h>
+#include <Chessman.h>
+#include <ChessLayout.h>
+
 
 // 测试棋盘初始化
 TEST(ChessAlgorithmTest, BoardInitialization)

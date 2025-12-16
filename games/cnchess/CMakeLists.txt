@@ -1,6 +1,6 @@
 add_subdirectory(algorithm)
 if(NOT SOUI_ENABLE_GAME_TEST)
-#add_subdirectory(test)
+add_subdirectory(test)
 endif()
 #add_subdirectory(client)
 #add_subdirectory(server)
