@@ -9,7 +9,7 @@ PropBag * SSingleton<PropBag>::ms_Singleton = NULL;
 
 PropBag::PropBag()
 {
-    m_wPort=3310;	//默认端口号
+    m_wPort=DEF_PORT;	//默认端口号
     
 	memset(m_dwProps,0,sizeof(m_dwProps));
 
@@ -44,7 +44,7 @@ void PropBag::Init(LPCTSTR pszPropXml)
     m_dwProps[PROPID_MIN_STEPS] = xmlNode.attribute(L"min_steps").as_int(10);	//默认最小步数为10步
     m_dwProps[PROPID_EXCHANGABLE] = xmlNode.attribute(L"exchangable").as_int(0);	//默认不可交换颜色
 
-    m_wPort = xmlNode.attribute(L"port").as_int(3310);     //默认端口号
+    m_wPort = xmlNode.attribute(L"port").as_int(DEF_PORT);     //默认端口号
 }
 WORD PropBag::GetPort() const
 {

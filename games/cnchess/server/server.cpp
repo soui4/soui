@@ -76,7 +76,9 @@ int run(LPCTSTR pszCfg){
             log->start();
         }
         
-        int nPort = 8080; // 默认端口
+        PropBag *propBag = new PropBag;
+        propBag->Init(pszCfg);
+        int nPort = propBag->GetPort();
         SLOGI() << "start chess server on port " << nPort;
         CWebSocketGame game;
         g_game = &game;
@@ -87,8 +89,8 @@ int run(LPCTSTR pszCfg){
         signal(SIGINT, signalHandler);
         signal(SIGTERM, signalHandler);
 #endif
-        
         BOOL bRet = game.GameStart(nPort);
+        delete propBag;
         SLOGI() << " chess server quit, ret=" << bRet;
         return bRet ? 0 : 1;
     }
