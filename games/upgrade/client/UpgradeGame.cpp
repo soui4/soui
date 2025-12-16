@@ -49,7 +49,6 @@ UpgradeGame::UpgradeGame(CMainDlg* pMainDlg, SGameTheme* pTheme)
     ,m_bShowPrevRound(FALSE)
     ,m_putCard(this)
     ,m_roundResult(RESULT_UNKNOWN)
-    ,m_bSound(TRUE)
 {
     memset(m_pUserInfo, 0, sizeof(m_pUserInfo));
     m_curShowMain.index = -1;
@@ -2009,8 +2008,6 @@ SImageWnd* UpgradeGame::GetSeatFlag(int nSeat,int flagId){
  */
 void UpgradeGame::PlayEffectSound(LPCWSTR pszSound)
 {
-    if(!m_bSound)
-        return;
     SStringW strFile = m_pTheme->GetEffectSoundFile(pszSound);
     if(!strFile.IsEmpty()){
         TCHAR szResPrefix[MAX_PATH]={0};
@@ -2031,8 +2028,6 @@ void UpgradeGame::PlayEffectSound(LPCWSTR pszSound)
  */
 void UpgradeGame::PlayProcessSound(LPCWSTR pszSound,int nSex)
 {
-    if(!m_bSound)
-        return;
     SStringW strFile = m_pTheme->GetProcSoundFile(nSex == SEX_MALE, pszSound);
     if(!strFile.IsEmpty()){
         TCHAR szResPrefix[MAX_PATH]={0};
