@@ -55,7 +55,6 @@ protected:
     BOOL IsCheckmate(BOOL bRed);
 
 protected:
-    std::vector<PWSCLIENT> m_clients;
     ChessState m_state;
 
     // 象棋游戏数据

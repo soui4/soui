@@ -13,7 +13,7 @@ translucent="1"
     
         <text text="服务器地址:"/>
         <window layout="hbox" interval="5" gravity="center">        
-            <edit name="edt_svr" text="soui.com.cn:3311" columnWeight="1" margin="2"/>
+            <edit name="edt_svr" text="localhost:3311" columnWeight="1" margin="2"/>
             <button name="btn_svr_local" size="50,30" text="本地"/>
         </window>
         <text text="用户名:"/>

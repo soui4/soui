@@ -1,4 +1,4 @@
-﻿//stamp:0ee36bacb956d5e4
+﻿//stamp:0ee36e803cdab34c
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -88,8 +88,6 @@ struct _R{
 		 const wchar_t * room_container;
 		 const wchar_t * seat_0;
 		 const wchar_t * seat_1;
-		 const wchar_t * seat_2;
-		 const wchar_t * seat_3;
 		 const wchar_t * seat_ready;
 		 const wchar_t * tileview_lobby;
 		 const wchar_t * txt_anchor_detail;
@@ -129,8 +127,6 @@ struct _R{
 		int room_container;
 		int seat_0;
 		int seat_1;
-		int seat_2;
-		int seat_3;
 		int seat_ready;
 		int tileview_lobby;
 		int txt_anchor_detail;
@@ -162,14 +158,8 @@ struct _R{
 	}color;
 	struct _string{
 		int about;
-		int err_putcard_0;
-		int err_putcard_1;
-		int err_putcard_2;
-		int err_putcard_3;
-		int err_putcard_4;
 		int lobby;
 		int login;
-		int msg_discount;
 		int title;
 		int upgrade;
 		int ver;
@@ -198,8 +188,6 @@ struct _R R={
 		L"room_container",
 		L"seat_0",
 		L"seat_1",
-		L"seat_2",
-		L"seat_3",
 		L"seat_ready",
 		L"tileview_lobby",
 		L"txt_anchor_detail",
@@ -240,8 +228,6 @@ struct _R R={
 		65548,
 		10,
 		11,
-		12,
-		13,
 		65550,
 		65549,
 		65560,
@@ -279,13 +265,7 @@ struct _R R={
 		2,
 		3,
 		4,
-		5,
-		6,
-		7,
-		8,
-		9,
-		10,
-		11
+		5
 	}
 	
 };

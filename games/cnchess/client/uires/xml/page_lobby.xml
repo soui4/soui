@@ -9,7 +9,7 @@
             <img skin="skin_table">
                 <img name="img_playing" pos="|0,|-10" offset="-0.5,-0.5" skin="skin_playing" visible="0"/>
             </img>
-            <button size="0,-2" weight="1" name="seat_2" id="12" text="2" cursor="hand">
+            <button size="0,-2" weight="1" name="seat_1" id="11" text="1" cursor="hand">
                 <img name="seat_ready" skin="skin_handup" visible="0"/>
             </button>
         </window>
