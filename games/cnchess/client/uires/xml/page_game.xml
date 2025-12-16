@@ -1,0 +1,3 @@
+<?xml version="1.0" encoding="utf-8"?>
+<page title="@string/cnchess" name="game_container" layout="anchor" skin="skin_back" enableLayer="1" clipClient="1">
+</page>

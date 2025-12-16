@@ -4,7 +4,7 @@
   <ver value="1.0" />
   <login value="登录" />
   <lobby value="大厅" />
-  <upgrade value="开心象棋" />
+  <cnchess value="开心象棋" />
   <about value="关于" />
 
 </string>
