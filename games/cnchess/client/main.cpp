@@ -23,7 +23,10 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 
     int nRet = 0;
     SApplication app(hInstance);
-    
+    // Register external window class
+    app.RegisterSkinClass<SSkinAni>();
+
+    app.RegisterWindowClass<SGifPlayer>();
     SStringT appDir = app.GetAppDir();
 
     SAppCfg cfg;
@@ -58,13 +61,33 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 #endif
     // Show main dialog
     {
+        MyProfile *pMyProfile = new MyProfile();
+
         SAutoRefPtr<SGameTheme> theme(new SGameTheme(),FALSE);
-        SStringT themeDir = appDir + _T("/def_theme");
+        SStringT themeDir = appDir + _T("/cnchess/def_theme");
         if(GetFileAttributes(themeDir) == INVALID_FILE_ATTRIBUTES)
         {
             themeDir = srcDir + _T("/def_theme");
         }
         theme->Load(themeDir);
+
+        // 加载头像
+        static LPCTSTR kMyAvatar = _T("/avatar/myshow.gif");
+        SStringT strAvatarPath = appDir + kMyAvatar;
+        if(GetFileAttributes(strAvatarPath) == INVALID_FILE_ATTRIBUTES){
+            strAvatarPath = srcDir + kMyAvatar;
+        }
+        FILE *f = _tfopen(strAvatarPath, _T("rb"));
+        if(f){
+            fseek(f, 0, SEEK_END);
+            int nSize = ftell(f);
+            fseek(f, 0, SEEK_SET);
+            BYTE *pData = new BYTE[nSize];
+            fread(pData, 1, nSize, f);
+            pMyProfile->SetAvatarData(pData, nSize);
+            fclose(f);
+            delete[] pData;
+        }
 
         CMainDlg dlgMain(theme);
         dlgMain.Create(GetActiveWindow());
@@ -74,6 +97,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
             dlgMain.ShowWindow(SW_SHOWNORMAL);
             nRet = app.Run(dlgMain.m_hWnd);
         }
+        delete pMyProfile;
     }
 
     OleUninitialize();

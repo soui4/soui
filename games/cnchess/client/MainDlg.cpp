@@ -1,3 +1,7 @@
+﻿// MainDlg.cpp : implementation of the CMainDlg class
+//
+/////////////////////////////////////////////////////////////////////////////
+
 #include "stdafx.h"
 #include "MainDlg.h"    
 #include "LoginDlg.h"
@@ -12,14 +16,14 @@ CMainDlg::CMainDlg(SGameTheme* pTheme)
 , m_pTheme(pTheme)
 , m_bMute(FALSE)
 {
-    m_pChessGame = new CChessGame(this, pTheme);
+    m_pUpgradeGame = new UpgradeGame(this,pTheme);
     m_pLobbyHandler = new LobbyHandler();
     m_webSocketClient.SetMessageHandler(this);
 }
 
 CMainDlg::~CMainDlg()
 {
-    delete m_pChessGame;
+    delete m_pUpgradeGame;
     delete m_pLobbyHandler;
 }
 
@@ -30,12 +34,15 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
         OnClose();
         return FALSE;
     }
-    
-    SStringT strTitle = SStringT().Format(_T("中国象棋"));
+    MyProfile* myProfile = MyProfile::getSingletonPtr();
+    myProfile->SetSex(dlgLogin.m_cSex);
+    myProfile->SetName(dlgLogin.m_strName);
+
+    SStringT strTitle = SStringT().Format(_T("用户:%s"), myProfile->GetName().c_str());
     FindChildByName(L"txt_title")->SetWindowText(strTitle);
     SetWindowText(strTitle);
     m_pLobbyHandler->Init(FindChildByName(L"room_container"), &m_webSocketClient);
-    m_pChessGame->Init(FindChildByName(L"game_container"), &m_webSocketClient);
+    m_pUpgradeGame->Init(FindChildByName(L"game_container"), &m_webSocketClient);
 
     SStringA svr = S_CT2A(dlgLogin.m_strSvr);
     BOOL bRet = m_webSocketClient.ConnectToServer(svr, "");
@@ -43,33 +50,124 @@ BOOL CMainDlg::OnInitDialog(HWND hWnd, LPARAM lParam)
     return TRUE;
 }
 
+//TODO:消息映射
 void CMainDlg::OnClose()
 {
-    CSimpleWnd::DestroyWindow();
+    SNativeWnd::DestroyWindow();
 }
 
 void CMainDlg::OnMaximize()
 {
-    SendFrameNofityState(WN_MAXIMIZE);
+    SendMessage(WM_SYSCOMMAND, SC_MAXIMIZE);
 }
 
 void CMainDlg::OnRestore()
 {
-    SendFrameNofityState(WN_RESTORE);
+    SendMessage(WM_SYSCOMMAND, SC_RESTORE);
 }
 
 void CMainDlg::OnMinimize()
 {
-    SendFrameNofityState(WN_MINIMIZE);
+    SendMessage(WM_SYSCOMMAND, SC_MINIMIZE);
 }
 
 void CMainDlg::OnSize(UINT nType, CSize size)
 {
-    SendFrameNofitySize(nType, size);
-    SetMsgHandled(FALSE);
+    SetMsgHandled(FALSE);   
+    SWindow *pBtnMax = FindChildByName(L"btn_max");
+    SWindow *pBtnRestore = FindChildByName(L"btn_restore");
+    if(!pBtnMax || !pBtnRestore) return;
+    
+    if (nType == SIZE_MAXIMIZED)
+    {
+        pBtnRestore->SetVisible(TRUE);
+        pBtnMax->SetVisible(FALSE);
+    }
+    else if (nType == SIZE_RESTORED)
+    {
+        pBtnRestore->SetVisible(FALSE);
+        pBtnMax->SetVisible(TRUE);
+    }
 }
-
 void CMainDlg::OnScaleChanged(int nScale)
 {
-    SDpiHandler<CMainDlg>::OnScaleChanged(nScale);
 }
+
+BOOL CMainDlg::OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE>> data)
+{
+	STaskHelper::post(GetMsgLoop(), this, &CMainDlg::_OnMessage, dwType, data);
+    return TRUE;
+}
+
+void CMainDlg::OnConnected()
+{
+    SLOGI()<<"Connected to server";
+    m_pLobbyHandler->OnConnected();
+    m_pUpgradeGame->OnConnected();
+}
+
+void CMainDlg::OnDisconnected()
+{
+    SLOGI()<<"Disconnected from server";
+    m_pLobbyHandler->OnDisconnected();
+    m_pUpgradeGame->OnDisconnected();
+}
+
+BOOL CMainDlg::_OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data)
+{
+    BOOL bRet = FALSE;
+    const BYTE *pData = data?data->data():NULL;
+    int nSize = data?data->size():0;
+    switch(dwType)
+    {
+    case GMT_CONNECT:
+        {
+            if (nSize == sizeof(WORD))
+            {
+                WORD wCode = *((WORD*)pData);
+                if (wCode == 0)
+                {
+                    // 连接成功
+                    OnConnected();
+                }
+                else
+                {
+                    // 连接失败
+                    OnDisconnected();
+                }
+            }
+        }
+        break;
+    case GMT_SOCKCLOSE:
+        {
+            // 连接断开
+            OnDisconnected();
+        }
+        break;
+    }
+    bRet = m_pLobbyHandler->OnMessage(dwType, data);
+    if(bRet) return TRUE;
+    bRet = m_pUpgradeGame->OnMessage(dwType, data);
+    return bRet;
+}
+
+void CMainDlg::OnBtnMute()
+{
+    FindChildByName(L"btn_mute")->SetVisible(FALSE);
+    FindChildByName(L"btn_unmute")->SetVisible(TRUE);
+    m_bMute = TRUE;
+}
+
+void CMainDlg::OnBtnUnmute()
+{
+    FindChildByName(L"btn_mute")->SetVisible(TRUE);
+    FindChildByName(L"btn_unmute")->SetVisible(FALSE);
+    m_bMute = FALSE;
+}
+
+void CMainDlg::PlayWave(LPCTSTR pszSound)
+{
+    if(m_bMute) return;
+    ::PlaySound(pszSound,NULL,SND_ASYNC | SND_NOSTOP | SND_FILENAME);
+}
+

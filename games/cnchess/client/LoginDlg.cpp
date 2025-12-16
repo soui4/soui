@@ -1,33 +1,35 @@
 #include "stdafx.h"
 #include "LoginDlg.h"
 
-CLoginDlg::CLoginDlg()
-    : SHostWnd(_T("LAYOUT:XML_LOGIN"))
-    , m_cSex(0)
-{
-}
-
-CLoginDlg::~CLoginDlg()
+CLoginDlg::CLoginDlg() : SHostDialog(_T("LAYOUT:XML_LOGIN"))
 {
 }
 
 BOOL CLoginDlg::OnInitDialog(HWND wndFocus, LPARAM lInitParam)
 {
-    FindChildByName2<SComboView>(L"cbo_sex")->SetCurSel(0);
-    FindChildByName2<SEdit>(L"edit_name")->SetWindowText(_T("象棋爱好者"));
-    FindChildByName2<SEdit>(L"edit_svr")->SetWindowText(_T("ws://127.0.0.1:8080"));
     return TRUE;
 }
 
-void CLoginDlg::OnBtnOK()
+void CLoginDlg::OnClose()
 {
-    m_cSex = FindChildByName2<SComboView>(L"cbo_sex")->GetCurSel();
-    m_strName = FindChildByName2<SEdit>(L"edit_name")->GetWindowText();
-    m_strSvr = FindChildByName2<SEdit>(L"edit_svr")->GetWindowText();
+    EndDialog(IDCANCEL);
+}
+
+void CLoginDlg::OnLogin()
+{
+    SWindow * pEdtSvr = FindChildByName2<SEdit>(L"edt_svr");
+    SWindow * pEdtName = FindChildByName2<SEdit>(L"edt_name");
+    m_strSvr = pEdtSvr->GetWindowText();
+    m_strName = pEdtName->GetWindowText();
+    SComboBox * pComboSex = FindChildByName2<SComboBox>(L"cbx_sex");
+    int iSel = pComboSex->GetCurSel();
+    m_cSex = pComboSex->GetItemData(iSel);
+
     EndDialog(IDOK);
 }
 
-void CLoginDlg::OnBtnCancel()
+void CLoginDlg::OnBtnLocal()
 {
-    EndDialog(IDCANCEL);
+    SWindow * pEdtSvr = FindChildByName2<SEdit>(L"edt_svr");
+    pEdtSvr->SetWindowText(_T("127.0.0.1:3310"));
 }

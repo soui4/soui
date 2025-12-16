@@ -5,6 +5,7 @@ include_directories(${PROJECT_SOURCE_DIR}/config)
 include_directories(${PROJECT_SOURCE_DIR}/utilities/include)
 include_directories(${PROJECT_SOURCE_DIR}/SOUI/include)
 include_directories(${PROJECT_SOURCE_DIR}/components)
+include_directories(${PROJECT_SOURCE_DIR}/controls.extend)
 include_directories(${CMAKE_CURRENT_SOURCE_DIR}/../include)
 include_directories(${PROJECT_SOURCE_DIR}/soui-sys-resource)
 
@@ -17,17 +18,24 @@ source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
-set(current_project "chess")
-add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_RC})
-
-add_dependencies(${current_project} soui4)
+set(current_project "cnchess_client")
+add_executable(${current_project} WIN32 ${CURRENT_HEADERS} ${CURRENT_SRCS} ${CURRENT_SOUIS} ${CURRENT_RC})
+ 
+add_dependencies(${current_project} soui4 ExtendCtrls)
 link_directories(${SOUI_ROOT}/lib)
-target_link_libraries(${current_project} 
-    soui4 
-    utilities4
-    ws2_32
-    winmm
-)
+target_link_libraries(${current_project} soui4 utilities4 ExtendCtrls cnchess_algorithm)
+
+if(CMAKE_SYSTEM_NAME MATCHES "Windows")
+    target_link_libraries(${current_project} winmm)
+    if(MSVC)
+    set(DPI_AWARE_MANIFEST "${PROJECT_SOURCE_DIR}/__cmake/dpi_aware.manifest")
+    set_target_properties(${current_project} PROPERTIES
+            LINK_FLAGS "/MANIFEST:EMBED /MANIFESTINPUT:${DPI_AWARE_MANIFEST}"
+        )
+    endif(MSVC)
+else()
+    target_link_libraries(${current_project} swinx)
+endif()
 
 set_target_properties (${current_project} PROPERTIES
     FOLDER "games/cnchess"
@@ -37,5 +45,5 @@ set_target_properties (${current_project} PROPERTIES
 add_custom_command(TARGET ${current_project} POST_BUILD 
     COMMAND ${CMAKE_COMMAND} -E copy_directory 
     ${CMAKE_CURRENT_SOURCE_DIR}/def_theme 
-    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/def_theme
+    ${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/$<CONFIGURATION>/cnchess/def_theme
 )

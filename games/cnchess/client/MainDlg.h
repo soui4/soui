@@ -1,3 +1,6 @@
+﻿// MainDlg.h : interface of the CMainDlg class
+//
+/////////////////////////////////////////////////////////////////////////////
 #pragma once
 
 #include <helper/SDpiHelper.hpp>
@@ -5,6 +8,7 @@
 #include "WebSocketClient.h"
 #include "LobbyHandler.h"
 #include "ChessGame.h"
+#include "myprofile.h"
 
 class CMainDlg : public SHostWnd
                , public SDpiHandler<CMainDlg>
@@ -42,7 +46,7 @@ public:
         EVENT_NAME_COMMAND(L"btn_restore", OnRestore)
         EVENT_NAME_COMMAND(L"btn_mute", OnBtnMute)
         EVENT_NAME_COMMAND(L"btn_unmute", OnBtnUnmute)  
-        CHAIN_EVENT_MAP_MEMBER(*m_pChessGame)
+        CHAIN_EVENT_MAP_MEMBER(*m_pUpgradeGame)
         CHAIN_EVENT_MAP_MEMBER(*m_pLobbyHandler) 
     EVENT_MAP_END2(SHostWnd)
         
@@ -52,13 +56,13 @@ public:
         MSG_WM_INITDIALOG(OnInitDialog)
         MSG_WM_CLOSE(OnClose)
         MSG_WM_SIZE(OnSize)
-        CHAIN_MSG_MAP_MEMBER(*m_pChessGame)
+        CHAIN_MSG_MAP_MEMBER(*m_pUpgradeGame)
         CHAIN_MSG_MAP(SHostWnd)
         REFLECT_NOTIFICATIONS_EX()
     END_MSG_MAP()
 
 private:
-    CChessGame* m_pChessGame;  // 象棋游戏核心逻辑
+    UpgradeGame* m_pUpgradeGame;  // 升级游戏核心逻辑
     LobbyHandler* m_pLobbyHandler;
         // 网络通信
     WebSocketClient m_webSocketClient;
