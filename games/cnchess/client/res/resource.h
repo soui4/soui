@@ -1,4 +1,4 @@
-﻿//stamp:0ee36e803cdab34c
+﻿//stamp:0ee371c897315c67
 /*<------------------------------------------------------------------------------------------------->*/
 /*该文件由uiresbuilder生成，请不要手动修改*/
 /*<------------------------------------------------------------------------------------------------->*/
@@ -12,7 +12,7 @@
 			const TCHAR * XML_MAINWND;
 			const TCHAR * XML_LOGIN;
 			const TCHAR * page_lobby;
-			const TCHAR * page_upgrade;
+			const TCHAR * page_game;
 			const TCHAR * page_about;
 			}LAYOUT;
 		struct _values{
@@ -42,7 +42,7 @@ struct _UIRES UIRES={
 			_T("LAYOUT:XML_MAINWND"),
 			_T("LAYOUT:XML_LOGIN"),
 			_T("LAYOUT:page_lobby"),
-			_T("LAYOUT:page_upgrade"),
+			_T("LAYOUT:page_game"),
 			_T("LAYOUT:page_about"),
 		},
 		{
@@ -77,14 +77,12 @@ struct _R{
 		 const wchar_t * btn_mute;
 		 const wchar_t * btn_restore;
 		 const wchar_t * btn_svr_local;
-		 const wchar_t * btn_test;
 		 const wchar_t * btn_unmute;
 		 const wchar_t * cbx_sex;
 		 const wchar_t * edt_name;
 		 const wchar_t * edt_svr;
 		 const wchar_t * game_container;
 		 const wchar_t * img_playing;
-		 const wchar_t * mask_select;
 		 const wchar_t * room_container;
 		 const wchar_t * seat_0;
 		 const wchar_t * seat_1;
@@ -116,14 +114,12 @@ struct _R{
 		int btn_mute;
 		int btn_restore;
 		int btn_svr_local;
-		int btn_test;
 		int btn_unmute;
 		int cbx_sex;
 		int edt_name;
 		int edt_svr;
 		int game_container;
 		int img_playing;
-		int mask_select;
 		int room_container;
 		int seat_0;
 		int seat_1;
@@ -158,10 +154,10 @@ struct _R{
 	}color;
 	struct _string{
 		int about;
+		int cnchess;
 		int lobby;
 		int login;
 		int title;
-		int upgrade;
 		int ver;
 	}string;
 
@@ -177,14 +173,12 @@ struct _R R={
 		L"btn_mute",
 		L"btn_restore",
 		L"btn_svr_local",
-		L"btn_test",
 		L"btn_unmute",
 		L"cbx_sex",
 		L"edt_name",
 		L"edt_svr",
 		L"game_container",
 		L"img_playing",
-		L"mask_select",
 		L"room_container",
 		L"seat_0",
 		L"seat_1",
@@ -217,36 +211,34 @@ struct _R R={
 		65537,
 		65541,
 		65544,
-		65555,
 		65538,
 		65546,
 		65545,
 		65543,
 		65554,
 		65551,
-		65556,
 		65548,
 		10,
 		11,
 		65550,
 		65549,
+		65558,
+		65557,
+		65563,
+		65568,
+		65555,
+		65566,
+		65556,
+		65561,
+		65562,
 		65560,
 		65559,
-		65565,
-		65570,
-		65557,
-		65568,
-		65558,
-		65563,
 		65564,
-		65562,
-		65561,
-		65566,
 		65552,
 		65553,
-		65569,
+		65567,
 		65536,
-		65567
+		65565
 	}
 	,
 	{

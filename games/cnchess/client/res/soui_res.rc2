@@ -1,4 +1,4 @@
-//stamp:01dc6d75972a9ada
+//stamp:01dc6e8a80a4296b
 /*<------------------------------------------------------------------------------------------------->*/
 #define DEFINE_UIRES(name, type, file_path)\
     name type file_path
@@ -7,7 +7,7 @@ DEFINE_UIRES(XML_INIT,	UIDEF,	"uires/uidef/init.xml")
 DEFINE_UIRES(XML_MAINWND,	LAYOUT,	"uires/xml/dlg_main.xml")
 DEFINE_UIRES(XML_LOGIN,	LAYOUT,	"uires/xml/dlg_login.xml")
 DEFINE_UIRES(page_lobby,	LAYOUT,	"uires/xml/page_lobby.xml")
-DEFINE_UIRES(page_upgrade,	LAYOUT,	"uires/xml/page_upgrade.xml")
+DEFINE_UIRES(page_game,	LAYOUT,	"uires/xml/page_game.xml")
 DEFINE_UIRES(page_about,	LAYOUT,	"uires/xml/page_about.xml")
 DEFINE_UIRES(string,	values,	"uires/values/string.xml")
 DEFINE_UIRES(color,	values,	"uires/values/color.xml")
