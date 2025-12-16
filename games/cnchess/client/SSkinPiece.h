@@ -14,7 +14,7 @@ class SSkinPiece : public SSkinImgList
         PIECE_ROWS=14,
     };
 public:
-	SSkinPiece(void):m_ptCenter(-1,-1){}
+    SSkinPiece(void);
 	~SSkinPiece(void){ }
     CPoint GetCenter() const;
    

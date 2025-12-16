@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
-<page title="@string/cnchess" name="game_container" layout="hbox" enableLayer="1" clipClient="1">
-   <img skin="skin_piece" iconIndex="0"/>
-<img skin="skin_piece" iconIndex="1"/>
-         <img skin="skin_piece" iconIndex="2"/>
-            <img skin="skin_piece" iconIndex="3"/>
-               <img skin="skin_piece" iconIndex="4"/>
+<page title="@string/cnchess" name="game_container" layout="anchor" enableLayer="1" clipClient="1" colorBkgnd="@color/gray">
+    <img skin="skin_pieces" iconIndex="0" pos="0,0,3"/>
+    <img skin="skin_pieces" iconIndex="1" pos="0,0,3" offset="1,0"/>
+    <img skin="skin_pieces" iconIndex="2" pos="0,0,3" offset="2,0"/>
+
 </page>
