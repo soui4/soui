@@ -35,13 +35,15 @@ void PropBag::Init(LPCTSTR pszPropXml)
         return;
     }
     SXmlNode xmlNode = xmlDoc.root().child(L"prop");
-    // m_dwProps[PI_TIME_REPORT] = xmlNode.attribute(L"report").as_int(10);
-    // m_dwProps[PI_TIME_PUTBOTTOM] = xmlNode.attribute(L"putbottom").as_int(60);
-    // m_dwProps[PI_TIME_REBEL] = xmlNode.attribute(L"rebel").as_int(10);
-    // m_dwProps[PI_TIME_PUTCARD] = xmlNode.attribute(L"putcard").as_int(20);
-    // m_dwProps[PI_RULE_REBEL] = xmlNode.attribute(L"rebel").as_int(1);
-    // m_dwProps[PI_RULE_LEVEL_5_10_K] = xmlNode.attribute(L"510k").as_int(0);
-    // m_dwProps[PI_RULE_2_MAIN] = xmlNode.attribute(L"2main").as_int(1);
+    m_dwProps[PROPID_REGRET] = xmlNode.attribute(L"regret").as_int(1);	//默认悔棋次数为1次
+    m_dwProps[PROPID_TIME_ROUND] = xmlNode.attribute(L"round").as_int(0);	//默认无局时
+    m_dwProps[PROPID_TIME_STEP] = xmlNode.attribute(L"step").as_int(0);	//默认无步时
+    m_dwProps[PROPID_MAX_STP_JIANG] = xmlNode.attribute(L"max_jiang").as_int(10);	//默认长将步数为10步
+    m_dwProps[PROPID_MAX_STP_CATCH] = xmlNode.attribute(L"max_catch").as_int(10);	//默认长捉步数为10步
+    m_dwProps[PROPID_MAX_STP_PEACE] = xmlNode.attribute(L"max_peace").as_int(100);	//默认不吃子步数为100步
+    m_dwProps[PROPID_MIN_STEPS] = xmlNode.attribute(L"min_steps").as_int(10);	//默认最小步数为10步
+    m_dwProps[PROPID_EXCHANGABLE] = xmlNode.attribute(L"exchangable").as_int(0);	//默认不可交换颜色
+
     m_wPort = xmlNode.attribute(L"port").as_int(3310);     //默认端口号
 }
 WORD PropBag::GetPort() const

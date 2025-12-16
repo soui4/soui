@@ -13,19 +13,11 @@ enum tagPROPID
 	PROPID_REGRET=0,	//悔棋次数
 	PROPID_TIME_ROUND,	//局时
 	PROPID_TIME_STEP,	//步时,步时与读秒都为0时为定时房间
-	PROPID_TIME_EXTRA,	//读秒
-	PROPID_TIME_MAKEUP,	//每步增加可用时间,定时房间有效
 	PROPID_MAX_STP_JIANG,	//长将步限
 	PROPID_MAX_STP_CATCH,	//长捉步限
 	PROPID_MAX_STP_PEACE,	//最多不吃子步数
 	PROPID_MIN_STEPS,		//每局最小步数，以内不能求和及认输
 	PROPID_EXCHANGABLE,		//可交换颜色
-	PROPID_COEF_MATCH,		//比赛重要系数,在计算积分时使用
-	PROPID_EXPERIENCE_WIN,		//赢棋获得经验值
-	PROPID_EXPERIENCE_DRAW,	//和棋获得经验值
-	PROPID_EXPERIENCE_LOSS,	//输棋获得经验值,在计算积分时使用
-	PROPID_ENABLE_ONCEMORE,
-
 	PROP_SIZE
 };
 
