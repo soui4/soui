@@ -24,6 +24,16 @@ CPoint SSkinPiece::GetCenter() const
     return m_ptCenter;
 }
 
+void SSkinPiece::_Scale(ISkinObj *skinObj, int nScale)
+{
+    __baseCls::_Scale(skinObj, nScale);
+    SSkinPiece *pRet = sobj_cast<SSkinPiece>(skinObj);
+    CSize szSkin = m_pImgShadow->Size(); 
+    szSkin.cx = MulDiv(szSkin.cx, nScale, GetScale());
+    szSkin.cy = MulDiv(szSkin.cy, nScale, GetScale());
+    m_pImgShadow->Scale2(&pRet->m_pImgShadow, szSkin.cx, szSkin.cy, kHigh_FilterLevel);
+}
+
 void SSkinPiece::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
 {
     if (!GetImage())

@@ -23,6 +23,7 @@ public:
     STDMETHOD_(int, GetStates)(THIS) SCONST OVERRIDE;
 protected:
     void _DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const override;
+    void _Scale(ISkinObj *skinObj, int nScale) override;
 public:
     SOUI_ATTRS_BEGIN()
         ATTR_POINT(L"center", m_ptCenter, TRUE)
