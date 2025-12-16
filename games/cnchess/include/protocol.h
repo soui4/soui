@@ -138,6 +138,9 @@ typedef struct tagGAME_AVATAR_ACK
 //其它游戏的消息ID从GMT_GAMEBASE+1开始
 #define	GMT_GAMEBASE		1000
 
+#define MSG_REQ 0x00000000
+#define MSG_ACK 0x10000000
+
 #pragma pack(pop)
 
 #endif//_PROTOCOL_H_
