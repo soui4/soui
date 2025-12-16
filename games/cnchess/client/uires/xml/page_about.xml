@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<page name="room_container" title="@string/about" layout="vbox" gravity="center" padding="20dp">
+    <text name="txt_title" text="升级游戏" font="size:24" align="center" margin="10dp"/>
+    
+    <text name="txt_desc" text="这是一个使用SOUI框架开发的纸牌升级游戏。" font="size:14" align="center" margin="5dp"/>
+    
+    <text name="txt_new_features" text="SOUI 5.1 新特性：" font="size:16;bold:1" margin="10dp,20dp,5dp,5dp"/>
+    
+    <text name="txt_anchor_layout" text="锚点布局（Anchor Layout）" font="size:14;bold:1" margin="20dp,10dp,5dp,5dp"/>
+    <text name="txt_anchor_detail" text="• 基于9个参考点的新型布局模型&#xA;• 适用于复杂界面元素精确定位&#xA;• 游戏类应用的精灵容器推荐使用anchor布局作为宿主容器" font="size:14" margin="30dp,5dp"/>
+    
+    <text name="txt_property_animation" text="属性动画（Property Animation）" font="size:14;bold:1" margin="20dp,10dp,5dp,5dp"/>
+    <text name="txt_prop_detail" text="• 支持对布局参数和窗口属性的动画控制&#xA;• 借鉴Android属性动画设计模式&#xA;• 动画系统参考Android属性动画设计模式" font="size:14" margin="30dp,5dp"/>
+    
+    <text name="txt_path_animation" text="路径动画（Path Animation）" font="size:14;bold:1" margin="20dp,10dp,5dp,5dp"/>
+    <text name="txt_path_detail" text="• 使用锚点布局支持数值动画实现&#xA;• 可实现复杂的曲线运动轨迹&#xA;• 适用于游戏元素的移动动画效果" font="size:14" margin="30dp,5dp"/>
+    
+    <text name="txt_contact" text="联系我们：" font="size:16;bold:1" margin="10dp,20dp,5dp,5dp"/>
+    <text name="txt_qq_group" text="SOUI官方QQ群：229313785" font="size:14" margin="20dp,5dp"/>
+    <text name="txt_website" text="官方网站：https://gitee.com/setoutsoft/soui4" font="size:14" margin="20dp,5dp"/>
+    
+    <text name="txt_info" text="SOUI是一套轻量级的Windows客户端UI开发框架，具有高效、稳定、易用的特点。如果您对此项目感兴趣，欢迎加入我们的QQ群交流学习！" font="size:12" align="center" margin="10dp,30dp,10dp,10dp"/>
+    <text name="txt_thanks" text="所有游戏图片资源来自网络，版权归原作者所有。" font="size:12" align="center" margin="10dp,10dp,10dp,10dp"/>
+    <text name="txt_copyright" text="Copyright © 2015-2020 Setoutsoft" font="size:12" align="center"/>
+</page>

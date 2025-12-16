@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+  <skin>
+    <imgframe name="skin_item_bk" src="image:PNG_ITEM_BK" states="3" margin="5,5,5,5"/>
+    <imglist name="skin_table" src="image:PNG_TABLE"/>
+    <imglist name="skin_handup" src="image:PNG_HANDUP"/>"
+    <imglist name="skin_playing" src="image:PNG_PLAYING"/>"
+    <imglist name="skin_btn_mute" src="image:PNG_MUTE" states="4"/>
+    <imglist name="skin_btn_unmute" src="image:PNG_UNMUTE" states="4"/>
+  </skin>
