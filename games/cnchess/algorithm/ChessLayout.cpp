@@ -1,6 +1,7 @@
 ﻿#include "stdafx.h"
 #include "ChessLayout.h"
 #include <sstream>
+#include <algorithm>
 
 #ifdef _UNICODE
 #define tstringstream wstringstream
@@ -53,7 +54,7 @@ void CChsLytState::UpdateState()
 {
 	POINT ptDest[MAX_MOVES];
 	int   nDest;
-	int x,y;
+	LONG x,y;
 	ClearState();
 	for(y=0;y<10;y++) for(x=0;x<9;x++)
 	{
@@ -88,8 +89,8 @@ void CChsLytState::UpdateState()
 						int n1,n2;
 						if(p->x==x)
 						{
-							n1=min(p->y,y);
-							n2=max(p->y,y);
+							n1=std::min(p->y,y);
+							n2=std::max(p->y,y);
 							for(int i=n1+1;i<=n2-1;i++)
 								if(m_pLayout->m_chesses[i][x]!=CHSMAN_NULL)
 								{
@@ -98,8 +99,8 @@ void CChsLytState::UpdateState()
 								}
 						}else //if(p->y==y)
 						{
-							n1=min(p->x,x);
-							n2=max(p->x,x);
+							n1=std::min(p->x,x);
+							n2=std::max(p->x,x);
 							for(int i=n1+1;i<=n2-1;i++)
 								if(m_pLayout->m_chesses[y][i]!=CHSMAN_NULL)
 								{
@@ -333,7 +334,20 @@ void CChessLayout::GetMoveDescription(MOVESTEP mstep,TCHAR szDesc[100])
 		_T("退"),
 		_T("左"),
 		_T("右"),
+		_T("前"),
+		_T("后"),
 	};
+	enum MoveType
+	{
+		MT_IN=0,
+		MT_EQUAL,
+		MT_OUT,
+		MT_LEFT,
+		MT_RIGHT,
+		MT_FRONT,
+		MT_BACK,
+	};
+
 	const LPTSTR *pszPos=kszPosCn;
 	const LPTSTR *pszChess=kszRedChess;
 	POINT pt1=mstep.pt1,pt2=mstep.pt2;
@@ -370,12 +384,13 @@ void CChessLayout::GetMoveDescription(MOVESTEP mstep,TCHAR szDesc[100])
 		if(mstep.pt1.x==mstep.pt2.x)
 		{
 			if(mstep.pt1.y<mstep.pt2.y)
-				_stprintf(szDesc,_T("%s%s进%s"),pszChess[chsMove],pszPos[9-mstep.pt1.x],pszPos[mstep.pt2.y-mstep.pt1.y]);
+				ss << pszChess[chsMove] << pszPos[9-mstep.pt1.x] << kszMove[MT_IN] << pszPos[mstep.pt2.y-mstep.pt1.y];
 			else
-				_stprintf(szDesc,_T("%s%s退%s"),pszChess[chsMove],pszPos[9-mstep.pt1.x],pszPos[mstep.pt1.y-mstep.pt2.y]);
+				ss << pszChess[chsMove] << pszPos[9-mstep.pt1.x] << kszMove[MT_OUT] << pszPos[mstep.pt1.y-mstep.pt2.y];
 		}
 		else
-			_stprintf(szDesc,_T("%s%s平%s"),pszChess[chsMove],pszPos[9-mstep.pt1.x],pszPos[9-mstep.pt2.x]);
+			ss << pszChess[chsMove] << pszPos[9-mstep.pt1.x] << kszMove[MT_EQUAL] << pszPos[9-mstep.pt2.x];
+		
 		break;
 
 	case CHSMAN_RED_JU://红车
@@ -383,22 +398,22 @@ void CChessLayout::GetMoveDescription(MOVESTEP mstep,TCHAR szDesc[100])
 		if(mstep.pt1.y>mstep.pt2.y)
 		{//退
 			if(iSameChs!=-1)
-				_stprintf(szDesc,_T("%s%s退%s"),iSameChs<mstep.pt1.y?"前":"后",pszChess[chsMove],pszPos[mstep.pt1.y-mstep.pt2.y]);
+				ss << (iSameChs<mstep.pt1.y?kszMove[MT_FRONT]:kszMove[MT_BACK]) << pszChess[chsMove] << kszMove[MT_OUT] << pszPos[mstep.pt1.y-mstep.pt2.y];
 			else
-				_stprintf(szDesc,_T("%s%s退%s"),pszChess[chsMove],pszPos[9-mstep.pt1.x],pszPos[mstep.pt1.y-mstep.pt2.y]);
+				ss << pszChess[chsMove] << pszPos[9-mstep.pt1.x] << kszMove[MT_OUT] << pszPos[mstep.pt1.y-mstep.pt2.y];
 		}
 		else if(mstep.pt1.y<mstep.pt2.y)
 		{//进
 			if(iSameChs!=-1)
-				_stprintf(szDesc,_T("%s%s进%s"),iSameChs<mstep.pt1.y?"前":"后",pszChess[chsMove],pszPos[mstep.pt2.y-mstep.pt1.y]);
+				ss << (iSameChs<mstep.pt1.y?kszMove[MT_FRONT]:kszMove[MT_BACK]) << pszChess[chsMove] << kszMove[MT_IN] << pszPos[mstep.pt2.y-mstep.pt1.y];
 			else
-				_stprintf(szDesc,_T("%s%s进%s"),pszChess[chsMove],pszPos[9-mstep.pt1.x],pszPos[mstep.pt2.y-mstep.pt1.y]);
+				ss << pszChess[chsMove] << pszPos[9-mstep.pt1.x] << kszMove[MT_IN] << pszPos[mstep.pt2.y-mstep.pt1.y];
 		}else
 		{//平
 			if(iSameChs!=-1)
-				_stprintf(szDesc,_T("%s%s平%s"),iSameChs<mstep.pt1.y?"前":"后",pszChess[chsMove],pszPos[9-mstep.pt2.x]);
+				ss << (iSameChs<mstep.pt1.y?kszMove[MT_FRONT]:kszMove[MT_BACK]) << pszChess[chsMove] << kszMove[MT_EQUAL] << pszPos[9-mstep.pt2.x];
 			else
-				_stprintf(szDesc,_T("%s%s平%s"),pszChess[chsMove],pszPos[9-mstep.pt1.x],pszPos[9-mstep.pt2.x]);
+				ss << pszChess[chsMove] << pszPos[9-mstep.pt1.x] << kszMove[MT_EQUAL] << pszPos[9-mstep.pt2.x];
 		}
 		break;
 
@@ -406,9 +421,10 @@ void CChessLayout::GetMoveDescription(MOVESTEP mstep,TCHAR szDesc[100])
 	case CHSMAN_RED_SHI://红士
 	case CHSMAN_RED_XIANG://红相
 		if(iSameChs!=-1)
-			_stprintf(szDesc,_T("%s%s%s%s"),iSameChs<mstep.pt1.y?"前":"后",pszChess[chsMove],mstep.pt1.y<mstep.pt2.y?"进":"退",pszPos[9-mstep.pt2.x]);
+			ss << (iSameChs<mstep.pt1.y?kszMove[MT_FRONT]:kszMove[MT_BACK]) << pszChess[chsMove] << (mstep.pt1.y<mstep.pt2.y?kszMove[MT_IN]:kszMove[MT_OUT]) << pszPos[9-mstep.pt2.x];
 		else
-			_stprintf(szDesc,_T("%s%s%s%s"),pszChess[chsMove],pszPos[9-mstep.pt1.x],mstep.pt1.y<mstep.pt2.y?"进":"退",pszPos[9-mstep.pt2.x]);
+			ss << pszChess[chsMove] << pszPos[9-mstep.pt1.x] << (mstep.pt1.y<mstep.pt2.y?kszMove[MT_IN]:kszMove[MT_OUT]) << pszPos[9-mstep.pt2.x];
+		
 		break;
 
 	case CHSMAN_RED_BING://红兵
@@ -424,15 +440,15 @@ void CChessLayout::GetMoveDescription(MOVESTEP mstep,TCHAR szDesc[100])
 				if(nCount==0)
 				{//没有同列的兵
 					if(mstep.pt1.y==mstep.pt2.y)
-						_stprintf(szDesc,_T("%s%s平%s"),pszChess[chsMove],pszPos[9-mstep.pt1.x],pszPos[9-mstep.pt2.x]);
+						ss << pszChess[chsMove] << pszPos[9-mstep.pt1.x] << kszMove[MT_EQUAL] << pszPos[9-mstep.pt2.x];
 					else
-						_stprintf(szDesc,_T("%s%s进%s"),pszChess[chsMove],pszPos[9-mstep.pt1.x],pszPos[1]);
+						ss << pszChess[chsMove] << pszPos[9-mstep.pt1.x] << kszMove[MT_IN] << pszPos[1];
 				}else if(nCount==1)
 				{//有一颗同列的兵
 					if(mstep.pt1.y==mstep.pt2.y)
-						_stprintf(szDesc,_T("%s%s平%s"),mstep.pt1.y>nPos[1]?"前":"后",pszChess[chsMove],pszPos[9-mstep.pt2.x]);
+						ss << (mstep.pt1.y>nPos[1]?kszMove[MT_FRONT]:kszMove[MT_BACK]) << pszChess[chsMove] << kszMove[MT_EQUAL] << pszPos[9-mstep.pt2.x];
 					else
-						_stprintf(szDesc,_T("%s%s进%s"),mstep.pt1.y>nPos[1]?"前":"后",pszChess[chsMove],pszPos[1]);
+						ss << (mstep.pt1.y>nPos[1]?kszMove[MT_FRONT]:kszMove[MT_BACK]) << pszChess[chsMove] << kszMove[MT_IN] << pszPos[1];
 				}else//if(nCount>1)
 				{//多个兵在同一列
 					int j=0;
@@ -444,16 +460,18 @@ void CChessLayout::GetMoveDescription(MOVESTEP mstep,TCHAR szDesc[100])
 						else
 							j++;
 						if(mstep.pt1.y==mstep.pt2.y)
-							_stprintf(szDesc,_T("%s%s平%s"),pszPos[j],pszChess[chsMove],pszPos[mstep.pt2.x]);
+							ss << pszPos[j] << pszChess[chsMove] << kszMove[MT_EQUAL] << pszPos[mstep.pt2.x];
 						else
-							_stprintf(szDesc,_T("%s%s进%s"),pszPos[j],pszChess[chsMove],pszPos[1]);
+							ss << pszPos[j] << pszChess[chsMove] << kszMove[MT_IN] << pszPos[1];
 				}
+				
 		}
 		break;
 
 	default:
 		break;
 	}
+	_tcscpy(szDesc, ss.str().c_str());
 }
 
 BOOL CChessLayout::IsValidMove(POINT pt1 , POINT pt2,CChsLytState *pLytState)
