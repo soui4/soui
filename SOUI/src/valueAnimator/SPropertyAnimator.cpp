@@ -53,7 +53,6 @@ void SPropertyValuesHolder::SetByteValues(const BYTE *values, int count)
         }
         m_valueSize = sizeof(BYTE);
         m_valueCount = count;
-        m_totalWeight = count;
     }
 }
 
@@ -70,7 +69,6 @@ void SPropertyValuesHolder::SetShortValues(const short *values, int count)
         }
         m_valueSize = sizeof(short);
         m_valueCount = count;
-        m_totalWeight = count;
     }
 }
 
@@ -87,7 +85,6 @@ void SPropertyValuesHolder::SetColorRefValues(const COLORREF *values, int count)
         }
         m_valueSize = sizeof(COLORREF);
         m_valueCount = count;
-        m_totalWeight = count;
     }
 }
 
@@ -101,7 +98,6 @@ void SPropertyValuesHolder::SetFloatValues(const float *values, int count)
         memcpy(m_value.fValue, values, sizeof(float) * count);
         m_valueSize = sizeof(float);
         m_valueCount = count;
-        m_totalWeight = count;
     }
 }
 
@@ -115,7 +111,6 @@ void SPropertyValuesHolder::SetIntValues(const int *values, int count)
         memcpy(m_value.nValue, values, sizeof(int) * count);
         m_valueSize = sizeof(int);
         m_valueCount = count;
-        m_totalWeight = count;
     }
 }
 
@@ -132,7 +127,6 @@ void SPropertyValuesHolder::SetLayoutSizeValues(const LAYOUTSIZE *values, int co
         }
         m_valueSize = sizeof(LAYOUTSIZE);
         m_valueCount = count;
-        m_totalWeight = count;
     }
 }
 
@@ -146,7 +140,6 @@ void SPropertyValuesHolder::SetPositionValues(const void *values, int count, int
         memcpy(m_value.pValue, values, valueSize * count);
         m_valueSize = valueSize;
         m_valueCount = count;
-        m_totalWeight = count;
     }
 }
 
@@ -252,12 +245,41 @@ void SPropertyValuesHolder::ClearValues()
 
 float SPropertyValuesHolder::Fraction2Index(float fraction, int idx[2]) const
 {
-    float segmentFraction = fraction * (m_valueCount - 1);
-    idx[0] = (int)segmentFraction;
-    idx[1] = idx[0] + 1;
-    if (idx[1] >= m_valueCount)
+    if (!m_value.pWeights) 
+    {
+        // 没有权重，使用均匀分布逻辑
+        float segmentFraction = fraction * (m_valueCount - 1);
+        idx[0] = (int)segmentFraction;
+        idx[1] = idx[0] + 1;
+        if (idx[1] >= m_valueCount)
+            idx[1] = m_valueCount - 1;
+        return segmentFraction - idx[0];
+    }
+    else 
+    {
+        // 使用权重计算关键帧索引和片段分数
+        float weightedFraction = fraction * m_totalWeight;
+        float accumulatedWeight = 0.0f;
+        for (int i = 0; i < m_valueCount - 1; i++) 
+        {
+            accumulatedWeight += m_value.pWeights[i];
+            if (weightedFraction <= accumulatedWeight) 
+            {
+                idx[0] = i;
+                idx[1] = i + 1;
+                
+                // 计算在当前段内的fraction
+                float segmentStart = accumulatedWeight - m_value.pWeights[i];
+                float segmentLength = m_value.pWeights[i];
+                return (weightedFraction - segmentStart) / segmentLength;
+            }
+        }
+        
+        // 如果fraction超出了所有段，返回最后一段
+        idx[0] = m_valueCount - 2;
         idx[1] = m_valueCount - 1;
-    return segmentFraction - idx[0];
+        return 1.0f;
+    }
 }
 
 BOOL SPropertyValuesHolder::SetKeyFrameWeights(const float *weights, int count)
@@ -266,10 +288,10 @@ BOOL SPropertyValuesHolder::SetKeyFrameWeights(const float *weights, int count)
     {
         float totalWeight = 0.0f;
         for(int i = 0; i < count; i++){
+            if(weights[i] <= 0.0f)
+                return FALSE;
             totalWeight += weights[i];
         }
-        if(totalWeight <= 0.0f)
-            return FALSE;
         if(!m_value.pWeights)
         {
             m_value.pWeights = new float[count];
