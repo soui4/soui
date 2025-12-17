@@ -108,6 +108,8 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
     rcBoard.DeflateRect(rcMargin);
     m_ptBoardOrigin.x = rcBoard.left;
     m_ptBoardOrigin.y = rcBoard.bottom;
+    
+    m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale*100, 0);
 }
 
 void WINAPI CChessGame::OnAnimatorGroupEnd(IAnimatorGroup * pGroup, int nID)

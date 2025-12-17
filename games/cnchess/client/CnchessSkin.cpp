@@ -4,13 +4,14 @@
 SNSBEGIN
 
 SSkinPiece::SSkinPiece(void)
-    : m_ptCenter(-1, -1)
+    : m_ptCenter(38,38)
+    , m_szChess(76,86)
 {
 }
 
 SIZE SSkinPiece::GetSkinSize() const
 {
-    return m_pImgShadow->Size();
+    return m_szChess;
 }
 
 int SSkinPiece::GetStates() const
@@ -21,22 +22,7 @@ int SSkinPiece::GetStates() const
 
 CPoint SSkinPiece::GetCenter() const
 {
-    if(m_ptCenter.x != -1)
-        return m_ptCenter;
-    SIZE szImg = GetImage()->Size();
-    SIZE szChess = {szImg.cx/PIECE_COLS,szImg.cy/PIECE_ROWS};
-    m_ptCenter = CPoint(szChess.cx/2,szChess.cy/2);
     return m_ptCenter;
-}
-
-void SSkinPiece::_Scale(ISkinObj *skinObj, int nScale)
-{
-    __baseCls::_Scale(skinObj, nScale);
-    SSkinPiece *pRet = sobj_cast<SSkinPiece>(skinObj);
-    CSize szSkin = m_pImgShadow->Size(); 
-    szSkin.cx = MulDiv(szSkin.cx, nScale, GetScale());
-    szSkin.cy = MulDiv(szSkin.cy, nScale, GetScale());
-    m_pImgShadow->Scale2(&pRet->m_pImgShadow, szSkin.cx, szSkin.cy, kHigh_FilterLevel);
 }
 
 void SSkinPiece::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BYTE byAlpha) const
@@ -57,7 +43,7 @@ void SSkinPiece::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
     CRect rcSrc(CPoint(),szChess);
     rcSrc.OffsetRect(iCol * szChess.cx, iRow * szChess.cy);
     CRect rcDst = *rcDraw;
-    rcDst.bottom = rcDst.top + szChess.cy;
+    rcDst.bottom = rcDst.top + rcDst.Width();
     pRT->DrawBitmapEx(&rcDst, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
 }
 SNSEND

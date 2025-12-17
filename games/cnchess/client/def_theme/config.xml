@@ -11,7 +11,7 @@
         <apng name="ani_vectory_2" src="file:Sprite/礼花2.png"/>"
         <apng name="ani_vectory_3" src="file:Sprite/礼花3.png"/>"
 
-        <piece name="skin_pieces" src="file:image/pieces.png" shadow="file:image/piece_shadow.png"/>
+        <piece name="skin_pieces" src="file:image/pieces.png" shadow="file:image/piece_shadow.png" filterLevel="high" size="76,86" center="38,38"/>
         <board name="skin_chessboard" src="file:image/chessboard.png" filterLevel="high" margin="64,68,67,71"/>
 
         <imglist name="skin_digit" src="file:image/digital_score.png" states="12"/>

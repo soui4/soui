@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <page title="@string/cnchess" name="game_container" layout="anchor" enableLayer="1" clipClient="1" colorBkgnd="@color/gray">
-    <img skin="skin_pieces" iconIndex="0" pos="0,0,10" offset="-0.5,-0.5" layer="10"/>
-    <img skin="skin_pieces" iconIndex="1" pos="0,1,10" offset="-0.5,-0.5" layer="10"/>
-    <img skin="skin_pieces" iconIndex="2" pos="8,9,10" offset="-0.5,-0.5" layer="10"/>
+    <img skin="skin_pieces" iconIndex="0" pos="0,0,10" offset="-0.5,-0.5" layer="10" size="76,86"/>
+    <img skin="skin_pieces" iconIndex="1" pos="0,1,10" offset="-0.5,-0.5" layer="10" size="76,86"/>
+    <img skin="skin_pieces" iconIndex="2" pos="8,9,10" offset="-0.5,-0.5" layer="10" size="76,86"/>
 
 </page>
