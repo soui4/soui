@@ -34,6 +34,21 @@ private:
     mutable CPoint m_ptCenter;
 };
 
+
+class SSkinBoard : public SSkinImgList
+{
+	DEF_SOBJECT(SSkinImgList, L"board")
+public:
+    SSkinBoard(void){}
+    ~SSkinBoard(void){ }
+public:
+    SOUI_ATTRS_BEGIN()
+        ATTR_RECT(L"margin", m_rcMargin, TRUE)
+    SOUI_ATTRS_END()
+
+    CRect m_rcMargin;
+};
+
 SNSEND
 
 #endif//__SSKINPIECE_H__

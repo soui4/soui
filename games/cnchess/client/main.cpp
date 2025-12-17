@@ -2,7 +2,7 @@
 #include <SAppCfg.h>
 #include "MainDlg.h"
 #include "SGameTheme.h"
-#include "SSkinPiece.h"
+#include "CnchessSkin.h"
 
 
 static const TCHAR * kPath_SysRes = _T("/../../../soui-sys-resource");

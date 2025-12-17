@@ -68,6 +68,9 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
         rcBoard.DeflateRect(0, (szGameBoard.cy - nHei) / 2);
         m_pChessBoard->Move(rcBoard);
     }
+    //calc cell size
+    m_szCell.cx = rcBoard.Width() / 9;
+    m_szCell.cy = rcBoard.Height() / 10;
 }
 
 void WINAPI CChessGame::OnAnimatorGroupEnd(IAnimatorGroup * pGroup, int nID)

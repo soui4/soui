@@ -236,4 +236,5 @@ private:
 
     SList<SAutoRefPtr<IAnimatorGroup> > m_animatorGroupList;
     SAutoRefPtr<SImageWnd> m_pChessBoard;
+    CSize   m_szCell;
 };

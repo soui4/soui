@@ -1,5 +1,5 @@
 #include "stdafx.h"
-#include "SSkinPiece.h"
+#include "CnchessSkin.h"
 
 SNSBEGIN
 
