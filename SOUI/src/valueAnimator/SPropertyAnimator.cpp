@@ -292,7 +292,8 @@ float SPropertyValuesHolder::Fraction2Index(float fraction, int idx[2]) const
 
 BOOL SPropertyValuesHolder::SetKeyFrameWeights(const float *weights, int count)
 {
-    if (weights && count == m_valueCount)
+    // 权重数量应该是关键帧数减1，因为权重表示的是帧之间的段
+    if (weights && count == m_valueCount - 1)
     {
         float totalWeight = 0.0f;
         for(int i = 0; i < count; i++){
@@ -313,7 +314,8 @@ BOOL SPropertyValuesHolder::SetKeyFrameWeights(const float *weights, int count)
 
 BOOL SPropertyValuesHolder::GetKeyFrameWeights(float *weights, int count) const
 {
-    if (!weights || count != m_valueCount)
+    // 权重数量应该是关键帧数减1
+    if (!weights || count != m_valueCount - 1)
         return FALSE;
     if (m_value.pWeights)
     {
@@ -513,6 +515,27 @@ void SPropertyAnimator::SetPropertyValuesHolders(IPropertyValuesHolder **pHolder
             m_propertyHolders.Add(pHolders[i]);
         }
     }
+}
+
+IPropertyValuesHolder *SPropertyAnimator::GetPropertyValuesHolder(LPCWSTR propertyName) const
+{
+    for (int i = 0; i < m_propertyHolders.GetCount(); i++)
+    {
+        if (wcscmp(m_propertyHolders[i]->GetPropertyName(), propertyName) == 0)
+        {
+            return m_propertyHolders[i];
+        }
+    }
+    return NULL;
+}
+
+IPropertyValuesHolder *SPropertyAnimator::GetPropertyValuesHolder(int index) const
+{
+    if (index >= 0 && index < m_propertyHolders.GetCount())
+    {
+        return m_propertyHolders[index];
+    }
+    return NULL;
 }
 
 // 静态工厂方法

@@ -253,12 +253,15 @@ void CMainDlg::OnBtnAnimation()
 		};
 		if(m_runningAnimator1) 
 			m_runningAnimator1->end();
-        m_runningAnimator1.Attach(SPropertyAnimator::ofPosition(pWnd_left_top, LayoutProperty::POSITION, pos, ARRAYSIZE(pos), sizeof(AnchorPos)));
-		if (m_runningAnimator1)
-		{
-			m_runningAnimator1->setDuration(2000);
-			m_runningAnimator1->start(this);
-		}
+		SPropertyAnimator *pAnimator = SPropertyAnimator::ofPosition(pWnd_left_top, LayoutProperty::POSITION, pos, ARRAYSIZE(pos), sizeof(AnchorPos));
+		//设置权重
+		float weights[] = { 1.0f, 2.0f };
+		pAnimator->GetPropertyValuesHolder(0)->SetKeyFrameWeights(weights, ARRAYSIZE(weights));
+		m_runningAnimator1 = pAnimator;
+		//as m_runningAnimator1 hold a ref, we need release pAnimator
+		pAnimator->Release();
+		m_runningAnimator1->setDuration(2000);
+		m_runningAnimator1->start(this);
 	}
 	if(1){
 		//animate pWnd_left_bottom  to pWnd_left_top

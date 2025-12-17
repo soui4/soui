@@ -113,7 +113,11 @@ public:
     // 设置属性值持有者
     void SetPropertyValuesHolder(IPropertyValuesHolder *pHolder);
     void SetPropertyValuesHolders(IPropertyValuesHolder **pHolders, int count);
-    
+    IPropertyValuesHolder* GetPropertyValuesHolder(LPCWSTR propertyName) const;
+    IPropertyValuesHolder* GetPropertyValuesHolder(int index) const;
+    int GetPropertyValuesHolderCount() const{
+        return m_propertyHolders.GetCount();
+    }
 protected:
     // SValueAnimator接口实现
     STDMETHOD_(void, onEvaluateValue)(THIS_ float fraction) OVERRIDE;
