@@ -55,8 +55,9 @@ CChessGame::~CChessGame()
 {
 }
 
-void CChessGame::Init(SWindow *pGameBoard, WebSocketClient *pWs)
+void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
 {
+    SWindow* pGameBoard = pGameHost->FindChildByName(L"chessboard");
     SAnchorLayout *pAnchorLayout = sobj_cast<SAnchorLayout>(pGameBoard->GetLayout());
     SASSERT(pAnchorLayout);
 
@@ -109,7 +110,7 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
     m_ptBoardOrigin.x = rcBoard.left;
     m_ptBoardOrigin.y = rcBoard.bottom;
 
-    m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale*100, 0);
+    m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale*100, 1);
 }
 
 void WINAPI CChessGame::OnAnimatorGroupEnd(IAnimatorGroup * pGroup, int nID)
