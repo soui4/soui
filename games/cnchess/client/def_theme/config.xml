@@ -12,7 +12,7 @@
         <apng name="ani_vectory_3" src="file:Sprite/礼花3.png"/>"
 
         <piece name="skin_pieces" src="file:image/pieces.png" shadow="file:image/piece_shadow.png"/>
-        <imglist name="skin_chessboard" src="file:image/chessboard.png" filterLevel="high"/>
+        <board name="skin_chessboard" src="file:image/chessboard.png" filterLevel="high" margin="64,68,67,71"/>
 
         <imglist name="skin_digit" src="file:image/digital_score.png" states="12"/>
         <imglist name="skin_clock" src="file:image/闹钟.png"/>

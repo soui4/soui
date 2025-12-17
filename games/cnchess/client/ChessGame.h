@@ -114,6 +114,7 @@ public:
     BOOL OnMessage(DWORD dwType, std::shared_ptr<std::vector<BYTE> > data) override;    
     
 public:
+    static POINT CALLBACK ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData);   
     void OnGameBoardSizeChanged(IEvtArgs *e);
     /**
      * @brief 事件映射表
@@ -237,4 +238,5 @@ private:
     SList<SAutoRefPtr<IAnimatorGroup> > m_animatorGroupList;
     SAutoRefPtr<SImageWnd> m_pChessBoard;
     CSize   m_szCell;
+    CPoint  m_ptBoardCenter;
 };

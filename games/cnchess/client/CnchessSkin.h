@@ -41,6 +41,15 @@ class SSkinBoard : public SSkinImgList
 public:
     SSkinBoard(void){}
     ~SSkinBoard(void){ }
+
+    CRect GetMargin() const{
+        return m_rcMargin;
+    }
+public:
+    //disable scale
+    STDMETHOD_(ISkinObj *, Scale)(THIS_ int nScale) OVERRIDE{
+        return NULL;
+    }
 public:
     SOUI_ATTRS_BEGIN()
         ATTR_RECT(L"margin", m_rcMargin, TRUE)

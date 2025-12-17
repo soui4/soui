@@ -166,7 +166,8 @@ class SOUI_EXP SAnchorLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     DEF_SOBJECT(SObjectImpl<ILayout>, L"Anchor")
 
   public:
-    typedef CPoint (CALLBACK *PFN_ANCHOR_TO_POS)(const CRect &rcParent, int type);
+    typedef POINT (*PFN_Position2Point)(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData);
+
     /**
      * @brief 构造函数
      */
@@ -207,17 +208,21 @@ class SOUI_EXP SAnchorLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     STDMETHOD_(SIZE, MeasureChildren)
     (THIS_ const IWindow *pParent, int nWidth, int nHeight) SCONST OVERRIDE;
 
-    void SetAnchor2PosCallback(PFN_ANCHOR_TO_POS pfnAnchor2Pos);
-    PFN_ANCHOR_TO_POS GetAnchor2PosCallback() const{
-        return m_pfnAnchor2Pos;
+    void SetPosition2PointCallback(PFN_Position2Point pfnAnchor2Pos, void * userData){
+        m_pfnPosition2Point = pfnAnchor2Pos;
+        m_pUserData = userData;
+    }
+    PFN_Position2Point GetPosition2PointCallback() const{
+        return m_pfnPosition2Point;
     }
 
-    static CPoint CALLBACK DefaultAnchor2Pos(const CRect &rcParent, int type);
+    static POINT DefaultPosition2Point(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData);
   protected:
-    POINT Position2Point(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale) const;
+    static CPoint Anchor2Pos(const CRect &rcParent, int type);
     POINT CalcPoint4Animator(const AnchorPos &start, const AnchorPos &end, float fraction, const CRect &rcParent, const CSize & szChild, int nScale) const;
 
-    PFN_ANCHOR_TO_POS m_pfnAnchor2Pos;
+    PFN_Position2Point m_pfnPosition2Point;
+    void * m_pUserData; //for callback param;
   };
 
 SNSEND

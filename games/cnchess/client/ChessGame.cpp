@@ -3,10 +3,21 @@
 #include "MainDlg.h"
 #include <helper/SFunctor.hpp>
 #include <cnchessProtocol.h>
+#include "CnchessSkin.h"
 #include <helper/slog.h>
 #define kLogTag "ChessGame"
 
 #define TIMERID_CLOCK 503
+
+POINT CChessGame::ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData){
+    if(pos.type == 100){
+        //type == 100 is chess anchor
+        CChessGame *pThis = (CChessGame *)userData;
+        return CPoint();
+    }else{
+        return SAnchorLayout::DefaultPosition2Point(pos, rcParent, szChild, nScale, userData);
+    }
+}
 
 /**
  * @brief 构造函数
@@ -40,6 +51,11 @@ CChessGame::~CChessGame()
 
 void CChessGame::Init(SWindow *pGameBoard, WebSocketClient *pWs)
 {
+    SAnchorLayout *pAnchorLayout = sobj_cast<SAnchorLayout>(pGameBoard->GetLayout());
+    SASSERT(pAnchorLayout);
+
+    pAnchorLayout->SetPosition2PointCallback(ChessAnchor2Pos,this);
+
     m_pGameBoard = pGameBoard;
     m_webSocketClient = pWs;
     m_pChessBoard = sobj_cast<SImageWnd>(m_pTheme->GetWidget(Sprites::board_main));
@@ -50,27 +66,41 @@ void CChessGame::Init(SWindow *pGameBoard, WebSocketClient *pWs)
 void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
 {
     EventSwndSize *evt = sobj_cast<EventSwndSize>(e);
+    SSkinBoard * pSkin = sobj_cast<SSkinBoard>(m_pChessBoard->GetSkin());
     CSize szBoard = m_pChessBoard->GetSkin()->GetSkinSize();
     CRect rcGameGoard = m_pGameBoard->GetClientRect();
     CSize szGameBoard = evt->szWnd;
     float fRatio1 = (float)szGameBoard.cx / szGameBoard.cy;
     float fRatio2 = (float)szBoard.cx / szBoard.cy;
     CRect rcBoard =  rcGameGoard;
+    float scale = 1.0f;
     if(fRatio1 > fRatio2)
     {
         int nWid = (int)(szGameBoard.cy * fRatio2);
         rcBoard.DeflateRect((szGameBoard.cx - nWid) / 2, 0);
+        scale = (float)nWid / szBoard.cx;
         m_pChessBoard->Move(rcBoard);
     }
     else
     {
         int nHei = (int)(szGameBoard.cx / fRatio2);
         rcBoard.DeflateRect(0, (szGameBoard.cy - nHei) / 2);
+        scale = (float)nHei / szBoard.cy;
         m_pChessBoard->Move(rcBoard);
     }
+    CRect rcMargin = pSkin->GetMargin();
+    CSize szCellAll = szBoard - CSize(rcMargin.left + rcMargin.right,rcMargin.top+rcMargin.bottom);
+
     //calc cell size
-    m_szCell.cx = rcBoard.Width() / 9;
-    m_szCell.cy = rcBoard.Height() / 10;
+    m_szCell.cx = szCellAll.cx * scale / 8;
+    m_szCell.cy = szCellAll.cy * scale / 9;
+
+    rcMargin.left *= scale;
+    rcMargin.top *= scale;
+    rcMargin.right *= scale;
+    rcMargin.bottom *= scale;
+    rcBoard.DeflateRect(rcMargin);
+    m_ptBoardCenter = rcBoard.CenterPoint();
 }
 
 void WINAPI CChessGame::OnAnimatorGroupEnd(IAnimatorGroup * pGroup, int nID)

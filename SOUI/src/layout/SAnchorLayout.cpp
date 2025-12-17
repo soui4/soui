@@ -304,7 +304,7 @@ BOOL SAnchorLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float 
 }
 
 //////////////////////////////////////////////////////////////////////////
-CPoint SAnchorLayout::DefaultAnchor2Pos(const CRect &rcParent, int type)
+CPoint SAnchorLayout::Anchor2Pos(const CRect &rcParent, int type)
 {
     CPoint pt;
     switch (type)
@@ -351,7 +351,8 @@ CPoint SAnchorLayout::DefaultAnchor2Pos(const CRect &rcParent, int type)
     return pt;
 }
 SAnchorLayout::SAnchorLayout(void)
-:m_pfnAnchor2Pos(DefaultAnchor2Pos)
+:m_pfnPosition2Point(DefaultPosition2Point)
+,m_pUserData(NULL)
 {
 }
 
@@ -374,19 +375,19 @@ SIZE SAnchorLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHei
     return CSize();
 }
 
-POINT SAnchorLayout::Position2Point(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale) const
+POINT SAnchorLayout::DefaultPosition2Point(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData)
 {
-    CPoint pt = m_pfnAnchor2Pos(rcParent, pos.type);
+    CPoint pt = Anchor2Pos(rcParent, pos.type);
     pt.x += pos.x.toPixelSize(nScale);
     pt.y += pos.y.toPixelSize(nScale);
     pt.Offset(pos.fOffsetX * szChild.cx,pos.fOffsetY * szChild.cy);
     return pt;
 }
 POINT SAnchorLayout::CalcPoint4Animator(const AnchorPos &start, const AnchorPos &end, float fraction, const CRect &rcParent, const CSize & szChild, int nScale) const{
-    POINT ptStart = Position2Point(start,rcParent,szChild,nScale);
+    POINT ptStart = m_pfnPosition2Point(start,rcParent,szChild,nScale,m_pUserData);
     if(end.type == APT_Invalid)
         return ptStart;
-    POINT ptEnd = Position2Point(end,rcParent,szChild,nScale);
+    POINT ptEnd = m_pfnPosition2Point(end,rcParent,szChild,nScale,m_pUserData);
     CPoint pt;
     pt.x = ptStart.x + (ptEnd.x - ptStart.x) * fraction;
     pt.y = ptStart.y + (ptEnd.y - ptStart.y) * fraction;
@@ -468,7 +469,7 @@ void SAnchorLayout::LayoutChildren(IWindow *pParent)
             }
             else
             {
-                pt = Position2Point(pParam->pos, rcParent, szChild, pChild->GetScale());
+                pt = m_pfnPosition2Point(pParam->pos, rcParent, szChild, pChild->GetScale(),m_pUserData);
             }
             if (szChild.cx == rcParent.Width())
             {
@@ -481,7 +482,7 @@ void SAnchorLayout::LayoutChildren(IWindow *pParent)
         }
         else
         {
-            pt = Position2Point(pParam->pos, rcParent, szChild, pChild->GetScale());
+            pt = m_pfnPosition2Point(pParam->pos, rcParent, szChild, pChild->GetScale(),m_pUserData);
             if (pParam->width.isMatchParent())
             {
                 pt.x = rcParent.left;

@@ -28,6 +28,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     // Register external window class
     app.RegisterSkinClass<SSkinAni>();
     app.RegisterSkinClass<SSkinPiece>();
+    app.RegisterSkinClass<SSkinBoard>();
     app.RegisterWindowClass<SGifPlayer>();
     SStringT appDir = app.GetAppDir();
 
