@@ -255,7 +255,7 @@ void CMainDlg::OnBtnAnimation()
 			m_runningAnimator1->end();
 		SPropertyAnimator *pAnimator = SPropertyAnimator::ofPosition(pWnd_left_top, LayoutProperty::POSITION, pos, ARRAYSIZE(pos), sizeof(AnchorPos));
 		//设置权重
-		float weights[] = { 1.0f, 2.0f };
+		float weights[] = { 1.0f, 5.0f };
 		pAnimator->GetPropertyValuesHolder(0)->SetKeyFrameWeights(weights, ARRAYSIZE(weights));
 		m_runningAnimator1 = pAnimator;
 		//as m_runningAnimator1 hold a ref, we need release pAnimator
