@@ -729,7 +729,7 @@ void SImageWnd::OnScaleChanged(int scale)
         GetScaleSkin(m_pSkin, scale);
 }
 
-ISkinObj *SImageWnd::GetSkin()
+ISkinObj *SImageWnd::GetSkin() const
 {
     return m_pSkin;
 }

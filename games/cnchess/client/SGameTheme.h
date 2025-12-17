@@ -53,6 +53,8 @@ namespace Sprites{
     static const wchar_t* avatar_enemy = L"avatar_enemy";   ///< 对手头像
 
     static const wchar_t* img_clock = L"img_clock";         ///< 时钟图片
+
+    static const wchar_t* board_main = L"board_main";       ///< 棋盘主界面
 }
 
 /**

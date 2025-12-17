@@ -42,6 +42,17 @@ void CChessGame::Init(SWindow *pGameBoard, WebSocketClient *pWs)
 {
     m_pGameBoard = pGameBoard;
     m_webSocketClient = pWs;
+    m_pChessBoard = sobj_cast<SChessBoard>(m_pTheme->GetWidget(Sprites::board_main));
+    m_pGameBoard->InsertChild(m_pChessBoard);
+    m_pChessBoard->AddRef();
+}
+
+void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
+{
+    EventSwndSize *evt = sobj_cast<EventSwndSize>(e);
+    CSize szBoard = m_pChessBoard->GetBoardSize();
+    CSize szGameBoard = evt->szWnd;
+
 }
 
 void WINAPI CChessGame::OnAnimatorGroupEnd(IAnimatorGroup * pGroup, int nID)

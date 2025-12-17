@@ -3,12 +3,16 @@
 
 SNSBEGIN
 
-class SChessBoard : public SWindow
+class SChessBoard : public SImageWnd
 {
-    DEF_SOBJECT(SWindow, L"chessboard")
+    DEF_SOBJECT(SImageWnd, L"chessboard")
 public:
     SChessBoard(void);
     ~SChessBoard(void);
+
+    SIZE GetBoardSize() const;
+protected:
+    void OnScaleChanged(int scale) override;
 };
 
 SNSEND

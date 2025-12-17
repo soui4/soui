@@ -38,7 +38,7 @@
             <include src="file:xml/clock_digit.xml" name="digit2" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
             <window size="0,0" weight="1"/>
         </img>
-        <chessboard name="board_main" skin="skin_chessboard" layout="anchor" enableLayer="1"/>
+        <chessboard name="board_main" skin="skin_chessboard" layout="anchor" enableLayer="1" ownerLayout="anchor" pos="0,0,4" offset="-0.5,-0.5" fitImage="1" />
 
     </widgets>
     <anchors>
