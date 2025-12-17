@@ -15,8 +15,8 @@ POINT CChessGame::ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, c
         CChessGame *pThis = (CChessGame *)userData;
         SASSERT(pos.x.fSize>=0 && pos.x.fSize<9 && pos.y.fSize>=0 && pos.y.fSize<10);
         CPoint pt = pThis->m_ptBoardOrigin;
-        pt.x += pThis->m_szCell.cx * pos.x.fSize;
-        pt.y -= pThis->m_szCell.cy * pos.y.fSize;
+        pt.x += pThis->m_cellWidth * pos.x.fSize;
+        pt.y -= pThis->m_cellHeight * pos.y.fSize;
         pt.x += pos.fOffsetX * szChild.cx;
         pt.y += pos.fOffsetY * szChild.cy;
         return pt;
@@ -98,8 +98,8 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
     CSize szCellAll = szBoard - CSize(rcMargin.left + rcMargin.right,rcMargin.top+rcMargin.bottom);
 
     //calc cell size
-    m_szCell.cx = szCellAll.cx * scale / 8;
-    m_szCell.cy = szCellAll.cy * scale / 9;
+    m_cellWidth = szCellAll.cx * scale / 8;
+    m_cellHeight = szCellAll.cy * scale / 9;
 
     rcMargin.left *= scale;
     rcMargin.top *= scale;
@@ -108,7 +108,7 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
     rcBoard.DeflateRect(rcMargin);
     m_ptBoardOrigin.x = rcBoard.left;
     m_ptBoardOrigin.y = rcBoard.bottom;
-    
+
     m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale*100, 0);
 }
 
