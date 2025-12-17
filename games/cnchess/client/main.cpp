@@ -3,6 +3,7 @@
 #include "MainDlg.h"
 #include "SGameTheme.h"
 #include "SSkinPiece.h"
+#include "ChessBoard.h"
 
 static const TCHAR * kPath_SysRes = _T("/../../../soui-sys-resource");
 static const TCHAR *kPath_UiRes = _T("/uires");
@@ -27,6 +28,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     // Register external window class
     app.RegisterSkinClass<SSkinAni>();
     app.RegisterSkinClass<SSkinPiece>();
+    app.RegisterWindowClass<SChessBoard>();
     app.RegisterWindowClass<SGifPlayer>();
     SStringT appDir = app.GetAppDir();
 
@@ -39,7 +41,9 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         .SetLog(TRUE);
 #ifdef _WIN32
     cfg.SetSysResPeFile(appDir + _T("/soui-sys-resource.dll"));
-    cfg.SetAppResPeHandle(hInstance);
+    //cfg.SetAppResPeHandle(hInstance);
+    SStringT strAppRes = srcDir + kPath_UiRes;
+    cfg.SetAppResFile(strAppRes);
 #else
     SStringT strAppRes = appDir+_T("/chess_uires.zip");
     if(GetFileAttributes(strAppRes) != INVALID_FILE_ATTRIBUTES)
