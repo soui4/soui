@@ -21,6 +21,7 @@ SPropertyValuesHolder::SPropertyValuesHolder()
 {
     m_value.nType = PROP_TYPE_UNKNOWN;
     m_value.fValue = NULL;
+    m_value.pWeights = NULL;
     m_valueCount = 0;
 }
 
@@ -52,6 +53,7 @@ void SPropertyValuesHolder::SetByteValues(const BYTE *values, int count)
         }
         m_valueSize = sizeof(BYTE);
         m_valueCount = count;
+        m_totalWeight = count;
     }
 }
 
@@ -68,6 +70,7 @@ void SPropertyValuesHolder::SetShortValues(const short *values, int count)
         }
         m_valueSize = sizeof(short);
         m_valueCount = count;
+        m_totalWeight = count;
     }
 }
 
@@ -84,6 +87,7 @@ void SPropertyValuesHolder::SetColorRefValues(const COLORREF *values, int count)
         }
         m_valueSize = sizeof(COLORREF);
         m_valueCount = count;
+        m_totalWeight = count;
     }
 }
 
@@ -97,6 +101,7 @@ void SPropertyValuesHolder::SetFloatValues(const float *values, int count)
         memcpy(m_value.fValue, values, sizeof(float) * count);
         m_valueSize = sizeof(float);
         m_valueCount = count;
+        m_totalWeight = count;
     }
 }
 
@@ -110,6 +115,7 @@ void SPropertyValuesHolder::SetIntValues(const int *values, int count)
         memcpy(m_value.nValue, values, sizeof(int) * count);
         m_valueSize = sizeof(int);
         m_valueCount = count;
+        m_totalWeight = count;
     }
 }
 
@@ -126,6 +132,7 @@ void SPropertyValuesHolder::SetLayoutSizeValues(const LAYOUTSIZE *values, int co
         }
         m_valueSize = sizeof(LAYOUTSIZE);
         m_valueCount = count;
+        m_totalWeight = count;
     }
 }
 
@@ -139,6 +146,7 @@ void SPropertyValuesHolder::SetPositionValues(const void *values, int count, int
         memcpy(m_value.pValue, values, valueSize * count);
         m_valueSize = valueSize;
         m_valueCount = count;
+        m_totalWeight = count;
     }
 }
 
@@ -230,9 +238,15 @@ void SPropertyValuesHolder::ClearValues()
             m_value.pValue = NULL;
             break;
         }
+        if(m_value.pWeights)
+        {
+            delete[] m_value.pWeights;
+            m_value.pWeights = NULL;
+        }
         m_value.nType = PROP_TYPE_UNKNOWN;
         m_valueSize = 0;
         m_valueCount = 0;
+        m_totalWeight = 0;
     }
 }
 
@@ -244,6 +258,45 @@ float SPropertyValuesHolder::Fraction2Index(float fraction, int idx[2]) const
     if (idx[1] >= m_valueCount)
         idx[1] = m_valueCount - 1;
     return segmentFraction - idx[0];
+}
+
+BOOL SPropertyValuesHolder::SetKeyFrameWeights(const float *weights, int count)
+{
+    if (weights && count == m_valueCount)
+    {
+        float totalWeight = 0.0f;
+        for(int i = 0; i < count; i++){
+            totalWeight += weights[i];
+        }
+        if(totalWeight <= 0.0f)
+            return FALSE;
+        if(!m_value.pWeights)
+        {
+            m_value.pWeights = new float[count];
+        }
+        memcpy(m_value.pWeights, weights, sizeof(float) * count);
+        m_totalWeight = totalWeight;
+        return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL SPropertyValuesHolder::GetKeyFrameWeights(float *weights, int count) const
+{
+    if (!weights || count != m_valueCount)
+        return FALSE;
+    if (m_value.pWeights)
+    {
+        memcpy(weights, m_value.pWeights, sizeof(float) * count);
+    }
+    else
+    {
+        for (int i = 0; i < count; i++)
+        {
+            weights[i] = 1.0f;
+        }
+    }
+    return TRUE;
 }
 
 BYTE SPropertyValuesHolder::InterpolateByte(float fraction) const

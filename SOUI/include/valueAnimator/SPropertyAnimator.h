@@ -26,6 +26,7 @@ typedef struct _PROPVALUE{
         LAYOUTSIZE * pLayoutSize;
         void* pValue; 
     };
+    float * pWeights;
 }PROPVALUE;
 
 /**
@@ -62,6 +63,9 @@ public:
     STDMETHOD_(int, GetKeyframeCount)(CTHIS) SCONST OVERRIDE{
         return m_valueCount;
     }
+    STDMETHOD_(BOOL, SetKeyFrameWeights)(THIS_ const float *weights, int count) OVERRIDE;
+    STDMETHOD_(BOOL, GetKeyFrameWeights)(CTHIS_ float *weights, int count) SCONST OVERRIDE;
+
     // 静态工厂方法
     static SPropertyValuesHolder* ofByte(LPCWSTR propertyName, const BYTE *values, int count);
     static SPropertyValuesHolder* ofShort(LPCWSTR propertyName, const short *values, int count);
@@ -78,6 +82,7 @@ private:
     PROPVALUE m_value;
 
     int m_valueCount;
+    float m_totalWeight;
     int m_valueSize;  // 用于位置值的大小
 
     void ClearValues();

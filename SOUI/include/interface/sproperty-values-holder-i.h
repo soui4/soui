@@ -150,6 +150,23 @@ DECLARE_INTERFACE_(IPropertyValuesHolder, IObjRef)
      * @return 关键帧数量
      */
     STDMETHOD_(int, GetKeyframeCount)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief 设置关键帧权重
+     * @param weights 权重数组
+     * @param count 权重数量
+     * @return 成功返回TRUE,失败返回FALSE(权重数量与关键帧数量不一致)
+     * @note 权重数量必须与关键帧数量一致,不设置权重则默认为1.0
+     */
+    STDMETHOD_(BOOL, SetKeyFrameWeights)(THIS_ const float *weights, int count) PURE;
+
+    /**
+     * @brief 获取关键帧权重
+     * @param weights 权重数组
+     * @param count 权重数量
+     * @return 成功返回TRUE,失败返回FALSE(权重数量与关键帧数量不一致)
+     */
+    STDMETHOD_(BOOL, GetKeyFrameWeights)(CTHIS_ float *weights, int count) SCONST PURE;
 };
 
 SNSEND
