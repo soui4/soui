@@ -238,5 +238,5 @@ private:
     SList<SAutoRefPtr<IAnimatorGroup> > m_animatorGroupList;
     SAutoRefPtr<SImageWnd> m_pChessBoard;
     CSize   m_szCell;
-    CPoint  m_ptBoardCenter;
+    CPoint  m_ptBoardOrigin;    ///棋盘左下角坐标
 };

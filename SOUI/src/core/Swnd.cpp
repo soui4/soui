@@ -1671,6 +1671,15 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
             pChild = pChild->GetWindow(GSW_NEXTSIBLING);
         }
     }
+
+    EventSwndPos evt(this);
+    evt.rcWnd = m_rcWindow;
+    FireEvent(evt);
+
+    CRect rcClient;
+    GetClientRect(&rcClient);
+    SSendMessage(WM_SIZE, 0, MAKELPARAM(rcClient.Width(), rcClient.Height()));
+
     // only if window is visible now, we do relayout.
     if (IsVisible(FALSE))
     {
@@ -1685,14 +1694,6 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
     { // mark layout to self dirty.
         m_layoutDirty = dirty_self;
     }
-
-    EventSwndPos evt(this);
-    evt.rcWnd = m_rcWindow;
-    FireEvent(evt);
-
-    CRect rcClient;
-    GetClientRect(&rcClient);
-    SSendMessage(WM_SIZE, 0, MAKELPARAM(rcClient.Width(), rcClient.Height()));
     return TRUE;
 }
 

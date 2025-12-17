@@ -10,10 +10,16 @@
 #define TIMERID_CLOCK 503
 
 POINT CChessGame::ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData){
-    if(pos.type == 100){
-        //type == 100 is chess anchor
+    if(pos.type == 10){
+        //type == 10 is chess anchor
         CChessGame *pThis = (CChessGame *)userData;
-        return CPoint();
+        SASSERT(pos.x.fSize>=0 && pos.x.fSize<9 && pos.y.fSize>=0 && pos.y.fSize<10);
+        CPoint pt = pThis->m_ptBoardOrigin;
+        pt.x += pThis->m_szCell.cx * pos.x.fSize;
+        pt.y -= pThis->m_szCell.cy * pos.y.fSize;
+        pt.x += pos.fOffsetX * szChild.cx;
+        pt.y += pos.fOffsetY * szChild.cy;
+        return pt;
     }else{
         return SAnchorLayout::DefaultPosition2Point(pos, rcParent, szChild, nScale, userData);
     }
@@ -100,7 +106,8 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
     rcMargin.right *= scale;
     rcMargin.bottom *= scale;
     rcBoard.DeflateRect(rcMargin);
-    m_ptBoardCenter = rcBoard.CenterPoint();
+    m_ptBoardOrigin.x = rcBoard.left;
+    m_ptBoardOrigin.y = rcBoard.bottom;
 }
 
 void WINAPI CChessGame::OnAnimatorGroupEnd(IAnimatorGroup * pGroup, int nID)
