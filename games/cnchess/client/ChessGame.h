@@ -10,7 +10,7 @@
 #include <sobject/Sobject.hpp>
 #include <helper/obj-ref-impl.hpp>
 #include <ChessLayout.h>
-#include "ChessBoard.h"
+
 class CMainDlg;
 
 /**
@@ -120,7 +120,7 @@ public:
      */
     EVENT_MAP_BEGIN()
         EVENT_CHECK_SENDER_ROOT(m_pGameBoard)
-        EVENT_ID_HANDLER(m_pGameBoard->GetID(), EventSwndSize::EventID, OnGameBoardSizeChanged)
+        EVENT_NAME_HANDLER(m_pGameBoard->GetName(), EventSwndSize::EventID, OnGameBoardSizeChanged)
     EVENT_MAP_BREAK()
 public:
     /**
@@ -235,5 +235,5 @@ private:
     DWORD m_dwProps[MAX_PROP];          ///< 游戏属性
 
     SList<SAutoRefPtr<IAnimatorGroup> > m_animatorGroupList;
-    SAutoRefPtr<SChessBoard> m_pChessBoard;
+    SAutoRefPtr<SImageWnd> m_pChessBoard;
 };

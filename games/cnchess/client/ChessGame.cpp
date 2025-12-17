@@ -42,7 +42,7 @@ void CChessGame::Init(SWindow *pGameBoard, WebSocketClient *pWs)
 {
     m_pGameBoard = pGameBoard;
     m_webSocketClient = pWs;
-    m_pChessBoard = sobj_cast<SChessBoard>(m_pTheme->GetWidget(Sprites::board_main));
+    m_pChessBoard = sobj_cast<SImageWnd>(m_pTheme->GetWidget(Sprites::board_main));
     m_pGameBoard->InsertChild(m_pChessBoard);
     m_pChessBoard->AddRef();
 }
@@ -50,9 +50,24 @@ void CChessGame::Init(SWindow *pGameBoard, WebSocketClient *pWs)
 void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
 {
     EventSwndSize *evt = sobj_cast<EventSwndSize>(e);
-    CSize szBoard = m_pChessBoard->GetBoardSize();
+    CSize szBoard = m_pChessBoard->GetSkin()->GetSkinSize();
+    CRect rcGameGoard = m_pGameBoard->GetClientRect();
     CSize szGameBoard = evt->szWnd;
-
+    float fRatio1 = (float)szGameBoard.cx / szGameBoard.cy;
+    float fRatio2 = (float)szBoard.cx / szBoard.cy;
+    CRect rcBoard =  rcGameGoard;
+    if(fRatio1 > fRatio2)
+    {
+        int nWid = (int)(szGameBoard.cy * fRatio2);
+        rcBoard.DeflateRect((szGameBoard.cx - nWid) / 2, 0);
+        m_pChessBoard->Move(rcBoard);
+    }
+    else
+    {
+        int nHei = (int)(szGameBoard.cx / fRatio2);
+        rcBoard.DeflateRect(0, (szGameBoard.cy - nHei) / 2);
+        m_pChessBoard->Move(rcBoard);
+    }
 }
 
 void WINAPI CChessGame::OnAnimatorGroupEnd(IAnimatorGroup * pGroup, int nID)
