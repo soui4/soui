@@ -257,6 +257,14 @@ float SPropertyValuesHolder::Fraction2Index(float fraction, int idx[2]) const
     }
     else 
     {
+        // 处理特殊情况：fraction为1.0时
+        if (fraction >= 1.0f) 
+        {
+            idx[0] = m_valueCount - 2;
+            idx[1] = m_valueCount - 1;
+            return 1.0f;
+        }
+
         // 使用权重计算关键帧索引和片段分数
         float weightedFraction = fraction * m_totalWeight;
         float accumulatedWeight = 0.0f;
