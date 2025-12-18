@@ -22,7 +22,7 @@ class CMainDlg;
  * 3. 游戏数据管理
  * 4. 与UI的交互
  */
-class CChessGame : public TObjRefImpl<SObject>, public WebSocketClient::IListener, public IConnListener2, public IAnimatorGroupListerer
+class CChessGame : public TObjRefImpl<SObject>, public WebSocketClient::IListener, public IConnListener2, public IAnimatorListener
 {
     DEF_SOBJECT(SObject, L"chessgame")     // 定义SObject的类名和类别名
     
@@ -94,8 +94,9 @@ public:
     int GetBankerIndex() const { return m_iBankerIndex; }
     
 public:
-    void WINAPI OnAnimatorGroupEnd(IAnimatorGroup * pGroup, int nID) override;
-
+    STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator * pAnimator) override{}
+    STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator * pAnimator) override;
+    STDMETHOD_(void, onAnimationRepeat)(THIS_ IValueAnimator * pAnimator) override{}
 public:
     /**
      * @brief WebSocket连接建立回调
@@ -245,4 +246,5 @@ private:
 
     CChessLayout    m_layout;
     BOOL m_bRedSide;
+    int  m_nSelectedChessID;
 };

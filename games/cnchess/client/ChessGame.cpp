@@ -6,6 +6,7 @@
 #include "CnchessSkin.h"
 #include "ChessPiece.h"
 #include "utils.h"
+#include <valueAnimator/SPropertyAnimator.h>
 #include <helper/slog.h>
 #define kLogTag "ChessGame"
 
@@ -56,19 +57,98 @@ CChessGame::~CChessGame()
 {
 }
 
+enum{
+    ANI_UP=1,
+    ANI_MOVE,
+    ANI_DOWN,
+    ANI_MOVEDOWN,
+};
+
+void CChessGame::onAnimationEnd(IValueAnimator * pAnimator)
+{
+    SPropertyAnimator *pPropAnimator = sobj_cast<SPropertyAnimator>(pAnimator);
+    CChessPiece *pPiece = (CChessPiece *)pPropAnimator->GetTarget();
+    if(pPropAnimator->GetID() == ANI_MOVE ){
+        //start a new animation to move the piece down
+        auto pAnim = Util::OffsetSprite(pPiece, -m_cellWidth/10, -m_cellHeight/10, 100);
+        pAnim->SetID(ANI_MOVEDOWN);
+        pAnim->addListener(this);
+    }else if(pPropAnimator->GetID() == ANI_DOWN){
+        //set the piece to normal state
+        pPiece->SetPicesState(CChessPiece::STATE_NORMAL);
+        pPiece->SetLayer(1);//restore layer
+    }else if(pPropAnimator->GetID() == ANI_MOVEDOWN){
+        //move the piece down
+        pPiece->SetPicesState(CChessPiece::STATE_NORMAL);
+        pPiece->SetLayer(1);
+
+        //todo: move the piece to the layout.
+    }
+}
+
 BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
 {
-    CChessPiece *pPiece = sobj_cast<CChessPiece>(e->Sender());
-    if(pPiece->GetPicesState() == CChessPiece::STATE_NORMAL)
+    if(m_nSelectedChessID != -1)
     {
-        pPiece->SetPicesState(CChessPiece::STATE_UP);
-        //offset the piece by 10% of cell size for x and y
-        Util::OffsetSprite(pPiece, m_cellWidth/10, m_cellHeight/10, 100);
-    }
-    else if(pPiece->GetPicesState() == CChessPiece::STATE_UP)
-    {
-        pPiece->SetPicesState(CChessPiece::STATE_DOWN);
-        Util::OffsetSprite(pPiece, -m_cellWidth/10, -m_cellHeight/10, 100);
+        SWindow *pTarget = sobj_cast<SWindow>(e->Sender());
+        if(pTarget->GetID() == m_nSelectedChessID)
+        {//cancel the selection
+            CChessPiece *pSelPiece = (CChessPiece *)pTarget;
+            pSelPiece->SetPicesState(CChessPiece::STATE_NORMAL);
+            Util::OffsetSprite(pSelPiece, -m_cellWidth/10, -m_cellHeight/10, 100);
+            m_nSelectedChessID = -1;
+        }else{
+            //move the selected piece to the target position
+            ULONG_PTR lp = pTarget->GetUserData();
+            POINT ptTarget={GET_X_LPARAM(lp),GET_Y_LPARAM(lp)};
+            CChessPiece *pSelPiece = (CChessPiece *)m_pGameBoard->FindChildByID(m_nSelectedChessID);
+            SASSERT(pSelPiece);
+            pSelPiece->SetLayer(3);
+            pSelPiece->SetUserData(MAKELPARAM(ptTarget.x,ptTarget.y));
+
+            SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pTarget->GetLayoutParam();
+            SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
+            AnchorPos pos = pParamStruct->pos;
+            pos.x.fSize += m_cellWidth/10;
+            pos.y.fSize += m_cellHeight/10;
+            auto pAnim = Util::MoveSpriteTo(pSelPiece, pos, 500);
+            pAnim->SetID(ANI_MOVE);
+            pAnim->addListener(this);
+        }
+    }else{
+        CChessPiece *pTarget = sobj_cast<CChessPiece>(e->Sender());
+        //select the piece that is on the same side as the player
+        BOOL bRedSide = pTarget->IsRedSide();
+        if(bRedSide == m_bRedSide){
+            if(pTarget->GetPicesState() == CChessPiece::STATE_NORMAL)
+            {//raise up the piece
+                pTarget->SetPicesState(CChessPiece::STATE_UP);
+                pTarget->SetLayer(2);
+                //offset the piece by 10% of cell size for x and y
+                Util::OffsetSprite(pTarget, m_cellWidth/10, m_cellHeight/10, 100);
+                m_nSelectedChessID = pTarget->GetID();
+            }
+            else if(pTarget->GetPicesState() == CChessPiece::STATE_UP)
+            {//drop down the piece
+                auto pAnim = Util::OffsetSprite(pTarget, -m_cellWidth/10, -m_cellHeight/10, 100);
+                pAnim->SetID(ANI_DOWN);
+                pAnim->addListener(this);
+                m_nSelectedChessID = -1;
+            }
+
+            LPARAM lp = pTarget->GetUserData();
+            POINT ptPiece={GET_X_LPARAM(lp),GET_Y_LPARAM(lp)};
+            //show or hide possible move positions
+            POINT ptMoves[MAX_MOVES];
+            int nMoves = m_layout.GetPossiableMoves(ptPiece.x,ptPiece.y, ptMoves);
+            for(int i = 0; i < nMoves; i++)
+            {
+                if(m_layout.m_chesses[ptMoves[i].y][ptMoves[i].x] != CHSMAN_NULL)
+                    continue;
+                IWindow *pFlag = m_pGameBoard->FindChildByID(1000 + ptMoves[i].y * 9 + ptMoves[i].x);
+                pFlag->SetVisible(m_nSelectedChessID!=-1,TRUE);
+            }
+        }
     }
     return TRUE;
 }
@@ -87,12 +167,14 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
     m_pChessBoard->AddRef();
 
     m_bRedSide = TRUE;
+    m_nSelectedChessID = -1;
     m_layout.InitLayout(NULL,m_bRedSide?CS_RED:CS_BLACK);
     //init chess layout
     SXmlNode xmlPiece = m_pTheme->GetTemplate(Template::kChessPiece);
     SStringW clsName = xmlPiece.attribute(L"wndclass").as_string(L"chesspiece");
     SXmlNode xmlPosFlag = m_pTheme->GetTemplate(Template::kPosFlag);
     SStringW flgClsName = xmlPosFlag.attribute(L"wndclass").as_string(L"img");
+    auto slot = Subscriber(&CChessGame::OnChessPieceClick, this);
     for(int y=0;y<10;y++) for(int x=0;x<9;x++)
     {
         {
@@ -105,7 +187,9 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
             pParamStruct->pos.y.fSize = y;
             m_pGameBoard->InsertIChild(pFlag);
             pFlag->SetID(1000 + y * 9 + x);
+            pFlag->SetUserData(MAKELPARAM(x,y));
             pFlag->SetVisible(FALSE,TRUE);
+            pFlag->SubscribeEvent(EventCmd::EventID, &slot);
         }
 
         if(m_layout.m_chesses[y][x] == CHSMAN_NULL) 
@@ -120,8 +204,8 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
             pParamStruct->pos.x.fSize = x;
             pParamStruct->pos.y.fSize = y;
             pPiece->SetID(m_layout.m_nChsID[y][x]);
+            pPiece->SetUserData(MAKELPARAM(x,y));
             m_pGameBoard->InsertChild(pPiece);
-            auto slot = Subscriber(&CChessGame::OnChessPieceClick, this);
             pPiece->SubscribeEvent(EventCmd::EventID, &slot);
         }
     }
@@ -169,10 +253,6 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
     m_ptBoardOrigin.y = rcBoard.bottom;
 
     m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale*100, 1);
-}
-
-void WINAPI CChessGame::OnAnimatorGroupEnd(IAnimatorGroup * pGroup, int nID)
-{
 }
 
 void CChessGame::OnConnected()
