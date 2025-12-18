@@ -29,6 +29,7 @@
             <text name="txt_name" text=" " font="size:16"/>
         </avatar>
         <piece  wndClass="chesspiece" skin="skin_pieces" ownerLayout="anchor" offset="-0.5,-0.5" layer="10" size="76,76"/>
+        <shadow wndClass="img" skin="skin_piece_shadow" ownerLayout="anchor" pos="0,0,10" offset="-0.5,-0.5" layer="5" size="76,86"/>
         <posflag wndClass="img" skin="skin_pos_flag" ownerLayout="anchor" pos="0,0,10" offset="-0.5,-0.5" layer="5" size="27,26" msgTransparent="0" />
     </template>
     <widgets>
@@ -41,9 +42,7 @@
             <include src="file:xml/clock_digit.xml" name="digit2" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
             <window size="0,0" weight="1"/>
         </img>
-        <img name="board_main" skin="skin_chessboard" layout="anchor" enableLayer="1" ownerLayout="anchor" pos="0,0,4" offset="-0.5,-0.5" fitImage="1">
-            <img name="piece_shadow" skin="skin_piece_shadow" pos="0,0,4" offset="-0.5,-0.5" layer="15" visible="0"/>
-        </img>
+        <img name="board_main" skin="skin_chessboard" layout="anchor" enableLayer="1" ownerLayout="anchor" pos="0,0,4" offset="-0.5,-0.5" fitImage="1"/>
 
     </widgets>
     <anchors>

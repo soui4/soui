@@ -107,6 +107,7 @@ namespace Template{
     static const wchar_t *kAvatar = L"avatar";
     static const wchar_t *kTip = L"tip";
     static const wchar_t *kChessPiece = L"piece";
+    static const wchar_t *kShadow = L"shadow";
     static const wchar_t *kPosFlag = L"posflag";
 }
 /**
@@ -124,7 +125,6 @@ public:
     enum{
         LAYER_PIESE = 10,       ///< 棋子
         LAYER_PIESE_UP = 20,    ///< 棋子抬起
-        LAYER_SHAWDOW = 15,     ///< 棋子阴影
         LAYER_POSFLAG = 5,      ///< 棋子位置标志
     };
 
