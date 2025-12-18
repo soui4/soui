@@ -25,7 +25,8 @@ bool STimerlineHandlerMgr::UnregisterTimelineHandler(ITimelineHandler *pHandler)
 
 bool STimerlineHandlerMgr::RegisterValueAnimator(IValueAnimator *pAnimator)
 {
-    for(SPOSITION pos = m_lstAnimators.GetHeadPosition(); pos; ){
+    for (SPOSITION pos = m_lstAnimators.GetHeadPosition(); pos;)
+    {
         IValueAnimator *p = m_lstAnimators.GetNext(pos);
         if (p == pAnimator)
             return false;
@@ -36,7 +37,8 @@ bool STimerlineHandlerMgr::RegisterValueAnimator(IValueAnimator *pAnimator)
 
 bool STimerlineHandlerMgr::UnregisterValueAnimator(IValueAnimator *pAnimator)
 {
-    for(SPOSITION pos = m_lstAnimators.GetHeadPosition(); pos; ){
+    for (SPOSITION pos = m_lstAnimators.GetHeadPosition(); pos;)
+    {
         SPOSITION pos2 = pos;
         IValueAnimator *p = m_lstAnimators.GetNext(pos);
         if (p == pAnimator)
@@ -70,7 +72,7 @@ void STimerlineHandlerMgr::OnNextFrame()
         pHandlers[i]->OnNextFrame();
     }
     delete[] pHandlers;
-    SList<SAutoRefPtr<IValueAnimator> > lstAnimators;
+    SList<SAutoRefPtr<IValueAnimator>> lstAnimators;
     lstAnimators.Copy(m_lstAnimators);
     pos = lstAnimators.GetHeadPosition();
     while (pos)

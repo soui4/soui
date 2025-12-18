@@ -123,7 +123,7 @@ void SNotifyCenter::OnFireEvent(IEvtArgs *e)
 void SNotifyCenter::OnFireEvts()
 {
     SList<IEvtArgs *> evts;
-    SList<SAutoRefPtr<IRunnable> > cbs;
+    SList<SAutoRefPtr<IRunnable>> cbs;
     {
         SAutoLock lock(m_cs);
         evts = m_ayncEvent;

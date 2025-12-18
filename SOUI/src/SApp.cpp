@@ -179,7 +179,7 @@ void SObjectDefaultRegister::RegisterWindows(SObjectFactoryMgr *objFactory) cons
     objFactory->TplRegisterFactory<SActiveX>();
 #endif //_WIN32
 }
- 
+
 void SObjectDefaultRegister::RegisterSkins(SObjectFactoryMgr *objFactory) const
 {
     objFactory->TplRegisterFactory<SSkinImgList>();
@@ -720,9 +720,12 @@ IValueAnimator *SApplication::CreateValueAnimatorByName(LPCWSTR pszName) const
 void SApplication::SetLogManager(ILogMgr *pLogMgr)
 {
     m_logManager = pLogMgr;
-    if(m_logManager){
+    if (m_logManager)
+    {
         Log::setLogCallback(SouiLog_Callback);
-    }else{
+    }
+    else
+    {
         Log::setLogCallback(NULL);
     }
 }

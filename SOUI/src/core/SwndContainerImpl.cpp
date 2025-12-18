@@ -495,7 +495,7 @@ void SwndContainerImpl::OnNextFrame()
 {
     if (!m_pRoot->IsVisible(FALSE))
         return;
-    if(!IsTimelineEnabled())
+    if (!IsTimelineEnabled())
         return;
     m_timelineHandlerMgr.OnNextFrame();
 }

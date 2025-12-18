@@ -70,14 +70,14 @@ DECLARE_INTERFACE_(ISwndContainer, ITimelineHandlersMgr)
      * @param pAnimator Pointer to the value animator.
      * @return TRUE if registration is successful, FALSE otherwise.
      */
-    STDMETHOD_(BOOL, RegisterValueAnimator)(THIS_ IValueAnimator *pAnimator) PURE;
+    STDMETHOD_(BOOL, RegisterValueAnimator)(THIS_ IValueAnimator * pAnimator) PURE;
 
     /**
      * @brief Unregisters a value animator.
      * @param pAnimator Pointer to the value animator.
      * @return TRUE if unregistration is successful, FALSE otherwise.
      */
-    STDMETHOD_(BOOL, UnregisterValueAnimator)(THIS_ IValueAnimator *pAnimator) PURE;
+    STDMETHOD_(BOOL, UnregisterValueAnimator)(THIS_ IValueAnimator * pAnimator) PURE;
 
     /**
      * @brief Registers an IDropTarget with a Swnd.

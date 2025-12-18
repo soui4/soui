@@ -177,7 +177,7 @@ typedef enum _MouseClickId
  * @class SEvtArgs
  * @brief 事件参数基类
  */
-class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs> > {
+class SOUI_EXP SEvtArgs : public TObjRefImpl<SObjectImpl<IEvtArgs>> {
     DEF_SOBJECT(SObjectImpl<IEvtArgs>, L"event")
 
   public:
@@ -714,12 +714,10 @@ DEF_EVT(EventRealWndPosition, EVT_REALWND_POSITION, on_real_wnd_position, {
 
 typedef struct IListView IListView;
 
-DEF_EVT(EventDropdownListGetBuddyRect, EVT_DROPDOWN_LIST_GET_BUDDY_RECT, on_dropdown_list_get_buddy_rect, {
-    RECT rcBuddy;
-})
+DEF_EVT(EventDropdownListGetBuddyRect, EVT_DROPDOWN_LIST_GET_BUDDY_RECT, on_dropdown_list_get_buddy_rect, { RECT rcBuddy; })
 
-DEF_EVT(EventDropdownListFill, EVT_DROPDOWN_LIST_FILL,  on_dropdown_list_fill, {
-    const IStringT* strKey;
+DEF_EVT(EventDropdownListFill, EVT_DROPDOWN_LIST_FILL, on_dropdown_list_fill, {
+    const IStringT *strKey;
     IListView *pListView;
     BOOL bPopup;
 })

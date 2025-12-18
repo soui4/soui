@@ -27,10 +27,10 @@ class SResDesc {
     }
 };
 
-class SLogDesc{
-public:
+class SLogDesc {
+  public:
     BOOL m_bLogEnable;
-    SStringA m_strLogName;  //default set to app_name
+    SStringA m_strLogName; // default set to app_name
     int m_nLogLevel;
     SLogDesc()
     {
@@ -39,15 +39,15 @@ public:
     }
 };
 
-class SMultiLangDesc{
-public:
+class SMultiLangDesc {
+  public:
     BOOL enable;
     SStringT langResId;
-    SMultiLangDesc():enable(FALSE)
+    SMultiLangDesc()
+        : enable(FALSE)
     {
     }
 };
-
 
 class SResLoader {
   public:
@@ -145,68 +145,79 @@ SAppCfg ::~SAppCfg(void)
 }
 
 // C++版本的链式调用方法实现
-SAppCfg & SAppCfg::SetRender(Render render){
-    m_render = render; 
+SAppCfg &SAppCfg::SetRender(Render render)
+{
+    m_render = render;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetImgDecoder(ImgDecoder decoder){
-    m_imgDecoder = decoder; 
+SAppCfg &SAppCfg::SetImgDecoder(ImgDecoder decoder)
+{
+    m_imgDecoder = decoder;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetSysResPeHandle(HMODULE hResModule){
+SAppCfg &SAppCfg::SetSysResPeHandle(HMODULE hResModule)
+{
     m_sysResDesc->m_type = ResType_PeHandle;
     m_sysResDesc->m_hResModule = hResModule;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetSysResPeFile(LPCTSTR pszPath){
+SAppCfg &SAppCfg::SetSysResPeFile(LPCTSTR pszPath)
+{
     m_sysResDesc->m_type = ResType_PeFile;
     m_sysResDesc->m_szFile = pszPath;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetSysResFile(LPCTSTR pszPath) {
+SAppCfg &SAppCfg::SetSysResFile(LPCTSTR pszPath)
+{
     m_sysResDesc->m_type = ResType_ResFile;
     m_sysResDesc->m_szFile = pszPath;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetSysResZip(LPCTSTR pszZipFile, LPCSTR pszPwd){
+SAppCfg &SAppCfg::SetSysResZip(LPCTSTR pszZipFile, LPCSTR pszPwd)
+{
     m_sysResDesc->m_type = ResType_ZipFile;
     m_sysResDesc->m_szFile = pszZipFile;
-    if(pszPwd) m_sysResDesc->m_szPwd = pszPwd;
+    if (pszPwd)
+        m_sysResDesc->m_szPwd = pszPwd;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetSysRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd){
+SAppCfg &SAppCfg::SetSysRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
+{
     m_sysResDesc->m_type = ResType_7zFile;
     m_sysResDesc->m_szFile = psz7zFile;
-    if(pszPwd) m_sysResDesc->m_szPwd = pszPwd;
+    if (pszPwd)
+        m_sysResDesc->m_szPwd = pszPwd;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetAppResPeHandle(HMODULE hResModule){
+SAppCfg &SAppCfg::SetAppResPeHandle(HMODULE hResModule)
+{
     m_appResDesc->m_type = ResType_PeHandle;
     m_appResDesc->m_hResModule = hResModule;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetAppResPeFile(LPCTSTR pszPath){ 
+SAppCfg &SAppCfg::SetAppResPeFile(LPCTSTR pszPath)
+{
     m_appResDesc->m_type = ResType_PeFile;
     m_appResDesc->m_szFile = pszPath;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetAppResFile(LPCTSTR pszPath)
+SAppCfg &SAppCfg::SetAppResFile(LPCTSTR pszPath)
 {
     m_appResDesc->m_type = ResType_ResFile;
     m_appResDesc->m_szFile = pszPath;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd)
+SAppCfg &SAppCfg::SetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd)
 {
     m_appResDesc->m_type = ResType_ZipFile;
     m_appResDesc->m_szFile = pszZipFile;
@@ -215,7 +226,7 @@ SAppCfg & SAppCfg::SetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd)
     return *this;
 }
 
-SAppCfg & SAppCfg::SetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
+SAppCfg &SAppCfg::SetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
 {
     m_appResDesc->m_type = ResType_7zFile;
     m_appResDesc->m_szFile = psz7zFile;
@@ -224,29 +235,35 @@ SAppCfg & SAppCfg::SetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
     return *this;
 }
 
-SAppCfg & SAppCfg::SetUidefId(const SStringT &strUidefId){
+SAppCfg &SAppCfg::SetUidefId(const SStringT &strUidefId)
+{
     m_uidefId = strUidefId;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetLog(BOOL bLogEnable, int nLogLevel, LPCSTR pszLogName){
+SAppCfg &SAppCfg::SetLog(BOOL bLogEnable, int nLogLevel, LPCSTR pszLogName)
+{
     m_logDesc->m_bLogEnable = bLogEnable;
     m_logDesc->m_nLogLevel = nLogLevel;
-    if(pszLogName) m_logDesc->m_strLogName = pszLogName;
+    if (pszLogName)
+        m_logDesc->m_strLogName = pszLogName;
     return *this;
 }
 
-SAppCfg & SAppCfg::SetAppDir(LPCTSTR pszAppDir){
+SAppCfg &SAppCfg::SetAppDir(LPCTSTR pszAppDir)
+{
     m_appDir = pszAppDir;
     return *this;
 }
 
-SAppCfg & SAppCfg::EnableScript(BOOL bEnable){
+SAppCfg &SAppCfg::EnableScript(BOOL bEnable)
+{
     m_enableScript = bEnable;
     return *this;
 }
 
-SAppCfg & SAppCfg::EnableMultiLang(const SStringT &langResId, BOOL bEnable){
+SAppCfg &SAppCfg::EnableMultiLang(const SStringT &langResId, BOOL bEnable)
+{
     m_langDesc->enable = bEnable;
     m_langDesc->langResId = langResId;
     return *this;
@@ -437,97 +454,111 @@ BOOL SAppCfg::DoConfig(SApplication *pApp) const
 }
 
 // IAppCfg接口方法实现
-IAppCfg* SAppCfg::ISetRender(Render render){
+IAppCfg *SAppCfg::ISetRender(Render render)
+{
     SetRender(render);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetImgDecoder(ImgDecoder decoder){
+IAppCfg *SAppCfg::ISetImgDecoder(ImgDecoder decoder)
+{
     SetImgDecoder(decoder);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetSysResPeHandle(HMODULE hResModule){
+IAppCfg *SAppCfg::ISetSysResPeHandle(HMODULE hResModule)
+{
     SetSysResPeHandle(hResModule);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetSysResPeFile(LPCTSTR pszPath){
+IAppCfg *SAppCfg::ISetSysResPeFile(LPCTSTR pszPath)
+{
     SetSysResPeFile(pszPath);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetSysResFile(LPCTSTR pszPath) {
+IAppCfg *SAppCfg::ISetSysResFile(LPCTSTR pszPath)
+{
     SetSysResFile(pszPath);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetSysResZip(LPCTSTR pszZipFile, LPCSTR pszPwd){
+IAppCfg *SAppCfg::ISetSysResZip(LPCTSTR pszZipFile, LPCSTR pszPwd)
+{
     SetSysResZip(pszZipFile, pszPwd);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetSysRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd){
+IAppCfg *SAppCfg::ISetSysRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
+{
     SetSysRes7z(psz7zFile, pszPwd);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetAppResPeHandle(HMODULE hResModule){
+IAppCfg *SAppCfg::ISetAppResPeHandle(HMODULE hResModule)
+{
     SetAppResPeHandle(hResModule);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetAppResPeFile(LPCTSTR pszPath){ 
+IAppCfg *SAppCfg::ISetAppResPeFile(LPCTSTR pszPath)
+{
     SetAppResPeFile(pszPath);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetAppResFile(LPCTSTR pszPath)
+IAppCfg *SAppCfg::ISetAppResFile(LPCTSTR pszPath)
 {
     SetAppResFile(pszPath);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd)
+IAppCfg *SAppCfg::ISetAppResZip(LPCTSTR pszZipFile, LPCSTR pszPwd)
 {
     SetAppResZip(pszZipFile, pszPwd);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
+IAppCfg *SAppCfg::ISetAppRes7z(LPCTSTR psz7zFile, LPCSTR pszPwd)
 {
     SetAppRes7z(psz7zFile, pszPwd);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetUidefId(LPCTSTR strUidefId){
+IAppCfg *SAppCfg::ISetUidefId(LPCTSTR strUidefId)
+{
     SetUidefId(strUidefId);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetLog(BOOL bLogEnable, int nLogLevel, LPCSTR pszLogName){
+IAppCfg *SAppCfg::ISetLog(BOOL bLogEnable, int nLogLevel, LPCSTR pszLogName)
+{
     SetLog(bLogEnable, nLogLevel, pszLogName);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::ISetAppDir(LPCTSTR pszAppDir){
+IAppCfg *SAppCfg::ISetAppDir(LPCTSTR pszAppDir)
+{
     SetAppDir(pszAppDir);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::IEnableScript(BOOL bEnable){
+IAppCfg *SAppCfg::IEnableScript(BOOL bEnable)
+{
     EnableScript(bEnable);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
-IAppCfg* SAppCfg::IEnableMultiLang(LPCTSTR langResId, BOOL bEnable){
+IAppCfg *SAppCfg::IEnableMultiLang(LPCTSTR langResId, BOOL bEnable)
+{
     EnableMultiLang(langResId, bEnable);
-    return (IAppCfg*)this;
+    return (IAppCfg *)this;
 }
 
 BOOL SAppCfg::IDoConfig(IApplication *pApp) SCONST
 {
-    return DoConfig((SApplication*)pApp);
+    return DoConfig((SApplication *)pApp);
 }
 
 SNSEND

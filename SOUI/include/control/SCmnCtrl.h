@@ -445,6 +445,7 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      * @param nParentHei 父容器高度
      */
     STDMETHOD_(void, GetDesiredSize)(THIS_ SIZE *pSize, int nParentWid, int nParentHei) OVERRIDE;
+
   protected:
     /**
      * @brief 处理颜色化事件

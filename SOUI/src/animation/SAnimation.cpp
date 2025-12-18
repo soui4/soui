@@ -112,8 +112,8 @@ BOOL SAnimation::getTransformation(uint64_t currentTime, ITransformation *outTra
     float normalizedTime;
     if (duration != 0)
     {
-        int64_t diff = (int64_t)(currentTime - (mStartTime+startOffset));
-        normalizedTime = (float)diff/ (float)duration;
+        int64_t diff = (int64_t)(currentTime - (mStartTime + startOffset));
+        normalizedTime = (float)diff / (float)duration;
     }
     else
     {

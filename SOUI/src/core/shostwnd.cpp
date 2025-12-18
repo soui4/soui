@@ -1568,7 +1568,8 @@ BOOL SHostWnd::UnregisterTimelineHandler(ITimelineHandler *pHandler)
     return bRet;
 }
 
-BOOL SHostWnd::RegisterValueAnimator(IValueAnimator *pAnimator){
+BOOL SHostWnd::RegisterValueAnimator(IValueAnimator *pAnimator)
+{
     bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
     BOOL bRet = SwndContainerImpl::RegisterValueAnimator(pAnimator);
     bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
@@ -1579,7 +1580,8 @@ BOOL SHostWnd::RegisterValueAnimator(IValueAnimator *pAnimator){
     return bRet;
 }
 
-BOOL SHostWnd::UnregisterValueAnimator(IValueAnimator *pAnimator){
+BOOL SHostWnd::UnregisterValueAnimator(IValueAnimator *pAnimator)
+{
     bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
     BOOL bRet = SwndContainerImpl::UnregisterValueAnimator(pAnimator);
     bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
@@ -2135,7 +2137,7 @@ void SHostWnd::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 }
 
 void SHostWnd::OnScaleChanged(int nScale)
-{ 
+{
 }
 
 void SHostWnd::SetScale(THIS_ int nScale, LPCRECT desRect)

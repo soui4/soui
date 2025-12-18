@@ -14,8 +14,8 @@ SNSBEGIN
 
 typedef struct _LAYOUTSIZE LAYOUTSIZE;
 
-
-typedef enum _PROP_TYPE {
+typedef enum _PROP_TYPE
+{
     PROP_TYPE_UNKNOWN = 0,
     PROP_TYPE_BYTE,
     PROP_TYPE_SHORT,
@@ -24,7 +24,7 @@ typedef enum _PROP_TYPE {
     PROP_TYPE_FLOAT,
     PROP_TYPE_LAYOUT_SIZE,
     PROP_TYPE_VARIANT,
-}PROP_TYPE;
+} PROP_TYPE;
 
 /**
  * @interface IPropertyValuesHolder
@@ -120,13 +120,13 @@ DECLARE_INTERFACE_(IPropertyValuesHolder, IObjRef)
      * @brief 获取起始值
      * @param pValue 输出值指针
      */
-    STDMETHOD_(void,GetStartValue)(CTHIS_ void *pValue) SCONST PURE;
+    STDMETHOD_(void, GetStartValue)(CTHIS_ void *pValue) SCONST PURE;
 
     /**
      * @brief 获取结束值
      * @param pValue 输出值指针
      */
-    STDMETHOD_(void,GetEndValue)(CTHIS_ void *pValue) SCONST PURE;
+    STDMETHOD_(void, GetEndValue)(CTHIS_ void *pValue) SCONST PURE;
 
     /**
      * @brief 将动画进度转换为索引
@@ -143,7 +143,7 @@ DECLARE_INTERFACE_(IPropertyValuesHolder, IObjRef)
      * @param valueSize 值大小
      * @return 成功返回TRUE
      */
-    STDMETHOD_(BOOL,GetValueByIndex)(CTHIS_ int index, void *pValue, int valueSize) SCONST PURE;
+    STDMETHOD_(BOOL, GetValueByIndex)(CTHIS_ int index, void *pValue, int valueSize) SCONST PURE;
 
     /**
      * @brief 获取关键帧数量

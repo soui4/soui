@@ -78,6 +78,7 @@ class SOUI_EXP SSpinButtonCtrl : public TWindowProxy<ISpinButtonCtrl> {
      * @param pBuddy Pointer to the buddy SWindow object.
      */
     STDMETHOD_(void, SetBuddy)(THIS_ IWindow *pBuddy) OVERRIDE;
+
   protected:
     /**
      * @brief Calculates the desired size of the control.
@@ -210,13 +211,13 @@ class SOUI_EXP SSpinButtonCtrl : public TWindowProxy<ISpinButtonCtrl> {
     SOUI_ATTRS_END()
 
   protected:
-    int m_nMax;          /**< Maximum value of the spin button. */
-    int m_nMin;          /**< Minimum value of the spin button. */
-    int m_nValue;        /**< Current value of the spin button. */
-    UINT m_uStep;        /**< Step size for incrementing or decrementing the value. */
-    BOOL m_bCircle;      /**< Flag indicating if the spin button is circular. */
-    SStringW m_strBuddy; /**< Buddy window identifier. */
-    SAutoRefPtr<IWindow> m_pBuddy;   /**< Buddy window object. */
+    int m_nMax;                        /**< Maximum value of the spin button. */
+    int m_nMin;                        /**< Minimum value of the spin button. */
+    int m_nValue;                      /**< Current value of the spin button. */
+    UINT m_uStep;                      /**< Step size for incrementing or decrementing the value. */
+    BOOL m_bCircle;                    /**< Flag indicating if the spin button is circular. */
+    SStringW m_strBuddy;               /**< Buddy window identifier. */
+    SAutoRefPtr<IWindow> m_pBuddy;     /**< Buddy window object. */
     SAutoRefPtr<ISkinObj> m_pUpSkin;   /**< Skin object for the up button. */
     SAutoRefPtr<ISkinObj> m_pDownSkin; /**< Skin object for the down button. */
 

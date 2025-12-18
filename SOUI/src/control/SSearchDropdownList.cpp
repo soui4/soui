@@ -12,7 +12,7 @@ class SDropdownList : public SDropDownWnd {
   public:
     SDropdownList(ISDropDownOwner *pOwner);
 
-    BOOL Create(IXmlNode *initxml=NULL);
+    BOOL Create(IXmlNode *initxml = NULL);
 
   protected:
     BOOL WINAPI PreTranslateMessage(MSG *pMsg) OVERRIDE
@@ -60,7 +60,7 @@ void SSearchDropdownList::AdjustDropdownList()
     SASSERT(m_pDropDownWnd);
     EventDropdownListGetBuddyRect evt(this);
     FireEvent(&evt);
-    CRect rcBuddy=evt.rcBuddy;
+    CRect rcBuddy = evt.rcBuddy;
     GetContainer()->FrameToHost(rcBuddy);
 
     ClientToScreen(GetContainer()->GetHostHwnd(), (LPPOINT)&rcBuddy);
@@ -82,7 +82,7 @@ void SSearchDropdownList::AdjustDropdownList()
 
     CSize szDropdown;
     szDropdown.cx = rcBuddy.Width();
-    SLayoutSize szBorder(1,dp);
+    SLayoutSize szBorder(1, dp);
     CRect rcPadding = m_pDropDownWnd->GetRoot()->GetStyle().GetPadding();
     CRect rcMargin = m_pDropDownWnd->GetRoot()->GetStyle().GetMargin();
     int nItemHeight = rcPadding.top + rcPadding.bottom + rcMargin.top + rcMargin.bottom;
@@ -152,7 +152,7 @@ void SSearchDropdownList::CloseUp(int code)
 }
 
 BOOL SSearchDropdownList::IsDropdown() const
-{ 
+{
     return m_pDropDownWnd != NULL;
 }
 
@@ -166,7 +166,7 @@ void SSearchDropdownList::DropDown(const IStringT *pText)
         if (xmlDropdownStyleNode)
             m_pDropDownWnd->Create(&xmlDropdownStyleNode);
         else
-        m_pDropDownWnd->Create();
+            m_pDropDownWnd->Create();
         GetContainer()->EnableHostPrivateUiDef(FALSE);
         m_pDropDownWnd->GetRoot()->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
     }
@@ -197,7 +197,7 @@ BOOL SSearchDropdownList::CreateChildren(SXmlNode xmlNode)
 
 BOOL SSearchDropdownList::FireEvent(IEvtArgs *evt)
 {
-    if (evt->IdFrom()== IDC_DROPDOWN_LIST)
+    if (evt->IdFrom() == IDC_DROPDOWN_LIST)
     {
         if (evt->GetID() == EVT_CMD)
         {

@@ -25,7 +25,7 @@
  * @param alise Alias for the object (optional).
  * @return New object information structure.
  */
-EXTERN_C SOUI_EXP void ObjInfo_New(SObjectInfo *info,LPCWSTR name, int type, LPCWSTR alise = NULL);
+EXTERN_C SOUI_EXP void ObjInfo_New(SObjectInfo *info, LPCWSTR name, int type, LPCWSTR alise = NULL);
 
 /**
  * @brief Checks if the object information is valid.

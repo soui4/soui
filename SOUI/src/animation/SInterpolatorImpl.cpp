@@ -161,36 +161,73 @@ SOvershootInterpolator::SOvershootInterpolator(float tension)
 
 //////////////////////////////////////////////////////////////////////////
 // Quad interpolators
-float SQuadInInterpolator::getInterpolation(float t) const { return t * t; }
-float SQuadOutInterpolator::getInterpolation(float t) const { return t * (2.0f - t); }
-float SQuadInOutInterpolator::getInterpolation(float t) const {
-    if (t < 0.5f) return 2.0f * t * t;
+float SQuadInInterpolator::getInterpolation(float t) const
+{
+    return t * t;
+}
+float SQuadOutInterpolator::getInterpolation(float t) const
+{
+    return t * (2.0f - t);
+}
+float SQuadInOutInterpolator::getInterpolation(float t) const
+{
+    if (t < 0.5f)
+        return 2.0f * t * t;
     return -1.0f + (4.0f - 2.0f * t) * t;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Cubic interpolators
-float SCubicInInterpolator::getInterpolation(float t) const { return t * t * t; }
-float SCubicOutInterpolator::getInterpolation(float t) const { float p = t - 1.0f; return p * p * p + 1.0f; }
-float SCubicInOutInterpolator::getInterpolation(float t) const {
-    if (t < 0.5f) return 4.0f * t * t * t;
-    float p = 2.0f * t - 2.0f; return 0.5f * p * p * p + 1.0f;
+float SCubicInInterpolator::getInterpolation(float t) const
+{
+    return t * t * t;
+}
+float SCubicOutInterpolator::getInterpolation(float t) const
+{
+    float p = t - 1.0f;
+    return p * p * p + 1.0f;
+}
+float SCubicInOutInterpolator::getInterpolation(float t) const
+{
+    if (t < 0.5f)
+        return 4.0f * t * t * t;
+    float p = 2.0f * t - 2.0f;
+    return 0.5f * p * p * p + 1.0f;
 }
 
 //////////////////////////////////////////////////////////////////////////
 // Sine interpolators
-float SSineInInterpolator::getInterpolation(float t) const { return (float)(1.0f - cos((t * PI) / 2.0f)); }
-float SSineOutInterpolator::getInterpolation(float t) const { return (float)sin((t * PI) / 2.0f); }
-float SSineInOutInterpolator::getInterpolation(float t) const { return (float)(-0.5f * (cos(PI * t) - 1.0f)); }
+float SSineInInterpolator::getInterpolation(float t) const
+{
+    return (float)(1.0f - cos((t * PI) / 2.0f));
+}
+float SSineOutInterpolator::getInterpolation(float t) const
+{
+    return (float)sin((t * PI) / 2.0f);
+}
+float SSineInOutInterpolator::getInterpolation(float t) const
+{
+    return (float)(-0.5f * (cos(PI * t) - 1.0f));
+}
 
 //////////////////////////////////////////////////////////////////////////
 // Exponential interpolators
-float SExpoInInterpolator::getInterpolation(float t) const { return (t == 0.0f) ? 0.0f : (float)pow(2.0f, 10.0f * (t - 1.0f)); }
-float SExpoOutInterpolator::getInterpolation(float t) const { return (t == 1.0f) ? 1.0f : 1.0f - (float)pow(2.0f, -10.0f * t); }
-float SExpoInOutInterpolator::getInterpolation(float t) const {
-    if (t == 0.0f) return 0.0f;
-    if (t == 1.0f) return 1.0f;
-    if (t < 0.5f) return 0.5f * (float)pow(2.0f, (20.0f * t) - 10.0f);
+float SExpoInInterpolator::getInterpolation(float t) const
+{
+    return (t == 0.0f) ? 0.0f : (float)pow(2.0f, 10.0f * (t - 1.0f));
+}
+float SExpoOutInterpolator::getInterpolation(float t) const
+{
+    return (t == 1.0f) ? 1.0f : 1.0f - (float)pow(2.0f, -10.0f * t);
+}
+float SExpoInOutInterpolator::getInterpolation(float t) const
+{
+    if (t == 0.0f)
+        return 0.0f;
+    if (t == 1.0f)
+        return 1.0f;
+    if (t < 0.5f)
+        return 0.5f * (float)pow(2.0f, (20.0f * t) - 10.0f);
     return -0.5f * (float)pow(2.0f, (-20.0f * t) + 10.0f) + 1.0f;
 }
 
@@ -239,11 +276,21 @@ float SBackInOutInterpolator::getInterpolation(float t) const
 
 //////////////////////////////////////////////////////////////////////////
 // Quint interpolators
-float SQuintInInterpolator::getInterpolation(float t) const { return t * t * t * t * t; }
-float SQuintOutInterpolator::getInterpolation(float t) const { float p = t - 1.0f; return p * p * p * p * p + 1.0f; }
-float SQuintInOutInterpolator::getInterpolation(float t) const {
-    if (t < 0.5f) return 16.0f * t * t * t * t * t; // (2t)^5 / 2 = 32 t^5 /2 =16 t^5
-    float p = (2.0f * t) - 2.0f; return 0.5f * p * p * p * p * p + 1.0f;
+float SQuintInInterpolator::getInterpolation(float t) const
+{
+    return t * t * t * t * t;
+}
+float SQuintOutInterpolator::getInterpolation(float t) const
+{
+    float p = t - 1.0f;
+    return p * p * p * p * p + 1.0f;
+}
+float SQuintInOutInterpolator::getInterpolation(float t) const
+{
+    if (t < 0.5f)
+        return 16.0f * t * t * t * t * t; // (2t)^5 / 2 = 32 t^5 /2 =16 t^5
+    float p = (2.0f * t) - 2.0f;
+    return 0.5f * p * p * p * p * p + 1.0f;
 }
 
 SNSEND

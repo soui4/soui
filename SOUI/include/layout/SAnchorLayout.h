@@ -12,7 +12,7 @@ SNSBEGIN
  * @brief 9锚点布局参数类
  */
 class SOUI_EXP SAnchorLayoutParam
-    : public TObjRefImpl<SObjectImpl<ILayoutParam> >
+    : public TObjRefImpl<SObjectImpl<ILayoutParam>>
     , protected SAnchorLayoutParamStruct {
     DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"AnchorLayoutParam")
 
@@ -23,6 +23,7 @@ class SOUI_EXP SAnchorLayoutParam
     SAutoRefPtr<IPropertyValuesHolder> m_aniHeightHolder;
     float m_fAniFraction;
     ANI_STATE m_aniState;
+
   public:
     /**
      * @brief 构造函数
@@ -102,6 +103,7 @@ class SOUI_EXP SAnchorLayoutParam
      * @param state ANI_STATE--动画状态（ANI_START/ANI_PROGRESS/ANI_END）
      */
     STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) OVERRIDE;
+
   protected:
     /**
      * @brief 处理宽度属性
@@ -154,7 +156,6 @@ class SOUI_EXP SAnchorLayoutParam
     SOUI_ATTRS_BREAK()
 
   public:
-
     static BOOL ParsePosition(const SStringW &pos, AnchorPos &AniPos);
 };
 
@@ -162,11 +163,11 @@ class SOUI_EXP SAnchorLayoutParam
  * @class SouiLayout
  * @brief Soui布局类
  */
-class SOUI_EXP SAnchorLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
+class SOUI_EXP SAnchorLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     DEF_SOBJECT(SObjectImpl<ILayout>, L"Anchor")
 
   public:
-    typedef POINT (*PFN_Position2Point)(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData);
+    typedef POINT (*PFN_Position2Point)(const AnchorPos &pos, const CRect &rcParent, const CSize &szChild, int nScale, void *userData);
 
     /**
      * @brief 构造函数
@@ -208,22 +209,25 @@ class SOUI_EXP SAnchorLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
     STDMETHOD_(SIZE, MeasureChildren)
     (THIS_ const IWindow *pParent, int nWidth, int nHeight) SCONST OVERRIDE;
 
-    void SetPosition2PointCallback(PFN_Position2Point pfnAnchor2Pos, void * userData){
+    void SetPosition2PointCallback(PFN_Position2Point pfnAnchor2Pos, void *userData)
+    {
         m_pfnPosition2Point = pfnAnchor2Pos;
         m_pUserData = userData;
     }
-    PFN_Position2Point GetPosition2PointCallback() const{
+    PFN_Position2Point GetPosition2PointCallback() const
+    {
         return m_pfnPosition2Point;
     }
 
-    static POINT DefaultPosition2Point(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData);
+    static POINT DefaultPosition2Point(const AnchorPos &pos, const CRect &rcParent, const CSize &szChild, int nScale, void *userData);
+
   protected:
     static CPoint Anchor2Pos(const CRect &rcParent, int type);
-    POINT CalcPoint4Animator(const AnchorPos &start, const AnchorPos &end, float fraction, const CRect &rcParent, const CSize & szChild, int nScale) const;
+    POINT CalcPoint4Animator(const AnchorPos &start, const AnchorPos &end, float fraction, const CRect &rcParent, const CSize &szChild, int nScale) const;
 
     PFN_Position2Point m_pfnPosition2Point;
-    void * m_pUserData; //for callback param;
-  };
+    void *m_pUserData; // for callback param;
+};
 
 SNSEND
 

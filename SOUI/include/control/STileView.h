@@ -129,6 +129,7 @@ class SOUI_EXP STileView
     virtual BOOL IsItemRedrawDelay() const;
 
     virtual BOOL IsTimelineEnabled() const;
+
   protected:
     /**
      * @brief Handles data set changes.

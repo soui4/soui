@@ -67,13 +67,13 @@ void SWindowFinder::CacheResultForID(IWindow *pParent, int nID, int nDeep, IWind
     m_findCache[fi] = pResult->GetSwnd();
 }
 
-BOOL  SWindowFinder::EraseCacheForID(IWindow *pParent, int nID, int nDeep)
+BOOL SWindowFinder::EraseCacheForID(IWindow *pParent, int nID, int nDeep)
 {
     SFindInfo fi(pParent, nID, nDeep);
     return m_findCache.RemoveKey(fi);
 }
 
-BOOL  SWindowFinder::EraseCacheForName(IWindow *pParent, LPCWSTR strName, int nDeep)
+BOOL SWindowFinder::EraseCacheForName(IWindow *pParent, LPCWSTR strName, int nDeep)
 {
     SFindInfo fi(pParent, strName, nDeep);
     return m_findCache.RemoveKey(fi);

@@ -896,23 +896,23 @@ DECLARE_INTERFACE_(IWindow, IObject)
      */
     STDMETHOD_(BOOL, IsVideoCanvas)(CTHIS) SCONST PURE;
 
-    /** 
-    * RegisterDragDrop
-    * @brief    注册窗口为拖拽目标
-    * @param    IDropTarget * pDragTarget --  拖拽目标对象
-    * @return   BOOL -- TRUE:成功
-    *
-    * Describe
-    */
+    /**
+     * RegisterDragDrop
+     * @brief    注册窗口为拖拽目标
+     * @param    IDropTarget * pDragTarget --  拖拽目标对象
+     * @return   BOOL -- TRUE:成功
+     *
+     * Describe
+     */
     STDMETHOD_(BOOL, RegisterDragDrop)(THIS_ IDropTarget * pDragTarget) PURE;
 
-    /** 
-    * UnregisterDragDrop
-    * @brief    取消注册拖拽目标
-    * @return   BOOL -- TRUE:成功
-    *
-    * Describe
-    */
+    /**
+     * UnregisterDragDrop
+     * @brief    取消注册拖拽目标
+     * @return   BOOL -- TRUE:成功
+     *
+     * Describe
+     */
     STDMETHOD_(BOOL, UnregisterDragDrop)(THIS) PURE;
 
     /**
@@ -934,7 +934,7 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param fraction float--动画进度（0.0-1.0）
      * @param state ANI_STATE--动画状态（ANI_START/ANI_PROGRESS/ANI_END）
      */
-    STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) PURE;
+    STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder * pHolder, float fraction, ANI_STATE state) PURE;
 };
 
 SNSEND

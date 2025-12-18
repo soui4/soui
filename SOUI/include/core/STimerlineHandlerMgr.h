@@ -68,7 +68,7 @@ class STimerlineHandlerMgr : public ITimelineHandler {
     STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
 
   protected:
-    SList<SAutoRefPtr<IValueAnimator> > m_lstAnimators;
+    SList<SAutoRefPtr<IValueAnimator>> m_lstAnimators;
     typedef SMap<ITimelineHandler *, bool> TLMAP; // Map type for storing timeline handlers.
     TLMAP m_mapHandlers;                          // Map of registered timeline handlers.
 };

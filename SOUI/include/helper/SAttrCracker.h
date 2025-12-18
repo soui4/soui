@@ -41,11 +41,11 @@
     }                                                                                              \
     else
 
-#define ATTR_CHAIN_PREFIX(varname, flag, prefix)                                                   \
-    if (FAILED(hRet) && SUCCEEDED(hRet = varname.SetAttribute(strAttribName.StartsWith(prefix)?strAttribName.Mid(SStringW(prefix).GetLength()):strAttribName, strValue, bLoading))) \
-    {                                                                                              \
-        hRet |= flag;                                                                              \
-    }                                                                                              \
+#define ATTR_CHAIN_PREFIX(varname, flag, prefix)                                                                                                                                        \
+    if (FAILED(hRet) && SUCCEEDED(hRet = varname.SetAttribute(strAttribName.StartsWith(prefix) ? strAttribName.Mid(SStringW(prefix).GetLength()) : strAttribName, strValue, bLoading))) \
+    {                                                                                                                                                                                   \
+        hRet |= flag;                                                                                                                                                                   \
+    }                                                                                                                                                                                   \
     else
 
 #define ATTR_CHAIN_PTR(varname, flag)                                                                                     \
@@ -55,11 +55,11 @@
     }                                                                                                                     \
     else
 
-#define ATTR_CHAIN_PTR_PREFIX(varname, flag, prefix)                                                                                     \
+#define ATTR_CHAIN_PTR_PREFIX(varname, flag, prefix)                                                                                                                                                                                                                 \
     if (SStringW strAttrib_##varname = strAttribName.StartsWith(prefix) ? strAttribName.Mid(SStringW(prefix).GetLength()) : strAttribName && FAILED(hRet) && varname != NULL && SUCCEEDED(hRet = varname->ISetAttribute(&strAttrib_##varname, &strValue, bLoading))) \
-    {                                                                                                                     \
-        hRet |= flag;                                                                                                     \
-    }                                                                                                                     \
+    {                                                                                                                                                                                                                                                                \
+        hRet |= flag;                                                                                                                                                                                                                                                \
+    }                                                                                                                                                                                                                                                                \
     else
 
 #define ATTR_CHAIN_CLASS(cls) \

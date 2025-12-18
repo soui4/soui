@@ -1682,7 +1682,7 @@ const SMatrix &SMatrix::I()
 const SMatrix &SMatrix::InvalidMatrix()
 {
     static const float kInvalidMatrix[9] = { SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax };
-    static const SMatrix invalidMatrix(kInvalidMatrix,kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask);
+    static const SMatrix invalidMatrix(kInvalidMatrix, kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask);
     return invalidMatrix;
 }
 

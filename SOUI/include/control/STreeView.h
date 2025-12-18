@@ -582,7 +582,7 @@ class SOUI_EXP STreeView
     virtual BOOL IsItemRedrawDelay() const;
 
     virtual BOOL IsTimelineEnabled() const;
-    
+
     /**
      * @brief Draws lines for an item.
      * @param pRT Pointer to the rendering target.

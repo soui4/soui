@@ -347,10 +347,10 @@ class SOUI_EXP SHostWnd
     BOOL m_bResizing;    /**< Indicates if resizing is in progress. */
 
     SAutoRefPtr<IAnimation> m_hostAnimation; /**< Host animation object. */
-    DWORD m_AniState; /**< Animation state. */
-    BOOL m_bFirstShow; /**< Indicates if it's the first time the window is shown. */
-    tid_t m_dwThreadID; /**< Thread ID. */
-    SRootWindow *m_pRoot; /**< Pointer to the root window. */
+    DWORD m_AniState;                        /**< Animation state. */
+    BOOL m_bFirstShow;                       /**< Indicates if it's the first time the window is shown. */
+    tid_t m_dwThreadID;                      /**< Thread ID. */
+    SRootWindow *m_pRoot;                    /**< Pointer to the root window. */
 
     EventHandlerInfo m_evtHandler;           /**< Event handler information. */
     SAutoRefPtr<IHostPresenter> m_presenter; /**< Presenter for rendering. */
@@ -1284,6 +1284,7 @@ class SOUI_EXP SHostWnd
      * @return Number of tasks removed.
      */
     STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE;
+
   protected:
     /**
      * @brief Creates a tooltip for the container.
@@ -1334,6 +1335,7 @@ class SOUI_EXP SHostWnd
      * @brief Called when the scale of the window changes.
      * */
     virtual void OnScaleChanged(int nScale);
+
   public:
     /**
      * @brief Handles the resize event of the root window.

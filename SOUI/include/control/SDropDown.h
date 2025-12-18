@@ -71,7 +71,7 @@ class SOUI_EXP SDropDownWnd
      * @param dwExStyle Extended window style
      * @return TRUE if successful, FALSE otherwise
      */
-    BOOL Create(LPCRECT lpRect, IXmlNode * pInitXml, DWORD dwStyle = WS_POPUP, DWORD dwExStyle = WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
+    BOOL Create(LPCRECT lpRect, IXmlNode *pInitXml, DWORD dwStyle = WS_POPUP, DWORD dwExStyle = WS_EX_TOOLWINDOW | WS_EX_TOPMOST);
 
     /**
      * @brief End the dropdown window

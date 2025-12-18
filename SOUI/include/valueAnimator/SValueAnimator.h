@@ -43,7 +43,7 @@ SNSBEGIN
  * out of an animation. This behavior can be changed by calling setInterpolator(TimeInterpolator).
  */
 class SOUI_EXP SValueAnimator
-    : public TObjRefImpl<SObjectImpl<IValueAnimator> >
+    : public TObjRefImpl<SObjectImpl<IValueAnimator>>
     , ITimelineHandler {
     DEF_SOBJECT(SObjectImpl<IValueAnimator>, L"valueAnimator")
 
@@ -173,7 +173,8 @@ class SOUI_EXP SValueAnimator
      * @brief The container managing the timeline handlers.
      */
     ITimelineHandlersMgr *mContainer;
-    void * m_pUserData;
+    void *m_pUserData;
+
   public:
     /**
      * @brief Creates a new SValueAnimator object.
@@ -349,7 +350,7 @@ class SOUI_EXP SValueAnimator
      */
     STDMETHOD_(ITimelineHandler *, GetTimelineHandler)(THIS) OVERRIDE;
 
-        /**
+    /**
      * @brief 获取用户数据
      * @return LPVOID - 用户数据指针
      */
@@ -361,6 +362,7 @@ class SOUI_EXP SValueAnimator
      * @return void
      */
     STDMETHOD_(void, SetUserData)(THIS_ LPVOID pUserData) OVERRIDE;
+
   private:
     /**
      * @brief Notifies start listeners.
@@ -801,7 +803,7 @@ class SOUI_EXP SAnimatorGroup
     /**
      * @brief Constructor.
      */
-    SAnimatorGroup(int nID=0);
+    SAnimatorGroup(int nID = 0);
 
     /**
      * @brief Destructor.

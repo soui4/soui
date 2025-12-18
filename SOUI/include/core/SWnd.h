@@ -51,50 +51,50 @@ SNSBEGIN
  */
 namespace LayoutProperty
 {
-    // 通用属性
-    static const LPCWSTR WIDTH = L"width";
-    static const LPCWSTR HEIGHT = L"height";
+// 通用属性
+static const LPCWSTR WIDTH = L"width";
+static const LPCWSTR HEIGHT = L"height";
 
-    // 位置属性（souilayout and anchorlayout）
-    static const LPCWSTR OFFSET_X = L"offsetX";
-    static const LPCWSTR OFFSET_Y = L"offsetY";
+// 位置属性（souilayout and anchorlayout）
+static const LPCWSTR OFFSET_X = L"offsetX";
+static const LPCWSTR OFFSET_Y = L"offsetY";
 
-    // 线性布局属性
-    static const LPCWSTR WEIGHT = L"weight";
-    static const LPCWSTR EXTEND_LEFT = L"extendLeft";
-    static const LPCWSTR EXTEND_RIGHT = L"extendRight";
-    static const LPCWSTR EXTEND_TOP = L"extendTop";
-    static const LPCWSTR EXTEND_BOTTOM = L"extendBottom";
+// 线性布局属性
+static const LPCWSTR WEIGHT = L"weight";
+static const LPCWSTR EXTEND_LEFT = L"extendLeft";
+static const LPCWSTR EXTEND_RIGHT = L"extendRight";
+static const LPCWSTR EXTEND_TOP = L"extendTop";
+static const LPCWSTR EXTEND_BOTTOM = L"extendBottom";
 
-    // 网格布局属性
-    static const LPCWSTR COL_WEIGHT = L"colWeight";
-    static const LPCWSTR ROW_WEIGHT = L"rowWeight";
+// 网格布局属性
+static const LPCWSTR COL_WEIGHT = L"colWeight";
+static const LPCWSTR ROW_WEIGHT = L"rowWeight";
 
-    // Soui布局属性
-    static const LPCWSTR LEFT = L"left";
-    static const LPCWSTR TOP = L"top";
-    static const LPCWSTR RIGHT = L"right";
-    static const LPCWSTR BOTTOM = L"bottom";
+// Soui布局属性
+static const LPCWSTR LEFT = L"left";
+static const LPCWSTR TOP = L"top";
+static const LPCWSTR RIGHT = L"right";
+static const LPCWSTR BOTTOM = L"bottom";
 
-    // AnchorLayout属性
-    static const LPCWSTR POSITION = L"pos";  // 窗口位置
-    static const LPCWSTR POSITION_X = L"posX";  // X坐标（相对于锚点）
-    static const LPCWSTR POSITION_Y = L"posY";  // Y坐标（相对于锚点）
-}
+// AnchorLayout属性
+static const LPCWSTR POSITION = L"pos";    // 窗口位置
+static const LPCWSTR POSITION_X = L"posX"; // X坐标（相对于锚点）
+static const LPCWSTR POSITION_Y = L"posY"; // Y坐标（相对于锚点）
+} // namespace LayoutProperty
 
 namespace WindowProperty
-{ 
-    static const LPCWSTR ALPHA = L"alpha";
-    static const LPCWSTR COLOR_BKGND = L"colorBkgnd";
-    static const LPCWSTR COLOR_TEXT = L"colorText";
-    static const LPCWSTR SCALE = L"scale";
-    static const LPCWSTR SCALE_X = L"scaleX";
-    static const LPCWSTR SCALE_Y = L"scaleY";
-    static const LPCWSTR ROTATION = L"rotation";
-    static const LPCWSTR TRANSLATE = L"translate";
-    static const LPCWSTR TRANSLATE_X = L"translateX";
-    static const LPCWSTR TRANSLATE_Y = L"translateY";
-};
+{
+static const LPCWSTR ALPHA = L"alpha";
+static const LPCWSTR COLOR_BKGND = L"colorBkgnd";
+static const LPCWSTR COLOR_TEXT = L"colorText";
+static const LPCWSTR SCALE = L"scale";
+static const LPCWSTR SCALE_X = L"scaleX";
+static const LPCWSTR SCALE_Y = L"scaleY";
+static const LPCWSTR ROTATION = L"rotation";
+static const LPCWSTR TRANSLATE = L"translate";
+static const LPCWSTR TRANSLATE_X = L"translateX";
+static const LPCWSTR TRANSLATE_Y = L"translateY";
+}; // namespace WindowProperty
 
 /**
  * @brief Flags for window show state.
@@ -332,7 +332,7 @@ class SAnimatorHandler;
  * event handling, and rendering.
  */
 class SOUI_EXP SWindow
-    : public TObjRefImpl<SObjectImpl<IWindow> >
+    : public TObjRefImpl<SObjectImpl<IWindow>>
     , protected IAnimationListener {
     DEF_SOBJECT(SObjectImpl<IWindow>, L"window")
 
@@ -350,7 +350,7 @@ class SOUI_EXP SWindow
         STransformation m_transform;   /**< Transformation */
         bool m_bFillAfter;             /**< Fill after flag */
         SWindow *m_pPrevSiblingBackup; /**< Previous sibling backup */
-        
+
       public:
         /**
          * @brief Constructor.
@@ -1229,6 +1229,7 @@ class SOUI_EXP SWindow
      * @param state ANI_STATE--动画状态（ANI_START/ANI_PROGRESS/ANI_END）
      */
     STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) OVERRIDE;
+
   public:
 #ifdef _WIN32
     /**
@@ -1501,17 +1502,18 @@ class SOUI_EXP SWindow
      */
     SWindow *FindChildByNamePath(LPCWSTR pszName)
     {
-       SStringW strName(pszName);
-       SStringWList lstName;
-       UINT nCount = SplitString(strName, L'/', lstName);
-       SWindow *pRet = this;
-       for(UINT i = 0; i < nCount; i++){
-          SWindow *pFind = pRet->FindChildByName(lstName[i], -1);
-          if(pFind == NULL) 
-            return NULL;
-          pRet = pFind;
-       }
-	   return pRet;
+        SStringW strName(pszName);
+        SStringWList lstName;
+        UINT nCount = SplitString(strName, L'/', lstName);
+        SWindow *pRet = this;
+        for (UINT i = 0; i < nCount; i++)
+        {
+            SWindow *pFind = pRet->FindChildByName(lstName[i], -1);
+            if (pFind == NULL)
+                return NULL;
+            pRet = pFind;
+        }
+        return pRet;
     }
 
     /**
@@ -2574,7 +2576,7 @@ class SOUI_EXP SWindow
      * Describe  This method processes the 'layer' attribute.
      */
     HRESULT OnAttrLayer(const SStringW &strValue, BOOL bLoading);
-    
+
     /**
      * DefAttributeProc
      * @brief    Default attribute processing function.
@@ -2727,7 +2729,7 @@ class SOUI_EXP SWindow
     STrText m_strToolTipText; /**< Tooltip text for the window. */
     SStringW m_strTrCtx;      /**< Translation context. If empty, uses the container's translation context. */
     UINT m_uZorder;           /**< Z-order of the window. */
-    int  m_nLayer;            /**< Layer of the window. */
+    int m_nLayer;             /**< Layer of the window. */
     BOOL m_bEnableLayer;      /**< Indicates if the layer is enabled. */
     int m_nUpdateLockCnt;     /**< Update lock count. Prevents Invalidate messages to the host when locked. */
 
@@ -2778,7 +2780,7 @@ class SOUI_EXP SWindow
     SAutoRefPtr<ICaret> m_caret;             /**< Caret object. */
 
     FunSwndProc m_funSwndProc; /**< Custom window procedure. */
-    SAnimatorHandler * m_pAnimatorHandler;
+    SAnimatorHandler *m_pAnimatorHandler;  /**< Property animator handler for the window. */
 #ifdef _WIN32
     SAutoRefPtr<IAccessible> m_pAcc;    /**< Accessibility object. */
     SAutoRefPtr<IAccProxy> m_pAccProxy; /**< Accessibility proxy object. */

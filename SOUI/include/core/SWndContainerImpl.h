@@ -229,6 +229,7 @@ class SOUI_EXP SwndContainerImpl
      * @return TRUE if designer mode is enabled, FALSE otherwise.
      */
     STDMETHOD_(BOOL, IsDesignerMode)(CTHIS) SCONST OVERRIDE;
+
   public: // ITimelineHandler
     /**
      * @brief Called when the next frame is ready.

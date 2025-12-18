@@ -7,7 +7,7 @@ SNSBEGIN
 
 SValueAnimator::SValueAnimator()
     : mContainer(NULL)
-    ,m_pUserData(NULL)
+    , m_pUserData(NULL)
 {
     sDurationScale = 1.0f;
     mStartTime = -1;
@@ -52,7 +52,7 @@ SValueAnimator::~SValueAnimator()
 void SValueAnimator::addAnimationCallback()
 {
     SASSERT(mContainer);
-    mContainer->RegisterValueAnimator(this);//this value animator will holded by mContainer.
+    mContainer->RegisterValueAnimator(this); // this value animator will holded by mContainer.
 }
 
 void SValueAnimator::removeAnimationCallback()
@@ -62,7 +62,7 @@ void SValueAnimator::removeAnimationCallback()
         AddRef();
         mContainer->UnregisterValueAnimator(this);
         mContainer = NULL;
-        Release();//may be call deconstructor here.
+        Release(); // may be call deconstructor here.
     }
 }
 
@@ -294,7 +294,7 @@ void SValueAnimator::endAnimation()
     }
     mRunning = false;
     mStarted = false;
-    
+
     mStartListenersCalled = false;
     mLastFrameTime = -1;
     mFirstFrameTime = -1;
@@ -388,7 +388,7 @@ void SValueAnimator::start(bool playBackwards)
         }
     }
     mStarted = true;
- 
+
     mRunning = false;
     mAnimationEndRequested = false;
     // Resets mLastFrameTime when start() is called, so that if the animation was running,
