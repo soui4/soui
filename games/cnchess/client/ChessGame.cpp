@@ -64,19 +64,36 @@ enum{
     ANI_MOVEDOWN,
 };
 
-void CChessGame::onAnimationEnd(IValueAnimator * pAnimator)
+void CChessGame::ShowPosFlags(POINT ptPiece, BOOL bShow)
+{
+    // show or hide possible move positions
+    POINT ptMoves[MAX_MOVES];
+    int nMoves = m_layout.GetPossiableMoves(ptPiece.x, ptPiece.y, ptMoves);
+    for (int i = 0; i < nMoves; i++)
+    {
+        if (m_layout.m_chesses[ptMoves[i].y][ptMoves[i].x] != CHSMAN_NULL)
+            continue;
+        IWindow *pFlag = m_pGameBoard->FindChildByID(1000 + ptMoves[i].y * 9 + ptMoves[i].x);
+        pFlag->SetVisible(bShow, TRUE);
+    }
+}
+
+void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
 {
     SPropertyAnimator *pPropAnimator = sobj_cast<SPropertyAnimator>(pAnimator);
     CChessPiece *pPiece = (CChessPiece *)pPropAnimator->GetTarget();
     if(pPropAnimator->GetID() == ANI_MOVE ){
         //start a new animation to move the piece down
-        auto pAnim = Util::OffsetSprite(pPiece, -m_cellWidth/10, -m_cellHeight/10, 100);
+        auto pAnim = Util::OffsetSprite(pPiece, -0.1f, 0.1f, 100);
         pAnim->SetID(ANI_MOVEDOWN);
         pAnim->addListener(this);
     }else if(pPropAnimator->GetID() == ANI_DOWN){
         //set the piece to normal state
         pPiece->SetPicesState(CChessPiece::STATE_NORMAL);
         pPiece->SetLayer(1);//restore layer
+        ULONG_PTR lp = pPiece->GetUserData();
+        POINT ptPiece={GET_X_LPARAM(lp),GET_Y_LPARAM(lp)};
+        ShowPosFlags(ptPiece, FALSE);
     }else if(pPropAnimator->GetID() == ANI_MOVEDOWN){
         //move the piece down
         pPiece->SetPicesState(CChessPiece::STATE_NORMAL);
@@ -94,7 +111,7 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
         if(pTarget->GetID() == m_nSelectedChessID)
         {//cancel the selection
             CChessPiece *pSelPiece = (CChessPiece *)pTarget;
-            auto pAni = Util::OffsetSprite(pSelPiece, -m_cellWidth/10, -m_cellHeight/10, 100);
+            auto pAni = Util::OffsetSprite(pSelPiece, -0.1f, 0.1f, 100);
             pAni->SetID(ANI_DOWN);
             pAni->addListener(this);
             m_nSelectedChessID = -1;
@@ -110,8 +127,8 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
             SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pTarget->GetLayoutParam();
             SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
             AnchorPos pos = pParamStruct->pos;
-            pos.x.fSize += m_cellWidth/10;
-            pos.y.fSize += m_cellHeight/10;
+            pos.x.fSize += 0.1f;
+            pos.y.fSize += -0.1f;
             auto pAnim = Util::MoveSpriteTo(pSelPiece, pos, 500);
             pAnim->SetID(ANI_MOVE);
             pAnim->addListener(this);
@@ -126,29 +143,21 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
                 pTarget->SetPicesState(CChessPiece::STATE_UP);
                 pTarget->SetLayer(2);
                 //offset the piece by 10% of cell size for x and y
-                Util::OffsetSprite(pTarget, m_cellWidth/10, m_cellHeight/10, 100);
+                Util::OffsetSprite(pTarget, 0.1f, -0.1f, 100);
                 m_nSelectedChessID = pTarget->GetID();
             }
             else if(pTarget->GetPicesState() == CChessPiece::STATE_UP)
             {//drop down the piece
-                auto pAnim = Util::OffsetSprite(pTarget, -m_cellWidth/10, -m_cellHeight/10, 100);
+                auto pAnim = Util::OffsetSprite(pTarget, -0.1f, 0.1f, 100);
                 pAnim->SetID(ANI_DOWN);
                 pAnim->addListener(this);
                 m_nSelectedChessID = -1;
             }
 
+            //show or hide possible move positions
             LPARAM lp = pTarget->GetUserData();
             POINT ptPiece={GET_X_LPARAM(lp),GET_Y_LPARAM(lp)};
-            //show or hide possible move positions
-            POINT ptMoves[MAX_MOVES];
-            int nMoves = m_layout.GetPossiableMoves(ptPiece.x,ptPiece.y, ptMoves);
-            for(int i = 0; i < nMoves; i++)
-            {
-                if(m_layout.m_chesses[ptMoves[i].y][ptMoves[i].x] != CHSMAN_NULL)
-                    continue;
-                IWindow *pFlag = m_pGameBoard->FindChildByID(1000 + ptMoves[i].y * 9 + ptMoves[i].x);
-                pFlag->SetVisible(m_nSelectedChessID!=-1,TRUE);
-            }
+            ShowPosFlags(ptPiece, m_nSelectedChessID != -1);
         }
     }
     return TRUE;

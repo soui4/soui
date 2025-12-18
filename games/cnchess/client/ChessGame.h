@@ -93,6 +93,7 @@ public:
      */
     int GetBankerIndex() const { return m_iBankerIndex; }
     
+    void ShowPosFlags(POINT pt, BOOL bShow);
 public:
     STDMETHOD_(void, onAnimationStart)(THIS_ IValueAnimator * pAnimator) override{}
     STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator * pAnimator) override;
