@@ -344,13 +344,6 @@ class SOUI_EXP SWindow
     friend class SHostProxy;
     friend class SAnimatorHandler;
 
-    typedef enum tagAnimationState
-    {
-        anim_none = 0,
-        anim_animation = 1,       /**< Animation object is playing. */
-        anim_animator=2,  /**< value Animator is playing. */
-    }AnimationState;
-
     class SAnimationHandler : public ITimelineHandler {
       private:
         SWindow *m_pOwner;             /**< Owner window */
@@ -2768,7 +2761,7 @@ class SOUI_EXP SWindow
     SAutoRefPtr<IAnimation> m_animation;  /**< Animation object. */
     SAnimationHandler m_animationHandler; /**< Animation handler for the window.  */
     STransformation m_transform;          /**< Transformation object. */
-    BOOL m_animationState;                /**< Animation state.*/
+    BOOL m_isAnimating;                /**< Animation state.*/
     BOOL m_isDestroying;                  /**< Flag indicating if the window is being destroyed. */
 
     typedef struct GETRTDATA

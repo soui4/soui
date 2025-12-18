@@ -370,7 +370,7 @@ SWindow::SWindow()
     , m_strText(this)
     , m_strToolTipText(this)
     , m_animationHandler(this)
-    , m_animationState(FALSE)
+    , m_isAnimating(FALSE)
     , m_isDestroying(FALSE)
     , m_isLoading(FALSE)
     , m_funSwndProc(NULL)
@@ -2900,7 +2900,7 @@ BOOL SWindow::ReleaseCapture()
 
 void SWindow::SetAnimation(IAnimation *animation)
 {
-    if (m_animationState)
+    if (m_isAnimating)
     {
         ClearAnimation();
     }
@@ -2949,7 +2949,7 @@ void SWindow::ClearAnimation()
 {
     if (m_animation)
     {
-        if (m_animationState)
+        if (m_isAnimating)
         {
             m_animation->cancel();
             OnAnimationStop(m_animation);
@@ -2960,14 +2960,14 @@ void SWindow::ClearAnimation()
         }
         m_animation->setAnimationListener(NULL);
         m_animation = NULL;
-        m_animationState = FALSE;
+        m_isAnimating = FALSE;
     }
 }
 
 STransformation SWindow::GetTransformation() const
 {
     STransformation ret = m_transform;
-    if (m_animationState || m_animationHandler.getFillAfter())
+    if (m_isAnimating || m_animationHandler.getFillAfter())
     {
         ret.postCompose(m_animationHandler.GetTransformation());
     }
@@ -3389,7 +3389,7 @@ SWindow *SWindow::GetSelectedChildInGroup()
 
 bool SWindow::IsDrawToCache() const
 {
-    return m_bCacheDraw || m_animationState || !m_pAnimatorHandler->IsEmpty();
+    return m_bCacheDraw || m_isAnimating || !m_pAnimatorHandler->IsEmpty();
 }
 
 void SWindow::OnStateChanging(DWORD dwOldState, DWORD dwNewState)
@@ -3771,25 +3771,25 @@ BOOL SWindow::SetLayoutParam(ILayoutParam *pLayoutParam)
 
 void SWindow::OnAnimationStart(THIS_ IAnimation *pAni)
 {
-    if(m_animationState)
+    if(m_isAnimating)
         return;
     EventSwndAnimationStart evt(this);
     evt.pAni = pAni;
     FireEvent(&evt);
-    m_animationState = TRUE;
+    m_isAnimating = TRUE;
     m_animationHandler.OnAnimationStart();
     UpdateCacheMode();
 }
 
 void SWindow::OnAnimationStop(THIS_ IAnimation *pAni)
 {
-    SASSERT(m_animationState);
+    SASSERT(m_isAnimating);
     if (GetContainer())
         GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
     InvalidateRect(NULL);
     pAni->setStartTime(START_ON_FIRST_FRAME);
     m_animationHandler.OnAnimationStop();
-    m_animationState = FALSE;
+    m_isAnimating = FALSE;
     UpdateCacheMode();
     EventSwndAnimationStop evt(this);
     evt.pAni = pAni;
