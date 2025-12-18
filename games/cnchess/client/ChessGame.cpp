@@ -12,6 +12,11 @@
 
 #define TIMERID_CLOCK 503
 
+enum{
+    ID_FLAG_BASE = 1000,
+    ID_SHADOW_BASE = 2000,
+};
+
 POINT CChessGame::ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData){
     if(pos.type == 10){
         //type == 10 is chess anchor
@@ -73,7 +78,7 @@ void CChessGame::ShowPosFlags(POINT ptPiece, BOOL bShow)
     {
         if (m_layout.m_chesses[ptMoves[i].y][ptMoves[i].x] != CHSMAN_NULL)
             continue;
-        IWindow *pFlag = m_pGameBoard->FindChildByID(1000 + ptMoves[i].y * 9 + ptMoves[i].x);
+        IWindow *pFlag = m_pGameBoard->FindChildByID(ID_FLAG_BASE + ptMoves[i].y * 9 + ptMoves[i].x);
         pFlag->SetVisible(bShow, TRUE);
     }
 }
@@ -199,13 +204,16 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
     m_layout.InitLayout(NULL,m_bRedSide?CS_RED:CS_BLACK);
     //init chess layout
     SXmlNode xmlPiece = m_pTheme->GetTemplate(Template::kChessPiece);
-    SStringW clsName = xmlPiece.attribute(L"wndclass").as_string(L"chesspiece");
+    SStringW clsPieceName = xmlPiece.attribute(L"wndclass").as_string(L"chesspiece");
+    SXmlNode xmlShadow = m_pTheme->GetTemplate(Template::kShadow);
+    SStringW clsShadowName = xmlShadow.attribute(L"wndclass").as_string(L"img");
+
     SXmlNode xmlPosFlag = m_pTheme->GetTemplate(Template::kPosFlag);
     SStringW flgClsName = xmlPosFlag.attribute(L"wndclass").as_string(L"img");
     auto slot = Subscriber(&CChessGame::OnChessPieceClick, this);
     for(int y=0;y<10;y++) for(int x=0;x<9;x++)
     {
-        {
+        {//init pos flag
             IWindow *pFlag = SApplication::getSingletonPtr()->CreateWindowByName(flgClsName);
             pFlag->InitFromXml(&xmlPosFlag);
             SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pFlag->GetLayoutParam();
@@ -214,7 +222,7 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
             pParamStruct->pos.x.fSize = x;
             pParamStruct->pos.y.fSize = y;
             m_pGameBoard->InsertIChild(pFlag);
-            pFlag->SetID(1000 + y * 9 + x);
+            pFlag->SetID(ID_FLAG_BASE + y * 9 + x);
             pFlag->SetUserData(MAKELPARAM(x,y));
             pFlag->SetVisible(FALSE,TRUE);
             pFlag->SubscribeEvent(EventCmd::EventID, &slot);
@@ -222,8 +230,8 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
 
         if(m_layout.m_chesses[y][x] == CHSMAN_NULL) 
             continue;
-        {
-            CChessPiece *pPiece = (CChessPiece *)SApplication::getSingletonPtr()->CreateWindowByName(clsName);
+        {//init chess piece
+            CChessPiece *pPiece = (CChessPiece *)SApplication::getSingletonPtr()->CreateWindowByName(clsPieceName);
             pPiece->InitFromXml(&xmlPiece);
             pPiece->SetChessMan(m_layout.m_chesses[y][x]);
             SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pPiece->GetLayoutParam();
@@ -235,6 +243,17 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
             pPiece->SetPos(CPoint(x,y));
             m_pGameBoard->InsertChild(pPiece);
             pPiece->SubscribeEvent(EventCmd::EventID, &slot);
+        }
+        {//init shadow
+            IWindow *pShadow = SApplication::getSingletonPtr()->CreateWindowByName(clsShadowName);
+            pShadow->InitFromXml(&xmlShadow);
+            SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pShadow->GetLayoutParam();
+            SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
+            pParamStruct->pos.type = 10;
+            pParamStruct->pos.x.fSize = x;
+            pParamStruct->pos.y.fSize = y;
+            pShadow->SetID(ID_SHADOW_BASE + m_layout.m_nChsID[y][x]);
+            m_pGameBoard->InsertIChild(pShadow);
         }
     }
 
