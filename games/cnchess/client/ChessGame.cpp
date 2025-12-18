@@ -107,6 +107,7 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
         pPiece->SetPicesState(CChessPiece::STATE_NORMAL);
         pPiece->SetLayer(1);
         pPiece->SetPos(ptTarget);
+        pPiece->SetTarget(CPoint(-1,-1));
         m_nSelectedChessID = -1;
 
         //swap side
