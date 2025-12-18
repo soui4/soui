@@ -128,13 +128,12 @@ class SAnimatorHandler {
   public:
       SAnimatorHandler() {
       }
-      
+
       BOOL IsEmpty() const{
           return m_lstAnimator.IsEmpty();
       }
 
-      BOOL OnSetAnimatorValue(SStringW strPropName, IPropertyValuesHolder* pHolder, float fraction, ANI_STATE state) {
-          if(state == ANI_START){
+      int GetPropType(SStringW strPropName) const{
           int type = -1;
           if(strPropName.CompareNoCase(WindowProperty::ALPHA)==0){
               type = ANI_ALPHA;
@@ -160,15 +159,18 @@ class SAnimatorHandler {
           else if(strPropName.CompareNoCase(WindowProperty::TRANSLATE_Y)==0){
               type = ANI_TRANSLATE_Y;
           }
-          if(type == -1)
-              return FALSE;
+          return type;
+      }
+
+      void OnSetAnimatorValue(SWindow *pWnd, int type, IPropertyValuesHolder* pHolder, float fraction, ANI_STATE state) {
+          SASSERT(type != -1);
+          if(state == ANI_START){
            AnimatorHolder *pAniHolder = new AnimatorHolder;
            pAniHolder->holder = pHolder;
            pAniHolder->type = type;
            pAniHolder->fraction = fraction;
            m_lstAnimator.AddTail(pAniHolder);
            pAniHolder->Release();
-           return TRUE;
         }
         if(state == ANI_END){
             for(SPOSITION pos = m_lstAnimator.GetHeadPosition();pos;)
@@ -176,8 +178,14 @@ class SAnimatorHandler {
                 AnimatorHolder *pAniHolder = m_lstAnimator.GetNext(pos);
                 if(pAniHolder->holder == pHolder)
                 {
+                    CRect rc = pWnd->GetWindowRect();
+                    int wid = rc.Width();
+                    int hei = rc.Height();
+                    int nScale = pWnd->GetScale();
+                    STransformation tmp = GetTransformation(pWnd, pAniHolder, wid, hei, nScale);
+                    pWnd->m_transform.Compose(&tmp);
                     m_lstAnimator.RemoveAt(pos);
-                    return TRUE;
+                    break;
                 }
             }
         }else if(state == ANI_PROGRESS){
@@ -187,12 +195,10 @@ class SAnimatorHandler {
                 if(pAniHolder->holder == pHolder)
                 {
                     pAniHolder->fraction = fraction;
-                    return TRUE;
+                    break;
                 }
             }    
         }
-        return FALSE;
-
       }
 
       STransformation GetTransformation(const SWindow *pWnd) {
@@ -204,6 +210,14 @@ class SAnimatorHandler {
         for(SPOSITION pos = m_lstAnimator.GetHeadPosition();pos;)
         {
             AnimatorHolder *pHolder = m_lstAnimator.GetNext(pos);
+            STransformation tmp = GetTransformation(pWnd, pHolder, wid, hei, nScale);
+            ret.compose(tmp);
+        }    
+        return ret;
+      }
+      
+  private:
+        STransformation GetTransformation(const SWindow * pWnd, AnimatorHolder *pHolder, int wid, int hei, int nScale) const{
             STransformation tmp;
             switch(pHolder->type)
             {
@@ -308,12 +322,9 @@ class SAnimatorHandler {
             }
                 break;
             }
-            ret.compose(tmp);
-        }    
-        return ret;
+        return tmp;
       }
-      
-  private:
+
     SList<SAutoRefPtr<AnimatorHolder> > m_lstAnimator;
 };
 
@@ -2000,7 +2011,11 @@ BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, A
         InvalidateRect(NULL);
         return TRUE;
     }
-    if(m_pAnimatorHandler->OnSetAnimatorValue(strPropName, pHolder, fraction, state)){
+    int type = m_pAnimatorHandler->GetPropType(strPropName);
+    if(type != -1){
+        InvalidateRect(NULL);
+        m_pAnimatorHandler->OnSetAnimatorValue(this, type, pHolder, fraction, state);
+        InvalidateRect(NULL);
         return TRUE;
     }
 

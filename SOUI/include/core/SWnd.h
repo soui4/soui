@@ -342,6 +342,7 @@ class SOUI_EXP SWindow
     friend class SwndContainerImpl;
     friend class FocusSearch;
     friend class SHostProxy;
+    friend class SAnimatorHandler;
 
     typedef enum tagAnimationState
     {
