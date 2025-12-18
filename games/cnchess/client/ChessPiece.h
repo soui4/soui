@@ -35,9 +35,27 @@ public:
     BOOL IsRedSide() const{
         return CHSMANSIDE(m_chessMan) == CS_RED;
     }
+
+    void SetPos(POINT pt){
+        m_pos = pt;
+    }
+
+    POINT GetPos() const{
+        return m_pos;
+    }
+
+    void SetTarget(POINT pt){
+        m_target = pt;
+    }
+
+    POINT GetTarget() const{
+        return m_target;
+    }
 private:
     int m_state;
     CHESSMAN m_chessMan;
+    CPoint m_pos;
+    CPoint m_target;
 };
 
 SNSEND
