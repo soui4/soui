@@ -121,6 +121,10 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
             POINT ptTarget={GET_X_LPARAM(lp),GET_Y_LPARAM(lp)};
             CChessPiece *pSelPiece = (CChessPiece *)m_pGameBoard->FindChildByID(m_nSelectedChessID);
             SASSERT(pSelPiece);
+            lp = pSelPiece->GetUserData();
+            POINT ptSrc={GET_X_LPARAM(lp),GET_Y_LPARAM(lp)};
+            ShowPosFlags(ptSrc, FALSE);
+
             pSelPiece->SetLayer(3);
             pSelPiece->SetUserData(MAKELPARAM(ptTarget.x,ptTarget.y));
 
@@ -129,7 +133,7 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
             AnchorPos pos = pParamStruct->pos;
             pos.x.fSize += 0.1f;
             pos.y.fSize += -0.1f;
-            auto pAnim = Util::MoveSpriteTo(pSelPiece, pos, 500);
+            auto pAnim = Util::MoveSpriteTo(pSelPiece, pos, 200);
             pAnim->SetID(ANI_MOVE);
             pAnim->addListener(this);
         }
