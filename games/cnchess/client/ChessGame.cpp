@@ -94,8 +94,9 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
         if(pTarget->GetID() == m_nSelectedChessID)
         {//cancel the selection
             CChessPiece *pSelPiece = (CChessPiece *)pTarget;
-            pSelPiece->SetPicesState(CChessPiece::STATE_NORMAL);
-            Util::OffsetSprite(pSelPiece, -m_cellWidth/10, -m_cellHeight/10, 100);
+            auto pAni = Util::OffsetSprite(pSelPiece, -m_cellWidth/10, -m_cellHeight/10, 100);
+            pAni->SetID(ANI_DOWN);
+            pAni->addListener(this);
             m_nSelectedChessID = -1;
         }else{
             //move the selected piece to the target position
