@@ -87,6 +87,13 @@ namespace WindowProperty
     static const LPCWSTR ALPHA = L"alpha";
     static const LPCWSTR COLOR_BKGND = L"colorBkgnd";
     static const LPCWSTR COLOR_TEXT = L"colorText";
+    static const LPCWSTR SCALE = L"scale";
+    static const LPCWSTR SCALE_X = L"scaleX";
+    static const LPCWSTR SCALE_Y = L"scaleY";
+    static const LPCWSTR ROTATION = L"rotation";
+    static const LPCWSTR TRANSLATE = L"translate";
+    static const LPCWSTR TRANSLATE_X = L"translateX";
+    static const LPCWSTR TRANSLATE_Y = L"translateY";
 };
 
 /**
@@ -334,14 +341,28 @@ class SOUI_EXP SWindow
     friend class FocusSearch;
     friend class SHostProxy;
 
+    typedef enum tagAnimationState
+    {
+        anim_none = 0,
+        anim_animation,       /**< Animation object is playing. */
+        anim_animator_alpha,  /**< value Animator of alpha is playing. */
+        anim_animator_rotate, /**< value Animator of rotation is playing. */
+        anim_animator_scale,  /**< value Animator of scale is playing. */
+        anim_animator_scaleX, /**< value Animator of scaleX is playing. */
+        anim_animator_scaleY, /**< value Animator of scaleY is playing. */
+        anim_animator_translate,  /**< value Animator of translate is playing. */
+        anim_animator_translateX, /**< value Animator of translateX is playing. */
+        anim_animator_translateY, /**< value Animator of translateY is playing. */
+    }AnimationState;
+
     class SAnimationHandler : public ITimelineHandler {
       private:
         SWindow *m_pOwner;             /**< Owner window */
-        STransformation m_transform;   /**< Transformation */
         bool m_bFillAfter;             /**< Fill after flag */
         SWindow *m_pPrevSiblingBackup; /**< Previous sibling backup */
-
+        
       public:
+        STransformation m_transform;   /**< Transformation */
         /**
          * @brief Constructor.
          * @param pOwner Owner window.
@@ -2098,6 +2119,8 @@ class SOUI_EXP SWindow
      * @param nScale The scale factor.
      */
     void GetScaleSkin(SAutoRefPtr<ISkinObj> &pSkin, int nScale);
+
+    BOOL CheckAnimationState(AnimationState aniState, ANI_STATE state);
     // Protected methods for handling messages
   protected:
     /**
@@ -2751,8 +2774,8 @@ class SOUI_EXP SWindow
     SAutoRefPtr<IAnimation> m_animation;  /**< Animation object. */
     SAnimationHandler m_animationHandler; /**< Animation handler for the window.  */
     STransformation m_transform;          /**< Transformation object. */
-    bool m_isAnimating;                   /**< Flag indicating if the window is currently animating. */
-    bool m_isDestroying;                  /**< Flag indicating if the window is being destroyed. */
+    AnimationState m_animationState;      /**< Animation state. at one time, only one animation can be playing.*/
+    BOOL m_isDestroying;                  /**< Flag indicating if the window is being destroyed. */
 
     typedef struct GETRTDATA
     {
