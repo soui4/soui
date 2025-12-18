@@ -240,4 +240,6 @@ private:
     float m_cellWidth;
     float m_cellHeight;
     CPoint  m_ptBoardOrigin;    ///棋盘左下角坐标
+
+    CChessLayout    m_layout;
 };

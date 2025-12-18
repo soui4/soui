@@ -4,6 +4,7 @@
 #include <helper/SFunctor.hpp>
 #include <cnchessProtocol.h>
 #include "CnchessSkin.h"
+#include "ChessPiece.h"
 #include <helper/slog.h>
 #define kLogTag "ChessGame"
 
@@ -68,6 +69,27 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
     m_pChessBoard = sobj_cast<SImageWnd>(m_pTheme->GetWidget(Sprites::board_main));
     m_pGameBoard->InsertChild(m_pChessBoard);
     m_pChessBoard->AddRef();
+
+    m_layout.InitLayout(NULL,CS_RED);
+    //init chess layout
+    SXmlNode xml = m_pTheme->GetTemplate(Template::kChessPiece);
+    SStringW clsName = xml.attribute(L"wndclass").as_string(L"chesspiece");
+    for(int y=0;y<10;y++) for(int x=0;x<9;x++)
+    {
+        if(m_layout.m_chesses[y][x] == CHSMAN_NULL) 
+            continue;
+        CChessPiece *pPiece = (CChessPiece *)SApplication::getSingletonPtr()->CreateWindowByName(clsName);
+        pPiece->InitFromXml(&xml);
+        pPiece->SetChessMan(m_layout.m_chesses[y][x]);
+        SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pPiece->GetLayoutParam();
+        SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
+        pParamStruct->pos.type = 10;
+        pParamStruct->pos.x.fSize = x;
+        pParamStruct->pos.y.fSize = y;
+        pPiece->SetID(m_layout.m_nChsID[y][x]);
+        m_pGameBoard->InsertChild(pPiece);
+    }
+
 }
 
 void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)

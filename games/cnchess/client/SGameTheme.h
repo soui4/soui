@@ -103,6 +103,11 @@ namespace Sounds{
     }
 }
 
+namespace Template{
+    static const wchar_t *kAvatar = L"avatar";
+    static const wchar_t *kTip = L"tip";
+    static const wchar_t *kChessPiece = L"piece";
+}
 /**
  * @brief 游戏主题类
  * 

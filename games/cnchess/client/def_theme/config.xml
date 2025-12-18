@@ -27,6 +27,7 @@
             </window>
             <text name="txt_name" text=" " font="size:16"/>
         </avatar>
+        <piece  wndClass="chesspiece" skin="skin_pieces" ownerLayout="anchor" offset="-0.5,-0.5" layer="1" size="76,86"/>
     </template>
     <widgets>
         <gifplayer name="sprite_connecting" skin="ani_conn" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="100" />

@@ -4,6 +4,7 @@
 #include "SGameTheme.h"
 #include "CnchessSkin.h"
 #include "ChessBoard.h"
+#include "ChessPiece.h"
 
 static const TCHAR * kPath_SysRes = _T("/../../../soui-sys-resource");
 static const TCHAR *kPath_UiRes = _T("/uires");
@@ -31,6 +32,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
     app.RegisterSkinClass<SSkinBoard>();
     app.RegisterWindowClass<SGifPlayer>();
     app.RegisterWindowClass<CChessBoard>();
+    app.RegisterWindowClass<CChessPiece>();
     SStringT appDir = app.GetAppDir();
 
     SAppCfg cfg;
