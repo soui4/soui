@@ -87,6 +87,9 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
         auto pAnim = Util::OffsetSprite(pPiece, -0.1f, 0.1f, 100);
         pAnim->SetID(ANI_MOVEDOWN);
         pAnim->addListener(this);
+
+        //swap side
+        m_bRedSide = !m_bRedSide;
     }else if(pPropAnimator->GetID() == ANI_DOWN){
         //set the piece to normal state
         pPiece->SetPicesState(CChessPiece::STATE_NORMAL);
@@ -94,11 +97,12 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
         ULONG_PTR lp = pPiece->GetUserData();
         POINT ptPiece={GET_X_LPARAM(lp),GET_Y_LPARAM(lp)};
         ShowPosFlags(ptPiece, FALSE);
+        m_nSelectedChessID = -1;
     }else if(pPropAnimator->GetID() == ANI_MOVEDOWN){
         //move the piece down
         pPiece->SetPicesState(CChessPiece::STATE_NORMAL);
         pPiece->SetLayer(1);
-
+        m_nSelectedChessID = -1;
         //todo: move the piece to the layout.
     }
 }
@@ -136,6 +140,7 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
             auto pAnim = Util::MoveSpriteTo(pSelPiece, pos, 200);
             pAnim->SetID(ANI_MOVE);
             pAnim->addListener(this);
+            m_nSelectedChessID = -1;
         }
     }else{
         CChessPiece *pTarget = sobj_cast<CChessPiece>(e->Sender());
