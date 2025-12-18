@@ -256,7 +256,7 @@ public:
      * @param nSpeed 动画速度
      * @return 动画对象
      */
-    static SAutoRefPtr<IValueAnimator> OffsetSprite(IWindow *pCard, int dx, int dy, int nSpeed);
+    static SAutoRefPtr<IValueAnimator> OffsetSprite(IWindow *pCard, float dx, float dy, int nSpeed);
 
     /**
      * @brief 移动精灵卡牌

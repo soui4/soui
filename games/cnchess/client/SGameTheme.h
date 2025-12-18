@@ -107,6 +107,7 @@ namespace Template{
     static const wchar_t *kAvatar = L"avatar";
     static const wchar_t *kTip = L"tip";
     static const wchar_t *kChessPiece = L"piece";
+    static const wchar_t *kPosFlag = L"posflag";
 }
 /**
  * @brief 游戏主题类

@@ -31,6 +31,10 @@ public:
     CHESSMAN GetChessMan() const{
         return m_chessMan;
     }
+
+    BOOL IsRedSide() const{
+        return CHSMANSIDE(m_chessMan) == CS_RED;
+    }
 private:
     int m_state;
     CHESSMAN m_chessMan;

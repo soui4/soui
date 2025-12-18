@@ -5,6 +5,7 @@
 #include <cnchessProtocol.h>
 #include "CnchessSkin.h"
 #include "ChessPiece.h"
+#include "utils.h"
 #include <helper/slog.h>
 #define kLogTag "ChessGame"
 
@@ -14,7 +15,6 @@ POINT CChessGame::ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, c
     if(pos.type == 10){
         //type == 10 is chess anchor
         CChessGame *pThis = (CChessGame *)userData;
-        SASSERT(pos.x.fSize>=0 && pos.x.fSize<9 && pos.y.fSize>=0 && pos.y.fSize<10);
         CPoint pt = pThis->m_ptBoardOrigin;
         pt.x += pThis->m_cellWidth * pos.x.fSize;
         pt.y -= pThis->m_cellHeight * pos.y.fSize;
@@ -56,6 +56,22 @@ CChessGame::~CChessGame()
 {
 }
 
+BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
+{
+    CChessPiece *pPiece = sobj_cast<CChessPiece>(e->Sender());
+    if(pPiece->GetPicesState() == CChessPiece::STATE_NORMAL)
+    {
+        pPiece->SetPicesState(CChessPiece::STATE_UP);
+        //offset the piece by 10% of cell size for x and y
+        Util::OffsetSprite(pPiece, m_cellWidth/10, m_cellHeight/10, 100);
+    }
+    else if(pPiece->GetPicesState() == CChessPiece::STATE_UP)
+    {
+        pPiece->SetPicesState(CChessPiece::STATE_DOWN);
+        Util::OffsetSprite(pPiece, -m_cellWidth/10, -m_cellHeight/10, 100);
+    }
+    return TRUE;
+}
 void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
 {
     SWindow* pGameBoard = pGameHost->FindChildByName(L"chessboard");
@@ -70,24 +86,44 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
     m_pGameBoard->InsertChild(m_pChessBoard);
     m_pChessBoard->AddRef();
 
-    m_layout.InitLayout(NULL,CS_RED);
+    m_bRedSide = TRUE;
+    m_layout.InitLayout(NULL,m_bRedSide?CS_RED:CS_BLACK);
     //init chess layout
-    SXmlNode xml = m_pTheme->GetTemplate(Template::kChessPiece);
-    SStringW clsName = xml.attribute(L"wndclass").as_string(L"chesspiece");
+    SXmlNode xmlPiece = m_pTheme->GetTemplate(Template::kChessPiece);
+    SStringW clsName = xmlPiece.attribute(L"wndclass").as_string(L"chesspiece");
+    SXmlNode xmlPosFlag = m_pTheme->GetTemplate(Template::kPosFlag);
+    SStringW flgClsName = xmlPosFlag.attribute(L"wndclass").as_string(L"img");
     for(int y=0;y<10;y++) for(int x=0;x<9;x++)
     {
+        {
+            IWindow *pFlag = SApplication::getSingletonPtr()->CreateWindowByName(flgClsName);
+            pFlag->InitFromXml(&xmlPosFlag);
+            SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pFlag->GetLayoutParam();
+            SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
+            pParamStruct->pos.type = 10;
+            pParamStruct->pos.x.fSize = x;
+            pParamStruct->pos.y.fSize = y;
+            m_pGameBoard->InsertIChild(pFlag);
+            pFlag->SetID(1000 + y * 9 + x);
+            pFlag->SetVisible(FALSE,TRUE);
+        }
+
         if(m_layout.m_chesses[y][x] == CHSMAN_NULL) 
             continue;
-        CChessPiece *pPiece = (CChessPiece *)SApplication::getSingletonPtr()->CreateWindowByName(clsName);
-        pPiece->InitFromXml(&xml);
-        pPiece->SetChessMan(m_layout.m_chesses[y][x]);
-        SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pPiece->GetLayoutParam();
-        SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
-        pParamStruct->pos.type = 10;
-        pParamStruct->pos.x.fSize = x;
-        pParamStruct->pos.y.fSize = y;
-        pPiece->SetID(m_layout.m_nChsID[y][x]);
-        m_pGameBoard->InsertChild(pPiece);
+        {
+            CChessPiece *pPiece = (CChessPiece *)SApplication::getSingletonPtr()->CreateWindowByName(clsName);
+            pPiece->InitFromXml(&xmlPiece);
+            pPiece->SetChessMan(m_layout.m_chesses[y][x]);
+            SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pPiece->GetLayoutParam();
+            SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
+            pParamStruct->pos.type = 10;
+            pParamStruct->pos.x.fSize = x;
+            pParamStruct->pos.y.fSize = y;
+            pPiece->SetID(m_layout.m_nChsID[y][x]);
+            m_pGameBoard->InsertChild(pPiece);
+            auto slot = Subscriber(&CChessGame::OnChessPieceClick, this);
+            pPiece->SubscribeEvent(EventCmd::EventID, &slot);
+        }
     }
 
 }

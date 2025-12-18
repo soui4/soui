@@ -242,7 +242,7 @@ void SSpriteCard::OnMouseMove(UINT nFlags, CPoint pt)
 }
 
 //------------------------------------------------------------------------
-SAutoRefPtr<IValueAnimator> Util::OffsetSprite(IWindow *pCard, int dx, int dy, int nSpeed)
+SAutoRefPtr<IValueAnimator> Util::OffsetSprite(IWindow *pCard, float dx, float dy, int nSpeed)
 {
     ILayoutParam *pParam = (ILayoutParam*)pCard->GetLayoutParam();
     SASSERT(pParam->IsClass(SAnchorLayoutParam::GetClassName()));

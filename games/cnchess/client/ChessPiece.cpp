@@ -8,6 +8,7 @@ CChessPiece::CChessPiece()
 ,m_chessMan(CHSMAN_BLK_BING)
 {
     SetIcon(m_chessMan*3+m_state);
+    m_bMsgTransparent = FALSE;
 }
 
 CChessPiece::~CChessPiece()

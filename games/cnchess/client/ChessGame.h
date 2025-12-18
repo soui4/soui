@@ -58,7 +58,9 @@ public:
      * @brief 析构函数
      */
     virtual ~CChessGame();
-    
+
+    BOOL OnChessPieceClick(IEvtArgs *e);
+
     /**
      * @brief 初始化游戏
      * @param pGameBoard 游戏面板窗口指针
@@ -242,4 +244,5 @@ private:
     CPoint  m_ptBoardOrigin;    ///棋盘左下角坐标
 
     CChessLayout    m_layout;
+    BOOL m_bRedSide;
 };
