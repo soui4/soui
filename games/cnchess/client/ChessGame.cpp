@@ -256,6 +256,11 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
     m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale*100, 1);
 }
 
+void CChessGame::OnTimer(UINT_PTR uIDEvent)
+{
+    SetMsgHandled(FALSE);
+}
+
 void CChessGame::OnConnected()
 {
     SLOGI() << "Connected to server";

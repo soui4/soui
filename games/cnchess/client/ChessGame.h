@@ -131,12 +131,12 @@ public:
      * @brief 定时器事件处理
      * @param uIDEvent 定时器ID
      */
-    void OnTimer(UINT_PTR uIDEvent){}
+  void OnTimer(UINT_PTR uIDEvent);
     
     /**
      * @brief 消息映射表
      */
-    BEGIN_MSG_MAP_EX(UpgradeGame)
+    BEGIN_MSG_MAP_EX(CChessGame)
         MSG_WM_TIMER(OnTimer)
     END_MSG_MAP()
 protected:
