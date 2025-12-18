@@ -118,6 +118,15 @@ class SGameTheme : public TObjRefImpl<IObjRef>
 {
 public:
 
+    /**
+     * @brief 窗口层级枚举
+     */
+    enum{
+        LAYER_PIESE = 10,       ///< 棋子
+        LAYER_PIESE_UP = 20,    ///< 棋子抬起
+        LAYER_SHAWDOW = 15,     ///< 棋子阴影
+        LAYER_POSFLAG = 5,      ///< 棋子位置标志
+    };
 
 public:
     /**

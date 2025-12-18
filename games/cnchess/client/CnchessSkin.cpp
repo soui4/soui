@@ -5,7 +5,7 @@ SNSBEGIN
 
 SSkinPiece::SSkinPiece(void)
     : m_ptCenter(38,38)
-    , m_szChess(76,86)
+    , m_szChess(76,76)
 {
 }
 
@@ -32,12 +32,6 @@ void SSkinPiece::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, BY
 
     int iCol = iState % PIECE_COLS;
     int iRow = iState / PIECE_COLS;
-
-    if(iCol == 1){
-        SIZE sz = m_pImgShadow->Size();
-        RECT rcSrc = { 0, 0, sz.cx, sz.cy };
-        pRT->DrawBitmapEx(rcDraw, m_pImgShadow, &rcSrc, GetExpandMode(), byAlpha);
-    }
     SIZE szImg = GetImage()->Size();
     SIZE szChess = {szImg.cx/PIECE_COLS,szImg.cy/PIECE_ROWS};
     CRect rcSrc(CPoint(),szChess);

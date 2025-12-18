@@ -11,7 +11,7 @@
         <apng name="ani_vectory_2" src="file:Sprite/礼花2.png"/>"
         <apng name="ani_vectory_3" src="file:Sprite/礼花3.png"/>"
 
-        <piece name="skin_pieces" src="file:image/pieces.png" shadow="file:image/piece_shadow.png" filterLevel="high" size="76,86" center="38,38"/>
+        <piece name="skin_pieces" src="file:image/pieces.png"  filterLevel="high" size="76,76" center="38,38"/>
         <board name="skin_chessboard" src="file:image/chessboard.png" filterLevel="high" margin="64,68,67,71"/>
         <imglist name="skin_pos_flag" src="file:image/posflag.png"/>"
 
@@ -28,8 +28,8 @@
             </window>
             <text name="txt_name" text=" " font="size:16"/>
         </avatar>
-        <piece  wndClass="chesspiece" skin="skin_pieces" ownerLayout="anchor" offset="-0.5,-0.5" layer="2" size="76,86"/>
-        <posflag wndClass="img" skin="skin_pos_flag" ownerLayout="anchor" pos="0,0,10" offset="-0.5,-0.5" layer="1" size="27,26" msgTransparent="0" />
+        <piece  wndClass="chesspiece" skin="skin_pieces" ownerLayout="anchor" offset="-0.5,-0.5" layer="10" size="76,76"/>
+        <posflag wndClass="img" skin="skin_pos_flag" ownerLayout="anchor" pos="0,0,10" offset="-0.5,-0.5" layer="5" size="27,26" msgTransparent="0" />
     </template>
     <widgets>
         <gifplayer name="sprite_connecting" skin="ani_conn" ownerLayout="anchor" pos="0,-50,4" offset="-0.5,-0.5" layer="100" />
@@ -41,7 +41,9 @@
             <include src="file:xml/clock_digit.xml" name="digit2" pos="0,0,4" size="-1,-1" offset="-0.5,-0.5"/>
             <window size="0,0" weight="1"/>
         </img>
-        <img name="board_main" skin="skin_chessboard" layout="anchor" enableLayer="1" ownerLayout="anchor" pos="0,0,4" offset="-0.5,-0.5" fitImage="1" />
+        <img name="board_main" skin="skin_chessboard" layout="anchor" enableLayer="1" ownerLayout="anchor" pos="0,0,4" offset="-0.5,-0.5" fitImage="1">
+            <img name="piece_shadow" skin="skin_piece_shadow" pos="0,0,4" offset="-0.5,-0.5" layer="15" visible="0"/>
+        </img>
 
     </widgets>
     <anchors>

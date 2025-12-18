@@ -29,11 +29,9 @@ protected:
 public:
     SOUI_ATTRS_BEGIN()
         ATTR_POINT(L"center", m_ptCenter, TRUE)
-        ATTR_IMAGE(L"shadow", m_pImgShadow, FALSE)
         ATTR_SIZE(L"size", m_szChess, TRUE) //chess size, default is 76,86
     SOUI_ATTRS_END()
 private:
-    SAutoRefPtr<IBitmapS> m_pImgShadow;
     CPoint m_ptCenter;
     CSize  m_szChess;
 };
