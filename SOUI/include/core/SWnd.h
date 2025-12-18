@@ -2761,7 +2761,7 @@ class SOUI_EXP SWindow
     SAutoRefPtr<IAnimation> m_animation;  /**< Animation object. */
     SAnimationHandler m_animationHandler; /**< Animation handler for the window.  */
     STransformation m_transform;          /**< Transformation object. */
-    BOOL m_isAnimating;                /**< Animation state.*/
+    BOOL m_isAnimating;                   /**< Flag indicating if the window is currently animating. */
     BOOL m_isDestroying;                  /**< Flag indicating if the window is being destroyed. */
 
     typedef struct GETRTDATA
