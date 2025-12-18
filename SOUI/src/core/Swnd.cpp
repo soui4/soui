@@ -99,6 +99,224 @@ SStringW STrText::EscapeString(const SStringW &strValue)
     return strCvt;
 }
 
+
+//------------------------------------------------------------------------
+enum{
+    ANI_ALPHA=0,
+    ANI_SCALE,
+    ANI_SCALE_X,
+    ANI_SCALE_Y,
+    ANI_ROTATE,
+    ANI_TRANSLATE,
+    ANI_TRANSLATE_X,
+    ANI_TRANSLATE_Y,
+};
+
+class AnimatorHolder : public TObjRefImpl<IObjRef> 
+{
+  public:
+    AnimatorHolder()
+    {
+        type = -1;
+    }
+    SAutoRefPtr<IPropertyValuesHolder> holder;
+    float fraction;
+    int type;
+};
+
+class SAnimatorHandler {
+  public:
+      SAnimatorHandler() {
+      }
+      
+      BOOL IsEmpty() const{
+          return m_lstAnimator.IsEmpty();
+      }
+
+      BOOL OnSetAnimatorValue(SStringW strPropName, IPropertyValuesHolder* pHolder, float fraction, ANI_STATE state) {
+          if(state == ANI_START){
+          int type = -1;
+          if(strPropName.CompareNoCase(WindowProperty::ALPHA)==0){
+              type = ANI_ALPHA;
+          }
+          else if(strPropName.CompareNoCase(WindowProperty::SCALE)==0){
+              type = ANI_SCALE;
+          }
+          else if(strPropName.CompareNoCase(WindowProperty::SCALE_X)==0){
+              type = ANI_SCALE_X;
+          }
+          else if(strPropName.CompareNoCase(WindowProperty::SCALE_Y)==0){
+              type = ANI_SCALE_Y;
+          }
+          else if(strPropName.CompareNoCase(WindowProperty::ROTATION)==0){
+              type = ANI_ROTATE;
+          }
+          else if(strPropName.CompareNoCase(WindowProperty::TRANSLATE)==0){
+              type = ANI_TRANSLATE;
+          }
+          else if(strPropName.CompareNoCase(WindowProperty::TRANSLATE_X)==0){
+              type = ANI_TRANSLATE_X;
+          }
+          else if(strPropName.CompareNoCase(WindowProperty::TRANSLATE_Y)==0){
+              type = ANI_TRANSLATE_Y;
+          }
+          if(type == -1)
+              return FALSE;
+           AnimatorHolder *pAniHolder = new AnimatorHolder;
+           pAniHolder->holder = pHolder;
+           pAniHolder->type = type;
+           pAniHolder->fraction = fraction;
+           m_lstAnimator.AddTail(pAniHolder);
+           pAniHolder->Release();
+           return TRUE;
+        }
+        if(state == ANI_END){
+            for(SPOSITION pos = m_lstAnimator.GetHeadPosition();pos;)
+            {
+                AnimatorHolder *pAniHolder = m_lstAnimator.GetNext(pos);
+                if(pAniHolder->holder == pHolder)
+                {
+                    m_lstAnimator.RemoveAt(pos);
+                    return TRUE;
+                }
+            }
+        }else if(state == ANI_PROGRESS){
+            for(SPOSITION pos = m_lstAnimator.GetHeadPosition();pos;)
+            {
+                AnimatorHolder *pAniHolder = m_lstAnimator.GetNext(pos);
+                if(pAniHolder->holder == pHolder)
+                {
+                    pAniHolder->fraction = fraction;
+                    return TRUE;
+                }
+            }    
+        }
+        return FALSE;
+
+      }
+
+      STransformation GetTransformation(const SWindow *pWnd) {
+        STransformation ret;
+        CRect rc = pWnd->GetWindowRect();
+        int wid = rc.Width();
+        int hei = rc.Height();
+        int nScale = pWnd->GetScale();
+        for(SPOSITION pos = m_lstAnimator.GetHeadPosition();pos;)
+        {
+            AnimatorHolder *pHolder = m_lstAnimator.GetNext(pos);
+            STransformation tmp;
+            switch(pHolder->type)
+            {
+            case ANI_ALPHA:
+                {
+                    if(pHolder->holder->GetValueType()==PROP_TYPE_BYTE){
+                        BYTE alpha;
+                        pHolder->holder->GetAnimatedValue(pHolder->fraction,&alpha);
+                        tmp.SetAlpha(alpha);
+                    }else if(pHolder->holder->GetValueType()==PROP_TYPE_FLOAT){
+                        float alpha;
+                        pHolder->holder->GetAnimatedValue(pHolder->fraction,&alpha);
+                        tmp.SetAlpha((BYTE)(alpha*255));
+                    }
+                }
+                break;
+            case ANI_SCALE:
+            {
+                if(pHolder->holder->GetValueType()==PROP_TYPE_FLOAT){
+                    float scale;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&scale);
+                    tmp.GetMatrix()->setScale2(scale, scale,wid*0.5f,hei*0.5f);
+                }
+            }
+                break;
+            case ANI_SCALE_X:
+            {
+                if(pHolder->holder->GetValueType()==PROP_TYPE_FLOAT){
+                    float scale;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&scale);
+                    tmp.GetMatrix()->setScale2(scale, 1,wid*0.5f,hei*0.5f);
+                }
+            }
+                break;
+            case ANI_SCALE_Y:
+            {
+                if(pHolder->holder->GetValueType()==PROP_TYPE_FLOAT){
+                    float scale;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&scale);
+                    tmp.GetMatrix()->setScale2(1, scale,wid*0.5f,hei*0.5f);
+                }
+            }
+                break;
+            case ANI_ROTATE:
+            {
+                if(pHolder->holder->GetValueType()==PROP_TYPE_FLOAT){
+                    float rotate;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&rotate);
+                    tmp.GetMatrix()->setRotate2(rotate,wid*0.5f,hei*0.5f);
+                }
+            }
+                break;
+            case ANI_TRANSLATE:
+            {
+                if(pHolder->holder->GetValueType()==PROP_TYPE_FLOAT){
+                    float translate;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&translate);
+                    tmp.GetMatrix()->setTranslate(translate,translate);
+                }else if(pHolder->holder->GetValueType()==PROP_TYPE_LAYOUT_SIZE){
+                    SLayoutSize translate;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&translate);
+                    tmp.GetMatrix()->setTranslate(translate.toPixelSize(nScale),translate.toPixelSize(nScale));
+                }else if(pHolder->holder->GetValueType()==PROP_TYPE_INT){
+                    int nValue;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&nValue);
+                    tmp.GetMatrix()->setTranslate(nValue,nValue);
+                }
+            }
+                break;
+            case ANI_TRANSLATE_X:
+            {
+                if(pHolder->holder->GetValueType()==PROP_TYPE_FLOAT){
+                    float translate;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&translate);
+                    tmp.GetMatrix()->setTranslate(translate,0.0f);
+                }else if(pHolder->holder->GetValueType()==PROP_TYPE_LAYOUT_SIZE){
+                    SLayoutSize translate;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&translate);
+                    tmp.GetMatrix()->setTranslate(translate.toPixelSize(nScale),0.0f);
+                }else if(pHolder->holder->GetValueType()==PROP_TYPE_INT){
+                    int nValue;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&nValue);
+                    tmp.GetMatrix()->setTranslate(nValue,0.0f);
+                }
+            }
+                break;
+            case ANI_TRANSLATE_Y:
+            {
+                if(pHolder->holder->GetValueType()==PROP_TYPE_FLOAT){
+                    float translate;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&translate);
+                    tmp.GetMatrix()->setTranslate(0.0f,translate);
+                }else if(pHolder->holder->GetValueType()==PROP_TYPE_LAYOUT_SIZE){
+                    SLayoutSize translate;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&translate);
+                    tmp.GetMatrix()->setTranslate(0.0f,translate.toPixelSize(nScale));
+                }else if(pHolder->holder->GetValueType()==PROP_TYPE_INT){
+                    int nValue;
+                    pHolder->holder->GetAnimatedValue(pHolder->fraction,&nValue);
+                    tmp.GetMatrix()->setTranslate(0.0f,nValue);
+                }
+            }
+                break;
+            }
+            ret.compose(tmp);
+        }    
+        return ret;
+      }
+      
+  private:
+    SList<SAutoRefPtr<AnimatorHolder> > m_lstAnimator;
+};
+
 //////////////////////////////////////////////////////////////////////////
 // SWindow Implement
 //////////////////////////////////////////////////////////////////////////
@@ -141,7 +359,7 @@ SWindow::SWindow()
     , m_strText(this)
     , m_strToolTipText(this)
     , m_animationHandler(this)
-    , m_animationState(anim_none)
+    , m_animationState(FALSE)
     , m_isDestroying(FALSE)
     , m_isLoading(FALSE)
     , m_funSwndProc(NULL)
@@ -149,6 +367,8 @@ SWindow::SWindow()
     , m_nMainThreadId(::GetCurrentThreadId()) // 初始化对象的线程不一定是主线程
 #endif
 {
+    m_pAnimatorHandler = new SAnimatorHandler();
+
     m_nMaxWidth.setWrapContent();
 
     m_pLayout.Attach(new SouiLayout());
@@ -187,6 +407,7 @@ SWindow::SWindow()
 
 SWindow::~SWindow()
 {
+    delete m_pAnimatorHandler;
 #ifdef SOUI_ENABLE_ACC
     if (m_pAcc)
     {
@@ -1762,32 +1983,9 @@ int SWindow::GetLayer() const
     return m_nLayer;
 }
 
-BOOL SWindow::CheckAnimationState(AnimationState aniState, ANI_STATE state)
-{
-    if (state == ANI_START)
-    {
-        if (m_animationState != anim_none)
-            return FALSE;
-        m_animationState = aniState;
-    }
-    if (m_animationState != aniState)
-        return FALSE;
-    if (state == ANI_END)
-    {
-        m_animationState = anim_none;
-    }
-    return TRUE;
-}
-
 BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
 {
     SStringW strPropName = pHolder->GetPropertyName();
-    if(strPropName.CompareNoCase(WindowProperty::ALPHA)==0){
-        BYTE byAlpha;
-        pHolder->GetAnimatedValue(fraction, &byAlpha);
-        SetAlpha(byAlpha);
-        return TRUE;
-    }
     if(strPropName.CompareNoCase(WindowProperty::COLOR_BKGND)==0){
         COLORREF crBkgnd;
         pHolder->GetAnimatedValue(fraction, &crBkgnd);
@@ -1802,78 +2000,7 @@ BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, A
         InvalidateRect(NULL);
         return TRUE;
     }
-    if(strPropName.CompareNoCase(WindowProperty::ROTATION)==0){
-        if(!CheckAnimationState(anim_animator_rotate, state))
-            return FALSE;
-        CRect rc = GetWindowRect();
-        float fRotation;
-        pHolder->GetAnimatedValue(fraction, &fRotation);
-        SMatrix mtx;
-        mtx.setRotate2(fRotation, 0.5f*rc.Width(), 0.5f*rc.Height());
-        m_animationHandler.m_transform.setMatrix(mtx);
-        return TRUE;
-    }
-    if(strPropName.CompareNoCase(WindowProperty::SCALE)==0){ 
-        if(!CheckAnimationState(anim_animator_scale, state))
-            return FALSE;
-        CRect rc = GetWindowRect();
-        float fScale;
-        pHolder->GetAnimatedValue(fraction, &fScale);
-        SMatrix mtx;
-        mtx.setScale2(fScale, fScale, 0.5f*rc.Width(), 0.5f*rc.Height());
-        m_animationHandler.m_transform.setMatrix(mtx);
-        return TRUE;
-    }
-    if(strPropName.CompareNoCase(WindowProperty::SCALE_X)==0){
-        if(!CheckAnimationState(anim_animator_scaleX, state))
-            return FALSE;
-        CRect rc = GetWindowRect();
-        float fScaleX;
-        pHolder->GetAnimatedValue(fraction, &fScaleX);
-        SMatrix mtx;
-        mtx.setScale2(fScaleX, 1.0f, 0.5f*rc.Width(), 0.5f*rc.Height());
-        m_animationHandler.m_transform.setMatrix(mtx);
-        return TRUE;
-    }
-    if(strPropName.CompareNoCase(WindowProperty::SCALE_Y)==0){
-        if(!CheckAnimationState(anim_animator_scaleY, state))
-            return FALSE;
-        CRect rc = GetWindowRect();
-        float fScaleY;
-        pHolder->GetAnimatedValue(fraction, &fScaleY);
-        SMatrix mtx;
-        mtx.setScale2(1.0f, fScaleY, 0.5f*rc.Width(), 0.5f*rc.Height());
-        m_animationHandler.m_transform.setMatrix(mtx);
-        return TRUE;
-    }
-    if(strPropName.CompareNoCase(WindowProperty::TRANSLATE)==0){
-        if(!CheckAnimationState(anim_animator_translate, state))
-            return FALSE;
-        float fTranslate;
-        pHolder->GetAnimatedValue(fraction, &fTranslate);
-        SMatrix mtx;
-        mtx.setTranslate(fTranslate, fTranslate);
-        m_animationHandler.m_transform.setMatrix(mtx);
-        return TRUE;
-    }
-    if(strPropName.CompareNoCase(WindowProperty::TRANSLATE_X)==0){
-        if(!CheckAnimationState(anim_animator_translateX, state))
-            return FALSE;
-        float fTranslate;
-        pHolder->GetAnimatedValue(fraction, &fTranslate);
-        SMatrix mtx;
-        mtx.setTranslate(fTranslate, 0.0f);
-        m_animationHandler.m_transform.setMatrix(mtx);
-        return TRUE;
-    }
-    if(strPropName.CompareNoCase(WindowProperty::TRANSLATE_Y)==0){
-        if(!CheckAnimationState(anim_animator_translateY, state))
-            return FALSE;
-        float fTranslate;
-        pHolder->GetAnimatedValue(fraction, &fTranslate);
-        SMatrix mtx;
-        mtx.setTranslate(0.0f, fTranslate);
-        m_animationHandler.m_transform.setMatrix(mtx);
+    if(m_pAnimatorHandler->OnSetAnimatorValue(strPropName, pHolder, fraction, state)){
         return TRUE;
     }
 
@@ -2758,18 +2885,13 @@ BOOL SWindow::ReleaseCapture()
 
 void SWindow::SetAnimation(IAnimation *animation)
 {
-    if (m_animationState == anim_animation)
+    if (m_animationState)
     {
         ClearAnimation();
     }
     m_animation = animation;
     if (m_animation)
     {
-        if(m_animationState != anim_none)
-        {
-            SSLOGW()<<"SetAnimation failed, another animation is playing!";
-            return;
-        }    
         m_animation->setAnimationListener(this);
         if (m_animation->getStartTime() == START_ON_FIRST_FRAME)
         {
@@ -2812,7 +2934,7 @@ void SWindow::ClearAnimation()
 {
     if (m_animation)
     {
-        if (m_animationState == anim_animation)
+        if (m_animationState)
         {
             m_animation->cancel();
             OnAnimationStop(m_animation);
@@ -2823,20 +2945,22 @@ void SWindow::ClearAnimation()
         }
         m_animation->setAnimationListener(NULL);
         m_animation = NULL;
-        m_animationState = anim_none;
+        m_animationState = FALSE;
     }
 }
 
 STransformation SWindow::GetTransformation() const
 {
-    if (m_animationState == anim_none && !m_animationHandler.getFillAfter())
-        return m_transform;
-    else
+    STransformation ret = m_transform;
+    if (m_animationState || m_animationHandler.getFillAfter())
     {
-        STransformation ret = m_transform;
         ret.postCompose(m_animationHandler.GetTransformation());
-        return ret;
     }
+    if(!m_pAnimatorHandler->IsEmpty())
+    {
+        ret.postCompose(m_pAnimatorHandler->GetTransformation(this));
+    }
+    return ret;
 }
 
 void SWindow::SetMatrix(const SMatrix &mtx)
@@ -3250,7 +3374,7 @@ SWindow *SWindow::GetSelectedChildInGroup()
 
 bool SWindow::IsDrawToCache() const
 {
-    return m_bCacheDraw || m_animationState != anim_none;
+    return m_bCacheDraw || m_animationState || !m_pAnimatorHandler->IsEmpty();
 }
 
 void SWindow::OnStateChanging(DWORD dwOldState, DWORD dwNewState)
@@ -3632,25 +3756,25 @@ BOOL SWindow::SetLayoutParam(ILayoutParam *pLayoutParam)
 
 void SWindow::OnAnimationStart(THIS_ IAnimation *pAni)
 {
-    if(m_animationState != anim_none)
+    if(m_animationState)
         return;
     EventSwndAnimationStart evt(this);
     evt.pAni = pAni;
     FireEvent(&evt);
-    m_animationState = anim_animation;
+    m_animationState = TRUE;
     m_animationHandler.OnAnimationStart();
     UpdateCacheMode();
 }
 
 void SWindow::OnAnimationStop(THIS_ IAnimation *pAni)
 {
-    SASSERT(m_animationState == anim_animation);
+    SASSERT(m_animationState);
     if (GetContainer())
         GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
     InvalidateRect(NULL);
     pAni->setStartTime(START_ON_FIRST_FRAME);
     m_animationHandler.OnAnimationStop();
-    m_animationState = anim_none;
+    m_animationState = FALSE;
     UpdateCacheMode();
     EventSwndAnimationStop evt(this);
     evt.pAni = pAni;

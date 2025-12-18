@@ -322,6 +322,8 @@ class SOUI_EXP STrText {
     SStringT strTr;   /**< Translated text */
 };
 
+class SAnimatorHandler;
+
 /**
  * @class SWindow
  * @brief Base class for SOUI DUI windows.
@@ -344,25 +346,18 @@ class SOUI_EXP SWindow
     typedef enum tagAnimationState
     {
         anim_none = 0,
-        anim_animation,       /**< Animation object is playing. */
-        anim_animator_alpha,  /**< value Animator of alpha is playing. */
-        anim_animator_rotate, /**< value Animator of rotation is playing. */
-        anim_animator_scale,  /**< value Animator of scale is playing. */
-        anim_animator_scaleX, /**< value Animator of scaleX is playing. */
-        anim_animator_scaleY, /**< value Animator of scaleY is playing. */
-        anim_animator_translate,  /**< value Animator of translate is playing. */
-        anim_animator_translateX, /**< value Animator of translateX is playing. */
-        anim_animator_translateY, /**< value Animator of translateY is playing. */
+        anim_animation = 1,       /**< Animation object is playing. */
+        anim_animator=2,  /**< value Animator is playing. */
     }AnimationState;
 
     class SAnimationHandler : public ITimelineHandler {
       private:
         SWindow *m_pOwner;             /**< Owner window */
+        STransformation m_transform;   /**< Transformation */
         bool m_bFillAfter;             /**< Fill after flag */
         SWindow *m_pPrevSiblingBackup; /**< Previous sibling backup */
         
       public:
-        STransformation m_transform;   /**< Transformation */
         /**
          * @brief Constructor.
          * @param pOwner Owner window.
@@ -2119,8 +2114,6 @@ class SOUI_EXP SWindow
      * @param nScale The scale factor.
      */
     void GetScaleSkin(SAutoRefPtr<ISkinObj> &pSkin, int nScale);
-
-    BOOL CheckAnimationState(AnimationState aniState, ANI_STATE state);
     // Protected methods for handling messages
   protected:
     /**
@@ -2774,7 +2767,7 @@ class SOUI_EXP SWindow
     SAutoRefPtr<IAnimation> m_animation;  /**< Animation object. */
     SAnimationHandler m_animationHandler; /**< Animation handler for the window.  */
     STransformation m_transform;          /**< Transformation object. */
-    AnimationState m_animationState;      /**< Animation state. at one time, only one animation can be playing.*/
+    BOOL m_animationState;                /**< Animation state.*/
     BOOL m_isDestroying;                  /**< Flag indicating if the window is being destroyed. */
 
     typedef struct GETRTDATA
@@ -2791,7 +2784,7 @@ class SOUI_EXP SWindow
     SAutoRefPtr<ICaret> m_caret;             /**< Caret object. */
 
     FunSwndProc m_funSwndProc; /**< Custom window procedure. */
-
+    SAnimatorHandler * m_pAnimatorHandler;
 #ifdef _WIN32
     SAutoRefPtr<IAccessible> m_pAcc;    /**< Accessibility object. */
     SAutoRefPtr<IAccProxy> m_pAccProxy; /**< Accessibility proxy object. */
