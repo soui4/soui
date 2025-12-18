@@ -166,7 +166,7 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
             if(pTarget->GetPicesState() == CChessPiece::STATE_NORMAL)
             {//raise up the piece
                 pTarget->SetPicesState(CChessPiece::STATE_UP);
-                pTarget->SetLayer(2);
+                pTarget->SetLayer(SGameTheme::LAYER_PIESE_UP);
                 //offset the piece by 10% of cell size for x and y
                 Util::OffsetSprite(pTarget, 0.1f, -0.1f, 100);
                 m_nSelectedChessID = pTarget->GetID();

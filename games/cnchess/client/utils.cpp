@@ -116,4 +116,24 @@ SAutoRefPtr<IValueAnimator> Util::MoveAndHideSprite(IWindow *pSprite, AnchorPos 
     return pAnimator;
 }
 
+SAutoRefPtr<IValueAnimator> Util::ScaleSprite(IWindow *pSprite, float sx, float sy, int nSpeed){
+    SMatrix mtx;
+    pSprite->GetMatrix(&mtx);
+    float valuex[] = {
+		mtx.fMat[kMScaleX],
+		sx
+	};
+    SAutoRefPtr<IPropertyValuesHolder> pScaleXHolder(SPropertyValuesHolder::ofFloat(WindowProperty::SCALE_X, valuex, 2), FALSE);
+    float valuey[] = {
+		mtx.fMat[kMScaleY],
+		sy
+	};
+    SAutoRefPtr<IPropertyValuesHolder> pScaleYHolder(SPropertyValuesHolder::ofFloat(WindowProperty::SCALE_Y, valuey, 2), FALSE);
+    IPropertyValuesHolder *holders[] = { pScaleXHolder, pScaleYHolder };
+    SAutoRefPtr<IValueAnimator> pAnimator(SPropertyAnimator::ofPropertyValuesHolder(pSprite, holders, ARRAYSIZE(holders)), FALSE);
+    pAnimator->setDuration(nSpeed);
+    s_movingCardMgr.StartAnimator(pAnimator, pSprite);
+    return pAnimator;
+}
+
 SNSEND

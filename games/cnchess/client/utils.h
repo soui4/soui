@@ -6,9 +6,20 @@ SNSBEGIN
 class Util
 {
 public:
+
     /**
-     * @brief 偏移精灵卡牌
-     * @param pSprite 卡牌对象
+     * @brief 偏移精灵窗口
+     * @param pSprite 精灵对象
+     * @param dx X轴偏移量
+     * @param dy Y轴偏移量
+     * @param nSpeed 动画速度
+     * @return 动画对象
+     */
+    static SAutoRefPtr<IValueAnimator> ScaleSprite(IWindow *pSprite, float sx, float sy, int nSpeed);
+
+    /**
+     * @brief 偏移精灵窗口
+     * @param pSprite 精灵对象
      * @param dx X轴偏移量
      * @param dy Y轴偏移量
      * @param nSpeed 动画速度
@@ -17,8 +28,8 @@ public:
     static SAutoRefPtr<IValueAnimator> OffsetSprite(IWindow *pSprite, float dx, float dy, int nSpeed);
 
     /**
-     * @brief 移动精灵卡牌
-     * @param pSprite 卡牌对象
+     * @brief 移动精灵窗口
+     * @param pSprite 精灵对象
      * @param fromPos 起始位置
      * @param toPos 目标位置
      * @param nSpeed 动画速度
@@ -27,8 +38,8 @@ public:
     static SAutoRefPtr<IValueAnimator> MoveSprite(IWindow *pSprite, AnchorPos fromPos, AnchorPos toPos, int nSpeed);
 
     /**
-     * @brief 移动精灵卡牌到指定位置
-     * @param pSprite 卡牌对象
+     * @brief 移动精灵到指定位置
+     * @param pSprite 精灵对象
      * @param toPos 目标位置
      * @param nSpeed 动画速度
      * @return 动画对象
@@ -36,8 +47,8 @@ public:
     static SAutoRefPtr<IValueAnimator> MoveSpriteTo(IWindow *pSprite, AnchorPos toPos, int nSpeed);
 
     /**
-     * @brief 移动并隐藏精灵卡牌
-     * @param pSprite 卡牌对象
+     * @brief 移动并隐藏精灵窗口
+     * @param pSprite 精灵对象
      * @param toPos 目标位置
      * @param nSpeed 动画速度
      * @return 动画对象
