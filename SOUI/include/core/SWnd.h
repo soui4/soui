@@ -1230,6 +1230,12 @@ class SOUI_EXP SWindow
      */
     STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) OVERRIDE;
 
+    /**
+     * @brief 设置窗口属性动画矩阵中心
+     * @param x float--中心X坐标, 0.5f表示窗口中心
+     * @param y float--中心Y坐标, 0.5f表示窗口中心
+     */
+    STDMETHOD_(void, SetPivot)(THIS_ float x, float y) OVERRIDE;
   public:
 #ifdef _WIN32
     /**
@@ -2781,6 +2787,8 @@ class SOUI_EXP SWindow
 
     FunSwndProc m_funSwndProc; /**< Custom window procedure. */
     SAnimatorHandler *m_pAnimatorHandler;  /**< Property animator handler for the window. */
+    float m_pivotX;                         /**< Pivot X coordinate for transformations. default is 0.5f */
+    float m_pivotY;                         /**< Pivot Y coordinate for transformations. default is 0.5f */
 #ifdef _WIN32
     SAutoRefPtr<IAccessible> m_pAcc;    /**< Accessibility object. */
     SAutoRefPtr<IAccProxy> m_pAccProxy; /**< Accessibility proxy object. */

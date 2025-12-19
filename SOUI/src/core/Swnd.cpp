@@ -260,7 +260,7 @@ class SAnimatorHandler {
             {
                 float scale;
                 pHolder->holder->GetAnimatedValue(pHolder->fraction, &scale);
-                tmp.GetMatrix()->setScale2(scale, scale, wid * 0.5f, hei * 0.5f);
+                tmp.GetMatrix()->setScale2(scale, scale, wid * pWnd->m_pivotX, hei * pWnd->m_pivotY);
             }
         }
         break;
@@ -270,7 +270,7 @@ class SAnimatorHandler {
             {
                 float scale;
                 pHolder->holder->GetAnimatedValue(pHolder->fraction, &scale);
-                tmp.GetMatrix()->setScale2(scale, 1, wid * 0.5f, hei * 0.5f);
+                tmp.GetMatrix()->setScale2(scale, 1, wid * pWnd->m_pivotX, hei * pWnd->m_pivotY);
             }
         }
         break;
@@ -280,7 +280,7 @@ class SAnimatorHandler {
             {
                 float scale;
                 pHolder->holder->GetAnimatedValue(pHolder->fraction, &scale);
-                tmp.GetMatrix()->setScale2(1, scale, wid * 0.5f, hei * 0.5f);
+                tmp.GetMatrix()->setScale2(1, scale, wid * pWnd->m_pivotX, hei * pWnd->m_pivotY);
             }
         }
         break;
@@ -290,7 +290,7 @@ class SAnimatorHandler {
             {
                 float rotate;
                 pHolder->holder->GetAnimatedValue(pHolder->fraction, &rotate);
-                tmp.GetMatrix()->setRotate2(rotate, wid * 0.5f, hei * 0.5f);
+                tmp.GetMatrix()->setRotate2(rotate, wid * pWnd->m_pivotX, hei * pWnd->m_pivotY);
             }
         }
         break;
@@ -413,6 +413,8 @@ SWindow::SWindow()
     , m_isDestroying(FALSE)
     , m_isLoading(FALSE)
     , m_funSwndProc(NULL)
+    , m_pivotX(0.5f)
+    , m_pivotY(0.5f)
 #ifdef _DEBUG
     , m_nMainThreadId(::GetCurrentThreadId()) // 初始化对象的线程不一定是主线程
 #endif
@@ -2082,6 +2084,12 @@ BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, A
         bRet = FireEvent(evt);
     }
     return bRet;
+}
+
+void SWindow::SetPivot(float x, float y)
+{
+    m_pivotX = x;
+    m_pivotY = y;
 }
 
 int SWindow::OnCreate(LPVOID)

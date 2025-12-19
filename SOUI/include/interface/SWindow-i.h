@@ -935,6 +935,13 @@ DECLARE_INTERFACE_(IWindow, IObject)
      * @param state ANI_STATE--动画状态（ANI_START/ANI_PROGRESS/ANI_END）
      */
     STDMETHOD_(BOOL, SetAnimatorValue)(THIS_ IPropertyValuesHolder * pHolder, float fraction, ANI_STATE state) PURE;
+
+    /**
+     * @brief 设置窗口属性动画矩阵中心
+     * @param x float--中心X坐标, 0.5f表示窗口中心
+     * @param y float--中心Y坐标, 0.5f表示窗口中心
+     */
+    STDMETHOD_(void, SetPivot)(THIS_ float x, float y) PURE;
 };
 
 SNSEND
