@@ -1236,6 +1236,16 @@ class SOUI_EXP SWindow
      * @param y float--中心Y坐标, 0.5f表示窗口中心
      */
     STDMETHOD_(void, SetPivot)(THIS_ float x, float y) OVERRIDE;
+
+    /**
+     * @brief 获取窗口属性动画矩阵中心
+     * @param x float*--中心X坐标, 0.5f表示窗口中心
+     * @param y float*--中心Y坐标, 0.5f表示窗口中心
+     */
+    STDMETHOD_(void, GetPivot)(CTHIS_ float *x, float *y) SCONST OVERRIDE{
+        *x = m_pivotX;
+        *y = m_pivotY;
+    }
   public:
 #ifdef _WIN32
     /**
