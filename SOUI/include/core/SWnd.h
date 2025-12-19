@@ -1266,6 +1266,7 @@ class SOUI_EXP SWindow
      */
     void accNotifyEvent(DWORD dwEvt);
 
+    static BOOL GetAnimatedLayoutSize(IPropertyValuesHolder *pHolder, float fraction, SLayoutSize &ret);
   public:
     /**
      * @brief Retrieves the current message being processed.

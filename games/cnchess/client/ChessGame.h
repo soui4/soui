@@ -120,11 +120,13 @@ public:
 public:
     static POINT CALLBACK ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData);   
     void OnGameBoardSizeChanged(IEvtArgs *e);
+    void OnBtnTest();
     /**
      * @brief 事件映射表
      */
     EVENT_MAP_BEGIN()
         EVENT_CHECK_SENDER_ROOT(m_pGameBoard)
+        EVENT_ID_COMMAND(1234, OnBtnTest)
         EVENT_NAME_HANDLER(m_pGameBoard->GetName(), EventSwndSize::EventID, OnGameBoardSizeChanged)
     EVENT_MAP_BREAK()
 public:

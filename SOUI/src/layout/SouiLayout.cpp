@@ -410,14 +410,12 @@ BOOL SouiLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fra
     SStringW strPropName = pHolder->GetPropertyName();
     if (strPropName.CompareNoCase(LayoutProperty::WIDTH) == 0)
     {
-        LAYOUTSIZE layoutSize;
-        pHolder->GetAnimatedValue(fraction, &width);
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, width);
         return TRUE;
     }
     if (strPropName.CompareNoCase(LayoutProperty::HEIGHT) == 0)
     {
-        LAYOUTSIZE layoutSize;
-        pHolder->GetAnimatedValue(fraction, &height);
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, height);
         return TRUE;
     }
     if (strPropName.CompareNoCase(LayoutProperty::OFFSET_X) == 0)

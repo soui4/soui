@@ -116,21 +116,23 @@ SAutoRefPtr<IValueAnimator> Util::MoveAndHideSprite(IWindow *pSprite, AnchorPos 
     return pAnimator;
 }
 
-SAutoRefPtr<IValueAnimator> Util::ScaleSprite(IWindow *pSprite, float sx, float sy, int nSpeed){
-    SMatrix mtx;
-    pSprite->GetMatrix(&mtx);
+SAutoRefPtr<IValueAnimator> Util::ScaleSprite(IWindow *pSprite, float from, float to, int nSpeed){
     float valuex[] = {
-		mtx.fMat[kMScaleX],
-		sx
+		from,
+		to
 	};
-    SAutoRefPtr<IPropertyValuesHolder> pScaleXHolder(SPropertyValuesHolder::ofFloat(WindowProperty::SCALE_X, valuex, 2), FALSE);
-    float valuey[] = {
-		mtx.fMat[kMScaleY],
-		sy
+    SAutoRefPtr<IValueAnimator> pAnimator(SPropertyAnimator::ofFloat(pSprite, WindowProperty::SCALE, valuex, ARRAYSIZE(valuex)), FALSE);
+    pAnimator->setDuration(nSpeed);
+    s_movingCardMgr.StartAnimator(pAnimator, pSprite);
+    return pAnimator;
+}
+
+SAutoRefPtr<IValueAnimator> Util::ChangeSpriteHeight(IWindow *pSprite, float from, float to, int nSpeed){
+    float valuex[] = {
+		from,
+		to
 	};
-    SAutoRefPtr<IPropertyValuesHolder> pScaleYHolder(SPropertyValuesHolder::ofFloat(WindowProperty::SCALE_Y, valuey, 2), FALSE);
-    IPropertyValuesHolder *holders[] = { pScaleXHolder, pScaleYHolder };
-    SAutoRefPtr<IValueAnimator> pAnimator(SPropertyAnimator::ofPropertyValuesHolder(pSprite, holders, ARRAYSIZE(holders)), FALSE);
+    SAutoRefPtr<IValueAnimator> pAnimator(SPropertyAnimator::ofFloat(pSprite, LayoutProperty::HEIGHT, valuex, ARRAYSIZE(valuex)), FALSE);
     pAnimator->setDuration(nSpeed);
     s_movingCardMgr.StartAnimator(pAnimator, pSprite);
     return pAnimator;

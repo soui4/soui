@@ -51,6 +51,9 @@ public:
     POINT GetTarget() const{
         return m_target;
     }
+
+public:
+    STDMETHOD_(BOOL,SetAnimatorValue)(THIS_ IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state) override;
 private:
     int m_state;
     CHESSMAN m_chessMan;

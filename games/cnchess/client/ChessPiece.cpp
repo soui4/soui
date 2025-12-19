@@ -17,4 +17,17 @@ CChessPiece::~CChessPiece()
 {
 }
 
+BOOL CChessPiece::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state){
+    if(wcscmp(pHolder->GetPropertyName(), WindowProperty::SCALE) == 0){
+        float scale=1.0;
+        pHolder->GetAnimatedValue(fraction, &scale);
+        CRect rcWnd = GetWindowRect();
+        SMatrix mtx;
+        mtx.setScale2(scale, scale, rcWnd.Width() / 2.0f, rcWnd.Height() / 2.0f);
+        SetMatrix(mtx);
+        return TRUE;
+    }
+    return __baseCls::SetAnimatorValue(pHolder, fraction, state);
+}
+
 SNSEND

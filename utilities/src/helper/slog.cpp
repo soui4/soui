@@ -55,7 +55,8 @@ Log::~Log()
         if (nLen > 0)
         {
             logbuf2[nLen] = 0;
-            if (IsConsoleProgram())
+            OutputDebugStringA(logbuf2);
+            /*if (IsConsoleProgram())
             {
                 fwrite(logbuf2, 1, nLen, stdout);
                 fflush(stdout);
@@ -63,7 +64,7 @@ Log::~Log()
             else
             {
                 OutputDebugStringA(logbuf2);
-            }
+            }*/
         }
         free(logbuf2);
     }

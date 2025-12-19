@@ -2,7 +2,7 @@
 <page title="@string/cnchess" name="game_container">
     <chessboard name="chessboard" size="-2,-2" enableLayer="1" layout="anchor">
 
-        <window size="100,100" pos="0,0,0" colorBkgnd="@color/red"/>
+        <window size="100,100" pos="0,0,0" colorBkgnd="@color/red" id="1234"/>
         <window size="100,100" pos="0,0,8" offset="-1,-1" colorBkgnd="@color/blue"/>
     </chessboard>
 </page>

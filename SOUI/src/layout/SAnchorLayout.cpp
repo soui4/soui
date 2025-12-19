@@ -10,7 +10,6 @@
 SNSBEGIN
 
 SAnchorLayoutParam::SAnchorLayoutParam()
-    : m_aniState(ANI_END)
 {
     Clear();
 }
@@ -239,24 +238,21 @@ ILayoutParam *SAnchorLayoutParam::Clone() const
 BOOL SAnchorLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
 {
     SStringW strProp = pHolder->GetPropertyName();
-    m_aniState = state;
-    m_fAniFraction = fraction;
 
     if (strProp.CompareNoCase(LayoutProperty::POSITION) == 0)
     {
         if (state == ANI_START)
         {
-            {
-                if (m_aniPosHolder)
-                    return FALSE;
-                m_aniPosHolder = pHolder;
-            }
+            if (m_aniPosHolder)
+                return FALSE;
+            m_aniPosHolder = pHolder;
         }
         else if (state == ANI_END)
         {
             pHolder->GetEndValue(&pos);
             m_aniPosHolder = NULL;
         }
+        m_fAniFraction = fraction;
         return TRUE;
     }
     if (strProp.CompareNoCase(LayoutProperty::POSITION_X) == 0)
@@ -281,32 +277,12 @@ BOOL SAnchorLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float 
     }
     if (strProp.CompareNoCase(LayoutProperty::WIDTH) == 0)
     {
-        if (state == ANI_START)
-        {
-            if (m_aniWidthHolder)
-                return FALSE;
-            m_aniWidthHolder = pHolder;
-        }
-        else if (state == ANI_END)
-        {
-            pHolder->GetEndValue(&width);
-            m_aniWidthHolder = NULL;
-        }
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, width);
         return TRUE;
     }
     if (strProp.CompareNoCase(LayoutProperty::HEIGHT) == 0)
     {
-        if (state == ANI_START)
-        {
-            if (m_aniHeightHolder)
-                return FALSE;
-            m_aniHeightHolder = pHolder;
-        }
-        else if (state == ANI_END)
-        {
-            pHolder->GetEndValue(&height);
-            m_aniHeightHolder = NULL;
-        }
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, height);
         return TRUE;
     }
     return FALSE;
@@ -453,30 +429,11 @@ void SAnchorLayout::LayoutChildren(IWindow *pParent)
             }
         }
         CPoint pt;
-        if (pParam->m_aniState != ANI_END)
+        if (SAutoRefPtr<IPropertyValuesHolder> pHolder = pParam->m_aniPosHolder)
         {
             float fraction = pParam->m_fAniFraction;
-            CSize szAuto;
-            pChild->GetDesiredSize(&szAuto, rcParent.Width(), rcParent.Height());
-            if (SAutoRefPtr<IPropertyValuesHolder> pHolder = pParam->m_aniWidthHolder)
-            {
-                int idx[2];
-                float segfraction = pHolder->Fraction2Index(fraction, idx);
-                SLayoutSize width[2];
-                pHolder->GetValueByIndex(idx[0], &width[0], sizeof(SLayoutSize));
-                pHolder->GetValueByIndex(idx[1], &width[1], sizeof(SLayoutSize));
-                szChild.cx = _InterpolateLayoutSize(pChild, rcParent.Width(), szAuto.cx, width[0], width[1], segfraction);
-            }
-            if (SAutoRefPtr<IPropertyValuesHolder> pHolder = pParam->m_aniHeightHolder)
-            {
-                int idx[2];
-                float segfraction = pHolder->Fraction2Index(fraction, idx);
-                SLayoutSize height[2];
-                pHolder->GetValueByIndex(idx[0], &height[0], sizeof(SLayoutSize));
-                pHolder->GetValueByIndex(idx[1], &height[1], sizeof(SLayoutSize));
-                szChild.cy = _InterpolateLayoutSize(pChild, rcParent.Height(), szAuto.cy, height[0], height[1], segfraction);
-            }
-            if (SAutoRefPtr<IPropertyValuesHolder> pHolder = pParam->m_aniPosHolder)
+            CSize szAuto = szChild;
+            if (pHolder->GetValueType() == PROP_TYPE_VARIANT && pHolder->GetValueSize() == sizeof(AnchorPos))
             {
                 AnchorPos aniPos[2];
                 int idx[2];
@@ -484,10 +441,6 @@ void SAnchorLayout::LayoutChildren(IWindow *pParent)
                 pHolder->GetValueByIndex(idx[0], &aniPos[0], sizeof(AnchorPos));
                 pHolder->GetValueByIndex(idx[1], &aniPos[1], sizeof(AnchorPos));
                 pt = CalcPoint4Animator(aniPos[0], aniPos[1], segFraction, rcParent, szChild, pChild->GetScale());
-            }
-            else
-            {
-                pt = m_pfnPosition2Point(pParam->pos, rcParent, szChild, pChild->GetScale(), m_pUserData);
             }
             if (szChild.cx == rcParent.Width())
             {

@@ -22,7 +22,7 @@ void CChessBoard::SDispatchMessage(UINT message, WPARAM wParam, LPARAM lParam)
         {
             SAnchorLayoutParam *pParam = (SAnchorLayoutParam *)pChild->GetLayoutParam();
             SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct *)pParam->GetRawData();
-            BOOL bChessAnchor = pParamStruct->pos.type == 10;
+            BOOL bChessAnchor = pParamStruct->pos.type >= 10;
             if (bChessAnchor && lParam != 0)
             {
                 pChild->SDispatchMessage(message, wParam, lParam);

@@ -19,11 +19,7 @@ class SOUI_EXP SAnchorLayoutParam
     friend class SAnchorLayout;
 
     SAutoRefPtr<IPropertyValuesHolder> m_aniPosHolder;
-    SAutoRefPtr<IPropertyValuesHolder> m_aniWidthHolder;
-    SAutoRefPtr<IPropertyValuesHolder> m_aniHeightHolder;
     float m_fAniFraction;
-    ANI_STATE m_aniState;
-
   public:
     /**
      * @brief 构造函数

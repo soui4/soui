@@ -124,8 +124,10 @@ class AnimatorHolder : public TObjRefImpl<IObjRef> {
 };
 
 class SAnimatorHandler {
+    STransformation m_transform; /**< Transformation */
+    SWindow *m_pOwner;
   public:
-    SAnimatorHandler()
+    SAnimatorHandler(SWindow *pOwner):m_pOwner(pOwner)
     {
     }
 
@@ -172,9 +174,12 @@ class SAnimatorHandler {
         return type;
     }
 
-    void OnSetAnimatorValue(SWindow *pWnd, int type, IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
+    BOOL OnSetAnimatorValue(SStringW strType, IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
     {
-        SASSERT(type != -1);
+        int type = GetPropType(strType);
+        if (type == -1)
+            return FALSE;
+        m_pOwner->InvalidateRect(NULL);
         if (state == ANI_START)
         {
             AnimatorHolder *pAniHolder = new AnimatorHolder;
@@ -192,13 +197,13 @@ class SAnimatorHandler {
                 AnimatorHolder *pAniHolder = m_lstAnimator.GetNext(it);
                 if (pAniHolder->holder == pHolder)
                 {
-                    CRect rc = pWnd->GetWindowRect();
+                    CRect rc = m_pOwner->GetWindowRect();
                     int wid = rc.Width();
                     int hei = rc.Height();
-                    int nScale = pWnd->GetScale();
+                    int nScale = m_pOwner->GetScale();
                     pAniHolder->fraction = fraction;
-                    STransformation tmp = GetTransformation(pWnd, pAniHolder, wid, hei, nScale);
-                    pWnd->m_transform.Compose(&tmp);
+                    STransformation tmp = GetTransformation(pAniHolder, wid, hei, nScale);
+                    m_pOwner->m_transform.Compose(&tmp);
                     m_lstAnimator.RemoveAt(pos);
                     break;
                 }
@@ -216,26 +221,33 @@ class SAnimatorHandler {
                 }
             }
         }
+        UpdateTransformation();
+        m_pOwner->InvalidateRect(NULL);
+        return TRUE;
     }
 
-    STransformation GetTransformation(const SWindow *pWnd)
+    STransformation GetTransformation() const
     {
-        STransformation ret;
-        CRect rc = pWnd->GetWindowRect();
-        int wid = rc.Width();
-        int hei = rc.Height();
-        int nScale = pWnd->GetScale();
-        for (SPOSITION pos = m_lstAnimator.GetHeadPosition(); pos;)
-        {
-            AnimatorHolder *pHolder = m_lstAnimator.GetNext(pos);
-            STransformation tmp = GetTransformation(pWnd, pHolder, wid, hei, nScale);
-            ret.compose(tmp);
-        }
-        return ret;
+        return m_transform;
     }
 
   private:
-    STransformation GetTransformation(const SWindow *pWnd, AnimatorHolder *pHolder, int wid, int hei, int nScale) const
+    void UpdateTransformation()
+    {
+        m_transform.Clear();
+        CRect rc = m_pOwner->GetWindowRect();
+        int wid = rc.Width();
+        int hei = rc.Height();
+        int nScale = m_pOwner->GetScale();
+        for (SPOSITION pos = m_lstAnimator.GetHeadPosition(); pos;)
+        {
+            AnimatorHolder *pHolder = m_lstAnimator.GetNext(pos);
+            STransformation tmp = GetTransformation(pHolder, wid, hei, nScale);
+            m_transform.compose(tmp);
+        }
+    }
+
+    STransformation GetTransformation(AnimatorHolder *pHolder, int wid, int hei, int nScale) const
     {
         STransformation tmp;
         switch (pHolder->type)
@@ -264,7 +276,7 @@ class SAnimatorHandler {
             {
                 float scale;
                 pHolder->holder->GetAnimatedValue(pHolder->fraction, &scale);
-                tmp.GetMatrix()->setScale2(scale, scale, wid * pWnd->m_pivotX, hei * pWnd->m_pivotY);
+                tmp.GetMatrix()->setScale2(scale, scale, wid * m_pOwner->m_pivotX, hei * m_pOwner->m_pivotY);
                 tmp.SetTransformationType(TYPE_MATRIX);
             }
         }
@@ -275,7 +287,7 @@ class SAnimatorHandler {
             {
                 float scale;
                 pHolder->holder->GetAnimatedValue(pHolder->fraction, &scale);
-                tmp.GetMatrix()->setScale2(scale, 1, wid * pWnd->m_pivotX, hei * pWnd->m_pivotY);
+                tmp.GetMatrix()->setScale2(scale, 1, wid * m_pOwner->m_pivotX, hei * m_pOwner->m_pivotY);
                 tmp.SetTransformationType(TYPE_MATRIX);
             }
         }
@@ -286,7 +298,7 @@ class SAnimatorHandler {
             {
                 float scale;
                 pHolder->holder->GetAnimatedValue(pHolder->fraction, &scale);
-                tmp.GetMatrix()->setScale2(1, scale, wid * pWnd->m_pivotX, hei * pWnd->m_pivotY);
+                tmp.GetMatrix()->setScale2(1, scale, wid * m_pOwner->m_pivotX, hei * m_pOwner->m_pivotY);
                 tmp.SetTransformationType(TYPE_MATRIX);
             }
         }
@@ -297,7 +309,7 @@ class SAnimatorHandler {
             {
                 float rotate;
                 pHolder->holder->GetAnimatedValue(pHolder->fraction, &rotate);
-                tmp.GetMatrix()->setRotate2(rotate, wid * pWnd->m_pivotX, hei * pWnd->m_pivotY);
+                tmp.GetMatrix()->setRotate2(rotate, wid * m_pOwner->m_pivotX, hei * m_pOwner->m_pivotY);
                 tmp.SetTransformationType(TYPE_MATRIX);
             }
         }
@@ -436,7 +448,7 @@ SWindow::SWindow()
     , m_nMainThreadId(::GetCurrentThreadId()) // 初始化对象的线程不一定是主线程
 #endif
 {
-    m_pAnimatorHandler = new SAnimatorHandler();
+    m_pAnimatorHandler = new SAnimatorHandler(this);
 
     m_nMaxWidth.setWrapContent();
 
@@ -2056,6 +2068,33 @@ int SWindow::GetLayer() const
     return m_nLayer;
 }
 
+
+BOOL SWindow::GetAnimatedLayoutSize(IPropertyValuesHolder *pHolder, float fraction, SLayoutSize &ret)
+{
+    switch(pHolder->GetValueType())
+    {
+    case PROP_TYPE_LAYOUT_SIZE:
+        pHolder->GetAnimatedValue(fraction, &ret);
+        return TRUE;
+    case PROP_TYPE_INT:
+        {
+            int nValue;
+            pHolder->GetAnimatedValue(fraction, &nValue);
+            ret = SLayoutSize((float)nValue, SLayoutSize::defUnit);
+            return TRUE;
+        }
+    case PROP_TYPE_FLOAT:
+        {
+            float fValue;
+            pHolder->GetAnimatedValue(fraction, &fValue);
+            ret = SLayoutSize(fValue, SLayoutSize::defUnit);
+            return TRUE;
+        }
+        default:
+            return FALSE;
+    }
+}
+
 BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
 {
     SStringW strPropName = pHolder->GetPropertyName();
@@ -2075,20 +2114,16 @@ BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, A
         InvalidateRect(NULL);
         return TRUE;
     }
-    int type = m_pAnimatorHandler->GetPropType(strPropName);
-    if (type != -1)
-    {
-        InvalidateRect(NULL);
-        m_pAnimatorHandler->OnSetAnimatorValue(this, type, pHolder, fraction, state);
-        InvalidateRect(NULL);
+    if (m_pAnimatorHandler->OnSetAnimatorValue(strPropName, pHolder, fraction, state))
         return TRUE;
-    }
 
     BOOL bRet = GetLayoutParam()->SetAnimatorValue(pHolder, fraction, state);
     if (bRet)
     {
-        if (GetParent())
+        if (GetParent()){
             GetParent()->RequestRelayout();
+            GetParent()->UpdateChildrenPosition();
+        }
         InvalidateRect(NULL);
     }
     else
@@ -3046,7 +3081,7 @@ STransformation SWindow::GetTransformation() const
     }
     if (!m_pAnimatorHandler->IsEmpty())
     {
-        ret.compose(m_pAnimatorHandler->GetTransformation(this));
+        ret.compose(m_pAnimatorHandler->GetTransformation());
     }
     return ret;
 }
@@ -3948,7 +3983,7 @@ BOOL SWindow::IsClipClient() const
 
 BOOL SWindow::IsLayoutDirty() const
 {
-    return m_layoutDirty != dirty_clean;
+    return m_layoutDirty;
 }
 
 SWindow *SWindow::GetWindow(int uCode) const

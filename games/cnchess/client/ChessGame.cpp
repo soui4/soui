@@ -17,6 +17,12 @@ enum{
     ID_SHADOW_BASE = 2000,
 };
 
+static const float kPieceScale = 1.1f;
+enum{
+    kShadowHeight_Normal = 86,
+    kShadowHeight_Up = 110,
+};
+
 POINT CChessGame::ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale, void * userData){
     if(pos.type == 10){
         //type == 10 is chess anchor
@@ -27,7 +33,17 @@ POINT CChessGame::ChessAnchor2Pos(const AnchorPos &pos, const CRect &rcParent, c
         pt.x += pos.fOffsetX * szChild.cx;
         pt.y += pos.fOffsetY * szChild.cy;
         return pt;
-    }else{
+    }else if(pos.type == 11){
+        //shadow anchor
+        CChessGame *pThis = (CChessGame *)userData;
+        CPoint pt = pThis->m_ptBoardOrigin;
+        pt.x += pThis->m_cellWidth * pos.x.fSize;
+        pt.y -= pThis->m_cellHeight * pos.y.fSize;
+        pt.x += pos.fOffsetX * szChild.cx;
+        pt.y += pos.fOffsetY * szChild.cx;//
+        return pt;
+    }
+    else{
         return SAnchorLayout::DefaultPosition2Point(pos, rcParent, szChild, nScale, userData);
     }
 }
@@ -67,6 +83,7 @@ enum{
     ANI_MOVE,
     ANI_DOWN,
     ANI_MOVEDOWN,
+    ANI_SHADOW_RESTORE,
 };
 
 void CChessGame::ShowPosFlags(POINT ptPiece, BOOL bShow)
@@ -87,18 +104,30 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
 {
     SPropertyAnimator *pPropAnimator = sobj_cast<SPropertyAnimator>(pAnimator);
     CChessPiece *pPiece = (CChessPiece *)pPropAnimator->GetTarget();
-    if(pPropAnimator->GetID() == ANI_MOVE ){
-        //start a new animation to move the piece down
-        auto pAnim = Util::OffsetSprite(pPiece, -0.1f, 0.1f, 100);
-        pAnim->SetID(ANI_MOVEDOWN);
-        pAnim->addListener(this);
-    }else if(pPropAnimator->GetID() == ANI_DOWN){
+    if (pPropAnimator->GetID() == ANI_MOVE)
+    {
+        // start a new animation to move the piece down
+        CChessPiece *pSelPiece = pPiece;
+        auto pAni = Util::ScaleSprite(pSelPiece, kPieceScale, 1.0f, 200);
+        pAni->SetID(ANI_MOVEDOWN);
+        pAni->addListener(this);
+
+        // restore shadow height
+        SWindow *pShadow = m_pGameBoard->FindChildByID(ID_SHADOW_BASE + pSelPiece->GetID());
+        CRect rc = pShadow->GetWindowRect();
+        SLOGI()<<"restore shadow height: "<< kShadowHeight_Normal;
+        Util::ChangeSpriteHeight(pShadow, kShadowHeight_Up, kShadowHeight_Normal, 200);
+    }
+    else if (pPropAnimator->GetID() == ANI_DOWN)
+    {
         //set the piece to normal state
         pPiece->SetPicesState(CChessPiece::STATE_NORMAL);
-        pPiece->SetLayer(1);//restore layer
+        pPiece->SetLayer(SGameTheme::LAYER_PIESE);//restore layer
         ShowPosFlags(pPiece->GetPos(), FALSE);
         m_nSelectedChessID = -1;
-    }else if(pPropAnimator->GetID() == ANI_MOVEDOWN){
+    }
+    else if (pPropAnimator->GetID() == ANI_MOVEDOWN)
+    {
         //move the piece down
         POINT ptPiece = pPiece->GetPos();
         POINT ptTarget = pPiece->GetTarget();
@@ -107,10 +136,12 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
         if(moveStep.nEnemyID != 0){
             CChessPiece *pEnemyPiece = (CChessPiece *)m_pGameBoard->FindChildByID(moveStep.nEnemyID);
             pEnemyPiece->Destroy();
+            SWindow *pShadow = m_pGameBoard->FindChildByID( ID_SHADOW_BASE + moveStep.nEnemyID);
+            pShadow->Destroy();
         }
 
         pPiece->SetPicesState(CChessPiece::STATE_NORMAL);
-        pPiece->SetLayer(1);
+        pPiece->SetLayer(SGameTheme::LAYER_PIESE);
         pPiece->SetPos(ptTarget);
         pPiece->SetTarget(CPoint(-1,-1));
         m_nSelectedChessID = -1;
@@ -125,11 +156,19 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
     if(m_nSelectedChessID != -1)
     {
         SWindow *pTarget = sobj_cast<SWindow>(e->Sender());
+
         if(pTarget->GetID() == m_nSelectedChessID)
         {//cancel the selection
             CChessPiece *pSelPiece = (CChessPiece *)pTarget;
-            auto pAni = Util::ScaleSprite(pSelPiece, 1.0f, 1.0f, 100);
+            auto pAni = Util::ScaleSprite(pSelPiece, kPieceScale, 1.0f, 200);
             pAni->SetID(ANI_DOWN);
+            pAni->addListener(this);
+
+            //restore shadow height
+            SWindow *pShadow = m_pGameBoard->FindChildByID(ID_SHADOW_BASE + pSelPiece->GetID());
+            CRect rc = pShadow->GetWindowRect();
+            pAni=Util::ChangeSpriteHeight(pShadow, kShadowHeight_Up, kShadowHeight_Normal, 200);
+            pAni->SetID(ANI_SHADOW_RESTORE);
             pAni->addListener(this);
             m_nSelectedChessID = -1;
         }else{
@@ -146,16 +185,23 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
             SASSERT(pSelPiece);
             ShowPosFlags(pSelPiece->GetPos(), FALSE);
             pSelPiece->SetTarget(ptTarget);
-            pSelPiece->SetLayer(3);
+            pSelPiece->SetLayer(SGameTheme::LAYER_PIESE);
 
             SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pTarget->GetLayoutParam();
             SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
             AnchorPos pos = pParamStruct->pos;
-            pos.x.fSize += 0.1f;
-            pos.y.fSize += -0.1f;
+            //move the piece to the target position
             auto pAnim = Util::MoveSpriteTo(pSelPiece, pos, 200);
             pAnim->SetID(ANI_MOVE);
             pAnim->addListener(this);
+            //move the shadow to the target position
+            SWindow *pShadow = m_pGameBoard->FindChildByID(ID_SHADOW_BASE + pSelPiece->GetID());
+            pParam = (SAnchorLayoutParam*)pShadow->GetLayoutParam();
+            pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
+            pos = pParamStruct->pos;
+            pos.x.fSize = ptTarget.x;
+            pos.y.fSize = ptTarget.y;
+            Util::MoveSpriteTo(pShadow, pos, 200);
             m_nSelectedChessID = -1;
         }
     }else{
@@ -168,12 +214,16 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
                 pTarget->SetPicesState(CChessPiece::STATE_UP);
                 pTarget->SetLayer(SGameTheme::LAYER_PIESE_UP);
                 //scale the piece by 110% of cell size for x and y
-                Util::ScaleSprite(pTarget, 1.1f, 1.1f, 100);
+                Util::ScaleSprite(pTarget, 1.0f, kPieceScale, 200);
                 m_nSelectedChessID = pTarget->GetID();
+
+                //increase shadow height
+                SWindow *pShadow = m_pGameBoard->FindChildByID(ID_SHADOW_BASE + pTarget->GetID());
+                auto pAni = Util::ChangeSpriteHeight(pShadow, kShadowHeight_Normal, kShadowHeight_Up, 200);
             }
             else if(pTarget->GetPicesState() == CChessPiece::STATE_UP)
             {//drop down the piece
-                auto pAnim = Util::ScaleSprite(pTarget, 1.0f, 1.0f, 100);
+                auto pAnim = Util::ScaleSprite(pTarget, 1.1f,1.0f, 200);
                 pAnim->SetID(ANI_DOWN);
                 pAnim->addListener(this);
                 m_nSelectedChessID = -1;
@@ -249,7 +299,7 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
             pShadow->InitFromXml(&xmlShadow);
             SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pShadow->GetLayoutParam();
             SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
-            pParamStruct->pos.type = 10;
+            pParamStruct->pos.type = 11;
             pParamStruct->pos.x.fSize = x;
             pParamStruct->pos.y.fSize = y;
             pShadow->SetPivot(0.5f,0.0f);
@@ -301,6 +351,13 @@ void CChessGame::OnGameBoardSizeChanged(IEvtArgs *e)
     m_ptBoardOrigin.y = rcBoard.bottom;
 
     m_pGameBoard->SDispatchMessage(UM_SETSCALE, scale*100, 1);
+}
+
+void CChessGame::OnBtnTest()
+{
+    SWindow *pWnd = m_pGameBoard->FindChildByID(ID_SHADOW_BASE+11);
+    CRect rcWnd = pWnd->GetWindowRect();
+    SLOGI() << "rcwnd:" << rcWnd.top << " " << rcWnd.bottom << " hei=" << rcWnd.Height();
 }
 
 void CChessGame::OnTimer(UINT_PTR uIDEvent)

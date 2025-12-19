@@ -15,7 +15,9 @@ public:
      * @param nSpeed 动画速度
      * @return 动画对象
      */
-    static SAutoRefPtr<IValueAnimator> ScaleSprite(IWindow *pSprite, float sx, float sy, int nSpeed);
+    static SAutoRefPtr<IValueAnimator> ScaleSprite(IWindow *pSprite, float from, float to, int nSpeed);
+
+    static SAutoRefPtr<IValueAnimator> ChangeSpriteHeight(IWindow *pSprite, float from, float to, int nSpeed);
 
     /**
      * @brief 偏移精灵窗口
