@@ -1,4 +1,4 @@
-#include "stdafx.h"
+﻿#include "stdafx.h"
 #include "utils.h"
 #include <valueAnimator/SPropertyAnimator.h>
 SNSBEGIN

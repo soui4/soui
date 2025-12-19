@@ -128,7 +128,7 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
         if(pTarget->GetID() == m_nSelectedChessID)
         {//cancel the selection
             CChessPiece *pSelPiece = (CChessPiece *)pTarget;
-            auto pAni = Util::OffsetSprite(pSelPiece, -0.1f, 0.1f, 100);
+            auto pAni = Util::ScaleSprite(pSelPiece, 1.0f, 1.0f, 100);
             pAni->SetID(ANI_DOWN);
             pAni->addListener(this);
             m_nSelectedChessID = -1;
@@ -167,13 +167,13 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
             {//raise up the piece
                 pTarget->SetPicesState(CChessPiece::STATE_UP);
                 pTarget->SetLayer(SGameTheme::LAYER_PIESE_UP);
-                //offset the piece by 10% of cell size for x and y
-                Util::OffsetSprite(pTarget, 0.1f, -0.1f, 100);
+                //scale the piece by 110% of cell size for x and y
+                Util::ScaleSprite(pTarget, 1.1f, 1.1f, 100);
                 m_nSelectedChessID = pTarget->GetID();
             }
             else if(pTarget->GetPicesState() == CChessPiece::STATE_UP)
             {//drop down the piece
-                auto pAnim = Util::OffsetSprite(pTarget, -0.1f, 0.1f, 100);
+                auto pAnim = Util::ScaleSprite(pTarget, 1.0f, 1.0f, 100);
                 pAnim->SetID(ANI_DOWN);
                 pAnim->addListener(this);
                 m_nSelectedChessID = -1;
@@ -252,6 +252,7 @@ void CChessGame::Init(SWindow *pGameHost, WebSocketClient *pWs)
             pParamStruct->pos.type = 10;
             pParamStruct->pos.x.fSize = x;
             pParamStruct->pos.y.fSize = y;
+            pShadow->SetPivot(0.5f,0.0f);
             pShadow->SetID(ID_SHADOW_BASE + m_layout.m_nChsID[y][x]);
             m_pGameBoard->InsertIChild(pShadow);
         }
