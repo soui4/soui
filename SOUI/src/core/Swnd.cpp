@@ -329,6 +329,7 @@ class SAnimatorHandler {
         int type = GetPropType(strType);
         if (type == -1)
             return FALSE;
+        BOOL bEmpty1 = IsEmpty();
         m_pOwner->OnAnimationInvalidate(true);
         if (state == ANI_START)
         {
@@ -372,11 +373,16 @@ class SAnimatorHandler {
             }
         }
         UpdateTransformation();
+        BOOL bEmpty2 = IsEmpty();
+        if (bEmpty1 != bEmpty2)
+        {
+            m_pOwner->UpdateCacheMode();
+        }
         m_pOwner->OnAnimationInvalidate(false);
         return TRUE;
     }
 
-    STransformation GetTransformation() const
+    const STransformation &GetTransformation() const
     {
         return m_transform;
     }
@@ -860,14 +866,14 @@ void SWindow::Move(LPCRECT prect)
 
     if (prect)
     {
-        m_bFloat = TRUE; //使用Move后，程序不再自动计算窗口坐标
+        m_bFloat = TRUE; // 使用Move后，程序不再自动计算窗口坐标
         OnRelayout(*prect);
     }
     else if (GetParent())
     {
-        //恢复自动计算位置
+        // 恢复自动计算位置
         m_bFloat = FALSE;
-        //重新计算自己及兄弟窗口的坐标
+        // 重新计算自己及兄弟窗口的坐标
         RequestRelayout();
     }
 }
@@ -1049,16 +1055,16 @@ void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /*=ICWND_LAS
     m_layoutDirty = dirty_self;
 
     if (!GetLayout()->IsParamAcceptable(pNewChild->GetLayoutParam()))
-    { //检查子窗口原有的布局属性是不是和当前窗口的布局类型是否匹配
+    { // 检查子窗口原有的布局属性是不是和当前窗口的布局类型是否匹配
         ILayoutParam *pLayoutParam = GetLayout()->CreateLayoutParam();
         pNewChild->SetLayoutParam(pLayoutParam);
         pLayoutParam->Release();
     }
 
-    //继承父窗口的disable状态
+    // 继承父窗口的disable状态
     pNewChild->OnEnable(!IsDisabled(TRUE), ParentEnable);
 
-    //只在插入新控件时需要标记zorder失效,删除控件不需要标记
+    // 只在插入新控件时需要标记zorder失效,删除控件不需要标记
     if (GetContainer())
         GetContainer()->MarkWndTreeZorderDirty();
     OnAfterInsertChild(pNewChild);
@@ -1133,7 +1139,7 @@ BOOL SWindow::IsVisible(BOOL bCheckParent /*= FALSE*/) const
         return m_bVisible;
 }
 
-//因为NotifyInvalidateRect只有窗口可见时再通知刷新，这里在窗口可见状态改变前后都执行一次通知。
+// 因为NotifyInvalidateRect只有窗口可见时再通知刷新，这里在窗口可见状态改变前后都执行一次通知。
 void SWindow::SetVisible(BOOL bVisible, BOOL bUpdate /*=FALSE*/)
 {
     if (bUpdate)
@@ -1308,10 +1314,10 @@ SWindow *SWindow::FindChildByName(LPCSTR strName, int nDeep /*= -1*/)
     return FindChildByName(S_CA2W(strName, CP_UTF8), nDeep);
 }
 
-const static wchar_t KLabelInclude[] = L"include"; //文件包含的标签
-const static wchar_t KTempNamespace[] = L"t:";     //模板识别ＮＳ
-const static wchar_t KTempData[] = L"data";        //模板参数
-const static wchar_t KTempParamFmt[] = L"{{%s}}";  //模板数据替换格式
+const static wchar_t KLabelInclude[] = L"include"; // 文件包含的标签
+const static wchar_t KTempNamespace[] = L"t:";     // 模板识别ＮＳ
+const static wchar_t KTempData[] = L"data";        // 模板参数
+const static wchar_t KTempParamFmt[] = L"{{%s}}";  // 模板数据替换格式
 
 BOOL SWindow::CreateChildren(SXmlNode xmlNode)
 {
@@ -1323,7 +1329,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
             continue;
 
         if (_wcsicmp(xmlChild.name(), KLabelInclude) == 0)
-        { //在窗口布局中支持include标签
+        { // 在窗口布局中支持include标签
             SStringT strSrc = S_CW2T(xmlChild.attribute(L"src").value());
             SXmlDoc xmlDoc;
             if (LOADXML(xmlDoc, strSrc))
@@ -1357,7 +1363,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                 SSLOGW() << "load include file failed, file name=" << strSrc;
             }
         }
-        else if (!xmlChild.get_userdata()) //通过userdata来标记一个节点是否可以忽略
+        else if (!xmlChild.get_userdata()) // 通过userdata来标记一个节点是否可以忽略
         {
             SStringW strName = xmlChild.name();
             if (strName.StartsWith(KTempNamespace))
@@ -1375,7 +1381,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                         {
                             SStringW strParam = SStringW().Format(KTempParamFmt, param.name());
                             SStringW strValue = param.value();
-                            strValue.Replace(L"\"", L"&#34;");  //防止数据中包含“双引号”，导致破坏XML结构
+                            strValue.Replace(L"\"", L"&#34;");  // 防止数据中包含“双引号”，导致破坏XML结构
                             strXml.Replace(strParam, strValue); // replace params to value.
                         }
                         SXmlDoc xmlDoc;
@@ -1396,7 +1402,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
     }
     if (!m_isLoading)
     {
-        //动态创建子窗口，同步窗口的的属性
+        // 动态创建子窗口，同步窗口的的属性
         if (GetScale() != 100)
             SDispatchMessage(UM_SETSCALE, GetScale(), 0);
         if (m_crColorize != 0)
@@ -1446,7 +1452,7 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
         if (m_pLayoutParam)
             m_pLayoutParam->Clear();
 
-        //优先处理"layout"属性
+        // 优先处理"layout"属性
         SXmlAttr attrLayout = xmlNode.attribute(L"layout");
         if (attrLayout)
         {
@@ -1454,7 +1460,7 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
             SetAttribute(attrLayout.name(), attrLayout.value(), TRUE);
         }
 
-        //优先处理"class"属性
+        // 优先处理"class"属性
         SXmlAttr attrClass = xmlNode.attribute(L"class");
         if (attrClass)
         {
@@ -1498,7 +1504,7 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
         }
         SSendMessage(WM_SHOWWINDOW, IsVisible(TRUE), ParentShow);
     }
-    //创建子窗口
+    // 创建子窗口
     if (!CreateChildren(xmlNode))
     {
         if (m_pParent)
@@ -1554,7 +1560,7 @@ SWND SWindow::SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent) const
     if (!IsContainPoint(pt2, TRUE))
     {
         pt = pt2;      // update pt;
-        return m_swnd; //只在鼠标位于客户区时，才继续搜索子窗口
+        return m_swnd; // 只在鼠标位于客户区时，才继续搜索子窗口
     }
     SWND swndChild = 0;
 
@@ -1587,7 +1593,7 @@ BOOL SWindow::NeedRedrawWhenStateChange()
     return GetStyle().GetStates() > 1;
 }
 
-//如果当前窗口有绘制缓存，它可能是由cache属性定义的，也可能是由于定义了alpha
+// 如果当前窗口有绘制缓存，它可能是由cache属性定义的，也可能是由于定义了alpha
 void SWindow::_PaintClient(IRenderTarget *pRT)
 {
     if (m_pGetRTData)
@@ -1599,7 +1605,7 @@ void SWindow::_PaintClient(IRenderTarget *pRT)
     {
         IRenderTarget *pRTCache = m_cachedRT;
         if (pRTCache)
-        { //在窗口正在创建的时候进来pRTCache可能为NULL
+        { // 在窗口正在创建的时候进来pRTCache可能为NULL
             CRect rcWnd = GetWindowRect();
             pRTCache->SetViewportOrg(-rcWnd.TopLeft());
             if (IsCacheDirty())
@@ -1738,7 +1744,7 @@ void SWindow::_PaintChildren(IRenderTarget *pRT, IRegionS *pRgn, UINT iBeginZord
         if (pChild->m_uZorder >= iEndZorder)
             break;
         if (pChild->m_uZorder < iBeginZorder)
-        { //看整个分枝的zorder是不是在绘制范围内
+        { // 看整个分枝的zorder是不是在绘制范围内
             SWindow *pNextChild = pChild->GetWindow(GSW_NEXTSIBLING);
             if (pNextChild)
             {
@@ -1749,7 +1755,7 @@ void SWindow::_PaintChildren(IRenderTarget *pRT, IRegionS *pRgn, UINT iBeginZord
                 }
             }
             else
-            { //最后一个节点时查看最后子窗口的zorder
+            { // 最后一个节点时查看最后子窗口的zorder
                 SWindow *pLastChild = pChild;
                 while (pLastChild->GetChildrenCount())
                 {
@@ -1797,13 +1803,13 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     IRenderTarget *pRTBackup = NULL; // backup current RT
 
     if (IsLayeredWindow())
-    { //获得当前LayeredWindow RT来绘制内容
+    { // 获得当前LayeredWindow RT来绘制内容
         pRTBackup = pRT;
         pRT = NULL;
         GETRENDERFACTORY->CreateRenderTarget(&pRT, rcWnd.Width(), rcWnd.Height());
         pRT->BeginDraw();
         pRT->OffsetViewportOrg(-rcWnd.left, -rcWnd.top, NULL);
-        //绘制到窗口的缓存上,需要继承原RT的绘图属性
+        // 绘制到窗口的缓存上,需要继承原RT的绘图属性
         pRT->SelectObject(pRTBackup->GetCurrentObject(OT_FONT), NULL);
         pRT->SelectObject(pRTBackup->GetCurrentObject(OT_PEN), NULL);
         pRT->SelectObject(pRTBackup->GetCurrentObject(OT_BRUSH), NULL);
@@ -1863,7 +1869,7 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     pRT->RestoreClip(nSave1);
 
     if (IsLayeredWindow())
-    { //将绘制到窗口的缓存上的图像返回到上一级RT
+    { // 将绘制到窗口的缓存上的图像返回到上一级RT
         SASSERT(pRTBackup);
         pRT->EndDraw();
         OnCommitSurface(pRTBackup, &rcWnd, pRT, &rcWnd, GetAlpha());
@@ -1909,7 +1915,7 @@ void SWindow::TransformPointEx(CPoint &pt) const
     }
 }
 
-//当前函数中的参数包含zorder,为了保证传递进来的zorder是正确的,必须在外面调用zorder重建.
+// 当前函数中的参数包含zorder,为了保证传递进来的zorder是正确的,必须在外面调用zorder重建.
 void SWindow::_PaintRegion(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegin, UINT iZorderEnd)
 {
     ASSERT_UI_THREAD();
@@ -1960,7 +1966,7 @@ void SWindow::InvalidateRect(const CRect &rect, BOOL bFromThis /*=TRUE*/, BOOL b
     if (!IsVisible(TRUE) || IsUpdateLocked() || !GetContainer())
         return;
 
-    //只能更新窗口有效区域
+    // 只能更新窗口有效区域
     CRect rcWnd = GetWindowRect();
 
     CRect rcIntersect = rect & rcWnd;
@@ -2047,7 +2053,7 @@ BOOL SWindow::FireEvent(IEvtArgs *evt)
     BOOL bRet = FALSE;
     do
     {
-        //调用事件订阅的处理方法
+        // 调用事件订阅的处理方法
         m_evtSet.FireEvent(evt);
         if (!evt->IsBubbleUp())
         {
@@ -2055,7 +2061,7 @@ BOOL SWindow::FireEvent(IEvtArgs *evt)
             break;
         }
 
-        //调用脚本事件处理方法
+        // 调用脚本事件处理方法
         if (GetScriptModule())
         {
             SStringW strEvtName = evt->GetName();
@@ -2105,7 +2111,7 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
 
         InvalidateRect(m_rcWindow);
 
-        SSendMessage(WM_NCCALCSIZE); //计算非客户区大小
+        SSendMessage(WM_NCCALCSIZE); // 计算非客户区大小
     }
     // keep relative position of float children
     if (ptDiff.x != 0 || ptDiff.y != 0)
@@ -2141,7 +2147,7 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
         // don't call UpdateLayout, otherwise will result in dead cycle.
         if (m_layoutDirty != dirty_clean && GetChildrenCount())
         {
-            UpdateChildrenPosition(); //更新子窗口位置
+            UpdateChildrenPosition(); // 更新子窗口位置
         }
         m_layoutDirty = dirty_clean;
     }
@@ -2484,14 +2490,14 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 {
     if (m_funSwndProc)
     {
-        //使用回调函数计算窗口Size
+        // 使用回调函数计算窗口Size
         BOOL bRet = m_funSwndProc(this, UM_GETDESIREDSIZE, nParentHei, nParentHei, (LRESULT *)psz);
         if (bRet)
         {
             return;
         }
     }
-    //检查当前窗口的MatchParent属性及容器窗口的WrapContent属性。
+    // 检查当前窗口的MatchParent属性及容器窗口的WrapContent属性。
     ILayoutParam *pLayoutParam = GetLayoutParam();
     bool bSaveHorz = nParentWid == SIZE_WRAP_CONTENT && pLayoutParam->IsMatchParent(Horz);
     bool bSaveVert = nParentHei == SIZE_WRAP_CONTENT && pLayoutParam->IsMatchParent(Vert);
@@ -2502,7 +2508,7 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 
     CSize szRet(KWnd_MaxSize, KWnd_MaxSize);
     if (pLayoutParam->IsSpecifiedSize(Horz))
-    { //检查设置大小
+    { // 检查设置大小
         SLayoutSize layoutSize;
         pLayoutParam->GetSpecifiedSize(Horz, &layoutSize);
         szRet.cx = layoutSize.toPixelSize(GetScale());
@@ -2513,7 +2519,7 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     }
 
     if (pLayoutParam->IsSpecifiedSize(Vert))
-    { //检查设置大小
+    { // 检查设置大小
         SLayoutSize layoutSize;
         pLayoutParam->GetSpecifiedSize(Vert, &layoutSize);
         szRet.cy = layoutSize.toPixelSize(GetScale());
@@ -2534,7 +2540,7 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
         CSize szChilds;
         if (GetChildrenCount() > 0)
         {
-            //计算子窗口大小
+            // 计算子窗口大小
             CSize szParent(nParentWid, nParentHei);
             if (nParentWid > 0)
             {
@@ -2575,7 +2581,7 @@ SIZE SWindow::MeasureContent(int nParentWid, int nParentHei)
     ILayoutParam *pLayoutParam = GetLayoutParam();
     CRect rcPadding = GetStyle().GetPadding();
 
-    //计算文本大小
+    // 计算文本大小
     SStringT strText = GetWindowText(FALSE);
     CRect rcTest4Text;
     if (!strText.IsEmpty())
@@ -2689,9 +2695,9 @@ void SWindow::OnShowWindow(BOOL bShow, UINT nStatus)
     if (!IsVisible(TRUE))
     {
         if (IsFocused() && GetContainer())
-            GetContainer()->OnSetSwndFocus(0); //窗口隐藏时自动失去焦点
+            GetContainer()->OnSetSwndFocus(0); // 窗口隐藏时自动失去焦点
         if (GetCapture() == m_swnd)
-            ReleaseCapture(); //窗口隐藏时自动失去Capture
+            ReleaseCapture(); // 窗口隐藏时自动失去Capture
     }
 
     if (!m_bDisplay)
@@ -2837,7 +2843,7 @@ void SWindow::GetChildrenLayoutRect(RECT *prc) const
 void SWindow::UpdateChildrenPosition()
 {
     if (m_layoutDirty == dirty_self)
-    { //当前窗口所有子窗口全部重新布局
+    { // 当前窗口所有子窗口全部重新布局
         GetLayout()->LayoutChildren(this);
 
         SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
@@ -2857,7 +2863,7 @@ void SWindow::UpdateChildrenPosition()
         }
     }
     else if (m_layoutDirty == dirty_child)
-    { //只有个别子窗口需要重新布局
+    { // 只有个别子窗口需要重新布局
         SWindow *pChild = GetNextLayoutChild(NULL);
         while (pChild)
         {
@@ -2872,7 +2878,7 @@ void SWindow::UpdateChildrenPosition()
 
 void SWindow::RequestRelayout()
 {
-    RequestRelayout(m_swnd, TRUE); //此处bSourceResizable可以为任意值
+    RequestRelayout(m_swnd, TRUE); // 此处bSourceResizable可以为任意值
 }
 
 void SWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
@@ -2880,12 +2886,12 @@ void SWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
     SASSERT(SWindowMgr::IsWindow(hSource));
 
     if (bSourceResizable)
-    { //源窗口大小发生变化,当前窗口的所有子窗口全部重新布局
+    { // 源窗口大小发生变化,当前窗口的所有子窗口全部重新布局
         m_layoutDirty = dirty_self;
     }
 
     if (m_layoutDirty != dirty_self)
-    { //需要检测当前窗口是不是内容自适应
+    { // 需要检测当前窗口是不是内容自适应
         m_layoutDirty = (hSource == m_swnd || GetLayoutParam()->IsWrapContent(Any)) ? dirty_self : dirty_child;
     }
 
@@ -2950,7 +2956,7 @@ BOOL SWindow::IsLayeredWindow() const
     return m_bLayeredWindow || GetAlpha() != 0xFF;
 }
 
-//查询当前窗口内容将被渲染到哪一个渲染层上，没有渲染层时返回NULL
+// 查询当前窗口内容将被渲染到哪一个渲染层上，没有渲染层时返回NULL
 SWindow *SWindow::_GetCurrentLayeredWindow()
 {
     SWindow *pWnd = this;
@@ -3252,7 +3258,7 @@ void SWindow::SetAlpha(BYTE byAlpha)
 
 BYTE SWindow::GetAlpha() const
 {
-    return (BYTE)((int)m_transform.GetAlpha() * m_pAnimationHandler->GetTransformation().GetAlpha() / 255);
+    return GetTransformation().GetAlpha();
 }
 
 void SWindow::SetMatrix(const IMatrix *mtx)
@@ -3332,7 +3338,7 @@ void SWindow::PaintBackground(IRenderTarget *pRT, LPRECT pRc)
     GETRENDERFACTORY->CreateRegion(&pRgn);
     pRgn->CombineRect(&rcDraw, RGN_COPY);
 
-    pRT->ClearRect(&rcDraw, 0); //清除残留的alpha值
+    pRT->ClearRect(&rcDraw, 0); // 清除残留的alpha值
 
     SASSERT(GetContainer());
     GetContainer()->BuildWndTreeZorder();
@@ -3441,7 +3447,7 @@ HRESULT SWindow::OnAttrClass(const SStringW &strValue, BOOL bLoading)
     SXmlNode xmlStyle = GETSTYLE(strValue);
     if (xmlStyle)
     {
-        //优先处理layout属性
+        // 优先处理layout属性
         SXmlAttr attrLayout = xmlStyle.attribute(L"layout");
         if (attrLayout)
         {
@@ -3449,9 +3455,9 @@ HRESULT SWindow::OnAttrClass(const SStringW &strValue, BOOL bLoading)
             MarkAttributeHandled(attrLayout, true);
         }
         for (SXmlAttr attr = xmlStyle.first_attribute(); attr; attr = attr.next_attribute())
-        { //解析style中的属性
+        { // 解析style中的属性
             if (_wcsicmp(attr.name(), L"class") == 0 || IsAttributeHandled(attr))
-                continue; //防止class中包含有其它class属性,避免发生死循环
+                continue; // 防止class中包含有其它class属性,避免发生死循环
             SetAttribute(attr.name(), attr.value(), bLoading);
         }
         MarkAttributeHandled(attrLayout, false);
@@ -3873,7 +3879,7 @@ HRESULT SWindow::AfterAttribute(const SStringW &strAttribName, const SStringW &s
     {
         HRESULT hFlag = hr & 0xFFFF0000;
         if ((hFlag & HRET_FLAG_LAYOUT_PARAM) || (hFlag & HRET_FLAG_LAYOUT))
-        { //修改了窗口的布局属性,请求父窗口重新布局
+        { // 修改了窗口的布局属性,请求父窗口重新布局
             if (GetParent())
             {
                 GetParent()->RequestRelayout();
@@ -3922,7 +3928,7 @@ void SWindow::SetToolTipText(LPCTSTR pszText)
     if (!GetContainer())
         return;
     if (GetContainer()->GetHover() == m_swnd)
-    { //请求更新显示的tip
+    { // 请求更新显示的tip
         GetContainer()->UpdateTooltip();
     }
 }
@@ -3952,12 +3958,12 @@ void SWindow::OnScaleChanged(int scale)
     GetScaleSkin(m_pNcSkin, scale);
     GetScaleSkin(m_pBgSkin, scale);
 
-    //标记布局脏
+    // 标记布局脏
     m_layoutDirty = dirty_self;
 
     if (m_animation && m_animation->hasEnded())
     {
-        //动画结束状态下，重新刷新动画结束位置
+        // 动画结束状态下，重新刷新动画结束位置
         long tmDuration = m_animation->getDuration();
         long tmOffset = m_animation->getStartOffset();
         m_animation->setStartTime(STime::GetCurrentTimeMs() - tmDuration - tmOffset);
@@ -4276,7 +4282,7 @@ IWindow *SWindow::GetISelectedChildInGroup(THIS)
 BOOL SWindow::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult)
 {
     SASSERT(lResult);
-    BOOL bOldMsgHandle = IsMsgHandled(); //备分上一个消息的处理状态
+    BOOL bOldMsgHandle = IsMsgHandled(); // 备分上一个消息的处理状态
     BOOL bRet = FALSE;
     if (m_funSwndProc)
     {
@@ -4287,7 +4293,7 @@ BOOL SWindow::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult
         SetMsgHandled(FALSE);
         bRet = ProcessSwndMessage(uMsg, wParam, lParam, *lResult);
     }
-    SetMsgHandled(bOldMsgHandle); //恢复上一个消息的处理状态
+    SetMsgHandled(bOldMsgHandle); // 恢复上一个消息的处理状态
 
     return bRet;
 }

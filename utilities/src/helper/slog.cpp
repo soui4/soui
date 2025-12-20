@@ -15,8 +15,11 @@ LogCallback Log::gs_logCallback = NULL;
 
 static bool IsConsoleProgram()
 {
-    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    return hStdOut != INVALID_HANDLE_VALUE;
+#ifdef _WIN32
+    return GetConsoleWindow() != NULL;
+#else
+    return true;
+#endif
 }
 
 Log::Log(const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr)
@@ -55,8 +58,7 @@ Log::~Log()
         if (nLen > 0)
         {
             logbuf2[nLen] = 0;
-            OutputDebugStringA(logbuf2);
-            /*if (IsConsoleProgram())
+            if (IsConsoleProgram())
             {
                 fwrite(logbuf2, 1, nLen, stdout);
                 fflush(stdout);
@@ -64,7 +66,7 @@ Log::~Log()
             else
             {
                 OutputDebugStringA(logbuf2);
-            }*/
+            }
         }
         free(logbuf2);
     }

@@ -1,5 +1,7 @@
 #include "stdafx.h"
 #include "ChessPiece.h"
+#include <helper/slog.h>
+#define kLogTag "CChessPiece"
 
 SNSBEGIN
 
@@ -18,7 +20,7 @@ CChessPiece::~CChessPiece()
 }
 
 BOOL CChessPiece::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state){
-    if(wcscmp(pHolder->GetPropertyName(), WindowProperty::SCALE) == 0){
+    if(0 && wcscmp(pHolder->GetPropertyName(), WindowProperty::SCALE) == 0){
         float scale=1.0;
         pHolder->GetAnimatedValue(fraction, &scale);
         CRect rcWnd = GetWindowRect();

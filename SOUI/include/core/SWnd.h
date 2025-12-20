@@ -2734,7 +2734,9 @@ class SOUI_EXP SWindow
 
     SAutoRefPtr<IAnimation> m_animation;   /**< Animation object. */
     SAnimationHandler *m_pAnimationHandler; /**< Animation handler for the window.  */
-    SAnimatorHandler *m_pAnimatorHandler;  /**< Property animator handler for the window. */
+    float m_pivotX;                         /**< Pivot X coordinate for transformations. default is 0.5f */
+    float m_pivotY;                         /**< Pivot Y coordinate for transformations. default is 0.5f */
+    SAnimatorHandler *m_pAnimatorHandler;   /**< Property animator handler for the window. */
     STransformation m_transform;           /**< Transformation object. */
     BOOL m_isAnimating;                    /**< Flag indicating if the window is currently animating. */
     BOOL m_isDestroying;                   /**< Flag indicating if the window is being destroyed. */
@@ -2753,8 +2755,6 @@ class SOUI_EXP SWindow
     SAutoRefPtr<ICaret> m_caret;             /**< Caret object. */
 
     FunSwndProc m_funSwndProc; /**< Custom window procedure. */
-    float m_pivotX;            /**< Pivot X coordinate for transformations. default is 0.5f */
-    float m_pivotY;            /**< Pivot Y coordinate for transformations. default is 0.5f */
 #ifdef _WIN32
     SAutoRefPtr<IAccessible> m_pAcc;    /**< Accessibility object. */
     SAutoRefPtr<IAccProxy> m_pAccProxy; /**< Accessibility proxy object. */

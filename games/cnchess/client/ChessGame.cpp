@@ -108,7 +108,8 @@ void CChessGame::onAnimationEnd(IValueAnimator *pAnimator)
     {
         // start a new animation to move the piece down
         CChessPiece *pSelPiece = pPiece;
-        auto pAni = Util::ScaleSprite(pSelPiece, kPieceScale, 1.0f, 200);
+        SLOGI()<<"restore piece scale: "<< 1.0f;
+        auto pAni = Util::ScaleSprite(pSelPiece,1.0f, 1.0f/kPieceScale, 200);
         pAni->SetID(ANI_MOVEDOWN);
         pAni->addListener(this);
 
@@ -160,7 +161,8 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
         if(pTarget->GetID() == m_nSelectedChessID)
         {//cancel the selection
             CChessPiece *pSelPiece = (CChessPiece *)pTarget;
-            auto pAni = Util::ScaleSprite(pSelPiece, kPieceScale, 1.0f, 200);
+            SLOGI()<<"chess piece clicked, id="<<m_nSelectedChessID<<" restore scale to 1.0";
+            auto pAni = Util::ScaleSprite(pSelPiece, 1.0f, 1.0f/kPieceScale,200);
             pAni->SetID(ANI_DOWN);
             pAni->addListener(this);
 
@@ -181,6 +183,7 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
                 ULONG_PTR lp = pTarget->GetUserData();
                 ptTarget=CPoint(GET_X_LPARAM(lp),GET_Y_LPARAM(lp));
             }
+            SLOGI()<<"move piece to: "<<ptTarget.x<<","<<ptTarget.y<<" id="<<m_nSelectedChessID;
             CChessPiece *pSelPiece = (CChessPiece *)m_pGameBoard->FindChildByID(m_nSelectedChessID);
             SASSERT(pSelPiece);
             ShowPosFlags(pSelPiece->GetPos(), FALSE);
@@ -216,10 +219,11 @@ BOOL CChessGame::OnChessPieceClick(IEvtArgs *e)
                 //scale the piece by 110% of cell size for x and y
                 Util::ScaleSprite(pTarget, 1.0f, kPieceScale, 200);
                 m_nSelectedChessID = pTarget->GetID();
+                SLOGI()<<"scale piece to: "<<kPieceScale<<" id="<<m_nSelectedChessID;
 
                 //increase shadow height
                 SWindow *pShadow = m_pGameBoard->FindChildByID(ID_SHADOW_BASE + pTarget->GetID());
-                auto pAni = Util::ChangeSpriteHeight(pShadow, kShadowHeight_Normal, kShadowHeight_Up, 200);
+                Util::ChangeSpriteHeight(pShadow, kShadowHeight_Normal, kShadowHeight_Up, 200);
             }
             else if(pTarget->GetPicesState() == CChessPiece::STATE_UP)
             {//drop down the piece
