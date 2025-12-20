@@ -73,7 +73,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 
         SAutoRefPtr<SGameTheme> theme(new SGameTheme(),FALSE);
         SStringT themeDir = appDir + _T("/cnchess/def_theme");
-        if(GetFileAttributes(themeDir) == INVALID_FILE_ATTRIBUTES)
+        //if(GetFileAttributes(themeDir) == INVALID_FILE_ATTRIBUTES)
         {
             themeDir = srcDir + _T("/def_theme");
         }
