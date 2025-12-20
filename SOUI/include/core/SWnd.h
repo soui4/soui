@@ -90,7 +90,7 @@ static const LPCWSTR COLOR_TEXT = L"colorText";
 static const LPCWSTR SCALE = L"scale";
 static const LPCWSTR SCALE_X = L"scaleX";
 static const LPCWSTR SCALE_Y = L"scaleY";
-static const LPCWSTR ROTATION = L"rotation";
+static const LPCWSTR ROTATE = L"rotate";
 static const LPCWSTR TRANSLATE = L"translate";
 static const LPCWSTR TRANSLATE_X = L"translateX";
 static const LPCWSTR TRANSLATE_Y = L"translateY";
@@ -2603,6 +2603,8 @@ class SOUI_EXP SWindow
         ATTR_BOOL(L"drawFocusRect", m_bDrawFocusRect, TRUE)
         ATTR_BOOL(L"hoverAware", m_bHoverAware, FALSE)
         ATTR_BOOL(L"float", m_bFloat, FALSE)
+        ATTR_FLOAT(L"pivotX", m_pivotX, FALSE)
+        ATTR_FLOAT(L"pivotY", m_pivotY, FALSE)
         ATTR_CHAIN(m_style, HRET_FLAG_STYLE)
         ATTR_CHAIN_PTR(m_pLayout, HRET_FLAG_LAYOUT)
         ATTR_CHAIN_PTR(m_pLayoutParam, HRET_FLAG_LAYOUT_PARAM)
@@ -2732,14 +2734,14 @@ class SOUI_EXP SWindow
 
     COLORREF m_crColorize; /**< Colorization value for the window. */
 
-    SAutoRefPtr<IAnimation> m_animation;   /**< Animation object. */
+    SAutoRefPtr<IAnimation> m_animation;    /**< Animation object. */
     SAnimationHandler *m_pAnimationHandler; /**< Animation handler for the window.  */
     float m_pivotX;                         /**< Pivot X coordinate for transformations. default is 0.5f */
     float m_pivotY;                         /**< Pivot Y coordinate for transformations. default is 0.5f */
     SAnimatorHandler *m_pAnimatorHandler;   /**< Property animator handler for the window. */
-    STransformation m_transform;           /**< Transformation object. */
-    BOOL m_isAnimating;                    /**< Flag indicating if the window is currently animating. */
-    BOOL m_isDestroying;                   /**< Flag indicating if the window is being destroyed. */
+    STransformation m_transform;            /**< Transformation object. */
+    BOOL m_isAnimating;                     /**< Flag indicating if the window is currently animating. */
+    BOOL m_isDestroying;                    /**< Flag indicating if the window is being destroyed. */
 
     typedef struct GETRTDATA
     {
