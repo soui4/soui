@@ -323,7 +323,7 @@ class SOUI_EXP STrText {
 };
 
 class SAnimatorHandler;
-
+class SAnimationHandler;
 /**
  * @class SWindow
  * @brief Base class for SOUI DUI windows.
@@ -343,55 +343,7 @@ class SOUI_EXP SWindow
     friend class FocusSearch;
     friend class SHostProxy;
     friend class SAnimatorHandler;
-
-    class SAnimationHandler : public ITimelineHandler {
-      private:
-        SWindow *m_pOwner;             /**< Owner window */
-        STransformation m_transform;   /**< Transformation */
-        bool m_bFillAfter;             /**< Fill after flag */
-        SWindow *m_pPrevSiblingBackup; /**< Previous sibling backup */
-
-      public:
-        /**
-         * @brief Constructor.
-         * @param pOwner Owner window.
-         */
-        SAnimationHandler(SWindow *pOwner);
-
-        /**
-         * @brief Called when animation starts.
-         */
-        void OnAnimationStart();
-
-        /**
-         * @brief Called when animation stops.
-         */
-        void OnAnimationStop();
-
-        /**
-         * @brief Gets the transformation.
-         * @return Transformation object.
-         */
-        const STransformation &GetTransformation() const;
-
-        /**
-         * @brief Gets the fill after flag.
-         * @return Fill after flag.
-         */
-        bool getFillAfter() const;
-
-      public:
-        STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
-
-      protected:
-        /**
-         * @brief Called when the owner window is resized.
-         * @param e Event arguments.
-         * @return TRUE if handled, FALSE otherwise.
-         */
-        BOOL OnOwnerResize(IEvtArgs *e);
-    };
-
+    friend class SAnimationHandler;
   public:
     /**
      * @brief Constructor.
@@ -2778,7 +2730,8 @@ class SOUI_EXP SWindow
     COLORREF m_crColorize; /**< Colorization value for the window. */
 
     SAutoRefPtr<IAnimation> m_animation;  /**< Animation object. */
-    SAnimationHandler m_animationHandler; /**< Animation handler for the window.  */
+    SAnimationHandler *m_animationHandler; /**< Animation handler for the window.  */
+    SAnimatorHandler *m_pAnimatorHandler;  /**< Property animator handler for the window. */
     STransformation m_transform;          /**< Transformation object. */
     BOOL m_isAnimating;                   /**< Flag indicating if the window is currently animating. */
     BOOL m_isDestroying;                  /**< Flag indicating if the window is being destroyed. */
@@ -2797,7 +2750,6 @@ class SOUI_EXP SWindow
     SAutoRefPtr<ICaret> m_caret;             /**< Caret object. */
 
     FunSwndProc m_funSwndProc; /**< Custom window procedure. */
-    SAnimatorHandler *m_pAnimatorHandler;  /**< Property animator handler for the window. */
     float m_pivotX;                         /**< Pivot X coordinate for transformations. default is 0.5f */
     float m_pivotY;                         /**< Pivot Y coordinate for transformations. default is 0.5f */
 #ifdef _WIN32

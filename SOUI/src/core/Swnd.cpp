@@ -100,6 +100,154 @@ SStringW STrText::EscapeString(const SStringW &strValue)
 }
 
 //------------------------------------------------------------------------
+    class SAnimationHandler : public ITimelineHandler {
+      private:
+        SWindow *m_pOwner;             /**< Owner window */
+        STransformation m_transform;   /**< Transformation */
+        bool m_bFillAfter;             /**< Fill after flag */
+        SWindow *m_pPrevSiblingBackup; /**< Previous sibling backup */
+
+      public:
+        /**
+         * @brief Constructor.
+         * @param pOwner Owner window.
+         */
+        SAnimationHandler(SWindow *pOwner);
+
+        /**
+         * @brief Called when animation starts.
+         */
+        void OnAnimationStart();
+
+        /**
+         * @brief Called when animation stops.
+         */
+        void OnAnimationStop();
+
+        /**
+         * @brief Gets the transformation.
+         * @return Transformation object.
+         */
+        const STransformation &GetTransformation() const;
+
+        /**
+         * @brief Gets the fill after flag.
+         * @return Fill after flag.
+         */
+        bool getFillAfter() const;
+
+      public:
+        STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
+
+      protected:
+        /**
+         * @brief Called when the owner window is resized.
+         * @param e Event arguments.
+         * @return TRUE if handled, FALSE otherwise.
+         */
+        BOOL OnOwnerResize(IEvtArgs *e);
+    };
+
+static SWindow *ICWND_NONE = (SWindow *)-2;
+SAnimationHandler::SAnimationHandler(SWindow *pOwner)
+    : m_pOwner(pOwner)
+    , m_bFillAfter(false)
+    , m_pPrevSiblingBackup(ICWND_NONE)
+{
+}
+
+void SAnimationHandler::OnAnimationStart()
+{
+    IAnimation *pAni = m_pOwner->GetAnimation();
+    SASSERT(pAni);
+    if (pAni->getZAdjustment() != ZORDER_NORMAL)
+    {
+        m_pPrevSiblingBackup = m_pOwner->GetWindow(GSW_PREVSIBLING);
+        if (m_pPrevSiblingBackup == NULL)
+            m_pPrevSiblingBackup = ICWND_FIRST;
+
+        if (pAni->getZAdjustment() == ZORDER_TOP)
+            m_pOwner->AdjustZOrder(ICWND_LAST);
+        else
+            m_pOwner->AdjustZOrder(ICWND_FIRST);
+    }
+    else
+    {
+        m_pPrevSiblingBackup = ICWND_NONE;
+    }
+    m_pOwner->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SAnimationHandler::OnOwnerResize, this));
+    if (m_pOwner->GetParent())
+    {
+        m_pOwner->GetParent()->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SAnimationHandler::OnOwnerResize, this));
+    }
+    OnOwnerResize(NULL);
+}
+
+void SAnimationHandler::OnAnimationStop()
+{
+    m_pOwner->GetEventSet()->unsubscribeEvent(EventSwndSize::EventID, Subscriber(&SAnimationHandler::OnOwnerResize, this));
+    if (m_pOwner->GetParent())
+    {
+        m_pOwner->GetParent()->GetEventSet()->unsubscribeEvent(EventSwndSize::EventID, Subscriber(&SAnimationHandler::OnOwnerResize, this));
+    }
+    if (m_pPrevSiblingBackup != ICWND_NONE)
+    {
+        m_pOwner->AdjustZOrder(m_pPrevSiblingBackup);
+        m_pPrevSiblingBackup = ICWND_NONE;
+    }
+}
+
+const STransformation &SAnimationHandler::GetTransformation() const
+{
+    return m_transform;
+}
+
+void SAnimationHandler::OnNextFrame()
+{
+    IAnimation *pAni = m_pOwner->GetAnimation();
+    SASSERT(pAni);
+    pAni->AddRef();
+    m_pOwner->AddRef();
+    uint64_t tm = pAni->getStartTime();
+    if (tm > 0)
+    {
+        m_pOwner->OnAnimationInvalidate(pAni, true);
+        BOOL bMore = pAni->getTransformation(STime::GetCurrentTimeMs(), &m_transform);
+        m_pOwner->OnAnimationInvalidate(pAni, false);
+        if (!bMore)
+        { // animation stopped.
+            if (pAni->isFillEnabled() && pAni->getFillAfter())
+            {
+                m_bFillAfter = true;
+            }
+            else
+            {
+                m_bFillAfter = false;
+            }
+        }
+    }
+    m_pOwner->Release();
+    pAni->Release();
+}
+
+BOOL SAnimationHandler::OnOwnerResize(IEvtArgs *e)
+{
+    CSize szOwner = m_pOwner->GetWindowRect().Size();
+    CSize szParent = szOwner;
+    SWindow *p = m_pOwner->GetParent();
+    if (p)
+    {
+        szParent = p->GetWindowRect().Size();
+    }
+    m_pOwner->GetAnimation()->initialize(szOwner.cx, szOwner.cy, szParent.cx, szParent.cy, m_pOwner->GetScale());
+    return true;
+}
+
+bool SAnimationHandler::getFillAfter() const
+{
+    return m_bFillAfter;
+}
+//------------------------------------------------------------------------
 enum
 {
     ANI_ALPHA = 0,
@@ -437,7 +585,6 @@ SWindow::SWindow()
     , m_crColorize(0)
     , m_strText(this)
     , m_strToolTipText(this)
-    , m_animationHandler(this)
     , m_isAnimating(FALSE)
     , m_isDestroying(FALSE)
     , m_isLoading(FALSE)
@@ -449,6 +596,7 @@ SWindow::SWindow()
 #endif
 {
     m_pAnimatorHandler = new SAnimatorHandler(this);
+    m_animationHandler = new SAnimationHandler(this);
 
     m_nMaxWidth.setWrapContent();
 
@@ -489,6 +637,7 @@ SWindow::SWindow()
 SWindow::~SWindow()
 {
     delete m_pAnimatorHandler;
+    delete m_animationHandler;
 #ifdef SOUI_ENABLE_ACC
     if (m_pAcc)
     {
@@ -3022,7 +3171,7 @@ void SWindow::SetAnimation(IAnimation *animation)
             m_animation->startNow();
         }
         if (GetContainer())
-            GetContainer()->RegisterTimelineHandler(&m_animationHandler);
+            GetContainer()->RegisterTimelineHandler(m_animationHandler);
     }
 }
 
@@ -3064,7 +3213,7 @@ void SWindow::ClearAnimation()
         }
         if (GetContainer())
         {
-            GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
+            GetContainer()->UnregisterTimelineHandler(m_animationHandler);
         }
         m_animation->setAnimationListener(NULL);
         m_animation = NULL;
@@ -3075,9 +3224,9 @@ void SWindow::ClearAnimation()
 STransformation SWindow::GetTransformation() const
 {
     STransformation ret = m_transform;
-    if (m_isAnimating || m_animationHandler.getFillAfter())
+    if (m_isAnimating || m_animationHandler->getFillAfter())
     {
-        ret.compose(m_animationHandler.GetTransformation());
+        ret.compose(m_animationHandler->GetTransformation());
     }
     if (!m_pAnimatorHandler->IsEmpty())
     {
@@ -3101,7 +3250,7 @@ void SWindow::SetAlpha(BYTE byAlpha)
 
 BYTE SWindow::GetAlpha() const
 {
-    return (BYTE)((int)m_transform.GetAlpha() * m_animationHandler.GetTransformation().GetAlpha() / 255);
+    return (BYTE)((int)m_transform.GetAlpha() * m_animationHandler->GetTransformation().GetAlpha() / 255);
 }
 
 void SWindow::SetMatrix(const IMatrix *mtx)
@@ -3810,7 +3959,7 @@ void SWindow::OnScaleChanged(int scale)
         long tmDuration = m_animation->getDuration();
         long tmOffset = m_animation->getStartOffset();
         m_animation->setStartTime(STime::GetCurrentTimeMs() - tmDuration - tmOffset);
-        m_animationHandler.OnNextFrame();
+        m_animationHandler->OnNextFrame();
     }
 }
 
@@ -3885,7 +4034,7 @@ void SWindow::OnAnimationStart(THIS_ IAnimation *pAni)
     evt.pAni = pAni;
     FireEvent(&evt);
     m_isAnimating = TRUE;
-    m_animationHandler.OnAnimationStart();
+    m_animationHandler->OnAnimationStart();
     UpdateCacheMode();
 }
 
@@ -3893,10 +4042,10 @@ void SWindow::OnAnimationStop(THIS_ IAnimation *pAni)
 {
     SASSERT(m_isAnimating);
     if (GetContainer())
-        GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
+        GetContainer()->UnregisterTimelineHandler(m_animationHandler);
     InvalidateRect(NULL);
     pAni->setStartTime(START_ON_FIRST_FRAME);
-    m_animationHandler.OnAnimationStop();
+    m_animationHandler->OnAnimationStop();
     m_isAnimating = FALSE;
     UpdateCacheMode();
     EventSwndAnimationStop evt(this);
@@ -3947,7 +4096,7 @@ void SWindow::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *
             pOldContainer->UnregisterTrackMouseEvent(m_swnd);
         if (GetCapture() == m_swnd)
             ReleaseCapture();
-        pOldContainer->UnregisterTimelineHandler(&m_animationHandler);
+        pOldContainer->UnregisterTimelineHandler(m_animationHandler);
         if (GetStyle().m_bVideoCanvas)
             pOldContainer->UnregisterVideoCanvas(m_swnd);
     }
@@ -4204,110 +4353,9 @@ BOOL SWindow::UnregisterDragDrop(THIS)
 void SWindow::OnAnimationPauseChange(THIS_ IAnimation *animation, BOOL bPaused)
 {
     if (bPaused)
-        GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
+        GetContainer()->UnregisterTimelineHandler(m_animationHandler);
     else
-        GetContainer()->RegisterTimelineHandler(&m_animationHandler);
-}
-
-//////////////////////////////////////////////////////////////////////////
-static SWindow *ICWND_NONE = (SWindow *)-2;
-SWindow::SAnimationHandler::SAnimationHandler(SWindow *pOwner)
-    : m_pOwner(pOwner)
-    , m_bFillAfter(false)
-    , m_pPrevSiblingBackup(ICWND_NONE)
-{
-}
-
-void SWindow::SAnimationHandler::OnAnimationStart()
-{
-    IAnimation *pAni = m_pOwner->GetAnimation();
-    SASSERT(pAni);
-    if (pAni->getZAdjustment() != ZORDER_NORMAL)
-    {
-        m_pPrevSiblingBackup = m_pOwner->GetWindow(GSW_PREVSIBLING);
-        if (m_pPrevSiblingBackup == NULL)
-            m_pPrevSiblingBackup = ICWND_FIRST;
-
-        if (pAni->getZAdjustment() == ZORDER_TOP)
-            m_pOwner->AdjustZOrder(ICWND_LAST);
-        else
-            m_pOwner->AdjustZOrder(ICWND_FIRST);
-    }
-    else
-    {
-        m_pPrevSiblingBackup = ICWND_NONE;
-    }
-    m_pOwner->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
-    if (m_pOwner->GetParent())
-    {
-        m_pOwner->GetParent()->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
-    }
-    OnOwnerResize(NULL);
-}
-
-void SWindow::SAnimationHandler::OnAnimationStop()
-{
-    m_pOwner->GetEventSet()->unsubscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
-    if (m_pOwner->GetParent())
-    {
-        m_pOwner->GetParent()->GetEventSet()->unsubscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
-    }
-    if (m_pPrevSiblingBackup != ICWND_NONE)
-    {
-        m_pOwner->AdjustZOrder(m_pPrevSiblingBackup);
-        m_pPrevSiblingBackup = ICWND_NONE;
-    }
-}
-
-const STransformation &SWindow::SAnimationHandler::GetTransformation() const
-{
-    return m_transform;
-}
-
-void SWindow::SAnimationHandler::OnNextFrame()
-{
-    IAnimation *pAni = m_pOwner->GetAnimation();
-    SASSERT(pAni);
-    pAni->AddRef();
-    m_pOwner->AddRef();
-    uint64_t tm = pAni->getStartTime();
-    if (tm > 0)
-    {
-        m_pOwner->OnAnimationInvalidate(pAni, true);
-        BOOL bMore = pAni->getTransformation(STime::GetCurrentTimeMs(), &m_transform);
-        m_pOwner->OnAnimationInvalidate(pAni, false);
-        if (!bMore)
-        { // animation stopped.
-            if (pAni->isFillEnabled() && pAni->getFillAfter())
-            {
-                m_bFillAfter = true;
-            }
-            else
-            {
-                m_bFillAfter = false;
-            }
-        }
-    }
-    m_pOwner->Release();
-    pAni->Release();
-}
-
-BOOL SWindow::SAnimationHandler::OnOwnerResize(IEvtArgs *e)
-{
-    CSize szOwner = m_pOwner->GetWindowRect().Size();
-    CSize szParent = szOwner;
-    SWindow *p = m_pOwner->GetParent();
-    if (p)
-    {
-        szParent = p->GetWindowRect().Size();
-    }
-    m_pOwner->GetAnimation()->initialize(szOwner.cx, szOwner.cy, szParent.cx, szParent.cy, m_pOwner->GetScale());
-    return true;
-}
-
-bool SWindow::SAnimationHandler::getFillAfter() const
-{
-    return m_bFillAfter;
+        GetContainer()->RegisterTimelineHandler(m_animationHandler);
 }
 
 SNSEND
