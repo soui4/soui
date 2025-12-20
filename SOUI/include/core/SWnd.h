@@ -344,6 +344,7 @@ class SOUI_EXP SWindow
     friend class SHostProxy;
     friend class SAnimatorHandler;
     friend class SAnimationHandler;
+
   public:
     /**
      * @brief Constructor.
@@ -1194,10 +1195,12 @@ class SOUI_EXP SWindow
      * @param x float*--中心X坐标, 0.5f表示窗口中心
      * @param y float*--中心Y坐标, 0.5f表示窗口中心
      */
-    STDMETHOD_(void, GetPivot)(CTHIS_ float *x, float *y) SCONST OVERRIDE{
+    STDMETHOD_(void, GetPivot)(CTHIS_ float *x, float *y) SCONST OVERRIDE
+    {
         *x = m_pivotX;
         *y = m_pivotY;
     }
+
   public:
 #ifdef _WIN32
     /**
@@ -1219,6 +1222,7 @@ class SOUI_EXP SWindow
     void accNotifyEvent(DWORD dwEvt);
 
     static BOOL GetAnimatedLayoutSize(IPropertyValuesHolder *pHolder, float fraction, SLayoutSize &ret);
+
   public:
     /**
      * @brief Retrieves the current message being processed.
@@ -2728,12 +2732,12 @@ class SOUI_EXP SWindow
 
     COLORREF m_crColorize; /**< Colorization value for the window. */
 
-    SAutoRefPtr<IAnimation> m_animation;  /**< Animation object. */
-    SAnimationHandler *m_animationHandler; /**< Animation handler for the window.  */
+    SAutoRefPtr<IAnimation> m_animation;   /**< Animation object. */
+    SAnimationHandler *m_pAnimationHandler; /**< Animation handler for the window.  */
     SAnimatorHandler *m_pAnimatorHandler;  /**< Property animator handler for the window. */
-    STransformation m_transform;          /**< Transformation object. */
-    BOOL m_isAnimating;                   /**< Flag indicating if the window is currently animating. */
-    BOOL m_isDestroying;                  /**< Flag indicating if the window is being destroyed. */
+    STransformation m_transform;           /**< Transformation object. */
+    BOOL m_isAnimating;                    /**< Flag indicating if the window is currently animating. */
+    BOOL m_isDestroying;                   /**< Flag indicating if the window is being destroyed. */
 
     typedef struct GETRTDATA
     {
@@ -2749,8 +2753,8 @@ class SOUI_EXP SWindow
     SAutoRefPtr<ICaret> m_caret;             /**< Caret object. */
 
     FunSwndProc m_funSwndProc; /**< Custom window procedure. */
-    float m_pivotX;                         /**< Pivot X coordinate for transformations. default is 0.5f */
-    float m_pivotY;                         /**< Pivot Y coordinate for transformations. default is 0.5f */
+    float m_pivotX;            /**< Pivot X coordinate for transformations. default is 0.5f */
+    float m_pivotY;            /**< Pivot Y coordinate for transformations. default is 0.5f */
 #ifdef _WIN32
     SAutoRefPtr<IAccessible> m_pAcc;    /**< Accessibility object. */
     SAutoRefPtr<IAccProxy> m_pAccProxy; /**< Accessibility proxy object. */

@@ -199,7 +199,6 @@ ILayoutParam *SLinearLayoutParam::Clone() const
     return pRet;
 }
 
-
 BOOL SLinearLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
 {
     SStringW strName = pHolder->GetPropertyName();

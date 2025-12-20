@@ -239,7 +239,7 @@ class SOUI_EXP SRootWindow : public SWindow {
      *
      * @param bErase Flag indicating whether to erase the animation.
      */
-    virtual void OnAnimationInvalidate( bool bErase);
+    virtual void OnAnimationInvalidate(bool bErase);
 
   protected: // SWindow virtual methods
     /**

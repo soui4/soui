@@ -100,53 +100,53 @@ SStringW STrText::EscapeString(const SStringW &strValue)
 }
 
 //------------------------------------------------------------------------
-    class SAnimationHandler : public ITimelineHandler {
-      private:
-        SWindow *m_pOwner;             /**< Owner window */
-        STransformation m_transform;   /**< Transformation */
-        bool m_bFillAfter;             /**< Fill after flag */
-        SWindow *m_pPrevSiblingBackup; /**< Previous sibling backup */
+class SAnimationHandler : public ITimelineHandler {
+  private:
+    SWindow *m_pOwner;             /**< Owner window */
+    STransformation m_transform;   /**< Transformation */
+    bool m_bFillAfter;             /**< Fill after flag */
+    SWindow *m_pPrevSiblingBackup; /**< Previous sibling backup */
 
-      public:
-        /**
-         * @brief Constructor.
-         * @param pOwner Owner window.
-         */
-        SAnimationHandler(SWindow *pOwner);
+  public:
+    /**
+     * @brief Constructor.
+     * @param pOwner Owner window.
+     */
+    SAnimationHandler(SWindow *pOwner);
 
-        /**
-         * @brief Called when animation starts.
-         */
-        void OnAnimationStart();
+    /**
+     * @brief Called when animation starts.
+     */
+    void OnAnimationStart();
 
-        /**
-         * @brief Called when animation stops.
-         */
-        void OnAnimationStop();
+    /**
+     * @brief Called when animation stops.
+     */
+    void OnAnimationStop();
 
-        /**
-         * @brief Gets the transformation.
-         * @return Transformation object.
-         */
-        const STransformation &GetTransformation() const;
+    /**
+     * @brief Gets the transformation.
+     * @return Transformation object.
+     */
+    const STransformation &GetTransformation() const;
 
-        /**
-         * @brief Gets the fill after flag.
-         * @return Fill after flag.
-         */
-        bool getFillAfter() const;
+    /**
+     * @brief Gets the fill after flag.
+     * @return Fill after flag.
+     */
+    bool getFillAfter() const;
 
-      public:
-        STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
+  public:
+    STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
 
-      protected:
-        /**
-         * @brief Called when the owner window is resized.
-         * @param e Event arguments.
-         * @return TRUE if handled, FALSE otherwise.
-         */
-        BOOL OnOwnerResize(IEvtArgs *e);
-    };
+  protected:
+    /**
+     * @brief Called when the owner window is resized.
+     * @param e Event arguments.
+     * @return TRUE if handled, FALSE otherwise.
+     */
+    BOOL OnOwnerResize(IEvtArgs *e);
+};
 
 static SWindow *ICWND_NONE = (SWindow *)-2;
 SAnimationHandler::SAnimationHandler(SWindow *pOwner)
@@ -274,8 +274,10 @@ class AnimatorHolder : public TObjRefImpl<IObjRef> {
 class SAnimatorHandler {
     STransformation m_transform; /**< Transformation */
     SWindow *m_pOwner;
+
   public:
-    SAnimatorHandler(SWindow *pOwner):m_pOwner(pOwner)
+    SAnimatorHandler(SWindow *pOwner)
+        : m_pOwner(pOwner)
     {
     }
 
@@ -515,7 +517,7 @@ class SAnimatorHandler {
         case ANI_TRANSLATE_Y:
         {
             if (pHolder->holder->GetValueType() == PROP_TYPE_FLOAT)
-           {
+            {
                 float translate;
                 pHolder->holder->GetAnimatedValue(pHolder->fraction, &translate);
                 tmp.GetMatrix()->setTranslate(0.0f, translate);
@@ -596,7 +598,7 @@ SWindow::SWindow()
 #endif
 {
     m_pAnimatorHandler = new SAnimatorHandler(this);
-    m_animationHandler = new SAnimationHandler(this);
+    m_pAnimationHandler = new SAnimationHandler(this);
 
     m_nMaxWidth.setWrapContent();
 
@@ -637,7 +639,7 @@ SWindow::SWindow()
 SWindow::~SWindow()
 {
     delete m_pAnimatorHandler;
-    delete m_animationHandler;
+    delete m_pAnimationHandler;
 #ifdef SOUI_ENABLE_ACC
     if (m_pAcc)
     {
@@ -2217,30 +2219,29 @@ int SWindow::GetLayer() const
     return m_nLayer;
 }
 
-
 BOOL SWindow::GetAnimatedLayoutSize(IPropertyValuesHolder *pHolder, float fraction, SLayoutSize &ret)
 {
-    switch(pHolder->GetValueType())
+    switch (pHolder->GetValueType())
     {
     case PROP_TYPE_LAYOUT_SIZE:
         pHolder->GetAnimatedValue(fraction, &ret);
         return TRUE;
     case PROP_TYPE_INT:
-        {
-            int nValue;
-            pHolder->GetAnimatedValue(fraction, &nValue);
-            ret = SLayoutSize((float)nValue, SLayoutSize::defUnit);
-            return TRUE;
-        }
+    {
+        int nValue;
+        pHolder->GetAnimatedValue(fraction, &nValue);
+        ret = SLayoutSize((float)nValue, SLayoutSize::defUnit);
+        return TRUE;
+    }
     case PROP_TYPE_FLOAT:
-        {
-            float fValue;
-            pHolder->GetAnimatedValue(fraction, &fValue);
-            ret = SLayoutSize(fValue, SLayoutSize::defUnit);
-            return TRUE;
-        }
-        default:
-            return FALSE;
+    {
+        float fValue;
+        pHolder->GetAnimatedValue(fraction, &fValue);
+        ret = SLayoutSize(fValue, SLayoutSize::defUnit);
+        return TRUE;
+    }
+    default:
+        return FALSE;
     }
 }
 
@@ -2269,7 +2270,8 @@ BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, A
     BOOL bRet = GetLayoutParam()->SetAnimatorValue(pHolder, fraction, state);
     if (bRet)
     {
-        if (GetParent()){
+        if (GetParent())
+        {
             GetParent()->RequestRelayout();
             GetParent()->UpdateChildrenPosition();
         }
@@ -3171,7 +3173,7 @@ void SWindow::SetAnimation(IAnimation *animation)
             m_animation->startNow();
         }
         if (GetContainer())
-            GetContainer()->RegisterTimelineHandler(m_animationHandler);
+            GetContainer()->RegisterTimelineHandler(m_pAnimationHandler);
     }
 }
 
@@ -3213,7 +3215,7 @@ void SWindow::ClearAnimation()
         }
         if (GetContainer())
         {
-            GetContainer()->UnregisterTimelineHandler(m_animationHandler);
+            GetContainer()->UnregisterTimelineHandler(m_pAnimationHandler);
         }
         m_animation->setAnimationListener(NULL);
         m_animation = NULL;
@@ -3224,9 +3226,9 @@ void SWindow::ClearAnimation()
 STransformation SWindow::GetTransformation() const
 {
     STransformation ret = m_transform;
-    if (m_isAnimating || m_animationHandler->getFillAfter())
+    if (m_isAnimating || m_pAnimationHandler->getFillAfter())
     {
-        ret.compose(m_animationHandler->GetTransformation());
+        ret.compose(m_pAnimationHandler->GetTransformation());
     }
     if (!m_pAnimatorHandler->IsEmpty())
     {
@@ -3250,7 +3252,7 @@ void SWindow::SetAlpha(BYTE byAlpha)
 
 BYTE SWindow::GetAlpha() const
 {
-    return (BYTE)((int)m_transform.GetAlpha() * m_animationHandler->GetTransformation().GetAlpha() / 255);
+    return (BYTE)((int)m_transform.GetAlpha() * m_pAnimationHandler->GetTransformation().GetAlpha() / 255);
 }
 
 void SWindow::SetMatrix(const IMatrix *mtx)
@@ -3959,7 +3961,7 @@ void SWindow::OnScaleChanged(int scale)
         long tmDuration = m_animation->getDuration();
         long tmOffset = m_animation->getStartOffset();
         m_animation->setStartTime(STime::GetCurrentTimeMs() - tmDuration - tmOffset);
-        m_animationHandler->OnNextFrame();
+        m_pAnimationHandler->OnNextFrame();
     }
 }
 
@@ -4034,7 +4036,7 @@ void SWindow::OnAnimationStart(THIS_ IAnimation *pAni)
     evt.pAni = pAni;
     FireEvent(&evt);
     m_isAnimating = TRUE;
-    m_animationHandler->OnAnimationStart();
+    m_pAnimationHandler->OnAnimationStart();
     UpdateCacheMode();
 }
 
@@ -4042,10 +4044,10 @@ void SWindow::OnAnimationStop(THIS_ IAnimation *pAni)
 {
     SASSERT(m_isAnimating);
     if (GetContainer())
-        GetContainer()->UnregisterTimelineHandler(m_animationHandler);
+        GetContainer()->UnregisterTimelineHandler(m_pAnimationHandler);
     InvalidateRect(NULL);
     pAni->setStartTime(START_ON_FIRST_FRAME);
-    m_animationHandler->OnAnimationStop();
+    m_pAnimationHandler->OnAnimationStop();
     m_isAnimating = FALSE;
     UpdateCacheMode();
     EventSwndAnimationStop evt(this);
@@ -4096,7 +4098,7 @@ void SWindow::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *
             pOldContainer->UnregisterTrackMouseEvent(m_swnd);
         if (GetCapture() == m_swnd)
             ReleaseCapture();
-        pOldContainer->UnregisterTimelineHandler(m_animationHandler);
+        pOldContainer->UnregisterTimelineHandler(m_pAnimationHandler);
         if (GetStyle().m_bVideoCanvas)
             pOldContainer->UnregisterVideoCanvas(m_swnd);
     }
@@ -4353,9 +4355,9 @@ BOOL SWindow::UnregisterDragDrop(THIS)
 void SWindow::OnAnimationPauseChange(THIS_ IAnimation *animation, BOOL bPaused)
 {
     if (bPaused)
-        GetContainer()->UnregisterTimelineHandler(m_animationHandler);
+        GetContainer()->UnregisterTimelineHandler(m_pAnimationHandler);
     else
-        GetContainer()->RegisterTimelineHandler(m_animationHandler);
+        GetContainer()->RegisterTimelineHandler(m_pAnimationHandler);
 }
 
 SNSEND

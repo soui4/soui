@@ -20,6 +20,7 @@ class SOUI_EXP SAnchorLayoutParam
 
     SAutoRefPtr<IPropertyValuesHolder> m_aniPosHolder;
     float m_fAniFraction;
+
   public:
     /**
      * @brief 构造函数
