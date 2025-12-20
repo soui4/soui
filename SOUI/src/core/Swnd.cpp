@@ -211,9 +211,9 @@ void SAnimationHandler::OnNextFrame()
     uint64_t tm = pAni->getStartTime();
     if (tm > 0)
     {
-        m_pOwner->OnAnimationInvalidate(pAni, true);
+        m_pOwner->OnAnimationInvalidate(true);
         BOOL bMore = pAni->getTransformation(STime::GetCurrentTimeMs(), &m_transform);
-        m_pOwner->OnAnimationInvalidate(pAni, false);
+        m_pOwner->OnAnimationInvalidate(false);
         if (!bMore)
         { // animation stopped.
             if (pAni->isFillEnabled() && pAni->getFillAfter())
@@ -327,7 +327,7 @@ class SAnimatorHandler {
         int type = GetPropType(strType);
         if (type == -1)
             return FALSE;
-        m_pOwner->InvalidateRect(NULL);
+        m_pOwner->OnAnimationInvalidate(true);
         if (state == ANI_START)
         {
             AnimatorHolder *pAniHolder = new AnimatorHolder;
@@ -370,7 +370,7 @@ class SAnimatorHandler {
             }
         }
         UpdateTransformation();
-        m_pOwner->InvalidateRect(NULL);
+        m_pOwner->OnAnimationInvalidate(false);
         return TRUE;
     }
 
@@ -4060,7 +4060,7 @@ void SWindow::OnAnimationRepeat(THIS_ IAnimation *pAni)
     FireEvent(&evt);
 }
 
-void SWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
+void SWindow::OnAnimationInvalidate(bool bErase)
 {
     InvalidateRect(NULL);
 }

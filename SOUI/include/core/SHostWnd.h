@@ -237,10 +237,9 @@ class SOUI_EXP SRootWindow : public SWindow {
     /**
      * @brief Called when an animation is invalidated.
      *
-     * @param pAni Pointer to the animation object.
      * @param bErase Flag indicating whether to erase the animation.
      */
-    virtual void OnAnimationInvalidate(IAnimation *pAni, bool bErase);
+    virtual void OnAnimationInvalidate( bool bErase);
 
   protected: // SWindow virtual methods
     /**

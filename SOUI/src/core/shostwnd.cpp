@@ -165,7 +165,7 @@ SRootWindow::SRootWindow(SHostWnd *pHostWnd)
     GetEventSet()->addEvent(EVENTID(EventMenuCmd));
 }
 
-void SRootWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
+void SRootWindow::OnAnimationInvalidate(bool bErase)
 {
     if (bErase)
     {
@@ -174,7 +174,7 @@ void SRootWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
         m_pHostWnd->m_memRT->ClearRect(rcWnd, 0);
         m_pHostWnd->m_memRT->EndDraw();
     }
-    SWindow::OnAnimationInvalidate(pAni, bErase);
+    SWindow::OnAnimationInvalidate(bErase);
     if (!bErase)
         Update();
 }

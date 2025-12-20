@@ -1585,10 +1585,9 @@ class SOUI_EXP SWindow
   protected:
     /**
      * @brief Called when an animation requires a redraw.
-     * @param pAni Pointer to the animation object.
      * @param bErase TRUE if the background should be erased; otherwise, FALSE.
      */
-    virtual void OnAnimationInvalidate(IAnimation *pAni, bool bErase);
+    virtual void OnAnimationInvalidate(bool bErase);
 
     /**
      * @brief Called when the content of the window changes.
