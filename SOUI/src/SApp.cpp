@@ -43,7 +43,10 @@ SNSBEGIN
 
 static void SouiLog_Callback(const char *tag, const char *pLogStr, int level, const char *file, int line, const char *fun, void *retAddr)
 {
-    ILogMgr *pLogMgr = SApplication::getSingleton().GetLogManager();
+    SApplication *pApp = SApplication::getSingletonPtr();
+    if (!pApp)
+        return;
+    ILogMgr *pLogMgr = pApp->GetLogManager();
     if (pLogMgr && pLogMgr->prePushLog(level))
     {
         pLogMgr->pushLog(level, tag, pLogStr, file, line, fun, retAddr);
