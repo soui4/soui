@@ -14,8 +14,7 @@ SNSBEGIN
     class SImgFrame_STB : public TObjRefImpl<IImgFrame>
     {
     public:
-        SImgFrame_STB(const BYTE *data,int w,int h,int nDelay);
-        SImgFrame_STB(BYTE *data, int w, int h, int nDelay);
+        SImgFrame_STB(const BYTE *data,int w,int h,int nDelay,BOOL bMove);
         ~SImgFrame_STB();
 
 		STDMETHOD_(BOOL,GetSize)(THIS_ UINT *pWid,UINT *pHei) OVERRIDE;

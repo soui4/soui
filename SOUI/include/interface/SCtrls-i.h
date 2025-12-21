@@ -217,7 +217,7 @@ DECLARE_INTERFACE_(IImageWnd, ICtrl)
      *
      * Describe  获取资源
      */
-    STDMETHOD_(ISkinObj *, GetSkin)(THIS) PURE;
+    STDMETHOD_(ISkinObj *, GetSkin)(CTHIS) SCONST PURE;
 
     /**
      * SImageWnd::SetImage

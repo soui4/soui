@@ -151,7 +151,7 @@ class SOUI_EXP SMessageLoop : public TObjRefImpl<IMessageLoop> {
 
   protected:
     // Flag indicating whether the message loop is running
-    BOOL m_bRunning;
+    volatile BOOL m_bRunning;
     // Flag indicating whether the message loop should quit
     BOOL m_bQuit;
     // Flag indicating whether idle processing should be done

@@ -145,7 +145,7 @@ void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
     pRet->m_state2Index = m_state2Index;
     pRet->m_bLazyLoad = FALSE;
 
-    CSize szSkin = GetSkinSize();
+    CSize szSkin = SSkinImgList::GetSkinSize(); // add SSkinImgList:: to avoid call function implemented in derived class
     szSkin.cx = MulDiv(szSkin.cx, nScale, GetScale());
     szSkin.cy = MulDiv(szSkin.cy, nScale, GetScale());
     if (m_bVertical)

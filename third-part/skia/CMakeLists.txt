@@ -8,16 +8,20 @@ if(CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
   endif()
 
 else()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
-# 检查目标平台是否为ARM
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "arm" OR CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64")
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a+simd")
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+simd")
-#enable_language(ASM)
-else()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
-endif()
-add_definitions(-DSK_USE_POSIX_THREADS)
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
+    # 检查目标平台是否为ARM
+    if(BUILD_FOR_ARM)
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a+simd")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+simd")
+        else()
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv7-a+neon")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a+neon")
+        endif()
+    else(BUILD_FOR_ARM)
+        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
+    endif(BUILD_FOR_ARM)
+    add_definitions(-DSK_USE_POSIX_THREADS)
 endif()
 
 if(NOT CMAKE_SYSTEM_NAME MATCHES Windows)
@@ -966,7 +970,7 @@ else()
     )
 endif()
 #message("...........plat....${CMAKE_GENERATOR_PLATFORM}")
-if(("${CMAKE_GENERATOR_PLATFORM}" MATCHES "ARM64") OR (CMAKE_SYSTEM_PROCESSOR MATCHES "aarch64") OR (CMAKE_SYSTEM_PROCESSOR MATCHES "arm"))
+if(BUILD_FOR_ARM)
 if(MSVC)
 set(srcs
     ${srcs}
@@ -1000,13 +1004,6 @@ set(srcs
     "src/opts/SkUtils_opts_arm.cpp"
     "src/opts/SkXfermode_opts_arm_neon.cpp"
     "src/opts/SkXfermode_opts_arm.cpp"
-#    "src/opts/SkXfermode_opts_none.cpp"
-#    "src/opts/SkBitmapProcState_opts_none.cpp"
-#    "src/opts/SkBlitRow_opts_none.cpp"
-#    "src/opts/SkBlurImage_opts_none.cpp"
-#    "src/opts/SkMorphology_opts_none.cpp"
-#    "src/opts/SkUtils_opts_none.cpp"
-#    "src/opts/SkBlitMask_opts_none.cpp"
 )
 endif(MSVC)
 else()

@@ -416,19 +416,19 @@ void SUiDef::SetUiDef(IUiDefInfo *pUiDefInfo, bool bUpdateDefFont)
     SetDefFontInfo(m_defUiDefInfo->GetDefFontInfo());
 }
 
-void SUiDef::PushUiDefInfo(IUiDefInfo *pUiDefInfo, BOOL bPreivate)
+void SUiDef::PushUiDefInfo(IUiDefInfo *pUiDefInfo, BOOL bPrivate)
 {
     SAutoLock autolock(m_cs);
     m_lstUiDefInfo.AddTail(pUiDefInfo);
     pUiDefInfo->AddRef();
-    if (bPreivate)
+    if (bPrivate)
         m_cs.Enter();
 }
 
-BOOL SUiDef::PopUiDefInfo(IUiDefInfo *pUiDefInfo, BOOL bPreivate)
+BOOL SUiDef::PopUiDefInfo(IUiDefInfo *pUiDefInfo, BOOL bPrivate)
 {
     SAutoLock autolock(m_cs);
-    if (bPreivate)
+    if (bPrivate)
         m_cs.Leave();
     if (!pUiDefInfo)
     {

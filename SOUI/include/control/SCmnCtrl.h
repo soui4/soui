@@ -416,7 +416,7 @@ class SOUI_EXP SImageWnd : public TWindowProxy<IImageWnd> {
      * @brief 获取资源
      * @return ISkinObj指针
      */
-    STDMETHOD_(ISkinObj *, GetSkin)(THIS) OVERRIDE;
+    STDMETHOD_(ISkinObj *, GetSkin)(CTHIS) SCONST OVERRIDE;
 
     /**
      * @brief 设置绘制图片

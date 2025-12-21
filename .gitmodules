@@ -2,3 +2,10 @@
 	path = swinx
 	url = https://gitee.com/setoutsoft/swinx.git
 	branch = master
+[submodule "third-part/libwebsockets"]
+	path = third-part/libwebsockets
+	url = https://gitee.com/setoutsoft/libwebsockets.git
+	branch = soui_ws
+[submodule "third-part/openssl-cmake"]
+	path = third-part/openssl-cmake
+	url = https://gitee.com/setoutsoft/openssl-cmake.git

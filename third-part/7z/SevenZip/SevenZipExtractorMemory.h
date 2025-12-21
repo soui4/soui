@@ -9,18 +9,18 @@
 namespace SevenZip
 {
 
-    class SevenZipExtractorMemory : public SevenZipArchive
-    {
-    public: 
-        SevenZipExtractorMemory();
-        virtual ~SevenZipExtractorMemory();
+	class SevenZipExtractorMemory : public SevenZipArchive
+	{
+	public: 
+		SevenZipExtractorMemory();
+		virtual ~SevenZipExtractorMemory();
 
 		virtual HRESULT ExtractArchive(CFileStream &fileStreams, ProgressCallback* callback, SevenZipPassword *pSevenZipPassword = NULL);
-        const TString& GetErrorString(); 
-    private:
+		const TString& GetErrorString(); 
+	private:
 
-		HRESULT ExtractArchive(CFileStream &fileStreams, FILE* archiveStream,  ProgressCallback* callback, SevenZipPassword *pSevenZipPassword);
-		 
-        TString m_message;
-    };
+		HRESULT ExtractArchive(CFileStream &fileStreams,const CMyComPtr< IStream >& archiveStream,  ProgressCallback* callback, SevenZipPassword *pSevenZipPassword);
+
+		TString m_message;
+	};
 }

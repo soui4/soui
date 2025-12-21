@@ -190,17 +190,17 @@ class SOUI_EXP SUiDef
     /**
      * @brief Pushes a new UI definition information object onto the stack.
      * @param pUiDefInfo Pointer to the UI definition information object.
-     * @param bPreivate TRUE if the UI definition is private, FALSE otherwise.
+     * @param bPrivate TRUE if the UI definition is private, FALSE otherwise.
      */
-    void PushUiDefInfo(IUiDefInfo *pUiDefInfo, BOOL bPreivate = FALSE);
+    void PushUiDefInfo(IUiDefInfo *pUiDefInfo, BOOL bPrivate = FALSE);
 
     /**
      * @brief Pops a UI definition information object from the stack.
      * @param pUiDefInfo Pointer to the UI definition information object to pop. If NULL, pops the last object.
-     * @param bPreivate TRUE if the UI definition is private, FALSE otherwise.
+     * @param bPrivate TRUE if the UI definition is private, FALSE otherwise.
      * @return TRUE if the UI definition is successfully popped, FALSE otherwise.
      */
-    BOOL PopUiDefInfo(IUiDefInfo *pUiDefInfo, BOOL bPreivate = FALSE);
+    BOOL PopUiDefInfo(IUiDefInfo *pUiDefInfo, BOOL bPrivate = FALSE);
 
     /**
      * @brief Pushes a new skin pool onto the stack.

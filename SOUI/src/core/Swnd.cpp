@@ -787,7 +787,11 @@ SWindow *SWindow::FindChildByID(int id, int nDeep /* =-1*/)
     ISwndFinder *pFinder = GetContainer()->GetSwndFinder();
     SWindow *pRet = (SWindow *)pFinder->FindChildByID(this, id, nDeep);
     if (pRet)
-        return pRet;
+    {
+        if (pRet->IsDescendant(this) && pRet->GetID() == id)
+            return pRet;
+        pFinder->EraseCacheForID(this, id, nDeep);
+    }
 
     pRet = _FindChildByID(id, nDeep);
     if (pRet)
@@ -802,11 +806,15 @@ SWindow *SWindow::FindChildByName(LPCWSTR pszName, int nDeep)
     SStringW strName(pszName);
     if (strName.IsEmpty())
         return NULL;
-
     ISwndFinder *pFinder = GetContainer()->GetSwndFinder();
     SWindow *pRet = (SWindow *)pFinder->FindChildByName(this, strName, nDeep);
     if (pRet)
-        return pRet;
+    {
+        if (pRet->IsDescendant(this) && wcsicmp(pRet->GetName(), pszName) == 0)
+            return pRet;
+        // update find cache.
+        pFinder->EraseCacheForName(this, strName, nDeep);
+    }
 
     pRet = _FindChildByName(strName, nDeep);
     if (pRet)
@@ -865,7 +873,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
             }
             else
             {
-                SASSERT(FALSE);
+                SSLOGW() << "load include file failed, file name=" << strSrc;
             }
         }
         else if (!xmlChild.get_userdata()) //通过userdata来标记一个节点是否可以忽略
@@ -951,7 +959,6 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
 {
     ASSERT_UI_THREAD();
     SXmlNode xmlNode(pNode);
-    SASSERT(m_pContainer);
     m_isLoading = true;
     if (xmlNode)
     {
@@ -988,7 +995,8 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
             }
         }
     }
-
+    if (m_pContainer)
+    {
     //发送WM_CREATE消息
     if (0 != SSendMessage(WM_CREATE))
     {
@@ -1004,23 +1012,25 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
     { //从父窗口更新状态
         if (!m_pParent->IsVisible(TRUE))
             m_dwState |= WndState_Invisible;
-        if (m_pParent->IsDisabled(TRUE))
-            m_dwState |= WndState_Disable;
+            if (m_pParent->IsDisabled(TRUE))
+                m_dwState |= WndState_Disable;
+        }
+        SSendMessage(WM_SHOWWINDOW, IsVisible(TRUE), ParentShow);
     }
-    SSendMessage(WM_SHOWWINDOW, IsVisible(TRUE), ParentShow);
-
-    //创建子窗口
+    // 创建子窗口
     if (!CreateChildren(xmlNode))
     {
         if (m_pParent)
             m_pParent->DestroyChild(this);
         return FALSE;
     }
-    //请求根窗口重新布局。由于布局涉及到父子窗口同步进行，同步执行布局操作可能导致布局过程重复执行。
-    RequestRelayout();
-
-    EventSwndInitFinish evt(this);
-    FireEvent(&evt);
+    if (m_pContainer)
+    {
+        // 请求根窗口重新布局。由于布局涉及到父子窗口同步进行，同步执行布局操作可能导致布局过程重复执行。
+        RequestRelayout();
+        EventSwndInitFinish evt(this);
+        FireEvent(&evt);
+    }
     m_isLoading = false;
     return TRUE;
 }
@@ -1635,6 +1645,15 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
             pChild = pChild->GetWindow(GSW_NEXTSIBLING);
         }
     }
+
+    EventSwndPos evt(this);
+    evt.rcWnd = m_rcWindow;
+    FireEvent(evt);
+
+    CRect rcClient;
+    GetClientRect(&rcClient);
+    SSendMessage(WM_SIZE, 0, MAKELPARAM(rcClient.Width(), rcClient.Height()));
+
     // only if window is visible now, we do relayout.
     if (IsVisible(FALSE))
     {
@@ -1649,16 +1668,10 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
     { // mark layout to self dirty.
         m_layoutDirty = dirty_self;
     }
-
-    EventSwndPos evt(this);
-    evt.rcWnd = m_rcWindow;
-    FireEvent(evt);
-
-    CRect rcClient;
-    GetClientRect(&rcClient);
-    SSendMessage(WM_SIZE, 0, MAKELPARAM(rcClient.Width(), rcClient.Height()));
     return TRUE;
 }
+
+
 
 int SWindow::OnCreate(LPVOID)
 {

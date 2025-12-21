@@ -32,10 +32,10 @@ static inline float SkDoubleToFloat(double x)
     return static_cast<float>(x);
 }
 
-SMatrix::SMatrix(const float data[9])
+SMatrix::SMatrix(const float data[9], int type)
 {
     memcpy(fMat, data, 9 * sizeof(float));
-    setTypeMask(kUnknown_Mask);
+    setTypeMask(type);
 }
 
 /*      [scale-x    skew-x      trans-x]   [X]   [X']
@@ -1673,33 +1673,17 @@ bool SMatrix::getMinMaxScales(float scaleFactors[2]) const
     return get_scale_factor<kBoth_MinMaxOrBoth>(this->getType(), fMat, scaleFactors);
 }
 
-namespace
-{
-
-struct PODMatrix
-{
-    float matrix[9];
-    uint32_t typemask;
-
-    const SMatrix &asSkMatrix() const
-    {
-        return *reinterpret_cast<const SMatrix *>(this);
-    }
-};
-} // namespace
-
 const SMatrix &SMatrix::I()
 {
-    static const PODMatrix identity = { { SK_Scalar1, 0, 0, 0, SK_Scalar1, 0, 0, 0, SK_Scalar1 }, kIdentity_Mask | kRectStaysRect_Mask };
-    SASSERT(identity.asSkMatrix().isIdentity());
-    return identity.asSkMatrix();
+    static const SMatrix identity;
+    return identity;
 }
 
 const SMatrix &SMatrix::InvalidMatrix()
 {
-
-    static const PODMatrix invalid = { { SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax }, kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask };
-    return invalid.asSkMatrix();
+    static const float kInvalidMatrix[9] = { SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax };
+    static const SMatrix invalidMatrix(kInvalidMatrix, kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask);
+    return invalidMatrix;
 }
 
 ///////////////////////////////////////////////////////////////////////////////

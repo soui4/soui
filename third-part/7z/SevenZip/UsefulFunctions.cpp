@@ -223,142 +223,150 @@ namespace SevenZip
     bool UsefulFunctions::GetNumberOfItems(const TString & archivePath,
         CompressionFormatEnum &format, size_t & numberofitems)
     {
-    	FILE* fileStream = _tfopen(archivePath.c_str(), _T("rb"));
-		if (fileStream == NULL) {
-			return HRESULT_FROM_WIN32(GetLastError());
+		CMyComPtr< IStream > fileStream = FileSys::OpenFileToRead(archivePath);
+
+		if (fileStream == NULL)
+		{
+			return false;
+			//throw SevenZipException( StrFmt( _T( "Could not open archive \"%s\"" ), m_archivePath.c_str() ) );
 		}
 
-        CMyComPtr< IInArchive > archive = UsefulFunctions::GetArchiveReader(format);
-        CMyComPtr< InStreamWrapper > inFile = new InStreamWrapper(fileStream);
-        CMyComPtr< ArchiveOpenCallback > openCallback = new ArchiveOpenCallback();
+		CMyComPtr< IInArchive > archive = UsefulFunctions::GetArchiveReader(format);
+		CMyComPtr< InStreamWrapper > inFile = new InStreamWrapper(fileStream);
+		CMyComPtr< ArchiveOpenCallback > openCallback = new ArchiveOpenCallback();
 
-        HRESULT hr = archive->Open(inFile, 0, openCallback);
-        if (hr != S_OK)
-        {
-            return false;
-            //throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
-        }
+		HRESULT hr = archive->Open(inFile, 0, openCallback);
+		if (hr != S_OK)
+		{
+			return false;
+			//throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
+		}
 
-        UInt32 mynumofitems;
-        hr = archive->GetNumberOfItems(&mynumofitems);
-        if (hr != S_OK)
-        {
-            return false;
-            //throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
-        }
-        numberofitems = size_t(mynumofitems);
+		UInt32 mynumofitems;
+		hr = archive->GetNumberOfItems(&mynumofitems);
+		if (hr != S_OK)
+		{
+			return false;
+			//throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
+		}
+		numberofitems = size_t(mynumofitems);
 
-        archive->Close();
-        return true;
+		archive->Close();
+		return true;
     }
 
     bool UsefulFunctions::GetItemsNames(const TString & archivePath,
         CompressionFormatEnum &format, size_t & numberofitems,
         std::vector<TString> & itemnames, std::vector<size_t> & origsizes)
     {
-    	FILE* fileStream = _tfopen(archivePath.c_str(), _T("rb"));
-		if (fileStream == NULL) {
-			return HRESULT_FROM_WIN32(GetLastError());
+		CMyComPtr< IStream > fileStream = FileSys::OpenFileToRead(archivePath);
+
+		if (fileStream == NULL)
+		{
+			return false;
+			//throw SevenZipException( StrFmt( _T( "Could not open archive \"%s\"" ), m_archivePath.c_str() ) );
 		}
 
-        CMyComPtr< IInArchive > archive = UsefulFunctions::GetArchiveReader(format);
-        CMyComPtr< InStreamWrapper > inFile = new InStreamWrapper(fileStream);
-        CMyComPtr< ArchiveOpenCallback > openCallback = new ArchiveOpenCallback();
+		CMyComPtr< IInArchive > archive = UsefulFunctions::GetArchiveReader(format);
+		CMyComPtr< InStreamWrapper > inFile = new InStreamWrapper(fileStream);
+		CMyComPtr< ArchiveOpenCallback > openCallback = new ArchiveOpenCallback();
 
-        HRESULT hr = archive->Open(inFile, 0, openCallback);
-        if (hr != S_OK)
-        {
-            return false;
-            //throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
-        }
+		HRESULT hr = archive->Open(inFile, 0, openCallback);
+		if (hr != S_OK)
+		{
+			return false;
+			//throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
+		}
 
-        UInt32 mynumofitems;
-        hr = archive->GetNumberOfItems(&mynumofitems);
-        if (hr != S_OK)
-        {
-            return false;
-            //throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
-        }
-        numberofitems = size_t(mynumofitems);
+		UInt32 mynumofitems;
+		hr = archive->GetNumberOfItems(&mynumofitems);
+		if (hr != S_OK)
+		{
+			return false;
+			//throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
+		}
+		numberofitems = size_t(mynumofitems);
 
-        itemnames.clear();
-        itemnames.resize(numberofitems);
+		itemnames.clear();
+		itemnames.resize(numberofitems);
 
-        origsizes.clear();
-        origsizes.resize(numberofitems);
+		origsizes.clear();
+		origsizes.resize(numberofitems);
 
-        for (UInt32 i = 0; i < numberofitems; i++)
-        {
-            {
-                // Get uncompressed size of file
-                CPropVariant prop;
-                hr = archive->GetProperty(i, kpidSize, &prop);
-                if (hr != S_OK)
-                {
-                    return false;
-                    //throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
-                }
+		for (UInt32 i = 0; i < numberofitems; i++)
+		{
+			{
+				// Get uncompressed size of file
+				CPropVariant prop;
+				hr = archive->GetProperty(i, kpidSize, &prop);
+				if (hr != S_OK)
+				{
+					return false;
+					//throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
+				}
 
-                int size = prop.intVal;
-                origsizes[i] = size_t(size);
+				int size = prop.intVal;
+				origsizes[i] = size_t(size);
 
-                // Get name of file
-                hr = archive->GetProperty(i, kpidPath, &prop);
-                if (hr != S_OK)
-                {
-                    return false;
-                    //throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
-                }
+				// Get name of file
+				hr = archive->GetProperty(i, kpidPath, &prop);
+				if (hr != S_OK)
+				{
+					return false;
+					//throw SevenZipException( GetCOMErrMsg( _T( "Open archive" ), hr ) );
+				}
 
-                //valid string? pass back the found value and call the callback function if set
-                if (prop.vt == VT_BSTR) {
-                    WCHAR* path = prop.bstrVal;
-                    std::wstring mypath(path);
-                    #ifdef _UNICODE
-                    itemnames[i] = mypath;
-                    #else
-                    itemnames[i] = ToString(mypath);
-                    #endif
-                    
-                }
-            }
-        }
+				//valid string? pass back the found value and call the callback function if set
+				if (prop.vt == VT_BSTR) {
+					WCHAR* path = prop.bstrVal;
+					std::wstring mypath(path);
+					#ifdef _UNICODE
+					itemnames[i] = mypath;
+					#else
+					itemnames[i] = ToString(mypath);
+					#endif//_UNICODE
+				}
+			}
+		}
 
-        archive->Close();
-        return true;
+		archive->Close();
+		return true;
     }
 
     bool UsefulFunctions::DetectCompressionFormat(const TString & archivePath,
         CompressionFormatEnum & archiveCompressionFormat)
     {
-#if defined(_UNICODE)
-		FILE* fileStream = _wfopen(archivePath.c_str(), L"rb");
-#else
-		FILE* fileStream = fopen(archivePath.c_str(), "rb");
-#endif
-        std::vector<CompressionFormatEnum> myAvailableFormats;
-        myAvailableFormats.reserve(12);
+		CMyComPtr< IStream > fileStream = FileSys::OpenFileToRead(archivePath);
 
-        //use default format as first.
-        myAvailableFormats.push_back(archiveCompressionFormat);
+		if (fileStream == NULL)
+		{
+			return false;
+			//throw SevenZipException( StrFmt( _T( "Could not open archive \"%s\"" ), m_archivePath.c_str() ) );
+		}
 
-        // Add more formats here if 7zip supports more formats in the future
-        myAvailableFormats.push_back(CompressionFormat::SevenZip);
-        myAvailableFormats.push_back(CompressionFormat::Lzma86);
-        myAvailableFormats.push_back(CompressionFormat::Lzma);
-        myAvailableFormats.push_back(CompressionFormat::Cab);
-        myAvailableFormats.push_back(CompressionFormat::Zip);
-//         myAvailableFormats.push_back(CompressionFormat::Rar);
-//         myAvailableFormats.push_back(CompressionFormat::BZip2);
-//         myAvailableFormats.push_back(CompressionFormat::Tar);
-//         myAvailableFormats.push_back(CompressionFormat::Iso);
+		std::vector<CompressionFormatEnum> myAvailableFormats;
+		myAvailableFormats.reserve(12);
 
-        for (size_t i = myAvailableFormats.size(); i > 0; --i)             {
-            if (myAvailableFormats[i - 1] == archiveCompressionFormat) {
-                myAvailableFormats.erase(myAvailableFormats.begin()+(i-1));
-                break;
-            }
-        }
+		//use default format as first.
+		myAvailableFormats.push_back(archiveCompressionFormat);
+
+		// Add more formats here if 7zip supports more formats in the future
+		myAvailableFormats.push_back(CompressionFormat::SevenZip);
+		myAvailableFormats.push_back(CompressionFormat::Lzma86);
+		myAvailableFormats.push_back(CompressionFormat::Lzma);
+		myAvailableFormats.push_back(CompressionFormat::Cab);
+		myAvailableFormats.push_back(CompressionFormat::Zip);
+		//         myAvailableFormats.push_back(CompressionFormat::Rar);
+		//         myAvailableFormats.push_back(CompressionFormat::BZip2);
+		//         myAvailableFormats.push_back(CompressionFormat::Tar);
+		//         myAvailableFormats.push_back(CompressionFormat::Iso);
+
+		for (size_t i = myAvailableFormats.size(); i > 0; --i)             {
+			if (myAvailableFormats[i - 1] == archiveCompressionFormat) {
+				myAvailableFormats.erase(myAvailableFormats.begin()+(i-1));
+				break;
+			}
+		}
 
         // Check each format for one that works
         CMyComPtr< ArchiveOpenCallback > openCallback = new ArchiveOpenCallback();

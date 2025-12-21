@@ -68,7 +68,7 @@ file(GLOB_RECURSE CURRENT_RC *.rc *.rc2)
 
 source_group("Header Files" FILES ${CURRENT_HEADERS})
 source_group("Source Files" FILES ${CURRENT_SRCS})
-source_group("SoUI Resouece" FILES ${CURRENT_SOUIS})
+source_group("SoUI Resource" FILES ${CURRENT_SOUIS})
 source_group("Resource Files" FILES ${CURRENT_RC})
 
 # 将生成的resource.h文件添加到项目中

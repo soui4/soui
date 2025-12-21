@@ -160,6 +160,24 @@ class SWindowFinder : public TObjRefImpl<ISwndFinder> {
      */
     void WINAPI CacheResultForID(IWindow *pParent, int nID, int nDeep, IWindow *pResult) override;
 
+    /**
+     * @brief 删除缓存
+     * @param pParent 父窗口指针
+     * @param nID 窗口ID
+     * @param nDeep 查找深度
+     * @return 删除成功返回true，否则返回false
+     */
+    BOOL WINAPI EraseCacheForID(IWindow *pParent, int nID, int nDeep) override;
+
+    /**
+     * @brief 删除缓存
+     * @param pParent 父窗口指针
+     * @param strName 窗口名称
+     * @param nDeep 查找深度
+     * @return 删除成功返回true，否则返回false
+     */
+    BOOL WINAPI EraseCacheForName(IWindow *pParent, LPCWSTR strName, int nDeep) override;
+
   protected:
     /**
      * @brief 通过查找信息查找子窗口

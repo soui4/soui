@@ -1318,7 +1318,7 @@ class SOUI_EXP SWindow
      * @brief Retrieves the bounding rectangle of the window.
      * @return CRect Bounding rectangle of the window.
      */
-    CRect GetWindowRect() const;
+    virtual CRect GetWindowRect() const;
 
     /**
      * @brief Retrieves the client rectangle of the window.

@@ -24,19 +24,16 @@ namespace SevenZip
 
     bool SevenZipLister::ListArchive(ListCallback* callback)
 	{
-#if  defined(_UNICODE)
-		FILE* fileStream = _wfopen(m_archivePath.c_str(), L"rb");
-#else
-		FILE* fileStream = fopen(m_archivePath.c_str(), "rb");
-#endif
-		if (fileStream == NULL) {
+		CMyComPtr< IStream > fileStream = FileSys::OpenFileToRead(m_archivePath);
+		if (fileStream == NULL)
+		{
 			return false;
 		}
 
 		return ListArchive(fileStream, callback);
 	}
 
-	bool SevenZipLister::ListArchive(FILE* archiveStream, ListCallback* callback)
+	bool SevenZipLister::ListArchive(const CMyComPtr< IStream >& archiveStream, ListCallback* callback)
 	{
 		CMyComPtr< IInArchive > archive = UsefulFunctions::GetArchiveReader(m_compressionFormat);
 		CMyComPtr< InStreamWrapper > inFile = new InStreamWrapper(archiveStream);
