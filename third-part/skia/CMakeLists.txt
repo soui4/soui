@@ -11,8 +11,13 @@ else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-deprecated-declarations")
     # 检查目标平台是否为ARM
     if(BUILD_FOR_ARM)
-        set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a+simd")
-        set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+simd")
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a+simd")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+simd")
+        else()
+            set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv7-a+neon")
+            set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a+neon")
+        endif()
     else(BUILD_FOR_ARM)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
     endif(BUILD_FOR_ARM)
@@ -966,63 +971,56 @@ else()
 endif()
 #message("...........plat....${CMAKE_GENERATOR_PLATFORM}")
 if(BUILD_FOR_ARM)
-if(MSVC)
-set(srcs
-    ${srcs}
-    "src/opts/SkXfermode_opts_none.cpp"
-    "src/opts/SkBitmapProcState_opts_none.cpp"
-    "src/opts/SkBlitRow_opts_none.cpp"
-    "src/opts/SkBlurImage_opts_none.cpp"
-    "src/opts/SkMorphology_opts_none.cpp"
-    "src/opts/SkUtils_opts_none.cpp"
-    "src/opts/SkBlitMask_opts_none.cpp"
-)
+    if(MSVC)
+        set(srcs
+            ${srcs}
+            "src/opts/SkXfermode_opts_none.cpp"
+            "src/opts/SkBitmapProcState_opts_none.cpp"
+            "src/opts/SkBlitRow_opts_none.cpp"
+            "src/opts/SkBlurImage_opts_none.cpp"
+            "src/opts/SkMorphology_opts_none.cpp"
+            "src/opts/SkUtils_opts_none.cpp"
+            "src/opts/SkBlitMask_opts_none.cpp"
+        )
+    else()
+        set(srcs
+            ${srcs}
+            "src/opts/memset.arm.S"
+        #    "src/opts/memset16_neon.S"
+        #    "src/opts/memset32_neon.S"
+            "src/opts/SkBitmapProcState_arm_neon.cpp"
+            "src/opts/SkBitmapProcState_matrixProcs_neon.cpp"
+            "src/opts/SkBitmapProcState_opts_arm.cpp"
+            "src/opts/SkBlitMask_opts_arm_neon.cpp"
+            "src/opts/SkBlitMask_opts_arm.cpp"
+            "src/opts/SkBlitRow_opts_arm_neon.cpp"
+            "src/opts/SkBlitRow_opts_arm.cpp"
+            "src/opts/SkBlurImage_opts_arm.cpp"
+            "src/opts/SkBlurImage_opts_neon.cpp"
+            "src/opts/SkMorphology_opts_arm.cpp"
+            "src/opts/SkMorphology_opts_neon.cpp"
+            "src/opts/SkTextureCompression_opts_arm.cpp"
+            "src/opts/SkTextureCompression_opts_neon.cpp"
+            "src/opts/SkUtils_opts_arm.cpp"
+            "src/opts/SkXfermode_opts_arm_neon.cpp"
+            "src/opts/SkXfermode_opts_arm.cpp"
+        )
+    endif(MSVC)
 else()
-set(srcs
-    ${srcs}
-    "src/opts/memset.arm.S"
-#    "src/opts/memset16_neon.S"
-#    "src/opts/memset32_neon.S"
-    "src/opts/SkBitmapProcState_arm_neon.cpp"
-    "src/opts/SkBitmapProcState_matrixProcs_neon.cpp"
-    "src/opts/SkBitmapProcState_opts_arm.cpp"
-    "src/opts/SkBlitMask_opts_arm_neon.cpp"
-    "src/opts/SkBlitMask_opts_arm.cpp"
-    "src/opts/SkBlitRow_opts_arm_neon.cpp"
-    "src/opts/SkBlitRow_opts_arm.cpp"
-    "src/opts/SkBlurImage_opts_arm.cpp"
-    "src/opts/SkBlurImage_opts_neon.cpp"
-    "src/opts/SkMorphology_opts_arm.cpp"
-    "src/opts/SkMorphology_opts_neon.cpp"
-    "src/opts/SkTextureCompression_opts_arm.cpp"
-    "src/opts/SkTextureCompression_opts_neon.cpp"
-    "src/opts/SkUtils_opts_arm.cpp"
-    "src/opts/SkXfermode_opts_arm_neon.cpp"
-    "src/opts/SkXfermode_opts_arm.cpp"
-#    "src/opts/SkXfermode_opts_none.cpp"
-#    "src/opts/SkBitmapProcState_opts_none.cpp"
-#    "src/opts/SkBlitRow_opts_none.cpp"
-#    "src/opts/SkBlurImage_opts_none.cpp"
-#    "src/opts/SkMorphology_opts_none.cpp"
-#    "src/opts/SkUtils_opts_none.cpp"
-#    "src/opts/SkBlitMask_opts_none.cpp"
-)
-endif(MSVC)
-else()
-set(srcs
-    ${srcs}
-    "src/opts/opts_check_x86.cpp"
-    "src/opts/SkXfermode_opts_SSE2.cpp"
-    "src/opts/SkBitmapFilter_opts_SSE2.cpp"
-    "src/opts/SkBitmapProcState_opts_SSE2.cpp"
-    "src/opts/SkBitmapProcState_opts_SSSE3.cpp"
-    "src/opts/SkBlitRect_opts_SSE2.cpp"
-    "src/opts/SkBlitRow_opts_SSE2.cpp"
-    "src/opts/SkBlurImage_opts_SSE2.cpp"
-    "src/opts/SkBlurImage_opts_SSE4.cpp"
-    "src/opts/SkMorphology_opts_SSE2.cpp"
-    "src/opts/SkUtils_opts_SSE2.cpp"
-)
+    set(srcs
+        ${srcs}
+        "src/opts/opts_check_x86.cpp"
+        "src/opts/SkXfermode_opts_SSE2.cpp"
+        "src/opts/SkBitmapFilter_opts_SSE2.cpp"
+        "src/opts/SkBitmapProcState_opts_SSE2.cpp"
+        "src/opts/SkBitmapProcState_opts_SSSE3.cpp"
+        "src/opts/SkBlitRect_opts_SSE2.cpp"
+        "src/opts/SkBlitRow_opts_SSE2.cpp"
+        "src/opts/SkBlurImage_opts_SSE2.cpp"
+        "src/opts/SkBlurImage_opts_SSE4.cpp"
+        "src/opts/SkMorphology_opts_SSE2.cpp"
+        "src/opts/SkUtils_opts_SSE2.cpp"
+    )
 endif()
 
 source_group("Header Files" FILES ${headers})
