@@ -28,15 +28,6 @@ set_source_files_properties(${CURRENT_RC} PROPERTIES OBJECT_DEPENDS "${CURRENT_U
 set(RESBUILD_EXE $<TARGET_FILE:uiresbuilder>)
 # 将生成的resource.h文件添加到项目中
 set(UIRES_RES_HEADER ${CMAKE_CURRENT_SOURCE_DIR}/res/resource.h)
-# 添加自定义命令来处理uires.idx文件
-# 这将使用uiresbuilder工具将资源索引文件转换为resource.h 
-add_custom_command(
-    OUTPUT ${UIRES_RES_HEADER}
-    COMMAND ${RESBUILD_EXE} -i ${CMAKE_CURRENT_SOURCE_DIR}/uires/uires.idx -p ${CMAKE_CURRENT_SOURCE_DIR}/uires -r ${CMAKE_CURRENT_SOURCE_DIR}/res/soui_res.rc2 -h ${CMAKE_CURRENT_SOURCE_DIR}/res/resource.h idtable
-    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/uires/uires.idx ${CURRENT_SOUIS}
-    COMMENT "Processing uires.idx to generate soui_res.rc2"
-    VERBATIM
-)
 
 # 确保在构建时会处理uires.idx文件
 set_source_files_properties(${UIRES_RES_HEADER} PROPERTIES GENERATED TRUE)

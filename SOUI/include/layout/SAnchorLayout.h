@@ -164,7 +164,7 @@ class SOUI_EXP SAnchorLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     DEF_SOBJECT(SObjectImpl<ILayout>, L"Anchor")
 
   public:
-    typedef POINT (*PFN_Position2Point)(const AnchorPos &pos, const CRect &rcParent, const CSize &szChild, int nScale, void *userData);
+    typedef POINT (CALLBACK * PFN_Position2Point)(const AnchorPos &pos, const CRect &rcParent, const CSize &szChild, int nScale, void *userData);
 
     /**
      * @brief 构造函数
@@ -216,7 +216,7 @@ class SOUI_EXP SAnchorLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
         return m_pfnPosition2Point;
     }
 
-    static POINT DefaultPosition2Point(const AnchorPos &pos, const CRect &rcParent, const CSize &szChild, int nScale, void *userData);
+    static POINT CALLBACK DefaultPosition2Point(const AnchorPos &pos, const CRect &rcParent, const CSize &szChild, int nScale, void *userData);
 
   protected:
     static CPoint Anchor2Pos(const CRect &rcParent, int type);
