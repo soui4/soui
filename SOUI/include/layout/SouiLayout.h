@@ -12,11 +12,12 @@ SNSBEGIN
  * @brief Soui布局参数类
  */
 class SouiLayoutParam
-    : public TObjRefImpl<SObjectImpl<ILayoutParam> >
-    , protected SouiLayoutParamStruct {
+    : public TObjRefImpl<SObjectImpl<ILayoutParam>>
+    , public SouiLayoutParamStruct {
     DEF_SOBJECT(SObjectImpl<ILayoutParam>, L"SouiLayoutParam")
 
     friend class SouiLayout;
+
   public:
     /**
      * @brief 构造函数
@@ -111,6 +112,7 @@ class SouiLayoutParam
      * @return 额外大小
      */
     int GetExtraSize(ORIENTATION orientation, int nScale) const;
+
   protected:
     /**
      * @brief 处理宽度属性
@@ -192,7 +194,7 @@ class SouiLayoutParam
  * @class SouiLayout
  * @brief Soui布局类
  */
-class SOUI_EXP SouiLayout : public TObjRefImpl<SObjectImpl<ILayout> > {
+class SOUI_EXP SouiLayout : public TObjRefImpl<SObjectImpl<ILayout>> {
     DEF_SOBJECT(SObjectImpl<ILayout>, L"SouiLayout")
 
   public:

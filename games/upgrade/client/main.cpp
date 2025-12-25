@@ -66,7 +66,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
         MyProfile *pMyProfile = new MyProfile();
 
         SAutoRefPtr<SGameTheme> theme(new SGameTheme(),FALSE);
-        SStringT themeDir = app.GetAppDir() + _T("/def_theme");
+        SStringT themeDir = app.GetAppDir() + _T("/upgrade/def_theme");
         if(GetFileAttributes(themeDir) == INVALID_FILE_ATTRIBUTES)
         {
             themeDir = srcDir + _T("/def_theme");

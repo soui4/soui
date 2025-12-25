@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<page name="room_container" title="@string/lobby" layout="vbox">
+ <tileview name="tileview_lobby" size="-2,0" weight="1" wantTab="1" marginSize="5" sbFadeFrames="30" align="center">
+    <template itemWidth="200" itemHeight="180" layout="vbox" gravity="center" skin="skin_item_bk">
+        <window size="-2,0" weight="1"  layout="hbox" gravity="center">
+            <button size="0,-2" weight="1" name="seat_0" id="10" text="0" cursor="hand">
+                <img name="seat_ready" skin="skin_handup" visible="0"/>
+            </button>
+            <img skin="skin_table">
+                <img name="img_playing" pos="|0,|-10" offset="-0.5,-0.5" skin="skin_playing" visible="0"/>
+            </img>
+            <button size="0,-2" weight="1" name="seat_1" id="11" text="1" cursor="hand">
+                <img name="seat_ready" skin="skin_handup" visible="0"/>
+            </button>
+        </window>
+        <text name="txt_table_id" text="table id" />
+    </template>
+ </tileview>
+ <window size="-2,-1" layout="hbox" interval="5">
+    <text text="游戏规则:"/>
+    <text name="txt_table_info" size="-2,-1"/>
+ </window>
+</page>

@@ -31,6 +31,6 @@
 #include <control/SSearchDropdownList.h>
 #ifdef _WIN32
 #include <control/SActiveX.h>
-#endif//_WIN32
+#endif //_WIN32
 
 #endif // __SOUICTRLS__H__

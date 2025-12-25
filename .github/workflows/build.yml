@@ -60,7 +60,7 @@ jobs:
 
     - name: Install dependencies (Ubuntu)
       if: startsWith(matrix.dist, 'ubuntu')
-      run: sudo apt-get update && sudo apt install -y cmake  build-essential gperf libxcb1-dev libgl1-mesa-dev freeglut3-dev pkg-config --fix-missing
+      run: sudo apt-get update && sudo apt install -y cmake  build-essential libxcb1-dev libxcb-render0-dev uuid-dev libasound2-dev libgl1-mesa-dev freeglut3-dev pkg-config --fix-missing
 
     - name: Install dependencies (macOS)
       if: matrix.os == 'macOS'

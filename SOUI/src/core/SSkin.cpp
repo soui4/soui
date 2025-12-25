@@ -59,13 +59,16 @@ void SSkinImgList::_DrawByIndex(IRenderTarget *pRT, LPCRECT rcDraw, int iState, 
         OffsetRect(&rcSrc, 0, iState * sz.cy);
     else
         OffsetRect(&rcSrc, iState * sz.cx, 0);
-    if(m_bTile){
-        SAutoRefPtr<IBrushS> brush,oldBrush;
-        pRT->CreateBitmapBrush(GetImage(),kRepeat_TileMode, kRepeat_TileMode, &brush);
-        pRT->SelectObject(brush,(IRenderObj**)&oldBrush);
+    if (m_bTile)
+    {
+        SAutoRefPtr<IBrushS> brush, oldBrush;
+        pRT->CreateBitmapBrush(GetImage(), kRepeat_TileMode, kRepeat_TileMode, &brush);
+        pRT->SelectObject(brush, (IRenderObj **)&oldBrush);
         pRT->FillRectangle(rcDraw);
-        pRT->SelectObject(oldBrush,NULL);
-    }else{
+        pRT->SelectObject(oldBrush, NULL);
+    }
+    else
+    {
         pRT->DrawBitmapEx(rcDraw, GetImage(), &rcSrc, GetExpandMode(), byAlpha);
     }
 }
@@ -153,7 +156,7 @@ void SSkinImgList::_Scale(ISkinObj *skinObj, int nScale)
     pRet->m_state2Index = m_state2Index;
     pRet->m_bLazyLoad = FALSE;
 
-    CSize szSkin = GetSkinSize();
+    CSize szSkin = SSkinImgList::GetSkinSize(); // add SSkinImgList:: to avoid call function implemented in derived class
     szSkin.cx = MulDiv(szSkin.cx, nScale, GetScale());
     szSkin.cy = MulDiv(szSkin.cy, nScale, GetScale());
     if (m_bVertical)

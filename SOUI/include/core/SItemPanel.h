@@ -144,6 +144,7 @@ class SOUI_EXP SOsrPanel
     STDMETHOD_(int, RemoveTasksForObject)(THIS_ void *pObj) OVERRIDE;
     STDMETHOD_(BOOL, IsTimelineEnabled)(CTHIS) SCONST OVERRIDE;
     STDMETHOD_(BOOL, IsDesignerMode)(CTHIS) SCONST OVERRIDE;
+
   public: // SWindow
     virtual LRESULT DoFrameEvent(UINT uMsg, WPARAM wParam, LPARAM lParam);
     virtual void ModifyItemState(DWORD dwStateAdd, DWORD dwStateRemove);

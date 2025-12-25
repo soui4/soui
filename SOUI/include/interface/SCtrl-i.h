@@ -42,6 +42,5 @@ DECLARE_INTERFACE_(ICtrl, IObjRef)
     STDMETHOD_(IWindow *, ToIWindow)(THIS) PURE;
 };
 
-
 SNSEND
 #endif // __SCTRL_I__H__

@@ -15,57 +15,75 @@
     </caption>
     
     <!-- 主内容区域 -->
-    <tabctrl size="-2,0" weight="1" padding="10,10,10,10" tabAlign="top" tabHeight="30" tabWidth="200">
-      <page title="anchor animation" layout="anchor" enableLayer="1">
-         <window size="100,100" colorBkgnd="#ff0000" text="left top" pos="0,0,0" offset="0,0" name="win_left_top"/>
-         <window size="100,100" colorBkgnd="#00ff00" text="right top" pos="0,0,2" offset="-1,0" name="win_right_top"/>
-         <window size="100,100" colorBkgnd="#0000ff" text="left bottom" pos="0,0,6" offset="0,-1" name="win_left_bottom"/>
-         <window size="100,100" colorBkgnd="#ff00ff" text="right bottom" pos="0,0,8" offset="-1,-1" name="win_right_bottom"/>
-         <window size="100,100" colorBkgnd="#ffff00" text="center" pos="0,0,4" offset="-0.5,-0.5" name="win_center" layer="-1"/>
-         <button name="btn_ani" size="100,30" text="animate" pos="0,0,1" offset="-0.5,0"/>
-      </page>
-      <page title="layout animation" layout="vbox">
-      <!-- 说明文字 -->
-      <text size="-2,40" multiLines="1" colorText="#333333" font="size:14">
-        这个演示展示了SOUI新的Android风格布局动画API。点击下面的按钮来测试不同类型的动画效果。
-      </text>
-      
-      <!-- 动画演示区域 -->
-      <window size="-2,0" weight="1" colorBkgnd="#f5f5f5" colorBorder="#cccccc" margin="0,10,0,10" padding="10,10,10,10">
-        <text pos="5,5" colorText="#666666" font="size:12">动画演示区域 (线性布局)</text>
-        
-        <!-- 线性布局容器 -->
-        <window name="linear_container" pos="10,30,-10,-10" layout="linearLayout" orientation="horizontal" interval="10">
-          <!-- 静态窗口1 -->
-          <window colorBkgnd="#ff6b6b" width="80dp" height="60dp" weight="1">
-            <text pos="5,5,-5,-5" colorText="white" align="center">静态1</text>
-          </window>
-          
-          <!-- 动画目标窗口 -->
-          <window name="animation_target" colorBkgnd="#4ecdc4" width="100dp" height="60dp" weight="1">
-            <text pos="5,5,-5,-5" colorText="white" align="center" multiLines="1">动画目标</text>
-          </window>
-          
-          <!-- 静态窗口2 -->
-          <window colorBkgnd="#45b7d1" width="80dp" height="60dp" weight="1">
-            <text pos="5,5,-5,-5" colorText="white" align="center">静态2</text>
-          </window>
-        </window>
-      </window>
-      
-      <!-- 控制按钮区域 -->
-      <window size="-2,-1" layout="vbox" padding="0,10,0,0">
-        <text size="-2,25" colorText="#333333" font="size:16,weight:bold">动画控制按钮:</text>
-        <!-- 第一行按钮 -->
-        <window size="-2,45" layout="hbox" interval="10" margin="0,10,0,5">
-          <button name="btn_width_anim" size="120,35" skin="skin_btn_blue">宽度动画</button>
-          <button name="btn_height_anim" size="120,35" skin="skin_btn_green">高度动画</button>
-          <button name="btn_size_anim" size="120,35" skin="skin_btn_red">大小动画</button>
-          <button name="btn_weight_anim" size="120,35" skin="skin_btn_orange">权重动画</button>
-          <button name="btn_multi_anim" size="150,35" skin="skin_btn_purple">多属性动画</button>
-        </window>
-      </window>
-      </page>
-    </tabctrl>
+	  <tabctrl size="-2,0" weight="1" padding="10,10,10,10" tabAlign="top" tabHeight="30" tabWidth="200">
+		  <page title="anchor animation" layout="anchor" enableLayer="1">
+			  <window size="100,100" colorBkgnd="#ff0000" text="left top" pos="0,0,0" offset="0,0" name="win_left_top"/>
+			  <window size="100,100" colorBkgnd="#00ff00" text="right top" pos="0,0,2" offset="-1,0" name="win_right_top"/>
+			  <window size="100,100" colorBkgnd="#0000ff" text="left bottom" pos="0,0,6" offset="0,-1" name="win_left_bottom"/>
+			  <window size="100,100" colorBkgnd="#ff00ff" text="right bottom" pos="0,0,8" offset="-1,-1" name="win_right_bottom"/>
+			  <window size="100,100" colorBkgnd="#ffff00" text="center" pos="0,0,4" offset="-0.5,-0.5" name="win_center" layer="-1"/>
+			  <button name="btn_ani" size="100,30" text="animate" pos="0,0,1" offset="-0.5,0"/>
+		  </page>
+		  <page title="layout animation" layout="vbox">
+			  <!-- 说明文字 -->
+			  <text size="-2,40" multiLines="1" colorText="#333333" font="size:14">
+				  这个演示展示了SOUI新的Android风格布局动画API。点击下面的按钮来测试不同类型的动画效果。
+			  </text>
+
+			  <!-- 动画演示区域 -->
+			  <window size="-2,0" weight="1" colorBkgnd="#f5f5f5" colorBorder="#cccccc" margin="0,10,0,10" padding="10,10,10,10">
+				  <text pos="5,5" colorText="#666666" font="size:12">动画演示区域 (线性布局)</text>
+
+				  <!-- 线性布局容器 -->
+				  <window name="linear_container" pos="10,30,-10,-10" layout="linearLayout" orientation="horizontal" interval="10">
+					  <!-- 静态窗口1 -->
+					  <window colorBkgnd="#ff6b6b" width="80dp" height="60dp" weight="1">
+						  <text pos="5,5,-5,-5" colorText="white" align="center">静态1</text>
+					  </window>
+
+					  <!-- 动画目标窗口 -->
+					  <window name="animation_target" colorBkgnd="#4ecdc4" width="100dp" height="60dp" weight="1">
+						  <text pos="5,5,-5,-5" colorText="white" align="center" multiLines="1">动画目标</text>
+					  </window>
+
+					  <!-- 静态窗口2 -->
+					  <window colorBkgnd="#45b7d1" width="80dp" height="60dp" weight="1">
+						  <text pos="5,5,-5,-5" colorText="white" align="center">静态2</text>
+					  </window>
+				  </window>
+			  </window>
+
+			  <!-- 控制按钮区域 -->
+			  <window size="-2,-1" layout="vbox" padding="0,10,0,0">
+				  <text size="-2,25" colorText="#333333" font="size:16,weight:bold">动画控制按钮:</text>
+				  <!-- 第一行按钮 -->
+				  <window size="-2,45" layout="hbox" interval="10" margin="0,10,0,5">
+					  <button name="btn_width_anim" size="120,35" >宽度动画</button>
+					  <button name="btn_height_anim" size="120,35">高度动画</button>
+					  <button name="btn_size_anim" size="120,35" >大小动画</button>
+					  <button name="btn_weight_anim" size="120,35" >权重动画</button>
+					  <button name="btn_multi_anim" size="150,35">多属性动画</button>
+				  </window>
+			  </window>
+		  </page>
+		  <page title="animator set" layout="vbox" gravity="center" interval="10">
+			  <text colorText="#333333" font="size:14">
+				  AnimatorSet演示 - 点击下面的按钮来测试不同的动画编排模式
+			  </text>
+			  <window size="-2,0" weight="1" layout="anchor" enableLayer="1">
+				  <window size="100,100" colorBkgnd="#ff0000" text="left top" pos="0,0,0" offset="0,0" name="set_left_top"/>
+				  <window size="100,100" colorBkgnd="#00ff00" text="right top" pos="0,0,2" offset="-1,0" name="set_right_top"/>
+				  <window size="100,100" colorBkgnd="#0000ff" text="left bottom" pos="0,0,6" offset="0,-1" name="set_left_bottom"/>
+				  <window size="100,100" colorBkgnd="#ff00ff" text="right bottom" pos="0,0,8" offset="-1,-1" name="set_right_bottom"/>
+			  </window>
+			  <!-- 按钮行 -->
+			  <window size="-2,40" layout="hbox" interval="10">
+				  <button name="btn_parallel_anim" size="150,35">并行执行</button>
+				  <button name="btn_sequential_anim" size="150,35">串行执行</button>
+				  <button name="btn_complex_anim" size="150,35">复杂依赖</button>
+          <button name="btn_set_restore" size="150,35">还原</button>
+			  </window>
+		  </page>
+	  </tabctrl>
   </root>
 </SOUI>

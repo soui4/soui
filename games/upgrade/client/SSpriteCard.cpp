@@ -110,7 +110,7 @@ class CMovingCardMgr : public IAnimatorListener {
     }
     STDMETHOD_(void, onAnimationEnd)(THIS_ IValueAnimator *pAnimator) override
     {
-        SPropertyAnimator *pPropAnimator = sobj_cast<SPropertyAnimator>(pAnimator);
+        IPropertyAnimator *pPropAnimator = sobj_cast<IPropertyAnimator>(pAnimator);
         SASSERT(pPropAnimator);
         IWindow *pTarget = pPropAnimator->GetTarget();
         m_mapMovingCards.RemoveKey(pTarget);
@@ -242,7 +242,7 @@ void SSpriteCard::OnMouseMove(UINT nFlags, CPoint pt)
 }
 
 //------------------------------------------------------------------------
-SAutoRefPtr<IValueAnimator> Util::OffsetSprite(IWindow *pCard, int dx, int dy, int nSpeed)
+SAutoRefPtr<IValueAnimator> Util::OffsetSprite(IWindow *pCard, float dx, float dy, int nSpeed)
 {
     ILayoutParam *pParam = (ILayoutParam*)pCard->GetLayoutParam();
     SASSERT(pParam->IsClass(SAnchorLayoutParam::GetClassName()));

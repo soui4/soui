@@ -3,11 +3,10 @@
 #define kLogTag "WsServer"
 
 SNSBEGIN
-WsServer::WsServer(ISvrListener *pListener, const WsCfg &cfg)
+WsServer::WsServer(ISvrListener *pListener)
     : m_pListener(pListener)
     , m_context(nullptr)
     , m_finished(true)
-    , m_cfg(cfg)
 {
 }
 
@@ -29,10 +28,10 @@ static bool load_file(const char *pszPath_u8, std::string &buf)
     return true;
 }
 #endif
-int WsServer::start(uint16_t port, const char *protocolName_, SvrOption option)
+int WsServer::start(uint16_t port, const char *protocolName_, SvrOption option, SvrPingCfg pingCfg)
 {
     m_protocolName = protocolName_;
-
+    m_cfg = pingCfg;
     lws_protocols protocols[] = { { m_protocolName.c_str(), &WsServer::cb_lws, sizeof(void*), kSocketBufSize, 0, nullptr, kSocketBufSize },
                                   {
                                       nullptr, nullptr, 0, 0, 0, nullptr, 0 // Quasi null terminator

@@ -3,6 +3,7 @@
 /////////////////////////////////////////////////////////////////////////////
 #pragma once
 #include <valueAnimator/SPropertyAnimator.h>
+#include <valueAnimator/SAnimatorSet.h>
 
 class CMainDlg : public SHostWnd
 			   , public SDpiHandler<CMainDlg>
@@ -26,6 +27,12 @@ public:
 	void OnMultiPropertyAnimation();
 	void OnBtnAnimation();
 
+	// AnimatorSet演示方法
+	void OnParallelAnimation();
+	void OnSequentialAnimation();
+	void OnComplexAnimatorSetAnimation();
+	void OnBtnSetRestore();
+
 protected:
 	//soui消息
 	EVENT_MAP_BEGIN()
@@ -41,6 +48,12 @@ protected:
 		EVENT_NAME_COMMAND(L"btn_weight_anim", OnWeightAnimation)
 		EVENT_NAME_COMMAND(L"btn_multi_anim", OnMultiPropertyAnimation)
 		EVENT_NAME_COMMAND(L"btn_ani", OnBtnAnimation)
+
+		// AnimatorSet动画事件
+		EVENT_NAME_COMMAND(L"btn_parallel_anim", OnParallelAnimation)
+		EVENT_NAME_COMMAND(L"btn_sequential_anim", OnSequentialAnimation)
+		EVENT_NAME_COMMAND(L"btn_complex_anim", OnComplexAnimatorSetAnimation)
+		EVENT_NAME_COMMAND(L"btn_set_restore", OnBtnSetRestore) // 还原动画集演示窗口的位置
 	EVENT_MAP_END2(SHostWnd)
 		
 	//HostWnd真实窗口消息处理
@@ -57,4 +70,5 @@ private:
 	SWindow *m_pAnimationTarget;  // 动画目标窗口
 	SAutoRefPtr<IValueAnimator> m_runningAnimator1;// 正在运行的动画
 	SAutoRefPtr<IValueAnimator> m_runningAnimator2;// 正在运行的动画
+	SAutoRefPtr<SAnimatorSet> m_runningAnimatorSet;// 正在运行的动画集
 };

@@ -169,8 +169,10 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
 
 	// 启动服务器
 	SvrOption option = { FALSE, NULL, NULL }; // 非安全连接
+    SvrPingCfg pingCfg = { 50, 100, 10 };
+
     SLOGI() << "Started on port:" << uPort;
-	int nRet = m_pWsServer->start(uPort, "upgrade", option);
+	int nRet = m_pWsServer->start(uPort, "upgrade", option, pingCfg);
 	if (nRet != 0)
 		return FALSE;
     bool bFinish = m_pWsServer->wait(-1);
@@ -244,8 +246,8 @@ void CWebSocketGame::RemoveClient(ISvrConnection* pConn)
 		return;
     }
 
-    int iTable = id / 4;
-    int iSeat = id % 4;
+    int iTable = id / PLAYER_COUNT;
+    int iSeat = id % PLAYER_COUNT;
     auto it = m_tableClients.find(iTable);
 	if (it == m_tableClients.end())
         return; // unknown client
@@ -269,8 +271,8 @@ void CWebSocketGame::ProcessReceivedData(ISvrConnection* pConn, const void* data
 	}
 	int id = pConn->getId();
 	if(id != -1){
-		int iTable = id / 4;
-		int iSeat = id % 4;
+        int iTable = id / PLAYER_COUNT;
+        int iSeat = id % PLAYER_COUNT;
 		auto it = m_tableClients.find(iTable);
 		if (it == m_tableClients.end())
 		{
@@ -418,6 +420,10 @@ BOOL CWebSocketGame::ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSiz
         auto it = m_tableClients.find(nTable);
         it->second->OnPlayerLeave(nSeat, pClient);
 		pClient->m_bReady = FALSE;
+        if (it->second->GetPlayerCount() == 0)
+        { // dismiss the table
+            m_tableClients.erase(it);
+        }
 	}
     // remove client from temp list
     for (auto it = m_tmpClients.begin(); it != m_tmpClients.end(); ++it)

@@ -7,7 +7,8 @@ SNSBEGIN
 
 SValueAnimator::SValueAnimator()
     : mContainer(NULL)
-    ,m_pUserData(NULL)
+    , m_pUserData(NULL)
+    , _this_for_callback(this)
 {
     sDurationScale = 1.0f;
     mStartTime = -1;
@@ -51,8 +52,8 @@ SValueAnimator::~SValueAnimator()
 
 void SValueAnimator::addAnimationCallback()
 {
-    SASSERT(mContainer);
-    mContainer->RegisterValueAnimator(this);//this value animator will holded by mContainer.
+    if(mContainer)
+        mContainer->RegisterValueAnimator(this); // this value animator will holded by mContainer.
 }
 
 void SValueAnimator::removeAnimationCallback()
@@ -62,13 +63,13 @@ void SValueAnimator::removeAnimationCallback()
         AddRef();
         mContainer->UnregisterValueAnimator(this);
         mContainer = NULL;
-        Release();//may be call deconstructor here.
+        Release(); // may be call deconstructor here.
     }
 }
 
 void SValueAnimator::OnNextFrame()
 {
-    doAnimationFrame(STime::GetCurrentTimeMs());
+    commitAnimationFrame(STime::GetCurrentTimeMs());
 }
 
 void SValueAnimator::copy(const IValueAnimator *pSrc)
@@ -92,7 +93,7 @@ void SValueAnimator::animateValue(float fraction)
     size_t numListeners = mUpdateListeners.GetCount();
     for (size_t i = 0; i < numListeners; ++i)
     {
-        mUpdateListeners[i]->onAnimationUpdate(this);
+        mUpdateListeners[i]->onAnimationUpdate(_this_for_callback);
     }
 }
 
@@ -101,7 +102,97 @@ float SValueAnimator::getAnimatedFraction() const
     return mCurrentFraction;
 }
 
-bool SValueAnimator::doAnimationFrame(uint64_t frameTime)
+bool SValueAnimator::isInitialized()
+{
+    return mInitialized;
+}
+
+void SValueAnimator::skipToEndValue(bool inReverse)
+{
+    float endFraction = inReverse ? 0.f : 1.f;
+    if (mRepeatCount % 2 == 1 && mRepeatMode == REVERSE)
+    {
+        // This would end on fraction = 0
+        endFraction = 0.f;
+    }
+    animateValue(endFraction);
+}
+
+void SValueAnimator::animateBasedOnPlayTime(long currentPlayTime, long lastPlayTime, bool inReverse)
+{
+    if (currentPlayTime < 0 || lastPlayTime < 0)
+    {
+        return; // error
+    }
+    // Check whether repeat callback is needed only when repeat count is non-zero
+    if (mRepeatCount > 0)
+    {
+        int iteration = (int)(currentPlayTime / mDuration);
+        int lastIteration = (int)(lastPlayTime / mDuration);
+
+        // Clamp iteration to [0, mRepeatCount]
+        iteration = smin(iteration, mRepeatCount);
+        lastIteration = smin(lastIteration, mRepeatCount);
+
+        if (iteration != lastIteration)
+        {
+            size_t numListeners = mListeners.GetCount();
+            for (size_t i = 0; i < numListeners; ++i)
+            {
+                mListeners[i]->onAnimationRepeat(_this_for_callback);
+            }
+        }
+    }
+
+    if (mRepeatCount != INFINITE && currentPlayTime >= (mRepeatCount + 1) * mDuration)
+    {
+        skipToEndValue(inReverse);
+    }
+    else
+    {
+        // Find the current fraction:
+        float fraction = currentPlayTime / (float)mDuration;
+        fraction = getCurrentIterationFraction(fraction, inReverse);
+        animateValue(fraction);
+    }
+}
+
+bool SValueAnimator::animateBasedOnTime(uint64_t currentTime)
+{
+    bool done = false;
+    if (mRunning)
+    {
+        long scaledDuration = getScaledDuration();
+        float fraction = scaledDuration > 0 ? (float)(currentTime - mStartTime) / scaledDuration : 1.f;
+        float lastFraction = mOverallFraction;
+        bool newIteration = (int)fraction > (int)lastFraction;
+        bool lastIterationFinished = (fraction >= mRepeatCount + 1) && (mRepeatCount != INFINITE);
+        if (scaledDuration == 0)
+        {
+            // 0 duration animator, ignore the repeat count and skip to the end
+            done = true;
+        }
+        else if (newIteration && !lastIterationFinished)
+        {
+            // Time to repeat
+            SArray<IAnimatorListener *> tmpListeners = mListeners;
+            for (UINT i = 0; i < tmpListeners.GetCount(); i++)
+            {
+                tmpListeners[i]->onAnimationRepeat(_this_for_callback);
+            }
+        }
+        else if (lastIterationFinished)
+        {
+            done = true;
+        }
+        mOverallFraction = clampFraction(fraction);
+        float currentIterationFraction = getCurrentIterationFraction(mOverallFraction, mReversing);
+        animateValue(currentIterationFraction);
+    }
+    return done;
+}
+
+BOOL SValueAnimator::commitAnimationFrame(uint64_t frameTime)
 {
     if (mStartTime < 0)
     {
@@ -155,109 +246,6 @@ bool SValueAnimator::doAnimationFrame(uint64_t frameTime)
     return finished;
 }
 
-bool SValueAnimator::isInitialized()
-{
-    return mInitialized;
-}
-
-void SValueAnimator::skipToEndValue(bool inReverse)
-{
-    float endFraction = inReverse ? 0.f : 1.f;
-    if (mRepeatCount % 2 == 1 && mRepeatMode == REVERSE)
-    {
-        // This would end on fraction = 0
-        endFraction = 0.f;
-    }
-    animateValue(endFraction);
-}
-
-void SValueAnimator::animateBasedOnPlayTime(long currentPlayTime, long lastPlayTime, bool inReverse)
-{
-    if (currentPlayTime < 0 || lastPlayTime < 0)
-    {
-        return; // error
-    }
-    // Check whether repeat callback is needed only when repeat count is non-zero
-    if (mRepeatCount > 0)
-    {
-        int iteration = (int)(currentPlayTime / mDuration);
-        int lastIteration = (int)(lastPlayTime / mDuration);
-
-        // Clamp iteration to [0, mRepeatCount]
-        iteration = smin(iteration, mRepeatCount);
-        lastIteration = smin(lastIteration, mRepeatCount);
-
-        if (iteration != lastIteration)
-        {
-            size_t numListeners = mListeners.GetCount();
-            for (size_t i = 0; i < numListeners; ++i)
-            {
-                mListeners[i]->onAnimationRepeat(this);
-            }
-        }
-    }
-
-    if (mRepeatCount != INFINITE && currentPlayTime >= (mRepeatCount + 1) * mDuration)
-    {
-        skipToEndValue(inReverse);
-    }
-    else
-    {
-        // Find the current fraction:
-        float fraction = currentPlayTime / (float)mDuration;
-        fraction = getCurrentIterationFraction(fraction, inReverse);
-        animateValue(fraction);
-    }
-}
-
-bool SValueAnimator::animateBasedOnTime(uint64_t currentTime)
-{
-    bool done = false;
-    if (mRunning)
-    {
-        long scaledDuration = getScaledDuration();
-        float fraction = scaledDuration > 0 ? (float)(currentTime - mStartTime) / scaledDuration : 1.f;
-        float lastFraction = mOverallFraction;
-        bool newIteration = (int)fraction > (int)lastFraction;
-        bool lastIterationFinished = (fraction >= mRepeatCount + 1) && (mRepeatCount != INFINITE);
-        if (scaledDuration == 0)
-        {
-            // 0 duration animator, ignore the repeat count and skip to the end
-            done = true;
-        }
-        else if (newIteration && !lastIterationFinished)
-        {
-            // Time to repeat
-            SArray<IAnimatorListener *> tmpListeners = mListeners;
-            for (UINT i = 0; i < tmpListeners.GetCount(); i++)
-            {
-                tmpListeners[i]->onAnimationRepeat(this);
-            }
-        }
-        else if (lastIterationFinished)
-        {
-            done = true;
-        }
-        mOverallFraction = clampFraction(fraction);
-        float currentIterationFraction = getCurrentIterationFraction(mOverallFraction, mReversing);
-        animateValue(currentIterationFraction);
-    }
-    return done;
-}
-
-void SValueAnimator::commitAnimationFrame(long frameTime)
-{
-    if (!mStartTimeCommitted)
-    {
-        mStartTimeCommitted = true;
-        uint64_t adjustment = frameTime - mLastFrameTime;
-        if (adjustment > 0)
-        {
-            mStartTime += adjustment;
-        }
-    }
-}
-
 bool SValueAnimator::isPulsingInternal()
 {
     return mLastFrameTime >= 0;
@@ -294,7 +282,7 @@ void SValueAnimator::endAnimation()
     }
     mRunning = false;
     mStarted = false;
-    
+
     mStartListenersCalled = false;
     mLastFrameTime = -1;
     mFirstFrameTime = -1;
@@ -305,7 +293,7 @@ void SValueAnimator::endAnimation()
         size_t numListeners = tmpListeners.GetCount();
         for (size_t i = 0; i < numListeners; ++i)
         {
-            tmpListeners[i]->onAnimationEnd(this);
+            tmpListeners[i]->onAnimationEnd(_this_for_callback);
         }
     }
     mReversing = false;
@@ -364,7 +352,6 @@ void SValueAnimator::end()
 
 void SValueAnimator::start(ITimelineHandlersMgr *pContainer)
 {
-    SASSERT(pContainer);
     mContainer = pContainer;
     start(false);
 }
@@ -388,7 +375,7 @@ void SValueAnimator::start(bool playBackwards)
         }
     }
     mStarted = true;
- 
+
     mRunning = false;
     mAnimationEndRequested = false;
     // Resets mLastFrameTime when start() is called, so that if the animation was running,
@@ -426,7 +413,7 @@ void SValueAnimator::notifyStartListeners()
     size_t numListeners = tmpListeners.GetCount();
     for (size_t i = 0; i < numListeners; ++i)
     {
-        tmpListeners[i]->onAnimationStart(this);
+        tmpListeners[i]->onAnimationStart(_this_for_callback);
     }
     mStartListenersCalled = true;
     Release();
@@ -441,9 +428,9 @@ void SValueAnimator::removeListener(IAnimatorListener *p)
     }
 }
 
-ITimelineHandler *SValueAnimator::GetTimelineHandler()
+ITimelineHandler *SValueAnimator::GetTimelineHandler() const
 {
-    return this;
+    return const_cast<SValueAnimator *>(this);
 }
 
 LPVOID SValueAnimator::GetUserData() const

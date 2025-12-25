@@ -16,7 +16,7 @@ class SHostWnd;
  * This class handles the painting and event processing for the non-client area of a window.
  */
 class SOUI_EXP SNcPainter
-    : public TObjRefImpl<SObjectImpl<INcPainter> >
+    : public TObjRefImpl<SObjectImpl<INcPainter>>
     , public IItemContainer
     , public IHostProxy {
     DEF_SOBJECT(SObjectImpl<INcPainter>, L"ncpainter")
@@ -96,7 +96,8 @@ class SOUI_EXP SNcPainter
      */
     virtual BOOL IsItemRedrawDelay() const;
 
-    virtual BOOL IsTimelineEnabled() const{
+    virtual BOOL IsTimelineEnabled() const
+    {
         return TRUE;
     }
     /**

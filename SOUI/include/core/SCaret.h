@@ -16,7 +16,7 @@ SNSBEGIN
  *             drawing, and animation.
  */
 class SOUI_EXP SCaret
-    : public TObjRefImpl<SObjectImpl<ICaret> >
+    : public TObjRefImpl<SObjectImpl<ICaret>>
     , public ITimelineHandler {
     DEF_SOBJECT(SObjectImpl<ICaret>, L"caret")
 

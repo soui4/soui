@@ -57,25 +57,6 @@ class SOUI_EXP SMatrix
      */
     SMatrix &operator=(const SMatrix &src);
 
-    /**
-     * @brief Equality operator.
-     * @param a First matrix.
-     * @param b Second matrix.
-     * @return True if matrices are equal, false otherwise.
-     */
-    friend bool operator==(const SMatrix &a, const SMatrix &b);
-
-    /**
-     * @brief Inequality operator.
-     * @param a First matrix.
-     * @param b Second matrix.
-     * @return True if matrices are not equal, false otherwise.
-     */
-    friend bool operator!=(const SMatrix &a, const SMatrix &b)
-    {
-        return !(a == b);
-    }
-
   public:
     /**
      * @brief Post-concats the matrix with a translation.
@@ -280,6 +261,16 @@ class SOUI_EXP SMatrix
      * @return True if the matrix is a similarity transform, false otherwise.
      */
     bool isSimilarity(float tol = SK_ScalarNearlyZero) const;
+
+    bool operator==(const SMatrix &other) const
+    {
+        return SFloatsEqual(fMat, other.fMat,9);
+    }
+
+    bool operator!=(const SMatrix &other) const
+    {
+        return !(*this == other);
+    }
 
     /**
      * @brief Checks if the matrix contains only translation, rotation/reflection, or scale (non-uniform scale is allowed).

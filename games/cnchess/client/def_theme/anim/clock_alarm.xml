@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<set repeatCount="-1" fillAfter="false">
+    <rotate duration="50" startOffset="0" fromDegrees="0" toDegrees="-20" pivotX="50%" pivotY="50%" repeatCount="1" repeatMode="reverse"
+        interpolator="linear"/>
+    <rotate duration="50" startOffset="900" fromDegrees="0" toDegrees="20" pivotX="50%" pivotY="50%" repeatCount="1" repeatMode="reverse"
+        interpolator="linear"/>
+</set>
+

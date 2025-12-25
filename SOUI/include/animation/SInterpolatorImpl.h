@@ -7,7 +7,7 @@
 
 SNSBEGIN
 
-typedef TObjRefImpl<SObjectImpl<IInterpolator> > SInterpolatorBase;
+typedef TObjRefImpl<SObjectImpl<IInterpolator>> SInterpolatorBase;
 
 /**
  * @class SLinearInterpolator
@@ -380,6 +380,7 @@ class SOUI_EXP SBackInInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"BackIn")
   private:
     float mTension;
+
   public:
     SBackInInterpolator(float tension = 1.70158f);
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
@@ -412,6 +413,7 @@ class SOUI_EXP SBackOutInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"BackOut")
   private:
     float mTension;
+
   public:
     SBackOutInterpolator(float tension = 1.70158f);
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;
@@ -424,6 +426,7 @@ class SOUI_EXP SBackInOutInterpolator : public SInterpolatorBase {
     DEF_SOBJECT(SInterpolatorBase, L"BackInOut")
   private:
     float mTension;
+
   public:
     SBackInOutInterpolator(float tension = 1.70158f);
     STDMETHOD_(float, getInterpolation)(THIS_ float input) SCONST OVERRIDE;

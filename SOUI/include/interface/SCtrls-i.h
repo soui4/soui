@@ -217,7 +217,7 @@ DECLARE_INTERFACE_(IImageWnd, ICtrl)
      *
      * Describe  获取资源
      */
-    STDMETHOD_(ISkinObj *, GetSkin)(THIS) PURE;
+    STDMETHOD_(ISkinObj *, GetSkin)(CTHIS) SCONST PURE;
 
     /**
      * SImageWnd::SetImage
@@ -2295,7 +2295,7 @@ DECLARE_INTERFACE_(IDateTimePicker, ICtrl)
     STDMETHOD_(void, Clear)(THIS) PURE;
 };
 
-typedef int(*FunTreeSortCallback)(void *pCtx, const void *phItem1, const void *phItem2);
+typedef int (*FunTreeSortCallback)(void *pCtx, const void *phItem1, const void *phItem2);
 
 #ifndef STVI_ROOT
 #ifdef _WIN64
@@ -3270,7 +3270,7 @@ DECLARE_INTERFACE_(ISpinButtonCtrl, ICtrl)
      * @param pBuddy --关联的窗口对象
      * @return void
      */
-    STDMETHOD_(void, SetBuddy)(THIS_ IWindow *pBuddy) PURE;
+    STDMETHOD_(void, SetBuddy)(THIS_ IWindow * pBuddy) PURE;
 };
 
 // {80E930E7-BFC2-4e5e-8FFC-A2F0B4EC24E9}
@@ -3441,8 +3441,6 @@ DECLARE_INTERFACE_(IStackView, ICtrl)
     STDMETHOD_(IWindow *, GetSelPage)(CTHIS) SCONST PURE;
     STDMETHOD_(IWindow *, GetPage)(CTHIS_ int iPage) SCONST PURE;
 };
-
-
 
 // {59D1145E-C906-404e-8128-29C7CC80E3DD}
 DEFINE_SGUID(IID_ISearchDropdownList, 0x59d1145e, 0xc906, 0x404e, 0x81, 0x28, 0x29, 0xc7, 0xcc, 0x80, 0xe3, 0xdd);

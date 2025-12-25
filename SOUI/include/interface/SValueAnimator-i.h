@@ -212,9 +212,9 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
     /**
      * @brief 提交动画帧
      * @param frameTime - 帧时间
-     * @return void
+     * @return TRUE if the animation is finished, FALSE otherwise.
      */
-    STDMETHOD_(void, commitAnimationFrame)(THIS_ long frameTime) PURE;
+    STDMETHOD_(BOOL, commitAnimationFrame)(THIS_ uint64_t frameTime) PURE;
 
     /**
      * @brief 获取动画当前进度
@@ -246,7 +246,7 @@ DECLARE_INTERFACE_(IValueAnimator, IObject)
      * @brief 获取时间线处理器
      * @return ITimelineHandler* - 时间线处理器指针
      */
-    STDMETHOD_(ITimelineHandler *, GetTimelineHandler)(CTHIS) PURE;
+    STDMETHOD_(ITimelineHandler *, GetTimelineHandler)(CTHIS) SCONST PURE;
 
     /**
      * @brief 获取用户数据

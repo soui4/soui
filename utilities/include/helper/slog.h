@@ -84,6 +84,8 @@ class UTILITIES_API SLogStream {
     SLogStream &operator<<(double t);
     SLogStream &operator<<(const SLogBinary &binary);
 
+    SLogStream &operator<<(const RECT &rc);
+    SLogStream &operator<<(const POINT &pt);
     /**
      * @brief 格式化输出日志
      * @param format 格式字符串

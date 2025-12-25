@@ -99,6 +99,458 @@ SStringW STrText::EscapeString(const SStringW &strValue)
     return strCvt;
 }
 
+//------------------------------------------------------------------------
+class SAnimationHandler : public ITimelineHandler {
+  private:
+    SWindow *m_pOwner;             /**< Owner window */
+    STransformation m_transform;   /**< Transformation */
+    bool m_bFillAfter;             /**< Fill after flag */
+    SWindow *m_pPrevSiblingBackup; /**< Previous sibling backup */
+
+  public:
+    /**
+     * @brief Constructor.
+     * @param pOwner Owner window.
+     */
+    SAnimationHandler(SWindow *pOwner);
+
+    /**
+     * @brief Called when animation starts.
+     */
+    void OnAnimationStart();
+
+    /**
+     * @brief Called when animation stops.
+     */
+    void OnAnimationStop();
+
+    /**
+     * @brief Gets the transformation.
+     * @return Transformation object.
+     */
+    const STransformation &GetTransformation() const;
+
+    /**
+     * @brief Gets the fill after flag.
+     * @return Fill after flag.
+     */
+    bool getFillAfter() const;
+
+  public:
+    STDMETHOD_(void, OnNextFrame)(THIS_) OVERRIDE;
+
+  protected:
+    /**
+     * @brief Called when the owner window is resized.
+     * @param e Event arguments.
+     * @return TRUE if handled, FALSE otherwise.
+     */
+    BOOL OnOwnerResize(IEvtArgs *e);
+};
+
+static SWindow *ICWND_NONE = (SWindow *)-2;
+SAnimationHandler::SAnimationHandler(SWindow *pOwner)
+    : m_pOwner(pOwner)
+    , m_bFillAfter(false)
+    , m_pPrevSiblingBackup(ICWND_NONE)
+{
+}
+
+void SAnimationHandler::OnAnimationStart()
+{
+    IAnimation *pAni = m_pOwner->GetAnimation();
+    SASSERT(pAni);
+    if (pAni->getZAdjustment() != ZORDER_NORMAL)
+    {
+        m_pPrevSiblingBackup = m_pOwner->GetWindow(GSW_PREVSIBLING);
+        if (m_pPrevSiblingBackup == NULL)
+            m_pPrevSiblingBackup = ICWND_FIRST;
+
+        if (pAni->getZAdjustment() == ZORDER_TOP)
+            m_pOwner->AdjustZOrder(ICWND_LAST);
+        else
+            m_pOwner->AdjustZOrder(ICWND_FIRST);
+    }
+    else
+    {
+        m_pPrevSiblingBackup = ICWND_NONE;
+    }
+    m_pOwner->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SAnimationHandler::OnOwnerResize, this));
+    if (m_pOwner->GetParent())
+    {
+        m_pOwner->GetParent()->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SAnimationHandler::OnOwnerResize, this));
+    }
+    OnOwnerResize(NULL);
+}
+
+void SAnimationHandler::OnAnimationStop()
+{
+    m_pOwner->GetEventSet()->unsubscribeEvent(EventSwndSize::EventID, Subscriber(&SAnimationHandler::OnOwnerResize, this));
+    if (m_pOwner->GetParent())
+    {
+        m_pOwner->GetParent()->GetEventSet()->unsubscribeEvent(EventSwndSize::EventID, Subscriber(&SAnimationHandler::OnOwnerResize, this));
+    }
+    if (m_pPrevSiblingBackup != ICWND_NONE)
+    {
+        m_pOwner->AdjustZOrder(m_pPrevSiblingBackup);
+        m_pPrevSiblingBackup = ICWND_NONE;
+    }
+}
+
+const STransformation &SAnimationHandler::GetTransformation() const
+{
+    return m_transform;
+}
+
+void SAnimationHandler::OnNextFrame()
+{
+    IAnimation *pAni = m_pOwner->GetAnimation();
+    SASSERT(pAni);
+    pAni->AddRef();
+    m_pOwner->AddRef();
+    uint64_t tm = pAni->getStartTime();
+    if (tm > 0)
+    {
+        m_pOwner->OnAnimationInvalidate(true);
+        BOOL bMore = pAni->getTransformation(STime::GetCurrentTimeMs(), &m_transform);
+        m_pOwner->OnAnimationInvalidate(false);
+        if (!bMore)
+        { // animation stopped.
+            if (pAni->isFillEnabled() && pAni->getFillAfter())
+            {
+                m_bFillAfter = true;
+            }
+            else
+            {
+                m_bFillAfter = false;
+            }
+        }
+    }
+    m_pOwner->Release();
+    pAni->Release();
+}
+
+BOOL SAnimationHandler::OnOwnerResize(IEvtArgs *e)
+{
+    CSize szOwner = m_pOwner->GetWindowRect().Size();
+    CSize szParent = szOwner;
+    SWindow *p = m_pOwner->GetParent();
+    if (p)
+    {
+        szParent = p->GetWindowRect().Size();
+    }
+    m_pOwner->GetAnimation()->initialize(szOwner.cx, szOwner.cy, szParent.cx, szParent.cy, m_pOwner->GetScale());
+    return true;
+}
+
+bool SAnimationHandler::getFillAfter() const
+{
+    return m_bFillAfter;
+}
+//------------------------------------------------------------------------
+enum
+{
+    ANI_ALPHA = 0,
+    ANI_SCALE,
+    ANI_SCALE_X,
+    ANI_SCALE_Y,
+    ANI_ROTATE,
+    ANI_TRANSLATE,
+    ANI_TRANSLATE_X,
+    ANI_TRANSLATE_Y,
+};
+
+struct PropIdMap
+{
+    const LPCWSTR pszName;
+    int type;
+};
+
+static const PropIdMap kPropIdMap[] = {
+    { WindowProperty::SCALE, ANI_SCALE }, 
+    { WindowProperty::SCALE_X, ANI_SCALE_X }, 
+    { WindowProperty::SCALE_Y, ANI_SCALE_Y }, 
+    { WindowProperty::ROTATE, ANI_ROTATE }, 
+    { WindowProperty::TRANSLATE, ANI_TRANSLATE },
+    { WindowProperty::TRANSLATE_X, ANI_TRANSLATE_X }, 
+    { WindowProperty::TRANSLATE_Y, ANI_TRANSLATE_Y },
+};
+
+class AnimatorHolder : public TObjRefImpl<IObjRef> {
+  public:
+    SAutoRefPtr<IPropertyValuesHolder> holder;
+    float fraction;
+    int type;
+};
+
+class SAnimatorHandler {
+    STransformation m_transform; /**< Transformation */
+    SWindow *m_pOwner;
+
+  public:
+    SAnimatorHandler(SWindow *pOwner);
+
+    BOOL IsEmpty() const;
+
+    int GetPropType(SStringW strPropName) const;
+
+    BOOL OnSetAnimatorValue(SStringW strType, IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state);
+
+    const STransformation &GetTransformation() const
+    {
+        return m_transform;
+    }
+
+  private:
+    void UpdateTransformation();
+    STransformation GetTransformation(AnimatorHolder *pHolder, int wid, int hei, int nScale) const;
+
+    SList<SAutoRefPtr<AnimatorHolder>> m_lstAnimator;
+};
+
+SAnimatorHandler::SAnimatorHandler(SWindow *pOwner)
+    : m_pOwner(pOwner)
+{
+}
+
+BOOL SAnimatorHandler::IsEmpty() const
+{
+    return m_lstAnimator.IsEmpty();
+}
+
+int SAnimatorHandler::GetPropType(SStringW strPropName) const
+{
+    int type = -1;
+    for (size_t i = 0; i < ARRAYSIZE(kPropIdMap); i++)
+    {
+        if (strPropName.CompareNoCase(kPropIdMap[i].pszName) == 0)
+        {
+            type = kPropIdMap[i].type;
+            break;
+        }
+    }
+    return type;
+}
+
+BOOL SAnimatorHandler::OnSetAnimatorValue(SStringW strType, IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
+{
+    int type = GetPropType(strType);
+    if (type == -1)
+        return FALSE;
+    BOOL bEmpty1 = IsEmpty();
+    m_pOwner->OnAnimationInvalidate(true);
+    if (state == ANI_START)
+    {
+        AnimatorHolder *pAniHolder = new AnimatorHolder;
+        pAniHolder->holder = pHolder;
+        pAniHolder->type = type;
+        pAniHolder->fraction = fraction;
+        m_lstAnimator.AddTail(pAniHolder);
+        pAniHolder->Release();
+    }
+    if (state == ANI_END)
+    {
+        for (SPOSITION it = m_lstAnimator.GetHeadPosition(); it;)
+        {
+            SPOSITION pos = it;
+            AnimatorHolder *pAniHolder = m_lstAnimator.GetNext(it);
+            if (pAniHolder->holder == pHolder)
+            {
+                CRect rc = m_pOwner->GetWindowRect();
+                int wid = rc.Width();
+                int hei = rc.Height();
+                int nScale = m_pOwner->GetScale();
+                pAniHolder->fraction = fraction;
+                STransformation tmp = GetTransformation(pAniHolder, wid, hei, nScale);
+                m_pOwner->m_transform.Compose(&tmp);
+                m_lstAnimator.RemoveAt(pos);
+                break;
+            }
+        }
+    }
+    else if (state == ANI_PROGRESS)
+    {
+        for (SPOSITION pos = m_lstAnimator.GetHeadPosition(); pos;)
+        {
+            AnimatorHolder *pAniHolder = m_lstAnimator.GetNext(pos);
+            if (pAniHolder->holder == pHolder)
+            {
+                pAniHolder->fraction = fraction;
+                break;
+            }
+        }
+    }
+    UpdateTransformation();
+    BOOL bEmpty2 = IsEmpty();
+    if (bEmpty1 != bEmpty2)
+    {
+        m_pOwner->UpdateCacheMode();
+    }
+    m_pOwner->OnAnimationInvalidate(false);
+    return TRUE;
+}
+
+void SAnimatorHandler::UpdateTransformation()
+{
+    m_transform.Clear();
+    CRect rc = m_pOwner->GetWindowRect();
+    int wid = rc.Width();
+    int hei = rc.Height();
+    int nScale = m_pOwner->GetScale();
+    for (SPOSITION pos = m_lstAnimator.GetHeadPosition(); pos;)
+    {
+        AnimatorHolder *pHolder = m_lstAnimator.GetNext(pos);
+        STransformation tmp = GetTransformation(pHolder, wid, hei, nScale);
+        m_transform.compose(tmp);
+    }
+}
+
+STransformation SAnimatorHandler::GetTransformation(AnimatorHolder *pHolder, int wid, int hei, int nScale) const
+{
+    STransformation tmp;
+    switch (pHolder->type)
+    {
+    case ANI_ALPHA:
+    {
+        if (pHolder->holder->GetValueType() == PROP_TYPE_BYTE)
+        {
+            BYTE alpha;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &alpha);
+            tmp.SetAlpha(alpha);
+            tmp.SetTransformationType(TYPE_ALPHA);
+        }
+        else if (pHolder->holder->GetValueType() == PROP_TYPE_FLOAT)
+        {
+            float alpha;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &alpha);
+            tmp.SetAlpha((BYTE)(alpha * 255));
+            tmp.SetTransformationType(TYPE_ALPHA);
+        }
+    }
+    break;
+    case ANI_SCALE:
+    {
+        if (pHolder->holder->GetValueType() == PROP_TYPE_FLOAT)
+        {
+            float scale;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &scale);
+            tmp.GetMatrix()->setScale2(scale, scale, wid * m_pOwner->m_pivotX, hei * m_pOwner->m_pivotY);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+    }
+    break;
+    case ANI_SCALE_X:
+    {
+        if (pHolder->holder->GetValueType() == PROP_TYPE_FLOAT)
+        {
+            float scale;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &scale);
+            tmp.GetMatrix()->setScale2(scale, 1, wid * m_pOwner->m_pivotX, hei * m_pOwner->m_pivotY);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+    }
+    break;
+    case ANI_SCALE_Y:
+    {
+        if (pHolder->holder->GetValueType() == PROP_TYPE_FLOAT)
+        {
+            float scale;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &scale);
+            tmp.GetMatrix()->setScale2(1, scale, wid * m_pOwner->m_pivotX, hei * m_pOwner->m_pivotY);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+    }
+    break;
+    case ANI_ROTATE:
+    {
+        if (pHolder->holder->GetValueType() == PROP_TYPE_FLOAT)
+        {
+            float rotate;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &rotate);
+            tmp.GetMatrix()->setRotate2(rotate, wid * m_pOwner->m_pivotX, hei * m_pOwner->m_pivotY);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+    }
+    break;
+    case ANI_TRANSLATE:
+    {
+        if (pHolder->holder->GetValueType() == PROP_TYPE_FLOAT)
+        {
+            float translate;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &translate);
+            tmp.GetMatrix()->setTranslate(translate, translate);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+        else if (pHolder->holder->GetValueType() == PROP_TYPE_LAYOUT_SIZE)
+        {
+            SLayoutSize translate;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &translate);
+            tmp.GetMatrix()->setTranslate(translate.toPixelSize(nScale), translate.toPixelSize(nScale));
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+        else if (pHolder->holder->GetValueType() == PROP_TYPE_INT)
+        {
+            int nValue;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &nValue);
+            tmp.GetMatrix()->setTranslate(nValue, nValue);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+    }
+    break;
+    case ANI_TRANSLATE_X:
+    {
+        if (pHolder->holder->GetValueType() == PROP_TYPE_FLOAT)
+        {
+            float translate;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &translate);
+            tmp.GetMatrix()->setTranslate(translate, 0.0f);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+        else if (pHolder->holder->GetValueType() == PROP_TYPE_LAYOUT_SIZE)
+        {
+            SLayoutSize translate;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &translate);
+            tmp.GetMatrix()->setTranslate(translate.toPixelSize(nScale), 0.0f);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+        else if (pHolder->holder->GetValueType() == PROP_TYPE_INT)
+        {
+            int nValue;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &nValue);
+            tmp.GetMatrix()->setTranslate(nValue, 0.0f);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+    }
+    break;
+    case ANI_TRANSLATE_Y:
+    {
+        if (pHolder->holder->GetValueType() == PROP_TYPE_FLOAT)
+        {
+            float translate;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &translate);
+            tmp.GetMatrix()->setTranslate(0.0f, translate);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+        else if (pHolder->holder->GetValueType() == PROP_TYPE_LAYOUT_SIZE)
+        {
+            SLayoutSize translate;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &translate);
+            tmp.GetMatrix()->setTranslate(0.0f, translate.toPixelSize(nScale));
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+        else if (pHolder->holder->GetValueType() == PROP_TYPE_INT)
+        {
+            int nValue;
+            pHolder->holder->GetAnimatedValue(pHolder->fraction, &nValue);
+            tmp.GetMatrix()->setTranslate(0.0f, nValue);
+            tmp.SetTransformationType(TYPE_MATRIX);
+        }
+    }
+    break;
+    }
+    return tmp;
+}
+
 //////////////////////////////////////////////////////////////////////////
 // SWindow Implement
 //////////////////////////////////////////////////////////////////////////
@@ -140,15 +592,19 @@ SWindow::SWindow()
     , m_crColorize(0)
     , m_strText(this)
     , m_strToolTipText(this)
-    , m_animationHandler(this)
-    , m_isAnimating(false)
-    , m_isDestroying(false)
-    , m_isLoading(false)
+    , m_isAnimating(FALSE)
+    , m_isDestroying(FALSE)
+    , m_isLoading(FALSE)
     , m_funSwndProc(NULL)
+    , m_pivotX(0.5f)
+    , m_pivotY(0.5f)
 #ifdef _DEBUG
     , m_nMainThreadId(::GetCurrentThreadId()) // 初始化对象的线程不一定是主线程
 #endif
 {
+    m_pAnimatorHandler = new SAnimatorHandler(this);
+    m_pAnimationHandler = new SAnimationHandler(this);
+
     m_nMaxWidth.setWrapContent();
 
     m_pLayout.Attach(new SouiLayout());
@@ -187,6 +643,8 @@ SWindow::SWindow()
 
 SWindow::~SWindow()
 {
+    delete m_pAnimatorHandler;
+    delete m_pAnimationHandler;
 #ifdef SOUI_ENABLE_ACC
     if (m_pAcc)
     {
@@ -407,14 +865,14 @@ void SWindow::Move(LPCRECT prect)
 
     if (prect)
     {
-        m_bFloat = TRUE; //使用Move后，程序不再自动计算窗口坐标
+        m_bFloat = TRUE; // 使用Move后，程序不再自动计算窗口坐标
         OnRelayout(*prect);
     }
     else if (GetParent())
     {
-        //恢复自动计算位置
+        // 恢复自动计算位置
         m_bFloat = FALSE;
-        //重新计算自己及兄弟窗口的坐标
+        // 重新计算自己及兄弟窗口的坐标
         RequestRelayout();
     }
 }
@@ -580,7 +1038,7 @@ void SWindow::_InsertChild(SWindow *pNewChild, SWindow *pInsertAfter)
         pNewChild->m_pNextSibling = pNext;
         pNext->m_pPrevSibling = pNewChild;
     }
-    m_nChildrenCount++; 
+    m_nChildrenCount++;
 }
 
 void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /*=ICWND_LAST*/)
@@ -596,24 +1054,26 @@ void SWindow::InsertChild(SWindow *pNewChild, SWindow *pInsertAfter /*=ICWND_LAS
     m_layoutDirty = dirty_self;
 
     if (!GetLayout()->IsParamAcceptable(pNewChild->GetLayoutParam()))
-    { //检查子窗口原有的布局属性是不是和当前窗口的布局类型是否匹配
+    { // 检查子窗口原有的布局属性是不是和当前窗口的布局类型是否匹配
         ILayoutParam *pLayoutParam = GetLayout()->CreateLayoutParam();
         pNewChild->SetLayoutParam(pLayoutParam);
         pLayoutParam->Release();
     }
 
-    //继承父窗口的disable状态
+    // 继承父窗口的disable状态
     pNewChild->OnEnable(!IsDisabled(TRUE), ParentEnable);
 
-    //只在插入新控件时需要标记zorder失效,删除控件不需要标记
-    if(GetContainer())
+    // 只在插入新控件时需要标记zorder失效,删除控件不需要标记
+    if (GetContainer())
         GetContainer()->MarkWndTreeZorderDirty();
     OnAfterInsertChild(pNewChild);
-    if(!m_isLoading){
+    if (!m_isLoading)
+    {
         RequestRelayout();
         pNewChild->SDispatchMessage(UM_SETSCALE, GetScale(), 0);
         pNewChild->SDispatchMessage(UM_SETCOLORIZE, GetColorizeColor(), 0);
-        if(pNewChild->IsVisible(FALSE) && IsVisible(TRUE)){
+        if (pNewChild->IsVisible(FALSE) && IsVisible(TRUE))
+        {
             pNewChild->SSendMessage(WM_SHOWWINDOW, TRUE);
         }
     }
@@ -678,7 +1138,7 @@ BOOL SWindow::IsVisible(BOOL bCheckParent /*= FALSE*/) const
         return m_bVisible;
 }
 
-//因为NotifyInvalidateRect只有窗口可见时再通知刷新，这里在窗口可见状态改变前后都执行一次通知。
+// 因为NotifyInvalidateRect只有窗口可见时再通知刷新，这里在窗口可见状态改变前后都执行一次通知。
 void SWindow::SetVisible(BOOL bVisible, BOOL bUpdate /*=FALSE*/)
 {
     if (bUpdate)
@@ -815,7 +1275,7 @@ SWindow *SWindow::FindChildByID(int id, int nDeep /* =-1*/)
     if (pRet)
     {
         if (pRet->IsDescendant(this) && pRet->GetID() == id)
-            return pRet;    
+            return pRet;
         pFinder->EraseCacheForID(this, id, nDeep);
     }
 
@@ -836,9 +1296,9 @@ SWindow *SWindow::FindChildByName(LPCWSTR pszName, int nDeep)
     SWindow *pRet = (SWindow *)pFinder->FindChildByName(this, strName, nDeep);
     if (pRet)
     {
-        if (pRet->IsDescendant(this) && wcsicmp(pRet->GetName(), pszName)==0)
+        if (pRet->IsDescendant(this) && wcsicmp(pRet->GetName(), pszName) == 0)
             return pRet;
-        //update find cache.
+        // update find cache.
         pFinder->EraseCacheForName(this, strName, nDeep);
     }
 
@@ -853,10 +1313,10 @@ SWindow *SWindow::FindChildByName(LPCSTR strName, int nDeep /*= -1*/)
     return FindChildByName(S_CA2W(strName, CP_UTF8), nDeep);
 }
 
-const static wchar_t KLabelInclude[] = L"include"; //文件包含的标签
-const static wchar_t KTempNamespace[] = L"t:";     //模板识别ＮＳ
-const static wchar_t KTempData[] = L"data";        //模板参数
-const static wchar_t KTempParamFmt[] = L"{{%s}}";  //模板数据替换格式
+const static wchar_t KLabelInclude[] = L"include"; // 文件包含的标签
+const static wchar_t KTempNamespace[] = L"t:";     // 模板识别ＮＳ
+const static wchar_t KTempData[] = L"data";        // 模板参数
+const static wchar_t KTempParamFmt[] = L"{{%s}}";  // 模板数据替换格式
 
 BOOL SWindow::CreateChildren(SXmlNode xmlNode)
 {
@@ -868,7 +1328,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
             continue;
 
         if (_wcsicmp(xmlChild.name(), KLabelInclude) == 0)
-        { //在窗口布局中支持include标签
+        { // 在窗口布局中支持include标签
             SStringT strSrc = S_CW2T(xmlChild.attribute(L"src").value());
             SXmlDoc xmlDoc;
             if (LOADXML(xmlDoc, strSrc))
@@ -902,7 +1362,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                 SSLOGW() << "load include file failed, file name=" << strSrc;
             }
         }
-        else if (!xmlChild.get_userdata()) //通过userdata来标记一个节点是否可以忽略
+        else if (!xmlChild.get_userdata()) // 通过userdata来标记一个节点是否可以忽略
         {
             SStringW strName = xmlChild.name();
             if (strName.StartsWith(KTempNamespace))
@@ -920,7 +1380,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
                         {
                             SStringW strParam = SStringW().Format(KTempParamFmt, param.name());
                             SStringW strValue = param.value();
-                            strValue.Replace(L"\"", L"&#34;");  //防止数据中包含“双引号”，导致破坏XML结构
+                            strValue.Replace(L"\"", L"&#34;");  // 防止数据中包含“双引号”，导致破坏XML结构
                             strXml.Replace(strParam, strValue); // replace params to value.
                         }
                         SXmlDoc xmlDoc;
@@ -941,7 +1401,7 @@ BOOL SWindow::CreateChildren(SXmlNode xmlNode)
     }
     if (!m_isLoading)
     {
-        //动态创建子窗口，同步窗口的的属性
+        // 动态创建子窗口，同步窗口的的属性
         if (GetScale() != 100)
             SDispatchMessage(UM_SETSCALE, GetScale(), 0);
         if (m_crColorize != 0)
@@ -991,7 +1451,7 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
         if (m_pLayoutParam)
             m_pLayoutParam->Clear();
 
-        //优先处理"layout"属性
+        // 优先处理"layout"属性
         SXmlAttr attrLayout = xmlNode.attribute(L"layout");
         if (attrLayout)
         {
@@ -999,7 +1459,7 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
             SetAttribute(attrLayout.name(), attrLayout.value(), TRUE);
         }
 
-        //优先处理"class"属性
+        // 优先处理"class"属性
         SXmlAttr attrClass = xmlNode.attribute(L"class");
         if (attrClass)
         {
@@ -1043,7 +1503,7 @@ BOOL SWindow::InitFromXml(IXmlNode *pNode)
         }
         SSendMessage(WM_SHOWWINDOW, IsVisible(TRUE), ParentShow);
     }
-    //创建子窗口
+    // 创建子窗口
     if (!CreateChildren(xmlNode))
     {
         if (m_pParent)
@@ -1099,7 +1559,7 @@ SWND SWindow::SwndFromPoint(CPoint &pt, BOOL bIncludeMsgTransparent) const
     if (!IsContainPoint(pt2, TRUE))
     {
         pt = pt2;      // update pt;
-        return m_swnd; //只在鼠标位于客户区时，才继续搜索子窗口
+        return m_swnd; // 只在鼠标位于客户区时，才继续搜索子窗口
     }
     SWND swndChild = 0;
 
@@ -1132,7 +1592,7 @@ BOOL SWindow::NeedRedrawWhenStateChange()
     return GetStyle().GetStates() > 1;
 }
 
-//如果当前窗口有绘制缓存，它可能是由cache属性定义的，也可能是由于定义了alpha
+// 如果当前窗口有绘制缓存，它可能是由cache属性定义的，也可能是由于定义了alpha
 void SWindow::_PaintClient(IRenderTarget *pRT)
 {
     if (m_pGetRTData)
@@ -1144,7 +1604,7 @@ void SWindow::_PaintClient(IRenderTarget *pRT)
     {
         IRenderTarget *pRTCache = m_cachedRT;
         if (pRTCache)
-        { //在窗口正在创建的时候进来pRTCache可能为NULL
+        { // 在窗口正在创建的时候进来pRTCache可能为NULL
             CRect rcWnd = GetWindowRect();
             pRTCache->SetViewportOrg(-rcWnd.TopLeft());
             if (IsCacheDirty())
@@ -1283,7 +1743,7 @@ void SWindow::_PaintChildren(IRenderTarget *pRT, IRegionS *pRgn, UINT iBeginZord
         if (pChild->m_uZorder >= iEndZorder)
             break;
         if (pChild->m_uZorder < iBeginZorder)
-        { //看整个分枝的zorder是不是在绘制范围内
+        { // 看整个分枝的zorder是不是在绘制范围内
             SWindow *pNextChild = pChild->GetWindow(GSW_NEXTSIBLING);
             if (pNextChild)
             {
@@ -1294,7 +1754,7 @@ void SWindow::_PaintChildren(IRenderTarget *pRT, IRegionS *pRgn, UINT iBeginZord
                 }
             }
             else
-            { //最后一个节点时查看最后子窗口的zorder
+            { // 最后一个节点时查看最后子窗口的zorder
                 SWindow *pLastChild = pChild;
                 while (pLastChild->GetChildrenCount())
                 {
@@ -1342,13 +1802,13 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     IRenderTarget *pRTBackup = NULL; // backup current RT
 
     if (IsLayeredWindow())
-    { //获得当前LayeredWindow RT来绘制内容
+    { // 获得当前LayeredWindow RT来绘制内容
         pRTBackup = pRT;
         pRT = NULL;
         GETRENDERFACTORY->CreateRenderTarget(&pRT, rcWnd.Width(), rcWnd.Height());
         pRT->BeginDraw();
         pRT->OffsetViewportOrg(-rcWnd.left, -rcWnd.top, NULL);
-        //绘制到窗口的缓存上,需要继承原RT的绘图属性
+        // 绘制到窗口的缓存上,需要继承原RT的绘图属性
         pRT->SelectObject(pRTBackup->GetCurrentObject(OT_FONT), NULL);
         pRT->SelectObject(pRTBackup->GetCurrentObject(OT_PEN), NULL);
         pRT->SelectObject(pRTBackup->GetCurrentObject(OT_BRUSH), NULL);
@@ -1408,7 +1868,7 @@ void SWindow::DispatchPaint(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegi
     pRT->RestoreClip(nSave1);
 
     if (IsLayeredWindow())
-    { //将绘制到窗口的缓存上的图像返回到上一级RT
+    { // 将绘制到窗口的缓存上的图像返回到上一级RT
         SASSERT(pRTBackup);
         pRT->EndDraw();
         OnCommitSurface(pRTBackup, &rcWnd, pRT, &rcWnd, GetAlpha());
@@ -1454,7 +1914,7 @@ void SWindow::TransformPointEx(CPoint &pt) const
     }
 }
 
-//当前函数中的参数包含zorder,为了保证传递进来的zorder是正确的,必须在外面调用zorder重建.
+// 当前函数中的参数包含zorder,为了保证传递进来的zorder是正确的,必须在外面调用zorder重建.
 void SWindow::_PaintRegion(IRenderTarget *pRT, IRegionS *pRgn, UINT iZorderBegin, UINT iZorderEnd)
 {
     ASSERT_UI_THREAD();
@@ -1505,7 +1965,7 @@ void SWindow::InvalidateRect(const CRect &rect, BOOL bFromThis /*=TRUE*/, BOOL b
     if (!IsVisible(TRUE) || IsUpdateLocked() || !GetContainer())
         return;
 
-    //只能更新窗口有效区域
+    // 只能更新窗口有效区域
     CRect rcWnd = GetWindowRect();
 
     CRect rcIntersect = rect & rcWnd;
@@ -1592,7 +2052,7 @@ BOOL SWindow::FireEvent(IEvtArgs *evt)
     BOOL bRet = FALSE;
     do
     {
-        //调用事件订阅的处理方法
+        // 调用事件订阅的处理方法
         m_evtSet.FireEvent(evt);
         if (!evt->IsBubbleUp())
         {
@@ -1600,7 +2060,7 @@ BOOL SWindow::FireEvent(IEvtArgs *evt)
             break;
         }
 
-        //调用脚本事件处理方法
+        // 调用脚本事件处理方法
         if (GetScriptModule())
         {
             SStringW strEvtName = evt->GetName();
@@ -1650,7 +2110,7 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
 
         InvalidateRect(m_rcWindow);
 
-        SSendMessage(WM_NCCALCSIZE); //计算非客户区大小
+        SSendMessage(WM_NCCALCSIZE); // 计算非客户区大小
     }
     // keep relative position of float children
     if (ptDiff.x != 0 || ptDiff.y != 0)
@@ -1671,20 +2131,6 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
             pChild = pChild->GetWindow(GSW_NEXTSIBLING);
         }
     }
-    // only if window is visible now, we do relayout.
-    if (IsVisible(FALSE))
-    {
-        // don't call UpdateLayout, otherwise will result in dead cycle.
-        if (m_layoutDirty != dirty_clean && GetChildrenCount())
-        {
-            UpdateChildrenPosition(); //更新子窗口位置
-        }
-        m_layoutDirty = dirty_clean;
-    }
-    else
-    { // mark layout to self dirty.
-        m_layoutDirty = dirty_self;
-    }
 
     EventSwndPos evt(this);
     evt.rcWnd = m_rcWindow;
@@ -1693,6 +2139,21 @@ BOOL SWindow::OnRelayout(const CRect &rcWnd)
     CRect rcClient;
     GetClientRect(&rcClient);
     SSendMessage(WM_SIZE, 0, MAKELPARAM(rcClient.Width(), rcClient.Height()));
+
+    // only if window is visible now, we do relayout.
+    if (IsVisible(FALSE))
+    {
+        // don't call UpdateLayout, otherwise will result in dead cycle.
+        if (m_layoutDirty != dirty_clean && GetChildrenCount())
+        {
+            UpdateChildrenPosition(); // 更新子窗口位置
+        }
+        m_layoutDirty = dirty_clean;
+    }
+    else
+    { // mark layout to self dirty.
+        m_layoutDirty = dirty_self;
+    }
     return TRUE;
 }
 
@@ -1706,7 +2167,8 @@ static int LayerCompare(const void *arg1, const void *arg2)
 UINT SWindow::OnBuildTreeZorder(UINT iOrder)
 {
     m_uZorder = iOrder++;
-    if(m_bEnableLayer && !GetContainer()->IsDesignerMode()){
+    if (m_bEnableLayer && !GetContainer()->IsDesignerMode())
+    {
         SArray<SWindow *> lstChild;
         lstChild.SetCount(GetChildrenCount());
         int i = 0;
@@ -1719,10 +2181,11 @@ UINT SWindow::OnBuildTreeZorder(UINT iOrder)
         // sort children by layer
         SArray<SWindow *> lstChildSorted;
         lstChildSorted.SetCount(lstChild.GetCount());
-        memcpy(lstChildSorted.GetData(),lstChild.GetData(),lstChild.GetCount()*sizeof(SWindow *));
+        memcpy(lstChildSorted.GetData(), lstChild.GetData(), lstChild.GetCount() * sizeof(SWindow *));
         qsort(lstChildSorted.GetData(), lstChildSorted.GetCount(), sizeof(SWindow *), LayerCompare);
-        if(memcmp(lstChild.GetData(),lstChildSorted.GetData(),lstChild.GetCount()*sizeof(SWindow *)) != 0){
-            //reorder children by layer
+        if (memcmp(lstChild.GetData(), lstChildSorted.GetData(), lstChild.GetCount() * sizeof(SWindow *)) != 0)
+        {
+            // reorder children by layer
             for (UINT i = 0; i < lstChild.GetCount(); i++)
             {
                 SWindow *pChild = lstChild[i];
@@ -1732,7 +2195,7 @@ UINT SWindow::OnBuildTreeZorder(UINT iOrder)
             {
                 SWindow *pChild = lstChildSorted[i];
                 _InsertChild(pChild, ICWND_LAST);
-            }          
+            }
         }
     }
     SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
@@ -1761,36 +2224,76 @@ int SWindow::GetLayer() const
     return m_nLayer;
 }
 
+BOOL SWindow::GetAnimatedLayoutSize(IPropertyValuesHolder *pHolder, float fraction, SLayoutSize &ret)
+{
+    switch (pHolder->GetValueType())
+    {
+    case PROP_TYPE_LAYOUT_SIZE:
+        pHolder->GetAnimatedValue(fraction, &ret);
+        return TRUE;
+    case PROP_TYPE_INT:
+    {
+        int nValue;
+        pHolder->GetAnimatedValue(fraction, &nValue);
+        ret = SLayoutSize((float)nValue, SLayoutSize::defUnit);
+        return TRUE;
+    }
+    case PROP_TYPE_FLOAT:
+    {
+        float fValue;
+        pHolder->GetAnimatedValue(fraction, &fValue);
+        ret = SLayoutSize(fValue, SLayoutSize::defUnit);
+        return TRUE;
+    }
+    default:
+        return FALSE;
+    }
+}
+
 BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
 {
     SStringW strPropName = pHolder->GetPropertyName();
-    if(strPropName.CompareNoCase(WindowProperty::ALPHA)==0){
-        BYTE byAlpha;
-        pHolder->GetAnimatedValue(fraction, &byAlpha);
-        SetAlpha(byAlpha);
-        return TRUE;
-    }
-    if(strPropName.CompareNoCase(WindowProperty::COLOR_BKGND)==0){
+    if (strPropName.CompareNoCase(WindowProperty::COLOR_BKGND) == 0)
+    {
         COLORREF crBkgnd;
         pHolder->GetAnimatedValue(fraction, &crBkgnd);
         GetStyle().m_crBg = crBkgnd;
         InvalidateRect(NULL);
         return TRUE;
     }
-    if(strPropName.CompareNoCase(WindowProperty::COLOR_TEXT)==0){
+    if (strPropName.CompareNoCase(WindowProperty::COLOR_TEXT) == 0)
+    {
         COLORREF crText;
         pHolder->GetAnimatedValue(fraction, &crText);
-        GetStyle().SetTextColor(0,crText);
+        GetStyle().SetTextColor(0, crText);
         InvalidateRect(NULL);
         return TRUE;
     }
+    if (strPropName.CompareNoCase(WindowProperty::ALPHA) == 0)
+    {
+        if(pHolder->GetValueType() != PROP_TYPE_BYTE)
+            return FALSE;
+        BYTE byAlpha;
+        pHolder->GetAnimatedValue(fraction, &byAlpha);
+        SetAlpha(byAlpha);
+        return TRUE;
+    }
+    if (m_pAnimatorHandler->OnSetAnimatorValue(strPropName, pHolder, fraction, state))
+        return TRUE;
+
     BOOL bRet = GetLayoutParam()->SetAnimatorValue(pHolder, fraction, state);
-    if(bRet){
-        if(GetParent())
+    if (bRet)
+    {
+        if (GetParent())
+        {
             GetParent()->RequestRelayout();
+            GetParent()->UpdateChildrenPosition();
+        }
         InvalidateRect(NULL);
-    }else{
-        //fire event to external
+    }
+    else
+    {
+        // fire event to external
         EventSwndAnimatorFractor evt(this);
         evt.fraction = fraction;
         evt.pHolder = pHolder;
@@ -1798,6 +2301,12 @@ BOOL SWindow::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, A
         bRet = FireEvent(evt);
     }
     return bRet;
+}
+
+void SWindow::SetPivot(float x, float y)
+{
+    m_pivotX = x;
+    m_pivotY = y;
 }
 
 int SWindow::OnCreate(LPVOID)
@@ -1989,14 +2498,14 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 {
     if (m_funSwndProc)
     {
-        //使用回调函数计算窗口Size
+        // 使用回调函数计算窗口Size
         BOOL bRet = m_funSwndProc(this, UM_GETDESIREDSIZE, nParentHei, nParentHei, (LRESULT *)psz);
         if (bRet)
         {
             return;
         }
     }
-    //检查当前窗口的MatchParent属性及容器窗口的WrapContent属性。
+    // 检查当前窗口的MatchParent属性及容器窗口的WrapContent属性。
     ILayoutParam *pLayoutParam = GetLayoutParam();
     bool bSaveHorz = nParentWid == SIZE_WRAP_CONTENT && pLayoutParam->IsMatchParent(Horz);
     bool bSaveVert = nParentHei == SIZE_WRAP_CONTENT && pLayoutParam->IsMatchParent(Vert);
@@ -2007,7 +2516,7 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
 
     CSize szRet(KWnd_MaxSize, KWnd_MaxSize);
     if (pLayoutParam->IsSpecifiedSize(Horz))
-    { //检查设置大小
+    { // 检查设置大小
         SLayoutSize layoutSize;
         pLayoutParam->GetSpecifiedSize(Horz, &layoutSize);
         szRet.cx = layoutSize.toPixelSize(GetScale());
@@ -2018,7 +2527,7 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
     }
 
     if (pLayoutParam->IsSpecifiedSize(Vert))
-    { //检查设置大小
+    { // 检查设置大小
         SLayoutSize layoutSize;
         pLayoutParam->GetSpecifiedSize(Vert, &layoutSize);
         szRet.cy = layoutSize.toPixelSize(GetScale());
@@ -2039,7 +2548,7 @@ void SWindow::GetDesiredSize(SIZE *psz, int nParentWid, int nParentHei)
         CSize szChilds;
         if (GetChildrenCount() > 0)
         {
-            //计算子窗口大小
+            // 计算子窗口大小
             CSize szParent(nParentWid, nParentHei);
             if (nParentWid > 0)
             {
@@ -2080,7 +2589,7 @@ SIZE SWindow::MeasureContent(int nParentWid, int nParentHei)
     ILayoutParam *pLayoutParam = GetLayoutParam();
     CRect rcPadding = GetStyle().GetPadding();
 
-    //计算文本大小
+    // 计算文本大小
     SStringT strText = GetWindowText(FALSE);
     CRect rcTest4Text;
     if (!strText.IsEmpty())
@@ -2194,9 +2703,9 @@ void SWindow::OnShowWindow(BOOL bShow, UINT nStatus)
     if (!IsVisible(TRUE))
     {
         if (IsFocused() && GetContainer())
-            GetContainer()->OnSetSwndFocus(0); //窗口隐藏时自动失去焦点
+            GetContainer()->OnSetSwndFocus(0); // 窗口隐藏时自动失去焦点
         if (GetCapture() == m_swnd)
-            ReleaseCapture(); //窗口隐藏时自动失去Capture
+            ReleaseCapture(); // 窗口隐藏时自动失去Capture
     }
 
     if (!m_bDisplay)
@@ -2342,7 +2851,7 @@ void SWindow::GetChildrenLayoutRect(RECT *prc) const
 void SWindow::UpdateChildrenPosition()
 {
     if (m_layoutDirty == dirty_self)
-    { //当前窗口所有子窗口全部重新布局
+    { // 当前窗口所有子窗口全部重新布局
         GetLayout()->LayoutChildren(this);
 
         SWindow *pChild = GetWindow(GSW_FIRSTCHILD);
@@ -2362,7 +2871,7 @@ void SWindow::UpdateChildrenPosition()
         }
     }
     else if (m_layoutDirty == dirty_child)
-    { //只有个别子窗口需要重新布局
+    { // 只有个别子窗口需要重新布局
         SWindow *pChild = GetNextLayoutChild(NULL);
         while (pChild)
         {
@@ -2377,7 +2886,7 @@ void SWindow::UpdateChildrenPosition()
 
 void SWindow::RequestRelayout()
 {
-    RequestRelayout(m_swnd, TRUE); //此处bSourceResizable可以为任意值
+    RequestRelayout(m_swnd, TRUE); // 此处bSourceResizable可以为任意值
 }
 
 void SWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
@@ -2385,12 +2894,12 @@ void SWindow::RequestRelayout(SWND hSource, BOOL bSourceResizable)
     SASSERT(SWindowMgr::IsWindow(hSource));
 
     if (bSourceResizable)
-    { //源窗口大小发生变化,当前窗口的所有子窗口全部重新布局
+    { // 源窗口大小发生变化,当前窗口的所有子窗口全部重新布局
         m_layoutDirty = dirty_self;
     }
 
     if (m_layoutDirty != dirty_self)
-    { //需要检测当前窗口是不是内容自适应
+    { // 需要检测当前窗口是不是内容自适应
         m_layoutDirty = (hSource == m_swnd || GetLayoutParam()->IsWrapContent(Any)) ? dirty_self : dirty_child;
     }
 
@@ -2406,7 +2915,7 @@ void SWindow::UpdateLayout()
     if (m_layoutDirty != dirty_clean && GetChildrenCount())
     {
         UpdateChildrenPosition();
-        if(m_layoutDirty == dirty_child)
+        if (m_layoutDirty == dirty_child)
             m_layoutDirty = dirty_clean;
     }
 }
@@ -2455,7 +2964,7 @@ BOOL SWindow::IsLayeredWindow() const
     return m_bLayeredWindow || GetAlpha() != 0xFF;
 }
 
-//查询当前窗口内容将被渲染到哪一个渲染层上，没有渲染层时返回NULL
+// 查询当前窗口内容将被渲染到哪一个渲染层上，没有渲染层时返回NULL
 SWindow *SWindow::_GetCurrentLayeredWindow()
 {
     SWindow *pWnd = this;
@@ -2678,7 +3187,7 @@ void SWindow::SetAnimation(IAnimation *animation)
             m_animation->startNow();
         }
         if (GetContainer())
-            GetContainer()->RegisterTimelineHandler(&m_animationHandler);
+            GetContainer()->RegisterTimelineHandler(m_pAnimationHandler);
     }
 }
 
@@ -2717,34 +3226,38 @@ void SWindow::ClearAnimation()
         if (m_isAnimating)
         {
             m_animation->cancel();
-            OnAnimationStop(m_animation);
         }
-        else if (GetContainer())
+        if (GetContainer())
         {
-            GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
+            GetContainer()->UnregisterTimelineHandler(m_pAnimationHandler);
         }
         m_animation->setAnimationListener(NULL);
         m_animation = NULL;
+        m_isAnimating = FALSE;
     }
 }
 
 STransformation SWindow::GetTransformation() const
 {
-    if (!m_isAnimating && !m_animationHandler.getFillAfter())
-        return m_transform;
-    else
+    STransformation ret = m_transform;
+    if (m_isAnimating || m_pAnimationHandler->getFillAfter())
     {
-        STransformation ret = m_transform;
-        ret.postCompose(m_animationHandler.GetTransformation());
-        return ret;
+        ret.compose(m_pAnimationHandler->GetTransformation());
     }
+    if (!m_pAnimatorHandler->IsEmpty())
+    {
+        ret.compose(m_pAnimatorHandler->GetTransformation());
+    }
+    return ret;
 }
 
-void SWindow::SetMatrix(const SMatrix &mtx)
+void SWindow::SetMatrix(const SMatrix &mtx, BOOL bInvalidate)
 {
-    InvalidateRect(NULL);
+    if(bInvalidate)
+        InvalidateRect(NULL);
     m_transform.setMatrix(mtx);
-    InvalidateRect(NULL);
+    if(bInvalidate)
+        InvalidateRect(NULL);
 }
 
 void SWindow::SetAlpha(BYTE byAlpha)
@@ -2755,13 +3268,13 @@ void SWindow::SetAlpha(BYTE byAlpha)
 
 BYTE SWindow::GetAlpha() const
 {
-    return (BYTE)((int)m_transform.GetAlpha() * m_animationHandler.GetTransformation().GetAlpha() / 255);
+    return GetTransformation().GetAlpha();
 }
 
-void SWindow::SetMatrix(const IMatrix *mtx)
+void SWindow::SetMatrix(const IMatrix *mtx, BOOL bInvalidate)
 {
     SMatrix smtx(mtx->Data()->fMat);
-    m_transform.setMatrix(smtx);
+    SetMatrix(smtx, bInvalidate);
 }
 
 void SWindow::GetMatrix(IMatrix *mtx) SCONST
@@ -2835,7 +3348,7 @@ void SWindow::PaintBackground(IRenderTarget *pRT, LPRECT pRc)
     GETRENDERFACTORY->CreateRegion(&pRgn);
     pRgn->CombineRect(&rcDraw, RGN_COPY);
 
-    pRT->ClearRect(&rcDraw, 0); //清除残留的alpha值
+    pRT->ClearRect(&rcDraw, 0); // 清除残留的alpha值
 
     SASSERT(GetContainer());
     GetContainer()->BuildWndTreeZorder();
@@ -2944,7 +3457,7 @@ HRESULT SWindow::OnAttrClass(const SStringW &strValue, BOOL bLoading)
     SXmlNode xmlStyle = GETSTYLE(strValue);
     if (xmlStyle)
     {
-        //优先处理layout属性
+        // 优先处理layout属性
         SXmlAttr attrLayout = xmlStyle.attribute(L"layout");
         if (attrLayout)
         {
@@ -2952,9 +3465,9 @@ HRESULT SWindow::OnAttrClass(const SStringW &strValue, BOOL bLoading)
             MarkAttributeHandled(attrLayout, true);
         }
         for (SXmlAttr attr = xmlStyle.first_attribute(); attr; attr = attr.next_attribute())
-        { //解析style中的属性
+        { // 解析style中的属性
             if (_wcsicmp(attr.name(), L"class") == 0 || IsAttributeHandled(attr))
-                continue; //防止class中包含有其它class属性,避免发生死循环
+                continue; // 防止class中包含有其它class属性,避免发生死循环
             SetAttribute(attr.name(), attr.value(), bLoading);
         }
         MarkAttributeHandled(attrLayout, false);
@@ -3151,7 +3664,7 @@ SWindow *SWindow::GetSelectedChildInGroup()
 
 bool SWindow::IsDrawToCache() const
 {
-    return m_bCacheDraw || m_isAnimating;
+    return m_bCacheDraw || m_isAnimating || !m_pAnimatorHandler->IsEmpty();
 }
 
 void SWindow::OnStateChanging(DWORD dwOldState, DWORD dwNewState)
@@ -3347,19 +3860,19 @@ HRESULT SWindow::OnAttrLayout(const SStringW &strValue, BOOL bLoading)
 
 HRESULT SWindow::OnAttrOwnerLayout(const SStringW &strValue, BOOL bLoading)
 {
-    if(GetParent())
+    if (GetParent())
         return E_INVALIDARG;
-    if(strValue.CompareNoCase(SouiLayout::GetClassName()) == 0)
+    if (strValue.CompareNoCase(SouiLayout::GetClassName()) == 0)
         m_pLayoutParam.Attach(new SouiLayoutParam());
-    else if(strValue.CompareNoCase(SLinearLayout::GetClassName()) == 0)
+    else if (strValue.CompareNoCase(SLinearLayout::GetClassName()) == 0)
         m_pLayoutParam.Attach(new SLinearLayoutParam());
-    else if(strValue.CompareNoCase(SHBox::GetClassName()) == 0)
+    else if (strValue.CompareNoCase(SHBox::GetClassName()) == 0)
         m_pLayoutParam.Attach(new SLinearLayoutParam());
-    else if(strValue.CompareNoCase(SVBox::GetClassName()) == 0)
+    else if (strValue.CompareNoCase(SVBox::GetClassName()) == 0)
         m_pLayoutParam.Attach(new SLinearLayoutParam());
-    else if(strValue.CompareNoCase(SGridLayout::GetClassName()) == 0)
+    else if (strValue.CompareNoCase(SGridLayout::GetClassName()) == 0)
         m_pLayoutParam.Attach(new SGridLayoutParam());
-    else if(strValue.CompareNoCase(SAnchorLayout::GetClassName()) == 0)
+    else if (strValue.CompareNoCase(SAnchorLayout::GetClassName()) == 0)
         m_pLayoutParam.Attach(new SAnchorLayoutParam());
     else
         return E_INVALIDARG;
@@ -3376,7 +3889,7 @@ HRESULT SWindow::AfterAttribute(const SStringW &strAttribName, const SStringW &s
     {
         HRESULT hFlag = hr & 0xFFFF0000;
         if ((hFlag & HRET_FLAG_LAYOUT_PARAM) || (hFlag & HRET_FLAG_LAYOUT))
-        { //修改了窗口的布局属性,请求父窗口重新布局
+        { // 修改了窗口的布局属性,请求父窗口重新布局
             if (GetParent())
             {
                 GetParent()->RequestRelayout();
@@ -3425,7 +3938,7 @@ void SWindow::SetToolTipText(LPCTSTR pszText)
     if (!GetContainer())
         return;
     if (GetContainer()->GetHover() == m_swnd)
-    { //请求更新显示的tip
+    { // 请求更新显示的tip
         GetContainer()->UpdateTooltip();
     }
 }
@@ -3455,16 +3968,16 @@ void SWindow::OnScaleChanged(int scale)
     GetScaleSkin(m_pNcSkin, scale);
     GetScaleSkin(m_pBgSkin, scale);
 
-    //标记布局脏
+    // 标记布局脏
     m_layoutDirty = dirty_self;
 
     if (m_animation && m_animation->hasEnded())
     {
-        //动画结束状态下，重新刷新动画结束位置
+        // 动画结束状态下，重新刷新动画结束位置
         long tmDuration = m_animation->getDuration();
         long tmOffset = m_animation->getStartOffset();
         m_animation->setStartTime(STime::GetCurrentTimeMs() - tmDuration - tmOffset);
-        m_animationHandler.OnNextFrame();
+        m_pAnimationHandler->OnNextFrame();
     }
 }
 
@@ -3533,23 +4046,25 @@ BOOL SWindow::SetLayoutParam(ILayoutParam *pLayoutParam)
 
 void SWindow::OnAnimationStart(THIS_ IAnimation *pAni)
 {
+    if (m_isAnimating)
+        return;
     EventSwndAnimationStart evt(this);
     evt.pAni = pAni;
     FireEvent(&evt);
-
-    m_isAnimating = true;
-    m_animationHandler.OnAnimationStart();
+    m_isAnimating = TRUE;
+    m_pAnimationHandler->OnAnimationStart();
     UpdateCacheMode();
 }
 
 void SWindow::OnAnimationStop(THIS_ IAnimation *pAni)
 {
+    SASSERT(m_isAnimating);
     if (GetContainer())
-        GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
+        GetContainer()->UnregisterTimelineHandler(m_pAnimationHandler);
     InvalidateRect(NULL);
     pAni->setStartTime(START_ON_FIRST_FRAME);
-    m_animationHandler.OnAnimationStop();
-    m_isAnimating = false;
+    m_pAnimationHandler->OnAnimationStop();
+    m_isAnimating = FALSE;
     UpdateCacheMode();
     EventSwndAnimationStop evt(this);
     evt.pAni = pAni;
@@ -3563,7 +4078,7 @@ void SWindow::OnAnimationRepeat(THIS_ IAnimation *pAni)
     FireEvent(&evt);
 }
 
-void SWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
+void SWindow::OnAnimationInvalidate(bool bErase)
 {
     InvalidateRect(NULL);
 }
@@ -3599,7 +4114,7 @@ void SWindow::OnContainerChanged(ISwndContainer *pOldContainer, ISwndContainer *
             pOldContainer->UnregisterTrackMouseEvent(m_swnd);
         if (GetCapture() == m_swnd)
             ReleaseCapture();
-        pOldContainer->UnregisterTimelineHandler(&m_animationHandler);
+        pOldContainer->UnregisterTimelineHandler(m_pAnimationHandler);
         if (GetStyle().m_bVideoCanvas)
             pOldContainer->UnregisterVideoCanvas(m_swnd);
     }
@@ -3635,7 +4150,7 @@ BOOL SWindow::IsClipClient() const
 
 BOOL SWindow::IsLayoutDirty() const
 {
-    return m_layoutDirty != dirty_clean;
+    return m_layoutDirty;
 }
 
 SWindow *SWindow::GetWindow(int uCode) const
@@ -3777,7 +4292,7 @@ IWindow *SWindow::GetISelectedChildInGroup(THIS)
 BOOL SWindow::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult)
 {
     SASSERT(lResult);
-    BOOL bOldMsgHandle = IsMsgHandled(); //备分上一个消息的处理状态
+    BOOL bOldMsgHandle = IsMsgHandled(); // 备分上一个消息的处理状态
     BOOL bRet = FALSE;
     if (m_funSwndProc)
     {
@@ -3788,7 +4303,7 @@ BOOL SWindow::SwndProc(UINT uMsg, WPARAM wParam, LPARAM lParam, LRESULT *lResult
         SetMsgHandled(FALSE);
         bRet = ProcessSwndMessage(uMsg, wParam, lParam, *lResult);
     }
-    SetMsgHandled(bOldMsgHandle); //恢复上一个消息的处理状态
+    SetMsgHandled(bOldMsgHandle); // 恢复上一个消息的处理状态
 
     return bRet;
 }
@@ -3856,110 +4371,9 @@ BOOL SWindow::UnregisterDragDrop(THIS)
 void SWindow::OnAnimationPauseChange(THIS_ IAnimation *animation, BOOL bPaused)
 {
     if (bPaused)
-        GetContainer()->UnregisterTimelineHandler(&m_animationHandler);
+        GetContainer()->UnregisterTimelineHandler(m_pAnimationHandler);
     else
-        GetContainer()->RegisterTimelineHandler(&m_animationHandler);
-}
-
-//////////////////////////////////////////////////////////////////////////
-static SWindow *ICWND_NONE = (SWindow *)-2;
-SWindow::SAnimationHandler::SAnimationHandler(SWindow *pOwner)
-    : m_pOwner(pOwner)
-    , m_bFillAfter(false)
-    , m_pPrevSiblingBackup(ICWND_NONE)
-{
-}
-
-void SWindow::SAnimationHandler::OnAnimationStart()
-{
-    IAnimation *pAni = m_pOwner->GetAnimation();
-    SASSERT(pAni);
-    if (pAni->getZAdjustment() != ZORDER_NORMAL)
-    {
-        m_pPrevSiblingBackup = m_pOwner->GetWindow(GSW_PREVSIBLING);
-        if (m_pPrevSiblingBackup == NULL)
-            m_pPrevSiblingBackup = ICWND_FIRST;
-
-        if (pAni->getZAdjustment() == ZORDER_TOP)
-            m_pOwner->AdjustZOrder(ICWND_LAST);
-        else
-            m_pOwner->AdjustZOrder(ICWND_FIRST);
-    }
-    else
-    {
-        m_pPrevSiblingBackup = ICWND_NONE;
-    }
-    m_pOwner->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
-    if (m_pOwner->GetParent())
-    {
-        m_pOwner->GetParent()->GetEventSet()->subscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
-    }
-    OnOwnerResize(NULL);
-}
-
-void SWindow::SAnimationHandler::OnAnimationStop()
-{
-    m_pOwner->GetEventSet()->unsubscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
-    if (m_pOwner->GetParent())
-    {
-        m_pOwner->GetParent()->GetEventSet()->unsubscribeEvent(EventSwndSize::EventID, Subscriber(&SWindow::SAnimationHandler::OnOwnerResize, this));
-    }
-    if (m_pPrevSiblingBackup != ICWND_NONE)
-    {
-        m_pOwner->AdjustZOrder(m_pPrevSiblingBackup);
-        m_pPrevSiblingBackup = ICWND_NONE;
-    }
-}
-
-const STransformation &SWindow::SAnimationHandler::GetTransformation() const
-{
-    return m_transform;
-}
-
-void SWindow::SAnimationHandler::OnNextFrame()
-{
-    IAnimation *pAni = m_pOwner->GetAnimation();
-    SASSERT(pAni);
-    pAni->AddRef();
-    m_pOwner->AddRef();
-    uint64_t tm = pAni->getStartTime();
-    if (tm > 0)
-    {
-        m_pOwner->OnAnimationInvalidate(pAni, true);
-        BOOL bMore = pAni->getTransformation(STime::GetCurrentTimeMs(), &m_transform);
-        m_pOwner->OnAnimationInvalidate(pAni, false);
-        if (!bMore)
-        { // animation stopped.
-            if (pAni->isFillEnabled() && pAni->getFillAfter())
-            {
-                m_bFillAfter = true;
-            }
-            else
-            {
-                m_bFillAfter = false;
-            }
-        }
-    }
-    m_pOwner->Release();
-    pAni->Release();
-}
-
-BOOL SWindow::SAnimationHandler::OnOwnerResize(IEvtArgs *e)
-{
-    CSize szOwner = m_pOwner->GetWindowRect().Size();
-    CSize szParent = szOwner;
-    SWindow *p = m_pOwner->GetParent();
-    if (p)
-    {
-        szParent = p->GetWindowRect().Size();
-    }
-    m_pOwner->GetAnimation()->initialize(szOwner.cx, szOwner.cy, szParent.cx, szParent.cy, m_pOwner->GetScale());
-    return true;
-}
-
-bool SWindow::SAnimationHandler::getFillAfter() const
-{
-    return m_bFillAfter;
+        GetContainer()->RegisterTimelineHandler(m_pAnimationHandler);
 }
 
 SNSEND

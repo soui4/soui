@@ -102,7 +102,8 @@ IAnimatorGroup *SouiFactory::CreateAnimatorGroup(THIS)
     return new SAnimatorGroup();
 }
 
-IAppCfg * SouiFactory::CreateAppCfg(THIS) {
+IAppCfg *SouiFactory::CreateAppCfg(THIS)
+{
     return new SAppCfg();
 }
 SNSEND

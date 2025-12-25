@@ -49,7 +49,6 @@ UpgradeGame::UpgradeGame(CMainDlg* pMainDlg, SGameTheme* pTheme)
     ,m_bShowPrevRound(FALSE)
     ,m_putCard(this)
     ,m_roundResult(RESULT_UNKNOWN)
-    ,m_bSound(TRUE)
 {
     memset(m_pUserInfo, 0, sizeof(m_pUserInfo));
     m_curShowMain.index = -1;
@@ -109,8 +108,7 @@ void UpgradeGame::Init(SWindow *pGameBoard, WebSocketClient *pWs)
             pAvatar->InitFromXml(&xmlAvatar);
             m_pGameBoard->InsertIChild(pAvatar);
             SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pAvatar->GetLayoutParam();
-            SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
-            pParamStruct->pos = m_pTheme->GetAnchorPos(AnchorName::kAvatarBottom + i);
+            pParam->pos = m_pTheme->GetAnchorPos(AnchorName::kAvatarBottom + i);
             pAvatar->SetID(ID_AVATAR_BASE + i);
         }
         SWindow *pAvatar = m_pGameBoard->FindChildByID(ID_AVATAR_BASE + 0);
@@ -130,8 +128,7 @@ void UpgradeGame::Init(SWindow *pGameBoard, WebSocketClient *pWs)
             m_pGameBoard->InsertIChild(pColorFlag);
             pColorFlag->SetID(ID_AVATAR_FLAGS_BASE + i);
             SAnchorLayoutParam *pParam = (SAnchorLayoutParam*)pColorFlag->GetLayoutParam();
-            SAnchorLayoutParamStruct *pParamStruct = (SAnchorLayoutParamStruct*)pParam->GetRawData();
-            pParamStruct->pos = m_pTheme->GetAnchorPos(AnchorName::kColorBottom + i);
+            pParam->pos = m_pTheme->GetAnchorPos(AnchorName::kColorBottom + i);
             pColorFlag->RequestRelayout();
         }
     }
@@ -1972,7 +1969,7 @@ void UpgradeGame::OnAvatarAck(const void *pData, int nSize){
     if(pAck->dwLen == 0){
         return;
     }
-    for(int i = 0; i < 4; i++){
+    for(int i = 0; i < PLAYER_COUNT; i++){
         if(m_pUserInfo[i] && m_pUserInfo[i]->uid == pAck->uid){
             m_userAvatar[i] = std::make_shared<std::vector<BYTE> >(pAck->byData, pAck->byData + pAck->dwLen);
             SLOGI() << "OnAvatarAck: player=" << i << ", size=" << pAck->dwLen;
@@ -2009,8 +2006,6 @@ SImageWnd* UpgradeGame::GetSeatFlag(int nSeat,int flagId){
  */
 void UpgradeGame::PlayEffectSound(LPCWSTR pszSound)
 {
-    if(!m_bSound)
-        return;
     SStringW strFile = m_pTheme->GetEffectSoundFile(pszSound);
     if(!strFile.IsEmpty()){
         TCHAR szResPrefix[MAX_PATH]={0};
@@ -2031,8 +2026,6 @@ void UpgradeGame::PlayEffectSound(LPCWSTR pszSound)
  */
 void UpgradeGame::PlayProcessSound(LPCWSTR pszSound,int nSex)
 {
-    if(!m_bSound)
-        return;
     SStringW strFile = m_pTheme->GetProcSoundFile(nSex == SEX_MALE, pszSound);
     if(!strFile.IsEmpty()){
         TCHAR szResPrefix[MAX_PATH]={0};

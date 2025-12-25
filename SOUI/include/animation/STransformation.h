@@ -83,7 +83,7 @@ class SOUI_EXP STransformation : public ITransformation {
      * @param t The transformation to compose with.
      * @hide
      */
-    void postCompose(STransformation t);
+    void postCompose(const STransformation &t);
 
     /**
      * @brief Gets the 3x3 matrix representing the transformation.

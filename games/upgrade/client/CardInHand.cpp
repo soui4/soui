@@ -785,7 +785,7 @@ int CPutCard::TakeinCard(int nWinner)
 
 void CPutCard::onAnimationEnd(IValueAnimator * pAnimator)
 {
-    SPropertyAnimator * pPropAnim = sobj_cast<SPropertyAnimator>(pAnimator);
+    IPropertyAnimator * pPropAnim = sobj_cast<IPropertyAnimator>(pAnimator);
     IWindow *pTarget = pPropAnim->GetTarget();
     pTarget->Destroy();
 }

@@ -2,7 +2,7 @@
 #include "SLineChartView.h"
 #include "../renderer/SLineChartRenderer.h"
 #include <float.h>
-#include <algorithm>
+#include <sdef.h>
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
@@ -56,10 +56,10 @@ void SLineChartView::SetLineChartData(SLineChartData* pData)
                         SPointValue* pValue = pLine->GetValue(j);
                         if (pValue)
                         {
-                            minX = (std::min)(minX, pValue->GetX());
-                            maxX = (std::max)(maxX, pValue->GetX());
-                            minY = (std::min)(minY, pValue->GetY());
-                            maxY = (std::max)(maxY, pValue->GetY());
+                            minX = smin(minX, pValue->GetX());
+                            maxX = smax(maxX, pValue->GetX());
+                            minY = smin(minY, pValue->GetY());
+                            maxY = smax(maxY, pValue->GetY());
                         }
                     }
                 }

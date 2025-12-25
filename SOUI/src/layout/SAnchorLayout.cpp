@@ -9,8 +9,7 @@
 
 SNSBEGIN
 
-
-SAnchorLayoutParam::SAnchorLayoutParam():m_aniState(ANI_END)
+SAnchorLayoutParam::SAnchorLayoutParam()
 {
     Clear();
 }
@@ -79,12 +78,14 @@ BOOL SAnchorLayoutParam::GetSpecifiedSize(ORIENTATION orientation, LAYOUTSIZE *p
     {
         *pLayoutSize = height;
         return TRUE;
-    }else if (orientation == Horz)
+    }
+    else if (orientation == Horz)
     {
         *pLayoutSize = width;
         return TRUE;
-    }else
-    {   
+    }
+    else
+    {
         return FALSE;
     }
 }
@@ -117,10 +118,12 @@ BOOL SAnchorLayoutParam::ParsePosition(const SStringW &strValue, AnchorPos &aniP
     }
     aniPos.x = GETLAYOUTSIZE(posStr[0]);
     aniPos.y = GETLAYOUTSIZE(posStr[1]);
-    if(ret > 2)
+    if (ret > 2)
     {
         aniPos.type = _wtoi(posStr[2]);
-    }else{
+    }
+    else
+    {
         aniPos.type = APT_Left_Top;
     }
     return TRUE;
@@ -128,7 +131,7 @@ BOOL SAnchorLayoutParam::ParsePosition(const SStringW &strValue, AnchorPos &aniP
 
 HRESULT SAnchorLayoutParam::OnAttrPos(const SStringW &strValue, BOOL bLoading)
 {
-    ParsePosition(strValue,pos);
+    ParsePosition(strValue, pos);
     return S_OK;
 }
 
@@ -229,27 +232,27 @@ void *SAnchorLayoutParam::GetRawData()
 
 ILayoutParam *SAnchorLayoutParam::Clone() const
 {
-    return  new SAnchorLayoutParam(*this);
+    return new SAnchorLayoutParam(*this);
 }
 
 BOOL SAnchorLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
 {
     SStringW strProp = pHolder->GetPropertyName();
-    m_aniState = state;
-    m_fAniFraction = fraction;
 
-    if(strProp.CompareNoCase(LayoutProperty::POSITION)== 0)
+    if (strProp.CompareNoCase(LayoutProperty::POSITION) == 0)
     {
-        if(state == ANI_START){
+        if (state == ANI_START)
         {
-            if(m_aniPosHolder)
+            if (m_aniPosHolder)
                 return FALSE;
             m_aniPosHolder = pHolder;
-        }    
-        }else if(state == ANI_END){
+        }
+        else if (state == ANI_END)
+        {
             pHolder->GetEndValue(&pos);
             m_aniPosHolder = NULL;
         }
+        m_fAniFraction = fraction;
         return TRUE;
     }
     if (strProp.CompareNoCase(LayoutProperty::POSITION_X) == 0)
@@ -274,37 +277,19 @@ BOOL SAnchorLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float 
     }
     if (strProp.CompareNoCase(LayoutProperty::WIDTH) == 0)
     {
-        if(state == ANI_START){
-            if(m_aniWidthHolder)
-                return FALSE;
-            m_aniWidthHolder = pHolder;
-        }
-        else if(state == ANI_END)
-        {
-            pHolder->GetEndValue(&width);
-            m_aniWidthHolder = NULL;
-        }
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, width);
         return TRUE;
     }
     if (strProp.CompareNoCase(LayoutProperty::HEIGHT) == 0)
     {
-        if(state == ANI_START){
-            if(m_aniHeightHolder)
-                return FALSE;
-            m_aniHeightHolder = pHolder;
-        }
-        else if(state == ANI_END)
-        {
-            pHolder->GetEndValue(&height);
-            m_aniHeightHolder = NULL;
-        }
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, height);
         return TRUE;
     }
     return FALSE;
 }
 
 //////////////////////////////////////////////////////////////////////////
-CPoint SAnchorLayout::DefaultAnchor2Pos(const CRect &rcParent, int type)
+CPoint SAnchorLayout::Anchor2Pos(const CRect &rcParent, int type)
 {
     CPoint pt;
     switch (type)
@@ -351,7 +336,8 @@ CPoint SAnchorLayout::DefaultAnchor2Pos(const CRect &rcParent, int type)
     return pt;
 }
 SAnchorLayout::SAnchorLayout(void)
-:m_pfnAnchor2Pos(DefaultAnchor2Pos)
+    : m_pfnPosition2Point(DefaultPosition2Point)
+    , m_pUserData(NULL)
 {
 }
 
@@ -374,28 +360,30 @@ SIZE SAnchorLayout::MeasureChildren(const IWindow *pParent, int nWidth, int nHei
     return CSize();
 }
 
-POINT SAnchorLayout::Position2Point(const AnchorPos &pos, const CRect &rcParent, const CSize & szChild, int nScale) const
+POINT SAnchorLayout::DefaultPosition2Point(const AnchorPos &pos, const CRect &rcParent, const CSize &szChild, int nScale, void *userData)
 {
-    CPoint pt = m_pfnAnchor2Pos(rcParent, pos.type);
+    CPoint pt = Anchor2Pos(rcParent, pos.type);
     pt.x += pos.x.toPixelSize(nScale);
     pt.y += pos.y.toPixelSize(nScale);
-    pt.Offset(pos.fOffsetX * szChild.cx,pos.fOffsetY * szChild.cy);
+    pt.Offset(pos.fOffsetX * szChild.cx, pos.fOffsetY * szChild.cy);
     return pt;
 }
-POINT SAnchorLayout::CalcPoint4Animator(const AnchorPos &start, const AnchorPos &end, float fraction, const CRect &rcParent, const CSize & szChild, int nScale) const{
-    POINT ptStart = Position2Point(start,rcParent,szChild,nScale);
-    if(end.type == APT_Invalid)
+POINT SAnchorLayout::CalcPoint4Animator(const AnchorPos &start, const AnchorPos &end, float fraction, const CRect &rcParent, const CSize &szChild, int nScale) const
+{
+    POINT ptStart = m_pfnPosition2Point(start, rcParent, szChild, nScale, m_pUserData);
+    if (end.type == APT_Invalid)
         return ptStart;
-    POINT ptEnd = Position2Point(end,rcParent,szChild,nScale);
+    POINT ptEnd = m_pfnPosition2Point(end, rcParent, szChild, nScale, m_pUserData);
     CPoint pt;
     pt.x = ptStart.x + (ptEnd.x - ptStart.x) * fraction;
     pt.y = ptStart.y + (ptEnd.y - ptStart.y) * fraction;
     return pt;
 }
 
-static int _InterpolateLayoutSize(const IWindow *pChild,int parentSize,int autoSize,const SLayoutSize &start,const SLayoutSize &end,float fraction){
-    int nStart = start.isMatchParent()?parentSize : start.isWrapContent()?autoSize : start.toPixelSize(pChild->GetScale());
-    int nEnd = end.isMatchParent()? parentSize : end.isWrapContent()?autoSize : end.toPixelSize(pChild->GetScale());
+static int _InterpolateLayoutSize(const IWindow *pChild, int parentSize, int autoSize, const SLayoutSize &start, const SLayoutSize &end, float fraction)
+{
+    int nStart = start.isMatchParent() ? parentSize : start.isWrapContent() ? autoSize : start.toPixelSize(pChild->GetScale());
+    int nEnd = end.isMatchParent() ? parentSize : end.isWrapContent() ? autoSize : end.toPixelSize(pChild->GetScale());
     return nStart + (nEnd - nStart) * fraction;
 }
 void SAnchorLayout::LayoutChildren(IWindow *pParent)
@@ -412,7 +400,9 @@ void SAnchorLayout::LayoutChildren(IWindow *pParent)
             SLayoutSize layoutSize;
             pParam->GetSpecifiedSize(Horz, &layoutSize);
             szChild.cx = layoutSize.toPixelSize(pChild->GetScale());
-        }else if(pParam->IsMatchParent(Horz)){
+        }
+        else if (pParam->IsMatchParent(Horz))
+        {
             szChild.cx = rcParent.Width();
         }
         if (pParam->IsSpecifiedSize(Vert))
@@ -420,7 +410,9 @@ void SAnchorLayout::LayoutChildren(IWindow *pParent)
             SLayoutSize layoutSize;
             pParam->GetSpecifiedSize(Vert, &layoutSize);
             szChild.cy = layoutSize.toPixelSize(pChild->GetScale());
-        }else if(pParam->IsMatchParent(Vert)){
+        }
+        else if (pParam->IsMatchParent(Vert))
+        {
             szChild.cy = rcParent.Height();
         }
         if (szChild.cx == SIZE_WRAP_CONTENT || szChild.cy == SIZE_WRAP_CONTENT)
@@ -437,38 +429,18 @@ void SAnchorLayout::LayoutChildren(IWindow *pParent)
             }
         }
         CPoint pt;
-        if (pParam->m_aniState != ANI_END)
+        if (SAutoRefPtr<IPropertyValuesHolder> pHolder = pParam->m_aniPosHolder)
         {
             float fraction = pParam->m_fAniFraction;
-            CSize szAuto;
-            pChild->GetDesiredSize(&szAuto,rcParent.Width(),rcParent.Height());
-            if(SAutoRefPtr<IPropertyValuesHolder> pHolder = pParam->m_aniWidthHolder){
-                int idx[2];
-                float segfraction = pHolder->Fraction2Index(fraction, idx);
-                SLayoutSize width[2];
-                pHolder->GetValueByIndex(idx[0], &width[0], sizeof(SLayoutSize));
-                pHolder->GetValueByIndex(idx[1], &width[1], sizeof(SLayoutSize));
-                szChild.cx = _InterpolateLayoutSize(pChild,rcParent.Width(),szAuto.cx,width[0], width[1], segfraction);
-            }
-            if(SAutoRefPtr<IPropertyValuesHolder> pHolder = pParam->m_aniHeightHolder){
-                int idx[2];
-                float segfraction = pHolder->Fraction2Index(fraction, idx);
-                SLayoutSize height[2];
-                pHolder->GetValueByIndex(idx[0], &height[0], sizeof(SLayoutSize));
-                pHolder->GetValueByIndex(idx[1], &height[1], sizeof(SLayoutSize));
-                szChild.cy = _InterpolateLayoutSize(pChild,rcParent.Height(),szAuto.cy, height[0], height[1], segfraction);
-            }
-            if(SAutoRefPtr<IPropertyValuesHolder> pHolder = pParam->m_aniPosHolder){
+            CSize szAuto = szChild;
+            if (pHolder->GetValueType() == PROP_TYPE_VARIANT && pHolder->GetValueSize() == sizeof(AnchorPos))
+            {
                 AnchorPos aniPos[2];
                 int idx[2];
                 float segFraction = pHolder->Fraction2Index(fraction, idx);
                 pHolder->GetValueByIndex(idx[0], &aniPos[0], sizeof(AnchorPos));
                 pHolder->GetValueByIndex(idx[1], &aniPos[1], sizeof(AnchorPos));
                 pt = CalcPoint4Animator(aniPos[0], aniPos[1], segFraction, rcParent, szChild, pChild->GetScale());
-            }
-            else
-            {
-                pt = Position2Point(pParam->pos, rcParent, szChild, pChild->GetScale());
             }
             if (szChild.cx == rcParent.Width())
             {
@@ -481,7 +453,7 @@ void SAnchorLayout::LayoutChildren(IWindow *pParent)
         }
         else
         {
-            pt = Position2Point(pParam->pos, rcParent, szChild, pChild->GetScale());
+            pt = m_pfnPosition2Point(pParam->pos, rcParent, szChild, pChild->GetScale(), m_pUserData);
             if (pParam->width.isMatchParent())
             {
                 pt.x = rcParent.left;

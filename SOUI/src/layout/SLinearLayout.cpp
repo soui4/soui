@@ -202,37 +202,37 @@ ILayoutParam *SLinearLayoutParam::Clone() const
 BOOL SLinearLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
 {
     SStringW strName = pHolder->GetPropertyName();
-    if(strName.CompareNoCase(LayoutProperty::WIDTH)==0)
+    if (strName.CompareNoCase(LayoutProperty::WIDTH) == 0)
     {
-        pHolder->GetAnimatedValue(fraction, &width);
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, width);
         return TRUE;
     }
-    if(strName.CompareNoCase(LayoutProperty::HEIGHT)==0)
+    if (strName.CompareNoCase(LayoutProperty::HEIGHT) == 0)
     {
-        pHolder->GetAnimatedValue(fraction, &height);
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, height);
         return TRUE;
     }
-    if(strName.CompareNoCase(LayoutProperty::EXTEND_LEFT)==0)
+    if (strName.CompareNoCase(LayoutProperty::EXTEND_LEFT) == 0)
     {
-        pHolder->GetAnimatedValue(fraction, &extend_left);
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, extend_left);
         return TRUE;
     }
-    if(strName.CompareNoCase(LayoutProperty::EXTEND_RIGHT)==0)
+    if (strName.CompareNoCase(LayoutProperty::EXTEND_RIGHT) == 0)
     {
-        pHolder->GetAnimatedValue(fraction, &extend_right);
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, extend_right);
         return TRUE;
     }
-    if(strName.CompareNoCase(LayoutProperty::EXTEND_TOP)==0)
+    if (strName.CompareNoCase(LayoutProperty::EXTEND_TOP) == 0)
     {
-        pHolder->GetAnimatedValue(fraction, &extend_top);
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, extend_top);
         return TRUE;
     }
-    if(strName.CompareNoCase(LayoutProperty::EXTEND_BOTTOM)==0)
+    if (strName.CompareNoCase(LayoutProperty::EXTEND_BOTTOM) == 0)
     {
-        pHolder->GetAnimatedValue(fraction, &extend_bottom);
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, extend_bottom);
         return TRUE;
     }
-    if(strName.CompareNoCase(LayoutProperty::WEIGHT)==0)
+    if (strName.CompareNoCase(LayoutProperty::WEIGHT) == 0)
     {
         pHolder->GetAnimatedValue(fraction, &weight);
         return TRUE;

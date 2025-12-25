@@ -14,7 +14,8 @@ enum
     POS_WAIT = 0x12000000, //坐标的计算依赖于其它窗口的布局
 };
 
-SouiLayoutParam::SouiLayoutParam(){
+SouiLayoutParam::SouiLayoutParam()
+{
     Clear();
 }
 
@@ -404,23 +405,26 @@ ILayoutParam *SouiLayoutParam::Clone() const
     return pRet;
 }
 
-BOOL SouiLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state){
+BOOL SouiLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
+{
     SStringW strPropName = pHolder->GetPropertyName();
-    if(strPropName.CompareNoCase(LayoutProperty::WIDTH) == 0){
-        LAYOUTSIZE layoutSize;
-        pHolder->GetAnimatedValue(fraction, &width);
+    if (strPropName.CompareNoCase(LayoutProperty::WIDTH) == 0)
+    {
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, width);
         return TRUE;
     }
-    if(strPropName.CompareNoCase(LayoutProperty::HEIGHT) == 0){
-        LAYOUTSIZE layoutSize;
-        pHolder->GetAnimatedValue(fraction, &height);
+    if (strPropName.CompareNoCase(LayoutProperty::HEIGHT) == 0)
+    {
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, height);
         return TRUE;
     }
-    if(strPropName.CompareNoCase(LayoutProperty::OFFSET_X) == 0){
+    if (strPropName.CompareNoCase(LayoutProperty::OFFSET_X) == 0)
+    {
         pHolder->GetAnimatedValue(fraction, &fOffsetX);
         return TRUE;
     }
-    if(strPropName.CompareNoCase(LayoutProperty::OFFSET_Y) == 0){
+    if (strPropName.CompareNoCase(LayoutProperty::OFFSET_Y) == 0)
+    {
         pHolder->GetAnimatedValue(fraction, &fOffsetY);
         return TRUE;
     }

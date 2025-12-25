@@ -533,7 +533,7 @@ int SComboBase::OnCreate(LPVOID)
         return ret;
     if (!m_pSkinBtn)
     {
-        SSLOGW()<<"SComboBase::OnCreate failed! skin of btn is null!";
+        SSLOGW() << "SComboBase::OnCreate failed! skin of btn is null!";
         return -1;
     }
     return 0;

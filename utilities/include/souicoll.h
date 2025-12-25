@@ -483,6 +483,8 @@ public:
     void RemoveAt( size_t iElement, size_t nCount = 1 );
 
 	int Find(const E & target) const;
+
+    BOOL RemoveElement(const E & target);
 #ifdef _DEBUG
     void AssertValid() const;
 #endif  // _DEBUG
@@ -929,6 +931,16 @@ void SArray< E, ETraits >::RemoveAt( size_t iElement, size_t nElements )
                                    nMoveCount );
     }
     m_nSize -= nElements;
+}
+
+template< typename E, class ETraits >
+BOOL SArray< E, ETraits >::RemoveElement(const E& element)
+{
+    int nIndex = Find(element);
+    if (nIndex == -1) 
+        return FALSE;
+    RemoveAt(nIndex);
+    return TRUE;
 }
 
 template< typename E, class ETraits >

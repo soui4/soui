@@ -54,11 +54,13 @@ IWindow *SSpinButtonCtrl::GetIBuddy() const
 void SSpinButtonCtrl::SetBuddy(IWindow *pBuddy)
 {
     MemberFunctionSlot<SSpinButtonCtrl, IEvtArgs> slot = Subscriber(&SSpinButtonCtrl::OnBuddyChange, this);
-    if(m_pBuddy){
+    if (m_pBuddy)
+    {
         m_pBuddy->UnsubscribeEvent(EVT_RE_NOTIFY, &slot);
     }
     m_pBuddy = pBuddy;
-    if(m_pBuddy){
+    if (m_pBuddy)
+    {
         m_pBuddy->SubscribeEvent(EVT_RE_NOTIFY, &slot);
     }
 }
@@ -225,9 +227,9 @@ int SSpinButtonCtrl::OnCreate(void *)
     if (nRet != 0)
         return nRet;
     OnValueChanged(true);
-    if(m_strBuddy.IsEmpty()) 
+    if (m_strBuddy.IsEmpty())
         return 0;
-    SWindow * pBuddy = GetParent()->FindChildByName(m_strBuddy);
+    SWindow *pBuddy = GetParent()->FindChildByName(m_strBuddy);
     SetBuddy(pBuddy);
     return 0;
 }

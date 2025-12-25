@@ -9,9 +9,8 @@ SNSBEGIN
  * @class SLayoutSize
  * @brief 布局大小类
  */
-class SOUI_EXP SLayoutSize : public LAYOUTSIZE{
+class SOUI_EXP SLayoutSize : public LAYOUTSIZE {
   public:
-
     /**
      * @brief 默认构造函数
      * @param fSize 大小值（默认为0.0f）
@@ -25,9 +24,15 @@ class SOUI_EXP SLayoutSize : public LAYOUTSIZE{
      */
     SLayoutSize(float fSize, Unit unit);
 
-    SLayoutSize(const SLayoutSize &src) { *this = src; }
-    SLayoutSize(const LAYOUTSIZE &src) { *this = src; }
-    
+    SLayoutSize(const SLayoutSize &src)
+    {
+        *this = src;
+    }
+    SLayoutSize(const LAYOUTSIZE &src)
+    {
+        *this = src;
+    }
+
     /**
      * @brief 设置为包裹内容大小
      */

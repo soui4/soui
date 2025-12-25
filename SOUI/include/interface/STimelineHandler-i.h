@@ -13,12 +13,12 @@ SNSBEGIN
 #define INTERFACE ITimelineHandler
 DECLARE_INTERFACE(ITimelineHandler)
 {
-    #ifdef __cplusplus
+#ifdef __cplusplus
     enum
     {
-        kPulseInterval = 10  // 10ms
+        kPulseInterval = 10 // 10ms
     };
-    #endif
+#endif
     /**
      * @brief 下一个动画帧处理接口
      * @return

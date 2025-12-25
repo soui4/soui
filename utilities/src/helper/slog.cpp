@@ -15,8 +15,11 @@ LogCallback Log::gs_logCallback = NULL;
 
 static bool IsConsoleProgram()
 {
-    HANDLE hStdOut = GetStdHandle(STD_OUTPUT_HANDLE);
-    return hStdOut != INVALID_HANDLE_VALUE;
+#ifdef _WIN32
+    return GetConsoleWindow() != NULL;
+#else
+    return true;
+#endif
 }
 
 Log::Log(const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr)
@@ -317,6 +320,16 @@ SLogStream &SLogStream::operator<<(const char *t)
 SLogStream &SLogStream::operator<<(const void *t)
 {
     return writePointer(t);
+}
+
+SLogStream &SLogStream::operator<<(const POINT &pt)
+{
+    return writeFormat("{%d,%d}", pt.x, pt.y);
+}
+
+SLogStream &SLogStream::operator<<(const RECT &rc)
+{
+    return writeFormat("{%d,%d,%d,%d}", rc.left, rc.top, rc.right, rc.bottom);
 }
 
 SNSEND

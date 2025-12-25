@@ -144,6 +144,16 @@ TEST(soui,mb){
     EXPECT_TRUE(wcscmp(src,szWd)==0);
 }
 
+TEST(soui, matrix)
+{
+    SMatrix mtx1, mtx2,mtx3;
+    mtx1.setScale2(2, 2, 50, 50);
+    mtx2.setScale2(2, 1, 50, 50);
+    mtx3.setScale2(1, 2, 50, 50);
+    SMatrix mtx4 = mtx2 * mtx3;
+    EXPECT_EQ(mtx1, mtx4);
+}
+
 class TaskHost {
 public:
     TaskHost(int id_) :id(id_) {}

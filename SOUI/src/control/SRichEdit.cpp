@@ -2133,8 +2133,8 @@ COLORREF SRichEdit::SetDefaultTextColor(COLORREF cr)
 
 void SRichEdit::OnEnableDragDrop(BOOL bEnable)
 {
-	if(!GetContainer())
-		return;
+    if (!GetContainer())
+        return;
     if (bEnable)
     {
         SRicheditDropTarget *pDropTarget = new SRicheditDropTarget(m_pTxtHost->GetTextService());
@@ -2322,7 +2322,7 @@ LRESULT SRichEdit::OnGetRect(UINT uMsg, WPARAM wp, LPARAM lp)
 
 BOOL SRichEdit::OnTxSetTimer(UINT idTimer, UINT uTimeout)
 {
-    SMap<UINT, SAutoRefPtr<ITimer> >::CPair *p = m_mapTimer.Lookup(idTimer);
+    SMap<UINT, SAutoRefPtr<ITimer>>::CPair *p = m_mapTimer.Lookup(idTimer);
     if (p)
     {
         p->m_value->KillTimer();

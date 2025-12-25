@@ -689,7 +689,7 @@ class SOUI_EXP SRichEdit : public TPanelProxy<IRichEdit> {
     BYTE m_byDbcsLeadByte;                      /**< DBCS输入时的中文头字节*/
     SStringW m_strRtfSrc;                       /**< 在XML中指定的RTF数据源*/
     STextHost *m_pTxtHost;                      /**< Host of Richedit*/
-    SMap<UINT, SAutoRefPtr<ITimer> > m_mapTimer; /**< map of timer to id*/
+    SMap<UINT, SAutoRefPtr<ITimer>> m_mapTimer; /**< map of timer to id*/
 };
 
 SNSEND

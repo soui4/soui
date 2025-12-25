@@ -165,7 +165,7 @@ SRootWindow::SRootWindow(SHostWnd *pHostWnd)
     GetEventSet()->addEvent(EVENTID(EventMenuCmd));
 }
 
-void SRootWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
+void SRootWindow::OnAnimationInvalidate(bool bErase)
 {
     if (bErase)
     {
@@ -174,7 +174,7 @@ void SRootWindow::OnAnimationInvalidate(IAnimation *pAni, bool bErase)
         m_pHostWnd->m_memRT->ClearRect(rcWnd, 0);
         m_pHostWnd->m_memRT->EndDraw();
     }
-    SWindow::OnAnimationInvalidate(pAni, bErase);
+    SWindow::OnAnimationInvalidate(bErase);
     if (!bErase)
         Update();
 }
@@ -1568,7 +1568,8 @@ BOOL SHostWnd::UnregisterTimelineHandler(ITimelineHandler *pHandler)
     return bRet;
 }
 
-BOOL SHostWnd::RegisterValueAnimator(IValueAnimator *pAnimator){
+BOOL SHostWnd::RegisterValueAnimator(IValueAnimator *pAnimator)
+{
     bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
     BOOL bRet = SwndContainerImpl::RegisterValueAnimator(pAnimator);
     bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
@@ -1579,7 +1580,8 @@ BOOL SHostWnd::RegisterValueAnimator(IValueAnimator *pAnimator){
     return bRet;
 }
 
-BOOL SHostWnd::UnregisterValueAnimator(IValueAnimator *pAnimator){
+BOOL SHostWnd::UnregisterValueAnimator(IValueAnimator *pAnimator)
+{
     bool bEmpty1 = m_timelineHandlerMgr.IsEmpty();
     BOOL bRet = SwndContainerImpl::UnregisterValueAnimator(pAnimator);
     bool bEmpty2 = m_timelineHandlerMgr.IsEmpty();
@@ -2135,7 +2137,7 @@ void SHostWnd::OnCommand(UINT uNotifyCode, int nID, HWND wndCtl)
 }
 
 void SHostWnd::OnScaleChanged(int nScale)
-{ 
+{
 }
 
 void SHostWnd::SetScale(THIS_ int nScale, LPCRECT desRect)

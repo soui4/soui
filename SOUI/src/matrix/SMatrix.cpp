@@ -150,16 +150,6 @@ uint8_t SMatrix::computeTypeMask() const
 
 ///////////////////////////////////////////////////////////////////////////////
 
-bool operator==(const SMatrix &a, const SMatrix &b)
-{
-    const float *ma = a.fMat;
-    const float *mb = b.fMat;
-
-    return ma[0] == mb[0] && ma[1] == mb[1] && ma[2] == mb[2] && ma[3] == mb[3] && ma[4] == mb[4] && ma[5] == mb[5] && ma[6] == mb[6] && ma[7] == mb[7] && ma[8] == mb[8];
-}
-
-///////////////////////////////////////////////////////////////////////////////
-
 // helper function to determine if upper-left 2x2 of matrix is degenerate
 static inline bool is_degenerate_2x2(float scaleX, float skewX, float skewY, float scaleY)
 {
@@ -1682,7 +1672,7 @@ const SMatrix &SMatrix::I()
 const SMatrix &SMatrix::InvalidMatrix()
 {
     static const float kInvalidMatrix[9] = { SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax, SK_ScalarMax };
-    static const SMatrix invalidMatrix(kInvalidMatrix,kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask);
+    static const SMatrix invalidMatrix(kInvalidMatrix, kTranslate_Mask | kScale_Mask | kAffine_Mask | kPerspective_Mask);
     return invalidMatrix;
 }
 

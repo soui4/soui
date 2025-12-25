@@ -1,21 +1,23 @@
 ﻿/**
- * @file sproperty-values-holder-i.h
+ * @file SPropertyAnimator-i.h
  * @brief SOUI属性动画接口定义 - 参考Android属性动画系统设计
  * @author SOUI group
  * @date 2025
  */
 
-#ifndef __SPROPERTY_VALUES_HOLDER_I__H__
-#define __SPROPERTY_VALUES_HOLDER_I__H__
+#ifndef __SPROPERTY_AMINATOR_I__H__
+#define __SPROPERTY_AMINATOR_I__H__
 
 #include <interface/obj-ref-i.h>
-//#include <interface/slayout-i.h>
+
+
 SNSBEGIN
 
+typedef struct IWindow IWindow;
 typedef struct _LAYOUTSIZE LAYOUTSIZE;
 
-
-typedef enum _PROP_TYPE {
+typedef enum _PROP_TYPE
+{
     PROP_TYPE_UNKNOWN = 0,
     PROP_TYPE_BYTE,
     PROP_TYPE_SHORT,
@@ -24,7 +26,7 @@ typedef enum _PROP_TYPE {
     PROP_TYPE_FLOAT,
     PROP_TYPE_LAYOUT_SIZE,
     PROP_TYPE_VARIANT,
-}PROP_TYPE;
+} PROP_TYPE;
 
 /**
  * @interface IPropertyValuesHolder
@@ -120,13 +122,13 @@ DECLARE_INTERFACE_(IPropertyValuesHolder, IObjRef)
      * @brief 获取起始值
      * @param pValue 输出值指针
      */
-    STDMETHOD_(void,GetStartValue)(CTHIS_ void *pValue) SCONST PURE;
+    STDMETHOD_(void, GetStartValue)(CTHIS_ void *pValue) SCONST PURE;
 
     /**
      * @brief 获取结束值
      * @param pValue 输出值指针
      */
-    STDMETHOD_(void,GetEndValue)(CTHIS_ void *pValue) SCONST PURE;
+    STDMETHOD_(void, GetEndValue)(CTHIS_ void *pValue) SCONST PURE;
 
     /**
      * @brief 将动画进度转换为索引
@@ -143,15 +145,73 @@ DECLARE_INTERFACE_(IPropertyValuesHolder, IObjRef)
      * @param valueSize 值大小
      * @return 成功返回TRUE
      */
-    STDMETHOD_(BOOL,GetValueByIndex)(CTHIS_ int index, void *pValue, int valueSize) SCONST PURE;
+    STDMETHOD_(BOOL, GetValueByIndex)(CTHIS_ int index, void *pValue, int valueSize) SCONST PURE;
 
     /**
      * @brief 获取关键帧数量
      * @return 关键帧数量
      */
     STDMETHOD_(int, GetKeyframeCount)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief 设置关键帧权重
+     * @param weights 权重数组
+     * @param count 权重数量
+     * @return 成功返回TRUE,失败返回FALSE(权重数量与关键帧数量不一致)
+     * @note 权重数量必须与关键帧数量一致,不设置权重则默认为1.0
+     */
+    STDMETHOD_(BOOL, SetKeyFrameWeights)(THIS_ const float *weights, int count) PURE;
+
+    /**
+     * @brief 获取关键帧权重
+     * @param weights 权重数组
+     * @param count 权重数量
+     * @return 成功返回TRUE,失败返回FALSE(权重数量与关键帧数量不一致)
+     */
+    STDMETHOD_(BOOL, GetKeyFrameWeights)(CTHIS_ float *weights, int count) SCONST PURE;
+};
+
+
+DECLARE_INTERFACE_(IPropertyAnimator, IValueAnimator)
+{ 
+    /**
+     * @brief 获取动画目标
+     * @return 动画目标
+     */
+    STDMETHOD_(IWindow *,GetTarget)(CTHIS) SCONST PURE;
+
+    /**
+     * @brief 设置属性值持有者
+     * @param pHolder 属性值持有者
+     */
+    STDMETHOD_(void,SetPropertyValuesHolder)(THIS_ IPropertyValuesHolder *pHolder) PURE;
+    /**
+     * @brief 设置属性值持有者数组
+     * @param pHolders 属性值持有者数组
+     * @param count 属性值持有者数量
+     */
+    STDMETHOD_(void,SetPropertyValuesHolders)(THIS_ IPropertyValuesHolder **pHolders, int count) PURE; 
+    /**
+     * @brief 获取属性值持有者
+     * @param propertyName 属性名称
+     * @return 属性值持有者
+     */
+    STDMETHOD_(IPropertyValuesHolder *,GetPropertyValuesHolderByName)(CTHIS_ LPCWSTR propertyName) SCONST PURE;
+
+    /**
+     * @brief 获取属性值持有者
+     * @param index 索引
+     * @return 属性值持有者
+     */
+    STDMETHOD_(IPropertyValuesHolder *,GetPropertyValuesHolderByIndex)(CTHIS_ int index) SCONST PURE;
+
+    /**
+     * @brief 获取属性值持有者数量
+     * @return 属性值持有者数量
+     */
+    STDMETHOD_(int,GetPropertyValuesHolderCount)(CTHIS) SCONST PURE;
 };
 
 SNSEND
 
-#endif // __SPROPERTY_VALUES_HOLDER_I__H__
+#endif // __SPROPERTY_AMINATOR_I__H__

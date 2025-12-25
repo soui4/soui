@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<page title="@string/cnchess" name="game_container">
+    <chessboard name="chessboard" size="-2,-2" enableLayer="1" layout="anchor">
+        <button name="btn_test" size="100,30" text="test" pos="0,0,2" offset="-1,0" layer="20000"/>
+    </chessboard>
+</page>

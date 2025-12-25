@@ -177,6 +177,7 @@ class SWindowFinder : public TObjRefImpl<ISwndFinder> {
      * @return 删除成功返回true，否则返回false
      */
     BOOL WINAPI EraseCacheForName(IWindow *pParent, LPCWSTR strName, int nDeep) override;
+
   protected:
     /**
      * @brief 通过查找信息查找子窗口

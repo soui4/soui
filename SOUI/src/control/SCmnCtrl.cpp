@@ -708,9 +708,12 @@ SIZE SImageWnd::MeasureContent(int wid, int hei)
 
 void SImageWnd::GetDesiredSize(SIZE *pSize, int nParentWid, int nParentHei)
 {
-    if(m_bFitImage){
+    if (m_bFitImage)
+    {
         *pSize = MeasureContent(nParentWid, nParentHei);
-    }else{
+    }
+    else
+    {
         __baseCls::GetDesiredSize(pSize, nParentWid, nParentHei);
     }
 }
@@ -729,7 +732,7 @@ void SImageWnd::OnScaleChanged(int scale)
         GetScaleSkin(m_pSkin, scale);
 }
 
-ISkinObj *SImageWnd::GetSkin()
+ISkinObj *SImageWnd::GetSkin() const
 {
     return m_pSkin;
 }
@@ -896,7 +899,8 @@ void SProgress::GetDesiredSize(SIZE *psz, int wid, int hei)
     if (IsVertical())
     {
         szRet.cx = sizeBg.cx + rcMargin.left + rcMargin.right;
-        if (GetLayoutParam()->IsSpecifiedSize(Vert)){
+        if (GetLayoutParam()->IsSpecifiedSize(Vert))
+        {
             SLayoutSize layoutSize;
             GetLayoutParam()->GetSpecifiedSize(Vert, &layoutSize);
             szRet.cy = layoutSize.toPixelSize(GetScale());
@@ -907,7 +911,8 @@ void SProgress::GetDesiredSize(SIZE *psz, int wid, int hei)
     else
     {
         szRet.cy = sizeBg.cy + rcMargin.top + rcMargin.bottom;
-        if (GetLayoutParam()->IsSpecifiedSize(Horz)){
+        if (GetLayoutParam()->IsSpecifiedSize(Horz))
+        {
             SLayoutSize layoutSize;
             GetLayoutParam()->GetSpecifiedSize(Horz, &layoutSize);
             szRet.cx = layoutSize.toPixelSize(GetScale());
@@ -1086,7 +1091,7 @@ void SCheckBox::GetTextRect(LPRECT pRect)
 void SCheckBox::OnPaint(IRenderTarget *pRT)
 {
     CRect rcCheckBox = GetCheckRect();
-    if(m_pSkin)
+    if (m_pSkin)
         m_pSkin->DrawByState(pRT, rcCheckBox, GetState());
     __baseCls::OnPaint(pRT);
 }
@@ -1335,7 +1340,8 @@ void SRadioBox::GetTextRect(LPRECT pRect)
 void SRadioBox::OnPaint(IRenderTarget *pRT)
 {
     CRect rcRadioBox = GetRadioRect();
-    if(m_pSkin){
+    if (m_pSkin)
+    {
         m_pSkin->DrawByState(pRT, rcRadioBox, GetState());
     }
     __baseCls::OnPaint(pRT);

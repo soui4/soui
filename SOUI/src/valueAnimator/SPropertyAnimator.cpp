@@ -21,6 +21,7 @@ SPropertyValuesHolder::SPropertyValuesHolder()
 {
     m_value.nType = PROP_TYPE_UNKNOWN;
     m_value.fValue = NULL;
+    m_value.pWeights = NULL;
     m_valueCount = 0;
 }
 
@@ -56,7 +57,7 @@ void SPropertyValuesHolder::SetByteValues(const BYTE *values, int count)
 }
 
 void SPropertyValuesHolder::SetShortValues(const short *values, int count)
-{  
+{
     ClearValues();
     if (values && count > 0)
     {
@@ -150,13 +151,13 @@ BOOL SPropertyValuesHolder::GetAnimatedValue(float fraction, void *pValue) const
     switch (m_value.nType)
     {
     case PROP_TYPE_FLOAT:
-        *(float*)pValue = InterpolateFloat(fraction);
+        *(float *)pValue = InterpolateFloat(fraction);
         return TRUE;
     case PROP_TYPE_INT:
-        *(int*)pValue = InterpolateInt(fraction);
+        *(int *)pValue = InterpolateInt(fraction);
         return TRUE;
     case PROP_TYPE_LAYOUT_SIZE:
-        *(LAYOUTSIZE*)pValue = InterpolateLayoutSize(fraction);
+        *(LAYOUTSIZE *)pValue = InterpolateLayoutSize(fraction);
         return TRUE;
     case PROP_TYPE_BYTE:
         *(BYTE *)pValue = InterpolateByte(fraction);
@@ -182,16 +183,16 @@ void SPropertyValuesHolder::GetEndValue(void *pValue) const
 {
     if (!pValue || m_valueCount < 2)
         return;
-    memcpy(pValue, (char*)m_value.fValue + (m_valueCount - 1)*m_valueSize, m_valueSize);
+    memcpy(pValue, (char *)m_value.fValue + (m_valueCount - 1) * m_valueSize, m_valueSize);
 }
 
 BOOL SPropertyValuesHolder::GetValueByIndex(int index, void *pValue, int valueSize) const
 {
     if (!pValue || index < 0 || index >= m_valueCount)
         return FALSE;
-    if(valueSize != m_valueSize)
+    if (valueSize != m_valueSize)
         return FALSE;
-    memcpy(pValue, (char*)m_value.pValue + index * valueSize, valueSize);
+    memcpy(pValue, (char *)m_value.pValue + index * valueSize, valueSize);
     return TRUE;
 }
 
@@ -230,20 +231,105 @@ void SPropertyValuesHolder::ClearValues()
             m_value.pValue = NULL;
             break;
         }
+        if (m_value.pWeights)
+        {
+            delete[] m_value.pWeights;
+            m_value.pWeights = NULL;
+        }
         m_value.nType = PROP_TYPE_UNKNOWN;
         m_valueSize = 0;
         m_valueCount = 0;
+        m_totalWeight = 0;
     }
 }
 
 float SPropertyValuesHolder::Fraction2Index(float fraction, int idx[2]) const
 {
-    float segmentFraction = fraction * (m_valueCount - 1);
-    idx[0] = (int)segmentFraction;
-    idx[1] = idx[0] + 1;
-    if (idx[1] >= m_valueCount)
+    if (!m_value.pWeights)
+    {
+        // 没有权重，使用均匀分布逻辑
+        float segmentFraction = fraction * (m_valueCount - 1);
+        idx[0] = (int)segmentFraction;
+        idx[1] = idx[0] + 1;
+        if (idx[1] >= m_valueCount)
+            idx[1] = m_valueCount - 1;
+        return segmentFraction - idx[0];
+    }
+    else
+    {
+        // 处理特殊情况：fraction为1.0时
+        if (fraction >= 1.0f)
+        {
+            idx[0] = m_valueCount - 2;
+            idx[1] = m_valueCount - 1;
+            return 1.0f;
+        }
+
+        // 使用权重计算关键帧索引和片段分数
+        float weightedFraction = fraction * m_totalWeight;
+        float accumulatedWeight = 0.0f;
+        for (int i = 0; i < m_valueCount - 1; i++)
+        {
+            accumulatedWeight += m_value.pWeights[i];
+            if (weightedFraction <= accumulatedWeight)
+            {
+                idx[0] = i;
+                idx[1] = i + 1;
+
+                // 计算在当前段内的fraction
+                float segmentStart = accumulatedWeight - m_value.pWeights[i];
+                float segmentLength = m_value.pWeights[i];
+                return (weightedFraction - segmentStart) / segmentLength;
+            }
+        }
+
+        // 如果fraction超出了所有段，返回最后一段
+        idx[0] = m_valueCount - 2;
         idx[1] = m_valueCount - 1;
-    return segmentFraction - idx[0];
+        return 1.0f;
+    }
+}
+
+BOOL SPropertyValuesHolder::SetKeyFrameWeights(const float *weights, int count)
+{
+    // 权重数量应该是关键帧数减1，因为权重表示的是帧之间的段
+    if (weights && count == m_valueCount - 1)
+    {
+        float totalWeight = 0.0f;
+        for (int i = 0; i < count; i++)
+        {
+            if (weights[i] <= 0.0f)
+                return FALSE;
+            totalWeight += weights[i];
+        }
+        if (!m_value.pWeights)
+        {
+            m_value.pWeights = new float[count];
+        }
+        memcpy(m_value.pWeights, weights, sizeof(float) * count);
+        m_totalWeight = totalWeight;
+        return TRUE;
+    }
+    return FALSE;
+}
+
+BOOL SPropertyValuesHolder::GetKeyFrameWeights(float *weights, int count) const
+{
+    // 权重数量应该是关键帧数减1
+    if (!weights || count != m_valueCount - 1)
+        return FALSE;
+    if (m_value.pWeights)
+    {
+        memcpy(weights, m_value.pWeights, sizeof(float) * count);
+    }
+    else
+    {
+        for (int i = 0; i < count; i++)
+        {
+            weights[i] = 1.0f;
+        }
+    }
+    return TRUE;
 }
 
 BYTE SPropertyValuesHolder::InterpolateByte(float fraction) const
@@ -266,12 +352,7 @@ short SPropertyValuesHolder::InterpolateShort(float fraction) const
 
 static COLORREF _InterpolateCOLORREF(COLORREF start, COLORREF end, float fraction)
 {
-    return RGBA(
-        GetRValue(start) + BYTE((GetRValue(end) - GetRValue(start)) * fraction),
-        GetGValue(start) + BYTE((GetGValue(end) - GetGValue(start)) * fraction),
-        GetBValue(start) + BYTE((GetBValue(end) - GetBValue(start)) * fraction),
-        GetAValue(start) + BYTE((GetAValue(end) - GetAValue(start)) * fraction)
-    );
+    return RGBA(GetRValue(start) + BYTE((GetRValue(end) - GetRValue(start)) * fraction), GetGValue(start) + BYTE((GetGValue(end) - GetGValue(start)) * fraction), GetBValue(start) + BYTE((GetBValue(end) - GetBValue(start)) * fraction), GetAValue(start) + BYTE((GetAValue(end) - GetAValue(start)) * fraction));
 }
 
 COLORREF SPropertyValuesHolder::InterpolateColorRef(float fraction) const
@@ -320,7 +401,7 @@ SLayoutSize SPropertyValuesHolder::InterpolateLayoutSize(float fraction) const
 }
 
 // 静态工厂方法
-SPropertyValuesHolder* SPropertyValuesHolder::ofByte(LPCWSTR propertyName, const BYTE *values, int count)
+SPropertyValuesHolder *SPropertyValuesHolder::ofByte(LPCWSTR propertyName, const BYTE *values, int count)
 {
     SPropertyValuesHolder *pHolder = new SPropertyValuesHolder();
     pHolder->SetPropertyName(propertyName);
@@ -328,7 +409,7 @@ SPropertyValuesHolder* SPropertyValuesHolder::ofByte(LPCWSTR propertyName, const
     return pHolder;
 }
 
-SPropertyValuesHolder* SPropertyValuesHolder::ofShort(LPCWSTR propertyName, const short *values, int count)
+SPropertyValuesHolder *SPropertyValuesHolder::ofShort(LPCWSTR propertyName, const short *values, int count)
 {
     SPropertyValuesHolder *pHolder = new SPropertyValuesHolder();
     pHolder->SetPropertyName(propertyName);
@@ -336,7 +417,7 @@ SPropertyValuesHolder* SPropertyValuesHolder::ofShort(LPCWSTR propertyName, cons
     return pHolder;
 }
 
-SPropertyValuesHolder* SPropertyValuesHolder::ofColorRef(LPCWSTR propertyName, const COLORREF *values, int count)
+SPropertyValuesHolder *SPropertyValuesHolder::ofColorRef(LPCWSTR propertyName, const COLORREF *values, int count)
 {
     SPropertyValuesHolder *pHolder = new SPropertyValuesHolder();
     pHolder->SetPropertyName(propertyName);
@@ -344,7 +425,7 @@ SPropertyValuesHolder* SPropertyValuesHolder::ofColorRef(LPCWSTR propertyName, c
     return pHolder;
 }
 
-SPropertyValuesHolder* SPropertyValuesHolder::ofFloat(LPCWSTR propertyName, const float *values, int count)
+SPropertyValuesHolder *SPropertyValuesHolder::ofFloat(LPCWSTR propertyName, const float *values, int count)
 {
     SPropertyValuesHolder *pHolder = new SPropertyValuesHolder();
     pHolder->SetPropertyName(propertyName);
@@ -352,7 +433,7 @@ SPropertyValuesHolder* SPropertyValuesHolder::ofFloat(LPCWSTR propertyName, cons
     return pHolder;
 }
 
-SPropertyValuesHolder* SPropertyValuesHolder::ofInt(LPCWSTR propertyName, const int *values, int count)
+SPropertyValuesHolder *SPropertyValuesHolder::ofInt(LPCWSTR propertyName, const int *values, int count)
 {
     SPropertyValuesHolder *pHolder = new SPropertyValuesHolder();
     pHolder->SetPropertyName(propertyName);
@@ -360,7 +441,7 @@ SPropertyValuesHolder* SPropertyValuesHolder::ofInt(LPCWSTR propertyName, const 
     return pHolder;
 }
 
-SPropertyValuesHolder* SPropertyValuesHolder::ofLayoutSize(LPCWSTR propertyName, const LAYOUTSIZE *values, int count)
+SPropertyValuesHolder *SPropertyValuesHolder::ofLayoutSize(LPCWSTR propertyName, const LAYOUTSIZE *values, int count)
 {
     SPropertyValuesHolder *pHolder = new SPropertyValuesHolder();
     pHolder->SetPropertyName(propertyName);
@@ -380,6 +461,7 @@ SPropertyValuesHolder *SPropertyValuesHolder::ofPosition(LPCWSTR propertyName, c
 
 SPropertyAnimator::SPropertyAnimator(IWindow *pTarget)
 {
+    _this_for_callback = (IPropertyAnimator *)this;
     m_pTarget = pTarget;
     addListener(this);
 }
@@ -388,17 +470,17 @@ SPropertyAnimator::~SPropertyAnimator()
 {
 }
 
-void SPropertyAnimator::onAnimationStart(IValueAnimator * pAnimator)
+void SPropertyAnimator::onAnimationStart(IValueAnimator *pAnimator)
 {
-     for(int i=0;i<m_propertyHolders.GetCount();i++)
+    for (int i = 0; i < m_propertyHolders.GetCount(); i++)
     {
-        m_pTarget->SetAnimatorValue(m_propertyHolders[i], 0.f, ANI_START);         
+        m_pTarget->SetAnimatorValue(m_propertyHolders[i], 0.f, ANI_START);
     }
 }
 
-void SPropertyAnimator::onAnimationEnd(IValueAnimator * pAnimator)
+void SPropertyAnimator::onAnimationEnd(IValueAnimator *pAnimator)
 {
-    for(int i=0;i<m_propertyHolders.GetCount();i++)
+    for (int i = 0; i < m_propertyHolders.GetCount(); i++)
     {
         m_pTarget->SetAnimatorValue(m_propertyHolders[i], 1.f, ANI_END);
     }
@@ -432,8 +514,29 @@ void SPropertyAnimator::SetPropertyValuesHolders(IPropertyValuesHolder **pHolder
     }
 }
 
+IPropertyValuesHolder *SPropertyAnimator::GetPropertyValuesHolderByName(LPCWSTR propertyName) const
+{
+    for (int i = 0; i < m_propertyHolders.GetCount(); i++)
+    {
+        if (wcscmp(m_propertyHolders[i]->GetPropertyName(), propertyName) == 0)
+        {
+            return m_propertyHolders[i];
+        }
+    }
+    return NULL;
+}
+
+IPropertyValuesHolder *SPropertyAnimator::GetPropertyValuesHolderByIndex(int index) const
+{
+    if (index >= 0 && index < m_propertyHolders.GetCount())
+    {
+        return m_propertyHolders[index];
+    }
+    return NULL;
+}
+
 // 静态工厂方法
-SPropertyAnimator *SPropertyAnimator::ofFloat(IWindow *pWnd, LPCWSTR propertyName, const float *values, int valueCount)
+IPropertyAnimator *SPropertyAnimator::ofFloat(IWindow *pWnd, LPCWSTR propertyName, const float *values, int valueCount)
 {
     SPropertyAnimator *pAnimator = new SPropertyAnimator(pWnd);
     SPropertyValuesHolder *pHolder = SPropertyValuesHolder::ofFloat(propertyName, values, valueCount);
@@ -443,7 +546,7 @@ SPropertyAnimator *SPropertyAnimator::ofFloat(IWindow *pWnd, LPCWSTR propertyNam
     return pAnimator;
 }
 
-SPropertyAnimator *SPropertyAnimator::ofInt(IWindow *pWnd, LPCWSTR propertyName, const int *values, int valueCount)
+IPropertyAnimator *SPropertyAnimator::ofInt(IWindow *pWnd, LPCWSTR propertyName, const int *values, int valueCount)
 {
     SPropertyAnimator *pAnimator = new SPropertyAnimator(pWnd);
     SPropertyValuesHolder *pHolder = SPropertyValuesHolder::ofInt(propertyName, values, valueCount);
@@ -453,8 +556,7 @@ SPropertyAnimator *SPropertyAnimator::ofInt(IWindow *pWnd, LPCWSTR propertyName,
     return pAnimator;
 }
 
-
-SPropertyAnimator *SPropertyAnimator::ofLayoutSize(IWindow *pWnd, LPCWSTR propertyName, const SLayoutSize *values, int valueCount)
+IPropertyAnimator *SPropertyAnimator::ofLayoutSize(IWindow *pWnd, LPCWSTR propertyName, const SLayoutSize *values, int valueCount)
 {
     SPropertyAnimator *pAnimator = new SPropertyAnimator(pWnd);
     SPropertyValuesHolder *pHolder = SPropertyValuesHolder::ofLayoutSize(propertyName, values, valueCount);
@@ -464,17 +566,17 @@ SPropertyAnimator *SPropertyAnimator::ofLayoutSize(IWindow *pWnd, LPCWSTR proper
     return pAnimator;
 }
 
-SPropertyAnimator *SPropertyAnimator::ofPosition(IWindow *pWnd, LPCWSTR propertyName, const void *values, int valueCount, int valueSize)
+IPropertyAnimator *SPropertyAnimator::ofPosition(IWindow *pWnd, LPCWSTR propertyName, const void *values, int valueCount, int valueSize)
 {
     SPropertyAnimator *pAnimator = new SPropertyAnimator(pWnd);
 
-    SPropertyValuesHolder *pHolder = SPropertyValuesHolder::ofPosition(propertyName, values, valueCount,valueSize);
+    SPropertyValuesHolder *pHolder = SPropertyValuesHolder::ofPosition(propertyName, values, valueCount, valueSize);
     pAnimator->SetPropertyValuesHolder(pHolder);
     pHolder->Release();
     return pAnimator;
 }
 
-SPropertyAnimator *SPropertyAnimator::ofPropertyValuesHolder(IWindow *pWnd, IPropertyValuesHolder **propertyHolders, int holderCount)
+IPropertyAnimator *SPropertyAnimator::ofPropertyValuesHolder(IWindow *pWnd, IPropertyValuesHolder **propertyHolders, int holderCount)
 {
     SPropertyAnimator *pAnimator = new SPropertyAnimator(pWnd);
     pAnimator->SetPropertyValuesHolders(propertyHolders, holderCount);

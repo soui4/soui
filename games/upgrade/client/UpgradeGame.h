@@ -587,7 +587,6 @@ private:
     std::shared_ptr<GAME_UPGRADE_TURNOVER> m_turnOverMsg;       ///< 一轮结束消息
     std::shared_ptr<GAME_UPGRADE_REQPUTBOTTOM> m_reqPutBottomMsg; ///< 请求垫底消息
     DWORD m_dwProps[MAX_PROP];          ///< 游戏属性
-    BOOL m_bSound;                      ///< 音效开关
 
     SList<SAutoRefPtr<IAnimatorGroup> > m_animatorGroupList;
 };

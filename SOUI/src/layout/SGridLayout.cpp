@@ -202,17 +202,17 @@ ILayoutParam *SGridLayoutParam::Clone() const
 BOOL SGridLayoutParam::SetAnimatorValue(IPropertyValuesHolder *pHolder, float fraction, ANI_STATE state)
 {
     SStringW strPropName = pHolder->GetPropertyName();
-    if(strPropName.CompareNoCase(LayoutProperty::WIDTH) == 0)
+    if (strPropName.CompareNoCase(LayoutProperty::WIDTH) == 0)
     {
-        pHolder->GetAnimatedValue(fraction, &width);
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, width);
         return TRUE;
     }
-    if(strPropName.CompareNoCase(LayoutProperty::HEIGHT) == 0)
+    if (strPropName.CompareNoCase(LayoutProperty::HEIGHT) == 0)
     {
-        pHolder->GetAnimatedValue(fraction, &height);
+        SWindow::GetAnimatedLayoutSize(pHolder, fraction, height);
         return TRUE;
     }
-    return FALSE; 
+    return FALSE;
 }
 //////////////////////////////////////////////////////////////////////////
 SGridLayout::SGridLayout(void)

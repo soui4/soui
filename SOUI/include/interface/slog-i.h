@@ -13,7 +13,6 @@ enum
     LOG4Z_LOG_BUF_SIZE = 10240,
 };
 
-
 #undef INTERFACE
 #define INTERFACE IOutputFileBuilder
 DECLARE_INTERFACE_(IOutputFileBuilder, IObjRef)

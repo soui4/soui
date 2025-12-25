@@ -323,7 +323,6 @@ void CPreviewHost::OnFrameMoved(IEvtArgs *e)
             nHeight = SIZE_MATCH_PARENT;
 		m_pListener->OnUpdateSize(nWidth,nHeight);
 		SAnchorLayout *pAnchorLayout = (SAnchorLayout *)pLayout;
-		if(pAnchorLayout->GetAnchor2PosCallback() == SAnchorLayout::DefaultAnchor2Pos)
 		{
 			SAnchorLayoutParam *pAnchorParam = (SAnchorLayoutParam *)pLayoutParam;
 			SAnchorLayoutParamStruct *pRawData = (SAnchorLayoutParamStruct *)pAnchorParam->GetRawData();

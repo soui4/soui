@@ -1007,13 +1007,14 @@ typedef enum _Direction
     kCCW_Direction,
 } Direction;
 
-typedef enum _PathOP {
-    kDifference_PathOp,         //!< subtract the op path from the first path
-    kIntersect_PathOp,          //!< intersect the two paths
-    kUnion_PathOp,              //!< union (inclusive-or) the two paths
-    kXOR_PathOp,                //!< exclusive-or the two paths
-    kReverseDifference_PathOp,  //!< subtract the first path from the op path
-}PathOP;
+typedef enum _PathOP
+{
+    kDifference_PathOp,        //!< subtract the op path from the first path
+    kIntersect_PathOp,         //!< intersect the two paths
+    kUnion_PathOp,             //!< union (inclusive-or) the two paths
+    kXOR_PathOp,               //!< exclusive-or the two paths
+    kReverseDifference_PathOp, //!< subtract the first path from the op path
+} PathOP;
 
 /**
  * @struct     IPath
@@ -1411,9 +1412,8 @@ DECLARE_INTERFACE_(IPathS, IRenderObj)
      * @param out output path object
      * @return   BOOL -- TRUE if successful.
      */
-    STDMETHOD_(BOOL, op)(CTHIS_ const IPathS *other, PathOP op, IPathS * out) SCONST PURE;
+    STDMETHOD_(BOOL, op)(CTHIS_ const IPathS *other, PathOP op, IPathS *out) SCONST PURE;
 };
-
 
 typedef enum GradientType
 {

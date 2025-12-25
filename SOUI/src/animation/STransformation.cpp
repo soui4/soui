@@ -54,7 +54,7 @@ const SMatrix &STransformation::getMatrix() const
     return mMatrix;
 }
 
-void STransformation::postCompose(STransformation t)
+void STransformation::postCompose(const STransformation &t)
 {
     if (t.hasAlpha())
     {

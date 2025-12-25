@@ -1,0 +1,23 @@
+//stamp:01dc753cd2cefa88
+/*<------------------------------------------------------------------------------------------------->*/
+#define DEFINE_UIRES(name, type, file_path)\
+    name type file_path
+
+DEFINE_UIRES(XML_INIT,	UIDEF,	"uires/uidef/init.xml")
+DEFINE_UIRES(XML_MAINWND,	LAYOUT,	"uires/xml/dlg_main.xml")
+DEFINE_UIRES(XML_LOGIN,	LAYOUT,	"uires/xml/dlg_login.xml")
+DEFINE_UIRES(page_lobby,	LAYOUT,	"uires/xml/page_lobby.xml")
+DEFINE_UIRES(page_game,	LAYOUT,	"uires/xml/page_game.xml")
+DEFINE_UIRES(page_about,	LAYOUT,	"uires/xml/page_about.xml")
+DEFINE_UIRES(dlg_peace_req,	LAYOUT,	"uires/xml/dlg_peace_req.xml")
+DEFINE_UIRES(dlg_peace_ack,	LAYOUT,	"uires/xml/dlg_peace_ack.xml")
+DEFINE_UIRES(string,	values,	"uires/values/string.xml")
+DEFINE_UIRES(color,	values,	"uires/values/color.xml")
+DEFINE_UIRES(skin,	values,	"uires/values/skin.xml")
+DEFINE_UIRES(ICON_LOGO,	ICON,	"uires/icon/logo.ico")
+DEFINE_UIRES(PNG_TABLE,	image,	"uires/image/table.png")
+DEFINE_UIRES(PNG_ITEM_BK,	image,	"uires/image/item_bk.png")
+DEFINE_UIRES(PNG_HANDUP,	image,	"uires/image/handup.png")
+DEFINE_UIRES(PNG_PLAYING,	image,	"uires/image/playing.png")
+DEFINE_UIRES(PNG_MUTE,	image,	"uires/image/mute.png")
+DEFINE_UIRES(PNG_UNMUTE,	image,	"uires/image/unmute.png")

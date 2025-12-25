@@ -55,7 +55,7 @@ class TypeEvaluator : public TObjRefImpl<IObjRef> {
      */
     TypeEvaluator()
     {
-        memset(&mStart,0, sizeof(T));
+        memset(&mStart, 0, sizeof(T));
         memset(&mEnd, 0, sizeof(T));
     }
 
