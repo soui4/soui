@@ -617,7 +617,7 @@ void CWebSocketGame::OnTableChange(int nTableId)
 			PWSCLIENT client = pClients[i];
 			if(client){
 				ss.write((char*)&client->m_nIndex, sizeof(int));
-				ss.write((char*)&client->m_bReady, sizeof(BOOL));
+				ss.write((char*)&client->m_bReady, sizeof(uint32_t));
 				ss.write((char*)&client->m_userInfo, sizeof(GS_USERINFO));
 			}
 		}
@@ -649,7 +649,7 @@ void CWebSocketGame::notifyRoomInfoChanged()
                 continue;
             }
             ss.write((char *)&pClients[i]->m_nIndex, sizeof(int));
-            ss.write((char *)&pClients[i]->m_bReady, sizeof(BOOL));
+            ss.write((char *)&pClients[i]->m_bReady, sizeof(uint32_t));
             ss.write((char *)&pClients[i]->m_userInfo, sizeof(GS_USERINFO));
         }
     }
@@ -694,7 +694,7 @@ void CWebSocketGame::sendRoomInfo(PWSCLIENT pClient)
 				continue;
 			}
 			ss.write((char*)&pClients[i]->m_nIndex, sizeof(int));
-			ss.write((char *)&pClients[i]->m_bReady, sizeof(BOOL));
+			ss.write((char *)&pClients[i]->m_bReady, sizeof(uint32_t));
 			ss.write((char *)&pClients[i]->m_userInfo, sizeof(GS_USERINFO));
 		}
 	}

@@ -4,7 +4,7 @@
 
 #include "stdafx.h"
 #include "WebSocketGame.h"
-#include <upgradeProtocol.h>
+#include <protocol.h>
 #include <tchar.h>
 #include <string>
 #include <map>
@@ -170,7 +170,6 @@ BOOL CWebSocketGame::GameStart(unsigned short uPort)
 	// 启动服务器
 	SvrOption option = { FALSE, NULL, NULL }; // 非安全连接
     SvrPingCfg pingCfg = { 50, 100, 10 };
-
     SLOGI() << "Started on port:" << uPort;
 	int nRet = m_pWsServer->start(uPort, "upgrade", option, pingCfg);
 	if (nRet != 0)
@@ -271,7 +270,7 @@ void CWebSocketGame::ProcessReceivedData(ISvrConnection* pConn, const void* data
 	}
 	int id = pConn->getId();
 	if(id != -1){
-        int iTable = id / PLAYER_COUNT;
+		int iTable = id / PLAYER_COUNT;
         int iSeat = id % PLAYER_COUNT;
 		auto it = m_tableClients.find(iTable);
 		if (it == m_tableClients.end())
@@ -420,8 +419,10 @@ BOOL CWebSocketGame::ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSiz
         auto it = m_tableClients.find(nTable);
         it->second->OnPlayerLeave(nSeat, pClient);
 		pClient->m_bReady = FALSE;
+        pClient->m_pConn->setId(-1);
+        id = -1;
         if (it->second->GetPlayerCount() == 0)
-        { // dismiss the table
+        {//dismiss the table
             m_tableClients.erase(it);
         }
 	}
@@ -459,11 +460,12 @@ BOOL CWebSocketGame::ClientSeatDown(PWSCLIENT pClient, LPVOID pData, DWORD dwSiz
 	
     pClient->m_nTable = pSeatID->nTableId;
     pClient->m_nIndex = pSeatID->nSeat;
-    pClient->m_pConn->setId(pSeatID->nTableId * PLAYER_COUNT + pSeatID->nSeat);
+    id = pSeatID->nTableId * PLAYER_COUNT + pSeatID->nSeat;
+    pClient->m_pConn->setId(id);
 	it->second->OnAddPlayer(pSeatID->nSeat, pClient);
 
 	OnTableChange(pClient->m_nTable);
-    SLOGI() << "Client Seat Down: table=" << pSeatID->nTableId << ", seat=" << pSeatID->nSeat << ", client=" << pClient;
+    SLOGI() << "Client Seat Down: table=" << pSeatID->nTableId << ", seat=" << pSeatID->nSeat << ", client=" << pClient << " id="<<id;
     return TRUE;
 }
 
@@ -550,8 +552,6 @@ BOOL CWebSocketGame::OnMsg(PWSCLIENT pClient, DWORD dwType, LPVOID pData, DWORD 
 	{
 	case GMT_LOGIN_REQ:
 		return ClientLogin(pClient, pData, dwSize);
-	// case GMT_LOGOFF:
-	// 	return ClientLogoff(pClient, pData, dwSize);
 	case GMT_SEATDOWN_REQ:
 		return ClientSeatDown(pClient, pData, dwSize);
 	case GMT_GETUP_REQ:
@@ -617,7 +617,7 @@ void CWebSocketGame::OnTableChange(int nTableId)
 			PWSCLIENT client = pClients[i];
 			if(client){
 				ss.write((char*)&client->m_nIndex, sizeof(int));
-				ss.write((char*)&client->m_bReady, sizeof(BOOL));
+				ss.write((char*)&client->m_bReady, sizeof(uint32_t));
 				ss.write((char*)&client->m_userInfo, sizeof(GS_USERINFO));
 			}
 		}
@@ -649,7 +649,7 @@ void CWebSocketGame::notifyRoomInfoChanged()
                 continue;
             }
             ss.write((char *)&pClients[i]->m_nIndex, sizeof(int));
-            ss.write((char *)&pClients[i]->m_bReady, sizeof(BOOL));
+            ss.write((char *)&pClients[i]->m_bReady, sizeof(uint32_t));
             ss.write((char *)&pClients[i]->m_userInfo, sizeof(GS_USERINFO));
         }
     }
@@ -694,7 +694,7 @@ void CWebSocketGame::sendRoomInfo(PWSCLIENT pClient)
 				continue;
 			}
 			ss.write((char*)&pClients[i]->m_nIndex, sizeof(int));
-			ss.write((char *)&pClients[i]->m_bReady, sizeof(BOOL));
+			ss.write((char *)&pClients[i]->m_bReady, sizeof(uint32_t));
 			ss.write((char *)&pClients[i]->m_userInfo, sizeof(GS_USERINFO));
 		}
 	}

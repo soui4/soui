@@ -19,6 +19,8 @@ void CChessBoard::SDispatchMessage(UINT message, WPARAM wParam, LPARAM lParam)
         if(lParam!=0)
         {
             m_nChsScale = (int)wParam;
+        }else{
+            SSendMessage(message, wParam, lParam);
         }
         // the used defined scale should only used for pieces.
         SWindow *pChild = GetWindow(GSW_FIRSTCHILD);

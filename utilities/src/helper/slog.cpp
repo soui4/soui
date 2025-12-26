@@ -9,9 +9,9 @@
 SNSBEGIN
 
 //////////////////////////////////////////////////////////////////////////
-int Log::s_logLevel = LOG_LEVEL_INFO;
-bool Log::s_enableEcho = true;
-LogCallback Log::gs_logCallback = NULL;
+int SLog::s_logLevel = LOG_LEVEL_INFO;
+bool SLog::s_enableEcho = true;
+LogCallback SLog::gs_logCallback = NULL;
 
 static bool IsConsoleProgram()
 {
@@ -22,7 +22,7 @@ static bool IsConsoleProgram()
 #endif
 }
 
-Log::Log(const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr)
+SLog::SLog(const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr)
     : m_level(level)
     , m_pAddr(pAddr)
     , m_file(filename)
@@ -34,7 +34,7 @@ Log::Log(const char *tag, int level, const char *filename, const char *funcname,
     strcpy(m_tag, tag);
 }
 
-Log::~Log()
+SLog::~SLog()
 {
     if (m_level < s_logLevel)
         return;
@@ -47,7 +47,7 @@ Log::~Log()
     {
         SYSTEMTIME wtm;
         GetLocalTime(&wtm);
-        const int kMaxLog = Log::MAX_LOGLEN + 100;
+        const int kMaxLog = SLog::MAX_LOGLEN + 100;
         char *logbuf2 = (char *)malloc(kMaxLog + 1);
         tid_t tid = GetCurrentThreadId();
 #ifdef _WIN32
@@ -72,24 +72,24 @@ Log::~Log()
     }
 }
 
-SLogStream &Log::stream()
+SLogStream &SLog::stream()
 {
     return m_stream;
 }
 
-void Log::setLogLevel(int nLevel)
+void SLog::setLogLevel(int nLevel)
 {
     s_logLevel = nLevel;
 }
 
 // setLogCallback is not thread safe.
 // call this at the beginning of program please.
-void Log::setLogCallback(LogCallback logCallback)
+void SLog::setLogCallback(LogCallback logCallback)
 {
     gs_logCallback = logCallback;
 }
 
-void Log::setLogEcho(bool bEnable)
+void SLog::setLogEcho(bool bEnable)
 {
     s_enableEcho = bEnable;
 }
@@ -107,9 +107,9 @@ SLogStream::SLogStream()
 SLogStream &SLogStream::writeWString(const wchar_t *t, int nLen)
 {
     DWORD dwLen = WideCharToMultiByte(CP_ACP, 0, t, nLen, NULL, 0, NULL, NULL);
-    if (dwLen < Log::MAX_LOGLEN)
+    if (dwLen < SLog::MAX_LOGLEN)
     {
-        char buf[Log::MAX_LOGLEN];
+        char buf[SLog::MAX_LOGLEN];
         dwLen = WideCharToMultiByte(CP_ACP, 0, t, nLen, buf, dwLen, NULL, NULL);
         if (dwLen > 0)
         {
@@ -195,10 +195,10 @@ SLogStream &SLogStream::writeFormat(const wchar_t *fmt2, ...)
     const wchar_t *fmt = fmt2;
 #endif //_WIN32
 
-    wchar_t logbuf[SNS::Log::MAX_LOGLEN] = { 0 };
+    wchar_t logbuf[SNS::SLog::MAX_LOGLEN] = { 0 };
     va_list args;
     va_start(args, fmt2);
-    int ret = vswprintf(logbuf, SNS::Log::MAX_LOGLEN, fmt, args);
+    int ret = vswprintf(logbuf, SNS::SLog::MAX_LOGLEN, fmt, args);
     va_end(args);
 #ifndef _WIN32
     free(fmt);

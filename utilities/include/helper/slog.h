@@ -157,7 +157,7 @@ typedef void (*LogCallback)(const char *tag, const char *pLogStr, int level, con
  * @class Log
  * @brief 日志记录类
  */
-class UTILITIES_API Log {
+class UTILITIES_API SLog {
   public:
     enum
     {
@@ -175,12 +175,12 @@ class UTILITIES_API Log {
      * @param lineIndex 行号
      * @param pAddr 返回地址
      */
-    Log(const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr);
+    SLog(const char *tag, int level, const char *filename, const char *funcname, int lineIndex, void *pAddr);
 
     /**
      * @brief 析构函数
      */
-    ~Log();
+    ~SLog();
 
     /**
      * @brief 获取日志流对象
@@ -247,7 +247,7 @@ SNSEND
  * @param tag 日志标签
  * @param level 日志级别
  */
-#define SLOG(tag, level) SNS::Log(tag, level, __FILE__, FUNCNAME, __LINE__, RetAddr()).stream()
+#define SLOG(tag, level) SNS::SLog(tag, level, __FILE__, FUNCNAME, __LINE__, RetAddr()).stream()
 
 /**
  * @def SLOG_FMT

@@ -84,8 +84,7 @@ int SMessageLoop::Run()
             break;
         if (!bGetMsg)
         {
-            SSLOGD() << "WaitMsg returned FALSE (error)";
-            continue; // error, don't process
+            continue;
         }
         nRet = HandleMsg();
     } while (!m_bQuit);

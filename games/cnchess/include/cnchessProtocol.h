@@ -34,7 +34,7 @@ typedef struct tagMSG_MOVE
 {
 	POINT ptBegin;	//起点
 	POINT ptEnd;	//终点
-	BOOL  bLocal;   //本地消息标志
+	uint32_t  bLocal;   //本地消息标志
 	int	  iIndex;	//走棋人座位号
 	DWORD dwRoundTime;//局时,以秒为单位
 }MSG_MOVE,*PMSG_MOVE;

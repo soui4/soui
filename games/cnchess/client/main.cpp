@@ -5,7 +5,7 @@
 #include "CnchessSkin.h"
 #include "ChessBoard.h"
 #include "ChessPiece.h"
-
+#include <helper/slog.h>
 static const TCHAR * kPath_SysRes = _T("/../../../soui-sys-resource");
 static const TCHAR *kPath_UiRes = _T("/uires");
 
@@ -69,6 +69,7 @@ int WINAPI _tWinMain(HINSTANCE hInstance, HINSTANCE /*hPrevInstance*/, LPTSTR lp
 #endif
     // Show main dialog
     {
+        SLog::setLogLevel(LOG_LEVEL_DEBUG);
         MyProfile *pMyProfile = new MyProfile();
 
         SAutoRefPtr<SGameTheme> theme(new SGameTheme(),FALSE);

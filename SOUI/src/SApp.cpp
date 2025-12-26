@@ -725,11 +725,11 @@ void SApplication::SetLogManager(ILogMgr *pLogMgr)
     m_logManager = pLogMgr;
     if (m_logManager)
     {
-        Log::setLogCallback(SouiLog_Callback);
+        SLog::setLogCallback(SouiLog_Callback);
     }
     else
     {
-        Log::setLogCallback(NULL);
+        SLog::setLogCallback(NULL);
     }
 }
 

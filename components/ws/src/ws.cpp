@@ -2,7 +2,7 @@
 #include "wsClient.h"
 #include "wsServer.h"
 #include <helper/slog.h>
-
+#define kLogTag "Ws"
 
 SNSBEGIN
 
@@ -10,21 +10,28 @@ static WsLogCallback g_logCallback = NULL;
 
 static void lws_log_emit(int level, const char *line)
 {
-    int sLevel = LOG_LEVEL_DEBUG;
+    int soui_level = LOG_LEVEL_INFO;
     switch (level)
     {
-        case LLL_ERR:
-            sLevel = LOG_LEVEL_ERROR;
-            break;
-        case LLL_WARN:
-            sLevel = LOG_LEVEL_WARN;
-            break;
-        case LLL_NOTICE:
-            sLevel = LOG_LEVEL_INFO;
-            break;
+    case LLL_ERR:
+        soui_level = LOG_LEVEL_ERROR;
+        break;
+    case LLL_WARN:
+        soui_level = LOG_LEVEL_WARN;
+        break;
+    case LLL_DEBUG:
+        soui_level = LOG_LEVEL_DEBUG;
+        break;
+    case LLL_INFO:
+    case LLL_NOTICE:
+    default:
+        soui_level = LOG_LEVEL_INFO;
+        break;
     }
     if(g_logCallback){
-        g_logCallback(sLevel,line);
+        g_logCallback(soui_level,line);
+    }else{
+        SLOG(kLogTag,soui_level) << line;
     }
 }
 
@@ -32,7 +39,7 @@ class Websocket : public TObjRefImpl<IWebsocket> {
   public:
     Websocket()
     {
-        lws_set_log_level(LLL_ERR | LLL_WARN | LLL_NOTICE, lws_log_emit);
+        lws_set_log_level(LLL_ERR | LLL_WARN | LLL_NOTICE | LLL_INFO | LLL_DEBUG, lws_log_emit);
     }
     // IWebsocket methods
     STDMETHODIMP_(IWsClient *) CreateWsClient(THIS_ IConnListener *pListener) OVERRIDE

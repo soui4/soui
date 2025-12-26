@@ -30,7 +30,7 @@ class GameClient
 	std::string m_strGameName;  // 游戏名称
 	int m_nTable;				// 游戏桌号
 	int m_nIndex;                // 游戏座位
-	BOOL m_bReady;				// 是否准备
+	uint32_t m_bReady;			// 是否准备
 	DWORD m_dwState;            // 游戏状态
 	DWORD_PTR m_dwData;         // 扩展数据，由具体游戏使用的数据，一般是指向一个指针
 };

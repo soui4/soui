@@ -114,8 +114,12 @@ void CCnChess::OnGameEnd()
 
 BOOL CCnChess::OnPlayerLeave(int seatId, PWSCLIENT pClient)
 {
+    int state = m_state;
 	CGameTable::OnPlayerLeave(seatId, pClient);
-	BrdcstAckOver(GOT_NETBREAK, seatId, L"断线");
+    if (state == TABLE_STATE_PLAYING)
+	{
+		BrdcstAckOver(GOT_NETBREAK, seatId, L"对家断线");
+	}
     return TRUE;
 }
 

@@ -73,7 +73,7 @@ int run(LPCTSTR pszCfg){
         comMgr.CreateLog4z((IObjRef**)&log);
         if(log){
             s_logMgr = log;
-            Log::setLogCallback(SouiLog_Callback);
+            SLog::setLogCallback(SouiLog_Callback);
             log->setLoggerName("UpgradeServer");
             log->start();
         }
