@@ -2731,7 +2731,42 @@ SNSBEGIN
 
 	BOOL SPath_Skia::hitTestStroke(CTHIS_ float x,float y,float strokeSize) const
 	{
-		return FALSE;
+		if (m_skPath.isEmpty()) {
+			return FALSE;
+		}
+
+		// 创建一个 SkPaint 对象用于描述 stroke 属性
+		SkPaint paint;
+		paint.setStyle(SkPaint::kStroke_Style);
+		paint.setStrokeWidth(strokeSize);
+
+		// 使用 getFillPath 将 stroke 路径转换为填充路径
+		// stroke 的轮廓会被转换为一个可填充的区域
+		SkPath strokePath;
+		if (!paint.getFillPath(m_skPath, &strokePath)) {
+			// 如果转换失败（例如 hairline stroke），使用简单的距离检测
+			// 对于 hairline，strokeSize 应该很小
+			SkScalar halfStroke = strokeSize * 0.5f;
+			SkScalar minDistSqd = halfStroke * halfStroke;
+			SkPoint testPt = SkPoint::Make(x, y);
+
+			SkPath::Iter iter(m_skPath, false);
+			SkPoint pts[4];
+			SkPath::Verb verb;
+
+			while ((verb = iter.next(pts)) != SkPath::kDone_Verb) {
+				if (verb == SkPath::kLine_Verb) {
+					SkScalar distSqd = testPt.distanceToLineSegmentBetweenSqd(pts[0], pts[1]);
+					if (distSqd <= minDistSqd) {
+						return TRUE;
+					}
+				}
+			}
+			return FALSE;
+		}
+
+		// 检测点是否在 stroke 形成的填充区域内
+		return strokePath.contains(x, y);
 	}
 
 	BOOL SPath_Skia::op(const IPathS *other,PathOP op,IPathS *out) const{
