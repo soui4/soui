@@ -17,52 +17,119 @@
 #include "SkColor_opts_neon.h"
 #include <arm_neon.h>
 
-#ifdef SK_CPU_ARM64
-static inline uint8x8x4_t sk_vld4_u8_arm64_3(const SkPMColor* SK_RESTRICT & src) {
+// Unified load functions that work on both ARM32 and ARM64
+// These functions encapsulate the architecture-specific and compiler-specific logic
+
+// Load 3 channels (RGB, ignore Alpha) from 8 pixels
+static inline uint8x8x4_t sk_vld4_u8_3(const SkPMColor* SK_RESTRICT & src) {
     uint8x8x4_t vsrc;
-    uint8x8_t vsrc_0, vsrc_1, vsrc_2;
 
-    asm (
-        "ld4    {v0.8b - v3.8b}, [%[src]], #32 \t\n"
-        "mov    %[vsrc0].8b, v0.8b             \t\n"
-        "mov    %[vsrc1].8b, v1.8b             \t\n"
-        "mov    %[vsrc2].8b, v2.8b             \t\n"
-        : [vsrc0] "=w" (vsrc_0), [vsrc1] "=w" (vsrc_1),
-          [vsrc2] "=w" (vsrc_2), [src] "+&r" (src)
-        : : "v0", "v1", "v2", "v3"
-    );
+#if defined(_MSC_VER) || defined(SK_BUILD_NO_INLINE_ASM)
+    // MSVC or no inline assembly - use NEON intrinsics (works on both ARM32 and ARM64)
+    vsrc = vld4_u8((const uint8_t*)src);
+    src += 8;
+#else
+    // GCC/Clang with inline assembly optimization
+    #ifdef SK_CPU_ARM64
+        // ARM64 (AArch64) assembly syntax
+        uint8x8_t vsrc_0, vsrc_1, vsrc_2;
 
-    vsrc.val[0] = vsrc_0;
-    vsrc.val[1] = vsrc_1;
-    vsrc.val[2] = vsrc_2;
+        asm (
+            "ld4    {v0.8b - v3.8b}, [%[src]], #32 \t\n"
+            "mov    %[vsrc0].8b, v0.8b             \t\n"
+            "mov    %[vsrc1].8b, v1.8b             \t\n"
+            "mov    %[vsrc2].8b, v2.8b             \t\n"
+            : [vsrc0] "=w" (vsrc_0), [vsrc1] "=w" (vsrc_1),
+              [vsrc2] "=w" (vsrc_2), [src] "+&r" (src)
+            : : "v0", "v1", "v2", "v3"
+        );
 
-    return vsrc;
-}
+        vsrc.val[0] = vsrc_0;
+        vsrc.val[1] = vsrc_1;
+        vsrc.val[2] = vsrc_2;
+    #else
+        // ARM32 assembly syntax
+        register uint8x8_t d0 asm("d0");
+        register uint8x8_t d1 asm("d1");
+        register uint8x8_t d2 asm("d2");
+        register uint8x8_t d3 asm("d3");
 
-static inline uint8x8x4_t sk_vld4_u8_arm64_4(const SkPMColor* SK_RESTRICT & src) {
-    uint8x8x4_t vsrc;
-    uint8x8_t vsrc_0, vsrc_1, vsrc_2, vsrc_3;
-
-    asm (
-        "ld4    {v0.8b - v3.8b}, [%[src]], #32 \t\n"
-        "mov    %[vsrc0].8b, v0.8b             \t\n"
-        "mov    %[vsrc1].8b, v1.8b             \t\n"
-        "mov    %[vsrc2].8b, v2.8b             \t\n"
-        "mov    %[vsrc3].8b, v3.8b             \t\n"
-        : [vsrc0] "=w" (vsrc_0), [vsrc1] "=w" (vsrc_1),
-          [vsrc2] "=w" (vsrc_2), [vsrc3] "=w" (vsrc_3),
-          [src] "+&r" (src)
-        : : "v0", "v1", "v2", "v3"
-    );
-
-    vsrc.val[0] = vsrc_0;
-    vsrc.val[1] = vsrc_1;
-    vsrc.val[2] = vsrc_2;
-    vsrc.val[3] = vsrc_3;
-
-    return vsrc;
-}
+        asm (
+            "vld4.8    {d0-d3},[%[src]]!"
+            : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3), [src] "+&r" (src)
+            :
+        );
+        vsrc.val[0] = d0;
+        vsrc.val[1] = d1;
+        vsrc.val[2] = d2;
+    #endif
 #endif
+
+    return vsrc;
+}
+
+// Load 4 channels (RGBA) from 8 pixels
+static inline uint8x8x4_t sk_vld4_u8_4(const SkPMColor* SK_RESTRICT & src) {
+    uint8x8x4_t vsrc;
+
+#if defined(_MSC_VER) || defined(SK_BUILD_NO_INLINE_ASM)
+    // MSVC or no inline assembly - use NEON intrinsics (works on both ARM32 and ARM64)
+    vsrc = vld4_u8((const uint8_t*)src);
+    src += 8;
+#else
+    // GCC/Clang with inline assembly optimization
+    #ifdef SK_CPU_ARM64
+        // ARM64 (AArch64) assembly syntax
+        uint8x8_t vsrc_0, vsrc_1, vsrc_2, vsrc_3;
+
+        asm (
+            "ld4    {v0.8b - v3.8b}, [%[src]], #32 \t\n"
+            "mov    %[vsrc0].8b, v0.8b             \t\n"
+            "mov    %[vsrc1].8b, v1.8b             \t\n"
+            "mov    %[vsrc2].8b, v2.8b             \t\n"
+            "mov    %[vsrc3].8b, v3.8b             \t\n"
+            : [vsrc0] "=w" (vsrc_0), [vsrc1] "=w" (vsrc_1),
+              [vsrc2] "=w" (vsrc_2), [vsrc3] "=w" (vsrc_3),
+              [src] "+&r" (src)
+            : : "v0", "v1", "v2", "v3"
+        );
+
+        vsrc.val[0] = vsrc_0;
+        vsrc.val[1] = vsrc_1;
+        vsrc.val[2] = vsrc_2;
+        vsrc.val[3] = vsrc_3;
+    #else
+        // ARM32 assembly syntax
+        #if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 6))
+            // GCC 4.7+ supports this syntax
+            asm (
+                "vld4.u8 %h[vsrc], [%[src]]!"
+                : [vsrc] "=w" (vsrc), [src] "+&r" (src)
+                : :
+            );
+        #else
+            // Older GCC versions
+            register uint8x8_t d0 asm("d0");
+            register uint8x8_t d1 asm("d1");
+            register uint8x8_t d2 asm("d2");
+            register uint8x8_t d3 asm("d3");
+
+            asm volatile (
+                "vld4.u8    {d0-d3},[%[src]]!;"
+                : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3),
+                  [src] "+&r" (src)
+                : :
+            );
+            vsrc.val[0] = d0;
+            vsrc.val[1] = d1;
+            vsrc.val[2] = d2;
+            vsrc.val[3] = d3;
+        #endif
+    #endif
+#endif
+
+    return vsrc;
+}
 
 void S32_D565_Opaque_neon(uint16_t* SK_RESTRICT dst,
                            const SkPMColor* SK_RESTRICT src, int count,
@@ -73,13 +140,8 @@ void S32_D565_Opaque_neon(uint16_t* SK_RESTRICT dst,
         uint8x8x4_t vsrc;
         uint16x8_t vdst;
 
-        // Load
-#ifdef SK_CPU_ARM64
-        vsrc = sk_vld4_u8_arm64_3(src);
-#else
-        vsrc = vld4_u8((uint8_t*)src);
-        src += 8;
-#endif
+        // Load (unified function handles ARM32/ARM64 and MSVC/GCC)
+        vsrc = sk_vld4_u8_3(src);
 
         // Convert src to 565
         vdst = SkPixel32ToPixel16_neon8(vsrc);
@@ -118,26 +180,8 @@ void S32_D565_Blend_neon(uint16_t* SK_RESTRICT dst,
         uint16x8_t vdst, vdst_r, vdst_g, vdst_b;
         uint16x8_t vres_r, vres_g, vres_b;
 
-        // Load src
-#ifdef SK_CPU_ARM64
-        vsrc = sk_vld4_u8_arm64_3(src);
-#else
-        {
-        register uint8x8_t d0 asm("d0");
-        register uint8x8_t d1 asm("d1");
-        register uint8x8_t d2 asm("d2");
-        register uint8x8_t d3 asm("d3");
-
-        asm (
-            "vld4.8    {d0-d3},[%[src]]!"
-            : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3), [src] "+&r" (src)
-            :
-        );
-        vsrc.val[0] = d0;
-        vsrc.val[1] = d1;
-        vsrc.val[2] = d2;
-        }
-#endif
+        // Load src (unified function handles ARM32/ARM64 and MSVC/GCC)
+        vsrc = sk_vld4_u8_3(src);
 
         // Load and unpack dst
         vdst = vld1q_u16(dst);
@@ -186,6 +230,11 @@ void S32_D565_Blend_neon(uint16_t* SK_RESTRICT dst,
         } while (--count != 0);
     }
 }
+
+// S32A_D565_Opaque_neon - Convert 32-bit ARGB with alpha to 16-bit RGB565
+// This function uses inline assembly for performance optimization
+// MSVC does not support inline assembly on ARM, so we disable it for MSVC builds
+#if !defined(SK_BUILD_NO_INLINE_ASM)
 
 #ifdef SK_CPU_ARM32
 void S32A_D565_Opaque_neon(uint16_t* SK_RESTRICT dst,
@@ -465,6 +514,8 @@ void S32A_D565_Opaque_neon(uint16_t* SK_RESTRICT dst,
 }
 #endif // #ifdef SK_CPU_ARM32
 
+#endif // !defined(SK_BUILD_NO_INLINE_ASM)
+
 static inline uint16x8_t SkDiv255Round_neon8(uint16x8_t prod) {
     prod += vdupq_n_u16(128);
     prod += vshrq_n_u16(prod, 8);
@@ -497,33 +548,7 @@ void S32A_D565_Blend_neon(uint16_t* SK_RESTRICT dst,
 
             // load pixels
             vdst = vld1q_u16(dst);
-#ifdef SK_CPU_ARM64
-            vsrc = sk_vld4_u8_arm64_4(src);
-#else
-#if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 6))
-            asm (
-                "vld4.u8 %h[vsrc], [%[src]]!"
-                : [vsrc] "=w" (vsrc), [src] "+&r" (src)
-                : :
-            );
-#else
-            register uint8x8_t d0 asm("d0");
-            register uint8x8_t d1 asm("d1");
-            register uint8x8_t d2 asm("d2");
-            register uint8x8_t d3 asm("d3");
-
-            asm volatile (
-                "vld4.u8    {d0-d3},[%[src]]!;"
-                : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3),
-                  [src] "+&r" (src)
-                : :
-            );
-            vsrc.val[0] = d0;
-            vsrc.val[1] = d1;
-            vsrc.val[2] = d2;
-            vsrc.val[3] = d3;
-#endif
-#endif // #ifdef SK_CPU_ARM64
+            vsrc = sk_vld4_u8_4(src);  // Unified function handles ARM32/ARM64 and MSVC/GCC
 
 
             // deinterleave dst
@@ -633,26 +658,8 @@ void S32_D565_Blend_Dither_neon(uint16_t *dst, const SkPMColor *src,
             int16x8_t vres_r, vres_g, vres_b;
             int8x8_t vres8_r, vres8_g, vres8_b;
 
-            // Load source and add dither
-#ifdef SK_CPU_ARM64
-            vsrc = sk_vld4_u8_arm64_3(src);
-#else
-            {
-            register uint8x8_t d0 asm("d0");
-            register uint8x8_t d1 asm("d1");
-            register uint8x8_t d2 asm("d2");
-            register uint8x8_t d3 asm("d3");
-
-            asm (
-                "vld4.8    {d0-d3},[%[src]]! "
-                : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3), [src] "+&r" (src)
-                :
-            );
-            vsrc.val[0] = d0;
-            vsrc.val[1] = d1;
-            vsrc.val[2] = d2;
-            }
-#endif
+            // Load source (unified function handles ARM32/ARM64 and MSVC/GCC)
+            vsrc = sk_vld4_u8_3(src);
             vsrc_r = vsrc.val[NEON_R];
             vsrc_g = vsrc.val[NEON_G];
             vsrc_b = vsrc.val[NEON_B];
@@ -1284,25 +1291,8 @@ void S32A_D565_Opaque_Dither_neon (uint16_t * SK_RESTRICT dst,
         }
 #endif
 
-#ifdef SK_CPU_ARM64
-        vsrc = sk_vld4_u8_arm64_4(src);
-#else
-        {
-        register uint8x8_t d0 asm("d0");
-        register uint8x8_t d1 asm("d1");
-        register uint8x8_t d2 asm("d2");
-        register uint8x8_t d3 asm("d3");
-
-        asm ("vld4.8    {d0-d3},[%[src]]! "
-            : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3), [src] "+r" (src)
-            :
-        );
-        vsrc.val[0] = d0;
-        vsrc.val[1] = d1;
-        vsrc.val[2] = d2;
-        vsrc.val[3] = d3;
-        }
-#endif
+        // Load source (unified function handles ARM32/ARM64 and MSVC/GCC)
+        vsrc = sk_vld4_u8_4(src);
         sa = vsrc.val[NEON_A];
         sr = vsrc.val[NEON_R];
         sg = vsrc.val[NEON_G];
@@ -1452,25 +1442,8 @@ void S32_D565_Opaque_Dither_neon(uint16_t* SK_RESTRICT dst,
         uint16x8_t dst8;
         uint8x8x4_t vsrc;
 
-#ifdef SK_CPU_ARM64
-        vsrc = sk_vld4_u8_arm64_3(src);
-#else
-        {
-        register uint8x8_t d0 asm("d0");
-        register uint8x8_t d1 asm("d1");
-        register uint8x8_t d2 asm("d2");
-        register uint8x8_t d3 asm("d3");
-
-        asm (
-            "vld4.8    {d0-d3},[%[src]]! "
-            : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3), [src] "+&r" (src)
-            :
-        );
-        vsrc.val[0] = d0;
-        vsrc.val[1] = d1;
-        vsrc.val[2] = d2;
-        }
-#endif
+        // Load source (unified function handles ARM32/ARM64 and MSVC/GCC)
+        vsrc = sk_vld4_u8_3(src);
         sr = vsrc.val[NEON_R];
         sg = vsrc.val[NEON_G];
         sb = vsrc.val[NEON_B];
@@ -1650,7 +1623,13 @@ const SkBlitRow::Proc sk_blitrow_platform_565_procs_arm_neon[] = {
     // no dither
     S32_D565_Opaque_neon,
     S32_D565_Blend_neon,
+#if defined(SK_BUILD_NO_INLINE_ASM)
+    // Windows ARM (MSVC) - S32A_D565_Opaque_neon uses inline assembly
+    // Fall back to default implementation (will be provided by SkBlitRow_D16.cpp)
+    NULL,   // S32A_D565_Opaque - uses inline assembly, not available on MSVC
+#else
     S32A_D565_Opaque_neon,
+#endif
 #if 0
     S32A_D565_Blend_neon,
 #else
@@ -1661,7 +1640,12 @@ const SkBlitRow::Proc sk_blitrow_platform_565_procs_arm_neon[] = {
     // dither
     S32_D565_Opaque_Dither_neon,
     S32_D565_Blend_Dither_neon,
+#if defined(SK_BUILD_NO_INLINE_ASM)
+    // Windows ARM (MSVC) - S32A_D565_Opaque_Dither_neon uses inline assembly
+    NULL,   // S32A_D565_Opaque_Dither - uses inline assembly, not available on MSVC
+#else
     S32A_D565_Opaque_Dither_neon,
+#endif
     NULL,   // S32A_D565_Blend_Dither
 };
 
