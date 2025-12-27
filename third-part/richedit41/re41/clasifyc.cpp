@@ -679,8 +679,11 @@ void UninitKinsokuClassify()
  *		do is look up the data; no conditionals necessary.
  *
  *		The routine is inline to avoid the call overhead. It is static
- *		because it only returns characters from the tables; i.e., this 
+ *		because it only returns characters from the tables; i.e., this
  *		routine does NOT classify all Unicode characters.
+ *
+ *		Modified to support UTF-32 (Linux) where WCHAR is 32-bit.
+ *		For characters beyond BMP (> 0xFFFF), returns -1 (unclassified).
  *
  *	@rdesc
  *		Returns the classification.
@@ -690,6 +693,11 @@ KinsokuClassify(
 	WCHAR ch )	// @parm char to classify.
 {
 	//TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "KinsokuClassify");
+
+	// For UTF-32 support: Only classify characters in BMP (Basic Multilingual Plane)
+	// Characters beyond 0xFFFF are not in our classification tables
+	if (ch > 0xFFFF)
+		return -1;	// Unclassified, will be handled by GetStringTypeEx
 
 	return classifyData[ classifyIndex[ ch >> bitmapShift ] ].
 			classifications[ ch & ( classifyChunkSize-1 )];
@@ -870,19 +878,28 @@ void BatchClassify (
  *		If the character is not in the Kinsoku classification tables then
  *		GetStringTypeEx is used to classify any remaining character.
  *
+ *		Modified to support UTF-32 (Linux) where WCHAR is 32-bit.
+ *
  *	@rdesc
  *		Kinsoku classification for ch
  */
 INT GetKinsokuClass (
-	WCHAR	ch,		//@parm char 
+	WCHAR	ch,		//@parm char
 	WORD	cType3,	//@parm cType3 info
 	LCID	lcid)	//@parm lcid
 {
 	//TRACEBEGIN(TRCSUBSYSFE, TRCSCOPEINTERN, "GetKinsokuClass");
 
-	// surrogate classification
+	// surrogate classification (only relevant for UTF-16, i.e., when WCHAR is 16-bit)
+	// In UTF-32, surrogates should not appear as they are invalid code points
+#if WCHAR_SIZE == 2
 	if (IN_RANGE(0xD800, ch, 0xDFFF))
 		return IN_RANGE(0xDC00, ch, 0xDFFF) ? brkclsClose : brkclsOpen;
+#else
+	// In UTF-32, surrogate range is invalid, treat as unclassified
+	if (IN_RANGE(0xD800, ch, 0xDFFF))
+		return 15;	// Treat invalid surrogates as regular chars
+#endif
 
 	INT iCategory = KinsokuClassify(ch);
 	if(iCategory >= 0)
