@@ -12,11 +12,19 @@ else()
     # 检查目标平台是否为ARM
     if(BUILD_FOR_ARM)
         if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            # ARM64 (aarch64) configuration
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv8-a+simd")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv8-a+simd")
+            # Define ARM64 and NEON macros for Skia
+            add_definitions(-DSK_CPU_ARM64)
+            add_definitions(-DSK_ARM_HAS_NEON)
         else()
+            # ARM32 (armv7) configuration
             set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -march=armv7-a+neon")
             set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -march=armv7-a+neon")
+            # Define ARM32 and NEON macros for Skia
+            add_definitions(-DSK_CPU_ARM32)
+            add_definitions(-DSK_ARM_HAS_NEON)
         endif()
     else(BUILD_FOR_ARM)
         set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -msse4.1")
@@ -979,32 +987,48 @@ if(BUILD_FOR_ARM)
             "src/opts/SkBlitRow_opts_none.cpp"
             "src/opts/SkBlurImage_opts_none.cpp"
             "src/opts/SkMorphology_opts_none.cpp"
-            "src/opts/SkUtils_opts_none.cpp"
             "src/opts/SkBlitMask_opts_none.cpp"
+            "src/opts/SkUtils_opts_none.cpp"
         )
     else()
-        set(srcs
-            ${srcs}
-            "src/opts/memset.arm.S"
-        #    "src/opts/memset16_neon.S"
-        #    "src/opts/memset32_neon.S"
-            "src/opts/SkBitmapProcState_arm_neon.cpp"
-            "src/opts/SkBitmapProcState_matrixProcs_neon.cpp"
-            "src/opts/SkBitmapProcState_opts_arm.cpp"
-            "src/opts/SkBlitMask_opts_arm_neon.cpp"
-            "src/opts/SkBlitMask_opts_arm.cpp"
-            "src/opts/SkBlitRow_opts_arm_neon.cpp"
-            "src/opts/SkBlitRow_opts_arm.cpp"
-            "src/opts/SkBlurImage_opts_arm.cpp"
-            "src/opts/SkBlurImage_opts_neon.cpp"
-            "src/opts/SkMorphology_opts_arm.cpp"
-            "src/opts/SkMorphology_opts_neon.cpp"
-            "src/opts/SkTextureCompression_opts_arm.cpp"
-            "src/opts/SkTextureCompression_opts_neon.cpp"
-            "src/opts/SkUtils_opts_arm.cpp"
-            "src/opts/SkXfermode_opts_arm_neon.cpp"
-            "src/opts/SkXfermode_opts_arm.cpp"
-        )
+        # Check if it's ARM64 (aarch64) or ARM32
+        if(CMAKE_SIZEOF_VOID_P EQUAL 8)
+            # ARM64 - Use only NEON optimized versions, exclude files with 32-bit ARM inline assembly
+            set(srcs
+                ${srcs}
+                "src/opts/SkXfermode_opts_arm_neon.cpp"
+                "src/opts/SkBitmapProcState_arm_neon.cpp"
+                "src/opts/SkBitmapProcState_matrixProcs_neon.cpp"
+                "src/opts/SkBlitRow_opts_arm_neon.cpp"
+                "src/opts/SkBlurImage_opts_neon.cpp"
+                "src/opts/SkMorphology_opts_neon.cpp"
+                "src/opts/SkBlitMask_opts_arm_neon.cpp"
+                "src/opts/SkTextureCompression_opts_neon.cpp"
+                "src/opts/SkUtils_opts_none.cpp"
+            )
+        else()
+            # ARM32 - Use both ARM and NEON versions
+            set(srcs
+                ${srcs}
+                "src/opts/memset.arm.S"
+                "src/opts/SkBitmapProcState_arm_neon.cpp"
+                "src/opts/SkBitmapProcState_matrixProcs_neon.cpp"
+                "src/opts/SkBitmapProcState_opts_arm.cpp"
+                "src/opts/SkBlitMask_opts_arm_neon.cpp"
+                "src/opts/SkBlitMask_opts_arm.cpp"
+                "src/opts/SkBlitRow_opts_arm_neon.cpp"
+                "src/opts/SkBlitRow_opts_arm.cpp"
+                "src/opts/SkBlurImage_opts_arm.cpp"
+                "src/opts/SkBlurImage_opts_neon.cpp"
+                "src/opts/SkMorphology_opts_arm.cpp"
+                "src/opts/SkMorphology_opts_neon.cpp"
+                "src/opts/SkTextureCompression_opts_arm.cpp"
+                "src/opts/SkTextureCompression_opts_neon.cpp"
+                "src/opts/SkUtils_opts_arm.cpp"
+                "src/opts/SkXfermode_opts_arm_neon.cpp"
+                "src/opts/SkXfermode_opts_arm.cpp"
+            )
+        endif()
     endif(MSVC)
 else()
     set(srcs
