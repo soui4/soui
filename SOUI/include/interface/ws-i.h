@@ -1,4 +1,4 @@
-#ifndef WS_LISTENER_H
+﻿#ifndef WS_LISTENER_H
 #define WS_LISTENER_H
 
 #define _WINSOCKAPI_
@@ -85,9 +85,10 @@ typedef struct _SvrOption
 } SvrOption;
 typedef struct _SvrPingCfg
 {
-    int pingIntervalSeconds; // ping���ʱ�䣬��λ��
-    int nHeartbeatSeconds;   // �������ʱ�䣬��λ�룬ping���ʱ���2������
-    int nPingTimeoutCount;   // ping��ʱ�����������˴�����ر�����
+    uint32_t pingIntervalSeconds; // ping发送间隔时间，单位秒。服务器会定期发送ping检测客户端是否在线
+    uint32_t nHeartbeatSeconds;   // 心跳超时时间，单位秒。如果客户端在此时间内没有任何活动（发送数据或pong），连接将被关闭
+    uint32_t nPingTimeoutCount;   // ping超时最大次数。如果连续发送ping但未收到pong的次数超过此值，连接将被关闭
+                             // 注意：nHeartbeatSeconds应该大于 pingIntervalSeconds * nPingTimeoutCount，否则心跳超时会先触发
 }SvrPingCfg;
 
 #undef INTERFACE

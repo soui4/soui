@@ -32,6 +32,13 @@ int WsServer::start(uint16_t port, const char *protocolName_, SvrOption option, 
 {
     m_protocolName = protocolName_;
     m_cfg = pingCfg;
+    if(m_cfg.nHeartbeatSeconds<5)
+        m_cfg.nHeartbeatSeconds = 5;
+    if(m_cfg.nPingTimeoutCount<2)
+        m_cfg.nPingTimeoutCount = 2;
+    if(m_cfg.pingIntervalSeconds>m_cfg.nHeartbeatSeconds/2){
+        m_cfg.pingIntervalSeconds = m_cfg.nHeartbeatSeconds/2;
+    }
     lws_protocols protocols[] = { { m_protocolName.c_str(), &WsServer::cb_lws, sizeof(void*), kSocketBufSize, 0, nullptr, kSocketBufSize },
                                   {
                                       nullptr, nullptr, 0, 0, 0, nullptr, 0 // Quasi null terminator
@@ -105,44 +112,65 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
     case LWS_CALLBACK_TIMER:
         {
             SvrConnection* conn = *(SvrConnection**)userData;
-            time_t now = time(NULL);
-            
-            // 检查总体活动超时（心跳超时）
-            // 增加2秒的冗余时间，避免因计时误差导致的误判
-            static const int kMaxHeartbeatRedundancy = 5;
-            if (now - conn->last_activity > m_cfg.nHeartbeatSeconds + kMaxHeartbeatRedundancy) {
-                SLOGI() << "timeout, close connection!" << m_cfg.nHeartbeatSeconds << " conn="<<conn;
-                lws_close_reason(websocket, LWS_CLOSE_STATUS_GOINGAWAY,
-                                (unsigned char *)"heartbeat timeout", 18);
-                return -1;
+            if (!conn) {
+                lwsl_err("invalid connection in TIMER callback");
+                break;  // 使用break而不是return -1，避免影响其他连接
             }
-            
-            // 检查是否需要发送ping（ping间隔独立于心跳间隔）
-            // 只有当距离上次ping的时间超过ping间隔，并且距离上次活动的时间也超过一定时间才发送ping
-            if (now - conn->last_ping >= m_cfg.pingIntervalSeconds && 
-                now - conn->last_activity >= m_cfg.pingIntervalSeconds/2) {
-                lws_send_ping(websocket);
-                conn->last_ping = now;
-                conn->ping_timeout_count++;
-                
-                if (conn->ping_timeout_count > m_cfg.nPingTimeoutCount) {
-                    SLOGI() << "ping timeout, close connection!" << conn->ping_timeout_count << " conn"<<conn;
-                    lws_close_reason(websocket, LWS_CLOSE_STATUS_POLICY_VIOLATION,
-                                    (unsigned char *)"too many ping timeouts", 22);
-                    return -1;
+            time_t now = time(NULL);
+
+            // 1. 检查心跳超时（基于最后活动时间）
+            // 如果客户端在nHeartbeatSeconds时间内没有任何活动（包括发送数据和pong），则关闭连接
+            if (now - conn->last_activity > m_cfg.nHeartbeatSeconds) {
+                SLOGI() << "heartbeat timeout, close connection! timeout=" << m_cfg.nHeartbeatSeconds
+                       << "s, inactive=" << (now - conn->last_activity) << "s, conn=" << conn;
+                lws_close_reason(websocket, LWS_CLOSE_STATUS_GOINGAWAY,
+                                (unsigned char *)"heartbeat timeout", 17);
+                return -1;  // 关闭连接，不需要重设定时器
+            }
+
+            // 2. 检查是否需要发送ping
+            // 只有在客户端空闲（距离上次活动超过ping间隔）时才需要发送ping来检测连接
+            // 如果客户端一直有活动，说明连接正常，不需要发送ping
+            if (now - conn->last_activity >= m_cfg.pingIntervalSeconds) {
+                // 检查是否到了发送ping的时间
+                if (now - conn->last_ping >= m_cfg.pingIntervalSeconds) {
+                    // 检查上一次ping是否超时（发送ping后一直没收到pong）
+                    if (conn->ping_timeout_count >= m_cfg.nPingTimeoutCount) {
+                        SLOGI() << "ping timeout count exceeded, close connection! count="
+                               << conn->ping_timeout_count << ", max=" << m_cfg.nPingTimeoutCount
+                               << ", conn=" << conn;
+                        lws_close_reason(websocket, LWS_CLOSE_STATUS_POLICY_VIOLATION,
+                                        (unsigned char *)"ping timeout", 12);
+                        return -1;  // 关闭连接
+                    }
+
+                    // 发送ping
+                    lws_send_ping(websocket);
+                    conn->last_ping = now;
+                    conn->ping_timeout_count++;  // 假设会超时，收到pong时会清零
+                    SLOGI() << "send ping, count=" << conn->ping_timeout_count << ", conn=" << conn;
                 }
             }
-            
-            lws_set_timer_usecs(websocket, m_cfg.nHeartbeatSeconds * LWS_USEC_PER_SEC);
+
+            // 3. 重设定时器
+            // 使用ping间隔和心跳超时中较小的值作为定时器间隔
+            // 这样可以确保及时发送ping和检查心跳超时
+            uint32_t timer_interval = smin(m_cfg.pingIntervalSeconds, m_cfg.nHeartbeatSeconds);
+            if (timer_interval < 1) {
+                timer_interval = 1;  // 最小1秒
+            }
+            lws_set_timer_usecs(websocket, timer_interval * LWS_USEC_PER_SEC);
         }
     break;
     case LWS_CALLBACK_RECEIVE_PONG:
     {
         SvrConnection* conn = *(SvrConnection**)userData;
         if (conn) {
-            conn->ping_timeout_count = 0;
-            conn->last_activity = time(NULL); // 只更新活动时间，不更新last_ping
-            SLOGI() << "recv pong, connection!" << conn;
+            conn->ping_timeout_count = 0;  // 收到pong，清零超时计数器
+            conn->last_activity = time(NULL);  // 更新最后活动时间
+            SLOGI() << "recv pong, reset ping timeout counter, conn=" << conn;
+        } else {
+            lwsl_err("invalid connection in RECEIVE_PONG callback");
         }
     }
     break;
@@ -168,8 +196,14 @@ int WsServer::handler(lws *websocket, lws_callback_reasons reasons,
             {
                 *(SvrConnection **)userData = (SvrConnection *)connection;
                 connection->last_activity = time(NULL);
-                connection->last_ping = connection->last_activity; // 初始化last_ping
-                lws_set_timer_usecs(websocket, m_cfg.nHeartbeatSeconds * LWS_USEC_PER_SEC);
+                // 心跳数据已在SvrConnection构造函数中初始化
+                // 设置定时器
+                uint32_t timer_interval = smin(m_cfg.pingIntervalSeconds, m_cfg.nHeartbeatSeconds);
+                if (timer_interval < 1) {
+                    timer_interval = 1;
+                }
+                lws_set_timer_usecs(websocket, timer_interval * LWS_USEC_PER_SEC);
+                SLOGI() << "connection established, timer_interval=" << timer_interval << "s, conn=" << connection;
             }
         }
         break;

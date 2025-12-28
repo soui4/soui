@@ -814,6 +814,10 @@ void CChessGame::OnTableInfo(IEvtArgs *e)
     {
         OnStageChanged(STAGE_WAIT_START);
     }
+    else
+    {
+        OnStageChanged(STAGE_CONTINUE);
+    }
 }
 
 void CChessGame::PlayWattingAnimation(LPCTSTR pszTip)

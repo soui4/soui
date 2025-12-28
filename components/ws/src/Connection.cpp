@@ -9,8 +9,12 @@ SvrConnection::SvrConnection(lws_context *ctx, lws *socket,ISvrListener *pSvrLis
     , m_socket(socket)
     , m_msgId(0)
     , m_svrListener(pSvrListener)
+    , m_id(0)
+    , m_groupId(0)
 {
-    last_activity = last_ping =0;
+    time_t now = time(NULL);
+    last_activity = now;
+    last_ping = now;
     ping_timeout_count = 0;
 }
 
@@ -49,7 +53,8 @@ void SvrConnection::sendBuf()
         std::vector<unsigned char> buf;
         buf.resize(msgData.buf.length() + LWS_PRE);
         memcpy(buf.data() + LWS_PRE, msgData.buf.data(), msgData.buf.length());
-        if (int n = lws_write(m_socket, buf.data() + LWS_PRE, msgData.buf.length(), msgData.bBinary ? LWS_WRITE_BINARY : LWS_WRITE_TEXT) < 0)
+        int n = lws_write(m_socket, buf.data() + LWS_PRE, msgData.buf.length(), msgData.bBinary ? LWS_WRITE_BINARY : LWS_WRITE_TEXT);
+        if (n < 0)
         {
             lwsl_err("%s: WRITEABLE: %d\n", __func__, n);
             // todo:close the connect

@@ -24,7 +24,7 @@ class WsClient : public TObjRefImpl<IWsClient> {
     // IConnection methods
     STDMETHODIMP_(int) isValid(THIS) SCONST OVERRIDE
     {
-        return m_connected || !m_finished;
+        return m_connected && !m_finished;
     }
 
     STDMETHODIMP_(int) sendText(THIS_ const char *text, int nLen DEF_VAL(-1)) OVERRIDE

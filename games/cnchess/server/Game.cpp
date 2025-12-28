@@ -90,9 +90,7 @@ void CGameTable::OnRemovePlayer(int seatId)
             SLOGW()<<"player is null";
             return;
         }
-        if(m_state == TABLE_STATE_PLAYING){
-            OnPlayerLeave(seatId, pClient);
-        }
+        OnPlayerLeave(seatId, pClient);
         m_clients[seatId] = nullptr;
         delete pClient;
     }

@@ -37,6 +37,7 @@ public:
             int length = sizeof(GAME_TABLE_INFO) + (pTableInfo->nPlayers-1) * sizeof(SEAT_INFO);
             GAME_TABLE_INFO *table = (GAME_TABLE_INFO *)malloc(length);
             memcpy(table, pTableInfo, length);
+            m_pLobby->OnTableInfo(table, length);
             m_tables.insert(std::make_pair(pTableInfo->nTableId, std::shared_ptr<GAME_TABLE_INFO>(table, free)));
             pTableInfo = (GAME_TABLE_INFO *)((BYTE *)pTableInfo + length);
         }
