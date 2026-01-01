@@ -53,7 +53,7 @@ SLog::~SLog()
 #ifdef _WIN32
         int nLen = _snprintf(logbuf2, kMaxLog, "tid=%u,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
 #else
-        int nLen = _snprintf(logbuf2, kMaxLog, "tid=%ld,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
+        int nLen = _snprintf(logbuf2, kMaxLog, "tid=%ld,%04d-%02d-%02d %02d:%02d:%02d %03dms %s,%s %s %s:%d\n", (int64_t)tid, wtm.wYear, wtm.wMonth, wtm.wDay, wtm.wHour, wtm.wMinute, wtm.wSecond, wtm.wMilliseconds, m_tag, m_logBuf, m_func, m_file, m_line);
 #endif //_WIN32
         if (nLen > 0)
         {

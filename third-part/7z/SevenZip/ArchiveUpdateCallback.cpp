@@ -146,9 +146,9 @@ STDMETHODIMP ArchiveUpdateCallback::GetProperty( UInt32 index, PROPID propID, PR
 		case kpidIsDir:		prop = fileInfo.IsDirectory; break;
 		case kpidSize:		prop = fileInfo.Size; break;
 		case kpidAttrib:	prop = fileInfo.Attributes; break;
-		case kpidCTime:		prop = fileInfo.CreationTime; break;
-		case kpidATime:		prop = fileInfo.LastAccessTime; break;
-		case kpidMTime:		prop = fileInfo.LastWriteTime; break;
+		case kpidCTime:		prop = (uint64_t)fileInfo.CreationTime; break;
+		case kpidATime:		prop = (uint64_t)fileInfo.LastAccessTime; break;
+		case kpidMTime:		prop = (uint64_t)fileInfo.LastWriteTime; break;
 	}
 
 	prop.Detach( value );
