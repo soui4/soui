@@ -17,52 +17,23 @@
 #include "SkColor_opts_neon.h"
 #include <arm_neon.h>
 
-#ifdef SK_CPU_ARM64
 static inline uint8x8x4_t sk_vld4_u8_arm64_3(const SkPMColor* SK_RESTRICT & src) {
-    uint8x8x4_t vsrc;
-    uint8x8_t vsrc_0, vsrc_1, vsrc_2;
-
-    asm (
-        "ld4    {v0.8b - v3.8b}, [%[src]], #32 \t\n"
-        "mov    %[vsrc0].8b, v0.8b             \t\n"
-        "mov    %[vsrc1].8b, v1.8b             \t\n"
-        "mov    %[vsrc2].8b, v2.8b             \t\n"
-        : [vsrc0] "=w" (vsrc_0), [vsrc1] "=w" (vsrc_1),
-          [vsrc2] "=w" (vsrc_2), [src] "+&r" (src)
-        : : "v0", "v1", "v2", "v3"
-    );
-
-    vsrc.val[0] = vsrc_0;
-    vsrc.val[1] = vsrc_1;
-    vsrc.val[2] = vsrc_2;
-
-    return vsrc;
+    uint8x8x4_t vsrc = vld4_u8((uint8_t*)src);
+    src += 8; // Increment src by 8 pixels (32 bytes)
+    // Only return the first 3 channels (RGB), ignoring alpha
+    uint8x8x4_t result;
+    result.val[0] = vsrc.val[0]; // R
+    result.val[1] = vsrc.val[1]; // G
+    result.val[2] = vsrc.val[2]; // B
+    // result.val[3] is not set since this function only returns 3 channels
+    return result;
 }
 
 static inline uint8x8x4_t sk_vld4_u8_arm64_4(const SkPMColor* SK_RESTRICT & src) {
-    uint8x8x4_t vsrc;
-    uint8x8_t vsrc_0, vsrc_1, vsrc_2, vsrc_3;
-
-    asm (
-        "ld4    {v0.8b - v3.8b}, [%[src]], #32 \t\n"
-        "mov    %[vsrc0].8b, v0.8b             \t\n"
-        "mov    %[vsrc1].8b, v1.8b             \t\n"
-        "mov    %[vsrc2].8b, v2.8b             \t\n"
-        "mov    %[vsrc3].8b, v3.8b             \t\n"
-        : [vsrc0] "=w" (vsrc_0), [vsrc1] "=w" (vsrc_1),
-          [vsrc2] "=w" (vsrc_2), [vsrc3] "=w" (vsrc_3),
-          [src] "+&r" (src)
-        : : "v0", "v1", "v2", "v3"
-    );
-
-    vsrc.val[0] = vsrc_0;
-    vsrc.val[1] = vsrc_1;
-    vsrc.val[2] = vsrc_2;
-    vsrc.val[3] = vsrc_3;
-
-    return vsrc;
+    uint8x8x4_t vsrc = vld4_u8((uint8_t*)src);
+    src += 8; // Increment src by 8 pixels (32 bytes)
+    return vsrc; // Return all 4 channels (RGBA)
 }
-#endif
 
 void S32_D565_Opaque_neon(uint16_t* SK_RESTRICT dst,
                            const SkPMColor* SK_RESTRICT src, int count,
@@ -119,25 +90,7 @@ void S32_D565_Blend_neon(uint16_t* SK_RESTRICT dst,
         uint16x8_t vres_r, vres_g, vres_b;
 
         // Load src
-#ifdef SK_CPU_ARM64
         vsrc = sk_vld4_u8_arm64_3(src);
-#else
-        {
-        register uint8x8_t d0 asm("d0");
-        register uint8x8_t d1 asm("d1");
-        register uint8x8_t d2 asm("d2");
-        register uint8x8_t d3 asm("d3");
-
-        asm (
-            "vld4.8    {d0-d3},[%[src]]!"
-            : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3), [src] "+&r" (src)
-            :
-        );
-        vsrc.val[0] = d0;
-        vsrc.val[1] = d1;
-        vsrc.val[2] = d2;
-        }
-#endif
 
         // Load and unpack dst
         vdst = vld1q_u16(dst);
@@ -186,272 +139,124 @@ void S32_D565_Blend_neon(uint16_t* SK_RESTRICT dst,
         } while (--count != 0);
     }
 }
-
-#ifdef SK_CPU_ARM32
-void S32A_D565_Opaque_neon(uint16_t* SK_RESTRICT dst,
-                           const SkPMColor* SK_RESTRICT src, int count,
-                           U8CPU alpha, int /*x*/, int /*y*/) {
-    SkASSERT(255 == alpha);
-
-    if (count >= 8) {
-        uint16_t* SK_RESTRICT keep_dst = 0;
-
-        asm volatile (
-                      "ands       ip, %[count], #7            \n\t"
-                      "vmov.u8    d31, #1<<7                  \n\t"
-                      "vld1.16    {q12}, [%[dst]]             \n\t"
-                      "vld4.8     {d0-d3}, [%[src]]           \n\t"
-                      // Thumb does not support the standard ARM conditional
-                      // instructions but instead requires the 'it' instruction
-                      // to signal conditional execution
-                      "it eq                                  \n\t"
-                      "moveq      ip, #8                      \n\t"
-                      "mov        %[keep_dst], %[dst]         \n\t"
-
-                      "add        %[src], %[src], ip, LSL#2   \n\t"
-                      "add        %[dst], %[dst], ip, LSL#1   \n\t"
-                      "subs       %[count], %[count], ip      \n\t"
-                      "b          9f                          \n\t"
-                      // LOOP
-                      "2:                                         \n\t"
-
-                      "vld1.16    {q12}, [%[dst]]!            \n\t"
-                      "vld4.8     {d0-d3}, [%[src]]!          \n\t"
-                      "vst1.16    {q10}, [%[keep_dst]]        \n\t"
-                      "sub        %[keep_dst], %[dst], #8*2   \n\t"
-                      "subs       %[count], %[count], #8      \n\t"
-                      "9:                                         \n\t"
-                      "pld        [%[dst],#32]                \n\t"
-                      // expand 0565 q12 to 8888 {d4-d7}
-                      "vmovn.u16  d4, q12                     \n\t"
-                      "vshr.u16   q11, q12, #5                \n\t"
-                      "vshr.u16   q10, q12, #6+5              \n\t"
-                      "vmovn.u16  d5, q11                     \n\t"
-                      "vmovn.u16  d6, q10                     \n\t"
-                      "vshl.u8    d4, d4, #3                  \n\t"
-                      "vshl.u8    d5, d5, #2                  \n\t"
-                      "vshl.u8    d6, d6, #3                  \n\t"
-
-                      "vmovl.u8   q14, d31                    \n\t"
-                      "vmovl.u8   q13, d31                    \n\t"
-                      "vmovl.u8   q12, d31                    \n\t"
-
-                      // duplicate in 4/2/1 & 8pix vsns
-                      "vmvn.8     d30, d3                     \n\t"
-                      "vmlal.u8   q14, d30, d6                \n\t"
-                      "vmlal.u8   q13, d30, d5                \n\t"
-                      "vmlal.u8   q12, d30, d4                \n\t"
-                      "vshr.u16   q8, q14, #5                 \n\t"
-                      "vshr.u16   q9, q13, #6                 \n\t"
-                      "vaddhn.u16 d6, q14, q8                 \n\t"
-                      "vshr.u16   q8, q12, #5                 \n\t"
-                      "vaddhn.u16 d5, q13, q9                 \n\t"
-                      "vqadd.u8   d6, d6, d0                  \n\t"  // moved up
-                      "vaddhn.u16 d4, q12, q8                 \n\t"
-                      // intentionally don't calculate alpha
-                      // result in d4-d6
-
-                      "vqadd.u8   d5, d5, d1                  \n\t"
-                      "vqadd.u8   d4, d4, d2                  \n\t"
-
-                      // pack 8888 {d4-d6} to 0565 q10
-                      "vshll.u8   q10, d6, #8                 \n\t"
-                      "vshll.u8   q3, d5, #8                  \n\t"
-                      "vshll.u8   q2, d4, #8                  \n\t"
-                      "vsri.u16   q10, q3, #5                 \n\t"
-                      "vsri.u16   q10, q2, #11                \n\t"
-
-                      "bne        2b                          \n\t"
-
-                      "1:                                         \n\t"
-                      "vst1.16      {q10}, [%[keep_dst]]      \n\t"
-                      : [count] "+r" (count)
-                      : [dst] "r" (dst), [keep_dst] "r" (keep_dst), [src] "r" (src)
-                      : "ip", "cc", "memory", "d0","d1","d2","d3","d4","d5","d6","d7",
-                      "d16","d17","d18","d19","d20","d21","d22","d23","d24","d25","d26","d27","d28","d29",
-                      "d30","d31"
-                      );
-    }
-    else
-    {   // handle count < 8
-        uint16_t* SK_RESTRICT keep_dst = 0;
-
-        asm volatile (
-                      "vmov.u8    d31, #1<<7                  \n\t"
-                      "mov        %[keep_dst], %[dst]         \n\t"
-
-                      "tst        %[count], #4                \n\t"
-                      "beq        14f                         \n\t"
-                      "vld1.16    {d25}, [%[dst]]!            \n\t"
-                      "vld1.32    {q1}, [%[src]]!             \n\t"
-
-                      "14:                                        \n\t"
-                      "tst        %[count], #2                \n\t"
-                      "beq        12f                         \n\t"
-                      "vld1.32    {d24[1]}, [%[dst]]!         \n\t"
-                      "vld1.32    {d1}, [%[src]]!             \n\t"
-
-                      "12:                                        \n\t"
-                      "tst        %[count], #1                \n\t"
-                      "beq        11f                         \n\t"
-                      "vld1.16    {d24[1]}, [%[dst]]!         \n\t"
-                      "vld1.32    {d0[1]}, [%[src]]!          \n\t"
-
-                      "11:                                        \n\t"
-                      // unzips achieve the same as a vld4 operation
-                      "vuzp.u16   q0, q1                      \n\t"
-                      "vuzp.u8    d0, d1                      \n\t"
-                      "vuzp.u8    d2, d3                      \n\t"
-                      // expand 0565 q12 to 8888 {d4-d7}
-                      "vmovn.u16  d4, q12                     \n\t"
-                      "vshr.u16   q11, q12, #5                \n\t"
-                      "vshr.u16   q10, q12, #6+5              \n\t"
-                      "vmovn.u16  d5, q11                     \n\t"
-                      "vmovn.u16  d6, q10                     \n\t"
-                      "vshl.u8    d4, d4, #3                  \n\t"
-                      "vshl.u8    d5, d5, #2                  \n\t"
-                      "vshl.u8    d6, d6, #3                  \n\t"
-
-                      "vmovl.u8   q14, d31                    \n\t"
-                      "vmovl.u8   q13, d31                    \n\t"
-                      "vmovl.u8   q12, d31                    \n\t"
-
-                      // duplicate in 4/2/1 & 8pix vsns
-                      "vmvn.8     d30, d3                     \n\t"
-                      "vmlal.u8   q14, d30, d6                \n\t"
-                      "vmlal.u8   q13, d30, d5                \n\t"
-                      "vmlal.u8   q12, d30, d4                \n\t"
-                      "vshr.u16   q8, q14, #5                 \n\t"
-                      "vshr.u16   q9, q13, #6                 \n\t"
-                      "vaddhn.u16 d6, q14, q8                 \n\t"
-                      "vshr.u16   q8, q12, #5                 \n\t"
-                      "vaddhn.u16 d5, q13, q9                 \n\t"
-                      "vqadd.u8   d6, d6, d0                  \n\t"  // moved up
-                      "vaddhn.u16 d4, q12, q8                 \n\t"
-                      // intentionally don't calculate alpha
-                      // result in d4-d6
-
-                      "vqadd.u8   d5, d5, d1                  \n\t"
-                      "vqadd.u8   d4, d4, d2                  \n\t"
-
-                      // pack 8888 {d4-d6} to 0565 q10
-                      "vshll.u8   q10, d6, #8                 \n\t"
-                      "vshll.u8   q3, d5, #8                  \n\t"
-                      "vshll.u8   q2, d4, #8                  \n\t"
-                      "vsri.u16   q10, q3, #5                 \n\t"
-                      "vsri.u16   q10, q2, #11                \n\t"
-
-                      // store
-                      "tst        %[count], #4                \n\t"
-                      "beq        24f                         \n\t"
-                      "vst1.16    {d21}, [%[keep_dst]]!       \n\t"
-
-                      "24:                                        \n\t"
-                      "tst        %[count], #2                \n\t"
-                      "beq        22f                         \n\t"
-                      "vst1.32    {d20[1]}, [%[keep_dst]]!    \n\t"
-
-                      "22:                                        \n\t"
-                      "tst        %[count], #1                \n\t"
-                      "beq        21f                         \n\t"
-                      "vst1.16    {d20[1]}, [%[keep_dst]]!    \n\t"
-
-                      "21:                                        \n\t"
-                      : [count] "+r" (count)
-                      : [dst] "r" (dst), [keep_dst] "r" (keep_dst), [src] "r" (src)
-                      : "ip", "cc", "memory", "d0","d1","d2","d3","d4","d5","d6","d7",
-                      "d16","d17","d18","d19","d20","d21","d22","d23","d24","d25","d26","d27","d28","d29",
-                      "d30","d31"
-                      );
-    }
-}
-
-#else // #ifdef SK_CPU_ARM32
-
 void S32A_D565_Opaque_neon(uint16_t* SK_RESTRICT dst,
                            const SkPMColor* SK_RESTRICT src, int count,
                            U8CPU alpha, int /*x*/, int /*y*/) {
     SkASSERT(255 == alpha);
 
     if (count >= 16) {
-        asm (
-            "movi    v4.8h, #0x80                   \t\n"
-
-            "1:                                     \t\n"
-            "sub     %[count], %[count], #16        \t\n"
-            "ld1     {v16.8h-v17.8h}, [%[dst]]      \t\n"
-            "ld4     {v0.16b-v3.16b}, [%[src]], #64 \t\n"
-            "prfm    pldl1keep, [%[src],#512]       \t\n"
-            "prfm    pldl1keep, [%[dst],#256]       \t\n"
-            "ushr    v20.8h, v17.8h, #5             \t\n"
-            "ushr    v31.8h, v16.8h, #5             \t\n"
-            "xtn     v6.8b, v31.8h                  \t\n"
-            "xtn2    v6.16b, v20.8h                 \t\n"
-            "ushr    v20.8h, v17.8h, #11            \t\n"
-            "shl     v19.16b, v6.16b, #2            \t\n"
-            "ushr    v31.8h, v16.8h, #11            \t\n"
-            "xtn     v22.8b, v31.8h                 \t\n"
-            "xtn2    v22.16b, v20.8h                \t\n"
-            "shl     v18.16b, v22.16b, #3           \t\n"
-            "mvn     v3.16b, v3.16b                 \t\n"
-            "xtn     v16.8b, v16.8h                 \t\n"
-            "mov     v7.16b, v4.16b                 \t\n"
-            "xtn2    v16.16b, v17.8h                \t\n"
-            "umlal   v7.8h, v3.8b, v19.8b           \t\n"
-            "shl     v16.16b, v16.16b, #3           \t\n"
-            "mov     v22.16b, v4.16b                \t\n"
-            "ushr    v24.8h, v7.8h, #6              \t\n"
-            "umlal   v22.8h, v3.8b, v18.8b          \t\n"
-            "ushr    v20.8h, v22.8h, #5             \t\n"
-            "addhn   v20.8b, v22.8h, v20.8h         \t\n"
-            "cmp     %[count], #16                  \t\n"
-            "mov     v6.16b, v4.16b                 \t\n"
-            "mov     v5.16b, v4.16b                 \t\n"
-            "umlal   v6.8h, v3.8b, v16.8b           \t\n"
-            "umlal2  v5.8h, v3.16b, v19.16b         \t\n"
-            "mov     v17.16b, v4.16b                \t\n"
-            "ushr    v19.8h, v6.8h, #5              \t\n"
-            "umlal2  v17.8h, v3.16b, v18.16b        \t\n"
-            "addhn   v7.8b, v7.8h, v24.8h           \t\n"
-            "ushr    v18.8h, v5.8h, #6              \t\n"
-            "ushr    v21.8h, v17.8h, #5             \t\n"
-            "addhn2  v7.16b, v5.8h, v18.8h          \t\n"
-            "addhn2  v20.16b, v17.8h, v21.8h        \t\n"
-            "mov     v22.16b, v4.16b                \t\n"
-            "addhn   v6.8b, v6.8h, v19.8h           \t\n"
-            "umlal2  v22.8h, v3.16b, v16.16b        \t\n"
-            "ushr    v5.8h, v22.8h, #5              \t\n"
-            "addhn2  v6.16b, v22.8h, v5.8h          \t\n"
-            "uqadd   v7.16b, v1.16b, v7.16b         \t\n"
-#if SK_PMCOLOR_BYTE_ORDER(B,G,R,A)
-            "uqadd   v20.16b, v2.16b, v20.16b       \t\n"
-            "uqadd   v6.16b, v0.16b, v6.16b         \t\n"
-#elif SK_PMCOLOR_BYTE_ORDER(R,G,B,A)
-            "uqadd   v20.16b, v0.16b, v20.16b       \t\n"
-            "uqadd   v6.16b, v2.16b, v6.16b         \t\n"
-#else
-#error "This function only supports BGRA and RGBA."
-#endif
-            "shll    v22.8h, v20.8b, #8             \t\n"
-            "shll    v5.8h, v7.8b, #8               \t\n"
-            "sri     v22.8h, v5.8h, #5              \t\n"
-            "shll    v17.8h, v6.8b, #8              \t\n"
-            "shll2   v23.8h, v20.16b, #8            \t\n"
-            "shll2   v7.8h, v7.16b, #8              \t\n"
-            "sri     v22.8h, v17.8h, #11            \t\n"
-            "sri     v23.8h, v7.8h, #5              \t\n"
-            "shll2   v6.8h, v6.16b, #8              \t\n"
-            "st1     {v22.8h}, [%[dst]], #16        \t\n"
-            "sri     v23.8h, v6.8h, #11             \t\n"
-            "st1     {v23.8h}, [%[dst]], #16        \t\n"
-            "b.ge    1b                             \t\n"
-            : [dst] "+&r" (dst), [src] "+&r" (src), [count] "+&r" (count)
-            :: "cc", "memory", "v0", "v1", "v2", "v3", "v4", "v5", "v6", "v7",
-               "v16", "v17", "v18", "v19", "v20", "v21", "v22", "v23", "v24",
-               "v31"
-        );
+        do {
+            // Load 16 dst uint16 values
+            uint16x8_t vdst_lo = vld1q_u16(dst);
+            uint16x8_t vdst_hi = vld1q_u16(dst + 8);
+            
+            // Load 16 src pixels (64 bytes = 16 pixels * 4 bytes)
+            uint8x16x4_t vsrc = vld4q_u8((const uint8_t*)src);
+            
+            // Alias for readability
+            uint8x16_t vr = vsrc.val[0];
+            uint8x16_t vg = vsrc.val[1];
+            uint8x16_t vb = vsrc.val[2];
+            uint8x16_t va = vsrc.val[3];
+            
+            // Process low 8 pixels
+            {
+                uint8x8_t r_lo = vget_low_u8(vr);
+                uint8x8_t g_lo = vget_low_u8(vg);
+                uint8x8_t b_lo = vget_low_u8(vb);
+                uint8x8_t a_lo = vget_low_u8(va);
+                
+                // Extract dst components for low pixels
+                // Green: (vdst_lo >> 5) & 0x3F
+                uint16x8_t dst_g_lo = vshrq_n_u16(vdst_lo, 5);
+                dst_g_lo = vandq_u16(dst_g_lo, vdupq_n_u16(0x3F));
+                
+                // Red: (vdst_lo >> 11) & 0x1F
+                uint16x8_t dst_r_lo = vshrq_n_u16(vdst_lo, 11);
+                
+                // Blue: vdst_lo & 0x1F
+                uint16x8_t dst_b_lo = vandq_u16(vdst_lo, vdupq_n_u16(0x1F));
+                
+                // Inverse alpha for blending: 255 - alpha
+                uint16x8_t inv_a_lo = vsubw_u8(vdupq_n_u16(256), a_lo);
+                
+                // Blend: src + dst * (255 - src_alpha)
+                // For each channel
+                uint16x8_t res_r_lo = vmovl_u8(r_lo); // Initialize with src red
+                uint16x8_t tmp = vmulq_u16(dst_r_lo, inv_a_lo);
+                res_r_lo = vaddq_u16(res_r_lo, vshrq_n_u16(tmp, 8));
+                
+                uint16x8_t res_g_lo = vmovl_u8(g_lo);
+                tmp = vmulq_u16(dst_g_lo, inv_a_lo);
+                res_g_lo = vaddq_u16(res_g_lo, vshrq_n_u16(tmp, 8));
+                
+                uint16x8_t res_b_lo = vmovl_u8(b_lo);
+                tmp = vmulq_u16(dst_b_lo, inv_a_lo);
+                res_b_lo = vaddq_u16(res_b_lo, vshrq_n_u16(tmp, 8));
+                
+                // Convert back to 565 format
+                // Narrow to 5/6/5 bits and pack
+                res_r_lo = vshrq_n_u16(res_r_lo, 3);  // R: 8->5 bits
+                res_g_lo = vshrq_n_u16(res_g_lo, 2);  // G: 8->6 bits
+                res_b_lo = vshrq_n_u16(res_b_lo, 3);  // B: 8->5 bits
+                
+                // Pack to 565: (R << 11) | (G << 5) | B
+                uint16x8_t result_lo = vsliq_n_u16(res_b_lo, res_g_lo, 5);
+                result_lo = vsliq_n_u16(result_lo, res_r_lo, 11);
+                
+                vst1q_u16(dst, result_lo);
+            }
+            
+            // Process high 8 pixels
+            {
+                uint8x8_t r_hi = vget_high_u8(vr);
+                uint8x8_t g_hi = vget_high_u8(vg);
+                uint8x8_t b_hi = vget_high_u8(vb);
+                uint8x8_t a_hi = vget_high_u8(va);
+                
+                // Extract dst components for high pixels
+                uint16x8_t dst_g_hi = vshrq_n_u16(vdst_hi, 5);
+                dst_g_hi = vandq_u16(dst_g_hi, vdupq_n_u16(0x3F));
+                
+                uint16x8_t dst_r_hi = vshrq_n_u16(vdst_hi, 11);
+                
+                uint16x8_t dst_b_hi = vandq_u16(vdst_hi, vdupq_n_u16(0x1F));
+                
+                // Inverse alpha
+                uint16x8_t inv_a_hi = vsubw_u8(vdupq_n_u16(256), a_hi);
+                
+                // Blend high pixels
+                uint16x8_t res_r_hi = vmovl_u8(r_hi);
+                uint16x8_t tmp = vmulq_u16(dst_r_hi, inv_a_hi);
+                res_r_hi = vaddq_u16(res_r_hi, vshrq_n_u16(tmp, 8));
+                
+                uint16x8_t res_g_hi = vmovl_u8(g_hi);
+                tmp = vmulq_u16(dst_g_hi, inv_a_hi);
+                res_g_hi = vaddq_u16(res_g_hi, vshrq_n_u16(tmp, 8));
+                
+                uint16x8_t res_b_hi = vmovl_u8(b_hi);
+                tmp = vmulq_u16(dst_b_hi, inv_a_hi);
+                res_b_hi = vaddq_u16(res_b_hi, vshrq_n_u16(tmp, 8));
+                
+                // Convert back to 565
+                res_r_hi = vshrq_n_u16(res_r_hi, 3);
+                res_g_hi = vshrq_n_u16(res_g_hi, 2);
+                res_b_hi = vshrq_n_u16(res_b_hi, 3);
+                
+                uint16x8_t result_hi = vsliq_n_u16(res_b_hi, res_g_hi, 5);
+                result_hi = vsliq_n_u16(result_hi, res_r_hi, 11);
+                
+                vst1q_u16(dst + 8, result_hi);
+            }
+            
+            src += 16;
+            dst += 16;
+            count -= 16;
+            
+        } while (count >= 16);
     }
-        // Leftovers
+    
+    // Leftovers
     if (count > 0) {
         do {
             SkPMColor c = *src++;
@@ -463,7 +268,6 @@ void S32A_D565_Opaque_neon(uint16_t* SK_RESTRICT dst,
         } while (--count != 0);
     }
 }
-#endif // #ifdef SK_CPU_ARM32
 
 static inline uint16x8_t SkDiv255Round_neon8(uint16x8_t prod) {
     prod += vdupq_n_u16(128);
@@ -497,34 +301,7 @@ void S32A_D565_Blend_neon(uint16_t* SK_RESTRICT dst,
 
             // load pixels
             vdst = vld1q_u16(dst);
-#ifdef SK_CPU_ARM64
             vsrc = sk_vld4_u8_arm64_4(src);
-#else
-#if (__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 6))
-            asm (
-                "vld4.u8 %h[vsrc], [%[src]]!"
-                : [vsrc] "=w" (vsrc), [src] "+&r" (src)
-                : :
-            );
-#else
-            register uint8x8_t d0 asm("d0");
-            register uint8x8_t d1 asm("d1");
-            register uint8x8_t d2 asm("d2");
-            register uint8x8_t d3 asm("d3");
-
-            asm volatile (
-                "vld4.u8    {d0-d3},[%[src]]!;"
-                : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3),
-                  [src] "+&r" (src)
-                : :
-            );
-            vsrc.val[0] = d0;
-            vsrc.val[1] = d1;
-            vsrc.val[2] = d2;
-            vsrc.val[3] = d3;
-#endif
-#endif // #ifdef SK_CPU_ARM64
-
 
             // deinterleave dst
             vdst_g = vshlq_n_u16(vdst, SK_R16_BITS);        // shift green to top of lanes
@@ -634,25 +411,8 @@ void S32_D565_Blend_Dither_neon(uint16_t *dst, const SkPMColor *src,
             int8x8_t vres8_r, vres8_g, vres8_b;
 
             // Load source and add dither
-#ifdef SK_CPU_ARM64
             vsrc = sk_vld4_u8_arm64_3(src);
-#else
-            {
-            register uint8x8_t d0 asm("d0");
-            register uint8x8_t d1 asm("d1");
-            register uint8x8_t d2 asm("d2");
-            register uint8x8_t d3 asm("d3");
 
-            asm (
-                "vld4.8    {d0-d3},[%[src]]! "
-                : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3), [src] "+&r" (src)
-                :
-            );
-            vsrc.val[0] = d0;
-            vsrc.val[1] = d1;
-            vsrc.val[2] = d2;
-            }
-#endif
             vsrc_r = vsrc.val[NEON_R];
             vsrc_g = vsrc.val[NEON_G];
             vsrc_b = vsrc.val[NEON_B];
@@ -1283,26 +1043,8 @@ void S32A_D565_Opaque_Dither_neon (uint16_t * SK_RESTRICT dst,
         }
         }
 #endif
-
-#ifdef SK_CPU_ARM64
         vsrc = sk_vld4_u8_arm64_4(src);
-#else
-        {
-        register uint8x8_t d0 asm("d0");
-        register uint8x8_t d1 asm("d1");
-        register uint8x8_t d2 asm("d2");
-        register uint8x8_t d3 asm("d3");
 
-        asm ("vld4.8    {d0-d3},[%[src]]! "
-            : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3), [src] "+r" (src)
-            :
-        );
-        vsrc.val[0] = d0;
-        vsrc.val[1] = d1;
-        vsrc.val[2] = d2;
-        vsrc.val[3] = d3;
-        }
-#endif
         sa = vsrc.val[NEON_A];
         sr = vsrc.val[NEON_R];
         sg = vsrc.val[NEON_G];
@@ -1452,25 +1194,8 @@ void S32_D565_Opaque_Dither_neon(uint16_t* SK_RESTRICT dst,
         uint16x8_t dst8;
         uint8x8x4_t vsrc;
 
-#ifdef SK_CPU_ARM64
         vsrc = sk_vld4_u8_arm64_3(src);
-#else
-        {
-        register uint8x8_t d0 asm("d0");
-        register uint8x8_t d1 asm("d1");
-        register uint8x8_t d2 asm("d2");
-        register uint8x8_t d3 asm("d3");
 
-        asm (
-            "vld4.8    {d0-d3},[%[src]]! "
-            : "=w" (d0), "=w" (d1), "=w" (d2), "=w" (d3), [src] "+&r" (src)
-            :
-        );
-        vsrc.val[0] = d0;
-        vsrc.val[1] = d1;
-        vsrc.val[2] = d2;
-        }
-#endif
         sr = vsrc.val[NEON_R];
         sg = vsrc.val[NEON_G];
         sb = vsrc.val[NEON_B];
@@ -1577,19 +1302,11 @@ void Color32_arm_neon(SkPMColor* dst, const SkPMColor* src, int count,
             // load src color, 8 pixels, 4 64 bit registers
             // (and increment src).
             uint32x2x4_t vsrc;
-#if defined(SK_CPU_ARM32) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 6)))
-            asm (
-                "vld1.32    %h[vsrc], [%[src]]!"
-                : [vsrc] "=w" (vsrc), [src] "+r" (src)
-                : :
-            );
-#else // 64bit targets and Clang
             vsrc.val[0] = vld1_u32(src);
             vsrc.val[1] = vld1_u32(src+2);
             vsrc.val[2] = vld1_u32(src+4);
             vsrc.val[3] = vld1_u32(src+6);
             src += 8;
-#endif
 
             // multiply long by scale, 64 bits at a time,
             // destination into a 128 bit register.
@@ -1619,18 +1336,9 @@ void Color32_arm_neon(SkPMColor* dst, const SkPMColor* src, int count,
 
             // store back the 8 calculated pixels (2 128 bit
             // registers), and increment dst.
-#if defined(SK_CPU_ARM32) && ((__GNUC__ > 4) || ((__GNUC__ == 4) && (__GNUC_MINOR__ > 6)))
-            asm (
-                "vst1.32    %h[vdst], [%[dst]]!"
-                : [dst] "+r" (dst)
-                : [vdst] "w" (vdst)
-                : "memory"
-            );
-#else // 64bit targets and Clang
             vst1q_u32(dst, vdst.val[0]);
             vst1q_u32(dst+4, vdst.val[1]);
             dst += 8;
-#endif
             count -= 8;
 
         } while (count >= 8);

@@ -971,7 +971,7 @@ else()
 endif()
 #message("...........plat....${CMAKE_GENERATOR_PLATFORM}")
 if(BUILD_FOR_ARM)
-    if(MSVC OR NOT CMAKE_SIZEOF_VOID_P EQUAL 8)
+    if(MSVC)
         set(srcs
             ${srcs}
             "src/opts/SkXfermode_opts_none.cpp"

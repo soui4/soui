@@ -50,6 +50,7 @@ void SI8_D16_nofilter_DX_arm(const SkBitmapProcState& s,
         int count8 = count >> 3;
         const uint16_t* SK_RESTRICT xx = (const uint16_t*)(xy + 1);
 
+        #ifdef ENABLE_INLINE_ASM
         asm volatile (
             "cmp        %[count8], #0                  \n\t"  // compare loop counter with 0
             "beq        2f                             \n\t"  // if loop counter == 0, exit
@@ -99,7 +100,63 @@ void SI8_D16_nofilter_DX_arm(const SkBitmapProcState& s,
             : [table] "r" (table), [srcAddr] "r" (srcAddr)
             : "memory", "cc", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11"
         );
+        #else
+        // Process 8 pixels at a time
+        for (i = 0; i < count8; i++) {
+            // Load 8 x-coordinates (16-bit values)
+            uint16_t x0 = xx[0];
+            uint16_t x1 = xx[1];
+            uint16_t x2 = xx[2];
+            uint16_t x3 = xx[3];
+            uint16_t x4 = xx[4];
+            uint16_t x5 = xx[5];
+            uint16_t x6 = xx[6];
+            uint16_t x7 = xx[7];
+            
+            // Ensure coordinates are within bounds
+            SkASSERT(x0 < s.fBitmap->width());
+            SkASSERT(x1 < s.fBitmap->width());
+            SkASSERT(x2 < s.fBitmap->width());
+            SkASSERT(x3 < s.fBitmap->width());
+            SkASSERT(x4 < s.fBitmap->width());
+            SkASSERT(x5 < s.fBitmap->width());
+            SkASSERT(x6 < s.fBitmap->width());
+            SkASSERT(x7 < s.fBitmap->width());
 
+            // Load the source pixels based on coordinates
+            uint8_t src0 = srcAddr[x0];
+            uint8_t src1 = srcAddr[x1];
+            uint8_t src2 = srcAddr[x2];
+            uint8_t src3 = srcAddr[x3];
+            uint8_t src4 = srcAddr[x4];
+            uint8_t src5 = srcAddr[x5];
+            uint8_t src6 = srcAddr[x6];
+            uint8_t src7 = srcAddr[x7];
+
+            // Lookup in color table
+            uint16_t dst0 = table[src0];
+            uint16_t dst1 = table[src1];
+            uint16_t dst2 = table[src2];
+            uint16_t dst3 = table[src3];
+            uint16_t dst4 = table[src4];
+            uint16_t dst5 = table[src5];
+            uint16_t dst6 = table[src6];
+            uint16_t dst7 = table[src7];
+
+            // Store 8 results
+            colors[0] = dst0;
+            colors[1] = dst1;
+            colors[2] = dst2;
+            colors[3] = dst3;
+            colors[4] = dst4;
+            colors[5] = dst5;
+            colors[6] = dst6;
+            colors[7] = dst7;
+
+            colors += 8;
+            xx += 8;
+        }
+        #endif
         for (i = (count & 7); i > 0; --i) {
             src = srcAddr[*xx++]; *colors++ = table[src];
         }
@@ -135,6 +192,7 @@ void SI8_opaque_D32_nofilter_DX_arm(const SkBitmapProcState& s,
         sk_memset32(colors, dstValue, count);
     } else {
         const uint16_t* xx = (const uint16_t*)(xy + 1);
+#ifdef ENABLE_INLINE_ASM
 
         asm volatile (
             "subs       %[count], %[count], #8        \n\t"   // decrement count by 8, set flags
@@ -183,6 +241,64 @@ void SI8_opaque_D32_nofilter_DX_arm(const SkBitmapProcState& s,
             : [table] "r" (table), [srcAddr] "r" (srcAddr)
             : "memory", "cc", "r4", "r5", "r6", "r7", "r8", "r9", "r10", "r11"
         );
+#else
+        int c = count;
+
+        // Process 8 pixels at a time
+        while (c >= 8) {
+            // Load 8 x-coordinates (16-bit values)
+            uint16_t x0 = xx[0];
+            uint16_t x1 = xx[1];
+            uint16_t x2 = xx[2];
+            uint16_t x3 = xx[3];
+            uint16_t x4 = xx[4];
+            uint16_t x5 = xx[5];
+            uint16_t x6 = xx[6];
+            uint16_t x7 = xx[7];
+
+            // Load the source pixels based on coordinates
+            uint8_t src0 = srcAddr[x0];
+            uint8_t src1 = srcAddr[x1];
+            uint8_t src2 = srcAddr[x2];
+            uint8_t src3 = srcAddr[x3];
+            uint8_t src4 = srcAddr[x4];
+            uint8_t src5 = srcAddr[x5];
+            uint8_t src6 = srcAddr[x6];
+            uint8_t src7 = srcAddr[x7];
+
+            // Lookup in color table (multiply by 4 to get index for 32-bit values)
+            SkPMColor dst0 = table[src0];
+            SkPMColor dst1 = table[src1];
+            SkPMColor dst2 = table[src2];
+            SkPMColor dst3 = table[src3];
+            SkPMColor dst4 = table[src4];
+            SkPMColor dst5 = table[src5];
+            SkPMColor dst6 = table[src6];
+            SkPMColor dst7 = table[src7];
+
+            // Store 8 results
+            colors[0] = dst0;
+            colors[1] = dst1;
+            colors[2] = dst2;
+            colors[3] = dst3;
+            colors[4] = dst4;
+            colors[5] = dst5;
+            colors[6] = dst6;
+            colors[7] = dst7;
+
+            colors += 8;
+            xx += 8;
+            c -= 8;
+        }
+
+        // Handle remaining pixels one by one
+        while (c > 0) {
+            uint16_t x = *xx++;
+            uint8_t src = srcAddr[x];
+            *colors++ = table[src];
+            c--;
+        }
+#endif
     }
 
     s.fBitmap->getColorTable()->unlockColors();

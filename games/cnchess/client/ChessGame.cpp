@@ -814,7 +814,7 @@ void CChessGame::OnTableInfo(IEvtArgs *e)
     {
         OnStageChanged(STAGE_WAIT_START);
     }
-    else
+    if (!m_bReady[0] && m_stage != STAGE_PLAYING)
     {
         OnStageChanged(STAGE_CONTINUE);
     }
